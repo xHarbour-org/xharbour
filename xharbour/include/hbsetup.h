@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.20 2004/06/12 13:23:09 druzus Exp $
+ * $Id: hbsetup.h,v 1.21 2004/08/02 20:26:06 likewolf Exp $
  */
 
 /*
@@ -126,7 +126,7 @@
  *
  * By default this is turned on. Define HB_FM_STATISTICS_OFF to turn it off.
 */
-#ifndef HB_FM_STATISTICS_OFF
+#if !defined(HB_FM_STATISTICS_OFF) && !defined(HB_OPT_CON) && !defined(HB_OPT_GUI)
    #define HB_FM_STATISTICS
 #endif
 

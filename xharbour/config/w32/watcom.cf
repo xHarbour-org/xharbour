@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.16 2004/08/02 20:11:13 lf_sfnet Exp $
+# $Id: watcom.cf,v 1.17 2004/09/09 11:48:40 lf_sfnet Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -24,6 +24,10 @@ CPPFLAGS = -j -w2 -d1 -5 -fp5 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT
 CPPFLAGS += -i. -i$(TOP)include -iinclude
 ifeq ($(HB_LIB_COMPILE),)
     CPPFLAGS += -i$(HB_INC_COMPILE)
+endif
+
+ifeq ($(HB_LEX),SIMPLEX)
+CFLAGS += -DSIMPLEX
 endif
 
 # work arround to DOS command line size limit

@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.7 2004/07/29 14:33:10 lf_sfnet Exp $
+ * $Id: gtinfo.ch,v 1.8 2004/07/30 22:14:13 maurifull Exp $
  */
 
 /*
@@ -79,6 +79,7 @@
 #define GTI_WINTITLE      26  /* title */
 #define GTI_ICONFILE      27  /* icon file */
 #define GTI_ICONRES       28  /* icon resource */
+#define GTI_MOUSESTATUS   29  /* mouse enabled = 1 mouse disabled = 0 */
 
 #define GTI_INPUTFD       30  /* Get Standard input steream of application/GT */
 #define GTI_OUTPUTFD      31  /* Get Standard output steream of application/GT */

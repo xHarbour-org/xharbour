@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2004/08/02 21:05:50 lf_sfnet Exp $
+# $Id: Makefile,v 1.1 2004/08/22 17:20:14 lf_sfnet Exp $
 #
 
 ROOT = ../../../
@@ -7,9 +7,10 @@ ROOT = ../../../
 C_SOURCES=\
 	../hvm.c \
 	../fm.c \
+	../classes.c 
 
 LIBNAME=optcon
 
 include $(TOP)$(ROOT)config/lib.cf
 
-CFLAGS := $(CFLAGS) -DHB_NO_PROFILE -DHB_NO_TRACE -DHB_FM_STATISTICS_OFF
+CFLAGS += -DHB_OPT_CON

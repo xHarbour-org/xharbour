@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3421 2004/09/10 17:32:43 druzus Exp $
+ * $Id: ChangeLog,v 1.3422 2004/09/11 10:42:39 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-12 17:35 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * xharbour/config/dos/watcom.cf
+    * reverted C_USR change as I did in w32/watcom.cf.
+  * xharbour/config/w32/watcom.cf
+    * synced with dos/watcom.cf
+  * xharbour/include/gtinfo.ch
+    * added #define for GTI_MOUSESTATUS to easily enable/disable mouse.
+  * xharbour/include/hbsetup.ch
+    * added defines HB_OPT_CON and HB_OPT_GUI to avoid command line
+    * limitation on OpenWatcom/DOS builds.
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/classes.c
+    added check of HB_OPT_CON and HB_OPT_GUI
+  * source/vm/optcon/Makefile
+  * source/vm/optgui/Makefile
+    * added HB_OPT_CON and HB_OPT_GUI to CFLAGS
 
 2004-09-11 12:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/pp/ppcore.c

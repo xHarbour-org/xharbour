@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.127 2004/07/28 22:28:35 ronpinkas Exp $
+ * $Id: classes.c,v 1.128 2004/08/14 07:57:54 ronpinkas Exp $
  */
 
 /*
@@ -162,6 +162,10 @@
 #define BASE_METHODS   BUCKET * 20  /* Incerement unit of number of messages */
 #define HASH_KEY       ( BASE_METHODS / BUCKET )
 
+#if defined(HB_OPT_CON) || defined(HB_OPT_GUI)
+   #define HB_NO_PROFILER
+#endif
+ 
 #ifndef HB_NO_PROFILER
    extern BOOL hb_bProfiler; /* profiler activity status */
 #endif
