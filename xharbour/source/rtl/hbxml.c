@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.21 2004/04/01 22:00:42 druzus Exp $
+ * $Id: hbxml.c,v 1.22 2004/04/02 21:28:37 jonnymind Exp $
  */
 
 /*
@@ -794,7 +794,7 @@ static void mxml_node_read_data( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc, 
 
    if ( iAllocated > iPos + 1 )
    {
-      buf = MXML_REALLOCATOR( buf, iPos + 1 );
+      buf = (char *) MXML_REALLOCATOR( buf, iPos + 1 );
    }
 
    hb_itemPutCRaw( &hbtemp, buf, iPos );
@@ -881,7 +881,7 @@ static MXML_STATUS mxml_node_read_name( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITE
    buf[ iPos ] = 0;
    if ( iAllocated > iPos + 1 )
    {
-      buf = MXML_REALLOCATOR( buf, iPos + 1 );
+      buf = (char *) MXML_REALLOCATOR( buf, iPos + 1 );
    }
    hb_itemPutCRaw( &hbtemp, buf, iPos );
    hb_objSendMsg( pNode,"_CNAME", 1, &hbtemp );
@@ -961,7 +961,7 @@ static void mxml_node_read_directive( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM 
          hb_objSendMsg( pNode,"_NTYPE", 1, &hbtemp );
          if ( iAllocated > iPos + 1 )
          {
-            buf = MXML_REALLOCATOR( buf, iPos + 1 );
+            buf = (char *) MXML_REALLOCATOR( buf, iPos + 1 );
          }
          hb_itemPutCRaw( &hbtemp, buf, iPos );
          hb_objSendMsg( pNode,"_CDATA", 1, &hbtemp );
@@ -1044,7 +1044,7 @@ static void mxml_node_read_pi( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc )
       hbtemp.type = HB_IT_NIL;
       if ( iAllocated > iPos + 1 )
       {
-         buf = MXML_REALLOCATOR( buf, iPos + 1 );
+         buf = (char *) MXML_REALLOCATOR( buf, iPos + 1 );
       }
       hb_itemPutCRaw( &hbtemp, buf, iPos );
       hb_objSendMsg( pNode,"_CDATA", 1, &hbtemp );
@@ -1162,7 +1162,7 @@ static void mxml_node_read_comment( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM do
       buf[ iPos ] = 0;
       if ( iAllocated > iPos + 1 )
       {
-         buf = MXML_REALLOCATOR( buf, iPos + 1 );
+         buf = (char *) MXML_REALLOCATOR( buf, iPos + 1 );
       }
       hb_itemPutCRaw( &hbtemp, buf, iPos );
       hb_objSendMsg( pNode,"_CDATA", 1, &hbtemp );
@@ -1976,7 +1976,7 @@ char * mxml_sgs_extract( MXML_SGS *sgs )
    sgs->buffer[ sgs->length ] = 0;
    if ( sgs->allocated > sgs->length + 1 )
    {
-      ret = MXML_REALLOCATOR( sgs->buffer, sgs->length +1 );
+      ret = (char *) MXML_REALLOCATOR( sgs->buffer, sgs->length +1 );
    }
    MXML_DELETOR( sgs );
 
