@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.122 2002/11/11 18:43:56 what32 Exp $
+ * $Id: xide.prg,v 1.123 2002/11/11 23:18:06 what32 Exp $
  */
 
 /*
@@ -216,7 +216,7 @@ METHOD MainToolBar() CLASS MainFrame
       TCoolBar():Create( MainFrame:ToolTabs:StdTab )
       :CoolBar1:SetStyle( WS_BORDER, .F. )
       With Object :Add( StdTools():Create( MainFrame:ToolTabs:StdTab ) )
-         :GetHandle()
+         Application:ProcessMessages()
          :SetStyle( TBSTYLE_CHECKGROUP )
 
          aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
@@ -224,7 +224,6 @@ METHOD MainToolBar() CLASS MainFrame
                           'RadioGroup', 'Panel', 'ActionList' }
          FOR n :=0 TO 16
              oTool := ToolButton():Create( MainFrame:ToolTabs:StdTab:StdTools )
-
              oTool:Action := {|oItem| FormEdit:OnMenuCommand( oItem ) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
              oTool:Hint   := aStdTab[ n +1 ]
@@ -249,7 +248,6 @@ METHOD MainToolBar() CLASS MainFrame
       TCoolBar():Create( MainFrame:ToolTabs:Win32 )
       :CoolBar1:SetStyle( WS_BORDER, .F. )
       With Object :Add( WinTools():Create( ::ToolTabs:Win32 ) )
-         :GetHandle()
          :SetStyle( TBSTYLE_CHECKGROUP )
 
          aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'CoolBar', ;

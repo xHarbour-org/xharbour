@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.62 2002/11/11 18:43:55 what32 Exp $
+ * $Id: xInspect.prg,v 1.63 2002/11/11 23:18:06 what32 Exp $
  */
 
 /*
@@ -40,6 +40,7 @@ GLOBAL EXTERNAL Application
 GLOBAL EXTERNAL FormEdit
 GLOBAL EXTERNAL MainFrame
 GLOBAL EXTERNAL ObjInspect
+GLOBAL EXTERNAL ObjTree
 GLOBAL InspTabs
 
 CLASS ObjInspect FROM TForm
@@ -268,10 +269,10 @@ METHOD DelObject( oObj ) CLASS ComboInsp
    LOCAL n,x,y
    IF ( n:= aScan( ::Parent:Objects, {|o|o:handle == oObj:handle} ))>0
 
-      FOR x:=1 to len(::Parent:Parent:ObjTree:TreeView1:Items)
+      FOR x:=1 to Len( ObjTree:TreeView1:Items)
 
-          IF( y:=aScan( ::Parent:Parent:ObjTree:TreeView1:Items[x]:Items,{|o|o:cargo == oObj:handle} ))>0
-             ::Parent:Parent:ObjTree:TreeView1:Items[x]:Items[y]:Delete()
+          IF( y:=aScan( ObjTree:TreeView1:Items[x]:Items,{|o|o:cargo == oObj:handle} ))>0
+             ObjTree:TreeView1:Items[x]:Items[y]:Delete()
              EXIT
           ENDIF
 

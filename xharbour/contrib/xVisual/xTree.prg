@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.19 2002/11/08 05:45:10 what32 Exp $
+ * $Id: xTree.prg,v 1.20 2002/11/11 23:18:06 what32 Exp $
  */
 
 /*
@@ -49,8 +49,6 @@ ENDCLASS
 
 METHOD Create( oParent ) CLASS ObjTree
 
-   ::Super:Create( oParent )
-
    ::FCaption := 'Object Tree'
    ::Name     := "ObjTree"
    ::FLeft    := 0
@@ -58,6 +56,9 @@ METHOD Create( oParent ) CLASS ObjTree
    ::FWidth   := 200
    ::FHeight  := 150
    ::ExStyle  := WS_EX_TOOLWINDOW
+
+   ::Super:Create( oParent )
+
    ::GetHandle()
 RETURN( Self )
 
