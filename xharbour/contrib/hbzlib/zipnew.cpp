@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.20 2004/03/24 03:18:05 lculik Exp $
+ * $Id: zipnew.cpp,v 1.21 2004/05/18 16:21:28 srobert Exp $
  */
 
 /*
@@ -984,6 +984,142 @@ DWORD GetCurrentFileSize( LPCTSTR szFile )
 
 #endif
 
+
+int hb_UnzipAll(char *szFile,PHB_ITEM pBlock,BOOL bWithPath,char *szPassWord,char *pbyBuffer,PHB_ITEM pDiskBlock,PHB_ITEM pProgress)
+{
+bool iReturn=true;
+uLong uiCount=0;
+int iCause=0;
+int iMode=true;
+CZipArchive szZip;
+BOOL bChange=FALSE;
+   SpanCallback span;
+   SpanActionCallback spanac;
+
+   char  * szPath = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
+
+
+   if ( HB_IS_BLOCK( pProgress ) )
+   {
+      pProgressInfo = pProgress;
+      szZip.SetCallback( &spanac );
+   }
+
+    if (szPassWord != NULL){
+        szZip.SetPassword(szPassWord);
+      }
+     iMode=hb_CheckSpanMode(szFile);
+
+     try {
+        if(iMode==0) {
+            szZip.Open(szFile,CZipArchive::zipOpen,0);
+                     }
+        else {
+            if (iMode ==-1) {
+                szZip.SetSpanCallback( &span );
+                szZip.Open(szFile,CZipArchive::zipOpen,0);
+                            }
+             else {
+                if (iMode==-2) {
+                    szZip.Open(szFile,CZipArchive::zipOpen,1);
+                              }
+                else {
+                    iReturn =false;
+                     }
+                  }
+             }
+    }
+    catch (CZipException& e)    {
+      iCause=e.m_iCause       ;
+	}
+
+ if (iReturn) {
+
+      if ( pbyBuffer )
+      {
+         if (hb_stricmp(pbyBuffer,".\\")==0 )
+         {
+            hb_fsCurDirBuffEx( 0, (BYTE*) szPath, _POSIX_PATH_MAX + 1 );
+         }
+         else
+         {
+            strcpy(szPath,pbyBuffer);
+         }
+
+         hb_fsChDir((BYTE*)"\\");
+         szZip.SetRootPath(szPath);
+      }
+
+    for (uiCount=0;uiCount<(int)szZip.GetCount();uiCount++){
+		CZipFileHeader fh;
+            const char *  szFileNameInZip;
+            CZipString szTempString;
+            PHB_FNAME pOut;
+            szZip.GetFileInfo( fh, ( WORD )uiCount );
+            szTempString  = ( LPCTSTR )fh.GetFileName( );
+            szFileNameInZip = ( const char * )szTempString;
+            pOut = hb_fsFNameSplit( ( char * ) szFileNameInZip );
+            if ( szPath == NULL )
+            {
+               szPath = ( char* )pOut->szDrive;
+               pOut->szDrive = "";
+               hb_fsFNameMerge( ( char* )szFileNameInZip, pOut );
+               bChange = TRUE;
+            }
+            szZip.SetRootPath(szPath);
+            hb_xfree( pOut );
+
+
+            if( pBlock  !=  NULL )
+            {
+               HB_ITEM FileName;
+               HB_ITEM Pos;
+
+               Pos.type = HB_IT_NIL;
+               FileName.type = HB_IT_NIL;
+               hb_vmEvalBlockV( pBlock, 2, hb_itemPutC( &FileName, ( char * )szFileNameInZip ),hb_itemPutNI(&Pos,uiCount) );
+
+               hb_itemClear( &FileName );
+            }
+
+
+        try {
+                     if (!HB_IS_BLOCK(pProgress))
+                     {
+         
+            szZip.SetPassword(szPassWord);
+            szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+            }
+            else
+            {
+            szZip.SetPassword(szPassWord);
+
+            szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
+            }
+            
+        }
+    catch (CZipException& e)
+	{
+      iCause=e.m_iCause       ;
+	}
+        if(bChange) {
+        bChange=FALSE;
+//        szPath=NULL;
+        }
+
+    }
+
+    }
+   if (szPath)
+   {
+      hb_fsChDir((BYTE*)szPath);
+      hb_xfree(szPath);
+   }
+
+return iReturn;
+}
+
+
 #ifdef __cplusplus
 }
 #endif
@@ -1025,3 +1161,4 @@ int hb_CheckSpanMode( char * szFile )
 
    return iReturn;
 }
+

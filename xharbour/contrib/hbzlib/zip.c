@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.38 2004/05/25 13:36:56 srobert Exp $
+ * $Id: zip.c,v 1.39 2004/05/26 10:34:35 lculik Exp $
  */
 
 /*
@@ -931,6 +931,26 @@ HB_FUNC(SETZIPREADONLY)
 {
    hb_SetZipReadOnly( hb_parl( 1 ) );
 }
+HB_FUNC(HB_UNZIPALLFILE)
+
+{
+    PHB_ITEM pProgress = hb_param( 7, HB_IT_BLOCK );
+    HB_ITEM iProgress;
+    iProgress.type = HB_IT_NIL;
+
+    if( pProgress )
+    {
+        hb_itemCopy( &iProgress, pProgress );
+    }
+
+    if ( ! ISCHAR(6) && ! ISARRAY(6) )
+    { 
+        char szFile[_POSIX_PATH_MAX];
+        strcpy(szFile,hb_parc(1));
+        hb_retl(hb_UnzipAll(hb___CheckFile(szFile),hb_param( 2, HB_IT_BLOCK),ISLOG(3) ? hb_parl(3) : 0 ,hb_parc(4),ISCHAR(5) ? hb_parc(5) : NULL,hb_param( 6, HB_IT_BLOCK),&iProgress));
+    }
+}
+
 #if defined(HB_OS_LINUX)
 
 int GetFileAttributes( char *szEntry )

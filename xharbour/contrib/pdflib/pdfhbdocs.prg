@@ -1,5 +1,5 @@
 /*
- * $Id: pdfhbdoc.c,v 1.1 2004/07/02 04:32:29 lculik Exp $
+ * $Id: pdfhbdocs.prg,v 1.1 2004/07/26 01:32:09 lculik Exp $
  */
 
 /*
@@ -655,10 +655,10 @@ LOCAL ulTempPos := 0
 LOCAL cText
    DEFAULT lBold TO .F.
 
-   iSize := PdfMaxBoxSize( szPDFFile, pText, Iif( bBold, 1, 0 ), pEnd, iRow, pStart )
+   iSize := PdfMaxBoxSize(  pText, Iif( bBold, 1, 0 ), pEnd, iRow, pStart )
 
    FOR each cText in pText
-      setText( szPDFFile, cText, pStart[ hb_enumindex() ], iRow, iSize, pEnd[ hb_enumindex() ], bBold )
+      setText(  cText, pStart[ hb_enumindex() ], iRow, iSize, pEnd[ hb_enumindex() ], lBold )
    NEXT
 
    IF ( lDecRow )
