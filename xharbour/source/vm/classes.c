@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.52 2003/03/30 19:35:08 ronpinkas Exp $
+ * $Id: classes.c,v 1.53 2003/04/01 00:42:08 ronpinkas Exp $
  */
 
 /*
@@ -1205,7 +1205,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, long lID_or_FuncPointer_or_B
          }
       }
 
-      if( wType == HB_OO_MSG_INLINE && lID_or_FuncPointer_or_BlockPointer == NULL )
+      if( wType == (USHORT) HB_OO_MSG_INLINE && lID_or_FuncPointer_or_BlockPointer == 0l )
       {
          hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSADDMSG", 0 );
       }
@@ -1422,7 +1422,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, long lID_or_FuncPointer_or_B
  */
 HB_FUNC( __CLSADDMSG )
 {
-   USHORT   uiClass, uiScope, wType, uiSprClass;
+   USHORT   uiClass, uiScope, wType, uiSprClass = 0;
    char     *szMessage, szAssign[ HB_SYMBOL_NAME_LEN ];
    long     lID_or_FuncPointer_or_BlockPointer;
    PHB_ITEM pInit = NULL;
@@ -1445,7 +1445,7 @@ HB_FUNC( __CLSADDMSG )
 
    // 3
    lID_or_FuncPointer_or_BlockPointer = (long) hb_param( 3, HB_IT_BLOCK );
-   if( lID_or_FuncPointer_or_BlockPointer == NULL )
+   if( lID_or_FuncPointer_or_BlockPointer == 0l )
    {
       lID_or_FuncPointer_or_BlockPointer = hb_parnl( 3 );
    }
@@ -3101,3 +3101,72 @@ HB_FUNC( HB_OBJMSGPTR )
    }
 }
 
+
+/* ================================================ */
+
+/* JC1: get class handle from name
+ *
+ * Param: the name of the class
+ * output: the position of the class in the array of classes, or nothing.
+ */
+UINT hb_clsGetHandleFromName( char *szClassName )
+{
+   PCLASS start = s_pClasses;
+   UINT uPos = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_clsGetHandleFromName(%s)", szClassName));
+
+   while ( s_uiClasses > uPos && strcmp( start->szName, szClassName ) != 0 )
+   {
+      uPos ++;
+      start++;
+   }
+
+   if ( uPos == s_uiClasses )
+   {
+      return 0;
+   }
+   return uPos + 1;
+}
+
+
+HB_FUNC( __CLSGETHANDLEFROMNAME )
+{
+   HB_THREAD_STUB
+   hb_retni( hb_clsGetHandleFromName( hb_parc(1) ) );
+}
+
+
+/* JC1: Return all the data and shared data properties of a class
+ *
+ * Param: the name of the class
+ * output: the position of the class in the array of classes, or nothing.
+ */
+HB_FUNC( __CLASSSELPERSISTENT )
+{
+   USHORT uiClass = ( USHORT ) hb_parni( 1 );
+   PHB_ITEM pReturn = hb_itemNew( NULL );
+
+   if( uiClass && uiClass <= s_uiClasses )
+   {
+      PCLASS pClass = s_pClasses + ( uiClass - 1 );
+      USHORT uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET );
+      USHORT uiAt;
+
+      hb_itemRelease( pReturn );
+      pReturn = hb_itemArrayNew(0);
+                                                /* Create a transfer array  */
+      for( uiAt = 0; uiAt < uiLimit; uiAt++ )
+      {
+         PMETHOD pMethod = pClass->pMethods + uiAt;
+         PHB_DYNS pMessage = ( PHB_DYNS ) pMethod->pMessage;
+         if( pMethod->bIsPersistent )
+         {
+            PHB_ITEM pItem = hb_itemPutC( NULL, pMessage->pSymbol->szName );
+            hb_arrayAddForward( pReturn, pItem );
+         }
+      }
+   }
+
+   hb_itemRelease( hb_itemReturn( pReturn ) );
+}

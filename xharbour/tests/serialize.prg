@@ -1,6 +1,6 @@
 ****************************************************
 * Serialize.prg
-* $Id$
+* $Id: serialize.prg,v 1.1 2003/02/16 00:00:19 jonnymind Exp $
 * Test for the hb_serial family function
 *
 * This serialization functions allow to store consistently any
@@ -25,19 +25,39 @@
 * Giancarlo Niccolai
 *
 
+#include "hbclass.ch"
+
+Class AClass
+   DATA aData PERSISTENT
+
+   METHOD aMethod()
+   METHOD New( cDt ) CONSTRUCTOR
+   HIDDEN:
+   Data aHIdden
+ENDCLASS
+
+METHOD aMethod() CLASS aClass
+   ? "Method from class ", ::aData
+RETURN .T.
+
+METHOD New( cData ) CLASS aClass
+   ::aData := cData
+RETURN .T.
+
+
 Procedure MAIN()
-   LOCAL cTmp
+   LOCAL cTmp, oData
    LOCAL cSerial
 
    CLEAR SCREEN
    @1,10 SAY "X H A R B O U R - Serialization and deserialization tests"
-   ?
 
    cTmp := HB_Serialize( "A string" )
    cTmp += HB_Serialize( 12.4 )
    cTmp += HB_Serialize( CtoD( "2/2/2001" ) )
    cTmp += HB_Serialize( { 1, 2, { "a", "b" }, 3 } )
    cTmp += HB_Serialize( 20 )
+   cTmp += HB_Serialize( AClass():New("A parameter") )
 
    /* now we deserialize */
    cSerial := HB_DeserialBegin( cTmp )
@@ -45,11 +65,14 @@ Procedure MAIN()
    cTmp := HB_DeserialNext( cSerial )
    DO WHILE cTmp != NIL
 
-      IF ValType( cTmp ) == "A"
-         ArrayDump( cTmp, 0 )
-      ELSE
-         ? cTmp
-      ENDIF
+      DO CASE
+         CASE ValType( cTmp ) == "A"
+            ArrayDump( cTmp, 0 )
+         CASE ValType( cTmp ) == "O"
+            cTmp:aMethod()
+         OTHERWISE
+            ? cTmp
+      ENDCASE
 
       cTmp := HB_DeserialNext( cSerial )
    ENDDO

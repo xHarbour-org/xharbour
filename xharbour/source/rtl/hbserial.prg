@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.3 2003/03/10 23:22:00 jonnymind Exp $
+ * $Id: hbserial.prg,v 1.4 2003/04/13 12:35:17 jonnymind Exp $
  */
 
 /*
@@ -54,38 +54,89 @@
 
 FUNCTION HB_Serialize( oObject )
    LOCAL cSerial
-   LOCAL oElem
+   LOCAL oElem, aProperties
 
-   IF ValType( oObject ) == "A"
-      cSerial :="A" + HB_CreateLen8( Len( oObject ) )
-      FOR EACH oElem IN oObject
-         cSerial += HB_Serialize( oElem )
-      NEXT
-   ELSE
-      cSerial := HB_SerializeSimple( oObject )
-   ENDIF
+   SWITCH ValType( oObject )
+      CASE "A"
+         cSerial :="A" + HB_CreateLen8( Len( oObject ) )
+         FOR EACH oElem IN oObject
+            cSerial += HB_Serialize( oElem )
+         NEXT
+      EXIT
+
+      CASE "O"
+         aProperties := __ClassSelPersistent( __ClassH( oObject ) )
+         cSerial := "O" + HB_CreateLen8( Len( aProperties ) )
+         cSerial += HB_SerializeSimple( oObject:ClassName )
+
+         FOR EACH oElem in aProperties
+            cSerial += HB_Serialize( __objSendMsg( oObject, oElem ) )
+         NEXT
+
+      EXIT
+
+      DEFAULT
+         cSerial := HB_SerializeSimple( oObject )
+   END
 RETURN cSerial
 
 FUNCTION HB_Deserialize( cSerial, nMaxLen )
    LOCAL oObject
-   LOCAL oElem
-   LOCAL nLen
+   LOCAL oElem, cClassName, aProperties, oVal
+   LOCAL nLen, nClassID
 
-   IF cSerial[1] == "A"
-      oObject := {}
-      cSerial := Substr( cSerial, 2 )
-      nLen := HB_GetLen8( cSerial )
-      cSerial := Substr( cSerial, 9 )
-      DO WHILE nLen > 0
-         oElem := HB_Deserialize( cSerial, nMaxLen )
-         Aadd( oObject, oElem )
-         cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
-         nLen --
-      ENDDO
-   ELSE
-      // can be NIL on deserialization error
-      oObject := HB_DeserializeSimple( cSerial, nMaxLen )
+   IF Len( cSerial ) < 8
+      RETURN NIL
    ENDIF
+
+   SWITCH cSerial[1]
+      CASE "A"
+         oObject := {}
+         cSerial := Substr( cSerial, 2 )
+         nLen := HB_GetLen8( cSerial )
+         cSerial := Substr( cSerial, 9 )
+         DO WHILE nLen > 0
+            oElem := HB_Deserialize( cSerial, nMaxLen )
+            Aadd( oObject, oElem )
+            cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
+            nLen --
+         ENDDO
+      EXIT
+
+      CASE "O"
+         cSerial := Substr( cSerial, 2 )
+         nLen := HB_GetLen8( cSerial )
+         cSerial := Substr( cSerial, 9 )
+         cClassName := HB_DeserializeSimple( cSerial, 128 )
+         IF cClassName == NIL
+            RETURN NIL
+         ENDIF
+         cSerial :=  Substr( cSerial, HB_SerialNext( cSerial )+1 )
+         // Let's create a new instance of this class, if possible
+         nClassID := __ClsGetHandleFromName( cClassName )
+         IF nClassID == 0
+            // TODO: Rise an error
+            RETURN NIL
+         ENDIF
+         oObject := __ClsInst( nClassId )
+         aProperties := __ClassSelPersistent( nClassId )
+
+         IF Len( aProperties ) != nLen
+            // todo: RISE AN ERROR
+            RETURN NIL
+         ENDIF
+
+         FOR EACH oElem in aProperties
+            oVal := HB_Deserialize( cSerial, nMaxLen )
+            __objSendMsg( oObject, "_" + oElem, oVal )
+            cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
+         NEXT
+         ? "cSerial :", cSerial
+      EXIT
+
+      DEFAULT
+         oObject := HB_DeserializeSimple( cSerial, nMaxLen )
+   END
 
 RETURN oObject
 
