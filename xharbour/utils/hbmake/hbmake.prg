@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.76 2003/06/27 13:47:05 lculik Exp $
+ * $Id: hbmake.prg,v 1.77 2003/07/06 19:15:20 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1269,7 +1269,7 @@ FUNC CreateMakeFile( cFile )
    IF lApollo
       @  3, 40 SAY "Apollo path" GET cmedpath PICT "@s20"
    ENDIF 
-
+cResname += cAllRes
 
 //   @  3, 40 SAY "Obj Files Dir" GET cObjDir PICT "@s15"
 //   @  4, 1  SAY  s_aLangMessages[ 45 ] GET cAppName VALID ! Empty( cAppName )
