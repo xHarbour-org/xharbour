@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.7 2003/12/04 09:26:54 druzus Exp $
+ * $Id: hbver.c,v 1.8 2004/01/16 13:15:40 ignacioortiz Exp $
  */
 
 /*
@@ -243,7 +243,9 @@ char * hb_verPlatform( void )
 
                   osVerEx.dwOSVersionInfoSize = sizeof( osVerEx );
 
-                  if( GetVersionEx( &osVerEx ) )
+                           /* this should not be required, but it seems */
+                           /* the Windows GetVersionEx decl is incorrect */
+                  if( GetVersionEx( ( LPOSVERSIONINFOA ) &osVerEx ) )
                   {
                      /* workstation type */
 

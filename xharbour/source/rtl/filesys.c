@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.61 2004/01/13 00:16:36 andijahja Exp $
+ * $Id: filesys.c,v 1.62 2004/01/16 11:41:20 lculik Exp $
  */
 
 /*
@@ -3449,10 +3449,11 @@ char HB_EXPORT * hb_fileTrim( BYTE * szFile)  /* Caller must free the buffer ret
 
    char * szFileTrim = (char*) szFile;
    ULONG ulPos;
-   szFile = (char * ) hb_xgrab( 255 );
-   ulPos =  hb_strRTrimLen( szFile, strlen( szFile ), FALSE );
-   szFile = hb_strLTrim( szFile, &ulPos );
-   strncpy( szFileTrim, szFile, ulPos );
+
+   szFile = (BYTE * ) hb_xgrab( 255 );
+   ulPos =  hb_strRTrimLen( ( const char *) szFile, strlen( (const char *) szFile ), FALSE );
+   szFile = (BYTE *) hb_strLTrim( ( const char *) szFile, &ulPos );
+   strncpy( szFileTrim, ( const char *) szFile, ulPos );
    szFileTrim[ulPos]  = '\0';
 
    return szFileTrim;
