@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2681 2004/03/30 05:55:33 druzus Exp $
+ * $Id: ChangeLog,v 1.2682 2004/03/30 09:29:44 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,7 +9,7 @@
 */
 
 
-2004-03-30 19:08 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+2004-03-30 11:42 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/gtos2/gtos2.c
     * Completely changed the way it works, it has been broken since day one !!
       First, all calls to VioXXX() functions should use only tileable memory, this is still broken
