@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.8 2002/12/20 19:00:49 ronpinkas Exp $
+* $Id: thread.c,v 1.9 2002/12/20 23:19:41 jonnymind Exp $
 */
 
 /*
@@ -897,14 +897,14 @@ HB_FUNC( WAITFORTHREADS )
 /*
 JC: I am leaving this in the source code for now; you can never know, this could
 be useful in the future.
-
+*/
 #if defined( HB_OS_WIN_32 )
 void hb_SignalObjectAndWait( HB_COND_T hToSignal, HB_MUTEX_T hToWaitFor, DWORD dwMillisec, BOOL bUnused )
 {
     ReleaseMutex( hToSignal );
     WaitForSingleObject( hToWaitFor, dwMillisec );
 }
-#endif */
+#endif 
 
 #endif
 
