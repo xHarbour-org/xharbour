@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.232 2003/07/13 19:34:34 jonnymind Exp $
+ * $Id: hvm.c,v 1.233 2003/07/14 19:18:47 jonnymind Exp $
  */
 
 /*
@@ -602,6 +602,7 @@ void HB_EXPORT hb_vmQuit( void )
 #endif
 
    /* release all remaining items */
+#ifndef HB_THREAD_SUPPORT
    hb_stackRemove( 0 );
    //printf( "After Stack\n" );
 
@@ -609,6 +610,7 @@ void HB_EXPORT hb_vmQuit( void )
    {
       hb_itemClear( &(HB_VM_STACK.Return) );
    }
+#endif
    //printf( "After Return\n" );
 
    if( s_aStatics.type == HB_IT_ARRAY )
@@ -624,10 +626,10 @@ void HB_EXPORT hb_vmQuit( void )
    }
    //printf( "\nAfter Globals\n" );
 
-   #ifndef HB_THREAD_SUPPORT
+#ifndef HB_THREAD_SUPPORT
    // in threads, it is called by the th stack destructor
    hb_memvarsRelease();    /* clear all PUBLIC variables */
-   #endif
+#endif
 
    //printf( "After Memvar\n" );
 
@@ -636,14 +638,19 @@ void HB_EXPORT hb_vmQuit( void )
    hb_gcReleaseAll();
    //printf( "After GC\n" );
 
+
+#ifndef HB_THREAD_SUPPORT
+   //JC1: under threads, we'll kill our stack when needed
+
    hb_memvarsFree();    /* free memory allocated for memvars table */
    //printf( "After memvarsFree\n" );
 
-#ifdef HB_THREAD_SUPPORT
-   hb_threadExit();
-#endif
-
    hb_stackFree();
+#else
+
+    hb_threadExit();
+
+#endif
 
    //printf( "After stackFree\n" );
 

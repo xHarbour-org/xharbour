@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.35 2003/07/13 19:34:33 jonnymind Exp $
+ * $Id: estack.c,v 1.36 2003/07/14 19:18:47 jonnymind Exp $
  */
 
 /*
@@ -181,14 +181,13 @@ void hb_stackInit( void )
 }
 
 void hb_stackFree( void )
-{
-#ifndef HB_THREAD_SUPPORT
+{ 
+   #ifndef HB_THREAD_SUPPORT
+   //JC1: Under threads, stack is freed by the hb_threadExit()
+
    LONG i;
-#endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackFree()"));
-
-   #ifndef HB_THREAD_SUPPORT
 
    i = hb_stack.wItems - 1;
 
@@ -197,10 +196,6 @@ void hb_stackFree( void )
       hb_xfree( hb_stack.pItems[ i-- ] );
    }
    hb_xfree( hb_stack.pItems );
-
-   #else
-
-   hb_threadDestroyStack( &hb_stack );  // destroyes the main stack
 
    #endif
 }

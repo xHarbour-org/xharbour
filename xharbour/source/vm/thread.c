@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.85 2003/07/13 22:26:17 jonnymind Exp $
+* $Id: thread.c,v 1.86 2003/07/14 19:18:47 jonnymind Exp $
 */
 
 /*
@@ -416,15 +416,23 @@ void hb_threadDestroyStack( HB_STACK *pStack )
          hb_itemClear( *pPos );
       }
    }
+   
 
    /* Error handler is never allocated; it resides in the stack, or
       is owned by callers. */
-   if( pStack->errorBlock && pStack->errorBlock->type )
+   if( pStack->errorBlock && pStack->errorBlock->type != HB_IT_NIL )
    {
-      hb_itemClear( pStack->errorBlock );
+      // Harbour should remove the error handler of the main stack
+      // from PRG level or around that.
+      if( pStack != &hb_stack ) {
+         hb_itemClear( pStack->errorBlock );
+      }
    }
 
-   hb_itemClear( pStack->aTryCatchHandlerStack );
+   if (  pStack->aTryCatchHandlerStack &&  pStack->aTryCatchHandlerStack->type != HB_IT_NIL )
+   {
+      //hb_itemClear( pStack->aTryCatchHandlerStack );
+   }
 
    /* Free each element of the stack */
    #ifndef HB_SAFE_ALLOC
@@ -440,7 +448,11 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    free( pStack->pItems );
 
    // releases this thread's memvars
-   hb_memvarsRelease( pStack );
+   if( pStack != &hb_stack )
+   {
+      // Main thread should have them removed before arriving here.
+      hb_memvarsRelease( pStack );
+   }
    hb_xfree( pStack->privateStack );
    hb_xfree( pStack->globalTable );
 
@@ -1873,7 +1885,8 @@ void hb_threadExit( void )
    hb_threadWaitAll();
 
    // the main stack is now destroyed by hb_stack_exit
-   //hb_threadDestroyStack( hb_ht_stack );
+   
+   hb_threadDestroyStack( hb_ht_stack );
    hb_ht_stack = NULL;
 
    /* Destroyng all shell locks mutexes */
