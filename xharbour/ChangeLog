@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2451 2004/03/02 21:12:47 druzus Exp $
+ * $Id: ChangeLog,v 1.2452 2004/03/02 21:55:19 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-02 23:50 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+   * xharbour/source/vm/itemapi.c
+    ! yet another workaround in hb_itemStrVal() for rounding the
+      last digit in big number
+
+   * xharbour/bin/hb-func.sh
+    ! add missing \
+
 2004-03-03 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * utils/hbtest/rt_stra.prg
     ! change result to actual return values :

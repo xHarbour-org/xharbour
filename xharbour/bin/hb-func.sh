@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: hb-func.sh,v 1.13 2004/02/18 21:35:55 druzus Exp $
+# $Id: hb-func.sh,v 1.14 2004/03/02 17:31:28 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -158,7 +158,7 @@ HB_MAIN_FUNC=""
 [ -n "\$TMPDIR" ] || TMPDIR="\$TMP"
 [ -n "\$TMPDIR" ] || TMPDIR="\$TEMP"
 [ -n "\$TMPDIR" ] || TMPDIR="/tmp"
-_TMP_FILE_="${TMPDIR}/hb-build-\$USER-\$\$.c"
+_TMP_FILE_="\${TMPDIR}/hb-build-\$USER-\$\$.c"
 
 ## parse params
 P=( "\$@" ); n=0; DIROUT="."; FILEOUT=""
