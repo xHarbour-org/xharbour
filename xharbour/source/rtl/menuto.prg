@@ -1,5 +1,5 @@
 /*
- * $Id: menuto.prg,v 1.3 2002/03/18 16:25:09 lculik Exp $
+ * $Id: menuto.prg,v 1.4 2002/04/02 04:50:33 walito Exp $
  */
 
 /*
@@ -69,8 +69,9 @@ function __MenuTo( bBlock, cVariable )
       lDeclared := .T.
    else
       lDeclared := .F.
-      n := eval( bBlock )
    endif
+
+   n := eval( bBlock )
 
    // if no prompts were defined, exit with 0
 
