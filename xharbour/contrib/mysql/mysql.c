@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.0 2002/10/12 22:01:12 lculik Exp $
+ * $Id: mysql.c,v 1.1 2003/02/03 05:19:18 walito Exp $
  */
 
 /*
@@ -343,11 +343,11 @@ HB_FUNC(SQLSRVINFO)
    _retc((char *) mysql_get_server_info( (MYSQL *)_parnl(1) ) );
 }
 
-#ifndef __GNUC__
-int filelength( int handle )
+#ifdef __GNUC__
+long filelength( int handle )
 {
-    int nEnd = hb_fsSeek( handle, 0 , 2 );
-    int nStart = hb_fsSeek( handle , 0 , 0 );
+    long nEnd = hb_fsSeek( handle, 0 , 2 );
+    long nStart = hb_fsSeek( handle , 0 , 0 );
     return nEnd - nStart;
 }
 #endif    
