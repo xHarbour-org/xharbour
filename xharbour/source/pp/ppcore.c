@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.158 2004/06/30 21:37:12 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.159 2004/07/01 04:09:06 ronpinkas Exp $
  */
 
 /*
@@ -4713,8 +4713,6 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                      // Maybe the group was instanciated already and since this is Non Repeatable we don't need to instanciate again.
                      if( ! rezs )
                      {
-                        int iExpanded = 0;
-
                         // Flagging all markers (EXCEPT the non repeatable that we'll be instanciated) in Repeatable group as Instanciated.
                         for( i = 0; i < lennew; i++ )
                         {
@@ -4741,8 +4739,6 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                         #if 1
                             while( (i = hb_strAt( exppatt, 2, ptr + iResidualOffset + 1, lennew )) > 0 )
                             {
-                               iExpanded++;
-
                                #ifdef DEBUG_MARKERS
                                   printf( "   Expand: '%s' at %i len: %i\n", exppatt, i, lennew );
                                #endif
