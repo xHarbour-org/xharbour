@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.134 2004/05/21 13:33:49 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.135 2004/05/21 21:26:40 druzus Exp $
  */
 
 /*
@@ -4527,7 +4527,7 @@ static LPCDXINDEX hb_cdxFindBag( CDXAREAP pArea, char * szBagName )
 
    pFileName = hb_fsFNameSplit( szBagName );
    szBaseName = hb_strdup( pFileName->szName );
-   szBasePath = pFileName->szPath ? hb_strdup( pFileName->szPath ) : "";
+   szBasePath = pFileName->szPath ? hb_strdup( pFileName->szPath ) : NULL;
    hb_strUpper( szBaseName, strlen(szBaseName) );
 
    pIndex = pArea->lpIndexes;
@@ -4535,14 +4535,15 @@ static LPCDXINDEX hb_cdxFindBag( CDXAREAP pArea, char * szBagName )
    {
       hb_xfree( pFileName );
       pFileName = hb_fsFNameSplit( pIndex->szFileName );
-      if ( !hb_stricmp( pFileName->szName, szBaseName ) &&
-          ( !pFileName->szPath || !hb_stricmp( pFileName->szPath, szBasePath ) ) )
+      if ( !hb_stricmp( pFileName->szName, szBaseName ) && ( !szBasePath || 
+           ( pFileName->szPath && hb_stricmp( pFileName->szPath, szBasePath ) ) ) )
             break;
       pIndex = pIndex->pNext;
    }
    hb_xfree( pFileName );
    hb_xfree( szBaseName );
-   hb_xfree( szBasePath );
+   if ( szBasePath )
+      hb_xfree( szBasePath );
    return pIndex;
 }
 
@@ -4865,9 +4866,9 @@ static BOOL hb_cdxDBOISkipEval( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
             break;
          if ( hb_cdxEvalSeekCond( pTag, pEval ) )
          {
-//            ULONG ulRecNo = pArea->ulRecNo;
-//            SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
-//            if ( pArea->ulRecNo == ulRecNo || hb_cdxEvalSeekCond( pTag, pEval ) )
+            ULONG ulRecNo = pArea->ulRecNo;
+            SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
+            if ( pArea->ulRecNo == ulRecNo || hb_cdxEvalSeekCond( pTag, pEval ) )
             {
                fFound = TRUE;
                break;
@@ -4888,9 +4889,9 @@ static BOOL hb_cdxDBOISkipEval( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
             break;
          if ( hb_cdxEvalSeekCond( pTag, pEval ) )
          {
-//            ULONG ulRecNo = pArea->ulRecNo;
-//            SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
-//            if ( pArea->ulRecNo == ulRecNo || hb_cdxEvalSeekCond( pTag, pEval ) )
+            ULONG ulRecNo = pArea->ulRecNo;
+            SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
+            if ( pArea->ulRecNo == ulRecNo || hb_cdxEvalSeekCond( pTag, pEval ) )
             {
                fFound = TRUE;
                break;
