@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.15 2004/02/01 23:40:50 jonnymind Exp $
+ * $Id: gtnul.c,v 1.16 2004/02/03 14:01:14 druzus Exp $
  */
 
 /*
@@ -848,7 +848,7 @@ void hb_gt_SetKeyCP(char * pszTermCDP, char * pszHostCDP)
 
 int hb_gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
 {
-   GT_FUNCS.info( iMsgType, bUpdate, iParam, vpParam );
+   return GT_FUNCS.info( iMsgType, bUpdate, iParam, vpParam );
 }
 
 /* ********************************************************************** */

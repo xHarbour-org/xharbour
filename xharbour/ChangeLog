@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2213 2004/02/03 15:31:27 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2214 2004/02/03 16:37:41 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-03 10:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/gtnul/gtnul.c
+    * Added missing return value to hb_gt_info()
+
+  * tests/pp.prg
+    * Version RC5
 
 2004-02-03 13:10 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/gtalleg/gtalleg.c
@@ -23,7 +30,7 @@
     + #include <commdlg.h>
 
   * xhatbour/tests/wvtgui.prg
-    * Updated to demonstrate above functions.  
+    * Updated to demonstrate above functions.
 
 2004-02-03 15:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
