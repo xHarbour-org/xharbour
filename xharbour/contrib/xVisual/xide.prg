@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.132 2002/11/17 09:03:45 what32 Exp $
+ * $Id: xide.prg,v 1.133 2002/11/18 06:24:20 what32 Exp $
  */
 
 /*
@@ -54,7 +54,7 @@ FUNCTION Main
    Application():Initialize()
 
    // splash screen
-   oSplash := TSplash():Create( Application, "visualxharbour.bmp", 3000 )
+//   oSplash := TSplash():Create( Application, "visualxharbour.bmp", 3000 )
 
    WITH OBJECT Application
       WITH OBJECT :CreateForm( MainForm(), @MainForm )
@@ -75,12 +75,14 @@ FUNCTION Main
          ObjEdit    := ObjEdit():Create( MainForm )
          // focus to main Frame
          :SetFocus()
-
       END
+      
       MainForm:Update()
+      
       :Run()
   END
-RETURN( nil)
+  
+RETURN NIL
 
 //----------------------------------------------------------------------------------------------
 

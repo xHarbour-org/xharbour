@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.96 2002/11/19 08:00:04 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.97 2002/11/19 20:23:20 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -249,7 +249,7 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
          aRect:={10,10,NIL,NIL}
       ENDIF
 
-//      cName:=::GetUniquePropName(::CtrlName)
+      cName:=::GetUniquePropName(::CtrlName)
 
       cClass := "T" + AllTrim( ::CtrlName )
       n := HB_FuncPtr( cClass )
@@ -268,19 +268,24 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
 
       IF oObj != NIL
 
+         IF ::CtrlName == "CoolBar"
+            aRect[1] := 0
+            aRect[2] := 0
+         ENDIF
+
          oObj:Create( Self )
          oObj:FCaption := oObj:Name
          oObj:FLeft    := aRect[1]
          oObj:FTop     := aRect[2]
          oObj:SetParent( Self )
 
-         DO CASE
-            CASE ::CtrlName == "CoolBar"
-               oBand := TCoolBand():Create( oObj )
-               oBand:MinHeight := 28
-         ENDCASE
+         IF ::CtrlName == "CoolBar"
+            oBand := TCoolBand():Create( oObj )
+            oBand:MinHeight := 28
+         ENDIF
          
          ::SetControl( oObj )
+         
       ENDIF
    ENDIF
 
