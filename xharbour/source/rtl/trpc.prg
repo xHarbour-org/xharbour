@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.26 2003/12/11 14:44:52 jonnymind Exp $
+ * $Id: trpc.prg,v 1.27 2004/01/10 12:40:09 tommir Exp $
  */
 
 /*
@@ -79,7 +79,7 @@
       +"function description" as returned by tRPCFunction::Describe()
 
    12 - Too many functions in function request
-      Sending data in compressed format:
+
 
 
    TCP requests:
@@ -1469,6 +1469,7 @@ METHOD UDPInterpretRequest( cData, nPacketLen, cRes ) CLASS tRPCService
          ELSE
             cRes := "XHBR10"+ HB_Serialize( ::cServerName )
          ENDIF
+         RETURN .T.
 
       /* XRB01 - Function scan */
       CASE cCode == "XHBR01"
@@ -1495,12 +1496,18 @@ METHOD UDPInterpretRequest( cData, nPacketLen, cRes ) CLASS tRPCService
                IF HB_RegexMatch( cMatch, oFunc:cName ) .and. cNumber <= oFunc:cSerial
                   cRes := "XHBR11" + HB_Serialize(::cServerName ) + ;
                      HB_Serialize( ofunc:Describe())
+                  RETURN .T.
                ENDIF
             NEXT
          ENDIF
+
+         /* If we don't have the function, we cannot reply */
+         RETURN .F.
+
    ENDCASE
 
-RETURN .T.
+   /* Ignore malfored requests. */
+RETURN .F.
 
 
 METHOD Terminating( oConnection ) CLASS tRPCService

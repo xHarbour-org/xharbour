@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3467 2004/09/26 12:36:16 jonnymind Exp $
+ * $Id: ChangeLog,v 1.3468 2004/09/26 14:48:36 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-09-26 17:20 UTC+0200 Giancarlo Niccolai <gc at niccolai dot ws>
+  * source/rtl/trpc.prg
+    ! function replying to client requests for existing functions may
+      make the program crash if the request was malformed. Fixed.
 
 2004-09-26 16:47 UTC+0200 Giancarlo Niccolai <gc at niccolai dot ws>
   * source/rtl/hbini.prg
