@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.186 2003/03/27 07:44:56 ronpinkas Exp $
+ * $Id: hvm.c,v 1.187 2003/03/27 11:48:17 ronpinkas Exp $
  */
 
 /*
@@ -1085,8 +1085,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                {
                   PHB_ITEM pSelf = hb_stackItemFromTop( -1 );
 
-                  if( HB_IS_OBJECT( pSelf ) )
+                  if( HB_IS_OBJECT( pSelf ) && pSelf->item.asArray.value->uiPrevCls == 0 )
                   {
+
                      BOOL bConstructor;
                      PHB_FUNC pFunc;
 
@@ -1139,7 +1140,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                {
                   PHB_ITEM pSelf = hb_stackItemFromTop( -2 );
 
-                  if( HB_IS_OBJECT( pSelf ) )
+                  if( HB_IS_OBJECT( pSelf ) && pSelf->item.asArray.value->uiPrevCls == 0 )
                   {
                      BOOL bConstructor;
                      PHB_FUNC pFunc;
