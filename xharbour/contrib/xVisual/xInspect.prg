@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.54 2002/10/29 23:50:11 what32 Exp $
+ * $Id: xInspect.prg,v 1.55 2002/10/30 15:22:42 what32 Exp $
  */
 
 /*
@@ -46,6 +46,7 @@ CLASS ObjInspect FROM TForm
    VAR CurObject AS OBJECT
 
    METHOD New( oParent ) INLINE ::Caption := 'Object Inspector',;
+                                ::Name    := "ObjInspect",;
                                 ::left    := 0,;
                                 ::top     := 275,;
                                 ::width   := 200,;
@@ -224,7 +225,7 @@ METHOD SetCurSel(n) CLASS ComboInsp
       ENDIF
 
       IF FormEdit != NIL
-      
+
          IF ( ! FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ) ) .AND. ( ! FormEdit:oMask:Creating ) ;
             .AND. ( ! FormEdit:oMask:mousedown ) .AND. ( ! FormEdit:oMask:moving ) .AND. ( ! FormEdit:oMask:sizing ) ;
             .AND. ( ! FormEdit:oMask:selecting )
@@ -232,9 +233,9 @@ METHOD SetCurSel(n) CLASS ComboInsp
             FormEdit:oMask:OnLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
             FormEdit:oMask:OnLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
          ENDIF
-         
+
       ENDIF
-      
+
    ENDIF
 
 RETURN Super:SetCurSel( n )
@@ -244,21 +245,21 @@ RETURN Super:SetCurSel( n )
 METHOD DelObject( oObj ) CLASS ComboInsp
    LOCAL n,x,y
    IF ( n:= aScan( ::Parent:Objects, {|o|o:handle == oObj:handle} ))>0
-   
+
       FOR x:=1 to len(::Parent:Parent:ObjTree:TreeView1:Items)
-      
+
           IF( y:=aScan( ::Parent:Parent:ObjTree:TreeView1:Items[x]:Items,{|o|o:cargo == oObj:handle} ))>0
              ::Parent:Parent:ObjTree:TreeView1:Items[x]:Items[y]:Delete()
              EXIT
           ENDIF
-          
+
       NEXT
-      
+
       aDel( ::Parent:Objects, n, .T. )
       ::DeleteString( n-1 )
       ::SetCurSel( n-2 )
    ENDIF
-   
+
 RETURN nil
 
 //---------------------------------------------------------------------------------
@@ -269,26 +270,26 @@ METHOD DrawItem( dis ) CLASS ComboInsp
    LOCAL aClip, aRect
    LOCAL itemTxt, cText
    LOCAL nLen, n
-   
+
    lSelected := And( dis:itemState, ODS_SELECTED ) > 0
-   
+
    aClip := { dis:rcItem:Left,  dis:rcItem:Top, ;
               dis:rcItem:Right, dis:rcItem:Bottom  }
-              
+
    IF And( dis:itemAction, ODA_DRAWENTIRE ) > 0 .OR. And( dis:itemAction, ODA_SELECT ) > 0
-   
+
       SetTextColor( dis:hDC  , GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
       SetBkColor( dis:hDC  , GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
-      
+
       nLen    := SendMessage( dis:hwndItem, CB_GETLBTEXTLEN, dis:itemID, 0 )
       itemTxt := Space( nLen + 1 )
       SendMessage( dis:hwndItem, CB_GETLBTEXT, dis:itemID, @itemTxt )
-      
+
       itemTxt :=left(itemTxt,nLen)
       cText   := ""
       aRect   := ACLONE(aClip)
       FOR n := 1 to nLen + 1
-      
+
           IF SubStr( itemTxt, n, 1) == chr(9) .or. n == nLen + 1
              IF n == nLen + 1
                 SetTextColor( dis:hDC, GetSysColor( IF( lselected, COLOR_HIGHLIGHTTEXT,;
@@ -300,10 +301,10 @@ METHOD DrawItem( dis ) CLASS ComboInsp
              aRect[1] += 80
              LOOP
           ENDIF
-          
+
           cText += SubStr( itemTxt, n, 1 )
       NEXT
-      
+
    ENDIF
    IF And( dis:itemState, ODS_FOCUS ) > 0 .OR. And( dis:itemAction, ODA_FOCUS ) > 0
       DrawfocusRect( dis:hDC, aclip )
@@ -357,7 +358,7 @@ RETURN self
 METHOD SetColControl(x,y) CLASS InspectBrowser
 
    LOCAL cType, cVar, aRect
-   
+
    if y == 2
 
       IF ::oCtrl != NIL
@@ -420,9 +421,9 @@ METHOD OnCommand(nwParam,nlParam) CLASS InspectBrowser
                       oList:Create()
               ENDCASE
       ENDCASE
-      
+
    ENDIF
-   
+
 RETURN nil
 
 //------------------------------------------------------------------------------------------

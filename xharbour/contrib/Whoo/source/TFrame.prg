@@ -78,11 +78,26 @@ METHOD New( oParent ) CLASS TFrame
 
 *-----------------------------------------------------------------------------*
 
-METHOD Add( cName, oObj, lCreate ) CLASS TFrame
+METHOD Add( oObj, lCreate ) CLASS TFrame
+
+   LOCAL oCtrl, nInst := 1
 
    DEFAULT lCreate TO .T.
-   oObj:propname := cName
-   ::SetLink( cName, oObj )
+
+   //oObj:propname := cName
+
+   IF oObj:Name == NIL
+      FOR EACH oCtrl IN ::Controls
+          IF oCtrl:ControlName == oObj:ControlName
+             nInst++
+          ENDIF
+      NEXT
+
+      oObj:Name := oObj:ControlName + AllTrim( Str( nInst ) )
+   ENDIF
+
+   ::SetLink( oObj )
+
    IF lCreate
       oObj:Create()
    endif
@@ -92,17 +107,21 @@ METHOD Add( cName, oObj, lCreate ) CLASS TFrame
 
 *-----------------------------------------------------------------------------*
 
-METHOD SetLink( cName, oObj ) CLASS TFrame
-   local hClass, nSeq
+METHOD SetLink( oObj ) CLASS TFrame
+
+   LOCAL hClass, nSeq, cName := oObj:Name
+
    IF !ISCHARACTER( cName )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
-     ELSEIF !__objHasMsg( self, cName ) .AND. !__objHasMsg( self, "_" + cName )
+   ELSEIF !__objHasMsg( self, cName ) .AND. !__objHasMsg( self, "_" + cName )
       hClass := ::ClassH
       nSeq   := __cls_IncData( hClass )
       __clsAddMsg( hClass,       cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_PROTECTED )
       __clsAddMsg( hClass, "_" + cName, nSeq, HB_OO_MSG_DATA, NIL, HB_OO_CLSTP_PROTECTED )
    ENDIF
+
    __ObjSetValueList( self, { { cName, oObj } } )
+
 return( oObj )
 
 *-----------------------------------------------------------------------------*

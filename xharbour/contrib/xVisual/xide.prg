@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.106 2002/10/30 08:14:01 ronpinkas Exp $
+ * $Id: xide.prg,v 1.107 2002/10/30 15:22:42 what32 Exp $
  */
 
 /*
@@ -111,8 +111,10 @@ return(self)
 //----------------------------------------------------------------------------------------------
 
 METHOD MainToolBar() CLASS MainFrame
-   local n, oTool, oSplash
+
+   LOCAL n, oTool, oSplash
    LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab
+
    ::Add( TRebar():New( MainFrame ) )
 
     // add the xmake toolbar
@@ -215,9 +217,14 @@ METHOD MainToolBar() CLASS MainFrame
       :Rebar1:AddBand( NIL, RBBS_NOVERT, :WinTools:handle, 100, 30,  , "", NIL )
       :WinTools:DisableAll()
    End
+
    //--------- sets a QUICK access to the control
-   ::SetLink( 'StdBar',   ::ToolTabs:StdTab:StdTools)
-   ::SetLink( 'Win32Bar', ::ToolTabs:Win32:WinTools )
+   ::ToolTabs:StdTab:StdTools:Name := "StdBar"
+   ::SetLink( ::ToolTabs:StdTab:StdTools)
+
+   ::ToolTabs:Win32:WinTools:Name := "Win32Bar"
+   ::SetLink( ::ToolTabs:Win32:WinTools )
+
 return(self)
 
 //----------------------------------------------------------------------------------------------
@@ -360,9 +367,14 @@ int XFMParse( char *sText )
    static PHB_DYNS pCreateForm = NULL;
    static PHB_DYNS pTFormEdit = NULL;
    PHB_DYNS pClassSym;
-   HB_ITEM Exp, Control;
+   HB_ITEM Exp, Control, Object, Name;
    PHB_ITEM pForm;
    MSG msg ;
+
+   Exp.type = HB_IT_NIL;
+   Control.type = HB_IT_NIL;
+   Object.type = HB_IT_NIL;
+   Name.type = HB_IT_NIL;
 
    if( pCreateForm == NULL )
    {
@@ -621,6 +633,10 @@ int XFMParse( char *sText )
       hb_vmDo( 0 );
 
       hb_itemForwardValue( &Control, &hb_stack.Return );
+
+      hb_itemPutC( &Name, sClass );
+      hb_objSendMsg( &Control, "_NAME", 1, &Name );
+      hb_stack.Return.type = HB_IT_NIL;
    }
    else
    {
@@ -648,28 +664,48 @@ int XFMParse( char *sText )
       {
          if( *sText == '\0' )
          {
-            OutputDebugString( "END\n" );
-
-            hb_objSendMsg( &FORMEDIT, "ADD", 1, &Control );
-            hb_stack.Return.type = HB_IT_NIL;
-
-            OutputDebugString( "Done Add()" );
-
-            while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+            if( Object.type == HB_IT_NIL )
             {
-               TranslateMessage(&msg);
-               DispatchMessage(&msg);
+               OutputDebugString( "END CONTROL\n" );
+
+               hb_objSendMsg( &FORMEDIT, "ADD", 1, &Control );
+               hb_stack.Return.type = HB_IT_NIL;
+
+               OutputDebugString( "Done Add()" );
+
+               while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+               {
+                  TranslateMessage(&msg);
+                  DispatchMessage(&msg);
+               }
+
+               hb_objSendMsg( &FORMEDIT, "SETCONTROL", 1, &Control );
+               hb_stack.Return.type = HB_IT_NIL;
+
+               OutputDebugString( "Done SetControl()" );
+
+               while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+               {
+                  TranslateMessage(&msg);
+                  DispatchMessage(&msg);
+               }
             }
-
-            hb_objSendMsg( &FORMEDIT, "SETCONTROL", 1, &Control );
-            hb_stack.Return.type = HB_IT_NIL;
-
-            OutputDebugString( "Done SetControl()" );
-
-            while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+            else
             {
-               TranslateMessage(&msg);
-               DispatchMessage(&msg);
+               OutputDebugString( "END OBJECT\n" );
+
+               sAssign[0] = '_';
+               sAssign[1] = '\0';
+               strcat( (char *) sAssign, (char *) sClass );
+
+               OutputDebugString( "Property: " );
+               OutputDebugString( sAssign );
+               OutputDebugString( "\n" );
+
+               hb_objSendMsg( &Control, sAssign, 1, &Object );
+               hb_stack.Return.type = HB_IT_NIL;
+
+               hb_itemClear( &Object );
             }
 
             sText = pEnd[ --iEnd ] + 11;
@@ -738,6 +774,20 @@ int XFMParse( char *sText )
       OutputDebugString( " IS: " );
       OutputDebugString( (char *) sFromClass );
       OutputDebugString( "\n" );
+
+      pClassSym = hb_dynsymFind( sFromClass );
+      if( pClassSym )
+      {
+         hb_vmPushSymbol( pClassSym->pSymbol );
+         hb_vmPushNil();
+         hb_vmDo( 0 );
+
+         hb_itemForwardValue( &Object, &hb_stack.Return );
+      }
+      else
+      {
+         return 0;
+      }
 
       pEnd[ iEnd ] = strstr( sText, "END OBJECT" );
       if( pEnd[ iEnd ] == NULL )
@@ -914,7 +964,7 @@ int XFMParse( char *sText )
    sprintf( (char *) sTemp, "%i\n", Exp.type );
    OutputDebugString( sTemp );
 
-   hb_objSendMsg( &Control, sAssign, 1, &Exp );
+   hb_objSendMsg( Object.type == HB_IT_NIL ? &Control : &Object, sAssign, 1, &Exp );
    hb_stack.Return.type = HB_IT_NIL;
 
    SKIP_EOL();

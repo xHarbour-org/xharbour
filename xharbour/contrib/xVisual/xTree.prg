@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.13 2002/10/28 23:39:04 ronpinkas Exp $
+ * $Id: xTree.prg,v 1.14 2002/10/30 16:37:46 what32 Exp $
  */
 
 /*
@@ -38,6 +38,7 @@ GLOBAL EXTERNAL FormEdit
 CLASS ObjTree FROM TForm
    VAR TreeRoot AS OBJECT
    METHOD New( oParent ) INLINE ::Caption := 'Object Tree',;
+                                ::Name    := "ObjTree",;
                                 ::left    := 0,;
                                 ::top     := 125,;
                                 ::width   := 200,;

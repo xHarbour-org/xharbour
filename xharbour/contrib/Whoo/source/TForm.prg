@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.48 2002/10/29 02:12:38 what32 Exp $
+ * $Id: TForm.prg,v 1.49 2002/10/30 08:14:00 ronpinkas Exp $
  */
 
 /*
@@ -133,6 +133,7 @@ METHOD New( oParent ) CLASS TForm
 *-----------------------------------------------------------------------------*
 
 METHOD Add( oObj, lCreate ) CLASS TForm
+
    LOCAL nSeq, hClass, nInst := 1, oCtrl
 
    DEFAULT lCreate TO .T.
@@ -164,6 +165,8 @@ METHOD Add( oObj, lCreate ) CLASS TForm
    IF lCreate
       oObj:Create()
    endif
+
+   OutputDebugString( CRLF + "*** " + oObj:Name + " ***" + CRLF );
 
    aAdd( ::Controls, oObj )
 
@@ -210,7 +213,7 @@ return(nil)
 
 *-----------------------------------------------------------------------------*
 
-METHOD SetLink( cName, oObj ) CLASS TForm
-   __objAddData( self, cName )
-   __ObjSetValueList( self, { { cName, oObj } } )
+METHOD SetLink( oObj ) CLASS TForm
+   __objAddData( self, oObj:Name )
+   __ObjSetValueList( self, { { oObj:Name, oObj } } )
 return( oObj )

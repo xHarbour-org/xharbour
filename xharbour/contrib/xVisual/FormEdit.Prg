@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.77 2002/10/30 08:14:01 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.78 2002/10/30 15:22:41 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -118,22 +118,21 @@ GLOBAL EXTERNAL FormEdit
 
 //----------------------------------------------------------------------------//
 
-METHOD AddControl( cName, oObj )
+METHOD AddControl( oObj )
 
    LOCAL oCtrl
 
-   oObj:Name := cName
    oCtrl := Super:Add( oObj )
 
-   aAdd( ::aCtrl, oCtrl)
+   aAdd( ::aCtrl, oCtrl )
    ::oMask:GetSiblings()
    ::oMask:SetFocus()
    ::oMask:Cursor := NIL
    ::CtrlName := NIL
 
-   ::XFMControl( cName, oObj, .F. )
+   ::XFMControl( oObj:Name, oObj, .F. )
 
-   RETURN(oCtrl)
+RETURN oCtrl
 
 //----------------------------------------------------------------------------//
 
@@ -288,6 +287,8 @@ RETURN oObj
 METHOD SetControl( oObj ) CLASS TFormEdit
 
    LOCAL oTree, o, n
+
+   //TraceLog( oObj, oObj:Caption, oObj:Top, oObj:Left, oObj:Height, oObj:Width, oObj:xxCaption, oObj:xxTop, oObj:xxLeft, oObj:xxHeight, oObj:xxWidth )
 
    aAdd( ::aCtrl, oObj )
    ::oMask:GetSiblings()

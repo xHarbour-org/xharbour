@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.35 2002/10/29 23:50:10 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.36 2002/10/30 16:37:46 what32 Exp $
  */
 
 /*
@@ -500,7 +500,7 @@ METHOD OnLButtonDown( wParam, x, y )
                   WinSetCursor( LoadCursor(, ::aSelected[ 1, SEL_HOTAREAS, nPos, 3 ] ) )
                ENDIF
                ::sizing := .T.
-               
+
               ELSE
                ::nClick := HTCAPTION
 
@@ -509,7 +509,7 @@ METHOD OnLButtonDown( wParam, x, y )
                ENDIF
 
                ::moving := .T.
-               
+
                FOR EACH a IN ::aSelected
                    a[ SEL_ANCHORX ] := x - a[ SEL_OLDRECT, 1 ] // anchor X
                    a[ SEL_ANCHORY ] := y - a[ SEL_OLDRECT, 2 ] // anchor Y
@@ -518,7 +518,7 @@ METHOD OnLButtonDown( wParam, x, y )
             ::aEditRect := ::MoveCtrl( ::Handle, { x, y } )
 
             EXIT
-            
+
          ENDIF
       NEXT
     ELSE
@@ -537,16 +537,16 @@ METHOD OnLButtonDown( wParam, x, y )
                 ShowWindow( a[ SEL_HANDLE ], SW_SHOW ) } )
       NEXT
 
-      
+
       ::aSelected := {}
       ::nClick    := HTCLIENT
 
       WinSetCursor( LoadCursor(, IDC_SIZEALL ) )
-         
+
       ::selecting := .T.
       ::aEditRect := { x, y, x, y }
       ::aClickPt  := { x, y }
-      
+
    ENDIF
 
    // ToolTips and Inspector selection
@@ -567,27 +567,25 @@ METHOD OnLButtonDown( wParam, x, y )
 
    ::mousedown := .T.
    SetCapture( ::Handle )
-  
+
    UpdateWindow( ::Parent:handle )
-     
+
    IF wParam != NIL
-   IF lFound
-      ::ChangeInspector( 0 )
+      IF lFound
+         ::ChangeInspector( 0 )
 
-      ::HintWindow:Activate(1)
-      ::HintWindow:TrackHint(1)
-      ::lHintActive := .T.
+         ::HintWindow:Activate(1)
+         ::HintWindow:TrackHint(1)
+         ::lHintActive := .T.
+      ELSE
+         // Only if MOUSE Click, NOT simulated
+         ::ChangeInspector( 1 )
+      ENDIF
+   ENDIF
 
-   ELSE
-      // Only if MOUSE Click, NOT simulated
-      ::ChangeInspector( 1 )
-   ENDIF
-   ENDIF
-   RETURN( NIL )
+RETURN NIL
 
 *-----------------------------------------------------------------------------*
-
-
 METHOD ChangeInspector( n )
 
    STATIC nSelObj
@@ -718,8 +716,16 @@ METHOD OnMouseMove( aParam, x, y )
                ELSE
                   WinSetCursor( LoadCursor( hThisInstance, "FINGER" ) )
                ENDIF
+
                lFound := .T.
                oObj   := ::Parent:ChildFromHandle( hChild )
+
+               IF oObj == NIL
+                  TraceLog( hChild )
+                  aEval( ::Parent:Controls, {|o| TraceLog( o:Name, o:Handle ) } )
+                  EXIT
+               ENDIF
+
                IF oLastObj == NIL .OR. hChild != oLastObj:handle .OR. ::lHintActive
                   ::HintWindow:Activate(1)
                   ::HintWindow:SetTitle( 2, "Class: " + oObj:Classname() )
@@ -856,11 +862,11 @@ METHOD OnLButtonUp( wParam, x, y )
 
    ReleaseCapture()
    ::BringToTop()
-   
+
    IF wParam !=NIL
       ::SetFocus()
    ENDIF
-   
+
    RETURN( NIL )
 
 *-----------------------------------------------------------------------------*
