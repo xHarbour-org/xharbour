@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.405 2004/06/21 19:06:25 ronpinkas Exp $
+ * $Id: hvm.c,v 1.406 2004/06/21 19:34:23 ronpinkas Exp $
  */
 
 /*
@@ -2561,8 +2561,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                lNewVal = lVal + iAdd;
 
-               if(( iAdd >= 0 && lNewVal >= lVal ) ||
-                  ( iAdd <  0 && lNewVal <  lVal ))
+               if(( iAdd >= 0 && lNewVal >= lVal ) || ( iAdd <  0 && lNewVal <  lVal ) )
                {
                   hb_itemPutNInt( pLocal, lNewVal );
                   break;
@@ -2602,6 +2601,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                   Add.type = HB_IT_INTEGER;
                   Add.item.asInteger.value = iAdd;
+                  Add.item.asInteger.length = 10;
 
                   // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
                   hb_vmPushNil();
@@ -2804,6 +2804,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                   Add.type = HB_IT_INTEGER;
                   Add.item.asInteger.value = iAdd;
+                  Add.item.asInteger.length = 10;
 
                   // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
                   hb_vmPushNil();
@@ -2832,7 +2833,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   }
                   else
                   {
-                     (&Add)->item.asInteger.value *= -1 ;
+                     Add.item.asInteger.value *= -1;
+                     Add.item.asInteger.length = 10;
+
                      pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pTop, &Add );
                   }
 
@@ -4928,23 +4931,35 @@ static void hb_vmNot( void )
       if( HB_IS_INTEGER( hb_stackItemFromTop( -1 ) ) )
       {
          if( pItem->item.asInteger.value == 0 )
+         {
             pItem->item.asInteger.value = 1;
-    else
+         }
+         else
+         {
             pItem->item.asInteger.value = 0;
+         }
       }
       else if( HB_IS_LONG( hb_stackItemFromTop( -1 ) ) )
       {
          if( pItem->item.asLong.value == 0 )
+         {
             pItem->item.asLong.value = 1;
-    else
+         }
+         else
+         {
             pItem->item.asLong.value = 0;
+         }
       }
       else
       {
          if( pItem->item.asDouble.value == 0 )
+         {
             pItem->item.asDouble.value = 1.0;
-    else
+         }
+         else
+         {
             pItem->item.asDouble.value = 0.0;
+         }
       }
    }
 #endif
@@ -7507,13 +7522,17 @@ static BOOL hb_vmPopLogical( void )
       ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
 
       if( HB_IS_INTEGER( hb_stackItemFromTop( -1 ) ) )
+      {
          return ( ( * HB_VM_STACK.pPos )->item.asInteger.value != 0 );
-
+      }
       else if( HB_IS_LONG( hb_stackItemFromTop( -1 ) ) )
+      {
          return ( ( * HB_VM_STACK.pPos )->item.asLong.value != 0 );
-
+      }
       else
+      {
          return ( ( * HB_VM_STACK.pPos )->item.asDouble.value != 0.0 );
+      }
    }
 #endif
    else
