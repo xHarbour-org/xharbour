@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.41 2003/07/25 01:57:59 druzus Exp $
+ * $Id: filesys.c,v 1.42 2003/07/30 14:07:41 druzus Exp $
  */
 
 /*
@@ -1628,7 +1628,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
    errno = 0;
    // allowing async cancelation here
    HB_TEST_CANCEL_ENABLE_ASYN
-   switch( uiMode )
+   switch( uiMode & FL_MASK )
    {
       case FL_LOCK:
          bResult = ( LockFile( DostoWinHandle( hFileHandle ), ulStart,0, ulLength,0 ) == 0 );
@@ -1651,7 +1651,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
 
       errno = 0;
 
-      switch( uiMode )
+      switch( uiMode & FL_MASK )
       {
       case FL_LOCK:
 
@@ -1690,7 +1690,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
       errno = 0;
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
-      switch( uiMode )
+      switch( uiMode & FL_MASK )
       {
          case FL_LOCK:
             bResult = ( locking( hFileHandle, _LK_LOCK, ulLength ) == 0 );
@@ -1717,7 +1717,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
       errno = 0;
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
-      switch( uiMode )
+      switch( uiMode & FL_MASK )
       {
          case FL_LOCK:
             bResult = ( _locking( hFileHandle, _LK_LOCK, ulLength ) == 0 );
@@ -1745,17 +1745,19 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
 
       errno = 0;
 
-      switch( uiMode )
+      switch( uiMode & FL_MASK )
       {
          case FL_LOCK:
 
-            lock_info.l_type   = F_WRLCK;
+            lock_info.l_type   = (uiMode & FLX_SHARED) ? F_RDLCK : F_WRLCK;
             lock_info.l_start  = ulStart;
             lock_info.l_len    = ulLength;
             lock_info.l_whence = SEEK_SET;   /* start from the beginning of the file */
             lock_info.l_pid    = getpid();
 
-            bResult = ( fcntl( hFileHandle, F_SETLK, &lock_info ) >= 0 );
+            bResult = ( fcntl( hFileHandle,
+                               (uiMode & FLX_WAIT) ? F_SETLKW: F_SETLK,
+                               &lock_info ) >= 0 );
             break;
 
          case FL_UNLOCK:
@@ -1781,7 +1783,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
    errno = 0;
    // allowing async cancelation here
    HB_TEST_CANCEL_ENABLE_ASYN
-   switch( uiMode )
+   switch( uiMode & FL_MASK )
    {
       case FL_LOCK:
          bResult = ( lock( hFileHandle, ulStart, ulLength ) == 0 );

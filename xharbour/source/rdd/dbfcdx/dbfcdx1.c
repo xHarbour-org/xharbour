@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.57 2003/08/21 16:49:37 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.58 2003/08/25 16:24:52 druzus Exp $
  */
 
 /*
@@ -6769,9 +6769,8 @@ ERRCODE hb_cdxGoTo( CDXAREAP pArea, ULONG ulRecNo )
 
    if( !pTag->CurKeyInfo || (ULONG) pTag->CurKeyInfo->Tag != ulRecNo )
    {
-      pKey = hb_cdxEvalKey( pArea, pTag, TRUE );
-
       hb_cdxIndexLockRead( pTag->pIndex, pTag );
+      pKey = hb_cdxEvalKey( pArea, pTag, TRUE );
       lRecno = hb_cdxTagKeyFind( pTag, pKey );
       hb_cdxIndexUnLockRead( pTag->pIndex, pTag );
       pArea->fEof = pTag->TagEOF;
