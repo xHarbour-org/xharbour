@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.12 2003/09/26 20:18:58 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.13 2003/09/27 17:25:51 ronpinkas Exp $
  */
 
 /*
@@ -52,7 +52,7 @@ char * hb_comp_szErrors[] =
    "Unclosed control structure %s",
    "%s statement with no loop in sight",
    "Syntax error: \'%s\' in: \'%s\'",
-   "Incomplete statement: %s",
+   "Incomplete statement or unbalanced delimiters",
    "Incorrect number of arguments: %s %s",
    "Invalid lvalue: \'%s\'",
    "Invalid use of \'@\' (pass by reference): \'%s\'",

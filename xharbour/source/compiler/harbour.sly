@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.50 2003/09/30 17:30:27 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.51 2003/10/04 17:59:27 ronpinkas Exp $
  */
 
 /*
@@ -2669,12 +2669,12 @@ void yyerror( char * s )
          }
          else
          {
-            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, "<end of line>" );
+            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INCOMPLETE_STMT, NULL, NULL );
          }
       }
       else
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_YACC, s, "<end of line>" );
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INCOMPLETE_STMT, NULL, NULL );
       }
    }
    else
