@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1401 2003/09/03 00:33:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1402 2003/09/03 00:42:20 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-09-03 08:05 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+   * source/common/reserved.c
+     + Add option to omit reserved words by adding -DHB_RESERVED_OFF (default is ON)
+
+     /*
+     This may be useful when one is working with pCode DLL where he must redefine
+     reserved words as dummy functions in the DLL.
+     */
+
 2003-09-03 07:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * source/rtl/inkey.c
    * source/rtl/gtstd/gtstd.c

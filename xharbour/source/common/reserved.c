@@ -1,5 +1,5 @@
 /*
- * $Id: reserved.c,v 1.4 2001/06/14 21:20:43 dholm Exp $
+ * $Id: reserved.c,v 1.1.1.1 2001/12/21 10:44:32 ronpinkas Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 /* Table with reserved functions names
  * NOTE: THIS TABLE MUST BE SORTED ALPHABETICALLY
 */
+#if(!defined( HB_RESERVED_OFF ))
 static const char * s_szReservedFun[] = {
    "AADD"      ,
    "ABS"       ,
@@ -123,9 +124,11 @@ static const char * s_szReservedFun[] = {
 };
 
 #define RESERVED_FUNCTIONS  sizeof( s_szReservedFun ) / sizeof( char * )
+#endif
 
 char * hb_compReservedName( char * szName )
 {
+#if(!defined( HB_RESERVED_OFF ))
    unsigned int wNum = 0;
    int iFound = 1;
 
@@ -143,5 +146,8 @@ char * hb_compReservedName( char * szName )
    }
 
    return iFound == 0 ? ( char * ) s_szReservedFun[ wNum - 1 ] : NULL;
+#else
+   return NULL;
+#endif
 }
 
