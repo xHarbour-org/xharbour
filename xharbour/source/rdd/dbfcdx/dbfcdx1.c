@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.156 2004/09/01 19:30:48 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.157 2004/09/03 01:34:59 druzus Exp $
  */
 
 /*
@@ -1073,7 +1073,7 @@ static ULONG hb_cdxIndexGetAvailPage( LPCDXINDEX pIndex, BOOL bHeader )
       {
          if ( hb_fsSeek( hFile, ulPos, FS_SET ) != ulPos ||
               hb_fsRead( hFile, (BYTE *) byBuf, 4 ) != 4 )
-            hb_errInternal( EDBF_READ, "Read index page failed.", "", "" );
+            hb_errInternal( EDBF_READ, "hb_cdxIndexGetAvailPage: Read index page failed.", "", "" );
          pIndex->freePage = HB_GET_LE_UINT32( byBuf );
 #ifdef HB_CDX_DBGUPDT
          cdxReadNO++;
@@ -1216,7 +1216,7 @@ static void hb_cdxIndexPageRead( LPCDXINDEX pIndex, ULONG ulPos, BYTE * pBuffer,
 
    if ( hb_fsSeek( pIndex->hFile, ulPos, FS_SET ) != ulPos ||
         hb_fsRead( pIndex->hFile, pBuffer, uiSize ) != uiSize )
-      hb_errInternal( EDBF_READ, "Read index page failed.", "", "" );
+      hb_errInternal( EDBF_READ, "hb_cdxIndexPageRead: Read index page failed.", "", "" );
 #ifdef HB_CDX_DBGUPDT
    cdxReadNO++;
 #endif
