@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.57 2003/03/28 22:11:51 lculik Exp $
+ * $Id: hbmake.prg,v 1.58 2003/03/29 00:00:34 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -337,12 +337,12 @@ FUNCTION ParseMakeFile( cFile )
 
                      IF aTemp[ 1 ] == "ALLOBJ" .AND. ! lMt
 
-                        IF At( 'hvm', Lower( aTemp[ 2 ] ) ) ==  0 .AND. ! lLinux  .and. ! s_lLibrary
+/*                        IF At( 'hvm', Lower( aTemp[ 2 ] ) ) ==  0 .AND. ! lLinux  .and. ! s_lLibrary
                            aTemp[ 2 ] += IIF( ! lMt .AND. ! lGui, " $(BHC)\lib\hvm.obj", ;
                               IIF( lMt .AND. ! lGui, " $(BHC)\lib\hvmmt.obj", ;
                               IIF( ! lMt .AND. lGui, " $(BHC)\lib\hvmgui.obj", ;
                               " $(BHC)\lib\hvmguimt.obj" ) ) )
-                        ENDIF
+                        ENDIF*/
 
                      ENDIF
 
@@ -1639,11 +1639,7 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LINKER = ilink32" + CRLF )
       fWrite( s_nLinkHandle, " " + CRLF )
-      fWrite( s_nLinkHandle, "ALLOBJ = " + IIF( ( lFwh .OR. lMinigui ), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + ;
-              IIF( ! lMt .AND. ! lGui, " $(BHC)\lib\hvm.obj", ;
-              IIF( lMt .AND. ! lGui, " $(BHC)\lib\hvmmt.obj", ;
-              IIF( ! lMt .AND. lGui, " $(BHC)\lib\hvmgui.obj", ;
-              " $(BHC)\lib\hvmguimt.obj" ) ) ) + CRLF )
+      fWrite( s_nLinkHandle, "ALLOBJ = " + IIF( ( lFwh .OR. lMinigui ), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       fWrite( s_nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) import32.lib " + IIF( lMt,"cw32mt.lib", "cw32.lib" )+ CRLF )
       fWrite( s_nLinkHandle, ".autodepend" + CRLF )
