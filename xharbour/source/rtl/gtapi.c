@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.48 2004/11/23 17:04:22 lf_sfnet Exp $
+ * $Id: gtapi.c,v 1.49 2004/11/26 17:46:31 druzus Exp $
  */
 
 /*
@@ -226,8 +226,8 @@ void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
 
    hb_gt_gobjects = NULL;
 
-   s_pColor = ( int * ) hb_xgrab( ( HB_CLR_MAX_ + 1 ) * sizeof( int ) );
    s_uiColorCount = HB_CLR_MAX_ + 1;
+   s_pColor = ( int * ) hb_xgrab( s_uiColorCount * sizeof( int ) );
 
 #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
    if( hb_cmdargCheck( "NOMOUSE" ) )
@@ -808,7 +808,7 @@ USHORT HB_EXPORT hb_gtColorToN( char * szColorString )
 USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
 {
    char c;
-   char buff[ 6 ];
+   char buff[ 7 ];
    BOOL bHasI = FALSE;
    BOOL bHasU = FALSE;
    BOOL bHasX = FALSE;
@@ -816,7 +816,7 @@ USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
    int nPos = 0;
    int nFore = 0;
    int nColor = 0;
-   int nCount = -1, i = 0, y;
+   int nCount = -1, i = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetColorStr(%s)", szColorString));
 
@@ -837,40 +837,23 @@ USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
    do
    {
       c = *szColorString++;
-      c = toupper( c );
 
-      while( c <= '9' && c >= '0' && i < 6 )
+      while( c >= '0' && c <= '9' && i < 6 )
       {
-         if( i == 0 )
-         {
-            memset( buff, '\0', 6 );
-         }
-
          buff[ i++ ] = c;
          c = *szColorString++;
       }
 
       if( i > 0 )
       {
-         --i;
-         nColor = 0;
-         /* TODO: this can probably be replaced with atoi() */
-         /* ie: nColor = atoi( buff ); */
-         for( y = 1; i + 1; y *= 10, i-- )
-         {
-            if( buff[ i ] != '\0')
-            {
-               nColor += ( ( buff[ i ] - '0' ) * y );
-            }
-         }
-         nColor &= 0x0F;
-         i = 0;
+         buff[ i ] = '\0';
+         nColor = atoi( buff ) & 0x0F;
          ++nCount;
+         i = 0;
       }
-
       ++nCount;
 
-      switch( c )
+      switch( toupper( c ) )
       {
          case 'B':
             nColor |= 1;
@@ -2514,6 +2497,7 @@ HB_CT_WND HB_EXPORT * hb_ctWNew( SHORT FRow, SHORT FCol, SHORT LRow,
 
  w->ShadowA            = ct_ShadowA;
  w->s_uiColorIndex     = 0;
+ w->s_uiColorCount     = 0;
  w->s_pColor           = NULL;
  w->hb_gt_gobjects     = NULL;
  w->hb_gt_gobjects_end = NULL;
@@ -2675,9 +2659,10 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
    }
    else
    {
-      wnd->s_pColor = ( int* ) hb_xgrab( ( HB_CLR_MAX_ + 1 ) * sizeof( int ) );
+      wnd->s_pColor = ( int* ) hb_xgrab( s_uiColorCount * sizeof( int ) );
       memcpy( wnd->s_pColor, s_pColor, s_uiColorCount );
    }
+   wnd->s_uiColorCount  = s_uiColorCount;
    wnd->s_uiCursorStyle = s_uiCursorStyle;
    wnd->s_uiColorIndex  = s_uiColorIndex;
 
@@ -2725,6 +2710,7 @@ SHORT HB_EXPORT hb_ctWSelect( SHORT iwnd )
          ct_WCur->ScNone             = s_ScNone;
          ct_WCur->s_uiCursorStyle    = s_uiCursorStyle;
          ct_WCur->s_uiColorIndex     = s_uiColorIndex;
+         ct_WCur->s_uiColorCount     = s_uiColorCount;
          ct_WCur->s_pColor           = s_pColor;
          ct_WCur->hb_gt_gobjects     = hb_gt_gobjects;
          ct_WCur->hb_gt_gobjects_end = hb_gt_gobjects_end;
@@ -2809,6 +2795,7 @@ SHORT HB_EXPORT hb_ctWSelect( SHORT iwnd )
 
       s_uiCursorStyle    = ct_WCur->s_uiCursorStyle;
       s_uiColorIndex     = ct_WCur->s_uiColorIndex;
+      s_uiColorCount     = ct_WCur->s_uiColorCount;
       s_pColor           = ct_WCur->s_pColor;
       hb_gt_gobjects     = ct_WCur->hb_gt_gobjects;
       hb_gt_gobjects_end = ct_WCur->hb_gt_gobjects_end;
@@ -2873,6 +2860,7 @@ SHORT HB_EXPORT hb_ctWAClose( void )
 
       ct_WCur->s_uiCursorStyle    = s_uiCursorStyle;
       ct_WCur->s_uiColorIndex     = s_uiColorIndex;
+      ct_WCur->s_uiColorCount     = s_uiColorCount;
       ct_WCur->s_pColor           = s_pColor;
       ct_WCur->hb_gt_gobjects     = hb_gt_gobjects;
       ct_WCur->hb_gt_gobjects_end = hb_gt_gobjects_end;

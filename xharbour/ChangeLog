@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3633 2004/11/26 17:36:44 druzus Exp $
+ * $Id: ChangeLog,v 1.3634 2004/11/26 17:46:20 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-26 22:57 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapi.h
+  * xharbour/source/rtl/gtapi.c
+    ! fixed GPF when hb_gtSetColorStr() sets different color string
+      size in different Windows
 
 2004-11-26 18:50 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbapi.h

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.37 2004/10/25 17:30:04 ronpinkas Exp $
+ * $Id: hbapigt.h,v 1.38 2004/11/23 17:04:20 lf_sfnet Exp $
  */
 
 /*
@@ -352,6 +352,7 @@ typedef struct _hb_gt_wnd
 
    USHORT          s_uiCursorStyle;    // GT API
    USHORT          s_uiColorIndex;
+   USHORT          s_uiColorCount;
    int *           s_pColor;
    HB_GT_GOBJECT * hb_gt_gobjects;
    HB_GT_GOBJECT * hb_gt_gobjects_end;
