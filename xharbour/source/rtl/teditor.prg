@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.4 2002/04/29 22:23:18 lculik Exp $
+ * $Id: teditor.prg,v 1.5 2002/06/21 20:33:35 walito Exp $
  */
 
 /*
@@ -836,9 +836,9 @@ STATIC procedure BrowseText(oSelf, nPassedKey)
          nKey = nPassedKey
       endif
 
-      IF !( ( bKeyBlock := setkey( nKey ) ) == NIL )
-         eval( bKeyBlock )
-         loop
+      if (bKeyBlock := Setkey( nKey )) <> NIL
+         Eval( bKeyBlock )
+         Loop
       endif
 
       if nKey == K_ESC
@@ -889,10 +889,10 @@ METHOD Edit(nPassedKey) CLASS HBEditor
             
          endif
 
-         IF !( ( bKeyBlock := setkey( nKey ) ) == NIL )
-            eval( bKeyBlock )
-            loop
-         endif
+      if (bKeyBlock := Setkey( nKey )) <> NIL
+         Eval( bKeyBlock )
+         Loop
+      endif
 
          do case
 
@@ -933,20 +933,27 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                ::InsertState(!::lInsert)
 
             case nKey == K_DEL
+               // If there is a wordwrapping limit and I'm past it
+               if ::lWordWrap .AND. ::nCol > ::nWordWrapCol
+                  ::MoveCursor(K_DOWN)
+                  ::MoveCursor(K_HOME)
+
+               else
+
                ::lDirty := .T.
                // If I'm on last char of a line and there are more lines, append next line to current one
-               lDelAppend := ::nCol > ::LineLen(::nRow)
-               ::aText[::nRow]:cText := Stuff(::aText[::nRow]:cText, ::nCol, 1, "")
-               if lDelAppend
-                  if ::nRow < ::naTextLen
-                     ::aText[::nRow]:cText += ::GetLine(::nRow + 1)
-                     ::RemoveLine(::nRow + 1)
-                     ::RefreshWindow()
-                  else
-                     ::RefreshLine()
+                  lDelAppend := ::nCol > ::LineLen(::nRow)
+                  ::aText[::nRow]:cText := Stuff(::aText[::nRow]:cText, ::nCol, 1, "")
+                  if lDelAppend
+                     if ::nRow < ::naTextLen
+                        ::aText[::nRow]:cText += ::GetLine(::nRow + 1)
+                        ::RemoveLine(::nRow + 1)
+                        ::SplitLine(::nRow)
+                        ::RefreshWindow()
+                     else
+                        ::RefreshLine()
+                     endif
                   endif
-               else
-                  ::RefreshLine()
                endif
 
             case nKey == K_TAB
