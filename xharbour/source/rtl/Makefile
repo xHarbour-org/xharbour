@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.14 2003/01/12 22:50:21 jonnymind Exp $
+# $Id: Makefile,v 1.15 2003/01/27 04:26:40 walito Exp $
 #
 
 ROOT = ../../
@@ -44,6 +44,7 @@ C_SOURCES=\
         gtapiu.c     \
         gx.c         \
         hardcr.c     \
+        hbrandom.c   \
         idle.c       \
         inkey.c      \
         is.c         \
