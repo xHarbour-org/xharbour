@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.24 2003/02/22 05:54:57 jonnymind Exp $
+* $Id: thread.h,v 1.25 2003/02/26 05:36:09 jonnymind Exp $
 */
 
 /*
@@ -161,9 +161,7 @@ typedef struct tag_HB_THREAD_PARAM
     PHB_ITEM pArgs;
     USHORT uiCount;
     BOOL bIsMethod;
-#ifdef HB_OS_WIN_32
-   HB_THREAD_CONTEXT *context;
-#endif
+    HB_THREAD_CONTEXT *context;
 } HB_THREAD_PARAM;
 
 /* Ligthweight system indepented reentrant mutex, used internally by harbour */
