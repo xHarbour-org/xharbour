@@ -1,5 +1,5 @@
 /*
- * $Id: dispc.c,v 1.3 2002/11/05 17:50:55 walito Exp $
+ * $Id: dispc.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /*
@@ -172,7 +172,7 @@ static long getblock(long offset)
         /* read in the file and set the buffer bottom variable equal */
         /*  to the number of bytes actually read in.                 */
 
-    buffbot = hb_fsReadLarge( infile, buffer, buffsize );
+    buffbot = hb_fsReadLarge( infile, (BYTE *) buffer, buffsize );
 
         /* if a full buffer's worth was not read in, make it full.   */
 
@@ -183,7 +183,7 @@ static long getblock(long offset)
         else
             hb_fsSeek( infile, (long) buffsize, SEEK_SET );
 
-        buffbot = hb_fsReadLarge( infile, buffer, buffsize );
+        buffbot = hb_fsReadLarge( infile, (BYTE *) buffer, buffsize );
     }
 
         /* return the actual file position */
@@ -583,7 +583,7 @@ HB_FUNC( _FT_DFINIT )
         norm   = hb_parni(7);                 /* normal color attribute    */
         hlight = hb_parni(8);                 /* highlight color attribute */
 
-        if ((hb_parinfo(9) && 512) == 512)       /* if array */
+        if ((hb_parinfo(9) & 512) == 512)       /* if array */
         {
            keytype = K_LIST;
            kcount  = hb_parinfa( 9, 0 );
@@ -729,7 +729,6 @@ HB_FUNC( FT_DISPFILE )
 
     int ch;
 
-
     /* make sure buffers were allocated and file was opened */
     if (isallocated == TRUE && infile > 0)
       {
@@ -747,7 +746,7 @@ HB_FUNC( FT_DISPFILE )
 
         do
         {
-            if ( refresh == YES )           /* redraw window contents? */
+            if ( refresh )           /* redraw window contents? */
                 disp_update(wintop);
 
                 hb_gtRest( sline, scol, eline, ecol, vseg );
@@ -774,13 +773,13 @@ HB_FUNC( FT_DISPFILE )
 
             switch (ch)
             {
-               case K_DOWN :  if ( brows == YES )          /* if browse flag */
+               case K_DOWN :  if ( brows )                 /* if browse flag */
                                   winrow = eline;          /* is set, force  */
                                                            /* active line to */
                               linedown();                  /* be last line   */
                               break;
 
-               case K_UP   :  if ( brows == YES )          /* if browse flag */
+               case K_UP   :  if ( brows )                 /* if browse flag */
                                   winrow = sline;          /* is set, force  */
                                                            /* active line to */
                               lineup();                    /* be first line  */

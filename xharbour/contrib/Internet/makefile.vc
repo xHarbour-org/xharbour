@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.1 2003/05/27 15:19:12 paultucker Exp $
+# $Id: makefile.vc,v 1.1 2003/09/23 21:23:55 paultucker Exp $
 #
 
 #
@@ -87,6 +87,8 @@ HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
 
 {$(INTERNET_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(INTERNET_DIR)}.prg{$(OBJ_DIR)}.c::
 
 {$(INTERNET_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<

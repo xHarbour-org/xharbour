@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallbc.bat,v 1.4 2003/09/25 02:02:31 paultucker Exp $
+rem $Id: makallbc.bat,v 1.5 2003/10/01 17:44:49 paultucker Exp $
 rem 
 
 echo create system files
@@ -41,6 +41,13 @@ if errorlevel 1 goto end
 :libmisc
 echo libmisc
 cd contrib\libmisc
+call make_b32.bat %1
+cd ..\..
+if errorlevel 1 goto end
+
+:libnf
+echo libnf
+cd contrib\libnf
 call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end

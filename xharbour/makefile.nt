@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.44 2003/09/09 02:07:54 paultucker Exp $
+# $Id: makefile.nt,v 1.46 2003/09/25 02:02:31 paultucker Exp $
 #
 
 #
@@ -325,6 +325,8 @@ LIBS2 = \
 {$(RTL_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
+{$(RTL_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
+
 {$(RTL_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RTL_LIB)2
@@ -615,6 +617,8 @@ MACRO_LIB_OBJS = \
 {$(RDD_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
+{$(RDD_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
+
 {$(RDD_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RDD_LIB)2
@@ -647,6 +651,8 @@ RDD_LIB_OBJS = \
 {$(RDD_DIR)\nulsys}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
+{$(RDD_DIR)\nulsys}.prg{$(OBJ_DIR)}.c::
+
 {$(RDD_DIR)\nulsys}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(NULSYS_LIB)2
@@ -660,6 +666,8 @@ NULSYS_LIB_OBJS = \
 
 {$(RDD_DIR)\dbfntx}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)$(MT)}.c::
 
 {$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
@@ -677,6 +685,8 @@ DBFNTX_LIB_OBJS = \
 {$(RDD_DIR)\dbfcdx}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
+{$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)$(MT)}.c::
+
 {$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFCDX_LIB)2
@@ -693,6 +703,8 @@ DBFCDX_LIB_OBJS = \
 {$(RDD_DIR)\dbfdbt}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
+{$(RDD_DIR)\dbfdbt}.prg{$(OBJ_DIR)$(MT)}.c::
+
 {$(RDD_DIR)\dbfdbt}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFDBT_LIB)2
@@ -708,6 +720,8 @@ DBFDBT_LIB_OBJS = \
 
 {$(RDD_DIR)\dbffpt}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\dbffpt}.prg{$(OBJ_DIR)$(MT)}.c::
 
 {$(RDD_DIR)\dbffpt}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
@@ -738,6 +752,8 @@ PP_LIB_OBJS = \
 
 {$(DEBUG_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.c::
 
 {$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
@@ -782,6 +798,8 @@ COMMON_LIB_OBJS = \
 {$(VM_DIR)}.c{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.obj::
    $(CC) $(CLIBFLAGS) -DHB_FM_STATISTICS_OFF -DHB_NO_PROFILER -Fo$(OBJ_DIR)$(MT)\OPT\CONSOLE\ $<
 
+{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.c::
+
 {$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\OPT\CONSOLE\ $<
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(VM_LIB_OPT_CON)2
@@ -798,6 +816,8 @@ VM_LIB_OPT_CON_OBJS = \
 {$(VM_DIR)}.c{$(OBJ_DIR)$(MT)\OPT\GUI}.obj::
    $(CC) $(CLIBFLAGS) -DHB_FM_STATISTICS_OFF -DHB_NO_PROFILER -DHB_GUI -Fo$(OBJ_DIR)$(MT)\OPT\GUI\ $<
 
+{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\GUI}.c::
+
 {$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\GUI}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\OPT\GUI\ $<
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(VM_LIB_OPT_GUI)2
@@ -813,6 +833,8 @@ VM_LIB_OPT_GUI_OBJS = \
 
 {$(VM_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
 
 {$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
@@ -944,6 +966,8 @@ SAMPLES_LIB_OBJS =  \
 #
 {$(ODBC_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+{$(ODBC_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
 
 {$(ODBC_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
@@ -1152,7 +1176,7 @@ $(HARBOUR_EXE) : \
    $(COMPILER_DIR)\exproptb.c \
    $(COMPILER_DIR)\exproptc.c
    -$(ECHO) > $(OBJ_DIR)\unistd.h
-   $(CC) $(C_FLAGSNMT) -I$(OBJ_DIR) -Fo$(OBJ_DIR)\ -W3 $** -o $(HARBOUR_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB)
+   $(CC) $(C_FLAGSNMT) -I$(OBJ_DIR) -Fo$(OBJ_DIR)\ -W3 $** -o $(HARBOUR_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
    -$(DEL) $(OBJ_DIR)\unistd.h
 
 #
