@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.62 2003/07/13 22:26:16 jonnymind Exp $
+# $Id: makefile.bc,v 1.63 2003/07/24 02:10:39 jonnymind Exp $
 #
 
 #
@@ -605,6 +605,7 @@ DEBUG_LIB_OBJS = \
    $(OBJ_DIR)\dbgtarr.obj \
    $(OBJ_DIR)\dbgtobj.obj \
    $(OBJ_DIR)\tbrwtext.obj \
+   $(OBJ_DIR)\dbgaltd.obj \
    $(OBJ_DIR)\dbgwa.obj
 
 #
@@ -2432,6 +2433,13 @@ $(OBJ_DIR)\dbgwa.c : $(DEBUG_DIR)\dbgwa.prg
 
 $(OBJ_DIR)\dbgwa.obj : $(OBJ_DIR)\dbgwa.c
    $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\dbgaltd.c : $(DEBUG_DIR)\dbgaltd.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dbgaltd.obj : $(OBJ_DIR)\dbgaltd.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 
 #
 # GTCGI.LIB dependencies
