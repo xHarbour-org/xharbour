@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.97 2003/11/11 20:20:53 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.98 2003/11/11 20:46:18 ronpinkas Exp $
  */
 
 /*
@@ -150,7 +150,7 @@ static int    stroncpy( char *, char *, int );
 static int    strincpy( char *, char * );
 static BOOL   truncmp( char **, char **, BOOL );
 static BOOL   strincmp( char *, char **, BOOL );
-static int    strotrim( char *, BOOL ); /* Ron Pinkas 2001-02-14 added 2nd parameter */
+static int    strotrim( char *, int ); /* Ron Pinkas 2001-02-14 added 2nd parameter */
 static int    NextWord( char **, char *, BOOL );
 static int    NextName( char **, char * );
 static int    NextParm( char **, char * );
@@ -1222,14 +1222,14 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
   {
     // Ron Pinkas commented 2002-09-23
     //RemoveSlash( mpatt, FALSE );
-    mlen = strotrim( mpatt, TRUE );
+    mlen = strotrim( mpatt, 0 );
 
     /* Ron Pinkas removed 2000-12-03
     sLine += ipos + 1; */
 
     HB_SKIPTABSPACES(sLine);
     hb_pp_strocpy( rpatt, sLine );
-    rlen = strotrim( rpatt, TRUE );
+    rlen = strotrim( rpatt, 0 );
 
     ConvertPatterns( mpatt, mlen, rpatt, rlen );
 
@@ -1871,7 +1871,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
   HB_TRACE(HB_TR_DEBUG, ("hb_pp_ParseExpression(%s, %s)", sLine, sOutLine));
 
-  strotrim( sLine, FALSE );
+  strotrim( sLine, 1 );
 
   isdvig = 0;
 
@@ -2702,7 +2702,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   *(ptro + *lenres) = '\0';
 
   //printf( "%s\n", ptro );
-  strotrim( ptro, ptro[0] == '#' ); // Removing excess spaces.
+  strotrim( ptro, 2 ); // Removing excess spaces.
   //printf( "%s\n", ptro );
 
   *lenres = RemoveNotInstanciated( ptro );   /* Removing [ ... ] from result string */
@@ -5534,12 +5534,16 @@ static int strincpy( char * ptro, char * ptri )
   return len;
 }
 
-static int strotrim( char * stroka, BOOL bRule )
+static int strotrim( char * stroka, int iContext )
 {
   char *ptr = stroka, *pString = 0, lastc = '0', curc;
   int lens = 0, State = STATE_NORMAL;
 
-  char cLastChar = ' ';
+  // iContext 0 = ParseCommand(), 1 = hb_pp_ParseExpression, 2 = CommandStuff()
+  BOOL bRule = (iContext == 0 || stroka[0] == '#');
+
+  // Simulate cLastChar value if last token qualifies as array index prefix.
+  char cLastChar = ( s_bArray ? 'a' : ' ' );
 
   char *sFirstToken = stroka;
 
@@ -5613,6 +5617,13 @@ static int strotrim( char * stroka, BOOL bRule )
            }
         }
      }
+     else if( State == STATE_BRACKET )
+     {
+        if( curc == ']' )
+        {
+           State = STATE_NORMAL;
+        }
+     }
      else
      {
         if( curc == '\'' )
@@ -5629,7 +5640,13 @@ static int strotrim( char * stroka, BOOL bRule )
         /* Ron Pinkas 2001-02-14 added bRule logic */
         else if( curc == '[' )
         {
-           if( bRule == FALSE && ( strchr( ")]}.\"'\\", cLastChar ) == NULL ) )
+           // Hack - 1st phase, do not attempt to determine [] context.
+           if( iContext == 1 )
+           {
+              // Same as STATE_NORMAL but more clear.
+              State = STATE_BRACKET;
+           }
+           else if( bRule == FALSE && strchr( ")]}.\"'\\", cLastChar ) == NULL )
            {
               if( ISNAME( cLastChar ) )
               {

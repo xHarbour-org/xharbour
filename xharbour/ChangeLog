@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1737 2003/11/17 17:33:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1738 2003/11/18 00:57:25 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-17 19:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Changed 2nd param of strotrim() to int iContext, and added logic to avoid []
+      context detrermination if context is hb_pp_ParseExpression().
+      This fixes a bug where spaces were removed from [...] literal strings.
+
+    * Added logic to initialize cLastChar in strotrim() based on s_Array
+      which was set by the preceding call to hb_pp_NextToken().
+      This fixes a bug where result begins with a \[. This was processed as a LITERAL String
+      but the #directive anchor which was retrived with the last call to hb_pp_NextToken()
+      is what should be used to determine the context.
 
 2003-11-18 01:50 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * vm\eval.c
