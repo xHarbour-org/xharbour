@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.168 2002/01/03 03:21:52 lculik Exp $
+ * $Id: filesys.c,v 1.7 2002/01/05 19:28:48 lculik Exp $
  */
 
 /*
@@ -408,7 +408,6 @@ FHANDLE hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
             dwFlags |= GENERIC_READ;
             break;
 
-         case  FO_READ | FO_WRITE :
          case  FO_READWRITE :
             dwFlags |= GENERIC_READ | GENERIC_WRITE;
             break;
@@ -421,11 +420,11 @@ FHANDLE hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
       /* shared flags */
       switch (uiFlags & ( FO_DENYREAD | FO_SHARED | FO_DENYWRITE | FO_EXCLUSIVE ))
       {
-      case  FO_DENYREAD:
+      case  FO_DENYREAD :
          dwShare = FILE_SHARE_WRITE;
          break;
 
-      case FO_SHARED:
+      case FO_SHARED :
          dwShare = FILE_SHARE_WRITE | FILE_SHARE_READ;
          break;
 
