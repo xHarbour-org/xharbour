@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.53 2004/03/13 12:14:45 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.54 2004/03/14 13:37:20 vouchcac Exp $
  */
 
 /*
@@ -2313,18 +2313,16 @@ METHOD DrawARow() CLASS TBrowse
 METHOD DeHilite() CLASS TBrowse
    Local nRow := ::RowPos + ::nRowData
    Local nCol := ::nColPos, nCurCol
-   Local lColorRect := .f.
 
    SetPos( nRow, ::aColsInfo[ nCol, o_Obj ]:colPos )
 
    if !Empty( ::aRect ) .and.;
            ::aRect[ 1 ] <= nRow .and. ::aRect[ 3 ] >= nRow .and.;
            ::aRect[ 2 ] <= nCol .and. ::aRect[ 4 ] >= nCol
-      lColorRect := .t.
+      ::DispCell( nCol, TBC_CLR_STANDARD, ::aRectColor )
+   else
+      ::DispCell( nCol, TBC_CLR_STANDARD )
    endif
-
-   // nCurCol := ::DispCell( nCol, TBC_CLR_STANDARD, if( lColorRect, ::aRectColor, ) )
-   ::DispCell( nCol, TBC_CLR_STANDARD, if( lColorRect, ::aRectColor, ) )
 
    // SetPos( nRow, nCurCol )
    SetPos( nRow, ::aColsInfo[ nCol, o_Obj ]:colPos )
@@ -2336,21 +2334,20 @@ METHOD DeHilite() CLASS TBrowse
 METHOD Hilite() CLASS TBrowse
    Local nRow := ::RowPos + ::nRowData
    Local nCol := ::nColPos, nCurCol
-   Local lColorRect := .f.
 
    // Start of cell
    //
    SetPos( nRow, ::aColsInfo[ nCol, o_Obj ]:ColPos )
 
    if !Empty( ::aRect ) .and.;
-        ::aRect[ 1 ] <= nRow .and. ::aRect[ 3 ] >= nRow .and.;
-        ::aRect[ 2 ] <= nCol .and. ::aRect[ 4 ] >= nCol
-      lColorRect := .t.
+              ::aRect[ 1 ] <= nRow .and. ::aRect[ 3 ] >= nRow .and.;
+              ::aRect[ 2 ] <= nCol .and. ::aRect[ 4 ] >= nCol
+      ::DispCell( nCol, TBC_CLR_ENHANCED, ::aRectColor )
+   else
+      ::DispCell( nCol, TBC_CLR_ENHANCED )
    endif
 
-//   nCurCol := ::DispCell( nCol, TBC_CLR_ENHANCED, if( lColorRect, ::aRectColor, ) )
-   ::DispCell( nCol, TBC_CLR_ENHANCED, if( lColorRect, ::aRectColor, ) )
-//   SetPos( nRow, nCurCol )
+   // SetPos( nRow, nCurCol )
    SetPos( nRow, ::aColsInfo[ nCol, o_Obj ]:ColPos )
 
 #ifdef HB_COMPAT_C53
@@ -2368,7 +2365,6 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
    LOCAL oCol      := aColsInfo[ o_Obj       ]
    LOCAL nWidth    := aColsInfo[ o_Width     ]
    LOCAL nLen      := aColsInfo[ o_WidthCell ]
-   LOCAL cType     := aColsInfo[ o_Type      ]
    LOCAL ftmp      := Eval( oCol:block )
 //   LOCAL nCol
 
@@ -2378,33 +2374,32 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
    LOCAL cColor
 
    // if called when the column type is not defined, then do nothing
-   if EMPTY( cType )
-     RETURN nil // nCol
-   ENDIF
+   if empty( aColsInfo[ o_Type ] )
+      Return nil // nCol
+   endif
 
    if aColors == NIL
       if oCol:ColorBlock == NIL
-//         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, nColor ) - 1 )
-         cColor := ::aColorSpec[ ColorToDisp( oCol:DefColor, nColor ) ]
+         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, nColor ) - 1 )
+//         cColor := ::aColorSpec[ ColorToDisp( oCol:DefColor, nColor ) ]
       else
-//         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( Eval( oCol:ColorBlock, ftmp ), nColor ) - 1 )
-         cColor := ::aColorSpec[ ColorToDisp( Eval( oCol:ColorBlock, ftmp ), nColor ) ]
+         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( Eval( oCol:ColorBlock, ftmp ), nColor ) - 1 )
+//         cColor := ::aColorSpec[ ColorToDisp( Eval( oCol:ColorBlock, ftmp ), nColor ) ]
       endif
    else
       cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( aColors, nColor ) - 1 )
 //       cColor := ::aColorSpec[ ColorToDisp( aColors, nColor ) ]
    endif
 
-   Switch cType
+   Switch aColsInfo[ o_Type ]
    case "C"
    case "M"
 /*
       nCol := Col()
-
       DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
       DispOut( Space( nWidth - nLen ), cColor )
 */
-      DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), @cColor )
+      DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), cColor )
       exit
 
    case "N"
@@ -2416,18 +2411,16 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
       DispOut( PadL( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
       nCol := Col()
 */
-
-      DispOut( PadL( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), @cColor )
+      DispOut( PadL( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), cColor )
       exit
 
    case "D"
-
 /*
       nCol := Col()
       DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
       DispOut( Space( nWidth - nLen ), cColor )
 */
-      DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), @cColor )
+      DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nWidth ), cColor )
       exit
 
    case "L"
@@ -2437,12 +2430,12 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
       DispOut( iif( ftmp, "T", "F" ), cColor )
       DispOut( Space( nWidth - Int( nWidth / 2 ) - 1 ), cColor )
 */
-      DispOut( padc( iif( ftmp, "T", "F" ),nWidth ), @cColor )
+      DispOut( padc( iif( ftmp, "T", "F" ),nWidth ), cColor )
       exit
 
    default
 //      nCol := Col()
-      DispOut( Space( nWidth ), @cColor )
+      DispOut( Space( nWidth ), cColor )
 
    end
 
@@ -2451,8 +2444,8 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
 //-------------------------------------------------------------------//
 
 METHOD DispCellNormal( nColumn ) CLASS TBrowse
-   LOCAL ftmp      := Eval( ::aColsInfo[ nColumn, o_Obj ]:block )
-   LOCAL cColor
+   Local ftmp := Eval( ::aColsInfo[ nColumn, o_Obj ]:block )
+   Local cColor
 
    if ::aColsInfo[ nColumn, o_Obj ]:ColorBlock == NIL
       cColor := ::aColorSpec[ ::aColsInfo[ nColumn, o_DefColor, TBC_CLR_STANDARD ] ]
@@ -2723,46 +2716,45 @@ METHOD TApplyKey( nKey, oBrowse ) CLASS tBrowse
 //-------------------------------------------------------------------//
 
 Method hitTest( mrow,mcol ) CLASS TBROWSE
-  Local i, nVisCol, lHitHeader := .f.
+   Local i, nVisCol, lHitHeader := .f.
 
-  ::mRowPos := ::rowPos
-  ::mColPos := ::colPos
+   ::mRowPos := ::rowPos
+   ::mColPos := ::colPos
 
-  if mRow < ::nTop .or. mRow > ::rect[ 3 ]
-     return HTNOWHERE
-  elseif mRow = ::nTop
-     lHitHeader := .t.
-  endif
+   if mRow < ::nTop .or. mRow > ::rect[ 3 ]
+      return HTNOWHERE
+   elseif mRow = ::nTop
+      lHitHeader := .t.
+   endif
 
-  if mCol < ::rect[ 2 ] .or. mCol > ::rect[ 4 ]
-     return HTNOWHERE
-  endif
+   if mCol < ::rect[ 2 ] .or. mCol > ::rect[ 4 ]
+      return HTNOWHERE
+   endif
 
-  ::mRowPos := mRow - ::rect[ 1 ] + 1
+   ::mRowPos := mRow - ::rect[ 1 ] + 1
 
-  nVisCol := len( ::aColumnsSep )
+   nVisCol := len( ::aColumnsSep )
 
-  if nVisCol == 0
-    ::mColPos := 1
+   if nVisCol == 0
+      ::mColPos := 1
 
-  elseif mcol >= ::aColumnsSep[ nVisCol ]
-    ::mColPos := nVisCol + 1
+   elseif mcol >= ::aColumnsSep[ nVisCol ]
+      ::mColPos := nVisCol + 1
 
-  else
-    for i := 1 to nVisCol
-      if mcol < ::aColumnsSep[ i ]
-        ::mColPos := i
-        exit
-      endif
-    next
+   else
+      for i := 1 to nVisCol
+         if mcol < ::aColumnsSep[ i ]
+            ::mColPos := i
+            exit
+         endif
+      next
+   endif
 
-  endif
+   if lHitHeader
+      return -5122
+   endif
 
-  if lHitHeader
-     return -5122
-  endif
-
-  Return HTCELL
+   Return HTCELL
 
 //-------------------------------------------------------------------//
 
@@ -2787,9 +2779,10 @@ static Function EvalSkipBlock( bBlock, nSkip )
    local lSign   := nSkip >= 0
    local nSkiped := Eval( bBlock, nSkip )
 
-   if (lSign .and. nSkiped < 0) .or. (!lSign .and. nSkiped > 0)
+   if ( lSign .and. nSkiped < 0 ) .or. ( !lSign .and. nSkiped > 0 )
       nSkiped := 0
    endif
+
    Return nSkiped
 
 //-------------------------------------------------------------------//
