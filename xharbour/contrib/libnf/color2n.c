@@ -1,5 +1,5 @@
 /*
- * $Id: color2n.c,v 1.3 2004/03/23 22:16:52 andijahja Exp $
+ * $Id: color2n.c,v 1.4 2004/09/06 20:01:02 druzus Exp $
  */
 
 /*
@@ -102,7 +102,9 @@ static int _ftColor2I( char * cColor )
 
     // check for the background color
 
-    while ( cColor[ iBack++ ] != '/' && cColor[ iBack ] != 0 );
+    while ( cColor[ iBack++ ] != '/' && cColor[ iBack ] != 0 )
+    {
+    }
 
     if ( cColor[--iBack ] == '/' )
     {

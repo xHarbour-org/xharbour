@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.11 2005/01/02 03:37:15 guerra000 Exp $
+ * $Id: hbpp.c,v 1.12 2005/02/17 07:53:48 andijahja Exp $
  */
 
 /*
@@ -265,7 +265,9 @@ int main( int argc, char * argv[] )
   }
 
   hb_buffer = ( char* ) hb_xgrab( HB_PP_STR_SIZE );
-  while( hb_pp_Internal( handl_o,hb_buffer ) > 0 );
+  while( hb_pp_Internal( handl_o,hb_buffer ) > 0 )
+  {
+  }
   fclose( hb_comp_files.pLast->handle );
   hb_xfree( hb_comp_files.pLast->pBuffer );
   hb_xfree( hb_comp_files.pLast );

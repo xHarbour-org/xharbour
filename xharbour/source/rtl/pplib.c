@@ -1,5 +1,5 @@
 /*
- * $Id: pplib.c,v 1.8 2004/10/26 01:30:54 ronpinkas Exp $
+ * $Id: pplib.c,v 1.9 2005/01/02 03:31:13 guerra000 Exp $
  */
 
 /*
@@ -217,7 +217,9 @@ HB_FUNC( __PPADDRULE )
          if( hb_comp_files.pLast )
          {
             hb_buffer = ( char* ) hb_xgrab( HB_PP_STR_SIZE );
-            while( hb_pp_Internal( NULL,hb_buffer ) > 0 );
+            while( hb_pp_Internal( NULL,hb_buffer ) > 0 )
+            {
+	    }
             CloseInclude();
             hb_xfree( hb_buffer );
          }
