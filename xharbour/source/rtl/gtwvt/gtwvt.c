@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.4 2003/12/22 01:18:59 peterrees Exp $
+ * $Id: gtwvt.c,v 1.5 2003/12/22 02:06:31 peterrees Exp $
  */
 
 /*
@@ -557,7 +557,9 @@ void HB_GT_FUNC(gt_PutText( USHORT top, USHORT left, USHORT bottom, USHORT right
 void HB_GT_FUNC(gt_SetAttribute( USHORT rowStart, USHORT colStart, USHORT rowStop, USHORT colStop, BYTE attr ))
 {
   USHORT irow, icol, index;
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d", usTop, usLeft, usBottom, usRight, (int) attr));
+
+  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %i", rowStart, colStart, rowStop, colStop, attr));
+
   for ( irow = rowStart; irow <=rowStop; irow++)
   {
     index = hb_wvt_gtGetIndexForTextBuffer(colStart, irow);
@@ -687,9 +689,11 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
  */
 BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
 {
-  BOOL bResult= FALSE;
-  HFONT hFont
+  BOOL bResult = FALSE;
+  HFONT hFont;
+
   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", row, col));
+
   if (row<= WVT_MAX_ROWS && col<= WVT_MAX_COLS)
   {
     hFont = hb_wvt_gtGetFont(_s.fontFace, _s.fontHeight, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage);
