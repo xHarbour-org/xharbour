@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.58 2003/03/29 00:00:34 lculik Exp $
+ * $Id: hbmake.prg,v 1.59 2003/03/30 15:59:54 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -342,7 +342,8 @@ FUNCTION ParseMakeFile( cFile )
                               IIF( lMt .AND. ! lGui, " $(BHC)\lib\hvmmt.obj", ;
                               IIF( ! lMt .AND. lGui, " $(BHC)\lib\hvmgui.obj", ;
                               " $(BHC)\lib\hvmguimt.obj" ) ) )
-                        ENDIF*/
+                        ENDIF
+			*/
 
                      ENDIF
 
