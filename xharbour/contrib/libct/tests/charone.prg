@@ -1,5 +1,5 @@
 /*
- * $Id: charone.prg,v 1.2 2001/07/17 20:27:13 mbirdyg Exp $
+ * $Id: charone.prg,v 1.1 2003/03/04 21:05:51 lculik Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
  */
 
 
-#include "../ct.ch"
+//#include "../ct.ch"
 
 
 procedure main
@@ -70,6 +70,7 @@ procedure main
  qout ([  charone("A  B  CCCD")      == "A B CD"? ---> "] + charone("A  B  CCCD")      + ["])
  qout ([  charone(" ", "A  B  A  B") == "A B A B"? --> "] + charone(" ", "A  B  A  B") + ["])
  qout ([  charone("o", "122oooB12o") == "122oB12o"? -> "] + charone("o", "122oooB12o") + ["])
+ qout ([  charone(" ", "111 22  33") == "111 22 33"? > "] + charone(" ", "111 22  33") + ["])
  qout ("")
 
  qout ("End test of CHARONE()")

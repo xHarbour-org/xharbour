@@ -1,5 +1,5 @@
 /*
- * $Id: wordone.prg,v 1.2 2001/07/17 20:27:13 mbirdyg Exp $
+ * $Id: wordone.prg,v 1.1 2003/03/04 21:06:21 lculik Exp $
  */
 
 /*
@@ -53,9 +53,6 @@
  */
 
 
-#include "../ct.ch"
-
-
 procedure main
 
  ctinit()
@@ -68,6 +65,8 @@ procedure main
  qout ([  wordone("12ABAB12")       == "12AB12" ? --> "] + wordone("12ABAB12")       + ["])
  qout ([  wordone("1AAAA2")         == "1AAAA2" ? --> "] + wordone("1AAAA2")         + ["])
  qout ([  wordone("12", "1212ABAB") == "12ABAB" ? --> "] + wordone("12", "1212ABAB") + ["])
+ qout ([  wordone("1223", "122222") == "122222" ? --> "] + wordone("1223", "122222") + ["])
+ qout ([  wordone("122322", "122222") == "1222" ? --> "] + wordone("122322", "122222") + ["])
  qout ("")
 
  qout ("End test of WORDONE()")
