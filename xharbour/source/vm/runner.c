@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.8 2002/05/16 02:28:38 ronpinkas Exp $
+ * $Id: runner.c,v 1.9 2002/12/19 18:15:36 ronpinkas Exp $
  */
 
 /*
@@ -68,6 +68,17 @@
 #include "hbvm.h"
 #include "hbpcode.h"
 
+// *** WARNING *** copy of this also in hvm.c !!!
+typedef struct _SYMBOLS
+{
+   PHB_SYMB pModuleSymbols;  /* pointer to a one module own symbol table */
+   USHORT   uiModuleSymbols; /* number of symbols on that table */
+   struct _SYMBOLS * pNext;  /* pointer to the next SYMBOLS structure */
+   HB_SYMBOLSCOPE hScope;    /* scope collected from all symbols in module used to speed initialization code */
+} SYMBOLS, * PSYMBOLS;       /* structure to keep track of all modules symbol tables */
+
+extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
+
 /* TODO: Fill the error codes with valid ones (instead of 9999) */
 /* TOFIX: Change this assembler hack to something standard and portable */
 /* TODO: Change the fopen()/fread()/fclose() calls to hb_fs*() */
@@ -112,6 +123,7 @@ typedef struct
    LONG ulSymStart;                             /* Startup Symbol           */
    PHB_SYMB pSymRead;                           /* Symbols read             */
    PHB_DYNF pDynFunc;                           /* Functions read           */
+   PSYMBOLS pPrevLastModule;
 } HRB_BODY, * PHRB_BODY;
 
 
@@ -167,28 +179,45 @@ HB_FUNC( __HRBRUN )
          if( argc > 1 )
          {
             argv = (char**) hb_xgrab( sizeof(char*) * (argc-1) );
+
             for( i=0; i<argc-1; i++ )
+            {
                argv[i] = hb_parc( i+2 );
+            }
          }
+
          hb_hrbDo( pHrbBody, argc-1, argv );
+
          if( argv )
+         {
             hb_xfree( argv );
+         }
+
          hb_retl( 1 );
+
          hb_hrbUnLoad( pHrbBody );
       }
       else
+      {
          hb_retl( 0 );
+      }
    }
    else
+   {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBRUN", 0 );
+   }
 }
 
 HB_FUNC( __HRBLOAD )
 {
    if( hb_pcount() >= 1 )
+   {
       hb_retnl( (LONG) hb_hrbLoad( hb_parc( 1 ) ) );
+   }
    else
+   {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBLOAD", 0 );
+   }
 }
 
 HB_FUNC( __HRBDO )
@@ -206,26 +235,41 @@ HB_FUNC( __HRBDO )
          if( argc > 1 )
          {
             argv = (char**) hb_xgrab( sizeof(char*) * (argc-1) );
+
             for( i=0; i<argc-1; i++ )
+            {
                argv[i] = hb_parc( i+2 );
+            }
          }
+
          hb_hrbDo( pHrbBody, argc-1, argv );
+
          if( argv )
+         {
             hb_xfree( argv );
+         }
       }
       else
+      {
          hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBDO", 0 );
+      }
    }
    else
+   {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBDO", 0 );
+   }
 }
 
 HB_FUNC( __HRBUNLOAD )
 {
    if( hb_pcount() >= 1 )
+   {
       hb_hrbUnLoad( (PHRB_BODY) hb_parnl( 1 ) );
+   }
    else
+   {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBUNLOAD", 0 );
+   }
 }
 
 HB_FUNC( __HRBGETFU )
@@ -242,25 +286,39 @@ HB_FUNC( __HRBGETFU )
          while( ulPos < pHrbBody->ulSymbols )
          {
             if( !strcmp( szName, pHrbBody->pSymRead[ ulPos ].szName ) )
+            {
                break;
+            }
+
             ulPos++;
          }
+
          if( ulPos < pHrbBody->ulSymbols )
+         {
             hb_retnl( (LONG) ( pHrbBody->pSymRead + ulPos ) );
+         }
          else
+         {
             hb_retnl( 0 );
+         }
+
          hb_xfree( szName );
       }
       else
+      {
          hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBGETFU", 0 );
+      }
    }
    else
+   {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBGETFU", 0 );
+   }
 }
 
 HB_FUNC( __HRBDOFU )
 {
    int argc = hb_pcount();
+
    if( argc >=1 )
    {
       int i;
@@ -270,16 +328,23 @@ HB_FUNC( __HRBDOFU )
       {
          hb_vmPushSymbol( pSym );
          hb_vmPushNil();
+
          for( i = 0; i < argc-1; i++ ) /* Push other  params  */
+         {
             hb_vmPush( hb_param( i + 2, HB_IT_ANY ) );
+         }
 
          hb_vmDo( argc-1 );            /* Run function        */
       }
       else
+      {
          hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBDOFU", 0 );
+      }
    }
    else
+   {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBDOFU", 0 );
+   }
 }
 
 PHRB_BODY hb_hrbLoad( char* szHrb )
@@ -295,7 +360,9 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
    pFileName = hb_fsFNameSplit( szHrb );
 
    if( ! pFileName->szExtension )
+   {
       pFileName->szExtension = ".hrb";
+   }
 
    hb_fsFNameMerge( szFileName, pFileName );
 
@@ -308,7 +375,9 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
       USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 9999, NULL, szFileName, 0, EF_CANDEFAULT | EF_CANRETRY, 1, hb_paramError( 1 ) );
 
       if( uiAction == E_DEFAULT || uiAction == E_BREAK )
+      {
          break;
+      }
    }
 
    if( file )
@@ -326,9 +395,13 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
          hb_hrbFileClose( file );
          return NULL;
       }
+
       pHrbBody = ( PHRB_BODY ) hb_xgrab( sizeof( HRB_BODY ) );
+
       pHrbBody->ulSymStart = -1;
       pHrbBody->ulSymbols = hb_hrbFileReadLong( file, szFileName );
+      pHrbBody->pPrevLastModule = NULL;
+
       pSymRead = ( PHB_SYMB ) hb_xgrab( pHrbBody->ulSymbols * sizeof( HB_SYMB ) );
 
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )  /* Read symbols in .HRB     */
@@ -338,68 +411,93 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
          pSymRead[ ul ].pFunPtr = ( PHB_FUNC ) ( ULONG ) hb_hrbFileReadByte( file, szFileName );
          pSymRead[ ul ].pDynSym = NULL;
 
-         if ( pHrbBody->ulSymStart == -1 &&
-                    pSymRead[ ul ].cScope & HB_FS_FIRST &&
-                    ! ( pSymRead[ ul ].cScope & HB_FS_INITEXIT ) )
-             pHrbBody->ulSymStart = ul;
+         if ( pHrbBody->ulSymStart == -1 && pSymRead[ ul ].cScope & HB_FS_FIRST && ! ( pSymRead[ ul ].cScope & HB_FS_INITEXIT ) )
+         {
+            pHrbBody->ulSymStart = ul;
+         }
       }
 
       pHrbBody->ulFuncs = hb_hrbFileReadLong( file, szFileName );  /* Read number of functions */
       pDynFunc = ( PHB_DYNF ) hb_xgrab( pHrbBody->ulFuncs * sizeof( HB_DYNF ) );
       memset( pDynFunc, 0, pHrbBody->ulFuncs * sizeof( HB_DYNF ) );
+
       for( ul = 0; ul < pHrbBody->ulFuncs; ul++ )         /* Read symbols in .HRB     */
       {
          pDynFunc[ ul ].szName = hb_hrbFileReadId( file, szFileName );
 
          ulSize = hb_hrbFileReadLong( file, szFileName );      /* Read size of function    */
          pDynFunc[ ul ].pCode = ( BYTE * ) hb_xgrab( ulSize );
+
+         /* Read the block           */
          hb_hrbFileRead( file, szFileName, ( char * ) pDynFunc[ ul ].pCode, 1, ulSize );
-                                             /* Read the block           */
-         pDynFunc[ ul ].pAsmCall = hb_hrbAsmCreateFun( pSymRead,
-                                              pDynFunc[ ul ].pCode );
-                                             /* Create matching dynamic  */
-                                             /* function                 */
+
+        /* Create matching dynamic function */
+         pDynFunc[ ul ].pAsmCall = hb_hrbAsmCreateFun( pSymRead, pDynFunc[ ul ].pCode );
+
+         //printf( "#%i/%i Sym: >%s<, pAsm: %p\n", ul, pHrbBody->ulFuncs, pDynFunc[ ul ].szName, pDynFunc[ ul ].pAsmCall );
       }
 
       pHrbBody->pSymRead = pSymRead;
       pHrbBody->pDynFunc = pDynFunc;
       s_ulSymEntry = 0;
+
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )    /* Linker                   */
       {
+         //printf( "#%i/%i Sym: >%s<\n", ul, pHrbBody->ulSymbols, pSymRead[ ul ].szName );
+
          if( ( ( ULONG ) pSymRead[ ul ].pFunPtr ) == SYM_FUNC )
          {
             ulPos = hb_hrbFindSymbol( pSymRead[ ul ].szName, pDynFunc, pHrbBody->ulFuncs );
-            if( ulPos != SYM_NOT_FOUND )
+
+            //printf( "Pos: %i\n", ulPos );
+
+            if( ulPos == SYM_NOT_FOUND )
+            {
+               pSymRead[ ul ].pFunPtr = ( PHB_FUNC ) SYM_EXTERN;
+            }
+            else
             {
                /* Exists and NOT static ?  */
-/*                if(    hb_dynsymFind( pSymRead[ ul ].szName ) &&
-                   !( pSymRead[ ul ].cScope & HB_FS_STATIC ) )
+               /*
+               if( hb_dynsymFind( pSymRead[ ul ].szName ) && ! ( pSymRead[ ul ].cScope & HB_FS_STATIC ) )
                {
                   hb_errRT_BASE( EG_ARG, 9999, "Duplicate symbol", pSymRead[ ul ].szName );
                   bError = TRUE;
                   break;
                }
-*/
+               */
                pSymRead[ ul ].pFunPtr = pDynFunc[ ulPos ].pAsmCall->pFunPtr;
             }
-            else
-               pSymRead[ ul ].pFunPtr = ( PHB_FUNC ) SYM_EXTERN;
          }
+
+         /* External function        */
          if( ( ( ULONG ) pSymRead[ ul ].pFunPtr ) == SYM_EXTERN )
-         {                                   /* External function        */
+         {
+            //printf( "External\n" );
+
             pDynSym = hb_dynsymFind( pSymRead[ ul ].szName );
-            if( !pDynSym )
+
+            //printf( "Found: %p\n", pDynSym );
+
+            if( pDynSym )
+            {
+
+               pSymRead[ ul ].pFunPtr = pDynSym->pFunPtr;
+            }
+            else
             {
                char szName[21];
-               strncpy( szName,pSymRead[ ul ].szName,20 );
+
+               strncpy( szName, pSymRead[ ul ].szName, 20 );
+
                hb_hrbUnLoad( pHrbBody );
                hb_errRT_BASE( EG_ARG, 9999, "Unknown or unregistered symbol", szName, 0 );
                bError = TRUE;
                break;
             }
-            pSymRead[ ul ].pFunPtr = pDynSym->pFunPtr;
          }
       }
+
       if( bError )
       {
          hb_hrbUnLoad( pHrbBody );
@@ -408,7 +506,11 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
       hb_hrbFileClose( file );
    }
+
+   pHrbBody->pPrevLastModule = hb_vmLastModule();
+
    hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, __FILE__, (int) HB_PCODE_VER );
+
    return pHrbBody;
 }
 
@@ -432,6 +534,7 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
          pHrbBody->pSymRead[ ul ].pFunPtr();
       }
    }
+
    for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )    /* Check INIT functions     */
    {
       if( ( pHrbBody->pSymRead[ ul ].cScope & HB_FS_INITEXIT ) == HB_FS_INIT )
@@ -450,8 +553,12 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
    {
        hb_vmPushSymbol( &( pHrbBody->pSymRead[ pHrbBody->ulSymStart ] ) );
        hb_vmPushNil();
+
        for( i = 0; i < ( hb_pcount() - 1 ); i++ )
+       {
           hb_vmPush( hb_param( i + 2, HB_IT_ANY ) ); /* Push other cmdline params*/
+       }
+
        hb_vmDo( hb_pcount() - 1 );                   /* Run the thing !!!        */
 
        pRetVal = hb_itemNew( NULL );
@@ -472,26 +579,59 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
    }
 
    if( pRetVal )
+   {
       hb_itemRelease( hb_itemReturn( pRetVal ) );
+   }
 }
 
 void hb_hrbUnLoad( PHRB_BODY pHrbBody )
 {
    ULONG ul;
 
+   if( pHrbBody->pPrevLastModule && pHrbBody->pPrevLastModule->pNext )
+   {
+      // Release PSYMBOLS of our module.
+      hb_xfree( pHrbBody->pPrevLastModule->pNext );
+
+      // Reset
+      pHrbBody->pPrevLastModule->pNext = NULL;
+   }
+
    for( ul = 0; ul < pHrbBody->ulFuncs; ul++ )
    {
+      PHB_DYNS pDyn;
+
+      pDyn = hb_dynsymFind( pHrbBody->pDynFunc[ ul ].szName );
+
+      if( pDyn && pDyn->pFunPtr && pDyn->pFunPtr == pHrbBody->pDynFunc[ ul ].pAsmCall->pFunPtr )
+      {
+         //printf( "Reset >%s<\n", pHrbBody->pDynFunc[ ul ].szName );
+
+         pDyn->pFunPtr = NULL;
+         pDyn->pSymbol->pFunPtr = NULL;
+      }
+
       hb_xfree( pHrbBody->pDynFunc[ ul ].pAsmCall->pAsmData );
       hb_xfree( pHrbBody->pDynFunc[ ul ].pAsmCall );
       hb_xfree( pHrbBody->pDynFunc[ ul ].pCode );
       hb_xfree( pHrbBody->pDynFunc[ ul ].szName );
    }
 
+   //printf( "Done with Functions\n" );
+
+   /* We can NOT release the symbols or else the Dynamic-Symbols-Table will get corrupted!!!
+    * The list as whole is NOT a candidate for possible recycling because the future hrb may be modified!
+    * It is possible to recycle individual symbols but I'm not sure it's worth the efforts.
    for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )
+   {
+      //printf( "# %i/%i Freeing: >%s<\n", ul, pHrbBody->ulSymbols, pHrbBody->pSymRead[ ul ].szName );
+
       hb_xfree( pHrbBody->pSymRead[ ul ].szName );
+   }
+   hb_xfree( pHrbBody->pSymRead );
+   */
 
    hb_xfree( pHrbBody->pDynFunc );
-   hb_xfree( pHrbBody->pSymRead );
    hb_xfree( pHrbBody );
 }
 
@@ -501,24 +641,34 @@ static ULONG hb_hrbFindSymbol( char * szName, PHB_DYNF pDynFunc, ULONG ulLoaded 
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbFindSymbol(%s, %p, %lu)", szName, pDynFunc, ulLoaded));
 
-   if( ( s_ulSymEntry < ulLoaded ) &&             /* Is it a normal list ?    */
-       !strcmp( szName, pDynFunc[ s_ulSymEntry ].szName ) )
+   if( ( s_ulSymEntry < ulLoaded ) &&  /* Is it a normal list ? */ ! strcmp( szName, pDynFunc[ s_ulSymEntry ].szName ) )
+   {
       ulRet = s_ulSymEntry++;
+   }
    else
    {
       BOOL bFound = FALSE;
 
       ulRet = 0;
-      while( !bFound && ulRet < ulLoaded )
+
+      while( ! bFound && ulRet < ulLoaded )
       {
-         if( !strcmp( szName, pDynFunc[ ulRet ].szName ) )
+         if( ! strcmp( szName, pDynFunc[ ulRet ].szName ) )
+         {
             bFound = TRUE;
+         }
          else
+         {
             ulRet++;
+         }
       }
+
       if( !bFound )
+      {
          ulRet = SYM_NOT_FOUND;
+      }
    }
+
    return ulRet;
 }
 
@@ -530,16 +680,16 @@ static int hb_hrbFileReadHead( FILE * file, char * szFileName )
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileReadHead(%p)", file ));
 
    hb_hrbFileRead( file, szFileName, ( char * ) szBuf, 1, 4 );
+
    if( strncmp( ( char * ) szHead, ( char * ) szBuf, 4 ) )
    {
       hb_errRT_BASE_Ext1( EG_CORRUPTION, 9999, NULL, szFileName, 0, EF_CANDEFAULT, 1, hb_paramError( 1 ) );
       return 0;
    }
+
    hb_hrbFileRead( file, szFileName, cInt, 2, 1 );
 
-   return ( ( BYTE ) cInt[ 0 ] ) +
-          ( ( BYTE ) cInt[ 1 ] ) * 0x100 ;
-
+   return ( ( BYTE ) cInt[ 0 ] ) + ( ( BYTE ) cInt[ 1 ] ) * 0x100 ;
 }
 
 /* ReadId
@@ -555,14 +705,21 @@ static char * hb_hrbFileReadId( FILE * file, char * szFileName )
 
    szTemp = ( char * ) hb_xgrab( 256 );
    szIdx  = szTemp;
+
    do
    {
       hb_hrbFileRead( file, szFileName, szIdx, 1, 1 );
+
       if( *szIdx )
+      {
          szIdx++;
+      }
       else
+      {
          bCont = FALSE;
-   } while( bCont );
+      }
+   }
+   while( bCont );
 
    szRet = ( char * ) hb_xgrab( szIdx - szTemp + 1 );
    strcpy( szRet, szTemp );
@@ -598,10 +755,12 @@ static long hb_hrbFileReadLong( FILE * file, char * szFileName )
       return 0;
    }
    else
+   {
       return ( ( BYTE ) cLong[ 0 ] )             +
              ( ( BYTE ) cLong[ 1 ] ) * 0x100     +
              ( ( BYTE ) cLong[ 2 ] ) * 0x10000   +
              ( ( BYTE ) cLong[ 3 ] ) * 0x1000000 ;
+   }
 }
 
 
@@ -612,7 +771,9 @@ static void hb_hrbFileRead( FILE * file, char * szFileName, char * cBuffer, int 
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileRead(%p, %s, %p, %d, %d)", file, szFileName, cBuffer, iSize, iCount));
 
    if( iCount != ( int ) fread( cBuffer, iSize, iCount, file ) )
+   {
       hb_errRT_BASE_Ext1( EG_READ, 9999, NULL, szFileName, 0, EF_NONE, 0 );
+   }
 }
 
 
@@ -695,8 +856,7 @@ static void hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address )
 
 
 /* Intel specific ?? Patch an address relative to the next instruction */
-static void hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset,
-                                    void * Address, ULONG ulNext )
+static void hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext )
 {
    ULONG ulBase;
    ULONG ulRelative;

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.192 2003/04/27 00:46:04 ronpinkas Exp $
+ * $Id: hvm.c,v 1.193 2003/04/29 23:55:40 ronpinkas Exp $
  */
 
 /*
@@ -105,6 +105,8 @@
 /* DEBUG only*/
 /*#include <windows.h>*/
 
+// Here because of hbvm.h can't be used to to conflict with symbold in hbcomp.h BOTH are #included from expression optimizer :-(
+// *** WARNING *** copy of this also in runner.c !!!
 typedef struct _SYMBOLS
 {
    PHB_SYMB pModuleSymbols;  /* pointer to a one module own symbol table */
@@ -522,12 +524,12 @@ void HB_EXPORT hb_vmQuit( void )
    {
       return;
    }
-   //printf( "\nvmQuit()\n" );
 
-   //printf( "After Thread\n" );
+   //printf( "\nvmQuit()\n" );
 
    #ifdef HB_MACRO_STATEMENTS
      hb_pp_Free();
+     //printf( "After PP\n" );
    #endif
 
    s_uiActionRequest = 0;         /* EXIT procedures should be processed */
@@ -612,7 +614,6 @@ void HB_EXPORT hb_vmQuit( void )
 
    hb_traceExit();
    //printf( "After traceExit\n" );
-
 
    exit( s_byErrorLevel );
 }
@@ -6314,6 +6315,21 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
    }
 }
 
+HB_EXPORT PSYMBOLS hb_vmLastModule( void )
+{
+   PSYMBOLS pLastModule = s_pSymbols;
+
+   if( pLastModule )
+   {
+      while( pLastModule->pNext )
+      {
+         pLastModule = pLastModule->pNext;
+      }
+   }
+
+   return pLastModule;
+}
+
 static void hb_vmReleaseLocalSymbols( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmReleaseLocalSymbols()"));
@@ -6383,13 +6399,18 @@ static void hb_vmDoExitFunctions( void )
 
             if( scope == HB_FS_EXIT )
             {
+               //printf( "Exit: %p, Name: >%s<, Func: %p\n", pLastSymbols->pModuleSymbols + ui, ( pLastSymbols->pModuleSymbols + ui )->szName, ( pLastSymbols->pModuleSymbols + ui )->pFunPtr );
+
                hb_vmPushSymbol( pLastSymbols->pModuleSymbols + ui );
                hb_vmPushNil();
                hb_vmDo( 0 );
+
                if( s_uiActionRequest )
+               {
                   /* QUIT or BREAK was issued - stop processing
                   */
                   return;
+               }
             }
          }
       }

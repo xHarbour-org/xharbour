@@ -584,7 +584,12 @@ STATIC s_aSwitchDefs := {}
        NEXT
    #endif
 
-   IF sSource != NIL
+   IF sSource == NIL
+      s_nRow := 2
+      s_nCol := 0
+
+      RP_Dot()
+   ELSE
       s_nRow := Row()
       s_nCol := Col()
 
@@ -607,10 +612,6 @@ STATIC s_aSwitchDefs := {}
       ELSE
          PP_PreProFile( sSource, sPPOExt )
       ENDIF
-   ELSE
-      s_nRow := 2
-      s_nCol := 0
-      RP_Dot()
    ENDIF
 
    DevPos( s_nRow, s_nCol )
@@ -3231,7 +3232,8 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                      Alert( [Class #DEFINE Rules size mismatch] )
                   ENDIF
                ENDIF
-          #ifdef __HARBOUR__
+
+          #ifdef FW
             ELSEIF sLine == "FIVEWIN.CH"
                IF ! s_lFWLoaded
                   s_lFWLoaded := .T.
@@ -3261,6 +3263,9 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                      Alert( [FW #DEFINE Rules size mismatch] )
                   ENDIF
                ENDIF
+          #endif
+
+          #ifdef MINIGUI
             ELSEIF sLine == "MINIGUI.CH"
                IF ! s_lMiniGUILoaded
                   s_lMiniGUILoaded := .T.
@@ -3291,6 +3296,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                   ENDIF
                ENDIF
           #endif
+
             ELSE
                PP_PreProFile( sLine ) // Intentionally not using s_sIncludeFile
 
@@ -9132,48 +9138,6 @@ PROCEDURE PP_LoadRun()
    ENDIF
 
 RETURN
-
-//--------------------------------------------------------------//
-
-#ifdef __HARBOUR__
-
-   //--------------------------------------------------------------//
-   PROCEDURE PP_LoadClass()
-
-      IF ! s_lClsLoaded
-         s_lClsLoaded := .T.
-         InitClsRules()
-         InitClsResults()
-      ENDIF
-
-   RETURN
-
-   //--------------------------------------------------------------//
-   PROCEDURE PP_LoadFW()
-
-      IF ! s_lFWLoaded
-         s_lFWLoaded := .T.
-         InitFWRules()
-         InitFWResults()
-      ENDIF
-
-   RETURN
-
-   //--------------------------------------------------------------//
-   PROCEDURE PP_LoadMiniGUI()
-
-      IF ! s_lMiniGUILoaded
-         s_lMiniGUILoaded := .T.
-         InitMiniGUIRules()
-         InitMiniGUIResults()
-      ENDIF
-
-   RETURN
-
-   //--------------------------------------------------------------//
-   FUNCTION PP_CompileText( sLines )
-   RETURN PP_CompileLine( sLines )
-#endif
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1008 2003/05/08 03:45:01 lculik Exp $
+ * $Id: ChangeLog,v 1.1009 2003/05/08 10:50:38 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-08 19:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbextern.ch
+    + Added some missing symbols.
+
+  * source/vm/hvm.c
+    * Minor formatting.
+
+  * source/vm/runner.c
+    ! Fixed few bugs causing GPFs.
+    * Some Formatting.
+
+  * tests/pp.prg
+  * tests/pp_harb.ch
+    * Moved all [x]Harbour specific code from pp.prg to pp_harb.ch.
+
 2003-05-08 07:45 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   *source/rdd/dbfntx/dbfntx1.c
     ! Added fixes to Ordkeycount() Borrow from harbour
@@ -20,13 +36,13 @@
     utils/hbmake/Makefile
      + Tmake.prg added to dependencies
    * utils/hbmake/hbmake.prg
-    ! several changes 
+    ! several changes
       New screen on edit mode for user be more confortable
       Mouse enable on all items
       Now user can edit an existing make file
       Please note is an work on progress
 
-2003-05-07 16:463 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+2003-05-07 16:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
     * Commented 1 leftover debug printf()
 
