@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.111 2002/06/07 09:49:28 alkresin Exp $
+ * $Id: dbf1.c,v 1.112 2002/08/07 19:26:03 horacioroldan Exp $
  */
 
 /*
@@ -1404,6 +1404,8 @@ ERRCODE hb_dbfSetFieldExtent( DBFAREAP pArea, USHORT uiFieldExtent )
 ERRCODE hb_dbfClose( DBFAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfClose(%p)", pArea));
+   /* Reset parent rel struct */
+   pArea->lpdbPendingRel = NULL;
 
    SUPER_CLOSE( ( AREAP ) pArea );
 
