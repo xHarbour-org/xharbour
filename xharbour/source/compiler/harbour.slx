@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.56 2004/08/04 20:57:43 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.57 2004/11/21 21:43:45 druzus Exp $
  */
 
 /*
@@ -873,7 +873,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
 static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
 {
    BOOL fDbl;
-   
+
    fDbl = hb_compStrToNum( szNum, plVal, pdVal, piDec, piWidth );
    return fDbl ? NUM_DOUBLE : NUM_LONG;
 }
@@ -883,7 +883,7 @@ static int hb_comp_SLX_CustomAction( int x )
    extern BOOL hb_pp_bInline;
    char *pTmp;
 
-   DEBUG_INFO( printf( "Custom Action for %i\n", x ) );
+   DEBUG_INFO( printf( "Custom Action for %i after: %i\n", x, iLastToken ) );
 
    if( x < HB_AFTER_EXP )
    {
@@ -928,6 +928,7 @@ static int hb_comp_SLX_CustomAction( int x )
    switch ( x )
    {
       case HB_IDENTIFIER :
+         bIgnoreWords = FALSE;
          yylval.string = hb_compIdentifierNew( yytext, TRUE );
          iIdentifier++;
          DEBUG_INFO( printf( "Primary Identifier %s Increased to: %i\n", yytext, iIdentifier ) );

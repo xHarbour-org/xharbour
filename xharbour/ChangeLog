@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3869 2005/02/25 22:02:58 brianhays Exp $
+ * $Id: ChangeLog,v 1.3870 2005/02/25 22:13:17 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-25 17:21 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/compiler/harbour.slx
+    + Added missing reset of bIgnoreWords for case HB_IDENTIFIER in hb_comp_SLX_CustomAction()
+      /* This fixes parse error when a reserved word used as Identifier is followed by a reserved word. */
+
 2005-02-26 05:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/hbusage.c
     ! more updates on list of developers
