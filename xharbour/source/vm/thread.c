@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.130 2003/12/03 13:01:26 mauriliolongo Exp $
+* $Id: thread.c,v 1.131 2003/12/04 13:39:08 jonnymind Exp $
 */
 
 /*
@@ -170,13 +170,6 @@ void hb_threadInit( void )
       pthread_setspecific( hb_pkCurrentStack, (void *)&hb_stack );
       HB_COND_INIT( hb_threadStackCond );
    #endif
-
-   /* signal we are ready for hb_xgrab (but not yet able to store mem stats*/
-   hb_stack.pItems = NULL; // frist this, temporarily disabling collection
-   hb_ht_stack = &hb_stack; // then this, preparing the head stack
-
-   hb_threadSetupStack( &hb_stack, HB_CURRENT_THREAD() );
-
 }
 
 void hb_threadExit( void )

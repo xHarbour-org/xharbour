@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.290 2003/12/01 23:50:13 druzus Exp $
+ * $Id: hvm.c,v 1.291 2003/12/03 13:01:24 mauriliolongo Exp $
  */
 
 /*
@@ -455,12 +455,6 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    HB_TRACE( HB_TR_INFO, ("errInit" ) );
    hb_errInit();
-
-   /* Under mt, this is done by static initializers */
-   #ifndef HB_THREAD_SUPPORT
-      HB_TRACE( HB_TR_INFO, ("stackInit" ) );
-      hb_stackInit();
-   #endif
 
    HB_TRACE( HB_TR_INFO, ("dynsymNew" ) );
    hb_dynsymNew( &hb_symEval, NULL );  /* initialize dynamic symbol for evaluating codeblocks */
