@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.52 2004/01/17 02:36:21 fsgiudice Exp $
+ * $Id: gtwvt.c,v 1.53 2004/01/17 21:54:04 fsgiudice Exp $
  */
 
 /*
@@ -4122,7 +4122,7 @@ HB_FUNC( WVT_SETCLIPBOARD )
 
    // Allocate a global memory object for the text.
 
-   hglbCopy = GlobalAlloc(GMEM_MOVEABLE, nLen * sizeof(TCHAR));
+   hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (nLen+1) * sizeof(TCHAR));
    if (hglbCopy == NULL)
    {
        CloseClipboard();
@@ -4133,8 +4133,8 @@ HB_FUNC( WVT_SETCLIPBOARD )
    // Lock the handle and copy the text to the buffer.
 
    lptstrCopy = GlobalLock(hglbCopy);
-   memcpy(lptstrCopy, cText, nLen * sizeof(TCHAR));
-   lptstrCopy[nLen] = (TCHAR) 0;    // null character
+   memcpy(lptstrCopy, cText, (nLen+1) * sizeof(TCHAR));
+   lptstrCopy[nLen+1] = (TCHAR) 0;    // null character
    GlobalUnlock(hglbCopy);
 
    // Place the handle on the clipboard.
