@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.26 2003/08/10 22:15:14 lculik Exp $
+ * $Id: set.c,v 1.27 2003/08/12 23:34:06 ronpinkas Exp $
  */
 
 /*
@@ -835,7 +835,7 @@ HB_FUNC( SET )
          Check for "WIN:" and "JOB: only do when compiling with Borland or Msvc C Compilers
          */
    #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
-         if ( (hb_stricmp( szResult, "WIN:") != 0 ) &&( hb_stricmp( szResult,"JOB:") != 0)  && (strlen(szNewFile) != 0))
+         if ( (hb_stricmp( szResult, "WIN:") != 0 ) &&( hb_stricmp( szResult,"JOB:") != 0)  && (strlen(szNewFile) != 0)  &&( hb_stricmp( szResult,"LPT1") != 0) &&( hb_stricmp( szResult,"LPT2") != 0) &&( hb_stricmp( szResult,"LPT3") != 0))
    #else
          if ( strlen(szNewFile) != 0)
    #endif
