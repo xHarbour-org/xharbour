@@ -3142,6 +3142,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    LOCAL sBackupLine
    LOCAL sSkipped
    LOCAL bArrayPrefix
+   LOCAL sPending
 
    //TraceLog( sLine )
 
@@ -3453,6 +3454,8 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
       ENDIF
 
       //TraceLog( sLine )
+      sPending := ""
+      aEval( aPendingLines, {|s| IIF( s != NIL, sPending += '; ' + s, ) } )
 
       sBackupLine := sLine
       sPassed     := ""
@@ -3549,7 +3552,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             bArrayPrefix := s_bArrayPrefix
          #endif
 
-         IF ( nRule := MatchRule( sToken, @sLine, aTransRules, aTransResults, .F., .T. ) ) > 0
+         IF ( nRule := MatchRule( sToken, @sLine, aTransRules, aTransResults, .F., .T., @sPending ) ) > 0
             //? "TRANSLATED: " + sLine
             //WAIT
 
@@ -3557,6 +3560,11 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                BREAK( "Cyclic directive: #translate " + sToken )
             ELSE
                aAdd( aTranslated, nRule )
+            ENDIF
+
+            IF Empty( sPending )
+               nPendingLines := 0
+               aSize( aPendingLines, 0 )
             ENDIF
 
             nPosition := 0
@@ -3618,7 +3626,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
       sToken := NextToken( @sLine )
 
-      IF sToken != NIL .AND. ( nRule := MatchRule( sToken, @sLine, aCommRules, aCommResults, .T., .T. ) ) > 0
+      IF sToken != NIL .AND. ( nRule := MatchRule( sToken, @sLine, aCommRules, aCommResults, .T., .T., @sPending ) ) > 0
          //? "COMMANDED: " + sLine
          //? '"' + sLeft +'"', '"' + sPassed + '"'
          //WAIT
@@ -3631,6 +3639,11 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             aAdd( aCommanded, nRule )
          ENDIF
          */
+
+         IF Empty( sPending )
+            nPendingLines := 0
+            aSize( aPendingLines, 0 )
+         ENDIF
 
          nPosition := 0
          WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
@@ -3728,7 +3741,7 @@ RETURN sOut
 
 //--------------------------------------------------------------//
 
-STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
+STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper, sPending )
 
    LOCAL Counter, nRules, nRule, aMarkers, xMarker
    LOCAL aMP, nOptional := 0, sAnchor, cType, aList, nMarkerId, nKeyLen
@@ -4054,7 +4067,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
 
          IF ( sAnchor == NIL .OR. sMultiStopper != NIL .OR. ;
               ( ( ( sToken := NextToken( @sWorkLine ) ) != NIL  .AND. ( DropTrailingWS( @sToken, @sPad ), nLen := Max( 4, Len( sToken ) ), Upper( sToken ) == Left( sAnchor, nLen ) ) ) ) ) ;
-            .AND. ( nMarkerId == 0 .OR. ( sAnchor == NIL .AND. sMultiStopper != NIL ) .OR. ( ( xMarker := NextExp( @sWorkLine, cType, aList, sNextAnchor, aRules[nRule][3] ) ) != NIL ) )
+            .AND. ( nMarkerId == 0 .OR. ( sAnchor == NIL .AND. sMultiStopper != NIL ) .OR. ( ( xMarker := NextExp( @sWorkLine, cType, aList, sNextAnchor, aRules[nRule][3], @sPending ) ) != NIL ) )
 
             IF sMultiStopper != NIL
                IF sAnchor == NIL
@@ -4898,7 +4911,7 @@ RETURN sReturn
 
 //--------------------------------------------------------------//
 
-STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
+STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX, sPending )
 
   LOCAL  sExp, sTemp, Counter, sPad, sToken, sList
   LOCAL  sNextLine, sNextToken, sLastToken, sJustToken, sJustNext, cLastChar
@@ -4992,6 +5005,11 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
      CASE cType == '*'
         sExp  := sLine
         sLine := ""
+        IF ! Empty( sPending )
+           sExp += sPending
+           sPending := ""
+        ENDIF
+
         //? "EXP <*>: " + sExp
         RETURN sExp
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.78 2003/08/09 18:49:49 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.79 2003/09/03 12:51:36 paultucker Exp $
  */
 
 /*
@@ -215,6 +215,8 @@ char *     hb_pp_STD_CH = NULL;
 static BOOL s_bArray = FALSE;
 
 static char s_sToken[2048];
+
+static char *s_pTerminator;
 
 #if defined(__WATCOMC__)
 extern BOOL hb_pp_bInline;
@@ -1608,7 +1610,12 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
      if( ipos > 0 )
      {
-        *( ptri + ipos - 1 ) = '\0';
+        s_pTerminator = ( ptri + ipos - 1 );
+        *s_pTerminator = '\0';
+     }
+     else
+     {
+        s_pTerminator = NULL;
      }
 
      HB_SKIPTABSPACES( ptri );
@@ -1822,6 +1829,11 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
               {
                  *( ptri + ipos - 1 ) = ';';
                  //printf( "Restored: >%s<\n", sLine );
+
+                 if( s_pTerminator == NULL )
+                 {
+                    ipos = 0;
+                 }
               }
 
               if( isdvig + ipos > 0 )
@@ -2615,6 +2627,12 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   }
   else if( *(exppatt+2) == '3' )  /*  ----  wild match marker  */
   {
+     if( s_pTerminator )
+     {
+        *s_pTerminator = ';';
+        s_pTerminator = NULL;
+     }
+
      lenreal = hb_pp_strocpy( expreal, *ptri );
      *ptri += lenreal;
      SearnRep( exppatt,expreal,lenreal,ptro,lenres);

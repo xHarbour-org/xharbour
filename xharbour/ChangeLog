@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1586 2003/10/13 00:03:40 druzus Exp $
+ * $Id: ChangeLog,v 1.1587 2003/10/13 03:50:19 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-12 22:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+  * tests/pp.prg
+    + Added logic to make Wild Match Marker more greedy (match beyond a <;> (in line newline).
+      /* This fixes Clipper compatibility error reported by Przemek. */
 
 2003-10-13 00:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbdoc/genpdf.prg
@@ -50,7 +56,7 @@
    bin/pack_src.bat
    bin/pack_src.sh
     ! updated version number to 0.91
-    
+
 2003-10-11 10:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/hbservice.c
     ! protect the code with #if !defined(__DJGPP__)/#endif
