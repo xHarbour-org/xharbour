@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.101 2004/12/08 04:52:07 guerra000 Exp $
+ * $Id: tbrowse.prg,v 1.102 2005/01/01 18:50:26 guerra000 Exp $
  */
 
 /*
@@ -2114,17 +2114,16 @@ METHOD DrawARow( nRow ) CLASS TBrowse
             // There're less rows in the screen
             if nRowsToSkip < 0   // Going up... browse must be in top row
                ::rowPos := MIN( MAX( ::rowPos + nRowsToSkip - nSkipped, 1 ), ::rowCount )
+               ::nNewRowPos := MIN( MAX( ::nNewRowPos + nRowsToSkip - nSkipped, 1 ), ::rowCount )
                ::nLastRetrieved := 1
                nRow := 1
                lDisplay := .T.
-
-               // TODO: Change ::refreshAll() to SAVESCREEN(), RESTSCREEN(), AFILL( ::aRedraw[bottom], .T. )
                ::refreshAll()
-
             else                 // Going down...
                ::nLastRetrieved += nSkipped
                nRow := ::nLastRetrieved + 1
                ::rowPos := MIN( ::rowPos, ::nLastRetrieved )
+               ::nNewRowPos := MIN( MAX( ::nNewRowPos, 1 ), ::rowCount )
                lDisplay := .F.
             endif
          else

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3750 2005/01/15 18:57:49 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3751 2005/01/17 04:35:25 aleytys Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-16 22:47 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/tbrowse.prg
+    ! Fixed bug when new there're less records at the top than
+      remaining rows. Thanks to Goran Sedlar.
 
 2005-01-17 04:24 UTC+0000 Philip Chee <philip@aleytys.pc.my>
   * source/ct/spread.prg
