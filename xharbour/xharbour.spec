@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.39 2003/11/15 23:33:13 druzus Exp $
+# $Id: xharbour.spec,v 1.40 2003/11/20 23:47:34 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -242,14 +242,14 @@ rm -rf $RPM_BUILD_ROOT
 %build
 %{hb_env}
 
-make
+make -r
 
 # build contrib libraries
 libs="%{!?_without_ct: libct} %{!?_without_nf: libnf} %{?_with_adsrdd: rdd_ads} %{?_with_mysql: mysql}"
 for l in $libs
 do
     pushd contrib/$l
-        make
+        make -r
     popd
 done
 
@@ -273,14 +273,14 @@ mkdir -p $HB_INC_INSTALL
 mkdir -p $HB_LIB_INSTALL
 mkdir -p $RPM_BUILD_ROOT/usr/lib
 
-make -i install
+make -r -i install
 
 # install contrib libraries
 libs="%{!?_without_ct: libct} %{!?_without_nf: libnf} %{?_with_adsrdd: rdd_ads} %{?_with_mysql: mysql}"
 for l in $libs
 do
     pushd contrib/$l
-        make -i install
+        make -r -i install
     popd
 done
 
@@ -289,11 +289,11 @@ pushd source/vm
     TMP_C_USR=$C_USR
     C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/-DHB_PARANOID_MEM_CHECK}
     rm -f fm.o
-    make fm.o
+    make -r fm.o
     ar -r $HB_LIB_INSTALL/libfm.a fm.o
     rm -f fm.o
     if [ $HB_MT = "MT" ]; then
-        make fm.o 'HB_LIBCOMP_MT=YES'
+        make -r fm.o 'HB_LIBCOMP_MT=YES'
         ar -r $HB_LIB_INSTALL/libfmmt.a fm.o
         rm -f fm.o
     fi
@@ -640,7 +640,7 @@ then
     do
         pushd utils/${utl}
         rm -fR "./${HB_ARCHITECTURE}"
-        make install
+        make -r install
         strip ${HB_BIN_INSTALL}/${utl}
         popd
     done

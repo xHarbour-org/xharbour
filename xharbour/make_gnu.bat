@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: make_gnu.bat,v 1.12 2001/11/06 23:18:02 vszakats Exp $
+rem $Id: make_gnu.bat,v 1.1.1.1 2001/12/21 10:38:56 ronpinkas Exp $
 rem 
 
 rem ---------------------------------------------------------------
@@ -117,7 +117,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HARBOURDIR%/include
    rem ---------------------------------------------------------------
    rem Start the GNU make system
 
-   make -r %1 %2 %3 %4 %5 %6 %7 %8 %9 > make_gnu.log
+   make %1 %2 %3 %4 %5 %6 %7 %8 %9 > make_gnu.log
    goto END
 
 :END

@@ -1,5 +1,5 @@
 #
-# $Id: dir.cf,v 1.6 2000/04/06 06:52:47 vszel Exp $
+# $Id: dir.cf,v 1.1.1.1 2001/12/21 10:47:59 ronpinkas Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -10,10 +10,19 @@ ifeq ($(DIRS),) # Empty directory list
 DIR_RULE =\
 	@echo Done
 else
+
+# We have to use script to overcome the DOS limit of max 128 characters
+# NOTE: The empty line directly before 'endef' HAVE TO exist!
+# It causes that every commands will be separated by LF
+define dir_mk
+$(DIR_MAKE) -C $(file) $@
+
+endef
+
 DIR_LIST := $(subst /,\,$(DIRS))
 DIR_MAKE := $(subst /,\,$(MK))
-DIR_RULE =\
-	$(COMSPEC) /C FOR %d IN ($(DIR_LIST)) DO $(DIR_MAKE) -C %d $@
+DIR_RULE = $(foreach file, $(DIR_LIST), $(dir_mk))
+
 endif
 
 endif # ! compiling a specific program module

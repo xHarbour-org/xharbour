@@ -1,9 +1,16 @@
 #
-# $Id: install.cf,v 1.2 1999/06/20 01:43:53 rglab Exp $
+# $Id: install.cf,v 1.1.1.1 2001/12/21 10:47:59 ronpinkas Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
 
+# We have to use script to overcome the DOS limit of max 128 characters
+# NOTE: The empty line directly before 'endef' HAVE TO exist!
+# It causes that every commands will be separated by LF
+define inst_file
+$(CP) $(file) $(subst /,\,$(INSTALL_DIR))
+
+endef
+
 INSTALL_LIST = $(subst /,\,$(INSTALL_OBJS))
-INSTALL_RULE =\
-	$(COMSPEC) /c FOR %f IN ($(INSTALL_LIST)) DO COPY %f $(subst /,\,$(INSTALL_DIR))
+INSTALL_RULE = $(foreach file, $(INSTALL_LIST), $(inst_file))

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.18 2003/11/10 11:49:47 druzus Exp $
+# $Id: make_tgz.sh,v 1.19 2003/11/20 23:47:34 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -50,11 +50,11 @@ export HB_LIB_INSTALL="/usr/lib/${name}"
 
 # buid
 umask 022
-make clean
-make
+make -r clean
+make -r
 pushd contrib/libct
-    make clean
-    make
+    make -r clean
+    make -r
 popd
 
 # install
@@ -72,9 +72,9 @@ export HB_LIB_INSTALL="$HB_INST_PREF/$HB_LIB_INSTALL"
 mkdir -p $HB_BIN_INSTALL
 mkdir -p $HB_INC_INSTALL
 mkdir -p $HB_LIB_INSTALL
-make -i install
+make -r -i install
 pushd contrib/libct
-    make -i install
+    make -r -i install
 popd
 
 # build fm lib with memory statistic
@@ -82,11 +82,11 @@ pushd source/vm
     TMP_C_USR=$C_USR
     C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/-DHB_PARANOID_MEM_CHECK}
     rm -f fm.o
-    make fm.o
+    make -r fm.o
     ar -r $HB_LIB_INSTALL/libfm.a fm.o
     rm -f fm.o
     if [ $HB_MT = "MT" ]; then
-        make fm.o 'HB_LIBCOMP_MT=YES'
+        make -r fm.o 'HB_LIBCOMP_MT=YES'
         ar -r $HB_LIB_INSTALL/libfmmt.a fm.o
         rm -f fm.o
     fi
@@ -420,7 +420,7 @@ then
     do
         pushd utils/${utl}
         rm -fR "./${HB_ARCHITECTURE}"
-        make install
+        make -r install
         strip ${HB_BIN_INSTALL}/${utl}
         popd
     done

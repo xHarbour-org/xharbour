@@ -60,7 +60,7 @@ MD = md
 
 dirbase::
 	-if not exist $(HB_ARCHITECTURE)\nul $(MD) $(HB_ARCHITECTURE)
-	-if not exist $(ARCH_DOS)\nul        $(MD) $(ARCH_DOS)
+	-if not exist $(ARCH_DOS)\nul $(MD) $(ARCH_DOS)
 
 clean::
 	-for %f in ($(ARCH_DOS)\*.*) do $(RM) %f
@@ -68,7 +68,6 @@ clean::
 	-if exist *.obj $(RM) *.obj
 	-if exist core $(RM) core
 	-if exist *.o $(RM) *.o
-	-$(RD) $(ARCH_DOS)
-	-$(RD) $(HB_ARCHITECTURE)
+	-if exist $(ARCH_DOS)\nul $(RD) $(ARCH_DOS)
+	-if exist $(HB_ARCHITECTURE)\nul $(RD) $(HB_ARCHITECTURE)
 endif
-
