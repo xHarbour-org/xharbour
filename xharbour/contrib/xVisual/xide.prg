@@ -1,5 +1,3 @@
-
-
 #include "windows.ch"
 #include "wingdi.ch"
 #include "common.ch"
