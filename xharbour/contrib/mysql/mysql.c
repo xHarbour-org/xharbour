@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.4 2003/03/15 23:19:28 walito Exp $
+ * $Id: mysql.c,v 1.5 2003/12/21 02:56:15 walito Exp $
  */
 
 /*
@@ -89,25 +89,29 @@ HB_FUNC(SQLCONNECT) // MYSQL *mysql_real_connect(MYSQL*, char * host, char * use
    const char *szUser=hb_parc(2);
    const char *szPass=hb_parc(3);
 #if MYSQL_VERSION_ID > 32200
-      /* from 3.22.x of MySQL there is a new parameter in mysql_real_connect() call, that is char * db
-         which is not used here */
-       mysql = mysql_init((MYSQL*) 0)       ;
+   /* from 3.22.x of MySQL there is a new parameter in mysql_real_connect() call, that is char * db
+      which is not used here */
+   mysql = mysql_init((MYSQL*) 0)       ;
 
-      if ( ( mysql != NULL) )
-      {
-        if( mysql_real_connect( mysql, szHost, szUser, szPass, 0, MYSQL_PORT, NULL, 0) )
-        _retnl((long) mysql);
-      else
-      {
-         mysql_close( mysql );
-         _retnl( 0 );
-      }
+   if ( ( mysql != NULL) )
+   {
+     if( mysql_real_connect( mysql, szHost, szUser, szPass, 0, MYSQL_PORT, NULL, 0) )
+     {
+        hb_retnl((long) mysql);
+     }
+     else
+     {
+       mysql_close( mysql );
+       hb_retnl( 0 );
+     }
    }
    else
-      _retnl( 0 );
+   {
+     hb_retnl( 0 );
+   }
 #else
    mysql = mysql_real_connect(NULL, _parc(1), _parc(2), _parc(3), 0, NULL, 0);
-   _retnl((long) mysql);
+   hb_retnl((long) mysql);
 #endif
 }
 
@@ -115,124 +119,107 @@ HB_FUNC(SQLCONNECT) // MYSQL *mysql_real_connect(MYSQL*, char * host, char * use
 HB_FUNC(SQLCLOSE) // void mysql_close(MYSQL *mysql)
 {
    mysql_close((MYSQL *)_parnl(1));
-   _ret();
+   hb_ret();
 }
 
 
 HB_FUNC(SQLSELECTD) // int mysql_select_db(MYSQL *, char *)
 {
    const   char *db=hb_parc(2);
-   _retnl((long) mysql_select_db((MYSQL *)_parnl(1), db));
+   hb_retnl((long) mysql_select_db((MYSQL *)_parnl(1), db));
 }
 
 
 HB_FUNC(SQLQUERY) // int mysql_query(MYSQL *, char *)
 {
-   _retnl((long) mysql_query((MYSQL *)_parnl(1), _parc(2)));
+   hb_retnl((long) mysql_query((MYSQL *)_parnl(1), _parc(2)));
 }
 
 
 HB_FUNC(SQLSTORER) // MYSQL_RES *mysql_store_result(MYSQL *)
 {
-   _retnl((long) mysql_store_result((MYSQL *)_parnl(1)));
+   hb_retnl((long) mysql_store_result((MYSQL *)_parnl(1)));
 }
 
 
 HB_FUNC(SQLFREER) // void mysql_free_result(MYSQL_RES *)
 {
    mysql_free_result((MYSQL_RES *)_parnl(1));
-   _ret();
+   hb_ret();
 }
 
 
 HB_FUNC(SQLFETCHR) // MYSQL_ROW *mysql_fetch_row(MYSQL_RES *)
 {
    MYSQL_RES *mresult = (MYSQL_RES *)_parnl(1);
-   int num_fields = mysql_num_fields(mresult);
-   ITEM aRow = _itemArrayNew(num_fields);
-   ITEM temp;
+   int i, num_fields = mysql_num_fields(mresult);
    MYSQL_ROW mrow;
-   int i;
+   HB_ITEM itRow, itTemp;
+   itRow.type = HB_IT_NIL ;
+   itTemp.type = HB_IT_NIL ;
+
+   hb_arrayNew( &itRow, num_fields );
 
    mrow = mysql_fetch_row(mresult);
 
    if ( mrow  != NULL )
-      for (i = 0; i < num_fields; i++) {
-         /* if field is not empty */
-         if (mrow[i] != NULL) {
-            temp = _itemPutC(NULL, mrow[i]);
-          } else {
-            temp = _itemPutC(NULL, "");
-          }
+   {
+     for (i = 0; i < num_fields; i++)
+     {
+       /* if field is not empty */
+       if (mrow[i] != NULL)
+       {
+         hb_itemPutC(&itTemp, mrow[i]);
+       }
+       else
+       {
+         hb_itemPutC(&itTemp, "");
+       }
+       hb_arraySetForward(&itRow, i+1, &itTemp);
+     }
+   }
+   hb_itemReturn(&itRow);
 
-         hb_arraySetForward(aRow, i + 1, temp);
-//         _itemRelease(temp);
-      }
-   hb_itemReturn(aRow);
-//   _itemRelease(aRow);
 }
 
 
 HB_FUNC(SQLDATAS) // void mysql_data_seek(MYSQL_RES *, unsigned int)
 {
    mysql_data_seek((MYSQL_RES *)_parnl(1), (unsigned int)_parni(2));
-   _ret();
+   hb_ret();
 }
 
 
 HB_FUNC(SQLNROWS) // my_ulongulong  mysql_num_rows(MYSQL_RES *)
 {
    /* NOTE: I receive a my_ulongulong which I convert to a long, so I could lose precision */
-   _retnl((long)mysql_num_rows(((MYSQL_RES *)_parnl(1))));
+   hb_retnl((long)mysql_num_rows(((MYSQL_RES *)_parnl(1))));
 }
 
 
 HB_FUNC(SQLFETCHF) // MYSQL_FIELD *mysql_fetch_field(MYSQL_RES *)
 {
    /* NOTE: field structure of MySQL has 8 members as of MySQL 3.22.x */
-   ITEM aField = _itemArrayNew(8);
-
-   ITEM temp;
    MYSQL_FIELD *mfield;
+   HB_ITEM itField, itTemp;
+
+   itField.type = HB_IT_NIL ;
+   itTemp.type = HB_IT_NIL ;
 
    mfield = mysql_fetch_field((MYSQL_RES *)_parnl(1));
-
-   if (!(mfield == NULL)) {
-      temp = _itemPutC(NULL, mfield->name);
-      hb_arraySetForward(aField, 1, temp);
-//      _itemRelease(temp);
-
-      temp = _itemPutC(NULL, mfield->table);
-      hb_arraySetForward(aField, 2, temp);
-//      _itemRelease(temp);
-
-      temp = _itemPutC(NULL, mfield->def);
-      hb_arraySetForward(aField, 3, temp);
-//      _itemRelease(temp);
-
-      temp = _itemPutNL(NULL, (long)mfield->type);
-      hb_arraySetForward(aField, 4, temp);
-//      _itemRelease(temp);
-
-      temp = _itemPutNL(NULL, mfield->length);
-      hb_arraySetForward(aField, 5, temp);
-//      _itemRelease(temp);
-
-      temp = _itemPutNL(NULL, mfield->max_length);
-      hb_arraySetForward(aField, 6, temp);
-//      _itemRelease(temp);
-
-      temp = _itemPutNL(NULL, mfield->flags);
-      hb_arraySetForward(aField, 7, temp);
-//      _itemRelease(temp);
-
-      temp = _itemPutNL(NULL, mfield->decimals);
-      hb_arraySetForward(aField, 8, temp);
-//      _itemRelease(temp);
-
+   hb_arrayNew( &itField, 8 );
+   if (!(mfield == NULL))
+   {
+      hb_arraySetForward(&itField, 1, hb_itemPutC(&itTemp, mfield->name));
+      hb_arraySetForward(&itField, 2, hb_itemPutC(&itTemp, mfield->table));
+      hb_arraySetForward(&itField, 3, hb_itemPutC(&itTemp, mfield->def));
+      hb_arraySetForward(&itField, 4, hb_itemPutNL(&itTemp, (long)mfield->type));
+      hb_arraySetForward(&itField, 5, hb_itemPutNL(&itTemp, mfield->length));
+      hb_arraySetForward(&itField, 6, hb_itemPutNL(&itTemp, mfield->max_length));
+      hb_arraySetForward(&itField, 7, hb_itemPutNL(&itTemp, mfield->flags));
+      hb_arraySetForward(&itField, 8, hb_itemPutNL(&itTemp, mfield->decimals));
    }
-   hb_itemReturn(aField);
-//   _itemRelease(aField);
+   hb_itemReturn(&itField);
 
 }
 
@@ -240,37 +227,37 @@ HB_FUNC(SQLFETCHF) // MYSQL_FIELD *mysql_fetch_field(MYSQL_RES *)
 HB_FUNC(SQLFSEEK) // MYSQL_FIELD_OFFSET mysql_field_seek(MYSQL_RES *, MYSQL_FIELD_OFFSET)
 {
    mysql_field_seek((MYSQL_RES *)_parnl(1), (MYSQL_FIELD_OFFSET)_parni(2));
-   _ret();
+   hb_ret();
 }
 
 
 HB_FUNC(SQLNUMFI) // unsigned int mysql_num_fields(MYSQL_RES *)
 {
-   _retnl(mysql_num_fields(((MYSQL_RES *)_parnl(1))));
+   hb_retnl(mysql_num_fields(((MYSQL_RES *)_parnl(1))));
 }
 
 #if MYSQL_VERSION_ID > 32200
 HB_FUNC(SQLFICOU) // unsigned int mysql_num_fields(MYSQL_RES *)
 {
-   _retnl(mysql_field_count(((MYSQL *)_parnl(1))));
+   hb_retnl(mysql_field_count(((MYSQL *)_parnl(1))));
 }
 #endif
 
 HB_FUNC(SQLLISTF) // MYSQL_RES *mysql_list_fields(MYSQL *, char *);
 {
-   _retnl((long) mysql_list_fields((MYSQL *)_parnl(1), _parc(2), NULL));
+   hb_retnl((long) mysql_list_fields((MYSQL *)_parnl(1), _parc(2), NULL));
 }
 
 
 HB_FUNC(SQLGETERR) // char *mysql_error(MYSQL *);
 {
-   _retc((char *)mysql_error((MYSQL *)_parnl(1)));
+   hb_retc((char *)mysql_error((MYSQL *)_parnl(1)));
 }
 
 HB_FUNC(SQLGETERRNO)
 {
-   _retnl(mysql_errno((MYSQL *)_parnl(1)));
-} 
+   hb_retnl(mysql_errno((MYSQL *)_parnl(1)));
+}
 
 HB_FUNC(SQLLISTDB) // MYSQL_RES * mysql_list_dbs(MYSQL *, char * wild);
 {
@@ -278,24 +265,22 @@ HB_FUNC(SQLLISTDB) // MYSQL_RES * mysql_list_dbs(MYSQL *, char * wild);
    MYSQL_RES * mresult;
    MYSQL_ROW mrow;
    long nr, i;
-   ITEM aDBs;
-   ITEM temp;
+   HB_ITEM itDBs, itTemp;
 
    mresult = mysql_list_dbs(mysql, NULL);
+
    nr = (LONG) mysql_num_rows(mresult);
-   aDBs = _itemArrayNew(nr);
 
-   for (i = 0; i < nr; i++) {
+   hb_arrayNew( &itDBs, 0 );
+
+   for (i = 0; i < nr; i++)
+   {
       mrow = mysql_fetch_row(mresult);
-      temp = _itemPutC(NULL, mrow[0]);
-
-      hb_arraySetForward(aDBs, i + 1, temp);
-//      _itemRelease(temp);
+      hb_arrayAddForward((PHB_ITEM) &itDBs , hb_itemPutC(&itTemp, mrow[0]) );
    }
 
    mysql_free_result(mresult);
-   hb_itemReturn(aDBs);
-//   _itemRelease(aDBs);
+   hb_itemReturn(&itDBs);
 }
 
 
@@ -305,47 +290,43 @@ HB_FUNC(SQLLISTTBL) // MYSQL_RES * mysql_list_tables(MYSQL *, char * wild);
    MYSQL_RES * mresult;
    MYSQL_ROW mrow;
    long nr, i;
-   ITEM aTables;
-   ITEM temp;
-
+   HB_ITEM itTables, itTemp;
+   itTables.type = HB_IT_NIL;
+   itTemp.type = HB_IT_NIL ;
    mresult = mysql_list_tables(mysql, NULL);
    nr = (LONG) mysql_num_rows(mresult);
-   aTables = _itemArrayNew(nr);
 
-   for (i = 0; i < nr; i++) {
+   hb_arrayNew(&itTables,0);
 
+   for (i = 0; i < nr; i++)
+   {
       mrow = mysql_fetch_row(mresult);
-      temp = _itemPutC(NULL, mrow[0]);
-
-      hb_arraySetForward(aTables, i + 1, temp);
-//      _itemRelease(temp);
+      hb_arrayAddForward((PHB_ITEM) &itTables , hb_itemPutC(&itTemp, mrow[0]) );
    }
-
    mysql_free_result(mresult);
-   hb_itemReturn(aTables);
-//   _itemRelease(aTables);
+   hb_itemReturn(&itTables);
 }
 
 
 // returns bitwise and of first parameter with second
 HB_FUNC(SQLAND)
 {
-   _retnl(_parnl(1) & _parnl(2));
+   hb_retnl(_parnl(1) & _parnl(2));
 }
 
 HB_FUNC(SQLAFFROWS)
 {
-   _retnl( (LONG) mysql_affected_rows( (MYSQL *)_parnl(1) ) );
+   hb_retnl( (LONG) mysql_affected_rows( (MYSQL *)_parnl(1) ) );
 }
 
 HB_FUNC(SQLHOSTINFO)
 {
-   _retc((char *) mysql_get_host_info( (MYSQL *)_parnl(1) ) );
+   hb_retc((char *) mysql_get_host_info( (MYSQL *)_parnl(1) ) );
 }
 
 HB_FUNC(SQLSRVINFO)
 {
-   _retc((char *) mysql_get_server_info( (MYSQL *)_parnl(1) ) );
+   hb_retc((char *) mysql_get_server_info( (MYSQL *)_parnl(1) ) );
 }
 
 #ifdef __GNUC__
@@ -355,7 +336,7 @@ long filelength( int handle )
     long nStart = hb_fsSeek( handle , 0 , 0 );
     return nEnd - nStart;
 }
-#endif    
+#endif
 
 char *filetoBuff(char *f,char *s)
 {
@@ -374,12 +355,12 @@ HB_FUNC(DATATOSQL)
    int iSize;
    char *buffer;
    from=hb_parc(1);
-   iSize= hb_parclen(1) ; 
+   iSize= hb_parclen(1) ;
 
    buffer=(char*)hb_xgrab((iSize*2)+1);
-   iSize = mysql_escape_string(buffer,from,iSize); 
-   hb_retclenAdopt((char*)buffer,iSize) ;               
-//   hb_xfree(buffer);
+   iSize = mysql_escape_string(buffer,from,iSize);
+   hb_retclenAdopt((char*)buffer,iSize) ;
+
 }
 
 HB_FUNC(FILETOSQLBINARY)
@@ -398,8 +379,8 @@ HB_FUNC(FILETOSQLBINARY)
    hb_fsClose(fh);
    from=(char*)filetoBuff(FromBuffer,szFile);
    buffer=(char*)hb_xgrab(iLen+1);
-   iSize = mysql_escape_string(buffer,from,iSize);  
-   hb_retclenAdopt((char*)buffer, iSize);                
-//   hb_xfree(buffer);
+   iSize = mysql_escape_string(buffer,from,iSize);
+   hb_retclenAdopt((char*)buffer, iSize);
+
    hb_xfree(FromBuffer);
 }
