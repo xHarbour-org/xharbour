@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.54 2003/08/11 16:23:00 walito Exp $
+ * $Id: tget.prg,v 1.55 2003/09/13 20:37:30 walito Exp $
  */
 
 /*
@@ -488,53 +488,59 @@ return Self
 
 METHOD SetFocus() CLASS Get
 
-   local lWasNil := (::buffer == NIL)
-   local xVarGet := ::VarGet() // In VarGet() is setting ::xVarGet
+   local xVarGet
 
-   ::hasfocus   := .t.
-   ::rejected   := .f.
-   ::typeout    := .f.
+   if !::HasFocus
 
-   ::Original   := xVarGet
-   ::type       := ValType( xVarGet )
-   ::Picture    := ::cPicture
-   ::buffer     := ::PutMask( xVarGet, .f. )
-   ::changed    := .f.
-   ::clear      := ( "K" IN ::cPicFunc .or. ::type == "N")
-//   ::nMaxLen    := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
-   ::pos        := 0
-   ::lEdit      := .f.
+      xVarGet := ::VarGet() // In VarGet() is setting ::xVarGet
 
-   ::pos := ::FirstEditable( )
+      ::hasfocus   := .t.
+      ::rejected   := .f.
+      ::typeout    := .f.
 
-   if ::pos = 0
-      ::TypeOut = .t.
-   endif
+      ::Original   := xVarGet
+      ::type       := ValType( xVarGet )
+      ::Picture    := ::cPicture
+      ::buffer     := ::PutMask( xVarGet, .f. )
+      ::changed    := .f.
+      ::clear      := ( "K" IN ::cPicFunc .or. ::type == "N")
+//      ::nMaxLen    := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
+      ::pos        := 0
+      ::lEdit      := .f.
 
-   if ::type == "N"
-      ::decpos := At( iif( ::lDecRev .or. "E" IN ::cPicFunc, ",", "." ), ::buffer )
-      ::minus := ( xVarGet < 0 )
+      ::pos := ::FirstEditable( )
+
+      if ::pos = 0
+         ::TypeOut = .t.
+      endif
+
+      if ::type == "N"
+         ::decpos := At( iif( ::lDecRev .or. "E" IN ::cPicFunc, ",", "." ), ::buffer )
+         ::minus := ( xVarGet < 0 )
+      else
+         ::decpos := NIL
+         ::minus  := .f.
+      endif
+      ::lMinusPrinted := ::minus
+
+      if ::type == "D"
+         ::BadDate := IsBadDate( ::buffer, ::cPicFunc )
+      else
+         ::BadDate := .f.
+      endif
+
+      if ::buffer != NIL
+         if ::nDispLen == NIL .or. !::lDispLen
+            ::nDispLen := ::nMaxLen
+         endif
+
+         ::Display( .T. )
+      else
+         ::Display()
+      endif
    else
-      ::decpos := NIL
-      ::minus  := .f.
-   endif
-   ::lMinusPrinted := ::minus
-
-   if ::type == "D"
-      ::BadDate := IsBadDate( ::buffer, ::cPicFunc )
-   else
-      ::BadDate := .f.
-   endif
-
-   IF lWasNil .and. ::buffer != NIL
-      IF ::nDispLen == NIL .or. !::lDispLen
-         ::nDispLen := ::nMaxLen
-      ENDIF
-
-      ::Display( .T. )
-   ELSE
       ::Display()
-   ENDIF
+   endif
 
 return Self
 
@@ -553,6 +559,7 @@ METHOD KillFocus() CLASS Get
    ::pos      := NIL
 
    ::Display()
+   ::xVarGet  := NIL
 
 
 return Self
