@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.22 2004/05/19 14:32:07 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.24 2004/06/18 14:01:20 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -724,7 +724,7 @@ METHOD Append( oRow ) CLASS TPQquery
     Local nParams := 0
 
     ::SetKey()
-        
+
     if ! Empty(::Tablename)
         cQuery := 'INSERT INTO ' + ::Schema + '.' + ::Tablename + '('
         For i := 1 to oRow:FCount()
@@ -771,7 +771,7 @@ METHOD Update(oRow) CLASS TPQquery
     Local nParams := 0
 
     ::SetKey()
-    
+
     if ! Empty(::Tablename) .and. ! Empty(::aKeys)
         cWhere := ''
         For i := 1 to len(::aKeys)
@@ -803,7 +803,7 @@ METHOD Update(oRow) CLASS TPQquery
             res := PQexecParams( ::pDB, cQuery, aParams)    
             if PQresultstatus(res) != PGRES_COMMAND_OK            
                 result := PQresultErrorMessage(res)
-            endif                
+            endif        
         end            
     end            
 RETURN result
@@ -943,7 +943,6 @@ METHOD SetKey() CLASS TPQquery
     Local nTableId, xTableId := -1
     Local nCount := 0
     Local cTable
-    Local aKeys := {}
     Local res
     Local nPos
 
@@ -1006,14 +1005,15 @@ METHOD SetKey() CLASS TPQquery
             res := PQexec(::pDB, cQuery)
 
             if PQresultstatus(res) == PGRES_TUPLES_OK .and. PQlastrec(res) != 0
+                ::aKeys := {}
+                
                 For x := 1 To PQlastrec(res)
-                    aadd( aKeys, PQgetvalue( res, x, 1 ) )
+                    aadd( ::aKeys, PQgetvalue( res, x, 1 ) )
                 Next                          
             endif   
-            
+                        
             PQclear(res)
         endif
-        ::aKeys := aKeys            
     endif    
     
 RETURN nil
