@@ -1,12 +1,8 @@
 @echo off
 rem 
-rem $Id: makallbc.bat,v 1.3 2003/09/24 20:45:05 paultucker Exp $
+rem $Id: makallbc.bat,v 1.4 2003/09/25 02:02:31 paultucker Exp $
 rem 
 
-IF '%BCC_DIR%'=='' SET BCC_DIR=e:\bcc55
-echo.
-echo BCC_DIR is set to %BCC_DIR% (change if needed)
-echo.
 echo create system files
 call make_b32 %1
 
