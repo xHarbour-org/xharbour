@@ -1,5 +1,5 @@
 /*
- * $Id: TCStatusBar.prg,v 1.15 2002/10/27 01:29:25 what32 Exp $
+ * $Id: TCStatusBar.prg,v 1.16 2002/10/29 02:12:37 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -43,14 +43,14 @@ CLASS TStatusBar FROM TCustomControl
    DATA xxWidth  PROTECTED  INIT   0
    DATA xxHeight PROTECTED  INIT   0
 
-   DATA Style   INIT  WS_CHILD + WS_VISIBLE
+   DATA Style    INIT  WS_CHILD + WS_VISIBLE
 
    DATA lRegister PROTECTED INIT .F.
    DATA lControl  PROTECTED INIT .T.
    DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
 
-   DATA rect PROTECTED
+   DATA rect      PROTECTED
 
    DATA WinClass    PROTECTED INIT "msctls_statusbar32"
    DATA ControlName PROTECTED INIT "StatusBar"
@@ -82,7 +82,7 @@ METHOD SetPanels(aParts) CLASS TStatusBar
 
    LOCAL nLeft,n,aRect,bSizes := ""
 
-   AEVAL(aParts,{|x| bSizes+=L2BIN(x)})
+   AEVAL( aParts,{|x| bSizes+=L2BIN( x ) } )
 
    RETURN( ::SendMessage( SB_SETPARTS, LEN( aParts ), bSizes ))
 
@@ -102,11 +102,11 @@ METHOD GetHeight() CLASS TStatusBar
 
 *------------------------------------------------------------------------------*
 
-METHOD GetPanelRect(nPanel) CLASS TStatusBar
+METHOD GetPanelRect( nPanel ) CLASS TStatusBar
 
    local aRect,aPt
 
-   aRect:=StatusBarGetRect(::handle,nPanel)
+   aRect := StatusBarGetRect( ::handle, nPanel )
    aRect[3]-=aRect[1]
    aRect[4]-=aRect[2]
 
@@ -114,7 +114,7 @@ METHOD GetPanelRect(nPanel) CLASS TStatusBar
 
 *------------------------------------------------------------------------------*
 
-METHOD SetPanelIcon(nPanel,hIcon) CLASS TStatusBar
+METHOD SetPanelIcon( nPanel, hIcon ) CLASS TStatusBar
 
    SetStatusIcon( ::handle, 0, hIcon )
 

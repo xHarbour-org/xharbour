@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.22 2002/10/29 02:12:37 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.23 2002/10/31 04:08:43 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -90,7 +90,10 @@ CLASS TToolBar FROM TCustomControl
 
    DATA lRegister PROTECTED INIT .F.
    DATA lControl  PROTECTED INIT .T.
-   DATA Msgs      PROTECTED INIT {WM_SIZE,WM_MOVE}
+   DATA Msgs      PROTECTED INIT { WM_SIZE, WM_MOVE }
+   
+   ACCESS RowCount          INLINE SendMessage( ::handle, TB_GETROWS, 0, 0 )
+   ASSIGN RowCount( nRows ) INLINE SendMessage( ::handle, TB_SETROWS, nRows )
 
 
    DATA abuttons PROTECTED
@@ -98,7 +101,8 @@ CLASS TToolBar FROM TCustomControl
    DATA Created  PROTECTED
    DATA ntProc   PROTECTED
    DATA aMenus   PROTECTED
-   VAR nImg,hBMInst,nBMId,xBtn,yBtn,xBmp,yBmp PROTECTED
+
+   VAR nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp PROTECTED
 
    DATA WinClass    PROTECTED INIT "toolbar32"
    DATA ControlName PROTECTED INIT "ToolBar"
@@ -116,10 +120,10 @@ CLASS TToolBar FROM TCustomControl
    METHOD Disableall()
    METHOD Enableall()
    
-   METHOD CLickButton(nBtn,lFlag) INLINE lFlag := IFNIL(lFlag,.T.,lFlag),;
-                                         ::SendMessage(TB_CHECKBUTTON,nBtn,If(lFlag,1,0))
+   METHOD CLickButton(nBtn,lFlag) INLINE lFlag := IFNIL( lFlag, .T., lFlag ),;
+                                         ::SendMessage( TB_CHECKBUTTON, nBtn, If( lFlag, 1, 0 ) )
                                          
-   METHOD IsButtonClicked(nBtn)   INLINE IF(::SendMessage(TB_ISBUTTONCHECKED,nBtn,0)==0,.F.,.T.)
+   METHOD IsButtonClicked(nBtn)   INLINE IF( ::SendMessage( TB_ISBUTTONCHECKED, nBtn, 0) == 0, .F., .T. )
    METHOD AddMenu()
 
    METHOD SetListStyle()          INLINE ::Style := OR(::Style,TBSTYLE_LIST)
@@ -164,11 +168,12 @@ METHOD AddBitmap(hInst, nhIdBmp, nButtons) CLASS TToolBar
    tbab:hInst := hInst
    tbab:nId   := nhIdBmp
    AADD(::aBitmaps,{tbab,nButtons})
+
    IF ::created
-     SendMessage(::handle,TB_ADDBITMAP,nButtons,tbab:value)
+     SendMessage( ::handle, TB_ADDBITMAP, nButtons, tbab:value )
    ENDIF
 
-   RETURN(1)
+   RETURN Self
 
 *-----------------------------------------------------------------------------*
 
@@ -185,11 +190,12 @@ METHOD AddButton( oBtn ) CLASS TToolBar
    tbb:fsState   := oBtn:State
    tbb:fsStyle   := oBtn:Style
    tbb:dwData    := oBtn:cargo
-   tbb:iString   := LEN(::aButtons)
+   tbb:iString   := LEN( ::aButtons )
+   
    AADD(::aButtons,oBtn)
 
-   SendMessage(::handle,TB_ADDBUTTONS,1,tbb:value)
-   SendMessage(::handle,TB_ADDSTRING, 0,oBtn:Caption)
+   SendMessage( ::handle, TB_ADDBUTTONS, 1, tbb:value)
+   SendMessage( ::handle, TB_ADDSTRING, 0, oBtn:Caption)
 
 RETURN(self)
 

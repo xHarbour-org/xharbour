@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.13 2002/10/25 09:14:41 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.14 2002/10/27 01:29:24 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -233,16 +233,16 @@ CLASS TWBrowse FROM TWinControl
    METHOD GoToPos()
    METHOD Kill()
 
-   METHOD OnPaint(hDC) INLINE ::drawheader(),;
-                              ::drawdata(hDC),;
-                              self
+   METHOD OnPaint( hDC ) INLINE ::drawheader(),;
+                                ::drawdata( hDC ),;
+                                self
 
-   METHOD OnGetDlgCode() INLINE DLGC_WANTALLKEYS+DLGC_WANTARROWS+DLGC_WANTCHARS
-   METHOD OnDestroy()    INLINE ::Kill(),NIL
-   METHOD OnSetFocus()   INLINE ::drawdata(,::RowPos,IF(::wantHiliteAll,NIL,::ColPos)),NIL
-   METHOD OnKillFocus()  INLINE ::drawdata(,::RowPos,IF(::wantHiliteAll,NIL,::ColPos)),NIL
+   METHOD OnGetDlgCode() INLINE DLGC_WANTALLKEYS + DLGC_WANTARROWS + DLGC_WANTCHARS
+   METHOD OnDestroy()    INLINE ::Kill(), NIL
+   METHOD OnSetFocus()   INLINE ::drawdata(, ::RowPos, IF( ::wantHiliteAll, NIL, ::ColPos ) ), NIL
+   METHOD OnKillFocus()  INLINE ::drawdata(, ::RowPos, IF( ::wantHiliteAll, NIL, ::ColPos ) ), NIL
    METHOD OnEraseBkGnd() INLINE 0
-   METHOD OnSize()       INLINE ::RefreshAll(),nil
+   METHOD OnSize()       INLINE ::RefreshAll(), NIL
    METHOD OnNotify()
    METHOD OnSysColorChange()
 
@@ -303,7 +303,7 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight, Source, aHeader, bNotify
    ::Width     := IFNIL( nWidth ,  ::Width,   nWidth   )
    ::Height    := IFNIL( nHeight,  ::height,  nHeight  )
    ::Msgs      := -1
-   ::WndProc   :="FormProc"
+   ::WndProc   := "FormProc"
 
    ::wantHiliteAll   := .F.
    ::wantRowSep      := .T.
@@ -318,11 +318,11 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight, Source, aHeader, bNotify
    ::wantEnterKey    := .F.
    ::wantAutoHilite  := .T.
    ::bOnChangeBlock  := bNotify
-   ::wantNotify      := (ValType(bNotify)=="B") // tbd
+   ::wantNotify      := ( ValType( bNotify ) == "B" ) // tbd
 
    // initialize
 
-   ::ColWidths       := {0}
+   ::ColWidths       := { 0 }
    ::Columns         := {}
    ::aData           := {}
    ::aFgColors       := {}
@@ -372,81 +372,84 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight, Source, aHeader, bNotify
    ::ItemHeight      := 18
    ::HeadHeight      := 18
 
-   ::ArrayMode       :=.F.
-   ::Source          :=Source
+   ::ArrayMode       := .F.
+   ::Source          := Source
    DO CASE
-   CASE ValType(Source)=="A"
-      ::ArrayMode:=.T.
-   CASE ValType(Source)=="C"
-      ::ArrayMode:=.F.
-   CASE Source==NIL .AND. ! Empty(ALIAS())
-      ::Source:=ALIAS()
-   OTHERWISE
-      // error will come on configure or refresh !
+      CASE ValType( Source ) == "A"
+         ::ArrayMode := .T.
+
+      CASE ValType( Source )== "C"
+         ::ArrayMode := .F.
+
+      CASE Source == NIL .AND. ! Empty( ALIAS() )
+         ::Source := ALIAS()
+
+      OTHERWISE
+         // error will come on configure or refresh !
    ENDCASE
    IF ::ArrayMode
-      ::Element   :=1
-      ::RecPos    :=::Element
-      ::RecCount  :=Len(::Source)
-      ::bSeekChar :={|ob,chr| .F.}
+      ::Element   := 1
+      ::RecPos    := ::Element
+      ::RecCount  := Len( ::Source )
+      ::bSeekChar := {|ob, chr| .F.}
 
-      ::bGoToPos  :={|ob,nPos| ob:Element:=nPos,;
-                               ob:HitTop:=(ob:Element < 1),;
-                               ob:HitBottom:=(ob:Element > Len(ob:Source)),;
-                               ob:Element:=Min(ob:Element,Len(ob:Source)+1),;
-                               ob:Element:=Max(ob:Element,1),;
-                               ob:RecCount:=LEN(ob:Source),;
-                               ob:RecPos:=ob:Element}
+      ::bGoToPos  := {|ob, nPos| ob:Element  := nPos,;
+                                 ob:HitTop   := ( ob:Element < 1 ),;
+                                 ob:HitBottom:= ( ob:Element > Len( ob:Source ) ),;
+                                 ob:Element  := Min( ob:Element, Len( ob:Source ) + 1 ),;
+                                 ob:Element  := Max( ob:Element, 1),;
+                                 ob:RecCount := LEN( ob:Source ),;
+                                 ob:RecPos   := ob:Element }
 
-      ::bGoTop    := {||::Element:=1,;
-                        ::HitTop:=(Len(::Source)==0),;
-                        ::HitBottom:=(::Element > Len(::Source)),;
-                        ::RecCount := LEN(::Source),;
-                        ::RecPos:=::Element}
+      ::bGoTop    := {||::Element   := 1 ,;
+                        ::HitTop    := ( Len( ::Source ) == 0 ) ,;
+                        ::HitBottom := ( ::Element > Len( ::Source ) ) ,;
+                        ::RecCount  := Len( ::Source ) ,;
+                        ::RecPos    := ::Element }
 
-      ::bGoBottom := {||::Element:=Len(::Source),;
-                        ::HitTop:=(Len(::Source)==0),;
-                        ::HitBottom:=(Len(::Source)==0),;
-                        ::RecCount := LEN(::Source),;
-                        ::RecPos:=::Element}
+      ::bGoBottom := {||::Element   := Len( ::Source ) ,;
+                        ::HitTop    := ( Len( ::Source ) == 0 ) ,;
+                        ::HitBottom := ( Len( ::Source ) == 0 ) ,;
+                        ::RecCount  := Len( ::Source ) ,;
+                        ::RecPos    := ::Element }
 
-      ::bSkip     :={|n|::Element+=n,;
-                        ::HitTop:=(::Element < 1),;
-                        ::HitBottom:=(::Element > Len(::Source)),;
-                        ::RecCount:=Len(::Source),;
-                        ::Element:=Min(::Element,Len(::Source)+1),;
-                        ::Element:=Max(::Element,1),;
-                        ::RecPos:=::Element}
+      ::bSkip     :={|n|::Element   += n,;
+                        ::HitTop    := ( ::Element < 1 ) ,;
+                        ::HitBottom := ( ::Element > Len( ::Source ) ) ,;
+                        ::RecCount  := Len( ::Source ) ,;
+                        ::Element   := Min( ::Element, Len( ::Source ) + 1 ) ,;
+                        ::Element   := Max( ::Element, 1 ),;
+                        ::RecPos    := ::Element }
 
-      ::bRecNo    :={||::Element}
+      ::bRecNo    :={|| ::Element }
 
    ELSE
 
-      ::Element:=1
-      ::RecPos:=(::Source)->(RECNO())
-      ::RecCount:=(::Source)->(RecCount())
-      ::bSeekChar :=NIL
-      ::bGoToPos :={|ob,nPos|  gotorec(ob,nPos),;
-                               ::RecPos:=nPos,;
-                               ::HitTop:=(::Source)->(bof()),;
-                               ::HitBottom:=(::Source)->(eof()),;
-                               ::RecCount:=(::Source)->(RecCount()),;
-                               IF(::HitTop,::RecPos:=1,),;
-                               IF(::HitBottom,::RecPos:=::RecCount,)}
+      ::Element   := 1
+      ::RecPos    := ( ::Source )->( RECNO() )
+      ::RecCount  := ( ::Source )->( RecCount() )
+      ::bSeekChar := NIL
+      ::bGoToPos  := {|ob,nPos| gotorec( ob, nPos ) ,;
+                               ::RecPos   := nPos,;
+                               ::HitTop   := ( ::Source )->( bof() ),;
+                               ::HitBottom:= ( ::Source )->( eof() ),;
+                               ::RecCount := ( ::Source )->( RecCount() ),;
+                               IF( ::HitTop, ::RecPos := 1,),;
+                               IF( ::HitBottom, ::RecPos := ::RecCount,) }
 
-      ::bGoTop :={| | (::Source)->(dbgotop()),;
-                  ::HitTop:=(::source)->(BOF()),;
-                  ::HitBottom:=(::Source)->(eof()),;
-                  ::RecCount:=(::Source)->(RecCount()),;
-                  ::RecPos:=1,;
-                  IF(::HitTop,::RecPos:=1,),;
-                  IF(::HitBottom,::RecPos:=::RecCount,)}
+      ::bGoTop :={|| ( ::Source )->( dbgotop() ),;
+                     ::HitTop    := ( ::source )->( Bof() ),;
+                     ::HitBottom := ( ::Source )->( Eof() ),;
+                     ::RecCount  := ( ::Source )->( RecCount() ),;
+                     ::RecPos    := 1,;
+                     IF( ::HitTop, ::RecPos := 1,),;
+                     IF( ::HitBottom, ::RecPos := ::RecCount,) }
 
-      ::bGoBottom :={|n| (::Source)->(dbgobottom()),;
-                     ::HitTop:=(::Source)->(bof()),;
-                     ::HitBottom:=(::source)->(EOF()),;
-                     ::RecCount:=(::Source)->(RecCount()),;
-                     ::RecPos:=::RecCount,;
+      ::bGoBottom :={|n| ( ::Source )->( dbgobottom() ),;
+                     ::HitTop    :=(::Source)->(bof()),;
+                     ::HitBottom :=(::source)->(EOF()),;
+                     ::RecCount  :=(::Source)->(RecCount()),;
+                     ::RecPos    :=::RecCount,;
                      IF(::HitTop,::RecPos:=1,),;
                      IF(::HitBottom,::RecPos:=::RecCount,)}
 

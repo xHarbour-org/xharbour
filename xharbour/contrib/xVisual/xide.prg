@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.108 2002/10/30 21:39:31 ronpinkas Exp $
+ * $Id: xide.prg,v 1.109 2002/10/31 04:09:00 what32 Exp $
  */
 
 /*
@@ -137,7 +137,8 @@ METHOD MainToolBar() CLASS MainFrame
       :AddButton( ToolButton():New(12,,'View',                           112 ) )
       :AddButton( ToolButton():New(13,,'Files',                          113 ) )
 
-      SendMessage( :handle, TB_SETROWS, 2 )
+      :RowCount := 2
+
       // ----------------------------------------------------   set imagelist
       hImg1:= ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
       hBmp := LoadImage( hInstance(), "XMAKE", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )

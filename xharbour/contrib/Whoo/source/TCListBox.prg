@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.17 2002/10/28 12:03:51 what32 Exp $
+ * $Id: TCListBox.prg,v 1.18 2002/10/29 02:12:37 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -59,19 +59,21 @@ CLASS TListBox FROM TCustomControl
    DATA WndProc   PROTECTED INIT 'ControlProc'
 
    DATA Items     EXPORTED INIT TStrings():New()
-
-   ACCESS CurSel INLINE ::GetCurSel()
+   
+   ACCESS CurSel  INLINE ::GetCurSel()
 
    DATA WinClass    PROTECTED INIT "listbox"
    DATA ControlName PROTECTED INIT "ListBox"
 
    METHOD New() CONSTRUCTOR
+   
    METHOD GetString()
    METHOD GetItemRect()
    METHOD GetSelItems()
-   METHOD AddString( cText )        INLINE ::SendMessage( LB_ADDSTRING, 0, cText)
-   METHOD InsertString(cText,nLine) INLINE ::SendMessage( LB_INSERTSTRING, nLine, cText )
-   METHOD DeleteString(nLine)       INLINE ::SendMessage( LB_DELETESTRING, nLine, 0)
+   METHOD AddItem( cText )          INLINE ::SendMessage( LB_ADDSTRING, 0, cText)
+   METHOD Clear()                   INLINE ::SendMessage( LB_RESETCONTENT, 0, 0 )
+   METHOD InsertItem(cText,nLine)   INLINE ::SendMessage( LB_INSERTSTRING, nLine, cText )
+   METHOD DeleteItem(nLine)         INLINE ::SendMessage( LB_DELETESTRING, nLine, 0)
    METHOD SetCurSel(nLine)          INLINE ::SendMessage( LB_SETCURSEL, nLine, 0)
    METHOD SetSel(nLine,lSel)        INLINE ::SendMessage( LB_SETSEL, if(lSel,1,0), MAKELPARAM(nLine, 0))
    METHOD FindString(nStart,cStr)   INLINE ::SendMessage( LB_FINDSTRING, IFNIL(nStart,-1,nStart), cStr)
@@ -80,7 +82,7 @@ CLASS TListBox FROM TCustomControl
    METHOD GetCurSel()               INLINE ::SendMessage( LB_GETCURSEL, 0, 0)
    METHOD Dir(nAttr, cFileSpec)     INLINE ::SendMessage( LB_DIR, nAttr, cFileSpec)
    METHOD GetSelCount()             INLINE ::SendMessage( LB_GETSELCOUNT, 0, 0)
-
+   METHOD OnCreate()
 ENDCLASS
 
 *------------------------------------------------------------------------------*
@@ -131,77 +133,13 @@ METHOD GetSelItems() CLASS TListBox
 
 *------------------------------------------------------------------------------*
 
-/*
+METHOD OnCreate() CLASS TListBox
+   
+   LOCAL cStr
 
+   FOR EACH cStr IN ::Items:Text
+      ::AddItem( cStr )
+   NEXT
 
+RETURN Self
 
-
-*------------------------------------------------------------------------------*
-
-function LBGetSelLines(hLBox)
-local i, a := LBGetSelItems(hLBox)
-for i = 1 to len(a)
-   a[i] = LBGetText(hLBox, a[i])
-next i
-return a
-
-*------------------------------------------------------------------------------*
-
-function LBGetText(hLBox, nLine)
-local nLen, cBuf := space(SendMessage(hLBox, LB_GETTEXTLEN, nLine, 0) + 1)
-nLen = SendMessage(hLBox, LB_GETTEXT, nLine, @cBuf)
-return iif(nLen == LB_ERR, nil, left(cBuf, nLen))
-
-*------------------------------------------------------------------------------*
-
-function LBGetTextLen(hLBox, nLine)
-return SendMessage(hLBox, LB_GETTEXTLEN, nLine, 0)
-
-*------------------------------------------------------------------------------*
-
-function LBInsertString(hLBox, cNewStr, nLine)
-return SendMessage(hLBox, LB_INSERTSTRING, nLine, cNewStr)
-
-*------------------------------------------------------------------------------*
-
-procedure LBResetContent(hLBox)
-SendMessage(hLBox, LB_RESETCONTENT, 0, 0)
-return
-
-*------------------------------------------------------------------------------*
-
-function LBSelectString(hLBox, cStr, nStart)
-if nStart == nil
-   nStart = -1       // search from the start
-endif
-return SendMessage(hLBox, LB_SELECTSTRING, nStart, cStr)
-
-*------------------------------------------------------------------------------*
-
-function LBSetCurSel(hLBox, nLine)
-return SendMessage(hLBox, LB_SETCURSEL, nLine, 0)
-
-*------------------------------------------------------------------------------*
-
-function LBSetHorzExtent(hLBox, nWidth)
-return SendMessage(hLBox, LB_SETHORIZONTALEXTENT, nWidth, 0)
-
-*------------------------------------------------------------------------------*
-
-function LBSetSel(hLBox, nLine, lSelect)
-return SendMessage(hLBox, LB_SETSEL, iif(lSelect,1,0), MAKELPARAM(nLine, 0))
-
-*------------------------------------------------------------------------------*
-
-function LBSetTabStops(hLBox, aTabs)
-local nLen, cTabs := ""
-if aTabs == nil
-   cTabs := nLen := 0      // Windows default is 2 dialog units
-else
-   nLen = len(aTabs)
-   aeval(aTabs, {|n| cTabs += i2bin(n)})
-endif
-return SendMessage(hLBox, LB_SETTABSTOPS, nLen, cTabs) != 0
-
-*------------------------------------------------------------------------------*
-*/

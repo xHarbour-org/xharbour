@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.37 2002/10/29 06:21:37 ronpinkas Exp $
+ * $Id: TApplication.prg,v 1.38 2002/10/30 08:14:00 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -133,15 +133,11 @@ METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
 
          WITH OBJECT aVar[2]
             :Parent    := oForm
-            :Instance  := _GetInstance()
+            :Instance  := hInstance()
             :Create()
-            //OutputDebugString( HB_QWith():Id )
-            //TraceLog( HB_QWith():Id )
          END WITH
       ENDIF
    NEXT
-
-   //ProcessMessages()
 
    oTarget := oForm
 

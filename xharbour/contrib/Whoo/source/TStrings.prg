@@ -1,5 +1,5 @@
 /*
- * $Id: TStrings.prg,v 1.2 2002/10/23 02:19:41 what32 Exp $
+ * $Id: TStrings.prg,v 1.3 2002/10/23 06:32:38 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -43,7 +43,6 @@ CLASS TStrings FROM TPersistent
    DATA DelimitedText  EXPORTED  
    DATA Delimiter      EXPORTED  
    DATA Names          EXPORTED  
-   DATA Objects        EXPORTED  
    DATA QuoteChar      EXPORTED  
    DATA Strings        EXPORTED  
    DATA StringsAdapter EXPORTED  
@@ -100,6 +99,8 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New() CLASS TStrings
+   
+   
    RETURN( self )
 
 *------------------------------------------------------------------------------*
