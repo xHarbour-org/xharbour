@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.36 2004/10/24 17:59:27 druzus Exp $
+ * $Id: gtapi.c,v 1.37 2004/10/25 13:19:01 druzus Exp $
  */
 
 /*
@@ -218,6 +218,8 @@ static void hb_ctWSDisp( HB_CT_WND * wnd );
 /****************************************************************************/
 void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
 {
+   SHORT iTmpRow, iTmpCol;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_gtInit()"));
 
    hb_gt_gobjects = NULL;
@@ -235,8 +237,8 @@ void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
 
    hb_gtSetColorStr( hb_set.HB_SET_COLOR );
 
-   s_iRow = hb_gt_Row();
-   s_iCol = hb_gt_Col();
+   iTmpRow = s_iRow = hb_gt_Row();
+   iTmpCol = s_iCol = hb_gt_Col();
    s_ScNone = FALSE;
    s_uiPreCount = 0;
    s_uiPreCNest = 0;
@@ -244,6 +246,8 @@ void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
    s_Width = hb_gt_GetScreenWidth();
 
    hb_ctInit();
+   // Restores the "original" cursor position
+   hb_gtSetPos( iTmpRow, iTmpCol );
 
    /* This should be called after s_iRow/s_iCol initialization. */
    hb_gtSetCursor( SC_NORMAL );
