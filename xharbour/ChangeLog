@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.378 2002/09/16 05:34:00 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.379 2002/09/16 18:17:27 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-16 13:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/global1.prg
+    * Modified to demonstrate sharing and usage of GLOBAL variables from C code.
 
 2002-09-16 11:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * makefile.vc
