@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.14 2004/02/28 03:45:07 andijahja Exp $
+ * $Id: zip.c,v 1.15 2004/02/28 07:47:05 andijahja Exp $
  */
 
 /*
@@ -76,13 +76,9 @@ static void ZipCreateArray( PHB_ITEM pParam )
    }
    else
    {
-      ulLen = pParam->item.asArray.value->ulLen;
-      for ( ul = 0 ; ul < ulLen ; ul ++ )
-      {
-         char *szArray = hb_arrayGetC( pParam, ul + 1 );
-         hb_arrayAddForward( &TempArray, hb_itemPutC( &Temp, szArray ) );
-         hb_xfree( szArray );
-      }
+      PHB_ITEM pClone = hb_arrayClone( pParam, NULL );
+      hb_itemCopy( &TempArray, pClone );
+      hb_itemRelease( pClone );
    }
 
    ulLenArr = (&TempArray)->item.asArray.value->ulLen;
@@ -93,21 +89,31 @@ static void ZipCreateArray( PHB_ITEM pParam )
    {
       char *szArrEntry = hb_arrayGetC( &TempArray, ulArr + 1 );
 
-      pWildFile = hb_fsDirectory(szArrEntry,NULL,NULL,TRUE);
-      ulLen = pWildFile->item.asArray.value->ulLen;
-
-      for ( ul = 0; ul < ulLen ; ul ++ )
+      if ( strchr( szArrEntry, '*') != NULL )
       {
-         char * szEntry;
-         pDirEntry = hb_arrayGetItemPtr( pWildFile, ul + 1 );
-         szEntry = hb_arrayGetC( pDirEntry, 1 );
-         hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szEntry ) );
-         hb_xfree( szEntry );
+         pWildFile = hb_fsDirectory(szArrEntry,NULL,NULL,TRUE);
+         ulLen = pWildFile->item.asArray.value->ulLen;
+
+         for ( ul = 0; ul < ulLen ; ul ++ )
+         {
+            char * szEntry;
+            pDirEntry = hb_arrayGetItemPtr( pWildFile, ul + 1 );
+            szEntry = hb_arrayGetC( pDirEntry, 1 );
+            hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szEntry ) );
+            hb_xfree( szEntry );
+         }
+
+         hb_itemRelease( pWildFile );
+      }
+      else
+      {
+         hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szArrEntry ) );
       }
 
-      hb_itemRelease( pWildFile );
       hb_xfree( szArrEntry );
    }
+
+   hb_itemClear( &TempArray );
 }
 
 HB_FUNC( HB_ZIPFILE )
