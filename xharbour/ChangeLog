@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1271 2003/07/20 17:50:00 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1272 2003/07/20 19:43:05 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-21 15:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    * Reverted recenge change which disabled SubStr( <s>, <n>, 1) optimization.
+
+    /* Andi, the change you made was not as per the ChangeLog Entry, can you please expalin
+       what problem you tried to solve - do you have a small sample?  */
+
+  * source/compiler/genc.c
+    * Reverted recent change which was NOT documented in ChangeLog.
+
+    /*
+      Andi could you please explain waht was the purpose of that change?
+
+      Sadly I just wasted more than 12 hours, trying to understand why xHB.exe was no longer working.
+      until I finally discovered that HB_BACK_END support was removed from genc.c, and there was no
+      ChangeLog Entry to document that change.
+    */
 
 2003-07-20 21:57 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * include/thread.h
@@ -34,7 +52,7 @@
 
 2003-07-20 00:01 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * config/w32/global.cf
-    ! Wasn't building the directory gcc_mt under CMD environment. Fixed. 
+    ! Wasn't building the directory gcc_mt under CMD environment. Fixed.
 
   * include/hbdefs.h
     ! gcc is not able to see a typedef in #if defined(), so if the _winnt_h
@@ -51,7 +69,7 @@
       memvar's data at the end of a thread. Help is needed here;
       For the moment, MT programs using memvars should set them to 0 before
       thread termination.
-  
+
   * source/vm/fm.c
     + added a comment about thread termination sequence.
 
