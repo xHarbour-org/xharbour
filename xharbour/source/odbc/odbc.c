@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.20 2004/11/21 21:43:48 druzus Exp $
+ * $Id: odbc.c,v 1.21 2004/11/22 15:35:09 druzus Exp $
  */
 
 /*
@@ -340,16 +340,16 @@ HB_FUNC( SQLFETCHSC )
 
 HB_FUNC( SQLERROR ) //  hEnv, hDbc, hStmt, @ cErrorClass, @ nType, @ cErrorMsg
 {
-   BYTE bBuffer1[ 256 ], szErrorMsg[ 256 ];
-   UDWORD lError;
-   SWORD wLen;
+   BYTE        bBuffer1[ 256 ], szErrorMsg[ 256 ];
+   SQLUINTEGER lError;
+   SWORD       wLen;
 
    hb_retni( SQLError( ( HENV ) hb_parnl( 1 ), ( HDBC ) hb_parnl( 2 ),
-                       ( HSTMT ) hb_parnl( 3 ), bBuffer1, (LONG *) &lError,
+                       ( HSTMT ) hb_parnl( 3 ), bBuffer1, &lError,
                        szErrorMsg, 256, &wLen ) );
 
    hb_storc( (char *) bBuffer1, 4 );
-   hb_stornl( lError, 5 );
+   hb_stornl( ( LONG ) lError, 5 );
    hb_storc( (char *) szErrorMsg, 6 );
 }
 
@@ -357,7 +357,7 @@ HB_FUNC( SQLROWCOUN )
 {
     SQLUINTEGER  uiRowCountPtr = hb_parni( 2 );
     WORD         wResult       = SQLRowCount( ( HSTMT ) hb_parnl( 1 ),
-                                              ( LONG * ) &uiRowCountPtr );
+                                              &uiRowCountPtr );
 
     if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
     {
@@ -485,10 +485,10 @@ HB_FUNC( SQLBINDOUTPARAM ) /* SqlBindOutParam( nStatementHandle, nParameterNumbe
 {
    PHB_ITEM pResult = hb_param( 6, HB_IT_BYREF );
    PHB_ITEM pLen    = hb_param( 7, HB_IT_BYREF );
-   LONG lLen = hb_itemGetNL( pLen );
+   SQLLEN lLen = hb_itemGetNL( pLen );
 
    RETCODE ret = SQLBindParameter( ( HSTMT ) hb_parnl( 1 ), (USHORT) hb_parni( 2 ), SQL_PARAM_OUTPUT, SQL_CHAR, (USHORT) hb_parni( 3 ), (USHORT) hb_parni( 4 ), (USHORT) hb_parni( 5 ), pResult->item.asString.value, pResult->item.asString.length, &lLen );
-   hb_stornl( 7, lLen );
+   hb_stornl( ( LONG ) lLen, 7 );
    hb_retni( ret );
 }
 

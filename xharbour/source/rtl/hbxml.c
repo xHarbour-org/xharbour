@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.26 2004/04/08 13:26:53 druzus Exp $
+ * $Id: hbxml.c,v 1.27 2004/11/21 21:44:19 druzus Exp $
  */
 
 /*
@@ -1799,8 +1799,9 @@ static void mxml_output_func_to_stream( MXML_OUTPUT *out, char *s, int len )
 */
 static void mxml_output_func_to_handle( MXML_OUTPUT *out, char *s, int len )
 {
-   FHANDLE fh = (FHANDLE) out->data;
+   FHANDLE fh = out->u.hFile;
    int olen;
+
    olen = hb_fsWrite( fh, (BYTE *) s, len );
 
    if ( olen < len )
@@ -1815,7 +1816,8 @@ static void mxml_output_func_to_handle( MXML_OUTPUT *out, char *s, int len )
 */
 static void mxml_output_func_to_sgs( MXML_OUTPUT *out, char *s, int len )
 {
-   MXML_SGS *sgs = (MXML_SGS *) out->data;
+   MXML_SGS *sgs = (MXML_SGS *) out->u.vPtr;
+
    MXML_STATUS stat;
 
    if ( len == 1 ) 
@@ -1951,7 +1953,7 @@ void mxml_refil_ungetc( MXML_REFIL *ref, int chr )
 
 static void mxml_refill_from_handle_func( MXML_REFIL *ref )
 {
-   FHANDLE fh = (FHANDLE) ref->data;
+   FHANDLE fh = (FHANDLE) ref->u.hFile;
    int len;
 
    len = hb_fsRead( fh, (BYTE *) ref->buffer, ref->bufsize );
@@ -2135,7 +2137,7 @@ HB_FUNC( HBXML_DATAREAD )
 
 
    if( pDoc == NULL || pParam == NULL ||
-      ( !HB_IS_STRING( pParam ) && !HB_IS_NUMERIC( pParam)) )
+      ( !HB_IS_STRING( pParam ) && !HB_IS_NUMERIC( pParam ) ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type",
          NULL,
@@ -2157,7 +2159,7 @@ HB_FUNC( HBXML_DATAREAD )
          mxml_refill_from_handle_func,
          buffer, 0, 512 );
 
-      refil.data = (void *) hb_itemGetNI( pParam );
+      refil.u.vPtr = (void *) hb_itemGetNL( pParam );
    }
 
    /* Now we can get the root node */
@@ -2224,7 +2226,7 @@ HB_FUNC( HBXML_NODE_TO_STRING )
 
    sgs = mxml_sgs_new();
    mxml_output_setup( &out, mxml_output_func_to_sgs , 0 );
-   out.data = sgs;
+   out.u.vPtr = ( void * ) sgs;
 
    if( mxml_node_write( &out, pNode, iStyle ) == MXML_STATUS_OK )
    {
@@ -2274,7 +2276,7 @@ HB_FUNC( HBXML_NODE_WRITE )
    }
 
    mxml_output_setup( &out, mxml_output_func_to_handle , 0 );
-   out.data = (void *) hb_itemGetNI( pHandle );
+   out.u.hFile = ( FHANDLE ) hb_itemGetNL( pHandle );
 
    iRet = mxml_node_write( &out, pNode, iStyle );
    hb_retni( iRet );

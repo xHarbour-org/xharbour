@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.h,v 1.6 2004/03/23 18:09:29 jonnymind Exp $
+ * $Id: hbxml.h,v 1.7 2004/04/04 22:52:41 jonnymind Exp $
  */
 
 /*
@@ -173,7 +173,11 @@ typedef struct tag_mxml_refil
    int sparechar;
 
    // data available for callback functions
-   void *data;
+   union
+   {
+      FHANDLE hFile;
+      void    *vPtr;
+   } u;
 
 } MXML_REFIL;
 
@@ -192,7 +196,11 @@ typedef struct tag_mxml_output
    int node_done;
 
    // data available for callback functions
-   void *data;
+   union
+   {
+      FHANDLE hFile;
+      void    *vPtr;
+   } u;
 
 } MXML_OUTPUT;
 
