@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.84 2004/07/29 21:16:25 druzus Exp $
+ * $Id: dbfntx1.c,v 1.85 2004/11/21 21:44:16 druzus Exp $
  */
 
 /*
@@ -296,6 +296,38 @@ static void hb_IncString( NTXAREAP pArea, char* s, int slen )
          }
          else
             *ptr = (char) ++nsymb;
+         break;
+      }
+   }
+}
+
+static void hb_DecString( NTXAREAP pArea, char* s, int slen )
+{
+   char *ptr;
+   UINT nsymb;
+
+   for( ptr=s+slen-1;ptr>=s;ptr-- )
+   {
+      nsymb = (UINT) *ptr;
+      if( nsymb > 0 )
+      {
+         UINT n1, i;
+         if( pArea->cdPage->lSort && ( n1 = (UINT) pArea->cdPage->s_chars[ nsymb ] ) != 0 )
+         {
+            n1 --;
+            for( i=0; i<255; i++ )
+            {
+               if( n1 == (UINT) pArea->cdPage->s_chars[ i ] )
+               {
+                  *ptr = (char) i;
+                  break;
+               }
+            }
+            if( i >= 255 )
+               *ptr = (char) --nsymb;
+         }
+         else
+            *ptr = (char) --nsymb;
          break;
       }
    }
@@ -3233,7 +3265,10 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
         LONG lRecnoLast;
 
         pArea->fEof = pArea->fBof = FALSE;
-        hb_IncString( pArea, pKey2->key, keylen );
+        if( pTag->AscendKey )
+           hb_IncString( pArea, pKey2->key, keylen );
+        else
+           hb_DecString( pArea, pKey2->key, keylen );
         lRecnoLast = hb_ntxTagKeyFind( pTag, pKey2, keylen, &result, FALSE );
         if( lRecnoLast > 0 )
         {

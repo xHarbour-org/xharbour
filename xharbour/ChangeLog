@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3610 2004/11/22 21:45:46 druzus Exp $
+ * $Id: ChangeLog,v 1.3611 2004/11/22 23:13:42 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-23 05:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    + added hb_DecString()
+    ! fixed SEEK LAST for descending indexes
 
 2004-11-23 00:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbcmd.c
