@@ -176,7 +176,7 @@ CLASS TWindow FROM TWindowBase
     METHOD OnCreate( lParam )               VIRTUAL //INLINE ::Create( lParam )
     METHOD OnDestroy()                      VIRTUAL
     METHOD OnDropFile()                     VIRTUAL // FSG - to be implemented
-    METHOD OnEraseBackground()              VIRTUAL // FSG - to be implemented
+    METHOD OnEraseBkGnd()                   VIRTUAL // FSG - to be implemented
     METHOD OnIdle()                         VIRTUAL // FSG - to be implemented
     METHOD OnInitDialog()                   VIRTUAL // FSG - to be implemented
     METHOD OnKeyDown()                      VIRTUAL // FSG - to be implemented
@@ -193,6 +193,7 @@ CLASS TWindow FROM TWindowBase
     METHOD OnNotify()                       VIRTUAL // FSG - to be implemented
     METHOD OnLBtnDown()                     VIRTUAL
 //    METHOD OnPaint()                        VIRTUAL // FSG - to be implemented
+   METHOD OnDrawItem()                      VIRTUAL
    METHOD OnGetMinMaxInfo()                 VIRTUAL
    METHOD OnPaint()                 ;
           INLINE ;
@@ -741,6 +742,8 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
               nRet := ::OnSize(wParam, LoWord(lParam), HiWord(lParam))
          CASE nMsg == WM_SYSCOMMAND
               nRet := ::OnSysCommand(wParam, LoWord(lParam), HiWord(lParam))
+         CASE nMsg == WM_ERASEBKGND
+              nRet := ::OnEraseBkGnd() 
          CASE nMsg == WM_TIMER
               nRet := ::OnTimer( wParam )
          //CASE nMsg == WM_QUERYENDSESSION
