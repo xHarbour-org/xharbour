@@ -1,6 +1,6 @@
 @echo off
 REM
-REM $Id: dll_b32.bat,v 1.3 2003/10/01 05:56:28 ronpinkas Exp $
+REM $Id: dll_b32.bat,v 1.4 2003/10/01 06:08:17 ronpinkas Exp $
 REM
 REM ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 REM ³ This is a batch file to create harbour.dll ³Û
@@ -8,6 +8,8 @@ REM ³ Please adjust envars accordingly           ³Û
 REM ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 REM  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
+if not exist obj md obj
+if not exist obj\dll md obj\dll
 if not exist obj\dll\b32 md obj\dll\b32
 if not exist lib\b32 md lib\b32
 
