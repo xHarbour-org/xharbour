@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3137 2004/07/07 01:36:02 kaddath Exp $
+ * $Id: ChangeLog,v 1.3138 2004/07/07 04:39:35 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-09 15:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/debug/debugger.prg
+    + Added some missing commands.
+    ! Display correct file after changing source file path.
+    ! Restore LastKey() and Inkey() before- and afterblocks when evaluating
+      expressions.
+    * Convenient command history processing.
+    * Some code formatting.
+  * source/rtl/mouseapi.c
+    ! Fixed a typo in a trace message.
 
 2004-07-06 21:39 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/compiler/cmdcheck.c

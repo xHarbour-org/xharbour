@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.44 2004/06/06 22:46:44 likewolf Exp $
+ * $Id: debugger.prg,v 1.45 2004/06/30 10:05:15 likewolf Exp $
  */
 
 /*
@@ -314,6 +314,7 @@ CLASS TDebugger
    DATA   oBar, oBrwText, cPrgName, oBrwStack, oBrwVars, aVars
    DATA   cImage
    DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor
+   DATA   nAppLastKey, bAppInkeyAfter, bAppInkeyBefore
    DATA   aBreakPoints
    DATA   aCallStack    //stack of procedures with debug info
    DATA   aProcStack    //stack of all procedures
@@ -365,7 +366,9 @@ CLASS TDebugger
    METHOD EditVar( nVar )
    METHOD EndProc()
    METHOD Exit() INLINE ::lEnd := .t.
-   METHOD Go() INLINE ::RestoreAppStatus(), ::lGo := .t., ::Exit()
+   METHOD FindNext()
+   METHOD FindPrevious()
+   METHOD Go()
    METHOD GoToLine( nLine )
    METHOD HandleEvent()
    METHOD Hide()
@@ -380,6 +383,8 @@ CLASS TDebugger
    METHOD LoadCallStack()
 
    METHOD Local()
+   
+   METHOD Locate( nMode, cValue )
 
    METHOD MonoDisplay()
    METHOD NextWindow()
@@ -395,15 +400,16 @@ CLASS TDebugger
    METHOD Public()
    METHOD Quit() INLINE ::Exit(), ::Hide(), s_lExit := .T., s_oDebugger := NIL, __QUIT()
    METHOD RefreshVars()
-   METHOD RestoreAppStatus()
+   METHOD RestoreAppScreen()
+   METHOD RestoreAppState()
    METHOD RestoreSettings()
    METHOD RunAtStartup() INLINE ::lRunAtStartup := ::oPullDown:GetItemByIdent( "ALTD" ):checked := !::lRunAtStartup
-   METHOD SaveAppStatus()
+   METHOD SaveAppScreen( lRestore )
+   METHOD SaveAppState()
    METHOD SaveSettings()
    METHOD Show()
    METHOD ShowAppScreen()
    METHOD ShowCallStack()
-   //METHOD ShowCodeLine( nLine, cPrgName )
    METHOD ShowCodeLine( nProc )
    METHOD StackProc( cModuleName, nProcLevel )
    METHOD ShowHelp( nTopic )
@@ -438,9 +444,6 @@ CLASS TDebugger
    METHOD ViewSets()
    METHOD WndVarsLButtonDown( nMRow, nMCol )
    METHOD LineNumbers( lLineNumbers ) // Toggles numbering of source code lines
-   METHOD Locate()
-   METHOD FindNext()
-   METHOD FindPrevious()
    METHOD RemoveWindow()
    METHOD SearchLine()
    METHOD ToggleAnimate() INLINE ::oPullDown:GetItemByIdent( "ANIMATE" ):checked := ::lAnimate := ! ::lAnimate
@@ -493,6 +496,8 @@ METHOD New() CLASS TDebugger
    if empty( ::cPathForFiles )
       ::cPathForFiles     := getenv( "PATH" )
    endif
+   ::aPathDirs := PathToArray( ::cPathForFiles )
+
    ::nTabWidth         := 4
    ::nSpeed            := 0
    ::lShowCallStack    := .f.
@@ -539,7 +544,8 @@ METHOD Activate() CLASS TDebugger
       ::ShowCallStack()
     endif
   ELSE
-    ::SaveAppStatus()
+    ::SaveAppState()
+    ::SaveAppScreen()
   ENDIF
   ::loadVars()
   ::ShowVars()
@@ -587,36 +593,6 @@ METHOD BarDisplay() CLASS TDebugger
 
 return nil
 
-METHOD BuildCommandWindow() CLASS TDebugger
-
-   local GetList := {}, oGet
-   local cCommand
-
-   ::oWndCommand := TDbWindow():New( MaxRow() - 5, 0, MaxRow() - 1, MaxCol(),;
-                                    "Command" )
-
-   ::oWndCommand:bGotFocus   := { || ::oGetListCommand:SetFocus(), SetCursor( SC_NORMAL ) }
-   ::oWndCommand:bLostFocus  := { || SetCursor( SC_NONE ) }
-   ::oWndCommand:bKeyPressed := { | nKey | ::CommandWindowProcessKey( nKey ) }
-   ::oWndCommand:bPainted    := { || DispOutAt( ::oWndCommand:nBottom - 1,;
-                             ::oWndCommand:nLeft + 1, "> ", __DbgColors()[ 2 ] ),;
-                        oGet:ColorDisp( Replicate( __DbgColors()[ 2 ] + ",", 5 ) ),;
-                        hb_ClrArea( ::oWndCommand:nTop + 1, ::oWndCommand:nLeft + 1,;
-                        ::oWndCommand:nBottom - 2, ::oWndCommand:nRight - 1,;
-                        iif( ::lMonoDisplay, 15, HB_ColorToN( __DbgColors()[ 2 ] ) ) ) }
-   AAdd( ::aWindows, ::oWndCommand )
-
-   ::aLastCommands := {}
-   ::nCommand := 0
-
-   cCommand := Space( ::oWndCommand:nRight - ::oWndCommand:nLeft - 3 )
-   // We don't use the GET command here to avoid the painting of the GET
-   AAdd( GetList, oGet := Get():New( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 3,;
-         { | u | iif( PCount() > 0, cCommand := u, cCommand ) }, "cCommand" ) )
-   oGet:ColorSpec := Replicate( __DbgColors()[ 2 ] + ",", 5 )
-   ::oGetListCommand := HBGetList():New( GetList )
-
-return nil
 
 METHOD BuildBrowseStack() CLASS TDebugger
 
@@ -637,6 +613,39 @@ METHOD BuildBrowseStack() CLASS TDebugger
    endif
 
 return nil
+
+
+METHOD BuildCommandWindow() CLASS TDebugger
+
+   local GetList := {}, oGet
+   local cCommand
+
+   ::oWndCommand := TDbWindow():New( MaxRow() - 5, 0, MaxRow() - 1, MaxCol(),;
+                                    "Command" )
+
+   ::oWndCommand:bGotFocus   := { || ::oGetListCommand:SetFocus(), SetCursor( SC_NORMAL ) }
+   ::oWndCommand:bLostFocus  := { || SetCursor( SC_NONE ) }
+   ::oWndCommand:bKeyPressed := { | nKey | ::CommandWindowProcessKey( nKey ) }
+   ::oWndCommand:bPainted    := { || DispOutAt( ::oWndCommand:nBottom - 1,;
+                             ::oWndCommand:nLeft + 1, "> ", __DbgColors()[ 2 ] ),;
+                        oGet:ColorDisp( Replicate( __DbgColors()[ 2 ] + ",", 5 ) ),;
+                        hb_ClrArea( ::oWndCommand:nTop + 1, ::oWndCommand:nLeft + 1,;
+                        ::oWndCommand:nBottom - 2, ::oWndCommand:nRight - 1,;
+                        iif( ::lMonoDisplay, 15, HB_ColorToN( __DbgColors()[ 2 ] ) ) ) }
+   AAdd( ::aWindows, ::oWndCommand )
+
+   ::aLastCommands := { "" }
+   ::nCommand := 1
+
+   cCommand := Space( ::oWndCommand:nRight - ::oWndCommand:nLeft - 3 )
+   // We don't use the GET command here to avoid the painting of the GET
+   AAdd( GetList, oGet := Get():New( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 3,;
+         { | u | iif( PCount() > 0, cCommand := u, cCommand ) }, "cCommand" ) )
+   oGet:ColorSpec := Replicate( __DbgColors()[ 2 ] + ",", 5 )
+   ::oGetListCommand := HBGetList():New( GetList )
+
+return nil
+
 
 METHOD CallStackProcessKey( nKey ) CLASS TDebugger
 
@@ -808,40 +817,46 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
    local cCommand, cResult, oE
    local bLastHandler
    local lDisplay
+   local n, nWidth := ::oWndCommand:nRight - ::oWndCommand:nLeft - 3
 
    do case
-      case nKey == K_UP
-           if ::nCommand > 0
-              ::oGetListCommand:oGet:VarPut( ::aLastCommands[ ::nCommand ] )
-              ::oGetListCommand:oGet:Buffer := ::aLastCommands[ ::nCommand ]
-              ::oGetListCommand:oGet:Pos := 1
+      case nKey == K_UP .OR. nKey == K_F3
+           if ::nCommand > 1
+	      ::oGetListCommand:oGet:Assign()
+	      ::aLastCommands[ ::nCommand ] := Trim( ::oGetListCommand:oGet:VarGet() )
+	      ::nCommand--
+	      cCommand := PadR( ::aLastCommands[ ::nCommand ], nWidth )
+              ::oGetListCommand:oGet:VarPut( cCommand )
+              ::oGetListCommand:oGet:Buffer := cCommand
+              ::oGetListCommand:oGet:Pos := Len( ::aLastCommands[ ::nCommand ] ) + 1
               ::oGetListCommand:oGet:Display()
-              if ::nCommand > 1
-                 ::nCommand--
-              endif
            endif
 
       case nKey == K_DOWN
-           if ::nCommand > 0 .AND. ::nCommand <= Len( ::aLastCommands )
-              ::oGetListCommand:oGet:VarPut( ::aLastCommands[ ::nCommand ] )
-              ::oGetListCommand:oGet:Buffer := ::aLastCommands[ ::nCommand ]
-              ::oGetListCommand:oGet:Pos := 1
+           if ::nCommand < Len( ::aLastCommands )
+	      ::oGetListCommand:oGet:Assign()
+	      ::aLastCommands[ ::nCommand ] := Trim( ::oGetListCommand:oGet:VarGet() )
+	      ::nCommand++
+	      cCommand := PadR( ::aLastCommands[ ::nCommand ], nWidth )
+              ::oGetListCommand:oGet:VarPut( cCommand )
+              ::oGetListCommand:oGet:Buffer := cCommand
+              ::oGetListCommand:oGet:Pos := Len( ::aLastCommands[ ::nCommand ] ) + 1
               ::oGetListCommand:oGet:Display()
-              if ::nCommand < Len( ::aLastCommands )
-                 ::nCommand++
-              endif
            endif
 
       case nKey == K_ENTER
            /* We must call :Assign() before :VarGet(), because it's no longer
             * called on every change */
            ::oGetListCommand:oGet:Assign()
-           cCommand := ::oGetListCommand:oGet:VarGet()
+           cCommand := Trim( ::oGetListCommand:oGet:VarGet() )
 
            if ! Empty( cCommand )
-	      IF ATail( ::aLastCommands ) != cCommand
-                AAdd( ::aLastCommands, cCommand )
-              ENDIF
+	      IF ( n := AScan( ::aLastCommands, cCommand ) ) > 0 .AND. n < Len( ::aLastCommands )
+	        ADel( ::aLastCommands, n, .T. )
+	      ENDIF
+	      ::nCommand := Len( ::aLastCommands )
+	      ::aLastCommands[ ::nCommand ] := cCommand
+	      AAdd( ::aLastCommands, "" )
               ::nCommand := Len( ::aLastCommands )
               ::oWndCommand:ScrollUp( 1 )
               ::DoCommand( cCommand )
@@ -849,7 +864,7 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
 
            DispOutAt( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 1, "> ",;
               __DbgColors()[ 2 ] )
-           cCommand := Space( ::oWndCommand:nRight - ::oWndCommand:nLeft - 3 )
+           cCommand := Space( nWidth )
            ::oGetListCommand:oGet:VarPut( cCommand )
            ::oGetListCommand:oGet:Buffer := cCommand
            ::oGetListCommand:oGet:Pos := 1
@@ -906,7 +921,9 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
          cResult := CreateExpression( cParam, aCmnd )
          IF( EMPTY(cResult) )
             //valid syntax
+	    ::RestoreAppState()
             cResult := GetWatchValue( aCmnd, @lValid )
+	    ::SaveAppState()
             IF( aCmnd[WP_TYPE] == "??" )
                IF( lValid )
                   ::Inspect( aCmnd[WP_EXPR], cResult )
@@ -931,21 +948,45 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
         ENDIF
 
      CASE starts( "BP", cCommand )
+        /* TODO: Support BP <cFuncName> */
         IF !Empty( cParam )
-           AAdd( ::aBreakPoints, ;
-                 { Val( cParam ), ;
-                   strip_path( SubStr( cParam, RAt( " ", cParam ) + 1 ) ) } )
+           IF ( n := At( " ", cParam ) ) > 0
+              cParam1 := AllTrim( SubStr( cParam, n + 1 ) )
+              cParam := Left( cParam, n - 1 )
+	   ELSE
+	      cParam1 := ::cPrgName
+           ENDIF
+           AAdd( ::aBreakPoints, { Val( cParam ), strip_path( cParam1 ) } )
         ELSE
            ::ToggleBreakPoint()
         ENDIF
+
+     CASE starts( "CALLSTACK", cCommand )
+        ::Stack( Upper( cParam ) == "ON" )
+
+     /* TODO: Support DELETE ALL [TP|BP|WP], DELETE WP|TP|BP <nNumber> */
 
      CASE starts( "DOS", cCommand )
         ::OsShell()
         SetCursor( SC_NORMAL )
 
+     CASE starts( "FIND", cCommand )
+        ::Locate( 0, cParam )
+
+     CASE starts( "GO", cCommand )
+        ::Go()
+
+     CASE starts( "GOTO", cCommand ) .AND. Val( cParam ) > 0
+        ::GoToLine( Val( cParam ) )
+
      CASE starts( "HELP", cCommand )
         ::ShowHelp()
 
+     CASE starts( "INPUT", cCommand ) .AND. !Empty( cParam )
+        ::DoScript( cParam )
+     
+     /* TODO: Support LIST BP|WP|TP */
+     
      CASE starts( "MONITOR", cCommand )
         cParam := Upper( cParam )
         DO CASE
@@ -962,6 +1003,9 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
            OTHERWISE
               cResult := "Command error"
          ENDCASE
+
+      CASE starts( "NEXT", cCommand )
+         ::FindNext()
 
       CASE starts( "NUM", cCommand )
          IF Upper( cParam ) == "OFF"
@@ -1007,29 +1051,42 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
          ENDCASE
 
       CASE starts( "OUTPUT", cCommand )
-        
-        SetCursor( SC_NONE )
-        ::ShowAppScreen()
-        SetCursor( SC_NORMAL )
+         SetCursor( SC_NONE )
+         ::ShowAppScreen()
+         SetCursor( SC_NORMAL )
+	
+      CASE starts( "PREV", cCommand )
+         ::FindPrevious()
 
-     CASE starts( "QUIT", cCommand )
-        ::Quit()
+      CASE starts( "QUIT", cCommand )
+         ::Quit()
 
-     CASE starts( "TP", cCommand )
-        ::TracepointAdd( cParam )
+      /* TODO: Support RESTART */
 
-     CASE starts( "VIEW", cCommand )
-        IF !Empty( cParam ) .AND. starts( "CALLSTACK", Upper( cParam ) )
-           ::Stack()
-        ELSE
-           cResult := "Command error"
-        ENDIF
+      CASE starts( "RESUME", cCommand )
+         ::Resume()
 
-     CASE starts( "WP", cCommand )
-        ::WatchpointAdd( cParam )
+      CASE starts( "SPEED", cCommand )
+         ::nSpeed := Val( cParam )
 
-     OTHERWISE
-        cResult := "Command error"
+      CASE starts( "STEP", cCommand )
+         ::Step()
+
+      CASE starts( "TP", cCommand )
+         ::TracepointAdd( cParam )
+
+      CASE starts( "VIEW", cCommand )
+         IF !Empty( cParam ) .AND. starts( "CALLSTACK", Upper( cParam ) )
+            ::Stack()
+         ELSE
+            cResult := "Command error"
+         ENDIF
+
+      CASE starts( "WP", cCommand )
+         ::WatchpointAdd( cParam )
+
+      OTHERWISE
+         cResult := "Command error"
 
    ENDCASE
 
@@ -1076,16 +1133,16 @@ METHOD EditColor( nColor, oBrwColors ) CLASS TDebugger
    oBrwColors:RefreshCurrent()
    oBrwColors:ForceStable()
 
-   #ifndef HB_NO_READDBG
+#ifndef HB_NO_READDBG
    SetCursor( SC_NORMAL )
    @ Row(), Col() + 15 GET cColor COLOR SubStr( ::ClrModal(), 5 ) ;
       VALID iif( Type( cColor ) != "C", ( Alert( "Must be string" ), .f. ), .t. )
 
    READ
    SetCursor( SC_NONE )
-   #else
+#else
    cColor := getdbginput( Row(), Col() + 15, cColor,  { |cColor| iif( Type( cColor ) != "C", ( Alert( "Must be string" ), .f. ), .t. ) }, SubStr( ::ClrModal(), 5 ) )
-   #endif
+#endif
 
    Set( _SET_SCOREBOARD, lPrevScore )
    Set( _SET_EXIT, lPrevExit )
@@ -1110,16 +1167,16 @@ METHOD EditSet( nSet, oBrwSets ) CLASS TDebugger
    oBrwSets:RefreshCurrent()
    oBrwSets:ForceStable()
 
-   #ifndef HB_NO_READDBG
+#ifndef HB_NO_READDBG
    SetCursor( SC_NORMAL )
    @ Row(), Col()+13 GET cSet COLOR SubStr( ::ClrModal(), 5 ) ;
      VALID iif( Type(cSet) != cType, (Alert( "Must be of type '"+cType+"'" ), .f. ), .t. )
 
    READ
    SetCursor( SC_NONE )
-   #else
+#else
    cSet := getdbginput( Row(), Col()+13, cSet, { |cSet| iif( Type(cSet) != cType, (Alert( "Must be of type '"+cType+"'" ), .f. ), .t. ) }, SubStr( ::ClrModal(), 5 ) )
-   #endif
+#endif
 
    Set( _SET_SCOREBOARD, lPrevScore )
    Set( _SET_EXIT, lPrevExit )
@@ -1132,50 +1189,6 @@ METHOD EditSet( nSet, oBrwSets ) CLASS TDebugger
    oBrwSets:ForceStable()
 
 return nil
-
-
-METHOD VarGetValue( aVar ) CLASS TDebugger
-  LOCAL nProcLevel, uValue
-  LOCAL cProc
-  LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
-
-  IF( cType == "L" )
-    nProcLevel := hb_dbg_procLevel() - aVar[ VAR_LEVEL ]
-    cProc := aVar[ VAR_FUNCNAME ]
-    uValue := hb_dbg_vmVarLGet( nProcLevel, aVar[ VAR_POS ] )
-
-  ELSEIF( cType == "S" )
-    uValue := hb_dbg_vmVarSGet( aVar[ VAR_LEVEL ], aVar[ VAR_POS ] )
-
-  ELSE
-    //Public or Private
-    uValue := aVar[ VAR_POS ]
-  ENDIF
-
-RETURN uValue
-
-
-METHOD VarSetValue( aVar, uValue ) CLASS TDebugger
-  LOCAL nProcLevel
-  LOCAL cProc
-  LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
-
-  IF( cType == "L" )
-    nProcLevel := hb_dbg_procLevel() - aVar[VAR_LEVEL]   //skip debugger stack
-    cProc := aVar[ VAR_FUNCNAME ]
-    hb_dbg_vmVarLSet( nProcLevel, aVar[ VAR_POS ], uValue )
-
-  ELSEIF( cType == "S" )
-    hb_dbg_vmVarSSet( aVar[ VAR_LEVEL ], aVar[ VAR_POS ], uValue )
-
-  ELSE
-    //Public or Private
-    aVar[ VAR_POS ] := uValue
-    &( aVar[ VAR_NAME ] ) := uValue
-
-  ENDIF
-
-RETURN self
 
 
 METHOD EditVar( nVar ) CLASS TDebugger
@@ -1234,16 +1247,67 @@ METHOD EndProc() CLASS TDebugger
 
 return nil
 
+
+METHOD FindNext() CLASS TDebugger
+RETURN ::Locate( 1, ::cSearchString )
+
+
+METHOD FindPrevious() CLASS TDebugger
+RETURN ::Locate( 2, ::cSearchString )
+
+
+METHOD Go() CLASS TDebugger
+  // we are starting to run again so reset to the deepest call if
+  // displaying stack
+  IF ! ::oBrwStack == NIL
+    ::oBrwStack:GoTop()
+  ENDIF
+  ::RestoreAppScreen()
+  ::RestoreAppState()
+  ::lGo := .T.
+  ::Exit()
+RETURN NIL
+
+
+METHOD GotoLine( nLine ) CLASS TDebugger
+
+   local nRow, nCol
+
+   /*if ::oBrwVars != nil
+      ::ShowVars()
+   endif*/
+
+   ::oBrwText:GotoLine( nLine )
+   nRow = Row()
+   nCol = Col()
+
+   // no source code line stored yet
+   /*if ::oBrwStack != nil .and. Len( ::aCallStack ) > 0 .and. ;
+      ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] == nil
+      ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] = nLine
+   endif*/
+
+   if ::oWndStack != nil .and. ! ::oBrwStack:Stable
+      ::oBrwStack:ForceStable()
+   endif
+
+   if ::oWndCode:lFocused .and. SetCursor() != SC_SPECIAL1
+      SetPos( nRow, nCol )
+      SetCursor( SC_SPECIAL1 )
+   endif
+   SetPos( nRow, nCol )
+   
+   // Store cursor position to be restored by ::oWndCode:bGotFocus
+   ::oWndCode:cargo[ 1 ] := nRow
+   ::oWndCode:cargo[ 2 ] := nCol
+
+return nil
+
+
 METHOD HandleEvent() CLASS TDebugger
 
    local nPopup, oWnd
    local nKey, nMRow, nMCol, n
-   local nLastKey, bInkeyBefore, bInkeyAfter
-
-   /* Save LastKey() and Inkey() blocks */
-   nLastKey := LastKey()
-   bInkeyBefore := SetInkeyBeforeBlock( NIL )
-   bInkeyAfter := SetInkeyAfterBlock( NIL )
 
    if ::lAnimate
       if ::nSpeed != 0
@@ -1254,7 +1318,6 @@ METHOD HandleEvent() CLASS TDebugger
       else
          ::Step()
          RETURN nil
-         //KEYBOARD Chr( 255 ) // Forces a Step(). Only 0-255 range is supported
       endif
    endif
 
@@ -1348,11 +1411,6 @@ METHOD HandleEvent() CLASS TDebugger
               ::ShowAppScreen()
 
          case nKey == K_F5
-              // we are starting to run again so reset to the deepest call if
-              // displaying stack
-              if ! ::oBrwStack == nil
-                 ::oBrwStack:GoTop()
-              endif
               ::Go()
 
          case nKey == K_CTRL_F5
@@ -1364,7 +1422,7 @@ METHOD HandleEvent() CLASS TDebugger
          case nKey == K_F7
               ::ToCursor()
 
-         case nKey == K_F8 .or. nKey == 255
+         case nKey == K_F8
               ::Step()
 
          case nKey == K_F9
@@ -1392,11 +1450,6 @@ METHOD HandleEvent() CLASS TDebugger
       endcase
    end
 
-   /* Restore LastKey() and Inkey() blocks */   
-   SetLastKey( nLastKey )
-   SetInkeyBeforeBlock( bInkeyBefore )
-   SetInkeyAfterBlock( bInkeyAfter )
-   
 return nil
 
 METHOD Hide() CLASS TDebugger
@@ -1409,177 +1462,162 @@ METHOD Hide() CLASS TDebugger
 return nil
 
 
-METHOD LoadColors() CLASS TDebugger
-  
-   LOCAL n
+METHOD HideCallStack() CLASS TDebugger
 
-   ::oPullDown:LoadColors()
-   IF ::lActive
-      ::oPullDown:Refresh()
-      ::BarDisplay()
-   ENDIF
-   for n := 1 to Len( ::aWindows )
-      ::aWindows[ n ]:LoadColors()
-      IF ::lActive
-         ::aWindows[ n ]:Refresh()
-      ENDIF
-   next
- 
-RETURN NIL
+   ::lShowCallStack = .f.
 
-
-METHOD MonoDisplay() CLASS TDebugger
-
-   ::lMonoDisplay := ! ::lMonoDisplay
-   ::oPullDown:GetItemByIdent( "MONO" ):checked := ::lMonoDisplay
-   ::LoadColors()
-
-return nil
-
-
-METHOD NextWindow() CLASS TDebugger
-
-   local oWnd
-
-   if Len( ::aWindows ) > 0
-      oWnd := ::aWindows[ ::nCurrentWindow++ ]
-      oWnd:SetFocus( .f. )
-      if ::nCurrentWindow > Len( ::aWindows )
-         ::nCurrentWindow := 1
-      endif
-      while ! ::aWindows[ ::nCurrentWindow ]:lVisible
-         ::nCurrentWindow++
-         if ::nCurrentWindow > Len( ::aWindows )
-            ::nCurrentWindow := 1
-         endif
-      end
-      oWnd := ::aWindows[ ::nCurrentWindow ]
-      oWnd:SetFocus( .t. )
-   endif
-
-return nil
-
-
-METHOD PathForFiles( cPathForFiles ) CLASS TDebugger
-
-   IF cPathForFiles == NIL  
-      cPathForFiles := ::InputBox( "Search path for source files:", ::cPathForFiles )
-   ENDIF
-   IF ! RIGHT(cPathForFiles, 1) $ HB_OSPATHDELIMITERS()
-     cPathForFiles += HB_OSPATHSEPARATOR()
-   ENDIF
-   ::cPathForFiles := cPathForFiles
-
-RETURN Self
-
-
-METHOD PrevWindow() CLASS TDebugger
-
-   local oWnd
-
-   if Len( ::aWindows ) > 0
-      oWnd := ::aWindows[ ::nCurrentWindow-- ]
-      oWnd:SetFocus( .f. )
-      if ::nCurrentWindow < 1
-         ::nCurrentWindow := Len( ::aWindows )
-      endif
-      while ! ::aWindows[ ::nCurrentWindow ]:lVisible
-         ::nCurrentWindow--
-         if ::nCurrentWindow < 1
-            ::nCurrentWindow := Len( ::aWindows )
-         endif
-      end
-      oWnd := ::aWindows[ ::nCurrentWindow ]
-      oWnd:SetFocus( .t. )
-   endif
-
-return nil
-
-METHOD Show() CLASS TDebugger
-
-   ::cAppImage  := SaveScreen()
-   ::nAppRow    := Row()
-   ::nAppCol    := Col()
-   ::cAppColors := SetColor()
-   ::nAppCursor := SetCursor( SC_NONE )
-
-   ::oPullDown:Display()
-   ::oWndCode:Show( .t. )
-   ::oWndCommand:Show()
-   DispOutAt( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 1, ">" )
-
-   ::BarDisplay()
-
-return nil
-
-METHOD ShowAppScreen() CLASS TDebugger
-
-   ::cImage := SaveScreen()
-   RestScreen( 0, 0, MaxRow(), MaxCol(), ::cAppImage )
-
-   if LastKey() == K_LBUTTONDOWN
-      InKey( 0, INKEY_ALL )
-      InKey( 0, INKEY_ALL )
-   else
-      InKey( 0, INKEY_ALL )
-   endif
-
-   while LastKey() == K_MOUSEMOVE
-      InKey( 0, INKEY_ALL )
-   end
-   RestScreen( 0, 0, MaxRow(), MaxCol(), ::cImage )
-
-return nil
-
-METHOD ShowCallStack() CLASS TDebugger
-
-   local n := 1
-   local oCol
-
-   ::lShowCallStack = .t.
-
-   if ::oWndStack == nil
-
-      SetCursor( SC_NONE )
-
+   if ::oWndStack != nil
       DispBegin()
-      // Resize code window
-      ::oWndCode:Resize(,,, ::oWndCode:nRight - 16 )
-      // Resize vars window
-      if ::oWndVars != nil
-         ::oWndVars:Resize(,,, ::oWndVars:nRight - 16 )
+      ::oWndStack:Hide()
+      if ::aWindows[ ::nCurrentWindow ] == ::oWndStack
+        ::NextWindow()
       endif
-      // Resize watchpoints window
+      ::RemoveWindow( ::oWndStack )
+      ::oWndStack = nil
+
+      ::oWndCode:Resize(,,, ::oWndCode:nRight + 16 )
+      if ::oWndVars != nil
+         ::oWndVars:Resize(,,, ::oWndVars:nRight + 16 )
+      endif
       if ::oWndPnt != nil
-         ::oWndPnt:Resize(,,, ::oWndPnt:nRight - 16)
+         ::oWndPnt:Resize(,,, ::oWndPnt:nRight + 16 )
       endif
       DispEnd()
-
-      if ::aWindows[ ::nCurrentWindow ]:lFocused
-         ::aWindows[ ::nCurrentWindow ]:SetFocus( .f. )
-      endif
-
-      ::oWndStack := TDbWindow():New( 1, MaxCol() - 15, MaxRow() - 6, MaxCol(),;
-                                     "Calls" )
-      ::oWndStack:bKeyPressed  := { | nKey | ::CallStackProcessKey( nKey ) }
-      ::oWndStack:bLButtonDown := { | nKey | ::CallStackProcessKey( K_LBUTTONDOWN ) }
-
-      AAdd( ::aWindows, ::oWndStack )
-      //::nCurrentWindow = Len( ::aWindows )
-
-      if ::oBrwStack == nil
-         ::BuildBrowseStack()
-      endif
-
-      ::oWndStack:bPainted := { || ::oBrwStack:ColorSpec := __DbgColors()[ 2 ] + "," + ;
-                                  __DbgColors()[ 5 ] + "," + __DbgColors()[ 4 ],;
-                                  ::oBrwStack:RefreshAll(), ::oBrwStack:ForceStable() }
-      ::oWndStack:bGotFocus = { || SetCursor( SC_NONE ) }
-
-      ::oWndStack:Show( .f. )
    endif
 
 return nil
+
+
+METHOD HideVars() CLASS TDebugger
+
+   ::oWndVars:Hide()
+   ::oWndCode:nTop := 1
+   ::oBrwText:Resize( ::oWndCode:nTop+1 )
+   if ::aWindows[ ::nCurrentWindow ] == ::oWndVars
+      ::NextWindow()
+   ENDIF
+
+return nil
+
+
+METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
+
+   local nTop    := ( MaxRow() / 2 ) - 5
+   local nLeft   := ( MaxCol() / 2 ) - 25
+   local nBottom := ( MaxRow() / 2 ) - 3
+   local nRight  := ( MaxCol() / 2 ) + 25
+   local cType   := ValType( uValue )
+   local uTemp   := PadR( uValue, nRight - nLeft - 1 )
+   local GetList := {}
+   local nOldCursor
+   local lScoreBoard := Set( _SET_SCOREBOARD, .f. )
+   local lExit
+   local oWndInput := TDbWindow():New( nTop, nLeft, nBottom, nRight, cMsg,;
+                                       ::oPullDown:cClrPopup )
+
+   DEFAULT lEditable TO .t.
+
+   oWndInput:lShadow := .t.
+   oWndInput:Show()
+
+   if lEditable
+#ifndef HB_NO_READDBG
+      if bValid == nil
+         @ nTop + 1, nLeft + 1 GET uTemp COLOR "," + __DbgColors()[ 5 ]
+      else
+          @ nTop + 1, nLeft + 1 GET uTemp VALID Eval( bValid, uTemp ) ;
+           COLOR "," + __DbgColors()[ 5 ]
+      endif
+
+      nOldCursor := SetCursor( SC_NORMAL )
+      READ
+      SetCursor( nOldCursor )
+#else
+      uTemp := getdbginput( nTop + 1, nLeft + 1, uTemp, bValid, __DbgColors()[ 5 ] )     
+#endif 
+   else
+      @ nTop + 1, nLeft + 1 SAY ValToStr( uValue ) COLOR "," + __DbgColors()[ 5 ]
+      SetPos( nTop + 1, nLeft + 1 )
+      nOldCursor := SetCursor( SC_NONE )
+
+      lExit = .f.
+
+      while ! lExit
+         Inkey( 0 )
+
+         do case
+            case LastKey() == K_ESC
+               lExit = .t.
+
+            case LastKey() == K_ENTER
+               if cType == "A"
+                  if Len( uValue ) == 0
+                     Alert( "Array is empty" )
+                  else
+                     __DbgArrays( uValue, cMsg )
+                  endif
+
+               elseif cType == "O"
+                  __DbgObject( uValue, cMsg )
+
+               else
+                  Alert( "Value cannot be edited" )
+               endif
+
+            otherwise
+               Alert( "Value cannot be edited" )
+         endcase
+      end
+
+      SetCursor( nOldCursor )
+   endif
+
+#ifndef HB_NO_READDBG
+   nOldCursor := SetCursor( SC_NORMAL )
+   READ
+   SetCursor( nOldCursor )
+#endif
+
+   oWndInput:Hide()
+   Set( _SET_SCOREBOARD, lScoreBoard )
+
+   do case
+      case cType == "C"
+           uTemp := AllTrim( uTemp )
+
+      case cType == "D"
+           uTemp := CToD( uTemp )
+
+      case cType == "N"
+           uTemp := Val( uTemp )
+
+   endcase
+
+return iif( LastKey() != K_ESC, uTemp, uValue )
+
+
+METHOD Inspect( uValue, cValueName ) CLASS TDebugger
+
+   uValue = ::InputBox( uValue, cValueName,, .f. )
+
+return nil
+
+
+METHOD IsBreakPoint( nLine, cPrgName ) CLASS TDebugger
+return AScan( ::aBreakPoints, { | aBreak | (aBreak[ 1 ] == nLine) .AND. (aBreak [ 2 ] == cPrgName) } ) != 0
+
+
+METHOD LineNumbers( lLineNumbers ) CLASS TDebugger
+
+   If( lLineNumbers == NIL, lLineNumbers := !::lLineNumbers, )
+   ::lLineNumbers := lLineNumbers
+   ::oPulldown:GetItemByIdent( "LINE" ):checked := ::lLineNumbers
+   IF ::oBrwText != NIL
+      ::oBrwText:lLineNumbers := lLineNumbers
+      ::oBrwText:RefreshAll()
+   ENDIF
+
+return Self
 
 
 METHOD LoadCallStack() CLASS TDebugger
@@ -1601,14 +1639,30 @@ METHOD LoadCallStack() CLASS TDebugger
       ::aProcStack[i-nDebugLevel+1] := { PROCNAME( i )+"("+NTRIM(PROCLINE(i))+")", ,,,, nLevel }
     ENDIF
   NEXT
+RETURN NIL
 
+
+METHOD LoadColors() CLASS TDebugger
+  
+   LOCAL n
+
+   ::oPullDown:LoadColors()
+   IF ::lActive
+      ::oPullDown:Refresh()
+      ::BarDisplay()
+   ENDIF
+   for n := 1 to Len( ::aWindows )
+      ::aWindows[ n ]:LoadColors()
+      IF ::lActive
+         ::aWindows[ n ]:Refresh()
+      ENDIF
+   next
+ 
 RETURN NIL
 
 
 METHOD LoadSettings() CLASS TDebugger
-
    ::DoScript( ::cSettingsFileName )
-
 return nil
 
 
@@ -1683,6 +1737,269 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
 return nil
 
 
+METHOD Local() CLASS TDebugger
+   ::lShowLocals := ! ::lShowLocals
+   ::RefreshVars()
+return nil
+
+
+METHOD Locate( nMode, cValue ) CLASS TDebugger
+  LOCAL lFound
+
+  DEFAULT nMode TO 0
+
+  IF Empty( cValue )
+    cValue := ::InputBox( "Search string", ::cSearchString )
+    IF Empty( cValue )
+      RETURN NIL
+    ENDIF
+  ENDIF
+
+  ::cSearchString := cValue
+
+  lFound := ::oBrwText:Search( ::cSearchString, ::lCaseSensitive, nMode )
+   
+  // Save cursor position to be restored by ::oWndCode:bGotFocus
+  ::oWndCode:cargo[ 1 ] := Row()
+  ::oWndCode:cargo[ 2 ] := Col()
+RETURN lFound
+
+
+METHOD LocatePrgPath( cPrgName ) CLASS TDebugger
+
+   local i
+   local iMax
+   local aPaths
+   local cRetPrgName
+   local cSep
+
+   cSep := HB_OsPathSeparator()
+
+   aPaths := ::aPathDirs
+
+   iMax := len( aPaths )
+
+   for i := 1 to iMax
+       cRetPrgName := aPaths[i] + cSep + cPrgName
+       if file( cRetPrgName )
+          exit
+       else
+          cRetPrgName := nil
+       endif
+   next i
+
+return cRetPrgName
+
+
+METHOD MonoDisplay() CLASS TDebugger
+
+   ::lMonoDisplay := ! ::lMonoDisplay
+   ::oPullDown:GetItemByIdent( "MONO" ):checked := ::lMonoDisplay
+   ::LoadColors()
+
+return nil
+
+
+METHOD NextRoutine() CLASS TDebugger
+  ::RestoreAppScreen()
+  ::RestoreAppState()
+  ::lNextRoutine := .T.
+  ::Exit()
+RETURN self
+
+
+METHOD NextWindow() CLASS TDebugger
+
+   local oWnd
+
+   if Len( ::aWindows ) > 0
+      oWnd := ::aWindows[ ::nCurrentWindow++ ]
+      oWnd:SetFocus( .f. )
+      if ::nCurrentWindow > Len( ::aWindows )
+         ::nCurrentWindow := 1
+      endif
+      while ! ::aWindows[ ::nCurrentWindow ]:lVisible
+         ::nCurrentWindow++
+         if ::nCurrentWindow > Len( ::aWindows )
+            ::nCurrentWindow := 1
+         endif
+      end
+      oWnd := ::aWindows[ ::nCurrentWindow ]
+      oWnd:SetFocus( .t. )
+   endif
+
+return nil
+
+
+METHOD Open() CLASS TDebugger
+   LOCAL cFileName := ::InputBox( "Please enter the filename", Space( 255 ) )
+   LOCAL cPrgName
+
+   cFileName:= ALLTRIM( cFileName )
+
+   if !EMPTY(cFileName) .AND. (cFileName != ::cPrgName .OR. valtype(::cPrgName)=='U')
+      if ! File( cFileName ) .and. ! Empty( ::cPathForFiles )
+         cFileName := ::LocatePrgPath( cFileName )
+         if Empty( cFileName )
+           Alert( "File not found!" )
+           return NIL
+         endif
+      endif
+      ::cPrgName := cFileName
+      ::lppo := RAT(".PPO", UPPER(cFileName)) > 0
+      ::oPulldown:GetItemByIdent( "PPO" ):Checked := ::lppo
+      ::oBrwText := nil
+      ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
+                   ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, cFileName,;
+                   __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
+                   __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ;
+                   ::lLineNumbers )
+      ::oWndCode:Browser := ::oBrwText
+      ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
+      ::oWndCode:SetCaption( ::cPrgName )
+      ::oWndCode:Refresh()       // to force the window caption to update
+   endif
+return nil
+
+
+METHOD OpenPPO() CLASS TDebugger
+   LOCAL nPos
+   LOCAL lSuccess:=.F.
+
+   IF Empty( ::cPrgName )
+      RETURN .F.
+   ENDIF
+
+   nPos := RAT(".PPO", UPPER(::cPrgName))
+   IF( nPos == 0 )
+      nPos := RAT(".PRG", UPPER(::cPrgName))
+      IF( nPos > 0 )
+         ::cPrgName := LEFT(::cPrgName,nPos-1) + ".ppo"
+      ELSE
+         ::cPrgName += ".ppo"
+      ENDIF
+      lSuccess := FILE(::cPrgName)
+      ::lppo := lSuccess
+   ELSE
+      ::cPrgName := LEFT(::cPrgName,nPos-1) + ".prg"
+      lSuccess := FILE( ::cPrgName )
+      ::lppo := !lSuccess
+   ENDIF
+
+   IF( lSuccess )
+      ::oBrwText := nil
+      ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
+        ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, ::cPrgName,;
+        __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
+        __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ::lLineNumbers )
+      ::oWndCode:Browser := ::oBrwText
+      ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
+      ::oWndCode:SetCaption( ::cPrgName )
+      ::oWndCode:Refresh()// to force the window caption to update
+   endif
+
+   ::oPullDown:GetItemByIdent( "PPO" ):checked := ::lPPO
+
+return lSuccess
+
+
+METHOD OSShell() CLASS TDebugger
+
+   local cImage := SaveScreen()
+   local cColors := SetColor()
+   local cOs    := Upper( OS() )
+   local cShell
+   local bLastHandler := ErrorBlock({ |objErr| BREAK (objErr) })
+   local oE
+
+   SET COLOR TO "W/N"
+   CLS
+   ? "Type 'exit' to return to the Debugger"
+   SetCursor( SC_NORMAL )
+
+   begin sequence
+      if At("WINDOWS", cOs) != 0 .OR. At("DOS", cOs) != 0 .OR. At("OS/2", cOs) != 0
+         cShell := GetEnv("COMSPEC")
+         RUN ( cShell )
+      elseif At("LINUX", cOs) != 0 .OR. At( "BSD", cOs ) != 0 .OR. At( "DARWIN", cOs ) != 0
+         cShell := GetEnv("SHELL")
+         RUN ( cShell )
+      else
+         Alert( "Not implemented yet!" )
+      endif
+
+   recover using oE
+      Alert("Error: " + oE:description)
+
+   end sequence
+
+   ErrorBlock(bLastHandler)
+
+   SetCursor( SC_NONE )
+   RestScreen( ,,,, cImage )
+   SetColor( cColors )
+
+return nil
+
+
+METHOD PathForFiles( cPathForFiles ) CLASS TDebugger
+
+   IF cPathForFiles == NIL  
+      cPathForFiles := ::InputBox( "Search path for source files:", ::cPathForFiles )
+   ENDIF
+   ::cPathForFiles := cPathForFiles
+   ::aPathDirs := PathToArray( ::cPathForFiles )
+ 
+   ::Resume()
+RETURN Self
+
+
+METHOD PrevWindow() CLASS TDebugger
+
+   local oWnd
+
+   if Len( ::aWindows ) > 0
+      oWnd := ::aWindows[ ::nCurrentWindow-- ]
+      oWnd:SetFocus( .f. )
+      if ::nCurrentWindow < 1
+         ::nCurrentWindow := Len( ::aWindows )
+      endif
+      while ! ::aWindows[ ::nCurrentWindow ]:lVisible
+         ::nCurrentWindow--
+         if ::nCurrentWindow < 1
+            ::nCurrentWindow := Len( ::aWindows )
+         endif
+      end
+      oWnd := ::aWindows[ ::nCurrentWindow ]
+      oWnd:SetFocus( .t. )
+   endif
+
+return nil
+
+
+METHOD Private() CLASS TDebugger
+   ::lShowPrivates := ! ::lShowPrivates
+   ::RefreshVars()
+return nil
+
+
+METHOD Public() CLASS TDebugger
+   ::lShowPublics := ! ::lShowPublics
+   ::RefreshVars()
+return nil
+
+
+// check for breakpoints in the current file and display them
+METHOD RedisplayBreakPoints() CLASS TDebugger
+   local n
+   for n := 1 to Len( ::aBreakpoints )
+      if ::aBreakpoints[ n ] [ 2 ] == strip_path( ::cPrgName )
+        ::oBrwText:ToggleBreakPoint(::aBreakpoints[ n ] [ 1 ], .T.)
+      Endif
+   next
+return nil
+
+
 METHOD RefreshVars() CLASS TDebugger
    ::oPulldown:GetItemByIdent( "LOCAL" ):checked := ::lShowLocals
    ::oPulldown:GetItemByIdent( "PRIVATE" ):checked := ::lShowPrivates
@@ -1700,6 +2017,384 @@ METHOD RefreshVars() CLASS TDebugger
 RETURN NIL
 
 
+METHOD RemoveWindow( oWnd ) CLASS TDebugger
+
+  local n := AScan( ::aWindows, { | o | o == oWnd } )
+
+  if n != 0
+     ::aWindows = ADel ( ::aWindows, n )
+     ::aWindows = ASize( ::aWindows, Len( ::aWindows ) - 1 )
+  endif
+
+  ::nCurrentWindow = 1
+
+return nil
+
+
+METHOD ResizeWindows( oWindow ) CLASS TDebugger
+  LOCAL oWindow2, nTop, i
+
+  IF oWindow == ::oWndVars
+    oWindow2 := ::oWndPnt
+  ELSEIF oWindow == ::oWndPnt
+    oWindow2 := ::oWndVars
+  ENDIF
+
+  DispBegin()
+  IF oWindow2 == NIL
+    nTop := oWindow:nBottom +1
+  ELSE
+    IF oWindow2:lVisible
+      IF oWindow:nTop < oWindow2:nTop
+        nTop := oWindow2:nBottom - oWindow2:nTop + 1
+        oWindow2:Resize( oWindow:nBottom+1,, oWindow:nBottom+nTop)
+      ELSE
+        nTop := oWindow:nBottom - oWindow:nTop + 1
+        oWindow:Resize( oWindow2:nBottom+1,, oWindow2:nBottom+nTop)
+      ENDIF
+      nTop := MAX( oWindow:nBottom, oWindow2:nBottom ) + 1
+    ELSE
+      IF oWindow:nTop > 1
+        nTop := oWindow:nBottom - oWindow:nTop + 1
+        oWindow:Resize( 1, , nTop )
+      ENDIF
+      nTop := oWindow:nBottom + 1
+    ENDIF
+  ENDIF
+
+  oWindow:hide()
+  IF oWindow2 != NIL
+    oWindow2:hide()
+  ENDIF
+  ::oWndCode:Resize( nTop )
+  IF oWindow2 != NIL
+    oWindow2:show()
+  ENDIF
+  oWindow:show()
+  DispEnd()
+
+RETURN self
+
+
+METHOD RestoreAppScreen() CLASS TDebugger
+  ::cImage := SaveScreen()
+  DispBegin()
+  RestScreen( 0, 0, MaxRow(), MaxCol(), ::cAppImage )
+  SetPos( ::nAppRow, ::nAppCol )
+  SetColor( ::cAppColors )
+  SetCursor( ::nAppCursor )
+  DispEnd()
+return nil
+
+
+METHOD RestoreAppState() CLASS TDebugger
+  SetLastKey( ::nAppLastKey )
+  SetInkeyAfterBlock( ::bAppInkeyAfter )
+  SetInkeyBeforeBlock( ::bAppInkeyBefore )
+RETURN NIL
+
+
+METHOD RestoreSettings() CLASS TDebugger
+
+   local n
+
+   ::cSettingsFileName := ::InputBox( "File name", ::cSettingsFileName )
+
+   if LastKey() != K_ESC
+      ::LoadSettings()
+      ::ShowVars()
+   endif
+
+return nil
+
+
+METHOD SaveAppScreen( lRestore ) CLASS TDebugger
+  IF lRestore == NIL
+    lRestore := .T.
+  ENDIF
+  DispBegin()
+  ::cAppImage  := SaveScreen()
+  ::nAppRow    := Row()
+  ::nAppCol    := Col()
+  ::cAppColors := SetColor()
+  ::nAppCursor := SetCursor( SC_NONE )
+  IF lRestore
+    RestScreen( 0, 0, MaxRow(), MaxCol(), ::cImage )
+  ENDIF
+  DispEnd()
+return nil
+
+
+METHOD SaveAppState() CLASS TDebugger
+  ::nAppLastKey := LastKey()
+  ::bAppInkeyAfter := SetInkeyAfterBlock( NIL )
+  ::bAppInkeyBefore := SetInkeyBeforeBlock( NIL )
+RETURN NIL
+
+
+METHOD SaveSettings() CLASS TDebugger
+
+   local cInfo := "", n, oWnd
+
+   ::cSettingsFileName := ::InputBox( "File name", ::cSettingsFileName )
+
+   if LastKey() != K_ESC
+
+      if ! Empty( ::cPathForFiles )
+         cInfo += "Options Path " + ::cPathForFiles + HB_OsNewLine()
+      endif
+
+      cInfo += "Options Colors {"
+      for n := 1 to Len( ::aColors )
+         cInfo += '"' + ::aColors[ n ] + '"'
+         if n < Len( ::aColors )
+            cInfo += ","
+         endif
+      next
+      cInfo += "}" + HB_OsNewLine()
+
+      if ::lMonoDisplay
+         cInfo += "Options mono " + HB_OsNewLine()
+      endif
+
+      if !::lRunAtStartup
+         cInfo += "Options NoRunAtStartup " + HB_OsNewLine()
+      endif
+
+      if ::nSpeed != 0
+         cInfo += "Run Speed " + AllTrim( Str( ::nSpeed ) ) + HB_OsNewLine()
+      endif
+
+      for n := 1 to Len( ::aWindows )
+         oWnd := ::aWindows[ n ]
+         cInfo += "Window Size " + AllTrim( Str( oWnd:nBottom - oWnd:nTop + 1 ) ) + " "
+         cInfo += AllTrim( Str( oWnd:nRight - oWnd:nLeft + 1 ) ) + HB_OsNewLine()
+         cInfo += "Window Move " + AllTrim( Str( oWnd:nTop ) ) + " "
+         cInfo += AllTrim( Str( oWnd:nLeft ) ) + HB_OsNewLine()
+         cInfo += "Window Next" + HB_OsNewLine()
+      next
+
+      if ::nTabWidth != 4
+         cInfo += "Options Tab " + AllTrim( Str( ::nTabWidth ) ) + HB_OsNewLine()
+      endif
+
+      if ::lShowStatics
+         cInfo += "Monitor Static" + HB_OsNewLine()
+      endif
+
+      if ::lShowPublics
+         cInfo += "Monitor Public" + HB_OsNewLine()
+      endif
+
+      if ::lShowLocals
+         cInfo += "Monitor Local" + HB_OsNewLine()
+      endif
+
+      if ::lShowPrivates
+         cInfo += "Monitor Private" + HB_OsNewLine()
+      endif
+
+      if ::lSortVars
+         cInfo += "Monitor Sort" + HB_OsNewLine()
+      endif
+
+      if ::lShowCallStack
+         cInfo += "View CallStack" + HB_OsNewLine()
+      endif
+
+      if ! ::lLineNumbers
+         cInfo += "Num Off" + HB_OsNewLine()
+      endif
+
+      if ! Empty( ::aBreakPoints )
+         for n := 1 to Len( ::aBreakPoints )
+            cInfo += "BP " + AllTrim( Str( ::aBreakPoints[ n ][ 1 ], , 0 ) ) + " " + ;
+                     AllTrim( ::aBreakPoints[ n ][ 2 ] ) + HB_OsNewLine()
+         next
+      endif
+
+      MemoWrit( ::cSettingsFileName, cInfo )
+   endif
+
+return nil
+
+
+METHOD SearchLine() CLASS TDebugger
+
+   local cLine
+
+   cLine := ::InputBox( "Line number", "1" )
+
+   if Val( cLine ) > 0
+      ::GotoLine ( Val( cLine ) )
+   endif
+
+return nil
+
+
+METHOD Show() CLASS TDebugger
+
+   ::SaveAppScreen( .F. )
+
+   ::oPullDown:Display()
+   ::oWndCode:Show( .t. )
+   ::oWndCommand:Show()
+   DispOutAt( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 1, ">" )
+
+   ::BarDisplay()
+
+return nil
+
+
+METHOD ShowAppScreen() CLASS TDebugger
+
+   ::cImage := SaveScreen()
+   RestScreen( 0, 0, MaxRow(), MaxCol(), ::cAppImage )
+
+   if LastKey() == K_LBUTTONDOWN
+      InKey( 0, INKEY_ALL )
+      InKey( 0, INKEY_ALL )
+   else
+      InKey( 0, INKEY_ALL )
+   endif
+
+   while LastKey() == K_MOUSEMOVE
+      InKey( 0, INKEY_ALL )
+   end
+   RestScreen( 0, 0, MaxRow(), MaxCol(), ::cImage )
+
+return nil
+
+
+METHOD ShowCallStack() CLASS TDebugger
+
+   local n := 1
+   local oCol
+
+   ::lShowCallStack = .t.
+
+   if ::oWndStack == nil
+
+      SetCursor( SC_NONE )
+
+      DispBegin()
+      // Resize code window
+      ::oWndCode:Resize(,,, ::oWndCode:nRight - 16 )
+      // Resize vars window
+      if ::oWndVars != nil
+         ::oWndVars:Resize(,,, ::oWndVars:nRight - 16 )
+      endif
+      // Resize watchpoints window
+      if ::oWndPnt != nil
+         ::oWndPnt:Resize(,,, ::oWndPnt:nRight - 16)
+      endif
+      DispEnd()
+
+      if ::aWindows[ ::nCurrentWindow ]:lFocused
+         ::aWindows[ ::nCurrentWindow ]:SetFocus( .f. )
+      endif
+
+      ::oWndStack := TDbWindow():New( 1, MaxCol() - 15, MaxRow() - 6, MaxCol(),;
+                                     "Calls" )
+      ::oWndStack:bKeyPressed  := { | nKey | ::CallStackProcessKey( nKey ) }
+      ::oWndStack:bLButtonDown := { | nKey | ::CallStackProcessKey( K_LBUTTONDOWN ) }
+
+      AAdd( ::aWindows, ::oWndStack )
+      //::nCurrentWindow = Len( ::aWindows )
+
+      if ::oBrwStack == nil
+         ::BuildBrowseStack()
+      endif
+
+      ::oWndStack:bPainted := { || ::oBrwStack:ColorSpec := __DbgColors()[ 2 ] + "," + ;
+                                  __DbgColors()[ 5 ] + "," + __DbgColors()[ 4 ],;
+                                  ::oBrwStack:RefreshAll(), ::oBrwStack:ForceStable() }
+      ::oWndStack:bGotFocus = { || SetCursor( SC_NONE ) }
+
+      ::oWndStack:Show( .f. )
+   endif
+
+return nil
+
+
+METHOD ShowCodeLine( nProc ) CLASS TDebugger
+   LOCAL nPos, nLevel
+   LOCAL nLine, cPrgName
+
+   // we only update the stack window and up a new browse
+   // to view the code if we have just broken execution
+   if !::lGo .AND. !::lTrace
+      if ::oWndStack != nil
+         ::oBrwStack:RefreshAll()
+      endif
+
+      nLine := ::aProcStack[ nProc ][ CSTACK_LINE ]
+      cPrgName := ::aProcStack[ nProc ][ CSTACK_MODULE ]
+
+      IF ( nLine == NIL )
+         ::oBrwText := nil
+         ::oWndCode:Browser := nil
+         ::oWndCode:SetCaption( ::aProcStack[ nProc ][ CSTACK_FUNCTION ] +;
+                                ": Code not available" )
+         ::oWndCode:Refresh()// to force the window caption to update
+         RETURN nil
+      ENDIF
+
+      if( ::lppo )
+         nPos :=RAT(".PRG", UPPER(cPrgName) )
+         IF( nPos > 0 )
+            cPrgName := LEFT( cPrgName, nPos-1 ) + ".ppo"
+         ELSE
+            cPrgName += cPrgName +".ppo"
+         ENDIF
+      endif
+
+      if ! empty( cPrgName )
+
+         if ( strip_path( cPrgName ) != strip_path( ::cPrgName ) .OR. ::oBrwText == NIL )
+
+            if ! File( cPrgName ) .and. !Empty( ::cPathForFiles )
+               cPrgName := ::LocatePrgPath( cPrgName )
+            endif
+
+            ::cPrgName := cPrgName
+
+	    IF !File( cPrgName )
+	       ::oBrwText := NIL
+	       ::oWndCode:Browser := NIL
+	       ::oWndCode:SetCaption( ::aProcStack[ nProc ][ CSTACK_MODULE ] + ;
+	                              "  File not found" )
+               ::oWndCode:Refresh()
+	       RETURN NIL
+	    ENDIF
+
+            if ::oBrwText == nil
+               ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
+                                             ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, cPrgName,;
+                                             __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
+                                             __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ;
+                                             ::lLineNumbers )
+
+               ::oWndCode:Browser := ::oBrwText
+
+            else
+               ::oBrwText:LoadFile(cPrgName)
+            endif
+
+            ::oWndCode:bPainted := {|| IIF( ::oBrwText != nil, ::oBrwText:RefreshAll():ForceStable(), ::oWndCode:Clear() ) }
+            ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
+            ::oWndCode:SetCaption( ::cPrgName )
+            ::oWndCode:Refresh()       // to force the window caption to update
+         endif
+         ::oBrwText:SetActiveLine( nLine )
+         ::GotoLine( nLine )
+      endif
+
+   endif
+
+return nil
+
+
 METHOD ShowHelp( nTopic ) CLASS TDebugger
 
    local nCursor := SetCursor( SC_NONE )
@@ -1708,6 +2403,7 @@ METHOD ShowHelp( nTopic ) CLASS TDebugger
    SetCursor( nCursor )
 
 return nil
+
 
 METHOD ShowVars() CLASS TDebugger
 
@@ -1821,33 +2517,20 @@ METHOD ShowVars() CLASS TDebugger
 return nil
 
 
-METHOD VarGetInfo( aVar ) CLASS TDebugger
-  LOCAL uValue
-  LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
+METHOD Stack() CLASS TDebugger
 
-  uValue := ::VarGetValue( aVar )
-  do case
-    case cType == "L"
-      return aVar[ VAR_NAME ] + " <Local, " + ;
-       ValType( uValue ) + ;
-       ">: " + ValToStr( uValue )
+   ::lShowCallStack := ! ::lShowCallStack  
+   ::oPulldown:GetItemByIdent( "CALLSTACK" ):checked := ::lShowCallStack
+   if ::lActive
+      if ::lShowCallStack
+         ::ShowCallStack()
+      else
+         ::HideCallStack()
+      endif
+   endif
 
-    case cType == "S"
-      return aVar[ VAR_NAME ] + " <Static, " + ;
-       ValType( uValue ) + ;
-       ">: " + ValToStr( uValue )
+return nil
 
-    OTHERWISE
-      return aVar[ VAR_NAME ] + " <" + aVar[ VAR_TYPE ] + ", " + ;
-       ValType( uValue ) + ;
-       ">: " + ValToStr( uValue )
-  endcase
-return ""
-
-
-static function CompareLine( Self )
-
-return { | a | a[ 1 ] == Self:oBrwText:nRow }  // it was nLine
 
 METHOD StackProc( cModuleName, nProcLevel ) CLASS TDebugger
    // always treat filename as lower case - we need it consistent for comparisons
@@ -1863,526 +2546,6 @@ METHOD StackProc( cModuleName, nProcLevel ) CLASS TDebugger
    AIns( ::aCallStack, 1, aEntry, .T. )
 return nil
 
-//METHOD ShowCodeLine( nLine, cPrgName ) CLASS TDebugger
-METHOD ShowCodeLine( nProc ) CLASS TDebugger
-   LOCAL nPos, nLevel
-   LOCAL nLine, cPrgName
-
-   // we only update the stack window and up a new browse
-   // to view the code if we have just broken execution
-   if !::lGo .AND. !::lTrace
-      if ::oWndStack != nil
-         ::oBrwStack:RefreshAll()
-      endif
-
-      nLine := ::aProcStack[ nProc ][ CSTACK_LINE ]
-      cPrgName := ::aProcStack[ nProc ][ CSTACK_MODULE ]
-
-      IF ( nLine == NIL )
-         ::oBrwText := nil
-         ::oWndCode:Browser := nil
-         ::oWndCode:SetCaption( ::aProcStack[ nProc ][ CSTACK_FUNCTION ] +;
-                                ": Code not available" )
-         ::oWndCode:Refresh()// to force the window caption to update
-         RETURN nil
-      ENDIF
-
-      if( ::lppo )
-         nPos :=RAT(".PRG", UPPER(cPrgName) )
-         IF( nPos > 0 )
-            cPrgName := LEFT( cPrgName, nPos-1 ) + ".ppo"
-         ELSE
-            cPrgName += cPrgName +".ppo"
-         ENDIF
-      endif
-
-      if ! empty( cPrgName )
-
-         if ( strip_path( cPrgName ) != strip_path( ::cPrgName ) .OR. ::oBrwText == NIL )
-
-            if ! File( cPrgName ) .and. !Empty( ::cPathForFiles )
-               cPrgName := ::LocatePrgPath( cPrgName )
-            endif
-
-            ::cPrgName := cPrgName
-
-            if ::oBrwText == nil
-               ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
-                                             ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, cPrgName,;
-                                             __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
-                                             __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ;
-                                             ::lLineNumbers )
-
-               ::oWndCode:Browser := ::oBrwText
-
-            else
-               ::oBrwText:LoadFile(cPrgName)
-            endif
-
-            ::oWndCode:bPainted := {|| IIF( ::oBrwText != nil, ::oBrwText:RefreshAll():ForceStable(), ::oWndCode:Clear() ) }
-            ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
-            ::oWndCode:SetCaption( ::cPrgName )
-            ::oWndCode:Refresh()       // to force the window caption to update
-         endif
-         ::oBrwText:SetActiveLine( nLine )
-         ::GotoLine( nLine )
-      endif
-
-   endif
-
-return nil
-
-METHOD Open() CLASS TDebugger
-   LOCAL cFileName := ::InputBox( "Please enter the filename", Space( 255 ) )
-   LOCAL cPrgName
-
-   cFileName:= ALLTRIM( cFileName )
-
-   if !EMPTY(cFileName) .AND. (cFileName != ::cPrgName .OR. valtype(::cPrgName)=='U')
-      if ! File( cFileName ) .and. ! Empty( ::cPathForFiles )
-         cFileName := ::LocatePrgPath( cFileName )
-         if Empty( cFileName )
-           Alert( "File not found!" )
-           return NIL
-         endif
-      endif
-      ::cPrgName := cFileName
-      ::lppo := RAT(".PPO", UPPER(cFileName)) > 0
-      ::oPulldown:GetItemByIdent( "PPO" ):Checked := ::lppo
-      ::oBrwText := nil
-      ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
-                   ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, cFileName,;
-                   __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
-                   __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ;
-                   ::lLineNumbers )
-      ::oWndCode:Browser := ::oBrwText
-      ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
-      ::oWndCode:SetCaption( ::cPrgName )
-      ::oWndCode:Refresh()       // to force the window caption to update
-   endif
-return nil
-
-METHOD OpenPPO() CLASS TDebugger
-   LOCAL nPos
-   LOCAL lSuccess:=.F.
-
-   nPos := RAT(".PPO", UPPER(::cPrgName))
-   IF( nPos == 0 )
-      nPos := RAT(".PRG", UPPER(::cPrgName))
-      IF( nPos > 0 )
-         ::cPrgName := LEFT(::cPrgName,nPos-1) + ".ppo"
-      ELSE
-         ::cPrgName += ".ppo"
-      ENDIF
-      lSuccess := FILE(::cPrgName)
-      ::lppo := lSuccess
-   ELSE
-      ::cPrgName := LEFT(::cPrgName,nPos-1) + ".prg"
-      lSuccess := FILE( ::cPrgName )
-      ::lppo := !lSuccess
-   ENDIF
-
-   IF( lSuccess )
-      ::oBrwText := nil
-      ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
-        ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, ::cPrgName,;
-        __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
-        __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ::lLineNumbers )
-      ::oWndCode:Browser := ::oBrwText
-      ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
-      ::oWndCode:SetCaption( ::cPrgName )
-      ::oWndCode:Refresh()// to force the window caption to update
-   endif
-
-   ::oPullDown:GetItemByIdent( "PPO" ):checked := ::lPPO
-
-return lSuccess
-
-
-// check for breakpoints in the current file and display them
-METHOD RedisplayBreakPoints() CLASS TDebugger
-
-   local n
-   for n := 1 to Len( ::aBreakpoints )
-      if ::aBreakpoints[ n ] [ 2 ] == strip_path( ::cPrgName )
-        ::oBrwText:ToggleBreakPoint(::aBreakpoints[ n ] [ 1 ], .T.)
-      Endif
-   next
-return nil
-
-METHOD OSShell() CLASS TDebugger
-
-   local cImage := SaveScreen()
-   local cColors := SetColor()
-   local cOs    := Upper( OS() )
-   local cShell
-   local bLastHandler := ErrorBlock({ |objErr| BREAK (objErr) })
-   local oE
-
-   SET COLOR TO "W/N"
-   CLS
-   ? "Type 'exit' to return to the Debugger"
-   SetCursor( SC_NORMAL )
-
-   begin sequence
-      if At("WINDOWS", cOs) != 0 .OR. At("DOS", cOs) != 0 .OR. At("OS/2", cOs) != 0
-         cShell := GetEnv("COMSPEC")
-         RUN ( cShell )
-      elseif At("LINUX", cOs) != 0
-         cShell := GetEnv("SHELL")
-         RUN ( cShell )
-      else
-         Alert( "Not implemented yet!" )
-      endif
-
-   recover using oE
-      Alert("Error: " + oE:description)
-
-   end sequence
-
-   ErrorBlock(bLastHandler)
-
-   SetCursor( SC_NONE )
-   RestScreen( ,,,, cImage )
-   SetColor( cColors )
-
-return nil
-
-METHOD HideCallStack() CLASS TDebugger
-
-   ::lShowCallStack = .f.
-
-   if ::oWndStack != nil
-      DispBegin()
-      ::oWndStack:Hide()
-      if ::aWindows[ ::nCurrentWindow ] == ::oWndStack
-        ::NextWindow()
-      endif
-      ::RemoveWindow( ::oWndStack )
-      ::oWndStack = nil
-
-      ::oWndCode:Resize(,,, ::oWndCode:nRight + 16 )
-      if ::oWndVars != nil
-         ::oWndVars:Resize(,,, ::oWndVars:nRight + 16 )
-      endif
-      if ::oWndPnt != nil
-         ::oWndPnt:Resize(,,, ::oWndPnt:nRight + 16 )
-      endif
-      DispEnd()
-   endif
-
-return nil
-
-METHOD HideVars() CLASS TDebugger
-
-   ::oWndVars:Hide()
-   ::oWndCode:nTop := 1
-   ::oBrwText:Resize( ::oWndCode:nTop+1 )
-   if ::aWindows[ ::nCurrentWindow ] == ::oWndVars
-      ::NextWindow()
-   ENDIF
-
-return nil
-
-METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
-
-   local nTop    := ( MaxRow() / 2 ) - 5
-   local nLeft   := ( MaxCol() / 2 ) - 25
-   local nBottom := ( MaxRow() / 2 ) - 3
-   local nRight  := ( MaxCol() / 2 ) + 25
-   local cType   := ValType( uValue )
-   local uTemp   := PadR( uValue, nRight - nLeft - 1 )
-   local GetList := {}
-   local nOldCursor
-   local lScoreBoard := Set( _SET_SCOREBOARD, .f. )
-   local lExit
-   local oWndInput := TDbWindow():New( nTop, nLeft, nBottom, nRight, cMsg,;
-                                       ::oPullDown:cClrPopup )
-
-   DEFAULT lEditable TO .t.
-
-   oWndInput:lShadow := .t.
-   oWndInput:Show()
-
-   if lEditable
-      #ifndef HB_NO_READDBG
-      if bValid == nil
-         @ nTop + 1, nLeft + 1 GET uTemp COLOR "," + __DbgColors()[ 5 ]
-      else
-          @ nTop + 1, nLeft + 1 GET uTemp VALID Eval( bValid, uTemp ) ;
-           COLOR "," + __DbgColors()[ 5 ]
-      endif
-
-      nOldCursor := SetCursor( SC_NORMAL )
-      READ
-      SetCursor( nOldCursor )
-      #else
-      uTemp := getdbginput( nTop + 1, nLeft + 1, uTemp, bValid, __DbgColors()[ 5 ] )     
-      #endif 
-   else
-      @ nTop + 1, nLeft + 1 SAY ValToStr( uValue ) COLOR "," + __DbgColors()[ 5 ]
-      SetPos( nTop + 1, nLeft + 1 )
-      nOldCursor := SetCursor( SC_NONE )
-
-      lExit = .f.
-
-      while ! lExit
-         Inkey( 0 )
-
-         do case
-            case LastKey() == K_ESC
-               lExit = .t.
-
-            case LastKey() == K_ENTER
-               if cType == "A"
-                  if Len( uValue ) == 0
-                     Alert( "Array is empty" )
-                  else
-                     __DbgArrays( uValue, cMsg )
-                  endif
-
-               elseif cType == "O"
-                  __DbgObject( uValue, cMsg )
-
-               else
-                  Alert( "Value cannot be edited" )
-               endif
-
-            otherwise
-               Alert( "Value cannot be edited" )
-         endcase
-      end
-
-      SetCursor( nOldCursor )
-   endif
-
-   #ifndef HB_NO_READDBG
-   nOldCursor := SetCursor( SC_NORMAL )
-   READ
-   SetCursor( nOldCursor )
-   #endif
-
-   oWndInput:Hide()
-   Set( _SET_SCOREBOARD, lScoreBoard )
-
-   do case
-      case cType == "C"
-           uTemp := AllTrim( uTemp )
-
-      case cType == "D"
-           uTemp := CToD( uTemp )
-
-      case cType == "N"
-           uTemp := Val( uTemp )
-
-   endcase
-
-return iif( LastKey() != K_ESC, uTemp, uValue )
-
-METHOD Inspect( uValue, cValueName ) CLASS TDebugger
-
-   uValue = ::InputBox( uValue, cValueName,, .f. )
-
-return nil
-
-METHOD IsBreakPoint( nLine, cPrgName ) CLASS TDebugger
-return AScan( ::aBreakPoints, { | aBreak | (aBreak[ 1 ] == nLine) .AND. (aBreak [ 2 ] == cPrgName) } ) != 0
-
-
-METHOD GotoLine( nLine ) CLASS TDebugger
-
-   local nRow, nCol
-
-   /*if ::oBrwVars != nil
-      ::ShowVars()
-   endif*/
-
-   ::oBrwText:GotoLine( nLine )
-   nRow = Row()
-   nCol = Col()
-
-   // no source code line stored yet
-   /*if ::oBrwStack != nil .and. Len( ::aCallStack ) > 0 .and. ;
-      ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] == nil
-      ::aCallStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] = nLine
-   endif*/
-
-   if ::oWndStack != nil .and. ! ::oBrwStack:Stable
-      ::oBrwStack:ForceStable()
-   endif
-
-   if ::oWndCode:lFocused .and. SetCursor() != SC_SPECIAL1
-      SetPos( nRow, nCol )
-      SetCursor( SC_SPECIAL1 )
-   endif
-   SetPos( nRow, nCol )
-   
-   // Store cursor position to be restored by ::oWndCode:bGotFocus
-   ::oWndCode:cargo[ 1 ] := nRow
-   ::oWndCode:cargo[ 2 ] := nCol
-
-return nil
-
-
-METHOD Local() CLASS TDebugger
-
-   ::lShowLocals := ! ::lShowLocals
-   ::RefreshVars()
-   
-return nil
-
-
-METHOD Private() CLASS TDebugger
-
-   ::lShowPrivates := ! ::lShowPrivates
-   ::RefreshVars()
-
-return nil
-
-METHOD Public() CLASS TDebugger
-
-   ::lShowPublics := ! ::lShowPublics
-   ::RefreshVars()
-
-return nil
-
-METHOD RestoreAppStatus() CLASS TDebugger
-
-   ::cImage := SaveScreen()
-   DispBegin()
-   RestScreen( 0, 0, MaxRow(), MaxCol(), ::cAppImage )
-   SetPos( ::nAppRow, ::nAppCol )
-   SetColor( ::cAppColors )
-   SetCursor( ::nAppCursor )
-   DispEnd()
-
-return nil
-
-METHOD RestoreSettings() CLASS TDebugger
-
-   local n
-
-   ::cSettingsFileName := ::InputBox( "File name", ::cSettingsFileName )
-
-   if LastKey() != K_ESC
-      ::LoadSettings()
-      ::ShowVars()
-   endif
-
-return nil
-
-METHOD SaveAppStatus() CLASS TDebugger
-
-   DispBegin()
-   ::cAppImage  := SaveScreen()
-   ::nAppRow    := Row()
-   ::nAppCol    := Col()
-   ::cAppColors := SetColor()
-   ::nAppCursor := SetCursor( SC_NONE )
-   RestScreen( 0, 0, MaxRow(), MaxCol(), ::cImage )
-   DispEnd()
-
-return nil
-
-METHOD SaveSettings() CLASS TDebugger
-
-   local cInfo := "", n, oWnd
-
-   ::cSettingsFileName := ::InputBox( "File name", ::cSettingsFileName )
-
-   if LastKey() != K_ESC
-
-      if ! Empty( ::cPathForFiles )
-         cInfo += "Options Path " + ::cPathForFiles + HB_OsNewLine()
-      endif
-
-      cInfo += "Options Colors {"
-      for n := 1 to Len( ::aColors )
-         cInfo += '"' + ::aColors[ n ] + '"'
-         if n < Len( ::aColors )
-            cInfo += ","
-         endif
-      next
-      cInfo += "}" + HB_OsNewLine()
-
-      if ::lMonoDisplay
-         cInfo += "Options mono " + HB_OsNewLine()
-      endif
-
-      if !::lRunAtStartup
-         cInfo += "Options NoRunAtStartup " + HB_OsNewLine()
-      endif
-
-      if ::nSpeed != 0
-         cInfo += "Run Speed " + AllTrim( Str( ::nSpeed ) ) + HB_OsNewLine()
-      endif
-
-      for n := 1 to Len( ::aWindows )
-         oWnd := ::aWindows[ n ]
-         cInfo += "Window Size " + AllTrim( Str( oWnd:nBottom - oWnd:nTop + 1 ) ) + " "
-         cInfo += AllTrim( Str( oWnd:nRight - oWnd:nLeft + 1 ) ) + HB_OsNewLine()
-         cInfo += "Window Move " + AllTrim( Str( oWnd:nTop ) ) + " "
-         cInfo += AllTrim( Str( oWnd:nLeft ) ) + HB_OsNewLine()
-         cInfo += "Window Next" + HB_OsNewLine()
-      next
-
-      if ::nTabWidth != 4
-         cInfo += "Options Tab " + AllTrim( Str( ::nTabWidth ) ) + HB_OsNewLine()
-      endif
-
-      if ::lShowStatics
-         cInfo += "Monitor Static" + HB_OsNewLine()
-      endif
-
-      if ::lShowPublics
-         cInfo += "Monitor Public" + HB_OsNewLine()
-      endif
-
-      if ::lShowLocals
-         cInfo += "Monitor Local" + HB_OsNewLine()
-      endif
-
-      if ::lShowPrivates
-         cInfo += "Monitor Private" + HB_OsNewLine()
-      endif
-
-      if ::lSortVars
-         cInfo += "Monitor Sort" + HB_OsNewLine()
-      endif
-
-      if ::lShowCallStack
-         cInfo += "View CallStack" + HB_OsNewLine()
-      endif
-
-      if ! ::lLineNumbers
-         cInfo += "Num Off" + HB_OsNewLine()
-      endif
-
-      if ! Empty( ::aBreakPoints )
-         for n := 1 to Len( ::aBreakPoints )
-            cInfo += "BP " + AllTrim( Str( ::aBreakPoints[ n ][ 1 ], , 0 ) ) + " " + ;
-                     AllTrim( ::aBreakPoints[ n ][ 2 ] ) + HB_OsNewLine()
-         next
-      endif
-
-      MemoWrit( ::cSettingsFileName, cInfo )
-   endif
-
-return nil
-
-METHOD Stack() CLASS TDebugger
-
-   ::lShowCallStack := ! ::lShowCallStack  
-   ::oPulldown:GetItemByIdent( "CALLSTACK" ):checked := ::lShowCallStack
-   if ::lActive
-      if ::lShowCallStack
-         ::ShowCallStack()
-      else
-         ::HideCallStack()
-      endif
-   endif
-
-return nil
 
 METHOD Static() CLASS TDebugger
 
@@ -2390,6 +2553,35 @@ METHOD Static() CLASS TDebugger
    ::RefreshVars()
 
 return nil
+
+
+METHOD Step() CLASS TDebugger
+  // we are starting to run again so reset to the deepest call if
+  // displaying stack
+  if ! ::oBrwStack == nil
+    ::oBrwStack:GoTop()
+  endif
+  ::RestoreAppScreen()
+  ::RestoreAppState()
+  ::Exit()
+RETURN nil
+
+
+METHOD ToCursor() CLASS TDebugger
+  LOCAL cLine
+
+  cLine := ::oBrwText:GetLine( ::oBrwText:nRow )
+  IF ::oBrwText:lLineNumbers
+    cLine := SUBSTR( cLine, AT(":",cLine)+1 )
+  ENDIF
+  IF IsValidStopLine( cLine )
+    ::aToCursor := { ::oBrwText:nRow, strip_path( ::cPrgName ) }
+    ::RestoreAppScreen()
+    ::RestoreAppState()
+    ::lToCursor := .T.
+    ::Exit()
+  ENDIF
+RETURN self
 
 
 // Toggle a breakpoint at the cursor position in the currently viewed file
@@ -2427,6 +2619,108 @@ METHOD ToggleBreakPoint() CLASS TDebugger
   ENDIF
 
 return nil
+
+
+METHOD TracepointAdd( cExpr ) CLASS TDebugger
+   LOCAL cErr
+   LOCAL aWatch
+   LOCAL lSuccess
+   LOCAL uValue
+
+   IF( cExpr == NIL )
+      cExpr:=SPACE(255)
+      cExpr := ALLTRIM( ::InputBox( "Enter Tracepoint", cExpr ) )
+      IF( LASTKEY() == K_ESC )
+         RETURN self
+      ENDIF
+   ENDIF
+   cExpr := ALLTRIM( cExpr )
+   IF( EMPTY(cExpr) )
+      RETURN self
+   ENDIF
+   aWatch := {"tp", cExpr, NIL}
+   cErr := CreateExpression( cExpr, aWatch )
+   IF( !EMPTY(cErr) )
+      ALERT( cErr )
+      RETURN self
+   ENDIF
+   AADD( ::aWatch, aWatch )
+   ::RestoreAppState()
+   uValue := GetWatchValue( aWatch, @lSuccess )
+   ::SaveAppState()
+   AADD( ::aTrace, { LEN(::aWatch), IIF(lSuccess, uValue, NIL )} )
+   ::lTracepoints :=.T.
+   ::WatchpointsShow()
+
+RETURN self
+
+
+METHOD VarGetInfo( aVar ) CLASS TDebugger
+  LOCAL uValue
+  LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
+
+  uValue := ::VarGetValue( aVar )
+  do case
+    case cType == "L"
+      return aVar[ VAR_NAME ] + " <Local, " + ;
+       ValType( uValue ) + ;
+       ">: " + ValToStr( uValue )
+
+    case cType == "S"
+      return aVar[ VAR_NAME ] + " <Static, " + ;
+       ValType( uValue ) + ;
+       ">: " + ValToStr( uValue )
+
+    OTHERWISE
+      return aVar[ VAR_NAME ] + " <" + aVar[ VAR_TYPE ] + ", " + ;
+       ValType( uValue ) + ;
+       ">: " + ValToStr( uValue )
+  endcase
+return ""
+
+
+METHOD VarGetValue( aVar ) CLASS TDebugger
+  LOCAL nProcLevel, uValue
+  LOCAL cProc
+  LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
+
+  IF( cType == "L" )
+    nProcLevel := hb_dbg_procLevel() - aVar[ VAR_LEVEL ]
+    cProc := aVar[ VAR_FUNCNAME ]
+    uValue := hb_dbg_vmVarLGet( nProcLevel, aVar[ VAR_POS ] )
+
+  ELSEIF( cType == "S" )
+    uValue := hb_dbg_vmVarSGet( aVar[ VAR_LEVEL ], aVar[ VAR_POS ] )
+
+  ELSE
+    //Public or Private
+    uValue := aVar[ VAR_POS ]
+  ENDIF
+
+RETURN uValue
+
+
+METHOD VarSetValue( aVar, uValue ) CLASS TDebugger
+  LOCAL nProcLevel
+  LOCAL cProc
+  LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
+
+  IF( cType == "L" )
+    nProcLevel := hb_dbg_procLevel() - aVar[VAR_LEVEL]   //skip debugger stack
+    cProc := aVar[ VAR_FUNCNAME ]
+    hb_dbg_vmVarLSet( nProcLevel, aVar[ VAR_POS ], uValue )
+
+  ELSEIF( cType == "S" )
+    hb_dbg_vmVarSSet( aVar[ VAR_LEVEL ], aVar[ VAR_POS ], uValue )
+
+  ELSE
+    //Public or Private
+    aVar[ VAR_POS ] := uValue
+    &( aVar[ VAR_NAME ] ) := uValue
+
+  ENDIF
+
+RETURN self
 
 
 METHOD ViewSets() CLASS TDebugger
@@ -2472,6 +2766,223 @@ METHOD ViewSets() CLASS TDebugger
 
 return nil
 
+
+METHOD WatchGetInfo( aWatch ) CLASS TDebugger
+   LOCAL xVal
+   LOCAL ctype
+   LOCAL lValid
+
+   ::RestoreAppState()
+   xVal := GetWatchValue( aWatch, @lValid )
+   ::SaveAppState()
+   IF( lValid )
+      cType := VALTYPE( xVal )
+      xVal  := ValToStr( xVal )
+   ELSE
+      //xVal contains error description
+      cType := 'U'
+//      xVal  := "Undefined"
+   ENDIF
+
+RETURN aWatch[WP_EXPR]+" <"+aWatch[WP_TYPE]+", " +cType+">: " +xVal
+
+
+METHOD WatchpointAdd( cExpr ) CLASS TDebugger
+   LOCAL cErr
+   LOCAL aWatch
+
+   IF( cExpr == NIL )
+      cExpr:=SPACE(255)
+      cExpr := ALLTRIM( ::InputBox( "Enter Watchpoint", cExpr ) )
+      IF( LASTKEY() == K_ESC )
+         RETURN self
+      ENDIF
+   ENDIF
+   cExpr := ALLTRIM( cExpr )
+   IF( EMPTY(cExpr) )
+      RETURN self
+   ENDIF
+   aWatch := {"wp", cExpr, NIL}
+   cErr := CreateExpression( cExpr, aWatch )
+   IF( !EMPTY(cErr) )
+      ALERT( cErr )
+      RETURN self
+   ENDIF
+   AADD( ::aWatch, aWatch )
+   ::WatchpointsShow()
+
+RETURN self
+
+
+METHOD WatchpointDel( nPos ) CLASS TDebugger
+   LOCAL nIdx
+
+   IF( ::oWndPnt != NIL .AND. ::oWndPnt:lVisible )
+      IF( nPos == NIL )
+         //called from the menu
+         nPos := ::InputBox( "Enter item number to delete", ::oBrwPnt:cargo[1]-1 )
+      ELSE
+         nPos--
+      ENDIF
+      IF( LastKey() != K_ESC )
+         IF( nPos >=0 .AND. nPos < LEN(::aWatch) )
+            ::oBrwPnt:gotop()
+            IF( ::aWatch[nPos+1][WP_TYPE] == "tp" )
+               nIdx := ASCAN( ::aTrace, {|a| a[TR_IDX]==nPos+1} )
+               IF( nIdx > 0 )
+                  ADEL( ::aTrace[nIdx] )
+                  ASIZE( ::aTrace, LEN(::aTrace)-1 )
+                  ::lTracepoints := LEN(::aTrace) > 0
+               ENDIF
+            ENDIF
+            ADEL( ::aWatch, nPos+1 )
+            ASIZE( ::aWatch, LEN(::aWatch)-1 )
+            IF( LEN(::aWatch) == 0 )
+               ::WatchpointsHide()
+            ELSE
+               ::WatchpointsShow()
+            ENDIF
+         ENDIF
+      ENDIF
+   ENDIF
+
+RETURN self
+
+
+METHOD WatchpointEdit( nPos ) CLASS TDebugger
+   LOCAL cExpr
+   LOCAL aWatch
+   LOCAL cErr
+
+   cExpr:=PADR( ::aWatch[nPos][WP_EXPR], 255 )
+   cExpr := ALLTRIM( ::InputBox( "Enter Watchpoint", cExpr ) )
+   IF( LASTKEY() == K_ESC )
+      RETURN self
+   ENDIF
+   cExpr := ALLTRIM( cExpr )
+   IF( EMPTY(cExpr) )
+      RETURN self
+   ENDIF
+   aWatch := {"wp", cExpr, NIL}
+   cErr := CreateExpression( cExpr, aWatch )
+   IF( !EMPTY(cErr) )
+      ALERT( cErr )
+      RETURN self
+   ENDIF
+   ::aWatch[ nPos ] := aWatch
+   ::WatchpointsShow()
+
+RETURN self
+
+
+METHOD WatchpointsHide() CLASS TDebugger
+
+   ::oWndPnt:Hide()
+   ::oWndCode:nTop := IIF(::oWndVars!=NIL .AND. ::oWndVars:lVisible, ::oWndVars:nBottom+1,1)
+   ::oBrwText:Resize( ::oWndCode:nTop+1 )
+   if ::aWindows[ ::nCurrentWindow ] == ::oWndPnt
+      ::NextWindow()
+   ENDIF
+
+return nil
+
+
+METHOD WatchPointsShow() CLASS TDebugger
+
+   local nWidth, n := 1
+   Local oCol
+   local lRepaint := .f.
+   local nTop
+   LOCAL lFocused
+
+   if ::lGo
+      return nil
+   endif
+
+   if LEN(::aWatch) == 0
+      return nil
+   endif
+
+   if ::oWndPnt == nil
+      nTop := IIF(::oWndVars!=NIL .AND. ::oWndVars:lVisible,::oWndVars:nBottom,0) + 1
+      ::oWndPnt := TDbWindow():New( nTop,;
+         0, ;
+         nTop +Min( 4, Len( ::aWatch ) ) + 1,;
+         MaxCol() - iif( ::oWndStack != nil, ::oWndStack:nWidth(), 0 ),;
+         "Watch" )
+
+      //::oBrwText:Resize( ::oWndPnt:nBottom + 1 )
+      //::oWndCode:nTop := ::oWndPnt:nBottom + 1
+      //::oBrwText:Resize( ::oWndCode:nTop + 1 )
+      //::oBrwText:RefreshAll()
+      //::oWndCode:SetFocus( .t. )
+
+//      ::oWndPnt:bLButtonDown := { | nMRow, nMCol | ::WndVarsLButtonDown( nMRow, nMCol ) }
+//      ::oWndPnt:bLDblClick   := { | nMRow, nMCol | ::EditVar( ::oBrwPnt:Cargo[ 1 ] ) }
+
+      ::oBrwPnt := TDbgBrowser():New( nTop+1, 1, ::oWndPnt:nBottom - 1, MaxCol() - iif( ::oWndStack != nil,;
+                               ::oWndStack:nWidth(), 0 ) - 1 )
+
+      ::oWndPnt:Browser := ::oBrwPnt
+
+      ::oBrwPnt:Cargo :={ 1,{}} // Actual highligthed row
+      ::oBrwPnt:ColorSpec := ::aColors[ 2 ] + "," + ::aColors[ 5 ] + "," + ::aColors[ 3 ]
+      ::oBrwPnt:GOTOPBLOCK := { || ::oBrwPnt:cargo[ 1 ] := Min( 1, Len(::aWatch) ) }
+      ::oBrwPnt:GoBottomBlock := { || ::oBrwPnt:cargo[ 1 ] := Len( ::aWatch ) }
+      ::oBrwPnt:SkipBlock = { | nSkip, nOld | nOld := ::oBrwPnt:Cargo[ 1 ],;
+                               ::oBrwPnt:Cargo[ 1 ] += nSkip,;
+                               ::oBrwPnt:Cargo[ 1 ] := Min( Max( ::oBrwPnt:Cargo[ 1 ], 1 ),;
+                                                             Len( ::aWatch ) ),;
+                               IIF( LEN(::aWatch) > 0, ::oBrwPnt:Cargo[ 1 ] - nOld, 0 ) }
+
+      nWidth := ::oWndPnt:nWidth() - 1
+      oCol := TBColumnNew( "", ;
+         { || PadR( IIF( LEN( ::aWatch ) > 0, ;
+                       AllTrim( Str( ::oBrwPnt:Cargo[1] -1 ) ) + ") " + ;
+                       ::WatchGetInfo( ::aWatch[ Max( ::oBrwPnt:Cargo[1], 1 ) ] ), ;
+                       " " ), ;
+                   ::oWndPnt:nWidth() - 2 ) } )
+      ::oBrwPnt:AddColumn( oCol )
+      AAdd(::oBrwPnt:Cargo[2], ::aWatch)
+      oCol:DefColor:={1,2}
+
+      ::oWndPnt:bPainted := { || if(Len(::aWatch) > 0, ( ::oBrwPnt:RefreshAll():ForceStable(),RefreshVarsS(::oBrwPnt) ),) }
+
+      ::oWndPnt:bKeyPressed := { | nKey | ( iif( nKey == K_DOWN ;
+      , ::oBrwPnt:Down(), nil ), iif( nKey == K_UP, ::oBrwPnt:Up(), nil ) ;
+      , iif( nKey == K_PGDN, ::oBrwPnt:PageDown(), nil ) ;
+      , iif( nKey == K_PGUP, ::oBrwPnt:PageUp(), nil ) ;
+      , iif( nKey == K_HOME, ::oBrwPnt:GoTop(), nil ) ;
+      , iif( nKey == K_END, ::oBrwPnt:GoBottom(), nil ) ;
+      , iif( nKey == K_DEL, ::WatchpointDel( ::oBrwPnt:Cargo[1] ), nil ) ;
+      , iif( nKey == K_ENTER, ::WatchpointEdit( ::oBrwPnt:Cargo[1] ), nil ), ::oBrwPnt:ForceStable() ) }
+
+      AAdd( ::aWindows, ::oWndPnt )
+      ::oWndPnt:Show()
+      ::ResizeWindows( ::oWndPnt )
+   else
+      if( ::oBrwPnt:cargo[1] <= 0 )
+         ::oBrwPnt:cargo[1] := 1
+      endif
+      DispBegin()
+      if Len( ::aWatch ) > ::oWndPnt:nBottom - ::oWndPnt:nTop - 1
+         //Resize( top, left, bottom, right )
+         ::oWndPnt:Resize( ,, ::oWndPnt:nTop + Min( Len( ::aWatch ) + 1, 4 ) )
+         lRepaint := .t.
+      elseif Len( ::aWatch ) < ::oWndPnt:nBottom - ::oWndPnt:nTop - 1
+         ::oWndPnt:Resize( ,, ::oWndPnt:nTop + Len( ::aWatch ) + 1 )
+         lRepaint := .t.
+      else
+         ::oBrwPnt:RefreshAll():ForceStable()
+      endif
+      if ! ::oWndPnt:lVisible .OR. lRepaint
+         ::ResizeWindows( ::oWndPnt )
+      endif
+   endif
+   DispEnd()
+return nil
+
+
 METHOD WndVarsLButtonDown( nMRow, nMCol ) CLASS TDebugger
 
    if nMRow > ::oWndVars:nTop .and. ;
@@ -2493,8 +3004,8 @@ METHOD WndVarsLButtonDown( nMRow, nMCol ) CLASS TDebugger
 
 return nil
 
-static procedure SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cCaption, bEdit )
 
+static procedure SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cCaption, bEdit )
 
    local nSet := oBrwSets:cargo[1]
    local cTemp:=str(nSet,4)
@@ -2595,378 +3106,6 @@ static function ValToStr( uVal )
 
 return cResult
 
-METHOD LineNumbers( lLineNumbers ) CLASS TDebugger
-
-   If( lLineNumbers == NIL, lLineNumbers := !::lLineNumbers, )
-   ::lLineNumbers := lLineNumbers
-   ::oPulldown:GetItemByIdent( "LINE" ):checked := ::lLineNumbers
-   IF ::oBrwText != NIL
-      ::oBrwText:lLineNumbers := lLineNumbers
-      ::oBrwText:RefreshAll()
-   ENDIF
-
-return Self
-
-METHOD Locate( nMode ) CLASS TDebugger
-
-   local cValue, lFound
-
-   DEFAULT nMode TO 0
-
-   cValue := ::InputBox( "Search string", ::cSearchString )
-
-   if empty( cValue )
-      return nil
-   endif
-
-   ::cSearchString := cValue
-
-   lFound := ::oBrwText:Search( ::cSearchString, ::lCaseSensitive, 0 )
-   
-   // Save cursor position to be restored by ::oWndCode:bGotFocus
-   ::oWndCode:cargo[ 1 ] := Row()
-   ::oWndCode:cargo[ 2 ] := Col()
-
-RETURN lFound
-
-METHOD FindNext() CLASS TDebugger
-
-   local lFound
-
-   if Empty( ::cSearchString )
-      lFound := ::Locate( 1 )
-   else
-      lFound := ::oBrwText:Search( ::cSearchString, ::lCaseSensitive, 1 )
-
-      // Save cursor position to be restored by ::oWndCode:bGotFocus
-      ::oWndCode:cargo[ 1 ] := Row()
-      ::oWndCode:cargo[ 2 ] := Col()
-   endif
-   
-return lFound
-
-METHOD FindPrevious() CLASS TDebugger
-
-   local lFound
-
-   if Empty( ::cSearchString )
-      lFound := ::Locate( 2 )
-   else
-      lFound := ::oBrwText:Search( ::cSearchString, ::lCaseSensitive, 2 )
-
-      // Save cursor position to be restored by ::oWndCode:bGotFocus
-      ::oWndCode:cargo[ 1 ] := Row()
-      ::oWndCode:cargo[ 2 ] := Col()
-   endif
-
-return lFound
-
-METHOD RemoveWindow( oWnd ) CLASS TDebugger
-
-  local n := AScan( ::aWindows, { | o | o == oWnd } )
-
-  if n != 0
-     ::aWindows = ADel ( ::aWindows, n )
-     ::aWindows = ASize( ::aWindows, Len( ::aWindows ) - 1 )
-  endif
-
-  ::nCurrentWindow = 1
-
-return nil
-
-METHOD SearchLine() CLASS TDebugger
-
-   local cLine
-
-   cLine := ::InputBox( "Line number", "1" )
-
-   if Val( cLine ) > 0
-      ::GotoLine ( Val( cLine ) )
-   endif
-
-return nil
-
-METHOD LocatePrgPath( cPrgName ) CLASS TDebugger
-
-   local i
-   local iMax
-   local aPaths
-   local cRetPrgName
-   local cSep
-
-   if empty( ::aPathDirs )
-      ::aPathDirs := PathToArray( ::cPathForFiles )
-   endif
-
-   cSep := HB_OsPathSeparator()
-
-   aPaths := ::aPathDirs
-
-   iMax := len( aPaths )
-
-   for i := 1 to iMax
-       cRetPrgName := aPaths[i] + cSep + cPrgName
-       if file( cRetPrgName )
-          exit
-       else
-          cRetPrgName := nil
-       endif
-   next i
-
-return cRetPrgName
-
-
-METHOD ToCursor() CLASS TDebugger
-  LOCAL cLine
-
-  cLine := ::oBrwText:GetLine( ::oBrwText:nRow )
-  IF ::oBrwText:lLineNumbers
-    cLine := SUBSTR( cLine, AT(":",cLine)+1 )
-  ENDIF
-  IF IsValidStopLine( cLine )
-    ::aToCursor := { ::oBrwText:nRow, strip_path( ::cPrgName ) }
-    ::RestoreAppStatus()
-    ::lToCursor := .t.
-    ::Exit()
-  ENDIF
-
-RETURN self
-
-METHOD NextRoutine() CLASS TDebugger
-
-   ::RestoreAppStatus()
-   ::lNextRoutine := .t.
-   ::Exit()
-
-RETURN self
-
-
-METHOD WatchpointAdd( cExpr ) CLASS TDebugger
-   LOCAL cErr
-   LOCAL aWatch
-
-   IF( cExpr == NIL )
-      cExpr:=SPACE(255)
-      cExpr := ALLTRIM( ::InputBox( "Enter Watchpoint", cExpr ) )
-      IF( LASTKEY() == K_ESC )
-         RETURN self
-      ENDIF
-   ENDIF
-   cExpr := ALLTRIM( cExpr )
-   IF( EMPTY(cExpr) )
-      RETURN self
-   ENDIF
-   aWatch := {"wp", cExpr, NIL}
-   cErr := CreateExpression( cExpr, aWatch )
-   IF( !EMPTY(cErr) )
-      ALERT( cErr )
-      RETURN self
-   ENDIF
-   AADD( ::aWatch, aWatch )
-   ::WatchpointsShow()
-
-RETURN self
-
-METHOD TracepointAdd( cExpr ) CLASS TDebugger
-   LOCAL cErr
-   LOCAL aWatch
-   LOCAL lSuccess
-   LOCAL uValue
-
-   IF( cExpr == NIL )
-      cExpr:=SPACE(255)
-      cExpr := ALLTRIM( ::InputBox( "Enter Tracepoint", cExpr ) )
-      IF( LASTKEY() == K_ESC )
-         RETURN self
-      ENDIF
-   ENDIF
-   cExpr := ALLTRIM( cExpr )
-   IF( EMPTY(cExpr) )
-      RETURN self
-   ENDIF
-   aWatch := {"tp", cExpr, NIL}
-   cErr := CreateExpression( cExpr, aWatch )
-   IF( !EMPTY(cErr) )
-      ALERT( cErr )
-      RETURN self
-   ENDIF
-   AADD( ::aWatch, aWatch )
-   uValue := GetWatchValue( aWatch, @lSuccess )
-   AADD( ::aTrace, { LEN(::aWatch), IIF(lSuccess, uValue, NIL )} )
-   ::lTracepoints :=.T.
-   ::WatchpointsShow()
-
-RETURN self
-
-
-METHOD WatchPointsShow() CLASS TDebugger
-
-   local nWidth, n := 1
-   Local oCol
-   local lRepaint := .f.
-   local nTop
-   LOCAL lFocused
-
-   if ::lGo
-      return nil
-   endif
-
-   if LEN(::aWatch) == 0
-      return nil
-   endif
-
-   if ::oWndPnt == nil
-      nTop := IIF(::oWndVars!=NIL .AND. ::oWndVars:lVisible,::oWndVars:nBottom,0) + 1
-      ::oWndPnt := TDbWindow():New( nTop,;
-         0, ;
-         nTop +Min( 4, Len( ::aWatch ) ) + 1,;
-         MaxCol() - iif( ::oWndStack != nil, ::oWndStack:nWidth(), 0 ),;
-         "Watch" )
-
-      //::oBrwText:Resize( ::oWndPnt:nBottom + 1 )
-      //::oWndCode:nTop := ::oWndPnt:nBottom + 1
-      //::oBrwText:Resize( ::oWndCode:nTop + 1 )
-      //::oBrwText:RefreshAll()
-      //::oWndCode:SetFocus( .t. )
-
-//      ::oWndPnt:bLButtonDown := { | nMRow, nMCol | ::WndVarsLButtonDown( nMRow, nMCol ) }
-//      ::oWndPnt:bLDblClick   := { | nMRow, nMCol | ::EditVar( ::oBrwPnt:Cargo[ 1 ] ) }
-
-      ::oBrwPnt := TDbgBrowser():New( nTop+1, 1, ::oWndPnt:nBottom - 1, MaxCol() - iif( ::oWndStack != nil,;
-                               ::oWndStack:nWidth(), 0 ) - 1 )
-
-      ::oWndPnt:Browser := ::oBrwPnt
-
-      ::oBrwPnt:Cargo :={ 1,{}} // Actual highligthed row
-      ::oBrwPnt:ColorSpec := ::aColors[ 2 ] + "," + ::aColors[ 5 ] + "," + ::aColors[ 3 ]
-      ::oBrwPnt:GOTOPBLOCK := { || ::oBrwPnt:cargo[ 1 ] := Min( 1, Len(::aWatch) ) }
-      ::oBrwPnt:GoBottomBlock := { || ::oBrwPnt:cargo[ 1 ] := Len( ::aWatch ) }
-      ::oBrwPnt:SkipBlock = { | nSkip, nOld | nOld := ::oBrwPnt:Cargo[ 1 ],;
-                               ::oBrwPnt:Cargo[ 1 ] += nSkip,;
-                               ::oBrwPnt:Cargo[ 1 ] := Min( Max( ::oBrwPnt:Cargo[ 1 ], 1 ),;
-                                                             Len( ::aWatch ) ),;
-                               IIF( LEN(::aWatch) > 0, ::oBrwPnt:Cargo[ 1 ] - nOld, 0 ) }
-
-      nWidth := ::oWndPnt:nWidth() - 1
-      oCol:=TBColumnNew( "", ;
-         { || PadR( IIF( LEN( ::aWatch ) > 0, ;
-                       AllTrim( Str( ::oBrwPnt:Cargo[1] -1 ) ) + ") " + ;
-                       ::WatchGetInfo( ::aWatch[ Max( ::oBrwPnt:Cargo[1], 1 ) ] ), ;
-                       " " ), ;
-                   ::oWndPnt:nWidth() - 2 ) } )
-      ::oBrwPnt:AddColumn( oCol )
-      AAdd(::oBrwPnt:Cargo[2], ::aWatch)
-      oCol:DefColor:={1,2}
-
-      ::oWndPnt:bPainted := { || if(Len(::aWatch) > 0, ( ::oBrwPnt:RefreshAll():ForceStable(),RefreshVarsS(::oBrwPnt) ),) }
-
-      ::oWndPnt:bKeyPressed := { | nKey | ( iif( nKey == K_DOWN ;
-      , ::oBrwPnt:Down(), nil ), iif( nKey == K_UP, ::oBrwPnt:Up(), nil ) ;
-      , iif( nKey == K_PGDN, ::oBrwPnt:PageDown(), nil ) ;
-      , iif( nKey == K_PGUP, ::oBrwPnt:PageUp(), nil ) ;
-      , iif( nKey == K_HOME, ::oBrwPnt:GoTop(), nil ) ;
-      , iif( nKey == K_END, ::oBrwPnt:GoBottom(), nil ) ;
-      , iif( nKey == K_DEL, ::WatchpointDel( ::oBrwPnt:Cargo[1] ), nil ) ;
-      , iif( nKey == K_ENTER, ::WatchpointEdit( ::oBrwPnt:Cargo[1] ), nil ), ::oBrwPnt:ForceStable() ) }
-
-      AAdd( ::aWindows, ::oWndPnt )
-      ::oWndPnt:Show()
-      ::ResizeWindows( ::oWndPnt )
-   else
-      if( ::oBrwPnt:cargo[1] <= 0 )
-         ::oBrwPnt:cargo[1] := 1
-      endif
-      DispBegin()
-      if Len( ::aWatch ) > ::oWndPnt:nBottom - ::oWndPnt:nTop - 1
-         //Resize( top, left, bottom, right )
-         ::oWndPnt:Resize( ,, ::oWndPnt:nTop + Min( Len( ::aWatch ) + 1, 4 ) )
-         lRepaint := .t.
-      elseif Len( ::aWatch ) < ::oWndPnt:nBottom - ::oWndPnt:nTop - 1
-         ::oWndPnt:Resize( ,, ::oWndPnt:nTop + Len( ::aWatch ) + 1 )
-         lRepaint := .t.
-      else
-         ::oBrwPnt:RefreshAll():ForceStable()
-      endif
-      if ! ::oWndPnt:lVisible .OR. lRepaint
-         ::ResizeWindows( ::oWndPnt )
-      endif
-   endif
-   DispEnd()
-return nil
-
-METHOD WatchpointEdit( nPos ) CLASS TDebugger
-   LOCAL cExpr
-   LOCAL aWatch
-   LOCAL cErr
-
-   cExpr:=PADR( ::aWatch[nPos][WP_EXPR], 255 )
-   cExpr := ALLTRIM( ::InputBox( "Enter Watchpoint", cExpr ) )
-   IF( LASTKEY() == K_ESC )
-      RETURN self
-   ENDIF
-   cExpr := ALLTRIM( cExpr )
-   IF( EMPTY(cExpr) )
-      RETURN self
-   ENDIF
-   aWatch := {"wp", cExpr, NIL}
-   cErr := CreateExpression( cExpr, aWatch )
-   IF( !EMPTY(cErr) )
-      ALERT( cErr )
-      RETURN self
-   ENDIF
-   ::aWatch[ nPos ] := aWatch
-   ::WatchpointsShow()
-
-RETURN self
-
-
-METHOD WatchpointDel( nPos ) CLASS TDebugger
-   LOCAL nIdx
-
-   IF( ::oWndPnt != NIL .AND. ::oWndPnt:lVisible )
-      IF( nPos == NIL )
-         //called from the menu
-         nPos := ::InputBox( "Enter item number to delete", ::oBrwPnt:cargo[1]-1 )
-      ELSE
-         nPos--
-      ENDIF
-      IF( LastKey() != K_ESC )
-         IF( nPos >=0 .AND. nPos < LEN(::aWatch) )
-            ::oBrwPnt:gotop()
-            IF( ::aWatch[nPos+1][WP_TYPE] == "tp" )
-               nIdx := ASCAN( ::aTrace, {|a| a[TR_IDX]==nPos+1} )
-               IF( nIdx > 0 )
-                  ADEL( ::aTrace[nIdx] )
-                  ASIZE( ::aTrace, LEN(::aTrace)-1 )
-                  ::lTracepoints := LEN(::aTrace) > 0
-               ENDIF
-            ENDIF
-            ADEL( ::aWatch, nPos+1 )
-            ASIZE( ::aWatch, LEN(::aWatch)-1 )
-            IF( LEN(::aWatch) == 0 )
-               ::WatchpointsHide()
-            ELSE
-               ::WatchpointsShow()
-            ENDIF
-         ENDIF
-      ENDIF
-   ENDIF
-
-RETURN self
-
-
-METHOD WatchpointsHide() CLASS TDebugger
-
-   ::oWndPnt:Hide()
-   ::oWndCode:nTop := IIF(::oWndVars!=NIL .AND. ::oWndVars:lVisible, ::oWndVars:nBottom+1,1)
-   ::oBrwText:Resize( ::oWndCode:nTop+1 )
-   if ::aWindows[ ::nCurrentWindow ] == ::oWndPnt
-      ::NextWindow()
-   ENDIF
-
-return nil
-
-
 STATIC FUNCTION GetWatchValue( aWatch, plSuccess )
    LOCAL aVars, i, j
    LOCAL nLen, aLocVars
@@ -3026,80 +3165,6 @@ STATIC FUNCTION GetWatchValue( aWatch, plSuccess )
    ErrorBlock( bEBlock )
 
 RETURN xVal
-
-METHOD WatchGetInfo( aWatch ) CLASS TDebugger
-   LOCAL xVal
-   LOCAL ctype
-   LOCAL lValid
-
-   xVal := GetWatchValue( aWatch, @lValid )
-   IF( lValid )
-      cType := VALTYPE( xVal )
-      xVal  := ValToStr( xVal )
-   ELSE
-      //xVal contains error description
-      cType := 'U'
-//      xVal  := "Undefined"
-   ENDIF
-
-RETURN aWatch[WP_EXPR]+" <"+aWatch[WP_TYPE]+", " +cType+">: " +xVal
-
-
-METHOD ResizeWindows( oWindow ) CLASS TDebugger
-  LOCAL oWindow2, nTop, i
-
-  IF oWindow == ::oWndVars
-    oWindow2 := ::oWndPnt
-  ELSEIF oWindow == ::oWndPnt
-    oWindow2 := ::oWndVars
-  ENDIF
-
-  DispBegin()
-  IF oWindow2 == NIL
-    nTop := oWindow:nBottom +1
-  ELSE
-    IF oWindow2:lVisible
-      IF oWindow:nTop < oWindow2:nTop
-        nTop := oWindow2:nBottom - oWindow2:nTop + 1
-        oWindow2:Resize( oWindow:nBottom+1,, oWindow:nBottom+nTop)
-      ELSE
-        nTop := oWindow:nBottom - oWindow:nTop + 1
-        oWindow:Resize( oWindow2:nBottom+1,, oWindow2:nBottom+nTop)
-      ENDIF
-      nTop := MAX( oWindow:nBottom, oWindow2:nBottom ) + 1
-    ELSE
-      IF oWindow:nTop > 1
-        nTop := oWindow:nBottom - oWindow:nTop + 1
-        oWindow:Resize( 1, , nTop )
-      ENDIF
-      nTop := oWindow:nBottom + 1
-    ENDIF
-  ENDIF
-
-  oWindow:hide()
-  IF oWindow2 != NIL
-    oWindow2:hide()
-  ENDIF
-  ::oWndCode:Resize( nTop )
-  IF oWindow2 != NIL
-    oWindow2:show()
-  ENDIF
-  oWindow:show()
-  DispEnd()
-
-RETURN self
-
-
-METHOD Step() CLASS TDebugger
-  // we are starting to run again so reset to the deepest call if
-  // displaying stack
-  if ! ::oBrwStack == nil
-    ::oBrwStack:GoTop()
-  endif
-  ::RestoreAppStatus()
-  ::Exit()
-RETURN nil
-
 
 
 STATIC FUNCTION CreateExpression( cExpr, aWatch )
@@ -3331,11 +3396,9 @@ return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
 
 
 static function PathToArray( cList )
-
    local nPos
    local aList := {}
-   local cSep
-   local cDirSep
+   local cSep, cDirSep, cDir
 
    cSep := HB_OsPathListSeparator()
    cDirSep := HB_OsPathDelimiters()

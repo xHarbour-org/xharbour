@@ -1,5 +1,5 @@
 /*
- * $Id: mouseapi.c,v 1.5 2003/10/07 22:25:46 paultucker Exp $
+ * $Id: mouseapi.c,v 1.6 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -152,7 +152,7 @@ void HB_EXPORT hb_mouseSetBounds( int iTop, int iLeft, int iBottom, int iRight )
 
 void HB_EXPORT hb_mouseGetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouseSetBounds(%p, %p, %p, %p)", piTop, piLeft, piBottom, piRight));
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseGetBounds(%p, %p, %p, %p)", piTop, piLeft, piBottom, piRight));
 
    hb_mouse_GetBounds( piTop, piLeft, piBottom, piRight );
 }
