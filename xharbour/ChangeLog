@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3029 2004/06/04 19:25:55 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3031 2004/06/06 23:53:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,52 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-06 23:53 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
+  * source/rtl/ttextlin.prg
+    + Added # include "common.ch" to better class data initialization.
+  
+  * source/rtl/memoedit.prg
+    + Added handling of UDF by memoedit, especially in R/O mode. Made by Ath.
+    ! ::Procname and ::ProcLine are renamed to ::cProcName and ::nProcLine to better 
+      name convention.
+    ! ::nLineLenght is initialized with NIL. This var is treated properly in teditor.prg
+
+  * source/rtl/teditor.prg
+    + Added handling of UDF by memoedit, especially in read-only mode. Made by Ath.
+    + Added lTestMode class data to show some data Values at screen's footer.
+    + Added nLineLength class data to better understanding what column will be limit when 
+            lWordWrap is false.
+    + Added BOL() method to return true if cursor is at Begin of Line.
+    + Added EOL() method to return true if cursor is at End of Line.
+    + Added EOTL() method to return true if cursor is at End of Text-Line.
+    + Added BOT() method to return true if cursor is at Begin of Text.
+    + Added EOT() method to return true if cursor is at End of Text.
+    + Added BOR() method to return true if cursor is at Begin of Row.
+    + Added EOR() method to return true if cursor is at End of Row.
+    + Added GetChar() method to return the character at <nRol> and <nCol> position. 
+    + Added SplitLine2() method to split current and next lines when insert is on and 
+            cursor is before at end-of-line.
+    + Added IsLeftScroled() method to return true if the text is left scrolled.
+    + Added IsHardCR() to return true if line end with Hard CR.
+    ! Changed ProcName and ProcLine class data to cProName and nProLine to better convention name.
+    ! Changed InsertState() method name to ToggleInsert() to better understanding. 
+    ! Changed K_Return() behaviour to better hard CR management in insert mode.
+    ! Changed Text2array() method to better split text if lWordWrap is false.
+    ! Changed K_ascii() method to better management of cursor position. If edit over tab 
+              column, then the virtual tab character will be replaced by spaces.
+    ! Changed SplitLine() method to better cursor position and split management.
+    ! Changed K_tab() method to better management of tab char in insert mode.
+    ! Changed GetText() method to better tab management.
+    ! Changed WordRight()/WordLeft() methods to better navigation over tab spaces.
+    ! Changed Edit() method.  Now in read-only mode TAB and BACKSAPE navigation works. 
+              if lEditAllow is false then insert will be not allowed also.
+    ! Changed New() method to better nLineLenght and nWordWrapCol management.
+    ! Changed Right()/End() methods. When lWordWrap is false, then nWordWrapCol+1 will be 
+              the column limit.
+    - Removed nMarkPos and nMarkLen class data to code cleaning. They aren't in use nowhere.
+    - Removed AddLine() method. Use InsertLine() instead. 
+
 
 2004-06-05 15:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/include/hbgtwvt.h

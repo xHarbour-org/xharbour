@@ -1,5 +1,5 @@
 /*
- * $Id: ttextlin.prg,v 1.1.1.2 2004/05/11 22:47:00 modalsist Exp $
+ * $Id: ttextlin.prg,v 1.3 2004/06/06 23:43:13 modalsist Exp $
  */
 
 /*
@@ -51,15 +51,18 @@
  */
 
 /*
- * Eduardo Fernandes <eduardo@modalsistemas.com.br>
- * 11-May-2004
+ * v.1.2 - 2004-05-11 Eduardo Fernandes <eduardo@modalsistemas.com.br>
  *
- * Revision to proper working with tab columns.
- * See teditor.prg and memoedit.prg to more details.
+ *  - Revision to proper working with tab columns.
+ *    See teditor.prg and memoedit.prg to more details.
+ *
+ * v.1.3 - 2004-06-03 Eduardo Fernandes <eduardo@modalsistemas.com.br>
+ *
+ *  - Added # include "common.ch" to better DATA vars initialization in
+ *    New() Method.
  */
-
- */
-
+ 
+#include "common.ch"
 #include "hbclass.ch"
 
 CLASS HBTextLine
@@ -70,15 +73,20 @@ CLASS HBTextLine
                     //           .NIL. if text line end with null char
    DATA aTabCol     // array to save/restore tab columns
 
-   METHOD New( cLine, lSoftCR , aTab )
+   METHOD New( cLine, lEOL , aTab )
 
 ENDCLASS
 
-// Creates a new line of text
-METHOD New( cLine, lSoftCR, aTab ) CLASS HBTextLine
+// Create a new line of text
+METHOD New( cLine, lEOL, aTab ) CLASS HBTextLine
 
-   ::cText   := iif( Empty( cLine ), "", cLine )
-   ::lSoftCR := iif( Empty( lSoftCR ), NIL, lSoftCR )
-   ::aTabCol := iif( Empty( aTab ) , {}, aTab )
+   default cLine to ""
+   default lEOL to nil
+   default aTab to {}
+   
+   ::cText   := cLine
+   ::lSoftCR := lEOL
+   ::aTabCol := aTab
 
 RETURN Self
+

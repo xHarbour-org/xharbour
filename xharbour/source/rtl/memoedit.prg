@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.21 2004/05/15 22:35:32 modalsist Exp $
+ * $Id: memoedit.prg,v 1.23 2004/06/06 23:15:00 modalsist Exp $
  */
 
 /*
@@ -52,26 +52,37 @@
 //-------------------------------------------------------------------//
 
 /*
- * Eduardo Fernandes <eduardo@modalsistemas.com.br>
+ * 
  *
- * v.1.19
+ * v.1.19 - Eduardo Fernandes <eduardo@modalsistemas.com.br>
  * Revision to proper working with tab columns, CTRL_T behaviour and other things.
  * See teditor.prg and ttextlin.prg to more details.
  *
- * v.1.20
+ * v.1.20  - Eduardo Fernandes <eduardo@modalsistemas.com.br>
  * Fixed bug in read only mode when call an user function and press Tab key, reported by 
  * Stephan Hennekens. 
  * 
- * v.1.21 - 2004/05/15
+ * v.1.21 - 2004/05/15 - Eduardo Fernandes <eduardo@modalsistemas.com.br>
  * Fixed word-wrap control in memoedit.prg through <nLineLength> parameter.
  * 
  * if nLineLength < 0 then word-wrap = false like Clipper.
  * if nLineLength = 0 or null, then word-wrap = true and wordwrapcol = nRight - nLeft + 1.
  * if nLineLength > 0 then word-wrap = true and wordwrapcol = nLineLength
  *
- *
  * v.1.22 - 2004/06/04     Vicente Guerra <vicente@guerra.com.mx>
  * Send ProcName() and ProcLine() in SETKEY() procedure calls.
+ *
+ * v.1.23 - 2004/05/28 - Eduardo Fernandes <eduardo@modalsistemas.com.br> 
+ *
+ * Fixes made by Ath <ath@ath.myweb.nl>
+ * Major concern is the handling of UDF by memoedit, especially in R/O mode.
+ *
+ * Changes made by Eduardo Fernandes
+ *
+ * ::Procname and ::ProcLine are renamed to ::cProcName and ::nProcLine to better name
+ * convention.
+ *
+ * ::nLineLenght is initialized with NIL. This value is properly treated in teditor.prg.
  *
  */
 
@@ -135,13 +146,13 @@ METHOD Edit() CLASS TMemoEditor
    // NOTE: K_ALT_W is not compatible with clipper exit memo and save key, but I cannot discriminate
    //       K_CTRL_W and K_CTRL_END from harbour code.
    //
-   local aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_V, K_ALT_W, K_ESC }
+//   local aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_V, K_ALT_W, K_ESC }   // Not needed any longer, Ath 2004-05-25
    local bKeyBlock
 
    // If I have an user function I need to trap configurable keys and ask to
    // user function if handle them the standard way or not
    //
-   if ::lEditAllow .AND. ISCHARACTER( ::xUserFunction )
+   if ISCHARACTER( ::xUserFunction )  // Removed '::lEditAllow' condition, Ath 2004-05-25
 
       while !( ::lExitEdit )
 
@@ -154,19 +165,26 @@ METHOD Edit() CLASS TMemoEditor
 
          nKey := Inkey( 0 )
 
-         if ( bKeyBlock := Setkey( nKey ) ) <> NIL
-            // Pass Self as 4th. parameter
-            Eval( bKeyBlock, ::ProcName, ::ProcLine, "", Self )
-            Loop
-         endif
+         //  Ath 2004-05-25: All keys should be processed by the UDF before internal processing continues
 
-         // Is it a configurable key ?
-         //
-         if nKey IN aConfigurableKeys
-            nUserKey := ::xDo( iif( ::lDirty, ME_UNKEYX, ME_UNKEY ) )
-            ::HandleUserKey( nKey, nUserKey )
+         nUserKey := ::xDo( iif( ::lDirty, ME_UNKEYX, ME_UNKEY ) )
+
+         if nUserkey <> nil
+            ::HandleUserKey( nKey, @nUserKey )       // Optionally delete nHandleKey content if NOT used, Ath 2004-05-25
+
+            if nUserkey = nil
+               super:Edit( nKey )
+            endif
 
          else
+            // Evaluate SetKey settings *after* the user-function is called, just like Clipper, Ath 2004-05-25
+            if ( bKeyBlock := Setkey( nKey ) ) <> NIL
+ //            Eval( bKeyBlock, Self )                // 7/01/2004 12:47p.m. Pass Self as parameter
+               // Pass Self as 4th. parameter
+               Eval( bKeyBlock, ::cProcName, ::nProcLine, "", Self ) 
+             Loop
+            endif
+
             super:Edit( nKey )
 
          endif
@@ -174,7 +192,7 @@ METHOD Edit() CLASS TMemoEditor
       enddo
 
    else
-      // If I can't edit text buffer or there is not a user function enter standard HBEditor
+      // If there is not a user function enter standard HBEditor
       // ::Edit() method which is able to handle everything
       //
       super:Edit()
@@ -223,7 +241,7 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
                              K_SH_F1,K_SH_F2,K_SH_F3,K_SH_F4,K_SH_F5,K_SH_F6,K_SH_F7,K_SH_F8,K_SH_F9,K_SH_F10,K_SH_F11,K_SH_F12,;
                              K_CTRL_F1,K_CTRL_F2,K_CTRL_F3,K_CTRL_F4,K_CTRL_F5,K_CTRL_F6,K_CTRL_F7,K_CTRL_F8,K_CTRL_F9,K_CTRL_F10,K_CTRL_F11,K_CTRL_F12,;
                              K_ALT_F1,K_ALT_F2,K_ALT_F3,K_ALT_F4,K_ALT_F5,K_ALT_F6,K_ALT_F7,K_ALT_F8,K_ALT_F9,K_ALT_F10,K_ALT_F11,K_ALT_F12 }
-                           
+
 
    if nUserKey <> nil
       Switch nUserKey
@@ -255,13 +273,13 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
          case 14
          case 15
          case 16
-         case 17 
+         case 17
          case 18
          case 19
          case 20
          case 21
          case 22
-         case 23  
+         case 23
          case 24
          case 25
          case 26
@@ -310,8 +328,8 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
             exit
 
          default
-            // Do nothing
-
+            // Do nothing, tell caller we couldn't handle the key, Ath 2004-05-25
+            nUserKey := nil
       end
    endif
 
@@ -356,18 +374,18 @@ FUNCTION MemoEdit(cString,;         // same as Clipper
                   nWindowRow,;      // idem
                   nWindowColumn,;   // idem
                   lToggleExitSave)  // new parameter, xHarbour option.
-                                    // this change CTRL-W by CTRL-Q to finish edit with save. 
-                                    // Default is CTRL-W as Clipper, but in xHarbour CTRL-W 
+                                    // this change CTRL-W by CTRL-Q to finish edit with save.
+                                    // Default is CTRL-W as Clipper, but in xHarbour CTRL-W
                                     // have same behaviour as CTRL-END.
 
-   LOCAL oEd 
-   
+   LOCAL oEd
+
    DEFAULT nTop            TO 0
    DEFAULT nLeft           TO 0
    DEFAULT nBottom         TO MaxRow()
    DEFAULT nRight          TO MaxCol()
    DEFAULT lEditMode       TO .T.
-   DEFAULT nLineLength     TO 0 
+   DEFAULT nLineLength     TO nil 
    DEFAULT nTabSize        TO 4
    DEFAULT nTextBuffRow    TO 1
    DEFAULT nTextBuffColumn TO 0
@@ -375,22 +393,12 @@ FUNCTION MemoEdit(cString,;         // same as Clipper
    DEFAULT nWindowColumn   TO nTextBuffColumn
    DEFAULT cString         TO ""
    DEFAULT lToggleExitSave TO .F.  // Toogle betewn CTRL-W/CTRL-Q. Default is CTRL-W
-   
+
    if !ISLOGICAL( cUserFunction ) .AND. Empty( cUserFunction )
       cUserFunction = nil
    endif
 
-   // if nLineLength < 0  Word Wrap will be seted to false in HBEditor, otherwise true.
-   IF nLineLength == 0
-      nLineLength := nRight - nLeft + 1 
-   ENDIF   
 
-
-// Original MemoEdit() converts Tabs into spaces;
-//   oEd := TMemoEditor():New( StrTran( cString, Chr( K_TAB ), Space( 1 ) ), nTop, nLeft, nBottom, nRight, ;
-//              lEditMode, nLineLength, nTabSize, nTextBuffRow, nTextBuffColumn, nWindowRow, nWindowColumn )
-
-// Now Tabs is trated properly in HBEditor
    oEd := TMemoEditor():New( cString ,;
                              nTop, nLeft,;
                              nBottom, nRight, ;
@@ -403,8 +411,8 @@ FUNCTION MemoEdit(cString,;         // same as Clipper
                              nWindowColumn,;
                              lToggleExitSave )
 
-   oEd:ProcName := ProcName( 1 )
-   oEd:ProcLine := ProcLine( 1 )
+   oEd:cProcName := ProcName( 1 )
+   oEd:nProcLine := ProcLine( 1 )
 
    oEd:MemoInit( cUserFunction )
    oEd:RefreshWindow()
