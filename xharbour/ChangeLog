@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1204 2003/07/01 01:41:35 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1205 2003/07/01 05:20:57 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-01 01:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  - contrib/Whoo/source/TControl.prg
+  - contrib/Whoo/source/TCustomControl.prg
+  - contrib/Whoo/source/TCustomImageList.prg
+  - contrib/Whoo/source/THintWindow.prg
+  - contrib/Whoo/source/TWinControl.prg
+  + contrib/Whoo/source/controls.prg
+    - Folded TControl, TCustomControl, TImageList, THintWindow and TWinControl into controls.prg
+  * contrib/Whoo/makefile.bc
+    * Updatated as per above.
+
+  * source/rtl/set.c
+    + Added support for 3rd paramater lAppend to SET( _SET_TRACEFILE, <NewFile>, [<lAppend>] ).
+      /* Now when switching between files, content may be preserved. */
+
+  * source/vm/hvm.c
+    ! Fixed 2 GPF risks, related to a BREAK ( or Throw() ) issued from within a FOR EACH ... or WITH OBJECT ...
+      /*
+         NOTE! I discovered that FOR EACH ... and WITH OBJECT ... are NOT Thread Safe - we need to move:
+         hb_vm_wEnumCollectionCounter, hb_vm_aEnumCollection, and hb_vm_awEnumIndex, to HB_VM_STACK.
+         Same for: hb_vm_aWithObject, and hb_vm_wWithObjectCounter.
+
+         Giancarlo, can you please address this?
+      */
 
 2003-07-01 02:10 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source\lang\msges.c

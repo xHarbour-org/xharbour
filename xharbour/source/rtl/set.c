@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.21 2003/03/19 08:50:11 ronpinkas Exp $
+ * $Id: set.c,v 1.22 2003/05/06 08:53:08 druzus Exp $
  */
 
 /*
@@ -918,14 +918,29 @@ HB_FUNC( SET )
           break;
        case HB_SET_TRACEFILE :
           hb_retc( (char *) ( hb_set.HB_SET_TRACEFILE ) );
+
           if( args > 1 && HB_IS_STRING( pArg2 ) )
           {
              FILE *fpTrace;
+             BOOL bAppend = FALSE;
 
              strcpy( hb_set.HB_SET_TRACEFILE, pArg2->item.asString.value );
 
              /* Create trace.log for tracing. */
-             fpTrace = fopen( (char *) (hb_set.HB_SET_TRACEFILE), "w" );
+             if( args > 2 && HB_IS_LOGICAL( pArg3 ) )
+             {
+                bAppend = pArg3->item.asLogical.value;
+             }
+
+             if( bAppend )
+             {
+                fpTrace = fopen( (char *) (hb_set.HB_SET_TRACEFILE), "wa" );
+             }
+             else
+             {
+                fpTrace = fopen( (char *) (hb_set.HB_SET_TRACEFILE), "w" );
+             }
+
              if( fpTrace )
              {
                 fclose( fpTrace );
