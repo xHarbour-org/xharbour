@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.26 2002/01/26 02:03:43 ronpinkas Exp $
+ * $Id: hvm.c,v 1.27 2002/01/26 05:24:29 ronpinkas Exp $
  */
 
 /*
@@ -1121,6 +1121,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             short iAdd = ( short ) ( pCode[ w + 2 ] + ( pCode[ w + 3 ] * 256 ) );
             double dNewVal;
 
+            w += 4;
+
             if( HB_IS_BYREF( pLocal ) )
             {
                pLocal = hb_itemUnRef( pLocal );
@@ -1141,6 +1143,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                   dNewVal = pLocal->item.asDouble.value + iAdd;
                }
             }
+            else if( HB_IS_DATE( pLocal ) )
+            {
+               pLocal->item.asDate.value += iAdd;
+               break;
+            }
             else
             {
                PHB_ITEM pAdd = hb_itemPutNI( NULL, ( int ) iAdd );
@@ -1151,7 +1158,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                if( pResult )
                {
                   hb_itemForwardValue( pLocal, pResult );
-                  w += 4;
                   break;
                }
             }
@@ -1175,7 +1181,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                pLocal->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
             }
 
-            w += 4;
             break;
          }
 
@@ -1209,6 +1214,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             short iAdd = ( short ) ( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
             double dNewVal;
 
+            w += 3;
+
             if( HB_IS_NUMERIC( pTop ) )
             {
                if( pTop->type & HB_IT_INTEGER )
@@ -1224,6 +1231,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                   dNewVal = pTop->item.asDouble.value + iAdd;
                }
             }
+            else if( HB_IS_DATE( pTop ) )
+            {
+               pTop->item.asDate.value += iAdd;
+               break;
+            }
             else
             {
                PHB_ITEM pAdd    = hb_itemPutNI( NULL, ( int ) iAdd );
@@ -1234,7 +1246,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                if( pResult )
                {
                   hb_itemForwardValue( pTop, pResult );
-                  w += 3;
                   break;
                }
             }
@@ -1258,7 +1269,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                pTop->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
             }
 
-            w += 3;
             break;
          }
 
