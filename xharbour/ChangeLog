@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.569 2003/01/01 20:58:47 jonnymind Exp $
+ * $Id: ChangeLog,v 1.570 2003/01/02 03:31:01 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-02-01 04:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+2003-01-02 04:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/hbstack.h
     * Default compilation is now WITHOUT threads; -DHB_THREAD_SUPPORT
       must be specified for thread functions to be included.
