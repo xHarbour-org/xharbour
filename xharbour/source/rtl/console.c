@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.3 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: console.c,v 1.4 2002/04/28 20:18:43 lculik Exp $
  */
 
 /*
@@ -271,8 +271,10 @@ static void hb_conOutAlt( char * pStr, ULONG ulLen )
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       if (!hb_set.hb_set_winprinter)
           hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
+#if defined(HB_OS_WIN_32)
       else  
           WriteStringtoPrint(pStr);
+#endif
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
       s_uiPCol += ( USHORT ) ulLen;
    }
@@ -289,8 +291,10 @@ static void hb_conOutDev( char * pStr, ULONG ulLen )
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       if (!hb_set.hb_set_winprinter)
           hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
+#if defined(HB_OS_WIN_32)
       else  
           WriteStringtoPrint(pStr);
+#endif
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
       s_uiPCol += ( USHORT ) ulLen;
    }
@@ -353,10 +357,11 @@ HB_FUNC( QOUT )
       if (!hb_set.hb_set_winprinter)
           while( uiCount-- > 0 )
              hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
+#if defined(HB_OS_WIN_32)
       else
           while( uiCount-- > 0 )
             WriteStringtoPrint(" ");
-
+#endif
         
 
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
@@ -372,8 +377,10 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       if (!hb_set.hb_set_winprinter)
           hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
+#if defined(HB_OS_WIN_32)
       else
           WinPrinterEject();
+#endif
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
 
@@ -406,19 +413,22 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
 
       if( uiProw < s_uiPRow )
       {
-         if (hb_set.hb_set_winprinter)
-            WinPrinterEject();
-         else
+         if (!hb_set.hb_set_winprinter)
             hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
+#if defined(HB_OS_WIN_32)          
+         else
+            WinPrinterEject();
+      #endif
          s_uiPRow = s_uiPCol = 0;
       }
 
       for( uiCount = s_uiPRow; uiCount < uiProw; uiCount++ )
         if (!hb_set.hb_set_winprinter)        
          hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
+#if defined(HB_OS_WIN_32)
         else
          WriteStringtoPrint(s_szCrLf);
-
+#endif
       if( uiProw > s_uiPRow )
          s_uiPCol = 0;
 
@@ -427,9 +437,10 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
       for( uiCount = s_uiPCol; uiCount < uiPcol; uiCount++ )
         if (!hb_set.hb_set_winprinter)        
             hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
+#if defined(HB_OS_WIN_32)
         else
             WriteStringtoPrint(" ");
-
+#endif
       s_uiPRow = uiProw;
       s_uiPCol = uiPcol;
 

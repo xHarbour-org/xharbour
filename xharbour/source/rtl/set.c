@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.6 2002/03/31 02:56:32 ronpinkas Exp $
+ * $Id: set.c,v 1.7 2002/04/28 20:18:43 lculik Exp $
  */
 
 /*
@@ -174,6 +174,7 @@ static void close_binary( FHANDLE handle )
       hb_fsSetError( user_ferror );
    }
 }
+#if defined(HB_OS_WIN_32)
 static void close_binarywin( FHANDLE handle )
 {
    HB_TRACE(HB_TR_DEBUG, ("close_binarywin(%p)", handle));
@@ -188,7 +189,7 @@ static void close_binarywin( FHANDLE handle )
    }
 }
 
-
+#endif
 static void close_text( FHANDLE handle )
 {
    HB_TRACE(HB_TR_DEBUG, ("close_text(%p)", handle));
@@ -205,6 +206,7 @@ static void close_text( FHANDLE handle )
       hb_fsSetError( user_ferror );
    }
 }
+#if defined(HB_OS_WIN_32)
 static FHANDLE openw_handle(char *szPrinter,HB_set_enum set_specifier)
 {
    FHANDLE hHandle;
@@ -228,7 +230,7 @@ static FHANDLE openw_handle(char *szPrinter,HB_set_enum set_specifier)
     }
  return hHandle;
 }
-
+#endif
 static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_set_enum set_specifier )
 {
    USHORT user_ferror;
@@ -592,15 +594,16 @@ HB_FUNC( SET )
             /* If the print file is not already open, open it in overwrite mode. */
             hb_set.HB_SET_DEVICE = set_string( pArg2, hb_set.HB_SET_DEVICE );
 
-            if ( !hb_set.hb_set_winprinter){
+            if ( !hb_set.hb_set_winprinter) 
                 if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_printhan == FS_ERROR
                 && hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0 )
                    hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, FALSE, ".prn", HB_SET_PRINTFILE );
-            }
+      #if defined(HB_OS_WIN_32)            
             else
                 if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_winhan == FS_ERROR
                 && hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0 )
                    hb_set.hb_set_winhan = openw_handle(sPrinterName,HB_SET_PRINTFILE);
+      #endif
          }
          break;
       case HB_SET_EPOCH      :
@@ -746,10 +749,12 @@ HB_FUNC( SET )
 
             if (!hb_set.hb_set_winprinter)
                close_binary( hb_set.hb_set_printhan );
+#if defined(HB_OS_WIN_32)
             else{
                hb_set.hb_set_winprinter=FALSE;
                close_binarywin(hb_set.hb_set_winhan);
                }
+#endif
             /* Just Open an New File if is not an Printer Name Or an
             Printer Job Name */
 
