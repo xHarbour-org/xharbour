@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.39 2004/08/05 16:41:42 paultucker Exp $
+# $Id: hrbdll.vc,v 1.40 2004/08/27 05:42:13 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -530,6 +530,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ctmath.obj \
   $(OBJ_DIR)\ctmath2.obj \
   $(OBJ_DIR)\ctnet.obj \
+  $(OBJ_DIR)\ctpad.obj \
   $(OBJ_DIR)\ctset.obj \
   $(OBJ_DIR)\ctstr.obj \
   $(OBJ_DIR)\dbftools.obj \
@@ -544,7 +545,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\num1.obj \
   $(OBJ_DIR)\numat.obj \
   $(OBJ_DIR)\numlohi.obj \
-  $(OBJ_DIR)\pad.obj \
   $(OBJ_DIR)\pos1.obj \
   $(OBJ_DIR)\pos2.obj \
   $(OBJ_DIR)\posdiff.obj \
@@ -614,7 +614,7 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
         /DLL \
         /IMPLIB:LIB\vc\harbour.lib \
         /NOLOGO \
-        /DEFAULTLIB:user32.lib advapi32.lib gdi32.lib libcmt.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib \
+        /DEFAULTLIB:user32.lib advapi32.lib gdi32.lib libcmt.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib mpr.lib\
         /SUBSYSTEM:WINDOWS \
         /OPT:WIN98 \
         $(HARBOUR_DLL_OBJS)
@@ -2100,6 +2100,9 @@ $(OBJ_DIR)\ctmath2.obj : $(CT_DIR)\ctmath2.c
 $(OBJ_DIR)\ctnet.obj : $(CT_DIR)\ctnet.c
   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
+$(OBJ_DIR)\ctpad.obj : $(CT_DIR)\ctpad.c
+  $(CC) $(CLIBFLAGS) /Fo$@ $**
+
 $(OBJ_DIR)\ctset.obj : $(CT_DIR)\ctset.c
   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
@@ -2140,9 +2143,6 @@ $(OBJ_DIR)\numat.obj : $(CT_DIR)\numat.c
   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\numlohi.obj : $(CT_DIR)\numlohi.c
-  $(CC) $(CLIBFLAGS) /Fo$@ $**
-
-$(OBJ_DIR)\pad.obj : $(CT_DIR)\pad.c
   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\pos1.obj : $(CT_DIR)\pos1.c
@@ -2238,7 +2238,7 @@ $(OBJ_DIR)\datetime.obj : $(OBJ_DIR)\datetime.c
 $(OBJ_DIR)\dattime2.c : $(CT_DIR)\dattime2.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\dbgtwin.obj : $(OBJ_DIR)\dbgtwin.c
+$(OBJ_DIR)\dattime2.obj : $(OBJ_DIR)\dattime2.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\dattime3.c : $(CT_DIR)\dattime3.prg

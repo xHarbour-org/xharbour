@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.54 2004/08/05 16:41:42 paultucker Exp $
+# $Id: hrbdll.bc,v 1.55 2004/08/27 05:42:13 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -477,6 +477,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ctmath.obj \
   $(OBJ_DIR)\ctmath2.obj \
   $(OBJ_DIR)\ctnet.obj \
+  $(OBJ_DIR)\ctpad.obj \
   $(OBJ_DIR)\ctset.obj \
   $(OBJ_DIR)\ctstr.obj \
   $(OBJ_DIR)\dbftools.obj \
@@ -491,7 +492,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\num1.obj \
   $(OBJ_DIR)\numat.obj \
   $(OBJ_DIR)\numlohi.obj \
-  $(OBJ_DIR)\pad.obj \
   $(OBJ_DIR)\pos1.obj \
   $(OBJ_DIR)\pos2.obj \
   $(OBJ_DIR)\posdiff.obj \
@@ -979,6 +979,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\ctmath.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\ctmath2.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\ctnet.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\ctpad.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\ctset.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\ctstr.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\dbftools.obj          + >> hdll.tmp
@@ -993,7 +994,6 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\num1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\numat.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\numlohi.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\pad.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\pos1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\pos2.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\posdiff.obj           + >> hdll.tmp
@@ -1031,6 +1031,7 @@ $(HARBOUR_DLL)  : \
   echo. ,                                + >> hdll.tmp
   echo. cw32.lib                         + >> hdll.tmp
   echo. import32.lib                     + >> hdll.tmp
+  echo. mpr.lib                          + >> hdll.tmp
   echo. uuid.lib                           >> hdll.tmp
   ILINK32 -aa -Tpd -Gn @hdll.tmp
 
@@ -2593,6 +2594,9 @@ $(OBJ_DIR)\ctmath2.obj : $(CT_DIR)\ctmath2.c
 $(OBJ_DIR)\ctnet.obj : $(CT_DIR)\ctnet.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\ctpad.obj : $(CT_DIR)\ctpad.c
+  $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\ctset.obj : $(CT_DIR)\ctset.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -2633,9 +2637,6 @@ $(OBJ_DIR)\numat.obj : $(CT_DIR)\numat.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\numlohi.obj : $(CT_DIR)\numlohi.c
-  $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\pad.obj : $(CT_DIR)\pad.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pos1.obj : $(CT_DIR)\pos1.c
