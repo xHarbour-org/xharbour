@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.59 2003/06/03 04:08:55 druzus Exp $
+ * $Id: classes.c,v 1.60 2003/06/06 06:45:09 druzus Exp $
  */
 
 /*
@@ -505,6 +505,12 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
             pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
          }
       #else
+         if( strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0  && pBase != HB_VM_STACK.pItems );
+         {
+            // Backtrack 1 level.
+            pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+         }
+
          if( HB_IS_BLOCK( *( pBase + 1 ) ) || strcmp( ( *pBase )->item.asSymbol.value->szName, "AEVAL" ) == 0 )
          {
             PHB_ITEM pBlock;
@@ -2355,7 +2361,7 @@ HB_FUNC( __OBJSENDMSG )
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 3000, NULL, "__OBJSENDMSG", 0 );
+      hb_errRT_BASE( EG_ARG, 3000, NULL, "__OBJSENDMSG", 2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ) );
    }
 }
 
