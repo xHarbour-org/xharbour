@@ -1,5 +1,5 @@
 /*
- * $Id: scroll.c,v 1.1.1.1 2001/12/21 10:42:02 ronpinkas Exp $
+ * $Id: scroll.c,v 1.2 2003/09/22 18:30:40 ronpinkas Exp $
  */
 
 /*
@@ -65,55 +65,67 @@ HB_FUNC( SCROLL )
    int iBottom;
    int iRight;
 
-   /* Enforce limits of (0,0) to (MAXROW(),MAXCOL()) */
+   PHB_ITEM pBottom, pRight;
 
-   if( hb_pcount() == 0 )
+   iTop = hb_parni( 1 );
+   if( iTop < 0 )
    {
-      iTop    = 0;
-      iLeft   = 0;
-      iBottom = iMaxRow;
-      iRight  = iMaxCol;
+      iTop = 0;
    }
-   else
+   else if( iTop > iMaxRow )
    {
-      iTop = hb_parni( 1 ); /* Defaults to zero on bad type */
-      if( iTop < 0 )
-      {
-         iTop = 0;
-      }
-      else if( iTop > iMaxRow )
-      {
-         iTop = iMaxRow;
-      }
+      iTop = iMaxRow;
+   }
 
-      iLeft = hb_parni( 2 ); /* Defaults to zero on bad type */
-      if( iLeft < 0 )
-      {
-         iLeft = 0;
-      }
-      else if( iLeft > iMaxCol )
-      {
-         iLeft = iMaxCol;
-      }
+   iLeft = hb_parni( 2 );
+   if( iLeft < 0 )
+   {
+      iLeft = 0;
+   }
+   else if( iLeft > iMaxCol )
+   {
+      iLeft = iMaxCol;
+   }
 
+   pBottom = hb_parni( 3 );
+   if( pBottom )
+   {
       iBottom = hb_parni( 3 );
       if( iBottom < iTop )
       {
          return;
       }
+      else if( iBottom > iMaxRow )
+      {
+         iBottom = iMaxRow;
+      }
+   }
+   else
+   {
+      iBottom = iMaxRow;
+   }
 
-      iRight = hb_parni( 4 );
+   pRight = hb_parni( 4 );
+   if( pRight )
+   {
       if( iRight <= iLeft )
       {
          return;
       }
+      else if( iRight > iMaxCol )
+      {
+         iRight = iMaxCol;
+      }
+   }
+   else
+   {
+      iRight = iMaxCol;
    }
 
    hb_gtScroll( ( USHORT ) iTop,
                 ( USHORT ) iLeft,
                 ( USHORT ) iBottom,
                 ( USHORT ) iRight,
-                hb_parni( 5 ), /* Defaults to zero on bad type */
+                hb_parni( 5 ),   /* Defaults to zero on bad type */
                 hb_parni( 6 ) ); /* Defaults to zero on bad type */
 }
-
