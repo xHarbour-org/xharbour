@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.11 2002/10/09 03:43:21 druzus Exp $
+ * $Id: console.c,v 1.12 2002/12/15 23:06:02 ronpinkas Exp $
  */
 
 /*
@@ -69,6 +69,7 @@
  *
  */
 #define HB_OS_WIN_32_USED
+
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapifs.h"
@@ -266,7 +267,7 @@ void hb_conOutAlt( char * pStr, ULONG ulLen )
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       if (!hb_set.hb_set_winprinter)
           hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) && (!defined(__MINGW32__))
+#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
       else
           WriteStringtoPrint(pStr);
 #endif
@@ -287,7 +288,7 @@ static void hb_conOutDev( char * pStr, ULONG ulLen )
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       if (!hb_set.hb_set_winprinter)
           hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) && (!defined(__MINGW32__))
+#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
       else
           WriteStringtoPrint(pStr);
 #endif
@@ -354,7 +355,7 @@ HB_FUNC( QOUT )
       if (!hb_set.hb_set_winprinter)
           while( uiCount-- > 0 )
              hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) && (!defined(__MINGW32__))
+#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
       else
           while( uiCount-- > 0 )
             WriteStringtoPrint(" ");
@@ -375,7 +376,7 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       if (!hb_set.hb_set_winprinter)
           hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) && (!defined(__MINGW32__))
+#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
       else
           WinPrinterEject();
 #endif
@@ -414,7 +415,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
       {
          if (!hb_set.hb_set_winprinter)
             hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) && (!defined(__MINGW32__))
+#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
          else
             WriteStringtoPrint("\x0C\x0D");
 #endif
@@ -424,7 +425,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
       for( uiCount = s_uiPRow; uiCount < uiProw; uiCount++ )
         if (!hb_set.hb_set_winprinter)
          hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) && (!defined(__MINGW32__))
+#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
         else
          WriteStringtoPrint(s_szCrLf);
 #endif
@@ -440,7 +441,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
              hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D", 1 );
              s_uiPCol = 0;
              }
-         #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) && (!defined(__MINGW32__))
+         #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
          else
             {
              WriteStringtoPrint("\x0D");
@@ -454,7 +455,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
       for( uiCount = s_uiPCol; uiCount < uiPcol; uiCount++ )
         if (!hb_set.hb_set_winprinter)
             hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) && (!defined(__MINGW32__))
+#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
         else
             WriteStringtoPrint(" ");
 #endif

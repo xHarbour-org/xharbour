@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.12 2001/12/26 21:21:08 dholm Exp $
+# $Id: mingw32.cf,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -65,6 +65,8 @@ endif
 ifneq ($(LNK_USR_LIB),)
 LINKLIBS += $(foreach lib, $(LNK_USR_LIB), -l$(lib))
 endif
+
+LINKLIBS += -luser32 -lwinspool -lole32 -loleaut32 -luuid
 
 # The -) option could be appropriate to link against libraries with
 # cyclic dependencies, but I think it is not really necessary if the

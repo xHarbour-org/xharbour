@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.526 2002/12/15 23:05:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.528 2002/12/15 23:48:01 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-15 22:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * config/rules.cf
+    ! Removed extra endif
+
+  * config/w32/mingw32.cf
+    + Added: LINKLIBS += -luser32 -lwinspool -lole32 -loleaut32 -luuid
+
+  - include/tprint.hpp
+  - source/rtl/tprinter.cpp
+  - source/rtl/tprint.cpp
+  + source/rtl/tprint.c
+  + source/rtl/tprinter.c
+    -+ Replaced C++ implementation with C.
+
+  /* Luiz: I wish I understood WHY you coded that in C++??? */
+
+  * source/rtl/Makefile
+    - Removed tprint.cpp and tprinter.cpp
+    - Added tprint.c and tprinter.c
+
+  * source/rtl/console.c
+  * source/rtl/set.c
+    * Commented && (!defined(__MINGW32__))
+
+  * source/vm/arrays.c
+    - Removed unused var.
 
 2002-12-15 21:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   * config/c.cf

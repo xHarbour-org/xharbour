@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.30 2002/11/14 21:46:18 ronpinkas Exp $
+ * $Id: arrays.c,v 1.31 2002/11/18 14:50:05 map Exp $
  */
 
 /*
@@ -805,7 +805,7 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
 
       if( pBaseArray->pItems )
       {
-         HB_ITEM_PTR pItem = pBaseArray->pItems, pValue;
+         HB_ITEM_PTR pItem = pBaseArray->pItems; //, pValue;
          ULONG ulLen = pBaseArray->ulLen;
 
          while( ulLen-- )

@@ -1,5 +1,5 @@
 #
-# $Id: rules.cf,v 1.2 2002/12/15 23:06:01 ronpinkas Exp $
+# $Id: rules.cf,v 1.3 2002/12/15 23:44:48 lculik Exp $
 #
 
 # How to run yacc.
@@ -68,7 +68,6 @@ endif
 
 %$(OBJ_EXT) : %.cpp
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(?:.cpp=$(OBJ_EXT))
-endif
 
 # Rule to generate an executable file from an object file.
 %$(EXE_EXT) : %$(OBJ_EXT)
