@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.2 2003/09/12 20:12:33 paultucker Exp $
+# $Id: makefile.vc,v 1.3 2003/09/12 20:50:51 paultucker Exp $
 #
 
 !IF "$(OS)" == "Windows_NT"
@@ -8,33 +8,15 @@ NULL=
 NULL=nul
 !ENDIF
 
-OUTDIR=lib\vc
+OUTDIR=..\..\lib\vc
 INTDIR=obj\vc
 
 ALL : "$(OUTDIR)\hbzip.lib"
 
 CLEAN :
-	-@erase "$(INTDIR)\stdafx.obj"
-	-@erase "$(INTDIR)\zip.obj"
-	-@erase "$(INTDIR)\ziparchive.obj"
-	-@erase "$(INTDIR)\zipautobuffer.obj"
-	-@erase "$(INTDIR)\zipcentraldir.obj"
-	-@erase "$(INTDIR)\zipcollections.obj"
-	-@erase "$(INTDIR)\zipcomp.obj"
-	-@erase "$(INTDIR)\zipcompatibility.obj"
-	-@erase "$(INTDIR)\zipexception.obj"
-	-@erase "$(INTDIR)\zipfile.obj"
-	-@erase "$(INTDIR)\zipfileheader.obj"
-	-@erase "$(INTDIR)\zipinternalinfo.obj"
-	-@erase "$(INTDIR)\zipmemfile.obj"
-	-@erase "$(INTDIR)\zipnew.obj"
-	-@erase "$(INTDIR)\zippathcomponent.obj"
-	-@erase "$(INTDIR)\zipplatform.obj"
-	-@erase "$(INTDIR)\zipplatformcomm.obj"
-	-@erase "$(INTDIR)\zipstorage.obj"
-	-@erase "$(INTDIR)\ZipString.obj"
-	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(OUTDIR)\hbzip.lib"
+	-@if exist "$(INTDIR)\*.obj" del "$(INTDIR)\*.obj" >nul
+	-@if exist "$(INTDIR)\*.c" del "$(INTDIR)\*.c" >nul
+	-@if exist "$(OUTDIR)\hbzip.lib" del "$(OUTDIR)\hbzip.lib" >nul
 
 "$(OUTDIR)" :
     @if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -46,7 +28,7 @@ CPP=cl.exe
 CPP_PROJ=/nologo /TP /GB /ML /W3 /GX -Ogtyb2 /I "..\..\include" /Iinclude\
          /DWIN32 /DNDEBUG /D_MBCS /D_LIB\
          /Fp"$(INTDIR)\hbzip.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\"\
-         /FD /c
+         /FD /c $(CFLAGS)
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -59,21 +41,6 @@ CPP_PROJ=/nologo /TP /GB /ML /W3 /GX -Ogtyb2 /I "..\..\include" /Iinclude\
 <<
 
 .cxx{$(INTDIR)}.obj::
-   $(CPP) @<<
-   $(CPP_PROJ) $<
-<<
-
-.c{$(INTDIR)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $<
-<<
-
-.cpp{$(INTDIR)}.sbr::
-   $(CPP) @<<
-   $(CPP_PROJ) $<
-<<
-
-.cxx{$(INTDIR)}.sbr::
    $(CPP) @<<
    $(CPP_PROJ) $<
 <<
@@ -105,118 +72,4 @@ LIB32_OBJS= \
     $(LIB32) @<<
   $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
 <<
-
-
-SOURCE=stdafx.cpp
-
-"$(INTDIR)\stdafx.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zip.c
-
-"$(INTDIR)\zip.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=ziparchive.cpp
-
-"$(INTDIR)\ziparchive.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipautobuffer.cpp
-
-"$(INTDIR)\zipautobuffer.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipcentraldir.cpp
-
-"$(INTDIR)\zipcentraldir.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipcollections.cpp
-
-"$(INTDIR)\zipcollections.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipcomp.cpp
-
-"$(INTDIR)\zipcomp.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipcompatibility.cpp
-
-"$(INTDIR)\zipcompatibility.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipexception.cpp
-
-"$(INTDIR)\zipexception.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipfile.cpp
-
-"$(INTDIR)\zipfile.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipfileheader.cpp
-
-"$(INTDIR)\zipfileheader.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipinternalinfo.cpp
-
-"$(INTDIR)\zipinternalinfo.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipmemfile.cpp
-
-"$(INTDIR)\zipmemfile.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipnew.cpp
-
-"$(INTDIR)\zipnew.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zippathcomponent.cpp
-
-"$(INTDIR)\zippathcomponent.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipplatform.cpp
-
-"$(INTDIR)\zipplatform.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipplatformcomm.cpp
-
-"$(INTDIR)\zipplatformcomm.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=zipstorage.cpp
-
-"$(INTDIR)\zipstorage.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-SOURCE=ZipString.cpp
-
-"$(INTDIR)\ZipString.obj" : $(SOURCE) "$(INTDIR)"
-	$(CPP) $(CPP_PROJ) $(SOURCE)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.57 2003/09/15 15:40:12 ronpinkas Exp $
+ * $Id: tget.prg,v 1.58 2003/09/18 19:48:45 paultucker Exp $
  */
 
 /*
@@ -245,7 +245,7 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicMask := SubStr( cPicture, nAt + 1 )
       endif
 
-      AnalyzePicture( @::cPicFunc )
+//      AnalyzePicture( @::cPicFunc )
 
       if "D" IN ::cPicFunc
 
@@ -1715,6 +1715,7 @@ STATIC FUNCTION IsBadDate( cBuffer, cPicFunc )
 
  return .f.
 
+/*
 static procedure AnalyzePicture( cPicture )
    Local cChar, lS := .f.
 
@@ -1730,4 +1731,4 @@ static procedure AnalyzePicture( cPicture )
       endcase
    Next
 Return
-
+*/

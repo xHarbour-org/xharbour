@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1499 2003/09/22 18:30:36 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1500 2003/09/23 03:51:38 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-23 00:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * contrib\hbzlib\Makefile
+  * contrib\hbzlib\Make_b32.bat
+  * contrib\hbzlib\Make_vc.bat
+  * contrib\hbzlib\Makefile.bc
+  * contrib\hbzlib\Makefile.vc
+    * First of a set of changes to contribs make so they are all consistant
+    * other contribs will follow tomorrow along with a batch file to create all.
+  * source/rtl/tget.prg
+    * Commentout AnalyzePicture() call. Can someone tell me what the intended
+    * purpose of this was?
 
 2003-23-09 00:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/isprint.c

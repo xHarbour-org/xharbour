@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.8 2003/09/14 13:25:29 paultucker Exp $
+# $Id: makefile.bc,v 1.9 2003/09/14 15:01:28 paultucker Exp $
 #
 
 #
@@ -17,7 +17,7 @@ BCB = .
 !endif
 
 OBJ_DIR = obj\b32
-LIB_DIR = lib\b32
+LIB_DIR = ..\..\lib\b32
 
 IMPLIB  = Implib
 BCC32   = Bcc32 @bccw32.cfg
