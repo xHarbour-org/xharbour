@@ -1,5 +1,5 @@
 /*
- * $Id: hb_f.c,v 1.3 2001/06/14 07:32:15 brianhays Exp $
+ * $Id: hb_f.c,v 1.1 2003/04/14 16:09:13 lculik Exp $
  */
 
 /*
@@ -371,6 +371,7 @@ HB_FUNC( HB_FREADANDSKIP )
            ((*(b + x) == 10) && x < read-1 && (*(b + x + 1) == 13)) )
       {
          x += 2;
+         bHasCRLF = TRUE;
          break;
       }
       x++;
