@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.112 2004/07/19 20:57:54 peterrees Exp $
+ * $Id: filesys.c,v 1.113 2004/07/20 02:31:26 peterrees Exp $
  */
 
 /*
@@ -183,13 +183,17 @@
 
 #if defined( __DJGPP__ )
    #define HB_FS_GETDRIVE(n) ( n = getdisk() )
-   #define HB_FS_SETDRIVE(n, total) ( total = setdisk( n ) )
+   #define HB_FS_SETDRIVE(n) ( setdisk( n ) )
 #elif defined( __WATCOMC__ )
    #define HB_FS_GETDRIVE(n) ( _dos_getdrive( &( n ) ), --( n ) )
-   #define HB_FS_SETDRIVE(n, total) ( _dos_setdrive( ( n ) + 1, &( total ) ) )
+   #define HB_FS_SETDRIVE(n) \
+   { \
+      UINT uiDummy; \
+      _dos_setdrive( ( n ) + 1, uiDummy ); \
+   }
 #else
    #define HB_FS_GETDRIVE(n) ( ( ( n = _getdrive() ) < 65 ) ? --( n ) : ( (n) -= 65 ) )
-   #define HB_FS_SETDRIVE(n, total) ( _chdrive( ( n ) + 1 ) )
+   #define HB_FS_SETDRIVE(n) ( _chdrive( ( n ) + 1 ) )
 #endif
 
 #ifndef O_BINARY
@@ -2787,13 +2791,13 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 
    {
       /* 'unsigned int' _have to_ be used in Watcom */
-      UINT uiSave, uiNewDrive, uiDummy;
+      UINT uiSave, uiNewDrive;
 
       /* allowing async cancelation here */
       HB_TEST_CANCEL_ENABLE_ASYN
 
       HB_FS_GETDRIVE( uiSave );
-      HB_FS_SETDRIVE( nDrive, uiDummy );
+      HB_FS_SETDRIVE( nDrive );
       HB_FS_GETDRIVE( uiNewDrive );
 
       if ( nDrive == uiNewDrive )
@@ -2803,7 +2807,7 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
       }
       else
       {
-         HB_FS_SETDRIVE( uiSave, uiDummy );
+         HB_FS_SETDRIVE( uiSave );
 
          uiResult = (USHORT) FS_ERROR;
          hb_fsSetError( (USHORT) FS_ERROR );
@@ -2846,10 +2850,10 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
    {
       /* 'unsigned int' _have to_ be used in Watcom
        */
-      UINT uiSave, uiDummy, uiNewDrive;
+      UINT uiSave, uiNewDrive;
 
       HB_FS_GETDRIVE( uiSave );
-      HB_FS_SETDRIVE( nDrive, uiDummy );
+      HB_FS_SETDRIVE( nDrive );
       HB_FS_GETDRIVE( uiNewDrive );
       if( nDrive != uiNewDrive )
       {
@@ -2861,7 +2865,7 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
          uiResult = 0;
          hb_fsSetError( 0 );
       }
-      HB_FS_SETDRIVE( uiSave, uiDummy );
+      HB_FS_SETDRIVE( uiSave );
    }
 
    HB_STACK_LOCK
