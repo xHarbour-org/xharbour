@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_gc.bat,v 1.1 2005/02/17 08:03:07 andijahja Exp $
+rem $Id: make_gc.bat,v 1.2 2005/02/17 12:22:26 andijahja Exp $
 rem
 rem Batch File For Building xHarbour with MinGW32 under Windows
 rem
@@ -31,19 +31,19 @@ rem Set up our BIN paths
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
 
-if not exist %GCCOBJ%              md %GCCOBJ%
-if not exist %GCCLIB%              md %GCCLIB%
-if not exist %GCCBIN%              md %GCCBIN%
-if not exist %GCCOBJ%\opt          md %GCCOBJ%\opt
-if not exist %GCCOBJ%\unicode      md %GCCOBJ%\unicode
-if not exist %GCCOBJ%\libmisc      md %GCCOBJ%\libmisc
-if not exist %GCCOBJ%\nanfor       md %GCCOBJ%\nanfor
-if not exist %GCCOBJ%\libct        md %GCCOBJ%\libct
-if not exist %GCCOBJ%\html         md %GCCOBJ%\html
-if not exist %GCCOBJ%\design       md %GCCOBJ%\design
-if not exist %GCCOBJ%\rddads       md %GCCOBJ%\rddads
-if not exist %GCCOBJ%\opt\console  md %GCCOBJ%\opt\console
-if not exist %GCCOBJ%\opt\gui      md %GCCOBJ%\opt\gui
+if not exist %OBJ_DIR%              md %OBJ_DIR%
+if not exist %LIB_DIR%              md %LIB_DIR%
+if not exist %BIN_DIR%              md %BIN_DIR%
+if not exist %OBJ_DIR%\opt          md %OBJ_DIR%\opt
+if not exist %OBJ_DIR%\unicode      md %OBJ_DIR%\unicode
+if not exist %OBJ_DIR%\libmisc      md %OBJ_DIR%\libmisc
+if not exist %OBJ_DIR%\nanfor       md %OBJ_DIR%\nanfor
+if not exist %OBJ_DIR%\libct        md %OBJ_DIR%\libct
+if not exist %OBJ_DIR%\html         md %OBJ_DIR%\html
+if not exist %OBJ_DIR%\design       md %OBJ_DIR%\design
+if not exist %OBJ_DIR%\rddads       md %OBJ_DIR%\rddads
+if not exist %OBJ_DIR%\opt\console  md %OBJ_DIR%\opt\console
+if not exist %OBJ_DIR%\opt\gui      md %OBJ_DIR%\opt\gui
 
 :BUILD
 
@@ -60,30 +60,30 @@ if not exist %GCCOBJ%\opt\gui      md %GCCOBJ%\opt\gui
 
 :CLEAN
 
-if exist %GCCLIB%\*.a              del %GCCLIB%\*.a
-if exist %GCCBIN%\*.exe            del %GCCBIN%\*.exe
-if exist %GCCOBJ%\*.o              del %GCCOBJ%\*.o
-if exist %GCCOBJ%\*.c              del %GCCOBJ%\*.c
-if exist %GCCOBJ%\*.h              del %GCCOBJ%\*.h
-if exist %GCCOBJ%\*.output         del %GCCOBJ%\*.output
-if exist %GCCOBJ%\opt\*.o          del %GCCOBJ%\opt\*.o
-if exist %GCCOBJ%\unicode\*.o      del %GCCOBJ%\unicode\*.o
-if exist %GCCOBJ%\libmisc\*.o      del %GCCOBJ%\libmisc\*.o
-if exist %GCCOBJ%\nanfor\*.o       del %GCCOBJ%\nanfor\*.o
-if exist %GCCOBJ%\libct\*.o        del %GCCOBJ%\libct\*.o
-if exist %GCCOBJ%\design\*.o       del %GCCOBJ%\design\*.o
-if exist %GCCOBJ%\html\*.o         del %GCCOBJ%\html\*.o
-if exist %GCCOBJ%\rddads\*.o       del %GCCOBJ%\rddads\*.o
-if exist %GCCOBJ%\opt\console\*.o  del %GCCOBJ%\opt\console\*.o
-if exist %GCCOBJ%\opt\gui\*.o      del %GCCOBJ%\opt\gui\*.o
-if exist %GCCOBJ%\opt\*.c          del %GCCOBJ%\opt\*.c
-if exist %GCCOBJ%\unicode\*.c      del %GCCOBJ%\unicode\*.c
-if exist %GCCOBJ%\libmisc\*.c      del %GCCOBJ%\libmisc\*.c
-if exist %GCCOBJ%\nanfor\*.c       del %GCCOBJ%\nanfor\*.c
-if exist %GCCOBJ%\libct\*.c        del %GCCOBJ%\libct\*.c
-if exist %GCCOBJ%\rddads\*.c       del %GCCOBJ%\rddads\*.c
-if exist %GCCOBJ%\opt\console\*.c  del %GCCOBJ%\opt\console\*.c
-if exist %GCCOBJ%\opt\gui\*.c      del %GCCOBJ%\opt\gui\*.c
+if exist %LIB_DIR%\*.a              del %LIB_DIR%\*.a
+if exist %BIN_DIR%\*.exe            del %BIN_DIR%\*.exe
+if exist %OBJ_DIR%\*.o              del %OBJ_DIR%\*.o
+if exist %OBJ_DIR%\*.c              del %OBJ_DIR%\*.c
+if exist %OBJ_DIR%\*.h              del %OBJ_DIR%\*.h
+if exist %OBJ_DIR%\*.output         del %OBJ_DIR%\*.output
+if exist %OBJ_DIR%\opt\*.o          del %OBJ_DIR%\opt\*.o
+if exist %OBJ_DIR%\unicode\*.o      del %OBJ_DIR%\unicode\*.o
+if exist %OBJ_DIR%\libmisc\*.o      del %OBJ_DIR%\libmisc\*.o
+if exist %OBJ_DIR%\nanfor\*.o       del %OBJ_DIR%\nanfor\*.o
+if exist %OBJ_DIR%\libct\*.o        del %OBJ_DIR%\libct\*.o
+if exist %OBJ_DIR%\design\*.o       del %OBJ_DIR%\design\*.o
+if exist %OBJ_DIR%\html\*.o         del %OBJ_DIR%\html\*.o
+if exist %OBJ_DIR%\rddads\*.o       del %OBJ_DIR%\rddads\*.o
+if exist %OBJ_DIR%\opt\console\*.o  del %OBJ_DIR%\opt\console\*.o
+if exist %OBJ_DIR%\opt\gui\*.o      del %OBJ_DIR%\opt\gui\*.o
+if exist %OBJ_DIR%\opt\*.c          del %OBJ_DIR%\opt\*.c
+if exist %OBJ_DIR%\unicode\*.c      del %OBJ_DIR%\unicode\*.c
+if exist %OBJ_DIR%\libmisc\*.c      del %OBJ_DIR%\libmisc\*.c
+if exist %OBJ_DIR%\nanfor\*.c       del %OBJ_DIR%\nanfor\*.c
+if exist %OBJ_DIR%\libct\*.c        del %OBJ_DIR%\libct\*.c
+if exist %OBJ_DIR%\rddads\*.c       del %OBJ_DIR%\rddads\*.c
+if exist %OBJ_DIR%\opt\console\*.c  del %OBJ_DIR%\opt\console\*.c
+if exist %OBJ_DIR%\opt\gui\*.c      del %OBJ_DIR%\opt\gui\*.c
    goto EXIT
 
 :EXIT
