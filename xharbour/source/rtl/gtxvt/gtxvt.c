@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.25 2004/02/06 17:07:31 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.26 2004/02/09 16:31:24 jonnymind Exp $
  */
 
 /*
@@ -2513,10 +2513,26 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
 
             case Button4:
                button = map[3];
+               if ( evt->type == ButtonPress )
+               {
+                  status->lastMouseEvent = 0;
+               }
+               else
+               {
+                  status->lastMouseEvent = K_MWFORWARD;
+               }
             break;
 
             case Button5:
                button = map[4];
+               if ( evt->type == ButtonPress )
+               {
+                  status->lastMouseEvent = 0;
+               }
+               else
+               {
+                  status->lastMouseEvent = K_MWBACKWARD;
+               }
             break;
          }
 
@@ -4081,6 +4097,16 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
       }
    }
 
+   if (! bKey  && ( eventmask & INKEY_MWHEEL ) > 0)
+   {
+      if ( s_status->lastMouseEvent == K_MWFORWARD ||
+            s_status->lastMouseEvent == K_MWBACKWARD )
+      {
+         bKey = TRUE;
+         c = s_status->lastMouseEvent;
+         s_status->lastMouseEvent = 0;
+      }
+   }
    return ( bKey ? c : 0);
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2277 2004/02/13 16:52:25 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2278 2004/02/13 16:55:31 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-13 19:24 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/achoice.prg
+    * Added mouse support: a click selects, dbl click emulates K_ENTER
+      and mousewheel goes pgup/down
+
+  * source/rtl/gtxvt/gtxvt.c
+    * Added support for mouse wheel
+      (As currently middle mouse button is a shortcut for fast paste, and
+       all X applications are invited to follow this behavior, I have not
+       yet implemented middle mouse button up/down).
+
+  * tests/ac_test.prg
+    * Added an inkey() at the end to allow results display in windowed GTs.
 
 2004-02-13 17:53 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/menuto.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: ac_test.prg,v 1.1 1999/10/04 18:46:26 vszel Exp $
+ * $Id: ac_test.prg,v 1.1.1.1 2001/12/21 10:45:39 ronpinkas Exp $
  */
 
 *+====================================================================
@@ -155,7 +155,7 @@ local nChoice
 local ncntr
 
 clear screen
-
+SET EVENTMASK TO INKEY_ALL
 setcolor( 'GB+/B,GR+/R,,,W/N' )
 
 asize( aPermits, Len( aPrompts ) )
@@ -185,7 +185,9 @@ if nChoice > 0
    ? aPrompts[ nChoice ]
 endif
 setpos( maxrow() - 2, 0 )
-
+SET EVENTMASK TO INKEY_KEYBOARD
+? "Press a key to end"
+Inkey(0)
 return
 
 *+--------------------------------------------------------------------

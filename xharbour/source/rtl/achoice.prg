@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.13 2003/05/12 04:50:58 walito Exp $
+ * $Id: achoice.prg,v 1.14 2003/07/14 21:35:35 walito Exp $
  */
 
 /*
@@ -330,7 +330,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
             ENDIF
          ENDIF
 
-      CASE nKey == K_PGUP
+      CASE nKey == K_PGUP .OR. nKey == K_MWFORWARD 
 
          IF nPos == nFrstItem
             nMode := AC_HITTOP
@@ -367,7 +367,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
             ENDIF
          ENDIF
 
-      CASE nKey == K_PGDN
+      CASE nKey == K_PGDN .OR. nKey == K_MWBACKWARD
 
          IF nPos == nLastItem
             nMode := AC_HITBOTTOM
@@ -413,6 +413,21 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
       CASE nKey == K_ENTER .AND. !lUserFunc
          nMode     := AC_SELECT
          lFinished := .T.
+
+      CASE nKey == K_LBUTTONDOWN .or. (nKey == K_LDBLCLK .AND. !lUserFunc )
+         nNewPos := Hittest( nTop, nLeft, nBottom, nRight )
+
+         IF nNewPos >= 0
+            nNewPos += nAtTop
+            IF Eval( bSelect, alSelect[ nNewPos ] )
+               nPos := nNewPos
+            ENDIF
+         ENDIF
+
+         IF nKey == K_LDBLCLK
+            nMode     := AC_SELECT
+            lFinished := .T.
+         ENDIF
 
       CASE nKey == K_RIGHT .AND. !lUserFunc
          IF nPos > 0
@@ -470,7 +485,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
       OTHERWISE
 
          IF nMode != AC_NOITEM
-            IF nKey == 0  // No keystroke
+            IF nKey == 0 // No keystroke
                nMode := AC_IDLE
             ELSE
                nMode := AC_EXCEPT
@@ -480,6 +495,18 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
       ENDCASE
 
       IF lUserFunc
+
+         IF nKey == K_LDBLCLK
+            nNewPos := Hittest( nTop, nLeft, nBottom, nRight )
+            IF nNewPos >= 0
+               nNewPos += nAtTop
+               IF Eval( bSelect, alSelect[ nNewPos ] )
+                  nPos := nNewPos
+                  /* EMULATE ENTER */
+                  SetLastKey( K_ENTER )
+               ENDIF
+            ENDIF
+         ENDIF
 
          nUserFunc := Do( xUserFunc, nMode, nPos, nPos - nAtTop )
 
@@ -631,3 +658,14 @@ STATIC FUNCTION Ach_Limits( nFrstItem, nLastItem, nItems, bSelect, alSelect, acI
 
    RETURN nMode
 
+
+STATIC FUNCTION Hittest( nTop, nLeft, nBottom, nRight )
+   LOCAL nPos
+   LOCAL nMouseRow := MRow()
+   LOCAL nMouseCol := MCol()
+
+   nPos := iif( ;
+         nMouseRow >= nTop   .and. nMouseRow <= nBottom .and.;
+         nMouseCol >= nLeft  .and. nMouseCol <= nRight,  ;
+         nMouseRow - nTop, -1 )
+RETURN nPos
