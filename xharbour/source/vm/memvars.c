@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.92 2005/01/04 05:15:06 walito Exp $
+ * $Id: memvars.c,v 1.93 2005/01/04 05:25:38 walito Exp $
  */
 
 /*
@@ -186,7 +186,7 @@ void hb_memvarsRelease( void )
             }
          #endif
 
-         /*if( --( s_globalTable[ ulCnt ].counter ) == 0 )*/
+         if( --( s_globalTable[ ulCnt ].counter ) == 0 )
          {
             if( s_globalTable[ ulCnt ].hPrevMemvar == ( HB_HANDLE ) -1 )
             {

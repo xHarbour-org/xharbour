@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.429 2005/01/02 03:37:15 guerra000 Exp $
+ * $Id: hvm.c,v 1.430 2005/01/03 16:59:16 ronpinkas Exp $
  */
 
 /*
@@ -877,6 +877,9 @@ int HB_EXPORT hb_vmQuit( void )
    hb_cdpReleaseAll();          /* releases codepages */
    //printf("After Cdp\n" );
 #endif
+
+   hb_gcCollectAll( TRUE );
+   //printf("After GC before Memvar\n" );
 
 #ifndef HB_THREAD_SUPPORT
    hb_memvarsRelease();    /* clear all PUBLIC variables */
