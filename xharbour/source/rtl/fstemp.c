@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.3 2002/10/27 14:41:38 lculik Exp $
+ * $Id: fstemp.c,v 1.4 2003/03/07 13:32:15 jonnymind Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 #include <errno.h>
 
 /* NOTE: The buffer must be at least _POSIX_PATH_MAX chars long */
-#ifndef HB_OS_LINUX
+#if !defined( HB_OS_LINUX ) && !defined( HB_OS_BSD )
 
 static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * pszPrefix )
 {
