@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.71 2003/12/06 15:33:39 jonnymind Exp $
+* $Id: thread.h,v 1.72 2003/12/06 15:58:34 jonnymind Exp $
 */
 
 /*
@@ -487,8 +487,6 @@ typedef struct tag_HB_SHARED_RESOURCE
 /************************************************************
 * List of mutexes that can be used to regulate concurency
 *************************************************************/
-/* Monitor for sync access to the local contexts */
-extern HB_CRITICAL_T hb_threadStackMutex;
 /* Monitor for sync access to the global stack */
 extern HB_CRITICAL_T hb_globalsMutex;
 /* Monitor for sync access to the global stack */

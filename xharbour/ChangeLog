@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1827 2003/12/06 15:33:37 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1828 2003/12/06 15:58:28 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-06 16:55 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/thread.c
+  * include/thread.h
+    ! fixed ThreadWaitAll()
+    % removed hb_threadStackMutex. Now the mutex of hb_runningStacks guards
+      both the count of the running threads and their stack list.
 
 2003-12-06 16:55 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/thread.c

@@ -112,10 +112,7 @@ static UINT s_thread_unique_id;
 #endif
 
 /* Declarations of shell mutexes */
-HB_EXPORT HB_CRITICAL_T hb_threadStackMutex;
-#ifndef HB_OS_WIN_32
 HB_EXPORT HB_COND_T hb_threadStackCond;
-#endif
 
 HB_EXPORT HB_CRITICAL_T hb_globalsMutex;
 HB_EXPORT HB_CRITICAL_T hb_staticsMutex;
@@ -139,13 +136,13 @@ BOOL hb_bIdleFence;
 
 void hb_threadInit( void )
 {
-   HB_CRITICAL_INIT( hb_threadStackMutex );
    HB_CRITICAL_INIT( hb_allocMutex );
    HB_CRITICAL_INIT( hb_garbageAllocMutex );
    HB_CRITICAL_INIT( hb_macroMutex );
    HB_CRITICAL_INIT( hb_outputMutex );
    HB_CRITICAL_INIT( hb_mutexMutex );
    HB_CRITICAL_INIT( hb_dynsymMutex );
+   HB_COND_INIT( hb_threadStackCond );
    s_thread_unique_id = 1;
    HB_CRITICAL_INIT( s_thread_unique_id_mutex );
    HB_SHARED_INIT( hb_runningStacks, 0 );
@@ -170,7 +167,6 @@ void hb_threadInit( void )
    #else
       pthread_key_create( &hb_pkCurrentStack, NULL );
       pthread_setspecific( hb_pkCurrentStack, (void *)&hb_stack );
-      HB_COND_INIT( hb_threadStackCond );
    #endif
 }
 
@@ -199,14 +195,13 @@ void hb_threadCloseHandles( void )
    HB_CRITICAL_DESTROY( hb_macroMutex );
    HB_CRITICAL_DESTROY( hb_garbageAllocMutex );
    HB_CRITICAL_DESTROY( hb_allocMutex );
-   HB_CRITICAL_DESTROY( hb_threadStackMutex );
    HB_CRITICAL_DESTROY( hb_dynsymMutex );
+   HB_COND_DESTROY(hb_threadStackCond);
 
    #ifdef HB_OS_WIN_32
       TlsFree( hb_dwCurrentStack );
       HB_CRITICAL_DESTROY( hb_cancelMutex );
    #else
-      HB_COND_DESTROY(hb_threadStackCond);
       pthread_key_delete( hb_pkCurrentStack );
    #endif
 
@@ -550,6 +545,8 @@ HB_STACK *hb_threadUnlinkStack( HB_STACK* pStack )
       hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadUnlinkStack", 0 );
    }
 
+   HB_COND_SIGNAL( hb_threadStackCond );
+
    return p;
 }
 
@@ -563,7 +560,7 @@ HB_STACK *hb_threadGetStack( HB_THREAD_T id )
 {
    HB_STACK *p;
 
-   HB_CRITICAL_LOCK( hb_threadStackMutex );
+   HB_SHARED_LOCK( hb_runningStacks );
 
    if( last_stack && HB_SAME_THREAD( last_stack->th_id, id ) )
    {
@@ -587,7 +584,7 @@ HB_STACK *hb_threadGetStack( HB_THREAD_T id )
 
    hb_errRT_BASE_SubstR( EG_ARG, 1099, "Can't find thread ID", "INTERNAL THREADING", 1, hb_paramError( 1 ) );
 
-   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
+   HB_SHARED_UNLOCK( hb_runningStacks );
    return p;
 }
 
@@ -598,7 +595,7 @@ HB_STACK *hb_threadGetStackNoError( HB_THREAD_T id )
 {
    HB_STACK *p;
 
-   HB_CRITICAL_LOCK( hb_threadStackMutex );
+   HB_SHARED_LOCK( hb_runningStacks );
 
    if( last_stack && HB_SAME_THREAD( last_stack->th_id, id) )
    {
@@ -619,7 +616,7 @@ HB_STACK *hb_threadGetStackNoError( HB_THREAD_T id )
       }
    }
 
-   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
+   HB_SHARED_UNLOCK( hb_runningStacks );
    return p;
 }
 
@@ -675,7 +672,7 @@ int hb_threadCountStacks()
    int count = 0;
 
    /* never unlinks the main stack */
-   HB_CRITICAL_LOCK( hb_threadStackMutex );
+   HB_SHARED_LOCK( hb_runningStacks );
 
    p = hb_ht_stack;
    while ( p )
@@ -683,7 +680,7 @@ int hb_threadCountStacks()
       count ++;
       p = p->next;
    }
-   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
+   HB_SHARED_UNLOCK( hb_runningStacks );
 
    return count;
 }
@@ -727,10 +724,6 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
    HB_STACK *_pStack_ = (HB_STACK *) Cargo;
    PHB_DYNS pExecSym;
 
-   /* thread stack is locked since creation */
-   HB_CRITICAL_LOCK( hb_threadStackMutex );
-   hb_threadLinkStack( _pStack_ );
-
    /* Sets the cancellation handler so small delays in
    cancellation do not cause segfault or memory leaks */
 #ifdef HB_OS_WIN_32
@@ -740,13 +733,11 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
    _pStack_->th_id = HB_CURRENT_THREAD();
    _pStack_->th_vm_id = hb_threadUniqueId();
    pthread_setspecific( hb_pkCurrentStack, Cargo );
-   /* tell the world we are ready */
-   HB_COND_SIGNAL( hb_threadStackCond );
-
    pthread_cleanup_push( hb_threadTerminator, NULL );
-#endif
 
-   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
+   HB_SHARED_SIGNAL( hb_runningStacks );
+
+#endif
 
 
    // call errorsys() to initialize errorblock
@@ -868,12 +859,6 @@ void hb_threadTerminator( void *pData )
 
    HB_STACK_LOCK;
 
-   /* ... except for this little unlink */
-   HB_CRITICAL_LOCK( hb_threadStackMutex );
-   /* now we can detach this thread */
-   hb_threadUnlinkStack( _pStack_ );
-   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
-
    #ifdef HB_OS_WIN_32
       CloseHandle( _pStack_->th_h );
    #else
@@ -893,10 +878,13 @@ void hb_threadTerminator( void *pData )
    }
    HB_CRITICAL_UNLOCK( hb_mutexMutex );
 
-   hb_threadDestroyStack( _pStack_ );
-
    /* we are out of business */
    HB_SHARED_LOCK( hb_runningStacks );
+
+   /* now we can detach this thread */
+   hb_threadUnlinkStack( _pStack_ );
+   hb_threadDestroyStack( _pStack_ );
+
    if ( --hb_runningStacks.content.asLong < 1 )
    {
       HB_SHARED_SIGNAL( hb_runningStacks );
@@ -922,26 +910,19 @@ HB_EXPORT void hb_threadWaitAll()
       return;
    }
 
+
    HB_SHARED_LOCK( hb_runningStacks );
+   hb_runningStacks.content.asLong --;
+   HB_VM_STACK.bInUse = 0;
 
-   if( HB_VM_STACK.bInUse )
-   {
-      hb_runningStacks.content.asLong--;
-      HB_VM_STACK.bInUse = FALSE;
-      if ( hb_runningStacks.content.asLong < 1)
-      {
-         HB_SHARED_SIGNAL( hb_runningStacks );
-      }
-   }
-
-   while ( hb_ht_stack->next != NULL )
+   while ( hb_runningStacks.content.asLong > 0 || hb_ht_stack->next != NULL )
    {
       HB_SHARED_WAIT( hb_runningStacks );
    }
 
-   hb_runningStacks.content.asLong++;
-   HB_VM_STACK.bInUse = TRUE;
-
+   /* no more threads now */
+   hb_runningStacks.content.asLong ++;
+   HB_VM_STACK.bInUse = 1;
    HB_SHARED_UNLOCK( hb_runningStacks );
 }
 
@@ -955,10 +936,12 @@ HB_EXPORT void hb_threadKillAll()
    HB_STACK *pStack;
    HB_THREAD_STUB;
 
-   /* DO NOT destroy main thread stack */
+   hb_threadWaitForIdle();
+
    pStack = hb_ht_stack;
    while( pStack )
    {
+      /* DO NOT destroy main thread stack */
       if ( HB_SAME_THREAD( pStack->th_id, hb_main_thread_id )
           || HB_SAME_THREAD( pStack->th_id, HB_CURRENT_THREAD()) )
       {
@@ -1345,18 +1328,15 @@ HB_FUNC( STARTTHREAD )
    pStack->bIsMethod = bIsMethod;
 
    /* Forbid usage of stack before that new thread's VM takes care of it */
-   HB_SHARED_LOCK( hb_runningStacks );
-   pStack->bInUse = TRUE;
-   hb_runningStacks.content.asLong ++;
-   HB_SHARED_UNLOCK( hb_runningStacks );
-
    hb_threadFillStack( pStack, pArgs );
 
    /* we can be inspected now, but we are sure that our child thread
       stack cannot */
-   HB_STACK_UNLOCK;
+   HB_SHARED_LOCK( hb_runningStacks );
 
-   HB_CRITICAL_LOCK( hb_threadStackMutex );
+   hb_runningStacks.content.asLong++;
+   pStack->bInUse = TRUE;
+   hb_threadLinkStack( pStack );
 
 #if defined(HB_OS_WIN_32)
 /*   #ifndef __BORLANDC__
@@ -1375,11 +1355,20 @@ HB_FUNC( STARTTHREAD )
       pStack->th_h = th_h;
       ResumeThread( th_h );
 #else
+   #if 0
+      hb_runningStacks.content.asLong--;
+      HB_VM_STACK.bInUse = FALSE;
+      HB_SHARED_SIGNAL( hb_runningStacks );
+
       /* Wait until the child is ready */
       while (pStack->th_vm_id == 0 )
       {
-         HB_COND_WAIT( hb_threadStackCond, hb_threadStackMutex );
+         HB_SHARED_WAIT( hb_runningStacks );
       }
+
+      /* regain control of our stack */
+      HB_STACK_LOCK;
+      #endif
 #endif
 
       pThread->threadId = pStack->th_id;
@@ -1395,9 +1384,7 @@ HB_FUNC( STARTTHREAD )
    }
    //notice that the child thread won't be able to proceed until we
    // release this mutex.
-   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
-   HB_STACK_LOCK;
-
+   HB_SHARED_UNLOCK( hb_runningStacks );
 }
 
 /*
