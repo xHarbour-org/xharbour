@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.299 2003/12/19 03:27:52 fsgiudice Exp $
+ * $Id: hvm.c,v 1.300 2003/12/19 07:30:01 ronpinkas Exp $
  */
 
 /*
@@ -4479,14 +4479,15 @@ static void hb_vmArrayPush( void )
       ULONG ulPos;
       HB_ITEM hbElem;
 
-      if (! hb_hashScan(pArray, pIndex, &ulPos ) )
+      if( ! hb_hashScan(pArray, pIndex, &ulPos ) )
       {
-         hb_errRT_BASE( EG_BOUND, 1132, NULL,
-               hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+         hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
          return;
       }
 
+      hbElem.type = HB_IT_NIL;
       hb_hashGet( pArray, ulPos, &hbElem );
+
       hb_stackPop();
       hb_itemForwardValue( hb_stackItemFromTop( -1 ), &hbElem );
       return;
