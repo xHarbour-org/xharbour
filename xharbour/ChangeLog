@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2587 2004/03/17 00:17:57 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2588 2004/03/17 01:36:33 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-17 03:40 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed RTerror code in seek 1201 not 1020 (Thanks to Luiz)
+
+  * xharbour/source/rdd/dbcmd.c
+    * casting, strcmp() returns integer not pointer
+
+  * xharbour/include/clipdefs.h
+  * xharbour/include/hbapi.h
+  * xharbour/include/hbcomp.h
+  * xharbour/include/hbexprb.c
+  * xharbour/include/hbexprop.h
+  * xharbour/include/hbtypes.h
+  * xharbour/include/hbvm.h
+  * xharbour/include/hbxml.h
+  * xharbour/source/rtl/errorsys.prg
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/macro.c
+  * xharbour/source/vm/maindllp.c
+    * some long to LONG conversion. I intentionally change it in
+      some comments too to make it more clear for programmers which
+      maybe confused on 64bit machines. Andy and others many thanks 
+      for already done conversion. It looks much more clear.
+
+  I would like to ask you about all places you know where memory pointer
+  is converted to [U]LONG var. This information is necessary for me for
+  xHarbour 64bit port.
+  Gian what is this trick in thread.h with stack address?
+
 2004-03-16 22:33 UTC-0300 Luiz Rafael Culik Guimaraes<culikr@brturbo.com>
   * utils/hbdoc/hbdoc.prg
     ! changes on WriteContentFile() and WriteChmContentFile() to generate the content on alphabetical order

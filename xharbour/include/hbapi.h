@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.124 2004/03/15 12:45:25 druzus Exp $
+ * $Id: hbapi.h,v 1.125 2004/03/16 14:39:22 druzus Exp $
  */
 
 /*
@@ -223,7 +223,7 @@ extern int      HB_EXPORT hb_parinfo( int iParam ); /* Determine the param count
 extern int      HB_EXPORT hb_parl( int iParam, ... ); /* retrieve a logical parameter as an int */
 extern double   HB_EXPORT hb_parnd( int iParam, ... ); /* retrieve a numeric parameter as a double */
 extern int      HB_EXPORT hb_parni( int iParam, ... ); /* retrieve a numeric parameter as a integer */
-extern LONG     HB_EXPORT hb_parnl( int iParam, ... ); /* retrieve a numeric parameter as a long */
+extern LONG     HB_EXPORT hb_parnl( int iParam, ... ); /* retrieve a numeric parameter as a LONG */
 extern void     HB_EXPORT * hb_parptr( int iParam, ... ); /* retrieve a pointer to a memory collected by GC */
 extern void     HB_EXPORT * hb_parpointer( int iParam ); /* retrieve ONLY a pointer from ONLY HB_IT_POINTER, or retunrs NULL */
 extern PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask ); /* retrieve a generic parameter */
@@ -310,20 +310,20 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
 
     extern void  HB_EXPORT  hb_retds( char * szDate );  /* returns a date, must use yyyymmdd format */
     extern void  HB_EXPORT  hb_retd( LONG lYear, LONG lMonth, LONG lDay ); /* returns a date */
-    extern void  HB_EXPORT  hb_retdl( LONG lJulian );   /* returns a long value as a julian date */
+    extern void  HB_EXPORT  hb_retdl( LONG lJulian );   /* returns a LONG value as a julian date */
     extern void  HB_EXPORT  hb_retl( int iTrueFalse );  /* returns a logical integer */
     extern void  HB_EXPORT  hb_retnd( double dNumber ); /* returns a double */
     extern void  HB_EXPORT  hb_retni( int iNumber );    /* returns a integer number */
-    extern void  HB_EXPORT  hb_retnl( LONG lNumber );   /* returns a long number */
+    extern void  HB_EXPORT  hb_retnl( LONG lNumber );   /* returns a LONG number */
     extern void  HB_EXPORT  hb_retnlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
     extern void  HB_EXPORT  hb_retndlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
     extern void  HB_EXPORT  hb_retnilen( int iNumber, int iWidth ); /* returns a integer number, with specific width */
-    extern void  HB_EXPORT  hb_retnllen( LONG lNumber, int iWidth ); /* returns a long number, with specific width */
+    extern void  HB_EXPORT  hb_retnllen( LONG lNumber, int iWidth ); /* returns a LONG number, with specific width */
     extern void  HB_EXPORT  hb_reta( ULONG ulLen );  /* returns an array with a specific length */
     extern void  HB_EXPORT  hb_retptr( void *voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
    #ifndef HB_LONG_LONG_OFF
-    extern void  HB_EXPORT  hb_retnll( LONGLONG llNumber ); /* returns a long long int */
-    extern void  HB_EXPORT  hb_retnlllen( LONGLONG llNumber, int iWidth ); /* returns a long long int, with specific width */
+    extern void  HB_EXPORT  hb_retnll( LONGLONG llNumber ); /* returns a LONGLONG int */
+    extern void  HB_EXPORT  hb_retnlllen( LONGLONG llNumber, int iWidth ); /* returns a LONGLONG int, with specific width */
     extern void  HB_EXPORT  hb_retnint( LONGLONG llNumber );
     extern void  HB_EXPORT  hb_retnintlen( LONGLONG llNumber, int iWidth );
    #else
@@ -340,10 +340,10 @@ extern void  HB_EXPORT  hb_storclen( char * szText, ULONG ulLength, int iParam, 
 extern void  HB_EXPORT  hb_stords( char * szDate, int iParam, ... );   /* szDate must have yyyymmdd format */
 extern void  HB_EXPORT  hb_storl( int iLogical, int iParam, ... ); /* stores a logical integer on a variable by reference */
 extern void  HB_EXPORT  hb_storni( int iValue, int iParam, ... ); /* stores an integer on a variable by reference */
-extern void  HB_EXPORT  hb_stornl( LONG lValue, int iParam, ... ); /* stores a long on a variable by reference */
+extern void  HB_EXPORT  hb_stornl( LONG lValue, int iParam, ... ); /* stores a LONG on a variable by reference */
 extern void  HB_EXPORT  hb_stornd( double dValue, int iParam, ... ); /* stores a double on a variable by reference */
 #ifndef HB_LONG_LONG_OFF
-extern void  HB_EXPORT  hb_stornll( LONGLONG llValue, int iParam, ... ); /* stores a long long int on a variable by reference */
+extern void  HB_EXPORT  hb_stornll( LONGLONG llValue, int iParam, ... ); /* stores a LONGLONG int on a variable by reference */
 #endif
 
 extern void    HB_EXPORT hb_xinit( void );                         /* Initialize fixed memory subsystem */
@@ -388,10 +388,10 @@ extern char     HB_EXPORT * hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex ); /
 extern ULONG    HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string length contained on an array element */
 extern BOOL     HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the logical value contained on an array element */
 extern int      HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the int value contained on an array element */
-extern LONG     HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the long numeric value contained on an array element */
+extern LONG     HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the LONG numeric value contained on an array element */
 extern double   HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the double value contained on an array element */
 extern char     HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate ); /* retrieves the date value contained in an array element */
-extern LONG     HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date value contained in an array element, as a long integer */
+extern LONG     HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date value contained in an array element, as a LONG integer */
 extern USHORT   HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the type of an array item */
 extern void     HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount ); /* fill an array with a given item */
 extern ULONG    HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact ); /* scan an array for a given item, or until code-block item returns TRUE */
@@ -411,7 +411,7 @@ extern PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase ); /* Create
 #endif
 
 #ifndef HB_LONG_LONG_OFF
-   extern LONGLONG HB_EXPORT hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the long long int value contained on an array element */
+   extern LONGLONG HB_EXPORT hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the LONGLONG int value contained on an array element */
 #endif
 
 /* string management */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbtypes.h,v 1.5 2002/10/19 11:19:52 antoniolinares Exp $
+ * $Id: hbtypes.h,v 1.1 2003/04/24 20:18:43 lculik Exp $
  */
 
 /*
@@ -75,16 +75,16 @@ typedef void     ( * HB_RET)( void );
 typedef void     ( * HB_RETC)( char * szText );
 typedef void     ( * HB_RETCLEN)( char * szText, ULONG ulLen );
 typedef void     ( * HB_RETDS)( char * szDate );
-typedef void     ( * HB_RETD)( long lYear, long lMonth, long lDay );
-typedef void     ( * HB_RETDL)( long lJulian );
+typedef void     ( * HB_RETD)( LONG lYear, LONG lMonth, LONG lDay );
+typedef void     ( * HB_RETDL)( LONG lJulian );
 typedef void     ( * HB_RETL)( int iTrueFalse );
 typedef void     ( * HB_RETND)( double dNumber );
 typedef void     ( * HB_RETNI)( int iNumber );
-typedef void     ( * HB_RETNL)( long lNumber );
+typedef void     ( * HB_RETNL)( LONG lNumber );
 typedef void     ( * HB_RETNLEN)( double dNumber, int iWidth, int iDec );
 typedef void     ( * HB_RETNDLEN)( double dNumber, int iWidth, int iDec );
 typedef void     ( * HB_RETNILEN)( int iNumber, int iWidth );
-typedef void     ( * HB_RETNLLEN)( long lNumber, int iWidth );
+typedef void     ( * HB_RETNLLEN)( LONG lNumber, int iWidth );
 typedef void     ( * HB_RETA)( ULONG ulLen );
 typedef ULONG    ( * HB_PARINFA)( int iParamNum, ULONG uiArrayIndex );
 typedef int      ( * HB_PARINFO)( int iParam );
@@ -96,7 +96,7 @@ typedef int      ( * HB_PARINFO)( int iParam );
 typedef int      ( * HB_PARL)( int iParam );
 typedef double   ( * HB_PARND)( int iParam );
 typedef int      ( * HB_PARNI)( int iParam );
-typedef long     ( * HB_PARNL)( int iParam );
+typedef LONG     ( * HB_PARNL)( int iParam );
 typedef ULONG    ( * HB_PARCLEN2)( int iParam, ULONG ulArrayIndex );
 typedef ULONG    ( * HB_PARCSIZ2)( int iParam, ULONG ulArrayIndex );
 typedef char *   ( * HB_PARDS2)( int iParam, ULONG ulArrayIndex );
@@ -104,20 +104,20 @@ typedef char *   ( * HB_PARDSBUFF2)( char * szDate,int iParam, ULONG ulArrayInde
 typedef int      ( * HB_PARL2)( int iParam, ULONG ulArrayIndex );
 typedef double   ( * HB_PARND2)( int iParam, ULONG ulArrayIndex );
 typedef int      ( * HB_PARNI2)( int iParam, ULONG ulArrayIndex );
-typedef long     ( * HB_PARNL2)( int iParam, ULONG ulArrayIndex );
+typedef LONG     ( * HB_PARNL2)( int iParam, ULONG ulArrayIndex );
 typedef int      ( * HB_STORC)( char * szText, int iParam );
 typedef int      ( * HB_STORCLEN)( char * szText, ULONG ulLength, int iParam);
 typedef int      ( * HB_STORDS)( char * szDate, int iParam) ;
 typedef int      ( * HB_STORL)( int iLogical, int iParam );
 typedef int      ( * HB_STORNI)( int iValue, int iParam );
-typedef int      ( * HB_STORNL)( long lValue, int iParam );
+typedef int      ( * HB_STORNL)( LONG lValue, int iParam );
 typedef int      ( * HB_STORND)( double dValue, int iParam );
 typedef int      ( * HB_STORC2)( char * szText, int iParam , ULONG ulArrayIndex);
 typedef int      ( * HB_STORCLEN2)( char * szText, ULONG ulLength, int iParam , ULONG ulArrayIndex);
 typedef int      ( * HB_STORDS2)( char * szDate, int iParam , ULONG ulArrayIndex) ;
 typedef int      ( * HB_STORL2)( int iLogical, int iParam , ULONG ulArrayIndex);
 typedef int      ( * HB_STORNI2)( int iValue, int iParam , ULONG ulArrayIndex);
-typedef int      ( * HB_STORNL2)( long lValue, int iParam , ULONG ulArrayIndex);
+typedef int      ( * HB_STORNL2)( LONG lValue, int iParam , ULONG ulArrayIndex);
 typedef int      ( * HB_STORND2)( double dValue, int iParam , ULONG ulArrayIndex);
 typedef BOOL     ( * HB_ARRAYNEW)( PHB_ITEM pItem, ULONG ulLen );
 typedef ULONG    ( * HB_ARRAYLEN)( PHB_ITEM pArray );

@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.28 2003/12/12 05:31:20 jonnymind Exp $
+ * $Id: errorsys.prg,v 1.29 2004/01/10 10:21:48 ronpinkas Exp $
  */
 
 /*
@@ -557,7 +557,7 @@ HB_FUNC( SETUNHANDLEDEXCEPTIONFILTER )
    pDefaultHandler = SetUnhandledExceptionFilter( PRGUnhandledExceptionFilter );
    //TraceLog( NULL, "Default: %p\n", pDefaultHandler );
 
-   hb_retnl( (long) pDefaultHandler );
+   hb_retnl( (LONG) pDefaultHandler );
 }
 
 #pragma ENDDUMP

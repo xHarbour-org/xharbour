@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.h,v 1.3 2003/06/30 23:06:27 jonnymind Exp $
+ * $Id: hbxml.h,v 1.4 2003/11/21 13:03:29 jonnymind Exp $
  */
 
 /*
@@ -165,8 +165,8 @@ typedef struct tag_mxml_refil
    int bufpos;   // current position
 
    // lenght of the stream for implementing progress indicators
-   long int streampos;
-   long int streamlen;
+   LONG streampos;
+   LONG streamlen;
 
    // callback funcs
    MXML_REFIL_FUNC refil_func;

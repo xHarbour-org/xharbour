@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.93 2004/03/11 01:26:07 andijahja Exp $
+ * $Id: dbcmd.c,v 1.94 2004/03/12 19:32:53 andijahja Exp $
  */
 
 /*
@@ -5344,7 +5344,7 @@ HB_FUNC( __DBDELIM )
       {
          cDelimArg = hb_strupr( pDelimArg->item.asString.value );
 
-         if ( strcmp ( cDelimArg, "BLANK" ) == NULL )
+         if ( strcmp ( cDelimArg, "BLANK" ) == 0 )
          {
             cDelim = (BYTE*) "";
             cSeparator = (BYTE*) " ";

@@ -4727,7 +4727,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
             {
                if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
                   break;
-               fFound = hb_strMatchWild( (char const*)pTag->CurKey->val, szPattern );
+               fFound = hb_strMatchWild( (const char *) pTag->CurKey->val, szPattern );
                if ( fFound )
                   break;
                hb_cdxTagKeyRead( pTag, NEXT_RECORD );
@@ -4752,7 +4752,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
          {
             if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
                break;
-            fFound = hb_strMatchWild( (char const*)pTag->CurKey->val, szPattern );
+            fFound = hb_strMatchWild( (const char *) pTag->CurKey->val, szPattern );
             if ( fFound )
                break;
             hb_cdxTagKeyRead( pTag, PREV_RECORD );
@@ -5274,7 +5274,7 @@ static ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyItm, BOO
 
    if ( ! pTag )
    {
-      hb_cdxErrorRT( pArea, EG_NOORDER, 1020, NULL, EF_CANDEFAULT );
+      hb_cdxErrorRT( pArea, EG_NOORDER, 1201, NULL, EF_CANDEFAULT );
       return FAILURE;
    }
    else

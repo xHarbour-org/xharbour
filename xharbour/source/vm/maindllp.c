@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.5 2003/04/24 20:18:49 lculik Exp $
+ * $Id: maindllp.c,v 1.6 2003/05/26 20:37:14 ronpinkas Exp $
  */
 
 /*
@@ -227,7 +227,7 @@ void hb_retds( char * szDate )  /* returns a date, must use yyyymmdd format */
 }
 
 #undef hb_retd
-void hb_retd( long lYear, long lMonth, long lDay ) /* returns a date */
+void hb_retd( LONG lYear, LONG lMonth, LONG lDay ) /* returns a date */
 {
    FARPROC pRetd=GetProcAddress( GetModuleHandle( NULL ), "_hb_retd" );
 
@@ -238,7 +238,7 @@ void hb_retd( long lYear, long lMonth, long lDay ) /* returns a date */
 }
 
 #undef hb_retdl
-void hb_retdl( long lJulian )   /* returns a long value as a julian date */
+void hb_retdl( LONG lJulian )   /* returns a LONG value as a julian date */
 {
    FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_retdl" );
 
@@ -283,7 +283,7 @@ void hb_retni( int iNumber )    /* returns a integer number */
 }
 
 #undef hb_retnl
-void hb_retnl( long lNumber )   /* returns a long number */
+void hb_retnl( LONG lNumber )   /* returns a LONG number */
 {
    FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_retnl" );
 
@@ -327,7 +327,7 @@ void hb_retnilen( int iNumber, int iWidth ) /* returns a integer number, with sp
 }
 
 #undef hb_retnllen
-void hb_retnllen( long lNumber, int iWidth ) /* returns a long number, with specific width */
+void hb_retnllen( LONG lNumber, int iWidth ) /* returns a LONG number, with specific width */
 {
    FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_retnilen" );
 
@@ -589,7 +589,7 @@ int hb_parni( int iParam, ... ) /* retrieve a numeric parameter as a integer */
 }
 
 #undef hb_parnl
-long hb_parnl( int iParam, ... ) /* retrieve a numeric parameter as a long */
+LONG hb_parnl( int iParam, ... ) /* retrieve a numeric parameter as a LONG */
 {
    FARPROC pParNl=GetProcAddress( GetModuleHandle( NULL ), "_hb_parnl" );
    FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
@@ -749,7 +749,7 @@ void hb_storni( int iValue, int iParam, ... )
 }
 
 #undef hb_stornl
-void hb_stornl( long lValue, int iParam, ... )
+void hb_stornl( LONG lValue, int iParam, ... )
 {
    FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
    FARPROC pStorNl = GetProcAddress( GetModuleHandle( NULL ), "_hb_stornl" );

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.8 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbexprop.h,v 1.9 2004/02/16 06:07:12 ronpinkas Exp $
  */
 
 /*
@@ -188,7 +188,7 @@ typedef struct HB_EXPR_
       } asRTVar;      /* PUBLIC or PRIVATE variable declaration */
       struct
       {
-         long lVal;           /* long value */
+         LONG lVal;           /* LONG value */
          double dVal;         /* double value */
          unsigned char bWidth; /* unsigned char used intentionally */
          unsigned char bDec;  /* unsigned char used intentionally */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.72 2004/02/16 06:07:11 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.73 2004/03/13 06:17:30 ronpinkas Exp $
  */
 
 /*
@@ -1585,7 +1585,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      else
                      {
                         pReduced->value.asString.string = ( char * ) HB_XGRAB( 2 );
-                        pReduced->value.asString.string[ 0 ] = ( ( long ) pArg->value.asNum.dVal % 256 );
+                        pReduced->value.asString.string[ 0 ] = ( ( LONG ) pArg->value.asNum.dVal % 256 );
                         pReduced->value.asString.string[ 1 ] = '\0';
                         pReduced->value.asString.dealloc = TRUE;
                         pReduced->ulLength = 1;
@@ -2169,7 +2169,7 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
                /* numeric alias
                 * 2->var
                 *
-                * NOTE: only integer (long) values are allowed
+                * NOTE: only integer (LONG) values are allowed
                 */
                if( pAlias->value.asNum.NumType == HB_ET_LONG )
                   HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, NULL, pAlias->value.asNum.lVal );
@@ -2224,7 +2224,7 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
                /* numeric alias
                 * 2->var
                 *
-                * NOTE: only integer (long) values are allowed
+                * NOTE: only integer (LONG) values are allowed
                 */
                if( pAlias->value.asNum.NumType == HB_ET_LONG )
                   HB_EXPR_PCODE4( hb_compGenPopAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, NULL, pAlias->value.asNum.lVal );

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.38 2004/02/16 06:07:12 ronpinkas Exp $
+ * $Id: macro.c,v 1.39 2004/02/16 06:32:05 paultucker Exp $
  */
 
 /*
@@ -1309,7 +1309,7 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_
    hb_dynsymUnlock();
 }
 
-/* generates the pcode to push a long number on the virtual machine stack */
+/* generates the pcode to push a LONG number on the virtual machine stack */
 void hb_compGenPushLong( LONG lNumber, HB_MACRO_DECL )
 {
    if( lNumber )

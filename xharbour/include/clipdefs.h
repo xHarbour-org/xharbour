@@ -1,5 +1,5 @@
 /*
- * $Id: clipdefs.h,v 1.21 2001/12/29 18:45:02 vszakats Exp $
+ * $Id: clipdefs.h,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
  */
 
 /*
@@ -90,7 +90,7 @@ typedef LONGP   PLONG;
 typedef ULONG * ULONGP;
 typedef ULONGP  PULONG;
 
-typedef unsigned long DWORD;
+typedef ULONG   DWORD;
 typedef DWORD * DWORDP;
 typedef DWORDP  PDWORD;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.357 2004/03/11 04:22:28 ronpinkas Exp $
+ * $Id: hvm.c,v 1.358 2004/03/12 12:37:25 likewolf Exp $
  */
 
 /*
@@ -198,10 +198,10 @@ static void    hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec ); /* 
 static void    hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols ); /* creates a macro-compiled codeblock */
 static void    hb_vmPushLocal( SHORT iLocal );    /* pushes the containts of a local onto the stack */
 static void    hb_vmPushLocalByRef( SHORT iLocal );    /* pushes a local by refrence onto the stack */
-static void    hb_vmPushLongConst( LONG lNumber );  /* Pushes a long constant (pcode) */
-HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 ); /* pushes a number on to the stack and decides if it is integer, long or double */
+static void    hb_vmPushLongConst( LONG lNumber );  /* Pushes a LONG constant (pcode) */
+HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 ); /* pushes a number on to the stack and decides if it is SHORT, LONG or double */
 #ifndef HB_LONG_LONG_OFF
-   HB_EXPORT void    hb_vmPushLongLong( LONGLONG lNumber );  /* Pushes a long long (pcode) */
+   HB_EXPORT void    hb_vmPushLongLong( LONGLONG lNumber );  /* Pushes a LONGLONG (pcode) */
    HB_EXPORT void    hb_vmPushNumInt( LONGLONG lNumber );
 #else
    HB_EXPORT void    hb_vmPushNumInt( LONG lNumber );
@@ -6010,7 +6010,7 @@ HB_EXPORT HB_ITEM_PTR hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ...
    }
    va_end( va );
 
-   /* take care here, possible loss of data long to short ... */
+   /* take care here, possible loss of data LONG to SHORT ... */
    /* added an explicit casting here for VC++ JFL */
    hb_vmSend( (USHORT) ulArgCount );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.23 2004/01/27 09:56:08 likewolf Exp $
+ * $Id: hbcomp.h,v 1.24 2004/02/05 12:44:17 andijahja Exp $
  */
 
 /*
@@ -130,7 +130,7 @@ typedef struct _COMCLASS
 typedef struct _ENUMDEF
 {
    char *szName;                   /* Set name */
-   unsigned long lMembers;
+   ULONG lMembers;
    char **pMembers;
    struct _ENUMDEF *pNext;
 } ENUMDEF, *PENUMDEF;
@@ -368,12 +368,12 @@ extern void hb_compGenPushVarRef( char * szVarName );    /* generates the pcode 
 extern void hb_compGenPushMemVarRef( char * szVarName );    /* generates the pcode to push a memvar variable by reference to the virtual machine stack */
 extern void hb_compGenPushInteger( int iNumber );        /* Pushes a integer number on the virtual machine stack */
 extern void hb_compGenPushLogical( int iTrueFalse );     /* pushes a logical value on the virtual machine stack */
-extern void hb_compGenPushLong( long lNumber );          /* Pushes a long number on the virtual machine stack */
+extern void hb_compGenPushLong( LONG lNumber );          /* Pushes a LONG number on the virtual machine stack */
 extern void hb_compGenPushNil( void );                   /* Pushes nil on the virtual machine stack */
 extern void hb_compGenPushString( char * szText, ULONG ulLen );       /* Pushes a string on the virtual machine stack */
 extern void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias ); /* Pushes a symbol on to the Virtual machine stack */
-extern void hb_compGenPushAliasedVar( char *, BOOL, char *, long );
-extern void hb_compGenPopAliasedVar( char *, BOOL, char *, long );
+extern void hb_compGenPushAliasedVar( char *, BOOL, char *, LONG );
+extern void hb_compGenPopAliasedVar( char *, BOOL, char *, LONG );
 extern void hb_compGenPushFunRef( char * );
 extern void hb_compGenPCode1( BYTE );             /* generates 1 byte of pcode */
 extern void hb_compGenPData1( BYTE );             /* generates 1 byte of pcode argument */
