@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.67 2003/09/15 16:39:26 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.68 2003/09/24 18:02:25 druzus Exp $
  */
 
 /*
@@ -5342,8 +5342,7 @@ static USHORT hb_cdxFindTag( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
                uiTag = 0;
             */
             hb_strncpyUpperTrim( szName, hb_itemGetCPtr( pOrderInfo->itmOrder ),
-                  (hb_itemGetCLen( pOrderInfo->itmOrder ) > CDX_MAX_TAG_NAME_LEN) ?
-                  CDX_MAX_TAG_NAME_LEN : hb_itemGetCLen( pOrderInfo->itmOrder ) );
+                  HB_MIN(hb_itemGetCLen( pOrderInfo->itmOrder ), CDX_MAX_TAG_NAME_LEN) );
             pCdx = pArea->lpIndexes;
             pTag = NULL;
             uiTag = 0;

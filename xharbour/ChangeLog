@@ -8,11 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-09-26 13:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
-  * source/compiler/hbgenerr.c
-    * Changed "Unclosed control structures" to "Unclosed control structure (at line: %s)"
-  * source/compiler/harbour.sly
-    + Added logic to report unclosed control structures, instead of generic "Parse error ..."
+2003-09-27 12:10 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/strcase.c
+    * changed hb_strncpyUpper to work as per strncpy docs.
+  * tests/testdbf.prg
+    * tests the dbfcdx driver.
+  * source/rdd/dbfcdx/dbfcdx1.c
+    * minor change to use HB_MIN()
 
 2003-09-26 10:21 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/hbxml.c
@@ -41,7 +43,7 @@
   * contrib/xwt/make_b32.bat
   * contrib/xwt/makefile.bc
     * Correct CLEAN support
-
+    
 2003-09-25 13:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + doc/en/print.txt
     * Docs for Getprinters() and GetDefaultPrinter() function
