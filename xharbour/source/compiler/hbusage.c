@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: hbusage.c,v 1.4 2002/01/27 22:30:07 ronpinkas Exp $
  */
 
 /*
@@ -155,6 +155,7 @@ void hb_compPrintCredits( void )
            "Gonzalo A. Diethelm <gonzalo.diethelm@iname.com>\n"
            "Ignacio Ortiz de Zuniga <ignacio@fivetech.com>\n"
            "Janica Lubos <janica@fornax.elf.stuba.sk>\n"
+           "Jean-Francois Lefebvre (mafact) <jfl@mafact.com>\n"
            "Jose Lalin <dezac@corevia.com>\n"
            "Leslee Griffith <les.griffith@vantagesystems.ca>\n"
            "Luiz Rafael Culik <culik@sl.conex.net>\n"
