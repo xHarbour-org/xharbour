@@ -6443,7 +6443,9 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
    if( pRegEx == NULL || pString == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type", NULL, 2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ));
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type", NULL,
+         4, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ),
+          hb_param( 3, HB_IT_ANY ), hb_param( 4, HB_IT_ANY ));
       return FALSE;
    }
 

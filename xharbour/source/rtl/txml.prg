@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.1 2003/06/16 15:07:18 jonnymind Exp $
+ * $Id: txml.prg,v 1.2 2003/06/16 20:13:34 jonnymind Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ CLASS TXMLNode
    DATA oParent
    DATA oChild
 
-   METHOD New( nType, cName, aAttributes, cData )
+   METHOD New( nType, cName, aAttributes, cData )  CONSTRUCTOR
    METHOD Clone()                      INLINE HBXml_node_clone( Self )
    METHOD CloneTree()                  INLINE HBXml_node_clone_tree( Self )
 
@@ -87,29 +87,10 @@ CLASS TXMLNode
    METHOD ToString( nStyle )        INLINE HBXml_node_to_string( Self, nStyle )
    METHOD Write( fHandle, nStyle )  INLINE HBXml_node_write( Self, fHandle, nStyle )
 
+   //Useful for debugging purposes
+   METHOD ToArray()                 INLINE;
+             { ::nType, ::cName, ::aAttributes, ::cData }
 ENDCLASS
-
-
-METHOD NextInTree() CLASS TXmlNode
-   LOCAL oNext := NIL, oTemp
-
-   IF ::oChild != NIL
-      oNext := ::oChild
-   ELSEIF ::oNext != NIL
-      oNext := ::oNext
-   ELSE
-      oTemp := ::oParent
-      DO WHILE oTemp != NIL
-         IF oTemp:oNext != NIL
-            oNext := oTemp:oNext
-            EXIT
-         ENDIF
-         oTemp := oTemp:oParent
-      ENDDO
-   ENDIF
-   
-RETURN oNext
-
 
 METHOD New( nType, cName, aAttributes, cData ) class TXmlNode
    IF nType == NIL
@@ -129,6 +110,27 @@ METHOD New( nType, cName, aAttributes, cData ) class TXmlNode
 RETURN Self
 
 
+METHOD NextInTree() CLASS TXmlNode
+   LOCAL oNext := NIL, oTemp
+
+   IF ::oChild != NIL
+      oNext := ::oChild
+   ELSEIF ::oNext != NIL
+      oNext := ::oNext
+   ELSE
+      oTemp := ::oParent
+      DO WHILE oTemp != NIL
+         IF oTemp:oNext != NIL
+            oNext := oTemp:oNext
+            EXIT
+         ENDIF
+         oTemp := oTemp:oParent
+      ENDDO
+   ENDIF
+
+RETURN oNext
+
+
 METHOD GetAttribute( cAttrib ) CLASS TXmlNode
    LOCAL aElem
 
@@ -144,9 +146,8 @@ RETURN NIL
 METHOD SetAttribute( cAttrib, cValue ) CLASS TXmlNode
    LOCAL aElem
 
-   IF ValType( cAttrib ) != cValue
-      cValue := CStr( cValue )
-   ENDIF
+   cAttrib := CStr( cAttrib )
+   cValue := CStr( cValue )
 
    FOR EACH aElem IN ::aAttributes
       IF aElem[1] == cAttrib
@@ -184,6 +185,137 @@ METHOD Path() CLASS TXmlNode
 RETURN NIL
 
 /********************************************
+   Iterator class
+*********************************************/
+CLASS TXmlIterator
+   METHOD New( oNodeTop, nType ) CONSTRUCTOR
+   METHOD Next()
+   METHOD Rewind()                  INLINE   ::oNode := ::oTop
+   METHOD Find( cName, cAttribute, cValue, cData )
+
+   METHOD GetNode()                 INLINE   ::oNode
+
+HIDDEN:
+   DATA nType
+   DATA cName
+   DATA cAttribute
+   DATA cValue
+   DATA cData
+
+   DATA oNode
+   DATA oTop
+ENDCLASS
+
+METHOD New( oNodeTop, nType ) CLASS TXmlIterator
+   ::nType := IIF( nType == NIL, HBXML_ITERATOR_ALL, nType )
+   ::oTop  := oNodeTop
+   ::oNode := oNodeTop
+RETURN Self
+
+METHOD Find( cName, cAttribute, cValue, cData ) CLASS TXmlIterator
+   ::cName := cName
+   ::cAttribute := cAttribute
+   ::cValue := cValue
+   ::cData := cData
+RETURN ::Next()
+
+METHOD Next() CLASS TXmlIterator
+   LOCAL oFound := ::oNode:NextInTree()
+   LOCAL bFound := .F.
+
+   SWITCH ::nType
+      CASE HBXML_ITERATOR_ALL
+         IF oFound != NIL
+            bFound := .T.
+         ENDIF
+      EXIT
+
+      CASE HBXML_ITERATOR_SCAN
+         DO WHILE oFound != NIL .and. .not. bFound
+            IF ::cName != NIL
+               IF oFound:cName == NIL .or. ::cName != oFound:cName
+                  oFound := oFound:NextInTree()
+                  LOOP
+               ENDIF
+            ENDIF
+
+            IF ::cAttribute != NIL
+               IF AScan( oFound:aAttributes, {|elem| ::cAttribute == elem[1] }) == 0
+                  oFound := oFound:NextInTree()
+                  LOOP
+               ENDIF
+            ENDIF
+
+            IF ::cValue != NIL
+               IF AScan( oFound:aAttributes, {|elem| ::cValue == elem[2]}) == 0
+                  oFound := oFound:NextInTree()
+                  LOOP
+               ENDIF
+            ENDIF
+
+            IF ::cData != NIL
+               IF oFound:cData == NIL .or. ::cData != oFound:cData
+                  oFound := oFound:NextInTree()
+                  LOOP
+               ENDIF
+            ENDIF
+
+            // if it arrives here, this means a match!
+            bFound := .T.
+         ENDDO
+
+      EXIT
+
+      CASE HBXML_ITERATOR_REGEX
+         DO WHILE oFound != NIL .and. .not. bFound
+            IF ::cName != NIL
+               IF oFound:cName == NIL .or. .not. oFound:cName LIKE ::cName
+                  oFound := oFound:NextInTree()
+                  LOOP
+               ENDIF
+            ENDIF
+
+            IF ::cAttribute != NIL
+               IF AScan( oFound:aAttributes, {|elem| elem[1] LIKE ::cAttribute } ) == 0
+                  oFound := oFound:NextInTree()
+                  LOOP
+               ENDIF
+            ENDIF
+
+            IF ::cValue != NIL
+               IF AScan( oFound:aAttributes, {|elem| elem[2] LIKE ::cValue } ) == 0
+                  oFound := oFound:NextInTree()
+                  LOOP
+               ENDIF
+            ENDIF
+
+            IF ::cData != NIL
+               IF oFound:cData == NIL .or. .not. oFound:cData HAS ::cData
+                  oFound := oFound:NextInTree()
+                  LOOP
+               ENDIF
+            ENDIF
+
+            // if it arrives here, this means a match!
+            bFound := .T.
+         ENDDO
+
+         CASE HBXML_ITERATOR_PATH
+            //TODO: Implement this
+         EXIT
+
+      EXIT
+   END
+
+   // move pointer only if found
+   IF bFound
+      ::oNode := oFound
+   ENDIF
+
+RETURN oFound
+
+
+/********************************************
    Document Class
 *********************************************/
 
@@ -194,24 +326,47 @@ CLASS TXmlDocument
    DATA nLine
    DATA nNodeCount
 
-   METHOD New( oNode )
+   METHOD New( xElem )                CONSTRUCTOR
    METHOD Read( xData )               INLINE HBXML_DATAREAD( Self, xData )
    METHOD ToString( nStyle )          INLINE ::oRoot:ToString( nStyle )
    METHOD Write( fHandle, nStyle )    INLINE ::oRoot:Write( fHandle, nStyle )
 
+   METHOD FindFirst( cName, cAttrib, cValue, cData )
+   METHOD FindFirstRegex( cName, cAttrib, cValue, cData )
+   METHOD FindNext()                   INLINE ::oIterator:Next()
+
+HIDDEN:
+   DATA oIterator
+
 ENDCLASS
 
-METHOD New( oNode ) CLASS TXmlDocument
-   IF oNode == NIL
-      ::oRoot := TXmlNode():New( HBXML_TYPE_DOCUMENT )
-   ELSE
-      ::oRoot = oNode
-   ENDIF
-   
+METHOD New( xElem ) CLASS TXmlDocument
    ::nStatus := HBXML_STATUS_OK
    ::nError := HBXML_ERROR_NONE
    ::nLine := 1
    ::nNodeCount := 0
 
+   IF xElem == NIL
+      ::oRoot := TXmlNode():New( HBXML_TYPE_DOCUMENT )
+   ELSE
+      SWITCH ValType( xElem )
+         CASE 'O'
+            ::oRoot = xElem
+         EXIT
+
+         CASE 'N'
+         CASE 'C'
+            ::oRoot := TXmlNode():New( HBXML_TYPE_DOCUMENT )
+            ::Read( xElem )
+      END
+   ENDIF
+
 RETURN Self
 
+METHOD FindFirst( cName, cAttrib, cValue, cData ) CLASS TXmlDocument
+   ::oIterator := TXmlIterator():New( ::oRoot, HBXML_ITERATOR_SCAN )
+RETURN ::oIterator:Find( cName, cAttrib, cValue, cData )
+
+METHOD FindFirstRegex( cName, cAttrib, cValue, cData ) CLASS TXmlDocument
+   ::oIterator := TXmlIterator():New( ::oRoot, HBXML_ITERATOR_REGEX )
+RETURN ::oIterator:Find( cName, cAttrib, cValue, cData )

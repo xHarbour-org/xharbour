@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbxml.ch,v 1.1 2003/06/16 00:03:21 jonnymind Exp $
  */
 
 /*
@@ -90,5 +90,11 @@
 #define HBXML_TYPE_DIRECTIVE      3
 #define HBXML_TYPE_DATA           4
 #define HBXML_TYPE_DOCUMENT       5
+
+/* Iterator types */
+#define HBXML_ITERATOR_ALL        1
+#define HBXML_ITERATOR_SCAN       2
+#define HBXML_ITERATOR_REGEX      3
+#define HBXML_ITERATOR_PATH       4
 
 #endif

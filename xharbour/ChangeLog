@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1125 2003/06/16 22:30:24 lculik Exp $
+ * $Id: ChangeLog,v 1.1126 2003/06/17 00:54:30 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-06-17 12:11 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/regex.c
+    ! Minor fix in error reporting (really minor :-)
+
+  * source/rtl/txml.prg
+  * include/hbxml.ch
+    + Added FindFirst(), FindFirstRegex() and FindNext() functions
+      to TXmlDocument class.
+      Find operation are done with an iterator that is programmed
+      as a xHarbour class directly in txml.prg
+    % An xml file or string can now be passed also in the constructor
+
+  * tests/xmltest.prg
+    + Added test for find features
+    
 2003-06-17 02:43 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/config/lib.cf
   * xharbour/config/linux/dir.cf
