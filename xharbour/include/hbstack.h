@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.7 2002/12/19 18:15:34 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.8 2002/12/22 06:53:59 walito Exp $
  */
 
 /*
@@ -89,7 +89,7 @@ typedef struct
 #endif
 
 /* JC1: test for macro accessing the stack */
-#if defined( HB_THREAD_SUPPORT ) && ! defined(HB_COMP_H_)
+#if defined( HB_THREAD_SUPPORT )
    #include "thread.h"
    extern HB_STACK *hb_getCurrentStack( void );
 

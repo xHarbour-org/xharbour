@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.551 2002/12/25 15:26:07 walito Exp $
+ * $Id: ChangeLog,v 1.552 2002/12/26 02:48:34 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-27 23:28 UTC+0100    Giancarlo Niccolai <giancarlo@niccolai.ws>
+
+* include/hbstack.h
+* include/inet.h
+* source/rtl/inet.c
+* source/vm/estack.c
+* source/vm/thread.c
+  ! compilation problems with -DHB_NO_DEFAULT_THREADS are now fixed
+
+* source/rtl/inet.c
+  * Removed completely (using comments) locking mechanism upon sockets. To be studied
+    more deeply when MT/GC is working.
 
 2002-12-26 03:38 UTC+0100  Giancarlo Niccolai <giancarlo@niccolai.ws>
 

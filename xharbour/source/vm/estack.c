@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.19 2002/12/20 08:39:43 ronpinkas Exp $
+ * $Id: estack.c,v 1.20 2002/12/23 00:14:22 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,6 @@ HB_STACK hb_stack;
 
 #ifdef HB_THREAD_SUPPORT
    #include "thread.h"
-#endif
 
 HB_STACK *hb_getCurrentStack( void )
 {
@@ -113,7 +112,7 @@ HB_STACK *hb_getCurrentStack( void )
       }
    }
 }
-
+#endif
 /* ------------------------------- */
 
 void hb_stackPop( void )

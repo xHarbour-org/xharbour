@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.17 2002/12/24 06:42:21 ronpinkas Exp $
+* $Id: thread.c,v 1.18 2002/12/26 02:48:47 jonnymind Exp $
 */
 
 /*
@@ -70,6 +70,8 @@
 #include "hbvm.h"
 #include "hbstack.h"
 #include "thread.h"
+
+#ifdef HB_THREAD_SUPPORT
 
 HB_THREAD_CONTEXT *hb_ht_context;
 HB_CRITICAL_T context_monitor;
@@ -990,3 +992,5 @@ void hb_LWRM_unlock( HB_LWR_MUTEX *lpMutex )
       }
    }
 }
+
+#endif
