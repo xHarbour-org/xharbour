@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3953 2005/03/17 13:53:55 andijahja Exp $
+ * $Id: ChangeLog,v 1.3954 2005/03/17 14:35:38 snaiperis Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-17 17:59 UTC+0200 Mindaugas Kavaliauskas <dbtopas at @ at dbtopas.lt>
+  * source/vm/hvm.c
+    ! fixed bit operations on 64bit numbers on 32bit systems. Bugfix is 
+      proposed by Przemyslaw. Thanks.
 
 2005-03-17 16:25 UTC+0200 Mindaugas Kavaliauskas <dbtopas at @ at dbtopas.lt>
   * source/ct/disk.c

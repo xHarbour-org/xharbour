@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.444 2005/03/06 00:53:04 andijahja Exp $
+ * $Id: hvm.c,v 1.445 2005/03/10 02:41:45 ronpinkas Exp $
  */
 
 /*
@@ -5127,7 +5127,7 @@ static void hb_vmBitAnd( void )
 
    if( HB_IS_NUMBER( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      pItem1->item.asLong.value = hb_itemGetNL( pItem1 ) & hb_itemGetNL( pItem2 );
+      pItem1->item.asLong.value = hb_itemGetNInt( pItem1 ) & hb_itemGetNInt( pItem2 );
       pItem1->type = HB_IT_LONG;
       hb_stackPop();
    }
@@ -5200,9 +5200,9 @@ static void hb_vmBitAnd( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
-      LONG   lVal = hb_itemGetNL( pItem1 );
-      char*  pString = pItem2->item.asString.value;
-      ULONG  ulLen = pItem2->item.asString.length;
+      HB_LONG  lVal = hb_itemGetNInt( pItem1 );
+      char*    pString = pItem2->item.asString.value;
+      ULONG    ulLen = pItem2->item.asString.length;
 
       while ( ulLen )
          lVal &= pString[--ulLen];
@@ -5214,7 +5214,7 @@ static void hb_vmBitAnd( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      pItem1->item.asLong.value = hb_itemGetNL( pItem1 ) & hb_itemGetNL( pItem2 );
+      pItem1->item.asLong.value = hb_itemGetNInt( pItem1 ) & hb_itemGetNInt( pItem2 );
       pItem1->type = HB_IT_LONG;
       hb_stackPop();
    }
@@ -5246,7 +5246,7 @@ static void hb_vmBitOr( void )
 
    if( HB_IS_NUMBER( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      pItem1->item.asLong.value = hb_itemGetNL( pItem1 ) | hb_itemGetNL( pItem2 );
+      pItem1->item.asLong.value = hb_itemGetNInt( pItem1 ) | hb_itemGetNInt( pItem2 );
       pItem1->type = HB_IT_LONG;
       hb_stackPop();
    }
@@ -5319,9 +5319,9 @@ static void hb_vmBitOr( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
-      LONG   lVal = hb_itemGetNL( pItem1 );
-      char*  pString = pItem2->item.asString.value;
-      ULONG  ulLen = pItem2->item.asString.length;
+      HB_LONG   lVal = hb_itemGetNInt( pItem1 );
+      char*     pString = pItem2->item.asString.value;
+      ULONG     ulLen = pItem2->item.asString.length;
 
       while ( ulLen )
          lVal |= pString[--ulLen];
@@ -5333,7 +5333,7 @@ static void hb_vmBitOr( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      pItem1->item.asLong.value = hb_itemGetNL( pItem1 ) | hb_itemGetNL( pItem2 );
+      pItem1->item.asLong.value = hb_itemGetNInt( pItem1 ) | hb_itemGetNInt( pItem2 );
       pItem1->type = HB_IT_LONG;
       hb_stackPop();
    }
@@ -5366,7 +5366,7 @@ static void hb_vmBitXor( void )
 
    if( HB_IS_NUMBER( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      pItem1->item.asLong.value = hb_itemGetNL( pItem1 ) ^ hb_itemGetNL( pItem2 );
+      pItem1->item.asLong.value = hb_itemGetNInt( pItem1 ) ^ hb_itemGetNInt( pItem2 );
       pItem1->type = HB_IT_LONG;
       hb_stackPop();
    }
@@ -5439,9 +5439,9 @@ static void hb_vmBitXor( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
-      LONG   lVal = hb_itemGetNL( pItem1 );
-      char*  pString = pItem2->item.asString.value;
-      ULONG  ulLen = pItem2->item.asString.length;
+      HB_LONG   lVal = hb_itemGetNInt( pItem1 );
+      char*     pString = pItem2->item.asString.value;
+      ULONG     ulLen = pItem2->item.asString.length;
 
       while ( ulLen )
          lVal ^= pString[--ulLen];
@@ -5453,7 +5453,7 @@ static void hb_vmBitXor( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      pItem1->item.asLong.value = hb_itemGetNL( pItem1 ) ^ hb_itemGetNL( pItem2 );
+      pItem1->item.asLong.value = hb_itemGetNInt( pItem1 ) ^ hb_itemGetNInt( pItem2 );
       pItem1->type = HB_IT_LONG;
       hb_stackPop();
    }
