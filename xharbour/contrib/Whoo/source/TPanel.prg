@@ -1,5 +1,5 @@
 /*
- * $Id: TPanel.prg,v 1.13 2002/10/28 02:19:05 what32 Exp $
+ * $Id: TPanel.prg,v 1.14 2002/10/29 02:12:38 what32 Exp $
  */
 
 /*
@@ -62,14 +62,16 @@ CLASS TPanel FROM TForm
    DATA WinClass    PROTECTED INIT "Panel"
    DATA ControlName PROTECTED INIT "Panel"
 
-   METHOD New()
+   METHOD Create()
 
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
 
-METHOD New( oParent ) CLASS TPanel
+METHOD Create( oParent ) CLASS TPanel
    
+   super:Create( oParent )
+
    ::WndProc   := IFNIL(::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL(::Msgs,-1,::Msgs)
    ::FrameWnd  := .F.
@@ -80,6 +82,6 @@ METHOD New( oParent ) CLASS TPanel
    ::ExStyle   := IFNIL(::ExStyle,0,::ExStyle)
    ::Modal     := IFNIL(::Modal,.F.,::Modal)
 
-   RETURN( super:New( oParent ) )
+   RETURN( Self )
 
 *-----------------------------------------------------------------------------*

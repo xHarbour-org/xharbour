@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.24 2002/10/29 02:12:38 what32 Exp $
+ * $Id: TTabSheet.prg,v 1.1 2002/10/31 04:08:44 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -63,14 +63,14 @@ METHOD New( oParent, cCaption, cRes, nImgPos ) CLASS TTabSheet
 
    super:new( oParent )
 
-   ::Left    := 0
-   ::Top     := 0
-   ::width   := 10
-   ::height  := 10
-   ::style   := WS_CHILD + WS_VISIBLE
-   ::modal   := .F.
-   ::resname := cRes
-   ::Caption := cCaption
+   ::FLeft     := 0
+   ::FTop      := 0
+   ::FWidth    := 10
+   ::FHeight   := 10
+   ::style    := WS_CHILD + WS_VISIBLE
+   ::modal    := .F.
+   ::resname  := cRes
+   ::FCaption := cCaption
    ::ImageIndex := nImgPos
 
 return( self )

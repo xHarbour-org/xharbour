@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.14 2002/10/27 01:29:24 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.15 2002/10/31 08:18:20 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -202,7 +202,6 @@ CLASS TWBrowse FROM TWinControl
    DATA xTrackColumn       PROTECTED 
    DATA xDragColumn        PROTECTED 
 
-   METHOD New() CONSTRUCTOR
    METHOD AddColumn()
    METHOD InsColumn()
    METHOD DelColumn()
@@ -220,7 +219,6 @@ CLASS TWBrowse FROM TWinControl
    METHOD RestoreColumnOrder()
    METHOD Freeze()
 
-   METHOD Create()      INLINE super:Create(),::Configure()
    METHOD RefreshAll()
    METHOD RefreshCurrent()
    METHOD Hilite()
@@ -286,22 +284,19 @@ CLASS TWBrowse FROM TWinControl
 
    METHOD GetItemRect()
    METHOD GetItemText()
-
+   METHOD Create() 
+   METHOD CreateWnd() 
+   
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
 
-METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight, Source, aHeader, bNotify ) CLASS TWBrowse
+METHOD Create( oParent ) CLASS TWBrowse
    local i, oCol
 
    ::WinClass    := "WHBrowser"
    ::ControlName := "Browse"
 
-   ::id        := nId
-   ::Left      := IFNIL( nLeft,    ::Left,    nLeft    )
-   ::Top       := IFNIL( nTop,     ::Top,     nTop     )
-   ::Width     := IFNIL( nWidth ,  ::Width,   nWidth   )
-   ::Height    := IFNIL( nHeight,  ::height,  nHeight  )
    ::Msgs      := -1
    ::WndProc   := "FormProc"
 
@@ -317,8 +312,8 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight, Source, aHeader, bNotify
    ::wantUseSysColors:= .T.
    ::wantEnterKey    := .F.
    ::wantAutoHilite  := .T.
-   ::bOnChangeBlock  := bNotify
-   ::wantNotify      := ( ValType( bNotify ) == "B" ) // tbd
+//   ::bOnChangeBlock  := bNotify
+   ::wantNotify      := .F. //( ValType( bNotify ) == "B" ) // tbd
 
    // initialize
 
@@ -373,20 +368,53 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight, Source, aHeader, bNotify
    ::HeadHeight      := 18
 
    ::ArrayMode       := .F.
-   ::Source          := Source
+//   ::Source          := Source
+
+   ::HeadText     :={}
+   ::HeadAlign    :={}
+   ::HeadBmps     :={}
+   ::HeadBmpAlign :={}
+   ::ColBgColors  :={}
+   ::ColFgColors  :={}
+   ::ColAlign     :={}
+   ::ColVAlign    :={}
+   ::ColFonts     :={}
+   ::ColBmps      :={}
+   ::ColBmpAlign  :={}
+   ::ColStyle     :={}
+   ::ColOffset    :={}
+   ::objects      :={}
+
+/*
+   if aHeader!=NIL
+      for i:=1 to len( aHeader )
+          oCol:=GetAColumn( aHeader, i)
+          oCol:VertAlign := TA_CENTER
+          oCol:bSaveBlock:= aHeader[i][3]
+          ::AddColumn(oCol)
+      next
+   END
+*/
+return(super:Create( oParent ))
+
+
+//---------------------------------------------------------------------------------------------
+
+METHOD CreateWnd() CLASS TWBrowse
+
+   ::ArrayMode := .F.
+   
    DO CASE
-      CASE ValType( Source ) == "A"
+      CASE ValType( ::Source ) == "A"
          ::ArrayMode := .T.
 
-      CASE ValType( Source )== "C"
-         ::ArrayMode := .F.
-
-      CASE Source == NIL .AND. ! Empty( ALIAS() )
+      CASE ::Source == NIL .AND. ! Empty( ALIAS() )
          ::Source := ALIAS()
 
-      OTHERWISE
-         // error will come on configure or refresh !
    ENDCASE
+   
+   TraceLog( ::ArrayMode, ::Source )
+   
    IF ::ArrayMode
       ::Element   := 1
       ::RecPos    := ::Element
@@ -462,33 +490,10 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight, Source, aHeader, bNotify
                  IF(::HitBottom,::RecPos:=::RecCount,)}
       ::bRecNo :={| | (::Source)->(RecNo())}
    ENDIF
-
-   ::HeadText     :={}
-   ::HeadAlign    :={}
-   ::HeadBmps     :={}
-   ::HeadBmpAlign :={}
-   ::ColBgColors  :={}
-   ::ColFgColors  :={}
-   ::ColAlign     :={}
-   ::ColVAlign    :={}
-   ::ColFonts     :={}
-   ::ColBmps      :={}
-   ::ColBmpAlign  :={}
-   ::ColStyle     :={}
-   ::ColOffset    :={}
-   ::objects      :={}
-
-
-   if aHeader!=NIL
-      for i:=1 to len( aHeader )
-          oCol:=GetAColumn( aHeader, i)
-          oCol:VertAlign := TA_CENTER
-          oCol:bSaveBlock:= aHeader[i][3]
-          ::AddColumn(oCol)
-      next
-   END
-
-return(super:new( oParent ))
+   
+   super:CreateWnd()
+   ::Configure()   
+RETURN Self
 
 //---------------------------------------------------------------------------------------------
 

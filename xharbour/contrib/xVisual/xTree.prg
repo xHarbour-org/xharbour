@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.15 2002/10/30 21:39:31 ronpinkas Exp $
+ * $Id: xTree.prg,v 1.16 2002/11/05 21:40:09 what32 Exp $
  */
 
 /*
@@ -38,34 +38,56 @@ GLOBAL EXTERNAL FormEdit
 CLASS ObjTree FROM TForm
 
    VAR TreeRoot AS OBJECT
-
-   METHOD New( oParent ) INLINE ::Caption := 'Object Tree',;
-                                ::Name    := "ObjTree",;
-                                ::Fleft    := 0,;
-                                ::Ftop     := 125,;
-                                ::Fwidth   := 200,;
-                                ::Fheight  := 150,;
-                                ::ExStyle := WS_EX_TOOLWINDOW ,;
-                                super:new( oParent )
-   METHOD OnCloseQuery() INLINE 0
+   DATA oTree PROTECTED
+   
+   METHOD Create()
    METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE  ::TreeView1:Move( , , x, y, .t. )
+   METHOD OnCloseQuery() INLINE 0
+   METHOD OnSize(n,x,y)  INLINE IIF( ! ::oTree == NIL, ::oTree:Move( , , x, y, .t. ), ), NIL
 
 ENDCLASS
+
+METHOD Create( oParent ) CLASS ObjTree
+
+   ::FCaption := 'Object Tree'
+   ::Name     := "ObjTree"
+   ::FLeft    := 0
+   ::FTop     := 125
+   ::FWidth   := 200
+   ::FHeight  := 150
+   ::ExStyle := WS_EX_TOOLWINDOW
+
+   super:Create( oParent )
+
+   ::GetHandle()
+
+RETURN( Self )
+
 
 METHOD OnCreate() CLASS ObjTree
 
    LOCAL o,hImg,hBmp
-
+   
    hImg := ImageList_Create( 16, 16, ILC_COLORDDB+ILC_MASK )
    hBmp := LoadImage( hInstance(), "OBJTREE", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
    ImageList_AddMasked( hImg, hBmp, RGB( 0, 255, 255 ) )
    DeleteObject(hBmp)
 
-   ::Add( TreeObj():New( self, 100,  0,  0, 100, 100) )
+   ::oTree := TreeObj():Create( self )
    
-   TVSetImageList(::TreeView1:handle, hImg, 0 )
-RETURN(nil)
+   ::oTree:Width := ::FWidth
+   ::oTree:Height:= ::FHeight
+   
+   ::Add( ::oTree )
+
+   ::oTree:FWidth := 100
+   ::oTree:FHeight:= 100
+
+   ::oTree:Show( SW_SHOW )
+
+   TVSetImageList(::oTree:Handle, hImg, 0 )
+
+RETURN( Self )
 
 //------------------------------------------------------------------------------------------------------------------
 
@@ -85,7 +107,7 @@ return(o)
 
 METHOD OnChange( oItem ) CLASS TreeObj
 
-   LOCAL n := aScan( ::Parent:Parent:ObjInspect:Objects, {|o|o:handle == oItem:cargo} )
+   LOCAL n := aScan( ::Parent:Parent:ObjInspect:Objects, {|o|o:FHandle == oItem:cargo} )
 
    IF n > 0
       ::Parent:Parent:ObjInspect:ComboBox1:SetCurSel( n - 1 )

@@ -1,5 +1,5 @@
 /*
- * $Id: xPad.prg,v 1.6 2002/10/29 02:21:09 what32 Exp $
+ * $Id: xPad.prg,v 1.7 2002/11/05 21:40:09 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -187,47 +187,36 @@ typedef struct tagTEXTMETRIC {;
 } TEXTMETRIC;
 
 //---------------------------------------------------------------------------------------------
-CLASS ObjEdit FROM TPanel
+CLASS ObjEdit FROM TForm
+
    DATA oEd
-   METHOD New( oParent ) INLINE ::Caption := 'Source Editor',;
-                                ::left    := 100,;
-                                ::top     := 100,;
-                                ::width   := 300,;
-                                ::height  := 300,;
-                                ::Name    := "ObjEdit",;
-                                ::Style   := WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+DS_MODALFRAME+WS_MAXIMIZEBOX+WS_MINIMIZEBOX+WS_THICKFRAME,;
-                                super:new( oParent )
-   METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE ::SourceEdit:Move(,,x,y,.t.),nil
+  
+   METHOD Create()
+   
 ENDCLASS
 
-METHOD OnCreate() CLASS ObjEdit
-   local aRect := ::ClientRect()
-   ::Add( TEditor():New( self, "", 101,  0,0, aRect[3], aRect[4] ) )
+//---------------------------------------------------------------------------------------------
+METHOD Create( oParent ) CLASS ObjEdit
 
-   ::oEd := oEdit():New( ::SourceEdit:handle )
-   
-   ResetProcedure(::SourceEdit:handle)
+   ::FCaption := 'Source Editor'
+   ::Fleft    := 100
+   ::Ftop     := 100
+   ::Fwidth   := 300
+   ::Fheight  := 300
+   ::Name     := "ObjEdit"
+   ::Style    := WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+DS_MODALFRAME+WS_MAXIMIZEBOX+WS_MINIMIZEBOX+WS_THICKFRAME
+   super:Create( oParent )
+
+   ::GetHandle()
+
+   ::oEd := oEdit():New( ::FHandle )
+   ResetProcedure( ::FHandle )
    ::oEd:configure()
    ::oEd:subclass()
-   UpdateWindow(::SourceEdit:handle)
-return(nil)
+   UpdateWindow( ::FHandle )
 
-CLASS TEditor FROM TForm
-   METHOD New( oParent ) INLINE ::Name := "SourceEdit", super:New( oParent )
+return( Self )
 
-   METHOD Create() INLINE ::Style  := WS_CHILD+WS_BORDER+WS_TABSTOP+WS_VSCROLL+WS_HSCROLL,;
-                          ::ExStyle:= WS_EX_CLIENTEDGE,;
-                          super:Create()
-
-   METHOD SetText(c) INLINE ::Parent:oEd:aText    := {''} ,;
-                            ::Parent:oEd:Lines    := 1 ,;
-                            ::Parent:oEd:TopLine  := 1 ,;
-                            ::Parent:oEd:Line     := 1 ,;
-                            ::Parent:oEd:Col      := 1 ,;
-                            ::Parent:oEd:SetText( c ),;
-                            ::Parent:oEd:Configure()
-ENDCLASS
 
 *-----------------------------------------------------------------------------*
 Class oedit

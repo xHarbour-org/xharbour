@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.56 2002/10/30 21:39:31 ronpinkas Exp $
+ * $Id: xInspect.prg,v 1.57 2002/11/05 21:40:09 what32 Exp $
  */
 
 /*
@@ -41,26 +41,23 @@ GLOBAL EXTERNAL FormEdit
 
 CLASS ObjInspect FROM TForm
 
-   VAR Browser  AS OBJECT
+   VAR Browser  AS OBJECT PROTECTED
+   VAR Combo    AS OBJECT PROTECTED
+   
    VAR Objects  AS ARRAY INIT {}
+   
    VAR CurObject AS OBJECT
 
-   METHOD New( oParent ) INLINE ::Caption := 'Object Inspector',;
-                                ::Name    := "ObjInspect",;
-                                ::left    := 0,;
-                                ::top     := 275,;
-                                ::width   := 200,;
-                                ::height  := 297,;
-                                ::ExStyle := WS_EX_TOOLWINDOW,;
-                                super:new( oParent )
-
+   METHOD Create()
    METHOD OnCloseQuery() INLINE 0
-   METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE  ::ComboBox1:Move( , , x, 21, .T. ),;
+
+   METHOD OnSize(n,x,y)  INLINE  /*::ComboBox1:Width := x,*/;
                                  ::InspTabs:Move( , 25, x, y-25, .T. ),;
-                                 ::browser:width := ::InspTabs:Properties:ClientRect()[3],;
-                                 ::browser:height:= ::InspTabs:Properties:ClientRect()[4],;
+                                 ::browser:FWidth := ::InspTabs:Properties:ClientRect()[3],;
+                                 ::browser:FHeight:= ::InspTabs:Properties:ClientRect()[4],;
+                                 ::browser:Move( , , , , .T. ),;
                                  NIL
+
    METHOD SetBrowserData()
    METHOD SaveVar()
 ENDCLASS
@@ -101,29 +98,44 @@ RETURN Self
 
 //-------------------------------------------------------------------------------------------------
 
-METHOD OnCreate() CLASS ObjInspect
+METHOD Create( oParent ) CLASS ObjInspect
 
    LOCAL oTabs
 
-   local aRect := ::ClientRect()
-   local oCombo:= ComboInsp():New(  self, 100, 0, 0, aRect[3], 100 )
-   oCombo:Style:= WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
+   ::FCaption := "Object Inspector"
+   ::Name     := "ObjInspect"
+   ::FLeft    := 0
+   ::FTop     := 275
+   ::FWidth   := 200
+   ::FHeight  := 297
+   ::ExStyle  := WS_EX_TOOLWINDOW
 
-   ::Add( oCombo )
-   ::ComboBox1:SetItemHeight( -1, 15 )
+   super:Create( oParent )
 
-   oTabs := TTabControl():New( self, 101,  0,  25, aRect[3], aRect[4]-25)
-   oTabs:Name := "InspTabs"
+   ::Combo        := ComboInsp():Create( self )
+   ::Add( ::Combo )
+
+   ::Combo:FWidth := ::FWidth
+   ::Combo:FWidth := 100
+   ::Combo:Style  := WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
+   ::Combo:SetItemHeight( -1, 15 )
+//   ::Combo:Show( SW_SHOW )
+
+   oTabs := TTabControl():Create( self )
+   oTabs:FTop   := 25
+   oTabs:FWidth := ::FWidth
+   oTabs:FHeight:= ::FHeight - 25
+   oTabs:Name   := "InspTabs"
+
    ::Add( oTabs )
 
-   ::InspTabs:AddTab( "Properties")
-   ::InspTabs:AddTab( "Events", TabPage():New( ::InspTabs, "Events") )
-   ::InspTabs:Configure()
+   ::InspTabs:AddTab( "Properties" )
+   ::InspTabs:AddTab( "Events", TabPage():Create( ::InspTabs ) )
 
-   ::Browser:=InspectBrowser():New( ::InspTabs:Properties )
-   ::Browser:Create()
+   ::Browser:=InspectBrowser():Create( ::InspTabs:Properties )
+   ::Browser:Show( SW_SHOW )
 
-return( super:OnCreate() )
+return( Self )
 
 //----------------------------------------------------------------------------------------------
 
@@ -171,6 +183,7 @@ return(self)
 //----------------------------------------------------------------------------------------------
 
 CLASS ComboInsp FROM TComboBox
+//   METHOD Create( oParent ) INLINE super:Create( oParent ), ::Show( SW_SHOW )
    METHOD DrawItem()
    METHOD OnClick()
    METHOD AddString()
@@ -318,7 +331,7 @@ return( 1 )
 CLASS InspectBrowser FROM TWBrowse
 
    DATA oCtrl
-   METHOD New() CONSTRUCTOR
+   METHOD Create() CONSTRUCTOR
    METHOD SetColControl()
    METHOD OnCommand()
 
@@ -326,12 +339,18 @@ ENDCLASS
 
 //-------------------------------------------------------------------------------------------
 
-METHOD New( oParent ) CLASS InspectBrowser
+METHOD Create( oParent ) CLASS InspectBrowser
 
    LOCAL oCol1,oCol2, aProp := { {"",""} }
 
-   super:New( oParent, 150, 0, 0, 100, 100, aProp )
+   super:Create( oParent )
 
+   ::FLeft  := 0
+   ::FTop   := 0
+   ::FWidth := 100
+   ::FHeight:= 100
+   ::Source := aProp
+   
    ::BgColor      := GetSysColor( COLOR_BTNFACE )
    ::HiliteNoFocus:= GetSysColor( COLOR_BTNFACE )
    ::wantHScroll  :=.F.
@@ -350,7 +369,7 @@ METHOD New( oParent ) CLASS InspectBrowser
 
    ::bOnDblClick   := {|o,x,y|::SetColControl(x,y)}
    ::Font          := oParent:Parent:font
-
+   
 RETURN self
 
 //-------------------------------------------------------------------------------------------

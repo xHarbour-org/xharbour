@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.24 2002/10/29 02:12:38 what32 Exp $
+ * $Id: TabControl.Prg,v 1.25 2002/11/05 21:39:59 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -67,7 +67,6 @@ CLASS TTabControl FROM TCustomControl
    DATA WinClass    PROTECTED INIT WC_TABCONTROL
    DATA ControlName PROTECTED INIT "TabControl"
 
-   METHOD New() CONSTRUCTOR
    METHOD AddTab()
    METHOD InsertTab()
    METHOD DeleteTab()
@@ -107,16 +106,6 @@ ENDCLASS
 
 *-----------------------------------------------------------------------------*
 
-METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TTabControl
-   ::id        := nId
-   ::Left      := IFNIL( nLeft,   ::Left,   nLeft  )
-   ::Top       := IFNIL( nTop,    ::Top,    nTop   )
-   ::width     := IFNIL( nWidth,  ::width , nWidth )
-   ::Height    := IFNIL( nHeight, ::height, nHeight)
-RETURN( super:new( oParent ))
-
-*-----------------------------------------------------------------------------*
-
 METHOD Notify( hdr ) CLASS TTabControl
    LOCAL nSel
    nSel:=TabCtrl_GetCurSel( ::handle )+1
@@ -132,22 +121,35 @@ METHOD Notify( hdr ) CLASS TTabControl
 METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
    LOCAL hTab, cRes
    local hClass, nSeq
+   
    if VALTYPE( oPage ) == "C"
       cRes := oPage
       oPage:= NIL
    endif
-   DEFAULT oPage TO TabPage():New( self, cName )
-   ShowWindow( oPage:handle, SW_SHOW )
+   
+   DEFAULT oPage TO TabPage():Create( self )
+   
    if cRes != NIL
       oPage:resname := cRes
       oPage:ImageIndex := nImgPos
    endif
    oPage:Name := cName
-   if (hTab:=TabCtrl_AddItem(::handle,oPage:Caption,oPage:ImageIndex)) > -1
+   oPage:Caption := cName
+
+   if (hTab:=TabCtrl_AddItem(::FHandle,oPage:Caption,oPage:ImageIndex)) > -1
       AADD(::Controls,oPage )
       __objAddData( self, cName, HB_OO_CLSTP_PROTECTED )
       __ObjSetValueList( self, { { cName, oPage } } )
    ENDIF
+
+   IF oPage:FHandle == NIL
+//      oPage:CreateWnd()
+   ENDIF
+
+   IF Len( ::Controls ) > 1
+      ShowWindow(oPage:handle,SW_HIDE)
+   ENDIF
+
    RETURN(hTab)
 
 *-----------------------------------------------------------------------------*
@@ -182,7 +184,7 @@ METHOD DeleteTab(nPos) CLASS TTabControl
 
 *-----------------------------------------------------------------------------*
 
-METHOD Configure(lCreate) CLASS TTabControl
+METHOD Configure() CLASS TTabControl
 
    LOCAL aTab //:=GetClientRect(::handle)
    local acRect:={0,0,0,0}
@@ -195,9 +197,6 @@ METHOD Configure(lCreate) CLASS TTabControl
    
    aTab := {::FLeft, ::FTop, ::FWidth, ::FHeight }
 
-   TraceLog()
-
-   DEFAULT lCreate TO .T.
    IF LEN(::Controls) > 0
    
       acRect := TabCtrl_GetItemRect( ::handle, 0 )
@@ -216,30 +215,14 @@ METHOD Configure(lCreate) CLASS TTabControl
 
    FOR i:=1 TO LEN(::Controls)
       IF ::Controls[i]!=NIL
-         IF lCreate
-            ::Controls[i]:Create()
-         ENDIF
-         
-//         VIEW aTab
 
          ::Controls[i]:FLeft   := acRect[1]
          ::Controls[i]:FTop    := acRect[2]+acRect[4]
          ::Controls[i]:FWidth  := aTab[3]-6
          ::Controls[i]:FHeight := aTab[4]-acRect[2]-acRect[4]-4
  
-         ::Controls[i]:Move( , , , , .F. )
-/*         
-         ::Controls[i]:Move( acRect[1],;
-                         acRect[2]+acRect[4],;
-                         aTab[3]-6,;
-                         aTab[4]-acRect[2]-acRect[4]-4,;
-                         .F.)
-*/
-         if lCreate
-            IF i<>::CurSel
-               ShowWindow(::Controls[i]:handle,SW_HIDE)
-            endif
-         endif
+         ::Controls[i]:Move( , , , , .T. )
+
       endif
    next
 
@@ -400,12 +383,11 @@ METHOD SetUnicodeFormat( lUnicode ) CLASS TTabControl
 *-----------------------------------------------------------------------------*
 
 METHOD OnSize( nwParam,x , y ) CLASS TTabControl
-   local n, aRect, oCtrl
-//   FOR EACH oCtrl IN ::Controls
-//       IF oCtrl != NIL
-          ::Configure(.F.)
-//       ENDIF
-//   NEXT
+
+   LOCAL n, aRect, oCtrl
+
+   ::Configure()
+
 return( nil )
 
 *-----------------------------------------------------------------------------*
@@ -421,22 +403,21 @@ return(nil)
 
 CLASS TabPage FROM TPanel
    DATA ImageIndex
-   METHOD New() CONSTRUCTOR
+   METHOD Create() CONSTRUCTOR
    METHOD OnCommand()
 ENDCLASS
 
-METHOD New( oParent, cCaption, cRes, nImgPos ) CLASS TabPage
-   super:new( oParent )
-   ::Left    := 0
-   ::Top     := 0
-   ::width   := 10
-   ::height  := 10
-   ::style   := WS_CHILD + WS_VISIBLE
-   ::modal   := .F.
-   ::resname := cRes
-   ::Caption := cCaption
-   ::ImageIndex := nImgPos
-return( self )
+METHOD Create( oParent ) CLASS TabPage
+   ::FLeft    := 0
+   ::FTop     := 0
+   ::FWidth   := 10
+   ::FHeight  := 10
+   ::style    := WS_CHILD + WS_VISIBLE
+   ::modal    := .F.
+   ::resname  := NIL
+   ::ImageIndex := 0
+   super:Create( oParent )
+return( Self )
 
 METHOD OnCommand(nwParam,nlParam) CLASS TabPage
    IF ::Parent:SendTo != NIL

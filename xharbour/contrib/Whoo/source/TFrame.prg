@@ -55,7 +55,7 @@ CLASS TFrame FROM TWinControl
    DATA WinClass    PROTECTED INIT "Frame"
    DATA ControlName PROTECTED INIT "Frame"
 
-   METHOD New()
+   METHOD Create()
    METHOD Add()
    METHOD SetLink()
    METHOD GetObj()
@@ -63,7 +63,7 @@ ENDCLASS
 
 *-----------------------------------------------------------------------------*
 
-METHOD New( oParent ) CLASS TFrame
+METHOD Create( oParent ) CLASS TFrame
 
    ::WndProc   := 'FormProc'
    ::Msgs      := -1
@@ -74,15 +74,13 @@ METHOD New( oParent ) CLASS TFrame
    ::lRegister := .T.
    InitCommonControls()
 
-   return( super:New( oParent ) )
+return( super:Create( oParent ) )
 
 *-----------------------------------------------------------------------------*
 
-METHOD Add( oObj, lCreate ) CLASS TFrame
+METHOD Add( oObj ) CLASS TFrame
 
    LOCAL oCtrl, nInst := 1
-
-   DEFAULT lCreate TO .T.
 
    //oObj:propname := cName
 
@@ -98,9 +96,6 @@ METHOD Add( oObj, lCreate ) CLASS TFrame
 
    ::SetLink( oObj )
 
-   IF lCreate
-      oObj:Create()
-   endif
    AADD( ::Controls, oObj )
 
    return( oObj )

@@ -1,5 +1,5 @@
 /*
- * $Id: TCButton.prg,v 1.20 2002/10/31 08:18:20 what32 Exp $
+ * $Id: TCButton.prg,v 1.21 2002/11/05 21:39:58 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -58,12 +58,12 @@ ENDCLASS
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TButton
 
-   ::id        := nId
-   ::Caption   := IFNIL( cCaption, ::Caption, cCaption )
-   ::Left      := IFNIL( nLeft,    ::Left,    nLeft    )
-   ::Top       := IFNIL( nTop,     ::Top,     nTop     )
-   ::Width     := IFNIL( nWidth ,  ::Width,   nWidth   )
-   ::Height    := IFNIL( nHeight,  ::height,  nHeight  )
+   ::id         := nId
+   ::FCaption   := IFNIL( cCaption, ::FCaption, cCaption )
+   ::FLeft      := IFNIL( nLeft,    ::FLeft,    nLeft    )
+   ::FTop       := IFNIL( nTop,     ::FTop,     nTop     )
+   ::FWidth     := IFNIL( nWidth ,  ::FWidth,   nWidth   )
+   ::FHeight    := IFNIL( nHeight,  ::FHeight,  nHeight  )
 
    RETURN( super:new( oParent ) )
 

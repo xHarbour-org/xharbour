@@ -1,5 +1,5 @@
 /*
- * $Id: TCProgBar.prg,v 1.10 2002/10/29 02:12:37 what32 Exp $
+ * $Id: TCProgBar.prg,v 1.11 2002/11/05 21:39:58 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -84,7 +84,7 @@ METHOD SetPosition(n) CLASS TProgressBar
    DEFAULT n TO 0
    ::position := n
    ::SendMessage( PBM_SETPOS, 20, 0 )
-   IF ::Caption!="".and.AND(GetWindowLong(::handle,GWL_STYLE),PBS_SMOOTH)>0
+   IF ::Caption!="".and.AND(GetWindowLong(::Handle,GWL_STYLE),PBS_SMOOTH)>0
       ::DrawText()
    END
    UpdateWindow( ::handle )

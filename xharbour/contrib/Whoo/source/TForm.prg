@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.52 2002/10/31 16:34:26 ronpinkas Exp $
+ * $Id: TForm.prg,v 1.53 2002/11/05 21:39:58 what32 Exp $
  */
 
 /*
@@ -88,7 +88,7 @@ CLASS TForm FROM TWinControl
    DATA WinClass    PROTECTED INIT "Form"
    DATA ControlName PROTECTED INIT "Form"
 
-   METHOD New()
+   METHOD Create()
    METHOD Add()
    METHOD Del()
    METHOD ChildFromHandle( hHandle )
@@ -116,8 +116,10 @@ RETURN(c)
 
 *-----------------------------------------------------------------------------*
 
-METHOD New( oParent ) CLASS TForm
+METHOD Create( oParent ) CLASS TForm
 
+   InitCommonControls()
+   
    ::WndProc   := IFNIL( ::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL( ::Msgs,-1,::Msgs)
    ::FrameWnd  := IFNIL( ::FrameWnd,.F.,::FrameWnd)
@@ -126,9 +128,8 @@ METHOD New( oParent ) CLASS TForm
    ::lRegister := IFNIL( ::lRegister,.T.,::lRegister)
    ::lControl  := .F.
    ::ExStyle   := IFNIL( ::ExStyle,0,::ExStyle)
-   InitCommonControls()
 
-   RETURN( super:New( oParent ) )
+RETURN( super:Create( oParent ) )
 
 *-----------------------------------------------------------------------------*
 
@@ -161,11 +162,6 @@ METHOD Add( oObj, lCreate ) CLASS TForm
    __ObjSetValueList( self, { { oObj:Name, oObj } } )
 
    oObj:Parent := Self
-
-   TraceLog( oObj:Name, lCreate )
-   IF lCreate
-      oObj:Create()
-   endif
 
    aAdd( ::Controls, oObj )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.23 2002/10/29 02:12:37 what32 Exp $
+ * $Id: TCRebar.prg,v 1.24 2002/11/05 21:55:15 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -44,10 +44,10 @@ pragma pack(4)
 CLASS TRebar FROM TCustomControl
 
    DATA Caption  PROTECTED  INIT ""
-   DATA xxLeft   PROTECTED  INIT    0
-   DATA xxTop    PROTECTED  INIT    0
-   DATA xxWidth  PROTECTED  INIT  200
-   DATA xxHeight PROTECTED  INIT  100
+   DATA FLeft   PROTECTED  INIT    0
+   DATA FTop    PROTECTED  INIT    0
+   DATA FWidth  PROTECTED  INIT  200
+   DATA FHeight PROTECTED  INIT  100
 
    DATA Style   INIT  WS_VISIBLE+WS_BORDER+WS_CHILD+WS_CLIPCHILDREN+WS_CLIPSIBLINGS+;
                       /*RBS_VARHEIGHT+*/RBS_BANDBORDERS+CCS_NODIVIDER+CCS_NOPARENTALIGN+CCS_TOP
@@ -63,10 +63,9 @@ CLASS TRebar FROM TCustomControl
    DATA WinClass    PROTECTED INIT REBARCLASSNAME
    DATA ControlName PROTECTED INIT "Rebar"
 
-   METHOD New() CONSTRUCTOR
+   METHOD Create() CONSTRUCTOR
    METHOD AddBand()
    METHOD RebarProc()
-   METHOD OnCreate()
    METHOD Delete()
    METHOD DelControl()
 
@@ -93,15 +92,6 @@ METHOD DelControl() CLASS TRebar
 
 *------------------------------------------------------------------------------*
 
-METHOD OnCreate() CLASS TRebar
-
-   ::nrProc := SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam|;
-                            ::RebarProc(nMsg,nwParam,nlParam)},{WM_SIZE})
-   ::RebarProc(WM_SIZE,0,0)
-
-   RETURN(super:OnCreate())
-
-*------------------------------------------------------------------------------*
 
 METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
 
@@ -111,19 +101,28 @@ METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
    IF nMsg==WM_SIZE
       acRect:=GetClientRect(::Parent:handle)
       aRect:=GetWindowRect(::handle)
-      MoveWindow(::handle,0,0,acRect[3],aRect[4]-aRect[2],.t.)
+      
+      ::FWidth := acRect[3]
+      ::FHeight:= aRect[4]-aRect[2]
+      
+      ::Move( , , , , .T. )
    endif
    
-   RETURN( 0) //CallWindowProc(::nrProc,::Parent:handle,nMsg,nwParam,nlParam))
+   RETURN( CallWindowProc(::nrProc,::Parent:handle,nMsg,nwParam,nlParam) )
 
 *------------------------------------------------------------------------------*
 
-METHOD New( oParent ) CLASS TRebar
+METHOD Create( oParent ) CLASS TRebar
+
    InitCommonControlsEx(ICC_COOL_CLASSES)
+   super:Create( oParent )
+
+   ::FHeight := 20
+   ::nrProc := SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam|;
+                            ::RebarProc(nMsg,nwParam,nlParam)},{WM_SIZE})
+   ::RebarProc( WM_SIZE,0,0)
    
-   ::Height := 20
-   super:new( oParent )
-   RETURN( self )
+RETURN( self )
 
 *------------------------------------------------------------------------------*
 

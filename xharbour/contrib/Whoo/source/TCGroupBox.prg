@@ -1,5 +1,5 @@
 /*
- * $Id: TCGroupBox.prg,v 1.12 2002/10/29 02:12:37 what32 Exp $
+ * $Id: TCGroupBox.prg,v 1.13 2002/11/05 21:39:58 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -59,12 +59,12 @@ ENDCLASS
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TGroupBox
 
-   ::Caption   := cCaption
-   ::id        := nId
-   ::Left      := nLeft
-   ::Top       := nTop
-   ::Width     := IFNIL( nWidth , ::width , nWidth )
-   ::Height    := IFNIL( nHeight, ::height, nHeight)
+   ::FCaption   := cCaption
+   ::id         := nId
+   ::FLeft      := nLeft
+   ::FTop       := nTop
+   ::FWidth     := IFNIL( nWidth , ::FWidth , nWidth )
+   ::FHeight    := IFNIL( nHeight, ::FHeight, nHeight)
 
    RETURN( super:new( oParent ) )
 

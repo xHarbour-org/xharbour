@@ -1,5 +1,5 @@
 /*
- * $Id: TCEdit.prg,v 1.17 2002/10/29 02:12:37 what32 Exp $
+ * $Id: TCEdit.prg,v 1.18 2002/11/05 21:39:58 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -62,12 +62,12 @@ ENDCLASS
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TEdit
 
-   ::Caption   := IFNIL(cCaption, ::Caption, cCaption)
-   ::id        := nId
-   ::Left      := nLeft
-   ::Top       := nTop
-   ::Width     := IFNIL( nWidth , ::Width , nWidth )
-   ::Height    := IFNIL( nHeight, ::height, nHeight)
+   ::FCaption   := IFNIL(cCaption, ::FCaption, cCaption)
+   ::id         := nId
+   ::FLeft      := nLeft
+   ::FTop       := nTop
+   ::FWidth     := IFNIL( nWidth , ::FWidth , nWidth )
+   ::FHeight    := IFNIL( nHeight, ::FHeight, nHeight)
 
    RETURN( super:new( oParent ) )
 

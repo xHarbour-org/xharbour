@@ -336,7 +336,7 @@ HB_FUNC( POSTTHREADMESSAGE )
                              ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI ReplyMessage( IN LRESULT lResult);
 
 HB_FUNC( REPLYMESSAGE )

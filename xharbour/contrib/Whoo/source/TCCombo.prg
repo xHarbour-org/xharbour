@@ -1,5 +1,5 @@
 /*
- * $Id: TCCombo.prg,v 1.23 2002/10/29 02:12:37 what32 Exp $
+ * $Id: TCCombo.prg,v 1.24 2002/11/05 21:39:58 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -39,11 +39,11 @@
 
 CLASS TComboBox FROM TCustomControl
 
-   DATA Caption PROTECTED INIT ""
-   DATA FLeft   PROTECTED  INIT   0
-   DATA FTop    PROTECTED  INIT   0
-   DATA FWidth  PROTECTED  INIT  80
-   DATA FHeight PROTECTED  INIT  20
+   DATA FCaption PROTECTED  INIT ""
+   DATA FLeft    PROTECTED  INIT   0
+   DATA FTop     PROTECTED  INIT   0
+   DATA FWidth   PROTECTED  INIT  80
+   DATA FHeight  PROTECTED  INIT  20
    
    DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_BORDER+WS_TABSTOP+CBS_DROPDOWNLIST+WS_VSCROLL+CBS_HASSTRINGS
 
@@ -55,7 +55,6 @@ CLASS TComboBox FROM TCustomControl
    DATA WinClass    PROTECTED INIT "combobox"
    DATA ControlName PROTECTED INIT "ComboBox"
 
-   METHOD New() CONSTRUCTOR
    METHOD AddString( cText )        INLINE ::SendMessage( CB_ADDSTRING, 0, cText)
    METHOD InsertString(cText,nLine) INLINE ::SendMessage( CB_INSERTSTRING, nLine, cText )
    METHOD DeleteString(nLine)       INLINE ::SendMessage( CB_DELETESTRING, nLine, 0)
@@ -69,13 +68,3 @@ CLASS TComboBox FROM TCustomControl
 ENDCLASS
 
 *------------------------------------------------------------------------------*
-
-METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight) CLASS TComboBox
-
-   ::id        := nId
-   ::Left      := nLeft
-   ::Top       := nTop
-   ::Width     := IFNIL( nWidth , ::width , nWidth )
-   ::Height    := IFNIL( nHeight, ::height, nHeight)
-
-   RETURN( super:new( oParent ) )

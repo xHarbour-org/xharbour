@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomTabControl.prg,v 1.11 2002/10/30 08:14:00 ronpinkas Exp $
+ * $Id: TCustomTab.prg,v 1.1 2002/10/31 04:08:43 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -74,7 +74,7 @@ CLASS TCustomTabControl FROM TWinControl
 ENDCLASS
 
 METHOD Create() CLASS TCustomTabControl
-   ::handle := CreateWindowEx( ::ExStyle, WC_TABCONTROL, , ::Style, ;
+   ::FHandle := CreateWindowEx( ::ExStyle, WC_TABCONTROL, , ::Style, ;
                                ::TabPosition[1], ::TabPosition[2], ;
                                ::TabPosition[3], ::TabPosition[4], ;
                                ::Parent:Handle, ::Id, ::Instance )

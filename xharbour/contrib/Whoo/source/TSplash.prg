@@ -1,5 +1,5 @@
 /*
- * $Id: TSplash.prg,v 1.4 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TSplash.prg,v 1.5 2002/11/05 21:39:58 what32 Exp $
  */
 
 /*
@@ -34,30 +34,35 @@
 
 CLASS TSplash FROM TForm
    DATA bitmap
-   METHOD New()           CONSTRUCTOR
-   METHOD OnPaint( hDC )  INLINE DrawBitmap(hDC,::bitmap),0
+   METHOD Create() CONSTRUCTOR
+   METHOD OnPaint( hDC )  INLINE DrawBitmap( hDC, ::bitmap ), 0
    METHOD OnDestroy()     INLINE DeleteObject(::bitmap),NIL
-   METHOD OnTimer(n)      INLINE if( n==1,::Destroy(),)
+   METHOD OnTimer( n )    INLINE IIF( n==1,::Destroy(),)
    METHOD OnLButtonDown() INLINE ::Destroy()
    METHOD OnRButtonDown() INLINE ::Destroy()
 ENDCLASS
 
-METHOD New( oParent, cFile, nTimeOut ) CLASS TSplash
+METHOD Create( oParent, cFile, nTimeOut ) CLASS TSplash
    local aRect,abRect
-   super:new( oParent )
    DEFAULT nTimeOut TO 2000
-   aRect := GetWindowRect(GetDesktopWindow())
-   
-   ::bitmap:= LoadImage( NIL, cFile, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE )
-   abRect  := GetBitmapSize( ::bitmap )
-   
-   ::Fwidth := abRect[1]
-   ::Fheight:= abRect[2]
-   ::Fleft  := (aRect[3]/2)-(::Fwidth/2)
-   ::Ftop   := (aRect[4]/2)-(::Fheight/2)
-   ::style := WS_POPUP + WS_BORDER
-   ::ExStyle:= WS_EX_TOPMOST
-   ::Create()
-   UpdateWindow( ::handle)
-   SetTimer( ::handle, 1, nTimeOut )
+
+   ::style   := WS_POPUP + WS_VISIBLE + WS_BORDER
+   ::ExStyle := WS_EX_TOPMOST
+
+   ::bitmap  := LoadImage( NIL, cFile, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE )
+
+   aRect     := GetWindowRect(GetDesktopWindow())
+   abRect    := GetBitmapSize( ::bitmap )
+
+   ::FWidth  := abRect[1]
+   ::FHeight := abRect[2]
+   ::FLeft   := (aRect[3]/2)-(::FWidth/2)
+   ::FTop    := (aRect[4]/2)-(::FHeight/2)
+
+   super:Create( oParent )
+
+   SetTimer( ::Handle, 1, nTimeOut )
+
+   ProcessMessages()
+
 return( self )

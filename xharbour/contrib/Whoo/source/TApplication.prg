@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.38 2002/10/30 08:14:00 ronpinkas Exp $
+ * $Id: TApplication.prg,v 1.39 2002/10/31 08:18:20 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -35,6 +35,7 @@ GLOBAL oAppl
 #include "debug.ch"
 #include "wingdi.ch"
 #include "tabctrl.ch"
+#include "classex.ch"
 
 GLOBAL EXTERNAL lPrevInstance
 
@@ -42,7 +43,10 @@ GLOBAL EXTERNAL lPrevInstance
 
 CLASS Application
 
+   PROPERTY OnIdle READ FOnIdle WRITE FOnIdle
+
    DATA Instance
+   DATA InstMsg
    DATA handle
    DATA nFormCount            INIT 0
    DATA FrameCreated AS LOGIC INIT .F.
@@ -96,28 +100,44 @@ METHOD Run() CLASS Application
       ENDIF
    ENDDO
 
+/*
+   DO WHILE .T.
+      IF PeekMessage( @cMsg ) //, 0, 0, 0 )
+         IF !IsDialogMessage( , cMsg )
+            TranslateMessage( cMsg )
+            DispatchMessage( cMsg )
+         ENDIF
+      ELSE
+         IF ValType( ::FOnIdle ) == 'B'
+            Eval( ::FOnIdle )
+         ELSEIF ValType( ::FOnIdle ) == 'N'
+            HB_Exec( ::FOnIdle )
+         ELSE
+            WaitMessage()
+         ENDIF
+      ENDIF
+   ENDDO
+*/
    RETURN(0)
 
 *------------------------------------------------------------------------------*
 
 METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
 
-   LOCAL aVars, aVar  //, cForm := SubStr( oForm:ClassName, 2 )
+   LOCAL aVars, aVar
 
    DEFAULT oParent TO self
 
-//   TraceLog( cForm, oForm, oForm:PropName )
-
-   oForm := if( oForm != NIL, oForm:New( oParent ), TForm():New( oParent ) )
    oForm:Name := oForm:ClassName() //ControlName + AllTrim( Str( Len( ::AppForms ) + 1 ) )
+
+//   oForm := if( oForm != NIL, oForm:Create( oParent ), TForm():Create( oParent ) )
 
    __objAddData( Self, oForm:Name )
    __ObjSetValueList( self, { { oForm:Name, oForm } } )
 
    WITH OBJECT oForm
-      //TraceLog( :Caption, :Top, :Left, :Height, :Width )
 
-      :Create()
+//      :Create()
 
       IF oParent:handle == ::handle
          aAdd( ::aForms, oForm )
@@ -134,7 +154,7 @@ METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
          WITH OBJECT aVar[2]
             :Parent    := oForm
             :Instance  := hInstance()
-            :Create()
+            :Create( Self )
          END WITH
       ENDIF
    NEXT

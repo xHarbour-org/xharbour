@@ -1,5 +1,5 @@
 /*
- * $Id: TTreeview.prg,v 1.16 2002/10/29 02:12:38 what32 Exp $
+ * $Id: TTreeview.prg,v 1.17 2002/11/05 21:39:58 what32 Exp $
  */
 
 /*
@@ -45,11 +45,11 @@ CLASS TTreeView FROM TCustomControl
    DATA ImageList PROTECTED
    DATA bChanged  PROTECTED
 
-   DATA Caption PROTECTED INIT ""
-   DATA FLeft   PROTECTED  INIT    0
-   DATA FTop    PROTECTED  INIT    0
-   DATA FWidth  PROTECTED  INIT  160
-   DATA FHeight PROTECTED  INIT  160
+   DATA FCaption PROTECTED  INIT ""
+   DATA FLeft    PROTECTED  INIT    0
+   DATA FTop     PROTECTED  INIT    0
+   DATA FWidth   PROTECTED  INIT  160
+   DATA FHeight  PROTECTED  INIT  160
 
    DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_TABSTOP+TVS_HASBUTTONS+TVS_HASLINES+TVS_LINESATROOT+TVS_SHOWSELALWAYS
    DATA ExStyle INIT  WS_EX_CLIENTEDGE
@@ -61,8 +61,6 @@ CLASS TTreeView FROM TCustomControl
 
    DATA WinClass    PROTECTED INIT "SysTreeView32"
    DATA ControlName PROTECTED INIT "TreeView"
-
-   METHOD New() CONSTRUCTOR
 
    METHOD Add()
    METHOD Expand()               INLINE aEval( ::Items, { | oItem | oItem:Expand() } )
@@ -81,7 +79,7 @@ CLASS TTreeView FROM TCustomControl
 ENDCLASS
 
 //----------------------------------------------------------------------------//
-
+/*
 METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TTreeView
 
    ::id        := nId
@@ -90,7 +88,7 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TTreeView
    ::width     := IFNIL( nWidth,  ::width , nWidth )
    ::Height    := IFNIL( nHeight, ::height, nHeight)
 return( super:New( oParent ) )
-
+*/
 //----------------------------------------------------------------------------//
 
 METHOD Add( cPrompt, nImage, cargo ) CLASS TTreeView
