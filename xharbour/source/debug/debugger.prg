@@ -97,8 +97,6 @@
 #define TR_IDX       1  //index into ::aWatch item storing expression
 #define TR_VALUE     2  //the current value of the expression
 
-#define USE_READ        // undef it if you want to debug a custom getsys.prg
-
 static s_oDebugger
 static s_lExit := .F.
 
@@ -1076,7 +1074,7 @@ METHOD EditColor( nColor, oBrwColors ) CLASS TDebugger
    oBrwColors:RefreshCurrent()
    oBrwColors:ForceStable()
 
-   #ifdef USE_READ
+   #ifndef HB_NO_READDBG
    SetCursor( SC_NORMAL )
    @ Row(), Col() + 15 GET cColor COLOR SubStr( ::ClrModal(), 5 ) ;
       VALID iif( Type( cColor ) != "C", ( Alert( "Must be string" ), .f. ), .t. )
@@ -1110,7 +1108,7 @@ METHOD EditSet( nSet, oBrwSets ) CLASS TDebugger
    oBrwSets:RefreshCurrent()
    oBrwSets:ForceStable()
 
-   #ifdef USE_READ
+   #ifndef HB_NO_READDBG
    SetCursor( SC_NORMAL )
    @ Row(), Col()+13 GET cSet COLOR SubStr( ::ClrModal(), 5 ) ;
      VALID iif( Type(cSet) != cType, (Alert( "Must be of type '"+cType+"'" ), .f. ), .t. )
@@ -2113,7 +2111,7 @@ METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
    oWndInput:Show()
 
    if lEditable
-      #ifdef USE_READ
+      #ifndef HB_NO_READDBG
       if bValid == nil
          @ nTop + 1, nLeft + 1 GET uTemp COLOR "," + __DbgColors()[ 5 ]
       else
@@ -2164,7 +2162,7 @@ METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
       SetCursor( nOldCursor )
    endif
 
-   #ifdef USE_READ
+   #ifndef HB_NO_READDBG
    nOldCursor := SetCursor( SC_NORMAL )
    READ
    SetCursor( nOldCursor )
@@ -3375,7 +3373,7 @@ STATIC FUNCTION strip_path( cFileName )
   HB_FNAMESPLIT( cFileName, NIL, @cName, @cExt )
 RETURN cName + cExt
 
-#ifndef USE_READ
+#ifdef HB_NO_READDBG
 STATIC FUNCTION getdbginput( nTop, nLeft, uValue, bValid, cColor )
 
   LOCAL nOldCursor 
