@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.147 2003/12/28 22:25:35 druzus Exp $
+* $Id: thread.c,v 1.148 2003/12/29 23:38:57 jonnymind Exp $
 */
 
 /*
@@ -1670,7 +1670,7 @@ HB_FUNC( ISSAMETHREAD )
    if( pThread1 == NULL || pThread1->sign != HB_THREAD_ID_SIGN ||
        ( pThread2 != NULL && pThread2->sign != HB_THREAD_ID_SIGN ) )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "THREADISSAME", 2,
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "ISSAMETHREAD", 2,
          hb_paramError(1), hb_paramError(2) );
       return;
    }

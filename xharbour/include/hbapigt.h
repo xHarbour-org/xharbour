@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.24 2004/01/25 13:18:39 jonnymind Exp $
+ * $Id: hbapigt.h,v 1.25 2004/01/27 03:11:46 ronpinkas Exp $
  */
 
 /*
@@ -70,6 +70,7 @@
 #define HB_APIGT_H_
 
 #include "hbapi.h"
+#include "gtinfo.ch"
 
 HB_EXTERN_BEGIN
 
@@ -201,6 +202,21 @@ typedef enum
    /* TODO: add other types */
    GTO_TEXT       = 100,
 } HB_gt_object_enum;
+
+/* Event subsystem */
+
+typedef enum
+{
+   GTEVENT_RESIZE   = 0,
+   GTEVENT_CLOSE    = 1,
+   GTEVENT_ICONIZE  = 2,
+   GTEVENT_MAXH     = 3,
+   GTEVENT_MAXV     = 4,
+   GTEVENT_MAXIMIZE = 5,
+   GTEVENT_DEICONIZE= 6,
+   GTEVENT_SHUTDOWN = 7
+} HB_gt_event_enum;
+
 
 /* This pointers holds the list of items that the GT module should draw */
 extern HB_GT_GOBJECT *hb_gt_gobjects;
@@ -392,6 +408,27 @@ extern int    hb_mouse_CountButton( void );
 extern void   hb_mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight );
 extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight );
 
+/*
+   GT DRIVER request to api to update the status: USER made something on the
+   window that request immediate attention of the GT system.
+*/
+extern void hb_gt_hasChanged( int status );
+
+/* Gt to driver communication */
+/*
+   GT API request to driver to update its status: PRG level made
+   something important to change.
+*/
+extern void hb_gt_update( int status );
+
+
+/*
+   GT information query or update. msgType determines the kind of information
+   to be queried or changed, the parameters are provided to pass status changes;
+   different messages may use different parameters.
+*/
+extern int  hb_gt_info(int iMsgType, BOOL bUpdate, int iParm, void *vpParam );
+
 /* for compilation with multi GT drivers
    User can choose GT on runtime by //GT:<gtname> switch [druzus] */
 
@@ -522,6 +559,9 @@ typedef struct _HB_GT_FUNCS
     /* extended GT functions */
     void    (* SetDispCP) ( char *, char *, BOOL );
     void    (* SetKeyCP) ( char *, char * );
+    /* GT to DRIVER communication functions */
+    void    (* update ) ( int );
+    int     (* info ) (int, BOOL , int , void * );
 } HB_GT_FUNCS, * PHB_GT_FUNCS;
 
 typedef struct _HB_GT_INIT
@@ -591,6 +631,21 @@ extern BOOL   HB_GT_FUNC( mouse_IsButtonPressed( int iButton ) );
 extern int    HB_GT_FUNC( mouse_CountButton( void ) );
 extern void   HB_GT_FUNC( mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ) );
 extern void   HB_GT_FUNC( mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ) );
+
+/* Gt to driver communication */
+/*
+   GT API request to driver to update its status: PRG level made
+   something important to change.
+*/
+extern void HB_GT_FUNC( gt_update( int status ) );
+
+
+/*
+   GT information query or update. msgType determines the kind of information
+   to be queried or changed, the parameters are provided to pass status changes;
+   different messages may use different parameters.
+*/
+extern int  HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParm, void *vpParam ));
 
 #else
 #  define HB_GT_FUNC(x)   HB_GT_FUNC_(x)

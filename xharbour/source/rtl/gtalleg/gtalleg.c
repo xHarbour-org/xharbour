@@ -1,55 +1,60 @@
 /*
- * $Id: gtalleg.c,v 1.11 2004/02/01 00:35:42 maurifull Exp $
+<<<<<<< gtalleg.c
+* $Id: gtalleg.c,v 1.11 2004/02/01 00:35:42 maurifull Exp $
+*/
+=======
+ * $Id: gtalleg.c,v 1.12 2004/02/01 20:55:50 maurifull Exp $
  */
+>>>>>>> 1.12
 
 /*
- * xHarbour Project source code:
- * Allegro based virtual gt with graphic extensions.
- *
- * Copyright 2004 Mauricio Abre <maurifull@datafull.com>
- * www - http://www.xharbour.org
- * www - http://www.harbour-project.org
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
- *
- * As a special exception, the Harbour Project gives permission for
- * additional uses of the text contained in its release of Harbour.
- *
- * The exception is that, if you link the Harbour libraries with other
- * files to produce an executable, this does not by itself cause the
- * resulting executable to be covered by the GNU General Public License.
- * Your use of that executable is in no way restricted on account of
- * linking the Harbour library code into it.
- *
- * This exception does not however invalidate any other reasons why
- * the executable file might be covered by the GNU General Public License.
- *
- * This exception applies only to the code released by the Harbour
- * Project under the name Harbour.  If you copy code from other
- * Harbour Project or Free Software Foundation releases into a copy of
- * Harbour, as the General Public License permits, the exception does
- * not apply to the code that you add in this way.  To avoid misleading
- * anyone as to the status of such modified files, you must delete
- * this exception notice from them.
- *
- * If you write modifications of your own for Harbour, it is your choice
- * whether to permit this exception to apply to your modifications.
- * If you do not wish that, delete this exception notice.
- *
- */
+* xHarbour Project source code:
+* Allegro based virtual gt with graphic extensions.
+*
+* Copyright 2004 Mauricio Abre <maurifull@datafull.com>
+* www - http://www.xharbour.org
+* www - http://www.harbour-project.org
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this software; see the file COPYING.  If not, write to
+* the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+* Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+*
+* As a special exception, the Harbour Project gives permission for
+* additional uses of the text contained in its release of Harbour.
+*
+* The exception is that, if you link the Harbour libraries with other
+* files to produce an executable, this does not by itself cause the
+* resulting executable to be covered by the GNU General Public License.
+* Your use of that executable is in no way restricted on account of
+* linking the Harbour library code into it.
+*
+* This exception does not however invalidate any other reasons why
+* the executable file might be covered by the GNU General Public License.
+*
+* This exception applies only to the code released by the Harbour
+* Project under the name Harbour.  If you copy code from other
+* Harbour Project or Free Software Foundation releases into a copy of
+* Harbour, as the General Public License permits, the exception does
+* not apply to the code that you add in this way.  To avoid misleading
+* anyone as to the status of such modified files, you must delete
+* this exception notice from them.
+*
+* If you write modifications of your own for Harbour, it is your choice
+* whether to permit this exception to apply to your modifications.
+* If you do not wish that, delete this exception notice.
+*
+*/
 
 #define HB_GT_NAME      ALLEG
 
@@ -62,7 +67,6 @@
 #include "hbset.h"
 #include "hbvm.h"
 #include "inkey.ch"
-#include "gtinfo.ch"
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 static int s_iMsButtons, s_iMSBoundTop, s_iMSBoundLeft, s_iMSBoundBottom, s_iMSBoundRight;
@@ -90,62 +94,62 @@ static void hb_gt_DoCursor( void );
 #define s_usVBorder 0
 
 typedef struct {
-    char al_key;
-    int xhb_key;
+   char al_key;
+   int xhb_key;
 } gtAllegKey;
 
 #define GT_KEY_TABLE_SIZE 49
 
 static const gtAllegKey sKeyTable[GT_KEY_TABLE_SIZE] = {
-    {AL_KEY_ESC,    K_ESC},
-    {AL_KEY_INSERT, K_INS},
-    {AL_KEY_HOME,   K_HOME},
-    {AL_KEY_PGUP,   K_PGUP},
-    {AL_KEY_PGDN,   K_PGDN},
-    {AL_KEY_END,    K_END},
-    {AL_KEY_DEL,    K_DEL},
-    {AL_KEY_UP,     K_UP},
-    {AL_KEY_DOWN,   K_DOWN},
-    {AL_KEY_LEFT,   K_LEFT},
-    {AL_KEY_RIGHT,  K_RIGHT},
-    {AL_KEY_A,      K_ALT_A},
-    {AL_KEY_B,      K_ALT_B},
-    {AL_KEY_C,      K_ALT_C},
-    {AL_KEY_D,      K_ALT_D},
-    {AL_KEY_E,      K_ALT_E},
-    {AL_KEY_F,      K_ALT_F},
-    {AL_KEY_G,      K_ALT_G},
-    {AL_KEY_H,      K_ALT_H},
-    {AL_KEY_I,      K_ALT_I},
-    {AL_KEY_J,      K_ALT_J},
-    {AL_KEY_K,      K_ALT_K},
-    {AL_KEY_L,      K_ALT_L},
-    {AL_KEY_M,      K_ALT_M},
-    {AL_KEY_N,      K_ALT_N},
-    {AL_KEY_O,      K_ALT_O},
-    {AL_KEY_P,      K_ALT_P},
-    {AL_KEY_Q,      K_ALT_Q},
-    {AL_KEY_R,      K_ALT_R},
-    {AL_KEY_S,      K_ALT_S},
-    {AL_KEY_T,      K_ALT_T},
-    {AL_KEY_U,      K_ALT_U},
-    {AL_KEY_V,      K_ALT_V},
-    {AL_KEY_W,      K_ALT_W},
-    {AL_KEY_X,      K_ALT_X},
-    {AL_KEY_Y,      K_ALT_Y},
-    {AL_KEY_Z,      K_ALT_Z},
-    {AL_KEY_F1,     K_F1},
-    {AL_KEY_F2,     K_F2},
-    {AL_KEY_F3,     K_F3},
-    {AL_KEY_F4,     K_F4},
-    {AL_KEY_F5,     K_F5},
-    {AL_KEY_F6,     K_F6},
-    {AL_KEY_F7,     K_F7},
-    {AL_KEY_F8,     K_F8},
-    {AL_KEY_F9,     K_F9},
-    {AL_KEY_F10,    K_F10},
-    {AL_KEY_F11,    K_F11},
-    {AL_KEY_F12,    K_F12}
+   {AL_KEY_ESC,    K_ESC},
+   {AL_KEY_INSERT, K_INS},
+   {AL_KEY_HOME,   K_HOME},
+   {AL_KEY_PGUP,   K_PGUP},
+   {AL_KEY_PGDN,   K_PGDN},
+   {AL_KEY_END,    K_END},
+   {AL_KEY_DEL,    K_DEL},
+   {AL_KEY_UP,     K_UP},
+   {AL_KEY_DOWN,   K_DOWN},
+   {AL_KEY_LEFT,   K_LEFT},
+   {AL_KEY_RIGHT,  K_RIGHT},
+   {AL_KEY_A,      K_ALT_A},
+   {AL_KEY_B,      K_ALT_B},
+   {AL_KEY_C,      K_ALT_C},
+   {AL_KEY_D,      K_ALT_D},
+   {AL_KEY_E,      K_ALT_E},
+   {AL_KEY_F,      K_ALT_F},
+   {AL_KEY_G,      K_ALT_G},
+   {AL_KEY_H,      K_ALT_H},
+   {AL_KEY_I,      K_ALT_I},
+   {AL_KEY_J,      K_ALT_J},
+   {AL_KEY_K,      K_ALT_K},
+   {AL_KEY_L,      K_ALT_L},
+   {AL_KEY_M,      K_ALT_M},
+   {AL_KEY_N,      K_ALT_N},
+   {AL_KEY_O,      K_ALT_O},
+   {AL_KEY_P,      K_ALT_P},
+   {AL_KEY_Q,      K_ALT_Q},
+   {AL_KEY_R,      K_ALT_R},
+   {AL_KEY_S,      K_ALT_S},
+   {AL_KEY_T,      K_ALT_T},
+   {AL_KEY_U,      K_ALT_U},
+   {AL_KEY_V,      K_ALT_V},
+   {AL_KEY_W,      K_ALT_W},
+   {AL_KEY_X,      K_ALT_X},
+   {AL_KEY_Y,      K_ALT_Y},
+   {AL_KEY_Z,      K_ALT_Z},
+   {AL_KEY_F1,     K_F1},
+   {AL_KEY_F2,     K_F2},
+   {AL_KEY_F3,     K_F3},
+   {AL_KEY_F4,     K_F4},
+   {AL_KEY_F5,     K_F5},
+   {AL_KEY_F6,     K_F6},
+   {AL_KEY_F7,     K_F7},
+   {AL_KEY_F8,     K_F8},
+   {AL_KEY_F9,     K_F9},
+   {AL_KEY_F10,    K_F10},
+   {AL_KEY_F11,    K_F11},
+   {AL_KEY_F12,    K_F12}
 };
 
 #define GT_UPD_RECT(t,l,b,r) if (t<s_usUpdTop) s_usUpdTop=t; if (l<s_usUpdLeft) s_usUpdLeft=l; if (b>s_usUpdBottom) s_usUpdBottom=b; if (r>s_usUpdRight) s_usUpdRight=r;
@@ -212,7 +216,7 @@ static void hb_gt_DoCursor()
 
    if ( s_bVisible && s_usDispCount > 1 )
    {
-    s_bVisible = FALSE;  // prevent cursor flicker on buffered screen i/o
+   s_bVisible = FALSE;  // prevent cursor flicker on buffered screen i/o
    }
 }
 
@@ -421,10 +425,10 @@ static void HB_GT_FUNC(gt_ScreenUpdate( void ))
 // Should be ellipses, otherwise they'll not fill entire requested area
 // But I leaved circles to match its name
 //                 al_draw_ellipse( al_screen, gobject->x, gobject->y, gobject->width / 2, gobject->height / 2, al_make_color( gcolor.usRed, gcolor.usGreen, gcolor.usBlue ) );
-                   al_draw_circle( bmp, gobject->x + gobject->width / 2, gobject->y + gobject->height / 2, gobject->width / 2 - 1, gcolor );
-                   s_usUpdRight = MAX(s_usUpdRight,gobject->x+gobject->width-1);
-                   s_usUpdBottom = MAX(s_usUpdBottom,gobject->y+gobject->height-1);
-                   break;
+                  al_draw_circle( bmp, gobject->x + gobject->width / 2, gobject->y + gobject->height / 2, gobject->width / 2 - 1, gcolor );
+                  s_usUpdRight = MAX(s_usUpdRight,gobject->x+gobject->width-1);
+                  s_usUpdBottom = MAX(s_usUpdBottom,gobject->y+gobject->height-1);
+                  break;
 
                case GTO_DISK:
                   al_draw_circle_fill( bmp, gobject->x + gobject->width / 2, gobject->y + gobject->height / 2, gobject->width / 2 - 1, gcolor );
@@ -464,9 +468,9 @@ static void HB_GT_FUNC(gt_ScreenUpdate( void ))
       al_unscare_mouse();
 
       if ( s_sCurCol * s_byFontWidth >= s_usUpdLeft &&
-           s_sCurCol * s_byFontWidth <= s_usUpdRight &&
-           s_sCurRow * s_byFontSize >= s_usUpdTop &&
-           s_sCurRow * s_byFontSize <= s_usUpdBottom )
+         s_sCurCol * s_byFontWidth <= s_usUpdRight &&
+         s_sCurRow * s_byFontSize >= s_usUpdTop &&
+         s_sCurRow * s_byFontSize <= s_usUpdBottom )
       {
          hb_gt_DoCursor();
       }
@@ -822,7 +826,7 @@ void HB_GT_FUNC(gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, U
       GT_UPD_RECT(usTop,usLeft,usBottom,usRight);
       HB_GT_FUNC(gt_ScreenUpdate());
 
-    }
+   }
 }
 
 void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE byAttr, SHORT iRows, SHORT iCols ))
@@ -855,102 +859,102 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
 
    if ( usTop < s_usScrHeight && usLeft < s_usScrWidth )
    {
-     HB_GT_FUNC(gt_DispBegin());
-     if ( ( iRows != 0 ) | ( iCols != 0 ) )
-     {
-        if ( iRows < 0 )
-        {
-           usT = usTop;
-           usB = usBottom + iRows;
-        }
-        else
-        {
-           usT = usTop + iRows;
-           usB = usBottom;
-        }
+   HB_GT_FUNC(gt_DispBegin());
+   if ( ( iRows != 0 ) | ( iCols != 0 ) )
+   {
+      if ( iRows < 0 )
+      {
+         usT = usTop;
+         usB = usBottom + iRows;
+      }
+      else
+      {
+         usT = usTop + iRows;
+         usB = usBottom;
+      }
 
-        if ( iCols < 0 )
-        {
-           usL = usLeft;
-           usR = usRight + iCols;
-        }
-        else
-        {
-           usL = usLeft + iCols;
-           usR = usRight;
-        }
+      if ( iCols < 0 )
+      {
+         usL = usLeft;
+         usR = usRight + iCols;
+      }
+      else
+      {
+         usL = usLeft + iCols;
+         usR = usRight;
+      }
 
-        pbyScr = (BYTE *) hb_xgrab(HB_GT_FUNC(gt_RectSize(usB - usT + 1, usR - usL + 1)));
-        HB_GT_FUNC(gt_GetText(usT, usL, usB, usR, pbyScr));
-        HB_GT_FUNC(gt_PutText(usT - iRows, usL - iCols, usB - iRows, usR - iCols, pbyScr));
-        hb_xfree(pbyScr);
+      pbyScr = (BYTE *) hb_xgrab(HB_GT_FUNC(gt_RectSize(usB - usT + 1, usR - usL + 1)));
+      HB_GT_FUNC(gt_GetText(usT, usL, usB, usR, pbyScr));
+      HB_GT_FUNC(gt_PutText(usT - iRows, usL - iCols, usB - iRows, usR - iCols, pbyScr));
+      hb_xfree(pbyScr);
 
-        if ( iRows < 0 )
-        {
-           usT = usB;
-           usB = usT - iRows;
-           usTop = MAX(usTop-iRows,0);
-        }
-        else
-        {
-           usB = usT;
-           usT = usB - iRows;
-           usBottom = MIN(usBottom - iRows,s_usScrHeight-1);
-        }
+      if ( iRows < 0 )
+      {
+         usT = usB;
+         usB = usT - iRows;
+         usTop = MAX(usTop-iRows,0);
+      }
+      else
+      {
+         usB = usT;
+         usT = usB - iRows;
+         usBottom = MIN(usBottom - iRows,s_usScrHeight-1);
+      }
 
-        if ( iCols < 0 )
-        {
-           usL = usR;
-           usR = usL - iCols;
-           usLeft = MAX(usLeft-iCols,0);
-        }
-        else
-        {
-           usR = usL;
-           usL = usR - iCols;
-           usRight = MIN(usRight-iCols,s_usScrWidth-1);
-        }
-     }
-     else
-     {
-        usT = usTop;
-        usL = usLeft;
-        usB = usBottom + 1;
-        usR = usRight;
-     }
+      if ( iCols < 0 )
+      {
+         usL = usR;
+         usR = usL - iCols;
+         usLeft = MAX(usLeft-iCols,0);
+      }
+      else
+      {
+         usR = usL;
+         usL = usR - iCols;
+         usRight = MIN(usRight-iCols,s_usScrWidth-1);
+      }
+   }
+   else
+   {
+      usT = usTop;
+      usL = usLeft;
+      usB = usBottom + 1;
+      usR = usRight;
+   }
 
-     for ( i = usT; i < usB ; i++ )
-     {
-        HB_GT_FUNC(gt_Replicate(i, usL, byAttr, ' ', usR - usL + 1));
-     }
+   for ( i = usT; i < usB ; i++ )
+   {
+      HB_GT_FUNC(gt_Replicate(i, usL, byAttr, ' ', usR - usL + 1));
+   }
 
-     HB_GT_FUNC(gt_DispEnd());
+   HB_GT_FUNC(gt_DispEnd());
 
-     if ( hb_gt_gobjects )
-     {
-        gobject = hb_gt_gobjects;
+   if ( hb_gt_gobjects )
+   {
+      gobject = hb_gt_gobjects;
 
-        while ( gobject )
-        {
-           usLeft = MIN(usLeft,gobject->x/s_byFontWidth);
-           usTop = MIN(usTop,gobject->x/s_byFontSize);
-           if ( ( gobject->type == GTO_SQUARE ) | ( gobject->type == GTO_RECTANGLE ) )
-           {
-              usRight = MAX(usRight,usLeft+gobject->width/s_byFontWidth);
-              usBottom = MAX(usBottom,usTop+gobject->height/s_byFontSize);
-           }
-           else
-           {
-              usRight = MAX(usRight,gobject->width/s_byFontWidth+s_byFontWidth-1);
-              usBottom = MAX(usBottom,gobject->height/s_byFontSize+s_byFontSize-1);
-           }
+      while ( gobject )
+      {
+         usLeft = MIN(usLeft,gobject->x/s_byFontWidth);
+         usTop = MIN(usTop,gobject->x/s_byFontSize);
+         if ( ( gobject->type == GTO_SQUARE ) | ( gobject->type == GTO_RECTANGLE ) )
+         {
+            usRight = MAX(usRight,usLeft+gobject->width/s_byFontWidth);
+            usBottom = MAX(usBottom,usTop+gobject->height/s_byFontSize);
+         }
+         else
+         {
+            usRight = MAX(usRight,gobject->width/s_byFontWidth+s_byFontWidth-1);
+            usBottom = MAX(usBottom,gobject->height/s_byFontSize+s_byFontSize-1);
+         }
 
-           gobject = gobject->next;
-        }
-     }
+         gobject = gobject->next;
+      }
+   }
 
-     GT_UPD_RECT(usTop,usLeft,usBottom,usRight);
-     HB_GT_FUNC(gt_ScreenUpdate());
+   GT_UPD_RECT(usTop,usLeft,usBottom,usRight);
+   HB_GT_FUNC(gt_ScreenUpdate());
    }
 }
 
@@ -976,12 +980,12 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
 
    if ( ( s_usGFXWidth != 0 ) && ( s_usGFXHeight != 0 ) )
    {
-     iWidth = (int) s_usGFXWidth;
-     iHeight = (int) s_usGFXHeight;
+   iWidth = (int) s_usGFXWidth;
+   iHeight = (int) s_usGFXHeight;
    } else
    {
-     iWidth = s_byFontWidth * usCols;
-     iHeight = s_byFontSize * usRows;
+   iWidth = s_byFontWidth * usCols;
+   iHeight = s_byFontSize * usRows;
    }
    if ( usRows > 11 && usCols > 23 && usRows < 129 && usCols < 257 )
    {
@@ -1165,21 +1169,21 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       }
 
       hb_gt_DoCursor();  // show initial cursor
-    }
+   }
 
-    if ( !lClearInit )
-    {
-       s_usUpdTop = 0;
-       s_usUpdLeft = 0;
-       s_usUpdBottom = s_usScrHeight - 1;
-       s_usUpdRight = s_usScrWidth - 1;
-       HB_GT_FUNC(gt_ScreenUpdate());
-    }
+   if ( !lClearInit )
+   {
+      s_usUpdTop = 0;
+      s_usUpdLeft = 0;
+      s_usUpdBottom = s_usScrHeight - 1;
+      s_usUpdRight = s_usScrWidth - 1;
+      HB_GT_FUNC(gt_ScreenUpdate());
+   }
 
-    lClearInit = TRUE;
-    s_usGFXWidth = 0;
-    s_usGFXHeight = 0;
-    return lMode;
+   lClearInit = TRUE;
+   s_usGFXWidth = 0;
+   s_usGFXHeight = 0;
+   return lMode;
 }
 
 USHORT HB_GT_FUNC(gt_Box( SHORT sTop, SHORT sLeft, SHORT sBottom, SHORT sRight, BYTE *szBox, BYTE byAttr ))
@@ -1460,19 +1464,19 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
          }
       } /* else if ( ( al_mouse_b & 4 ) != ( s_byMSButtons & 4 ) )
       {
-          if ( al_mouse_b & 4 )
-          {
-              if ( eventmask & INKEY_MDOWN )
-              {
+         if ( al_mouse_b & 4 )
+         {
+            if ( eventmask & INKEY_MDOWN )
+            {
                   nKey = K_MBUTTONDOWN;
-              }
-          } else
-          {
-              if ( eventmask & INKEY_MUP )
-              {
+            }
+         } else
+         {
+            if ( eventmask & INKEY_MUP )
+            {
                   nKey = K_MBUTTONUP;
-              }
-          }
+            }
+         }
       } */
       // We need to define INKEY_M* & K_MBUTTON* in inkey.ch !
       s_byMSButtons = (BYTE) al_mouse_b;
@@ -1552,12 +1556,12 @@ int HB_GT_FUNC(mouse_Row( void ))
 {
    if ( s_pbyScrBuffer == NULL )
    {
-    HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+   HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
    }
 
    if ( al_mouse_needs_poll() )
    {
-    al_poll_mouse();
+   al_poll_mouse();
    }
 
    return al_mouse_y / s_byFontSize;
@@ -1660,6 +1664,83 @@ void HB_GT_FUNC(mouse_GetBounds( int *piTop, int *piLeft, int *piBottom, int *pi
    *piRight = s_iMSBoundRight;
 }
 
+/*
+* GTInfo() implementation
+*
+*/
+int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParm, void *vpParam ) )
+{
+   int iOldValue;
+   int iWidth, iHeight;
+
+   switch ( iMsgType )
+   {
+      case GTI_ISGRAPHIC:
+      return (int) TRUE;
+
+      case GTI_SCREENWIDTH:
+         iOldValue = AL_SCREEN_W;
+         if ( bUpdate && iParam > 0 )
+         {
+            s_usGFXWidth = (USHORT) iParam;
+//            lClearInit = ( s_pbyScrBuffer == NULL );
+//            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+         }
+      return iOldValue;
+
+      case GTI_SCREENHEIGHT:
+         iOldValue = AL_SCREEN_H;
+         if ( bUpdate && iParam > 0 )
+         {
+            s_usGFXHeight = (USHORT) iParam;
+            lClearInit = ( s_pbyScrBuffer == NULL );
+            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+         }
+      return iOldValue;
+
+      case GTI_SCREENDEPTH:
+         iOldValue = al_bitmap_color_depth( al_screen );
+         if ( bUpdate &&
+               (( iParam == 8 ) || ( iParam == 15 ) ||
+                ( iParam == 16 ) || ( iParam == 24 ) || ( iParam == 32 ) )
+            )
+         {
+            al_set_color_depth( iParam );
+            lClearInit = ( s_pbyScrBuffer == NULL );
+            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+         }
+      return iOldValue;
+
+      case GTI_FONTSIZE:
+         iOldValue = s_byFontSize;
+         if ( bUpdate && iParam > 0 && iParam < 256 )
+         {
+            s_byFontSize = (char) iParam;
+            s_byFontWidth = s_byFontSize / 2;
+            lClearInit = ( s_pbyScrBuffer == NULL );
+            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+         }
+      return iOldValue;
+
+      case GTI_FONTWIDTH:
+      return s_byFontWidth;
+
+      case GTI_DESKTOPWIDTH:
+         al_get_desktop_resolution( &iWidth, &iHeight );
+      return iWidth;
+
+      case GTI_DESKTOPHEIGHT:
+         al_get_desktop_resolution( &iWidth, &iHeight );
+      return iHeight;
+
+      case GTI_DESKTOPDEPTH:
+      return al_desktop_color_depth();
+   }
+
+   // DEFAULT: there's something wrong if we are here.
+   return -1;
+}
+
 #ifdef HB_MULTI_GT
 
 static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
@@ -1705,25 +1786,28 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
    gt_funcs->Tone               = HB_GT_FUNC(gt_Tone);
    gt_funcs->ExtendedKeySupport = HB_GT_FUNC(gt_ExtendedKeySupport);
    gt_funcs->ReadKey            = HB_GT_FUNC(gt_ReadKey);
+   gt_funcs->info               = HB_GT_FUNC(gt_info);
+   // todo: update
 }
 
 static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 {
 
-    HB_TRACE(HB_TR_DEBUG, ("hb_mouseFnInit(%p)", gt_funcs));
+   HB_TRACE(HB_TR_DEBUG, ("hb_mouseFnInit(%p)", gt_funcs));
 
-    gt_funcs->mouse_Init            = HB_GT_FUNC(null_func);
-    gt_funcs->mouse_Exit            = HB_GT_FUNC(null_func);
-    gt_funcs->mouse_IsPresent       = HB_GT_FUNC(mouse_IsPresent);
-    gt_funcs->mouse_Show            = HB_GT_FUNC(mouse_Show);
-    gt_funcs->mouse_Hide            = HB_GT_FUNC(mouse_Hide);
-    gt_funcs->mouse_Col             = HB_GT_FUNC(mouse_Col);
-    gt_funcs->mouse_Row             = HB_GT_FUNC(mouse_Row);
-    gt_funcs->mouse_SetPos          = HB_GT_FUNC(mouse_SetPos);
-    gt_funcs->mouse_IsButtonPressed = HB_GT_FUNC(mouse_IsButtonPressed);
-    gt_funcs->mouse_CountButton     = HB_GT_FUNC(mouse_CountButton);
-    gt_funcs->mouse_GetBounds       = HB_GT_FUNC(mouse_GetBounds);
-    gt_funcs->mouse_SetBounds       = HB_GT_FUNC(mouse_SetBounds);
+   gt_funcs->mouse_Init            = HB_GT_FUNC(null_func);
+   gt_funcs->mouse_Exit            = HB_GT_FUNC(null_func);
+   gt_funcs->mouse_IsPresent       = HB_GT_FUNC(mouse_IsPresent);
+   gt_funcs->mouse_Show            = HB_GT_FUNC(mouse_Show);
+   gt_funcs->mouse_Hide            = HB_GT_FUNC(mouse_Hide);
+   gt_funcs->mouse_Col             = HB_GT_FUNC(mouse_Col);
+   gt_funcs->mouse_Row             = HB_GT_FUNC(mouse_Row);
+   gt_funcs->mouse_SetPos          = HB_GT_FUNC(mouse_SetPos);
+   gt_funcs->mouse_IsButtonPressed = HB_GT_FUNC(mouse_IsButtonPressed);
+   gt_funcs->mouse_CountButton     = HB_GT_FUNC(mouse_CountButton);
+   gt_funcs->mouse_GetBounds       = HB_GT_FUNC(mouse_GetBounds);
+   gt_funcs->mouse_SetBounds       = HB_GT_FUNC(mouse_SetBounds);
+   // todo: update
 }
 
 static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ), HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
@@ -1731,19 +1815,19 @@ static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ), HB_GT_FUNC(gtFnInit), 
 HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
-    hb_gtRegister( &gtInit );
+   hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
 #if defined(HB_STATIC_STARTUP) || ((!defined(__GNUC__)) && (!defined(_MSC_VER)) )
-    #pragma startup HB_GT_FUNC(_gt_Init_)
+   #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 
 #endif
 
 /* 
- * this is necessary if you want to link with .so allegro libs
- * or when link staticalt and your linker will force to link main()
- * from allegro library not the harbour one
- */
+* this is necessary if you want to link with .so allegro libs
+* or when link staticalt and your linker will force to link main()
+* from allegro library not the harbour one
+*/
 int _mangled_main( int argc, char * argv[] )
 {
    HB_TRACE(HB_TR_DEBUG, ("_mangled_main(%d, %p)", argc, argv));
@@ -1759,6 +1843,7 @@ void *_mangled_main_address = _mangled_main;
  * GTInfo() implementation
  *
  */
+ /*
 HB_FUNC( GTINFO )
 {
    int iWidth, iHeight;
@@ -1844,3 +1929,5 @@ HB_FUNC( GTINFO )
 	 break;
    }
 }
+
+*/

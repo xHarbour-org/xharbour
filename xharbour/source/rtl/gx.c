@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.3 2004/01/18 20:48:52 jonnymind Exp $
+ * $Id: gx.c,v 1.4 2004/01/24 16:29:40 jonnymind Exp $
  */
 
 /*
@@ -143,4 +143,36 @@ HB_FUNC( SETGTRESIZEEVENT )
       hb_gtSetResizeEvent( hb_itemGetNL( pEvent ) );
    }
 }
+
+
+HB_FUNC( GTINFO )
+{
+   PHB_ITEM pInfo = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM pSet = hb_param( 2, HB_IT_NUMERIC );
+
+   /* Parameter error */
+   if ( pInfo == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "GTINFO", 2,
+         hb_paramError( 1 ), hb_paramError( 2 ) );
+      return;
+   }
+
+   /* Is it a query? */
+   if ( pSet == NULL )
+   {
+      /* Parameter void * still unused, for future developement. */
+      hb_retni( HB_GT_FUNC( gt_info( hb_itemGetNI( pInfo ), FALSE, 0, NULL ) ) );
+   }
+   else
+   {
+      /* Parameter void * still unused, for future developement. */
+      hb_retni( HB_GT_FUNC( gt_info( hb_itemGetNI( pInfo ), TRUE,
+            hb_itemGetNI( pSet ), NULL ) ) );
+   }
+
+}
+
+
+
 
