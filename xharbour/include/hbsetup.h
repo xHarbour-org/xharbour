@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.5 2002/09/19 01:57:42 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.6 2002/10/14 18:22:01 ronpinkas Exp $
  */
 
 /*
@@ -280,7 +280,7 @@
 #ifndef HB_OS_DOS
    #if defined(DOS) || defined(_QC) || defined(__DOS__) || defined(MSDOS) || defined(__MSDOS__) || defined(__RSX32__)
       #define HB_OS_DOS
-      #if defined(__386__)
+      #if defined(__386__) || defined(__DJGPP__)
          #define HB_OS_DOS_32
       #else
          #define HB_OS_DOS_16
@@ -331,6 +331,14 @@
  *
  * hbmath.h    - math errors handling
 */
+
+/* ***********************************************************************
+ * Fix DJGPP in call to: toupper(), tolower(), is...()
+ *
+*/
+#ifdef __DJGPP__
+   #include "hbfixdj.h"
+#endif
 
 
 /* ***********************************************************************
