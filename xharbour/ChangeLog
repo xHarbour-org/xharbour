@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3674 2004/12/14 23:26:33 mlombardo Exp $
+ * $Id: ChangeLog,v 1.3675 2004/12/15 13:39:17 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-16 23:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbcmd.c
+    * removed unnecessary UNLOCK_AREA
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * fixed some possible removing of scopes set by scopped relations
 
 2004-12-15 14:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/make_gnu.sh

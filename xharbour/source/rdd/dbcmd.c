@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.135 2004/11/22 23:13:55 druzus Exp $
+ * $Id: dbcmd.c,v 1.136 2004/11/23 17:04:21 lf_sfnet Exp $
  */
 
 /*
@@ -3836,7 +3836,6 @@ HB_FUNC( DBSETRELATION )
       if( !pChildArea )
       {
          hb_errRT_BASE( EG_NOALIAS, EDBCMD_NOALIAS, NULL, szAlias, 0 );
-         UNLOCK_AREA
          return;
       }
 
