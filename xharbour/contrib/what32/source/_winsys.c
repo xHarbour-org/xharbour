@@ -927,19 +927,22 @@ HB_FUNC(HTMLHELP)
 );
 */
 
-
-HB_FUNC( CREATFILE )
+HB_FUNC( CREATEFILE )
 {
 
- SECURITY_ATTRIBUTES *sa = ( SECURITY_ATTRIBUTES *) hb_param( 4, HB_IT_STRING )->item.asString.value ;
+   SECURITY_ATTRIBUTES *sa ;
 
- hb_retnl( (LONG) CreateFile( (LPCTSTR) hb_parc(1),
-                       (DWORD)   hb_parnl(2),
-                       (DWORD)   hb_parnl(3),
-                       (SECURITY_ATTRIBUTES *) sa ,
-                       (DWORD) hb_parnl(5),
-                       (DWORD) hb_parnl(6),
-                       (HANDLE) hb_parnl(7) ) ) ;
+   if( ISCHAR( 4 ) ) 
+      sa = ( SECURITY_ATTRIBUTES *) hb_param( 4, HB_IT_STRING )->item.asString.value ;
+
+   hb_retnl( (LONG) CreateFile( (LPCTSTR) hb_parc(1),
+                                (DWORD)   hb_parnl(2),
+                                (DWORD)   hb_parnl(3),
+                                ISCHAR( 4 ) ? (SECURITY_ATTRIBUTES *) sa : NULL ,
+                                (DWORD) hb_parnl(5),
+                                (DWORD) hb_parnl(6),
+                                ISNIL( 7 ) ? NULL : (HANDLE) hb_parnl(7) ) ) ;
+
 }
 
 
@@ -966,8 +969,34 @@ HB_FUNC( CLOSEHANDLE )
   LPDWORD lpNumberOfBytesRead, // pointer to number of bytes read
   LPOVERLAPPED lpOverlapped    // pointer to structure for data
 );
- 
+
 */
+
+HB_FUNC( READFILE )
+{
+
+   char * Buffer = ( char *) hb_xgrab( hb_parnl( 3 ) ) ;
+   DWORD nRead   = 0      ;
+   BOOL  bRet             ;
+   OVERLAPPED *Overlapped ;
+
+   if( ISCHAR( 5 ) )
+      Overlapped = ( OVERLAPPED *) hb_param( 4, HB_IT_STRING )->item.asString.value ;
+
+
+   bRet = ReadFile( (HANDLE) hb_parnl( 1 ) ,
+                    Buffer                 ,
+                    (DWORD)  hb_parnl( 3 ) ,
+                    &nRead        ,
+                    Overlapped );
+
+   if ( bRet )
+        hb_storclen( Buffer, nRead, 4 ) ;
+
+   hb_stornl( nRead, 4 ) ;
+   hb_retl( bRet ) ;
+
+}
 
 //-----------------------------------------------------------------------------
 
@@ -980,9 +1009,33 @@ BOOL WriteFile(
   LPDWORD lpNumberOfBytesWritten,  // pointer to number of bytes written
   LPOVERLAPPED lpOverlapped        // pointer to structure for overlapped I/O
 );
- 
 
 */
+
+HB_FUNC( WRITEFILE )
+{
+
+   DWORD nWritten = 0     ;
+   OVERLAPPED *Overlapped ;
+
+   if( ISCHAR( 4 ))
+     Overlapped = ( OVERLAPPED *) hb_param( 4, HB_IT_STRING )->item.asString.value ;
+
+   hb_retl ( WriteFile( (HANDLE)  hb_parnl( 1 )   ,
+                     hb_parc( 2 )       ,
+                     hb_parclen( 2 )    ,
+                     &nWritten          ,
+                     ISCHAR( 4 ) ? Overlapped : NULL ) ) ;
+
+   hb_stornl( nWritten, 3 ) ;
+
+}
+
+
+
+
+
+
 
 
 //-----------------------------------------------------------------------------
