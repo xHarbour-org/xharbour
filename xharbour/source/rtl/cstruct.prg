@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.9 2002/07/23 07:22:34 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.10 2002/07/23 17:44:03 ronpinkas Exp $
  */
 
 /*
@@ -130,6 +130,7 @@ Procedure HB_CStructureCSyntax( cStructure, aDefinitions, cTag, cSynonList, nAli
 
    LOCAL cElem, nAt, nIndex := 1
    LOCAL nLen, Counter, CType
+   LOCAL oErr
 
    FOR EACH cElem IN aDefinitions
        // *** PP bug - remove when possible! ***
@@ -172,6 +173,20 @@ Procedure HB_CStructureCSyntax( cStructure, aDefinitions, cTag, cSynonList, nAli
             CType := HB_CStructureID( Left( CType, Len( CType ) - 1 ), .F. )
          ELSE
             CType := HB_CStructureID( CType, .T. )
+            IF CType == CTYPE_STRUCTURE .OR. CType == CTYPE_STRUCTURE_PTR
+               oErr := ErrorNew()
+               oErr:Args          := { cStructure, aDefinitions, cTag, cSynonList, nAlign }
+               oErr:CanDefault    := .F.
+               oErr:CanRetry      := .F.
+               oErr:CanSubstitute := .T.
+               oErr:Description   := "Undefined CType: '" + aDefinitions[Counter] + "'"
+               oErr:Operation     := "HB_CStructureCSyntax()"
+               oErr:Severity      := ES_ERROR
+               oErr:SubCode       := 2
+               oErr:SubSystem     := "C Structure"
+
+               CType := Eval( ErrorBlock(), oErr )
+            ENDIF
          ENDIF
 
          HB_Member( aDefinitions[Counter + 1], CType )
@@ -206,7 +221,7 @@ Function HB_CStructure( cStructure, nAlign )
       oErr:Desscription  := "Structure not initialized with __ActiveStructure()"
       oErr:Operation     := "HB_CStructure()"
       oErr:Severity      := ES_ERROR
-      oErr:SubCode       := 2
+      oErr:SubCode       := 3
       oErr:SubSystem     := "C Structure"
 
       Return Eval( ErrorBlock(), oErr )
@@ -333,7 +348,7 @@ Function HB_CStructureFromID( nID, nAlign )
       oErr:Description  := "ID out of range."
       oErr:Operation     := "HB_CStructureFromID()"
       oErr:Severity      := ES_ERROR
-      oErr:SubCode       := 3
+      oErr:SubCode       := 4
       oErr:SubSystem     := "C Structure"
 
       Return Eval( ErrorBlock(), oErr )
