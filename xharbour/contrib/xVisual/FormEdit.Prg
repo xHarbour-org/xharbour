@@ -32,14 +32,12 @@ GLOBAL EXTERNAL hThisInstance
    METHOD Add()
    METHOD OnPaint( hDC )     INLINE ::DrawGrid( hDC, 3 ),0
    METHOD OnCreate()         INLINE ::CreateSub()
-  // METHOD OnEraseBkgnd()
    METHOD OnSize()
 
-   METHOD OnMenuCommand(oItem) //INLINE ::SubCommands( nwParam )
+   METHOD OnMenuCommand(oItem)
    METHOD CreateSub()
    METHOD DrawGrid()
-   //METHOD SubCommands()
-
+   METHOD GetUniquePropName()
 
  END CLASS
 
@@ -56,8 +54,6 @@ METHOD Add( cName, oObj )
    RETURN(oCtrl)
 
 //----------------------------------------------------------------------------//
-
-// move mask to cover the entire window
 
 METHOD OnSize(nFlag,Width,Height)
 
@@ -76,27 +72,45 @@ METHOD OnSize(nFlag,Width,Height)
 
 METHOD OnMenuCommand(oItem)
 
-   //view oItem:Id
+  LOCAL a:=__objGetValueList( self )
+  LOCAL nInd:=0
+  LOCAL cName:=::GetUniquePropName(oItem:Text)
 
-   DO CASE
-   CASE oItem:Text=="Button"
-     ::Add('Button1',        TButton():New(   self, 'Button1',      500,   0,  0, 200, 100 ) )
-   CASE oItem:Text=="Edit"
-      ::Add('TestEdit',      TEdit():New(     self, 'Edit1',        501, 210,  0, 200,  20 ) )
-   CASE oItem:Text=="ComboBox"
-       ::Add('ComboBox1',    TComboBox():New( self, 'ComboBox1',    502, 210, 30, 200, 100 ) )
-   CASE oItem:Text=="CheckBox"
-       ::Add('CheckBox1',    TCheck():New(    self, 'CheckBox1',    505, 210,105, 200,  20 ) )
-   CASE oItem:Text=="RadioButton"
-       ::Add('RadioButton1', TRadio():New(    self, 'RadioButton1', 504, 210, 80, 200,  20 ) )
-   CASE oItem:Text=="ListBox"
-       ::Add('ListBox1',     TListBox():New(  self, 'ListBox1',     506, 210,  20,200,200 ) )
-   CASE oItem:Text=="Label"
-       ::Add('Label1',       TStatic():New(   self, 'Label1',       503, 210, 55, 200,  20 ) )
+  DO CASE
+  CASE oItem:Text=="Button"
+     ::Add(cName, TButton():New(   self, cName, 500,  10, 10, 100,  24 ) )
+  CASE oItem:Text=="Edit"
+     ::Add(cName, TEdit():New(     self, cName, 501, 210,  0, 200,  20 ) )
+  CASE oItem:Text=="ComboBox"
+     ::Add(cName, TComboBox():New( self, cName, 502, 210, 30, 200, 100 ) )
+  CASE oItem:Text=="CheckBox"
+     ::Add(cName, TCheck():New(    self, cName, 505, 210,105, 200,  20 ) )
+  CASE oItem:Text=="RadioButton"
+     ::Add(cName, TRadio():New(    self, cName, 504, 210, 80, 200,  20 ) )
+  CASE oItem:Text=="ListBox"
+     ::Add(cName, TListBox():New(  self, cName, 506, 210, 20, 200, 200 ) )
+  CASE oItem:Text=="Label"
+     ::Add(cName, TStatic():New(   self, cName, 503, 210, 55, 200,  20 ) )
 
-   ENDCASE
+  ENDCASE
 
-   RETURN(NIL)
+  RETURN(NIL)
+
+//----------------------------------------------------------------------------//
+
+METHOD GetUniquePropName(cName)
+
+  LOCAL aProp:=__objGetValueList( self )
+  LOCAL nInd:=1
+
+ // view aProp
+
+  DO WHILE aScan(aProp, {|a| a[1]==UPPER(cName)+alltrim(str(nInd))}) > 0
+     nInd++
+  ENDDO
+
+  RETURN(cName+alltrim(str(nInd)))
+
 
 //----------------------------------------------------------------------------//
 
@@ -127,9 +141,6 @@ METHOD CreateSub()
    RETURN( xRet )
 
 //----------------------------------------------------------------------------//
-
-
-// __objGetValueList( oObject ) <- lists properties ?
 
 METHOD DrawGrid(hDC,nGran)
 
