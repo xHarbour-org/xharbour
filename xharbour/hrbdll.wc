@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.5 2004/05/09 23:40:01 druzus Exp $
+# $Id: hrbdll.wc,v 1.6 2004/08/05 16:41:42 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -1858,7 +1858,7 @@ $(OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
 $(OBJ_DIR)\base64x.obj : $(TIP_DIR)\base64x.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
-$(OBJ_DIR)\utils.obj : ($TIP_DIR)\utils.c
+$(OBJ_DIR)\utils.obj : $(TIP_DIR)\utils.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\client.c : $(TIP_DIR)\client.prg

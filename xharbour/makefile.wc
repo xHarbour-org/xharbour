@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.5 2004/07/01 13:18:35 vouchcac Exp $
+# $Id: makefile.wc,v 1.6 2004/08/05 16:41:42 paultucker Exp $
 #
 
 #
@@ -3105,7 +3105,7 @@ $(OBJ_DIR)\hbmlang.obj : $(HBMAKE_DIR)\hbmlang.c
 $(OBJ_DIR)\base64x.obj : $(TIP_DIR)\base64x.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
-$(OBJ_DIR)\utils.obj : ($TIP_DIR)\utils.c
+$(OBJ_DIR)\utils.obj : $(TIP_DIR)\utils.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\client.c : $(TIP_DIR)\client.prg
