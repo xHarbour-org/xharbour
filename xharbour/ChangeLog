@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3349 2004/08/27 05:42:13 paultucker Exp $
+ * $Id: ChangeLog,v 1.3350 2004/08/27 05:48:53 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -12,9 +12,9 @@
   - source/math.c
   - source/net.c
   - source/pad.c
-  + source/ctmath2.c
-  + source/ctnet.c
-  + source/ctpad.c
+  + source/ct/ctmath2.c
+  + source/ct/ctnet.c
+  + source/ct/ctpad.c
   - contrib/libct
   - contrib/winprn
   * contrib/MakeFile
