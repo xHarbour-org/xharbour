@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2153 2004/01/27 03:40:27 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2154 2004/01/27 04:08:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-26 20:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * hrbdll.vc
+    - Commented out uc437.c ( hb_uniTbl_437 already defined in cdpapi.c )
+      /* Not sure what is the desirable fix, or why the redundancy. */
 
 2004-01-26 20:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c

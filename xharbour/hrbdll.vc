@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.28 2003/12/19 01:32:39 fsgiudice Exp $
+# $Id: hrbdll.vc,v 1.29 2004/01/26 22:03:24 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -466,7 +466,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\uc1250.obj   \
   $(OBJ_DIR)\uc1251.obj   \
   $(OBJ_DIR)\uc1257.obj   \
-  $(OBJ_DIR)\uc437.obj    \
+#  $(OBJ_DIR)\uc437.obj    \
   $(OBJ_DIR)\uc850.obj    \
   $(OBJ_DIR)\uc852.obj    \
   $(OBJ_DIR)\uc866.obj    \
