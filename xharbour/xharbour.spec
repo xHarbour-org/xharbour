@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.25 2003/08/09 20:45:18 druzus Exp $
+# $Id: xharbour.spec,v 1.26 2003/08/18 14:50:48 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -265,15 +265,20 @@ do
             else
                 lm="${ls}"
             fi
-            if [ -f $ls ]
+            if [ "${HB_MULTI_GT}" = "yes" ] || \
+               [ "${l#gt}" = "${l}" ] || \
+               [ "${l}" == "${HB_GT_LIB}" ]
             then
-                LIBS="$LIBS $ls"
+                if [ -f $ls ]
+                then
+                    LIBS="$LIBS $ls"
+                fi
+                if [ -f $lm ]
+                then
+                    LIBSMT="$LIBSMT $lm"
+                fi
             fi
-            if [ -f $lm ]
-            then
-                LIBSMT="$LIBSMT $lm"
-            fi
-	;;
+            ;;
     esac
 done
 $HB_BIN_INSTALL/hb-mkslib lib%{name}-%{version}.so $LIBS
@@ -311,16 +316,16 @@ if [ \$# == 0 ]; then
     -main=<main_func>   # set the name of main program function/procedure.
                         # if not set then 'MAIN' is used or if it doesn't
                         # exist the name of first public function/procedure
-                        # in first linked object module
+                        # in first linked object module (link)
 "
     exit 1
 elif [ "\$*" == "mk-links" ]; then
     DIR="\${0%/*}"
     NAME="\${0##*/}"
     if [ "\${DIR}" != "\${NAME}" ]; then
-	for n in %{hb_pref}cc %{hb_pref}cmp %{hb_pref}mk %{hb_pref}lnk gharbour harbour-link; do
-	    ln -sf "\${NAME}" "\${DIR}/\${n}"
-	done
+        for n in %{hb_pref}cc %{hb_pref}cmp %{hb_pref}mk %{hb_pref}lnk gharbour harbour-link; do
+            ln -sf "\${NAME}" "\${DIR}/\${n}"
+        done
     fi
     exit
 fi
@@ -329,6 +334,7 @@ fi
 HB_STATIC="no"
 HB_MT=""
 HB_GT="%{hb_gt}"
+HB_MG="%{hb_mgt}"
 
 HB_GT_REQ=""
 HB_FM_REQ=""
@@ -340,25 +346,25 @@ P=( "\$@" ); n=0; DIROUT="."; FILEOUT=""
 while [ \$n -lt \${#P[@]} ]; do
     v=\${P[\$n]}; p=""
     case "\$v" in
-	-o*)
-	    d="\${v#-o}"; p="\${v}"
-	    if [ -d "\${d}" ]; then
-		DIROUT="\${d%/}"
-	    elif [ -d "\${d%/*}" ]; then
-		DIROUT="\${d%/*}"; FILEOUT="\${d##*/}"; p="-o\${d%.*}"
-	    elif [ -n "\${d}" ]; then
-		FILEOUT="\${d}"; p="-o\${d%.*}"
-	    fi ;;
-	-static)     HB_STATIC="yes" ;;
-	-fullstatic) HB_STATIC="full" ;;
-	-shared)     HB_STATIC="no" ;;
-	-mt)         HB_MT="MT" ;;
-	-gt*)        HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
-	-fmstat)     HB_FM_REQ="STAT" ;;
-	-nofmstat)   HB_FM_REQ="NOSTAT" ;;
-	-main=*)     HB_MAIN_FUNC="\${v#*=}" ;;
-	-*)          p="\${v}" ;;
-	*)           [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
+        -o*)
+            d="\${v#-o}"; p="\${v}"
+            if [ -d "\${d}" ]; then
+                DIROUT="\${d%/}"
+            elif [ -d "\${d%/*}" ]; then
+                DIROUT="\${d%/*}"; FILEOUT="\${d##*/}"; p="-o\${d%.*}"
+            elif [ -n "\${d}" ]; then
+                FILEOUT="\${d}"; p="-o\${d%.*}"
+            fi ;;
+        -static)     HB_STATIC="yes" ;;
+        -fullstatic) HB_STATIC="full" ;;
+        -shared)     HB_STATIC="no" ;;
+        -mt)         HB_MT="MT" ;;
+        -gt*)        HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
+        -fmstat)     HB_FM_REQ="STAT" ;;
+        -nofmstat)   HB_FM_REQ="NOSTAT" ;;
+        -main=*)     HB_MAIN_FUNC="\${v#*=}" ;;
+        -*)          p="\${v}" ;;
+        *)           [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
     esac
     [ -n "\$p" ] && PP[\$n]="\$p"
     n=\$[\$n + 1]
@@ -366,8 +372,8 @@ done
 P=( "\${PP[@]}" )
 
 case "\${HB_MT}" in
-    [Mm][Tt]|[Yy][Ee][Ss]|1)	HB_MT="MT";;
-    *)	HB_MT="";;
+    [Mm][Tt]|[Yy][Ee][Ss]|1)  HB_MT="MT";;
+    *)  HB_MT="";;
 esac
 
 SYSTEM_LIBS="-lm -lncurses -lslang -lgpm"
@@ -376,8 +382,14 @@ if [ "\${HB_MT}" = "MT" ]; then
     SYSTEM_LIBS="-lpthread \${SYSTEM_LIBS}"
 fi
 
+HB_GT_STAT=""
 [ -z "\${HB_GT_REQ}" ] && HB_GT_REQ="\${HB_GT}"
-HB_GT_REQ=\`echo \${HB_GT_REQ}|tr a-z A-Z\`
+if [ "\${HB_MG}" != "yes" ]; then
+    [ "\${HB_STATIC}" = "yes" ] && HB_GT_STAT=\`echo \${HB_GT_REQ}|tr A-Z a-z\`
+    HB_GT_REQ=""
+else
+    HB_GT_REQ=\`echo \${HB_GT_REQ}|tr a-z A-Z\`
+fi
 HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr a-z A-Z\`
 
 # set environment variables
@@ -409,17 +421,19 @@ else
 fi
 for l in \${libs}
 do
-    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-    [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+    if [ "\${HB_MG}" = "yes" ] || [ "\${l#gt}" = "\${l}" ] || [ "\${l}" == "gt\${HB_GT_STAT}" ]; then
+        [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
+        [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+    fi
 done
 HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
 l="fm"
 [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
 if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
     if [ "\${HB_STATIC}" = "yes" ] && [ "\${HB_FM_REQ}" = "STAT" ]; then
-	HARBOUR_LIBS="-l\${l} \${HARBOUR_LIBS}"
+        HARBOUR_LIBS="-l\${l} \${HARBOUR_LIBS}"
     else
-	HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+        HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
     fi
 fi
 
@@ -436,15 +450,15 @@ hb_cc()
 hb_link()
 {
     if [ -n "\${HB_MAIN_FUNC}" ]; then
-	HB_MAIN_FUNC="@\${HB_MAIN_FUNC}"
+        HB_MAIN_FUNC="@\${HB_MAIN_FUNC}"
     elif [ -f "\${FOUTO}" ]; then
-	HB_MAIN_FUNC=\`hb_lnk_main "\${FOUTO}"\`
+        HB_MAIN_FUNC=\`hb_lnk_main "\${FOUTO}"\`
     fi
     if [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_FM_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
-	hb_lnk_request > \${_TMP_FILE_} && \\
-	gcc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        hb_lnk_request > \${_TMP_FILE_} && \\
+        gcc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     else
-	gcc "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        gcc "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     fi
 }
 
@@ -459,41 +473,42 @@ hb_lnk_request()
 {
     echo "#include \\"hbapi.h\\""
     if [ "\${HB_STATIC}" = "yes" ] || [ -n "\${HB_FM_REQ}" ]; then
-	for gt in \${HB_GT_REQ}; do
-	    echo "extern HB_FUNC( HB_GT_\${gt} );"
-	done
-	if [ -n "\${HB_FM_REQ}" ]; then
-	    echo "extern HB_FUNC( HB_FM_\${HB_FM_REQ} );"
-	fi
-	echo "void hb_lnk_ForceLink_build( void )"
-	echo "{"
-	for gt in \${HB_GT_REQ}; do
-	    echo "   HB_FUNCNAME( HB_GT_\${gt} )();"
-	done
-	if [ -n "\${HB_FM_REQ}" ]; then
-	    echo "   HB_FUNCNAME( HB_FM_\${HB_FM_REQ} )();"
-	fi
-	echo "}"
+        for gt in \${HB_GT_REQ}; do
+            echo "extern HB_FUNC( HB_GT_\${gt} );"
+        done
+        if [ -n "\${HB_FM_REQ}" ]; then
+            echo "extern HB_FUNC( HB_FM_\${HB_FM_REQ} );"
+        fi
+        echo "void hb_lnk_ForceLink_build( void )"
+        echo "{"
+        for gt in \${HB_GT_REQ}; do
+            echo "   HB_FUNCNAME( HB_GT_\${gt} )();"
+        done
+        if [ -n "\${HB_FM_REQ}" ]; then
+            echo "   HB_FUNCNAME( HB_FM_\${HB_FM_REQ} )();"
+        fi
+        echo "}"
     fi
     gt="\${HB_GT_REQ%%%% *}"
     if [ -n "\$gt" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
-	echo "#include \\"hbinit.h\\""
-	echo "extern char * s_defaultGT;"
-	echo "extern char * s_pszLinkedMain;"
-	echo "HB_CALL_ON_STARTUP_BEGIN( hb_lnk_SetDefault_build )"
-	if [ -n "\$gt" ]; then
-	    echo "   s_defaultGT = \\"\$gt\\";"
-	fi
-	if [ -n "\${HB_MAIN_FUNC}" ]; then
-	    echo "   s_pszLinkedMain = \\"\${HB_MAIN_FUNC}\\";"
-	fi
-	echo "HB_CALL_ON_STARTUP_END( hb_lnk_SetDefault_build )"
+        echo "#include \\"hbinit.h\\""
+        echo "extern char * s_defaultGT;"
+        echo "extern char * s_pszLinkedMain;"
+        echo "HB_CALL_ON_STARTUP_BEGIN( hb_lnk_SetDefault_build )"
+        if [ -n "\$gt" ]; then
+            echo "   s_defaultGT = \\"\$gt\\";"
+        fi
+        if [ -n "\${HB_MAIN_FUNC}" ]; then
+            echo "   s_pszLinkedMain = \\"\${HB_MAIN_FUNC}\\";"
+        fi
+        echo "HB_CALL_ON_STARTUP_END( hb_lnk_SetDefault_build )"
     fi
 }
 
 hb_lnk_main()
 {
-    (nm \$1 -g -n --defined-only|sed -e 's/^[0-9a-fA-F]* T HB_FUN_//'|head -1)2>/dev/null
+    (nm \$1 -g -n --defined-only|sed -e '/HB_FUN_/ ! d' -e 's/^[0-9a-fA-F]* T HB_FUN_//'|head -1|grep -v '^MAIN\$')2>/dev/null
+#    (nm \$1 -n --defined-only|sed -e '/HB_FUN_/ ! d' -e 's/^[0-9a-fA-F]* [Tt] HB_FUN_//'|head -1|grep -v '^MAIN\$')2>/dev/null
 }
 
 hb_cleanup()
@@ -508,20 +523,20 @@ HB="\${0##*/}"
 
 case "\${HB}" in
     *cc)
-	hb_cc "\${P[@]}"
-	;;
+        hb_cc "\${P[@]}"
+        ;;
     *cmp|gharbour)
-	hb_cmp "\${P[@]}"
-	;;
+        hb_cmp "\${P[@]}"
+        ;;
     *lnk|harbour-link)
-	hb_link "\${P[@]}"
-	;;
+        hb_link "\${P[@]}"
+        ;;
     *mk)
-	hb_cmp "\${P[@]}" && \\
-	hb_link "\${FOUTO}" && \\
-	strip "\${FOUTE}" && \\
-	rm -f "\${FOUTO}"
-	;;
+        hb_cmp "\${P[@]}" && \\
+        hb_link "\${FOUTO}" && \\
+        strip "\${FOUTE}" && \\
+        rm -f "\${FOUTO}"
+        ;;
 esac
 EOF
 chmod 755 $HB_BIN_INSTALL/%{hb_pref}-build
@@ -550,7 +565,7 @@ EOF
 
 # Create PP
 pushd tests
-$HB_BIN_INSTALL/xhbmk pp -n -w -D_DEFAULT_INC_DIR=\"$_DEFAULT_INC_DIR\"
+$HB_BIN_INSTALL/%{hb_pref}mk pp -n -w -D_DEFAULT_INC_DIR=\"${_DEFAULT_INC_DIR}\"
 install -m755 -s pp $HB_BIN_INSTALL/pp
 ln -s pp $HB_BIN_INSTALL/pprun
 install -m644 rp_dot.ch $HB_INC_INSTALL/
@@ -559,15 +574,15 @@ popd
 # check if we should rebuild tools with shared libs
 if [ "%{hb_lnkso}" = yes ]
 then
-    export L_USR="-L${HB_LIB_INSTALL} -lxharbour -lncurses -lslang -lgpm"
+    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm"
 
     for utl in hbmake hbrun hbpp hbdoc
     do
-	pushd utils/${utl}
-	rm -fR "./${HB_ARCHITECTURE}"
-	make install
-	strip ${HB_BIN_INSTALL}/${utl}
-	popd
+        pushd utils/${utl}
+        rm -fR "./${HB_ARCHITECTURE}"
+        make install
+        strip ${HB_BIN_INSTALL}/${utl}
+        popd
     done
 fi
 
@@ -607,7 +622,7 @@ All these scripts accept command line switches:
                         #      the default at runtime
 -fmstat                 # link with the memory statistics lib
 -nofmstat               # do not link with the memory statistics lib (default)
--main=<main_func>	# set the name of main program function/procedure.
+-main=<main_func>       # set the name of main program function/procedure.
                         # if not set then 'MAIN' is used or if it doesn't
                         # exist the name of first public function/procedure
                         # in first linked object module (link)
@@ -762,8 +777,8 @@ rm -rf $RPM_BUILD_ROOT
 
 * Wed Jul 23 2003 Przemyslaw Czerpak <druzus@polbox.com>
 - fixed file (user and group) owner for RPMs builded from non root account
-- shared lib names changed from xharbour{mt,}.so to
-  xharbour{mt,}-<version>.so and soft links with short names created
+- shared lib names changed from [x]harbour{mt,}.so to
+  [x]harbour{mt,}-<version>.so and soft links with short names created
 - 0.82 version set
 
 * Wed Apr 30 2003 Przemyslaw Czerpak <druzus@polbox.com>

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.54 2003/07/18 12:58:17 lculik Exp $
+ * $Id: dbfcdx1.c,v 1.55 2003/08/18 12:13:46 druzus Exp $
  */
 
 /*
@@ -3009,7 +3009,7 @@ static void hb_cdxPageRealFree( LPCDXPAGEINFO pPage )
    hb_cdxPagePoolCheck( pTag );
 #endif
 
-   if( pPage->NewRoot && pPage->Owner != NULL )
+   if ( pPage->NewRoot && pPage->Owner != NULL )
    {
       pPage->Owner->Child = NULL;
       hb_cdxPageRealFree( pPage->Owner );
@@ -3024,6 +3024,15 @@ static void hb_cdxPageRealFree( LPCDXPAGEINFO pPage )
    /* Free all keys */
    hb_cdxKeyListFree( pPage->pKeys );
    pPage->pKeys = NULL;
+
+#if 0
+   /* DEBUG */
+   /* TODO: add code for returnning free page */
+   if ( pPage->Left == -1 && pPage->Right == -1 && (pPage->PageType & 0xf0) == 0xf0 )
+   {
+      printf("\r\nfreeing page: %08lx, type=%02x\r\n", pPage->Page, pPage->PageType); fflush(stdout);
+   }
+#endif
 
    hb_xfree( pPage );
 #ifndef HB_CDX_DBGCODE_OFF
@@ -3197,8 +3206,8 @@ static BYTE hb_cdxPageKeyLeafInsert( LPCDXPAGEINFO pPage, LPCDXKEYINFO pKey, BOO
       {
          pNewKey->pNext = pPage->pKeys;
          pPage->pKeys = pNewKey;
-         // TODO : optimize this calc
          pPage->uiKeys++;
+         // TODO : optimize this calc
          hb_cdxPageCalcLeafSpace( pPage );
       }
       else
@@ -3495,6 +3504,14 @@ static LPCDXKEYINFO hb_cdxPageGetKey( LPCDXPAGEINFO pPage, USHORT uiKey )
 {
    LPCDXKEYINFO pKey;
 
+   if ( !pPage )
+      hb_cdxErrInternal( "hb_cdxPageGetKey: pPage is NULL" );
+   if ( !pPage->pKeys )
+   {
+      //if ( uiKey == 0xffff ) return NULL;
+      //hb_cdxErrInternal( "hb_cdxPageGetKey: pPage->pKeys is NULL" );
+      pKey = pPage->pKeys;
+   }   
    pKey = pPage->pKeys;
    while( uiKey > 0 && pKey->pNext != NULL )
    {
@@ -3721,7 +3738,6 @@ static void hb_cdxPageCalcLeafSpace( LPCDXPAGEINFO pPage )
    LPCDXTAG pTag;
    ULONG ulMaxRec;
    LPCDXKEYINFO p, q;
-   BYTE ok;
 
    pTag = pPage->TagParent;
    if( pTag->OptFlags & 0x80 )
@@ -3747,35 +3763,26 @@ static void hb_cdxPageCalcLeafSpace( LPCDXPAGEINFO pPage )
       pPage->DCMask = (BYTE) hb_cdxMakeMask( pPage->DCBits );
       pPage->TCMask = (BYTE) hb_cdxMakeMask( pPage->TCBits );
    }
-   ok = 0;
-   while ( !ok )
+   iSpace = cd = 0; // kcnt =
+   // lm = sizeof( pData->cdxu.Internal.IntData ) / 2;
+   q = NULL;
+   for( uiCount = 0; uiCount < pPage->uiKeys; uiCount++ )
    {
-      ok = 1;
-      iSpace = cd = 0; // kcnt =
-      // lm = sizeof( pData->cdxu.Internal.IntData ) / 2;
-      q = NULL;
-      for( uiCount = 0; uiCount < pPage->uiKeys; uiCount++ )
+      p = hb_cdxPageGetKey( pPage, uiCount );
+      if( q != NULL )
       {
-         p = hb_cdxPageGetKey( pPage, uiCount );
-         if( q != NULL )
-         {
-            hb_cdxKeyFindDup( p, q, &cd, NULL);
-         }
-         q = p;
-         cd = p->length - cd ;
-         iSpace += cd + pPage->ReqByte;
-         if ( (ULONG) p->Tag > pPage->RNMask )
-         {
-            while( (ULONG) p->Tag > pPage->RNMask )
-            {
-               pPage->ReqByte++;
-               pPage->RNBits += 8;
-               pPage->RNMask = ( pPage->RNMask << 8 ) | 0xFF;
-            }
-            ok = 0;
-            break;
-         }
+         hb_cdxKeyFindDup( p, q, &cd, NULL);
       }
+      q = p;
+      cd = p->length - cd ;
+      while( (ULONG) p->Tag > pPage->RNMask )
+      {
+         pPage->ReqByte++;
+         pPage->RNBits += 8;
+         pPage->RNMask = ( pPage->RNMask << 8 ) | 0xFF;
+         iSpace += uiCount;
+      }
+      iSpace += cd + pPage->ReqByte;
    }
    pPage->FreeSpace = CDX_EXTERNAL_SPACE - iSpace;
 }
@@ -3972,12 +3979,15 @@ static BYTE hb_cdxPageKeyLeafBalance( LPCDXPAGEINFO pPage )
          }
          childs[i]->uiKeys = uiCount;
          usKeys += uiCount;
-         // childs[i]->FreeSpace = iSpace;
+#ifndef HB_CDX_DBGCODE_OFF
          hb_cdxPageCalcLeafSpace( childs[i] );
          if ( childs[i]->FreeSpace != iSpace )
          {
             hb_cdxErrInternal( "hb_cdxPageKeyLeafBalance: space calculated wrong!." );
          }
+#else
+         childs[i]->FreeSpace = iSpace;
+#endif
          pKeyList = pKeyTmp->pNext;
          pKeyTmp->pNext = NULL;
       }
@@ -4039,6 +4049,12 @@ static BYTE hb_cdxPageKeyLeafBalance( LPCDXPAGEINFO pPage )
    
             childs[j]->Owner    = NULL;
             childs[j]->Changed  = FALSE;
+            /* DEBUG */
+            childs[j]->PageType |= 0xF0;
+            childs[j]->Changed  = TRUE;
+            childs[j]->Left     = -1;
+            childs[j]->Right    = -1;
+
             hb_cdxPageRealFree( childs[j] );
          }
          nChilds = i;
@@ -4174,6 +4190,11 @@ static BYTE hb_cdxPageKeyIntBalance( LPCDXPAGEINFO pPage )
    
             childs[nChilds-1]->Owner    = NULL;
             childs[nChilds-1]->Changed  = FALSE;
+            /* DEBUG */
+            childs[nChilds-1]->PageType |= 0xF0;
+            childs[nChilds-1]->Changed  = TRUE;
+            childs[nChilds-1]->Left     = -1;
+            childs[nChilds-1]->Right    = -1;
             hb_cdxPageRealFree( childs[nChilds-1] );
             nChilds--;
          }
@@ -4366,10 +4387,25 @@ static BYTE hb_cdxPageKeyDelete( LPCDXPAGEINFO pPage )
       }
       else if ( bChildRet & 1 )
       {
-         p = hb_cdxPageGetKey( pPage, pPage->CurKey );
-         pLastKey = hb_cdxPageGetKey( pPage->Child, pPage->Child->uiKeys - 1 );
-         hb_cdxKeyCopy( p, pLastKey );
-         p->Tag = pPage->Child->Page;
+         /* DEBUG */
+         /* if ( pPage->Child->uiKeys == 0 ) then it GPFs */
+         if ( pPage->Child->uiKeys == 0 )
+         {
+            p = hb_cdxPageGetKey( pPage, pPage->CurKey );
+            if ( pPage->CurKey == 0 )
+               pPage->pKeys = pPage->pKeys->pNext;
+            else
+               hb_cdxPageGetKey( pPage, pPage->CurKey - 1 )->pNext = p->pNext;
+            hb_cdxKeyFree( p );
+            pPage->uiKeys--;
+         }
+         else
+         {
+            p = hb_cdxPageGetKey( pPage, pPage->CurKey );
+            pLastKey = hb_cdxPageGetKey( pPage->Child, pPage->Child->uiKeys - 1 );
+            hb_cdxKeyCopy( p, pLastKey );
+            p->Tag = pPage->Child->Page;
+         }
          pPage->Changed = TRUE;
          if ( pPage->Owner && ( pPage->CurKey >= pPage->uiKeys - 1 ) )
             bRet |= 1;
@@ -4437,20 +4473,23 @@ static void hb_cdxPageLeafCheckKeys( LPCDXPAGEINFO pPage )
    int res;
 
    last = pPage->pKeys;
-   p = last->pNext;
-   while ( p )
+   if ( pPage->uiKeys > 0 || last )
    {
-      res = hb_cdxKeyCompare( last, p, TRUE);
-      if ( res == 0 )
-      {
-         res = last->Tag - p->Tag;
-      }
-      if ( res >= 0 )
-      {
-         hb_cdxErrInternal( "hb_cdxPageLeafCheckKeys: index corrupted." );
-      }
-      last = p;
       p = last->pNext;
+      while ( p )
+         {
+            res = hb_cdxKeyCompare( last, p, TRUE);
+         if ( res == 0 )
+         {
+            res = last->Tag - p->Tag;
+         }
+         if ( res >= 0 )
+         {
+            hb_cdxErrInternal( "hb_cdxPageLeafCheckKeys: index corrupted." );
+         }
+         last = p;
+         p = last->pNext;
+      }
    }
 }
 #endif
@@ -5163,9 +5202,7 @@ static BOOL hb_cdxSortSwapGetNextKey( LPSORTINFO pSort, LONG * pKeyRec, BYTE * p
 
       if( --pPage->keysLeft )
       {
-         LPSORTSWAPITEM pItem;
-         BYTE  lRead;
-         lRead = 0;
+         LPSORTSWAPITEM pItem = NULL;
          if ( pPage->nBufLeft < (USHORT) (sizeof(SORTSWAPITEM) + (USHORT) pPage->tmpKeyLen - 1) ) {
             printf("Error! --- swapgetnextkey\n");
          }
@@ -5178,15 +5215,12 @@ static BOOL hb_cdxSortSwapGetNextKey( LPSORTINFO pSort, LONG * pKeyRec, BYTE * p
          if ( pPage->nBufLeft > 512 ) {
             printf("Error! --- swapgetnextkey\n");
          }
-         if ( pPage->nBufLeft < (sizeof(SORTSWAPITEM) - 1) ) {
-            lRead = 1;
-         }
-         else {
+         if ( pPage->nBufLeft >= (sizeof(SORTSWAPITEM) - 1) ) {
             pItem = (LPSORTSWAPITEM) (pPage->page + pPage->nCurPos);
             if ( pPage->nBufLeft < (USHORT) (sizeof(SORTSWAPITEM) + (USHORT) pItem->keyLen - 1 ) )
-               lRead = 1;
+               pItem = NULL;
          }
-         if ( lRead ) {
+         if ( !pItem ) {
             pPage->nBytesLeft += pPage->nBufLeft;
             hb_fsSeek( pSort->hTempFile, pPage->nFileOffset + pPage->pageLen - pPage->nBytesLeft, SEEK_SET );
             pPage->nBufLeft = (USHORT) ( ( pPage->nBytesLeft < sizeof(pPage->page) ) ? pPage->nBytesLeft : sizeof(pPage->page) );
@@ -5365,11 +5399,13 @@ static void hb_cdxSortInsertWord( LPSORTINFO pSort, LONG Tag, char * Value,
       /*
          Patch for empty fields (> 1)
       */
+/*
          while( pSort->WPch[0] > 1 && pSort->WPch[ pSort->WPch[0] ] ==
                                       ( pSort->CurTag->uiType == 'C' ? ' ' : 0 ) )
          {
             pSort->WPch[0]--;
          }
+*/
    }
    pSort->LevelPtr = pSort->RootLink;
    pSort->PriorPtr = 0;
@@ -5741,6 +5777,11 @@ static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
 #ifndef HB_CDX_DBGCODE_OFF
    if( hb_cdxKeyCompare( Value, pSort->LastKey, TRUE ) < 0 )
    {
+/*
+      printf("\r\nValue->length=%2d, Value->Value=%s", Value->length, Value->Value);
+      printf("\r\n Last->length=%2d,  Last->Value=%s", pSort->LastKey->length, pSort->LastKey->Value);
+      fflush(stdout);
+*/
       hb_cdxErrInternal( "hb_cdxSortAddExternal: Index corrupted" );
    }
 #endif
@@ -5777,7 +5818,7 @@ static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
    pSort->NodeList[ Lvl ]->Entry_Ct++;
    if( pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace <
        ( pSort->CurTag->uiLen + 8 +
-       pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes ) * 2 )
+       pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes ) * 1 ) /*2 only if count after the key was added */
    {
       pa = pSort->NodeList[ Lvl ]->Rght_Ptr;
       // TODO : check this, may be wrong
@@ -7070,7 +7111,7 @@ ERRCODE hb_cdxGoCold( CDXAREAP pArea )
       if( pArea->lpIndexes && pArea->lpIndexes->TagList )
       {
          pTag = pArea->lpIndexes->TagList;
-         hb_cdxIndexLockWrite ( pTag->pIndex, pTag );
+         hb_cdxIndexLockWrite( pTag->pIndex, pTag );
          uiTag = 1;
          while( pTag )
          {
