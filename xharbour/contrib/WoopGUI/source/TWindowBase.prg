@@ -25,6 +25,8 @@
 
 static snWinID
 
+
+
 CLASS TWindowBase FROM TObject
 
     CLASSDATA aoWindows    AS ARRAY INIT {} HIDDEN // Array of windows (this array contains all windows, windows are controls too)
@@ -72,7 +74,7 @@ CLASS TWindowBase FROM TObject
     DATA nMenu              AS NUMERIC       // Handle to menu or to child window
     DATA nApplication       AS NUMERIC       // Handle to application
     DATA pStruct                             // window-creation data (not used)
-
+    
     METHOD New() CONSTRUCTOR
     METHOD Init()
     METHOD Create()
@@ -204,7 +206,9 @@ METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oP
     ASSIGN ::hInstance     WITH oClass:hInstance      DEFAULT GetModuleHandle()
     ASSIGN ::hIcon         WITH oClass:hIcon          DEFAULT LoadIcon(NULL, IDI_APPLICATION)
     ASSIGN ::hCursor       WITH oClass:hCursor        //DEFAULT LoadCursor(NULL, IDC_ARROW) // FSG - to be checked
+
     ASSIGN ::hbrBackground WITH oClass:hbrBackground  DEFAULT COLOR_BTNFACE
+
     //ASSIGN ::cMenuName     WITH oClass:cMenuName
     //ASSIGN ::cClassName    WITH oClass:cClassName     DEFAULT "WoopGUIClass"
     ASSIGN ::hIconSm       WITH oClass:hIconSm        DEFAULT LoadIcon(NULL, IDI_APPLICATION)
@@ -298,12 +302,11 @@ RETURN Self
 
 METHOD Register() CLASS TWindowBase
   LOCAL nHandle
-
+  
   WG_DebugTrace( "TWindowBase:Register()", "::cClassName", ::cClassName )
 
   nHandle := RegisterClassEx( ::nClassStyle, 0/*bWindowProc*/, ::hInstance, ::hIcon, ::hCursor, ::hbrBackground,;
                               ::nMenu, ::cClassName, ::hIconSm )
-
   IF nHandle <> 0
      ::AddWinClass( Self )
   ENDIF

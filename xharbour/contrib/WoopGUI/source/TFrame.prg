@@ -55,7 +55,7 @@ ENDCLASS
 
 METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar ) CLASS TFrame
 
-    ASSIGN ::cClassName   WITH "WoopGUIFrmClass"
+    ASSIGN ::cClassName   WITH "FrmClass"
     ASSIGN ::cName        WITH cName                   DEFAULT "Frame_1"
     ASSIGN ::nStyle       WITH nStyle                  DEFAULT WS_OVERLAPPEDWINDOW
     ASSIGN ::nRow         WITH nRow                    DEFAULT CW_USEDEFAULT
