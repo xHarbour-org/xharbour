@@ -1,5 +1,5 @@
 /*
- * $Id: ctwin.c,v 1.1 2004/10/23 23:00:00 oh1 Exp $
+ * $Id: ctwin.c,v 1.1 2004/10/23 23:29:08 oh1 Exp $
  */
 
 /*
@@ -281,7 +281,6 @@ HB_FUNC( WFLASTROW ) /* Return position of the bottom row of formatted area */
 HB_FUNC( WFORMAT ) /* Set the usable area within a window */
 {
    SHORT FRow = 0, FCol = 0, LRow = 0, LCol = 0, NCur;
-   int i;
 
    NCur = hb_ctWSelect( -2 );
 
@@ -396,9 +395,7 @@ HB_FUNC( WNUM ) /* Get the highest windows handle */
 HB_FUNC( WOPEN ) /* Opens a new window */
 {
    BOOL      lDel = FALSE;
-   HB_CT_WND * wnd;
-   int       i;
-   SHORT     ClearB, iRow, iCol;
+   int i;
 
    if( hb_pcount() < 4 || !ISNUM( 1 ) || !ISNUM( 2 ) || !ISNUM( 3 ) ||
        !ISNUM( 4 ) )
@@ -492,7 +489,7 @@ HB_FUNC( WSETSHADOW ) /* Set the window shadow color */
 }
 /****************************************************************************/
 /* Get the array of windows handle ( New ) */
-HB_FUN( WSTACK )
+HB_FUNC( WSTACK )
 {
    SHORT    i, SMax, *Stac;
    PHB_ITEM pStack, pN;

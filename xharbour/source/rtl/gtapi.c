@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.35 2004/10/23 23:00:00 oh1 Exp $
+ * $Id: gtapi.c,v 1.35 2004/10/23 23:31:31 oh1 Exp $
  */
 
 /*
@@ -1021,8 +1021,8 @@ USHORT HB_EXPORT hb_gtSetCursor( USHORT uiCursorStyle )
       if( s_iRow >= ct_WFRow && s_iRow <= ct_ULRow &&
           s_iCol >= ct_UFCol && s_iCol <= ct_ULCol &&
           ( ct_NCur == 0 ||
-            s_iRow >= ct_BFRow && s_iRow <= ct_BLRow &&
-            s_iCol >= ct_BFCol && s_iCol <= ct_BLCol ) )
+            ( s_iRow >= ct_BFRow && s_iRow <= ct_BLRow &&
+              s_iCol >= ct_BFCol && s_iCol <= ct_BLCol ) ) )
       {
          hb_gt_SetCursorStyle( uiCursorStyle );
       }
@@ -1067,11 +1067,11 @@ USHORT HB_EXPORT hb_gtSetPos( SHORT iRow, SHORT iCol )
 
    /* Validate the new cursor position */
    if( ct_WNCol<= 0 ||
-       ( iRow >= ct_WFRow && iRow <= ct_ULRow &&
-         iCol >= ct_UFCol && iCol <= ct_ULCol ) &&
-          ( ct_NCur == 0 ||
-            iRow >= ct_BFRow && iRow <= ct_BLRow &&
-            iCol >= ct_BFCol && iCol <= ct_BLCol ) )
+       ( ( iRow >= ct_WFRow && iRow <= ct_ULRow &&
+           iCol >= ct_UFCol && iCol <= ct_ULCol ) &&
+         ( ct_NCur == 0 ||
+           ( iRow >= ct_BFRow && iRow <= ct_BLRow &&
+             iCol >= ct_BFCol && iCol <= ct_BLCol ) ) ) )
    {
       hb_gt_SetPos( iRow, iCol, HB_GT_SET_POS_BEFORE );
 
@@ -1108,11 +1108,11 @@ USHORT HB_EXPORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMethod )
 
    /* Validate the new cursor position */
    if( ct_WNCol<= 0 ||
-       ( iRow >= ct_WFRow && iRow <= ct_ULRow &&
-         iCol >= ct_UFCol && iCol <= ct_ULCol ) &&
-          ( ct_NCur == 0 ||
-            iRow >= ct_BFRow && iRow <= ct_BLRow &&
-            iCol >= ct_BFCol && iCol <= ct_BLCol ) )
+       ( ( iRow >= ct_WFRow && iRow <= ct_ULRow &&
+           iCol >= ct_UFCol && iCol <= ct_ULCol ) &&
+         ( ct_NCur == 0 ||
+           ( iRow >= ct_BFRow && iRow <= ct_BLRow &&
+             iCol >= ct_BFCol && iCol <= ct_BLCol ) ) ) )
    {
       hb_gt_SetPos( iRow, iCol, iMethod );
 
@@ -2161,7 +2161,7 @@ static void hb_ctSCSave( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
    if( FRow >= ct_BFRow && FCol >= ct_BFCol &&
        LRow <= ct_BLRow && LCol <= ct_BLCol)
    {
-      hb_gt_GetText( FRow, FCol, LRow, LCol, *uiAddr );
+      hb_gt_GetText( FRow, FCol, LRow, LCol, ( BYTE * ) *uiAddr );
    }
    else
    {
@@ -2178,7 +2178,7 @@ static void hb_ctSCSave( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
                       ct_CSize * ( ( iRow - FRow ) * ( LCol - FCol + 1 )
                                    + FCol2 - FCol );
 
-            hb_gt_GetText( iRow, FCol2, iRow, LCol2, ( void * ) uiAddr2 );
+            hb_gt_GetText( iRow, FCol2, iRow, LCol2, ( BYTE * ) uiAddr2 );
          }
       }
    }
@@ -2197,7 +2197,7 @@ static void hb_ctSCRest( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
    if( FRow >= ct_BFRow && FCol >= ct_BFCol &&
        LRow <= ct_BLRow && LCol <= ct_BLCol)
    {
-      hb_gt_PutText( FRow, FCol, LRow, LCol, uiAddr );
+      hb_gt_PutText( FRow, FCol, LRow, LCol, ( BYTE * ) uiAddr );
    }
    else
    {
@@ -2214,7 +2214,7 @@ static void hb_ctSCRest( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
                       ct_CSize * ( ( iRow - FRow ) * ( LCol - FCol + 1 )
                                    + FCol2 - FCol );
 
-            hb_gt_PutText( iRow, FCol2, iRow, LCol2, ( void * ) uiAddr2 );
+            hb_gt_PutText( iRow, FCol2, iRow, LCol2, ( BYTE * ) uiAddr2 );
          }
       }
    }
@@ -2407,8 +2407,6 @@ SHORT HB_EXPORT hb_ctSetPos( SHORT iRow, SHORT iCol )
 /* Allocates screen area for windows */
 SHORT HB_EXPORT hb_ctWBoard( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol )
 {
-   int i;
-
    if( ct_SMax > 1 ) return -1;
 
    if( FRow < 0 )            FRow = 0;
@@ -2568,7 +2566,6 @@ void HB_EXPORT hb_ctWMode( BOOL MFRow, BOOL MFCol, BOOL MLRow, BOOL MLCol )
 SHORT HB_EXPORT hb_ctWMove( SHORT FRow, SHORT FCol )
 {
    SHORT iRow, iCol;
-   int i;
 
    if( FRow < ct_BFRow && !ct_MFRow ) FRow = ct_BFRow;
    if( FCol < ct_BFCol && !ct_MFCol ) FCol = ct_BFCol;
@@ -2681,8 +2678,8 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
       if ( ct_Wind[ i ] == NULL ) break;
    if ( i >= ct_WMax)
    {
-      ct_Wind = hb_xrealloc( ct_Wind,
-                   ( ct_WMax + 1 ) * sizeof( HB_CT_WND* ) );
+      ct_Wind = ( HB_CT_WND ** ) hb_xrealloc( ct_Wind,
+                                    ( ct_WMax + 1 ) * sizeof( HB_CT_WND* ) );
       i = ct_WMax;
       ct_WMax++;
    }
@@ -2735,7 +2732,7 @@ SHORT HB_EXPORT hb_ctWSelect( SHORT iwnd )
 
       if( i >= ct_SMax )                              // New Window
       {
-         ct_Stac = hb_xrealloc( ct_Stac, ( ct_SMax + 1 ) * sizeof( SHORT ) );
+         ct_Stac = ( SHORT * ) hb_xrealloc( ct_Stac, ( ct_SMax + 1 ) * sizeof( SHORT ) );
          ct_Stac[ ct_SMax ] = iwnd;
          i = ct_SMax;
          ct_SMax++;

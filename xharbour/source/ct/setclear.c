@@ -1,5 +1,5 @@
 /*
- * $Id: setclear.c,v 1.0 2004/10/23 23:00:00 oh1 Exp $
+ * $Id: SETCLEAR.C,v 1.1 2004/10/23 23:29:08 oh1 Exp $
  */
 
 /*
