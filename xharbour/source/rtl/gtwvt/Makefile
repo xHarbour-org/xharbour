@@ -1,11 +1,13 @@
 #
-# $Id: Makefile,v 1.2 2003/05/16 19:52:12 druzus Exp $
+# $Id: Makefile,v 1.1 2003/12/21 21:31:52 druzus Exp $
 #
 
 ROOT = ../../../
 
 C_SOURCES=\
 	gtwvt.c \
+	wvtcore.c \
+	wvtutils.c
 
 LIBNAME=gtwvt
 
