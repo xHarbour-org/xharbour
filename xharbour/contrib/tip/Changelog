@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.1 2003/02/22 16:44:45 jonnymind Exp $
+ * $Id: Changelog,v 1.2 2003/02/22 21:26:49 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-03-23 15:02 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  + encoding/base64.c
+  + encoding/base64.h
+  + encoding/uuencode.c
+  + encoding/uuencode.h
+    Added this files for future integration in TIPS.
+    (Thanks to LUIZ CULIK)
+  
 2003-02-22 22:25 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * makefile.bc
   * make_b32
