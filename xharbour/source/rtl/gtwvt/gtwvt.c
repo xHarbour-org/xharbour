@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.100 2004/05/07 15:33:32 lf_sfnet Exp $
+ * $Id: gtwvt.c,v 1.101 2004/05/10 11:30:37 druzus Exp $
  */
 
 /*
@@ -189,6 +189,7 @@ static void    hb_wvt_gtCreateObjects( void );
 static void    hb_wvt_gtKillCaret( void );
 static void    hb_wvt_gtCreateCaret( void );
 static void    hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+static void    hb_wvt_gtCreateToolTipWindow( void );
 
 //-------------------------------------------------------------------//
 //
@@ -258,7 +259,12 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
     if( b_MouseEnable )
     {
       HB_GT_FUNC( mouse_Init() );
-    }
+   }
+
+   if( b_MouseEnable )
+   {
+      hb_wvt_gtCreateToolTipWindow();
+   }
 }
 
 //-------------------------------------------------------------------//
@@ -1769,10 +1775,13 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       {
         if ( _s.pSymWVT_PAINT )
         {
-          hb_vmPushSymbol( _s.pSymWVT_PAINT->pSymbol );
-          hb_vmPushNil();
-          hb_vmDo( 0 );
-          hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+//          if ( HB_GT_FUNC( gt_DispCount() ) == 0 )
+//          {
+             hb_vmPushSymbol( _s.pSymWVT_PAINT->pSymbol );
+             hb_vmPushNil();
+             hb_vmDo( 0 );
+             hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+//          }
         }
       }
       else
@@ -2209,7 +2218,7 @@ static HWND hb_wvt_gtCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   InitCommonControls();
 
-  wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+  wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS ;
   wndclass.lpfnWndProc   = hb_wvt_gtWndProc;
   wndclass.cbClsExtra    = 0;
   wndclass.cbWndExtra    = 0;
@@ -2711,14 +2720,15 @@ static void gt_hbInitStatics( void )
   _s.AltF4Close       = FALSE;
   _s.InvalidateWindow = TRUE;
   _s.EnableShortCuts  = FALSE;
-  _s.pSymWVT_PAINT    = hb_dynsymFind( "WVT_PAINT" ) ;
-  _s.pSymWVT_SETFOCUS = hb_dynsymFind( "WVT_SETFOCUS" ) ;
+  _s.pSymWVT_PAINT    = hb_dynsymFind( "WVT_PAINT"     ) ;
+  _s.pSymWVT_SETFOCUS = hb_dynsymFind( "WVT_SETFOCUS"  ) ;
   _s.pSymWVT_KILLFOCUS= hb_dynsymFind( "WVT_KILLFOCUS" ) ;
-  _s.pSymWVT_MOUSE    = hb_dynsymFind( "WVT_MOUSE" ) ;
+  _s.pSymWVT_MOUSE    = hb_dynsymFind( "WVT_MOUSE"     ) ;
   _s.rowStart         = 0;
   _s.rowStop          = 0;
   _s.colStart         = 0;
   _s.colStop          = 0;
+  _s.bToolTipActive   = FALSE;
 }
 
 //-------------------------------------------------------------------//
@@ -3264,8 +3274,8 @@ BOOL HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * image 
             {
               while ( y < ye )
               {
-                iPicture->lpVtbl->  Render( iPicture, _s.hdc, x, y, dc, dr, 0,
-                                            lHeight, lWidth, -lHeight, NULL );
+                iPicture->lpVtbl->Render( iPicture, _s.hdc, x, y, dc, dr, 0,
+                                          lHeight, lWidth, -lHeight, NULL );
                 y += dr;
               }
               y =  r;
@@ -4912,7 +4922,7 @@ HB_FUNC( WVT_DRAWLABEL )
       oldBkColor   = SetBkColor( _s.hdc, ISNIL( 7 ) ? _s.background : ( COLORREF ) hb_parnl( 7 ) );
       oldTextColor = SetTextColor( _s.hdc, ISNIL( 6 ) ? _s.foreground : ( COLORREF ) hb_parnl( 6 ) );
       oldTextAlign = SetTextAlign( _s.hdc, ( ISNIL( 4 ) ? TA_LEFT : hb_parni( 4 ) ) );
-      oldFont      = (HFONT) SelectObject( _s.hdc, hFont );
+      oldFont      = ( HFONT ) SelectObject( _s.hdc, hFont );
 
       //  Ground is Ready, Drat the Text
       //
@@ -5984,3 +5994,177 @@ HB_FUNC( WVT_DRAWOUTLINEEX )
 
 //-------------------------------------------------------------------//
 
+HB_FUNC( WVT_DRAWSTATUSBAR )
+{
+   int   iPanels = hb_parni( 1 );
+   int   i, iNext;
+   int   iTop, iLeft, iBottom, iRight;
+   POINT xy;
+
+   iNext = 0;
+
+   for ( i = 0; i < iPanels; i++ )
+   {
+      xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2, iNext+2 ), hb_parni( 2, iNext+1 ) );
+      iTop    = xy.y;
+      iLeft   = xy.x + 1;
+
+      xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2, iNext+4 ), hb_parni( 2, iNext+3 )+1 );
+      iBottom = xy.y - 1;
+      iRight  = xy.x - 2;
+
+      SelectObject( _s.hdc, _s.penWhite );
+
+      MoveToEx( _s.hdc, iRight, iTop, NULL );            // Right
+      LineTo( _s.hdc, iRight, iBottom );
+
+      MoveToEx( _s.hdc, iLeft, iBottom, NULL );          // Bottom
+      LineTo( _s.hdc, iRight, iBottom );
+
+      SelectObject( _s.hdc, _s.penDarkGray );
+
+      MoveToEx( _s.hdc, iLeft, iTop, NULL );             // Left
+      LineTo( _s.hdc, iLeft, iBottom );
+
+      MoveToEx( _s.hdc, iLeft, iTop, NULL );             // Top
+      LineTo( _s.hdc, iRight, iTop );
+
+      iNext = iNext + 4;
+   }
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2, 4 * iPanels ), hb_parni( 2, ( 4 * iPanels ) - 1 )+1 );
+   iTop    = xy.y - 2;
+   iLeft   = xy.x - 2;
+   iBottom = iTop;
+   iRight  = iLeft;
+
+   SelectObject( _s.hdc, _s.penBlack );
+
+   MoveToEx( _s.hdc, iLeft-4, iBottom, NULL );
+   LineTo( _s.hdc, iRight, iTop-4 );
+   MoveToEx( _s.hdc, iLeft-7, iBottom, NULL );
+   LineTo( _s.hdc, iRight, iTop-7 );
+   MoveToEx( _s.hdc, iLeft-10, iBottom, NULL );
+   LineTo( _s.hdc, iRight, iTop-10 );
+
+   SelectObject( _s.hdc, _s.penWhite );
+
+   MoveToEx( _s.hdc, iLeft-5, iBottom, NULL );
+   LineTo( _s.hdc, iRight, iTop-5 );
+   MoveToEx( _s.hdc, iLeft-8, iBottom, NULL );
+   LineTo( _s.hdc, iRight, iTop-8 );
+   MoveToEx( _s.hdc, iLeft-11, iBottom, NULL );
+   LineTo( _s.hdc, iRight, iTop-11 );
+}
+
+//-------------------------------------------------------------------//
+
+static void hb_wvt_gtCreateToolTipWindow( void )
+{
+   INITCOMMONCONTROLSEX icex;
+   HWND                 hwndTT;
+   TOOLINFO             ti;
+
+   // Load the tooltip class from the DLL.
+   //
+   icex.dwSize = sizeof( icex );
+   icex.dwICC  = ICC_BAR_CLASSES;
+
+   if( !InitCommonControlsEx( &icex ) )
+   {
+      return;
+   }
+
+   // Create the tooltip control.
+   //
+   hwndTT = CreateWindow( TOOLTIPS_CLASS, TEXT( "" ),
+                          WS_POPUP,
+                          CW_USEDEFAULT, CW_USEDEFAULT,
+                          CW_USEDEFAULT, CW_USEDEFAULT,
+                          NULL,
+                          ( HMENU ) NULL,
+                          hb_hInstance,
+                          NULL );
+
+   SetWindowPos( hwndTT,
+                 HWND_TOPMOST,
+                 0,
+                 0,
+                 0,
+                 0,
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE );
+
+   // Prepare TOOLINFO structure for use as tracking tooltip.
+   //
+   ti.cbSize    = sizeof( TOOLINFO );
+   ti.uFlags    = TTF_SUBCLASS;
+   ti.hwnd      = _s.hWnd;
+   ti.uId       = 100000;
+   ti.hinst     = hb_hInstance;
+   ti.lpszText  = "";
+   ti.rect.left = ti.rect.top = ti.rect.bottom = ti.rect.right = 0;
+
+   // Add the tool to the control, displaying an error if needed.
+   //
+   if( ! SendMessage( hwndTT, TTM_ADDTOOL, 0, ( LPARAM ) &ti ) )
+   {
+      return ;
+   }
+
+   _s.hWndTT = hwndTT;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETTOOLTIPACTIVE )
+{
+   BOOL bActive = _s.bToolTipActive;
+
+   if ( ! ISNIL( 1 ) )
+   {
+      _s.bToolTipActive = hb_parl( 1 );
+   }
+
+   hb_retl( bActive );
+}
+
+//-------------------------------------------------------------------//
+//
+//   Wvt_SetToolTip( nTop, nLeft, nBottom, nRight, cToolText )
+//
+HB_FUNC( WVT_SETTOOLTIP )
+{
+   TOOLINFO ti;
+   POINT    xy;
+   int      iTop, iLeft, iBottom, iRight;
+
+   if ( ! _s.bToolTipActive )
+   {
+      return;
+   }
+
+   ti.cbSize    = sizeof( TOOLINFO );
+   ti.hwnd      = _s.hWnd;
+   ti.uId       = 100000;
+
+   if ( SendMessage( _s.hWndTT, TTM_GETTOOLINFO, 0, ( LPARAM ) &ti ) )
+   {
+      xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+      iTop    = xy.y;
+      iLeft   = xy.x;
+
+      xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 4 )+1, hb_parni( 3 )+1 );
+      iBottom = xy.y - 1;
+      iRight  = xy.x - 1;
+
+      ti.lpszText    = hb_parc( 5 );
+      ti.rect.left   = iLeft;
+      ti.rect.top    = iTop;
+      ti.rect.right  = iRight;
+      ti.rect.bottom = iBottom;
+
+      SendMessage( _s.hWndTT, TTM_SETTOOLINFO, 0, ( LPARAM ) &ti );
+   }
+}
+
+//-------------------------------------------------------------------//

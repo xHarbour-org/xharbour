@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.19 2004/04/27 15:16:55 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.20 2004/04/30 11:48:59 vouchcac Exp $
  */
 
 /*
@@ -205,7 +205,8 @@ typedef struct global_data
   HDC       hCompDC;                   // Compatible DC to _s.hdc
   HFONT     hUserFonts[ WVT_FONTS_MAX ] ;  // User defined font handles
   HPEN      hUserPens[ WVT_PENS_MAX ]; // User defined pens
-
+  HWND      hWndTT;                    // Handle to hold tooltip information
+  BOOL      bToolTipActive;            // Flag to set whether tooltip is active or not
 } GLOBAL_DATA;
 
 //-------------------------------------------------------------------//
