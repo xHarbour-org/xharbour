@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.926 2003/04/08 18:27:14 jonnymind Exp $
+ * $Id: ChangeLog,v 1.927 2003/04/08 18:29:30 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2003-04-08 17:30 UTC-03000 Luiz Rafael Culik <culikr@uol.com.br>
+  * makefile.bc
+    ! Now build RPCMT.lib
 
 2003-04-08 15:30 UTC-03000 Luiz Rafael Culik <culikr@uol.com.br>
 
