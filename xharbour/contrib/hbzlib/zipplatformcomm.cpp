@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipPlatformComm.cpp $
 // $Archive: /ZipArchive/ZipPlatformComm.cpp $
-// $Date: 2003/08/20 15:03:53 $ $Author: lculik $
+// $Date: 2003/08/20 19:33:40 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -37,7 +37,8 @@ bool ZipPlatform::ForceDirectory(LPCTSTR lpDirectory)
 	CZipString szDirectory = lpDirectory;
 	szDirectory.TrimRight(CZipPathComponent::m_cSeparator);
 	CZipPathComponent zpc(szDirectory);
-	if ((zpc.GetFilePath() == szDirectory) ||
+
+	if ((zpc.GetFilePath() == (LPCTSTR) szDirectory) ||
 		(FileExists(szDirectory) == -1))
 		return true;
 	if (!ForceDirectory(zpc.GetFilePath()))
