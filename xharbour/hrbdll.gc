@@ -40,7 +40,6 @@ XBSCRIPT_DIR = $(HARBOUR_DIR)/utils/xbscript
 HARBOUR_DLL  = $(BIN_DIR)/harbour.dll
 HRBDLL_LIB   = $(LIB_DIR)/libharbour.a
 HRBDLL_DEF   = $(LIB_DIR)/harbour.def
-XHARBOUR_EXE = $(BIN_DIR)/xharbourdll.exe
 HBTEST_EXE   = $(BIN_DIR)/hbtestdll.exe
 HBRUN_EXE    = $(BIN_DIR)/hbrundll.exe
 HBDOC_EXE    = $(BIN_DIR)/hbdocdll.exe
@@ -59,8 +58,7 @@ ALL: \
    $(HBTEST_EXE) \
    $(HBMAKE_EXE) \
    $(HBRUN_EXE) \
-   $(XBSCRIPT_EXE) \
-   $(XHARBOUR_EXE)
+   $(XBSCRIPT_EXE)
 
 DLL_OBJECTS = \
    $(OBJ_DIR)/abs.o \
@@ -2801,21 +2799,3 @@ $(OBJ_DIR)/xbscript.c : $(XBSCRIPT_DIR)/xbscript.prg
 
 $(OBJ_DIR)/xbscript.o : $(OBJ_DIR)/xbscript.c
 	$(CC) $(CFLAGS) -I$(XBSCRIPT_DIR) -o $@ $^
-
-
-#-------------------------------------------------------------------------------
-# xharbourdll.exe
-#-------------------------------------------------------------------------------
-
-XHARBOUR_EXE_OBJS = \
-   $(OBJ_DIR)/mainwin.o \
-   $(OBJ_DIR)/xharbour.o
-
-$(XHARBOUR_EXE) : $(XHARBOUR_EXE_OBJS) $(LIB_TO_LINK)
-	$(CC) -WAll -o$(XHARBOUR_EXE) $(XHARBOUR_EXE_OBJS) -mno-cygwin $(MINGW_LIBRARY) -lxharbour
-
-$(OBJ_DIR)/xharbour.c : $(COMPILER_DIR)/xharbour.prg
-	$(HARBOUR_EXE) $(HARBOURFLAGS) -d__WIN32__ -o$@ $^
-
-$(OBJ_DIR)/xharbour.o : $(OBJ_DIR)/xharbour.c
-	$(CC) $(CFLAGS) -DHB_NO_DEFAULT_API_MACROS -DHB_NO_DEFAULT_STACK_MACROS -o $@ $^

@@ -90,11 +90,9 @@ HARBOUR_DLL     = $(BIN_DIR)\harbour.dll
 HBRUNDLL_EXE    = $(BIN_DIR)\hbrundll.exe
 HBTESTDLL_EXE   = $(BIN_DIR)\hbtestdll.exe
 HBMAKEDLL_EXE   = $(BIN_DIR)\hbmakedll.exe
-XHARBOURDLL_EXE = $(BIN_DIR)\xharbourdll.exe
 HBDOCDLL_EXE    = $(BIN_DIR)\hbdocdll.exe
 XBSCRIPTDLL_EXE = $(BIN_DIR)\xbscriptdll.exe
 HRBDLL_LIB      = $(BIN_DIR)\harbour.lib
-XHARBOUR_LIB    = $(LIB_DIR)\xharbour.lib
 
 CC_CMD  = $(CC) $(CLIBFLAGS) -o$@ $**
 HRB_CMD = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
@@ -110,11 +108,7 @@ ALL: \
   $(HBRUNDLL_EXE) \
   $(HBTESTDLL_EXE) \
   $(HBMAKEDLL_EXE) \
-  $(XBSCRIPTDLL_EXE) \
-  $(XHARBOURDLL_EXE)
-
-XHARBOURDLL_EXE_OBJS = \
-  $(OBJ_DIR)\xharbour.obj
+  $(XBSCRIPTDLL_EXE)
 
 XBSCRIPTDLL_EXE_OBJS = \
   $(OBJ_DIR)\xbscript.obj
@@ -728,13 +722,11 @@ CLEAN:
    -@if exist $(BIN_DIR)\hbrundll.tds    del $(BIN_DIR)\hbrundll.tds
    -@if exist $(BIN_DIR)\hbtestdll.tds   del $(BIN_DIR)\hbtestdll.tds
    -@if exist $(BIN_DIR)\hbmakedll.tds   del $(BIN_DIR)\hbmakedll.tds
-   -@if exist $(BIN_DIR)\xharbourdll.tds del $(BIN_DIR)\xharbourdll.tds
    -@if exist $(BIN_DIR)\hbdocdll.tds    del $(BIN_DIR)\hbdocdll.tds
    -@if exist $(BIN_DIR)\xbscriptdll.tds del $(BIN_DIR)\xbscriptdll.tds
    -@if exist $(HBRUNDLL_EXE)     del $(HBRUNDLL_EXE) >nul
    -@if exist $(HBTESTDLL_EXE)    del $(HBTESTDLL_EXE) >nul
    -@if exist $(HBMAKEDLL_EXE)    del $(HBMAKEDLL_EXE) >nul
-   -@if exist $(XHARBOURDLL_EXE)  del $(XHARBOURDLL_EXE) >nul
    -@if exist $(HBDOCDLL_EXE)     del $(HBDOCDLL_EXE) >nul
    -@if exist $(XBSCRIPTDLL_EXE)  del $(XBSCRIPTDLL_EXE) >nul
    -@if exist $(HARBOUR_DLL) del $(HARBOUR_DLL) >nul
@@ -3607,29 +3599,3 @@ $(OBJ_DIR)\hbrun.c : $(HBRUN_DIR)\hbrun.prg
 
 $(OBJ_DIR)\hbrun.obj : $(OBJ_DIR)\hbrun.c
    $(CC_CMD)
-
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ XHARBOURDLL.EXE dependencies ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-
-$(XHARBOURDLL_EXE) : \
-   $(XHARBOURDLL_EXE_OBJS) \
-   $(HRBDLL_LIB)
-
-   echo. $(OBJ_DIR)\mainwin.obj + > make.tmp
-   echo. $(OBJ_DIR)\xharbour.obj + >> make.tmp
-   echo. c0w32.obj, + >> make.tmp
-   echo. $(XHARBOURDLL_EXE),, + >> make.tmp
-   echo. $(XHARBOUR_LIB) + >> make.tmp
-   echo. $(HRBDLL_LIB) + >> make.tmp
-   echo. ws2_32.lib + >> make.tmp
-   echo. cw32.lib + >> make.tmp
-   echo. import32.lib, >> make.tmp
-   ILINK32 -x -ap -Tpe -Gn @make.tmp
-
-$(OBJ_DIR)\xharbour.c : $(COMPILER_DIR)\xharbour.prg
-   $(HARBOUR_EXE) $(MAINFLAGS) -d__WIN32__ $** -o$@
-
-$(OBJ_DIR)\xharbour.obj : $(OBJ_DIR)\xharbour.c
-   $(CC) $(CLIBFLAGS) -D"HB_NO_DEFAULT_API_MACROS" -D"HB_NO_DEFAULT_STACK_MACROS" -o$@ $**

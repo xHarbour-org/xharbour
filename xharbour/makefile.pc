@@ -121,8 +121,6 @@ MISC_OBJ_DIR    = $(OBJ_DIR)/libmisc
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßß
 
-XHARBOUR_DLL = $(BIN_DIR)\xharbour.dll
-XHARBOUR_EXE = $(BIN_DIR)\xharbour.exe
 HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
 HBTEST_EXE   = $(BIN_DIR)\hbtest.exe
 HBRUN_EXE    = $(BIN_DIR)\hbrun$(THREAD_MODE).exe
@@ -131,7 +129,6 @@ HBMAKE_EXE   = $(BIN_DIR)\hbmake.exe
 HBPP_EXE     = $(BIN_DIR)\hbpp.exe
 XBSCRIPT_EXE = $(BIN_DIR)\xbscript.exe
 
-XHARBOUR_LIB = $(LIB_DIR)\xharbour.lib
 PP_LIB       = $(LIB_DIR)\pp$(THREAD_MODE).lib
 MACRO_LIB    = $(LIB_DIR)\macro$(THREAD_MODE).lib
 DBFCDX_LIB   = $(LIB_DIR)\dbfcdx$(THREAD_MODE).lib
@@ -255,9 +252,7 @@ PROJECT = \
    $(HBDOC_EXE) \
    $(HBMAKE_EXE) \
    $(HBPP_EXE) \
-   $(XBSCRIPT_EXE) \
-   $(XHARBOUR_DLL) \
-   $(XHARBOUR_EXE)
+   $(XBSCRIPT_EXE)
 !endif
 
 PROJECT = \
@@ -270,47 +265,6 @@ ALL: $(PROJECT)
 # ³ OBJ Files ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßß
-
-XHARBOUR_EXE_OBJS = \
-   $(EXE_OBJ_DIR)\xharbour.obj
-
-XHARBOUR_DLL_OBJS = \
-   $(EXE_OBJ_DIR)\harbour.obj \
-   $(EXE_OBJ_DIR)\harboury.obj \
-   $(EXE_OBJ_DIR)\cmdcheck.obj \
-   $(EXE_OBJ_DIR)\hbusage.obj \
-   $(EXE_OBJ_DIR)\hbident.obj \
-   $(EXE_OBJ_DIR)\hbgenerr.obj \
-   $(EXE_OBJ_DIR)\hbpcode.obj \
-   $(EXE_OBJ_DIR)\hbfix.obj \
-   $(EXE_OBJ_DIR)\genc.obj \
-   $(EXE_OBJ_DIR)\gencobj.obj \
-   $(EXE_OBJ_DIR)\genobj32.obj \
-   $(EXE_OBJ_DIR)\genjava.obj \
-   $(EXE_OBJ_DIR)\genhrb.obj \
-   $(EXE_OBJ_DIR)\expropta.obj \
-   $(EXE_OBJ_DIR)\exproptb.obj \
-   $(EXE_OBJ_DIR)\exproptc.obj \
-   $(EXE_OBJ_DIR)\hbfunchk.obj \
-   $(EXE_OBJ_DIR)\hbslex.obj \
-   $(EXE_OBJ_DIR)\calconst.obj \
-   $(EXE_OBJ_DIR)\maindllh.obj \
-   \
-   $(EXE_OBJ_DIR)\ppcore.obj \
-   $(EXE_OBJ_DIR)\ppcomp.obj \
-   $(EXE_OBJ_DIR)\pptable.obj \
-   $(EXE_OBJ_DIR)\pragma.obj \
-   \
-   $(EXE_OBJ_DIR)\hbfhnd.obj \
-   $(EXE_OBJ_DIR)\hbfsapi.obj \
-   $(EXE_OBJ_DIR)\hbgete.obj \
-   $(EXE_OBJ_DIR)\hbhash.obj \
-   $(EXE_OBJ_DIR)\hbstr.obj \
-   $(EXE_OBJ_DIR)\hbver.obj \
-   $(EXE_OBJ_DIR)\expropt1.obj \
-   $(EXE_OBJ_DIR)\expropt2.obj \
-   $(EXE_OBJ_DIR)\reserved.obj
-
 SAMPLES_LIB_OBJS =  \
     $(SAM_OBJ_DIR)\environ.obj \
     $(SAM_OBJ_DIR)\date.obj   \
@@ -4923,188 +4877,3 @@ $(HBPP_EXE) : \
 
 $(OBJ_DIR)\hbpp.obj : $(HBPP_DIR)\hbpp.c
    $(CC_CMD)
-
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ XHARBOUR.DLL dependencies ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-
-$(XHARBOUR_DLL) : $(XHARBOUR_DLL_OBJS)
-   $(ECHO) $(EXE_OBJ_DIR)\harbour.obj > hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\harboury.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbslex.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\cmdcheck.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbusage.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbident.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbgenerr.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbpcode.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbfix.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\genc.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\gencobj.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\genobj32.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\genjava.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\genhrb.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\expropta.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\exproptb.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\exproptc.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbfunchk.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\calconst.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\ppcore.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\ppcomp.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\pptable.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\pragma.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbfhnd.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbfsapi.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbgete.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbhash.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbstr.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\hbver.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\expropt1.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\expropt2.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\reserved.obj >> hdll.tmp
-   $(ECHO) $(EXE_OBJ_DIR)\maindllh.obj >> hdll.tmp
-   $(ECHO) $(POCC_LIBRARY) >> hdll.tmp
-   $(POLINK) /OUT:$(XHARBOUR_DLL) /IMPLIB:$(XHARBOUR_LIB) /DLL \
-      /LIBPATH:$(POLIB_DIR) /LIBPATH:$(POLIB_DIR)\WIN /MACHINE:IX86 /OPT:WIN98 /SUBSYSTEM:CONSOLE \
-      @hdll.tmp
-
-$(EXE_OBJ_DIR)\harbour.obj : $(COMPILER_DIR)\harbour.c
-   $(CC) $(CFLAGS) /D"HB_EXEMEM_USED" /D"HB_CREATE_DLL" /Fo$@ $**
-
-$(EXE_OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
-   bison -v -d $** -o$@
-
-$(EXE_OBJ_DIR)\harboury.obj : $(EXE_OBJ_DIR)\harboury.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbslex.obj : $(COMPILER_DIR)\hbslex.c
-   $(CC) $(CFLAGS) /D"NEED_DUMMY_RETURN" /D"HB_EXEMEM_USED" /I"$(OBJ_DIR)" /Fo$@ $**
-
-$(EXE_OBJ_DIR)\cmdcheck.obj : $(COMPILER_DIR)\cmdcheck.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbusage.obj : $(COMPILER_DIR)\hbusage.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbident.obj : $(COMPILER_DIR)\hbident.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbgenerr.obj : $(COMPILER_DIR)\hbgenerr.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbpcode.obj : $(COMPILER_DIR)\hbpcode.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbfix.obj : $(COMPILER_DIR)\hbfix.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\genc.obj : $(COMPILER_DIR)\genc.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\gencobj.obj : $(COMPILER_DIR)\gencobj.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\genobj32.obj : $(COMPILER_DIR)\genobj32.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\genjava.obj : $(COMPILER_DIR)\genjava.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\genhrb.obj : $(COMPILER_DIR)\genhrb.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\expropta.obj : $(COMPILER_DIR)\expropta.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\exproptb.obj : $(COMPILER_DIR)\exproptb.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\exproptc.obj : $(COMPILER_DIR)\exproptc.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbfunchk.obj : $(COMPILER_DIR)\hbfunchk.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\calconst.obj : $(COMPILER_DIR)\calconst.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\maindllh.obj : $(VM_DIR)\maindllh.c
-   $(CC) $(CFLAGS) /D"HB_DLL_REQUIRED_DLLMAIN" /Fo$@ $**
-
-$(EXE_OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\ppcomp.obj : $(PP_DIR)\ppcomp.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\pplib.obj : $(RTL_DIR)\pplib.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbfhnd.obj : $(COMMON_DIR)\hbfhnd.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbfsapi.obj : $(COMMON_DIR)\hbfsapi.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbgete.obj : $(COMMON_DIR)\hbgete.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbhash.obj : $(COMMON_DIR)\hbhash.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbstr.obj : $(COMMON_DIR)\hbstr.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbtrace.obj : $(COMMON_DIR)\hbtrace.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\hbver.obj : $(COMMON_DIR)\hbver.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\expropt1.obj : $(COMMON_DIR)\expropt1.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\expropt2.obj : $(COMMON_DIR)\expropt2.c
-   $(CC_CMD_DLL)
-
-$(EXE_OBJ_DIR)\reserved.obj : $(COMMON_DIR)\reserved.c
-   $(CC_CMD_DLL)
-
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ XHARBOUR.EXE dependencies ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-
-$(XHARBOUR_EXE) : \
-   $(XHARBOUR_EXE_OBJS) \
-   $(XHARBOUR_LIB) \
-   $(PP_LIB) \
-   $(COMMON_LIB) \
-   $(VM_LIB) \
-   $(RTL_LIB) \
-   $(GTWIN_LIB) \
-   $(LANG_LIB) \
-   $(RDD_LIB) \
-   $(MACRO_LIB) \
-   $(DBFNTX_LIB) \
-   $(DBFDBT_LIB) \
-   $(DBFCDX_LIB) \
-   $(DBFFPT_LIB)
-   $(ECHO) $(EXE_OBJ_DIR)\xharbour.obj >> make.tmp
-   $(ECHO) $(XHARBOUR_LIB) >> make.tmp
-   $(ECHO) $(HARBOUR_LIBRARY) >> make.tmp
-   $(ECHO) $(POCC_LIBRARY) >> make.tmp
-   $(POLINK) /OUT:$(XHARBOUR_EXE) $(LINKFLAGS) @make.tmp
-   @IF EXIST make.tmp $(DEL) make.tmp > NUL
-
-$(EXE_OBJ_DIR)\xharbour.obj : $(EXE_OBJ_DIR)\xharbour.c
-   $(CC_CMD)
-
-$(EXE_OBJ_DIR)\xharbour.c : $(COMPILER_DIR)\xharbour.prg
-   $(HARBOUR_EXE) $(MAINFLAGS) -d__WIN32__ $** -o$@

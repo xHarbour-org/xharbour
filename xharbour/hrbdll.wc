@@ -77,9 +77,7 @@ CC_CMD      = $(CC) $(CLIBFLAGS) -fo$@ $**
 
 HARBOUR_DLL     = $(BIN_DIR)\harbour.dll
 HARBOUR_LIB     = $(LIB_DIR)\harbour.lib
-XHARBOUR_LIB    = $(LIB_DIR)\xharbour.lib
 HBRUNDLL_EXE    = $(BIN_DIR)\hbrundll.exe
-XHARBOURDLL_EXE = $(BIN_DIR)\xharbourdll.exe
 HBTESTDLL_EXE   = $(BIN_DIR)\hbtestdll.exe
 HBMAKEDLL_EXE   = $(BIN_DIR)\hbmakedll.exe
 HBDOCDLL_EXE    = $(BIN_DIR)\hbdocdll.exe
@@ -96,8 +94,7 @@ ALL: $(HARBOUR_DLL) \
      $(HBTESTDLL_EXE) \
      $(HBMAKEDLL_EXE) \
      $(XBSCRIPTDLL_EXE) \
-     $(HARBOUR_DLL) \
-     $(XHARBOURDLL_EXE)
+     $(HARBOUR_DLL)
 
 XBSCRIPTDLL_EXE_OBJS = \
   $(OBJ_DIR)\xbscript.obj
@@ -2953,22 +2950,3 @@ $(OBJ_DIR)\hbrun.c : $(HBRUN_DIR)\hbrun.prg
 
 $(OBJ_DIR)\hbrun.obj : $(OBJ_DIR)\hbrun.c
    $(CC_CMD)
-
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ XHARBOURDLL.EXE dependencies ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-
-$(XHARBOURDLL_EXE) : $(OBJ_DIR)\xharbour.obj $(HARBOUR_LIB)
-   echo. $(OBJ_DIR)\mainstd.obj > make.tmp
-   echo. $(OBJ_DIR)\xharbour.obj >> make.tmp
-   echo. $(XHARBOUR_LIB) >> make.tmp
-   echo. $(HARBOUR_LIB) >> make.tmp
-   echo. uuid.lib >> make.tmp
-   LINK386 @make.tmp /nologo /out:$(XHARBOURDLL_EXE) /subsystem:console
-
-$(OBJ_DIR)\xharbour.c : $(COMPILER_DIR)\xharbour.prg
-   $(HARBOUR_EXE) $(MAINFLAGS) -d__WIN32__ $** -o$@
-
-$(OBJ_DIR)\xharbour.obj : $(OBJ_DIR)\xharbour.c
-   $(CC) $(CFLAGS) -dHB_NO_DEFAULT_API_MACROS -dHB_NO_DEFAULT_STACK_MACROS -fo$@ $**
