@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.32 2003/01/12 22:50:21 jonnymind Exp $
+* $Id: thread.c,v 1.33 2003/01/13 01:14:22 jonnymind Exp $
 */
 
 /*
@@ -338,6 +338,7 @@ void hb_threadExit( void )
       #else
             TerminateThread( hb_ht_context->th_h, 0);
             WaitForSingleObject( hb_ht_context->th_h, INFINITE );
+            CloseHandle( hb_ht_context->th_h );
             hb_threadDestroyContextFromHandle( hb_ht_context->th_h );
       #endif
    }
@@ -660,6 +661,7 @@ HB_FUNC( STOPTHREAD )
          }
       }
       WaitForSingleObject( th, INFINITE );
+      CloseHandle( th );
    #endif
 
    hb_threadDestroyContextFromHandle( th );
@@ -681,6 +683,7 @@ HB_FUNC( KILLTHREAD )
       pthread_cancel( th );
    #else
       TerminateThread( th, 0);
+      CloseHandle( th );
    #endif
 }
 

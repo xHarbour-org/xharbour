@@ -122,7 +122,6 @@ FUNCTION Connect( cAddress, nPort )
    aServiceData[ 4 ] := Seconds()
    aCntSockets[ 1 ] := aServiceData
 
-   ? "Done"
    MutexUnlock( MutexCnt )
 
 RETURN NIL
@@ -132,12 +131,14 @@ FUNCTION CheckTime( nTimeout )
 
    DO WHILE .T.
       ThreadSleep( 1000 )
+      ? seconds()
       MutexLock( MutexCnt )
       FOR EACH aTicket IN aCntSockets
 
          /* If status is still connecting ... */
          IF aTicket[ 3 ] == 0 .and. aTicket[ 4 ] + nTimeout < Seconds()
-            StopThread( aTicket[ 2 ] )
+            ? "killing the thread"
+            KillThread( aTicket[ 2 ] )
             aTicket[ 3 ] := -1
             InetDestroy( aTicket[1] )
          ENDIF

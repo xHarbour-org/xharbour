@@ -1,15 +1,26 @@
 
 ifeq ($(HB_MT),MT)
-MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntxmt -ldbfcdxmt -lpthread
+MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntxmt -ldbfcdxmt 
 else
 MTLIBS= -lvm -lrtl -lrdd -lrtl -lvm -ldbfntx -ldbfcdx
 endif
 
-%.o: %.prg
-	harbour -n -go $<
+ifeq ($(HB_ARCHITECTURE),linux)
+GT_LIBS=-lgtsln -lslang -lgpm -lpthread
+EXE_EXT=
+else
+GT_LIBS=-lgtwin -lwsock32 -lwinspool
+EXE_EXT=.exe
+endif
 
-%: %.o
+%.c: %.prg
+	harbour -n $<
+%.o: %.c
+		gcc -I$(HB_INC_INSTALL) -c -o $@ $< 
+	
+
+%$(EXE_EXT): %.o
 	gcc -o $@ $< -I$(HB_INC_INSTALL) -L$(HB_LIB_INSTALL) \
 		-ldebug $(MTLIBS) -lmacro  -lpp  -llang  -lcommon\
-		-lgtsln -lslang -lgpm -lm\
+		$(GT_LIBS) -lm\
    
