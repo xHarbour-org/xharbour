@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.112 2004/01/16 00:36:42 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.113 2004/01/16 13:15:40 ignacioortiz Exp $
  */
 
 /*
@@ -554,7 +554,8 @@ char * hb_ppPlatform( void )
 
                   osVerEx.dwOSVersionInfoSize = sizeof( osVerEx );
 
-                  if( GetVersionEx( &osVerEx ) )
+                                    /* Windows decl error */
+                  if( GetVersionEx( ( LPOSVERSIONINFO ) &osVerEx ) )
                   {
                      /* workstation type */
 
