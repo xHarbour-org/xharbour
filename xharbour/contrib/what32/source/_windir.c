@@ -181,7 +181,7 @@ HB_FUNC( CREATEDIRECTORY )
    SECURITY_ATTRIBUTES *sa ;
 
    if (ISCHAR(2)) 
-       sa = (SECURITY_ATTRIBUTES *) hb_param(1, HB_IT_STRING)->item.asString.value;
+       sa = (SECURITY_ATTRIBUTES *) hb_param(2, HB_IT_STRING)->item.asString.value;
 
    hb_retl( CreateDirectoryA( (LPCSTR) hb_parc( 1 ), sa ) ) ;
 }
