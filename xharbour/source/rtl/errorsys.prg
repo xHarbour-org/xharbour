@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.8 2002/05/04 06:47:51 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.9 2002/05/08 20:07:07 ronpinkas Exp $
  */
 
 /*
@@ -102,10 +102,13 @@ STATIC FUNCTION DefError( oError )
         Return .F.
      Endif
 
-     cMessage := ErrorMessage( oError )
+     cMessage := ProcName(1) + "(" + Str( ProcLine(1) ) + ") "
+     cMessage += ErrorMessage( oError )
      If !Empty( oError:osCode )
         cDOSError := "(DOS Error " + Ltrim( Str( oError:osCode ) ) + ")"
      Endif
+
+     cMessage += "Arguments: " + Arguments( oError )
 
      // Build buttons
 

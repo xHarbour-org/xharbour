@@ -1998,7 +1998,7 @@ PROCEDURE RP_Comp_Err( oErr, sLine, nLine )
 
 //--------------------------------------------------------------//
 
-FUNCTION RP_Run_Err( oErr, aProcedures )
+FUNCTION RP_Run_Err( oErr, aProcedures, nLine )
 
    LOCAL Counter, xArg, sArgs := "", nProc, sProc
 
@@ -2084,8 +2084,9 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
       ENDIF
    ENDIF
 
-   TraceLog( s_sModule, "Sorry, R/T Error: [" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) +  "] '" + oErr:Operation + "' '" + oErr:Description + "' " + sArgs + " " + PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
-   Alert( [R/T Error: ] + "[" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) + "] '" + oErr:Operation + "' " + CRLF + ;
+   TraceLog( s_sModule, nLine, "Sorry, R/T Error: [" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) +  "] '" + oErr:Operation + "' '" + oErr:Description + "' " + sArgs + " " + PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
+
+   Alert( [Line: ] + Str( nLine ) + [ R/T Error: ] + "[" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) + "] '" + oErr:Operation + "' " + CRLF + ;
 	        oErr:Description + CRLF + ;
 					sArgs + CRLF + ;
 					PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + CRLF + ;
@@ -8266,7 +8267,7 @@ STATIC FUNCTION InitRunResults()
 RETURN .T.
 
 //--------------------------------------------------------------//
-PROCEDURE PP_RunInit( aProcedures, aInitExit )
+PROCEDURE PP_RunInit( aProcedures, aInitExit, nLine )
 
    IF ValType( aProcedures ) != 'A' .OR. ValType( aInitExit ) != 'A'
       Alert( [Invalid parameters to: ] + ProcName() + [ must be Arrays!] )
@@ -8278,7 +8279,7 @@ PROCEDURE PP_RunInit( aProcedures, aInitExit )
       aInitExit[2] := {}
    ENDIF
 
-   ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
+   ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures, nLine ) } )
 
    InitRules()
    InitResults()
@@ -8408,6 +8409,10 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks )
 
    sLines := ""
 
+   IF nLines == 0
+      RETURN ""
+   ENDIF
+
    //TraceLog( nLines )
 
    // Don't process the last line for [;].
@@ -8479,7 +8484,7 @@ FUNCTION PP_RunText( sLines, bPP, aParams )
       bPP := .T.
    ENDIF
 
-   PP_RunInit( aProcedures, aInitExit )
+   PP_RunInit( aProcedures, aInitExit, @nLine )
 
    IF bPP
       PP_PreProText( sLines, asLines )
@@ -8516,7 +8521,7 @@ FUNCTION PP_RunArray( asLines, aParams )
    LOCAL aProcedures := {}, aInitExit := { {}, {} }, nProcId := 0, ;
          nLine, nLines, nOpen, nClose
 
-   PP_RunInit( aProcedures, aInitExit )
+   PP_RunInit( aProcedures, aInitExit, @nLine )
 
    ErrorBlock( {|oErr| RP_Comp_Err( oErr, asLines[nLine], nLine ) } )
 
