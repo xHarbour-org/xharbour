@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.148 2002/04/02 19:31:34 mafact Exp $
+ * $Id: ChangeLog,v 1.149 2002/04/04 19:35:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-06 23:00 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * source/rtl/gtsln/Makefile
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtsln/kbsln.c
+  * source/rtl/gtsln/mousesln.c
+  + source/rtl/gtsln/gtsln.h
+  + source/rtl/gtsln/termtype.c
+    * Added very basic mouse support under xterm
 
 2002-04-04 11:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg
