@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3048 2004/06/09 06:26:50 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3049 2004/06/09 10:09:29 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -64,6 +64,13 @@
       (using hb_fsCurDir() on an directoryrecurse("*.*") on an directory
        /usr/src/xharbour was setting path to usr/src/xharbour and this the
         function return 0 itens om array)
+
+2004-06-08 17:36 UTC-0300 Giancarlo Niccolai <antispam /at/ niccolai "dot" ws>
+  * source/rtl/hblog.prg
+    ! Rotating file also after a write error.
+
+  * include/hblog.ch
+    ! INIT ON FILE was ignoring max file size and rotation count.
 
 2004-06-08 09:34 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * contrib/tip/tipclientsmtp.prg
