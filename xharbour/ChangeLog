@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1426 2003/09/08 16:22:49 iananderson Exp $
+ * $Id: ChangeLog,v 1.1427 2003/09/08 19:18:42 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-09 03:20 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/simplex.c
+  * xharbour/source/compiler/genc.c
+  * xharbour/source/compiler/hbusage.c
+    * casting and some nonstandard C statements corrected
+
+  * xharbour/source/pp/pptable.c
+    + added some missing CLIPPER 5.3 statements:
+      SET MBLOCKSIZE TO <x>
+      SET MEMOBLOCK TO <x>
+      SET MFILEEXT TO <x>
+      SET AUTOSHARE TO [<x>]
+      SET AUTORDER TO [<x>]
+      SET STRICTREAD <x:ON,OFF,&>
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    + DBFFPT now uses _SET_MFILEEXT and _SET_MBLOCKSIZE
 
 2003-09-08 21:17 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/make_tgz.sh

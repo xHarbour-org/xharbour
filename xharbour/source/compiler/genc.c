@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.48 2003/07/15 09:15:33 andijahja Exp $
+ * $Id: genc.c,v 1.49 2003/07/21 22:41:06 ronpinkas Exp $
  */
 
 /*
@@ -1590,7 +1590,7 @@ static HB_GENC_FUNC( hb_p_pushdouble )
 
    fprintf( cargo->yyc, "\tHB_P_PUSHDOUBLE," );
    ++lPCodePos;
-   for( i = 0; i < sizeof( double ) + sizeof( BYTE ) + sizeof( BYTE ); ++i )
+   for( i = 0; i < ( int ) ( sizeof( double ) + sizeof( BYTE ) + sizeof( BYTE ) ); ++i )
       fprintf( cargo->yyc, " %i,", ( ( BYTE * ) pFunc->pCode )[ lPCodePos + i ] );
    if( cargo->bVerbose ) fprintf( cargo->yyc, "\t/* %.*f, %d, %d */",
       *( ( BYTE * ) &( pFunc->pCode[ lPCodePos + sizeof( double ) ] ) ),

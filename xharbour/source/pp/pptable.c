@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.26 2003/07/30 20:45:40 andijahja Exp $
+ * $Id: pptable.c,v 1.27 2003/08/27 08:58:21 druzus Exp $
  */
 
 /*
@@ -215,7 +215,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___79 = {0,"@","\1A00, \1B00 SAY \1C00 [COLOR \1D00]",
        "DevPos( \1A00, \1B00 ) ; DevOut( \1C00 [, \1D00] )",&sC___78 };
    /* This hack breaks compatibility with some proper Clipper code
-      If someone wants to use it then should put it in your own .ch file /*
+      If someone wants to use it then should put it in your own .ch file */
    /*
    static COMMANDS sC___78 = {0,"@","\1A00, \1B00 SAY \1C00 [PICTURE \1D00] [COLOR \1E00]",
        "DevOutPict( \1C00, \1D00, \1E00, \1A00, \1B00 )",&sC___77 };
@@ -469,6 +469,15 @@ void hb_pp_Table( void )
        "ReadModal(GetList,NIL,NIL,\1A00,\1B00,\1C00,\1D00 ) ; GetList := {}",&sC___259 };
    static COMMANDS sC___261 = {0,"@","\1A00,\1B00 GET \1C00 [PICTURE \1D00] [VALID \1E00] [WHEN \1F00] [CAPTION \1G00] [MESSAGE \1H00] [SEND \1I00]",
        "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1C00,\1C20,\1D00,\1E40,\1F40 ) ) [; ATail(GetList):Caption := \1G00] [; ATail(GetList):CapRow := ATail(Getlist):row ; ATail(GetList):CapCol := ATail(Getlist):col - __CapLength(\1G00) - 1] [; ATail(GetList):message := \1H00] [; ATail(GetList):\1I00] ; ATail(GetList):Display()",&sC___260 };
+   static COMMANDS sC___262 = {0,"SET","MBLOCKSIZE TO \1A00","Set( _SET_MBLOCKSIZE, \1A00 )",&sC___261 };
+   static COMMANDS sC___263 = {0,"SET","MEMOBLOCK TO \1A00","Set( _SET_MBLOCKSIZE, \1A00 )",&sC___262 };
+   static COMMANDS sC___264 = {0,"SET","MFILEEXT TO \1A00","Set( _SET_MFILEEXT, \1A00 )",&sC___263 };
+   static COMMANDS sC___265 = {0,"SET","AUTOSHARE TO \1A00","Set( _SET_AUTOSHARE, \1A00 )",&sC___264 };
+   static COMMANDS sC___266 = {0,"SET","AUTOSHARE TO","Set( _SET_AUTOSHARE, 0 )",&sC___265 };
+   static COMMANDS sC___267 = {0,"SET","AUTORDER TO \1A00","Set( _SET_AUTORDER, \1A00 )",&sC___266 };
+   static COMMANDS sC___268 = {0,"SET","AUTORDER TO","Set( _SET_AUTORDER, 0 )",&sC___267 };
+   static COMMANDS sC___269 = {0,"SET","STRICTREAD \1A20 ON,OFF,&>","Set(_SET_STRICTREAD,\1A30 )",&sC___268 };
+   static COMMANDS sC___270 = {0,"SET","STRICTREAD (\1A00)","Set(_SET_STRICTREAD,\1A00 )",&sC___269 };
 #endif
 
    static COMMANDS sT___01 = {0,"{","\1A00 => \1B00 [,\1C00 => \1D00] }", "( HB_SetWith( TAssociativeArray({ { \1A00,\1B00 } [,{ \1C00,\1D00 } ] } ) ), __ClsSetModule( HB_QWith():ClassH ), HB_SetWith() ) ",NULL };
@@ -477,7 +486,7 @@ void hb_pp_Table( void )
    static COMMANDS sT___04 = {0,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___03 };
 
 #if defined( HB_COMPAT_C53 )
-   hb_pp_topCommand = &sC___261;
+   hb_pp_topCommand = &sC___270;
 #else
    hb_pp_topCommand = &sC___254;
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: dbffpt1.c,v 1.1 2003/09/08 12:56:53 druzus Exp $
  */
 
 /*
@@ -1747,7 +1747,21 @@ static ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    switch( uiIndex )
    {
       case DBI_MEMOEXT:
-         hb_itemPutC( pItem, FPT_MEMOEXT );
+         if ( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
+         {
+            PHB_FNAME pFileName;
+
+            pFileName = hb_fsFNameSplit( ( char * ) pArea->szMemoFileName );
+            hb_itemPutC( pItem, pFileName->szExtension );
+            hb_xfree( pFileName );
+         }
+         else
+         {
+            hb_itemPutC( pItem, ( hb_set.HB_SET_MFILEEXT &&
+                                  strlen( hb_set.HB_SET_MFILEEXT ) > 0 ) ?
+                                 hb_set.HB_SET_MFILEEXT :
+                                 FPT_MEMOEXT );
+         }
          break;
 
       /* case DBI_RDD_VERSION */
@@ -1940,7 +1954,9 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
       hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
 
    memset( &fptHeader, 0, sizeof( FPTHEADER ) );
-   pArea->uiMemoBlockSize = FPT_DEFBLOCKSIZE;
+   pArea->uiMemoBlockSize = ( hb_set.HB_SET_MBLOCKSIZE > 0 && 
+                              hb_set.HB_SET_MBLOCKSIZE < 0xFFFF ) ? 
+                            hb_set.HB_SET_MBLOCKSIZE : FPT_DEFBLOCKSIZE;
    pArea->bMemoType = MEMO_FPT_HB;
    //pArea->bMemoType = MEMO_FPT_SIX;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.1 2003/03/21 00:06:29 ronpinkas Exp $
+ * $Id: simplex.c,v 1.2 2003/08/09 18:49:49 ronpinkas Exp $
  */
 
 /*
@@ -60,9 +60,9 @@
 #endif
 
 /* Language Definitions Readability. */
-#define SELF_CONTAINED_WORDS_ARE LEX_WORD static aSelfs[] =
-#define LANGUAGE_KEY_WORDS_ARE LEX_WORD static aKeys[] =
-#define LANGUAGE_WORDS_ARE LEX_WORD static aWords[] =
+#define SELF_CONTAINED_WORDS_ARE static LEX_WORD aSelfs[] =
+#define LANGUAGE_KEY_WORDS_ARE static LEX_WORD aKeys[] =
+#define LANGUAGE_WORDS_ARE static LEX_WORD aWords[] =
 #define LANGUAGE_RULES_ARE static int aiRules[][ MAX_MATCH + 2 ] =
 #define ACCEPT_TOKEN_AND_DROP_DELIMITER_IF_ONE_OF_THESE(x) static char *szOmmit = x
 #define ACCEPT_TOKEN_AND_RETURN_DELIMITERS static LEX_DELIMITER aDelimiters[] =
