@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.7 2003/02/11 03:53:40 paultucker Exp $
+ * $Id: adsfunc.c,v 1.8 2003/02/14 21:17:37 lculik Exp $
  */
 
 /*
@@ -1379,10 +1379,10 @@ HB_FUNC( ADSDDCREATE )
    UNSIGNED16 usEncrypt          = ISNUM(2) ? hb_parnl( 0 ) : 0 ;
    UNSIGNED8  *pucDescription    = ISCHAR( 3 ) ? hb_parc( 3 ) : NULL ;
 
-   ulRetval = AdsDDCreate( pucDictionaryPath,
+   ulRetVal = AdsDDCreate( ( UNSIGNED8 *)pucDictionaryPath,
                            usEncrypt,
-                           pucDescription,
-                           adsConnectHandle );
+                           ( UNSIGNED8 *)pucDescription,
+                           &adsConnectHandle );
 
    if (ulRetVal == AE_SUCCESS)
    {
@@ -1394,6 +1394,52 @@ HB_FUNC( ADSDDCREATE )
    }
 
 }
+
+HB_FUNC( ADSDDGETDBPROPERTY )
+{
+    #define ADS_MAX_PARAMDEF_LEN  2048
+    UNSIGNED16 ulPropety = ( UNSIGNED16 ) hb_parni( 1 );
+    char sBuffer[ADS_MAX_PARAMDEF_LEN];
+    UNSIGNED16 ulLength;
+    UNSIGNED16 ulBuffer;
+    UNSIGNED32 ulRetVal;
+    BOOL bChar = FALSE ;
+
+
+    switch ( ulPropety )
+    {
+       case ADS_DD_COMMENT:
+       case ADS_DD_DEFAULT_TABLE_PATH:
+       case ADS_DD_USER_DEFINED_PROP:
+       case ADS_DD_TEMP_TABLE_PATH:
+       case ADS_DD_VERSION:
+       {
+          ulLength = ADS_MAX_PARAMDEF_LEN ;
+          ulRetVal = AdsDDGetDatabaseProperty( adsConnectHandle, ulPropety, &sBuffer, &ulLength );
+          bChar = TRUE ;
+          break;
+       }
+       case ADS_DD_LOG_IN_REQUIRED:
+       case ADS_DD_VERIFY_ACCESS_RIGHTS:
+       case ADS_DD_ENCRYPT_TABLE_PASSWORD:
+       case ADS_DD_ENCRYPT_NEW_TABLE: 
+       {
+          ulLength = sizeof( UNSIGNED16 );
+          ulRetVal = AdsDDGetDatabaseProperty( adsConnectHandle, ulPropety, &ulBuffer, &ulLength );
+          break;
+       }
+    }
+
+   if  ( ulPropety == ADS_DD_LOG_IN_REQUIRED || ulPropety == ADS_DD_VERIFY_ACCESS_RIGHTS  || ulPropety == ADS_DD_ENCRYPT_NEW_TABLE)
+   {
+      hb_retl(ulBuffer );
+   }
+   else if ( bChar )
+      hb_retclen(sBuffer, ulLength);
+   else
+      hb_retnl(ulBuffer );
+}
+
 
 #endif
 
@@ -1462,7 +1508,7 @@ HB_FUNC( ADSINTRANSACTION )
 }
 
 
-HB_FUNC( ROOLBACK )
+HB_FUNC( ADSROLLBACK )
 {
 
    ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
