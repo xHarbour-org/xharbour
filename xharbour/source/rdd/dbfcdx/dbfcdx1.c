@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.150 2004/08/09 23:58:45 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.151 2004/08/10 01:25:15 druzus Exp $
  */
 
 /*
@@ -1684,9 +1684,6 @@ static void hb_cdxPageCheckDupTrl( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys 
       }
       if ( bDup != ( iKey == 0 ? 0 : pKeyBuf[ iPos + iNum + 4 ] ) )
       {
-#ifdef HB_CDX_DSPDBG_INFO
-//         printf( "[%31s][%31s]", &pKeyBuf[ iPos - iLen ], &pKeyBuf[ iPos ] ); fflush(stdout);
-#endif
          printf("\r\nbDup=%d, keybuf->bDup=%d (bTrl=%d), iKey=%d/%d\r\n", bDup, pKeyBuf[ iPos + iNum + 4 ], bTrl, iKey, iKeys );
          fflush(stdout);
          bErr = TRUE;
@@ -2670,9 +2667,9 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
          else
             lpTmpPage = NULL;
 
+#if 1
          if ( !fIns && lpTmpPage != NULL )
          {
-#if 1
             SHORT j, iSize = 0, iMaxReq;
             ULONG ulMaxRec = 0, ul;
             BYTE * pbKey, bMax;
@@ -2684,7 +2681,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
                iSize += iLen - 6 - ( j == 0 ? 0 : pPtr[ ( j + 1 ) * iLen - 2 ] ) - pPtr[ ( j + 1 ) * iLen - 1 ];
             }
             pbKey = hb_cdxPageGetKeyVal( lpTmpPage, 0 );
-            bMax = ( lpTmpPage->node.extNode.keyPool[ lpTmpPage->ReqByte - 2 ]
+            bMax = ( HB_GET_LE_UINT16( &lpTmpPage->node.extNode.keyPool[ lpTmpPage->ReqByte - 2 ] )
                          >> ( 16 - lpTmpPage->TCBits ) ) & lpTmpPage->TCMask;
 #ifdef HB_CDX_PACKTRAIL
             bMax = iLen - 6 - bMax;
@@ -2693,6 +2690,9 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
 #endif
             for ( j = 0; j < bMax &&
                          pPtr[ ( iKeys - 1 ) * iLen + j ] == pbKey[ j ]; j++ );
+#ifdef HB_CDX_DSPDBG_INFO
+            printf("\r\nbDup=%d, bTrl=%d ", j, iLen - 6 - bMax ); fflush(stdout);
+#endif
             iSize -= j;
             iMaxReq = lpTmpPage->ReqByte;
             ul = lpTmpPage->RNMask;
@@ -2706,18 +2706,11 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
                      ( iMaxReq - lpTmpPage->ReqByte ) * lpTmpPage->iKeys;
             if ( iSize < 0 )
                fIns = TRUE;
-#else
-            if ( lpTmpPage->ReqByte > iMaxReq )
-               iMaxReq = lpTmpPage->ReqByte;
-            if ( lpTmpPage->iFree < iKeys * ( iLen - 6 + iMaxReq ) +
-                        ( iMaxReq - lpTmpPage->ReqByte ) * lpTmpPage->iKeys )
-               fIns = TRUE;
-#endif
             else
             {
 #ifdef HB_CDX_DSPDBG_INFO
-               printf("\r\ninserting #keys=%d/%d (%d) parent=%lx, child=%lx, rec=%ld",
-                      iKeys, lpTmpPage->iKeys, i, pPage->Page, lpTmpPage->Page, (ULONG) HB_GET_LE_UINT32( pPtr + iLen - 6 ));
+               printf("\r\ninserting bDup=%d #keys=%d/%d (%d) parent=%lx, child=%lx (%d), rec=%ld",
+                      j, iKeys, lpTmpPage->iKeys, i, pPage->Page, lpTmpPage->Page, iSize, (ULONG) HB_GET_LE_UINT32( pPtr + iLen - 6 ));
                fflush(stdout);
 #endif
                if ( iBufSize >= iKeys + lpTmpPage->iKeys )
@@ -2750,12 +2743,14 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
                      ++bDup;
                   pPtr[ iLen - 2 ] = bDup;
                   iKeys += lpTmpPage->iKeys;
+#ifdef HB_CDX_DSPDBG_INFO
+                  printf(" bDup2=%d, bTrl2=%d ", bDup, pPtr[ iLen - 1 ] ); fflush(stdout);
+#endif
                }
                pPtr = pKeyPool;
                childs[i] = lpTmpPage;
                if ( iFirstKey + i >= pPage->iKeys )
                   iRet |= NODE_NEWLASTKEY;
-#if 0
 #ifdef HB_CDX_DBGCODE_EXT
                childs[i]->iKeys = 0;
                if ( childs[i]->pKeyBuf )
@@ -2766,6 +2761,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
                }
                hb_cdxPageCalcLeafSpace( childs[i], pPtr, iKeys );
                hb_cdxPageLeafEncode( childs[i], pPtr, childs[i]->iKeys );
+               iSize += ( iMaxReq - childs[i]->ReqByte ) * childs[i]->iKeys;
                if ( iSize != childs[i]->iFree )
                {
                   printf("\r\ninserting, iSize=%d, childs[i]->iFree=%d", iSize, childs[i]->iFree); fflush(stdout);
@@ -2773,8 +2769,8 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
                   hb_cdxErrInternal( "hb_cdxPageGetChild: index corrupted." );
                }
 #endif
-#endif
             }
+#endif
          }
          else
             fIns = TRUE;
@@ -7779,9 +7775,6 @@ static void hb_cdxSortAddNodeKey( LPCDXSORTINFO pSort, int iLevel, BYTE *pKeyVal
       pPage->iFree -= iTmp + pPage->ReqByte;
       pPage->iKeys++;
 #ifdef HB_CDX_DBGCODE_EXT
-#ifdef HB_CDX_DSPDBG_INFO
-//      printf( "\r\niDup=%d, iTrl=%d [%31s][%31s]", iDup, iTrl, pSort->pLastKey, pKeyVal ); fflush(stdout);
-#endif
       hb_cdxPageCheckDupTrlRaw( pSort->NodeList[ iLevel ] );
 #endif
    }
