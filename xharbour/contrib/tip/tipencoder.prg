@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipencoder.prg,v 1.1 2003/11/30 14:41:50 jonnymind Exp $
+* $Id: tipencoder.prg,v 1.2 2003/12/01 00:19:39 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "fileio.ch"
@@ -20,24 +20,23 @@ ENDCLASS
 
 
 METHOD New( cModel ) class TIPEncoder
-
    cModel := Lower( cModel )
-
-   DO CASE
-      CASE cModel == "text" .or. cModel == "plain"
-         ::cName := "text"
-         RETURN Self
-
-      CASE cModel == "base64"
+   IF cModel == "base64"
          RETURN TIPEncoderBase64():New()
 
-      CASE cModel == "quoted-printable"
-         RETURN TIPEncoderQP():New()
+   ELSEIF cModel == "quoted-printable"
+      RETURN TIPEncoderQP():New()
 
-      CASE cModel == "url" .or. cModel == "urlencoded"
-         RETURN TIPEncoderURL():New()
+   ELSEIF cModel == "url" .or. cModel == "urlencoded"
+      RETURN TIPEncoderURL():New()
 
-   ENDCASE
+   ELSEIF cModel == "text" .or. cModel == "plain";
+             .or. cModel == "text/plain" .or. cModel == "as-is";
+             .or. cModel == "7-bit" .or. cModel == "8-bit"
+      ::cName := "as-is"
+      RETURN Self
+   ENDIF
+
 RETURN NIL
 
 METHOD Encode( cData ) class TIPEncoder

@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.17 2003/11/30 14:41:50 jonnymind Exp $
+ * $Id: Changelog,v 1.18 2003/12/01 00:19:39 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-02 05:08 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * tipencoder.prg
+   ! fixes to initialization (DO CASE brought some trouble,
+     changed with an IF)
+
+  + tipmail.prg
+    + Added full MIME w/multipart support!
+
+  * tests/Makefile
+  + tests/Makefile.testmail
+  + tests/testmail.prg
+    + Added tests for mail parsing
+  + tests/Makefile.testmmail
+  + tests/testmmail.prg
+    + Added tests for mail composing
 
 2003-12-01 01:23 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * tipencoderbase64.prg
