@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.65 2003/09/07 02:55:08 ronpinkas Exp $
+ * $Id: arrays.c,v 1.66 2003/09/07 23:12:15 ronpinkas Exp $
  */
 
 /*
@@ -1575,8 +1575,8 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
          USHORT uiLine;
 
          hb_procinfo( 0, szProc, &uiLine, szModule  );
-         TraceLog( NULL, "Warning! Could not locate old owner %p of array %p [%s->%s(%i)]\n",
-                         pOldHolder, pBaseArray, szModule, szProc, uiLine );
+         TraceLog( NULL, "Warning! Could not locate old owner %p of array %p [%s->%s(%i)] Stack: %p\n",
+                         pOldHolder, pBaseArray, szModule, szProc, uiLine, hb_stackItemFromTop(1) );
       }
 
       hb_arrayRegisterHolder( pBaseArray, pNewHolder );

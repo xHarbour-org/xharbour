@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.38 2003/09/04 02:14:39 ronpinkas Exp $
+ * $Id: estack.c,v 1.39 2003/09/07 23:12:15 ronpinkas Exp $
  */
 
 /*
@@ -133,7 +133,7 @@ void hb_stackPush( void )
       #ifndef HB_ARRAY_USE_COUNTER
          if( HB_VM_STACK.pItems != pOldItems )
          {
-            for( i = 0; i < HB_VM_STACK.wItems; ++i )
+            for( i = 0; i < CurrIndex; ++i )
             {
                if( HB_IS_ARRAY( HB_VM_STACK.pItems[ i ] ) )
                {
