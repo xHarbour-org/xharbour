@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.17 2003/09/03 12:51:36 paultucker Exp $
+ * $Id: hbsrlraw.c,v 1.18 2003/09/23 15:16:21 jonnymind Exp $
  */
 
 /*
@@ -376,6 +376,22 @@ ULONG hb_serialNextRaw( char *cBuf )
          while ( ulCount > 0 )
          {
             cBuf += ulNext;
+            ulNext = hb_serialNextRaw( cBuf );
+            ulData += ulNext;
+            ulCount --;
+         }
+      return ulData;
+
+      case 'H':
+         ulData = ulNext = 9;
+         ulCount = hb_getlen8( ( BYTE *) (cBuf + 1) );
+
+         while ( ulCount > 0 )
+         {
+            cBuf += ulNext;
+            ulNext = hb_serialNextRaw( cBuf );
+            cBuf += ulNext;
+            ulData += ulNext;
             ulNext = hb_serialNextRaw( cBuf );
             ulData += ulNext;
             ulCount --;

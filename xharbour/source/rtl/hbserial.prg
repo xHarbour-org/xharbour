@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.7 2003/05/23 03:27:08 ronpinkas Exp $
+ * $Id: hbserial.prg,v 1.8 2003/11/10 00:59:32 fsgiudice Exp $
  */
 
 /*
@@ -52,9 +52,9 @@
  */
 
 FUNCTION HB_Serialize( xValue )
-
    LOCAL cSerial
    LOCAL xElement, aPropertiesAndValues, aPropertyAndValue
+   LOCAL nPos
 
    SWITCH ValType( xValue )
       CASE "A"
@@ -62,6 +62,16 @@ FUNCTION HB_Serialize( xValue )
 
          FOR EACH xElement IN xValue
             cSerial += HB_Serialize( xElement )
+         NEXT
+
+         EXIT
+
+      CASE "H"
+         cSerial := "H" + HB_CreateLen8( Len( xValue ) )
+
+         FOR nPos := 1 TO Len( xValue )
+            cSerial += HB_Serialize( HGetKeyAt( xValue, nPos ) )
+            cSerial += HB_Serialize( HGetValueAt( xValue, nPos ) )
          NEXT
 
          EXIT
@@ -103,6 +113,23 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
          DO WHILE nLen > 0
             oElem := HB_Deserialize( cSerial, nMaxLen )
             Aadd( oObject, oElem )
+            cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
+            nLen --
+         ENDDO
+      EXIT
+
+      CASE "H"
+         oObject := Hash()
+         cSerial := Substr( cSerial, 2 )
+         nLen := HB_GetLen8( cSerial )
+         cSerial := Substr( cSerial, 9 )
+         HAllocate( oObject, nLen )
+
+         DO WHILE nLen > 0
+            oElem := HB_Deserialize( cSerial, nMaxLen )
+            cSerial :=  Substr( cSerial, HB_SerialNext( cSerial )+1 )
+            oVal := HB_Deserialize( cSerial, nMaxLen )
+            HSet( oObject, oElem, oVal )
             cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
             nLen --
          ENDDO

@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.1 2003/11/09 23:16:39 jonnymind Exp $
+ * $Id: hash.c,v 1.2 2003/11/09 23:38:11 jonnymind Exp $
  */
 
 /*
@@ -1221,7 +1221,7 @@ HB_FUNC( HDELAT )
 HB_FUNC( HGETKEYS )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
-   PHB_ITEM pKeys, pK;
+   PHB_ITEM pKeys, pK, pArr;
    ULONG ulPos, ulLen;
 
    if ( pHash == NULL  )
@@ -1235,20 +1235,21 @@ HB_FUNC( HGETKEYS )
    ulLen = pHash->item.asHash.value->ulLen;
    hb_arrayNew( pKeys, ulLen );
    pK = pHash->item.asHash.value->pKeys;
+   pArr = pKeys->item.asArray.value->pItems;
 
-   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pK++ )
+   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pK++, pArr++ )
    {
-      hb_itemCopy( hb_arrayGetItemPtr( pKeys, ulPos ), pK );
+      hb_itemCopy( pArr, pK );
    }
 
-   hb_itemReturn( pKeys );
+   hb_itemForwardValue( &HB_VM_STACK.Return, pKeys );
 }
 
 
 HB_FUNC( HGETVALUES )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
-   PHB_ITEM pVals, pV;
+   PHB_ITEM pVals, pV, pArr;
    ULONG ulPos, ulLen;
 
    if ( pHash == NULL  )
@@ -1262,13 +1263,14 @@ HB_FUNC( HGETVALUES )
    ulLen = pHash->item.asHash.value->ulLen;
    hb_arrayNew( pVals, ulLen );
    pV = pHash->item.asHash.value->pValues;
+   pArr = pVals->item.asArray.value->pItems;
 
-   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pV++ )
+   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pV++, pArr )
    {
-      hb_itemCopy( hb_arrayGetItemPtr( pVals, ulPos ), pV );
+      hb_itemCopy( pArr, pV );
    }
 
-   hb_itemReturn( pVals );
+   hb_itemForwardValue( &HB_VM_STACK.Return, pVals );
 }
 
 /***********************************************************
