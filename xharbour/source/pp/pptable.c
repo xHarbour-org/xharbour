@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.48 2004/11/04 19:50:06 ronpinkas Exp $
+ * $Id: pptable.c,v 1.49 2004/11/11 19:49:43 ronpinkas Exp $
  */
 
 /*
@@ -516,5 +516,5 @@ void hb_pp_Table( void )
 #endif
 
    hb_pp_topDefine = &sD___69;
-   hb_pp_topTranslate = &sT___04;
+   hb_pp_topTranslate = &sT___05;
 }
