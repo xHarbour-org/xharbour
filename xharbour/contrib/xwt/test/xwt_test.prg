@@ -1,4 +1,5 @@
 #include "xwt.ch"
+#include "xwtcmd.ch"
 
 GLOBAL oFileSel
 GLOBAL oOtherBox

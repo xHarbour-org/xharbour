@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_framewnd.c,v 1.3 2003/04/12 23:47:15 jonnymind Exp $
+   $Id: xwt_gtk_framewnd.c,v 1.4 2003/06/08 14:05:35 jonnymind Exp $
 
    GTK interface - Frame window
 */
@@ -29,13 +29,21 @@ static gboolean wnd_evt_destroy( GtkWidget *widget,  GdkEvent  *event, gpointer 
 static void *frame_get_mainwidget( void *data )
 {
    PXWT_GTK_FRAMEWND wnd = (PXWT_GTK_FRAMEWND) data;
+   #if __GNUC__<3
+   return wnd->a.a.main_widget;
+   #else
    return wnd->main_widget;
+   #endif
 }
 
 static void *frame_get_topwidget( void *data )
 {
    PXWT_GTK_FRAMEWND wnd = (PXWT_GTK_FRAMEWND) data;
+   #if __GNUC__ <3
+   return wnd->a.window;
+   #else  
    return wnd->window;
+   #endif
 }
 
 BOOL xwt_gtk_createFrameWindow( PXWT_WIDGET xwtData )
@@ -44,11 +52,18 @@ BOOL xwt_gtk_createFrameWindow( PXWT_WIDGET xwtData )
    PHB_BASEARRAY pSelf;
 
    pSelf = xwtData->owner;
-
+   #if __GNUC__ <3
+   frame->a.window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+   #else  
    frame->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+   #endif
 
    frame->vbox = gtk_vbox_new(FALSE, 0);
+   #if __GNUC__ <3
+   gtk_container_add (GTK_CONTAINER (frame->a.window), frame->vbox);
+   #else
    gtk_container_add (GTK_CONTAINER (frame->window), frame->vbox);
+   #endif
 
    /* Now we create the menu bar */
    frame->menu_box = gtk_handle_box_new();
@@ -62,10 +77,20 @@ BOOL xwt_gtk_createFrameWindow( PXWT_WIDGET xwtData )
 
    /* Create a void grid of 1,1 as the central widget, for now.
       Inside this central area, many widgets can then find place.*/
+   #if __GNUC__ <3
+   {
+   frame->a.a.main_widget = gtk_table_new( 1, 1, TRUE );
+   gtk_box_pack_start(GTK_BOX(frame->vbox), frame->a.a.main_widget, TRUE, TRUE, 0 );
+   gtk_widget_show(frame->a.a.main_widget);
+   }
+   #else
+   {
    frame->main_widget = gtk_table_new( 1, 1, TRUE );
    gtk_box_pack_start(GTK_BOX(frame->vbox), frame->main_widget, TRUE, TRUE, 0 );
    gtk_widget_show(frame->main_widget);
+   }
 
+   #endif
    /* Create the status bar. */
    frame->status_bar = gtk_statusbar_new();
    gtk_box_pack_start(GTK_BOX(frame->vbox), frame->status_bar, FALSE, FALSE, 0 );
@@ -79,11 +104,20 @@ BOOL xwt_gtk_createFrameWindow( PXWT_WIDGET xwtData )
    Unclean objects will be taken by the gc. */
 
    // We must send only the internal object pointer. pSelf will be destroyed with stack pop
-   g_signal_connect(G_OBJECT(frame->window), "delete_event",
+   #if __GNUC__ < 3
+   g_signal_connect(G_OBJECT(frame->a.window), "delete_event",
+      G_CALLBACK (wnd_evt_destroy), pSelf );
+
+   // A center position is a generally good default
+   gtk_window_set_position( GTK_WINDOW( frame->a.window), GTK_WIN_POS_CENTER );
+   #else
+    g_signal_connect(G_OBJECT(frame->window), "delete_event",
       G_CALLBACK (wnd_evt_destroy), pSelf );
 
    // A center position is a generally good default
    gtk_window_set_position( GTK_WINDOW( frame->window), GTK_WIN_POS_CENTER );
+   #endif
+   
 
    xwtData->widget_data = (void *) frame;
    xwtData->destructor = hb_xfree;

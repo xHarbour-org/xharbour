@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.12 2003/06/05 17:06:22 jonnymind Exp $
+   $Id: xwt_gtk.h,v 1.13 2003/06/08 14:05:35 jonnymind Exp $
 
    GTK interface
 */
@@ -29,14 +29,22 @@ typedef struct tag_xwt_gtk_base
 
 typedef struct tag_xwt_gtk_modal
 {
+  #if __GNUC__ < 3
+  XWT_GTK_BASE a;
+  #else
   XWT_GTK_BASE;
+  #endif
   BOOL modal;
   BOOL canceled;
 } XWT_GTK_MODAL, *PXWT_GTK_MODAL;
 
 typedef struct tag_xwt_gtk_splitter
 {
+   #if __GNUC__ < 3
+   XWT_GTK_BASE a;
+   #else
    XWT_GTK_BASE;
+   #endif
    GtkWidget *first_widget;
    GtkWidget *second_widget;
    BOOL bShrink1;
@@ -45,13 +53,21 @@ typedef struct tag_xwt_gtk_splitter
 
 typedef struct tag_xwt_gtk_wnd
 {
-   XWT_GTK_BASE;
+  #if __GNUC__ < 3
+  XWT_GTK_BASE a;
+  #else
+  XWT_GTK_BASE;
+  #endif
    GtkWidget *window;
 } XWT_GTK_WND, *PXWT_GTK_WND;
 
 typedef struct tag_xwt_gtk_framewnd
 {
+  #if __GNUC__ < 3
+   XWT_GTK_WND a ; 
+   #else
    XWT_GTK_WND;
+   #endif
    GtkWidget *vbox;
    GtkWidget *menu_bar;
    GtkWidget *menu_box;
@@ -61,7 +77,11 @@ typedef struct tag_xwt_gtk_framewnd
 
 typedef struct tag_xwt_gtk_menuitem
 {
-   XWT_GTK_BASE;
+  #if __GNUC__ < 3
+  XWT_GTK_BASE a;
+  #else
+  XWT_GTK_BASE;
+  #endif
    GtkWidget *hbox;
    GtkWidget *image;
    GtkWidget *label;
@@ -71,21 +91,33 @@ typedef struct tag_xwt_gtk_menuitem
 
 typedef struct tag_xwt_gtk_align
 {
-   XWT_GTK_BASE;
-   GtkWidget *align;
-   int iVAlign;
-   int iHAlign;
+  #if __GNUC__ < 3
+  XWT_GTK_BASE a;
+  #else
+  XWT_GTK_BASE;
+  #endif
+  GtkWidget *align;
+  int iVAlign;
+  int iHAlign;
 } XWT_GTK_ALIGN, *PXWT_GTK_ALIGN;
 
 typedef struct tag_xwt_gtk_sensible
 {
+   #if __GNUC__ < 3
+   XWT_GTK_ALIGN a;
+   #else
    XWT_GTK_ALIGN;
+   #endif
    GtkWidget *evt_window;
 } XWT_GTK_SENSIBLE, *PXWT_GTK_SENSIBLE;
 
 typedef struct tag_xwt_gtk_image
 {
+   #if __GNUC__ < 3
+   XWT_GTK_SENSIBLE a;
+   #else
    XWT_GTK_SENSIBLE;
+   #endif
    GdkPixmap *pixmap;
    char *filename;
 } XWT_GTK_IMAGE, *PXWT_GTK_IMAGE;
@@ -93,14 +125,22 @@ typedef struct tag_xwt_gtk_image
 
 typedef struct tag_xwt_gtk_container
 {
+   #if __GNUC__ < 3
+   XWT_GTK_ALIGN a;
+   #else
    XWT_GTK_ALIGN;
+   #endif
    GtkWidget *frame;
 } XWT_GTK_CONTAINER, *PXWT_GTK_CONTAINER;
 
 
 typedef struct tag_xwt_gtk_laycontainer
 {
+   #if __GNUC__ < 3
+   XWT_GTK_CONTAINER a;
+   #else
    XWT_GTK_CONTAINER;
+   #endif
    BOOL bFill;
    BOOL bExpand;
 } XWT_GTK_LAYCONTAINER, *PXWT_GTK_LAYCONTAINER;
@@ -108,7 +148,12 @@ typedef struct tag_xwt_gtk_laycontainer
 
 typedef struct tag_xwt_gtk_layout
 {
+   #if __GNUC__ < 3
+   XWT_GTK_LAYCONTAINER a;
+   #else
    XWT_GTK_LAYCONTAINER;
+   #endif
+   
    int iMode;
    int iPadding;
 } XWT_GTK_LAYOUT, *PXWT_GTK_LAYOUT;
@@ -116,7 +161,11 @@ typedef struct tag_xwt_gtk_layout
 
 typedef struct tag_xwt_gtk_grid
 {
+   #if __GNUC__ < 3
+   XWT_GTK_LAYCONTAINER a;
+   #else
    XWT_GTK_LAYCONTAINER;
+   #endif
    int iRows;
    int iCols;
    BOOL bShrink;

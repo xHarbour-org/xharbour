@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.14 2003/06/05 17:06:22 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.15 2003/06/08 14:05:34 jonnymind Exp $
 
    Global declarations, common functions
 */
@@ -393,6 +393,19 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             PXWT_GTK_GRID grid = (PXWT_GTK_GRID) wWidget->widget_data;
             PXWT_WIDGET wChild = pChild->item.asPointer.value;
 
+	    #if __GNUC__ <3
+            gtk_table_attach(
+               GTK_TABLE( wMain ),
+               GTK_WIDGET( wChild->get_top_widget( wChild->widget_data ) ),
+               hb_itemGetNI( pCol ),
+               hb_itemGetNI( pCol ) + hb_itemGetNI( pWidth ),
+               hb_itemGetNI( pRow ),
+               hb_itemGetNI( pRow ) + hb_itemGetNI( pHeight ),
+               (grid->a.bFill << 2) + (grid->bShrink << 1) + grid->a.bExpand,
+               (grid->a.bFill << 2) + (grid->bShrink << 1) + grid->a.bExpand,
+               grid->iXPad, grid->iYPad
+            );
+	    #else
             gtk_table_attach(
                GTK_TABLE( wMain ),
                GTK_WIDGET( wChild->get_top_widget( wChild->widget_data ) ),
@@ -404,6 +417,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
                (grid->bFill << 2) + (grid->bShrink << 1) + grid->bExpand,
                grid->iXPad, grid->iYPad
             );
+	    #endif
             return TRUE;
          }
       return FALSE;
@@ -667,7 +681,11 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
          else
          {
+	 #if __GNUC__ <3
+            if ( ( (PXWT_GTK_IMAGE) wWidget->widget_data)->a.evt_window == NULL )
+	 #else
             if ( ( (PXWT_GTK_IMAGE) wWidget->widget_data)->evt_window == NULL )
+	 #endif
             {
                return FALSE;
             }
@@ -874,14 +892,22 @@ BOOL xwt_drv_add( PXWT_WIDGET wWSelf, PXWT_WIDGET wWChild )
       case XWT_TYPE_LAYOUT:
       {
          PXWT_GTK_LAYOUT lay = ( PXWT_GTK_LAYOUT ) wWSelf->widget_data;
+	 #if __GNUC__ < 3
+         gtk_box_pack_start( GTK_BOX( wSelf ), wChild, lay->a.bExpand, lay->a.bFill, lay->iPadding );
+	 #else
          gtk_box_pack_start( GTK_BOX( wSelf ), wChild, lay->bExpand, lay->bFill, lay->iPadding );
+	 #endif
       }
       break;
 
       case XWT_TYPE_VIEWPORT:
       {
          PXWT_GTK_WND vp = ( PXWT_GTK_WND ) wWSelf->widget_data;
+         #if __GNUC__ <3
+         vp->a.main_widget = wChild;
+         #else
          vp->main_widget = wChild;
+         #endif
          gtk_scrolled_window_add_with_viewport( GTK_SCROLLED_WINDOW( vp->window ), wChild );
       }
       break;
@@ -904,7 +930,11 @@ BOOL xwt_drv_remove( PXWT_WIDGET wWSelf, PXWT_WIDGET wWChild )
    if ( wWSelf->type == XWT_TYPE_VIEWPORT )
    {
       PXWT_GTK_WND vp = ( PXWT_GTK_WND ) wWSelf->widget_data;
+      #if __GNUC__ <3
+      vp->a.main_widget = NULL;
+      #else
       vp->main_widget = NULL;
+      #endif
    }
 
    return TRUE;
@@ -959,12 +989,14 @@ void *xwt_gtk_get_mainwidget_base( void *data )
 {
    XWT_GTK_BASE *widget = (XWT_GTK_BASE *) data;
    return widget->main_widget;
+
 }
 
 void *xwt_gtk_get_topwidget_base( void *data )
 {
    XWT_GTK_BASE *widget = (XWT_GTK_BASE *) data;
    return widget->main_widget;
+
 }
 
 void *xwt_gtk_get_topwidget_align( void *data )
@@ -974,7 +1006,11 @@ void *xwt_gtk_get_topwidget_align( void *data )
    {
       return widget->align;
    }
+   #if __GNUC__ <3
+   return widget->a.main_widget;
+   #else
    return widget->main_widget;
+   #endif
 }
 
 void *xwt_gtk_get_topwidget_sensible( void *data )
@@ -982,20 +1018,36 @@ void *xwt_gtk_get_topwidget_sensible( void *data )
    XWT_GTK_SENSIBLE *widget = (XWT_GTK_SENSIBLE *) data;
    if ( widget->evt_window != NULL )
    {
-      return widget->evt_window;
+    return widget->evt_window;
    }
-   if ( widget->align != NULL )
+   #if __GNUC__ < 3
+   if ( widget->a.align != NULL )
+   {
+      return widget->a.align;
+   }
+   #else
+      if ( widget->align != NULL )
    {
       return widget->align;
    }
+
+   #endif
+   #if __GNUC__ <3
+   return widget->a.a.main_widget;
+   #else
    return widget->main_widget;
+   #endif
 }
 
 /******************************************************/
 void xwt_gtk_set_alignment( XWT_GTK_ALIGN* widget )
 {
    GtkWidget *parent;
+   #if __GNUC__ <3
+   GtkWidget *target = GTK_WIDGET( widget->a.main_widget );
+   #else
    GtkWidget *target = GTK_WIDGET( widget->main_widget );
+   #endif
    double vpos, hpos;
 
 

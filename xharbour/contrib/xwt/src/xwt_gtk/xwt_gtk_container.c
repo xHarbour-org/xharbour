@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_container.c,v 1.1 2003/04/07 18:20:32 jonnymind Exp $
+   $Id: xwt_gtk_container.c,v 1.2 2003/04/08 18:21:50 jonnymind Exp $
 
    Abstract container management.
 */
@@ -18,11 +18,22 @@ void *container_get_topwidget( void *data )
    {
       return widget->frame;
    }
+   #if __GNUC__ <3
+   if ( widget->a.align != NULL )
+   {
+      return widget->a.align;
+   }
+   #else
    if ( widget->align != NULL )
    {
       return widget->align;
    }
+   #endif
+   #if __GNUC__ <3
+   return widget->a.a.main_widget;
+   #else
    return widget->main_widget;
+   #endif
 }
 
 BOOL xwt_gtk_container_set_box( PXWT_WIDGET wWidget )

@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_gtk_fileselect.c,v 1.3 2003/04/18 13:28:51 jonnymind Exp $
+   $Id: xwt_gtk_fileselect.c,v 1.4 2003/06/08 14:05:35 jonnymind Exp $
 
    GTK interface - File Selection Box 
 */
@@ -21,10 +21,16 @@ static void file_ok_sel( GtkWidget *widget,  gpointer cb_data )
    // If you use this macro, you must put it AFTER variable decl,
    // and BEFORE any other statement
    XWT_GTK_MAKESELF( (((PXWT_WIDGET)cb_data)->owner) );
-
+  #if __GNUC__ <3
+   fname = gtk_file_selection_get_filename (
+      GTK_FILE_SELECTION ( xwtFilew->a.main_widget )
+   );
+   #else
    fname = gtk_file_selection_get_filename (
       GTK_FILE_SELECTION ( xwtFilew->main_widget )
    );
+
+   #endif
 
    // itemPutC uses the char* parameter as it were const: it does not
    // mangles with that, it just creates a new local copy of the param.
@@ -61,8 +67,11 @@ BOOL xwt_gtk_createFileSelection( PXWT_WIDGET xwtData )
 
    filew = gtk_file_selection_new("");
    // this widget is NOT displayed by default
-
+   #if __GNUC__ <3
+   xwtFilew->a.main_widget = filew;
+   #else
    xwtFilew->main_widget = filew;
+   #endif
    xwtFilew->modal = FALSE;
    xwtFilew->canceled = FALSE;
 

@@ -1,5 +1,5 @@
 ##################################
-# $Id: Rules.make,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+# $Id: Rules.make,v 1.2 2003/04/18 13:28:26 jonnymind Exp $
 #
 # Rules for making simwin
 #
@@ -60,7 +60,7 @@ all:$(TARGET)
 	$(CC) -c -o$@ $(CFLAGS) -I$(HB_INC_INSTALL) $<
 
 %.c: %.prg
-	$(HB_BIN_INSTALL)/harbour -w2 -n $(PRGFLAGS) -I$(HB_INC_INSTALL)  -o$@ $<
+	$(HB_BIN_INSTALL)/harbour -w2 -p -n $(PRGFLAGS) -I$(HB_INC_INSTALL)  -o$@ $<
 
 $(TARGET): $(OBJECTS)
 ifeq ( lib , $(patsubst %.a, lib, $(TARGET)))
