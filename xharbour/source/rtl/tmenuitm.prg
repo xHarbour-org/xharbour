@@ -1,5 +1,5 @@
 /*
- * $Id: tmenuitm.prg,v 1.4 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: tmenuitm.prg,v 1.1.1.1 2001/12/21 10:42:05 ronpinkas Exp $
  */
 
 /*
@@ -53,13 +53,40 @@
 #include "common.ch"
 #include "button.ch"
 #include "hbsetup.ch"
+#include "hbclass.ch"
 
 #ifdef HB_COMPAT_C53
 
 //--------------------------------------------------------------------------//
 function MenuItem( cCaption, boData, nShortcut, cMsg, nID )
 
-   LOCAL oClass
+   local oMenuItem := HBMenuItem():New( cCaption, boData, nShortcut, cMsg, nID )
+
+return oMenuItem
+
+//--------------------------------------------------------------------------//
+CLASS HBMenuItem
+
+   DATA ClassName init "MENUITEM"
+   DATA caption   init ""
+   DATA cargo
+   DATA checked   init FALSE
+   DATA column    init 0
+   DATA data
+   DATA enabled
+   DATA id
+   DATA message
+   DATA row       init 0
+   DATA shortcut
+   DATA style     init HB_TMENUITEM_STYLE
+
+   METHOD New( cCaption, boData, nShortcut, cMsg, nID )
+   METHOD isPopUp()
+
+ENDCLASS
+
+//--------------------------------------------------------------------------//
+METHOD New( cCaption, boData, nShortcut, cMsg, nID ) CLASS HBMenuItem
 
    if ISBLOCK( boData ) .or. ISOBJECT( boData )
       boData := iif( cCaption != MENU_SEPARATOR, boData, nil )
@@ -71,30 +98,21 @@ function MenuItem( cCaption, boData, nShortcut, cMsg, nID )
    DEFAULT cMsg      TO ""
    DEFAULT nID       TO 0
 
-   oClass := HBClass():New( "MENUITEM" )
+   ::caption  := cCaption
+   ::checked  := FALSE
+   ::column   := 0
+   ::data     := boData
+   ::enabled  := iif( cCaption != MENU_SEPARATOR, TRUE, FALSE )
+   ::id       := nID
+   ::message  := cMsg
+   ::row      := 0
+   ::shortcut := nShortcut
+   ::style    := HB_TMENUITEM_STYLE
 
-   oClass:AddData( "caption"  ,  cCaption )
-   oClass:AddData( "cargo" )
-   oClass:AddData( "checked"  ,  FALSE )
-   oClass:AddData( "column"   ,  0 )
-   oClass:AddData( "data"     ,  boData )
-   oClass:AddData( "enabled"  ,  iif( cCaption != MENU_SEPARATOR, TRUE, FALSE ) )
-   oClass:AddData( "id"       ,  nID )
-   oClass:AddData( "message"  ,  cMsg )
-   oClass:AddData( "row"      ,  0 )
-   oClass:AddData( "shortcut" ,  nShortcut )
-   oClass:AddData( "style"    ,  HB_TMENUITEM_STYLE )
-
-   oClass:AddMethod( "isPopup",  @isPopup() )
-
-   oClass:Create()
-
-return oClass:Instance()
+return Self
 
 //--------------------------------------------------------------------------//
-static function isPopUp()
-
-   LOCAL Self  := QSelf()
+METHOD isPopUp() CLASS HBMenuItem
 
    if ISOBJECT( ::data ) .and. ::data:ClassName() == "POPUPMENU"
       return TRUE

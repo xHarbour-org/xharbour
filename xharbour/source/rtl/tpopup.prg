@@ -1,5 +1,5 @@
 /*
- * $Id: tpopup.prg,v 1.2 2002/11/13 04:32:26 walito Exp $
+ * $Id: tpopup.prg,v 1.3 2002/11/13 20:43:13 walito Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 #include "color.ch"
 #include "common.ch"
 #include "hbsetup.ch"
+#include "hbclass.ch"
 
 #ifdef HB_COMPAT_C53
 
@@ -68,10 +69,67 @@
          an exit statement and two assigments which is good for speed critical
          and small functions. [jlalin]
 */
+
 //--------------------------------------------------------------------------//
 function PopUp( nTop, nLeft, nBottom, nRight )
 
-   LOCAL oClass
+   LOCAL oPopUp := PopUpMenu():New( nTop, nLeft, nBottom, nRight )
+
+return oPopUp
+
+//--------------------------------------------------------------------------//
+CLASS PopUpMenu
+
+   DATA ClassName       init    "POPUPMENU"
+   DATA aItems          init    {}
+   DATA border          init    B_SINGLE + SEPARATOR_SINGLE
+   DATA bottom
+   DATA cargo
+   DATA colorSpec       init    "N/W,W/N,W+/W,W+/N,N+/W,W/N"
+   DATA current         init    0
+   DATA itemCount       init    0
+   DATA left
+   DATA opened          init    FALSE PROTECTED
+   DATA right
+   DATA saveScr         init    ""    PROTECTED
+   DATA top
+   DATA width           init    0
+
+#ifdef HB_EXTENSION
+   DATA shadowed        init    FALSE
+#endif
+
+   METHOD New( nTop, nLeft, nBottom, nRight )
+   METHOD AddItem( oItem )
+   METHOD Close( lClose )
+   METHOD DelItem( nPos )
+   METHOD Display()
+   METHOD GetAccel( nKey )
+   METHOD GetFirst()
+   METHOD GetItem( nPos )
+   METHOD GetLast()
+   METHOD GetNext()
+   METHOD GetPrev()
+   METHOD GetShortct( nKey )
+   METHOD HitTest( nRow, nCol )
+   METHOD InsItem( nPos, oItem )
+   METHOD IsOpen()
+   METHOD Open()
+   MESSAGE Select( nPos )       METHOD _Select( nPos )
+   METHOD SetItem( nPos, oItem )
+
+   /* NOTE: This method is new in Harbour */
+#ifdef HB_EXTENSION
+   METHOD SetCoors( nItem, nRow, nCol )
+#endif
+
+   METHOD IsShortCut( nKey, nID )
+   METHOD IsQuick( nKey, nID )
+
+ENDCLASS
+
+//--------------------------------------------------------------------------//
+METHOD New( nTop, nLeft, nBottom, nRight ) CLASS PopUpMenu
 
    /* NOTE: When a PopUp is created and attached to a TopBar object, its
             coords are initialized to -1, so the TopBar can update them
@@ -82,54 +140,28 @@ function PopUp( nTop, nLeft, nBottom, nRight )
    DEFAULT nBottom TO  0
    DEFAULT nRight  TO  0
 
-   oClass := HBClass():New( "POPUPMENU" )
-
-   oClass:AddData( "aItems"      ,  {} )
-   oClass:AddData( "border"      ,  B_SINGLE + SEPARATOR_SINGLE )
-   oClass:AddData( "bottom"      ,  nBottom )
-   oClass:AddData( "cargo" )
-   oClass:AddData( "colorSpec"   ,  "N/W,W/N,W+/W,W+/N,N+/W,W/N" )
-   oClass:AddData( "current"     ,  0 )
-   oClass:AddData( "itemCount"   ,  0 )
-   oClass:AddData( "left"        ,  nLeft )
-   oClass:AddData( "opened"      ,  FALSE )
-   oClass:AddData( "right"       ,  nRight )
-   oClass:AddData( "saveScr"     ,  "" )
-   oClass:AddData( "top"         ,  nTop )
-   oClass:AddData( "width"       ,  0 )
+   ::aItems    := {}
+   ::border    := B_SINGLE + SEPARATOR_SINGLE
+   ::bottom    := nBottom
+   ::colorSpec := "N/W,W/N,W+/W,W+/N,N+/W,W/N"
+   ::current   := 0
+   ::itemCount := 0
+   ::left      := nLeft
+   ::opened    := FALSE
+   ::right     := nRight
+   ::saveScr   := ""
+   ::top       := nTop
+   ::width     := 0
 
 #ifdef HB_EXTENSION
-   oClass:AddData( "shadowed"    ,  FALSE )
+   ::shadowed  := FALSE
 #endif
 
-   oClass:AddMethod( "AddItem"   ,  @AddItem() )
-   oClass:AddMethod( "Close"     ,  @Close() )
-   oClass:AddMethod( "DelItem"   ,  @DelItem() )
-   oClass:AddMethod( "Display"   ,  @Display() )
-   oClass:AddMethod( "GetAccel"  ,  @GetAccel() )
-   oClass:AddMethod( "GetFirst"  ,  @GetFirst() )
-   oClass:AddMethod( "GetItem"   ,  @GetItem() )
-   oClass:AddMethod( "GetLast"   ,  @GetLast() )
-   oClass:AddMethod( "GetNext"   ,  @GetNext() )
-   oClass:AddMethod( "GetPrev"   ,  @GetPrev() )
-   oClass:AddMethod( "GetShortct",  @GetShortct() )
-   oClass:AddMethod( "HitTest"   ,  @HitTest() )
-   oClass:AddMethod( "InsItem"   ,  @InsItem() )
-   oClass:AddMethod( "IsOpen"    ,  @IsOpen() )
-   oClass:AddMethod( "Open"      ,  @Open() )
-   oClass:AddMethod( "Select"    ,  @_Select() )
-   oClass:AddMethod( "SetItem"   ,  @SetItem() )
+return Self
 
-   /* NOTE: This method is new in Harbour */
-   oClass:AddMethod( "SetCoors"  ,  @SetCoors() )
-
-   oClass:Create()
-
-return oClass:Instance()
 //--------------------------------------------------------------------------//
-static function AddItem( oItem )
+METHOD AddItem( oItem ) CLASS PopUpMenu
 
-   LOCAL Self  := QSelf()
    LOCAL nLen
 
    aAdd( ::aItems, oItem )
@@ -139,10 +171,9 @@ static function AddItem( oItem )
    ::width := Max( nLen + 4, ::width ) // 4 is for box margins
 
 return Self
-//--------------------------------------------------------------------------//
-static function Close( lClose )
 
-   LOCAL Self  := QSelf()
+//--------------------------------------------------------------------------//
+METHOD Close( lClose ) CLASS PopUpMenu
 
    DEFAULT lClose TO TRUE
 
@@ -161,14 +192,12 @@ static function Close( lClose )
    endif
 
 return Self
-//--------------------------------------------------------------------------//
-static function DelItem( nPos )
 
-   LOCAL Self  := QSelf()
+//--------------------------------------------------------------------------//
+METHOD DelItem( nPos ) CLASS PopUpMenu
 
    if nPos > 0 .and. nPos <= ::itemCount
       aDel( ::aItems, nPos, .T. )
-//      aSize( ::aItems, Len( ::aItems ) - 1 )
       ::itemCount--
 
       aEval( ::aItems, ;
@@ -177,50 +206,44 @@ static function DelItem( nPos )
    endif
 
 return Self
+
 //--------------------------------------------------------------------------//
 /* NOTE: This method corrects two bugs in Cl*pper:
          1) when two menuitems have the same key and the
             first item is disabled
          2) when a menuitem is disabled it will ignore the key [jlalin]
 */
-static function GetAccel( nKey )
+METHOD GetAccel( nKey ) CLASS PopUpMenu
 
-   LOCAL Self  := QSelf()
    LOCAL nAt   := 0
    LOCAL cKey  := Upper( Chr( nKey ) )
-//   LOCAL n
    LOCAL oItems
 
-//   n := 1
    FOR EACH oItems IN ::aItems
       nAt := At( "&", oItems:caption )
       if nAt > 0 .and. oItems:enabled .and. Upper( SubStr( oItems:caption, nAt + 1, 1 ) ) == cKey
          return HB_EnumIndex()
       endif
-//      n++
    NEXT
 
 return 0
-//--------------------------------------------------------------------------//
-static function GetFirst()
 
-   LOCAL Self  := QSelf()
-//   LOCAL n
+//--------------------------------------------------------------------------//
+METHOD GetFirst() CLASS PopUpMenu
+
    LOCAL oItems
 
-//   n := 1
    FOR EACH oItems IN ::aItems
       if oItems:caption != MENU_SEPARATOR .and. oItems:enabled
          return HB_EnumIndex()
       endif
-//      n++
    NEXT
 
 return 0
-//--------------------------------------------------------------------------//
-static function GetItem( nPos )
 
-   LOCAL Self  := QSelf()
+//--------------------------------------------------------------------------//
+METHOD GetItem( nPos ) CLASS PopUpMenu
+
    LOCAL oItem
 
    if nPos > 0 .and. nPos <= ::itemCount
@@ -228,10 +251,10 @@ static function GetItem( nPos )
    endif
 
 return oItem
-//--------------------------------------------------------------------------//
-static function GetLast()
 
-   LOCAL Self  := QSelf()
+//--------------------------------------------------------------------------//
+METHOD GetLast() CLASS PopUpMenu
+
    LOCAL n
 
    for n := ::itemCount to 1 step -1
@@ -241,10 +264,10 @@ static function GetLast()
    next
 
 return 0
-//--------------------------------------------------------------------------//
-static function GetNext()
 
-   LOCAL Self  := QSelf()
+//--------------------------------------------------------------------------//
+METHOD GetNext() CLASS PopUpMenu
+
    LOCAL n
 
    if ::current < ::itemCount
@@ -256,10 +279,10 @@ static function GetNext()
   endif
 
 return 0
-//--------------------------------------------------------------------------//
-static function GetPrev()
 
-   LOCAL Self  := QSelf()
+//--------------------------------------------------------------------------//
+METHOD GetPrev() CLASS PopUpMenu
+
    LOCAL n
 
    if ::current > 1
@@ -271,34 +294,31 @@ static function GetPrev()
   endif
 
 return 0
+
 //--------------------------------------------------------------------------//
 /* NOTE: This method corrects a bug in Cl*pper:
          1) when a menuitem is disabled it will ignore the key [jlalin]
 */
-static function GetShortct( nKey )
+METHOD GetShortct( nKey ) CLASS PopUpMenu
 
-   LOCAL Self  := QSelf()
-//   LOCAL n
    LOCAL oItems
 
-//   n := 1
    FOR EACH oItems IN ::aItems
       if oItems:enabled .and. oItems:shortcut == nKey
          return HB_EnumIndex()
       endif
-//      n++
    NEXT
 
 return 0
+
 //--------------------------------------------------------------------------//
 /* NOTE: This method corrects two bugs in Cl*pper:
          1) when two menuitems have the same key and the first item
             is disabled
          2) when a menuitem is disabled it will ignore the click [jlalin]
 */
-static function HitTest( nRow, nCol )
+METHOD HitTest( nRow, nCol ) CLASS PopUpMenu
 
-   LOCAL Self  := QSelf()
    LOCAL nHit  := HTNOWHERE
 
    do case
@@ -333,15 +353,12 @@ static function HitTest( nRow, nCol )
    endcase
 
 return nHit
-//--------------------------------------------------------------------------//
-static function InsItem( nPos, oItem )
 
-   LOCAL Self  := QSelf()
+//--------------------------------------------------------------------------//
+METHOD InsItem( nPos, oItem ) CLASS PopUpMenu
 
    if nPos > 0 .and. nPos <= ::itemCount
-//      aSize( ::aItems, ::itemCount )
       aIns( ::aItems, nPos, oItem, .T. )
-//      ::aItems[ nPos ] := oItem
       ::itemCount++
 
       aEval( ::aItems, ;
@@ -350,16 +367,14 @@ static function InsItem( nPos, oItem )
    endif
 
 return Self
-//--------------------------------------------------------------------------//
-static function IsOpen()
 
-   LOCAL Self  := QSelf()
+//--------------------------------------------------------------------------//
+METHOD IsOpen() CLASS PopUpMenu
 
 return ::opened
-//--------------------------------------------------------------------------//
-static function Open()
 
-   LOCAL Self  := QSelf()
+//--------------------------------------------------------------------------//
+METHOD Open() CLASS PopUpMenu
 
    if !::opened
       ::opened := TRUE
@@ -368,10 +383,9 @@ static function Open()
    endif
 
 return Self
-//--------------------------------------------------------------------------//
-static function _Select( nPos )
 
-   LOCAL Self  := QSelf()
+//--------------------------------------------------------------------------//
+METHOD _Select( nPos ) CLASS PopUpMenu
 
    if ( nPos > 0 .and. nPos <= ::itemCount ) .and. ;
          ::current != nPos .and. ::aItems[ nPos ]:enabled
@@ -386,10 +400,9 @@ static function _Select( nPos )
    endif
 
 return Self
-//--------------------------------------------------------------------------//
-static function SetItem( nPos, oItem )
 
-   LOCAL Self  := QSelf()
+//--------------------------------------------------------------------------//
+METHOD SetItem( nPos, oItem ) CLASS PopUpMenu
 
    if nPos > 0 .and. nPos <= ::itemCount
       ::aItems[ nPos ] := oItem
@@ -398,14 +411,13 @@ static function SetItem( nPos, oItem )
 
 return Self
 //--------------------------------------------------------------------------//
-static function Display()
 
-   LOCAL Self     := QSelf()
+METHOD Display() CLASS PopUpMenu
+
    LOCAL nTop     := ::top
    LOCAL nAt      := 0
    LOCAL lPopup   := FALSE
    LOCAL cPrompt
-//   LOCAL n
    LOCAL oItems
 
    DispBegin()
@@ -422,7 +434,6 @@ static function Display()
    endif
 #endif
 
-//   n := 1
    FOR EACH oItems IN ::aItems
 
       nAt := At( "&", oItems:caption )
@@ -458,16 +469,15 @@ static function Display()
                      CLR_UNSELECTED ) ) )
          endif
       endif
-//      n++
    next
 
    DispEnd()
 
 return Self
-//--------------------------------------------------------------------------//
-static function SetCoors( nItem, nRow, nCol )
 
-   LOCAL Self  := QSelf()
+#ifdef HB_EXTENSION
+//--------------------------------------------------------------------------//
+METHOD SetCoors( nItem, nRow, nCol ) CLASS PopUpMenu
 
    if ::top == -1 .or. ::left == -1
       ::top    := nRow
@@ -489,6 +499,88 @@ static function SetCoors( nItem, nRow, nCol )
    endif
 
 return Self
+#endif
 //--------------------------------------------------------------------------//
+
+/* The routines below were added by Larry Sevilla <lsevilla@nddc.edu.ph> */
+/* based on the MenuSys.prg of Clipper 5.3b                              */
+
+/***
+*
+*  IsShortCut( <oMenu>, <nKey>, <nID> ) -> .T. | .F.
+*
+*  ShortCut processing for initial Get or Menu Item.
+*
+***/
+METHOD IsShortCut( nKey, nID ) CLASS PopUpMenu
+
+   LOCAL nItem, nTotal, nShortCut, oItem, i
+
+  do case
+   // Test and assign top menu item shortCut, enabled, and !PopUp:
+   // Changed by enclosing assignment before ':Enabled':
+   case   ( ( nShortCut := ::GetShortCt( nKey ) ) > 0 ) .AND. ;
+            ( ( oItem := ::GetItem( nShortcut ) ):Enabled ) .AND. ;
+            ( !( oItem:IsPopUp() ) )
+      ::Select( nShortCut )
+      EVAL( oItem:Data, oItem )
+      nID := oItem:ID
+      RETURN ( .T. )
+
+   // Test and assignment for TopBar MenuItem:
+   case   nShortCut == 0
+      nTotal := ::ItemCount()
+      nItem  := ::Current
+      IIF( nItem == 0, nItem := 1, )
+
+      // Loop to wrap around through TopMenu from Current Item:
+      FOR i := 1 TO nTotal
+         IF ( !( oItem := ::GetItem( nItem ) ):Enabled )
+         ELSEIF ( !oItem:IsPopUp() )
+         ELSEIF ( oItem:Data:IsQuick( nKey, @nID ) )
+            RETURN ( .T. )
+         ENDIF
+         IIF( ++nItem > nTotal, nItem := 1, )
+      NEXT
+
+   ENDcase
+
+   RETURN ( .F. )
+
+/***
+*
+*  IsQuick( <oMenu>, <nKey>, <nID> ) --> .T. | .F.
+*
+*  IsShortCut() for secondary ShortCut processing.
+*  Navigates to the next Get or Menu Item from the
+*  Current if more than one uses the same ShortCut.
+*
+***/
+METHOD IsQuick( nKey, nID ) CLASS PopUpMenu
+
+   LOCAL nItem, nTotal, nShortCut, oItem // , i
+
+   IF ( ( nShortCut := ::GetShortCt( nKey ) ) == 0 )
+      nTotal := ::ItemCount
+
+      FOR nItem := 1 TO nTotal
+         IF ( !( oItem := ::GetItem( nItem ) ):Enabled )
+	 ELSEIF ( !( oItem:IsPopUp() ) )
+         ELSEIF ( oItem:Data:IsQuick( nKey, @nID ) )
+	    RETURN ( .T. )
+	 ENDIF
+      NEXT
+
+   ELSEIF ( !( oItem := ::GetItem( nShortCut ) ):IsPopUp() )
+      IF oItem:Enabled
+         ::Select( nShortCut )
+	 EVAL( oItem:Data, oItem )
+	 nID := oItem:ID
+	 RETURN ( .T. )
+      ENDIF
+
+   ENDIF
+
+   RETURN ( .F. )
 
 #endif
