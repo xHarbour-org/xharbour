@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1785 2003/11/27 17:57:47 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1786 2003/11/27 20:18:01 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-28 00:40 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/fstemp.c
+    * Include <unistd.h> on BSD to avoid warnings.
+  * source/rtl/hbffind.c
+    ! Don't try to closedir() in hb_fsFindClose() if a directory has not
+      been open.
+  * tests/Makefile
+    ! Fixed to work on Darwin.
 
 2003-11-27 21:21 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/error.ch

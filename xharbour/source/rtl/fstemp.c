@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.6 2003/11/11 20:20:54 ronpinkas Exp $
+ * $Id: fstemp.c,v 1.7 2003/11/20 23:47:36 druzus Exp $
  */
 
 /*
@@ -50,6 +50,10 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#ifdef HB_OS_BSD
+#include <unistd.h>  /* We need mkstemp() */
+#endif
 
 #include "hbapi.h"
 #include "hbapifs.h"

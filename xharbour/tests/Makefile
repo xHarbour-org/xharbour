@@ -1,7 +1,7 @@
 # xHarbour project
 # Demo makefile for GNU MAKE in tests/ subdir
 #
-# $Id: Makefile,v 1.16 2003/09/18 13:45:35 jonnymind Exp $
+# $Id: Makefile,v 1.17 2003/11/15 16:55:18 jonnymind Exp $
 #
 # Copyright 2003 Giancarlo Niccolai
 #
@@ -21,12 +21,12 @@
 #
 
 ifeq ($(HB_MT),MT)
-MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntx -ldbfcdx -ldbfdbt -lmacromt
-ifeq ($(HB_ARCHITECTURE),linux)
-MTLIBS+=-lpthread
-endif
+   MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntx -ldbfcdx -ldbfdbt -lmacromt
+   ifeq ($(HB_ARCHITECTURE),linux)
+      MTLIBS+=-lpthread
+   endif
 else
-  MTLIBS= -lvm -lrtl -lrdd -lrtl -lvm -ldbfntx -ldbfcdx -ldbfdbt -lmacro
+   MTLIBS= -lvm -lrtl -lrdd -lrtl -lvm -ldbfntx -ldbfcdx -ldbfdbt -lmacro
 endif
 
 ifeq ($(HB_ARCHITECTURE),linux)
@@ -43,7 +43,7 @@ ifeq ($(HB_ARCHITECTURE),linux)
        endif
      endif
    endif
-EXE_EXT=
+   EXE_EXT=
 else
   ifeq ($(HB_ARCHITECTURE),darwin)
     ifeq ($(HB_GT_LIB),gtcrs)
@@ -61,7 +61,14 @@ else
   endif
 endif
 ifeq ($(HB_MULTI_GT),yes)
-GT_LIBS += -lgtnul
+   GT_LIBS += -lgtnul
+endif
+
+ALL_LIBS = -ldebug $(MTLIBS) -lpp -llang -lcommon $(GT_LIBS) -lm
+ifeq ($(HB_ARCHITECTURE),darwin)
+   LD_LIBS = $(ALL_LIBS) $(ALL_LIBS)
+else
+   LD_LIBS = -Wl,--start-group $(ALL_LIBS) -Wl,--end-group
 endif
 
 %.c: %.prg
@@ -72,8 +79,5 @@ endif
 
 %$(EXE_EXT): %.o
 	gcc -o $@ $< $(C_USR) -I$(HB_INC_INSTALL) -L$(HB_LIB_INSTALL) \
-		-Wl,--start-group \
-			-ldebug $(MTLIBS) -lpp -llang -lcommon \
-			$(GT_LIBS) -lm \
-		-Wl,--end-group
+		$(LD_LIBS)
 

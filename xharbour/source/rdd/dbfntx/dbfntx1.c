@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.63 2003/09/15 16:39:26 druzus Exp $
+ * $Id: dbfntx1.c,v 1.64 2003/10/13 00:03:46 druzus Exp $
  */
 
 /*
@@ -117,6 +117,10 @@
  */
 
 #include <math.h>
+#ifdef HB_OS_BSD
+#include <unistd.h>  /* We need mkstemp() */
+#endif
+
 #include "hbapi.h"
 #include "hbinit.h"
 #include "hbapiitm.h"

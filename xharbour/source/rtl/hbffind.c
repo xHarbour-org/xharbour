@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.5 2003/09/07 03:01:14 ronpinkas Exp $
+ * $Id: hbffind.c,v 1.6 2003/09/09 02:08:01 paultucker Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.5 2003/09/07 03:01:14 ronpinkas Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.6 2003/09/09 02:08:01 paultucker Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -1032,7 +1032,10 @@ void HB_EXPORT hb_fsFindClose( PHB_FFIND ffind )
 #elif defined(HB_OS_UNIX)
 
          {
-            closedir( info->dir );
+            if (info->dir)
+            {
+               closedir( info->dir );
+            }
          }
 
 #elif defined(HB_OS_MAC)
