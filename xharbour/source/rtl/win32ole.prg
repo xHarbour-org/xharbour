@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.41 2004/03/01 22:58:11 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.42 2004/03/02 04:46:55 ronpinkas Exp $
  */
 
 /*
@@ -1922,7 +1922,11 @@ RETURN uObj
            hb_retc( "DISP_E_PARAMNOTOPTIONAL" );
            break;
 
-          case MK_E_UNAVAILABLE:
+        case CO_E_SERVER_EXEC_FAILURE:
+           hb_retc( "CO_E_SERVER_EXEC_FAILURE" );
+           break;
+
+        case MK_E_UNAVAILABLE:
            hb_retc( "MK_E_UNAVAILABLE" );
            break;
 
