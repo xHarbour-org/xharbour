@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3403 2004/09/05 22:54:51 peterrees Exp $
+ * $Id: ChangeLog,v 1.3404 2004/09/05 23:40:03 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-06 01:30 UTC+0200 Henryk Olkowski <oh1@op.pl>
+  * xharbour/source/ct/ctwin.prg
+    ! fixed problem with @ ... SAY and Quot()/QQuot()
+      after SET PRINTER TO (file)
 
 2004-09-06 11:40 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rtl/version.c not /source/rtl/tprinter.c
@@ -2585,4 +2590,3 @@
 
   * tests/Makefile
     ! More compliancy with lastests building models.
-
