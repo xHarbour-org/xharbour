@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.18 2002/02/01 23:48:06 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.19 2002/02/16 02:29:32 ronpinkas Exp $
  */
 
 /*
@@ -224,6 +224,8 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
 PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
 {
+   static const char *s_sNull = "", *s_sSpace = " ";
+
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
    if( pItem )
@@ -238,18 +240,29 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
       pItem = hb_itemNew( NULL );
    }
 
-   if( szText == NULL )
-   {
-      szText = "";
-   }
-
    pItem->type = HB_IT_STRING;
-   pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
-   *( pItem->item.asString.puiHolders ) = 1;
-   pItem->item.asString.bStatic = FALSE;
-   pItem->item.asString.length = strlen( szText );
-   pItem->item.asString.value = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
-   strcpy( pItem->item.asString.value, szText );
+
+   if( szText == NULL || szText[0] == '\0' )
+   {
+      pItem->item.asString.length = 0;
+      pItem->item.asString.value = s_sNull;
+      pItem->item.asString.bStatic = TRUE;
+   }
+   else if( szText[0] == ' ' && szText[0] == '\0' )
+   {
+      pItem->item.asString.length = 1;
+      pItem->item.asString.value = s_sSpace;
+      pItem->item.asString.bStatic = TRUE;
+   }
+   else
+   {
+      pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+      *( pItem->item.asString.puiHolders ) = 1;
+      pItem->item.asString.bStatic = FALSE;
+      pItem->item.asString.length = strlen( szText );
+      pItem->item.asString.value = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
+      strcpy( pItem->item.asString.value, szText );
+   }
 
    return pItem;
 }
