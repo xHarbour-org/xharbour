@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.1 2003/06/15 20:27:01 jonnymind Exp $
+ * $Id: txml.prg,v 1.1 2003/06/16 15:07:18 jonnymind Exp $
  */
 
 /*
@@ -67,25 +67,25 @@ CLASS TXMLNode
    DATA oChild
 
    METHOD New( nType, cName, aAttributes, cData )
-   METHOD Clone()                      INLINE HBXml_node_clone( ::Self )
-   METHOD CloneTree()                  INLINE HBXml_node_clone_tree( ::Self )
+   METHOD Clone()                      INLINE HBXml_node_clone( Self )
+   METHOD CloneTree()                  INLINE HBXml_node_clone_tree( Self )
 
-   METHOD Unlink()                     INLINE HBXml_node_unlink( ::Self )
+   METHOD Unlink()                     INLINE HBXml_node_unlink( Self )
    METHOD NextInTree()
 
-   METHOD InsertBefore( oNode )        INLINE HBXml_node_insert_before( oNode, ::Self )
-   METHOD InsertAfter( oNode )         INLINE HBXml_node_insert_after( oNode, ::Self )
-   METHOD InsertBelow( oNode )         INLINE HBXml_node_insert_below( oNode, ::Self )
-   METHOD AddBelow( oNode )            INLINE HBXml_node_add_below( oNode, ::Self )
-   
+   METHOD InsertBefore( oNode )        INLINE HBXml_node_insert_before( oNode, Self )
+   METHOD InsertAfter( oNode )         INLINE HBXml_node_insert_after( oNode, Self )
+   METHOD InsertBelow( oNode )         INLINE HBXml_node_insert_below( oNode, Self )
+   METHOD AddBelow( oNode )            INLINE HBXml_node_add_below( oNode, Self )
+
    METHOD GetAttribute( cAttrib )
    METHOD SetAttribute( cAttrib, cValue )
-   
+
    METHOD Depth()
    METHOD Path()
 
-   METHOD ToString( nStyle )        INLINE HBXml_node_to_string( ::Self, nStyle )
-   METHOD Write( fHandle, nStyle )  INLINE HBXml_node_write( ::Self, fHandle, nStyle )
+   METHOD ToString( nStyle )        INLINE HBXml_node_to_string( Self, nStyle )
+   METHOD Write( fHandle, nStyle )  INLINE HBXml_node_write( Self, fHandle, nStyle )
 
 ENDCLASS
 
@@ -102,7 +102,7 @@ METHOD NextInTree() CLASS TXmlNode
       DO WHILE oTemp != NIL
          IF oTemp:oNext != NIL
             oNext := oTemp:oNext
-            BREAK
+            EXIT
          ENDIF
          oTemp := oTemp:oParent
       ENDDO
@@ -168,14 +168,20 @@ RETURN 0
 
 
 METHOD Path() CLASS TXmlNode
+   IF ::nType == HBXML_TYPE_DOCUMENT
+      RETURN ""
+   ENDIF
+
    IF ::cName != NIL
       IF ::oParent != NIL
-         RETURN ::oParent:Path() + "/" + ::cName
+         IF ::oParent:Path() != NIL
+            RETURN ::oParent:Path() + "/" + ::cName
+         ENDIF
       ELSE
          RETURN "/" + ::cName
       ENDIF
    ENDIF
-RETURN NIL 
+RETURN NIL
 
 /********************************************
    Document Class
@@ -189,8 +195,10 @@ CLASS TXmlDocument
    DATA nNodeCount
 
    METHOD New( oNode )
+   METHOD Read( xData )               INLINE HBXML_DATAREAD( Self, xData )
    METHOD ToString( nStyle )          INLINE ::oRoot:ToString( nStyle )
    METHOD Write( fHandle, nStyle )    INLINE ::oRoot:Write( fHandle, nStyle )
+
 ENDCLASS
 
 METHOD New( oNode ) CLASS TXmlDocument

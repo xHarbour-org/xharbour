@@ -1,6 +1,6 @@
 ************************************************************
 * xmltest.prg
-* $Id: xmltest.prg,v 1.1 2003/06/15 20:27:01 jonnymind Exp $
+* $Id: xmltest.prg,v 1.2 2003/06/16 15:07:19 jonnymind Exp $
 *
 * Test for XML routines of Xharbour rtl (MXML/HBXML)
 *
@@ -32,7 +32,8 @@ PROCEDURE Main( cFileName )
 
    @3,10 SAY "File " + cFileName + " Opened. Processing XML."
 
-   xmlDoc := HB_XmlCreate( hFile )
+   xmlDoc := TXmlDocument():New()
+   xmlDoc:Read( hFile )
    IF xmlDoc:nStatus != HBXML_STATUS_OK
       @4,10 SAY "Error While Processing File: "
       @5,10 SAY "On Line: " + AllTrim( Str( xmlDoc:nLine ) )
@@ -56,15 +57,16 @@ PROCEDURE Main( cFileName )
    ? ""
 
    xmlNode := xmlDoc:oRoot:oChild
-
    DO WHILE xmlNode != NIL
       cData := xmlNode:Path()
       IF cData == NIL
          cData :=  "(Node without path)"
       ENDIF
-      
+
       ? Alltrim( Str( xmlNode:nType ) ), ", ", xmlNode:cName, ", ", ;
             ValToPrg( xmlNode:aAttributes ), ", ", xmlNode:cData, ": ", cData
+
+      xmlNode := xmlNode:NextInTree()
    ENDDO
 
    ? ""

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.30 2003/05/20 00:33:40 lculik Exp $
+# $Id: Makefile,v 1.31 2003/06/15 20:27:01 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -194,6 +194,7 @@ PRG_SOURCES=\
         ttable.prg   \
         ttextlin.prg \
         ttopbar.prg  \
+	txml.prg     \
         typefile.prg \
         wait.prg     \
         win32ole.prg \

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1122 2003/06/16 00:08:46 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1123 2003/06/16 15:07:17 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-06-16 22:10 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/Makefile
+    + Added linux compilation of txml
 
+  * source/rtl/hbxml.c
+  * source/rtl/txml.prg
+    ! Now XML integration into xharbour class is working (prototype)
+
+  * tests/xmltest.prg
+    % More adaptation to the model and stylistic fixes
+    
 2003-06-16 17:10 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * makefile.bc
   * source/rtl/hbxml.c
