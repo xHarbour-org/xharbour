@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.64 2004/09/17 02:37:30 druzus Exp $
+# $Id: xharbour.spec,v 1.65 2004/09/22 15:20:05 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -53,7 +53,7 @@
 
 %define name     xharbour
 %define dname    xHarbour
-%define version  0.99.1
+%define version  0.99.2
 %define releasen 0
 %define prefix   /usr
 %define hb_pref  xhb
@@ -83,7 +83,7 @@
 
 Summary:        Free software Clipper compatible compiler
 Summary(pl):    Darmowy kompilator kompatybilny z jÍzykiem Clipper.
-Summary(pt_BR): Um compilador Clipper compativel Gratis 
+Summary(pt_BR): Um compilador Clipper compativel Gratis
 Summary(ru):    Û◊œ¬œƒŒŸ  ÀœÕ–…Ã—‘œ“, ”œ◊Õ≈”‘…ÕŸ  ” —⁄ŸÀœÕ Clipper.
 Name:           %{name}
 Version:        %{version}
@@ -234,7 +234,7 @@ tightly together.
 1. What is supposed to be 100% Clipper compatible Pre-Processor
    (with some extensions).
 2. DOT prompt, which suppose to allow most of Clipper syntax.
-3. Finally, PP is a limited Clipper/Harbour/xBase Interpreter. Subject 
+3. Finally, PP is a limited Clipper/Harbour/xBase Interpreter. Subject
    to those same few limitations it can execute most of Harbour syntax.
    You can write your own xBase scripts by adding to your .prg files
    #!/usr/bin/pprun
@@ -256,9 +256,9 @@ uma da outra.
 1. Que e supostamente ser um Pre-Processor 100% compativel com o Clipper
    (com algumas extenss‰es).
 2. DOT prompt, que supostamente permite a maioria das syntaxes do Clipper.
-3. Finalmente, PP Ç um limitado Interpretador Clipper/Harbour/xBase . Sujeito  
+3. Finalmente, PP Ç um limitado Interpretador Clipper/Harbour/xBase . Sujeito
    com algumas limitaá‰es que pode executar a maioria da syntaxe do Harbour.
-   Voce pode escrever seus proprios scritps em .prg ao adicionar as seus arquivos 
+   Voce pode escrever seus proprios scritps em .prg ao adicionar as seus arquivos
    .prg #!/usr/bin/pprun
 
 %description -l ru pp
@@ -278,7 +278,7 @@ uma da outra.
 ## Preperation.
 ######################################################################
 
-%prep 
+%prep
 %setup -c %{name}
 rm -rf $RPM_BUILD_ROOT
 
@@ -665,7 +665,7 @@ rm -rf $RPM_BUILD_ROOT
 - Added README.RPM to the documentation directory.
 
 * Sat Jan 06 2001 Dave Pearson <davep@davep.org>
-- The gharbour script now passes the harbour include directory, using -I, 
+- The gharbour script now passes the harbour include directory, using -I,
   to harbour.
 
 * Thu Aug 24 2000 Dave Pearson <davep@davep.org>
@@ -685,15 +685,15 @@ rm -rf $RPM_BUILD_ROOT
 * Wed Aug 02 2000 Dave Pearson <davep@davep.org>
 - Removed hbtest from the list of files installed into the bin directory.
 - Added 'bash' and 'sh-utils' to the list of required packages.
-  
+
 * Tue Aug 01 2000 Dave Pearson <davep@davep.org>
 - Added harbour environment scripts to /etc/profile.d.
 - Added generation of gharbour and harbour-link commands.
 
 * Mon Jul 31 2000 Dave Pearson <davep@davep.org>
-- Re-worked the layout of the spec file to make it cleaner and easier to 
+- Re-worked the layout of the spec file to make it cleaner and easier to
   read and maintain.
 - The latest harbour ChangeLog is now installed into the RPM's doc
   directory.
-- The content of the RPM's doc directory reflects the layout and content of 
+- The content of the RPM's doc directory reflects the layout and content of
   the harbour source's doc directory.
