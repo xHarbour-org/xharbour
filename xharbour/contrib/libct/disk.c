@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.2 2004/02/01 17:23:55 paultucker Exp $
+ * $Id: disk.c,v 1.3 2004/02/23 03:31:04 lculik Exp $
  */
 /*
  * xHarbour Project source code:
@@ -264,7 +264,7 @@ HB_FUNC ( DIRNAME )
    USHORT uiErrorOld = hb_fsError();
    BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
 
-   hb_fsCurDirBuff( 0, pbyBuffer + 1, _POSIX_PATH_MAX + 1 );
+   hb_fsCurDirBuff( 0, pbyBuffer + 1, _POSIX_PATH_MAX  );
    pbyBuffer[0] = OS_PATH_DELIMITER;
 
    hb_retcAdopt( ( char * ) pbyBuffer );
