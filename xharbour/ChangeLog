@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.199 2002/05/03 01:25:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.200 2002/05/03 07:38:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-03 19:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! One more fix in SernRep() - rewrote the handling of repeatable/non repeatables into a repeatable group.
+
+  * tests/pp.prg
+    ! Fixed support for RETURN [...] to exit the current procedure.
 
 2002-05-03 00:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * config/w32/gcc.cf

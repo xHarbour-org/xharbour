@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.11 2002/04/26 19:04:46 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.12 2002/04/26 23:27:10 ronpinkas Exp $
  */
 
 /*
@@ -1806,7 +1806,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
   SearnRep( "\1", "", 0, ptro, lenres );
   *(ptro + *lenres) = '\0';
-  *lenres = RemoveSlash( ptro );   /* Removing '\' from result string */
+  *lenres = RemoveSlash( ptro );   /* Removing '\', '[' and ']' from result string */
 
   if( com_or_tra )
   {
@@ -1824,47 +1824,56 @@ static int RemoveSlash( char * stroka )
   int State = STATE_INIT;
   BOOL bDirective = FALSE;
   int lenres = strlen( stroka );
+  char cLastChar = '\0';
 
   HB_TRACE(HB_TR_DEBUG, ("RemoveSlash(%s)", stroka));
 
   while( *ptr != '\0' )
-    {
-      switch( State ) {
-      case STATE_INIT:
-        if( *ptr != ' ' && *ptr != '\t' ) State = STATE_NORMAL;
-        if( *ptr == '#' )  bDirective = TRUE;
-      case STATE_NORMAL:
-        if( *ptr == '\'' )  State = STATE_QUOTE1;
-        else if( *ptr == '\"' )  State = STATE_QUOTE2;
-        else if( *ptr == '[' )  State = STATE_QUOTE3;
-        else if( *ptr == ';' )
+  {
+     switch( State )
+     {
+        case STATE_INIT:
+          if( *ptr != ' ' && *ptr != '\t' ) State = STATE_NORMAL;
+          if( *ptr == '#' )  bDirective = TRUE;
+
+        case STATE_NORMAL:
+          if( *ptr == '\'' )  State = STATE_QUOTE1;
+          else if( *ptr == '\"' )  State = STATE_QUOTE2;
+          else if( *ptr == '[' && ( bDirective || ( ( strchr( ")]}.", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) ) ) )  State = STATE_QUOTE3;
+          else if( *ptr == ';' )
           {
             State = STATE_INIT;
             bDirective = FALSE;
           }
-        else if( !bDirective )
+          else if( !bDirective )
           {
-            if( *ptr == '\\' && ( *(ptr+1) == '[' || *(ptr+1) == ']' ||
-                                  *(ptr+1) == '{' || *(ptr+1) == '}' || *(ptr+1) == '<' ||
-                                  *(ptr+1) == '>' || *(ptr+1) == '\'' || *(ptr+1) == '\"' ) )
-              {
+             if( *ptr == '\\' && ( *(ptr+1) == '[' || *(ptr+1) == ']' ||
+                                   *(ptr+1) == '{' || *(ptr+1) == '}' || *(ptr+1) == '<' ||
+                                   *(ptr+1) == '>' || *(ptr+1) == '\'' || *(ptr+1) == '\"' ) )
+             {
                 hb_pp_Stuff( "", ptr, 0, 1, lenres - (ptr - stroka) );
                 lenres--;
-              }
+             }
           }
-        break;
-      case STATE_QUOTE1:
-        if( *ptr == '\'' )  State = STATE_NORMAL;
-        break;
-      case STATE_QUOTE2:
-        if( *ptr == '\"' )  State = STATE_NORMAL;
-        break;
-      case STATE_QUOTE3:
-        if( *ptr == ']' )  State = STATE_NORMAL;
-        break;
-      }
-      ptr++;
-    }
+          break;
+
+        case STATE_QUOTE1:
+          if( *ptr == '\'' )  State = STATE_NORMAL;
+          break;
+
+        case STATE_QUOTE2:
+          if( *ptr == '\"' )  State = STATE_NORMAL;
+          break;
+
+        case STATE_QUOTE3:
+          if( *ptr == ']' )  State = STATE_NORMAL;
+          break;
+     }
+
+     cLastChar = *ptr;
+     ptr++;
+  }
+
   return lenres;
 }
 
@@ -2881,6 +2890,10 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
             ptr2++;
          }
 
+         #ifdef DEBUG_MARKERS
+            printf( "Markers: %i\n", kolmarkers );
+         #endif
+
          if( s_Repeate && lenreal && kolmarkers && lastchar != '0' && *(ptrOut + ifou + 2) == '0' )
          {
             isdvig += ifou;
@@ -2934,13 +2947,13 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                      {
                         if( *(expnew+i) == '\1' )
                         {
-                            *(expnew+i+3) = s_groupchar;
+                           *(expnew+i+3) = s_groupchar;
 
-                            #ifdef DEBUG_MARKERS
-                               printf( "   Group char: %s\n", (expnew+i+3) );
-                            #endif
+                           #ifdef DEBUG_MARKERS
+                              printf( "   Group char: %s\n", (expnew+i+3) );
+                           #endif
 
-                            i += 4;
+                           i += 4;
                         }
                      }
                   }
@@ -2948,6 +2961,34 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                   hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres-(ptr-ptro)+1 );
                   *lenres += lennew;
                   isdvig = ptr - ptro + (ptr2-ptr-1) + lennew;
+                  rezs = TRUE;
+
+                  #ifdef DEBUG_MARKERS
+                     printf( "   Instanciated Repeatable Group: %s\n", expnew );
+                  #endif
+               }
+               else
+               {
+                  // Don't change order must perform first.
+                  // Only marker in this repeatable group, and it's not repeatable.
+                  if( kolmarkers == 0 )
+                  {
+                     ptr[0]  = ' ';
+                     ptr2[0] = ' ';
+
+                     #ifdef DEBUG_MARKERS
+                        printf( "   Removed Repeatable Squares for Non Repeatable exclusive Marker: '%s'\n", ptr );
+                     #endif
+                  }
+
+                  // Replace NON repeatable into the residual repeatable container.
+                  *lenres += ReplacePattern( exppatt[2], expreal, lenreal, ptrOut + ifou - 1, *lenres-isdvig-ifou+1 );
+                  isdvig += ifou - 1;
+
+                  #ifdef DEBUG_MARKERS
+                     printf( "   Replaced non repeatable into Residual Group '%s'\n", ptr );
+                  #endif
+
                   rezs = TRUE;
                }
             }
