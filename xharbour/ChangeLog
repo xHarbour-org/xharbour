@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3791 2005/02/04 01:11:47 druzus Exp $
+ * $Id: ChangeLog,v 1.3792 2005/02/04 09:11:01 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-04 15:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/thread.h
+    ! Added a #define WIN32_LEAN_AND_MEAN to prevent uncontrolled inclusion of
+      ole2.h from windows.h which led to errors during compilation of
+      source/rtl/win32ole.prg.
 
 2005-02-04 09:37 UTC+0100 Patrick Mast <patrick@xHarbour.com>
   * utils/hbdoc/genchm.prg

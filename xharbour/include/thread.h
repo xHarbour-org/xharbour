@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.99 2004/12/31 11:55:49 druzus Exp $
+* $Id: thread.h,v 1.100 2005/01/25 10:47:49 druzus Exp $
 */
 
 /*
@@ -74,7 +74,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 #define HB_THREAD_MAX_UNIQUE_ID  32000
 #define HB_MUTEX_SIGNATURE       0xF0316913
 
-/* Maximun number of cycles that can be completed by VM without stack unlock */
+/* Maximum number of cycles that can be completed by VM without stack unlock */
 #define HB_VM_UNLOCK_PERIOD 5000
 
 #if defined(HB_OS_WIN_32)
@@ -82,6 +82,10 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       #define _WIN32_WINNT 0x0400
    #endif
    #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
+
+   /* Prevent inclusion of ole2.h and other extraneous headers in windows.h */
+   #define WIN32_LEAN_AND_MEAN
+
    #include <windows.h>
 
    typedef struct tag_HB_WINCOND_T
