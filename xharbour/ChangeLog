@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2608 2004/03/19 21:45:11 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2609 2004/03/20 00:27:19 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-19 19:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbcmd.c
+    ! Fixed GPF Trap in __dbDelim()
+    % Optimized __dbDelim()
+
+  /* Andi please note that you can NEVER use:
+
+         hb_strupr( pParam->item.asString.value )
+
+     The reason is the hb_strupr() converts to upper IN-PLACE, but the Paramater may be a STATIC String.
+     This is a very bad GPF Trap. Additionally please review the above change to see more efficent handling
+     of short strings. Remeber Strings are ARRAYS of characters.
+  */
 
 2004-03-19 16:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c

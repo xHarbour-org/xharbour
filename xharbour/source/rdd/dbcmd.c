@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.95 2004/03/17 02:29:00 druzus Exp $
+ * $Id: dbcmd.c,v 1.96 2004/03/18 03:57:29 ronpinkas Exp $
  */
 
 /*
@@ -5323,7 +5323,6 @@ HB_FUNC( __DBDELIM )
       BOOL bExport = hb_parl( 1 );
       char *cFileName = hb_parcx( 2 );
       PHB_ITEM pDelimArg = hb_param( 3, HB_IT_STRING );
-      char *cDelimArg;
       PHB_ITEM pFields = hb_param( 4, HB_IT_ARRAY );
       PHB_ITEM pFor = hb_param( 5, HB_IT_BLOCK );
       PHB_ITEM pWhile = hb_param( 6, HB_IT_BLOCK );
@@ -5334,24 +5333,27 @@ HB_FUNC( __DBDELIM )
       PHB_FNAME pFileName;
       FHANDLE handle;
       LONG lStart, lCount;
-      BYTE *cSeparator = (BYTE*) ",";
-      BYTE *cDelim = (BYTE*) "\"";
+      char cSeparator[] = ",";
+      char cDelim[] = "\"";
       char szFileName[ _POSIX_PATH_MAX + 1 ];
 
       BOOL bRetry;
 
       if( pDelimArg )
       {
-         cDelimArg = hb_strupr( pDelimArg->item.asString.value );
-
-         if ( strcmp ( cDelimArg, "BLANK" ) == 0 )
+         if( toupper( pDelimArg->item.asString.value[0] ) == 'B' &&
+             toupper( pDelimArg->item.asString.value[1] ) == 'L' &&
+             toupper( pDelimArg->item.asString.value[2] ) == 'A' &&
+             toupper( pDelimArg->item.asString.value[3] ) == 'N' &&
+             toupper( pDelimArg->item.asString.value[4] ) == 'K' &&
+             pDelimArg->item.asString.value[5] == '\0' )
          {
-            cDelim = (BYTE*) "";
-            cSeparator = (BYTE*) " ";
+            cDelim[0] = '\0';
+            cSeparator[0] = ' ';
          }
          else
          {
-            strncpy( (char*) cDelim, cDelimArg, 1 );
+            cDelim[0] = pDelimArg->item.asString.value[0];
          }
       }
 
@@ -5453,7 +5455,7 @@ HB_FUNC( __DBDELIM )
          }
 
          // Doing things now
-         hb_Dbf2Text( pWhile, pFor, pFields, (char*) cDelim, handle, cSeparator, lCount );
+         hb_Dbf2Text( pWhile, pFor, pFields, cDelim, handle, cSeparator, lCount );
 
          hb_fsClose( handle );
       }
