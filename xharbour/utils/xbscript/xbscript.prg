@@ -9907,7 +9907,8 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
 
    LOCAL bErrHandler, oError, xRet
    LOCAL aProcedure, bPreset, aPresetProcedures
-
+   LOCAL nProc
+   
    #ifdef __XHARBOUR__
       #ifdef DYN
          LOCAL nPresetDyn
@@ -9918,10 +9919,10 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
       nLine := 0
    ENDIF
 
-	 IF aProcedures == s_aProcedures
-			bPreset := .F.
-	 ELSE
-			bPreset := .T.
+   IF aProcedures == s_aProcedures
+      bPreset := .F.
+   ELSE
+      bPreset := .T.
 
       aPresetProcedures := s_aProcedures
       s_aProcedures := aProcedures
@@ -9931,10 +9932,10 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
             nPresetDyn := PP_GenDynProcedures( aProcedures )
          #endif
       #endif
-	 ENDIF
+   ENDIF
 
-   IF bScriptProc
-      PP_ExecProcedure( s_aProcedures, aScan( aProcedures, {|aProc| aProc[1] == cExp } ) )
+   IF bScriptProc .AND. ( nProc := aScan( aProcedures, {|aProc| aProc[1] == cExp } ) ) > 0
+      PP_ExecProcedure( s_aProcedures, nProc )
 
       IF bPreset
          s_aProcedures := aPresetProcedures
@@ -10045,11 +10046,10 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
    InitRunRules()
    InitRunResults()
 
-	 IF aProcedures == s_aProcedures
-			bPreset := .F.
-
-	 ELSE
-			bPreset := .T.
+   IF aProcedures == s_aProcedures
+      bPreset := .F.
+   ELSE
+      bPreset := .T.
 
       aPresetProcedures := s_aProcedures
       s_aProcedures := aProcedures
@@ -10059,7 +10059,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
             nPresetDyn := PP_GenDynProcedures( aProcedures )
          #endif
       #endif
-	 ENDIF
+   ENDIF
 
    BEGIN SEQUENCE
       nProcs := Len( aInitExit[1] )

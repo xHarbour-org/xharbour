@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.70 2005/03/03 20:29:04 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.71 2005/03/04 22:58:50 ronpinkas Exp $
  */
 
 /*
@@ -385,7 +385,7 @@ RETURN xRet
      return wString;
   }
 
-  static BSTR AnsiToBSTR( LPSTR cString )
+  static BSTR AnsiToSysString( LPSTR cString )
   {
      UINT uLen;
      LPWSTR wString;
@@ -409,6 +409,7 @@ RETURN xRet
      //wprintf( L"\nWide: '%s'\n", wString );
 
      bstrString = SysAllocString( wString );
+
      hb_xfree( wString );
 
      return bstrString;
@@ -496,16 +497,16 @@ RETURN xRet
               case HB_IT_MEMO:
                 if( bByRef )
                 {
-                   bstrString = AnsiToBSTR( hb_parcx( nArg ) );
+                   bstrString = AnsiToWide( hb_parcx( nArg ) );
                    hb_itemReleaseString( uParam );
-                   uParam->item.asString.value = (char *) bstrString;
+                   hb_itemPutCRaw( uParam, (char *) bstrString, uParam->item.asString.length * 2 + 1 );
                    pArgs[ n ].n1.n2.vt   = VT_BYREF | VT_BSTR;
                    pArgs[ n ].n1.n2.n3.pbstrVal = (BSTR *) &( uParam->item.asString.value );
                 }
                 else
                 {
                    pArgs[ n ].n1.n2.vt   = VT_BSTR;
-                   pArgs[ n ].n1.n2.n3.bstrVal = AnsiToBSTR( hb_parcx( nArg ) );
+                   pArgs[ n ].n1.n2.n3.bstrVal = AnsiToSysString( hb_parcx( nArg ) );
                 }
                 break;
 
@@ -695,6 +696,7 @@ RETURN xRet
                  case VT_BYREF | VT_BSTR:
                    //printf( "String\n" );
                    sString = WideToAnsi( *( pDispParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
+
                    SysFreeString( *( pDispParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
 
                    hb_itemPutCPtr( aPrgParams[ n ], sString, strlen( sString ) );
@@ -787,6 +789,7 @@ RETURN xRet
               switch( pDispParams->rgvarg[ n ].n1.n2.vt )
               {
                  case VT_BSTR:
+                   break;
 
                  case VT_DISPATCH:
                    //TraceLog( NULL, "***NOT REF*** Dispatch %p\n", pDispParams->rgvarg[ n ].n1.n2.n3.pdispVal );
@@ -1005,7 +1008,9 @@ RETURN xRet
 
         source = WideToAnsi( excep.bstrSource );
         description = WideToAnsi( excep.bstrDescription );
+
         MessageBox( NULL, description, source, MB_ICONHAND );
+
         hb_xfree( source );
         hb_xfree( description );
      }
@@ -1186,7 +1191,7 @@ RETURN xRet
      LPIID riid = (LPIID) &IID_IDispatch;
      IDispatch *pDisp;
 
-     bstrClassID = AnsiToBSTR( hb_parcx( 1 ) );
+     bstrClassID = AnsiToSysString( hb_parcx( 1 ) );
 
      if( hb_parcx( 1 )[ 0 ] == '{' )
      {
@@ -1205,7 +1210,7 @@ RETURN xRet
      {
         if( hb_parcx( 2 )[ 0 ] == '{' )
         {
-           bstrClassID = AnsiToBSTR( hb_parcx( 2 ) );
+           bstrClassID = AnsiToSysString( hb_parcx( 2 ) );
            s_nOleError = CLSIDFromString( bstrClassID, &iid );
            SysFreeString( bstrClassID );
         }
@@ -1243,7 +1248,7 @@ RETURN xRet
 
      if( ( s_nOleError == S_OK ) || ( s_nOleError == (HRESULT) S_FALSE) )
      {
-        bstrClassID = AnsiToBSTR( hb_parcx( 1 ) );
+        bstrClassID = AnsiToSysString( hb_parcx( 1 ) );
 
         if( hb_parcx( 1 )[ 0 ] == '{' )
         {
@@ -1263,7 +1268,7 @@ RETURN xRet
         {
            if( hb_parcx( 2 )[ 0 ] == '{' )
            {
-              bstrClassID = AnsiToBSTR( hb_parcx( 2 ) );
+              bstrClassID = AnsiToSysString( hb_parcx( 2 ) );
               s_nOleError = CLSIDFromString( bstrClassID, &iid );
               SysFreeString( bstrClassID );
            }
@@ -1389,7 +1394,7 @@ RETURN xRet
 
      if( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[0] == '_' && ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[1] && hb_pcount() >= 1 )
      {
-        bstrMessage = AnsiToBSTR( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
+        bstrMessage = AnsiToSysString( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_USER_DEFAULT, &DispID );
         SysFreeString( bstrMessage );
         //TraceLog( NULL, "1. ID of: '%s' -> %i Result: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1, DispID, s_nOleError );
@@ -1402,7 +1407,7 @@ RETURN xRet
      if( s_nOleError != S_OK )
      {
         // Try again without removing the assign prefix (_).
-        bstrMessage = AnsiToBSTR( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
+        bstrMessage = AnsiToSysString( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, 0, &DispID );
         SysFreeString( bstrMessage );
         //TraceLog( NULL, "2. ID of: '%s' -> %i Result: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, DispID, s_nOleError );
@@ -1485,6 +1490,7 @@ RETURN xRet
 
         if( s_nOleError == DISP_E_EXCEPTION )
         {
+           // Intentional to avoid report of memory leak if fatal error.
            char *sTemp = WideToAnsi( excep.bstrDescription );
            sDescription = (char *) malloc( strlen( sTemp ) + 1 );
            strcpy( sDescription, sTemp );
