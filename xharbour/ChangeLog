@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3460 2004/09/21 22:30:58 druzus Exp $
+ * $Id: ChangeLog,v 1.3461 2004/09/22 14:50:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-09-22 17:18 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/xharbour.spec
+    * changed version number to 0.99.1
+
 2004-09-20 07:46 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbver.h
   * bin/pack_bin.bat
@@ -15,7 +19,7 @@
     * Refreshed for 0.99.1
 
 2004-09-22 00:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
-  * xharbour/source/vm/fm.c
+  * xharbour/source/common/hbstr.c
     * hb_fsFNameMerge() changed to use only _POSIX_PATH_MAX - 1
       significant characters plus leading 0 char until other sources
       will not have been changed to use _POSIX_PATH_MAX + 1 buffer size
