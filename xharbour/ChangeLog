@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2018 2004/01/07 23:39:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2019 2004/01/08 08:45:35 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-08 15:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/bldtest.bat
+    * Fixed to show help if called with no params (was hung).
+    * Clean after %2.c|obj|tds and %3.c|obj|tds if existing.
+    + Added support for /WVT or /wvt and logic to allow multiple arguments support.
+
 2004-01-08 14:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c
     + Wvt_DrawBoxGroupRaised( nTop, nLeft, nBottom, nRight )
-    ! Wvt_SetMouseMove( lSetMove ) 
+    ! Wvt_SetMouseMove( lSetMove )
       Now the function returns the previous state of mouse movement set flag.
 
 2004-01-07 15:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
