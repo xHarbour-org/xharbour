@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.47 2004/12/17 08:07:02 bdj Exp $
+rem $Id: bld.bat,v 1.48 2005/01/26 02:34:49 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -111,7 +111,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
 :COMPILE
 
-   echo Compilando
+   echo Compiling...
    echo %HB_BIN_INSTALL%\harbour %1.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
    %HB_BIN_INSTALL%\harbour %1.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
    IF NOT '%2'=='' %HB_BIN_INSTALL%\harbour %2.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3800 2005/02/08 16:52:47 druzus Exp $
+ * $Id: ChangeLog,v 1.3801 2005/02/08 18:32:28 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-10 15:02 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbclass.ch
+    % Optimized repeated #translate related to Super, bu using #untranslate.
+    % Optimized out some unneeded Repeat Markers, in Super related rules.
+  * bin/bld.bat
+    * Compliando -> Compiling
 
 2005-02-08 10:28 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbclass.ch

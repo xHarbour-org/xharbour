@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.25 2005/01/27 16:30:36 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.26 2005/02/08 18:35:07 ronpinkas Exp $
  */
 
 /*
@@ -253,11 +253,14 @@ DECLARE HBClass ;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
      #xtranslate CLSMETH <ClassName> \<MethodName> => @<ClassName>_\<MethodName> ;;
      #xtranslate DECLCLASS <ClassName> => <ClassName> ;;
+     ; #untranslate Super() : ;
+     ; #untranslate Super : ;
+     ; #untranslate : Super : ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
-     [ ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ] ;
-     [ ; #translate Super() : => ::<SuperClass1>: ] ;
-     [ ; #translate Super : => ::<SuperClass1>: ] ;
-     [ ; #translate : Super : => :<SuperClass1>: ]
+     ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
+     ; #translate Super() : => ::<SuperClass1>: ;
+     ; #translate Super : => ::<SuperClass1>: ;
+     ; #translate : Super : => :<SuperClass1>:
 
 #else
 
@@ -278,11 +281,14 @@ DECLARE HBClass ;
      #undef  _CLASS_MODE_ ;;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
      #translate CLSMETH <ClassName> \<MethodName>() => @\<MethodName> ;
+     ; #untranslate Super() : ;
+     ; #untranslate Super : ;
+     ; #untranslate : Super : ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
-     [ ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ] ;
-     [ ; #translate Super() : => ::<SuperClass1>: ] ;
-     [ ; #translate Super : => ::<SuperClass1>: ] ;
-     [ ; #translate : Super : => :<SuperClass1>: ]
+     ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
+     ; #translate Super() : => ::<SuperClass1>: ;
+     ; #translate Super : => ::<SuperClass1>: ;
+     ; #translate : Super : => :<SuperClass1>:
 
 #endif /* HB_SHORTNAMES */
 
@@ -308,11 +314,14 @@ DECLARE HBClass ;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
      #xtranslate CLSMETH <ClassName> \<MethodName> => @<ClassName>_\<MethodName> ;;
      #xtranslate DECLCLASS <ClassName> => <ClassName> ;;
+     ; #untranslate Super() : ;
+     ; #untranslate Super : ;
+     ; #untranslate : Super : ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
-     [ ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ] ;
-     [ ; #translate Super() : => ::<SuperClass1>: ] ;
-     [ ; #translate Super : => ::<SuperClass1>: ] ;
-     [ ; #translate : Super : => :<SuperClass1>: ]
+     ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
+     ; #translate Super() : => ::<SuperClass1>: ;
+     ; #translate Super : => ::<SuperClass1>: ;
+     ; #translate : Super : => :<SuperClass1>:
 
 #xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] FUNCTION <FuncName> => ;
    _HB_CLASS <ClassName> ;;
@@ -330,11 +339,14 @@ DECLARE HBClass ;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
      #xtranslate CLSMETH <ClassName> \<MethodName> => @<ClassName>_\<MethodName> ;;
      #xtranslate DECLCLASS <ClassName> => <ClassName> ;;
+     ; #untranslate Super() : ;
+     ; #untranslate Super : ;
+     ; #untranslate : Super : ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
-     [ ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ] ;
-     [ ; #translate Super() : => ::<SuperClass1>: ] ;
-     [ ; #translate Super : => ::<SuperClass1>: ] ;
-     [ ; #translate : Super : => :<SuperClass1>: ]
+     ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
+     ; #translate Super() : => ::<SuperClass1>: ;
+     ; #translate Super : => ::<SuperClass1>: ;
+     ; #translate : Super : => :<SuperClass1>:
 
 #else
 
@@ -353,11 +365,14 @@ DECLARE HBClass ;
      #undef  _CLASS_MODE_ ;;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
      #translate CLSMETH <ClassName> \<MethodName>() => @\<MethodName> ;
+     ; #untranslate Super() : ;
+     ; #untranslate Super : ;
+     ; #untranslate : Super : ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
-     [ ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ] ;
-     [ ; #translate Super() : => ::<SuperClass1>: ] ;
-     [ ; #translate Super : => ::<SuperClass1>: ] ;
-     [ ; #translate : Super : => :<SuperClass1>: ] ;
+     ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
+     ; #translate Super() : => ::<SuperClass1>: ;
+     ; #translate Super : => ::<SuperClass1>: ;
+     ; #translate : Super : => :<SuperClass1>:
 
 #endif /* HB_SHORTNAMES */
 
