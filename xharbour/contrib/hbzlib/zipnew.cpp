@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.18 2004/03/18 13:55:10 lculik Exp $
+ * $Id: zipnew.cpp,v 1.20 2004/03/24 03:18:05 lculik Exp $
  */
 
 /*
@@ -227,7 +227,6 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
    {
       szZip.SetAdvanced( pZipI.iWrite, pZipI.iExtract, pZipI.iRead );
    }
-
    try
    {
       switch( iOMode )
@@ -1001,7 +1000,9 @@ int hb_CheckSpanMode( char * szFile )
 
    try
    {
-      szZip.Open( szFile, CZipArchive::zipOpen, 0 );
+// s.r. to avoid GPF when ZIP file is read only !
+//      szZip.Open( szFile, CZipArchive::zipOpen, 0 );
+        szZip.Open( szFile, pZipI.iReadOnly ? CZipArchive::zipOpenReadOnly : CZipArchive::zipOpen, 0 );
    }
 
    catch( CZipException &e )
@@ -1016,7 +1017,6 @@ int hb_CheckSpanMode( char * szFile )
          iReturn = 103;
       }
    }
-
    if ( ! iReturn )
    {
       iReturn = szZip.GetSpanMode( );
