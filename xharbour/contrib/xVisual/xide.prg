@@ -175,9 +175,13 @@ CLASS ObjEdit FROM TForm
                                 ::height  := 300,;
                                 super:new( oParent )
    METHOD OnCreate()
+   METHOD OnSize(n,x,y)  INLINE ::QuickEdit:Move(,,x,y,.t.),nil
 ENDCLASS
 
 METHOD OnCreate() CLASS ObjEdit
    local aRect := ::ClientRect()
-   ::Add('QuickEdit', TEdit():New( self, "", 101,  0,0, aRect[3], aRect[4] ) )
+   ::Add('QuickEdit', TEdit():New( self, "", 101,  0,0, aRect[3], aRect[4] ),.F. )
+   ::QuickEdit:Style := WS_CHILD+WS_VISIBLE+ES_MULTILINE+WS_BORDER+WS_VSCROLL+WS_HSCROLL+WS_TABSTOP
+   ::QuickEdit:create()
 return(nil)
+
