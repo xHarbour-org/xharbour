@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.20 2002/09/18 03:00:49 ronpinkas Exp $
+ * $Id: genc.c,v 1.21 2002/09/19 01:57:42 ronpinkas Exp $
  */
 
 /*
@@ -264,7 +264,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          }
 
          fprintf( yyc, "                                           };\n"
-                       "static PHB_ITEM *pGlobals = pConstantGlobals;\n\n" );
+                       "static PHB_ITEM *pGlobals = (PHB_ITEM *) pConstantGlobals;\n\n" );
       }
 
       /* Generate functions data
