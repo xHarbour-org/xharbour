@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.114 2004/12/09 13:41:39 lf_sfnet Exp $
+ * $Id: arrays.c,v 1.115 2004/12/27 11:06:10 lf_sfnet Exp $
  */
 
 /*
@@ -82,6 +82,7 @@
 #endif
 
 extern char *hb_vm_acAscii[256];
+int hb_arrayMode( void );
 
 BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
 {
@@ -1862,10 +1863,18 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
            hb_procinfo( 0, szProc, &uiLine, szModule  );
            TraceLog( NULL, "Warning! Could not locate owner %p of garbage array %p [%s->%s(%i)]\n", pHolder, pBaseArray, szModule, szProc, uiLine );
-        #endif 
+        #endif
       }
 
       //TraceLog( NULL, "DONE hb_arrayReleaseHolder( %p, %p )\n", pBaseArray, pHolder );
    }
 #endif
 
+int hb_arrayMode()
+{
+   #ifdef HB_ARRAY_USE_COUNTER
+      return 0;
+   #else
+      return 1;
+   #endif
+}

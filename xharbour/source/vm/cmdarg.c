@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.15 2004/05/08 13:42:06 andijahja Exp $
+ * $Id: cmdarg.c,v 1.16 2005/03/06 00:53:04 andijahja Exp $
  */
 
 /*
@@ -351,7 +351,8 @@ void hb_cmdargProcessVM( void )
 
    if( hb_cmdargCheck( "BUILD" ) )
    {
-      hb_verBuildInfo();
+      char * szBldInfo = hb_verBuildInfo( TRUE );
+      hb_xfree( szBldInfo );
    }
 
    iHandles = hb_cmdargNum( "F" );
