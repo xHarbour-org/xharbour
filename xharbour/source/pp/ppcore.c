@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.104 2003/12/11 05:09:26 andijahja Exp $
+ * $Id: ppcore.c,v 1.105 2003/12/17 23:55:14 ronpinkas Exp $
  */
 
 /*
@@ -1712,7 +1712,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
      if( rpatt[i] == '\\' )
      {
-        if( rpatt[ i + 1 ] != '[' && rpatt[ i + 1 ] != ']' && rpatt[ i + 1 ] != '<' )
+        if( rpatt[ i + 1 ] != '[' && rpatt[ i + 1 ] != ']' && rpatt[ i + 1 ] != '<' && rpatt[ i + 1 ] != '\\' )
         {
            hb_pp_Stuff( "", rpatt + i, 0, 1, rplen - i );
            rplen--;

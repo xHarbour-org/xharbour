@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1919 2003/12/22 01:27:14 peterrees Exp $
+ * $Id: ChangeLog,v 1.1920 2003/12/22 02:08:32 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-21 20:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed handling of multiple escapes (//) to allow generation of escape in nested #directive
+      (reported by Francesco)
+
+  * source/pp/ppcomp.c
+    + Added logic to generate output for nested #directives genreated by pre-processing (Clipper compatibility).
+
 2003-12-22 15:07 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * fixed HB_GT_FUNC(gt_SetAttribute( )) so hb_shadow() works correctly
 

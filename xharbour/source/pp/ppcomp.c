@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.5 2003/04/03 17:49:21 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.6 2003/04/05 20:00:51 ronpinkas Exp $
  */
 
 /*
@@ -94,6 +94,7 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
      pFile = hb_comp_files.pLast;
      lens = lContinue = 0;
      ptrOut = sOut;
+
      while( ( rdlen = hb_pp_RdStr( pFile->handle, s_szLine + lens, HB_PP_STR_SIZE - 1 -
                   lens, lContinue, ( char * ) pFile->pBuffer, &( pFile->lenBuffer ),
                   &( pFile->iBuffer ), State ) ) >= 0 )
@@ -116,11 +117,18 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
         if( s_szLine[ lens - 1 ] == ';' )
         {
            lContinue = 1;
+
            lens--;
            lens--;
-           while( s_szLine[ lens ] == ' ' || s_szLine[ lens ] == '\t' ) lens--;
+
+           while( s_szLine[ lens ] == ' ' || s_szLine[ lens ] == '\t' )
+           {
+              lens--;
+           }
+
            s_szLine[ ++lens ] = ' ';
            s_szLine[ ++lens ] = '\0';
+
            State = STATE_NORMAL;
         }
         else
@@ -130,7 +138,7 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
            State = 0;
         }
 
-        if( !lContinue )
+        if( ! lContinue )
         {
            if( *s_szLine != '\0' )
            {
@@ -146,39 +154,48 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
                     pFile = ( PFILE ) ( ( PFILE ) hb_comp_files.pLast )->pPrev;
 
                     if( lLine )
+                    {
                        sprintf( s_szLine, "#line %d \"%s\"\n", pFile->iLine, pFile->szFileName );
+                    }
                     else
+                    {
                        *s_szLine = '\0';
+                    }
 
                     lLine = 0;
-                    sprintf( s_szLine + strlen(s_szLine), "#line 1 \"%s\"", hb_comp_files.pLast->szFileName );
+                    sprintf( s_szLine + strlen( s_szLine ), "#line 1 \"%s\"", hb_comp_files.pLast->szFileName );
                  }
                  else
+                 {
                     *s_szLine = '\0';
+                 }
               }
               else
               {
                  if( *ptr == '\0' )
                  {
                     if( hb_comp_files.iFiles == 1 )
+                    {
                        *s_szLine = '\0';
+                    }
                     else
+                    {
                        continue;
+                    }
                  }
                  else
                  {
                     if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] )
                     {
-                       /* Ron Pinkas removed 2001-01-20
-                       if( ( hb_pp_LastOutLine < hb_comp_iLine - 1 ) && hb_comp_files.iFiles == 1 && handl_o )
-                          for( ; hb_pp_LastOutLine < hb_comp_iLine-1; hb_pp_LastOutLine++ )
-                             hb_pp_WrStr( handl_o, "\n" );
-                       hb_pp_LastOutLine = hb_comp_iLine;
-                       */
+                       //printf( "Parse: >%s<\n", ptr );
                        hb_pp_ParseExpression( ptr, s_szOutLine );
+                       //printf( "1-Parsed: >%s<\n", s_szLine );
+                       //printf( "2-Parsed: >%s<\n", s_szOutLine );
                     }
                     else
+                    {
                        *s_szLine = '\0';
+                    }
                  }
               }
            }
@@ -190,7 +207,9 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
      if( rdlen < 0 )
      {
         if( hb_comp_files.iFiles == 1 )
+        {
            return 0;      /* we have reached the main EOF */
+        }
         else
         {
            CloseInclude();
@@ -203,17 +222,33 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
        /* Ron Pinkas end 2000-06-22 */
      }
 
-     if( *s_szLine ) break;
+     if( *s_szLine )
+     {
+        break;
+     }
+     else
+     {
+        if( s_szOutLine[0] == '#' )
+        {
+           hb_pp_WrStr( handl_o, s_szOutLine );
+           s_szOutLine[0] = '\0';
+        }
+     }
   }
 
   if( lLine )
   {
      if( hb_comp_files.iFiles == 1 )
+     {
         hb_pp_LastOutLine = hb_comp_iLine;
+     }
 
      sprintf( ptrOut, "#line %d \"%s\"", ( hb_comp_files.pLast->iLine ) , hb_comp_files.pLast->szFileName );
 
-     while( *ptrOut ) ptrOut++;
+     while( *ptrOut )
+     {
+        ptrOut++;
+     }
 
      /* Ron Pinkas added 2000-06-14 */
      tmpPtr = s_szLine;
@@ -227,24 +262,8 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
      }
      /* Ron Pinkas end 2000-06-14 */
   }
-  else
-  {
-     /* Ron Pinkas added 2000-06-13 */
-        /* Ignore empty lines in #included files. */
-     /* Ron Pinkas removed 2001-01-20 */
-     #if 0
-     if( ( hb_pp_LastOutLine != hb_comp_iLine ) && hb_comp_files.iFiles == 1 && handl_o )
-     /* Ron Pinkas end 2000-06-13 */
-        for( ; hb_pp_LastOutLine < hb_comp_iLine; hb_pp_LastOutLine++ )
-            hb_pp_WrStr( handl_o, "\n" );
-    #endif
-    /* END Ron Pinkas removed 2001-01-20 */
-  }
 
   lens = hb_pp_strocpy( ptrOut, s_szLine ) + ( ptrOut - sOut );
-
-  *( sOut + lens++ ) = '\n';
-  *( sOut + lens ) = '\0';
 
   if( hb_comp_iLineINLINE && hb_pp_bInline == 0 )
   {
@@ -254,7 +273,37 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
 
   if( handl_o )
   {
-     hb_pp_WrStr( handl_o, sOut );
+     char *pTmp = sOut;
+
+     HB_SKIPTABSPACES( pTmp );
+
+     //printf( "1>%s<\n", sOut );
+     //printf( "2>%s<\n", s_szOutLine );
+
+     if( s_szOutLine[0] && ( strstr( s_szOutLine, pTmp ) ) )
+     {
+        if( pTmp > sOut )
+        {
+           hb_pp_Stuff( sOut, s_szOutLine, pTmp - sOut, 0, strlen( s_szOutLine ) );
+        }
+
+        hb_pp_WrStr( handl_o, s_szOutLine );
+     }
+     else if( s_szOutLine[0] == '#' && strstr( pTmp, s_szOutLine ) == NULL )
+     {
+        strcpy( sOut + lens, s_szOutLine );
+
+        hb_pp_WrStr( handl_o, sOut );
+     }
+     else
+     {
+        hb_pp_WrStr( handl_o, sOut );
+     }
+
+     *( sOut + lens++ ) = '\n';
+     *( sOut + lens ) = '\0';
+
+     s_szOutLine[0] = '\0';
   }
 
   #if 0
