@@ -411,9 +411,9 @@ STATIC s_lReturnRequested
 
 #ifdef REVISION
 	 #xtranslate Stringify( <x> ) => #<x>
-   STATIC s_cVer := "1.0.RC7" + Stringify( REVISION )
+   STATIC s_cVer := "1.0.RC8" + Stringify( REVISION )
 #else
-   STATIC s_cVer := "1.0.RC7"
+   STATIC s_cVer := "1.0.RC8"
 #endif
 
 //--------------------------------------------------------------//
@@ -1979,7 +1979,7 @@ RETURN
 
 //--------------------------------------------------------------//
 
-PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
+FUNCTION PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
    LOCAL nBaseProc := s_nProcId, sPresetModule := s_sModule, nProc
    LOCAL bErrHandler, oError
@@ -9527,7 +9527,7 @@ RETURN xRet
 #endif
 
 //--------------------------------------------------------------//
-FUNCTION PP_Exec( aProcedures, aInitExit, nProcId, aParams )
+FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
 
    LOCAL nProc, nProcs, xRet
    LOCAL oError, bErrHandler := ErrorBlock()
@@ -9537,6 +9537,10 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nProcId, aParams )
       s_aParams := aParams
    ELSE
       s_aParams := {}
+   ENDIF
+
+   IF nStartup == NIL
+      nStartup := 1
    ENDIF
 
    InitRules()
@@ -9563,7 +9567,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nProcId, aParams )
          PP_ExecProcedure( aProcedures, aInitExit[1][nProc] )
       NEXT
 
-      FOR nProc := 1 TO nProcId
+      FOR nProc := nStartup TO nScriptProcs
          IF aScan( aInitExit[1], nProc ) == 0 .AND. aScan( aInitExit[2], nProc ) == 0
             xRet := PP_ExecProcedure( aProcedures, nProc )
             EXIT

@@ -30,6 +30,7 @@
 
      DATA cCompiledText        INIT ""
      DATA nCompiledLines       INIT 0
+     DATA nNextStartProc       INIT 1
      DATA cText                INIT ""
      DATA acPPed               INIT {}
      DATA cPPed                INIT ""
@@ -49,7 +50,7 @@
      METHOD GetPPO()                                    INLINE ( ::cPPed )
 
      METHOD Compile()
-     METHOD Run()
+     METHOD Run( p1, p2, p3, p4, p5, p6, p7, p8, p9 )
      METHOD RunFile( cFile, aParams, cPPOExt, bBlanks ) INLINE PP_Run( cFile, aParams, cPPOExt, bBlanks )
 
      #ifdef __XHARBOUR__
@@ -79,7 +80,7 @@
   //----------------------------------------------------------------------------//
   METHOD Compile() CLASS  TInterpreter
 
-     LOCAL nLine, nLines, sLine, nProcId := 0
+     LOCAL nLine, nLines, sLine, nProcID := ::nProcs
      LOCAL bErrHandler, oError
 
      IF Empty( ::cText )
@@ -90,7 +91,7 @@
 
      BEGIN SEQUENCE
 
-        IF ::nProcs == 0
+        IF nProcID == 0
            PP_InitStd()
            PP_LoadRun()
 
@@ -102,6 +103,9 @@
            ::nCompiledLines     := 0
            ::nProcs             := 0
            ::aScriptHostGlobals := {}
+           ::nNextStartProc     := 1
+        ELSE
+           ::nNextStartProc := nProcID + 1
         ENDIF
 
         ::cPPed += PP_PreProText( ::cText, ::acPPed, .T., .F., ::nStartLine, ::cName )
@@ -131,12 +135,11 @@
 
      ErrorBlock( bErrHandler )
 
-     ::nProcs := nProcId
-
      IF ::bWantsErrorObject .AND. oError:ClassName == "ERROR"
         RETURN oError
      ENDIF
 
+     ::nProcs := nProcId
      ::cCompiledText += ::cText
      ::nCompiledLines := nLines
      ::cText := ""
@@ -173,7 +176,7 @@
               ENDIF
            #endif
 
-           xRet := PP_Exec( ::aCompiledProcs, ::aInitExit, ::nProcs, aParams )
+           xRet := PP_Exec( ::aCompiledProcs, ::aInitExit, ::nProcs, aParams, ::nNextStartProc )
         ELSE
             oError := ErrorNew( [PP], 1003, [Interpreter], [Can't execute after compilation error], {} )
             oError:ProcLine := 0
