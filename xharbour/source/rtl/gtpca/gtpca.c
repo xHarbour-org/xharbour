@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.8 2003/12/28 22:25:34 druzus Exp $
+ * $Id: gtpca.c,v 1.9 2003/12/29 11:16:51 druzus Exp $
  */
 
 /*
@@ -691,6 +691,25 @@ void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
     hb_fsWriteLarge( s_iFilenoStderr, ( BYTE * ) pbyStr, ulLen );
 }
 
+/*
+* GTInfo() implementation
+*/
+int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
+{
+   HB_SYMBOL_UNUSED( bUpdate );
+   HB_SYMBOL_UNUSED( iParam );
+   HB_SYMBOL_UNUSED( vpParam );
+
+   switch ( iMsgType )
+   {
+      case GTI_ISGRAPHIC:
+      return (int) FALSE;
+   }
+   // DEFAULT: there's something wrong if we are here.
+   return -1;
+}
+
+
 /* *********************************************************************** */
 
 #ifdef HB_MULTI_GT
@@ -738,6 +757,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->Tone                  = HB_GT_FUNC( gt_Tone );
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
+    gt_funcs->info                  = HB_GT_FUNC( gt_info );
 }
 
 /* ********************************************************************** */

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.34 2004/01/05 21:09:03 paultucker Exp $
+ * $Id: gtwin.c,v 1.35 2004/01/20 03:41:35 walito Exp $
  */
 
 /*
@@ -1838,6 +1838,23 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 
 /* *********************************************************************** */
 
+int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
+{
+   HB_SYMBOL_UNUSED( bUpdate );
+   HB_SYMBOL_UNUSED( iParam );
+   HB_SYMBOL_UNUSED( vpParam );
+
+   switch ( iMsgType )
+   {
+      case GTI_ISGRAPHIC:
+      return (int) FALSE;
+   }
+   // DEFAULT: there's something wrong if we are here.
+   return -1;
+}
+
+/* *********************************************************************** */
+
 #ifdef HB_MULTI_GT
 
 static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
@@ -1883,6 +1900,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->Tone                  = HB_GT_FUNC( gt_Tone );
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
+    gt_funcs->info                  = HB_GT_FUNC( gt_info );
     /* extended GT functions */
 //    gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
 //    gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.59 2004/01/25 20:44:29 paultucker Exp $
+ * $Id: gtwvt.c,v 1.60 2004/01/26 08:14:07 vouchcac Exp $
  */
 
 /*
@@ -3236,6 +3236,24 @@ HB_EXPORT BOOL hb_wvt_gtDrawOutline( int iTop, int iLeft, int iBottom, int iRigh
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
+/* *********************************************************************** */
+
+int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
+{
+   HB_SYMBOL_UNUSED( bUpdate );
+   HB_SYMBOL_UNUSED( iParam );
+   HB_SYMBOL_UNUSED( vpParam );
+
+   switch ( iMsgType )
+   {
+      case GTI_ISGRAPHIC:
+      return (int) FALSE;
+   }
+   // DEFAULT: there's something wrong if we are here.
+   return -1;
+}
+
+
 #ifdef HB_MULTI_GT
 
 static void HB_GT_FUNC( gtFnInit( PHB_GT_FUNCS gt_funcs ) )
@@ -3281,6 +3299,7 @@ static void HB_GT_FUNC( gtFnInit( PHB_GT_FUNCS gt_funcs ) )
     gt_funcs->Tone                  = HB_GT_FUNC( gt_Tone );
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
+    gt_funcs->info                  = HB_GT_FUNC( gt_info );
 }
 
 //-------------------------------------------------------------------//
@@ -3841,7 +3860,7 @@ HB_FUNC( WVT_SETONTOP )
    hb_retl( SetWindowPos( _s.hWnd, HWND_TOPMOST, 
                           rect.left, 
                           rect.top, 
-                          0, 
+                          0,
                           0, 
                           SWP_NOSIZE + SWP_NOMOVE + SWP_NOACTIVATE ) );
 }
@@ -3937,7 +3956,7 @@ HB_FUNC( WVT_RESTSCREEN )
    iHeight = iBottom - iTop + 1 ;
    
    hDCComp = CreateCompatibleDC( _s.hdc );
-  
+
    if ( SelectObject( hDCComp, ( HBITMAP ) hb_parnl( 5,3 ) ) )
    {
       if ( ( iWidth == hb_parni( 5,1 ) )  && ( iHeight == hb_parni( 5,2 ) ) )

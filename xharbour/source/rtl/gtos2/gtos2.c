@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.5 2003/05/16 19:52:09 druzus Exp $
+ * $Id: gtos2.c,v 1.6 2003/05/21 09:35:36 druzus Exp $
  */
 
 /*
@@ -1149,3 +1149,22 @@ void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
 {
     hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }
+
+/*
+* GTInfo() implementation
+*/
+int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
+{
+   HB_SYMBOL_UNUSED( bUpdate );
+   HB_SYMBOL_UNUSED( iParam );
+   HB_SYMBOL_UNUSED( vpParam );
+
+   switch ( iMsgType )
+   {
+      case GTI_ISGRAPHIC:
+      return (int) FALSE;
+   }
+   // DEFAULT: there's something wrong if we are here.
+   return -1;
+}
+

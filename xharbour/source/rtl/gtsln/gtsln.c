@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.15 2003/06/30 17:08:57 ronpinkas Exp $
+ * $Id: gtsln.c,v 1.16 2003/12/28 22:25:34 druzus Exp $
  */
 
 /*
@@ -1339,6 +1339,21 @@ static void HB_GT_FUNC(gt_build_conv_tabs())
 }
 
 /* *********************************************************************** */
+
+int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
+{
+   HB_SYMBOL_UNUSED( bUpdate );
+   HB_SYMBOL_UNUSED( iParam );
+   HB_SYMBOL_UNUSED( vpParam );
+
+   switch ( iMsgType )
+   {
+      case GTI_ISGRAPHIC:
+      return (int) FALSE;
+   }
+   // DEFAULT: there's something wrong if we are here.
+   return -1;
+}
 
 #ifdef HB_MULTI_GT
 

@@ -1,9 +1,9 @@
 /*
 <<<<<<< gtalleg.c
-* $Id: gtalleg.c,v 1.11 2004/02/01 00:35:42 maurifull Exp $
+* $Id: gtalleg.c,v 1.13 2004/02/01 23:09:34 jonnymind Exp $
 */
 =======
- * $Id: gtalleg.c,v 1.12 2004/02/01 20:55:50 maurifull Exp $
+ * $Id: gtalleg.c,v 1.13 2004/02/01 23:09:34 jonnymind Exp $
  */
 >>>>>>> 1.12
 
@@ -1672,6 +1672,8 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParm, void *v
 {
    int iOldValue;
    int iWidth, iHeight;
+
+   HB_SYMBOL_UNUSED( vpParam );
 
    switch ( iMsgType )
    {

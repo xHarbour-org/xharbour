@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.28 2004/01/18 06:34:16 likewolf Exp $
+ * $Id: gtcrs.c,v 1.29 2004/01/26 15:00:52 druzus Exp $
  */
 
 /*
@@ -3245,6 +3245,22 @@ void HB_GT_FUNC(gt_DelEventHandle( int iFileDes ))
 
 /* *********************************************************************** */
 
+int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
+{
+   HB_SYMBOL_UNUSED( bUpdate );
+   HB_SYMBOL_UNUSED( iParam );
+   HB_SYMBOL_UNUSED( vpParam );
+
+   switch ( iMsgType )
+   {
+      case GTI_ISGRAPHIC:
+      return (int) FALSE;
+   }
+   // DEFAULT: there's something wrong if we are here.
+   return -1;
+}
+/* *********************************************************************** */
+
 #ifdef HB_MULTI_GT
 
 static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
@@ -3293,6 +3309,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     /* extended GT functions */
     gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
     gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
+    gt_funcs->info                  = HB_GT_FUNC( gt_info );
 }
 
 /* ********************************************************************** */

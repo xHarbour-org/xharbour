@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2200 2004/02/01 22:38:57 paultucker Exp $
+ * $Id: ChangeLog,v 1.2201 2004/02/01 22:52:03 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,46 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-02-02 00:39 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtalleg/gtalleg.c
+  * source/rtl/gtcgi/gtcgi.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtdos/gtdos.c
+  * source/rtl/gtnul/gtnul.c
+  * source/rtl/gtos2/gtos2.c
+  * source/rtl/gtpca/gtpca.c
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtstd/gtstd.c
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtxvt/gtxvt.c
+    ! Added gt_info implementation to all the gts. (currently they all return
+      that the GT is uncapable to do graphic. Expert of single GTs are invited
+      to update them).
+
+  * tests/gt_info.prg
+    ! GTInfo() ALWAYS returns an integer; the check GTInfo(GTI_ISGRAPHIC) == .T.
+      is not valid, as it returns 0 for nongraphic screens and 1 for graphic screens.
+      In future, value greater than 1 may indicate particular graphic abilities.
+
+2004-02-02 00:07 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+   * include/hbapigt.h
+   * source/rtl/gtapi.c
+   * source/rtl/gx.c
+   * source/rtl/gtalleg/gtalleg.c
+     * GTInfo() is now in gx.c, and calls the C frontend hb_gt_info(..) in
+       gtapi.c; hb_multigt has been updated accordingly;
+       gtalleg.c has an implementation of HB_GT_FUNC( gt_info );
+     * Added "info" filed to the HB_MULTI_GT strucutre. Currently only GT
+       alleg has implemented it, so a call on GTInfo() under another GT will
+       cause immediate GPF.
+     * Work in progress to add event driven GT interface (removing termination
+         handlers and the like).
+
+   * source/vm/thread.c
+     * Minor formatting.
 
 2004-02-02 01:55 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * contrib/libct/files.c

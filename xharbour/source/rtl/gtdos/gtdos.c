@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.10 2003/12/28 22:25:34 druzus Exp $
+ * $Id: gtdos.c,v 1.11 2003/12/29 21:57:34 druzus Exp $
  */
 
 /*
@@ -1706,3 +1706,19 @@ void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
 {
     hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }
+
+int hb_gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
+{
+   HB_SYMBOL_UNUSED( bUpdate );
+   HB_SYMBOL_UNUSED( iParam );
+   HB_SYMBOL_UNUSED( vpParam );
+
+   switch ( iMsgType )
+   {
+      case GTI_ISGRAPHIC:
+      return (int) FALSE;
+   }
+   // DEFAULT: there's something wrong if we are here.
+   return -1;
+}
+

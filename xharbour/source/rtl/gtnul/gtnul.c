@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.13 2003/12/05 05:47:14 mlombardo Exp $
+ * $Id: gtnul.c,v 1.14 2003/12/28 22:25:34 druzus Exp $
  */
 
 /*
@@ -906,6 +906,21 @@ void hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRigh
     GT_FUNCS.mouse_GetBounds( piTop, piLeft, piBottom, piRight );
 }
 
+int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
+{
+   HB_SYMBOL_UNUSED( bUpdate );
+   HB_SYMBOL_UNUSED( iParam );
+   HB_SYMBOL_UNUSED( vpParam );
+
+   switch ( iMsgType )
+   {
+      case GTI_ISGRAPHIC:
+      return (int) FALSE;
+   }
+   // DEFAULT: there's something wrong if we are here.
+   return -1;
+}
+
 /* ********************************************************************** */
 
 /*
@@ -1018,6 +1033,8 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     /* extended GT functions */
     gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
     gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
+    gt_funcs->info                  = HB_GT_FUNC( gt_info );
+
 }
 
 /* ********************************************************************** */

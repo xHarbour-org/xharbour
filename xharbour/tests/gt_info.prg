@@ -8,7 +8,7 @@
 Function Main
 Local nOp
 
-   If !GTInfo(GTI_ISGRAPHIC)
+   If GTInfo(GTI_ISGRAPHIC) == 0
      ?
      ? "This test is intended to run under graphics capable gts only"
      ?
