@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.347 2004/03/05 22:37:58 ronpinkas Exp $
+ * $Id: hvm.c,v 1.348 2004/03/05 23:00:05 andijahja Exp $
  */
 
 /*
@@ -2266,8 +2266,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                hb_itemPutNI( &Add, ( int ) iAdd );
                pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, &Add );
 
-               hb_itemClear( &Add );
-
                if( pResult )
                {
                   hb_itemForwardValue( pLocal, pResult );
@@ -2412,15 +2410,15 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                Add.type = HB_IT_NIL;
                hb_itemPutNI( &Add, ( int ) iAdd );
 
-               if( iAdd>0 )
+               if( iAdd > 0 )
+               {
                   pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pTop, &Add );
+               }
                else
                {
                   (&Add)->item.asInteger.value *= -1 ;
                   pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pTop, &Add );
                }
-
-               hb_itemClear( &Add );
 
                if( pResult )
                {
@@ -2515,7 +2513,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                HB_ITEM Tmp;
                Tmp.type = HB_IT_NIL;
                hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "LEFT", 2, pString, hb_itemPutNI( &Tmp, iNewLen ) );
-               hb_itemClear( &Tmp );
             }
 
             w += 3;
