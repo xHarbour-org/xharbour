@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_checkbox.c,v 1.1 2003/04/21 06:56:33 jonnymind Exp $
+   $Id: xwt_gtk_treelist.c,v 1.1 2003/06/05 17:06:22 jonnymind Exp $
 
    GTK interface - management of checkbox widget
 */
@@ -30,7 +30,7 @@ static void xwt_gtk_renderItem( GtkTreeViewColumn *tree_column,
    {
       case HB_IT_STRING:
          g_object_set( G_OBJECT( cell ),
-                  "text",  (GValue *) hb_itemGetC( pItem ), NULL );
+                  "text",  (GValue *) hb_itemGetCPtr( pItem ), NULL );
       break;
       case HB_IT_INTEGER:
          sprintf( buf, "%d", pItem->item.asInteger.value );
@@ -52,72 +52,29 @@ static void xwt_gtk_renderItem( GtkTreeViewColumn *tree_column,
    }
 }
 
-/*
-static void chkb_clicked( GtkWidget *widget,  gpointer cb_data )
+
+static void cell_edited(
+      GtkWidget *widget, gchar *arg1, gchar *arg2, gpointer cb_data )
 {
-   XWT_GTK_MAKESELF( cb_data );
+   PXWT_WIDGET xwtData = (PXWT_WIDGET *) cb_data;
+   XWT_GTK_MAKESELF( xwtData->owner );
+   // just a test for now
    xwt_rise_event( &Self, XWT_E_CLICKED, 0 );
 }
 
-static void chkb_pressed( GtkWidget *widget,  gpointer cb_data )
-{
-   XWT_GTK_MAKESELF( cb_data );
-   xwt_rise_event( &Self, XWT_E_PRESSED, 0 );
-}
-
-static void chkb_released( GtkWidget *widget,  gpointer cb_data )
-{
-   XWT_GTK_MAKESELF( cb_data );
-   xwt_rise_event( &Self, XWT_E_RELEASED, 0 );
-}
-
-static void chkb_enter( GtkWidget *widget,  gpointer cb_data )
-{
-   XWT_GTK_MAKESELF( cb_data );
-   xwt_rise_event( &Self, XWT_E_ENTER, 0 );
-}
-
-static void chkb_leave( GtkWidget *widget,  gpointer cb_data )
-{
-   XWT_GTK_MAKESELF( cb_data );
-   xwt_rise_event( &Self, XWT_E_LEAVE, 0 );
-}
-
-
-static void chkb_toggled( GtkWidget *widget,  gpointer cb_data )
-{
-   HB_ITEM lStatus;
-   XWT_GTK_MAKESELF( cb_data );
-
-   hb_itemPutL( &lStatus, gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( widget ) ) );
-   xwt_rise_event( &Self, XWT_E_CHANGED, 1, &lStatus );
-}
-*/
-
-PXWT_WIDGET xwt_gtk_createTreelist( PHB_ITEM pSelf )
+BOOL xwt_gtk_createTreelist( PXWT_WIDGET xwtData )
 {
    GtkWidget *treelist;
-   PXWT_WIDGET xwtData;
 
    treelist = gtk_tree_view_new();
    // add a container to the window
 
-   /*
-   g_signal_connect (G_OBJECT(checkbox), "pressed", G_CALLBACK (chkb_pressed), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(checkbox), "released", G_CALLBACK (chkb_released), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(checkbox), "clicked", G_CALLBACK (chkb_clicked), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(checkbox), "enter", G_CALLBACK (chkb_enter), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(checkbox), "leave", G_CALLBACK (chkb_leave), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(checkbox), "toggled", G_CALLBACK (chkb_toggled ), pSelf->item.asArray.value );
-*/
-   XWT_CREATE_WIDGET( xwtData );
-   xwtData->type = XWT_TYPE_TREELIST;
    xwtData->widget_data = treelist;
    xwtData->destructor = NULL;
    xwtData->get_main_widget = xwtData->get_top_widget = xwt_gtk_get_topwidget_neuter;
    gtk_widget_show( treelist );
 
-   return xwtData;
+   return TRUE;
 }
 
 BOOL xwt_gtk_treelist_set_content( PXWT_WIDGET xwtData, PHB_ITEM pContent )
@@ -197,32 +154,54 @@ BOOL xwt_gtk_treelist_set_content( PXWT_WIDGET xwtData, PHB_ITEM pContent )
    return TRUE;
 }
 
-BOOL xwt_gtk_treelist_set_columns( PXWT_WIDGET xwtData, PHB_ITEM pCols )
+static void xwt_gtk_treelist_setdefattr( GtkTreeViewColumn *column )
+{
+   gtk_tree_view_column_set_clickable( column, TRUE );
+   gtk_tree_view_column_set_sizing( column, GTK_TREE_VIEW_COLUMN_AUTOSIZE );
+   gtk_tree_view_column_set_resizable( column, TRUE );
+   // TODO: How to make it clean?
+   //gtk_tree_view_column_set_reorderable( column, TRUE );
+}
+
+
+BOOL xwt_gtk_treelist_create_columns( PXWT_WIDGET xwtData, int nCols )
 {
    GtkCellRenderer *renderer;
    GtkTreeViewColumn *column;
    GtkTreeView *tv;
-   UINT nLen, i, nColi;
-   PHB_ITEM pItem;
+   UINT i, nColi;
 
    tv = (GtkTreeView *) xwtData->widget_data;
    renderer = gtk_cell_renderer_text_new();
 
    // todo: remove previously existing columns
-   nLen = hb_arrayLen( pCols );
-   for ( i = 0; i < nLen; i ++ )
+   // invisible header for headerless list at the beginning
+   gtk_tree_view_set_headers_visible( tv, FALSE );
+
+   for ( i = 0; i < nCols; i ++ )
    {
-      pItem = hb_arrayGetItemPtr( pCols, i + 1 );
+      renderer = gtk_cell_renderer_text_new();
+
+      g_object_set_data(G_OBJECT (renderer),
+         "column", GINT_TO_POINTER( i ) );
+
+      g_object_set(G_OBJECT (renderer),
+         "mode", GTK_CELL_RENDERER_MODE_ACTIVATABLE,
+         NULL);
+
+      g_signal_connect (renderer, "edited", G_CALLBACK (cell_edited), xwtData);
 
       nColi = gtk_tree_view_insert_column_with_attributes (
             GTK_TREE_VIEW (tv),
             -1,
-            hb_itemGetC( pItem ),
+            "",   // no title in the beginning
             renderer,
             //"text", i,  todo. add attribs
             NULL);
 
       column = gtk_tree_view_get_column (GTK_TREE_VIEW (tv), nColi - 1);
+
+      xwt_gtk_treelist_setdefattr( column );
 
       gtk_tree_view_column_set_cell_data_func(
          column,
@@ -232,6 +211,89 @@ BOOL xwt_gtk_treelist_set_columns( PXWT_WIDGET xwtData, PHB_ITEM pCols )
          NULL);
 
    }
+
    return TRUE;
+}
+
+
+
+BOOL xwt_gtk_treelist_set_columns( PXWT_WIDGET xwtData, PHB_ITEM pCols )
+{
+   GtkTreeViewColumn *column;
+   GtkTreeView *tv;
+   UINT nLen, i;
+   PHB_ITEM pItem;
+
+   tv = (GtkTreeView *) xwtData->widget_data;
+
+   // todo: remove previously existing columns
+   nLen = hb_arrayLen( pCols );
+
+   // Now we know some header will be displayed
+   gtk_tree_view_set_headers_visible( tv, TRUE );
+
+   for ( i = 0; i < nLen; i ++ )
+   {
+      pItem = hb_arrayGetItemPtr( pCols, i + 1 );
+
+      column = gtk_tree_view_get_column (GTK_TREE_VIEW (tv), i);
+
+      gtk_tree_view_column_set_title( column, hb_itemGetCPtr( pItem ) );
+   }
+
+   return TRUE;
+}
+
+
+BOOL xwt_gtk_treelist_set_colattr( PXWT_WIDGET xwtData, char *prop, void *data )
+{
+   GtkTreeViewColumn *column;
+   GtkTreeView *tv;
+   GList *glRenderers;
+   GtkCellRenderer *renderer;
+
+   tv = (GtkTreeView *) xwtData->widget_data;
+
+   // Let's see what kind of attribute we have to set
+   if (strcmp( prop, "editable" ) == 0 )
+   {
+      int nCol = GPOINTER_TO_INT( data );
+      BOOL bEditable = TRUE;
+      if ( nCol < 0 )
+      {
+         nCol = -nCol;
+         bEditable = FALSE;
+      }
+      nCol--;
+
+      column = gtk_tree_view_get_column (GTK_TREE_VIEW (tv), nCol);
+      if ( column == NULL )
+      {
+         return FALSE;
+      }
+
+      glRenderers = gtk_tree_view_column_get_cell_renderers( column );
+      renderer = (GtkCellRenderer *)glRenderers->data;
+      if ( bEditable )
+      {
+         g_object_set( G_OBJECT( renderer ),
+            "mode", GTK_CELL_RENDERER_MODE_EDITABLE,
+            "editable", bEditable,
+            NULL);
+      }
+      else
+      {
+         g_object_set( G_OBJECT( renderer ),
+            "mode", GTK_CELL_RENDERER_MODE_ACTIVATABLE,
+            "editable", bEditable,
+            NULL);
+      }
+
+      g_list_free( glRenderers );
+
+      return TRUE;
+   }
+
+   return FALSE;
 }
 

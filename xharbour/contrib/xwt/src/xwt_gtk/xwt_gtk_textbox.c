@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_textbox.c,v 1.2 2003/03/28 14:44:40 gian Exp $
+   $Id: xwt_gtk_textbox.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Text box - basic input field
 */
@@ -34,23 +34,20 @@ static void box_activate( GtkWidget *widget,  gpointer cb_data )
    hb_itemRelease( pString );
 }
 
-PXWT_WIDGET xwt_gtk_createTextbox( PHB_ITEM pSelf )
+BOOL xwt_gtk_createTextbox( PXWT_WIDGET xwtData )
 {
    GtkWidget *box;
-   PXWT_WIDGET xwtData;
    box = gtk_entry_new();
 
    gtk_widget_show( box );
 
    // no need for destructor, the data is just our widget for now
-   XWT_CREATE_WIDGET( xwtData );
-   xwtData->type = XWT_TYPE_TEXTBOX;
    xwtData->widget_data = (void *)box;
    xwtData->destructor = NULL;
    xwtData->get_main_widget = xwtData->get_top_widget = xwt_gtk_get_topwidget_neuter;
 
-   g_signal_connect (G_OBJECT(box), "activate", G_CALLBACK (box_activate), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(box), "changed", G_CALLBACK (box_changed), pSelf->item.asArray.value );
+   g_signal_connect (G_OBJECT(box), "activate", G_CALLBACK (box_activate), xwtData->owner );
+   g_signal_connect (G_OBJECT(box), "changed", G_CALLBACK (box_changed), xwtData->owner );
 
-   return xwtData;
+   return TRUE;
 }

@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_gtk_fileselect.c,v 1.2 2003/04/17 23:42:17 lculik Exp $
+   $Id: xwt_gtk_fileselect.c,v 1.3 2003/04/18 13:28:51 jonnymind Exp $
 
    GTK interface - File Selection Box 
 */
@@ -14,13 +14,13 @@
 
 static void file_ok_sel( GtkWidget *widget,  gpointer cb_data )
 {
-   PXWT_GTK_MODAL xwtFilew = (PXWT_GTK_MODAL) cb_data;
+   PXWT_GTK_MODAL xwtFilew = (PXWT_GTK_MODAL) ((PXWT_WIDGET)cb_data)->widget_data;
    HB_ITEM itmFileName;
    const char *fname;
    // this builds the Self object
    // If you use this macro, you must put it AFTER variable decl,
    // and BEFORE any other statement
-   XWT_GTK_MAKESELF( (xwtFilew->owner) );
+   XWT_GTK_MAKESELF( (((PXWT_WIDGET)cb_data)->owner) );
 
    fname = gtk_file_selection_get_filename (
       GTK_FILE_SELECTION ( xwtFilew->main_widget )
@@ -39,9 +39,9 @@ static void file_ok_sel( GtkWidget *widget,  gpointer cb_data )
 
 static void file_cancel_sel( GtkWidget *widget,  gpointer cb_data )
 {
-   PXWT_GTK_MODAL xwtFilew = (PXWT_GTK_MODAL) cb_data;
+   PXWT_GTK_MODAL xwtFilew = (PXWT_GTK_MODAL) ((PXWT_WIDGET)cb_data)->widget_data;
    HB_ITEM itmFileName;
-   XWT_GTK_MAKESELF( (xwtFilew->owner) );
+   XWT_GTK_MAKESELF( (((PXWT_WIDGET)cb_data)->owner) );
 
    //rising the updated event, to signal that we have a candidate filename
    xwt_rise_event( &Self, XWT_E_CANCELED, 0);
@@ -52,20 +52,17 @@ static void file_cancel_sel( GtkWidget *widget,  gpointer cb_data )
    xwtFilew->canceled = TRUE;
 }
 
-PXWT_WIDGET xwt_gtk_createFileSelection( PHB_ITEM pSelf )
+BOOL xwt_gtk_createFileSelection( PXWT_WIDGET xwtData )
 {
    GtkWidget *filew;
    PXWT_GTK_MODAL xwtFilew;
-   PXWT_WIDGET xwtData;
 
-   XWT_CREATE_WIDGET( xwtData );
    xwtFilew = (PXWT_GTK_MODAL) hb_xgrab( sizeof( XWT_GTK_MODAL ) );
 
    filew = gtk_file_selection_new("");
    // this widget is NOT displayed by default
 
    xwtFilew->main_widget = filew;
-   xwtFilew->owner = pSelf->item.asArray.value;
    xwtFilew->modal = FALSE;
    xwtFilew->canceled = FALSE;
 
@@ -73,14 +70,13 @@ PXWT_WIDGET xwt_gtk_createFileSelection( PHB_ITEM pSelf )
    // so it is useful to pass the xwt_gtk data.
    g_signal_connect (
       G_OBJECT (GTK_FILE_SELECTION (filew)->ok_button),
-      "clicked", G_CALLBACK (file_ok_sel), xwtFilew
+      "clicked", G_CALLBACK (file_ok_sel), xwtData
    );
 
    g_signal_connect(
       G_OBJECT (GTK_FILE_SELECTION (filew)->cancel_button),
-      "clicked", G_CALLBACK (file_cancel_sel),xwtFilew);
+      "clicked", G_CALLBACK (file_cancel_sel),xwtData);
 
-   xwtData->type = XWT_TYPE_FILESEL;
    // you ALWAYS need to set the xwtData->widget_data.
    // if no driver level widget wrapper is needed, you can
    // use the gtkWidget here, and set NULL for the destructor.
@@ -91,6 +87,6 @@ PXWT_WIDGET xwt_gtk_createFileSelection( PHB_ITEM pSelf )
    xwtData->get_main_widget = xwt_gtk_get_mainwidget_base;
    xwtData->get_top_widget = xwt_gtk_get_mainwidget_base;
 
-   return xwtData;
+   return TRUE;
 }
 

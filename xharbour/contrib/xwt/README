@@ -5,7 +5,7 @@
                                  Giancarlo Niccolai
 
 
-$Id$
+$Id: README,v 1.2 2003/04/03 10:57:56 jonnymind Exp $
 
 
 ABSTRACT
@@ -119,16 +119,9 @@ structures or objects useful to hold the state of the underlying system
 level API. This "raw widget" is created by the driver, reimplementing the
 following function defined in xwt_api.h
 
-PXWT_WIDGET xwt_drv_create( PHB_ITEM pSelf, int xwt_type );
+BOOL xwt_drv_create( PXWT_WIDGET pSelf );
 
-PXWT_WIDGET is a pointer to the raw widget structure, while pSelf is a
-PHB_ITEM pointing to the object that requested the creation of the raw widget,
-while the xwt_type is one of the types defined in xwt.ch, or an application
-defined type. The driver must here switch() on the xwt_type and create a
-metastructure that can be later used to reference the widget; if the widget
-type is not recognized or still not implemented, the routine can return NULL.
-
-The widget structure is defined as follows:
+PXWT_WIDGET is a pointer to the raw widget structure, defined as follows;
 
 typedef struct tag_xwt_widget
 {
@@ -141,7 +134,19 @@ typedef struct tag_xwt_widget
 
    // pointer to raw widget data that is known by virtual functions
    void *widget_data;
+
+   // back reference to xharbour object owner
+   PHB_BASEARRAY owner;
+
 } XWT_WIDGET, *PXWT_WIDGET;
+
+This structure is initialized by the api so that the "type" field contains the
+XWT_TYPE_*, indicating which kind of widget must be built, and owner is pointing
+to the object that requested the creation of the raw widget. The driver must
+here switch() on the "type" and create a metastructure that can be later
+used to reference the widget (putting it in widget_data member);
+if the widget type is not recognized or still not implemented, the routine can
+return FALSE, else it will return TRUE.
 
 All the elements of XWT_WIDGET are managed by the DRIVER level functions,
 and are at disposal of the driver implementation. We'll discuss this structure

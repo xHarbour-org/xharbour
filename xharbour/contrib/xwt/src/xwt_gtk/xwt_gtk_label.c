@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_label.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: xwt_gtk_label.c,v 1.2 2003/04/08 18:21:51 jonnymind Exp $
 
    Label - Basic text label to draw on the screen
 */
@@ -11,10 +11,9 @@
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 
-PXWT_WIDGET xwt_gtk_createLabel( PHB_ITEM pSelf )
+BOOL xwt_gtk_createLabel( PXWT_WIDGET xwtData )
 {
    GtkWidget *label;
-   PXWT_WIDGET xwtData;
    PXWT_GTK_SENSIBLE sens;
 
    label = gtk_label_new("");
@@ -28,12 +27,10 @@ PXWT_WIDGET xwt_gtk_createLabel( PHB_ITEM pSelf )
    xwt_gtk_set_alignment( (PXWT_GTK_ALIGN) sens );
 
    // no need for destructor, the data is just our widget for now
-   XWT_CREATE_WIDGET( xwtData );
-   xwtData->type = XWT_TYPE_LABEL;
    xwtData->widget_data = (void *)sens;
    xwtData->destructor = hb_xfree;
    xwtData->get_main_widget = xwt_gtk_get_mainwidget_base;
    xwtData->get_top_widget = xwt_gtk_get_topwidget_sensible;
 
-   return xwtData;
+   return TRUE;
 }

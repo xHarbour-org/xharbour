@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_grid.c,v 1.2 2003/04/21 06:56:33 jonnymind Exp $
+   $Id: xwt_gtk_grid.c,v 1.3 2003/04/22 19:03:37 jonnymind Exp $
 
    Grid - a col/row layout adapter
 */
@@ -12,9 +12,8 @@
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 
-PXWT_WIDGET xwt_gtk_createGrid( PHB_ITEM pSelf )
+BOOL xwt_gtk_createGrid( PXWT_WIDGET xwtData )
 {
-   PXWT_WIDGET xwtData;
    PXWT_GTK_GRID grid;
 
    grid = ( PXWT_GTK_GRID ) hb_xgrab( sizeof( XWT_GTK_GRID ) );
@@ -28,17 +27,13 @@ PXWT_WIDGET xwt_gtk_createGrid( PHB_ITEM pSelf )
    grid->iYPad = 0;
    grid->iXPad = 0;
 
-
    gtk_widget_show( grid->main_widget );
 
-   XWT_CREATE_WIDGET( xwtData );
-
-   xwtData->type = XWT_TYPE_GRID;
    xwtData->widget_data = (void *)grid;
    xwtData->destructor = hb_xfree;
    xwtData->get_main_widget = xwt_gtk_get_mainwidget_base;
    xwtData->get_top_widget = container_get_topwidget;
 
-   return xwtData;
+   return TRUE;
 }
 

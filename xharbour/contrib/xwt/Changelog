@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.17 2003/05/26 15:46:30 jonnymind Exp $
+ * $Id: Changelog,v 1.18 2003/06/05 17:06:11 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,43 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-08 16:00 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/xwt.ch
+  * include/xwt_api.h
+  * src/treelist.prg
+  * src/xwt_api.c
+  * src/xwt_gtk/xwt_gtk.c
+  * src/xwt_gtk/xwt_gtk.h
+  * src/xwt_gtk/xwt_gtk_button.c
+  * src/xwt_gtk/xwt_gtk_checkbox.c
+  * src/xwt_gtk/xwt_gtk_fileselect.c
+  * src/xwt_gtk/xwt_gtk_framewnd.c
+  * src/xwt_gtk/xwt_gtk_grid.c
+  * src/xwt_gtk/xwt_gtk_image.c
+  * src/xwt_gtk/xwt_gtk_label.c
+  * src/xwt_gtk/xwt_gtk_layout.c
+  * src/xwt_gtk/xwt_gtk_menu.c
+  * src/xwt_gtk/xwt_gtk_menuitem.c
+  * src/xwt_gtk/xwt_gtk_pane.c
+  * src/xwt_gtk/xwt_gtk_radiobutton.c
+  * src/xwt_gtk/xwt_gtk_splitter.c
+  * src/xwt_gtk/xwt_gtk_textbox.c
+  * src/xwt_gtk/xwt_gtk_togglebutton.c
+  * src/xwt_gtk/xwt_gtk_treelist.c
+  * src/xwt_gtk/xwt_gtk_viewport.c
+  * src/xwt_gtk/xwt_gtk_window.c
+    * The owner memer has been moved inside the core xwt_api widget
+      structure.
+    * The xwt widget is created in the xwt_api.c file, and then
+      passed into the driver for adding local data. xwt_drv_create()
+      has changed consequently
+
+  * README
+    * Reflecting latest changes
+
+  * test/xwt_test.prg
+    * Reflecting latest changes
 
 2003-06-05 19:15 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   + src/treeitem.prg

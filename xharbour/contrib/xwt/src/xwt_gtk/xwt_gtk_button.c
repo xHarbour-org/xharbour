@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_button.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: xwt_gtk_button.c,v 1.2 2003/04/12 23:47:15 jonnymind Exp $
 
    GTK interface - management of button widget
 */
@@ -43,27 +43,24 @@ static void btn_leave( GtkWidget *widget,  gpointer cb_data )
 }
 
 
-PXWT_WIDGET xwt_gtk_createButton( PHB_ITEM pSelf )
+BOOL xwt_gtk_createButton( PXWT_WIDGET xwtData )
 {
    GtkWidget *button;
-   PXWT_WIDGET xwtData;
 
    button = gtk_button_new ();
    // add a container to the window
 
-   g_signal_connect (G_OBJECT(button), "pressed", G_CALLBACK (btn_pressed), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(button), "released", G_CALLBACK (btn_released), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (btn_clicked), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(button), "enter", G_CALLBACK (btn_enter), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(button), "leave", G_CALLBACK (btn_leave), pSelf->item.asArray.value );
+   g_signal_connect (G_OBJECT(button), "pressed", G_CALLBACK (btn_pressed), xwtData->owner );
+   g_signal_connect (G_OBJECT(button), "released", G_CALLBACK (btn_released), xwtData->owner );
+   g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (btn_clicked), xwtData->owner );
+   g_signal_connect (G_OBJECT(button), "enter", G_CALLBACK (btn_enter), xwtData->owner );
+   g_signal_connect (G_OBJECT(button), "leave", G_CALLBACK (btn_leave), xwtData->owner );
 
-   XWT_CREATE_WIDGET( xwtData );
-   xwtData->type = XWT_TYPE_BUTTON;
    xwtData->widget_data = button;
    xwtData->destructor = NULL;
    xwtData->get_main_widget = xwtData->get_top_widget = xwt_gtk_get_topwidget_neuter;
 
    gtk_widget_show( button );
 
-   return xwtData;
+   return TRUE;
 }

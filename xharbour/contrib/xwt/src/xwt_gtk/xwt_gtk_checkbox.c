@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_button.c,v 1.2 2003/04/12 23:47:15 jonnymind Exp $
+   $Id: xwt_gtk_checkbox.c,v 1.1 2003/04/21 06:56:33 jonnymind Exp $
 
    GTK interface - management of checkbox widget
 */
@@ -52,28 +52,25 @@ static void chkb_toggled( GtkWidget *widget,  gpointer cb_data )
    xwt_rise_event( &Self, XWT_E_CHANGED, 1, &lStatus );
 }
 
-PXWT_WIDGET xwt_gtk_createCheckbox( PHB_ITEM pSelf )
+BOOL xwt_gtk_createCheckbox( PXWT_WIDGET xwtData )
 {
    GtkWidget *checkbox;
-   PXWT_WIDGET xwtData;
 
    checkbox = gtk_check_button_new ();
    // add a container to the window
 
-   g_signal_connect (G_OBJECT(checkbox), "pressed", G_CALLBACK (chkb_pressed), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(checkbox), "released", G_CALLBACK (chkb_released), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(checkbox), "clicked", G_CALLBACK (chkb_clicked), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(checkbox), "enter", G_CALLBACK (chkb_enter), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(checkbox), "leave", G_CALLBACK (chkb_leave), pSelf->item.asArray.value );
-   g_signal_connect (G_OBJECT(checkbox), "toggled", G_CALLBACK (chkb_toggled ), pSelf->item.asArray.value );
+   g_signal_connect (G_OBJECT(checkbox), "pressed", G_CALLBACK (chkb_pressed), xwtData->owner );
+   g_signal_connect (G_OBJECT(checkbox), "released", G_CALLBACK (chkb_released), xwtData->owner );
+   g_signal_connect (G_OBJECT(checkbox), "clicked", G_CALLBACK (chkb_clicked), xwtData->owner );
+   g_signal_connect (G_OBJECT(checkbox), "enter", G_CALLBACK (chkb_enter), xwtData->owner );
+   g_signal_connect (G_OBJECT(checkbox), "leave", G_CALLBACK (chkb_leave), xwtData->owner );
+   g_signal_connect (G_OBJECT(checkbox), "toggled", G_CALLBACK (chkb_toggled ), xwtData->owner );
 
-   XWT_CREATE_WIDGET( xwtData );
-   xwtData->type = XWT_TYPE_CHECKBOX;
    xwtData->widget_data = checkbox;
    xwtData->destructor = NULL;
    xwtData->get_main_widget = xwtData->get_top_widget = xwt_gtk_get_topwidget_neuter;
 
    gtk_widget_show( checkbox );
 
-   return xwtData;
+   return TRUE;
 }

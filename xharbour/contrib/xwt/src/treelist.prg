@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id$
+   $Id: treelist.prg,v 1.1 2003/06/05 17:06:22 jonnymind Exp $
 
    TreeList - A flexible list of items or tree of items.
 
@@ -58,6 +58,10 @@ CLASS XWTTreeList FROM XWTTreeItem
    METHOD SetTitles( xTitles )
    METHOD SetContent( xContent )
 
+   METHOD CountColumns()
+
+   METHOD SetColumnEditable( nColNum, lCanEdit )
+
 HIDDEN:
    DATA xTitles
    DATA xContent
@@ -78,12 +82,59 @@ METHOD New( xContent, xTitles ) CLASS XWTTreeList
 
 RETURN Self
 
+
 METHOD SetTitles( xTitles ) CLASS XWTTreeList
    ::xTitles := xTitles
    XWT_SetProperty( ::oRawWidget, XWT_PROP_TITLES, xTitles )
 RETURN NIL
 
+
 METHOD SetContent( xContent ) CLASS XWTTreeList
    ::xContent := xContent
    XWT_SetProperty( ::oRawWidget, XWT_PROP_CONTENT, xContent )
+   XWT_SetProperty( ::oRawWidget, XWT_PROP_COLUMNS, ::CountColumns() )
 RETURN NIL
+
+
+METHOD CountColumns() CLASS XWTTreeList
+   LOCAL nColumns := 0
+   LOCAL cType, xObj
+
+   IF ::xContent != NIL
+      xObj := ::xContent[1]
+      cType := ValType( xObj )
+      // descend into the tree item structure
+      DO WHILE cType == "O" .and. Upper(xObj:ClassName()) == "XWTTREEITEM"
+         xObj := xObj:xContent
+         cType := ValType( xObj )
+      ENDDO
+
+      IF cType == "A"
+         nColumns := Len( xObj )
+      ELSE
+         nColumns := 1
+      ENDIF
+
+   ENDIF
+
+RETURN nColumns
+
+METHOD SetColumnEditable( nCol, lCanEdit )
+   LOCAL nLen := ::CountColumns()
+
+   IF lCanEdit == NIL
+      lCanEdit := .T.
+   ENDIF
+
+   IF nCol == NIL .or. nCol <=0
+      FOR nCol := 1 TO nLen
+         IF lCanEdit
+            XWT_SetProperty( ::oRawWidget, XWT_PROP_COLEDITABLE, nCol )
+         ELSE
+            XWT_SetProperty( ::oRawWidget, XWT_PROP_COLEDITABLE, -nCol )
+         ENDIF
+      NEXT
+
+   ENDIF
+
+RETURN .T.

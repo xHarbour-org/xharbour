@@ -118,11 +118,12 @@ PROCEDURE MAIN()
 
    oVLay2:Add( oRadioPanel )
    /***** A list **********/
-   oList := XWTTreeList():New( ;
+   oList := XWTTreeList():New(;
          { {"uno", 2, 3.12, "fir"}, ;
            {"dos",3,4,5} },;  //the table
          { "C1", "C2", "C3", "C4" } ; // the titles
          )
+   oList:SetColumnEditable( 0 )
    oVLay:Add( oList )
    /***** MENU design *****/
    oMenu := XwtMenu():New( "File" )

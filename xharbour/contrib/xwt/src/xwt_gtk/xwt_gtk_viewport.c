@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_viewport.c,v 1.4 2003/04/08 18:21:52 jonnymind Exp $
+   $Id: xwt_gtk_viewport.c,v 1.1 2003/04/12 23:47:15 jonnymind Exp $
 
    Viewport - an infinite scroller container & drawing area
 */
@@ -33,14 +33,12 @@ static void *viewport_get_topwidget( void *data )
    return widget->window;
 }
 
-PXWT_WIDGET xwt_gtk_createViewPort( PHB_ITEM pSelf )
+BOOL xwt_gtk_createViewPort( PXWT_WIDGET xwtData )
 {
    PXWT_GTK_WND viewport;
-   PXWT_WIDGET xwtData;
 
    viewport = (PXWT_GTK_WND) hb_xgrab( sizeof( XWT_GTK_WND ) );
    viewport->main_widget = NULL;
-   viewport->owner = pSelf->item.asArray.value;
 
    viewport->window = gtk_scrolled_window_new( NULL, NULL );
    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( viewport->window ),
@@ -50,16 +48,14 @@ PXWT_WIDGET xwt_gtk_createViewPort( PHB_ITEM pSelf )
 
    g_signal_connect (G_OBJECT(viewport->window),
       "scroll-child", G_CALLBACK (viewport_scrolled),
-      pSelf->item.asArray.value );
+      xwtData->owner );
 
    // no need for destructor, the data is just our widget for now
-   XWT_CREATE_WIDGET( xwtData );
 
-   xwtData->type = XWT_TYPE_VIEWPORT;
    xwtData->widget_data = (void *)viewport;
    xwtData->destructor = hb_xfree;
    xwtData->get_main_widget = xwt_gtk_get_mainwidget_base;
    xwtData->get_top_widget = viewport_get_topwidget;
 
-   return xwtData;
+   return TRUE;
 }

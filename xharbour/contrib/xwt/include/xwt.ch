@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.12 2003/05/11 15:14:43 jonnymind Exp $
+   $Id: xwt.ch,v 1.13 2003/06/05 17:06:21 jonnymind Exp $
 
    Definitions
 */
@@ -91,6 +91,8 @@
 #define XWT_PROP_VISIBILITY 102 // int (see widget visibility)
 
 #define XWT_PROP_TITLES     110 //PHB_ITEM (HB_IT_ARRAY) in data
+#define XWT_PROP_COLUMNS    111 //Number of columns in a table
+#define XWT_PROP_COLEDITABLE    112 //Number of columns in a table, negative for disable
 
 /* Fake properties */
 #define XWT_PROP_SETMENUBAR 1000 // PHB_ITEM (HB_IT_ARRAY) in data

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_menuitem.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: xwt_gtk_menuitem.c,v 1.2 2003/04/08 18:21:52 jonnymind Exp $
 
    Menu item managemetn
 */
@@ -24,9 +24,8 @@ static void *mi_get_topwidget( void *data )
 }
 
 
-PXWT_WIDGET xwt_gtk_createMenuItem( PHB_ITEM pSelf )
+BOOL xwt_gtk_createMenuItem( PXWT_WIDGET xwtData )
 {
-   PXWT_WIDGET xwtData;
    PXWT_GTK_MENUITEM menuitem;
 
    menuitem = (PXWT_GTK_MENUITEM) hb_xgrab( sizeof( XWT_GTK_MENUITEM ) );
@@ -49,19 +48,16 @@ PXWT_WIDGET xwt_gtk_createMenuItem( PHB_ITEM pSelf )
 
 
    // add a container to the window
-   menuitem->owner = pSelf->item.asArray.value;
    g_signal_connect (G_OBJECT (menuitem->main_widget), "activate", G_CALLBACK (mi_activate),
-      menuitem->owner );
+      xwtData->owner );
 
    gtk_widget_show( menuitem->main_widget );
 
    // no need for destructor, the data is just our widget for now
-   XWT_CREATE_WIDGET( xwtData );
-   xwtData->type = XWT_TYPE_MENUITEM;
    xwtData->widget_data = menuitem;
    xwtData->destructor = hb_xfree;
    xwtData->get_main_widget = xwt_gtk_get_topwidget_base;
    xwtData->get_top_widget = xwt_gtk_get_topwidget_base;
 
-   return xwtData;
+   return TRUE;
 }

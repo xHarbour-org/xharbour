@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.h,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: xwt_api.h,v 1.2 2003/04/18 13:28:49 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE - header
 */
@@ -31,6 +31,10 @@ typedef struct tag_xwt_widget
 
    // pointer to raw widget data that is known by virtual functions
    void *widget_data;
+
+   // back reference to xharbour object owner
+   PHB_BASEARRAY owner;
+
 } XWT_WIDGET, *PXWT_WIDGET;
 
 
@@ -88,7 +92,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wSelf, PXWT_PROPERTY prop );
 BOOL xwt_drv_add( PXWT_WIDGET wSelf, PXWT_WIDGET wChild );
 BOOL xwt_drv_remove( PXWT_WIDGET wSelf, PXWT_WIDGET wChild );
 
-PXWT_WIDGET xwt_drv_create( PHB_ITEM pSelf, int xwt_type );
+BOOL xwt_drv_create( PXWT_WIDGET wSelf );
 BOOL xwt_drv_destroy( PXWT_WIDGET wSelf );
 
 /* executes a widget in modal state */

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.13 2003/05/11 15:14:43 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.14 2003/06/05 17:06:22 jonnymind Exp $
 
    Global declarations, common functions
 */
@@ -483,7 +483,20 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
       return FALSE;
 
+      case XWT_PROP_COLUMNS:
+         if( wWidget->type == XWT_TYPE_TREELIST )
+         {
+            return xwt_gtk_treelist_create_columns( wWidget, prop->value.number );
+         }
+      return FALSE;
 
+      case XWT_PROP_COLEDITABLE:
+         if( wWidget->type == XWT_TYPE_TREELIST )
+         {
+            return xwt_gtk_treelist_set_colattr( wWidget, "editable",
+                  GINT_TO_POINTER( prop->value.number ) );
+         }
+      return FALSE;
    }
 
    return FALSE;
@@ -777,30 +790,31 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 }
 
 
-PXWT_WIDGET xwt_drv_create(  PHB_ITEM pSelf, int type )
+BOOL xwt_drv_create( PXWT_WIDGET xwtData )
 {
-   switch( type )
+   switch( xwtData->type )
    {
-      case XWT_TYPE_WINDOW:  return xwt_gtk_createWindow( pSelf );
-      case XWT_TYPE_FRAME:   return xwt_gtk_createFrameWindow( pSelf );
-      case XWT_TYPE_PANE:    return xwt_gtk_createPane( pSelf );
-      case XWT_TYPE_BUTTON:  return xwt_gtk_createButton( pSelf );
-      case XWT_TYPE_LABEL:   return xwt_gtk_createLabel( pSelf );
-      case XWT_TYPE_MENU:    return xwt_gtk_createMenu( pSelf );
-      case XWT_TYPE_MENUITEM:return xwt_gtk_createMenuItem( pSelf );
-      case XWT_TYPE_TEXTBOX: return xwt_gtk_createTextbox( pSelf );
-      case XWT_TYPE_IMAGE:  return xwt_gtk_createImage( pSelf );
-      case XWT_TYPE_LAYOUT:  return xwt_gtk_createLayout( pSelf );
-      case XWT_TYPE_GRID:  return xwt_gtk_createGrid( pSelf );
-      case XWT_TYPE_VIEWPORT:  return xwt_gtk_createViewPort( pSelf );
-      case XWT_TYPE_RADIOBUTTON:  return xwt_gtk_createRadioButton( pSelf );
-      case XWT_TYPE_CHECKBOX:  return xwt_gtk_createCheckbox( pSelf );
-      case XWT_TYPE_FILESEL:  return xwt_gtk_createFileSelection( pSelf );
-      case XWT_TYPE_SPLITTER:  return xwt_gtk_createSplitter( pSelf );
-      case XWT_TYPE_TOGGLEBUTTON:  return xwt_gtk_createToggleButton( pSelf );
-      case XWT_TYPE_TREELIST: return xwt_gtk_createTreelist( pSelf );
+      case XWT_TYPE_WINDOW:  return xwt_gtk_createWindow( xwtData );
+      case XWT_TYPE_FRAME:   return xwt_gtk_createFrameWindow( xwtData );
+      case XWT_TYPE_PANE:    return xwt_gtk_createPane( xwtData );
+      case XWT_TYPE_BUTTON:  return xwt_gtk_createButton( xwtData );
+      case XWT_TYPE_LABEL:   return xwt_gtk_createLabel( xwtData );
+      case XWT_TYPE_MENU:    return xwt_gtk_createMenu( xwtData );
+      case XWT_TYPE_MENUITEM:return xwt_gtk_createMenuItem( xwtData );
+      case XWT_TYPE_TEXTBOX: return xwt_gtk_createTextbox( xwtData );
+      case XWT_TYPE_IMAGE:  return xwt_gtk_createImage( xwtData );
+      case XWT_TYPE_LAYOUT:  return xwt_gtk_createLayout( xwtData );
+      case XWT_TYPE_GRID:  return xwt_gtk_createGrid( xwtData );
+      case XWT_TYPE_VIEWPORT:  return xwt_gtk_createViewPort( xwtData );
+      case XWT_TYPE_RADIOBUTTON:  return xwt_gtk_createRadioButton( xwtData );
+      case XWT_TYPE_CHECKBOX:  return xwt_gtk_createCheckbox( xwtData );
+      case XWT_TYPE_FILESEL:  return xwt_gtk_createFileSelection( xwtData );
+      case XWT_TYPE_SPLITTER:  return xwt_gtk_createSplitter( xwtData );
+      case XWT_TYPE_TOGGLEBUTTON:  return xwt_gtk_createToggleButton( xwtData );
+      case XWT_TYPE_TREELIST: return xwt_gtk_createTreelist( xwtData );
    }
    return FALSE;
+   
 }
 
 BOOL xwt_drv_destroy( PXWT_WIDGET wWidget )

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.11 2003/05/11 15:14:43 jonnymind Exp $
+   $Id: xwt_gtk.h,v 1.12 2003/06/05 17:06:22 jonnymind Exp $
 
    GTK interface
 */
@@ -25,8 +25,6 @@ void *xwt_gtk_get_topwidget_neuter( void *);
 typedef struct tag_xwt_gtk_base
 {
    GtkWidget *main_widget;
-   PHB_BASEARRAY owner;
-
 } XWT_GTK_BASE, *PXWT_GTK_BASE;
 
 typedef struct tag_xwt_gtk_modal
@@ -126,24 +124,24 @@ typedef struct tag_xwt_gtk_grid
 } XWT_GTK_GRID, *PXWT_GTK_GRID;
 
 
-PXWT_WIDGET xwt_gtk_createButton( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createFrameWindow( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createLabel( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createMenu( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createMenuItem( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createPane( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createTextbox( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createWindow( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createImage( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createLayout( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createGrid( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createViewPort( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createRadioButton( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createFileSelection( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createCheckbox( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createSplitter( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createToggleButton( PHB_ITEM pSelf );
-PXWT_WIDGET xwt_gtk_createTreelist( PHB_ITEM pSelf );
+BOOL xwt_gtk_createButton( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createFrameWindow( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createLabel( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createMenu( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createMenuItem( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createPane( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createTextbox( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createWindow( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createImage( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createLayout( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createGrid( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createViewPort( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createRadioButton( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createFileSelection( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createCheckbox( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createSplitter( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createToggleButton( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createTreelist( PXWT_WIDGET wSelf );
 
 void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
 void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
@@ -167,6 +165,8 @@ void *xwt_gtk_get_topwidget_sensible( void *data );
 
 BOOL xwt_gtk_treelist_set_content( PXWT_WIDGET xwtData, PHB_ITEM pContent );
 BOOL xwt_gtk_treelist_set_columns( PXWT_WIDGET xwtData, PHB_ITEM pCols );
+BOOL xwt_gtk_treelist_create_columns( PXWT_WIDGET xwtData, int nCols );
+BOOL xwt_gtk_treelist_set_colattr( PXWT_WIDGET xwtData, char *prop, void *data );
 
 /*** Putting a widget in a frame ****/
 GtkWidget *xwt_gtk_enframe( GtkWidget *framed );

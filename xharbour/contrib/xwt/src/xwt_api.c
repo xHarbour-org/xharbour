@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.10 2003/04/22 19:03:35 jonnymind Exp $
+   $Id: xwt_api.c,v 1.11 2003/06/05 17:06:22 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -167,7 +167,23 @@ HB_FUNC( XWT_MODAL )
 
 HB_FUNC( XWT_CREATE )
 {
-   hb_retptr( xwt_drv_create( hb_param(1, HB_IT_ARRAY ), hb_parni( 2 ) ) );
+   PXWT_WIDGET xwtData;
+   PHB_ITEM pSelf = hb_param(1, HB_IT_ARRAY );
+   XWT_CREATE_WIDGET( xwtData );
+
+   xwtData->type = hb_parni( 2 );
+   xwtData->owner = pSelf->item.asArray.value;
+   
+   if ( xwt_drv_create( xwtData ) )
+   {
+      hb_retptr( xwtData );
+   }
+   else
+   {
+      hb_xfree( xwtData );
+      // TODO: signal error here.
+      hb_ret();
+   }
 }
 
 
@@ -235,6 +251,8 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_VISIBILITY:
       case XWT_PROP_LAYMODE:
       case XWT_PROP_BORDER:
+      case XWT_PROP_COLUMNS:
+      case XWT_PROP_COLEDITABLE:
          prop.value.number = hb_parni( 3 );
       break;
 
@@ -355,6 +373,7 @@ HB_FUNC( XWT_GETPROPERTY )
       case XWT_PROP_VISIBILITY:
       case XWT_PROP_LAYMODE:
       case XWT_PROP_BORDER:
+      case XWT_PROP_COLEDITABLE:
          if( pParam1 != NULL )
          {
             hb_itemPutNI( pParam1, prop.value.number );

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_framewnd.c,v 1.2 2003/04/08 18:21:51 jonnymind Exp $
+   $Id: xwt_gtk_framewnd.c,v 1.3 2003/04/12 23:47:15 jonnymind Exp $
 
    GTK interface - Frame window
 */
@@ -38,10 +38,12 @@ static void *frame_get_topwidget( void *data )
    return wnd->window;
 }
 
-PXWT_WIDGET xwt_gtk_createFrameWindow(PHB_ITEM pSelf )
+BOOL xwt_gtk_createFrameWindow( PXWT_WIDGET xwtData )
 {
    PXWT_GTK_FRAMEWND frame = hb_xgrab( sizeof(XWT_GTK_FRAMEWND) );
-   PXWT_WIDGET xwtData;
+   PHB_BASEARRAY pSelf;
+
+   pSelf = xwtData->owner;
 
    frame->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
@@ -76,25 +78,21 @@ PXWT_WIDGET xwt_gtk_createFrameWindow(PHB_ITEM pSelf )
    That system will eventually rise the destroy signal to propagate child auto-destruction.
    Unclean objects will be taken by the gc. */
 
-   frame->owner = pSelf->item.asArray.value;
    // We must send only the internal object pointer. pSelf will be destroyed with stack pop
-   g_signal_connect(G_OBJECT(frame->window), "delete_event", G_CALLBACK (wnd_evt_destroy),
-      frame->owner );
+   g_signal_connect(G_OBJECT(frame->window), "delete_event",
+      G_CALLBACK (wnd_evt_destroy), pSelf );
 
    // A center position is a generally good default
    gtk_window_set_position( GTK_WINDOW( frame->window), GTK_WIN_POS_CENTER );
 
-   XWT_CREATE_WIDGET( xwtData );
-   xwtData->type = XWT_TYPE_FRAME;
    xwtData->widget_data = (void *) frame;
    xwtData->destructor = hb_xfree;
    xwtData->get_main_widget = frame_get_mainwidget;
    xwtData->get_top_widget = frame_get_topwidget;
 
    // add a container to the window
-   return xwtData;
+   return TRUE;
 }
-
 
 
 

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_image.c,v 1.1 2003/04/07 10:27:45 jonnymind Exp $
+   $Id: xwt_gtk_image.c,v 1.2 2003/04/08 18:21:51 jonnymind Exp $
 
    GTK interface - Clickable image widget
 */
@@ -28,25 +28,23 @@ static gboolean
    xwt_rise_event( &Self, XWT_E_PRESSED, 2, &pPosX, &pPosY );
    return TRUE;
 }
-/*
+
 static gboolean
   button_click_callback (GtkWidget      *event_box,
                          GdkEventButton *event,
                          gpointer        data)
 {
-   PHB_ITEM pPosX = hb_itemNew( NULL );
-   PHB_ITEM pPosY = hb_itemNew( NULL );
+   HB_ITEM pPosX;
+   HB_ITEM pPosY;
    XWT_GTK_MAKESELF( data );
 
-   hb_itemPutNI( pPosX, event->x );
-   hb_itemPutNI( pPosY, event->y );
+   hb_itemPutNI( &pPosX, event->x );
+   hb_itemPutNI( &pPosY, event->y );
 
-   xwt_rise_event( &Self, XWT_E_CLICKED, 2, pPosX, pPosY );
-   hb_itemRelease( pPosX );
-   hb_itemRelease( pPosY );
+   xwt_rise_event( &Self, XWT_E_CLICKED, 2, &pPosX, &pPosY );
    return TRUE;
 }
-*/
+
 
 
 static void image_destroy( void *data )
@@ -59,9 +57,8 @@ static void image_destroy( void *data )
    hb_xfree( img );
 }
 
-PXWT_WIDGET xwt_gtk_createImage( PHB_ITEM pSelf )
+BOOL xwt_gtk_createImage( PXWT_WIDGET xwtData )
 {
-   PXWT_WIDGET xwtData;
    PXWT_GTK_IMAGE imgdata = (PXWT_GTK_IMAGE) hb_xgrab( sizeof( XWT_GTK_IMAGE ) );
 
    imgdata->main_widget = gtk_image_new();
@@ -71,18 +68,15 @@ PXWT_WIDGET xwt_gtk_createImage( PHB_ITEM pSelf )
    xwt_gtk_set_alignment( (PXWT_GTK_ALIGN) imgdata );
 
    imgdata->pixmap = NULL;
-   imgdata->owner = pSelf->item.asArray.value;
    imgdata->filename = NULL;
    gtk_widget_show( GTK_WIDGET( imgdata->main_widget ) );
 
-   XWT_CREATE_WIDGET( xwtData );
-   xwtData->type = XWT_TYPE_IMAGE;
    xwtData->widget_data = imgdata;
    xwtData->destructor = image_destroy;
    xwtData->get_main_widget = xwt_gtk_get_mainwidget_base;
    xwtData->get_top_widget = xwt_gtk_get_topwidget_sensible;
 
-   return xwtData;
+   return TRUE;
 }
 
 BOOL xwt_gtk_imageLoad( PXWT_WIDGET wSelf, const char *filename )
@@ -121,7 +115,7 @@ BOOL xwt_gtk_image_setSensible( PXWT_WIDGET wSelf )
    gtk_container_add (GTK_CONTAINER (evt),GTK_WIDGET( wSelf->get_top_widget( wSelf->widget_data ) ));
 
    g_signal_connect (G_OBJECT (evt),"button_press_event",
-                      G_CALLBACK (button_press_callback), imgSelf->owner);
+                      G_CALLBACK (button_press_callback), wSelf->owner);
    gtk_widget_show( evt );
    imgSelf->evt_window = evt;
    return TRUE;
