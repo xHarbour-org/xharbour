@@ -53,7 +53,7 @@ FUNCTION Main
                :AddButton( "CompPPO",      ToolButton():New(11,,'Compile to PPO',21 ) )
                :AddButton( "View",         ToolButton():New(12,,'View',22 ) )
                :AddButton( "Files",        ToolButton():New(13,,'Files',23) )
-
+               
                SendMessage( :handle, TB_SETROWS, 2 )
                // ----------------------------------------------------   set imagelist
                hImg1:= ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
@@ -157,8 +157,7 @@ CLASS ObjTree FROM TForm
                                 ::top     := 125,;
                                 ::width   := 200,;
                                 ::height  := 150,;
-                                ::Style   := WS_POPUP + WS_CAPTION + WS_VISIBLE + WS_THICKFRAME,;
-                                ::ExStyle := WS_EX_CLIENTEDGE ,;
+                                ::ExStyle := WS_EX_CLIENTEDGE + WS_EX_TOOLWINDOW ,;
                                 super:new( oParent )
    // disallow window from being closed
    METHOD OnCloseQuery() INLINE 0
@@ -172,8 +171,7 @@ CLASS ObjInspect FROM TForm
                                 ::top     := 275,;
                                 ::width   := 200,;
                                 ::height  := 250,;
-                                ::Style   := WS_POPUP + WS_CAPTION + WS_VISIBLE + WS_THICKFRAME,;
-                                ::ExStyle := WS_EX_CLIENTEDGE ,;
+                                ::ExStyle := WS_EX_CLIENTEDGE + WS_EX_TOOLWINDOW ,;
                                 super:new( oParent )
    // disallow window from being closed
    METHOD OnCloseQuery() INLINE 0
