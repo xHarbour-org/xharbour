@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.73 2003/04/25 23:02:48 jonnymind Exp $
+* $Id: thread.c,v 1.74 2003/04/27 15:58:51 paultucker Exp $
 */
 
 /*
@@ -1569,8 +1569,10 @@ void hb_threadWaitAll()
       #elif defined(HB_OS_DARWIN)
          usleep( 1 );
       #else
+      {
          static struct timespec nanosecs = { 0, 1000 };
          nanosleep( &nanosecs, NULL );
+      }
       #endif
       HB_STACK_LOCK;
       HB_CRITICAL_LOCK( hb_threadStackMutex );
