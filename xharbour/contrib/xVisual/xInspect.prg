@@ -49,7 +49,8 @@ ENDCLASS
 
 //-------------------------------------------------------------------------------------------------
 METHOD SetBrowserData( oObj ) CLASS ObjInspect
-
+   ::Parent:ObjEdit:QuickEdit:SetText('oops')
+   
    ::CurObject := oObj
 
    ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
@@ -149,6 +150,7 @@ CLASS ComboInsp FROM TComboBox
    METHOD OnClick()
    METHOD AddString()
    METHOD SetCurSel()
+   METHOD DelObject()
 ENDCLASS
 
 //---------------------------------------------------------------------------------
@@ -172,6 +174,17 @@ return(super:AddString(cText))
 METHOD SetCurSel(n) CLASS ComboInsp
    ::Parent:SetBrowserData( ::Parent:Objects[n+1] )
 return(super:SetCurSel(n))
+
+//---------------------------------------------------------------------------------
+
+METHOD DelObject( oObj ) CLASS ComboInsp
+   local n
+   IF ( n:= aScan( ::Parent:Objects, {|o|o:handle == oObj:handle} ))>0
+      aDel( ::Parent:Objects, n, .T. )
+      ::DeleteString( n-1 )
+      ::SetCurSel( n-2 )
+   ENDIF
+return(nil)
 
 //---------------------------------------------------------------------------------
 

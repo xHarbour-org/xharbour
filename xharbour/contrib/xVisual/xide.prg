@@ -32,6 +32,7 @@ FUNCTION Main
          // add the object windows
          :Add( 'ObjTree', ObjTree():New( oApp:MainFrame ) )
          :Add( 'ObjInsp', ObjInspect():New( oApp:MainFrame ) )
+         :Add( 'ObjEdit', ObjEdit():New( oApp:MainFrame ) )
 
          // focus to main Frame
          :SetFocus()
@@ -165,3 +166,12 @@ METHOD MainStatusBar() CLASS MainFrame
 return(self)
 
 //----------------------------------------------------------------------------------------------
+
+CLASS ObjEdit FROM TForm
+   METHOD OnCreate()
+ENDCLASS
+
+METHOD OnCreate() CLASS ObjEdit
+   local aRect := ::ClientRect()
+   ::Add('QuickEdit', TEdit():New( self, 'edit', 101,  0,0, aRect[3], aRect[4] ) )
+return(nil)

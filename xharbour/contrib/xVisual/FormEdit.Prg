@@ -70,6 +70,7 @@ GLOBAL EXTERNAL oApp
    METHOD OnCloseQuery()     INLINE ::Parent:WindowMenu:Enable( 101 ),;
                                     ::Parent:StdBar:DisableAll(),;
                                     ::XFMTrace(),;
+                                    ::Parent:ObjInsp:InspCombo:DelObject( self ),;
                                     super:OnCloseQuery()
 
    METHOD XFMTop()
@@ -207,6 +208,9 @@ METHOD CreateControl(aRect)
       if oObj!=NIL
          oObj:SetMethod("OnMove",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj )})
          oObj:SetMethod("OnSize",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj )})
+         
+         oObj:SetMethod("Delete",{||oApp:MainFrame:ObjInsp:InspCombo:DelObject( oObj ),;
+                                    HB_QSELF():DelControl() } )
 
          oApp:MainFrame:ObjInsp:InspCombo:AddString(oObj:propname+chr(9)+oObj:ClassName(),oObj)
          oApp:MainFrame:ObjInsp:InspCombo:SetCurSel(oApp:MainFrame:ObjInsp:InspCombo:GetCount()-1)
@@ -267,7 +271,6 @@ METHOD CreateSub()
 
    ::Parent:ObjInsp:InspCombo:AddString(::PropName+chr(9)+"TFORM",self)
    ::Parent:ObjInsp:InspCombo:SetCurSel(::Parent:ObjInsp:InspCombo:GetCount()-1)
-
    ::Parent:ObjTree:Tree:Add( ::PropName )
 
    xRet := super:OnCreate()
