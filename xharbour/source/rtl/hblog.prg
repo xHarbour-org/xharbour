@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.29 2003/06/16 22:10:51 lculik Exp $
+* $Id: hblog.prg,v 1.1 2003/07/10 10:49:00 jonnymind Exp $
 */
 
 /*
@@ -100,42 +100,51 @@ RETURN
 
 
 PROCEDURE HB_CloseStandardLog()
-   #ifdef HB_THREAD_SUPPORT
-      MutexLock( StdLogMutex )
-   #Endif
 
-   StdLogger:Close()
+   // If the logger is NIL also the mutex is NIL
+   IF StdLogger != NIL
+      #ifdef HB_THREAD_SUPPORT
+         MutexLock( StdLogMutex )
+      #Endif
 
-   #ifdef HB_THREAD_SUPPORT
-      MutexUnlock( StdLogMutex )
-      DestroyMutex( StdLogMutex )
-   #Endif
+      StdLogger:Close()
+
+      #ifdef HB_THREAD_SUPPORT
+         MutexUnlock( StdLogMutex )
+         DestroyMutex( StdLogMutex )
+      #Endif
+
+   ENDIF
 RETURN
 
 
 PROCEDURE HB_SetStandardLogStyle( nStyle )
-   #ifdef HB_THREAD_SUPPORT
-      MutexLock( StdLogMutex )
-   #Endif
+   IF StdLogger != NIL
+      #ifdef HB_THREAD_SUPPORT
+         MutexLock( StdLogMutex )
+      #Endif
 
-   StdLogger:SetStyle( nStyle )
+      StdLogger:SetStyle( nStyle )
 
-   #ifdef HB_THREAD_SUPPORT
-      MutexUnlock( StdLogMutex )
-   #Endif
+      #ifdef HB_THREAD_SUPPORT
+         MutexUnlock( StdLogMutex )
+      #Endif
+   ENDIF
 RETURN
 
 
 PROCEDURE HB_StandardLog( cMsg, nPrio )
-   #ifdef HB_THREAD_SUPPORT
-      MutexLock( StdLogMutex )
-   #Endif
+   IF StdLogger != NIL
+      #ifdef HB_THREAD_SUPPORT
+         MutexLock( StdLogMutex )
+      #Endif
 
-   StdLogger:Log( cMsg, nPrio )
+      StdLogger:Log( cMsg, nPrio )
 
-   #ifdef HB_THREAD_SUPPORT
-      MutexUnlock( StdLogMutex )
-   #Endif
+      #ifdef HB_THREAD_SUPPORT
+         MutexUnlock( StdLogMutex )
+      #Endif
+   ENDIF
 RETURN
 
 FUNCTION HB_BldLogMsg( ... )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1236 2003/07/10 15:19:44 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1237 2003/07/10 16:10:16 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-11 00:00 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hblog.prg
+    * Now LOG command (PP short for HB_StandardLogMessage() ) can be
+      used also if LOG is not initialized. This will cause log system
+      not to log anything, but will allow to create user-defined libraries
+      that uses LOG but really log something only if the main application
+      decide to use the log system.
+
+  * tests/logtest.prg
+    ! fixed some misbehaving in visualization/interface.
 
 2003-07-10 23:10 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * include/hbdefs.h

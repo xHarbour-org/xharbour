@@ -1,6 +1,6 @@
 ************************************************************
 * logtest.prg
-* $Id: xmltest.prg,v 1.5 2003/06/30 23:06:27 jonnymind Exp $
+* $Id: logtest.prg,v 1.1 2003/07/10 10:49:00 jonnymind Exp $
 *
 * Demonstrates the standard log system
 *
@@ -18,25 +18,25 @@ Procedure MAIN()
 
    // We'll use this to allow users to change level.
    LOCAL aLevelNames := { ;
-   	"Critical",;
-	"Error", ;
-	"Warning", ;
-	"Information", ;
-	"Debug", ;
-	"Debug (lower)", ;
-	"Debug (still lower)";
+      "Critical",;
+      "Error", ;
+      "Warning", ;
+      "Information", ;
+      "Debug", ;
+      "Debug (lower)", ;
+      "Debug (still lower)";
    }
-   // mapping level names to real HB_ log levels 
+   // mapping level names to real HB_ log levels
    LOCAL aLevels := { ;
-   	HB_LOG_CRITICAL,;
-	HB_LOG_ERROR, ;
-	HB_LOG_WARNING, ;
-	HB_LOG_INFO, ;
-	HB_LOG_DEBUG, ;
-	HB_LOG_DEBUG+1, ;
-	HB_LOG_DEBUG+2 ;
+      HB_LOG_CRITICAL,;
+   HB_LOG_ERROR, ;
+   HB_LOG_WARNING, ;
+   HB_LOG_INFO, ;
+   HB_LOG_DEBUG, ;
+   HB_LOG_DEBUG+1, ;
+   HB_LOG_DEBUG+2 ;
    }
-   
+
    SET COLOR TO w+/b
    CLEAR SCREEN
    @1,15 SAY "X H A R B O U R - Log test "
@@ -46,14 +46,14 @@ Procedure MAIN()
    @6,10 SAY "To the file logtest.log: only INFO or above"
    @7,10 SAY "To the system log: only error or critical."
    @8,5 SAY "Press ESC to select another priority; Press it again to exit"
-   @9,5 SAY "*Notice: to demonstrate self log file rolling feature, log file"  
+   @9,5 SAY "*Notice: to demonstrate self log file rolling feature, log file"
    @10,6 SAY "limit is set to 2K"
 
    // Log can be initialized in any moment
    // Other than the HB_Logger class, there is a "standard log" that is
    // a static HB_Logger instantation, that is accessed with some functions.
    // The following instructions are preprocessor wrappers.
- 
+
    INIT LOG ON ;
       File( "logtest.log", HB_LOG_INFO, 2, 5 ), ;
       SYSLOG( HB_LOG_ERROR,  0x3ffaaffaa ), ;
@@ -65,9 +65,10 @@ Procedure MAIN()
    // HB_LogSyslog, ERROR and above, application code 0x3ffaaffaa
    // HB_LogConsole, any level.
    // Also, the application name for logging is set to "Log Test Program
-   
+
    // preparing a "virual console"
-   @22,0 say "Virtual console  ----------------------------------------"
+   @22,0 SAY "Virtual console  ----------------------------------------"
+   @23,0 SAY Space( 80 )
    @23,0
 
    // a demo of how the log works from within a program
@@ -77,45 +78,44 @@ Procedure MAIN()
 
    @13,30 SAY "Insert message to log below:"
    cMessage := Space(45)
-   @14,30 GET cMessage
-   
+
    nChoice := 1
    DO WHILE nChoice > 0
       MakeBox( 11,2, 19, 25 )
-      @11,5 SAY  "Select Level: " 
+      @11,5 SAY  "Select Level: "
       nChoice := Achoice(12, 4, 18, 24 , aLevelNames)
 
       IF nChoice > 0
-      	 DO While LastKey() != K_ESC
+         DO While LastKey() != K_ESC
+            @14,30 GET cMessage
             READ
+            @10, nChoice say "HERE"
             IF LastKey() != K_ESC
                // Preparing virtual console
-               @22,0 SAY Space(80)
-               @22,0
+               @23,0 SAY Space(80)
+               @23,0
 
-               LOG cMessage PRIO aLevels[ nChoice ] 
-	       cMessage := Space( 45 )
-               @14,30 GET cMessage
-	       READ
-	    ENDIF
-	 ENDDO
+               LOG cMessage PRIO aLevels[ nChoice ]
+               cMessage := Space( 45 )
+            ENDIF
+         ENDDO
       ENDIF
    ENDDO
 
    // Log closing creates a log INFO message
-   @22,0 SAY Space(80)
-   @22,0
+   @23,0 SAY Space(80)
+   @23,0
    // closing the log
    CLOSE LOG
 
    @24,0
-   
+
 RETURN
 
 
 PROCEDURE MakeBox( nRow, nCol, nRowTo, nColTo )
    @nRow, nCol, nRowTo, nColTo ;
-        BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) +;
-        Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
+      BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) +;
+      Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
 RETURN
 
