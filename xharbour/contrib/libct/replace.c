@@ -1,5 +1,5 @@
 /*
- * $Id: replace.c,v 1.2 2001/10/20 05:40:55 paultucker Exp $
+ * $Id: replace.c,v 1.1 2003/03/04 21:04:51 lculik Exp $
  */
 
 /*
@@ -73,7 +73,7 @@ static void do_replace (int iSwitch)
 {
 
   /* suppressing return value ? */
-  int iNoRet = ct_getref();
+  int iNoRet = ct_getref() && ISBYREF( 1 );
 
   /* param check */
   if ((ISCHAR (1)) &&

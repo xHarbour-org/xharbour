@@ -1,5 +1,5 @@
 /*
- * $Id: pos2.c,v 1.2 2001/10/20 05:40:55 paultucker Exp $
+ * $Id: pos2.c,v 1.1 2003/03/04 21:04:46 lculik Exp $
  */
 
 /*
@@ -89,7 +89,7 @@ HB_FUNC (POSCHAR)
 
   int iNoRet;
 
-  iNoRet = ct_getref();
+  iNoRet = ct_getref() && ISBYREF( 1 );
 
   if (hb_parclen (1) > 0)
   {
@@ -468,7 +468,7 @@ HB_FUNC (POSREPL)
 
   int iNoRet;
 
-  iNoRet = ct_getref();
+  iNoRet = ct_getref() && ISBYREF( 1 );
 
   if (ISCHAR (1))
   {

@@ -1,5 +1,5 @@
 /*
- * $Id: relation.c,v 1.2 2001/10/20 05:40:55 paultucker Exp $
+ * $Id: relation.c,v 1.1 2003/03/04 21:04:50 lculik Exp $
  */
 
 /*
@@ -226,7 +226,7 @@ HB_FUNC (CHARRELREP)
 
   int iNoRet;
 
-  iNoRet = ct_getref();
+  iNoRet = ct_getref() && ISBYREF( 4 );
 
   if (ISCHAR (1) &&
       ISCHAR (2) &&

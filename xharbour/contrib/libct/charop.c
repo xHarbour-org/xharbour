@@ -1,5 +1,5 @@
 /*
- * $Id: charop.c,v 1.3 2001/07/17 17:47:34 mbirdyg Exp $
+ * $Id: charop.c,v 1.1 2003/03/04 21:04:13 lculik Exp $
  */
 
 /*
@@ -84,7 +84,7 @@ static void do_charop (int iSwitch)
   int iNoRet;
 
   /* suppressing return value ? */
-  iNoRet = ct_getref();
+  iNoRet = ct_getref() && ISBYREF( 1 );
 
   if (ISCHAR (1))
   {

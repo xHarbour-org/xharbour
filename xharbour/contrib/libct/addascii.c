@@ -1,5 +1,5 @@
 /*
- * $Id: addascii.c,v 1.1 2003/03/04 21:03:58 lculik Exp $
+ * $Id: addascii.c,v 1.2 2004/05/12 02:25:08 druzus Exp $
  */
 
 /*
@@ -127,7 +127,7 @@ HB_FUNC (ADDASCII)
   int iNoRet;
 
   /* suppressing return value ? */
-  iNoRet = ct_getref();
+  iNoRet = ct_getref() && ISBYREF( 1 );
   
   if (ISCHAR (1))
   {

@@ -1,5 +1,5 @@
 /*
- * $Id: charrepl.c,v 1.4 2002/02/18 23:13:03 mbirdyg Exp $
+ * $Id: charrepl.c,v 1.1 2003/03/04 21:04:15 lculik Exp $
  */
 
 /*
@@ -128,7 +128,7 @@ HB_FUNC (CHARREPL)
   size_t sSearchLen, sReplaceLen;
 
   /* suppressing return value ? */
-  iNoRet = ct_getref();
+  iNoRet = ct_getref() && ISBYREF( 2 );
 
   /* param check */
   if (((sSearchLen = (size_t)hb_parclen (1)) > 0) &&

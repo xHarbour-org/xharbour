@@ -1,5 +1,5 @@
 /*
- * $Id: charsort.c,v 1.4 2002/01/16 16:11:02 dholm Exp $
+ * $Id: charsort.c,v 1.1 2003/03/04 21:04:17 lculik Exp $
  */
 
 /*
@@ -171,7 +171,7 @@ HB_FUNC (CHARSORT)
   int iNoRet;
 
   /* suppressing return value ? */
-  iNoRet = ct_getref();
+  iNoRet = ct_getref() && ISBYREF( 1 );
 
   /* param check I */
   if (ISCHAR (1))

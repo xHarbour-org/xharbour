@@ -1,5 +1,5 @@
 /*
- * $Id: token1.c,v 1.6 2001/07/23 16:38:00 mbirdyg Exp $
+ * $Id: token1.c,v 1.1 2003/03/04 21:04:53 lculik Exp $
  */
 
 /*
@@ -84,7 +84,7 @@ static void do_token1 (int iSwitch)
 {
 
   int iParamCheck = 0;
-  int iNoRef = ct_getref();
+  int iNoRef = ct_getref() && ISBYREF( 1 );
 
   switch (iSwitch)
   {

@@ -1,5 +1,5 @@
 /*
- * $Id: charmirr.c,v 1.3 2001/07/17 17:47:34 mbirdyg Exp $
+ * $Id: charmirr.c,v 1.1 2003/03/04 21:04:06 lculik Exp $
  */
 
 /*
@@ -107,7 +107,7 @@ HB_FUNC (CHARMIRR)
   int iNoRet;
 
   /* suppressing return value ? */
-  iNoRet = ct_getref();
+  iNoRet = ct_getref() && ISBYREF( 1 );
 
   /* param check */
   if (ISCHAR (1))

@@ -1,5 +1,5 @@
 /*
- * $Id: charswap.c,v 1.4 2001/07/23 16:38:00 mbirdyg Exp $
+ * $Id: charswap.c,v 1.1 2003/03/04 21:04:18 lculik Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ static void do_charswap (int iSwitch)
   int iNoRet;
 
   /* suppress return value ? */
-  iNoRet = ct_getref();
+  iNoRet = ct_getref() && ISBYREF( 1 );
 
   /* param check */
   if (ISCHAR (1))

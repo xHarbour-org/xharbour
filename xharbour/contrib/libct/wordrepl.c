@@ -1,5 +1,5 @@
 /*
- * $Id: wordrepl.c,v 1.4 2001/07/20 22:45:46 lculik Exp $
+ * $Id: wordrepl.c,v 1.1 2003/03/04 21:04:56 lculik Exp $
  */
 
 /*
@@ -129,7 +129,7 @@ HB_FUNC (WORDREPL)
   size_t sSearchLen, sReplaceLen;
 
   /* suppressing return value ? */
-  iNoRet = ct_getref();
+  iNoRet = ct_getref() && ISBYREF( 2 );
   iMultiPass = ct_getatmupa();
 
   /* param check */

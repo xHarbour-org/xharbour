@@ -1,5 +1,5 @@
 /*
- * $Id: range.c,v 1.2 2004/06/18 21:13:03 likewolf Exp $
+ * $Id: range.c,v 1.3 2004/07/22 14:17:04 likewolf Exp $
  */
 
 /*
@@ -228,7 +228,7 @@ HB_FUNC (RANGEREM)
 HB_FUNC (RANGEREPL)
 {
 
-  int iNoRef = ct_getref();
+  int iNoRef = ct_getref() && ISBYREF( 3 );
 
   if (((hb_parclen (1) > 0) || ISNUM (1)) &&
       ((hb_parclen (2) > 0) || ISNUM (2)) &&
@@ -303,7 +303,7 @@ HB_FUNC (RANGEREPL)
       hb_storclen (pcRet, sStrLen, 3);
     }
 
-    if (iNoRef && ISBYREF( 3 ))
+    if (iNoRef)
     {
       /* Contrary to the official documentation, RANGREPL() returns NIL instead of .F.
        * in this situation. If the string is not passed by reference, it returns the

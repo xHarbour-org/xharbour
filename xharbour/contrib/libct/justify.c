@@ -1,5 +1,5 @@
 /*
- * $Id: justify.c,v 1.3 2001/10/20 05:40:55 paultucker Exp $
+ * $Id: justify.c,v 1.1 2003/03/04 21:04:36 lculik Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static void do_justify (int iSwitch)
 
   int iNoRet;
 
-  iNoRet = ct_getref();
+  iNoRet = ct_getref() && ISBYREF( 1 );
 
   if (ISCHAR (1))
   {

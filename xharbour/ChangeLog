@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3191 2004/07/22 14:47:43 likewolf Exp $
+ * $Id: ChangeLog,v 1.3192 2004/07/22 15:54:34 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-22 20:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * contrib/libct/addascii.c
+  * contrib/libct/charmirr.c
+  * contrib/libct/charop.c
+  * contrib/libct/charrepl.c
+  * contrib/libct/charsort.c
+  * contrib/libct/charswap.c
+  * contrib/libct/justify.c
+  * contrib/libct/pos2.c
+  * contrib/libct/range.c
+  * contrib/libct/relation.c
+  * contrib/libct/replace.c
+  * contrib/libct/token1.c
+  * contrib/libct/wordrepl.c
+    ! If CSETREF() is set to .T., don't return values ONLY IF the string IS
+      ACTUALLY passed by reference. Undocumented CA-Tools compatibility.
 
 2004-07-22 21:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c
