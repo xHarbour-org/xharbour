@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.32 2003/09/11 17:59:01 druzus Exp $
+# $Id: xharbour.spec,v 1.33 2003/09/17 12:45:10 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -30,7 +30,7 @@
 
 %define name     xharbour
 %define dname    xHarbour
-%define version  0.82.0
+%define version  0.91.1
 %define releasen 0
 %define prefix   /usr
 %define hb_pref  xhb
@@ -147,6 +147,24 @@ Esse pacote %{dname} provem as bibliotecas  de run time staticas para linkagem
 dos os programas
 
 
+%package contrib
+Summary:        Contrib runtime libaries for %{dname} compiler
+Summary(pl):    Contrib bilioteki dla kompilatora %{dname}
+Summary(pt_BR):  Libs contrib para  %{dname}
+Group:          Development/Languages
+Requires:       %{name} = %{version}
+
+%description contrib
+%{dname} is a Clipper compatible compiler.
+This package provides %{dname} contrib libraries for program linking.
+
+
+%description -l pt_BR contrib
+%{dname} ‚ um compilador compativel com o clippe.
+Esse pacote %{dname} provem as bibliotecas  contrib para linkagem
+dos  programas
+
+
 ######################################################################
 ## PP
 ######################################################################
@@ -215,6 +233,18 @@ pushd contrib/libct
     make
 popd
 
+pushd contrib/rdd_ads
+    make
+popd
+
+pushd contrib/libnf
+    make
+popd
+
+pushd contrib/mysql
+    make
+popd
+
 ######################################################################
 ## Install.
 ######################################################################
@@ -239,6 +269,18 @@ make -i install
 
 # install CT lib
 pushd contrib/libct
+    make -i install
+popd
+
+pushd contrib/rdd_ads
+    make -i install
+popd
+
+pushd contrib/libnf
+    make -i install
+popd
+
+pushd contrib/mysql
     make -i install
 popd
 
@@ -576,7 +618,7 @@ cat > $RPM_BUILD_ROOT/etc/profile.d/harb.sh <<EOF
 export HB_LEX="SIMPLEX"
 export C_USR="-DHB_FM_STATISTICS_OFF -O2"
 EOF
-
+chmod 777 $RPM_BUILD_ROOT/etc/profile.d/harb.sh
 
 # Create PP
 pushd tests
@@ -717,8 +759,10 @@ EOF
 ######################################################################
 ## Post install
 ######################################################################
-#%post lib
-#/sbin/ldconfig
+%post
+/etc/profile.d/harb.sh
+%post lib
+/sbin/ldconfig
 
 ######################################################################
 ## Post uninstall
@@ -768,7 +812,40 @@ rm -rf $RPM_BUILD_ROOT
 %files static
 %defattr(-,root,root,755)
 %dir %{prefix}/lib/%{name}
-%{prefix}/lib/%{name}/*.a
+%{prefix}/lib/%{name}/libcodepage.a
+%{prefix}/lib/%{name}/libcommon.a
+%{prefix}/lib/%{name}/libdbfcdx*.a
+%{prefix}/lib/%{name}/libdbfdbt.a
+%{prefix}/lib/%{name}/libdbffpt.a
+%{prefix}/lib/%{name}/libdbfntx*.a
+%{prefix}/lib/%{name}/libdebug.a
+%{prefix}/lib/%{name}/libfm.a
+%{prefix}/lib/%{name}/libfmmt.a
+%{prefix}/lib/%{name}/libgtcgi.a
+%{prefix}/lib/%{name}/libgtcrs.a
+%{prefix}/lib/%{name}/libgtnul.a
+%{prefix}/lib/%{name}/libgtpca.a
+%{prefix}/lib/%{name}/libgtsln.a
+%{prefix}/lib/%{name}/libgtstd.a
+%{prefix}/lib/%{name}/libhbodbc.a
+%{prefix}/lib/%{name}/liblang.a
+%{prefix}/lib/%{name}/libmacro.a
+%{prefix}/lib/%{name}/libmacromt.a
+%{prefix}/lib/%{name}/libnulsys*.a
+%{prefix}/lib/%{name}/libpp*.a
+%{prefix}/lib/%{name}/librdd*.a
+%{prefix}/lib/%{name}/librtl*.a
+%{prefix}/lib/%{name}/libsamples.a
+%{prefix}/lib/%{name}/libvm*.a
+
+
+%files contrib
+%defattr(-,root,root,755)
+%dir %{prefix}/lib/%{name}
+%{prefix}/lib/%{name}/libct*.a
+%{prefix}/lib/%{name}/libnf*.a
+%{prefix}/lib/%{name}/librddads*.a
+%{prefix}/lib/%{name}/libmysql*.a
 
 %files lib
 %defattr(-,root,root,755)
