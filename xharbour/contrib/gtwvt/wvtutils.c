@@ -102,17 +102,10 @@ HB_EXTERN_END
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
-/* get pointer to WVT GlobalData structure at startup */
-HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_wvt_Init_ )
-static void HB_EXPORT hb_wvt_wvtUtils( void )
+void HB_EXPORT hb_wvt_wvtUtils( void )
 {
    _s = hb_wvt_gtGetGlobalData();
 }
-HB_CALL_ON_STARTUP_END( _hb_startup_gt_wvt_Init_ )
-
-#if defined( HB_PRAGMA_STARTUP )
-   #pragma startup _hb_startup_gt_wvt_Init_
-#endif
 
 //-------------------------------------------------------------------//
 //

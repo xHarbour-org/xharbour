@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.142 2005/01/22 11:32:05 druzus Exp $
+ * $Id: gtwvt.c,v 1.141 2005/01/13 10:30:31 bdj Exp $
  */
 
 /*
@@ -89,7 +89,7 @@
    #define _WIN32_IE 0x0400
 #endif
 
-#include "gtwvt.h"
+#include "hbgtwvt.h"
 
 #ifndef WM_MOUSEWHEEL
    #define WM_MOUSEWHEEL 0x020A
@@ -267,6 +267,9 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
     _s.hdc        = GetDC( _s.hWnd );
     _s.hCompDC    = CreateCompatibleDC( _s.hdc );
     hb_wvt_gtInitGui();
+
+    hb_wvt_wvtCore();
+    hb_wvt_wvtUtils();
 
     if( b_MouseEnable )
     {

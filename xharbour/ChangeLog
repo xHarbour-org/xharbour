@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3761 2005/01/21 18:41:13 druzus Exp $
+ * $Id: ChangeLog,v 1.3762 2005/01/22 11:31:50 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-22 16:15 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * xharbour/source/rtl/gtwvt/Makefile
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  + xharbour/source/rtl/gtwvt/gtwvt.h
+  - xharbour/include/hbgtwvt.h
+  - xharbour/include/wvtwin.ch
+  - xharbour/include/wvtgui.ch
+  - xharbour/source/rtl/gtwvt/wvtclass.prg
+  - xharbour/source/rtl/gtwvt/wvtpaint.prg
+  - xharbour/source/rtl/gtwvt/wvtcore.c
+  - xharbour/source/rtl/gtwvt/wvtutils.c
+  - xharbour/source/rtl/gtwvt/ChangeLog
+  + xharbour/contrib/gtwvt/*
+    * gtwvt moved to contrib. Please update non gnu makefiles.
 
 2005-01-22 12:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfntx/dbfntx1.c

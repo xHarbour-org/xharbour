@@ -1,5 +1,5 @@
 /*
- * $Id: wvtclass.prg,v 1.4 2004/07/29 15:14:39 vouchcac Exp $
+ * $Id: wvtclass.prg,v 1.5 2004/08/30 14:10:20 vouchcac Exp $
  */
 
 /*
