@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.19 2004/09/01 02:01:19 modalsist Exp $
+rem $Id: make_b32.bat,v 1.20 2004/12/18 00:36:07 modalsist Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -35,9 +35,8 @@ if "%1" == "CLEAN" goto CLEAN
 
 :BUILD
 
-   SET HB_MT=
-   make -l -fmakefile.bc %1 %2 %3 > make_b32.log
-   make -l -DHB_THREAD_SUPPORT -fmakefile.bc %2 %3 >> make_b32.log
+   make -l OBJ_DIR=obj\b32 -fmakefile.bc %1 %2 %3 > make_b32.log
+   make -l OBJ_DIR=obj\b32\mt -DHB_THREAD_SUPPORT -DHB_MT=mt -fmakefile.bc %2 %3 >> make_b32.log
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
