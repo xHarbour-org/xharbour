@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2800 2004/04/18 17:27:58 likewolf Exp $
+ * $Id: ChangeLog,v 1.2801 2004/04/18 18:02:27 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-04-19 03:50 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
+  * source/rtl/teditor.prg
+    ! Correct sanitization on New() parameters; prevents function looping into memoedit after
+      changing the text to crash.
+    % More compact and readable (by far) code.
+    
 2004-04-18 23:35 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * source/rtl/teditor.prg
     ! More fixes to TEditor.

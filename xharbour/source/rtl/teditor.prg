@@ -28,7 +28,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.27 2004/04/18 10:18:18 jonnymind Exp $
+/* $Id: teditor.prg,v 1.28 2004/04/18 17:59:58 vouchcac Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -218,9 +218,9 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    default  nLineLength to nil
    default  nTabSize    to nil
    default  nTextRow    to 1
-   default  nTextCol    to 0
-   default  nWndRow     to 0
-   default  nWndCol     to 0
+   default  nTextCol    to 1
+   default  nWndRow     to 1
+   default  nWndCol     to 1
 
    IF HB_IsNumeric( nLineLength ) .AND. nLineLength <= 0
       nLineLength := NIL
@@ -290,23 +290,35 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    if nTabSize != NIL
       ::nTabWidth := nTabSize
    endif
+   
+   // ::naTextLen is guaranteed to be at least 1 by TextToArray()
+   ::nRow := min( nTextRow, ::naTextLen )
+   ::nCol := min( Len( ::aText[ ::nRow ]:cText ) , nTextCol )
+   IF ::lWordWrap .and. ::nCol > ::nWordWrapCol
+      ::nCol := ::nWordWrapCol
+   ENDIF
+   IF ::nRow < 1
+      ::nRow := 1
+   ENDIF
+   IF ::nCol < 1
+      ::nCol := 1
+   ENDIF
 
-   nTextRow    := max( 1, nTextRow )
-   nTextCol    := max( 0, nTextCol )
-   nWndRow     := max( 0, nWndRow  )
-   nWndCol     := max( 0, nWndCol  )
-
-   ::nFirstRow := max( 1, nTextRow - nWndRow )
-   ::nFirstCol := max( 1, nTextCol - nWndCol )
-   ::nRow      := max( 1, nTextRow     )
-   ::nCol      := max( 1, nTextCol + 1 )
-
-   // Empty area of screen which will hold editor window
-   Scroll( nTop, nLeft, nBottom, nRight )
-
-   // Set cursor position
-   ::SetPos( ::nTop + nWndRow, ::nLeft + nWndCol )
-
+   // calculate firstrow and firstcol based on nWndRow and nWndCol with respect to nRow nCol
+   ::nFirstRow := max( ::nRow - nWndRow, 1 )
+   ::nFirstCol := max( ::nCol - nWndCol, 1 )
+   // extra sanitization over max bounds
+   IF ::nFirstRow >  ::naTextLen
+      ::nFirstRow := ::naTextLen
+   ENDIF
+   
+   IF ::nFirstCol >  ::LineLen( ::nFirstRow ) + 1
+      ::nFirstCol := ::LineLen( ::nFirstRow ) + 1
+   ENDIF
+   
+   // Set cursor position; also initializes phisical to virtual mapping
+   ::SetPos( ::nTop + ::nRow - ::nFirstRow, ::nLeft + ::nCol  - ::nFirstCol )
+   ::RefreshWindow()
 return Self
 
 //-------------------------------------------------------------------//
@@ -366,16 +378,15 @@ METHOD RefreshWindow() CLASS HBEditor
    nOCol := ::Col()
    nORow := ::Row()
    nOCur := SetCursor( SC_NONE )
-
+   
+   // CLEAR THE WHOLE WINDOW!!! previous version wished to spare some output, but 
+   // C is faster than a VM loop!!
+   Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight )
+   
    for i := 0 to Min( ::nNumRows - 1, ::naTextLen - 1 )
-      DispOutAt( ::nTop + i, ::nLeft, PadR( SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol, ::nNumCols ), ::nNumCols, " " ), ::LineColor( ::nFirstRow + i ) )
+     DispOutAt( ::nTop + i, ::nLeft, SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol, ::nNumCols ), ::LineColor( ::nFirstRow + i ) )
    next
-
-   // Clear rest of editor window ( needed when deleting lines of text )
-   if ::naTextLen < ::nNumRows
-      Scroll( ::nTop + ::naTextLen, ::nLeft, ::nBottom, ::nRight )
-   endif
-
+   
    SetCursor( nOCur )
    ::SetPos( nORow, nOCol )
 
@@ -433,12 +444,7 @@ METHOD Down() CLASS HBEditor
 
    IF ::nRow < ::naTextLen
       ::GotoLine( ::nRow + 1 )
-      // Modified = keep at max of end of line
-      // JC1: nRow has changed now, but can be at max ::naTextLen, so its valid
-      IF ::nCol > ::LineLen( ::nRow )
-         ::End()
-      ENDIF
-   ELSE
+   //ELSE
       // JC1: pressing down at the end of text will make
       // cursor to go to the end of line (temporarily disabled )
       /*IF ::naTextLen > 0
@@ -447,88 +453,26 @@ METHOD Down() CLASS HBEditor
       */
    ENDIF
 
-/*
-   if !::lEditAllow
-      while ::Row() < ::nBottom .AND. ::nRow < ::naTextLen
-         ::nRow++
-         ::SetPos( ::Row() + 1, ::Col() )
-      enddo
-   endif
-
-   if ::Row() == ::nBottom
-      if ::nRow < ::naTextLen
-         Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight, 1 )
-         ::nFirstRow++
-         ::nRow++
-         ::RefreshLine()
-      endif
-   else
-      if ::nRow < ::naTextLen
-         ::nRow++
-         ::SetPos( ::Row() + 1, ::Col() )
-      endif
-   endif
-
-   // Modified = keep at max of end of line
-   if ::nCol > ::LineLen( ::nRow )
-      ::End()
-   endif
-*/
 RETURN Self
 
 //-------------------------------------------------------------------//
 
 METHOD PageDown() CLASS HBEditor
-
-   if ::nRow + ::nNumRows < ::naTextLen
-      ::nRow += ::nNumRows
-      ::nFirstRow += ::nNumRows
-      if ::nFirstRow + ::nNumRows > ::naTextLen
-         ::nFirstRow -= ( ( ::nFirstRow + ::nNumRows ) - ::naTextLen ) + 1
-      endif
-   else
-      ::nFirstRow := Max( ::naTextLen - ::nNumRows + 1, 1 )
-      ::nRow := ::naTextLen
-      ::SetPos( Min( ::nTop + ::naTextLen - 1, ::nBottom ), ::Col() )
-   endif
-   ::RefreshWindow()
-
-   // Modified = keep at max of end of line
-   if ::nCol > ::LineLen( ::nRow )
-      ::End()
-   endif
-
-   Return Self
+   ::GotoLine( min( ::nRow + ::nNumRows, ::naTextLen ) )
+Return Self
 
 //-------------------------------------------------------------------//
 
 METHOD Bottom() CLASS HBEditor
-
-   ::nRow += ::nBottom - ::Row()
-   if ::nRow >  ::naTextLen
-      ::nRow := ::naTextLen
-   endif
-   ::nCol      := Max( ::LineLen( ::nRow ), 1 )
-   ::nFirstCol := Max( ::nCol - ::nNumCols + 1, 1 )
-   ::SetPos( Min( ::nTop + ::naTextLen - 1, ::nBottom ), Min( ::nLeft + ::nCol - 1, ::nRight ) )
-
-   ::RefreshWindow()
-
-   Return Self
+   LOCAL nRowTo := min( ::nFirstRow + ::nNumRows-1, ::naTextLengt)
+   ::GotoLine( nRowTo , ::nLineLenght( nRowTo ) + 1 )
+RETURN Self
 
 //-------------------------------------------------------------------//
 
 METHOD GoBottom() CLASS HBEditor
-
-   ::nRow      := ::naTextLen
-   ::nCol      := Max( ::LineLen( ::nRow ), 1 )
-   ::nFirstRow := Max( ::naTextLen - ::nNumRows + 1, 1 )
-   ::nFirstCol := Max( ::nCol - ::nNumCols + 1, 1 )
-   ::SetPos( Min( ::nTop + ::naTextLen - 1, ::nBottom ), Min( ::nLeft + ::nCol - 1, ::nRight ) )
-
-   ::RefreshWindow()
-
-   Return Self
+   ::GotoPos( ::naTextLen, ::LineLen( ::naTextLen ) + 1 ) 
+Return Self
 
 //-------------------------------------------------------------------//
 
@@ -536,86 +480,27 @@ METHOD Up() CLASS HBEditor
 
    IF ::nRow > 1
       ::GotoLine( ::nRow - 1 )
-      // nRow changes in the meanwhile
-      IF ::nCol > ::LineLen( ::nRow )
-         ::End()
-      ENDIF
    ENDIF
 
-/*
-   if ! ::lEditAllow
-      while ::Row() > ::nTop .AND. ::nRow > 1
-         ::nRow--
-         ::SetPos( ::Row() - 1, ::Col() )
-      enddo
-   endif
-
-   if ::Row() == ::nTop
-      if ::nRow > 1
-         Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight, -1 )
-         ::nFirstRow--
-         ::nRow--
-         ::RefreshLine()
-      endif
-   else
-      ::nRow--
-      ::SetPos( ::Row() - 1, ::Col() )
-   endif
-
-*/
 Return Self
 
 //-------------------------------------------------------------------//
 
 METHOD PageUp() CLASS HBEditor
-
-   if ( ::nRow - ::nNumRows ) > 1
-      ::nRow -= ::nNumRows
-      ::nFirstRow -= ::nNumRows
-      if ::nFirstRow < 1
-         ::nFirstRow := 1
-      endif
-   else
-      ::nFirstRow := 1
-      ::nRow := 1
-      ::SetPos( ::nTop, ::Col() )
-   endif
-
-   ::RefreshWindow()
-
-   // Modified = keep at max of end of line
-   if ::nCol > ::LineLen( ::nRow )
-      ::End()
-   endif
-
-   Return Self
+   ::GotoLine( Max( 1, ::nRow - ::nNumRows) )
+RETURN Self
 
 //-------------------------------------------------------------------//
 
 METHOD Top() CLASS HBEditor
-
-   ::nCol      := 1
-   ::nFirstCol := 1
-   ::nRow      -= ( ::Row() - ::nTop )
-   ::SetPos( ::nTop, ::nLeft )
-
-   ::RefreshWindow()
-
-   Return Self
+   ::GotoPos( ::nFirstRow, ::LineLen( ::nFirstRow ) )
+RETURN Self
 
 //-------------------------------------------------------------------//
 
 METHOD GoTop() CLASS HBEditor
-
-   ::nRow      := 1
-   ::nCol      := 1
-   ::nFirstCol := 1
-   ::nFirstRow := 1
-   ::SetPos( ::nTop, ::nLeft )
-
-   ::RefreshWindow()
-
-   Return Self
+   ::GotoPos( 1, 1 )
+RETURN Self
 
 //-------------------------------------------------------------------//
 //
@@ -624,37 +509,14 @@ METHOD GoTop() CLASS HBEditor
 //-------------------------------------------------------------------//
 
 METHOD Right() CLASS HBEditor
-
-   if ::Col() == ::nRight
-//      if ::nCol <= iif( ::lWordWrap, ::nWordWrapCol, ::LineLen( ::nRow ) )
-      if ::nCol <= ::nWordWrapCol
-         Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight,, 1 )
-         ::nFirstCol++
-         ::nCol++
-         ::RefreshColumn()
-      else
-         if ( ::lWordWrap )
-            ::Down()
-            ::Home()
-         endif
-      endif
-   else
-      ::nCol++
-      ::SetPos( ::Row(), ::Col() + 1 )
-   endif
-
-   //mod = move to next line
-   //
-   If ::lRightScroll
-      if ( ::lWordWrap )
-         if ::nCol > ::LineLen( ::nRow ) .and. ::nRow < ::naTextLen
-            ::Down()
-            ::Home()
-         endif
-      endif
-   endif
-
-   Return Self
+   IF ::nCol == ::LineLen( ::nRow ) + 1 .and. ::nRow < ::naTextLen
+       ::GotoPos( ::nRow + 1, 1, .T. )
+   ELSE
+      // Gotocol checks for line bounds also; as the IF should check for a
+      // method too, theres no spare in IF here.
+      ::GotoCol( ::nCol + 1 )
+   ENDIF
+RETURN Self
 
 //-------------------------------------------------------------------//
 
@@ -692,31 +554,16 @@ Return Self
 //-------------------------------------------------------------------//
 
 METHOD Left() CLASS HBEditor
-
-   if ::Col() == ::nLeft
-      if ::nCol > 1
-         Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight,, -1 )
-         ::nFirstCol--
-         ::nCol--
-         ::RefreshColumn()
-
-      // Modified = keep at max of end of line
-      //
-      else
-         if ::lWordWrap
-            if ::nRow > 1
-               ::Up()
-               ::End()
-            endif
-         endif
-      endif
-   else
-      ::nCol--
-      ::SetPos( ::Row(), ::Col() - 1 )
-   endif
-
-   Return Self
-
+   // Gotocol checks for nCol > 1 also, but this saves a func call
+   IF ::nCol == 1 
+      IF ::nRow > 1
+         ::GotoPos(::nRow - 1, ::LineLen( ::nRow - 1) + 1, .T. )
+      ENDIF
+      //else do nothing
+   ELSE
+      ::GotoCol( ::nCol - 1 )
+   ENDIF
+RETURN Self
 //-------------------------------------------------------------------//
 
 METHOD WordLeft() CLASS HBEditor
@@ -744,14 +591,8 @@ METHOD WordLeft() CLASS HBEditor
 //-------------------------------------------------------------------//
 
 METHOD Home() CLASS HBEditor
-
-   ::nCol      := 1
-   ::nFirstCol := 1
-   ::SetPos( ::Row(), ::nLeft )
-
-   ::RefreshWindow()
-
-   Return Self
+   ::GotoCol( 1 )
+RETURN Self
 
 //-------------------------------------------------------------------//
 
@@ -761,6 +602,7 @@ METHOD MoveCursor( nKey ) CLASS HBEditor
    //
    Switch nKey
 
+      // TODO: for optimization, change this with relativie GOTOCOL, GOTOPOS and GOTOROW
       case K_DOWN
          ::Down()
          exit
@@ -1006,6 +848,10 @@ METHOD K_Ascii( nKey ) CLASS HBEditor
 
    // nKey := ASC( HB_ANSITOOEM( CHR( nKey ) ) )    // convert from windows
 
+   IF .not. ::lEditAllow
+      Return Self
+   ENDIF
+      
    ::lDirty   := .T.
    ::nMarkPos := 0
 
@@ -1045,6 +891,12 @@ METHOD K_Bs() CLASS HBEditor
    LOCAL lHardCR := .f.
    LOCAL nRowPos
 
+   IF .not. ::lEditAllow
+      IF ::nCol > 1
+         ::GotoCol( ::nCol -1 )
+      ENDIF
+      RETURN Self
+   ENDIF
    // Heavily modified, with line wrapping and respect of :SoftCR status added
    // Handling this destructive key properly is quite complex, especially at line end
 
@@ -1184,29 +1036,33 @@ RETURN Self
 METHOD K_Return() CLASS HBEditor
    LOCAL lHardCR := .f.
 
-   ::lDirty := .T.
-
-   IF ::lInsert
-      IF ::aText[ ::nRow ]:lSoftCR
-         ::aText[ ::nRow + 1 ]:cText := Substr( ::aText[ ::nRow ]:cText, ::nCol ) +" "+ ::aText[ ::nRow + 1 ]:cText
-         ::SplitLine( ::nRow )
-      ELSE
-         ::InsertLine( Substr( ::aText[ ::nRow ]:cText, ::nCol ), .F., ::nRow + 1 )
+   IF ::lEditAllow
+      ::lDirty := .T.
+      
+      IF ::lInsert
+         IF ::nRow == ::naTextLen
+            ::AddLine( "", .F. )
+         ELSEIF ::aText[ ::nRow ]:lSoftCR
+            ::aText[ ::nRow + 1 ]:cText := Substr( ::aText[ ::nRow ]:cText, ::nCol ) +" "+ ::aText[ ::nRow + 1 ]:cText
+            ::SplitLine( ::nRow )
+         ELSE
+            ::InsertLine( Substr( ::aText[ ::nRow ]:cText, ::nCol ), .F., ::nRow + 1 )
+         ENDIF
+         ::aText[ ::nRow ]:cText := Left( ::aText[ ::nRow ]:cText, ::nCol - 1 )
+      ELSEIF ::nRow == ::naTextLen
+         ::AddLine( "", .F. )
       ENDIF
-      ::aText[ ::nRow ]:cText := Left( ::aText[ ::nRow ]:cText, ::nCol - 1 )
-
-   ELSEIF ::nRow == ::naTextLen
-      ::AddLine( "", .F. )
-
+      
+      // the current line should not have softcr anymore
+      //
+      ::aText[ ::nRow ]:lSoftCR := .F.
    ENDIF
-
-   // the current line should not have softcr anymore
-   //
-   ::aText[ ::nRow ]:lSoftCR := .F.
 
    // will also refresh
    //
-   ::GotoPos( ::nRow + 1, 1, .T. )
+   IF ::nRow < ::naTextLen
+      ::GotoPos( ::nRow + 1, 1, .T. )
+   ENDIF
 
 RETURN Self
 
@@ -1269,42 +1125,44 @@ return Self
 
 METHOD GotoLine( nRow ) CLASS HBEditor
 
-   if nRow <= ::naTextLen .AND. nRow > 0
+   IF nRow <= ::naTextLen .AND. nRow > 0
       // I need to move cursor if is past requested line number and if requested line is
       // inside first screen of text otherwise ::nFirstRow would be wrong
       //
       IF nRow < ::nFirstRow
          ::nFirstRow := nRow
          ::RefreshWindow()
-
-      ELSEIF nRow - ::nFirstRow > ::nBottom - ::nTop
-         ::nFirstRow := Max( 1, nRow - (::nBottom - ::nTop) )
+      ELSEIF nRow - ::nFirstRow >= ::nNumRows 
+         ::nFirstRow := Max(1, nRow - ::nNumRows + 1)
          ::RefreshWindow()
 
       ENDIF
 
       ::nRow := nRow
-      ::SetPos( ::nTop + nRow - ::nFirstRow, ::Col() )
+      IF ::nCol > ::LineLen( nRow ) + 1
+         ::nCol := ::LineLen( nRow ) + 1
+      ENDIF
+      ::SetPos( ::nTop + nRow - ::nFirstRow, ::nLeft + ::nCol - ::nFirstCol )
    ENDIF
 
-return Self
+RETURN Self
 
 //-------------------------------------------------------------------//
 
 METHOD GotoCol( nCol ) CLASS HBEditor
 
-   IF nCol <= ::LineLen( ::nRow ) + 1 .AND. nCol > 0
-      // I need to move cursor if is past requested column and if requested column is
-      // inside first screen of text otherwise ::nFirstCol would be wrong
-      //
-      IF nCol < ::nFirstCol
-         ::nFirstCol :=  nCol
+   IF nCol >= 1    
+      IF nCol > ::LineLen( ::nRow ) + 1
+         nCol := ::LineLen( ::nRow ) + 1
+      ENDIF
+      // I need to move cursor if is past requested line number and if requested line is
+      // inside first screen of text otherwise ::nFirstRow would be wrong
+      if nCol < ::nFirstCol 
+         ::nFirstCol := nCol
          ::RefreshWindow()
-
-      ELSEIF nCol - ::nFirstCol > ::nRight - ::nLeft
-         ::nFirstCol := Max( 1, nCol - ( ::nRight - ::nLeft ) )
+      ELSEIF nCol - ::nFirstCol >= ::nNumCols
+         ::nFirstCol := Max( 1, nCol - ::nNumCols + 1 )
          ::RefreshWindow()
-
       ENDIF
 
       ::nCol := nCol
@@ -1326,28 +1184,34 @@ METHOD GotoPos( nRow, nCol, lRefresh ) CLASS HBEditor
       IF nRow < ::nFirstRow
          ::nFirstRow := nRow
          lRefresh := .T.
-      ELSEIF nRow - ::nFirstRow > ::nBottom - ::nTop
-         ::nFirstRow := Max( 1, nRow - ( ::nBottom - ::nTop ) )
+      ELSEIF nRow - ::nFirstRow >= ::nNumRows
+         ::nFirstRow := Max(1, nRow - ::nNumRows + 1 )
          lRefresh := .T.
       ENDIF
       ::nRow := nRow
-   endif
-
-   if nCol <= ::LineLen( nRow ) + 1 .AND. nCol > 0
-      if nCol < ::nFirstCol
+   ENDIF
+   
+   IF nCol >= 1    
+      IF nCol > ::LineLen( nRow ) + 1
+         nCol := ::LineLen( nRow ) + 1
+      ENDIF
+      // I need to move cursor if is past requested line number and if requested line is
+      // inside first screen of text otherwise ::nFirstRow would be wrong
+      if nCol < ::nFirstCol 
          ::nFirstCol := nCol
          lRefresh := .T.
-      ELSEIF nCol - ::nFirstCol > ::nRight - ::nLeft
-         ::nFirstCol := Max( 1, nCol - ( ::nRight - ::nLeft ) )
+      ELSEIF nCol - ::nFirstCol >= ::nNumCols 
+         ::nFirstCol := Max( 1, nCol - ::nNumCols + 1 )
          lRefresh := .T.
       ENDIF
       ::nCol := nCol
-   endif
-
-   if lRefresh
+   ENDIF
+   
+   
+   IF lRefresh
       ::SetPos( ::nTop + nRow - ::nFirstRow, ::nLeft + nCol - ::nFirstCol )
       ::RefreshWindow()
-   endif
+   ENDIF
 
 RETURN Self
 
@@ -1469,18 +1333,20 @@ METHOD SplitLine( nRow ) CLASS HBEditor
       ENDDO
 
       // next line?
-      IF nCurSpace == 0
-         nRow++
-         ::GotoPos( nRow, nPosInWord )
-
-      ELSEIF nCurSpace == ::nCol
+      IF nCurSpace == 0 
          nRow ++
-         ::GotoPos( nRow, 1 )
-
+         //fake border new.
+         ::nFirstCol := 1
+         ::GotoPos( nRow, nPosInWord, .T. )
+      ELSEIF nCurSpace == ::nCol 
+         nRow ++
+         ::GotoPos( nRow, 1, .T. )
+      ELSE
+         ::RefreshWindow()
       ENDIF
+   ELSE
+      ::RefreshWindow()
    ENDIF
-
-   ::RefreshWindow()
    ::lRightScroll := .T.          // set at beginning of if/endif -- must be .F. in SplitScreen()
 
 RETURN Self
