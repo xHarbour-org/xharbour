@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3247 2004/07/31 08:05:29 likewolf Exp $
+ * $Id: ChangeLog,v 1.3248 2004/07/31 16:40:44 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-31 20:10 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com
+  * include/thread.h
+    ! on Single thread use the hb_GetStack() function insted of hb_stack var.
+      this allow acess to app stack on dll
 
 2004-07-31 20:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * contrib/libct/token1.c
