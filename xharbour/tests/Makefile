@@ -1,7 +1,7 @@
 # xHarbour project
 # Demo makefile for GNU MAKE in tests/ subdir
 #
-# $Id$
+# $Id: Makefile,v 1.7 2003/01/30 00:46:25 jonnymind Exp $
 #
 # Copyright 2003 Giancarlo Niccolai
 #
@@ -53,7 +53,7 @@ else
 endif
 
 %.c: %.prg
-	harbour -I$(HB_INC_INSTALL) $(PRG_USR) -n $<
+	$(HB_BIN_INSTALL)/harbour -I$(HB_INC_INSTALL) $(PRG_USR) -n $<
 %.o: %.c
 		gcc -I$(HB_INC_INSTALL) -c -o $@ $<
 

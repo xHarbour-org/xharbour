@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.177 2003/03/10 23:22:04 jonnymind Exp $
+ * $Id: hvm.c,v 1.178 2003/03/14 00:32:41 ronpinkas Exp $
  */
 
 /*
@@ -2527,13 +2527,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       }
       /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
       #if defined(HB_THREAD_SUPPORT)
-         if ( iCount == 20 )
+         if ( iCount == HB_VM_UNLOCK_PERIOD )
          {
             HB_STACK_UNLOCK;
             HB_TEST_CANCEL_ENABLE_ASYN;
             iCount = 0;
          }
-      //printf( "Count: %d\r\n", hb_runningContexts.content.asLong );
       #endif
    }
 

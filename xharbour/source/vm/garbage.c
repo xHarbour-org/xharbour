@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.49 2003/03/10 23:22:03 jonnymind Exp $
+ * $Id: garbage.c,v 1.50 2003/03/12 00:24:09 jonnymind Exp $
  */
 
 /*
@@ -503,7 +503,7 @@ void hb_gcCollect( void )
    
    /* TODO: decrease the amount of time spend collecting */
    HB_STACK_UNLOCK;
-   #if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT ) 
+   #if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT )
       hb_threadSubscribeIdle( hb_gcCollectAll );
    #else
       hb_gcCollectAll();
@@ -515,34 +515,29 @@ void hb_gcCollect( void )
 */
 void hb_gcCollectAll()
 {
-   HB_GARBAGE_PTR pAlloc, pDelete;   
+   HB_GARBAGE_PTR pAlloc, pDelete;
    HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
-      
-   /* is anoter garbage in action? */  
+
+   /* is anoter garbage in action? */
    #ifdef HB_THREAD_SUPPORT
 
       #ifdef HB_OS_WIN_32
-         if ( s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )  
+         if ( s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
          {
             return;
          }
       #else
          HB_CRITICAL_LOCK( hb_runningStacks.Mutex );
-         if ( s_bCollecting == TRUE || s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )  
+         if ( s_bCollecting == TRUE || s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
          {
             HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
             return;
          }
          s_bCollecting = TRUE;
-         HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_runningStacks.Mutex );
-         while ( hb_runningStacks.content.asLong != 0 )
-         {
-            HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );
-         }
-         hb_runningStacks.content.asLong = -1;
-         // no need to signal, no one must be awaken
+
+         hb_threadWaitForIdle();
          HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
-         HB_CLEANUP_POP;
+
       #endif
    #else
       if ( s_bCollecting )  // note: 1) is volatile and 2) not very important if fails 1 time
@@ -559,9 +554,9 @@ void hb_gcCollectAll()
    #endif
 
 
-   /* By hypotesis, only one thread will be granted the right to be here; 
-   so cheching for consistency of s_pCurrBlock further is useless.*/   
-   
+   /* By hypotesis, only one thread will be granted the right to be here;
+   so cheching for consistency of s_pCurrBlock further is useless.*/
+
    /* Now that we are rightful owner of the GC process, we must
    * forbid all other threads from acting into the objects that
    * are going to be (in different times):
@@ -725,18 +720,19 @@ void hb_gcCollectAll()
    s_bCollecting = FALSE;
 
    s_pCurrBlock = pAlloc;
-   
+
    /* Step 4 - flip flag */
    /* Reverse used/unused flag so we don't have to mark all blocks
    * during next collecting
    */
    s_uUsedFlag ^= HB_GC_USED_FLAG;
 
-   /* Step 5: release all the locks on the scanned objects */      
+   /* Step 5: release all the locks on the scanned objects */
    /* Put itself back on machine execution count */
 
-   #if defined ( HB_THREAD_SUPPORT ) && ! defined( HB_OS_WIN_32 )
-      HB_STACK_START;
+   /* Unblocks all threads */
+   #if defined( HB_THREAD_SUPPORT )
+      hb_runningStacks.aux = 0;
    #endif
 }
 
@@ -868,7 +864,7 @@ HB_FUNC( HB_GCALL )
    {
       s_uAllocated = HB_GC_COLLECTION_JUSTIFIED;
    }
-   
+
    #if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT ) 
       hb_threadSubscribeIdle( hb_gcCollectAll );
    #else

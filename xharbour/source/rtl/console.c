@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.25 2003/03/02 15:22:30 jonnymind Exp $
+ * $Id: console.c,v 1.26 2003/03/10 23:21:59 jonnymind Exp $
  */
 
 /*
@@ -80,20 +80,20 @@
 #include "hb_io.h"
 #include "thread.h"
 
-#if  defined( HB_THREAD_SUPPORT ) 
+#if  defined( HB_THREAD_SUPPORT )
    /* WARNING: Output is a cancellation point. NEVER cross non optimized stack access,
    or calls to hb_param* / hb_ret* family functions with this macros. This macros
    are inner shell locks. */
    #define HB_CONSOLE_SAFE_LOCK\
-         HB_CRITICAL_LOCK( hb_outputMutex );\
          HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_outputMutex );\
-         HB_STACK_UNLOCK;
-         
+         HB_STACK_UNLOCK;\
+         HB_CRITICAL_LOCK( hb_outputMutex );
+
    #define HB_CONSOLE_SAFE_UNLOCK \
+         HB_CRITICAL_UNLOCK( hb_outputMutex );\
          HB_STACK_LOCK;\
-         HB_CLEANUP_POP;\
-         HB_CRITICAL_UNLOCK( hb_outputMutex );
-#else   
+         HB_CLEANUP_POP;
+#else
    #define HB_CONSOLE_SAFE_LOCK
    #define HB_CONSOLE_SAFE_UNLOCK
 #endif

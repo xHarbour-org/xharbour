@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.63 2003/03/12 13:31:23 jonnymind Exp $
+* $Id: thread.c,v 1.64 2003/03/13 02:43:13 jonnymind Exp $
 */
 
 /*
@@ -82,7 +82,7 @@
 
 /* To be honest, this implementation is far from being thread safe;
    TODO: better implementation, but I argue it will ALWAYS be better
-   to implement syste specific solution, where available.
+   to implement system specific solution, where available.
 */
 
 static HB_CRITICAL_T s_mtxTryLock;
@@ -125,7 +125,6 @@ volatile static int s_threadStarted = 0;
 #endif
 
 /* Declarations of shell mutexes */
-HB_CRITICAL_T hb_garbageMutex;
 HB_CRITICAL_T hb_threadStackMutex;
 HB_CRITICAL_T hb_globalsMutex;
 HB_CRITICAL_T hb_staticsMutex;
@@ -137,9 +136,11 @@ HB_CRITICAL_T hb_mutexMutex;
 HB_CRITICAL_T hb_cancelMutex;
 
 HB_SHARED_RESOURCE hb_runningStacks;
-#ifdef HB_OS_WIN_32 
+#ifdef HB_OS_WIN_32
    HB_SHARED_RESOURCE hb_idleQueueRes;
 #endif
+
+BOOL hb_bIdleFence;
 
 HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
 {
@@ -562,19 +563,18 @@ void hb_threadSubscribeIdle( HB_IDLE_FUNC pFunc )
       hb_idleQueueRes.content.asPointer = (void *) pIdle->next;
       hb_xfree( pIdle );
    }
-  
+
    HB_CRITICAL_UNLOCK( hb_idleQueueRes.Mutex );
 }
 
 void hb_threadCancelInternal( )
 {
    HB_THREAD_STUB
-   int iCount;
-         
+
    /* Make sure we are not going to be canceled */
    HB_DISABLE_ASYN_CANC;
-     
-/*   
+
+/*
    iCount = HB_VM_STACK.iCleanCount;
    while ( iCount > 0 )
    {
@@ -613,7 +613,7 @@ void hb_threadCancel( HB_STACK *pStack )
    TerminateThread( pStack->th_h, 0 );
    hb_threadTerminator( (void *)pStack );
    HB_CRITICAL_UNLOCK( hb_cancelMutex );
-      
+
 }
    
 #endif
@@ -628,13 +628,13 @@ void hb_threadTerminator( void *pData )
    /* now we can detach this thread */
    hb_threadUnlinkStack( _pStack_->th_id );
    HB_CRITICAL_UNLOCK( hb_threadStackMutex );
-   
+
    #ifdef HB_OS_WIN_32
       CloseHandle( _pStack_->th_h );
    #else
       pthread_detach( HB_CURRENT_THREAD() );
    #endif
-   
+
    /* eventually unlocks held mutexes */
    HB_CRITICAL_LOCK( hb_mutexMutex );
    pMtx = hb_ht_mutex;
@@ -647,7 +647,7 @@ void hb_threadTerminator( void *pData )
       pMtx = pMtx->next;
    }
    HB_CRITICAL_UNLOCK( hb_mutexMutex );
-    
+
    hb_threadDestroyStack( _pStack_ );
    
    HB_SET_SHARED( hb_runningStacks, HB_COND_INC, -1 );
@@ -925,7 +925,7 @@ HB_FUNC( STOPTHREAD )
       HB_CRITICAL_UNLOCK( hb_cancelMutex );
       
       WaitForSingleObject( stack->th_h, INFINITE );
-   
+
    #endif
        
    /* Notify mutex before to leave */
@@ -1013,7 +1013,7 @@ HB_FUNC( JOINTHREAD )
       WaitForSingleObject( stack->th_h, INFINITE );
    #endif
    HB_STACK_LOCK;
-   
+
 }
 
 /*JC1: this will always be called when cancellation is delayed */
@@ -1504,7 +1504,7 @@ void hb_threadKillAll()
 }
 
 HB_FUNC( WAITFORTHREADS )
-{   
+{
    hb_threadWaitAll();
 }
 
@@ -1515,6 +1515,59 @@ HB_FUNC( KILLALLTHREADS )
    hb_threadKillAll();
 }
 
+HB_FUNC( THREADIDLEFENCE )
+{
+   HB_THREAD_STUB
+   BOOL bOld;
+
+   HB_CRITICAL_LOCK( hb_runningStacks.Mutex );
+
+   bOld = hb_bIdleFence;
+
+   if ( hb_pcount() == 1 )
+   {
+      hb_bIdleFence = hb_parl( 1 );
+   }
+   
+   hb_retl( bOld );
+   
+   HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
+}
+
+#ifndef HB_OS_WIN_32
+
+void hb_threadResetAux( void *ptr )
+{
+   ((HB_SHARED_RESOURCE *) ptr)->aux = 0;
+}
+
+/* hb_runningStacks mutex must be held before calling this function */
+void hb_threadWaitForIdle( void )
+{
+   /* Do we have to set an idle fence? */
+   if ( hb_bIdleFence )
+   {
+      /* blocks all the threads */
+      hb_runningStacks.aux = 1;
+   }
+
+   HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_runningStacks.Mutex );
+   HB_CLEANUP_PUSH( hb_threadResetAux, hb_runningStacks );
+   /* wait until the road is clear */
+   while ( hb_runningStacks.content.asLong != 0 )
+   {
+      HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );
+   }
+   /* blocks all threads here if not blocked before */
+   hb_runningStacks.aux = 1;
+   //hb_runningStacks.content.asLong = -1;
+   // no need to signal, no one must be awaken
+   HB_CLEANUP_POP;
+   HB_CLEANUP_POP;
+}
+
+#endif
+
 /*
 JC: I am leaving this in the source code for now; you can never know, this could
 be useful in the future.
@@ -1522,10 +1575,10 @@ be useful in the future.
 #if defined( HB_OS_WIN_32 ) //&& ( WINVER < 0x0400)
 DWORD hb_SignalObjectAndWait( HB_MUTEX_T hToSignal, HB_COND_T hToWaitFor, DWORD dwMillisec, BOOL bUnused )
 {
-   HB_THREAD_STUB 
+   HB_THREAD_STUB
    int iStatus;
    HB_SYMBOL_UNUSED( bUnused );
-   
+
    HB_MUTEX_UNLOCK( hToSignal );
    // here we can allow cancellation
    HB_ENABLE_ASYN_CANC;
@@ -1533,7 +1586,7 @@ DWORD hb_SignalObjectAndWait( HB_MUTEX_T hToSignal, HB_COND_T hToWaitFor, DWORD 
    iStatus = WaitForSingleObject( hToWaitFor, dwMillisec ) != WAIT_OBJECT_0;
    HB_DISABLE_ASYN_CANC;
    HB_MUTEX_LOCK( hToSignal );
-   
+
    return iStatus;
 }
 #endif
@@ -1560,13 +1613,16 @@ void hb_threadInit( void )
    HB_CRITICAL_INIT( hb_mutexMutex );
 
    HB_SHARED_INIT( hb_runningStacks, 0 );
-   
+
    last_stack = NULL;
    hb_main_thread_id = HB_CURRENT_THREAD();
    hb_ht_stack = hb_threadCreateStack( hb_main_thread_id );
    hb_ht_mutex = NULL;
    s_threadStarted = 1;
-   
+
+   /* Idle fence is true by default */
+   hb_bIdleFence = TRUE;
+
    #ifdef HB_OS_WIN_32
       HB_CRITICAL_INIT( hb_cancelMutex );
       hb_dwCurrentStack = TlsAlloc();
@@ -1586,11 +1642,11 @@ void hb_threadExit( void )
 {
    hb_threadKillAll();
    hb_threadWaitAll();
-   
+
    hb_threadDestroyStack( hb_ht_stack );
    hb_ht_stack = NULL;
    s_threadStarted = 0;
-   
+
    /* Destroyng all shell locks mutexes */
    HB_SHARED_DESTROY( hb_runningStacks );
    HB_CRITICAL_DESTROY( hb_mutexMutex );
@@ -1606,7 +1662,7 @@ void hb_threadExit( void )
    #else
       pthread_key_delete( hb_pkCurrentStack );
    #endif
-   
+
    #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
       HB_CRITICAL_DESTROY( s_mtxTryLock );
    #endif

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.35 2003/03/13 02:43:13 jonnymind Exp $
+* $Id: thread.h,v 1.36 2003/03/13 02:59:40 jonnymind Exp $
 */
 
 /*
@@ -64,6 +64,8 @@
 typedef void (*HB_CLEANUP_FUNC)(void *);
 #define HB_MAX_CLEANUPS  12
 
+/* Maximun number of cycles that can be completed by VM without stack unlock */
+#define HB_VM_UNLOCK_PERIOD 20
 
 #if defined(HB_OS_WIN_32)
    #ifndef _WIN32_WINNT
@@ -114,7 +116,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       HB_CRITICAL_UNLOCK( hb_cancelMutex );\
    }
       
-   
+
    #define HB_CLEANUP_PUSH(X,Y) 
    /*{ \
       HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ] = X;\
@@ -123,19 +125,23 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
  
    #define HB_CLEANUP_POP    
    // HB_VM_STACK.iCleanCount--;
-         
-   #define HB_CLEANUP_POP_EXEC 
+
+   #define HB_CLEANUP_POP_EXEC
    /*{\
       HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ]( HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount ]);\
       HB_VM_STACK.iCleanCount--;\
    }*/
-    
+
    extern DWORD hb_dwCurrentStack;
    #define hb_threadGetCurrentStack() ( (HB_STACK *) TlsGetValue( hb_dwCurrentStack ) )
 
    #define HB_STACK_LOCK \
    {\
       HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
+      while ( hb_runningStacks.content.asLong < 0 || hb_runningStacks.aux ) \
+      {\
+         HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );\
+      }\
       if( ! HB_VM_STACK.bInUse ) \
       {\
          hb_runningStacks.content.asLong++;\
@@ -156,21 +162,21 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
          }\
       }\
       HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
-   } 
-   
+   }
+
    typedef struct tag_HB_IDLE_FUNC_LIST
    {
       HB_IDLE_FUNC func;
       struct tag_HB_IDLE_FUNC_LIST *next;
    } HB_IDLE_FUNC_LIST;
-   
+
 #else
 
    #include <pthread.h>
    #include <errno.h>
    #define HB_THREAD_T                 pthread_t
    #define HB_CRITICAL_T               pthread_mutex_t
-         
+
    /* ODD: this definition is missing on some linux headers;
       we should remove it when this bug is fixed */
    int pthread_mutexattr_setkind_np( pthread_mutexattr_t * attr, int kind );
@@ -182,7 +188,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
          pthread_mutex_init( &(x), &attr );\
          pthread_mutexattr_destroy( &attr );\
       }
-   
+
    #define HB_MUTEX_T                  pthread_mutex_t
    #define HB_CRITICAL_DESTROY( x )    pthread_mutex_destroy( &(x) )
    #define HB_CRITICAL_LOCK( x )       pthread_mutex_lock( &(x) )
@@ -193,47 +199,47 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define HB_MUTEX_DESTROY( x )       HB_CRITICAL_DESTROY( x )
    #define HB_MUTEX_LOCK( x )          HB_CRITICAL_LOCK( x )
    #define HB_MUTEX_UNLOCK( x )        HB_CRITICAL_UNLOCK( x )
-   
+
    extern int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec );
-   
+
    #define HB_COND_T                   pthread_cond_t
    #define HB_COND_INIT( x )           pthread_cond_init( &(x), NULL )
    #define HB_COND_WAIT( x, y )        pthread_cond_wait( &(x), &(y) )
    #define HB_COND_WAITTIME( x, y, t )  hb_condTimeWait( &(x) , &(y), t )
    #define HB_COND_SIGNAL( x )         pthread_cond_broadcast( &(x) )
    #define HB_COND_DESTROY( x )        pthread_cond_destroy( &(x) )
-   
+
    #define HB_CURRENT_THREAD           pthread_self
    #define HB_CLEANUP_PUSH(x, y )      pthread_cleanup_push( x, (void *)&(y) )
    #define HB_CLEANUP_POP              pthread_cleanup_pop(0)
    #define HB_CLEANUP_POP_EXEC         pthread_cleanup_pop(1)
-   
-   #define HB_ENABLE_ASYN_CANC   
+
+   #define HB_ENABLE_ASYN_CANC
    #define HB_DISABLE_ASYN_CANC
    #define HB_TEST_CANCEL_ENABLE_ASYN
-   
+
    extern pthread_key_t hb_pkCurrentStack;
    #define hb_threadGetCurrentStack() ( (HB_STACK *) pthread_getspecific( hb_pkCurrentStack ) )
 
    /* Context using management */
    #define HB_STACK_LOCK \
    {\
-      HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_runningStacks.Mutex );\
       HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
-      while ( hb_runningStacks.content.asLong < 0 ) \
-      {\
-         HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );\
-      }\
       if( ! HB_VM_STACK.bInUse ) \
       {\
+         HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_runningStacks.Mutex );\
+         while ( hb_runningStacks.aux ) \
+         {\
+            HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );\
+         }\
+         HB_CLEANUP_POP;\
          hb_runningStacks.content.asLong++;\
          HB_VM_STACK.bInUse = TRUE;\
          HB_COND_SIGNAL( hb_runningStacks.Cond );\
       }\
       HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
-      HB_CLEANUP_POP;\
-   } 
-   
+   }
+
    #define HB_STACK_UNLOCK \
    {\
       HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
@@ -244,11 +250,13 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
          HB_COND_SIGNAL( hb_runningStacks.Cond );\
       }\
       HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
-   } 
+   }
+   
+   extern void hb_threadWaitForIdle( void );
 #endif
 
 /**********************************************************/
-/* 
+/*
 * Enanched stack for multithreading
 */
 
@@ -265,16 +273,16 @@ typedef struct tag_HB_STACK
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
-      
+
    HB_THREAD_T th_id;
    /* Is this thread going to run a method? */
    BOOL bIsMethod;
    /* data to initialize the stack */
-   UINT uiParams;   
+   UINT uiParams;
    /* Flag to signal that the context is in use */
    BOOL bInUse; // this must be used with the guard of a global resource
    struct tag_HB_STACK *next;
-   
+
 #ifdef HB_OS_WIN_32
    HANDLE th_h;
    BOOL bCanceled; // set when there is a cancel request and bInUse is true
@@ -305,10 +313,10 @@ typedef struct tag_HB_SHARED_RESOURCE
 {
    HB_CRITICAL_T Mutex;  // mutex is used to read or write safely
    union {              // data that can be read or written
-      long asLong;
-      void *asPointer;
+      volatile long asLong;
+      volatile void *asPointer;
    } content;
-   unsigned int aux;
+   volatile unsigned int aux;
    HB_COND_T Cond; //condition that may change
 } HB_SHARED_RESOURCE;
 
@@ -363,9 +371,9 @@ typedef struct tag_HB_SHARED_RESOURCE
    HB_CRITICAL_UNLOCK( pshr.Mutex );\
    HB_CLEANUP_POP;\
 }
-                
+
 /** JC1:
-   In MT libs, every function accessing stack will record the HB_STACK 
+   In MT libs, every function accessing stack will record the HB_STACK
    (provided by hb_threadGetCurrentContext()) into a local Stack variable, and
    this variable will be accessed instead of HB_VM_STACK.
 */
@@ -378,7 +386,6 @@ typedef struct tag_HB_SHARED_RESOURCE
    #define HB_VM_STACK (* hb_threadGetCurrentStack() )
    #define HB_THREAD_STUB
 #endif
-
 
 /* LWRM management */
 
@@ -452,8 +459,6 @@ typedef struct tag_HB_LWR_MUTEX
 /************************************************************
 * List of mutexes that can be used to regulate concurency
 *************************************************************/
-/* Monitor for sync access to the garbage collecting process */
-extern HB_CRITICAL_T hb_garbageMutex;
 /* Monitor for sync access to the local contexts */
 extern HB_CRITICAL_T hb_threadStackMutex;
 /* Monitor for sync access to the global stack */
@@ -477,9 +482,8 @@ extern HB_SHARED_RESOURCE hb_runningStacks;
    extern HB_SHARED_RESOURCE hb_idleQueueRes;
 #endif
 
-
-#define HB_STACK_STOP    ( HB_WAIT_SHARED( hb_runningStacks, HB_COND_EQUAL, 0, HB_COND_SET, -1 ) )
-#define HB_STACK_START   HB_SET_SHARED( hb_runningStacks, HB_COND_SET, 0 )
+/* regulates idle aware threads to be fenced or free */
+extern BOOL hb_bIdleFence;
 
 /***********************************************************************/
 /* Function and globals definitions */
@@ -512,7 +516,7 @@ extern void hb_threadTerminator( void *pData );
    void hb_threadResumeAll( void );
    void hb_threadSubscribeIdle( HB_IDLE_FUNC );
    void hb_threadCallIdle( void ); 
-   void hb_threadCancelInternal( void );   
+   void hb_threadCancelInternal( void );
 #endif
 
 

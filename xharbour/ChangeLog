@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.833 2003/03/13 02:59:37 jonnymind Exp $
+ * $Id: ChangeLog,v 1.834 2003/03/14 00:32:35 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-14 12:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/thread.h
+  * source/vm/thread.c
+    + Added support for fenced idle routines under Linux.
+    + Added PRG function ThreadIdleFence( [bMode] )--> bOldMode that
+      queries or sets the idle fence.
+
+  * source/vm/garbage.c
+    * Now GC can be in fenced or unfenced mode under linux.
+
+  * source/vm/hvm.c
+    * The maximum count of instructions after wich the VM tests for cancelation
+      is now defined in thread.h (HB_VM_UNLOCK_PERIOD).
+
+  * source/rtl/console.c
+    ! Fixed a bug in secure console locking.
+
+  * tests/Makefile
+    ! harbour is now searched in $HB_BIN_INSTALL
+
+  * tests/mtgc.prg
+    + Added a test for unfenced garbage collecting.
 
 2003-03-13 16:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c
