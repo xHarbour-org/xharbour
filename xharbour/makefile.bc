@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.64 2003/09/06 01:19:19 lculik Exp $
+# $Id: makefile.bc,v 1.65 2003/09/09 02:07:54 paultucker Exp $
 #
 
 #
@@ -91,6 +91,8 @@ LIB_DIR = lib\b32
    RTL_OBJ_DIR   = $(OBJ_DIR)\mt
    MACRO_OBJ_DIR = $(OBJ_DIR)\mt
    RDD_OBJ_DIR   = $(OBJ_DIR)\mt
+   DBT_OBJ_DIR   = $(OBJ_DIR)\mt
+   FPT_OBJ_DIR   = $(OBJ_DIR)\mt
    NTX_OBJ_DIR   = $(OBJ_DIR)\mt
    CDX_OBJ_DIR   = $(OBJ_DIR)\mt
    PP_OBJ_DIR    = $(OBJ_DIR)\mt
@@ -102,6 +104,8 @@ LIB_DIR = lib\b32
    RTL_OBJ_DIR   = $(OBJ_DIR)
    MACRO_OBJ_DIR = $(OBJ_DIR)
    RDD_OBJ_DIR   = $(OBJ_DIR)
+   DBT_OBJ_DIR   = $(OBJ_DIR)
+   FPT_OBJ_DIR   = $(OBJ_DIR)
    NTX_OBJ_DIR   = $(OBJ_DIR)
    CDX_OBJ_DIR   = $(OBJ_DIR)
    PP_OBJ_DIR    = $(OBJ_DIR)
@@ -192,6 +196,8 @@ HVM_GUI_MT_OBJ_FLAGS = $(CLIBFLAGS) -DSIMPLEX -DHB_THREAD_SUPPORT -DHB_GUI
 COMMON_LIB     = $(LIB_DIR)\common.lib
 CODEPAGE_LIB   = $(LIB_DIR)\codepage.lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdx.lib
+DBFDBT_LIB     = $(LIB_DIR)\dbfdbt.lib
+DBFFPT_LIB     = $(LIB_DIR)\dbffpt.lib
 DBFNTX_LIB     = $(LIB_DIR)\dbfntx.lib
 DEBUG_LIB      = $(LIB_DIR)\debug.lib
 LANG_LIB       = $(LIB_DIR)\lang.lib
@@ -210,6 +216,8 @@ VM_LIB_OPT_GUI   = $(LIB_DIR)\optgui.lib
 RTL_STLIB        = $(RTL_LIB)
 MACRO_STLIB      = $(MACRO_LIB)
 RDD_STLIB        = $(RDD_LIB)
+DBFDBT_STLIB     = $(DBFDBT_LIB)
+DBFFPT_STLIB     = $(DBFFPT_LIB)
 DBFNTX_STLIB     = $(DBFNTX_LIB)
 DBFCDX_STLIB     = $(DBFCDX_LIB)
 PP_STLIB         = $(PP_LIB)
@@ -222,6 +230,8 @@ ODBC_STLIB       = $(ODBC_LIB)
    RTL_LIB        = $(LIB_DIR)\rtlmt.lib
    MACRO_LIB      = $(LIB_DIR)\macromt.lib
    RDD_LIB        = $(LIB_DIR)\rddmt.lib
+   DBFDBT_LIB     = $(LIB_DIR)\dbfdbtmt.lib
+   DBFFPT_LIB     = $(LIB_DIR)\dbffptmt.lib
    DBFNTX_LIB     = $(LIB_DIR)\dbfntxmt.lib
    DBFCDX_LIB     = $(LIB_DIR)\dbfcdxmt.lib
    PP_LIB         = $(LIB_DIR)\ppmt.lib
@@ -570,6 +580,16 @@ RDD_LIB_OBJS = \
 NULSYS_LIB_OBJS = \
    $(OBJ_DIR)\nulsys.obj
 
+DBFDBT_LIB_OBJS = \
+   $(DBT_OBJ_DIR)\dbfdbt1.obj \
+   \
+   $(DBT_OBJ_DIR)\dbfdbt0.obj
+
+DBFFPT_LIB_OBJS = \
+   $(FPT_OBJ_DIR)\dbffpt1.obj \
+   \
+   $(FPT_OBJ_DIR)\dbffpt0.obj
+
 DBFNTX_LIB_OBJS = \
    $(NTX_OBJ_DIR)\dbfntx1.obj \
    \
@@ -861,6 +881,8 @@ all: \
    $(LANG_LIB) \
    $(RDD_LIB) \
    $(NULSYS_LIB) \
+   $(DBFDBT_LIB) \
+   $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
    $(HB_GT_LIBS) \
@@ -880,6 +902,22 @@ all: \
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
     IF EXIST "$(COMMON_LIB)" $(DEL) "$(COMMON_LIB)" > NUL
     $(LINKER) "$(COMMON_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
+$(DBFDBT_LIB) : $(DBFDBT_LIB_OBJS)
+    IF EXIST "$(DBFDBT_LIB)" $(DEL) "$(DBFDBT_LIB)" > NUL
+    $(LINKER) "$(DBFDBT_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
+$(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
+    IF EXIST "$(DBFFPT_LIB)" $(DEL) "$(DBFFPT_LIB)" > NUL
+    $(LINKER) "$(DBFFPT_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
@@ -2345,6 +2383,32 @@ $(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 #
+# DBFDBT.LIB dependencies
+#
+
+$(DBT_OBJ_DIR)\dbfdbt0.c : $(RDD_DIR)\dbfdbt\dbfdbt0.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(DBT_OBJ_DIR)\dbfdbt0.obj : $(DBT_OBJ_DIR)\dbfdbt0.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(DBT_OBJ_DIR)\dbfdbt1.obj : $(RDD_DIR)\dbfdbt\dbfdbt1.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+#
+# DBFFPT.LIB dependencies
+#
+
+$(FPT_OBJ_DIR)\dbfFPT0.c : $(RDD_DIR)\dbfFPT\dbfFPT0.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(FPT_OBJ_DIR)\dbfFPT0.obj : $(FPT_OBJ_DIR)\dbfFPT0.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(FPT_OBJ_DIR)\dbfFPT1.obj : $(RDD_DIR)\dbfFPT\dbfFPT1.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+#
 # DBFNTX.LIB dependencies
 #
 
@@ -2608,6 +2672,8 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
+   $(ECHO) $(DBFDBT_LIB) >> make.tmp
+   $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
    $(ECHO) $(CODEPAGE_LIB) >> make.tmp
@@ -2652,6 +2718,8 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_STLIB) >> make.tmp
+   $(ECHO) $(DBFDBT_STLIB) >> make.tmp
+   $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
    $(CC) @make.tmp
@@ -2755,6 +2823,8 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_STLIB) >> make.tmp
+   $(ECHO) $(DBFDBT_STLIB) >> make.tmp
+   $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
 !if $d(HB_DOC_PDF)
@@ -2902,6 +2972,8 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_STLIB) >> make.tmp
+   $(ECHO) $(DBFDBT_STLIB) >> make.tmp
+   $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
    $(CC) @make.tmp

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1432 2003/09/09 09:47:09 paultucker Exp $
+ * $Id: ChangeLog,v 1.1433 2003/09/09 16:33:57 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-09 17:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * makefile.bc
+     + Added support for dbfdbt.lib and dbffpt.lib
 
 2003-09-09 13:39 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * xharbour/contrib/libct/Makefile
@@ -25,7 +29,7 @@
 2003-09-09 01:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
    * updated to use the new dbf[fpt|dbt] libraries
-   
+
 2003-09-08 22:07 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * makefile.nt
    * makefile.vc
@@ -82,7 +86,7 @@
    * contrib/rdd_ads/adsfunc.c
      + New functions related to Advantage Data Dictionary - ADSREINDEX()
      ! Fixed some compilation errors when building with ADS_REQUIRE_VERSION6
-     
+
 2003-09-08 14:46 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/contrib/libct/Makefile
   * xharbour/contrib/libct/bit1.c
