@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3186 2004/07/22 10:55:20 paultucker Exp $
+ * $Id: ChangeLog,v 1.3187 2004/07/22 11:32:08 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-22 17:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/rtl/teditor.prg
+    ! Process files with multiple leading empty lines correctly.
 
 2004-07-22 15:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * contrib/libct/files.c

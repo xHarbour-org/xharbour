@@ -28,7 +28,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.45 2004/06/19 15:30:43 modalsist Exp $
+/* $Id: teditor.prg,v 1.46 2004/07/14 01:17:08 guerra000 Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -1817,13 +1817,13 @@ STATIC function Text2Array( cString, nWordWrapCol )
    nRetLen := 0
    ncSLen  := Len( cString )
 
-   // If cString starts with an EOL delimiter I have to add an empty line since __StrTkPtr
-   // gives back _next_ token and would skip this first EOL delimiter
-   if Left( cString, nEOLLen ) == cEOL
+   // If cString starts with EOL delimiters I have to add empty lines since __StrTkPtr
+   // gives back _next_ token and would skip these first EOL delimiters
+   do while SubStr( cString, nTokPos + 1, nEOLLen ) == cEOL
       AAdd( aArray, HBTextLine():New( cLine, .F. ) )
       nTokPos += nEOLLen
       nRetLen += nEOLLen
-   endif
+   enddo
 
    while nRetLen < ncSLen
       /* TOFIX: Note that __StrToken is not able to cope with delimiters longer than one char */
