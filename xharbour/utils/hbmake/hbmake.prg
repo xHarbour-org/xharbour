@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.35 2002/12/15 23:41:31 lculik Exp $
+ * $Id: hbmake.prg,v 1.36 2002/12/28 22:19:19 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -986,10 +986,10 @@ FUNCTION Compfiles()
                             ENDIF
 
                             cComm := Strtran( cComm, "$**", acs[ nFiles ] )
-                            cComm += " >> Test.out"
+                            cComm += " 2> Test.out"
                         @ 4,16 Say acs[nFiles]
                         GaugeUpdate(aGauge,nFile/Len( aprgs ))
-
+                        nFile++
 //                            Outstd( cComm )
                                      ! ( cComm )
                             cErrText := Memoread( 'Test.out' )
@@ -1207,6 +1207,7 @@ FUNC crtmakfile( cFile )
     LOCAL lCw          := .f.
     LOCAL lMiniGui     := .f.
     LOCAL lRddAds      := .f.
+    LOCAL lMt          := .F.
     LOCAL cOs          := "Win32"
     LOCAL cCompiler    := "BCC"
     LOCAL cfwhpath     := Space( 200 )
@@ -1228,7 +1229,12 @@ FUNC crtmakfile( cFile )
     LOCAL cDefBccLibs    := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib common.lib gtwin.lib"
     LOCAL cDefGccLibs    := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
     LOCAL cgcclibsos2    := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
-    LOCAL cDeflibGccLibs := "-lvm -lrtl -lgtsln -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lslang -lm"
+    LOCAL cDeflibGccLibs := "-lvm -lrtl -lgtsln -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lslang -lgpm -lpthread -lm"
+    LOCAL cDefBccLibsmt    := "bcc640.lib lang.lib vmmt.lib rtlmt.lib rddmt.lib macro.lib pp.lib dbfntxmt.lib dbfcdxmt.lib common.lib gtwin.lib"
+    LOCAL cDefGccLibsmt    := "-lvmmt -lrtlmt -lgtdos -llang -lrddmt -lrtlmt -lvmmt -lmacro -lpp -ldbfntxmt -ldbfcdxmt -lcommon"
+    LOCAL cgcclibsos2mt    := "-lvmmt -lrtlmt -lgtos2 -llang -lrddmt -lrtlmt -lvmmt -lmacro -lpp -ldbfntxmt -ldbfcdxmt -lcommon"
+    LOCAL cDeflibGccLibsmt := "-lvmmt -lrtlmt -lgtsln -llang -lrddmt -lrtlmt -lvmmt -lmacro -lpp -ldbfntxmt -ldbfcdxmt -lcommon -lslang -lgpm -lpthread -lm"
+
     LOCAL cLibs          := ""
     LOCAL citem          := ""
     LOCAL cExt           := ""
@@ -1297,6 +1303,7 @@ FUNC crtmakfile( cFile )
     @ 11, 40 get lXFwh checkbox caption "Xharbour FWH"             style "[o ]"
     @ 12,  1 Say "Resource file Name" Get CResName
     @ 13, 1 say aLangMessages[ 43 ] get nFilestoAdd pict "99" valid nFilestoAdd > 0
+    @ 13, 40 GET lMt checkbox caption aLangMessages [44] style "[o ]"
     READ
 
     IF !Empty( cUserDef )
@@ -1842,21 +1849,21 @@ FUNC crtmakfile( cFile )
 
             if lXfwh
 
-               Fwrite( nLinkHandle, "LIBFILES = $(FWH)\lib\fivehx.lib $(FWH)\lib\fivehc.lib " + cDefBccLibs + CRLF )
+               Fwrite( nLinkHandle, "LIBFILES = $(FWH)\lib\fivehx.lib $(FWH)\lib\fivehc.lib " + if(!lMt,cDefBccLibs,cDefBccLibsmt) + CRLF )
 
             ELSE
 
-               Fwrite( nLinkHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib " + cDefBccLibs + CRLF )
+               Fwrite( nLinkHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib " + if( !lMt ,cDefBccLibs,cDefBccLibsmt) + CRLF )
 
             Endif
 
         ELSEIF lMiniGui
 
-            Fwrite( nLinkHandle, "LIBFILES = Minigui.lib " + cDefBccLibs + CRLF )
+            Fwrite( nLinkHandle, "LIBFILES = Minigui.lib " + if(!lMt,cDefBccLibs,cDefBccLibsmt) + CRLF )
 
         ELSEIF lCw
 
-            Fwrite( nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib" + cDefBccLibs + CRLF )
+            Fwrite( nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib" + if(!lMt,cDefBccLibs,cDefBccLibsmt) + CRLF )
 
         ELSE
 
@@ -1868,15 +1875,15 @@ FUNC crtmakfile( cFile )
 
         IF cOs == "Linux"
 
-            Fwrite( nLinkHandle, "LIBFILES = -Wl,--start-group " + cDeflibGccLibs + " -Wl,--end-group " + CRLF )
+            Fwrite( nLinkHandle, "LIBFILES = -Wl,--start-group " + if(!lMt,cDeflibGccLibs,cDeflibGccLibsmt) + " -Wl,--end-group " + CRLF )
 
         ELSEIF cOs == "OS/2"
 
-            Fwrite( nLinkHandle, "LIBFILES = " + cgcclibsos2 + CRLF )
+            Fwrite( nLinkHandle, "LIBFILES = " + if(!lMt,cgcclibsos2,cgcclibsos2mt) + CRLF )
 
         ELSE
 
-            Fwrite( nLinkHandle, "LIBFILES = " + cDefgccLibs + CRLF )
+            Fwrite( nLinkHandle, "LIBFILES = " + if(!lMt,cDefgccLibs,cDefgccLibs) + CRLF )
 
         ENDIF
 
@@ -3756,19 +3763,19 @@ FUNCTION BuildLangArray( cLang )
         Aadd( aLang, "Select C Compiler" )
         Aadd( aLang, "Graphic Library" )
         Aadd( aLang, "Harbour Options" )
-        Aadd( aLang, "Automatic memvar declaration" )
-        Aadd( aLang, "Variables are assumed M->" )
-        Aadd( aLang, "Debug info" )
-        Aadd( aLang, "Suppress line number information" )
-        Aadd( aLang, "Generate pre-processed output" )
-        Aadd( aLang, "compile module only" )
+        Aadd( aLang, "Automatic memvar declaration /a"  )
+        Aadd( aLang, "Variables are assumed M-> /v" )
+        Aadd( aLang, "Debug info /b" )
+        Aadd( aLang, "Suppress line number information /l" )
+        Aadd( aLang, "Generate pre-processed output /p" )
+        Aadd( aLang, "compile module only /m" )
         Aadd( aLang, "User Defines " )
         Aadd( aLang, "User include Path" )
         Aadd( aLang, "Use External Libs" )
         Aadd( aLang, "Spacebar to select, Enter to continue process" )
-        Aadd( aLang, "Warninge level /w" )
+        Aadd( aLang, "Warning level /w" )
         Aadd( aLang, "Numbers of source files per line on makefile")
-
+        Aadd( aLang, "Use Multi Thread Library")
 
     ELSEIF cLang == "ES"
 
@@ -3815,7 +3822,7 @@ FUNCTION BuildLangArray( cLang )
         Aadd( aLang, "Espa‡o para selecionar, Enter p/ continuar processo" )
         Aadd( aLang, "N¡vel de Aviso do compilador /w" )
         Aadd( aLang, "Numeros de fontes por linha no makefile")
-
+        Aadd( aLang, "Use a libreria Multi Thread")
 
     ELSEIF cLang == "PT"
 
@@ -3862,7 +3869,7 @@ FUNCTION BuildLangArray( cLang )
         Aadd( aLang, "Espa‡o para selecionar, Enter p/ continuar processo" )
         Aadd( aLang, "N¡vel de Aviso do compilador /w" )
         Aadd( aLang, "Numeros de fontes por linha no makefile")
-
+        Aadd( aLang, "Use a Biblioteca Multi Thread")
     ENDIF
 
     RETURN aLang
