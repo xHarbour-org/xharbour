@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.143 2002/12/30 21:24:09 ronpinkas Exp $
+ * $Id: hvm.c,v 1.144 2002/12/31 00:58:55 ronpinkas Exp $
  */
 
 /*
@@ -1526,7 +1526,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHGLOBALREF") );
              {
                 short iGlobal    = pCode[ w + 1 ];
-                HB_ITEM_PTR pTop = ( * HB_VM_STACK.pPos );
+                PHB_ITEM pTop = ( * HB_VM_STACK.pPos );
 
                 pTop->type = HB_IT_BYREF;
 
@@ -1958,23 +1958,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              * a new value of the given field
              */
          {
-            PHB_ITEM pTop;
 
             hb_rddPutFieldValue( ( hb_stackItemFromTop(-1) ), pSymbols + ( USHORT ) ( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) ) );
-            hb_stackDec();
 
-            pTop = ( * HB_VM_STACK.pPos );
+            hb_stackPop();
 
-            if( HB_IS_COMPLEX( pTop ) )
-            {
-               hb_itemClear( pTop );
-            }
-            else
-            {
-               pTop->type = HB_IT_NIL;
-            }
-
-            HB_TRACE(HB_TR_INFO, ("(hb_vmPopField)"));
             w += 3;
             break;
          }
@@ -2016,22 +2004,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          {
             PHB_ITEM pTop;
 
-            hb_stackDec();
-
-            pTop = ( * HB_VM_STACK.pPos );
+            pTop = *( HB_VM_STACK.pPos - 1 );
 
             hb_memvarSetValue( pSymbols + ( USHORT ) ( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) ), pTop );
 
-            if( HB_IS_COMPLEX( pTop ) )
-            {
-               hb_itemClear( pTop );
-            }
-            else
-            {
-               pTop->type = HB_IT_NIL;
-            }
+            hb_stackPop();
 
-            HB_TRACE(HB_TR_INFO, ("(hb_vmPopMemvar)"));
             w += 3;
             break;
          }
@@ -2258,27 +2236,14 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_MPOPFIELD:
          {
             HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
-            PHB_ITEM pTop;
 
             /* Pops a value from the eval stack and uses it to set
             * a new value of the given field
             */
             hb_rddPutFieldValue( ( hb_stackItemFromTop(-1) ), ( *pDynSym )->pSymbol );
 
-            hb_stackDec();
+            hb_stackPop();
 
-            pTop = ( * HB_VM_STACK.pPos );
-
-            if( HB_IS_COMPLEX( pTop ) )
-            {
-               hb_itemClear( pTop );
-            }
-            else
-            {
-               pTop->type = HB_IT_NIL;
-            }
-
-            HB_TRACE(HB_TR_INFO, ("(hb_vmMPopField)"));
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
          }
@@ -4722,17 +4687,18 @@ static void hb_vmEndBlock( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmEndBlock()"));
 
-   hb_stackDec();                               /* make the last item visible */
-   hb_itemForwardValue( &(HB_VM_STACK.Return), ( * HB_VM_STACK.pPos ) ); /* Forward it */
+   hb_itemForwardValue( &(HB_VM_STACK.Return),  *( HB_VM_STACK.pPos - 1 ) );
+
+   hb_stackDec();
 }
 
 static void hb_vmRetValue( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRetValue()"));
 
-   hb_stackDec();                               /* make the last item visible */
+   hb_itemForwardValue( &(HB_VM_STACK.Return), *( HB_VM_STACK.pPos - 1 ) );
 
-   hb_itemForwardValue( &(HB_VM_STACK.Return), ( * HB_VM_STACK.pPos ) ); /* Forward it */
+   hb_stackDec();
 }
 
 static void hb_vmDebuggerEndProc( void )
@@ -5519,6 +5485,7 @@ static void hb_vmPopAlias( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPopAlias()"));
 
    hb_vmSelectWorkarea( hb_stackItemFromTop( -1 ) ); /* it clears the passed item */
+
    hb_stackDec();
 }
 
