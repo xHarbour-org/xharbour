@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtwin.prg,v 1.2 2003/01/31 04:29:39 walito Exp $
+ * $Id: dbgtwin.prg,v 1.11 2003/06/14 13:50:32 antoniolinares Exp $
  */
 
 /*
@@ -129,6 +129,7 @@ METHOD ScrollUp( nLines ) CLASS TDbWindow
 return nil
 
 METHOD SetCaption( cCaption ) CLASS TDbWindow
+
    ::cCaption := cCaption
 return nil
   
@@ -208,7 +209,6 @@ METHOD Show( lFocused ) CLASS TDbWindow
    endif
 
    ::ShowCaption()
-   
    ::lVisible := .t.
 
 return nil
@@ -228,18 +228,16 @@ METHOD ShowModal() CLASS TDbWindow
          Eval( ::bKeyPressed, nKey )
       endif
 
-      Switch nKey
-         case K_ESC
+      do case
+         case nKey == K_ESC
               lExit := .t.
-              exit
 
-         case K_LBUTTONDOWN
+         case nKey == K_LBUTTONDOWN
               if MRow() == ::nTop .and. MCol() >= ::nLeft + 1 .and. ;
                  MCol() <= ::nLeft + 3
                  lExit := .t.
               endif
-              exit
-      end
+      endcase
    end
 
    ::Hide()
@@ -280,42 +278,37 @@ METHOD Move() Class TDbWindow
 
       nKey := Inkey( 0 )
 
-      Switch nKey
-         case K_UP
+      do case
+         case nkey == K_UP
               if ::ntop != 0
                  ::ntop--
                  ::nbottom--
               endif
-              exit
 
-         case K_DOWN
+         case nKey == K_DOWN
               if ::nBottom != MaxRow()
                  ::nTop++
                  ::nBottom++
               endif
-              exit
 
-         case K_LEFT
+         case nKey == K_LEFT
               if ::nLeft != 0
                  ::nLeft--
                  ::nRight--
               endif
-              exit
 
-         case K_RIGHT
+         case nKey == K_RIGHT
               if ::nBottom != MaxRow()
                  ::nLeft++
                  ::nRight++
               endif
-              exit
 
-         case K_ESC
+         case nKey == K_ESC
               ::nTop    := nOldTop
               ::nLeft   := nOldLeft
               ::nBottom := nOldBottom
               ::nRight  := nOldRight
-              exit
-      end
+      endcase
 
       if nKey == K_ESC .or. nKey == K_ENTER
          exit
