@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2625 2004/03/22 09:22:05 brianhays Exp $
+ * $Id: ChangeLog,v 1.2626 2004/03/22 14:00:56 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-03-22 18:54 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+  ! source/vm/hvm.c
+    ! hb_vmInit() to build on OS/2 GCC HB_Trace() call must be after EXCEPTIONREGISTRATIONRECORD
+      definition, really don't know why :|
 
 2004-03-22 11:06 UTC-0300 Luiz Rafael Culik Guimaraes<culikr@brturbo.com>
   ! contrib/hbzlib/zipnew.cpp
