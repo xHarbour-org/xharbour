@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.23 2002/06/02 23:31:38 lculik Exp $
+ * $Id: hbmake.prg,v 1.24 2002/06/16 02:06:16 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -119,7 +119,7 @@ FUNCTION main( cFile, p1, p2, p3, p4, p5, p6 )
     LOCAL allParam
     LOCAL nLang    := GETUSERLANG()
     //Local oProfile := HBProfile():new()
-
+   FERASE("Test.out")
     //__setProfiler( .T. )
 
     IF Pcount() == 0
@@ -1209,7 +1209,7 @@ FUNC crtmakfile( cFile )
     LOCAL lGenppo        := .f.
     LOCAL getlist        := {}
     LOCAL cTopFile       := ""
-    LOCAL cDefBccLibs    := "lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib common.lib gtwin.lib"
+    LOCAL cDefBccLibs    := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib common.lib gtwin.lib"
     LOCAL cDefGccLibs    := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
     LOCAL cgcclibsos2    := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
     LOCAL cDeflibGccLibs := "-lvm -lrtl -lgtsln -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lslang -lm"
