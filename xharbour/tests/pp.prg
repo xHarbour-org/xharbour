@@ -65,6 +65,8 @@
 
 #ifdef __HARBOUR__
 
+   EXTERN dbClearRel
+
    // Enable extended syntax.
    #ifdef __XHARBOUR__
       #define __FOR_EACH__
@@ -73,8 +75,6 @@
 
       REQUEST ErrorSys
 
-      EXTERN dbClearRel
-
       EXTERN CreateObject
       EXTERN GetActiveObject
 
@@ -82,10 +82,15 @@
          REQUEST SQLRDD
          REQUEST SR_ODBC
 				 REQUEST SR_MYSQL
+
 				 #ifdef PGS
 				    REQUEST SR_PGS
 				 #endif
       #endif
+
+      #ifdef ZIP
+				 EXTERN ZipCreate
+			#endif
    #endif
 
    #ifndef NO_BOOST
@@ -404,7 +409,12 @@ STATIC s_lReturnRequested
    STATIC s_bExternalRecovery
 #endif
 
-STATIC s_cVer := "1.0.RC6"
+#ifdef REVISION
+	 #xtranslate Stringify( <x> ) => #<x>
+   STATIC s_cVer := "1.0.RC7" + Stringify( REVISION )
+#else
+   STATIC s_cVer := "1.0.RC7"
+#endif
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
