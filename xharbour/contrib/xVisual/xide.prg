@@ -13,7 +13,9 @@ FUNCTION Main
    oApp := Application():New()
    
    oApp:CreateForm( 'MainForm', mainForm() )
-
+   
+   oApp:MainForm:SetBkBrush( COLOR_APPWORKSPACE+1 )
+   
    oApp:MainForm:WindowMenu := TMenu():New()
    
       oApp:MainForm:WindowMenu:AddPopup( 'popup 1' )
@@ -33,7 +35,8 @@ FUNCTION Main
          oApp:MainForm:WindowMenu:Popup:AddItem( 'item 203', 203)
          
       oApp:MainForm:SetWindowMenu()
-
+   
+   oApp:MainForm:PostMessage( WM_COMMAND, 200 )
    oApp:Run()
 
 RETURN( nil)
@@ -44,7 +47,6 @@ CLASS MainForm FROM TForm
 
    METHOD New( oParent )       INLINE ::Caption := 'Main Form from TForm', super:new( oParent )
    
-   METHOD OnPaint( hDC )       INLINE DrawGrid( ::handle, hDC, 3 ),0
    METHOD OnClose()            INLINE MessageBox( ::handle, 'OnClose','Whoo'),;
                                       PostQuitMessage(0)
    
