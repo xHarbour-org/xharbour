@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.18 2004/03/01 09:36:20 paultucker Exp $
+ * $Id: achoice.prg,v 1.19 2004/03/10 19:06:09 peterrees Exp $
  */
 
 /*
@@ -637,7 +637,7 @@ STATIC FUNCTION Ach_Limits( nFrstItem, nLastItem, nItems, bSelect, alSelect, acI
          EXIT
       ENDIF
 */
-      IF !ISCHARACTER( cItems )
+      IF !ISCHARACTER( cItems ) .OR. cItems == ""
          nItems := HB_EnumIndex() - 1
          EXIT
       ENDIF

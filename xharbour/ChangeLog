@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2987 2004/05/25 04:28:28 guerra000 Exp $
+ * $Id: ChangeLog,v 1.2988 2004/05/25 13:35:42 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-25 13:53 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/achoice.prg
+     ! ACHOICE() must not display rows after null strings "".
 
 2004-05-25 09:32 UTC-0400 Sylvain Robert <s.robert/at/videotron.ca>
   * contrib/hbzlib/zip.c
