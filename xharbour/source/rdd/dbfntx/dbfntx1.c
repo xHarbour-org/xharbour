@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.144 2002/10/04 11:50:19 alkresin Exp $
+ * $Id: dbfntx1.c,v 1.24 2002/10/12 00:38:26 horacioroldan Exp $
  */
 
 /*
@@ -3885,8 +3885,13 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
    {
       pArea->lpNtxTag = pIndex->CompoundTag;
    }
+
    if( !pArea->lpCurTag )
+   {
       pArea->lpCurTag = pIndex->CompoundTag;
+		SELF_GOTOP( ( AREAP ) pArea );
+	}
+
    hb_xfree( szFileName );
    hb_xfree( pFileName );
    return SUCCESS;

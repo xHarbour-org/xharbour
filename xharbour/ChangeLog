@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.483 2002/11/09 07:50:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.484 2002/11/11 04:26:13 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-12 00:45 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/rdd/dbfntx/dbfntx1.c
+    ! Fixed ordListAdd for Cl*pper compatibility : "After the new orders
+      are opened, the work area is positioned to the first logical record
+      in the controlling order"
 
 2002-11-11 01:24 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/vm/itemapi.c
