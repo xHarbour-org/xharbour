@@ -1,5 +1,5 @@
 /*
- * $Id: dummy.prg,v 1.49 2001/12/15 11:32:08 vszakats Exp $
+ * $Id: dummy.prg,v 1.1.1.1 2001/12/21 10:41:27 ronpinkas Exp $
  */
 
 /*
@@ -58,8 +58,6 @@
 FUNCTION ordCond()         ; RETURN NIL
 FUNCTION ordDescend()      ; RETURN .F.
 FUNCTION ordIsUnique()     ; RETURN .F.
-FUNCTION ordKeyAdd()       ; RETURN .F.
-FUNCTION ordKeyDel()       ; RETURN .F.
 FUNCTION ordKeyGoto()      ; RETURN .F.
 FUNCTION ordSetRelation()  ; RETURN NIL
 FUNCTION ordSkipUnique()   ; RETURN .F.
