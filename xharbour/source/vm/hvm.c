@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.362 2004/03/21 15:55:06 druzus Exp $
+ * $Id: hvm.c,v 1.363 2004/03/22 17:44:28 mauriliolongo Exp $
  */
 
 /*
@@ -398,23 +398,6 @@ void hb_vmDoInitRdd( void )
    }
 }
 
-#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
-void hb_vmDoInitOle( void )
-{
-   PHB_DYNS pDynSym;
-
-   // Init Ole if Win32Ole is linked.
-   pDynSym = hb_dynsymFind( "INITIALIZE_OLE" );
-   if( pDynSym && pDynSym->pSymbol->pFunPtr )
-   {
-      //TraceLog( NULL, "OLE: %p %p\n", pDynSym, pDynSym->pSymbol->pFunPtr );
-      hb_vmPushSymbol( pDynSym->pSymbol );
-      hb_vmPushNil();
-      hb_vmDo(0);
-   }
-}
-#endif
-
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
@@ -554,7 +537,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
       HB_TRACE( HB_TR_INFO, ("InitOle" ) );
-      hb_vmDoInitOle();
+      Win32_OleInitialize();
    #endif
 
    //printf( "Before InitFunctions\n" );
@@ -795,6 +778,11 @@ int HB_EXPORT hb_vmQuit( void )
       HB_TRACE(HB_TR_DEBUG, ("   Released s_aStatics: %p\n", &s_aStatics) );
    }
    //printf("\nAfter Statics\n" );
+
+   #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+      HB_TRACE( HB_TR_INFO, ("QuitOle" ) );
+      Win32_OleUnInitialize();
+   #endif
 
    hb_inkeyExit();
    //printf("\nAfter inkey\n" );

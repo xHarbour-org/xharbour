@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.51 2004/03/22 03:31:20 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.52 2004/03/23 19:56:30 ronpinkas Exp $
  */
 
 /*
@@ -56,8 +56,6 @@
   FUNCTION GetActiveObject( cString )
   Return NIL
 #else
-
-Static bOleInitialized := .F.
 
 #include "hbclass.ch"
 #include "error.ch"
@@ -134,7 +132,7 @@ RETURN TOleAuto():GetActiveObject( cString )
 
    static char *s_OleRefFlags = NULL;
 
-   HB_FUNC( OLE_INITIALIZE )
+   void Win32_OleInitialize( void )
    {
       s_nOleError = OleInitialize( NULL );
 
@@ -143,7 +141,7 @@ RETURN TOleAuto():GetActiveObject( cString )
       s_pSym_hObj    = hb_dynsymFindName( "HOBJ" );;
    }
 
-   HB_FUNC( OLE_UNINITIALIZE )
+   void Win32_OleUnInitialize( void )
    {
       OleUninitialize();
    }
@@ -164,23 +162,7 @@ RETURN TOleAuto():GetActiveObject( cString )
 
 #pragma ENDDUMP
 
-
 //----------------------------------------------------------------------------//
-
-// Called directly by HVM to ensure avilability of OLE to other INIT Procedures.
-/*INIT*/ PROCEDURE Initialize_Ole
-   IF ! bOleInitialized
-      bOleInitialized := .T.
-      Ole_Initialize()
-   ENDIF
-RETURN
-
-EXIT PROCEDURE UnInitialize_Ole
-   IF bOleInitialized
-      bOleInitialized := .F.
-      Ole_UnInitialize()
-   ENDIF
-RETURN
 
 CLASS TOleAuto
 
