@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.16 2004/09/29 22:38:43 rodrigo_moreno Exp $
+ * $Id: postgres.c,v 1.17 2004/12/15 12:51:17 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -412,6 +412,23 @@ HB_FUNC(PQCMDTUPLES)
 {
     if (hb_parinfo(1))
         hb_retc(PQcmdTuples( (PGresult *) hb_parptr(1) ));
+}
+
+
+HB_FUNC(PQESCAPESTRING)
+{
+    char *source;
+    char *dest;
+    size_t size;
+        
+    source = hb_parcx(1);
+    dest = (char *) hb_xgrab( strlen(source) * 2 + 1);
+    size = strlen(source);
+    
+    PQescapeString(dest, source, size);
+    
+    hb_retc(dest);
+    hb_xfree( (char *) dest);    
 }
 
 
