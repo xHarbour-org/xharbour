@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1726 2003/11/15 20:25:47 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1727 2003/11/15 21:26:41 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-15 00:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    + simple logic to detect low level locks overwriting added
+      overwriting lock is not possible in DOS/Windows so I try
+      to not use this POSIX feature and this code should cause
+      internal error when I'll use it by mistake. It's not perfect
+      because it should not be implemented in RDD layer but in file
+      IO (hb_fsLock) and recognize files by device ID + inode not
+      their handle but it should be enough to detect my mistakes ;-)
+      The full implementation we will have to do for using the same
+      database by on process with different aliases all by threads
+      with independent workareas.
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/include/hbrdddbf.h
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbf1.c
+    * fixed at least four race conditions in DBF RDD. They could
+      cause database and index used by DBF RDD or all
+      other RDDs which inherits from DBF RDD (DBFNTX, DBFCDX, DBFFPT,
+      FDBDBT) corruption
+
+  * xharbour/xharbour.spec
+    * small fix foru new RPM
+
+  * xharbour/make_rpm.sh
+    * small fix suggested by Toma¾ Zupan for distributions which change
+      names of some packages but have proper Provides macro in spec.
 
 2003-11-15 22:23 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/hash.c

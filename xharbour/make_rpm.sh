@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.13 2003/11/10 13:47:39 lculik Exp $
+# $Id: make_rpm.sh,v 1.14 2003/11/11 01:34:45 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -22,7 +22,7 @@
 
 test_reqrpm()
 {
-    rpm -q "$1" &> /dev/null
+    rpm -q --whatprovides "$1" &> /dev/null
 }
 
 get_rpmmacro()

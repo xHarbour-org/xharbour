@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.37 2003/11/10 13:53:53 lculik Exp $
+# $Id: xharbour.spec,v 1.38 2003/11/11 01:34:45 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -608,6 +608,7 @@ VERBOSE=YES
 DELTMP=YES
 EOF
 
+if [ "%{?_with_hrbsh:1}" ]; then
 cat > $RPM_BUILD_ROOT/etc/profile.d/harb.sh <<EOF
 %{hb_cc}
 %{hb_arch}
@@ -619,6 +620,7 @@ export HB_LEX="SIMPLEX"
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 EOF
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/harb.sh
+fi
 
 # Create PP
 pushd tests

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.4 2003/09/08 12:56:52 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.5 2003/11/10 11:49:48 druzus Exp $
  */
 
 /*
@@ -136,6 +136,7 @@ typedef struct _DBFAREA
    BOOL fDeleted;                /* TRUE if record is deleted */
    BOOL fUpdateHeader;           /* Update header of file */
    BOOL fFLocked;                /* TRUE if file is locked */
+   BOOL fHeaderLocked;           /* TRUE id DBF header is locked */
    LPDBRELINFO lpdbPendingRel;   /* Pointer to parent rel struct */
    BYTE bYear;                   /* Last update */
    BYTE bMonth;

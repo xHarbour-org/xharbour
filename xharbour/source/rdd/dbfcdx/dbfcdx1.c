@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.82 2003/11/11 21:24:18 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.83 2003/11/12 02:01:10 druzus Exp $
  */
 
 /*
@@ -57,6 +57,7 @@
 //#define HB_CDX_DSPDBG_INFO
 //#define HB_CDP_SUPPORT_OFF
 //#define HB_CDX_DBGTIME
+//#define HB_CDX_DBGUPDT
 
 #include "hbapi.h"
 #include "hbinit.h"
@@ -361,7 +362,12 @@ static CDXDBGTIME hb_cdxGetTime()
    return ( (CDXDBGTIME) tv.tv_sec * 1000000 + (CDXDBGTIME) tv.tv_usec );
 }
 #endif
-
+#ifdef HB_CDX_DBGUPDT
+static ULONG cdxWriteNO = 0;
+static ULONG cdxReadNO = 0;
+static SHORT cdxStackSize = 0;
+static SHORT cdxTmpStackSize = 0;
+#endif
 
 /*
  * internal DBFCDX function
@@ -948,6 +954,9 @@ static ULONG hb_cdxIndexGetAvailPage( LPCDXINDEX pIndex, BOOL bHeader )
               hb_fsRead( hFile, (BYTE *) &byBuf, 4 ) != 4 )
             hb_errInternal( EDBF_READ, "Read index page failed.", "", "" );
          pIndex->freePage = HB_GET_LE_ULONG( byBuf );
+#ifdef HB_CDX_DBGUPDT
+         cdxReadNO++;
+#endif
       }
    }
    else
@@ -1033,6 +1042,9 @@ static void hb_cdxIndexFlushAvailPage( LPCDXINDEX pIndex )
       ulPos = pLst->ulAddr;
       pLst->fStat = FALSE;
       pLst = pLst->pNext;
+#ifdef HB_CDX_DBGUPDT
+      cdxWriteNO++;
+#endif
    }
 }
 
@@ -1066,6 +1078,9 @@ static void hb_cdxIndexPageWrite( LPCDXINDEX pIndex, ULONG ulPos, BYTE * pBuffer
         hb_fsWrite( pIndex->hFile, pBuffer, uiSize ) != uiSize )
       hb_errInternal( EDBF_WRITE, "Write in index page failed.", "", "" );
    pIndex->fChanged = TRUE;
+#ifdef HB_CDX_DBGUPDT
+   cdxWriteNO++;
+#endif
 }
 
 /*
@@ -1080,6 +1095,9 @@ static void hb_cdxIndexPageRead( LPCDXINDEX pIndex, ULONG ulPos, BYTE * pBuffer,
    if ( hb_fsSeek( pIndex->hFile, ulPos, FS_SET ) != ulPos ||
         hb_fsRead( pIndex->hFile, pBuffer, uiSize ) != uiSize )
       hb_errInternal( EDBF_READ, "Read index page failed.", "", "" );
+#ifdef HB_CDX_DBGUPDT
+   cdxReadNO++;
+#endif
 }
 
 /*
@@ -1098,6 +1116,9 @@ static void hb_cdxIndexCheckVersion( LPCDXINDEX pIndex )
       else
          hb_errInternal( 2155, "hb_cdxIndexCheckVersion: Read error on index heading page.", "", "" );
    }
+#ifdef HB_CDX_DBGUPDT
+   cdxReadNO++;
+#endif
    ulFree = HB_GET_LE_ULONG( &byBuf[0] );
    ulVer = HB_GET_BE_ULONG( &byBuf[4] );
    if ( !pIndex->fShared )
@@ -1127,6 +1148,12 @@ static BOOL hb_cdxIndexLockRead( LPCDXINDEX pIndex )
    }
    if ( pIndex->lockRead != 0 )
       hb_errInternal( 9105, "hb_cdxIndexLockRead: bad count of locks.", "", "" );
+
+#ifndef HB_CDX_DBGCODE_OFF
+   if ( pIndex->WrLck || pIndex->RdLck )
+      hb_errInternal( 9107, "hb_cdxIndexLockRead: lock failure (*)", "", "" );
+   pIndex->RdLck = TRUE;
+#endif
 
    while (! (ret = hb_fsLock ( pIndex->hFile, CDX_LOCKOFFSET, CDX_LOCKSIZE,
                                FL_LOCK | FLX_SHARED | FLX_WAIT ) ) );
@@ -1162,12 +1189,18 @@ static BOOL hb_cdxIndexLockWrite( LPCDXINDEX pIndex )
       ret = TRUE;
    else
    {
+#ifndef HB_CDX_DBGCODE_OFF
+      if ( pIndex->WrLck || pIndex->RdLck )
+         hb_errInternal( 9107, "hb_cdxIndexLockWrite: lock failure (*)", "", "" );
+      pIndex->WrLck = TRUE;
+#endif
       while (! (ret = hb_fsLock ( pIndex->hFile, CDX_LOCKOFFSET, CDX_LOCKSIZE,
                                   FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT ) ) );
    }
    if ( !ret )
       /* TODO: change into RT error dbfcdx/1038 */
       hb_errInternal( 9107, "hb_cdxIndexLockWrite: lock failure.", "", "" );
+
    if ( ret )
    {
       pIndex->lockWrite++;
@@ -1199,6 +1232,11 @@ static BOOL hb_cdxIndexUnLockRead( LPCDXINDEX pIndex )
 
    if ( pIndex->fShared )
    {
+#ifndef HB_CDX_DBGCODE_OFF
+      if ( pIndex->WrLck || ! pIndex->RdLck )
+         hb_errInternal( 9108, "hb_cdxIndexUnLockRead: unlock error (*)", "", "" );
+      pIndex->RdLck = FALSE;
+#endif
       if ( !hb_fsLock ( pIndex->hFile, CDX_LOCKOFFSET, CDX_LOCKSIZE, FL_UNLOCK ) )
       {
          hb_errInternal( 9108, "hb_cdxIndexUnLockRead: unlock error.", "", "" );
@@ -1246,6 +1284,11 @@ static BOOL hb_cdxIndexUnLockWrite( LPCDXINDEX pIndex )
          }
          pIndex->fChanged = FALSE;
       }
+#ifndef HB_CDX_DBGCODE_OFF
+      if ( ! pIndex->WrLck || pIndex->RdLck )
+         hb_errInternal( 9108, "hb_cdxIndexUnLockWrite: unlock error (*)", "", "" );
+      pIndex->WrLck = FALSE;
+#endif
       if ( !hb_fsLock ( pIndex->hFile, CDX_LOCKOFFSET, CDX_LOCKSIZE, FL_UNLOCK ) )
       {
          hb_errInternal( 9108, "hb_cdxIndexUnLockWrite: unlock error.", "", "" );
@@ -1263,6 +1306,9 @@ static BOOL hb_cdxIndexUnLockWrite( LPCDXINDEX pIndex )
             hb_errInternal( EDBF_WRITE, "Write in index page failed (ver.ex)", "", "" );
          }
          pIndex->ulVersion = pIndex->freePage;
+#ifdef HB_CDX_DBGUPDT
+         cdxWriteNO++;
+#endif
       }
       pIndex->fChanged = FALSE;
    }
@@ -2704,9 +2750,6 @@ static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, SHORT iChildRet )
    }
    iNeedKeys = ( iKeys + pPage->TagParent->MaxKeys - 1 )
                        / pPage->TagParent->MaxKeys;
-   iDiv = HB_MAX( iMax - iMin, iBlncKeys - iNeedKeys );
-   /* iDiv = iMax - iMin; */
-
 #if 1
    if ( iNeedKeys == 1 && iBlncKeys > 1 && childs[0]->Left != CDX_DUMMYNODE &&
         childs[iBlncKeys-1]->Right != CDX_DUMMYNODE &&
@@ -2716,6 +2759,9 @@ static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, SHORT iChildRet )
       iNeedKeys = 2;
    }
 #endif
+   iDiv = HB_MAX( iMax - iMin - ( pPage->TagParent->MaxKeys >> 1 ) + 1,
+                  iBlncKeys - iNeedKeys );
+   /* iDiv = iMax - iMin; */
 
    if ( iDiv >= 2 || fForce )
    {
@@ -3040,6 +3086,9 @@ static int hb_cdxPageKeyInsert( LPCDXPAGE pPage, LPCDXKEY pKey )
       iChildRet = hb_cdxPageLeafAddKey( pPage, pKey );
    else /* interior node */
       iChildRet = hb_cdxPageKeyInsert( pPage->Child, pKey );
+#ifdef HB_CDX_DBGUPDT
+   cdxTmpStackSize++;
+#endif
    return hb_cdxPageBalance( pPage, iChildRet );
 }
 
@@ -3561,12 +3610,23 @@ static BOOL hb_cdxPageReadPrevKey( LPCDXPAGE pPage )
 static BOOL hb_cdxPageReadNextKey( LPCDXPAGE pPage )
 {
    LPCDXPAGE pOwnerPage = NULL;
-
+#ifdef HB_CDX_DBGUPDT
+   SHORT iDepth = 0;
+   while ( pPage->Child )
+   {
+      pOwnerPage = pPage;
+      pPage = pPage->Child;
+      iDepth++;
+   }
+   if ( iDepth > cdxStackSize )
+      cdxStackSize = iDepth;
+#else
    while ( pPage->Child )
    {
       pOwnerPage = pPage;
       pPage = pPage->Child;
    }
+#endif
    pPage->iCurKey++;
    while ( pPage->iCurKey >= pPage->iKeys )
    {
@@ -3814,7 +3874,14 @@ static void hb_cdxTagKeyAdd( LPCDXTAG pTag, LPCDXKEY pKey )
 
    if ( ! fFound )
    {
+#ifdef HB_CDX_DBGUPDT
+      cdxTmpStackSize = 0;
+#endif
       hb_cdxPageKeyInsert( pTag->RootPage, pKey );
+#ifdef HB_CDX_DBGUPDT
+      if ( cdxTmpStackSize > cdxStackSize )
+         cdxStackSize = cdxTmpStackSize;
+#endif
       /* TODO: !!! remove when page leaf balance can save CurKey */
       hb_cdxTagKeyFind( pTag, pKey );
    }
@@ -4065,6 +4132,10 @@ static void hb_cdxIndexFree( LPCDXINDEX pIndex )
 
    if ( pIndex->fShared && ( pIndex->lockWrite || pIndex->lockRead ) )
       hb_errInternal( 9104, "hb_cdxIndexFree: index file still locked.", "", "" );
+#ifndef HB_CDX_DBGCODE_OFF
+   if ( pIndex->WrLck || pIndex->RdLck )
+      hb_errInternal( 9104, "hb_cdxIndexFree: index file still locked (*)", "", "" );
+#endif
 
    if ( pIndex->szFileName != NULL )
       hb_xfree( pIndex->szFileName );
@@ -4158,13 +4229,14 @@ static LPCDXINDEX hb_cdxFindBag( CDXAREAP pArea, char * szBagName )
 
    pFileName = hb_fsFNameSplit( szBagName );
    szBaseName = hb_strdup( pFileName->szName );
-   hb_strUpper( szBaseName, strlen(szBaseName));
+   hb_strUpper( szBaseName, strlen(szBaseName) );
 
    pIndex = pArea->lpIndexes;
-   while ( pIndex ) {
+   while ( pIndex )
+   {
       hb_xfree( pFileName );
       pFileName = hb_fsFNameSplit( pIndex->szFileName );
-      hb_strUpper( pFileName->szName, strlen(pFileName->szName));
+      hb_strUpper( pFileName->szName, strlen(pFileName->szName) );
       if ( !hb_stricmp( pFileName->szName, szBaseName ) )
          break;
       pIndex = pIndex->pNext;
@@ -5177,6 +5249,11 @@ static ERRCODE hb_cdxClose( CDXAREAP pArea )
                       cdxTimeExtBlc + cdxTimeIntBlc ) / 1000000 );
    fflush(stdout);
    cdxTimeIntBld = cdxTimeExtBld = 0;
+#endif
+#ifdef HB_CDX_DBGUPDT
+   printf( "\r\n#reads=%ld, #writes=%ld, stacksize=%d\r\n", cdxReadNO, cdxWriteNO, cdxStackSize );
+   fflush(stdout);
+   cdxReadNO = cdxWriteNO = 0;
 #endif
 
    return SUPER_CLOSE( ( AREAP ) pArea );
@@ -6553,8 +6630,9 @@ static int hb_cdxSortKeyCompare( LPCDXKEYINFO pKey1, LPCDXKEYINFO pKey2 )
       return 0;
 }
 
-static int hb_cdxSortKeyValCompare( LPCDXTAG pTag, BYTE * pKeyVal1, BYTE keyLen1,
-                                BYTE * pKeyVal2, BYTE keyLen2 )
+static int hb_cdxSortKeyValCompare( LPCDXTAG pTag,
+                                    BYTE * pKeyVal1, BYTE keyLen1,
+                                    BYTE * pKeyVal2, BYTE keyLen2 )
 {
    CDXKEYINFO pKey1, pKey2;
    pKey1.Value   = pKeyVal1;

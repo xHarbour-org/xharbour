@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.20 2003/11/10 11:49:48 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.21 2003/11/11 01:34:45 druzus Exp $
  */
 
 /*
@@ -320,6 +320,10 @@ typedef struct _CDXINDEX
    LPCDXLIST freeLst;         /* list of free pages in index file */
    int      lockWrite;        /* number of write lock set */
    int      lockRead;         /* number of read lock set */
+#ifndef HB_CDX_DBGCODE_OFF
+   BOOL     RdLck;
+   BOOL     WrLck;
+#endif
    BOOL     fChanged;         /* changes written to index, need upadte ulVersion */
    ULONG    ulVersion;        /* network version/update flag */
 } CDXINDEX;
@@ -391,6 +395,7 @@ typedef struct _CDXAREA
    BOOL fDeleted;                /* TRUE if record is deleted */
    BOOL fUpdateHeader;           /* Update header of file */
    BOOL fFLocked;                /* TRUE if file is locked */
+   BOOL fHeaderLocked;           /* TRUE id DBF header is locked */
    LPDBRELINFO lpdbPendingRel;   /* Pointer to parent rel struct */
    BYTE bYear;                   /* Last update */
    BYTE bMonth;
