@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.h,v 1.11 2003/11/04 18:12:19 ronpinkas Exp $
+ * $Id: dbfcdx1.h,v 1.12 2003/11/05 03:32:48 druzus Exp $
  */
 
 /*
@@ -77,6 +77,8 @@
 
 #if (__BORLANDC__ > 1040) /* Use this only above Borland C++ 3.1 */
    #pragma option -a1 /* byte alignment */
+#elif defined(_MSC_VER)
+   #pragma pack(push, 1)
 #elif defined(__GNUC__)
    #pragma pack(1)
 #elif defined(__WATCOMC__)
@@ -145,6 +147,8 @@ typedef SORTSWAPITEM * LPSORTSWAPITEM;
 
 #if (__BORLANDC__ > 1040) /* Use this only above Borland C++ 3.1 */
    #pragma option -a /* default alignment */
+#elif defined(_MSC_VER)
+   #pragma pack(pop)
 #elif defined(__GNUC__)
    #pragma pack()
 #elif defined(__WATCOMC__)
