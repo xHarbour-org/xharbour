@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.88 2002/02/05 05:07:45 horacioroldan Exp $
+ * $Id: dbfcdx1.c,v 1.89 2002/03/05 02:54:37 horacioroldan Exp $
  */
 
 /*
@@ -4658,6 +4658,9 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
    /*HB_SYMBOL_UNUSED( bSoftSeek );   */
    /*HB_SYMBOL_UNUSED( pKey );        */
    /*HB_SYMBOL_UNUSED( bFindLast );   */
+
+   if( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
+      return FAILURE;
 
    if( ! pTag )
    {
