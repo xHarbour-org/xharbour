@@ -21,9 +21,6 @@ PROCEDURE Main()
            //? "E-H"
            EXIT
 
-         CASE 'I'
-           ? "I"
-
          DEFAULT
            ? "Other"
       END
