@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2762 2004/04/06 19:16:00 lculik Exp $
+ * $Id: ChangeLog,v 1.2763 2004/04/06 21:11:32 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-06 15:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/codebloc.c
+    - Removed extranous if in hb_codeblockDelete()
+
+  * source/vm/hvm.c
+    * Corrected few == HB_IT_STRING to & HB_IT_STRING
+
+  * source/vm/memvars.c
+    ! Fixed memory leak
+
 2004-04-07 04:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   + make_w32.bat
   + makefile.wc
@@ -48,7 +59,7 @@
 
   * xharbour/source/rtl/filesys.c
     ! hb_fsCreateEx() use now WinAPI,
-    + added convert_create_flags() for WinAPI, 
+    + added convert_create_flags() for WinAPI,
     * some next fsError changes
 
 I've tested the changes in Linux and DOS (DJGPP, OpenWatcom) - please

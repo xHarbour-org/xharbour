@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.72 2004/04/03 03:28:13 ronpinkas Exp $
+ * $Id: memvars.c,v 1.73 2004/04/03 11:47:11 jonnymind Exp $
  */
 
 /*
@@ -868,11 +868,16 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
 
          pReference = &s_globalTable[ pDyn->hMemvar ].item;
 
-         if( pReference->type == HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.puiHolders ) > 1 ) )
+         if( pReference->type & HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.puiHolders ) > 1 ) )
          {
             char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
 
             memcpy( sString, pReference->item.asString.value, pReference->item.asString.length + 1 );
+
+            if( pReference->item.asString.bStatic == FALSE )
+            {
+                hb_itemReleaseString( pReference );
+            }
 
             pReference->item.asString.value = sString;
             pReference->item.asString.bStatic = FALSE;
@@ -2245,7 +2250,7 @@ HB_FUNC( __MVRESTORE )
 void hb_memvarsIsMemvarRef( void *pData )
 {
    HB_STACK *pStack = ( HB_STACK *) pData;
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarsIsMemvarRef()"));
 
    if( pStack->globalTable )
@@ -2257,7 +2262,7 @@ void hb_memvarsIsMemvarRef( void *pData )
          /* do not check detached variables - for these variables only
           * references from the eval stack are meaningfull for the GC
          */
-         if( pStack->globalTable[ ulCnt ].counter && 
+         if( pStack->globalTable[ ulCnt ].counter &&
             pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
          {
             hb_gcItemRef( &(pStack->globalTable[ ulCnt ].item) );

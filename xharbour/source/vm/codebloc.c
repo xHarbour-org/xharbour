@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.40 2004/03/18 04:28:31 druzus Exp $
+ * $Id: codebloc.c,v 1.41 2004/04/03 01:51:02 ronpinkas Exp $
  */
 
 /*
@@ -294,12 +294,9 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
          while( ui )
          {
-            if( HB_IS_MEMVAR( &( pCBlock->pLocals[ ui ] ) ) )
-            {
-               //TraceLog( NULL, "Release Detached %i\n", ui );
-               hb_memvarValueDecRef( pCBlock->pLocals[ ui ].item.asMemvar.value );
-               //TraceLog( NULL, "DONE Release Detached %i\n", ui );
-            }
+            //TraceLog( NULL, "Release Detached %i\n", ui );
+            hb_memvarValueDecRef( pCBlock->pLocals[ ui ].item.asMemvar.value );
+            //TraceLog( NULL, "DONE Release Detached %i\n", ui );
 
 			ui--;
          }

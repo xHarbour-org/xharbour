@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.371 2004/04/03 01:51:03 ronpinkas Exp $
+ * $Id: hvm.c,v 1.373 2004/04/04 09:24:47 andijahja Exp $
  */
 
 /*
@@ -2178,7 +2178,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
                 pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
 
-                if( (*pGlobals)[ iGlobal ]->type == HB_IT_STRING && ( (*pGlobals)[ iGlobal ]->item.asString.bStatic || *( (*pGlobals)[ iGlobal ]->item.asString.puiHolders ) > 1 ) )
+                if( (*pGlobals)[ iGlobal ]->type & HB_IT_STRING && ( (*pGlobals)[ iGlobal ]->item.asString.bStatic || *( (*pGlobals)[ iGlobal ]->item.asString.puiHolders ) > 1 ) )
                 {
                    char *sString = (char*) hb_xgrab( (*pGlobals)[ iGlobal ]->item.asString.length + 1 );
 
@@ -5039,7 +5039,7 @@ static void hb_vmArrayPop( void )
 
          //pArray = pArray->item.asString.pOrigin;
 
-         if( pValue->type == HB_IT_STRING )
+         if( pValue->type & HB_IT_STRING )
          {
             bNewChar = pValue->item.asString.value[0];
          }
@@ -6919,7 +6919,7 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
 
       pLocal = *( HB_VM_STACK.pBase + iLocal + 1 );
 
-      if( pLocal->type == HB_IT_STRING && ( pLocal->item.asString.bStatic || *( pLocal->item.asString.puiHolders ) > 1 ) )
+      if( pLocal->type & HB_IT_STRING && ( pLocal->item.asString.bStatic || *( pLocal->item.asString.puiHolders ) > 1 ) )
       {
          char *sString = (char*) hb_xgrab( pLocal->item.asString.length + 1 );
 
@@ -6983,7 +6983,7 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushStaticByRef(%hu)", uiStatic));
 
-   if( pReference->type == HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.puiHolders ) > 1 ) )
+   if( pReference->type & HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.puiHolders ) > 1 ) )
    {
       char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
 
@@ -8369,7 +8369,7 @@ HB_FUNC( HB_RESTOREBLOCK )
       hb_arrayGet( pBlockAsArray, 2, &PCode );
       hb_arrayGet( pBlockAsArray, 3, &ParamCount );
 
-      if( ModuleName.type == HB_IT_STRING && PCode.type == HB_IT_STRING && ParamCount.type == HB_IT_INTEGER )
+      if( ModuleName.type & HB_IT_STRING && PCode.type & HB_IT_STRING && ParamCount.type == HB_IT_INTEGER )
       {
          pModuleSymbols = hb_vmFindModuleByName( ModuleName.item.asString.value );
 
