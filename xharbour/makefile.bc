@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.125 2004/11/29 23:30:00 ptsarenko Exp $
+# $Id: makefile.bc,v 1.125 2004/11/29 22:09:56 ptsarenko Exp $
 #
 
 #
@@ -965,6 +965,7 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\dattime3.obj \
    $(CT_OBJ_DIR)\diskutil.obj \
    $(CT_OBJ_DIR)\fcopy.obj \
+   $(CT_OBJ_DIR)\getinfo.obj \
    $(CT_OBJ_DIR)\getsecrt.obj \
    $(CT_OBJ_DIR)\invrtwin.obj \
    $(CT_OBJ_DIR)\like.obj \
@@ -3447,6 +3448,12 @@ $(CT_OBJ_DIR)\fcopy.c : $(CT_DIR)\fcopy.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(CT_OBJ_DIR)\fcopy.obj : $(CT_OBJ_DIR)\fcopy.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(CT_OBJ_DIR)\getinfo.c : $(CT_DIR)\getinfo.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(CT_OBJ_DIR)\getinfo.obj : $(CT_OBJ_DIR)\getinfo.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(CT_OBJ_DIR)\getsecrt.c : $(CT_DIR)\getsecrt.prg

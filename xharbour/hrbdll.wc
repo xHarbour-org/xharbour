@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.25 2004/11/30 22:00:00 ptsarenko Exp $
+# $Id: hrbdll.wc,v 1.25 2004/11/30 20:19:53 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -542,6 +542,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dattime3.obj \
   $(OBJ_DIR)\diskutil.obj \
   $(OBJ_DIR)\fcopy.obj \
+  $(OBJ_DIR)\getinfo.obj \
   $(OBJ_DIR)\invrtwin.obj \
   $(OBJ_DIR)\like.obj \
   $(OBJ_DIR)\numconv.obj \
@@ -2334,6 +2335,12 @@ $(OBJ_DIR)\fcopy.c : $(CT_DIR)\fcopy.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\fcopy.obj : $(OBJ_DIR)\fcopy.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\getinfo.c : $(CT_DIR)\getinfo.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\getinfo.obj : $(OBJ_DIR)\getinfo.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg

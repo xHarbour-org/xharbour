@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.72 2004/11/29 23:30:00 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.72 2004/11/29 22:09:41 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -540,6 +540,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dattime3.obj \
   $(OBJ_DIR)\diskutil.obj \
   $(OBJ_DIR)\fcopy.obj \
+  $(OBJ_DIR)\getinfo.obj \
   $(OBJ_DIR)\invrtwin.obj \
   $(OBJ_DIR)\like.obj \
   $(OBJ_DIR)\numconv.obj \
@@ -1057,6 +1058,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\dattime3.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\diskutil.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\fcopy.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\getinfo.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\invrtwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\like.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\numconv.obj           + >> hdll.tmp
@@ -2844,6 +2846,12 @@ $(OBJ_DIR)\fcopy.c : $(CT_DIR)\fcopy.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\fcopy.obj : $(OBJ_DIR)\fcopy.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\getinfo.c : $(CT_DIR)\getinfo.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\getinfo.obj : $(OBJ_DIR)\getinfo.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.29 2004/11/30 22:00:00 ptsarenko Exp $
+# $Id: makefile.wc,v 1.29 2004/11/30 20:19:53 ptsarenko Exp $
 #
 
 #
@@ -858,6 +858,7 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\dattime3.obj \
    $(CT_OBJ_DIR)\diskutil.obj \
    $(CT_OBJ_DIR)\fcopy.obj \
+   $(CT_OBJ_DIR)\getinfo.obj \
    $(CT_OBJ_DIR)\getsecrt.obj \
    $(CT_OBJ_DIR)\invrtwin.obj \
    $(CT_OBJ_DIR)\like.obj \
@@ -3112,6 +3113,9 @@ $(CT_OBJ_DIR)\fcopy.c : $(CT_DIR)\fcopy.prg
 
 $(CT_OBJ_DIR)\fcopy.obj : $(CT_OBJ_DIR)\fcopy.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(CT_OBJ_DIR)\getsecrt.c : $(CT_DIR)\getinfo.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(CT_OBJ_DIR)\getsecrt.c : $(CT_DIR)\getsecrt.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
