@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.435 2005/01/30 08:02:03 ptsarenko Exp $
+ * $Id: hvm.c,v 1.436 2005/02/14 18:44:48 snaiperis Exp $
  */
 
 /*
@@ -5124,7 +5124,6 @@ static void hb_vmBitAnd( void )
    pItem2 = hb_stackItemFromTop( -1 );
    pItem1 = hb_stackItemFromTop( -2 );
 
-
    if( HB_IS_STRING( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
       char*  pString1 = pItem1->item.asString.value;
@@ -5208,8 +5207,8 @@ static void hb_vmBitAnd( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      pItem1->type = HB_IT_LONG;
       pItem1->item.asLong.value = hb_itemGetNL( pItem1 ) & hb_itemGetNL( pItem2 );
+      pItem1->type = HB_IT_LONG;
       hb_stackPop();
    }
    else
@@ -5321,8 +5320,8 @@ static void hb_vmBitOr( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      pItem1->type = HB_IT_LONG;
       pItem1->item.asLong.value = hb_itemGetNL( pItem1 ) | hb_itemGetNL( pItem2 );
+      pItem1->type = HB_IT_LONG;
       hb_stackPop();
    }
    else
@@ -5435,8 +5434,8 @@ static void hb_vmBitXor( void )
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      pItem1->type = HB_IT_LONG;
       pItem1->item.asLong.value = hb_itemGetNL( pItem1 ) ^ hb_itemGetNL( pItem2 );
+      pItem1->type = HB_IT_LONG;
       hb_stackPop();
    }
    else
