@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2432 2004/03/01 02:22:47 andijahja Exp $
+ * $Id: ChangeLog,v 1.2433 2004/03/01 05:16:42 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-01 04:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+    * source/rtl/achoice.prg
+      * if an xSelect array is passed in and it's not the same length as the
+      * acItems array, then resize alSelect to match.
+
 2004-03-01 12:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    * include/hbapifs.h
      % add second parameter to hb_fsDirectoryRecursive( char* , char* ) for

@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.16 2004/02/19 02:59:06 andijahja Exp $
+ * $Id: achoice.prg,v 1.17 2004/02/20 00:31:23 andijahja Exp $
  */
 
 /*
@@ -82,6 +82,9 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
       AFill( alSelect, xSelect )
    ENDIF
 
+   IF Len( acItems ) <> Len( alSelect )
+      aSize( alSelect, Len( acItems ) )
+   ENDIF
 
    IF !lFinished
 
@@ -332,7 +335,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
             ENDIF
          ENDIF
 
-      CASE nKey == K_PGUP .OR. nKey == K_MWFORWARD 
+      CASE nKey == K_PGUP .OR. nKey == K_MWFORWARD
 
          IF nPos == nFrstItem
             nMode := AC_HITTOP
