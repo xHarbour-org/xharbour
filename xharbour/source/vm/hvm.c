@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.278 2003/11/15 16:55:17 jonnymind Exp $
+ * $Id: hvm.c,v 1.279 2003/11/22 01:41:10 ronpinkas Exp $
  */
 
 /*
@@ -640,7 +640,7 @@ int HB_EXPORT hb_vmQuit( void )
    }
    else
    {
-      return;
+      return s_iErrorLevel;
    }
 
    //printf("\nvmQuit()\n" );
