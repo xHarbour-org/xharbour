@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.31 2004/03/16 00:36:29 andijahja Exp $
+ * $Id: transfrm.c,v 1.32 2004/03/16 15:07:34 andijahja Exp $
  */
 
 /*
@@ -225,28 +225,35 @@ HB_FUNC( TRANSFORM )
          /* HACKS !                                                           */
          /* To solve Transform ( "1234567890", "@9" )                         */
          /* ================================================================= */
-         if ( *pPic->item.asString.value == '@' && *szPic == '9' )
          {
-            ULONG ii;
+            char * szTmp = pPic->item.asString.value;
 
-            if ( strchr( szPic , 'D' ) == NULL )
+            if ( *szTmp == '@' && *szPic == '9' )
             {
-               szPicNew = (char*) hb_xgrab( ulExpLen + 1 );
+               ULONG ii;
 
-               hb_xmemset( szPicNew, '\0', ulExpLen + 1 );
-
-               for ( ii = 0; ii < ulExpLen; ii ++ )
+               if ( strchr( szTmp, 'D' ) == NULL )
                {
-                  szPicNew[ ii ] = '9';
-               }
+                  if( strchr( szTmp, 'R' ) == NULL )
+                  {
+                     szPicNew = (char*) hb_xgrab( ulExpLen + 1 );
 
-               szPic = szPicNew;
-               ulPicLen = strlen( szPic );
-            }
-            else
-            {
-               uiPicFlags |= PF_DATE;
-               uiPicFlags |= PF_NUMDATE;
+                     hb_xmemset( szPicNew, '\0', ulExpLen + 1 );
+
+                     for ( ii = 0; ii < ulExpLen; ii ++ )
+                     {
+                        szPicNew[ ii ] = '9';
+                     }
+
+                     szPic = szPicNew;
+                     ulPicLen = strlen( szPic );
+                  }
+               }
+               else
+               {
+                  uiPicFlags |= PF_DATE;
+                  uiPicFlags |= PF_NUMDATE;
+               }
             }
          }
 
