@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2313 2004/02/17 18:16:52 druzus Exp $
+ * $Id: ChangeLog,v 1.2314 2004/02/17 18:44:11 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-18 01:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/tgetint.prg
+    ! Fixed __GetA() to create a SetGet block which returns the base array,
+      and ignores any passed value - Clipper compatability.
+
+  * source/rtl/tget.prg
+    ! Fixed :VarGet() and :VarPut() methods to utilize :SubScript if applicable.
+    - Removed redundant :Block() SETGET method, renamed :bBlock to :Block
+      and removed its PROTECTED Scope.
+
 2004-02-18 01:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/hbinit.h
     + new macro HB_PRAGMA_STARTUP

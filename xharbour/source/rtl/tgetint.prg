@@ -1,5 +1,5 @@
 /*
- * $Id: tgetint.prg,v 1.2 2002/03/26 05:06:58 ronpinkas Exp $
+ * $Id: tgetint.prg,v 1.3 2002/10/19 16:30:46 ronpinkas Exp $
  */
 
 /*
@@ -74,7 +74,7 @@ FUNCTION __GET( bSetGet, cVarName, cPicture, bValid, bWhen )
    IF bSetGet == NIL
       IF Left( cVarName, 3 ) == "M->"
          cVarName := SubStr( cVarName, 4 )
-         bSetGet := {|_1| iif( _1 == NIL,  __MVGET( cVarName ), __MVPUT( cVarName, _1 ) ) }
+         bSetGet := {|_1| IIF( _1 == NIL,  __MVGET( cVarName ), __MVPUT( cVarName, _1 ) ) }
       ELSEIF FieldPos( cVarName ) > 0
          // "{|_1| IIF( _1 == NIL, FIELD->&cVarName, FIELD->&cVarName := _1 )"
          bSetGet := &( "{|_1| IIF( _1 == NIL, FIELD->" + cVarName + ", FIELD->" + cVarName + " := _1 ) }" )
@@ -97,26 +97,26 @@ FUNCTION __GETA( bGetArray, cVarName, cPicture, bValid, bWhen, aIndex )
 
    LOCAL oGet
    LOCAL nDim := Len( aIndex )
-   LOCAL bSetGet
    LOCAL aGetVar
    LOCAL nCounter
 
    IF bGetArray == NIL
-      IF __MVEXIST( cVarName )
-         aGetVar := __MVGET( cVarName )
+      IF Left( cVarName, 3 ) == "M->"
+         cVarName := SubStr( cVarName, 4 )
+         bGetArray := {|| __MVGET( cVarName ) }
+      ELSEIF FieldPos( cVarName ) > 0
+         // "{|| FIELD->&cVarName )"
+         bGetArray := &( "{|| FIELD->" + cVarName + "}" )
+      ELSEIF __MVEXIST( cVarName )
+         // "{|| M->&cVarName )"
+         bGetArray := {|| __MVGET( cVarName ) }
       ELSE
-         aGetVar := &cVarName
+         // "{|| &cVarName )"
+         bGetArray := &( "{|| " + cVarName + "}" )
       ENDIF
-   ELSE
-      aGetVar := Eval( bGetArray )
    ENDIF
 
-   FOR nCounter := 1 TO nDim - 1
-      aGetVar := aGetVar[ aIndex[ nCounter ] ]
-   NEXT
-   bSetGet := {|_1| iif( _1 == NIL, aGetVar[ aIndex[ nCounter ] ], aGetVar[ aIndex[ nCounter ] ] := _1 ) }
-
-   oGet := Get():New(,, bSetGet, cVarName, cPicture )
+   oGet := Get():New(,, bGetArray, cVarName, cPicture )
    oGet:SubScript := aIndex
 
    oGet:PreBlock := bWhen

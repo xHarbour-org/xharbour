@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.67 2004/01/28 22:36:22 andijahja Exp $
+ * $Id: tget.prg,v 1.68 2004/02/15 21:58:46 ronpinkas Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ CLASS Get
 
    DATA cColorSpec   PROTECTED   // Used only for METHOD ColorSpec
    DATA cPicture     PROTECTED   // Used only for METHOD Picture
-   DATA bBlock       PROTECTED   // Used only for METHOD Block
+   DATA Block
 
    METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec )
 
@@ -119,7 +119,6 @@ CLASS Get
    MESSAGE _Assign METHOD Assign()
 #endif
    METHOD HitTest(mrow,mcol)
-   METHOD Block( bBlock )         SETGET  // Replace to DATA Block
    METHOD ColorSpec( cColorSpec ) SETGET  // Replace to DATA ColorSpec
    METHOD Picture( cPicture )     SETGET  // Replace to DATA Picture
    METHOD Display( lForced )
@@ -189,7 +188,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::HasFocus   := .f.
    ::lEdit      := .f.
    ::BadDate    := .f.
-   ::bBlock     := bVarBlock
+   ::Block     := bVarBlock
    ::Changed    := .f.
    ::Clear      := .f.
    ::Col        := nCol
@@ -595,10 +594,24 @@ return Self
 
 METHOD VarPut( xValue, lReFormat ) CLASS Get
 
+   LOCAL nCounter, aGetVar, aIndex, nDim
+
    DEFAULT lReFormat TO .t.
 
-   if ::bBlock != nil .and. xValue != nil
-      Eval( ::bBlock, xValue )
+   if ::Block != nil .and. xValue != nil
+
+      IF ::SubScript == NIL
+         Eval( ::Block, xValue )
+      ELSE
+         aIndex := ::SubScript
+         nDim := Len( aIndex )
+         aGetVar := Eval( ::Block )
+         FOR nCounter := 1 TO nDim - 1
+            aGetVar := aGetVar[ aIndex[ nCounter ] ]
+         NEXT
+         aGetVar[ aIndex[ nCounter ] ] := xValue
+      ENDIF
+
       if lReFormat
          if !::hasfocus
             ::Original := xValue
@@ -616,7 +629,25 @@ return xValue
 
 METHOD VarGet() CLASS Get
 
-  LOCAL xVarGet := IIF( ValType( ::bBlock ) == 'B', Eval( ::bBlock ), NIL )
+   LOCAL xVarGet, aIndex, nDim, aGetVar, nCounter
+
+   IF ! HB_IsBlock( ::Block )
+      ::xVarGet := NIL
+      ::Type    := 'U'
+      RETURN NIL
+   ENDIF
+
+   IF ::SubScript == NIL
+      xVarGet := Eval( ::Block )
+   ELSE
+      aIndex := ::SubScript
+      nDim := Len( aIndex )
+      aGetVar := Eval( ::Block )
+      FOR nCounter := 1 TO nDim - 1
+         aGetVar := aGetVar[ aIndex[ nCounter ] ]
+      NEXT
+      xVarGet := aGetVar[ aIndex[ nCounter ] ]
+   ENDIF
 
   ::xVarGet := xVarGet
   ::Type    := ValType( xVarGet )
@@ -1627,41 +1658,6 @@ METHOD Picture( cPicture ) CLASS Get
    endif
 
 return ::cPicture
-
-//---------------------------------------------------------------------------//
-
-/* The METHOD Block and DATA bBlock allow to replace the
- * property Block for a function to control the content and
- * to carry out certain actions to normalize the data.
- * The particular case is that the Block is loaded later on
- * to the creation of the object, being necessary to carry out
- * several tasks to adjust the internal data of the object
- * to display correctly.
- */
-
-METHOD Block( bBlock ) CLASS Get
-
-   if PCOUNT() > 0
-      ::bBlock   := bBlock
-   endif
-
-/*
-//
-// This is the first step to eliminate this method SETGET.
-// Given the current state of compatibility, is no longer
-// necessary to have this method.
-//
-
-   if bBlock != NIL .AND. !::HasFocus
-
-      ::Original := ::VarGet() // In VarGet() is setting xVarGet
-
-      ::Type     := ValType( ::Original )
-
-      ::Picture( ::Picture )
-   endif
-*/
-return ::bBlock
 
 //---------------------------------------------------------------------------//
 
