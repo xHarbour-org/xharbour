@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.67 2004/04/11 20:00:10 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.68 2004/04/20 05:18:43 bdj Exp $
  */
 
 /*
@@ -1478,34 +1478,30 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
          (::nFrozenCols ==0 .and. n == ::leftVisible )
          n     := ::leftVisible
 
-         if nSpacePre > 0
-
-            // we need to draw headSep for the nSpacePre gap
-            if ::lHeadSep
-               chSep := if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
-                                       ::aColsInfo[ n,o_Obj ]:HeadSep )
-               if nLeftCol>0 .and. ::aColsInfo[ nLeftCol,o_Width ] > 0 .and.;
-                  ::nFrozenCols > 0
-                  DispOutAT( nScreenRowT, nTPos-min(len(chSep), ncSepWidth), chSep, ::cColorSpec )
-               endif
-               DispOutAT( nScreenRowT, nTPos, repl(right(chSep,1),nSpacePre), ::cColorSpec )
+         // we need to draw headSep for the nSpacePre gap
+         if ::lHeadSep
+            chSep := if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
+                                    ::aColsInfo[ n,o_Obj ]:HeadSep )
+            if nLeftCol>0 .and. ::aColsInfo[ nLeftCol,o_Width ] > 0 .and.;
+               ::nFrozenCols > 0
+               DispOutAT( nScreenRowT, nTPos-min(len(chSep), ncSepWidth), chSep, ::cColorSpec )
             endif
-
-            // we need to draw footSep for the nSpacePre gap
-            if ::lFootSep
-               cfSep := if( ::aColsInfo[ n,o_Obj ]:FootSep == nil, ::FootSep, ;
-                                       ::aColsInfo[ n,o_Obj ]:FootSep )
-               if nLeftCol>0 .and. ::aColsInfo[ nLeftCol,o_Width ] > 0 .and.;
-                  ::nFrozenCols > 0
-                  DispOutAT( nScreenRowB, nBPos-min(len(cfSep),ncSepWidth), cfSep, ::cColorSpec )
-               endif
-               DispOutAT( nScreenRowB, nBPos, repl(right(cfSep,1),nSpacePre), ::cColorSpec )
-            endif
-
-            nTPos += nSpacePre
-            nBPos += nSpacePre
-
+            DispOutAT( nScreenRowT, nTPos, repl(right(chSep,1),nSpacePre), ::cColorSpec )
          endif
+
+         // we need to draw footSep for the nSpacePre gap
+         if ::lFootSep
+            cfSep := if( ::aColsInfo[ n,o_Obj ]:FootSep == nil, ::FootSep, ;
+                                    ::aColsInfo[ n,o_Obj ]:FootSep )
+            if nLeftCol>0 .and. ::aColsInfo[ nLeftCol,o_Width ] > 0 .and.;
+               ::nFrozenCols > 0
+               DispOutAT( nScreenRowB, nBPos-min(len(cfSep),ncSepWidth), cfSep, ::cColorSpec )
+            endif
+            DispOutAT( nScreenRowB, nBPos, repl(right(cfSep,1),nSpacePre), ::cColorSpec )
+         endif
+
+         nTPos += nSpacePre
+         nBPos += nSpacePre
       endif
 
       // we need to handle even n==::rightVisible in the following block

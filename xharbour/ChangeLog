@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2818 2004/04/21 16:37:45 kaddath Exp $
+ * $Id: ChangeLog,v 1.2819 2004/04/22 07:58:01 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,17 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-04-22 17:10 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/tbrowse.prg
+    ! Remove nSpacePre > 0 checking in ::Redrawheaders()
+      (as suggested by Ath. Thanks.)
+
 2004-04-22 13:20 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/teditor.prg
     * All the fixes offered by Eduardo Fernandez with little modifications and optimizations.
-      Still more fixes. Now Insert/Overstike mode is exactly Clipper comaptible. 
+      Still more fixes. Now Insert/Overstike mode is exactly Clipper comaptible.
       In my experiments memoedit without wordwrap is behaving exactly like Clipper but
       for only one bug ( I am desperately after ), memoedit with wordwrap still have some
       differences which I hope will be covered soon.
 
     /* Phil - I am sorry that your fix has been overwritten, which was due to excessive
        merging of CVS updates, please re-fix it as I have lost old code.
-    */ 
+    */
 
 2004-04-21 09:36 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * source/rtl/tget.prg
