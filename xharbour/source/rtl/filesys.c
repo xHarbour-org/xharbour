@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.28 2003/02/10 12:48:51 lculik Exp $
+ * $Id: filesys.c,v 1.29 2003/03/05 23:56:16 jonnymind Exp $
  */
 
 /*
@@ -557,9 +557,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpen(%p, %hu)", pFilename, uiFlags));
 
-#ifndef HB_OS_LINUX
    pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
-#endif
 
 #if defined(X__WIN32__)
 
@@ -682,9 +680,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
 #endif
 
-#ifndef HB_OS_LINUX
    hb_xfree( pFilename );
-#endif
    return hFileHandle;
 }
 

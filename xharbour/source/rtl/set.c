@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.18 2003/01/12 11:55:22 lculik Exp $
+ * $Id: set.c,v 1.19 2003/01/12 15:29:47 lculik Exp $
  */
 
 /*
@@ -1058,9 +1058,15 @@ void hb_setInitialize( void )
    hb_set.HB_SET_TYPEAHEAD = 50; hb_inkeyReset( TRUE ); /* Allocate keyboard typeahead buffer */
    hb_set.HB_SET_UNIQUE = FALSE;
    hb_set.HB_SET_VIDEOMODE = 0;
+#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+   hb_set.HB_SET_FILECASE = HB_SET_CASE_MIXED;
+   hb_set.HB_SET_DIRCASE = HB_SET_CASE_MIXED;
+   hb_set.HB_SET_DIRSEPARATOR = '/';
+#else   
    hb_set.HB_SET_FILECASE = HB_SET_CASE_LOWER;
    hb_set.HB_SET_DIRCASE = HB_SET_CASE_LOWER;
    hb_set.HB_SET_DIRSEPARATOR = '\\';
+#endif
 
    hb_set.HB_SET_WRAP = FALSE;
    hb_set.hb_set_winprinter=FALSE;

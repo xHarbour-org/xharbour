@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.4 2003/01/16 16:27:24 walito Exp $
+ * $Id: file.c,v 1.5 2003/03/05 23:56:16 jonnymind Exp $
  */
 
 /*
@@ -57,23 +57,17 @@ BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
 {
    PHB_FFIND ffind;
 
-#ifdef HB_OS_WIN_32
    pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
-#endif
 
    if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
    {
       hb_fsFindClose( ffind );
-#ifdef HB_OS_WIN_32
       hb_xfree(pFilename);
-#endif
       hb_fsSetError( 0 );
       return TRUE;
    }
    else {
-#ifdef HB_OS_WIN_32
       hb_xfree(pFilename);
-#endif
       hb_fsSetError( 0 );
       return FALSE;
       }
