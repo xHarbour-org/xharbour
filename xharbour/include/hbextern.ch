@@ -1,5 +1,5 @@
 /*
- * $Id: hbextern.ch,v 1.46 2002/02/08 19:44:34 alkresin Exp $
+ * $Id: hbextern.ch,v 1.3 2002/03/06 06:21:14 ronpinkas Exp $
  */
 
 /*
@@ -406,7 +406,7 @@ EXTERNAL __XSAVESCREEN
 /* Harbour internal functions */
 
 EXTERNAL __CLASSADD
-EXTERNAL __CLASSINSTANCE
+EXTERNAL __CLASSINS
 EXTERNAL __CLASSNAME
 EXTERNAL __CLASSNEW
 EXTERNAL __CLASSSEL

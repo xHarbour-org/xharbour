@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.10 2002/04/26 06:52:49 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.11 2002/04/26 19:04:46 ronpinkas Exp $
  */
 
 /*
@@ -65,6 +65,8 @@
  * See doc/license.txt for licensing terms.
  *
  */
+
+//#define DEBUG_MARKERS
 
 /*
  * Avoid tracing in preprocessor/compiler.
@@ -2823,15 +2825,15 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
    HB_TRACE(HB_TR_DEBUG, ("SearnRep(%s, %s, %i, %s, %p)", exppatt, expreal, lenreal, ptro, lenres));
 
-   #if 0
-   if( s_bReplacePat )
-   {
-      printf( "Replace '%s' with '%s' Len: %i, in '%s'\n", exppatt, expreal, lenreal, ptro );
-   }
-   else
-   {
-      printf( "Scan '%s' with '%s' Len: %i, in '%s'\n", exppatt, expreal, lenreal, ptro );
-   }
+   #ifdef DEBUG_MARKERS
+      if( s_bReplacePat )
+      {
+         printf( "Replace '%s' with '%s' Len: %i, in '%s'\n", exppatt, expreal, lenreal, ptro );
+      }
+      else
+      {
+         printf( "Scan '%s' with '%s' Len: %i, in '%s'\n", exppatt, expreal, lenreal, ptro );
+      }
    #endif
 
    if( *( exppatt + 1 ) == '\0' )
@@ -2841,7 +2843,9 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
    while( ( ifou = md_strAt( exppatt, ( *( exppatt + 1 ) ) ? 2 : 1, ptrOut, FALSE, FALSE, TRUE )) > 0 ) /* ??? */
    {
-      //printf( "   Found: >%s< At: %i In: >%s<\n", exppatt, ifou, ptrOut );
+      #ifdef DEBUG_MARKERS
+         printf( "   Found: >%s< At: %i In: >%s<\n", exppatt, ifou, ptrOut );
+      #endif
 
       bFound = TRUE;
       rezs = FALSE;
@@ -2851,13 +2855,9 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
       if( ptr )
       {
-         //printf( "   Repeat: %i Previous Square: '%s'\n", s_Repeate, ptr );
-
-         // Ron Pinkas added 2002-04-26 ( Dont replace not repeatable into the Repeatable residual container
-         if( s_Repeate == 0 && s_bReplacePat && lenreal )
-         {
-            return;
-         }
+         #ifdef DEBUG_MARKERS
+            printf( "   Repeat: %i Previous Square: '%s'\n", s_Repeate, ptr );
+         #endif
 
          if( s_Repeate )
          {
@@ -2905,38 +2905,51 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
             }
             else
             {
-               lennew = ptr2-ptr-1;
-
-               memcpy( expnew, ptr+1, lennew );
-               *(expnew + lennew++) = ' ';
-               *(expnew + lennew) = '\0';
-
-               while( (i = hb_strAt( exppatt, 2, expnew, lennew )) > 0 )
+               if( s_Repeate )
                {
-                  //printf( "   1\n" );
-                  lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew+i-1, lennew );
-               }
+                  lennew = ptr2-ptr-1;
 
-               if( kolmarkers )
-               {
-                  s_groupchar = (char) ( (unsigned int)s_groupchar + 1 );
-                  //printf( "   Increased to %c;", s_groupchar );
+                  memcpy( expnew, ptr+1, lennew );
+                  *(expnew + lennew++) = ' ';
+                  *(expnew + lennew) = '\0';
 
-                  for( i=0; i<lennew; i++ )
+                  while( (i = hb_strAt( exppatt, 2, expnew, lennew )) > 0 )
                   {
-                     if( *(expnew+i) == '\1' )
+                     #ifdef DEBUG_MARKERS
+                        printf( "   1\n" );
+                     #endif
+
+                     lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew+i-1, lennew );
+                  }
+
+                  if( kolmarkers )
+                  {
+                     s_groupchar = (char) ( (unsigned int)s_groupchar + 1 );
+
+                     #ifdef DEBUG_MARKERS
+                        printf( "   Increased to %c;", s_groupchar );
+                     #endif
+
+                     for( i=0; i<lennew; i++ )
                      {
-                         *(expnew+i+3) = s_groupchar;
-                         //printf( "   Group char: %s\n", (expnew+i+3) );
-                         i += 4;
+                        if( *(expnew+i) == '\1' )
+                        {
+                            *(expnew+i+3) = s_groupchar;
+
+                            #ifdef DEBUG_MARKERS
+                               printf( "   Group char: %s\n", (expnew+i+3) );
+                            #endif
+
+                            i += 4;
+                        }
                      }
                   }
-               }
 
-               hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres-(ptr-ptro)+1 );
-               *lenres += lennew;
-               isdvig = ptr - ptro + (ptr2-ptr-1) + lennew;
-               rezs = TRUE;
+                  hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres-(ptr-ptro)+1 );
+                  *lenres += lennew;
+                  isdvig = ptr - ptro + (ptr2-ptr-1) + lennew;
+                  rezs = TRUE;
+               }
             }
          }
       }
@@ -2950,7 +2963,9 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                lastchar = *(ptrOut + ifou + 2);
             }
 
-            //printf( "Repeate: %i lastchar: '%c' '%c'\n", s_Repeate, lastchar, *(ptrOut + ifou + 2) );
+            #ifdef DEBUG_MARKERS
+               printf( "Repeate: %i lastchar: '%c' '%c'\n", s_Repeate, lastchar, *(ptrOut + ifou + 2) );
+            #endif
 
             // Ron Pinkas added [s_Repeate &&] 2002-04-26
             if( s_Repeate && lastchar != *(ptrOut + ifou + 2) )
@@ -2961,7 +2976,10 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
             }
          }
 
-         //printf( "   2\n" );
+         #ifdef DEBUG_MARKERS
+            printf( "   2\n" );
+         #endif
+
          *lenres += ReplacePattern( exppatt[2], expreal, lenreal, ptrOut + ifou - 1, *lenres-isdvig-ifou+1 );
          isdvig += ifou - 1;
       }
@@ -2978,7 +2996,9 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
       s_aIsRepeate[ s_Repeate - 1 ]++;
    }
 
-   //printf( "Replaced '%s' with '%s' => >%s<\n\n", exppatt, expreal, ptro );
+   #ifdef DEBUG_MARKERS
+      printf( "Replaced '%s' with '%s' => >%s<\n\n", exppatt, expreal, ptro );
+   #endif
 }
 
 static int ReplacePattern( char patttype, char * expreal, int lenreal, char * ptro, int lenres )
@@ -2988,7 +3008,9 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
 
   HB_TRACE(HB_TR_DEBUG, ("ReplacePattern(%c, %s, %i, %s, %i)", patttype, expreal, lenreal, ptro, lenres));
 
-  //printf( "   %c, '%s', %i, '%s', %i\n", patttype, expreal, lenreal, ptro, lenres );
+  #ifdef DEBUG_MARKERS
+     printf( "   %c, '%s', %i, '%s', %i\n", patttype, expreal, lenreal, ptro, lenres );
+  #endif
 
   switch( *(ptro+2) ) {
   case '0':  /* Regular result marker  */
@@ -3186,7 +3208,9 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
     break;
   }
 
-  //printf( "   '%s', '%s'\n", expreal, ptro );
+  #ifdef DEBUG_MARKERS
+     printf( "   '%s', '%s'\n", expreal, ptro );
+  #endif
 
   return rmlen - 4;
 }

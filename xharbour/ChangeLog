@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.173 2002/04/26 16:00:37 lculik Exp $
+ * $Id: ChangeLog,v 1.174 2002/04/26 19:04:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-26 16:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbextern.ch
+    * Corrected __ClassInstance to __ClassIns
+
+  * source/pp/ppcore.c
+    * Final fix in SernRep() - This fixes all output issues I was aware of.
 
 2002-04-26 12:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
