@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3061 2004/06/11 14:06:11 vouchcac Exp $
+ * $Id: ChangeLog,v 1.3062 2004/06/12 01:30:56 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2004-06-11 18:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+2004-06-11 18:40 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * bin/!pack_bin.bat
+  * bin/!pack_src.bat
+  * include/hbver.h
+    * Marked Version info as 0.99.0
+
+2004-06-11 18:30 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/macro/macro.slx
     ! Fixed compile warning
 
