@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_gnu.sh,v 1.11 2004/12/14 23:27:02 mlombardo Exp $
+# $Id: make_gnu.sh,v 1.12 2004/12/15 13:39:30 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -15,12 +15,15 @@
 # ---------------------------------------------------------------
 
 if [ -z "$HB_ARCHITECTURE" ]; then
-    hb_arch=`uname -s | tr -d "[-]" | tr "[A-Z]" "[a-z]" 2>/dev/null`
-    case "$hb_arch" in
-        *windows*) hb_arch="w32" ;;
-        *dos)      hb_arch="dos" ;;
-        *bsd)      hb_arch="bsd" ;;
-    esac
+    if [ "$OSTYPE" = "msdosdjgpp" ]; then
+        hb_arch="dos"
+    else
+        hb_arch=`uname -s | tr -d "[-]" | tr A-Z a-z 2>/dev/null`
+        case "$hb_arch" in
+            *windows*) hb_arch="w32" ;;
+            *bsd)      hb_arch="bsd" ;;
+        esac
+    fi
     export HB_ARCHITECTURE="$hb_arch"
 fi
 
@@ -33,20 +36,45 @@ if [ -z "$HB_COMPILER" ]; then
     export HB_COMPILER="$hb_comp"
 fi
 
-if [ -z "$HB_GPM_MOUSE" ]; then export HB_GPM_MOUSE=yes; fi
-if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtsln; fi
+if [ -z "$HB_GPM_MOUSE" ]; then
+    case "$HB_ARCHITECTURE" in
+        linux) hb_gpm="yes" ;;
+        *)     hb_gpm="no" ;;
+    esac
+    export HB_GPM_MOUSE="$hb_gpm"
+fi
+
+if [ -z "$HB_GT_LIB" ]; then
+    case "$HB_ARCHITECTURE" in
+        dos) hb_gt="gtdos" ;;
+        os2) hb_gt="gtos2" ;;
+        w32) hb_gt="gtwin" ;;
+        *)   hb_gt="gtstd" ;;
+    esac
+    export HB_GT_LIB="$hb_gt"
+fi
+
 if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
-if [ -z "$HB_MT" ]; then export HB_MT=MT; fi
+
+if [ -z "$HB_MT" ]; then
+    case "$HB_ARCHITECTURE" in
+        dos) hb_mt="" ;;
+        *)   hb_mt="MT" ;;
+    esac
+    export HB_MT="$hb_mt"
+fi
 
 # export PRG_USR=
 # export C_USR=
 # export L_USR=
 
+if [ -z "$PREFIX" ]; then export PREFIX=/usr/local; fi
+
 # Set to constant value to be consistent with the non-GNU make files.
 
-if [ -z "$HB_BIN_INSTALL" ]; then export HB_BIN_INSTALL=$(pwd)/bin/; fi
-if [ -z "$HB_LIB_INSTALL" ]; then export HB_LIB_INSTALL=$(pwd)/lib/; fi
-if [ -z "$HB_INC_INSTALL" ]; then export HB_INC_INSTALL=$(pwd)/include/; fi
+if [ -z "$HB_BIN_INSTALL" ]; then export HB_BIN_INSTALL=$PREFIX/bin/; fi
+if [ -z "$HB_LIB_INSTALL" ]; then export HB_LIB_INSTALL=$PREFIX/lib/xharbour/; fi
+if [ -z "$HB_INC_INSTALL" ]; then export HB_INC_INSTALL=$PREFIX/include/xharbour/; fi
 
 if [ -z "$HB_ARCHITECTURE" ]; then
    echo "Error: HB_ARCHITECTURE is not set."
@@ -84,14 +112,14 @@ if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
    echo "    HB_COMPILER:"
    echo "      - When HB_ARCHITECTURE=dos"
    echo "        - bcc16   (Borland C++ 3.x, 4.x, 5.0x, DOS 16-bit)"
-   echo "        - djgpp   (Delorie GNU C, DOS 32-bit)"
-   echo "        - rxs32   (EMX/RSXNT/DOS GNU C, DOS 32-bit)"
+   echo "        - djgpp   (DJ Delorie's DGJPP GNU C, DOS 32-bit)"
+   echo "        - rsx32   (EMX/RSXNT/DOS GNU C, DOS 32-bit)"
    echo "        - watcom  (Watcom C++ 9.x, 10.x, 11.x, DOS 32-bit)"
    echo "      - When HB_ARCHITECTURE=w32"
    echo "        - bcc32   (Borland C++ 4.x, 5.x, Windows 32-bit)"
    echo "        - gcc     (Cygnus/Cygwin GNU C, Windows 32-bit)"
-   echo "        - mingw32 (Cygnus/Mingw32 GNU C, Windows 32-bit)"
-   echo "        - rxsnt   (EMX/RSXNT/Win32 GNU C, Windows 32-bit)"
+   echo "        - mingw32 (MinGW32 GNU C, Windows 32-bit)"
+   echo "        - rsxnt   (EMX/RSXNT/Win32 GNU C, Windows 32-bit)"
    echo "        - icc     (IBM Visual Age C++, Windows 32-bit)"
    echo "        - msvc    (Microsoft Visual C++, Windows 32-bit)"
    echo "      - When HB_ARCHITECTURE=linux"
@@ -114,7 +142,7 @@ if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
    echo "      - gtxwc (XWindow console)    (for *nixes architecture)"
    echo
    echo "  - Use these optional envvars to configure the make process"
-   echo "    when using the 'all' command:"
+   echo "    when using the 'all' target:"
    echo
    echo "    PRG_USR - Extra Harbour compiler options"
    echo "    C_USR   - Extra C compiler options"

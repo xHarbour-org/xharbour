@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3720 2005/01/08 13:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3720 2005/01/08 11:26:38 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-09 09:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * make_gnu.sh
+    ! Fixed DJGPP detection (it has no uname).
+    ! Enable HB_GPM_MOUSE only for Linux.
+    ! Disable HB_MT for DOS.
+    ! Use the default GTs specified in help output for different platforms.
+    * Default installation paths now respect $PREFIX if set. Otherwise,
+      /usr/local is used.
+  * bin/hb-func.sh
+    ! Fixed tr syntax for compatibility with MinGW.
+    ! Changed $PATH separator character to ';' for DOS.
+    ! Make -static the default in DOS.
+    ! Don't generate main function request on DJGPP.
+  * contrib/libnf/chdir.c
+  * contrib/libnf/mkdir.c
+    ! Fixed for DJGPP.
+  * source/common/hbver.c
+    ! Fixed the names of DJGPP and MinGW compilers.
+  * source/compiler/hbusage.c
+    * Added 2005 to the copyright message.
+  * source/pp/ppcore.c
+    * Fixed a pair of typos.
+  * source/rtl/gtwvt/wvtutils.c
+  * source/tip/utils.c
+    ! Typecasts.
 
 2004-01-08 13:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   ! Changelog

@@ -1,5 +1,5 @@
 /*
- * $Id: chdir.c,v 1.2 2004/03/18 03:46:55 ronpinkas Exp $
+ * $Id: chdir.c,v 1.3 2004/12/15 13:39:33 druzus Exp $
  */
 
 /* File......: CHDIR.ASM
@@ -78,26 +78,42 @@ End
 /* This is the New one Rewriten in C*/
 
 #include "extend.h"
-#if defined(HB_OS_DOS)
-#include "dos.h"
+
+#if defined( HB_OS_DOS )
+   #include <dos.h>
+   #if defined( __DJGPP__ )
+      #include <errno.h>
+      #include <unistd.h>
+   #endif
 #endif
 
-HB_FUNC( FT_CHDIR)
+HB_FUNC( FT_CHDIR )
 {
-#if defined(HB_OS_DOS)
-   {
-
-    int Status;
-    char *path=hb_parcx(1);
-    union REGS regs;
-    struct SREGS sregs;
-    segread(&sregs);
-    regs.h.ah=0x3B;
-    sregs.ds=FP_SEG(path);
-    regs.HB_XREGS.dx=FP_OFF(path);
-    HB_DOS_INT86X(0x21,&regs,&regs,&sregs);
-    Status=regs.HB_XREGS.ax;
-    hb_retl(Status);
-   }
+#if defined( HB_OS_DOS )
+   #if defined( __DJGPP__ )
+      if ( chdir( hb_parcx( 1 ) ) )
+      {
+         hb_retni( ( errno == EINVAL ) ? 99 : 3 );
+      }
+      else
+      {
+         hb_retni( 0 );
+      }
+   #else
+      int Status;
+      char *path = hb_parcx(1);
+      union REGS regs;
+      struct SREGS sregs;
+      
+      regs.h.ah = 0x3B;
+      
+      segread( &sregs );
+      sregs.ds = FP_SEG( path );
+      regs.HB_XREGS.dx = FP_OFF( path );
+      
+      HB_DOS_INT86X( 0x21, &regs, &regs, &sregs);
+      Status = regs.HB_XREGS.ax;
+      hb_retni( Status );
+   #endif
 #endif
 }

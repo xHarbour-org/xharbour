@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.4 2004/11/21 21:44:23 druzus Exp $
+ * $Id: utils.c,v 1.5 2004/12/15 13:39:35 druzus Exp $
  */
 
 /*
@@ -109,24 +109,24 @@ HB_FUNC( TIP_TIMESTAMP )
    {
       GetLocalTime( &st );
 
-      sprintf( szRet, "%s, %d %s %d %02d:%02d:%02d %+03d%02d",
+      sprintf( szRet, "%s, %u %s %u %02u:%02u:%02u %+03d%02d",
             days[ st.wDayOfWeek ], st.wDay, months[ st.wMonth -1],
             st.wYear,
             st.wHour, st.wMinute, st.wSecond,
-            tzInfo.Bias/60,
-            tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 );
+            (int)( tzInfo.Bias / 60 ),
+            (int)( tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 ) );
    }
    else
    {
       lDate = hb_itemGetDL( pDate );
       hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
 
-      sprintf( szRet, "%s, %d %s %d %02d:%02d:%02d %+03d%02d",
+      sprintf( szRet, "%s, %d %s %d %02u:%02u:%02u %+03d%02d",
             days[ hb_dateDOW( iYear, iMonth, iDay ) - 1 ], iDay,
             months[ iMonth -1], iYear,
-            ulHour / 3600, (ulHour % 3600) / 60, (ulHour % 60),
-            tzInfo.Bias/60,
-            tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 );
+            (UINT)( ulHour / 3600 ), (UINT)( (ulHour % 3600) / 60 ), (UINT)( ulHour % 60 ),
+            (int)( tzInfo.Bias / 60 ),
+            (int)( tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 ) );
    }
 
 

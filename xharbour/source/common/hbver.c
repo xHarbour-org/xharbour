@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.18 2004/09/05 22:51:59 peterrees Exp $
+ * $Id: hbver.c,v 1.19 2004/11/21 21:43:43 druzus Exp $
  */
 
 /*
@@ -524,11 +524,11 @@ char * hb_verCompiler( void )
 #elif defined(__GNUC__)
 
    #if defined(__DJGPP__)
-      szName = "Delorie GNU C";
+      szName = "DJ Delorie's DJGPP";
    #elif defined(__CYGWIN__)
       szName = "Cygnus Cygwin GNU C";
    #elif defined(__MINGW32__)
-      szName = "Cygnus MinGW GNU C";
+      szName = "MinGW GNU C";
    #elif defined(__RSX32__)
       szName = "EMX/RSXNT/DOS GNU C";
    #elif defined(__RSXNT__)

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.18 2004/09/28 03:25:18 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.19 2004/11/23 17:04:23 lf_sfnet Exp $
  */
 
 /*
@@ -1310,7 +1310,7 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
          else
          {
             _s->pFunc[ iIndex ] = NULL;
-            _s->iType[ iIndex ] = NULL;
+            _s->iType[ iIndex ] = 0;
          }
          SendMessage( hDlg, WM_INITDIALOG, 0, 0 );
       }
@@ -1811,7 +1811,7 @@ HB_FUNC( WIN_GETDLGITEMTEXT )
 HB_FUNC( WIN_CHECKDLGBUTTON )
 {
    hb_retl( CheckDlgButton( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ),
-                            ISNUM( 3 ) ? hb_parni( 3 ) : ( UINT ) hb_parl( 3 ) ) );
+                            ( UINT )( ISNUM( 3 ) ? hb_parni( 3 ) : hb_parl( 3 ) ) ) );
 }
 
 //-------------------------------------------------------------------//
