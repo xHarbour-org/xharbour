@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.17 2002/09/16 05:34:01 ronpinkas Exp $
+ * $Id: harbour.c,v 1.18 2002/09/17 05:51:42 ronpinkas Exp $
  */
 
 /*
@@ -199,8 +199,8 @@ ULONG          hb_comp_Supported;
 int            hb_comp_iBaseLine;
 int            hb_comp_ulLastOffsetPos;
 
-PVAR           hb_comp_pGlobals = NULL;
-short          hb_comp_iGlobals = 0;
+PVAR           hb_comp_pGlobals;
+short          hb_comp_iGlobals;
 
 /* EXTERNAL statement can be placed into any place in a function - this flag is
  * used to suppress error report generation
@@ -4069,7 +4069,6 @@ static void hb_compInitVars( void )
    hb_comp_symbols.pLast    = NULL;
    hb_comp_szAnnounce       = NULL;
    hb_comp_pInitFunc        = NULL;
-   hb_comp_pGlobalsFunc     = NULL;
    hb_comp_bAnyWarning      = FALSE;
 
    hb_comp_iLine           = 1;
@@ -4085,6 +4084,10 @@ static void hb_compInitVars( void )
    hb_comp_inlines.iCount = 0;
    hb_comp_inlines.pFirst = NULL;
    hb_comp_inlines.pLast  = NULL;
+
+   hb_comp_pGlobalsFunc   = NULL;
+   hb_comp_pGlobals       = NULL;
+   hb_comp_iGlobals       = 0;
 }
 
 static void hb_compGenOutput( int iLanguage )
