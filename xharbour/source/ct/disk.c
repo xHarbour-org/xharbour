@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.5 2005/03/15 04:05:43 andijahja Exp $
+ * $Id: disk.c,v 1.7 2005/03/16 21:10:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -15,6 +15,7 @@
  * FileMove()    - Ready.
  * Volume()      - Ready.
  * GetVolInfo()  - Ready.  This function is new.
+ * VolSerial()   - Ready.
  *
  * Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>
  * NUMDISKL()
@@ -79,6 +80,7 @@
 #include <dos.h>
 
 #endif
+
 
 HB_FUNC ( DELETEFILE )
 {
@@ -298,7 +300,7 @@ if ( !ct_getsafety() )
 */
 HB_FUNC( GETVOLINFO )
 {
-    int retval=0;
+    int iretval;
     char * sDrive="";
     char * sVolName[255];
 
@@ -307,7 +309,7 @@ HB_FUNC( GETVOLINFO )
 
 #if defined(HB_OS_WIN_32)
 
-    retval = GetVolumeInformation( sDrive,
+    iretval = GetVolumeInformation( sDrive,
                                    (char*) &sVolName,
                                    256,
                                    NULL,
@@ -316,10 +318,47 @@ HB_FUNC( GETVOLINFO )
                                    NULL,
                                    0 );
 #endif
-    if ( retval!=0 )
+    if ( iretval!=0 )
       hb_retc( (char *) sVolName );
     else  
       hb_retc("");
 
+}
+
+/*
+ * VolSerial() function returns the volume serial number of an drive letter like 
+ * floppy, Hard-disk, CD or mapped network drive. The return value is a dword 
+ * type. If the drive is not available, volserial() returns -1.
+ * To convert in the hex format, call hb_numtohex() function. Example:
+ * hb_numtohex( volserial("c:\")). See volser.prg in xharbour\tests\ct folder.
+ */
+HB_FUNC( VOLSERIAL )
+{
+    int retval=0;
+    char * sDrive="";
+    DWORD dSerial;
+
+    strncat( sDrive, (char*) hb_parcx(1), 3 );
+    strcat( sDrive, "\0" );
+
+#if defined(HB_OS_WIN_32)
+
+    retval = GetVolumeInformation( sDrive,     // RootPathName
+                                   NULL,       // VolumeName
+                                   0,          // VolumeNameSize
+                                   &dSerial,   // VolumeSerialNumber
+                                   NULL,       // MaxComponentLength
+                                   NULL,       // FileSystemFlags
+                                   NULL,       // FileSystemName
+                                   0 );        // FileSystemSize
+#endif
+    if ( retval!=0 )
+    {
+      hb_retnd( dSerial );
+    }  
+    else
+    {  
+      hb_retni( -1 );
+    }  
 }
 
