@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.8 2003/12/22 16:01:51 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.9 2003/12/22 18:56:15 ronpinkas Exp $
  */
 
 /*
@@ -185,7 +185,7 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
                  }
                  else
                  {
-                    if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] )
+                    if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
                     {
                        //printf( "Parse: >%s<\n", ptr );
                        hb_pp_ParseExpression( ptr, s_szOutLine );

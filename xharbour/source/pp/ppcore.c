@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.176 2004/10/21 17:04:41 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.177 2004/10/22 01:45:50 druzus Exp $
  */
 
 /*
@@ -112,6 +112,8 @@
 
 int hb_pp_ParseDefine( char * );                         /* Process #define directive */
 
+double CalcConstant( char **pExp );                       /* Parser for #if and #elif directives */
+
 static COMMANDS * AddCommand( char * );                  /* Add new #command to an array  */
 static COMMANDS * AddTranslate( char * );                /* Add new #translate to an array  */
 static DEFINES *  DefSearch( char *, BOOL * );
@@ -120,6 +122,7 @@ static COMMANDS * TraSearch( char *, COMMANDS * );
 
 static int    ParseUndef( char * );                        /* Process #undef directive */
 static int    ParseIfdef( char *, int );                   /* Process #ifdef directive */
+static int    ParseIf( char * );                          /* Process #if and #elif directives */
 static void   ParseCommand( char *, BOOL, BOOL, BOOL );    /* Process #command or #translate directive */
 static void   ConvertPatterns( char *, int, char *, int ); /* Converting result pattern in #command and #translate */
 static int    WorkDefine( char **, char *, DEFINES * );    /* Replace fragment of code with a #defined result text */
@@ -223,8 +226,8 @@ extern int hb_pp_LastOutLine;
 char * hb_pp_szErrors[] =
 {
    "Can\'t open #include file: \'%s\'; %s",
-   "#else does not match #ifdef",
-   "#endif does not match #ifdef",
+   "#else|#elif does not match #if[def]",
+   "#endif does not match #if[def]",
    "Bad filename in #include '%s'",
    "#define without parameters",
    "Missing => in #directive \'%s\' [%s]'",
@@ -246,7 +249,8 @@ char * hb_pp_szErrors[] =
    "Unclosed repeatable group '[%s'",
    "Unknown result marker <%s> in #directive",
    "Too many instanced of marker or group",
-   "Too many nested optional groups"
+   "Too many nested optional groups",
+   "Parse error in constant expression '%s'"
 };
 
 /* Table with warnings */
@@ -722,7 +726,7 @@ void hb_pp_Init( void )
    s_bReplacePat = TRUE;
    s_prevchar = 'A';
 
-   if( !hb_pp_aCondCompile )
+   if( ! hb_pp_aCondCompile )
    {
       hb_pp_aCondCompile = ( int * ) hb_xgrab( sizeof( int ) * 5 );
    }
@@ -822,15 +826,54 @@ int hb_pp_ParseDirective( char * sLine )
 
   HB_SKIPTABSPACES(sLine);
 
-  if( i == 4 && memcmp( sDirective, "ELSE", 4 ) == 0 )
-  {     /* ---  #else  --- */
-     if( hb_pp_nCondCompile == 0 )
+  if( i == 2 && memcmp( sDirective, "IF", 2 ) == 0 )
+  {
+     ParseIf( sLine ); /* --- #if  --- */
+  }
+  else if( i == 4 && memcmp( sDirective, "ELIF", 4 ) == 0 )
+  {     /* ---  #elif  --- */
+     if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] == 2 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] == -2 )
      {
         hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DIRECTIVE_ELSE, NULL, NULL );
      }
-     else if( hb_pp_nCondCompile == 1 || hb_pp_aCondCompile[hb_pp_nCondCompile-2] )
+     else if( hb_pp_nCondCompile == 1 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 2 ] > 0 )
      {
-        hb_pp_aCondCompile[hb_pp_nCondCompile-1] = 1 - hb_pp_aCondCompile[hb_pp_nCondCompile-1];
+        // -1 Indicates that one of the branches above already matched!!!
+        if( hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
+        {
+           hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = -1;
+        }
+        else if( hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] == 0 )
+        {
+           hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = CalcConstant( &sLine ) ? 1 : 0;
+        }
+     }
+  }
+  else if( i == 4 && memcmp( sDirective, "ELSE", 4 ) == 0 )
+  {     /* ---  #else  --- */
+     if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] == 2 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] == -2 )
+     {
+        hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DIRECTIVE_ELSE, NULL, NULL );
+     }
+     else if( hb_pp_nCondCompile == 1 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 2 ] >= 0 )
+     {
+        if( hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] >= 0 )
+        {
+           hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = 1 - hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ];
+
+           if( hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] )
+           {
+              hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = 2;
+           }
+           else
+           {
+              hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = -2;
+           }
+        }
+        else
+        {
+           hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = -2;
+        }
      }
   }
   else if( i >= 4 && i <= 5 && memcmp( sDirective, "ENDIF", i ) == 0 )
@@ -852,7 +895,7 @@ int hb_pp_ParseDirective( char * sLine )
   {
      ParseIfdef( sLine, FALSE ); /* --- #ifndef  --- */
   }
-  else if( hb_pp_nCondCompile==0 || hb_pp_aCondCompile[hb_pp_nCondCompile-1])
+  else if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
   {
      if( i >= 4 && i <= 7 && memcmp( sDirective, "INCLUDE", i ) == 0 )
      {    /* --- #include --- */
@@ -1149,7 +1192,7 @@ static int ParseIfdef( char * sLine, int usl )
 
   HB_TRACE(HB_TR_DEBUG, ("ParseIfdef(%s, %d)", sLine, usl));
 
-  if( hb_pp_nCondCompile==0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] )
+  if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
   {
      NextWord( &sLine, defname, FALSE );
 
@@ -1165,9 +1208,9 @@ static int ParseIfdef( char * sLine, int usl )
       hb_pp_aCondCompile = (int*) hb_xrealloc( hb_pp_aCondCompile, sizeof( int ) * s_maxCondCompile );
   }
 
-  if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] )
+  if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
   {
-      if( ( ( stdef = DefSearch(defname,NULL)) != NULL && usl ) || ( stdef == NULL && !usl ) )
+      if( ( ( stdef = DefSearch(defname, NULL ) ) != NULL && usl ) || ( stdef == NULL && ! usl ) )
       {
          hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 1;
       }
@@ -1175,6 +1218,36 @@ static int ParseIfdef( char * sLine, int usl )
       {
          hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
       }
+  }
+  else
+  {
+     hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
+  }
+
+  hb_pp_nCondCompile++;
+
+  return 0;
+}
+
+static int ParseIf( char * sLine )
+{
+  HB_TRACE(HB_TR_DEBUG, ("ParseIf(%s)", sLine));
+
+  if( hb_pp_nCondCompile == s_maxCondCompile )
+  {
+      s_maxCondCompile += 5;
+      hb_pp_aCondCompile = (int*) hb_xrealloc( hb_pp_aCondCompile, sizeof( int ) * s_maxCondCompile );
+  }
+
+  if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
+  {
+     hb_pp_aCondCompile[ hb_pp_nCondCompile ] = CalcConstant( &sLine ) ? 1 : 0;
+
+     if( sLine[0] )
+     {
+        hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
+        hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_INVALID_CONSTANT_EXPRESSION, sLine, NULL );
+     }
   }
   else
   {
@@ -5490,6 +5563,7 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
       {
         sBuffer[0] = '\n';
       }
+
       *iBuffer = 0;
     }
 
@@ -5608,10 +5682,32 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
               break;
 
             case '&':
-              if( readed > 0 && buffer[readed-1] == '&' )
+              if( readed > 0 && buffer[readed -1 ] == '&' )
               {
-                bOK = FALSE;
-                readed--;
+                 int i = 0;
+
+                 while( buffer[i] == ' ' || buffer[i] == '\t' )
+                 {
+                    i++;
+                 }
+
+                 if( buffer[i] == '#' )
+                 {
+                    i++;
+
+                    while( buffer[i] == ' ' || buffer[i] == '\t' )
+                    {
+                       i++;
+                    }
+
+                    if( ( buffer[i] == 'i' || buffer[i] == 'I' ) && ( buffer[i + 1] == 'f' || buffer[i + 1] == 'F' ) && ( buffer[i + 2] == ' ' || buffer[i + 2] == '\t' ) )
+                    {
+                       break;
+                    }
+                 }
+
+                 bOK = FALSE;
+                 readed--;
               }
               break;
 

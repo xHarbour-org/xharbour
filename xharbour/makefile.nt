@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.95 2004/10/01 20:55:10 paultucker Exp $
+# $Id: makefile.nt,v 1.96 2004/10/12 12:28:50 lculik Exp $
 #
 
 #
@@ -1416,7 +1416,8 @@ $(HARBOUR_EXE) : \
    $(COMPILER_DIR)\genjava.c \
    $(COMPILER_DIR)\expropta.c \
    $(COMPILER_DIR)\exproptb.c \
-   $(COMPILER_DIR)\exproptc.c
+   $(COMPILER_DIR)\exproptc.c \
+   $(PP_DIR)\calconst.c
    -$(ECHO) > $(OBJ_DIR)\unistd.h
    $(CC) $(C_FLAGSNMT) -I$(OBJ_DIR) -Fo$(OBJ_DIR)\ -W3 $** -o $(HARBOUR_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
    -$(DEL) $(OBJ_DIR)\unistd.h

@@ -1,5 +1,5 @@
 /*
- * $Id: pplib.c,v 1.4 2004/04/07 03:10:15 andijahja Exp $
+ * $Id: pplib.c,v 1.5 2004/10/20 03:14:42 ronpinkas Exp $
  */
 
 /*
@@ -310,6 +310,12 @@ PINLINE   hb_compInlineAdd( char * szFunName )
 {
    HB_SYMBOL_UNUSED( szFunName );
    return NULL;
+}
+
+//#if and #elif parser is under GPL (without the xHarbour Exception) and can not be used in RTL version.
+double CalcConstant( char **pExp )
+{
+   return 0;
 }
 
 #endif

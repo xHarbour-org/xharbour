@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.16 2004/03/06 19:54:31 ronpinkas Exp $
+ * $Id: hberrors.h,v 1.17 2004/10/20 03:14:40 ronpinkas Exp $
  */
 
 /*
@@ -181,6 +181,7 @@ HB_EXTERN_BEGIN
 #define HB_PP_ERR_UNKNOWN_RESULTMARKER          23
 #define HB_PP_ERR_TOO_MANY_INSTANCES            24
 #define HB_PP_ERR_TOO_MANY_OPTIONALS            25
+#define HB_PP_ERR_INVALID_CONSTANT_EXPRESSION   26
 
 #define HB_PP_WARN_DEFINE_REDEF                 1
 #define HB_PP_WARN_NO_DIRECTIVES                2

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3511 2004/10/21 21:18:41 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3512 2004/10/22 01:45:47 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,33 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-10-21 19:38 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  + source/pp/calconst.c
+    + New parser for constant expressions to support new C style #if and #elif directives.
+  * include/hberrors.h
+  * source/pp/ppcore.c
+  * source/rtl/pplib.c
+    + Added support for new C style #if and #elif directives.
+
+  * source/pp/ppcore.c
+    + Added logic to detect and generate error on redundant #else directives.
+
+  * makefile.bc
+  * makefile.nt
+  * makefile.vc
+    + Added support for new calconst.c
+
+     /* NOTE:
+              1. MSVC support not tested
+              2. GNU Make needs to be updated (make sure to NOT include calconst when building pp[mt].lib!!!
+      */
+
+
 2004-10-22 03:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/spfiles.c
     * changed hb_spFile() to always store file name with path in second
       parameter (if given) even when it returns FALSE to eliminate
-      race condition in next calls to hb_spOpen()/hb_spCreate() 
+      race condition in next calls to hb_spOpen()/hb_spCreate()
       I'm still not sure about one thing - does Clipper check current
       directory before SET_PATH if SET_DEFAULT is not set?
       Anyhow the modification now will be done inside hb_spFile not

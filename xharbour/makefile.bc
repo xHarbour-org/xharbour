@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.112 2004/09/30 14:15:49 mlombardo Exp $
+# $Id: makefile.bc,v 1.113 2004/10/12 12:28:50 lculik Exp $
 #
 
 #
@@ -978,6 +978,7 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\exproptb.obj \
    $(OBJ_DIR)\exproptc.obj \
    $(OBJ_DIR)\hbfunchk.obj \
+   $(OBJ_DIR)\calconst.obj \
    $(PP_LIB) \
    $(OBJ_DIR)\hbslex.obj
 
@@ -1451,6 +1452,7 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\exproptb.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\exproptc.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbfunchk.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\calconst.obj >> make.tmp
    $(ECHO) $(COMMON_LIB) $(PP_LIB) >> make.tmp
    $(CC) @make.tmp
    $(DEL) make.tmp
@@ -1510,6 +1512,9 @@ $(OBJ_DIR)\exproptc.obj : $(COMPILER_DIR)\exproptc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\hbfunchk.obj : $(COMPILER_DIR)\hbfunchk.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\calconst.obj : $(PP_DIR)\calconst.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 #
@@ -3410,13 +3415,16 @@ $(CT_OBJ_DIR)\util.obj : $(CT_OBJ_DIR)\util.c
 #
 $(HBPP_EXE) : \
    $(HBPP_DIR)\hbpp.c \
+   $(PP_DIR)\calconst.c \
    $(PP_LIB_OBJS) \
    $(COMMON_LIB_OBJS)
 
    $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\hbpp.obj $(HBPP_DIR)\hbpp.c
+   $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\calconst.obj $(PP_DIR)\calconst.c
    $(ECHO) $(CFLAGS) > make.tmp
    $(ECHO) -e$(HBPP_EXE) >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbpp.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\calconst.obj >> make.tmp
    $(ECHO) $(COMMON_LIB) $(PP_LIB) >> make.tmp
    $(CC) @make.tmp
    $(DEL) make.tmp
