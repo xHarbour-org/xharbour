@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.687 2003/02/05 18:21:38 jonnymind Exp $
+ * $Id: ChangeLog,v 1.688 2003/02/06 05:29:36 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -19,3 +19,7 @@
     ! Fix conditional compilation for filelenght() function
       Reported by Juan Jose and Luca Bellini.
 
+2003-02-07 02:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/rtl/tbrowse.prg
+    ! Bug fix on decimal display of numeric field.
+      Reported by: vicente@guerra.com.mx (Vicente Guerra)
