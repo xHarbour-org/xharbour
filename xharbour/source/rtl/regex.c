@@ -6359,9 +6359,9 @@ HB_FUNC( HB_ATX )
    PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
-   int iStart = hb_parni(4), iEnd = hb_parni(5);
+   ULONG ulStart = hb_parnl(4), ulEnd = hb_parnl(5);
 
-   if( pRegEx && pString && iStart <= pString->item.asString.length )
+   if( pRegEx && pString && ulStart <= pString->item.asString.length )
    {
       if( pRegEx->item.asString.length > 3 && memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
       {
@@ -6387,20 +6387,20 @@ HB_FUNC( HB_ATX )
 
       if( pReg )
       {
-         if( iStart || iEnd )
+         if( ulStart || ulEnd )
          {
             EFlags |= REG_STARTEND;
-            aMatches[0].rm_so = iStart > 1 ? iStart - 1 : 0;
-            aMatches[0].rm_eo = iEnd > 0 && iEnd < pString->item.asString.length ? iEnd : pString->item.asString.length;
+            aMatches[0].rm_so = ulStart > 1 ? ulStart - 1 : 0;
+            aMatches[0].rm_eo = ulEnd > 0 && ulEnd < pString->item.asString.length ? ulEnd : pString->item.asString.length;
          }
 
          if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
          {
             // Very STARNGE bug if string is found at position 0 regex "forgets" to add the offset!!!
-            if( iStart && aMatches[0].rm_so == 0 )
+            if( ulStart && aMatches[0].rm_so == 0 )
             {
-               aMatches[0].rm_so += iStart - 1;
-               aMatches[0].rm_eo += iStart - 1;
+               aMatches[0].rm_so += ulStart - 1;
+               aMatches[0].rm_eo += ulStart - 1;
             }
 
             ulLen = aMatches[0].rm_eo - aMatches[0].rm_so;

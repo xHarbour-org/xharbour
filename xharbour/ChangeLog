@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3449 2004/09/19 00:00:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3449 2004/09/19 23:52:25 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-20 02:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/regex.c
+    * changed 'int iStart, iEnd' to 'ULONG ulStart, ulEnd' I hope it
+      doesn't break anything.
 
 2004-09-19 20:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * xharbour/utils/hbmake/hbmake.prg
