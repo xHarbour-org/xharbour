@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.108 2004/01/09 18:51:31 lculik Exp $
+ * $Id: hbmake.prg,v 1.109 2004/01/10 16:13:00 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1283,7 +1283,7 @@ FUNC CreateMakeFile( cFile )
          lCompMod        := oMake:lCompMod
          lGenppo         := oMake:lGenppo
          cRdd            := IIF( oMake:lRddAds, "RddAds", IIF( oMake:lMediator, "Mediator", "None" ) )
-         cGui            := IIF( oMake:lFwh, "FWH", IIF( oMake:lmini , "MiniGui",IIF(oMake:lWhoo, "Whoo",  IIF( oMake:lCw, "C4W", IIF( oMake:lHwGui, "HWGUI","None" ) ) ) ) )
+         cGui            := IIF( oMake:lFwh, "FWH", IIF( oMake:lmini , "MiniGui",IIF(oMake:lWhoo, "Whoo",  IIF( oMake:lCw, "C4W", IIF( oMake:lHwGui, "HWGUI",IIF( oMake:lGtWvt, "Gtwvt","" )) ) ) ) )
          cFwhpath        := oMake:cFmc
          ccwpath         := oMake:cFmc
          cMiniPath       := oMake:cFmc
@@ -1697,6 +1697,10 @@ FUNC CreateMakeFile( cFile )
    ELSEIF lHwGui
       fWrite( s_nLinkHandle, "HWGUI = " + cHwPath + CRLF )
       lGui := .T.
+   ELSEIF lgtWvt
+      fWrite( s_nLinkHandle, "GTWVT = " +  CRLF )
+      lGui := .T.
+
    ELSEIF lWhoo
       fWrite( s_nLinkHandle, "WHOO = " + cWhooPath + CRLF )
       lGui := .T.

@@ -42,6 +42,7 @@ Data  lxFwh          init .F.
 Data  lCw            init .F.
 Data  lmini          init .F.
 Data  lHwgui         init .F.
+Data  lGtwvt         init .F.
 Data  lWhoo          init .F.
 Data  lRddAds        init .F.
 Data  lMediator      init .F.
@@ -1071,6 +1072,11 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
                 IF aTemp[ 1 ] == "HWGUI"
                    ::cFMC:= aTemp[2]
                    ::lHwGui :=.t.
+                endif
+
+                IF aTemp[ 1 ] == "GTWVT"
+                   ::cFMC:= ""
+                   ::lGtwvt :=.t.
                 endif
 
                 IF aTemp[ 1 ] == "WHOO"
