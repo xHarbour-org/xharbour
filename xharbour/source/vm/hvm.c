@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.331 2004/02/21 06:09:26 ronpinkas Exp $
+ * $Id: hvm.c,v 1.332 2004/02/21 08:58:25 jonnymind Exp $
  */
 
 /*
@@ -3406,16 +3406,17 @@ static void hb_vmPlus( void )
    {
       ULONG ulLen = pItem2->item.asHash.value->ulTotalLen;
       HB_ITEM hbNum;
-      PHB_ITEM pResult;
+      HB_ITEM HashResult;
 
-      pResult = hb_hashClone( pItem1 );
+      HashResult.type = HB_IT_NIL;
+      hb_hashClone( pItem1, &HashResult );
+      hbNum.type = HB_IT_NIL;
       hb_itemPutNI( &hbNum, 0 ); // normal merge mode
 
-      hb_hashMerge( pResult, pItem2, 1, ulLen, &hbNum );
+      hb_hashMerge( &HashResult, pItem2, 1, ulLen, &hbNum );
       hb_stackPop();
       hb_stackPop();
-      hb_itemPushForward( pResult );
-      hb_itemRelease( pResult );
+      hb_itemPushForward( &HashResult );
    }
    else
    {
@@ -3517,59 +3518,56 @@ static void hb_vmMinus( void )
    {
       ULONG ulLen = pItem2->item.asHash.value->ulTotalLen;
       HB_ITEM hbNum;
-      PHB_ITEM pResult;
+      HB_ITEM HashResult;
 
-      pResult = hb_hashClone( pItem1 );
+      HashResult.type = HB_IT_NIL;
+      hb_hashClone( pItem1, &HashResult );
+      hbNum.type = HB_IT_NIL;
       hb_itemPutNI( &hbNum, 3 ); // NOT mode
 
-      hb_hashMerge( pResult, pItem2, 1, ulLen, &hbNum );
+      hb_hashMerge( &HashResult, pItem2, 1, ulLen, &hbNum );
       hb_stackPop();
       hb_stackPop();
-      hb_itemPushForward( pResult );
-      hb_itemRelease( pResult );
+      hb_itemPushForward( &HashResult );
    }
    else if( HB_IS_HASH( pItem1 ) && HB_IS_ARRAY( pItem2 ) )
    {
       ULONG ulLen = pItem2->item.asArray.value->ulLen;
       ULONG ulPos;
-      PHB_ITEM pResult;
+      HB_ITEM HashResult;
       PHB_ITEM pRef = pItem2->item.asArray.value->pItems;
 
-      pResult = hb_hashClone( pItem1 );
+      HashResult.type = HB_IT_NIL;
+      hb_hashClone( pItem1, &HashResult );
       while( ulLen > 0 )
       {
-         if( hb_hashScan( pResult, pRef, &ulPos ) )
+         if( hb_hashScan( &HashResult, pRef, &ulPos ) )
          {
-            hb_hashRemove( pResult, ulPos );
+            hb_hashRemove( &HashResult, ulPos );
          }
          pRef++;
          ulLen --;
       }
       hb_stackPop();
       hb_stackPop();
-      hb_itemPushForward( pResult );
-      hb_itemRelease( pResult );
+      hb_itemPushForward( &HashResult );
    }
    else if( HB_IS_HASH( pItem1 ) && (
       pItem2->type & ( HB_IT_NUMERIC | HB_IT_STRING | HB_IT_DATE ) ) )
    {
       ULONG ulPos;
-      PHB_ITEM pResult;
+      HB_ITEM HashResult;
 
+      HashResult.type = HB_IT_NIL;
       if ( hb_hashScan( pItem1, pItem2, &ulPos ) )
       {
-         pResult = hb_hashClone( pItem1 );
-         hb_hashRemove( pResult, ulPos );
-      }
-      else
-      {
-         pResult = hb_itemNew( NULL );
+         hb_hashClone( pItem1, &HashResult );
+         hb_hashRemove( &HashResult, ulPos );
       }
 
       hb_stackPop();
       hb_stackPop();
-      hb_itemPushForward( pResult );
-      hb_itemRelease( pResult );
+      hb_itemPushForward( &HashResult );
    }
    else
    {
@@ -5700,17 +5698,19 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          }
          else if( strcmp( szIndex, "KEYS" ) == 0 )
          {
-            PHB_ITEM pKeys = hb_hashGetKeys( pSelf );
+            HB_ITEM ArrKeys;
 
-            hb_itemForwardValue( &(HB_VM_STACK.Return), pKeys );
-            hb_itemRelease( pKeys );
+            ArrKeys.type = HB_IT_NIL;
+            hb_hashGetKeys( pSelf, &ArrKeys );
+            hb_itemForwardValue( &(HB_VM_STACK.Return), &ArrKeys );
          }
          else if( strcmp( szIndex, "VALUES" ) == 0 )
          {
-            PHB_ITEM pValues = hb_hashGetValues( pSelf );
+            HB_ITEM ArrValues;
 
-            hb_itemForwardValue( &(HB_VM_STACK.Return), pValues );
-            hb_itemRelease( pValues );
+            ArrValues.type = HB_IT_NIL;
+            hb_hashGetValues( pSelf, &ArrValues );
+            hb_itemForwardValue( &(HB_VM_STACK.Return), &ArrValues );
          }
          else
          {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbhashapi.h,v 1.5 2003/11/23 03:13:53 jonnymind Exp $
+ * $Id: hashapi.h,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
  */
 
 /*
@@ -69,12 +69,12 @@ BOOL HB_EXPORT hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem 
 BOOL HB_EXPORT hb_hashGet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
 
 void HB_EXPORT hb_hashPreallocate( PHB_ITEM pHash, ULONG ulLength );
-PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash );
+PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDestHash );
 void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
       ULONG ulStart, ULONG ulEnd, PHB_ITEM pBlock );
 
-PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pHash );
-PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pHash );
+PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pKeys, PHB_ITEM pHash );
+PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pValues, PHB_ITEM pHash );
 PHB_ITEM HB_EXPORT hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos );
 PHB_ITEM HB_EXPORT hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos );
 

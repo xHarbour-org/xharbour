@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.26 2004/02/21 05:45:46 ronpinkas Exp $
+ * $Id: hash.c,v 1.27 2004/02/21 06:09:25 ronpinkas Exp $
  */
 
 /*
@@ -325,7 +325,7 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
    ULONG ulLen;
    PHB_ITEM pPos, pPos1;
    PHB_BASEHASH pBaseHash;
-   HB_ITEM hbSubHash;
+   HB_ITEM hbSubHash, HashPage;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hashAdd(%p, %p, %p)", pHash, pKey, pValue));
 
@@ -369,7 +369,8 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
          // Creates the first partition
          if ( pBaseHash->ulLen == 0 )
          {
-            pPage = hb_hashNew( NULL );
+            HashPage.type = HB_IT_NIL;
+            pPage = hb_hashNew( &HashPage );
             pPageBase = pPage->item.asHash.value;
             pPageBase->uiLevel = pBaseHash->uiLevel - 1;
             pPageBase->bCase = pBaseHash->bCase;
@@ -384,7 +385,6 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
             hb_itemCopy( pBaseHash->pKeys, pKey );
             pBaseHash->pValues->type = HB_IT_NIL;
             hb_itemForwardValue( pBaseHash->pValues, pPage );
-            hb_itemRelease( pPage );
 
             return TRUE;
          }
@@ -1232,25 +1232,33 @@ void HB_EXPORT hb_hashPreallocate( PHB_ITEM pHash, ULONG ulNewLen )
    }
 }
 
-PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash )
+PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDest )
 {
    PHB_BASEHASH pSrcBase, pDestBase;
-   PHB_ITEM pDest;
    PHB_ITEM pKey, pVal;
 
    ULONG ulLen, ulCount;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hashClone( %p, %p)", pSrcHash ));
 
+   if ( pDest == NULL )
+   {
+      pDest = hb_itemNew( NULL );
+   }
+   else if (HB_IS_COMPLEX( pDest ) )
+   {
+      hb_itemClear( pDest );
+   }
+
    if(! HB_IS_HASH( pSrcHash ) )
    {
-      return hb_itemNew( NULL );
+      return pDest;
    }
 
    pSrcBase = pSrcHash->item.asHash.value;
    ulLen = pSrcBase->ulLen;
 
-   pDest = hb_hashNew( NULL );
+   hb_hashNew( pDest );
    pDestBase = pDest->item.asHash.value;
    pKey = pSrcBase->pKeys;
    pVal = pSrcBase->pValues;
@@ -1570,9 +1578,9 @@ HB_GARBAGE_FUNC( hb_hashReleaseGarbage )
    hb_hashReleaseBase( pBaseHash );
 }
 
-PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pHash )
+PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pKeys, PHB_ITEM pHash )
 {
-   PHB_ITEM pKeys, pK, pArr;
+   PHB_ITEM pK, pArr;
    ULONG ulPos, ulLen;
 
    if ( ! HB_IS_HASH( pHash ) )
@@ -1580,7 +1588,14 @@ PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pHash )
       return NULL;
    }
 
-   pKeys = hb_itemNew( NULL );
+   if ( pKeys == NULL )
+   {
+      pKeys = hb_itemNew( NULL );
+   }
+   else if ( HB_IS_COMPLEX( pKeys ) )
+   {
+      hb_itemClear( pKeys );
+   }
 
    if ( pHash->item.asHash.value->uiLevel == 0 )
    {
@@ -1610,9 +1625,9 @@ PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pHash )
 }
 
 
-PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pHash )
+PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pVals, PHB_ITEM pHash )
 {
-   PHB_ITEM pVals, pV, pArr;
+   PHB_ITEM pV, pArr;
    ULONG ulPos, ulLen;
 
    if ( ! HB_IS_HASH( pHash ) )
@@ -1620,7 +1635,14 @@ PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pHash )
       return NULL;
    }
 
-   pVals = hb_itemNew( NULL );
+   if ( pVals == NULL )
+   {
+      pVals = hb_itemNew( NULL );
+   }
+   else if ( HB_IS_COMPLEX( pVals ) )
+   {
+      hb_itemClear( pVals );
+   }
 
    if ( pHash->item.asHash.value->uiLevel == 0 )
    {
@@ -1736,6 +1758,7 @@ HB_FUNC( HASH )
 {
    int iPCount = hb_pcount();
    PHB_ITEM pHash;
+   HB_ITEM Hash;
 
    if ( iPCount % 2 != 0 )
    {
@@ -1743,7 +1766,8 @@ HB_FUNC( HASH )
       return;
    }
 
-   pHash = hb_hashNew( NULL );
+   Hash.type = HB_IT_NIL;
+   pHash = hb_hashNew( &Hash );
 
    if( iPCount > 0 )
    {
@@ -1775,8 +1799,6 @@ HB_FUNC( HASH )
    }
 
    hb_itemReturn( pHash );
-
-   hb_itemRelease( pHash );
 }
 
 
@@ -2045,7 +2067,8 @@ HB_FUNC( HDELAT )
 ***************************************************************/
 HB_FUNC( HGETKEYS )
 {
-   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH ), pKeys;
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   HB_ITEM Keys;
 
    if ( pHash == NULL  )
    {
@@ -2053,15 +2076,16 @@ HB_FUNC( HGETKEYS )
       return;
    }
 
-   pKeys = hb_hashGetKeys( pHash );
-   hb_itemForwardValue( &HB_VM_STACK.Return, pKeys );
-   hb_itemRelease( pKeys );
+   Keys.type = HB_IT_NIL;
+   hb_hashGetKeys( &Keys, pHash );
+   hb_itemForwardValue( &HB_VM_STACK.Return, &Keys );
 }
 
 
 HB_FUNC( HGETVALUES )
 {
-   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH ), pValues;
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   HB_ITEM Values;
 
    if ( pHash == NULL  )
    {
@@ -2069,9 +2093,9 @@ HB_FUNC( HGETVALUES )
       return;
    }
 
-   pValues = hb_hashGetValues( pHash );
-   hb_itemForwardValue( &HB_VM_STACK.Return, pValues );
-   hb_itemRelease( pValues );
+   Values.type = HB_IT_NIL;
+   hb_hashGetValues(&Values, pHash );
+   hb_itemForwardValue( &HB_VM_STACK.Return, &Values );
 }
 
 /***********************************************************
@@ -2169,7 +2193,8 @@ HB_FUNC( HEVAL )
 
 HB_FUNC( HCLONE )
 {
-   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH ), pClone;
+   HB_ITEM Clone;
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
 
    if( ! pHash )
    {
@@ -2177,9 +2202,9 @@ HB_FUNC( HCLONE )
       hb_paramError( 1 ), hb_paramError( 2 ));
    }
 
-   pClone = hb_hashClone( pHash );
-   hb_itemForwardValue( &HB_VM_STACK.Return, pClone );
-   hb_itemRelease( pClone );
+   Clone.type = HB_IT_NIL;
+   hb_hashClone( pHash, &Clone );
+   hb_itemForwardValue( &HB_VM_STACK.Return, &Clone );
 }
 
 

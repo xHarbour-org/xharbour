@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2364 2004/02/22 02:00:11 lculik Exp $
+ * $Id: ChangeLog,v 1.2365 2004/02/22 02:02:26 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-22 05:30 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
+  * include/hashapi.h
+  * source/vm/hash.c
+    * hb_hashClone, hb_hashGetKeys and hb_hashGetValues now accepts an extra
+      nullable HB_ITEM pointer; if this is not null, the new object is stored
+      in the provided item, else a new item is dinamically created. hb_hashNew
+      was already working that way.
+    % Optimized all replication operation by using HB_ITEMs allocated in the
+      stack and never calling hb_itemRelease().
+
+  * source/vm/hvm.c
+  * source/vm/classes.c
+    ! a couple of hb_itemPutxx() were missing HB_IT_NIL initialization.
+    * updated hb_hash* function calls with the new parameter convntion.
+    % Optimized hash cloning operators like i.e. "+", "-" and "+=" as above
+
 2004-02-22 23:00 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   * contrib/hbzlib/zipnew.cpp
   * contrib/hbzlib/zip.c
