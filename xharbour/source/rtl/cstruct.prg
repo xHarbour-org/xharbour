@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.29 2004/05/20 21:09:22 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.30 2004/05/20 21:15:15 ronpinkas Exp $
  */
 
 /*
@@ -68,6 +68,8 @@ PROCEDURE __INIT_LONGLONGS
 
    HB_CStructureCSyntax( "LONGLONG", { "4", "long[2]", } , , , 8 )
    __ClsSetModule( __ActiveStructure() )
+
+   InitSymbols()
 RETURN
 
 //---------------------------------------------------------------------------//
@@ -128,6 +130,7 @@ Function __ActiveStructure( cStructure, nAlign )
       __clsAddMsg( hClass,  "SayMembers", @SayMembers() , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Init"      , @Init()       , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Pointer"   , @Pointer()    , HB_OO_MSG_METHOD )
+      __clsAddMsg( hClass,  "CopyTo"    , @CopyTo()     , HB_OO_MSG_METHOD )
 
       FOR EACH cMember IN acMembers
          __clsAddMsg( hClass,       cMember, HB_EnumIndex(), HB_OO_MSG_PROPERTY )
@@ -434,6 +437,7 @@ Function HB_CTypeArrayID( CType, nLen )
       __clsAddMsg( hClass,  "SayMembers", @SayMembers() , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Init"      , @Init()       , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Pointer"   , @Pointer()    , HB_OO_MSG_METHOD )
+      __clsAddMsg( hClass,  "CopyTo"    , @CopyTo()     , HB_OO_MSG_METHOD )
 
       FOR Counter := 1 TO nLen
          cMember := LTrim( Str( Counter ) )
@@ -586,4 +590,51 @@ STATIC Function Pointer( nNewPointer, lAdopt )
    ENDIF
 
 RETURN QSelf()
+//---------------------------------------------------------------------------//
+
+#pragma BEGINDUMP
+  #include "hbapi.h"
+  #include "hbvmpub.h"
+  #include "hbfast.h"
+  #include "hbvm.h"
+  #include "hbapierr.h"
+  #include "hbstack.h"
+
+  static PHB_DYNS s_pVALUE;
+
+  HB_FUNC_STATIC( INITSYMBOLS )
+  {
+     s_pVALUE = hb_dynsymGetCase( "VALUE" );
+  }
+
+  HB_FUNC_STATIC( COPYTO )
+  {
+     PHB_ITEM pTarget = hb_param( 1, HB_IT_ANY );
+     void *pPointer;
+     PHB_ITEM pStructure;
+     PHB_ITEM pSizeOf;
+
+     if( HB_IS_LONG( pTarget ) )
+     {
+        pPointer = (void *) pTarget->item.asLong.value;
+     }
+     else if( HB_IS_POINTER( pTarget ) )
+     {
+        pPointer = pTarget->item.asPointer.value;
+     }
+     else
+     {
+        hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "C Structure:CopyTo()", 1, hb_paramError( 1 ) );
+     }
+
+     pStructure = hb_stackSelfItem();
+     pSizeOf = pStructure->item.asArray.value->pItems + pStructure->item.asArray.value->ulLen - 3;
+
+     hb_vmPushSymbol( s_pVALUE->pSymbol );
+     hb_vmPush( pStructure );
+     hb_vmSend(0);
+
+     memcpy( pPointer, (void *) hb_parc(-1), hb_itemGetNI( pSizeOf ) );
+  }
+#pragma ENDDUMP
 //---------------------------------------------------------------------------//

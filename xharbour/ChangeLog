@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2969 2004/05/21 13:33:28 druzus Exp $
+ * $Id: ChangeLog,v 1.2970 2004/05/21 21:27:30 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-21 14:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/cstruct.prg
+    + Added :CopyTo( nTargetPointer ) METHOD.
 
 2004-05-21 23:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
