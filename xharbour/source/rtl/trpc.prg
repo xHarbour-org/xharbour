@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.12 2003/04/13 11:16:27 jonnymind Exp $
+ * $Id: trpc.prg,v 1.13 2003/04/13 23:55:26 jonnymind Exp $
  */
 
 /*
@@ -208,7 +208,7 @@ CLASS tRPCFunction
    DATA nAuthLevel
    DATA bGetRawParams
 
-   CLASSDATA cPattern INIT HB_RegexComp( "^C:[0-9]{1,6}$|^A$|^D$|^N:[0-9]{1,2}(,[0-9]{1,2})?$")
+   CLASSDATA cPattern INIT HB_RegexComp( "^C:[0-9]{1,6}$|^A$|^O$|^D$|^N:[0-9]{1,2}(,[0-9]{1,2})?$")
 
    METHOD New( cFname, cSerial, cFret, aParams, nAuthLevel, bGetRawParams ) CONSTRUCTOR
    METHOD CheckTypes( aParams )
