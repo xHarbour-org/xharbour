@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.10 2003/06/20 17:32:42 jonnymind Exp $
+# $Id: Makefile,v 1.11 2003/10/11 13:26:28 lculik Exp $
 #
 
 ROOT = ../../
@@ -54,7 +54,7 @@ PRG_SOURCES=\
 	harbinit.prg \
 
 ifneq ($(HB_ARCHITECTURE),dos)
-    C_SOURCES +=    thread.c     
+	C_SOURCES +=    thread.c     
 endif
 
 ifeq ($(HB_MT),MT)
