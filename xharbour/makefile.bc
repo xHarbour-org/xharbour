@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.101 2004/08/05 16:41:42 paultucker Exp $
+# $Id: makefile.bc,v 1.102 2004/08/25 20:36:54 lf_sfnet Exp $
 #
 
 #
@@ -986,10 +986,10 @@ SAMPLES_LIB_OBJS =  \
 ODBC_LIB_OBJS =       \
    $(OBJ_DIR)\odbc.obj \
    $(OBJ_DIR)\todbc.obj
-   
+
 DLL_MAIN_LIB_OBJS = \
    $(VM_OBJ_DIR)\mainstd.obj \
-   $(VM_OBJ_DIR)\mainwin.obj 
+   $(VM_OBJ_DIR)\mainwin.obj
 
 
 #
@@ -3209,6 +3209,7 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) -e$(HBDOC_EXE) >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbdoc.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genasc.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\teeasc.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genhpc.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genhtm.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genchm.obj >> make.tmp
@@ -3254,6 +3255,12 @@ $(OBJ_DIR)\genasc.c : $(HBDOC_DIR)\genasc.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\genasc.obj : $(OBJ_DIR)\genasc.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\teeasc.c : $(HBDOC_DIR)\teeasc.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\teeasc.obj : $(OBJ_DIR)\teeasc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\genhpc.c : $(HBDOC_DIR)\genhpc.prg
