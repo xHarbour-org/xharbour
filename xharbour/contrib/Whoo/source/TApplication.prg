@@ -6,12 +6,9 @@ CLASS Application
    
    DATA Instance
    DATA handle
-   DATA aForms    INIT {}
    
    METHOD New() CONSTRUCTOR
    METHOD Run()
-   METHOD AddData( cSymbol ) INLINE __objAddData( self, cSymbol )
-   
    METHOD CreateForm()
    
 ENDCLASS
@@ -45,9 +42,9 @@ METHOD CreateForm( cForm, oForm ) CLASS Application
 
    __objAddData( self, cForm )
    
-   oForm := if( oForm != NIL, oForm:New( self ), TForm():New(self) )
+   oForm := if( oForm != NIL, oForm:New( self ), TForm():New( self ) )
 
-   __ObjSetValueList( self, { {cForm, oForm} } )
+   __ObjSetValueList( self, { { cForm, oForm } } )
 
    oForm:Create()
    
