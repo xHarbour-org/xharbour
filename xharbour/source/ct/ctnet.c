@@ -1,5 +1,5 @@
 /*
- * $Id: ctnet.c,v 1.3 2004/09/19 09:01:56 lf_sfnet Exp $
+ * $Id: ctnet.c,v 1.4 2004/09/21 02:40:39 paultucker Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.
@@ -94,9 +94,6 @@
 #include <winnetwk.h>
 
 #define HB_OS_WIN_32_USED
-#if defined(_MSC_VER)
-#define snprintf _snprintf
-#endif
 
 BOOL WINAPI WNetErrorHandler(DWORD dwErrorCode, LPSTR lpszFunction) 
 { 
