@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2108 2004/01/21 06:34:11 andijahja Exp $
+ * $Id: ChangeLog,v 1.2109 2004/01/21 11:42:13 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-21 10:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * include/hbapi.h
+   * include/hbapiitm.h
+   * include/hbdefs.h
+   * include/hbvm.h
+   * source/vm/itemapi.c
+   * source/vm/hvm.c
+     % Optimizations in the arithmetic operations of interger numbers.
+       Now the arithmetic operations with integer numbers are faster than
+       with numbers in floating point.
+
 2004-01-21 18:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/genc.c
     ! overlooked fix on critical section.
