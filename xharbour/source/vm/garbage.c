@@ -1,6 +1,5 @@
-
 /*
- * $Id: garbage.c,v 1.69 2003/12/06 15:33:39 jonnymind Exp $
+ * $Id: garbage.c,v 1.70 2003/12/19 07:30:01 ronpinkas Exp $
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.105 2003/12/19 07:30:00 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.106 2003/12/19 16:14:01 jonnymind Exp $
  */
 
 /*
@@ -171,18 +171,19 @@ typedef struct HB_GARBAGE_
    USHORT used;                /* used/unused block */
 } HB_GARBAGE, *HB_GARBAGE_PTR;
 
-extern HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
-extern void   hb_gcGripDrop( HB_ITEM_PTR pItem );
+extern HB_EXPORT HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
+extern HB_EXPORT void   hb_gcGripDrop( HB_ITEM_PTR pItem );
 
-extern void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pFunc ); /* allocates a memory controlled by the garbage collector */
-void * hb_gcAllocPointer( ULONG ulSize ); /* Function specific to alloc HB_IT_POINTER held (and GC susceptible) values */
-extern void   hb_gcFree( void *pAlloc ); /* deallocates a memory allocated by the garbage collector */
-extern void * hb_gcLock( void *pAlloc ); /* do not release passed memory block */
-extern void * hb_gcUnlock( void *pAlloc ); /* passed block is allowed to be released */
-extern void   hb_gcCollect( void ); /* checks if a single memory block can be released */
-extern void   hb_gcCollectAll( void ); /* checks if all memory blocks can be released */
+extern HB_EXPORT void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pFunc ); /* allocates a memory controlled by the garbage collector */
+extern HB_EXPORT void   hb_gcFree( void *pAlloc ); /* deallocates a memory allocated by the garbage collector */
+extern HB_EXPORT void * hb_gcLock( void *pAlloc ); /* do not release passed memory block */
+extern HB_EXPORT void * hb_gcUnlock( void *pAlloc ); /* passed block is allowed to be released */
+extern HB_EXPORT void   hb_gcCollect( void ); /* checks if a single memory block can be released */
+extern HB_EXPORT void   hb_gcCollectAll( void ); /* checks if all memory blocks can be released */
+
 extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditionally */
 extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
+
 extern void   HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
 #ifdef HB_THREAD_SUPPORT
