@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.30 2003/01/30 00:46:21 jonnymind Exp $
+# $Id: makefile.bc,v 1.31 2003/02/12 02:30:17 lculik Exp $
 #
 
 #
@@ -294,6 +294,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hardcr.obj \
    $(RTL_OBJ_DIR)\hbrandom.obj \
    $(RTL_OBJ_DIR)\hbcompress.obj \
+   $(RTL_OBJ_DIR)\hbserial.obj \
    $(RTL_OBJ_DIR)\idle.obj \
    $(RTL_OBJ_DIR)\inkey.obj \
    $(RTL_OBJ_DIR)\is.obj \
@@ -392,6 +393,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\fieldbl.obj \
    $(RTL_OBJ_DIR)\getlist.obj \
    $(RTL_OBJ_DIR)\getsys.obj \
+   $(RTL_OBJ_DIR)\hbsrlraw.obj \
    $(RTL_OBJ_DIR)\input.obj \
    $(RTL_OBJ_DIR)\listbox.obj \
    $(RTL_OBJ_DIR)\memoedit.obj \
@@ -425,6 +427,8 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\tpopup.obj \
    $(RTL_OBJ_DIR)\traceprg.obj \
    $(RTL_OBJ_DIR)\treport.obj \
+   $(RTL_OBJ_DIR)\trpc.obj \
+   $(RTL_OBJ_DIR)\trpccli.obj \
    $(RTL_OBJ_DIR)\ttable.obj \
    $(RTL_OBJ_DIR)\ttextlin.obj \
    $(RTL_OBJ_DIR)\ttopbar.obj \
@@ -1576,6 +1580,16 @@ $(RTL_OBJ_DIR)\hbcompress.obj : $(RTL_DIR)\hbcompress.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
+$(RTL_OBJ_DIR)\hbserial.c : $(RTL_DIR)\hbserial.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\hbserial.obj : $(RTL_OBJ_DIR)\hbserial.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(RTL_OBJ_DIR)\hbsrlraw.obj : $(RTL_DIR)\hbsrlraw.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC) $(CLIBFLAGS) -o$@ $**
@@ -2075,6 +2089,20 @@ $(RTL_OBJ_DIR)\treport.c : $(RTL_DIR)\treport.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\treport.obj : $(RTL_OBJ_DIR)\treport.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(RTL_OBJ_DIR)\trpc.c : $(RTL_DIR)\trpc.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\trpc.obj : $(RTL_OBJ_DIR)\trpc.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(RTL_OBJ_DIR)\trpccli.c : $(RTL_DIR)\trpccli.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\trpccli.obj : $(RTL_OBJ_DIR)\trpccli.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 

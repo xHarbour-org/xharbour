@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.722 2003/02/16 00:30:12 jonnymind Exp $
+ * $Id: ChangeLog,v 1.723 2003/02/16 02:32:30 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-16 11:45 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * makefile.bc
+    + source/rtl/hbserial.prg
+    + source/rtl/hbsrlraw.c
+    + source/rtl/trpccli.prg
+    + source/rtl/trpc.prg
 
 2003-02-15 21:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/regex.c
@@ -209,24 +215,24 @@
   + source/rtl/hbcompress.c
 
 2003-02-11 21:14 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-   * contrib/what32/source/_winclpb.c 
+   * contrib/what32/source/_winclpb.c
       ! GETCLIPBOARDFORMATNAME
         removed unused cchMaxCount
-   * contrib/what32/source/_windll.c 
+   * contrib/what32/source/_windll.c
       ! CALLDLL
         removed unused float  FltParms[15];
-   * contrib/what32/source/_wininet.c 
+   * contrib/what32/source/_wininet.c
       ! FTPCOMMAND
         phFtpCommand  should be an HINTERNET, not a pointer.
-   * contrib/what32/source/_winhead.c 
+   * contrib/what32/source/_winhead.c
       ! HEADER_GETITEM
         hdi should be an HDITEM, not a pointer to it.
-   * contrib/what32/source/_winmenu.c 
+   * contrib/what32/source/_winmenu.c
       ! added cast in call to GetMenuItemInfo
-   * contrib/what32/source/_winlv.c 
+   * contrib/what32/source/_winlv.c
       ! LISTVIEWNOTIFY
         commented out unused szString decl
-   * contrib/what32/source/_winsys.c 
+   * contrib/what32/source/_winsys.c
       ! GETUSERNAME
         nSize is a DWORD, not a pointer.
       ! GETVERSIONEX
@@ -244,35 +250,35 @@
       ! WSASTARTUP
         WSAData should be a WSADATA, not a pointer
       ! WSAACCEPT
-        commented out unused s 
-   * contrib/what32/source/_winmous.c 
+        commented out unused s
+   * contrib/what32/source/_winmous.c
      ! GETCURSORINFO
       pci should be a CURSORINFO, not a pointer.
-   * contrib/what32/source/_winwnd.c 
+   * contrib/what32/source/_winwnd.c
      ! GETTITLEBARINFO
        pti should be a TITLEBARINFO, not a pointer.
-   * contrib/what32/source/_winshell.c 
+   * contrib/what32/source/_winshell.c
      ! DRAGQUERYPOINT
        lpPoint should actually be a POINT, not a pointer.
-   * contrib/what32/source/wincore.prg 
+   * contrib/what32/source/wincore.prg
      ! Changed Otherwise: to Default:
-   * contrib/what32/source/_winicon.c 
+   * contrib/what32/source/_winicon.c
      ! GETICONINFO
        ii should be an ICONINFO, not a pointer.
      ! EXTRACTASSOCIATEDICON
        lpilcon should be a WORD not a pointer to one.
-   * contrib/what32/source/_windlg.c 
+   * contrib/what32/source/_windlg.c
      ! MAPDIALOGRECT
        lpRect is only a pointer to a RECT.  It is being used
        as if it IS a RECT.  Changed into a rect, and passed
        address to MapDialogRect
-   * contrib/what32/source/_winbmp.c 
+   * contrib/what32/source/_winbmp.c
      ! CreateDIBSection()
        VOID ** ppBits -> VOID ** ppBits = (VOID **)0;
        to remove 'use before initialise' warning
-   * contrib/what32/makefile.nt 
-   * contrib/what32/makefile.vc 
-   * contrib/what32/make_vc.bat 
+   * contrib/what32/makefile.nt
+   * contrib/what32/makefile.vc
+   * contrib/what32/make_vc.bat
      ! Now compiles with MSVC
 
 2003-02-12 02:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
@@ -283,12 +289,12 @@
       HB_COMPRESS( cSource [, nSourceLen ] ) --> cDest
       HB_COMPRESS( nComprFactor, cSource [,nSourceLen ] ) --> cDest
       HB_COMPRESS( cSource, nSourceLen, @cDest, @nDestLen ) --> nError
-      HB_COMPRESS( nComprFactor, cSource, nSourceLen, @cDest, @nDestLen ) 
+      HB_COMPRESS( nComprFactor, cSource, nSourceLen, @cDest, @nDestLen )
             --> nError
-            
+
       HB_UNCOMPRESS( nDestLen, cSource [, nSourceLen ] ) --> cDest
       HB_UNCOMPRESS( nDestLen, cSource, nSourceLen, @cDest ) --> nError
-      
+
       HB_COMPRESSERROR() --> nError
       HB_COMPRESSERRORDESC() -->cDesc
       HB_COMPRESSBUFLEN( nUncompressedLen )--> nDefaultBufLen
@@ -305,7 +311,7 @@
   + include/hbcompress.ch
     * PRG level definitions for usage with zlib. Not required, but
       useful (e.g. errror level meanings).
-  
+
   + tests/compress.prg
     + A test for basic string compression functions
 
