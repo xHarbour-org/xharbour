@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.1.1.1 2001/12/21 10:48:08 ronpinkas Exp $
+ * $Id: whatsnew.txt,v 1.2 2004/03/11 08:05:59 patrickmast Exp $
  */
 
 ----------------------------------------------------------------------
@@ -9,6 +9,12 @@ xHarbour 0.93 (Bug Freeze at 2004-03-10 )
 - Uncounted bug fixes
 - Extension of some xHarbour functions
 - Bug fixes in compiler in relation with illegal characters and C output.
+- New C Extensions guidelines documentation.
+- New [] Array operator overloading.
+- New Object Destructor.
+- Many Debugger fixes and improvements.
+- Fixed all reported RDD, PP and TRL issues.
+
 
 Version 0.37 Build 37 (2001-06-26)
 
