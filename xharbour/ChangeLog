@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2150 2004/01/27 03:06:57 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2151 2004/01/27 03:11:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-27 04:19 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  + tests/tbrowse.prg
+  + tests/tbcolumn.prg
+  + tests/tstbrwdb.prg
+    New Tbrowse class
+
+    /*
+    I've completly rewrote from scratch the TBrowse class, it is based on Virtual Screen
+    as reported from Hannes Ziegler in his TBMORE.TXT (thanks to him and to Andi for the suggest)
+    but it is NOT binary compatible for choice, because i've adopted the xHarbour enhancements.
+    It's a work in progress !
+    There are a lot of fixes that i have to do.
+    Actually are not implemented some functionality like colors and panning.
+    To test it you can do:
+
+    bldtest tstbrwdb tbrowse tbcolumn  (to test the new tbrowse)
+    or
+    bldtest tstbrwdb                   (to test with the current tbrowse)
+
+    I hope you like it.
+    Francesco
+    */
 
 2004-01-26 19:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapigt.h
