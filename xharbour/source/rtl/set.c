@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.119 2001/12/14 09:32:51 vszakats Exp $
+ * $Id: set.c,v 1.1.1.1 2001/12/21 10:42:21 ronpinkas Exp $
  */
 
 /*
@@ -711,6 +711,10 @@ HB_FUNC( SET )
          hb_retl( hb_set.HB_SET_IDLEREPEAT );
          if( args > 1 ) hb_set.HB_SET_IDLEREPEAT = set_logical( pArg2 );
          break;
+      case HB_SET_TRACE :
+         hb_retl( hb_set.HB_SET_TRACE );
+         if( args > 1 ) hb_set.HB_SET_TRACE = set_logical( pArg2 );
+         break;
       default                :
          /* Return NIL if called with invalid SET specifier */
          break;
@@ -784,6 +788,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_SCROLLBREAK = TRUE;
    hb_set.HB_SET_SOFTSEEK = FALSE;
    hb_set.HB_SET_STRICTREAD = FALSE;
+   hb_set.HB_SET_TRACE = TRUE; /* Default Trace to ON */
    hb_set.HB_SET_TYPEAHEAD = 50; hb_inkeyReset( TRUE ); /* Allocate keyboard typeahead buffer */
    hb_set.HB_SET_UNIQUE = FALSE;
    hb_set.HB_SET_VIDEOMODE = 0;

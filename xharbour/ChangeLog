@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.64 2002/01/31 02:20:27 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.65 2002/01/31 02:58:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,40 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-30 21:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  + source/rtl/traceprg.prg
+    + New file with TraceLog() functionality, and new CStr() (converts any type to a String).
+      /* Tracing info can be turned ON or OFF with new SET TRACE ON|OFF command (ON by default). */
+
+  * makefile.bc
+  * makefile.vc
+  * source/rtl/Makefile
+    + Added support for new traceprg.prg
+
+  * include/hbset.h
+  * include/set.ch
+  * source/rtl/set.c
+    + Support for new HB_SET_TRACE ( _SET_TRACE ) ON by default.
+
+  * source/pp/pptable.c
+    + Burned support for new #define _SET_TRACE
+    + Burned support for new #command SET TRACE ON|OFF
+
+  * source/rtl/errorsys.prg
+    - Removed the TraceLog functionality.
+
+  * source/vm/arrayshb.c
+    + Added copyright notice of HB_aParams() and HB_aExpressions()
+
+  * source/vm/macro.c
+    * Synched with following GHarbour change:
+        2002-01-30 12:30 UTC+0200 Chen Kedem <niki@actcom.co.il>
+           * source/vm/macro.c
+             ! hb_macroCheckParam() - Wrong error code 1080 is used, changed into 1065
+
+  * tests/pp.prg
+    * Renamed xToStr() to CStr() and revised #ifdef __XHARBOUR__ with regard to TraceLog()
 
 2002-01-30 18:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h

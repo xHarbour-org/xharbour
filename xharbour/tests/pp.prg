@@ -39,7 +39,7 @@
       #INCLUDE "fwextern.ch"
    #else
       #ifdef WIN
-         #COMMAND Alert( <x> ) => MessageBox( 0, xToStr( <x> ), "PP for Windows", 0 )
+         #COMMAND Alert( <x> ) => MessageBox( 0, CStr( <x> ), "PP for Windows", 0 )
          EXTERN MessageBox
       #endif
    #endif
@@ -695,7 +695,7 @@ PROCEDURE RP_Dot()
 
    PP_PreProFile( "rp_dot.ch" )
    #ifdef WIN
-      PP_PreProLine( '#COMMAND Alert( <x> ) => MessageBox( 0, xToStr( <x> ), "TInterpreter for Windows", 0 )' )
+      PP_PreProLine( '#COMMAND Alert( <x> ) => MessageBox( 0, CStr( <x> ), "TInterpreter for Windows", 0 )' )
    #endif
 
    ErrorBlock( {|oErr| RP_Dot_Err( oErr ) } )
@@ -7744,6 +7744,7 @@ INIT PROCEDURE PPInit
    FClose(FileHandle)
 
 RETURN
+#endif
 
 //--------------------------------------------------------------//
 FUNCTION TraceLog(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 )
@@ -7771,7 +7772,7 @@ FUNCTION TraceLog(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p
    ENDIF
 
    FOR Counter := 1 to PCount()
-      FWrite( FileHandle, '>>>' + xToStr( aEntries[Counter] ) + '<<<' + CRLF )
+      FWrite( FileHandle, '>>>' + CStr( aEntries[Counter] ) + '<<<' + CRLF )
    NEXT
 
    FWrite( FileHandle, CRLF )
@@ -7780,8 +7781,9 @@ FUNCTION TraceLog(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p
 
 RETURN .T.
 
+#ifndef __XHARBOUR__
 //--------------------------------------------------------------//
-FUNCTION xToStr( xExp )
+FUNCTION CStr( xExp )
 
    LOCAL cType
 
@@ -7814,7 +7816,7 @@ FUNCTION xToStr( xExp )
          RETURN '{|| Block }'
 
       CASE cType = 'O'
-         RETURN "{ Object }"
+         RETURN "{ " + xExp:ClassName() + " Object }"
 
       OTHERWISE
          RETURN "Type: " + cType
@@ -8033,7 +8035,7 @@ STATIC FUNCTION InitRunResults()
 
    /* Commands Results*/
  #ifdef WIN
-   aAdd( aCommResults, { { {   0, 'MessageBox( 0, xToStr( ' }, {   0,   1 }, {   0, ' ), "xBaseScript for Windows", 0 )' } }, { -1,  1, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'MessageBox( 0, CStr( ' }, {   0,   1 }, {   0, ' ), "xBaseScript for Windows", 0 )' } }, { -1,  1, -1} , { NIL }  } )
  #endif
    aAdd( aCommResults, { , , { NIL }  } )
    aAdd( aCommResults, { , , { NIL }  } )

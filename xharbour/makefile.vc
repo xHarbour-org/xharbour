@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.4 2002/01/19 14:15:41 ronpinkas Exp $
+# $Id: makefile.vc,v 1.5 2002/01/29 08:43:52 ronpinkas Exp $
 #
 
 #
@@ -417,6 +417,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\tmenuitm.obj \
    $(OBJ_DIR)\tobject.obj \
    $(OBJ_DIR)\tpopup.obj \
+   $(OBJ_DIR)\traceprg.obj \
    $(OBJ_DIR)\treport.obj \
    $(OBJ_DIR)\ttextlin.obj \
    $(OBJ_DIR)\ttopbar.obj \

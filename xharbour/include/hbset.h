@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.15 2001/12/14 09:32:51 vszakats Exp $
+ * $Id: hbset.h,v 1.1.1.1 2001/12/21 10:47:41 ronpinkas Exp $
  */
 
 /*
@@ -124,7 +124,8 @@ typedef enum
 
    /* Harbour SET extensions start at 100 */
    HB_SET_LANGUAGE      = 100,
-   HB_SET_IDLEREPEAT    = 101
+   HB_SET_IDLEREPEAT    = 101,
+   HB_SET_TRACE         = 102
 
 } HB_set_enum;
 
@@ -180,6 +181,7 @@ typedef struct
    BOOL    HB_SET_SCROLLBREAK;
    BOOL    HB_SET_SOFTSEEK;
    BOOL    HB_SET_STRICTREAD;
+   BOOL    HB_SET_TRACE;
    int     HB_SET_TYPEAHEAD;
    BOOL    HB_SET_UNIQUE;
    int     HB_SET_VIDEOMODE;

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.2 2002/01/22 00:23:28 ronpinkas Exp $
+ * $Id: macro.c,v 1.3 2002/01/30 04:10:05 ronpinkas Exp $
  */
 
 /*
@@ -140,7 +140,7 @@ static BOOL hb_macroCheckParam( HB_ITEM_PTR pItem )
 
    if( ! HB_IS_STRING(pItem) )
    {
-      HB_ITEM_PTR pResult = hb_errRT_BASE_Subst( EG_ARG, 1080, NULL, "&", 0 );
+      HB_ITEM_PTR pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 0 );
 
       bValid = FALSE;
       if( pResult )

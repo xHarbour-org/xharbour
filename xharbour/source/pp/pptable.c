@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.26 2002/01/10 14:21:09 alkresin Exp $
+ * $Id: pptable.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -121,6 +121,7 @@ void hb_pp_Table( void )
    static DEFINES sD___50 = {"_SET_AUTOSHARE",NULL,-1,"47", &sD___49 };
    static DEFINES sD___51 = {"_SET_LANGUAGE",NULL,-1,"100", &sD___50 };
    static DEFINES sD___52 = {"_SET_IDLEREPEAT",NULL,-1,"101", &sD___51 };
+   static DEFINES sD___53 = {"_SET_TRACE",NULL,-1,"102", &sD___52 };
 
    static COMMANDS sC___1 = {0,"NOTE","\1A30",NULL,NULL };
    static COMMANDS sC___2 = {0,"DO","WHILE \1A00","while \1A00",&sC___1 };
@@ -414,8 +415,9 @@ void hb_pp_Table( void )
    static COMMANDS sC___240 = {0,"SET","EVENTMASK TO \1A00","Set( _SET_EVENTMASK, \1A00 )",&sC___239 };
    static COMMANDS sC___241 = {0,"SET","OPTIMIZE \1A20ON,OFF,&>","Set( _SET_OPTIMIZE, \1A30 )",&sC___240 };
    static COMMANDS sC___242 = {0,"SET","OPTIMIZE (\1A00)","Set( _SET_OPTIMIZE, \1A00 )",&sC___241 };
+   static COMMANDS sC___243 = {0,"SET","TRACE \1A20ON,OFF,&>","Set( _SET_TRACE, \1A30 )",&sC___242 };
 
-   hb_pp_topDefine = &sD___52;
-   hb_pp_topCommand = &sC___242;
+   hb_pp_topDefine = &sD___53;
+   hb_pp_topCommand = &sC___243;
    hb_pp_topTranslate = NULL;
 }

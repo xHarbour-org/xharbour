@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.2 2002/01/27 09:01:57 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.3 2002/01/27 10:57:09 ronpinkas Exp $
  */
 
 /*
@@ -47,6 +47,13 @@
  * If you write modifications of your own for Harbour, it is your choice
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
+ *
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.xharbour.org
+ *
+ * Copyright 2001 Ron Pinkas <ron@profit-master.com>
+ * HB_FUNC( HB_APARAMS )
+ * HB_FUNC( HB_AEXPRESSIONS )
  *
  */
 
