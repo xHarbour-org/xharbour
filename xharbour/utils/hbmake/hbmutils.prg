@@ -128,9 +128,8 @@ Static Function GetDirs( cPattern ,lGcc)
      Local aDir   := {}
      Local lLinux := At( 'linux', lower(Os()) ) > 0 .or. lgcc
      
-
      
-     Aeval( Directory( cPattern + if(lLinux,"*","*."), "D" ), ;
+     Aeval( Directory( cPattern + if(lLinux,"*","*.*"), "D" ), ;
             { | xItem | If( xItem[ 5 ] = "D" .and. ;
             ( xItem[ 1 ] != "." .and. xItem[ 1 ] != ".." ), ;
             ( Aadd( aDir, cPattern + xItem[ 1 ] + If( llinux, "/", '\' ) ), ;
