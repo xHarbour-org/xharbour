@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.5 2003/02/07 18:18:24 ronpinkas Exp $
+ * $Id: inkey.c,v 1.6 2003/09/02 22:59:37 andijahja Exp $
  */
 
 /*
@@ -92,7 +92,7 @@ static int    s_inkeyForce;      /* Variable to hold keyboard input when TYPEAHE
 static PHB_inkeyKB s_inkeyKB = NULL;
 static HB_inkey_enum s_eventmask;
 
-#if defined( HB_OS_WIN_32_USED )
+#if ( defined( __WIN32__) || defined( HB_OS_WIN_32_USED ) )
    extern bCapsLockOn;
    extern bShiftPressed;
 #endif
@@ -345,7 +345,7 @@ HB_FUNC( INKEY )
                        hb_parnd( 1 ),
                        ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK );
 
-#if defined( HB_OS_WIN_32_USED )
+#if ( defined( __WIN32__) || defined( HB_OS_WIN_32_USED ) )
    if ( bCapsLockOn )
    {
       if ( bShiftPressed )
