@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.9 2002/01/30 03:32:40 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.10 2002/01/31 02:58:06 ronpinkas Exp $
  */
 
 /*
@@ -186,6 +186,7 @@ struct hb_struMemvar
 struct hb_struPointer
 {
    void * value;
+   BOOL collect;
 };
 
 struct hb_struRefer
@@ -290,6 +291,7 @@ extern int      HB_EXPORT hb_parl( int iParam, ... ); /* retrieve a logical para
 extern double   HB_EXPORT hb_parnd( int iParam, ... ); /* retrieve a numeric parameter as a double */
 extern int      HB_EXPORT hb_parni( int iParam, ... ); /* retrieve a numeric parameter as a integer */
 extern long     HB_EXPORT hb_parnl( int iParam, ... ); /* retrieve a numeric parameter as a long */
+extern void     HB_EXPORT * hb_parptr( int iParam, ... ); /* retrieve a pointer to a memory collected by GC */
 extern PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask ); /* retrieve a generic parameter */
 extern PHB_ITEM HB_EXPORT hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
 extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
@@ -316,6 +318,7 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 #define hb_retndlen( dNumber, iWidth, iDec ) hb_itemPutNDLen( &hb_stack.Return, dNumber, iWidth, iDec )
 #define hb_retnilen( iNumber, iWidth )       hb_itemPutNILen( &hb_stack.Return, iNumber, iWidth )
 #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &hb_stack.Return, lNumber, iWidth )
+#define hb_retptr( void *voidPtr )           hb_itemPutPtrGC( &hb_stack.Return, voidPtr )
 
 #else
 
@@ -336,6 +339,7 @@ extern void  HB_EXPORT  hb_retndlen( double dNumber, int iWidth, int iDec ); /* 
 extern void  HB_EXPORT  hb_retnilen( int iNumber, int iWidth ); /* returns a integer number, with specific width */
 extern void  HB_EXPORT  hb_retnllen( long lNumber, int iWidth ); /* returns a long number, with specific width */
 extern void  HB_EXPORT  hb_reta( ULONG ulLen );  /* returns an array with a specific length */
+extern void  HB_EXPORT  hb_retptr( void *voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
 
 #endif
 
