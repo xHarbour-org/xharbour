@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.55 2003/12/09 02:53:49 ronpinkas Exp $
+ * $Id: TApplication.prg,v 1.56 2004/03/11 22:03:59 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -53,7 +53,7 @@ CLASS Application FROM TComponent
    DATA InstMsg
 
 
-   PROPERTY Handle READ FHandle
+
    DATA FTerminate INIT .F.
 
    DATA nFormCount            INIT 0
@@ -118,6 +118,7 @@ METHOD CreateForm( oForm, oTarget ) CLASS Application
 
    STATIC oBase
    LOCAL aVars, aVar
+   lOCAL cItem, nPos := 0
 
    IF oBase == NIL
       oBase := TForm()
@@ -141,6 +142,7 @@ METHOD CreateForm( oForm, oTarget ) CLASS Application
    ENDIF
 
    FOR EACH aVar IN aVars
+      tracelog(aVar[1],avar[2])
       IF ValType( aVar[2] ) == 'O'
          //TraceLog( aVar[1] )
          aVar[2]:Create( oForm )
@@ -149,6 +151,14 @@ METHOD CreateForm( oForm, oTarget ) CLASS Application
          IF aVar[2]:ClassName == "TLISTBOX"
 
          ENDIF
+
+         IF aVar[2]:className == "TCOMBOBOX"
+            FOR EACH cItem IN aVar[2]:items
+                aVar[2]:insertString( cItem, nPos )
+                nPos++
+            NEXT
+         ENDIF
+
       ENDIF
    NEXT
 

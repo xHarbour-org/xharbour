@@ -1,5 +1,5 @@
 /*
- * $Id: TCCombo.prg,v 1.26 2003/01/09 08:21:03 what32 Exp $
+ * $Id: TCCombo.prg,v 1.27 2003/03/07 15:17:18 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -44,6 +44,8 @@ CLASS TComboBox FROM TCustomControl
    DATA FTop     EXPORTED  INIT   0
    DATA FWidth   EXPORTED  INIT  80
    DATA FHeight  EXPORTED  INIT  20
+   DATA Items    EXPORTED  INIT {}
+   DATA ItemIndex EXPORTED INIT 0
    
    DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_BORDER+WS_TABSTOP+CBS_DROPDOWNLIST+WS_VSCROLL+CBS_HASSTRINGS
 
@@ -54,6 +56,7 @@ CLASS TComboBox FROM TCustomControl
 
    DATA WinClass    EXPORTED INIT "combobox"
    DATA ControlName EXPORTED INIT "ComboBox"
+
 
    METHOD AddString( cText )        INLINE ::SendMessage( CB_ADDSTRING, 0, cText)
    METHOD InsertString(cText,nLine) INLINE ::SendMessage( CB_INSERTSTRING, nLine, cText )

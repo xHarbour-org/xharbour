@@ -1,5 +1,5 @@
 /*
- * $Id: controls.prg,v 1.5 2004/03/04 06:29:48 ronpinkas Exp $
+ * $Id: controls.prg,v 1.6 2004/03/12 17:01:57 patrickmast Exp $
  */
 
 /*
@@ -238,6 +238,7 @@ CLASS TControl FROM TComponent
   DATA OnClose                    //: TCloseEvent;
   DATA OnCloseQuery               //: TCloseQueryEvent;
   DATA OnCreate                   //: TNotifyEvent;
+  DATA OnChange
   DATA OnDblClick                 //stored IsForm;
   DATA OnDestroy                  //: TNotifyEvent;
   DATA OnDeactivate               //: TNotifyEvent;
@@ -718,6 +719,7 @@ RETURN ::FHandle
 METHOD Create( oOwner ) CLASS TWinControl
 
    ::Super:Create( oOwner )
+
 
    ::Instance := oOwner:Instance
 
@@ -1558,6 +1560,7 @@ METHOD Create( oOwner ) CLASS TCustomControl
       ENDIF
 
    ENDIF
+
 RETURN( self )
 
 *------------------------------------------------------------------------------*
@@ -1751,6 +1754,7 @@ CLASS THintWindow  FROM TCustomControl
 ENDCLASS
 
 METHOD Create( oParent ) CLASS THintWindow
+
    ::Super:Create( oParent )
 RETURN( self )
 
