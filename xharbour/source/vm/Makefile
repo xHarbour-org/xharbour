@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2002/12/18 16:32:07 ronpinkas Exp $
+# $Id: Makefile,v 1.6 2003/01/05 06:50:36 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -34,11 +34,11 @@ C_SOURCES=\
 	fm.c         \
 	garbage.c    \
 	hvm.c        \
-        inet.c       \
+	inet.c       \
 	initexit.c   \
 	initsymb.c   \
 	itemapi.c    \
-        fastitem.c   \
+	fastitem.c   \
 	macro.c      \
 	$(C_MAIN)    \
 	memvars.c    \
@@ -47,11 +47,16 @@ C_SOURCES=\
 	proc.c       \
 	pvalue.c     \
 	runner.c     \
-        thread.c     \
+	thread.c     \
 
 PRG_SOURCES=\
 	harbinit.prg \
 
+ifeq ($(HB_MT),MT)
+LIBNAME=vmmt
+ARCH_SUFFIX=_mt
+else
 LIBNAME=vm
+endif
 
 include $(TOP)$(ROOT)config/lib.cf

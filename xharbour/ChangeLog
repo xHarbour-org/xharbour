@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.604 2003/01/10 06:00:19 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.605 2003/01/10 09:45:06 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,57 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-10 16:28 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * Makefile
+    ! Just a formal correction in comments: they where without <TAB>
+      char, decommenting them would have caused make breaking.
+  
+  * make_gnu.sh
+    + added "both" "mt" or "st" parameter (defaults to mt): it
+      can be called as 
+      $ . make_gnu.sh both install
+
+  * config/linux/global.cf
+    ! Fixed subdirectory creation using mkdir -p
+    + Added RANLIB definition
+    + Added an ARCH_SUFFIX variable that is added to ARCH_DIR,
+      to allow separate compilation of modules (e.g. for thread
+      capability)
+    ! Fixed useage of ARCH_DIR instead of ARCH where is suitable
+    + make clean clears also *_mt/ subdirs (used for MT
+      compilations)
+
+  * config/linux/gcc.cf
+    + Added rules to manage HB_MT env var: if defeined,
+      HB_THREAD_SUPPORT is defined, and -lpthread is added to
+      default compilation.
+    + Added a RANLIB passage after AR
+
+  * source/vm/Makefile
+  * source/rtl/Makefile
+  * source/rdd/dbfntx/Makefile
+  * source/rdd/dbfcdx/Makefile
+  * source/rdd/nulsys/Makefile
+  * source/rdd/Makefile
+    * if env var HB_MT=MT, ARCH_SUFFIX is set to _mt, and library
+      names have an additional mt suffix (e.g. vmmt instead of vm)
+
+  + tests/Makefile
+    + a make file for test files, that is also useful as a demo
+      on how to build MT compliant makefiles. Can be used as bld.bat:
+      export HB_MT=MT
+      make client
+      export HB_MT=
+      make server
+
+  + samples/sitesvr/Makefile
+    * LIBS list must now include vmmt/rddmt/rtlmt instead if 
+      vm/rdd/vm; this will trigger other makefiles to act
+      correctly and link the correct version. This for the
+      bin files linked after basic libs.
+
+
 
 2003-01-10 10:40 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * samples/sitesvr/sitesrv.prg

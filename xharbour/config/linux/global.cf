@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.4 2000/08/30 22:05:48 vszel Exp $
+# $Id: global.cf,v 1.1.1.1 2001/12/21 10:47:58 ronpinkas Exp $
 #
 
 all : first
@@ -15,7 +15,8 @@ ifeq ($(HB_GT_LIB),)
    HB_GT_LIB = gtstd
 endif
 
-ARCH_DIR = $(ARCH)/
+ARCH_DIR = $(ARCH)$(ARCH_SUFFIX)/
+
 MK = $(MAKE)
 
 RM = rm -f
@@ -23,11 +24,12 @@ RD = rm -f -r
 CP = cp -f
 MV = mv -f
 MD = mkdir
+MDP = mkdir -p
+RANLIB = ranlib
 
 dirbase::
-	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
-	 [ -d $(ARCH) ] || $(MD) $(ARCH)
+	@[ -d $(ARCH_DIR) ] || $(MDP) $(ARCH_DIR)
 
 clean::
-	-$(RD) $(ARCH_DIR)
-
+	-$(RD) $(ARCH)/
+	-$(RD) $(ARCH)_mt/

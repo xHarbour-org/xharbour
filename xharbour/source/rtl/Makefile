@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.11 2002/12/24 00:42:47 lculik Exp $
+# $Id: Makefile,v 1.12 2003/01/05 06:50:35 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -180,7 +180,14 @@ PRG_SOURCES=\
 	wait.prg     \
         win32ole.prg \
 
+
+ifeq ($(HB_MT),MT)
+LIBNAME=rtlmt
+ARCH_SUFFIX=_mt
+else
 LIBNAME=rtl
+endif
+
 
 # The list of all valid GT drivers is defined in config/<arch>/global.cf.
 DIRS=$(HB_GT_LIBS)

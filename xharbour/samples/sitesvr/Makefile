@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2003/01/04 04:33:12 jonnymind Exp $
+# $Id: Makefile,v 1.2 2003/01/04 13:14:09 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -12,12 +12,12 @@ PRG_MAIN=sitesrv.prg
 
 LIBS=\
 	debug \
-	vm \
-	rtl \
+	vmmt \
+	rtlmt \
 	lang \
-	rdd \
-	rtl \
-	vm \
+	rddmt \
+	rtlmt \
+	vmmt \
 	macro \
 	pp \
 	common \

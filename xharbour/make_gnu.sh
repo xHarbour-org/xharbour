@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_gnu.sh,v 1.1.1.1 2001/12/21 10:40:33 ronpinkas Exp $
+# $Id: make_gnu.sh,v 1.2 2002/04/16 16:12:18 map Exp $
 #
 
 # ---------------------------------------------------------------
@@ -25,8 +25,8 @@ if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtsln; fi
 
 # Set to constant value to be consistent with the non-GNU make files.
 
-if [ -z "$HB_BIN_INSTALL" ]; then export HB_BIN_INSTALL=bin/; fi    
-if [ -z "$HB_LIB_INSTALL" ]; then export HB_LIB_INSTALL=lib/; fi    
+if [ -z "$HB_BIN_INSTALL" ]; then export HB_BIN_INSTALL=bin/; fi
+if [ -z "$HB_LIB_INSTALL" ]; then export HB_LIB_INSTALL=lib/; fi
 if [ -z "$HB_INC_INSTALL" ]; then export HB_INC_INSTALL=include/; fi
 
 if [ -z "$HB_ARCHITECTURE" ]; then
@@ -99,7 +99,30 @@ else
 
    # ---------------------------------------------------------------
    # Start the GNU make system
+   HB_MT_OLD=$HB_MT
 
-   make $*
+   case $1 in
+   both|BOTH)
+      export HB_MT=MT
+      shift
+      make $*
+      export HB_MT=
+      make $*
+   ;;
+   mt|MT)
+      export HB_MT=MT
+      shift
+      make $*
+   ;;
+   st|ST)
+      export HB_MT=
+      shift
+      make $*
+   ;;
+   *)
+      export HB_MT=
+      make $*
 
+   esac
+   export HB_MT=$HB_MT_OLD
 fi

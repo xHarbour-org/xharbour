@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2000/09/01 22:14:28 bcantero Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:43:06 ronpinkas Exp $
 #
 
 ROOT = ../../../
@@ -10,6 +10,11 @@ C_SOURCES=\
 PRG_SOURCES=\
 	dbfcdx0.prg \
 
+ifeq ($(HB_MT),MT)
+LIBNAME=dbfcdxmt
+ARCH_SUFFIX=_mt
+else
 LIBNAME=dbfcdx
+endif
 
 include $(TOP)$(ROOT)config/lib.cf
