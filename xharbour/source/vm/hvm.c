@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.25 2002/01/24 05:41:03 ronpinkas Exp $
+ * $Id: hvm.c,v 1.26 2002/01/26 02:03:43 ronpinkas Exp $
  */
 
 /*
@@ -616,34 +616,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             break;
 
          case HB_P_FUNCTION:
-            if( HB_IS_COMPLEX( &hb_stack.Return ) )
-            {
-               hb_itemClear( &hb_stack.Return );
-            }
-            else
-            {
-               ( &hb_stack.Return )->type = HB_IT_NIL;
-            }
-
-            hb_vmDo( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
-            hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
-            hb_stackPush();
+            hb_vmFunction( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
             w += 3;
             break;
 
          case HB_P_FUNCTIONSHORT:
-            if( HB_IS_COMPLEX( &hb_stack.Return ) )
-            {
-               hb_itemClear( &hb_stack.Return );
-            }
-            else
-            {
-               ( &hb_stack.Return )->type = HB_IT_NIL;
-            }
-
-            hb_vmDo( pCode[ w + 1 ] );
-            hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
-            hb_stackPush();
+            hb_vmFunction( pCode[ w + 1 ] );
             w += 2;
             break;
 
@@ -3657,6 +3635,15 @@ HB_ITEM_PTR hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ... )
 void hb_vmFunction( USHORT uiParams )
 {
    HB_TRACE( HB_TR_DEBUG, ("hb_vmFunction(%hu)", uiParams ) );
+
+   if( HB_IS_COMPLEX( &hb_stack.Return ) )
+   {
+      hb_itemClear( &hb_stack.Return );
+   }
+   else
+   {
+      ( &hb_stack.Return )->type = HB_IT_NIL;
+   }
 
    if( hb_stackItemFromTop( - ( uiParams + 1 ) )->type )
    {
