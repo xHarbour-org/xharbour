@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.542 2002/12/21 18:20:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.543 2002/12/21 22:40:42 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-22 03:54 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * include/hbstack.h
+    ! DOS is not compatible with multithreads, use hb?stack.
+  * include/inet.h
+    ! DOS is not compatible with TCP&IP native.
+  * source/rtl/inet.c
+    ! DOS is not compatible with TCP&IP native.
+  * source/rtl/set.c
+    ! In the set_string function, when then item parameter is NIL use a
+      zero-length string (bug fix for SET PATH TO and SET DEFAULT TO).
+      Borrowed from Harbour, change made by David G. Holm
+    ! Fix, reset PRINTFILE handle when close file.
 
 2002-12-22 01:29 UTC+0300 Phil Krylov <phil@mail.ru>
   * include/inet.h
