@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.31 2002/10/28 13:29:05 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.32 2002/10/28 17:23:59 what32 Exp $
  */
 
 /*
@@ -106,7 +106,7 @@ CLASS oCtrlMask FROM TWinControl
    DATA Cursor
    DATA lHintActive INIT .T.
    DATA lChanged    INIT .F.
-   
+
    METHOD New() CONSTRUCTOR
    METHOD OnGetDlgCode() INLINE DLGC_WANTARROWS + DLGC_WANTTAB
    METHOD OnRButtonDown()
@@ -268,7 +268,7 @@ METHOD OnKeyDown( wParam, lParam )
             RETURN(NIL)
 
          CASE wParam==VK_DOWN
-         
+
             lOnBorder := .F.
             acRect    := GetClientRect(::Handle)
             b         := 1
@@ -278,18 +278,18 @@ METHOD OnKeyDown( wParam, lParam )
             ELSE
                ::sizing := .T.
             ENDIF
-            
+
             FOR EACH a IN ::aSelected
-            
+
                aRect := GetWindowRect( a[ SEL_HANDLE ] )
                RectScreenToClient( ::Handle, aRect )
                a[ SEL_OLDRECT ] := aClone( aRect )
-               
+
                IF a[ SEL_OLDRECT][4] >= acRect[4]
                   lOnBorder := .T.
                   EXIT
                ENDIF
-               
+
             NEXT
 
          CASE wParam==VK_UP //up
@@ -302,18 +302,18 @@ METHOD OnKeyDown( wParam, lParam )
             ELSE
                ::sizing := .T.
             ENDIF
-            
+
             FOR EACH a IN ::aSelected
                aRect := GetWindowRect( a[ SEL_HANDLE ] )
                RectScreenToClient( ::Handle, aRect )
                a[ SEL_OLDRECT ] := aClone( aRect )
-               
+
                IF ( lCtrl .AND. ( a[ SEL_OLDRECT ][ 2 ] <= 0 ) ) .OR.;
                   ( lShift .AND. ( a[ SEL_OLDRECT ][ 4 ] - a[ SEL_OLDRECT ][ 2 ] <= MINY ) )
                   lOnBorder:=.T.
                   EXIT
                ENDIF
-               
+
             NEXT
 
          CASE wParam == VK_LEFT // left
@@ -326,18 +326,18 @@ METHOD OnKeyDown( wParam, lParam )
             ELSE
                ::sizing := .T.
             ENDIF
-            
+
             FOR EACH a IN ::aSelected
                aRect := GetWindowRect( a[ SEL_HANDLE ] )
                RectScreenToClient( ::Handle, aRect )
                a[ SEL_OLDRECT ] := aClone( aRect )
-               
+
                IF ( lCtrl .AND. ( a[ SEL_OLDRECT ][ 1 ] <= 0 ) ) .OR.;
                   (lShift .AND. ( a[ SEL_OLDRECT ][ 3 ] - a[ SEL_OLDRECT ][ 1 ] <= MINX ) )
                   lOnBorder := .T.
                   EXIT
                ENDIF
-               
+
             NEXT
 
          CASE wParam == VK_RIGHT
@@ -354,12 +354,12 @@ METHOD OnKeyDown( wParam, lParam )
                aRect := GetWindowRect( a[ SEL_HANDLE ] )
                RectScreenToClient( ::Handle, aRect )
                a[ SEL_OLDRECT ] := aClone( aRect )
-               
+
                IF a[ SEL_OLDRECT ][ 3 ] >= acRect[ 3 ]
                   lOnBorder := .T.
                   EXIT
                ENDIF
-               
+
             NEXT
 
       ENDCASE
@@ -394,12 +394,12 @@ METHOD OnKeyDown( wParam, lParam )
       IF ::sizing .OR. ::moving
          ::sizing := .F.
          ::moving := .F.
-         
+
          FOR EACH a IN ::aSelected
             oObj := ::Parent:ChildFromHandle( a[ SEL_HANDLE ] )
-            oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, 1)
+            oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, .F. )
          NEXT
-         
+
       ENDIF
    ENDIF
 
@@ -412,7 +412,7 @@ METHOD OnPaint( hDC )
    LOCAL a
    LOCAL n:=0
    IF !empty( ::aSelected )
-   
+
       IF ! ::mousedown
          FOR EACH a In ::aSelected
            n++
@@ -422,7 +422,7 @@ METHOD OnPaint( hDC )
                                                               COLOR_WINDOWTEXT + 1 ) )
          NEXT
       ENDIF
-      
+
    ENDIF
 
    RETURN(nil)
@@ -473,17 +473,17 @@ METHOD OnLButtonDown( wParam, x, y )
    LOCAL a
    LOCAL aOldSelected := aClone( ::aSelected )
    local Item
-   
+
    ClientToScreen( ::Handle, aPt )
 
    IF Empty( ::Cursor )
-      
+
       ::lChanged := .F.
 
       FOR EACH hChild IN ::aSiblings
          aWRect := GetWindowRect( hChild )
          IF PtInRect( aWRect, aPt )
-            
+
             lFound := .T.
             IF aScan( ::aSelected, {|a| a[ SEL_HANDLE ] == hChild } ) == 0
                aRect := aClone( aWRect )
@@ -493,7 +493,7 @@ METHOD OnLButtonDown( wParam, x, y )
                ShowWindow( a[ SEL_HANDLE ], SW_SHOW ) } )
                ::aSelected := { { hChild, aclone( aRect ), x - aRect[1], y - aRect[2], {}, aclone( aRect ) } }   // handle,rect,anchorX,anchorY,aHot
             ENDIF
-            
+
             IF Len( ::aSelected ) == 1 .and. ( nPos := aScan( ::aSelected[ 1, SEL_HOTAREAS ],{|a| ptInRect( a[1], {x,y} ) } ) ) > 0 // <= aHot
                ::nClick := ::aSelected[ 1, SEL_HOTAREAS, nPos, 2 ]
                WinSetCursor( LoadCursor(, ::aSelected[ 1, SEL_HOTAREAS, nPos, 3 ] ) )
@@ -541,26 +541,27 @@ METHOD OnLButtonDown( wParam, x, y )
 
    // ToolTips and Inspector selection
    IF lFound
-      ::SendMessage( WM_USER + 1, 0 )
+      ::ChangeInspector( 0 )
 
       ::HintWindow:Activate(1)
       ::HintWindow:TrackHint(1)
       ::lHintActive := .T.
-     ELSE
-      ::PostMessage( WM_USER + 1, 1 )
+   ELSE
+      ::ChangeInspector( 1 )
    ENDIF
-
 
    hDC := GetDC( ::Handle )
    SetTextColor( hDC, RGB( 255, 255, 128 ) )
    SetBkColor( hDC, RGB( 0, 0, 125 ) )
-   IF len( ::aSelected ) > 1
+
+   IF Len( ::aSelected ) > 1
       FOR EACH a In ::aSelected
          DrawFocusRect( hDC, a[ SEL_NEWRECT ] )
       NEXT
-     ELSE
+   ELSE
       DrawFocusRect( hDC, ::aEditRect )
    ENDIF
+
    ReleaseDc( ::Handle, hDC )
 
    ::mousedown := .T.
@@ -572,42 +573,40 @@ METHOD OnLButtonDown( wParam, x, y )
 *-----------------------------------------------------------------------------*
 
 METHOD OnUserMsg( nMsg, nwParam, nlParam)
-   
+
    IF nMsg == WM_USER + 1
       ::ChangeInspector( nwParam )
    ENDIF
-   
+
 RETURN( nil )
 
 *-----------------------------------------------------------------------------*
 
 METHOD ChangeInspector( n )
 
-   LOCAL Item, SubItem, hTreeItem
-   static nSelObj
-            
-   IF n == 1 
-  
-      FOR EACH Item IN MainFrame:ObjTree:TreeView1:Items
+   STATIC nSelObj
 
+   LOCAL Item, SubItem, hTreeItem, oObj
+
+   IF n == 1
+      FOR EACH Item IN MainFrame:ObjTree:TreeView1:Items
           IF Item:cargo == ::Parent:handle
              Item:Select()
              nSelObj := ::handle
              EXIT
           ENDIF
-
       NEXT
+
       RETURN( nil )
-      
    ENDIF
-   
-   IF Len( ::aSelected ) == 1 .AND. ( nSelObj == NIL .OR. nSelObj != ::aSelected[ 1 ][ SEL_HANDLE ] )
+
+   IF Len( ::aSelected ) == 1 .AND. nSelObj != ::aSelected[ 1 ][ SEL_HANDLE ]
       // need to tell the inspector
       FOR EACH Item IN MainFrame:ObjTree:TreeView1:Items
-             
           // Check TreeView subitems
           FOR EACH SubItem IN Item:Items
               IF SubItem:cargo == ::aSelected[ 1 ][ SEL_HANDLE ]
+                 oObj := SubItem
                  hTreeItem := SubItem:handle
                  EXIT
               ENDIF
@@ -616,22 +615,24 @@ METHOD ChangeInspector( n )
           // Check TreeView Root items
           IF hTreeItem != NIL
              EXIT
-            ELSEIF Item:cargo == ::aSelected[ 1 ][ SEL_HANDLE ]
+          ELSEIF Item:cargo == ::aSelected[ 1 ][ SEL_HANDLE ]
+             oObj := Item
              hTreeItem := Item:handle
              EXIT
           ENDIF
-
       NEXT
-         
+
       // Select the TreeView item
       IF hTreeItem != NIL
-         MainFrame:ObjTree:TreeView1:SelectItem( hTreeItem )
-         nSelObj := ::aSelected[ 1 ][ SEL_HANDLE ]
+         IF ! ( ::Parent:Parent:ObjInspect:CurObject == oObj )
+            MainFrame:ObjTree:TreeView1:SelectItem( hTreeItem )
+            nSelObj := ::aSelected[ 1 ][ SEL_HANDLE ]
+         ENDIF
       ENDIF
-            
+
    ENDIF
 
-RETURN( nil )
+RETURN NIL
 
 *-----------------------------------------------------------------------------*
 
@@ -647,23 +648,23 @@ METHOD OnMouseMove( aParam, x, y )
    LOCAL hDC
    LOCAL a,oObj, aTipRect
    static oLastObj
-   
+
    IF ::mousedown
 
       aTipRect := ::aEditRect
-      
+
       ::MoveCtrl( ::Handle, aPt )
       if !aTipRect[1] == ::aEditRect[1].or.;
          !aTipRect[2] == ::aEditRect[2].or.;
          !aTipRect[3] == ::aEditRect[3].or.;
          !aTipRect[4] == ::aEditRect[4]
-         
+
          ::lChanged := .T.
-         
+
          hDC := GetDC( ::Handle )
          SetTextColor( hDC, RGB( 255, 255, 128 ) )
          SetBkColor( hDC, RGB( 0, 0, 128 ) )
-      
+
          // old
          IF len( ::aSelected ) > 1
             FOR EACH a In ::aSelected
@@ -679,7 +680,7 @@ METHOD OnMouseMove( aParam, x, y )
 
          UpdateWindow( ::Parent:handle )
 
-      
+
          //new
          IF len( ::aSelected ) > 1
             ::MoveCtrl( ::Handle, aPt )
@@ -720,7 +721,7 @@ METHOD OnMouseMove( aParam, x, y )
                   ::lHintActive := .F.
                   oLastObj      := oObj
                endif
-               
+
                EXIT
             ENDIF
          NEXT
@@ -759,10 +760,11 @@ METHOD OnLButtonUp( wParam, x, y )
    IF ::creating
       ::cursor := NIL
    ENDIF
+
    IF ::moving .OR. ::sizing
       UpdateWindow( ::Parent:handle )
    ENDIF
-    
+
    ::mousedown := .F.
    hDC := GetDC( ::Handle )
 
@@ -780,32 +782,31 @@ METHOD OnLButtonUp( wParam, x, y )
    IF ::moving
       ::moving := .F.
    ENDIF
+
    IF ::sizing
       ::sizing := .F.
    ENDIF
+
    ::MoveCtrl( , aPt )
    FOR EACH a IN ::aSelected
-
        ShowWindow( a[ SEL_HANDLE ], SW_HIDE )
 
        MoveWindow( a[ SEL_HANDLE ], a[ SEL_NEWRECT, 1 ],a[ SEL_NEWRECT , 2 ],;
                    a[ SEL_NEWRECT, 3 ]- a[ SEL_NEWRECT, 1 ], a[ SEL_NEWRECT, 4 ] - a[ SEL_NEWRECT, 2 ], .F. )
 
        ShowWindow( a[ SEL_HANDLE ], SW_SHOW )
-       
+
        aRect := GetWindowRect( a[1] )
        RectScreenToClient( ::Handle, aRect )
        a[ SEL_OLDRECT ] := aClone( aRect )
-      
+
        if ::lChanged .AND. a[ SEL_HANDLE ] == ::Parent:Parent:ObjInspect:CurObject:handle
           oObj := ::Parent:ChildFromHandle( a[ SEL_HANDLE ] )
-          oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, 1, .F. )
+          oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, .F. )
        endif
-
    NEXT
 
    IF ::selecting
-
       ::selecting := .F.
       WinSetCursor( LoadCursor(, IDC_ARROW ) )
       DrawFocusRect( hDC, ::aEditRect )
@@ -826,23 +827,22 @@ METHOD OnLButtonUp( wParam, x, y )
             RectScreenToClient( ::Handle, aRect )
             ::aSelected:={ { oObj:Handle, aclone( aRect ), 0, 0, {}, {} } } // handle,rect,anchorX,anchorY,aHot
          ENDIF
-
       ELSE
-
          FOR EACH hChild IN ::aSiblings
             aWRect := GetWindowRect( hChild )
             aRect  := aClone( aWRect )
             RectScreenToClient( ::Handle, aRect )
+
             IF !empty( IntersectRect( aRect, ::aEditRect ) )
                aAdd( ::aSelected, { hChild, aclone( aRect ), 0, 0, {}, {} } ) // handle,rect,anchorX,anchorY,aHot
             ENDIF
          NEXT
-
       ENDIF
+
       InvalidateRect( ::Handle,, .F. )
    ENDIF
-   ReleaseDc( ::Handle, hDC )
 
+   ReleaseDc( ::Handle, hDC )
 
   // InvalidateRect(::Handle,,.F.)
   // RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_UPDATENOW+RDW_ALLCHILDREN)
@@ -931,7 +931,7 @@ METHOD MoveCtrl( hWnd, aPt )
 METHOD GetSiblings()
    LOCAL hWnd  := GetWindow( ::Parent:Handle, GW_CHILD )
    ::aSiblings := {}
-   
+
    DO WHILE !empty( hWnd )
       IF hWnd <> ::Handle
          aIns( ::aSiblings, 1, hWnd, .T.)
@@ -1049,7 +1049,7 @@ FUNCTION RaScan( a, b, s, n )  // scans array backwards
   IF ValType( n ) # 'N'
     n := Len( a )
   ENDIF
-  
+
   n := Min( Max( 0, n), s )
   e := s - n + 1
 
@@ -1079,7 +1079,7 @@ FUNCTION RaEval( a, b, s, n)  // traverses array backwards
   IF ValType( n ) # 'N'
     n := Len( a )
   ENDIF
-  
+
   n := Min( Max( 0, n ), s )
   e := s - n + 1
 

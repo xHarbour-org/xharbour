@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.74 2002/10/28 12:04:18 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.75 2002/10/28 13:32:10 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -92,7 +92,7 @@ GLOBAL EXTERNAL FormEdit
    METHOD AddControl()
    METHOD OnCreate()         INLINE ::CreateSub()
    METHOD OnSize()
-   METHOD OnMove()           INLINE ::Parent:ObjInspect:SetBrowserData( self,1 ),NIL
+   METHOD OnMove()           INLINE ::Parent:ObjInspect:SetBrowserData( HB_QSelf(), .F. ),NIL
 
    METHOD OnPaint( hDC )     INLINE ::TileGrid(hDC)
    METHOD TileGrid(hDC)
@@ -136,18 +136,19 @@ METHOD AddControl( cName, oObj )
 
 //----------------------------------------------------------------------------//
 
-METHOD OnSize(nFlag,Width,Height)
+METHOD OnSize( nFlag, Width, Height)
 
    LOCAL aRect
 
    IF ::oMask <> NIL
-      aRect:=GetClientRect(::Handle)
-      ::oMask:Move(aRect[1],aRect[2],aRect[3],aRect[4],.T.)
+      aRect := GetClientRect(::Handle)
+      ::oMask:Move( aRect[1], aRect[2], aRect[3], aRect[4], .T. )
       ::oMask:Refresh()
    ENDIF
-   ::Parent:ObjInspect:SetBrowserData( self,1 )
 
-   RETURN(NIL)
+   ::Parent:ObjInspect:SetBrowserData( Self, .F. )
+
+   RETURN NIL
 
 //----------------------------------------------------------------------------//
 
@@ -249,7 +250,7 @@ METHOD CreateControl(aRect)
          IF !("2" $ cName) // only one Rebar
 
             oObj:=::Add( TRebar():New( self ) )
-           
+
          ENDIF
 
       CASE ::CtrlName=="ToolBar"
@@ -284,7 +285,7 @@ METHOD CreateControl(aRect)
          MainFrame:ObjInspect:ComboBox1:AddString( oObj:name + chr(9) + oObj:ClassName(), oObj )
          oTree := MainFrame:ObjTree:TreeView1:Add( oObj:Name, 1, oObj:handle )
          oTree:Select()
-         
+
 
          IF !EMPTY( oObj:Controls )
             FOR n := 1 TO LEN( oObj:Controls )
@@ -344,7 +345,7 @@ METHOD CreateSub()
    LOCAL oBtn
    LOCAL xRet
    Local oTree
-   
+
    ::SetGridSize()
 
    ::Parent:StdBar:EnableAll()

@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.48 2002/10/28 17:23:59 what32 Exp $
+ * $Id: xInspect.prg,v 1.49 2002/10/28 18:45:20 ronpinkas Exp $
  */
 
 /*
@@ -64,31 +64,29 @@ ENDCLASS
 
 //-------------------------------------------------------------------------------------------------
 
-METHOD SetBrowserData( oObj, nState ) CLASS ObjInspect
+METHOD SetBrowserData( oObj, bCurrent ) CLASS ObjInspect
+
    LOCAL aProp
 
-   DEFAULT nState TO 0
-
    IF ::CurObject == oObj
-      RETURN Self
-   ENDIF
+      IF bCurrent
+         // Do nothing - already selected.
+         RETURN Self
+      ELSE
+         TraceLog()
+         FOR EACH aProp IN ::Browser:source
+            aProp[2] := __objSendMsg( ::CurObject, aProp[1] )
+         NEXT
+         ::Browser:RefreshAll()
+      ENDIF
+   ELSE
+      ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
+      aSort( ::Browser:Source,,, {|x,y| x[1] < y[1] } )
+      aEval( ::Browser:Source, {|a|a[1] := Proper( a[1] ) } )
+      ::Browser:RefreshAll()
 
-   IF nState == 0
       ::CurObject := oObj
    ENDIF
-
-   IF oObj:handle == ::CurObject:handle .OR. nState == 0
-      IF nState == 0
-         ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
-         aSort( ::Browser:Source,,, {|x,y| x[1] < y[1] } )
-         aEval( ::Browser:Source, {|a|a[1] := Proper( a[1] )} )
-      ELSE
-         FOR EACH aProp IN ::Browser:source
-             aProp[2] := __objSendMsg( ::CurObject, aProp[1] )
-         NEXT
-      ENDIF
-      ::Browser:RefreshAll()
-   endif
 
    IF oObj:ClassName == "TFORMEDIT"
       oObj:XFMRoot()
@@ -181,7 +179,9 @@ METHOD OnClick(nwParam,nlParam) CLASS ComboInsp
    IF HiWord( nwParam ) == CBN_SELCHANGE
       oObj := ::Parent:Objects[::GetCurSel()+1]
 
-      ::Parent:SetBrowserData( oObj )
+      IF ! ( ::Parent:CurObject == oObj )
+         ::Parent:SetBrowserData( oObj, .T. )
+      ENDIF
 
       IF ( ! FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ) ) .AND. ( ! FormEdit:oMask:Creating )
          FormEdit:oMask:OnLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
@@ -201,19 +201,28 @@ return(super:AddString(cText))
 //---------------------------------------------------------------------------------
 
 METHOD SetCurSel(n) CLASS ComboInsp
-   IF n<0
-      ::Parent:Browser:source:={"",""}
+
+   LOCAL oObj
+
+   IF n < 0
+      ::Parent:Browser:source := { "", "" }
       ::Parent:Browser:RefreshAll()
-     else
-      ::Parent:SetBrowserData( ::Parent:Objects[n+1] )
-      if FormEdit != NIL
-         IF !FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ).and.!FormEdit:oMask:Creating
-            FormEdit:oMask:OnLButtonDown(, ::Parent:CurObject:Left+4, ::Parent:CurObject:Top+4 )
-            FormEdit:oMask:OnLButtonUp(, ::Parent:CurObject:Left+4, ::Parent:CurObject:Top+4 )
+   ELSE
+      oObj := ::Parent:Objects[ n + 1 ]
+
+      IF ! ( ::Parent:CurObject == oObj )
+         ::Parent:SetBrowserData( oObj, .T. )
+      ENDIF
+
+      IF FormEdit != NIL
+         IF !FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ) .AND. ! FormEdit:oMask:Creating
+            FormEdit:oMask:OnLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
+            FormEdit:oMask:OnLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
          ENDIF
       ENDIF
-   endif
-return(super:SetCurSel(n))
+   ENDIF
+
+RETURN Super:SetCurSel( n )
 
 //---------------------------------------------------------------------------------
 
