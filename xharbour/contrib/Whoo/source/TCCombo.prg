@@ -7,13 +7,12 @@ CLASS TComboBox FROM TControl
    METHOD New() CONSTRUCTOR
 ENDCLASS
 
-METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TComboBox
+METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TComboBox
    ::id        := nId
    ::lRegister := .F.
    ::lControl  := .T.
    ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY}, ::Msgs )
    ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
-   ::Caption   := cCaption
    ::Left      := nLeft
    ::Top       := nTop
    ::Width     := nWidth
