@@ -31,7 +31,7 @@
 
 #include <winuser.h>
 #include <commctrl.h>
-#if defined(__MINGW32__) || defined(__WATCOMC__)
+#if defined(__MINGW32__) || defined(__WATCOMC__) || defined(_MSC_VER)
    #include <ole2.h>
    #include <ocidl.h>
 #else
