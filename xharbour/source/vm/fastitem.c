@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.62 2004/03/30 18:37:29 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.63 2004/04/02 04:30:52 ronpinkas Exp $
  */
 
 /*
@@ -191,7 +191,7 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
 
          if( --( pItem->item.asArray.value->uiHolders ) == 0 )
          {
-            //hb_arrayRelease( pItem );
+            hb_arrayRelease( pItem );
          }
       #else
          hb_arrayReleaseHolder( pItem->item.asArray.value, (void *) pItem );
