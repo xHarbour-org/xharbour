@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.40 2003/01/31 19:37:38 jonnymind Exp $
+* $Id: thread.c,v 1.41 2003/02/01 12:45:36 jonnymind Exp $
 */
 
 /*
@@ -331,6 +331,7 @@ hb_create_a_thread(
    }
 
    hb_gcUnlock( pt->pArgs->item.asArray.value );
+   hb_itemRelease( pt->pArgs );
 
    if( pt->bIsMethod )
    {
@@ -341,7 +342,6 @@ hb_create_a_thread(
       hb_vmDo( pt->uiCount - 1 );
    }
 
-   hb_itemRelease( pt->pArgs );
    free( pt );
    hb_threadDestroyContext( tCurrent );
 
