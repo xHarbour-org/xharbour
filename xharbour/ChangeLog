@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3073 2004/06/16 06:40:15 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3074 2004/06/17 07:07:28 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-17 15:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/tbcolumn.prg
+    * Fixed column heading to be of type character. 
+ 
+  * xharbour/source/rtl/tbrowse.prg
+    + Method CheckRowPos()
+      Checks if ::RowPos confirms to screen coordinates and data underneath.
+      The bug Was reported many times specially by Francessco.
+
+    + Method AColInfo()
+      Simplifies and initializes ::aColInfo with same methodology when adding,
+      inserting columns.
 
 2004-06-17 01:58 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/transfrm.c
