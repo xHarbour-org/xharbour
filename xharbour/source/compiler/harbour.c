@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.62 2004/01/27 15:20:39 likewolf Exp $
+ * $Id: harbour.c,v 1.63 2004/01/28 07:04:28 andijahja Exp $
  */
 
 /*
@@ -2833,16 +2833,17 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
    {
       int iLine = hb_comp_iLine - 1;
       int iOffset = hb_comp_iLine - hb_comp_iBaseLine;
+      BOOL bCodeblock = ( hb_comp_functions.pLast->pOwner != NULL );
 
       //printf( "Line: %i, Offset %i LastPos %i, Pos %i\n", hb_comp_iLine, iOffset, hb_comp_ulLastOffsetPos, hb_comp_functions.pLast->lPCodePos );
 
-      if( hb_comp_iBaseLine == 0 )
+      if( !bCodeblock && hb_comp_iBaseLine == 0 )
       {
          hb_comp_iBaseLine = hb_comp_iLine;
          hb_comp_ulLastLinePos = hb_comp_functions.pLast->lPCodePos;
          hb_compGenPCode3( HB_P_BASELINE, HB_LOBYTE( iLine ), HB_HIBYTE( iLine ), ( BOOL ) 0 );
       }
-      else if( iOffset < 256 )
+      else if( !bCodeblock && iOffset < 256 )
       {
          if( iOffset )
          {
@@ -2869,9 +2870,14 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
             }
          }
       }
-      else if( ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastLinePos ) > 3 ) || hb_comp_bDebugInfo )
+      else if( bCodeblock
+               || ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastLinePos ) > 3 )
+               || hb_comp_bDebugInfo )
       {
-         hb_comp_ulLastLinePos = hb_comp_functions.pLast->lPCodePos;
+         if ( !bCodeblock )
+         {
+            hb_comp_ulLastLinePos = hb_comp_functions.pLast->lPCodePos;
+         }
          hb_compGenPCode3( HB_P_LINE, HB_LOBYTE( iLine ), HB_HIBYTE( iLine ), ( BOOL ) 0 );
       }
       else
@@ -4211,6 +4217,18 @@ void hb_compStaticDefStart( void )
       hb_compGenPCodeN( pBuffer, 5, 0 );
 
       hb_compGenPCode3( HB_P_SFRAME, 0, 0, ( BOOL ) 0 );     /* frame for statics variables */
+      
+      if( hb_comp_bDebugInfo )
+      {
+         BYTE * pBuffer;
+         int iFileLen = strlen( hb_comp_files.pLast->szFileName );
+         
+         pBuffer = ( BYTE * ) hb_xgrab( 2 + iFileLen );
+         pBuffer[0] = HB_P_MODULENAME;
+         memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) hb_comp_files.pLast->szFileName, iFileLen+1 );
+         hb_compGenPCodeN( pBuffer, 2 + iFileLen, 0 );
+         hb_xfree( pBuffer );
+      }
    }
    else
    {
@@ -4259,7 +4277,7 @@ void hb_compGlobalsDefEnd( void )
 
 /*
  * Start a new fake-function that will hold pcodes for a codeblock
-*/
+ */
 void hb_compCodeBlockStart()
 {
    PFUNCTION pBlock;
@@ -4319,22 +4337,22 @@ void hb_compCodeBlockEnd( void )
    }
    wLocalsCnt = wLocals;
 
-   if( ( pCodeblock->lPCodePos + 3 ) <= 255 &&  pCodeblock->wParamCount == 0 && wLocals == 0 )
+   /* NOTE: 3 = HB_P_PUSHBLOCK | HB_P_PUSHBLOCKSHORT + BYTE( size ) + _ENDBLOCK */
+   wSize = (USHORT)pCodeblock->lPCodePos + 3;
+   if ( hb_comp_bDebugInfo )
    {
-      /* NOTE: 3 = HB_P_PUSHBLOCKSHORT + BYTE( size ) + _ENDBLOCK */
-      wSize = ( USHORT ) pCodeblock->lPCodePos + 3;
+      wSize += 3 + strlen( hb_comp_files.pLast->szFileName ) + strlen( pFunc->szName );
+      wSize += wLocalsLen;
+   }
 
+   if( wSize <= 255 && pCodeblock->wParamCount == 0 && wLocals == 0 )
+   {
       hb_compGenPCode2( HB_P_PUSHBLOCKSHORT, ( BYTE ) wSize, ( BOOL ) 0 );
    }
    else
    {
-      /* NOTE: 8 = HB_P_PUSHBLOCK + USHORT( size ) + USHORT( wParams ) + USHORT( wLocals ) + _ENDBLOCK */
-      wSize = ( USHORT ) pCodeblock->lPCodePos + 8 + wLocals * 2;
-      if( hb_comp_bDebugInfo )
-      {
-         wSize += (3 + strlen( hb_comp_files.pLast->szFileName ) + strlen( pFunc->szName ));
-         wSize += wLocalsLen;
-      }
+      /* NOTE: 5 = BYTE( size ) + USHORT( wParams ) + USHORT( wLocals ) */
+      wSize += 5 + wLocals * 2;
       
       hb_compGenPCode3( HB_P_PUSHBLOCK, HB_LOBYTE( wSize ), HB_HIBYTE( wSize ), ( BOOL ) 0 );
       hb_compGenPCode2( HB_LOBYTE( pCodeblock->wParamCount ), HB_HIBYTE( pCodeblock->wParamCount ), ( BOOL ) 0 );
@@ -4354,13 +4372,15 @@ void hb_compCodeBlockEnd( void )
    if( hb_comp_bDebugInfo )
    {
       BYTE * pBuffer;
+      int iFileLen = strlen( hb_comp_files.pLast->szFileName );
+      int iFuncLen = strlen( pFunc->szName );
       
-      pBuffer = ( BYTE * ) hb_xgrab( 3 + strlen( hb_comp_files.pLast->szFileName ) + strlen( pFunc->szName ) );
+      pBuffer = ( BYTE * ) hb_xgrab( 3 + iFileLen + iFuncLen );
       pBuffer[0] = HB_P_MODULENAME;
-      memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) hb_comp_files.pLast->szFileName, strlen( hb_comp_files.pLast->szFileName ) );
-      pBuffer[ strlen( hb_comp_files.pLast->szFileName ) + 1 ] = ':';
-      memcpy( ( BYTE * ) ( &( pBuffer[ strlen( hb_comp_files.pLast->szFileName ) + 2 ] ) ), ( BYTE * ) pFunc->szName, strlen( pFunc->szName ) + 1 );
-      hb_compGenPCodeN( pBuffer, 3 + strlen( hb_comp_files.pLast->szFileName ) + strlen( pFunc->szName ), 0 );
+      memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) hb_comp_files.pLast->szFileName, iFileLen );
+      pBuffer[ iFileLen + 1 ] = ':';
+      memcpy( ( BYTE * ) ( &( pBuffer[ iFileLen + 2 ] ) ), ( BYTE * ) pFunc->szName, iFuncLen + 1 );
+      hb_compGenPCodeN( pBuffer, 3 + iFileLen + iFuncLen, 0 );
       hb_xfree( pBuffer );
 
       /* generate the names of referenced local variables */
@@ -4368,16 +4388,18 @@ void hb_compCodeBlockEnd( void )
       iLocalPos = -1;
       while( wLocalsCnt-- )
       {
-         pBuffer = ( BYTE * ) hb_xgrab( strlen( pVar->szName ) + 4 );
+         int iVarLen = strlen( pVar->szName );
+         
+         pBuffer = ( BYTE * ) hb_xgrab( iVarLen + 4 );
          
          pBuffer[0] = HB_P_LOCALNAME;
          pBuffer[1] = HB_LOBYTE( iLocalPos );
          pBuffer[2] = HB_HIBYTE( iLocalPos );
          iLocalPos--;
          
-         memcpy( ( BYTE * ) ( & ( pBuffer[3] ) ), pVar->szName, strlen( pVar->szName ) + 1 );
+         memcpy( ( BYTE * ) ( & ( pBuffer[3] ) ), pVar->szName, iVarLen + 1 );
          
-         hb_compGenPCodeN( pBuffer, strlen( pVar->szName ) + 4 , 0 );
+         hb_compGenPCodeN( pBuffer, iVarLen + 4 , 0 );
          
          hb_xfree( pBuffer );
          
@@ -4469,7 +4491,6 @@ static void hb_compInitVars( void )
 
 static void hb_compGenOutput( int iLanguage, char *szSourceExtension, char *szSourcePath )
 {
-
    switch( iLanguage )
    {
       case LANG_C:

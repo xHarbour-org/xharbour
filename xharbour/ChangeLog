@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2164 2004/01/28 04:14:26 maurifull Exp $
+ * $Id: ChangeLog,v 1.2165 2004/01/28 07:04:25 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-28 10:30 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/compiler/harbour.c
+    ! Don't use HB_P_BASELINE/HB_P_LINEOFFSET optimizations inside codeblocks
+      because hb_comp_ulLastLinePos is not valid there.
+    ! Fixed generation of pcode in codeblocks with no local variables or
+      parameters (merged in from Harbour, by Ryszard Glab).
+    + Generate module name inside '(_INITSTATICS)' function if -b option
+      is used (merged in from Harbour, by Ryszard Glab).
+
 2004-01-28 14:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/harbour.c
     * fix typo "intenrational" -> "international"
