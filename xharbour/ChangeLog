@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3157 2004/07/15 10:24:10 jonnymind Exp $
+ * $Id: ChangeLog,v 1.3158 2004/07/15 18:01:18 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-15 14:00 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/compiler/genc.c
+    * Corrected HB_P*LOCALNEAR* generation to not use (unsigned char) casting as it resulted in compile warnings.
+
+  * source/pp/ppcore.c
+    ! Fixed SearnRep() handling of multiple Non Repeatable Marker into Residual Group.
+    * Commented reset of bDontInstanciate in SearnRep(), this appears to fix recent bug report
+      but requires extensive testing. I tested all xHarbour and FWH sources, please report any new problem.
 
 2004-07-15 22:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * bin/hb-func.sh

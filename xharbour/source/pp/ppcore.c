@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.159 2004/07/01 04:09:06 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.160 2004/07/03 09:52:02 ronpinkas Exp $
  */
 
 /*
@@ -4499,7 +4499,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
          if( pPrevSquare != ptr )
          {
             pPrevSquare = ptr;
-            bDontInstanciate = FALSE;
+            //bDontInstanciate = FALSE;
             lastchar = '0';
          }
          // END - Ron Pinkas added 2003-05-09
@@ -4546,7 +4546,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                }
                else
                {
-                  hb_pp_Stuff( "", ptr, 0, ptr2-ptr+1, *lenres-(ptr-ptro) );
+                  hb_pp_Stuff( "", ptr, 0, ptr2 - ptr + 1, *lenres - ( ptr - ptro ) );
                   *lenres -= ptr2-ptr+1;
                   isdvig = ptr - ptro;
                   rezs = TRUE;
@@ -4731,23 +4731,37 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
                         // Ron Pinkas added June-03-2003
                         iResidualOffset = 0;
+
+                        // Ron Pinkas added July-15-2004
+                        iOffset = 0;
+
                         /*
                          * iResidualOffset is counting the impact of the Expansion of Marker into the Residual.
                          * This is because the effect is DOUBLED when the expended residual is ALSO Instanciated.
                          */
                         // *** EITHER *** this block OR the #else below!!!
                         #if 1
-                            while( (i = hb_strAt( exppatt, 2, ptr + iResidualOffset + 1, lennew )) > 0 )
+                            while( ( i = hb_strAt( exppatt, 2, ptr + iOffset, lennew - iOffset ) ) > 0 )
                             {
                                #ifdef DEBUG_MARKERS
                                   printf( "   Expand: '%s' at %i len: %i\n", exppatt, i, lennew );
                                #endif
 
-                               // Ron Pinkas iOffset and iResidualOffset added June-03-2003.
+                               // Ron Pinkas added July-15-2004
+                               // New Start of search.
+                               iOffset += i;
 
-                               iOffset = ReplacePattern( exppatt[2], expreal, lenreal, ptr + iResidualOffset + i, *lenres - ( ptr + i - ptro ) );
-                               lennew += iOffset;
-                               iResidualOffset += iOffset;
+                               // Ron Pinkas revised July-15-2004 to use the corrected iOffset.
+                               // Ron Pinkas iOffset and iResidualOffset added June-03-2003.
+                               i = ReplacePattern( exppatt[2], expreal, lenreal, ptr + iOffset - 1, *lenres - ( ptr + iOffset - 1 - ptro ) );
+
+                               // Ron Pinkas added July-15-2004
+                               // New Start of search (after replaced value).
+                               iOffset += lenreal;
+
+                               lennew += i;
+                               iResidualOffset += i;
+                               *lenres += i;
 
                                #ifdef DEBUG_MARKERS
                                   printf( "lennew: %i, Offset: %i\n", lennew, iOffset );
@@ -4755,7 +4769,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                             }
 
                             #ifdef DEBUG_MARKERS
-                               printf( "   Replaced Non Repeatable into Residual Group >%s<, lennew: %i, strlen: %i\n", ptr, lennew, strlen( ptr ) - 2 );
+                               printf( "(1) Replaced Non Repeatable into Residual Group >%s<, lennew: %i, strlen: %i\n", ptr, lennew, strlen( ptr ) - 2 );
                             #endif
 
                             memcpy( expnew, ptr + 1, lennew );
@@ -4785,7 +4799,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                             }
 
                             #ifdef DEBUG_MARKERS
-                               printf( "   Replaced Non Repeatable into Residual Group >%s<, lennew: %i, strlen: %i\n", ptr, lennew, strlen(ptr) - 2 );
+                               printf( "(2) Replaced Non Repeatable into Residual Group >%s<, lennew: %i, strlen: %i\n", ptr, lennew, strlen(ptr) - 2 );
                             #endif
                         #endif
 

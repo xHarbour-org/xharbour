@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.77 2004/06/29 22:14:12 ronpinkas Exp $
+ * $Id: genc.c,v 1.78 2004/07/03 03:34:53 ronpinkas Exp $
  */
 
 /*
@@ -1770,7 +1770,7 @@ static HB_GENC_FUNC( hb_p_poplocal )
 static HB_GENC_FUNC( hb_p_poplocalnear )
 {
    fprintf( cargo->yyc, "\tHB_P_POPLOCALNEAR, %i,",
-            (signed char) pFunc->pCode[ lPCodePos + 1 ] );
+            pFunc->pCode[ lPCodePos + 1 ] );
 
    if( cargo->bVerbose )
    {
@@ -2102,7 +2102,7 @@ static HB_GENC_FUNC( hb_p_pushlocal )
 static HB_GENC_FUNC( hb_p_pushlocalnear )
 {
    fprintf( cargo->yyc, "\tHB_P_PUSHLOCALNEAR, %i,",
-            (signed char) pFunc->pCode[ lPCodePos + 1 ] );
+            pFunc->pCode[ lPCodePos + 1 ] );
 
    if( cargo->bVerbose )
    {
