@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.108 2004/01/07 20:06:57 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.109 2004/01/10 05:51:26 ronpinkas Exp $
  */
 
 /*
@@ -3117,6 +3117,27 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       return 0;
    }
 
+   if( cMarkerType == '4' && strchr( "\"&(['", ( *ptri )[0] ) == NULL )
+   {
+      char *pTmp = strchr( *ptri, ' ' );
+
+      if( pTmp )
+      {
+         lens = pTmp - *ptri;
+
+         if( expreal != NULL )
+         {
+            strncpy( expreal, *ptri, lens );
+            expreal[lens] = '\0';
+
+            *ptri   += lens;
+            expreal += lens;
+         }
+
+         goto Done;
+      }
+   }
+
    State = ( **ptri=='\'' || **ptri=='\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
 
    while( **ptri != '\0' && !rez && lens < maxrez )
@@ -3745,6 +3766,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       *expreal = '\0';
    }
 
+ Done:
    /* Ron Pinkas added 2000-06-21 */
    if( bStrict )
    {
