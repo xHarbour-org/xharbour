@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.57 2003/04/06 05:47:40 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.58 2003/04/07 06:08:42 ronpinkas Exp $
  */
 
 /*
@@ -4660,7 +4660,7 @@ static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
         (*ptri)++;
       }
 
-      printf( ">>>Accepted: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
+      //printf( ">>>Accepted: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
       return FALSE;
   }
 
