@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.53 2003/11/24 15:15:26 lf_sfnet Exp $
+ * $Id: fastitem.c,v 1.54 2003/11/26 13:43:15 jonnymind Exp $
  */
 
 /*
@@ -564,8 +564,6 @@ PHB_ITEM HB_EXPORT hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
    pItem->type = HB_IT_POINTER;
    pItem->item.asPointer.value = pValue;
    pItem->item.asPointer.collect = FALSE;
-   pItem->item.asPointer.fFinalizer = NULL;
-
 
    return pItem;
 }
@@ -590,35 +588,10 @@ PHB_ITEM HB_EXPORT hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
    pItem->type = HB_IT_POINTER;
    pItem->item.asPointer.value = pValue;
    pItem->item.asPointer.collect = TRUE;
-   pItem->item.asPointer.fFinalizer = NULL;
 
    return pItem;
 }
 
-PHB_ITEM HB_EXPORT hb_itemPutPtrFinalizer( PHB_ITEM pItem, void * pValue,
-      PHB_FINALIZER_FUNC pFunc )
-{
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
-
-   if( pItem )
-   {
-      if( HB_IS_COMPLEX( pItem ) )
-      {
-         hb_itemClear( pItem );
-      }
-   }
-   else
-   {
-      pItem = hb_itemNew( NULL );
-   }
-
-   pItem->type = HB_IT_POINTER;
-   pItem->item.asPointer.value = pValue;
-   pItem->item.asPointer.collect = TRUE;
-   pItem->item.asPointer.fFinalizer = pFunc;
-
-   return pItem;
-}
 
 void HB_EXPORT hb_itemFastClear( PHB_ITEM pItem )
 {

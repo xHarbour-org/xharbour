@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.22 2003/07/13 18:10:00 walito Exp $
+ * $Id: hbapiitm.h,v 1.23 2003/11/26 13:43:15 jonnymind Exp $
  */
 
 /*
@@ -140,10 +140,6 @@ extern char     HB_EXPORT * hb_itemString   ( PHB_ITEM pItem, ULONG * ulLen, BOO
 extern PHB_ITEM HB_EXPORT hb_itemValToStr ( PHB_ITEM pItem ); /* Convert any scalar to a string */
 extern char     HB_EXPORT * hb_itemPadConv  ( PHB_ITEM pItem, char * buffer, ULONG * pulSize );
 extern void     HB_EXPORT hb_itemSwap     ( PHB_ITEM pItem1, PHB_ITEM pItem2 );
-
-/* Pointer api */
-PHB_ITEM HB_EXPORT hb_itemPutPtrFinalizer( PHB_ITEM pItem, void * pValue,
-      PHB_FINALIZER_FUNC pFunc );
 
 #if defined(HB_EXTERN_C)
 }

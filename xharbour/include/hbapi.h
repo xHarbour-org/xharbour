@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.96 2003/11/26 05:44:04 jonnymind Exp $
+ * $Id: hbapi.h,v 1.97 2003/11/26 13:43:15 jonnymind Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ extern "C" {
 #define HB_IS_POINTER( p ) HB_IS_OF_TYPE( p, HB_IT_POINTER )
 #define HB_IS_HASH( p )    HB_IS_OF_TYPE( p, HB_IT_HASH )
 #define HB_IS_ORDERABLE( p )    ( ( p )->type & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) )
-#define HB_IS_COMPLEX( p )  ( ( p )->type  && ( HB_IS_STRING( p ) || HB_IS_BLOCK( p ) || HB_IS_ARRAY( p ) || HB_IS_MEMVAR( p ) || HB_IS_POINTER( p )|| HB_IS_HASH( p )) )
+#define HB_IS_COMPLEX( p )  ( ( p )->type  && ( HB_IS_STRING( p ) || HB_IS_BLOCK( p ) || HB_IS_ARRAY( p ) || HB_IS_MEMVAR( p ) || HB_IS_HASH( p )) )
 #define HB_IS_SIMPLE( p ) ( ! HB_IS_COMPLEX( p ) )
 
 #define ISNIL( n )         ( hb_param( n, HB_IT_ANY ) == NULL || HB_IS_NIL( hb_param( n, HB_IT_ANY ) ) ) /* NOTE: Intentionally using a different method */
@@ -430,8 +430,10 @@ extern HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg );
 extern HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend );
 extern HB_EXPORT ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
 extern HB_EXPORT void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
-extern HB_EXPORT PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pDestNullable ); /* Returns a property */
-extern HB_EXPORT void     hb_objSetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pValue ); /* Set a property to a certain value */
+/*#define hb_objGetPropValue( pObj, szProp, pDestNullable ) \
+   if ( pDestNullable == NULL ) \
+   {\
+*/
 extern HB_EXPORT USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
 
 /* dynamic symbol table management */

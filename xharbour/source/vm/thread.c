@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.119 2003/11/26 13:43:15 jonnymind Exp $
+* $Id: thread.c,v 1.120 2003/11/26 21:17:24 ronpinkas Exp $
 */
 
 /*
@@ -1159,17 +1159,21 @@ HB_FUNC( JOINTHREAD )
 
 }
 
-static void hb_threadMutexFinalize( void *pData )
+/* JC1: Compatibility; DestroyMutex does not exists anymore */
+HB_FUNC( DESTROYMUTEX )
 {
 
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *)  pData;
+}
+
+HB_GARBAGE_FUNC( hb_threadMutexFinalize )
+{
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *)  Cargo;
 
    hb_threadUnlinkMutex( Mutex );
 
    HB_MUTEX_DESTROY( Mutex->mutex );
    HB_COND_DESTROY( Mutex->cond );
    hb_arrayRelease( Mutex->aEventObjects );
-
    hb_gcFree( Mutex );
 }
 
@@ -1179,7 +1183,8 @@ HB_FUNC( CREATEMUTEX )
    HB_THREAD_STUB
    HB_MUTEX_STRUCT *mt;
 
-   mt = (HB_MUTEX_STRUCT *) hb_gcAllocPointer( sizeof( HB_MUTEX_STRUCT ) );
+   mt = (HB_MUTEX_STRUCT *)
+      hb_gcAlloc( sizeof( HB_BASEHASH ), hb_threadMutexFinalize );
 
    HB_MUTEX_INIT( mt->mutex );
    HB_COND_INIT( mt->cond );
@@ -1193,7 +1198,7 @@ HB_FUNC( CREATEMUTEX )
 
    hb_threadLinkMutex( mt );
 
-   hb_retptrfin( mt, hb_threadMutexFinalize );
+   hb_retptr( mt );
 }
 
 

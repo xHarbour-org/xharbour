@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1776 2003/11/26 19:43:24 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1777 2003/11/26 20:16:03 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-26 22:59 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapi.h
+  * include/hbapiitm.h
+  * include/hbvmpub.h
+  * source/vm/classes.c
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/garbage.c
+  * source/vm/thread.c
+    ! reverted changes on HB_IT_POINTER structure, using standard GC
+      finalizator instead.
+
+  * tests/mtcomplex.prg
+    * Testing for mutex correct finalization
+
 
 2003-11-26 23:10 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * make_drw.sh
@@ -21,7 +37,7 @@
 
 2003-11-26 20:40 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/hvm.c
-    * using hb_vm_* prefix also in MT for enums and withobject 
+    * using hb_vm_* prefix also in MT for enums and withobject
      (by define aliasing)
 
   * tests/mtcomplex.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.20 2003/11/23 03:13:53 jonnymind Exp $
+ * $Id: hbvmpub.h,v 1.21 2003/11/26 13:43:15 jonnymind Exp $
  */
 
 /*
@@ -164,17 +164,10 @@
        LONG value;
     };
 
-    /* Pointer utility functions */
-    #define HB_FINALIZER_FUNC_( hbfunc )\
-         void hbfunc( void * )
-    typedef HB_FINALIZER_FUNC_( HB_FINALIZER_FUNC );
-    typedef HB_FINALIZER_FUNC *PHB_FINALIZER_FUNC;
-
     struct hb_struPointer
     {
        void * value;
        BOOL collect;
-       PHB_FINALIZER_FUNC fFinalizer;
     };
 
     struct hb_struRefer

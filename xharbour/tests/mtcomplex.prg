@@ -2,7 +2,7 @@
 * Complex example of Multi thread usage
 *
 * Giancarlo Niccolai
-* $Id: mtcomplex.prg,v 1.12 2003/10/19 00:57:54 jonnymind Exp $
+* $Id: mtcomplex.prg,v 1.13 2003/11/26 19:43:27 jonnymind Exp $
 *
 * Here we have a main thread counting, and some secondary
 * threads counting too (in different fashons).
@@ -14,9 +14,11 @@
 PROCEDURE Main()
    LOCAL i
    LOCAL Mutex := CreateMutex()
+   LOCAL Mutex2 := CreateMutex()
    LOCAL Thread4Handle, MonitorHandle
    LOCAL bKill := .F.
 
+   Mutex2 := NIL
    SET OUTPUT SAFETY ON
 
    set color to w+/b
@@ -47,6 +49,7 @@ PROCEDURE Main()
          @ 14, 27 SAY "(Killed 4th. Thread!)" 
       ENDIF
 
+      HB_GCAll( .T. )
       ThreadSleep( 30 )
       IF Inkey() != 0
          bKill := .T.

@@ -1,6 +1,6 @@
 
 /*
- * $Id: garbage.c,v 1.62 2003/11/26 05:44:04 jonnymind Exp $
+ * $Id: garbage.c,v 1.64 2003/11/26 14:03:14 jonnymind Exp $
  */
 
 /*
@@ -148,13 +148,6 @@ static void hb_gcUnlink( HB_GARBAGE_PTR *pList, HB_GARBAGE_PTR pAlloc )
    {
       *pList = NULL;    /* this was the last block */
    }
-}
-
-
-/* allocates a memory block */
-void * hb_gcAllocPointer( ULONG ulSize )
-{
-   return hb_gcAlloc( ulSize, hb_gcGripRelease );
 }
 
 /* allocates a memory block */
@@ -334,14 +327,6 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 
       if( pAlloc->pFunc == hb_gcGripRelease )
       {
-         if( HB_IS_POINTER( pItem ) && pItem->item.asPointer.fFinalizer )
-         {
-            pItem->item.asPointer.fFinalizer( pItem->item.asPointer.fFinalizer );
-         }
-         else if( HB_IS_HASH( pItem ) && pItem->item.asHash.value )
-         {
-            hb_hashRelease( pItem );
-         }
          if( HB_IS_COMPLEX( pItem ) )
          {
             hb_itemClear( pItem );    /* clear value stored in this item */

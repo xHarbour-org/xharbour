@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.28 2003/10/01 17:41:47 paultucker Exp $
+ * $Id: extend.c,v 1.29 2003/11/26 13:43:15 jonnymind Exp $
  */
 
 /*
@@ -67,9 +67,6 @@
  * Copyright 2002 Marek Paliwoda <paliwoda@inetia.pl>
  *    hb_parptr()
  *    hb_retptr()
- *
- * Copyright 2003 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
- *    hb_retptrfin()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -826,12 +823,6 @@ void HB_EXPORT hb_retnllen( long lNumber, int iWidth )
 void hb_retptr( void *voidPtr )
 {
    hb_itemPutPtrGC( &(HB_VM_STACK.Return), voidPtr );
-}
-
-#undef hb_retptrfin
-void hb_retptrfin( void *voidPtr, PHB_FINALIZER_FUNC fin )
-{
-   hb_itemPutPtrFinalizer( &(HB_VM_STACK.Return), voidPtr, fin );
 }
 
 void HB_EXPORT hb_storc( char * szText, int iParam, ... )
