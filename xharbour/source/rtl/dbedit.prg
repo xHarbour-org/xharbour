@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.11 2003/11/23 20:23:55 maurifull Exp $
+ * $Id: dbedit.prg,v 1.12 2003/12/07 03:06:05 maurifull Exp $
  */
 
 /*
@@ -139,7 +139,7 @@ Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
       bFun := {|| "  <Memo>  "}
     End
 
-    If HB_ISARRAY(xHdr) .And. Empty(xHdr[i])  // handle empty column headers
+    If HB_ISARRAY(xHdr) .And. HB_ISNIL(xHdr[i])  // handle empty column headers
       IIf(HB_ISSTRING(aCols[i]), xHdr[i] := aCols[i], "<block>")
     End
 

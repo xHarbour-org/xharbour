@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1835 2003/12/08 01:36:06 mlombardo Exp $
+ * $Id: ChangeLog,v 1.1836 2003/12/09 00:50:24 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-08 23:37 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/dbedit.prg
+    ! Fixed column titles to be Clipper compatible
+      Clipper lets title empty when aHeader[column] == ""
 
 2003-12-08 16:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbset.h
