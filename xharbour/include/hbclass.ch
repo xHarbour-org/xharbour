@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.14 2004/03/02 01:58:54 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.15 2004/03/03 11:41:10 ronpinkas Exp $
  */
 
 /*
@@ -113,7 +113,17 @@ DECLARE HBClass ;
         AddVirtual( cName AS String )
 
 #xtranslate __ERR([<msg,...>]) => #error [<msg>]
-#xtranslate )() => )
+
+/*
+   TOO General, was matching:
+
+   &( MacroFunc )()
+
+   Commented and replaced with the more specific trailing 2 rules.
+*/
+//#xtranslate )() => )
+#xcommand _HB_MEMBER <MethodName>([<params,...>])() [<*x*>] => _HB_MEMBER <MethodName>(<params>) <x>
+#xtranslate @<!funcname!>([<params,...>])() => @<funcname>(<params>)
 
 #ifdef HB_CLS_NOTOBJECT
  #define __HB_CLS_PAR  __CLS_PAR00
