@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.16 2004/01/28 07:04:28 andijahja Exp $
+ * $Id: hbusage.c,v 1.17 2004/03/31 19:29:46 likewolf Exp $
  */
 
 /*
@@ -168,6 +168,7 @@ void hb_compPrintCredits( void )
            "Ignacio Ortiz de Zuniga <ignacio@fivetech.com>\n"
            "Janica Lubos <janica@fornax.elf.stuba.sk>\n"
            "Jean-Francois Lefebvre (mafact) <jfl@mafact.com>\n"
+           "Jose F. Gimenez <jfgimenez@wanadoo.es>\n"
            "Jose Lalin <dezac@corevia.com>\n"
            "Leslee Griffith <les.griffith@vantagesystems.ca>\n"
            "Lorenzo Fiorini <lorenzo_fiorini@tin.it>\n"
@@ -178,6 +179,7 @@ void hb_compPrintCredits( void )
            "Matthew Hamilton <mhamilton@bunge.com.au>\n"
            "Mauricio Abre <maurifull@datafull.com>\n"
            "Maurilio Longo <maurilio.longo@libero.it>\n"
+           "Mindaugas Kavaliauskas <dbtopas@dbtopas.lt>\n"
            "Nicolas del Pozo <niko@geroa.com>\n"
            "Patrick Mast <harbour@winfakt.com>\n"
            "Paul Tucker <ptucker@sympatico.ca>\n"
@@ -189,8 +191,10 @@ void hb_compPrintCredits( void )
            "Przemyslaw Czerpak <druzus@polbox.com>\n"
            "Ron Pinkas <ron@profit-master.com>\n"
            "Ryszard Glab <rglab@imid.med.pl>\n"
+           "Sylvain Robert <s.robert@videotron.ca>\n"
            "Tim Stone <timstone@mstrlink.com>\n"
            "Tommi Rouvali <tommi@rouvali.com>\n"
+           "Vicente Guerra <vicente@guerra.com.mx>\n"
            "Viktor Szakats <viktor.szakats@syenar.hu>\n"
            "Vladimir Kazimirchik <v_kazimirchik@yahoo.com>\n"
            "Walter Negro <anegro@overnet.com.ar>\n"
