@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2487 2004/03/04 21:49:44 peterrees Exp $
+ * $Id: ChangeLog,v 1.2488 2004/03/04 21:51:50 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-05 05:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/direct.c
+    % Ref my previous changes. I commited the wrong file :(.
+      The correct one now commited.
+
 2004-03-05 04:55 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/hbffind.c
     ! minor fix to be more Clipper compatible when Directory( "C:", "V" )

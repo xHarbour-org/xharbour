@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.37 2004/03/04 09:12:29 paultucker Exp $
+ * $Id: direct.c,v 1.38 2004/03/04 21:51:50 andijahja Exp $
  */
 
 /*
@@ -342,7 +342,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
                sFileName++;
             }
 
-            if( hb_strMatchRegExpDir( (const char *) sFileName, (const char *) sRegEx, ui == 0 ) )
+            if( hb_strMatchRegExpDir( (const char *) sFileName, (const char *) sRegEx, FALSE ) )
             {
                hb_arrayAddForward( pResult, pEntry );
             }
@@ -380,6 +380,10 @@ void HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char 
    hb_fsDirectory( &Dir, szSkleton, szAttributes, FALSE, TRUE );
 
    hb_arrayNew( pResult, 0 );
+
+   /* initialize regex */
+   hb_strMatchRegExpDir( (const char *) szFName, (const char *) sRegEx, TRUE );
+
    hb_fsDirectoryCrawler( &Dir, pResult, szFName, szAttributes, sRegEx );
 
    /* reset regex for next loop */
