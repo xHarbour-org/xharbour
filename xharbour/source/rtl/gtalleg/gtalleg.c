@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.25 2004/07/21 22:09:22 maurifull Exp $
+ * $Id: gtalleg.c,v 1.26 2004/07/28 19:48:49 maurifull Exp $
  */
 
 /*
@@ -92,7 +92,7 @@ static ULONG s_clipsize = 0;
 #define s_usVBorder 0
 
 typedef struct {
-   char al_key;
+   int al_key;
    int xhb_key;
 } gtAllegKey;
 
@@ -148,6 +148,22 @@ static const gtAllegKey sKeyTable[GT_KEY_TABLE_SIZE] = {
    {AL_KEY_F10,    K_F10},
    {AL_KEY_F11,    K_F11},
    {AL_KEY_F12,    K_F12}
+};
+
+#define GT_CTRL_TABLE_SIZE 11
+
+static const gtAllegKey sCtrlTable[GT_CTRL_TABLE_SIZE] = {
+   {AL_KEY_LEFT,   K_CTRL_LEFT},
+   {AL_KEY_RIGHT,  K_CTRL_RIGHT},
+   {AL_KEY_UP,     K_CTRL_UP},
+   {AL_KEY_DOWN,   K_CTRL_DOWN},
+   {AL_KEY_QUOTE,  K_CTRL_PRTSCR},
+   {AL_KEY_INSERT, K_CTRL_INS},
+   {AL_KEY_DEL,    K_CTRL_DEL},
+   {AL_KEY_HOME,   K_CTRL_HOME},
+   {AL_KEY_END,    K_CTRL_END},
+   {AL_KEY_PGUP,   K_CTRL_PGUP},
+   {AL_KEY_PGDN,   K_CTRL_PGDN}
 };
 
 #define GT_UPD_RECT(t,l,b,r) if (t<s_usUpdTop) s_usUpdTop=t; if (l<s_usUpdLeft) s_usUpdLeft=l; if (b>s_usUpdBottom) s_usUpdBottom=b; if (r>s_usUpdRight) s_usUpdRight=r;
@@ -1509,7 +1525,37 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
          nKey = al_read_key();
       }
 
-      if ( nKey & 255 )
+#ifdef DEBUG
+   if (!lKey && nKey != 0)
+//   if (nKey != 0)
+   {
+//     Good standard debuging...
+       printf("gtAlleg: Scancode: %d (0x%0x) ascii: %d (0x%0x) raw: %d (0x%0x)\n", nKey>>8, nKey>>8, nKey&0xff, nKey&0xff, nKey, nKey);
+   }
+#endif
+
+      if ( ( ( nKey & 255 ) == 2 || ( nKey & 255 ) == 3 )  && ( nKey >> 8 ) > 31 )  // K_CTRL_ + navigation key
+      {
+         for ( i = 0; i < GT_CTRL_TABLE_SIZE; i++ )
+         {
+            if ( ( nKey >> 8 ) == sCtrlTable[i].al_key )
+            {
+               nKey = sCtrlTable[i].xhb_key;
+	       lKey = TRUE;
+               break;
+            }
+         }
+      }
+      else if ( ( nKey & 255 ) < 32 && ( nKey & 255 ) == ( nKey >> 8 ) )  // K_CTRL_A .. Z
+      {
+#ifdef HB_NEW_KCTRL
+        nKey = 512 + ( nKey & 255 );
+#else
+        nKey = nKey & 255;
+#endif
+	lKey = TRUE;
+      }
+      else if ( nKey & 255 )
       {
          nKey = nKey & 255;
 	 lKey = TRUE;
@@ -1527,15 +1573,6 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
          }
       }
    }
-
-#ifdef DEBUG
-//   if (!lKey && nKey != 0)
-   if (nKey != 0)
-   {
-//     Good standard debuging...
-       printf("gtAlleg: Unhandled Key, scancode: %d (0x%0x) ascii: %d (0x%0x)\n", nKey>>8, nKey>>8, nKey&0xff, nKey&0xff);
-   }
-#endif
 
    return nKey;
 }
@@ -1716,7 +1753,7 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
             lClearInit = ( s_pbyScrBuffer == NULL );
             HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
          }
-      return iOldValue;
+         return iOldValue;
 
       case GTI_SCREENDEPTH:
          iOldValue = ( s_pbyScrBuffer == NULL ? al_desktop_color_depth() : al_bitmap_color_depth( al_screen ) );
@@ -1729,7 +1766,7 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
             lClearInit = ( s_pbyScrBuffer == NULL );
             HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
          }
-      return iOldValue;
+         return iOldValue;
 
       case GTI_FONTSIZE:
          iOldValue = s_byFontSize;
@@ -1740,27 +1777,36 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
             lClearInit = ( s_pbyScrBuffer == NULL );
             HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
          }
-      return iOldValue;
+         return iOldValue;
 
       case GTI_FONTWIDTH:
          return s_byFontWidth;
 
       case GTI_DESKTOPWIDTH:
          al_get_desktop_resolution( &iWidth, &iHeight );
-      return iWidth;
+         return iWidth;
 
       case GTI_DESKTOPHEIGHT:
          al_get_desktop_resolution( &iWidth, &iHeight );
-      return iHeight;
+         return iHeight;
 
       case GTI_DESKTOPDEPTH:
          return al_desktop_color_depth();
 
+      case GTI_KBDSHIFTS:
+         iOldValue = al_key_shifts;
+	 if ( bUpdate )
+         {
+	    al_set_keyboard_leds( iParam );
+         }
+         return iOldValue;
+
       case GTI_WINTITLE:
-      {
-         al_set_window_title( (char *) vpParam );
-         return 1;
-      }
+         if ( b Update )
+         {
+            al_set_window_title( (char *) vpParam );
+            return 1;
+         }
    }
 
    // DEFAULT: there's something wrong if we are here.

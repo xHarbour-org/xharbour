@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3243 2004/07/30 16:37:28 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3244 2004/07/30 18:23:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-30 19:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * include/gtinfo.ch
+    + GTI_KBDSHIFTS for query/update kbd shifts state
+      (update only for NUM, CAPS & SCROLL locks)
+    + GTI_KBD_* constants
+      To be ANDed with returned gtInfo() value or ORed to change led keys
+  * source/rtl/gtalleg/gtalleg.c
+    + K_CTRL_* codes handling
+    + GTI_KBDSHIFTS implementation
+  * tests/gtinfo.prg
+    + Asyncrhonous update of kbd state
 
 2004-07-30 11:21 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/vm/arrayshb.c

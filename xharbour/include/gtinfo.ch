@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.6 2004/07/27 16:56:15 lf_sfnet Exp $
+ * $Id: gtinfo.ch,v 1.7 2004/07/29 14:33:10 lf_sfnet Exp $
  */
 
 /*
@@ -69,6 +69,7 @@
 #define GTI_DESKTOPWIDTH   6  /* Get width of desktop in pixels */
 #define GTI_DESKTOPHEIGHT  7  /* Get height of desktop in pixels */
 #define GTI_DESKTOPDEPTH   8  /* Amount of bits used for colors in system */
+#define GTI_KBDSHIFTS     10  /* Keyboard shift/ctrl/alt, caps/num/scroll & winkeys state */
 #define GTI_DESKTOPROWS   20  /* Get Size of desktop in character rows */
 #define GTI_DESKTOPCOLS   21  /* Get Size of desktop in character cols */
 #define GTI_FONTWEIGHT    22  /* Get/set the weight of the font used in application */
@@ -94,5 +95,21 @@
 #define GTI_FONTQ_DRAFT    1
 #define GTI_FONTQ_NORMAL   2
 #define GTI_FONTQ_HIGH     3
+
+/* Keyboard shifts states */
+#define GTI_KBD_SHIFT         1
+#define GTI_KBD_CTRL          2
+#define GTI_KBD_ALT           4
+#define GTI_KBD_LWIN          8
+#define GTI_KBD_RWIN         16
+#define GTI_KBD_MENU         32
+#define GTI_KBD_SCROLOCK    256
+#define GTI_KBD_NUMLOCK     512
+#define GTI_KBD_CAPSLOCK   1024
+#define GTI_KBD_INALTSEQ   2048
+#define GTI_KBD_ACCENT1    4096
+#define GTI_KBD_ACCENT2    8192
+#define GTI_KBD_ACCENT3   16384
+#define GTI_KBD_ACCENT4   32768
 
 #endif /* HB_GTINFO_CH_ */

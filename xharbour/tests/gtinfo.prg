@@ -2,7 +2,7 @@
  * Test to query/set properties for graphics gts
  * Under textual gts it should only properly quit
  *
- * $Id: gtinfo.prg,v 1.3 2004/02/19 23:43:10 jonnymind Exp $
+ * $Id: gtinfo.prg,v 1.4 2004/07/28 19:48:50 maurifull Exp $
  */
 #include "gtinfo.ch"
 
@@ -18,10 +18,12 @@ Local nOp
    End
 
    SetColor("w+/b,b/w")
+   hb_idleAdd({|| updKeys()})
 
    While .T.
       CLEAR SCREEN
       gtInfo(GTI_WINTITLE, "gtInfo() api demonstration program")
+      updKeys(.T.)
       @ 3, 5 Say "Desktop Resolution: " + ;
                AllTrim(Str(GTInfo(GTI_DESKTOPWIDTH))) + "x" + ;
             AllTrim(Str(GTInfo(GTI_DESKTOPHEIGHT))) + "x" + ;
@@ -95,4 +97,32 @@ Local nOp
 	    End
       End
    End
+Return Nil
+
+Function updKeys(lPar)
+Static aKeys := Nil, lInit := .F.
+Local i, aNewKeys, nY := Row(), nX := Col()
+
+  If !lInit .Or. !Empty(lPar)
+    @ MaxRow(), MaxCol() - 36 Say "SHF   CTR   ALT   NUM   CAP   SCR   " Color "w+/b"
+    aKeys := {0, 0, 0, 0, 0, 0}
+    lInit := .T.
+  End
+
+  i := gtInfo(GTI_KBDSHIFTS)
+  aNewKeys := {i & GTI_KBD_SHIFT,;
+               i & GTI_KBD_CTRL,;
+	       i & GTI_KBD_ALT,;
+	       i & GTI_KBD_NUMLOCK,;
+	       i & GTI_KBD_CAPSLOCK,;
+	       i & GTI_KBD_SCROLOCK}
+
+  For i := 1 To Len(aNewKeys)
+    If aNewKeys[i] != aKeys[i]
+      @ MaxRow(), MaxCol() - 2 - ((6 - i) * 6) Say IIf(aNewKeys[i] == 0, ' ', '*') Color "g+/b"
+      aKeys[i] := aNewKeys[i]
+    End
+  Next
+
+  SetPos(nY, nX)
 Return Nil
