@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.20 2003/03/16 07:28:31 jonnymind Exp $
+* $Id: inet.c,v 1.21 2003/03/16 15:03:37 jonnymind Exp $
 */
 
 /*
@@ -57,9 +57,16 @@
 #include <fcntl.h>
 
 #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE ) || defined( HB_OS_BSD )
-	#include <sys/time.h>
+   #include <sys/time.h>
 #endif
 
+#ifdef HB_OS_LINUX
+   #include <signal.h>
+void hb_inetLinuxSigusrHandle( int sig )
+{
+   // nothing to do
+}
+#endif
 
 #ifndef HB_NO_DEFAULT_INET
 static int s_iSessions = 0;
@@ -144,6 +151,7 @@ int hb_selectWriteExceptSocket( HB_SOCKET_STRUCT *Socket )
    }
    return 0;
 }
+
 
 /*** Utilty to access host DNS */
 struct hostent *hb_getHosts( char *name, HB_SOCKET_STRUCT *Socket )
@@ -297,6 +305,8 @@ HB_FUNC( INETINIT )
       #if defined(HB_OS_WIN_32)
          WSADATA wsadata;
          WSAStartup( MAKEWORD(1,1), &wsadata );
+      #elif defined( HB_OS_LINUX )
+         signal( SIGUSR1, hb_inetLinuxSigusrHandle );
       #endif
    }
 }
@@ -354,6 +364,10 @@ HB_FUNC( INETCLOSE )
       hb_retni( HB_INET_CLOSE( Socket->com ) );
 
       Socket->com = 0;
+      #ifdef HB_OS_LINUX
+         kill( 0, SIGUSR1);
+      #endif
+      hb_retni( 0 );
    }
    else
    {
@@ -1504,7 +1518,6 @@ HB_FUNC( INETACCEPT )
       NewSocket->com = 0;
       HB_SOCKET_SET_ERROR2( NewSocket, -1, "Timeout" );
    }
-   
    HB_STACK_LOCK;
       
    if( NewSocket->com == -1 )
