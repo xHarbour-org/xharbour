@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.11 2002/09/21 05:21:07 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.12 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -57,6 +57,10 @@
 #include "hbvm.h"
 #include "hbstack.h"
 
+#ifdef HB_THREAD_SUPPORT
+   extern HB_CRITICAL_T hb_gcCollectionMutex;
+#endif
+
 extern PHB_ITEM **hb_vm_pGlobals;
 extern short hb_vm_iGlobals;
 
@@ -107,10 +111,8 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
 
       while( uiLocals-- )
       {
-         /* Swap the current value of local variable with the reference to this
-          * value.
-          * TODO: If Harbour will support threads in the future then we need
-          * to implement some kind of semaphores here.
+         /*
+          * Swap the current value of local variable with the reference to this value.
           */
          pLocal = hb_stackItemFromBase( *pLocalPosTable++ );
 
@@ -237,6 +239,10 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
    if( pCBlock && (--pCBlock->ulCounter == 0) )
    {
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+      #endif
+
       if( pCBlock->pLocals )
       {
          USHORT ui = pCBlock->uiLocals;
@@ -267,6 +273,10 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
       /* free space allocated for a CODEBLOCK structure
       */
       hb_gcFree( pCBlock );
+
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+      #endif
    }
 }
 

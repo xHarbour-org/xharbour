@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.34 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: arrays.c,v 1.35 2002/12/29 08:32:41 ronpinkas Exp $
  */
 
 /*
@@ -75,6 +75,10 @@
 #include "hbapilng.h"
 #include "hbvm.h"
 #include "hbstack.h"
+
+#ifdef HB_THREAD_SUPPORT
+   extern HB_CRITICAL_T hb_gcCollectionMutex;
+#endif
 
 extern char *hb_vm_acAscii[256];
 
@@ -796,6 +800,10 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
 
       HB_TRACE( HB_TR_DEBUG, ( "pBaseArray %p", pBaseArray ) );
 
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+      #endif
+
       /* Release object tree as needed */
       if( pBaseArray->puiClsTree )
       {
@@ -850,6 +858,10 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
 
       pArray->type = HB_IT_NIL;
       pArray->item.asArray.value = NULL;
+
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+      #endif
 
       //printf( "\nDone! hb_arrayRelease(%p) %p", pArray, pArray->item.asArray.value );
       return TRUE;

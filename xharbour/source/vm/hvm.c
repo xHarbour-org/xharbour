@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.137 2002/12/29 08:32:42 ronpinkas Exp $
+ * $Id: hvm.c,v 1.138 2002/12/29 17:55:42 ronpinkas Exp $
  */
 
 /*
@@ -503,7 +503,6 @@ void HB_EXPORT hb_vmQuit( void )
 
    #ifdef HB_THREAD_SUPPORT
        hb_threadExit();
-       HB_CRITICAL_DESTROY( hb_gcCollectionMutex );
    #endif
    //printf( "After Thread\n" );
 
@@ -581,6 +580,10 @@ void HB_EXPORT hb_vmQuit( void )
 
    hb_xexit();
    //printf( "After xexit\n" );
+
+   #ifdef HB_THREAD_SUPPORT
+       HB_CRITICAL_DESTROY( hb_gcCollectionMutex );
+   #endif
 
    exit( s_byErrorLevel );
 }
