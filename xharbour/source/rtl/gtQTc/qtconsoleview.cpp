@@ -3,7 +3,8 @@
                              -------------------
     begin                : dom nov 17 13:34:51 CET 2002
     copyright            : (C) 2002 by Giancarlo
-    email                : 
+    email                :
+    $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -24,7 +25,7 @@
 QTconsoleView::QTconsoleView(QWidget *parent, QTconsoleDoc *doc) : QWidget(parent)
 {
   /** connect doc with the view*/
-  connect(doc, SIGNAL(documentChanged()), this, SLOT(slotDocumentChanged()));
+  connect(doc, SIGNAL(documentChanged( QRect )), this, SLOT(slotDocumentChanged( QRect )));
   pDoc = doc;
   // set the font to a default
   set_font( new QFont( "Courier", 12 ) );
@@ -44,12 +45,10 @@ QTconsoleView::~QTconsoleView()
 	delete blinker;
 }
 
-void QTconsoleView::slotDocumentChanged()
+void QTconsoleView::slotDocumentChanged( QRect r )
 {
 	// find a smarter repaint
-
-	//repaint( calcRectOfChars( pDoc->_rectMody), false );
-   update( calcRectOfChars( pDoc->_rectMody) );
+   update( calcRectOfChars( r ) );
 }
 
 
@@ -67,7 +66,7 @@ void QTconsoleView::paintEvent( QPaintEvent *e )
 
 	QString bufstring;
 
-	
+
 	int olda1 = -1;
 	int olda2 = -1;
 	int charp = 0;
@@ -97,7 +96,7 @@ void QTconsoleView::paintEvent( QPaintEvent *e )
 			p.setPen( NoPen );
 			p.drawRect( posx, posy , cellWidth( c ), cellHeight() );
 			// draw cursor
-			if ( pDoc->getCursX() == col && pDoc->getCursY() == row && blinkStatus) {
+			if ( pDoc->getCursX() == col && pDoc->getCursY() == row && blinkStatus == 1) {
 				//TODO: change this with a better cursor drawing function
 				// that takes care of reversing color of character
 				QBrush oldb = p.brush();
@@ -106,13 +105,13 @@ void QTconsoleView::paintEvent( QPaintEvent *e )
 				p.setBrush( oldb );
 			}
 			// draw character only if not blinking
-			if ( c && !( ( attr & 0x80 ) && blinkStatus == 0 )  ) {
+			if ( c && !( ( attr & 0x80 ) && blinkStatus <= 0 )  ) {
 				p.setPen( pen );
 				p.drawText( posx, posy+_fmetric->ascent() , QChar( c ) );
 			}
 		}
 	}
-	
+
 }
 /** Read property of QFont * _font. */
 const QFont * QTconsoleView::get_font(){
@@ -218,13 +217,11 @@ void QTconsoleView::slotBlink()
 		int pr = i * pDoc->cols() * 2;
 		for ( int j = 0; j < pDoc->cols()*2; j+=2 ) {
 			if ( (pDoc->buffer[j + pr] & 0x80) )  {
-				//repaint( calcRectOfChars( j/2, i, 1, 1), false );
             update( calcRectOfChars( j/2, i, 1, 1) );
          }
 		}
 	}
 	// repaint cursor
-	//repaint( calcRectOfChars( pDoc->getCursX(), pDoc->getCursY(), 1, 1), false );
    update( calcRectOfChars( pDoc->getCursX(), pDoc->getCursY(), 1, 1) );
 }
 

@@ -26,22 +26,11 @@ QTconsoleDoc::QTconsoleDoc()
   // set initial cursor position
   cursX = 0;
   cursY = 0;
-  _rectCommited = false;
+  _rectCommited = true;
   _changing = 0;
   int size = _cols * 2 * _rows;
   buffer = new char[ size ];
   setAttrib( 0x07 );
-  clearScr( );
-  /*
-  setAttrib( 0x2f );
-  write( 1,1, "Una scritta all'inizio");
-  write( 30, 12, "Una scritta a meta'" );
-  write( 60, 24, "Una scritta alla fine" );
-  // blinking!
-  setAttrib( 0x80 + 0x2f );
-  write( 70, 10, "Una scritta invisibile" );
-  gotoXY( 75, 24 );
-  write( "Una stringa che deve andare a scrollare tutto il video!\n\r");*/
 }
 
 QTconsoleDoc::~QTconsoleDoc()
@@ -66,7 +55,7 @@ bool QTconsoleDoc::saveAs(const QString &filename)
 
 bool QTconsoleDoc::load(const QString &filename)
 {
-  emit documentChanged();
+  emit documentChanged( QRect( 0,0, _cols, _rows) );
   return true;
 }
 
@@ -86,6 +75,22 @@ void QTconsoleDoc::clearScr( unsigned char attrib )
 		pos ++;
 	}
 	rectChanging( QRect( 0,0, _cols, _rows ) );
+	setModified();
+}
+
+void QTconsoleDoc::clearScr( unsigned char attrib, int left, int top, int width, int height )
+{
+   for ( int i = 0; i < height; i ++ ) {
+      char *pos = buffer + ( ( i + top ) * _cols + left)  *2;
+      char *size = pos + width * 2;
+      while ( pos < size )  {
+         *pos = (char) attrib;
+         pos ++;
+         *pos = 0;
+         pos ++;
+      }
+   }
+	rectChanging( QRect( left, top, width, height ) );
 	setModified();
 }
 
@@ -137,7 +142,7 @@ bool QTconsoleDoc::read( int x, int y, char *data, int width, int height )
 	for (int i = 0; i < height; i ++ ) {
 		char *pos = buffer + ((_cols * (y+i) +x )* 2 )+1;
 		char *end = buffer + ((_cols * (y+i) +x + width)* 2 )+1;
-	
+
 		while ( pos < end ) {
 			*data = *pos;
 			pos+=2;
@@ -168,10 +173,12 @@ bool QTconsoleDoc::readAttrib( int x, int y, char *attr )
 /** Writes a single attribute*/
 bool QTconsoleDoc::writeAttrib( int x, int y, char attr )
 {
-	if ( x < 0 || x >= _cols || y < 0 || y >= _rows ) return false;
+   if ( x < 0 || x >= _cols || y < 0 || y >= _rows ) return false;
 
-	buffer[ ((_cols * y +x )* 2 )] = attr;
-	return true;
+   buffer[ ((_cols * y +x )* 2 )] = attr;
+   rectChanging( QRect(x, y, 1, 1 ) );
+   setModified();
+   return true;
 }
 
 /** Write Multiline data block of data from the buffer */
@@ -244,7 +251,7 @@ bool QTconsoleDoc::setMem( int x, int y, char *data, int width, int height )
 	return true;
 }
 
-/** Adds a rectangle to the current modify area, that will be notified when the 
+/** Adds a rectangle to the current modify area, that will be notified when the
 changes are comited to the views with setModified( true ) or endChanging() */
 void QTconsoleDoc::rectChanging( QRect r )
 {
@@ -253,12 +260,13 @@ void QTconsoleDoc::rectChanging( QRect r )
 		_rectCommited = false;
 	}
 	else
-		_rectMody = _rectMody.unite( r );
+		_rectMody |=  r;
 }
+
 /** Scroll the text of a defined number of lines... */
 bool QTconsoleDoc::scroll( int lines )
 {
-	if ( lines <= 0 ) return false;
+	if ( lines <= 0 ) lines = _rows;
 	if ( lines > _rows ) lines = _rows;
 
 	int rest = _rows - lines;
@@ -266,14 +274,37 @@ bool QTconsoleDoc::scroll( int lines )
 	if ( rest ) {
 		char *data = new char [rest * _cols * 2];
 		getMem(0, lines, data, _cols, rest );
-		clearScr( );
+		clearScr( getAttrib() );
 		setMem(0,0, data, _cols, rest );
 		delete data;
 	}
 	else
-		clearScr( );
-		
+		clearScr( getAttrib() );
+
 	return true;
+}
+
+bool QTconsoleDoc::scroll(int top, int left, int bottom, int right, char attr,
+      int vert, int horiz )
+{
+   int width = right - left+1;
+   int height = bottom - top+1;
+
+   if ( width < 0 || height < 0 ) return false;
+
+   if ( vert == 0 && horiz == 0 ) {
+      if ( height == _rows && width == _cols )
+         clearScr( attr );
+      else
+         clearScr( attr, left, top, width, height );
+      return true;
+   }
+
+   if ( abs( vert ) >= height || abs( horiz ) >= width ) {
+      clearScr( attr, left, top, width, height );
+      return true;
+   }
+   return false;
 }
 
 /** Writes a "teletype" character, acting as a console */
@@ -291,7 +322,7 @@ bool QTconsoleDoc::write( char c )
 		case 13: cursX = 0; break;
 		case 10: cursY++; break;
 		case 9: cursX += 8; break;
-		case 12: clearScr( ); break;
+		case 12: clearScr( getAttrib() ); break;
 		case 8:
 			cursX--;
 			if ( cursX < 0 ) {
@@ -321,9 +352,8 @@ bool QTconsoleDoc::write( char c )
 		scroll();
 	}
 	// add the character and following character (cursor) to be modified
-	rectChanging( QRect(oldCursX, oldCursY, oldCursX - cursX+1, oldCursX - cursY+1) );
+	rectChanging( QRect(oldCursX, oldCursY, cursX - oldCursX +1, cursY - oldCursY +1) );
 	endChanging();
-
 	return true;
 }
 

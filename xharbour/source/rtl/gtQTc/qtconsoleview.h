@@ -35,8 +35,7 @@ class QTconsoleView : public QWidget
 protected:
 
   virtual void paintEvent( QPaintEvent *e );
-  //virtual void keyPressEvent( QKeyEvent *e );
-  
+
   public:
     QTconsoleView(QWidget *parent=0, QTconsoleDoc* doc=0);
     ~QTconsoleView();
@@ -76,6 +75,7 @@ protected:
   QRect charsFromRect( const QRect &r ) {
 	  return charsFromRect( r.x(), r.y(), r.width(), r.height() );
 	  }
+
 	
 private: // Private attributes
   /** Font of the window */
@@ -84,7 +84,7 @@ private: // Private attributes
   QFontMetrics * _fmetric;
 
 protected slots:
-    void slotDocumentChanged();
+    void slotDocumentChanged( QRect );
   /** Changes the status of the cursor and the blinking characters, and call repaint to update the areas. */
   void slotBlink();
   

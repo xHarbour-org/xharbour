@@ -3,7 +3,7 @@
 *
 * (C) 2003 Giancarlo Niccolai & Ron Pinkas
 *
-* $Id$
+* $Id: mtgc.prg,v 1.8 2003/02/01 12:45:36 jonnymind Exp $
 *
 * This programs allocates Garbage Collectable objects in
 * subthreads, and force the collection in a crossed thread
@@ -22,10 +22,12 @@ PROCEDURE Main()
 
   LOCAL nStart := Seconds()
 
+  set color to w+/b
   CLEAR SCREEN
   Mutex := CreateMutex()
 
-  // 1st param is the Startup Function, 2nd. is Self if 1st param is a Method or NIL otherwise,
+  // 1st param is the Startup Function, 2nd. is Self if 1st param 
+  // is a Method or NIL otherwise,
   // rest are paramaters to be passed to the Function/Method.
   StartThread ( @MyThreadFunc(), 2, "1st Thread:",     0,  5000 )
   StartThread ( @MyThreadFunc(), 4, "2nd Thread:",  5000, 10000 )
@@ -49,13 +51,16 @@ PROCEDURE MyThreadFunc( nRow, cName, nStart, nMax )
      IF nRow < 10
         aVar := { 1 }
         aVar[1] := Array( 50 )
-        aVar[1][1] := aVar
+        *aVar[1][1] := aVar
         aVar := NIL
 
         @ nRow, 40 SAY "Before:" + Str( Memory( HB_MEM_USED ) )
-        HB_GCALL( .T. )
+        IF nRow == 2
+           HB_GCALL( .T. )
+        ENDIF
         @ nRow, 60 SAY "After:" + Str( Memory( HB_MEM_USED ) )
      ENDIF
+
   NEXT
 
 RETURN

@@ -48,6 +48,9 @@ class QTconsoleDoc : public QObject
   /** Clears virtual screen with a given background color (default black ) */
   void clearScr( unsigned char attrib );
   void clearScr() { clearScr( _attrib ); }
+  void clearScr( unsigned char attrib, int top, int left, int width, int heigth );
+  bool scroll(int top, int left, int bottom, int right, char attr,
+      int vert, int horiz );
     
 
     // todo, make it private
@@ -92,17 +95,11 @@ class QTconsoleDoc : public QObject
 
   void gotoXY( int x, int y )
   {
-	  // signal that the cursor has moved
-	  _rectMody = QRect( cursX, cursY, 1 , 1 );
 	  cursX = x;
 	  cursY = y;
-	  emit documentChanged();
-	  // signal where the cursor had moved
-	  _rectMody = QRect( cursX, cursY, 1 , 1 );
-	  emit documentChanged();
-	  
+	  setModified();
    }
-  /** Adds a rectangle to the current modify area, that will be notified when the 
+  /** Adds a rectangle to the current modify area, that will be notified when the
 changes are comited to the views with setModified( true ) or endChanging() */
   void rectChanging( QRect r );
 
@@ -118,16 +115,16 @@ changes are comited to the views with setModified( true ) or endChanging() */
 			setModified();
 		}
 	}
-	
+
   /** Scroll the text of a defined number of lines... */
   bool scroll( int lines = 1 );
-	
+
   signals:
-    void documentChanged();
+    void documentChanged( QRect );
 
   protected:
     bool modified;
-    
+
   /** This variables contains the screen buffer, organized as a normal screen buffer.
  */
 private: // Private attributes
@@ -140,8 +137,8 @@ private: // Private attributes
 		if ( _changing ) return;
 		modified = t;
 		if ( t ) {
-			emit documentChanged();
-			_rectCommited = false;
+			emit documentChanged( _rectMody );
+			_rectCommited = true;
 		}
 	}
 

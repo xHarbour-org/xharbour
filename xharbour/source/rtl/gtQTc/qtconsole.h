@@ -46,8 +46,6 @@
 
 #define MAX_BUF_CHARS 50
 #define VERSION "1.0"
-// list
-#include <list>
 
 /**
 * This Class is the base class for your application. It sets up the main
@@ -82,9 +80,7 @@ public:
 	bool queryExit();
 	
 	QTconsoleDoc *getDoc() { return doc; }
-	bool keyPressed() { return _cbuf_size != 0; }
 	QKeyEvent *nextKey( );
-
 
 public slots:
 
@@ -168,12 +164,13 @@ private:
 
 	QAction *helpAboutApp;
 
-	/** Key press character buffer */
-	int _cbuf_size;
-	std::list< QKeyEvent *> _cbuf;
-
 protected:
 	void keyPressEvent( QKeyEvent *e );
 };
+
+#define GTQC_MAX_KEYCODES 50
+extern int gtqt_keycodes[];
+extern int gtqt_keycount;
+
 #endif
 

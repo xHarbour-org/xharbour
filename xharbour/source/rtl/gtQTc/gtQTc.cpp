@@ -1,5 +1,5 @@
 /*
-* $Id$
+* $Id: gtQTc.cpp,v 1.1 2003/01/30 00:46:25 jonnymind Exp $
 */
 
 /*
@@ -117,25 +117,7 @@
 	#endif
 	#include <signal.h>
 #endif
-#if !defined(__DJGPP__)
-	static char FAR * scrnPtr;
-	static char FAR * scrnStealth = NULL;
-	static char FAR * hb_gt_ScreenAddress( void );
-	static int    scrnVirtual = FALSE;
-	static USHORT scrnWidth = 0;
-	static USHORT scrnHeight = 0;
-	static SHORT  scrnPosRow = -1;
-	static SHORT  scrnPosCol = -1;
-#else
-	static char * scrnPtr = NULL;
-	static int    scrnVirtual = FALSE;
-	static USHORT scrnWidth = 0;
-	static USHORT scrnHeight = 0;
-	static SHORT  scrnPosRow = -1;
-	static SHORT  scrnPosCol = -1;
-#endif
 
-static BOOL s_bBreak; /* Used to signal Ctrl+Break to hb_inkeyPoll() */
 static USHORT s_uiDispCount;
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
@@ -160,7 +142,6 @@ void *start_qtapp( void *param )
 	qtapp->setMainWidget(qtcapp);
 
 	qtcapp->show();
-	//qtapp->exec();
 
 	return 0;
 }
@@ -198,25 +179,394 @@ void hb_gt_Exit( void )
 	HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
 
 	hb_mouse_Exit();
-#if !defined(__DJGPP__)
-if( scrnStealth != ( char * ) -1 )
-	hb_xfree( scrnStealth );
-#endif
 	pthread_cancel( th );
 }
 
 
 int hb_gt_ExtendedKeySupport()
 {
-	return 0;
+	return 1;
 }
 
 /*TODO*/
 int hb_gt_ReadKey( HB_inkey_enum eventmask )
 {
-	int ch = -1;
+	int ch = 0, ascii, state, key;
 	HB_SYMBOL_UNUSED( eventmask );
 	HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
+
+   if ( gtqt_keycount == 0 )
+      return 0;
+
+   /* TODO: CTRL-BREAK management */
+   ch = gtqt_keycodes[ --gtqt_keycount ];
+   ascii = ch & 0xff;
+   state = ch & 0xff00;
+   key = ch >> 16;
+
+   ch = 0;
+   if ( ( state & Qt::CTRL) != 0  )
+   {
+      switch( key ) {
+      case Qt::Key_Up:  /*  Ctrl + Left arrow */
+         ch = K_CTRL_UP;
+         break;
+      case Qt::Key_Down:  /* Ctrl + Right arrow */
+         ch = K_CTRL_DOWN;
+         break;
+      case Qt::Key_Left:  /*  Ctrl + Left arrow */
+         ch = K_CTRL_LEFT;
+         break;
+      case Qt::Key_Right:  /* Ctrl + Right arrow */
+         ch = K_CTRL_RIGHT;
+         break;
+      case Qt::Key_Home:  /* Ctrl + Home */
+         ch = K_CTRL_HOME;
+         break;
+      case Qt::Key_End:  /* Ctrl + End */
+         ch = K_CTRL_END;
+         break;
+      case Qt::Key_PageUp:  /* Ctrl + Page Up */
+         ch = K_CTRL_PGUP;
+         break;
+      case Qt::Key_PageDown:  /* Ctrl + Page Down */
+         ch = K_CTRL_PGDN;
+         break;
+      case Qt::Key_Return:
+         ch = K_CTRL_RET;
+         break;
+      case Qt::Key_Print:
+         ch = K_CTRL_PRTSCR;
+         break;
+      case Qt::Key_Question:
+         ch = K_CTRL_QUESTION;
+         break;
+
+      /* edit keys */
+      case Qt::Key_Insert:
+         ch = K_CTRL_INS;
+         break;
+      case Qt::Key_Delete:
+         ch = K_CTRL_DEL;
+         break;
+      case Qt::Key_Backspace:
+         ch = K_CTRL_BS;
+         break;
+      case Qt::Key_Tab:
+         ch = K_CTRL_TAB;
+         break;
+
+      /* emulated cursors */
+      case Qt::Key_E:
+         ch = K_UP;
+         break;
+      case Qt::Key_X:
+         ch = K_DOWN;
+         break;
+      case Qt::Key_S:
+         ch = K_LEFT;
+         break;
+      case Qt::Key_D:
+         ch = K_RIGHT;
+         break;
+      case Qt::Key_M:
+         ch = K_RETURN;
+         break;
+
+      /* Keypad controls */
+      case Qt::Key_5:
+         if ( state & Qt::Keypad ) ch = KP_CTRL_5;
+         break;
+      case Qt::Key_Slash:
+         if ( state & Qt::Keypad ) ch = KP_CTRL_SLASH;
+         break;
+      case Qt::Key_Asterisk:
+         if ( state & Qt::Keypad ) ch = KP_CTRL_ASTERISK;
+         break;
+      case Qt::Key_Plus:
+         if ( state & Qt::Keypad ) ch = KP_CTRL_PLUS;
+         break;
+      case Qt::Key_Minus:
+         if ( state & Qt::Keypad ) ch = KP_CTRL_MINUS;
+         break;
+
+      /* functions */
+      case Qt::Key_F1:
+         ch = K_CTRL_F1;
+         break;
+      case Qt::Key_F2:
+         ch = K_CTRL_F2;
+         break;
+      case Qt::Key_F3:
+         ch = K_CTRL_F3;
+         break;
+      case Qt::Key_F4:
+         ch = K_CTRL_F4;
+         break;
+      case Qt::Key_F5:
+         ch = K_CTRL_F5;
+         break;
+      case Qt::Key_F6:
+         ch = K_CTRL_F6;
+         break;
+      case Qt::Key_F7:
+         ch = K_CTRL_F7;
+         break;
+      case Qt::Key_F8:
+         ch = K_CTRL_F8;
+         break;
+      case Qt::Key_F9:
+         ch = K_CTRL_F9;
+         break;
+      case Qt::Key_F10:
+         ch = K_CTRL_F10;
+         break;
+      case Qt::Key_F11:
+         ch = K_CTRL_F11;
+         break;
+      case Qt::Key_F12:
+         ch = K_CTRL_F12;
+         break;
+      }
+   }
+   else if ( ( state & Qt::ALT) != 0 )
+   {
+      switch( key ) {
+      case Qt::Key_Up:  /*  Ctrl + Left arrow */
+         ch = K_ALT_UP;
+         break;
+      case Qt::Key_Down:  /* Ctrl + Right arrow */
+         ch = K_ALT_DOWN;
+         break;
+      case Qt::Key_Left:  /*  ALT + Left arrow */
+         ch = K_ALT_LEFT;
+         break;
+      case Qt::Key_Right:  /* ALT + Right arrow */
+         ch = K_ALT_RIGHT;
+         break;
+      case Qt::Key_Home:  /* ALT + Home */
+         ch = K_ALT_HOME;
+         break;
+      case Qt::Key_End:  /* ALT + End */
+         ch = K_ALT_END;
+         break;
+      case Qt::Key_PageUp:  /* ALT + Page Up */
+         ch = K_ALT_PGUP;
+         break;
+      case Qt::Key_PageDown:  /* ALT + Page Down */
+         ch = K_ALT_PGDN;
+         break;
+      case Qt::Key_Return:
+         ch = K_ALT_RETURN;
+         break;
+      case Qt::Key_Escape:
+         ch = K_ALT_ESC;
+         break;
+
+      /* Keypad controls */
+      case Qt::Key_5:
+         if ( state & Qt::Keypad ) ch = KP_ALT_5;
+         break;
+      case Qt::Key_Slash:
+         if ( state & Qt::Keypad ) ch = KP_ALT_SLASH;
+         break;
+      case Qt::Key_Asterisk:
+         if ( state & Qt::Keypad ) ch = KP_ALT_ASTERISK;
+         break;
+      case Qt::Key_Plus:
+         if ( state & Qt::Keypad ) ch = KP_ALT_PLUS;
+         break;
+      case Qt::Key_Minus:
+         if ( state & Qt::Keypad ) ch = KP_ALT_MINUS;
+         break;
+      
+      /* edit keys */
+      case Qt::Key_Insert:
+         ch = K_ALT_INS;
+         break;
+      case Qt::Key_Delete:
+         ch = K_ALT_DEL;
+         break;
+      case Qt::Key_Backspace:
+         ch = K_ALT_BS;
+         break;
+      case Qt::Key_Tab:
+         ch = K_ALT_TAB;
+         break;
+
+      /* functions */
+      case Qt::Key_F1:
+         ch = K_ALT_F1;
+         break;
+      case Qt::Key_F2:
+         ch = K_ALT_F2;
+         break;
+      case Qt::Key_F3:
+         ch = K_ALT_F3;
+         break;
+      case Qt::Key_F4:
+         ch = K_ALT_F4;
+         break;
+      case Qt::Key_F5:
+         ch = K_ALT_F5;
+         break;
+      case Qt::Key_F6:
+         ch = K_ALT_F6;
+         break;
+      case Qt::Key_F7:
+         ch = K_ALT_F7;
+         break;
+      case Qt::Key_F8:
+         ch = K_ALT_F8;
+         break;
+      case Qt::Key_F9:
+         ch = K_ALT_F9;
+         break;
+      case Qt::Key_F10:
+         ch = K_ALT_F10;
+         break;
+      case Qt::Key_F11:
+         ch = K_ALT_F11;
+         break;
+      case Qt::Key_F12:
+         ch = K_ALT_F12;
+         break;
+      }
+   }
+   else if ( ( state & Qt::SHIFT) != 0  )
+   {
+      switch ( key ) {
+
+      /* edit keys */
+      case Qt::Key_Tab:
+         ch = K_SH_TAB;
+         break;
+
+      case Qt::Key_F1:
+         ch = K_SH_F1;
+         break;
+      case Qt::Key_F2:
+         ch = K_SH_F2;
+         break;
+      case Qt::Key_F3:
+         ch = K_SH_F3;
+         break;
+      case Qt::Key_F4:
+         ch = K_SH_F4;
+         break;
+      case Qt::Key_F5:
+         ch = K_SH_F5;
+         break;
+      case Qt::Key_F6:
+         ch = K_SH_F6;
+         break;
+      case Qt::Key_F7:
+         ch = K_SH_F7;
+         break;
+      case Qt::Key_F8:
+         ch = K_SH_F8;
+         break;
+      case Qt::Key_F9:
+         ch = K_SH_F9;
+         break;
+      case Qt::Key_F10:
+         ch = K_SH_F10;
+         break;
+      case Qt::Key_F11:
+         ch = K_SH_F11;
+         break;
+      case Qt::Key_F12:
+         ch = K_SH_F12;
+         break;
+      }
+   }
+
+   /* Now verifies functions and special keys */
+   if ( ch == 0 )  /* IMPORTANT: shift may be ON! */
+   {
+      switch ( key ) {
+      case Qt::Key_Up:
+         ch = K_UP;
+         break;
+      case Qt::Key_Down:
+         ch = K_DOWN;
+         break;
+      case Qt::Key_Left:
+         ch = K_LEFT;
+         break;
+      case Qt::Key_Right:
+         ch = K_RIGHT;
+         break;
+      case Qt::Key_Home:
+         ch = K_HOME;
+         break;
+      case Qt::Key_End:
+         ch = K_END;
+         break;
+      case Qt::Key_PageUp:
+         ch = K_PGUP;
+         break;
+      case Qt::Key_PageDown:
+         ch = K_PGDN;
+         break;
+
+      /* edit keys */
+      case Qt::Key_Insert:
+         ch = K_INS;
+         break;
+      case Qt::Key_Delete:
+         ch = K_DEL;
+         break;
+      case Qt::Key_Backspace:
+         ch = K_BS;
+         break;
+      case Qt::Key_Tab:
+         ch = K_TAB;
+         break;
+
+      /* functions */
+      case Qt::Key_F1:
+         ch = K_F1;
+         break;
+      case Qt::Key_F2:
+         ch = K_F2;
+         break;
+      case Qt::Key_F3:
+         ch = K_F3;
+         break;
+      case Qt::Key_F4:
+         ch = K_F4;
+         break;
+      case Qt::Key_F5:
+         ch = K_F5;
+         break;
+      case Qt::Key_F6:
+         ch = K_F6;
+         break;
+      case Qt::Key_F7:
+         ch = K_F7;
+         break;
+      case Qt::Key_F8:
+         ch = K_F8;
+         break;
+      case Qt::Key_F9:
+         ch = K_F9;
+         break;
+      case Qt::Key_F10:
+         ch = K_F10;
+         break;
+      case Qt::Key_F11:
+         ch = K_F11;
+         break;
+      case Qt::Key_F12:
+         ch = K_F12;
+         break;
+      }
+   }
+
+   if ( ch == 0 ) {
+      ch = ascii;
+   }
 
 	return ch;
 }
@@ -342,11 +692,9 @@ static void hb_gt_xPutch( USHORT cRow, USHORT cCol, BYTE attr, BYTE ch )
 {
 	HB_TRACE(HB_TR_DEBUG, ("hb_gt_xPutch(%hu, %hu, %d, %d", cRow, cCol, (int) attr, (int) ch));
 	int oldatt = qtcapp->getDoc()->getAttrib();
-	//printf("Attrib: %x\n", attr );
 	qtcapp->getDoc()->setAttrib( (char) attr );
 	qtcapp->getDoc()->write( cCol,cRow, (char) ch );
 	qtcapp->getDoc()->setAttrib( oldatt );
-	//qtapp->processEvents();
 }
 
 void hb_gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG len )
@@ -356,8 +704,6 @@ void hb_gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG len )
 	qtcapp->getDoc()->setAttrib( attr );
 	qtcapp->getDoc()->write( cCol, cRow, (char *)str, len );
 	qtcapp->getDoc()->setAttrib( oldatt );
-	//qtapp->processEvents();
-
 }
 
 int hb_gt_RectSize( USHORT rows, USHORT cols )
@@ -370,15 +716,13 @@ int hb_gt_RectSize( USHORT rows, USHORT cols )
 void hb_gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE * dest )
 {
 	HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p", usTop, usLeft, usBottom, usRight, dest));
-	qtcapp->getDoc()->getMem( usTop, usLeft, (char *)dest, usBottom - usTop , usRight - usLeft );
+	qtcapp->getDoc()->getMem( usLeft, usTop, (char *)dest, usRight - usLeft +1, usBottom - usTop +1 );
 }
 
 void hb_gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE * srce )
 {
 	HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p", usTop, usLeft, usBottom, usRight, srce));
-	qtcapp->getDoc()->setMem( usTop, usLeft, (char *)srce, usBottom - usTop , usRight - usLeft );
-	//qtapp->processEvents();
-
+	qtcapp->getDoc()->setMem( usLeft, usTop, (char *)srce, usRight - usLeft +1, usBottom - usTop +1 );
 }
 
 void hb_gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE attr )
@@ -418,8 +762,12 @@ void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight,
 	HB_SYMBOL_UNUSED( usBottom );
 	HB_SYMBOL_UNUSED( attr );
 	HB_SYMBOL_UNUSED( sHoriz );
+	char old_attr = qtcapp->getDoc()->getAttrib();
 
-	qtcapp->getDoc()->scroll( sVert );
+	qtcapp->getDoc()->setAttrib( (char) attr );
+	qtcapp->getDoc()->scroll( (int) usTop, (int) usLeft, (int) usBottom,
+      (int) usRight, (char) attr, (int)sVert, (int)sHoriz );
+   qtcapp->getDoc()->setAttrib( old_attr );
 }
 
 void hb_gt_DispBegin( void )
@@ -440,6 +788,7 @@ void hb_gt_DispEnd( void )
 BOOL hb_gt_GetBlink()
 {
 	HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetBlink()"));
+   return true;
 }
 
 /*TODO: implement this */
@@ -478,7 +827,7 @@ void hb_gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byChar, ULON
 	qtcapp->getDoc()->startChanging();
 	qtcapp->getDoc()->setAttrib( (char) byAttr );
 	qtcapp->getDoc()->gotoXY(uiCol, uiRow );
-	for ( int i = 0; i < nLength; i ++ )
+	for ( unsigned int i = 0; i < nLength; i ++ )
 		qtcapp->getDoc()->write( (char) byChar );
 
 	qtcapp->getDoc()->gotoXY( col, row );
@@ -746,6 +1095,11 @@ extern "C" {
 
    HB_FUNC( HB_QTAPPEXEC )
    {
-      qtapp->exec();
+      hb_retni(qtapp->exec());
+   }
+
+   HB_FUNC( HB_QTAPPEXIT )
+   {
+      qtapp->exit( hb_parni(1) );
    }
 }

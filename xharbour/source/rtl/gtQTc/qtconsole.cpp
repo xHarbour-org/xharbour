@@ -26,6 +26,11 @@
 #include "filenew.xpm"
 #include <iostream>
 
+/* temporary solution */
+int gtqt_keycodes[ GTQC_MAX_KEYCODES ];
+int gtqt_keycount = 0;
+
+
 QTconsoleApp::QTconsoleApp()
 {
   setCaption(tr("QTconsole " VERSION));
@@ -45,7 +50,6 @@ QTconsoleApp::QTconsoleApp()
 
   _rows = 0;
   _cols = 0;
-  _cbuf_size = 0;
 }
 
 
@@ -411,26 +415,10 @@ void QTconsoleApp::viewUpdated()
 	}
 }
 
-void QTconsoleApp::keyPressEvent ( QKeyEvent * e )
+void QTconsoleApp::keyPressEvent( QKeyEvent *e )
 {
-	_cbuf.push_front( new QKeyEvent( *e ) );
-
-	if (  _cbuf_size < MAX_BUF_CHARS )
-		_cbuf_size++;
-	else {
-		QKeyEvent *evt = _cbuf.back();
-		_cbuf.pop_back();
-		delete evt;
-	}
-}
-
-QKeyEvent *QTconsoleApp::nextKey( )
-{
-	if ( _cbuf_size > 0 ) {
-		_cbuf_size --;
-		QKeyEvent *evt = _cbuf.back();
-		_cbuf.pop_back();
-		return evt;
-	}
-	return 0;
+   if ( gtqt_keycount < GTQC_MAX_KEYCODES-1 ) {
+      gtqt_keycodes[ gtqt_keycount++ ] = e->ascii() | e->state() |e->key() << 16;
+      e->accept();
+   }
 }
