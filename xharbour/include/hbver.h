@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.h,v 1.15 2003/04/08 03:05:47 andijahja Exp $
+ * $Id: hbver.h,v 1.16 2003/04/08 18:32:21 lculik Exp $
  */
 
 /*
@@ -63,7 +63,7 @@
 
 
 #define HB_VER_LENTRY   "2003-04-08 15:30 UTC-03000 Luiz Rafael Culik $"
-#define HB_VER_CHLCVS   "ChangeLog,v 1.926"
+#define HB_VER_CHLCVS   "ChangeLog,v 1.927"
 #define HB_VER_C_USR    ""
 #define HB_VER_L_USR    ""
 #define HB_VER_PRG_USR  ""
