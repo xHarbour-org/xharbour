@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3813 2005/02/13 17:53:36 paultucker Exp $
+ * $Id: ChangeLog,v 1.3814 2005/02/14 06:00:08 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,8 +9,6 @@
 */
 
 2005-02-14 00:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-  * makallvc.bat
-   + contrib/tip
   * contrib/hbzlib/zipplatformcomm.cpp
    * cast so compiler selects a compare method.
 
