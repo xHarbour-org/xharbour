@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.1.1.1 2001/12/21 10:42:28 ronpinkas Exp $
+ * $Id: gtwin.c,v 1.2 2002/06/06 14:33:21 walito Exp $
  */
 
 /*
@@ -416,9 +416,6 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
                {
                   /* Fix for escape key problem with some international
                      keyboards and/or international versions of Windows */
-                  if( dwState & SHIFT_PRESSED )
-                     ch = 0;
-                  else
                      ch = 27;
                }
                if( ( ( ch == 0 || ch == -32 || ch == -16 ) && ( dwState & ( SHIFT_PRESSED | LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )
