@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.174 2004/05/28 18:51:22 likewolf Exp $
+* $Id: thread.c,v 1.175 2004/06/04 13:29:28 mauriliolongo Exp $
 */
 
 /*
@@ -746,7 +746,7 @@ void hb_threadIsLocalRef( void )
       // WITH OBJECT
       for( i = 0; i < pStack->wWithObjectCounter; i++ )
       {
-         if( ( &( pStack->aEnumCollection[ i ] ) )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+         if( ( &( pStack->aWithObject[ i ] ) )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
          {
             hb_gcItemRef( &( pStack->aWithObject[ i ] ) );
          }
