@@ -692,8 +692,8 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
               IF ::lStartFocusEvents THEN nRet := ::OnKillFocus()
          //CASE nMsg == WM_LBUTTONDBLCLK
          //     nRet := ::OnLDblClick(LoWord(lParam), HiWord(lParam), wParam)
-         //CASE nMsg == WM_LBUTTONDOWN
-         //     nRet := ::OnLBtnDown(LoWord(lParam), HiWord(lParam), wParam)
+         CASE nMsg == WM_LBUTTONDOWN
+              nRet := ::OnLBtnDown(LoWord(lParam), HiWord(lParam), wParam)
          //CASE nMsg == WM_LBUTTONUP
          //     nRet := ::OnLBtnUp(LoWord(lParam), HiWord(lParam), wParam)
          //CASE nMsg == WM_MENUCOMMAND  // THIS COMMAND EXIST IN WINVER > 5
