@@ -1,5 +1,5 @@
 /*
- * $Id: hbcy.c,v 1.3 2004/02/06 12:55:17 andijahja Exp $
+ * $Id: hbcy.c,v 1.4 2004/02/06 13:07:18 andijahja Exp $
  */
 
 /*
@@ -9,6 +9,7 @@
  * Source codes for functions:
  *    HB_YYENCODE()
  *    HB_YYDECODE()
+ *    HB_YYDECODE_FILE()
  *
  * Copyright 2004 Dmitry V. Korzhov <dk@april26.spb.ru>
  * www - http://www.harbour-project.org
@@ -330,8 +331,8 @@ static ULONG str2yye(BYTE *srcstr,ULONG srclen,BYTE *dststr)
             {
                l=1;
 
-               if (OS_EOL_LEN==2)
-                  dststr[dstlen++]='\r';
+               // if (OS_EOL_LEN==2)
+                  // dststr[dstlen++]='\r';
 
                dststr[dstlen++]='\n';
             }
@@ -362,8 +363,8 @@ static ULONG str2yye(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 
          if (dststr)
          {
-            if (OS_EOL_LEN==2)
-               dststr[dstlen++]='\r';
+            // if (OS_EOL_LEN==2)
+            //   dststr[dstlen++]='\r';
 
             dststr[dstlen++]='\n';
          }

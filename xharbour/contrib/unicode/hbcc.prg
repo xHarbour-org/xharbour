@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.4 2004/02/06 12:55:17 andijahja Exp $
+ * $Id: hbcc.prg,v 1.6 2004/02/06 18:58:27 andijahja Exp $
  */
 
 /*
@@ -16,6 +16,7 @@
  *    HB_CSTOCS()
  *    HB_B64ENCODE()
  *    HB_B64DECODE()
+ *    HB_B64DECODE_FILE()
  *
  * Copyright 2004 Dmitry V. Korzhov <dk@april26.spb.ru>
  * www - http://www.harbour-project.org
@@ -130,6 +131,18 @@ HB_B64DECODE(b64_string) -> string
       b64_string  - base64 encoded string
    Returns:
       decoded string
+
+B64DECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
+   Description:
+      Decode a Base64 encoded file
+   Parameters:
+      cFileInput = string, source filename to be decoded
+                   OR
+                   array, an array of file chunks arranged in proper order
+      cFileOutput = output filename
+   Returns:
+      Upon succesful decoding the function returns numnber of bytes written
+
 */
 #pragma BEGINDUMP
 
@@ -1550,7 +1563,9 @@ HB_FUNC( B64DECODE_FILE )
             if ( string )
             {
                if ( strstr ( string ,"Content-Transfer-Encoding: base64" ) != NULL )
+               {
                   break;
+               }
 
                if ( !bOutFile )
                {
@@ -1654,8 +1669,8 @@ HB_FUNC( B64DECODE_FILE )
 
    if ( bAlloc )
    {
-     hb_itemRelease(pStruct);
-     hb_itemRelease(pItem);
+      hb_itemRelease(pStruct);
+      hb_itemRelease(pItem);
    }
 
    if ( outFile )

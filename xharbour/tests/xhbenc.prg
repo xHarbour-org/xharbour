@@ -1,17 +1,19 @@
 **************************************************
 * xhbenc.prg
-* $Id: xhbenc.prg,v 1.2 2004/02/03 22:12:28 andijahja Exp $
+* $Id: xhbenc.prg,v 1.3 2004/02/06 12:55:17 andijahja Exp $
 * Test program for file encoding and decoding
-* UUEncode, Base64 and YYEncode
+* UUEncode, Base64, YYEncode and XXEncode
 *
 * Andi Jahja
 *
-* Must link hbcc.lib and libmisc.lib
+* Must link hbcc.lib
 //----------------------------------------------------------------------------//
 
 #include "directry.ch"
 #include "box.ch"
 #include "inkey.ch"
+
+static aOkey := { " Continue " , " Quit " }
 
 PROCEDURE MAIN()
 
@@ -21,11 +23,13 @@ PROCEDURE MAIN()
    LOCAL aOkey := { " Okay " }
    LOCAL nStart
 
+   BEGIN SEQUENCE
+
    SET CURSOR OFF
    CLEAR SCREEN
    IF Alert( "xHarbour File Encoding Tests",{" Continue "," Quit "},"N/W*" ) == 2
       restscreen(0,0,maxrow(),maxcol(),cScr)
-      RETURN
+      BREAK
    ENDIF
 
    CLEAR SCREEN
@@ -53,6 +57,16 @@ PROCEDURE MAIN()
    nStart := seconds()
    IF ( nError := YYENCODE_FILE( "pp.prg", "~pp.yye" ) ) == 0 .AND. File( "~pp.yye" )
       ShowResult( "~pp.yye", "YYE", nStart )
+   ELSE
+      ShowError( @nFault, nError )
+   ENDIF
+
+   CLEAR SCREEN
+   Alert( 'Will XXEncode pp.prg to ~pp.xxe.;Syntax: XXENCODE_FILE( "pp.prg", "~pp.xxe" )',aOkey,"W+/BG" )
+
+   nStart := seconds()
+   IF ( nError := XXENCODE_FILE( "pp.prg", "~pp.xxe" ) ) == 0 .AND. File( "~pp.xxe" )
+      ShowResult( "~pp.xxe", "XXE", nStart )
    ELSE
       ShowError( @nFault, nError )
    ENDIF
@@ -88,7 +102,19 @@ PROCEDURE MAIN()
    ENDIF
 
    CLEAR SCREEN
+   Alert( 'Now Will XXEncode pp.prg to ~pp*.xxe;with 2000 lines per chunk.;Syntax: XXENCODE_FILE_BY_CHUNK( "pp.prg", 2000, "~pp" )',aOkey,"N/BG*")
+
+   nStart := seconds()
+   IF ( nError := XXENCODE_FILE_BY_CHUNK( "pp.prg", 2000, "~pp" ) ) == 0
+      ShowResult( "~pp*.xxe", "XXE", nStart )
+   ELSE
+      ShowError( @nFault, nError )
+   ENDIF
+
+   CLEAR SCREEN
    Alert( "File Encoding Tests Completed" + if(nFault>0,". Error encountered : " + ltrim(str(nFault)),". All tests succesfull!"),aOkey,"N/W*" )
+
+   END SEQUENCE
 
    restscreen(0,0,maxrow(),maxcol(),cScr)
 
@@ -132,12 +158,18 @@ STATIC PROCEDURE ShowResult( cFileMask, cEncoding, nStart )
          ? "Decoding in progress ......"
          nStart := seconds()
          nDecoded := YYDECODE_FILE( aDecodedFiles, "result.txt" )
+      CASE cEncoding == "XXE"
+         cSyntax  := 'XXDECODE_FILE( aDecodedFiles, "result.txt" )'
+         Alert( "Now will decode the encoded files to 'result.txt';Syntax : " + cSyntax , { " Okay " }, "gr+/b" )
+         ? "Decoding in progress ......"
+         nStart := seconds()
+         nDecoded := XXDECODE_FILE( aDecodedFiles, "result.txt" )
       ENDCASE
 
       CLEAR SCREEN
 
       IF nDecoded > 0
-         Alert( "Decoding successful;Bytes written = " + ltrim(str(nDecoded)+"; Done in " + ltrim(str(seconds()-nStart))+ " secoonds"),{" View "},"N/W*" )
+         Alert( "Decoding successful;Bytes written = " + ltrim(str(nDecoded)+"; Done in " + ltrim(str(seconds()-nStart))+ " seconds"),{" View "},"N/W*" )
          IF !Empty( aDecodedFiles := Directory( "result.txt" ) )
             FOR EACH aItem IN aDecodedFiles
                View( aItem )

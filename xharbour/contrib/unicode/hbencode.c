@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.4 2004/02/03 02:05:40 andijahja Exp $
+ * $Id: hbencode.c,v 1.5 2004/02/03 22:11:43 andijahja Exp $
  */
 
 /*
@@ -328,7 +328,7 @@ static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int 
 }
 
 //----------------------------------------------------------------------------//
-static BYTE *getfilename ( BYTE *strFullPath )
+BYTE *hbcc_getfilename ( BYTE *strFullPath )
 {
    USHORT iLen;
    BYTE *strTmp;
@@ -382,7 +382,7 @@ static void output64chunk( int c1, int c2, int c3, int pads, FILE *outfile)
 static void b64header( FILE * outfile, BYTE* strIn )
 {
    fprintf(outfile,"Content-Type: application/octet-stream; name=\"");
-   fprintf(outfile, (char*) getfilename (strIn));
+   fprintf(outfile, (char*) hbcc_getfilename (strIn));
    fprintf(outfile,"\"\n");
    fprintf(outfile,"Content-Transfer-Encoding: base64\n\n");
 
@@ -444,14 +444,14 @@ static int b64encode_file( BYTE *strIn, BYTE *strOut )
 
       if (ct > 71)
       {
-         fprintf(outfile,"\n");
+         putc('\n', outfile);
          ct = 0;
       }
    }
 
    if (ct)
    {
-     fprintf(outfile,"\n");
+     putc('\n', outfile);
    }
 
    fclose (infile);
@@ -521,7 +521,7 @@ static int b64encode_file_by_chunk ( BYTE *strIn, BYTE *strOut, ULONG lines )
 
       if (ct > 71)
       {
-         fprintf(outfile,"\n");
+         putc('\n',outfile);
 
          lines --;
 
@@ -551,7 +551,7 @@ static int b64encode_file_by_chunk ( BYTE *strIn, BYTE *strOut, ULONG lines )
    {
       if ( ct )
       {
-         fprintf(outfile,"\n");
+         putc('\n',outfile);
       }
       fclose (outfile);
    }
@@ -597,7 +597,7 @@ static int uuencode_file ( BYTE *strIn, BYTE *strOut )
       return -2;
    }
 
-   fprintf (fpOutFile, "begin 666 %s\n", getfilename (strIn));
+   fprintf (fpOutFile, "begin 666 %s\n", hbcc_getfilename (strIn));
 
    while ( TRUE )
    {
@@ -615,7 +615,7 @@ static int uuencode_file ( BYTE *strIn, BYTE *strOut )
          putgroup (&strLine[iCnt], fpOutFile);
       }
 
-      fprintf (fpOutFile, "\n");
+      putc('\n',fpOutFile);
    }
 
    fprintf (fpOutFile, "end\n");
@@ -657,7 +657,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
       return -2;
    }
 
-   fprintf (fpOutFile, "begin 666 %s\n", getfilename (strIn));
+   fprintf (fpOutFile, "begin 666 %s\n", hbcc_getfilename (strIn));
 
    while ( TRUE )
    {
@@ -677,7 +677,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
 
      if ( ++nlinedone >= (nlines-1) )
      {
-        fprintf (fpOutFile, "\n");
+        putc('\n', fpOutFile);
         fclose( fpOutFile );
         nlinedone = -1;
         filenumber ++;
@@ -694,7 +694,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
      }
      else
      {
-        fprintf (fpOutFile, "\n");
+        putc('\n', fpOutFile);
      }
 
    }

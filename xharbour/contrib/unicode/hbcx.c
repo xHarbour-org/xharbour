@@ -1,5 +1,5 @@
 /*
- * $Id: hbcx.c,v 1.1 2004/01/14 06:14:03 andijahja Exp $
+ * $Id: hbcx.c,v 1.2 2004/02/02 10:12:40 andijahja Exp $
  */
 
 /*
@@ -9,6 +9,7 @@
  * Source codes for functions:
  *    HB_XXENCODE()
  *    HB_XXDECODE()
+ *    HB_XXDECODE_FILE()
  *
  * Copyright 2004 Dmitry V. Korzhov <dk@april26.spb.ru>
  * www - http://www.harbour-project.org
@@ -57,7 +58,7 @@
 /*XXencode support*/
 
 /*
-HB_XXENCODE(string) -> xx_string
+HB_XXENCODE(string) -> string
       Encodes string to XXencode (some mail/news software used)
    Parameters:
       string  - source character string
@@ -70,20 +71,519 @@ HB_XXDECODE(xx_string) -> string
       xx_string  - XXencode encoded string
    Returns:
       decoded string
-*/
 
+XXDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
+   Description:
+      XXDecode a given
+   Parameters:
+      cFileInput = string, source filename to be decoded
+                   OR
+                   array, an array of file chunks arranged in proper order
+      cFileOutput = output filename
+   Returns:
+      Upon succesful decoding the function returns numnber of bytes written
+*/
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbapifs.h"
 #define UU_STR_LEN 60
 #define UE_STR_LEN 45
 
 static BYTE *eolchars=(BYTE*) "\r\n";
 static BYTE *xxechars=(BYTE*) "+-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
 static ULONG int_xxenc(BYTE *,ULONG,BYTE *);
 static ULONG int_xxdec(BYTE *,ULONG,BYTE *);
 static BYTE int_xxbyte(BYTE);
 static BYTE int_xxbval(BYTE);
+extern BYTE *hbcc_getfilename ( BYTE *strFullPath );
+extern BOOL hbcc_file_read ( FILE *, char * );
+
+HB_FUNC( XXDECODE_FILE )
+{
+   PHB_ITEM pinFile = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM poutFile = hb_param( 2, HB_IT_STRING );
+   FILE *inFile, *outFile;
+   char *string, *szFileName;
+   ULONG srclen, dstlen, nBytesWritten = 0;
+   BYTE *dststr;
+   PHB_ITEM pStruct, pItem;
+   USHORT uiLen = 1, uiCount;
+   BOOL bOutFile = FALSE;
+   BOOL bAlloc = FALSE;
+
+   if( pinFile )
+   {
+      if ( ISCHAR( 1 ) )
+      {
+         if ( strlen( pinFile->item.asString.value ) == 0 )
+         {
+            hb_retni( 0 );
+            return;
+         }
+         else
+         {
+            pStruct = hb_itemNew( NULL );
+            pItem = hb_itemNew( NULL );
+            hb_arrayNew( pStruct, 1 );
+            hb_arraySet( pStruct, 1, hb_itemPutC( pItem, pinFile->item.asString.value ) );
+            bAlloc = TRUE;
+         }
+      }
+      else if ( ISARRAY( 1 ) )
+      {
+         pStruct = hb_param( 1, HB_IT_ARRAY );
+         uiLen = (USHORT) pStruct->item.asArray.value->ulLen;
+
+         if ( uiLen <= 0 )
+         {
+            hb_retni( 0 );
+            return;
+         }
+      }
+      else
+      {
+         hb_retni( 0 );
+         return;
+      }
+   }
+   else
+   {
+      hb_retni( 0 );
+      return;
+   }
+
+   if ( poutFile )
+   {
+      if ( strlen(poutFile->item.asString.value) == 0 )
+      {
+         hb_retni(0);
+         return;
+      }
+   }
+
+   string = (char*) hb_xgrab( SHRT_MAX );
+
+   for ( uiCount = 0; uiCount < uiLen; uiCount++ )
+   {
+      szFileName = hb_arrayGetC( pStruct, uiCount + 1 );
+
+      if ( !szFileName )
+      {
+         hb_xfree( string );
+         hb_retni( 0 );
+         return;
+      }
+
+      if ( strlen( szFileName ) == 0 )
+      {
+         hb_xfree( szFileName );
+         hb_xfree( string );
+         hb_retni( 0 );
+         return;
+      }
+
+      inFile = fopen( szFileName, "rb" );
+
+      if ( !inFile )
+      {
+         hb_xfree( szFileName );
+         hb_xfree( string );
+         hb_retni( 0 );
+         return;
+      }
+
+      while ( hbcc_file_read ( inFile, string ) )
+      {
+         if ( string )
+         {
+            if ( strstr ( string ,"end" ) != NULL )
+            {
+               continue;
+            }
+
+            if ( !bOutFile )
+            {
+               if ( poutFile )
+               {
+                  if ( strstr ( string ,"begin 6" ) != NULL )
+                  {
+                     outFile = fopen( poutFile->item.asString.value, "wb" );
+
+                     if ( !outFile )
+                     {
+                        break;
+                     }
+
+                     bOutFile = TRUE;
+                     continue;
+                  }
+                  else
+                  {
+                     continue;
+                  }
+               }
+               else
+               {
+                  if ( strstr ( string ,"begin 6" ) != NULL )
+                  {
+                     char *szFile ;
+                     szFile = string + 10;
+
+                     if( szFile )
+                     {
+                        outFile = fopen( szFile, "wb" );
+
+                        if ( outFile )
+                        {
+                           bOutFile = TRUE;
+                           continue;
+                        }
+                     }
+                  }
+                  else
+                  {
+                     continue;
+                  }
+               }
+            } // end if ( !bOutFile )
+
+            srclen = strlen( string );
+            dstlen = int_xxdec((BYTE*) string,srclen,NULL);
+            if ( dstlen )
+            {
+               dststr = (BYTE *) hb_xgrab(dstlen);
+               int_xxdec((BYTE*) string,srclen,dststr);
+
+               if ( bOutFile )
+               {
+                  nBytesWritten += fwrite( dststr, sizeof(BYTE), dstlen, outFile );
+               }
+
+               hb_xfree(dststr);
+            }
+         }
+      }
+
+      fclose( inFile );
+
+      if ( szFileName )
+      {
+         hb_xfree( szFileName );
+      }
+   }
+
+   hb_retnl( nBytesWritten );
+
+   hb_xfree( string );
+
+   if ( bAlloc )
+   {
+      hb_itemRelease(pStruct);
+      hb_itemRelease(pItem);
+   }
+
+   fclose( outFile );
+}
+
+HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
+{
+   PHB_ITEM pInFile  = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pLine = hb_param( 2, HB_IT_NUMERIC );
+   PHB_ITEM pOutFile = hb_param( 3, HB_IT_STRING );
+   PHB_FNAME pFileName = NULL;
+   ULONG nSize,i=0, ulLine, ulDecoded = 0;
+   FILE *infile, *OutFile;
+   int c1, c2, c3;
+   int iPart = 1;
+   char *szFileName, *cMask;
+   char szDestFile[ _POSIX_PATH_MAX ] ;
+
+   if ( !pInFile )
+   {
+      hb_retni( -1 );
+      return;
+   }
+
+   szFileName = (char*) hbcc_getfilename( (BYTE*) pInFile->item.asString.value );
+
+   if ( strlen( pInFile->item.asString.value ) == 0 || strlen ( szFileName ) == 0 )
+   {
+      hb_retni( -1 );
+      return;
+   }
+
+   infile = fopen( pInFile->item.asString.value, "rb" );
+
+   if ( !infile )
+   {
+      hb_retni( -1 );
+      return;
+   }
+
+   if( ! pLine )
+   {
+      fclose( infile );
+      hb_retni( -4 );
+      return;
+   }
+   else
+   {
+      ulLine = pLine->item.asLong.value;
+      if ( ulLine <= 0 )
+      {
+         fclose( infile );
+         hb_retni( -4 );
+         return;
+      }
+   }
+
+   fseek( infile, 0L, SEEK_END );
+   nSize = ftell( infile );
+   fseek( infile, 0L, SEEK_SET );
+
+   if ( pOutFile )
+   {
+      if ( strlen ( pOutFile->item.asString.value ) == 0 )
+      {
+         fclose( infile );
+         hb_retni( -2 );
+         return;
+      }
+      cMask = pOutFile->item.asString.value;
+   }
+   else
+   {
+      pFileName = hb_fsFNameSplit(pInFile->item.asString.value);
+      cMask = pFileName->szName;
+   }
+
+   sprintf( szDestFile, "%s%02d%s", cMask, iPart, ".xxe" );
+
+   OutFile = fopen( szDestFile, "wb" );
+
+   if ( !OutFile )
+   {
+      if ( pFileName != NULL )
+      {
+         hb_xfree( pFileName );
+      }
+      hb_retni( -3 );
+      fclose( infile );
+      return ;
+   }
+
+   fprintf( OutFile, "begin 644 %s\n", szFileName );
+
+   while ((c1 = getc(infile)) != EOF)
+   {
+      if ( i % UE_STR_LEN == 0 )
+      {
+         if ( i )
+         {
+            putc( '\n', OutFile );
+         }
+
+         if ( ++ ulDecoded == ulLine )
+         {
+            iPart ++;
+            ulDecoded = 0;
+            fclose( OutFile );
+            sprintf( szDestFile, "%s%02d%s", cMask, iPart, ".xxe" );
+            OutFile = fopen( szDestFile, "wb" );
+            if ( (nSize-i) > UE_STR_LEN )
+            {
+               putc(int_xxbyte(UE_STR_LEN),OutFile);
+            }
+            else
+            {
+               putc(int_xxbyte((BYTE)(nSize-i)),OutFile);
+            }
+         }
+         else
+         {
+            if ( (nSize-i) > UE_STR_LEN )
+            {
+               putc(int_xxbyte(UE_STR_LEN),OutFile);
+            }
+            else
+            {
+               putc(int_xxbyte((BYTE)(nSize-i)),OutFile);
+            }
+         }
+      }
+
+      putc( int_xxbyte((c1&0xFC)>>2), OutFile );
+
+      ++ i;
+      c2 = getc( infile );
+
+      if ( c2 == EOF )
+      {
+         putc( int_xxbyte((c1&0x03)<<4),OutFile);
+         putc( int_xxbyte(0),OutFile);
+         putc( int_xxbyte(0),OutFile);
+         break;
+      }
+
+      putc( int_xxbyte(((c1&0x03)<<4)|((c2&0xF0)>>4)),OutFile);
+
+      ++ i;
+      c3 = getc( infile );
+
+      if ( c3 == EOF )
+      {
+         putc( int_xxbyte((c2&0x0F)<<2),OutFile);
+         putc( int_xxbyte(0),OutFile);
+         break;
+      }
+
+      putc(int_xxbyte(((c2&0x0F)<<2)|((c3&0xC0)>>6)),OutFile);
+      putc(int_xxbyte(c3&0x3F),OutFile);
+
+      ++ i;
+   }
+
+   putc( '\n', OutFile );
+   putc(int_xxbyte('\0'),OutFile);
+   putc( '\n', OutFile );
+
+   fprintf( OutFile, "end\n" );
+
+   fclose( infile );
+   fclose( OutFile );
+
+   hb_retni(0);
+
+   if ( pFileName != NULL )
+   {
+      hb_xfree( pFileName );
+   }
+}
+
+HB_FUNC ( XXENCODE_FILE )
+{
+   PHB_ITEM pInFile  = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pOutFile = hb_param( 2, HB_IT_STRING );
+   PHB_FNAME pFileName ;
+   ULONG nSize,i=0;
+   FILE *infile, *OutFile;
+   int c1, c2, c3;
+   char *szFileName;
+   char szDestFile[ _POSIX_PATH_MAX ] ;
+
+   if ( !pInFile )
+   {
+      hb_retni( -1 );
+      return;
+   }
+
+   szFileName = (char*) hbcc_getfilename( (BYTE*) pInFile->item.asString.value );
+
+   if ( strlen ( szFileName ) == 0 )
+   {
+      hb_retni( -1 );
+      return;
+   }
+
+   infile = fopen( pInFile->item.asString.value, "rb" );
+
+   if ( !infile )
+   {
+      hb_retni( -3 );
+      return;
+   }
+
+   fseek( infile, 0L, SEEK_END );
+   nSize = ftell( infile );
+   fseek( infile, 0L, SEEK_SET );
+
+   if ( pOutFile )
+   {
+      if ( strlen ( pOutFile->item.asString.value ) == 0 )
+      {
+         hb_retni( -2 );
+         return;
+      }
+      OutFile = fopen( pOutFile->item.asString.value, "wb" );
+   }
+   else
+   {
+      pFileName = hb_fsFNameSplit(pInFile->item.asString.value);
+      pFileName->szExtension = ".yye";
+      hb_fsFNameMerge( szDestFile, pFileName );
+      OutFile = fopen( szDestFile, "wb" );
+   }
+
+   if ( !OutFile )
+   {
+      hb_retni( -4 );
+      fclose( infile );
+      return ;
+   }
+
+   fprintf( OutFile, "begin 644 %s\n", szFileName );
+
+   while ((c1 = getc(infile)) != EOF)
+   {
+      if ( i % UE_STR_LEN == 0 )
+      {
+         if ( i )
+         {
+            putc( '\n', OutFile );
+         }
+
+         if ( (nSize-i) > UE_STR_LEN )
+         {
+            putc(int_xxbyte(UE_STR_LEN),OutFile);
+         }
+         else
+         {
+            putc(int_xxbyte((BYTE)(nSize-i)),OutFile);
+         }
+      }
+
+      putc( int_xxbyte((c1&0xFC)>>2), OutFile );
+
+      ++ i;
+      c2 = getc( infile );
+
+      if ( c2 == EOF )
+      {
+         putc( int_xxbyte((c1&0x03)<<4),OutFile);
+         putc( int_xxbyte(0),OutFile);
+         putc( int_xxbyte(0),OutFile);
+         break;
+      }
+
+      putc( int_xxbyte(((c1&0x03)<<4)|((c2&0xF0)>>4)),OutFile);
+
+      ++ i;
+      c3 = getc( infile );
+
+      if ( c3 == EOF )
+      {
+         putc( int_xxbyte((c2&0x0F)<<2),OutFile);
+         putc( int_xxbyte(0),OutFile);
+         break;
+      }
+
+      putc(int_xxbyte(((c2&0x0F)<<2)|((c3&0xC0)>>6)),OutFile);
+      putc(int_xxbyte(c3&0x3F),OutFile);
+
+      ++ i;
+   }
+
+   putc( '\n', OutFile );
+   putc(int_xxbyte('\0'),OutFile);
+   putc( '\n', OutFile );
+
+   fprintf( OutFile, "end\n" );
+
+   fclose( infile );
+   fclose( OutFile );
+
+   hb_retni(0);
+}
 
 HB_FUNC(HB_XXENCODE)
 {
@@ -169,10 +669,10 @@ static ULONG int_xxenc(BYTE *srcstr,ULONG srclen,BYTE *dststr)
          {
             if (i)
             {
-               if (OS_EOL_LEN-1)
-               {
-                  dststr[dstlen++]='\r';
-               }
+               //if (OS_EOL_LEN-1)
+               //{
+               //   dststr[dstlen++]='\r';
+               //}
 
                dststr[dstlen++]='\n';
             }
@@ -259,18 +759,18 @@ static ULONG int_xxenc(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 
    if (dststr)
    {
-      if (OS_EOL_LEN-1)
-      {
-         dststr[dstlen++]='\r';
-      }
+      //if (OS_EOL_LEN-1)
+      //{
+      //   dststr[dstlen++]='\r';
+      //}
 
       dststr[dstlen++]='\n';
       dststr[dstlen++]=int_xxbyte('\0');
 
-      if (OS_EOL_LEN-1)
-      {
-         dststr[dstlen++]='\r';
-      }
+      //if (OS_EOL_LEN-1)
+      //{
+      //   dststr[dstlen++]='\r';
+      //}
 
       dststr[dstlen++]='\n';
    }
@@ -396,3 +896,4 @@ static ULONG int_xxdec(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 
    return dstlen;
 }
+

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcu.c,v 1.2 2004/02/02 10:12:40 andijahja Exp $
+ * $Id: hbcu.c,v 1.3 2004/02/06 12:55:17 andijahja Exp $
  */
 
 /*
@@ -71,6 +71,17 @@ HB_UUDECODE(uu_string) -> string
       uu_string  - UUencode encoded string
    Returns:
       decoded string
+
+UUDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
+   Description:
+      UUDecode a given file
+   Parameters:
+      cFileInput = string, source filename to be decoded
+                   OR
+                   array, an array of file chunks arranged in proper order
+      cFileOutput = output filename
+   Returns:
+      Upon succesful decoding the function returns numnber of bytes written
 */
 
 #include "hbapi.h"
@@ -184,6 +195,45 @@ HB_FUNC( UUDECODE_FILE )
       {
          if ( string )
          {
+            if ( !bOutFile )
+            {
+               if ( poutFile )
+               {
+                  if ( strstr ( string ,"begin 6" ) != NULL )
+                  {
+                     outFile = fopen( poutFile->item.asString.value, "wb" );
+
+                     if ( !outFile )
+                     {
+                        break;
+                     }
+
+                     bOutFile = TRUE;
+                     continue;
+                  }
+               }
+               else
+               {
+
+                  if ( strstr ( string ,"begin 6" ) != NULL )
+                  {
+                     char *szFile ;
+                     szFile = string + 10;
+
+                     if( szFile )
+                     {
+                        outFile = fopen( szFile, "wb" );
+
+                        if ( outFile )
+                        {
+                           bOutFile = TRUE;
+                           continue;
+                        }
+                     }
+                  }
+               }
+            } // end if ( !bOutFile )
+
             srclen = strlen( string );
             dstlen = int_uudec((BYTE*) string,srclen,NULL);
             if ( dstlen )
@@ -198,54 +248,15 @@ HB_FUNC( UUDECODE_FILE )
 
                hb_xfree(dststr);
             }
-            else
-            {
-              /* file name always at the first line */
-              /* substring 10 */
-              if ( !bOutFile )
-              {
-                 if ( poutFile )
-                 {
-                    if ( strstr ( string ,"begin 6" ) != NULL )
-                    {
-                       outFile = fopen( poutFile->item.asString.value, "wb" );
-
-                       if ( !outFile )
-                       {
-                          break;
-                       }
-
-                       bOutFile = TRUE;
-                    }
-                 }
-                 else
-                 {
-                    char *szFile ;
-
-                    if ( strstr ( string ,"begin 6" ) != NULL )
-                    {
-                       szFile = string + 10;
-
-                       if( szFile )
-                       {
-                          outFile = fopen( szFile, "wb" );
-
-                          if ( outFile )
-                          {
-                             bOutFile = TRUE;
-                          }
-                       }
-                    }
-                 }
-              }
-            }
          }
       }
 
       fclose( inFile );
 
       if ( szFileName )
+      {
          hb_xfree( szFileName );
+      }
    }
 
    hb_retnl( nBytesWritten );
@@ -254,8 +265,8 @@ HB_FUNC( UUDECODE_FILE )
 
    if ( bAlloc )
    {
-     hb_itemRelease(pStruct);
-     hb_itemRelease(pItem);
+      hb_itemRelease(pStruct);
+      hb_itemRelease(pItem);
    }
 
    fclose( outFile );
@@ -353,10 +364,10 @@ static ULONG int_uuenc(BYTE *srcstr,ULONG srclen,BYTE *dststr)
          {
             if (i)
             {
-               if (OS_EOL_LEN-1)
-               {
-                  dststr[dstlen++]='\r';
-               }
+               //if (OS_EOL_LEN-1)
+               //{
+               //   dststr[dstlen++]='\r';
+               //}
 
                dststr[dstlen++]='\n';
             }
@@ -443,18 +454,18 @@ static ULONG int_uuenc(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 
    if (dststr)
    {
-      if (OS_EOL_LEN-1)
-      {
-         dststr[dstlen++]='\r';
-      }
+      //if (OS_EOL_LEN-1)
+      //{
+      //   dststr[dstlen++]='\r';
+      //}
 
       dststr[dstlen++]='\n';
       dststr[dstlen++]=int_uubyte('\0');
 
-      if (OS_EOL_LEN-1)
-      {
-         dststr[dstlen++]='\r';
-      }
+      //if (OS_EOL_LEN-1)
+      //{
+      //   dststr[dstlen++]='\r';
+      //}
 
       dststr[dstlen++]='\n';
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.11 2004/02/03 22:11:43 andijahja Exp $
+ * $Id: ChangeLog,v 1.12 2004/02/06 12:55:17 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-08 01:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/unicode/hbcx.c
+    + add XXENCODE_FILE()
+    + add XXENCODE_FILE_BY_CHUNK()
+    + add XXDECODE_FILE()
+      Those are functions to XXEncode/XXDecode files.
+
+  * contrib\unicode\hbcc.prg
+  * contrib\unicode\hbcu.c
+  * contrib\unicode\hbcy.c
+    * do not write CR ('\r') to encoded files
+
+  * tests/xhbenc.prg
+    + add routines to tests XXEncoding/XXDecoding of file.
+
 2004-02-06 19:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * contrib/unicode/hbdecode.prg
     ! remmed PRG functions of decoding. They are really too slow and
