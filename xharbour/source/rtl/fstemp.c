@@ -1,5 +1,5 @@
  /*
- * $Id: fstemp.c,v 1.15 2004/07/25 21:53:14 peterrees Exp $
+ * $Id: fstemp.c,v 1.16 2004/07/28 02:45:23 peterrees Exp $
  */
 
 /*
@@ -150,7 +150,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
 static BOOL fsGetTempDirByCase( BYTE *pszName, const char *pszTempDir )
 {
    BOOL bOk= FALSE;
-   if ( *pszTempDir )
+   if ( pszTempDir!= NULL && *pszTempDir!= '\0' )
    {
       bOk= TRUE;
       strcpy( pszName, ( char *) pszTempDir );
