@@ -84,164 +84,167 @@ GLOBAL cLineComment := ";"
 GLOBAL cHalfLineComment := "#"
 
 
-PROCEDURE HB_SetIniComment( cLc, cHlc )
-   cLineComment := cLc
-   cHalfLineComment := cHlc
-RETURN
+procedure HB_SetIniComment( cLc, cHlc )
+   cLineComment = cLc
+   cHalfLineComment = cHlc
+return
 
 
-FUNCTION HB_ReadIni( cFileSpec, bKeyCaseSens )
-   LOCAL hIni := Hash()
+function HB_ReadIni( cFileSpec, bKeyCaseSens )
 
-   hIni[ "MAIN" ] := Hash()
+   local hIni := Hash()
 
-RETURN HB_ReadIni2( hIni, cFileSpec, bKeyCaseSens )
-
+return HB_ReadIni2( hIni, cFileSpec, bKeyCaseSens )
 
 
-STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens )
-   LOCAL aFiles
-   LOCAL cFile, nLen
-   LOCAL aKeyVal, hCurrentSection
-   LOCAL fHandle, nLineEnd
-   LOCAL cData, cBuffer, cLine
-   LOCAL reComment
+static function HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens )
 
-   reComment := HB_RegexComp( cHalfLineComment + "|^[ \t]*" + cLineComment )
+   local aFiles := HB_RegexSplit( ";", cFileSpec )
+   local cFile, nLen
+   local aKeyVal, hCurrentSection
+   local fHandle, nLineEnd
+   local cData := ""
+   local cBuffer := Space( 1024 )
+   local cLine
+   local reComment := HB_RegexComp( cHalfLineComment + "|^[ \t]*" + cLineComment )
 
-   aFiles := HB_RegexSplit( ";", cFileSpec )
-   IF Empty( aFiles )
-      aFiles := { cFileSpec }
-   ENDIF
+   if Empty( aFiles )
+      aFiles = { cFileSpec }
+   endif
 
-   FOR EACH cFile IN aFiles
-      IF File( cFile )
-         fHandle := fopen( cFile )
-         EXIT
-      ENDIF
-   NEXT
+   for each cFile in aFiles
+      if File( cFile )
+         fHandle = FOpen( cFile )
+         exit
+      endif
+   next
 
-   IF Empty( fHandle ) .or. fHandle <= 0
-      RETURN NIL
-   ENDIF
+   if Empty( fHandle ) .or. fHandle < 0
+      return nil
+   endif
 
    // Default case sensitiveness for keys
-   IF bKeyCaseSens == NIL
-      bKeyCaseSens := .T.
-   ENDIF
+   if bKeyCaseSens == nil
+      bKeyCaseSens = .t.
+   endif
 
-   /* we'll read the whole file, then we'll break it in lines. */
-   cBuffer := Space( 1024 )
-   cData := ""
-   DO WHILE ( nLen := Fread( fHandle, @cBuffer, 1024 ) ) > 0
-      cData += substr( cBuffer, 1, nLen )
-   ENDDO
-   Fclose( fHandle )
+   // we'll read the whole file, then we'll break it in lines.
+   while ( nLen := FRead( fHandle, @cBuffer, 1024 ) ) > 0
+      cData += SubStr( cBuffer, 1, nLen )
+   enddo
 
-   /* Always begin with the MAIN section */
-   hCurrentSection := aIni[ "MAIN" ]
+   FClose( fHandle )
 
-   cLine := ""
-   DO WHILE Len( cData ) > 0
-      nLineEnd := At( chr(13)+chr(10), Substr( cData, 1, 256) )
-      IF nLineEnd == 0
-         nLineEnd := At( chr(10), Substr( cData, 1, 256) )
-         IF nLineEnd == 0
-            nLineEnd := At( chr(13), Substr( cData, 1, 256) )
-            IF nLineEnd == 0
-               nLineEnd := Len( cData )
-            ENDIF
-         ENDIF
-      ENDIF
+   cLine = ""
+   while Len( cData ) > 0
+
+      nLineEnd = At( Chr( 13 ) + Chr( 10 ), SubStr( cData, 1, 256) )
+
+      if nLineEnd == 0
+
+         nLineEnd = At( Chr( 10 ), SubStr( cData, 1, 256 ) )
+
+         if nLineEnd == 0
+
+            nLineEnd = At( Chr( 13 ), SubStr( cData, 1, 256 ) )
+
+            if nLineEnd == 0
+               nLineEnd = Len( cData )
+            endif
+
+         endif
+
+      endif
 
       // Get the current line
-      cLine += AllTrim( Substr( cData, 1, nLineEnd-1 ) )
+      cLine += AllTrim( SubStr( cData, 1, nLineEnd - 1 ) )
+
       // if line terminator is 13/10 add one character
       // (added also support for MAC line termination 10 + 13)
-      IF Len( cData ) > nLineEnd .and. ;
-            ( cData[ nLineEnd + 1 ] == chr(10) .or. cData[ nLineEnd + 1 ] == chr(13) )
+      if Len( cData ) > nLineEnd .and. ( cData[ nLineEnd + 1 ] == Chr( 10 ) .or. cData[ nLineEnd + 1 ] == Chr( 13 ) )
          nLineEnd++
-      ENDIF
+      endif
 
       // remove current line
-      cData := Substr( cData, nLineEnd+1 )
+      cData = SubStr( cData, nLineEnd+1 )
 
       //Skip void lines
-      IF Len( cLine ) == 0
-         LOOP
-      ENDIF
+      if Len( cLine ) == 0
+         loop
+      endif
 
       //Sum up lines terminating with "<space>||" ...
-      IF Len( cLine ) > 3 .and. cLine[ -1 ] == "|" .and. cLine[ -2 ] == "|" .and. cLine[ -3 ] == " "
-         cLine := Substr( cLine, 1, Len( cLine ) -2 )
+      if Len( cLine ) > 3 .and. cLine[ -1 ] == "|" .and. cLine[ -2 ] == "|" .and. cLine[ -3 ] == " "
+
+         cLine = SubStr( cLine, 1, Len( cLine ) -2 )
 
          // ... but proceed if stream over
-         IF Len( cData ) > 0
-            LOOP
-         ENDIF
+         if Len( cData ) > 0
+            loop
+         endif
 
-      ENDIF
+      endif
 
       // remove eventual comments
-      aKeyVal := HB_RegexSplit( reComment, cLine )
-      IF .not. Empty( aKeyVal )
-         cLine := AllTrim( aKeyVal[1] )
-      ENDIF
+      aKeyVal = HB_RegexSplit( reComment, cLine )
+      if !Empty( aKeyVal )
+         cLine = AllTrim( aKeyVal[ 1 ] )
+      endif
 
       //Skip all comment lines
-      IF Len( cLine ) == 0
-         LOOP
-      ENDIF
+      if Len( cLine ) == 0
+         loop
+      endif
 
       // Is it an "INCLUDE" statement ?
-      aKeyVal := HB_RegEx("include (.*)", cLine )
-      IF .not. Empty( aKeyVal )
+      aKeyVal = HB_RegEx("include (.*)", cLine )
+      if !Empty( aKeyVal )
          // ignore void includes
-         aKeyVal[2] := AllTrim(aKeyVal[2])
-         IF Len( aKeyVal[2] ) == 0
-            LOOP
-         ENDIF
-          HB_ReadIni2( aIni, AllTrim(aKeyVal[2]), bKeyCaseSens )
-         cLine := ""
-         LOOP
-      ENDIF
+         aKeyVal[ 2 ] = AllTrim( aKeyVal[ 2 ] )
+         if Len( aKeyVal[ 2 ] ) == 0
+            loop
+         endif
+         HB_ReadIni2( aIni, AllTrim( aKeyVal[ 2 ] ), bKeyCaseSens )
+         cLine = ""
+         loop
+      endif
 
       //Is it a NEW section?
-      aKeyVal := HB_Regex( "[[](.*)[]]", cLine )
-      IF .not. Empty( aKeyVal )
-         cLine := AllTrim( aKeyVal[2] )
+      aKeyVal = HB_Regex( "[[](.*)[]]", cLine )
+      if !Empty( aKeyVal )
+         cLine = AllTrim( aKeyVal[ 2 ] )
          //Sanitizing
-         IF Len( cLine ) != 0
-            hCurrentSection := Hash()
-            IF .not. bKeyCaseSens
-               cLine := Upper( cLine )
-            ENDIF
+         if Len( cLine ) > 0
+            hCurrentSection = Hash()
+            if !bKeyCaseSens
+               cLine = Upper( cLine )
+            endif
             aIni[ cLine ] := hCurrentSection
-         ENDIF
-         cLine := ""
-         LOOP
-      ENDIF
+         endif
+         cLine = ""
+         loop
+      endif
 
       //Is it a valid key?
-
-      aKeyVal := HB_RegexSplit( "=|:", cLine,,,2 )
-      IF Len( aKeyVal ) == 1
+      aKeyVal = HB_RegexSplit( "=|:", cLine, nil, nil, 2 )
+      if Len( aKeyVal ) == 1
          //TODO: Signal error
-         cLine := ""
-         LOOP
-      ENDIF
+         cLine = ""
+         loop
+      endif
 
       // If not case sensitive, use upper keys
-      IF .not. bKeyCaseSens
-         aKeyVal[1] := Upper( aKeyVal[1] )
-      ENDIF
+      if !bKeyCaseSens
+         aKeyVal[ 1 ] = Upper( aKeyVal[ 1 ] )
+      endif
 
-      hCurrentSection[ AllTrim(aKeyVal[1]) ] := AllTrim(aKeyVal[2])
-      cLine := ""
-   ENDDO
+      hCurrentSection[ AllTrim( aKeyVal[ 1 ] ) ] = AllTrim( aKeyVal[ 2 ] )
 
-RETURN aIni
+      cLine = ""
 
+   enddo
+
+return aIni
 
 
 function HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd )
@@ -269,17 +272,7 @@ function HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd )
       FWrite( nFileId, cCommentBegin + cNewLine )
    endif
 
-   hCurrentSection = hIni[ "MAIN" ]
-
-   HEval( hCurrentSection, ;
-          { | cKey, xVal |  FWrite( nFileId, cKey + "=" + cKey + cNewLine ) };
-        )
-
    for each cSection in hIni:Keys
-
-       if cSection == "MAIN"
-          loop
-       endif
 
        hCurrentSection = hIni[ cSection ]
 
