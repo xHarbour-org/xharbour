@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.4 2004/01/07 12:54:58 rodrigo_moreno Exp $
+ * $Id: Changelog,v 1.5 2004/01/07 13:24:48 rodrigo_moreno Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-16 14:00 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  * Modified makefile.bc to user PG_DIR var
+  * Modified TPostgres.prg
+    * Changed ISCHAR to ISCHARACTER
+  * Modified samples/stress.prg
+    * Changed ISCHAR to ISCHARACTER
+    * Contributed by Eduardo Fenandez
 
 2004-01-07 11:20 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   * Modified make_b32.bat and makefile.bc, now it's working properly.

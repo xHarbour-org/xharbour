@@ -86,7 +86,7 @@ METHOD New( cHost, cDatabase, cUser, cPass, nPort ) CLASS TPQserver
     
     ::pDB := PQconnect(cDatabase, cHost, cUser, cPass, nPort)
 
-    ::lError := (ISCHAR(::pDB))
+    ::lError := (ISCHARACTER(::pDB))
     
     if ::lError
         ::cError := ::pDB
@@ -100,7 +100,7 @@ METHOD StartTransaction() CLASS TPQserver
     
     pQuery := PQexec( ::pDB, 'BEGIN' )
     
-    ::lError := (ISCHAR(pQuery))
+    ::lError := (ISCHARACTER(pQuery))
     
     if ::lError
         ::cError := pQuery
@@ -115,7 +115,7 @@ METHOD Commit() CLASS TPQserver
     
     pQuery := PQexec( ::pDB, 'COMMIT' )
     
-    ::lError := (ISCHAR(pQuery))
+    ::lError := (ISCHARACTER(pQuery))
     
     if ::lError
         ::cError := pQuery
@@ -130,7 +130,7 @@ METHOD Rollback() CLASS TPQserver
     
     pQuery := PQexec( ::pDB, 'ROLLBACK' )
     
-    ::lError := (ISCHAR(pQuery))
+    ::lError := (ISCHARACTER(pQuery))
     
     if ::lError
         ::cError := pQuery
@@ -158,7 +158,7 @@ METHOD TableExists( cTable ) CLASS TPQserver
     
     res := PQexec( ::pDB, cQuery )
     
-    if ! ISCHAR(res)
+    if ! ISCHARACTER(res)
         result := (PQlastrec(res) != 0)
     end
     
@@ -178,7 +178,7 @@ METHOD ListTables() CLASS TPQserver
     
     res := PQexec( ::pDB, cQuery )
     
-    if ! ISCHAR(res)
+    if ! ISCHARACTER(res)
         For i := 1 to PQlastrec(res)
             aadd( result, PQgetvalue( res, i, 1 ) )
         Next            
@@ -204,7 +204,7 @@ METHOD TableStruct( cTable ) CLASS TPQserver
     
     res := PQexec( ::pDB, cQuery )
     
-    if ! ISCHAR(res)
+    if ! ISCHARACTER(res)
         For i := 1 to PQlastrec(res)
             cField    := PQgetvalue(res, i, 1)
             cType     := PQgetvalue(res, i, 2)            
@@ -331,7 +331,7 @@ METHOD CreateTable( cTable, aStruct ) CLASS TPQserver
     
     res := PQexec( ::pDB, cQuery )
     
-    if (::lError := (ISCHAR(res)))
+    if (::lError := (ISCHARACTER(res)))
         ::cError := res
         result := .f.
     end
@@ -346,7 +346,7 @@ METHOD DeleteTable( cTable  ) CLASS TPQserver
 
     res := PQexec( ::pDB, 'DROP TABLE ' + cTable  )
     
-    if (::lError := (ISCHAR(res)))
+    if (::lError := (ISCHARACTER(res)))
         ::cError := res
         result := .f.
     end
@@ -465,7 +465,7 @@ METHOD Refresh() CLASS TPQquery
 
     res := PQexec( ::pDB, ::cQuery )
         
-    if ! ISCHAR(res)
+    if ! ISCHARACTER(res)
     
         // Get some information about metadata
         aTemp := PQmetadata(res)
@@ -498,7 +498,7 @@ METHOD Refresh() CLASS TPQquery
                 
                 temp := PQexec(::pDB, cQuery)
                 
-                if ! ISCHAR(temp)
+                if ! ISCHARACTER(temp)
                     For i := 1 to PQlastrec(temp)                
                         n := AScan( aStruct, {|x| x[8] == val(PQgetvalue( temp, i, 1 )) .and.;
                                                   x[7] == val(PQgetvalue( temp, i, 5 )) })                
@@ -762,7 +762,7 @@ METHOD Delete(oRow) CLASS TPQquery
 
         if ! (cWhere == '')
             res := PQexec( ::pDB, 'DELETE FROM ' + ::aTables[1] + ' WHERE ' + cWhere)            
-            result := ! ISCHAR(res)  
+            result := ! ISCHARACTER(res)  
             
             if ! result     
                 ::lError := .t.
@@ -808,7 +808,7 @@ METHOD Append( oRow ) CLASS TPQquery
 
         if lChanged
             res := PQexec( ::pDB, cQuery)            
-            result := ! ISCHAR(res)   
+            result := ! ISCHARACTER(res)   
 
             if ! result     
                 ::lError := .t.
@@ -866,7 +866,7 @@ METHOD Update(oRow) CLASS TPQquery
             cQuery := Left( cQuery, len(cQuery) - 1 ) + ' WHERE ' + cWhere            
             
             res := PQexec( ::pDB, cQuery)            
-            result := ! ISCHAR(res)   
+            result := ! ISCHARACTER(res)   
         
             if ! result     
                 ::lError := .t.

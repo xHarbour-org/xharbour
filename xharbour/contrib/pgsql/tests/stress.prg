@@ -15,7 +15,7 @@ Function Main()
     ? 'Connecting....'    
     oServer := PQconnect(cDatabase, cServer, cUser, cPass, 5432)
 
-    if ISCHAR(oServer)
+    if ISCHARACTER(oServer)
         ? oServer
         quit
     end
@@ -104,7 +104,7 @@ Function Main()
 
     ? oQuery := PQexec(oServer, 'SELECT sum(salary) as sum_salary FROM test WHERE code between 1 and 4000')
 
-    if ! ISCHAR(oquery)
+    if ! ISCHARACTER(oquery)
         @ 18,0 say 'Sum values....' + PQgetvalue(oquery, 1, 1)    
     end
 
@@ -114,7 +114,7 @@ Function Main()
     For i := 1 to 4000
         oQuery := PQexec(oServer, 'SELECT salary FROM test WHERE code = ' + str(i))
         
-        if ! ISCHAR(oQuery)
+        if ! ISCHARACTER(oQuery)
             x += val(PQgetvalue(oquery, 1, 1))    
             
             @ 19,0 say 'Sum values....' + str(x)
