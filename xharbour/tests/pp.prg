@@ -46,13 +46,139 @@
    #ifdef FW
       #INCLUDE "fwextern.ch"
    #else
+      #ifdef MINIGUI
+         #define WIN
+
+         EXTERN PLAYBEEP
+         EXTERN PLAYASTERISK
+         EXTERN PLAYEXCLAMATION
+         EXTERN PLAYHAND
+         EXTERN PLAYQUESTION
+         EXTERN PLAYOK
+         EXTERN ACTIVATEFORM
+         EXTERN GETFONT
+         EXTERN GETFILE
+         EXTERN PUTFILE
+         EXTERN GETMENU
+         EXTERN GETSUBMENU
+         EXTERN CCHECKMENUITEM
+         EXTERN CUNCHECKMENUITEM
+         EXTERN GETMENUCHECKSTATE
+         EXTERN CENABLEMENUITEM
+         EXTERN CDISABLEMENUITEM
+         EXTERN GETMENUENABLEDSTATE
+         EXTERN INITTIMER
+         EXTERN KILLTIMER
+         EXTERN INITTOOLTIP
+         EXTERN SETTOOLTIP
+         EXTERN INITPANEL
+         EXTERN C_MSGRETRYCANCEL
+         EXTERN C_MSGOKCANCEL
+         EXTERN C_MSGYESNO
+         EXTERN INITPROGRESSBAR
+         EXTERN INITSLIDER
+         EXTERN REPAINTSTATUS
+         EXTERN INITDATEPICK
+         EXTERN SETDATEPICK
+         EXTERN GETDATEPICKYEAR
+         EXTERN GETDATEPICKMONTH
+         EXTERN GETDATEPICKDAY
+         EXTERN EXITPROCESS
+         EXTERN LISTVIEW_GETFIRSTITEM
+         EXTERN INITGUI
+         EXTERN INITTOPMOSTFORM
+         EXTERN TRACKPOPUPMENU
+         EXTERN INITSTATUS
+         EXTERN SETSTATUS
+         EXTERN INITFORM
+         EXTERN INITMODALWINDOW
+         EXTERN ACTIVATEFORMGENERIC
+         EXTERN ACTIVATEFORMNOWAIT
+         EXTERN CSHOWCONTROL
+         EXTERN MAXIMIZE
+         EXTERN MINIMIZE
+         EXTERN RESTORE
+         EXTERN CHIDECONTROL
+         EXTERN INITBUTTON
+         EXTERN INITIMAGEBUTTON
+         EXTERN INITLABEL
+         EXTERN INITCHECKBOX
+         EXTERN INITGROUPBOX
+         EXTERN INITRADIOGROUP
+         EXTERN INITRADIOBUTTON
+         EXTERN INITCOMBOBOX
+         EXTERN INITLISTBOX
+         EXTERN INITSPINNER
+         EXTERN INITTEXTBOX
+         EXTERN INITNUMERICTEXTBOX
+         EXTERN INITPASSWORDTEXTBOX
+         EXTERN INITEDITBOX
+         EXTERN INITREADONLYEDITBOX
+         EXTERN GETACTIVEWINDOW
+         EXTERN SETACTIVEWINDOW
+         EXTERN INITLISTVIEW
+         EXTERN MSGBOX
+         EXTERN POSTQUITMESSAGE
+         EXTERN INITLISTVIEWCOLUMNS
+         EXTERN ADDLISTVIEWITEMS
+         EXTERN INITTABCONTROL
+         EXTERN TABCTRL_SETCURSEL
+         EXTERN TABCTRL_GETCURSEL
+         EXTERN INITIMAGE
+         EXTERN HIWORD
+         EXTERN LOWORD
+         EXTERN DESTROYWINDOW
+         EXTERN MSGINFO
+         EXTERN MSGSTOP
+         EXTERN MSGEXCLAMATION
+         EXTERN INITMENU
+         EXTERN INITCONTEXTMENU
+         EXTERN ISWINDOWENABLED
+         EXTERN ENABLEWINDOW
+         EXTERN DISABLEWINDOW
+         EXTERN SETFOREGROUNDWINDOW
+         EXTERN GETFOREGROUNDWINDOW
+         EXTERN GETNEXTWINDOW
+         EXTERN GETPREVWINDOW
+         EXTERN CHECKDLGBUTTON
+         EXTERN UNCHECKDLGBUTTON
+         EXTERN COMBOADDSTRING
+         EXTERN COMBOSETCURSEL
+         EXTERN LISTBOXADDSTRING
+         EXTERN LISTBOXSETCURSEL
+         EXTERN SETDLGITEMTEXT
+         EXTERN SETWINDOWTEXT
+         EXTERN CENTER
+         EXTERN LISTVIEW_SETCURSEL
+         EXTERN C_SETFOCUS
+         EXTERN GETDLGITEMTEXT
+         EXTERN GETWINDOWTEXT
+         EXTERN ISDLGBUTTONCHECKED
+         EXTERN COMBOGETCURSEL
+         EXTERN LISTBOXGETCURSEL
+         EXTERN COMBOBOXDELETESTRING
+         EXTERN LISTBOXDELETESTRING
+         EXTERN LISTVIEWDELETESTRING
+         EXTERN LISTBOXRESET
+         EXTERN LISTVIEWRESET
+         EXTERN COMBOBOXRESET
+         EXTERN SENDMESSAGE
+         EXTERN C_GETFOLDER
+         EXTERN C_BROWSEFORFOLDER
+         EXTERN C_GETSPECIALFOLDER
+      #endif
+
       #ifdef WIN
          #COMMAND Alert( <x> ) => MessageBox( 0, CStr( <x> ), "PP for Windows", 0 )
          EXTERN MessageBox
          EXTERN CreateObject
       #endif
+
+
    #endif
+
 #else
+
    #DEFINE __CLIPPER__
 
    #ifndef CRLF
@@ -214,7 +340,7 @@ STATIC s_acFlowType := {},  s_nFlowId := 0
    STATIC s_bRecursive := .F.
 #endif
 
-static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
+static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUILoaded := .F.
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
@@ -932,7 +1058,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
          ExtractLeadingWS( @sBlock )
          DropTrailingWS( @sBlock )
 
-         IF ! ( sBlock == '' )
+         IF ! Empty( sBlock )
             IF sBlock = "#line"
                LOOP
             ENDIF
@@ -2976,9 +3102,9 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             DropTrailingWS( @sLine )
 
             // Strip the ""
-            sLine := SubStr( sLine, 2, Len( sLine ) - 2 )
+            sLine := Upper( SubStr( sLine, 2, Len( sLine ) - 2 ) )
 
-            IF Upper( sLine ) = "HBCLASS"
+            IF sLine == "HBCLASS.CH"
                IF ! s_lClsLoaded
                   s_lClsLoaded := .T.
                   InitClsRules()
@@ -2993,7 +3119,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                      Alert( [Class #DEFINE Rules size mismatch] )
                   ENDIF
                ENDIF
-            ELSEIF Upper( sLine ) = "FIVEWIN"
+            ELSEIF sLine == "FIVEWIN.CH"
                IF ! s_lFWLoaded
                   s_lFWLoaded := .T.
                   IF ! s_lClsLoaded
@@ -3020,6 +3146,35 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                   ENDIF
                   IF Len( aCommRules ) != Len( aCommResults )
                      Alert( [FW #DEFINE Rules size mismatch] )
+                  ENDIF
+               ENDIF
+            ELSEIF sLine == "MINIGUI.CH"
+               IF ! s_lMiniGUILoaded
+                  s_lMiniGUILoaded := .T.
+                  IF ! s_lClsLoaded
+                     s_lClsLoaded := .T.
+                     InitClsRules()
+                     InitClsResults()
+                     IF Len( aDefRules ) != Len( aDefResults )
+                        Alert( [Class #DEFINE Rules size mismatch] )
+                     ENDIF
+                     IF Len( aTransRules ) != Len( aTransResults )
+                        Alert( [Class #TRANSLATE Rules size mismatch] )
+                     ENDIF
+                     IF Len( aCommRules ) != Len( aCommResults )
+                        Alert( [Class #DEFINE Rules size mismatch] )
+                     ENDIF
+                  ENDIF
+                  InitMiniGUIRules()
+                  InitMiniGUIResults()
+                  IF Len( aDefRules ) != Len( aDefResults )
+                     Alert( [MiniGUI #DEFINE Rules size mismatch] )
+                  ENDIF
+                  IF Len( aTransRules ) != Len( aTransResults )
+                     Alert( [MiniGUI #TRANSLATE Rules size mismatch] )
+                  ENDIF
+                  IF Len( aCommRules ) != Len( aCommResults )
+                     Alert( [MiniGUI #DEFINE Rules size mismatch] )
                   ENDIF
                ENDIF
             ELSE
@@ -8692,29 +8847,42 @@ PROCEDURE PP_LoadRun()
 RETURN
 
 //--------------------------------------------------------------//
-PROCEDURE PP_LoadClass()
-
-   IF ! s_lClsLoaded
-      s_lClsLoaded := .T.
-      InitClsRules()
-      InitClsResults()
-   ENDIF
-
-RETURN
-
-//--------------------------------------------------------------//
-PROCEDURE PP_LoadFW()
-
-   IF ! s_lFWLoaded
-      s_lFWLoaded := .T.
-      InitFWRules()
-      InitFWResults()
-   ENDIF
-
-RETURN
-
-//--------------------------------------------------------------//
 #ifdef __HARBOUR__
+
+   //--------------------------------------------------------------//
+   PROCEDURE PP_LoadClass()
+
+      IF ! s_lClsLoaded
+         s_lClsLoaded := .T.
+         InitClsRules()
+         InitClsResults()
+      ENDIF
+
+   RETURN
+
+   //--------------------------------------------------------------//
+   PROCEDURE PP_LoadFW()
+
+      IF ! s_lFWLoaded
+         s_lFWLoaded := .T.
+         InitFWRules()
+         InitFWResults()
+      ENDIF
+
+   RETURN
+
+   //--------------------------------------------------------------//
+   PROCEDURE PP_LoadMiniGUI()
+
+      IF ! s_lMiniGUILoaded
+         s_lMiniGUILoaded := .T.
+         InitMiniGUIRules()
+         InitMiniGUIResults()
+      ENDIF
+
+   RETURN
+
+   //--------------------------------------------------------------//
    FUNCTION PP_CompileText( sLines )
    RETURN PP_CompileLine( sLines )
 #endif
@@ -8722,12 +8890,6 @@ RETURN
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
    #include "pp_harb.ch"
-#else
-   STATIC FUNCTION InitFWRules()
-   RETURN .T.
-
-   STATIC FUNCTION InitFWResults()
-   RETURN .T.
 #endif
 
 //--------------------------------------------------------------//

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.212 2002/05/11 00:48:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.213 2002/05/11 20:03:52 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-11 22:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * tests/pp.prg
+   * tests/pp_harb.ch
+     + Added support for MiniGUI
+
+   /*
+    Note: You need to use -dMINIGUI to enable the support.
+        : xBaseScript can now run MiniGUI demo.prg.
+   */
 
 2002-05-11 13:02 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * tests/pp.prg
