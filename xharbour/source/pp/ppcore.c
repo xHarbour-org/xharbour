@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.195 2005/02/27 05:52:00 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.196 2005/03/02 17:39:13 ronpinkas Exp $
  */
 
 /*
@@ -2407,10 +2407,12 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
      }
      ptri = sLine + isdvig;
 
-     ipos = md_strAt( ";", 1, ptri, TRUE, FALSE, bRule, FALSE );
+     ipos = md_strAt( ";", 1, ptri, FALSE, FALSE, bRule, FALSE );
 
      if( ipos > 0 )
      {
+        //printf( "Found <;> at %i in <%s>\n", ipos, ptri );
+
         s_pTerminator = ( ptri + ipos - 1 );
 
         /*
@@ -6142,136 +6144,104 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
      /* END */
      else
      {
-        if( State == STATE_BRACKET )
+        if( ( *(szText+lPos) == '\'' || *(szText+lPos) == '`' ) && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
         {
-           if( *(szText+lPos) == ']' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
-           {
-              kolSquare--;
-              if( kolSquare == 0 )
-              {
-                 State = STATE_NORMAL;
-              }
-
-              cLastChar = ']';
-              lPos++;
-              continue;
-           }
-           else if( *(szText+lPos) == '[' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
-           {
-              kolSquare++;
-              cLastChar = '[';
-              lPos++;
-              continue;
-           }
-           else if( *(szText+lPos) == ',' )
-           {
-              cLastChar = ',';
-              lPos++;
-              continue;
-           }
+           State = STATE_QUOTE1;
+           lPos++;
+           continue;
         }
-        else
+        else if( IS_ESC_STRING( *(szText+lPos)) )
         {
-           if( ( *(szText+lPos) == '\'' || *(szText+lPos) == '`' ) && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
+           State = STATE_QUOTE4;
+           lPos+=2;
+           continue;
+        }
+        else if( *(szText+lPos) == '\"' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
+        {
+           State = STATE_QUOTE2;
+           lPos++;
+           continue;
+        }
+        else if( bRule == FALSE && *(szText+lPos) == '[' && strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) )
+        {
+           State = STATE_QUOTE3;
+           lPos++;
+           continue;
+        }
+        else if( *(szText+lPos) == '[' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) && szSub[lSubPos] != '[' )
+        {
+           kolSquare++;
+           cLastChar = '[';
+           lPos++;
+           continue;
+        }
+        else if( *(szText+lPos) == '(' )
+        {
+           kolPrth++;
+        }
+        else if( *(szText+lPos) == ')' )
+        {
+           kolPrth--;
+        }
+        else if( *(szText+lPos) == '{' )
+        {
+           kolFig++;
+        }
+        else if( *(szText+lPos) == '}' )
+        {
+           kolFig--;
+        }
+        else if( szText[lPos] == '.' && ( szSub[lSubPos] != '.' || lSubLen == 1 ) )
+        {
+           if( toupper( szText[lPos + 1] ) == 'T' && szText[lPos + 2] == '.' )
            {
-              State = STATE_QUOTE1;
+              lPos += 3;
+           }
+           else if( toupper( szText[lPos + 1] ) == 'F' && szText[lPos + 2] == '.' )
+           {
+              lPos += 3;
+           }
+           else if( toupper( szText[lPos + 1] ) == 'Y' && szText[lPos + 2] == '.' )
+           {
+              lPos += 3;
+           }
+           else if( toupper( szText[lPos + 1] ) == 'N' && szText[lPos + 2] == '.' )
+           {
+              lPos += 3;
+           }
+           else if( toupper( szText[lPos + 1] ) == 'O' && toupper( szText[lPos + 2] ) == 'R' && szText[lPos + 4] == '.' )
+           {
+              lPos += 4;
+           }
+           else if( toupper( szText[lPos + 1] ) == 'A' && toupper( szText[lPos + 2] ) == 'N' && toupper( szText[lPos + 3] ) == 'D' && szText[lPos + 4] == '.' )
+           {
+              lPos += 5;
+           }
+           else if( toupper( szText[lPos + 1] ) == 'N' && toupper( szText[lPos + 2] ) == 'O' && toupper( szText[lPos + 3] ) == 'T' && szText[lPos + 4] == '.' )
+           {
+              lPos += 5;
+           }
+           else if( lPos && isdigit( ( BYTE ) szText[lPos - 1] ) && isdigit( ( BYTE ) szText[lPos + 1] ) )
+           {
               lPos++;
-              continue;
-           }
-           else if( IS_ESC_STRING( *(szText+lPos)) )
-           {
-              State = STATE_QUOTE4;
-              lPos+=2;
-              continue;
-           }
-           else if( *(szText+lPos) == '\"' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
-           {
-              State = STATE_QUOTE2;
-              lPos++;
-              continue;
-           }
-           else if( bRule == FALSE && *(szText+lPos) == '[' && strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) )
-           {
-              State = STATE_QUOTE3;
-              lPos++;
-              continue;
-           }
-           else if( *(szText+lPos) == '[' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) && szSub[lSubPos] != '[' )
-           {
-              State = STATE_BRACKET;
-              kolSquare++;
-              cLastChar = '[';
-              lPos++;
-              continue;
-           }
-           else if( *(szText+lPos) == '(' )
-           {
-              kolPrth++;
-           }
-           else if( *(szText+lPos) == ')' )
-           {
-              kolPrth--;
-           }
-           else if( *(szText+lPos) == '{' )
-           {
-              kolFig++;
-           }
-           else if( *(szText+lPos) == '}' )
-           {
-              kolFig--;
-           }
-           else if( szText[lPos] == '.' && ( szSub[lSubPos] != '.' || lSubLen == 1 ) )
-           {
-              if( toupper( szText[lPos + 1] ) == 'T' && szText[lPos + 2] == '.' )
-              {
-                 lPos += 3;
-              }
-              else if( toupper( szText[lPos + 1] ) == 'F' && szText[lPos + 2] == '.' )
-              {
-                 lPos += 3;
-              }
-              else if( toupper( szText[lPos + 1] ) == 'Y' && szText[lPos + 2] == '.' )
-              {
-                 lPos += 3;
-              }
-              else if( toupper( szText[lPos + 1] ) == 'N' && szText[lPos + 2] == '.' )
-              {
-                 lPos += 3;
-              }
-              else if( toupper( szText[lPos + 1] ) == 'O' && toupper( szText[lPos + 2] ) == 'R' && szText[lPos + 4] == '.' )
-              {
-                 lPos += 4;
-              }
-              else if( toupper( szText[lPos + 1] ) == 'A' && toupper( szText[lPos + 2] ) == 'N' && toupper( szText[lPos + 3] ) == 'D' && szText[lPos + 4] == '.' )
-              {
-                 lPos += 5;
-              }
-              else if( toupper( szText[lPos + 1] ) == 'N' && toupper( szText[lPos + 2] ) == 'O' && toupper( szText[lPos + 3] ) == 'T' && szText[lPos + 4] == '.' )
-              {
-                 lPos += 5;
-              }
-              else if( lPos && isdigit( ( BYTE ) szText[lPos - 1] ) && isdigit( ( BYTE ) szText[lPos + 1] ) )
+
+              while( isdigit( ( BYTE ) szText[lPos] ) )
               {
                  lPos++;
-
-                 while( isdigit( ( BYTE ) szText[lPos] ) )
-                 {
-                    lPos++;
-                 }
               }
-              else
-              {
-                 if( szSub[lSubPos] != '.' )
-                 {
-                    lPos++;
-                 }
-              }
-
+           }
+           else
+           {
               if( szSub[lSubPos] != '.' )
               {
-                 lSubPos = 0;
-                 continue;
+                 lPos++;
               }
+           }
+
+           if( szSub[lSubPos] != '.' )
+           {
+              lSubPos = 0;
+              continue;
            }
         }
 
