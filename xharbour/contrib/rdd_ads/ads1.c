@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.34 2004/03/22 09:22:08 brianhays Exp $
+ * $Id: ads1.c,v 1.35 2004/03/24 08:02:06 brianhays Exp $
  */
 
 /*
@@ -114,6 +114,11 @@ HB_INIT_SYMBOLS_END( ads1__InitSymbols )
 
 static RDDFUNCS adsSuper;
 
+
+/*
+ * -- HELPER FUNCTIONS --
+ */
+
 void adsSetListener_callback( HB_set_enum setting, HB_set_listener_enum when )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsSetListener_callback (%d  %d)", setting, when));
@@ -155,7 +160,18 @@ void adsSetListener_callback( HB_set_enum setting, HB_set_listener_enum when )
             break;
       }
    }
+}
 
+static void adsSetSend( void )
+{
+   HB_TRACE(HB_TR_DEBUG, ("adsSetSend()"));
+
+   AdsSetDateFormat( (UNSIGNED8*) hb_set.HB_SET_DATEFORMAT );
+   AdsSetDefault( (UNSIGNED8*) hb_set.HB_SET_DEFAULT );
+   AdsShowDeleted( ! hb_set.HB_SET_DELETED );
+   AdsSetEpoch( hb_set.HB_SET_EPOCH );
+   AdsSetExact( hb_set.HB_SET_EXACT );
+   AdsSetSearchPath( (UNSIGNED8*) hb_set.HB_SET_PATH );
 }
 
 
@@ -454,6 +470,9 @@ ERRCODE adsCloseCursor( ADSAREAP pArea )
    }
    return uiError;
 }
+
+
+
 
 /*
  * -- ADS METHODS --
@@ -3581,6 +3600,7 @@ HB_FUNC( ADS_GETFUNCTABLE )
    pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
    if( pTable )
    {
+      adsSetSend();
       iSetListenerHandle = hb_setListenerAdd( adsSetListener_callback );
       hb_retni( hb_rddInherit( pTable, &adsTable, &adsSuper, 0 ) );
    }

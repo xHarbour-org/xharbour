@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2659 2004/03/26 03:23:17 lculik Exp $
+ * $Id: ChangeLog,v 1.2660 2004/03/26 05:17:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-26 00:50 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+
+  * contrib/rdd_ads/ads1.c
+    + Added Przemek's fix for initializing SETs correctly at rdd startup.
+      Fixes the bug where SET DELETED ON (and potentially other SETs)
+      *before* the RddRegister("ADS",1) was not sending the current settings
+      to the database engine (so the command was essentially ignored).
+
+  * contrib/rdd_ads/doc/en/adsfuncs.txt
+    * Minor formatting and grammar fixes.
 
 2004-03-25 21:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/arrayshb.c

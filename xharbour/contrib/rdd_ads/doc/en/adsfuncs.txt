@@ -1,5 +1,5 @@
 /*
- * $Id: adsfuncs.txt,v 1.6 2004/02/01 12:02:39 lculik Exp $
+ * $Id: adsfuncs.txt,v 1.7 2004/02/28 16:41:54 lculik Exp $
  */
 
 /*
@@ -1170,7 +1170,7 @@ ADSIsTableEncrypted
  *  $EXAMPLES$
  *  IF adsConnect60("xharbour.add",7/* All types of conection*/,"ADSSYS","",)
  *     // Add one user
- *      AdsDDCreateUser(,"Luiz","papael","This is luiz User") 
+ *      AdsDDCreateUser(,"Luiz","papael","This is luiz User")
  *     // Add the tables
  *      AdsDDaddTable("Table1","table1.adt","table1.adi")
  *  $TESTS$
@@ -1194,16 +1194,16 @@ ADSIsTableEncrypted
  *  $CATEGORY$
  *      Advantage Database RDD
  *  $ONELINER$
- *      This function inform that you want to use an datadictionary conection
+ *      This function specifies that you want to use a datadictionary connection
  *  $SYNTAX$
  *      ADSUSEDICTIONARY(<lUse>) --> lOldStatus
  *  $ARGUMENTS$
- *      <lUseDictionary> Toggle to say id you want to use an database inside an
- *      data dictionary or not
+ *      <lUseDictionary> Toggle to say if you want to use a database inside a
+ *      data dictionary or not.
  *  $RETURNS$
  *      <lOldStatus> -> The old status of this function
  *  $DESCRIPTION$
- *      This function toggle the usage or not of database(.adt or .dbf files)
+ *      This function toggles the usage or not of databases (.adt or .dbf files)
  *      that are stored on an Advantage Data Dictionary
  *  $TESTS$
  *      AdsUseDictionary(.t.)
@@ -1249,7 +1249,7 @@ ADSIsTableEncrypted
  *  $EXAMPLES$
  *      IF adsConnect60("xharbour.add",7/* All types of conection*/,"ADSSYS","",)
  *      // Add one user
- *         AdsDDCreateUser(,"Luiz","papael","This is luiz User") 
+ *         AdsDDCreateUser(,"Luiz","papael","This is luiz User")
  *      ENDIF
  *  $STATUS$
  *      R
