@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.7 2002/03/17 23:27:28 lculik Exp $
+ * $Id: tget.prg,v 1.8 2002/03/22 15:35:51 walito Exp $
  */
 
 /*
@@ -424,7 +424,7 @@ METHOD SetFocus() CLASS Get
    endif
 
    IF lWasNil .and. ::buffer != NIL
-      IF ::nDispLen == 0
+      IF ::nDispLen == NIL
          ::nDispLen := ::nMaxLen
       ENDIF
 
@@ -1212,13 +1212,18 @@ METHOD Picture( cPicture ) CLASS Get
 
    if cPicture != NIL
 
+      ::nDispLen := NIL
+
       ::cPicture := cPicture
       ::ParsePict( cPicture )
 
       ::buffer  := ::PutMask( )
       ::nMaxLen := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
 
-      ::nDispLen := ::nMaxLen
+      if ::nDispLen == NIL
+         ::nDispLen := ::nMaxLen
+      endif
+
    endif
 
 return ::cPicture
