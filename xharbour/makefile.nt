@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.82 2004/07/01 14:45:30 paultucker Exp $
+# $Id: makefile.nt,v 1.83 2004/07/13 17:25:12 paultucker Exp $
 #
 
 #
@@ -526,6 +526,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\scrollbr.obj \
    $(OBJ_DIR)$(MT)\setfunc.obj \
    $(OBJ_DIR)$(MT)\setta.obj \
+   $(OBJ_DIR)$(MT)\stream.obj \
    $(OBJ_DIR)$(MT)\tbcolumn.obj \
    $(OBJ_DIR)$(MT)\tbrowse.obj \
    $(OBJ_DIR)$(MT)\tclass.obj \
@@ -550,7 +551,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\typefile.obj \
    $(OBJ_DIR)$(MT)\wait.obj \
    $(OBJ_DIR)$(MT)\win32ole.obj \
-   $(OBJ_DIR)$(MT)\stream.obj
+   $(OBJ_DIR)$(MT)\win32prn.obj
 
 
 #

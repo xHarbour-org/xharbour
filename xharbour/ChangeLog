@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3259 2004/08/02 20:25:57 likewolf Exp $
+ * $Id: ChangeLog,v 1.3260 2004/08/02 21:05:43 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-02 21:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.bc
+  * makefile.vc
+  * makefile.nt
+    + source/rtl/win32prn.prg
+  * source/rtl/win32prn.prg
+    * casts on struct member assignment.
 
 2004-08-02 23:10 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/rtl/gtwvt/Makefile

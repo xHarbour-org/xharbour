@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.19 2004/07/05 20:56:07 peterrees Exp $
+ * $Id: win32prn.prg,v 1.1 2004/08/02 20:11:13 lf_sfnet Exp $
  */
 
 /*
@@ -799,10 +799,10 @@ HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
         if (pDevMode )
         {
           DocumentProperties(0,hPrinter,pszPrinterName, pDevMode,pDevMode,DM_OUT_BUFFER) ;
-          pDevMode->dmPaperSize     = ISNUM(3) && hb_parnl(3) > 0 ? hb_parnl(3) : pDevMode->dmPaperSize ;
+          pDevMode->dmPaperSize     = ( short ) ( ISNUM(3) && hb_parnl(3) > 0 ? hb_parnl(3) : pDevMode->dmPaperSize ) ;
           pDevMode->dmOrientation   = ISLOG(4) ? (hb_parl(4) ? 2 : 1) : pDevMode->dmOrientation;
-          pDevMode->dmCopies        = ISNUM(5) && hb_parnl(5) > 0 ? hb_parnl(5) : pDevMode->dmCopies;
-          pDevMode->dmDefaultSource = ISNUM(6) && hb_parnl(6) > 0 ? hb_parnl(6) : pDevMode->dmDefaultSource;
+          pDevMode->dmCopies        = ( short ) ( ISNUM(5) && hb_parnl(5) > 0 ? hb_parnl(5) : pDevMode->dmCopies );
+          pDevMode->dmDefaultSource = ( short ) ( ISNUM(6) && hb_parnl(6) > 0 ? hb_parnl(6) : pDevMode->dmDefaultSource );
           Result= (BOOL) ResetDC(hDC, pDevMode) ;
           hb_xfree(pDevMode) ;
         }

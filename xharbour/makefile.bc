@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.98 2004/07/01 13:18:34 vouchcac Exp $
+# $Id: makefile.bc,v 1.99 2004/07/22 10:49:18 paultucker Exp $
 #
 
 #
@@ -514,6 +514,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\scrollbr.obj \
    $(RTL_OBJ_DIR)\setfunc.obj \
    $(RTL_OBJ_DIR)\setta.obj \
+   $(RTL_OBJ_DIR)\stream.obj \
    $(RTL_OBJ_DIR)\tbcolumn.obj \
    $(RTL_OBJ_DIR)\tbrowse.obj \
    $(RTL_OBJ_DIR)\tclass.obj \
@@ -538,7 +539,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\typefile.obj \
    $(RTL_OBJ_DIR)\wait.obj \
    $(RTL_OBJ_DIR)\win32ole.obj \
-   $(RTL_OBJ_DIR)\stream.obj
+   $(RTL_OBJ_DIR)\win32prn.obj
 
 #
 # LANG.LIB rules
@@ -2195,6 +2196,12 @@ $(RTL_OBJ_DIR)\strcase.obj : $(RTL_DIR)\strcase.c
 $(RTL_OBJ_DIR)\strdel.obj : $(RTL_DIR)\strdel.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(RTL_OBJ_DIR)\stream.c : $(RTL_DIR)\stream.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\stream.obj : $(RTL_OBJ_DIR)\stream.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(RTL_OBJ_DIR)\strings.obj : $(RTL_DIR)\strings.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -2381,10 +2388,10 @@ $(RTL_OBJ_DIR)\win32ole.c : $(RTL_DIR)\win32ole.prg
 $(RTL_OBJ_DIR)\win32ole.obj : $(RTL_OBJ_DIR)\win32ole.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(RTL_OBJ_DIR)\stream.c : $(RTL_DIR)\stream.prg
+$(RTL_OBJ_DIR)\win32prn.c : $(RTL_DIR)\win32prn.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RTL_OBJ_DIR)\stream.obj : $(RTL_OBJ_DIR)\stream.c
+$(RTL_OBJ_DIR)\win32prn.obj : $(RTL_OBJ_DIR)\win32prn.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\word.obj : $(RTL_DIR)\word.c
