@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.39 2003/01/28 08:38:37 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.40 2003/01/28 16:13:00 ronpinkas Exp $
  */
 
 /*
@@ -4294,7 +4294,7 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
 
               if( szSub[0] != '.' )
               {
-                 lSubPos == 0;
+                 lSubPos = 0;
                  continue;
               }
            }
