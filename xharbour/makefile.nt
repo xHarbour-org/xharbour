@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.93 2004/09/19 03:58:59 kaddath Exp $
+# $Id: makefile.nt,v 1.94 2004/09/30 14:15:50 mlombardo Exp $
 #
 
 #
@@ -791,7 +791,7 @@ DBFFPT_LIB_OBJS = \
 #
 
 {$(PP_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+   $(CC) -Ow $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 PP_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ppcore.obj \
