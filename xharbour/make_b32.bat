@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.28 2001/11/07 00:26:14 vszakats Exp $
+rem $Id: make_b32.bat,v 1.1.1.1 2001/12/21 10:38:56 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -10,6 +10,13 @@ rem
 rem Instead, make a local copy and modify that one, or make a call to 
 rem this batch file from your customized one. [vszakats]
 rem ---------------------------------------------------------------
+
+if not exist obj md obj
+if not exist obj\b32 md obj\b32
+if not exist lib md lib
+if not exist lib\b32 md lib\b32
+if not exist bin md bin
+if not exist bin\b32 md bin\b32
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
