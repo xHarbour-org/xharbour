@@ -229,6 +229,7 @@ PROJECT = \
 !if ("$(THREAD_MODE)"=="")
 PROJECT = \
    $(PROJECT) \
+   $(CODEPAGE_LIB) \
    $(LANG_LIB) \
    $(DEBUG_LIB) \
    $(NULSYS_LIB) \
