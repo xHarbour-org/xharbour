@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.12 2004/01/18 03:51:35 paultucker Exp $
+ * $Id: hbver.c,v 1.13 2004/03/20 23:24:46 druzus Exp $
  */
 
 /*
@@ -68,9 +68,6 @@
  * See doc/license.txt for licensing terms.
  *
  */
-
-/* NOTE: For OS/2. Must be ahead of any and all #include statements */
-#define INCL_DOSMISC
 
 #define HB_OS_WIN_32_USED
 

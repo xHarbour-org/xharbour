@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2626 2004/03/22 14:00:56 lculik Exp $
+ * $Id: ChangeLog,v 1.2627 2004/03/22 17:46:58 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2004-03-22 18:58 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+  * source/common/hbver.c
+    * removed un-needed #define INCL_xxx
 
 2004-03-22 18:54 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
   ! source/vm/hvm.c
