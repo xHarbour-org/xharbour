@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.857 2003/03/19 21:05:54 lculik Exp $
+ * $Id: ChangeLog,v 1.858 2003/03/20 13:49:07 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-20 16:21 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbreadini.prg
+    + Added support for long lines using "\" as a terminator character.
+      when the \ is not used as the last character of the line, it is
+      not treated in any special way, so windows path are safe.
+
+  * tests/parseini.ini
+    + Added a LONG entry to demonstrate this feature.
 
 2003-03-20 10:45 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
@@ -19,7 +28,7 @@
 2003-03-19 18:01 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/pp/pptable.c
     ! hb_pp_topDefine = &sD___56 to hb_pp_topDefine = &sD___58
-    
+
 2003-03-19 14:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/set.ch
     ! Added _SET_TRACEFILE and _SET_TRACESTACK, and changed the
