@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.34 2002/01/30 03:32:40 ronpinkas Exp $
+ * $Id: hvm.c,v 1.35 2002/01/30 04:10:05 ronpinkas Exp $
  */
 
 /*
@@ -3035,11 +3035,17 @@ static void hb_vmArrayPush( void )
    pArray = hb_stackItemFromTop( -2 );
 
    if( HB_IS_INTEGER( pIndex ) )
+   {
       ulIndex = ( ULONG ) pIndex->item.asInteger.value;
+   }
    else if( HB_IS_LONG( pIndex ) )
+   {
       ulIndex = ( ULONG ) pIndex->item.asLong.value;
+   }
    else if( HB_IS_DOUBLE( pIndex ) )
+   {
       ulIndex = ( ULONG ) pIndex->item.asDouble.value;
+   }
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
@@ -3089,7 +3095,9 @@ static void hb_vmArrayPush( void )
       }
    }
    else
+   {
       hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+   }
 }
 
 static void hb_vmArrayPop( void )
@@ -3148,7 +3156,9 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
    hb_vmArrayNew( &itArray, uiDimensions );
 
    while( uiDimensions-- )
+   {
       hb_stackPop();
+   }
 
    hb_itemForwardValue( ( hb_stackTopItem() ), &itArray );
    hb_stackPush();
@@ -3266,6 +3276,15 @@ static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSy
    ItemMsg.type = HB_IT_SYMBOL;
    ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
    ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
+
+   if( HB_IS_COMPLEX( &hb_stack.Return ) )
+   {
+      hb_itemClear( &hb_stack.Return );       /* clear return value */
+   }
+   else
+   {
+      ( &hb_stack.Return )->type = HB_IT_NIL;
+   }
 
    hb_vmPush( &ItemMsg );
    hb_vmPush( pObjItem );                             /* Push object              */
@@ -3831,7 +3850,7 @@ void hb_vmFunction( USHORT uiParams )
       hb_vmDo( uiParams );
    }
 
-   hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
+   hb_itemCopy( hb_stackTopItem(), &hb_stack.Return );
    hb_stackPush();
 }
 
