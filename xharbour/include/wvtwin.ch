@@ -45,13 +45,16 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
+//-------------------------------------------------------------------//
+//
+//                         GTWVT Specific
+//
 //-------------------------------------------------------------------//
 //
 //   Wvt_DrawButton() constants
 //
 #define WVT_BTN_FORMAT_RAISED         0   // Default
-#define WVT_BTN_FORMAT_RECESSED       1   
+#define WVT_BTN_FORMAT_RECESSED       1
 #define WVT_BTN_FORMAT_FLAT           2
 #define WVT_BTN_FORMAT_OUTLINED       3
 
@@ -63,7 +66,7 @@
 //-------------------------------------------------------------------//
 //
 //   Wvt_DrawLine( nTop, nLeft, nBottom, nRight, nOrient, nFormat,;
-//                 nAlign, nStyle, nThick, nColor ) 
+//                 nAlign, nStyle, nThick, nColor )
 //
 //   nOrient
 #define WVT_LINE_HORZ                 0   // Default
@@ -71,10 +74,10 @@
 
 //   nFormat
 #define WVT_LINE_RAISED               0   // Default
-#define WVT_LINE_RECESSED             1   
+#define WVT_LINE_RECESSED             1
 #define WVT_LINE_PLAIN                2
 
-//   nAlign 
+//   nAlign
 #define WVT_LINE_CENTER               0   // Default
 #define WVT_LINE_TOP                  1
 #define WVT_LINE_BOTTOM               2
@@ -83,11 +86,15 @@
 
 //   nStyle
 #define WVT_LINE_SOLID                0   // Default
-#define WVT_LINE_DASH                 1   
+#define WVT_LINE_DASH                 1
 #define WVT_LINE_DOT                  2
 #define WVT_LINE_DASHDOT              3
 #define WVT_LINE_DASHDOTDOT           4
 
+//-------------------------------------------------------------------//
+//
+//                          Windows Specific
+//
 //-------------------------------------------------------------------//
 //
 //                   Menu Manipulation Constants

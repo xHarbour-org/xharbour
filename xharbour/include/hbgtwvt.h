@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.22 2004/05/14 12:33:48 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.23 2004/05/22 11:59:42 vouchcac Exp $
  */
 
 /*
@@ -81,6 +81,7 @@
 #include <commdlg.h>
 
 #if defined(__MINGW32__) || defined(__WATCOMC__) || defined(_MSC_VER)
+   #include <unknwn.h>
    #include <ole2.h>
    #include <ocidl.h>
    #include <olectl.h>
@@ -142,6 +143,16 @@
 
 //-------------------------------------------------------------------//
 
+typedef BOOL ( WINAPI *wvtGradientFill )     (
+                      HDC        hdc,
+                      PTRIVERTEX pVertex,
+                      ULONG      dwNumVertex,
+                      PVOID      pMesh,
+                      ULONG      dwNumMesh,
+                      ULONG      dwMode      );
+
+//-------------------------------------------------------------------//
+
 typedef struct global_data
 {
   POINT     PTEXTSIZE;                 // size of the fixed width font
@@ -189,15 +200,19 @@ typedef struct global_data
   HPEN      penWhiteDim;               // White dim pen to draw GDI elements
   HPEN      penDarkGray;               // Dark gray pen to draw GDI elements
   HPEN      penGray;                   // Gray pen equivilant to Clipper White
+  HPEN      penNull;                   // Null pen
   HPEN      currentPen;                // Handle to current pen settable at runtime
   HBRUSH    currentBrush;              // Handle to current brush settable by runtime
+  HBRUSH    diagonalBrush;             // Handle to diaoganl brush to draw scrollbars
+  HBRUSH    solidBrush;                // Handle to solid brush
+  HBRUSH    wvtWhiteBrush;             // Wvt specific White colored brush
   HDC       hdc;                       // Handle to Windows Device Context
   PHB_DYNS  pSymWVT_PAINT;             // Stores pointer to WVT_PAINT function
   PHB_DYNS  pSymWVT_SETFOCUS;          // Stores pointer to WVT_SETFOCUS function
   PHB_DYNS  pSymWVT_KILLFOCUS;         // Stores pointer to WVT_KILLFOCUS function
   PHB_DYNS  pSymWVT_MOUSE;             // Stores pointer to WVT_MOUSE function
   PHB_DYNS  pSymWVT_TIMER;             // Stores pointer to WVT_TIMER function
-  int       rowStart;                  // Holds nTop    of last WM_PAINT rectangle returned by Wvt_GrtPaintRect()
+  int       rowStart;                  // Holds nTop    of last WM_PAINT rectangle returned by Wvt_GetPaintRect()
   int       rowStop;                   // Holds nBottom of last WM_PAINT rectangle
   int       colStart;                  // Holds nLeft   of last WM_PAINT rectangle
   int       colStop;                   // Holds nRight  of last WM_PAINT rectangle
@@ -208,6 +223,8 @@ typedef struct global_data
   HPEN      hUserPens[ WVT_PENS_MAX ]; // User defined pens
   HWND      hWndTT;                    // Handle to hold tooltip information
   BOOL      bToolTipActive;            // Flag to set whether tooltip is active or not
+  HINSTANCE hMSImg32;                  // Handle to the loaded library msimg32.dll
+  wvtGradientFill pfnGF;               // Pointer to Address of the GradientFill function in MSImg32.dll
 } GLOBAL_DATA;
 
 typedef GLOBAL_DATA * LPGLOBAL_DATA;
@@ -246,6 +263,9 @@ COLORREF HB_EXPORT hb_wvt_gtGetColorData( int iIndex );
 BOOL   HB_EXPORT hb_wvt_gtSetColorData( int iIndex, COLORREF ulCr );
 
 HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void );
+
+void   HB_EXPORT hb_wvt_wvtCore( void );
+void   HB_EXPORT hb_wvt_wvtUtils( void );
 
 //-------------------------------------------------------------------//
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.105 2004/05/22 11:59:43 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.106 2004/06/04 06:57:25 bdj Exp $
  */
 
 /*
@@ -257,15 +257,18 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
     _s.hdc     = GetDC( _s.hWnd );
     _s.hCompDC = CreateCompatibleDC( _s.hdc );
 
+    hb_wvt_wvtCore();
+    hb_wvt_wvtUtils();
+
     if( b_MouseEnable )
     {
       HB_GT_FUNC( mouse_Init() );
-   }
+    }
 
-   if( b_MouseEnable )
-   {
+    if( b_MouseEnable )
+    {
       hb_wvt_gtCreateToolTipWindow();
-   }
+    }
 }
 
 //-------------------------------------------------------------------//
@@ -278,13 +281,17 @@ void HB_GT_FUNC( gt_Exit( void ) )
 
     if ( _s.hWnd )
     {
-      DeleteObject( ( HPEN   ) _s.penWhite     );
-      DeleteObject( ( HPEN   ) _s.penWhiteDim  );
-      DeleteObject( ( HPEN   ) _s.penBlack     );
-      DeleteObject( ( HPEN   ) _s.penDarkGray  );
-      DeleteObject( ( HPEN   ) _s.penGray      );
-      DeleteObject( ( HPEN   ) _s.currentPen   );
-      DeleteObject( ( HBRUSH ) _s.currentBrush );
+      DeleteObject( ( HPEN   ) _s.penWhite      );
+      DeleteObject( ( HPEN   ) _s.penWhiteDim   );
+      DeleteObject( ( HPEN   ) _s.penBlack      );
+      DeleteObject( ( HPEN   ) _s.penDarkGray   );
+      DeleteObject( ( HPEN   ) _s.penGray       );
+      DeleteObject( ( HPEN   ) _s.penNull       );
+      DeleteObject( ( HPEN   ) _s.currentPen    );
+      DeleteObject( ( HBRUSH ) _s.currentBrush  );
+      DeleteObject( ( HBRUSH ) _s.diagonalBrush );
+      DeleteObject( ( HBRUSH ) _s.solidBrush    );
+      DeleteObject( ( HBRUSH ) _s.wvtWhiteBrush );
 
       if ( _s.hdc )
       {
@@ -316,6 +323,11 @@ void HB_GT_FUNC( gt_Exit( void ) )
          {
             DeleteObject( _s.hUserPens[ i ] );
          }
+      }
+
+      if ( _s.hMSImg32 )
+      {
+         FreeLibrary( _s.hMSImg32 );
       }
 
       DestroyWindow( _s.hWnd );
@@ -1433,14 +1445,30 @@ static void hb_wvt_gtCreateObjects( void )
    _s.penWhiteDim  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 205,205,205 ) );
    _s.penDarkGray  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 150,150,150 ) );
    _s.penGray      = CreatePen( PS_SOLID, 0, ( COLORREF ) _COLORS[ 7 ] );
+   _s.penNull      = CreatePen( PS_NULL , 0, ( COLORREF ) _COLORS[ 7 ] );
 
    _s.currentPen   = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );
 
    lb.lbStyle      = BS_NULL;
    lb.lbColor      = RGB( 198,198,198 );
    lb.lbHatch      = 0;
-
    _s.currentBrush = CreateBrushIndirect( &lb );
+
+   lb.lbStyle      = BS_HATCHED;
+   lb.lbColor      = RGB( 210,210,210 );
+   lb.lbHatch      = HS_DIAGCROSS; // HS_BDIAGONAL;
+   _s.diagonalBrush = CreateBrushIndirect( &lb );
+
+   lb.lbStyle      = BS_SOLID;
+   lb.lbColor      = NULL;  // RGB( 0,0,0 );
+   lb.lbHatch      = 0;
+   _s.solidBrush = CreateBrushIndirect( &lb );
+
+   lb.lbStyle      = BS_SOLID;
+   lb.lbColor      = _COLORS[ 7 ];
+   lb.lbHatch      = 0;
+   _s.wvtWhiteBrush= CreateBrushIndirect( &lb );
+
 }
 
 //-------------------------------------------------------------------//
@@ -2027,6 +2055,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           }
         }
       }
+      bIgnoreWM_SYSCHAR = FALSE;    // As Suggested by Peter
       return( 0 );
     }
 
@@ -2158,6 +2187,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         hb_wvt_gtAddCharToInputQueue( c );
 
       }
+      bIgnoreWM_SYSCHAR = FALSE;
       return( 0 );
     }
 
@@ -2295,7 +2325,7 @@ static void hb_wvt_gtCreateToolTipWindow( void )
    // Create the tooltip control.
    //
    hwndTT = CreateWindow( TOOLTIPS_CLASS, TEXT( "" ),
-                          WS_POPUP ,
+                          WS_POPUP | TTS_ALWAYSTIP ,
                           CW_USEDEFAULT, CW_USEDEFAULT,
                           CW_USEDEFAULT, CW_USEDEFAULT,
                           NULL,
@@ -2749,6 +2779,7 @@ static HFONT hb_wvt_gtGetFont( char * pszFace, int iHeight, int iWidth, int iWei
 static void gt_hbInitStatics( void )
 {
   OSVERSIONINFO osvi ;
+  HINSTANCE h;
 
   _s.ROWS             = WVT_DEFAULT_ROWS;
   _s.COLS             = WVT_DEFAULT_COLS;
@@ -2800,6 +2831,16 @@ static void gt_hbInitStatics( void )
   _s.colStart         = 0;
   _s.colStop          = 0;
   _s.bToolTipActive   = FALSE;
+
+  h = LoadLibraryEx( "msimg32.dll", NULL, 0 );
+  if ( h )
+  {
+    _s.pfnGF = ( wvtGradientFill ) GetProcAddress( h, "GradientFill" );
+    if ( _s.pfnGF )
+    {
+      _s.hMSImg32 = h;
+    }
+  }
 }
 
 //-------------------------------------------------------------------//

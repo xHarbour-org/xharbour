@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.1 2004/05/14 12:33:59 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.2 2004/05/22 11:59:43 vouchcac Exp $
  */
 
 /*
@@ -75,10 +75,19 @@
 
 #include "hbgtwvt.h"
 
+static GLOBAL_DATA *_s = NULL;
+
 //-------------------------------------------------------------------//
 //
 //              Pritpal Bedi <pritpal@vouchcac.com>
 //
+//-------------------------------------------------------------------//
+
+void HB_EXPORT hb_wvt_wvtUtils( void )
+{
+   _s = hb_wvt_gtGetGlobalData();
+}
+
 //-------------------------------------------------------------------//
 //
 //     Wvt_ChooseFont( cFontName, nHeight, nWidth, nWeight, nQuality, ;
@@ -86,7 +95,6 @@
 //
 HB_FUNC( WVT_CHOOSEFONT )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
    CHOOSEFONT  cf;
    LOGFONT     lf;
    LONG        PointSize = 0;
@@ -164,7 +172,6 @@ HB_FUNC( WVT_CHOOSEFONT )
 //
 HB_FUNC( WVT_CHOOSECOLOR )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
    CHOOSECOLOR cc ;
    COLORREF    crCustClr[ 16 ] ;
    int         i ;
@@ -194,16 +201,18 @@ HB_FUNC( WVT_CHOOSECOLOR )
 
 HB_FUNC( WVT_MESSAGEBOX )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
    MessageBox( _s->hWnd, hb_parcx( 1 ), hb_parcx( 2 ), ISNIL( 3 ) ? MB_OK : hb_parni( 3 ) );
 }
 
 //-------------------------------------------------------------------//
+//
+//                              Tooltips
+//
+//-------------------------------------------------------------------//
 
 HB_FUNC( WVT_SETTOOLTIPACTIVE )
 {
-   GLOBAL_DATA *_s     = hb_wvt_gtGetGlobalData();
-   BOOL        bActive = _s->bToolTipActive;
+   BOOL bActive = _s->bToolTipActive;
 
    if ( ! ISNIL( 1 ) )
    {
@@ -219,7 +228,6 @@ HB_FUNC( WVT_SETTOOLTIPACTIVE )
 //
 HB_FUNC( WVT_SETTOOLTIP )
 {
-   GLOBAL_DATA *_s  = hb_wvt_gtGetGlobalData();
    TOOLINFO ti;
    POINT    xy;
    int      iTop, iLeft, iBottom, iRight;
@@ -255,10 +263,69 @@ HB_FUNC( WVT_SETTOOLTIP )
 
 //-------------------------------------------------------------------//
 
+HB_FUNC( WVT_SETTOOLTIPWIDTH )
+{
+   SendMessage( _s->hWndTT, TTM_SETMAXTIPWIDTH, 0, ( LPARAM ) ( int ) hb_parni( 1 ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETTOOLTIPBKCOLOR )
+{
+   SendMessage( _s->hWndTT, TTM_SETTIPBKCOLOR, ( WPARAM ) ( COLORREF ) hb_parnl( 1 ), 0 );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETTOOLTIPTEXTCOLOR )
+{
+   SendMessage( _s->hWndTT, TTM_SETTIPTEXTCOLOR, ( WPARAM ) ( COLORREF ) hb_parnl( 1 ), 0 );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETTOOLTIPTITLE )
+{
+   int iIcon;
+
+   if ( ! ISNIL( 2 ) )
+   {
+      iIcon = ISNIL( 1 ) ? 0 : hb_parni( 1 );
+      if ( iIcon > 3 )
+      {
+         iIcon = 0 ;
+      }
+      SendMessage( _s->hWndTT, TTM_SETTITLE, ( WPARAM ) iIcon, ( LPARAM ) hb_parcx( 2 ) );
+   }
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETTOOLTIPWIDTH )
+{
+   hb_retni( SendMessage( _s->hWndTT, TTM_GETMAXTIPWIDTH, 0, 0 ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETTOOLTIPBKCOLOR )
+{
+   hb_retnl( ( COLORREF ) SendMessage( _s->hWndTT, TTM_GETTIPBKCOLOR, 0, 0 ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETTOOLTIPTEXTCOLOR )
+{
+   hb_retnl( ( COLORREF ) SendMessage( _s->hWndTT, TTM_GETTIPTEXTCOLOR, 0, 0 ) );
+}
+
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+
 HB_FUNC( WVT_SETTIMER )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
-
    hb_retl( SetTimer( _s->hWnd, 101, hb_parni( 1 ), NULL ) );
 }
 
@@ -266,8 +333,6 @@ HB_FUNC( WVT_SETTIMER )
 
 HB_FUNC( WVT_KILLTIMER )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
-
    hb_retl( KillTimer( _s->hWnd, 101 ) );
 }
 
@@ -275,7 +340,6 @@ HB_FUNC( WVT_KILLTIMER )
 
 HB_FUNC( WVT_SETONTOP )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
    RECT rect;
 
    GetWindowRect( _s->hWnd, &rect );
@@ -292,7 +356,6 @@ HB_FUNC( WVT_SETONTOP )
 
 HB_FUNC( WVT_SETASNORMAL )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
    RECT rect;
 
    GetWindowRect( _s->hWnd, &rect );
@@ -309,8 +372,6 @@ HB_FUNC( WVT_SETASNORMAL )
 
 HB_FUNC( WVT_MINIMIZE )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
-
    ShowWindow( _s->hWnd, SW_MINIMIZE );
 }
 
@@ -318,8 +379,6 @@ HB_FUNC( WVT_MINIMIZE )
 
 HB_FUNC( WVT_MAXIMIZE )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
-
    ShowWindow( _s->hWnd, SW_RESTORE );
 }
 
@@ -327,7 +386,6 @@ HB_FUNC( WVT_MAXIMIZE )
 
 HB_FUNC( WVT_SETMOUSEPOS )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
    POINT xy;
 
    xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
@@ -346,8 +404,6 @@ HB_FUNC( WVT_SETMOUSEPOS )
 
 HB_FUNC( WVT_GETPAINTRECT )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
-
    HB_ITEM  info;
    HB_ITEM  temp;
 
@@ -368,7 +424,6 @@ HB_FUNC( WVT_GETPAINTRECT )
 
 HB_FUNC( WVT_SETPOINTER )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
    int     iCursor = hb_parni( 1 );
    HCURSOR hCursor;
 
@@ -450,8 +505,6 @@ HB_FUNC( WVT_SETPOINTER )
 
 HB_FUNC( WVT_SETFONT )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
-
    hb_retl( hb_wvt_gtSetFont(
             ISNIL( 1 ) ? _s->fontFace   : hb_parcx( 1 ),
             ISNIL( 2 ) ? _s->fontHeight : hb_parni( 2 ),
@@ -517,8 +570,6 @@ HB_FUNC( WVT_CENTERWINDOW )
 
 HB_FUNC( WVT_SETMOUSEMOVE )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
-
    if ( ISNIL( 1 ) )
    {
       hb_retl( _s->MouseMove );
@@ -554,8 +605,6 @@ HB_FUNC( WVT_GETXYFROMROWCOL )
 
 HB_FUNC( WVT_GETFONTINFO )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
-
    HB_ITEM  info;
    HB_ITEM  temp;
 
@@ -581,7 +630,7 @@ HB_FUNC( WVT_GETPALETTE )
 {
    HB_ITEM  info;
    HB_ITEM  temp;
-   int       i;
+   int      i;
 
    info.type = HB_IT_NIL;
    temp.type = HB_IT_NIL;
@@ -622,8 +671,6 @@ HB_FUNC( WVT_SETPALETTE )
 
 HB_FUNC( WVT_SETMENU )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
-
    SetMenu( _s->hWnd, ( HMENU ) hb_parni( 1 ) ) ;
 
    hb_wvt_gtResetWindow();
@@ -633,8 +680,6 @@ HB_FUNC( WVT_SETMENU )
 
 HB_FUNC( WVT_SETPOPUPMENU )
 {
-   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
-
    HMENU hPopup = _s->hPopup ;
 
    _s->hPopup = ( HMENU ) hb_parnl( 1 );
@@ -952,4 +997,29 @@ HB_FUNC( WVT_KEYBOARD )
 }
 
 //-------------------------------------------------------------------//
+
+HB_FUNC( WVT_INVALIDATERECT )
+{
+   RECT  rc;
+   POINT xy;
+
+   xy           = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   rc.top       = xy.y;
+   rc.left      = xy.x;
+   xy           = hb_wvt_gtGetXYFromColRow( hb_parni( 4 )+1, hb_parni( 3 )+1 );
+   rc.bottom    = xy.y - 1;
+   rc.right     = xy.x - 1;
+
+   InvalidateRect( _s->hWnd, &rc, TRUE );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_ISLBUTTONPRESSED )
+{
+   hb_retl( GetKeyState( VK_LBUTTON ) & 0x8000 );
+}
+
+//-------------------------------------------------------------------//
+
 
