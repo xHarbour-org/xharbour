@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.12 2002/07/24 03:28:06 lculik Exp $
+ * $Id: isprint.c,v 1.13 2002/07/24 03:31:16 lculik Exp $
  */
 
 /*
@@ -450,7 +450,7 @@ HB_FUNC(GETPRINTERS)
             
         else {
 
-               realloc( buffer , 0 ) ;
+               free(buffer) ;
                buffer = ( unsigned char * ) malloc( needed ) ;
 
                res=EnumPrinters(PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL| PRINTER_ENUM_CONNECTIONS ,
@@ -467,23 +467,23 @@ HB_FUNC(GETPRINTERS)
 
        for ( a = 0 ; a < returned ; a++ ){
 
-       PHB_ITEM pSubItems = hb_itemArrayNew( 2 );
+          PHB_ITEM pSubItems = hb_itemArrayNew( 2 );
 
-       PHB_ITEM pFile = hb_itemPutC( NULL, ( ( PRINTER_INFO_5 * ) ( buffer + sizeof( PRINTER_INFO_5 ) * a ) )->pPrinterName );
+          PHB_ITEM pFile = hb_itemPutC( NULL, ( ( PRINTER_INFO_5 * ) ( buffer + sizeof( PRINTER_INFO_5 ) * a ) )->pPrinterName );
 
-       PHB_ITEM pPort = hb_itemPutC( NULL,( ( PRINTER_INFO_5 * ) ( buffer + sizeof( PRINTER_INFO_5 ) * a ) )->pPortName );
+          PHB_ITEM pPort = hb_itemPutC( NULL,( ( PRINTER_INFO_5 * ) ( buffer + sizeof( PRINTER_INFO_5 ) * a ) )->pPortName );
 
-       hb_arraySet( pSubItems , 1 , pFile ) ;
+          hb_arraySet( pSubItems , 1 , pFile ) ;
 
-       hb_arraySet( pSubItems , 2 , pPort ) ;
+          hb_arraySet( pSubItems , 2 , pPort ) ;
 
-       hb_arrayAdd( pArrayPrinter , pSubItems );
+          hb_arrayAdd( pArrayPrinter , pSubItems );
 
-       hb_itemRelease( pFile ) ;
+          hb_itemRelease( pFile ) ;
                        
-       hb_itemRelease( pPort ) ;
+          hb_itemRelease( pPort ) ;
 
-       hb_itemRelease( pSubItems );
+          hb_itemRelease( pSubItems );
     }
 
    hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
