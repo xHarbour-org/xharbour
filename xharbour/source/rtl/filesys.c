@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.86 2004/04/02 22:38:24 andijahja Exp $
+ * $Id: filesys.c,v 1.87 2004/04/03 01:51:02 ronpinkas Exp $
  */
 
 /*
@@ -1704,8 +1704,18 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
    HB_TEST_CANCEL_ENABLE_ASYN
 
    errno = 0;
+
+   #if defined(_MSC_VER)
+      _doserrno = 0;
+   #endif
+
    hFileHandle = open( ( char * ) pFilename, oflag, pmode );
-   hb_fsSetError( errno );
+
+   #if defined(_MSC_VER)
+      hb_fsSetError( _doserrno != 0 ? ( USHORT ) _doserrno : errno ) ;
+   #else
+      hb_fsSetError( errno );
+   #endif
 
    HB_DISABLE_ASYN_CANC
 
