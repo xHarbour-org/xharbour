@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.65 2003/11/27 21:44:54 likewolf Exp $
+ * $Id: dbfntx1.c,v 1.66 2004/01/17 17:51:43 lculik Exp $
  */
 
 /*
@@ -2439,17 +2439,22 @@ static void hb_ntxBufferSave( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo )
       pTag->RootBlock = 1024;
 }
 
-static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, USHORT* numRecinBuf, LPDBORDERCONDINFO lpdbOrdCondInfo )
+static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, USHORT* numRecinBuf, LPDBORDERCONDINFO lpdbOrdCondInfo, ULONG ulRecNo )
 {
    if( (!lpdbOrdCondInfo || lpdbOrdCondInfo->fAll ) && !pArea->lpdbRelations )
    {
       if( *numRecinBuf == 10 )
          *numRecinBuf = 0;
       if( *numRecinBuf == 0 )
-         hb_fsReadLarge( pArea->hDataFile, readBuffer, pArea->uiRecordLen  * 10 );
-
+      {
+         ULONG ulBufLen = pArea->uiRecordLen  * 10;
+         hb_fsSeek( pArea->hDataFile,
+             pArea->uiHeaderLen + pArea->uiRecordLen * ( ulRecNo - 1 ), FS_SET );
+         hb_fsReadLarge( pArea->hDataFile, readBuffer, ulBufLen );
+      }
       pArea->pRecord = readBuffer + (*numRecinBuf) * pArea->uiRecordLen;
       pArea->fDeleted = ( pArea->pRecord[ 0 ] == '*' );
+      pArea->ulRecNo = ulRecNo;
       (*numRecinBuf) ++;
       return TRUE;
    }
@@ -2477,7 +2482,7 @@ static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, USHORT* numRecinBuf
 
       return TRUE;
    }
-      return TRUE;
+   return TRUE;
 }
 
 /* DJGPP can sprintf a float that is almost 320 digits long */
@@ -2556,23 +2561,19 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
       pRecordTmp = pArea->pRecord;
       fValidBuffer = pArea->fValidBuffer;
       pArea->fValidBuffer = TRUE;
-      hb_fsSeek( pArea->hDataFile, pArea->uiHeaderLen, FS_SET );
    }
    else if( pArea->lpdbRelations || pArea->lpdbOrdCondInfo->fUseCurrent )
    {
       SELF_GOTOP( ( AREAP ) pArea );
    }
 
+   bWhileOk = TRUE;
    for( ulRecNo = 1; ulRecNo <= ulRecCount; ulRecNo++)
    {
-      if( !hb_ntxReadBuf( pArea, readBuffer, &numRecinBuf, pArea->lpdbOrdCondInfo ) )
+      if( !hb_ntxReadBuf( pArea, readBuffer, &numRecinBuf, pArea->lpdbOrdCondInfo, ulRecNo ) )
          break;
-      if( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll )
-         pArea->ulRecNo = ulRecNo;
       if( pTag->pForItem != NULL )
          bWhileOk = checkLogicalExpr( pTag->pForItem, pItem );
-      else
-         bWhileOk = TRUE;
       if( bWhileOk )
       {
          ulKeyNo ++;

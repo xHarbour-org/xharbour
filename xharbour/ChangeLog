@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2144 2004/01/26 14:59:25 druzus Exp $
+ * $Id: ChangeLog,v 1.2145 2004/01/26 16:58:16 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-26 19:40 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed bug when user codeblock/macro in one of index expresions
+      call lastrec() (or any other functions which reposition seek file
+      offset on DBF file handle)
+    ! fixed bug when indexing with BDF with index relation active
 
 2004-01-26 17:10 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/hbdefs.h
