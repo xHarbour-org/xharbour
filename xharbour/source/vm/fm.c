@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.24 2003/02/22 05:54:57 jonnymind Exp $
+ * $Id: fm.c,v 1.25 2003/02/26 05:36:11 jonnymind Exp $
  */
 
 /*
@@ -750,9 +750,7 @@ void * hb_xmemset( void * pDestArg, int iFill, ULONG ulLen )
 ULONG hb_xquery( USHORT uiMode )
 {
    ULONG ulResult;
-   #ifdef HB_FM_STATISTICS
-      HB_THREAD_STUB
-   #endif
+   HB_THREAD_STUB
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xquery(%hu)", uiMode));
 
