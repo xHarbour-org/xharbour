@@ -2487,6 +2487,8 @@
          {
             char *sFunctionName = hb_parc( 1 );
             short int iID = hb_parni( 2 );
+            static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;
+
             PASM_CALL pDynFunc;
             PHB_DYNS pDynSym;
 
@@ -2508,8 +2510,8 @@
             BYTE *pcode = (BYTE *) hb_xgrab( 31 );
 
             pcode[ 0] = HB_P_SFRAME;
-            pcode[ 1] = 168;
-            pcode[ 2] = 2;                 /* symbol (_INITSTATICS) */
+            pcode[ 1] = HB_LOBYTE( iLastSym );
+            pcode[ 2] = HB_HIBYTE( iLastSym );
 
             pcode[ 3] = HB_P_PUSHNIL;
 
