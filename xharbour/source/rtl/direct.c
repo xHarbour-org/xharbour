@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.11 2004/01/23 10:44:47 andijahja Exp $
+ * $Id: direct.c,v 1.12 2004/02/21 14:39:01 andijahja Exp $
  */
 
 /*
@@ -144,6 +144,8 @@ HB_FUNC( DIRECTORY )
           | HB_FA_ENCRYPTED
           | HB_FA_VOLCOMP;
 
+   hb_arrayNew( &pDir, 0 );
+
    if( pAttributes && hb_itemGetCLen( pAttributes ) > 0 )
       if ( ( uiMask |= hb_fsAttrEncode( hb_itemGetCPtr( pAttributes ) ) ) & HB_FA_LABEL )
       {
@@ -170,7 +172,6 @@ HB_FUNC( DIRECTORY )
       pTime.type = HB_IT_NIL ;
       pAttr.type = HB_IT_NIL ;
 
-      hb_arrayNew( &pDir, 0 );
 
       do
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2356 2004/02/21 14:38:59 andijahja Exp $
+ * $Id: ChangeLog,v 1.2357 2004/02/21 17:03:19 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-22 03:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rdd/dbcmd.c
+    % Optimized out usage of hb_itemNew()
+
+  * source/rtl/direct.c
+    ! return value was not initialized before filespec is found and this causes
+      GPF when filespec is not found. Fixed.
 
 2004-02-21 09:07 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/regex.c

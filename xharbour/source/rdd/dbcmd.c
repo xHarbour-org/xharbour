@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.73 2004/02/20 02:35:40 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.74 2004/02/20 22:33:55 ronpinkas Exp $
  */
 
 /*
@@ -74,6 +74,7 @@
 #include "hbapilng.h"
 #include "hbapiitm.h"
 #include "hbrddwrk.h"
+#include "hbfast.h"
 #ifndef HB_CDP_SUPPORT_OFF
 #  include "hbapicdp.h"
 #endif
@@ -1103,7 +1104,8 @@ HB_FUNC( AFIELDS )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pName, pType, pLen, pDec, pItem;
+   PHB_ITEM pName, pType, pLen, pDec;
+   HB_ITEM pItem;
    USHORT uiFields, uiArrayLen, uiCount;
 
    if( !s_pCurrArea )
@@ -1123,7 +1125,7 @@ HB_FUNC( AFIELDS )
    }
 
    uiArrayLen = 0;
-   pItem = hb_itemNew( NULL );
+   pItem.type = HB_IT_NIL;
    SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields );
    if( pName )
    {
@@ -1132,8 +1134,8 @@ HB_FUNC( AFIELDS )
          uiArrayLen = uiFields;
       for( uiCount = 1; uiCount <= uiArrayLen; uiCount++ )
       {
-         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_NAME, pItem );
-         hb_arraySet( pName, uiCount, pItem );
+         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_NAME, &pItem );
+         hb_arraySetForward( pName, uiCount, &pItem );
       }
    }
    if( pType )
@@ -1143,8 +1145,8 @@ HB_FUNC( AFIELDS )
          uiArrayLen = uiFields;
       for( uiCount = 1; uiCount <= uiArrayLen; uiCount++ )
       {
-         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_TYPE, pItem );
-         hb_arraySet( pType, uiCount, pItem );
+         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_TYPE, &pItem );
+         hb_arraySetForward( pType, uiCount, &pItem );
       }
    }
    if( pLen )
@@ -1154,8 +1156,8 @@ HB_FUNC( AFIELDS )
          uiArrayLen = uiFields;
       for( uiCount = 1; uiCount <= uiArrayLen; uiCount++ )
       {
-         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_LEN, pItem );
-         hb_arraySet( pLen, uiCount, pItem );
+         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_LEN, &pItem );
+         hb_arraySetForward( pLen, uiCount, &pItem );
       }
    }
    if( pDec )
@@ -1165,12 +1167,12 @@ HB_FUNC( AFIELDS )
          uiArrayLen = uiFields;
       for( uiCount = 1; uiCount <= uiArrayLen; uiCount++ )
       {
-         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_DEC, pItem );
-         hb_arraySet( pDec, uiCount, pItem );
+         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_DEC, &pItem );
+         hb_arraySetForward( pDec, uiCount, &pItem );
       }
    }
 
-   hb_itemRelease( pItem );
+   // hb_itemRelease( pItem );
    hb_retni( uiArrayLen );
 }
 
@@ -2232,7 +2234,7 @@ HB_FUNC( DBSKIP )
 HB_FUNC( DBSTRUCT )
 {
    HB_THREAD_STUB
-   PHB_ITEM pItem, pData;
+   HB_ITEM pItem, pData;
    USHORT uiFields, uiCount;
 
    hb_arrayNew( &(HB_VM_STACK.Return), 0 );
@@ -2241,30 +2243,28 @@ HB_FUNC( DBSTRUCT )
    {
       SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields );
 
-      pData = hb_itemNew( NULL );
-      pItem = hb_itemNew( NULL );
+      pData.type = HB_IT_NIL;
+      pItem.type = HB_IT_NIL;
 
       for( uiCount = 1; uiCount <= uiFields; uiCount++ )
       {
-         hb_arrayNew( pItem, 4 );
+         hb_arrayNew( &pItem, 4 );
 
-         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_NAME, pData );
-         hb_arraySetForward( pItem, 1, pData );
+         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_NAME, &pData );
+         hb_arraySetForward( &pItem, 1, &pData );
 
-         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_TYPE, pData );
-         hb_arraySetForward( pItem, 2, pData );
+         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_TYPE, &pData );
+         hb_arraySetForward( &pItem, 2, &pData );
 
-         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_LEN, pData );
-         hb_arraySetForward( pItem, 3, pData );
+         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_LEN, &pData );
+         hb_arraySetForward( &pItem, 3, &pData );
 
-         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_DEC, pData );
-         hb_arraySetForward( pItem, 4, pData );
+         SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_DEC, &pData );
+         hb_arraySetForward( &pItem, 4, &pData );
 
-         hb_arrayAddForward( &(HB_VM_STACK.Return), pItem );
+         hb_arrayAddForward( &(HB_VM_STACK.Return), &pItem );
       }
 
-      hb_itemRelease( pItem );
-      hb_itemRelease( pData );
    }
 }
 
@@ -2527,14 +2527,14 @@ HB_FUNC( FIELDDEC )
 
       if( ( uiIndex = hb_parni( 1 ) ) > 0 )
       {
-         PHB_ITEM pItem = hb_itemNew( NULL );
+         HB_ITEM pItem;
+         pItem.type = HB_IT_NIL;
 
-         if( SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, DBS_DEC, pItem ) == SUCCESS)
+         if( SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, DBS_DEC, &pItem ) == SUCCESS)
          {
-            hb_itemRelease( hb_itemReturn( pItem ) );
+            hb_itemForwardValue( &(HB_VM_STACK).Return, &pItem );
             return;
          }
-         hb_itemRelease( pItem );
       }
    }
 
@@ -2544,20 +2544,20 @@ HB_FUNC( FIELDDEC )
 HB_FUNC( FIELDGET )
 {
    HB_THREAD_STUB
-   PHB_ITEM pItem;
+   HB_ITEM pItem;
    USHORT uiField, uiFields;
 
-   pItem = hb_itemNew( NULL );
+   pItem.type = HB_IT_NIL;
    uiField = hb_parni( 1 );
 
    if( s_pCurrArea && uiField )
    {
       if( SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields ) == SUCCESS &&
           uiField > 0 && uiField <= uiFields )
-         SELF_GETVALUE( ( AREAP ) s_pCurrArea->pArea, uiField, pItem );
+         SELF_GETVALUE( ( AREAP ) s_pCurrArea->pArea, uiField, &pItem );
    }
 
-   hb_itemRelease( hb_itemReturn( pItem ) );
+   hb_itemForwardValue( &(HB_VM_STACK).Return, &pItem );
 }
 
 HB_FUNC( FIELDLEN )
@@ -2570,14 +2570,14 @@ HB_FUNC( FIELDLEN )
 
       if( ( uiIndex = hb_parni( 1 ) ) > 0 )
       {
-         PHB_ITEM pItem = hb_itemNew( NULL );
+         HB_ITEM pItem;
+         pItem.type = HB_IT_NIL;
 
-         if( SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, DBS_LEN, pItem ) == SUCCESS )
+         if( SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, DBS_LEN, &pItem ) == SUCCESS )
          {
-            hb_itemRelease( hb_itemReturn( pItem ) );
+            hb_itemForwardValue( &(HB_VM_STACK.Return), &pItem );
             return;
          }
-         hb_itemRelease( pItem );
       }
    }
 
@@ -2671,14 +2671,14 @@ HB_FUNC( FIELDTYPE )
 
       if( ( uiIndex = hb_parni( 1 ) ) > 0 )
       {
-         PHB_ITEM pItem = hb_itemNew( NULL );
+         HB_ITEM pItem;
+         pItem.type = HB_IT_NIL;
 
-         if( SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, DBS_TYPE, pItem ) == SUCCESS )
+         if( SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, DBS_TYPE, &pItem ) == SUCCESS )
          {
-            hb_itemRelease( hb_itemReturn( pItem ) );
+            hb_itemForwardValue( &(HB_VM_STACK).Return, &pItem );
             return;
          }
-         hb_itemRelease( pItem );
       }
    }
 
@@ -2716,15 +2716,15 @@ HB_FUNC( FOUND )
 HB_FUNC( HEADER )
 {
    HB_THREAD_STUB
-   PHB_ITEM pRecSize;
+   HB_ITEM pRecSize;
 
    if( !s_pCurrArea )
       hb_retni( 0 );
    else
    {
-      pRecSize = hb_itemNew( NULL );
-      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_GETHEADERSIZE, pRecSize );
-      hb_itemRelease( hb_itemReturn( pRecSize ) );
+      pRecSize.type = HB_IT_NIL;
+      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_GETHEADERSIZE, &pRecSize );
+      hb_itemForwardValue( &(HB_VM_STACK).Return, &pRecSize );
    }
 }
 
@@ -3413,12 +3413,12 @@ HB_FUNC( RDDLIST )
 {
    HB_THREAD_STUB
    USHORT uiType;
-   PHB_ITEM pName;
+   HB_ITEM pName;
    LPRDDNODE pRddNode;
 
    hb_rddCheck();
    hb_arrayNew( &(HB_VM_STACK.Return), 0 );
-   pName = hb_itemNew( NULL );
+   pName.type = HB_IT_NIL;
    pRddNode = s_pRddList;
    uiType = hb_parni( 1 );       /* 0 all types of RDD's */
 
@@ -3426,13 +3426,12 @@ HB_FUNC( RDDLIST )
    {
       if( ( uiType == 0 ) || ( pRddNode->uiType == uiType ) )
       {
-         hb_arrayAddForward( &(HB_VM_STACK.Return), hb_itemPutC( pName, pRddNode->szName ) );
+         hb_arrayAddForward( &(HB_VM_STACK.Return), hb_itemPutC( &pName, pRddNode->szName ) );
       }
 
       pRddNode = pRddNode->pNext;
    }
 
-   hb_itemRelease( pName );
 }
 
 HB_FUNC( RDDNAME )
@@ -3503,13 +3502,13 @@ HB_FUNC( RECNO )
 HB_FUNC( RECSIZE )
 {
    HB_THREAD_STUB
-   PHB_ITEM pRecSize;
+   HB_ITEM pRecSize;
 
    if( s_pCurrArea )
    {
-      pRecSize = hb_itemNew( NULL );
-      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_GETRECSIZE, pRecSize );
-      hb_itemRelease( hb_itemReturn( pRecSize ) );
+      pRecSize.type = HB_IT_NIL;
+      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_GETRECSIZE, &pRecSize );
+      hb_itemForwardValue( &(HB_VM_STACK).Return, &pRecSize );
    }
    else
       hb_retni( 0 );
@@ -3690,11 +3689,13 @@ HB_FUNC( ORDSCOPE )
    if ( s_pCurrArea )
    {
       DBORDSCOPEINFO sInfo;
-      PHB_ITEM pScopeValue = hb_itemNew( NULL );
+      HB_ITEM pScopeValue;
+
+      pScopeValue.type = HB_IT_NIL;
 
       sInfo.nScope = hb_parni( 1 );
 
-      SELF_SCOPEINFO( ( AREAP ) s_pCurrArea->pArea, sInfo.nScope, pScopeValue );
+      SELF_SCOPEINFO( ( AREAP ) s_pCurrArea->pArea, sInfo.nScope, &pScopeValue );
 
       if ( hb_pcount() > 1 )
       {
@@ -3708,9 +3709,9 @@ HB_FUNC( ORDSCOPE )
 
          /* Clipper compatible - I'm not sure it's good to emulate it, Druzus */
          if ( ISNIL( 2 ) )
-            pScopeValue = hb_itemPutL( pScopeValue, TRUE );
+            hb_itemPutL( &pScopeValue, TRUE );
       }
-      hb_itemRelease( hb_itemReturn( pScopeValue ) );
+      hb_itemForwardValue( &(HB_VM_STACK).Return, &pScopeValue );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDSCOPE" );
@@ -4017,7 +4018,6 @@ HB_FUNC( DBINFO )
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBINFO" );
 }
-
 HB_FUNC( DBORDERINFO )
 {
    HB_THREAD_STUB
@@ -4106,7 +4106,7 @@ HB_FUNC( DBRECORDINFO )
    if( s_pCurrArea )
    {
       pType = hb_param( 1 , HB_IT_NUMERIC );
-     pRecNo = hb_param( 2 , HB_IT_NUMERIC );
+      pRecNo = hb_param( 2 , HB_IT_NUMERIC );
       if( pType )
       {
          pInfo = hb_param( 3 , HB_IT_ANY );
@@ -4354,17 +4354,17 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
 
   if ( createIt )
   {
-     PHB_ITEM pFieldArray, pItem, pData;
+     HB_ITEM pFieldArray, pItem, pData;
      USHORT uiFields, uiCount;
 
-     /* get the table structure */
-     pFieldArray = hb_itemNew( NULL );
+     pFieldArray.type = HB_IT_NIL;
+     pItem.type = HB_IT_NIL;
+     pData.type = HB_IT_NIL;
 
+     /* get the table structure */
      SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields );
 
-     hb_arrayNew( pFieldArray, 0 );
-     pData = hb_itemNew( NULL );
-     pItem = hb_itemNew( NULL );
+     hb_arrayNew( &pFieldArray, 0 );
 
      if( pFields )
      {
@@ -4393,7 +4393,7 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
 
            if( ( uiCount = hb_rddFieldIndex( (AREAP) s_pCurrArea->pArea, szFieldName ) ) != 0 )
            {
-              AddField( pFieldArray, pItem, pData, uiCount );
+              AddField( &pFieldArray, &pItem, &pData, uiCount );
            }
         }
 
@@ -4404,16 +4404,12 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
         for( uiCount = 1; uiCount <= uiFields; uiCount++ )
         {
            /*if ( !pFields || IsFieldIn( (( PHB_DYNS )((( AREAP )s_pCurrArea->pArea)->lpFields + (uiCount-1))->sym )->pSymbol->szName,  pFields )) */
-           AddField( pFieldArray, pItem, pData, uiCount );
+           AddField( &pFieldArray, &pItem, &pData, uiCount );
         }
      }
 
-     hb_itemRelease( pItem );
-     hb_itemRelease( pData );
-
-     if( ! hb_arrayLen( pFieldArray ) )
+     if( ! hb_arrayLen( &pFieldArray ) )
      {
-        hb_itemRelease( pFieldArray );
 
         SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
 
@@ -4438,7 +4434,7 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
      /* now create a new table based on the current Area's record layout */
      ( ( AREAP ) pAreaNode->pArea )->atomAlias = hb_dynsymGet( ( char * ) pInfo.atomAlias );
 
-     if( SELF_CREATEFIELDS( ( AREAP ) pAreaNode->pArea, pFieldArray ) == FAILURE )
+     if( SELF_CREATEFIELDS( ( AREAP ) pAreaNode->pArea, &pFieldArray ) == FAILURE )
      {
         SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
 
@@ -4459,8 +4455,6 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
         hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBAPP" );
         return NULL;
      }
-
-     hb_itemRelease( pFieldArray );
 
      SELF_CLOSE( ( AREAP ) pAreaNode->pArea );
      SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
@@ -4498,10 +4492,10 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
   HB_THREAD_STUB
 
   USHORT   i,f;
-  PHB_ITEM fieldValue;
+  HB_ITEM fieldValue;
   char * szName;
 
-  fieldValue = hb_itemNew( NULL );
+  fieldValue.type = HB_IT_NIL;
   szName = ( char * ) hb_xgrab( ( ( AREAP ) pAreaTo)->uiMaxFieldNameLength + 1 );
 
   for( i = 0 ; i < pAreaTo->uiFieldCount; i++ )
@@ -4519,14 +4513,14 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
       {
         LPAREANODE s_curr = s_pCurrArea;
 
-        SELF_GETVALUE( pAreaFrom, f++, fieldValue );
+        SELF_GETVALUE( pAreaFrom, f++, &fieldValue );
 
         if( s )
         {
           s_pCurrArea = s;
         }
 
-        SELF_PUTVALUE( pAreaTo, i + 1, fieldValue );
+        SELF_PUTVALUE( pAreaTo, i + 1, &fieldValue );
 
         s_pCurrArea = s_curr;
       }
@@ -4534,7 +4528,6 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
   }
 
   hb_xfree( szName );
-  hb_itemRelease( fieldValue );
 }
 
 /*move the records, filtering if apropiate*/
