@@ -429,7 +429,7 @@ STATIC s_aEnumerations := {}, s_anEnumerator := {}, s_anForEachStartingBlock := 
 #ifndef REVISION
   #define REVISION .0
 #endif
-STATIC s_cVer := "1.0.RC10" + Stringify( REVISION )
+STATIC s_cVer := "1.0.RC11" + Stringify( REVISION )
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
