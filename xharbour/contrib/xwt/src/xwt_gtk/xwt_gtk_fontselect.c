@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_gtk_fileselect.c,v 1.5 2003/07/23 15:58:10 lculik Exp $
+   $Id: xwt_gtk_fontselect.c,v 1.1 2003/09/02 22:42:32 lculik Exp $
 
    GTK interface - File Selection Box 
 */
@@ -45,7 +45,7 @@ static void font_ok_sel( GtkWidget *widget,  gpointer cb_data )
 static void font_cancel_sel( GtkWidget *widget,  gpointer cb_data )
 {
    PXWT_GTK_MODAL xwtFilew = (PXWT_GTK_MODAL) ((PXWT_WIDGET)cb_data)->widget_data;
-   HB_ITEM itmFileName;
+
    XWT_GTK_MAKESELF( (((PXWT_WIDGET)cb_data)->owner) );
 
    //rising the updated event, to signal that we have a candidate filename

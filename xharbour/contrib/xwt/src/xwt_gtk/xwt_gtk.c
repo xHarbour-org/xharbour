@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.25 2003/10/09 23:57:23 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.26 2003/11/08 00:45:56 jonnymind Exp $
 
    Global declarations, common functions
 
@@ -16,6 +16,7 @@
 #include <hbapi.h>
 #include <xwt_gtk.h>
 #include <xwt_api.h>
+#include <xwt_calendar.h>
 #define FGCOLOR 1
 #define BGCOLOR 2
 #define BASECOLOR 3
@@ -201,6 +202,11 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
             case XWT_TYPE_IMAGE:
             return xwt_gtk_imageLoad( wWidget, prop->value.text );
+	    	    
+            case XWT_TYPE_PROGRESSBAR:
+               gtk_progress_bar_set_text(GTK_PROGRESS_BAR (wSelf), prop->value.text );
+               return TRUE;
+
 
             case XWT_TYPE_GRID: case XWT_TYPE_LAYOUT: case XWT_TYPE_PANE:
                if ( wSelf != wMain )
@@ -233,11 +239,27 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          switch( prop->value.number )
          {
             case XWT_VIS_HIDDEN:
-               gtk_widget_hide( wSelf );
+	       if(  wWidget->type ==XWT_TYPE_CALENDAR)
+	       { 
+	         PXWT_GTK_CALENDAR itm = (PXWT_GTK_CALENDAR) wWidget->widget_data ;
+                 gtk_widget_hide( GTK_WIDGET(itm->window ));
+	       }
+	       else
+	       {
+                 gtk_widget_hide( wSelf );
+	       }
             return TRUE;
 
             case XWT_VIS_NORMAL:
+	       if(  wWidget->type ==XWT_TYPE_CALENDAR)
+	       {
+	          PXWT_GTK_CALENDAR itm = (PXWT_GTK_CALENDAR) wWidget->widget_data ;
+                  gtk_widget_show( GTK_WIDGET(itm->window ) );
+	       }
+	       else
+	       {
                gtk_widget_show( wSelf );
+	       }
             return TRUE;
          }
 
@@ -694,21 +716,18 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_TOGGLEBUTTON:
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
-		widget_set_color(wSelf, &color,BASECOLOR)
-;
+		widget_set_color(wSelf, &color,BASECOLOR);
 	    
 		break;
             case XWT_TYPE_LABEL:
-	    	widget_set_color(wMain, &color,BASECOLOR)
-;
+	    	widget_set_color(wMain, &color,BASECOLOR);
 
 	    break;	    
 	    case XWT_TYPE_MENUITEM:
 	    {
 //	        gtk_widget_modify_base (wSelf, GTK_STATE_NORMAL, &color);
 	        PXWT_GTK_MENUITEM itm = (PXWT_GTK_MENUITEM) wWidget->widget_data;
-		widget_set_color(itm->label, &color,BASECOLOR)
-;
+		widget_set_color(itm->label, &color,BASECOLOR);
 }
 	    	    
             break;
@@ -718,6 +737,31 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
         return TRUE;
    }
 
+      case XWT_PROP_PROGRESSTYPE:
+      switch ( prop->value.number )
+      {
+      case 0:
+         gtk_progress_bar_set_orientation (GTK_PROGRESS_BAR (wSelf), 
+                      GTK_PROGRESS_LEFT_TO_RIGHT);
+
+      case 1:
+         gtk_progress_bar_set_orientation (GTK_PROGRESS_BAR (wSelf), 
+                      GTK_PROGRESS_RIGHT_TO_LEFT);
+
+      case 2:
+         gtk_progress_bar_set_orientation (GTK_PROGRESS_BAR (wSelf), 
+                      GTK_PROGRESS_BOTTOM_TO_TOP);
+
+      case 3:
+         gtk_progress_bar_set_orientation (GTK_PROGRESS_BAR (wSelf), 
+                      GTK_PROGRESS_TOP_TO_BOTTOM);
+
+      }
+      return TRUE;
+
+      case XWT_PROP_PROGRESSFRAC:
+         gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR (wSelf),prop->value.number);
+         return TRUE;
       case XWT_PROP_TEXTCOLOR:
       {
         GdkColor color;
@@ -1038,6 +1082,18 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
          return TRUE;
 
+      case XWT_PROP_GETDATE:        
+         if ( ! (( PXWT_GTK_MODAL ) wWidget->widget_data)->canceled )
+         {
+            gtk_calendar_get_date (GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG(wSelf)->calendar ),(guint)&prop->date.year, (guint)&prop->date.month, (guint)&prop->date.day);
+         }
+         else
+         {
+            prop->date.year = 1900;
+            prop->date.month = 01;
+            prop->date.day = 01;
+         }
+         return TRUE;
 
 
       case XWT_PROP_STATUS:
@@ -1048,6 +1104,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             return TRUE;
          }
       return FALSE;
+      
 
       case XWT_PROP_BOX:
          if( wWidget->type == XWT_TYPE_LAYOUT ||  wWidget->type == XWT_TYPE_PANE || wWidget->type == XWT_TYPE_GRID )
@@ -1093,6 +1150,8 @@ BOOL xwt_drv_create( PXWT_WIDGET xwtData )
       case XWT_TYPE_TREELIST:    return xwt_gtk_createTreelist( xwtData );
       case XWT_TYPE_BROWSE:      return xwt_gtk_createBrowse( xwtData );
       case XWT_TYPE_FONTSEL:     return xwt_gtk_createFontSelection( xwtData );
+      case XWT_TYPE_CALENDAR:    return xwt_gtk_createCalendar(xwtData);
+      case XWT_TYPE_CALENDARM:    return xwt_gtk_createCalendarModal(xwtData);
 
    }
    return FALSE;

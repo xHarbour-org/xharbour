@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.15 2003/09/04 20:26:24 xthefull Exp $
+   $Id: xwt_gtk.h,v 1.16 2003/11/08 00:45:56 jonnymind Exp $
 
    GTK interface
 */
@@ -89,6 +89,8 @@ typedef struct tag_xwt_gtk_menuitem
 } XWT_GTK_MENUITEM, *PXWT_GTK_MENUITEM;
 
 
+
+
 typedef struct tag_xwt_gtk_align
 {
   #if __GNUC__ < 3
@@ -171,6 +173,23 @@ typedef struct tag_xwt_gtk_grid
    BOOL bShrink;
    int iYPad, iXPad;
 } XWT_GTK_GRID, *PXWT_GTK_GRID;
+
+typedef struct tag_xwt_gtk_calendar
+{
+  gboolean  settings[5];
+  GtkWidget *window;
+  GtkWidget *calendar;
+
+  GtkWidget *vbox;
+  GtkWidget *hbox;
+  GtkWidget *hbbox;  
+  GtkWidget *button;
+  GtkWidget *button1;
+  GtkWidget *frame;
+  GtkWidget *bbox;
+} XWT_GTK_CALENDAR, *PXWT_GTK_CALENDAR;
+
+
 
 
 BOOL xwt_gtk_createButton( PXWT_WIDGET wSelf );
