@@ -1,5 +1,5 @@
 /*
- * $Id: rt_stra.prg,v 1.1.1.1 2001/12/21 10:44:52 ronpinkas Exp $
+ * $Id: rt_stra.prg,v 1.2 2003/07/13 22:21:26 andijahja Exp $
  */
 
 /*
@@ -60,8 +60,13 @@ FUNCTION Main_STRA()
    /* STR() */
 
    TEST_LINE( Str(NIL)                        , "E BASE 1099 Argument error STR A:3:U:NIL;U:NIL;U:NIL F:S" )
+#ifdef __XHARBOUR__
+   TEST_LINE( Str("A", 10, 2)                 , "     65.00"     )
+   TEST_LINE( Str(100, 10, "A")               , "**********"     )
+#else
    TEST_LINE( Str("A", 10, 2)                 , "E BASE 1099 Argument error STR A:3:C:A;N:10;N:2 F:S"      )
    TEST_LINE( Str(100, 10, "A")               , "E BASE 1099 Argument error STR A:3:N:100;N:10;C:A F:S"    )
+#endif
    TEST_LINE( Str(100, 10, NIL)               , "E BASE 1099 Argument error STR A:3:N:100;N:10;U:NIL F:S"  )
    TEST_LINE( Str(100, NIL, NIL)              , "E BASE 1099 Argument error STR A:3:N:100;U:NIL;U:NIL F:S" )
    TEST_LINE( Str( w_TEST->TYPE_N_I )         , "        100"    )
@@ -170,8 +175,13 @@ FUNCTION Main_STRA()
    TEST_LINE( StrZero(100, NIL, NIL)          , "E BASE 1099 Argument error STR A:3:N:100;U:NIL;U:NIL F:S" )
 #else
    TEST_LINE( StrZero(NIL)                    , "E BASE 9999 Argument error STRZERO A:3:U:NIL;U:NIL;U:NIL F:S")
+#ifdef __XHARBOUR__
+   TEST_LINE( StrZero("A", 10, 2)             , "0000065.00"     )
+   TEST_LINE( StrZero(100, 10, "A")           , "**********"     )
+#else
    TEST_LINE( StrZero("A", 10, 2)             , "E BASE 9999 Argument error STRZERO A:3:C:A;N:10;N:2 F:S"      )
    TEST_LINE( StrZero(100, 10, "A")           , "E BASE 9999 Argument error STRZERO A:3:N:100;N:10;C:A F:S"    )
+#endif
    TEST_LINE( StrZero(100, 10, NIL)           , "E BASE 9999 Argument error STRZERO A:3:N:100;N:10;U:NIL F:S"  )
    TEST_LINE( StrZero(100, NIL, NIL)          , "E BASE 9999 Argument error STRZERO A:3:N:100;U:NIL;U:NIL F:S" )
 #endif

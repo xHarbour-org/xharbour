@@ -1,5 +1,5 @@
 /*
- * $Id: rt_str.prg,v 1.2 2003/05/30 06:49:33 ronpinkas Exp $
+ * $Id: rt_str.prg,v 1.3 2003/07/13 22:21:26 andijahja Exp $
  */
 
 /*
@@ -134,7 +134,11 @@ FUNCTION Main_STR()
    /* CHR() */
 
    TEST_LINE( Chr( NIL )                      , "E BASE 1104 Argument error CHR A:1:U:NIL F:S"     )
+#ifdef __XHARBOUR__
+   TEST_LINE( Chr( "A" )                      , "A"                                    )
+#else
    TEST_LINE( Chr( "A" )                      , "E BASE 1104 Argument error CHR A:1:C:A F:S"       )
+#endif
    TEST_LINE( Chr( "ADDDDDD" )                , "E BASE 1104 Argument error CHR A:1:C:ADDDDDD F:S" )
    TEST_LINE( Chr( -10000000.0 )              , "€"                                    )
    TEST_LINE( Chr( -100000 )                  , "`"                                    )
@@ -380,8 +384,11 @@ FUNCTION Main_STR()
 #endif
    TEST_LINE( StrTran( "AA", "A" )            , "" )
    TEST_LINE( StrTran( "AA", "A", "1" )       , "11" )
+#ifdef __XHARBOUR__
+   TEST_LINE( StrTran( "AA", "A", "1", "2" )  , "AA" )
+#else
    TEST_LINE( StrTran( "AA", "A", "1", "2" )  , "11" )
-
+#endif
    /* UPPER() */
 
    TEST_LINE( Upper( scString )               , "HELLO"                                )
@@ -479,7 +486,11 @@ FUNCTION Main_STR()
    TEST_LINE( Replicate(200  , 0 )            , "E BASE 1106 Argument error REPLICATE A:2:N:200;N:0 F:S" )
    TEST_LINE( Replicate(""   , 10 )           , "" )
    TEST_LINE( Replicate(""   , 0 )            , "" )
+#ifdef __XHARBOUR__
+   TEST_LINE( Replicate("A"  , "B" )          , Replicate( "A", 66 ) )
+#else
    TEST_LINE( Replicate("A"  , "B" )          , "E BASE 1106 Argument error REPLICATE A:2:C:A;C:B F:S" )
+#endif
    TEST_LINE( Replicate("A"  , 1 )            , "A"                                        )
    TEST_LINE( Replicate("A"  , 2 )            , "AA"                                       )
    TEST_LINE( Replicate("HE", 3 )             , "HEHEHE"                                   )
@@ -491,7 +502,11 @@ FUNCTION Main_STR()
 
    /* SPACE() */
 
+#ifdef __XHARBOUR__
+   TEST_LINE( Space( "A" )                    , Space(65) )
+#else
    TEST_LINE( Space( "A" )                    , "E BASE 1105 Argument error SPACE A:1:C:A F:S" )
+#endif
    TEST_LINE( Space( 0 )                      , "" )
    TEST_LINE( Space( -10 )                    , "" )
    TEST_LINE( Space( 10 )                     , "          " )
@@ -502,9 +517,15 @@ FUNCTION Main_STR()
    /* SUBSTR() */
 
    TEST_LINE( SubStr(100     , 0, -1)         , "E BASE 1110 Argument error SUBSTR A:3:N:100;N:0;N:-1 F:S"   )
+#ifdef __XHARBOUR__
+   TEST_LINE( SubStr("abcdef", 1, "a")        , "abcdef"     )
+   TEST_LINE( SubStr("abcdef", "a")           , ""           )
+   TEST_LINE( SubStr("abcdef", "a", 1)        , ""           )
+#else
    TEST_LINE( SubStr("abcdef", 1, "a")        , "E BASE 1110 Argument error SUBSTR A:3:C:abcdef;N:1;C:a F:S" )
    TEST_LINE( SubStr("abcdef", "a")           , "E BASE 1110 Argument error SUBSTR A:3:C:abcdef;C:a;U:NIL F:S")
    TEST_LINE( SubStr("abcdef", "a", 1)        , "E BASE 1110 Argument error SUBSTR A:3:C:abcdef;C:a;N:1 F:S" )
+#endif
    TEST_LINE( SubStr("abcdef", 0, -1)         , ""               )
    TEST_LINE( SubStr("abcdef", 0, 0)          , ""               )
    TEST_LINE( SubStr("abcdef", 0, 1)          , "a"              )
@@ -543,7 +564,11 @@ FUNCTION Main_STR()
    /* LEFT() */
 
    TEST_LINE( Left(100     , -10)                , "E BASE 1124 Argument error LEFT A:2:N:100;N:-10 F:S"  )
+#ifdef __XHARBOUR__
+   TEST_LINE( Left("abcdef", "A")                , "abcdef" )
+#else
    TEST_LINE( Left("abcdef", "A")                , "E BASE 1124 Argument error LEFT A:2:C:abcdef;C:A F:S" )
+#endif
    TEST_LINE( Left("abcdef", -10)                , ""               )
    TEST_LINE( Left("abcdef", -2)                 , ""               )
    TEST_LINE( Left("abcdef", 0)                  , ""               )
@@ -554,7 +579,7 @@ FUNCTION Main_STR()
    /* RIGHT() */
 
    TEST_LINE( Right(100     , -10)               , ""               )
-   TEST_LINE( Right("abcdef", "A")               , ""               )
+   TEST_LINE( Right("abcdef", "A")               , "abcdef"         )
    TEST_LINE( Right("abcdef", -10)               , ""               )
    TEST_LINE( Right("abcdef", -2)                , ""               )
    TEST_LINE( Right("abcdef", 0)                 , ""               )
@@ -580,7 +605,11 @@ FUNCTION Main_STR()
    TEST_LINE( Pad(scString, @snIntP)             , "HELLO     "     ) /* Bug in CA-Cl*pper, it will return "" */
 #endif
 #ifndef __XPP__
+#ifdef __XHARBOUR__
+   TEST_LINE( Pad("abcdef", "A")                 , Pad( "abcdef", 65 )                               )
+#else
    TEST_LINE( Pad("abcdef", "A")                 , ""               )
+#endif
    TEST_LINE( Pad("abcdef", -5)                  , ""               )
 #endif
    TEST_LINE( Pad("abcdef", 0)                   , ""               )
@@ -607,7 +636,11 @@ FUNCTION Main_STR()
    TEST_LINE( PadR(scString, @snIntP)            , "HELLO     "     ) /* Bug in CA-Cl*pper, it will return "" */
 #endif
 #ifndef __XPP__
+#ifdef __XHARBOUR__
+   TEST_LINE( PadR("abcdef", "A")                , PadR( "abcdef", 65 )               )
+#else
    TEST_LINE( PadR("abcdef", "A")                , ""               )
+#endif
    TEST_LINE( PadR("abcdef", -5)                 , ""               )
 #endif
    TEST_LINE( PadR("abcdef", 0)                  , ""               )
@@ -634,7 +667,11 @@ FUNCTION Main_STR()
    TEST_LINE( PadL(scString, @snIntP)            , "     HELLO"     ) /* Bug in CA-Cl*pper, it will return "" */
 #endif
 #ifndef __XPP__
+#ifdef __XHARBOUR__
+   TEST_LINE( PadL("abcdef", "A")                , PadL( "abcdef", 65 ) )
+#else
    TEST_LINE( PadL("abcdef", "A")                , ""               )
+#endif
    TEST_LINE( PadL("abcdef", -5)                 , ""               )
 #endif
    TEST_LINE( PadL("abcdef", 0)                  , ""               )
@@ -661,7 +698,11 @@ FUNCTION Main_STR()
    TEST_LINE( PadC(scString, @snIntP)            , "  HELLO   "     ) /* Bug in CA-Cl*pper, it will return "" */
 #endif
 #ifndef __XPP__
+#ifdef __XHARBOUR__
+   TEST_LINE( PadC("abcdef", "A")                , PadC( "abcdef", 65 ) )
+#else
    TEST_LINE( PadC("abcdef", "A")                , ""               )
+#endif
    TEST_LINE( PadC("abcdef", -5)                 , ""               )
 #endif
    TEST_LINE( PadC("abcdef", 0)                  , ""               )

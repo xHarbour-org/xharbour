@@ -1,5 +1,5 @@
 /*
- * $Id: rt_math.prg,v 1.1.1.1 2001/12/21 10:44:46 ronpinkas Exp $
+ * $Id: rt_math.prg,v 1.2 2003/01/16 16:59:40 walito Exp $
  */
 
 /*
@@ -59,7 +59,11 @@ FUNCTION Main_MATH()
 
    /* LOG() */
 
+#ifdef __XHARBOUR__
+   TEST_LINE( Log("A")                        , Log( 65 )                              )
+#else
    TEST_LINE( Log("A")                        , "E BASE 1095 Argument error LOG A:1:C:A F:S" )
+#endif
    TEST_LINE( Str(Log(-1))                    , "***********************"              )
 // TEST_LINE( Str(Log(0))                     , "***********************"              )
    TEST_LINE( Str(Log(1))                     , "         0.00"                        )
@@ -71,7 +75,11 @@ FUNCTION Main_MATH()
 
    /* SQRT() */
 
+#ifdef __XHARBOUR__
+   TEST_LINE( Sqrt("A")                        , Sqrt( 65 )                            )
+#else
    TEST_LINE( Sqrt("A")                       , "E BASE 1097 Argument error SQRT A:1:C:A F:S" )
+#endif
    TEST_LINE( Sqrt(-1)                        , 0                                      )
    TEST_LINE( Sqrt(0)                         , 0                                      )
    TEST_LINE( Sqrt(4)                         , 2                                      )
@@ -84,7 +92,11 @@ FUNCTION Main_MATH()
 
    /* ABS() */
 
+#ifdef __XHARBOUR__
+   TEST_LINE( Abs("A")                        , 65                                     )
+#else
    TEST_LINE( Abs("A")                        , "E BASE 1089 Argument error ABS A:1:C:A F:S" )
+#endif
    TEST_LINE( Abs(0)                          , 0                                      )
    TEST_LINE( Abs(10)                         , 10                                     )
    TEST_LINE( Abs(-10)                        , 10                                     )
@@ -123,7 +135,11 @@ FUNCTION Main_MATH()
 
    /* EXP() */
 
+#ifdef __XHARBOUR__
+   TEST_LINE( Exp("A")                        , Exp( 65 )                              )
+#else
    TEST_LINE( Exp("A")                        , "E BASE 1096 Argument error EXP A:1:C:A F:S" )
+#endif
    TEST_LINE( Exp(0)                          , 1.00                                   )
    TEST_LINE( Str(Exp(15))                    , "   3269017.37"                        )
    TEST_LINE( Str(Exp(snIntZ))                , "         1.00"                        )
@@ -240,7 +256,11 @@ FUNCTION Main_MATH()
    /* INT() */
 
    TEST_LINE( Int( NIL )                      , "E BASE 1090 Argument error INT A:1:U:NIL F:S"     )
+#ifdef __XHARBOUR__
+   TEST_LINE( Int( "A" )                      , 65                                   )
+#else
    TEST_LINE( Int( "A" )                      , "E BASE 1090 Argument error INT A:1:C:A F:S"       )
+#endif
    TEST_LINE( Int( {} )                       , "E BASE 1090 Argument error INT A:1:A:{.[0].} F:S" )
    TEST_LINE( Int( 0 )                        , 0                                    )
    TEST_LINE( Int( 0.0 )                      , 0                                    )
@@ -357,9 +377,15 @@ FUNCTION Main_MATH()
    /* MOD() */
 
    TEST_LINE( MOD()                           , "E BASE 1085 Argument error % A:2:U:NIL;U:NIL F:S" )
+#ifdef __XHARBOUR__
+   TEST_LINE( MOD( "A", "B" )                 , 65.00                                              )
+   TEST_LINE( MOD( "A", 100 )                 , 65.00                                              )
+   TEST_LINE( MOD( 100, "B" )                 , 34.00                                              )
+#else
    TEST_LINE( MOD( "A", "B" )                 , "E BASE 1085 Argument error % A:2:C:A;C:B F:S"     )
    TEST_LINE( MOD( "A", 100 )                 , "E BASE 1085 Argument error % A:2:C:A;N:100 F:S"   )
    TEST_LINE( MOD( 100, "B" )                 , "E BASE 1085 Argument error % A:2:N:100;C:B F:S"   )
+#endif
    TEST_LINE( MOD( NIL, NIL )                 , "E BASE 1085 Argument error % A:2:U:NIL;U:NIL F:S" )
    TEST_LINE( MOD( 100, 60, "A" )             , 40.00                              )
 

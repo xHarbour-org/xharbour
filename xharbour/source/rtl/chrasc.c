@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.10 2003/07/13 22:21:25 andijahja Exp $
+ * $Id: chrasc.c,v 1.11 2003/07/18 21:42:35 andijahja Exp $
  */
 
 /*
@@ -63,7 +63,6 @@ extern char *hb_vm_acAscii[256];
 /* converts an ASCII code to a character value */
 HB_FUNC( CHR )
 {
-
    if ( hb_param( 1, HB_IT_NUMERIC ) )
    {
       /* NOTE: CA-Cl*pper's compiler optimizer will be wrong for those
@@ -87,9 +86,13 @@ HB_FUNC( ASC )
    if( pText )
    {
       if( hb_itemGetCLen( pText ) > 0 )
+      {
          hb_retni( ( BYTE ) * ( hb_itemGetCPtr( pText ) ) );
+      }
       else
+      {
          hb_retni( 0 );
+      }
    }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1107, NULL, "ASC", 1, hb_paramError( 1 ) );

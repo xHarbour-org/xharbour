@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.31 2003/11/30 12:32:30 druzus Exp $
+ * $Id: extend.c,v 1.32 2003/12/07 13:35:02 jonnymind Exp $
  */
 
 /*
@@ -109,16 +109,13 @@ PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
          }
       }
 
-      uiType = pItem->type;
-
-      if( ( uiType & ( USHORT ) iMask ) || ( uiType == HB_IT_NIL && ( USHORT ) iMask == HB_IT_ANY ) )
+      if( iMask == HB_IT_ANY || pItem->type & ( USHORT ) iMask )
       {
          return pItem;
       }
       else
       {
-         #define HB_IS_REAL_NUMERIC( p ) ( p )->type & HB_IT_NUMERIC
-         if( iMask == HB_IT_NUMERIC && HB_IS_REAL_NUMERIC( pItem ) )
+         if( iMask == HB_IT_NUMERIC && HB_IS_NUMERIC( pItem ) )
          {
             return pItem;
          }
@@ -387,6 +384,10 @@ int  HB_EXPORT hb_parl( int iParam, ... )
          return pItem->item.asLongLong.value != 0 ? 1 : 0;
       }
 #endif
+      else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
+      {
+         return pItem->item.asString.value[0];
+      }
       else if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
@@ -440,6 +441,10 @@ double  HB_EXPORT hb_parnd( int iParam, ... )
          return ( double ) pItem->item.asLongLong.value;
       }
 #endif
+      else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
+      {
+         return ( double ) pItem->item.asString.value[0];
+      }
       else if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
@@ -493,6 +498,10 @@ int  HB_EXPORT hb_parni( int iParam, ... )
          return ( int ) pItem->item.asLongLong.value;
       }
 #endif
+      else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
+      {
+         return ( int ) pItem->item.asString.value[0];
+      }
       else if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
@@ -550,6 +559,10 @@ long  HB_EXPORT hb_parnl( int iParam, ... )
          return ( long ) pItem->item.asLongLong.value;
       }
 #endif
+      else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
+      {
+         return ( long ) pItem->item.asString.value[0];
+      }
       else if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
@@ -563,7 +576,7 @@ long  HB_EXPORT hb_parnl( int iParam, ... )
       }
    }
 
-   return 0l;
+   return 0;
 }
 
 /* NEW function - to retrieve a pointer from a harbour level */

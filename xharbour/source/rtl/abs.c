@@ -1,5 +1,5 @@
 /*
- * $Id: abs.c,v 1.3 2003/07/18 21:42:35 andijahja Exp $
+ * $Id: abs.c,v 1.4 2003/07/23 12:35:57 druzus Exp $
  */
 
 /*
@@ -95,6 +95,12 @@ HB_FUNC( ABS )
       }
 #endif
       else if( HB_IS_DOUBLE( pNumber ) )
+      {
+         double dNumber = hb_itemGetND( pNumber );
+
+         hb_retndlen( dNumber >= 0.0 ? dNumber : -dNumber, 0, iDec );
+      }
+      else if( HB_IS_STRING( pNumber ) )
       {
          double dNumber = hb_itemGetND( pNumber );
 

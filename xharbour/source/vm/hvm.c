@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.295 2003/12/11 10:59:27 toninhofwi Exp $
+ * $Id: hvm.c,v 1.296 2003/12/13 07:16:25 andijahja Exp $
  */
 
 /*
@@ -4457,10 +4457,6 @@ static void hb_vmArrayPush( void )
    PHB_ITEM pArray;
    long     lIndex;
 
- #ifndef HB_C52_STRICT
-   BOOL bStrIndex = FALSE;
- #endif
-
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayAt()"));
 
    pIndex = hb_stackItemFromTop( -1 );
@@ -4508,7 +4504,6 @@ static void hb_vmArrayPush( void )
       if( pIndex->item.asString.length == 1 )
       {
          lIndex = ( long ) pIndex->item.asString.value[0];
-         bStrIndex = TRUE;
       }
       else if( HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
       {
@@ -4616,7 +4611,7 @@ static void hb_vmArrayPush( void )
             hb_stackPop();
 
             /*
-             * Empty String and Index is -1, this may be result of optimixations:
+             * Empty String and Index is -1, this may be result of optimizations:
              *
              *    SubStr( "", -1, 1 ) or aTail( "" ).
              *
@@ -4656,10 +4651,6 @@ static void hb_vmArrayPush( void )
          }
 
          pArray->item.asString.length  = 1;
-      }
-      else if( bStrIndex )
-      {
-         hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
       }
       else
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.57 2003/12/13 03:25:24 andijahja Exp $
+ * $Id: itemapi.c,v 1.58 2003/12/18 00:40:29 andijahja Exp $
  */
 
 /*
@@ -100,7 +100,7 @@
 extern PHB_CODEPAGE s_cdpage;
 #endif
 
-#if defined(__BORLANDC__) || defined(__WATCOMC__) 
+#if defined(__BORLANDC__) || defined(__WATCOMC__)
 #include <float.h>  /* for _finite() and _isnan() */
 #endif
 
@@ -454,6 +454,11 @@ BOOL HB_EXPORT hb_itemGetL( PHB_ITEM pItem )
             return pItem->item.asLongLong.value != 0;
          #endif
 
+         case  HB_IT_STRING:
+            if( pItem->item.asString.length == 1 )
+            {
+               return pItem->item.asString.value[0];
+            }
       }
    }
 
@@ -483,13 +488,16 @@ double HB_EXPORT hb_itemGetND( PHB_ITEM pItem )
          case HB_IT_LOGICAL:
             return ( double ) pItem->item.asLogical.value;
 
-         case HB_IT_STRING:
-            return ( double ) pItem->item.asString.value[0];
-
          #ifndef HB_LONG_LONG_OFF
          case HB_IT_LONGLONG:
             return (double) pItem->item.asLongLong.value;
          #endif
+
+         case  HB_IT_STRING:
+            if( pItem->item.asString.length == 1 )
+            {
+               return (double) pItem->item.asString.value[0];
+            }
       }
    }
 
@@ -519,13 +527,16 @@ int HB_EXPORT hb_itemGetNI( PHB_ITEM pItem )
          case HB_IT_LOGICAL:
             return ( int ) pItem->item.asLogical.value;
 
-         case HB_IT_STRING:
-            return ( int ) pItem->item.asString.value[0];
-
          #ifndef HB_LONG_LONG_OFF
          case HB_IT_LONGLONG:
             return ( int ) pItem->item.asLongLong.value;
         #endif
+
+         case  HB_IT_STRING:
+            if( pItem->item.asString.length == 1 )
+            {
+               return ( int ) pItem->item.asString.value[0];
+            }
       }
    }
 
@@ -555,13 +566,16 @@ long HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
          case HB_IT_LOGICAL:
             return ( long ) pItem->item.asLogical.value;
 
-         case HB_IT_STRING:
-            return ( long ) pItem->item.asString.value[0];
-
          #ifndef HB_LONG_LONG_OFF
          case HB_IT_LONGLONG:
             return ( long ) pItem->item.asLongLong.value;
          #endif
+
+         case  HB_IT_STRING:
+            if( pItem->item.asString.length == 1 )
+            {
+               return ( long ) pItem->item.asString.value[0];
+            }
       }
    }
 
