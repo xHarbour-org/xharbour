@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.931 2003/04/09 13:52:05 paultucker Exp $
+ * $Id: ChangeLog,v 1.932 2003/04/09 15:59:20 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-09 19:04 UTC+0100 Ian Anderson <i.anderson@procon-online.de>
+  * contrib\rdd_ads\adsfunc.c
+    + Added support for AdsCacheRecords(), this allows you
+      to specify how many records to read ahead when doing a
+      skip, and gives significant performance benefit
 
 2003-04-09 13:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * include/hbver.h
