@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.108 2004/06/08 20:00:29 lculik Exp $
+ * $Id: filesys.c,v 1.109 2004/06/08 20:31:29 ronpinkas Exp $
  */
 
 /*
@@ -154,8 +154,6 @@
       #include <io.h>
    #elif defined(__DJGPP__)
       #include <dir.h>
-      #define _getdrive getdisk
-      #define _chdrive  setdisk
    #endif
    #if !defined(HAVE_POSIX_IO)
       #define HAVE_POSIX_IO
@@ -180,6 +178,18 @@
    #include <sys\signal.h>
    #include <sys\process.h>
    #include <sys\wait.h>
+#endif
+
+
+#if defined( __DJGPP__ )
+   #define HB_FS_GETDRIVE(n) ( n = getdisk() )
+   #define HB_FS_SETDRIVE(n, total) ( total = setdisk( n ) )
+#elif defined( __WATCOMC__ )
+   #define HB_FS_GETDRIVE(n) ( _dos_getdrive( &( n ) ), --( n ) )
+   #define HB_FS_SETDRIVE(n) ( _dos_setdrive( ( n ) + 1, &( total ) ) )
+#else
+   #define HB_FS_GETDRIVE(n) ( ( ( n = _getdrive() ) < 65 ) ? --( n ) : ( (n) -= 65 ) )
+   #define HB_FS_SETDRIVE(n, total) ( _chdrive( ( n ) + 1 ) )
 #endif
 
 #ifndef O_BINARY
@@ -2762,55 +2772,32 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 #if defined(HB_FS_DRIVE_LETTER)
    HB_STACK_UNLOCK
 
- #if defined( __WATCOMC__ )
    {
-      /* 'unsigned int' _have to_ be used in Watcom
-       */
-      UINT uiSave;
-      UINT uiTotal;
+      /* 'unsigned int' _have to_ be used in Watcom */
+      UINT uiSave, uiNewDrive, uiDummy;
 
-      /* 1 = A:, 2 = B:, 3 = C:, etc
-       * _dos_*() functions don't set 'errno'
-       */
-      _dos_getdrive( &uiSave );
-
-      _dos_setdrive( nDrive + 1, &uiTotal );
-      _dos_getdrive( &uiTotal );
-      if( ( nDrive + 1 ) == uiTotal )
-      {
-         uiResult = 0;
-         hb_fsSetError( 0 );
-      }
-      else
-      {
-         _dos_setdrive( uiSave, &uiTotal );
-         uiResult = FS_ERROR;
-         hb_fsSetError( FS_ERROR );
-      }
-   }
- #else
-   {
-      USHORT uiSave = _getdrive();
-
-      // allowing async cancelation here
+      /* allowing async cancelation here */
       HB_TEST_CANCEL_ENABLE_ASYN
 
-      _chdrive( nDrive + 1 );
-      if( ( nDrive + 1 ) == _getdrive() )
+      HB_FS_GETDRIVE( uiSave );
+      HB_FS_SETDRIVE( nDrive, uiDummy );
+      HB_FS_GETDRIVE( uiNewDrive );
+
+      if ( nDrive == uiNewDrive )
       {
          uiResult = 0;
          hb_fsSetError( 0 );
       }
       else
       {
-         _chdrive( uiSave );
+         HB_FS_SETDRIVE( uiSave, uiDummy );
+	 
          uiResult = (USHORT) FS_ERROR;
          hb_fsSetError( (USHORT) FS_ERROR );
       }
       HB_DISABLE_ASYN_CANC
-
-   }
- #endif
+    }
+    
     HB_STACK_UNLOCK
 
 #else
@@ -2843,22 +2830,15 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
 #if defined(HB_FS_DRIVE_LETTER)
    HB_STACK_UNLOCK
 
- #if defined( __WATCOMC__ )
-
    {
       /* 'unsigned int' _have to_ be used in Watcom
        */
-      UINT uiSave;
-      UINT uiTotal;
+      UINT uiSave, uiDummy, uiNewDrive;
 
-      /* 1=  A:, 2 = B:, 3 = C:, etc
-       * _dos_*() functions don't set 'errno'
-       */
-      _dos_getdrive( &uiSave );
-
-      _dos_setdrive( nDrive + 1, &uiTotal );
-      _dos_getdrive( &uiTotal );
-      if( ( nDrive + 1 ) != uiTotal )
+      HB_FS_GETDRIVE( uiSave );
+      HB_FS_SETDRIVE( nDrive, uiDummy );
+      HB_FS_GETDRIVE( uiNewDrive );
+      if( nDrive != uiNewDrive )
       {
          uiResult = FS_ERROR;
          hb_fsSetError( FS_ERROR );
@@ -2868,26 +2848,9 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
          uiResult = 0;
          hb_fsSetError( 0 );
       }
-      _dos_setdrive( uiSave, &uiTotal );
+      HB_FS_SETDRIVE( uiSave, uiDummy );
    }
- #else
-   {
-      USHORT uiSave = _getdrive();
-
-      _chdrive( nDrive + 1 );
-      if( ( nDrive + 1 ) == _getdrive() )
-      {
-         uiResult = 0;
-         hb_fsSetError( 0 );
-      }
-      else
-      {
-         uiResult = (USHORT) FS_ERROR;
-         hb_fsSetError( (USHORT) FS_ERROR );
-      }
-      _chdrive( uiSave );
-   }
- #endif
+   
    HB_STACK_LOCK
 
 #else
@@ -2927,53 +2890,22 @@ BOOL   HB_EXPORT  hb_fsIsDevice( FHANDLE hFileHandle )
 
 BYTE   HB_EXPORT  hb_fsCurDrv( void )
 {
-   USHORT uiResult;
+   /* 'unsigned int' _have to_ be used in Watcom */
+   UINT uiResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDrv()"));
 
-#if defined(HB_FS_DRIVE_LETTER)
+#if defined( HB_FS_DRIVE_LETTER ) || defined( __WATCOMC__ )
 
-   {
-      uiResult = _getdrive();
-      #if defined(__DJGPP__)
-         /* _getdrive() returned a drive number, base 0. */
-      #else
-      if( uiResult < 65 )
-      {
-         /* _getdrive() returned a drive number, base 1. */
-         uiResult--;
-      }
-      else
-      {
-         /* _getdrive() returned a drive letter. */
-         uiResult -= 65;
-      }
-      #endif
-      hb_fsSetError( 0 );
-   }
-
-#elif defined( __WATCOMC__ )
-
-   {
-      /* 'unsigned int' _have to_ be used in Watcom
-       */
-      unsigned uiDrive;
-
-      /* 1 = A:, 2 = B:, 3 = C:, etc
-       * _dos_*() functions don't set 'errno'
-       */
-      _dos_getdrive( &uiDrive );
-      hb_fsSetError( 0 );
-      uiResult = ( USHORT ) uiDrive - 1;
-   }
+   HB_FS_GETDRIVE( uiResult );
 
 #else
 
    uiResult = 0;
-   hb_fsSetError( FS_ERROR );
 
 #endif
 
+   hb_fsSetError( FS_ERROR );
    return ( BYTE ) uiResult; /* Return the drive number, base 0. */
 }
 
