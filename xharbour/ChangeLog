@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.771 2003/02/24 06:32:51 jonnymind Exp $
+ * $Id: ChangeLog,v 1.772 2003/02/24 16:19:45 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-25 00:50 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/itemapi.c
+  * source/vm/fastitem.c
+    ! Test over locking/threadsafing features has been completed.
+      Resuming prvious version.
 
 2003-02-24 13:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/htmllib/ofile.prg
