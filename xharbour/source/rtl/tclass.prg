@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.10 2004/03/03 11:41:10 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.11 2004/07/26 10:38:07 ronpinkas Exp $
  */
 
 /*
@@ -546,8 +546,83 @@ ENDCLASS
 //----------------------------------------------------------------------------//
 
 CLASS ARRAY FROM SCALAROBJECT FUNCTION _ARRAY
-   METHOD AsString() INLINE ValToPrgExp( HB_QSelf() )
+   METHOD _Size( nLen )         INLINE aSize( Self, nLen ), nLen
+   METHOD Add( xValue )         INLINE aAdd( Self, xValue ), Self
+   METHOD AddAll( oCollection )
+   METHOD AtIndex( nPos )       INLINE Self[nPos]
+   METHOD AtPut( nPos, xValue ) INLINE Self[ nPos ] := xValue
+   METHOD Append( xValue )      INLINE aAdd( Self, xValue ), Self
+   METHOD AsString()            INLINE ValToPrgExp( HB_QSelf() )
+   METHOD Collect( bCollect )
+   METHOD Copy()                INLINE aCopy( Self, Array( Len( Self ) ) )
+   METHOD DeleteAt( nPos )
+   METHOD Do( bBlock )
+   METHOD IndexOf( xValue )
+   METHOD Init( nLen )          INLINE ::Size := IIF( nLen == NIL, 0, nLen ), Self
+   METHOD InsertAt( nPos, xValue )
+   METHOD Remove( xValue )
+   METHOD Scan( bScan )         INLINE aScan( Self, bScan )
+
 ENDCLASS
+
+METHOD AddAll( oCollection )
+   oCollection:Do( { |xValue| ::Add(xValue) } )
+RETURn Self
+
+METHOD Collect( bCollect ) CLASS ARRAY
+
+   LOCAL xElement, aResult[0]
+
+   FOR EACH xElement IN Self
+      IF Eval( bCollect, UnRef( xElement ) )
+          aAdd( aResult, UnRef( xElement ) )
+      END
+   NEXT
+
+RETURN aResult
+
+METHOD DeleteAt( nPos ) CLASS ARRAY
+
+   IF nPos > 0 .AND. nPos <= Len( Self )
+      aDel( Self, nPos, .T. )
+   ENDIF
+
+RETURN Self
+
+METHOD Do( bEval ) CLASS ARRAY
+   LOCAL xElement
+
+   FOR EACH xElement IN Self
+      bEval:Eval( UnRef( xElement ), HB_EnumIndex() )
+   NEXT
+
+RETURN Self
+
+METHOD IndexOf( xValue ) CLASS ARRAY
+   LOCAL xElement, cType := ValType( xValue )
+
+   FOR EACH xElement IN Self
+      IF ValType( xElement ) == cType .AND. xElement == xValue
+         RETURN HB_EnumIndex()
+      END
+   NEXT
+
+RETURN 0
+
+METHOD InsertAt( nPos, xValue ) CLASS ARRAY
+
+   IF nPos > Len( self )
+      aSize( Self, nPos )
+      Self[ nPos ] := xValue
+   ELSEIF nPos > 0
+      aIns( Self, nPos, xValue, .T. )
+   ENDIF
+
+RETURN Self
+
+METHOD Remove( xValue ) CLASS ARRAY
+   ::DeleteAt( ::IndexOf( xValue ) )
+RETURN Self
 
 //----------------------------------------------------------------------------//
 CLASS BLOCK FROM SCALAROBJECT FUNCTION _BLOCK
@@ -584,3 +659,5 @@ CLASS POINTER FROM SCALAROBJECT FUNCTION _POINTER
    METHOD AsString INLINE HB_NumToHex( HB_QSelf() )
 ENDCLASS
 
+FUNCTION UnRef( xValue )
+RETURN xValue

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3213 2004/07/26 01:43:50 lculik Exp $
+ * $Id: ChangeLog,v 1.3214 2004/07/26 10:38:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-26 13:55 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbclass.ch
+    * Minor correction
+
+  * source/rtl/tclass.prg
+    + Added implementation of Class(y) compatible class for native type ARRAY
+
+  * tests/enbltype.prg
+    * Greatly enhanced to demonstrate base class for native arrays.
 
 2004-07-26 03:36 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/objfunc.prg

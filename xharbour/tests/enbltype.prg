@@ -2,14 +2,25 @@
 
 PROCEDURE Main()
 
-   LOCAL aVar := { "One", 2, "Three" }
+   LOCAL aVar := {}
+
+   ENABLE TYPE CLASS ARRAY, CHARACTER, NUMERIC
 
    CLS
 
-   ENABLE TYPE CLASS NUMERIC, ARRAY
+   aVar:Init( 2 )
+   aVar:AtPut( 1, "One" )
+   aVar:AtPut( 2, 2 )
+
+   aVar:InsertAt( 3, "Three" )
+
+   Alert( "Found at pos: " + aVar:IndexOf( "Three" ):AsString )
+
+   aVar:Do( {|xElement| Alert( xElement:AsString ) } )
+
+   aVar:AddAll( { 4, "Five", 6 } )
 
    ? aVar:AsString
-   ? aVar[2]:AsString
 
 RETURN
 
