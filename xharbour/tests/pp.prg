@@ -342,7 +342,8 @@ STATIC s_acFlowType := {},  s_nFlowId := 0
    STATIC s_bRecursive := .F.
 #endif
 
-static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUILoaded := .F.
+STATIC s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUILoaded := .F.
+STATIC s_aSwitchDefs := {}
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
@@ -474,7 +475,8 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUIL
 
          sDefine := SubStr( sSwitch, nAt + 2, nNext - 1 )
          sSwitch := Left( sSwitch, nAt - 1 ) + SubStr( sSwitch, nAt + 1 + nNext )
-         CompileDefine( sDefine )
+         //CompileDefine( sDefine )
+         aAdd( s_aSwitchDefs, sDefine )
       ENDDO
 
       /* Process command line include paths. */
@@ -569,6 +571,17 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUIL
          Alert( [Not using standard rules.] )
       ENDIF
    ENDIF
+
+   // Command line defines.
+   #ifdef __XHARBOUR__
+       FOR EACH sDefine IN s_aSwitchDefs
+          CompileDefine( sDefine )
+       NEXT
+   #else
+       FOR nAt := 1 TO Len( s_aSwitchDefs )
+          CompileDefine( s_aSwitchDefs[ nAt ] )
+       NEXT
+   #endif
 
    IF sSource != NIL
       nRow := Row()
@@ -880,7 +893,7 @@ PROCEDURE RP_Dot()
 
       IF LastKey() == 27
          EXIT
-      ELSEIF LastKey() == 13 .OR. LastKey == 24 .OR. LastKey() == 9
+      ELSEIF LastKey() == 13 .OR. LastKey() == 24 .OR. LastKey() == 9
          nKBCommand++
       ELSEIF LastKey() == 5 .OR. LastKey() == 271
          nKBCommand--

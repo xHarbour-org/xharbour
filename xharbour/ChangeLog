@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.360 2002/08/28 00:53:18 lculik Exp $
+ * $Id: ChangeLog,v 1.361 2002/08/28 21:29:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-08-29 11:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    ! Fixed handling of command line defines.
+
+  * tests/pptest.prg
+    + Added #ifdef sample in demo script.
 
 2002-08-28 14:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/memvars.c

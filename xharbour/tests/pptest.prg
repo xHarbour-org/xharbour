@@ -5,6 +5,10 @@ PROCEDURE Main
 
    CLEAR SCREEN
 
+   #ifdef HELLO
+     Alert( "Defined" )
+   #endif
+
    Alert( "Testing PP as Interpreter... " )
 
    ? cName
