@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.15 2002/01/26 02:03:43 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.16 2002/01/27 05:23:32 ronpinkas Exp $
  */
 
 /*
@@ -46,6 +46,11 @@
  * If you write modifications of your own for xHarbour, it is your choice
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
+ *
+ * hb_itemClear() and hb_itemCopy() are derivative work of original code
+ * in the Harbour Project http://harbour-project.org (source/vm/itemapi.c)
+ * Copyright of Antonio Linares <alinares@fivetech.com>
+ *
  */
 
 #include "hbapi.h"
