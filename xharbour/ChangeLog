@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.31 2002/01/20 15:56:53 lculik Exp $
+ * $Id: ChangeLog,v 1.32 2002/01/20 17:11:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-01-21 02:25:00 UTC+0700 Andi Jahja <andijahja@cbn.net.id>
+   * source/vm/itemapi.c
+   * source/vm/hvm.c
+   * source/vm/fastitem.c
+     ! MSVC wants explicit type casts when allocating memory via hb_xgrab.
+       Such casts added.
 
 2002-01-20 13:45 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
   * source/common/hbffind.c

@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.8 2002/01/12 10:04:28 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.9 2002/01/17 23:20:48 ronpinkas Exp $
  */
 
 /*
@@ -179,90 +179,90 @@ PHB_ITEM hb_itemArrayGet( PHB_ITEM pArray, ULONG ulIndex )
 
 PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
+  HB_TRACE(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
-   if( pItem )
-   {
-      hb_itemClear( pItem );
-   }
-   else
-   {
-      pItem = hb_itemNew( NULL );
-   }
+  if( pItem )
+  {
+     hb_itemClear( pItem );
+  }
+  else
+  {
+     pItem = hb_itemNew( NULL );
+  }
 
-   if( szText == NULL )
-   {
-      szText = "";
-   }
+  if( szText == NULL )
+  {
+     szText = "";
+  }
 
-   pItem->type = HB_IT_STRING;
-   pItem->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
-   *( pItem->item.asString.puiHolders ) = 1;
-   pItem->item.asString.bStatic = FALSE;
-   pItem->item.asString.length = strlen( szText );
-   pItem->item.asString.value = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
-   strcpy( pItem->item.asString.value, szText );
+  pItem->type = HB_IT_STRING;
+  pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+  *( pItem->item.asString.puiHolders ) = 1;
+  pItem->item.asString.bStatic = FALSE;
+  pItem->item.asString.length = strlen( szText );
+  pItem->item.asString.value = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
+  strcpy( pItem->item.asString.value, szText );
 
-   return pItem;
+  return pItem;
 }
 
 PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
+  HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
 
-   if( pItem )
-   {
-      hb_itemClear( pItem );
-   }
-   else
-   {
-      pItem = hb_itemNew( NULL );
-   }
+  if( pItem )
+  {
+     hb_itemClear( pItem );
+  }
+  else
+  {
+     pItem = hb_itemNew( NULL );
+  }
 
-   /* NOTE: CA-Clipper seems to be buggy here, it will return ulLen bytes of
-            trash if the szText buffer is NULL, at least with hb_retclen().
-            [vszakats] */
+  /* NOTE: CA-Clipper seems to be buggy here, it will return ulLen bytes of
+           trash if the szText buffer is NULL, at least with hb_retclen().
+           [vszakats] */
 
-   if( szText == NULL )
-   {
-      szText = "";
-      ulLen = 0;
-   }
+  if( szText == NULL )
+  {
+     szText = "";
+     ulLen = 0;
+  }
 
-   pItem->type = HB_IT_STRING;
-   pItem->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
-   *( pItem->item.asString.puiHolders ) = 1;
-   pItem->item.asString.bStatic = FALSE;
-   pItem->item.asString.length = ulLen;
-   pItem->item.asString.value = ( char * ) hb_xgrab( ulLen + 1 );
-   hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
-   pItem->item.asString.value[ ulLen ] = '\0';
+  pItem->type = HB_IT_STRING;
+  pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+  *( pItem->item.asString.puiHolders ) = 1;
+  pItem->item.asString.bStatic = FALSE;
+  pItem->item.asString.length = ulLen;
+  pItem->item.asString.value = ( char * ) hb_xgrab( ulLen + 1 );
+  hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
+  pItem->item.asString.value[ ulLen ] = '\0';
 
-   return pItem;
+  return pItem;
 }
 
 PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
+  HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
 
-   if( pItem )
-   {
-      hb_itemClear( pItem );
-   }
-   else
-   {
-      pItem = hb_itemNew( NULL );
-   }
+  if( pItem )
+  {
+     hb_itemClear( pItem );
+  }
+  else
+  {
+     pItem = hb_itemNew( NULL );
+  }
 
-   pItem->type = HB_IT_STRING;
-   pItem->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
-   *( pItem->item.asString.puiHolders ) = 1;
-   pItem->item.asString.bStatic = FALSE;
-   pItem->item.asString.length = ulLen;
-   pItem->item.asString.value = szText;
-   pItem->item.asString.value[ ulLen ] = '\0';
+  pItem->type = HB_IT_STRING;
+  pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+  *( pItem->item.asString.puiHolders ) = 1;
+  pItem->item.asString.bStatic = FALSE;
+  pItem->item.asString.length = ulLen;
+  pItem->item.asString.value = szText;
+  pItem->item.asString.value[ ulLen ] = '\0';
 
-   return pItem;
+  return pItem;
 }
 
 void hb_itemSetCMemo( PHB_ITEM pItem )
@@ -860,31 +860,31 @@ void hb_itemInit( PHB_ITEM pItem )
 
 void hb_itemClear( PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ( "hb_itemClear(%p) Type: %i", pItem, pItem->type ) );
+  HB_TRACE(HB_TR_DEBUG, ( "hb_itemClear(%p) Type: %i", pItem, pItem->type ) );
 
-   if( HB_IS_STRING( pItem ) )
-   {
-      hb_itemReleaseString( pItem );
-   }
-   else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
-   {
-      if( ( pItem->item.asArray.value )->uiHolders && --( pItem->item.asArray.value )->uiHolders == 0 )
-      {
-         hb_arrayRelease( pItem );
-      }
-   }
-   else if( HB_IS_BLOCK( pItem ) )
-   {
-      hb_codeblockDelete( pItem );
-   }
-   else if( HB_IS_MEMVAR( pItem ) )
-   {
-      hb_memvarValueDecRef( pItem->item.asMemvar.value );
-   }
+  if( HB_IS_STRING( pItem ) )
+  {
+     hb_itemReleaseString( pItem );
+  }
+  else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
+  {
+     if( ( pItem->item.asArray.value )->uiHolders && --( pItem->item.asArray.value )->uiHolders == 0 )
+     {
+        hb_arrayRelease( pItem );
+     }
+  }
+  else if( HB_IS_BLOCK( pItem ) )
+  {
+     hb_codeblockDelete( pItem );
+  }
+  else if( HB_IS_MEMVAR( pItem ) )
+  {
+     hb_memvarValueDecRef( pItem->item.asMemvar.value );
+  }
 
-   pItem->type    = HB_IT_NIL;
+  pItem->type    = HB_IT_NIL;
 
-   HB_TRACE(HB_TR_DEBUG, ( "DONE hb_itemClear(%p)", pItem ) );
+  HB_TRACE(HB_TR_DEBUG, ( "DONE hb_itemClear(%p)", pItem ) );
 }
 
 /* Internal API, not standard Clipper */
