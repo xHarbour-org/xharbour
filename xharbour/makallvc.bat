@@ -1,7 +1,7 @@
 @echo off
 
 rem 
-rem $Id:
+rem $Id: makallvc.bat $
 rem 
 
 call make_vc %1
