@@ -1,5 +1,5 @@
 /*
- * $Id: pdfhbdoc.c,v 1.1 2004/07/02 04:32:29 lculik Exp $
+ * $Id: pdf1.prg,v 1.1 2004/07/26 01:32:09 lculik Exp $
  */
 
 /*
@@ -1387,8 +1387,8 @@ FIELD FIRST, PREV, NEXT, LAST, COUNT, PARENT, PAGE, COORD, TITLE, LEVEL
                    "/Producer ()" + CRLF + ;
                    Iif( !Empty( ::aReport[ AUTHOR ] ), "/Author (" + ::aReport[ AUTHOR ] + ')', "/Author ()" ) + CRLF + ;
                    "/Creator ()" + CRLF + ;
-                   Iif( !Empty( ::aReport[ SUBJECT ] ), "/Subject (" + aReport[ SUBJECT ] + ')', "/Subject ()" ) + CRLF + ;
-                   Iif( !Empty( ::aReport[ KEYWORD ] ), "/Keywords (" + aReport[ KEYWORD ] + ')', "/Keywords ()" ) + CRLF + ;
+                   Iif( !Empty( ::aReport[ SUBJECT ] ), "/Subject (" + ::aReport[ SUBJECT ] + ')', "/Subject ()" ) + CRLF + ;
+                   Iif( !Empty( ::aReport[ KEYWORD ] ), "/Keywords (" + ::aReport[ KEYWORD ] + ')', "/Keywords ()" ) + CRLF + ;
                    "/CreationDate (D:" + Str( Year( Date() ), 4 ) + Padl( Month( Date() ), 2, "0" ) + Padl( Day( Date() ), 2, "0" ) + Substr( Time(), 1, 2 ) + Substr( Time(), 4, 2 ) + Substr( Time(), 7, 2 ) + ")" + CRLF + ;
                    ">>" + CRLF + ;
                    "endobj" + CRLF
