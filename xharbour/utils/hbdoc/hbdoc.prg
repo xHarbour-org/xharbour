@@ -1,5 +1,5 @@
 /*
- * $Id: hbdoc.prg,v 1.9 2005/01/14 01:17:20 lculik Exp $
+ * $Id: hbdoc.prg,v 1.10 2005/01/31 19:19:34 patrickmast Exp $
  */
 
 /*
@@ -53,8 +53,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2005/01/14 01:17:20 $
- * Revision..: $Revision: 1.9 $
+ * Date......: $Date: 2005/01/31 19:19:34 $
+ * Revision..: $Revision: 1.10 $
  * Log file..: $Logfile:     $
  *
  *
@@ -142,11 +142,14 @@ MEMVAR lPdf
 MEMVAR lWww
 MEMVAR lWww2
 MEMVAR lChm
+MEMVAR lChm2
 MEMVAR lNorton
 MEMVAR aWWW
 MEMVAR lTroff
 MEMVAR aResult
-STATIC cTitle:=''
+MEMVAR theHandle
+
+STATIC cTitle := ''
 
 /*
 */
@@ -163,11 +166,19 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
    // NG/EH input
 
    LOCAL aExtensions := { "*.ch", "*.prg", "*.c", "*.asm", "*.txt" }
-   LOCAL i
-   Local cLast
+   LOCAL i,j
+   LOCAL cLast
    LOCAL nItem
    LOCAL nHpj
-   LOCAL cItem:=''
+   LOCAL cItem := ''
+   LOCAL cFName
+   LOCAL cLName
+   LOCAL aName
+   LOCAL nLen
+   LOCAL lDone
+   LOCAL cMI
+   LOCAL oHTMIndex
+   LOCAL cFileName
 
    LOCAL cCompiler     // Compiler type
    LOCAL oHtm
@@ -198,7 +209,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
    PUBLIC lNorton     := .F.
    PUBLIC lTee        := .F.
    PUBLIC aWWW        := {}
-   PUBLIC aResult:={}
+   PUBLIC aResult     := {}
    PUBLIC lTroff      := .f.
 
    //  The following variables are used to allow one to change the delimiter
@@ -216,7 +227,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
 
    //  See if flag is there
 
-   IF .NOT. EMPTY( cFlags )   
+   IF .NOT. EMPTY( cFlags )
       IF LEFT( cFlags, 1 ) == "-" .OR. LEFT( cFlags, 1 ) == "/"
          IF ( cFlags := UPPER( RIGHT( cFlags, 3 ) ) ) == "TXT"
             lAscii      := .T.
@@ -234,13 +245,13 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
          ELSEIF cFlags = "HTM"
             lWww := .T.
          ELSEIF cFlags = "HT2"
-            lWww2 := .T. 
+            lWww2 := .T.
          ELSEIF cFlags = "PDF"
-            lPdf := .T. 
+            lPdf := .T.
          ELSEIF cFlags = "CHM"
             lChm := .T.
-         ELSEIF cFlags = "CH2"  
-            lChm2 := .T.  
+         ELSEIF cFlags = "CH2"
+            lChm2 := .T.
          ELSEIF cFlags = "TRF"
             lTroff := .t.
          ELSEIF cFlags = "DOC"
@@ -310,7 +321,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
       IF EMPTY( DIRECTORY( "htm.*", "D" ) )
          FT_MKDIR( "htm" )
       ENDIF
-   ELSEIF lWww2 
+   ELSEIF lWww2
       IF EMPTY( DIRECTORY( "htm.*", "D" ) )
          FT_MKDIR( "htm" )
       ENDIF
@@ -319,11 +330,11 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
          FT_MKDIR( "chm" )
       ENDIF
 
-   ELSEIF lChm2 
+   ELSEIF lChm2
       IF EMPTY( DIRECTORY( "chm.*", "D" ) )
          FT_MKDIR( "chm" )
       ENDIF
- 
+
    ELSEIF   lPdf
       IF EMPTY( DIRECTORY( "pdf.*", "D" ) )
          FT_MKDIR( "pdf" )
@@ -356,7 +367,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
    ENDIF
    if lNgi .or. lRtf
    cCompiler := fill_Link_info( cLinkName )
-   endif        
+   endif
 
    IF cAtFile = NIL                     // use all files in directory
 
@@ -389,12 +400,12 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
          #endif
             ELSEIF lWww
                ProcessWww()
-            ELSEIF lWww2 
+            ELSEIF lWww2
                ProcessWww2()
             ELSEIF lChm
                ProcessChm()
             ELSEIF lChm2
-               ProcessWww2() 
+               ProcessWww2()
             ELSEIF lNgi
                ProcessiNg()
             ELSEIF lTroff
@@ -427,12 +438,12 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
                             tracelog(aRtfid,aRtfid[1])
          ELSEIF lWww
             ProcessWww()
-         ELSEIF lWww2 
-            ProcessWww2() 
+         ELSEIF lWww2
+            ProcessWww2()
          ELSEIF lChm
             ProcessChm()
-         ELSEIF lChm2 
-            ProcessWww2() 
+         ELSEIF lChm2
+            ProcessWww2()
          ELSEIF lNgi
             ProcessiNg()
          ELSEIF lTroff
@@ -451,7 +462,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
    @ INFILELINE,  0 CLEAR TO INFILELINE, MAXCOL()
    @ MODULELINE,  0 CLEAR TO MODULELINE, MAXCOL()
    @ LINELINE,  0 CLEAR TO LINELINE, MAXCOL()
-   @ INFILELINE, 30 SAY "Sorting input files"         
+   @ INFILELINE, 30 SAY "Sorting input files"
 
    ASORT( aDocInfo,,, { | a, b | UPPER( a[ 1 ] + " " + a[ 2 ] ) < UPPER( b[ 1 ] + " " + b[ 2 ] ) } )
 
@@ -460,23 +471,23 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
 
    @ INFILELINE,  0 CLEAR TO INFILELINE, MAXCOL()
    IF lnorton
-      @ INFILELINE, 30 SAY "Assembling " + IIF( lAscii, "documentation", "HelpC" ) ;         
+      @ INFILELINE, 30 SAY "Assembling " + IIF( lAscii, "documentation", "HelpC" ) ;
               + " input files"
    ELSEIF lRTF
-      @ INFILELINE, 30 SAY "Assembling " + IIF( lAscii, "documentation", "WINHELP" ) ;         
+      @ INFILELINE, 30 SAY "Assembling " + IIF( lAscii, "documentation", "WINHELP" ) ;
               + " input files"
    ELSEIF lPdf
-      @ INFILELINE, 30 SAY "Assembling " + IIF( lAscii, "documentation", "Adobe Portable Document Format" ) ;         
+      @ INFILELINE, 30 SAY "Assembling " + IIF( lAscii, "documentation", "Adobe Portable Document Format" ) ;
               + " input files"
 
    ELSEIF lWww .or. lChm
-      @ INFILELINE, 30 SAY "Assembling " + IIF( lAscii, "documentation", "Html" ) ;         
+      @ INFILELINE, 30 SAY "Assembling " + IIF( lAscii, "documentation", "Html" ) ;
               + " input files"
    ELSEIF lNgi
-      @ INFILELINE, 30 SAY "Assembling " + IIF( lAscii, "documentation", "NG" ) ;         
+      @ INFILELINE, 30 SAY "Assembling " + IIF( lAscii, "documentation", "NG" ) ;
               + " input files"
    ELSEIF lTroff
-      @ INFILELINE, 30 SAY "Assembling " + IIF( lAscii, "documentation", "TROFF" ) ;         
+      @ INFILELINE, 30 SAY "Assembling " + IIF( lAscii, "documentation", "TROFF" ) ;
               + " input files"
 
    ENDIF
@@ -516,7 +527,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
             SET CONSOLE ON
             WRITE_ERROR( "Category not found: " + aDocInfo[ i, 1 ],,,, aDocInfo[ i, 4 ] )
             @ ERRORLINE,  0 CLEAR TO ERRORLINE, MAXCOL()
-            @ ERRORLINE, 20 SAY "Category not found: " + aDocInfo[ i, 1 ] + " in " + aDocInfo[ i, 4 ]         
+            @ ERRORLINE, 20 SAY "Category not found: " + aDocInfo[ i, 1 ] + " in " + aDocInfo[ i, 4 ]
             SET ALTERNATE TO "assembl.bat" ADDITIVE
             SET ALTERNATE ON
             SET CONSOLE OFF
@@ -573,7 +584,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
       Next
       FWRITE( nHpj, '1 xHarbour Runtime functions and Commands by Name'+CRLF)
       asort(aWww,,,{|x,y| x[1]<y[1]})
-      for ppp:=1 to len(aWww) 
+      for ppp:=1 to len(aWww)
           if aWww[ppp,3]<>'Run Time Errors' .and. aWww[ppp,3] <>"Document"  .and. aWww[ppp,3] <>"The garbage collector"  .and. aWww[ppp,3] <>"OOP Command" .and. aWww[ppp,3] <>"Command"  .and. aWww[ppp,3] <>"The idle states"
              fWrite( nHpj, '2 '+aWww[ppp,1]+"="+aWww[ppp,2]+">Funca"+CRLF)
           endif
@@ -587,7 +598,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
       for ppp:=1 to nItem
 
         cLast:=GetNextContent(ppp)
-        if cLast =='Statement' .or. cLast =="Command"  
+        if cLast =='Statement' .or. cLast =="Command"
             WriteContentFile(aWww,cLast,nHpj)
         endif
       Next
@@ -613,7 +624,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
 
 
     fClose(nHpj)
-set console off
+    set console off
    ELSEIF lWWW
       ASORT( aDocWWWInfo,,, { | a, b | UPPER( a[ 1 ]  ) < UPPER( b[ 1 ]) } )
       asort(adocinfo,,,{|x,y| x[1]+x[2]<y[1]+y[2]})
@@ -624,9 +635,9 @@ set console off
           ohtm:=THTML():new('htm\hb'+strtran(citem," ","")+'.htm',aMetaContents)
           ohtm:WriteText('<h2>'+adocinfo[1,1]+'</h2><br>')
           ohtm:WriteText("<table>")
-  
+
       for ppp:=1 to len(adocinfo)
-      
+
            if citem ==adocinfo[ppp,1]
                oHtm:WritelinkTable(adocinfo[ppp,4],adocinfo[ppp,2],adocinfo[ppp,3])
            else
@@ -709,7 +720,7 @@ set console off
 
         endif
       Next
-      ohtm1:writetext('</ul>')        
+      ohtm1:writetext('</ul>')
 
         ohtm1:close()
 
@@ -725,44 +736,44 @@ set console off
      next
      ohtm:close()
 
-   ELSEIF lWww2 
-      cFileName := "index.htm"  
+   ELSEIF lWww2
+      cFileName := "index.htm"
       oHtmIndex := THTML():New('htm\' + cFileName)
-   
-      // Add title to HTML 
-      oHtmIndex:WriteText("<title>xHarbour - Reference Guide</title>")  
-   
-      // Add CSS to the HTML 
+
+      // Add title to HTML
+      oHtmIndex:WriteText("<title>xHarbour - Reference Guide</title>")
+
+      // Add CSS to the HTML
       oHtmIndex:WriteText("<style>")
-      oHtmIndex:WriteText("body {font-family:arial;font-size:14px;line-height:18px;}")  
-      oHtmIndex:WriteText(".classtitle {font-weight:bold;font-size:20px;padding-bottom:4px;}") 
-      oHtmIndex:WriteText(".functiontitle {font-weight:bold;font-size:20px;padding-bottom:4px;}") 
+      oHtmIndex:WriteText("body {font-family:arial;font-size:14px;line-height:18px;}")
+      oHtmIndex:WriteText(".classtitle {font-weight:bold;font-size:20px;padding-bottom:4px;}")
+      oHtmIndex:WriteText(".functiontitle {font-weight:bold;font-size:20px;padding-bottom:4px;}")
       oHtmIndex:WriteText("</style></head><body>")
-   
-      oHtmIndex:WriteText("<div style='font-size:20px;font-weight:bold;margin-bottom:16px;'>xHarbour Reference Guide</div>") 
-   
+
+      oHtmIndex:WriteText("<div style='font-size:20px;font-weight:bold;margin-bottom:16px;'>xHarbour Reference Guide</div>")
+
       ASORT(aDocInfo,,, {|x, y| x[1] < y[1]})
-   
+
       oHtmIndex:WriteText("<div class='classtitle'>Alphabetical list of classes</div>")
-      oHtmIndex:WriteText("<div style='margin-left:12px;margin-bottom:12px;'>") 
+      oHtmIndex:WriteText("<div style='margin-left:12px;margin-bottom:12px;'>")
       FOR i := 1 TO LEN(aDocInfo)
-         IF aDocInfo[i][3] = .T. 
-            oHtmIndex:WriteText("<strong>&raquo;</strong> <a href='" + aDocInfo[i][2] + "' target=_self>" + aDocInfo[i][1] + "</a><br>") 
-         END IF 
+         IF aDocInfo[i][3] = .T.
+            oHtmIndex:WriteText("<strong>&raquo;</strong> <a href='" + aDocInfo[i][2] + "' target=_self>" + aDocInfo[i][1] + "</a><br>")
+         END IF
       NEXT
-      oHtmIndex:WriteText("</div>")  
-   
+      oHtmIndex:WriteText("</div>")
+
       oHtmIndex:WriteText("<div class='functiontitle'>Alphabetical list of functions</div>")
-      oHtmIndex:WriteText("<div style='margin-left:12px;margin-bottom:12px;'>")  
+      oHtmIndex:WriteText("<div style='margin-left:12px;margin-bottom:12px;'>")
       FOR i := 1 TO LEN(aDocInfo)
-         IF aDocInfo[i][3] = .F. 
-            oHtmIndex:WriteText("<strong>&raquo;</strong> <a href='" + aDocInfo[i][2] + "' target=_self>" + aDocInfo[i][1] + "</a><br>") 
-         END IF 
-      NEXT  
-      oHtmIndex:WriteText("</div>") 
-      oHtmIndex:WriteText("</html>") 
+         IF aDocInfo[i][3] = .F.
+            oHtmIndex:WriteText("<strong>&raquo;</strong> <a href='" + aDocInfo[i][2] + "' target=_self>" + aDocInfo[i][1] + "</a><br>")
+         END IF
+      NEXT
+      oHtmIndex:WriteText("</div>")
+      oHtmIndex:WriteText("</html>")
    ELSEIF lChm
- 
+
       nHpj := FCREATE( 'chm\'+lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +".hhp" )
 
       FWRITE( nHpj, '[OPTIONS]' + CRLF )
@@ -848,7 +859,7 @@ set console off
           oHtm:AddObject("text/sitemap")
           oHTm:AddParam('Name',cLast)
           ohtm:EndObject()
-          ohtm:WriteText("<ul>")          
+          ohtm:WriteText("<ul>")
         endif
         if cLast<>'Run Time Errors' .and. cLast <>"Document"  .and. cLast <>"The garbage collector"  .and. cLast <>"OOP Command" .and. cLast <>"Command"  .and. cLast <>"The idle states"
         //    oHtm:WriteText( "<UL>" )
@@ -891,9 +902,9 @@ set console off
       oHtm:WriteText( "</UL>" )
       ohtm:WriteText("</ul>")
     ohtm:close()
- 
+
    ELSEIF lChm2
-      nHpj := FCREATE( 'chm\'+lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +".hhp" ) 
+      nHpj := FCREATE( 'chm\'+lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +".hhp" )
 
       FWRITE( nHpj, '[OPTIONS]' + CRLF )
       FWRITE( nHpj, 'Compatibility=1.1 or later'+CRLF)
@@ -968,7 +979,7 @@ set console off
       ENDIF
 
       @ INFILELINE,  0 CLEAR TO INFILELINE, MAXCOL()
-      @ INFILELINE, 30 SAY "Writing summary file"         
+      @ INFILELINE, 30 SAY "Writing summary file"
 
    ENDIF
 
@@ -982,7 +993,7 @@ set console off
    //  Send out list of authors
 
    @ INFILELINE,  0 CLEAR TO INFILELINE, MAXCOL()
-   @ INFILELINE, 30 SAY "Sorting Author file"         
+   @ INFILELINE, 30 SAY "Sorting Author file"
 
    FOR i := 1 TO LEN( aAuthorList )
 
@@ -1020,7 +1031,7 @@ set console off
                            UPPER( a[ 3 ] ) < UPPER( b[ 3 ] ) ) } )
 
    @ INFILELINE,  0 CLEAR TO INFILELINE, MAXCOL()
-   @ INFILELINE, 30 SAY "Writing Author file"         
+   @ INFILELINE, 30 SAY "Writing Author file"
 
    IF LEN( aAuthorList ) > 1
       i     := 2
@@ -1062,9 +1073,9 @@ set console off
 
 
 
-   @ MAXROW(), 0 SAY "Execute ASSEMBL.BAT to compile and link Guides"         
+   @ MAXROW(), 0 SAY "Execute ASSEMBL.BAT to compile and link Guides"
 
-   WAIT 
+   WAIT
 
    //  Return to caller
 SET CURSOR ON
@@ -1536,7 +1547,7 @@ STATIC FUNCTION ReadLinkFile( cFile )
    Local cLine
    Local cVer:=''
    LOCAL aLocDoc   := {}
-   Local nH:=FT_FUSE(cFile) 
+   Local nH:=FT_FUSE(cFile)
    DO WHILE FREADline( nH, @cBuffer, 4096 )
       cBuffer := TRIM( SUBSTR( cBuffer, 1 ) )
       AADD( Alocdoc, CbUFFER )
@@ -1625,4 +1636,4 @@ for nCount:=1 to Len(aTemp)
          Endif
 next
 return nil
-    
+
