@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2502 2004/03/05 23:14:00 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2503 2004/03/05 23:34:44 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,7 +9,7 @@
 */
 
 2004-03-07 00:41 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
-  * source/rtl/hbini.c
+  * source/rtl/hbini.prg
     ! Reverted latest changes that completely broke the code.
     
     /* Even the simplest test wasn't running (and cannot ever 
