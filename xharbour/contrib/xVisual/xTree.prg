@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.8 2002/10/17 17:16:46 what32 Exp $
+ * $Id: xTree.prg,v 1.9 2002/10/22 17:23:46 what32 Exp $
  */
 
 /*
@@ -45,7 +45,7 @@ CLASS ObjTree FROM TForm
                                 super:new( oParent )
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE  ::Tree:Move(,,x,y,.t.),nil
+   METHOD OnSize(n,x,y)  INLINE  ::TreeView:Move(,,x,y,.t.),nil
 ENDCLASS
 
 METHOD OnCreate() CLASS ObjTree
@@ -56,9 +56,9 @@ METHOD OnCreate() CLASS ObjTree
    ImageList_AddMasked( hImg, hBmp, RGB( 0, 255, 255 ) )
    DeleteObject(hBmp)
 
-   ::Add('tree', TreeObj():New( self, 100,  0,  0, 100, 100) )
+   ::Add( TreeObj():New( self, 100,  0,  0, 100, 100) )
 
-   TVSetImageList(::Tree:handle, hImg, 0 )
+   TVSetImageList(::TreeView:handle, hImg, 0 )
 RETURN(nil)
 
 
@@ -77,8 +77,8 @@ METHOD Add( cText, nImg, hObj ) CLASS TreeObj
 return(o)
 
 METHOD OnChange( oItem ) CLASS TreeObj
-   local n := aScan( ::Parent:Parent:ObjInsp:Objects, {|o|o:PropName == oItem:Caption} )
+   local n := aScan( ::Parent:Parent:ObjInspect:Objects, {|o|o:Name == oItem:Caption} )
    IF n>0
-      ::Parent:Parent:ObjInsp:InspCombo:SetCurSel(n-1)
+      ::Parent:Parent:ObjInspect:ComboBox:SetCurSel(n-1)
    ENDIF
 return(0)

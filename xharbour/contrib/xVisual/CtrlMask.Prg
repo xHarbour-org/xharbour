@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.27 2002/10/25 09:14:57 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.28 2002/10/26 06:50:24 what32 Exp $
  */
 
 /*
@@ -67,6 +67,7 @@ TODO:
 #define ASWORD( nUword ) if( ( nUword > 32768 ),(nUword-65536),nUword )
 
 GLOBAL EXTERNAL hThisInstance
+GLOBAL EXTERNAL FormEdit
 
 // selected controls array elements
 
@@ -127,7 +128,8 @@ METHOD New( oParent ) CLASS oCtrlMask
    ::width     := oParent:width
    ::height    := oParent:height
    ::style     := WS_CHILD + WS_VISIBLE
-   ::name      := "CTRLMASK"
+   ::WinClass  := "CTRLMASK"
+   ::ControlName := "CTRLMASK"
    ::color     := GetStockObject( NULL_BRUSH )
    ::ExStyle   := WS_EX_TRANSPARENT
    ::Cursor    := 0
@@ -379,7 +381,7 @@ METHOD OnKeyDown( wParam, lParam )
    LOCAL oObj
 
    IF wParam == VK_RIGHT .OR. wParam == VK_LEFT .OR. ;
-      wParam == VK_UP .OR. wParam == VK_DOWN .OR. ;
+      wParam == VK_UP    .OR. wParam == VK_DOWN .OR. ;
       wParam == VK_SHIFT .OR. wParam == VK_CONTROL
 
       IF ::sizing .OR. ::moving
@@ -388,7 +390,7 @@ METHOD OnKeyDown( wParam, lParam )
          
          FOR EACH a IN ::aSelected
             oObj := ::Parent:ChildFromHandle( a[ SEL_HANDLE ] )
-            oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj, 1)
+            oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, 1)
          NEXT
          
       ENDIF
@@ -607,7 +609,7 @@ METHOD OnMouseMove( aParam, x, y )
                IF oLastObj == NIL .OR. hChild != oLastObj:handle .OR. ::lHintActive
                   ::HintWindow:Activate(1)
                   ::HintWindow:SetTitle( 2, "Class: " + oObj:Classname() )
-                  ::HintWindow:SetText( "Object: " + oObj:propname )
+                  ::HintWindow:SetText( "Object: " + oObj:name )
                   ::lHintActive := .F.
                   oLastObj      := oObj
                endif
@@ -686,9 +688,9 @@ METHOD OnLButtonUp( wParam, x, y )
       RectScreenToClient( ::Handle, aRect )
       a[ SEL_OLDRECT ] := aClone( aRect )
       
-      if a[ SEL_HANDLE ] == ::Parent:Parent:ObjInsp:CurObject:handle
+      if a[ SEL_HANDLE ] == ::Parent:Parent:ObjInspect:CurObject:handle
          oObj := ::Parent:ChildFromHandle( a[ SEL_HANDLE ] )
-         oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj, 1 )
+         oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, 1 )
       endif
 
    NEXT

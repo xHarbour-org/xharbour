@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.43 2002/10/14 01:36:55 fsgiudice Exp $
+ * $Id: TForm.prg,v 1.44 2002/10/22 17:24:20 what32 Exp $
  */
 
 /*
@@ -116,6 +116,9 @@ RETURN(c)
 
 METHOD New( oParent ) CLASS TForm
 
+   ::WinClass    := "Form"
+   ::ControlName := "Form"
+
    ::WndProc   := IFNIL(::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL(::Msgs,-1,::Msgs)
    ::FrameWnd  := .F.
@@ -124,22 +127,25 @@ METHOD New( oParent ) CLASS TForm
    ::lRegister := IFNIL(::lRegister,.T.,::lRegister)
    ::lControl  := .F.
    ::ExStyle   := IFNIL(::ExStyle,0,::ExStyle)
-   ::PropName  := IFNIL(::PropName,"TForm",::PropName)
    InitCommonControls()
 
    RETURN( super:New( oParent ) )
 
 *-----------------------------------------------------------------------------*
 
-METHOD Add( cName, oObj, lCreate ) CLASS TForm
+METHOD Add( oObj, lCreate ) CLASS TForm
    LOCAL nSeq, hClass
 
    DEFAULT lCreate TO .T.
+   
+   IF oObj:ControlName == "Form" .and. oObj:Name == NIL
+      oObj:Name := oObj:ClassName()
+   ENDIF
 
-   oObj:propname := cName
+   oObj:Name := IFNIL( oObj:Name, oObj:ControlName, oObj:Name )
 
-   __objAddData( self, cName, HB_OO_CLSTP_PROTECTED )
-   __ObjSetValueList( self, { { cName, oObj } } )
+   __objAddData( self, oObj:Name, HB_OO_CLSTP_PROTECTED )
+   __ObjSetValueList( self, { { oObj:Name, oObj } } )
 
    IF lCreate
       oObj:Create()
@@ -180,7 +186,7 @@ METHOD ChildFromId( nId ) CLASS TForm
 *-----------------------------------------------------------------------------*
 
 METHOD GetObj( cName ) CLASS TForm
-   local n:= ASCAN( ::Controls,{|o|o:propname==cName} )
+   local n:= ASCAN( ::Controls,{|o|o:Name==cName} )
    if n>0
       return( ::Controls[n] )
    endif

@@ -51,10 +51,10 @@ FUNCTION Main
 
 
    // splash screen
-   oSplash := TSplash():New( oApp, "visualxharbour.bmp", 3000 )
+//   oSplash := TSplash():New( oApp, "visualxharbour.bmp", 3000 )
 
    WITH OBJECT oApp
-      WITH OBJECT :CreateForm( @MainFrame, TMainFrame() )
+      WITH OBJECT :CreateForm( @MainFrame, MainFrame() )
          :SetStyle( WS_THICKFRAME, .F. )
          :SetStyle( WS_MAXIMIZEBOX, .F. )
          :MainMenu()
@@ -62,9 +62,9 @@ FUNCTION Main
          :MainStatusBar()
 
          // add the object windows
-         :Add( 'ObjTree', ObjTree():New( oApp:MainFrame ) )
-         :Add( 'ObjInsp', ObjInspect():New( oApp:MainFrame ) )
-         :Add( 'ObjEdit', ObjEdit():New( oApp:MainFrame ) )
+         :Add( /*'ObjTree',*/ ObjTree():New( MainFrame ) )
+         :Add( /*'ObjInsp',*/ ObjInspect():New( MainFrame ) )
+         :Add( /*'ObjEdit',*/ ObjEdit():New( MainFrame ) )
 
          // focus to main Frame
          :SetFocus()
@@ -75,7 +75,7 @@ RETURN( nil)
 
 //----------------------------------------------------------------------------------------------
 
-CLASS TMainFrame FROM TFrame
+CLASS MainFrame FROM TForm
    METHOD New( oParent ) INLINE ::Caption := 'xHarbour xIde',;
                                 ::left    := 0,;
                                 ::top     := 0,;
@@ -93,15 +93,15 @@ ENDCLASS
 
 //----------------------------------------------------------------------------------------------
 
-METHOD MainMenu() CLASS TMainFrame
+METHOD MainMenu() CLASS MainFrame
    ::WindowMenu := TMenu():New()
    With Object ::WindowMenu
       :AddPopup('&Test')
       With Object :Popup
-         :AddItem( 'Editor', 101, {||oApp:CreateForm( @FormEdit, TFormEdit(), oApp:MainFrame ) } )
-         :AddItem( 'Open', 102, {|| XFMOpen( "Form1a.prg" ) } )
+         :AddItem( 'Editor', 101, {||oApp:CreateForm( @FormEdit, TFormEdit(), MainFrame ) } )
+         :AddItem( 'Open', 102, {|| XFMOpen( "Form1.prg" ) } )
          :AddSeparator()
-         :AddItem( 'Exit'  , 200, {||oApp:MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
+         :AddItem( 'Exit'  , 200, {||MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
       end
    end
    ::SetWindowMenu()
@@ -109,13 +109,13 @@ return(self)
 
 //----------------------------------------------------------------------------------------------
 
-METHOD MainToolBar() CLASS TMainFrame
+METHOD MainToolBar() CLASS MainFrame
    local n, oTool, oSplash
    LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab
-   ::Add('Rebar', TRebar():New( oApp:MainFrame ) )
+   ::Add( /*"Rebar",*/ TRebar():New( MainFrame ) )
 
     // add the xmake toolbar
-   With Object ::Add( 'Tools', TToolBar():New( oApp:MainFrame, 444, 15, , , 26, 26, 20, 20, 14 ))
+   With Object ::Add( /*"Tools",*/ TToolBar():New( MainFrame, 444, 15, , , 26, 26, 20, 20, 14 ))
       :AddButton( "NewProj",      ToolButton():New( 0,,"New Project",                    100 ) )
       :AddButton( "OpenProj",     ToolButton():New( 1,,"Open Project",                   101 ) )
       :AddButton( "Properties",   ToolButton():New( 2,,"Properties",                     102 ) )
@@ -140,13 +140,13 @@ METHOD MainToolBar() CLASS TMainFrame
       SendMessage( :handle, TB_SETIMAGELIST, 0, hImg1 )
       //---------------------------------------------------------------------
    End
-   ::Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::Tools:handle, 200, 52, 200, "", NIL )
+   ::Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolBar:handle, 200, 52, 200, "", NIL )
 
    // add the TabControl on the Rebarband
-   With Object ::Add( 'Tabs', TTabControl():New( oApp:MainFrame, 445,  0,  0,  0,  0) )
-      :AddTab( "StdTab", TabPage():New( oApp:MainFrame:Tabs, "Standard" ) )
+   With Object ::Add( /*"Tabs",*/ TTabControl():New( MainFrame, 445,  0,  0,  0,  0) )
+      :AddTab( "StdTab", TabPage():New( MainFrame:TabControl, "Standard" ) )
       :AddTab( "Additional" )
-      :AddTab( "Win32", TabPage():New( oApp:MainFrame:Tabs, "Win32" ) )
+      :AddTab( "Win32", TabPage():New( MainFrame:TabControl, "Win32" ) )
       :AddTab( "System" )
       :AddTab( "Internet" )
       :AddTab( "Dialogs" )
@@ -155,20 +155,20 @@ METHOD MainToolBar() CLASS TMainFrame
       :AddTab( "Activex" )
       :Configure()
    End
-   ::Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::Tabs:handle, 550, 56, , "", NIL )
+   ::Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::TabControl:handle, 550, 56, , "", NIL )
 
    // sets the controls toolbar on the TabControl
-   With Object ::Tabs:StdTab
-      :Add( 'TabBand', TRebar():New( oApp:MainFrame:Tabs:StdTab ) )
-      :TabBand:SetStyle( WS_BORDER, .F. )
-      With Object :Add( 'StdTools', TToolBar():New( oApp:MainFrame:Tabs:StdTab, 444, 14, , , 28, 28, 20, 20 ) )
+   With Object ::TabControl:StdTab
+      :Add( /*'TabBand',*/ TRebar():New( MainFrame:TabControl:StdTab ) )
+      :Rebar:SetStyle( WS_BORDER, .F. )
+      With Object :Add( /*'StdTools',*/ TToolBar():New( MainFrame:TabControl:StdTab, 444, 14, , , 28, 28, 20, 20 ) )
          :SetStyle( TBSTYLE_CHECKGROUP )
          aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
                           'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
                           'RadioGroup', 'Panel', 'ActionList' }
          for n:=0 to 16
              oTool := ToolButton():New( n,,aStdTab[n+1], 150+n )
-             oTool:Action := {|oItem| oApp:FormEdit:OnMenuCommand(oItem) }
+             oTool:Action := {|oItem| FormEdit:OnMenuCommand(oItem) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
              :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
          next
@@ -181,22 +181,22 @@ METHOD MainToolBar() CLASS TMainFrame
          SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
          //---------------------------------------------------------------------
       End
-      :TabBand:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
-      :StdTools:DisableAll()
+      :Rebar:AddBand( NIL, RBBS_NOVERT, :ToolBar:handle, 100, 30,  , "", NIL )
+      :ToolBar:DisableAll()
    End
 
 //----------------------------------------------------------------------------------------------
-   With Object ::Tabs:Win32
-      :Add( 'TabWin32', TRebar():New( oApp:MainFrame:Tabs:Win32 ) )
-      :TabWin32:SetStyle( WS_BORDER, .F. )
-      With Object :Add( 'Win32Tools', TToolBar():New( oApp:MainFrame:Tabs:Win32, 445, 14, , , 28, 28, 20, 20 ) )
+   With Object ::TabControl:Win32
+      :Add( /*'TabWin32',*/ TRebar():New( MainFrame:TabControl:Win32 ) )
+      :Rebar:SetStyle( WS_BORDER, .F. )
+      With Object :Add( /*'Win32Tools',*/ TToolBar():New( MainFrame:TabControl:Win32, 445, 14, , , 28, 28, 20, 20 ) )
          :SetStyle( TBSTYLE_CHECKGROUP )
          aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'Rebar', ;
                       '', '', '', '', '', '', ;
                       '', '', '' }
          for n:=0 to 16
              oTool := ToolButton():New( n,,aStdTab[n+1], 250+n )
-             oTool:Action := {|oItem| oApp:FormEdit:OnMenuCommand(oItem) }
+             oTool:Action := {|oItem| FormEdit:OnMenuCommand(oItem) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
              :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
          next
@@ -210,20 +210,20 @@ METHOD MainToolBar() CLASS TMainFrame
          //---------------------------------------------------------------------
 
       End
-      :TabWin32:AddBand( NIL, RBBS_NOVERT, :Win32Tools:handle, 100, 30,  , "", NIL )
-      :Win32Tools:DisableAll()
+      :Rebar:AddBand( NIL, RBBS_NOVERT, :ToolBar:handle, 100, 30,  , "", NIL )
+      :ToolBar:DisableAll()
    End
    //--------- sets a QUICK access to the control
-   ::SetLink( 'StdBar',   ::Tabs:StdTab:StdTools)
-   ::SetLink( 'Win32Bar', ::Tabs:Win32:Win32Tools )
+   ::SetLink( 'StdBar',   ::TabControl:StdTab:ToolBar)
+   ::SetLink( 'Win32Bar', ::TabControl:Win32:ToolBar )
 return(self)
 
 //----------------------------------------------------------------------------------------------
 
-METHOD MainStatusBar() CLASS TMainFrame
-   ::Add('Status',  TStatusBar():New( oApp:MainFrame, 'StatusBar', 1001 ) )
-   ::Status:SetPanels( { 150,380,480,580,-1 } )
-   ::Status:SetPanelText( 0, "Visual xHarbour" )
+METHOD MainStatusBar() CLASS MainFrame
+   ::Add( /*'Status',*/  TStatusBar():New( MainFrame, 'StatusBar', 1001 ) )
+   ::StatusBar:SetPanels( { 150,380,480,580,-1 } )
+   ::StatusBar:SetPanelText( 0, "Visual xHarbour" )
 return(self)
 
 //----------------------------------------------------------------------------------------------
@@ -382,7 +382,7 @@ int XFMParse( char *sText )
    hb_vmPushNil();
    hb_vmDo( 0 );
 
-   //oApp:CreateForm( @FormEdit, TFormEdit(), oApp:MainFrame
+   //oApp:CreateForm( @FormEdit, TFormEdit(), MainFrame
    hb_vmPushSymbol( pCreateForm->pSymbol );
    hb_vmPush( &OAPP );
    hb_vmPushNil();
@@ -573,7 +573,7 @@ int XFMParse( char *sText )
       }
       sFromClass[i] = '\0';
 
-      OutputDebugString( " IS: " );
+      OutputDebugString( "IS: " );
       OutputDebugString( (char *) sFromClass );
       OutputDebugString( "\n" );
 

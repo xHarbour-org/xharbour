@@ -6,81 +6,32 @@ GLOBAL Form1
 // ! AUTO_GENERATED !
 CLASS TForm1 FROM TForm
 
-   DATA CAPTION INIT "TForm1"
-   DATA HEIGHT INIT        400
-   DATA LEFT INIT        200
-   DATA STYLE INIT   13565952
-   DATA TOP INIT        125
-   DATA WIDTH INIT        600
+      DATA BIMAXIMIZE INIT .T.
+      DATA BIMINIMIZE INIT .T.
+      DATA BISYSTEMMENU INIT .T.
+      DATA CAPTION INIT "TForm1"
+      DATA HEIGHT INIT        400
+      DATA LEFT INIT        200
+      DATA NAME INIT "TFORMEDIT"
+      DATA TOP INIT        125
+      DATA WIDTH INIT        600
+
+   CONTROL ListBox1 FROM TLISTBOX
+      :ID :=        506
+
+      OBJECT ITEMS IS TSTRINGS
+         :TEXT := {}
+      END OBJECT
+
+      :LEFT :=        335
+      :TOP :=         57
+   END CONTROL
 
    CONTROL Button1 FROM TBUTTON
       :CAPTION := "Button1"
-      :HEIGHT :=         24
       :ID :=        500
-      :LEFT :=        163
-      :STYLE :=  1342242816
-      :TOP :=         96
-      :WIDTH :=         80
-
-      :SetMethod( "OnClick", { || HB_QSelf():Parent:Button1Click( HB_QSelf() ) } )
+      :LEFT :=        140
+      :TOP :=         83
    END CONTROL
 
-   // Generated only for On... Events that were specied in the Designer.
-   METHOD OnClick()
-   METHOD OnLButtonDblClk
-
-   // Methods...
-   METHOD Button1Click( Sender )
-   //...
-
 END CLASS 
-
-METHOD OnClick() CLASS TForm1
-
-    /*
-       Code specified by developer in IDE for overridden event.
-       May refer to the form as either Self, ::, or Form1.
-       Self or :: are faster.
-    */
-    MessageBox( 0, ::Caption + " was clicked.", "Project1", 0 )
-
-Return Self
-
-METHOD OnLButtonDblClk CLASS TForm1
-
-
-   ::Button1:Caption := "New Caption"
-
-   //::Button1:SHow()
-
-   MessageBox( 0, ::Name + " was double clicked.", "Project1", 0 )
-   
-Return Self
-
-// Controls:
-METHOD Button1Click( Sender /* Button1 class TButton() */ ) CLASS TForm1
-
-   /*
-      Creating a fast reference to the initiating control.
-      This way we can use : for the child control initating
-      the Event (we also have :: for the container Form).
-   */
-   WITH OBJECT Sender
-
-   // Self is the container not the initiating control so:
-
-   // Using the standard WITH shortcut.
-   :Caption := "New Caption"          // Fastest.
-   // Or:
-   Sender:Caption := "New Caption"    // Still very fast.
-   // Or:
-   Self:Button1:Caption := "New Caption" // Slower, but might be needed when referring other controls on the form.
-   :Update()
-
-   // Now self:
-   ::Caption := "My Form"     // Faster.
-   ::Update()
-
-   END WITH // Sender
-
-Return Self

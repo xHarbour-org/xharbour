@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.69 2002/10/25 21:29:12 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.70 2002/10/26 08:57:48 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -46,6 +46,8 @@
 
 GLOBAL EXTERNAL hThisInstance
 GLOBAL EXTERNAL oApp
+GLOBAL EXTERNAL MainFrame
+GLOBAL EXTERNAL FormEdit
 
 /*
    For performance NOT using OS indpendant R/T function,
@@ -90,7 +92,7 @@ GLOBAL EXTERNAL oApp
    METHOD Add()
    METHOD OnCreate()         INLINE ::CreateSub()
    METHOD OnSize()
-   METHOD OnMove()           INLINE ::Parent:ObjInsp:SetBrowserData( self,1 ),NIL
+   METHOD OnMove()           INLINE ::Parent:ObjInspect:SetBrowserData( self,1 ),NIL
 
    METHOD OnPaint( hDC )     INLINE ::TileGrid(hDC)
    METHOD TileGrid(hDC)
@@ -102,7 +104,7 @@ GLOBAL EXTERNAL oApp
    METHOD SetGridSize(x,y)
    METHOD OnCloseQuery()     INLINE ::Parent:WindowMenu:Enable( 101 ),;
                                     ::Parent:StdBar:DisableAll(),;
-                                    ::Parent:ObjInsp:InspCombo:DelObject( self ),;
+                                    ::Parent:ObjInspect:ComboBox:DelObject( self ),;
                                     super:OnCloseQuery()
 
    METHOD XFMTop()
@@ -117,7 +119,10 @@ GLOBAL EXTERNAL oApp
 
 METHOD Add( cName, oObj )
 
-   LOCAL oCtrl := Super:Add( cName, oObj )
+   LOCAL oCtrl
+   
+   oObj:Name := cName
+   oCtrl := Super:Add( oObj )
 
    aAdd( ::aCtrl, oCtrl)
    ::oMask:GetSiblings()
@@ -140,7 +145,7 @@ METHOD OnSize(nFlag,Width,Height)
       ::oMask:Move(aRect[1],aRect[2],aRect[3],aRect[4],.T.)
       ::oMask:Refresh()
    ENDIF
-   ::Parent:ObjInsp:SetBrowserData( self,1 )
+   ::Parent:ObjInspect:SetBrowserData( self,1 )
 
    RETURN(NIL)
 
@@ -211,72 +216,71 @@ METHOD CreateControl(aRect)
 
       DO CASE
       CASE ::CtrlName=="Button"
-         oObj:=::Add(cName, TButton():New(   self, cName, 500,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
-//         TraceLog( oObj:Name )
+         oObj:=::Add( cName, TButton():New(   self, cName, 500,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="Edit"
-         oObj:=::Add(cName, TEdit():New(     self, cName, 501,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::Add( cName, TEdit():New(     self, cName, 501,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="Label"
-         oObj:=::Add(cName, TStatic():New(   self, cName, 502,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::Add( cName, TStatic():New(   self, cName, 502,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="CheckBox"
-         oObj:=::Add(cName, TCheck():New(    self, cName, 503,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::Add( cName, TCheck():New(    self, cName, 503,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="RadioButton"
-         oObj:=::Add(cName, TRadio():New(    self, cName, 504,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::Add( cName, TRadio():New(    self, cName, 504,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="ComboBox"
-         oObj:=::Add(cName, TComboBox():New( self,        505,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::Add( cName, TComboBox():New( self,        505,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="ListBox"
-         oObj:=::Add(cName, TListBox():New(  self,        506,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::Add( cName, TListBox():New(  self,        506,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="StatusBar"
          IF !("2" $ cName) // only one status bar
-           oObj:=::Add(cName, TStatusBar():New( self, cName, 507 ) )
+           oObj:=::Add( cName, TStatusBar():New( self, cName, 507 ) )
          ENDIF
       CASE ::CtrlName=="TabControl"
-         oObj:=::Add(cName, TTabControl():New( self,        508, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::Add( cName, TTabControl():New( self,        508, aRect[1], aRect[2], aRect[3], aRect[4] ) )
          oObj:AddTab( "Tab1" )
          oObj:configure()
       CASE ::CtrlName=="TabPage"
       CASE ::CtrlName=="GroupBox"
-         oObj:=::Add(cName, TGroupBox():New(   self, cName, 509, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::Add( cName, TGroupBox():New(   self, cName, 509, aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="TreeView"
-         oObj:=::Add(cName, TTreeView():New(   self,        510, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::Add( cName, TTreeView():New(   self,        510, aRect[1], aRect[2], aRect[3], aRect[4] ) )
 
 
       CASE ::CtrlName=="Rebar"
          IF !("2" $ cName) // only one Rebar
             cRebar := cName
-            oObj:=::Add(cName, TRebar():New( self ) )
+            oObj:=::Add( cName, TRebar():New( self ) )
          ENDIF
 
       CASE ::CtrlName=="ToolBar"
-         oObj:=::Add(cName, TToolBar():New( self, 511, 2, HINST_COMMCTRL, IDB_STD_SMALL_COLOR, 16, 16, 16, 16, 14 ) )
+         oObj:=::Add( cName, TToolBar():New( self, 511, 2, HINST_COMMCTRL, IDB_STD_SMALL_COLOR, 16, 16, 16, 16, 14 ) )
          oObj:AddButton("New", ToolButton():New( 0 , ,"New",  100 ) )
          oObj:AddButton("Open",ToolButton():New( 1 , ,"Open", 100 ) )
          IF cRebar != NIL
             ::GetObj(cRebar):AddBand( , RBBS_GRIPPERALWAYS+RBBS_NOVERT+RBBS_BREAK, oObj:handle, 200, 20, 200, "", NIL )
-            ::Parent:ObjTree:GetItem(::GetObj(cRebar)):Add( oObj:PropName,1, oObj:handle )
+            ::Parent:ObjTree:GetItem(::GetObj(cRebar)):Add( oObj:Name,1, oObj:handle )
          ENDIF
 
       CASE ::CtrlName=="ProgressBar"
-         oObj:=::Add(cName, TProgressBar():New(   self,          aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::Add( cName, TProgressBar():New( self, aRect[1], aRect[2], aRect[3], aRect[4] ) )
       OTHERWISE // unknown name
 
-         ::CtrlName:=NIL
+         ::CtrlName    :=NIL
          ::oMask:Cursor:=NIL
 
       ENDCASE
 
       if oObj!=NIL
-         oObj:SetMethod("Delete",{||oApp:MainFrame:ObjInsp:InspCombo:DelObject( oObj ), ;
+         oObj:SetMethod("Delete",{||MainFrame:ObjInspect:ComboBox:DelObject( oObj ), ;
                                     HB_QSELF():DelControl(), oObj:Parent:XFMControl( NIL, oObj, .T. ) } )
 
-         oApp:MainFrame:ObjInsp:InspCombo:AddString(oObj:propname+chr(9)+oObj:ClassName(),oObj)
-         oApp:MainFrame:ObjInsp:InspCombo:SetCurSel(oApp:MainFrame:ObjInsp:InspCombo:GetCount()-1)
-         oTree := ::Parent:ObjTree:Tree:Add( oObj:PropName,1, oObj:handle )
-         ::Parent:ObjTree:Tree:Expand()
+         MainFrame:ObjInspect:ComboBox:AddString(oObj:name+chr(9)+oObj:ClassName(),oObj)
+         MainFrame:ObjInspect:ComboBox:SetCurSel(MainFrame:ObjInspect:ComboBox:GetCount()-1)
+         oTree := ::Parent:ObjTree:TreeView:Add( oObj:Name,1, oObj:handle )
+         ::Parent:ObjTree:TreeView:Expand()
 
          IF !EMPTY(oObj:Controls)
             FOR n:=1 TO LEN(oObj:Controls)
                 o:=oObj:Controls[n]
-                oTree:Add( o:propname,1, o:handle )
+                oTree:Add( o:name,1, o:handle )
                 oTree:Expand()
             NEXT
          ENDIF
@@ -295,7 +299,7 @@ METHOD GetUniquePropName(cName)
 
    LOCAL nInd:=1
 
-   DO WHILE aScan( ::Controls, {|o| o: PropName==cName+AllTrim(Str(nInd))}) > 0
+   DO WHILE aScan( ::Controls, {|o| o:ControlName == cName+AllTrim(Str(nInd))}) > 0
       nInd++
    ENDDO
 
@@ -336,9 +340,9 @@ METHOD CreateSub()
    ::Parent:StdBar:EnableAll()
    ::Parent:Win32Bar:EnableAll()
 
-   ::Parent:ObjInsp:InspCombo:AddString(::PropName+chr(9)+"TFORM",self)
-   ::Parent:ObjInsp:InspCombo:SetCurSel(::Parent:ObjInsp:InspCombo:GetCount()-1)
-   ::Parent:ObjTree:Tree:Add( ::PropName )
+   ::Parent:ObjInspect:ComboBox:AddString(::Name+chr(9)+"TFORM",self)
+   ::Parent:ObjInspect:ComboBox:SetCurSel(::Parent:ObjInspect:ComboBox:GetCount()-1)
+   ::Parent:ObjTree:TreeView:Add( ::Name )
 
    xRet := super:OnCreate()
 
@@ -533,7 +537,7 @@ METHOD XFMReflect() CLASS TFormEdit
 
    TraceLog( cText )
 
-   oApp:MainFrame:ObjEdit:SourceEdit:SetText( cText )
+   MainFrame:ObjEdit:SourceEdit:SetText( cText )
 
 RETURN Self
 

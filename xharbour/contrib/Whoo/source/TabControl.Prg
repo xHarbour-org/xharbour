@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.21 2002/10/22 17:24:21 what32 Exp $
+ * $Id: TabControl.Prg,v 1.22 2002/10/25 05:33:52 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -59,8 +59,7 @@ CLASS TTabControl FROM TCustomControl
    DATA lControl  PROTECTED INIT .T.
    DATA Msgs      PROTECTED INIT {WM_SIZE,WM_MOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
-   DATA Name      PROTECTED INIT WC_TABCONTROL
-
+   
    DATA Cargo            PROTECTED
    DATA SendTo AS OBJECT PROTECTED
 
@@ -109,6 +108,9 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TTabControl
    ::Top       := IFNIL( nTop,    ::Top,    nTop   )
    ::width     := IFNIL( nWidth,  ::width , nWidth )
    ::Height    := IFNIL( nHeight, ::height, nHeight)
+   
+   ::WinClass    := WC_TABCONTROL
+   ::ControlName := "TabControl"
 RETURN( super:new( oParent ))
 
 *-----------------------------------------------------------------------------*
@@ -138,7 +140,7 @@ METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
       oPage:resname := cRes
       oPage:ImageIndex := nImgPos
    endif
-   oPage:propname := cName
+   oPage:Name := cName
    if (hTab:=TabCtrl_AddItem(::handle,oPage:Caption,oPage:ImageIndex)) > -1
       AADD(::Controls,oPage )
       __objAddData( self, cName, HB_OO_CLSTP_PROTECTED )
@@ -392,7 +394,7 @@ return( nil )
 *-----------------------------------------------------------------------------*
 
 METHOD GetObj( cName ) CLASS TTabControl
-   local n:= ASCAN( ::Controls,{|o|o:propname==cName} )
+   local n:= ASCAN( ::Controls,{|o|o:Name==cName} )
    if n>0
       return( ::Controls[n] )
    endif

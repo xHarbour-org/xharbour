@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.42 2002/10/25 05:33:57 what32 Exp $
+ * $Id: xInspect.prg,v 1.43 2002/10/25 07:20:34 what32 Exp $
  */
 
 /*
@@ -52,10 +52,10 @@ CLASS ObjInspect FROM TForm
                                 super:new( oParent )
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE  ::GetObj("InspCombo"):Move(,,x,21,.t.),;
-                                 ::GetObj("InspTabs"):Move(,25,x,y-25,.t.),;
-                                 ::browser:width :=::InspTabs:Properties:ClientRect()[3],;
-                                 ::browser:height:=::InspTabs:Properties:ClientRect()[4],;
+   METHOD OnSize(n,x,y)  INLINE  ::ComboBox:Move(,,x,21,.t.),;
+                                 ::TabControl:Move(,25,x,y-25,.t.),;
+                                 ::browser:width :=::TabControl:Properties:ClientRect()[3],;
+                                 ::browser:height:=::TabControl:Properties:ClientRect()[4],;
                                  nil
    METHOD SetBrowserData()
    METHOD SaveVar()
@@ -91,15 +91,15 @@ METHOD OnCreate() CLASS ObjInspect
    local oCombo:= ComboInsp():New(  self, 100, 0, 0, aRect[3], 100 )
    oCombo:Style:= WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
 
-   ::Add( 'InspCombo', oCombo )
-   ::InspCombo:SetItemHeight( -1, 15 )
+   ::Add( /*'InspCombo',*/ oCombo )
+   ::ComboBox:SetItemHeight( -1, 15 )
 
-   ::Add( 'InspTabs', TTabControl():New( self, 101,  0,  25, aRect[3], aRect[4]-25) )
-   ::InspTabs:AddTab( "Properties")
-   ::InspTabs:AddTab( "Events", TabPage():New( ::InspTabs, "Events") )
-   ::InspTabs:Configure()
+   ::Add( /*'InspTabs',*/ TTabControl():New( self, 101,  0,  25, aRect[3], aRect[4]-25) )
+   ::TabControl:AddTab( "Properties")
+   ::TabControl:AddTab( "Events", TabPage():New( ::TabControl, "Events") )
+   ::TabControl:Configure()
 
-   ::Browser:=InspectBrowser():New( ::InspTabs:Properties )
+   ::Browser:=InspectBrowser():New( ::TabControl:Properties )
    ::Browser:Create()
 
 return( super:OnCreate() )

@@ -1,5 +1,5 @@
 /*
- * $Id: TCStatusBar.prg,v 1.13 2002/10/14 01:36:55 fsgiudice Exp $
+ * $Id: TCStatusBar.prg,v 1.14 2002/10/17 09:59:15 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -38,7 +38,6 @@
 
 CLASS TStatusBar FROM TCustomControl
 
-//   DATA Caption INIT  "StatusBar"
    DATA xxLeft   PROTECTED  INIT   0
    DATA xxTop    PROTECTED  INIT   0
    DATA xxWidth  PROTECTED  INIT   0
@@ -50,8 +49,6 @@ CLASS TStatusBar FROM TCustomControl
    DATA lControl  PROTECTED INIT .T.
    DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
-   DATA Name      PROTECTED INIT "msctls_statusbar32"
-
 
    DATA rect PROTECTED
 
@@ -69,6 +66,9 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent, cCaption, nId ) CLASS TStatusBar
+
+   ::WinClass    := "msctls_statusbar32"
+   ::ControlName := "StatusBar"
 
    ::id        := nId
    ::Caption   := cCaption

@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.19 2002/10/17 09:59:15 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.20 2002/10/22 17:24:20 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -75,7 +75,7 @@ typedef struct {;
     UINT      uflags;
 } TOOLTIPTEXT
 
-//CLASS TToolBar FROM TWinControl
+
 CLASS TToolBar FROM TCustomControl
 
    DATA Caption PROTECTED INIT ""
@@ -91,7 +91,6 @@ CLASS TToolBar FROM TCustomControl
    DATA lRegister PROTECTED INIT .F.
    DATA lControl  PROTECTED INIT .T.
    DATA Msgs      PROTECTED INIT {WM_SIZE,WM_MOVE}
-   DATA Name      PROTECTED INIT "ToolBar32"
 
 
    DATA abuttons PROTECTED
@@ -127,6 +126,9 @@ ENDCLASS
 METHOD New( oParent, nId, nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp ) CLASS TToolBar
 
    InitCommonControlsEx(ICC_COOL_CLASSES)
+
+   ::WinClass    := "toolbar32"
+   ::ControlName := "ToolBar"
 
    ::Id      := nId
 

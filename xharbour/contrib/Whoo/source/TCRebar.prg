@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.19 2002/10/16 17:56:54 what32 Exp $
+ * $Id: TCRebar.prg,v 1.20 2002/10/17 09:59:15 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -57,7 +57,6 @@ CLASS TRebar FROM TCustomControl
    DATA lControl  PROTECTED INIT .T.
    DATA Msgs      PROTECTED INIT {WM_NOTIFY}
    DATA WndProc   PROTECTED INIT 'FormProc'
-   DATA Name      PROTECTED INIT REBARCLASSNAME
 
    VAR nrProc     PROTECTED
 
@@ -118,6 +117,10 @@ METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
 
 METHOD New( oParent ) CLASS TRebar
    InitCommonControlsEx(ICC_COOL_CLASSES)
+   
+   ::WinClass    := REBARCLASSNAME
+   ::ControlName := "Rebar"
+
    super:new( oParent )
    RETURN( self )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.12 2002/10/25 07:20:18 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.13 2002/10/25 09:14:41 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -293,6 +293,10 @@ ENDCLASS
 
 METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight, Source, aHeader, bNotify ) CLASS TWBrowse
    local i, oCol
+
+   ::WinClass    := "WHBrowser"
+   ::ControlName := "Browse"
+
    ::id        := nId
    ::Left      := IFNIL( nLeft,    ::Left,    nLeft    )
    ::Top       := IFNIL( nTop,     ::Top,     nTop     )

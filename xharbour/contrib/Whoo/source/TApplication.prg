@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.29 2002/10/25 21:29:10 ronpinkas Exp $
+ * $Id: TApplication.prg,v 1.30 2002/10/26 01:10:25 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -49,6 +49,7 @@ CLASS Application
    DATA MultiInstance         INIT .F.
    DATA InstMsg               INIT NIL
    DATA aForms                INIT {}
+   DATA AppForms              INIT {}
 
    METHOD Initialize() CONSTRUCTOR
    METHOD Run()
@@ -101,21 +102,25 @@ METHOD Run() CLASS Application
 
 METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
 
-   LOCAL aVars, aVar, cForm := SubStr( oForm:ClassName, 2 )
+   LOCAL aVars, aVar  //, cForm := SubStr( oForm:ClassName, 2 )
 
    DEFAULT oParent TO self
 
-   TraceLog( cForm, oForm, oForm:PropName )
+//   TraceLog( cForm, oForm, oForm:PropName )
 
-   __objAddData( Self, cForm )
    oForm := if( oForm != NIL, oForm:New( oParent ), TForm():New( oParent ) )
-   __ObjSetValueList( self, { { cForm, oForm } } )
-   oForm:propname := cForm
+   oForm:Name := oForm:ClassName() //ControlName + AllTrim( Str( Len( ::AppForms ) + 1 ) )
+
+   __objAddData( Self, oForm:Name )
+   __ObjSetValueList( self, { { oForm:Name, oForm } } )
+
    oForm:Create()
 
    IF oParent:handle == ::handle
       aAdd( ::aForms, oForm )
    ENDIF
+   
+   aAdd( ::AppForms, oForm:Name )
 
    aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
    FOR EACH aVar IN aVars
@@ -164,40 +169,3 @@ METHOD CreateFrame( cName, oFrame ) CLASS Application
 
    RETURN( oFrame )
 
-FUNCTION WinClass( cClass )
-
-   DO CASE
-    CASE cClass == "TBUTTON"
-       RETURN "button"
-
-    CASE cClass == "TEDIT"
-       RETURN "edit"
-
-    CASE cClass == "TSTATIC"
-       RETURN "static"
-
-    CASE cClass == "TCHECK"
-       RETURN "edit"
-
-    CASE cClass == "TRADIO"
-       RETURN "button"
-
-    CASE cClass == "TCOMBOBOX"
-       RETURN "combobox"
-
-    CASE cClass == "TLISTBOX"
-       RETURN "listbox"
-
-    CASE cClass == "TSTATUSBAR"
-       RETURN "msctls_statusbar32"
-
-    CASE cClass == "TTABCONTROL"
-       RETURN WC_TABCONTROL
-
-    CASE cClass == "TGROUPBOX"
-       RETURN "button"
-   END CASE
-
- RETURN NIL
-
-*------------------------------------------------------------------------------*

@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.14 2002/10/22 17:24:20 what32 Exp $
+ * $Id: TCListBox.prg,v 1.15 2002/10/22 23:08:10 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -55,7 +55,6 @@ CLASS TListBox FROM TCustomControl
    DATA lControl  PROTECTED INIT .T.
    DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
-   DATA Name      PROTECTED INIT "listbox"
 
    DATA Items     EXPORTED INIT TStrings():New()
 
@@ -82,6 +81,9 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TListBox
+
+   ::WinClass    := "listbox"
+   ::ControlName := "ListBox"
 
    ::id        := nId
    ::Left      := IFNIL( nLeft,    ::Left,    nLeft    )

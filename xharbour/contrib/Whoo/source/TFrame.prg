@@ -62,6 +62,9 @@ ENDCLASS
 
 METHOD New( oParent ) CLASS TFrame
 
+   ::WinClass    := "Frame"
+   ::ControlName := "Frame"
+
    ::WndProc   := 'FormProc'
    ::Msgs      := -1
    ::FrameWnd  := .T.

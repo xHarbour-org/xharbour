@@ -1,5 +1,5 @@
 /*
- * $Id: TCButton.prg,v 1.16 2002/10/17 09:59:15 what32 Exp $
+ * $Id: TCButton.prg,v 1.17 2002/10/17 17:16:20 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -35,7 +35,6 @@
 
 CLASS TButton FROM TCustomControl
 
-//   DATA Caption INIT  "Button"
    DATA xxLeft    PROTECTED INIT   0
    DATA xxTop     PROTECTED INIT   0
    DATA xxWidth   PROTECTED INIT  80
@@ -47,7 +46,6 @@ CLASS TButton FROM TCustomControl
    DATA lControl  PROTECTED INIT .T.
    DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE,WM_MOUSEMOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
-   DATA Name      PROTECTED INIT "button"
 
    METHOD New() CONSTRUCTOR
 
@@ -56,6 +54,9 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TButton
+
+   ::WinClass    := "button"
+   ::ControlName := "Button"
 
    ::id        := nId
    ::Caption   := IFNIL( cCaption, ::Caption, cCaption )
