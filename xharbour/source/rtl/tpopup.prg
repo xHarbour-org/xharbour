@@ -1,5 +1,5 @@
 /*
- * $Id: tpopup.prg,v 1.1.1.1 2001/12/21 10:42:09 ronpinkas Exp $
+ * $Id: tpopup.prg,v 1.2 2002/11/13 04:32:26 walito Exp $
  */
 
 /*
@@ -167,8 +167,8 @@ static function DelItem( nPos )
    LOCAL Self  := QSelf()
 
    if nPos > 0 .and. nPos <= ::itemCount
-      aDel( ::aItems, nPos )
-      aSize( ::aItems, Len( ::aItems ) - 1 )
+      aDel( ::aItems, nPos, .T. )
+//      aSize( ::aItems, Len( ::aItems ) - 1 )
       ::itemCount--
 
       aEval( ::aItems, ;
@@ -339,9 +339,9 @@ static function InsItem( nPos, oItem )
    LOCAL Self  := QSelf()
 
    if nPos > 0 .and. nPos <= ::itemCount
-      aSize( ::aItems, ::itemCount )
-      aIns( ::aItems, nPos )
-      ::aItems[ nPos ] := oItem
+//      aSize( ::aItems, ::itemCount )
+      aIns( ::aItems, nPos, oItem, .T. )
+//      ::aItems[ nPos ] := oItem
       ::itemCount++
 
       aEval( ::aItems, ;
