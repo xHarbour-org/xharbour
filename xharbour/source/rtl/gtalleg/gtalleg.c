@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.10 2004/01/30 17:05:07 maurifull Exp $
+ * $Id: gtalleg.c,v 1.11 2004/02/01 00:35:42 maurifull Exp $
  */
 
 /*
@@ -1770,7 +1770,13 @@ HB_FUNC( GTINFO )
          hb_retl( TRUE );
 	 break;
       case GTI_SCREENWIDTH:
-         hb_retni( AL_SCREEN_W );
+         if ( s_pbyScrBuffer == NULL )  // gt was NOT initialized
+	 {
+	    hb_retni( s_byFontWidth * s_usScrWidth );
+	 } else
+	 {
+            hb_retni( AL_SCREEN_W );
+	 }
 	 iWidth = hb_itemGetNI( hb_param( 2, HB_IT_NUMERIC ) );
 	 if ( iWidth > 0 )
 	 {
@@ -1780,7 +1786,13 @@ HB_FUNC( GTINFO )
 	 }
 	 break;
       case GTI_SCREENHEIGHT:
-         hb_retni( AL_SCREEN_H );
+         if ( s_pbyScrBuffer == NULL )  // gt was NOT initialized
+	 {
+	    hb_retni( s_byFontSize * s_usScrHeight );
+	 } else
+	 {
+            hb_retni( AL_SCREEN_H );
+	 }
 	 iHeight = hb_itemGetNI( hb_param( 2, HB_IT_NUMERIC ) );
 	 if ( iHeight > 0 )
 	 {
@@ -1790,7 +1802,13 @@ HB_FUNC( GTINFO )
 	 }
 	 break;
       case GTI_SCREENDEPTH:
-         hb_retni( al_bitmap_color_depth( al_screen ) );
+         if ( s_pbyScrBuffer == NULL )  // gt was NOT initialized
+	 {
+	    hb_retni( al_get_desktop_depth() );
+	 } else
+	 {
+            hb_retni( al_bitmap_color_depth( al_screen ) );
+	 }
 	 int iDepth = hb_itemGetNI( hb_param( 2, HB_IT_NUMERIC ) );
 	 if ( ( iDepth == 8 ) || ( iDepth == 15 ) || ( iDepth == 16 ) || ( iDepth == 24 ) || ( iDepth == 32 ) )
 	 {
