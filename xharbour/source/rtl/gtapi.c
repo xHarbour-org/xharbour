@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.41 2004/10/26 20:02:48 oh1 Exp $
+ * $Id: gtapi.c,v 1.42 2004/10/27 04:17:24 bdj Exp $
  */
 
 /*
@@ -1334,7 +1334,7 @@ USHORT HB_EXPORT hb_gtWrite( BYTE * pStr, ULONG ulLength )
 
       /* Truncate the text if the cursor will end up off the right edge */
       hb_gt_Puts( s_iRow, s_iCol, ( BYTE ) s_pColor[ s_uiColorIndex ], pStr,
-                  ct_WNCol > 0 ?
+                  s_Width > 0 ?
                      HB_MIN( ulLength, ( ULONG ) ( ct_ULCol - s_iCol + 1 ) ):
                      ulLength );
 
@@ -2727,14 +2727,12 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
 /* Activate Window */
 SHORT HB_EXPORT hb_ctWSelect( SHORT iwnd )
 {
-   SHORT i, j, pwnd;
+   SHORT i, j;
 
    if( iwnd != ct_NCur && iwnd >= 0 && iwnd < ct_WMax &&
        ct_Wind[ iwnd ] != NULL )
    {
       hb_gtDispBegin();
-
-      pwnd = ct_NCur;
 
       if( ct_WCur != NULL )
       {
@@ -2757,7 +2755,7 @@ SHORT HB_EXPORT hb_ctWSelect( SHORT iwnd )
       {
          ct_Stac = ( SHORT * ) hb_xrealloc( ct_Stac, ( ct_SMax + 1 ) * sizeof( SHORT ) );
          ct_Stac[ ct_SMax ] = iwnd;
-         i = ct_SMax;
+         // i = ct_SMax;  // This assign is never used...
          ct_SMax++;
 
          if( iwnd > 0 ) hb_ctWBSave( ct_Wind[ iwnd ] );
