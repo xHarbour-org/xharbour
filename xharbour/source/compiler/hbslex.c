@@ -1,5 +1,5 @@
 /*
- * $Id: hbslex.c,v 1.9 2005/01/13 04:31:36 ronpinkas Exp $
+ * $Id:$
  */
 
 #include "hbcomp.h"

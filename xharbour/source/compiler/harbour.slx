@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.60 2005/02/27 05:51:59 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.61 2005/03/15 21:39:30 andijahja Exp $
  */
 
 /*
@@ -52,6 +52,8 @@
 
 //#define SHOW_LEX_TOKENS
 //#define DEBUG_LEX
+
+#define HB_INLINE_MAX 999
 
 #ifdef DEBUG_LEX
    #undef DEBUG_INFO
@@ -1287,10 +1289,10 @@ static int hb_comp_SLX_CustomAction( int x )
 
 	    hb_xmemset( sInlineSym, '\0', 16 );
             hb_comp_cInlineID++;
-	    sprintf( szID, "%02d", hb_comp_cInlineID );
+	    sprintf( szID, "%03d", hb_comp_cInlineID );
 	    hb_xstrcat( sInlineSym, "HB_INLINE_", szID, NULL );
 
-	    if( hb_comp_cInlineID > 99 )
+	    if( hb_comp_cInlineID > HB_INLINE_MAX )
 	    {
                hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_TOOMANY_INLINE, NULL, NULL );
                break;
