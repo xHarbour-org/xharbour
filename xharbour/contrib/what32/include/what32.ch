@@ -40,11 +40,12 @@ GET < Var > ;
 [ COLOR < cColorSpec > ] ;
 [ < lAllowOverstrike: OVERSTRIKE > ] ;
 [ < lWantEnter: LIKEDOS > ] ;
+[ IN < oObj > ] ;
 = > aAdd( ;
           GetList, ;
-          WinGet( GetDlgItem( < hWndDlg > , < nId > ) , < Var > , < pic > , < { when } > , < { valid } > , ;
-                              < cColorSpec > , < .lAllowOverstrike. > , < .lWantEnter. > ) ;
+          [< oObj > := ] WinGet( GetDlgItem( < hWndDlg > , < nId > ) , < Var > , < pic > , < { when } > , < { valid } > , < cColorSpec > , < .lAllowOverstrike. > , < .lWantEnter. > ) ;
         )
+
         
 ////////////////////////////////////////////        
 // Variable type identifier pseudo-functions
