@@ -428,7 +428,11 @@ STATIC s_aEnumerations := {}, s_anEnumerator := {}, s_anForEachStartingBlock := 
 #ifndef REVISION
   #define REVISION .0
 #endif
-STATIC s_cVer := "1.0.RC11" + Stringify( REVISION )
+STATIC s_cVer := "1.0.RC12" + Stringify( REVISION )
+
+#ifdef __HARBOUR__
+   STATIC s_sAppPath
+#endif
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
@@ -2680,6 +2684,15 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
    LOCAL sTmp, nLastPosition := 0
    LOCAL bErrHandler
    LOCAL lMaintainPending
+
+   #ifdef __HARBOUR__
+      IF Empty( s_sAppPath )
+         s_sAppPath := HB_ArgV(0)
+         s_sAppPath := Left( s_sAppPath, RAt( OS_PATH_DELIMITER, s_sAppPath ) )
+         aAdd( s_asPaths, s_sAppPath )
+         nPaths++
+      ENDIF
+   #endif
 
    IF At( '.', sSource ) == 0
      sSource += ".prg"

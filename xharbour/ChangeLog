@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3443 2004/09/16 23:15:21 modalsist Exp $
+ * $Id: ChangeLog,v 1.3440 2004/09/16 18:35:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,34 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2004-09-17 04:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
-  * xharbour/make_rpm.sh
-  * xharbour/xharbour.spec
-    + added --with static and --without gtsln switches
-
-  * xharbour/bin/hb-func.sh
-    * removed redundant adsrdd in lib list
-
-2004-09-16 20:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
-  * source/utils/hbmake/hbmake.prg
-    ! Minor fix to restore cursor after a compiler error.
-
-2004-09-17 09:40 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
-  * /source/rtl/set.c
-    - fix small typo in previous change
-        extern BOOL isLegacyDevice -> hb_isLegacyDevice;
-
-2004-09-17 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
-  * /source/rtl/set.c
-    - open_handle() - for HB_OS_WIN_32 legacy devices use hb_fsOpen() not hb_fsCreate()
-       ( recommended in Win32 SDK )
-  * /source/rtl/tprinter.c
-    - rename isLegacyDevice() -> hb_isLegacyDevice()
-    HB_FUNC( PRINTERPORTTONAME ) - now case insensitive comparison and 2nd parameter
-       to allow partial name match  i.e. PRINTERPORTTONAME( "lpt1", .T. ) matches "LPT1:"
-    formatted code
-  * /doc/en/print.txt
-    - added PRINTERPORTTONAME()
+2004-09-18 12:35 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * utils/xbscript/xbscript.prg
+    + Added logic to to add App PAth as default include folder.
 
 2004-09-16 11:33 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c
@@ -516,6 +491,31 @@
 2004-09-01 03:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbrddfpt.h
   * xharbour/source/rdd/dbffpt/dbffpt1.c
+   * added macro HB_FPT_SAFE (enabled by default) to force a little
+     bit differ then Clipper lock schemes in read/update process but
+     really safe in network environment
+
+  * xharbour/source/rdd/dbf1.c
+   * indenting
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+   * indenting also - I wrote this file using tabs (sorry) then someone
+     update it with differ tab size setting and many of the functions
+     where unreadable - it was to big for manual changes so I used:
+         indent -bad -bap -bl -bli0 -cli3 -cbi0 -cs -hnl -i3 -lps -l80 \
+                -nfca -npcs -npsl -nsob -nut -prs -ss -ts3 "$@"
+     for automatic reformatting the whole file
+
+2004-08-31 11:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/ct/ctnet.c
+    * correction to netdisk and netredir - Don't concatenate onto hb_parc pointer!
+
+2004-08-31 18:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/gtwin/gtwin.c
+  * xharbour/source/gtwvt/gtwvt.c
+    Commented out IsClipBoardFormatAvailable() because of a peculiar
+    problem where if some other application copied some bitmap on
+xharbour/source/rdd/dbffpt/dbffpt1.c
    * added macro HB_FPT_SAFE (enabled by default) to force a little
      bit differ then Clipper lock schemes in read/update process but
      really safe in network environment
