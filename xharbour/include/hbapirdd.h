@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.14 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbapirdd.h,v 1.15 2004/03/30 05:55:35 druzus Exp $
  */
 
 /*
@@ -78,6 +78,7 @@ extern ERRCODE HB_EXPORT hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pField
 extern ERRCODE HB_EXPORT hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
 extern ERRCODE HB_EXPORT hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
 extern void    HB_EXPORT hb_rddShutDown( void );
+extern void    HB_EXPORT hb_rddReleaseCurrentArea( void );
 
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3023 2004/06/04 13:37:56 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3024 2004/06/04 14:06:17 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-04 16:42 UTC+0100 Jacek Potempa (Jacek.Potempa@otc.pl)
+
+  * source\rdd\dbcmd.c
+  * include\hbapirdd.h
+	Definition of hb_rddReleaseArea in dbcmd.c reverted to be HB_EXPORT instead of static
+	Its Declaration has been added to hbapirdd.h
 
 2004-06-04 16:05 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/debug/debugger.prg

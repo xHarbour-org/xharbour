@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.118 2004/05/24 08:47:43 lf_sfnet Exp $
+ * $Id: dbcmd.c,v 1.119 2004/05/24 10:04:32 lf_sfnet Exp $
  */
 
 /*
@@ -534,13 +534,18 @@ static AREAP hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
  * Closes and releases the current WorkArea preparing it
  * to be used with a new database.
  */
-static void hb_rddReleaseCurrentArea( void )
+void HB_EXPORT hb_rddReleaseCurrentArea( void )
 {
    HB_THREAD_STUB
    USHORT uiWaPos;
    AREAP pArea = HB_CURRENT_WA;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddReleaseCurrentArea()"));
+
+   if( !pArea )
+   {
+      return;
+   }
 
    SELF_CLOSE( ( AREAP ) pArea );
    SELF_RELEASE( ( AREAP ) pArea );
