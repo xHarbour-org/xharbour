@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.32 2002/06/13 22:46:05 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.33 2002/06/14 03:24:17 ronpinkas Exp $
  */
 
 /*
@@ -345,7 +345,7 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 
 PHB_ITEM hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRaw(%p, %s, %lu)", pItem, szText, ulLen));
 
    if( pItem )
    {
@@ -363,6 +363,30 @@ PHB_ITEM hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
    pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
    *( pItem->item.asString.puiHolders ) = 1;
    pItem->item.asString.bStatic = FALSE;
+   pItem->item.asString.length  = ulLen;
+   pItem->item.asString.value   = szText;
+
+   return pItem;
+}
+
+PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRawStatic(%p, %s, %lu)", pItem, szText, ulLen));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_STRING;
+   pItem->item.asString.bStatic = TRUE;
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
 

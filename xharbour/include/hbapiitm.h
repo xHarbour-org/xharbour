@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.9 2002/04/17 20:31:21 walito Exp $
+ * $Id: hbapiitm.h,v 1.10 2002/06/14 03:24:16 ronpinkas Exp $
  */
 
 /*
@@ -75,47 +75,48 @@ extern BOOL     hb_evalRelease  ( PEVALINFO pEvalInfo );
 extern PHB_ITEM hb_itemDo       ( PHB_ITEM pItem, ULONG ulPCount, ... );
 extern PHB_ITEM hb_itemDoC      ( char * szFunc, ULONG ulPCount, ... );
 
-extern PHB_ITEM hb_itemArrayGet ( PHB_ITEM pArray, ULONG ulIndex );
-extern PHB_ITEM hb_itemArrayNew ( ULONG ulLen );
-extern ULONG    hb_itemCopyC    ( PHB_ITEM pItem, char * szBuffer, ULONG ulLen );
-extern BOOL     hb_itemFreeC    ( char * szText );
-extern char *   hb_itemGetC     ( PHB_ITEM pItem );
-extern char *   hb_itemGetCPtr  ( PHB_ITEM pItem );
-extern ULONG    hb_itemGetCLen  ( PHB_ITEM pItem );
-extern char *   hb_itemGetDS    ( PHB_ITEM pItem, char * szDate );
-extern long     hb_itemGetDL    ( PHB_ITEM pItem );
-extern BOOL     hb_itemGetL     ( PHB_ITEM pItem );
-extern double   hb_itemGetND    ( PHB_ITEM pItem );
-extern int      hb_itemGetNI    ( PHB_ITEM pItem );
-extern long     hb_itemGetNL    ( PHB_ITEM pItem );
-extern void     hb_itemGetNLen  ( PHB_ITEM pItem, int * piWidth, int * piDec );
-extern void *   hb_itemGetPtr   ( PHB_ITEM pItem );
-extern PHB_ITEM hb_itemNew      ( PHB_ITEM pNull );
-extern USHORT   hb_itemPCount   ( void );
-extern PHB_ITEM hb_itemParam    ( USHORT uiParam );
-extern PHB_ITEM hb_itemPutC     ( PHB_ITEM pItem, char * szText );
-extern PHB_ITEM hb_itemPutCPtr  ( PHB_ITEM pItem, char * szText, ULONG ulLen );
-extern PHB_ITEM hb_itemPutCRaw  ( PHB_ITEM pItem, char * szText, ULONG ulLen );
-extern PHB_ITEM hb_itemPutCL    ( PHB_ITEM pItem, char * szText, ULONG ulLen );
-extern void     hb_itemSetCMemo ( PHB_ITEM pItem );
-extern PHB_ITEM hb_itemPutD     ( PHB_ITEM pItem, long lYear, long lMonth, long lDay );
-extern PHB_ITEM hb_itemPutDS    ( PHB_ITEM pItem, char * szDate );
-extern PHB_ITEM hb_itemPutDL    ( PHB_ITEM pItem, long lJulian );
-extern PHB_ITEM hb_itemPutL     ( PHB_ITEM pItem, BOOL bValue );
-extern PHB_ITEM hb_itemPutND    ( PHB_ITEM pItem, double dNumber );
-extern PHB_ITEM hb_itemPutNI    ( PHB_ITEM pItem, int iNumber );
-extern PHB_ITEM hb_itemPutNL    ( PHB_ITEM pItem, long lNumber );
-extern PHB_ITEM hb_itemPutNLen  ( PHB_ITEM pItem, double dNumber, int iWidth, int iDec );
-extern PHB_ITEM hb_itemPutNDLen ( PHB_ITEM pItem, double dNumber, int iWidth, int iDec );
-extern PHB_ITEM hb_itemPutNILen ( PHB_ITEM pItem, int iNumber, int iWidth );
-extern PHB_ITEM hb_itemPutNLLen ( PHB_ITEM pItem, long lNumber, int iWidth );
-extern PHB_ITEM hb_itemPutPtr   ( PHB_ITEM pItem, void * pValue );
-extern PHB_ITEM hb_itemPutPtrGC ( PHB_ITEM pItem, void * pValue );
-extern BOOL     hb_itemRelease  ( PHB_ITEM pItem );
-extern PHB_ITEM hb_itemReturn   ( PHB_ITEM pItem );
-extern ULONG    hb_itemSize     ( PHB_ITEM pItem );
-extern USHORT   hb_itemType     ( PHB_ITEM pItem );
-extern char *   hb_itemTypeStr  ( PHB_ITEM pItem );
+extern PHB_ITEM hb_itemArrayGet     ( PHB_ITEM pArray, ULONG ulIndex );
+extern PHB_ITEM hb_itemArrayNew     ( ULONG ulLen );
+extern ULONG    hb_itemCopyC        ( PHB_ITEM pItem, char * szBuffer, ULONG ulLen );
+extern BOOL     hb_itemFreeC        ( char * szText );
+extern char *   hb_itemGetC         ( PHB_ITEM pItem );
+extern char *   hb_itemGetCPtr      ( PHB_ITEM pItem );
+extern ULONG    hb_itemGetCLen      ( PHB_ITEM pItem );
+extern char *   hb_itemGetDS        ( PHB_ITEM pItem, char * szDate );
+extern long     hb_itemGetDL        ( PHB_ITEM pItem );
+extern BOOL     hb_itemGetL         ( PHB_ITEM pItem );
+extern double   hb_itemGetND        ( PHB_ITEM pItem );
+extern int      hb_itemGetNI        ( PHB_ITEM pItem );
+extern long     hb_itemGetNL        ( PHB_ITEM pItem );
+extern void     hb_itemGetNLen      ( PHB_ITEM pItem, int * piWidth, int * piDec );
+extern void *   hb_itemGetPtr       ( PHB_ITEM pItem );
+extern PHB_ITEM hb_itemNew          ( PHB_ITEM pNull );
+extern USHORT   hb_itemPCount       ( void );
+extern PHB_ITEM hb_itemParam        ( USHORT uiParam );
+extern PHB_ITEM hb_itemPutC         ( PHB_ITEM pItem, char * szText );
+extern PHB_ITEM hb_itemPutCPtr      ( PHB_ITEM pItem, char * szText, ULONG ulLen );
+extern PHB_ITEM hb_itemPutCRaw      ( PHB_ITEM pItem, char * szText, ULONG ulLen );
+extern PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ulLen );
+extern PHB_ITEM hb_itemPutCL        ( PHB_ITEM pItem, char * szText, ULONG ulLen );
+extern void     hb_itemSetCMemo     ( PHB_ITEM pItem );
+extern PHB_ITEM hb_itemPutD         ( PHB_ITEM pItem, long lYear, long lMonth, long lDay );
+extern PHB_ITEM hb_itemPutDS        ( PHB_ITEM pItem, char * szDate );
+extern PHB_ITEM hb_itemPutDL        ( PHB_ITEM pItem, long lJulian );
+extern PHB_ITEM hb_itemPutL         ( PHB_ITEM pItem, BOOL bValue );
+extern PHB_ITEM hb_itemPutND        ( PHB_ITEM pItem, double dNumber );
+extern PHB_ITEM hb_itemPutNI        ( PHB_ITEM pItem, int iNumber );
+extern PHB_ITEM hb_itemPutNL        ( PHB_ITEM pItem, long lNumber );
+extern PHB_ITEM hb_itemPutNLen      ( PHB_ITEM pItem, double dNumber, int iWidth, int iDec );
+extern PHB_ITEM hb_itemPutNDLen     ( PHB_ITEM pItem, double dNumber, int iWidth, int iDec );
+extern PHB_ITEM hb_itemPutNILen     ( PHB_ITEM pItem, int iNumber, int iWidth );
+extern PHB_ITEM hb_itemPutNLLen     ( PHB_ITEM pItem, long lNumber, int iWidth );
+extern PHB_ITEM hb_itemPutPtr       ( PHB_ITEM pItem, void * pValue );
+extern PHB_ITEM hb_itemPutPtrGC     ( PHB_ITEM pItem, void * pValue );
+extern BOOL     hb_itemRelease      ( PHB_ITEM pItem );
+extern PHB_ITEM hb_itemReturn       ( PHB_ITEM pItem );
+extern ULONG    hb_itemSize         ( PHB_ITEM pItem );
+extern USHORT   hb_itemType         ( PHB_ITEM pItem );
+extern char *   hb_itemTypeStr      ( PHB_ITEM pItem );
 
 /* Non Clipper compliant internal API */
 

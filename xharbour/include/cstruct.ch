@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.1 2002/06/12 11:53:06 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.2 2002/06/13 22:44:17 ronpinkas Exp $
  */
 
 /*
@@ -51,39 +51,43 @@
 
 #define CTYPE_CHAR 1
 #define CTYPE_UNSIGNED_CHAR -1
-
 #define CTYPE_CHAR_PTR 10
 #define CTYPE_UNSIGNED_CHAR_PTR -10
 
-#define CTYPE_INT 2
-#define CTYPE_UNSIGNED_INT -2
+#define CTYPE_SHORT 2
+#define CTYPE_UNSIGNED_SHORT -2
+#define CTYPE_SHORT_PTR 20
+#define CTYPE_UNSIGNED_SHORT_PTR -20
 
-#define CTYPE_INT_PTR 20
-#define CTYPE_UNSIGNED_INT_PTR -20
+#define CTYPE_INT 3
+#define CTYPE_UNSIGNED_INT -3
+#define CTYPE_INT_PTR 30
+#define CTYPE_UNSIGNED_INT_PTR -30
 
-#define CTYPE_LONG 3
-#define CTYPE_UNSIGNED_LONG -3
+#define CTYPE_LONG 4
+#define CTYPE_UNSIGNED_LONG -4
+#define CTYPE_LONG_PTR 40
+#define CTYPE_UNSIGNED_LONG_PTR -40
 
-#define CTYPE_LONG_PTR 30
-#define CTYPE_UNSIGNED_LONG_PTR -30
+#define CTYPE_FLOAT 5
+#define CTYPE_FLOAT_PTR 50
 
-#define CTYPE_FLOAT 4
+#define CTYPE_DOUBLE 6
+#define CTYPE_DOUBLE_PTR 60
 
-#define CTYPE_FLOAT_PTR 40
+#define CTYPE_VOID_PTR 7
 
-#define CTYPE_DOUBLE 5
+// ***Must*** be smaller than CTYPE_STRUCTURE_PTR
+#define CTYPE_STRUCTURE 1000
+#define CTYPE_STRUCTURE_PTR 10000
 
-#define CTYPE_DOUBLE_PTR 50
-
-#define CTYPE_VOID_PTR 6
-
-#define CTYPE_STRUCTURE_PTR 1000
-
-// Excluse from C compilation
+// Exclude from C compilation
 #ifdef _SET_CH
-   #command C STRUCTURE <!stru!> [ALIGN <align> ] => INIT PROCEDURE __INIT_<stru>; MEMVAR <stru>; PUBLIC <stru> := __ActiveStructure( #<stru>, { #<stru> }, <align> )
-   #command MEMBER <!elem!> AS <type> => aAdd( __ActiveStructure(), {#<elem>, <type> } )
-   #command MEMBER <!elem!> AS C STRUCTURE <!stru!> => aAdd( __ActiveStructure(), { #<elem>, HB_CStructureID( #<stru> ) } )
+   #command C STRUCTURE <!stru!> [ALIGN <align> ] => INIT PROCEDURE __INIT_<stru>; MEMVAR <stru>; PUBLIC <stru> := __ActiveStructure( #<stru>, <align> )
+   // <elem> instead of <!elem!> to allow ElemName[n] syntax.
+   #command MEMBER <elem> AS <type> => aAdd( __ActiveStructure(), HB_Member( { #<elem>, <type> } ) )
+   #command MEMBER <!elem!> AS <type> ( <nlen> ) => aAdd( __ActiveStructure(), { #<elem>, HB_CTypeArrayID( <type>, <nlen> ) } )
+   #command MEMBER <!elem!> AS [<inplace: INPLACE>] C STRUCTURE <!stru!> => IIF( M-><stru> == __ActiveStructure(), /* No need to instanciate */, HB_CStructure( #<stru>, M-><stru> ) ) ; aAdd( __ActiveStructure(), { #<elem>, HB_CStructureId( #<stru>, <.inplace.> ) } )
    #command END C STRUCTURE [<!stru!>] => ; __ActiveStructure( NIL ); RETURN
    #translate := C STRUCTURE <!stru!> => := HB_CStructure( #<stru>, M-><stru> )
 #endif

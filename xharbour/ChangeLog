@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.273 2002/06/14 18:32:51 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.274 2002/06/15 20:14:53 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-17 00:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Moved hb_stack.Return cleanup logic into hb_vmSend() and removed as prefix to calls.
+
+  * include/hbapiitm.h
+  * source/vm/fastitem.c
+    + Added hb_itemPutCRawStatic()
+
+  * include/cstruct.ch
+  * source/vm/arrayshb.c
+    + Added support for INPLACE nested structures.
+    + Added support for C ARRAYs as structure members.
+
+  * source/rtl/cstruct.prg
+    + Added support for CTYPE_*SHORT*.
+    + Added support for INPLACE nested structures.
+    + Added support for C ARRAYs as structure members.
+    + Added Function HB_IS_CStructure()
+    + Added Method SayMembers()
+
+  * tests/tstcstru.prg
+    - Removed obsolete array syntax.
+    * Modified to demo INPLACE Nested Structures and Array Members.
 
 2002-06-15 17:10 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/vm/hvm.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.78 2002/06/13 22:46:05 ronpinkas Exp $
+ * $Id: hvm.c,v 1.79 2002/06/15 20:06:42 walito Exp $
  */
 
 /*
@@ -846,14 +846,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
          case HB_P_SEND:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEND") );
-            if( HB_IS_COMPLEX( &hb_stack.Return ) )
-            {
-               hb_itemClear( &hb_stack.Return );
-            }
-            else
-            {
-               ( &hb_stack.Return )->type = HB_IT_NIL;
-            }
 
             hb_vmSend( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
 
@@ -879,14 +871,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
          case HB_P_SENDSHORT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDSHORT") );
-            if( HB_IS_COMPLEX( &hb_stack.Return ) )
-            {
-               hb_itemClear( &hb_stack.Return );
-            }
-            else
-            {
-               ( &hb_stack.Return )->type = HB_IT_NIL;
-            }
 
             hb_vmSend( pCode[ w + 1 ] );
 
@@ -3850,15 +3834,6 @@ static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSy
    ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
    ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
 
-   if( HB_IS_COMPLEX( &hb_stack.Return ) )
-   {
-      hb_itemClear( &hb_stack.Return );       /* clear return value */
-   }
-   else
-   {
-      ( &hb_stack.Return )->type = HB_IT_NIL;
-   }
-
    hb_vmPush( &ItemMsg );
    hb_vmPush( pObjItem );                             /* Push object              */
    hb_vmPush( pMsgItem );                             /* Push argument            */
@@ -3887,15 +3862,6 @@ static void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
    ItemMsg.type = HB_IT_SYMBOL;
    ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
    ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
-
-   if( HB_IS_COMPLEX( &hb_stack.Return ) )
-   {
-      hb_itemClear( &hb_stack.Return );       /* clear return value */
-   }
-   else
-   {
-      ( &hb_stack.Return )->type = HB_IT_NIL;
-   }
 
    hb_vmPush( &ItemMsg );
    hb_vmPush( pObjItem );                             /* Push object */
@@ -4153,6 +4119,15 @@ void hb_vmSend( USHORT uiParams )
    int            iPresetBase = s_iBaseLine;
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmSend(%hu)", uiParams ) );
+
+   if( HB_IS_COMPLEX( &hb_stack.Return ) )
+   {
+      hb_itemClear( &hb_stack.Return );
+   }
+   else
+   {
+      ( &hb_stack.Return )->type = HB_IT_NIL;
+   }
 
    //printf( "\n VmSend nItems: %i Params: %i Extra %i\n", hb_stack.pPos - hb_stack.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
 
@@ -4420,21 +4395,21 @@ void hb_vmFunction( USHORT uiParams )
 {
    HB_TRACE( HB_TR_DEBUG, ("hb_vmFunction(%hu)", uiParams ) );
 
-   if( HB_IS_COMPLEX( &hb_stack.Return ) )
-   {
-      hb_itemClear( &hb_stack.Return );
-   }
-   else
-   {
-      ( &hb_stack.Return )->type = HB_IT_NIL;
-   }
-
    if( hb_stackItemFromTop( - ( uiParams + 1 ) )->type )
    {
       hb_vmSend( uiParams );
    }
    else
    {
+      if( HB_IS_COMPLEX( &hb_stack.Return ) )
+      {
+         hb_itemClear( &hb_stack.Return );
+      }
+      else
+      {
+         ( &hb_stack.Return )->type = HB_IT_NIL;
+      }
+
       hb_vmDo( uiParams );
    }
 
