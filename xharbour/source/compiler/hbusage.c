@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.21 2004/04/17 10:11:08 andijahja Exp $
+ * $Id: hbusage.c,v 1.22 2004/05/07 16:31:10 ronpinkas Exp $
  */
 
 /*
@@ -171,7 +171,7 @@ void hb_compPrintCredits( void )
            "Jose F. Gimenez <jfgimenez@wanadoo.es>\n"
            "Jose Lalin <dezac@corevia.com>\n"
            "Leslee Griffith <les.griffith@vantagesystems.ca>\n"
-           "Lorenzo Fiorini <lorenzo_fiorini@tin.it>\n"
+           "Lorenzo Fiorini <lorenzo_fiorini@teamwork.it>\n"
            "Luiz Rafael Culik <culik@sl.conex.net>\n"
            "Manuel Ruiz <mrt@joca.es>\n"
            "Marcelo Lombardo <lombardo@uol.com.br>\n"
