@@ -43,24 +43,27 @@ STATIC FUNCTION DefError( e )
       RETURN ( .F. ) // NOTE
    ENDIF
 
-   OutputDebugString( e:description + CHR( 13 ) + "Procedure Stack Depth:" + ntrim( getprocstack( ) ) + CRLF )
-
    i := 2
    DO WHILE ( ! Empty( ProcName( i ) ) )
       cProcStack += ( CRLF + Trim( ProcName( i ) ) + "(" + NTRIM( ProcLine( i ++ ) ) + ")" )
       IF ProcName( i ) == 'DEFERROR' // Oops, recursive arror, cannot continue !
-         OutputDebugString( "Recursive error" + CRLF )
+         OutputDebugString( "" )
+         OutputDebugString( "===============" + CRLF )
+         OutputDebugString( "RECURSIVE ERROR" + CRLF )
+         OutputDebugString( "===============" + CRLF )
+         OutputDebugString( e:description + CHR( 13 ) + "Procedure Stack Depth:" + ntrim( getprocstack( ) ) + CRLF )
+         OutputDebugString( cProcStack + CRLF )
          PostQuitMessage( 0 )
          Errorlevel( 1 )
-         OutputDebugString( cProcStack + CRLF )
          // quit
          RETURN( .F. )
       ENDIF
    ENDDO
 
-   OutputDebugString( cProcStack + CRLF )
+   //OutputDebugString( cProcStack + CRLF )
 
    cErr := LogError( e, cProcStack )
+   OutputDebugString( cErr ) 
    cMessage := ErrorMessage( e )
 
    aOptions := { "Quit" }
@@ -189,12 +192,12 @@ STATIC FUNCTION LogError( e, cProcStack )
 
    cErr += cProcStack
 
-   SET PRINTER TO error.LOG ADDITIVE
-   SET console OFF
-   SET printer ON
+   SET PRINTER TO Error.Log ADDITIVE
+   SET CONSOLE OFF
+   SET PRINTER ON
 
 
-   ? '        Please mail or fax this error report to:'
+   QOut( "        Please mail or fax this error report to:" )
    /*
    ? '             +---------------------------+'
    ? '             |  YOUR BUSINESS NAME HERE  |'
@@ -202,15 +205,15 @@ STATIC FUNCTION LogError( e, cProcStack )
    ? '             |Some Prestigeous Town, 1234|'
    ? '             |    Fax: (01) 1234 1234    |'
    */
-   ? '             +---------------------------+'
-   ? cErr
+   QOut( "             +---------------------------+" )
+   QOut( cErr )
 
-   ? replicate( "=", 70 )
+   QOut(Replicate( "=", 70 ))
 
-   eject
-   SET printer OFF
-   SET printer TO
-   SET console ON
+   EJECT
+   SET PRINTER OFF
+   SET PRINTER TO
+   SET CONSOLE ON
 
    RETURN cErr
 
