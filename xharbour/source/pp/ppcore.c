@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.43 2003/02/04 05:52:46 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.44 2003/02/11 03:08:40 druzus Exp $
  */
 
 /*
@@ -1640,9 +1640,13 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
               ptri = sLine + isdvig;
               lenToken = strlen(stcmd->name);
 
+              //printf( "Anchore: '%s'\n", stcmd->name );
+
               while( ( ifou = md_strAt( stcmd->name, lenToken, ptri, TRUE, FALSE, FALSE, TRUE )) > 0 )
               {
                  ptri += ifou -1;
+
+                 //printf( "Trying %s\n", ptri );
 
                  if( ( i = WorkTranslate( ptri+lenToken, ptro, stcmd, &lens ) ) >= 0 )
                  {
@@ -2004,9 +2008,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   char * ptri = inputLine, * ptr, tmpname[ MAX_NAME ];
   int isWordInside = 0;
 
-  /*
-  printf( "MP: >%s<\nIn: >%s<\n", ptrmp, ptri );
-  */
+  //printf( "MP: >%s<\nIn: >%s<\n", ptrmp, ptri );
 
   HB_TRACE(HB_TR_DEBUG, ("CommandStuff(%s, %s, %s, %p, %d, %d)", ptrmp, inputLine, ptro, lenres, com_or_tra, com_or_xcom));
 
@@ -4472,21 +4474,57 @@ static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
 
   HB_TRACE(HB_TR_DEBUG, ("truncmp(%p, %p, %d)", ptro, ptri, lTrunc));
 
-  for( ; **ptri != ' ' && **ptri != '\t' && **ptri != ',' && **ptri != '[' && **ptri != ']' &&
-          **ptri != '\1' && **ptri != '\0' && toupper(**ptri)==toupper(**ptro);
-        (*ptro)++, (*ptri)++ );
+  //printf( "Input: '%s' MP: '%s'\n", *ptro, *ptri );
+
+  /* 2003-02-19 Ron Pinkas replaced with code below.
+  while( **ptri && **ptri != ' ' && **ptri != '\t' &&
+         **ptri != ',' && **ptri != '[' && **ptri != ']' &&
+         **ptri != '\1' && toupper(**ptri) == toupper(**ptro) )
+  {
+     (*ptro)++;
+     (*ptri)++;
+  }
+  */
+
+  while( **ptri && **ptro )
+  {
+     if( strchr( "({:=+-*/", **ptri ) )
+     {
+        while( **ptro == ' ' || **ptro == '\t' )
+        {
+           (*ptro)++;
+        }
+     }
+
+     if( **ptri == ',' || **ptri == '[' || **ptri == ']' || **ptri == '\1' || toupper(**ptri) != toupper(**ptro) )
+     {
+        break;
+     }
+
+     (*ptro)++;
+     (*ptri)++;
+  }
+
   co = *(*ptro-1);
   ci = **ptri;
-  if( ( ( ci == ' ' || ci == ',' || ci == '[' ||
-          ci == ']' || ci == '\1' || ci == '\0' ) &&
-        ( ( !ISNAME(**ptro) && ISNAME(co) ) ||
-          ( !ISNAME(co) ) ) ) )
-    return FALSE;
+
+  //printf( ">>>Input: '%s', MP: '%s', co: %c, ci: %c\n", *ptro, *ptri, co, ci );
+
+  if( ( ( ci == ' ' || ci == ',' || ci == '[' || ci == ']' || ci == '\1' || ci == '\0' ) &&
+        ( ( !ISNAME(**ptro) && ISNAME(co) ) || ( !ISNAME(co) ) ) ) )
+  {
+     return FALSE;
+  }
   else if( lTrunc && *ptro-ptrb >= 4 && ISNAME(ci) && !ISNAME(**ptro) && ISNAME(co) )
-    {
-      while( ISNAME(**ptri) ) (*ptri)++;
+  {
+      while( ISNAME(**ptri) )
+      {
+        (*ptri)++;
+      }
+
       return FALSE;
-    }
+  }
+
   return TRUE;
 }
 

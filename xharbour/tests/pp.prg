@@ -3042,6 +3042,8 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    LOCAL sBackupLine
    LOCAL sSkipped
 
+   //TraceLog( sLine )
+
    IF Left( LTrim( sLine ), 1 ) != '#'
        nPosition := 0
        WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
@@ -5926,6 +5928,8 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       sRule   := Left( sRule, nNext - 1 )
    ENDIF
 
+   //TraceLog( sRule, sResult )
+
    DO WHILE ! ( Left( sRule, 1 ) == '' )
       //? "Scaning: " + sRule
 
@@ -5973,7 +5977,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          IF nLen >= 1
             IF s1 == '\'
                sTemp := SubStr( sRule, 2, 1 )
-               sRule   := SubStr( sRule, 2 )
+               sRule := SubStr( sRule, 2 )
                BREAK
             ELSEIF s1 == '_' .OR. IsAlpha( s1 )
                sTemp := Upper( RTrim( NextToken( sRule ) ) ) // Not by refernce because of SubStr() below!!!
@@ -5994,6 +5998,8 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          ENDIF
 
       END SEQUENCE
+
+      //TraceLog( sTemp )
 
       IF sTemp != NIL
          IF ! ( sAnchor == NIL )
@@ -6431,11 +6437,8 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       nOptionalAt := At( '[', sResult )
       WHILE nOPtionalAt > 1 .AND. SubStr( sResult, nOptionalAt - 1, 1 ) == '\'
          nOffset := nOptionalAt
-         nOptionalAt := At( '[', SubStr( sResult, nOffset + 1 ) )
+         nOptionalAt := At( '[', sResult, nOffset + 1 )
       ENDDO
-      IF nOptionalAt > 0
-         nOptionalAt += nOffset
-      ENDIF
 
       nOffset := 0
       IF nOptionalAt == 0
@@ -6490,7 +6493,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          ELSE
             nCloseOptionalAt := At( ']', sResult )
             WHILE nCloseOptionalAt > 1 .AND. nCloseOptionalAt <= nAt .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
-               nCloseOptionalAt := At( ']', SubStr( sResult, nCloseOptionalAt + 1 ) )
+               nCloseOptionalAt := At( ']', sResult, nCloseOptionalAt + 1 )
             ENDDO
 
             IF nCloseOptionalAt > 0

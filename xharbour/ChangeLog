@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.741 2003/02/19 20:20:17 jonnymind Exp $
+ * $Id: ChangeLog,v 1.743 2003/02/20 01:35:20 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-19 17:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    ! Fixed compile time optimization of Right() to only be performed on LITRAL strings.
+
+  * source/pp/ppcore.c
+    ! Fixed truncmp() to skip over white space before operators.
+
+  * source/rtl/right.c
+    * Formatting.
+
+  * tests/pp.prg
+  * tests/pp_harb.ch
+    * Minor fixes.
+
 2003-02-20 02:35 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/thread.c
-    ! Under windows, instead of using suspended creation of threads, 
+    ! Under windows, instead of using suspended creation of threads,
       using a blocking mutex at the beginning to make sure all
-      creation rights are fulfilled. Also, the thread handle is not 
+      creation rights are fulfilled. Also, the thread handle is not
       taken by the created thread (but taken in the creator) because
       there is the need of specific rights to open a thread handle
       under windows 2000/xp
@@ -34,14 +48,14 @@
       own class
     * Code for encription has been put in place; an encription back
       end will be soon added
-  
+
   * source/rtl/trpccli.prg
     ! minor fixes
 
   * source/vm/fm.c
   * source/vm/thread.c
     ! malloc can be intrinsically thread unsafe (depending on os,
-      but generally it is). For this reason, a global 
+      but generally it is). For this reason, a global
       hb_allocMutex has been added on fm.c: this mutex is used to
       lock out sections in fm.c, but also to regulate all malloc(),
       realloc() and free() calls in MT programs. Thread.c is the

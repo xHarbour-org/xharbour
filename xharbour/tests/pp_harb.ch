@@ -257,7 +257,9 @@
          {
             sReturn[0] = sLine[0];
             Counter = 1;
-            while( isalnum( sLine[Counter] ) || sLine[Counter] == '_' || sLine[Counter] == '\\' )
+
+            // Why did I have the '\\' is NOT clear - document if and when reinstating!!!
+            while( isalnum( sLine[Counter] ) || sLine[Counter] == '_'  ) //|| sLine[Counter] == '\\' )
             {
                sReturn[Counter] = sLine[Counter];
                Counter++;
