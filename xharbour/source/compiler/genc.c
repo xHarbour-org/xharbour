@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.43 2003/06/18 08:57:01 ronpinkas Exp $
+ * $Id: genc.c,v 1.44 2003/06/23 18:50:58 ronpinkas Exp $
  */
 
 /*
@@ -366,6 +366,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
                     "#elif ! defined(__GNUC__)\n"
                     "   #pragma startup hb_vm_SymbolInit_%s%s\n"
                     "#endif\n\n",
+                    hb_comp_szPrefix, pFileName->szName,
                     hb_comp_szPrefix, pFileName->szName,
                     hb_comp_szPrefix, pFileName->szName,
                     hb_comp_szPrefix, pFileName->szName,
