@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.8 2002/01/04 02:12:04 ronpinkas Exp $
+ * $Id: hvm.c,v 1.9 2002/01/04 07:15:23 ronpinkas Exp $
  */
 
 /*
@@ -4397,7 +4397,6 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, USHORT uiModuleSymb
       hSymScope = ( pModuleSymbols + ui )->cScope;
       pNewSymbols->hScope |= hSymScope;
       if( ( ! s_pSymStart ) && ( hSymScope & HB_FS_FIRST && ! (  hSymScope & HB_FS_INITEXIT ) ) )
-         if( hb_StartApp() ) /* Are we calling this from the main application ? */
             s_pSymStart = pModuleSymbols + ui;  /* first public defined symbol to start execution */
 
       if( ( hSymScope == HB_FS_PUBLIC ) || ( hSymScope & ( HB_FS_MESSAGE | HB_FS_MEMVAR | HB_FS_FIRST ) ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.17 2002/01/04 17:56:12 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.18 2002/01/04 21:27:26 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-01-05 05:30:00 UTC+0700 Andi Jahja <andijahja@cbn.net.id>
+   * sourc/vm/dynlibhb.c
+     - remove function hb_StartApp()
+   * source/vm/hvm.c
+     - remove reference to hb_StartApp()
+
 2002-01-05 04:30:00 UTC+0700 Andi Jahja <andijahja@cbn.net.id>
    * include/hbapiitm.h
      + function declarations fron fastitem.c
