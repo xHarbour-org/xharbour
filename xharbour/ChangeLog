@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2124 2004/01/22 03:28:49 maurifull Exp $
+ * $Id: ChangeLog,v 1.2125 2004/01/22 03:47:59 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-22 18:50 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+  * source/odbc/todbc.prg
+    ! fixed method Open. Fix provided by Alexandre Bassanesi
+    
 2004-01-22 00:40 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/tpopup.prg
     ! Yet another bug making MenuBar crash when pressed right button or ALT+<nonshortcut>
@@ -26,7 +30,7 @@
   * source/rtl/gtalleg/ssf.h
   * source/rtl/gtalleg/ssf.c
   * source/rtl/gtalleg/fixedth.c
-    ! Fixed $Id: ChangeLog,v 1.2124 2004/01/22 03:28:49 maurifull Exp $ header
+    ! Fixed $Id: ChangeLog,v 1.2125 2004/01/22 03:47:59 maurifull Exp $ header
 
 2004-01-22 13:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /contrib/winprn/tprint.prg

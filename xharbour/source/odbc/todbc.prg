@@ -1,5 +1,5 @@
 /*
- * $Id: todbc.prg,v 1.2 2003/06/20 19:14:45 mlombardo Exp $
+ * $Id: todbc.prg,v 1.3 2003/10/13 03:37:28 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -381,7 +381,7 @@ METHOD Open() CLASS TODBC
          aadd( ::Fields, TODBCField():New() )
          ::Fields[ len( ::Fields ) ] :FieldID   := i
          ::Fields[ len( ::Fields ) ] :FieldName := cColName
-         ::Fields[ len( ::Fields ) ] :DataSize  := nNameLen
+         ::Fields[ len( ::Fields ) ] :DataSize  := nColsize
          ::Fields[ len( ::Fields ) ] :DataType  := nDataType
          ::Fields[ len( ::Fields ) ] :DataDecs  := nDecimals
          ::Fields[ len( ::Fields ) ] :AllowNull := ( nNul != 0 )
