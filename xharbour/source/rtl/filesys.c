@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.98 2004/04/14 18:54:55 srobert Exp $
+ * $Id: filesys.c,v 1.99 2004/04/14 20:59:10 andijahja Exp $
  */
 
 /*
@@ -1444,7 +1444,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpen(%p, %hu)", pFilename, uiFlags));
 
-   pFilename = hb_fileNameConv( hb_strdup( ( char * )pFilename) );
+   pFilename = (BYTE*)hb_fileNameConv( hb_strdup( ( char * )pFilename) );
 
    // Unlocking stack to allow cancelation points
    HB_STACK_UNLOCK
@@ -1551,7 +1551,7 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreate(%p, %hu)", pFilename, uiAttr));
 
-   pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
+   pFilename = (BYTE*)hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
 
    HB_STACK_UNLOCK
    // allowing async cancelation here
@@ -2518,6 +2518,7 @@ BOOL HB_EXPORT    hb_fsMkDir( BYTE * pDirname )
 {
    HB_THREAD_STUB
    BOOL bResult;
+   pDirname = (BYTE*)hb_fileNameConv( hb_strdup( ( char * )pDirname) );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsMkDir(%s)", (char*) pDirname));
 
@@ -2548,6 +2549,7 @@ BOOL HB_EXPORT    hb_fsMkDir( BYTE * pDirname )
 #endif
 
    HB_STACK_LOCK
+   hb_xfree(pDirname) ;
 
    return bResult;
 }
@@ -2557,6 +2559,7 @@ BOOL HB_EXPORT    hb_fsChDir( BYTE * pDirname )
    HB_THREAD_STUB
    BOOL bResult;
 
+   pDirname = (BYTE*)hb_fileNameConv( hb_strdup( ( char * )pDirname) );
    HB_TRACE(HB_TR_DEBUG, ("hb_fsChDir(%s)", (char*) pDirname));
 
    HB_STACK_UNLOCK
@@ -2582,7 +2585,7 @@ BOOL HB_EXPORT    hb_fsChDir( BYTE * pDirname )
 #endif
 
    HB_STACK_LOCK
-
+   hb_xfree( pDirname );
    return bResult;
 }
 
@@ -2590,6 +2593,7 @@ BOOL HB_EXPORT    hb_fsRmDir( BYTE * pDirname )
 {
    HB_THREAD_STUB
    BOOL bResult;
+   pDirname = (BYTE*)hb_fileNameConv( hb_strdup( ( char * )pDirname) );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsRmDir(%s)", (char*) pDirname));
 
@@ -2615,7 +2619,7 @@ BOOL HB_EXPORT    hb_fsRmDir( BYTE * pDirname )
 #endif
 
    HB_STACK_UNLOCK
-
+   hb_xfree( pDirname ) ;
    return bResult;
 }
 
