@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.76 2004/05/28 01:50:13 lculik Exp $
+ * $Id: tget.prg,v 1.77 2004/05/28 21:00:04 lculik Exp $
  */
 
 /*
@@ -1755,14 +1755,27 @@ STATIC FUNCTION BuildGetColor(cColorSpec)
    LOCAL cEndColor
    LOCAL cCur
    LOCAL cRet := ""
+   LOCAL aTokens
    DEFAULT cColorSpec to SetColor()
-
+   aTokens := hb_atoken(cColorSpec,",")
    /* ONLY ONE PAIR COLOR PASSED */
    
-   IF ( len( cColorSpec ) == 3 .or. Len( cColorSpec ) == 4 ) .AND. AT(',', cColorSpec ) == 0 
+   IF  len( aTokens ) == 1
    // replicate to 4 colors pairs as clipper do
       cCur := cColorSpec
-      cColorSpec := cCur + "," + cCur + "," + cCur + "," + cCur + "," + cCur + "," + cCur   
+      cColorSpec := cCur + "," + cCur + "," + cCur + "," + cCur + "," + cCur + "," + cCur
+   elseif   len( aTokens ) == 2
+      cCur := cColorSpec
+      cColorSpec := cCur + "," + aTokens[ 1 ] + "," + aTokens[ 1 ] + "," + aTokens[ 1 ] 
+
+   elseif   len( aTokens ) == 3
+      cCur := cColorSpec
+      cColorSpec := cCur + "," +aTokens[ 1 ] + "," + aTokens[ 1 ] 
+
+   elseif   len( aTokens ) == 4
+      cCur := cColorSpec
+      cColorSpec := cCur + "," aTokens[ 1 ]
+
    ENDIF
 
    // now process color acording to set intensity setting
