@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.18 2002/05/24 13:22:52 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.19 2002/05/25 02:41:39 ronpinkas Exp $
  */
 
 /*
@@ -2718,7 +2718,7 @@ static BOOL TestOptional( char *ptr1, char *ptr2 )
 
   //printf( "nbr: %i ptr2: >%s<\n", nbr, ptr2 );
 
-  return ( ! flagname ) && ( nbr <= 1 );
+  return ( ! flagname ) //&& ( nbr <= 1 );
 }
 
 static BOOL CheckOptional( char * ptrmp, char * ptri, char * ptro, int * lenres, BOOL com_or_tra, BOOL com_or_xcom )
