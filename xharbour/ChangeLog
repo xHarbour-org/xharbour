@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.10 2002/01/03 03:22:10 lculik Exp $
+ * $Id: ChangeLog,v 1.11 2002/01/03 03:53:44 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-02 20:11 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
+  * xharbour/source/rtl/filesys.c
+    ! Changed #ifdef __WIN32__ to #ifdef X__WIN32__ to disable wi32 logic, which is still broken.
+
+  * xharbour/utils/hbmake/hbmake.prg
+    ! Commented out line 1107 :
+        aLibs:=Getlibs( lgcc ,GetMakeDir()+'\lib')
+      because it refrences a non existent function GetLibs().
+
+    /* Luiz, please fix this, as hbmake can not be used now. */
+
 
 2002-01-02 19:25 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/source/vm/itemapi.c
