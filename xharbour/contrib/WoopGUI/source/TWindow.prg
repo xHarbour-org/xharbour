@@ -49,6 +49,8 @@ CLASS TWindow FROM TWindowBase
     ACCESS cTitle      INLINE ::cName
     ASSIGN cTitle( n ) INLINE ::cName := n
 
+    DATA lCreated      AS LOGICAL INIT FALSE
+
     DATA aoChilds      AS ARRAY INIT {} HIDDEN   // Childs windows - controls
 
     // Extension
@@ -78,7 +80,7 @@ CLASS TWindow FROM TWindowBase
     //DATA oFgColorFocus  AS OBJECT
 
     // Public methods
-    //METHOD  Activate()                       INLINE ShowWindow( ::nHandle, SW_SHOW )
+    METHOD Activate()
     METHOD New() CONSTRUCTOR
     METHOD AddChild( oChild )               INLINE aAdd( ::aoChilds, oChild )
     //METHOD Center()
@@ -95,6 +97,7 @@ CLASS TWindow FROM TWindowBase
     METHOD ConvertPixelsToDialogX( nPxl )   INLINE WG_Pixel2DialogX( nPxl )
     METHOD ConvertDialogToPixelsY( nDlg )   INLINE WG_Dialog2PixelY( nDlg )
     METHOD ConvertPixelsToDialogY( nPxl )   INLINE WG_Pixel2DialogY( nPxl )
+    METHOD Create()
     METHOD Destroy()
     METHOD DestroyChildren()                INLINE WG_DebugTrace( "TWindow:DestroyChildren()", "Self", Self, "::aoChilds", ::aoChilds ),;
                                                    aEval(::aoChilds, {|o| o:Destroy()} )
@@ -311,6 +314,22 @@ RETURN Self
 
 // METHOD Center() CLASS TWindow
 // RETURN CenterWindow( ::nHandle )
+
+
+METHOD Activate()
+
+   IF !::lCreated
+      ::Create()
+   ENDIF
+
+RETURN ::Super:Activate()
+
+METHOD Create()
+
+   ::Super:Create()
+   ::lCreated := TRUE
+
+RETURN Self
 
 METHOD ChangeColors( ncoFore, ncoBack ) CLASS TWindow
    WG_DebugTrace( "TWindow:ChangeColors()" )

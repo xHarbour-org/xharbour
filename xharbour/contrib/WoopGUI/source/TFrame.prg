@@ -33,6 +33,8 @@ CLASS TFrame FROM TWindow
     METHOD New()         CONSTRUCTOR
     METHOD NewExtended() CONSTRUCTOR
 
+    METHOD Create()
+
     //METHOD oStatusBar() SETGET
 
     //METHOD GetStatusBar()
@@ -71,16 +73,6 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar ) CL
                  ::nRow, ::nCol, ::nWidth, ::nHeight, ;
                  oParent /*, ::nChild, ::nApplication, ::pStruct*/ )
 
-    ::SetCurrentWindow( Self )
-
-    ::Create()
-
-    IF ::lStatusBar
-       // Create SIMPLE status bar
-       // FSG - Define application variable to make a standard statusbar
-       ::CreateStatusBar()
-    ENDIF
-
 RETURN Self
 
 METHOD NewExtended( cTitle, nStyle, nRow, nCol, nWidth, nHeight,;
@@ -94,6 +86,24 @@ METHOD NewExtended( cTitle, nStyle, nRow, nCol, nWidth, nHeight,;
    IF ValType( oMenu ) == "O" THEN ::SetMenu( oMenu )
    // IF ValType( oBrush ) == "O" THEN ::SetBrush( oBrush )
    // IF ValType( oIcon ) == "O" THEN ::SetIcon( oIcon )
+
+RETURN Self
+
+METHOD Create()
+
+    ::Super:Create()
+
+    ::SetCurrentWindow( Self )
+
+    IF ValType( ::oMenu ) == "O" THEN ::SetMenu( ::oMenu )
+   // IF ValType( oBrush ) == "O" THEN ::SetBrush( oBrush )
+   // IF ValType( oIcon ) == "O" THEN ::SetIcon( oIcon )
+
+    IF ::lStatusBar
+       // Create SIMPLE status bar
+       // FSG - Define application variable to make a standard statusbar
+       ::CreateStatusBar()
+    ENDIF
 
 RETURN Self
 

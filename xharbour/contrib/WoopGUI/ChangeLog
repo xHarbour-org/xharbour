@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5 2002/09/06 22:55:15 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.6 2002/09/07 06:48:22 what32 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-07 23:59 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/CWindow.c
+    * removed +1 from hbrBackground assignment in RegisterClassEx
+  * source/TFrame.prg
+    + Added Create() method and moved inside creation statements
+  * source/TWindow.prg
+    + Added lCreated data to check if a window is already created
+    + Added Activate() and Create() methods
+  * source/TWindowBase.prg
+    + Added METHOD SetBackgroundFromFile()
+    + Added FUNCTION WG_LoadImageFromFile( cFileName, nType, nWidth, nHeight, nLoad )
+      to load from file with some checks
+    + Added FUNCTION WG_GetBitmapFromFile( cFileName )
+    * Modified WG_GetBitmapFromFile(), WG_GetCursorFromFile(), WG_GetIconFromFile( cFileName )
+      to call WG_LoadImageFromFile()
+  * source/TWindowDef.prg
+    * Modifed methods for default values
+  * tests/demo.prg
+    * updated with window background
 
 2002-09-07 00:51 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * make_b32.bat
@@ -44,19 +64,19 @@
 WoopGUI 1.03 ( 2002-06-02 ) alpha release (for the moment this changelog isn't aligned with files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~                 because the changes are so much)
 
-[!] Rewrite the core of event handler. Now it is possibile to associate a Window Proc to 
+[!] Rewrite the core of event handler. Now it is possibile to associate a Window Proc to
     many controls so you can define your event managment.
     Thanks to Andy Wos e Manu Exposito for suggestions.
     Look SET WINDOW oWnd1 EVENTHANDLER command in \tests\demo.prg and search WindowProc methods
     in source file to see the mechanism.
     Write initial preprocessor commands.
-    Dialog windows not function properly. No tabs. No key accellerators. 
+    Dialog windows not function properly. No tabs. No key accellerators.
     This version had as goal to create a stable OOP core. On next release i hope to fix dialogs
     and add all basic controls.
 
 [+] Preprocessor commands. Look at include\woopgui.ch for syntax. Some parts are not functionally
     only for idea. Some ideas from Fivewin.ch.
-    
+
 [*] Break WoopGUI.lib in three parts: WoopGUI.lib, WAPILIB.lib and UTILS.lib
     The goal is to include WHAT32.lib in place of WAPILIB.lib (Let's go Andy & friends !)
 
@@ -64,7 +84,7 @@ WoopGUI 1.03 ( 2002-06-02 ) alpha release (for the moment this changelog isn't a
 [+] CGDI.c        - Added SelectObj and DeleteObj functions
 [*] corrected system of windows coordinates.  It was invert :-O
 [+] Added GetActiveWindow() and SetActiveWindow() functions.
-[+] Added MenuFunc.prg - Menu functions for Menu preprocessor commands. Now it is possible to 
+[+] Added MenuFunc.prg - Menu functions for Menu preprocessor commands. Now it is possible to
     create theorically infinite nested menus.
 [+] Added NewExtended() Method to many class so we have a basic New() method with essetial parameters
     and NewExtended() method for preprocessor command.
@@ -79,7 +99,7 @@ WoopGUI 1.03 ( 2002-06-02 ) alpha release (for the moment this changelog isn't a
 [*] A lot of fixes.
 
 WoopGUI 1.02 ( 2002-05-22 )
-~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [*] Changed name of the class TForm in TFrame as wxWindows defines
 
@@ -93,7 +113,7 @@ WoopGUI 1.02 ( 2002-05-22 )
 
 
 WoopGUI 1.01 ( 2002-05-18 )
-~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [+] Add this changelog.txt
 
@@ -110,19 +130,19 @@ WoopGUI 1.01 ( 2002-05-18 )
 
 [+] Add GetValue() Method to TButton
     Add GetValueAsString() Method to TControl
-    
+
 [*] In TControl:New() add AddControl() call to add to parent window controls i create
 
 [+] Add file called version_x.xx where x.xx show the current version of library
 
 [*] Made some some minor corrections in capplication.c cwindow.c and cmenu.c
     (Thanks to Ron Pikas)
-    
+
 [+] Add TIniFile() Class from sample file by Ron Pinkas
 
 [+] Add TForm Class from which derives all standard windows (like application)
     and TDialog Class from which derives all dialog windows
-    
+
 [+] and more ....
 
 

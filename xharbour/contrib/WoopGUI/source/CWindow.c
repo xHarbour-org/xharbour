@@ -144,7 +144,7 @@ HB_FUNC ( REGISTERCLASSEX )
     wcex.hInstance     = hInstance;
     wcex.hIcon         = hIcon;
     wcex.hCursor       = hCursor;
-    wcex.hbrBackground = (HBRUSH) (hbrBackground+1);
+    wcex.hbrBackground = (HBRUSH) (hbrBackground);
     wcex.lpszMenuName  = cMenuName;
     wcex.lpszClassName = cClassName;
     wcex.hIconSm       = hIconSm;

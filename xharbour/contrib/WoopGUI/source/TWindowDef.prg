@@ -57,7 +57,7 @@ METHOD New( nStyle, bWindowProc, hInstance, hIcon, hCursor, hbrBackground, cMenu
     ASSIGN ::hInstance     WITH hInstance      DEFAULT GetModuleHandle()
     ASSIGN ::hIcon         WITH hIcon          DEFAULT LoadIcon(NULL, IDI_APPLICATION)
     ASSIGN ::hCursor       WITH hCursor        //DEFAULT LoadCursor(NULL, IDC_ARROW) // FSG - to be checked
-    ASSIGN ::hbrBackground WITH hbrBackground  DEFAULT COLOR_BTNFACE
+    ASSIGN ::hbrBackground WITH hbrBackground  DEFAULT COLOR_BTNFACE + 1
     ASSIGN ::cMenuName     WITH cMenuName
     ASSIGN ::cClassName    WITH cClassName     DEFAULT "WoopGUIClass"
     ASSIGN ::hIconSm       WITH hIconSm        DEFAULT LoadIcon(NULL, IDI_APPLICATION)
@@ -67,15 +67,15 @@ METHOD New( nStyle, bWindowProc, hInstance, hIcon, hCursor, hbrBackground, cMenu
 RETURN Self
 
 METHOD SetCursorFromFile( cFileName ) CLASS TWindowDef
-   ::hCursor := WG_GetCursorFromFile( ::hInstance, cFileName )
+   ::hCursor := WG_GetCursorFromFile( cFileName )
 RETURN ::hCursor
 
 METHOD SetIconFromFile( cFileName ) CLASS TWindowDef
-   ::hIcon := WG_GetIconFromFile( ::hInstance, cFileName )
+   ::hIcon := WG_GetIconFromFile( cFileName )
 RETURN ::hIcon
 
 METHOD SetIconSmFromFile( cFileName ) CLASS TWindowDef
-   ::hIconSm := WG_GetIconFromFile( ::hInstance, cFileName )
+   ::hIconSm := WG_GetIconFromFile( cFileName )
 RETURN ::hIconSm
 
 //METHOD WindowProc( hWnd, nMessage, wParam, lParam ) CLASS TWindowDef

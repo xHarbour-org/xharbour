@@ -4,7 +4,7 @@
 #include "windows.ch"
 //#include "demo.ch"
 
-//#define WG_DEBUG
+#define WG_DEBUG
 
 
 function Main   //( hInstance, hprevInstance, cCmdLine, nCmdShow )
@@ -95,6 +95,8 @@ function Main   //( hInstance, hprevInstance, cCmdLine, nCmdShow )
    SET WINDOW oWnd1 MENU oMenuBar
    SET WINDOW oWnd1 CONTEXTMENU oContextMenu
    //oWnd1:SetMenu( oMenuBar )
+
+   oWnd1:SetBackgroundFromFile( "resource\bricks.bmp" )
 
    SET WINDOW oWnd1 TITLE "Francesco's Window"
    //oWnd1:SetTitle( "Francesco's Window" )

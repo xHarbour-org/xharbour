@@ -74,7 +74,7 @@ CLASS TWindowBase FROM TObject
     DATA nMenu              AS NUMERIC       // Handle to menu or to child window
     DATA nApplication       AS NUMERIC       // Handle to application
     DATA pStruct                             // window-creation data (not used)
-    
+
     METHOD New() CONSTRUCTOR
     METHOD Init()
     METHOD Create()
@@ -154,6 +154,7 @@ CLASS TWindowBase FROM TObject
     METHOD Restore()                           INLINE ShowWindow( ::nHandle, SW_RESTORE )
     METHOD SendMessage( nMsg, wParam, lParam ) INLINE SendMessage( ::nHandle, nMsg, wParam, lParam )
 
+    METHOD SetBackgroundFromFile()
     METHOD SetCurrentWindow()
     METHOD SetCursorFromFile()
     METHOD SetEventHandler()
@@ -207,7 +208,7 @@ METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oP
     ASSIGN ::hIcon         WITH oClass:hIcon          DEFAULT LoadIcon(NULL, IDI_APPLICATION)
     ASSIGN ::hCursor       WITH oClass:hCursor        //DEFAULT LoadCursor(NULL, IDC_ARROW) // FSG - to be checked
 
-    ASSIGN ::hbrBackground WITH oClass:hbrBackground  DEFAULT COLOR_BTNFACE
+    ASSIGN ::hbrBackground WITH oClass:hbrBackground  DEFAULT COLOR_BTNFACE + 1
 
     //ASSIGN ::cMenuName     WITH oClass:cMenuName
     //ASSIGN ::cClassName    WITH oClass:cClassName     DEFAULT "WoopGUIClass"
@@ -302,7 +303,7 @@ RETURN Self
 
 METHOD Register() CLASS TWindowBase
   LOCAL nHandle
-  
+
   WG_DebugTrace( "TWindowBase:Register()", "::cClassName", ::cClassName )
 
   nHandle := RegisterClassEx( ::nClassStyle, 0/*bWindowProc*/, ::hInstance, ::hIcon, ::hCursor, ::hbrBackground,;
@@ -373,16 +374,23 @@ METHOD WindowProc( nMessage, wParam, lParam ) CLASS TWindowBase
 RETURN nRet
 
 
+METHOD SetBackgroundFromFile( cFileName ) CLASS TWindowBase
+   LOCAL hBmp   := WG_GetBitmapFromFile( cFileName )
+   ::hbrBackground := CreatePatternBrush( hBmp )
+   WG_DebugTrace( "TWindowBase:SetBackgroundFromFile()", "Self", Self, "hBmp", hBmp, "::hbrBackground", ::hbrBackground )
+   DeleteObject(hBmp)
+RETURN ::hbrBackground
+
 METHOD SetCursorFromFile( cFileName ) CLASS TWindowBase
-   ::hCursor := WG_GetCursorFromFile( ::hInstance, cFileName )
+   ::hCursor := WG_GetCursorFromFile( cFileName )
 RETURN ::hCursor
 
 METHOD SetIconFromFile( cFileName ) CLASS TWindowBase
-   ::hIcon := WG_GetIconFromFile( ::hInstance, cFileName )
+   ::hIcon := WG_GetIconFromFile( cFileName )
 RETURN ::hIcon
 
 METHOD SetIconSmFromFile( cFileName ) CLASS TWindowBase
-   ::hIconSm := WG_GetIconFromFile( ::hInstance, cFileName )
+   ::hIconSm := WG_GetIconFromFile( cFileName )
 RETURN ::hIconSm
 
 METHOD UnRegister() CLASS TWindowBase
@@ -398,12 +406,33 @@ METHOD SetCurrentWindow( oWnd ) CLASS TWindowBase
   ::oCurrentWindow := oWnd
 RETURN nOldWnd
 
-FUNCTION WG_GetCursorFromFile( hInstance, cFileName )
-RETURN LoadImage( hInstance, cFileName, IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE + LR_DEFAULTSIZE )
+FUNCTION WG_GetBitmapFromFile( cFileName )
+   LOCAL nHandle := WG_LoadImageFromFile( cFileName, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE + LR_DEFAULTSIZE )
+RETURN nHandle
 
-FUNCTION WG_GetIconFromFile( hInstance, cFileName )
-   LOCAL nHandle := LoadImage( hInstance, cFileName, IMAGE_ICON, 0, 0, LR_LOADFROMFILE + LR_DEFAULTSIZE )
-   //MessageBox( , "nHandle := " + str( nHandle ) )
+FUNCTION WG_GetCursorFromFile( cFileName )
+   LOCAL nHandle := WG_LoadImageFromFile( cFileName, IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE + LR_DEFAULTSIZE )
+RETURN nHandle
+
+FUNCTION WG_GetIconFromFile( cFileName )
+   LOCAL nHandle := WG_LoadImageFromFile( cFileName, IMAGE_ICON, 0, 0, LR_LOADFROMFILE + LR_DEFAULTSIZE )
+RETURN nHandle
+
+// WG_LoadImage - Call API LoadImage with some checks
+FUNCTION WG_LoadImageFromFile( cFileName, nType, nWidth, nHeight, nLoad )
+   LOCAL nHandle
+   LOCAL lCheck := TRUE
+
+   IF cFileName == NIL .OR. ValType( cFileName ) <> "C"
+      MessageBox( , "WG_LoadImageFromFile() - FileName String not passed" )
+      lCheck := FALSE
+   ELSEIF !File( cFileName )
+      MessageBox( , "WG_LoadImageFromFile() - FileName not exist" )
+      lCheck := FALSE
+   ENDIF
+   IF lCheck
+      nHandle := LoadImage( NIL, cFileName, nType, nWidth, nHeight, nLoad )
+   ENDIF
 RETURN nHandle
 
 EXIT PROCEDURE __WG_TWindowBase_Exit()
