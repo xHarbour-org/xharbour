@@ -1,5 +1,5 @@
 /*
- * $Id: pickarry.prg,v 1.1 2000/12/10 18:25:36 lculik Exp $
+ * $Id: pickarry.prg,v 1.1.1.1 2001/12/21 10:45:02 ronpinkas Exp $
  */
 
 *+²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²
@@ -50,16 +50,19 @@ static someitems
 *+
 *+    Called from ( makelink.prg )   1 - function makelink()
 *+
-*+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+   *+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 *+
-function PICKARRY( T, L, b, r, IN_ARRAY, OUT_ARRAY )
+function PICKARRY( T, L, b, r, IN_ARRAY, OUT_ARRAY ,aDefault)
 
 local nChoice    := 1
 local x
 local NEW_ARRAY  := {}
 local NUM_ELEMS  := len( IN_ARRAY )
 local PAD_LEN    := ( r - 1 ) - ( L + 1 )
-local lIsChecked
+local lIsChecked := .f.
+Local aitems := IN_ARRAY
+Local aTemp 
+Local cItem,cItem1,cTemp
 
 someitems := 0
 
@@ -70,8 +73,37 @@ putscreen()
 
 for x := 1 to NUM_ELEMS
    IN_ARRAY[ X ]  := padr( '   ' + IN_ARRAY[ X ], PAD_LEN )
+   tracelog('"'+IN_ARRAY[ X ]+'"')
    OUT_ARRAY[ X ] := ' ' + OUT_ARRAY[ X ]
 next
+
+//aTemp :=GetFiles(aitems)
+
+if Len(ADefault) >0
+   For each cItem in aDefault
+   tracelog(citem)
+   
+   x:= ascan( IN_ARRAY,{| a,y |  substr(a,4,at(' ',alltrim(a))-1)==cItem})
+   tracelog(IN_ARRAY[1])   
+   tracelog(x,substr(IN_ARRAY[1],4,at(' ',alltrim(IN_ARRAY[1]))-1))
+   if x != 0
+   tracelog(IN_ARRAY[x])
+      IN_ARRAY[ x ]  := stuff( IN_ARRAY[ x ], 2, 1, if( lIsChecked, ' ', 'û' ) )
+   tracelog('"'+IN_ARRAY[ X ]+'"')
+      OUT_ARRAY[ x ] := stuff( OUT_ARRAY[ x ], 1, 1, if( lIsChecked, ' ', 'û' ) )
+   else
+      cItem:=substr(cItem,rat('\',cItem)-1)
+tracelog(citem)
+      x:= ascan( aTemp,{| a,y |   substr(a,4,at(' ',a)-1)==cItem})
+tracelog(x)
+      if x != 0
+      IN_ARRAY[ x ]  := stuff( IN_ARRAY[ x ], 2, 1, if( lIsChecked, ' ', 'û' ) )
+   tracelog('"'+IN_ARRAY[ X ]+'"')
+      OUT_ARRAY[ x ] := stuff( OUT_ARRAY[ x ], 1, 1, if( lIsChecked, ' ', 'û' ) )
+       endif
+    endif
+   next   
+endif
 
 do while nChoice != 0
    nChoice := achoice(    T, L    , b      , r     , IN_ARRAY,     , 'keys'   , nChoice, 1 )
@@ -100,6 +132,7 @@ for x := 1 to NUM_ELEMS
       aadd( NEW_ARRAY, substr( OUT_ARRAY[ X ], 2 ) )
    endif
    IN_ARRAY[ X ] := substr( IN_ARRAY[ X ], 4 )
+   tracelog( IN_ARRAY[ X ])
 next
 
 asize( OUT_ARRAY, len( NEW_ARRAY ) )
@@ -141,3 +174,12 @@ endif
 return ( RETVAL )
 
 *+ EOF: PICKARRY.PRG
+static function GetFiles(aIn)
+Local aRet:={}
+Local cItem:=""
+For each citem in ain
+citem:=substr(citem,1,at(' ',citem)-1)
+tracelog(cItem)
+   aadd(aret,substr(citem,1,at(' ',citem)))
+next
+return aret

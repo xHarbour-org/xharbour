@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:45:03 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2002/05/18 13:19:29 lculik Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -10,6 +10,7 @@ ROOT = ../../
 
 PRG_SOURCES=\
     hbmake.prg \
+    tmake.prg \
     hbmutils.prg \
     fclass1.prg \
     ffile1.prg \

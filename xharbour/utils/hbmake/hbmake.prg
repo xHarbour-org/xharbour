@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.64 2003/04/05 00:55:49 lculik Exp $
+ * $Id: hbmake.prg,v 1.65 2003/04/07 15:23:34 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -93,8 +93,10 @@ STATIC s_lExtended     := .T.
 STATIC s_lOs2          := .F.
 STATIC s_lRecurse      := .F.
 STATIC s_lEditMode     := .F.
+STATIC s_lCompress     := .F.
 STATIC s_aDir
 STATIC s_aLangMessages := {}
+STATIC s_cAppName      := ""
 STATIC s_cDefLang
 
 FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
@@ -108,7 +110,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    Ferase( "Test.out" )
    Ferase( s_cLinker )
-
+   SET(39,159)
    IF Pcount() == 0
       s_cDefLang      := IIF( nLang == 1, "PT", IIF( nLang == 2, "EN", "ES" ) )
       s_aLangMessages := BuildLangArray( s_cDefLang )
@@ -216,6 +218,10 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    Outstd( s_cLinkComm )
    __RUN( (s_cLinkComm) )
+
+   IF s_lCompress .AND. !s_lLibrary
+      __Run( " upx -9 "+ (s_cAppName) )
+   ENDIF
 
 RETURN NIL
 
@@ -362,12 +368,18 @@ FUNCTION ParseMakeFile( cFile )
                ENDIF
 
             ENDIF
+                IF aTemp[ 1 ] == "COMPRESS"
+                   s_lCompress := "YES" IN aTemp[ 2 ]
+                endif
+
 
             IF aTemp[ 1 ] == "PROJECT"
 
                IF At( '.lib', aTemp[ 2 ] ) > 0 .OR. At( '.a', aTemp[ 2 ] ) > 0
                   s_lLibrary := .t.
                ENDIF
+
+               s_cAppName := SubStr( aTemp[ 2 ], 1, AT( ' ', aTemp[ 2 ] ) -1 )
 
             ENDIF
 
@@ -914,7 +926,7 @@ FUNCTION CompileFiles()
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> Test.out"," > Test.out")
+                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> Test.out"," >> Test.out")
 
                   @  4, 16 SAY cPrg
                   GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
@@ -1036,10 +1048,14 @@ FUNC CreateMakeFile( cFile )
    LOCAL lCw          := .f.
    LOCAL lMiniGui     := .f.
    LOCAL lRddAds      := .f.
+   LOCAL lMediator    := .f.
+   LOCAL lApollo      := .f.
    LOCAL lMt          := .F.
    LOCAL cOs          := IIF( "LINUX" IN UPPER( OS() ), "Linux", "Win32")
    LOCAL cCompiler    := IIF( "LINUX" IN UPPER( OS() ), "GCC","BCC")
    LOCAL cfwhpath     := Space( 200 )
+   LOCAL cMedpath     := Space( 200 )
+   LOCAL cApolloPath     := Space( 200 )
    LOCAL ccwpath      := Space( 200 )
    LOCAL cMiniPath    := Space( 200 )
    LOCAL cObjDir      := "obj" + Space( 20 )
@@ -1051,20 +1067,24 @@ FUNC CreateMakeFile( cFile )
    LOCAL cDefHarOpts  := ""
    LOCAL nWarningLevel :=0
 
+   LOCAL lUseXharbourDll := .F.
+
    LOCAL lCompMod         := .f.
-   LOCAL x
+
    LOCAL lGenppo          := .f.
+   LOCAL x
    LOCAL getlist          := {}
    LOCAL cTopFile         := ""
    LOCAL cAppName         := Space( 50 )
    LOCAL cDefBccLibs      := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib common.lib gtwin.lib"
-   LOCAL cDefGccLibs      := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
-   LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
+   LOCAL cDefGccLibs      := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lm"
+   LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lm"
    LOCAL cDefLibGccLibs   := "-lvm -lrtl -lgtsln -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lslang -lgpm -lpthread -lm"
    LOCAL cDefBccLibsMt    := "bcc640.lib lang.lib vmmt.lib rtlMt.lib rddmt.lib macro.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib common.lib gtwin.lib"
-   LOCAL cDefGccLibsMt    := "-lvmmt -lrtlMt -lgtdos -llang -lrddmt -lrtlMt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon"
-   LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlMt -lgtos2 -llang -lrddmt -lrtlMt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon"
+   LOCAL cDefGccLibsMt    := "-lvmmt -lrtlMt -lgtdos -llang -lrddmt -lrtlMt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lm"
+   LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlMt -lgtos2 -llang -lrddmt -lrtlMt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lm"
    LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlMt -lgtsln -llang -lrddmt -lrtlMt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lslang -lgpm -lpthread -lm"
+   LOCAL cHarbDll         := "bcc640.lib hbdll_"
 
    LOCAL cLibs        := ""
    LOCAL citem        := ""
@@ -1072,6 +1092,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL cDrive       := ""
    LOCAL cPath        := ""
    LOCAL cTest        := ""
+   LOCAL cGui         := "None"
    LOCAL cUserdef     := Space( 40 )
    LOCAL cUserInclude := Space( 40 )
    LOCAL aLibs
@@ -1084,57 +1105,127 @@ FUNC CreateMakeFile( cFile )
    LOCAL nWriteFiles  := 0
    LOCAL cResName     := Space( 50 )
    LOCAL aSelFiles
-   LOCAL nFilestoAdd  := 0
+   LOCAL nFilestoAdd  := 5
    LOCAL lGui         := .F.
    LOCAL cBuild       := " "
    Local aUserDefs
    Local cCurrentDef  := ""
+   Local cRdd         := "None"
+   LOCAL cCurrentDir  :=""
+   Local nO
+   Local lNew := .F.
+   LOCAL oMake
+   
+   IF  File( cFile )
+      nO := Alert( "The makefile " + cFile +" Exist ",{ "Create new" , "Edit" } )
+      
+      IF nO == 1
+         s_nLinkHandle := Fcreate( cFile )
+         WriteMakeFileHeader()
+         lNew := .T.
+      ELSE
+         oMake :=ThbMake():new()
+         oMake:cMakefile:=cFile
+         oMake:ReadMakefile(cFile)
+         frename(cFile,cfile+".old")
 
-   s_nLinkHandle := Fcreate( cFile )
-   WriteMakeFileHeader()
+         lAutomemvar  := oMake:lAutomemvar
+         lvarismemvar := oMake:lvarismemvar
+         ldebug       := oMake:ldebug
+         lSupressline := oMake:lSupressline
+         lCompMod     := oMake:lCompMod
+         lGenppo      := oMake:lGenppo
+         cRdd         := IIF( oMake:lRddAds, "RddAds", IIF( oMake:lMediator, "Mediator", "None" ) )
+         cGui         := IIF( oMake:lFwh, "FWH", IIF( oMake:lmini , "MiniGui", IIF( oMake:lCw, "C4W", "None" ) ) )
+         cfwhpath     := oMake:cFmc
+         ccwpath      := oMake:cFmc
+         cMiniPath    := oMake:cFmc
+         cmedpath     := oMake:cMedpath
+         cAppName     := oMake:cAppLibName
+         s_cAppName     := oMake:cAppLibName
+         s_lCompress    := oMake:lCompress
+      ENDIF
+   ELSE
+         s_nLinkHandle := Fcreate( cFile )
+         WriteMakeFileHeader()
+         nO:=1
+   ENDIF
+
    CLS
    Setcolor( 'w/b+,b+/w,w+/b,w/b+,w/b,w+/b' )
    @  0,  0, Maxrow(), Maxcol() BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) + Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
    Attention( s_aLangMessages[ 27 ], 0 )
+   Attention( s_aLangMessages[ 47 ], maxrow() )
    @  1,  1 SAY s_aLangMessages[ 28 ]
-   @  1, 12 GET cos radio { "Win32", "OS/2", "Linux" }   VALID ! Empty( cos )
-   @  1, 23 SAY s_aLangMessages[ 29 ]
-   @  1, 40 GET cCompiler radio { "BCC", "MSVC", "GCC" } VALID ! Empty( cCompiler )
+
+//   @  1, 12 GET cos radio { "Win32", "OS/2", "Linux" }   VALID ! Empty( cos )
+   @ 1,12, 6,18 get cOs listbox { "Win32", "OS/2", "Linux" }   message s_aLangMessages[ 49 ] state OsSpec(getlist,1,@cos)  DROPDOWN 
+   @  1, 21 SAY s_aLangMessages[ 29 ]
+//   @  1, 40 GET cCompiler radio { "BCC", "MSVC", "GCC" } VALID ! Empty( cCompiler )
+ @ 1,40, 6,46 get cCompiler listbox { "BCC", "MSVC", "GCC" }  message s_aLangMessages[ 50 ] state OsSpec(getlist,2,@cCompiler) DROPDOWN 
    @  1, 48 SAY s_aLangMessages[ 30 ]
-   @  1, 64 GET lFwh checkbox caption "Use FWH"          WHEN Cos == "Win32" style "[o ]"
-   @  2, 64 GET lcw checkbox caption "Use C4W"           WHEN Cos == "Win32" style "[o ]"
-   @  3, 64 GET lRddads checkbox caption "Use RddAds"    WHEN Cos == "Win32" .OR. Cos == "Linux" style "[o ]"
-   @  4, 64 GET lMiniGui checkbox caption "Use Minigui"  WHEN Cos == "Win32" style "[o ]"
+//   @  1, 64 GET lFwh checkbox caption "Use FWH"          WHEN Cos == "Win32" style "[o ]"
+//   @  2, 64 GET lcw checkbox caption "Use C4W"           WHEN Cos == "Win32" style "[o ]"
+//   @  4, 64 GET lMiniGui checkbox caption "Use Minigui"  WHEN Cos == "Win32" style "[o ]"
+ @ 1, 60,8,78 Get  cGui ListBox { "None","FWH","MiniGui","What32","Whoo","C4W"}  DROPDOWN state OsSpec(getlist,3,@cGui) When CheckCompiler(cOs) message s_aLangMessages[ 51 ]
+//   @  2, 1 GET lRddads checkbox caption "Use RddAds"    WHEN Cos == "Win32" .OR. Cos == "Linux" style "[o ]"
+   @ 2,1 Say s_aLangMessages[ 48 ]
+   @ 2,16,6,26 get cRdd ListBox { "None","RddAds","Mediator","Apollo"}  WHEN Cos == "Win32" .or. Cos == "Linux" DROPDOWN message s_aLangMessages[ 52 ]
+   @ 2,30 Get s_lCompress CheckBox  caption s_aLangMessages[ 53 ] style "[o ]" message s_aLangMessages[ 54 ]
+   @ 2,55 Get lUseXharbourDll CheckBox caption "use Xharbour.dll" style "[o ]" WHEN Cos == "Win32" message s_aLangMessages[ 55 ]
+   @  3, 1 SAY "Obj Files Dir" GET cObjDir PICT "@s15" //MENSSAGE s_aLangMessages[ 56 ]
+   @  4, 1  SAY  s_aLangMessages[ 45 ] GET cAppName VALID ! Empty( cAppName )
+   if nO == 1
+      READ msg at maxrow()-1,1,maxcol()-1
+      s_cAppName     := alltrim(cAppName)
+      IF cOs != "Linux"
+         s_cAppName += ".exe"
+      ENDIF
+   else
+      clear gets
+   endif
+   lFwh := "FWH" IN cGui
+   lMiniGui := "MiniGui" IN cGui
+   lRddAds  := "RddAds"    IN cRdd
+   lMediator :=  "Mediator" IN cRdd
+   lApollo := "Apollo" IN cRdd
 
-   READ
-
+   tracelog(lfwh,lminigui,lRddAds,lMediator)
    IF lFwh
-      @  5,  1 SAY "FWH path" GET cfwhpath PICT "@s20"
+      @  3, 40 SAY "FWH path" GET cfwhpath PICT "@s20"
    ELSEIF lCw
-      @  5,  1 SAY "C4H path" GET ccwpath PICT "@s20"
+      @  3, 40 SAY "C4H path" GET ccwpath PICT "@s20"
    ELSEIF lMiniGui
-      @  5,  1 SAY "MinuGui path" GET cMiniPath PICT "@s20"
+      @  3, 40 SAY "MinuGui path" GET cMiniPath PICT "@s20"
    ENDIF
+   IF lMediator
+      @  3, 40 SAY "Mediator path" GET cmedpath PICT "@s20"
+   ENDIF
+   IF lApollo
+      @  3, 40 SAY "Apollo path" GET cmedpath PICT "@s20"
+   ENDIF 
 
-   @  5, 40 SAY "Obj Files Dir" GET cObjDir PICT "@s15"
-   @  6, 1  SAY  s_aLangMessages[ 45 ] GET cAppName VALID ! Empty( cAppName )
-   Attention( s_aLangMessages[ 31 ], 7 )
 
-   @  8,  1 GET lautomemvar checkbox caption s_aLangMessages[ 32 ] style "[o ]"
-   @  8, 40 GET lvarismemvar checkbox caption s_aLangMessages[ 33 ] style "[o ]"
-   @  9,  1 GET lDebug checkbox caption s_aLangMessages[ 34 ] style "[o ]"
-   @  9, 40 GET lSupressline checkbox caption s_aLangMessages[ 35 ] style "[o ]"
-   @ 10,  1 GET lGenppo checkbox caption s_aLangMessages[ 36 ] style "[o ]"
-   @ 10, 40 GET lCompMod checkbox caption s_aLangMessages[ 37 ] style "[o ]"
-   @ 11,  1 SAY s_aLangMessages[ 38 ]                                            GET cUserDef     PICT "@s15"
-   @ 11, 40 SAY s_aLangMessages[ 39 ]                                            GET cUserInclude PICT "@s15"
-   @ 12,  1 GET lExternalLib checkbox caption s_aLangMessages[ 40 ] style "[o ]"
-   @ 12, 40 GET lXFwh checkbox caption "Xharbour FWH" style "[o ]"
-   @ 13,  1 SAY "Resource file Name"                                           GET CResName
-   @ 14,  1 SAY s_aLangMessages[ 43 ] GET nFilestoAdd  PICT "99"   VALID nFilestoAdd > 0
-   @ 15,  1 GET lMt checkbox caption s_aLangMessages[ 44 ] style "[o ]"
-   @ 15, 40 SAY s_aLangMessages[ 46 ] GET nWarningLevel Pict "9"
-   READ
+//   @  3, 40 SAY "Obj Files Dir" GET cObjDir PICT "@s15"
+//   @  4, 1  SAY  s_aLangMessages[ 45 ] GET cAppName VALID ! Empty( cAppName )
+   Attention( s_aLangMessages[ 31 ], 5 )
+
+   @  6,  1 GET lautomemvar checkbox caption s_aLangMessages[ 32 ] style "[o ]"
+   @  6, 40 GET lvarismemvar checkbox caption s_aLangMessages[ 33 ] style "[o ]"
+   @  7,  1 GET lDebug checkbox caption s_aLangMessages[ 34 ] style "[o ]"
+   @  7, 40 GET lSupressline checkbox caption s_aLangMessages[ 35 ] style "[o ]"
+   @ 8,  1 GET lGenppo checkbox caption s_aLangMessages[ 36 ] style "[o ]"
+   @ 8, 40 GET lCompMod checkbox caption s_aLangMessages[ 37 ] style "[o ]"
+   @ 9,  1 SAY s_aLangMessages[ 38 ] GET cUserDef     PICT "@s15"
+   @ 9, 40 SAY s_aLangMessages[ 39 ] GET cUserInclude PICT "@s15"
+   @ 10,  1 GET lExternalLib checkbox caption s_aLangMessages[ 40 ] style "[o ]"
+   @ 10, 40 GET lXFwh checkbox caption "Xharbour FWH" style "[o ]"
+   @ 11,  1 SAY "Resource file Name"                                           GET CResName
+   @ 12,  1 SAY s_aLangMessages[ 43 ] GET nFilestoAdd  PICT "99"   VALID nFilestoAdd > 0
+   @ 13,  1 GET lMt checkbox caption s_aLangMessages[ 44 ] style "[o ]"
+   @ 13, 40 SAY s_aLangMessages[ 46 ] GET nWarningLevel Pict "9"
+  // READ
+   READ msg at maxrow()-1,1,maxcol()-1
 
    IF ! Empty( cUserDef )
       aUserDefs := ListasArray2(Alltrim( cUserDef ), ";")
@@ -1154,13 +1245,19 @@ FUNC CreateMakeFile( cFile )
    s_lGcc    := "GCC"  IN cCompiler
 
    cObjDir := Alltrim( cObjDir )
-
+   IF "Linux" in cOs
+          cCurrentDir:='/'+CurDirx()
+   ELSE 
+       cCurrentDir:=CurDrive()+":"+CurDirx()
+   ENDIF              
+   tracelog( cCurrentDir )
    IF ! Empty( cObjDir )
 
       IF DirChange( cObjDir ) != 0
          MakeDir( cObjDir )
       ELSE
-         DirChange( '..' )
+   //      DirChange( '..' )
+            DirChange( cCurrentDir )
       ENDIF
 
    ENDIF
@@ -1229,7 +1326,7 @@ FUNC CreateMakeFile( cFile )
       aAdd( s_aCommands, { ".c.obj:", "$(BCB)\BIN\bcc32 -I$(BHC)\include $(CFLAG1) $(CFLAG2) -o$* $**" } )
 
       IF s_lExtended
-         aAdd( s_aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -n -go -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include", "" ) ) + " -o$* $**" } )
+         aAdd( s_aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -n -go -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include", "" ) ) + IIF( lMediator," -I$(MEDIATOR)\include ","")+" -o$* $**" } )
       ELSE
          aAdd( s_aCommands, { ".prg.c:", "$(BHC)\bin\harbour -n -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include", "" ) ) + " -o$* $**" } )
       ENDIF
@@ -1264,7 +1361,7 @@ FUNC CreateMakeFile( cFile )
       aAdd( s_aCommands, { ".c.obj:", "$(BCB)\bin\cl -I$(BHC)\include $(CFLAG1) $(CFLAG2) -Fo$* $**" } )
 
       IF s_lExtended
-         aAdd( s_aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -n -I$(BHC)\include $(HARBOURFLAGS) -go  -I$(C4W)\include -o$* $**" } )
+         aAdd( s_aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -n -I$(BHC)\include $(HARBOURFLAGS) -go  -I$(C4W)\include" + IIF( lMediator," -I$(MEDIATOR)\include ","")+ "-o$* $**" } )
       ELSE
          aAdd( s_aCommands, { ".prg.c:", "$(BHC)\bin\harbour -n -I$(BHC)\include $(HARBOURFLAGS) -I$(C4W)\include -o$* $**" } )
       ENDIF
@@ -1283,7 +1380,11 @@ FUNC CreateMakeFile( cFile )
    ENDIF
 
    aOut := aClone( aIn )
-   pickarry( 11, 15, 20, 64, aIn, aOut )
+   if no != 1
+   pickarry( 11, 15, 20, 64, aIn, aOut ,ArrayAJoin( { oMake:aPrgs, oMake:aCs } ))
+   else
+   pickarry( 11, 15, 20, 64, aIn, aOut ,{})
+   endif
    nLenaOut := Len( aOut )
    aEval( aout, { | x, y | aout[ y ] := Trim( Substr( aOut[ y ], 1, At( ' ', aout[ y ] ) ) ) } )
    aOut := aSort( aOut )
@@ -1310,7 +1411,7 @@ FUNC CreateMakeFile( cFile )
       Attention( 'Spacebar to select, Enter to continue process', 22 )
       aEval( aLibs, { | x | aAdd( aLibsIn, x[ 1 ] ) } )
       aEval( aLibs, { | x | aAdd( aLibsOut, x[ 2 ] ) } )
-      pickarry( 11, 15, 20, 64, aLibsIn, aLibsOut )
+      pickarry( 11, 15, 20, 64, aLibsIn, aLibsOut ,{})
    ENDIF
 
    aEval( aout, { | xItem | IIF(  '.c'IN xItem  .OR.  '.C' IN xItem , aAdd( aoutc, xitem ), ) } )
@@ -1351,6 +1452,11 @@ FUNC CreateMakeFile( cFile )
       s_aObjsc := aClone( aoutc )
       aEval( aoutc, { | xItem, x | hb_FNAMESPLIT( xiTem, @cPath, @cTest, @cExt, @cDrive ), cext := Substr( cExt, 2 ), IIF( ! s_lGcc, s_aObjsc[ x ] := IIF( ! Empty( cObjDir ), cObjDir, '' ) + cTest + "." + Exten( cExt, 2 ), s_aObjsc[ x ] := IIF( ! Empty( cObjDir ), cObjDir, '' ) + cTest + "." + Exten( cExt, 1 ) ) } )
    ENDIF
+   if !lNew
+         s_nLinkHandle := Fcreate( cFile )
+         WriteMakeFileHeader()
+   endif
+   fWrite( s_nLinkHandle, "COMPRESS = " + IIF( s_lCompress, "YES", "NO" ) + CRLF )
 
    IF lFwh
       fWrite( s_nLinkHandle, "FWH = " + cfwhpath + CRLF )
@@ -1361,6 +1467,11 @@ FUNC CreateMakeFile( cFile )
    ELSEIF lMiniGui
       fWrite( s_nLinkHandle, "MINIGUI =" + cMiniPath + CRLF )
       lGui := .T.
+   ENDIF
+
+   IF lMediator
+      fWrite( s_nLinkHandle, "MEDIATOR =" + cMedPath + CRLF )
+      lGui := .F.
    ENDIF
 
    fWrite( s_nLinkHandle, "GUI = " + IIF( lFwh .OR. lCw .OR. lMinigui, "YES", "NO" ) + CRLF )
@@ -1943,7 +2054,7 @@ FUNCTION CompileUpdatedFiles()
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                      cComm := Strtran( cComm, "$**", cPrg )
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> Test.out"," > Test.out")
+                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2 > Test.out"," > Test.out")
                      @  4, 16 SAY cPrg
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
 
@@ -2237,7 +2348,7 @@ FUNC CreateLibMakeFile( cFile )
    ENDIF
 
    aOut := aClone( aIn )
-   pickarry( 10, 15, 19, 64, aIn, aOut )
+   pickarry( 10, 15, 19, 64, aIn, aOut ,{})
    nLenaOut := Len( aOut )
 
    aEval( aout, { | x, y | aout[ y ] := Trim( Substr( aOut[ y ], 1, At( ' ', aout[ y ] ) ) ) } )
@@ -3021,6 +3132,12 @@ FUNCTION ProcessParameters( cParams )
       cParams := Strtran( cParams, "-F", "" )
    ENDIF
 
+   IF  "-R" IN cParams
+      s_lRecurse := .T.
+      cParams  := Strtran( cParams, "-R", "" )
+   ENDIF
+
+
    IF  "-B" IN cParams
       s_lBcc    := .T.
       s_lGcc    := .F.
@@ -3055,10 +3172,6 @@ FUNCTION ProcessParameters( cParams )
       cParams       := Strtran( cParams, "-I", "" )
    ENDIF
 
-   IF  "-R" IN cParams
-      s_lRecurse := .T.
-      cParams  := Strtran( cParams, "-R", "" )
-   ENDIF
 
    IF  "-P" IN cParams
       s_lPrint  := .t.
@@ -3172,6 +3285,17 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "Use Multi Thread Library" )
       aAdd( aLang, "Executable file name" )
       aAdd( aLang, "Warning Level /w" )
+      aadd( aLang, "Enter Select|Arrow Change Selection|Spacebar Open Box")
+      aadd( aLang, "3rd Partie Rdd")
+      aadd( aLang, "What OS you Use")
+      aadd( aLang, "What C compiler  you has")
+      aadd( aLang, "This app use Graphical libraries")
+      aadd( aLang, "Do you use 3rd Parties Rdd")
+      aAdd( aLang, "Compress this app")
+      aAdd( aLang, "Compress the app after Link(use upx)")
+      aAdd( aLang, "Your app will be linked to user harbour.dll")
+      aadd( aLang, "Where the .obj/.o files will be generates")
+
 
    ELSEIF cLang == "ES"
       aAdd( aLang, "Harbour Make Utility  -  Programa Make de Harbour" )
@@ -3220,6 +3344,16 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "Use a libreria Multi Thread" )
       aAdd( aLang, "Nome Executavel" )
       aAdd( aLang, "Nivel Warning /w" )
+      aadd( aLang, "Enter Seleciona|Setas muda sele‡Æo|Espa‡o abre caixa")
+      aadd( aLang, "Rdd Terceiros")
+      aadd( aLang, "Qual OS vocˆ Usa")
+      aadd( aLang, "Qual compildor C vocˆ tem")
+      aadd( aLang, "Essa App usa Lib Grafica ou NÆo")
+      aadd( aLang, "Vocˆ usa Rdd's de terceiros")
+      aAdd( aLang, "Comprimir app")
+      aAdd( aLang, "Comprimir a app depois de linkada(usa upx)")
+      aAdd( aLang, "Sua aplica‡Æo Sera linkada para usar a harbour.dll")
+      aadd( aLang, "Onde os Arquivos .obj/.o serÆo gerados")
 
    ELSEIF cLang == "PT"
       aAdd( aLang, "Harbour Make Utility  -  Programa Make do Harbour" )
@@ -3268,6 +3402,18 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "Use a Biblioteca Multi Thread" )
       aAdd( aLang, "Nome Executavel" )
       aAdd( aLang, "Nivel Warning /w" )
+      aAdd( aLang,"Enter Seleciona|Setas muda sele‡Æo|Espa‡o abre caixa")
+      /* Messages Start Here */
+      aAdd( aLang, "Rdd Terceiros")
+      aAdd( aLang, "Qual OS vocˆ Usa")
+      aAdd( aLang, "Qual compildor C vocˆ tem")
+      aAdd( aLang, "Essa App usa Lib Grafica ou NÆo")
+      aAdd( aLang, "Vocˆ usa Rdd's de terceiros")
+      aAdd( aLang, "Comprimir app")
+      aAdd( aLang, "Comprimir a app depois de linkada(usa upx)")
+      aAdd( aLang, "Sua aplica‡Æo Sera linkada para usar a harbour.dll")   
+      aadd( aLang, "Onde os Arquivos .obj/.o serÆo gerados")
+
    ENDIF
 
 RETURN aLang
@@ -3284,6 +3430,7 @@ FUNCTION GetSelFiles( aIn, aOut )
 
       IF nPos > 0
          aAdd( aRet, cItem )
+         tracelog(cItem)
       ENDIF
 
    NEXT
@@ -3322,3 +3469,18 @@ FUNCTION ResetInternalVars()
 
 
 RETURN NIL
+
+Function OsSpec(GetList,nPos,cSpec)
+   local oGet := GetList[nPos]
+   local oControl
+   oControl := oGet:Control
+   IF oControl != nil
+      cSpec := oControl:GetData( oControl:Value )
+//   keyboard chr(9)
+   EndIf
+
+Return .T.
+
+function CheckCompiler(cOs)
+
+Return ("Win32" IN cOs)
