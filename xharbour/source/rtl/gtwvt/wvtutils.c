@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.3 2004/06/05 09:56:28 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.4 2004/06/06 11:33:21 lf_sfnet Exp $
  */
 
 /*
@@ -201,7 +201,7 @@ HB_FUNC( WVT_CHOOSECOLOR )
 
 HB_FUNC( WVT_MESSAGEBOX )
 {
-   MessageBox( _s->hWnd, hb_parcx( 1 ), hb_parcx( 2 ), ISNIL( 3 ) ? MB_OK : hb_parni( 3 ) );
+   hb_retni( MessageBox( _s->hWnd, hb_parcx( 1 ), hb_parcx( 2 ), ISNIL( 3 ) ? MB_OK : hb_parni( 3 ) ) ) ;
 }
 
 #if _WIN32_IE > 0x400
