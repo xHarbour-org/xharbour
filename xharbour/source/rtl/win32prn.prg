@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.5 2005/01/19 21:19:24 ptsarenko Exp $
+ * $Id: win32prn.prg,v 1.6 2005/02/12 19:54:03 druzus Exp $
  */
 
 /*
@@ -542,6 +542,8 @@ ENDCLASS
 #pragma BEGINDUMP
 
 #include <windows.h>
+#include <winspool.h>
+
 #include "hbapiitm.h"
 
 #ifndef INVALID_FILE_SIZE
@@ -959,9 +961,9 @@ HB_FUNC_STATIC( SETPEN )
 {
    HDC hDC = ( HDC ) hb_parnl( 1 );
    HPEN hPen = CreatePen(
-               hb_parni( 2 ),	// pen style 
-               hb_parni( 3 ),	// pen width  
-               (COLORREF) hb_parnl( 4 ) 	// pen color 
+               hb_parni( 2 ),	// pen style
+               hb_parni( 3 ),	// pen width
+               (COLORREF) hb_parnl( 4 ) 	// pen color
                );
    HPEN hOldPen = (HPEN) SelectObject( hDC, hPen);
 

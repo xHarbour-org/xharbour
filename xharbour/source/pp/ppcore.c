@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.191 2005/01/09 01:41:06 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.192 2005/01/09 06:08:25 likewolf Exp $
  */
 
 /*
@@ -402,6 +402,7 @@ void hb_pp_Free( void )
       hb_xfree( stcmd );
       s_kolAddComs--;
    }
+
    while( s_kolAddTras )
    {
       stcmd = hb_pp_topTranslate;
@@ -1593,17 +1594,20 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
     if( bRemove )
     {
        COMMANDS *cmd, *cmdPrev = NULL;
+	   int i;
 
        if( com_or_tra )
        {
           cmd = hb_pp_topCommand;
+		  i = s_kolAddComs;
        }
        else
        {
           cmd = hb_pp_topTranslate;
+		  i = s_kolAddTras;
        }
 
-       while ( cmd )
+       while( cmd && i-- )
        {
           //printf( "Searching Key X=%i '%s' Rule '%s' in Command: '%s' Rule: '%s'\n", com_or_xcom, cmdname, mpatt, cmd->name, cmd->mpatt );
 
@@ -1633,6 +1637,15 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
                 hb_xfree( cmd->mpatt );
                 hb_xfree( cmd->value );
                 hb_xfree( cmd );
+
+                if( com_or_tra )
+                {
+				   s_kolAddComs--;
+                }
+                else
+                {
+				   s_kolAddTras--;
+                }
 
                 return;
              }
