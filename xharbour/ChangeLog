@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.492 2002/11/13 18:52:44 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.493 2002/11/13 20:48:42 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-14 00:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Fixed HB_P_ARRAYPUSH when Element is BYREF (unref).
 
 2002-11-13 17:37 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/listbox.prg
