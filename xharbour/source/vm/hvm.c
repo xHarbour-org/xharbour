@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.75 2002/05/21 00:16:23 ronpinkas Exp $
+ * $Id: hvm.c,v 1.76 2002/05/21 00:27:18 ronpinkas Exp $
  */
 
 /*
@@ -3566,6 +3566,7 @@ static void hb_vmArrayPush( void )
 
          pArray->item.asString.value  = hb_vm_sNull;
          pArray->item.asString.length = 0;
+         pArray->item.asString.bStatic = TRUE;
       }
    }
  #endif
