@@ -1,0 +1,28 @@
+/*
+ * $Id$
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+2004-02-25 03:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  - contrib/design/makelib.bat
+    ! remove makelib.bat unintentionally copied into this folder
+
+2004-02-24 22:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  + contrib/design/general.prg
+  + contrib/design/makefile.bc
+  + contrib/design/makefile.vc
+  + contrib/design/makelib.bat
+  + contrib/design/make_b32.bat
+  + contrib/design/make_vc.bat
+  + contrib/design/readme.txt
+  + contrib/design/tbox.prg
+  + contrib/design/tcheck.prg
+  + contrib/design/tmenu.prg
+  + contrib/design/tradio.prg
+  + contrib/design/twindow.prg
+  + tests/design.prg
+    + text mode screen designer and code generator
