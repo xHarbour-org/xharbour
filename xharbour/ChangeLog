@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2019 2004/01/08 08:45:35 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2020 2004/01/08 23:47:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-08 14:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com> 
+   * xharbour/source/rtl/gtwvt/gtwvt.c 
+     + Wvt_DrawBoxGroupRaised( nTop, nLeft, nBottom, nRight ) 
+     ! Wvt_SetMouseMove( lSetMove ) 
+       Now the function returns the previous state of mouse movement set flag. 
+
+2004-01-07 15:10 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it> 
+   * source/rtl/gtwvt/gtwvt.c 
+     * add HB_OS_WIN_32_USED and changed includes to fix mingw32/OpenWatcom compile 
+
+2004-01-07 12:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com> 
+   * xharbour/source/rtl/gtwvt/gtwvt.c 
+     * Wvt_DrawBoxGet() 
+       Optimized to use _s.hdc instead of GetDC()/ReleaseDC() calls. 
+     * Added Some comments. 
+
+     /*
+         The above three messages were deletd from the changeLog, reported by 
+         Francessco. And as I do not know how to, I am adding them again.
+         Why these message deleted, I do not know.
+     */
 
 2004-01-08 15:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/bldtest.bat
