@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.68 2005/03/30 21:29:09 andijahja Exp $
+ * $Id: hbdefs.h,v 1.69 2005/03/31 03:15:18 druzus Exp $
  */
 
 /*
@@ -1073,6 +1073,8 @@ typedef PHB_FUNC HB_FUNC_PTR;
 #define HB_FUNC_INIT( funcname )   static HARBOUR HB_FUN_init_##funcname ( void )
 #define HB_FUNC_EXIT( funcname )   static HARBOUR HB_FUN_exit_##funcname ( void )
 #define HB_FUNC_INITSTATIC( )      static HARBOUR hb_INITSTATICS( void )
+#define HB_FUNC_INITGLOBAL( )      static HARBOUR hb_INITGLOBALS( void )
+#define HB_FUNC_REGISTERGLOBAL( )  static HARBOUR hb_REGISTERGLOBALS( void )
 
 typedef ULONG HB_HANDLE;        /* handle to memvar value */
 typedef char  HB_SYMBOLSCOPE;   /* stores symbol's scope */

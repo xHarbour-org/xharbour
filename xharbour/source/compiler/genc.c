@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.92 2005/04/02 00:57:19 andijahja Exp $
+ * $Id: genc.c,v 1.93 2005/04/02 01:10:12 andijahja Exp $
  */
 
 /*
@@ -93,6 +93,10 @@ extern char *hb_Command_Line;
  hb_comp_pCodeList is the file handle on which pCode Listing will be written
 */
 FILE *hb_comp_pCodeList = NULL;
+
+#define HB_PROTO_FUNC_REQUEST	1
+#define HB_PROTO_FUNC_STATIC	2
+#define HB_PROTO_FUNC_PUBLIC	3
 
 void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* generates the C language output */
 {
@@ -256,12 +260,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          /* Is it a STATIC$ */
          else if ( bIsStaticVariable )
          {
-            fprintf( yyc, "\nstatic HARBOUR hb_INITSTATICS( void );\n\n" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "HB_FUNC_INITSTATIC();\n" ); /* NOTE: hb_ intentionally in lower case */
          }
          /* Is it a GLOBAL$ */
          else if ( bIsGlobalVariable )
          {
-            fprintf( yyc, "static HARBOUR hb_INITGLOBALS( void );\n" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "HB_FUNC_INITGLOBAL();\n" ); /* NOTE: hb_ intentionally in lower case */
          }
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
@@ -298,7 +302,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
       if( iLocalGlobals )
       {
-         fprintf( yyc, "static HARBOUR hb_REGISTERGLOBALS( void );\n\n" ); /* NOTE: hb_ intentionally in lower case */
+         fprintf( yyc, "HB_FUNC_REGISTERGLOBAL();\n" ); /* NOTE: hb_ intentionally in lower case */
       }
 
       /* write functions prototypes for inline blocks */
@@ -344,9 +348,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          pFunc = pFunc->pNext;
       }
 
-      hb_compGenCAddProtos( 1, yyc );
-      hb_compGenCAddProtos( 2, yyc );
-      hb_compGenCAddProtos( 3, yyc );
+      hb_compGenCAddProtos( HB_PROTO_FUNC_REQUEST, yyc );
+      hb_compGenCAddProtos( HB_PROTO_FUNC_STATIC , yyc );
+      hb_compGenCAddProtos( HB_PROTO_FUNC_PUBLIC , yyc );
 
       if( bCritical )
       {
@@ -462,6 +466,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             else
             {
                fprintf( yyc, "HB_FS_PUBLIC" );
+#if defined( HB_NO_STATIC_FUNC_START )
                /*
                   We found first public function in program body and
                   make it starting procedure.
@@ -472,6 +477,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                   iStartupOffset = iSymOffset;
                   bSymFIRST = TRUE;
                }
+#endif
             }
 
             if( pSym->cScope & VS_MEMVAR )
@@ -486,18 +492,15 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
 #if !defined( HB_NO_STATIC_FUNC_START )
             if ( ( pSym->cScope & HB_FS_FIRST ) &&  ( ! hb_comp_bNoStartUp ) )
-            {
-               fprintf( yyc, " | HB_FS_FIRST" );
-               iStartupOffset = iSymOffset;
-            }
 #else
-            if ( ( pSym->cScope & HB_FS_FIRST ) && !( pSym->cScope & HB_FS_STATIC ) &&  ( ! hb_comp_bNoStartUp ) && ( ! bSymFIRST ) )
+            if ( ( pSym->cScope & HB_FS_FIRST ) &&  ( ! hb_comp_bNoStartUp ) && !( pSym->cScope & HB_FS_STATIC )  && ( ! bSymFIRST ) )
+#endif
             {
                fprintf( yyc, " | HB_FS_FIRST" );
                iStartupOffset = iSymOffset;
                bSymFIRST = TRUE;
             }
-#endif
+
             /* specify the function address if it is a defined function or an
                external called function */
             if( hb_compFunctionFind( pSym->szName ) ) /* is it a function defined in this module */
@@ -539,9 +542,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          iSymOffset++;
       }
 
-      hb_compGenCAddExtern( 1, yyc, bSymFIRST );
-      hb_compGenCAddExtern( 2, yyc, bSymFIRST );
-      hb_compGenCAddExtern( 3, yyc, bSymFIRST );
+      hb_compGenCAddExtern( HB_PROTO_FUNC_REQUEST, yyc, bSymFIRST );
+      hb_compGenCAddExtern( HB_PROTO_FUNC_STATIC , yyc, bSymFIRST );
+      hb_compGenCAddExtern( HB_PROTO_FUNC_PUBLIC , yyc, bSymFIRST );
 
       /*
          End of initializaton codes
@@ -649,12 +652,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          /* Is it STATICS$ */
          else if( bIsStaticVariable )
          {
-            fprintf( yyc, "static HARBOUR hb_INITSTATICS( void )" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "HB_FUNC_INITSTATIC()" ); /* NOTE: hb_ intentionally in lower case */
          }
          /* Is it GLOBALS$ */
          else if( bIsGlobalVariable )
          {
-            fprintf( yyc, "static HARBOUR hb_INITGLOBALS( void )" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "HB_FUNC_INITGLOBAL()" ); /* NOTE: hb_ intentionally in lower case */
          }
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
@@ -707,7 +710,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
       if( iLocalGlobals )
       {
-         fprintf( yyc, "static HARBOUR hb_REGISTERGLOBALS( void )\n"
+         fprintf( yyc, "HB_FUNC_REGISTERGLOBAL()\n"
                        "{\n"
                        "   hb_vmRegisterGlobals( &pGlobals, %i );\n", iGlobals );
          fprintf( yyc, "}\n\n" );
@@ -764,9 +767,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          fprintf( yyc, "#undef HB_PRG_PCODE_VER\n" );
          fprintf( yyc, "#define HB_PRG_PCODE_VER %i\n\n", (int) HB_PCODE_VER );
 
-         hb_compGenCAddProtos( 1, yyc );
-         hb_compGenCAddProtos( 2, yyc );
-         hb_compGenCAddProtos( 3, yyc );
+         hb_compGenCAddProtos( HB_PROTO_FUNC_REQUEST, yyc );
+         hb_compGenCAddProtos( HB_PROTO_FUNC_STATIC , yyc );
+         hb_compGenCAddProtos( HB_PROTO_FUNC_PUBLIC , yyc );
 
          fprintf( yyc, "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, hb_comp_FileAsSymbol );
 
@@ -808,7 +811,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          pTemp = pPubSymFirst;
          while( pTemp )
          {
-            // char szSym_Name[ HB_SYMBOL_NAME_LEN + 1 ];
             char *szSym_Name = (char*) hb_xgrab( HB_SYMBOL_NAME_LEN + 1 );
 
             hb_xmemset( szSym_Name, '\0', HB_SYMBOL_NAME_LEN + 1 );
@@ -1017,13 +1019,13 @@ static void hb_compGenCAddProtos( int iOption, FILE *yyc )
 
    switch( iOption )
    {
-      case 1 : /* REQUEST */
+      case HB_PROTO_FUNC_REQUEST :
          pTemp = pRequestList;
          break;
-      case 2 : /* HB_FUNC_STATIC */
+      case HB_PROTO_FUNC_STATIC :
          pTemp = pStatSymFirst;
          break;
-      case 3 : /* HB_FUNC */
+      case HB_PROTO_FUNC_PUBLIC :
          pTemp = pPubSymFirst;
          break;
    }
@@ -1062,13 +1064,13 @@ static void hb_compGenCAddExtern( int iOption, FILE *yyc, BOOL bSymFIRST )
 
    switch( iOption )
    {
-      case 1 : /* REQUEST */
+      case HB_PROTO_FUNC_REQUEST :
          pTemp = pRequestList;
          break;
-      case 2 : /* HB_FUNC_STATIC */
+      case HB_PROTO_FUNC_STATIC :
          pTemp = pStatSymFirst;
          break;
-      case 3 : /* HB_FUNC */
+      case HB_PROTO_FUNC_PUBLIC :
          pTemp = pPubSymFirst;
          break;
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3998 2005/04/02 01:44:39 andijahja Exp $
+ * $Id: ChangeLog,v 1.3999 2005/04/02 01:56:04 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-04-03 04:10 UTC+0700 Andi Jahja <andijahja@xharbou.com>
+  * source/compiler/harbour.c
+    * minor updates on processing script file:
+      ! compiles long file name inside quotes eg. "my program ver 1.prg"
+      ! compiles more than one file when a line contains more than one input
+        files in a row, separated by white space or a comma.
+      ! honor comments started with '#'
+      Reminder: script file processing is different with Clipper who processes
+      the listed files into a single object; harbour processes it into
+      individual c outputs.
+
+  * include/hbdefs.h
+    + new macros:
+      * HB_FUNC_INITGLOBAL == static HARBOUR hb_INITGLOBALS( void );
+      * HB_FUNC_REGISTERGLOBAL == static HARBOUR hb_REGISTERGLOBALS( void );
+
+  * source/compiler/genc.c
+    * fixed doubly assigned HB_FS_FIRST on starting procedure when
+      there is no prg module in a file.
+    * apply usage of new macros
+
 2005-04-02 08:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/harbour.c
     * reversals due lisencing issue

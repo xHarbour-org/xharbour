@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.101 2005/04/01 20:16:30 andijahja Exp $
+ * $Id: harbour.c,v 1.102 2005/04/02 01:57:18 andijahja Exp $
  */
 
 /*
@@ -5630,21 +5630,15 @@ static int hb_compProcessRSPFile( char* szRspName, int argc, char * argv[] )
    int iProcess = 1;
    int iStatus = EXIT_SUCCESS;
    BOOL bFirstChar = FALSE;
-   char *szFileRSP = (char*) hb_xgrab( strlen( szRspName ) );
 
-   hb_xmemset( szFileRSP, '\0', strlen( szRspName ) );
+   szRspName ++;
 
-   for ( i = 1; i < (int) strlen( szRspName ); i ++ )
-   {
-      szFileRSP[ i - 1 ] = szRspName[ i ];
-   }
-
-   inFile = fopen( szFileRSP, "r" );
+   inFile = fopen( szRspName, "r" );
    i = 0;
 
    if ( !inFile )
    {
-      printf( "Cannot open input file: %s\n", szFileRSP );
+      printf( "Cannot open input file: %s\n", szRspName );
       iStatus = EXIT_FAILURE;
    }
    else
@@ -5655,8 +5649,13 @@ static int hb_compProcessRSPFile( char* szRspName, int argc, char * argv[] )
 
       while ( ( ch = fgetc ( inFile ) ) != EOF )
       {
-         if ( ch == '\n')
+         if ( ch == '\n' || ch == ' ' )
          {
+	    if ( !(*szFile) )
+	    {
+	       continue;
+	    }
+
             if( iProcess > 1 )
             {
                hb_pp_Init();
@@ -5677,8 +5676,25 @@ static int hb_compProcessRSPFile( char* szRspName, int argc, char * argv[] )
             i = 0;
             hb_xmemset( szFile, '\0', _POSIX_PATH_MAX );
          }
-         else
-         {
+         else if ( ch == '#' )
+	 {
+            while ( ( ch = fgetc ( inFile ) ) != '\n' && ch != EOF )
+            {;
+            }
+	 }
+         else if ( ch == ',' )
+	 {
+	    continue;
+	 }
+         else if ( ch == '"' )
+	 {
+            while ( ( ch = fgetc ( inFile ) ) != '"' && ch != '\n' && ch != EOF )
+            {;
+               szFile [ i ++ ] = (char) ch;
+            }
+	 }
+	 else
+	 {
             /* left trim() */
             if( HB_ISSPACE( ch ) )
             {
@@ -5697,13 +5713,12 @@ static int hb_compProcessRSPFile( char* szRspName, int argc, char * argv[] )
                   bFirstChar = TRUE;
                }
             }
-         }
+	 }
       }
+
       fclose ( inFile );
       hb_xfree( szFile );
    }
-
-   hb_xfree( szFileRSP );
 
    return iStatus;
 }
