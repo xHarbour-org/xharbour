@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.61 2003/04/10 16:51:21 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.62 2003/04/19 05:17:01 ronpinkas Exp $
  */
 
 /*
@@ -4875,7 +4875,7 @@ static int strotrim( char * stroka, BOOL bRule )
 
      if( State != STATE_NORMAL || curc != ' ' || ( curc == ' ' && *( stroka + 1 ) != '\0' && lastc != ' ' && lastc != ',' && lastc != '(' && *( stroka + 1 ) != ',' ) )
      {
-        if( bRule || curc != '\\' )
+        if( State != STATE_NORMAL || bRule || curc != '\\' )
         {
            *ptr++ = curc;
            lastc = curc;

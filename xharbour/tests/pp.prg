@@ -5915,8 +5915,9 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    #ifdef __XHARBOUR__
       HB_AtX( "(^|[^\\])= *>", sRule, , @nNext, @nTokenLen )
    #else
-      DO WHILE ( nNext := At( "=>", sRule ) ) > 0
-         IF SubStr( sRule, nNext - 1 ) != '\'
+      nNext := 0
+      DO WHILE ( nNext := At( "=>", sRule, nNext + 1 ) ) > 0
+         IF ! SubStr( sRule, nNext - 1, 1 ) == '\'
             EXIT
          ENDIF
       ENDDO
@@ -7071,7 +7072,7 @@ RETURN nId
 STATIC FUNCTION CompileDefine( sRule )
 
    LOCAL sKey, sResult, aRule, nCloseAt, nId, sMarker, nCommaAt, aMP
-   LOCAL sToken, aRPs, sAnchor, aMarkers := {}, aResult
+   LOCAL sToken, aRPs, sAnchor, aMarkers := {}, aResult, sPad, sText := ""
 
    ExtractLeadingWS( @sRule )
 
@@ -7164,26 +7165,34 @@ STATIC FUNCTION CompileDefine( sRule )
          ELSE
 
             WHILE ( sToken := NextToken( @sResult ) ) != NIL
-
-               DropTrailingWS( @sToken )
+               DropTrailingWS( @sToken, @sPad )
 
 //? "Token: '" + sToken + "'"
-             #ifdef __XHARBOUR__
+            #ifdef __XHARBOUR__
                IF ( nId := aScan( aMarkers, sToken, , , .T. ) ) > 0
-             #else
+            #else
                IF ( nId := aScan( aMarkers, {|sMarker| sMarker == sToken } ) ) > 0
-             #endif
+            #endif
+                  IF ! ( sText == "" )
+                     aAdd( aRPs, { 0, sText } )
+                     aAdd( aResult[2], -1 )
+                     sText := sPad
+                  ENDIF
+
                   aAdd( aRPs, { 0, nId } )
                   aAdd( aResult[2], 1 )
                ELSE
-                  aAdd( aRPs, { 0, sToken } )
-                  aAdd( aResult[2], -1 )
+                  sText += sToken + sPad
                ENDIF
 
 //? "ID:", nID
 //WAIT
-
             ENDDO
+
+            IF ! ( sText == "" )
+               aAdd( aRPs, { 0, sText } )
+               aAdd( aResult[2], -1 )
+            ENDIF
 
             aResult[1] := aRPs
             aSize( aResult[3], Len( aMarkers ) )

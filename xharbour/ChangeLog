@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.972 2003/04/21 01:40:27 jonnymind Exp $
+ * $Id: ChangeLog,v 1.973 2003/04/21 03:05:07 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-21 01:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fix to recent change in strotrim() regarding '\'.
+
+  * source/rtl/regex.c
+    * Minor fix and formatting.
+
+  * tests/pp.prg
+    * Minor fix to CompileDefine()
+    * Minor fix to CompileRule() in non xHarbor mode.
 
 2003-04-21 05:04 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/estack.c
@@ -29,7 +40,6 @@
     ! Fixes on the new InetPeriodCallback() (expecially, added it on
       InetRecv(), InetRecvEndBlock() and InetDgramRecv(), and fixed
       a non-working InetRecvAll()).
-
 
 2003-04-21 00:44 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/hbapi.h
@@ -61,7 +71,7 @@
   * source/rtl/hbsrlraw.c
     + Added suport for objects containing NIL properties.
 
-2003-04-18 10:13 UTC+0200 Ron Pinkas <ron@ronpinkas.com>
+2003-04-18 10:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * contrib/what32/include/import.ch
     ! Fixed few typos.
 

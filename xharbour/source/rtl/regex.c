@@ -6337,80 +6337,80 @@ else
 
 HB_FUNC( HB_ATX )
 {
-    #define REGEX_MAX_GROUPS 16
-    regex_t re;
-    regmatch_t aMatches[REGEX_MAX_GROUPS];
-    int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
-    unsigned long ulLen;
+   #define REGEX_MAX_GROUPS 16
+   regex_t re;
+   regmatch_t aMatches[REGEX_MAX_GROUPS];
+   int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
+   unsigned long ulLen;
 
-    PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
-    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
-    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
-    PHB_ITEM pStart = hb_param( 4, HB_IT_INTEGER );
-    PHB_ITEM pEnd = hb_param( 5, HB_IT_INTEGER );
+   PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
+   PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
+   PHB_ITEM pStart = hb_param( 4, HB_IT_INTEGER );
+   PHB_ITEM pEnd = hb_param( 5, HB_IT_INTEGER );
 
-    if( pCaseSensitive && pCaseSensitive->item.asLogical.value == ( int ) FALSE )
-    {
-       CFlags |= REG_ICASE;
-    }
+   if( pCaseSensitive && pCaseSensitive->item.asLogical.value == ( int ) FALSE )
+   {
+      CFlags |= REG_ICASE;
+   }
 
-    if( pRegEx && pString )
-    {
-        if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
-        {
-           /*
-           if( (real_pcre *) (re)->top_bracket > 0 )
-           {
-              aMatches = hb_xgrabb(  (const real_pcre *) (re)->top_bracket * sizeof() )
-           }
-           */
+   if( pRegEx && pString )
+   {
+      if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
+      {
+         /*
+         if( (real_pcre *) (re)->top_bracket > 0 )
+         {
+            aMatches = hb_xgrabb(  (const real_pcre *) (re)->top_bracket * sizeof() )
+         }
+         */
 
-           if( pStart || pEnd )
-           {
-              EFlags |= REG_STARTEND;
-              aMatches[0].rm_so = 0;
-              aMatches[0].rm_eo = pString->item.asString.length;
-           }
+         if( pStart || pEnd )
+         {
+            EFlags |= REG_STARTEND;
+            aMatches[0].rm_so = 0;
+            aMatches[0].rm_eo = pString->item.asString.length;
+         }
 
-           if( pStart && pStart->item.asInteger.value > 0 && pStart->item.asInteger.value <= aMatches[0].rm_eo )
-           {
-              aMatches[0].rm_so = pStart->item.asInteger.value - 1;
-           }
+         if( pStart && pStart->item.asInteger.value > 0 && pStart->item.asInteger.value <= aMatches[0].rm_eo )
+         {
+            aMatches[0].rm_so = pStart->item.asInteger.value - 1;
+         }
 
-           if( pEnd && pEnd->item.asInteger.value > 0 && aMatches[0].rm_so + pEnd->item.asInteger.value <= aMatches[0].rm_eo )
-           {
-              aMatches[0].rm_eo = aMatches[0].rm_so + pEnd->item.asInteger.value;
-           }
+         if( pEnd && pEnd->item.asInteger.value > 0 && aMatches[0].rm_so + pEnd->item.asInteger.value <= aMatches[0].rm_eo )
+         {
+            aMatches[0].rm_eo = aMatches[0].rm_so + pEnd->item.asInteger.value;
+         }
 
-           if( regexec( &re, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
-           {
-              ulLen = aMatches[0].rm_eo - aMatches[0].rm_so;
+         if( regexec( &re, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
+         {
+            ulLen = aMatches[0].rm_eo - aMatches[0].rm_so;
 
+            if( hb_pcount() > 3 )
+            {
+               hb_stornl( aMatches[0].rm_so + 1, 4 );
+            }
 
-              if( hb_pcount() > 3 )
-              {
-                 hb_stornl( aMatches[0].rm_so + 1, 4 );
-              }
-              if( hb_pcount() > 4 )
-              {
-                 hb_stornl( aMatches[0].rm_eo - aMatches[0].rm_so, 5 );
-              }
+            if( hb_pcount() > 4 )
+            {
+               hb_stornl( aMatches[0].rm_eo - aMatches[0].rm_so, 5 );
+            }
 
-              hb_retclen( pString->item.asString.value + aMatches[0].rm_so, ulLen );
-              return;
-           }
-        }
-    }
+            hb_retclen( pString->item.asString.value + aMatches[0].rm_so, ulLen );
+            return;
+         }
+      }
+   }
 
-    if( hb_pcount() > 3 )
-    {
-       hb_stornl( 0, 4 );
-    }
+   if( hb_pcount() > 3 )
+   {
+      hb_stornl( 0, 4 );
+   }
 
-    if( hb_pcount() > 4 )
-    {
-       hb_stornl( 0, 5 );
-    }
+   if( hb_pcount() > 4 )
+   {
+      hb_stornl( 0, 5 );
+   }
 }
 
 /*
@@ -6480,6 +6480,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
    }
 
    aMatches[0].rm_so = 0;
+
    if( regexec( pReg, pString->item.asString.value, iMaxMatch, aMatches, EFlags ) == 0 )
    {
       switch ( cRequest )
@@ -6497,14 +6498,15 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                hb_arrayAddForward( &(HB_VM_STACK.Return), pMatch );
                i++;
             }
+
+           return TRUE;
          }
-         return TRUE;
 
          case 1: // HB_P_LIKE
-         return aMatches[0].rm_so == 0 && (unsigned long) (aMatches[0].rm_eo) == pString->item.asString.length;
+           return aMatches[0].rm_so == 0 && (unsigned long) (aMatches[0].rm_eo) == pString->item.asString.length;
 
          case 2: // HB_P_MATCH
-         return TRUE;
+           return TRUE;
 
          case 3: // Split
          {
@@ -6522,16 +6524,15 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                str += aMatches[ 0 ].rm_eo;
                iCount++;
             }
-            while ( *str && (iMax == 0 || iMax > iCount) &&
-                  regexec( pReg, str, 1, aMatches, EFlags ) == 0 );
+            while( *str && (iMax == 0 || iMax > iCount) && regexec( pReg, str, 1, aMatches, EFlags ) == 0 );
 
             /* last match must be done also in case that str is empty; this would
                mean an empty split field at the end of the string */
             pMatch = hb_itemPutCL( NULL, str, strlen( str ) );
             hb_arrayAddForward( &(HB_VM_STACK.Return), pMatch );
          }
-         return TRUE;
 
+         return TRUE;
       }
    }
 
