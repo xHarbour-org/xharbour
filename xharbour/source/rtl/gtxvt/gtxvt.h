@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.5 2004/01/05 15:24:00 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.6 2004/01/14 23:02:05 jonnymind Exp $
  */
 
 /*
@@ -127,6 +127,8 @@ typedef USHORT HB_GT_CELLTYPE;
 #define XVT_ICM_UPDATE        2     // UPDATE request. Follows an ICM_DATA_UPDATE struture
 #define XVT_ICM_MOUSEMOVE     3     // Change mouse position. Follows an ICM_DATA_RESIZE struture
 #define XVT_ICM_SETCURSOR     4     // Application has changed cursor shape
+#define XVT_ICM_ADDOBJECT     10    // A new graphical object has been added
+#define XVT_ICM_CLEAROBJECTS  11    // Graphical objects deleted
 #define XVT_ICM_BEGIN         50
 #define XVT_ICM_QUIT          100   // App requests message loop to quit
 

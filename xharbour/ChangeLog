@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2128 2004/01/22 23:24:44 walito Exp $
+ * $Id: ChangeLog,v 1.2129 2004/01/23 15:13:33 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-24 17:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapigt.h
+  * source/rtl/gtapi.c
+    + Added support for graphical objects under GT terminal:
+      hb_gtAddGobject( HB_GT_GOBJECT *gobject );
+      hb_gtDestroyGobject( HB_GT_GOBJECT *gobject );
+      hb_gtClearGobjects( void );
+      hb_gt_gcolorFromString( char *color_name );
+      hb_gtGobjectInside( HB_GT_GOBJECT *gobject,
+                        int x1, int y1, int x2, int y2 );
+
+  * source/rtl/gtxvt/gtxvt.c
+    + Added rendering of graphical objects.
+    % Greatly optimized color change for text data.
+
+  + source/rtl/Makefile
+  + source/rtl/gtgraph.c
+    + Added PRG level interface for graphical objects under GT
+      (functions like GTPoint(), GTLine() goes there; future functions as
+       GtSetForeground() should go there too).
+
+  + tests/gtgrap.prg
+    + Added a small test for gtgraph ability.
+
+
 2004-01-23 22:05 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/gtwvt/gtwvt.c
   * source/rdd/dbf1.c

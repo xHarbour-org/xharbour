@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.16 2004/01/18 10:12:42 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.17 2004/01/18 20:48:52 jonnymind Exp $
  */
 
 /*
@@ -69,6 +69,7 @@
 /* This definition has to be placed before #include "hbapigt.h" */
 
 #include "gtxvt.h"
+#include <X11/Xcms.h>
 #include <sys/mman.h>
 #include <sys/select.h>
 #include <sys/wait.h>
@@ -299,6 +300,10 @@ static void xvt_windowSetFont( PXWND_DEF wnd, XFontStruct * xfs );
 void xvt_windowUpdate( PXWND_DEF wnd, XSegment *rUpdate );
 static void xvt_windowRepaintColRow( PXWND_DEF wnd,
    int colStart, int rowStart, int colStop, int rowStop );
+
+static void xvt_windowRepaintGraphical( PXWND_DEF wnd,
+   int colStart, int rowStart, int colStop, int rowStop );
+
 static BOOL xvt_windowDrawText( PXWND_DEF wnd,  USHORT col, USHORT row, char * str, USHORT cbString );
 static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar );
 static void xvt_windowSetColors( PXWND_DEF wnd, BYTE attr );
@@ -340,6 +345,7 @@ static char *color_refs[] = {
    "rgb:FF/FF/FF"    /* white         */
 };
 
+static XColor s_xcolor[16];
 
 /************************ globals ********************************/
 static PXVT_BUFFER s_buffer = 0;
@@ -370,6 +376,8 @@ int s_countPoints[2];
 // we try to connect in initialization, so we can immediately
 // report a critical error
 Display *s_Xdisplay;
+
+static HB_GT_GOBJECT *s_gLastObj = NULL;
 
 /**********************************************************************
 *                                                                     *
@@ -414,6 +422,7 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
    int icol, irow, icount, istart=1;
    Display *dpy;
    PXWND_DEF wnd;
+   XColor dummy;
 
    // Pipe stream for update queue (app to wnd )
    pipe( streamUpdate );
@@ -443,6 +452,13 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
    XMapWindow( wnd->dpy, wnd->window );
    // ok, now we can inform the X manager about our new status:
    xvt_windowSetHints( wnd );
+
+   // create commonly used color items
+   for (irow = 0; irow < 16; irow ++ )
+   {
+      XAllocNamedColor( wnd->dpy, wnd->colors,
+              color_refs[irow], &dummy, &s_xcolor[ irow ] );
+   }
 
    // creates the sparse points
    // sparse points
@@ -612,6 +628,30 @@ static void xvt_bufferInvalidate( PXVT_BUFFER buf,
       USHORT appMsg;
 
       COMMIT_BUFFER( buf );
+      // new objects added?
+      if ( hb_gt_gobjects == NULL && s_gLastObj != NULL )
+      {
+         appMsg = XVT_ICM_CLEAROBJECTS;
+         write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+         s_gLastObj = NULL;
+      }
+      else {
+         HB_GT_GOBJECT *pObj = hb_gt_gobjects;
+         appMsg = XVT_ICM_ADDOBJECT;
+         while ( pObj != s_gLastObj )
+         {
+            write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+            write( streamUpdate[1], pObj, sizeof( HB_GT_GOBJECT ) );
+            if ( pObj->type == GTO_TEXT )
+            {
+               write( streamUpdate[1], pObj->data, pObj->data_len );
+            }
+
+            pObj = pObj->next;
+         }
+         s_gLastObj = hb_gt_gobjects;
+      }
+
       appMsg = XVT_ICM_UPDATE;
       write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
       write( streamUpdate[1], &buf->rInvalid, sizeof( XSegment ) );
@@ -963,6 +1003,82 @@ void xvt_windowUpdate( PXWND_DEF wnd, XSegment *rUpdate )
    write( streamFeedback[1], &appMsg, sizeof( appMsg ) );
 }
 
+/******** Draws the GT graphical objects **********/
+
+static void xvt_windowRepaintGraphical( PXWND_DEF wnd, int x1, int y1, int x2, int y2 )
+{
+   HB_GT_GOBJECT *pObj;
+   XColor color;
+
+   pObj = hb_gt_gobjects;
+
+   while ( pObj )
+   {
+      /* Check if pObj boundaries are inside the area to be updated */
+      if ( hb_gtGobjectInside( pObj, x1, y1, x2, y2 ) )
+      {
+         color.red = pObj->color.usRed <<8;
+         color.green = pObj->color.usGreen<<8;
+         color.blue = pObj->color.usBlue<<8;
+         color.flags = DoRed | DoGreen | DoBlue;
+         /* Ignore alpha for now */
+         XAllocColor( wnd->dpy, wnd->colors, &color );
+         XSetForeground( wnd->dpy, wnd->gc, color.pixel );
+         XFreeColors( wnd->dpy, wnd->colors, &(color.pixel), 1, 0 );
+
+         switch( pObj->type )
+         {
+            case GTO_POINT:
+               XDrawPoint( wnd->dpy, wnd->window, wnd->gc, pObj->x, pObj->y );
+            break;
+
+            case GTO_LINE:
+               /* For lines, width and height represent X2, Y2 */
+               XDrawLine( wnd->dpy, wnd->window, wnd->gc,
+                  pObj->x, pObj->y,
+                  pObj->width, pObj->height );
+            break;
+
+            case GTO_SQUARE:
+               /* For lines, width and height represent X2, Y2 */
+               XDrawRectangle( wnd->dpy, wnd->window, wnd->gc,
+                  pObj->x, pObj->y,
+                  pObj->width, pObj->height );
+            break;
+
+            case GTO_RECTANGLE:
+               /* For lines, width and height represent X2, Y2 */
+               XFillRectangle( wnd->dpy, wnd->window, wnd->gc,
+                  pObj->x, pObj->y,
+                  pObj->width, pObj->height );
+            break;
+
+
+            case GTO_CIRCLE:
+               XDrawArc( wnd->dpy, wnd->window, wnd->gc,
+                  pObj->x, pObj->y,
+                  pObj->width, pObj->height,
+                  0, 360*64);
+            break;
+
+            case GTO_DISK:
+               XFillArc( wnd->dpy, wnd->window, wnd->gc,
+                  pObj->x, pObj->y,
+                  pObj->width, pObj->height,
+                  0, 360*64);
+            break;
+
+            case GTO_TEXT:
+               XDrawString( wnd->dpy, wnd->window, wnd->gc,
+                  pObj->x, pObj->y,
+                  pObj->data, pObj->data_len );
+            break;
+         }
+      }
+
+      pObj = pObj->next;
+   }
+}
 
 /******** Draw a part (or all) of the window based on buffer content **********/
 static void xvt_windowRepaintColRow( PXWND_DEF wnd,
@@ -1057,6 +1173,15 @@ static void xvt_windowRepaintColRow( PXWND_DEF wnd,
                (char *) (buf->pBuffer+index), 1 );
       }
    }
+
+   // do the graphical updates
+   if ( hb_gt_gobjects != NULL )
+   {
+      xvt_windowRepaintGraphical( wnd,
+         colStart * wnd->fontWidth, rowStart * wnd->fontHeight,
+         colStop * wnd->fontWidth, rowStop * wnd->fontHeight );
+   }
+
 }
 
 /********************** Draw text into a window **************************/
@@ -1121,7 +1246,6 @@ static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar )
    /* Drawing a filler ? */
    if ( boxchar >= HB_GTXVT_FILLER1 )
    {
-      XColor color, dummy;
       int attr = wnd->buffer->pAttributes[ HB_GT_INDEXOF( wnd->buffer, col, row )  ];
       int fore = attr & 0x000F;
       int back = (attr & 0x00F0)>>4;
@@ -1132,15 +1256,13 @@ static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar )
 
       if ( boxchar != HB_GTXVT_FILLER3 )
       {
-         XAllocNamedColor( wnd->dpy, wnd->colors, color_refs[back], &color, &dummy );
-         XSetForeground( wnd->dpy, wnd->gc, color.pixel );
+         XSetForeground( wnd->dpy, wnd->gc, s_xcolor[back].pixel );
 
          // erase background!
          XFillRectangle( wnd->dpy, wnd->window, wnd->gc,
             basex, basey, cellx, celly );
 
-         XAllocNamedColor( wnd->dpy, wnd->colors, color_refs[fore], &color, &dummy );
-         XSetForeground( wnd->dpy, wnd->gc, color.pixel );
+         XSetForeground( wnd->dpy, wnd->gc, s_xcolor[fore].pixel );
 
          // draw in foreground!
          XDrawPoints( wnd->dpy, wnd->window, wnd->gc,
@@ -1153,16 +1275,14 @@ static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar )
          XFillRectangle( wnd->dpy, wnd->window, wnd->gc,
             basex, basey, cellx, celly );
 
-         XAllocNamedColor( wnd->dpy, wnd->colors, color_refs[back], &color, &dummy );
-         XSetForeground( wnd->dpy, wnd->gc, color.pixel );
+         XSetForeground( wnd->dpy, wnd->gc, s_xcolor[back].pixel );
 
          // draw in background!
          XDrawPoints( wnd->dpy, wnd->window, wnd->gc,
                pts, icount, CoordModePrevious );
 
          // reset foreground
-         XAllocNamedColor( wnd->dpy, wnd->colors, color_refs[fore], &color, &dummy );
-         XSetForeground( wnd->dpy, wnd->gc, color.pixel );
+         XSetForeground( wnd->dpy, wnd->gc, s_xcolor[fore].pixel );
       }
 
       // done here
@@ -1999,15 +2119,11 @@ static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar )
 
 static void xvt_windowSetColors( PXWND_DEF wnd, BYTE attr )
 {
-   XColor color, dummy;
    int fore = attr & 0x000F;
    int back = (attr & 0x00F0)>>4;
 
-   XAllocNamedColor( wnd->dpy, wnd->colors, color_refs[fore], &color, &dummy );
-   XSetForeground( wnd->dpy, wnd->gc, color.pixel );
-
-   XAllocNamedColor( wnd->dpy, wnd->colors, color_refs[back], &color, &dummy );
-   XSetBackground( wnd->dpy, wnd->gc, color.pixel );
+   XSetForeground( wnd->dpy, wnd->gc, s_xcolor[fore].pixel );
+   XSetBackground( wnd->dpy, wnd->gc, s_xcolor[back].pixel );
 }
 
 /**********************************************************************
@@ -2426,6 +2542,7 @@ static void xvt_processMessages( PXWND_DEF wnd )
    XEvent evt;
    fd_set updateSet;
    struct timeval timeout;
+   HB_GT_GOBJECT *pgObj;
    //struct timespec ts;
    BOOL bLoop = TRUE, bUpdate;
    XSegment rUpdate = {32000,32000,-1,-1};
@@ -2490,6 +2607,22 @@ static void xvt_processMessages( PXWND_DEF wnd )
 
             case XVT_ICM_SETCURSOR:
                xvt_windowSetCursor( wnd );
+            break;
+
+            case XVT_ICM_CLEAROBJECTS:
+               hb_gtClearGobjects();
+            break;
+
+            case XVT_ICM_ADDOBJECT:
+               pgObj = hb_xgrab( sizeof( HB_GT_GOBJECT ) );
+               read( streamUpdate[0], pgObj, sizeof( HB_GT_GOBJECT ) );
+               if ( pgObj->type == GTO_TEXT )
+               {
+                  pgObj->data = hb_xgrab( pgObj->data_len+1 );
+                  read( streamUpdate[0], pgObj->data, pgObj->data_len );
+                  pgObj->data[ pgObj->data_len ] = 0;
+               }
+               hb_gtAddGobject( pgObj );
             break;
 
             case XVT_ICM_QUIT:

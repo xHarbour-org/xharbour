@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.44 2003/12/19 01:32:39 fsgiudice Exp $
+# $Id: Makefile,v 1.45 2003/12/19 02:09:14 maurifull Exp $
 #
 
 ROOT = ../../
@@ -44,6 +44,7 @@ C_SOURCES=\
         gete.c       \
         gt.c         \
         gtapi.c      \
+        gtgraph.c    \
         gtapiu.c     \
         gx.c         \
         hardcr.c     \

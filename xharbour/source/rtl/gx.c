@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.2 2004/01/14 23:02:05 jonnymind Exp $
+ * $Id: gx.c,v 1.3 2004/01/18 20:48:52 jonnymind Exp $
  */
 
 /*
@@ -143,3 +143,4 @@ HB_FUNC( SETGTRESIZEEVENT )
       hb_gtSetResizeEvent( hb_itemGetNL( pEvent ) );
    }
 }
+

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.21 2004/01/18 20:48:52 jonnymind Exp $
+ * $Id: hbapigt.h,v 1.22 2004/01/21 22:51:35 maurifull Exp $
  */
 
 /*
@@ -154,6 +154,59 @@ typedef enum
    SC_SPECIAL1          = 3,    /* Full block */
    SC_SPECIAL2          = 4     /* Upper half block */
 } HB_cursor_enum;
+
+
+typedef struct _tag_HB_GT_GCOLOR
+{
+   USHORT usAlpha;
+   USHORT usRed;
+   USHORT usGreen;
+   USHORT usBlue;
+} HB_GT_GCOLOR;
+
+typedef struct _tag_HB_GT_COLDEF
+{
+   char *name;
+   HB_GT_GCOLOR color;
+} HB_GT_COLDEF;
+
+/* GT Graphical object system */
+typedef struct _tag_gt_gobject
+{
+   int type;
+   struct _tag_gt_gobject *next;
+   HB_GT_GCOLOR color;
+   int x;
+   int y;
+   /* Note: this data should be added on an "eredity" cast, but as many compilers
+   we support handle this differently, we just add here all the needed data.
+   Objects may ignore or use this fields for other things, i.e. strings will store
+   options in "width".
+   */
+   int width;
+   int height;
+   char *data;
+   USHORT data_len;
+} HB_GT_GOBJECT;
+
+typedef enum
+{
+   GTO_POINT      = 0,
+   GTO_LINE       = 1,
+   GTO_SQUARE     = 3,
+   GTO_RECTANGLE  = 4,
+   GTO_CIRCLE     = 5,
+   GTO_DISK       = 7,
+   /* TODO: add other types */
+   GTO_TEXT       = 100,
+} HB_gt_object_enum;
+
+/* This pointers holds the list of items that the GT module should draw */
+extern HB_GT_GOBJECT *hb_gt_gobjects;
+
+/* This is the list of colors */
+#define HB_GT_COLDEF_COUNT 16
+extern HB_GT_COLDEF hb_gt_gcoldefs[ HB_GT_COLDEF_COUNT ];
 
 /* Public interface. These should never change, only be added to. */
 
@@ -553,6 +606,14 @@ extern void   hb_setkeyExit( void );
 /* Private interface listed below. these are common to all platforms */
 
 /* none as of yet */
+
+/* Support for HB_GT_GOBJECT system */
+extern void HB_EXPORT hb_gtAddGobject( HB_GT_GOBJECT *gobject );
+extern void HB_EXPORT hb_gtDestroyGobject( HB_GT_GOBJECT *gobject );
+extern void HB_EXPORT hb_gtClearGobjects( void );
+extern HB_GT_COLDEF * HB_EXPORT hb_gt_gcolorFromString( char *color_name );
+extern BOOL HB_EXPORT hb_gtGobjectInside( HB_GT_GOBJECT *gobject,
+                        int x1, int y1, int x2, int y2 );
 
 /* JC1: Supporting Screen Output lock also from other modules */
 #ifdef HB_THREAD_SUPPORT

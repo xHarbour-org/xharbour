@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.15 2004/01/14 23:02:05 jonnymind Exp $
+ * $Id: gtapi.c,v 1.16 2004/01/18 20:48:52 jonnymind Exp $
  */
 
 /*
@@ -105,6 +105,31 @@ static int s_resizeEvent = 0;
 static BOOL s_closing = FALSE;
 static PHB_ITEM s_pOnClose = 0;
 
+/* GT graphic susbsystem */
+HB_GT_GOBJECT *hb_gt_gobjects;
+HB_GT_COLDEF hb_gt_gcoldefs[ HB_GT_COLDEF_COUNT ] =
+{
+   { "N",  { 0xFF, 0x00, 0x00, 0x00 } },
+   { "B",  { 0xFF, 0x00, 0x00, 0xAA } },
+   { "G",  { 0xFF, 0x00, 0xAA, 0x00 } },
+   { "BG", { 0xFF, 0x00, 0xAA, 0xAA } },
+   { "R",  { 0xFF, 0xAA, 0x00, 0x00 } },
+   { "RB", { 0xFF, 0xAA, 0x00, 0xAA } },
+   { "GR", { 0xFF, 0xAA, 0x55, 0x00 } },
+   { "W",  { 0xFF, 0xAA, 0xAA, 0xAA } },
+   { "N+", { 0xFF, 0x55, 0x55, 0x55 } },
+   { "B+", { 0xFF, 0x55, 0x55, 0xFF } },
+   { "G+", { 0xFF, 0x55, 0xFF, 0x55 } },
+   { "BG+",{ 0xFF, 0x55, 0xFF, 0xFF } },
+   { "R+", { 0xFF, 0xFF, 0x55, 0x55 } },
+   { "RB+",{ 0xFF, 0xFF, 0x55, 0xFF } },
+   { "GR+",{ 0xFF, 0xFF, 0xFF, 0x55 } },
+   { "W+", { 0xFF, 0xFF, 0xFF, 0xFF } }
+};
+
+HB_GT_GCOLOR hb_gtGForeground;
+HB_GT_GCOLOR hb_gtGBackground;
+
 // to spare time, I call this HB_FUN directly.
 extern void HB_EXPORT HB_FUN_HB_EXECFROMARRAY();
 
@@ -129,6 +154,8 @@ extern void HB_EXPORT HB_FUN_HB_EXECFROMARRAY();
 void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtInit()"));
+
+   hb_gt_gobjects = NULL;
 
    s_pColor = ( int * ) hb_xgrab( ( HB_CLR_MAX_ + 1 ) * sizeof( int ) );
    s_uiColorCount = HB_CLR_MAX_ + 1;
@@ -180,6 +207,8 @@ void hb_gtExit( void )
 
       hb_xfree( s_pColor );
    }
+
+   hb_gtClearGobjects();
 }
 
 int HB_EXPORT hb_gtExtendedKeySupport()
@@ -1068,6 +1097,8 @@ USHORT HB_EXPORT hb_gtScroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHO
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtScroll(%hu, %hu, %hu, %hu, %hd, %hd)", uiTop, uiLeft, uiBottom, uiRight, iRows, iCols));
 
+   hb_gtClearGobjects();
+
    hb_gt_Scroll( uiTop, uiLeft, uiBottom, uiRight, ( BYTE ) s_pColor[ s_uiColorIndex ], iRows, iCols );
 
    return 0;
@@ -1300,4 +1331,89 @@ void HB_EXPORT hb_gtHandleResize( void )
    {
       hb_inkeyPut( s_resizeEvent );
    }
+}
+
+/******************************************************************/
+void HB_EXPORT hb_gtAddGobject( HB_GT_GOBJECT *gobject )
+{
+   gobject->next = hb_gt_gobjects;
+   hb_gt_gobjects = gobject;
+}
+
+/* WARNING: This functions does NOT unlinks the object, it just free the memory
+   it has allocated */
+void HB_EXPORT hb_gtDestroyGobject( HB_GT_GOBJECT *gobject )
+{
+   switch( gobject->type )
+   {
+      case GTO_TEXT: hb_xfree( gobject->data ); break;
+      /* Other special deletion may go here. */
+   }
+
+   hb_xfree( gobject );
+}
+
+void HB_EXPORT hb_gtClearGobjects( void )
+{
+   HB_GT_GOBJECT *p, *pnext;
+
+   p = hb_gt_gobjects;
+
+   while ( p )
+   {
+      pnext = p->next;
+      hb_gtDestroyGobject( p );
+      p = pnext;
+   }
+
+   hb_gt_gobjects = NULL;
+}
+
+HB_GT_COLDEF* HB_EXPORT hb_gt_gcolorFromString( char *color_name )
+{
+   int i;
+
+   for ( i = 0; i < HB_GT_COLDEF_COUNT; i ++ )
+   {
+      if ( hb_stricmp( color_name, hb_gt_gcoldefs[ i ].name ) == 0 )
+      {
+         return &(hb_gt_gcoldefs[0]) + i;
+      }
+   }
+
+   return NULL;
+}
+
+BOOL HB_EXPORT hb_gtGobjectInside( HB_GT_GOBJECT *gobject,
+   int x1, int y1, int x2, int y2 )
+{
+   int xx2, yy2;
+
+   if( gobject->x >= x1 && gobject->x <= x2 &&
+      gobject->y >= y1 && gobject->y <= y2 )
+   {
+      return TRUE;
+   }
+
+   /* using width/height? */
+   if ( gobject->type == GTO_LINE && // line has width == x2
+      (gobject->width >= x1 && gobject->width <= x2 &&
+      gobject->height >= y1 && gobject->height <= y2 )
+      )
+   {
+      return TRUE;
+   }
+
+   /* using width/height? */
+   if ( gobject->type != GTO_POINT && gobject->type != GTO_TEXT )
+   {
+      xx2 = gobject->x + gobject->width;
+      yy2 = gobject->y + gobject->height;
+      if ( xx2 >= x1 && xx2 <= x2 && yy2 >= y1 && yy2 <= y2 )
+      {
+         return TRUE;
+      }
+   }
+
+   return FALSE;
 }
