@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.960 2003/04/17 09:27:46 paultucker Exp $
+ * $Id: ChangeLog,v 1.961 2003/04/17 21:22:06 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -22,6 +22,10 @@
     % TRpcServer:Add() can accept now a TRpcFunction parameter or
       a parameter list from which a new TRpcFunction is built
 
+  + include/hbrpc.ch
+    + Added commonly used constats for more ergonomic programming
+      of RPC
+      
   * tests/rpcclient.prg
   * tests/rpcclientst.prg
   * tests/rpcserver.prg
