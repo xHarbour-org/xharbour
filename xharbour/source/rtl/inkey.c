@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.35 2004/04/30 19:42:23 druzus Exp $
+ * $Id: inkey.c,v 1.36 2004/05/06 23:42:29 peterrees Exp $
  */
 
 /*
@@ -457,57 +457,53 @@ HB_FUNC( __KEYBOARD )
    {
       ULONG size = hb_parclen( 1 );
 
+      /* It might be just a request to clear the buffer */
       if( size != 0 )
       {
          BYTE * fPtr = ( BYTE * ) hb_parcx( 1 );
+         BYTE * pString     = ( BYTE * ) hb_xgrab( size + 1 );
+         PHB_inkeyKB pInkey = ( PHB_inkeyKB ) hb_xgrab( sizeof( HB_inkeyKB ) );
+         PHB_inkeyKB pRoot;
 
-         /* It might be just a request to clear the buffer */
-         /* bdj: comment out 'if', it disables __keyboard(chr(0)) */
-         // if( *fPtr )
+         pString[ size ] = 0;
+         pInkey->Pos    = size - 1;
+
+         while( size-- )
          {
-            BYTE * pString     = ( BYTE * ) hb_xgrab( size + 1 );
-            PHB_inkeyKB pInkey = ( PHB_inkeyKB ) hb_xgrab( sizeof( HB_inkeyKB ) );
-            PHB_inkeyKB pRoot;
-
-            pString[ size ] = 0;
-            pInkey->Pos    = size - 1;
-
-            while( size-- )
+            if( * fPtr == 59 )
             {
-               if( * fPtr == 59 )
-               {
-                  pString[ size ] = 13; /* Convert ";" to CR, like Clipper does */
-               }
-               else
-               {
-                  pString[ size ] = * fPtr;
-               }
-
-               fPtr++;
-            }
-
-            pInkey->String = pString;
-            pInkey->pNext  = NULL;
-
-            // printf( "pInkey->Pos = %i, pInkey->String = %s", pInkey->Pos, pInkey->String );
-
-            if( s_inkeyKB )
-            {
-               pRoot = s_inkeyKB;
-
-               while( pRoot->pNext )
-               {
-                  pRoot = pRoot->pNext;
-               }
-
-               pRoot->pNext = pInkey;
+               pString[ size ] = 13; /* Convert ";" to CR, like Clipper does */
             }
             else
             {
-               s_inkeyKB = pInkey;
+               pString[ size ] = * fPtr;
             }
 
-            hb_inkeyPut( -99 );
+            fPtr++;
+         }
+
+         pInkey->String = pString;
+         pInkey->pNext  = NULL;
+
+         // printf( "pInkey->Pos = %i, pInkey->String = %s", pInkey->Pos, pInkey->String );
+
+         if( s_inkeyKB )
+         {
+            pRoot = s_inkeyKB;
+
+            while( pRoot->pNext )
+            {
+               pRoot = pRoot->pNext;
+            }
+
+            pRoot->pNext = pInkey;
+         }
+         else
+         {
+            s_inkeyKB = pInkey;
+         }
+
+         hb_inkeyPut( -99 );
 
             /*
             // Stuff the string
@@ -536,7 +532,6 @@ HB_FUNC( __KEYBOARD )
                hb_inkeyPut( ch );
             }
             */
-         }
       }
    }
 #if defined( HB_EXTENSION )

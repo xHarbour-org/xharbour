@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2887 2004/05/07 16:31:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2888 2004/05/07 17:36:54 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-08 01:40 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/debug/debugger.prg
+    ! Save LastKey() value on activation of debugger and restore it when
+      running the application.
+  * source/rtl/inkey.c
+    * A little code cleanup in __KEYBOARD().
 
 2004-05-07 19:30 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rtl/gtwin/gtwin.c
