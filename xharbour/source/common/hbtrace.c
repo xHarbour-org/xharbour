@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.c,v 1.4 2003/02/19 16:43:39 iananderson Exp $
+ * $Id: hbtrace.c,v 1.5 2003/06/05 04:55:29 brianhays Exp $
  */
 
 /*
@@ -86,20 +86,16 @@ int hb_tracestate( int new_state )
    if( new_state == 0 ||
        new_state == 1 )
       s_enabled = new_state;
-//TraceLog( NULL, "tracestate called %d   %d\n", s_enabled, hb_tr_level_);
    return old_state;
 }
 
 int hb_tracelevel( int new_level )
 {
-   //int old_level = s_level;
    int old_level = hb_tr_level_;
 
    if( new_level >= HB_TR_ALWAYS &&
        new_level <  HB_TR_LAST )
       hb_tr_level_ = new_level;
-      //s_level = new_level;
-//TraceLog( NULL, "hb_tracelevel called %d\n", hb_tr_level_);
 
    return old_level;
 }
@@ -107,7 +103,6 @@ int hb_tracelevel( int new_level )
 int hb_tr_level( void )
 {
    static int s_level = -1;
-//TraceLog( NULL, "hb_tr_level called %d\n", hb_tr_level_);
 
    if( s_level == -1 )
    {
@@ -173,7 +168,6 @@ void hb_tr_trace( char * fmt, ... )
    /*
     * If tracing is disabled, do nothing.
     */
-//TraceLog( NULL, "hb_tr_trace called %d  %d\n", s_enabled, hb_tr_level_);
    if( s_enabled )
    {
       int i;
@@ -188,7 +182,6 @@ void hb_tr_trace( char * fmt, ... )
        *
        *   foo/bar/baz.c
        */
-//TraceLog( NULL, "hb_tr_trace  %s  \n", hb_tr_file_);
       for( i = 0; hb_tr_file_[ i ] != '\0'; ++i )
       {
          if( hb_tr_file_[ i ] != '.' &&
@@ -200,7 +193,6 @@ void hb_tr_trace( char * fmt, ... )
       /*
        * Print file and line.
        */
-//TraceLog( NULL, "hb_tr_trace fprintf %s  \n", hb_tr_file_);
       fprintf( s_fp, "%s:%d: %s ",
                hb_tr_file_ + i, hb_tr_line_, s_slevel[ hb_tr_level_ ] );
 

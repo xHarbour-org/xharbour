@@ -1,5 +1,5 @@
 /*
- * $Id: memoline.c,v 1.4 2003/05/26 18:09:43 mlombardo Exp $
+ * $Id: memoline.c,v 1.5 2003/06/05 04:55:29 brianhays Exp $
  */
 
 /*
@@ -100,7 +100,8 @@ HB_FUNC( MEMOLINE )
                ulLineEnd   = 0;
             }else
             {
-               bEmptyLine = (ulLineEnd == ulLineBegin);
+               /* True if EOL/CRLF is at front of line. Leading spaces are handled OK without this special flag */
+               bEmptyLine = ( ulPos <= ulLineBegin + OS_EOL_LEN -1);
             }
             break;
 
