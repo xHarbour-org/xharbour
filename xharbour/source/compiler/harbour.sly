@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.53 2003/10/10 04:19:49 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.54 2003/10/20 18:44:41 ronpinkas Exp $
  */
 
 /*
@@ -2552,6 +2552,14 @@ CatchError   : CATCH IdentName
                   hb_compLinePush();
                   hb_compGenPCode1( HB_P_SEQRECOVER );
                   hb_compGenPopVar( $2 );
+               }
+             | CATCH
+               {
+                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
+                  --hb_comp_wSeqCounter;
+                  hb_compLinePush();
+                  hb_compGenPCode2( HB_P_SEQRECOVER, HB_P_POP, ( BOOL ) 0 );
                }
              ;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1639 2003/10/31 04:28:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1640 2003/10/31 12:28:58 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,40 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-31 22:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + Added support for CATCH without a Catcher variable.
+      TRY
+         ...
+      CATCH
+         ...
+      END
+
+  * source/macro/macro.slx
+    ! Fixed GPF trap when 2 IDENTIFIER tokens in sequence (syntax error).
+
+  * source/pp/ppcore.c
+    + Added: ULONG HB_EXPORT hb_strAtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
+    * Modified ConvertPatterns() to use hb_strAtSkipStrings() instead of hb_strAt() to avoid text of literal strings.
+    ! Minor fix to RemoveSlash() when a '\' is being removed and bDirective == FALSE to avoid skipping the next charcter.
+    * Spell corrected "Unclosed repeatable group '[%s'".
+
+  * source/rtl/win32ole.prg
+    ! Added missing INIT qualifier in 'PROCEDURE Initialize_Ole'.
+    + Added logic to raise error in METHOD New(), and METHOD GetActiveObject() on failure to retrive an OLE Object.
+
+  * tests/testole.prg
+    * Modified to use TRY CATCH blocks instead of Ole2TxtError() to catch new error conditions.
+
+  * tests/rp_run.ch
+    + Added #command FIELDS ...
+
+  * tests/pp.prg
+    * Minor fixes.
+    * Refreshed built-in rules from rp_run.ch
+    + Added ability to override built-in rules for Interpreter with rp_run.ch.
 
 2003-10-31 10:30 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * contrib/rdd_ads/ace.h

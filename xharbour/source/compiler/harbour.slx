@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.39 2003/10/22 18:32:57 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.40 2003/10/27 21:23:36 ronpinkas Exp $
  */
 
 /*
@@ -161,7 +161,7 @@ SELF_CONTAINED_WORDS_ARE {
 
 /* KEYWORDS are grouped based on the next token they require. */
 #define WANTS_VAR        703 /* Wants Variable (including Macros): DO, FOR, PRIVATE, PUBLIC */
-#define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, CATCH, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, PARAMETERS, PROCEDURE, ENUM, STATIC */
+#define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, PARAMETERS, PROCEDURE, ENUM, STATIC */
 #define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER TRY*/
 #define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, IN, RETURN, WHILE, WITHOBJ SWITCH */
 #define REJECT_OP        707
@@ -222,7 +222,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "BEGIN{WS}SEQUENCE"               ) AS_TOKEN( BEGINSEQ         ),
                          LEX_WORD( "BREAK"                           ) AS_TOKEN( HB_WANTS_EXP - BREAK            ),
                          LEX_WORD( "CASE"                            ) AS_TOKEN( HB_WANTS_EXP - CASE             ),
-                         LEX_WORD( "CATCH"                           ) AS_TOKEN( HB_WANTS_ID  - CATCH            ),
+                         LEX_WORD( "CATCH"                           ) AS_TOKEN( CATCH            ),
                          LEX_WORD( "CRITICAL{WS}FUNCTION"            ) AS_TOKEN( HB_CRITICAL_FUNC ),
                          LEX_WORD( "CRITICAL{WS}PROCEDURE"           ) AS_TOKEN( HB_CRITICAL_PROC ),
                          LEX_WORD( "CRITICAL{WS}STATIC{WS}FUNCTION"  ) AS_TOKEN( HB_CRITICAL_STATIC_FUNC ),
@@ -355,6 +355,10 @@ LANGUAGE_RULES_ARE {
                     /* Wants Identifier. */
                     IF_SEQUENCE_IS( WANTS_ID       , IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( WANTS_ID       , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
+
+                    IF_SEQUENCE_IS( CATCH          , IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( CATCH          , '\n'        , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( CATCH          , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
 
                     /* Wants EOL */
                     IF_SEQUENCE_IS( WANTS_EOL      , '\n'        , 0      , 0          ) PASS_THROUGH(),

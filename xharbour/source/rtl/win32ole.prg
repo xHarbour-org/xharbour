@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.28 2003/06/26 01:29:15 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.29 2003/09/02 05:41:14 ronpinkas Exp $
  */
 
 /*
@@ -162,7 +162,7 @@ RETURN TOleAuto():GetActiveObject( cString )
 
 //----------------------------------------------------------------------------//
 
-PROCEDURE Initialize_Ole
+INIT PROCEDURE Initialize_Ole
    IF ! bOleInitialized
       bOleInitialized := .T.
       Ole_Initialize()
@@ -197,8 +197,43 @@ ENDCLASS
 
 METHOD New( uObj, cClass ) CLASS TOleAuto
 
+   LOCAL oErr
+
    IF ValType( uObj ) = 'C'
       ::hObj := CreateOleObject( uObj )
+
+      IF OleError() != 0
+         IF ::bShowException .AND. Ole2TxtError() == "DISP_E_EXCEPTION"
+            oErr := ErrorNew()
+            oErr:Args          := { uObj }
+            oErr:CanDefault    := .F.
+            oErr:CanRetry      := .F.
+            oErr:CanSubstitute := .T.
+            oErr:Description   := OLEExceptionDescription()
+            oErr:GenCode       := EG_OLEEXECPTION
+            oErr:Operation     := ProcName()
+            oErr:Severity      := ES_ERROR
+            oErr:SubCode       := -1
+            oErr:SubSystem     := OLEExceptionSource()
+
+            RETURN Eval( ErrorBlock(), oErr )
+         ELSE
+            oErr := ErrorNew()
+            oErr:Args          := { uObj }
+            oErr:CanDefault    := .F.
+            oErr:CanRetry      := .F.
+            oErr:CanSubstitute := .T.
+            oErr:Description   := Ole2TxtError()
+            oErr:GenCode       := EG_OLEEXECPTION
+            oErr:Operation     := ProcName()
+            oErr:Severity      := ES_ERROR
+            oErr:SubCode       := -1
+            oErr:SubSystem     := "TOleAuto"
+
+            RETURN Eval( ErrorBlock(), oErr )
+         ENDIF
+      ENDIF
+
       ::cClassName := uObj
    ELSEIF ValType( uObj ) = 'N'
       ::hObj := uObj
@@ -218,8 +253,43 @@ RETURN Self
 
 METHOD GetActiveObject( cClass ) CLASS TOleAuto
 
+   LOCAL oErr
+
    IF ValType( cClass ) = 'C'
       ::hObj := GetOleObject( cClass )
+
+      IF OleError() != 0
+         IF ::bShowException .AND. Ole2TxtError() == "DISP_E_EXCEPTION"
+            oErr := ErrorNew()
+            oErr:Args          := { cClass }
+            oErr:CanDefault    := .F.
+            oErr:CanRetry      := .F.
+            oErr:CanSubstitute := .T.
+            oErr:Description   := OLEExceptionDescription()
+            oErr:GenCode       := EG_OLEEXECPTION
+            oErr:Operation     := ProcName()
+            oErr:Severity      := ES_ERROR
+            oErr:SubCode       := -1
+            oErr:SubSystem     := OLEExceptionSource()
+
+            RETURN Eval( ErrorBlock(), oErr )
+         ELSE
+            oErr := ErrorNew()
+            oErr:Args          := { cClass }
+            oErr:CanDefault    := .F.
+            oErr:CanRetry      := .F.
+            oErr:CanSubstitute := .T.
+            oErr:Description   := Ole2TxtError()
+            oErr:GenCode       := EG_OLEEXECPTION
+            oErr:Operation     := ProcName()
+            oErr:Severity      := ES_ERROR
+            oErr:SubCode       := -1
+            oErr:SubSystem     := "TOleAuto"
+
+            RETURN Eval( ErrorBlock(), oErr )
+         ENDIF
+      ENDIF
+
       ::cClassName := cClass
    ELSE
       MessageBox( 0, "Invalid parameter type to constructor TOleAuto():GetActiveObject()!", "OLE Interface", 0 )
@@ -1207,43 +1277,42 @@ RETURN uObj
      LPIID riid = (LPIID) &IID_IDispatch;
      IDispatch * pDisp = NULL;
 
-     s_nOleError = S_OK;
+     wCLSID = AnsiToWide( hb_parc( 1 ) );
 
-     if ( ( s_nOleError == S_OK ) || ( s_nOleError == (HRESULT) S_FALSE) )
+     if ( hb_parc( 1 )[ 0 ] == '{' )
      {
-        wCLSID = AnsiToWide( hb_parc( 1 ) );
+        s_nOleError = CLSIDFromString( wCLSID, (LPCLSID) &ClassID );
+     }
+     else
+     {
+        s_nOleError = CLSIDFromProgID( wCLSID, (LPCLSID) &ClassID );
+     }
 
-        if ( hb_parc( 1 )[ 0 ] == '{' )
+     hb_xfree( wCLSID );
+
+     TraceLog( NULL, "Result: %i\n", s_nOleError );
+
+     if ( hb_pcount() == 2 )
+     {
+        if ( hb_parc( 2 )[ 0 ] == '{' )
         {
-           s_nOleError = CLSIDFromString( wCLSID, (LPCLSID) &ClassID );
+           wCLSID = AnsiToWide( hb_parc( 2 ) );
+           s_nOleError = CLSIDFromString( wCLSID, &iid );
+           hb_xfree( wCLSID );
         }
         else
         {
-           s_nOleError = CLSIDFromProgID( wCLSID, (LPCLSID) &ClassID );
+           memcpy( ( LPVOID ) &iid, hb_parc( 2 ), sizeof( iid ) );
         }
 
-        hb_xfree( wCLSID );
+        riid = &iid;
+     }
 
-        if ( hb_pcount() == 2 )
-        {
-           if ( hb_parc( 2 )[ 0 ] == '{' )
-           {
-              wCLSID = AnsiToWide( hb_parc( 2 ) );
-              s_nOleError = CLSIDFromString( wCLSID, &iid );
-              hb_xfree( wCLSID );
-           }
-           else
-           {
-              memcpy( ( LPVOID ) &iid, hb_parc( 2 ), sizeof( iid ) );
-           }
-
-           riid = &iid;
-        }
-
-        if ( s_nOleError == S_OK )
-        {
-           s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, riid, (void **) &pDisp );
-        }
+     if ( s_nOleError == S_OK )
+     {
+        TraceLog( NULL, "Class: %i\n", ClassID );
+        s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, riid, (void **) &pDisp );
+        TraceLog( NULL, "Result: %i\n", s_nOleError );
      }
 
      hb_retnl( ( LONG ) pDisp );
@@ -1691,7 +1760,7 @@ RETURN uObj
 
   HB_FUNC( OLE2TXTERROR )
   {
-     switch ( (LONG) s_nOleError)
+     switch( (LONG) s_nOleError )
      {
         case S_OK:
            hb_retc( "S_OK" );
@@ -1774,6 +1843,7 @@ RETURN uObj
            break;
 
         default:
+           TraceLog( NULL, "TOleAuto Error %p\n", s_nOleError );
            hb_retc( "Unknown error" );
            break;
      };

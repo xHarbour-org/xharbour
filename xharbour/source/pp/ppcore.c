@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.90 2003/10/28 08:23:44 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.91 2003/10/31 04:28:13 ronpinkas Exp $
  */
 
 /*
@@ -255,7 +255,7 @@ char * hb_pp_szWarnings[] =
 {
    "1Redefinition or duplicate definition of #define %s",
    "1No directives in command definitions file",
-   "1No markers in repeatble group [%s] - group will never be used."
+   "1No markers in repeatable group [%s] - group will never be used."
 };
 
 void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
@@ -1314,10 +1314,70 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
   }
 }
 
+ULONG HB_EXPORT hb_strAtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_strAtSkipStrings(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen));
+
+   if( ulSubLen > 0 && ulLen >= ulSubLen )
+   {
+      ULONG ulPos = 0;
+      ULONG ulSubPos = 0;
+
+      while( ulPos < ulLen && ulSubPos < ulSubLen )
+      {
+         if( szText[ ulPos ] == '"' )
+         {
+            while( ++ulPos < ulLen && szText[ ulPos ] != '"' )
+            {
+               // Skip.
+            }
+
+            ulPos++;
+            ulSubPos = 0;
+            continue;
+         }
+
+         if( szText[ ulPos ] == '\'' )
+         {
+            while( ++ulPos < ulLen && szText[ ulPos ] != '\'' )
+            {
+               // Skip.
+            }
+
+            ulPos++;
+            ulSubPos = 0;
+            continue;
+         }
+
+         if( szText[ ulPos ] == szSub[ ulSubPos ] )
+         {
+            ulSubPos++;
+            ulPos++;
+         }
+         else if( ulSubPos )
+         {
+            /* Go back to the first character after the first match,
+               or else tests like "22345" $ "012223456789" will fail. */
+            ulPos -= ( ulSubPos - 1 );
+            ulSubPos = 0;
+         }
+         else
+         {
+            ulPos++;
+         }
+      }
+
+      return ( ulSubPos < ulSubLen ) ? 0 : ( ulPos - ulSubLen + 1 );
+   }
+   else
+   {
+      return 0;
+   }
+}
+
 /* ConvertPatterns()
  * Converts result pattern in #command and #translate to inner format
  */
-
 static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 {
   int i = 0, ipos, ifou;
@@ -1498,7 +1558,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
         /* Look for appropriate result markers */
         ptr = rpatt;
 
-        while( ( ifou = hb_strAt( exppatt, explen, ptr, rlen - ( ptr - rpatt ) ) ) > 0 )
+        while( ( ifou = hb_strAtSkipStrings( exppatt, explen, ptr, rlen - ( ptr - rpatt ) ) ) > 0 )
         {
            /* Convert result marker into inner format */
            ifou --;
@@ -2539,6 +2599,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
   //printf( "%s\n", ptro );
   strotrim( ptro, ptro[0] == '#' ); // Removing excess spaces.
+  //printf( "%s\n", ptro );
   *lenres = RemoveSlash( ptro, TRUE );   /* Removing '\', '[' and ']' from result string */
   //printf( "%s\n", ptro );
 
@@ -2564,19 +2625,43 @@ static int RemoveSlash( char * stroka, BOOL bRemoveBrackets )
 
   while( *ptr != '\0' )
   {
+     //printf( "State %i, Char %c\n", State, *ptr );
+
      switch( State )
      {
         case STATE_INIT:
-          if( *ptr != ' ' && *ptr != '\t' ) State = STATE_NORMAL;
-          if( *ptr == '#' )  bDirective = TRUE;
+          if( *ptr != ' ' && *ptr != '\t' )
+          {
+             State = STATE_NORMAL;
+          }
+
+          if( *ptr == '#' )
+          {
+             bDirective = TRUE;
+          }
+
+          // Fall through.
 
         case STATE_NORMAL:
-          if( *ptr == '\'' )  State = STATE_QUOTE1;
-          else if( *ptr == '\"' ) State = STATE_QUOTE2;
+          if( *ptr == '\'' )
+          {
+             State = STATE_QUOTE1;
+          }
+          else if( *ptr == '\"' )
+          {
+             State = STATE_QUOTE2;
+          }
           /** Added by Giancarlo Niccolai 2003-06-20 */
-          else if( IS_ESC_STRING( *ptr ) ) { State = STATE_QUOTE4; ptr++; }
+          else if( IS_ESC_STRING( *ptr ) )
+          {
+             State = STATE_QUOTE4;
+             ptr++;
+          }
           /* End */
-          else if( *ptr == '[' && ( bDirective || ( ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) ) ) )  State = STATE_QUOTE3;
+          else if( *ptr == '[' && ( bDirective || ( ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) ) ) )
+          {
+             State = STATE_QUOTE3;
+          }
           else if( *ptr == ';' )
           {
             State = STATE_INIT;
@@ -2593,6 +2678,11 @@ static int RemoveSlash( char * stroka, BOOL bRemoveBrackets )
              {
                 hb_pp_Stuff( "", ptr, 0, 1, lenres - (ptr - stroka) );
                 lenres--;
+
+                if( ! bDirective )
+                {
+                   continue;
+                }
              }
              else if( *ptr == '\16' && bRemoveBrackets && ( pClose = strchr( ptr, '\17' ) ) != NULL )
              {
@@ -2603,20 +2693,32 @@ static int RemoveSlash( char * stroka, BOOL bRemoveBrackets )
           break;
 
         case STATE_QUOTE1:
-          if( *ptr == '\'' )  State = STATE_NORMAL;
+          if( *ptr == '\'' )
+          {
+             State = STATE_NORMAL;
+          }
           break;
 
         case STATE_QUOTE2:
-          if( *ptr == '\"' )  State = STATE_NORMAL;
+          if( *ptr == '\"' )
+          {
+             State = STATE_NORMAL;
+          }
           break;
 
         case STATE_QUOTE3:
-          if( *ptr == ']' )  State = STATE_NORMAL;
+          if( *ptr == ']' )
+          {
+             State = STATE_NORMAL;
+          }
           break;
 
         /** Added by Giancarlo Niccolai 2003-06-20 */
         case STATE_QUOTE4:
-          if( *ptr == '\"' && ptr[-1] != '\\' )  State = STATE_NORMAL;
+          if( *ptr == '\"' && ptr[-1] != '\\' )
+          {
+             State = STATE_NORMAL;
+          }
           break;
         /** END */
      }

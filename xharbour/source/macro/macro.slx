@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.7 2003/03/07 23:14:11 ronpinkas Exp $
+ * $Id: macro.slx,v 1.8 2003/09/30 20:35:07 ronpinkas Exp $
  */
 
 /*
@@ -82,6 +82,8 @@
 #undef IF_BELONG_LEFT
    #define IF_BELONG_LEFT(chr) if( iLastToken == IDENTIFIER || iLastToken == ']' || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || \
                                    iLastToken == '}' || iLastToken == LITERAL || iLastToken == FIELD || /*iLastToken == SELF ||*/ iLastToken == QSELF || iLastToken == IIF )
+
+static char *sIdOnHold;
 
 static HB_MACRO_PTR pMacro;
 static YYSTYPE *pYYLVAL;
@@ -178,26 +180,36 @@ LANGUAGE_WORDS_ARE {
                    };
 
 /* When reservered words are used as Identifier. */
-#define HB_IDENTIFIER     LEX_CUSTOM_ACTION - 3
-#define HB_MACRO_ERR      LEX_CUSTOM_ACTION - 4
+#define HB_MACRO_ERR      LEX_CUSTOM_ACTION - 3
+
+#define HB_ID_FIELD     LEX_CUSTOM_ACTION - 4
+#define HB_ID_QSELF     LEX_CUSTOM_ACTION - 5
+#define HB_ID_IIF       LEX_CUSTOM_ACTION - 6
+
+#define HB_ID_ON_HOLD    LEX_CUSTOM_ACTION -  7
+
+/* When 2 identifiers are correct syntax like in class declaration, we have to temporarily store the 2nd identifier. */
+#define _ID_ON_HOLD       913
 
 LANGUAGE_RULES_ARE {
 		    /* This _FIELD_ is NOT at BOL wants only ->. */
                     IF_SEQUENCE_IS( FIELD       , ALIASOP     , 0      , 0          ) PASS_THROUGH(),
-                    IF_SEQUENCE_IS( FIELD       , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
+                    IF_SEQUENCE_IS( FIELD       , 0           , 0      , 0          ) REDUCE_TO( HB_ID_FIELD       , 0             ),
 
                  /* IF_SEQUENCE_IS( SELF        , ':'         , 0      , 0          ) PASS_THROUGH(),
-                    IF_SEQUENCE_IS( SELF        , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ), */
+                    IF_SEQUENCE_IS( SELF        , 0           , 0      , 0          ) REDUCE_TO( HB_ID_SELF        , 0             ), */
 
                     IF_SEQUENCE_IS( QSELF       , '('         , ')'    , 0          ) REDUCE_TO( SELF + DONT_REDUCE, 0             ),
-                    IF_SEQUENCE_IS( QSELF       , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
+                    IF_SEQUENCE_IS( QSELF       , 0           , 0      , 0          ) REDUCE_TO( HB_ID_QSELF       , 0             ),
 
                     IF_SEQUENCE_IS( IIF         , '('         , 0      , 0          ) PASS_THROUGH(),
-                    IF_SEQUENCE_IS( IIF         , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER      , 0            ),
+                    IF_SEQUENCE_IS( IIF         , 0           , 0      , 0          ) REDUCE_TO( HB_ID_IIF         , 0            ),
 
                     IF_SEQUENCE_IS( '&'         , '\''        , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR  , 0        ),
                     IF_SEQUENCE_IS( '&'         , '"'         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR  , 0        ),
-                    IF_SEQUENCE_IS( '&'         , '['         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR  , 0        )
+                    IF_SEQUENCE_IS( '&'         , '['         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR  , 0        ),
+
+                    IF_SEQUENCE_IS( _ID_ON_HOLD , 0           , 0      , 0          ) REDUCE_TO( HB_ID_ON_HOLD      , 0                   )
                    };
 
 /* -------------------------------------------------  End of Language Definitions. ------------------------------------------------ */
@@ -308,8 +320,17 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             yyleng = YYLEX_PARAM->uiNameLen;
          }
 
-         pYYLVAL->string = hb_strdup( yytext );
-   	 iRet = IDENTIFIER;
+         if( iLastToken > 255 )
+         {
+            DEBUG_INFO( printf( "*** Holding %s\n", yytext ) );
+            sIdOnHold = hb_strdup( yytext );
+            iRet = _ID_ON_HOLD;
+         }
+         else
+         {
+            pYYLVAL->string = hb_strdup( yytext );
+            iRet = IDENTIFIER;
+         }
       }
    }
    else
@@ -370,7 +391,7 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    }
 
    DEBUG_INFO( printf(  "Element \"%s\" is %i\n", sToken, iRet ) );
-   return iRet + DONT_REDUCE;
+   return iRet;
 }
 
 long hb_macro_SLX_Hex2L( char* sHex )
@@ -417,8 +438,16 @@ int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char *sToken
          pYYLVAL->string = hb_strdup( sPair );
          return LITERAL + DONT_REDUCE ;
 
-      case HB_IDENTIFIER :
-         pYYLVAL->string = hb_strdup( sToken );
+      case HB_ID_FIELD :
+         pYYLVAL->string = hb_strdup( "FIELD" );
+         return IDENTIFIER + DONT_REDUCE;
+
+      case HB_ID_QSELF :
+         pYYLVAL->string = hb_strdup( "QSELF" );
+         return IDENTIFIER + DONT_REDUCE;
+
+      case HB_ID_IIF :
+         pYYLVAL->string = hb_strdup( "IIF" );
          return IDENTIFIER + DONT_REDUCE;
 
       case HB_SELF :
@@ -429,6 +458,11 @@ int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char *sToken
       case HB_MACRO_ERR :
 	 hb_macroError( EG_SYNTAX, YYLEX_PARAM );
          return 0;
+
+      case HB_ID_ON_HOLD :
+         pYYLVAL->string = sIdOnHold;
+         DEBUG_INFO( printf( "RELEASED ID_ON_HOLD: %s\n", sIdOnHold ) );
+         return IDENTIFIER;
 
       default:
          printf( "ERROR! [MACRO.SLX] - No Handler for Custom Action %i\n", x );

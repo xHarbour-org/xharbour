@@ -1,4 +1,4 @@
-#translate Alert( <msg> [, <opt,...>] )  => MessageBox( 0, <msg>, "xHArbour OleDemo", 0 )
+#translate Alert( <msg> [, <opt,...>] )  => MessageBox( 0, <msg>, "xHarbour OleDemo", 0 )
 
 #define CRLF Chr( 13 ) + Chr( 10 )
 
@@ -19,16 +19,16 @@ STATIC PROCEDURE Excel()
 
    LOCAL oExcel, oAS
 
-   oExcel := GetActiveObject( "Excel.Application" )
-
-   IF Ole2TxtError() != "S_OK"
-      oExcel := CreateObject( "Excel.Application" )
-   ENDIF
-
-   IF Ole2TxtError() != "S_OK"
-      Alert( "ERROR! Excel not avialable." )
-      RETURN
-   ENDIF
+   TRY
+      oExcel := GetActiveObject( "Excel.Application" )
+   CATCH
+      TRY
+         oExcel := CreateObject( "Excel.Application" )
+      CATCH
+         Alert( "ERROR! Excel not avialable. [" + Ole2TxtError()+ "]" )
+         RETURN
+      END
+   END
 
    oExcel:WorkBooks:Add()
 
@@ -69,16 +69,16 @@ STATIC PROCEDURE MsWord()
 
    LOCAL oWord, oText
 
-   oWord := GetActiveObject( "Word.Application" )
-
-   IF Ole2TxtError() != "S_OK"
-      oWord := CreateObject( "Word.Application" )
-   ENDIF
-
-   IF Ole2TxtError() != "S_OK"
-      Alert( "ERROR! Word not avialable." )
-      RETURN
-   ENDIF
+   TRY
+      oWord := GetActiveObject( "Word.Application" )
+   CATCH
+      TRY
+         oWord := CreateObject( "Word.Application" )
+      CATCH
+         Alert( "ERROR! Word not avialable. [" + Ole2TxtError()+ "]" )
+         RETURN
+      END
+   END
 
    oWord:Documents:Add()
 
@@ -100,16 +100,16 @@ STATIC PROCEDURE IEXPLORER()
 
    LOCAL oIE
 
-   oIE := GetActiveObject( "InternetExplorer.Application" )
-
-   IF Ole2TxtError() != "S_OK"
-      oIE := CreateObject( "InternetExplorer.Application" )
-   ENDIF
-
-   IF Ole2TxtError() != "S_OK"
-      Alert( "ERROR! IExplorer not avialable." )
-      RETURN
-   ENDIF
+   TRY
+      oIE := GetActiveObject( "InternetExplorer.Application" )
+   CATCH
+      TRY
+         oIE := CreateObject( "InternetExplorer.Application" )
+      CATCH
+         Alert( "ERROR! IExplorer not avialable. [" + Ole2TxtError()+ "]" )
+         RETURN
+      END
+   END
 
    oIE:Visible := .T.
 
@@ -123,16 +123,16 @@ STATIC PROCEDURE OUTLOOK()
 
    LOCAL oOL, oList, oMail, i
 
-   oOL := GetActiveObject( "Outlook.Application" )
-
-   IF Ole2TxtError() != "S_OK"
-      oOL := CreateObject( "Outlook.Application" )
-   ENDIF
-
-   IF Ole2TxtError() != "S_OK"
-      Alert( "ERROR! Outlook not avialable." )
-      RETURN
-   ENDIF
+   TRY
+      oOL := GetActiveObject( "Outlook.Application" )
+   CATCH
+      TRY
+         oOL := CreateObject( "Outlook.Application" )
+      CATCH
+         Alert( "ERROR! Outlook not avialable. [" + Ole2TxtError()+ "]" )
+         RETURN
+      END
+   END
 
    oList := oOL:CreateItem( 7 )  // olDistributionListItem
    oList:DLName := "Distribution List"
