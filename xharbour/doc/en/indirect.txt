@@ -7,41 +7,40 @@
  * $ONELINER$
  *      What is an executable array?
  * $DESCRIPTION$
- *    An executable array is an array that contains a set of symbols
- *    that can be used to execute dinamically a function, a procedure,
- *    an object's method or a codeblock.
+ *      An executable array is an array that contains a set of symbols
+ *      that can be used to execute dinamically a function, a procedure,
+ *      an object's method or a codeblock.
  *
- *    Indirect execution is similar to put a function in a codeblock
- *    and then have it EVAL()d, or to use a macro, but is easier to
- *    implement and more efficient by far.
+ *      Indirect execution is similar to put a function in a codeblock
+ *      and then have it EVAL()d, or to use a macro, but is easier to
+ *      implement and more efficient by far.
  *
- *    Indirect execution becomes valuable when you have variable execution
- *    parameters, like event handling, table lookups and the like.
+ *      Indirect execution becomes valuable when you have variable execution
+ *      parameters, like event handling, table lookups and the like.
  *
- *    An executable array has one of the following forms:
+ *      An executable array has one of the following forms:
  *
- *    { <cFunctionName>, ... }
- *    { <nFunctionReference>, ... }
- *    { <bCodeBlock>, ... }
- *    { <oObject>, <cMethodName>, ... }
- *    { <oObject>, <nMethodReference>, ... }
+ *    	{ <cFunctionName>, ... }
+ *    	{ <nFunctionReference>, ... }
+ *    	{ <bCodeBlock>, ... }
+ *    	{ <oObject>, <cMethodName>, ... }
+ *    	{ <oObject>, <nMethodReference>, ... }
  *
- *    Function (or procedure) names are normal strings that can also
- *    be built at runtime; function (or procedure) references are
- *    obtained by the operator @<fname>(). So to get the function
- *    reference of, i.e., Inkey, you have to use @Inkey(), without
- *    any parameter in parenthesis. Same for user defined (your)
- *    functions.
+ *    	Function (or procedure) names are normal strings that can also
+ *    	be built at runtime; function (or procedure) references are
+ *    	obtained by the operator @<fname>(). So to get the function
+ *    	reference of, i.e., Inkey, you have to use @Inkey(), without
+ *    	any parameter in parenthesis. Same for user defined (your)
+ *    	functions.
  *
- *    Access to object's method is similar, but the reference must be
- *    built using the function HB_ObjMsgPtr( <oObject>, <cMethodName> ).
- *    The other elements of the array are optional, and if given are passed
- *    to the function as the parameters.
+ *    	Access to object's method is similar, but the reference must be
+ *    	built using the function HB_ObjMsgPtr( <oObject>, <cMethodName> ).
+ *    	The other elements of the array are optional, and if given are passed
+ *    	to the function as the parameters.
  *
- *    Passing a function or a method reference instead of its name greatly
- *    improves the speed of the funciton, so it is advisable to use reference
- *    when possible.
- *
+ *    	Passing a function or a method reference instead of its name greatly
+ *    	improves the speed of the funciton, so it is advisable to use reference
+ *    	when possible.
  * $STATUS$
  *      R
  * $COMPLIANCE$
@@ -64,35 +63,29 @@
  * $ONELINER$
  *      Executes a function or method indirectly
  * $SYNTAX$
- *    HB_ExecFromArray( <aArray> ) --> Result
- *    HB_ExecFromArray( <nFuncRef> [, <aArrayParams> ] ) --> Result
- *    HB_ExecFromArray( <cFuncName> [, <aArrayParams> ] ) --> Result
- *    HB_ExecFromArray( <bCodeBlock> [, <aArrayParams> ] ) --> Result
- *    HB_ExecFromArray( <oObject>, <nMethodRef> [, <aArrayParams> ] ) --> Result
- *    HB_ExecFromArray( <oObject>, <cMethodName> [, <aArrayParams> ] ) --> Result
- *
+ *    	HB_ExecFromArray( <aArray> ) --> Result
+ *    	HB_ExecFromArray( <nFuncRef> [, <aArrayParams> ] ) --> Result
+ *    	HB_ExecFromArray( <cFuncName> [, <aArrayParams> ] ) --> Result
+ *    	HB_ExecFromArray( <bCodeBlock> [, <aArrayParams> ] ) --> Result
+ *    	HB_ExecFromArray( <oObject>, <nMethodRef> [, <aArrayParams> ] ) --> Result
+ *    	HB_ExecFromArray( <oObject>, <cMethodName> [, <aArrayParams> ] ) --> Result
  * $ARGUMENTS$
- *    <aArray> --> executable array
- *    <nFuncRef> --> function reference obtained with @FuncName()
- *    <cFuncName> --> string containing a function name
- *    <oObject> --> an Object
- *    <cMethodName> --> a string containing the name of a method of <oObject>
- *    <nMethodRef> --> a reference to a method of <oObject> obtained with HB_ObjMsgPtr( <oObject>, <cMethodName> )
- *    <aArrayParams> --> parameters to be passed to the callable.
- *
+ *    	<aArray> --> executable array
+ *    	<nFuncRef> --> function reference obtained with @FuncName()
+ *    	<cFuncName> --> string containing a function name
+ *    	<oObject> --> an Object
+ *    	<cMethodName> --> a string containing the name of a method of <oObject>
+ *    	<nMethodRef> --> a reference to a method of <oObject> obtained with HB_ObjMsgPtr( <oObject>, <cMethodName> )
+ *    	<aArrayParams> --> parameters to be passed to the callable.
  * $RETURNS$
  *      The return type depends on the function called.
- *
  * $DESCRIPTION$
- *    This function executes an executable array or a callable object
- *    (function, procedure, method or codeblock) using the content of
- *    <aArrayParams> as parameters. If one of the latter form is used
- *    <aArrayParams> is optional.
+ *    	This function executes an executable array or a callable object
+ *    	(function, procedure, method or codeblock) using the content of
+ *    	<aArrayParams> as parameters. If one of the latter form is used
+ *    	<aArrayParams> is optional.
  *
- *    In case of error (e.g. function name not found) an error is risen.
- *
- * $EXAMPLES$
- *
+ *    	In case of error (e.g. function name not found) an error is risen.
  * $STATUS$
  *      R
  * $COMPLIANCE$
@@ -113,18 +106,14 @@
  * $ONELINER$
  *      Executes a function or method indirectly
  * $SYNTAX$
- *    hb_execFromArray( PHB_ITEM <aArray> ) --> TRUE if sucessful, or FALSE
- *
+ *    	hb_execFromArray( PHB_ITEM <aArray> ) --> TRUE if sucessful, or FALSE
  * $ARGUMENTS$
- *    <aArray> --> executable array
- *
+ *    	<aArray> --> executable array
  * $RETURNS$
  *      The return type depends on the function called.
- *
  * $DESCRIPTION$
- *    This function is a C API shorter, more efficient version of the PRG
- *    function HB_EXECFROMARRAY. Only Executable array format is supported.
- *
+ *    	This function is a C API shorter, more efficient version of the PRG
+ *    	function HB_EXECFROMARRAY. Only Executable array format is supported.
  * $STATUS$
  *      R
  * $COMPLIANCE$
