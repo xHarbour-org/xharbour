@@ -1,5 +1,5 @@
 /*
- * $Id: tipmail.prg,v 1.26 2004/04/08 13:26:53 druzus Exp $
+ * $Id: popcln.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
  */
 
 /*
@@ -291,7 +291,7 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
       Instead of receiving a single char at a time until after we have the full mail, let's receive as
       much as we can and stop when we reach EOM (end of mail :)) sequence. This way is _a lot_ faster
    */
-   DO WHILE InetErrorCode( ::SocketCon ) == 0 .AND. iif(! Empty( nLen ), nLen < Len( cRet ), .T.)
+   DO WHILE InetErrorCode( ::SocketCon ) == 0 .AND. ! ::bEof
 
       cBuffer := Space(1024)
 
@@ -302,10 +302,16 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
       IF At(::cCRLF + "." + ::cCRLF, cRet, nRetLen) <> 0
          // Remove ".CRLF"
          cRet := Left(cRet, Len(cRet) - 3)
+         ::bEof := .T.
+
+      ELSEIF ! Empty( nLen ) .AND. nLen < Len( cRet )
          EXIT
+
       ELSE
          nRetLen += nRead
+
       ENDIF
+
    ENDDO
 
    IF InetErrorCode( ::SocketCon ) != 0

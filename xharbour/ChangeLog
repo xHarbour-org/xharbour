@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4004 2005/04/05 00:30:25 druzus Exp $
+ * $Id: ChangeLog,v 1.4005 2005/04/05 01:59:36 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2005-04-05 15:40 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/tip/popcln.prg
+     ! fixed an error of mine inserted into method ::Retrieve() a long
+       time ago causing ::bEof to have a wrong value.
 
 2005-04-05 03:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/config/linux/gcc.cf
@@ -459,7 +465,7 @@
       becomes application startup (see utils/xbscript/xbscript.prg as sample)
       This is a departure from Clipper compatibility which assumes the
       toppest function as application startup no matter if it is a static or
-      public function.	(IMO, this compatibility is no good to duplicate)
+      public function.  (IMO, this compatibility is no good to duplicate)
 
   + tests/hello1.prg
   + tests/hello2.prg
