@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.20 2003/11/04 18:00:30 ronpinkas Exp $
+ * $Id: hbdefs.h,v 1.21 2003/11/05 03:32:48 druzus Exp $
  */
 
 /*
@@ -189,6 +189,9 @@
    #define HB_GET_BE_ULONG( p )     HB_SWAP_ULONG( *( ULONG * )( p ) )
    #define HB_PUT_BE_ULONG( p, l )  ( *( ULONG * )( p ) = HB_SWAP_ULONG( l ) )
 
+   #define HB_GET_LE_DOUBLE( p )    ( *( double * )( p ) )
+   #define HB_PUT_LE_DOUBLE( p, d ) ( *( double * )( p ) = ( double ) ( d ) )
+
    #define HB_USHORT_FROM_LE( w )   ( ( USHORT )( w ) )
    #define HB_ULONG_FROM_LE( l )    ( ( ULONG )( l ) )
    #define HB_USHORT_TO_LE( w )     ( ( USHORT )( w ) )
@@ -286,6 +289,10 @@
 /* Be careful with double conversion. Some machines can use mixed form
    (Little/Big) for BYTE ORDER and WORD ORDER or even completely differ
    internal representation */
+
+   #define HB_GET_LE_DOUBLE( p )    HB_PCODE_MKDOUBLE( p )
+   #define HB_PUT_LE_DOUBLE( p, d ) ( *( double * )( p ) = HB_DOUBLE_TO_LE( d ) )
+
    #define HB_DOUBLE_TO_LE( d )     HB_DOUBLE_FROM_LE( d )
    #define HB_DOUBLE_FROM_LE( d )	\
 	( { \
