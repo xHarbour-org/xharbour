@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.136 2004/03/08 01:25:54 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.137 2004/03/08 04:19:22 ronpinkas Exp $
  */
 
 /*
@@ -4236,7 +4236,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
    int ifou, isdvig = 0;
    BOOL rezs, bDontInstanciate = FALSE;
-   //BOOL bFound = FALSE;
+   BOOL bFound = FALSE;
    int kolmarkers;
    int lennew, i;
    char lastchar = '0';
@@ -4269,7 +4269,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
          printf( "   Found: >%s< At: %i In: >%s< MarkerCount: %i\n", exppatt, ifou, ptrOut, (ptrOut + ifou)[2] - '0' );
       #endif
 
-      //bFound = TRUE;
+      bFound = TRUE;
       rezs = FALSE;
       ptr = ptrOut + ifou - 2;
       kolmarkers = 0;
@@ -4648,13 +4648,12 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
       ptrOut = ptro + isdvig;
    }
 
-   /* Ron Pinkas commented 2004-03-07 - Seems incorrect and unnecessary.
+   // Optional NOT found in result pattern IS Repetable.
    if( ( !bFound ) && s_Repeate )
    {
-      printf( "Found: %i s_Repeate %i\n", bFound, s_Repeate );
+      //printf( "Found: %i s_Repeate %i\n", bFound, s_Repeate );
       s_aIsRepeate[ s_Repeate - 1 ]++;
    }
-   */
 
    #ifdef DEBUG_MARKERS
       printf( "Replaced '%s' with '%s' => >%s<\n\n", exppatt, expreal, ptro );
