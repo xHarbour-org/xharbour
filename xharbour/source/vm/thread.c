@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.149 2004/02/01 23:09:34 jonnymind Exp $
+* $Id: thread.c,v 1.150 2004/02/14 01:29:45 andijahja Exp $
 */
 
 /*
@@ -1388,7 +1388,7 @@ HB_FUNC( STARTTHREAD )
 /*   #ifndef __BORLANDC__
       if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (void *) pStack , CREATE_SUSPENDED, &th_id ) ) != NULL )
    #else*/
-      if( ( th_h = (HANDLE)_beginthreadex( NULL, 0, hb_create_a_thread, (void *) pStack, CREATE_SUSPENDED, (UNIT *) &th_id) ) != 0L )
+      if( ( th_h = (HANDLE)_beginthreadex( NULL, 0, hb_create_a_thread, (void *) pStack, CREATE_SUSPENDED, (UINT *) &th_id) ) != 0L )
 //   #endif
 #else
    if( pthread_create( &th_id, NULL, hb_create_a_thread, (void *) pStack ) == 0 )
