@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.9 2003/05/28 04:10:17 ronpinkas Exp $
+ * $Id: hblog.ch,v 1.1 2003/07/10 10:48:58 jonnymind Exp $
  */
 
 /*
@@ -71,6 +71,12 @@
     #xtranslate SYSLOG( <nPrio>[, <nId>] )=> HB_LogSyslog():New( <nPrio>, <(cName)>, <nId> );;
     #xtranslate FILE( <cFname> [, <nPrio>[,<nMaxSize>[, <nBackup>]]] )=> ;
          HB_LogFile():New( <nPrio>, <cName>, <cFname>, <nMaxSize>, <nBackup> );;
+    #xtranslate EMAIL( <nPrio>, <cHelo>, <cServer>, <cDest> [, <cSubject> [,<cFrom>]] ) =>;
+         HB_LogEmail():New( <nPrio>, <cName>, <cServer>, <cDest>,;
+                <cFrom>, <cSubject>, <cHelo> ) ;;
+    #xtranslate MONITOR => HB_LogInetPort():New(, <(cName)> );;
+    #xtranslate MONITOR( <nPrio> [,<nPort>] )=>;
+             HB_LogInetPort():New( <nPrio>, <(cName)>, <nPort> );;
     HB_InitStandardLog( <data> );;
 
 #xcommand SET LOG STYLE <nStyle> => HB_SetStandardLogStyle( <nStyle> )

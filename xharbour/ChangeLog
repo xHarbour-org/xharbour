@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1238 2003/07/10 22:04:06 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1239 2003/07/13 18:33:38 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,58 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-13 21:33 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hblog.prg
+    ! Responsibility to format (add timestamps and the like) messages
+      has been moved to channels, as there are some channels that may
+      want to use different formattings (i.e. syslog has already a
+      timestamp).
+    * Syslog now just (and always) format the message with the priority
+      level description
+
+  * source/vm/hvm.c
+  * source/vm/macro.c
+    ! fixed misbehavior of FOR EACH, WITH OBJECT, and macro/codeblocs,
+      who often lost elements/parameters in multithreading programs.
+      The fix must be "certified", but seems right.
+
+  * include/thread.h
+    ! Added several fields to the thread HB_VM_STACK, to hold variables
+      needed by each thread to handle FOR EACH, WITH OBJECT and
+      macro/codeblocs parameter passing.
+
+  * source/vm/thread.c
+    + Added function hb_threadSetupStack() that prepare stacks even if
+      they are static (previously hb_threadCreateStack() returned a
+      newly allocated stack).
+
+  * source/vm/estack.c
+    ! hb_stackInit() Initializes threads() in MT. This allows hb_stack to be
+      initialized exactly as any other stack, simplifying mantainance.
+
+  * source/rtl/Makefile
+  * source/rtl/hblog.prg
+  + hbloginet.prg
+    + Added two internet bound log channel classes. HB_LogEmail can send an
+      email in case of log to be sent to administrators. HB_LogInetPort
+      waits for a connection incoming on an internet port ( default to 7761 ).
+      The connected client can then receive live feeds on logs; the port can
+      accept any number of connection; this class does not provides security
+      (it can be provided by deriving a subclass, or by system policies as
+         firewalls).
+      HB_logInetPort is meant for an application to have monitors that can
+      display it's status when and attach/detach randomly.
+
+      Both the classes works in ST and MT mode, but HB_LogInetPort will have
+      a delay of 50 Msecs for each log in ST.
+
+  * include/hblog.ch
+    + Added PP instruction to handle the new classes in standard log
+      initialization.
+
+  * tests/logtest.prg
+    + Added tests for inet accept and emailer.
 
 2003-07-13 15:25 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * include/hbexprb.c

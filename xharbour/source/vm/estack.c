@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.33 2003/05/27 00:36:22 mlombardo Exp $
+ * $Id: estack.c,v 1.34 2003/06/18 08:57:02 ronpinkas Exp $
  */
 
 /*
@@ -150,18 +150,18 @@ void hb_stackPush( void )
 
 void hb_stackInit( void )
 {
+#ifndef HB_THREAD_SUPPORT
    LONG i;
+#endif
+
    HB_TRACE(HB_TR_DEBUG, ("hb_stackInit()"));
    // Optimized to directly accessing hb_stack instead of HB_VM_STACK
 
    /*JC1: Under threads, the stack is not present until it is created here. Notice that
      calling xgrab is an error also WITHOUT threads, as the xgrab routine accesses
      a variable (the stack) that cannot be initialized yet */
-   #ifdef HB_THREAD_SUPPORT
-      hb_stack.pItems = ( HB_ITEM_PTR * ) malloc( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
-   #else
-      hb_stack.pItems = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
-   #endif
+   #ifndef HB_THREAD_SUPPORT
+   hb_stack.pItems = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
 
    hb_stack.pBase  = hb_stack.pItems;
    hb_stack.pPos   = hb_stack.pItems;     /* points to the first stack item */
@@ -169,40 +169,14 @@ void hb_stackInit( void )
 
    for( i=0; i < hb_stack.wItems; ++i )
    {
-      #ifdef HB_THREAD_SUPPORT
-         hb_stack.pItems[ i ] = (HB_ITEM *) malloc( sizeof( HB_ITEM ) );
-      #else
-         hb_stack.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
-      #endif
+      hb_stack.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
    }
 
    ( * hb_stack.pPos )->type = HB_IT_NIL;
 
    // other data to be initialized under MT
-   #ifdef HB_THREAD_SUPPORT
-      hb_stack.th_id = HB_CURRENT_THREAD();
-      /* internal thread ID is 1 */
-      hb_stack.th_vm_id = 1;
-      hb_stack.next = NULL;
-      hb_stack.pMethod = NULL;
-      hb_stack.Return.type = HB_IT_NIL;
-      hb_stack.bInUse = FALSE;
-      hb_stack.errorHandler = NULL;
-      // FM is not ready now, so error block of hb_stack must be initialized
-      // by init_error
-      hb_stack.iLaunchCount = 0;
-      hb_stack.uiErrorDOS = 0;
-
-      #ifdef HB_OS_WIN_32
-         hb_stack.th_h = NULL;
-         hb_stack.bCanceled = FALSE;
-         hb_stack.bCanCancel = FALSE;
-         /*
-         tc->iCleanCount = 0;
-         tc->pCleanUp = (HB_CLEANUP_FUNC *) malloc( sizeof( HB_CLEANUP_FUNC ) * HB_MAX_CLEANUPS );
-         tc->pCleanUpParam = (void **) malloc( sizeof( void *) * HB_MAX_CLEANUPS );
-         */
-      #endif
+   #else
+      hb_threadInit();
    #endif
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.22 2003/05/10 01:46:28 ronpinkas Exp $
+ * $Id: macro.c,v 1.23 2003/05/26 18:09:43 mlombardo Exp $
  */
 
 /*
@@ -486,11 +486,13 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
 void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
 {
    /* TODO: remove these externals */
+   //JC1: halfway though :-)
+   #ifndef HB_THREAD_SUPPORT
    extern int hb_vm_aiExtraParams[HB_MAX_MACRO_ARGS], hb_vm_iExtraParamsIndex;
    extern int hb_vm_aiExtraElements[HB_MAX_MACRO_ARGS], hb_vm_iExtraElementsIndex;
    extern int hb_vm_iExtraIndex;
-
    extern PHB_SYMB hb_vm_apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
+   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_macroGetValue(%p)", pItem));
 
@@ -559,7 +561,11 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
 
       iStatus = hb_macroParse( &struMacro, szString );
 
+#ifndef HB_THREAD_SUPPORT
       if( iContext && ( ( hb_vm_iExtraParamsIndex == HB_MAX_MACRO_ARGS ) || ( hb_vm_iExtraElementsIndex >= HB_MAX_MACRO_ARGS ) ) )
+#else
+      if( iContext && ( ( HB_VM_STACK.iExtraParamsIndex == HB_MAX_MACRO_ARGS ) || ( HB_VM_STACK.iExtraElementsIndex >= HB_MAX_MACRO_ARGS ) ) )
+#endif
       {
          hb_macroSyntaxError( &struMacro );
       }
@@ -579,6 +585,8 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
 
          if( iContext && struMacro.iListElements > 0 )
          {
+            #ifndef HB_THREAD_SUPPORT
+
             if( iContext == HB_P_MACROPUSHARG )
             {
                hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex] = struMacro.iListElements;
@@ -592,6 +600,24 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
             {
                hb_vm_iExtraIndex = struMacro.iListElements;
             }
+
+            #else
+
+            if( iContext == HB_P_MACROPUSHARG )
+            {
+               HB_VM_STACK.aiExtraParams[HB_VM_STACK.iExtraParamsIndex] = struMacro.iListElements;
+               HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex++] = NULL;
+            }
+            else if( iContext == HB_P_MACROPUSHLIST )
+            {
+               HB_VM_STACK.aiExtraElements[HB_VM_STACK.iExtraElementsIndex - 1] += struMacro.iListElements;
+            }
+            else if( iContext == HB_P_MACROPUSHINDEX )
+            {
+               HB_VM_STACK.iExtraIndex = struMacro.iListElements;
+            }
+
+            #endif
          }
       }
       else

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.230 2003/07/07 18:41:25 ronpinkas Exp $
+ * $Id: hvm.c,v 1.231 2003/07/13 18:15:40 walito Exp $
  */
 
 /*
@@ -252,12 +252,13 @@ static LONG     s_lRecoverBase;
 #define  HB_RECOVER_ADDRESS   -3
 #define  HB_RECOVER_VALUE     -4
 
+//JC1: macro and codeblock parameters are handled in thread stack
+#ifndef HB_THREAD_SUPPORT
 int hb_vm_aiExtraParams[HB_MAX_MACRO_ARGS], hb_vm_iExtraParamsIndex = 0;
 PHB_SYMB hb_vm_apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
-
 int hb_vm_aiExtraElements[HB_MAX_MACRO_ARGS], hb_vm_iExtraElementsIndex = 0, hb_vm_iExtraElements = 0;
-
 int hb_vm_iExtraIndex;
+#endif
 
 /* Request for some action - stop processing of opcodes
  */
@@ -284,7 +285,8 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
                              "\xE0", "\xE1", "\xE2", "\xE3", "\xE4", "\xE5", "\xE6", "\xE7", "\xE8", "\xE9", "\xEA", "\xEB", "\xEC", "\xED", "\xEE", "\xEF",
                              "\xF0", "\xF1", "\xF2", "\xF3", "\xF4", "\xF5", "\xF6", "\xF7", "\xF8", "\xF9", "\xFA", "\xFB", "\xFC", "\xFD", "\xFE", "\xFF" };
 
-
+//JC1: in MT this are handled by the single thread stack creation.
+#ifndef HB_THREAD_SUPPORT
 HB_ITEM hb_vm_aWithObject[ HB_MAX_WITH_OBJECTS ];
 USHORT  hb_vm_wWithObjectCounter; // Initilaized in hb_vmInit()
 BOOL    hb_vm_bWithObject = FALSE;
@@ -293,6 +295,8 @@ HB_ITEM  hb_vm_aEnumCollection[ HB_MAX_ENUMERATIONS ];
 PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
 ULONG    hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
 USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
+#endif
+
 
 static   HB_ITEM  s_aGlobals;         /* Harbour array to hold all application global variables */
 
@@ -377,8 +381,8 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    HB_VM_STACK.pItems = NULL; /* keep this here as it is used by fm.c */
    HB_VM_STACK.Return.type = HB_IT_NIL;
    /* under threads, thread context have been already initialized */
-#endif
 
+   //JC1: idem: undet threads this is already done
    for ( hb_vm_wWithObjectCounter = 0; hb_vm_wWithObjectCounter < HB_MAX_WITH_OBJECTS; hb_vm_wWithObjectCounter++  )
    {
       hb_vm_aWithObject[ hb_vm_wWithObjectCounter ].type = HB_IT_NIL;
@@ -391,6 +395,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
    }
    hb_vm_wEnumCollectionCounter = 0;
+#endif
 
    s_aGlobals.type = HB_IT_NIL;
    hb_arrayNew( &s_aGlobals, 0 );
@@ -656,8 +661,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    BOOL bCanRecover = FALSE;
    ULONG ulPrivateBase;
    LONG lOffset;
+#ifndef HB_THREAD_SUPPORT
    USHORT wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    USHORT wWithObjectCounter = hb_vm_wWithObjectCounter;
+#else
+   USHORT wEnumCollectionCounter = HB_VM_STACK.wEnumCollectionCounter;
+   USHORT wWithObjectCounter = HB_VM_STACK.wWithObjectCounter;
+#endif
 
    #ifndef HB_NO_PROFILER
       ULONG ulLastOpcode = 0; /* opcodes profiler support */
@@ -933,8 +943,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_ARRAYGEN:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ARRAYGEN %i + %i", HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ), hb_vm_iExtraElements ) );
+            #ifndef HB_THREAD_SUPPORT
             hb_vmArrayGen( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) + hb_vm_iExtraElements );
             hb_vm_iExtraElements = 0;
+            #else
+            hb_vmArrayGen( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) + HB_VM_STACK.iExtraElements );
+            HB_VM_STACK.iExtraElements = 0;
+            #endif
             w += 3;
             break;
 
@@ -1022,19 +1037,31 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_WITHOBJECT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_WITHOBJECT") );
+
+            #ifndef HB_THREAD_SUPPORT
             hb_itemForwardValue( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter++ ] ), hb_stackItemFromTop( -1 ) );
+            #else
+            hb_itemForwardValue( &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter++ ] ), hb_stackItemFromTop( -1 ) );
+            #endif
+
             hb_stackPop();
             w++;
             break;
 
          case HB_P_ENDWITHOBJECT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENDWITHOBJECT") );
+            #ifndef HB_THREAD_SUPPORT
             hb_itemClear( &( hb_vm_aWithObject[ --hb_vm_wWithObjectCounter ] ) );
+            #else
+            hb_itemClear( &( HB_VM_STACK.aWithObject[ --HB_VM_STACK.wWithObjectCounter ] ) );
+            #endif
             w++;
             break;
 
          case HB_P_FOREACH:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FOREACH") );
+
+            #ifndef HB_THREAD_SUPPORT
             hb_itemForwardValue( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_stackItemFromTop( -1 ) );
             hb_stackPop();
 
@@ -1046,20 +1073,48 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] = hb_itemUnRef( hb_stackItemFromTop( -1 ) );
             hb_stackPop();
             hb_vm_wEnumCollectionCounter++;
+
+            #else
+
+            hb_itemForwardValue( &( HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter ] ), hb_stackItemFromTop( -1 ) );
+            hb_stackPop();
+
+            if( HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter ].type != HB_IT_ARRAY && HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter ].type != HB_IT_STRING )
+            {
+               hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, &( HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter ] ), hb_itemPutNI( * HB_VM_STACK.pPos, 1 ) );
+            }
+
+            HB_VM_STACK.apEnumVar[ HB_VM_STACK.wEnumCollectionCounter ] = hb_itemUnRef( hb_stackItemFromTop( -1 ) );
+            hb_stackPop();
+            HB_VM_STACK.wEnumCollectionCounter++;
+
+            #endif
+
             w++;
             break;
 
          case HB_P_ENUMERATE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENUMERATE") );
+            #ifndef HB_THREAD_SUPPORT
+
             hb_vmPushLogical( hb_arrayGetByRef( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter - 1 ] ),
                                           ++hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ],
                                           hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter - 1 ] ) );
+            #else
 
+            hb_vmPushLogical( hb_arrayGetByRef( &( HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter - 1 ] ),
+                  ++HB_VM_STACK.awEnumIndex[ HB_VM_STACK.wEnumCollectionCounter - 1 ],
+                  HB_VM_STACK.apEnumVar[ HB_VM_STACK.wEnumCollectionCounter - 1 ] ) );
+
+            #endif
             w++;
             break;
 
          case HB_P_ENDENUMERATE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENDENUMERATE") );
+
+            #ifndef HB_THREAD_SUPPORT
+
             --hb_vm_wEnumCollectionCounter;
 
             hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
@@ -1068,12 +1123,28 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             // Incase EXIT was used.
             hb_itemClear( hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] );
 
+            #else
+
+            --HB_VM_STACK.wEnumCollectionCounter;
+
+            hb_itemClear( &( HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter ] ) );
+            HB_VM_STACK.awEnumIndex[ HB_VM_STACK.wEnumCollectionCounter ] = 0;
+
+            // Incase EXIT was used.
+            hb_itemClear( HB_VM_STACK.apEnumVar[ HB_VM_STACK.wEnumCollectionCounter ] );
+
+            #endif
+
             w++;
             break;
 
          case HB_P_ENUMINDEX:
             ( *HB_VM_STACK.pPos )->type = HB_IT_LONG;
+            #ifndef HB_THREAD_SUPPORT
             ( *HB_VM_STACK.pPos )->item.asLong.value = hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ];
+            #else
+            ( *HB_VM_STACK.pPos )->item.asLong.value = HB_VM_STACK.awEnumIndex[ HB_VM_STACK.wEnumCollectionCounter - 1 ];
+            #endif
             ( * HB_VM_STACK.pPos )->item.asLong.length = 10;
             hb_stackPush();
             w++;
@@ -1081,8 +1152,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_SENDWITH:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDWITH") );
-            // Intentionally NOT breaking - fall through!
+            #ifndef HB_THREAD_SUPPORT
             hb_vm_bWithObject = TRUE;
+            #else
+            HB_VM_STACK.bWithObject = TRUE;
+            #endif
+            // Intentionally NOT breaking - fall through!
 
          case HB_P_SEND:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEND") );
@@ -1105,7 +1180,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_SENDWITHSHORT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDWITHSHORT") );
+            #ifndef HB_THREAD_SUPPORT
             hb_vm_bWithObject = TRUE;
+            #else
+            HB_VM_STACK.bWithObject = TRUE;
+            #endif
             // Intentionally NOT breaking - fall through!
 
          case HB_P_SENDSHORT:
@@ -1116,7 +1195,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDSHORT") );
 
+            #ifndef HB_THREAD_SUPPORT
             if( hb_vm_iExtraParamsIndex == 0 )
+            #else
+            if( HB_VM_STACK.iExtraParamsIndex == 0 )
+            #endif
             {
                if( usParams == 0 )
                {
@@ -2480,6 +2563,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_macroGetValue( hb_stackItemFromTop( -1 ), HB_P_MACROPUSHARG, pCode[ ++w ] );
             w++;
 
+            #ifndef HB_THREAD_SUPPORT
             if( hb_vm_iExtraParamsIndex && hb_vm_apExtraParamsSymbol[hb_vm_iExtraParamsIndex - 1] == NULL )
             {
                if( pCode[w] == HB_P_PUSHSYMNEAR )
@@ -2500,6 +2584,28 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   w += 3;
                }
             }
+            #else
+            if( HB_VM_STACK.iExtraParamsIndex && HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] == NULL )
+            {
+               if( pCode[w] == HB_P_PUSHSYMNEAR )
+               {
+                  HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] = pSymbols + ( USHORT ) ( pCode[w + 1] );
+                  w += 2;
+               }
+               else if( pCode[w] == HB_P_MPUSHSYM )
+               {
+                  HB_DYNS_PTR *pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
+
+                  HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] = ( *pDynSym )->pSymbol;
+                  w += sizeof( HB_DYNS_PTR ) + 1;
+               }
+               else
+               {
+                  HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] = pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
+                  w += 3;
+               }
+            }
+            #endif
             else
             {
                if( pCode[w] == HB_P_PUSHSYMNEAR )
@@ -2518,7 +2624,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             break;
 
          case HB_P_MACROLIST:
+            #ifndef HB_THREAD_SUPPORT
             hb_vm_aiExtraElements[hb_vm_iExtraElementsIndex++] = 0;
+            #else
+            HB_VM_STACK.aiExtraElements[HB_VM_STACK.iExtraElementsIndex++] = 0;
+            #endif
             w++;
             break;
 
@@ -2532,7 +2642,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             break;
 
          case HB_P_MACROLISTEND:
+            #ifndef HB_THREAD_SUPPORT
             hb_vm_iExtraElements = hb_vm_aiExtraElements[--hb_vm_iExtraElementsIndex];
+            #else
+            HB_VM_STACK.iExtraElements = HB_VM_STACK.aiExtraElements[--HB_VM_STACK.iExtraElementsIndex];
+            #endif
             w++;
             break;
 
@@ -2542,6 +2656,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              * string for compilation
              */
             hb_macroGetValue( hb_stackItemFromTop( -1 ), HB_P_MACROPUSHINDEX, pCode[ ++w ] );
+            #ifndef HB_THREAD_SUPPORT
             if( hb_vm_iExtraIndex )
             {
                HB_ITEM *aExtraItems = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) * hb_vm_iExtraIndex );
@@ -2568,6 +2683,34 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                w++; /* To force skip the HB_P_ARRAYPUSH (was already processed above). */
             }
+            #else
+            if( HB_VM_STACK.iExtraIndex )
+            {
+               HB_ITEM *aExtraItems = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) * HB_VM_STACK.iExtraIndex );
+               int i;
+
+               /* Storing and removing the extra indexes. */
+               for ( i = HB_VM_STACK.iExtraIndex - 1; i >= 0; i-- )
+               {
+                  hb_itemCopy( aExtraItems + i, hb_stackItemFromTop(-1) );
+                  hb_stackPop();
+               }
+
+               /* First index is still on stack.*/
+               hb_vmArrayPush();
+
+               /* Now process each of the additional index including the last one (we will skip the HB_P_ARRAYPUSH which is know to follow . */
+               for ( i = 0; i < HB_VM_STACK.iExtraIndex; i++ )
+               {
+                  hb_vmPush( aExtraItems + i );
+                  hb_vmArrayPush();
+               }
+
+               hb_xfree( aExtraItems );
+
+               w++; /* To force skip the HB_P_ARRAYPUSH (was already processed above). */
+            }
+            #endif
 
             w++;
             break;
@@ -2838,6 +2981,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
 
    // Reset FOR EACH.
+   #ifndef HB_THREAD_SUPPORT
+
    while( hb_vm_wEnumCollectionCounter > wEnumCollectionCounter )
    {
       hb_vm_wEnumCollectionCounter--;
@@ -2855,6 +3000,28 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       // We might get here from BREAK, so item may have been released.
       hb_vm_aWithObject[ hb_vm_wWithObjectCounter ].type = HB_IT_NIL;
    }
+
+   #else
+
+   while( HB_VM_STACK.wEnumCollectionCounter > wEnumCollectionCounter )
+   {
+      HB_VM_STACK.wEnumCollectionCounter--;
+      //hb_itemClear( &( HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter ] ) );
+      // We might get here from BREAK, so item may have been released.
+      HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter ].type = HB_IT_NIL;
+      HB_VM_STACK.awEnumIndex[ HB_VM_STACK.wEnumCollectionCounter ] = 0;
+   }
+
+   // Reset WITH OBJECT.
+   while( HB_VM_STACK.wWithObjectCounter > wWithObjectCounter )
+   {
+      --HB_VM_STACK.wWithObjectCounter;
+      //hb_itemClear( &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter ] ) );
+      // We might get here from BREAK, so item may have been released.
+      HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter ].type = HB_IT_NIL;
+   }
+
+   #endif
 
    //JC1: do not allow cancellation or idle MT func: thread cleanup procedure
    // is under way, or another VM might return in control
@@ -4727,10 +4894,21 @@ void hb_vmDo( USHORT uiParams )
 
    //printf( "\VmDo nItems: %i Params: %i Extra %i\n", HB_VM_STACK.pPos - HB_VM_STACK.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
 
+   #ifndef HB_THREAD_SUPPORT
+
    if( hb_vm_iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] + 2 ) ) ) && pItem->item.asSymbol.value == hb_vm_apExtraParamsSymbol[hb_vm_iExtraParamsIndex - 1] )
    {
       uiParams += hb_vm_aiExtraParams[--hb_vm_iExtraParamsIndex];
    }
+
+   #else
+
+   if( HB_VM_STACK.iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + HB_VM_STACK.aiExtraParams[HB_VM_STACK.iExtraParamsIndex - 1] + 2 ) ) ) && pItem->item.asSymbol.value == HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] )
+   {
+      uiParams += HB_VM_STACK.aiExtraParams[--HB_VM_STACK.iExtraParamsIndex];
+   }
+
+   #endif
 
    if( hb_stackItemFromTop( - ( uiParams + 1 ) )->type )
    {
@@ -4866,10 +5044,17 @@ void hb_vmSend( USHORT uiParams )
 
    //printf( "\n VmSend nItems: %i Params: %i Extra %i\n", HB_VM_STACK.pPos - HB_VM_STACK.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
 
+   #ifndef HB_THREAD_SUPPORT
    if( hb_vm_iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] + 2 ) ) ) && pItem->item.asSymbol.value == hb_vm_apExtraParamsSymbol[hb_vm_iExtraParamsIndex - 1] )
    {
       uiParams += hb_vm_aiExtraParams[--hb_vm_iExtraParamsIndex];
    }
+   #else
+   if( HB_VM_STACK.iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + HB_VM_STACK.aiExtraParams[HB_VM_STACK.iExtraParamsIndex - 1] + 2 ) ) ) && pItem->item.asSymbol.value == HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] )
+   {
+      uiParams += HB_VM_STACK.aiExtraParams[--HB_VM_STACK.iExtraParamsIndex];
+   }
+   #endif
 
    #ifndef HB_NO_PROFILER
       if( bProfiler )
@@ -4881,11 +5066,19 @@ void hb_vmSend( USHORT uiParams )
    pItem = hb_stackNewFrame( &sStackState, uiParams );   /* procedure name */
    pSym = pItem->item.asSymbol.value;
 
+   #ifndef HB_THREAD_SUPPORT
    if( hb_vm_bWithObject )
    {
       hb_vm_bWithObject = FALSE;
       hb_itemCopy( * ( HB_VM_STACK.pBase + 1 ), &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ) ) ;
    }
+   #else
+   if( HB_VM_STACK.bWithObject )
+   {
+      HB_VM_STACK.bWithObject = FALSE;
+      hb_itemCopy( * ( HB_VM_STACK.pBase + 1 ), &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter - 1 ] ) ) ;
+   }
+   #endif
 
    pSelf = ( * ( HB_VM_STACK.pBase + 1 ) );   /* NIL, OBJECT or BLOCK */
 
@@ -7368,14 +7561,18 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
 HB_FUNC( HB_QWITH )
 {
    HB_THREAD_STUB
-
+#ifndef HB_THREAD_SUPPORT
    hb_itemCopy( &(HB_VM_STACK.Return), &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ) );
+#else
+   hb_itemCopy( &(HB_VM_STACK.Return), &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter - 1 ] ) );
+#endif
 }
 
 HB_FUNC( HB_SETWITH )
 {
    HB_THREAD_STUB
 
+#ifndef HB_THREAD_SUPPORT
    if( hb_pcount() == 0 )
    {
       hb_itemForwardValue( &(HB_VM_STACK.Return), &( hb_vm_aWithObject[ --hb_vm_wWithObjectCounter ] ) );
@@ -7386,6 +7583,18 @@ HB_FUNC( HB_SETWITH )
 
       hb_itemForwardValue( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter++ ] ), pWith );
    }
+#else
+   if( hb_pcount() == 0 )
+   {
+      hb_itemForwardValue( &(HB_VM_STACK.Return), &( HB_VM_STACK.aWithObject[ --HB_VM_STACK.wWithObjectCounter ] ) );
+   }
+   else
+   {
+      PHB_ITEM pWith = hb_param( 1, HB_IT_OBJECT );
+
+      hb_itemForwardValue( &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter++ ] ), pWith );
+   }
+#endif
 }
 
 HB_FUNC( HB_QSELF )

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.47 2003/05/25 17:03:18 jonnymind Exp $
+* $Id: thread.h,v 1.48 2003/06/18 08:57:01 ronpinkas Exp $
 */
 
 /*
@@ -52,7 +52,7 @@
 #ifndef HB_THREAD_H_
 #define HB_THREAD_H_
 
-#include "hbdefs.h"
+#include "hbapi.h"
 
 #ifdef HB_THREAD_SUPPORT
 
@@ -314,6 +314,26 @@ typedef struct tag_HB_STACK
    /* List of error handlers for TRY/CATCH blocks */
    PHB_ITEM aTryCatchHandlerStack;
 
+   /* Mt With Object index */
+   HB_ITEM aWithObject[ HB_MAX_WITH_OBJECTS ];
+   USHORT  wWithObjectCounter;
+   BOOL    bWithObject;
+
+   /* Mt for each enumeration index */
+   HB_ITEM  aEnumCollection[ HB_MAX_ENUMERATIONS ];
+   PHB_ITEM apEnumVar[ HB_MAX_ENUMERATIONS ];
+   ULONG    awEnumIndex[ HB_MAX_ENUMERATIONS ];
+   USHORT   wEnumCollectionCounter;
+
+   /* management of codeblock and macro params */
+   int aiExtraParams[HB_MAX_MACRO_ARGS];
+   int iExtraParamsIndex;
+   PHB_SYMB apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
+   int aiExtraElements[HB_MAX_MACRO_ARGS];
+   int iExtraElementsIndex;
+   int iExtraElements;
+   int iExtraIndex;
+
    struct tag_HB_STACK *next;
 
 #ifdef HB_OS_WIN_32
@@ -531,6 +551,7 @@ extern HB_MUTEX_STRUCT *hb_ht_mutex;
 extern HB_THREAD_T hb_main_thread_id;
 
 extern HB_STACK *hb_threadCreateStack( HB_THREAD_T th_id );
+extern void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th );
 extern HB_STACK *hb_threadLinkStack( HB_STACK *tc );
 extern HB_STACK *hb_threadUnlinkStack( HB_STACK *pStack );
 extern void hb_threadDestroyStack( HB_STACK *pStack );

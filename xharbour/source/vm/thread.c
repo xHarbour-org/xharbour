@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.82 2003/07/07 01:49:16 jonnymind Exp $
+* $Id: thread.c,v 1.83 2003/07/13 18:19:15 walito Exp $
 */
 
 /*
@@ -177,15 +177,10 @@ static UINT hb_threadUniqueId( void )
    return uiRet;
 }
 
-HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
+void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
 {
-   HB_STACK *tc;
    int i;
-
-#ifndef HB_SAFE_ALLOC
-   HB_CRITICAL_LOCK( hb_allocMutex );
-#endif
-   tc = (HB_STACK *) malloc( sizeof( HB_STACK));
+   ULONG uCount;
 
    tc->th_id = th;
    tc->th_vm_id = hb_threadUniqueId();
@@ -224,6 +219,42 @@ HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
       tc->pItems[ i ] = (HB_ITEM *) malloc( sizeof( HB_ITEM ) );
    }
    ( * (tc->pPos) )->type = HB_IT_NIL;
+
+   /* Initialization of "foreach" and "with object" */
+   for ( uCount = 0; uCount < HB_MAX_WITH_OBJECTS; uCount++  )
+   {
+      tc->aWithObject[ uCount ].type = HB_IT_NIL;
+   }
+   tc->wWithObjectCounter = 0;
+   tc->bWithObject = FALSE;
+
+   for ( uCount = 0; uCount < HB_MAX_ENUMERATIONS; uCount++ )
+   {
+      tc->aEnumCollection[ uCount ].type = HB_IT_NIL;
+      tc->awEnumIndex[ uCount ] = 0;
+   }
+   tc->wEnumCollectionCounter = 0;
+
+   /* initialization of macro & codeblock parameter passing */
+   tc->iExtraParamsIndex = 0;
+   tc->iExtraElementsIndex = 0;
+   tc->iExtraElements = 0;
+   tc->iExtraIndex = 0;
+
+}
+
+
+
+HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
+{
+   HB_STACK *tc;
+
+#ifndef HB_SAFE_ALLOC
+   HB_CRITICAL_LOCK( hb_allocMutex );
+#endif
+
+   tc = (HB_STACK *) malloc( sizeof( HB_STACK));
+   hb_threadSetupStack( tc, th );
 
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
@@ -1784,6 +1815,7 @@ void hb_threadInit( void )
       pthread_key_create( &hb_pkCurrentStack, NULL );
       pthread_setspecific( hb_pkCurrentStack, (void *)hb_ht_stack );
    #endif
+   hb_threadSetupStack( &hb_stack, HB_CURRENT_THREAD() );
 
    #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
       HB_CRITICAL_INIT( s_mtxTryLock );
