@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.10 2004/01/17 17:52:59 lculik Exp $
+ * $Id: direct.c,v 1.11 2004/01/23 10:44:47 andijahja Exp $
  */
 
 /*
@@ -99,6 +99,7 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 
 #include "directry.ch"
 
@@ -125,8 +126,7 @@ HB_FUNC( DIRECTORY )
 #endif
 */
 
-   PHB_ITEM  pDir = hb_itemArrayNew( 0 );
-
+   HB_ITEM pDir;
    PHB_FFIND ffind;
 
    /* Get the passed attributes and convert them to Harbour Flags */
@@ -158,11 +158,19 @@ HB_FUNC( DIRECTORY )
    /* Get the file list */
    if( ( ffind = hb_fsFindFirst( (const char *) szDirSpec, uiMask ) ) != NULL )
    {
-      PHB_ITEM pFilename = hb_itemNew( NULL );
-      PHB_ITEM pSize = hb_itemNew( NULL );
-      PHB_ITEM pDate = hb_itemNew( NULL );
-      PHB_ITEM pTime = hb_itemNew( NULL );
-      PHB_ITEM pAttr = hb_itemNew( NULL );
+      HB_ITEM pFilename;
+      HB_ITEM pSize;
+      HB_ITEM pDate;
+      HB_ITEM pTime;
+      HB_ITEM pAttr;
+
+      pFilename.type = HB_IT_NIL ;
+      pSize.type = HB_IT_NIL ;
+      pDate.type = HB_IT_NIL ;
+      pTime.type = HB_IT_NIL ;
+      pAttr.type = HB_IT_NIL ;
+
+      hb_arrayNew( &pDir, 0 );
 
       do
       {
@@ -171,32 +179,26 @@ HB_FUNC( DIRECTORY )
                 ( ( uiMask & HB_FA_LABEL     ) == 0 && ( ffind->attr & HB_FA_LABEL     ) != 0 ) ||
                 ( ( uiMask & HB_FA_DIRECTORY ) == 0 && ( ffind->attr & HB_FA_DIRECTORY ) != 0 ) ))
          {
-            PHB_ITEM pSubarray = hb_itemArrayNew( F_LEN );
+            HB_ITEM pSubarray;
             char buffer[ 32 ];
 
-            hb_arraySet( pSubarray, F_NAME, hb_itemPutC( pFilename, ffind->szName ) );
+            hb_arrayNew( &pSubarray, 0 );
+
+            hb_arrayAddForward( &pSubarray, hb_itemPutC( &pFilename, ffind->szName ) );
          #ifndef HB_LONG_LONG_OFF
-            hb_arraySet( pSubarray, F_SIZE, hb_itemPutNLL( pSize, ffind->size ) );
+            hb_arrayAddForward( &pSubarray, hb_itemPutNLL( &pSize, ffind->size ) );
          #else
-            hb_arraySet( pSubarray, F_SIZE, hb_itemPutNL( pSize, ffind->size ) );
+            hb_arrayAddForward( &pSubarray, hb_itemPutNL( &pSize, ffind->size ) );
          #endif
-            hb_arraySet( pSubarray, F_DATE, hb_itemPutDL( pDate, ffind->lDate ) );
-            hb_arraySet( pSubarray, F_TIME, hb_itemPutC( pTime, ffind->szTime ) );
-            hb_arraySet( pSubarray, F_ATTR, hb_itemPutC( pAttr, hb_fsAttrDecode( ffind->attr, buffer ) ) );
+            hb_arrayAddForward( &pSubarray, hb_itemPutDL( &pDate, ffind->lDate ) );
+            hb_arrayAddForward( &pSubarray, hb_itemPutC( &pTime, ffind->szTime ) );
+            hb_arrayAddForward( &pSubarray, hb_itemPutC( &pAttr, hb_fsAttrDecode( ffind->attr, buffer ) ) );
 
             /* Don't exit when array limit is reached */
-            hb_arrayAdd( pDir, pSubarray );
-
-            hb_itemRelease( pSubarray );
+            hb_arrayAddForward( &pDir, &pSubarray );
          }
       }
       while( hb_fsFindNext( ffind ) );
-
-      hb_itemRelease( pFilename );
-      hb_itemRelease( pSize );
-      hb_itemRelease( pDate );
-      hb_itemRelease( pTime );
-      hb_itemRelease( pAttr );
 
       hb_fsFindClose( ffind );
    }
@@ -205,6 +207,6 @@ HB_FUNC( DIRECTORY )
       hb_xfree( szDirSpec );
    }
 
-   hb_itemRelease( hb_itemReturn( pDir ) );
+   hb_itemForwardValue( &(HB_VM_STACK).Return, &pDir );
 }
 

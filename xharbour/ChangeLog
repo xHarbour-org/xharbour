@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2354 2004/02/21 08:58:04 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2355 2004/02/21 11:58:23 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-21 21:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/direct.c
+    % Optimized out usage of hb_itemNew()
+
+  * source/rtl/trim.c
+    % Optimized by :
+      * bypassing HB_IS_COMPLEX checking because parameter passed is always
+        string type.
+      * trim functions now completely using their own static function and
+        directly utilizing members of PHB_ITEM. They should be faster now.
+
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbcy.c
+    % Optimized out usage of hb_itemNew()
+
 2004-02-21 09:00 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   * utils/hbmake/hbmake.prg
     ! set target name to make file name

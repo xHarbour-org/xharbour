@@ -1,5 +1,5 @@
 /*
- * $Id: trim.c,v 1.5 2004/02/21 00:26:44 andijahja Exp $
+ * $Id: trim.c,v 1.6 2004/02/21 02:26:40 andijahja Exp $
  */
 
 /*
@@ -57,10 +57,11 @@ extern char *hb_vm_sNull;
 extern char *hb_vm_acAscii[256];
 
 /* Memo type is handled here */
-static PHB_ITEM hb_itemPutCLM( PHB_ITEM pItem, char * szText, ULONG ulLen )
+static PHB_ITEM hb_itemPutCLM( PHB_ITEM pItem, char * szText, ULONG ulLen, BOOL bIsMemo )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCLM(%p, %s, %lu)", pItem, szText, ulLen));
 
+#if 0
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
@@ -72,8 +73,9 @@ static PHB_ITEM hb_itemPutCLM( PHB_ITEM pItem, char * szText, ULONG ulLen )
    {
       pItem = hb_itemNew( NULL );
    }
+#endif
 
-   pItem->type = HB_IT_MEMO;
+   pItem->type = bIsMemo ? HB_IT_MEMO : HB_IT_STRING ;
 
    if( szText == NULL || ulLen == 0 )
    {
@@ -143,14 +145,13 @@ HB_FUNC( LTRIM )
 
    if( pText )
    {
-      ULONG ulLen = hb_itemGetCLen( pText );
-      char * szText = hb_strLTrim( hb_itemGetCPtr( pText ), &ulLen );
-      BOOL bIsMemo = ( hb_param(1,HB_IT_MEMOFLAG) != NULL );
+      ULONG ulLen = pText->item.asString.length;
+      char * szText = hb_strLTrim( pText->item.asString.value, &ulLen );
 
-      if( bIsMemo )
-         hb_itemPutCLM( &(HB_VM_STACK).Return, szText, ulLen );
-      else
-         hb_retclen( szText, ulLen );
+      hb_itemPutCLM( &(HB_VM_STACK).Return,
+                     szText,
+                     ulLen,
+                     hb_param(1,HB_IT_MEMOFLAG) != NULL );
    }
    else
    {
@@ -168,26 +169,16 @@ HB_FUNC( RTRIM )
 
    if( pText )
    {
-      BOOL bIsMemo = ( hb_param(1,HB_IT_MEMOFLAG) != NULL );
-      char * pszText = hb_itemGetCPtr( pText );
-
-      if ( bIsMemo )
-      {
 #ifdef HB_EXTENSION
-      hb_itemPutCLM( &(HB_VM_STACK).Return, pszText, hb_strRTrimLen( pszText,hb_itemGetCLen( pText ), ISLOG( 2 ) ? hb_parl( 2 ) : FALSE ) );
+      hb_itemPutCLM( &(HB_VM_STACK).Return,
+                     pText->item.asString.value,
+                     hb_strRTrimLen( pText->item.asString.value, pText->item.asString.length, ISLOG( 2 ) ? hb_parl( 2 ) : FALSE ),
+                     hb_param(1,HB_IT_MEMOFLAG) != NULL );
 #else
-      hb_itemPutCLM( &(HB_VM_STACK).Return, pszText, hb_strRTrimLen( pszText,hb_itemGetCLen( pText ), FALSE ) );
+      hb_itemPutCLM( &(HB_VM_STACK).Return,
+                     pText->item.asString.value,
+                     hb_strRTrimLen( pText->item.asString.value,pText->item.asString.length, FALSE ), hb_param(1,HB_IT_MEMOFLAG) != NULL );
 #endif
-      }
-      else
-      {
-#ifdef HB_EXTENSION
-      hb_retclen( pszText, hb_strRTrimLen( pszText, hb_itemGetCLen( pText ),
-         ISLOG( 2 ) ? hb_parl( 2 ) : FALSE ) );
-#else
-      hb_retclen( pszText, hb_strRTrimLen( pszText, hb_itemGetCLen( pText ), FALSE ) );
-#endif
-      }
    }
    else
       /* NOTE: "TRIM" is right here [vszakats] */
@@ -210,17 +201,16 @@ HB_FUNC( ALLTRIM )
 
    if( pText )
    {
-      BOOL bIsMemo = ( hb_param(1,HB_IT_MEMOFLAG) != NULL );
-      char * pszText = hb_itemGetCPtr( pText );
-      ULONG ulLen = hb_strRTrimLen( pszText, hb_itemGetCLen( pText ),
+      char * pszText;
+      ULONG ulLen = hb_strRTrimLen( pText->item.asString.value, pText->item.asString.length,
          ISLOG( 2 ) ? hb_parl( 2 ) : FALSE );
 
-      pszText = hb_strLTrim( pszText, &ulLen );
+      pszText = hb_strLTrim( pText->item.asString.value, &ulLen );
 
-      if( bIsMemo )
-         hb_itemPutCLM( &(HB_VM_STACK).Return, pszText, ulLen );
-      else
-         hb_retclen( pszText, ulLen );
+      hb_itemPutCLM( &(HB_VM_STACK).Return,
+                     pszText,
+                     ulLen,
+                     hb_param(1,HB_IT_MEMOFLAG) != NULL );
    }
    else
 #ifdef HB_COMPAT_C53

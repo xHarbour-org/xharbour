@@ -1,5 +1,5 @@
 /*
- * $Id: hbcx.c,v 1.2 2004/02/02 10:12:40 andijahja Exp $
+ * $Id: hbcx.c,v 1.3 2004/02/07 18:49:48 andijahja Exp $
  */
 
 /*
@@ -106,10 +106,9 @@ HB_FUNC( XXDECODE_FILE )
    char *string, *szFileName;
    ULONG srclen, dstlen, nBytesWritten = 0;
    BYTE *dststr;
-   PHB_ITEM pStruct, pItem;
+   HB_ITEM pStruct, pItem;
    USHORT uiLen = 1, uiCount;
    BOOL bOutFile = FALSE;
-   BOOL bAlloc = FALSE;
 
    if( pinFile )
    {
@@ -122,17 +121,16 @@ HB_FUNC( XXDECODE_FILE )
          }
          else
          {
-            pStruct = hb_itemNew( NULL );
-            pItem = hb_itemNew( NULL );
-            hb_arrayNew( pStruct, 1 );
-            hb_arraySet( pStruct, 1, hb_itemPutC( pItem, pinFile->item.asString.value ) );
-            bAlloc = TRUE;
+            pStruct.type = HB_IT_NIL;
+            pItem.type = HB_IT_NIL;
+            hb_arrayNew( &pStruct, 1 );
+            hb_arraySet( &pStruct, 1, hb_itemPutC( &pItem, pinFile->item.asString.value ) );
          }
       }
       else if ( ISARRAY( 1 ) )
       {
-         pStruct = hb_param( 1, HB_IT_ARRAY );
-         uiLen = (USHORT) pStruct->item.asArray.value->ulLen;
+         pStruct = (*hb_param( 1, HB_IT_ARRAY ));
+         uiLen = (USHORT) pStruct.item.asArray.value->ulLen;
 
          if ( uiLen <= 0 )
          {
@@ -165,7 +163,7 @@ HB_FUNC( XXDECODE_FILE )
 
    for ( uiCount = 0; uiCount < uiLen; uiCount++ )
    {
-      szFileName = hb_arrayGetC( pStruct, uiCount + 1 );
+      szFileName = hb_arrayGetC( &pStruct, uiCount + 1 );
 
       if ( !szFileName )
       {
@@ -275,12 +273,6 @@ HB_FUNC( XXDECODE_FILE )
    hb_retnl( nBytesWritten );
 
    hb_xfree( string );
-
-   if ( bAlloc )
-   {
-      hb_itemRelease(pStruct);
-      hb_itemRelease(pItem);
-   }
 
    fclose( outFile );
 }
