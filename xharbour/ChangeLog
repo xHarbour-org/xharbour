@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2194 2004/02/01 01:29:11 maurifull Exp $
+ * $Id: ChangeLog,v 1.2195 2004/02/01 12:11:40 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-02-01 12:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * contrib/libct/disk.c
+    - tabs
+    * casts
+  * contrib/libct/settime.c
+    * call parnl instead of parnd in waitperiod
+  * contrib/libct/makefile.vc
+  * contrib/libct/makefile.bc
+    * reordered
+  * contrib/libct/util.prg
+    * correct typo
+   
 2004-02-01 09:40 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   + contrib/libct/settime.c
   + contrib/libct/diskutil.prg

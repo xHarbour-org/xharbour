@@ -1,5 +1,5 @@
 /*
- * $Id: settime.c,v 1.0 2004/01/07 16:53:31 modalsist Exp $
+ * $Id: settime.c,v 1.1 2004/02/01 11:36:59 lculik Exp $
  *
  * xHarbour Project source code:
  * CT3 Date & Time supplementary functions:
@@ -160,13 +160,12 @@ HB_FUNC ( SETNEWTIME )
 
 HB_FUNC ( WAITPERIOD )
 {
-   DWORD dwWait = hb_parnd( 1 ) ;
+   DWORD dwWait = hb_parnl( 1 ) ;
 
-   Sleep( ( dwWait * 10 ) );
+   Sleep( dwWait * 10 );
 
    hb_retl( FALSE );
 }
 
 
 #endif
-

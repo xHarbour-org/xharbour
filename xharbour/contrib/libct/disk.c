@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c v 1.0 2004/01/09 12:13:33 modalsist Exp $
+ * $Id: disk.c,v 1.1 2004/02/01 11:36:59 lculik Exp $
  */
 /*
  * xHarbour Project source code:
@@ -71,23 +71,23 @@
 
 /*  $DOC$
  *  $FUNCNAME$
- *		DELETEFILE()
+ *      DELETEFILE()
  *  $CATEGORY$
- *		LIBCT File management
+ *      LIBCT File management
  *  $ONELINER$
  *      Delete an error-tolerant file.
  *  $SYNTAX$
- *		DELETEFILE(<cFileName>) --> nErrorCode
+ *      DELETEFILE(<cFileName>) --> nErrorCode
  *  $ARGUMENTS$
- *		<cFileName>  Designates which file name to delete.
+ *      <cFileName>  Designates which file name to delete.
  *  $RETURNS$
- *		DELETEFILE() returns a code that signifies its completion status:
+ *      DELETEFILE() returns a code that signifies its completion status:
  *
- *    	Code    Symb. constants     Definition
- *     	 0      NO_DISK_ERR         No error occurs
- *    	-2      ER_FILE_NOT_FOUND   File not found
- *    	-3      ER_PATH_NOT_FOUND   Path not found
- *    	-5      ER_ACCESS_DENIED    Access denied (e.g., file is read-only)
+ *    Code    Symb. constants     Definition
+ *       0      NO_DISK_ERR         No error occurs
+ *      -2      ER_FILE_NOT_FOUND   File not found
+ *      -3      ER_PATH_NOT_FOUND   Path not found
+ *      -5      ER_ACCESS_DENIED    Access denied (e.g., file is read-only)
  *  $DESCRIPTION$
  *      In contrast to FILEDELETE(), which permits you to specify file groups
  *      with wildcards, DELETEFILE() only accepts specific file names.  However,
@@ -95,12 +95,12 @@
  *      directly to the calling program.  This makes error-tolerant erasures in
  *      networks possible (see Examples).
  *
- *		Note
+ *      Note
  *
  *      You can use a drive designator and path name, but no
  *      wildcards.
  *  $EXAMPLES$
- *		How NOT to delete a file in a network environment:
+ *      How NOT to delete a file in a network environment:
  *
  *      IF FILE ("TEST.DBF")
  *       * Is it actually possible to delete the file?
@@ -134,7 +134,7 @@
 HB_FUNC ( DELETEFILE )
 {
  
-   BYTE * pFileName  = hb_parc( 1 ) ;
+   BYTE * pFileName  = ( BYTE *) hb_parc( 1 ) ;
    int iRet;
 
    if ( hb_fsDelete( (BYTE*) pFileName) )
@@ -152,7 +152,7 @@ HB_FUNC ( DELETEFILE )
  *  $FUNCNAME$
  *      DIRMAKE()
  *  $CATEGORY$
- *		LIBCT Directory management
+ *      LIBCT Directory management
  *  $ONELINER$
  *      Create a new directory
  *  $SYNTAX$
@@ -173,7 +173,7 @@ HB_FUNC ( DELETEFILE )
  *      create.  The DIRMAKE() function allows you to create new directories
  *      from within your CA-Clipper application.
  *
- *		Note
+ *      Note
  *
  *      <cDirectory> can contain a drive designator and a path,
  *      wildcards are not allowed.
@@ -199,7 +199,7 @@ HB_FUNC ( DELETEFILE )
 HB_FUNC ( DIRMAKE )
 {
 
-   BYTE * pFileName  = hb_parc( 1 ) ;
+   BYTE * pFileName  = ( BYTE *) hb_parc( 1 ) ;
    int iRet;
 
    if ( hb_fsMkDir( pFileName ) )
@@ -215,35 +215,35 @@ HB_FUNC ( DIRMAKE )
 
 /*  $DOC$
  *  $FUNCNAME$
- *		DIRNAME()
+ *      DIRNAME()
  *  $CATEGORY$
- *		LIBCT Directory management
+ *      LIBCT Directory management
  *  $ONELINER$
- * 		Determines the name of the current directory
+ *      Determines the name of the current directory
  *  $SYNTAX$
- * 		DIRNAME([<cDrive>]) --> cDirectory
+ *      DIRNAME([<cDrive>]) --> cDirectory
  *  $ARGUMENTS$
- * 		<cDrive>  Designates the drive for which the current directory is
- *    	determined (a colon is unnecessary).  The default is the current drive.
+ *      <cDrive>  Designates the drive for which the current directory is
+ *      determined (a colon is unnecessary).  The default is the current drive.
  *  $RETURNS$
- *		DIRNAME() returns the current directory name on the <cDrive>.
+ *      DIRNAME() returns the current directory name on the <cDrive>.
  *  $DESCRIPTION$
- *    	DIRNAME() determines the current directory name on the selected drive.
+ *      DIRNAME() determines the current directory name on the selected drive.
  *    	You can use this function to construct complete access paths.
  *
- *		Notes
+ *      Notes
  *
- *    	The maximum length of the returned value is 65 characters.  If
+ *      The maximum length of the returned value is 65 characters.  If
  *      no drive designator is specified, the current drive is assumed.
  *
- *    	If there is an invalid drive designation, DIRNAME() returns a
+ *      If there is an invalid drive designation, DIRNAME() returns a
  *      null string.
  *  $EXAMPLES$
- *		Display the current directory name:
+ *      Display the current directory name:
  *
  *      ? "Current Directory:  " + DIRNAME()
  *
- *    	With a drive designator:
+ *      With a drive designator:
  *
  *      ? DIRNAME("A")  // Current directory on Drive A:
  *  $TESTS$
@@ -256,7 +256,7 @@ HB_FUNC ( DIRMAKE )
  *  $FILES$
  *      Source is disk.c, library is libct.
  *  $SEEALSO$
- * 		DIRCHANGE() DIRMAKE() DIRREMOVE()
+ *       DIRCHANGE() DIRMAKE() DIRREMOVE()
  *  $END$
  */
 HB_FUNC ( DIRNAME )
@@ -276,16 +276,16 @@ HB_FUNC ( DIRNAME )
  *  $FUNCNAME$
  *      DRIVETYPE()
  *  $CATEGORY$
- *		LIBCT Disk management
+ *      LIBCT Disk management
  *  $ONELINER$
- *		Determines the drive type.
+ *      Determines the drive type.
  *  $SYNTAX$
- *		DRIVETYPE([<cDrive>]) --> nDriveType
+ *      DRIVETYPE([<cDrive>]) --> nDriveType
  *  $ARGUMENTS$
  *      <cDrive>   Designates the drive (A, B, C, etc.) for which the type
  *      is determined.  The default is the current drive.
  *  $RETURNS$
- *   	DRIVETYPE() returns a numeric value for the drive type.  The following
+ *      DRIVETYPE() returns a numeric value for the drive type.  The following
  *      codes apply:
  *
  *      Code  Definition
@@ -301,9 +301,9 @@ HB_FUNC ( DIRNAME )
  *      This function determines if you are dealing with a floppy drive, a hard
  *      disk, RAM drive, CD-ROM or NETWORK disk.
  *
- *		Note
+ *      Note
  *
- *    	Although DRIVETYPE() returns a 0 value for logical DOS
+ *      Although DRIVETYPE() returns a 0 value for logical DOS
  *      partitions, RAM floppies, and unavailable drives, you must also
  *      differentiate with DISKTYPE().  Here, each hard disk partition
  *      returns a 248 value.  A RAM floppy created with VDISK.SYS behaves
@@ -311,11 +311,11 @@ HB_FUNC ( DIRNAME )
  *      value.  If there is an unavailable drive, the DISTYPE() returns a
  *      value of 0.
  *  $EXAMPLES$
- *    	Determine if the drive is a RAM floppy:
+ *       Determine if the drive is a RAM floppy:
  *
- *    	IF DRIVETYPE() == 0 .AND. DISKTYPE() == 254
- *       ? "Drive " + DISKNAME() + ":  is a RAM-disk!"
- *    	ENDIF
+ *       IF DRIVETYPE() == 0 .AND. DISKTYPE() == 254
+ *          ? "Drive " + DISKNAME() + ":  is a RAM-disk!"
+ *       ENDIF
  *  $TESTS$
  *  $STATUS$
  *      Ready
@@ -331,98 +331,98 @@ HB_FUNC ( DIRNAME )
  */
 HB_FUNC ( DRIVETYPE )
 {
-    #if defined(HB_OS_WIN_32)
-	unsigned int uiType;
- 	LPCTSTR pDrive = (LPCTSTR) hb_parc( 1 );
+   #if defined(HB_OS_WIN_32)
+      unsigned int uiType;
+      char * pDrive = hb_parc( 1 );
 
-   	if ( strstr( pDrive, ":" ) == NULL )
-    {
-       strcat( pDrive, ":" ) ;
-    }
+      if ( strstr( pDrive, ":" ) == NULL )
+      {
+         strcat( pDrive, ":" ) ;
+      }
 
-   	if ( strstr( pDrive, "\\" ) == NULL )
-    {
-       strcat( pDrive, "\\" ) ;
-    }
+      if ( strstr( pDrive, "\\" ) == NULL )
+      {
+         strcat( pDrive, "\\" ) ;
+      }
 
-	uiType = GetDriveType( pDrive );
+      uiType = GetDriveType( pDrive );
 
-	if ( uiType  == DRIVE_RAMDISK )
-    {
-       hb_retni( 0 );  // RAM Drive - Clipper compatible
-    }
-	else if (uiType == DRIVE_REMOVABLE )
-    {
-       hb_retni( 2 );  // Floppy Drive - Clipper compatible
-    }
-	else if (uiType == DRIVE_FIXED )
-    {
-       hb_retni( 3 );  // Hard Drive  - Clipper compatible
-    }
-	else if (uiType == DRIVE_CDROM )
-    {
-       hb_retni( 4 );  // CD-Rom Drive - xHarbour extension
-    }
-	else if (uiType == DRIVE_REMOTE )
-    {
-       hb_retni( 5 );  // Network Drive - xHarbour extension
-    }
-	else
-    {
-       hb_retni( 9 );  // Unknow Drive - xHarbour extension
-    }
-#else
+      if ( uiType  == DRIVE_RAMDISK )
+      {
+         hb_retni( 0 );  // RAM Drive - Clipper compatible
+      }
+      else if (uiType == DRIVE_REMOVABLE )
+      {
+         hb_retni( 2 );  // Floppy Drive - Clipper compatible
+      }
+      else if (uiType == DRIVE_FIXED )
+      {
+         hb_retni( 3 );  // Hard Drive  - Clipper compatible
+      }
+      else if (uiType == DRIVE_CDROM )
+      {
+         hb_retni( 4 );  // CD-Rom Drive - xHarbour extension
+      }
+      else if (uiType == DRIVE_REMOTE )
+      {
+         hb_retni( 5 );  // Network Drive - xHarbour extension
+      }
+      else
+      {
+         hb_retni( 9 );  // Unknow Drive - xHarbour extension
+      }
+   #else
       hb_retni(9);
-#endif
+   #endif
 }
 
 /*  $DOC$
  *  $FUNCNAME$
- *		FILEMOVE()
+ *    FILEMOVE()
  *  $CATEGORY$
- *		LIBCT File management
+ *    LIBCT File management
  *  $ONELINER$
  *      Move files to another directory.
  *  $SYNTAX$
- *		FILEMOVE(<cSourceFile>, <cTargetFile>) --> nErrorCode
+ *    FILEMOVE(<cSourceFile>, <cTargetFile>) --> nErrorCode
  *  $ARGUMENTS$
- *		<cSourceFile>  Designates the name and the path of the source file.
+ *    <cSourceFile>  Designates the name and the path of the source file.
  *
- *   	<cTargetFile>  Designates the name and the path of the target file.
+ *     <cTargetFile>  Designates the name and the path of the target file.
  *  $RETURNS$
- *    	FILEMOVE() returns a value of 0 when the file can be moved; otherwise,
- *    	an error code is returned.  The codes are defined below:
+ *      FILEMOVE() returns a value of 0 when the file can be moved; otherwise,
+ *      an error code is returned.  The codes are defined below:
  *
- *    	Code    Symb. constants        Definition
+ *      Code    Symb. constants        Definition
  *
  *      0       NO_DISK_ERR            No errors
  *      -2      ER_FILE_NOT_FOUND      File not found
- *    	-3      ER_PATH_NOT_FOUND      Access path not found
- *    	-5      ER_ACCESS_DENIED       Access denied (e.g., network)
- *    	-17     ER_DIFFERENT_DEVICE    Target file not on same drive
+ *      -3      ER_PATH_NOT_FOUND      Access path not found
+ *      -5      ER_ACCESS_DENIED       Access denied (e.g., network)
+ *      -17     ER_DIFFERENT_DEVICE    Target file not on same drive
  *  $DESCRIPTION$
- *    	If a file is to be copied within a drive and then deleted it from the
- *    	original position, it is quicker to move the file.  FILEMOVE() makes
- *    	this possible.  The directory entries are also changed, which is much
- *    	quicker than copying and deleting.
+ *      If a file is to be copied within a drive and then deleted it from the
+ *      original position, it is quicker to move the file.  FILEMOVE() makes
+ *      this possible.  The directory entries are also changed, which is much
+ *      quicker than copying and deleting.
  *
- *		Notes
+ *    Notes
  *
- *    	You can use drive designators and access paths in
+ *      You can use drive designators and access paths in
  *      <cSourceFile> and <cTargetFile> file names.  Wildcards are not
  *      permitted.
  *
- *    	You can only move a file within a drive.  If the target
+ *      You can only move a file within a drive.  If the target
  *      directory already contains a file with the same name as the one from
  *      <cSourceFile>, the move is not completed.  In this case, FILEMOVE()
  *      returns a value of -5.  The only option available in this situation,
  *      is to delete the file in the target directory.
  *  $EXAMPLES$
- *    	Move a file from "\OLD" to "\NEW":
+ *      Move a file from "\OLD" to "\NEW":
  *
- *    	IF FILEMOVE("\OLD\CUST.DBF", "\NEW\CUST.DBF") = 0
+ *      IF FILEMOVE("\OLD\CUST.DBF", "\NEW\CUST.DBF") = 0
  *       ? "The file is now in the \NEW directory"
- *    	ENDIF
+ *      ENDIF
  *  $TESTS$
  *  $STATUS$
  *      Ready
@@ -433,14 +433,15 @@ HB_FUNC ( DRIVETYPE )
  *  $FILES$
  *      Source is disk.c, library is libct.
  *  $SEEALSO$
- *		FILECOPY()
+ *    FILECOPY()
  *  $END$
  */
 HB_FUNC ( FILEMOVE )
 {
-   BYTE * pSourceFile = hb_parc( 1 );
-   BYTE *  pTargetFile = hb_parc( 2 );
+   BYTE * pSourceFile = ( BYTE *) hb_parc( 1 );
+   BYTE *  pTargetFile = ( BYTE *) hb_parc( 2 );
    int iRet;
+
    if (hb_fsRename( pSourceFile , pTargetFile ) )
    {
       hb_retni ( 0 );
@@ -451,5 +452,3 @@ HB_FUNC ( FILEMOVE )
       hb_retni ( iRet * (-1) );
    }
 }
-
-

@@ -1,5 +1,5 @@
 /*
- *  $Id: util.prg,v 1.0 2004/01/16 121:08:40 modalsist Exp $
+ *  $Id: util.prg,v 1.1 2004/02/01 11:36:59 lculik Exp $
  */
 
 /*
@@ -209,7 +209,7 @@ FUNCTION Occurs( cStr1 , cStr2 )
       RETURN ( nOccurs )
    ENDIF
 
-   LOCALi := 1 to Len( cStr2 ) 
+   FOR i := 1 to Len( cStr2 ) 
       IF cStr1 == substr( cStr2 , i , Len( cStr1) )
          nOccurs += 1
       ENDIF  

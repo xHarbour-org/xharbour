@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.13 2004/01/26 09:41:40 paultucker Exp $
+# $Id: makefile.bc,v 1.14 2004/02/01 11:36:59 lculik Exp $
 #
 
 #
@@ -160,13 +160,13 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\datetime.obj \
    $(OBJ_DIR)\dattime2.obj \
    $(OBJ_DIR)\dattime3.obj \
+   $(OBJ_DIR)\fcopy.obj \
    $(OBJ_DIR)\invrtwin.obj \
    $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\screen2.obj \
    $(OBJ_DIR)\time.obj \
    $(OBJ_DIR)\strfile.obj \
-   $(OBJ_DIR)\util.obj \
-   $(OBJ_DIR)\fcopy.obj
+   $(OBJ_DIR)\util.obj
 
 
 #
