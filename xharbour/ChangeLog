@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2163 2004/01/28 01:54:33 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2164 2004/01/28 04:14:26 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-28 14:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/harbour.c
+    * fix typo "intenrational" -> "international"
+
+  * source/compiler/hbusage.c
+    * fix long outstanding fatal bug in "Credit" section by adding the
+      following ppls:
+        Andi Jahja <xharbour@cbn.net.id>
+        Antonio Carlos Pantaglione <toninho@fwi.com.br>
+        Charles Kwon <Charles@fivetech.net>
+        Francesco Saverio Giudice <info@fsgiudice.com>
+        Giancarlo Niccolai <gc@niccolai.ws>
+        Lorenzo Fiorini <lorenzo_fiorini@tin.it>
+        Marcelo Lombardo <lombardo@uol.com.br>
+        Mauricio Abre <maurifull@datafull.com>
+        Peter Rees <peter@rees.co.nz>
+        Phil Krylov <phil@newstar.rinet.ru>
+        Przemyslaw Czerpak <druzus@polbox.com>
+        Pritpal Bedi <pritpal@vouchcac.com>
+        Tommi Rouvali <tommi@rouvali.com>
 
 2004-01-28 1:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/gtalleg/ssf.h

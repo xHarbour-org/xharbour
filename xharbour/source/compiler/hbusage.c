@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.14 2003/10/06 21:31:35 ronpinkas Exp $
+ * $Id: hbusage.c,v 1.15 2004/01/06 19:33:55 andijahja Exp $
  */
 
 /*
@@ -139,22 +139,29 @@ void hb_compPrintModes( void )
  */
 void hb_compPrintCredits( void )
 {
+
    printf( "\n"
-           "Credits:  The Harbour Team at www.harbour-project.org\n"
+           "Credits: The xHarbour Team at www.xharbour.org\n"
+           "         The Harbour Team at www.harbour-project.org\n"
            "\n"
-           "April White <awhite@user.rose.com>\n"
+           "Andi Jahja <xharbour@cbn.net.id>\n"
+           "Antonio Carlos Pantaglione <toninho@fwi.com.br>\n"
+           "Antonio Linares <alinares@fivetech.com>\n"
            "Alejandro de Garate <alex_degarate@hotmail.com>\n"
            "Alexander S. Kresin <alex@belacy.belgorod.su>\n"
-           "Antonio Linares <alinares@fivetech.com>\n"
+           "April White <awhite@user.rose.com>\n"
            "Bil Simser <bsimser@home.com>\n"
            "Brian Hays <bhays@abacuslaw.com>\n"
            "Bruno Cantero <bruno@issnet.net>\n"
+           "Charles Kwon <Charles@fivetech.net>\n"
            "Chen Kedem <niki@actcom.co.il>\n"
            "Dave Pearson <davep@davep.org>\n"
            "David G. Holm <dholm@jsd-llc.com>\n"
            "Davor Siklic <siki@msoft.cz>\n"
            "Eddie Runia <eddie@runia.com>\n"
            "Felipe G. Coury <fcoury@creation.com.br>\n"
+           "Francesco Saverio Giudice <info@fsgiudice.com>\n"
+           "Giancarlo Niccolai <gc@niccolai.ws>\n"
            "Gonzalo A. Diethelm <gonzalo.diethelm@iname.com>\n"
            "Horacio D. Roldan Kasimatis <harbour_ar@yahoo.com.ar>\n"
            "Ignacio Ortiz de Zuniga <ignacio@fivetech.com>\n"
@@ -162,19 +169,27 @@ void hb_compPrintCredits( void )
            "Jean-Francois Lefebvre (mafact) <jfl@mafact.com>\n"
            "Jose Lalin <dezac@corevia.com>\n"
            "Leslee Griffith <les.griffith@vantagesystems.ca>\n"
+           "Lorenzo Fiorini <lorenzo_fiorini@tin.it>\n"
            "Luiz Rafael Culik <culik@sl.conex.net>\n"
            "Manuel Ruiz <mrt@joca.es>\n"
+           "Marcelo Lombardo <lombardo@uol.com.br>\n"
            "Matteo Baccan <baccan@isanet.it>\n"
            "Matthew Hamilton <mhamilton@bunge.com.au>\n"
+           "Mauricio Abre <maurifull@datafull.com>\n"
            "Maurilio Longo <maurilio.longo@libero.it>\n"
            "Nicolas del Pozo <niko@geroa.com>\n"
            "Patrick Mast <harbour@winfakt.com>\n"
            "Paul Tucker <ptucker@sympatico.ca>\n"
+           "Peter Rees <peter@rees.co.nz>\n"
            "Peter Townsend <cephas@tpgi.com.au>\n"
            "Phil Barnett <philb@iag.net>\n"
+           "Phil Krylov <phil@newstar.rinet.ru>\n"
+           "Pritpal Bedi <pritpal@vouchcac.com>\n"
+           "Przemyslaw Czerpak <druzus@polbox.com>\n"
            "Ron Pinkas <ron@profit-master.com>\n"
            "Ryszard Glab <rglab@imid.med.pl>\n"
            "Tim Stone <timstone@mstrlink.com>\n"
+           "Tommi Rouvali <tommi@rouvali.com>\n"
            "Viktor Szakats <viktor.szakats@syenar.hu>\n"
            "Vladimir Kazimirchik <v_kazimirchik@yahoo.com>\n"
            "Walter Negro <anegro@overnet.com.ar>\n"

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.61 2004/01/27 11:45:13 likewolf Exp $
+ * $Id: harbour.c,v 1.62 2004/01/27 15:20:39 likewolf Exp $
  */
 
 /*
@@ -4646,7 +4646,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
                if( hb_comp_bI18n )
                {
-                  printf( "Generating intenrational list to '%s'...\n", szHILName );
+                  printf( "Generating international list to '%s'...\n", szHILName );
                }
             }
 
