@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2717 2004/04/02 10:55:42 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2718 2004/04/02 11:13:18 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-02 07:16 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
+  * source/rtl/errorsys.prg
+    * if the error object have no argument don't add the text "Arguments:"
+      to cMessage
 
 2004-04-02 06:00 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
   * source/rtl/hbffind.c
