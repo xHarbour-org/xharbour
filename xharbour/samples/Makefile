@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2000/04/02 14:17:26 vszel Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:47:03 ronpinkas Exp $
 #
 
 ROOT = ../
@@ -8,6 +8,7 @@ DIRS=\
 	guestbk \
 	hscript \
 	misc \
+	sitesrv \
 	pe \
 
 include $(ROOT)config/dir.cf

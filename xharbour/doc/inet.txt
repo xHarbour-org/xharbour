@@ -1,0 +1,213 @@
+
+
+                                 XHARBOUR INET API
+                                -------------------
+
+
+        Giancarlo Niccolai <gian@niccolai.ws>
+
+
+
+
+STATUS OF THIS DOCUMENT
+=======================
+
+This is just a draft, a survival guide with minimal API instructions
+extracted from the inet.c program comments and from some posting to
+the xharbour newsgroup.
+
+More adequated version will be available soon.
+
+
+
+
+XHARBOUR INET API
+=================
+
+
+Startup / cleanup functions
+---------------------------
+
+INETINIT() -->NIL
+
+  Activates inet support; mainly used for winsock start up at the moment, but
+  could be used in the future for many other purpose. Put it at the beginning
+  of every program using INET functions.
+
+
+INETCLEANUP() -->NIL
+  Closes Inet support; mainly used for win32. Put it at the end of any program
+  using Inet functions
+
+
+InetClose( SOCKET ) --> NUMERIC
+  Closes the socket, notifiying both ends of the communication pipe that the
+  connection is over. If you have threads waiting for data to be read from
+  this socket, this method will make them to stop waiting and return an error
+  (socket closed) to their callers.
+  The method does not destroys the socket, that can be used by subordinate
+  threads to check that the socket is closed, and so they should stop as soon
+  as they can. Don't destroy the socket unless you are sure that no other
+  thread is using it.
+  RETURNS 0 on success or -1 on error; on error, the error code is set;
+  (actually, on success the socket error code is set to 1 -- socket closed )
+
+
+InetDestroy( SOCKET ) --> Numeric
+  Closes AND destroys a socket. After this call, the socket can't be used
+  anymore. Returns 0 on success -1 on failure.
+
+
+
+Informative functions
+---------------------
+
+InetErrorCode( SOCKET ) --> Numeric
+  Returns the last error code that has been provoked by a network operation,
+  or 0 if none. Error codes are the one used for winsock or UnixSockets (they
+  are the same); 1 is reserved for "connection closed" message.
+
+
+InetErrorDesc( SOCKET ) --> String
+  Returns a string describing the last error that have occoured to the socket;
+  the string is system dependent, and should be used only for debugging
+  purposes.
+
+
+InetCount( SOCKET ) --> Numeric
+  Returns the amount of characters read or written in the latest socket
+  operation.
+
+
+InetAdderss( SOCKET ) --> STRING
+  Returns a string representing the remote server addres in quad dot notation,
+  e.g. "192.168.1.1", or the local server address if the socket is server
+  side.
+  TODO: have a version that returns a vector of 4 numbers.
+
+
+InetPort( SOCKET ) --> STRING
+  Returns the port to which this socket is bound, or the remote port if this
+  socket is connected with a remote host or client
+
+
+
+
+Server Side socket functions
+----------------------------
+
+InetServer( port ) --> SOCKET
+  Creates a server that can accept connections from client on a certain port.
+  TODO: bind on a particular interface / ip address.
+  On error, sets error in the newly returned socket.
+
+InetAccept( SOCKET ) --> SOCKET
+  Waits until a connection is available on a socket created with InetServer;
+  Returns a socket that can be used to communicate with the incoming client.
+  On error, sets error in the newly returned socket.
+
+
+
+
+Client side socket functions
+----------------------------
+
+InetConnect( ADDRESS, PORT ) --> SOCKET
+  Connects to a remote server described by ADDRESS (string), that can be in
+  quad dot notation (e.g. "192.168.1.1") or in DNS name (e.g.
+  "www.xharbour.org"), using the desired port.
+  On error, the error of the returned socket is set.
+
+
+
+
+Sening and receiving data
+----------------------------
+
+InetRecv( SOCKET, @cString [, nAmount] ) --> NUMERIC
+  Reads at maximum nAmount bytes (or a number of bytes equal to cString
+  length if nAmount is not given) from the socket into cString.
+  The parameter cString must be preallocated so that it has enough
+  space to receive the data. The routine will block the thread until some
+  bytes are read from the socket, the socket is closed (either from the
+  receiver or the sender side)or a network error occours, wichever comes
+  first. In the latter cases, an error is set, and only the characters
+  received until premature end of communications are returned.
+  Notice that there is no guarantee that all the available bytes will be
+  read before the function returns, in fact, InetRecv returns as soon it
+  is able to fill cString with one bytes or more. To block the current
+  process until the whole cString is filled (or nAmuount bytes are read),
+  use the InetRecvALL().
+  RETURNS the number of the characters read from the SOCKET.
+
+
+InetRecvAll( SOCKET, @cString [, nAmount] ) --> NUMERIC
+  This function works exaclty as InetRecv, except for the fact that it
+  blocks untill nAmount bytes are read, if nAmount is given, or
+  cString is filled for it's whole lenght.
+  RETURNS the number of the characters read from the SOCKET. Might be
+  less than nAmount on premature socket closing or on network error.
+
+
+InetRecvLine( SOCKET [, @nResult, [, nMaxLength [, nBufSize]]] ) --> STRING
+  Blocks the calling thread until a sequence CRLF is read from the socket.
+  Incremental allocation and end-of-line checking are done in an efficient
+  way. If an error occours, or if the stream is closed before a CRLF is read,
+  the functions returns nothing and sets the socket error.
+  The returned string does not contains the trailing CRLF sequence, so an
+  empty line is effectively returned as an empty string.
+  If the nResult parameter is given, it will contain the number of bytes
+  read from the socket, including the CRLF sequence, so that in normal
+  conditions, nResult will report a count equal to the lenght of the
+  returned string plus 2. nResult will be 0 if stream is closed before
+  a CRLF sequence is read, and will be -1 on error.
+  An optional MaxLength parameter can be given to allow a maximum character
+  count before the data is returned any way. If this number is hit before
+  a CRLF sequence is encountered, nResult will contain the value one.
+  Finally, a nBufSize parameter can be given. If not, memory allocation
+  will be increased by discrete amounts of 80 bytes. The programmer
+  can provide here a different allocation strategy (e.g. setting nBufSize
+  equal to nMaxLenght, memory for reading the line will be allocated only
+  once, at the beginning of the function).
+
+
+InetDataReady( SOCKET [, nAmount] ) --> NUMERIC
+  Verifies if some data is available to be read in the socket without blocking
+  execution of the caller. If nAmount is not given, the functions returns 1 if
+  there is some data to be read, 0 if there isn't any data and -1 in case of
+  error. If nAmount is given, the functon will check if the stream has
+  available for reading at least nAmount characters; it will return the number
+  of available characters up to nAmount, 0 if none and -1 on error.
+  On error, the socket will report what kind of error happend.
+
+
+InetSend( SOCKET, STRING [, nLength ] ) --> NUNERIC
+  Send data being stored in a string over the socket. Returns the amount of
+  data written, 0 if the socket has been closed in the meanwhile or -1 on
+  error. nLenght aparameter can be given to allow writing only a part of
+  the string.
+  Please, notice that there is no guarantee that all your string will be
+  sent, as this is a decision that is up to the OS; this function does not
+  takes care to ensure that the data is really sent; so you should check for
+  the returned number, and send the part that has not been sent.
+  To ensure that all the data is sent before the function returns, use the
+  InetSendAll() function.
+  On error, the error in the socket is set.
+
+
+InetSendAll( SOCKET, STRING [, nLength ] ) --> NUNERIC
+  This function works exactly as InetSend() but it ensures that all the
+  data to be sent is written before returning.
+  
+
+
+  
+Utitlity Functions
+------------------
+
+InetCRLF() --> String
+  Returns a CRLF sequence used in many internet protocols.
+
+  
+  
+
