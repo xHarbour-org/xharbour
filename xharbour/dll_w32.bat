@@ -7,9 +7,9 @@ REM ³ This is a batch file to create harbour.dll ³Û
 REM ³ Please adjust envars accordingly           ³Û
 REM ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 REM  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-rem SET BISON_SIMPLE=c:\windows\bison.simple
-IF NOT EXIST OBJ\DLL MKDIR OBJ\DLL
-IF NOT EXIST OBJ\DLL\watcom MKDIR OBJ\DLL\watcom
+IF NOT EXIST obj            MKDIR obj
+IF NOT EXIST obj\dll        MKDIR obj\dll
+IF NOT EXIST obj\dll\watcom MKDIR obj\dll\watcom
 SET BISON_SIMPLE=c:\windows\bison.simple
 SET _LIB=%LIB%
 SET _PATH=%PATH%
@@ -19,7 +19,7 @@ SET LIB=C:\Watcom\Lib386;C:\Watcom\Lib386\NT
 SET WATCOM=C:\watcom
 SET EDPATH=C:\watcom\EDDAT
 SET INCLUDE=C:\watcom\H;C:\watcom\H\NT
-wmake -ms -h BCC_DIR=C:\WATCOM HARBOUR_EXE=bin\watcom\harbour.exe HB_LEX=SIMPLEX BIN_DIR=bin\watcom -f hrbdll.wc %1 %2 %3
+wmake -ms -h LIB_DIR=lib\watcom BIN_DIR=bin\watcom -f hrbdll.wc %1 %2 %3
 if exist hdll.tmp del hdll.tmp
 SET PATH=%_PATH%
 SET _PATH=

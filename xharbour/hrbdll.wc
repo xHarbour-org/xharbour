@@ -2,7 +2,7 @@
 # $Id: hrbdll.bc,v 1.42 2004/02/16 06:55:52 paultucker Exp $
 #
 #
-# This make file is for creating harbour.dll with Borland C++ 5.5.1
+# This make file is for creating harbour.dll with Open-Watcom 1.2
 # Envars should be modified to fit one's environment
 #
 
@@ -10,9 +10,8 @@
 # ³ general definition  ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßß
-# BIN_DIR is defined in dll_55.bat, please adjust accordingly
 
-HARBOUR_EXE = bin\watcom\harbour.exe
+HARBOUR_EXE = $(BIN_DIR)\harbour.exe
 CC          = WPP386
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -65,12 +64,14 @@ HARBOURFLAGS = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /i$(INCLUDE_DIR) /q0 /w /es2 
 #  ßßßßßßßßßß
 # Please adjust according to your environment
 
-HARBOUR_DLL = lib\watcom\harbour.dll
+HARBOUR_DLL = $(LIB_DIR)\harbour.dll
+HARBOUR_LIB = $(LIB_DIR)\harbour.lib
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ HARBOUR_DLL rules ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßß
+
 HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\abs.obj \
   $(OBJ_DIR)\accept.obj \
@@ -815,7 +816,7 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
   echo. $(OBJ_DIR)\hvm.obj                >> hdll.tmp
   echo. $(OBJ_DIR)\fastitem.obj           >> hdll.tmp
   echo. uuid.lib                          >> hdll.tmp
-  LINK386 /nologo /out:$(HARBOUR_DLL) /implib:lib\watcom\harbour.lib /dll @hdll.tmp
+  LINK386 /nologo /out:$(HARBOUR_DLL) /implib:$(HARBOUR_LIB) /dll @hdll.tmp
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ object file creation ³Û
