@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.83 2003/08/06 14:30:24 lculik Exp $
+ * $Id: hbmake.prg,v 1.84 2003/08/16 03:50:52 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1810,7 +1810,7 @@ cResname += cAllRes
    ELSEIF s_lGcc
 
       IF cOs == "Linux"
-         fWrite( s_nLinkHandle, "LIBFILES = -Wl,--start-group " + IIF( ! lMt, cDefLibGccLibs, cDefLibGccLibsMt ) + " -Wl,--end-group " + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = " + IIF( ! lMt, cDefLibGccLibs, cDefLibGccLibsMt ) + " " + CRLF )
       ELSEIF cOs == "OS/2"
          fWrite( s_nLinkHandle, "LIBFILES = " + IIF( ! lMt, cGccLibsOs2, cGccLibsOs2Mt ) + CRLF )
       ELSE
@@ -2615,8 +2615,8 @@ FUNC CreateLibMakeFile( cFile )
       fWrite( s_nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       fWrite( s_nLinkHandle, "ALLLIB = " + CRLF )
    ELSEIF s_lGcc
-      fWrite( s_nLinkHandle, "CFLAG1 = " + IIF( "linux" IN Lower( Getenv( "HB_ARCHITECTURE" ) ) , "-I$(HB_INC_INSTALL)", " -I$(BHC)/include" ) + " -c -Wall" + CRLF )
-      fWrite( s_nLinkHandle, "CFLAG2 = " + IIF( "linux" IN Lower( Getenv( "HB_ARCHITECTURE" ) ) , "-L $(HB_LIB_INSTALL)", " -L $(BHC)/lib" ) + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG1 = " + IIF( "linux" IN Lower( Os() ) , "-I/usr/include/xharbour", " -I$(BHC)/include" ) + " -c -Wall" + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG2 = " + IIF( "linux" IN Lower( Os() ) , "-L /usr/lib/xharbour", " -L $(BHC)/lib" ) + CRLF )
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
