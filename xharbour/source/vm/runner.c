@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.16 2003/11/11 20:20:55 ronpinkas Exp $
+ * $Id: runner.c,v 1.17 2003/12/01 05:56:56 ronpinkas Exp $
  */
 
 /*
@@ -81,10 +81,11 @@ extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
 
 static BYTE prgFunction[] =
 {
-   0x68, 0x00, 0x00, 0x00, 0x00,  /* push offset pcode               */
+   0x68, 0x00, 0x00, 0x00, 0x00,  /* push offset Globals             */
    0x68, 0x00, 0x00, 0x00, 0x00,  /* push offset symbols             */
+   0x68, 0x00, 0x00, 0x00, 0x00,  /* push offset pcode               */
    0xE8, 0x00, 0x00, 0x00, 0x00,  /* call near relative hb_vmExecute */
-   0x83, 0xC4, 0x08,              /* add esp, 8                      */
+   0x83, 0xC4, 0x0C,              /* add esp, 12                     */
    0xC3                           /* ret near                        */
 };
 
@@ -815,9 +816,10 @@ HB_EXPORT PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode )
                                               /* Copy new assembler code in */
 /* #if INTEL32 */
 
-   hb_hrbAsmPatch( asmRet->pAsmData, 1, pSymbols );   /* Insert pointer to testsym */
-   hb_hrbAsmPatch( asmRet->pAsmData, 6, pCode );      /* Insert pointer to testcode */
-   hb_hrbAsmPatchRelative( asmRet->pAsmData, 11, hb_vmExecute, 15 );
+   //hb_hrbAsmPatch( asmRet->pAsmData, 1, NULL );       /* Insert pointer to globals */
+   hb_hrbAsmPatch( asmRet->pAsmData, 6, pSymbols );   /* Insert pointer to symbols */
+   hb_hrbAsmPatch( asmRet->pAsmData, 11, pCode );      /* Insert pointer to pcode */
+   hb_hrbAsmPatchRelative( asmRet->pAsmData, 16, hb_vmExecute, 20 );
                                       /* Insert pointer to hb_vmExecute() */
 
 /* #elseif INTEL16 */

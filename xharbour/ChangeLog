@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1804 2003/12/01 03:53:36 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1805 2003/12/01 05:56:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-01 12:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/runner.c
+    * Modified prgFunction template to also push Globals.
+
+  * tests/pp.prg
+  * tests/pp_harb.ch
+    * Removed PP_ExecProcID(), and optimized PP_GenDynProcedure() to call PP_ExecProcedure() directly.
+    * Minor corrections.
 
 2003-11-30 21:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/runner.c

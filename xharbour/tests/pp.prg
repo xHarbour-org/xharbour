@@ -806,19 +806,6 @@ RETURN s_xRet
 
 //--------------------------------------------------------------//
 
-FUNCTION PP_ExecProcID( nProc, aParams )
-
-    s_xRet := NIL
-    s_aParams := aParams
-
-    //TraceLog()
-
-    PP_ExecProcedure( s_aDynProcedures, nProc )
-
-RETURN s_xRet
-
-//--------------------------------------------------------------//
-
 FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
    LOCAL aProc := aProcedures[nProc]
@@ -2119,42 +2106,43 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
 
    oRecover := oErr
 
-   #ifndef __XHARBOUR__
-      IF oErr:SubCode == 1001
-         IF s_sModule != NIL
-            sProc := s_sModule + oErr:Operation
-            nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
-         ELSE
-            nProc := 0
-         ENDIF
+   IF oErr:SubCode == 1001
+      IF s_sModule != NIL
+         sProc := s_sModule + oErr:Operation
+         nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
+      ELSE
+         nProc := 0
+      ENDIF
+
+      #ifndef __XHARBOUR__
          IF nProc == 0
             sProc := oErr:Operation
             nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
          ENDIF
+      #endif
 
-         IF nProc > 0
-            s_xRet := NIL
-            IF ValType( oErr:Args ) == 'A'
-               s_aParams := oErr:Args
-            ELSE
-               s_aParams := {}
-            ENDIF
+      IF nProc > 0
+         s_xRet := NIL
+         IF ValType( oErr:Args ) == 'A'
+            s_aParams := oErr:Args
+         ELSE
+            s_aParams := {}
+         ENDIF
 
-            lSuccess := .T.
+         lSuccess := .T.
 
-            BEGIN SEQUENCE
-               PP_ExecProcedure( aProcedures, nProc )
-            RECOVER USING oRecover
-               lSuccess := .F.
-               oRecover:Cargo := oErr
-            END
+         BEGIN SEQUENCE
+            PP_ExecProcedure( aProcedures, nProc )
+         RECOVER USING oRecover
+            lSuccess := .F.
+            oRecover:Cargo := oErr
+         END
 
-            IF lSuccess
-               RETURN s_xRet
-            ENDIF
+         IF lSuccess
+            RETURN s_xRet
          ENDIF
       ENDIF
-   #endif
+   ENDIF
 
    oRecover:ProcName   := PP_ProcName()
    oRecover:ProcLine   := PP_ProcLine()
@@ -9520,10 +9508,6 @@ RETURN s_bExternalRecovery
 //--------------------------------------------------------------//
 PROCEDURE PP_Warning( cMsg )
    ? cMsg
-RETURN
-
-STATIC PROCEDURE ForceSymbol()
-   PP_ExecProcID() // Force generation of fake PUSHSYM to be used by PP_GenDynProc()
 RETURN
 
 //--------------------------------------------------------------//

@@ -2505,29 +2505,53 @@
 
             //OutputDebugValues( NULL, "Dyn: '%s'\n", sFunctionName );
 
-            BYTE *pcode = (BYTE *) hb_xgrab( 15 );
-            pcode[ 0] = HB_P_PUSHSYMNEAR;
-            pcode[ 1] = 34;                   /* PP_EXECPROCID */
+            BYTE *pcode = (BYTE *) hb_xgrab( 31 );
 
-            pcode[ 2] = HB_P_PUSHNIL;
+            pcode[ 0] = HB_P_SFRAME;
+            pcode[ 1] = 168;
+            pcode[ 2] = 2;                 /* symbol (_INITSTATICS) */
 
-            pcode[ 3] = HB_P_PUSHINT;
-            pcode[ 4] = HB_LOBYTE( iID );
-            pcode[ 5] = HB_HIBYTE( iID );
+            pcode[ 3] = HB_P_PUSHNIL;
 
-            pcode[ 6] = HB_P_PUSHSYMNEAR;
-            pcode[ 7] = 31;                 /* HB_APARAMS */
+            pcode[ 4] = HB_P_POPSTATIC;
+            pcode[ 5] = 28;
+            pcode[ 6] = 0;                 /* S_XRET */
 
-            pcode[ 8] = HB_P_PUSHNIL;
+            pcode[ 7] = HB_P_PUSHSYMNEAR;
+            pcode[ 8] = 31;               /* HB_APARAMS */
 
-            pcode[ 9] = HB_P_FUNCTIONSHORT;
-            pcode[10] = 0;
+            pcode[ 9] = HB_P_PUSHNIL;
 
-            pcode[11] = HB_P_FUNCTIONSHORT;
-            pcode[12] = 2;
+            pcode[10] = HB_P_FUNCTIONSHORT;
+            pcode[11] =  0;
 
-            pcode[13] = HB_P_RETVALUE;
-            pcode[14] = HB_P_ENDPROC;
+            pcode[12] = HB_P_POPSTATIC;
+            pcode[13] = 36;
+            pcode[14] = 0;                /* S_APARAMS */
+
+            pcode[15] = HB_P_PUSHSYMNEAR;
+            pcode[16] = 33;               /* PP_EXECPROCEDURE */
+
+            pcode[17] = HB_P_PUSHNIL;
+
+            pcode[18] = HB_P_PUSHSTATIC;
+            pcode[19] = 54;
+            pcode[20] = 0;                 /* S_ADYNPROCEDURES */
+
+            pcode[21] = HB_P_PUSHINT;
+            pcode[22] = HB_LOBYTE( iID );
+            pcode[23] = HB_HIBYTE( iID );
+
+            pcode[24] =  HB_P_DOSHORT;
+            pcode[25] =  2;
+
+            pcode[26] = HB_P_PUSHSTATIC;
+            pcode[27] = 28;
+            pcode[28] = 0;                 /* S_XRET */
+
+            pcode[29] =  HB_P_RETVALUE;
+
+            pcode[30] = HB_P_ENDPROC;
 
             pDynFunc = hb_hrbAsmCreateFun( symbols, pcode );
 
