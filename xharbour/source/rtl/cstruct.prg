@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.1 2002/06/12 11:53:06 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.2 2002/06/13 22:44:57 ronpinkas Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ Function __ActiveStructure( cStructure, aStructure, nAlign )
 
       IF aScan( s_aClasses, { | aClassInfo | IIF( aClassInfo[1] == cStructure, .T., .F. ) } ) == 0
          //TraceLog( "Registered: " + cStructure )
-         aAdd( s_aClasses, { cStructure, NIL, NIL, IIF( ValType( nAlign ) == "N", nAlign, 4 ) } )
+         aAdd( s_aClasses, { cStructure, NIL, NIL, IIF( ValType( nAlign ) == "N", nAlign, 8 ) } )
       END
 
       aActiveStructure := aStructure

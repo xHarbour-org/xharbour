@@ -64,7 +64,7 @@ Return
 
   #include "hbapi.h"
 
-  //#pragma pack(1)
+  #pragma pack(4)
   typedef struct _MYSTRUCTURE
   {
     char * sName;

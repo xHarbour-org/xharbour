@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.270 2002/06/14 03:24:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.271 2002/06/14 17:43:28 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-14 11:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrayshb.c
+    ! Fixed alignment logic.
+
+  * source/rtl/cstruct.prg
+    * Changed default alignment to 8.
+
+  * tests/tstcstru.prg
+    * Changed test to use DWORD Alignment (4).
 
 2002-06-14 14:40 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/getlist.prg
