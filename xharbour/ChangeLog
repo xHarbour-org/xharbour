@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2005 2004/01/06 21:29:11 paultucker Exp $
+ * $Id: ChangeLog,v 1.2006 2004/01/06 21:43:57 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-05 12:20 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + move hb_dynsymFind( "WVT_PAINT" ) call out of wndProc
+   + into GLOBAL_DATA/gt_hbInitStatics()
+
 2004-01-07 10:42 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * doc/en/var.txt
     + Documentation for: __MVSYMBOLINFO()
