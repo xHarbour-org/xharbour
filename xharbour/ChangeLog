@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.87 2002/03/04 07:05:30 brianhays Exp $
+ * $Id: ChangeLog,v 1.88 2002/03/05 05:05:10 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-05 19:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed bug in md_strAt() where '(' or '{' would be counted twice if following a letter which was part of a match.
+    ! Fixed bug in WorkDefine() which didn't expand define within literal array.
+    * Some tracing additions and corrections.
 
 2002-03-04 11:48 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * source/rdd/dbfcdx/dbfcdx1.c

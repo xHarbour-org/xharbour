@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.5 2002/02/16 03:49:18 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.6 2002/03/01 19:18:57 ronpinkas Exp $
  */
 
 /*
@@ -1871,7 +1871,9 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   int rezrestr, ipos, nBra;
   char * ptr, * ptrtemp;
 
-  HB_TRACE(HB_TR_DEBUG, ("WorkMarkers(%p, %p, %s, %p)", ptrmp, ptri, ptro, lenres));
+  HB_TRACE(HB_TR_DEBUG, ("WorkMarkers(%s, %s, %s, %i, %i)", *ptrmp, *ptri, ptro, *lenres, com_or_xcom));
+
+  //printf( "WorkMarkers( '%s', '%s', '%s', %i, %i) %i\n", *ptrmp, *ptri, ptro, *lenres, com_or_xcom, s_numBrackets );
 
   /* Copying a match pattern to 'exppatt' */
   lenpatt = stroncpy( exppatt, *ptrmp, 4 );
@@ -2084,7 +2086,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
      {
         lenreal = getExpReal( expreal, ptri, TRUE, maxlenreal, FALSE );
         #if 0
-           printf( "Len: %i Exp: %s\n", lenreal, expreal );
+           printf( "List Len: %i Exp: %s\n", lenreal, expreal );
         #endif
      }
 
@@ -2138,7 +2140,9 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
    char cLastChar = '\0';
    /* Ron Pinkas end 2000-06-17 */
 
-   HB_TRACE(HB_TR_DEBUG, ("getExpReal(%s, %p, %d, %d, %d)", expreal, ptri, prlist, maxrez, bStrict));
+   HB_TRACE(HB_TR_DEBUG, ("getExpReal(%s, %s, %d, %d, %d)", expreal, *ptri, prlist, maxrez, bStrict));
+
+   //printf( "getExpReal('%s', '%s', %d, %d, %d)", expreal, *ptri, prlist, maxrez, bStrict );
 
    HB_SKIPTABSPACES( *ptri );
 
@@ -3398,7 +3402,9 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
   int lCase = ( *szSub == '\1' )? 0:1;
   char cLastChar = '\0';
 
-  HB_TRACE(HB_TR_DEBUG, ("md_strAt(%s, %d, %s, %d, %d)", szSub, lSubLen, szText, checkword, checkPrth));
+  HB_TRACE(HB_TR_DEBUG, ("md_strAt(%s, %d, %s, %i, %i, %i)", szSub, lSubLen, szText, checkword, checkPrth, bRule));
+
+  //printf( "md_strAt( '%s', %d, '%s', %i, %i, %i )\n", szSub, lSubLen, szText, checkword, checkPrth, bRule );
 
   while( *(szText+lPos) != '\0' && lSubPos < lSubLen )
   {
@@ -3532,7 +3538,7 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
            }
         }
 
-        if( !lSubPos && checkPrth &&
+        if( ( !lSubPos ) && checkPrth &&
           ( ( (kolPrth > 1) || (kolPrth == 1 && *(szText+lPos) != '(') || (kolPrth == 0 && *(szText+lPos) == ')') )
             || ( (kolFig > 1) || (kolFig == 1 && *(szText+lPos) != '{') || (kolFig == 0 && *(szText+lPos) == '}') ) ) )
         {
@@ -3557,6 +3563,16 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
         else if( lSubPos )
         {
            lSubPos = 0;
+
+           // Current character will be rechecked as possible new begining (lPos not incremented)!
+           if( kolPrth && *(szText+lPos) == '(' )
+           {
+              kolPrth--;
+           }
+           else if( kolFig && *(szText+lPos) == '{' )
+           {
+              kolFig--;
+           }
         }
         else
         {
@@ -4032,6 +4048,14 @@ static int NextParm( char ** sSource, char * sDest )
         StBr--;
      }
      /* END - Ron Pinkas added 2000-11-26 */
+     else if( **sSource == '{' )
+     {
+        StBr++;
+     }
+     else if( **sSource == '}' )
+     {
+        StBr--;
+     }
      else if( **sSource == '(' )
      {
         StBr++;
