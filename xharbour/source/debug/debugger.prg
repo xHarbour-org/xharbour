@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.4 2003/01/30 02:23:58 walito Exp $
+ * $Id: debugger.prg,v 1.5 2003/03/06 20:54:52 walito Exp $
  */
 
 /*
@@ -147,7 +147,7 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
                        endif
                     endif
                  else            // local variable
-                    cLocalName  := uParam2
+                    cLocalName  := IIF(valtype(uParam2)=='C',uParam2,'NIL')
                     nLocalIndex := uParam1
                     if s_oDebugger:lShowLocals
                        if ( nAt := AScan( s_oDebugger:aVars,; // Is there another var with this name ?
@@ -157,7 +157,9 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
                           AAdd( s_oDebugger:aVars, { cLocalName, nLocalIndex, "Local", ProcName( 1 ) } )
                        endif
                     endif
-                    AAdd( s_oDebugger:aCallStack[ 1 ][ 2 ], { cLocalName, nLocalIndex, "Local", ProcName( 1 ) } )
+                    IF valtype( s_oDebugger:aCallStack[ 1 ][ 2 ])=='A'
+                      AAdd( s_oDebugger:aCallStack[ 1 ][ 2 ], { cLocalName, nLocalIndex, "Local", ProcName( 1 ) } )
+                    endif
                  endif
                  if s_oDebugger:oBrwVars != nil
                     s_oDebugger:oBrwVars:RefreshAll()
@@ -258,11 +260,7 @@ CLASS TDebugger
    METHOD NextWindow()
    METHOD Open()
    METHOD OSShell()
-
-   METHOD PathForFiles() INLINE ;
-          ::cPathForFiles := ::InputBox( "Search path for source files:",;
-                                         ::cPathForFiles )
-
+   METHOD PathForFiles() 
    METHOD PrevWindow()
    METHOD Private()
    METHOD Public()
@@ -367,6 +365,14 @@ METHOD New() CLASS TDebugger
    ::lShowLocals       := .f.
    ::lAll              := .f.
    ::lSortVars         := .f.
+return Self
+
+METHOD PathForFiles() CLASS TDebugger
+
+   ::cPathForFiles := ::InputBox( "Search path for source files:", ::cPathForFiles )
+   IF RIGHT(::cPathForFiles,1)<>'\'
+     ::cPathForFiles:=::cPathForFiles+'\'
+   ENDIF
 return Self
 
 METHOD Activate( cModuleName ) CLASS TDebugger
@@ -747,6 +753,10 @@ return nil
 METHOD EndProc() CLASS TDebugger
 
    if Len( ::aCallStack ) > 1
+   
+   // free the browse for the exiting procedure, and recover the one from the stack
+   ::oBrwText:=nil
+   ::oBrwText:=::acallstack[1][3]
       ADel( ::aCallStack, 1, .t. )
       if ::oBrwStack != nil .and. ! ::lTrace
          ::oBrwStack:RefreshAll()
@@ -1267,7 +1277,8 @@ METHOD ShowCode( cModuleName ) CLASS TDebugger
    local cFunction := SubStr( cModuleName, RAt( ":", cModuleName ) + 1 )
    local cPrgName  := SubStr( cModuleName, 1, RAt( ":", cModuleName ) - 1 )
 
-   AIns( ::aCallStack, 1, { cFunction, {} }, .t. ) // function name and locals array
+   AIns( ::aCallStack, 1, { cFunction, {} , ::oBrwText}, .t. ) // function name and locals array
+                                                               // and the code window browse
 if !::lGo
    if ::oWndStack != nil
       ::oBrwStack:RefreshAll()
@@ -1275,20 +1286,34 @@ if !::lGo
 
    if cPrgName != ::cPrgName
       ::cPrgName := cPrgName
-      ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
-                   ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, ::cPrgName,;
-                   __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
-                   __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ] )
-
-      ::oWndCode:SetCaption( ::cPrgName )
+      
+      // warn if the source code file can't be found
+      IF .NOT. file(::cPathForFiles+::cPrgName)
+        Alert("Can't find source file "+::cPathForFiles+::cPrgName+" check path!")
+      ELSE
+        // store the open files in a stack, so we can
+        // easily get back to the correct file on procedure exit
+        ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
+                     ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, ::cPathForFiles+::cPrgName,;
+                     __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
+                     __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ] )
+        ::oWndCode:SetCaption( ::cPathForFiles+::cPrgName )
+      ENDIF
    endif
 endif
 return nil
 
 METHOD Open() CLASS TDebugger
-
    local cFileName := ::InputBox( "Please enter the filename", Space( 30 ) )
+  if (cFileName != ::cPrgName .OR. valtype(::cPrgName)=='U')
+      ::cPrgName := cFileName
+      ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
+                   ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, ::cPathForFiles+::cPrgName,;
+                   __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
+                   __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ] )
 
+      ::oWndCode:SetCaption( ::cPrgName )
+   endif
 return nil
 
 METHOD OSShell() CLASS TDebugger
@@ -1445,7 +1470,8 @@ METHOD RestoreAppStatus() CLASS TDebugger
    SetPos( ::nAppRow, ::nAppCol )
    SetColor( ::cAppColors )
    SetCursor( ::nAppCursor )
-
+   DispEnd()		// own up! who forgot this?
+   
 return nil
 
 METHOD RestoreSettings() CLASS TDebugger
