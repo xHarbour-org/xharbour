@@ -76,6 +76,10 @@
 #include <time.h>
 #include <ctype.h>
 
+#if defined( _MSC_VER )
+  #include <conio.h>
+#endif
+
 #include "hbset.h"
 #include "hbapigt.h"
 #include "hbapierr.h"
