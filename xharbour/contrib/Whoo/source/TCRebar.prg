@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.29 2002/11/15 01:56:34 what32 Exp $
+ * $Id: TCRebar.prg,v 1.30 2002/11/17 09:03:41 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -69,8 +69,21 @@ CLASS TCoolBar FROM TCustomControl
    METHOD CoolBarProc()
    METHOD Delete()
    METHOD DelControl()
+   METHOD WMNotify()
 
 ENDCLASS
+
+METHOD WMNotify( hdr, nlParam ) CLASS TCoolBar
+   
+   LOCAL Band
+   
+   FOR EACH Band IN ::Bands
+       IF __ClsMsgAssigned( Band:ChildObj, "Notify" )
+          Band:ChildObj:Notify( hdr )
+       ENDIF
+   NEXT
+   
+RETURN( 0 )
 
 METHOD Delete() CLASS TCoolBar
    local n
@@ -126,10 +139,11 @@ RETURN NIL
 //---------------------------------------------------------------------------------------------
 
 CLASS TCoolBand
-   DATA oStruct PROTECTED
-   DATA Index   PROTECTED
-   DATA Parent  PROTECTED
-
+   DATA oStruct  PROTECTED
+   DATA Index    PROTECTED
+   DATA Parent   PROTECTED
+   DATA ChildObj PROTECTED
+   
    DATA BorderStyles    AS ARRAY INIT { 0, RBBS_CHILDEDGE }
    DATA BreakStyles     AS ARRAY INIT { 0, RBBS_BREAK }
    DATA FixedBmpStyles  AS ARRAY INIT { 0, RBBS_FIXEDBMP }
@@ -179,6 +193,7 @@ METHOD SetGrippers( Value ) CLASS TCoolBand
 RETURN Self
 
 METHOD SetChild( oChild ) CLASS TCoolBand
+   ::ChildObj := oChild
    ::oStruct:fMask      := RBBIM_CHILD
    ::oStruct:hwndChild  := oChild:Handle
    ::Parent:SendMessage( RB_SETBANDINFO, ::Index, ::oStruct:value )
