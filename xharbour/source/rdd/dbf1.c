@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.109 2002/05/08 05:25:02 mafact Exp $
+ * $Id: dbf1.c,v 1.111 2002/06/07 09:49:28 alkresin Exp $
  */
 
 /*
@@ -71,6 +71,7 @@ HB_FUNC( DBF_GETFUNCTABLE );
 
 #undef HB_PRG_PCODE_VER
 #define HB_PRG_PCODE_VER HB_PCODE_VER
+
 
 HB_INIT_SYMBOLS_BEGIN( dbf1__InitSymbols )
 { "_DBFC",            HB_FS_PUBLIC, HB_FUNCNAME( _DBFC ), NULL },
@@ -351,6 +352,17 @@ static ERRCODE hb_dbfLockRecord( DBFAREAP pArea, ULONG ulRecNo, BOOL * pResult,
 
    if( bExclusive )
       hb_dbfUnlockAllRecords( pArea );
+
+   if( pArea->ulNumLocksPos > 0 )
+   {
+      ULONG ul;
+      for( ul=0; ul< pArea->ulNumLocksPos; ul++ )
+         if( pArea->pLocksPos[ ul ] == ulRecNo )
+         {
+            * pResult = TRUE;
+            return SUCCESS;
+         }
+   }
 
    if( hb_fsLock( pArea->hDataFile, DBF_LOCKPOS + ulRecNo, 1, FL_LOCK ) )
    {
@@ -1591,7 +1603,7 @@ ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    /* Create memo file */
    if( bHasMemo )
    {
-      unsigned char *tmp;
+      BYTE *tmp;
       ERRCODE result;
       pArea->szMemoFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
       pFileName = hb_fsFNameSplit( ( char * ) pCreateInfo->abName );
