@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.2 2002/04/26 16:00:48 lculik Exp $
+ * $Id: memoedit.prg,v 1.1.1.1 2001/12/21 10:41:13 ronpinkas Exp $
  */
 
 /*
@@ -105,14 +105,9 @@ METHOD Edit() CLASS TMemoEditor
    //       K_CTRL_W and K_CTRL_END from harbour code.
    local aConfigurableKeys := {K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_V, K_ALT_W, K_ESC }
    local bKeyBlock
+
    // If I have an user function I need to trap configurable keys and ask to
    // user function if handle them the standard way or not
-    nKey := Inkey(0)
-       if ! ( ( bKeyBlock := Setkey( nKey ) ) == NIL )
-          eval( bKeyBlock )
-          return Self
-       endif
-
    if ::lEditAllow .AND. ISCHARACTER(::xUserFunction)
 
       while ! ::lExitEdit
@@ -121,6 +116,13 @@ METHOD Edit() CLASS TMemoEditor
          // if there is an user function
          if NextKey() == 0
             ::IdleHook()
+         endif
+
+         nKey := Inkey(0)
+
+         if ! ( ( bKeyBlock := Setkey( nKey ) ) == NIL )
+            eval( bKeyBlock )
+            loop
          endif
 
          // Is it a configurable key ?
