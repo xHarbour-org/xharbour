@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.7 2002/06/21 19:18:27 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.8 2002/07/23 01:36:43 ronpinkas Exp $
  */
 
 /*
@@ -124,44 +124,38 @@ Function HB_CStructureID( cStructure, lInplace )
 Return aScan( s_aClasses, { | aClassInfo | IIF( aClassInfo[1] == cStructure, .T., .F. ) } ) + IIF( lInplace, CTYPE_STRUCTURE, CTYPE_STRUCTURE_PTR )
 
 //---------------------------------------------------------------------------//
-Procedure HB_CStructureCSyntax( cStructure, cDefinitions, cTag, cSynonList, nAlign )
+Procedure HB_CStructureCSyntax( cStructure, aDefinitions, cTag, cSynonList, nAlign )
 
-   LOCAL aDefinitions, nLen, Counter, CType
+   LOCAL cElem, nAt, nIndex := 1
+   LOCAL nLen, Counter, CType
 
-   cDefinitions := LTrim( RTrim( SubStr( cDefinitions, 2, Len( cDefinitions ) - 2 ) ) )
+   FOR EACH cElem IN aDefinitions
+       // *** PP bug - remove when possible! ***
+       IF cElem == NIL
+          aSize( aDefinitions, nIndex - 1 )
+          EXIT
+       ENDIF
 
-   cDefinitions := StrTran( cDefinitions, "*", "* " )
+       IF ( nAt := At( "*", cElem ) ) > 1
+          IF nIndex < Len( aDefinitions )
+             aIns( aDefinitions, nIndex + 1, SubStr( cElem, nAt + 1 ), .T. )
+          ELSE
+             aAdd( aDefinitions, SubStr( cElem, nAt + 1 ) )
+          ENDIF
 
-   nLen := Len( cDefinitions )
-   FOR Counter := 1 TO nLen
-      IF cDefinitions[Counter] == ' '
-         Counter++
-         WHILE cDefinitions[Counter] == ' '
-            cDefinitions[Counter] := '|'
-            Counter++
-         END
-         Counter--
-      ELSEIF cDefinitions[Counter] == '['
-         IF cDefinitions[Counter - 1] == ' '
-            cDefinitions[Counter - 1] := '|'
-         ENDIF
+          aDefinitions[nIndex] := StrTran( Left( cElem, nAt ), " ", "" )
+       ELSEIF ( nAt := At( "-", cElem ) ) > 1
+          IF nIndex < Len( aDefinitions )
+             aIns( aDefinitions, nIndex + 1, SubStr( cElem, nAt ), .T. )
+          ELSE
+             aAdd( aDefinitions, SubStr( cElem, nAt ) )
+          ENDIF
 
-         Counter++
-         WHILE cDefinitions[Counter] != ']'
-            IF cDefinitions[Counter] == ' '
-               cDefinitions[Counter] := '|'
-            ENDIF
-            Counter++
-         END
-      ELSEIF cDefinitions[Counter] == '*'
-         IF cDefinitions[Counter - 1] == ' '
-            cDefinitions[Counter - 1] := '|'
-         ENDIF
-      ENDIF
+          aDefinitions[nIndex] := RTrim( Left( cElem, nAt - 1 ) )
+       ENDIF
+
+       nIndex++
    NEXT
-
-   cDefinitions := StrTran( cDefinitions, "|", "" )
-   aDefinitions := HB_aTokens( cDefinitions )
 
    __ActiveStructure( cStructure, nAlign )
    nLen := Len( aDefinitions )

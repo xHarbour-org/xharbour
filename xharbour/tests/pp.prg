@@ -481,7 +481,7 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUIL
          IF nNext == 0
             nNext := 256
          ENDIF
-         sIncludePath := SubStr( sSwitch, nAt + 2, nNext )
+         sIncludePath := SubStr( sSwitch, nAt + 2, nNext - 1 )
 
          WHILE ( nNext := At( ';', sIncludePath ) ) > 0
             sPath := Left( sIncludePath, nNext - 1 )
@@ -2447,11 +2447,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
 
    s_sFile := sSource
 
-   hSource := FOpen( sSource, 0 )
+   hSource := FOpen( sSource, 64 )
    IF hSource == -1
       nPath := 1
       WHILE hSource == -1 .AND. nPath <= nPaths
-          hSource := FOpen( s_asPaths[nPath] + sSource, 0 )
+          hSource := FOpen( s_asPaths[nPath] + sSource, 64 )
           nPath++
       ENDDO
    ENDIF

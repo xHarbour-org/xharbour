@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.6 2002/06/19 01:30:17 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.7 2002/06/21 19:18:27 ronpinkas Exp $
  */
 
 /*
@@ -86,7 +86,7 @@
    #ifdef _SET_CH
       #command C STRUCTURE <!stru!> [ALIGN <align> ] => ;
                INIT PROCEDURE __INIT_<stru>; __ActiveStructure( #<stru>, <align> ) ; ;
-               #translate IS <stru> [ <x: :=, INIT, FROM> { <initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {<initlist>} ) ; ;
+               #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ) ; ;
 
       // <elem> instead of <!elem!> to allow ElemName[n] syntax.
       #command MEMBER <elem> IS <type> => HB_Member( #<elem>, <type> )
@@ -118,16 +118,10 @@
 
       #define __PACK 8
 
-      #xcommand typedef struct <elemArr> <!stru!> [, <*synon*> ] => ;
-               #translate IS <stru> [ <x: :=, INIT, FROM> { <initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {<initlist>} ) ; ;
+      #xcommand typedef struct [<!tag!>] { [<elem>] } <!stru!> [, <*synon*>] => ;
+                #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ) ; ;
                 INIT PROCEDURE __INIT_<stru>; ;
-                   HB_CStructureCSyntax( #<stru>, #<elemArr>, , <"synon">, __PACK ); ;
-                RETURN
-
-      #xcommand typedef struct <!tag!> <elemArr> <!stru!> [, <*synon*>] => ;
-                #translate IS <stru> [ <x: :=, INIT, FROM> { <initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {<initlist>} ) ; ;
-                INIT PROCEDURE __INIT_<stru>; ;
-                   HB_CStructureCSyntax( #<stru>, #<elemArr>, #<tag>, <"synon">, __PACK ); ;
+                   HB_CStructureCSyntax( #<stru>, {[#<elem>,]}, <(tag)>, <"synon">, __PACK ); ;
                 RETURN
 
       #xcommand pragma pack( <pack> ) => #undef __PACK; #define __PACK <pack>
