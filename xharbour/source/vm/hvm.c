@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.244 2003/08/01 19:52:47 druzus Exp $
+ * $Id: hvm.c,v 1.245 2003/08/02 05:50:50 ronpinkas Exp $
  */
 
 /*
@@ -490,11 +490,20 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 #ifdef HARBOUR_START_PROCEDURE
       else
       {
-         if( s_pszLinkedMain )
-            pDynSym = hb_dynsymFind( s_pszLinkedMain );
-
-         if( ! ( pDynSym && pDynSym->pSymbol->pFunPtr ) )
+         /* if first char is '@' then start procedure were set by
+            programmer explicitly and should have the highest priority
+            in other case it's the name of first public function in
+            first linked moudule which is used if there is no
+            HARBOUR_START_PROCEDURE in code */
+         if( s_pszLinkedMain && *s_pszLinkedMain == '@' )
+            pDynSym = hb_dynsymFind( s_pszLinkedMain + 1 );
+         else
+         {
             pDynSym = hb_dynsymFind( HARBOUR_START_PROCEDURE );
+
+            if( ! ( pDynSym && pDynSym->pSymbol->pFunPtr ) && s_pszLinkedMain )
+               pDynSym = hb_dynsymFind( s_pszLinkedMain );
+         }
 
          if( pDynSym && pDynSym->pSymbol->pFunPtr )
             s_pSymStart = pDynSym->pSymbol;

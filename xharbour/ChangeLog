@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1319 2003/08/02 05:50:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1320 2003/08/02 06:14:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-02 12:00 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_tgz.sh
+  * xharbour/xharbour.spec
+  * xharbour/source/vm/hvm.c
+    * small modification in support for automatic detection of first
+      function in linked modules for Linux
+      if first char of s_pszLinkedMain is '@' then start procedure were
+      set by programmer explicitly and should have the highest priority
+      in other case it's then name of first public function in first
+      linked moudule which is used if there is no HARBOUR_START_PROCEDURE
+      in code
 
 2003-08-01 23:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/fastitem.c

@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.18 2003/07/31 18:56:10 druzus Exp $
+# $Id: xharbour.spec,v 1.19 2003/08/01 19:52:44 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -407,7 +407,9 @@ hb_cc()
 
 hb_link()
 {
-    if [ -z "\${HB_MAIN_FUNC}" ] && [ -f "\${FOUTO}" ]; then
+    if [ -n "\${HB_MAIN_FUNC}" ]; then
+	HB_MAIN_FUNC="@\${HB_MAIN_FUNC}"
+    elif [ -f "\${FOUTO}" ]; then
 	HB_MAIN_FUNC=\`hb_lnk_main "\${FOUTO}"\`
     fi
     if [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_FM_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
