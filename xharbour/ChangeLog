@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.445 2002/10/16 01:18:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.446 2002/10/16 04:20:24 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-10-16 12:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/rtl/dircmd.prg
+    ! modified output format in function PutNormal()
+      previously: pp.exe - dir *.dbf -> test   .db
+             now: pp.exe - dir *.dbf -> test.dbf
 
 2002-10-15 21:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c

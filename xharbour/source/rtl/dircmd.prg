@@ -1,5 +1,5 @@
 /*
- * $Id: dircmd.prg,v 1.14 2001/06/15 17:59:21 dholm Exp $
+ * $Id: dircmd.prg,v 1.1.1.1 2001/12/21 10:41:28 ronpinkas Exp $
  */
 
 /*
@@ -130,8 +130,8 @@ STATIC PROCEDURE PutNormal( aDirEntry )
 
    hb_FNameSplit( aDirEntry[ F_NAME ], NIL, @cName, @cExt )
 
-   QOut( PadR( cName, 8 ) + " " +;
-         PadR( cExt, 3 ) + " " +;
+   cName := PADR(cName+cExt,12)
+   QOut( cName + " " + ;
          Str( aDirEntry[ F_SIZE ], 8 ) + "  " +;
          DToC( aDirEntry[ F_DATE ] ) )
 
