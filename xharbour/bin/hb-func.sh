@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.35 2004/11/26 14:33:19 likewolf Exp $
+# $Id: hb-func.sh,v 1.36 2004/12/02 03:26:19 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -529,7 +529,7 @@ mk_hblibso()
                 ln -sf $l $ll
             fi
             case $HB_LIB_INSTALL in
-                */usr/lib/*|*/usr/local/lib/*)
+                */usr/lib/*|*/usr/lib64/*|*/usr/local/lib/*|*/usr/local/lib64/*)
                     ln -sf ${name}/$l ../$ll
                     ;;
                 */usr/local/*)

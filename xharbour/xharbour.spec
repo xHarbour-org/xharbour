@@ -1,5 +1,4 @@
-#
-# $Id: xharbour.spec,v 1.66 2004/10/04 15:47:59 ronpinkas Exp $
+# $Id: xharbour.spec,v 1.67 2004/11/16 01:16:40 ronpinkas Exp $
 #
 
 # ---------------------------------------------------------------
@@ -55,7 +54,6 @@
 %define dname    xHarbour
 %define version  0.99.3
 %define releasen 0
-%define prefix   /usr
 %define hb_pref  xhb
 %define hb_arch  export HB_ARCHITECTURE=linux
 %define hb_cc    export HB_COMPILER=gcc
@@ -67,9 +65,9 @@
 %define hb_gpm   export HB_GPM_MOUSE=%{!?_without_gpm:yes}
 %define hb_sln   export HB_WITHOUT_GTSLN=%{?_without_gtsln:yes}
 %define hb_x11   export HB_WITHOUT_X11=%{?_without_x11:yes}
-%define hb_bdir  export HB_BIN_INSTALL=%{prefix}/bin
-%define hb_idir  export HB_INC_INSTALL=%{prefix}/include/%{name}
-%define hb_ldir  export HB_LIB_INSTALL=%{prefix}/lib/%{name}
+%define hb_bdir  export HB_BIN_INSTALL=%{_bindir}
+%define hb_idir  export HB_INC_INSTALL=%{_includedir}/%{name}
+%define hb_ldir  export HB_LIB_INSTALL=%{_libdir}/%{name}
 %define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
 %define hb_cmrc  export HB_COMMERCE=no
 %define hb_ctrb  %{!?_without_nf:libnf} %{?_with_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql}
@@ -88,7 +86,6 @@ Summary(ru):    Свободный компилятор, совместимый с языком Clipper.
 Name:           %{name}
 Version:        %{version}
 Release:        %{releasen}%{platform}
-Prefix:         %{prefix}
 Copyright:      GPL (plus exception)
 Group:          Development/Languages
 Vendor:         %{hb_host}
@@ -357,16 +354,16 @@ EOF
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/harb.sh
 fi
 
-[ "%{?_without_gtsln:1}" ] && rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libgtsln.a
-[ "%{?_with_odbc:1}" ]     || rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libhbodbc.a
-[ "%{?_with_allegro:1}" ]  || rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libgtalleg.a
+[ "%{?_without_gtsln:1}" ] && rm -f $HB_LIB_INSTALL/libgtsln.a
+[ "%{?_with_odbc:1}" ]     || rm -f $HB_LIB_INSTALL/libhbodbc.a
+[ "%{?_with_allegro:1}" ]  || rm -f $HB_LIB_INSTALL/libgtalleg.a
 
 # check if we should rebuild tools with shared libs
 if [ "%{!?_with_static:1}" ]
 then
     unset HB_GTALLEG
-    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/lib -lX11}"
-    #export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/lib -lX11} %{?_with_allegro:%(allegro-config --static)}"
+    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/%{_lib} -lX11}"
+    #export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/%{_lib} -lX11} %{?_with_allegro:%(allegro-config --static)}"
     export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
     for utl in hbmake hbrun hbpp hbdoc xbscript
     do
@@ -528,69 +525,73 @@ rm -rf $RPM_BUILD_ROOT
 %verify(not md5 mtime) %config /etc/harbour/hb-charmap.def
 %{?_with_hrbsh:/etc/profile.d/harb.sh}
 
-%{prefix}/bin/harbour
-%{prefix}/bin/hb-mkslib
-%{prefix}/bin/%{hb_pref}-build
-%{prefix}/bin/%{hb_pref}cc
-%{prefix}/bin/%{hb_pref}cmp
-%{prefix}/bin/%{hb_pref}lnk
-%{prefix}/bin/%{hb_pref}mk
-%{prefix}/bin/gharbour
-%{prefix}/bin/harbour-link
-#%{prefix}/bin/hbtest
-%{prefix}/bin/hbrun
-%{prefix}/bin/hbpp
-%{prefix}/bin/hbmake
-%dir %{prefix}/include/%{name}
-%{prefix}/include/%{name}/*
+%{_bindir}/harbour
+%{_bindir}/hb-mkslib
+%{_bindir}/%{hb_pref}-build
+%{_bindir}/%{hb_pref}cc
+%{_bindir}/%{hb_pref}cmp
+%{_bindir}/%{hb_pref}lnk
+%{_bindir}/%{hb_pref}mk
+%{_bindir}/gharbour
+%{_bindir}/harbour-link
+#%{_bindir}/hbtest
+%{_bindir}/hbrun
+%{_bindir}/hbpp
+%{_bindir}/hbmake
+%dir %{_includedir}/%{name}
+%{_includedir}/%{name}/*
 
 %files static
 %defattr(-,root,root,755)
-%dir %{prefix}/lib/%{name}
-%{prefix}/lib/%{name}/libcodepage.a
-%{prefix}/lib/%{name}/libcommon.a
-%{prefix}/lib/%{name}/libdb*.a
-%{prefix}/lib/%{name}/libdebug.a
-%{prefix}/lib/%{name}/libfm*.a
-%{prefix}/lib/%{name}/libgt*.a
-%{prefix}/lib/%{name}/libhbtip*.a
-%{?_with_odbc: %{prefix}/lib/%{name}/libhbodbc.a}
-%{prefix}/lib/%{name}/libhbct*.a
-%{prefix}/lib/%{name}/liblang.a
-%{prefix}/lib/%{name}/libmacro*.a
-%{prefix}/lib/%{name}/libnulsys*.a
-%{prefix}/lib/%{name}/libpp*.a
-%{prefix}/lib/%{name}/librdd*.a
-%{prefix}/lib/%{name}/librtl*.a
-%{prefix}/lib/%{name}/libsamples.a
-%{prefix}/lib/%{name}/libvm*.a
+%dir %{_libdir}/%{name}
+%{_libdir}/%{name}/libcodepage.a
+%{_libdir}/%{name}/libcommon.a
+%{_libdir}/%{name}/libdb*.a
+%{_libdir}/%{name}/libdebug.a
+%{_libdir}/%{name}/libfm*.a
+%{_libdir}/%{name}/libgt*.a
+%{_libdir}/%{name}/libhbtip*.a
+%{?_with_odbc: %{_libdir}/%{name}/libhbodbc.a}
+%{_libdir}/%{name}/libhbct*.a
+%{_libdir}/%{name}/liblang.a
+%{_libdir}/%{name}/libmacro*.a
+%{_libdir}/%{name}/libnulsys*.a
+%{_libdir}/%{name}/libpp*.a
+%{_libdir}/%{name}/librdd*.a
+%{_libdir}/%{name}/librtl*.a
+%{_libdir}/%{name}/libsamples.a
+%{_libdir}/%{name}/libvm*.a
 
 %files contrib
 %defattr(-,root,root,755)
-%dir %{prefix}/lib/%{name}
-%{!?_without_nf: %{prefix}/lib/%{name}/libnf*.a}
-%{?_with_adsrdd: %{prefix}/lib/%{name}/librddads*.a}
-%{?_with_mysql: %{prefix}/lib/%{name}/libmysql*.a}
-%{?_with_pgsql: %{prefix}/lib/%{name}/libhbpg*.a}
+%dir %{_libdir}/%{name}
+%{!?_without_nf: %{_libdir}/%{name}/libnf*.a}
+%{?_with_adsrdd: %{_libdir}/%{name}/librddads*.a}
+%{?_with_mysql: %{_libdir}/%{name}/libmysql*.a}
+%{?_with_pgsql: %{_libdir}/%{name}/libhbpg*.a}
 
 %files lib
 %defattr(-,root,root,755)
-%dir %{prefix}/lib/%{name}
-%{prefix}/lib/%{name}/*.so
-%{prefix}/lib/*.so
+%dir %{_libdir}/%{name}
+%{_libdir}/%{name}/*.so
+%{_libdir}/*.so
 
 %files pp
 %defattr(-,root,root,755)
 %doc utils/xbscript/xbscript.txt
-%{prefix}/bin/xbscript
-%{prefix}/bin/pprun
-%{prefix}/bin/xprompt
+%{_bindir}/xbscript
+%{_bindir}/pprun
+%{_bindir}/xprompt
 
 ######################################################################
 ## Spec file Changelog.
 ######################################################################
 
 %changelog
+* Sat Dec 04 2004 Przemyslaw Czerpak <druzus/at/priv.onet.pl>
+- the destination directories changed to use ditribution's
+  _bindir, _libdir, _includedir
+
 * Sat Aug 28 2004 Przemyslaw Czerpak <druzus/at/priv.onet.pl>
 - updated for recent changes in CVS structure - CT and TIP moved
   from contrib into core

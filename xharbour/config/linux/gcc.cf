@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.28 2004/09/08 00:17:10 druzus Exp $
+# $Id: gcc.cf,v 1.29 2004/10/31 13:15:46 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -122,11 +122,11 @@ endif
 
 ifeq ($(HB_GT_LIB),gtxvt)
 LINKLIBS += -lX11
-LINKPATHS +=-L/usr/X11R6/lib
+LINKPATHS += -L/usr/X11R6/lib
 else
 ifeq ($(HB_GT_LIB),gtxwc)
 LINKLIBS += -lX11
-LINKPATHS +=-L/usr/X11R6/lib
+LINKPATHS += -L/usr/X11R6/lib
 endif
 endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3651 2004/12/03 17:17:15 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3652 2004/12/03 22:05:24 aleytys Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-04 23:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/xharbour.spec
+    * the destination directories changed to use ditribution's
+      _bindir, _libdir, _includedir
+
+  * xharbour/bin/hb-func.sh
+    * modified to use */lib64 dirs
+
+  * xharbour/config/linux/gcc.cf
+    * minor formating
 
 2004-12-03 22:00 UTC+0000 Philip Chee <philip@aleytys.pc.my>
   * makefile.bc
