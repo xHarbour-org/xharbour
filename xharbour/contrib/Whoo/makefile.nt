@@ -1,10 +1,14 @@
 #
+# $id:
+#
+
+#
 # File:     makefile.nt
 # Author:   Paul Tucker <ptucker@sympatico.ca>
 # Created:  2002
 # Updated:
 #
-# Makefile : Builds WhooGUI for msvc in non batch mode
+# Makefile : Builds Whoo for msvc in batch mode
 
 # Global paths
 #
