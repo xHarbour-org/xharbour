@@ -186,6 +186,7 @@ METHOD CreateControl(aRect)
       ENDCASE
       if oObj!=NIL
          oApp:MainFrame:ObjInsp:InspCombo:AddString(oObj:propname+chr(9)+oObj:ClassName())
+         oApp:MainFrame:ObjInsp:InspCombo:SetCurSel(oApp:MainFrame:ObjInsp:InspCombo:GetCount()-1)
       endif
    ENDIF
    ::Parent:StdBar:CheckButton( 100, .T. )
