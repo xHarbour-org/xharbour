@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.430 2002/10/09 03:43:19 druzus Exp $
+ * $Id: ChangeLog,v 1.431 2002/10/09 20:42:55 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -41,6 +41,9 @@
 
   * source/pp/ppcore.c
     * Corrected type cast.
+
+  + tests/varparam.prg
+    + New test demo of new Varaiable Pararmeters in Functions.
 
 2002-10-09 04:53 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * source/rtl/gtwin/gtwin.c
