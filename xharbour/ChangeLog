@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3143 2004/07/12 23:58:18 kaddath Exp $
+ * $Id: ChangeLog,v 1.3144 2004/07/13 03:44:36 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-12 23:55 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+   * source/rtl/tbrowse.prg
+     ! Assumed ::RowPos := 1 when ::GoBottom() will redraws the screen.
+       Fixed previous fix. :(
 
 2004-07-12 22:34 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
    * source/rtl/tbrowse.prg
