@@ -26,6 +26,7 @@ CLASS TFrameMDIParent FROM TFrame
 
     // Data of this class only
 
+    DATA oMDIClienWindow AS OBJECT
     DATA aoMdiChilds   AS ARRAY INIT {} HIDDEN   // Childs mdi windows
 
     // Public Methods
@@ -67,8 +68,9 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar ) CL
     //ASSIGN ::pStruct      WITH NULL
     ASSIGN ::lStatusBar   WITH lStatusBar           DEFAULT FALSE
 
+    ::oMDIClientWindow := TWindow():New()
+
     ::Super:New( ::cName, ::nStyle, ::nRow, ::nCol, ::nWidth, ::nHeight, oParent, lStatusBar )
-    ::Create()
 
 RETURN Self
 
@@ -86,3 +88,6 @@ METHOD NewExtended( cTitle, nStyle, nRow, nCol, nWidth, nHeight,;
 
 RETURN Self
 
+METHOD Create()
+
+RETURN Self

@@ -82,6 +82,7 @@ RETURN Self
 METHOD CreateStatusBar( nParts, nStyle ) CLASS TDialog
   DEFAULT nStyle TO WS_CHILD + WS_VISIBLE + SBARS_TOOLTIPS
   ::oStatusBar := tStatusBar():New( Self, nParts, nStyle )
+  ::oStatusBar:Create()
 RETURN IIF( ::oStatusBar <> NIL, TRUE, FALSE )
 
 METHOD GetStatusBar() CLASS TDialog

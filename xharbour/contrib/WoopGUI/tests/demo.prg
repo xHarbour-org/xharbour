@@ -4,7 +4,7 @@
 #include "windows.ch"
 //#include "demo.ch"
 
-#define WG_DEBUG
+//#define WG_DEBUG
 
 
 function Main   //( hInstance, hprevInstance, cCmdLine, nCmdShow )

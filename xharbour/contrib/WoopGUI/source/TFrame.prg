@@ -114,8 +114,10 @@ RETURN Self
 //   ENDIF
 //RETURN oOldSB
 
-METHOD CreateStatusBar( nParts, nStyle ) CLASS TFrame
-  ::oStatusBar := tStatusBar():New( Self, nParts, nStyle )
+METHOD CreateStatusBar( naParts, nStyle ) CLASS TFrame
+  ::oStatusBar := tStatusBar():New( Self, naParts, nStyle )
+  ::oStatusBar:Create()
+  ::lStatusBar := TRUE
 RETURN IIF( ::oStatusBar <> NIL, TRUE, FALSE )
 
 METHOD GetStatusBar() CLASS TFrame

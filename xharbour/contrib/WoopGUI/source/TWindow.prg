@@ -205,6 +205,8 @@ CLASS TWindow FROM TWindowBase
     METHOD OnVScroll()                      VIRTUAL // FSG - to be implemented
 
     //METHOD PopEventHandler()                VIRTUAL // FSG - to be implemented
+
+    METHOD Paint()                          VIRTUAL
     METHOD PopUpMenu()                      VIRTUAL // FSG - to be implemented
     METHOD PopColors()
     METHOD PushColors()

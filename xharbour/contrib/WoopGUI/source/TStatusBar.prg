@@ -43,19 +43,19 @@ CLASS TStatusBar FROM TWindowBase
 
 ENDCLASS
 
-METHOD New( oParent, aParts, nStyle ) CLASS TStatusBar
+METHOD New( oParent, naParts, nStyle ) CLASS TStatusBar
+
+    IF VALTYPE( naParts ) == "N" THEN naParts := { naParts }
 
     ASSIGN ::cClassName   WITH STATUSCLASSNAME
     ASSIGN ::cName        WITH ""
     ASSIGN ::nStyle       WITH nStyle DEFAULT WS_CHILD + /*WS_BORDER +*/ WS_VISIBLE + SBARS_SIZEGRIP + SBARS_TOOLTIPS     // includes a sizing grip
-    ASSIGN ::aParts       WITH aParts DEFAULT {-1, 50}
+    ASSIGN ::aParts       WITH naParts DEFAULT { -1 }
 
     // Creo l'istanza tramite la classe window
     ::Super:New( , ::cClassName, ::cName, ::nStyle, ;
                                  0, 0, 0, 0, ;
                                  oParent )
-
-    ::Create( ::aParts ) // Numero di riquadri
 
 RETURN Self
 
@@ -66,15 +66,20 @@ RETURN Self
 // RETURN WG_CreateStatusBar( ::oParent:nHandle, ::nHandle, nParts )
 
 
-METHOD Create( ) CLASS TStatusBar //aParts AS ARRAY )
+METHOD Create( naParts ) CLASS TStatusBar //aParts AS ARRAY )
     LOCAL cSizes := ""
-    //ASSIGN ::aParts WITH aParts DEFAULT {-1}
+    //DEFAULT naParts TO -1
+
+    IF naParts <> NIL
+       IF VALTYPE( naParts ) == "N" THEN naParts := { naParts }
+       ::aParts := naParts
+    ENDIF
 
     ::Super:Create()  // Make the window
 
     ::oStack := TStack():New()
     //::SetWidths( { 200, 20, 50, 100, -1 } )
-    ::SetWidths( { 200, -1, 60, 100 } )
+    ::SetWidths( ::aParts )
     //::SetTooltip( "Message" )
 
 RETURN Self
