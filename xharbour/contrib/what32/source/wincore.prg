@@ -259,25 +259,6 @@ Function _ProcessMsg( hWnd, nMsg, nwParam, nlParam, nIndex )
       EndIf
    EndIf
 
-   // intercept menu event
-
-   // TBD
-
-   /*
-   If nMsg == WM_COMMAND .AND. nwParam <> 0
-      If ( hMenu := GetMenu( hWnd ) ) <> NIL
-         If ( cId := GetMenuId( hMenu, nwParam ) ) <> NIL
-            SelectWindow( hWnd )
-            If ValType( bMenuBlock := GetMenuBlock( hMenu, cId ) ) == "B"
-               eval( bMenuBlock, cId, hMenu )
-               //nRet:=ExecuteMenu(hWnd,nwParam)
-               Return( 0 )
-            EndIf
-         EndIf
-      EndIf
-   EndIf
-   */
-
    // find the procedure corresponding to the subclass index
    // bypass Windows procedure chain, where applicable
 
@@ -1272,7 +1253,7 @@ HB_FUNC ( _CREATEDIALOGINDIRECT )
   hb_retnl(
    (ULONG) CreateDialogIndirect(
             (ISNIL(1)  ? GetModuleHandle(NULL) : (HINSTANCE) hb_parnl(1) )   ,
-            (LPCDLGTEMPLATE) hb_parc(2) ,
+            (LPDLGTEMPLATE) hb_parc(2) ,
             (ISNIL(3) ?  NULL : (HWND) hb_parnl(3) )        ,
             (DLGPROC) hb_parnl(4)
           ));
