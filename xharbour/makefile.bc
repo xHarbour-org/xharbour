@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.50 2003/06/16 00:08:53 jonnymind Exp $
+# $Id: makefile.bc,v 1.51 2003/06/16 15:07:17 jonnymind Exp $
 #
 
 #
@@ -397,6 +397,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\strcase.obj \
    $(RTL_OBJ_DIR)\strings.obj \
    $(RTL_OBJ_DIR)\strmatch.obj \
+   $(RTL_OBJ_DIR)\strpeek.obj \
    $(RTL_OBJ_DIR)\strtran.obj \
    $(RTL_OBJ_DIR)\strzero.obj \
    $(RTL_OBJ_DIR)\stuff.obj \
@@ -2053,6 +2054,10 @@ $(RTL_OBJ_DIR)\strings.obj : $(RTL_DIR)\strings.c
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\strmatch.obj : $(RTL_DIR)\strmatch.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(RTL_OBJ_DIR)\strpeek.obj : $(RTL_DIR)\strpeek.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 

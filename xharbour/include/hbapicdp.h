@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.2 2003/05/28 03:10:19 paultucker Exp $
+ * $Id: hbapicdp.h,v 1.3 2003/05/28 11:59:05 druzus Exp $
  */
 
 /*
@@ -49,6 +49,8 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#ifndef HB_CDP_SUPPORT_OFF
 
 #ifndef HB_APICDP_H_
 #define HB_APICDP_H_
@@ -102,3 +104,8 @@ extern int HB_EXPORT hb_cdpcmp( char*, char*, ULONG, PHB_CODEPAGE, ULONG* );
 
 #endif /* HB_APICDP_H_ */
 
+#else
+
+#define PHB_CODEPAGE void*
+
+#endif /* HB_CDP_SUPPORT_OFF */

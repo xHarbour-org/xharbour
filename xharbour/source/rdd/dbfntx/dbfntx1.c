@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.44 2003/06/15 20:16:57 lculik Exp $
+ * $Id: dbfntx1.c,v 1.45 2003/06/18 19:47:10 mlombardo Exp $
  */
 
 /*
@@ -127,11 +127,12 @@
 #include "hbapierr.h"
 #include "hbapilng.h"
 #include "hbrddntx.h"
-#include "hbapicdp.h"
-
+#ifndef HB_CDP_SUPPORT_OFF
+#  include "hbapicdp.h"
+extern PHB_CODEPAGE s_cdpage;
+#endif
 #define __PRG_SOURCE__ __FILE__
 
-extern PHB_CODEPAGE s_cdpage;
 extern USHORT hb_rddFieldIndex( AREAP pArea, char * szName );
 
 HB_FUNC( _DBFNTX );
@@ -787,9 +788,11 @@ static USHORT hb_ntxPageFindCurrentKey( LPPAGEINFO pPage, ULONG ulRecno )
 static void hb_ntxGetCurrentKey( LPTAGINFO pTag, LPKEYINFO pKey )
 {
    char szBuffer[ NTX_MAX_KEY ];
-   PHB_CODEPAGE cdpTmp = s_cdpage;
    PHB_ITEM pItem;
+#ifndef HB_CDP_SUPPORT_OFF
+   PHB_CODEPAGE cdpTmp = s_cdpage;
    s_cdpage = pTag->Owner->Owner->cdPage;
+#endif
    if( pTag->nField )
    {
       pItem = hb_itemNew( NULL );
@@ -834,7 +837,9 @@ static void hb_ntxGetCurrentKey( LPTAGINFO pTag, LPKEYINFO pKey )
    else if( hb_itemType( pTag->pKeyItem ) != HB_IT_BLOCK )
       hb_stackPop();
    pKey->Xtra = pTag->Owner->Owner->ulRecNo;
+#ifndef HB_CDP_SUPPORT_OFF
    s_cdpage = cdpTmp;
+#endif
 }
 
 static BOOL hb_ntxTagGoToNextKey( LPTAGINFO pTag, BOOL lContinue )
@@ -1172,7 +1177,11 @@ static int hb_ntxItemCompare( char* s1, char* s2, int ilen1, int ilen2, BOOL Exa
       return -1;
 
    iLimit = ( ilen1 > ilen2 ) ? ilen2 : ilen1;
+#ifndef HB_CDP_SUPPORT_OFF
    iResult = (cdpage->lSort)? hb_cdpcmp( s1, s2, (ULONG)iLimit, cdpage, NULL ):memcmp( s1, s2, iLimit );
+#else
+   iResult = memcmp( s1, s2, iLimit );
+#endif
    if( !iResult )
    {
       if( ( iResult = ilen1 - ilen2 ) != 0 )
@@ -1942,9 +1951,12 @@ static void hb_ntxKeysSort( LPNTXSORTINFO pSortInfo, LPSORTITEM* pKeyFirst, LPSO
       }
       else if( pSortInfo->pKey1 )
       {
-//         result = memcmp( pKeyNew->key, pSortInfo->pKey1->key, KeyLength );
-          result = (s_cdpage->lSort)?
+#ifndef HB_CDP_SUPPORT_OFF
+         result = (s_cdpage->lSort)?
 	              hb_cdpcmp( pKeyNew->key, pSortInfo->pKey1->key, (ULONG)KeyLength, s_cdpage, NULL ):memcmp( pKeyNew->key, pSortInfo->pKey1->key, KeyLength );
+#else
+         result = memcmp( pKeyNew->key, pSortInfo->pKey1->key, KeyLength );
+#endif
 
          if( fDescend && result )
             result = ( result > 0 )? -1:1;
@@ -1969,9 +1981,12 @@ static void hb_ntxKeysSort( LPNTXSORTINFO pSortInfo, LPSORTITEM* pKeyFirst, LPSO
          pKey = *pKeyFirst;
       while( pKey )
       {
-//         result = memcmp( pKeyNew->key, pKey->key, KeyLength );
-          result = (s_cdpage->lSort)?
+#ifndef HB_CDP_SUPPORT_OFF
+         result = (s_cdpage->lSort)?
 	              hb_cdpcmp( pKeyNew->key, pKey->key, (ULONG)KeyLength, s_cdpage, NULL ):memcmp( pKeyNew->key, pKey->key, KeyLength );
+#else
+	 result = memcmp( pKeyNew->key, pKey->key, KeyLength );
+#endif
 
          if( fDescend && result )
             result = ( result > 0 )? -1:1;
@@ -2438,13 +2453,15 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
    USHORT numRecinBuf = 0, nParts = 0;
    BYTE * pRecordTmp;
    BOOL fValidBuffer;
+#ifndef HB_CDP_SUPPORT_OFF
    PHB_CODEPAGE cdpTmp = s_cdpage;
+   s_cdpage = pArea->cdPage;
+#endif
 
    ulRecCount = pIndex->Owner->ulRecCount;
    pArea = pIndex->Owner;
    pTag = pIndex->CompoundTag;
    pItem = hb_itemNew( NULL );
-   s_cdpage = pArea->cdPage;
 
    memset( &sortInfo, 0, sizeof( sortInfo ) );
    readBuffer = (BYTE*) hb_xgrab( pArea->uiRecordLen * 10 );
@@ -2630,7 +2647,9 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
    /* Building index file with previously sorted keys */
    hb_ntxBufferSave( pTag, &sortInfo );
 
+#ifndef HB_CDP_SUPPORT_OFF
    s_cdpage = cdpTmp;
+#endif
    if( pszTempName )
    {  /*  Close temporary swap file, delete it and free name buffer */
       hb_fsClose( sortInfo.tempHandle );
@@ -3078,7 +3097,9 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
              return retvalue;
            }
            strncpy( pKey2->key, pKey->item.asString.value, pTag->KeyLength );
+#ifndef HB_CDP_SUPPORT_OFF
            hb_cdpnTranslate( pKey2->key, s_cdpage, pArea->cdPage, pTag->KeyLength );
+#endif
            break;
         case HB_IT_INTEGER:
         case HB_IT_LONG:
@@ -4147,7 +4168,9 @@ static ERRCODE ntxSetScope( NTXAREAP pArea, LPDBORDSCOPEINFO sInfo )
                   if( *ppItem == NULL )
                      *ppItem = hb_itemNew( NULL );
                   hb_itemCopy( *ppItem, sInfo->scopeValue );
+#ifndef HB_CDP_SUPPORT_OFF
                   hb_cdpnTranslate( (*ppItem)->item.asString.value, s_cdpage, pArea->cdPage, (*ppItem)->item.asString.length );
+#endif
                }
                break;
             case HB_IT_INTEGER:

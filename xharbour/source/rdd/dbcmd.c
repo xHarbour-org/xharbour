@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.34 2003/06/03 15:30:08 lculik Exp $
+ * $Id: dbcmd.c,v 1.35 2003/06/09 10:29:01 jacekp Exp $
  */
 
 /*
@@ -71,7 +71,9 @@
 #include "hbapilng.h"
 #include "hbapiitm.h"
 #include "hbrddwrk.h"
-#include "hbapicdp.h"
+#ifndef HB_CDP_SUPPORT_OFF
+#  include "hbapicdp.h"
+#endif
 
 typedef struct _AREANODE
 {

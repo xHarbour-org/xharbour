@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.29 2003/06/18 00:28:52 lculik Exp $
+ * $Id: dbf1.c,v 1.30 2003/06/18 09:23:29 ronpinkas Exp $
  */
 
 /*
@@ -62,13 +62,13 @@
 #include "hbdate.h"
 #include "hbdbsort.h"
 #include "error.ch"
-#include "hbapicdp.h"
 #include <errno.h>
+#ifndef HB_CDP_SUPPORT_OFF
+#  include "hbapicdp.h"
+extern PHB_CODEPAGE s_cdpage;
+#endif
 
 #define __PRG_SOURCE__ __FILE__
-extern PHB_CODEPAGE s_cdpage;
-
-extern PHB_CODEPAGE s_cdpage;
 
 /* DJGPP can sprintf a float that is almost 320 digits long */
 #define HB_MAX_DOUBLE_LENGTH 320
@@ -1046,7 +1046,9 @@ ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_IT_STRING:
          hb_itemPutCL( pItem, ( char * ) pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                        pField->uiLen );
+#ifndef HB_CDP_SUPPORT_OFF
          hb_cdpTranslate( pItem->item.asString.value, pArea->cdPage,s_cdpage );
+#endif
          break;
 
       case HB_IT_LOGICAL:
@@ -1255,8 +1257,10 @@ ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                uiSize = pField->uiLen;
             memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                     hb_itemGetCPtr( pItem ), uiSize );
+#ifndef HB_CDP_SUPPORT_OFF
             if( HB_IS_STRING( pItem ) )
                hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], s_cdpage, pArea->cdPage, uiSize );
+#endif
             memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + uiSize,
                     ' ', pField->uiLen - uiSize );
          }
@@ -1767,6 +1771,7 @@ ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
 
    ( ( PHB_DYNS ) pArea->atomAlias )->hArea = pOpenInfo->uiArea;
+#ifndef HB_CDP_SUPPORT_OFF
    if( pOpenInfo->cdpId )
    {
       pArea->cdPage = hb_cdpFind( (char *) pOpenInfo->cdpId );
@@ -1775,6 +1780,7 @@ ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
    else
       pArea->cdPage = s_cdpage;
+#endif
    pArea->fShared = pOpenInfo->fShared;
    pArea->fReadonly = pOpenInfo->fReadonly;
    uiFlags = pOpenInfo->fReadonly ? FO_READ : FO_READWRITE;
