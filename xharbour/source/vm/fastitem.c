@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.21 2002/03/06 06:49:42 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.22 2002/03/22 15:36:55 map Exp $
  */
 
 /*
@@ -60,6 +60,10 @@
 #include "hbapierr.h"
 #include "hbdate.h"
 #include "hbset.h"
+
+static const char *s_sNull = "";
+
+extern char hb_vm_acAscii[256][2];
 
 /* Forward decalarations. */
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
@@ -224,8 +228,6 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
 PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
 {
-   static const char *s_sNull = "", *s_sSpace = " ";
-
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
    if( pItem )
@@ -244,23 +246,23 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
 
    if( szText == NULL || szText[0] == '\0' )
    {
-      pItem->item.asString.length = 0;
-      pItem->item.asString.value = (char *) s_sNull;
+      pItem->item.asString.length  = 0;
+      pItem->item.asString.value   = (char *) s_sNull;
       pItem->item.asString.bStatic = TRUE;
    }
-   else if( szText[0] == ' ' && szText[0] == '\0' )
+   else if( szText[1] == '\0' )
    {
-      pItem->item.asString.length = 1;
-      pItem->item.asString.value = (char *) s_sSpace;
+      pItem->item.asString.length  = 1;
+      pItem->item.asString.value   = (char *) ( hb_vm_acAscii[ (int) ( szText[0] ) ] );
       pItem->item.asString.bStatic = TRUE;
    }
    else
    {
-      pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+      pItem->item.asString.puiHolders      = (USHORT*) hb_xgrab( sizeof( USHORT ) );
       *( pItem->item.asString.puiHolders ) = 1;
-      pItem->item.asString.bStatic = FALSE;
-      pItem->item.asString.length = strlen( szText );
-      pItem->item.asString.value = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
+      pItem->item.asString.bStatic         = FALSE;
+      pItem->item.asString.length          = strlen( szText );
+      pItem->item.asString.value           = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
       strcpy( pItem->item.asString.value, szText );
    }
 
@@ -283,20 +285,30 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
       pItem = hb_itemNew( NULL );
    }
 
-   if( szText == NULL )
-   {
-      szText = "";
-      ulLen = 0;
-   }
-
    pItem->type = HB_IT_STRING;
-   pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
-   *( pItem->item.asString.puiHolders ) = 1;
-   pItem->item.asString.bStatic = FALSE;
-   pItem->item.asString.length = ulLen;
-   pItem->item.asString.value = ( char * ) hb_xgrab( ulLen + 1 );
-   hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
-   pItem->item.asString.value[ ulLen ] = '\0';
+
+   if( szText == NULL || ulLen == 0 )
+   {
+      pItem->item.asString.length  = 0;
+      pItem->item.asString.value   = (char *) s_sNull;
+      pItem->item.asString.bStatic = TRUE;
+   }
+   else if( ulLen == 1 )
+   {
+      pItem->item.asString.length  = 1;
+      pItem->item.asString.value   = (char *) ( hb_vm_acAscii[ (int) ( szText[0] ) ] );
+      pItem->item.asString.bStatic = TRUE;
+   }
+   else
+   {
+      pItem->item.asString.puiHolders      = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+      *( pItem->item.asString.puiHolders ) = 1;
+      pItem->item.asString.bStatic         = FALSE;
+      pItem->item.asString.length          = ulLen;
+      pItem->item.asString.value           = ( char * ) hb_xgrab( ulLen + 1 );
+      hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
+      pItem->item.asString.value[ ulLen ]  = '\0';
+   }
 
    return pItem;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.10 2002/01/30 19:02:41 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.11 2002/04/15 05:06:44 ronpinkas Exp $
  */
 
 /*
@@ -1246,7 +1246,33 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
             /* Reduce the expressions on the list of arguments
              */
             if( pSelf->value.asFunCall.pParms )
+            {
                pSelf->value.asFunCall.pParms = HB_EXPR_USE( pSelf->value.asFunCall.pParms, HB_EA_REDUCE );
+            }
+
+            if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBS", 4 ) == 0 )
+            {
+               USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
+
+               if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+               {
+                  --usCount;
+               }
+
+               if( usCount == 3 )
+               {
+                  HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+                  HB_EXPR_PTR pStart  = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
+                  HB_EXPR_PTR pLen    = pStart->pNext;
+
+                  if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
+                  {
+                     pSelf->ExprType = HB_ET_ARRAYAT;
+                     pSelf->value.asList.pExprList = pString;
+                     pSelf->value.asList.pIndex    = pStart;
+                  }
+               }
+            }
          }
          break;
 
@@ -1261,6 +1287,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
       case HB_EA_PUSH_PCODE:
          {
             USHORT usCount;
+            BYTE   bPcode = 0;
 
          #if defined( HB_MACRO_SUPPORT )
 
@@ -1269,6 +1296,15 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
          #else
 
             if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT", 4 ) == 0 )
+            {
+               bPcode = HB_P_LEFT;
+            }
+            else if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGH", 4 ) == 0 )
+            {
+               bPcode = HB_P_RIGHT;
+            }
+
+            if( bPcode )
             {
                usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
 
@@ -1291,7 +1327,8 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      }
                      HB_EXPR_USE( pString, HB_EA_PUSH_PCODE );
 
-                     hb_compGenPCode3( HB_P_LEFT, HB_LOBYTE( pLen->value.asNum.lVal ), HB_HIBYTE( pLen->value.asNum.lVal ), (BOOL) 0 );
+                     hb_compGenPCode3( bPcode, HB_LOBYTE( pLen->value.asNum.lVal ), HB_HIBYTE( pLen->value.asNum.lVal ), (BOOL) 0 );
+
                      break;
                   }
                }
