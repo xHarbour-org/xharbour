@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.65 2004/10/25 01:58:16 kaddath Exp $
+# $Id: hrbdll.bc,v 1.66 2004/10/25 03:07:25 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -2737,10 +2737,7 @@ $(OBJ_DIR)\cttime.c : $(CT_DIR)\cttime.prg
 $(OBJ_DIR)\cttime.obj : $(OBJ_DIR)\cttime.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\ctwin.c : $(CT_DIR)\ctwin.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\ctwin.obj : $(OBJ_DIR)\ctwin.c
+$(OBJ_DIR)\ctwin.obj : $(CT_DIR)\ctwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\datetime.c : $(CT_DIR)\datetime.prg
