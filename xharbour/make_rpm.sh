@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.23 2005/01/12 16:36:00 druzus Exp $
+# $Id: make_rpm.sh,v 1.24 2005/01/15 11:12:03 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -109,6 +109,10 @@ fi
 if [ "${HB_COMMERCE}" = "yes" ] || ! test_reqrpm "gpm-devel"
 then
     INST_PARAM="${INST_PARAM} --without gpm"
+fi
+if ! test_reqrpm "slang-devel"
+then
+    INST_PARAM="${INST_PARAM} --without gtsln"
 fi
 if ! test_reqrpm "XFree86-devel"
 then
