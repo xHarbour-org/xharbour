@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1705 2003/11/12 12:58:43 andijahja Exp $
+ * $Id: ChangeLog,v 1.1707 2003/11/12 14:18:57 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-11-12 16:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * utils/hbdict/hbdict.prg
+  * source/vm/thread.c
+    ! djgpp should now work with ThreadSleep()
+      Plz. someone test it.
 
 2003-11-12 15:25 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hvm.h

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.115 2003/11/11 20:20:55 ronpinkas Exp $
+* $Id: thread.c,v 1.116 2003/11/12 13:49:14 jonnymind Exp $
 */
 
 /*
@@ -54,7 +54,7 @@
 /* JC1: Now including all this files to make threadsleep available in ST */
 #define HB_THREAD_OPTIMIZE_STACK
 
-#if defined( HB_OS_DARWIN )
+#if defined( HB_OS_DARWIN ) || defined(__DJGPP__)
    #include <stdlib.h>
    #include <unistd.h>    /* We need usleep() in Darwin */
 #endif
@@ -2038,7 +2038,7 @@ void hb_threadSleep( int millisec )
 
    HB_STACK_UNLOCK;
 
-   #if defined( HB_OS_DARWIN )
+   #if defined( HB_OS_DARWIN ) || defined(__DJGPP__)
       usleep( millisec * 1000 );
    #elif defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
       {
