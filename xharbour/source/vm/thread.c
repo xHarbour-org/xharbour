@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.80 2003/06/22 18:33:00 ronpinkas Exp $
+* $Id: thread.c,v 1.81 2003/07/04 16:21:28 jonnymind Exp $
 */
 
 /*
@@ -1857,7 +1857,6 @@ void hb_threadSleep( int millisec )
 
 HB_FUNC( THREADSLEEP )
 {
-   HB_THREAD_STUB
    if( ! ISNUM( 1 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "THREADSLEEP", 1,
@@ -1870,7 +1869,7 @@ HB_FUNC( THREADSLEEP )
 
 HB_FUNC( SECONDSSLEEP )
 {
-   HB_THREAD_STUB
+
    int sleep;
 
    if( ! ISNUM( 1 ) )

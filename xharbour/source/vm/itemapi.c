@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.45 2003/07/06 19:47:30 lculik Exp $
+ * $Id: itemapi.c,v 1.46 2003/07/06 19:53:54 lculik Exp $
  */
 
 /*
@@ -1496,10 +1496,11 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                   iBytes = sprintf( szResult, "%*li", iWidth, pNumber->item.asLong.value );
                   break;
 
+#ifndef HB_LONG_DOUBLE_OFF
                case HB_IT_LDOUBLE:
                   iBytes = sprintf( szResult, "%*ll", iWidth, pNumber->item.asLDouble.value );
                   break;
-
+#endif
 
                case HB_IT_DATE:
                   iBytes = sprintf( szResult, "%*li", iWidth, pNumber->item.asDate.value );
