@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.13 2004/03/20 23:24:46 druzus Exp $
+ * $Id: hbver.c,v 1.14 2004/03/22 17:50:15 mauriliolongo Exp $
  */
 
 /*
@@ -424,6 +424,18 @@ char * hb_verCompiler( void )
 
    iVerMajor /= 100;
    iVerMinor = iVerMajor % 100;
+
+#elif defined(__POCC__)
+
+   szName = "Pelles ISO C Compiler";
+   iVerMajor = __POCC__ / 100;
+   iVerMinor = __POCC__ % 100;
+
+#elif defined(__XCC__)
+
+   szName = "Pelles ISO C Compiler";
+   iVerMajor = __XCC__ / 100;
+   iVerMinor = __XCC__ % 100;
 
 #elif defined(_MSC_VER)
 
