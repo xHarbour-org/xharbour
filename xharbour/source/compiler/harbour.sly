@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.60 2004/03/13 06:17:30 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.61 2004/03/17 08:29:44 ronpinkas Exp $
  */
 
 /*
@@ -2755,6 +2755,8 @@ void yyerror( char * s )
           hb_comp_wSwitchCounter
           */
 
+          hb_comp_pLoops = NULL;
+
          //printf( "Token: %s (%i)\n", yytext, yychar );
       }
       else
@@ -2843,11 +2845,16 @@ static void hb_compLoopStart( void )
       PTR_LOOPEXIT pLast = hb_comp_pLoops;
 
       while( pLast->pNext )
+      {
          pLast = pLast->pNext;
+      }
+
       pLast->pNext = pLoop;
    }
    else
+   {
       hb_comp_pLoops = pLoop;
+   }
 
    pLoop->pNext       = NULL;
    pLoop->pExitList   = NULL;
