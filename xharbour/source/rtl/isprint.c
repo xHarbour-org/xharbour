@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.9 2002/07/06 02:34:21 lculik Exp $
+ * $Id: isprint.c,v 1.10 2002/07/23 01:52:46 ronpinkas Exp $
  */
 
 /*
@@ -423,40 +423,73 @@ static BOOL DPGetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize)
   return TRUE;
 }
 #define MAX_PRINTERS 20
+
 HB_FUNC(GETPRINTERS)
+
 {
-    PHB_ITEM pArrayPrinter= hb_itemArrayNew( 0 );
+    PHB_ITEM pArrayPrinter = hb_itemArrayNew( 0 );
+
     unsigned char *buffer;
-    unsigned long needed=0,returned,a;
+    unsigned long needed = 0 , returned , a ;
     BOOL res;
     DWORD err;
-    err=0;
-    buffer=(unsigned char*)malloc(MAX_PRINTERS * sizeof(PRINTER_INFO_5));
-    res=FALSE;
 
-    res=EnumPrinters(PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL |PRINTER_ENUM_CONNECTIONS,NULL,5,buffer,MAX_PRINTERS*sizeof(PRINTER_INFO_5),&needed,&returned);
-    if(!res)
-        if(GetLastError() != ERROR_INSUFFICIENT_BUFFER)  {
-            hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
-            }
-          else {
-               buffer=(unsigned char*)realloc(buffer,0);
-               buffer=(unsigned char*)malloc(needed);
-               res=EnumPrinters(PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL| PRINTER_ENUM_CONNECTIONS,NULL,5,buffer,needed,&needed,&returned);
+    err = 0;
+    buffer = ( unsigned char * ) malloc( MAX_PRINTERS * sizeof( PRINTER_INFO_5 ) ) ;
+
+    res = FALSE;
+                                                                                             
+    res = EnumPrinters( PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL |PRINTER_ENUM_CONNECTIONS ,
+          NULL ,
+          5 ,
+          buffer ,
+          MAX_PRINTERS * sizeof( PRINTER_INFO_5 ) ,
+          &needed ,
+          &returned );
+
+    if( !res )
+
+        if( GetLastError() != ERROR_INSUFFICIENT_BUFFER )  
+             hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
+            
+        else {
+
+               buffer = ( unsigned char * ) realloc( buffer , 0 ) ;
+               buffer = ( unsigned char * ) malloc( needed ) ;
+
+               res=EnumPrinters(PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL| PRINTER_ENUM_CONNECTIONS ,
+               NULL ,
+               5 ,
+               buffer ,
+               needed , 
+               &needed ,
+               &returned );
                }
-    if(!res)
+
+       if( !res )
             hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
-   for (a=0; a<returned; a++){
-        PHB_ITEM pSubItems= hb_itemArrayNew( 2 );
-        PHB_ITEM pFile=hb_itemPutC( NULL, ((PRINTER_INFO_5 *)(buffer +sizeof(PRINTER_INFO_5) * a))->pPrinterName);
-        PHB_ITEM pPort=hb_itemPutC( NULL,((PRINTER_INFO_5 *)(buffer +sizeof(PRINTER_INFO_5) * a))->pPortName);
-        hb_arraySet(pSubItems,1,pFile);
-        hb_arraySet(pSubItems,2,pPort);
-        hb_arrayAdd(pArrayPrinter,pSubItems);
-        hb_itemRelease(pFile);
-        hb_itemRelease(pPort);
-        hb_itemRelease(pSubItems );
+
+       for ( a = 0 ; a < returned ; a++ ){
+
+       PHB_ITEM pSubItems = hb_itemArrayNew( 2 );
+
+       PHB_ITEM pFile = hb_itemPutC( NULL, ( ( PRINTER_INFO_5 * ) ( buffer + sizeof( PRINTER_INFO_5 ) * a ) )->pPrinterName );
+
+       PHB_ITEM pPort = hb_itemPutC( NULL,( ( PRINTER_INFO_5 * ) ( buffer + sizeof( PRINTER_INFO_5 ) * a ) )->pPortName );
+
+       hb_arraySet( pSubItems , 1 , pFile ) ;
+
+       hb_arraySet( pSubItems , 2 , pPort ) ;
+
+       hb_arrayAdd( pArrayPrinter , pSubItems );
+
+       hb_itemRelease( pFile ) ;
+                       
+       hb_itemRelease( pPort ) ;
+
+       hb_itemRelease( pSubItems );
     }
+
    hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
 
 }
