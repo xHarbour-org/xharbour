@@ -1,0 +1,12 @@
+##################################
+# $Id: Makefile.linux,v 1.3 2004/01/30 18:34:12 lculik Exp $
+#
+# Makefile for XWT Test program
+#
+
+
+PRGFLAGS=-I../include
+LIBS=`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt
+
+TARGETS=xwt_test 
+include ../Rules.make
