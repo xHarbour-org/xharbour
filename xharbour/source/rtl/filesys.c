@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.81 2004/03/25 19:18:25 druzus Exp $
+ * $Id: filesys.c,v 1.82 2004/03/30 22:47:23 druzus Exp $
  */
 
 /*
@@ -550,7 +550,7 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
       BYTE * pbyTmp;
       BOOL bRead;
       ULONG ulLen;
-      
+
       //JC1: unlocking the stack to allow cancelation points
       HB_STACK_UNLOCK;
 
@@ -1550,11 +1550,12 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
       HB_TEST_CANCEL_ENABLE_ASYN
 
       errno = 0;
+      _doserrno = 0 ;
       if( iShare )
          hFileHandle = _sopen( ( char * ) pFilename, convert_open_flags( uiFlags ), iShare );
       else
          hFileHandle = _open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
-      hb_fsSetError( errno );
+      hb_fsSetError( _doserrno != 0 ? ( USHORT ) _doserrno : errno ) ;
 
       HB_DISABLE_ASYN_CANC
    }
@@ -2173,7 +2174,7 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
 
    if( lOffset < 0 && Flags == SEEK_SET )
    {
-      /* 
+      /*
        * This is _BUGGY_ because 25 can be translated inside hb_fsSetError
        * ans it's not Clipper but some version of DOS compatibility!!!
        * I hate when someone try to fix his buggy .prg code which call
@@ -3345,12 +3346,14 @@ void  HB_EXPORT hb_fsSetError( USHORT uiError )
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSetError(%hu)", uiError));
 
+/* Will lead to R/T if sharing violation for database !
    #if defined(_MSC_VER)
       if ( uiError == EBADF )
          uiError = 6;
       else if ( uiError == EACCES )
          uiError = 5;
    #endif
+*/
 
    #if defined(X__WIN32__)
       s_uiErrorLast=WintoDosError(uiError);
