@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.83 2004/07/24 23:08:33 guerra000 Exp $
+ * $Id: tbrowse.prg,v 1.84 2004/07/27 22:35:29 kaddath Exp $
  */
 
 /*
@@ -131,10 +131,6 @@ CLASS TBrowse
    DATA aColumns
    DATA aColumnsSep           // Holds the column position where seperators are marked . for Wvt_DrawGridVert()
    DATA aColorSpec            // Holds colors of Tbrowse:ColorSpec
-   DATA cSpacePre             // Blank Space prior to first column
-   DATA cSpaceLast            // Blank space after the last column
-   DATA cSpaceWidth           // Spaces of browse width
-   DATA lRect
 
 #ifdef HB_COMPAT_C53
    DATA nRow                  // Row number for the actual cell
@@ -149,7 +145,8 @@ CLASS TBrowse
    ASSIGN colorSpec(cColor)   INLINE if( empty( cColor ), ::cColorSpec, ( ::lConfigured := .f., ;
                                      ::aColorSpec := Color2Array( cColor ), ::cColorSpec := cColor ) )
    ACCESS colPos              INLINE ::nColPos
-   ASSIGN colPos(nColPos)     INLINE ::lConfigured := .f., ::nColPos := if( nColPos == nil, ::nColPos, nColPos )
+   ASSIGN colPos(nColPos)     INLINE ::nColPos := iif( nColPos == nil, ::nColPos, nColPos ),;
+                                     iif(::nColPos < ::leftVisible .OR. ::nColPos > ::rightVisible, ::lConfigured := .F., NIL)
 
    ACCESS nBottom             INLINE ::nwBottom +  iif(::cBorder=="",0,1)
    ASSIGN nBottom( nBottom )  INLINE ::lConfigured := .f., ::nwBottom := nBottom - iif(::cBorder=="",0,1)
@@ -277,11 +274,16 @@ CLASS TBrowse
    DATA nFrozenCols                       // Number of frozen columns on left side of TBrowse
    DATA nColumns                          // Number of columns added to TBrowse
    DATA lNeverDisplayed                   // .T. if TBrowse has never been stabilized()
-   DATA lDispBegin
 
    DATA aColsInfo                         // Columns configuration array
    DATA nVisWidth                         // Visible width of Browser
    DATA lConfigured                       // Specifies whether tBrowse is already configured or not
+   DATA lForceStable                      // if .T. ::Stabilize() doesn't exit at every stage of stabilization
+
+   DATA cSpacePre                         // Blank Space prior to first column
+   DATA cSpaceLast                        // Blank space after the last column
+   DATA cSpaceWidth                       // Spaces of browse width
+   DATA lRect
 
 #ifdef HB_COMPAT_C53
    DATA rect
@@ -307,7 +309,6 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
 
    ::rowCount        := nBottom - nTop + 1
    ::nRowData        := nTop
-   ::lDispBegin      := .F.
    ::AutoLite        := .T.
    ::leftVisible     := 1
    ::rightVisible    := 1
@@ -371,6 +372,7 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::cSpaceLast      := ''
    ::cSpaceWidth     := ''
    ::lRect           := .f.
+   ::lForceStable    := .F.
 
    Return Self
 
@@ -1403,7 +1405,8 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
    LOCAL chSep, cfSep, nSpacePre, nSpaceLast, nLeftCol
    LOCAL ccSep, ncSepWidth
 
-DispBegin()
+   DispBegin()
+
    nSpacePre := INT( ( nWidth - ::nColsWidth ) / 2 )
    nSpaceLast := nWidth - nSpacePre - ::nColsWidth
 
@@ -1584,8 +1587,9 @@ DispBegin()
       next
    endif
 
-DispEnd()
-   Return Self
+   DispEnd()
+
+Return Self
 
 //---------------------------------------------------------------------//
 
@@ -1676,96 +1680,10 @@ METHOD CheckRowPos() CLASS TBrowse
 //-------------------------------------------------------------------//
 
 METHOD ForceStable() CLASS TBrowse
-   LOCAL nOldCursor                    // Current shape of cursor (which I remove before stabilization)
-   LOCAL ColorSpec
 
-   if ::nColumns == 0
-      // Return TRUE to avoid infinite loop ( do while !stabilize;end )
-      return Self
-   endif
-
-   // Configure the browse if not configured . Pritpal Bedi
-   if !::lConfigured .or. ::lNeverDisplayed
-      if ::lNeverDisplayed
-         ::configure( 3 )
-      endif
-      ::configure( 2 )
-   endif
-
-   // I need to set columns width If TBrowse was never displayed before
-   if ::lNeverDisplayed
-      //AEVal(::aColumns, {|oCol| ::SetColumnWidth(oCol)} )
-
-      // NOTE: It must be before call to ::SetFrozenCols() since this call
-      //       tests this iVar value, and I set it to .F. since I'm going to display TBrowse
-      //       for first time
-      ::lNeverDisplayed := .F.
-
-      // Force re-evaluation of frozen space since I could not calc it before
-      // being columns width not set
-      if ::freeze > 0
-         ::SetFrozenCols( ::freeze )
-      endif
-   endif
-
-   ::CheckRowPos()
-
-   ColorSpec  := ::aColorSpec[ 1 ]
-   nOldCursor := SetCursor( SC_NONE )
-
-   if ::lRedrawFrame
-      // Draw border
-      if Len( ::cBorder ) == 8
-         @::nTop,::nLeft,::nBottom,::nRight BOX ::cBorder COLOR ::aColorSpec[ 1 ]
-      endif
-
-      // How may columns fit on TBrowse width?
-      ::HowManyCol()
-      ::RedrawHeaders( ::nVisWidth )
-
-      // Now that browser frame has been redrawn we don't need to redraw it unless
-      // displayed columns change
-      ::lRedrawFrame := .F.
-   endif
-
-   // From this point there is stabilization of rows which is made up of three phases
-   // 1st repositioning of data source
-   // 2nd redrawing of rows, after each row we exit stabilization loop with .F.
-   // 3rd if all rows have been redrawn we set ::stable state to .T.
-   if !( ::stable )
-      // NOTE: I can enter here because of a movement key or a ::RefreshAll():ForceStable() call
-
-      ::CheckRowsToBeRedrawn()
-
-      //  Redraw Rows required to be redrawn
-      ::DrawARow()
-
-      // If I have fewer records than available TBrowse rows, cursor cannot be lower than
-      // last record (note ::lHitBottom is set only during a movement)
-      if ::nLastRetrieved < ::nNewRowPos
-         ::nNewRowPos := ::nLastRetrieved
-      endif
-
-      // If I'm not already under cursor I have to set data source to cursor position
-      if ::nLastRetrieved <> ::nNewRowPos
-         EvalSkipBlock( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
-         ::nLastRetrieved := ::nNewRowPos
-      endif
-
-      // new cursor position
-      ::RowPos    := ::nNewRowPos
-      ::HitTop    := ::lHitTop
-      ::HitBottom := ::lHitBottom
-
-      ::stable := .T.
-   endif
-
-   if ::AutoLite
-      ::Hilite()
-   else
-      ::PosCursor()
-   endif
-   SetCursor( nOldCursor )
+   ::lForceStable := .T.
+   ::Stabilize()
+   ::lForceStable := .F.
 
    Return self
 
@@ -1838,24 +1756,31 @@ METHOD Stabilize() CLASS TBrowse
    // 2nd redrawing of rows, after each row we exit stabilization loop with .F.
    // 3rd if all rows have been redrawn we set ::stable state to .T.
    //
-   if !::stable
+   if ! ::stable
       // NOTE: I can enter here because of a movement key or a ::RefreshAll():ForceStable() call
 
       if ::CheckRowsToBeRedrawn()
          // Exit first stage of stabilization
          //
          SetCursor( nOldCursor )
-         return .F.
+         if ! ::lForceStable
+            return .F.
+         endif
 
       endif
 
-      //  Draw browse row-by-row
-      //
-      if ( nRowToDraw := ascan( ::aRedraw, .t. ) ) <> 0
-         ::DrawARow( @nRowToDraw )
+      if ! ::lForceStable
+         //  Draw browse row-by-row
+         //
+         if ( nRowToDraw := ascan( ::aRedraw, .t. ) ) <> 0
+            ::DrawARow( @nRowToDraw )
 
-         SetCursor( nOldCursor )
-         return .F.
+            SetCursor( nOldCursor )
+            return .F.
+         endif
+      else
+         // Draw all rows
+         ::DrawARow()
       endif
 
       // If I reach this point I've repainted all rows so I can set ::stable state

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3265 2004/08/03 19:12:52 druzus Exp $
+ * $Id: ChangeLog,v 1.3266 2004/08/03 21:11:15 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-04 13:40 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tbrowse.prg
+    ! fixex colpos assignment, should change ::lConfigured only if new
+      colpos is out of tbrowse display area.
+    * removed all duplicated code of ::forcestable() which now calls
+      ::stabilize() after setting a new iVar to signal that a full
+      stabilization is required. IMHO a loop while ! ::Stabilize()
+      enddo is even more clear as a solution, but requires a few more
+      tests.
+    * cSpacePre/Last/Width and lRect are hidden iVar so I moved them
+      after HIDDEN: declaration.
+
+    /* IMHO tbrowse still has LOTS of duplicated code which should be
+       removed, just think of ::dispcell() and ::dispcellnormal() which
+       do the very same thing apart for a couple of ifs...
+       This code duplication makes tbrowse bigger and more difficult to
+       maintain.
+    */
+
+  * config/w32/global.cf
+    ! for loops require a %%var to work
 
 2004-08-03 23:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/regex.c
@@ -68,7 +90,7 @@
     * added HB_MULTI_GT support
   + source/rtl/win32prn.prg
   * source/rtl/Makefile
-    * moved and renamed contrib/winprn/tprint.prg 
+    * moved and renamed contrib/winprn/tprint.prg
   + tests/testw32p.prg
     * moved and renamed contrib/winprn/testprn.prg
   * config/w32/watcom.cf
