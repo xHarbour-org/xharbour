@@ -68,7 +68,7 @@ STATIC PROCEDURE MsWord()
 
    LOCAL oWord, oText
 
-   oWord:=TOleAuto():New( "Word.Application" )
+   oWord:=CreateObject( "Word.Application" )
 
    IF Ole2TxtError() != "S_OK"
       Alert( "ERROR! Word not avialable." )
@@ -98,7 +98,7 @@ STATIC PROCEDURE IEXPLORER()
 
    LOCAL oIE
 
-   oIE:=TOleAuto():New( "InternetExplorer.Application" )
+   oIE:=CreateObject( "InternetExplorer.Application" )
 
    IF Ole2TxtError() != "S_OK"
       Alert( "ERROR! IExplorer not avialable." )
@@ -119,7 +119,7 @@ STATIC PROCEDURE OUTLOOK()
 
    LOCAL oOL, oList, oMail, i
 
-   oOL := TOleAuto():New( "Outlook.Application.9" )
+   oOL := CreateObject( "Outlook.Application.9" )
 
    IF Ole2TxtError() != "S_OK"
       Alert( "ERROR! Outlook not avialable." )

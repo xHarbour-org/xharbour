@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.197 2002/05/02 22:28:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.198 2002/05/03 00:34:02 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,8 +9,6 @@
 */
 
 2002-05-02 17:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
-   * source/rtl/win32ole.prg
-     + Added Alert() as MessageBox() wrapper.
    + tests/testole.prg
      + Added demo of OLE/COM usage.
 
