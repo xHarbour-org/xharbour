@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.19 2003/07/05 17:40:42 lculik Exp $
+ * $Id: transfrm.c,v 1.20 2003/07/06 16:42:35 lculik Exp $
  */
 
 /*
@@ -527,11 +527,8 @@ HB_FUNC( TRANSFORM )
             iWidth = iOrigWidth;                       /* Push original width      */
             iDec = iOrigDec;                           /* Push original decimals   */
          }
-     #ifndef HB_LONG_DOUBLE_OFF
-         pNumber = hb_itemPutNLDLen( NULL, dPush, -1, iDec );
-     #else
          pNumber = hb_itemPutNDLen( NULL, dPush, -1, iDec );
-     #endif
+
          pWidth = hb_itemPutNI( NULL, iWidth + ( ( ulPicLen || iDec == 0 ) ? 0 : ( iDec + 1 ) ) );
          pDec = hb_itemPutNI( NULL, iDec );
 

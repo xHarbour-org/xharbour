@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.1214 2003/07/05 17:42:28 lculik Exp $
+ * $Id: ChangeLog,v 1.1215 2003/07/06 15:18:33 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-05 14:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/transform.c
+    include/hbapi.h
+    include/hbapifs.h
+    include/hbvmpub.h
+    include/hbapiitm.h
+    source/vm/itemapi.c
+    source/vm/extend.c
+    source/vm/arrays.c
+    source/vm/hvm.c
+    + Some functions was ajusted for long longs values
+    * changed support for long double  values into long long
+
 2003-07-06 12:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbtest/hbtest.prg
     ! set default codepage to EN

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.225 2003/07/01 08:17:45 ronpinkas Exp $
+ * $Id: hvm.c,v 1.226 2003/07/05 17:38:45 lculik Exp $
  */
 
 /*
@@ -2886,7 +2886,7 @@ static void hb_vmNegate( void )
    {
       pItem->item.asDouble.value = -pItem->item.asLDouble.value;
       /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
-      pItem->item.asDouble.length = ( pItem->item.asLDouble.value >= 10000000000000000.0 || pItem->item.asLDouble.value <= -99999999999999.0 ) ? 30 : 10;
+      pItem->item.asLDouble.length = 30 ;
    }
 #endif
 

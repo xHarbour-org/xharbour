@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.19 2003/07/05 17:38:45 lculik Exp $
+ * $Id: extend.c,v 1.20 2003/07/06 16:42:35 lculik Exp $
  */
 
 /*
@@ -1085,10 +1085,10 @@ long long  HB_EXPORT hb_parnld( int iParam, ... )
 }
 
 #undef hb_retnldlen
-void HB_EXPORT hb_retnldlen( long long dNumber, int iWidth, int iDec )
+void HB_EXPORT hb_retnldlen( long long dNumber, int iWidth)
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retndlen(%lf, %d, %d)", dNumber, iWidth, iDec));
+   HB_TRACE(HB_TR_DEBUG, ("hb_retndlen(%lf, %d, %d)", dNumber, iWidth));
 
-   hb_itemPutNLDLen( &(HB_VM_STACK.Return), dNumber, iWidth, iDec );
+   hb_itemPutNLDLen( &(HB_VM_STACK.Return), dNumber, iWidth);
 }
 #endif
