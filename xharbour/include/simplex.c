@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.15 2005/02/28 19:28:03 ronpinkas Exp $
+ * $Id: simplex.c,v 1.16 2005/03/02 05:03:01 ronpinkas Exp $
  */
 
 /*
@@ -179,7 +179,7 @@ static BOOL bNewLine = TRUE, bStart = TRUE;
 char * yytext = (char *) sToken;
 int yyleng;
 
-#define RESET_LEX() { iLen = 0; iHold = 0; iReturn = 0; bNewLine = TRUE; bIgnoreWords = FALSE; iPairToken = 0; }
+#define RESET_LEX() { iLen = 0; iHold = 0; iReturn = 0; bNewLine = TRUE; bIgnoreWords = FALSE; iPairToken = 0; iLastToken = 0; }
 
 /* Above are NOT overidable !!! Need to precede the Language Definitions. */
 

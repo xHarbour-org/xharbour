@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3957 2005/03/17 22:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3957 2005/03/17 20:23:27 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-17 21:23 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * include/simplex.c
+    * Added iLastToken = 0 to RESET_LEX() macro.
 
 2005-03-17 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * contrib/rdd_ads/adsfunc.c
@@ -22,7 +26,7 @@
 
 2005-03-17 17:59 UTC+0200 Mindaugas Kavaliauskas <dbtopas at @ at dbtopas.lt>
   * source/vm/hvm.c
-    ! fixed bit operations on 64bit numbers on 32bit systems. Bugfix is 
+    ! fixed bit operations on 64bit numbers on 32bit systems. Bugfix is
       proposed by Przemyslaw. Thanks.
 
 2005-03-17 16:25 UTC+0200 Mindaugas Kavaliauskas <dbtopas at @ at dbtopas.lt>
