@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.100 2004/10/22 14:34:41 paultucker Exp $
+# $Id: makefile.nt,v 1.101 2004/10/23 14:10:50 paultucker Exp $
 #
 
 #
@@ -1257,7 +1257,7 @@ CLEAN:
 
 $(HBPP_EXE) : \
    $(HBPP_DIR)\hbpp.c
-   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(COMMON_LIB) $(EXTRALIB)
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
 
 #
 # HBRUN.EXE rules
