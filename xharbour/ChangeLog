@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.544 2002/12/22 07:06:58 walito Exp $
+ * $Id: ChangeLog,v 1.545 2002/12/23 00:14:21 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,52 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-23 07:38 UTC+0100  Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * include/hbapigt.h
+  * source/rtl/console.c
+    * Chanced the Critical Section for console output into a reentrant
+      mutex (manually handed)
+    + Added hb_consoleLock() and hb_consoleUnlock() to allow other api part to
+      lock the screen
+    + Added HB_FUNC HBConsoleLock() and HBConsoleUnlock() to allow PRG to have
+      mutex on screen.
+
+  * source/rtl/alert.prg
+    ! Fixed MT alert unreadability: adding HBConsoleLock() to Alert, no other
+      thread can write
+      to screen in the meanwhile
+
+  * tests/client.prg
+    ! Check on InetErrorCode has been fixed
+
+2002-12-23 03:30 UTC+0100 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  *include/hbapi.h
+    ! A section was declared twice. Removed the unused copy (that would block
+      compilation).
+
+  * source/rtl/inet.c
+    * Repristinated both windows availability for InetDataReady and new grammar
+      for InetReadLine
+
+  * tests/client.prg
+    * Changed to match new InetReadLine grammar
+
+  * tests/server.prg
+    * Changed to match new InetReadLine grammar
+
+2002-12-22 22:49 UTC+0100 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * source/rtl/inet.c
+    + added check for ISBYREF(2) in all the InetRecv*()
+    * InetReadLine now has format (Sock, @C, [N]) and C can be allcated
+       on the fly
+    ! InetDataReady is now available under Windows ( using select() )
+
+  * client.prg
+    * updated to match Inet api change
+
+  * server.prg
+    * updated to match Inet api change
 
 2002-12-22 16:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/thread.h
@@ -57,6 +103,18 @@
       zero-length string (bug fix for SET PATH TO and SET DEFAULT TO).
       Borrowed from Harbour, change made by David G. Holm
     ! Fix, reset PRINTFILE handle when close file.
+
+2002-12-22 22:49 UTC+0100 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * source/rtl/inet.c
+    + added check for ISBYREF(2) in all the InetRecv*()
+    * InetReadLine now has format (Sock, @C, [N]) and C can be allcated on the fly
+    ! InetDataReady is now available under Windows ( using select() )
+
+  * tests/client.prg
+    * updated to match Inet api change
+
+  * tests/server.prg
+    * updated to match Inet api change
 
 2002-12-22 01:29 UTC+0300 Phil Krylov <phil@mail.ru>
   * include/inet.h
