@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.32 2004/10/22 11:26:43 paultucker Exp $
+ * $Id: gtalleg.c,v 1.33 2004/10/24 09:32:02 oh1 Exp $
  */
 
 /*
@@ -1939,6 +1939,11 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
 
 /* ********** Graphics API ********** */
 
+void HB_GT_FUNC( gt_ProcessMessages( void ) )
+{
+   return;
+}
+
 int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
 {
 
@@ -2129,6 +2134,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
    gt_funcs->SetClipboard       = HB_GT_FUNC( gt_SetClipboard );
    gt_funcs->GetClipboard       = HB_GT_FUNC( gt_GetClipboard );
    gt_funcs->GetClipboardSize   = HB_GT_FUNC( gt_GetClipboardSize );
+   gt_funcs->ProcessMessages    = HB_GT_FUNC( gt_ProcessMessages );
 
    /* Graphics API */
    gt_funcs->gfxPrimitive       = HB_GT_FUNC( gt_gfxPrimitive );

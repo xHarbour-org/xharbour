@@ -1,5 +1,5 @@
 /*
-* $Id: gtQTc.cpp,v 1.7 2004/09/08 00:17:12 druzus Exp $
+* $Id: gtQTc.cpp,v 1.8 2004/10/22 11:26:43 paultucker Exp $
 */
 
 /*
@@ -1083,6 +1083,11 @@ BOOL HB_GT_FUNC(gt_Suspend())
 BOOL HB_GT_FUNC(gt_Resume())
 {
 	return TRUE;
+}
+
+void HB_GT_FUNC( gt_ProcessMessages( void ) )
+{
+   return;
 }
 
 void HB_GT_FUNC(gt_OutStd( BYTE * pbyStr, ULONG ulLen ))

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.50 2004/10/24 09:37:59 oh1 Exp $
+ * $Id: gtxvt.c,v 1.51 2004/11/21 21:44:22 druzus Exp $
  */
 
 /*
@@ -4424,6 +4424,11 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
    return s_clipsize;
 }
 
+void HB_GT_FUNC( gt_ProcessMessages( void ) )
+{
+   return;
+}
+
 /* *********************************************************************** */
 
 int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
@@ -4708,6 +4713,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+    gt_funcs->ProcessMessages       = HB_GT_FUNC( gt_ProcessMessages );
     gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
     gt_funcs->gfxText               = HB_GT_FUNC( gt_gfxText );
 

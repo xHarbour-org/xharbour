@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.20 2004/10/24 09:36:14 oh1 Exp $
+ * $Id: gtos2.c,v 1.21 2004/11/02 14:40:04 mauriliolongo Exp $
  */
 
 /*
@@ -1324,6 +1324,11 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
    return s_clipsize;
 }
 
+void HB_GT_FUNC( gt_ProcessMessages( void ) )
+{
+   return;
+}
+   
 /* *********************************************************************** */
 
 void HB_GT_FUNC( gt_SetDispCP( char *pszTermCDP, char *pszHostCDP, BOOL bBox ) )
@@ -1516,6 +1521,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+    gt_funcs->ProcessMessages       = HB_GT_FUNC( gt_ProcessMessages );
 
     /* Graphics API */
 /*

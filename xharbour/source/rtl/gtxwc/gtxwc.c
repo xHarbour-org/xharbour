@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.5 2004/11/21 21:44:23 druzus Exp $
+ * $Id: gtxwc.c,v 1.6 2004/11/23 17:04:24 lf_sfnet Exp $
  */
 
 /*
@@ -4217,6 +4217,11 @@ BOOL HB_EXPORT hb_xvt_gtSetAltF4Close( BOOL bCanClose)
 }
 */
 
+void HB_GT_FUNC( gt_ProcessMessages( void ) )
+{
+   return;
+}
+
 #ifdef HB_MULTI_GT
 
 static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
@@ -4271,6 +4276,8 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
 */
+    gt_funcs->ProcessMessages       = HB_GT_FUNC( gt_ProcessMessages );
+
     /* Graphics API */
 /*
     gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
