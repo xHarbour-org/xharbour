@@ -79,13 +79,13 @@ HB_FUNC(PQCONNECT)
     conn = PQconnectdb(conninfo);
     
     if (PQstatus(conn) != CONNECTION_OK)
-        {
+    {
         hb_retc(PQerrorMessage(conn));
         PQfinish(conn);
         return;
-        }
+    }
         
-        db_handle = hb_itemPutPtr( NULL, ( void * ) conn );        
+    db_handle = hb_itemPutPtr( NULL, ( void * ) conn );        
     hb_itemReturn(db_handle);
     hb_itemRelease(db_handle); 
     
@@ -206,8 +206,8 @@ HB_FUNC(PQLASTREC)
 
 HB_FUNC(PQGETVALUE)
 {
-        PGresult   *res;
-        int         nRow, nCol;
+    PGresult   *res;
+    int         nRow, nCol;
 
     if (hb_pcount() == 3)
     {
