@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.26 2003/05/25 22:03:31 lculik Exp $
+ * $Id: dbf1.c,v 1.27 2003/05/31 22:26:54 lculik Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbapicdp.h"
 #include <errno.h>
 
-#define __PRG_SOURCE__ __FILE__
+extern PHB_CODEPAGE s_cdpage;
 
 extern PHB_CODEPAGE s_cdpage;
 
@@ -1908,6 +1908,7 @@ ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    {
       pField = ( LPDBFFIELD ) ( pBuffer + uiCount * sizeof( DBFFIELD ) );
       pFieldInfo.atomName = pField->bName;
+      hb_strUpper( pFieldInfo.atomName,11 );
       pFieldInfo.uiLen = pField->bLen;
       pFieldInfo.uiDec = 0;
       switch( pField->bType )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1128 2003/06/17 11:15:57 iananderson Exp $
+ * $Id: ChangeLog,v 1.1129 2003/06/17 14:22:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-06-17 16:50 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
+  * source/rtl/cdpapi.c
+    ! Bug fixed in hb_cdpTranslate() and hb_cdpnTranslate() borrow from harbour
+  * source/rdd/dbf1.c
+    * RDD works Ok now, if field names in dbf are in lower case ( this
+      may be if dbf created by other dbms ) (borrow from harbour)
 
 2003-06-17 7:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbvm.h

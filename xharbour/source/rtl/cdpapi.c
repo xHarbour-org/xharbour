@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.1 2003/05/16 19:52:07 druzus Exp $
+ * $Id: cdpapi.c,v 1.2 2003/05/28 11:59:05 druzus Exp $
  */
 
 /*
@@ -269,13 +269,16 @@ void HB_EXPORT hb_cdpTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpO
 
    if( cdpIn != cdpOut && cdpIn->nChars == cdpOut->nChars )
    {
+      int nAddLower = (cdpIn->lLatin)? 6:0;
       for( ; *psz; psz++ )
       {
-         if( ( n = (int)cdpIn->s_chars[ ((int)*psz)&255 ] ) != 0 )
+         if( ( ( n = (int)cdpIn->s_chars[ ((int)*psz)&255 ] ) != 0 ) && 
+             ( n <= cdpIn->nChars || ( n > (cdpOut->nChars+nAddLower) ) && 
+             ( n <= (cdpOut->nChars*2+nAddLower) ) ) )
          {
             n--;
-            *psz = ( n>=cdpOut->nChars )? 
-                        cdpOut->CharsLower[n-cdpOut->nChars]:cdpOut->CharsUpper[n];
+            *psz = ( n >= (cdpOut->nChars+nAddLower) )? 
+                        cdpOut->CharsLower[n-cdpOut->nChars-nAddLower]:cdpOut->CharsUpper[n];
          }
       }
    }
@@ -287,13 +290,16 @@ void HB_EXPORT hb_cdpnTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdp
    unsigned int i;
 
    if( cdpIn != cdpOut && cdpIn->nChars == cdpOut->nChars )
+      int nAddLower = (cdpIn->lLatin)? 6:0;
       for( i=0; i<nChars; i++,psz++ )
       {
-         if( ( n = (int)cdpIn->s_chars[ ((int)*psz)&255 ] ) != 0 )
+         if( ( ( n = (int)cdpIn->s_chars[ ((int)*psz)&255 ] ) != 0 ) && 
+             ( n <= cdpIn->nChars || ( n > (cdpOut->nChars+nAddLower) ) && 
+             ( n <= (cdpOut->nChars*2+nAddLower) ) ) )
          {
             n--;
-            *psz = ( n>=cdpOut->nChars )? 
-                        cdpOut->CharsLower[n-cdpOut->nChars]:cdpOut->CharsUpper[n];
+            *psz = ( n >= (cdpOut->nChars+nAddLower) )? 
+                        cdpOut->CharsLower[n-cdpOut->nChars-nAddLower]:cdpOut->CharsUpper[n];
          }
       }
 }
