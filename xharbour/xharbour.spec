@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.22 2003/08/05 16:37:31 druzus Exp $
+# $Id: xharbour.spec,v 1.23 2003/08/05 20:59:12 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -28,16 +28,16 @@
 %define hb_lnkso yes
 %define hb_libs  vm pp rtl rdd dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca odbc ct debug profiler
 
-%define hb_cc    export HB_COMPILER="gcc"
+%define hb_cc    export HB_COMPILER=gcc
 %define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3 $RPM_OPT_FLAGS"
-%define hb_arch  export HB_ARCHITECTURE="linux"
-%define hb_cmt   export HB_MT="%{hb_mt}"
-%define hb_cgt   export HB_GT_LIB="gt%{hb_gt}"
-%define hb_cgpm  export HB_GPM_MOUSE="%{hb_gpm}"
-%define hb_cmgt  export HB_MULTI_GT="%{hb_mgt}"
-%define hb_bdir  export HB_BIN_INSTALL="%{prefix}/bin"
-%define hb_idir  export HB_INC_INSTALL="%{prefix}/include/%{name}"
-%define hb_ldir  export HB_LIB_INSTALL="%{prefix}/lib/%{name}"
+%define hb_arch  export HB_ARCHITECTURE=linux
+%define hb_cmt   export HB_MT=%{hb_mt}
+%define hb_cgt   export HB_GT_LIB=gt%{hb_gt}
+%define hb_cgpm  export HB_GPM_MOUSE=%{hb_gpm}
+%define hb_cmgt  export HB_MULTI_GT=%{hb_mgt}
+%define hb_bdir  export HB_BIN_INSTALL=%{prefix}/bin
+%define hb_idir  export HB_INC_INSTALL=%{prefix}/include/%{name}
+%define hb_ldir  export HB_LIB_INSTALL=%{prefix}/lib/%{name}
 %define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_cmt} ; %{hb_cgt} ; %{hb_cgpm} ; %{hb_cmgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}
 %define hb_host  www.xharbour.org
 %define readme   README.RPM
