@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.38 2003/01/17 19:57:53 horacioroldan Exp $
+ * $Id: dbfcdx1.c,v 1.39 2003/02/13 14:36:04 mlombardo Exp $
  */
 
 /*
@@ -1251,7 +1251,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
    BYTE cTemp[8];
    LPCDXAREA pArea = pTag->pIndex->pArea;
    LONG lStep = 0;
-   BOOL bDirectRead, bCondAll, bCondRest, bEnd;
+   BOOL bDirectRead, bEnd;
    PHB_ITEM pForItem, pWhileItem, pEvalItem;
 
    if( ( pTag->OptFlags & 0x80 ) || pTag->Custom )

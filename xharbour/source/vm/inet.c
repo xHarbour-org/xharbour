@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.14 2003/02/07 10:28:40 jonnymind Exp $
+* $Id: inet.c,v 1.15 2003/02/13 01:22:35 jonnymind Exp $
 */
 
 /*
@@ -565,6 +565,7 @@ HB_FUNC( INETCLEARTIMEOUT )
 
    if ( pSocket != NULL )
    {
+      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
       Socket->timeout = -1;
    }
    else
