@@ -1,5 +1,5 @@
 /*
- * $Id: TComponent.prg,v 1.8 2002/11/08 04:46:51 ronpinkas Exp $
+ * $Id: TComponent.prg,v 1.9 2002/11/08 05:45:03 what32 Exp $
  */
 
 /*
@@ -28,7 +28,7 @@
  *
  */
 
-GLOBAL EXTERNAL oApp
+GLOBAL EXTERNAL Application
 
 #include "windows.ch"
 #include "HbClass.ch"
@@ -111,7 +111,7 @@ ENDCLASS
 
 METHOD Create( oOwner ) CLASS TComponent
 
-   IF ! oOwner == oApp
+   IF ! oOwner == Application
       oOwner:InsertComponent( Self )
    ENDIF
    

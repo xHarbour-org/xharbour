@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.84 2002/11/08 04:46:52 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.85 2002/11/08 05:45:10 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -45,7 +45,7 @@
 #define XFM_Size     XFM_Footer
 
 GLOBAL EXTERNAL hThisInstance
-GLOBAL EXTERNAL oApp
+GLOBAL EXTERNAL Application
 GLOBAL EXTERNAL MainFrame
 GLOBAL EXTERNAL FormEdit
 
@@ -260,9 +260,9 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
       CASE ::CtrlName=="TreeView"
          oObj:=::Add( TTreeView():New(   self,   510, aRect[1], aRect[2], aRect[3], aRect[4] ) )
 
-      CASE ::CtrlName=="Rebar"
-         IF !("2" $ cName) // only one Rebar
-            oObj:=::Add( TRebar():New( self ) )
+      CASE ::CtrlName=="CoolBar"
+         IF !("2" $ cName) // only one CoolBar
+            oObj:=::Add( TCoolBar():New( self ) )
          ENDIF
 
       CASE ::CtrlName=="ToolBar"

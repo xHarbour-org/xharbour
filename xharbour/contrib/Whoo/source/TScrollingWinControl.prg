@@ -1,5 +1,5 @@
 /*
- * $Id: TPopup.prg,v 1.6 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TScrollingWinControl.prg,v 1.1 2002/11/07 02:45:07 fsgiudice Exp $
  */
 
 /*
@@ -35,7 +35,7 @@
 
 
 CLASS TScrollingWinControl FROM TWinControl
-
+/*
   PROTECTED:
     METHOD   AdjustClientRect       virtual   //; override;
     METHOD   AlignControls          virtual   //; override;
@@ -48,7 +48,7 @@ CLASS TScrollingWinControl FROM TWinControl
     PROPERTY AutoScroll             AS LOGICAL DEFAULT TRUE
     METHOD   Resizing               VIRTUAL
   PUBLIC:
-    METHOD   Create     CONSTRUCTOR // OVERRIDE
+//    METHOD   Create     CONSTRUCTOR // OVERRIDE
     METHOD   Destroy                virtual   //destructor; override;
     METHOD   DisableAutoRange       virtual
     METHOD   EnableAutoRange        virtual
@@ -56,6 +56,6 @@ CLASS TScrollingWinControl FROM TWinControl
   PUBLISHED:
     PROPERTY HorzScrollBar          // : TControlScrollBar;
     PROPERTY VertScrollBar          // : TControlScrollBar;
-
+*/
 ENDCLASS
 

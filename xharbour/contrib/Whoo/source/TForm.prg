@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.55 2002/11/08 01:35:57 what32 Exp $
+ * $Id: TForm.prg,v 1.56 2002/11/08 05:45:03 what32 Exp $
  */
 
 /*
@@ -41,7 +41,7 @@
 
 *-----------------------------------------------------------------------------*
 
-CLASS TForm FROM TWinControl
+CLASS TForm FROM TCustomForm //WinControl
    DATA Modal        PROTECTED INIT .F.
    DATA resname      PROTECTED
    DATA xhBorder     PROTECTED
@@ -118,9 +118,7 @@ RETURN(c)
 
 METHOD Create( oParent ) CLASS TForm
 
-   InitCommonControls()
-   
-   super:Create( oParent )
+   ::Super:Create( oParent )
    
    ::WndProc   := IFNIL( ::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL( ::Msgs,-1,::Msgs)

@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.43 2002/11/07 23:01:29 what32 Exp $
+ * $Id: TApplication.prg,v 1.44 2002/11/09 03:18:16 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -27,7 +27,6 @@
  */
 
 
-GLOBAL Application
 
 #include "hbclass.ch"
 #include "what32.ch"
@@ -39,16 +38,8 @@ GLOBAL Application
 #include "WinTypes.ch" 
 #include "cstruct.ch"
 
+GLOBAL Application
 GLOBAL EXTERNAL lPrevInstance
-
-typedef struct tagMSG {;
-    HWND hwnd;
-    WORD message;
-    WORD wParam;
-    LONG lParam;
-    DWORD time;
-    POINT pt;
-} MSG
 
 *------------------------------------------------------------------------------*
 
@@ -92,7 +83,7 @@ METHOD Initialize() CLASS Application
 
    IF !::MultiInstance
       ::InstMsg := RegisterWindowMessage( GetModuleFileName() )
-      // AllowSetForegroundWindow( -1 )
+      AllowSetForegroundWindow( -1 )
       IF lPrevInstance
          SendMessage( HWND_BROADCAST, ::InstMsg, 0, 0)
          PostQuitMessage(0)
@@ -102,6 +93,10 @@ METHOD Initialize() CLASS Application
    ENDIF
    ::Instance := hInstance()
 
+   InitCommonControls()
+   InitCommonControlsEx()
+   InitCommonControlsEx(ICC_COOL_CLASSES)
+
    Application := Self
 
    RETURN(self)
@@ -110,27 +105,7 @@ METHOD Initialize() CLASS Application
 
 METHOD Run() CLASS Application
 
-   LOCAL cMsg
-   LOCAL msg IS MSG
-
    ::MainLoop()
-   
-   /*
-   DO WHILE .T.
-     IF PeekMessage( @cMsg, ,  , , PM_REMOVE )
-        msg:Buffer( cMsg )
-        
-        IF msg:message == WM_QUIT
-           EXIT
-        ENDIF
-        
-        IF !IsDialogMessage( , cMsg )
-           TranslateMessage( cMsg )
-           DispatchMessage( cMsg )
-        ENDIF
-     ENDIF
-   ENDDO
-   */
    
 Return 0
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.1 2002/11/07 02:45:06 fsgiudice Exp $
+ * $Id: TCustomForm.prg,v 1.2 2002/11/08 04:46:51 ronpinkas Exp $
  */
 
 /*
@@ -35,8 +35,9 @@
 
 
 CLASS TCustomForm FROM TScrollingWinControl
-
+/*
   PROTECTED:
+
     DATA     FActionLists              //: TList;
     DATA     FFormState                //: TFormState;
     METHOD   Activate                virtual  //; dynamic;
@@ -77,6 +78,8 @@ CLASS TCustomForm FROM TScrollingWinControl
     METHOD   VisibleChanging         virtual  //; override;
     METHOD   WndProc                 virtual  //(var Message: TMessage); override;
     METHOD   Resizing                virtual  //(State: TWindowState); override;
+*/
+
     PROPERTY ActiveMDIChild             //: TForm;
     PROPERTY AlphaBlend                 AS LOGICAL
     PROPERTY AlphaBlendValue            AS NUMERIC   //: Byte;
@@ -131,6 +134,7 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY OnResize                   //stored IsForm;
     PROPERTY OnShortCut                 //: TShortCutEvent;
     PROPERTY OnShow                     //: TNotifyEvent;
+/*
   PUBLIC:
     METHOD   Create                     CONSTRUCTOR //(AOwner: TComponent); override;
     METHOD   CreateNew                  CONSTRUCTOR //VIRTUAL     //(AOwner: TComponent; Dummy: Integer = 0); virtual;
@@ -156,6 +160,7 @@ CLASS TCustomForm FROM TScrollingWinControl
     METHOD   Show                       virtual
     METHOD   ShowModal                  VIRTUAL //: Integer; virtual;
     METHOD   WantChildKey               virtual //(Child: TControl; var Message: TMessage): Boolean; virtual;
+
     PROPERTY Active                     AS LOGICAL  //: Boolean;
     PROPERTY ActiveControl                      //: TWinControl;
     PROPERTY Action
@@ -175,6 +180,6 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY Monitor                    //: TMonitor;
     PROPERTY OleFormObject              //: IOleForm;
     PROPERTY WindowState                TYPE TWindowState DEFAULT wsNormal
-
+*/
 ENDCLASS
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.17 2002/11/07 23:01:30 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.18 2002/11/08 05:45:03 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -1158,9 +1158,9 @@ METHOD OnNotify( hdr, nlParam ) CLASS TWBrowse
 
 //         c:=peek(nlParam,nmHdr:sizeof())
 //         a:=Bin2A(c,{{LONG,LONG,LONG},LONG,LONG,LONG})
-//         IF ::OnEndDrag(a)
-//            RETURN(1)
-//         ENDIF
+         IF !::OnEndDrag(nmHdr)
+            RETURN(1)
+         ENDIF
          
       CASE hdr:code==HDN_GETDISPINFO
       CASE hdr:code==HDN_ITEMCHANGING
@@ -1243,7 +1243,7 @@ METHOD OnBeginDrag( hdr) CLASS TWBrowse
 RETURN(.F.)
 
 //---------------------------------------------------------------------------------------------
-/*
+
 METHOD OnEndDrag(hdr) CLASS TWBrowse
    LOCAL lRet:=.F.
    IF ::lMoving
@@ -1255,8 +1255,8 @@ METHOD OnEndDrag(hdr) CLASS TWBrowse
       ::xDragColumn:=0
    ENDIF
 RETURN(lRet)
-*/
 
+/*
 METHOD OnEndDrag(a)
    STATIC xTypes:={"-4","-4","-4","-4","-4","-4","-4","-4","-4"}
    LOCAL aItem
@@ -1275,7 +1275,7 @@ METHOD OnEndDrag(a)
       ::xDragColumn:=0
    ENDIF
 RETURN(lRet)
-
+*/
 //---------------------------------------------------------------------------------------------
 
 METHOD SetColPos(nCol,nPos,lInternal) CLASS TWBrowse

@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.120 2002/11/08 05:45:10 what32 Exp $
+ * $Id: xide.prg,v 1.121 2002/11/08 06:07:52 what32 Exp $
  */
 
 /*
@@ -38,7 +38,7 @@
 #include "wintypes.ch"
 #include "cstruct.ch"
 
-GLOBAL oApp
+GLOBAL EXTERNAL Application
 GLOBAL MainFrame
 GLOBAL FormEdit
 
@@ -51,12 +51,12 @@ GLOBAL ObjEdit
 FUNCTION Main
    local oSplash
 
-   oApp := Application():Initialize()
+   Application():Initialize()
 
    // splash screen
-   oSplash := TSplash():Create( oApp, "visualxharbour.bmp", 3000 )
+   oSplash := TSplash():Create( Application, "visualxharbour.bmp", 3000 )
 
-   WITH OBJECT oApp
+   WITH OBJECT Application
       WITH OBJECT :CreateForm( MainFrame(), @MainFrame )
 
          :SetStyle( WS_THICKFRAME, .F. )
@@ -89,7 +89,7 @@ CLASS MainFrame FROM TFrame
                                    ::ExStyle   := WS_EX_APPWINDOW,;
                                    ::FrameWnd  := .T.,;
                                    ::Icon      := LoadIcon( hInstance(), 'IDE' ),;
-                                   super:Create( oParent )
+                                   ::Super:Create( oParent )
 
    METHOD OnCloseQuery() INLINE IIF( ::MsgBox( 'Quitting xIDE ?','Exit', MB_YESNO ) == IDYES, NIL, 0 )
    METHOD MainMenu()
@@ -115,7 +115,7 @@ METHOD MainMenu() CLASS MainFrame
    oMenuItem := TMenuItem():Create( oPopup )
    oMenuItem:Caption := "Editor"
    oMenuItem:Command := 101
-   oMenuItem:OnClick := {||oApp:CreateForm( @FormEdit, TFormEdit(), MainFrame ) }
+   oMenuItem:OnClick := {||Application:CreateForm( @FormEdit, TFormEdit(), MainFrame ) }
    oMenuItem:AppendTo( oPopup:Handle )
 
    oMenuItem := TMenuItem():Create( oPopup )
@@ -137,7 +137,7 @@ METHOD MainMenu() CLASS MainFrame
    //With Object ::WindowMenu
    //   :AddPopup('&Test')
    //   With Object :Popup
-   //      :AddItem( 'Editor', 101, {||oApp:CreateForm( @FormEdit, TFormEdit(), MainFrame ) } )
+   //      :AddItem( 'Editor', 101, {||Application:CreateForm( @FormEdit, TFormEdit(), MainFrame ) } )
    //      :AddItem( 'Open', 102, {|| OpenProject():Create() } )
    //      :AddSeparator()
    //      :AddItem( 'Exit'  , 200, {||MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
@@ -152,13 +152,17 @@ return(self)
 METHOD MainToolBar() CLASS MainFrame
 
    LOCAL n, oTool, oSplash
-   LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab
+   LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab, oTb
 
-   TRebar():Create( MainFrame )
+   TCoolBar():Create( MainFrame )
 
     // add the xmake toolbar
    WITH OBJECT TToolBar():Create( MainFrame )
-      ToolButton():Create( ::ToolBar1 ):Hint := "New Project"
+      
+      oTb := ToolButton():Create( ::ToolBar1 )
+      oTb:Hint := "New Project"
+      oTb:OnClick := {|o| MessageBox( MainFrame:handle, o:name ) }
+      
       ToolButton():Create( ::ToolBar1 ):Hint := "Open Project"
       ToolButton():Create( ::ToolBar1 ):Hint := "Properties"
       ToolButton():Create( ::ToolBar1 ):Hint := "Build Application"
@@ -183,7 +187,8 @@ METHOD MainToolBar() CLASS MainFrame
       SendMessage( :handle, TB_SETIMAGELIST, 0, hImg1 )
       //---------------------------------------------------------------------
    END
-   ::Rebar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolBar1:handle, 200, 52, 200, "", NIL )
+
+   ::CoolBar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolBar1:handle, 200, 52, 200, "", NIL )
    // add the TabControl on the Rebarband
 
    WITH OBJECT ToolTabs():Create( MainFrame )
@@ -203,12 +208,12 @@ METHOD MainToolBar() CLASS MainFrame
       :Configure()
    END
 
-   ::Rebar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolTabs:handle, 550, 56, , "", NIL )
+   ::CoolBar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolTabs:handle, 550, 56, , "", NIL )
 
    // sets the controls toolbar on the TabControl
    With Object ::ToolTabs:StdTab
-      TRebar():Create( MainFrame:ToolTabs:StdTab )
-      :Rebar1:SetStyle( WS_BORDER, .F. )
+      TCoolBar():Create( MainFrame:ToolTabs:StdTab )
+      :CoolBar1:SetStyle( WS_BORDER, .F. )
       With Object :Add( StdTools():Create( MainFrame:ToolTabs:StdTab ) )
          :GetHandle()
          :SetStyle( TBSTYLE_CHECKGROUP )
@@ -221,6 +226,7 @@ METHOD MainToolBar() CLASS MainFrame
 
              oTool:Action := {|oItem| FormEdit:OnMenuCommand( oItem ) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
+             oTool:Hint   := aStdTab[ n +1 ]
          NEXT
 
          // ----------------------------------------------------   set imagelist
@@ -233,24 +239,25 @@ METHOD MainToolBar() CLASS MainFrame
 
          //---------------------------------------------------------------------
       End
-      :Rebar1:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
+      :CoolBar1:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
       :StdTools:Disable()
    End
 
 //----------------------------------------------------------------------------------------------
    With Object ::ToolTabs:Win32
-      TRebar():Create( MainFrame:ToolTabs:Win32 )
-      :Rebar1:SetStyle( WS_BORDER, .F. )
+      TCoolBar():Create( MainFrame:ToolTabs:Win32 )
+      :CoolBar1:SetStyle( WS_BORDER, .F. )
       With Object :Add( WinTools():Create( ::ToolTabs:Win32 ) )
          :GetHandle()
          :SetStyle( TBSTYLE_CHECKGROUP )
 
-         aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'Rebar', ;
+         aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'CoolBar', ;
                       '', '' }
          for n:=0 to 9
              oTool := ToolButton():Create( ::ToolTabs:Win32:WinTools )
              oTool:Action := {|oItem| FormEdit:OnMenuCommand(oItem) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
+             oTool:Hint   := aStdTab[ n +1 ]
          next
 
          // ----------------------------------------------------   set imagelist
@@ -264,7 +271,7 @@ METHOD MainToolBar() CLASS MainFrame
          //---------------------------------------------------------------------
 
       End
-      :Rebar1:AddBand( NIL, RBBS_NOVERT, :WinTools:handle, 100, 30,  , "", NIL )
+      :CoolBar1:AddBand( NIL, RBBS_NOVERT, :WinTools:handle, 100, 30,  , "", NIL )
       :WinTools:Disable()
    End
 
@@ -501,9 +508,9 @@ int XFMParse( char *sText )
    // Save result into pForm - we will use it multiple times below.
    hb_itemForwardValue( pForm, &hb_stack.Return );
 
-   //oApp:CreateForm( @FormEdit, TFormEdit(), MainFrame )
+   //Application:CreateForm( @FormEdit, TFormEdit(), MainFrame )
    hb_vmPushSymbol( pCreateForm->pSymbol );
-   hb_vmPush( &OAPP );
+   hb_vmPush( &APPLICATION );
    // See below alternative to pushing REF.
    //memcpy( ( * hb_stack.pPos ), &FORMEDIT, sizeof( HB_ITEM ) );
    //hb_stackPush();

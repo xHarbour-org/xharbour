@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.26 2002/11/07 20:05:56 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.27 2002/11/07 23:01:31 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -101,7 +101,7 @@ CLASS TToolBar FROM TCustomControl
    DATA Created  PROTECTED
    DATA ntProc   PROTECTED
    DATA aMenus   PROTECTED
-
+   
    VAR nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp PROTECTED
 
    DATA WinClass    PROTECTED INIT "toolbar32"
@@ -127,6 +127,7 @@ CLASS TToolBar FROM TCustomControl
 
    METHOD SetListStyle()          INLINE ::Style := OR(::Style,TBSTYLE_LIST)
 
+
    METHOD Disable()               INLINE ::DisableAll()//, EnableWindow( ::handle, .f. )
    METHOD Enable()                INLINE ::EnableAll()//, EnableWindow( ::handle, .t. )
 
@@ -137,13 +138,13 @@ ENDCLASS
 
 METHOD Create( oParent ) CLASS TToolBar
 
-   InitCommonControlsEx(ICC_COOL_CLASSES)
+   ::Super:Create( oParent )
    
-   super:Create( oParent )
    ::Parent  := oParent
    ::Id      := 0
 
-   ::nImg    := 15
+   ::nImg    := 0
+
    ::hBMInst := NIL
    ::nBMId   := NIL
    ::xBtn    := 26
@@ -151,11 +152,10 @@ METHOD Create( oParent ) CLASS TToolBar
    ::xBmp    := 20
    ::yBmp    := 20
 
-   ::aButtons:={}
    ::Created := .F.
    ::aBitmaps:={}
    ::aMenus  :={}
-
+   ::GetHandle()
    RETURN( Self )
 
 *-----------------------------------------------------------------------------*
@@ -175,26 +175,6 @@ METHOD AddBitmap(hInst, nhIdBmp, nButtons) CLASS TToolBar
    ENDIF
 
    RETURN Self
-
-*-----------------------------------------------------------------------------*
-
-METHOD Add( oBtn ) CLASS TToolBar
-
-   LOCAL tbb IS TBBUTTON
-
-   tbb:ibitmap   := oBtn:ImageIndex
-   tbb:idCommand := oBtn:Id
-   tbb:fsState   := oBtn:State
-   tbb:fsStyle   := oBtn:Style
-   tbb:dwData    := oBtn:cargo
-   tbb:iString   := LEN( ::aButtons )
-   
-   AADD(::aButtons,oBtn)
-
-   SendMessage( ::handle, TB_ADDBUTTONS, 1, tbb:value)
-   SendMessage( ::handle, TB_ADDSTRING, 0, oBtn:Caption)
-
-RETURN(self)
 
 *-----------------------------------------------------------------------------*
 
@@ -220,7 +200,6 @@ METHOD CreateWnd() CLASS TToolBar
    ::ntProc:=SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(hWnd,nMsg,nwParam,nlParam)},{WM_NOTIFY,WM_COMMAND})
    ::SendMessage(TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_DRAWDDARROWS )
    ::Created:=.T.
-   ::Show()
 return( self )
 
 
@@ -232,13 +211,13 @@ METHOD tbProc(hWnd,nMsg,nwParam,nlParam) CLASS TToolBar
    LOCAL Ttt
    LOCAL nmt
    LOCAL nID
-   LOCAL hMenu,rc,aRect
+   LOCAL hMenu,rc,aRect, nRet
    LOCAL n,x
    LOCAL hic
 
    DO CASE
    CASE nMsg==WM_COMMAND
-       IF (n:=ASCAN(::aButtons,{|btn| btn:id==nwParam})) > 0
+       IF (n:=ASCAN(::aButtons,{|btn| btn:oStruct:idCommand==nwParam})) > 0
           if ::aButtons[n]:Action != NIL
              if valtype(::aButtons[n]:Action) == "B"
                 EVAL( ::aButtons[n]:Action,::aButtons[n] )
@@ -246,13 +225,32 @@ METHOD tbProc(hWnd,nMsg,nwParam,nlParam) CLASS TToolBar
                 HB_Exec( ::aButtons[n]:Action,,::aButtons[n])
              endif
           endif
-       endif
+          
+          VIEW nwParam
+          
+          IF __ClsMsgAssigned( self, "OnClick" )
+             nRet := ::aButtons[n]:OnClick( nwParam, nlParam )
+          ELSEIF ::aButtons[n]:OnClick != NIL
+             IF ValType( ::aButtons[n]:OnClick ) == "B"
+                nRet := EVAL( ::aButtons[n]:OnClick, ::aButtons[n] )
+             ELSE
+                nRet := HB_Exec( ::aButtons[n]:OnClick, , ::aButtons[n] )
+             ENDIF
+          ENDIF
+            
+          IF nRet!=nil
+             return(nRet)
+          ENDIF
+
+       ENDIF
+
+
    CASE nMsg==WM_NOTIFY
      Hdr IS NMHDR
      Hdr:Buffer(peek(nlParam,Hdr:sizeof()))
      DO CASE
      CASE Hdr:code==TTN_NEEDTEXT
-       IF (n:=ASCAN(::aButtons,{|btn| btn:id==Hdr:idFrom})) > 0
+       IF (n:=ASCAN(::aButtons,{|btn| btn:oStruct:idCommand==Hdr:idFrom})) > 0
           Ttt IS TOOLTIPTEXT
           Ttt:Reset()
           Ttt:Buffer(peek(nlParam,Ttt:sizeof()))
@@ -275,14 +273,14 @@ METHOD tbProc(hWnd,nMsg,nwParam,nlParam) CLASS TToolBar
      ENDCASE
    ENDCASE
 
-   RETURN(CallWindowProc(::ntProc,hWnd /*::Parent:handle*/,nMsg,nwParam,nlParam))
+   RETURN CallWindowProc( ::ntProc, hWnd, nMsg, nwParam, nlParam )
 
 
 *-----------------------------------------------------------------------------*
 
 METHOD disableall() CLASS TToolBar
 
-   AEVAL(::aButtons,{|btn| ::disableBtn(btn:id)})
+   AEVAL(::aButtons,{|btn| ::disableBtn(btn:oStruct:idCommand)})
 
    RETURN(self)
 
@@ -290,9 +288,28 @@ METHOD disableall() CLASS TToolBar
 
 METHOD enableall() CLASS TToolBar
 
-   AEVAL(::aButtons,{|btn| ::enableBtn(btn:id)})
+   AEVAL(::aButtons,{|btn| ::enableBtn(btn:oStruct:idCommand)})
 
    RETURN(self)
+
+*-----------------------------------------------------------------------------*
+METHOD Add( oBtn ) CLASS TToolBar
+
+   oBtn:oStruct IS TBBUTTON
+
+   oBtn:oStruct:ibitmap   := Len( ::aButtons )
+   oBtn:oStruct:idCommand := Len( ::aButtons )
+   oBtn:oStruct:fsState   := oBtn:State
+   oBtn:oStruct:fsStyle   := oBtn:Style
+   oBtn:oStruct:dwData    := oBtn:cargo
+   oBtn:oStruct:iString   := LEN( ::aButtons )
+
+   AADD(::aButtons,oBtn)
+
+   SendMessage( ::handle, TB_ADDBUTTONS, 1, oBtn:oStruct:value)
+   SendMessage( ::handle, TB_ADDSTRING, 0, oBtn:Caption)
+
+RETURN Self
 
 *-----------------------------------------------------------------------------*
 
@@ -303,38 +320,41 @@ CLASS ToolButton
    DATA ControlName INIT "ToolButton"
    DATA Style      PROTECTED INIT TBSTYLE_BUTTON
    DATA PopupMenu
-   DATA Hint
    DATA Height
    DATA Width
    DATA Enabled
    DATA Action
-   DATA Id         INIT 0
    DATA State      INIT TBSTATE_ENABLED
    DATA Cargo
    DATA TextIndex  INIT 0
    DATA TabIndex   INIT 1
+
    DATA Parent     PROTECTED
+   DATA oStruct    PROTECTED
+
+   PROPERTY Id READ ::oStruct:idCommand WRITE SetId DEFAULT 0
    PROPERTY Caption READ FCaption WRITE SetText
 
+   DATA Hint
+  
+   DATA OnClick
+
    METHOD Create()
-   METHOD Disable()      INLINE ::Parent:DisableBtn( ::Id )
-   METHOD Enable()       INLINE ::Parent:EnableBtn( ::Id )
-   METHOD Click()        INLINE ::Parent:ClickButton( ::Id, .T. )
+   METHOD Disable()      INLINE ::Parent:DisableBtn( ::oStruct:idCommand )
+   METHOD Enable()       INLINE ::Parent:EnableBtn( ::oStruct:idCommand )
+   METHOD Click()        INLINE ::Parent:ClickButton( ::oStruct:idCommand, .T. )
    METHOD SetText(cText) INLINE ::FCaption := cText
 
+   METHOD SetId( n )     INLINE ::FId := n, ::oStruct:idCommand := n, Self
 ENDCLASS
 
 
-METHOD Create( oParent ) CLASS ToolButton //nImgIndex,cCaption,cHint,nId,bAction)
+METHOD Create( oParent ) CLASS ToolButton
   
    LOCAL oCtrl, nInst := 1
-
-   ::Parent     := oParent
-   ::Id         := Len( ::Parent:aButtons ) + 1
-   ::ImageIndex := Len( ::Parent:aButtons )
-
+   
    IF ::Name == NIL
-      FOR EACH oCtrl IN ::Parent:aButtons
+      FOR EACH oCtrl IN oParent:aButtons
           IF oCtrl:ControlName == ::ControlName
              nInst ++
           ENDIF
@@ -342,8 +362,10 @@ METHOD Create( oParent ) CLASS ToolButton //nImgIndex,cCaption,cHint,nId,bAction
       ::Name := ( ::ControlName + AllTrim( Str( nInst ) ) )
    ENDIF
 
-   __objAddData( ::Parent, ::Name, HB_OO_CLSTP_PROTECTED )
-   __ObjSetValueList( ::Parent, { { ::Name, self } } )
+   __objAddData( oParent, ::Name, HB_OO_CLSTP_PROTECTED )
+   __ObjSetValueList( oParent, { { ::Name, self } } )
+
+   ::Parent     := oParent
 
    oParent:Add( Self )
 

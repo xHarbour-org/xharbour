@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.28 2002/11/08 01:35:57 what32 Exp $
+ * $Id: TabControl.Prg,v 1.29 2002/11/08 06:07:40 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -403,7 +403,7 @@ return(nil)
 
 *-----------------------------------------------------------------------------*
 
-CLASS TabPage FROM TForm
+CLASS TabPage FROM TPanel
    DATA ImageIndex
    METHOD Create() CONSTRUCTOR
    METHOD OnCommand()
@@ -418,7 +418,7 @@ METHOD Create( oParent ) CLASS TabPage
    ::modal    := .F.
    ::resname  := NIL
    ::ImageIndex := 0
-   super:Create( oParent )
+   ::Super:Create( oParent )
 return( Self )
 
 METHOD OnCommand(nwParam,nlParam) CLASS TabPage

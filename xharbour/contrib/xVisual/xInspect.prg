@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.60 2002/11/08 01:36:01 what32 Exp $
+ * $Id: xInspect.prg,v 1.61 2002/11/09 06:15:27 what32 Exp $
  */
 
 /*
@@ -135,8 +135,6 @@ METHOD Create( oParent ) CLASS ObjInspect
    
    // Browser
    ::Browser:=InspectBrowser():Create( InspTabs:Properties )
-   
-   Application:ProcessMessages()
    
 return( Self )
 

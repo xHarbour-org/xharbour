@@ -1,10 +1,10 @@
 /*
- * $Id: TCRebar.prg,v 1.25 2002/11/07 20:05:56 what32 Exp $
+ * $Id: TCRebar.prg,v 1.26 2002/11/08 06:07:40 what32 Exp $
  */
 /*
  * xHarbour Project source code:
  *
- * Whoo.lib TRebar CLASS
+ * Whoo.lib TCoolBar CLASS
  *
  * Copyright 2002 Augusto Infante [augusto@2vias.com.ar]
  * www - http://www.xharbour.org
@@ -41,7 +41,7 @@ pragma pack(4)
 
 *------------------------------------------------------------------------------*
 
-CLASS TRebar FROM TCustomControl
+CLASS TCoolBar FROM TCustomControl
 
    DATA Caption  PROTECTED  INIT ""
    DATA FLeft   PROTECTED  INIT    0
@@ -61,17 +61,17 @@ CLASS TRebar FROM TCustomControl
    VAR nrProc     PROTECTED
 
    DATA WinClass    PROTECTED INIT REBARCLASSNAME
-   DATA ControlName PROTECTED INIT "Rebar"
+   DATA ControlName PROTECTED INIT "CoolBar"
 
    METHOD Create() CONSTRUCTOR
    METHOD AddBand()
-   METHOD RebarProc()
+   METHOD CoolBarProc()
    METHOD Delete()
    METHOD DelControl()
 
 ENDCLASS
 
-METHOD Delete() CLASS TRebar
+METHOD Delete() CLASS TCoolBar
    local n
    if( n := ascan( ::Parent:Controls, {|o|o:handle==::handle} ) )>0
       __objDelData( ::Parent, UPPER(::name ))
@@ -81,7 +81,7 @@ METHOD Delete() CLASS TRebar
    RETURN(self)
 
 
-METHOD DelControl() CLASS TRebar
+METHOD DelControl() CLASS TCoolBar
    local n
    if( n := ascan( ::Parent:Controls, {|o|o:handle==::handle} ) )>0
       __objDelData( ::Parent, UPPER(::name ))
@@ -93,7 +93,7 @@ METHOD DelControl() CLASS TRebar
 *------------------------------------------------------------------------------*
 
 
-METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
+METHOD CoolBarProc(nMsg,nwParam,nlParam) CLASS TCoolBar
 
    LOCAL acRect
    LOCAL aRect
@@ -110,15 +110,14 @@ METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
 
 *------------------------------------------------------------------------------*
 
-METHOD Create( oParent ) CLASS TRebar
+METHOD Create( oParent ) CLASS TCoolBar
 
-   InitCommonControlsEx(ICC_COOL_CLASSES)
-   super:Create( oParent )
+   ::Super:Create( oParent )
 
    ::FHeight := 20
    ::nrProc := SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam|;
-                            ::RebarProc(nMsg,nwParam,nlParam)}, WM_SIZE )
-   ::RebarProc( WM_SIZE,0,0)
+                            ::CoolBarProc(nMsg,nwParam,nlParam)}, WM_SIZE )
+   ::CoolBarProc( WM_SIZE,0,0)
    
 RETURN( self )
 
@@ -145,6 +144,7 @@ METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
    rbBand:hbmBack    := IFNIL(hBmp,0,hBmp)
 
    nBand := ::SendMessage( RB_INSERTBAND, -1, rbBand:value )
-   RETURN( nBand <> 0 )
+
+RETURN( nBand <> 0 )
 
 *------------------------------------------------------------------------------*

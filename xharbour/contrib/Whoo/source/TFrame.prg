@@ -75,7 +75,6 @@ METHOD Create( oOwner ) CLASS TFrame
    ::ExStyle   := WS_EX_APPWINDOW
    ::FormType  := RCF_WINDOW
    ::lRegister := .T.
-   InitCommonControls()
 
 Return Self
 
