@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.9 2003/03/16 06:00:33 jonnymind Exp $
+ * $Id: idle.c,v 1.10 2003/11/22 21:35:26 druzus Exp $
  */
 
 /*
@@ -57,6 +57,10 @@
  * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
  *    hb_releaseCPU()
  *
+ * Copyright 2003 Giancarlo Niccolai <antispam at niccolai dot ws>
+ *    hb_idleAddFunc()
+ *    hb_idleDelFunc()
+ *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -105,7 +109,7 @@ static void hb_releaseCPU( void )
    hb_threadSleep( 10 );
 
 #else
-   
+
    #if defined(HB_OS_WIN_32) || defined(__CYGWIN__)
       /* Forfeit the remainder of the current time slice. */
       Sleep( 20 );
@@ -173,7 +177,15 @@ void hb_idleState( void )
       }
       else if ( s_uiIdleTask < s_uiIdleMaxTask )
       {
-         hb_vmEvalBlock( s_pIdleTasks[ s_uiIdleTask ] );
+         PHB_ITEM pItem = s_pIdleTasks[ s_uiIdleTask ];
+         if ( HB_IS_BLOCK( pItem ) )
+         {
+            hb_vmEvalBlock( pItem );
+         }
+         else
+         {
+            hb_execFromArray( pItem );
+         }
          ++s_uiIdleTask;
       }
       else
@@ -226,75 +238,108 @@ HB_FUNC( HB_IDLERESET )
    hb_idleReset();
 }
 
+
+ULONG hb_idleAddFunc( PHB_ITEM pBlock )
+{
+   ++s_uiIdleMaxTask;
+   if( !s_pIdleTasks )
+   {
+      s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) );
+   }
+   else
+   {
+      s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xrealloc( s_pIdleTasks, sizeof( HB_ITEM_PTR ) * s_uiIdleMaxTask );
+   }
+   /* store a copy of passed codeblock
+   */
+   s_pIdleTasks[ s_uiIdleMaxTask - 1 ] = hb_itemNew( pBlock );
+
+   /* return a pointer as a handle to this idle task
+   */
+   if ( HB_IS_ARRAY( pBlock ) )
+   {
+      return ( ULONG ) pBlock->item.asArray.value;    /* TODO: access to pointers from harbour code */
+   }
+   else
+   {
+      return ( ULONG ) pBlock->item.asArray.value;    /* TODO: access to pointers from harbour code */
+   }
+}
+
 /* add a new background task and return its handle */
 HB_FUNC( HB_IDLEADD )
 {
-   HB_ITEM_PTR pBlock = hb_param( 1, HB_IT_BLOCK );
+   HB_ITEM_PTR pBlock = hb_param( 1, HB_IT_ANY );
 
-   if( pBlock )
+   if( HB_IS_BLOCK( pBlock ) || HB_IS_ARRAY( pBlock ) )
    {
-      ++s_uiIdleMaxTask;
-      if( !s_pIdleTasks )
-      {
-         s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) );
-      }
-      else
-      {
-         s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xrealloc( s_pIdleTasks, sizeof( HB_ITEM_PTR ) * s_uiIdleMaxTask );
-      }
-      /* store a copy of passed codeblock
-      */
-      s_pIdleTasks[ s_uiIdleMaxTask - 1 ] = hb_itemNew( pBlock );
-
-      /* return a pointer as a handle to this idle task
-      */
-      hb_retnl( ( ULONG ) pBlock->item.asBlock.value );    /* TODO: access to pointers from harbour code */
+      hb_retnl( hb_idleAddFunc( pBlock ) );
    }
    else
       hb_retnl( -1 );    /* error - a codeblock is required */
 }
 
+PHB_ITEM hb_idleDelFunc( ULONG ulID )
+{
+   SHORT iTask;
+   PHB_ITEM pItem = NULL;
+
+   iTask = 0;
+   while( iTask < s_uiIdleMaxTask )
+   {
+      pItem = s_pIdleTasks[ iTask ];
+
+      if( ( pItem->type == HB_IT_BLOCK &&
+            ulID == ( ULONG ) pItem->item.asBlock.value ) ||
+          ( pItem->type == HB_IT_ARRAY &&
+            ulID == ( ULONG ) pItem->item.asArray.value ) )
+
+      {
+         --s_uiIdleMaxTask;
+         if( s_uiIdleMaxTask )
+         {
+            if( iTask != s_uiIdleMaxTask )
+            {
+               memcpy( &s_pIdleTasks[ iTask ], &s_pIdleTasks[ iTask + 1 ],
+                        sizeof( HB_ITEM_PTR ) * ( s_uiIdleMaxTask - iTask ) );
+            }
+            s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xrealloc( s_pIdleTasks, sizeof( HB_ITEM_PTR ) * s_uiIdleMaxTask );
+         }
+         else
+         {
+            hb_xfree( s_pIdleTasks );
+            s_pIdleTasks = NULL;
+         }
+         /* Pitem has now a valid value */
+         break;
+      }
+      ++iTask;
+      /* Pitem is now NULL */
+      pItem = NULL;
+   }
+
+   return pItem;
+}
+
+
 /* Delete a task with given handle and return a codeblock with this task */
 HB_FUNC( HB_IDLEDEL )
 {
-   BOOL bFound = FALSE;
+   PHB_ITEM pItem = NULL;
 
    if( s_pIdleTasks && ( hb_parinfo( 1 ) & HB_IT_NUMERIC ) )
    {
-      SHORT iTask;
       ULONG ulID = hb_parnl( 1 );   /* TODO: access to pointers from harbour code */
-      HB_ITEM_PTR pItem;
 
-      iTask = 0;
-      while( iTask < s_uiIdleMaxTask && !bFound )
-      {
-         pItem = s_pIdleTasks[ iTask ];
-         if( ulID == ( ULONG ) pItem->item.asBlock.value )
-         {
-             hb_itemReturn( pItem ); /* return a codeblock */
-             hb_itemRelease( pItem );
-
-             --s_uiIdleMaxTask;
-             if( s_uiIdleMaxTask )
-             {
-                if( iTask != s_uiIdleMaxTask )
-                {
-                   memcpy( &s_pIdleTasks[ iTask ], &s_pIdleTasks[ iTask + 1 ],
-                           sizeof( HB_ITEM_PTR ) * ( s_uiIdleMaxTask - iTask ) );
-                }
-                s_pIdleTasks = ( HB_ITEM_PTR * ) hb_xrealloc( s_pIdleTasks, sizeof( HB_ITEM_PTR ) * s_uiIdleMaxTask );
-             }
-             else
-             {
-                hb_xfree( s_pIdleTasks );
-                s_pIdleTasks = NULL;
-             }
-             bFound = TRUE;
-         }
-         ++iTask;
-      }
+      pItem = hb_idleDelFunc( ulID );
    }
 
-   if( !bFound )
+   if( pItem == NULL )
+   {
       hb_ret();    /* return NIL */
+   }
+   else
+   {
+      hb_itemReturn( pItem ); /* return a codeblock */
+   }
 }

@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-12-18 15:35 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+2003-12-18 15:46 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/idle.c
     + Added hb_idleAddFunc() and hb_idleDelFunc() as
       C callable frontends for HB_IdleAdd() and HB_IdleDel()
