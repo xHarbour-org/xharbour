@@ -4,7 +4,7 @@
 * Giancarlo Niccolai et al.:
 * (PLZ. add your copyright...)
 *
-* $Id: xwt_test.prg,v 1.3 2004/05/20 15:41:37 jonnymind Exp $
+* $Id: xwt_test1.prg,v 1.1 2004/05/24 22:54:22 lculik Exp $
 *
 
 
@@ -16,7 +16,7 @@ GLOBAL oMenuChanged
 GLOBAL oWindow
 
 PROCEDURE MAIN()
-   LOCAL oLabel, oLayout, oMenu,oLabel1,oLabel2
+   LOCAL oLabel, oLayout, oMenu,oLabel1,oLabel2
    LOCAL oGrid, oViewport
 
    XwtInit()

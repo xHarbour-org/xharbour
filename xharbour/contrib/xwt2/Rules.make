@@ -1,5 +1,5 @@
 ##################################
-# $Id: Rules.make,v 1.7 2003/12/18 14:34:44 jonnymind Exp $
+# $Id: Rules.make,v 1.10 2004/08/21 17:27:13 lf_sfnet Exp $
 #
 # Rules for making simwin
 #
@@ -19,23 +19,31 @@
 #Generic make options
 LINKER = ar
 CC = gcc
+CFLAGS += -Wall -fms-extensions -I.
 ifeq ($(HB_COMPILER),mingw32)
-   CFLAGS += -Wall -mno-cygwin -mms-bitfields -mwindows -I.
-else
-   CFLAGS += -Wall -I.
+   CFLAGS += -mno-cygwin -mms-bitfields -mwindows
 endif
 LIBRARIAN = ranlib
-GT_LIBS=-lslang -lncurses -lgpm -lX11 -L/usr/X11/lib
+
+ifeq ($(HB_MULTI_GT),yes)
+   ifeq ($(HB_COMPILER),mingw32)
+      GT_LIBS=-lgtnul -lgtwin
+   else
+      GT_LIBS=-lgtnul -lgtcrs  -lncurses
+   endif
+else
+   GT_LIBS += -lgtcgi
+endif
 
 #libraries for binary building
 ifeq ($(HB_MT),MT)
-LIBFILES_ = -lxharbourmt $(GT_LIBS) -lm -lpthread
+LIBFILES_ = -ldebug -lvmmt -lrtlmt $(GT_LIBS) -lrddmt -lrtlmt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdx -ldbfdbt -lcommon -lm -lpthread
 else
-LIBFILES_ = -lxharbour $(GT_LIBS) -lm
+LIBFILES_ = -ldebug -lvm -lrtl $(GT_LIBS)  -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbfdbt -lcommon -lm
 endif
 
 ifeq ($(HB_COMPILER),mingw32)
-   LIBFILES_ += -luser32 -lgdi32 -lcomdlg32 -lwinspool
+   LIBFILES_ += -luser32 -lwinspool -lole32 -loleaut32 -luuid -lgdi32 -lcomctl32 -lcomdlg32 -lodbc32
    EXETYPE=.exe
 else
    LIBFILES_ += -lgpm
@@ -75,7 +83,7 @@ all:$(TARGET) $(TARGETS)
 	$(CC) -c -o$@ $(CFLAGS) -I$(HB_INC_INSTALL) $<
 
 %.c: %.prg
-	$(HB_BIN_INSTALL)/harbour -q0 -gc0 -w2 -p -n $(PRGFLAGS) -I$(HB_INC_INSTALL)  -o$@ $<
+	$(HB_BIN_INSTALL)/harbour -q0 -gc0 -w2 -n $(PRGFLAGS) -I$(HB_INC_INSTALL)  -o$@ $<
 
 $(TARGET): $(OBJECTS)
 ifeq ( lib , $(patsubst %.a, lib, $(TARGET)))
@@ -94,4 +102,4 @@ clean:
 	rm -f $(TARGETS)
 
 install: all
-	cp -f *.a $(HB_LIB_INSTALL)
+	cp -f *.a $(XWT_INSTALL)
