@@ -1,8 +1,8 @@
  /*
- * $Id: tmysql.prg,v 1.6 2003/02/18 01:25:58 lculik Exp $
+ * $Id: tmysql.prg,v 1.7 2003/02/18 17:15:41 lculik Exp $
  */
 
-/*
+ /*
  * Harbour Project source code:
  * MySQL DBMS classes.
  * These classes try to emulate clipper dbXXXX functions on a SQL query
@@ -293,7 +293,7 @@ CLASS TMySQLQuery
    METHOD   GoTop()      INLINE iif( ::nNumRows > 0, ( ::lEof := .f. , ::lBof := .f.), ),;
                                 ::getRow( 1 )
    METHOD   GoBottom()   INLINE iif( ::nNumRows > 0, ( ::lEof := .f. , ::lBof := .f.), ),;
-                                ::getRow( ::nNumRows - 1 )
+                                ::getRow( ::nNumRows ) //-1 )
    METHOD   GoTo( nRow ) INLINE ::lEof := ( ::nCurRow + nRow > ::nNumRows ),;
                                 ::lBof := ( ::nCurRow + nRow < 1 ),;
                                 ::GetRow( nRow )
@@ -312,6 +312,8 @@ CLASS TMySQLQuery
    METHOD   FieldLen( nNum )                    // Length of field N
    METHOD   FieldDec( nNum )                    // How many decimals in field N
    METHOD   FieldType( nNum )                   // Clipper type of field N
+
+   METHOD   Locate( cFieldName, Value, bPartialKey, bSoftSeek )
 
    PROTECTED:
 
@@ -448,17 +450,13 @@ Local nOldrow := ::nCurRow
       if (::nCurRow += nRows) < 1
          ::nCurRow := 0
          ::lBof    := .t.
-//      else
-//         ::nCurRow += nRows
       endif
 
    else
       // positive movement
       if (::nCurRow += nRows) > ::nNumRows
-         ::nCurRow := ::nNumRows
+         ::nCurRow := ::nNumRows + 1
          ::lEof    := .t.
-//      else
-//         ::nCurRow += nRows
       endif
 
    endif
@@ -493,15 +491,10 @@ METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
             ::lEof    := .t.
             ::nCurRow := ::nNumRows + 1
          endif
-         if nRow > 0 .and. nRow <= ::nNumRows - 1
+         if nRow > 0 .and. nRow <= ::nNumRows //- 1
             ::lBof    := .f.
             ::lEof    := .f.
             ::nCurRow := nRow
-         endif
-         if nRow = ::nNumRows
-            ::lBof    := .f.
-            ::lEof    := .t.
-            ::nCurRow := ::nNumRows - 1
          endif
          if nRow > ::nNumRows
             ::lBof    := .f.
@@ -552,7 +545,7 @@ METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
                   elseif cDateFormat = 'mm-dd-yyyy' // USA
                      xField := ctod(substr(xField,6,2)+"-"+right(xField,2,0)+ "-" + Left(xField, 4))
 
-                  elseif  cDateFormat = 'dd/mm/yyyy' // BRITISH ou FRENCH
+                  elseif  cDateFormat = 'dd/mm/yyyy' .or. cDateFormat = 'dd/mm/yy' // BRITISH ou FRENCH
                      xField :=  ctod(right(xField,2,0)+ "/"+ substr(xField,6,2)+"/"+ Left(xField, 4))
 
                   elseif cDateFormat = 'yyyy.mm.dd' // ANSI
@@ -576,6 +569,7 @@ METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
                   exit
 
                case "C"
+                  xField := PadR( xField , ::aFieldStruct[ HB_EnumIndex() ][ MYSQL_FS_LENGTH ] )
                case "M"
                case "B"
                   // Character or Memo field
@@ -679,6 +673,35 @@ METHOD FieldType( nNum ) CLASS TMySQLQuery
 
 return cType
 
+
+METHOD Locate( cFieldName, Value, bPartialKey, bSoftSeek ) CLASS TMySQLQuery
+local nRecPrec := ::recno(), bFound := .F.
+
+   //bSoftSeek cause the record pointer to be moved to the next record 
+   
+   if bSoftSeek   == NIL ; bSoftSeek := .F. ; endif         
+   if bPartialKey == NIL ; bPartialKey := .T. ; endif
+
+   ::gotop()
+   while ! ::eof() 
+     bFound := (::FieldGet(::FieldPos(cFieldName)) == Value) .or. ((::FieldGet(::FieldPos(cFieldName)) = Value) .and. bPartialKey)
+     
+     if !bFound .and. ((::FieldGet(::FieldPos(cFieldName)) > Value) .and. bSoftSeek)
+       bFound := .T.
+     endif
+     
+     if bFound
+       exit
+     endif
+     
+     ::skip()
+   enddo
+
+   if !bFound
+     ::goto(nRecPrec)
+   endif
+
+return bFound
 
 
 

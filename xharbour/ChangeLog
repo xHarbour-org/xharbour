@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.743 2003/02/20 01:35:20 jonnymind Exp $
+ * $Id: ChangeLog,v 1.744 2003/02/20 01:48:49 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-19 23:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/checkbox.prg
+    ! Source code reformatted
+  * contrib/mysql/mysql.prg
+    ! Changes Bellow provided and fixed by Rafael Letocart
+     Tests on long AND short date format (I only do it on BRITICH format)
+     Use the function PadR() for the VarChar fields to be ended with blank
+     space.
+     Added the class function LOCATE. The bSoftSeek parameter must be used with
+     a sorted field. I haven't fully test it. This function is not built for only
+     sorted table. Perhaps an other function (like seek()) could be written for
+     this (with a dicotomic search for example)? Any example of a search in a
+     sorted table would be appreciated. Thanks
+     bof() eof() gobottom() gotop() skip() working properly now
+  
 2003-02-19 17:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c
     ! Fixed compile time optimization of Right() to only be performed on LITRAL strings.
