@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.34 2003/01/13 10:47:17 jonnymind Exp $
+* $Id: thread.c,v 1.35 2003/01/14 23:45:37 jonnymind Exp $
 */
 
 /*
@@ -120,13 +120,14 @@ HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th )
 
       while( p->next )
       {
-            p = p->next;
+         p = p->next;
       }
 
       p->next = tc;
    }
 
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+
    return tc;
 }
 
@@ -148,21 +149,20 @@ void hb_threadDestroyContext( HB_THREAD_T th_id )
 
    while ( p && p->th_id != th_id )
    {
-         prev = p;
-         p = p->next;
+      prev = p;
+      p = p->next;
    }
 
    if( p )
    {
-
       /*unlink the stack*/
       if ( prev )
       {
-            prev->next = p->next;
+         prev->next = p->next;
       }
       else
       {
-            hb_ht_context = p->next;
+         hb_ht_context = p->next;
       }
 
       // Only for secondary Stacks.
@@ -171,12 +171,12 @@ void hb_threadDestroyContext( HB_THREAD_T th_id )
       /* Free each element of the stack */
       for( i = 0; i < p->stack->wItems; ++i )
       {
-            if( HB_IS_COMPLEX( p->stack->pItems[ i ] ) )
-            {
-               hb_itemClear( p->stack->pItems[ i ] );
-            }
+         if( HB_IS_COMPLEX( p->stack->pItems[ i ] ) )
+         {
+            hb_itemClear( p->stack->pItems[ i ] );
+         }
 
-            free( p->stack->pItems[ i ] );
+         free( p->stack->pItems[ i ] );
       }
 
       /* Free the stack */
@@ -214,6 +214,7 @@ HB_THREAD_CONTEXT *hb_threadGetContext( HB_THREAD_T id )
    HB_CRITICAL_LOCK( hb_threadContextMutex );
 
    p = hb_ht_context;
+
    while( p && p->th_id != id )
    {
       p = p->next;
@@ -226,19 +227,20 @@ HB_THREAD_CONTEXT *hb_threadGetContext( HB_THREAD_T id )
 
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
-   if ( !p )
-   {
-      char errdat[64];
-      sprintf( errdat, "Context not found for Thread %ld",  (long) id );
-      hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadGetCurrentContext", 0 );
-      return NULL;
-   }
-   else
+   if ( p )
    {
       //printf( "Found context %p;%ld\r\n", p, p->th_id);
       return p;
    }
+   else
+   {
+      char errdat[64];
 
+      sprintf( errdat, "Context not found for Thread %ld",  (long) id );
+      hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadGetCurrentContext", 0 );
+
+      return NULL;
+   }
 }
 
 void hb_threadInit( void )
@@ -253,6 +255,7 @@ void hb_threadExit( void )
 {
 
    HB_CRITICAL_LOCK( hb_threadContextMutex );
+
    while( hb_ht_context )
    {
       #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
@@ -265,8 +268,8 @@ void hb_threadExit( void )
       #endif
       hb_threadDestroyContext( hb_ht_context->th_id );
    }
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
    HB_CRITICAL_DESTROY( hb_threadContextMutex );
 }
 
@@ -302,6 +305,7 @@ hb_create_a_thread(
    if( HB_IS_SYMBOL( pPointer ) )
    {
       hb_vmPushSymbol( pPointer->item.asSymbol.value );
+
       if( pt->bIsMethod )
       {
          hb_vmPush( hb_arrayGetItemPtr( pt->pArgs, 2 ) );
@@ -461,9 +465,12 @@ HB_FUNC( STARTTHREAD )
          hb_itemRelease( pArgs );
          return;
       }
+
       bIsMethod = TRUE;
+
       /* Now we must move the object in the second place */
       hb_itemSwap( pPointer, hb_arrayGetItemPtr( pArgs, 2 ) );
+
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
    }
@@ -479,6 +486,7 @@ HB_FUNC( STARTTHREAD )
          hb_itemRelease( pArgs );
          return;
       }
+
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
    }
@@ -534,6 +542,7 @@ HB_FUNC( STOPTHREAD )
    if( ! ISNUM( 1 ) )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STOPTHREAD", 1, pArgs );
       hb_itemRelease( pArgs );
 
@@ -546,6 +555,7 @@ HB_FUNC( STOPTHREAD )
       if( pMutex != NULL )
       {
          Mutex = (HB_MUTEX_STRUCT *)  pMutex->item.asString.value;
+
          while( Mutex->waiting  > 0)
          {
                HB_COND_SIGNAL( Mutex->cond );
@@ -559,10 +569,12 @@ HB_FUNC( STOPTHREAD )
       /* TODO: error checking here */
 
       TerminateThread( context->th_h, 0);
+
       /* Notify mutex before to join */
       if( pMutex != NULL )
       {
          Mutex = (HB_MUTEX_STRUCT *)  pMutex->item.asString.value;
+
          while( Mutex->waiting  > 0)
          {
                HB_COND_SIGNAL( Mutex->cond );
@@ -586,8 +598,10 @@ HB_FUNC( KILLTHREAD )
    if( ! ISNUM( 1 ) )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "KILLTHREAD", 1, pArgs );
       hb_itemRelease( pArgs );
+
       return;
    }
 
@@ -607,8 +621,10 @@ HB_FUNC( CLEARTHREAD )
    if( ! ISNUM( 1 ) )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "CLEARTHREAD", 1, pArgs );
       hb_itemRelease( pArgs );
+
       return;
    }
 
@@ -627,8 +643,10 @@ HB_FUNC( JOINTHREAD )
    if( ! ISNUM( 1 ) )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "KILLTHREAD", 1, pArgs );
       hb_itemRelease( pArgs );
+
       return;
    }
 
@@ -664,8 +682,10 @@ HB_FUNC( DESTROYMUTEX )
    if( pMutex == NULL )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "DESTROYMUTEX", 1, pArgs );
       hb_itemRelease( pArgs );
+
       return;
    }
 
@@ -689,8 +709,10 @@ HB_FUNC( MUTEXLOCK )
    if( pMutex == NULL )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXLOCK", 1, pArgs );
       hb_itemRelease( pArgs );
+
       return;
    }
 
@@ -717,8 +739,10 @@ HB_FUNC( MUTEXUNLOCK )
    if( pMutex == NULL )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXUNLOCK", 1, pArgs );
       hb_itemRelease( pArgs );
+
       return;
    }
 
@@ -730,8 +754,8 @@ HB_FUNC( MUTEXUNLOCK )
 
       if( Mutex->lock_count == 0 )
       {
-            Mutex->locker = 0;
-            HB_MUTEX_UNLOCK( Mutex->mutex );
+         Mutex->locker = 0;
+         HB_MUTEX_UNLOCK( Mutex->mutex );
       }
    }
 }
@@ -748,8 +772,10 @@ HB_FUNC( SUBSCRIBE )
    if( pMutex == NULL || ( hb_pcount() == 2 && ! ISNUM(2)) )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SUBSCRIBE", 1, pArgs );
       hb_itemRelease( pArgs );
+
       return;
    }
 
@@ -768,7 +794,7 @@ HB_FUNC( SUBSCRIBE )
    Mutex->locker = 0;
    lc = Mutex->lock_count;
    Mutex->lock_count = 0;
-   
+
    /* destroy an old signaled objec, but not incoming objects */
    if ( Mutex->waiting >= 0 )
    {
@@ -781,18 +807,18 @@ HB_FUNC( SUBSCRIBE )
    {
       if ( hb_pcount() == 1 )
       {
-            HB_COND_WAIT( Mutex->cond, Mutex->mutex );
+         HB_COND_WAIT( Mutex->cond, Mutex->mutex );
       }
       else
       {
-            int wt = Mutex->waiting;
+         int wt = Mutex->waiting;
 
-            HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, hb_parnl( 2 ) );
+         HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, hb_parnl( 2 ) );
 
-            if ( wt == Mutex->waiting )
-            {
-               Mutex->waiting --;
-            }
+         if ( wt == Mutex->waiting )
+         {
+            Mutex->waiting --;
+         }
       }
    }
 
@@ -874,7 +900,7 @@ HB_FUNC( SUBSCRIBENOW )
 
       if( wt == Mutex->waiting )
       {
-            Mutex->waiting --;
+         Mutex->waiting --;
       }
    }
 
@@ -972,8 +998,10 @@ HB_FUNC( THREADSLEEP )
    if( ! ISNUM( 1 ) )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "THREADSLEEP", 1, pArgs );
       hb_itemRelease( pArgs );
+
       return;
    }
 
@@ -981,10 +1009,10 @@ HB_FUNC( THREADSLEEP )
       usleep( 1 );
    #elif defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
       {
-      struct timespec ts;
-      ts.tv_sec = hb_parni( 1 ) / 1000;
-      ts.tv_nsec = (hb_parni( 1 ) % 1000) * 1000000;
-      nanosleep( &ts, 0 );
+         struct timespec ts;
+         ts.tv_sec = hb_parni( 1 ) / 1000;
+         ts.tv_nsec = (hb_parni( 1 ) % 1000) * 1000000;
+         nanosleep( &ts, 0 );
       }
    #else
       Sleep( hb_parni( 1 ) );
