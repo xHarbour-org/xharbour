@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.45 2004/01/14 23:02:05 jonnymind Exp $
+ * $Id: gtwvt.c,v 1.46 2004/01/15 00:01:32 peterrees Exp $
  */
 
 /*
@@ -3635,6 +3635,10 @@ HB_FUNC( WVT_DRAWIMAGE )
 }
 
 //-------------------------------------------------------------------//
+/*
+  WVT_DRAWLABEL( nRow, nCol, cLabel, nAlign, nEscapement, nColor, nBkColor, cFontFace,
+                 nHeight, nWidth, nWeight, nQuality, nCharSet, lItalic, lUnderline, lStrikeOut )
+*/
 
 HB_FUNC( WVT_DRAWLABEL )
 {
@@ -3966,6 +3970,30 @@ HB_FUNC( WVT_DRAWGRIDVERT )
    }
 
    hb_retl( TRUE );
+}
+
+//-------------------------------------------------------------------//
+
+//-------------------------------------------------------------------//
+//   Author.....: Francesco Saverio Giudice <info@fsgiudice.com>
+//   Syntax.....: Wvt_GetRGBColor( nColor ) --> nRGBColor
+//   Description: Return the RGB values passing the color positional value
+//                0=Black, 1=Blue, etc
+//                as returned from hb_ColorToN()
+//   Creat. Date: 2004/01/15
+//   Last Modif.: 2004/01/15
+//
+HB_FUNC( WVT_GETRGBCOLOR )
+{
+   int iColor;
+   if ( !ISNIL( 1 ) )
+   {
+      iColor = hb_parni( 1 );
+      if ( iColor >= 0 && iColor <= 16 )  /* Test bound error */
+      {
+         hb_retnl( _COLORS[ iColor ] );
+      }
+   }
 }
 
 //-------------------------------------------------------------------//

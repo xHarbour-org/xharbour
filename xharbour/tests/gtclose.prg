@@ -1,6 +1,6 @@
 ***********************************************************
 * gtclose.prg
-* $Id: regextest.prg,v 1.3 2003/08/23 10:48:21 jonnymind Exp $
+* $Id: gtclose.prg,v 1.1 2004/01/14 23:06:08 jonnymind Exp $
 * Test for gt close callback and handler.
 *
 * Giancarlo Niccolai
@@ -81,7 +81,7 @@ PROCEDURE ReallyQuit()
 RETURN
 
 PROCEDURE Test1Complete()
-   @11,0 SAY Padc( "TEST2 ( intercepting using SetKey ) COMPLTETE.", Maxcol() )
+   @11,0 SAY Padc( "TEST2 ( intercepting using SetKey ) COMPLETE.", Maxcol() )
    @12,0 SAY Padc( "Press a key to proceed to next test.", Maxcol() )
    Inkey(0)
 RETURN
