@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.115 2002/10/10 16:44:59 ronpinkas Exp $
+ * $Id: hvm.c,v 1.116 2002/10/13 18:06:30 ronpinkas Exp $
  */
 
 /*
@@ -530,10 +530,10 @@ void HB_EXPORT hb_vmQuit( void )
    //printf( "After Return\n" );
 
    hb_arrayRelease( &s_aStatics );
-   //printf( "After Statics\n" );
+   //printf( "\nAfter Statics\n" );
 
    hb_arrayRelease( &s_aGlobals );
-   //printf( "After Globals\n" );
+   //printf( "\nAfter Globals\n" );
 
    hb_memvarsRelease();    /* clear all PUBLIC variables */
    //printf( "After Memvar\n" );
@@ -1487,19 +1487,22 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
                 pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
 
-              #if IS_THIS_NEEDED
-                if( (*pGlobals)[ iGlobal ]->type == HB_IT_STRING && (*pGlobals)[ iGlobal ]->item.asString.bStatic )
+                if( (*pGlobals)[ iGlobal ]->type == HB_IT_STRING && ( (*pGlobals)[ iGlobal ]->item.asString.bStatic || *( (*pGlobals)[ iGlobal ]->item.asString.puiHolders ) > 1 ) )
                 {
                    char *sString = (char*) hb_xgrab( (*pGlobals)[ iGlobal ]->item.asString.length + 1 );
 
                    memcpy( sString, (*pGlobals)[ iGlobal ]->item.asString.value, (*pGlobals)[ iGlobal ]->item.asString.length + 1 );
+
+                   if( (*pGlobals)[ iGlobal ]->item.asString.bStatic == FALSE )
+                   {
+                      hb_itemReleaseString( (*pGlobals)[ iGlobal ] );
+                   }
 
                    (*pGlobals)[ iGlobal ]->item.asString.value = sString;
                    (*pGlobals)[ iGlobal ]->item.asString.bStatic = FALSE;
                    (*pGlobals)[ iGlobal ]->item.asString.puiHolders = (USHORT *) hb_xgrab( sizeof( USHORT ) );
                    *( (*pGlobals)[ iGlobal ]->item.asString.puiHolders ) = 1;
                 }
-              #endif
 
                 hb_stackPush();
              }
@@ -4635,10 +4638,6 @@ static void hb_vmEndBlock( void )
 
 static void hb_vmRetValue( void )
 {
-   #if 0
-   PHB_ITEM pVal;
-   #endif
-
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRetValue()"));
 
    hb_stackDec();                               /* make the last item visible */
@@ -5111,7 +5110,8 @@ static void hb_vmPushLocal( SHORT iLocal )
 
 static void hb_vmPushLocalByRef( SHORT iLocal )
 {
-   HB_ITEM_PTR pTop = ( * hb_stack.pPos );
+   PHB_ITEM pTop = ( * hb_stack.pPos );
+   PHB_ITEM pLocal
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLocalByRef(%hd)", iLocal));
 
@@ -5127,16 +5127,23 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
          iLocal += ( *hb_stack.pBase )->item.asSymbol.paramcnt - 256;
       }
 
-      if( ( * ( hb_stack.pBase + iLocal + 1 ) )->type == HB_IT_STRING && ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.bStatic )
+      pLocal = *( hb_stack.pBase + iLocal + 1 );
+
+      if( pLocal->type == HB_IT_STRING && ( pLocal->item.asString.bStatic || *( pLocal->item.asString.puiHolders ) > 1 ) )
       {
-         char *sString = (char*) hb_xgrab( ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.length + 1 );
+         char *sString = (char*) hb_xgrab( pLocal->item.asString.length + 1 );
 
-         memcpy( sString, ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.value, ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.length + 1 );
+         memcpy( sString, pLocal->item.asString.value, pLocal->item.asString.length + 1 );
 
-         ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.value = sString;
-         ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.bStatic = FALSE;
-         ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
-         *( ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.puiHolders ) = 1;
+         if( pLocal->item.asString.bStatic == FALSE )
+         {
+            hb_itemReleaseString( pLocal );
+         }
+
+         pLocal->item.asString.value = sString;
+         pLocal->item.asString.bStatic = FALSE;
+         pLocal->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+         *( pLocal->item.asString.puiHolders ) = 1;
       }
 
       pTop->item.asRefer.BasePtr.itemsbasePtr = &hb_stack.pItems;
@@ -5182,11 +5189,16 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushStaticByRef(%hu)", uiStatic));
 
-   if( pReference->type == HB_IT_STRING && pReference->item.asString.bStatic )
+   if( pReference->type == HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.puiHolders ) > 1 ) )
    {
       char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
 
       memcpy( sString, pReference->item.asString.value, pReference->item.asString.length + 1 );
+
+      if( pReference->item.asString.bStatic == FALSE )
+      {
+         hb_itemReleaseString( pReference );
+      }
 
       pReference->item.asString.value = sString;
       pReference->item.asString.bStatic = FALSE;
@@ -5546,26 +5558,45 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
             {
                if( pModuleSymbols[ui].pFunPtr )
                {
-                  sprintf( sModule, "Owner of 1st fun: %s", pModuleSymbols[ui].szName );
+                  sprintf( sModule, "Program with 1st fun: %s", pModuleSymbols[ui].szName );
                   break;
                }
             }
 
             if( ui == uiModuleSymbols )
             {
-               sprintf( sModule, "Owner of 1st sym: %s", pModuleSymbols[0].szName );
+               sprintf( sModule, "Program with 1st sym: %s", pModuleSymbols[0].szName );
             }
 
             iPCodeVer = 0;
+         }
+      }
+      else
+      {
+         sModule = (char *) hb_xgrab( 128 );
+         bFree = TRUE;
+
+         for( ui = 0; ui < uiModuleSymbols; ui++ )
+         {
+            if( pModuleSymbols[ui].pFunPtr )
+            {
+               sprintf( sModule, "Program with 1st fun: %s", pModuleSymbols[ui].szName );
+               break;
+            }
+         }
+
+         if( ui == uiModuleSymbols )
+         {
+            sprintf( sModule, "Program with 1st sym: %s", pModuleSymbols[0].szName );
          }
       }
    va_end( ap );
 
    if( iPCodeVer != HB_PCODE_VER )
    {
-      char sTemp[256];
+      char sTemp[512];
 
-      sprintf( (char *) sTemp, "HVM version %i is incompatible with '%s' PCODE version %i\n", HB_PCODE_VER, sModule, iPCodeVer );
+      sprintf( (char *) sTemp, "'%s' was compiled by older version, PCODE version %i is no longer supported - Please recompile.\n", sModule, iPCodeVer );
 
       hb_errInternal( HB_EI_ERRUNRECOV, sTemp, NULL, NULL );
    }
@@ -5790,6 +5821,8 @@ void hb_vmRequestBreak( PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestBreak(%p)", pItem));
 
+   //printf( "Recover %i\n", s_lRecoverBase );
+
    if( s_lRecoverBase )
    {
       if( pItem )
@@ -5931,6 +5964,7 @@ void hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals )
       pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
 
       hb_arrayAdd( &s_aGlobals, pTop );
+      //printf( "*** Added %i ***\n", iGlobal );
    }
 
    pTop->type = HB_IT_NIL;

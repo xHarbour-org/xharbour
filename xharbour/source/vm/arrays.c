@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.25 2002/10/09 20:42:59 ronpinkas Exp $
+ * $Id: arrays.c,v 1.26 2002/10/10 16:44:59 ronpinkas Exp $
  */
 
 /*
@@ -385,11 +385,16 @@ BOOL hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
       pItem->item.asRefer.offset = 0; // Because 0 will be translated as a STATIC in hb_itemUnref();
       pItem->item.asRefer.BasePtr.itemsbase = &( pArray->item.asArray.value->pItems );
 
-      if( pElement->type == HB_IT_STRING && pElement->item.asString.bStatic )
+      if( pElement->type == HB_IT_STRING && ( pElement->item.asString.bStatic || *( pElement->item.asString.puiHolders ) > 1 ) )
       {
          char *sString = (char*) hb_xgrab( pElement->item.asString.length + 1 );
 
          memcpy( sString, pElement->item.asString.value, pElement->item.asString.length + 1 );
+
+         if( pElement->item.asString.bStatic == FALSE )
+         {
+            hb_itemReleaseString( pElement );
+         }
 
          pElement->item.asString.value = sString;
          pElement->item.asString.bStatic = FALSE;
@@ -759,7 +764,7 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
 {
    HB_TRACE( HB_TR_DEBUG, ("hb_arrayRelease(%p) %p", pArray, pArray->item.asArray.value ) );
 
-   //printf( "hb_arrayRelease(%p) %p\n", pArray, pArray->item.asArray.value );
+   //printf( "hb_arrayRelease(%p) type: %i %p\n", pArray, pArray->type, pArray->item.asArray.value );
 
    if( HB_IS_ARRAY( pArray ) )
    {
@@ -777,29 +782,34 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
 
       if( pBaseArray->pItems )
       {
-         HB_ITEM_PTR pItem = pBaseArray->pItems;
+         HB_ITEM_PTR pItem = pBaseArray->pItems, pValue;
          ULONG ulLen = pBaseArray->ulLen;
 
          while( ulLen-- )
          {
             HB_TRACE( HB_TR_INFO, ( "Array Item %p type:%i", pItem, pItem->type ) );
 
+            //printf( "Array Item %i %p type:%i\n", ulLen, pItem, pItem->type );
+
+            pValue = pItem;
+
+            if( HB_IS_BYREF( pValue ) )
+            {
+               pValue = hb_itemUnRef( pValue );
+            }
+
             /*-----------------12/21/2001 8:01PM----------------
              * The item is not released because it was not
              * allocated by the GC, its just a portion of the
              * pItems chunk, which will be released as one piece.
              * --------------------------------------------------*/
-            if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value == pBaseArray )
+            if( HB_IS_ARRAY( pValue ) && pValue->item.asArray.value == pBaseArray )
             {
                HB_TRACE( HB_TR_DEBUG, ("Warning! Nested Release (Cyclic)", pArray, pArray->item.asArray.value ) );
-               ++pItem;
-               continue;
             }
-            else if( HB_IS_COMPLEX( pItem ) )
+            else if( HB_IS_COMPLEX( pValue ) )
             {
-               //printf( "Before %p type: %i\n", pItem, pItem->type );
-               hb_itemClear( pItem );
-               //printf( "After %p\n", pItem );
+               hb_itemClear( pValue );
             }
 
             ++pItem;

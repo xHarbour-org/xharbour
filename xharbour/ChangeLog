@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.436 2002/10/13 18:06:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.437 2002/10/13 18:42:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-14 11:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrays.c
+  * source/vm/hvm.c
+    ! Fixed support for pushing [non static] string variable by reference.
+
+  * include/hbsetup.h
+    * Increased HB_PCODE_VER to 3 because recent change to HB_FS_PUBLIC requires all prg to be recompiled.
+  * source/vm/hvm.c
+    * Made PCODE version Error Message more user friendly.
 
 2002-10-13 11:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/win32ole.prg
