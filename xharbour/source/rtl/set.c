@@ -1056,7 +1056,22 @@ HB_FUNC( SET )
          hb_retc( hb_dirsep_string );
 	 if( args > 1 ) hb_set.HB_SET_DIRSEPARATOR = set_char( pArg2, hb_set.HB_SET_DIRSEPARATOR );
          break;
-
+      case HB_SET_ERRORLOOP :
+         hb_retni( hb_set.HB_SET_ERRORLOOP );
+         if( args > 1 )
+         {
+            if( HB_IS_NUMERIC( pArg2 ) )
+            {
+               hb_set.HB_SET_ERRORLOOP = hb_itemGetNI( pArg2 );
+               if( hb_set.HB_SET_ERRORLOOP < 0 )
+                  hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+               else if( hb_set.HB_SET_ERRORLOOP == 0 )
+                  hb_set.HB_SET_ERRORLOOP = 8;
+            }
+            else
+               hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+         }
+         break;
       default                :
          /* Return NIL if called with invalid SET specifier */
          break;
@@ -1152,6 +1167,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_DIRCASE = HB_SET_CASE_LOWER;
    hb_set.HB_SET_DIRSEPARATOR = '\\';
 #endif
+   hb_set.HB_SET_ERRORLOOP = 8;
 
    hb_set.HB_SET_WRAP = FALSE;
    hb_set.hb_set_winprinter=FALSE;

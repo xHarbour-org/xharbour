@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1308 2003/07/30 09:44:18 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.1309 2003/07/30 14:07:39 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-07-31 03:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+   * include/set.ch
+   * include/hbset.h
+   * source/pp/pptable.c
+   * source/rtl/set.c
+   * source/vm/errorapi.c
+     + Add routines to control the number of recursive loops of error handler
+       launching during runtime error. The loop is now configurable at prg
+       level during program design. Previously, it was fixed at 8 loops.
+
+     /*
+     I found that the default recursive error detection loop of 8 in certain
+     circumstances may be frustrating, particularly when our custom error
+     handler has to write quite a lot of data in error.log. And in most
+     cases the error.log contains redundant error logs when the detector
+     has to pass the default 8 loops. I frequently experience that the
+     error.log file sizes to until 4 MB (of redundant log), no joke!
+
+     The above modification allows user to control the loop on runtime ie.:
+
+     SET ERRORLOOP TO  1  // Only 1 (One) loop has to be passed before quiting.
+     SET ERRORLOOP TO  2  // 2 (Two) loops has to be passed before quiting.
+     etc...
+     SET ERRORLOOP TO     // The default 8 loops. It is retained as default.
+                          // Cannot ZERO, otherwise application quits silently
+                          // upon run time errors.
+
+     If we do not set the ERRORLOOP, the recursive loop will be 8.
+     */
 
 2003-07-30 15:50 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/hbsetup.h

@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.15 2003/07/14 19:58:12 jonnymind Exp $
+ * $Id: errorapi.c,v 1.16 2003/07/23 22:09:30 druzus Exp $
  */
 
 /*
@@ -83,6 +83,7 @@
 #include "hbapilng.h"
 #include "hbvm.h"
 #include "hbstack.h"
+#include "hbset.h"
 
 #ifdef HB_OS_WIN_32
    #define HB_OS_WIN_32_USED
@@ -93,7 +94,7 @@
    go into an infinite loop, this is an emulated version of the Clipper
    "Unrecoverable error 650: Processor stack fault" internal error, but
    better shows what is really the problem. [vszakats] */
-#define HB_ERROR_LAUNCH_MAX 8
+#define HB_ERROR_LAUNCH_MAX hb_set.HB_SET_ERRORLOOP
 
 /* In MT, this data is held in the stack */
 #ifndef HB_THREAD_SUPPORT
@@ -107,6 +108,8 @@
    #define s_iLaunchCount      (HB_VM_STACK.iLaunchCount)
    #define s_uiErrorDOS        (HB_VM_STACK.uiErrorDOS)
 #endif
+
+extern HB_SET_STRUCT hb_set;
 
 extern HB_FUNC( ERRORNEW );
 
