@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.25 2004/06/12 18:55:08 bdj Exp $
+ * $Id: hbgtwvt.h,v 1.26 2004/07/22 15:36:43 vouchcac Exp $
  */
 
 /*
@@ -263,7 +263,7 @@ BOOL   HB_EXPORT hb_wvt_gtDestroyPicture( IPicture * iPicture );
 COLORREF HB_EXPORT hb_wvt_gtGetColorData( int iIndex );
 BOOL   HB_EXPORT hb_wvt_gtSetColorData( int iIndex, COLORREF ulCr );
 
-HWND   HB_EXPORT hb_wvt_gtCreateDialogModeless( char * pszDlgResource, BOOL bOnTop );
+HWND   HB_EXPORT hb_wvt_gtCreateDialog( char * pszDlgResource, BOOL bOnTop );
 
 HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void );
 
