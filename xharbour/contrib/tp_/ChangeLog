@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.9 2004/08/26 16:18:35 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.10 2004/08/31 14:46:59 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,14 +9,20 @@
 */
 
 
+2004-08-31 16:50 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * tp_/os2.c
+   * tp_/telepath.prg
+     ! corrected an error on tp_crc16()
+     + added a bunch of functions, right now only to OS/2 build
+
 2004-08-31 16:45 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * tp_/TELEPATH.CH
      - removed UPPERCASE file
      + added telepath.ch
 
 2004-08-26 09:30 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
-	* tp_/os2.c
-	  + added OS/2 low level C code
+   * tp_/os2.c
+     + added OS/2 low level C code
 
 2004-08-25 23:50 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * tp_/telepath.prg

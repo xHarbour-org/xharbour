@@ -1,5 +1,5 @@
 /*
- * $Id: telepath.prg,v 1.7 2004/08/25 21:54:22 mauriliolongo Exp $
+ * $Id: telepath.prg,v 1.8 2004/08/26 16:18:35 mauriliolongo Exp $
  */
 
 /*
@@ -181,123 +181,6 @@ return tp_open( nPort, nInSize, nOutSize, nBaud, nData, cParity, nStop, cPortNam
 
 
 
-/*  linux
-function tp_open( cPortname, nPort, nBaud, nData, cParity, nStop )
-    LOCAL cnhandle
-   local cCommand
-   local lOldFile, lOldPath, lOldLower
-
-   if empty( cPortname )
-      tp_debug( 2, "You suck trying to open port num " + alltrim( str( nPort )) )
-      return 1
-   endif
-
-   if valtype( cPortname ) != "C"
-      tp_debug( 2, "You suck trying to open port name which isn't a type C" )
-      return 1
-   endif
-
-   cPortname := alltrim( cPortname )
-
-   if ! file( cPortname )
-      tp_debug( 2, "You suck trying to open port name " + alltrim( cPortname ))
-      return 1
-   endif
-
-   if ! isport( nPort )
-      tp_debug( 2, "Hmmm... Port num " + alltrim( str( nPort )) + " ain't a port" )
-      return 1
-   endif
-
-   if isopenport( nPort )
-      tp_debug( 2, "You sucks... port num " + alltrim( str( nPort )) + " was already open" )
-      tp_close( nPort )
-   endif
-
-   default nBaud to 9600
-   default nData to 8
-   default cParity to "N"
-   default nStop to 1
-
-   aPorts[ nPort, TPFP_NAME   ] := cPortname
-   aPorts[ nPort, TPFP_BAUD   ] := nBaud
-   aPorts[ nPort, TPFP_DBITS  ] := nData
-   aPorts[ nPort, TPFP_PARITY ] := cParity
-   aPorts[ nPort, TPFP_SBITS  ] := nStop
-   aPorts[ nPort, TPFP_OC     ] := "O"
-   aPorts[ nPort, TPFP_INBUF  ] := ""
-
-   cCommand := "stty -echo raw " + alltrim( str( nBaud )) + " "
-
-   /// 7/19/01 20:02:46 DDGL If the com port had previously been used with 7 bit data and is
-   /// now used with 8 bits, it would not set it to 8.  it previously assumed that it
-   /// was already 8.  d'oh.
-   if nData == 7
-      cCommand += "cs7 "
-   else
-      cCommand += "cs8 "
-   endif
-
-   /// 7/19/01 20:02:46 DDGL If the com port had previously been used with parity and then
-   /// later used with no parity, it would not set it to none.  it previously assumed that it
-   /// was already none.  d'oh.
-   if cParity == "E"
-      cCommand += "-parodd parenb "
-   elseif cParity == "O"
-      cCommand += "parodd parenb "
-   else
-      cCommand += "-parodd -parenb "
-   endif
-
-   /// 7/20/01 10:13:24 DDGL I suppose this was ok before.  But now if they pass something
-   /// unexpected as nStop, they will get 1 which is probably what they want.
-   if nStop == 2
-      cCommand += "cstopb "
-   else
-      cCommand += "-cstopb "
-   endif
-
-   cCommand += " < " + cPortname
-
-   lOldfile := FS_SET( "lowerfile", .f. )
-   lOldpath := FS_SET( "lowerpath", .f. )
-   lOldlower:= FS_SET( "lower",     .f. )
-
-   cnHandle := fopen( cPortname, 2 )
-
-   FS_SET( "lowerfile", lOldfile  )
-   FS_SET( "lowerpath", lOldpath  )
-   FS_SET( "lower",     lOldlower )
-
-   if cnHandle > 0
-      // success!
-      tp_debug( 2, "I got port " + alltrim( str( nPort )) + " open as handle " + alltrim( str( cnHandle )) )
-      aPorts[ nPort, TPFP_HANDLE ] := cnhandle
-
-      tp_debug( 2, "Going to run: " + cCommand )
-      run( cCommand )
-
-      tp_recv( nPort )
-      return 0
-   endif
-
-   if ! "/dev/ttyS" $ cPortname
-      cnHandle := ferror()
-   endif
-
-   tp_debug( 2, "FAILed to open " + cPortname + " as port " + alltrim( str( nPort )) + ".  Error " + alltrim( str( ferror() )) )
-   aPorts[ nPort, TPFP_NAME   ] := ""
-   aPorts[ nPort, TPFP_HANDLE ] := -1
-   aPorts[ nPort, TPFP_BAUD   ] := 9600
-   aPorts[ nPort, TPFP_DBITS  ] := 8
-   aPorts[ nPort, TPFP_PARITY ] := "N"
-   aPorts[ nPort, TPFP_SBITS  ] := 1
-   aPorts[ nPort, TPFP_OC     ] := "C"
-   aPorts[ nPort, TPFP_INBUF  ] := ""
-return 1*/
-
-
-
 function tp_open( nPort, nInSize, nOutSize, nBaud, nData, cParity, nStop, cPortname )
 
    local nRes
@@ -396,7 +279,7 @@ function tp_recv( nPort, nLength, nTimeout )
 
       if FetchChars( nPort ) == 0
          if ! tp_idle()
-            HB_IDLESTATE()
+            hb_IdleState()
          else
             exit
          endif
@@ -448,7 +331,7 @@ function tp_send( nPort, cString, nTimeout )
          nTotWritten += nWritten
 
          if ! tp_idle()
-            HB_IDLESTATE()
+            hb_IdleState()
          else
             exit
          endif
@@ -529,7 +412,7 @@ function tp_recvto( nPort, cDelim, nMaxlen, nTimeout )
 
          if ! tp_idle()
             if FetchChars( nPort ) == 0
-               HB_IDLESTATE()
+               hb_IdleState()
             endif
          else
             exit
@@ -577,6 +460,16 @@ return Len( aPorts[ nPort, TPFP_INBUF ] )
 
 
 
+function tp_outfree( nPort )
+
+   if ! isopenport( nPort )
+      return 0
+   endif
+
+return p_OutFree( aPorts[ nPort, TPFP_HANDLE ] )
+
+
+
 function tp_clearin( nPort )
 
    if isopenport( nPort )
@@ -606,26 +499,25 @@ function tp_crc32( cString )
 return p_CRC32( cString )
 
 
+/*                   nPort, nTimeout, acList|cString..., lIgnorecase */
+function tp_waitfor( ... )
 
-/*
-/// sorry, no waitproc at this time.
-function tp_waitfor( nPort, nTimeout, acList, lIgnorecase )
-   local x
-   local nAt
-   local nFirst := 100000
+   local aParam := hb_AParams()
    local nDone
-   local nRet := 0
+   local nPort, nTimeout, lIgnorecase
+
+   nPort := aParam[ 1 ]
+   nTimeout := aParam[ 2 ]
+   lIgnorecase := aParam[ Len( aParam ) ]
 
    if ! isopenport( nPort )
       return 0
    endif
 
-   if valtype( acList ) != "A"
-      return 0
-   endif
-
    default nTimeout to -1
    default lIgnorecase to .f.
+
+   /*
 
    if ntimeout < 0
       nDone := _clock() + 999999
@@ -667,8 +559,9 @@ function tp_waitfor( nPort, nTimeout, acList, lIgnorecase )
       tp_recv( nPort, nAt + len( acList[ nRet ] ))
       return nRet
    endif
+   */
+
 return 0
-*/
 
 
 
@@ -689,32 +582,6 @@ return nCurrentValue
 
 
 /*
-function tp_isri( nPort )
-    LOCAL rinph, riretval
-
-   if ! isopenport( nPort )
-      return .f.
-   endif
-   rinph := aPorts[ nPort, TPFP_HANDLE ]
-
-    HB_INLINE(rinph,@riretval)
-   {
-        double rinph= hb_parnd( 1 ) ;
-        double nnewval, noldval;
-      unsigned int riresult = 0;
-      ioctl( rinph, TIOCMGET, &riresult );
-        if ( riresult & TIOCM_RI )
-        {
-         riretval = 1;
-        }
-      else
-        {
-         riretval = 0;
-        }
-    hb_stornd(riretval,2);
-   }
-
-return ( riretval == 1 )
 
 // telepathy says...
 // returns old dtr value 0,1,2
@@ -752,71 +619,77 @@ function tp_ctrldtr( nPort, nParamNewval )
    }
 
 return noldval
+*/
+
+
 
 function tp_isdcd( nPort )
-    LOCAL nph, nretval
 
    if ! isopenport( nPort )
       return .f.
    endif
-   nph := aPorts[ nPort, TPFP_HANDLE ]
-    hB_inline(nph,@nretval)
-   {
-        double nph = hb_parnd( 1 ) ;
-        double nretval;
-      unsigned int result = 0;
-      ioctl( nph, TIOCMGET, &result );
-      if ( result & TIOCM_CD )
-         nretval = 1;
-      else
-         nretval = 0;
-    hb_stond(nretval,2);
-   }
 
-return ( nretval == 1 )
+return p_isdcd( aPorts[ nPort, TPFP_HANDLE ] )
+
+
+
+function tp_isri( nPort )
+
+   if ! isopenport( nPort )
+      return .f.
+   endif
+
+return p_isri( aPorts[ nPort, TPFP_HANDLE ] )
+
+
 
 function tp_isdsr( nPort )
-    LOCAL nph, nretval
 
    if ! isopenport( nPort )
       return .f.
    endif
-   nph := aPorts[ nPort, TPFP_HANDLE ]
-    hB_inline(nph,@nretval)
-   {
-        double nph = hb_parnd( 1 ) ;
-        double nretval;
-      unsigned int result = 0;
-      ioctl( nph, TIOCMGET, &result );
-      if ( result & TIOCM_DSR )
-         nretval = 1;
-      else
-         nretval = 0;
-    hb_stond(nretval,2);
-   }
-return ( nretval == 1 )
+
+return p_isdsr( aPorts[ nPort, TPFP_HANDLE ] )
+
 
 
 function tp_iscts( nPort )
-    LOCAL nph, nretval
 
    if ! isopenport( nPort )
       return .f.
    endif
-   nph := aPorts[ nPort, TPFP_HANDLE ]
-    hB_inline(nph,@nretval)
-   {
-        double nph = hb_parnd( 1 ) ;
-        double nretval;
-      unsigned int result = 0;
-      ioctl( nph, TIOCMGET, &result );
-      if ( result & TIOCM_CTS )
-         nretval = 1;
-      else
-         nretval = 0;
-    hb_stond(nretval,2);
-   }
-return ( nretval == 1 )
+
+return p_iscts( aPorts[ nPort, TPFP_HANDLE ] )
+
+
+
+function tp_flush( nPort, nTimeout )
+
+   local nDone
+
+   default nTimeout to -1
+
+   if ! isopenport( nPort )
+      return TE_CLOSED
+   endif
+
+   if nTimeout > 1800
+      nTimeout := 1800
+   endif
+
+   nDone := Seconds() + iif( nTimeout >= 0, nTimeout, 0 )
+
+   while tp_OutFree( nPort ) > 0 .AND. ;
+         ( nTimeout < 0 .OR. Seconds() < nDone )
+         hb_IdleState()
+   enddo
+
+return iif( tp_OutFree( nPort ) > 0, TE_TMOUT, 0 )
+
+
+
+
+/*
 
 /// sorry, but ctrldsr and ctrlcts will act like isdsr and iscts... if you want
 /// flow control, talk to the system.
@@ -926,8 +799,6 @@ return nil
 ///function tp_fifo
 ///return 0
 ///
-///function tp_flush
-///return 0
 ///
 ///function tp_outchrs
 ///return 0
@@ -935,8 +806,6 @@ return nil
 ///function tp_keybd
 ///return 0
 ///
-///function tp_outfree
-///return 0
 
 /// tp_debug is not a real TP function.  I included it so you can define your own debug
 /// output function.
@@ -998,7 +867,7 @@ static unsigned short crctab[ 256 ] = {
 
 
 /* updcrc() macro by Pete Disdale */
-#define updcrc(cp, crc)  ( ( crc << 8 ) ^ ( crctab[ ( ( crc >> 8 ) ^ cp ) ] ) )
+#define updcrc(cp, crc)  ( ( crc << 8 ) ^ ( crctab[ ( ( crc >> 8 ) ^ cp ) & 0xFF ] ) )
 
 
 HB_FUNC( P_CRC16 ) {

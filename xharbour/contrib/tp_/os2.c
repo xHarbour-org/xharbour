@@ -1,5 +1,5 @@
 /*
- * $Id: os2.c,v 1.1 2004/08/26 07:31:59 mauriliolongo Exp $
+ * $Id: os2.c,v 1.2 2004/08/26 16:18:35 mauriliolongo Exp $
  */
 
 /*
@@ -129,7 +129,10 @@ HB_FUNC( P_INITPORTSPEED ) {
          XON/XOFF OFF
          */
          dcb.fbCtlHndShake = MODE_DTR_HANDSHAKE | MODE_RTS_HANDSHAKE;
-         dcb.fbFlowReplace = MODE_RTS_HANDSHAKE;
+
+         /* 0x20 == full duplex */
+         dcb.fbFlowReplace = MODE_RTS_HANDSHAKE | 0x20;
+
          dcb.fbTimeout = MODE_NO_WRITE_TIMEOUT | MODE_NOWAIT_READ_TIMEOUT;
 
          if ( DosDevIOCtl( (HFILE) hb_parnl( 1 ), IOCTL_ASYNC, ASYNC_SETDCBINFO, &dcb,
@@ -183,3 +186,88 @@ HB_FUNC( P_WRITEPORT ) {
 }
 
 
+
+HB_FUNC( P_OUTFREE ) {
+
+   APIRET rc;
+   RXQUEUE rxqueue = { 0 };
+
+   if ( ( rc = DosDevIOCtl( (HFILE) hb_parnl( 1 ), IOCTL_ASYNC, ASYNC_GETOUTQUECOUNT,
+                            NULL, 0L, NULL, &rxqueue, sizeof(RXQUEUE), NULL ) ) == NO_ERROR ) {
+
+      hb_retnl( rxqueue.cb - rxqueue.cch );
+
+   } else {
+      // Put GetLastError() here, or better a second byref param?
+      hb_retnl( -1 );
+   }
+
+}
+
+
+
+HB_FUNC( P_ISDCD ) {
+
+   BYTE instat;
+
+   /* if DosDevIOCtl() returns an error, return no DCD */
+   if ( DosDevIOCtl( (HFILE) hb_parnl( 1 ), IOCTL_ASYNC, ASYNC_GETMODEMINPUT,
+                     NULL, 0, NULL, &instat, sizeof(instat), NULL) == NO_ERROR ) {
+      hb_retl( ( instat & DCD_ON ) == DCD_ON );
+
+   } else {
+
+      hb_retl( FALSE );
+   }
+}
+
+
+
+HB_FUNC( P_ISRI ) {
+
+   BYTE instat;
+
+   /* if DosDevIOCtl() returns an error, return no DCD */
+   if ( DosDevIOCtl( (HFILE) hb_parnl( 1 ), IOCTL_ASYNC, ASYNC_GETMODEMINPUT,
+                     NULL, 0, NULL, &instat, sizeof(instat), NULL) == NO_ERROR ) {
+      hb_retl( ( instat & RI_ON ) == RI_ON );
+
+   } else {
+
+      hb_retl( FALSE );
+   }
+}
+
+
+
+HB_FUNC( P_ISDSR ) {
+
+   BYTE instat;
+
+   /* if DosDevIOCtl() returns an error, return no DCD */
+   if ( DosDevIOCtl( (HFILE) hb_parnl( 1 ), IOCTL_ASYNC, ASYNC_GETMODEMINPUT,
+                     NULL, 0, NULL, &instat, sizeof(instat), NULL) == NO_ERROR ) {
+      hb_retl( ( instat & DSR_ON ) == DSR_ON );
+
+   } else {
+
+      hb_retl( FALSE );
+   }
+}
+
+
+
+HB_FUNC( P_ISCTS ) {
+
+   BYTE instat;
+
+   /* if DosDevIOCtl() returns an error, return no DCD */
+   if ( DosDevIOCtl( (HFILE) hb_parnl( 1 ), IOCTL_ASYNC, ASYNC_GETMODEMINPUT,
+                     NULL, 0, NULL, &instat, sizeof(instat), NULL) == NO_ERROR ) {
+      hb_retl( ( instat & CTS_ON ) == CTS_ON );
+
+   } else {
+
+      hb_retl( FALSE );
+   }
+}
