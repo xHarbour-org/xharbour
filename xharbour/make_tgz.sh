@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.34 2004/12/14 00:15:31 druzus Exp $
+# $Id: make_tgz.sh,v 1.35 2004/12/15 13:39:30 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -25,7 +25,7 @@ hb_contrib=""
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 
 if [ -z "$HB_ARCHITECTURE" ]; then
-    hb_arch=`uname -s | tr -d "[-]" | tr "[A-Z]" "[a-z]" 2>/dev/null`
+    hb_arch=`uname -s | tr -d "[-]" | tr "[:upper:]" "[:lower:]" 2>/dev/null`
     case "$hb_arch" in
         *windows*) hb_arch="w32" ;;
         *dos)      hb_arch="dos" ;;

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.15 2004/06/12 16:58:27 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.16 2004/07/09 19:55:05 likewolf Exp $
  */
 
 /*
@@ -76,25 +76,24 @@ CLASS TBrwText FROM HBEditor
    ACCESS colorSpec INLINE ::cColorSpec
    ASSIGN colorSpec(cClr) INLINE ::cColorSpec:=cClr
 
-   METHOD   New(nTop, nLeft, nBottom, nRight, cFileName, cColor)
+   METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor)
 
-   METHOD   RefreshAll()
-   METHOD   RefreshCurrent()
-   METHOD   ForceStable() INLINE NIL
-
-   METHOD   Resize( nTop, nLeft, nBottom, nRight )
-
-   METHOD   GotoLine(n)                      // Moves active line cursor
-   METHOD   SetActiveLine( n )               // Sets the line to be executed
-
-   METHOD   GetLine(nRow)                    // Redefine HBEditor method to add line number
-   METHOD   LineColor(nRow)                  // Redefine HBEditor method to handle line coloring
-
-   METHOD   ToggleBreakPoint(nRow, lSet)     // if lSet is .T. there is a BreakPoint active at nRow,
-                                             // if lSet is .F. BreakPoint at nRow has to be removed
-   METHOD   Search( cString, lCaseSensitive, nMode ) // 0 from Begining to end, 1 Forward, 2 Backwards
-
-   METHOD   LoadFile(cFileName)
+   METHOD End() INLINE ::ScrollTo( Len( ::GetLine( ::nRow ) ) - ::nNumCols ) // Scroll window to show the end of line
+   METHOD ForceStable() INLINE NIL         // TBrowse emulation for TDbgWindow
+   METHOD GetLine(nRow)                    // Redefine HBEditor method to add line number
+   METHOD GotoLine(n)                      // Moves active line cursor
+   METHOD Home() INLINE ::ScrollTo( 1 )    // Scroll window to leftmost position
+   METHOD Left() INLINE ::ScrollTo( ::nCol - 1 ) // Scroll window one column left
+   METHOD LineColor(nRow)                  // Redefine HBEditor method to handle line coloring
+   METHOD RefreshAll()
+   METHOD RefreshCurrent()
+   METHOD Resize( nTop, nLeft, nBottom, nRight )
+   METHOD Right() INLINE ::ScrollTo( ::nCol + 1 ) // Scroll window one column left
+   METHOD ScrollTo( nCol )                 // Scroll the window to specified column
+   METHOD Search( cString, lCaseSensitive, nMode ) // 0 from Begining to end, 1 Forward, 2 Backwards
+   METHOD SetActiveLine( n )               // Sets the line to be executed
+   METHOD ToggleBreakPoint(nRow, lSet)     // if lSet is .T. there is a BreakPoint active at nRow,
+                                           // if lSet is .F. BreakPoint at nRow has to be removed
 
 ENDCLASS
 
@@ -128,11 +127,32 @@ METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor, lLineNumbers) CLASS 
 return Self
 
 
-METHOD LoadFile(cFileName) CLASS TBrwText
+METHOD GetLine(nRow) CLASS TBrwText
+RETURN IIf( ::lLineNumbers, AllTrim( Str( nRow ) ) + ": ", "" ) + Super:GetLine( nRow )
 
-   Super:LoadFile(cFileName)
 
+METHOD GotoLine( n ) CLASS TBrwText
+   Super:GotoLine( n )
 return Self
+
+
+METHOD LineColor(nRow) CLASS TBrwText
+
+   local cColor, lHilited, lBreak, lExec, nIndex := CLR_CODE
+
+   lHilited := (nRow == ::nActiveLine)
+   lBreak := AScan(::aBreakPoints, nRow) > 0
+
+   if lHilited
+     nIndex += CLR_CURSOR
+   endif
+   if lBreak
+     nIndex += CLR_BKPT
+   endif
+
+   cColor := hb_ColorIndex(::cColorSpec, nIndex)
+
+return cColor
 
 
 METHOD RefreshAll() CLASS TBrwText
@@ -155,61 +175,15 @@ METHOD Resize( nTop, nLeft, nBottom, nRight ) CLASS TBrwText
 RETURN Self
 
 
-METHOD SetActiveLine( n ) CLASS TBrwText
-   ::nActiveLine := n
-   ::RefreshWindow()
-return Self
-
-
-METHOD GotoLine(n) CLASS TBrwText
-
-  Super:GotoLine(n)
-
-return Self
-
-METHOD GetLine(nRow) CLASS TBrwText
-
-return iif(::lLineNumbers, AllTrim(Str(nRow)) + ": ", "") + Super:GetLine(nRow)
-
-
-METHOD LineColor(nRow) CLASS TBrwText
-
-   local cColor, lHilited, lBreak, lExec, nIndex := CLR_CODE
-
-   lHilited := (nRow == ::nActiveLine)
-   lBreak := AScan(::aBreakPoints, nRow) > 0
-
-   if lHilited
-     nIndex += CLR_CURSOR
-   endif
-   if lBreak
-     nIndex += CLR_BKPT
-   endif
-
-   cColor := hb_ColorIndex(::cColorSpec, nIndex)
-
-return cColor
-
-
-METHOD ToggleBreakPoint(nRow, lSet) CLASS TBrwText
-
-   local nAt := AScan(::aBreakPoints, nRow)
-
-   if lSet
-      // add it only if not present
-      if nAt == 0
-         AAdd(::aBreakPoints, nRow)
-      endif
-
-   else
-      if nAt <> 0
-         ADel( ::aBreakPoints, nAt )
-         ASize( ::aBreakPoints, Len( ::aBreakPoints ) - 1 )
-      endif
-
-   endif
-
-return Self
+METHOD ScrollTo( nCol ) CLASS TBrwText
+   IF nCol >= 1
+      ::nCol := nCol
+      ::nFirstCol := nCol
+      ::RefreshWindow()
+      ::SetPos( ::Row(), ::nLeft )
+   ENDIF
+RETURN Self   
+   
 
 METHOD Search( cString, lCaseSensitive, nMode ) CLASS TBrwText
 
@@ -249,4 +223,32 @@ METHOD Search( cString, lCaseSensitive, nMode ) CLASS TBrwText
    next
 
 return lFound
+
+
+METHOD SetActiveLine( n ) CLASS TBrwText
+   ::nActiveLine := n
+   ::RefreshWindow()
+return Self
+
+
+METHOD ToggleBreakPoint(nRow, lSet) CLASS TBrwText
+
+   local nAt := AScan(::aBreakPoints, nRow)
+
+   if lSet
+      // add it only if not present
+      if nAt == 0
+         AAdd(::aBreakPoints, nRow)
+      endif
+
+   else
+      if nAt <> 0
+         ADel( ::aBreakPoints, nAt )
+         ASize( ::aBreakPoints, Len( ::aBreakPoints ) - 1 )
+      endif
+
+   endif
+
+return Self
+
 

@@ -1,6 +1,7 @@
-#!/bin/bash
+#!/bin/sh
+[ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_gnu.sh,v 1.12 2004/12/15 13:39:30 druzus Exp $
+# $Id: make_gnu.sh,v 1.13 2005/01/09 06:08:17 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -18,7 +19,7 @@ if [ -z "$HB_ARCHITECTURE" ]; then
     if [ "$OSTYPE" = "msdosdjgpp" ]; then
         hb_arch="dos"
     else
-        hb_arch=`uname -s | tr -d "[-]" | tr A-Z a-z 2>/dev/null`
+        hb_arch=`uname -s | tr -d "[-]" | tr "[:upper:]" "[:lower:]" 2>/dev/null`
         case "$hb_arch" in
             *windows*) hb_arch="w32" ;;
             *bsd)      hb_arch="bsd" ;;
