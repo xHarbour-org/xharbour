@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.52 2004/04/20 08:26:57 lf_sfnet Exp $
+ * $Id: gtwin.c,v 1.53 2004/05/07 15:33:32 lf_sfnet Exp $
  */
 
 /*
@@ -1437,7 +1437,8 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
              /* Save the keyboard state and ASCII key code */
              DWORD dwState = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState;
              WORD wChar = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualKeyCode;
-             WORD wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode;
+             /* Could be used in the future */
+             /* WORD wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode; */
              ch = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar;
            
              if ( s_wRepeated == 0 )

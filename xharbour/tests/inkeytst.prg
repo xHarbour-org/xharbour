@@ -1,5 +1,5 @@
 //
-// $Id: inkeytst.prg,v 1.7 2001/06/20 18:55:21 dholm Exp $
+// $Id: inkeytst.prg,v 1.1.1.1 2001/12/21 10:45:53 ronpinkas Exp $
 //
 
 // Testing Harbour keyboard input.
@@ -13,7 +13,7 @@
 
 #include "inkey.ch"
 
-PROCEDURE main( cSkip, cRaw )
+PROCEDURE main( cSkip )
 
 ALTD(0)
 
@@ -39,7 +39,7 @@ IF EMPTY( cSkip )
    NextTest()
 ENDIF
 
-   TEST7( cSkip, cRaw )
+   TEST7( cSkip )
    ?
 QUIT
 
@@ -192,7 +192,7 @@ RETURN
 
 
 
-PROCEDURE TEST7( cSkip, cRaw )
+PROCEDURE TEST7( cSkip )
 LOCAL nKey, nMask, cText
    CLS
    ? "For the last test, a loop is started and all keyboard and mouse"
@@ -202,14 +202,6 @@ LOCAL nKey, nMask, cText
    ?
    ? "Press any key."
    nMask := INKEY_ALL
-
-   IF ! EMPTY( cRaw )
-       IF UPPER( LEFT( cRaw, 1 ) ) == "R"
-          nMask += HB_INKEY_RAW
-       ELSE
-          nMask += HB_INKEY_EXTENDED
-       END IF
-   END IF
 
    SET(_SET_EVENTMASK, nMask)
 
