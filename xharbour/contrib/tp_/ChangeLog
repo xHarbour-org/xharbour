@@ -1,0 +1,13 @@
+I sent the original version to the flagship website in may 2000.
+I just now (July 2001) made the first change to the code.
+
+7/19/2001
+The bug I found is REALLY esoteric... it's in tp_open.  It comes into play
+when something previously set the parity to Even or Odd and then your telepathy program does a tp_open on that port and sets parity to None.  I previously
+assumed that if you were setting parity to N, the port was already at N and I
+didn't explicitly call stty -parenb and -parodd.
+
+I included telepathy.bak in case you care to look at the prior version.
+
+
+

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3309 2004/08/14 15:10:38 modalsist Exp $
+ * $Id: ChangeLog,v 1.3310 2004/08/16 12:51:46 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-16 16:10 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  + source/contrib/tp_
+    + Contains a freeware telepathy emulation library originally
+      developed with Flagship.
+      This is the initial commit of the original files, I've only
+      shortened file names to conform to 8.3 rule and removed
+      INSTALL and telepathy.bak.
 
 2004-08-16 14:44 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/gtapi.c
