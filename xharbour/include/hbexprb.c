@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.60 2003/08/13 23:51:02 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.61 2003/08/14 08:44:21 ronpinkas Exp $
  */
 
 /*
@@ -1828,6 +1828,24 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      pSelf->ExprType = HB_ET_ARRAYAT;
                      pSelf->value.asList.pExprList = pArray;
                      pSelf->value.asList.pIndex    = hb_compExprNewLong( -1 );
+                  }
+               }
+               // Type( <x> ) => Type( <x>, MacroFlags )
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "TYPE" ) == 0 )
+               {
+                  if( hb_compExprListLen( pSelf->value.asFunCall.pParms ) == 1 )
+                  {
+                     pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext =
+                        hb_compExprNewLong(
+                                             #ifndef HB_MACRO_SUPPORT
+                                                ( hb_comp_Supported & HB_COMPFLAG_HARBOUR  ? HB_SM_HARBOUR   : 0 ) |
+                                                ( hb_comp_Supported & HB_COMPFLAG_XBASE    ? HB_SM_XBASE     : 0 ) |
+                                                ( hb_comp_bShortCuts                       ? HB_SM_SHORTCUTS : 0 ) |
+                                                ( hb_comp_Supported & HB_COMPFLAG_RT_MACRO ? HB_SM_RT_MACRO  : 0 )
+                                             #else
+                                                HB_SM_RT_MACRO
+                                             #endif
+                                          );
                   }
                }
                #ifndef HB_MACRO_SUPPORT

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.49 2003/07/24 20:53:45 andijahja Exp $
+ * $Id: harbour.c,v 1.50 2003/08/14 08:44:21 ronpinkas Exp $
  */
 
 /*
@@ -1429,7 +1429,7 @@ static void hb_compDeclaredInit( void )
    _DECL s_251 = { "TONE"            , '-', 2 , (BYTE*)"NN"                                                   , {NULL}   , NULL , &s_250};
    _DECL s_252 = { "TRANSFORM"       , 'C', 2 , (BYTE*)" C"                                                   , {NULL}   , NULL , &s_251};
    _DECL s_253 = { "TRIM"            , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_252};
-   _DECL s_254 = { "TYPE"            , 'C', 1 , (BYTE*)" "                                                    , {NULL}   , NULL , &s_253};
+   _DECL s_254 = { "TYPE"            , 'C', 2 , (BYTE*)" N"                                                   , {NULL}   , NULL , &s_253};
    _DECL s_255 = { "U2BIN"           , 'C', 1 , (BYTE*)"N"                                                    , {NULL}   , NULL , &s_254};
    _DECL s_256 = { "UPDATED"         , 'L', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_255};
    _DECL s_257 = { "UPPER"           , 'C', 1 , (BYTE*)"C"                                                    , {NULL}   , NULL , &s_256};

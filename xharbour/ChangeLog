@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1361 2003/08/19 15:33:13 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1362 2003/08/19 20:13:57 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-19 21:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+  * source/vm/macro.c
+    + Added 2nd param to hb_macroGetType( PHB_ITEM pItem, BYTE Flags )
+
+  * include/hbexprb.c
+    + Added Macro Flags support to Type() function as a 2nd paramater so that Type is also compliant with Compile Time MAcro Flags.
+
+  * source/rtl/type.c
+    + Added Macro Flags support to Type() function as a second optional paramater.
+
+  * source/vm/macro.c
+    ! Fixed hb_compMemvarCheck() to check that Symbol found is indeed a Memvar.
+      This fixes Clipper compabtibility in hb_macroGetType(), i.e. Type()
+    + Added Macro Flags support to hb_macroGetType(). This allws proper type of xHarbour macro extensions,
+      unless disabled with -kc.
+
+  * source/compiler/harbour.c
+  * source/compiler/hbfunchk.c
+    * Revised paramater checking of Type() to allow for optional 2nd param.
 
 2003-08-19 17:15 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * tests/inifiles.prg

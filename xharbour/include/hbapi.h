@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.77 2003/07/23 12:35:57 druzus Exp $
+ * $Id: hbapi.h,v 1.78 2003/08/14 23:49:46 jonnymind Exp $
  */
 
 /*
@@ -536,7 +536,7 @@ extern char * hb_macroTextSubst( char * szString, ULONG *pulStringLen ); /* subs
 extern BOOL   hb_macroIsIdent( char * szString ); /* determine if a string is a valid function or variable name */
 extern void   hb_macroPopAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags ); /* compiles and evaluates an aliased macro expression */
 extern void   hb_macroPushAliasedValue( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, BYTE flags ); /* compiles and evaluates an aliased macro expression */
-extern char * hb_macroGetType( HB_ITEM_PTR pItem ); /* determine the type of an expression */
+extern char * hb_macroGetType( PHB_ITEM pItem, BYTE Flags ); /* determine the type of an expression */
 extern char * hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewString ); /* expands valid '&' operator */
 
 /* idle states */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbfunchk.c,v 1.1.1.1 2001/12/21 10:43:58 ronpinkas Exp $
+ * $Id: hbfunchk.c,v 1.2 2002/05/08 23:22:47 ronpinkas Exp $
  */
 
 /*
@@ -102,7 +102,7 @@ static HB_FUNCINFO hb_StdFunc[] =
    { "TIME"      , 0,  0 },
    { "TRANSFORM" , 2,  2 },
    { "TRIM"      , 1,  2 }, /* Second parameter is a Harbour extension */
-   { "TYPE"      , 1,  1 },
+   { "TYPE"      , 1,  2 }, /* Second parameter is a xHarbour extension */
    { "UPPER"     , 1,  1 },
    { "VAL"       , 1,  1 },
    { "VALTYPE"   , 1,  1 },

@@ -1,5 +1,5 @@
 /*
- * $Id: type.c,v 1.1.1.1 2001/12/21 10:42:18 ronpinkas Exp $
+ * $Id: type.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -53,13 +53,27 @@
 #include "hbapi.h"
 #include "hbapierr.h"
 
+#include "hbmacro.ch"
+
 HB_FUNC( TYPE )
 {
-   HB_ITEM_PTR pItem = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
 
    if( pItem )
    {
-      hb_retc( hb_macroGetType( pItem ) );
+      PHB_ITEM pFlags = hb_param( 2, HB_IT_INTEGER );
+      BYTE Flags;
+
+      if( pFlags )
+      {
+         Flags = (BYTE) ( pFlags->item.asInteger.value );
+      }
+      else
+      {
+         Flags = HB_SM_RT_MACRO;
+      }
+
+      hb_retc( hb_macroGetType( pItem, Flags ) );
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.24 2003/07/13 19:34:34 jonnymind Exp $
+ * $Id: macro.c,v 1.25 2003/07/29 16:24:00 druzus Exp $
  */
 
 /*
@@ -104,7 +104,9 @@ static int hb_macroParse( HB_MACRO_PTR pMacro, char * szString )
    pMacro->pCodeInfo->lPCodePos  = 0;
    pMacro->pCodeInfo->pLocals    = NULL;
    pMacro->pCodeInfo->pPrev      = NULL;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_macroParse.(%p, %s)", pMacro, szString));
+
    pMacro->pCodeInfo->pCode      = ( BYTE * ) hb_xgrab( HB_PCODE_SIZE );
 
    /* reset the type of compiled expression - this should be filled after
@@ -904,11 +906,11 @@ void hb_macroTextValue( HB_ITEM_PTR pItem )
    }
 }
 
-char * hb_macroGetType( HB_ITEM_PTR pItem )
+char * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
 {
    char * szType;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_macroGetType(%p)", pItem));
+   HB_TRACE(HB_TR_DEBUG, ("hb_macroGetType(%p, %i)", pItem, flags));
 
    if( hb_macroCheckParam( pItem ) )
    {
@@ -919,20 +921,21 @@ char * hb_macroGetType( HB_ITEM_PTR pItem )
       struMacro.Flags      = HB_MACRO_GEN_PUSH | HB_MACRO_GEN_TYPE;
       struMacro.uiNameLen  = HB_SYMBOL_NAME_LEN;
       struMacro.status     = HB_MACRO_CONT;
-      struMacro.supported  = s_macroFlags;
+      struMacro.supported  = (flags & HB_SM_RT_MACRO) ? s_macroFlags : flags;
+
       iStatus = hb_macroParse( &struMacro, szString );
 
       if( iStatus == HB_MACRO_OK )
       {
          /* passed string was successfully compiled
           */
-              if( struMacro.exprType == HB_ET_CODEBLOCK )
-              {
-                /* Clipper ignores any undeclared symbols or UDFs if the
-                 * compiled expression is a valid codeblock
-                 */
-                szType ="B";
-              }
+         if( struMacro.exprType == HB_ET_CODEBLOCK )
+         {
+           /* Clipper ignores any undeclared symbols or UDFs if the
+            * compiled expression is a valid codeblock
+            */
+           szType ="B";
+         }
          else if( struMacro.status & ( HB_MACRO_UNKN_SYM | HB_MACRO_UNKN_VAR) )
          {
             /* request for a symbol that is not in a symbol table or
@@ -942,7 +945,15 @@ char * hb_macroGetType( HB_ITEM_PTR pItem )
          }
          else if( struMacro.status & HB_MACRO_UDF )
          {
-            szType = "UI";  /* UDF function was used - cannot determine a type */
+            if( struMacro.status & HB_MACRO_CONT )
+            {
+               szType = "UI";  /* UDF function was used - cannot determine a type */
+            }
+            else
+            {
+               // This branch never tested, just seemed logical on review - might be unneeded.
+               szType = "U";   /* UDF and Some error. */
+            }
          }
          else if( struMacro.status & HB_MACRO_CONT )
          {
@@ -983,12 +994,16 @@ char * hb_macroGetType( HB_ITEM_PTR pItem )
          }
       }
       else
+      {
          szType = "UE";  /* syntax error during compilation */
+      }
 
       hb_macroDelete( &struMacro );
    }
    else
+   {
       szType = "U";
+   }
 
    return szType;
 }
@@ -1153,19 +1168,21 @@ ULONG hb_compGenJumpTrue( LONG lOffset, HB_MACRO_DECL )
 */
 static void hb_compMemvarCheck( char * szVarName, HB_MACRO_DECL )
 {
+   /* Test if variable exist if called from TYPE() function only */
    if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_TYPE )
    {
-      /* Test if variable exist if called from TYPE() function only */
-      if( !( HB_MACRO_DATA->status & (HB_MACRO_UNKN_VAR | HB_MACRO_UNKN_SYM) ) )
+      /* checking for variable is quite expensive than don't check it
+       * if there are already some undefined symbols or variables
+       */
+      if( ! ( HB_MACRO_DATA->status & (HB_MACRO_UNKN_VAR | HB_MACRO_UNKN_SYM) ) )
       {
-         /* checking for variable is quite expensive than don't check it
-          * if there are already some undefined symbols or variables
-         */
          if( hb_memvarScope( szVarName ) <= HB_MV_ERROR )
          {
-            if( ! hb_dynsymFind( szVarName ) )
+            PHB_DYNS pDyn = hb_dynsymFind( szVarName );
+
+            /* there is no memvar or field variable visible at this moment */
+            if( pDyn == NULL || pDyn->hMemvar == NULL )
             {
-               /* there is no memvar or field variable visible at this moment */
                 HB_MACRO_DATA->status |= HB_MACRO_UNKN_VAR;
                 HB_MACRO_DATA->status &= ~HB_MACRO_CONT;  /* don't run this pcode */
             }
@@ -1203,6 +1220,7 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
        */
       pSym = hb_dynsymGet( szVarName );
    }
+
    hb_compGenPCode1( bPCode, HB_MACRO_PARAM );
    hb_compGenPCodeN( ( BYTE * )( &pSym ), sizeof( pSym ), HB_MACRO_PARAM );
 }
@@ -1223,8 +1241,7 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_
 
       if( pSym )
       {
-         if( ! pSym->hArea &&
-	     (HB_MACRO_DATA->status & HB_MACRO_UDF && pSym->pSymbol->pFunPtr == NULL ) )
+         if( ! pSym->hArea && ( HB_MACRO_DATA->status & HB_MACRO_UDF && pSym->pSymbol->pFunPtr == NULL ) )
          {
             HB_MACRO_DATA->status |= HB_MACRO_UNKN_SYM;
             HB_MACRO_DATA->status &= ~HB_MACRO_CONT;  /* don't run this pcode */
