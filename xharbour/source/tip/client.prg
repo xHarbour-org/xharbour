@@ -1,5 +1,5 @@
 /*
- * $Id: tipmail.prg,v 1.26 2004/04/08 13:26:53 druzus Exp $
+ * $Id: client.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
  */
 
 /*
@@ -230,8 +230,9 @@ METHOD ReadToFile( cFile, nMode ) CLASS tIPClient
 
    ::nStatus := 1
    DO WHILE InetErrorCode( ::SocketCon ) == 0 .and. .not. ::bEof
-
-      cData := ::Read( 1024 )
+// change ( 1024 ) to ( ) because if file is less than 1024 byte
+// this method don't work !
+      cData := ::Read( )
       IF cData == NIL
          IF nFout != NIL
             Fclose( nFout )
