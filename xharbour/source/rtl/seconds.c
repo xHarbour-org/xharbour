@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.13 2001/12/06 02:24:12 dholm Exp $
+ * $Id: seconds.c,v 1.1.1.1 2001/12/21 10:41:54 ronpinkas Exp $
  */
 
 /*
@@ -57,6 +57,7 @@
    #include <sys/time.h>
 #elif defined( OS_UNIX_COMPATIBLE )
    #include <sys/timeb.h>
+   #include <sys/times.h>
 #else
    #include <sys\timeb.h>
 #endif
@@ -97,6 +98,62 @@ double hb_dateSeconds( void )
           ( ( double ) fraction / 1000.0 );
 }
 
+#ifdef HB_EXTENSION
+
+/*
+   secondsCPU(n) -> nTime
+   FlagShip/CLIP compatible function, which reports how many CPU and/or
+   system seconds have elapsed since the beginning of the program execution.
+    n == 1  utime  -> user CPU time of the current process
+    n == 2  stime  -> system CPU time behalf of the current process
+    n == 3  u + s  -> sum of utime + stime (default)
+    n == 11 cutime -> sum of the user CPU time of the current + child process
+    n == 12 cstime -> sum of the system CPU time of the current + child process
+    n == 13 cu+cs  -> sum of cutime + cstime
+*/
+double hb_secondsCPU(int n)
+{
+	double d = 0;
+
+#if defined( OS_UNIX_COMPATIBLE )
+	struct tms tm;
+
+	times(&tm);
+
+	if ((n < 1 || n > 3) && (n < 11 || n > 13))
+		n = 3;
+	
+	if (n > 10)
+	{
+		n -= 10;
+		if (n & 1)
+			d += tm.tms_cutime;
+		if (n & 2)
+			d += tm.tms_cstime;
+	}
+	if (n & 1)
+		d += tm.tms_utime;
+	if (n & 2)
+		d += tm.tms_stime;
+
+	d /= CLK_TCK;
+#else
+	/* TODO: this code is only for DOS and other platforms which cannot
+	         calculate process time */
+
+	if ((n < 1 || n > 3) && (n < 11 || n > 13))
+		n = 3;
+	else if (n > 10)
+		n -= 10;
+
+	if (n & 1)
+		d = hb_dateSeconds( void );
+#endif
+	return d;
+}
+
+#endif
+
 HB_FUNC( SECONDS )
 {
    hb_retnd( hb_dateSeconds() );
@@ -104,18 +161,14 @@ HB_FUNC( SECONDS )
 
 #ifdef HB_EXTENSION
 
+HB_FUNC( SECONDSCPU )
+{
+   hb_retnd( hb_secondsCPU( hb_parni( 1 ) ) );
+}
+
 HB_FUNC( HB_CLOCKS2SECS )
 {
    hb_retnd((double) hb_parnl( 1 ) / CLOCKS_PER_SEC );
 }
 
 #endif
-
-
-
-
-
-
-
-
-

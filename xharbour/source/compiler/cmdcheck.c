@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.52 2002/01/02 03:02:30 andijahja Exp $
+ * $Id: cmdcheck.c,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -706,7 +706,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                 {
                    unsigned int i = 0;
                    char * szPath = hb_strdup( s + 1 );
-                   while( i < strlen( szPath ) && !HB_ISOPTSEP( szPath[ i ] ) )
+                   while( i < strlen( szPath ) )
                       i++;
                    szPath[ i ] = '\0';
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.42 2003/02/03 18:36:03 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.43 2003/02/04 05:52:46 ronpinkas Exp $
  */
 
 /*
@@ -3943,6 +3943,11 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
 
     cha = sBuffer[ *iBuffer ];
     (*iBuffer)++;
+
+    if( cha == '\r' )
+    {
+      cha = ' ';
+    }
 
     if( cha == '\n' )
     {
