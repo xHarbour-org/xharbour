@@ -11,7 +11,7 @@
 * No copyright - released into the public domain NSA.
 */
 
-#include "Fileio.ch"
+#include "fileio.ch"
 #define  F_BLOCK   512
 
 Static nSrchand
