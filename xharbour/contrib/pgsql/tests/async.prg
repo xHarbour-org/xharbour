@@ -10,11 +10,11 @@ Function main()
     
     CLEAR SCREEN
         
-    ? "Connect", conn := PQConnect('test', '200.207.51.149', 'postgres', 'moreno', 5432)
+    ? "Connect", conn := PQConnect('test', '192.168.0.1', 'postgres', 'pass', 5432)
                 
-    ? "Status Conexao", PQerrorMessage(conn), PQstatus(conn)
+    ? "Conection status", PQerrorMessage(conn), PQstatus(conn)
     
-    ? "PQSendQuery", PQsendQuery(conn, 'SELECT codigo, emisao, vencto, saldup FROM duplic limit 5000')
+    ? "PQSendQuery", PQsendQuery(conn, 'SELECT * FROM huge_table limit 5000')
 
     xTime := time()
 
