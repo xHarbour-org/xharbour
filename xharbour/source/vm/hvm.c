@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.44 2002/03/10 18:41:54 ronpinkas Exp $
+ * $Id: hvm.c,v 1.45 2002/03/11 22:58:40 ronpinkas Exp $
  */
 
 /*
@@ -873,7 +873,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_ENDBLOCK:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENDBLOCK") );
             hb_vmEndBlock();
-            return;   /* end of a codeblock - stop evaluation */
+
+            /* end of a codeblock - stop evaluation */
+            if( pSymbols )
+            {
+               hb_memvarSetPrivatesBase( ulPrivateBase );
+            }
+            return;
 
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
 

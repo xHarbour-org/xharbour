@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.117 2002/03/17 00:50:02 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.118 2002/03/17 03:50:38 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-16 22:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbtrace.h
+  * source/rtl/trace.c
+    + Added void TraceLog( const char * sFile, const char * sTraceMsg );
+
+  * source/vm/hvm.c
+    ! Fixed bug - codeblock execution was not resetting the Base Stack for Memvars.
+
+  * source/vm/memvars.c
+    ! Fixed bug in __MVSAVE() - was not saving from absolute base (0).
+    /* Bug reported by Michael Harris */
 
 2002-03-16 19:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/macro.c

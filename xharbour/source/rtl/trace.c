@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.9 2001/11/02 01:11:29 brianhays Exp $
+ * $Id: trace.c,v 1.1.1.1 2001/12/21 10:42:15 ronpinkas Exp $
  */
 
 /*
@@ -54,6 +54,26 @@
 #include "hbtrace.h"
 
 #ifdef HB_EXTENSION
+
+void TraceLog( const char * sFile, const char * sTraceMsg )
+{
+   FILE *hFile;
+
+   if( sFile == NULL )
+   {
+      hFile = fopen( "trace.log", "a" );
+   }
+   else
+   {
+      hFile = fopen( sFile, "a" );
+   }
+
+   if ( hFile )
+   {
+      fprintf( hFile, sTraceMsg );
+      fclose( hFile );
+   }
+}
 
 HB_FUNC( HB_TRACESTATE )
 {

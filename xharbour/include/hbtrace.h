@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.h,v 1.18 2001/04/12 18:24:40 dholm Exp $
+ * $Id: hbtrace.h,v 1.1.1.1 2001/12/21 10:47:25 ronpinkas Exp $
  */
 
 /*
@@ -58,6 +58,8 @@
 #if defined(HB_EXTERN_C)
 extern "C" {
 #endif
+
+extern void TraceLog( const char * sFile, const char * sTraceMsg );
 
 /*
  * Tracing levels.

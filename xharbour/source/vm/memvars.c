@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.8 2002/01/27 19:14:51 ronpinkas Exp $
+ * $Id: memvars.c,v 1.9 2002/01/30 03:32:41 ronpinkas Exp $
  */
 
 /*
@@ -284,6 +284,9 @@ static void hb_memvarAddPrivate( PHB_DYNS pDynSym )
 ULONG hb_memvarGetPrivatesBase( void )
 {
    ULONG ulBase = s_privateStackBase;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarGetPrivatesBase()"));
+
    s_privateStackBase = s_privateStackCnt;
    return ulBase;
 }
@@ -1418,13 +1421,12 @@ HB_FUNC( __MVSAVE )
 
          /* Walk through all visible memory variables */
 
-         ULONG ulBase = s_privateStackCnt;
+         ULONG ulBase = 0;
 
-         while( ulBase > s_privateStackBase )
+         while( ulBase < s_privateStackCnt )
          {
             PHB_DYNS pDynVar;
 
-            --ulBase;
             pDynVar = s_privateStack[ ulBase ];
 
             /* NOTE: Harbour name lengths are not limited, but the .MEM file
@@ -1506,6 +1508,8 @@ HB_FUNC( __MVSAVE )
                   }
                }
             }
+
+            ulBase++;
          }
 
          buffer[ 0 ] = '\x1A';
