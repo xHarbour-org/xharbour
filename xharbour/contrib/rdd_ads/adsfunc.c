@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.9 2003/02/22 02:56:46 lculik Exp $
+ * $Id: adsfunc.c,v 1.10 2003/03/29 21:23:20 lculik Exp $
  */
 
 /*
@@ -1422,7 +1422,7 @@ HB_FUNC( ADSDDGETDBPROPERTY )
        case ADS_DD_LOG_IN_REQUIRED:
        case ADS_DD_VERIFY_ACCESS_RIGHTS:
        case ADS_DD_ENCRYPT_TABLE_PASSWORD:
-       case ADS_DD_ENCRYPT_NEW_TABLE: 
+       case ADS_DD_ENCRYPT_NEW_TABLE:
        {
           ulLength = sizeof( UNSIGNED16 );
           ulRetVal = AdsDDGetDatabaseProperty( adsConnectHandle, ulPropety, &ulBuffer, &ulLength );
@@ -1567,4 +1567,27 @@ HB_FUNC( ADSROLLBACK )
       hb_retl( FALSE );
    }
 }
+
+/*
+   set the number of records to read ahead, for the current work area
+   Call :    ADSCACHERECORDS(nRecords)
+   Returns : True if successful
+*/
+HB_FUNC( ADSCACHERECORDS )
+{
+   UNSIGNED32 ulRetVal ;
+   ADSAREAP pArea;
+
+   ulRetVal=FALSE;
+
+   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   if( pArea )
+      ulRetVal = AdsCacheRecords( pArea->hTable, hb_parni(1) );
+
+   if( !pArea || ulRetVal != AE_SUCCESS )
+ 	  hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSCACHERECORDS" );
+
+   hb_retl( ulRetVal );
+}
+
 
