@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.9 2002/08/01 00:33:15 lculik Exp $
+ * $Id: hbapifs.h,v 1.10 2002/10/27 14:41:37 lculik Exp $
  */
 
 /*
@@ -62,7 +62,11 @@ extern "C" {
 
 #define FS_ERROR F_ERROR
 
+#if defined(X__WIN32__)
+typedef long    FHANDLE;
+#else
 typedef int    FHANDLE;
+#endif
 
 /* File locking flags */
 #define FL_LOCK       0x0000   /* Lock a region   */

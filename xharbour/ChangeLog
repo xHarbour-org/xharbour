@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.587 2003/01/05 23:36:11 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.588 2003/01/06 12:42:29 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-06 12:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * include/hbapifs.h
+    * When X__WIN32__ is defined FHANDLE is defined as Long
+  * source/rtl/filesys.c
+    % Properly Fix the usage os Native Windows File IO API. harbour apps with native
+      WIN IO api has the same speed as Legacy api usage
+  * source/rtl/console.c
+    ! Minor Changes required to proper work of Windows File IO Native API
 
 2003-01-06 09:40 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
   * include/hbapirdd.h

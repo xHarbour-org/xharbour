@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.22 2002/12/29 20:59:56 jonnymind Exp $
+ * $Id: console.c,v 1.23 2002/12/31 07:15:44 jonnymind Exp $
  */
 
 /*
@@ -87,10 +87,16 @@ static USHORT s_uiPCol;
 static SHORT  s_originalMaxRow;
 static SHORT  s_originalMaxCol;
 static char   s_szCrLf[ CRLF_BUFFER_LEN ];
+#if defined(X__WIN32__)
+static HANDLE    s_iFilenoStdin;
+static HANDLE    s_iFilenoStdout;
+static HANDLE    s_iFilenoStderr;
+#else
 static int    s_iFilenoStdin;
 static int    s_iFilenoStdout;
 static int    s_iFilenoStderr;
 
+#endif
 #ifdef HB_THREAD_SUPPORT
    HB_CRITICAL_T s_ConsoleMutex;
 #endif
@@ -113,34 +119,46 @@ void hb_conInit( void )
 #endif
 
    s_uiPRow = s_uiPCol = 0;
-
+#if defined(X__WIN32__)
+   s_iFilenoStdin = GetStdHandle( STD_INPUT_HANDLE );
+   s_iFilenoStdout = GetStdHandle( STD_OUTPUT_HANDLE );
+#else
    s_iFilenoStdin = fileno( stdin );
    s_iFilenoStdout = fileno( stdout );
+#endif
 
 #ifdef HB_C52_UNDOC
    {
       int iStderr = hb_cmdargNum( "STDERR" ); /* Undocumented CA-Clipper switch //STDERR:x */
 
       if( iStderr < 0 )        /* //STDERR not used or invalid */
+#if !defined(X__WIN32__)
          s_iFilenoStderr = fileno( stderr );
+#else
+         s_iFilenoStderr = GetStdHandle( STD_ERROR_HANDLE );
+#endif
       else if( iStderr == 0 )  /* //STDERR with no parameter or 0 */
          s_iFilenoStderr = s_iFilenoStdout;
       else                     /* //STDERR:x */
          s_iFilenoStderr = iStderr;
    }
 #else
+#if !defined(X__WIN32__)
    s_iFilenoStderr = fileno( stderr );
+#else
+   s_iFilenoStderr = GetStdHandle( STD_ERROR_HANDLE );
 #endif
 
+#endif
    /* Some compilers open stdout and stderr in text mode, but
       Harbour needs them to be open in binary mode. */
-
+#if !defined(X__WIN32__)
    hb_fsSetDevMode( s_iFilenoStdout, FD_BINARY );
    hb_fsSetDevMode( s_iFilenoStderr, FD_BINARY );
-
+#endif
    s_bInit = TRUE;
 
-   hb_gtInit( s_iFilenoStdin, s_iFilenoStdout, s_iFilenoStderr );
+   hb_gtInit( (int)s_iFilenoStdin, (int)s_iFilenoStdout, (int)s_iFilenoStderr );
 
    s_originalMaxRow = hb_gtMaxRow(); /* Save the original */
    s_originalMaxCol = hb_gtMaxCol(); /* screen size */
@@ -157,10 +175,10 @@ void hb_conRelease( void )
       /* If the program changed the screen size, restore the original */
       hb_gtSetMode( s_originalMaxRow + 1, s_originalMaxCol + 1 );
    }
-
+#if !defined(X__WIN32__)
    hb_fsSetDevMode( s_iFilenoStdout, FD_TEXT );
    hb_fsSetDevMode( s_iFilenoStderr, FD_TEXT );
-
+#endif
    /* The is done by the OS from now on */
    s_szCrLf[ 0 ] = HB_CHAR_LF;
    s_szCrLf[ 1 ] = '\0';
@@ -232,7 +250,7 @@ void hb_conOutStd( char * pStr, ULONG ulLen )
 
    if( s_bInit )
    {
-      hb_gtAdjustPos( s_iFilenoStdout, pStr, ulLen );
+      hb_gtAdjustPos( (int)s_iFilenoStdout, pStr, ulLen );
       hb_gtPostExt();
    }
 }
@@ -256,7 +274,7 @@ void hb_conOutErr( char * pStr, ULONG ulLen )
 
    if( s_bInit )
    {
-      hb_gtAdjustPos( s_iFilenoStderr, pStr, ulLen );
+      hb_gtAdjustPos( (int)s_iFilenoStderr, pStr, ulLen );
       hb_gtPostExt();
    }
 }
