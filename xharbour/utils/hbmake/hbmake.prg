@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.74 2003/06/10 10:54:29 lculik Exp $
+ * $Id: hbmake.prg,v 1.75 2003/06/21 02:03:07 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1784,19 +1784,19 @@ FUNC CreateMakeFile( cFile )
       IF lFwh
 
          IF lXfwh
-            fWrite( s_nLinkHandle, "LIBFILES = $(FWH)\lib\fivehx.lib $(FWH)\lib\fivehc.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+            fWrite( s_nLinkHandle, "LIBFILES = $(FWH)\lib\fivehx.lib $(FWH)\lib\fivehc.lib optgui.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
          ELSE
-            fWrite( s_nLinkHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+            fWrite( s_nLinkHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib optgui.lib" + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
          ENDIF
 
       ELSEIF lMiniGui
-         fWrite( s_nLinkHandle, "LIBFILES = Minigui.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = Minigui.lib optgui.lib" + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSEIF lHwGui
-         fWrite( s_nLinkHandle, "LIBFILES = hwgui.lib procmisc.lib hwg_qhtm.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = hwgui.lib procmisc.lib hwg_qhtm.lib optgui.lib" + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSEIF lCw
-         fWrite( s_nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib" + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib optgui.lib "  + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSE
-         fWrite( s_nLinkHandle, "LIBFILES = " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = optcon.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ENDIF
 
    ELSEIF s_lGcc
