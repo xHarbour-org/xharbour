@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.27 2003/12/28 22:25:34 druzus Exp $
+ * $Id: gtcrs.c,v 1.28 2004/01/18 06:34:16 likewolf Exp $
  */
 
 /*
@@ -208,6 +208,10 @@ typedef struct ClipKeyCode {
     int shift_key;
 } ClipKeyCode;
 
+/* The tables below are indexed by internal key value,
+ * It cause that we don't have to make any linear scans
+ * to access information proper ClipKeyCode entry
+ */
 static const ClipKeyCode stdKeyTab[NO_STDKEYS] = {
     {K_SPACE,              0,             0,         0}, /*  32 */
     {'!',                  0,             0,         0}, /*  33 */
@@ -2402,7 +2406,7 @@ BOOL HB_GT_FUNC(gt_Resume( void ))
 
     wrefresh( s_ioBase->stdscr );
     gt_ttyset( s_ioBase );
-    /* redrawwin( curscr ); */
+    /* redrawwin( s_ioBase->stdscr ); */
     gt_refresh( s_ioBase );
     return TRUE;
 }

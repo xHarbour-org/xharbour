@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.25 2003/11/23 19:34:54 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.26 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -321,7 +321,7 @@ typedef struct _CDXINDEX
    int      lockWrite;        /* number of write lock set */
    int      lockRead;         /* number of read lock set */
    ULONG    ulLockPos;        /* readlock position for CL53 lock scheme */
-#ifndef HB_CDX_DBGCODE_OFF
+#ifdef HB_CDX_DBGCODE
    BOOL     RdLck;
    BOOL     WrLck;
 #endif

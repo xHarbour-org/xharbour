@@ -1,5 +1,5 @@
 /*
- * $Id: cdpplmaz.c,v 1.2 2003/06/20 13:44:57 druzus Exp $
+ * $Id: cdpplmaz.c,v 1.3 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -84,7 +84,8 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "PLMAZ",NUMBER_OF_CHARACTERS,
+static HB_CODEPAGE s_codepage = { "PLMAZ",
+    CPID_MAZ,UNITB_MAZ,NUMBER_OF_CHARACTERS,
     "AèBCïDEêFGHIJKLúMN•O£PQRSòTUVWXYZ†°","aÜbcçdeëfghijklímn§o¢pqrsûtuvwxyz¶ß",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cdpsliso.c,v 1.1 2003/06/19 22:39:02 druzus Exp $
+ * $Id: cdpsliso.c,v 1.2 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -84,7 +84,8 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "SLISO",NUMBER_OF_CHARACTERS,
+static HB_CODEPAGE s_codepage = { "SLISO",
+    CPID_8859_2,UNITB_8859_2,NUMBER_OF_CHARACTERS,
     "ABCÈÆDÐEFGHIJKLMNOPQRS©TUVWZ®XY","abcèdðefghijklmnopqrs¹tuvwz¾xy",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 

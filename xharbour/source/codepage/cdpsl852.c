@@ -1,5 +1,5 @@
 /*
- * $Id: cdpsl852.c,v 1.1 2003/06/19 22:39:02 druzus Exp $
+ * $Id: cdpsl852.c,v 1.2 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -84,7 +84,8 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "SL852",NUMBER_OF_CHARACTERS,
+static HB_CODEPAGE s_codepage = { "SL852",
+    CPID_852,UNITB_852,NUMBER_OF_CHARACTERS,
     "ABC¨èD—EFGHIJKLMNOPQRSÊTUVWZ¶XY","abcüd–efghijklmnopqrsÁtuvwzßxy",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 

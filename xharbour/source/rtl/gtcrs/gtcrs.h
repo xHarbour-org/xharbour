@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.7 2003/06/26 12:37:09 druzus Exp $
+ * $Id: gtcrs.h,v 1.8 2003/07/23 12:35:57 druzus Exp $
  */
 
 /*
@@ -104,8 +104,6 @@ extern int HB_GT_FUNC(gt_chrmapinit( int *piTransTbl, char *pszTerm ));
 #define CTRL_SEQ	"\036"
 #define ALT_SEQ		"\037"
 //#define NATION_SEQ	"\016"
-
-#define KP_CENTER               332   /* * Keypad 5                      */
 
 #define K_UNDEF  	0x10000
 #define K_METAALT	0x10001

@@ -1,5 +1,5 @@
 /*
- * $Id: cdpesdos.c,v 1.2 2003/06/20 13:44:57 druzus Exp $
+ * $Id: cdpesdos.c,v 1.3 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -75,7 +75,7 @@
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-    a~Ä
+      a~Ä
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -84,7 +84,8 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "ES", NUMBER_OF_CHARACTERS,
+static HB_CODEPAGE s_codepage = { "ES",
+    CPID_850, UNITB_850, NUMBER_OF_CHARACTERS,
     "AµBCDEêFGHI÷JKLMN•O‡PQRSTUÈöVWXYZ", "a†bcdeÇfghi°jklmn§o¢pqrstu£Åvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL, NULL,NULL,NULL,0,NULL };
 

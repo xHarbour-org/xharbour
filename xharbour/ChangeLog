@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2142 2004/01/26 08:36:10 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2143 2004/01/26 09:41:37 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,88 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-26 15:56 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbdefs.h
+    + added [U]LLONG_MAX/MIN support for older GCC version or compilation
+      without g99 flag
+
+  * xharbour/config/linux/gcc.cf
+    - removed g99 flag - I have nothing against GNU99 standard but this
+      flag allows to use some extensions which can make a trouble with
+      porting to other system/compilers so I don't want to set it as
+      default until it won't be strictly necessary for father developing
+
+  * xharbour/contrib/libct/Makefile
+    - setlast.c removed - now is a part of RTL
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * debug code divided into two parts enabled by macros HB_CDX_DBGCODE
+      and HB_CDX_DBGCODE_EXT. First macro doesn't give a big overhead
+      and can be enabled by default, the second slow down very much making
+      deep index structure analyzes. I did this looking for bug in
+      GCC 3.3.2 and -)3 optimization. I've found where the problem was
+      and changed the code to workaround this bug (I think we should inform
+      GCC team about it) but the funny thing was that the enabling old
+      debug code cause to compile dbfcdx.c correctly. Before my wrk.ard.
+      the bug could be seen only with HB_CDX_DBGCODE_EXT without
+      HB_CDX_DBGCODE. Now I'm thinking about Windows and BCC. I'm not
+      BCC user and cannot say much about current Windows version but I
+      remember that old BCC 3.1 has some strange bugs when full optimization
+      is enabled. In some cases I'm sure that some bugs raports on xhb-news
+      cannot appears so I think it could be problem with buggy optimization
+      in this compiler. Maybe I'm wrong but if any of you use DBFCDX with
+      BCC I would like to ask you to test DBFCDX compiled with different
+      debug macro compilation: HB_CDX_DBGCODE & HB_CDX_DBGCODE_EXT,
+      HB_CDX_DBGCODE, HB_CDX_DBGCODE_EXT
+
+  * xharbour/include/inkey.ch
+    + KP_CENTER definition added
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+    * use KP_CENTER instead of 332
+
+  * xharbour/include/hbapicdp.h
+  * xharbour/source/rtl/cdpapi.c
+  * xharbour/source/codepage/Makefile
+  * xharbour/source/codepage/cdp_tpl.c
+  * xharbour/source/codepage/cdpesdos.c
+  * xharbour/source/codepage/cdpeswin.c
+  * xharbour/source/codepage/cdpgedos.c
+  * xharbour/source/codepage/cdpgewin.c
+  * xharbour/source/codepage/cdphr1250.c
+  * xharbour/source/codepage/cdphr852.c
+  * xharbour/source/codepage/cdpltwin.c
+  * xharbour/source/codepage/cdppl852.c
+  * xharbour/source/codepage/cdppliso.c
+  * xharbour/source/codepage/cdpplmaz.c
+  * xharbour/source/codepage/cdpplwin.c
+  * xharbour/source/codepage/cdppt850.c
+  * xharbour/source/codepage/cdpptiso.c
+  * xharbour/source/codepage/cdpru866.c
+  * xharbour/source/codepage/cdprukoi.c
+  * xharbour/source/codepage/cdpruwin.c
+  * xharbour/source/codepage/cdpsl852.c
+  * xharbour/source/codepage/cdpsliso.c
+  * xharbour/source/codepage/cdpslwin.c
+  * xharbour/source/codepage/cdpsrwin.c
+  + xharbour/source/codepage/uc1250.c
+  + xharbour/source/codepage/uc1251.c
+  + xharbour/source/codepage/uc1257.c
+  + xharbour/source/codepage/uc437.c
+  + xharbour/source/codepage/uc850.c
+  + xharbour/source/codepage/uc852.c
+  + xharbour/source/codepage/uc866.c
+  + xharbour/source/codepage/uc8859_1.c
+  + xharbour/source/codepage/uc8859_2.c
+  + xharbour/source/codepage/uckoi8.c
+  + xharbour/source/codepage/ucmaz.c
+    + basic unicode support for curently defined code pages
+
+  * xharbour/source/rdd/dbf1.c
+    * tabs replaced by spaces
 
 2004-01-26 04:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * contrib/libct/makefile.bc

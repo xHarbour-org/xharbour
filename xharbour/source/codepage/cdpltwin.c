@@ -1,5 +1,5 @@
 /*
- * $Id: cdpltwin.c,v 1.1 2003/11/06 23:42:47 ronpinkas Exp $
+ * $Id: cdpltwin.c,v 1.2 2003/11/11 20:20:53 ronpinkas Exp $
  */
 
 /*
@@ -85,7 +85,8 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "LT",NUMBER_OF_CHARACTERS,
+static HB_CODEPAGE s_codepage = { "LT",
+    CPID_1257,UNITB_1257,NUMBER_OF_CHARACTERS,
     "AÀBCÈDEÆËFGHIÁYJKLMNOPQRSÐTUØÛVWXZÞ","aàbcèdeæëfghiáyjklmnopqrsðtuøûvwxzþ",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 

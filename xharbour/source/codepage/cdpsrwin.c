@@ -1,5 +1,5 @@
 /*
- * $Id: cdpsrwin.c,v 1.2 2003/05/27 14:02:07 druzus Exp $
+ * $Id: cdpsrwin.c,v 1.3 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,8 @@
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-static HB_CODEPAGE s_codepage = { "SRWIN",32,
+static HB_CODEPAGE s_codepage = { "SRWIN",
+    CPID_1251,UNITB_1251,32,
     "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞ‗","אבגדהוזחטיךכלםמןנסעףפץצקרשתûü‎‏ÿ",
     0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 

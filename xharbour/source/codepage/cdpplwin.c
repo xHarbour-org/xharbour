@@ -1,5 +1,5 @@
 /*
- * $Id: cdpplwin.c,v 1.3 2003/06/20 13:44:57 druzus Exp $
+ * $Id: cdpplwin.c,v 1.4 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -84,7 +84,8 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "PLWIN",NUMBER_OF_CHARACTERS,
+static HB_CODEPAGE s_codepage = { "PLWIN",
+    CPID_1250,UNITB_1250,NUMBER_OF_CHARACTERS,
     "A•BC∆DE FGHIJKL£MN—O”PQRSåTUVWXYZèØ","aπbcÊdeÍfghijkl≥mnÒoÛpqrsútuvwxyzüø",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 

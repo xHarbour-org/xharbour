@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.ch,v 1.17 2001/04/28 02:30:52 dholm Exp $
+ * $Id: inkey.ch,v 1.1.1.1 2001/12/21 10:47:26 ronpinkas Exp $
  */
 
 /*
@@ -135,6 +135,8 @@
 #define K_ALT_ESC               257   /* * Alt-Esc                       */
 
 /* Keypad keys */
+
+#define KP_CENTER               332   /* * Keypad 5                      */
 
 #define KP_ALT_ENTER            422   /* * Keypad Alt-Enter              */
 

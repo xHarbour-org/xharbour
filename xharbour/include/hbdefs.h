@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.23 2003/12/03 13:01:20 mauriliolongo Exp $
+ * $Id: hbdefs.h,v 1.24 2004/01/21 13:37:59 walito Exp $
  */
 
 /*
@@ -151,13 +151,31 @@
 
 #ifndef HB_LONG_LONG_OFF
    #ifndef __GNUC__
-      #define LONGLONG_MIN         _I64_MIN
-      #define LONGLONG_MAX         _I64_MAX
-      #define ULONGLONG_MAX        _UI64_MAX
+      #define LONGLONG_MIN          _I64_MIN
+      #define LONGLONG_MAX          _I64_MAX
+      #define ULONGLONG_MAX         _UI64_MAX
    #else
-      #define LONGLONG_MIN         LLONG_MIN
-      #define LONGLONG_MAX         LLONG_MAX
-      #define ULONGLONG_MAX        ULLONG_MAX
+      #if defined(ULLONG_MAX)
+         #define ULONGLONG_MAX      ULLONG_MAX
+      #elif defined(ULONG_LONG_MAX)
+         #define ULLONG_MAX         ULONG_LONG_MAX
+      #else
+         #define ULLONG_MAX         (~0ULL)
+      #endif
+      #if defined(LLONG_MAX)
+         #define LONGLONG_MAX       LLONG_MAX
+      #elif defined(LONG_LONG_MAX)
+         #define LLONG_MAX          LONG_LONG_MAX
+      #else
+         #define LLONG_MAX          (ULLONG_MAX>>1)
+      #endif
+      #if defined(LLONG_MIN)
+         #define LONGLONG_MIN       LLONG_MIN
+      #elif defined(LONG_LONG_MIN)
+         #define LLONG_MIN          LONG_LONG_MIN
+      #else
+         #define LLONG_MIN          (-LLONG_MAX - 1LL)
+      #endif
    #endif
 #endif
 

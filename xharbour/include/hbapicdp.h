@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.5 2003/08/18 12:13:46 druzus Exp $
+ * $Id: hbapicdp.h,v 1.6 2003/11/30 12:32:29 druzus Exp $
  */
 
 /*
@@ -62,14 +62,21 @@
 HB_EXTERN_BEGIN
 
 /* This hack is needed to force preprocessing if id is also a macro */
-#define HB_CODEPAGE_REQUEST( id )           HB_CODEPAGE_REQUEST_( id )
-#define HB_CODEPAGE_REQUEST_( id )          extern HB_FUNC( HB_CODEPAGE_##id ); \
-                                        void hb_codepage_ForceLink_##id( void ) \
-                                        { \
-                                           HB_FUNCNAME( HB_CODEPAGE_##id )(); \
-                                        }
+#define HB_CODEPAGE_REQUEST( id )      HB_CODEPAGE_REQUEST_( id )
+#define HB_CODEPAGE_REQUEST_( id )     extern HB_FUNC( HB_CODEPAGE_##id ); \
+                                       void hb_codepage_ForceLink_##id( void ) \
+                                       { \
+                                          HB_FUNCNAME( HB_CODEPAGE_##id )(); \
+                                       }
+#define HB_CODEPAGE_ANNOUNCE( id )     HB_FUNC( HB_CODEPAGE_##id ) {}
 
-#define HB_CODEPAGE_ANNOUNCE( id )          HB_FUNC( HB_CODEPAGE_##id ) {}
+typedef struct _HB_UNITABLE
+{
+   char     *uniID;
+   int      nChars;
+   BOOL     lMulti;
+   USHORT   *uniCodes;
+} HB_UNITABLE, * PHB_UNITABLE;
 
 typedef struct _HB_MULTICHAR
 {
@@ -80,21 +87,23 @@ typedef struct _HB_MULTICHAR
 
 typedef struct _HB_CODEPAGE
 {
-   char *id;
-   int   nChars;
-   char *CharsUpper;
-   char *CharsLower;
-   BOOL  lLatin;
-   BOOL  lAccEqual;
-   BOOL  lAccInterleave;
-   BOOL  lSort;
-   BYTE *s_chars;
-   BYTE *s_upper;
-   BYTE *s_lower;
-   BYTE *s_accent;
-   int   nMulti;
+   char *        id;
+   char *        uniID;
+   PHB_UNITABLE  uniTable;
+   int           nChars;
+   char *        CharsUpper;
+   char *        CharsLower;
+   BOOL          lLatin;
+   BOOL          lAccEqual;
+   BOOL          lAccInterleave;
+   BOOL          lSort;
+   BYTE *        s_chars;
+   BYTE *        s_upper;
+   BYTE *        s_lower;
+   BYTE *        s_accent;
+   int           nMulti;
    PHB_MULTICHAR multi;
-} HB_CODEPAGE, * PHB_CODEPAGE;
+} HB_CODEPAGE, *PHB_CODEPAGE;
 
 extern BOOL HB_EXPORT hb_cdpRegister( PHB_CODEPAGE );
 extern char HB_EXPORT * hb_cdpSelectID( char * );
@@ -104,6 +113,46 @@ extern void HB_EXPORT hb_cdpTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE );
 extern void HB_EXPORT hb_cdpnTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE, unsigned int );
 extern int HB_EXPORT hb_cdpcmp( char*, char*, ULONG, PHB_CODEPAGE, ULONG* );
 extern int HB_EXPORT hb_cdpchrcmp( char, char, PHB_CODEPAGE );
+
+extern USHORT HB_EXPORT hb_cdpGetU16( PHB_CODEPAGE, BYTE );
+extern ULONG HB_EXPORT hb_cdpStrnToUTF( PHB_CODEPAGE, BYTE*, ULONG, BYTE* );
+extern ULONG HB_EXPORT hb_cdpStrnToU16( PHB_CODEPAGE, BYTE*, ULONG, BYTE* );
+
+#define CPID_437     "cp437"
+#define CPID_850     "cp850"
+#define CPID_852     "cp852"
+#define CPID_866     "cp866"
+#define CPID_1250    "cp1250"
+#define CPID_1251    "cp1251"
+#define CPID_1257    "cp1257"
+#define CPID_8859_1  "iso8859-1"
+#define CPID_8859_2  "iso8859-2"
+#define CPID_KOI_8   "koi-8"
+#define CPID_MAZ     "plmaz"
+#define UNITB_437    &hb_uniTbl_437
+#define UNITB_850    &hb_uniTbl_850
+#define UNITB_852    &hb_uniTbl_852
+#define UNITB_866    &hb_uniTbl_866
+#define UNITB_1250   &hb_uniTbl_1250
+#define UNITB_1251   &hb_uniTbl_1251
+#define UNITB_1257   &hb_uniTbl_1257
+#define UNITB_8859_1 &hb_uniTbl_8859_1
+#define UNITB_8859_2 &hb_uniTbl_8859_2
+#define UNITB_KOI_8  &hb_uniTbl_KOI_8
+#define UNITB_MAZ    &hb_uniTbl_mazovia
+#define UNITB_UNDEF  ((PHB_UNITABLE) (-1))
+
+extern HB_UNITABLE hb_uniTbl_437;
+extern HB_UNITABLE hb_uniTbl_850;
+extern HB_UNITABLE hb_uniTbl_852;
+extern HB_UNITABLE hb_uniTbl_866;
+extern HB_UNITABLE hb_uniTbl_1250;
+extern HB_UNITABLE hb_uniTbl_1251;
+extern HB_UNITABLE hb_uniTbl_1257;
+extern HB_UNITABLE hb_uniTbl_8859_1;
+extern HB_UNITABLE hb_uniTbl_8859_2;
+extern HB_UNITABLE hb_uniTbl_KOI_8;
+extern HB_UNITABLE hb_uniTbl_mazovia;
 
 HB_EXTERN_END
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cdppt850.c,v 1.2 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: cdppt850.c,v 1.3 2003/07/16 17:03:04 druzus Exp $
  */
 
 /*
@@ -85,7 +85,8 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "PT850",NUMBER_OF_CHARACTERS,
+static HB_CODEPAGE s_codepage = { "PT850",
+    CPID_850,UNITB_850,NUMBER_OF_CHARACTERS,
     "Aµ∑∂«éBCÄDEê‘“FGHI÷ﬁ◊ÿJKLMN•O‡„‚ÂôPQRSTUÈÎÍöVWXYZ","a†ÖÉ∆ÑbcádeÇäàfghi°çåãjklmn§o¢ïì‰îpqrstu£óñÅvwxyz",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 

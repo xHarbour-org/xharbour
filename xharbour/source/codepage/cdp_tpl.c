@@ -1,5 +1,5 @@
 /*
- * $Id: cdp_tpl.c,v 1.1 2003/05/16 19:52:06 druzus Exp $
+ * $Id: cdp_tpl.c,v 1.2 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -83,7 +83,8 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "EN",NUMBER_OF_CHARACTERS,
+static HB_CODEPAGE s_codepage = { "EN",
+    CPID_437,UNITB_437,NUMBER_OF_CHARACTERS,
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
@@ -95,4 +96,3 @@ HB_CALL_ON_STARTUP_END( hb_codepage_Init_EN )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
    #pragma startup hb_codepage_Init_EN
 #endif
-

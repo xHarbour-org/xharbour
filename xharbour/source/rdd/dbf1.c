@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.50 2004/01/11 14:03:39 andijahja Exp $
+ * $Id: dbf1.c,v 1.51 2004/01/23 14:45:00 andijahja Exp $
  */
 
 /*
@@ -2524,9 +2524,9 @@ static ERRCODE hb_dbfRawLock( DBFAREAP pArea, USHORT uiAction, ULONG ulRecNo )
             if( !pArea->fHeaderLocked )
             {
                do
-							 {
-									fLck = hb_fsLock( pArea->hDataFile, ulPos, 1, FL_LOCK | FLX_WAIT );
-							 } while ( !fLck );
+               {
+                  fLck = hb_fsLock( pArea->hDataFile, ulPos, 1, FL_LOCK | FLX_WAIT );
+               } while ( !fLck );
                if( !fLck )
                   uiErr = FAILURE;
                else
