@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.89 2004/03/10 13:50:44 andijahja Exp $
+ * $Id: dbcmd.c,v 1.90 2004/03/10 22:12:52 andijahja Exp $
  */
 
 /*
@@ -5155,6 +5155,8 @@ HB_FUNC( DBF2TEXT )
    BOOL bEof = TRUE;
    BOOL bBof = TRUE;
 
+   BOOL bNoFieldPassed = ( pFields == NULL || pFields->item.asArray.value->ulLen == 0 ) ;
+
    SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields );
 
    Tmp.type = HB_IT_NIL;
@@ -5171,7 +5173,7 @@ HB_FUNC( DBF2TEXT )
 
       if ( hb___Eval ( pFor ) )
       {
-         if ( pFields == NULL || pFields->item.asArray.value->ulLen == 0 )
+         if ( bNoFieldPassed )
          {
             for ( ui = 1; ui <= uiFields; ui ++ )
             {
