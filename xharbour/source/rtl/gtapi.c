@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.22 2004/02/06 17:07:28 jonnymind Exp $
+ * $Id: gtapi.c,v 1.23 2004/02/06 18:12:59 jonnymind Exp $
  */
 
 /*
@@ -1455,17 +1455,17 @@ void HB_EXPORT hb_gt_hasChanged( int status )
 /******************************************************************/
 void HB_EXPORT hb_gtGetClipboard( char *szData, ULONG *pulMaxSize )
 {
-   HB_GT_FUNC( gt_GetClipboard( szData, pulMaxSize ) );
+   hb_gt_GetClipboard( szData, pulMaxSize );
 }
 
 void HB_EXPORT hb_gtSetClipboard( char *szData, ULONG ulSize )
 {
-   HB_GT_FUNC(gt_SetClipboard( szData, ulSize ) );
+   hb_gt_SetClipboard( szData, ulSize );
 }
 
 ULONG HB_EXPORT hb_gtGetClipboardSize( void )
 {
-   return HB_GT_FUNC(gt_GetClipboardSize());
+   return hb_gt_GetClipboardSize();
 }
 
 void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize )

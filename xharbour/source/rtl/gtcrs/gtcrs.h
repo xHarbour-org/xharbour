@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.8 2003/07/23 12:35:57 druzus Exp $
+ * $Id: gtcrs.h,v 1.9 2004/01/26 15:00:53 druzus Exp $
  */
 
 /*
@@ -69,6 +69,46 @@
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
 extern PHB_CODEPAGE s_cdpage;
+#endif
+
+#ifdef HB_NCURSES_194
+#  include <ncur194/curses.h>
+   extern int tigetflag(char *);
+   extern int tigetnum(char *);
+   extern char *tigetstr(char *);
+/*
+#  include <ncur194/term.h>
+*/
+#else
+#  include <curses.h>
+/*
+#  include <term.h>
+*/
+#endif
+#ifdef HAVE_GPM_H
+# include <gpm.h>
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <errno.h>
+#include <unistd.h>
+#include <termios.h>
+#include <fcntl.h>
+#include <time.h>
+#if defined( HB_OS_LINUX ) || defined( HB_OS_BSD )
+# if defined( HB_OS_LINUX )
+#  include <pty.h>  /* for openpty and forkpty */
+# elif defined( HB_OS_BSD )
+#  include <libutil.h> /* for openpty and forkpty */
+# endif
+# include <utmp.h> /* for login_tty */
 #endif
 
 #ifndef _POSIX_PATH_MAX

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2233 2004/02/07 03:11:12 andijahja Exp $
+ * $Id: ChangeLog,v 1.2234 2004/02/07 06:23:41 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-07 12:20 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rtl/gtcrs/Makefile
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+  * xharbour/source/rtl/gtcrs/chrmap.c
+  * xharbour/bin/hb-func.sh
+    * added support to older version of ncurses 1.94 (the same one used
+      by FlagShip)
+
+  * xharbour/source/rtl/gtapi.c
+  * xharbour/source/rtl/gtnul/gtnul.c
+    * fixed Clipboard function declaration
+
+Just small info about adding new functions into GT because all time
+I have to fix sth.
+1. HB_GT_FUNC() can be used only inside gt* driver
+2. add <newFunc> into HB_GT_FUNCS structure
+3. add function HB_GT_FUNC(gt_<newFunc>(...)) into GTNUL in dummy
+   or basic version.
+4. add wrapper for multi GT mode into GTNUL
+    [...] hb_gt_<newFunc>(...)
+    {
+	[return] GT_FUNCS.<newFunc>(...);
+    }
+5. Now it's safe to use hb_gt_<newFunc>(...) function in MULTI_GT mode
+   for all GT
+6. implement this function in other GT if you want,
+   if you will do that the function can be used in non MULTI_GT mode too.
+7. If you don't have enough time/knowlage/... to implement function
+   in all GT add upper level implementation which use hb_gt_<newFunc>(...)
+   into rtl/gtnul/gtext.c. It cause that this function will not be used
+   in single GT mode\ and you don't break anything.
 
 2004-02-07 00:21 UTC-0600 Vicente Guerra <vic@guerra.com.mx>
   * source/rdd/dbf1.c

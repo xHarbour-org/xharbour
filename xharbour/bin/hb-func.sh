@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: hb-func.sh,v 1.10 2004/01/28 04:14:33 maurifull Exp $
+# $Id: hb-func.sh,v 1.11 2004/01/30 02:06:31 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -77,7 +77,12 @@ mk_hbtools()
     if [ "${HB_COMPILER}" = "mingw32" ]; then
 	HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lgdi32 -lcomctl32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
     else
-        HB_SYS_LIBS="${HB_SYS_LIBS} -lncurses -lslang -lgpm"
+	if [ "${HB_NCURSES_194}" = "yes" ]; then
+            HB_SYS_LIBS="${HB_SYS_LIBS} -lncur194"
+	else
+            HB_SYS_LIBS="${HB_SYS_LIBS} -lncurses"
+	fi
+        HB_SYS_LIBS="${HB_SYS_LIBS} -lslang -lgpm"
         HB_SYS_LIBS="${HB_SYS_LIBS} -L/usr/X11R6/lib -lX11"
     fi
 

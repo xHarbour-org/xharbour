@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.17 2004/02/03 18:06:21 ronpinkas Exp $
+ * $Id: gtnul.c,v 1.18 2004/02/06 17:07:29 jonnymind Exp $
  */
 
 /*
@@ -95,7 +95,7 @@ static int s_iKeyRet = 13;
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 static char *s_clipboard = NULL;
-static int s_clipsize = 0;
+static ULONG s_clipsize = 0;
 
 /* ********************************************************************** */
 
@@ -610,6 +610,55 @@ void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int 
    HB_SYMBOL_UNUSED( piRight );
 }
 
+/* ************************** Clipboard support ********************************** */
+
+void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+{
+   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   {
+      *pulMaxSize = s_clipsize;
+   }
+
+   if ( *pulMaxSize != 0 )
+   {
+      memcpy( szData, s_clipboard, *pulMaxSize );
+   }
+
+}
+
+void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+{
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+
+   s_clipboard = (char *) hb_xgrab( ulSize +1 );
+   memcpy( s_clipboard, szData, ulSize );
+   s_clipboard[ ulSize ] = '\0';
+   s_clipsize = ulSize;
+}
+
+ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+{
+   return s_clipsize;
+}
+
+int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
+{
+   HB_SYMBOL_UNUSED( bUpdate );
+   HB_SYMBOL_UNUSED( iParam );
+   HB_SYMBOL_UNUSED( vpParam );
+
+   switch ( iMsgType )
+   {
+      case GTI_ISGRAPHIC:
+      return (int) FALSE;
+   }
+   // DEFAULT: there's something wrong if we are here.
+   return -1;
+}
+
 /* ********************************************************************** */
 
 void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
@@ -920,54 +969,21 @@ void hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRigh
     GT_FUNCS.mouse_GetBounds( piTop, piLeft, piBottom, piRight );
 }
 
-int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
+void hb_gt_GetClipboard( char *szData, ULONG *pulMaxSize )
 {
-   HB_SYMBOL_UNUSED( bUpdate );
-   HB_SYMBOL_UNUSED( iParam );
-   HB_SYMBOL_UNUSED( vpParam );
-
-   switch ( iMsgType )
-   {
-      case GTI_ISGRAPHIC:
-      return (int) FALSE;
-   }
-   // DEFAULT: there's something wrong if we are here.
-   return -1;
+    GT_FUNCS.GetClipboard( szData, pulMaxSize );
 }
 
-/* ************************** Clipboard support ********************************** */
-
-void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+void hb_gt_SetClipboard( char *szData, ULONG ulSize )
 {
-   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
-   {
-      *pulMaxSize = s_clipsize;
-   }
-
-   if ( *pulMaxSize != 0 )
-   {
-      memcpy( szData, s_clipboard, *pulMaxSize );
-   }
-
+    GT_FUNCS.SetClipboard( szData, ulSize );
 }
 
-void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+ULONG hb_gt_GetClipboardSize( void )
 {
-   if ( s_clipboard != NULL )
-   {
-      hb_xfree( s_clipboard );
-   }
-
-   s_clipboard = (char *) hb_xgrab( ulSize +1 );
-   memcpy( s_clipboard, szData, ulSize );
-   s_clipboard[ ulSize ] = '\0';
-   s_clipsize = ulSize;
+   return GT_FUNCS.GetClipboardSize();
 }
 
-ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
-{
-   return s_clipsize;
-}
 
 /* ********************************************************************** */
 

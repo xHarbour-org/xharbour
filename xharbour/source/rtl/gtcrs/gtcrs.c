@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.30 2004/02/01 23:40:50 jonnymind Exp $
+ * $Id: gtcrs.c,v 1.31 2004/02/06 17:07:29 jonnymind Exp $
  */
 
 /*
@@ -59,33 +59,6 @@
 /* *********************************************************************** */
 
 #include "gtcrs.h"
-#include "inkey.ch"
-#include "setcurs.ch"
-
-#include <curses.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/time.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <signal.h>
-#include <errno.h>
-#include <unistd.h>
-#include <termios.h>
-#include <fcntl.h>
-#include <time.h>
-#ifdef HAVE_GPM_H
-# include <gpm.h>
-#endif
-#if defined( HB_OS_LINUX ) || defined( HB_OS_BSD )
-# if defined( HB_OS_LINUX )
-#  include <pty.h>  /* for openpty and forkpty */
-# elif defined( HB_OS_BSD )
-#  include <libutil.h> /* for openpty and forkpty */
-# endif
-# include <utmp.h> /* for login_tty */
-#endif
 
 /* this variable should be global and checked in main VM loop */
 static volatile BOOL s_BreakFlag = FALSE;
@@ -99,7 +72,7 @@ static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 /* Clipboard management */
 static char *s_clipboard = NULL;
-static int s_clipsize = 0;
+static ULONG s_clipsize = 0;
 
 typedef struct evtFD {
     int fd;
@@ -112,7 +85,7 @@ typedef struct evtFD {
 typedef struct mouseEvent {
     int row, col;
     int lrow, lcol;
-    int buttons;
+    int buttonstate;
     int lbuttons;
     int lbup_row, lbup_col;
     int lbdn_row, lbdn_col;
@@ -153,7 +126,7 @@ typedef struct InOutBase {
     int is_color;
     unsigned int disp_count;
 
-    unsigned char *acsc, *bell, *flash, *civis, *cnorm, *cvvis;
+    unsigned char *acsc, *beep, *flash, *civis, *cnorm, *cvvis;
 
     int is_mouse;
     int mButtons;
@@ -918,37 +891,37 @@ static int getMouseKey(mouseEvent *mEvt)
 	nKey = K_MOUSEMOVE;
 	mEvt->lrow = mEvt->row;
 	mEvt->lcol = mEvt->col;
-    } else if (mEvt->lbuttons != mEvt->buttons) {
-	int butt = mEvt->lbuttons ^ mEvt->buttons;
+    } else if (mEvt->lbuttons != mEvt->buttonstate) {
+	int butt = mEvt->lbuttons ^ mEvt->buttonstate;
 
 	if (butt & M_BUTTON_LEFT) {
-	    if (mEvt->buttons & M_BUTTON_LEFT) {
+	    if (mEvt->buttonstate & M_BUTTON_LEFT) {
 		mEvt->lbdn_row = mEvt->row;
 		mEvt->lbdn_col = mEvt->col;
 	    } else {
 		mEvt->lbup_row = mEvt->row;
 		mEvt->lbup_col = mEvt->col;
 	    }
-	    nKey = (mEvt->buttons & M_BUTTON_LEFT) ?
-			((mEvt->buttons & M_BUTTON_LDBLCK) ? K_LDBLCLK :
+	    nKey = (mEvt->buttonstate & M_BUTTON_LEFT) ?
+			((mEvt->buttonstate & M_BUTTON_LDBLCK) ? K_LDBLCLK :
 			    K_LBUTTONDOWN) : K_LBUTTONUP;
 	    mEvt->lbuttons ^= M_BUTTON_LEFT;
-	    mEvt->buttons &= ~M_BUTTON_LDBLCK;
+	    mEvt->buttonstate &= ~M_BUTTON_LDBLCK;
 	} else if (butt & M_BUTTON_RIGHT) {
-	    if (mEvt->buttons & M_BUTTON_RIGHT) {
+	    if (mEvt->buttonstate & M_BUTTON_RIGHT) {
 		mEvt->rbdn_row = mEvt->row;
 		mEvt->rbdn_col = mEvt->col;
 	    } else {
 		mEvt->rbup_row = mEvt->row;
 		mEvt->rbup_col = mEvt->col;
 	    }
-	    nKey = (mEvt->buttons & M_BUTTON_RIGHT) ?
-			((mEvt->buttons & M_BUTTON_RDBLCK) ? K_RDBLCLK :
+	    nKey = (mEvt->buttonstate & M_BUTTON_RIGHT) ?
+			((mEvt->buttonstate & M_BUTTON_RDBLCK) ? K_RDBLCLK :
 			    K_RBUTTONDOWN) : K_RBUTTONUP;
 	    mEvt->lbuttons ^= M_BUTTON_RIGHT;
-	    mEvt->buttons &= ~M_BUTTON_RDBLCK;
+	    mEvt->buttonstate &= ~M_BUTTON_RDBLCK;
 	} else if (butt & M_BUTTON_MIDDLE) {
-	    if (mEvt->buttons & M_BUTTON_MIDDLE) {
+	    if (mEvt->buttonstate & M_BUTTON_MIDDLE) {
 		mEvt->mbdn_row = mEvt->row;
 		mEvt->mbdn_col = mEvt->col;
 	    } else {
@@ -956,9 +929,9 @@ static int getMouseKey(mouseEvent *mEvt)
 		mEvt->mbup_col = mEvt->col;
 	    }
 	    mEvt->lbuttons ^= M_BUTTON_MIDDLE;
-	    mEvt->buttons &= ~M_BUTTON_MIDDLE;
+	    mEvt->buttonstate &= ~M_BUTTON_MIDDLE;
 	} else
-	    mEvt->lbuttons = mEvt->buttons;
+	    mEvt->lbuttons = mEvt->buttonstate;
     }
 
     return nKey;
@@ -966,27 +939,27 @@ static int getMouseKey(mouseEvent *mEvt)
 
 static void chk_mevtdblck(mouseEvent *mEvt)
 {
-    if (mEvt->lbuttons != mEvt->buttons) {
+    if (mEvt->lbuttons != mEvt->buttonstate) {
 	struct timeval tv;
 
 	TIMEVAL_GET(tv);
 
-	if (mEvt->buttons & M_BUTTON_LEFT &&
+	if (mEvt->buttonstate & M_BUTTON_LEFT &&
 	    ~(mEvt->lbuttons & M_BUTTON_LEFT)) {
 	    if (TIMEVAL_LESS(tv, mEvt->BL_time))
-		mEvt->buttons |= M_BUTTON_LDBLCK;
+		mEvt->buttonstate |= M_BUTTON_LDBLCK;
 	    TIMEVAL_ADD(mEvt->BL_time, tv, mEvt->click_delay);
 	}
-	if (mEvt->buttons & M_BUTTON_MIDDLE &&
+	if (mEvt->buttonstate & M_BUTTON_MIDDLE &&
 	    ~(mEvt->lbuttons & M_BUTTON_MIDDLE)) {
 	    if (TIMEVAL_LESS(tv, mEvt->BM_time))
-		mEvt->buttons |= M_BUTTON_MDBLCK;
+		mEvt->buttonstate |= M_BUTTON_MDBLCK;
 	    TIMEVAL_ADD(mEvt->BM_time, tv, mEvt->click_delay);
 	}
-	if (mEvt->buttons & M_BUTTON_RIGHT &&
+	if (mEvt->buttonstate & M_BUTTON_RIGHT &&
 	    ~(mEvt->lbuttons & M_BUTTON_RIGHT)) {
 	    if (TIMEVAL_LESS(tv, mEvt->BR_time))
-		mEvt->buttons |= M_BUTTON_RDBLCK;
+		mEvt->buttonstate |= M_BUTTON_RDBLCK;
 	    TIMEVAL_ADD(mEvt->BR_time, tv, mEvt->click_delay);
 	}
     }
@@ -995,10 +968,10 @@ static void chk_mevtdblck(mouseEvent *mEvt)
 static void set_tmevt(char *cMBuf, mouseEvent *mEvt)
 {
     switch (cMBuf[0] & 0x3) {
-	case 0x0:	mEvt->buttons |= M_BUTTON_LEFT; break;
-	case 0x1:	mEvt->buttons |= M_BUTTON_MIDDLE; break;
-	case 0x2:	mEvt->buttons |= M_BUTTON_RIGHT; break;
-	case 0x3:	mEvt->buttons = 0; break;
+	case 0x0:	mEvt->buttonstate |= M_BUTTON_LEFT; break;
+	case 0x1:	mEvt->buttonstate |= M_BUTTON_MIDDLE; break;
+	case 0x2:	mEvt->buttonstate |= M_BUTTON_RIGHT; break;
+	case 0x3:	mEvt->buttonstate = 0; break;
     }
     mEvt->col = cMBuf[1] - 33;
     mEvt->row = cMBuf[2] - 33;
@@ -1024,18 +997,18 @@ static int set_gpmevt(int fd, int mode, void *data )
         mEvt->col = gEvt.x;
 	if( gEvt.type & GPM_DOWN ) {
 	    if (gEvt.buttons & GPM_B_LEFT)
-		mEvt->buttons |= M_BUTTON_LEFT;
+		mEvt->buttonstate |= M_BUTTON_LEFT;
 	    if (gEvt.buttons & GPM_B_MIDDLE)
-		mEvt->buttons |= M_BUTTON_MIDDLE;
+		mEvt->buttonstate |= M_BUTTON_MIDDLE;
 	    if (gEvt.buttons & GPM_B_RIGHT)
-		mEvt->buttons |= M_BUTTON_RIGHT;
+		mEvt->buttonstate |= M_BUTTON_RIGHT;
 	} else if( gEvt.type & GPM_UP ) {
 	    if (gEvt.buttons & GPM_B_LEFT)
-		mEvt->buttons &= ~M_BUTTON_LEFT;
+		mEvt->buttonstate &= ~M_BUTTON_LEFT;
 	    if (gEvt.buttons & GPM_B_MIDDLE)
-		mEvt->buttons &= ~M_BUTTON_MIDDLE;
+		mEvt->buttonstate &= ~M_BUTTON_MIDDLE;
 	    if (gEvt.buttons & GPM_B_RIGHT)
-		mEvt->buttons &= ~M_BUTTON_RIGHT;
+		mEvt->buttonstate &= ~M_BUTTON_RIGHT;
 	}
     }
     chk_mevtdblck(mEvt);
@@ -1479,17 +1452,17 @@ static void gt_tone(InOutBase *ioBase, double dFrequency, double dDuration)
 {
     char escseq[ 64 ];
 
-    if( ioBase->terminal_type == TERM_LINUX && ioBase->bell != NULL ) {
+    if( ioBase->terminal_type == TERM_LINUX && ioBase->beep != NULL ) {
         snprintf( escseq, sizeof(escseq) - 1, "\033[10;%hd]\033[11;%hd]%s",
                           (int) dFrequency,
                           (int)(dDuration * 1000.0 / 18.2),
-                          ioBase->bell );
+                          ioBase->beep );
 	escseq[ sizeof(escseq) - 1 ] = '\0';
 	write_ttyseq(ioBase, escseq);
     } else
 	/* curses beep() */
-	if ( ioBase->bell != NULL )
-	    write_ttyseq(ioBase, ioBase->bell);
+	if ( ioBase->beep != NULL )
+	    write_ttyseq(ioBase, ioBase->beep);
 	else if ( ioBase->flash != NULL )
 	    write_ttyseq(ioBase, ioBase->flash);
 }
@@ -1720,7 +1693,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 	    ioBase->terminal_type = TERM_LINUX;
 	else if (strstr( term, "xterm" ) != NULL ||
 	         strncmp( term, "rxvt", 4 ) == 0 ||
-		 strncmp( term, "putty", 4 ) == 0)
+		 strstr( term, "putty" ) == 0)
 	    ioBase->terminal_type = TERM_XTERM;
 
 	if ( (ptr = strchr( term, '/' )) != NULL )
@@ -1782,8 +1755,10 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 
 
     /* curses screen initialization */
-    /* initscr(); */
     ioBase->basescr = newterm(crsterm, ioBase->baseout, ioBase->basein);
+    //def_shell_mode();
+    //def_prog_mode();
+    curs_wrkaround();
 
     if ( ioBase->basescr == NULL ) {
 	destroy_ioBase(ioBase);
@@ -1793,7 +1768,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
     ioBase->stdscr = stdscr;
 
     ioBase->flash = tiGetS("flash");
-    ioBase->bell  = tiGetS("bel");
+    ioBase->beep  = tiGetS("bel");
     ioBase->civis = tiGetS("civis");
     ioBase->cnorm = tiGetS("cnorm");
     ioBase->cvvis = tiGetS("cvvis");
@@ -1887,23 +1862,29 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 
     getmaxyx( ioBase->stdscr, ioBase->maxrow, ioBase->maxcol );
     scrollok( ioBase->stdscr, FALSE );
+/*
     idlok( ioBase->stdscr, FALSE );
     idcok( ioBase->stdscr, FALSE );
-    curs_wrkaround();
-    wbkgdset( ioBase->stdscr, ' ' ); //| ioBase->attr_map[ 7 ] );
-    wclear( ioBase->stdscr );
-    wrefresh( ioBase->stdscr );
-    /* curs_set( 0 ); */
+    leaveok( ioBase->stdscr, FALSE );
+*/
 
-    /* curses keyboard initialization */
-    /* we have our own keyboard routine so it's unnecessary now */
-/*
+    /*
+     * curses keyboard initialization
+     * we have our own keyboard routine so it's unnecessary now
+     * but we call raw() to inform some versions of curses that
+     * there is no OPOST translation
+     */
     raw();
-    nodelay( stdscr, TRUE);
-    keypad( stdscr, FALSE);
+/*
+    nonl();
+    nodelay( ioBase->stdscr, TRUE);
+    keypad( ioBase->stdscr, FALSE);
     timeout( 0 );
     noecho();
+    curs_set( 0 );
 */
+    wclear( ioBase->stdscr );
+    wrefresh( ioBase->stdscr );
 
     gt_ttyset( ioBase );
     add_efds(ioBase, ioBase->base_infd, O_RDONLY, NULL, NULL);
@@ -2413,6 +2394,7 @@ BOOL HB_GT_FUNC(gt_Resume( void ))
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_Resume()"));
 
+    s_ioBase->lcursor = SC_UNDEF;
     wrefresh( s_ioBase->stdscr );
     gt_ttyset( s_ioBase );
     /* redrawwin( s_ioBase->stdscr ); */
@@ -2459,7 +2441,7 @@ void HB_GT_FUNC(gt_GetText( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT
 
     while( uiTop <= uiBottom )
     {
-        for( col = uiLeft; col <= uiRight; col++, pBuffer++)
+        for( col = uiLeft; (USHORT) col <= uiRight; col++, pBuffer++)
             *pBuffer = mvwinch( s_ioBase->stdscr, uiTop, col );
         ++uiTop;
     }
@@ -2470,14 +2452,19 @@ void HB_GT_FUNC(gt_GetText( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT
 void HB_GT_FUNC(gt_PutText( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE * pbySrc ))
 {
     int cols;
+    USHORT maxcol;
     chtype * pBuffer = ( chtype * ) pbySrc;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, uiBottom, uiRight, pbySrc));
 
     cols = uiRight - uiLeft + 1;
+    maxcol = HB_GT_FUNC(gt_GetScreenWidth()) - uiLeft;
+    if ( maxcol > cols )
+        maxcol = cols;
+
     while( uiTop <= uiBottom )
     {
-        mvwaddchnstr( s_ioBase->stdscr, uiTop, uiLeft, pBuffer, cols );
+        mvwaddchnstr( s_ioBase->stdscr, uiTop, uiLeft, pBuffer, maxcol );
         pBuffer += cols;
         ++uiTop;
     }
@@ -2493,6 +2480,14 @@ void HB_GT_FUNC(gt_SetAttribute( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, U
     chtype c;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d)", uiTop, uiLeft, uiBottom, uiRight, (int) byAttr));
+
+    dx = HB_GT_FUNC(gt_GetScreenWidth());
+    if ( uiRight >= dx )
+        uiRight = dx - 1;
+
+    dx = HB_GT_FUNC(gt_GetScreenHeight());
+    if ( uiBottom >= dx )
+        uiBottom = dx - 1;
 
     while( uiTop <= uiBottom )
     {
@@ -2525,7 +2520,7 @@ void HB_GT_FUNC(gt_Puts( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE * pbyStr,
     for( i = 0; i < ulLen; ++i )
         waddch( s_ioBase->stdscr, s_ioBase->std_chmap[ pbyStr[ i ] ] | attr );
 
-    getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col );
+    /* getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col ); */
     gt_refresh( s_ioBase );
 }
 
@@ -2806,7 +2801,7 @@ USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar,
 	while( uCols-- )
             waddch( s_ioBase->stdscr, ch );
 
-        //getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col );
+        /* getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col ); */
         gt_refresh( s_ioBase );
         ret = 0;
     }
@@ -2854,7 +2849,7 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
         while( uRow <= Bottom )
             mvwaddch( s_ioBase->stdscr, uRow++, Col, ch );
 
-        //getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col );
+        /* getyx( s_ioBase->stdscr, s_ioBase->row, s_ioBase->col ); */
         gt_refresh( s_ioBase );
         ret = 0;
     }
@@ -2960,7 +2955,7 @@ BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
     {
         int mask;
         mask = (iButton == 1) ? M_BUTTON_LEFT : M_BUTTON_RIGHT;
-        ret = (s_ioBase->mLastEvt.buttons & mask) != 0;
+        ret = (s_ioBase->mLastEvt.buttonstate & mask) != 0;
     }
 
     return ret;
@@ -3397,8 +3392,8 @@ HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
 
 /* *********************************************************************** */
 
-#if defined(HB_GT_CRS_BCEHACK) && defined(NCURSES_VERSION)
-#include "ncurses/term.h"
+#if defined(HB_GT_CRS_BCEHACK) && defined(NCURSES_VERSION) && !defined(HB_NCURSES_194)
+#include <term.h>
 static void curs_wrkaround()
 {
     back_color_erase = FALSE;

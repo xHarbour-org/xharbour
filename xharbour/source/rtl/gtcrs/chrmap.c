@@ -1,5 +1,5 @@
 /*
- * $Id: chrmap.c,v 1.3 2003/05/27 14:02:08 druzus Exp $
+ * $Id: chrmap.c,v 1.4 2004/02/03 14:01:14 druzus Exp $
  */
 
 /*
@@ -55,10 +55,6 @@
 /* NOTE: User programs should never call this layer directly! */
 
 #include "gtcrs.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define MAX_CHAR_VAL	0xff
 char *s_szDefaultCharMapFile = "/etc/harbour/hb-charmap.def";
