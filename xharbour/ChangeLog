@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3371 2004/08/29 22:55:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3371 2004/08/30 02:08:02 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2004-08-30 09:50 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/gtos2/gtos2.c
+     * changed the way the offscreen buffer gets updated and synced with
+       screen buffer.
+
 2004-08-29 22:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
    * Changelog,v 1.3371
    * xharbour/utils/hbmake/hbmake.prg
-     + fixed bound error when create a new makefile. 
+     + fixed bound error when create a new makefile.
 
    * xharbour/utils/hbmake/hbmutils.prg
      + create GetHarbourDir() function to avoid error when a lib is missing
@@ -32,7 +38,7 @@
     * added missed ct*.ch
   * bin/hb-func.sh
     * changed tip to hbtip and ct to hbct. Przemyslaw please check.
-    
+
 2004-08-29 13:11 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/vm/arrayshb.c
     * casts as reported by Lorenzo and Sylvain
