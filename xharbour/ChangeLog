@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3376 2004/08/30 16:51:17 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3377 2004/08/30 16:55:11 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-08-30 19:05 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/gtos2/gtos2.c
+     ! since internal s_uiDispCount starts from 1, DispCount() should
+       return it decremented by one
 
 2004-08-30 18:53 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * ChangeLog

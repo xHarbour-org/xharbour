@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.12 2004/08/30 07:54:59 mauriliolongo Exp $
+ * $Id: gtos2.c,v 1.13 2004/08/30 16:51:20 mauriliolongo Exp $
  */
 
 /*
@@ -218,6 +218,7 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
    s_vi.cb = sizeof( VIOMODEINFO );
    VioGetMode( &s_vi, 0 );        /* fill structure with current video mode settings */
 
+   /* To "comment out" old code calling VIOXXX subsystem */
    s_uiDispCount = 1;
 
    if( VioGetBuf(&s_ulLVBptr, &s_usLVBlength, 0) == NO_ERROR ) {
@@ -1000,7 +1001,7 @@ char * hb_gt_Version( void )
 
 USHORT hb_gt_DispCount()
 {
-   return s_uiDispCount;
+   return s_uiDispCount - 1;
 }
 
 
