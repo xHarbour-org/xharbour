@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.56 2003/12/30 11:52:45 lf_sfnet Exp $
+ * $Id: genc.c,v 1.57 2004/01/11 14:03:39 andijahja Exp $
  */
 
 /*
@@ -55,6 +55,8 @@ typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
  The value is TRUE when /gc3 is used
 */
 extern BOOL hb_comp_iGenVarList;
+extern char *hb_comp_FileAsSymbol;
+extern char *hb_comp_PrgFileName;
 
 /*
  hb_comp_pCodeList is the file handle on which pCode Listing will be written
@@ -74,6 +76,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
    PINLINE pInline = hb_comp_inlines.pFirst;
    PVAR pGlobal, pDelete;
    short iLocalGlobals = 0, iGlobals = 0;
+   int i, ulLen = strlen(hb_comp_FileAsSymbol);
 
    BOOL bIsPublicFunction ;
    BOOL bIsInitFunction   ;
@@ -130,8 +133,16 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       fflush( stdout );
    }
 
+   for( i = 0; i < ulLen; i++ )
+      hb_comp_FileAsSymbol[ i ] = toupper( (unsigned char) hb_comp_FileAsSymbol[ i ] );
+
+   while( ( pTmp = strchr( hb_comp_FileAsSymbol, ' ' ) ) != NULL )
+   {
+      *pTmp = '_';
+   }
+
    fprintf( yyc, "/*\n * xHarbour Compiler, build %d.%d (%s)\n", HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
-   fprintf( yyc, " * Generated C source code from <%s>\n */\n\n", szSourceName );
+   fprintf( yyc, " * Generated C source code from <%s>\n */\n\n", hb_comp_PrgFileName );
 
    if( hb_comp_iFunctionCnt )
    {
@@ -144,7 +155,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
 
       fprintf( yyc, "#include \"hbinit.h\"\n\n" );
 
-      fprintf( yyc, "#define __PRG_SOURCE__ \"%s\"\n\n", szSourceName );
+      fprintf( yyc, "#define __PRG_SOURCE__ \"%s\"\n\n", hb_comp_PrgFileName );
 
       if( ! hb_comp_bStartProc )
       {
@@ -280,7 +291,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       fprintf( yyc, "\n#undef HB_PRG_PCODE_VER\n" );
       fprintf( yyc, "#define HB_PRG_PCODE_VER %i\n", (int) HB_PCODE_VER );
 
-      fprintf( yyc, "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, pFileName->szName );
+      fprintf( yyc, "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, hb_comp_FileAsSymbol );
 
       iSymOffset = 0;
       iStartupOffset = -1;
@@ -422,11 +433,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
                     "#elif ! defined(__GNUC__)\n"
                     "   #pragma startup hb_vm_SymbolInit_%s%s\n"
                     "#endif\n\n",
-                    hb_comp_szPrefix, pFileName->szName,
-                    hb_comp_szPrefix, pFileName->szName,
-                    hb_comp_szPrefix, pFileName->szName,
-                    hb_comp_szPrefix, pFileName->szName,
-                    hb_comp_szPrefix, pFileName->szName );
+                    hb_comp_szPrefix, hb_comp_FileAsSymbol,
+                    hb_comp_szPrefix, hb_comp_FileAsSymbol,
+                    hb_comp_szPrefix, hb_comp_FileAsSymbol,
+                    hb_comp_szPrefix, hb_comp_FileAsSymbol,
+                    hb_comp_szPrefix, hb_comp_FileAsSymbol );
 
       if( hb_comp_bExplicitStartProc && iStartupOffset >= 0 )
       {
@@ -711,6 +722,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
    {
       fclose( hb_comp_pCodeList );
    }
+
+   hb_xfree( hb_comp_PrgFileName );
+
 }
 
 static void hb_compGenCInLine( FILE *yyc )

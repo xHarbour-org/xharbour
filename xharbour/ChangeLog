@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2106 2004/01/21 03:58:34 maurifull Exp $
+ * $Id: ChangeLog,v 1.2107 2004/01/21 04:10:03 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-21 13:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/harbour.c
+  * source/compiler/genc.c
+    ! harbour.exe now supports long PRG file name with white space.
+    ! fixes to use original PRG file name as part of symbol name.
+
 2004-01-21 17:09 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /contrib/winprn/tprint.prg
      + CreateFont() - fix iWidth calculation if iDiv < 0

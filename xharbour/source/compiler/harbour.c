@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.57 2003/12/19 01:12:06 druzus Exp $
+ * $Id: harbour.c,v 1.58 2003/12/30 11:52:45 lf_sfnet Exp $
  */
 
 /*
@@ -159,6 +159,8 @@ char *         hb_comp_szFromEnum;
 
 int            hb_comp_iLine;                             /* currently processed line number (globaly) */
 char *         hb_comp_szFile;                            /* File Name of last compiled line */
+char *         hb_comp_FileAsSymbol;                      /* File Name of last compiled line to be used in program body */
+char *         hb_comp_PrgFileName;                       /* Original PRG File Name */
 PFUNCTION      hb_comp_pInitFunc;
 PFUNCTION      hb_comp_pGlobalsFunc;
 PHB_FNAME      hb_comp_pFileName = NULL;
@@ -4474,14 +4476,17 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
       char szPpoName[ _POSIX_PATH_MAX ];
       char szHILName[ _POSIX_PATH_MAX ];
       char szVarListName[ _POSIX_PATH_MAX ];
-
       char *szSourceExtension, *szSourcePath;
+
+      hb_comp_FileAsSymbol = hb_comp_pFileName->szName ;
 
       if( !hb_comp_pFileName->szExtension )
       {
          hb_comp_pFileName->szExtension = ".prg";
       }
 
+      hb_comp_PrgFileName = (char*) hb_xgrab(_POSIX_PATH_MAX);
+      sprintf(hb_comp_PrgFileName, "%s%s",hb_comp_pFileName->szName,hb_comp_pFileName->szExtension);
       szSourceExtension = hb_comp_pFileName->szExtension;
       szSourcePath = hb_comp_pFileName->szPath;
 
