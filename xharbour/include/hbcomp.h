@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.16 2003/06/18 08:57:01 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.17 2003/06/20 17:32:41 jonnymind Exp $
  */
 
 /*
@@ -259,7 +259,7 @@ typedef void * HB_VOID_PTR;
 typedef  HB_PCODE_FUNC( HB_PCODE_FUNC_, HB_VOID_PTR );
 typedef  HB_PCODE_FUNC_ * HB_PCODE_FUNC_PTR;
 
-void hb_compPCodeEval( PFUNCTION, HB_PCODE_FUNC_PTR *, void * );
+void hb_compPCodeEval( PFUNCTION, HB_PCODE_FUNC_PTR *, void * , BOOL );
 
 #define VS_NONE           0
 #define VS_LOCAL          1

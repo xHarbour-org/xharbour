@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1197 2003/06/28 21:51:25 lculik Exp $
+ * $Id: ChangeLog,v 1.1198 2003/06/28 22:21:26 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,50 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-06-29 09:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/vm/hvm.c
+    + Add guards to hb_xfree() calls in function hb_vmReleaseLocalSymbols()
+      to avoid hb_xfree() trying to release a NULL pointer.
+    + Add function HB_FUNC( HB_NOMOUSE ). This is a dummy function which
+      will be added in symbol table upon request.
+      Now Win32 Console Mode can REQUEST HB_NOMOUSE from a PRG file to
+      disable mouse. This is of the same functionality as //NOMOUSE.
+
+  * include/hbcomp.h
+  * source/compiler/hbfix.c
+  * source/compiler/genc.c
+  * source/compiler/hbpcode.c
+    + Add 4th parameter to function hb_compPCodeEval()
+    + Add function hb_compPCodeList() for pCode listing
+
+  /*
+  /gc3 flag extended to generate .p file
+
+  .p file will be created during compiling a prg file with /gc3 flag. The file
+  contains information about xHarbour pCode used in such prg file. The file is
+  created in conformity with common INI file for further manipulation ie:
+
+  [MAIN]
+  HB_P_FOO=2
+  HB_P_BAR=1
+  TYPES=2
+  CALLS=3
+
+  The section name denotes function name. The entries denote pCode "name" and
+  the values thereof denote number of "calls/usage" and listed on the basis
+  of "First Used First Listed". The last two entries:
+
+    - TYPES=n, the value denotes number of pCode "types" in used.
+    - CALLS=n, the value denotes total number of pCode "calls".
+
+  .p file may be interested for those who are in the process of optimizing
+  a prg file. However, we have to know a bit about how pCode processing is
+  done. File source/vm/hvm.c is the exact reference for those interested
+  in studying the vm engine. The discussion thereof is beyond the scope of
+  this information. As a rule of thumb, theoritically, the lesser pCode
+  types and calls, the faster the functions in the related prg file will
+  execute.
+  */
 
 2003-06-28 19:19 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
   * source/rdd/dbfcdx/dbfcdx1.c

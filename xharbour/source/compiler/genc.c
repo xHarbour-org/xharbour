@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.45 2003/06/23 21:20:35 ronpinkas Exp $
+ * $Id: genc.c,v 1.46 2003/06/27 05:05:36 ronpinkas Exp $
  */
 
 /*
@@ -47,9 +47,23 @@ typedef struct HB_stru_genc_info
 typedef HB_GENC_FUNC( HB_GENC_FUNC_ );
 typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
 
+/*
+ Andi Jahja
+ Extended to generate pCode listing 2003.06.25
+ hb_comp_iGenVarList is first initialized in harbour.c as FALSE
+ The value is TRUE when /gc3 is used
+*/
+extern BOOL hb_comp_iGenVarList;
+
+/*
+ hb_comp_pCodeList is the file handle on which pCode Listing will be written
+*/
+FILE *hb_comp_pCodeList = NULL;
+
 void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSourcePath )       /* generates the C language output */
 {
    char szFileName[ _POSIX_PATH_MAX ];
+   char szpCodeFileName[ _POSIX_PATH_MAX ] ;
    char szSourceName[ _POSIX_PATH_MAX ], *pTmp;
    char *pszFileName;
    PFUNCTION pFunc = hb_comp_functions.pFirst;
@@ -94,9 +108,21 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       return;
    }
 
+   /*
+    Create *.p when /gc3 is used
+   */
+   if ( hb_comp_iGenVarList )
+   {
+      pFileName->szExtension = ".p";
+      hb_fsFNameMerge( szpCodeFileName, pFileName );
+      hb_comp_pCodeList = fopen( szpCodeFileName,"wb" );
+      if( !hb_comp_pCodeList )
+         hb_comp_iGenVarList = FALSE;
+   }
+
    if( ! hb_comp_bQuiet )
    {
-      printf( "Generating C source output to \'%s\'... ", szFileName );
+      printf( "Generating C source output to \'%s\'...\n", szFileName );
       fflush( stdout );
    }
 
@@ -426,6 +452,10 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
 
       while( pFunc )
       {
+         // The pCode Table is Written Here
+        if ( hb_comp_iGenVarList )
+           fprintf( hb_comp_pCodeList, "[%s]\n", pFunc->szName );
+
          bIsInitFunction   = ( pFunc->cScope & HB_FS_INIT ) ;
          bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT ) ;
          bIsStaticVariable = ( pFunc == hb_comp_pInitFunc ) ;
@@ -465,6 +495,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
 
          fprintf( yyc, "\n{\n   static const BYTE pcode[] =\n   {\n" );
 
+
          if( hb_comp_iGenCOutput == HB_COMPGENC_COMPACT )
          {
             hb_compGenCCompact( pFunc, yyc );
@@ -475,6 +506,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
          }
 
          fprintf( yyc, "   };\n\n" );
+
+         // Finished Writting The pCode Table
+         // printf( "\n" );
 
          if( pFunc->cScope & HB_FS_CRITICAL )
          {
@@ -500,6 +534,10 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
                        "   hb_vmRegisterGlobals( &pGlobals, %i );\n", iGlobals );
          fprintf( yyc, "}\n\n" );
       }
+
+      /*
+      Generate pCode Listing
+      */
 
       /* Generate codeblocks data
        */
@@ -622,6 +660,13 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
          printf( "Done.\n" );
       }
    }
+
+   /*
+    Close .p file
+   */
+   if ( hb_comp_iGenVarList )
+      fclose( hb_comp_pCodeList );
+
 }
 
 static HB_GENC_FUNC( hb_p_and )
@@ -2630,7 +2675,10 @@ static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )
    genc_info.bVerbose = ( hb_comp_iGenCOutput == HB_COMPGENC_VERBOSE );
    genc_info.yyc = yyc;
 
-   hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_verbose_table, ( void * ) &genc_info );
+   if( ! hb_comp_bQuiet && hb_comp_iGenVarList )
+      printf( "Generating pcode list for '%s'...\n", pFunc->szName );
+
+   hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_verbose_table, ( void * ) &genc_info, hb_comp_iGenVarList );
 
    if( genc_info.bVerbose )
       fprintf( yyc, "/* %05li */\n", pFunc->lPCodePos );
@@ -2660,6 +2708,7 @@ static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc )
 
       /* Displaying as decimal is more compact than hex */
       fprintf( yyc, "%d", ( int ) pFunc->pCode[ lPCodePos++ ] );
+
    }
 
    if( nChar != 0)

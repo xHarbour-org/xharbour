@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.20 2003/03/27 07:44:56 ronpinkas Exp $
+ * $Id: hbfix.c,v 1.21 2003/05/28 04:10:17 ronpinkas Exp $
  */
 
 /*
@@ -511,5 +511,5 @@ void hb_compFixFuncPCode( PFUNCTION pFunc )
 
    assert( HB_P_LAST_PCODE == sizeof( s_fixlocals_table ) / sizeof( HB_FIX_FUNC_PTR ) );
 
-   hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_fixlocals_table, ( void * ) &fix_info );
+   hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_fixlocals_table, ( void * ) &fix_info, FALSE );
 }
