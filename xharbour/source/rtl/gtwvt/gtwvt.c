@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.97 2004/04/27 15:16:59 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.98 2004/04/30 11:49:00 vouchcac Exp $
  */
 
 /*
@@ -4501,7 +4501,7 @@ HB_FUNC( WVT_SAVESCREEN )
 
    hBmp      = CreateCompatibleBitmap( _s.hdc, iWidth, iHeight ) ;
 
-   oldBmp = SelectObject( _s.hCompDC, hBmp );
+   oldBmp = (HBITMAP) SelectObject( _s.hCompDC, hBmp );
    BitBlt( _s.hCompDC, 0, 0, iWidth, iHeight, _s.hdc, iLeft, iTop, SRCCOPY );
    SelectObject( _s.hCompDC, oldBmp );
 
@@ -4538,7 +4538,7 @@ HB_FUNC( WVT_RESTSCREEN )
    iWidth  = iRight - iLeft + 1 ;
    iHeight = iBottom - iTop + 1 ;
 
-   hBmp    = SelectObject( _s.hCompDC, ( HBITMAP ) hb_parnl( 5,3 ) );
+   hBmp    = (HBITMAP) SelectObject( _s.hCompDC, ( HBITMAP ) hb_parnl( 5,3 ) );
    if ( hBmp )
    {
       if ( ( iWidth == hb_parni( 5,1 ) )  && ( iHeight == hb_parni( 5,2 ) ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.124 2004/03/31 21:02:06 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.125 2004/04/28 18:27:49 druzus Exp $
  */
 
 /*
@@ -56,6 +56,10 @@
 
 #define HB_CDX_CLIP_AUTOPEN
 #ifdef HB_THREAD_SUPPORT
+#define HB_CDX_THREAD_SORT
+#endif
+
+#ifdef __WATCOMC__
 #define HB_CDX_THREAD_SORT
 #endif
 

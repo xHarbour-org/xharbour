@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2853 2004/04/30 03:50:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2854 2004/04/30 12:26:24 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-30 17:15 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rtl/gtwvt/gtwvt.c
+    * added casts for OpenWatcom
+  * source/rdd/dbfcdx/dbfcdx1.c
+    * added HB_CDX_THREAD_SORT for OpenWatcom to fix qsort bug
 
 2004-04-30 17:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/include/hbgtwvt.h
