@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3477 2004/09/30 01:11:36 modalsist Exp $
+ * $Id: ChangeLog,v 1.3478 2004/09/30 01:16:11 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-29 21:04 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rdd/dbcmd.c
+    ! Fixed SELECT() result from non-character parameters, to 0 instead
+      the current work area, for Clipper compatibility.
 
 2004-09-29 22:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/hbmake.prg

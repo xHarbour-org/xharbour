@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.129 2004/09/13 13:18:40 druzus Exp $
+ * $Id: dbcmd.c,v 1.130 2004/09/21 02:52:35 druzus Exp $
  */
 
 /*
@@ -3641,7 +3641,11 @@ HB_FUNC( SELECT )
    szAlias = hb_parcx( 1 );
    ulLen = strlen( szAlias );
 
-   if( ulLen == 0 && ISCHAR( 1 ))
+   if( hb_parinfo( 0 ) == 0 )
+   {
+      hb_retni( hb_rddGetCurrentWorkAreaNumber() );
+   }
+   else if( ulLen == 0 || ! ISCHAR( 1 ) )
    {
       hb_retni( 0 );
    }
@@ -3649,13 +3653,9 @@ HB_FUNC( SELECT )
    {
       hb_retni( toupper( szAlias[ 0 ] ) - 'A' + 1 );
    }
-   else if( ulLen > 0 )
-   {
-      hb_retni( hb_rddSelect( szAlias ) );
-   }
    else
    {
-      hb_retni( hb_rddGetCurrentWorkAreaNumber() );
+      hb_retni( hb_rddSelect( szAlias ) );
    }
 }
 
