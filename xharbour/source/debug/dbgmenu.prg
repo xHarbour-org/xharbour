@@ -1,5 +1,5 @@
 /*
- * $Id: dbgmenu.prg,v 1.6 2004/05/08 16:26:18 likewolf Exp $
+ * $Id: dbgmenu.prg,v 1.7 2004/05/10 01:47:49 likewolf Exp $
  */
 
 /*
@@ -109,7 +109,7 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
       MENUITEM " ~Run "
       MENU
          MENUITEM " ~Animate" IDENT "ANIMATE" ;
-            ACTION oDebugger:ToggleAnimate() ;
+            ACTION ( oDebugger:ToggleAnimate(), oDebugger:Animate() ) ;
             CHECKED oDebugger:lAnimate
          MENUITEM " ~Step              F8 " ACTION oDebugger:Step()
          MENUITEM " ~Trace            F10"  ACTION oDebugger:Trace()

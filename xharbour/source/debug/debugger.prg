@@ -1,12 +1,12 @@
 /*
- * $Id: debugger.prg,v 1.40 2004/05/17 11:22:11 likewolf Exp $
+ * $Id: debugger.prg,v 1.43 2004/06/04 14:06:21 lf_sfnet Exp $
  */
 
 /*
  * Harbour Project source code:
  * The Debugger
  *
- * Cop yright 1999 Antonio Linares <alinares@fivetechsoft.com>
+ * Copyright 1999 Antonio Linares <alinares@fivetechsoft.com>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1243,9 +1243,6 @@ METHOD HandleEvent() CLASS TDebugger
    bInkeyBefore := SetInkeyBeforeBlock( NIL )
    bInkeyAfter := SetInkeyAfterBlock( NIL )
 
-   /* Save LastKey value() */
-   nLastKey := LastKey()
-   
    if ::lAnimate
       if ::nSpeed != 0
          Inkey( ::nSpeed / 10 )
@@ -1366,11 +1363,6 @@ METHOD HandleEvent() CLASS TDebugger
               ::ToCursor()
 
          case nKey == K_F8 .or. nKey == 255
-/*              // we are starting to run again so reset to the deepest call if
-              // displaying stack
-              if ! ::oBrwStack == nil
-                 ::oBrwStack:GoTop()
-              endif*/
               ::Step()
 
          case nKey == K_F9
@@ -2434,6 +2426,7 @@ METHOD ToggleBreakPoint() CLASS TDebugger
 
 return nil
 
+
 METHOD ViewSets() CLASS TDebugger
 
    local oWndSets := TDbWindow():New( 1, 8, MaxRow() - 2, MaxCol() - 8,;
@@ -3276,6 +3269,7 @@ STATIC FUNCTION IsValidStopLine( cLine )
 
   c := Left( cLine, 4 )
   IF ( Left( c, 3 ) == 'END' .OR.;
+       c == 'FUNC' .OR.;
        c == 'PROC' .OR.;
        c == 'NEXT' .OR.;
        c == 'ELSE' .OR.;
@@ -3372,6 +3366,7 @@ STATIC FUNCTION strip_path( cFileName )
 
   HB_FNAMESPLIT( cFileName, NIL, @cName, @cExt )
 RETURN cName + cExt
+
 
 #ifdef HB_NO_READDBG
 STATIC FUNCTION getdbginput( nTop, nLeft, uValue, bValid, cColor )
