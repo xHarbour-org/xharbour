@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.50 2003/12/14 09:23:12 fsgiudice Exp $
+ * $Id: Changelog,v 1.51 2003/12/18 14:34:44 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-25 00:40 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
+  + src/xwt_gtk/xwt_calendar.h
+    src/xwt_gtk/xwt_calendar.c
+    + Basic Calendar modal widget
+  * src/xwt_api.c
+    src/xwt_gtk/xwt_gtk.c
+    src/xwt_gtk/xwt_gtk.h
+    ! support for calendar widget
+  + xwt_gtk_calendar.c
+    ! calendar widget routined
+  + include/xwt.ch
+    include/xwt_api.h
+    !added new properties required by calendar
+    + src/calendar.prg
+      * source code to calendar class
+      please note this an change on progress  
+              
 2003-12-18 15:31 UTC+0100 Giancarlo Niccolai <antispam /at/
   * contrib/xwt/Rules.make
   * contrib/xwt/test/Makefile.linux
@@ -15,7 +32,6 @@
       more than one sample in the test directory.
       Please, mingw users are warned to update
       Makefile.mingw accordingly
-
 
 2003-12-14 10:22 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * makefile.bc
@@ -167,7 +183,7 @@
   * src/xwt_gtk/xwt_gtk.h
     ! Fixed warning the gcc from xwt_gtk.c, + added definition of xwt_gtk_createFontSelection( )
 
-2003-09-02 19:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-09-02 19:20 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   * include/xwt.ch
     + Added new types and property
   + src/fontsel.prg
@@ -210,7 +226,7 @@
     src/menuitem.prg
 
 
-2003-08-30 18:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-08-30 18:40 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   * src/radiobutton.prg
 
     ! Added support for color/fonts
@@ -227,7 +243,7 @@
   * xwt_test.prg
     ! added a QUIT sequence
 
-2003-08-29 15:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-08-29 15:30 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   *include/xwtcmd.ch
    Changed TOGGLEBUTTON and CHECKBOX commands to handle color/font
   * src/checkbox.prg
@@ -240,7 +256,7 @@
    Please note this is an work in progress
 
 
-2003-08-28 23:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-08-28 23:20 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   *src/button.prg
     ! Enhaced to accept font/fontsize and color parameter
   *src/xwt_api.c
@@ -254,7 +270,7 @@
    Please note this is an work in progress
 
 >>>>>>> 1.30
-2003-08-27 17:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-08-27 17:50 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   *include/xwt.ch
   *include/xwtcmd.ch
     ! menuitems now can has color , as also other font and font size
@@ -280,7 +296,7 @@
     ! minor fix for compiler GNU C version >= 3
 
 
-2003-08-26 23:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-08-26 23:50 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   *include/xwt.ch
   *include/xwtcmd.ch
   *include/xwt_api.h
@@ -297,14 +313,14 @@
    Please note this is an work in progress
 
 
-2003-08-25 17:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-08-25 17:50 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   * src/xwt_gtk/xwt_gtk_image.c
   * src/xwt_gtk/xwt_gtk_layout.c
   * src/xwt_gtk/xwt_gtk_viewport.c
   * src/xwt_gtk/xwt_gtk_window.c
     ! minor fix
 
-2003-07-23 12:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-07-23 12:50 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   + include/xwtcmd.ch
     * Removed commands from xtw.ch and created this new one
 
@@ -546,7 +562,7 @@
   * test/xwt_test.prg
     ! Changed to reflect this updates.
 
-2003-04-17 20:35 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-04-17 20:35 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   * src/filesel.prg
     + GetFile() Method
   * src/xwt_gtk/xwt_gtk_fileselct.c
