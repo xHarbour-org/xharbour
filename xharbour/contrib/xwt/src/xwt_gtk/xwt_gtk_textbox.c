@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_textbox.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: xwt_gtk_textbox.c,v 1.2 2003/06/08 14:05:36 jonnymind Exp $
 
    Text box - basic input field
 */
@@ -34,7 +34,7 @@ static void box_activate( GtkWidget *widget,  gpointer cb_data )
    hb_itemRelease( pString );
 }
 
-BOOL xwt_gtk_createTextbox( PXWT_WIDGET xwtData )
+BOOL xwt_gtk_createTextBox( PXWT_WIDGET xwtData )
 {
    GtkWidget *box;
    box = gtk_entry_new();

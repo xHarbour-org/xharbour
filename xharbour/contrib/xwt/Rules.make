@@ -1,5 +1,5 @@
 ##################################
-# $Id: Rules.make,v 1.8 2004/08/07 17:25:35 lf_sfnet Exp $
+# $Id: Rules.make,v 1.9 2004/08/08 11:24:05 lf_sfnet Exp $
 #
 # Rules for making simwin
 #
@@ -83,7 +83,7 @@ all:$(TARGET) $(TARGETS)
 	$(CC) -c -o$@ $(CFLAGS) -I$(HB_INC_INSTALL) $<
 
 %.c: %.prg
-	$(HB_BIN_INSTALL)/harbour -q0 -gc0 -w2 -p -n $(PRGFLAGS) -I$(HB_INC_INSTALL)  -o$@ $<
+	$(HB_BIN_INSTALL)/harbour -q0 -gc0 -w2 -n $(PRGFLAGS) -I$(HB_INC_INSTALL)  -o$@ $<
 
 $(TARGET): $(OBJECTS)
 ifeq ( lib , $(patsubst %.a, lib, $(TARGET)))

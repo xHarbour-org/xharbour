@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.8 2003/11/23 19:34:54 druzus Exp $
+ * $Id: gencobj.c,v 1.9 2004/02/05 12:44:17 andijahja Exp $
  */
 
 /*
@@ -49,16 +49,20 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
    char szCommandLine[ HB_CFG_LINE_LEN * 2 ];
    char szOutPath[ _POSIX_PATH_MAX ] = "\0";
 #if defined( OS_UNIX_COMPATIBLE )
-   char szDefaultUnixPath[ _POSIX_PATH_MAX ] = "/etc:/usr/local/etc";
+   char szDefaultPath[ _POSIX_PATH_MAX ] = "/etc:/usr/local/etc";
+   char * pszEnv = szDefaultPath;
    #define HB_NULL_STR " > /dev/null"
    #define HB_ACCESS_FLAG F_OK
 #elif defined( OS_DOS_COMPATIBLE )
+   char szDefaultPath[ _POSIX_PATH_MAX ] = "PATH";
+   char * pszEnv = hb_getenv( "PATH" );
    #define HB_NULL_STR " >nul"      
    #define HB_ACCESS_FLAG 0
+#else
+   char szDefaultPath[ _POSIX_PATH_MAX ] = NULL;
 #endif
    FILE * yyc;
    char * pszCfg;
-   char * pszEnv;
    BOOL bVerbose = FALSE;   /* Don't show C compiler messages (default). */
    BOOL bDelTmp = TRUE;     /* Delete intermediate C file (default). */
    int iSuccess;
@@ -72,15 +76,6 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
 
    /* Begin second pass */
 
-   /* Set up things  */
-#if defined( OS_DOS_COMPATIBLE ) 
-   pszEnv = hb_getenv( "PATH" );
-#elif defined( OS_UNIX_COMPATIBLE )
-   pszEnv = szDefaultUnixPath;
-#else
-   pszEnv = NULL;
-#endif
-
    /* Grab space */
    pszCfg = ( char * ) hb_xgrab( /*strlen( pszEnv )*/ _POSIX_PATH_MAX );
 
@@ -90,14 +85,8 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
       yyc = fopen( pszCfg, "rt" );
       if( ! yyc )
       {
-#if 0
-         /* QUESTION: Add a new error to Harbour ?
-            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_OPEN_CFG, szFileName, NULL );
-         */
-#else
-         printf( "\nError: Can't find %s file.\n", HB_CFG_FILENAME );
+         printf( "\nError: Can't open %s file.\n", HB_CFG_FILENAME );
          return;
-#endif
       }
 
       while( fgets( szLine, HB_CFG_LINE_LEN, yyc ) != NULL )
@@ -155,6 +144,19 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
       }
 
       fclose( yyc );
+
+   } else {
+     
+      printf( "\nError: Can't find %s file in %s.\n", HB_CFG_FILENAME, szDefaultPath ); 
+      printf( "harbour.cfg is a text file that contains:\n" ); 
+      printf( "CC=C compiler binary name eg. CC=gcc\n" );
+      printf( "CFLAGS=C compiler options eg. -c -I<includes>\n" );
+      printf( "       ( 'compile only' and harbour include dir are mandatory )\n" );
+      printf( "VERBOSE=NO|YES to show steps messages default is NO\n" );
+      printf( "DELTMP=NO|YES to delete generated C source default is YES\n" );
+      printf( "remember also to properly set the C compiler env.\n" );
+      return;
+      
    }
 
    #if defined( OS_DOS_COMPATIBLE ) 
@@ -167,7 +169,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
 
    if( ! hb_comp_bQuiet )
    {
-      printf( "Building object module output for \'%s\'...", szFileName );
+      printf( "\nBuilding object module for \'%s\'\nusing C compiler \'%s\' as defined in \'%s\'...\n", szFileName, szCompiler, pszCfg );         
       fflush( stdout );
    }
 
@@ -206,7 +208,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
       
       if( bVerbose )
       {
-         printf( "\n%s\n", szCommandLine ) ;
+         printf( "Exec: %s\n", szCommandLine ) ;
       }
       else
       {
@@ -216,24 +218,38 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
       /* Compile it! */
       iSuccess = ( system( szCommandLine ) != -1 );
 
+      if( ! hb_comp_bQuiet )
+      {
+         if( iSuccess )
+         {
+            printf( "Done.\n" );
+         }
+         else
+         {
+            printf( "Failed to execute: \"%s\"\n", szCommandLine );
+         }
+      }
+
       /* Delete intermediate .c file */
       /* QUESTION: Leave this file if C compiler fails ? */
       if( bDelTmp ) /* && iSuccess ) */
       {
-         remove( ( char * ) szFileName );
-      }
+         if( bVerbose )
+         {
+            printf( "Deleting: \"%s\"\n", szFileName );            
+         }
 
-      if( ! hb_comp_bQuiet )
-      {
-         if( iSuccess )
+         remove( ( char * ) szFileName );
+
+         if( bVerbose )
+         {
             printf( "Done.\n" );
-         else
-            printf( "\nFailed to execute: \"%s\"\n", szCommandLine );
+         }
       }
    }
    else
    {
-      printf( "\nError: No compiler defined in %s\n", HB_CFG_FILENAME );
+      printf( "Error: No compiler defined in %s\n", HB_CFG_FILENAME );
    }
 
    if( pszCfg )

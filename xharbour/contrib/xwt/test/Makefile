@@ -1,14 +1,14 @@
 ##################################
-# $Id: Makefile.linux,v 1.3 2004/01/30 18:34:12 lculik Exp $
+# $Id: Makefile,v 1.5 2004/08/08 11:24:05 lf_sfnet Exp $
 #
 # Makefile for XWT Test program
 #
 
-#TARGET = xwt_test
-#SOURCES = xwt_test.prg
+TARGET = xwt_test
+SOURCES = xwt_test.prg
 
-TARGET = t_browse
-SOURCES = t_browse.prg
+#TARGET = t_browse
+#SOURCES = t_browse.prg
 
 PRGFLAGS=-I../include
 LIBS=-L../lib -lxwt -lxwt_gtk -lxwt `pkg-config --libs gtk+-2.0` 

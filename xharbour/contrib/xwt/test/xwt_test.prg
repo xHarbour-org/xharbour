@@ -4,7 +4,7 @@
 * Giancarlo Niccolai et al.:
 * (PLZ. add your copyright...)
 *
-* $Id: xwt_test.prg,v 1.26 2004/01/26 20:30:31 lculik Exp $
+* $Id: xwt_test.prg,v 1.27 2004/01/30 18:34:13 lculik Exp $
 *
 
 
@@ -25,6 +25,8 @@ PROCEDURE MAIN()
    LOCAL oList, oCheck, aInputs, oInput, oRadioPanel,oCombo
    Local cData,cCombo
    Local aItems := {"Luiz","Ron","Gian","Marcelo","Patrick"}
+   Local oNoteBook
+   Local oEditBox
 
    XwtInit()
 
@@ -77,7 +79,7 @@ PROCEDURE MAIN()
 
    /* A beautiful GRID */
 
-   oGrid := XwtGrid():New(2,3)
+   oGrid := XwtGrid():New(2,4)
 
    DEFINE LABEL oLabel TEXT "Field label"  FONT "Clean" SIZE 20
 
@@ -96,8 +98,18 @@ PROCEDURE MAIN()
    oVLay2:Add( oGrid )
 
    /*** IMAGE ***/
-   DEFINE IMAGE oImg FILE "icon.png" OF oVLay2
+   DEFINE IMAGE oImg FILE "test\icon.png" // OF oVLay2
    //oImg:SetSensible()  // TODO: ANTES que oParent:Add( Self ), sino warning de GTK+
+
+   oNotebook := XWTNoteBook():New(,, oVLay2)
+
+   DEFINE LABEL oLabel TEXT "Page 1: " FONT "Courier" COLOR "#44FD56" 
+
+   oNotebook:AddPage( oLabel )
+
+   oNotebook:AddPage( oImg )
+
+   oEditbox := XWTEditBox():New(,, oVLay2)
 
    /*** An input mask ***/
    aInputs := {;
@@ -287,7 +299,7 @@ RETURN .T.
 FUNCTION BuildMenu()
    Local oMenu,oMenuItem,oMenuSec,oMenuHelp
 
-   MENU oMenu PROMPT "File"
+   MENU oMenu PROMPT "_File"
         MENUITEM oMenuItem PROMPT "Op_en" ICON "valley.png" ACTION @FileEvent() OF oMenu FONT "Clean" Size 20 Color "#44DE5F"
         MENUITEM oMenuItem PROMPT "Font s_el"  ACTION @FileEvent() OF oMenu FONT "Dingbats" Size 30 Color "#A300FF"	
         MENUITEM oMenuItem PROMPT "Calendar"  ACTION @FileEvent() OF oMenu FONT "Dingbats" Size 30 Color "#A300FF"	

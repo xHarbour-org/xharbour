@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.30 2004/01/30 18:34:12 lculik Exp $
+   $Id: xwt_gtk.c,v 1.31 2004/02/08 13:00:08 lculik Exp $
 
    Global declarations, common functions
 
@@ -1156,7 +1156,7 @@ BOOL xwt_drv_create( PXWT_WIDGET xwtData )
       case XWT_TYPE_LABEL:   return xwt_gtk_createLabel( xwtData );
       case XWT_TYPE_MENU:    return xwt_gtk_createMenu( xwtData );
       case XWT_TYPE_MENUITEM:return xwt_gtk_createMenuItem( xwtData );
-      case XWT_TYPE_TEXTBOX: return xwt_gtk_createTextbox( xwtData );
+      case XWT_TYPE_TEXTBOX: return xwt_gtk_createTextBox( xwtData );
       case XWT_TYPE_IMAGE:   return xwt_gtk_createImage( xwtData );
       case XWT_TYPE_LAYOUT:  return xwt_gtk_createLayout( xwtData );
       case XWT_TYPE_GRID:    return xwt_gtk_createGrid( xwtData );
@@ -1173,8 +1173,10 @@ BOOL xwt_drv_create( PXWT_WIDGET xwtData )
       case XWT_TYPE_CALENDARM:   return xwt_gtk_createCalendarModal(xwtData);
       case XWT_TYPE_COMBOBOX:    return  xwt_gtk_createComboBox(xwtData);
       case XWT_TYPE_LISTBOX:     return xwt_gtk_createListBox( xwtData );
-      case XWT_TYPE_COLORSELECT: return xwt_gtk_createColorSelection( xwtData );
-      case XWT_TYPE_PROGRESSBAR: return xwt_gtk_createProgressBar( xwtData );
+      case XWT_TYPE_COLORSELECT: return xwt_gtk_createColorSelection( xwtData );
+      case XWT_TYPE_PROGRESSBAR: return xwt_gtk_createProgressBar( xwtData );
+      case XWT_TYPE_NOTEBOOK:    return xwt_gtk_createNoteBook( xwtData );
+      case XWT_TYPE_EDITBOX:     return xwt_gtk_createEditBox( xwtData );
 
    }
    return FALSE;
@@ -1255,6 +1257,11 @@ BOOL xwt_drv_add( PXWT_WIDGET wWSelf, PXWT_WIDGET wWChild )
          vp->main_widget = wChild;
          #endif
          gtk_scrolled_window_add_with_viewport( GTK_SCROLLED_WINDOW( vp->window ), wChild );
+      }
+      break;
+      case XWT_TYPE_NOTEBOOK:
+      {
+         gtk_notebook_append_page( GTK_NOTEBOOK( wSelf ), wChild, NULL );
       }
       break;
 

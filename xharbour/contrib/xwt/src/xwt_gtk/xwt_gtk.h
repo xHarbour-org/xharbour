@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.20 2004/02/08 13:00:08 lculik Exp $
+   $Id: xwt_gtk.h,v 1.21 2004/03/21 21:30:01 lculik Exp $
 
    GTK interface
 */
@@ -198,7 +198,7 @@ BOOL xwt_gtk_createLabel( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createMenu( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createMenuItem( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createPane( PXWT_WIDGET wSelf );
-BOOL xwt_gtk_createTextbox( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createTextBox( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createWindow( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createImage( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createLayout( PXWT_WIDGET wSelf );
@@ -216,8 +216,10 @@ BOOL xwt_gtk_createCalendar( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createCalendarModal( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createComboBox( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createListBox( PXWT_WIDGET xwtData );
-BOOL xwt_gtk_createProgressBar( PXWT_WIDGET xwtData );
-BOOL xwt_gtk_createColorSelection( PXWT_WIDGET xwtData );
+BOOL xwt_gtk_createProgressBar( PXWT_WIDGET xwtData );
+BOOL xwt_gtk_createColorSelection( PXWT_WIDGET xwtData );
+BOOL xwt_gtk_createNoteBook( PXWT_WIDGET xwtData );
+BOOL xwt_gtk_createEditBox( PXWT_WIDGET xwtData );
 void xwt_gtk_ComboAddItem(PXWT_WIDGET xwtData, PHB_ITEM pComboArray );
 void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
 void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );

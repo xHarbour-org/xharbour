@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.57 2004/06/28 18:10:16 paultucker Exp $
+ * $Id: Changelog,v 1.58 2004/08/07 17:26:47 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-21 19:25 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  + contrib/xwt/src/notebook.prg 
+  + contrib/src/xwt_gtk/xwt_gtk_notebook.c
+    * added notebook (folder) widget
+  + contrib/xwt/src/editbox.prg
+  + contrib/src/xwt_gtk/xwt_gtk_editbox.c
+    * added editbox (text_view) widget with scrollbars
+  * contrib/xwt/src/xwt_gtk/xwt_gtk.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk.h
+  * contrib/xwt/include/xwt.ch
+    * added support of new widgets
+  * contrib/xwt/xwt_gtk/xwt_gtk_textbox.c
+    * xwt_createTextbox renamed to xwt_createTextBox
+  * contrib/xwt/test/xwt_text.prg
+    * added the new widgets to the test
 
 2004-08-07 19:25 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * contrib/xwt/rules.make
