@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.3 2003/05/21 09:35:36 druzus Exp $
+ * $Id: gtcrs.h,v 1.4 2003/05/26 13:32:49 druzus Exp $
  */
 
 /*
@@ -68,6 +68,8 @@
 #ifndef _POSIX_PATH_MAX
 #define _POSIX_PATH_MAX 256
 #endif
+
+/* #define HB_GT_CRS_TTYHACK */
 
 extern int HB_GT_FUNC(gt_chrmapinit( int *piTransTbl, char *pszTerm ));
 

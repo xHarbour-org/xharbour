@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.5 2003/05/28 11:59:06 druzus Exp $
+ * $Id: gtnul.c,v 1.6 2003/05/29 20:44:29 druzus Exp $
  */
 
 /*
@@ -54,7 +54,9 @@
 
 /* *********************************************************************** */
 
-#define HB_MULTI_GT
+#ifndef HB_MULTI_GT
+#  define HB_MULTI_GT
+#endif
 /* This definition has to be placed before #include "hbapigt.h" */
 #define HB_GT_NAME	NUL
 
@@ -67,16 +69,16 @@ static char * s_initGT = HB_GT_DRVNAME( HB_GT_NAME );
 #if defined(HB_DEFAULT_GT)
    char * s_defaultGT = HB_GT_DRVNAME( HB_DEFAULT_GT );
    HB_GT_REQUEST( HB_DEFAULT_GT );
-#elif defined(HB_GT_LIB)
+#elseif defined(HB_GT_LIB)
    char * s_defaultGT = HB_GT_DRVNAME( HB_GT_LIB );
    HB_GT_REQUEST( HB_GT_LIB );
-#elif defined(HB_OS_LINUX)
+#elseif defined(HB_OS_LINUX)
    char * s_defaultGT = "crs";
-#elif defined(HB_OS_WIN_32)
+#elseif defined(HB_OS_WIN_32)
    char * s_defaultGT = "win";
-#elif defined(HB_OS_DOS)
+#elseif defined(HB_OS_DOS)
    char * s_defaultGT = "dos";
-#elif defined(HB_OS_OS2)
+#elseif defined(HB_OS_OS2)
    char * s_defaultGT = "os2";
 #else
    char * s_defaultGT = "std";
@@ -319,6 +321,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT 
    HB_SYMBOL_UNUSED( uiLeft );
    HB_SYMBOL_UNUSED( uiBottom );
    HB_SYMBOL_UNUSED( uiRight );
+   HB_SYMBOL_UNUSED( byAttr );
    HB_SYMBOL_UNUSED( iRows );
    HB_SYMBOL_UNUSED( iCols );
 }
@@ -326,6 +329,12 @@ void HB_GT_FUNC(gt_Scroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT 
 void HB_GT_FUNC(gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byChar, ULONG nLength ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Replicate(%hu, %hu, %i, %i, %lu)", uiRow, uiCol, byAttr, byChar, nLength));
+
+   HB_SYMBOL_UNUSED( uiRow );
+   HB_SYMBOL_UNUSED( uiCol );
+   HB_SYMBOL_UNUSED( byAttr );
+   HB_SYMBOL_UNUSED( byChar );
+   HB_SYMBOL_UNUSED( nLength );
 }
 
 USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,

@@ -1,5 +1,5 @@
 /*
- * $Id: datetime.prg,v 1.3 2002/05/24 19:08:22 walito Exp $
+ * $Id: datetime.prg,v 1.1 2003/03/04 21:04:28 lculik Exp $
  */
 
 /*
@@ -316,9 +316,13 @@ Function EOY( date)
  *  $SEEALSO$
  *  $END$
  */
+
+/* this function is allready implemented in RTL */
+/*
 Function StoD( cdate)
  Local ofd := Set( _SET_DATEFORMAT, 'dd.mm.yyyy'), rvd
  cdate := If( ValType( cdate) == 'C', cdate, DtoS( Date()))
  rvd := CtoD( SubStr( cDate, 7, 2) + '.' + SubStr( cDate, 5, 2)  + '.' + SubStr( cDate, 1, 4))
  Set( _SET_DATEFORMAT, ofd)
  Return rvd
+*/

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.4 2003/05/30 02:02:50 lculik Exp $
+# $Id: make_rpm.sh,v 1.5 2003/06/03 04:08:49 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -21,10 +21,19 @@ do
     test_reqrpm "$i" || TOINST_LST="${TOINST_LST} $i"
 done
 
-if [ -z "${TOINST_LST}" ]
+if [ -z "${TOINST_LST}" ] || [ "$1" = "--force" ]
 then
     . ./bin/\!pack_src.sh
-    if [ -f ${hb_filename} ]
+    stat="$?"
+    if [ -z "${hb_filename}" ]
+    then
+	echo "The script ./bin/!pack_src.sh doesn't set archive name to \${hb_filename}"
+	exit 1
+    elif [ "${stat}" != 0 ]
+    then
+	echo "Error during packing the sources in ./bin/\!pack_src.sh"
+	exit 1
+    elif [ -f ${hb_filename} ]
     then
 	if [ `id -u` != 0 ] && [ ! -f ${HOME}/.rpmmacros ]
 	then
@@ -41,9 +50,11 @@ then
 	fi
     else
 	echo "Cannot find archive file: ${hb_filename}"
+	exit 1
     fi
 else
-    echo "If you want to build xHarbour compilers"
+    echo "If you want to build xHarbour compiler"
     echo "you have to install the folowing RPM files:"
     echo "${TOINST_LST}"
+    exit 1
 fi

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1114 2003/06/12 22:52:36 iananderson Exp $
+ * $Id: ChangeLog,v 1.1115 2003/06/13 06:58:43 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-15 15:10 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_rpm.sh
+  * xharbour/xhbgtmk.sh
+    + "--force" switch added to force operation even dependencies are
+      not sufficient
+
+  * xharbour/bin/!pack_src.sh
+    * minor modification to allow run this script from different places
+
+  * xharbour/contrib/libct/Makefile
+    * small modification for HB_MT checking
+
+  * xharbour/contrib/libct/datetime.prg
+    * removed redundant function DTOS already implemented in RTL
+
+  * xharbour/source/codepage/cdpplwin.c
+    * minor modifications
+
+  * xharbour/source/lang/msgen.c
+  * xharbour/source/lang/msgpl852.c
+  * xharbour/source/lang/msgpliso.c
+  * xharbour/source/lang/msgplmaz.c
+  * xharbour/source/lang/msgru866.c
+  * xharbour/source/lang/msgruwin.c
+    ! the bug reported by Alexander in msgru* on harbour-devel fixed.
+
+  + xharbour/source/lang/msgplwin.c
+  + xharbour/source/lang/msgrukoi.c
+    + msgplwin (cp125) added and msgrukoi (borrowed from Harbour) added
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+  * xharbour/source/rtl/gtnul/gtnul.c
+  * xharbour/source/rtl/gtpca/gtpca.c
+    * minor modifications
 
 2003-06-12 23:45 UTC-0800 Brian Hays <bhays@abacuslaw.com>
   * source/rtl/memoline.c

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: xhbgtmk.sh,v 1.2 2003/05/26 16:16:02 druzus Exp $
+# $Id: xhbgtmk.sh,v 1.3 2003/05/27 00:56:07 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -29,7 +29,7 @@ do
 done
 
 _cvs_RSH="${CVS_RSH}"
-[ -n "_cvs_RSH" ] || _cvs_RSH="rsh"
+[ -n "${_cvs_RSH}" ] || _cvs_RSH="rsh"
 
 if ! which ${_cvs_RSH} &>/dev/null
 then
@@ -41,7 +41,7 @@ then
     fi
 fi
 
-if [ -z "${TOINST_LST}" ]
+if [ -z "${TOINST_LST}" ] || [ "$1" = "--force" ]
 then
     cd
     mkdir -p CVS
@@ -54,4 +54,7 @@ else
     echo "If you want to build xHarbour compilers"
     echo "you have to install the folowing RPM files:"
     echo "${TOINST_LST}"
+    echo ""
+    echo "If you want to force installation run this script with --force paramter:"
+    echo "$0 --force"
 fi

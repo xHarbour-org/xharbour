@@ -1,5 +1,5 @@
 /*
- * $Id: msgruwin.c,v 1.8 2002/01/06 13:37:33 antoniolinares Exp $
+ * $Id: msgruwin.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Русский",                   /* Name (in native language) */
       "RU",                        /* RFC ID */
       "1251",                      /* Codepage */
-      "$Revision: 1.8 $ $Date: 2002/01/06 13:37:33 $",         /* Version */
+      "$Revision: 1.2 $ $Date: 2002/01/19 14:15:45 $",         /* Version */
 
       /* Month names */
 
@@ -81,7 +81,7 @@ static HB_LANG s_lang =
       "Сентябрь",
       "Октябрь",
       "Ноябрь",
-      "Декабрь"
+      "Декабрь",
 
       /* Day names */
 
@@ -91,7 +91,7 @@ static HB_LANG s_lang =
       "Среда",
       "Четверг",
       "Пятница",
-      "Суббота"
+      "Суббота",
 
       /* CA-Cl*pper compatible natmsg items */
 
@@ -160,7 +160,7 @@ static HB_LANG s_lang =
       "доступ к массиву",
       "присвоение массива",
       "не массив",
-      "сравнение"
+      "сравнение",
 
 
       /* Internal error names */
@@ -190,7 +190,7 @@ static HB_LANG s_lang =
       "Переполнение буфера памяти",
       "hb_xgrab requested to allocate zero bytes",
       "hb_xrealloc requested to resize to zero bytes",
-      "hb_xalloc requested to allocate zero bytes"
+      "hb_xalloc requested to allocate zero bytes",
 
       /* Texts */
 

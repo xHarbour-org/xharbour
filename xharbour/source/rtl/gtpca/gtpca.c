@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.4 2003/05/16 19:52:10 druzus Exp $
+ * $Id: gtpca.c,v 1.5 2003/05/21 09:35:36 druzus Exp $
  */
 
 /*
@@ -219,7 +219,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
    HB_SYMBOL_UNUSED( eventmask );
    /* TODO: */
-   return 0;
+   return 13;
 }
 #endif
 

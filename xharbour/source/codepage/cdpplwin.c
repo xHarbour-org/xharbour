@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cdpplwin.c,v 1.1 2003/05/26 13:32:49 druzus Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 
 /* Language name: Polish */
 /* ISO language code (2 chars): PL */
-/* Codepage: WIN */
+/* Codepage: 1250 */
 
 #include <ctype.h>
 #include "hbapi.h"

@@ -1,5 +1,5 @@
 ;/*
- * $Id: gtcrs.c,v 1.11 2003/05/29 20:44:29 druzus Exp $
+ * $Id: gtcrs.c,v 1.12 2003/06/06 06:45:09 druzus Exp $
  */
 
 /*
@@ -84,10 +84,10 @@
 #endif
 
 /* this variable should be global and checked in main VM loop */
-volatile static BOOL s_BreakFlag = FALSE;
-volatile static BOOL s_InetrruptFlag = FALSE;
+static volatile BOOL s_BreakFlag = FALSE;
+static volatile BOOL s_InetrruptFlag = FALSE;
 
-volatile static BOOL s_WinSizeChangeFlag = FALSE;
+static volatile BOOL s_WinSizeChangeFlag = FALSE;
 
 typedef struct evtFD {
     int fd;
@@ -999,6 +999,9 @@ static int set_gpmevt(int fd, int mode, void *data )
     mouseEvent *mEvt;
     Gpm_Event gEvt;
 
+    HB_SYMBOL_UNUSED( fd );
+    HB_SYMBOL_UNUSED( mode );
+
     mEvt = (mouseEvent *) data;
 
     if ( Gpm_GetEvent( &gEvt ) > 0 ) {
@@ -1238,6 +1241,7 @@ chtype get_acsc(InOutBase *ioBase, unsigned char ch)
 		break;
 	    }
 
+    retch = 0;
     if ( !retch )
 	switch (ch)
 	{
@@ -1565,7 +1569,8 @@ static int gt_setsize(InOutBase *ioBase, int rows, int cols)
 static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_t termpid)
 {
     InOutBase *ioBase;
-    int transTbl[256], i, bg, fg;
+    int transTbl[256], bg, fg;
+    unsigned int i;
     char buf[256], *ptr, *crsterm = NULL;
     chtype ch;
 
@@ -1685,10 +1690,11 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 	}
 	ioBase->std_chmap[i] |= ch;
 	ioBase->box_chmap[i] |= ch;
-	if (ch != i && (ioBase->std_chmap[i] & A_ALTCHARSET) == 0) {
+	if ( i != (ch & A_CHARTEXT) && 
+	     (ioBase->std_chmap[i] & A_ALTCHARSET) == 0 ) {
 	    if ( ioBase->out_transtbl == NULL )
 		ioBase->out_transtbl = hb_xgrab(256);
-	    ioBase->out_transtbl[i] = ch;
+	    ioBase->out_transtbl[i] = ch & A_CHARTEXT;
 	}
     }
     ioBase->attr_mask = -1;
@@ -1986,6 +1992,11 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
     if ( !s_ioBase )
     {
+#ifdef HB_GT_CRS_TTYHACK
+	int ittyfd;
+	if ( (ittyfd = open("/dev/tty",O_RDWR)) != -1)
+	    iFilenoStdin = iFilenoStdout = ittyfd;
+#endif
 	set_signals();
 	ioBase = create_ioBase( NULL, iFilenoStdin, iFilenoStdout, iFilenoStderr, -1 );
 	add_new_ioBase( ioBase );
