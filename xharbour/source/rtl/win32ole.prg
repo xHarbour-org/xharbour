@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.61 2005/01/30 10:00:00 ptsarenko Exp $
+ * $Id: win32ole.prg,v 1.62 2005/01/30 08:02:02 ptsarenko Exp $
  */
 
 /*
@@ -829,9 +829,6 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, u
          RETURN Eval( ErrorBlock(), oErr )
 
       ELSEIF ( cError := Ole2TxtError() ) != "S_OK"
-         IF cMsg == "END"
-            RETURN .t.
-         ENDIF
 
          oErr := ErrorNew()
          oErr:Args          := { Self, cMsg, HB_aParams() }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3780 2005/01/30 10:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3781 2005/01/30 08:01:30 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2005-01-30 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+2005-01-30 10:10 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * source/rtl/win32ole.prg
+    ! small fix, my fault
+
+2005-01-30 10:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/rtl/win32ole.prg
   * source/vm/hvm.c
     ole initializaztion and uninitialization moved to win32ole.prg
