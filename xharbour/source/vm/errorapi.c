@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.48 2004/09/03 01:35:00 druzus Exp $
+ * $Id: errorapi.c,v 1.49 2004/11/01 05:38:11 likewolf Exp $
  */
 
 /*
@@ -1390,6 +1390,33 @@ PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, char *
    return pRetVal;
 }
 
+PHB_ITEM HB_EXPORT hb_errRT_SubstArray( char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, PHB_ITEM pArray )
+{
+   PHB_ITEM pRetVal;
+   PHB_ITEM pError;
+
+   ULONG ulArgPos;
+
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_errRT_BASE_SubstArray()") );
+
+   pError = hb_errRT_New_Subst( ES_ERROR, szSubSystem ? szSubSystem : HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
+
+   /* Assign the new array to the object data item. */
+   hb_dynsymLock();
+   hb_vmPushSymbol( hb_dynsymGet( "_ARGS" )->pSymbol );
+   hb_dynsymUnlock();
+   hb_vmPush( pError );
+   hb_vmPush( pArray );
+   hb_vmSend( 1 );
+
+   /* Ok, launch... */
+   pRetVal = hb_errLaunchSubst( pError );
+
+   hb_itemRelease( pError );
+
+   return pRetVal;
+}
+
 void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, ULONG ulArgCount, ... )
 {
    PHB_ITEM pError;
@@ -1507,7 +1534,7 @@ USHORT HB_EXPORT hb_errRT_DBCMD( ULONG ulGenCode, ULONG ulSubCode, char * szDesc
       uiFlags = EF_CANDEFAULT;
    else
       uiFlags = EF_NONE;
-   
+
    pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_DBCMD, ulGenCode, ulSubCode, szDescription, szOperation, 0, uiFlags );
 
    uiAction = hb_errLaunch( pError );

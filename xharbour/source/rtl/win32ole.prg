@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.62 2005/01/30 08:02:02 ptsarenko Exp $
+ * $Id: win32ole.prg,v 1.62 2005/01/30 08:29:12 ptsarenko Exp $
  */
 
 /*
@@ -60,8 +60,6 @@
 #include "hbclass.ch"
 #include "error.ch"
 
-#define EG_OLEEXECPTION 1001
-
 //----------------------------------------------------------------------------//
 
 FUNCTION CreateObject( cString )
@@ -78,16 +76,8 @@ RETURN TOleAuto():GetActiveObject( cString )
 
 #pragma BEGINDUMP
 
-   #ifndef __STDC__
-      #define __STDC__ 1
-   #endif
-
    #ifndef CINTERFACE
       #define CINTERFACE 1
-   #endif
-
-   #ifndef __FLAT__
-     #define __FLAT__ 1
    #endif
 
    #define NONAMELESSUNION
@@ -132,36 +122,26 @@ RETURN TOleAuto():GetActiveObject( cString )
 
    static char *s_OleRefFlags = NULL;
 
-   HB_FUNC( SETOLEREFFLAGS )
-   {
-      if( s_OleRefFlags )
-      {
-         hb_xfree( s_OleRefFlags );
-         s_OleRefFlags = NULL;
-      }
-
-      if( hb_pcount() )
-      {
-         s_OleRefFlags = hb_strdup( hb_stackItemFromBase( 1 )->item.asString.value );
-      }
-   }
-
 #pragma ENDDUMP
 
 //----------------------------------------------------------------------------//
 
 INIT PROC HB_OLEINIT
-HB_INLINE()
-{
-   s_nOleError = OleInitialize( NULL );
-}
+   HB_INLINE()
+   {
+      s_nOleError = OleInitialize( NULL );
+
+      s_pSym_OleAuto = hb_dynsymFindName( "TOLEAUTO" );
+      s_pSym_New     = hb_dynsymFindName( "NEW" );
+      s_pSym_hObj    = hb_dynsymFindName( "HOBJ" );
+   }
 return
 
 EXIT PROC HB_OLEEXIT
-HB_INLINE()
-{
-   OleUninitialize();
-}
+   HB_INLINE()
+   {
+      OleUninitialize();
+   }
 return
 
 //----------------------------------------------------------------------------//
@@ -170,27 +150,19 @@ CLASS TOleAuto
 
    DATA hObj
    DATA cClassName
-   DATA bShowException INIT .T.
 
    METHOD New( uObj, cClass ) CONSTRUCTOR
    METHOD GetActiveObject( cClass ) CONSTRUCTOR
 
-   METHOD Invoke( cMember, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 )
-   METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 )
-   METHOD Get( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 )
+   METHOD Invoke()
+   METHOD Set()
+   MESSAGE Get METHOD Invoke()
 
    METHOD Collection( xIndex, xValue ) OPERATOR "[]"
 
    ERROR HANDLER OnError()
 
    DESTRUCTOR Release()
-
-   HB_INLINE()
-   {
-      s_pSym_OleAuto = hb_dynsymFindName( "TOLEAUTO" );
-      s_pSym_New     = hb_dynsymFindName( "NEW" );
-      s_pSym_hObj    = hb_dynsymFindName( "HOBJ" );
-   }
 
 ENDCLASS
 
@@ -204,9 +176,9 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
       ::hObj := CreateOleObject( uObj )
 
       IF OleError() != 0
-         IF ::bShowException .AND. Ole2TxtError() == "DISP_E_EXCEPTION"
+         IF Ole2TxtError() == "DISP_E_EXCEPTION"
             oErr := ErrorNew()
-            oErr:Args          := { uObj }
+            oErr:Args          := HB_aParams()
             oErr:CanDefault    := .F.
             oErr:CanRetry      := .F.
             oErr:CanSubstitute := .T.
@@ -220,7 +192,7 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
             RETURN Eval( ErrorBlock(), oErr )
          ELSE
             oErr := ErrorNew()
-            oErr:Args          := { uObj }
+            oErr:Args          := HB_aParams()
             oErr:CanDefault    := .F.
             oErr:CanRetry      := .F.
             oErr:CanSubstitute := .T.
@@ -238,6 +210,7 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
       ::cClassName := uObj
    ELSEIF ValType( uObj ) = 'N'
       ::hObj := uObj
+
       IF ValType( cClass ) == 'C'
          ::cClassName := cClass
       ELSE
@@ -271,7 +244,7 @@ METHOD GetActiveObject( cClass ) CLASS TOleAuto
       ::hObj := GetOleObject( cClass )
 
       IF OleError() != 0
-         IF ::bShowException .AND. Ole2TxtError() == "DISP_E_EXCEPTION"
+         IF Ole2TxtError() == "DISP_E_EXCEPTION"
             oErr := ErrorNew()
             oErr:Args          := { cClass }
             oErr:CanDefault    := .F.
@@ -312,271 +285,19 @@ RETURN Self
 
 //--------------------------------------------------------------------
 
-METHOD Invoke( cMethod, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 ) CLASS TOleAuto
+METHOD Invoke( ... ) CLASS TOleAuto
 
-   LOCAL uObj, nParams := PCount(), Counter
-   LOCAL OleRefFlags := Space( nParams - 1 )
-   LOCAL oErr
+   LOCAL cMethod := HB_aParams()[1]
 
-   //TraceLog( cMethod, nParams )
-
-   IF ProcName( 1 ) != "TOLEAUTO:" + cMethod
-
-      IF nParams >= 10
-         IF HB_ISBYREF( @uParam9 )
-            OleRefFlags[9] = 'Y'
-         ENDIF
-      ENDIF
-
-      IF nParams >= 9
-         IF HB_ISBYREF( @uParam8 )
-            OleRefFlags[8] = 'Y'
-         ENDIF
-      ENDIF
-
-      IF nParams >= 8
-         IF HB_ISBYREF( @uParam7 )
-            OleRefFlags[7] = 'Y'
-         ENDIF
-      ENDIF
-
-      IF nParams >= 7
-         IF HB_ISBYREF( @uParam6 )
-            OleRefFlags[6] = 'Y'
-         ENDIF
-      ENDIF
-
-      IF nParams >= 6
-         IF HB_ISBYREF( @uParam5 )
-            OleRefFlags[5] = 'Y'
-         ENDIF
-      ENDIF
-
-      IF nParams >= 5
-         IF HB_ISBYREF( @uParam4 )
-            OleRefFlags[4] = 'Y'
-         ENDIF
-      ENDIF
-
-      IF nParams >= 4
-         IF HB_ISBYREF( @uParam3 )
-            OleRefFlags[3] = 'Y'
-         ENDIF
-      ENDIF
-
-      IF nParams >= 3
-         IF HB_ISBYREF( @uParam2 )
-            OleRefFlags[2] = 'Y'
-         ENDIF
-      ENDIF
-
-      IF nParams >= 2
-         IF HB_ISBYREF( @uParam1 )
-            OleRefFlags[1] = 'Y'
-         ENDIF
-
-         SetOleRefFlags( OleRefFlags )
-      ENDIF
-   ENDIF
-
-   IF nParams == 10
-      uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
-   ELSEIF nParams == 9
-      uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
-   ELSEIF nParams == 8
-      uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
-   ELSEIF nParams == 7
-      uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
-   ELSEIF nParams == 6
-      uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
-   ELSEIF nParams == 5
-      uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4 )
-   ELSEIF nParams == 4
-      uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3 )
-   ELSEIF nParams == 3
-      uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2 )
-   ELSEIF nParams == 2
-      uObj := OLEInvoke( ::hObj, cMethod, @uParam1 )
-   ELSEIF nParams == 1
-      uObj := OLEInvoke( ::hObj, cMethod )
-   ELSE
-      MessageBox( 0, "TOleAuto:Invoke() - Unsupported number of parameter!", "OLE Interface", 0 )
-      RETURN NIL
-   ENDIF
-
-   SetOleRefFlags()
-
-   IF ::bShowException
-      IF Ole2TxtError() == "DISP_E_EXCEPTION"
-         oErr := ErrorNew()
-         oErr:Args          := { Self, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9  }
-         oErr:CanDefault    := .F.
-         oErr:CanRetry      := .F.
-         oErr:CanSubstitute := .T.
-         oErr:Description   := OLEExceptionDescription()
-         oErr:GenCode       := EG_OLEEXECPTION
-         oErr:Operation     := ::cClassName + ":" + cMethod
-         oErr:Severity      := ES_ERROR
-         oErr:SubCode       := -1
-         oErr:SubSystem     := OLEExceptionSource()
-
-         RETURN Eval( ErrorBlock(), oErr )
-
-      ELSEIF OleError() != 0
-         oErr := ErrorNew()
-         oErr:Args          := { Self, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9  }
-         oErr:CanDefault    := .F.
-         oErr:CanRetry      := .F.
-         oErr:CanSubstitute := .T.
-         oErr:Description   := Ole2TxtError()
-         oErr:GenCode       := EG_OLEEXECPTION
-         oErr:Operation     := ::cClassName + ":" + cMethod
-         oErr:Severity      := ES_ERROR
-         oErr:SubCode       := -1
-         oErr:SubSystem     := ::cClassName
-
-         RETURN Eval( ErrorBlock(), oErr )
-      ENDIF
-
-      IF ValType( uObj ) == 'O'
-         uObj:cClassName := Self:cClassName + ':' + cMethod
-         //TraceLog( HB_ArrayId( uObj ), "Returning: " + uObj:cClassName )
-      ENDIF
-   ENDIF
-
-RETURN uObj
+RETURN HB_ExecFromArray( Self, cMethod, aDel( HB_aParams(), 1, .T. ) )
 
 //--------------------------------------------------------------------
 
-METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 ) CLASS TOleAuto
+METHOD Set( ... ) CLASS TOleAuto
 
-   LOCAL uObj, nParams := PCount()
-   LOCAL oErr
+   LOCAL cMethod := HB_aParams()[1]
 
-   //TraceLog( cProperty, nParams )
-
-   IF nParams == 10
-      OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
-   ELSEIF nParams == 9
-      OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
-   ELSEIF nParams == 8
-      OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
-   ELSEIF nParams == 7
-      OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
-   ELSEIF nParams == 6
-      OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
-   ELSEIF nParams == 5
-      OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4 )
-   ELSEIF nParams == 4
-      OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3 )
-   ELSEIF nParams == 3
-      OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2 )
-   ELSEIF nParams == 2
-      OLESetProperty( ::hObj, cProperty, @uParam1 )
-   ELSE
-      MessageBox( 0, "TOleAuto:Set() - Unsupported number of parameter!", "OLE Interface", 0 )
-      RETURN NIL
-   ENDIF
-
-   SetOleRefFlags()
-
-   IF ::bShowException .AND. Ole2TxtError() == "DISP_E_EXCEPTION"
-      oErr := ErrorNew()
-      oErr:Args          := { Self, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 }
-      oErr:CanDefault    := .F.
-      oErr:CanRetry      := .F.
-      oErr:CanSubstitute := .T.
-      oErr:Description   := OLEExceptionDescription()
-      oErr:GenCode       := EG_OLEEXECPTION
-      oErr:Operation     := ::cClassName + ":" + cProperty
-      oErr:Severity      := ES_ERROR
-      oErr:SubCode       := -1
-      oErr:SubSystem     := OLEExceptionSource()
-
-      RETURN Eval( ErrorBlock(), oErr )
-   ELSEIF ::bShowException .AND. OleError() != 0
-      oErr := ErrorNew()
-      oErr:Args          := { Self, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 }
-      oErr:CanDefault    := .F.
-      oErr:CanRetry      := .F.
-      oErr:CanSubstitute := .T.
-      oErr:Description   := Ole2TxtError()
-      oErr:GenCode       := EG_OLEEXECPTION
-      oErr:Operation     := ::cClassName + ":" + cProperty
-      oErr:Severity      := ES_ERROR
-      oErr:SubCode       := -1
-      oErr:SubSystem     := ::cClassName
-
-      RETURN Eval( ErrorBlock(), oErr )
-   ENDIF
-
-RETURN nil
-
-//--------------------------------------------------------------------
-
-METHOD Get( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOleAuto
-
-   LOCAL uObj, nParams := PCount()
-   LOCAL oErr
-
-   //TraceLog( cProperty, nParams )
-
-   IF nParams == 7
-      uObj := OLEGetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
-   ELSEIF nParams == 6
-      uObj := OLEGetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
-   ELSEIF nParams == 5
-      uObj := OLEGetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4 )
-   ELSEIF nParams == 4
-      uObj := OLEGetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3 )
-   ELSEIF nParams == 3
-      uObj := OLEGetProperty( ::hObj, cProperty, @uParam1, @uParam2 )
-   ELSEIF nParams == 2
-      uObj := OLEGetProperty( ::hObj, cProperty, @uParam1 )
-   ELSEIF nParams == 1
-      uObj := OLEGetProperty( ::hObj, cProperty )
-   ELSE
-      MessageBox( 0, "TOleAuto:Get() - Unsupported number of parameter!", "OLE Interface", 0 )
-      RETURN NIL
-   ENDIF
-
-   IF ::bShowException
-      IF Ole2TxtError() == "DISP_E_EXCEPTION"
-         oErr := ErrorNew()
-         oErr:Args          := { Self, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 }
-         oErr:CanDefault    := .F.
-         oErr:CanRetry      := .F.
-         oErr:CanSubstitute := .T.
-         oErr:Description   := OLEExceptionDescription()
-         oErr:GenCode       := EG_OLEEXECPTION
-         oErr:Operation     := ::cClassName + ":" + cProperty
-         oErr:Severity      := ES_ERROR
-         oErr:SubCode       := -1
-         oErr:SubSystem     := OLEExceptionSource()
-
-         RETURN Eval( ErrorBlock(), oErr )
-      ELSEIF OleError() != 0
-         oErr := ErrorNew()
-         oErr:Args          := { Self, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 }
-         oErr:CanDefault    := .F.
-         oErr:CanRetry      := .F.
-         oErr:CanSubstitute := .T.
-         oErr:Description   := Ole2TxtError()
-         oErr:GenCode       := EG_OLEEXECPTION
-         oErr:Operation     := ::cClassName + ":" + cProperty
-         oErr:Severity      := ES_ERROR
-         oErr:SubCode       := -1
-         oErr:SubSystem     := ::cClassName
-
-         RETURN Eval( ErrorBlock(), oErr )
-      ENDIF
-
-      IF ValType( uObj ) == 'O'
-         uObj:cClassName := Self:cClassName + ':' + cProperty
-      ENDIF
-   ENDIF
-
-RETURN uObj
+RETURN HB_ExecFromArray( Self, '_' + cMethod, aDel( HB_aParams(), 1, .T. ) )
 
 //--------------------------------------------------------------------
 
@@ -598,261 +319,6 @@ METHOD Collection( xIndex, xValue ) CLASS TOleAuto
 	 END
 
 RETURN xRet
-
-//--------------------------------------------------------------------
-
-METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 ) CLASS TOleAuto
-
-   LOCAL cMsg := __GetMessage()
-   LOCAL bPresetShowException := ::bShowException
-   LOCAL uObj
-   LOCAL cError
-   LOCAL nParams := PCount(), OleRefFlags := Space( nParams )
-   LOCAL oErr
-
-   IF nParams >= 9
-      IF HB_ISBYREF( @uParam9 )
-         OleRefFlags[9] = 'Y'
-      ENDIF
-   ENDIF
-
-   IF nParams >= 8
-      IF HB_ISBYREF( @uParam8 )
-         OleRefFlags[8] = 'Y'
-      ENDIF
-   ENDIF
-
-   IF nParams >= 7
-      IF HB_ISBYREF( @uParam7 )
-         OleRefFlags[7] = 'Y'
-      ENDIF
-   ENDIF
-
-   IF nParams >= 6
-      IF HB_ISBYREF( @uParam6 )
-         OleRefFlags[6] = 'Y'
-      ENDIF
-   ENDIF
-
-   IF nParams >= 5
-      IF HB_ISBYREF( @uParam5 )
-         OleRefFlags[5] = 'Y'
-      ENDIF
-   ENDIF
-
-   IF nParams >= 4
-      IF HB_ISBYREF( @uParam4 )
-         OleRefFlags[4] = 'Y'
-      ENDIF
-   ENDIF
-
-   IF nParams >= 3
-      IF HB_ISBYREF( @uParam3 )
-         OleRefFlags[3] = 'Y'
-      ENDIF
-   ENDIF
-
-   IF nParams >= 2
-      IF HB_ISBYREF( @uParam2 )
-         OleRefFlags[2] = 'Y'
-      ENDIF
-   ENDIF
-
-   IF nParams >= 1
-      IF HB_ISBYREF( @uParam1 )
-         OleRefFlags[1] = 'Y'
-      ENDIF
-
-      SetOleRefFlags( OleRefFlags )
-   ENDIF
-
-   ::bShowException := .F.
-
-   IF LEFT( cMsg, 1 ) == '_'
-      cMsg := SubStr( cMsg, 2 )
-
-      SWITCH nParams
-         CASE 9
-            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
-            EXIT
-         CASE 8
-            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
-            EXIT
-         CASE 7
-            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
-            EXIT
-         CASE 6
-            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
-            EXIT
-         CASE 5
-            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
-            EXIT
-         CASE 4
-            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4 )
-            EXIT
-         CASE 3
-            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3 )
-            EXIT
-         CASE 2
-            uObj := ::Set( cMsg, @uParam1, @uParam2 )
-            EXIT
-         CASE 1
-            uObj := ::Set( cMsg, @uParam1 )
-            EXIT
-         CASE 0
-            uObj := ::Set( cMsg )
-            EXIT
-         DEFAULT
-           oErr := ErrorNew()
-           oErr:Args          := { Self, cMsg, HB_aParams() }
-           oErr:CanDefault    := .F.
-           oErr:CanRetry      := .F.
-           oErr:CanSubstitute := .T.
-           oErr:Description   := "Too many paramteres"
-           oErr:GenCode       := EG_OLEEXECPTION
-           oErr:Operation     := ::cClassName + ":" + cMsg
-           oErr:Severity      := ES_ERROR
-           oErr:SubCode       := -1
-           oErr:SubSystem     := "TOleAuto"
-      END
-
-      // Reset in ::Set()
-      //SetOleRefFlags()
-   ELSE
-      SWITCH nParams
-         CASE 9
-            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
-            EXIT
-         CASE 8
-            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
-            EXIT
-         CASE 7
-            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
-            EXIT
-         CASE 6
-            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
-            EXIT
-         CASE 5
-            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
-            EXIT
-         CASE 4
-            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4 )
-            EXIT
-         CASE 3
-            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3 )
-            EXIT
-         CASE 2
-            uObj := ::Invoke( cMsg, @uParam1, @uParam2 )
-            EXIT
-         CASE 1
-            uObj := ::Invoke( cMsg, @uParam1 )
-            EXIT
-         CASE 0
-            uObj := ::Invoke( cMsg )
-            EXIT
-         DEFAULT
-           oErr := ErrorNew()
-           oErr:Args          := { Self, cMsg, HB_aParams() }
-           oErr:CanDefault    := .F.
-           oErr:CanRetry      := .F.
-           oErr:CanSubstitute := .T.
-           oErr:Description   := "Too many paramteres"
-           oErr:GenCode       := EG_OLEEXECPTION
-           oErr:Operation     := ::cClassName + ":" + cMsg
-           oErr:Severity      := ES_ERROR
-           oErr:SubCode       := -1
-           oErr:SubSystem     := "TOleAuto"
-      END
-
-      // Reset in ::Invoke()
-      //SetOleRefFlags()
-
-      IF Ole2TxtError() != "S_OK"
-         //TraceLog( cMsg )
-
-         SWITCH nParams
-            CASE 9
-               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
-               EXIT
-            CASE 8
-               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
-               EXIT
-            CASE 7
-               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
-               EXIT
-            CASE 6
-               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
-               EXIT
-            CASE 5
-               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
-               EXIT
-            CASE 4
-               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4 )
-               EXIT
-            CASE 3
-               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3 )
-               EXIT
-            CASE 2
-               uObj := ::Get( cMsg, @uParam1, @uParam2 )
-               EXIT
-            CASE 1
-               uObj := ::Get( cMsg, @uParam1 )
-               EXIT
-            CASE 0
-               uObj := ::Get( cMsg )
-               EXIT
-            DEFAULT
-               // Deatlt with above!
-         END
-
-        // Reset in ::Get()
-        //SetOleRefFlags()
-      ENDIF
-   ENDIF
-
-   ::bShowException := bPresetShowException
-
-   IF ::bShowException
-      IF Ole2TxtError() == "DISP_E_EXCEPTION"
-         oErr := ErrorNew()
-         oErr:Args          := { Self, cMsg, HB_aParams() }
-         oErr:CanDefault    := .F.
-         oErr:CanRetry      := .F.
-         oErr:CanSubstitute := .T.
-         oErr:Description   := OLEExceptionDescription()
-         oErr:GenCode       := EG_OLEEXECPTION
-         oErr:Operation     := ::cClassName + ":" + cMsg
-         oErr:Severity      := ES_ERROR
-         oErr:SubCode       := -1
-         oErr:SubSystem     := OLEExceptionSource()
-
-         RETURN Eval( ErrorBlock(), oErr )
-
-      ELSEIF ( cError := Ole2TxtError() ) != "S_OK"
-
-         oErr := ErrorNew()
-         oErr:Args          := { Self, cMsg, HB_aParams() }
-         oErr:CanDefault    := .F.
-         oErr:CanRetry      := .F.
-         oErr:CanSubstitute := .T.
-         oErr:Description   := cError
-         oErr:GenCode       := EG_OLEEXECPTION
-         oErr:Operation     := ::cClassName + ":" + cMsg
-         oErr:Severity      := ES_ERROR
-         oErr:SubCode       := -1
-         oErr:SubSystem     := ::cClassName
-
-         RETURN Eval( ErrorBlock(), oErr )
-      ENDIF
-
-   ENDIF
-
-   IF ValType( uObj ) == 'O'
-      uObj:cClassName := Self:cClassName + ':' + cMsg
-      //TraceLog( HB_ArrayId( uObj ), "*Returning: " + uObj:cClassName )
-   ENDIF
-
-RETURN uObj
 
 //--------------------------------------------------------------------
 
@@ -951,28 +417,37 @@ RETURN uObj
      BSTR wString;
      BOOL bByRef;
 
-     nArgs = hb_pcount() - 2;
+     nArgs = hb_pcount();
 
      if( nArgs > 0 )
      {
         pArgs = ( VARIANTARG * ) hb_xgrab( sizeof( VARIANTARG ) * nArgs );
         aPrgParams = ( PHB_ITEM * ) hb_xgrab( sizeof( PHB_ITEM ) * nArgs );
 
+        s_OleRefFlags = (char *) hb_xgrab( nArgs );
+
         //printf( "Args: %i\n", nArgs );
 
         for( n = 0; n < nArgs; n++ )
         {
            // Pramateres processed in reveresed order.
-           nArg = nArgs + 2 - n;
+           nArg = nArgs - n;
            nParam = nArgs - n;
-
-           bByRef = s_OleRefFlags && s_OleRefFlags[ nParam - 1 ] == 'Y';
 
            //printf( "N: %i Arg: %i Type: %i ByRef: %i\n", n, nArg, hb_stackItemFromBase( nArg  )->type, bByRef );
 
            VariantInit( &( pArgs[ n ] ) );
 
            uParam = hb_param( nArg, HB_IT_ANY );
+
+           if( ( bByRef = HB_IS_BYREF( hb_stackItemFromBase( nArg ) ) ) != 0 )
+           {
+              s_OleRefFlags[ nArg ] == 'Y';
+           }
+           else
+           {
+              s_OleRefFlags[ nArg ] == 'N';
+           }
 
            aPrgParams[ n ] = uParam;
 
@@ -1115,43 +590,38 @@ RETURN uObj
                     pArgs[ n ].n1.n2.vt        = VT_ARRAY | VT_VARIANT;
                     pArgs[ n ].n1.n2.n3.parray = SafeArrayCreate( VT_VARIANT, 1, &rgsabound );
 
-                    if( s_pSym_hObj )
+                    for( i = 0; i < count; i++ )
                     {
-                       for( i = 0; i < count; i++ )
+                       elem = hb_arrayGetItemPtr( uParam, i+1 );
+
+                       if( strcmp( hb_objGetClsName( elem ), "TOLEAUTO" ) == 0 )
                        {
-                          elem = hb_arrayGetItemPtr( uParam, i+1 );
+                          VARIANT mVariant;
 
-                          if( strcmp( hb_objGetClsName( elem ), "TOLEAUTO" ) == 0 )
-                          {
-                             VARIANT mVariant;
+                          VariantInit( &mVariant );
 
-                             VariantInit( &mVariant );
+                          hb_vmPushSymbol( s_pSym_hObj->pSymbol );
+                          hb_vmPush( elem );
+                          hb_vmSend( 0 );
 
-                             hb_vmPushSymbol( s_pSym_hObj->pSymbol );
-                             hb_vmPush( elem );
-                             hb_vmSend( 0 );
-
-                             mVariant.n1.n2.vt = VT_DISPATCH;
-                             mVariant.n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
-                             SafeArrayPutElement( pArgs[ n ].n1.n2.n3.parray, &i, &mVariant );
-                          }
+                          mVariant.n1.n2.vt = VT_DISPATCH;
+                          mVariant.n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
+                          SafeArrayPutElement( pArgs[ n ].n1.n2.n3.parray, &i, &mVariant );
                        }
                     }
                  }
                  else
                  {
-                    if( strcmp( hb_objGetClsName( uParam ), "TOLEAUTO" ) == 0 )
+                    if( hb_clsIsParent( uParam->item.asArray.value->uiClass , "TOLEAUTO" ) )
                     {
-                       if( s_pSym_hObj )
-                       {
-                          hb_vmPushSymbol( s_pSym_hObj->pSymbol );
-                          hb_vmPush( uParam );
-                          hb_vmSend( 0 );
-                          //TraceLog( NULL, "\n#%i Dispatch: %ld\n", n, hb_parnl( -1 ) );
-                          pArgs[ n ].n1.n2.vt = VT_DISPATCH;
-                          pArgs[ n ].n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
-                          //printf( "\nDispatch: %p\n", pArgs[ n ].n1.n2.n3.pdispVal );
-                       }
+                       hb_vmPushSymbol( s_pSym_hObj->pSymbol );
+                       hb_vmPush( uParam );
+                       hb_vmSend( 0 );
+                       //TraceLog( NULL, "\n#%i Dispatch: %ld\n", n, hb_parnl( -1 ) );
+                       pArgs[ n ].n1.n2.vt = VT_DISPATCH;
+                       pArgs[ n ].n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
+                       //printf( "\nDispatch: %p\n", pArgs[ n ].n1.n2.n3.pdispVal );
+
                     }
                     else
                     {
@@ -1303,6 +773,7 @@ RETURN uObj
         }
 
         hb_xfree( ( LPVOID ) dParams->rgvarg );
+        hb_xfree( (void *) s_OleRefFlags );
 
         if( aPrgParams )
         {
@@ -1461,7 +932,7 @@ RETURN uObj
                     hb_vmPushLong( ( LONG ) mElem.n1.n2.n3.pdispVal );
                     hb_vmSend( 1 );
 
-                    mElem.n1.n2.n3.pdispVal -> lpVtbl -> AddRef( mElem.n1.n2.n3.pdispVal );
+                    mElem.n1.n2.n3.pdispVal->lpVtbl->AddRef( mElem.n1.n2.n3.pdispVal );
                  }
 
                  hb_arrayAddForward( &Result, &Add );
@@ -1659,65 +1130,23 @@ RETURN uObj
 
   //---------------------------------------------------------------------------//
 
-  HB_FUNC( OLEINVOKE ) // (hOleObject, szMethodName, uParams...)
+  void OleSetProperty( void )
   {
-     IDispatch * pDisp = ( IDispatch * ) hb_parnl( 1 );
-     BSTR wMember;
-     DISPID lDispID;
-     DISPPARAMS dParams;
-     UINT uArgErr;
-
-     VariantInit( &RetVal );
-     memset( (LPBYTE) &excep, 0, sizeof( excep ) );
-
-     //printf( "1\n" );
-
-     wMember = AnsiToWide( hb_parcx( 2 ) );
-     s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
-     hb_xfree( wMember );
-
-     //printf( "2\n" );
-
-     if( s_nOleError == S_OK )
-     {
-        GetParams( &dParams );
-
-        s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
-                                             lDispID,
-                                             &IID_NULL,
-                                             LOCALE_USER_DEFAULT,
-                                             DISPATCH_METHOD,
-                                             &dParams,
-                                             &RetVal,
-                                             &excep,
-                                             &uArgErr ) ;
-
-        //TraceLog( NULL, "Invoke '%s' Result: %p\n", hb_parcx(2), s_nOleError );
-
-        FreeParams( &dParams );
-
-        RetValue();
-     }
-     else
-     {
-        //TraceLog( NULL, "Invoke GetIDsOfNames '%s' Error: %p\n", hb_parcx(2), s_nOleError );
-     }
-  }
-
-  //---------------------------------------------------------------------------//
-
-  HB_FUNC( OLESETPROPERTY ) // (hOleObject, cPropName, uParams...)
-  {
-     IDispatch * pDisp = ( IDispatch * ) hb_parnl( 1 );
+     IDispatch * pDisp;
      BSTR wMember;
      DISPID lDispID, lPropPut = DISPID_PROPERTYPUT;
-     WORD wFlags;
      DISPPARAMS dParams;
      UINT uArgErr;
 
+     hb_vmPushSymbol( s_pSym_hObj->pSymbol );
+     hb_vmPush( hb_stackSelfItem() );
+     hb_vmSend( 0 );
+
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
-     wMember = AnsiToWide( hb_parcx( 2 ) );
+     pDisp = ( IDispatch * ) hb_parnl( -1 );
+     wMember = AnsiToWide( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
+
      s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
      hb_xfree( wMember );
 
@@ -1727,33 +1156,41 @@ RETURN uObj
         dParams.rgdispidNamedArgs = &lPropPut;
         dParams.cNamedArgs = 1;
 
-        if( dParams.rgvarg[0].n1.n2.vt == VT_DISPATCH )
-        {
-           wFlags = DISPATCH_PROPERTYPUTREF;// | DISPATCH_METHOD;
-           //TraceLog( NULL, "SetProperty '%s' BYREF\n", hb_parcx(2) );
-        }
-        else
-        {
-           wFlags = DISPATCH_PROPERTYPUT;// | DISPATCH_METHOD;
-        }
-
         //TraceLog( NULL, "SetProperty '%s' Args: %i\n", hb_parcx(2), dParams.cArgs );
 
-        s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
-                                           lDispID,
-                                           &IID_NULL,
-                                           LOCALE_USER_DEFAULT,
-                                           wFlags,
-                                           &dParams,
-                                           NULL,    // No return value
-                                           &excep,
-                                           &uArgErr );
+        if( s_OleRefFlags[ 0 ] || hb_param( 2, HB_IT_ARRAY ) )
+        {
+           s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
+                                                lDispID,
+                                                &IID_NULL,
+                                                LOCALE_USER_DEFAULT,
+                                                DISPATCH_PROPERTYPUTREF,
+                                                &dParams,
+                                                NULL,    // No return value
+                                                &excep,
+                                                &uArgErr );
+
+          if( s_nOleError == S_OK )
+          {
+             goto PropertyDone;
+          }
+        }
 
         //TraceLog( NULL, "SetProperty '%s' Result: %p\n", hb_parcx(2), s_nOleError );
 
-        FreeParams( &dParams );
+        s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
+                                             lDispID,
+                                             &IID_NULL,
+                                             LOCALE_USER_DEFAULT,
+                                             DISPATCH_PROPERTYPUT,
+                                             &dParams,
+                                             NULL,    // No return value
+                                             &excep,
+                                             &uArgErr );
 
-        hb_ret();
+      PropertyDone:
+
+        FreeParams( &dParams );
      }
      else
      {
@@ -1761,27 +1198,32 @@ RETURN uObj
      }
   }
 
-  //---------------------------------------------------------------------------//
-
-  HB_FUNC( OLEGETPROPERTY )  // (hOleObject, cPropName, uParams...)
+  void OleInvoke( void )
   {
-     IDispatch * pDisp = ( IDispatch * ) hb_parnl( 1 );
+     IDispatch * pDisp;
      BSTR wMember;
      DISPID lDispID;
      DISPPARAMS dParams;
      UINT uArgErr;
 
-     VariantInit( &RetVal );
-
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
-     wMember = AnsiToWide( hb_parcx( 2 ) );
+     hb_vmPushSymbol( s_pSym_hObj->pSymbol );
+     hb_vmPush( hb_stackSelfItem() );
+     hb_vmSend( 0 );
+
+     pDisp = ( IDispatch * ) hb_parnl( -1 );
+     wMember = AnsiToWide( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
+
      s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
+
      hb_xfree( wMember );
 
      if( s_nOleError == S_OK )
      {
         GetParams( &dParams );
+
+        VariantInit( &RetVal );
 
         s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                            lDispID,
@@ -1793,7 +1235,23 @@ RETURN uObj
                                            &excep,
                                            &uArgErr );
 
-        //TraceLog( NULL, "GetProperty '%s' Result: %p\n", hb_parcx(2), s_nOleError );
+        if( s_nOleError == S_OK )
+        {
+           goto InvokeDone;
+        }
+
+        s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
+                                           lDispID,
+                                           &IID_NULL,
+                                           LOCALE_USER_DEFAULT,
+                                           DISPATCH_METHOD,
+                                           &dParams,
+                                           &RetVal,
+                                           &excep,
+                                           &uArgErr );
+
+
+      InvokeDone:
 
         FreeParams( &dParams );
 
@@ -1807,180 +1265,6 @@ RETURN uObj
 
   //---------------------------------------------------------------------------//
 
-  HB_FUNC( OLEQUERYINTERFACE )  // (hOleObject, cIID ) -> ppvObject
-  {
-     IUnknown * pUnk = ( IUnknown * ) hb_parnl( 1 );
-     IUnknown * ppvObject = NULL;
-     GUID iid;
-     BSTR wiid;
-
-     s_nOleError = S_OK;
-
-     if( hb_parcx( 2 )[ 0 ] == '{' )
-     {
-        wiid = AnsiToWide( hb_parcx( 2 ) );
-        s_nOleError = CLSIDFromString( wiid, &iid );
-        hb_xfree( wiid );
-     }
-     else
-     {
-        memcpy( ( LPVOID ) &iid, hb_parcx( 2 ), sizeof( iid ) );
-     }
-
-     if( s_nOleError == S_OK )
-     {
-        s_nOleError = pUnk ->lpVtbl->QueryInterface( pUnk, (const struct _GUID *const) &iid, (void **) &ppvObject );
-     }
-
-     hb_retnl( ( LONG ) ppvObject );
-  }
-
-  //---------------------------------------------------------------------------//
-
-  HB_FUNC( OLEADDREF )  // ( hOleObject )
-  {
-     IUnknown * pUnk = ( IUnknown * ) hb_parnl( 1 );
-
-     hb_retnl( pUnk -> lpVtbl -> AddRef( pUnk ) );
-  }
-
-  //---------------------------------------------------------------------------//
-
-  //---------------------------------------------------------------------------//
-
-  #if 0
-  HB_FUNC( COMFUNCTION )  // ( hOleObject, nFunc, uParams... )
-  {
-     typedef HRESULT ( STDMETHODCALLTYPE * COMFunc ) ( IUnknown * pUnk );
-
-     IUnknown * pUnk = ( IUnknown * ) hb_parnl( 1 );
-     COMFunc pFunc;
-     COMFunc *vTbl;
-     int i, iParams = hb_pcount();
-     double doubles[16];
-     LPVOID ptros[16];
-
-     vTbl = ( COMFunc * ) &( pUnk -> lpVtbl -> QueryInterface );
-     vTbl += hb_parni( 2 ) + 2;
-     pFunc = *vTbl;
-
-     for( i = iParams; i > 2; i-- )
-     {
-        char *sString;
-        int iInt;
-        double dDouble;
-
-        switch ( ( hb_parinfo( i ) & ~HB_IT_BYREF) )
-        {
-           case HB_IT_STRING:
-           case HB_IT_MEMO:
-             sString = hb_parcx( i );
-             __asm push sString
-             break;
-
-           case HB_IT_LOGICAL:
-             if( ISBYREF( i ) )
-             {
-                ptros[ i ] = (LPVOID) hb_parl( i );
-                sString = ( char * ) &ptros[ i ];
-                __asm push sString
-             }
-             else
-             {
-                iInt = hb_parl( i );
-                __asm push iInt
-             }
-             break;
-
-           case HB_IT_INTEGER:
-           case HB_IT_LONG:
-             if( ISBYREF( i ) )
-             {
-                ptros[ i ] = (LPVOID) hb_parnl( i );
-                sString = ( char * ) &ptros[ i ];
-                __asm push sString
-             }
-             else
-             {
-                iInt = hb_parnl( i );
-                __asm push iInt
-             }
-             break;
-
-           case HB_IT_DOUBLE:
-             if( ISBYREF( i ) )
-             {
-                doubles[ i ] = hb_parnd( i );
-                sString = ( char * ) &doubles[ i ];
-                __asm push sString
-             }
-             else
-             {
-                dDouble = hb_parl( i );
-                __asm push dDouble
-             }
-             break;
-
-           case HB_IT_DATE:
-             if( ISBYREF( i ) )
-             {
-                doubles[ i ] = DateToDbl( hb_pards( i ) );
-                sString = ( char * ) &doubles[ i ];
-                __asm push sString
-             }
-             else
-             {
-                dDouble = DateToDbl( hb_pards( i ) );
-                __asm push dDouble
-             }
-             break;
-
-           default:
-             sString = ( char * ) NULL;
-             __asm push sString
-             break;
-        }
-     }
-
-     s_nOleError = pFunc( pUnk );
-
-     for ( i = 3; i <= iParams; i++ )
-     {
-        if( ISBYREF( i ) )
-        {
-           switch ( (hb_parinfo( i ) & ~HB_IT_BYREF) )
-           {
-              case HB_IT_STRING:
-              case HB_IT_MEMO:
-                hb_storc( (char *) hb_parcx( i ), i );
-                break;
-
-              case HB_IT_LOGICAL:
-                hb_storl( (LONG) ptros[ i ], i );
-                break;
-
-              case HB_IT_INTEGER:
-              case HB_IT_LONG:
-                hb_stornl( (LONG) ptros[ i ], i );
-                break;
-
-              case HB_IT_DOUBLE:
-                hb_stornd( doubles[ i ], i );
-                break;
-
-              case HB_IT_DATE:
-                hb_stords( DblToDate( doubles[ i ] ), i );
-                break;
-           }
-        }
-     }
-
-     hb_ret();
-  }
-  #endif
-
-  //---------------------------------------------------------------------------//
-
   HB_FUNC( OLEERROR )
   {
      hb_retnl( (LONG) s_nOleError );
@@ -1988,107 +1272,89 @@ RETURN uObj
 
   //---------------------------------------------------------------------------//
 
-  HB_FUNC( OLE2TXTERROR )
+  char * Ole2TxtError( void )
   {
      switch( (LONG) s_nOleError )
      {
         case S_OK:
-           hb_retc( "S_OK" );
-           break;
+           return "S_OK";
 
         case CO_E_CLASSSTRING:
-           hb_retc( "CO_E_CLASSSTRING" );
-           break;
+           return "CO_E_CLASSSTRING";
 
         case OLE_E_WRONGCOMPOBJ:
-           hb_retc( "OLE_E_WRONGCOMPOBJ" );
-           break;
+           return "OLE_E_WRONGCOMPOBJ";
 
         case REGDB_E_CLASSNOTREG:
-           hb_retc( "REGDB_E_CLASSNOTREG" );
-           break;
+           return "REGDB_E_CLASSNOTREG";
 
         case REGDB_E_WRITEREGDB:
-           hb_retc( "REGDB_E_WRITEREGDB" );
-           break;
+           return "REGDB_E_WRITEREGDB";
 
         case E_OUTOFMEMORY:
-           hb_retc( "E_OUTOFMEMORY" );
-           break;
+           return "E_OUTOFMEMORY";
 
         case E_NOTIMPL:
-           hb_retc( "E_NOTIMPL" );
-           break;
+           return "E_NOTIMPL";
 
         case E_INVALIDARG:
-           hb_retc( "E_INVALIDARG" );
-           break;
+           return "E_INVALIDARG";
 
         case E_UNEXPECTED:
-           hb_retc( "E_UNEXPECTED" );
-           break;
+           return "E_UNEXPECTED";
 
         case DISP_E_UNKNOWNNAME:
-           hb_retc( "DISP_E_UNKNOWNNAME" );
-           break;
+           return "DISP_E_UNKNOWNNAME";
 
         case DISP_E_UNKNOWNLCID:
-           hb_retc( "DISP_E_UNKNOWNLCID" );
-           break;
+           return "DISP_E_UNKNOWNLCID";
 
         case DISP_E_BADPARAMCOUNT:
-           hb_retc( "DISP_E_BADPARAMCOUNT" );
-           break;
+           return "DISP_E_BADPARAMCOUNT";
 
         case DISP_E_BADVARTYPE:
-           hb_retc( "DISP_E_BADVARTYPE" );
-           break;
+           return "DISP_E_BADVARTYPE";
 
         case DISP_E_EXCEPTION:
-           hb_retc( "DISP_E_EXCEPTION" );
-           break;
+           return "DISP_E_EXCEPTION";
 
         case DISP_E_MEMBERNOTFOUND:
-           hb_retc( "DISP_E_MEMBERNOTFOUND" );
-           break;
+           return "DISP_E_MEMBERNOTFOUND";
 
         case DISP_E_NONAMEDARGS:
-           hb_retc( "DISP_E_NONAMEDARGS" );
-           break;
+           return "DISP_E_NONAMEDARGS";
 
         case DISP_E_OVERFLOW:
-           hb_retc( "DISP_E_OVERFLOW" );
-           break;
+           return "DISP_E_OVERFLOW";
 
         case DISP_E_PARAMNOTFOUND:
-           hb_retc( "DISP_E_PARAMNOTFOUND" );
-           break;
+           return "DISP_E_PARAMNOTFOUND";
 
         case DISP_E_TYPEMISMATCH:
-           hb_retc( "DISP_E_TYPEMISMATCH" );
-           break;
+           return "DISP_E_TYPEMISMATCH";
 
         case DISP_E_UNKNOWNINTERFACE:
-           hb_retc( "DISP_E_UNKNOWNINTERFACE" );
-           break;
+           return "DISP_E_UNKNOWNINTERFACE";
 
         case DISP_E_PARAMNOTOPTIONAL:
-           hb_retc( "DISP_E_PARAMNOTOPTIONAL" );
-           break;
+           return "DISP_E_PARAMNOTOPTIONAL";
 
         case CO_E_SERVER_EXEC_FAILURE:
-           hb_retc( "CO_E_SERVER_EXEC_FAILURE" );
-           break;
+           return "CO_E_SERVER_EXEC_FAILURE";
 
         case MK_E_UNAVAILABLE:
-           hb_retc( "MK_E_UNAVAILABLE" );
-           break;
+           return "MK_E_UNAVAILABLE";
 
         default:
            TraceLog( NULL, "TOleAuto Error %p\n", s_nOleError );
-           hb_retc( "Unknown error" );
-           break;
+           return "Unknown error";
      };
+  }
+
+  //---------------------------------------------------------------------------//
+  HB_FUNC( OLE2TXTERROR )
+  {
+     hb_retc( Ole2TxtError() );
   }
 
   //---------------------------------------------------------------------------//
@@ -2138,6 +1404,78 @@ RETURN uObj
   }
 
   //---------------------------------------------------------------------------//
+  HB_FUNC( TOLEAUTO_ONERROR )
+  {
+     //TraceLog( NULL, "Class: '%s' Message: '%s' Params %i\n", hb_objGetClsName( hb_stackSelfItem() ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, hb_pcount() );
+
+     if( hb_pcount() >= 1 && ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[0] == '_' )
+     {
+        OleSetProperty();
+
+        if( s_nOleError == S_OK )
+        {
+           hb_itemReturn( hb_stackItemFromBase( 1 ) );
+           goto SkipInvoke;
+        }
+     }
+
+     OleInvoke();
+
+   SkipInvoke:
+
+     if( s_nOleError == S_OK )
+     {
+        if( HB_IS_OBJECT( &HB_VM_STACK.Return ) )
+        {
+           HB_ITEM Return;
+           HB_ITEM OleClassName;
+           char sOleClassName[ 256 ];
+
+           Return.type = HB_IT_NIL;
+           hb_itemForwardValue( &Return, &HB_VM_STACK.Return );
+
+           hb_objSendMsg( hb_stackSelfItem(), "cClassName", 0 );
+
+           strncpy( sOleClassName, hb_parc( - 1 ), hb_parclen( -1 ) );
+           sOleClassName[ hb_parclen( -1 ) ] = ':';
+           strcpy( sOleClassName + hb_parclen( -1 ) + 1, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
+
+           //TraceLog( NULL, "Class: '%s'\n", sOleClassName );
+
+           OleClassName.type = HB_IT_NIL;
+           hb_itemPutC( &OleClassName, sOleClassName );
+
+           hb_objSendMsg( &Return, "_cClassName", 1, &OleClassName );
+
+           hb_itemReturn( &Return );
+        }
+     }
+     else
+     {
+        PHB_ITEM pReturn;
+        char *sDescription;
+
+        hb_objSendMsg( hb_stackSelfItem(), "cClassName", 0 );
+
+        if( s_nOleError == DISP_E_EXCEPTION )
+        {
+           sDescription = WideToAnsi( excep.bstrDescription );
+        }
+        else
+        {
+           sDescription = Ole2TxtError();
+        }
+
+        pReturn = hb_errRT_SubstArray( hb_parcx( -1 ), EG_OLEEXECPTION, (ULONG) s_nOleError, sDescription, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, hb_arrayFromParams( HB_VM_STACK.pBase ) );
+
+        if( s_nOleError == DISP_E_EXCEPTION )
+        {
+           hb_xfree( (void *) sDescription );
+        }
+
+        hb_itemReturn( pReturn );
+     }
+  }
 
 #pragma ENDDUMP
 

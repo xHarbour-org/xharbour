@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.17 2004/04/20 14:33:23 jacekp Exp $
+ * $Id: eval.c,v 1.18 2004/04/28 18:31:22 druzus Exp $
  */
 
 /*
@@ -493,19 +493,21 @@ HB_FUNC( HB_EXECFROMARRAY )
 
       if( pString->type == HB_IT_STRING )
       {
-         pFunc = (PHB_FUNC) hb_objHasMsg( pSelf, pString->item.asString.value );
+         pExecSym = hb_dynsymGet( pString->item.asString.value );
       }
       else if( pString->type == HB_IT_POINTER )
       {
          pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
+         hb_dynsymLock();
+         pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+         hb_dynsymUnlock();
       }
-      hb_dynsymLock();
-      pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+
       if ( pExecSym )
       {
          hb_vmPushSymbol( pExecSym->pSymbol );
       }
-      hb_dynsymUnlock();
+
       pArgs = hb_param( 3, HB_IT_ARRAY );
    }
    else if( pFirst->type == HB_IT_STRING && uiPcount == 1) /* hb_ExecFromArray( cFunc )  */

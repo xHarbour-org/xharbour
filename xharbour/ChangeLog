@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3838 2005/02/18 18:08:52 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3839 2005/02/18 21:19:57 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-18 21:02 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbapierr.h
+  * source/vm/errorapi.c
+    + Added:
+      PHB_ITEM HB_EXPORT hb_errRT_SubstArray ( char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, PHB_ITEM pArray );
+
+  * source/vm/eval.c
+    ! Fixed and optimized HB_ExecFromArray( <oObj>, <cMethod> )
+      ( fix is for the case where cMethod is handled by means of OnError handler )
+
+  * include/error.ch
+    + Added: #define EG_OLEEXECPTION 1001
+
+  * source/rtl/win32ole.prg
+    * Greatly simplified and optimized, by means of an almost complete rewrite.
+      /* In general it should be able to run some code that failed before, I hope I didn't break anything. */
 
 2005-02-18 22:20 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/config/w32/bcc32.cf

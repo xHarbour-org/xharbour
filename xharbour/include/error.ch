@@ -1,5 +1,5 @@
 /*
- * $Id: error.ch,v 1.5 2004/03/29 18:04:00 ronpinkas Exp $
+ * $Id: error.ch,v 1.6 2004/03/30 18:37:28 ronpinkas Exp $
  */
 
 /*
@@ -107,6 +107,8 @@
 #define EG_ARRDIMENSION 48      /* Harbour special */
 #define EG_NOTARRAY     49      /* Harbour special */
 #define EG_CONDITION    50      /* Harbour special */
+
+#define EG_OLEEXECPTION 1001
 
 /* Internal errors */
 #define HB_EI_ERRUNRECOV        9000 /* "Unrecoverable error %lu: " */
