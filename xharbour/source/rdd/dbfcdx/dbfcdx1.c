@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.16 2002/05/21 16:45:43 horacioroldan Exp $
+ * $Id: dbfcdx1.c,v 1.17 2002/05/21 17:06:34 ronpinkas Exp $
  */
 
 /*
@@ -2749,7 +2749,8 @@ static USHORT hb_cdxIndexLockRead( LPCDXINDEX pIndex, LPCDXTAG pTag )
          hb_errInternal( 9105, "hb_cdxTagLockRead: bad count of locks.", "", "" );
       return 1;
    }
-   ret = hb_fsLock ( pIndex->hFile, 0x7FFFFFFEL, 1, FL_LOCK );
+   /* ret = hb_fsLock ( pIndex->hFile, 0x7FFFFFFEL, 1, FL_LOCK ); */
+   while (! (ret = hb_fsLock ( pIndex->hFile, 0x7FFFFFFEL, 1, FL_LOCK ) ) );
    if ( !ret )
       hb_errInternal( 9107, "hb_cdxTagLockRead: lock failure.", "", "" ); /* change into error dbfcdx/1038 */
    if ( ret ) {
