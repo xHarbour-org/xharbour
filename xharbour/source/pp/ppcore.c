@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.175 2004/10/20 22:40:50 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.176 2004/10/21 17:04:41 ronpinkas Exp $
  */
 
 /*
@@ -2294,7 +2294,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
                  if( hb_comp_PPTrace )
                  {
                     fprintf( hb_comp_PPTrace, "%s(%i) >%.*s<\n", hb_comp_files.pLast->szFileName, hb_comp_iLine - 1, i, ptrb );
-                    fprintf( hb_comp_PPTrace, "#defined >%.*s<\n\n", ptri - ptrb, ptro );
+                    fprintf( hb_comp_PPTrace, "#defined >%.*s<\n\n", ( int ) ( ptri - ptrb ), ptro );
                  }
 
                  hb_pp_Stuff( ptro, ptrb, i, ptri - ptrb, lens + 1 );

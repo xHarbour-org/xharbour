@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.165 2004/10/14 17:51:02 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.166 2004/10/14 22:42:16 druzus Exp $
  */
 
 /*
@@ -4686,10 +4686,6 @@ static void hb_cdxCreateFName( CDXAREAP pArea, char * szBagName,
       hb_strncpyUpperTrim( szBaseName, pFileName->szName, CDX_MAXTAGNAMELEN );
    }
 
-   if ( !pFileName->szPath )
-   {
-      pFileName->szPath = hb_set.HB_SET_DEFAULT ? hb_set.HB_SET_DEFAULT : ".";
-   }
    if ( !pFileName->szExtension || !fName )
    {
       DBORDERINFO pExtInfo;
@@ -6489,12 +6485,10 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
              ( pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE );
    do
    {
-      if ( ! hb_spFile( ( BYTE * ) szFileName, ( BYTE * ) szSpFile ) )
-         *szSpFile = '\0';
-
-      hFile = hb_spOpen( ( BYTE * ) ( *szSpFile ? szSpFile : szFileName ), uiFlags );
+      hb_spFile( ( BYTE * ) szFileName, ( BYTE * ) szSpFile );
+      hFile = hb_spOpen( ( BYTE * ) szSpFile , uiFlags );
       if ( hFile == FS_ERROR )
-         bRetry = ( hb_cdxErrorRT( pArea, EG_OPEN, 1003, *szSpFile ? szSpFile : szFileName,
+         bRetry = ( hb_cdxErrorRT( pArea, EG_OPEN, 1003, szSpFile,
                                    hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
       else
       {
@@ -6503,7 +6497,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
             hb_fsClose( hFile );
             hFile = FS_ERROR;
             hb_cdxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT,
-                           *szSpFile ? szSpFile : szFileName, hb_fsError(), EF_CANDEFAULT );
+                           szSpFile, hb_fsError(), EF_CANDEFAULT );
          }
          bRetry = FALSE;
       }
@@ -6851,24 +6845,24 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       FHANDLE hFile;
       BOOL bRetry;
 
-      if ( !fNewFile )
-         fNewFile = ! hb_spFile( ( BYTE * ) szFileName, ( BYTE * ) szSpFile );
-
       do
       {
+         if ( ! hb_spFile( ( BYTE * ) szFileName, ( BYTE * ) szSpFile ) )
+         {
+            fNewFile = TRUE;
+         }
+
          if ( fNewFile )
          {
-            /* TODO: no API to take real file name with path */
-            hFile = hb_spCreate( ( BYTE * ) szFileName, FC_NORMAL );
+            hFile = hb_spCreate( ( BYTE * ) szSpFile, FC_NORMAL );
          }
          else
          {
-            hb_strncpy( szFileName, szSpFile, _POSIX_PATH_MAX );
-            hFile = hb_spOpen( ( BYTE * ) szFileName,
+            hFile = hb_spOpen( ( BYTE * ) szSpFile,
                                FO_READWRITE | ( pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE ) );
          }
          if ( hFile == FS_ERROR )
-            bRetry = ( hb_cdxErrorRT( pArea, EG_CREATE, EDBF_CREATE, szFileName,
+            bRetry = ( hb_cdxErrorRT( pArea, EG_CREATE, EDBF_CREATE, szSpFile,
                                       hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
          else
             bRetry = FALSE;
@@ -6892,7 +6886,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       pIndex->hFile      = hFile;
       pIndex->fShared    = pArea->fShared;
       pIndex->fReadonly  = FALSE;
-      pIndex->szFileName = hb_strdup( szFileName );
+      pIndex->szFileName = hb_strdup( szSpFile );
 
       if ( !fNewFile )
       {

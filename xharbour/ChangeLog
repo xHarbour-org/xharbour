@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3510 2004/10/21 17:03:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3511 2004/10/21 21:18:41 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-22 03:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/spfiles.c
+    * changed hb_spFile() to always store file name with path in second
+      parameter (if given) even when it returns FALSE to eliminate
+      race condition in next calls to hb_spOpen()/hb_spCreate() 
+      I'm still not sure about one thing - does Clipper check current
+      directory before SET_PATH if SET_DEFAULT is not set?
+      Anyhow the modification now will be done inside hb_spFile not
+      RDD subsystem.
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    - removed all hacks with default paths from DBFCDX - now hb_spFile()
+      is strong enough to make this job yourself ;-)
+
+  * xharbour/source/pp/ppcore.c
+    * casting for pointers bigger then int
 
 2004-10-21 14:17 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/gtwin/gtwin.c

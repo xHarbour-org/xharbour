@@ -1,5 +1,5 @@
 /*
- * $Id: spfiles.c,v 1.6 2002/03/26 15:27:16 ronpinkas Exp $
+ * $Id: spfiles.c,v 1.7 2004/09/21 02:52:36 druzus Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 #include "hbapifs.h"
 #include "hbset.h"
 
-BOOL hb_spFile( BYTE * pFilename, BYTE *pRetPath )
+BOOL hb_spFile( BYTE * pFilename, BYTE * pRetPath )
 {
    BYTE *Path;
    BOOL bIsFile = FALSE;
@@ -98,6 +98,18 @@ BOOL hb_spFile( BYTE * pFilename, BYTE *pRetPath )
             NextPath = NextPath->pNext;
          }
       }
+
+      /*
+       * This code is intentional. To eliminate race condition,
+       * in pending hb_spCreate()/hb_spOpen() call when we have to know
+       * real path and file name we have to set its deterministic value
+       * here. If it's not necessary the caller may drop this value.
+       */
+      if( ! bIsFile )
+      {
+         pFilepath->szPath = hb_set.HB_SET_DEFAULT ? hb_set.HB_SET_DEFAULT : ".";
+         hb_fsFNameMerge( (char*) Path, pFilepath );
+      }
    }
 
    hb_xfree( pFilepath );
@@ -106,17 +118,13 @@ BOOL hb_spFile( BYTE * pFilename, BYTE *pRetPath )
    {
       hb_xfree( Path );
    }
-   else if( bIsFile == FALSE )
-   {
-      Path[0] = '\0';
-   }
 
    return bIsFile;
 }
 
 FHANDLE hb_spOpen( BYTE * pFilename, USHORT uiFlags )
 {
-   BYTE path[ _POSIX_PATH_MAX + 3 + 10 ];
+   BYTE path[ _POSIX_PATH_MAX + 1 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_spOpen(%p, %hu)", pFilename, uiFlags));
 
