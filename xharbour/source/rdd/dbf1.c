@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.49 2003/12/12 10:16:05 druzus Exp $
+ * $Id: dbf1.c,v 1.50 2004/01/11 14:03:39 andijahja Exp $
  */
 
 /*
@@ -639,7 +639,7 @@ BOOL HB_EXPORT hb_dbfLockExtFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, UL
    BOOL fRet = FALSE, fWait;
 
    if ( !hb_dbfLockExtGetData( bScheme, &ulPos, &ulPool ) )
-      return FALSE;
+      return fRet;
 
    do
    {
