@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.87 2004/08/02 12:37:14 druzus Exp $
+ * $Id: dbf1.c,v 1.88 2004/08/20 00:50:15 druzus Exp $
  */
 
 /*
@@ -2180,7 +2180,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
 
    /* Allocate only after succesfully open file */
-   pArea->szDataFileName = ( BYTE * ) hb_strdup( ( char * ) szPath );
+   pArea->szDataFileName = hb_strdup( ( char * ) szPath );
 
    /* Read file header and exit if error */
    if( SELF_READDBHEADER( ( AREAP ) pArea ) == FAILURE )
@@ -2380,7 +2380,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       hb_xfree( pFileName );
       tmp = pOpenInfo->abName;
       pOpenInfo->abName = szPath;
-      pArea->szMemoFileName = ( BYTE * ) hb_strdup( ( char * ) szPath );
+      pArea->szMemoFileName = hb_strdup( ( char * ) szPath );
 
       /* Open memo file and exit if error */
       if( SELF_OPENMEMFILE( ( AREAP ) pArea, pOpenInfo ) == FAILURE )
