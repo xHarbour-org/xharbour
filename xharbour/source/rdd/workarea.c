@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.14 2002/12/28 12:11:57 horacioroldan Exp $
+ * $Id: workarea.c,v 1.15 2003/01/06 12:39:27 horacioroldan Exp $
  */
 
 /*
@@ -678,28 +678,33 @@ ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
    if( pEvalInfo->dbsci.lNext )
       ulNext = hb_itemGetNL( pEvalInfo->dbsci.lNext );
 
-   while( !pArea->fEof )
+   if( pEvalInfo->dbsci.lNext && ulNext > 0 )
    {
-      if( pEvalInfo->dbsci.lNext && ulNext-- < 1 )
-         break;
-
-      if( pEvalInfo->dbsci.itmCobWhile )
+      while( !pArea->fEof )
       {
-         bWhile = hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobWhile ) );
-         if( !bWhile )
+
+        if( pEvalInfo->dbsci.itmCobWhile )
+        {
+            bWhile = hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobWhile ) );
+            if( !bWhile )
+               break;
+         }
+         else
+            bWhile = TRUE;
+
+         if( pEvalInfo->dbsci.itmCobFor )
+            bFor = hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobFor ) );
+         else
+            bFor = TRUE;
+
+         if( bFor && bWhile )
+            hb_vmEvalBlock( pEvalInfo->itmBlock );
+
+         if( pEvalInfo->dbsci.lNext && --ulNext < 1 )
             break;
+
+         SELF_SKIP( pArea, 1 );
       }
-      else
-         bWhile = TRUE;
-
-      if( pEvalInfo->dbsci.itmCobFor )
-         bFor = hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobFor ) );
-      else
-         bFor = TRUE;
-
-      if( bFor && bWhile )
-         hb_vmEvalBlock( pEvalInfo->itmBlock );
-      SELF_SKIP( pArea, 1 );
    }
 
    return SUCCESS;
