@@ -1,6 +1,6 @@
 
 /*
- * $Id: zipcomp.cpp,v 1.9 2002/01/26 00:35:47 lculik Exp $
+ * $Id: zipcomp.cpp,v 1.1 2002/07/03 02:59:07 lculik Exp $
  */
 
 /*
@@ -68,6 +68,7 @@ int   hb_CompressFile(char *szFile,PHB_ITEM pArray,int iCompLevel,PHB_ITEM pBloc
 {
     uLong uiCount;
     uLong uiPos;
+    BOOL bAdded=false;
     char szNewFile[MAXFILENAME];   
     int iCause;
     BOOL bFileExist=hb_fsFile((BYTE*)szFile);
@@ -108,6 +109,7 @@ int   hb_CompressFile(char *szFile,PHB_ITEM pArray,int iCompLevel,PHB_ITEM pBloc
                 const char *szDummy = (char *)hb_arrayGetCPtr(pArray,uiCount) ;
                 dwSize=GetCurrentFileSize(szDummy);
                 uiPos=uiCount;
+                bAdded=false;
                 if(pBlock !=NULL){
 
                    PHB_ITEM pFileName=hb_itemPutC(NULL,hb_arrayGetCPtr(pArray,uiCount));
@@ -127,24 +129,40 @@ int   hb_CompressFile(char *szFile,PHB_ITEM pArray,int iCompLevel,PHB_ITEM pBloc
                      if (!HB_IS_BLOCK(pProgress))
                      {
                      #if defined(HB_OS_WIN_32) || defined(__MINGW32__)
-                        if (bDrive)
+                        if (bDrive && !bAdded) {
                            szZip.AddNewFileDrv(szDummy, iCompLevel, true,NULL,NULL,65536);
+                           bAdded=true;
+                           }
                      #endif
-                        if (bPath)
+                        if (bPath && !bAdded)  {
                            szZip.AddNewFile(szDummy, iCompLevel, true,NULL,NULL,65536);
-                        if (!bDrive && !bPath)
+                           bAdded=true;
+                           }
+
+                        if (!bDrive && !bPath && !bAdded) {
                            szZip.AddNewFile(szDummy, iCompLevel, false,NULL,NULL,65536);
+                           bAdded=true;
+                           }
+
                         }
                      else
                      {
 #if defined(HB_OS_WIN_32) || defined(__MINGW32__)
-                        if (bDrive)
+                        if (bDrive && !bAdded)            {
                            szZip.AddNewFileDrv(szDummy, iCompLevel, true,hb_SetProgressofTdSpan,&(PHB_ITEM)pProgress,65536);
+                           bAdded=true;
+                           }
 #endif
-                        if (bPath)
+                        if (bPath && !bAdded)             {
                            szZip.AddNewFile(szDummy, iCompLevel, true,hb_SetProgressofTdSpan,&pProgress,65536);
-                        if (!bDrive && !bPath)
+                           bAdded=true;
+                           }
+
+                        if (!bDrive && !bPath && !bAdded) {
                            szZip.AddNewFile(szDummy, iCompLevel, false,hb_SetProgressofTdSpan,&pProgress,65536);
+                           bAdded=true;
+                           }
+
                       }
 /*                      iTotal+=dwSize;*/
                       if (uiPos== hb_arrayLen(pArray))
@@ -179,6 +197,7 @@ int   hb_CompressFile(char *szFile,PHB_ITEM pArray,int iCompLevel,PHB_ITEM pBloc
     uLong uiPos;
     BOOL bFileExist=hb_fsFile((BYTE*)szFile);
     DWORD dwSize;
+    BOOL bAdded=false;
     if (pDiskBlock !=NULL){
         pDiskStatus=pDiskBlock;
         }
@@ -227,6 +246,7 @@ int   hb_CompressFile(char *szFile,PHB_ITEM pArray,int iCompLevel,PHB_ITEM pBloc
                 const char *szDummy = (char *)hb_arrayGetCPtr(pArray,uiCount) ;
                 dwSize=GetCurrentFileSize(szDummy);
                  uiPos=uiCount;
+                 bAdded=false;
                 if(pBlock !=NULL){
 
                    PHB_ITEM pFileName=hb_itemPutC(NULL,hb_arrayGetCPtr(pArray,uiCount));
@@ -247,24 +267,42 @@ int   hb_CompressFile(char *szFile,PHB_ITEM pArray,int iCompLevel,PHB_ITEM pBloc
                      {
 
                      #if defined(HB_OS_WIN_32) || defined(__MINGW32__)
-                     if (bDrive)
+                     if (bDrive && !bAdded) {
                         szZip.AddNewFileDrv(szDummy, iCompLevel, true,NULL,NULL,65536);
+                           bAdded=true;
+                           }
+
                      #endif
-                     if (bPath)
+                     if (bPath && !bAdded)  {
                         szZip.AddNewFile(szDummy, iCompLevel, true,NULL,NULL,65536);
-                     if (!bDrive && !bPath)
+                           bAdded=true;
+                           }
+
+                     if (!bDrive && !bPath && !bAdded) {
                         szZip.AddNewFile(szDummy, iCompLevel, false,NULL,NULL,65536);
+                           bAdded=true;
+                           }
+
                        }
                      else
                      {
 #if defined(HB_OS_WIN_32) || defined(__MINGW32__)
-                        if (bDrive)
+                        if (bDrive && !bAdded) {
                            szZip.AddNewFileDrv(szDummy, iCompLevel, true,hb_SetProgressofTdSpan,&(PHB_ITEM)pProgress,65536);
+                           bAdded=true;
+                           }
+
 #endif
-                        if (bPath)
+                        if (bPath && !bAdded) {
                            szZip.AddNewFile(szDummy, iCompLevel, true,hb_SetProgressofTdSpan,&pProgress,65536);
-                        if (!bDrive && !bPath)
+                           bAdded=true;
+                           }
+
+                        if (!bDrive && !bPath && !bAdded) {
                            szZip.AddNewFile(szDummy, iCompLevel, false,hb_SetProgressofTdSpan,&pProgress,65536);
+                           bAdded=true;
+                           }
+
                       }
                       if (uiPos== hb_arrayLen(pArray))
                                             iTotal-=dwSize;
@@ -325,6 +363,7 @@ int   hb_CompressFileStd(char *szFile,char *szFiletoCompress,int iCompLevel,PHB_
     BOOL bFileExist=hb_fsFile((BYTE*)szFile);
     BOOL    bReturn=true;
     DWORD dwSize;
+    BOOL bAdded=false;
     CZipArchive szZip;
     if (szPassWord != NULL){
         szZip.SetPassword(szPassWord);
@@ -375,23 +414,40 @@ int   hb_CompressFileStd(char *szFile,char *szFiletoCompress,int iCompLevel,PHB_
                      {
 
                      #if defined(HB_OS_WIN_32) || defined(__MINGW32__)
-                     if (bDrive)
+                     if (bDrive && !bAdded) {
                         szZip.AddNewFileDrv((const char*)szFiletoCompress, iCompLevel, true,NULL,NULL,65536);
+                           bAdded=true;
+                           }
+
                      #endif   
-                     if (bPath)
+                     if (bPath && !bAdded)  {
                         szZip.AddNewFile((const char*)szFiletoCompress, iCompLevel, true,NULL,NULL,65536);
-                     if (!bDrive && !bPath)
+                           bAdded=true;
+                           }
+
+                     if (!bDrive && !bPath && !bAdded) {
                         szZip.AddNewFile((const char*)szFiletoCompress, iCompLevel, false,NULL,NULL,65536);
+                           bAdded=true;
+                           }
+
                      }
                      else {
                      #if defined(HB_OS_WIN_32) || defined(__MINGW32__)
-                     if (bDrive)
+                     if (bDrive && !bAdded)            {
                         szZip.AddNewFileDrv((const char*)szFiletoCompress, iCompLevel, true,hb_SetProgressofTdSpan,&pProgress,65536);
+                           bAdded=true;
+                           }
+
                      #endif   
-                     if (bPath)
+                     if (bPath && !bAdded)             {
                         szZip.AddNewFile((const char*)szFiletoCompress, iCompLevel, true,hb_SetProgressofTdSpan,&pProgress,65536);
-                     if (!bDrive && !bPath)
+                           bAdded=true;
+                           }
+
+                     if (!bDrive && !bPath && !bAdded) {
                         szZip.AddNewFile((const char*)szFiletoCompress, iCompLevel, false,hb_SetProgressofTdSpan,&pProgress,65536);
+                           bAdded=true;
+                           }
 
                      }
                        iTotal+=dwSize;
@@ -420,7 +476,7 @@ int   hb_CmpTdSpanStd(char *szFile,char * szFiletoCompress,int iCompLevel,PHB_IT
     char szNewFile[MAXFILENAME];
     CZipArchive szZip;    
     int iCause;
-
+    BOOL bAdded=false;
     BOOL bReturn=true;
     DWORD dwSize;
     BOOL bFileExist=hb_fsFile((BYTE*)szFile);
@@ -477,23 +533,41 @@ int   hb_CmpTdSpanStd(char *szFile,char * szFiletoCompress,int iCompLevel,PHB_IT
                      {
 
                      #if defined(HB_OS_WIN_32) || defined(__MINGW32__)
-                     if (bDrive)
+                     if (bDrive && !bAdded) {
                         szZip.AddNewFileDrv((const char*) szFiletoCompress, iCompLevel, true,NULL,NULL,65536);
+                           bAdded=true;
+                           }
+
                      #endif
-                     if (bPath)
+                     if (bPath && !bAdded)  {
                         szZip.AddNewFile((const char*) szFiletoCompress, iCompLevel, true,NULL,NULL,65536);
-                     if (!bDrive && !bPath)
+                           bAdded=true;
+                           }
+
+                     if (!bDrive && !bPath && !bAdded) {
                         szZip.AddNewFile((const char*) szFiletoCompress, iCompLevel, false,NULL,NULL,65536);
+                           bAdded=true;
+                           }
+
                      }
                      else {
                         #if defined(HB_OS_WIN_32) || defined(__MINGW32__)
-                        if (bDrive)
+                        if (bDrive && !bAdded)         {
                            szZip.AddNewFileDrv((const char*) szFiletoCompress, iCompLevel, true,hb_SetProgressofTdSpan,&pProgress,65536);
+                           bAdded=true;
+                           }
+
                         #endif
-                        if (bPath)
+                        if (bPath && !bAdded)          {
                            szZip.AddNewFile((const char*) szFiletoCompress, iCompLevel, true,hb_SetProgressofTdSpan,&pProgress,65536);
-                        if (!bDrive && !bPath)
+                           bAdded=true;
+                           }
+
+                        if (!bDrive && !bPath && !bAdded) {
                            szZip.AddNewFile((const char*) szFiletoCompress, iCompLevel, false,hb_SetProgressofTdSpan,&pProgress,65536);
+                           bAdded=true;
+                           }
+
                      }
                      iTotal+=dwSize;
                      
