@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.14 2003/07/14 21:35:35 walito Exp $
+ * $Id: achoice.prg,v 1.15 2004/02/13 18:25:36 jonnymind Exp $
  */
 
 /*
@@ -48,6 +48,8 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
 
    LOCAL bSelect   := {|x,y| if(ISLOGICAL(x), x, if(!Empty( x ), (y := &( x ),if(ISLOGICAL(y), y, .T.)), .T.)) }
 
+   LOCAL bInit     := .F.
+
    ColorSelect( CLR_STANDARD )
 
    lUserFunc := !Empty( xUserFunc ) .AND. ValType( xUserFunc ) IN "CB"
@@ -57,7 +59,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
    DEFAULT nLeft      TO 0                 // The leftmost column of the window
    DEFAULT nBottom    TO MaxRow()          // The bottommost row of the window
    DEFAULT nRight     TO MaxCol()          // The rightmost column of the window
-                      
+
    DEFAULT acItems    TO {}                // The items from which to choose
    DEFAULT xSelect    TO .T.               // Array or logical, what is selectable
    DEFAULT nPos       TO 1                 // The number of the selected item
@@ -109,6 +111,13 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
    ENDIF
 
    DO WHILE !lFinished
+
+      IF !bInit
+         bInit := .T.
+         if nPos == 1
+            SetPos( nTop, nLeft )
+         endif
+      ENDIF
 
       SWITCH nMode
       CASE AC_IDLE
