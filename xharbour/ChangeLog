@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2264 2004/02/11 17:34:36 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2265 2004/02/11 19:11:31 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-12 04:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/itemapi.c
+  * source/rtl/val.c
+    ! temporary solution for MSVC when LONGLONG is enabled.
+
+    /*
+    --- WARNING ---
+    This is a real hack for MSVC. xHarbour will process LONGLONG as double
+    when LONGLONG is enabled. Sufficient comments have been written to correct
+    the situation once a solution is found. The effect of this hacking should
+    not be noticable at PRG level. The result of hbtest.exe is a proof.
+    */
+
 2004-02-12 02:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/filestat.c
     ! fix compilation for MSVC

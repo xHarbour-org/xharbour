@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.12 2004/02/11 04:02:54 druzus Exp $
+ * $Id: val.c,v 1.13 2004/02/11 19:11:52 andijahja Exp $
  */
 
 /*
@@ -213,6 +213,13 @@ HB_FUNC( VAL )
 
          lValue = hb_strValInt( szText, &iOverflow );
 
+/*
+/ --- WARNING -----------------------------------------------------------\
+| This is a real hack for MSVC. xHarbour will process LONGLONG as double |
+| when LONGLONG is enabled. This comment has been written for reference  |
+| to correct the situation once a solution is found.                     |
+\------------------------------------------------------------------------/
+*/
 #ifndef _MSC_VER
          if( !iOverflow )
          {
@@ -235,7 +242,13 @@ HB_FUNC( VAL )
          {
             iWidth++;
          }
-
+/*
+/ --- WARNING -----------------------------------------------------------\
+| This is a real hack for MSVC. xHarbour will process LONGLONG as double |
+| when LONGLONG is enabled. This comment has been written for reference  |
+| to correct the situation once a solution is found.                     |
+\------------------------------------------------------------------------/
+*/
 #ifdef _MSC_VER
          if( iWidth == 1 && szText[ 0 ] == 0 )
          {
@@ -248,11 +261,10 @@ HB_FUNC( VAL )
 
          if( bInteger )
          {
-            hb_retnlen( dValue, iWidth, 0 );
+            iDec = 0;
          }
-         else
 #endif
-            hb_retnlen( dValue, iWidth, iDec );
+         hb_retnlen( dValue, iWidth, iDec );
       }
    }
    else
