@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.731 2003/02/18 17:22:34 lculik Exp $
+ * $Id: ChangeLog,v 1.732 2003/02/18 22:41:03 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-02-19 00:55 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/hvm.c
+    + Added function HB_ExecFromArray with the following syntax:
+      HB_ExecFromArray( @Func(), aArray )
+      HB_ExecFromArray( "FunctionName", aArray )
+      HB_ExecFromArray( oObject, "MethodName", aArray )
+      HB_ExecFromArray( oObject, nMethodID, aArray )
+      The aArray elements are passed into the paramter list of the target
+      function or methods.
+      TODO --> return of the called function must be returened by this
+      function, and also by HB_Exec function. Can someone lend me a
+      hand here?
+
+  * tests/exec.prg
+    + test to demonstrate this feature
+
 
 2003-02-19 01:00 UTC+0300 Phil Krylov <phil@mail.ru>
   * make_drw.sh
