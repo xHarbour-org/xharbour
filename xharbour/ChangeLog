@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2582 2004/03/16 14:43:45 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2583 2004/03/16 15:07:24 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-16 23:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! optimized by removing usage of hb_itemNew(NULL)
+
 2004-03-16 20:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/transform.c
     ! the length of get field expanded to the length of variable eventhough

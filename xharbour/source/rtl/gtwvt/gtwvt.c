@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.81 2004/03/15 16:52:17 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.82 2004/03/16 14:35:39 vouchcac Exp $
  */
 
 /*
@@ -4145,85 +4145,65 @@ HB_FUNC( WVT_SETMOUSEMOVE )
 
 HB_FUNC( WVT_GETXYFROMROWCOL )
 {
-   PHB_ITEM  aXY;
-   PHB_ITEM  temp;
+   HB_ITEM  aXY;
+   HB_ITEM  temp;
    POINT     xy;
 
    xy   = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
 
-   aXY  = hb_itemArrayNew( 2 );
+   aXY.type = HB_IT_NIL;
+   temp.type = HB_IT_NIL;
 
-   temp = hb_itemPutNL( NULL, xy.x );
-   hb_arraySet( aXY, 1, temp );
-   hb_itemRelease( temp );
+   hb_arrayNew( &aXY, 2 );
 
-   temp = hb_itemPutNL( NULL, xy.y );
-   hb_arraySet( aXY, 2, temp );
-   hb_itemRelease( temp );
+   hb_arraySetForward( &aXY, 1, hb_itemPutNL( &temp, xy.x ));
+   hb_arraySetForward( &aXY, 2, hb_itemPutNL( &temp, xy.y ) );
 
-   hb_itemReturn( aXY );
-   hb_itemRelease( aXY );
+   hb_itemReturn( &aXY );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_GETFONTINFO )
 {
-   PHB_ITEM  info;
-   PHB_ITEM  temp;
+   HB_ITEM  info;
+   HB_ITEM  temp;
 
-   info = hb_itemArrayNew( 7 );
+   info.type = HB_IT_NIL;
+   temp.type = HB_IT_NIL;
 
-   temp = hb_itemPutC( NULL, _s.fontFace );
-   hb_arraySet( info, 1, temp );
-   hb_itemRelease( temp );
+   hb_arrayNew( &info, 7 );
 
-   temp = hb_itemPutNL( NULL, _s.fontHeight );
-   hb_arraySet( info, 2, temp );
-   hb_itemRelease( temp );
+   hb_arraySetForward( &info, 1, hb_itemPutC( &temp, _s.fontFace ) );
+   hb_arraySetForward( &info, 2, hb_itemPutNL( &temp, _s.fontHeight ) );
+   hb_arraySetForward( &info, 3, hb_itemPutNL( &temp, _s.fontWidth ) );
+   hb_arraySetForward( &info, 4, hb_itemPutNL( &temp, _s.fontWeight ) );
+   hb_arraySetForward( &info, 5, hb_itemPutNL( &temp, _s.fontQuality ) );
+   hb_arraySetForward( &info, 6, hb_itemPutNL( &temp, _s.PTEXTSIZE.y ) );
+   hb_arraySetForward( &info, 7, hb_itemPutNL( &temp, _s.PTEXTSIZE.x ) );
 
-   temp = hb_itemPutNL( NULL, _s.fontWidth );
-   hb_arraySet( info, 3, temp );
-   hb_itemRelease( temp );
-
-   temp = hb_itemPutNL( NULL, _s.fontWeight );
-   hb_arraySet( info, 4, temp );
-   hb_itemRelease( temp );
-
-   temp = hb_itemPutNL( NULL, _s.fontQuality );
-   hb_arraySet( info, 5, temp );
-   hb_itemRelease( temp );
-
-   temp = hb_itemPutNL( NULL, _s.PTEXTSIZE.y );
-   hb_arraySet( info, 6, temp );
-   hb_itemRelease( temp );
-
-   temp = hb_itemPutNL( NULL, _s.PTEXTSIZE.x );
-   hb_arraySet( info, 7, temp );
-   hb_itemRelease( temp );
-
-   hb_itemReturn( info );
-   hb_itemRelease( info );
+   hb_itemReturn( &info );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_GETPALETTE )
 {
-   PHB_ITEM  info;
-   PHB_ITEM  temp;
+   HB_ITEM  info;
+   HB_ITEM  temp;
    int       i;
 
-   info = hb_itemArrayNew( 16 );
+   info.type = HB_IT_NIL;
+   temp.type = HB_IT_NIL;
+
+   hb_arrayNew( &info, 16 );
 
    for ( i = 0; i < 16; i++ )
    {
-      temp = hb_itemPutNL( NULL, _COLORS[ i ] );
-      hb_arraySet( info, i+1, temp );
-      hb_itemRelease( temp );
+      hb_arraySetForward( &info, i+1, hb_itemPutNL( &temp, _COLORS[ i ] ) );
    }
-   hb_itemReturn( info );
-   hb_itemRelease( info );
+
+   hb_itemReturn( &info );
 }
 
 //-------------------------------------------------------------------//
@@ -4295,9 +4275,12 @@ HB_FUNC( WVT_SAVESCREEN )
    HBITMAP  hBmp;
    POINT    xy;
    int      iTop, iLeft, iBottom, iRight, iWidth, iHeight;
-   PHB_ITEM info;
-   PHB_ITEM temp;
+   HB_ITEM  info;
+   HB_ITEM  temp;
    HDC      hDCComp;
+
+   info.type = HB_IT_NIL;
+   temp.type = HB_IT_NIL;
 
    xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
    iTop    = xy.y;
@@ -4319,22 +4302,13 @@ HB_FUNC( WVT_SAVESCREEN )
 
    DeleteDC( hDCComp );
 
-   info = hb_itemArrayNew( 3 );
+   hb_arrayNew( &info, 3 );
 
-   temp = hb_itemPutNI( NULL, iWidth );
-   hb_arraySet( info, 1, temp );
-   hb_itemRelease( temp );
+   hb_arraySetForward( &info, 1, hb_itemPutNI( &temp, iWidth ) );
+   hb_arraySetForward( &info, 2, hb_itemPutNI( &temp, iHeight ) );
+   hb_arraySetForward( &info, 3, hb_itemPutNL( &temp, ( ULONG ) hBmp ) );
 
-   temp = hb_itemPutNI( NULL, iHeight );
-   hb_arraySet( info, 2, temp );
-   hb_itemRelease( temp );
-
-   temp = hb_itemPutNL( NULL, ( ULONG ) hBmp );
-   hb_arraySet( info, 3, temp );
-   hb_itemRelease( temp );
-
-   hb_itemReturn( info );
-   hb_itemRelease( info );
+   hb_itemReturn( &info );
 }
 
 //-------------------------------------------------------------------//
