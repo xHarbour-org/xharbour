@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1543 2003/10/03 00:00:40 paultucker Exp $
+ * $Id: ChangeLog,v 1.1544 2003/10/03 01:18:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-02 22:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/tobject.prg
+    ! Fixed to allow keys of just ONE character.
+      /*
+         Please note that OOP Syntax must be used with keys of one letter.
+
+         oAA[ 'A' ] will fail because the 'A' is overloaded and used as a
+         NUMERIC Index in the context of Arrays.
+
+         Use:
+
+            oAA:A
+
+         Or:
+            __ObjSendMsg( oAA, "A" )
+
+         If you need dynmic indirect key support.
+       */
 
 2003-10-02 18:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/thread.c

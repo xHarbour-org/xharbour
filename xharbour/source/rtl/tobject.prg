@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.7 2003/03/25 02:36:12 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.8 2003/06/24 03:35:05 ronpinkas Exp $
  */
 
 /*
@@ -220,7 +220,7 @@ STATIC FUNCTION TAssociativeArray_OnError( xParam )
 
        QSelf():Keys( cProperty )
 
-       QSelf()[ cProperty ] := xParam
+       __ObjSendMsg( QSelf(), cMsg, xParam )
     ELSE
        Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
     ENDIF
