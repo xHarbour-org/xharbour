@@ -1,5 +1,5 @@
 /*
- * $Id: ctrlmask.prg,v 1.0 2002/10/05 06:27:24 ronpinkas Exp $
+ * $Id: CtrlMask.Prg,v 1.13 2002/10/06 02:50:59 ronpinkas Exp $
  */
 
 /*
@@ -27,10 +27,9 @@
  *
  */
 
+/*
 TODO:
 
-- correct grid painting - 0,0 align <- done
-- add asymetric grid ( x <> y )     <- done
 - add lSnap flag
 - revise (improve) snapping
   - snap only the mouse drag position
