@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.14 2004/01/27 21:18:20 peterrees Exp $
+ * $Id: file.c,v 1.15 2004/01/27 21:50:38 andijahja Exp $
  */
 
 /*
@@ -102,7 +102,6 @@ BOOL HB_EXPORT hb_fsIsDirectory( BYTE * pFilename )
    {
      if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
      {
-       hb_fsFindClose( ffind );
        if (( ffind->attr & HB_FA_DIRECTORY ) == HB_FA_DIRECTORY )
        {
          bResult = TRUE;
@@ -111,6 +110,7 @@ BOOL HB_EXPORT hb_fsIsDirectory( BYTE * pFilename )
        {
          bResult = TRUE;
        }
+       hb_fsFindClose( ffind );
      }
    }
    hb_fsSetError( 0 );

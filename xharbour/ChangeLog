@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2470 2004/03/03 19:37:33 mlombardo Exp $
+ * $Id: ChangeLog,v 1.2471 2004/03/03 19:41:27 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-04 03:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/file.c
+    ! fix hb_fsIsdirectory() function whereby ffind is used after it closed.
+      (Reported by Paul Tucker)
+
 2004-03-04 02:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/hbffind.c
     * fix for HB_OS_WIN_32 when DIRECTORY("D:\*.*","V") -> pointer overflow.
