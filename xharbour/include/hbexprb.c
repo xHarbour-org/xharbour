@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.33 2002/10/17 14:43:09 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.34 2002/10/17 14:57:10 ronpinkas Exp $
  */
 
 /*
@@ -1399,27 +1399,36 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         pReduced = hb_compExprNewLong( hb_strAt( pSub->value.asString.string, pSub->ulLength, pText->value.asString.string, pText->ulLength ) );
                      }
 
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
-                     pSelf = pReduced;
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
+
+                     //HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                     //pSelf = pReduced;
+                     memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
+                     HB_XFREE( pReduced );
                   }
                }
                else if( ( strcmp( "UPPER", pName->value.asSymbol ) == 0 ) && usCount == 1 )
                {
-                  HB_EXPR_PTR pText = pParms->value.asList.pExprList;
+                  pReduced = pParms->value.asList.pExprList;
 
-                  if( pText->ExprType == HB_ET_STRING )
+                  if( pReduced->ExprType == HB_ET_STRING )
                   {
                      ULONG i;
 
-                     for ( i = 0; i < pText->ulLength; i++ )
+                     for ( i = 0; i < pReduced->ulLength; i++ )
                      {
-                        pText->value.asString.string[i] = toupper( pText->value.asString.string[i] );
+                        pReduced->value.asString.string[i] = toupper( pReduced->value.asString.string[i] );
                      }
 
                      pParms->value.asList.pExprList = NULL;
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
 
-                     pSelf = pText;
+                     //HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                     //pSelf = pReduced;
+                     memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
+                     HB_XFREE( pReduced );
                   }
                }
                else if( ( strcmp( "CHR", pName->value.asSymbol ) == 0 ) && usCount )
@@ -1464,9 +1473,13 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         pReduced->ulLength = 1;
                      }
 
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                     //HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
 
-                     pSelf = pReduced;
+                     //pSelf = pReduced;
+                     memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
+                     HB_XFREE( pReduced );
                   }
                }
                else if( ( strcmp( "EVAL", pName->value.asSymbol ) == 0 ) && usCount )
@@ -1477,9 +1490,14 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   pBlock->pNext = NULL;
 
                   pReduced = hb_compExprNew( HB_ET_SEND );
-                  pReduced->value.asMessage.szMessage = hb_strdup( pName->value.asSymbol );
-                  pReduced->value.asMessage.pObject   = pBlock;
-                  pReduced->value.asMessage.pParms    = pParms;
+
+                  #if defined( HB_MACRO_SUPPORT )
+                     pReduced->value.asMessage.szMessage = hb_strdup( pName->value.asSymbol );
+                  #else
+                     pReduced->value.asMessage.szMessage = pName->value.asSymbol;
+                  #endif
+                  pReduced->value.asMessage.pObject = pBlock;
+                  pReduced->value.asMessage.pParms = pParms;
                   pReduced->value.asMessage.pParms->value.asList.pExprList = pArgs;
 
                   /* Optimize Eval( bBlock, [ArgList] ) to: bBlock:Eval( [ArgList] ) */
@@ -1488,13 +1506,16 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   /* Not using:
                         HB_EXPR_PCODE1( hb_compExprDelete, pName );
                         HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
-                     because we adopt their content - release container only!
+                     because we adopted their content - release container only!
                   */
 
-                  pSelf->value.asFunCall.pParms = NULL;
-                  HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                  //pSelf->value.asFunCall.pParms = NULL;
+                  //HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                  HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
 
-                  pSelf = pReduced;
+                  //pSelf = pReduced;
+                  memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
+                  HB_XFREE( pReduced );
                }
                else if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_XBASE ) &&
                    (( strcmp( "__DBLIST", pName->value.asSymbol ) == 0 ) && usCount >= 10) )

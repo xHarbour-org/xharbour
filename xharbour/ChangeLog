@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.449 2002/10/17 04:41:28 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.450 2002/10/17 14:57:09 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-17 22:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+   ! Fixed hb_compExprUseFunCall() to put reduced value into memory pointed to by pSelf.
+     /* This solved GPF under MSVC, and possible other compilers. */
+
+  * source/compiler/exproptb.c
+  * source/macro/macrob.c
+    * Touched to force recompilation of hbexprb.c (if not doing a CLEAN build).
+
+  * source/compiler/harbour.sly
+    + Added missing type casts.
+
+  * source/vm/classes.c
+    + Added missing type cast.
 
 2002-10-17 07:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c
