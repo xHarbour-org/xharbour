@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.4 2003/12/31 10:51:03 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.5 2004/01/02 11:11:28 jonnymind Exp $
  */
 
 /*
@@ -2522,9 +2522,9 @@ static void    hb_xvt_gtDrawBoxChar( PXWND_DEF wnd, int col, int row, int boxcha
          segs[1].x2 = segs[1].x1;
          segs[1].y2 = segs[0].y2;
 
-         segs[2].x1 = segs[1].x1;
+         segs[2].x1 = basex;
          segs[2].y1 = basey + celly/2;
-         segs[2].x2 = basex + cellx;
+         segs[2].x2 = segs[0].x1;
          segs[2].y2 = segs[2].y1;
 
          nsegs = 3;
