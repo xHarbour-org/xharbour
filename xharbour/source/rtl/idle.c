@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.5 2002/12/26 02:48:47 jonnymind Exp $
+ * $Id: idle.c,v 1.6 2002/12/29 08:32:41 ronpinkas Exp $
  */
 
 /*
@@ -101,63 +101,68 @@ static void hb_releaseCPU( void )
    HB_TRACE(HB_TR_DEBUG, ("releaseCPU()"));
 
    /* TODO: Add code to release time slices on all platforms */
+#ifdef HB_THREAD_SUPPORT
+   hb_threadSleep( 10 );
 
-#if defined(HB_OS_WIN_32) || defined(__CYGWIN__)
-   /* Forfeit the remainder of the current time slice. */
-   Sleep( 20 );
-
-#elif defined(HB_OS_OS2)
-   /* 23/nov/2000 - maurilio.longo@libero.it
-      Minimum time slice under OS/2 is 32 milliseconds, passed 1 will be rounded to 32 and
-      will give a chance to threads of lower priority to get executed.
-      Passing 0 causes current thread to give up its time slice only if there are threads of
-      equal priority waiting to be dispatched. Note: certain versions of OS/2 kernel have a
-      bug which causes DosSleep(0) not to work as expected.  */
-   DosSleep( 1 ); /* Duration is in milliseconds */
-
-#elif defined(HB_OS_DOS)
-
-   /* NOTE: there is a bug under NT 4 and 2000 -  if the app is running
-      in protected mode, time slices will _not_ be released - you must switch
-      to real mode first, execute the following, and switch back.
-
-      It just occurred to me that this is actually by design.  Since MS doesn't
-      want you to do this from a console app, their solution was to not allow
-      the call to work in protected mode - screw the rest of the planet <g>.
-
-      returns zero on failure. (means not supported)
-   */
-
-   {
-      union REGS regs;
-
-      regs.h.ah = 2;
-      regs.HB_XREGS.ax = 0x1680;
-
-      HB_DOS_INT86( 0x2F, &regs, &regs );
-   }
-
-#elif defined(HB_OS_UNIX)
-   #if defined(HB_OS_DARWIN)
-  usleep( 1 );
-   #else
-  {
-     static struct timespec nanosecs = { 0, 1000 };
-     /* NOTE: it will sleep at least 10 miliseconds (forced by kernel) */
-     nanosleep( &nanosecs, NULL );
-  }
-   #endif
 #else
+   
+   #if defined(HB_OS_WIN_32) || defined(__CYGWIN__)
+      /* Forfeit the remainder of the current time slice. */
+      Sleep( 20 );
 
-  /* Do nothing */
+   #elif defined(HB_OS_OS2)
+      /* 23/nov/2000 - maurilio.longo@libero.it
+         Minimum time slice under OS/2 is 32 milliseconds, passed 1 will be rounded to 32 and
+         will give a chance to threads of lower priority to get executed.
+         Passing 0 causes current thread to give up its time slice only if there are threads of
+         equal priority waiting to be dispatched. Note: certain versions of OS/2 kernel have a
+         bug which causes DosSleep(0) not to work as expected.  */
+      DosSleep( 1 ); /* Duration is in milliseconds */
 
+   #elif defined(HB_OS_DOS)
+
+      /* NOTE: there is a bug under NT 4 and 2000 -  if the app is running
+         in protected mode, time slices will _not_ be released - you must switch
+         to real mode first, execute the following, and switch back.
+
+         It just occurred to me that this is actually by design.  Since MS doesn't
+         want you to do this from a console app, their solution was to not allow
+         the call to work in protected mode - screw the rest of the planet <g>.
+
+         returns zero on failure. (means not supported)
+      */
+
+      {
+         union REGS regs;
+
+         regs.h.ah = 2;
+         regs.HB_XREGS.ax = 0x1680;
+
+         HB_DOS_INT86( 0x2F, &regs, &regs );
+      }
+
+   #elif defined(HB_OS_UNIX)
+      #if defined(HB_OS_DARWIN)
+   usleep( 1 );
+      #else
+   {
+      static struct timespec nanosecs = { 0, 1000 };
+      /* NOTE: it will sleep at least 10 miliseconds (forced by kernel) */
+      nanosleep( &nanosecs, NULL );
+   }
+      #endif
+   #else
+
+   /* Do nothing */
+
+   #endif
 #endif
 }
 
 /* performs all tasks defined for idle state */
 void hb_idleState( void )
 {
-
+   
    if( ! s_bIamIdle )
    {
       s_bIamIdle = TRUE;
@@ -165,7 +170,9 @@ void hb_idleState( void )
       if( hb_vm_bCollectGarbage )
       {
          hb_vm_bCollectGarbage = FALSE;
+         HB_CONTEXT_UNLOCK;
          hb_gcCollectAll();
+         HB_CONTEXT_LOCK;
          s_bIamIdle = FALSE;
          return;
       }

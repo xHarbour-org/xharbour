@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.26 2003/02/10 01:22:34 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.27 2003/02/26 05:36:09 jonnymind Exp $
  */
 
 /*
@@ -120,9 +120,7 @@ HB_FUNC( ARRAY )
 
       if( ! bError )
       {
-         HB_CRITICAL_LOCK( hb_threadContextMutex );
          hb_arrayNewRagged( &(HB_VM_STACK.Return), 1 );
-         HB_CRITICAL_UNLOCK( hb_threadContextMutex );
       }
    }
 }
@@ -395,9 +393,9 @@ HB_FUNC( ACLONE )
 
 HB_FUNC( HB_APARAMS )
 {
-   PHB_ITEM * pBase = hb_stack.pBase;
+   PHB_ITEM * pBase = HB_VM_STACK.pBase;
 
-   pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+   pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
    hb_itemRelease( hb_itemReturn( hb_arrayFromParams( pBase ) ) );
 }
@@ -416,10 +414,8 @@ HB_FUNC( HB_AEXPRESSIONS )
       return;
    }
 
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
    hb_arrayNew( pArray, 0 );
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-   
+      
    for( i = 0; i < pLine->item.asString.length; i++ )
    {
       switch( pLine->item.asString.value[i] )
@@ -494,13 +490,10 @@ HB_FUNC( HB_AEXPRESSIONS )
    {
       PHB_ITEM pExp = hb_itemNew( NULL );
 
-      HB_CRITICAL_LOCK( hb_threadContextMutex );
       
       hb_arrayAdd( pArray, hb_itemPutCL( pExp, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
 
-      hb_itemRelease( pExp );
-      
-      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+      hb_itemRelease( pExp );      
    }
 }
 
@@ -515,8 +508,6 @@ HB_FUNC( HB_ATOKENS )
       PHB_ITEM pToken = hb_itemNew( NULL );
       char cDelimiter = pDelim ? pDelim->item.asString.value[0] : 32;
       size_t i, iOffset = 0;
-
-      HB_CRITICAL_LOCK( hb_threadContextMutex );
       
       hb_arrayNew( pArray, 0 );
 
@@ -535,7 +526,6 @@ HB_FUNC( HB_ATOKENS )
       }
 
       hb_itemRelease( pToken );
-      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
       
    }
    else

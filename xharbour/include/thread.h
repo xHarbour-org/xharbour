@@ -117,7 +117,10 @@
     #define HB_CRITICAL_UNLOCK( x )        pthread_mutex_unlock( &(x) )
 **/
 
-    int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec );
+    extern int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec );
+    extern void hb_mutexForceUnlock( void *);
+    extern void hb_rawMutexForceUnlock( void *);
+
     
     #define HB_COND_T                   pthread_cond_t
     #define HB_COND_INIT( x )           pthread_cond_init( &(x), NULL )
@@ -127,8 +130,9 @@
     #define HB_COND_DESTROY( x )        pthread_cond_destroy( &(x) )
 
     #define HB_CURRENT_THREAD           pthread_self
-
-/* Thread support is only for linux and windows now */
+    #define HB_TEST_CANCEL              pthread_testcancel
+    #define HB_CLEANUP_PUSH(x, y )             pthread_cleanup_push( x, (void *)&(y) )
+    #define HB_CLEANUP_POP              pthread_cleanup_pop    
 #endif
 
 /* Complex Mutex Structure*/
@@ -146,23 +150,20 @@ typedef struct tag_HB_THREAD_CONTEXT
 {
    HB_THREAD_T th_id;
    HB_STACK *stack;
-   /* monitor must be owned to operate on the context */
+   /* Is this thread going to run a method? */
+   BOOL bIsMethod;
+   /* data to initialize the stack */
+   UINT uiParams;   
+   /* Flag to signal that the context is in use */
+   BOOL bInUse; // this must be used with the guard of a global resource
+
 #ifdef HB_OS_WIN_32
-    HANDLE th_h;
+   HANDLE th_h;
 #endif
    struct tag_HB_THREAD_CONTEXT *next;
 } HB_THREAD_CONTEXT;
 
 extern HB_THREAD_CONTEXT *last_context;
-/* Parameters passed for thread creation */
-typedef struct tag_HB_THREAD_PARAM
-{
-    HB_THREAD_T th_id;
-    PHB_ITEM pArgs;
-    USHORT uiCount;
-    BOOL bIsMethod;
-    HB_THREAD_CONTEXT *context;
-} HB_THREAD_PARAM;
 
 /* Ligthweight system indepented reentrant mutex, used internally by harbour */
 typedef struct tag_HB_LWR_MUTEX
@@ -176,7 +177,75 @@ typedef struct tag_HB_LWR_MUTEX
     int nCount;
 } HB_LWR_MUTEX;
 
+/*********************************************************************/
+/* Shared resource is a set of a resource, a mutex and a condition. */
 
+typedef struct tag_HB_SHARED_RESOURCE
+{
+   HB_MUTEX_T Mutex;  // mutex is used to read or write safely
+   union {              // data that can be read or written
+      long asLong;
+      void *asPointer;
+   } content;
+   unsigned int aux;
+   HB_COND_T Cond; //condition that may change
+} HB_SHARED_RESOURCE;
+
+#define HB_SHARED_INIT( pshr, data ) \
+{ \
+   HB_MUTEX_INIT( pshr.Mutex );\
+   HB_COND_INIT( pshr.Cond ); \
+   pshr.aux = 0;\
+   pshr.content.asLong = data;\
+}
+
+#define HB_SHARED_DESTROY( pshr ) \
+{ \
+   HB_MUTEX_DESTROY( pshr.Mutex );\
+   HB_COND_DESTROY( pshr.Cond ); \
+}
+
+#define HB_COND_EQUAL         0
+#define HB_COND_GREATER       1
+#define HB_COND_GREATER_EQUAL 2
+#define HB_COND_LESS          3
+#define HB_COND_INC           1
+#define HB_COND_SET           0
+
+#include <hbtrace.h>
+/* Lightweight macro for condition check */
+//TraceLog( "mtgc.log", "FILE %s(%d): SET PSHR: %d   THID: %d\r\n", __FILE__, __LINE__, pshr.content.asLong, HB_CURRENT_THREAD() );
+#define HB_SET_SHARED( pshr, pMode, pValue ) \
+{\
+   HB_MUTEX_LOCK( pshr.Mutex );\
+   pshr.content.asLong = pMode == HB_COND_INC ? pshr.content.asLong + pValue : pValue;\
+   HB_COND_SIGNAL( pshr.Cond );\
+   HB_MUTEX_UNLOCK( pshr.Mutex );\
+}
+
+/* Lightweight macro for condition check */
+#define HB_WAIT_SHARED( pshr, cond, pData, pMode, pValue ) \
+{\
+   HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, pshr.Mutex );\
+   HB_MUTEX_LOCK( pshr.Mutex );\
+   while ( 1 ) \
+   {\
+      if ( (cond == HB_COND_EQUAL && (long) pData == pshr.content.asLong) ||\
+         (cond == HB_COND_GREATER && pshr.content.asLong > (long) pData) ||\
+         (cond == HB_COND_GREATER_EQUAL && pshr.content.asLong >= (long) pData) || \
+         (cond == HB_COND_LESS && pshr.content.asLong < (long) pData) )\
+         break;\
+      HB_COND_WAIT( pshr.Cond, pshr.Mutex );\
+   }\
+   pshr.content.asLong = pMode == HB_COND_INC ? pshr.content.asLong + pValue : pValue;\
+   HB_COND_SIGNAL( pshr.Cond );\
+   HB_MUTEX_UNLOCK( pshr.Mutex );\
+   HB_CLEANUP_POP( 0 );\
+}
+    
+    
+/***********************************************************************/
+/* Function and globals definitions */
 extern HB_THREAD_CONTEXT *hb_ht_context;
 extern HB_THREAD_T hb_main_thread_id;
 
@@ -187,6 +256,37 @@ extern void hb_threadDestroyContext( HB_THREAD_CONTEXT *pContext );
 extern HB_THREAD_CONTEXT *hb_threadGetContext( HB_THREAD_T th_id );
 extern void hb_threadInit( void );
 extern void hb_threadExit( void );
+extern void hb_threadCreateStack( HB_THREAD_CONTEXT *pContext, PHB_ITEM pArgs );
+void hb_threadWaitAll();
+void hb_threadKillAll();
+void hb_threadSleep( int millisec );
+
+#ifdef HB_OS_WIN_32
+extern void hb_threadTerminator();
+#else
+extern void hb_threadTerminator( void *pData );
+#endif
+
+/** JC1:
+   In MT libs, every function accessing stack will record the HB_STACK 
+   (provided by hb_threadGetCurrentStack()) into a local Stack variable, and
+   this variable will be accessed instead of HB_VM_STACK.
+*/
+#define hb_threadGetCurrentStack() ( hb_threadGetCurrentContext()->stack )
+#define hb_threadGetCurrentContext() ( hb_threadGetContext( HB_CURRENT_THREAD() ) )
+
+#ifdef HB_THREAD_OPTIMIZE_STACK
+   #define HB_VM_STACK (*_pStack_)
+   #define HB_VM_CONTEXT (*_pContext_)
+   #define HB_THREAD_STUB\
+      HB_THREAD_CONTEXT *_pContext_ = hb_threadGetCurrentContext(); \
+      HB_STACK *_pStack_ = _pContext_->stack; 
+#else
+   #define HB_VM_CONTEXT (* hb_threadGetCurrentContext() )
+   #define HB_VM_STACK (* hb_threadGetCurrentStack() )
+   #define HB_THREAD_STUB
+#endif
+
 
 /* LWRM management */
 
@@ -225,7 +325,7 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
          }
          
     BOOL hb_critical_mutex_trylock( HB_CRITICAL_T *lpMutex );
-    #define HB_CRITICAL_TRYLOCK( lpMutex )   hb_critical_mutex_trylock( lpMutex )
+    #define HB_CRITICAL_TRYLOCK( Mutex )   hb_critical_mutex_trylock( &(Mutex) )
     
     #define HB_CRITICAL_UNLOCK( lpMutex ) \
          {\
@@ -241,6 +341,7 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
          }
 #else
    #ifdef HB_OS_LINUX
+      #include <errno.h>
    /* ODD: this definition is missing on some linux headers;
       we should remove it when this bug is fixed */
    int pthread_mutexattr_setkind_np( pthread_mutexattr_t * attr, int kind );
@@ -255,25 +356,23 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
          pthread_mutexattr_destroy( &attr );\
       }
 
-      #define HB_CRITICAL_LOCK( x )       HB_MUTEX_LOCK( x )
-      #define HB_CRITICAL_UNLOCK( x )     HB_MUTEX_UNLOCK( x )
+      /*#define HB_CRITICAL_LOCK( x ) \
+      {\
+         pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, NULL );\
+         pthread_cleanup_push(hb_mutexForceUnlock, (void *) &(x));\
+         HB_MUTEX_LOCK( x );\
+         pthread_testcancel();\
+         pthread_cleanup_pop(0);\
+         pthread_setcanceltype( PTHREAD_CANCEL_ASYNCHRONOUS, NULL );\
+      }*/
+
+      #define HB_CRITICAL_LOCK( x )       HB_MUTEX_LOCK( x );
+      #define HB_CRITICAL_UNLOCK( x )     HB_MUTEX_UNLOCK( x );
       #define HB_CRITICAL_DESTROY( x )    HB_MUTEX_DESTROY( x )
-      #define HB_CRITICAL_TRYLOCK( x )    pthread_mutex_trylock( x )
+      #define HB_CRITICAL_TRYLOCK( x )    ( pthread_mutex_trylock( &(x) ) != EBUSY )
+
    #endif
 #endif
-
-/* Forbidder mutex for xharbour */
-typedef struct tag_HB_FORBID_MUTEX
-{
-    HB_CRITICAL_T Control;
-    long lCount;
-} HB_FORBID_MUTEX;
-
-/* Forbidden mutex management */
-void hb_threadForbidenInit( HB_FORBID_MUTEX *Forbid );
-void hb_threadForbidenDestroy( HB_FORBID_MUTEX *Forbid );
-extern void hb_threadForbid( HB_FORBID_MUTEX * );
-extern void hb_threadAllow( HB_FORBID_MUTEX * );
 
 /* More elegant guard of a small section of code */
 #define HB_THREAD_GUARD( mutex, code )\
@@ -284,21 +383,151 @@ extern void hb_threadAllow( HB_FORBID_MUTEX * );
    }
 
 /************************************************************
-* List of mutexes that can be used to regulate concurency 
+* List of mutexes that can be used to regulate concurency
 *************************************************************/
 /* Monitor for sync access to the garbage collecting process */
 extern HB_CRITICAL_T hb_garbageMutex;
 /* Monitor for sync access to the local contexts */
 extern HB_CRITICAL_T hb_threadContextMutex;
+/* Monitor for sync access to the global context */
+extern HB_CRITICAL_T hb_globalsMutex;
+/* Monitor for sync access to the global context */
+extern HB_CRITICAL_T hb_staticsMutex;
+/* Monitor for sync access to the global context */
+extern HB_CRITICAL_T hb_memvarsMutex;
+/* Guard for threadunsafe malloc and free */
+extern HB_CRITICAL_T hb_allocMutex;
+/* Guard for console and output and free */
+extern HB_CRITICAL_T hb_outputMutex;
+/* Guard for memory allocated by the garbage collector */
+extern HB_CRITICAL_T hb_garbageAllocMutex;
+
+/* count of running contexts; set to -1 to block contexts from running */
+extern HB_SHARED_RESOURCE hb_runningContexts;
+
+/* Context using management */
+#define HB_CONTEXT_LOCK \
+{\
+   HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_runningContexts.Mutex );\
+   HB_MUTEX_LOCK( hb_runningContexts.Mutex );\
+   if( ! HB_VM_CONTEXT.bInUse ) \
+   {\
+      while ( hb_runningContexts.content.asLong < 0 ) \
+      {\
+         HB_COND_WAIT( hb_runningContexts.Cond, hb_runningContexts.Mutex );\
+      }\
+      hb_runningContexts.content.asLong++;\
+      HB_VM_CONTEXT.bInUse = TRUE;\
+      HB_COND_SIGNAL( hb_runningContexts.Cond );\
+   }\
+   HB_MUTEX_UNLOCK( hb_runningContexts.Mutex );\
+   HB_CLEANUP_POP( 0 );\
+} 
+
+#define HB_CONTEXT_UNLOCK \
+{\
+   HB_MUTEX_LOCK( hb_runningContexts.Mutex );\
+   if( HB_VM_CONTEXT.bInUse ) \
+   {\
+      hb_runningContexts.content.asLong--;\
+      HB_VM_CONTEXT.bInUse = FALSE;\
+      HB_COND_SIGNAL( hb_runningContexts.Cond );\
+   }\
+   HB_MUTEX_UNLOCK( hb_runningContexts.Mutex );\
+} 
+
+#define HB_CONTEXT_STOP_TELLING( var, value )\
+{\
+   HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_runningContexts.Mutex );\
+   HB_MUTEX_LOCK( hb_runningContexts.Mutex );\
+   var = value;\
+   while ( hb_runningContexts.content.asLong != 0 ) \
+   {\
+      HB_COND_WAIT( hb_runningContexts.Cond, hb_runningContexts.Mutex );\
+   }\
+   hb_runningContexts.content.asLong = -1;\
+   HB_COND_SIGNAL( hb_runningContexts.Cond );\
+   HB_MUTEX_UNLOCK( hb_runningContexts.Mutex );\
+   HB_CLEANUP_POP( 0 );\
+}
+
+#define HB_CONTEXT_STOP    ( HB_WAIT_SHARED( hb_runningContexts, HB_COND_EQUAL, 0, HB_COND_SET, -1 ) )
+#define HB_CONTEXT_START   ( HB_SET_SHARED( hb_runningContexts, HB_COND_SET, 0 ) )
+
+/* LEVEL 3 shell lock - locks all inner level objects */
+#if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
+
+   #define HB_SHELL_LOCK_LEVEL_3 \
+      HB_CRITICAL_UNLOCK( s_mtxTryLock ); \
+      HB_CRITICAL_LOCK( hb_allocMutex ); \
+      HB_CRITICAL_LOCK( hb_garbageAllocMutex ); \
+      HB_CRITICAL_LOCK( hb_outputMutex )
+   #define HB_SHELL_UNLOCK_LEVEL_3 \
+      HB_CRITICAL_UNLOCK( hb_outputMutex ); \
+      HB_CRITICAL_UNLOCK( hb_garbageAllocMutex ); \
+      HB_CRITICAL_UNLOCK( hb_allocMutex );\
+      HB_CRITICAL_UNLOCK( s_mtxTryLock )
 
 #else
+
+   #define HB_SHELL_LOCK_LEVEL_3 \
+      HB_CRITICAL_LOCK( hb_allocMutex ); \
+      HB_CRITICAL_LOCK( hb_garbageAllocMutex ); \
+      HB_CRITICAL_LOCK( hb_outputMutex )
+   #define HB_SHELL_UNLOCK_LEVEL_3 \
+      HB_CRITICAL_UNLOCK( hb_outputMutex ); \
+      HB_CRITICAL_UNLOCK( hb_garbageAllocMutex ); \
+      HB_CRITICAL_UNLOCK( hb_allocMutex )
+#endif
+
+/* Level 2 shell lock - locks all the top-level objects */
+#define HB_SHELL_LOCK_LEVEL_2 \
+      HB_CRITICAL_LOCK( hb_threadContextMutex ); \
+      HB_CRITICAL_LOCK( hb_globalsMutex ); \
+      HB_CRITICAL_LOCK( hb_staticsMutex ); \
+      HB_CRITICAL_LOCK( hb_memvarsMutex )
+
+#define HB_SHELL_UNLOCK_LEVEL_2 \
+      HB_CRITICAL_UNLOCK( hb_memvarsMutex ); \
+      HB_CRITICAL_UNLOCK( hb_staticsMutex ); \
+      HB_CRITICAL_UNLOCK( hb_globalsMutex ); \
+      HB_CRITICAL_UNLOCK( hb_threadContextMutex )
+
+/* Level 1 shell lock - locks the single thread object */
+#define HB_SHELL_LOCK_LEVEL_1 \
+   HB_CRITICAL_LOCK( hb_garbageMutex )
+
+#define HB_SHELL_UNLOCK_LEVEL_1 \
+   HB_CRITICAL_UNLOCK( hb_garbageMutex )
+
+   
+   
+   
+/******************************************************/
+/* Definitions when threading is turned off */
+
+#else 
 
    #define HB_CRITICAL_LOCK( x )
    #define HB_CRITICAL_TRYLOCK( x )
    #define HB_CRITICAL_UNLOCK( x )
    #define HB_THREAD_GUARD( mutex, code ) { code; }
 
-#endif
+   #define HB_TEST_CANCEL
+   #define HB_SET_SHARED( x, y, z )
+   #define HB_WAIT_SHARED( x, y, z, k, m )
+   #define HB_CONTEXT_STOP   
+   #define HB_CONTEXT_STOP_TELLING(x, y)
+   #define HB_CONTEXT_START  
+   #define HB_CONTEXT_LOCK  
+   #define HB_CONTEXT_UNLOCK   
+   #define HB_CLEANUP_PUSH( x, y )
+   #define HB_CLEANUP_POP( x )
+   
+   #define HB_THREAD_STUB
+   #define HB_VM_CONTEXT
+   #define HB_VM_STACK hb_stack
 
+#endif
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.25 2003/02/13 01:22:35 jonnymind Exp $
+ * $Id: estack.c,v 1.27 2003/02/24 06:30:16 jonnymind Exp $
  */
 
 /*
@@ -50,6 +50,9 @@
  *
  */
 
+/*JC1: say we are going to optimze MT stack */
+#define HB_THREAD_OPTMIZE_STACK
+
 #if defined(HB_INCLUDE_WINEXCHANDLER)
    #define HB_OS_WIN_32_USED
 #endif
@@ -63,41 +66,11 @@
 
 /* ------------------------------- */
 
-HB_STACK hb_stack;
-
-#ifdef HB_THREAD_SUPPORT
-
-#include "thread.h"
-
-HB_STACK *hb_stackGetCurrentStack( void )
-{
-   // Most common first.
-   HB_THREAD_T th = HB_CURRENT_THREAD();
-   if( hb_ht_context == NULL || th == hb_main_thread_id )
-   {
-      return &hb_stack;
-   }
-   else
-   {
-      return hb_threadGetContext( th )->stack;
-   }
-}
-
-/** JC1:
-   Turning on stack usage optimization. In MT libs, every function
-   accessing stack will record the HB_STACK (provided by
-   hb_threadGetCurrentStack()) into a local Stack variable, and
-   this variable will be accessed instead of HB_VM_STACK.
-*/
-#undef HB_VM_STACK
-#define HB_VM_STACK (*Stack)
-#define HB_THREAD_STUB  HB_STACK *Stack = hb_stackGetCurrentStack();
-
-#else
-
-#define HB_THREAD_STUB
-
+#ifndef HB_THREAD_SUPPORT
+   HB_STACK hb_stack;
 #endif
+
+
 /* ------------------------------- */
 
 void hb_stackPop( void )
@@ -195,22 +168,27 @@ void hb_stackPush( void )
 
 void hb_stackInit( void )
 {
-   LONG i;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_stackInit()"));
+   #ifndef HB_THREAD_SUPPORT
+      LONG i;
+      HB_TRACE(HB_TR_DEBUG, ("hb_stackInit()"));
+      // Optimized to directly accessing hb_stack instead of HB_VM_STACK
+      hb_stack.pItems = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
+      hb_stack.pBase  = hb_stack.pItems;
+      hb_stack.pPos   = hb_stack.pItems;     /* points to the first stack item */
+      hb_stack.wItems = STACK_INITHB_ITEMS;
 
-   // Optimized to directly accessing hb_stack instead of HB_VM_STACK
-   hb_stack.pItems = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
-   hb_stack.pBase  = hb_stack.pItems;
-   hb_stack.pPos   = hb_stack.pItems;     /* points to the first stack item */
-   hb_stack.wItems = STACK_INITHB_ITEMS;
+      for( i=0; i < hb_stack.wItems; ++i )
+      {
+         hb_stack.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
+      }
 
-   for( i=0; i < hb_stack.wItems; ++i )
-   {
-      hb_stack.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
-   }
-
-   ( * hb_stack.pPos )->type = HB_IT_NIL;
+      ( * hb_stack.pPos )->type = HB_IT_NIL;
+   #else
+      /* Since we need a context also for the main thread, here we are! */      
+      HB_TRACE(HB_TR_DEBUG, ("hb_stackInit()"));
+      hb_threadLinkContext( hb_threadCreateContext( HB_CURRENT_THREAD() ) );
+   #endif
 }
 
 void hb_stackRemove( LONG lUntilPos )
@@ -286,7 +264,7 @@ LONG HB_EXPORT hb_stackBaseOffset( void )
 **/
 #if defined( HB_THREAD_SUPPORT )
    #undef HB_VM_STACK
-   #define HB_VM_STACK (* hb_stackGetCurrentStack() )
+   #define HB_VM_STACK (* hb_threadGetCurrentStack() )
 #endif
 
 #undef hb_stackItem

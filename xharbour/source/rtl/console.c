@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.23 2002/12/31 07:15:44 jonnymind Exp $
+ * $Id: console.c,v 1.24 2003/01/06 14:11:44 lculik Exp $
  */
 
 /*
@@ -97,17 +97,10 @@ static int    s_iFilenoStdout;
 static int    s_iFilenoStderr;
 
 #endif
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_T s_ConsoleMutex;
-#endif
 
 void hb_conInit( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conInit()"));
-
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_INIT( s_ConsoleMutex );
-   #endif
 
 #if defined(OS_UNIX_COMPATIBLE) && !defined(HB_EOL_CRLF)
    s_szCrLf[ 0 ] = HB_CHAR_LF;
@@ -189,10 +182,6 @@ void hb_conRelease( void )
    hb_gtExit();
 
    s_bInit = FALSE;
-
-   #ifdef HB_THREAD_SUPPORT
-       HB_CRITICAL_DESTROY( s_ConsoleMutex );
-   #endif
 }
 
 char * hb_conNewLine( void )
@@ -362,12 +351,7 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
    USHORT uiPCount = hb_pcount();
    USHORT uiParam;
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_LOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_LOCK( hb_outputMutex );
 
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
    {
@@ -376,12 +360,7 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
          hb_conOutStd( " ", 1 );
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_UNLOCK( hb_outputMutex );
 }
 
 HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
@@ -389,12 +368,7 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
    USHORT uiPCount = hb_pcount();
    USHORT uiParam;
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_LOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_LOCK( hb_outputMutex );
 
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
    {
@@ -403,12 +377,7 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
          hb_conOutErr( " ", 1 );
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_UNLOCK( hb_outputMutex );
 }
 
 HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or printer) and is affected by SET ALTERNATE */
@@ -416,12 +385,7 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
    USHORT uiPCount = hb_pcount();
    USHORT uiParam;
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_LOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_LOCK( hb_outputMutex );
 
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
    {
@@ -432,22 +396,12 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
       }
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_UNLOCK( hb_outputMutex );
 }
 
 HB_FUNC( QOUT )
 {
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_LOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_LOCK( hb_outputMutex );
 
    hb_conOutAlt( s_szCrLf, CRLF_BUFFER_LEN - 1 );
 
@@ -475,22 +429,12 @@ HB_FUNC( QOUT )
 
    HB_FUNCNAME( QQOUT )();
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_UNLOCK( hb_outputMutex );
 }
 
 HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 {
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_LOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_LOCK( hb_outputMutex );
 
    if( (hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_printhan != FS_ERROR ) ||
        (hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_winhan != FS_ERROR ))
@@ -507,12 +451,7 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 
    s_uiPRow = s_uiPCol = 0;
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_UNLOCK( hb_outputMutex );
 }
 
 HB_FUNC( PROW ) /* Returns the current printer row position */
@@ -621,34 +560,19 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
 
 HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
 {
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_LOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_LOCK( hb_outputMutex );
 
    if( ISNUM( 1 ) && ISNUM( 2 ) )
    {
       hb_conDevPos( hb_parni( 1 ), hb_parni( 2 ) );
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_UNLOCK( hb_outputMutex );
 }
 
 HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
 {
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_LOCK( s_ConsoleMutex );
-      }
-   #endif
+    HB_CRITICAL_LOCK( hb_outputMutex );
 
    if( ISNUM( 1 ) && ISNUM( 2 ) )
    {
@@ -656,22 +580,12 @@ HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
       s_uiPCol = ( USHORT ) hb_parni( 2 );
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_UNLOCK( hb_outputMutex );
 }
 
 HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or printer), but is not affected by SET ALTERNATE */
 {
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_LOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_LOCK( hb_outputMutex );
 
    if( ISNUM( 3 ) && ISNUM( 4 ) )
    {
@@ -694,12 +608,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
       hb_conOut( 1, hb_conOutDev );
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_UNLOCK( hb_outputMutex );
 }
 
 HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected by SET ALTERNATE */
@@ -708,12 +617,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
    ULONG ulLen;
    BOOL bFreeReq;
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_LOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_LOCK( hb_outputMutex );
 
    if( ISCHAR( 2 ) )
    {
@@ -741,12 +645,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
          hb_xfree( pszString );
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_UNLOCK( hb_outputMutex );
 }
 
 /* Undocumented Clipper function */
@@ -759,12 +658,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
    ULONG ulLen;
    BOOL bFreeReq;
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_LOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_LOCK( hb_outputMutex );
 
    if( ISCHAR( 4 ) )
    {
@@ -794,30 +688,15 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
       }
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_UNLOCK( hb_outputMutex );
 }
 
 HB_FUNC( HBCONSOLELOCK )
 {
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_LOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_LOCK( hb_outputMutex );
 }
 
 HB_FUNC( HBCONSOLEUNLOCK )
 {
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
-      }
-   #endif
+   HB_CRITICAL_UNLOCK( hb_outputMutex );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.45 2003/02/26 06:14:00 jonnymind Exp $
+ * $Id: garbage.c,v 1.46 2003/02/26 14:38:38 jonnymind Exp $
  */
 
 /*
@@ -84,7 +84,7 @@ static HB_GARBAGE_PTR s_pLockedBlock = NULL;
 #endif
 
 /* marks if block releasing is requested during garbage collecting */
-static BOOL s_bCollecting = FALSE;
+volatile static BOOL s_bCollecting = FALSE;
 
 /* Signify ReleaseAll Processing is taking place. */
 static BOOL s_bReleaseAll = FALSE;
@@ -118,11 +118,9 @@ static ULONG s_uAllocated = 0;
    /* Mutex to access safely the "used flag" that is swapped at each scan */
    
    /* Mutex to access safely garbage allocation strategy */
-   static HB_CRITICAL_T s_garbageAllocMutex;
-   
    /* JC1: signal that GC is being used now */
-   static BOOL s_bGarbageAtWork = FALSE;
-   static HB_CRITICAL_T s_GawMutex;
+   //static BOOL s_bGarbageAtWork = FALSE;
+   //static HB_CRITICAL_T s_GawMutex;
 #endif
 
 /* Forward declaration.*/
@@ -166,16 +164,16 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
    HB_GARBAGE_PTR pAlloc;
 
    #ifdef GC_RECYCLE
-      HB_CRITICAL_LOCK( s_garbageAllocMutex );
+      HB_CRITICAL_LOCK( hb_garbageAllocMutex );
       if( s_pAvailableBaseArrays && ulSize == sizeof( HB_BASEARRAY ) )
       {
          pAlloc = s_pAvailableBaseArrays;
          hb_gcUnlink( &s_pAvailableBaseArrays, s_pAvailableBaseArrays );
-         HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+         HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
       }
       else
       {
-         HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+         HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
          pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( ulSize + sizeof( HB_GARBAGE ) );
       }
    #else
@@ -189,10 +187,10 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
       pAlloc->locked = 0;
       pAlloc->used   = s_uUsedFlag;
       
-      HB_CRITICAL_LOCK( s_garbageAllocMutex );
+      HB_CRITICAL_LOCK( hb_garbageAllocMutex );
       s_uAllocated++;
       hb_gcLink( &s_pCurrBlock, pAlloc );
-      HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+      HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
 
       HB_TRACE( HB_TR_DEBUG, ( "hb_gcAlloc %p in %p", pAlloc + 1, pAlloc ) );
 
@@ -224,21 +222,21 @@ void hb_gcFree( void *pBlock )
       {
          HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p) *LOCKED* %p", pBlock, pAlloc ) );
          
-         HB_THREAD_GUARD( s_garbageAllocMutex, hb_gcUnlink( &s_pLockedBlock, pAlloc ) );
+         HB_THREAD_GUARD( hb_garbageAllocMutex, hb_gcUnlink( &s_pLockedBlock, pAlloc ) );
          
          HB_GARBAGE_FREE( pAlloc );
       }
       else
       {
          // Might already be marked for deletion.
-         HB_CRITICAL_LOCK( s_garbageAllocMutex );
+         HB_CRITICAL_LOCK( hb_garbageAllocMutex );
          if( ! ( pAlloc->used & HB_GC_DELETE ) )
          {
             s_uAllocated--;
             hb_gcUnlink( &s_pCurrBlock, pAlloc );
             HB_GARBAGE_FREE( pAlloc );
          }
-         HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+         HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
       }
    }
    else
@@ -266,16 +264,16 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
    HB_GARBAGE_PTR pAlloc;
 
    #ifdef GC_RECYCLE
-      HB_CRITICAL_LOCK( s_garbageAllocMutex );
+      HB_CRITICAL_LOCK( hb_garbageAllocMutex );
       if( s_pAvailableItems )
       {
          pAlloc = s_pAvailableItems;
          hb_gcUnlink( &s_pAvailableItems, s_pAvailableItems );
-         HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+         HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
    }
       else
       {
-         HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+         HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
          pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) );
       }
    #else
@@ -302,7 +300,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
          pItem->type = HB_IT_NIL;
       }
       
-      HB_THREAD_GUARD( s_garbageAllocMutex, hb_gcLink( &s_pLockedBlock, pAlloc ) );
+      HB_THREAD_GUARD( hb_garbageAllocMutex, hb_gcLink( &s_pLockedBlock, pAlloc ) );
       return pItem;
    }
    else
@@ -343,11 +341,11 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
          }
       }
 
-      HB_CRITICAL_LOCK( s_garbageAllocMutex );
+      HB_CRITICAL_LOCK( hb_garbageAllocMutex );
       
       hb_gcUnlink( &s_pLockedBlock, pAlloc );
 
-      HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+      HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
       
       HB_GARBAGE_FREE( pAlloc );
    }
@@ -371,7 +369,7 @@ void * hb_gcLock( void * pBlock )
 
       if( ! pAlloc->locked )
       {
-         HB_CRITICAL_LOCK( s_garbageAllocMutex );
+         HB_CRITICAL_LOCK( hb_garbageAllocMutex );
          
          //hb_gcUnlink( pContextList, pAlloc );
          hb_gcUnlink( &s_pCurrBlock, pAlloc );
@@ -380,7 +378,7 @@ void * hb_gcLock( void * pBlock )
 
          pAlloc->used = s_uUsedFlag;
          
-         HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+         HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
       }
       ++pAlloc->locked;
    }
@@ -403,7 +401,7 @@ void *hb_gcUnlock( void *pBlock )
       {
          if( --pAlloc->locked == 0 )
          {
-            HB_CRITICAL_LOCK( s_garbageAllocMutex );
+            HB_CRITICAL_LOCK( hb_garbageAllocMutex );
             
             hb_gcUnlink( &s_pLockedBlock, pAlloc );
 
@@ -411,7 +409,7 @@ void *hb_gcUnlock( void *pBlock )
 
             pAlloc->used = s_uUsedFlag;
             
-            HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+            HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
          }
       }
    }
@@ -514,7 +512,9 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 void hb_gcCollect( void )
 {
    /* TODO: decrease the amount of time spend collecting */
+   HB_CONTEXT_UNLOCK;
    hb_gcCollectAll();
+   HB_CONTEXT_LOCK;
 }
 
 /* Check all memory blocks if they can be released
@@ -522,64 +522,45 @@ void hb_gcCollect( void )
 void hb_gcCollectAll( void )
 {
    HB_GARBAGE_PTR pAlloc, pDelete;
-
-
-   /*JC1: in MT, GC collecting is not just -locked-: if a second thread
-   wants to collect while another is doing collection, it will just wait
-   for the first to finish and then return. Double garbage collecting is
-   TO BE AVOIDED
-   */
    #ifdef HB_THREAD_SUPPORT
-      BOOL bWait = FALSE;
-      HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
+   BOOL bWait = FALSE;
+   #endif
+   
+   HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
 
-      /* Even if not locked, a read only non-critical variable here
-      should not be a problem */
-      if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
-      {
-         return;
-      }
-
-      /* ensure that noone is writing GAW now */
-      HB_CRITICAL_LOCK( s_GawMutex );
-      if( s_bGarbageAtWork )
+   /* is anoter garbage in action? */  
+   #ifdef HB_THREAD_SUPPORT
+      if ( s_bCollecting )  // note: 1) is volatile and 2) not very important if fails 1 time
       {
          bWait = TRUE;
       }
-      else
+      /* Working in single thread mode */
+      HB_CONTEXT_STOP_TELLING( s_bCollecting, TRUE );
+      if ( bWait )
       {
-         s_bGarbageAtWork = TRUE;
-      }
-      HB_CRITICAL_UNLOCK( s_GawMutex );
-
-      /* Lock if first thread, sync if others */
-      HB_CRITICAL_LOCK( hb_garbageMutex );
-
-      /* return harmlessy if Garbage was at work when function begun */
-      
-      if(bWait)
-      {
-         HB_CRITICAL_UNLOCK( hb_garbageMutex );
+         s_bCollecting = FALSE;
+         HB_CONTEXT_START;
          return;
-      }
-
+      }  
    #else
-      HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
-      if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
+      if ( s_bCollecting )  // note: 1) is volatile and 2) not very important if fails 1 time
       {
          return;
       }
    #endif
 
-   /* safely, atomically see if we have some work to do */
-   HB_CRITICAL_LOCK( s_garbageAllocMutex );
-   if( s_pCurrBlock==0 || s_bCollecting )
+   
+
+
+   /* Even if not locked, a read only non-critical variable here
+   should not be a problem */
+   if( s_pCurrBlock==0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
    {
-      HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
-      HB_CRITICAL_UNLOCK( hb_garbageMutex );
+      s_bCollecting = FALSE;
+      HB_SET_SHARED( hb_runningContexts, HB_COND_SET, 0 );
       return;
    }
-   HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+
    /* By hypotesis, only one thread will be granted the right to be here; 
    so cheching for consistency of s_pCurrBlock further is useless.*/   
    
@@ -590,7 +571,6 @@ void hb_gcCollectAll( void )
    * - freed (in their members)
    * - modified/released (in their strucure )
    *****/
-   HB_CRITICAL_LOCK( hb_threadContextMutex );   
 
    s_bCollecting = TRUE;
    s_uAllocated = 0;
@@ -631,7 +611,7 @@ void hb_gcCollectAll( void )
    /* check list of locked blocks for blocks referenced from
    * locked block
    */
-   HB_CRITICAL_LOCK( s_garbageAllocMutex );
+   //HB_CRITICAL_LOCK( hb_garbageAllocMutex );
     
    if( s_pLockedBlock )
    {
@@ -749,7 +729,7 @@ void hb_gcCollectAll( void )
 
    s_pCurrBlock = pAlloc;
    
-   HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+   //HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
 
    /* Step 4 - flip flag */
    /* Reverse used/unused flag so we don't have to mark all blocks
@@ -757,18 +737,10 @@ void hb_gcCollectAll( void )
    */
    s_uUsedFlag ^= HB_GC_USED_FLAG;
 
-   #ifdef HB_THREAD_SUPPORT
+   /* Step 5: release all the locks on the scanned objects */      
+   /* Put itself back on machine execution count */
+   HB_CONTEXT_START;
    
-      /* Step 5: release all the locks on the scanned objects */
-      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-
-      HB_CRITICAL_LOCK( s_GawMutex );
-      s_bGarbageAtWork = FALSE;
-      HB_CRITICAL_UNLOCK( s_GawMutex );
-         
-      HB_CRITICAL_UNLOCK( hb_garbageMutex );
-   #endif
-
 }
 
 /* JC1: THREAD UNSAFE
@@ -869,9 +841,7 @@ void hb_gcInit( void )
 {
    #ifdef HB_THREAD_SUPPORT
       //hb_threadForbidenInit( &hb_gcCollectionForbid );
-      HB_CRITICAL_INIT( s_GawMutex );
-      HB_CRITICAL_INIT( hb_garbageMutex );
-      HB_CRITICAL_INIT( s_garbageAllocMutex );
+      //HB_CRITICAL_INIT( s_GawMutex );
    #endif
 }
 
@@ -879,9 +849,7 @@ void hb_gcExit( void )
 {
    #ifdef HB_THREAD_SUPPORT
       //hb_threadForbidenDestroy( &hb_gcCollectionForbid );
-      HB_CRITICAL_DESTROY( s_GawMutex );
-      HB_CRITICAL_DESTROY( hb_garbageMutex );
-      HB_CRITICAL_DESTROY( s_garbageAllocMutex );
+      //HB_CRITICAL_DESTROY( s_GawMutex );
    #endif
 }
 
@@ -901,6 +869,8 @@ HB_FUNC( HB_GCALL )
    {
       s_uAllocated = HB_GC_COLLECTION_JUSTIFIED;
    }
-
+   HB_CONTEXT_UNLOCK;
    hb_gcCollectAll();
+   HB_CONTEXT_LOCK;
+
 }

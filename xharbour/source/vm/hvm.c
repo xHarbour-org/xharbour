@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.167 2003/02/26 05:36:11 jonnymind Exp $
+ * $Id: hvm.c,v 1.168 2003/02/28 10:38:45 ronpinkas Exp $
  */
 
 /*
@@ -61,10 +61,13 @@
  * Copyright 1999 Eddie Runia <eddie@runia.com>
  *    __VMVARSGET()
  *    __VMVARSLIST()
- *
+ *                
  * See doc/license.txt for licensing terms.
  *
  */
+
+/*JC1: say we are going to optimze MT stack */
+#define HB_THREAD_OPTMIZE_STACK
 
 #ifndef __MPW__
    #ifdef HB_OS_DARWIN
@@ -96,19 +99,6 @@
    #include "hbpp.h"
 #endif
 
-#ifdef HB_THREAD_SUPPORT
-   /** JC1:
-      Turning on stack usage optimization. In MT libs, every function
-      accessing stack will record the HB_STACK (provided by
-      hb_threadGetCurrentStack()) into a local Stack variable, and
-      this variable will be accessed instead of HB_VM_STACK.
-   */
-   #undef HB_VM_STACK
-   #define HB_VM_STACK (*Stack)
-   #define HB_THREAD_STUB  HB_STACK *Stack = hb_stackGetCurrentStack();
-#else
-   #define HB_THREAD_STUB
-#endif
 
 
 /* DEBUG only*/
@@ -352,12 +342,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmInit()"));
 
-    #ifdef HB_THREAD_SUPPORT
-       HB_TRACE( HB_TR_INFO, ("contextInit" ) );
-       hb_threadInit();
-    #endif
-
-    hb_gcInit();
+   hb_gcInit();
 
    /* initialize internal data structures */
    s_aStatics.type = HB_IT_NIL;
@@ -368,8 +353,11 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    s_lRecoverBase = 0;
    s_uiActionRequest = 0;
 
+#ifndef HB_THREAD_SUPPORT
    HB_VM_STACK.pItems = NULL; /* keep this here as it is used by fm.c */
    HB_VM_STACK.Return.type = HB_IT_NIL;
+   /* under threads, thread context have been already initialized */
+#endif
 
    for ( hb_vm_wWithObjectCounter = 0; hb_vm_wWithObjectCounter < HB_MAX_WITH_OBJECTS; hb_vm_wWithObjectCounter++  )
    {
@@ -394,8 +382,11 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    HB_TRACE( HB_TR_INFO, ("errInit" ) );
    hb_errInit();
+#ifndef HB_THREAD_SUPPORT
+   /* Under mt, this is done by static initializers */
    HB_TRACE( HB_TR_INFO, ("stackInit" ) );
    hb_stackInit();
+#endif
    HB_TRACE( HB_TR_INFO, ("dynsymNew" ) );
    hb_dynsymNew( &hb_symEval );  /* initialize dynamic symbol for evaluating codeblocks */
    HB_TRACE( HB_TR_INFO, ("setInitialize" ) );
@@ -555,7 +546,7 @@ void HB_EXPORT hb_vmQuit( void )
 
    if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
    {
-      hb_itemClear( &(hb_stack.Return) );
+      hb_itemClear( &(HB_VM_STACK.Return) );
    }
    //printf( "After Return\n" );
 
@@ -604,6 +595,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 {
    HB_THREAD_STUB
 
+#ifdef HB_THREAD_SUPPORT
+   int iCount = 0;
+#endif
    LONG w = 0;
    BOOL bCanRecover = FALSE;
    ULONG ulPrivateBase;
@@ -665,7 +659,14 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          }
       }
 #endif
-
+      /* JC1: we can proceed here only if not in garbage collecting */
+#ifdef HB_THREAD_SUPPORT
+      if ( iCount == 0 )
+      {
+         HB_CONTEXT_LOCK;
+      }
+      iCount++;
+#endif
       switch( pCode[ w ] )
       {
          /* Operators ( mathematical / character / misc ) */
@@ -918,8 +919,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                ( &(HB_VM_STACK.Return) )->type = HB_IT_NIL;
             }
-
             hb_vmDo( uiParams );
+            
 
             // Thread Safety.
             hb_stackPush();
@@ -945,9 +946,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                ( &(HB_VM_STACK.Return) )->type = HB_IT_NIL;
             }
-
             hb_vmDo( uiParams );
-
+            
             hb_stackPush();
             hb_itemForwardValue( *( HB_VM_STACK.pPos - 1 ), &(HB_VM_STACK.Return) );
 
@@ -1021,7 +1021,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_SEND:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEND") );
-
+            
             hb_vmSend( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
 
             w += 3;
@@ -1047,7 +1047,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_SENDSHORT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDSHORT") );
-
+            
             hb_vmSend( pCode[ w + 1 ] );
 
             w += 2;
@@ -1177,7 +1177,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /*
              * *** NOTE!!! Return!!!
              */
-
+            /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
+            HB_CONTEXT_UNLOCK;
             return;
 
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
@@ -2457,7 +2458,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_errInternal( HB_EI_VMBADOPCODE, NULL, NULL, NULL );
             break;
       }
-
+      /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
+      #ifdef HB_THREAD_SUPPORT
+         if ( iCount == 500 )
+         {
+            HB_CONTEXT_UNLOCK;
+            iCount = 0;
+         }
+      //printf( "Count: %d\r\n", hb_runningContexts.content.asLong );
+      #endif
+      
       if( s_uiActionRequest )
       {
          if( s_uiActionRequest & HB_BREAK_REQUESTED )
@@ -2519,8 +2529,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       --hb_vm_wWithObjectCounter;
       hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
    }
-
+   
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
+   
 }
 
 /* ------------------------------- */
@@ -3984,8 +3995,6 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayGen(%lu)", ulElements));
 
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
-
    itArray.type = HB_IT_NIL;
    hb_arrayNew( &itArray, ulElements );
 
@@ -4011,7 +4020,6 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
       hb_stackPush();
    }
 
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
 }
 
@@ -4026,8 +4034,6 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
    HB_ITEM_PTR pDim;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayNew(%p, %hu)", pArray, uiDimension));
-
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
 
    pDim = hb_stackItemFromTop( - uiDimension );
 
@@ -4067,8 +4073,6 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
          hb_vmArrayNew( hb_arrayGetItemPtr( pArray, ulElements-- ), uiDimension );
       }
    }
-
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
 }
 
@@ -4284,7 +4288,7 @@ void hb_vmDo( USHORT uiParams )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDo(%hu)", uiParams));
 
    //printf( "\VmDo nItems: %i Params: %i Extra %i\n", HB_VM_STACK.pPos - HB_VM_STACK.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
-
+   
    if( hb_vm_iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] + 2 ) ) ) && pItem->item.asSymbol.value == hb_vm_apExtraParamsSymbol[hb_vm_iExtraParamsIndex - 1] )
    {
       uiParams += hb_vm_aiExtraParams[--hb_vm_iExtraParamsIndex];
@@ -4310,6 +4314,7 @@ void hb_vmDo( USHORT uiParams )
    pSelf = hb_stackSelfItem();   /* NIL, OBJECT or BLOCK */
    bDebugPrevState = s_bDebugging;
    s_bDebugging = FALSE;
+
    HB_TRACE( HB_TR_INFO, ( "Symbol: '%s'", pSym->szName ) );
 
    if( HB_IS_NIL( pSelf ) ) /* are we sending a message ? */
@@ -4367,6 +4372,7 @@ void hb_vmDo( USHORT uiParams )
    HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmDo(%hu)", uiParams));
 
    hb_stackOldFrame( &sStackState );
+   
 
    HB_TRACE(HB_TR_DEBUG, ("Restored OldFrame hb_vmDo(%hu)", uiParams));
 
@@ -4792,7 +4798,6 @@ static void hb_vmFrame( BYTE bLocals, BYTE bParams )
       {
          hb_vmPushNil();
       }
-
       return;
    }
 
@@ -4840,7 +4845,6 @@ static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the g
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmStatics(%p, %hu)", pSym, uiStatics));
 
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
    if( HB_IS_NIL( &s_aStatics ) )
    {
       pSym->pFunPtr = NULL;         /* statics frame for this PRG */
@@ -4853,8 +4857,6 @@ static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the g
    }
 
    s_uiStatics = uiStatics; /* We need s_uiStatics for processing hb_vmStaticName() */
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-
 }
 
 static void hb_vmEndBlock( void )
@@ -6268,6 +6270,9 @@ HB_FUNC( __VMVARSSET )
 /* Mark all locals as used so they will not be released by the
  * garbage collector
  */
+ 
+#ifndef HB_THREAD_SUPPORT
+
 void hb_vmIsLocalRef( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
@@ -6294,6 +6299,8 @@ void hb_vmIsLocalRef( void )
       }
    }
 }
+
+#endif
 
 /* Mark all statics as used so they will not be released by the
  * garbage collector

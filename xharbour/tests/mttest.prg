@@ -36,6 +36,7 @@ PROCEDURE Main()
 
   @ 24, 0 SAY  "Sequential Time:" + Str( Seconds() - nStart )
 
+  Inkey(0)
 RETURN
 
 PROCEDURE MyThreadFunc( nRow, cName, nStart, nMax )

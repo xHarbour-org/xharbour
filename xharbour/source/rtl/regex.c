@@ -6512,7 +6512,7 @@ HB_FUNC( HB_REGEX )
 // Returns just .T. if match found or .F. otherwise.
 HB_FUNC( HB_REGEXMATCH )
 {
-   hb_regex( 2, NULL, NULL );
+   hb_retl ( hb_regex( 2, NULL, NULL ) );
 }
 
 HB_FUNC( HB_REGEXCOMP )

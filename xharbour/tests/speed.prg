@@ -10,6 +10,7 @@ Function Main()
  ? stop := Second()
  ? '==============='
  ? stop - start
+ Inkey(0)
  Return NIL
 
 FUNCTION xxx( Counter )

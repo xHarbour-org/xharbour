@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.7 2003/01/02 23:10:13 ronpinkas Exp $
+ * $Id: trace.c,v 1.8 2003/02/04 23:43:44 ronpinkas Exp $
  */
 
 /*
@@ -65,11 +65,10 @@ void hb_traceInit( void )
    FILE *fpTrace;
    PHB_DYNS pTraceLog = hb_dynsymFind( "TRACELOG" );
 
-   #ifdef HB_THREAD_SUPPORT
-      #ifdef HB_OS_WIN_32
-          InitializeCriticalSection( &s_CriticalMutex );
-      #endif
-   #endif
+   
+#ifdef HB_THREAD_SUPPORT
+   HB_CRITICAL_INIT( s_CriticalMutex );
+#endif
 
    if( pTraceLog && pTraceLog->pSymbol->pFunPtr )
    {
@@ -89,11 +88,10 @@ void hb_traceInit( void )
 
 void hb_traceExit( void )
 {
-   #ifdef HB_THREAD_SUPPORT
-      #ifdef HB_OS_WIN_32
-          DeleteCriticalSection( &s_CriticalMutex );
-      #endif
-   #endif
+#ifdef HB_THREAD_SUPPORT
+   HB_CRITICAL_DESTROY( s_CriticalMutex );
+#endif
+
 }
 
 void TraceLog( const char * sFile, const char * sTraceMsg, ... )
@@ -105,14 +103,7 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
       return;
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      #ifdef HB_OS_WIN_32
-         if( hb_ht_context )
-         {
-            EnterCriticalSection( &s_CriticalMutex );
-         }
-      #endif
-   #endif
+   HB_CRITICAL_LOCK( s_CriticalMutex );
 
    if( sFile == NULL )
    {
@@ -134,14 +125,8 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
       fclose( hFile );
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      #ifdef HB_OS_WIN_32
-         if( hb_ht_context )
-         {
-            LeaveCriticalSection( &s_CriticalMutex );
-         }
-      #endif
-   #endif
+   HB_CRITICAL_UNLOCK( s_CriticalMutex );
+
 }
 
 HB_FUNC( HB_TRACESTATE )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.13 2003/02/19 10:51:14 jonnymind Exp $
+ * $Id: hbstack.h,v 1.14 2003/02/22 05:54:57 jonnymind Exp $
  */
 
 /*
@@ -97,15 +97,6 @@ typedef struct
 
 /* JC1: test for macro accessing the stack */
 #include "thread.h"
-
-#if defined( HB_THREAD_SUPPORT )
-   extern HB_STACK *hb_stackGetCurrentStack( void );
-
-   //#define HB_VM_STACK ( hb_ht_context ? (* hb_stackGetCurrentStack() ) : hb_stack ) // Compiler disallow this optimization.
-   #define HB_VM_STACK (* hb_stackGetCurrentStack() )
-#else
-   #define HB_VM_STACK hb_stack
-#endif
 
 #ifndef HB_NO_DEFAULT_STACK_MACROS
     #define HB_STACK_MACROS

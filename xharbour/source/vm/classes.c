@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.36 2003/02/25 19:38:18 ronpinkas Exp $
+ * $Id: classes.c,v 1.37 2003/02/27 05:16:15 ronpinkas Exp $
  */
 
 /*
@@ -137,6 +137,9 @@
  *
  */
 
+/*JC1: say we are going to optimze MT stack */
+#define HB_THREAD_OPTMIZE_STACK
+
 #include <math.h>
 
 #include "hbapi.h"
@@ -153,20 +156,6 @@
 /* #include <windows.h> */
 
 //#define DEBUG_HASH
-
-#ifdef HB_THREAD_SUPPORT
-   /** JC1:
-      Turning on stack usage optimization. In MT libs, every function
-      accessing stack will record the HB_STACK (provided by
-      hb_threadGetCurrentStack()) into a local Stack variable, and
-      this variable will be accessed instead of HB_VM_STACK.
-   */
-   #undef HB_VM_STACK
-   #define HB_VM_STACK (*Stack)
-   #define HB_THREAD_STUB  HB_STACK *Stack = hb_stackGetCurrentStack();
-#else
-   #define HB_THREAD_STUB
-#endif
 
 struct hb_class_method
 {

@@ -8,7 +8,7 @@
 *
 * (C) 2003 Giancarlo Niccolai & Ron Pinkas
 *
-* $Id: mtgc.prg,v 1.10 2003/02/21 22:33:22 jonnymind Exp $
+* $Id: mtgc.prg,v 1.11 2003/02/22 01:30:37 jonnymind Exp $
 *
 * This programs allocates Garbage Collectable objects in
 * subthreads, and force the collection in a crossed thread
@@ -51,6 +51,7 @@ PROCEDURE Main()
   StartThread ( @MyThreadFunc(), 12, " 9th Thread:", 40000, 45000 )
   StartThread ( @MyThreadFunc(), 13, "10th Thread:", 45000, 50000 )
 
+   
   WaitForThreads()
   @ 15, 2 SAY "Threads Time:" + Str( Seconds() - nStart )
   @ 16, 2 SAY "Press a key to continue"
