@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.11 2003/12/12 05:31:20 jonnymind Exp $
+ * $Id: hbrdddbf.h,v 1.12 2003/12/12 15:04:38 jonnymind Exp $
  */
 
 /*
@@ -67,19 +67,31 @@ HB_EXTERN_BEGIN
 /* DBF locking schemes */
 #define DBF_LOCKPOS_CLIP                  1000000000L
 #define DBF_LOCKPOS_CL53                  1000000000L
-#define DBF_LOCKPOS_VFP                   0x7ffffffeL
+#define DBF_LOCKPOS_VFP                   0x40000000L
+#define DBF_LOCKPOS_VFPX                  0x7ffffffeL
 
 #define DBF_LOCKDIR_CLIP                  1
 #define DBF_LOCKDIR_CL53                  1
-#define DBF_LOCKDIR_VFP                   -1
+#define DBF_LOCKDIR_VFP                   2  /* lock forward at at record offset */
+#define DBF_LOCKDIR_VFPX                  -1
 
-#define FILE_LOCKPOS_CLIP                 1000000000L
-#define FILE_LOCKPOS_CL53                 0xfffeffffL
-#define FILE_LOCKPOS_VFP                  0x7ffffffeL
+#define DBF_FLCKSIZE_CLIP                 1000000000L
+#define DBF_FLCKSIZE_CL53                 1000000000L
+#define DBF_FLCKSIZE_VFP                  0x3ffffffdL
+#define DBF_FLCKSIZE_VFPX                 0x07ffffffL
 
-#define FILE_LOCKPOOL_CLIP                0L
-#define FILE_LOCKPOOL_CL53                0x00010000L
-#define FILE_LOCKPOOL_VFP                 0L
+#define DBF_RLCKSIZE_CLIP                 1L
+#define DBF_RLCKSIZE_CL53                 1L
+#define DBF_RLCKSIZE_VFP                  1L
+#define DBF_RLCKSIZE_VFPX                 1L
+
+#define IDX_LOCKPOS_CLIP                  1000000000L
+#define IDX_LOCKPOS_CL53                  0xfffeffffL
+#define IDX_LOCKPOS_VFP                   0x7ffffffeL
+
+#define IDX_LOCKPOOL_CLIP                 0L
+#define IDX_LOCKPOOL_CL53                 0x00010000L
+#define IDX_LOCKPOOL_VFP                  0L
 
 #ifdef OS_UNIX_COMPATIBLE
 #define DBF_EXLUSIVE_LOCKPOS              0x7fffffffL
@@ -281,8 +293,8 @@ static BOOL    hb_dbfExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex );
 extern ULONG HB_EXPORT hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
 extern void  HB_EXPORT hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock );
 extern ERRCODE HB_EXPORT hb_dbfGetEGcode( ERRCODE errCode );
-extern BOOL HB_EXPORT hb_dbfLockExtFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, ULONG *pPoolPos );
-extern BOOL HB_EXPORT hb_dbfLockExtGetData( BYTE bScheme, ULONG *ulPos, ULONG *ulPool );
+extern BOOL HB_EXPORT hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, ULONG *pPoolPos );
+extern BOOL HB_EXPORT hb_dbfLockIdxGetData( BYTE bScheme, ULONG *ulPos, ULONG *ulPool );
 
 HB_EXTERN_END
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.95 2004/01/25 12:16:00 andijahja Exp $
+ * $Id: dbfcdx1.c,v 1.96 2004/01/26 15:00:50 druzus Exp $
  */
 
 /*
@@ -1159,7 +1159,7 @@ static BOOL hb_cdxIndexLockRead( LPCDXINDEX pIndex )
    pIndex->RdLck = TRUE;
 #endif
 
-   ret = hb_dbfLockExtFile( pIndex->hFile, pIndex->pArea->bLockType,
+   ret = hb_dbfLockIdxFile( pIndex->hFile, pIndex->pArea->bLockType,
                          FL_LOCK | FLX_SHARED | FLX_WAIT, &pIndex->ulLockPos );
    if ( !ret )
       /* TODO: change into RT error dbfcdx/1038 */
@@ -1198,7 +1198,7 @@ static BOOL hb_cdxIndexLockWrite( LPCDXINDEX pIndex )
          hb_errInternal( 9107, "hb_cdxIndexLockWrite: lock failure (*)", "", "" );
       pIndex->WrLck = TRUE;
 #endif
-      ret = hb_dbfLockExtFile( pIndex->hFile, pIndex->pArea->bLockType,
+      ret = hb_dbfLockIdxFile( pIndex->hFile, pIndex->pArea->bLockType,
                             FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT, &pIndex->ulLockPos );
    }
    if ( !ret )
@@ -1241,7 +1241,7 @@ static BOOL hb_cdxIndexUnLockRead( LPCDXINDEX pIndex )
          hb_errInternal( 9108, "hb_cdxIndexUnLockRead: unlock error (*)", "", "" );
       pIndex->RdLck = FALSE;
 #endif
-      if ( !hb_dbfLockExtFile( pIndex->hFile, pIndex->pArea->bLockType, FL_UNLOCK, &pIndex->ulLockPos ) )
+      if ( !hb_dbfLockIdxFile( pIndex->hFile, pIndex->pArea->bLockType, FL_UNLOCK, &pIndex->ulLockPos ) )
       {
          hb_errInternal( 9108, "hb_cdxIndexUnLockRead: unlock error.", "", "" );
       }
@@ -1293,7 +1293,7 @@ static BOOL hb_cdxIndexUnLockWrite( LPCDXINDEX pIndex )
          hb_errInternal( 9108, "hb_cdxIndexUnLockWrite: unlock error (*)", "", "" );
       pIndex->WrLck = FALSE;
 #endif
-      if ( !hb_dbfLockExtFile( pIndex->hFile, pIndex->pArea->bLockType, FL_UNLOCK, &pIndex->ulLockPos ) )
+      if ( !hb_dbfLockIdxFile( pIndex->hFile, pIndex->pArea->bLockType, FL_UNLOCK, &pIndex->ulLockPos ) )
       {
          hb_errInternal( 9108, "hb_cdxIndexUnLockWrite: unlock error.", "", "" );
       }
@@ -6198,7 +6198,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          {
             ULONG ulPos, ulPool;
 
-            hb_dbfLockExtGetData( pArea->bLockType, &ulPos, &ulPool );
+            hb_dbfLockIdxGetData( pArea->bLockType, &ulPos, &ulPool );
             if ( uiIndex == DBOI_LOCKOFFSET )
                pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult, ulPos );
             else

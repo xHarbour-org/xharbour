@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.8 2003/09/08 12:56:53 druzus Exp $
+ * $Id: cdpapi.c,v 1.9 2004/01/26 15:00:51 druzus Exp $
  */
 
 /*
@@ -117,17 +117,19 @@ static int u16toutf8( unsigned char *szUTF8, USHORT uc )
       szUTF8[1] = 0x80 | ( uc & 0x3f );
       n = 2;
    }
-   else if ( uc <= 0xffff )
+   else /* if ( uc <= 0xffff ) */
    {
       szUTF8[0] = 0xe0 | ( ( uc >> 12 ) & 0x0f);
       szUTF8[1] = 0x80 | ( ( uc >> 6 ) & 0x3f);
       szUTF8[2] = 0x80 | ( uc & 0x3f );
       n = 3;
    }
+/*
    else
    {
       n = 0;
    }
+*/
    return n;
 }
 

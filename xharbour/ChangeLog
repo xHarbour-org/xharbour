@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2165 2004/01/28 07:04:25 andijahja Exp $
+ * $Id: ChangeLog,v 1.2166 2004/01/28 07:34:05 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-28 15:40 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbrdddbf.h
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * default locking scheme for VFP changed to make it compatible with
+      Clipper (cl52 and cl53+cdxlock.obj) for DBF without structural
+      index files
+
+  * xharbour/source/rtl/cdpapi.c
+    * temporary commented out redundant if statement there are unnecessary
+      for u16
+
+  + xharbour/contrib/unicode/cst/vendor/misc/pl-maz.txt
+    + unicode table for Polish Mazovia charset
 
 2004-01-28 10:30 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/compiler/harbour.c
