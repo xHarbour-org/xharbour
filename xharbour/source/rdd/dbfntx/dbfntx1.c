@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.36 2003/04/18 01:51:25 lculik Exp $
+ * $Id: dbfntx1.c,v 1.37 2003/04/27 15:58:51 paultucker Exp $
  */
 
 /*
@@ -484,7 +484,7 @@ static ULONG hb_ntxTagKeyCount( LPTAGINFO pTag )
       {
          LPKEYINFO pKey = hb_ntxKeyNew( NULL,pTag->KeyLength );
 
-         strcpy( pKey->key,pTag->topScope->item.asString.value );
+         strncpy( pKey->key,pTag->topScope->item.asString.value,pTag->KeyLength  );
          pTag->CurKeyInfo->Tag = pTag->CurKeyInfo->Xtra = pTag->TagEOF = 0;
          lRecno = ( hb_ntxTagFindCurrentKey( pTag, hb_ntxPageLoad( pTag,0 ),
                       pKey, FALSE, TRUE ) <= 0 )? pTag->CurKeyInfo->Xtra:0;
@@ -3930,6 +3930,7 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
          pError = hb_errNew();
          hb_errPutGenCode( pError, EG_OPEN );
          hb_errPutSubCode( pError, 1003 );
+         hb_errPutOsCode( pError, hb_fsError() );
          hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
          hb_errPutFileName( pError, szFileName );
          hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
@@ -3979,8 +3980,9 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
    else
    {
       pArea->lpNtxTag = pIndex->CompoundTag;
+      SELF_GOTOP( ( AREAP ) pArea );
    }
-   SELF_GOTOP( ( AREAP ) pArea );
+
 
    hb_xfree( szFileName );
    hb_xfree( pFileName );

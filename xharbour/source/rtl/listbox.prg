@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.8 2003/03/06 21:02:19 walito Exp $
+ * $Id: listbox.prg,v 1.9 2003/04/26 16:26:26 lculik Exp $
  */
 
 /*
@@ -1117,7 +1117,7 @@ Function Listbox( nTop, nLeft, nBottom, nRigth, lDrop )
         RETURN nil
      ENDIF
 
-RETURN HBListBox():New( nTop, nLeft, nBottom, nRigth, !lDrop )
+RETURN HBListBox():New( nTop, nLeft, nBottom, nRigth, lDrop )
 
 Static Function _Getdata( xItem )
 
