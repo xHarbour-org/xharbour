@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipencoderurl.prg,v 1.2 2003/12/10 13:30:46 jonnymind Exp $
+* $Id: tipencoderurl.prg,v 1.3 2004/04/23 16:30:21 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 
@@ -35,6 +35,11 @@ HB_FUNC( TIPENCODERURL_ENCODE )
    char *cRet;
    int nPos = 0, nPosRet = 0, nVal;
    char cElem;
+   
+   if ( hb_pcount() < 2 )
+   {
+      bComplete = TRUE;
+   }
 
    if ( ! cData )
    {
