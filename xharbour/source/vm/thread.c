@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.74 2003/04/27 15:58:51 paultucker Exp $
+* $Id: thread.c,v 1.75 2003/05/07 10:06:07 jonnymind Exp $
 */
 
 /*
@@ -134,7 +134,9 @@ HB_CRITICAL_T hb_threadStackMutex;
 HB_CRITICAL_T hb_globalsMutex;
 HB_CRITICAL_T hb_staticsMutex;
 HB_CRITICAL_T hb_memvarsMutex;
-HB_CRITICAL_T hb_allocMutex;
+#ifndef HB_SAFE_ALLOC
+    HB_CRITICAL_T hb_allocMutex;
+#endif
 HB_CRITICAL_T hb_garbageAllocMutex;
 HB_CRITICAL_T hb_outputMutex;
 HB_CRITICAL_T hb_mutexMutex;
@@ -153,7 +155,9 @@ HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
    HB_STACK *tc;
    int i;
 
+#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_LOCK( hb_allocMutex );
+#endif
    tc = (HB_STACK *) malloc( sizeof( HB_STACK));
 
    tc->th_id = th;
@@ -183,7 +187,9 @@ HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
    }
    ( * (tc->pPos) )->type = HB_IT_NIL;
 
+#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
+#endif
 
    return tc;
 }
@@ -307,7 +313,9 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    }
 
    /* Free each element of the stack */
+#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_LOCK( hb_allocMutex );
+#endif
    for( i = 0; i < pStack->wItems; i++ )
    {
       free( pStack->pItems[ i ] );
@@ -320,7 +328,9 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    //free( pStack->pCleanUpParam );
    #endif
    free( pStack );
+#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
+#endif
 
    // Call destructor
    /*
@@ -1718,7 +1728,9 @@ int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec
 void hb_threadInit( void )
 {
    HB_CRITICAL_INIT( hb_threadStackMutex );
+#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_INIT( hb_allocMutex );
+#endif
    HB_CRITICAL_INIT( hb_garbageAllocMutex );
    HB_CRITICAL_INIT( hb_outputMutex );
    HB_CRITICAL_INIT( hb_mutexMutex );
@@ -1763,7 +1775,9 @@ void hb_threadExit( void )
    HB_CRITICAL_DESTROY( hb_mutexMutex );
    HB_CRITICAL_DESTROY( hb_outputMutex );
    HB_CRITICAL_DESTROY( hb_garbageAllocMutex );
+#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_DESTROY( hb_allocMutex );
+#endif
    HB_CRITICAL_DESTROY( hb_threadStackMutex );
 
    #ifdef HB_OS_WIN_32

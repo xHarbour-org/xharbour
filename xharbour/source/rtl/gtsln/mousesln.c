@@ -1,5 +1,5 @@
 /*
- * $Id: mousesln.c,v 1.3 2002/04/16 16:12:18 map Exp $
+ * $Id: mousesln.c,v 1.5 2003/01/31 19:24:50 map Exp $
  */
 
 /*
@@ -130,14 +130,14 @@ static BOOL GetGpmEvent( Gpm_Event *Evt )
 
 /* *********************************************************************** */
 
-int hb_mouse_Inkey( HB_inkey_enum EventMask )
+int HB_GT_FUNC(mouse_Inkey( HB_inkey_enum EventMask ))
 {
     struct timeval  CurrTime;
     struct timezone TimeZone;
     /* Force first click as single */
     static struct timeval tv1 = { 0, 0 }  ;
     static struct timeval tv2;
-    int ch;
+    int ch = 0;
 
     if( hb_gt_UnderXterm )  
     {
@@ -253,7 +253,7 @@ int hb_mouse_Inkey( HB_inkey_enum EventMask )
 
 /* *********************************************************************** */
 
-void hb_mouse_Init( void )
+void HB_GT_FUNC(mouse_Init( void ))
 {
     if( hb_gt_UnderXterm )
     {
@@ -301,7 +301,7 @@ void hb_mouse_Init( void )
             }
 
             s_iMouseButtons = Gpm_GetSnapshot( NULL );
-            hb_mouse_FixTrash();
+            HB_GT_FUNC(mouse_FixTrash());
         }
     }
 #endif
@@ -309,7 +309,7 @@ void hb_mouse_Init( void )
 
 /* *********************************************************************** */
 
-void hb_mouse_Exit( void )
+void HB_GT_FUNC(mouse_Exit( void ))
 {
     if( hb_gt_UnderXterm )
     {
@@ -334,14 +334,14 @@ void hb_mouse_Exit( void )
 
 /* *********************************************************************** */
 
-BOOL hb_mouse_IsPresent( void )
+BOOL HB_GT_FUNC(mouse_IsPresent( void ))
 {
     return s_bMousePresent;
 }
 
 /* *********************************************************************** */
 
-void hb_mouse_Show( void )
+void HB_GT_FUNC(mouse_Show( void ))
 {
 #ifdef HAVE_GPM_H
     gpm_visiblepointer = 1;
@@ -353,7 +353,7 @@ void hb_mouse_Show( void )
 
 /* *********************************************************************** */
 
-void hb_mouse_Hide( void )
+void HB_GT_FUNC(mouse_Hide( void ))
 {
 #ifdef HAVE_GPM_H
     gpm_visiblepointer = 0;
@@ -363,21 +363,21 @@ void hb_mouse_Hide( void )
 
 /* *********************************************************************** */
 
-int hb_mouse_Col( void )
+int HB_GT_FUNC(mouse_Col( void ))
 {
     return s_LastMouseEvent.Col;
 }
 
 /* *********************************************************************** */
 
-int hb_mouse_Row( void )
+int HB_GT_FUNC(mouse_Row( void ))
 {
     return s_LastMouseEvent.Row;
 }
 
 /* *********************************************************************** */
 
-void hb_mouse_SetPos( int iRow, int iCol )
+void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
 {
     /* it does really nothing */
     s_LastMouseEvent.Col = iCol;
@@ -391,7 +391,7 @@ void hb_mouse_SetPos( int iRow, int iCol )
 
 /* *********************************************************************** */
 
-BOOL hb_mouse_IsButtonPressed( int iButton )
+BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
 {
     HB_SYMBOL_UNUSED( iButton );
 
@@ -400,14 +400,14 @@ BOOL hb_mouse_IsButtonPressed( int iButton )
 
 /* *********************************************************************** */
 
-int hb_mouse_CountButton( void )
+int HB_GT_FUNC(mouse_CountButton( void ))
 {
     return( s_iMouseButtons );
 }
 
 /* *********************************************************************** */
 
-void hb_mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight )
+void HB_GT_FUNC(mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ))
 {
     HB_SYMBOL_UNUSED( iTop );
     HB_SYMBOL_UNUSED( iLeft );
@@ -417,7 +417,7 @@ void hb_mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight )
 
 /* *********************************************************************** */
 
-void hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight )
+void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ))
 {
     HB_SYMBOL_UNUSED( piTop );
     HB_SYMBOL_UNUSED( piLeft );
@@ -427,7 +427,7 @@ void hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRigh
 
 /* *********************************************************************** */
 
-void hb_mouse_FixTrash()
+void HB_GT_FUNC(mouse_FixTrash())
 {
 #ifdef HAVE_GPM_H
     if( hb_gt_UnderLinuxConsole )

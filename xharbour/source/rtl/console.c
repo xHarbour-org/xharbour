@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.27 2003/03/14 11:22:30 jonnymind Exp $
+ * $Id: console.c,v 1.28 2003/03/16 06:00:32 jonnymind Exp $
  */
 
 /*
@@ -658,9 +658,9 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
 {
    HB_THREAD_STUB
    
-   char * pszString;
+   char * pszString = NULL;
    ULONG ulLen;
-   BOOL bFreeReq;
+   BOOL bFreeReq = FALSE;
 
    HB_CONSOLE_SAFE_LOCK
    
@@ -701,9 +701,9 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
 {
    HB_THREAD_STUB
    
-   char * pszString;
+   char * pszString = NULL;
    ULONG ulLen;
-   BOOL bFreeReq;
+   BOOL bFreeReq = FALSE;
 
    HB_CONSOLE_SAFE_LOCK
    

@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.2 2002/09/20 19:18:18 map Exp $
+ * $Id: gtpca.c,v 1.3 2002/09/27 20:51:49 map Exp $
  */
 
 /*
@@ -57,6 +57,9 @@
 
 /* NOTE: User programs should never call this layer directly! */
 
+/* This definition has to be placed before #include "hbapigt.h" */
+#define HB_GT_FNPREF(x) pca ## x
+
 #if defined(__GNUC__) && ! defined(__MINGW32__)
    #include <unistd.h>
    #if defined(__DJGPP__) || defined(__CYGWIN__) || defined(__EMX__)
@@ -80,11 +83,11 @@ static int s_iAttribute;
 static BOOL s_bColor;
 static char s_szSpaces[] = "                                                                                    "; /* 84 spaces */
 
-static void hb_gt_AnsiGetCurPos( USHORT * row, USHORT * col );
+static void HB_GT_FUNC(gt_AnsiGetCurPos( USHORT * row, USHORT * col ));
 
 static USHORT s_uiDispCount;
 
-void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
+void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
    s_iAttribute = 0;
@@ -92,7 +95,7 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
    s_iFilenoStdout = iFilenoStdout;
    s_iFilenoStderr = iFilenoStderr;
    s_usRow = s_usCol = 0;
-   hb_gt_AnsiGetCurPos( &s_usRow, &s_usCol );
+   HB_GT_FUNC(gt_AnsiGetCurPos( &s_usRow, &s_usCol ));
 #ifdef OS_UNIX_COMPATIBLE
    s_usMaxRow = 23;
    s_bColor = FALSE;
@@ -103,18 +106,18 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
    s_usMaxCol = 79;
    fprintf( stdout, "\x1B[=7h" ); /* Enable line wrap (for OUTSTD() and OUTERR()) */
    
-   hb_mouse_Init();
+   HB_GT_FUNC(mouse_Init());
 }
 
-void hb_gt_Exit( void )
+void HB_GT_FUNC(gt_Exit( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
    
-   hb_mouse_Exit();
+   HB_GT_FUNC(mouse_Exit());
    /* TODO: */
 }
 
-static void hb_gt_AnsiGetCurPos( USHORT * row, USHORT * col )
+static void HB_GT_FUNC(gt_AnsiGetCurPos( USHORT * row, USHORT * col ))
 {
    if( isatty( s_iFilenoStdin ) && isatty( s_iFilenoStdout ) )
    {
@@ -138,7 +141,7 @@ static void hb_gt_AnsiGetCurPos( USHORT * row, USHORT * col )
    }
 }
 
-static void hb_gt_AnsiSetAttributes( BYTE attr )
+static void HB_GT_FUNC(gt_AnsiSetAttributes( BYTE attr ))
 {
    static const int color[] = { 0, 4, 2, 6, 1, 5, 3, 7 };
    int bg_color = 40 + color[ ( attr & 0x70 ) >> 4 ];
@@ -153,7 +156,7 @@ static void hb_gt_AnsiSetAttributes( BYTE attr )
    fprintf( stdout, "\x1B[%d;%d;%dm", special, fg_color, bg_color );
 }
 
-BOOL hb_gt_AdjustPos( BYTE * pStr, ULONG ulLen )
+BOOL HB_GT_FUNC(gt_AdjustPos( BYTE * pStr, ULONG ulLen ))
 {
    USHORT row = s_usRow;
    USHORT col = s_usCol;
@@ -199,11 +202,11 @@ BOOL hb_gt_AdjustPos( BYTE * pStr, ULONG ulLen )
             }
       }
    }
-   hb_gt_SetPos( row, col, HB_GT_SET_POS_AFTER );
+   HB_GT_FUNC(gt_SetPos( row, col, HB_GT_SET_POS_AFTER ));
    return TRUE;
 }
 
-int hb_gt_ExtendedKeySupport()
+int HB_GT_FUNC(gt_ExtendedKeySupport())
 {
    return 0;
 }
@@ -211,7 +214,7 @@ int hb_gt_ExtendedKeySupport()
 #ifdef HARBOUR_GCC_OS2
    #include "..\..\kbdos2.gcc"
 #else
-int hb_gt_ReadKey( HB_inkey_enum eventmask )
+int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
    HB_SYMBOL_UNUSED( eventmask );
@@ -220,28 +223,28 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
 }
 #endif
 
-BOOL hb_gt_IsColor( void )
+BOOL HB_GT_FUNC(gt_IsColor( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_IsColor()"));
    /* TODO: */
    return s_bColor;
 }
 
-USHORT hb_gt_GetScreenWidth( void )
+USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth()"));
    /* TODO: */
    return s_usMaxCol + 1;
 }
 
-USHORT hb_gt_GetScreenHeight( void )
+USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenHeight()"));
    /* TODO: */
    return s_usMaxRow + 1;
 }
 
-void hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod )
+void HB_GT_FUNC(gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetPos(%hd, %hd, %hd)", iRow, iCol, iMethod));
 
@@ -256,20 +259,20 @@ void hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod )
    fprintf( stdout, "\x1B[%d;%dH", s_usRow + 1, s_usCol + 1 );
 }
 
-SHORT hb_gt_Row( void )
+SHORT HB_GT_FUNC(gt_Row( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Row()"));
    return s_usRow;
 }
 
-SHORT hb_gt_Col( void )
+SHORT HB_GT_FUNC(gt_Col( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Col()"));
    return s_usCol;
 }
 
 
-void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE attr, SHORT sVert, SHORT sHoriz )
+void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE attr, SHORT sVert, SHORT sHoriz ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Scroll(%hu, %hu, %hu, %hu, %d, %hd, %hd)", usTop, usLeft, usBottom, usRight, (int) attr, sVert, sHoriz));
    HB_SYMBOL_UNUSED( attr );
@@ -287,7 +290,7 @@ void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight,
          USHORT i;
          for( i = usTop; i <= usBottom; i++ )
          {
-            hb_gt_Puts( i, usLeft, s_iAttribute, ( BYTE * )s_szSpaces, (usRight - usLeft ) + 1 );
+            HB_GT_FUNC(gt_Puts( i, usLeft, s_iAttribute, ( BYTE * )s_szSpaces, (usRight - usLeft ) + 1 ));
          }
       }
    }
@@ -313,7 +316,7 @@ void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight,
    }
 }
 
-USHORT hb_gt_GetCursorStyle( void )
+USHORT HB_GT_FUNC(gt_GetCursorStyle( void ))
 {
    /* TODO: What shape is the cursor? */
    USHORT uiStyle = 0;
@@ -321,13 +324,13 @@ USHORT hb_gt_GetCursorStyle( void )
    return uiStyle;
 }
 
-void hb_gt_SetCursorStyle( USHORT style )
+void HB_GT_FUNC(gt_SetCursorStyle( USHORT style ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetCursorStyle(%hu)", style));
    HB_SYMBOL_UNUSED( style );
 }
 
-static void hb_gt_xPutch( USHORT usRow, USHORT usCol, BYTE attr, BYTE byChar )
+static void HB_GT_FUNC(gt_xPutch( USHORT usRow, USHORT usCol, BYTE attr, BYTE byChar ))
 {
    char tmp[ 2 ];
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_xPutch(%hu, %hu, %d, %i)", usRow, usCol, (int) attr, byChar));
@@ -339,7 +342,7 @@ static void hb_gt_xPutch( USHORT usRow, USHORT usCol, BYTE attr, BYTE byChar )
 
    /* Disable line wrap, set the new cursor position, send the string, then
       enable line wrap (for OUTSTD() and OUTERR() ) */
-   hb_gt_AnsiSetAttributes( attr );
+   HB_GT_FUNC(gt_AnsiSetAttributes( attr ));
    fprintf( stdout, "\x1B[=7l\x1B[%d;%dH%s\x1B[=7h", usRow + 1, usCol + 1, tmp );
 
    /* Restore whatever used to be at the termination position */
@@ -349,7 +352,7 @@ static void hb_gt_xPutch( USHORT usRow, USHORT usCol, BYTE attr, BYTE byChar )
    if( s_usCol > s_usMaxCol ) s_usCol = s_usMaxCol;
 }
 
-void hb_gt_Puts( USHORT usRow, USHORT usCol, BYTE attr, BYTE * str, ULONG len )
+void HB_GT_FUNC(gt_Puts( USHORT usRow, USHORT usCol, BYTE attr, BYTE * str, ULONG len ))
 {
    /* Because Clipper strings don't have to be null terminated, add a null
       terminating character after saving what used to be at the termination
@@ -359,7 +362,7 @@ void hb_gt_Puts( USHORT usRow, USHORT usCol, BYTE attr, BYTE * str, ULONG len )
    str[ len ] = '\0';
    /* Disable line wrap, set the new cursor position, send the string, then
       enable line wrap (for OUTSTD() and OUTERR() ) */
-   hb_gt_AnsiSetAttributes( attr );
+   HB_GT_FUNC(gt_AnsiSetAttributes( attr ));
    fprintf( stdout, "\x1B[=7l\x1B[%d;%dH%s\x1B[=7h", usRow + 1, usCol + 1, str );
    /* Restore whatever used to be at the termination position */
    str[ len ] = save;
@@ -369,12 +372,12 @@ void hb_gt_Puts( USHORT usRow, USHORT usCol, BYTE attr, BYTE * str, ULONG len )
    if( s_usCol > s_usMaxCol ) s_usCol = s_usMaxCol;
 }
 
-int hb_gt_RectSize( USHORT rows, USHORT cols )
+int HB_GT_FUNC(gt_RectSize( USHORT rows, USHORT cols ))
 {
    return rows * cols * 2;
 }
 
-void hb_gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE *dest )
+void HB_GT_FUNC(gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE *dest ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p)", usTop, usLeft, usBottom, usRight, dest));
    HB_SYMBOL_UNUSED( usTop );
@@ -385,7 +388,7 @@ void hb_gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight
    /* TODO: */
 }
 
-void hb_gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE *src )
+void HB_GT_FUNC(gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE *src ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", usTop, usLeft, usBottom, usRight, src) );
    HB_SYMBOL_UNUSED( usTop );
@@ -396,7 +399,7 @@ void hb_gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight
    /* TODO: */
 }
 
-void hb_gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE attr )
+void HB_GT_FUNC(gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE attr ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d)", usTop, usLeft, usBottom, usRight, (int) attr) );
    HB_SYMBOL_UNUSED( usTop );
@@ -408,7 +411,7 @@ void hb_gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT us
    s_iAttribute = attr;
 }
 
-void hb_gt_DispBegin( void )
+void HB_GT_FUNC(gt_DispBegin( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispBegin()"));
 
@@ -417,7 +420,7 @@ void hb_gt_DispBegin( void )
    /* TODO: */
 }
 
-void hb_gt_DispEnd( void )
+void HB_GT_FUNC(gt_DispEnd( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispEnd()"));
 
@@ -426,7 +429,7 @@ void hb_gt_DispEnd( void )
    /* TODO: here we flush the buffer, and restore normal screen writes */
 }
 
-BOOL hb_gt_SetMode( USHORT uiRows, USHORT uiCols )
+BOOL HB_GT_FUNC(gt_SetMode( USHORT uiRows, USHORT uiCols ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", uiRows, uiCols) );
    HB_SYMBOL_UNUSED( uiRows );
@@ -435,21 +438,21 @@ BOOL hb_gt_SetMode( USHORT uiRows, USHORT uiCols )
    return 0;   /* 0 = Ok, other = Fail */
 }
 
-BOOL hb_gt_GetBlink()
+BOOL HB_GT_FUNC(gt_GetBlink())
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetBlink()"));
    /* TODO: */
    return 1;               /* 0 = blink, 1 = intens      */
 }
 
-void hb_gt_SetBlink( BOOL bBlink )
+void HB_GT_FUNC(gt_SetBlink( BOOL bBlink ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetBlink(%d)", (int) bBlink) );
    HB_SYMBOL_UNUSED( bBlink );
    /* TODO: */
 }
 
-void hb_gt_Tone( double dFrequency, double dDuration )
+void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
 
@@ -459,29 +462,29 @@ void hb_gt_Tone( double dFrequency, double dDuration )
    HB_SYMBOL_UNUSED( dDuration );
 }
 
-char * hb_gt_Version( void )
+char * HB_GT_FUNC(gt_Version( void ))
 {
    return "Harbour Terminal: PC ANSI";
 }
 
-USHORT hb_gt_DispCount()
+USHORT HB_GT_FUNC(gt_DispCount())
 {
    return s_uiDispCount;
 }
 
 
-void hb_gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byChar, ULONG nLength )
+void HB_GT_FUNC(gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byChar, ULONG nLength ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Replicate(%hu, %hu, %i, %i, %lu)", uiRow, uiCol, byAttr, byChar, nLength));
 
    {
       while( nLength-- )
-         hb_gt_xPutch( uiRow, uiCol++, byAttr, byChar );
+         HB_GT_FUNC(gt_xPutch( uiRow, uiCol++, byAttr, byChar ));
    }
 }
 
-USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
-                  BYTE * szBox, BYTE byAttr )
+USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
+                          BYTE * szBox, BYTE byAttr ))
 {
    USHORT ret = 1;
    SHORT Row;
@@ -489,10 +492,10 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
    SHORT Height;
    SHORT Width;
 
-   if( ( Left   >= 0 && Left   < hb_gt_GetScreenWidth()  )  || 
-       ( Right  >= 0 && Right  < hb_gt_GetScreenWidth()  )  || 
-       ( Top    >= 0 && Top    < hb_gt_GetScreenHeight() )  || 
-       ( Bottom >= 0 && Bottom < hb_gt_GetScreenHeight() ) )
+   if( ( Left   >= 0 && Left   < HB_GT_FUNC(gt_GetScreenWidth())  )  || 
+       ( Right  >= 0 && Right  < HB_GT_FUNC(gt_GetScreenWidth())  )  || 
+       ( Top    >= 0 && Top    < HB_GT_FUNC(gt_GetScreenHeight()) )  || 
+       ( Bottom >= 0 && Bottom < HB_GT_FUNC(gt_GetScreenHeight()) ) )
    {
 
       /* Ensure that box is drawn from top left to bottom right. */
@@ -513,10 +516,10 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
       Height = Bottom - Top + 1;
       Width  = Right - Left + 1;
 
-      hb_gt_DispBegin();
+      HB_GT_FUNC(gt_DispBegin());
 
-      if( Height > 1 && Width > 1 && Top >= 0 && Top < hb_gt_GetScreenHeight() && Left >= 0 && Left < hb_gt_GetScreenWidth() )
-         hb_gt_xPutch( Top, Left, byAttr, szBox[ 0 ] ); /* Upper left corner */
+      if( Height > 1 && Width > 1 && Top >= 0 && Top < HB_GT_FUNC(gt_GetScreenHeight()) && Left >= 0 && Left < HB_GT_FUNC(gt_GetScreenWidth()) )
+         HB_GT_FUNC(gt_xPutch( Top, Left, byAttr, szBox[ 0 ] )); /* Upper left corner */
 
       Col = ( Height > 1 ? Left + 1 : Left );
       if(Col < 0 )
@@ -524,31 +527,31 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
          Width += Col;
          Col = 0;
       }
-      if( Right >= hb_gt_GetScreenWidth() )
+      if( Right >= HB_GT_FUNC(gt_GetScreenWidth()) )
       {
-         Width -= Right - hb_gt_GetScreenWidth();
+         Width -= Right - HB_GT_FUNC(gt_GetScreenWidth());
       }
 
-      if( Col <= Right && Col < hb_gt_GetScreenWidth() && Top >= 0 && Top < hb_gt_GetScreenHeight() )
-         hb_gt_Replicate( Top, Col, byAttr, szBox[ 1 ], Width + ( (Right - Left) > 1 ? -2 : 0 ) ); /* Top line */
+      if( Col <= Right && Col < HB_GT_FUNC(gt_GetScreenWidth()) && Top >= 0 && Top < HB_GT_FUNC(gt_GetScreenHeight()) )
+         HB_GT_FUNC(gt_Replicate( Top, Col, byAttr, szBox[ 1 ], Width + ( (Right - Left) > 1 ? -2 : 0 ) )); /* Top line */
 
-      if( Height > 1 && (Right - Left) > 1 && Right < hb_gt_GetScreenWidth() && Top >= 0 && Top < hb_gt_GetScreenHeight() )
-         hb_gt_xPutch( Top, Right, byAttr, szBox[ 2 ] ); /* Upper right corner */
+      if( Height > 1 && (Right - Left) > 1 && Right < HB_GT_FUNC(gt_GetScreenWidth()) && Top >= 0 && Top < HB_GT_FUNC(gt_GetScreenHeight()) )
+         HB_GT_FUNC(gt_xPutch( Top, Right, byAttr, szBox[ 2 ] )); /* Upper right corner */
 
       if( szBox[ 8 ] && Height > 2 && Width > 2 )
       {
          for( Row = Top + 1; Row < Bottom; Row++ )
          {
-            if( Row >= 0 && Row < hb_gt_GetScreenHeight() )
+            if( Row >= 0 && Row < HB_GT_FUNC(gt_GetScreenHeight()) )
             {
                Col = Left;
                if( Col < 0 )
                   Col = 0; /* The width was corrected earlier. */
                else
-                  hb_gt_xPutch( Row, Col++, byAttr, szBox[ 7 ] ); /* Left side */
-               hb_gt_Replicate( Row, Col, byAttr, szBox[ 8 ], Width - 2 ); /* Fill */
-               if( Right < hb_gt_GetScreenWidth() )
-                  hb_gt_xPutch( Row, Right, byAttr, szBox[ 3 ] ); /* Right side */
+                  HB_GT_FUNC(gt_xPutch( Row, Col++, byAttr, szBox[ 7 ] )); /* Left side */
+               HB_GT_FUNC(gt_Replicate( Row, Col, byAttr, szBox[ 8 ], Width - 2 )); /* Fill */
+               if( Right < HB_GT_FUNC(gt_GetScreenWidth()) )
+                  HB_GT_FUNC(gt_xPutch( Row, Right, byAttr, szBox[ 3 ] )); /* Right side */
             }
          }
       }
@@ -556,88 +559,88 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
       {
          for( Row = ( Width > 1 ? Top + 1 : Top ); Row < ( (Right - Left ) > 1 ? Bottom : Bottom + 1 ); Row++ )
          {
-            if( Row >= 0 && Row < hb_gt_GetScreenHeight() )
+            if( Row >= 0 && Row < HB_GT_FUNC(gt_GetScreenHeight()) )
             {
-               if( Left >= 0 && Left < hb_gt_GetScreenWidth() )
-                  hb_gt_xPutch( Row, Left, byAttr, szBox[ 7 ] ); /* Left side */
-               if( ( Width > 1 || Left < 0 ) && Right < hb_gt_GetScreenWidth() )
-                  hb_gt_xPutch( Row, Right, byAttr, szBox[ 3 ] ); /* Right side */
+               if( Left >= 0 && Left < HB_GT_FUNC(gt_GetScreenWidth()) )
+                  HB_GT_FUNC(gt_xPutch( Row, Left, byAttr, szBox[ 7 ] )); /* Left side */
+               if( ( Width > 1 || Left < 0 ) && Right < HB_GT_FUNC(gt_GetScreenWidth()) )
+                  HB_GT_FUNC(gt_xPutch( Row, Right, byAttr, szBox[ 3 ] )); /* Right side */
             }
          }
       }
 
       if( Height > 1 && Width > 1 )
       {
-         if( Left >= 0 && Bottom < hb_gt_GetScreenHeight() )
-            hb_gt_xPutch( Bottom, Left, byAttr, szBox[ 6 ] ); /* Bottom left corner */
+         if( Left >= 0 && Bottom < HB_GT_FUNC(gt_GetScreenHeight()) )
+            HB_GT_FUNC(gt_xPutch( Bottom, Left, byAttr, szBox[ 6 ] )); /* Bottom left corner */
 
          Col = Left + 1;
          if( Col < 0 )
             Col = 0; /* The width was corrected earlier. */
 
-         if( Col <= Right && Bottom < hb_gt_GetScreenHeight() )
-            hb_gt_Replicate( Bottom, Col, byAttr, szBox[ 5 ], Width - 2 ); /* Bottom line */
+         if( Col <= Right && Bottom < HB_GT_FUNC(gt_GetScreenHeight()) )
+            HB_GT_FUNC(gt_Replicate( Bottom, Col, byAttr, szBox[ 5 ], Width - 2 )); /* Bottom line */
 
-         if( Right < hb_gt_GetScreenWidth() && Bottom < hb_gt_GetScreenHeight() )
-            hb_gt_xPutch( Bottom, Right, byAttr, szBox[ 4 ] ); /* Bottom right corner */
+         if( Right < HB_GT_FUNC(gt_GetScreenWidth()) && Bottom < HB_GT_FUNC(gt_GetScreenHeight()) )
+            HB_GT_FUNC(gt_xPutch( Bottom, Right, byAttr, szBox[ 4 ] )); /* Bottom right corner */
       }
-      hb_gt_DispEnd();
+      HB_GT_FUNC(gt_DispEnd());
       ret = 0;
    }
 
    return ret;
 }
 
-USHORT hb_gt_BoxD( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, BYTE byAttr )
+USHORT HB_GT_FUNC(gt_BoxD( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, BYTE byAttr ))
 {
-   return hb_gt_Box( Top, Left, Bottom, Right, pbyFrame, byAttr );
+   return HB_GT_FUNC(gt_Box( Top, Left, Bottom, Right, pbyFrame, byAttr ));
 }
 
-USHORT hb_gt_BoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, BYTE byAttr )
+USHORT HB_GT_FUNC(gt_BoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, BYTE byAttr ))
 {
-   return hb_gt_Box( Top, Left, Bottom, Right, pbyFrame, byAttr );
+   return HB_GT_FUNC(gt_Box( Top, Left, Bottom, Right, pbyFrame, byAttr ));
 }
 
-USHORT hb_gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE byAttr )
+USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE byAttr ))
 {
    USHORT ret = 1;
-   if( Row >= 0 && Row < hb_gt_GetScreenHeight() )
+   if( Row >= 0 && Row < HB_GT_FUNC(gt_GetScreenHeight()) )
    {
       if( Left < 0 )
          Left = 0;
-      else if( Left >= hb_gt_GetScreenWidth() )
-         Left = hb_gt_GetScreenWidth() - 1;
+      else if( Left >= HB_GT_FUNC(gt_GetScreenWidth()) )
+         Left = HB_GT_FUNC(gt_GetScreenWidth()) - 1;
    
       if( Right < 0 )
          Right = 0;
-      else if( Right >= hb_gt_GetScreenWidth() )
-         Right = hb_gt_GetScreenWidth() - 1;
+      else if( Right >= HB_GT_FUNC(gt_GetScreenWidth()) )
+         Right = HB_GT_FUNC(gt_GetScreenWidth()) - 1;
 
       if( Left < Right )
-         hb_gt_Replicate( Row, Left, byAttr, byChar, Right - Left + 1 );
+         HB_GT_FUNC(gt_Replicate( Row, Left, byAttr, byChar, Right - Left + 1 ));
       else
-         hb_gt_Replicate( Row, Right, byAttr, byChar, Left - Right + 1 );
+         HB_GT_FUNC(gt_Replicate( Row, Right, byAttr, byChar, Left - Right + 1 ));
       ret = 0;
    }
    return ret;
 }
 
-USHORT hb_gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byAttr )
+USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byAttr ))
 {
    USHORT ret = 1;
    SHORT Row;
 
-   if( Col >= 0 && Col < hb_gt_GetScreenWidth() )
+   if( Col >= 0 && Col < HB_GT_FUNC(gt_GetScreenWidth()) )
    {
       if( Top < 0 )
          Top = 0;
-      else if( Top >= hb_gt_GetScreenHeight() )
-         Top = hb_gt_GetScreenHeight() - 1;
+      else if( Top >= HB_GT_FUNC(gt_GetScreenHeight()) )
+         Top = HB_GT_FUNC(gt_GetScreenHeight()) - 1;
 
       if( Bottom < 0 )
          Bottom = 0;
-      else if( Bottom >= hb_gt_GetScreenHeight() )
-         Bottom = hb_gt_GetScreenHeight() - 1;
+      else if( Bottom >= HB_GT_FUNC(gt_GetScreenHeight()) )
+         Bottom = HB_GT_FUNC(gt_GetScreenHeight()) - 1;
 
       if( Top <= Bottom )
          Row = Top;
@@ -647,38 +650,125 @@ USHORT hb_gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byA
          Bottom = Top;
       }
       while( Row <= Bottom )
-         hb_gt_xPutch( Row++, Col, byAttr, byChar );
+         HB_GT_FUNC(gt_xPutch( Row++, Col, byAttr, byChar ));
       ret = 0;
    }
    return ret;
 }
 
-BOOL hb_gt_PreExt()
+BOOL HB_GT_FUNC(gt_PreExt())
 {
    return TRUE;
 }
 
-BOOL hb_gt_PostExt()
+BOOL HB_GT_FUNC(gt_PostExt())
 {
    return TRUE;
 }
 
-BOOL hb_gt_Suspend()
+BOOL HB_GT_FUNC(gt_Suspend())
 {
    return TRUE;
 }
 
-BOOL hb_gt_Resume()
+BOOL HB_GT_FUNC(gt_Resume())
 {
    return TRUE;
 }
 
-void hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen )
+void HB_GT_FUNC(gt_OutStd( BYTE * pbyStr, ULONG ulLen ))
 {
     hb_fsWriteLarge( s_iFilenoStdout, ( BYTE * ) pbyStr, ulLen );
 }
 
-void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
+void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
 {
     hb_fsWriteLarge( s_iFilenoStderr, ( BYTE * ) pbyStr, ulLen );
 }
+
+/* *********************************************************************** */
+
+#ifdef HB_MULTI_GT
+
+static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
+{
+    HB_TRACE(HB_TR_DEBUG, ("hb_gtFnInit(%p)", gt_funcs));
+
+    gt_funcs->Init                  = HB_GT_FUNC( gt_Init );
+    gt_funcs->Exit                  = HB_GT_FUNC( gt_Exit );
+    gt_funcs->GetScreenWidth        = HB_GT_FUNC( gt_GetScreenWidth );
+    gt_funcs->GetScreenHeight       = HB_GT_FUNC( gt_GetScreenHeight );
+    gt_funcs->Col                   = HB_GT_FUNC( gt_Col );
+    gt_funcs->Row                   = HB_GT_FUNC( gt_Row );
+    gt_funcs->SetPos                = HB_GT_FUNC( gt_SetPos );
+    gt_funcs->AdjustPos             = HB_GT_FUNC( gt_AdjustPos );
+    gt_funcs->IsColor               = HB_GT_FUNC( gt_IsColor );
+    gt_funcs->GetCursorStyle        = HB_GT_FUNC( gt_GetCursorStyle );
+    gt_funcs->SetCursorStyle        = HB_GT_FUNC( gt_SetCursorStyle );
+    gt_funcs->DispBegin             = HB_GT_FUNC( gt_DispBegin );
+    gt_funcs->DispEnd               = HB_GT_FUNC( gt_DispEnd );
+    gt_funcs->DispCount             = HB_GT_FUNC( gt_DispCount );
+    gt_funcs->Puts                  = HB_GT_FUNC( gt_Puts );
+    gt_funcs->Replicate             = HB_GT_FUNC( gt_Replicate );
+    gt_funcs->RectSize              = HB_GT_FUNC( gt_RectSize );
+    gt_funcs->GetText               = HB_GT_FUNC( gt_GetText );
+    gt_funcs->PutText               = HB_GT_FUNC( gt_PutText );
+    gt_funcs->SetAttribute          = HB_GT_FUNC( gt_SetAttribute );
+    gt_funcs->Scroll                = HB_GT_FUNC( gt_Scroll );
+    gt_funcs->SetMode               = HB_GT_FUNC( gt_SetMode );
+    gt_funcs->GetBlink              = HB_GT_FUNC( gt_GetBlink );
+    gt_funcs->SetBlink              = HB_GT_FUNC( gt_SetBlink );
+    gt_funcs->Version               = HB_GT_FUNC( gt_Version );
+    gt_funcs->Box                   = HB_GT_FUNC( gt_Box );
+    gt_funcs->BoxD                  = HB_GT_FUNC( gt_BoxD );
+    gt_funcs->BoxS                  = HB_GT_FUNC( gt_BoxS );
+    gt_funcs->HorizLine             = HB_GT_FUNC( gt_HorizLine );
+    gt_funcs->VertLine              = HB_GT_FUNC( gt_VertLine );
+    gt_funcs->Suspend               = HB_GT_FUNC( gt_Suspend );
+    gt_funcs->Resume                = HB_GT_FUNC( gt_Resume );
+    gt_funcs->PreExt                = HB_GT_FUNC( gt_PreExt );
+    gt_funcs->PostExt               = HB_GT_FUNC( gt_PostExt );
+    gt_funcs->OutStd                = HB_GT_FUNC( gt_OutStd );
+    gt_funcs->OutErr                = HB_GT_FUNC( gt_OutErr );
+    gt_funcs->Tone                  = HB_GT_FUNC( gt_Tone );
+    gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
+    gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
+}
+
+/* ********************************************************************** */
+
+static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
+{
+    HB_TRACE(HB_TR_DEBUG, ("hb_mouseFnInit(%p)", gt_funcs));
+
+    gt_funcs->mouse_Init            = HB_GT_FUNC( mouse_Init );
+    gt_funcs->mouse_Exit            = HB_GT_FUNC( mouse_Exit );
+    gt_funcs->mouse_IsPresent       = HB_GT_FUNC( mouse_IsPresent );
+    gt_funcs->mouse_Show            = HB_GT_FUNC( mouse_Show );
+    gt_funcs->mouse_Hide            = HB_GT_FUNC( mouse_Hide );
+    gt_funcs->mouse_Col             = HB_GT_FUNC( mouse_Col );
+    gt_funcs->mouse_Row             = HB_GT_FUNC( mouse_Row );
+    gt_funcs->mouse_SetPos          = HB_GT_FUNC( mouse_SetPos );
+    gt_funcs->mouse_IsButtonPressed = HB_GT_FUNC( mouse_IsButtonPressed );
+    gt_funcs->mouse_CountButton     = HB_GT_FUNC( mouse_CountButton );
+    gt_funcs->mouse_SetBounds       = HB_GT_FUNC( mouse_SetBounds );
+    gt_funcs->mouse_GetBounds       = HB_GT_FUNC( mouse_GetBounds );
+}
+
+
+/* ********************************************************************** */
+
+static HB_GT_INIT gtInit = {"pca", HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit)};
+
+HB_GT_ANNOUNCE( PCA );
+
+HB_CALL_ON_STARTUP_BEGIN( hb_gt_Init_PCA )
+   hb_gtRegister( &gtInit );
+HB_CALL_ON_STARTUP_END( hb_gt_Init_PCA )
+#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+   #pragma startup hb_gt_Init_PCA
+#endif
+
+#endif  /* HB_MULTI_GT */
+
+/* *********************************************************************** */

@@ -1,5 +1,5 @@
 /*
- * $Id: kbdos2.gcc,v 1.2 2001/04/12 19:12:56 dholm Exp $
+ * $Id: kbdos2.gcc,v 1.1.1.1 2001/12/21 10:42:35 ronpinkas Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 /* NOTE: User programs should never call this layer directly! */
 
-int hb_gt_ReadKey( HB_inkey_enum eventmask )
+int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
    int ch;
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) event_mask));

@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.5 2002/04/26 06:52:49 ronpinkas Exp $
+ * $Id: strcase.c,v 1.6 2002/10/27 14:41:37 lculik Exp $
  */
 
 /*
@@ -56,6 +56,9 @@
 #include "hbapiitm.h"
 #include "hbfast.h"
 #include "hbapierr.h"
+#include "hbapicdp.h"
+
+extern PHB_CODEPAGE s_cdpage;
 
 /* converts szText to lower case. Does not create a new string! */
 char * HB_EXPORT hb_strLower( char * szText, ULONG ulLen )
@@ -64,8 +67,12 @@ char * HB_EXPORT hb_strLower( char * szText, ULONG ulLen )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strLower(%s, %lu)", szText, ulLen));
 
-   for( i = 0; i < ulLen; i++ )
-      szText[ i ] = tolower( szText[ i ] );
+   if( s_cdpage->nChars )
+      for( i = 0; i < ulLen; i++ )
+         szText[ i ] = (char) s_cdpage->s_lower[szText[i]&255];
+   else
+      for( i = 0; i < ulLen; i++ )
+         szText[ i ] = tolower( (unsigned char) szText[ i ] );
 
    return szText;
 }
@@ -77,10 +84,12 @@ char * HB_EXPORT hb_strLowerCopy( char * szText, ULONG ulLen )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strLowerCopy(%s, %lu)", szText, ulLen));
 
-   for( i = 0; i < ulLen; i++ )
-   {
-      szCopy[ i ] = tolower( szText[ i ] );
-   }
+   if( s_cdpage->nChars )
+      for( i = 0; i < ulLen; i++ )
+         szCopy[ i ] = (char) s_cdpage->s_lower[szText[i]&255];
+   else
+      for( i = 0; i < ulLen; i++ )
+         szCopy[ i ] = tolower( (unsigned char) szText[ i ] );
    szCopy[ i ] = '\0';
 
    return szCopy;
@@ -93,10 +102,12 @@ char * HB_EXPORT hb_strUpperCopy( char * szText, ULONG ulLen )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strUpperCopy(%s, %lu)", szText, ulLen));
 
-   for( i = 0; i < ulLen; i++ )
-   {
-      szCopy[ i ] = toupper( szText[ i ] );
-   }
+   if( s_cdpage->nChars )
+      for( i = 0; i < ulLen; i++ )
+         szCopy[ i ] = (char) s_cdpage->s_upper[szText[i]&255];
+   else
+      for( i = 0; i < ulLen; i++ )
+         szCopy[ i ] = toupper( (unsigned char) szText[ i ] );
    szCopy[ i ] = '\0';
 
    return szCopy;
@@ -109,8 +120,12 @@ char * HB_EXPORT hb_strUpper( char * szText, ULONG ulLen )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strUpper(%s, %lu)", szText, ulLen));
 
-   for( i = 0; i < ulLen; i++ )
-      szText[ i ] = toupper( szText[ i ] );
+   if( s_cdpage->nChars )
+      for( i = 0; i < ulLen; i++ )
+         szText[ i ] = (char) s_cdpage->s_upper[szText[i]&255];
+   else
+      for( i = 0; i < ulLen; i++ )
+         szText[ i ] = toupper( (unsigned char) szText[ i ] );
 
    return szText;
 }
@@ -126,7 +141,7 @@ char * HB_EXPORT hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLe
    {
       /* some compilers impliment toupper as a macro, and this has side effects! */
       /* *pDest++ = toupper( *pSource++ ); */
-      pDest[ ulLen ] = toupper( pSource[ ulLen ] );
+      pDest[ ulLen ] = toupper( (unsigned char) pSource[ ulLen ] );
    }
 
    return pDest;
@@ -148,7 +163,7 @@ char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen )
    {
       /* some compilers impliment toupper as a macro, and this has side effects! */
       /* *pDest++ = toupper( *pSource++ ); */
-      pDest[ ulLen ] = toupper( pSource[ ulLen ] );
+      pDest[ ulLen ] = toupper( (unsigned char) pSource[ ulLen ] );
    }
 
    return pDest;

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:42:31 ronpinkas Exp $
+# $Id: Makefile,v 1.3 2002/04/16 16:12:18 map Exp $
 #
 
 ROOT = ../../../
@@ -25,4 +25,8 @@ CFLAGS := -I/usr/include/slang -I/usr/local/include \
 
 ifeq ($(HB_GPM_MOUSE),yes)
 CFLAGS := $(CFLAGS) -DHAVE_GPM_H
+endif
+
+ifeq ($(HB_MULTI_GT),yes)
+CFLAGS += -DHB_MULTI_GT
 endif

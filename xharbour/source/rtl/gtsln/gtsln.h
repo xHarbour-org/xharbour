@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.h,v 1.3 2002/04/16 16:12:18 map Exp $
+ * $Id: gtsln.h,v 1.4 2002/09/20 19:18:18 map Exp $
  */
 
 /*
@@ -54,6 +54,9 @@
 
 /* *********************************************************************** */
 
+/* This definition has to be placed before #include "hbapigt.h" */
+#define HB_GT_FNPREF(x) sln ## x
+
 #include <slang.h>
 #include "hbapigt.h"
 #include "hbapifs.h"
@@ -67,8 +70,8 @@ extern BOOL hb_gt_UnderXterm;
 
 /* *********************************************************************** */
 
-void hb_gt_Init_TermType();
-int  hb_mouse_Inkey( HB_inkey_enum EventMask );
-void hb_mouse_FixTrash();
+void HB_GT_FUNC(gt_Init_TermType());
+int  HB_GT_FUNC(mouse_Inkey( HB_inkey_enum EventMask ));
+void HB_GT_FUNC(mouse_FixTrash());
 
 /* *********************************************************************** */

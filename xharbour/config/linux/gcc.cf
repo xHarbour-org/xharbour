@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.10 2003/02/22 05:54:56 jonnymind Exp $
+# $Id: gcc.cf,v 1.11 2003/04/13 11:35:46 jonnymind Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -14,24 +14,21 @@ CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(HB_INC_COMPILE)
 # We are under linux
-CFLAGS = -DHB_OS_LINUX
+CFLAGS = -DHB_OS_LINUX -Wall
 
 ifeq ($(HB_LEX),SIMPLEX)
-CFLAGS += -Wall -DSIMPLEX
-else
-CFLAGS += -Wall
+CFLAGS += -DSIMPLEX
 endif
-
 
 ifeq ($(HB_LIBCOMP_MT),)
 #always add thread support if not compiling a lib and using vmmt
 ifeq ($(findstring vmmt,$(LIBS)),vmmt)
-CFLAGS+= -DHB_THREAD_SUPPORT
+CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
 endif
 else
 #Add thread support to lib compilation only if compiling a _mt lib
 ifeq ($(HB_LIBCOMP_MT),YES)
-CFLAGS+= -DHB_THREAD_SUPPORT
+CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
 HB_MT_FLAGS = -DHB_THREAD_SUPPORT
 endif
 endif
@@ -71,6 +68,10 @@ endif
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
 LINKLIBS += -l$(HB_GT_LIB)
+ifeq ($(HB_MULTI_GT),yes)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
+LINKLIBS += -lgtnul
+endif
 endif
 
 # HB_SCREEN_LIB: empty, or one of ncurses, slang

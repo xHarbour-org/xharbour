@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.34 2003/02/24 23:52:19 jonnymind Exp $
+ * $Id: itemapi.c,v 1.35 2003/04/22 08:58:43 mauriliolongo Exp $
  */
 
 /*
@@ -93,10 +93,13 @@
 #include "hbdate.h"
 #include "hbset.h"
 #include "hbmath.h"
+#include "hbapicdp.h"
 
 #if defined(__BORLANDC__)
 #include <float.h>  /* for _finite() and _isnan() */
 #endif
+
+extern PHB_CODEPAGE s_cdpage;
 
 #ifdef HB_THREAD_SUPPORT
    extern HB_CRITICAL_T hb_gcCollectionMutex;
@@ -1179,8 +1182,6 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemStrCmp(%p, %p, %d)", pFirst, pSecond, (int) bForceExact));
 
-
-
    szFirst = pFirst->item.asString.value;
    szSecond = pSecond->item.asString.value;
    ulLenFirst = pFirst->item.asString.length;
@@ -1199,19 +1200,22 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
    /* Both strings not empty */
    if( ulMinLen )
    {
-      for( ulCounter = 0; ulCounter < ulMinLen && !iRet; ulCounter++ )
-      {
-         /* Difference found */
-         if( *szFirst != *szSecond )
+      if( s_cdpage->lSort )
+         iRet = hb_cdpcmp( szFirst,szSecond,ulMinLen,s_cdpage, &ulCounter );
+      else
+         for( ulCounter = 0; ulCounter < ulMinLen && !iRet; ulCounter++ )
          {
-            iRet = ( ( BYTE ) *szFirst < ( BYTE ) *szSecond ) ? -1 : 1;
+            /* Difference found */
+            if( *szFirst != *szSecond )
+            {
+               iRet = ( ( BYTE ) *szFirst < ( BYTE ) *szSecond ) ? -1 : 1;
+            }
+            else /* TODO : #define some constants */
+            {
+               szFirst++;
+               szSecond++;
+            }
          }
-         else /* TODO : #define some constants */
-         {
-            szFirst++;
-            szSecond++;
-         }
-      }
 
       if( hb_set.HB_SET_EXACT || bForceExact || ulLenSecond > ulCounter )
       {

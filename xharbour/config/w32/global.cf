@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.5 2003/01/10 22:41:53 jonnymind Exp $
+# $Id: global.cf,v 1.6 2003/01/12 22:50:17 jonnymind Exp $
 #
 
 all : first
@@ -9,6 +9,7 @@ HB_GT_LIBS=\
         gtpca \
         gtstd \
         gtwin \
+        gtnul \
 #       gtcrs \
 #       gtsln \
 

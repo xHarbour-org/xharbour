@@ -1,5 +1,5 @@
 /*
- * $Id: gt.c,v 1.3 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: gt.c,v 1.1.1.1 2001/12/21 10:41:40 ronpinkas Exp $
  */
 
 /*
@@ -68,3 +68,11 @@ HB_FUNC( DISPCOUNT )
    hb_retni( hb_gtDispCount() );
 }
 
+#ifdef HB_EXTENSION
+
+HB_FUNC( HB_GT_VERSION )
+{
+   hb_retc( hb_gt_Version() );
+}
+
+#endif

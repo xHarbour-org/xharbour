@@ -1,5 +1,5 @@
 /*
- * $Id: mouseos2.c,v 1.4 2001/04/12 07:45:31 ckedem Exp $
+ * $Id: mouseos2.c,v 1.1.1.1 2001/12/21 10:42:37 ronpinkas Exp $
  */
 
 /*
@@ -49,6 +49,9 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+/* This definition has to be placed before #include "hbapigt.h" */
+#define HB_GT_FNPREF(x) os2 ## x
 
 #define INCL_MOU
 #define INCL_VIO             /* needed only for VioGetMode/VIOMODEINFO    */

@@ -1,14 +1,21 @@
 #
-# $Id: Makefile,v 1.3 2000/04/26 11:10:44 rglab Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:42:40 ronpinkas Exp $
 #
 
 ROOT = ../../../
 
 C_SOURCES=\
-	gtcrs.c \
-	mousecrs.c \
-   kbdcrs.c \
+    gtcrs.c \
+    chrmap.c \
 
 LIBNAME=gtcrs
 
 include $(TOP)$(ROOT)config/lib.cf
+
+ifeq ($(HB_GPM_MOUSE),yes)
+CFLAGS := $(CFLAGS) -DHAVE_GPM_H
+endif
+
+ifeq ($(HB_MULTI_GT),yes)
+CFLAGS += -DHB_MULTI_GT
+endif

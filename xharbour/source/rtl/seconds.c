@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.3 2003/02/11 11:13:38 what32 Exp $
+ * $Id: seconds.c,v 1.4 2003/02/16 16:00:43 likewolf Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 #elif defined( OS_UNIX_COMPATIBLE )
    #include <sys/timeb.h>
    #include <sys/times.h>
+   #include <unistd.h>
 #else
    #include <sys\timeb.h>
 #endif
@@ -137,7 +138,9 @@ double hb_secondsCPU(int n)
    if (n & 2)
       d += tm.tms_stime;
 
-   d /= CLK_TCK;
+   /* In POSIX-1996 the CLK_TCK symbol is mentioned as obsolescent */
+   /* d /= CLK_TCK; */
+   d /= (double) sysconf(_SC_CLK_TCK);
 #else
    /* TODO: this code is only for DOS and other platforms which cannot
             calculate process time */

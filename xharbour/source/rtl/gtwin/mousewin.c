@@ -1,5 +1,5 @@
 /*
- * $Id: mousewin.c,v 1.2 2001/06/18 18:41:11 dholm Exp $
+ * $Id: mousewin.c,v 1.1.1.1 2001/12/21 10:42:25 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,9 @@
  *
  */
 
+/* This definition has to be placed before #include "hbapigt.h" */
+#define HB_GT_FNPREF(x) win ## x
+
 #define HB_OS_WIN_32_USED
 
 #include "hbapigt.h"
@@ -76,7 +79,7 @@ int hb_mouse_iRow;
 
 /* C callable low-level interface */
 
-void hb_mouse_Init( void )
+void HB_GT_FUNC(mouse_Init( void ))
 {
    /* TODO: */
 
@@ -84,43 +87,43 @@ void hb_mouse_Init( void )
    hb_mouse_iRow = 0;
 }
 
-void hb_mouse_Exit( void )
+void HB_GT_FUNC(mouse_Exit( void ))
 {
    /* TODO: */
 }
 
-BOOL hb_mouse_IsPresent( void )
+BOOL HB_GT_FUNC(mouse_IsPresent( void ))
 {
    /* TODO: */
 
    return TRUE;
 }
 
-void hb_mouse_Show( void )
+void HB_GT_FUNC(mouse_Show( void ))
 {
    /* TODO: */
 }
 
-void hb_mouse_Hide( void )
+void HB_GT_FUNC(mouse_Hide( void ))
 {
    /* TODO: */
 }
 
-int hb_mouse_Col( void )
+int HB_GT_FUNC(mouse_Col( void ))
 {
    /* TODO: */
 
-   return hb_mouse_iCol;
+   return HB_GT_FUNC(mouse_iCol);
 }
 
-int hb_mouse_Row( void )
+int HB_GT_FUNC(mouse_Row( void ))
 {
    /* TODO: */
 
-   return hb_mouse_iRow;
+   return HB_GT_FUNC(mouse_iRow);
 }
 
-void hb_mouse_SetPos( int iRow, int iCol )
+void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
 {
    /* TODO: */
 
@@ -128,7 +131,7 @@ void hb_mouse_SetPos( int iRow, int iCol )
    HB_SYMBOL_UNUSED( iCol );
 }
 
-BOOL hb_mouse_IsButtonPressed( int iButton )
+BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
 {
    /* TODO: */
 
@@ -137,7 +140,7 @@ BOOL hb_mouse_IsButtonPressed( int iButton )
    return FALSE;
 }
 
-int hb_mouse_CountButton( void )
+int HB_GT_FUNC(mouse_CountButton( void ))
 {
    DWORD dwCount = 0;
 
@@ -146,7 +149,7 @@ int hb_mouse_CountButton( void )
    return dwCount;
 }
 
-void hb_mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight )
+void HB_GT_FUNC(mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ))
 {
    /* TODO: */
 
@@ -156,7 +159,7 @@ void hb_mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight )
    HB_SYMBOL_UNUSED( iRight );
 }
 
-void hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight )
+void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ))
 {
    /* TODO: */
 

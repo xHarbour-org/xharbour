@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:42:40 ronpinkas Exp $
+# $Id: Makefile,v 1.1 2003/01/30 13:38:03 jonnymind Exp $
 #
 
 ROOT = ../../../
@@ -24,6 +24,10 @@ C_USR=-I/usr/lib/qt3/include
 	moc -o $@ $<
 
 include $(TOP)$(ROOT)config/lib.cf
+
+ifeq ($(HB_MULTI_GT),yes)
+CFLAGS += -DHB_MULTI_GT
+endif
 
 #.PHONY: clean
 

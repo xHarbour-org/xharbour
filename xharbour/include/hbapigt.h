@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.4 2002/12/23 06:45:58 jonnymind Exp $
+ * $Id: hbapigt.h,v 1.5 2003/01/27 04:22:37 walito Exp $
  */
 
 /*
@@ -319,6 +319,154 @@ extern BOOL   hb_mouse_IsButtonPressed( int iButton );
 extern int    hb_mouse_CountButton( void );
 extern void   hb_mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight );
 extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight );
+
+/* for compilation with multi GT drivers
+   User can choose GT on runtime by //GT:<gtname> switch [druzus] */
+
+#if defined(HB_MULTI_GT) && defined(HB_GT_FNPREF)
+#  define HB_GT_FUNC(x) HB_GT_FNPREF(_hb_ ## x)
+#else
+#  undef HB_MULTI_GT
+#  define HB_GT_FUNC(x) hb_ ## x
+#endif
+
+#ifdef HB_MULTI_GT
+
+#include "hbinit.h"
+
+/* This hack is needed to force preprocessing if id is also a macro */
+#define HB_GT_REQUEST( id )           HB_GT_REQUEST_( id )
+#define HB_GT_REQUEST_( id )          extern HB_FUNC( HB_GT_##id ); \
+                                      void hb_gt_ForceLink( void ) \
+                                      { \
+                                         HB_FUNCNAME( HB_GT_##id )(); \
+                                      }
+#define HB_GT_ANNOUNCE( id )          HB_FUNC( HB_GT_##id ) {}
+
+typedef struct _HB_GT_FUNCS
+{
+    void    (* Init) ( int, int, int );
+    void    (* Exit) ( void );
+    USHORT  (* GetScreenWidth) ( void );
+    USHORT  (* GetScreenHeight) ( void );
+    SHORT   (* Col) ( void );
+    SHORT   (* Row) ( void );
+    void    (* SetPos) ( SHORT, SHORT, SHORT );
+    BOOL    (* AdjustPos) ( BYTE *, ULONG );
+    BOOL    (* IsColor) ( void );
+    USHORT  (* GetCursorStyle) ( void );
+    void    (* SetCursorStyle) ( USHORT );
+    void    (* DispBegin) ( void );
+    void    (* DispEnd) ( void );
+    USHORT  (* DispCount) ( void );
+    void    (* Puts) ( USHORT, USHORT, BYTE, BYTE *, ULONG );
+    void    (* Replicate) ( USHORT, USHORT, BYTE, BYTE, ULONG );
+    int     (* RectSize) ( USHORT, USHORT );
+    void    (* GetText) ( USHORT, USHORT, USHORT, USHORT, BYTE * );
+    void    (* PutText) ( USHORT, USHORT, USHORT, USHORT, BYTE * );
+    void    (* SetAttribute) ( USHORT, USHORT, USHORT, USHORT, BYTE );
+    void    (* Scroll) ( USHORT, USHORT, USHORT, USHORT, BYTE, SHORT, SHORT );
+    BOOL    (* SetMode) ( USHORT, USHORT );
+    BOOL    (* GetBlink) ( void );
+    void    (* SetBlink) ( BOOL );
+    char *  (* Version) ( void );
+    USHORT  (* Box) ( SHORT, SHORT, SHORT, SHORT, BYTE *, BYTE );
+    USHORT  (* BoxD) ( SHORT, SHORT, SHORT, SHORT, BYTE *, BYTE );
+    USHORT  (* BoxS) ( SHORT, SHORT, SHORT, SHORT, BYTE *, BYTE );
+    USHORT  (* HorizLine) ( SHORT, SHORT, SHORT, BYTE, BYTE );
+    USHORT  (* VertLine) ( SHORT, SHORT, SHORT, BYTE, BYTE );
+    BOOL    (* Suspend) ( void );
+    BOOL    (* Resume) ( void );
+    BOOL    (* PreExt) ( void );
+    BOOL    (* PostExt) ( void );
+    void    (* OutStd) ( BYTE *, ULONG );
+    void    (* OutErr) ( BYTE *, ULONG );
+    void    (* Tone) ( double, double );
+    /* keyboard */
+    int     (* ExtendedKeySupport) ( void );
+    int     (* ReadKey) ( HB_inkey_enum );
+    /* mouse */
+    void    (* mouse_Init) ( void );
+    void    (* mouse_Exit) ( void );
+    BOOL    (* mouse_IsPresent) ( void );
+    void    (* mouse_Show) ( void );
+    void    (* mouse_Hide) ( void );
+    int     (* mouse_Col) ( void );
+    int     (* mouse_Row) ( void );
+    void    (* mouse_SetPos) ( int, int );
+    BOOL    (* mouse_IsButtonPressed) ( int );
+    int     (* mouse_CountButton) ( void );
+    void    (* mouse_SetBounds) ( int, int, int, int );
+    void    (* mouse_GetBounds) ( int *, int *, int *, int * );
+} HB_GT_FUNCS, * PHB_GT_FUNCS;
+
+typedef struct _HB_GT_INIT
+{
+    char    * id;
+    void    (* gtInit) ( PHB_GT_FUNCS );
+    void    (* mouseInit) ( PHB_GT_FUNCS );
+} HB_GT_INIT, * PHB_GT_INIT;
+
+extern BOOL   HB_EXPORT hb_gtRegister( PHB_GT_INIT gtInit );
+
+/* Private interface in multi GT version, common to all platforms */
+
+extern void   HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ) );
+extern void   HB_GT_FUNC( gt_Exit( void ) );
+extern BOOL   HB_GT_FUNC( gt_AdjustPos( BYTE * pStr, ULONG ulLen ) );
+extern USHORT HB_GT_FUNC( gt_Box( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight, BYTE * pbyFrame, BYTE byAttr ) );
+extern USHORT HB_GT_FUNC( gt_BoxD( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight, BYTE * pbyFrame, BYTE byAttr ) );
+extern USHORT HB_GT_FUNC( gt_BoxS( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight, BYTE * pbyFrame, BYTE byAttr ) );
+extern SHORT  HB_GT_FUNC( gt_Col( void ) );
+extern void   HB_GT_FUNC( gt_DispBegin( void ) );
+extern USHORT HB_GT_FUNC( gt_DispCount( void ) );
+extern void   HB_GT_FUNC( gt_DispEnd( void ) );
+extern BOOL   HB_GT_FUNC( gt_GetBlink( void ) );
+extern USHORT HB_GT_FUNC( gt_GetCursorStyle( void ) );
+extern USHORT HB_GT_FUNC( gt_GetScreenHeight( void ) );
+extern USHORT HB_GT_FUNC( gt_GetScreenWidth( void ) );
+extern void   HB_GT_FUNC( gt_GetText( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE * pbyDst ) );
+extern USHORT HB_GT_FUNC( gt_HorizLine( SHORT uiRow, SHORT uiLeft, SHORT uiRight, BYTE byChar, BYTE byAttr ) );
+extern BOOL   HB_GT_FUNC( gt_IsColor( void ) );
+extern BOOL   HB_GT_FUNC( gt_PreExt( void ) );
+extern BOOL   HB_GT_FUNC( gt_PostExt( void ) );
+extern BOOL   HB_GT_FUNC( gt_Suspend( void ) ); /* suspend the terminal before the shell call */
+extern BOOL   HB_GT_FUNC( gt_Resume( void ) ); /* resume the terminal after the shell call */
+extern void   HB_GT_FUNC( gt_Puts( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE * pbyStr, ULONG ulLen ) );
+extern void   HB_GT_FUNC( gt_PutText( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE * pbySrc ) );
+extern int    HB_GT_FUNC( gt_ExtendedKeySupport( void ) );
+extern int    HB_GT_FUNC( gt_ReadKey( HB_inkey_enum eventmask ) );
+extern int    HB_GT_FUNC( gt_RectSize( USHORT rows, USHORT cols ) );
+extern void   HB_GT_FUNC( gt_Replicate( USHORT uiTop, USHORT uiLeft, BYTE byAttr, BYTE byChar, ULONG ulLen ) );
+extern SHORT  HB_GT_FUNC( gt_Row( void ) );
+extern void   HB_GT_FUNC( gt_Scroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr, SHORT iRows, SHORT iCols ) );
+extern void   HB_GT_FUNC( gt_SetAttribute( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr ) );
+extern void   HB_GT_FUNC( gt_SetBlink( BOOL bBlink ) );
+extern void   HB_GT_FUNC( gt_SetCursorStyle( USHORT uiCursorShape ) );
+extern BOOL   HB_GT_FUNC( gt_SetMode( USHORT uiRows, USHORT uiCols ) );
+extern void   HB_GT_FUNC( gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod ) );
+extern void   HB_GT_FUNC( gt_Tone( double dFrequency, double dDuration ) );
+extern char * HB_GT_FUNC( gt_Version( void ) );
+extern USHORT HB_GT_FUNC( gt_VertLine( SHORT uiCol, SHORT uiTop, SHORT uiBottom, BYTE byChar, BYTE byAttr ) );
+
+extern void   HB_GT_FUNC( gt_OutStd( BYTE * pbyStr, ULONG ulLen ) );
+extern void   HB_GT_FUNC( gt_OutErr( BYTE * pbyStr, ULONG ulLen ) );
+
+extern void   HB_GT_FUNC( mouse_Init( void ) );
+extern void   HB_GT_FUNC( mouse_Exit( void ) ) ;
+extern BOOL   HB_GT_FUNC( mouse_IsPresent( void ) );
+extern void   HB_GT_FUNC( mouse_Show( void ) );
+extern void   HB_GT_FUNC( mouse_Hide( void ) );
+extern int    HB_GT_FUNC( mouse_Col( void ) );
+extern int    HB_GT_FUNC( mouse_Row( void ) );
+extern void   HB_GT_FUNC( mouse_SetPos( int iRow, int iCol ) );
+extern BOOL   HB_GT_FUNC( mouse_IsButtonPressed( int iButton ) );
+extern int    HB_GT_FUNC( mouse_CountButton( void ) );
+extern void   HB_GT_FUNC( mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ) );
+extern void   HB_GT_FUNC( mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ) );
+
+#endif  /* HB_MULTI_GT */
+
 
 /* SetKey related declarations */
 

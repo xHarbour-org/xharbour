@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2001/01/19 23:44:06 dholm Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:42:44 ronpinkas Exp $
 #
 
 ROOT = ../../../
@@ -11,3 +11,7 @@ C_SOURCES=\
 LIBNAME=gtcgi
 
 include $(TOP)$(ROOT)config/lib.cf
+
+ifeq ($(HB_MULTI_GT),yes)
+CFLAGS += -DHB_MULTI_GT
+endif

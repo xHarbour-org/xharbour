@@ -1,5 +1,5 @@
 /*
- * $Id: is.c,v 1.5 2001/04/12 18:56:29 dholm Exp $
+ * $Id: is.c,v 1.1.1.1 2001/12/21 10:41:46 ronpinkas Exp $
  */
 
 /*
@@ -53,32 +53,76 @@
 #include <ctype.h>
 
 #include "hbapi.h"
+#include "hbapicdp.h"
+
+extern PHB_CODEPAGE s_cdpage;
 
 /* determines if first char of string is letter */
 
 HB_FUNC( ISALPHA )
 {
-   hb_retl( isalpha( ( int ) *hb_parc( 1 ) ) );
+   char * szString = hb_parc( 1 );
+
+   if( szString != NULL )
+   {
+      if( isalpha( ( unsigned char ) * szString ) )
+         hb_retl( TRUE );
+      else if( s_cdpage->nChars && szString[0] && 
+           ( strchr( s_cdpage->CharsUpper,* szString ) || strchr( s_cdpage->CharsLower,* szString ) ) )
+         hb_retl( TRUE );
+      else
+         hb_retl( FALSE );
+   }
+   else
+      hb_retl( FALSE );
 }
 
 /* determines if first char of string is digit */
 
 HB_FUNC( ISDIGIT )
 {
-   hb_retl( isdigit( ( int ) *hb_parc( 1 ) ) );
+   char * szString = hb_parc( 1 );
+
+   if( szString != NULL )
+      hb_retl( isdigit( ( unsigned char ) * szString ) );
+   else
+      hb_retl( FALSE );
 }
 
 /* determines if first char of string is upper-case */
 
 HB_FUNC( ISUPPER )
 {
-   hb_retl( isupper( ( int ) *hb_parc( 1 ) ) );
+   char * szString = hb_parc( 1 );
+
+   if( szString != NULL )
+   {
+      if( isupper( ( unsigned char ) * szString ) )
+         hb_retl( TRUE );
+      else if( s_cdpage->nChars && szString[0] && strchr( s_cdpage->CharsUpper,* szString ) )
+         hb_retl( TRUE );
+      else
+         hb_retl( FALSE );
+   }
+   else
+      hb_retl( FALSE );
 }
 
 /* determines if first char of string is lower-case */
 
 HB_FUNC( ISLOWER )
 {
-   hb_retl( islower( ( int ) *hb_parc( 1 ) ) );
-}
+   char * szString = hb_parc( 1 );
 
+   if( szString != NULL )
+   {
+      if( islower( ( unsigned char ) * szString ) )
+         hb_retl( TRUE );
+      else if( s_cdpage->nChars && szString[0] && strchr( s_cdpage->CharsLower,* szString ) )
+         hb_retl( TRUE );
+      else
+         hb_retl( FALSE );
+   }
+   else
+      hb_retl( FALSE );
+}

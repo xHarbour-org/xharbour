@@ -1,5 +1,5 @@
 /*
- * $Id: mousedos.c,v 1.7 2001/06/14 21:20:43 dholm Exp $
+ * $Id: mousedos.c,v 1.1.1.1 2001/12/21 10:42:40 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,9 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+/* This definition has to be placed before #include "hbapigt.h" */
+#define HB_GT_FNPREF(x) dos ## x
 
 #include "hbapigt.h"
 

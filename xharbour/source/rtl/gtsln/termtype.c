@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.2 2002/03/31 22:50:53 map Exp $
+ * $Id: termtype.c,v 1.3 2002/04/16 16:12:18 map Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ BOOL hb_gt_UnderXterm = FALSE;
 
 /* *********************************************************************** */
 
-void hb_gt_Init_TermType()
+void HB_GT_FUNC(gt_Init_TermType())
 {
     char * Env;
     

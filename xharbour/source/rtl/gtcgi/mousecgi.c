@@ -1,5 +1,5 @@
 /*
- * $Id: mousecgi.c,v 1.2 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: mousecgi.c,v 1.1.1.1 2001/12/21 10:42:44 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,9 @@
  *
  */
 
+/* This definition has to be placed before #include "hbapigt.h" */
+#define HB_GT_FNPREF(x) cgi ## x
+
 #include "hbapigt.h"
 
 /* NOTE: This file is a simple stub for those platforms which don't have
@@ -57,60 +60,60 @@
 
 /* C callable low-level interface */
 
-void hb_mouse_Init( void )
+void HB_GT_FUNC(mouse_Init( void ))
 {
    ;
 }
 
-void hb_mouse_Exit( void )
+void HB_GT_FUNC(mouse_Exit( void ))
 {
    ;
 }
 
-BOOL hb_mouse_IsPresent( void )
+BOOL HB_GT_FUNC(mouse_IsPresent( void ))
 {
    return FALSE;
 }
 
-void hb_mouse_Show( void )
+void HB_GT_FUNC(mouse_Show( void ))
 {
    ;
 }
 
-void hb_mouse_Hide( void )
+void HB_GT_FUNC(mouse_Hide( void ))
 {
    ;
 }
 
-int hb_mouse_Col( void )
+int HB_GT_FUNC(mouse_Col( void ))
 {
    return 0;
 }
 
-int hb_mouse_Row( void )
+int HB_GT_FUNC(mouse_Row( void ))
 {
    return 0;
 }
 
-void hb_mouse_SetPos( int iRow, int iCol )
+void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
 {
    HB_SYMBOL_UNUSED( iRow );
    HB_SYMBOL_UNUSED( iCol );
 }
 
-BOOL hb_mouse_IsButtonPressed( int iButton )
+BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
 {
    HB_SYMBOL_UNUSED( iButton );
 
    return FALSE;
 }
 
-int hb_mouse_CountButton( void )
+int HB_GT_FUNC(mouse_CountButton( void ))
 {
    return 0;
 }
 
-void hb_mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight )
+void HB_GT_FUNC(mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ))
 {
    HB_SYMBOL_UNUSED( iTop );
    HB_SYMBOL_UNUSED( iLeft );
@@ -118,11 +121,10 @@ void hb_mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight )
    HB_SYMBOL_UNUSED( iRight );
 }
 
-void hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight )
+void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ))
 {
    HB_SYMBOL_UNUSED( piTop );
    HB_SYMBOL_UNUSED( piLeft );
    HB_SYMBOL_UNUSED( piBottom );
    HB_SYMBOL_UNUSED( piRight );
 }
-

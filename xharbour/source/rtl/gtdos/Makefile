@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2000/04/02 14:17:27 vszel Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:42:40 ronpinkas Exp $
 #
 
 ROOT = ../../../
@@ -11,3 +11,8 @@ C_SOURCES=\
 LIBNAME=gtdos
 
 include $(TOP)$(ROOT)config/lib.cf
+
+# uncomment the lines below when this gt will be ready for MULTI_GT
+#ifeq ($(HB_MULTI_GT),yes)
+#CFLAGS += -DHB_MULTI_GT
+#endif

@@ -1,5 +1,5 @@
 /*
- * $Id: keytrans.c,v 1.1.1.1 2001/12/21 10:42:30 ronpinkas Exp $
+ * $Id: keytrans.c,v 1.2 2002/09/20 19:18:18 map Exp $
  */
 
 /*
@@ -376,7 +376,7 @@ static int KeyTranslationTable[][ 2 ] =
             ( sizeof( KeyTranslationTable ) / ( 2 * sizeof ( int ) ) )
 
 /* a very simple sort algorithm */
-static void hb_gt_SortKeyTranslationTable( void )
+static void HB_GT_FUNC(gt_SortKeyTranslationTable( void ))
 {
    int i, j, min, KeyTmp[ 2 ];
 
@@ -413,7 +413,7 @@ static void hb_gt_SortKeyTranslationTable( void )
 /* ************************************************************************* */
 
 /* standard binary search */
-static int hb_gt_FindKeyTranslation( int SlangKey )
+static int HB_GT_FUNC(gt_FindKeyTranslation( int SlangKey ))
 {
    int Start,Stop,CurPos;
 
@@ -445,7 +445,7 @@ static int hb_gt_FindKeyTranslation( int SlangKey )
 
 /* ************************************************************************* */
 
-int hb_gt_SetKeyInKeyTranslationTable( int SlangKey, int ClipKey )
+int HB_GT_FUNC(gt_SetKeyInKeyTranslationTable( int SlangKey, int ClipKey ))
 {
    int i, Found = 0;
 

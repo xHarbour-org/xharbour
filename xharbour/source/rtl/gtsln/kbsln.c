@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.7 2003/04/18 18:30:54 jonnymind Exp $
+ * $Id: kbsln.c,v 1.8 2003/04/18 22:10:34 jonnymind Exp $
  */
 
 /*
@@ -121,14 +121,14 @@ unsigned char s_convKDeadKeys[ 257 ];  /* it should be allocated by hb_xalloc() 
 /* contains an integer value of a DeadKey or -1 */
 int hb_DeadKey = -1;
 
-static int hb_gt_try_get_Kbd_State();
+static int HB_GT_FUNC(gt_try_get_Kbd_State());
 
 /* key translations tables - notice problems with compilation after changes */
 #include "keytrans.c"
 
 /* *********************************************************************** */
 
-static void hb_gt_Init_KeyTranslations()
+static void HB_GT_FUNC(gt_Init_KeyTranslations())
 {
     char ch, keyname[ SLANG_MAX_KEYMAP_KEY_SEQ + 1 ];
     int  keynum, i;
@@ -208,7 +208,7 @@ static void hb_gt_Init_KeyTranslations()
 
 /* *********************************************************************** */
 
-int hb_gt_Init_Terminal( int phase )
+int HB_GT_FUNC(gt_Init_Terminal( int phase ))
 {
     struct termios newTTY;
     unsigned char * p;
@@ -219,7 +219,7 @@ int hb_gt_Init_Terminal( int phase )
     if( phase == 0 )
     {
         /* check if we run under linux console or under xterm */
-        hb_gt_Init_TermType();
+        HB_GT_FUNC(gt_Init_TermType());
        
 #ifdef __linux__
         /* for Linux console */
@@ -266,10 +266,10 @@ int hb_gt_Init_Terminal( int phase )
     if( ret && ( phase == 0 ) )
     {
         /* define keyboard translations */
-        hb_gt_Init_KeyTranslations();
+        HB_GT_FUNC(gt_Init_KeyTranslations());
   
         /* for binary search of key translations */
-        hb_gt_SortKeyTranslationTable();
+        HB_GT_FUNC(gt_SortKeyTranslationTable());
     }
  
     return( ret );
@@ -277,14 +277,14 @@ int hb_gt_Init_Terminal( int phase )
 
 /* *********************************************************************** */
 
-int hb_gt_ExtendedKeySupport()
+int HB_GT_FUNC(gt_ExtendedKeySupport())
 {
     return( 0 );
 }
 
 /* *********************************************************************** */
 
-int hb_gt_ReadKey( HB_inkey_enum eventmask )
+int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
     static int InDeadState = FALSE;
     unsigned int ch, tmp, kbdflags;
@@ -311,10 +311,10 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
 
     /* if no pending chars */
     if( 0 == SLang_input_pending( 0 ) )
-        return( hb_mouse_Inkey( eventmask ) );
+        return( HB_GT_FUNC(mouse_Inkey( eventmask )) );
 
 #if HB_GT_KBD_MODIF_MASK
-    kbdflags = hb_gt_try_get_Kbd_State();
+    kbdflags = HB_GT_FUNC(gt_try_get_Kbd_State());
 #else
     kbdflags = 0;
 #endif
@@ -375,7 +375,7 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
         if( ( tmp == SL_KEY_MOU ) )
         {
             if( ( eventmask & MOUSE_ALL_EVENTS_MASK ) != 0 )
-                return( hb_mouse_Inkey( eventmask ) );
+                return( HB_GT_FUNC(mouse_Inkey( eventmask )) );
             else
             {
                 /* mouse events are not requested so */
@@ -391,12 +391,12 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
 
         if( ( eventmask & INKEY_RAW ) == 0 )
         {
-            tmp = hb_gt_FindKeyTranslation( tmp );
+            tmp = HB_GT_FUNC(gt_FindKeyTranslation( tmp ));
 
             /* TOFIX: this code is broken - needs a diffrent aproach */
             if( tmp == 0 )
             {
-                tmp = hb_gt_FindKeyTranslation( ch );
+                tmp = HB_GT_FUNC(gt_FindKeyTranslation( ch ));
                 if( tmp == 0 && ch < 256 ) tmp = ch;
             }
         }
@@ -410,7 +410,7 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
 
 /* *********************************************************************** */
 
-static int hb_gt_try_get_Kbd_State()
+static int HB_GT_FUNC(gt_try_get_Kbd_State())
 {
 #if defined(__linux__)
     unsigned char modifiers = 6;
@@ -456,30 +456,30 @@ static int hb_gt_try_get_Kbd_State()
 
 /* *********************************************************************** */
 
-int hb_gt_Shft_Pressed()
+int HB_GT_FUNC(gt_Shft_Pressed())
 {
-    return ( hb_gt_try_get_Kbd_State() & SHIFT_PRESSED ) != 0;
+    return ( HB_GT_FUNC(gt_try_get_Kbd_State()) & SHIFT_PRESSED ) != 0;
 }
 
 /* *********************************************************************** */
 
-int hb_gt_Ctrl_Pressed()
+int HB_GT_FUNC(gt_Ctrl_Pressed())
 {
-    return ( hb_gt_try_get_Kbd_State() & CONTROL_PRESSED ) != 0;
+    return ( HB_GT_FUNC(gt_try_get_Kbd_State()) & CONTROL_PRESSED ) != 0;
 }
 
 /* *********************************************************************** */
 
-int hb_gt_Alt_Pressed()
+int HB_GT_FUNC(gt_Alt_Pressed())
 {
-    return ( hb_gt_try_get_Kbd_State() & ALT_PRESSED ) != 0;
+    return ( HB_GT_FUNC(gt_try_get_Kbd_State()) & ALT_PRESSED ) != 0;
 }
 
 /* *********************************************************************** */
 
-int hb_gt_Kbd_State()
+int HB_GT_FUNC(gt_Kbd_State())
 {
-    return hb_gt_try_get_Kbd_State();
+    return HB_GT_FUNC(gt_try_get_Kbd_State());
 }
 
 /* *********************************************************************** */

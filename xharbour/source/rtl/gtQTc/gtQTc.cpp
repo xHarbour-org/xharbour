@@ -1,5 +1,5 @@
 /*
-* $Id: gtQTc.cpp,v 1.2 2003/02/02 02:08:10 jonnymind Exp $
+* $Id: gtQTc.cpp,v 1.3 2003/02/02 22:31:16 jonnymind Exp $
 */
 
 /*
@@ -71,6 +71,9 @@
 */
 
 /* NOTE: User programs should never call this layer directly! */
+
+/* This definition has to be placed before #include "hbapigt.h" */
+#define HB_GT_FNPREF(x) QTc ## x
 
 #include "hbset.h" /* For Ctrl+Break handling */
 #include "hbvm.h" /* For Ctrl+Break handling */

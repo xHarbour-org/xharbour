@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.43 2003/04/21 17:40:53 jonnymind Exp $
+* $Id: thread.h,v 1.44 2003/04/25 23:02:48 jonnymind Exp $
 */
 
 /*
@@ -55,6 +55,13 @@
 #include "hbdefs.h"
 
 #ifdef HB_THREAD_SUPPORT
+
+/* Check if malloc/free is thread safe */
+#ifndef HB_SAFE_ALLOC
+#  if defined( HB_OS_LINUX ) && (defined(_THREAD_SAFE) || defined(_REENTRANT))
+#    define HB_SAFE_ALLOC
+#  endif
+#endif
 
 /* We should assert that cleanup functions must be in limited number */
 typedef void (*HB_CLEANUP_FUNC)(void *);
@@ -476,8 +483,10 @@ extern HB_CRITICAL_T hb_globalsMutex;
 extern HB_CRITICAL_T hb_staticsMutex;
 /* Monitor for sync access to the global stack */
 extern HB_CRITICAL_T hb_memvarsMutex;
+#ifndef HB_SAFE_ALLOC
 /* Guard for threadunsafe malloc and free */
 extern HB_CRITICAL_T hb_allocMutex;
+#endif
 /* Guard for console and output and free */
 extern HB_CRITICAL_T hb_outputMutex;
 /* Guard for memory allocated by the garbage collector */
