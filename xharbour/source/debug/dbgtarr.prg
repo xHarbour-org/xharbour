@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtarr.prg,v 1.2 2002/03/06 03:52:09 ronpinkas Exp $
+ * $Id: dbgtarr.prg,v 1.3 2002/12/01 03:58:01 walito Exp $
  */
 
 /*
@@ -130,21 +130,32 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) Class T
    Local nPos
 
    local nRecsToSkip
-   do case
 
-      case nKey == K_UP
+   Switch nKey
+
+      case K_UP
               oBrwSets:Up()
-      case nKey == K_DOWN
+              exit
+      case K_DOWN
               oBrwSets:Down()
-      case nKey == K_HOME .or. (nKey == K_CTRL_PGUP) .or. (nKey == K_CTRL_HOME)
+              exit
+      case K_HOME
+      case K_CTRL_PGUP
+      case K_CTRL_HOME
               oBrwSets:GoTop()
-      case nKey == K_END .or. (nkey == K_CTRL_PGDN) .or. (nkey == K_CTRL_END )
+              exit
+      case K_END
+      case K_CTRL_PGDN
+      case K_CTRL_END
               oBrwSets:GoBottom()
-      Case nKey == K_PGDN
+              exit
+      Case K_PGDN
               oBrwSets:pageDown()
-      Case nKey == K_PGUP
-              OBrwSets:PageUp()
-      Case nKey ==13
+              exit
+      Case K_PGUP
+              oBrwSets:PageUp()
+              exit
+      Case K_ENTER
 
                if valtype(aArray[nSet])=="A"
                   SetPos(ownd:nBottom,ownd:nLeft)
@@ -163,14 +174,15 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) Class T
                   Alert("Value cannot be edited")
                else
 
-              oBrwSets:RefreshCurrent()
-              ::doget(oBrwsets,aarray,nSet)
-              oBrwSets:RefreshCurrent()
-              oBrwSets:ForceStable()
+                  oBrwSets:RefreshCurrent()
+                  ::doget(oBrwsets,aarray,nSet)
+                  oBrwSets:RefreshCurrent()
+                  oBrwSets:ForceStable()
 
                endif
+               exit
 
-   endcase
+   end
       RefreshVarsS(oBrwSets)
 
       ::aWindows[::nCurwindow]:SetCaption( cName + "["+AllTrim( Str( oBrwSets:cargo[1] ) ) +".."+ ;
@@ -182,29 +194,38 @@ static function ValToStr( uVal )
    local cType := ValType( uVal )
    local cResult := "U"
 
-   do case
-      case uVal == nil
+   Switch cType
+      case "U"
            cResult := "NIL"
-      Case cType  =="B"
-         cResult:= "{ || ... }"
-      case cType == "A"
+           exit
+      Case "B"
+           cResult:= "{ || ... }"
+           exit
+      case "A"
            cResult := "{ ... }"
+           exit
 
-      case cType IN "CM"
+      case "C"
+      case "M"
            cResult := '"' + uVal + '"'
+           exit
 
-      case cType == "L"
+      case "L"
            cResult := iif( uVal, ".T.", ".F." )
+           exit
 
-      case cType == "D"
+      case "D"
            cResult := DToC( uVal )
+           exit
 
-      case cType == "N"
+      case "N"
            cResult := AllTrim( Str( uVal ) )
+           exit
 
-      case cType == "O"
+      case "O"
            cResult := "Class " + uVal:ClassName() + " object"
-   endcase
+           exit
+   end
 
 return cResult
 

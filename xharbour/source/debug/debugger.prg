@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.2 2002/03/06 03:52:09 ronpinkas Exp $
+ * $Id: debugger.prg,v 1.3 2002/12/01 03:59:21 walito Exp $
  */
 
 /*
@@ -98,8 +98,8 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
    local cLocalName, nLocalIndex
    local nAt
 
-   do case
-      case ValType( uParam1 ) == "C"   // called from hvm.c hb_vmModuleName()
+   Switch ValType( uParam1 )
+      case "C"   // called from hvm.c hb_vmModuleName()
            cModuleName := uParam1
            if ! s_lExit
               if s_oDebugger == nil
@@ -114,8 +114,9 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
                  s_oDebugger:LoadVars()
               endif
            endif
+           exit
 
-      case ValType( uParam1 ) == "N"   // called from hvm.c both hb_vmDebuggerShowLines()
+      case "N"   // called from hvm.c both hb_vmDebuggerShowLines()
            public __DbgStatics         // hb_vmStaticName() and hb_vmLocalName()
            if Type( "__DbgStatics" ) == "L"
               __DbgStatics := {}
@@ -190,8 +191,9 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
                  s_oDebugger:HandleEvent()
               endif
            endif
+           exit
 
-      otherwise   // called from hvm.c hb_vmDebuggerEndProc()
+      default   // called from hvm.c hb_vmDebuggerEndProc()
          if Empty( ProcName( 1 ) ) // ending (_INITSTATICS)
             return
          endif
@@ -199,7 +201,7 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
             s_oDebugger:EndProc()
             s_oDebugger:LoadVars()
          endif
-   endcase
+   end
 
 return
 
@@ -444,32 +446,40 @@ return nil
 
 METHOD CodeWindowProcessKey( nKey ) CLASS TDebugger
 
-   do case
-      case nKey == K_HOME
+   Switch nKey
+      case K_HOME
            ::oBrwText:GoTop()
+           exit
 
-      case nKey == K_END
+      case K_END
            ::oBrwText:GoBottom()
+           exit
 
-      case nKey == K_LEFT
+      case K_LEFT
            ::oBrwText:Left()
+           exit
 
-      case nKey == K_RIGHT
+      case K_RIGHT
            ::oBrwText:Right()
+           exit
 
-      case nKey == K_UP
+      case K_UP
            ::oBrwText:Up()
+           exit
 
-      case nKey == K_DOWN
+      case K_DOWN
            ::oBrwText:Down()
+           exit
 
-      case nKey == K_PGUP
+      case K_PGUP
            ::oBrwText:PageUp()
+           exit
 
-      case nKey == K_PGDN
+      case K_PGDN
            ::oBrwText:PageDown()
+           exit
 
-   endcase
+   end
 
 return nil
 
@@ -531,8 +541,8 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
    local cCommand, cResult, oE
    local bLastHandler
 
-   do case
-      case nKey == K_UP
+   Switch nKey
+      case K_UP
            if ::nCommand > 0
               ::oGetListCommand:oGet:VarPut( ::aLastCommands[ ::nCommand ] )
               ::oGetListCommand:oGet:Buffer := ::aLastCommands[ ::nCommand ]
@@ -542,8 +552,9 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
                  ::nCommand--
               endif
            endif
+           exit
 
-      case nKey == K_DOWN
+      case K_DOWN
            if ::nCommand > 0 .AND. ::nCommand <= Len( ::aLastCommands )
               ::oGetListCommand:oGet:VarPut( ::aLastCommands[ ::nCommand ] )
               ::oGetListCommand:oGet:Buffer := ::aLastCommands[ ::nCommand ]
@@ -553,8 +564,9 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
                  ::nCommand++
               endif
            endif
+           exit
 
-      case nKey == K_ENTER
+      case K_ENTER
            cCommand := ::oGetListCommand:oGet:VarGet()
            AAdd( ::aLastCommands, cCommand )
            ::nCommand++
@@ -591,10 +603,11 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
            ::oGetListCommand:oGet:Buffer := cCommand
            ::oGetListCommand:oGet:Pos := 1
            ::oGetListCommand:oGet:Display()
+           exit
 
-      otherwise
+      default
           ::oGetListCommand:GetApplyKey( nKey )
-   endcase
+   end
 
 return nil
 
@@ -763,14 +776,14 @@ METHOD HandleEvent() CLASS TDebugger
 
       nKey := InKey( 0, INKEY_ALL )
 
-      do case
-         case ::oPullDown:IsOpen()
+      if ::oPullDown:IsOpen()
               ::oPullDown:ProcessKey( nKey )
               if ::oPullDown:nOpenPopup == 0 // Closed
                  ::aWindows[ ::nCurrentWindow ]:SetFocus( .t. )
               endif
-
-         case nKey == K_LDBLCLK
+      else
+         Switch nKey
+         case K_LDBLCLK
               if MRow() == 0
 
               elseif MRow() == MaxRow()
@@ -790,8 +803,9 @@ METHOD HandleEvent() CLASS TDebugger
                     endif
                  next
               endif
+              exit
 
-         case nKey == K_LBUTTONDOWN
+         case K_LBUTTONDOWN
               if MRow() == 0
                  if ( nPopup := ::oPullDown:GetItemOrdByCoors( 0, MCol() ) ) != 0
                     SetCursor( SC_NONE )
@@ -815,57 +829,77 @@ METHOD HandleEvent() CLASS TDebugger
                     endif
                  next
               endif
+              exit
 
-         case nKey == K_RBUTTONDOWN
+         case K_RBUTTONDOWN
+              exit
 
-         case nKey == K_ESC
+         case K_ESC
               ::RestoreAppStatus()
               s_oDebugger := nil
               s_lExit := .T.
               DispEnd()
               ::Exit()
+              exit
 
-         case nKey == K_UP .or. nKey == K_DOWN .or. nKey == K_HOME .or. ;
-              nKey == K_END .or. nKey == K_ENTER .or. nKey == K_PGDN .or. nKey == K_PGUP
+         case K_UP
+         case K_DOWN
+         case K_HOME
+         case K_END
+         case K_ENTER
+         case K_PGDN
+         case K_PGUP
               oWnd := ::aWindows[ ::nCurrentWindow ]
               oWnd:KeyPressed( nKey )
+              exit
 
+         case K_TAB
+              ::NextWindow()
+              exit
+
+         case K_SH_TAB
+              ::PrevWindow()
+              exit
+
+         default
+
+         do case  // When SWITCH-CASE support negative numbers, convert this DO CASE to SWITCH-CASE
+         case nKey == K_F8 .OR. nKey == 255
+              ::Step()
+//              exit
 
          case nKey == K_F4
               ::ShowAppScreen()
+//              exit
 
          case nKey == K_F5
               ::Go()
+//              exit
 
          case nKey == K_F6
               ::ShowWorkAreas()
-
-         case nKey == K_F8 .or. nKey == 255
-              ::Step()
+//              exit
 
          case nKey == K_F9
               ::ToggleBreakPoint()
+//              exit
 
          case nKey == K_F10
               ::Trace()
+//              exit
 
-         case nKey == K_TAB
-              ::NextWindow()
-
-         case nKey == K_SH_TAB
-              ::PrevWindow()
-
-         case ::oWndCommand:lFocused .and. nKey < 272 // Alt
-              ::oWndCommand:KeyPressed( nKey )
-
-         otherwise
-              if ( nPopup := ::oPullDown:GetHotKeyPos( __dbgAltToKey( nKey ) ) ) != 0
+         other
+              if ::oWndCommand:lFocused .and. nKey < 272 // Alt
+                 ::oWndCommand:KeyPressed( nKey )
+              elseif ( nPopup := ::oPullDown:GetHotKeyPos( __dbgAltToKey( nKey ) ) ) != 0
                  if ::oPullDown:nOpenPopup != nPopup
                     SetCursor( SC_NONE )
                     ::oPullDown:ShowPopup( nPopup )
                  endif
               endif
-      endcase
+         endcase
+         end
+      endif
    end
 
 return nil
@@ -1332,17 +1366,20 @@ METHOD InputBox( cMsg, uValue, bValid ) CLASS TDebugger
    oWndInput:Hide()
    Set( _SET_SCOREBOARD, lScoreBoard )
 
-   do case
-      case cType == "C"
+   Switch cType
+      case "C"
            uTemp := AllTrim( uTemp )
+           exit
 
-      case cType == "D"
+      case "D"
            uTemp := CToD( uTemp )
+           exit
 
-      case cType == "N"
+      case "N"
            uTemp := Val( uTemp )
+           exit
 
-   endcase
+   end
 
 return iif( LastKey() != K_ESC, uTemp, uValue )
 
@@ -1596,64 +1633,91 @@ static procedure SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cCaption, bEdit )
    local cTemp:=str(nSet,4)
 
    Local nRectoMove
-   do case
-      case nKey == K_UP
-              oBrwSets:Up()
-      case nKey == K_DOWN
-              oBrwSets:Down()
-      case nKey == K_HOME .or. (nKey == K_CTRL_PGUP) .or. (nKey == K_CTRL_HOME)
-              oBrwSets:GoTop()
-      case nKey == K_END .or. (nkey == K_CTRL_PGDN) .or. (nkey == K_CTRL_END )
-              oBrwSets:GoBottom()
-      Case nKey == K_PGDN
-              oBrwSets:pageDown()
-      Case nKey == K_PGUP
-              OBrwSets:PageUp()
 
-      case nKey == K_ENTER
+   Switch nKey
+      case K_UP
+              oBrwSets:Up()
+              exit
+      case K_DOWN
+              oBrwSets:Down()
+              exit
+      case K_HOME
+      case K_CTRL_PGUP
+      case K_CTRL_HOME
+              oBrwSets:GoTop()
+              exit
+      case K_END
+      case K_CTRL_PGDN
+      case K_CTRL_END
+              oBrwSets:GoBottom()
+              exit
+      Case K_PGDN
+              oBrwSets:pageDown()
+              exit
+      Case K_PGUP
+              oBrwSets:PageUp()
+              exit
+
+      case K_ENTER
            if bEdit != nil
               Eval( bEdit )
            endif
            if LastKey() == K_ENTER
               KEYBOARD Chr( K_DOWN )
            endif
+           exit
 
-   endcase
-      RefreshVarsS(oBrwSets)
+   end
 
-      oWnd:SetCaption( cCaption + "[" + AllTrim( Str( oBrwSets:Cargo[1] ) ) + ;
+   RefreshVarsS(oBrwSets)
+
+   oWnd:SetCaption( cCaption + "[" + AllTrim( Str( oBrwSets:Cargo[1] ) ) + ;
                        ".." + AllTrim( Str( nSets ) ) + "]" )
 
 return
 static procedure SetsKeyVarPressed( nKey, oBrwSets, nSets, oWnd, bEdit )
    Local nRectoMove
    local nSet := oBrwSets:Cargo[1]
-   do case
-      case nKey == K_UP
+
+   Switch nKey
+      case K_UP
               oBrwSets:Up()
+              exit
 
-      case nKey == K_DOWN
+      case K_DOWN
               oBrwSets:Down()
+              exit
 
-      case nKey == K_HOME .or. (nKey == K_CTRL_PGUP) .or. (nKey == K_CTRL_HOME)
+      case K_HOME
+      case K_CTRL_PGUP
+      case K_CTRL_HOME
               oBrwSets:GoTop()
-      case nKey == K_END .or. (nkey == K_CTRL_PGDN) .or. (nkey == K_CTRL_END )
+              exit
+
+      case K_END
+      case K_CTRL_PGDN
+      case K_CTRL_END
               oBrwSets:GoBottom()
+              exit
 
-      Case nKey == K_PGDN
+      Case K_PGDN
               oBrwSets:pageDown()
-      Case nKey == K_PGUP
-              OBrwSets:PageUp()
+              exit
 
-      case nKey == K_ENTER
+      Case K_PGUP
+              oBrwSets:PageUp()
+              exit
+
+      case K_ENTER
            if bEdit != nil
               Eval( bEdit )
            endif
            if LastKey() == K_ENTER
               KEYBOARD Chr( K_DOWN )
            endif
+           exit
 
-   endcase
+   end
 
 return
 
@@ -1663,31 +1727,40 @@ static function ValToStr( uVal )
    local cType := ValType( uVal )
    local cResult := "U"
 
-   do case
-      case uVal == nil
+   Switch cType
+      case "U"
            cResult := "NIL"
+           exit
 
-      case cType == "A"
+      case "A"
            cResult := "{ ... }"
+           exit
 
-      Case cType  =="B"
-         cResult:= "{ || ... }"
+      Case "B"
+           cResult:= "{ || ... }"
+           exit
 
-      case cType IN "CM"
+      case "C"
+      case "M"
            cResult := '"' + uVal + '"'
+           exit
 
-      case cType == "L"
+      case "L"
            cResult := iif( uVal, ".T.", ".F." )
+           exit
 
-      case cType == "D"
+      case "D"
            cResult := DToC( uVal )
+           exit
 
-      case cType == "N"
+      case "N"
            cResult := AllTrim( Str( uVal ) )
+           exit
 
-      case cType == "O"
+      case "O"
            cResult := "Class " + uVal:ClassName() + " object"
-   endcase
+           exit
+   end
 
 return cResult
 

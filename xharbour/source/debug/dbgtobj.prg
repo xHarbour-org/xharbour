@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtobj.prg,v 1.1.1.1 2001/12/21 10:43:45 ronpinkas Exp $
+ * $Id: dbgtobj.prg,v 1.2 2002/12/01 03:58:35 walito Exp $
  */
 
 /*
@@ -164,50 +164,56 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) class t
    local cOldname:= ::objname
    Local nPos
 
-   do case
-      case nKey == K_UP
+   Switch nKey
+      case K_UP
            if oBrwSets:Cargo > 1
               oBrwSets:Cargo--
               oBrwSets:RefreshCurrent()
               oBrwSets:Up()
               oBrwSets:ForceStable()
            endif
+           exit
 
-      case nKey == K_DOWN
+      case K_DOWN
            if oBrwSets:Cargo < nSets
               oBrwSets:Cargo++
               oBrwSets:RefreshCurrent()
               oBrwSets:Down()
               oBrwSets:ForceStable()
            endif
+           exit
 
-      case nKey == K_HOME
+      case K_HOME
            if oBrwSets:Cargo > 1
               oBrwSets:Cargo := 1
               oBrwSets:GoTop()
               oBrwSets:ForceStable()
            endif
+           exit
 
-      case nKey == K_END
+      case K_END
            if oBrwSets:Cargo < nSets
               oBrwSets:Cargo := nSets
               oBrwSets:GoBottom()
               oBrwSets:ForceStable()
            endif
+           exit
 
-      case nKey == K_PGUP
+      case K_PGUP
            oBrwSets:PageUp()
            oBrwSets:Cargo := ::ArrayIndex
            oBrwSets:RefreshCurrent()
            oBrwSets:ForceStable()
+           exit
 
-      case nKey == K_PGDN
+      case K_PGDN
            oBrwSets:PageDown()
            oBrwSets:Cargo := ::ArrayIndex
            oBrwSets:RefreshCurrent()
            oBrwSets:ForceStable()
+           exit
 
-      Case nKey ==13
+      Case K_ENTER
             if nSet==oBrwSets:Cargo
                if valtype(aArray[nSet,2])=="A"
                   if len(   aArray[nSet,2])>0
@@ -229,8 +235,9 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) class t
                endif
 
             endif
+            exit
 
-   endcase
+   end
 
 return nil
 
@@ -239,31 +246,41 @@ static function ValToStr( uVal )
    local cType := ValType( uVal )
    local cResult := "U"
 
-   do case
-      case uVal == nil
+   Switch cType
+      case "U"
            cResult := "NIL"
+           exit
 
-      case cType == "A"
+      case "A"
            cResult := "{ ... }"
+           exit
 
-      case cType IN "CM"
+      case "C"
+      case "M"
            cResult := '"' + uVal + '"'
+           exit
 
-      case cType == "L"
+      case "L"
            cResult := iif( uVal, ".T.", ".F." )
+           exit
 
-      case cType == "D"
+      case "D"
            cResult := DToC( uVal )
+           exit
 
-      case cType == "N"
+      case "N"
            cResult := AllTrim( Str( uVal ) )
+           exit
 
-      case cType == "O"
+      case "O"
            cResult := "Class " + uVal:ClassName() + " object"
-      Case cType  =="B"
-         cResult:= "{ || ... }"
+           exit
 
-   endcase
+      Case "B"
+           cResult:= "{ || ... }"
+           exit
+
+   end
 
 return cResult
 

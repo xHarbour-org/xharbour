@@ -1,5 +1,5 @@
 /*
- * $Id: dbgwa.prg,v 1.1.1.1 2001/12/21 10:43:49 ronpinkas Exp $
+ * $Id: dbgwa.prg,v 1.2 2002/12/01 03:56:41 walito Exp $
  */
 
 /*
@@ -233,8 +233,8 @@ static function DlgWorkAreaKey( nKey, oDlg, aBrw, aAlias, aStruc, aInfo )
       return nil
    endif
 
-   do case
-   case nFocus == 1
+   Switch nFocus
+   case 1
       nAlias := aBrw[1]:Cargo
       WorkAreasKeyPressed( nKey, aBrw[1], oDlg, len( aAlias ) )
       if nAlias != aBrw[1]:Cargo
@@ -258,57 +258,63 @@ static function DlgWorkAreaKey( nKey, oDlg, aBrw, aAlias, aStruc, aInfo )
          aBrw[3]:Dehilite()
          UpdateInfo( oDlg, aAlias[aBrw[1]:Cargo] )
       endif
-   case nFocus == 2
+      exit
+   case 2
       WorkAreasKeyPressed( nKey, aBrw[2], oDlg, len( aInfo ) )
-   case nFocus == 3
+      exit
+   case 3
       WorkAreasKeyPressed( nKey, aBrw[3], oDlg, len( aStruc ) )
-   end case
+      exit
+   end
 
 return nil
 
 static procedure WorkAreasKeyPressed( nKey, oBrw, oDlg, nTotal )
 
-   do case
-      case nKey == K_UP
+   Switch nKey
+      case K_UP
            if oBrw:Cargo > 1
               oBrw:Cargo--
               oBrw:RefreshCurrent()
               oBrw:Up()
               oBrw:ForceStable()
            endif
+           exit
 
-      case nKey == K_DOWN
+      case K_DOWN
            if oBrw:Cargo < nTotal
               oBrw:Cargo++
               oBrw:RefreshCurrent()
               oBrw:Down()
               oBrw:ForceStable()
            endif
+           exit
 
-      case nKey == K_HOME
+      case K_HOME
            if oBrw:Cargo > 1
               oBrw:Cargo := 1
               oBrw:GoTop()
               oBrw:ForceStable()
            endif
+           exit
 
-      case nKey == K_END
+      case K_END
            if oBrw:Cargo < nTotal
               oBrw:Cargo := nTotal
               oBrw:GoBottom()
               oBrw:ForceStable()
            endif
+           exit
 
-   endcase
+   end
 
 return
 
 static function DbfInfo( aInfo )
 
-   local nFor
-   local xType, xValue, cValue
+   local xType, xValue, cValue, cInfo
 
-   aInfo := {}
+   aInfo := Array( Fcount() )
 
    Aadd(aInfo, "["+ltrim( str( Select(Alias()) ) ) + "] " + Alias())
    Aadd(aInfo, Space( 4 ) + "Current Driver")
@@ -322,27 +328,33 @@ static function DbfInfo( aInfo )
    Aadd(aInfo, Space( 8 ) + "Index order: " + ltrim( str( IndexOrd() ) ) )
    Aadd(aInfo, Space( 4 ) + "Current Record")
 
-   for nFor := 1 to Fcount()
+   for each cInfo in aInfo
 
-      xValue := Fieldget( nFor )
+      xValue := Fieldget( HB_EnumIndex() )
       xType  := Valtype( xValue )
 
-      do case
-      case xType IN "CM"
+      Switch xType
+      case "C"
+      case "M"
          cValue := xValue
-      case xType == "N"
+         exit
+      case "N"
          cValue := ltrim( str( xValue ) )
-      case xType == "D"
+         exit
+      case "D"
          cValue := Dtoc( xValue )
-      case xType == "L"
+         exit
+      case "L"
          cValue := iif( xValue, ".T.", ".F." )
-      case xType == "A"
+         exit
+      case "A"
          cValue := "Array"
-      otherwise
+         exit
+      default
          cValue := "Error"
-      end case
+      end
 
-      Aadd(aInfo, Space( 8 ) + Padr(FieldName( nFor ), 10) + " = " + Padr( cValue , 17 ) )
+      cInfo := Space( 8 ) + Padr(FieldName( HB_EnumIndex() ), 10) + " = " + Padr( cValue , 17 )
 
    next
 

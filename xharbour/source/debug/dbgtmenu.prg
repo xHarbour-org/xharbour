@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtmenu.prg,v 1.1.1.1 2001/12/21 10:43:44 ronpinkas Exp $
+ * $Id: dbgtmenu.prg,v 1.2 2002/12/01 03:57:23 walito Exp $
  */
 
 /*
@@ -389,8 +389,8 @@ METHOD ProcessKey( nKey ) CLASS TDbMenu
 
    local nPopup, oPopup
 
-   do case
-      case nKey == K_LBUTTONDOWN
+   Switch nKey
+      case K_LBUTTONDOWN
            if MRow() == 0
               if ( nPopup := ::GetItemOrdByCoors( 0, MCol() ) ) != 0
                  if nPopup != ::nOpenPopup
@@ -409,32 +409,41 @@ METHOD ProcessKey( nKey ) CLASS TDbMenu
                  ::EvalAction()
               endif
            endif
+           exit
 
-      case nKey == K_ESC
+      case K_ESC
            ::Close()
+           exit
 
-      case nKey == K_LEFT
+      case K_LEFT
            ::GoLeft()
+           exit
 
-      case nKey == K_RIGHT
+      case K_RIGHT
            ::GoRight()
+           exit
 
-      case nKey == K_DOWN
+      case K_DOWN
            ::GoDown()
+           exit
 
-      case nKey == K_UP
+      case K_UP
            ::GoUp()
+           exit
 
-      case nKey == K_ENTER
+      case K_ENTER
            ::EvalAction()
+           exit
 
-      case nKey == K_HOME
+      case K_HOME
            ::GoTop()
+           exit
 
-      case nKey == K_END
+      case K_END
            ::GoBottom()
+           exit
 
-      otherwise
+      default
 
          if ::nOpenPopup > 0
             if IsAlpha( Chr( nKey ) )
@@ -454,7 +463,7 @@ METHOD ProcessKey( nKey ) CLASS TDbMenu
             endif
          endif
 
-   endcase
+   end
 
 return nil
 
