@@ -1,5 +1,5 @@
 /*
- * $Id: mousewin.c,v 1.5 2003/12/04 09:26:55 druzus Exp $
+ * $Id: mousewin.c,v 1.6 2003/12/22 21:48:26 druzus Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 
 #define HB_OS_WIN_32_USED
 
+#include <windows.h>
 #include "hbapigt.h"
 
 #if defined(__IBMCPP__)
@@ -136,12 +137,31 @@ BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
    /* TODO: */
 
 //   HB_SYMBOL_UNUSED( iButton );
+  BOOL bReturn = FALSE;
+
+  if ( iButton == 0 )
+  {
+    bReturn = GetKeyState( VK_LBUTTON ) & 0x8000;
+  }
+  else if ( iButton== 1 )
+  {
+    bReturn = GetKeyState( VK_RBUTTON ) & 0x8000;
+  }
+  else if ( iButton == 2 )
+  {
+    bReturn = GetKeyState( VK_MBUTTON ) & 0x8000;
+  }
+
+  return( bReturn );
+
+/*
      if(iButton == 0 && s_mouseLast == 1002)
         return TRUE;
      if(iButton == 1 && s_mouseLast == 1004)
         return TRUE;
 
    return FALSE;
+*/
 }
 
 int HB_GT_FUNC(mouse_CountButton( void ))
