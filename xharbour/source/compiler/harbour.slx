@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.24 2003/01/23 23:35:00 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.25 2003/01/24 09:52:43 ronpinkas Exp $
  */
 
 /*
@@ -125,7 +125,7 @@ DEFINE_STREAM_AS_ONE_OF_THESE {
 START_NEW_LINE_IF_ONE_OF_THESE( "\n;" );
 
 
-#define HB_SELF         LEX_CUSTOM_ACTION - 6
+#define HB_SELF         LEX_CUSTOM_ACTION - 4
 
 SELF_CONTAINED_WORDS_ARE {
                            LEX_WORD( ".AND." ) AS_TOKEN( AND        + DONT_REDUCE ),
@@ -173,99 +173,107 @@ SELF_CONTAINED_WORDS_ARE {
 #define HB_WANTS_EXP     LEX_CUSTOM_ACTION - 2048
 
 /* When 2 identifiers are correct syntax like in class declaration, we have to temporarily store the 2nd identifier. */
-#define HB_ID_ON_HOLD  LEX_CUSTOM_ACTION - 7
+#define HB_ID_ON_HOLD    LEX_CUSTOM_ACTION -  5
 
-#define HB_MACRO_ERR   LEX_CUSTOM_ACTION - 8
+#define HB_MACRO_ERR     LEX_CUSTOM_ACTION -  6
 
-#define HB_INIT_PROC   LEX_CUSTOM_ACTION - 9
-#define HB_INIT_FUNC   LEX_CUSTOM_ACTION - 10
-#define HB_EXIT_PROC   LEX_CUSTOM_ACTION - 11
-#define HB_EXIT_FUNC   LEX_CUSTOM_ACTION - 12
-#define HB_STATIC_PROC LEX_CUSTOM_ACTION - 13
-#define HB_STATIC_FUNC LEX_CUSTOM_ACTION - 14
+#define HB_CRITICAL_FUNC        LEX_CUSTOM_ACTION -  7
+#define HB_CRITICAL_PROC        LEX_CUSTOM_ACTION -  8
+#define HB_CRITICAL_STATIC_FUNC LEX_CUSTOM_ACTION -  9
+#define HB_CRITICAL_STATIC_PROC LEX_CUSTOM_ACTION - 10
+#define HB_EXIT_FUNC            LEX_CUSTOM_ACTION - 11
+#define HB_EXIT_PROC            LEX_CUSTOM_ACTION - 12
+#define HB_INIT_FUNC            LEX_CUSTOM_ACTION - 13
+#define HB_INIT_PROC            LEX_CUSTOM_ACTION - 14
+#define HB_STATIC_FUNC          LEX_CUSTOM_ACTION - 15
+#define HB_STATIC_PROC          LEX_CUSTOM_ACTION - 16
 
-#define HB_DO_CASE_ID  LEX_CUSTOM_ACTION - 15
+#define HB_DO_CASE_ID    LEX_CUSTOM_ACTION - 17
 
-#define HB_DO_WHILE_ID   LEX_CUSTOM_ACTION - 16
-#define HB_DO_WHILE_WITH LEX_CUSTOM_ACTION - 17
+#define HB_DO_WHILE_ID   LEX_CUSTOM_ACTION - 18
+#define HB_DO_WHILE_WITH LEX_CUSTOM_ACTION - 19
 
-#define _WITH_ID_CR      LEX_CUSTOM_ACTION - 18
-#define _WITH_ID_SEMI    LEX_CUSTOM_ACTION - 19
+#define _WITH_ID_CR      LEX_CUSTOM_ACTION - 20
+#define _WITH_ID_SEMI    LEX_CUSTOM_ACTION - 21
 
-#define HB_IN            LEX_CUSTOM_ACTION - 20
-#define HB_STEP          LEX_CUSTOM_ACTION - 21
-#define HB_TO            LEX_CUSTOM_ACTION - 22
-#define HB_WITH          LEX_CUSTOM_ACTION - 23
+#define HB_IN            LEX_CUSTOM_ACTION - 22
+#define HB_STEP          LEX_CUSTOM_ACTION - 23
+#define HB_TO            LEX_CUSTOM_ACTION - 24
+#define HB_WITH          LEX_CUSTOM_ACTION - 25
 
 /* When reservered words are used as Identifier. */
-#define HB_IDENTIFIER    LEX_CUSTOM_ACTION - 24
+#define HB_IDENTIFIER    LEX_CUSTOM_ACTION - 26
 
-#define HB_INLINE        LEX_CUSTOM_ACTION - 25
+#define HB_INLINE        LEX_CUSTOM_ACTION - 27
 
-#define HB_TEXT_BLOCK    LEX_CUSTOM_ACTION - 26
-#define HB_TEXT_LINE     LEX_CUSTOM_ACTION - 27
-#define HB_NEXT_LINE     LEX_CUSTOM_ACTION - 28
+#define HB_TEXT_BLOCK    LEX_CUSTOM_ACTION - 28
+#define HB_TEXT_LINE     LEX_CUSTOM_ACTION - 29
+#define HB_NEXT_LINE     LEX_CUSTOM_ACTION - 30
 
-#define HB_TEXT_ID       LEX_CUSTOM_ACTION - 29
+#define HB_TEXT_ID       LEX_CUSTOM_ACTION - 31
 
 #define USE_KEYWORDS
 
 /* Key Words. */
 LANGUAGE_KEY_WORDS_ARE {
-                         LEX_WORD( "ANNOUNCE"            ) AS_TOKEN( HB_WANTS_ID  - ANNOUNCE         ),
-                         LEX_WORD( "BEGIN{WS}SEQUENCE"   ) AS_TOKEN( BEGINSEQ         ),
-                         LEX_WORD( "BREAK"               ) AS_TOKEN( HB_WANTS_EXP - BREAK            ),
-                         LEX_WORD( "CASE"                ) AS_TOKEN( HB_WANTS_EXP - CASE             ),
-                         LEX_WORD( "CATCH"               ) AS_TOKEN( HB_WANTS_ID  - CATCH            ),
-                         LEX_WORD( "DECLARE"             ) AS_TOKEN( DECLARE          ),
-                         LEX_WORD( "DEFAULT"             ) AS_TOKEN( HB_WANTS_EOL - DEFAULT          ),
-                         LEX_WORD( "DO"                  ) AS_TOKEN( HB_WANTS_VAR - DO               ),
-                         LEX_WORD( "DO{WS}CASE"          ) AS_TOKEN( DOCASE           ),
-                         LEX_WORD( "DO{WS}WHILE"         ) AS_TOKEN( DO_WHILE         ),
-                         LEX_WORD( "DO{WS}WHILE{WS}WITH" ) AS_TOKEN( DO_WHILE_WITH    ),
-                         LEX_WORD( "ELSE"                ) AS_TOKEN( HB_WANTS_EOL - ELSE             ),
-                         LEX_WORD( "ELSEIF"              ) AS_TOKEN( HB_WANTS_EXP - ELSEIF           ),
-                         LEX_WORD( "END"                 ) AS_TOKEN( HB_WANTS_EOL - END              ),
-                         LEX_WORD( "ENDCASE"             ) AS_TOKEN( HB_WANTS_EOL - ENDCASE          ),
-                         LEX_WORD( "ENDDO"               ) AS_TOKEN( HB_WANTS_EOL - ENDDO            ),
-                         LEX_WORD( "ENDIF"               ) AS_TOKEN( HB_WANTS_EOL - ENDIF            ),
-                         LEX_WORD( "ENUMERATION"         ) AS_TOKEN( HB_WANTS_ID  - ENUM             ),
-                         LEX_WORD( "EXIT"                ) AS_TOKEN( HB_WANTS_EOL - EXIT             ),
-                         LEX_WORD( "EXIT{WS}FUNCTION"    ) AS_TOKEN( HB_EXIT_FUNC     ),
-                         LEX_WORD( "EXIT{WS}PROCEDURE"   ) AS_TOKEN( HB_EXIT_PROC     ),
-                         LEX_WORD( "EXTERNAL"            ) AS_TOKEN( HB_WANTS_ID  - EXTERN           ),
-                         LEX_WORD( "FIELD"               ) AS_TOKEN( HB_WANTS_ID  - FIELD            ),
-                         LEX_WORD( "FOR"                 ) AS_TOKEN( HB_WANTS_VAR - FOR              ),
-                         LEX_WORD( "FOR{WS}EACH"         ) AS_TOKEN( FOREACH                         ),
-                         LEX_WORD( "FUNCTION"            ) AS_TOKEN( HB_WANTS_ID  - FUNCTION         ),
-                         LEX_WORD( "GLOBAL"              ) AS_TOKEN( HB_WANTS_ID  - GLOBAL           ),
-                         LEX_WORD( "GLOBAL{WS}EXTERNAL"  ) AS_TOKEN( EXTERNGLOBAL     ),
-                         LEX_WORD( "IF"                  ) AS_TOKEN( HB_WANTS_EXP - IF               ),
-                         LEX_WORD( "INIT{WS}FUNCTION"    ) AS_TOKEN( HB_INIT_FUNC     ),
-                         LEX_WORD( "INIT{WS}PROCEDURE"   ) AS_TOKEN( HB_INIT_PROC     ),
-                         LEX_WORD( "LOCAL"               ) AS_TOKEN( HB_WANTS_ID  - LOCAL            ),
-                         LEX_WORD( "LOOP"                ) AS_TOKEN( HB_WANTS_EOL - LOOP             ),
-                         LEX_WORD( "MEMVAR"              ) AS_TOKEN( HB_WANTS_ID  - MEMVAR           ),
-                         LEX_WORD( "NEXT"                ) AS_TOKEN( HB_WANTS_EOL - NEXT             ),
-                         LEX_WORD( "OTHERWISE"           ) AS_TOKEN( HB_WANTS_EOL - OTHERWISE        ),
-                         LEX_WORD( "PARAMETERS"          ) AS_TOKEN( HB_WANTS_ID  - PARAMETERS       ),
-                         LEX_WORD( "PRIVATE"             ) AS_TOKEN( HB_WANTS_VAR - PRIVATE          ),
-                         LEX_WORD( "PROCEDURE"           ) AS_TOKEN( HB_WANTS_ID  - PROCEDURE        ),
-                         LEX_WORD( "PUBLIC"              ) AS_TOKEN( HB_WANTS_VAR - PUBLIC           ),
-                         LEX_WORD( "RECOVER"             ) AS_TOKEN( HB_WANTS_EOL - RECOVER          ),
-                         LEX_WORD( "RECOVER{WS}USING"    ) AS_TOKEN( RECOVERUSING     ),
-                         LEX_WORD( "RETURN"              ) AS_TOKEN( HB_WANTS_EXP - RETURN           ),
-                         LEX_WORD( "STATIC"              ) AS_TOKEN( HB_WANTS_ID  - STATIC           ),
-                         LEX_WORD( "STATIC{WS}FUNCTION"  ) AS_TOKEN( HB_STATIC_FUNC   ),
-                         LEX_WORD( "STATIC{WS}PROCEDURE" ) AS_TOKEN( HB_STATIC_PROC   ),
-                         LEX_WORD( "SWITCH"              ) AS_TOKEN( HB_WANTS_EXP - SWITCH           ),
-                         LEX_WORD( "TEXT"                ) AS_TOKEN( HB_TEXT          ),
-                         LEX_WORD( "TRY"                 ) AS_TOKEN( HB_WANTS_EOL  - TRY             ),
-                         LEX_WORD( "WHILE"               ) AS_TOKEN( HB_WANTS_EXP - WHILE            ),
-                         LEX_WORD( "WITH{WS}OBJECT"      ) AS_TOKEN( WITHOBJ          ),
-                         LEX_WORD( "_HB_CLASS"           ) AS_TOKEN( DECLARE_CLASS    ),
-                         LEX_WORD( "_HB_MEMBER"          ) AS_TOKEN( DECLARE_MEMBER   ),
-                         LEX_WORD( "_PROCREQ_"           ) AS_TOKEN( PROCREQ          )
+                         LEX_WORD( "ANNOUNCE"                        ) AS_TOKEN( HB_WANTS_ID  - ANNOUNCE         ),
+                         LEX_WORD( "BEGIN{WS}SEQUENCE"               ) AS_TOKEN( BEGINSEQ         ),
+                         LEX_WORD( "BREAK"                           ) AS_TOKEN( HB_WANTS_EXP - BREAK            ),
+                         LEX_WORD( "CASE"                            ) AS_TOKEN( HB_WANTS_EXP - CASE             ),
+                         LEX_WORD( "CATCH"                           ) AS_TOKEN( HB_WANTS_ID  - CATCH            ),
+                         LEX_WORD( "CRITICAL{WS}FUNCTION"            ) AS_TOKEN( HB_CRITICAL_FUNC ),
+                         LEX_WORD( "CRITICAL{WS}PROCEDURE"           ) AS_TOKEN( HB_CRITICAL_PROC ),
+                         LEX_WORD( "CRITICAL{WS}STATIC{WS}FUNCTION"  ) AS_TOKEN( HB_CRITICAL_STATIC_FUNC ),
+                         LEX_WORD( "CRITICAL{WS}STATIC{WS}PROCEDURE" ) AS_TOKEN( HB_CRITICAL_STATIC_PROC ),
+                         LEX_WORD( "DECLARE"                         ) AS_TOKEN( DECLARE          ),
+                         LEX_WORD( "DEFAULT"                         ) AS_TOKEN( HB_WANTS_EOL - DEFAULT          ),
+                         LEX_WORD( "DO"                              ) AS_TOKEN( HB_WANTS_VAR - DO               ),
+                         LEX_WORD( "DO{WS}CASE"                      ) AS_TOKEN( DOCASE           ),
+                         LEX_WORD( "DO{WS}WHILE"                     ) AS_TOKEN( DO_WHILE         ),
+                         LEX_WORD( "DO{WS}WHILE{WS}WITH"             ) AS_TOKEN( DO_WHILE_WITH    ),
+                         LEX_WORD( "ELSE"                            ) AS_TOKEN( HB_WANTS_EOL - ELSE             ),
+                         LEX_WORD( "ELSEIF"                          ) AS_TOKEN( HB_WANTS_EXP - ELSEIF           ),
+                         LEX_WORD( "END"                             ) AS_TOKEN( HB_WANTS_EOL - END              ),
+                         LEX_WORD( "ENDCASE"                         ) AS_TOKEN( HB_WANTS_EOL - ENDCASE          ),
+                         LEX_WORD( "ENDDO"                           ) AS_TOKEN( HB_WANTS_EOL - ENDDO            ),
+                         LEX_WORD( "ENDIF"                           ) AS_TOKEN( HB_WANTS_EOL - ENDIF            ),
+                         LEX_WORD( "ENUMERATION"                     ) AS_TOKEN( HB_WANTS_ID  - ENUM             ),
+                         LEX_WORD( "EXIT"                            ) AS_TOKEN( HB_WANTS_EOL - EXIT             ),
+                         LEX_WORD( "EXIT{WS}FUNCTION"                ) AS_TOKEN( HB_EXIT_FUNC     ),
+                         LEX_WORD( "EXIT{WS}PROCEDURE"               ) AS_TOKEN( HB_EXIT_PROC     ),
+                         LEX_WORD( "EXTERNAL"                        ) AS_TOKEN( HB_WANTS_ID  - EXTERN           ),
+                         LEX_WORD( "FIELD"                           ) AS_TOKEN( HB_WANTS_ID  - FIELD            ),
+                         LEX_WORD( "FOR"                             ) AS_TOKEN( HB_WANTS_VAR - FOR              ),
+                         LEX_WORD( "FOR{WS}EACH"                     ) AS_TOKEN( FOREACH                         ),
+                         LEX_WORD( "FUNCTION"                        ) AS_TOKEN( HB_WANTS_ID  - FUNCTION         ),
+                         LEX_WORD( "GLOBAL"                          ) AS_TOKEN( HB_WANTS_ID  - GLOBAL           ),
+                         LEX_WORD( "GLOBAL{WS}EXTERNAL"              ) AS_TOKEN( EXTERNGLOBAL     ),
+                         LEX_WORD( "IF"                              ) AS_TOKEN( HB_WANTS_EXP - IF               ),
+                         LEX_WORD( "INIT{WS}FUNCTION"                ) AS_TOKEN( HB_INIT_FUNC     ),
+                         LEX_WORD( "INIT{WS}PROCEDURE"               ) AS_TOKEN( HB_INIT_PROC     ),
+                         LEX_WORD( "LOCAL"                           ) AS_TOKEN( HB_WANTS_ID  - LOCAL            ),
+                         LEX_WORD( "LOOP"                            ) AS_TOKEN( HB_WANTS_EOL - LOOP             ),
+                         LEX_WORD( "MEMVAR"                          ) AS_TOKEN( HB_WANTS_ID  - MEMVAR           ),
+                         LEX_WORD( "NEXT"                            ) AS_TOKEN( HB_WANTS_EOL - NEXT             ),
+                         LEX_WORD( "OTHERWISE"                       ) AS_TOKEN( HB_WANTS_EOL - OTHERWISE        ),
+                         LEX_WORD( "PARAMETERS"                      ) AS_TOKEN( HB_WANTS_ID  - PARAMETERS       ),
+                         LEX_WORD( "PRIVATE"                         ) AS_TOKEN( HB_WANTS_VAR - PRIVATE          ),
+                         LEX_WORD( "PROCEDURE"                       ) AS_TOKEN( HB_WANTS_ID  - PROCEDURE        ),
+                         LEX_WORD( "PUBLIC"                          ) AS_TOKEN( HB_WANTS_VAR - PUBLIC           ),
+                         LEX_WORD( "RECOVER"                         ) AS_TOKEN( HB_WANTS_EOL - RECOVER          ),
+                         LEX_WORD( "RECOVER{WS}USING"                ) AS_TOKEN( RECOVERUSING     ),
+                         LEX_WORD( "RETURN"                          ) AS_TOKEN( HB_WANTS_EXP - RETURN           ),
+                         LEX_WORD( "STATIC"                          ) AS_TOKEN( HB_WANTS_ID  - STATIC           ),
+                         LEX_WORD( "STATIC{WS}FUNCTION"              ) AS_TOKEN( HB_STATIC_FUNC   ),
+                         LEX_WORD( "STATIC{WS}PROCEDURE"             ) AS_TOKEN( HB_STATIC_PROC   ),
+                         LEX_WORD( "SWITCH"                          ) AS_TOKEN( HB_WANTS_EXP - SWITCH           ),
+                         LEX_WORD( "TEXT"                            ) AS_TOKEN( HB_TEXT          ),
+                         LEX_WORD( "TRY"                             ) AS_TOKEN( HB_WANTS_EOL  - TRY             ),
+                         LEX_WORD( "WHILE"                           ) AS_TOKEN( HB_WANTS_EXP - WHILE            ),
+                         LEX_WORD( "WITH{WS}OBJECT"                  ) AS_TOKEN( WITHOBJ          ),
+                         LEX_WORD( "_HB_CLASS"                       ) AS_TOKEN( DECLARE_CLASS    ),
+                         LEX_WORD( "_HB_MEMBER"                      ) AS_TOKEN( DECLARE_MEMBER   ),
+                         LEX_WORD( "_PROCREQ_"                       ) AS_TOKEN( PROCREQ          )
                        };
 
 /* Intermediate Words when ambigious. */
@@ -908,6 +916,22 @@ int hb_comp_SLX_CustomAction( int x )
       case HB_STATIC_FUNC :
          aiHold[ iHold++ ] = FUNCTION + DONT_REDUCE;
          return STATIC + DONT_REDUCE;
+
+      case HB_CRITICAL_PROC :
+         aiHold[ iHold++ ] = PROCEDURE + DONT_REDUCE;
+         return CRITICAL + DONT_REDUCE;
+
+      case HB_CRITICAL_FUNC :
+         aiHold[ iHold++ ] = FUNCTION + DONT_REDUCE;
+         return CRITICAL + DONT_REDUCE;
+
+      case HB_CRITICAL_STATIC_PROC :
+         aiHold[ iHold++ ] = PROCEDURE + DONT_REDUCE;
+         return CRITICAL_STATIC + DONT_REDUCE;
+
+      case HB_CRITICAL_STATIC_FUNC :
+         aiHold[ iHold++ ] = FUNCTION + DONT_REDUCE;
+         return CRITICAL_STATIC + DONT_REDUCE;
 
       case HB_IN :
          bIgnoreWords = FALSE;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.778 2003/02/26 05:36:07 jonnymind Exp $
+ * $Id: ChangeLog,v 1.779 2003/02/26 06:13:54 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,20 +8,35 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-25 22:43 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbvmpub.h
+    + Added HB_FS_CRITICAL
+
+  * source/compiler/genc.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + Added support for NEW Sysntax:
+        CRITICAL [STATIC] FUNCTION|PROCEDURE ...
+    /*
+       The CRITICAL qualifier guarantees that such function can NOT be run by more then 1 Thread
+       at a given time. Any other Thread about to start the CRITICAL Function, will be put on hold,
+       until the 1st Thread completed execution of the CRITICAL Function.
+     */
+
 2003-02-26 07:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
    * source/vm/garbage.c
    * source/vm/thread.c
      ! Now compiling on windows
-     
+
 2003-02-26 06:33 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
    * include/thread.h
    * source/vm/thread.c
-     + Added macro HB_TREAD_GUARD() for simpler threadsafing of one 
+     + Added macro HB_TREAD_GUARD() for simpler threadsafing of one
        command
      + Context initialization and destruction is now done in 4 phases
        instead of 2.
      + Added structures for TRYLOCK.
-   
+
    * source/vm/arrays.c
    * source/vm/arrayshb.c
    * source/vm/codebloc.c
@@ -31,12 +46,12 @@
    * source/vm/garbage.c
    * source/vm/hvm.c
      + New multithreading infracstructure framework has been initiated.
-       
+
    NOTE: This is a work in progress, and exactly a BEGIN of a LONG work.
    I have made sure that this commit works with mttest.prg and mtgc.prg,
    and I commit it because I need to show this changes to other developers
    involved in the project, and to port the source to my windows test
-   machines. Other programs, (involving classes, RDD and array management) 
+   machines. Other programs, (involving classes, RDD and array management)
    are NOT going to work with this commit, because the develpement of the
    new framework has just started.
 

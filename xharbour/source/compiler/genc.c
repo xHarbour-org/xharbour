@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.31 2003/01/26 02:48:51 likewolf Exp $
+ * $Id: genc.c,v 1.32 2003/02/15 22:20:10 paultucker Exp $
  */
 
 /*
@@ -66,12 +66,15 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
    BOOL bIsStaticVariable ;
    BOOL bIsGlobalVariable ;
 
+   BOOL bCritical = FALSE;
+
    if( ! pFileName->szExtension )
    {
       pFileName->szExtension = ".c";
    }
 
    hb_fsFNameMerge( szFileName, pFileName );
+   hb_strupr( pFileName->szName );
 
    yyc = fopen( szFileName, "wb" );
    if( ! yyc )
@@ -98,7 +101,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          fprintf( yyc, "#include \"hbpcode.h\"\n" );
       }
 
-      fprintf( yyc, "#include \"hbinit.h\"\n\n\n" );
+      fprintf( yyc, "#include \"hbinit.h\"\n\n" );
 
       if( ! hb_comp_bStartProc )
       {
@@ -114,12 +117,17 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          bIsGlobalVariable = ( pFunc == hb_comp_pGlobalsFunc ) ;
          bIsPublicFunction = ( pFunc->cScope == HB_FS_PUBLIC ) ;
 
+         if( pFunc->cScope & HB_FS_CRITICAL )
+         {
+            bCritical = TRUE;
+         }
+
          /* Is it a PUBLIC FUNCTION/PROCEDURE */
          if ( bIsPublicFunction )
             fprintf( yyc, "HB_FUNC( %s );\n", pFunc->szName );
          /* Is it a STATIC$ */
          else if ( bIsStaticVariable )
-            fprintf( yyc, "static HARBOUR hb_INITSTATICS( void );\n" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "\nstatic HARBOUR hb_INITSTATICS( void );\n\n" ); /* NOTE: hb_ intentionally in lower case */
          /* Is it a GLOBAL$ */
          else if ( bIsGlobalVariable )
             fprintf( yyc, "static HARBOUR hb_INITGLOBALS( void );\n" ); /* NOTE: hb_ intentionally in lower case */
@@ -152,7 +160,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
 
       if( iLocalGlobals )
       {
-         fprintf( yyc, "static HARBOUR hb_REGISTERGLOBALS( void );\n" ); /* NOTE: hb_ intentionally in lower case */
+         fprintf( yyc, "static HARBOUR hb_REGISTERGLOBALS( void );\n\n" ); /* NOTE: hb_ intentionally in lower case */
       }
 
       /* write functions prototypes for inline blocks */
@@ -175,15 +183,47 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          pFunc = pFunc->pNext;
       }
 
+      if( bCritical )
+      {
+         fprintf( yyc, "\n#define HB_THREAD_SUPPORT\n" );
+         fprintf( yyc, "#include \"thread.h\"\n\n" );
+
+         pFunc = hb_comp_functions.pFirst;
+         while( pFunc )
+         {
+            if( pFunc->cScope & HB_FS_CRITICAL )
+            {
+               fprintf( yyc, "static HB_CRITICAL_T s_Critical%s;\n", pFunc->szName );
+            }
+
+            pFunc = pFunc->pNext;
+         }
+
+         // Write init function for CRITICAL Functions Mutex initialization.
+         fprintf( yyc, "\nHB_CALL_ON_STARTUP_BEGIN( hb_InitCritical%s )\n", pFileName->szName );
+
+         pFunc = hb_comp_functions.pFirst;
+         while( pFunc )
+         {
+            if( pFunc->cScope & HB_FS_CRITICAL )
+            {
+               fprintf( yyc, "   HB_CRITICAL_INIT( s_Critical%s );\n", pFunc->szName );
+            }
+
+            pFunc = pFunc->pNext;
+         }
+
+         fprintf( yyc, "HB_CALL_ON_STARTUP_END( hb_InitCritical%s )\n", pFileName->szName );
+      }
+
       /* writes the symbol table */
       /* Generate the wrapper that will initialize local symbol table
        */
 
-      fprintf( yyc, "\n\n#undef HB_PRG_PCODE_VER\n" );
+      fprintf( yyc, "\n#undef HB_PRG_PCODE_VER\n" );
       fprintf( yyc, "#define HB_PRG_PCODE_VER %i\n", (int) HB_PCODE_VER );
 
-      hb_strupr( pFileName->szName );
-      fprintf( yyc, "\n\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, pFileName->szName );
+      fprintf( yyc, "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, pFileName->szName );
 
       while( pSym )
       {
@@ -274,7 +314,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          pSym = pSym->pNext;
       }
 
-      fprintf( yyc, "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n"
+      fprintf( yyc, "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n"
                     "#if defined(_MSC_VER)\n"
                     "   #if _MSC_VER >= 1010\n"
                     /* [pt] First version of MSC I have that supports this */
@@ -294,6 +334,14 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
                     hb_comp_szPrefix, pFileName->szName,
                     hb_comp_szPrefix, pFileName->szName );
 
+      if( bCritical )
+      {
+         fprintf( yyc, "#if defined(_MSC_VER)\n" );
+         fprintf( yyc, "   static HB_$INITSYM hb_auto_InitCritical = hb_InitCritical%s;\n", pFileName->szName );
+         fprintf( yyc, "#elif ! defined(__GNUC__)\n" );
+         fprintf( yyc, "   #pragma startup hb_InitCritical%s\n", pFileName->szName );
+         fprintf( yyc, "#endif\n\n" );
+      }
 
       if( hb_comp_pGlobals )
       {
@@ -385,7 +433,19 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          }
 
          fprintf( yyc, "   };\n\n" );
+
+         if( pFunc->cScope & HB_FS_CRITICAL )
+         {
+            fprintf( yyc, "   HB_CRITICAL_LOCK( s_Critical%s );\n", pFunc->szName );
+         }
+
          fprintf( yyc, "   hb_vmExecute( pcode, symbols, %s );\n", hb_comp_pGlobals ? "&pGlobals" : "NULL" );
+
+         if( pFunc->cScope & HB_FS_CRITICAL )
+         {
+            fprintf( yyc, "   HB_CRITICAL_UNLOCK( s_Critical%s );\n", pFunc->szName );
+         }
+
          fprintf( yyc,  "}\n\n" );
 
          pFunc = pFunc->pNext;
