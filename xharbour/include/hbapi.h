@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.109 2003/12/27 02:57:13 fsgiudice Exp $
+ * $Id: hbapi.h,v 1.110 2003/12/28 22:25:34 druzus Exp $
  */
 
 /*
@@ -607,7 +607,7 @@ extern BOOL     hb_backgroundActive( ULONG ulID, BOOL bActive );
 extern int      hb_backgroundTime( ULONG ulID, int nMillisec );
 
 /* seconds functions */
-extern double hb_secondsCPU(int n);
+HB_EXPORT extern double hb_secondsCPU(int n);
 
 /* misc */
 extern char * hb_verPlatform( void ); /* retrieves a newly allocated buffer containing platform version */

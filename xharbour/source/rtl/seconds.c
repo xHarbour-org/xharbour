@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.5 2003/05/16 19:52:08 druzus Exp $
+ * $Id: seconds.c,v 1.6 2003/11/26 03:17:49 likewolf Exp $
  */
 
 /*
@@ -114,7 +114,7 @@ double hb_dateSeconds( void )
     n == 12 cstime -> sum of the system CPU time of the current + child process
     n == 13 cu+cs  -> sum of cutime + cstime
 */
-double hb_secondsCPU(int n)
+HB_EXPORT double hb_secondsCPU(int n)
 {
    double d = 0;
 
@@ -125,7 +125,7 @@ double hb_secondsCPU(int n)
 
    if ((n < 1 || n > 3) && (n < 11 || n > 13))
       n = 3;
-   
+
    if (n > 10)
    {
       n -= 10;

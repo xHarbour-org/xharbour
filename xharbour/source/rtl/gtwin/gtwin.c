@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.29 2003/12/22 21:48:26 druzus Exp $
+ * $Id: gtwin.c,v 1.30 2003/12/28 22:25:35 druzus Exp $
  */
 
 /*
@@ -1713,7 +1713,7 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
     UINT uiValue;
     ULONG lAdjFreq;
 
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_w9xtone(%lf, %lf, %lf)", dFreq, dDurat, dTick));
+    HB_TRACE(HB_TR_DEBUG, ("hb_gt_w9xtone(%lf, %lf)", dFreq, dDurat));
 
     /* sync with internal clock with very small time period */
     hb_idleSleep( 0.01 );
@@ -1781,7 +1781,7 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
 
 static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat ))
 {
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_wNtTone(%lf, %lf, %lf)", dFreq, dDurat, dTick));
+    HB_TRACE(HB_TR_DEBUG, ("hb_gt_wNtTone(%lf, %lf)", dFreq, dDurat));
 
     /* Clipper ignores Tone() requests if Frequency is less than
        < 20 hz (and so should we) to maintain compatibility .. */
