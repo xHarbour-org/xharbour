@@ -1,5 +1,5 @@
 /*
- * $Id: speedtst.prg,v 1.2 2003/12/23 13:59:23 druzus Exp $
+ * $Id: speedtst.prg,v 1.3 2004/10/29 01:28:59 ronpinkas Exp $
  */
 
 #define ARR_LEN 16

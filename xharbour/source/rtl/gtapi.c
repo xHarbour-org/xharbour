@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.43 2004/10/27 06:22:10 guerra000 Exp $
+ * $Id: gtapi.c,v 1.44 2004/10/27 19:35:57 oh1 Exp $
  */
 
 /*
@@ -2015,29 +2015,33 @@ void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize )
 /* New CT3 Windows API functions                                                */
 /****************************************************************************/
 /*
-  hb_ctGetClearA()   - Get the default attribute for screen/window clear
-  hb_ctGetClearB()   - Get the default character for screen/window clear
   hb_ctMaxCol()      - Get the highest column number for screen/window
   hb_ctMaxRow()      - Get the highest row number for screen/window
+  hb_ctGetClearA()   - Get the default attribute for screen/window clear
+  hb_ctGetClearB()   - Get the default character for screen/window clear
   hb_ctSetClearA()   - Set the default attribute for screen/window clear
   hb_ctSetClearB()   - Set the default character for screen/window clear
   hb_ctSetCurColor() - Set current color
+  hb_ctWSetShadow()  - Set the window shadow color
   hb_ctSetPos()      - Move the cursor to a new position
+
+  hb_ctWFree()       - Free HB_CT_WND Table
+
+  hb_ctWClose()      - Close the active window
   hb_ctWAClose()     - Close all windows
+  hb_ctWOpen()       - Opens a new window
+
+
   hb_ctWBoard()      - Allocates screen area for windows
   hb_ctWCenter()     - Returns a window to the visible area, or centers it
-  hb_ctWClose()      - Close the active window
   hb_ctWCurrent()    - Get the current windows info
   hb_ctWFormat()     - Set the usable area within a window
-  hb_ctWFree()       - Free HB_CT_WND Table
   hb_ctWMode()       - Set the screen border overstep mode
   hb_ctWMove()       - Moves a window
   hb_ctWNew()        - Create new HB_CT_WND Table
   hb_ctWNum()        - Get the highest windows handle
-  hb_ctWOpen()       - Opens a new window
   hb_ctWSelect()     - Activate Window
   hb_ctWSetMove()    - Set the interactive movement mode
-  hb_ctWSetShadow()  - Set the window shadow color
   hb_ctWStep()       - Set the step width of interactive window movement
 
    Static functions:
@@ -2375,43 +2379,52 @@ SHORT HB_EXPORT hb_ctSetPos( SHORT iRow, SHORT iCol )
 {
    SHORT     iRC = FALSE;
 
-   /* Clipper 5.3b compatible (oh1) */
-
-   if( iRow < ct_WFRow - ct_UFRow )
+   /* temporary hack for GTs which do not set maxrow/maxcol */
+   if ( s_Width == 0 && s_Height == 0 )
    {
-      iRow = ct_WFRow - ct_UFRow;
-      iRC = TRUE;
+      return hb_gtSetPos( iRow, iCol );
    }
 
-   while( iCol < 0 )
+   if ( s_Width == 0 && s_Height == 0 )
    {
-      if( iRow > ct_WFRow - ct_UFRow) iRow--;
-      iCol += ct_ULCol - ct_UFCol + 1;
-      iRC = TRUE;
-   }
+      /* Clipper 5.3b compatible (oh1) */
 
-   if( iRow > ct_ULRow - ct_UFRow + 1 &&
-      ( iRow != s_iRow - ct_UFRow || iRC ||
-        iRow > ct_WLRow - ct_WFRow ||
-        iCol == ct_ULCol - ct_UFCol ) )
-   {
-    iRow = ct_ULRow - ct_UFRow + 1;
-    iRC = TRUE;
-   }
+      if( iRow < ct_WFRow - ct_UFRow )
+      {
+         iRow = ct_WFRow - ct_UFRow;
+         iRC = TRUE;
+      }
 
-   if( iCol > ct_ULCol - ct_UFCol + 1 &&
-       ( iCol != s_iCol - ct_UFCol || iRC ||
-         iCol > ct_WLCol - ct_WFCol ||
-         iRow < 0 ||
-         iRow == ct_ULRow - ct_UFRow ) )
-   {
-    iCol = ct_ULCol - ct_UFCol + 1;
-    iRC = TRUE;
-   }
+      while( iCol < 0 )
+      {
+         if( iRow > ct_WFRow - ct_UFRow) iRow--;
+         iCol += ct_ULCol - ct_UFCol + 1;
+         iRC = TRUE;
+      }
 
-   if( iRow > ct_ULRow - ct_UFRow + 1 && iRC )
-   {
-    iRow = ct_ULRow - ct_UFRow + 1;
+      if( iRow > ct_ULRow - ct_UFRow + 1 &&
+         ( iRow != s_iRow - ct_UFRow || iRC ||
+           iRow > ct_WLRow - ct_WFRow ||
+           iCol == ct_ULCol - ct_UFCol ) )
+      {
+         iRow = ct_ULRow - ct_UFRow + 1;
+         iRC = TRUE;
+      }
+
+      if( iCol > ct_ULCol - ct_UFCol + 1 &&
+          ( iCol != s_iCol - ct_UFCol || iRC ||
+            iCol > ct_WLCol - ct_WFCol ||
+            iRow < 0 ||
+            iRow == ct_ULRow - ct_UFRow ) )
+      {
+         iCol = ct_ULCol - ct_UFCol + 1;
+         iRC = TRUE;
+      }
+
+      if( iRow > ct_ULRow - ct_UFRow + 1 && iRC )
+      {
+         iRow = ct_ULRow - ct_UFRow + 1;
+      }
    }
 
    iRC = hb_gtSetPos( iRow, iCol );
