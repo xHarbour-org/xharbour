@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.65 2003/04/07 15:23:34 lculik Exp $
+ * $Id: hbmake.prg,v 1.66 2003/05/08 03:25:32 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1079,11 +1079,11 @@ FUNC CreateMakeFile( cFile )
    LOCAL cDefBccLibs      := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib common.lib gtwin.lib"
    LOCAL cDefGccLibs      := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lm"
    LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lm"
-   LOCAL cDefLibGccLibs   := "-lvm -lrtl -lgtsln -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lslang -lgpm -lpthread -lm"
+   LOCAL cDefLibGccLibs   := "-lvm -lrtl -lgtcrs -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lncurses -lgpm -lpthread -lm"
    LOCAL cDefBccLibsMt    := "bcc640.lib lang.lib vmmt.lib rtlMt.lib rddmt.lib macro.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib common.lib gtwin.lib"
    LOCAL cDefGccLibsMt    := "-lvmmt -lrtlMt -lgtdos -llang -lrddmt -lrtlMt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lm"
    LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlMt -lgtos2 -llang -lrddmt -lrtlMt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lm"
-   LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlMt -lgtsln -llang -lrddmt -lrtlMt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lslang -lgpm -lpthread -lm"
+   LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlMt -lgtcrs -llang -lrddmt -lrtlMt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lncurses -lgpm -lpthread -lm"
    LOCAL cHarbDll         := "bcc640.lib hbdll_"
 
    LOCAL cLibs        := ""
@@ -1672,8 +1672,8 @@ FUNC CreateMakeFile( cFile )
                cDefLibGccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
 
                IF "html" IN cDefLibGccLibs
-                   cDefLibGccLibs := StrTran( cDefLibGccLibs, "gtsln" , "gtcgi" )
-                   cDefLibGccLibs := StrTran( cDefLibGccLibs, "slang" , "" )
+                   cDefLibGccLibs := StrTran( cDefLibGccLibs, "gtcrs" , "gtcgi" )
+                   cDefLibGccLibs := StrTran( cDefLibGccLibs, "ncurses" , "" )
                ENDIF
 
             ELSE
@@ -1682,8 +1682,8 @@ FUNC CreateMakeFile( cFile )
                cDefLibGccLibsMt := cHtmlLib + " " + cOldLib + " " + cLibs
 
                IF "html" IN cDefLibGccLibsMt
-                   cDefLibGccLibsMt := StrTran( cDefLibGccLibsMt, "gtsln" , "gtcgi" )
-                   cDefLibGccLibsMt := StrTran( cDefLibGccLibsMt, "slang" , "" )
+                   cDefLibGccLibsMt := StrTran( cDefLibGccLibsMt, "gtcrs" , "gtcgi" )
+                   cDefLibGccLibsMt := StrTran( cDefLibGccLibsMt, "ncurses" , "" )
                ENDIF
 
             ENDIF

@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.45 2003/05/16 22:03:44 ronpinkas Exp $
+# $Id: makefile.bc,v 1.46 2003/05/20 00:33:37 lculik Exp $
 #
 
 #
@@ -710,6 +710,7 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cdpplmaz.obj \
    $(OBJ_DIR)\cdpru866.obj \
    $(OBJ_DIR)\cdpruwin.obj \
+   $(OBJ_DIR)\cdpsrwin.obj \
    $(OBJ_DIR)\cdprukoi.obj
 
 #
@@ -2674,6 +2675,10 @@ $(OBJ_DIR)\cdpru866.obj : $(CODEPAGE_DIR)\cdpru866.c
    tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdpruwin.obj : $(CODEPAGE_DIR)\cdpruwin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\cdpsrwin.obj : $(CODEPAGE_DIR)\cdpsrwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
