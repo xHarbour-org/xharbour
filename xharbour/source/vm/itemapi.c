@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.68 2004/02/09 18:00:38 druzus Exp $
+ * $Id: itemapi.c,v 1.69 2004/02/09 18:38:26 ronpinkas Exp $
  */
 
 /*
@@ -88,7 +88,9 @@
 #include <stdio.h>
 
 #if defined( _MSC_VER )
-   #define snprintf _snprintf
+   #ifndef __XCC__
+      #define snprintf _snprintf
+   #endif
 #endif
 
 #include "hbapi.h"
