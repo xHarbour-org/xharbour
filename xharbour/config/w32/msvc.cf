@@ -1,0 +1,49 @@
+#
+# $Id: msvc.cf,v 1.6 2001/02/09 17:18:26 dholm Exp $
+#
+
+include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
+
+OBJ_EXT = .obj
+EXE_EXT = .exe
+LIB_PREF =
+LIB_EXT = .lib
+
+CC = cl.exe
+CC_IN = -c
+CC_OUT = -Fo
+CPPFLAGS = -I. -I$(HB_INC_COMPILE)
+CFLAGS = -W0 -Zi  # -W4 for max warnings
+
+LD = cl.exe
+LD_OUT = -Fe
+
+# Add all libraries specified in CONTRIBS and LIBS.
+ifeq ($(HB_LIB_COMPILE),)
+LINKPATHS += -link $(foreach lib, $(CONTRIBS), -LIBPATH:$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
+LINKPATHS += -link $(foreach lib, $(LIBS), -LIBPATH:$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+else
+LINKPATHS += -link -LIBPATH:$(HB_LIB_COMPILE)
+endif
+LINKLIBS += $(foreach lib, $(CONTRIBS), $(lib)$(LIB_EXT))
+LINKLIBS += $(foreach lib, $(LIBS), $(lib)$(LIB_EXT))
+
+# If LIBS specifies the rdd library, add all DB drivers.
+ifeq ($(findstring rdd,$(LIBS)),rdd)
+LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -LIBPATH:$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
+LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), $(drv)$(LIB_EXT))
+endif
+
+# Add the specified GT driver library
+ifeq ($(findstring rtl,$(LIBS)),rtl)
+LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKLIBS += $(HB_GT_LIB)$(LIB_EXT)
+endif
+
+LDFLAGS = $(LINKPATHS)
+
+AR = lib.exe
+ARFLAGS = $(A_USR)
+AR_RULE = $(AR) $(ARFLAGS) /out:$@ $^ || $(RM) $@
+
+include $(TOP)$(ROOT)config/rules.cf

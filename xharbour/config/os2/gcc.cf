@@ -1,0 +1,99 @@
+#
+# $Id: gcc.cf,v 1.21 2001/08/30 20:34:51 dholm Exp $
+#
+
+include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
+
+OBJ_EXT = .o
+EXE_EXT = .exe
+LIB_PREF =
+LIB_EXT = .a
+
+CC = gcc
+CC_IN = -c
+CC_OUT = -o
+CPPFLAGS = -I. -I$(HB_INC_COMPILE)
+ifeq ($(HB_LEX),SIMPLEX)
+CFLAGS = -Wall -O2 -DSIMPLEX
+else
+CFLAGS = -Wall -O2
+endif
+
+LD = gcc
+LDFLAGS =
+LD_OUT = -o $(SPACE)
+
+ifeq ($(C_MAIN),)
+ifeq ($(HB_GT_LIB),os2pm)
+# If building a PM program, override the main object.
+LDFLAGS +=$(TOP)$(ROOT)source/vm/$(ARCH)/mainpm.o
+endif
+endif
+
+# Add all libraries specified in CONTRIBS and LIBS.
+ifeq ($(HB_LIB_COMPILE),)
+LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
+LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+else
+LINKPATHS += -L$(HB_LIB_COMPILE)
+endif
+#LINKLIBS += -Wl,-(
+LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
+LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
+
+# If LIBS specifies the rdd library, add all DB drivers.
+ifeq ($(findstring rdd,$(LIBS)),rdd)
+LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
+LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
+endif
+
+# Add the specified GT driver library
+ifeq ($(findstring rtl,$(LIBS)),rtl)
+ifeq ($(C_MAIN),)
+ifeq ($(HB_GT_LIB),os2pm)
+# Special handling for PM mode
+LINKPATHS += -L$(TOP)$(ROOT)contrib/hgf/$(HB_GT_LIB)/$(ARCH)
+LINKLIBS += -l$(HB_GT_LIB)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtos2/$(ARCH)
+LINKLIBS += -lgtos2
+else
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKLIBS += -l$(HB_GT_LIB)
+endif
+endif
+endif
+
+#LINKLIBS += -Wl,-)
+LDFLAGS += $(LINKPATHS)
+
+ifeq ($(C_MAIN),)
+ifeq ($(HB_GT_LIB),os2pm)
+# Override the default link rule in order to add a call to emxbind
+LD_RULE = $(LD) $(CFLAGS) $(LD_OUT)$@ $^ $(LDFLAGS) $(L_USR) $(LINKLIBS) & emxbind -ep $@
+endif
+endif
+
+# Note: The empty line directly before 'endef' HAVE TO exist!
+# It causes that every echo command will be separated by LF
+define lib_object
+echo ADDMOD $(file) >> __lib__.tmp
+
+endef
+
+# We have to use a script to overcome the AR limit of max 850 characters
+# in commmand line
+define create_library
+IF EXIST $@ $(RM) $@
+echo CREATE $@ > __lib__.tmp
+$(foreach file, $^, $(lib_object))
+echo SAVE >> __lib__.tmp
+echo END >> __lib__.tmp
+$(AR) -M < __lib__.tmp
+endef
+
+# Under OS/2 || isn't a command separator (inside a shell, that is); correct separator is &
+AR = ar
+ARFLAGS = $(A_USR)
+AR_RULE = $(create_library) & $(RM) __lib__.tmp
+
+include $(TOP)$(ROOT)config/rules.cf

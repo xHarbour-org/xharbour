@@ -1,0 +1,73 @@
+#
+# $Id: icc.cf,v 1.16 2001/08/31 18:28:04 dholm Exp $
+#
+
+include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
+
+OBJ_EXT = .obj
+EXE_EXT = .exe
+LIB_PREF =
+LIB_EXT = .lib
+
+CC = icc
+CC_IN = /C+ /Tp
+CC_OUT = /Fo
+CPPFLAGS = /I$(GRANDP) /I$(HB_INC_COMPILE)
+#CFLAGS = /Gs+ /W2 /Se /Sd+ /Ti+
+CFLAGS = /Gs+ /W2 /Se /Sd+
+
+LD = icc
+LD_OUT = /Fe
+LDFLAGS = /C- /B"/NOIgnoreCase"
+ifeq ($(HB_MAIN),)
+else
+ifeq ($(C_MAIN),)
+ifeq ($(HB_GT_LIB),os2pm)
+LDFLAGS +=/B"/PMtype:PM" $(TOP)$(ROOT)source/vm/$(ARCH)/mainpm.obj
+else
+LDFLAGS += $(TOP)$(ROOT)source/vm/$(ARCH)/mainstd.obj
+endif
+endif
+endif
+ifeq ($(HB_LIB_COMPILE),)
+LINKLIBS = $(foreach lib, $(CONTRIBS), $(TOP)$(ROOT)contrib/$(lib)/$(ARCH)/$(lib)$(LIB_EXT))
+LINKLIBS += $(foreach lib, $(LIBS), $(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)$(LIB_EXT))
+# If LIBS specifies the rdd library, add all DB drivers.
+ifeq ($(findstring rdd,$(LIBS)),rdd)
+LINKLIBS += $(foreach lib, $(HB_DB_DRIVERS), $(TOP)$(ROOT)source/rdd/$(lib)/$(ARCH)/$(lib)$(LIB_EXT))
+endif
+else
+LINKLIBS = $(foreach lib, $(LIBS), $(lib)$(LIB_EXT))
+# If LIBS specifies the rdd library, add all DB drivers.
+ifeq ($(findstring rdd,$(LIBS)),rdd)
+LINKLIBS += $(foreach lib, $(HB_DB_DRIVERS), $(lib)$(LIB_EXT))
+endif
+endif
+
+# Add the specified GT driver library
+ifeq ($(C_MAIN),)
+ifeq ($(findstring rtl,$(LIBS)),rtl)
+ifeq ($(HB_GT_LIB),os2pm)
+# Special handling for PM mode
+LINKLIBS += $(TOP)$(ROOT)contrib/hgf/$(HB_GT_LIB)/$(ARCH)/$(HB_GT_LIB)$(LIB_EXT)
+LINKLIBS += $(TOP)$(ROOT)source/rtl/gtos2/$(ARCH)/gtos2.lib
+else
+LINKLIBS += $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)/$(HB_GT_LIB)$(LIB_EXT)
+endif
+endif
+endif
+
+# HB_SCREEN_LIB: empty, or one of ncurses, slang
+# HB_SCREEN_LIB=ncurses
+# HB_SCREEN_LIB=slang
+
+ifneq ($(HB_SCREEN_LIB),)
+LINKLIBS += $(HB_SCREEN_LIB)
+endif
+
+AR = ilib
+ARFLAGS = /NOE /NOIgnoreCase $(A_USR)
+AROBJS = $(foreach file, $^, -+$(file))
+AR_RULE = $(AR) $(ARFLAGS) $@ $(AROBJS),,
+
+include $(TOP)$(ROOT)config/rules.cf

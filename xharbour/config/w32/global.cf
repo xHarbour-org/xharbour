@@ -1,0 +1,69 @@
+#
+# $Id: global.cf,v 1.6 2000/08/30 22:05:48 vszel Exp $
+#
+
+all : first
+
+HB_GT_LIBS=\
+        gtcgi \
+        gtpca \
+        gtstd \
+        gtwin \
+#       gtcrs \
+#       gtsln \
+
+ifeq ($(HB_GT_LIB),)
+   HB_GT_LIB = gtwin
+endif
+
+ifeq ($(SHLVL),) # COMMAND.COM
+
+# There is a conflict with the use of '\' and '/' characters
+# The MAKE requires '/' in filenames (ARCH_DIR) however some compilers
+# and some DOS commands require '\' (ARCH_DOS)
+ARCH_DIR = $(subst \,/,$(ARCH))
+ARCH_DOS = $(subst /,\,$(ARCH))
+MK := $(subst \,/,$(subst \~,~,$(MAKE)))
+
+ifeq ($(COMSPEC),) #location of command.com
+  COMSPEC := command.com
+endif
+
+RM = del
+RD = rmdir
+CP = copy
+MV = move
+MD = md
+
+dirbase::
+	-if not exist $(HB_ARCHITECTURE) $(MD) $(HB_ARCHITECTURE)
+	-if not exist $(ARCH_DOS)        $(MD) $(ARCH_DOS)
+
+clean::
+	-for %f in ($(ARCH_DOS)\*.*) do $(RM) %f
+	-if exist *.bak $(RM) *.bak
+	-if exist *.obj $(RM) *.obj
+	-if exist core $(RM) core
+	-if exist *.o $(RM) *.o
+	-if exist *.tds $(RM) *.tds
+	-$(RD) $(ARCH_DOS)
+	-$(RD) $(HB_ARCHITECTURE)
+else  # bash
+
+ARCH_DIR = $(ARCH)/
+MK = $(MAKE)
+
+RM = rm -f
+RD = rm -f -r
+CP = cp -f
+MV = mv -f
+MD = mkdir
+
+dirbase::
+	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
+	 [ -d $(ARCH) ] || $(MD) $(ARCH)
+
+clean::
+	-$(RD) $(ARCH_DIR)
+
+endif

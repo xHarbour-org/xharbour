@@ -1,0 +1,84 @@
+/*
+ * $Id: TODO,v 1.6 2001/12/17 09:33:56 vszakats Exp $
+ */
+
+                  Harbour Project To-Do list
+
+=======================================================================
+Tasks for v.1 beta:
+_______________________________________________________________________
+
+          Topic                              Responsible developer(s)
+===================================          =========================
+
+TEXT/ENDTEXT support                         ???
+
+DBFCDX support                               Ryszard Glab
+
+Fixing internal HVM/RTL handling of string   ???
+items (Clipper passes a pointer to the same
+allocated memory instead of creating
+string copies)
+
+Remove #pragma pack() tricks                 ???
+from rdd .h files.
+
+OO system                                    Jean-Francois Lefebvre (JFL)
+   Adding Class Method
+   Adding Multiple Constructor
+   Adding Class init Support
+
+Integrate floating point methods to          ???
+avoid inequalities at 13 or more
+decimals.  See DETAILS_FLOAT below.
+
+Add missing 5.3 ord* functions.              Brian Hays
+OrdKeyVal and others are still in
+dummy.prg. Move dbcmd.c
+
+'SAVE TO' statement doesn't work             ???
+like clipper's.  Is memofile
+support complete?
+[more info ???]
+
+
+=======================================================================
+Tasks for v.1 release:
+_______________________________________________________________________
+
+Rewrite filesys.c to use native platform     ???
+specific file I/O with unlimited number 
+of file handles, while maintaining 
+compatibility with the CA-Cl*pper legacy 
+handle numbering system. This either 
+involves adding a linked list for the 
+translation table, or we should state that 
+only handles 0-4 are number compatible. 
+[Optimization]
+
+Optimize out the need for the PUSHNIL        Ryszard Glab
+opcode before each function call.
+[Optimization]
+
+
+=======================================================================
+Tasks for after v.1 release:
+_______________________________________________________________________
+
+
+Dynamic multi-language compiler/runtime      ???
+support
+
+UNICODE support.                             ???
+
+Multithreading support.                      ???
+
+=======================================================================
+Detail descriptions for Tasks:
+_______________________________________________________________________
+
+DETAILS_FLOAT
+   The building of the double in val.c is simply different than how it
+   gets created when coded in source or read from a dbf
+   See Harbour archives under the subject
+      Some numbers are not as equal as others

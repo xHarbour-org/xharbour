@@ -1,0 +1,30 @@
+#
+# $Id: install.cf,v 1.1 1999/10/05 13:00:09 vszel Exp $
+#
+
+ifeq ($(SHLVL),) # COMMAND.COM
+
+INSTALL_LIST = $(subst /,\,$(INSTALL_OBJS))
+INSTALL_RULE =\
+	$(COMSPEC) /c FOR %f IN ($(INSTALL_LIST)) DO COPY %f $(subst /,\,$(INSTALL_DIR))
+
+else  # bash
+
+INSTALL_RULE =\
+	@if [ ! -d $(INSTALL_DIR) ]; \
+	then \
+	  echo "! Can't install, path not found:" $(INSTALL_DIR); \
+	else \
+	  for i in $(INSTALL_OBJS); \
+	  do \
+	    if [ -r $$i ]; \
+	    then \
+	      echo "! Installing $$i on $(INSTALL_DIR)"; \
+	      $(CP) $$i $(INSTALL_DIR); \
+	    else \
+	      echo "! Can't install $$i, not found"; \
+	    fi \
+	  done \
+	fi
+
+endif

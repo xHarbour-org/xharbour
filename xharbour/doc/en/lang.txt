@@ -1,0 +1,149 @@
+/*
+ * $Id: lang.txt,v 1.8 2001/12/16 12:20:48 ckedem Exp $
+ */
+
+/*
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.harbour-project.org
+ *
+ * Copyright 2000 Luiz Rafael Culik <culik@sl.conex.net>
+ *    Documentation for: HB_LANGSELECT(),HB_LANGNAME()
+ *
+ * See doc/license.txt for licensing terms.
+ *
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_LANGSELECT()
+ *  $CATEGORY$
+ *      Nation
+ *  $ONELINER$
+ *      Select a specific nation message module
+ *  $SYNTAX$
+ *      HB_LANGSELECT( <cNewLang> ) --> cOldLang
+ *  $ARGUMENTS$
+ *      <cNewLang>  The ID of the country language module
+ *      The possible values for <cNewLang> is below as is defined in the
+ *      Lang library,sorted by language.
+ *
+ *      <table>
+ *      Language            Codepage     <cNewLang>
+ *      Basque              850          EU
+ *      Catalan             850          CA
+ *      Chinese Simplified  936          ZH_GB
+ *      Chinese Traditional 950          ZH_BIG5
+ *      Croatian            852          HR852
+ *      Croatian            ISO-8859-2   HRISO
+ *      Czech               852          CS852
+ *      Czech               ISO-8859-2   CSISO
+ *      Czech               KAM          CSKAM
+ *      Czech               Windows-1250 CSWIN
+ *      English             437          EN
+ *      Esperanto           850          EO
+ *      French              850          FR
+ *      Galician            850          GL
+ *      German              850          DE
+ *      Hebrew              862          HE862
+ *      Hebrew              Windows-1255 HEWIN
+ *      Hungarian           852          HU852
+ *      Hungarian           CWI-2        HUCWI
+ *      Hungarian           Windows-1    HUWIN
+ *      Icelandic           850          IS85
+ *      Indonesian          437          ID
+ *      Italian             437          IT
+ *      Korean              949          KO
+ *      Polish              852          PL852
+ *      Polish              ISO-8859-1   PLISO
+ *      Polish              Mozowia      PLMAZ
+ *      Portuguese          850          PT
+ *      Romanian            852          RO
+ *      Russian             866          RU866
+ *      Russian             Windows-1251 RUWIN
+ *      Serbian             852          SR852
+ *      Serbian             ISO-8859-2   SRISO
+ *      Spanish             850          ES
+ *      </table>
+ *  $RETURNS$
+ *      <cOldLang>   The old language indentifier
+ *  $DESCRIPTION$
+ *      This function set a default language module for date/month names,
+ *      internal warnigs,NatMsg messages and internal errors. When a
+ *      Lang ID is selected all messages will be output as the current lang
+ *      selected until another one is selected or the program ends.
+ *  $EXAMPLES$
+ *      REQUEST HB_LANG_PT
+ *      REQUEST HB_LANG_RO
+ *      REQUEST HB_LANG_ES
+ *      FUNCTION MAIN()
+ *      HB_LANGSELECT( 'PT' )       // Default language is now Portuguese
+ *      ? CDOW( DATE() )            // Segunda-feira
+ *      ? 'Old language id selected is ", HB_LANGSELECT()   // PT
+ *      HB_LANGSELECT( 'RO' )       // Default language is now Romanian
+ *      ? CMONTH( DATE() )          // Mai
+ *      ? 'Old language id selected is ",HB_LANGSELECT()   // RO
+ *      HB_LANGSELECT( 'ES' )       // Default language is now Spanish
+ *      ? CMONTH( DATE() )          // Mayo
+ *      ? CDOW( DATE() )            // Lunes
+ *      RETURN NIL
+ *  $TESTS$
+ *      See tests/langapi.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is a Harbour Extension.
+ *  $PLATFORMS$
+ *      Dos,Win32,OS/2
+ *  $FILES$
+ *      Libraty is rtl
+ *  $SEEALSO$
+ *      HB_LANGNAME(),NATIONMSG()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_LANGNAME()
+ *  $CATEGORY$
+ *      Nation
+ *  $ONELINER$
+ *      Return the Name of the Current Language module in USE
+ *  $SYNTAX$
+ *      HB_LANGNAME() --> cLangName
+ *  $ARGUMENTS$
+ *      None.
+ *  $RETURNS$
+ *      <cLangName>  Name of the Current language in use
+ *  $DESCRIPTION$
+ *      This function return the current name of the language module in use.
+ *  $EXAMPLES$
+ *      REQUEST HB_LANG_PT
+ *      REQUEST HB_LANG_RO
+ *      REQUEST HB_LANG_ES
+ *      FUNCTION MAIN()
+ *      HB_LANGSELECT( 'PT' )       // Default language is now Portuguese
+ *      ? CDOW( DATE() )            //Segunda-feira
+ *      ? 'Current language is ", HB_LANGNAME()             // Portuguese
+ *      ? 'Old language id selected is ", HB_LANGSELECT()   // PT
+ *      HB_LANGSELECT( 'RO' )       // Default language is now Romanian
+ *      ? CMONTH( DATE() )          // Mai
+ *      ? 'Old language id selected is ",HB_LANGSELECT()    // RO
+ *      HB_LANGSELECT( 'ES' )       // Default language is now Spanish
+ *      ? 'Current language is ",HB_LANGNAME()              // Spanish
+ *      ? CMONTH( DATE() )          // Mayo
+ *      ? CDOW( DATE() )            // Lunes
+ *      RETURN NIL
+ *  $TESTS$
+ *      See tests/langapi.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is a Harbour Extension
+ *  $PLATFORMS$
+ *      Dos,Win32,OS/2
+ *  $FILES$
+ *      Library is lang
+ *  $SEEALSO$
+ *      HB_LANGSELECT(),NATIONMSG()
+ *  $END$
+ */

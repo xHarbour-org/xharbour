@@ -1,0 +1,823 @@
+/*
+ * $Id: rddord.txt,v 1.6 2000/11/02 22:33:00 lculik Exp $
+ */
+
+/*
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.harbour-project.org
+ *
+ * Copyright 1999 Luiz Rafael Culik <culik@sl.conex.net>
+ *    DB*() documentation
+ *    ORD*() documentation
+ *    RDD*() documentation
+ *
+ * See doc/license.txt for licensing terms.
+ *
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDBAGEXT()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Returns the Order Bag extension
+ *  $SYNTAX$
+ *      ORDBAGEXT() --> cBagExt        
+ *  $ARGUMENTS$
+ *      None 
+ *  $RETURNS$
+ *      <cBagExt> The Rdd extension name.
+ *  $DESCRIPTION$
+ *      This function return th character name of the RDD extension for
+ *      the order bag.This is determined by the active RDD for the selected
+ *      work area.
+ *
+ *      This function replaces the Indexord() function.
+ *  $EXAMPLES$
+ *      USE Tests NEW VIA "DBFNTX"
+ *      ? ORDBAGEXT()      //  Returns .ntx
+ *      DBCLOSEAREA()
+ *      USE Tests NEW VIA "DBFCDX"
+ *      ? ORDBAGEXT()      //  Returns .cdx
+ *      DBCLOSEAREA()
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *      This function is CA Clipper compliant
+ *  $PLATFORMS$
+ *      All   
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      INDEXEXT(),ORDBAGNAME()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDBAGNAME()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Returns the Order Bag Name.
+ *  $SYNTAX$
+ *      ORDBAGNAME(<nOrder> | <cOrderName>) --> cOrderBagName
+ *  $ARGUMENTS$
+ *     <nOrder> A numeric value representing the Order bag number.
+ *
+ *     <cOrderName> The character name of the Order Bag.
+ *  $RETURNS$
+ *      ORDBAGNAME() returns the Order bag name
+ *  $DESCRIPTION$
+ *      This function returns the name of the order bag for the specified
+ *      work area. If <nOrder> is specidied,it will represent the position
+ *      in the order list of the target order.If <cOrderName> is specified,
+ *      it will represent the name of the target order.In essence,it will
+ *      tell the name of the database (if That Rdd is in use) for a given
+ *      index name or index order number.If <cOrderName> is not specified
+ *      or <nOrder> is 0, the Current active order will be used.
+ *  $EXAMPLES$
+ *      USE Tests VIA "DBFCDX" NEW
+ *      Set index to TESTs
+ *      ORDBAGNAME( "TeName" )        // Returns: Customer
+ *      ORDBAGNAME( "TeLast" )        // Returns: Customer
+ *      ORDBAGNAME( "teZip" )         // Returns: Customer
+ *      Set Order to Tag TeName
+ *      ? OrderBagName() //Return Custumer
+ *  $TESTS$
+ *      See Examples
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *      This function is Ca-Clipper compliant
+ *  $PLATFORMS$
+ *      All   
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      INDEXORD(),ORDBAGEXT(),ALIAS()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDCONDSET()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Set the Condition and scope for an order
+ *  $SYNTAX$
+ *      ORDCONSET([<cForCondition>],
+ *        [<bForCondition>],
+ *        [<lAll>],
+ *        [<bWhileCondition>],
+ *        [<bEval>],
+ *        [<nInterval>],
+ *        [<nStart>],
+ *        [<nNext>],
+ *        [<nRecord>],
+ *        [<lRest>],
+ *        [<lDescend>],
+ *        [<lAdditive>],
+ *        [<lCurrent>],
+ *        [<lCustom>],
+ *        [<lNoOptimize>])
+ *  $ARGUMENTS$
+ *      <cForCondition> is a string that specifies the FOR condition for the
+ *   order.
+ *     <bForCondition> is a code block that defines a FOR condition that
+ *   each record within the scope must meet in order to be processed. If
+ *   a record does not meet the specified condition,it is ignored and the
+ *   next  record is processed.Duplicate keys values are not added to the
+ *   index file when a FOR condition is Used.
+ *  $RETURNS$
+ *
+ *  $DESCRIPTION$
+ *
+ *  $EXAMPLES$
+ *
+ *  $TESTS$
+ *
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *      ORDCONDSET() is CA-Clipper compliant
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDCREATE()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Create an Order in an Order Bag
+ *  $SYNTAX$
+ *      ORDCREATE(<cOrderBagName>,[<cOrderName>], <cExpKey>,
+ *      [<bExpKey>], [<lUnique>]) --> NIL
+ *  $ARGUMENTS$
+ *      <cOrderBagName>  Name of the file that contains one or more Orders.
+ *  
+ *      <cOrderName> Name of the order to be created.
+ *
+ *      <cExpKey> Key value for order for each record in the current work area
+ *
+ *      <bExpKey> Code block that evaluates to a key for the order for each
+ *      record in the work area.
+ *
+ *      <lUnique> Toggle the unique status of the index.
+ *  $RETURNS$
+ *      ORDCREATE() always returns NIL.
+ *  $DESCRIPTION$
+ *      This function creates an order for the current work area.It is
+ *      similar to the DBCREATEINDEX() except that this function allows
+ *      different orders based on the RDD in effect.The name of the file
+ *      <cOrderBagName> or the name of the order <cOrderName> are technically
+ *      both considered to be "optional" except that at least one of two
+ *      must exist in order to create the order.
+ *
+ *      The parameter <cExpKey> is the index key expression;typically in
+ *      a .DBF driver,the maximum length of the key is 255 characters.
+ *
+ *      If <bExpKey> is not specified,then the code block is create by
+ *      macro expanding the value of <cExpKey>.
+ *
+ *      If <lUnique> is not specified,then the current internal setting of
+ *      SET UNIQUE ON or OFF will be observed.
+ *
+ *      The active RDD driver determines the capacity in the order for a
+ *      specific order bag.
+ *
+ *      If the name <cOrderBagName> is found in the order bag can contain
+ *      a single order,the the name <cOrderBagName> is erased and a new
+ *      order is added to the order list in the current or specified work
+ *      area.On the other hand,if it can contain multiples tags and if
+ *      <cOrderBagName> does not already exist in the order list,then it is
+ *      added.It is does exist,then the <cOrderBagName> replaces the former
+ *      name in the order list in the current or specified work area.
+ *  $EXAMPLES$
+ *      USE TESTS VIA "DBFNDX" NEW
+ *      ORDCREATE( "FNAME",, "Tests->fName" )
+ *
+ *      USE TEsts VIA "DBFCDX" NEW
+ *      ORDCREATE( , "lName", "tests->lName" )
+ *  $TESTS$
+ *      See examples
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *      This function is Ca-Clipper compliant
+ *  $PLATFORMS$
+ *      All   
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      DBCREATEINDEX(),ORDNAME(),ORDSETFOCUS()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDDESTROY()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Remove an Order from an Order Bag
+ *  $SYNTAX$
+ *      ORDDESTROY(<cOrderName> [, <cOrderBagName> ]) --> NIL
+ *  $ARGUMENTS$
+ *      <cOrderName> Name of the order to remove
+ *
+ *      <cOrderBagName> Name of the order bag from which order id to be
+ *      removed
+ *  $RETURNS$
+ *      ORDDESTROY() always returns NIL.
+ *  $DESCRIPTION$
+ *      This function attempts to remove the order named <cOrderName> from the
+ *      file containing the order bag name <cOrderBagName>. If <cOrderBagName>
+ *      is not specified,then the name of the file will be based on the value
+ *      of the ORDNAME() function.If the extension is not included with the
+ *      name of the order file,then the extension will be obtained from the
+ *      default extension of the current and active RDD.
+ *
+ *      The DBFNTX driver do not support multiple order bags;therefore,there
+ *      cannot be an order to "destroy" from a bag.This function only works
+ *      for those drivers with support multiple orders bags (e.q. DBFCDX
+ *      and RDDADS drivers).
+ *  $EXAMPLES$
+ *      USE TEsts VIA "DBFCDX" NEW
+ *      ORDdestroy( "lName", "tests" )
+ *  $TESTS$
+ *      See examples
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *      This function is Ca-Clipper compliant
+ *  $PLATFORMS$
+ *      All   
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      ORDCREATE()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDFOR()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Return the FOR expression of an Order
+ *  $SYNTAX$
+ *      ORDFOR(<xOrder>[, <cOrderBagName>]) --> cForExp
+ *
+ *  $ARGUMENTS$
+ *      <xOrder>  It the name of the target order,or the numeric position
+ *      of the order.
+ *
+ *      <cOrderBagName> Name of the order bag.
+ *  $RETURNS$
+ *      ORDFOR() returns a expression containing the FOR condition for
+ *      an order.
+ *  $DESCRIPTION$
+ *      This function returns a character string that is the expression for
+ *      the FOR condition for the specified order.The order may be specified
+ *      if <xOrder> is the name of the order.However,<xOrder> may be an
+ *      numeric which represent the position in the order list of the desired
+ *      Order.
+ *  $EXAMPLES$
+ *      USE Tests NEW via _DBFCDX
+ *      INDEX ON  Tests->Id ;
+ *         TO  TESTS          ;
+ *         FOR Tests->Id > 100
+ *
+ *      ORDFOR( "Tests" )      // Returns: Tests->Id > 100
+ *  $TESTS$
+ *      See examples
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *      This function is Ca-Clipper compliant with one exception.
+ *      If the <xOrder> paramter is not specified or <xOrder> is 0, the current
+ *      active order is used.
+ *  $PLATFORMS$
+ *      All   
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      ORDKEY(),ORDCREATE(),ORDNAME(),ORDNUMBER()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDKEY()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Return the key expression of an Order
+ *  $SYNTAX$
+ *      ORDKEY(<cOrderName> | <nOrder> [, <cOrderBagName>]) --> cExpKey
+ *  $ARGUMENTS$
+ *      <xOrder>  It the name of the target order,or the numeric position
+ *      of the order.
+ *
+ *      <cOrderBagName> Name of the order bag.
+ *  $RETURNS$
+ *      <cExpKey> Returns a character string, cExpKey.
+ *  $DESCRIPTION$
+ *     ORDKEY() is an Order management function that returns a character
+ *   expression, cExpKey, that represents the key expression of the specified
+ *   Order.
+ *
+ *     You may specify the Order by name or with a number that represents its
+ *   position in the Order List.  Using the Order name is the preferred
+ *   method.
+ *
+ *     The active RDD determines the Order capacity of an Order Bag.  The
+ *   default DBFNTX and the DBFNDX drivers only support single-Order Bags,
+ *   while other RDDs may support multiple-Order Bags (e.g., the DBFCDX and
+ *   DBFMDX drivers).
+ *  $EXAMPLES$
+ *      USE Customer NEW via _DBFCDX
+ *      INDEX ON  Customer->Acct  ;
+ *         TO  Customer           ;
+ *         FOR Customer->Acct > "AZZZZZ"
+ *      Index on Custumer->Id to Cusid
+ *      
+ *      ORDKEY( "Customer" )      // Returns: Customer->Acct
+ *      Set order to 2
+ *      ORDKEY()                  // Returns: Custumer->Id
+ *      
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *      This function is Ca-Clipper compliant with one exception.
+ *      If the <xOrder> paramter is not specified or <xOrder> is 0, the current
+ *      active order is used.
+ *  $PLATFORMS$
+ *      All   
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      ORDFOR(),ORDNAME(),ORDNUMBER(),ORDKEY()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDLISTADD()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Add Orders to the Order List
+ *  $SYNTAX$
+ *     ORDLISTADD(<cOrderBagName>
+ *      [, <cOrderName>]) --> NIL
+ *  $ARGUMENTS$
+ *     <cOrderBagName> is the name of a disk file containing one or more
+ *   Orders.  You may specify <cOrderBagName> as the filename with or without
+ *   the pathname or appropriate extension.  If you do not include the
+ *   extension as part of <cOrderBagName> HARBOUR uses the default
+ *   extension of the current RDD.
+ *
+ *     <cOrderName> the name of the specific Order from the Order Bag to be
+ *   added to the Order List of the current work area.  If you do not specify
+ *   <cOrderName>, all orders in the Order Bag are added to the Order List of
+ *   the current work area.
+ *  $RETURNS$
+ *      ORDLISTADD() always returns NIL.
+ *  $DESCRIPTION$
+ *     ORDLISTADD() is an Order management function that adds the contents of
+ *   an Order Bag , or a single Order in an Order Bag, to the Order List.
+ *   This function lets you extend the Order List without issuing a SET INDEX
+ *   command that, first, clears all the active Orders from the Order List.
+ *
+ *     Any Orders already associated with the work area continue to be active.
+ *   If the newly opened Order Bag contains the only Order associated with
+ *   the work area, it becomes the controlling Order; otherwise, the
+ *   controlling Order remains unchanged.
+ *
+ *     After the new Orders are opened, the work area is positioned to the
+ *   first logical record in the controlling Order.
+ *
+ *     ORDLISTADD() is similar to the SET INDEX command or the INDEX clause of
+ *   the USE command, except that it does not clear the Order List prior to
+ *   adding the new order(s).
+ *
+ *     ORDLISTADD() supersedes the DBSETINDEX() function.
+ *
+ *     The active RDD determines the Order capacity of an Order Bag.  The
+ *   default  DBFNTX and the DBFNDX drivers only support single-Order Bags,
+ *   while other RDDs may support multiple-Order Bags (e.g., the DBFCDX and
+ *   DBPX drivers).  When using RDDs that support multiple Order Bags, you
+ *   must explicitly SET ORDER (or ORDSETFOCUS()) to the desired controlling
+ *   Order.  If you do not specify a controlling Order, the data file will be
+ *   viewed in natural Order.
+ *  $EXAMPLES$
+ *     In this example Customer.cdx contains three orders, CuAcct,
+ *      CuName, and CuZip.  ORDLISTADD() opens Customer.cdx but only uses the
+ *      order named CuAcct:
+ *
+ *      USE Customer VIA "DBFCDX" NEW
+ *      ORDLISTADD( "Customer", "CuAcct" )
+ *  $TESTS$
+ *
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *
+ *  $PLATFORMS$
+ *      All   
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      DBSETINDEX()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDLISTCLEAR()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Clear the current Order List
+ *  $SYNTAX$
+ *      ORDLISTCLEAR() --> NIL
+ *  $ARGUMENTS$
+ *
+ *  $RETURNS$
+ *      ORDLISTCLEAR() always returns NIL.
+ *  $DESCRIPTION$
+ *     ORDLISTCLEAR() is an Order management function that removes all Orders
+ *   from the Order List for the current or aliased work area.  When you are
+ *   done, the Order List is empty.
+ *
+ *    This function supersedes the function DBCLEARINDEX().
+ *
+ *  $EXAMPLES$
+ *   USE Sales NEW
+ *   SET INDEX TO SaRegion, SaRep, SaCode
+ *   .
+ *   . < statements >
+ *   .
+ *   ORDLISTCLEAR()      // Closes all the current indexes
+ *  $TESTS$
+ *
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *
+ *  $PLATFORMS$
+ *      All   
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *    DBCLEARINDEX()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDLISTREBUILD()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Rebuild all Orders in the Order List of the current work area
+ *  $SYNTAX$
+ *      ORDLISTREBUILD() --> NIL
+ *  $ARGUMENTS$
+ *
+ *  $RETURNS$
+ *      ORDLISTREBUILD() always returns NIL.
+ *  $DESCRIPTION$
+ *     ORDLISTREBUILD() is an Order management function that rebuilds all the
+ *   orders in the current or aliased Order List.
+ *
+ *     To only rebuild a single Order use the function ORDCREATE().
+ *
+ *     Unlike ORDCREATE(), this function rebuilds all Orders in the Order List.
+ *   It is equivalent to REINDEX.
+ *
+ *  $EXAMPLES$
+ *   USE Customer NEW
+ *   SET INDEX TO CuAcct, CuName, CuZip
+ *   ORDLISTREBUILD()     // Causes CuAcct, CuName, CuZip to
+ *                        // be rebuilt
+ *
+ *  $TESTS$
+ *
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *
+ *  $PLATFORMS$
+ *      All   
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      ORDCREATE()
+ *
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDNAME()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Return the name of an Order in the Order List
+ *  $SYNTAX$
+ *      ORDNAME(<nOrder>[,<cOrderBagName> --> cOrderName
+ *  $ARGUMENTS$
+ *     <nOrder> is an integer that identifies the position in the Order
+ *   List of the target Order whose database name is sought.
+ *
+ *     <cOrderBagName> is the name of a disk file containing one or more
+ *   Orders.  You may specify <cOrderBagName> as the filename with or without
+ *   the pathname or appropriate extension.  If you do not include the
+ *   extension as part of <xcOrderBagName> HARBOUR uses the default
+ *   extension of the current RDD.
+ *  $RETURNS$
+ *      ORDNAME() returns the name of the specified Order in the current Order
+ *      List or the specified Order Bag if opened in the Current Order list.
+ *  $DESCRIPTION$
+ *     ORDNAME() is an Order management function that returns the name of the
+ *   specified Order in the current Order List.
+ *
+ *     If <cOrderBagName> is an Order Bag that has been emptied into the
+ *   current Order List, only those Orders in the Order List that correspond
+ *   to <cOrderBagName> Order Bag are searched.
+ *
+ *     The active RDD determines the Order capacity of an Order Bag.  The
+ *   default DBFNTX and the DBFNDX drivers only support single-Order Bags,
+ *   while other RDDs may support multiple-Order Bags (e.g., the DBFCDX and
+ *   DBPX drivers).
+ *  $EXAMPLES$
+ *     This example retrieves the name of an Order using its position
+ *      in the order list:
+ *
+ *      USE Customer NEW
+ *      SET INDEX TO CuAcct, CuName, CuZip
+ *      ORDNAME( 2 )                        // Returns: CuName
+ *
+ *     This example retrieves the name of an Order given its position
+ *      within a specific Order Bag in the Order List:
+ *
+ *      USE Customer NEW
+ *      SET INDEX TO Temp, Customer
+ *      // Assume Customer contains CuAcct, CuName, CuZip
+ *      ORDNAME( 2, "Customer" )            // Returns: CuName
+ *  $TESTS$
+ *
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *
+ *  $PLATFORMS$
+ *      All   
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      ORDFOR(),ORDKEY(),ORDNUMBER()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDNUMBER()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Return the position of an Order in the current Order List
+ *  $SYNTAX$
+ *      ORDNUMBER(<cOrderName> [, <cOrderBagName>]) --> nOrderNo
+ *  $ARGUMENTS$
+ *      <cOrderName> the name of the specific Order whose position in the
+ *      Order List is sought.
+ *
+ *      <cOrderBagName> is the name of a disk file containing one or more
+ *      Orders.  You may specify <cOrderBagName> as the filename with or without
+ *      the pathname or appropriate extension.  If you do not include the
+ *      extension as part of <cOrderBagName> HARBOUR uses the default
+ *      extension of the current RDD.
+ *  $RETURNS$
+ *     Returns nOrderNo, an integer that represents the position of the
+ *   specified Order in the Order List.
+ *  $DESCRIPTION$
+ *     ORDNUMBER() is an Order management function that lets you determine the
+ *   position in the current Order List of the specified Order.  ORDNUMBER()
+ *   searches the Order List in the current work area and returns the
+ *   position of the first Order that matches <cOrderName>.    If
+ *   <cOrderBagName> is the name of an Order Bag newly emptied into the
+ *   current Order List, only those orders in the Order List that have been
+ *   emptied from <cOrderBagName> are searched.
+ *
+ *     If <cOrderName> is not found ORDNUMBER() raises a recoverable runtime
+ *   error.
+ *
+ *     The active RDD determines the Order capacity of an Order Bag.  The
+ *   default DBFNTX driver only supports single-Order Bags, while other RDDs
+ *   may support multiple-Order Bags (e.g., the DBFCDX and DBPX drivers).
+ *  $EXAMPLES$
+ *   USE Customer VIA "DBFNTX" NEW
+ *   SET INDEX TO CuAcct, CuName, CuZip
+ *   ORDNUMBER( "CuName" )            // Returns: 2
+ *  $TESTS$
+ *
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *
+ *  $PLATFORMS$
+ *      All   
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      INDEXORD()
+ *
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ORDSETFOCUS()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Set focus to an Order in an Order List
+ *  $SYNTAX$
+ *     ORDSETFOCUS([<cOrderName> | <nOrder>]
+ *      [,<cOrderBagName>]) --> cPrevOrderNameInFocus
+ *
+ *  $ARGUMENTS$
+ *     <cOrderName> is the name of the selected Order, a logical ordering
+ *   of a database.  ORDSETFOCUS() ignores any invalid values of
+ *   <cOrderName>.
+ *
+ *     <nOrder> is a number representing the position in the Order List of
+ *   the selected Order.
+ *
+ *     <cOrderBagName> is the name of a disk file containing one or more
+ *   Orders.  You may specify <cOrderBagName> as the filename with or without
+ *   the pathname or appropriate extension.  If you do not include the
+ *   extension as part of <cOrderBagName> HARBOUR uses the default
+ *   extension of the current RDD.
+ *  $RETURNS$
+ *      ORDSETFOCUS() returns the Order Name of the previous controlling Order.
+ *  $DESCRIPTION$
+ *     ORDSETFOCUS() is an Order management function that returns the Order
+ *   Name of the previous controlling Order and optionally sets the focus to
+ *   an new Order.
+ *
+ *     If you do not specify <cOrderName> or <nOrder>, the name of the
+ *   currently controlling order is returned and the controlling order
+ *   remains unchanged.
+ *
+ *     All Orders in an Order List are properly updated no matter what
+ *   <cOrderName> is the controlling Order.  After a change of controlling
+ *   Orders, the record pointer still points to the same record.
+ *
+ *     The active RDD determines the Order capacity of an Order Bag.  The
+ *   default DBFNTX driver only supports single-Order Bags, while other RDDs
+ *   may support multiple-Order Bags (e.g., the DBFCDX and DBPX drivers).
+ *
+ *     ORDSETFOCUS() supersedes INDEXORD().
+ *  $EXAMPLES$
+ *
+ *   USE Customer VIA "DBFNTX" NEW
+ *   SET INDEX TO CuAcct, CuName, CuZip
+ *   ? ORDSETFOCUS( "CuName" )        // Displays: "CuAcct"
+ *   ? ORDSETFOCUS()                  // Displays: "CuName"
+ *  $TESTS$
+ *
+ *  $STATUS$
+ *      S
+ *  $COMPLIANCE$
+ *
+ *  $PLATFORMS$
+ *      All   
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      INDEXEXT()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Returns the file extension of the index module used in an application
+ *  $SYNTAX$
+ *      INDEXEXT() --> <cExtension>
+ *  $ARGUMENTS$
+ *      None.
+ *  $RETURNS$
+ *      <cExtension>   Current driver file extension
+ *  $DESCRIPTION$
+ *      This function returns a string that tells what indexes are to be used
+ *      or will be created in the compiled application.The default value is
+ *      ".NTX". This is controled by the particular database driver that is
+ *      linked with the application,.
+ *  $EXAMPLES$
+ *      IF INDEXEXT()==".NTX"
+ *          ? "Current driver being used is DBFNTX"
+ *      Endif
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is Ca-Clipper compliant
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      INDEXKEY(),INDEXORD()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      INDEXKEY()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Yields the key expression of a specified index file.
+ *  $SYNTAX$
+ *      INDEXKEY(<nOrder>) --> <cIndexKey>
+ *  $ARGUMENTS$
+ *      <nOrder>  Index order number
+ *  $RETURNS$
+ *      <cIndexKey>   The index key
+ *  $DESCRIPTION$
+ *      This function returns a character string stored in the header of the
+ *      index file
+ *  
+ *      The index key is displayed for an index file that is designated by
+ *      <nOrder>,its position in the USE...INDEX or SET INDEX TO command in
+ *      the currently selected or designated work area.If there is no
+ *      corresnponding index key at the specified order position,a NULL
+ *      byte will be returned.
+ *  $EXAMPLES$
+ *      USE TESTS NEW INDEX TEST1
+ *      ? INDEXKEY(1)
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is Ca-Clipper compliant
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      INDEXORD()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      INDEXORD()
+ *  $CATEGORY$
+ *      Database
+ *  $ONELINER$
+ *      Returns the numeric position of the controlling index.
+ *  $SYNTAX$
+ *      INDEXORD() --> <nPosition>
+ *  $ARGUMENTS$
+ *      None.
+ *  $RETURNS$
+ *      <nPosition>   Ordinal position of a controling index
+ *  $DESCRIPTION$
+ *      The INDEXORD() function returns the numeric position of the current
+ *      controlling index in the selected or designated work area.
+ *      A returned value of 0 indicated that no active index is controlling
+ *      the database,which therefore is in the natural order.
+ *  $EXAMPLES$
+ *      USE TESTS NEW INDEX TEST1
+ *      IF INDEXORD()>0
+ *          ? "Current order is ",INDEXORD()
+ *      Endif
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is Ca-Clipper compliant
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Library is rdd
+ *  $SEEALSO$
+ *      INDEXKEY()
+ *  $END$
+ */

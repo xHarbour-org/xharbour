@@ -1,0 +1,17 @@
+#
+# $Id: dir.cf,v 1.6 2000/02/14 16:19:50 vszel Exp $
+#
+
+ifneq ($(HB_ARCHITECTURE),)
+ifneq ($(HB_COMPILER),)
+
+include $(TOP)$(ROOT)config/global.cf
+include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/dir.cf
+
+all : first
+
+first clean install::
+	$(DIR_RULE)
+
+endif
+endif

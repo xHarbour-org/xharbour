@@ -1,0 +1,25 @@
+#
+# $Id: global.cf,v 1.11 1999/10/10 11:34:57 bcantero Exp $
+#
+
+GRANDP = ../../
+ARCH := $(HB_ARCHITECTURE)/$(HB_COMPILER)
+
+HB_DB_DRIVERS=\
+	nulsys \
+	dbfntx \
+	dbfcdx \
+
+ifeq ($(HB_BIN_COMPILE),)
+HB_BIN_COMPILE := $(TOP)$(ROOT)source/compiler/$(ARCH)
+endif
+
+ifeq ($(HB_INC_COMPILE),)
+HB_INC_COMPILE := $(TOP)$(ROOT)include
+endif
+
+ifeq ($(HB_LIB_COMPILE),)
+HB_LIB_COMPILE :=
+endif
+
+include $(TOP)$(ROOT)config/$(ARCH).cf
