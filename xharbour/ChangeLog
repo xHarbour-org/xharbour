@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.8 2001/12/31 10:29:40 lculik Exp $
+ * $Id: ChangeLog,v 1.9 2002/01/02 04:40:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-01-03 00:40 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+   * include/hbfsapi.h
+     * under Win32 FHANDLE is typedef to long
+   * source/rtl/filesys.c
+     * Replaced all X__WIN32__ with __WIN32__
+     * hb_fscommit() now used true Win32 Api calls
+     * No more file limit on Win32  
+
+2002-01-02 07:45 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+   * utils/hbmake/hbmake.prg
+     * updated the date
+   * utils/hbmake/hbmutils.prg
+    * Sinc with harbour
 
 2002-01-01 20:29 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/source/vm/fastitem.c
