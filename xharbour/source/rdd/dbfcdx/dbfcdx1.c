@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.137 2004/05/24 13:45:56 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.138 2004/05/24 20:20:25 druzus Exp $
  */
 
 /*
@@ -55,9 +55,6 @@
  */
 
 #define HB_CDX_CLIP_AUTOPEN
-//#if defined( HB_THREAD_SUPPORT ) || defined( __WATCOMC__ )
-#define HB_CDX_THREAD_SORT
-//#endif
 
 #define HB_CDX_DBGCODE
 //#define HB_CDX_DBGCODE_EXT
@@ -1655,8 +1652,8 @@ static void hb_cdxPageCheckDupTrl( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys 
          {
             printf( "\r\nikey=%d, iKeys=%d, K=%d, ulRecPrev=%ld, ulRec=%ld",
                     iKey, iKeys, K,
-                    HB_GET_LE_UINT32( &pKeyBuf[ iPos + iNum - iLen ] ),
-                    HB_GET_LE_UINT32( &pKeyBuf[ iPos + iNum ] ) );
+                    (ULONG) HB_GET_LE_UINT32( &pKeyBuf[ iPos + iNum - iLen ] ),
+                    (ULONG) HB_GET_LE_UINT32( &pKeyBuf[ iPos + iNum ] ) );
             printf( "\r\npbValPrev=[%s] pbVal=[%s], [%d], pKeyBuf=%p",
                     &pKeyBuf[ iPos - iLen ], &pKeyBuf[ iPos ],
                     memcmp( &pKeyBuf[ iPos - iLen ], &pKeyBuf[ iPos ], iNum ),
@@ -1931,7 +1928,7 @@ static int hb_cdxPageLeafDelKey( LPCDXPAGE pPage )
 #ifdef HB_CDX_DSPDBG_INFO
    printf("\r\ndelkey: Page=%lx, iKey=%d/%d, rec=%ld",
           pPage->Page, iKey, pPage->iKeys,
-          HB_GET_LE_UINT32( &pPage->pKeyBuf[ ( iKey + 1 ) * iLen - 6 ] ));
+          (ULONG) HB_GET_LE_UINT32( &pPage->pKeyBuf[ ( iKey + 1 ) * iLen - 6 ] ));
    fflush(stdout);
 #endif
    iSpc = pPage->ReqByte + pPage->TagParent->uiLen -
@@ -2144,7 +2141,7 @@ static void hb_cdxPageIntDelKey( LPCDXPAGE pPage, SHORT iKey )
 #ifdef HB_CDX_DSPDBG_INFO
    printf("\r\nintDelKey: Page=%lx, iKey=%d/%d, ulPag=%lx",
           pPage->Page, iKey, pPage->iKeys,
-          HB_GET_BE_UINT32( &pPage->node.intNode.keyPool[ (iKey+1) * iLen - 4 ] ) );
+          (ULONG) HB_GET_BE_UINT32( &pPage->node.intNode.keyPool[ (iKey+1) * iLen - 4 ] ) );
    fflush(stdout);
 #endif
 #ifdef HB_CDX_DBGCODE
@@ -2636,7 +2633,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
                /* TODO: iBufSize to avoid new allocation if old buffer is large enough */
 #ifdef HB_CDX_DSPDBG_INFO
                printf("\r\ninserting #keys=%d/%d (%d) parent=%lx, child=%lx, rec=%ld",
-                      iKeys, lpTmpPage->iKeys, i, pPage->Page, lpTmpPage->Page, HB_GET_LE_UINT32( pPtr + iLen - 6 ));
+                      iKeys, lpTmpPage->iKeys, i, pPage->Page, lpTmpPage->Page, (ULONG) HB_GET_LE_UINT32( pPtr + iLen - 6 ));
                fflush(stdout);
 #endif
                if ( iBufSize >= iKeys + lpTmpPage->iKeys )
@@ -2937,7 +2934,7 @@ static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, int iChildRet )
 #else
    iDiv = iMax - iMin;
 #endif
-   if ( iDiv >= 2 || fForce )
+   if ( iKeys > 0 && ( iDiv >= 2 || fForce ) )
    {
 #if 1
       if ( iBlncKeys == 1 && iKeys > pPage->TagParent->MaxKeys &&
@@ -2954,16 +2951,16 @@ static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, int iChildRet )
       else
 #endif
       {
-         iMax = ( iKeys + iNeedKeys - 1 ) / iNeedKeys;
          iMin = HB_MAX( iKeys / iNeedKeys, 1 );
+         iMax = HB_MAX( ( iKeys + iNeedKeys - 1 ) / iNeedKeys, iMin );
          for ( i = iBlncKeys - 1; i > 1 &&
                   childs[i]->iKeys >= iMin && childs[i]->iKeys <= iMax; i-- )
          {
             iKeys -= childs[i]->iKeys;
             hb_cdxPageFree( childs[i], FALSE );
             iBlncKeys--;
-            iMax = ( iKeys + iNeedKeys - 1 ) / iNeedKeys;
             iMin = HB_MAX( iKeys / iNeedKeys, 1 );
+            iMax = HB_MAX( ( iKeys + iNeedKeys - 1 ) / iNeedKeys, iMin );
          }
          while ( iBlncKeys > 2 && childs[0]->iKeys >= iMin && childs[0]->iKeys <= iMax )
          {
@@ -2975,8 +2972,8 @@ static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, int iChildRet )
             {
                childs[i] = childs[i+1];
             }
-            iMax = ( iKeys + iNeedKeys - 1 ) / iNeedKeys;
             iMin = HB_MAX( iKeys / iNeedKeys, 1 );
+            iMax = HB_MAX( ( iKeys + iNeedKeys - 1 ) / iNeedKeys, iMin );
          }
       }
    }
@@ -7275,47 +7272,6 @@ static ERRCODE hb_cdxSetScope( CDXAREAP pArea, LPDBORDSCOPEINFO sInfo )
 
 /* ######################################################################### */
 
-#ifndef HB_CDX_THREAD_SORT
-
-static LPCDXSORTINFO s_cdxSort;
-
-static int hb_cdxSortCompare( const void * pKey1, const void * pKey2 )
-{
-   int i, iLen = s_cdxSort->keyLen;
-
-   i = hb_cdxValCompare( s_cdxSort->pTag, ( BYTE * ) pKey1, iLen,
-                                          ( BYTE * ) pKey2, iLen, TRUE );
-   if ( i == 0 )
-   {
-      i = ( HB_GET_LE_UINT32( ( BYTE * ) pKey1 + iLen ) < 
-            HB_GET_LE_UINT32( ( BYTE * ) pKey2 + iLen ) ) ? -1 : 1;
-   }
-   return i;
-}
-
-static void hb_cdxSortSortPage( LPCDXSORTINFO pSort )
-{
-   /*
-    * Warning!!! it's not thread safe but I intentionally decide to use qsort
-    * because it could be highly optimized for used platform by compiler
-    * It's quite possible that the core part of qsort will be written in
-    * assembler or use some system hacks.
-    * but honestly I have to say that the quick sort algorithm below gives
-    * similar results on Linux. I'm interesting in test results on other
-    * platforms.
-    */
-#ifdef HB_CDX_DBGTIME
-   cdxTimeIdxBld -= hb_cdxGetTime();
-#endif
-   s_cdxSort = pSort;
-   qsort( pSort->pKeyPool, pSort->ulKeys, pSort->keyLen + 4, hb_cdxSortCompare );
-#ifdef HB_CDX_DBGTIME
-   cdxTimeIdxBld += hb_cdxGetTime();
-#endif
-}
-
-#else
-
 static int hb_cdxQuickSortCompare( LPCDXSORTINFO pSort, BYTE * pKey1, BYTE * pKey2 )
 {
    int i, iLen = pSort->keyLen;
@@ -7330,9 +7286,6 @@ static int hb_cdxQuickSortCompare( LPCDXSORTINFO pSort, BYTE * pKey1, BYTE * pKe
    return i;
 }
 
-#define HB_CDX_SORT_OPT
-
-#ifdef HB_CDX_SORT_OPT
 static BOOL hb_cdxQSort( LPCDXSORTINFO pSort, BYTE * pSrc, BYTE * pBuf, LONG lKeys )
 {
    if ( lKeys > 1 )
@@ -7390,161 +7343,6 @@ static BOOL hb_cdxQSort( LPCDXSORTINFO pSort, BYTE * pSrc, BYTE * pBuf, LONG lKe
    }
    return TRUE;
 }
-#else
-static void hb_cdxQSort( LPCDXSORTINFO pSort, BYTE * pSrc, BYTE * pBuf, LONG lKeys )
-{
-   if ( lKeys > 1 )
-   {
-      int iLen = pSort->keyLen + 4;
-      LONG l1, l2;
-      BYTE * pPtr1, * pPtr2, *pDst;
-
-      l1 = lKeys >> 1;
-      l2 = lKeys - l1;
-      pPtr1 = &pSrc[ 0 ];
-      pPtr2 = &pSrc[ l1 * iLen ];
-
-      hb_cdxQSort( pSort, pPtr1, &pBuf[ 0 ], l1 );
-      hb_cdxQSort( pSort, pPtr2, &pBuf[ l1 * iLen ], l2 );
-      pDst = pBuf;
-      while ( l1 > 0 && l2 > 0 )
-      {
-         if ( hb_cdxQuickSortCompare( pSort, pPtr1, pPtr2 ) < 0 )
-         {
-            memcpy( pDst, pPtr1, iLen );
-            pPtr1 += iLen;
-            l1--;
-         }
-         else
-         {
-            memcpy( pDst, pPtr2, iLen );
-            pPtr2 += iLen;
-            l2--;
-         }
-         pDst += iLen;
-      }
-      if ( l1 > 0 )
-      {
-         memcpy( pDst, pPtr1, iLen * l1 );
-      }
-      else if ( l2 > 0 )
-      {
-         memcpy( pDst, pPtr2, iLen * l2 );
-      }
-      memcpy( pSrc, pBuf, iLen * lKeys );
-   }
-}
-#endif
-
-#if 0
-static LONG hb_cdxQuickSortSegment( LPCDXSORTINFO pSort, LONG lFrom, LONG lTo )
-{
-   LONG i, j, m;
-   BYTE pTmp[ CDX_MAXKEY + 4 ], *pMid, *pBuf = pSort->pKeyPool;
-   int iItmLen = pSort->keyLen + 4, iFind = 0;
-
-   m = lFrom + ( ( lTo - lFrom ) >> 1 );
-   pMid = &pBuf[ iItmLen * m ];
-   i = lFrom;
-   j = lTo;
-
-   while( i < j && ( i == m || hb_cdxQuickSortCompare( pSort, &pBuf[ iItmLen * i ], pMid ) < 0 ) )
-   {
-      i++;
-   }
-   while( i < j && ( j == m || hb_cdxQuickSortCompare( pSort, pMid, &pBuf[ iItmLen * j ] ) < 0 ) )
-   {
-      j--;
-   }
-   if ( i < j )
-   {
-      iFind = -1;
-      memcpy( pTmp, &pBuf[ iItmLen * i ], iItmLen );
-      do
-      {
-         if ( iFind < 0 )
-         {
-            iFind = 1;
-            memcpy( &pBuf[ iItmLen * i ], &pBuf[ iItmLen * j ], iItmLen );
-            i++;
-            while( i < j && ( i == m || hb_cdxQuickSortCompare( pSort, &pBuf[ iItmLen * i ], pMid ) < 0 ) )
-            {
-               i++;
-            }
-         }
-         else
-         {
-            iFind = -1;
-            memcpy( &pBuf[ iItmLen * j ], &pBuf[ iItmLen * i ], iItmLen );
-            j--;
-            while( i < j && ( j == m || hb_cdxQuickSortCompare( pSort, pMid, &pBuf[ iItmLen * j ] ) < 0 ) )
-            {
-               j--;
-            }
-         }
-      }
-      while ( i < j );
-
-      if ( m > j )
-      {
-         memcpy( &pBuf[ iItmLen * j ], &pBuf[ iItmLen * m ], iItmLen );
-         memcpy( &pBuf[ iItmLen * m ], pTmp, iItmLen );
-         m = j;
-      }
-      else
-      {
-         memcpy( &pBuf[ iItmLen * j ], pTmp, iItmLen );
-         j--;
-      }
-   }
-   else if ( j > m )
-   {
-      if ( hb_cdxQuickSortCompare( pSort, pMid, &pBuf[ iItmLen * j ] ) < 0 )
-      {
-         j--;
-      }
-   }
-   else if ( j < m )
-   {
-      if ( hb_cdxQuickSortCompare( pSort, &pBuf[ iItmLen * j ], pMid ) < 0 )
-      {
-         j++;
-      }
-   }
-
-   if ( j != m )
-   {
-      memcpy( pTmp, &pBuf[ iItmLen * j ], iItmLen );
-      memcpy( &pBuf[ iItmLen * j ], &pBuf[ iItmLen * m ], iItmLen );
-      memcpy( &pBuf[ iItmLen * m ], pTmp, iItmLen );
-   }
-
-   return j;
-}
-
-static void hb_cdxQuickSort( LPCDXSORTINFO pSort, LONG lFrom, LONG lTo )
-{
-   LONG lMiddle;
-
-   while( lFrom < lTo )
-   {
-      /* partition into two segments */
-      lMiddle = hb_cdxQuickSortSegment( pSort, lFrom, lTo );
-
-      /* sort the smallest partition to minimize stack requirements */
-      if( lMiddle - lFrom <= lTo - lMiddle )
-      {
-         hb_cdxQuickSort( pSort, lFrom, lMiddle - 1 );
-         lFrom = lMiddle + 1;
-      }
-      else
-      {
-         hb_cdxQuickSort( pSort, lMiddle + 1, lTo );
-         lTo = lMiddle - 1;
-      }
-   }
-}
-#endif
 
 static void hb_cdxSortSortPage( LPCDXSORTINFO pSort )
 {
@@ -7552,20 +7350,14 @@ static void hb_cdxSortSortPage( LPCDXSORTINFO pSort )
    cdxTimeIdxBld -= hb_cdxGetTime();
 #endif
    //hb_cdxQuickSort( pSort, 0, pSort->ulKeys - 1 );
-#ifdef HB_CDX_SORT_OPT
    if ( !hb_cdxQSort( pSort, pSort->pKeyPool, &pSort->pKeyPool[ pSort->ulKeys * ( pSort->keyLen + 4 ) ], pSort->ulKeys ) )
    {
       memcpy( pSort->pKeyPool, &pSort->pKeyPool[ pSort->ulKeys * ( pSort->keyLen + 4 ) ], pSort->ulKeys * ( pSort->keyLen + 4 ) );
    }
-#else
-   hb_cdxQSort( pSort, pSort->pKeyPool, &pSort->pKeyPool[ pSort->ulKeys * ( pSort->keyLen + 4 ) ], pSort->ulKeys );
-#endif
 #ifdef HB_CDX_DBGTIME
    cdxTimeIdxBld += hb_cdxGetTime();
 #endif
 }
-
-#endif
 
 static void hb_cdxSortAddNodeKey( LPCDXSORTINFO pSort, int iLevel, BYTE *pKeyVal, ULONG ulRec, ULONG ulPage )
 {
