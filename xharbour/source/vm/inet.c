@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.31 2003/07/14 19:18:47 jonnymind Exp $
+* $Id: inet.c,v 1.32 2003/07/15 09:15:34 andijahja Exp $
 */
 
 /*
@@ -1118,20 +1118,23 @@ HB_FUNC( INETRECVLINE )
 HB_FUNC( INETRECVENDBLOCK )
 {
    PHB_ITEM pSocket     = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pProto      = hb_param( 2, HB_IT_STRING );
+   PHB_ITEM pProto, pProtoOpt;
    PHB_ITEM pResult     = hb_param( 3, HB_IT_BYREF );
    PHB_ITEM pMaxSize    = hb_param( 4, HB_IT_NUMERIC );
    PHB_ITEM pBufferSize = hb_param( 5, HB_IT_NUMERIC );
 
    char cChar;
    char *Buffer;
-   char *Proto;
-   int iProtoSize;
+   char **Proto;
    int iAllocated, iBufferSize, iMax;
    int iLen;
    int iPos = 0;
    int iPosProto;
    int iTimeElapsed = 0;
+   int iprotos;
+   int i;
+   int *iprotosize;
+   int ifindproto = 0;
    BOOL bProtoFound;
 
    HB_SOCKET_STRUCT *Socket;
@@ -1144,15 +1147,49 @@ HB_FUNC( INETRECVENDBLOCK )
       return;
    }
 
-   if( pProto )
+   if( ISARRAY( 2 ) || ISCHAR( 2 ) )
    {
-      iProtoSize = pProto->item.asString.length;
-      Proto = (char *) pProto->item.asString.value;
+      if( ISARRAY( 2 ) )
+      {
+         pProto  = hb_param( 2, HB_IT_ARRAY );
+         iprotos = (int) pProto->item.asArray.value->ulLen;
+
+         if( iprotos <= 0 )
+         {
+            PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+            hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETRECVENDBLOCK", 1, pArgs );
+            hb_itemRelease( pArgs );
+            return;
+         }
+
+         Proto   = (char**) hb_xgrab( sizeof(char*) * iprotos );
+         iprotosize = (int *) hb_xgrab( sizeof(int) * iprotos );
+
+         for(i=0;i<iprotos;i++)
+         {
+            pProtoOpt     = hb_itemArrayGet( pProto, i+1 );
+            Proto[i]      = (char *) pProtoOpt->item.asString.value;
+            iprotosize[i] = pProtoOpt->item.asString.length;
+            hb_itemRelease( pProtoOpt );
+         }
+      }
+      else
+      {
+         pProto        = hb_param( 2, HB_IT_STRING );
+         Proto         = (char**) hb_xgrab( sizeof(char*) );
+         iprotosize    = (int *) hb_xgrab( sizeof(int) );
+         Proto[0]      = (char *) pProto->item.asString.value;
+         iprotosize[0] = pProto->item.asString.length;
+         iprotos       = 1;
+      }
    }
    else
    {
-      Proto = (char *) "\r\n";
-      iProtoSize = 2;
+      Proto         = (char**) hb_xgrab( sizeof(char*) );
+      iprotosize    = (int *) hb_xgrab( sizeof(int) );
+      Proto[0]      = (char *) "\r\n";
+      iprotos       = 1;
+      iprotosize[0] = 2;
    }
 
    if( pBufferSize )
@@ -1175,12 +1212,10 @@ HB_FUNC( INETRECVENDBLOCK )
 
    Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
 
-
    HB_SOCKET_ZERO_ERROR( Socket );
 
    Buffer = (char *) hb_xgrab( iBufferSize );
    iAllocated = iBufferSize;
-
 
    do
    {
@@ -1208,7 +1243,7 @@ HB_FUNC( INETRECVENDBLOCK )
          if ( Socket->caPeriodic != NULL )
          {
             hb_execFromArray( Socket->caPeriodic );
-            // do we continue?
+
             if ( hb_itemGetL( &HB_VM_STACK.Return ) &&
                (Socket->timelimit == -1 || iTimeElapsed < Socket->timelimit ))
             {
@@ -1221,20 +1256,31 @@ HB_FUNC( INETRECVENDBLOCK )
 
       if( iLen > 0 )
       {
-         if( cChar == Proto[iProtoSize - 1] && iProtoSize <= iPos )
+         int protos;
+         bProtoFound = 0;
+         for( protos=0;protos < iprotos;protos++)
          {
-            bProtoFound = 1;
-            for(iPosProto=0; iPosProto < (iProtoSize-1); iPosProto++)
+            if( cChar == Proto[protos][iprotosize[protos]-1] && iprotosize[protos] <= iPos )
             {
-               if(Proto[iPosProto] != Buffer[ (iPos-iProtoSize)+iPosProto+1 ])
+               bProtoFound = 1;
+               for(iPosProto=0; iPosProto < (iprotosize[protos]-1); iPosProto++)
                {
-                  bProtoFound = 0;
+                  if(Proto[protos][iPosProto] != Buffer[ (iPos-iprotosize[protos])+iPosProto+1 ])
+                  {
+                     bProtoFound = 0;
+                     break;
+                  }
+               }
+               if(bProtoFound)
+               {
+                  ifindproto = protos;
                   break;
                }
             }
-            if(bProtoFound)
-               break;
          }
+         if(bProtoFound)
+            break;
+
          Buffer[ iPos++ ] = cChar;
       }
       else
@@ -1271,15 +1317,14 @@ HB_FUNC( INETRECVENDBLOCK )
    {
       if( iMax == 0 || iPos < iMax )
       {
-         iPos = iPos - (iProtoSize-1);
          Socket->count = iPos;
 
          if( pResult )
          {
-            hb_itemPutNL( pResult, iPos );
+            hb_itemPutNL( pResult, iPos  - (iprotosize[ifindproto]-1) );
          }
 
-         hb_retclenAdopt( Buffer, iPos );
+         hb_retclenAdopt( Buffer, iPos  - (iprotosize[ifindproto]-1) );
       }
       else
       {
@@ -1294,6 +1339,8 @@ HB_FUNC( INETRECVENDBLOCK )
          hb_retc( NULL );
       }
    }
+   hb_xfree( Proto );
+   hb_xfree( iprotosize );
 }
 
 
@@ -1330,9 +1377,9 @@ HB_FUNC( INETDATAREADY )
 
    HB_STACK_UNLOCK;
    HB_TEST_CANCEL_ENABLE_ASYN;
-   
+
    iLen = select(Socket->com + 1, &rfds, NULL, NULL, &tv);
-   
+
    HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
    /* Don't rely on the value of tv now! */
@@ -1380,7 +1427,7 @@ HB_FUNC( INETSEND )
 
    HB_STACK_UNLOCK;
    HB_TEST_CANCEL_ENABLE_ASYN;
-   
+
    Socket->count = 0;
    if( hb_selectWriteSocket( Socket ) )
    {
