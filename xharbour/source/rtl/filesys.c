@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.35 2003/06/30 21:42:23 andijahja Exp $
+ * $Id: filesys.c,v 1.36 2003/07/15 09:15:33 andijahja Exp $
  */
 
 /*
@@ -1076,10 +1076,12 @@ ULONG   HB_EXPORT hb_fsReadLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCou
 
    #if defined(X__WIN32__)
       {
+         BOOL bError;
+
          // allowing async cancelation here
          HB_TEST_CANCEL_ENABLE_ASYN
 
-         BOOL bError = ReadFile( DostoWinHandle(hFileHandle), pBuff, ulCount, &ulRead, NULL );
+         bError = ReadFile( DostoWinHandle(hFileHandle), pBuff, ulCount, &ulRead, NULL );
 
          HB_DISABLE_ASYN_CANC
 
