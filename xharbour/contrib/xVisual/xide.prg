@@ -27,7 +27,7 @@ FUNCTION Main
             :AddPopup('&Test')
 
             WITH OBJECT :Popup
-               :AddItem( 'Editor'  , 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )
+               :AddItem( 'Editor'     , 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )
                :AddSeparator()
                :AddItem( 'Button'     , 102, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'Edit'       , 103, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
@@ -37,13 +37,14 @@ FUNCTION Main
                :AddItem( 'CheckBox'   , 107, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'ListBox'    , 108, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'StatusBar'  , 109, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
+               :AddItem( 'TabControl' , 110, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
 
             END
          END
          :SetWindowMenu()
 
 //----------------------------------------------------------------------------------------------
-//   UNDER CONSTRUCTION
+//   IMAGELIST CLASS UNDER CONSTRUCTION
 //----------------------------------------------------------------------------------------------
 
          hImg := ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
@@ -51,7 +52,7 @@ FUNCTION Main
          ImageList_AddMasked( hImg, hBmp, RGB( 0, 255, 255 ) )
 
          WITH OBJECT :Add('Rebar', TRebar():New( oApp:MainFrame ) )
-            WITH OBJECT :Add( 'Tools', TToolBar():New( oApp:MainFrame:Rebar, 444, 14, , , 32, 32, 24, 24 ) )
+            WITH OBJECT :Add( 'Tools', TToolBar():New( oApp:MainFrame:Rebar, 444, 14, , , 26, 26, 20, 20 ) )
                :AddButton( 0, 500,,,,  ,,'New Project' )
                :AddButton( 1, 11,,,,  ,,'Open Project' )
                :AddButton( 2, 12,,,,  ,,'Properties' )
@@ -67,9 +68,23 @@ FUNCTION Main
                :AddButton(12, 22,,,,  ,,'View' )
                :AddButton(14, 23,,,,  ,,'Files')
                SendMessage( :handle, TB_SETIMAGELIST, 0, hImg )
-               SendMessage( :handle, TB_SETBUTTONSIZE, 0, MAKELONG( 26, 26 ) )
             END
             :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK , :Tools:handle, 110, 26, 150 , "", NIL )
+
+            WITH OBJECT :Add( 'Tabs', TTabControl():New( oApp:MainFrame:Rebar, 445,  0,  0, 0,  0 ) )
+               :AddTab( "Standard")
+               :AddTab( "Aditional")
+               :AddTab( "Win32")
+               :AddTab( "System")
+               :AddTab( "Internet")
+               :AddTab( "Dialogs")
+               :AddTab( "Win 3.1")
+               :AddTab( "Samples")
+               :AddTab( "Activex")
+               :Configure()
+            END
+            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK, :Tabs:handle, 650, 60, , "", NIL )
+
          END
          
          WITH OBJECT :Add('Status',  TStatusBar():New( oApp:MainFrame, 'StatusBar', 1001 ) ) 
@@ -91,7 +106,7 @@ CLASS MainFrame FROM TFrame
                                 ::left    := 0,;
                                 ::top     := 0,;
                                 ::width   := GetWindowRect(GetDesktopWindow())[3],;
-                                ::height  := 100,;
+                                ::height  := 160,;
                                 super:new( oParent )
 
    METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting xIDE ?', 'OnCloseQuery', MB_YESNO ) == IDYES,;

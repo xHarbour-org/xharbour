@@ -16,7 +16,7 @@ WHOOOBJ    = TApplication.obj TWindow.obj TForm.obj TControl.obj \
              TMenu.obj TPopup.obj TMenuItem.obj TrackMenu.obj \
              TCButton.obj TCEdit.obj TCCheck.obj TCCombo.obj TCRadio.obj \
              TCStatic.obj TFrame.obj TPanel.obj TCListBox.obj TCStatusBar.obj \
-             TCRebar.obj TCToolBar.obj
+             TCRebar.obj TCToolBar.obj TabControl.obj
 
 !include $(WHO_DIR)\env\makelib.b32
 

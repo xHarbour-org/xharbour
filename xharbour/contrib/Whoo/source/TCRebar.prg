@@ -50,7 +50,7 @@ METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
       acRect:=GetClientRect(::Parent:handle)
       aRect:=GetWindowRect(::handle)
       MoveWindow(::handle,0,0,acRect[3],aRect[4]-aRect[2],.t.)
-   ENDIF
+   endif
    
    RETURN( CallWindowProc(::nrProc,::Parent:handle,nMsg,nwParam,nlParam))
 
@@ -91,7 +91,7 @@ METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
    rbBand:hwndChild  := IFNIL(hChild,0,hChild)
    rbBand:cxMinChild := IFNIL(cxMin,aRect[3]-aRect[1],cxMin)
    rbBand:cyMinChild := IFNIL(cyMin,aRect[4]-aRect[2],cyMin)
-   rbBand:cx         := IFNIL(cx,GetClientRect(::hParent)[3],cx)
+   rbBand:cx         := IFNIL(cx,GetClientRect(::Parent:handle)[3],cx)
    rbBand:lpText     := IFNIL(cText,"Test",cText)
    rbBand:hbmBack    := IFNIL(hBmp,0,hBmp)
 
