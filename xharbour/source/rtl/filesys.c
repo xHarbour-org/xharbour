@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.22 2003/01/06 20:37:44 ronpinkas Exp $
+ * $Id: filesys.c,v 1.23 2003/01/12 11:55:22 lculik Exp $
  */
 
 /*
@@ -1256,6 +1256,8 @@ BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
 
    errno = 0;
    bResult = ( unlink( ( char * ) pFilename ) == 0 );
+   if( errno == 22 )
+      errno = 2;
    s_uiErrorLast = errno;
 
 #elif defined(_MSC_VER) || defined(__MINGW32__)
@@ -1298,6 +1300,8 @@ BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 
    errno = 0;
    bResult = ( rename( ( char * ) pOldName, ( char * ) pNewName ) == 0 );
+   if( errno == 22 )
+      errno = 2;
    s_uiErrorLast = errno;
 
 #else
