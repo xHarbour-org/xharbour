@@ -4,9 +4,10 @@ Run=c:\xHarbour\contrib\xVisual\xIde.Exe
 
 [Files]
 c:\xHarbour\contrib\xVisual\xIde.prg=Yes
+c:\xHarbour\contrib\xVisual\xInspect.prg=Yes
 c:\xHarbour\contrib\xVisual\CtrlMask.prg=Yes
 c:\xHarbour\contrib\xVisual\FormEdit.Prg=Yes
 c:\xHarbour\Lib\whoo.lib=Yes
-c:\xHarbour\lib\whatplus.lib=Yes
 c:\xHarbour\Lib\what32.lib=Yes
+c:\xHarbour\contrib\xVisual\whatplus.lib=Yes
 c:\xHarbour\contrib\xVisual\xIde.res=Yes

@@ -20,6 +20,7 @@ CLASS TForm FROM TWindow
    METHOD ChildFromHandle( hHandle )
    METHOD ChildFromId( hHandle )
    METHOD GetObj()
+   METHOD SetLink()
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -34,6 +35,14 @@ METHOD New( oParent ) CLASS TForm
    ::lRegister := IFNIL(::lRegister,.T.,::lRegister)
    ::lControl  := .F.
    ::ExStyle   := IFNIL(::ExStyle,0,::ExStyle)
+   
+   ::PropList  := { { 'Name',   ::Name    },;
+                    { 'Caption',::Caption },;
+                    { 'Left',   ::Left    },;
+                    { 'Top',    ::Top     },;
+                    { 'Width',  ::width   },;
+                    { 'Height', ::height  },;
+                    { 'Style',  ::Left    } }
 
    RETURN( super:New( oParent ) )
 
@@ -88,3 +97,10 @@ METHOD GetObj( cName ) CLASS TForm
       return( ::Controls[n] )
    endif
 return(nil)
+
+*-----------------------------------------------------------------------------*
+
+METHOD SetLink( cName, oObj ) CLASS TForm
+   __objAddData( self, cName )
+   __ObjSetValueList( self, { { cName, oObj } } )
+return( oObj )

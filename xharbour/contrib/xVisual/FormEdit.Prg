@@ -249,7 +249,10 @@ METHOD CreateSub()
    ::Parent:WindowMenu:Enable( 110 )
 */
    ::Parent:StdBar:EnableAll()
-
+   
+   ::Parent:ObjInsp:Browser:source:= ACLONE( ::PropList )
+   ::Parent:ObjInsp:Browser:Configure()
+   
    xRet := super:OnCreate()
 
    ::oMask:=oCtrlMask():New( self )

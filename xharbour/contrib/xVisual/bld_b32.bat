@@ -24,6 +24,11 @@ IF ERRORLEVEL 1 type comp.log
 IF ERRORLEVEL 1 PAUSE
 if errorlevel 1 goto exit
 
+%HB_INSTALL%\bin\harbour %4 -es2 -p -n -w -i%HB_INSTALL%\include;%WHAT32%\include > comp.log
+IF ERRORLEVEL 1 type comp.log
+IF ERRORLEVEL 1 PAUSE
+if errorlevel 1 goto exit
+
 IF EXIST %1.rc %BCC_DIR%\BIN\brc32 -r %1
 if errorlevel 1 goto exit
 
@@ -32,17 +37,20 @@ echo -I%HB_INSTALL%\include;%BCC_DIR%\include >> b32.bc
 echo -c %1.c >> b32.bc
 echo -c %2.c >> b32.bc
 echo -c %3.c >> b32.bc
+echo -c %4.c >> b32.bc
 %BCC_DIR%\BIN\bcc32 @b32.bc
 if errorlevel 1 goto exit
 
 echo %BCC_DIR%\lib\c0w32.obj + > b32.bc
 echo %1.obj + >> b32.bc
 echo %2.obj + >> b32.bc
-echo %3.obj, + >> b32.bc
+echo %3.obj + >> b32.bc
+echo %4.obj, + >> b32.bc
 echo %1.exe, + >> b32.bc
 echo %1.map, + >> b32.bc
 echo %WHAT32%\lib\What32.lib + >> b32.bc
 echo %WHOO%\lib\whoo.lib  + >> b32.bc
+echo whatplus.lib  + >> b32.bc
 echo %HB_INSTALL%\lib\rtl.lib + >> b32.bc
 echo %HB_INSTALL%\lib\vm.lib + >> b32.bc
 echo %HB_INSTALL%\lib\gtwin.lib + >> b32.bc
