@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.62 2004/09/30 14:15:49 mlombardo Exp $
+# $Id: hrbdll.bc,v 1.63 2004/10/22 11:55:52 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -421,7 +421,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\uc1250.obj   \
   $(OBJ_DIR)\uc1251.obj   \
   $(OBJ_DIR)\uc1257.obj   \
-  $(OBJ_DIR)\uc437.obj    \
   $(OBJ_DIR)\uc850.obj    \
   $(OBJ_DIR)\uc852.obj    \
   $(OBJ_DIR)\uc866.obj    \
@@ -604,7 +603,6 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\uc1250.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\uc1251.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\uc1257.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\uc437.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\uc850.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\uc852.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\uc866.obj             + >> hdll.tmp
@@ -2385,9 +2383,6 @@ $(OBJ_DIR)\uc1251.obj : $(CODEPAGE_DIR)\uc1251.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\uc1257.obj : $(CODEPAGE_DIR)\uc1257.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\uc437.obj : $(CODEPAGE_DIR)\uc437.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\uc850.obj : $(CODEPAGE_DIR)\uc850.c
