@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.2 2002/04/17 18:15:38 walito Exp $
+ * $Id: teditor.prg,v 1.3 2002/04/28 02:49:20 lculik Exp $
  */
 
 /*
@@ -834,7 +834,7 @@ STATIC procedure BrowseText(oSelf, nPassedKey)
       endif
          IF !( ( bKeyBlock := setkey( nKey ) ) == NIL )
             eval( bKeyBlock )
-            return 
+            loop 
          endif
 
       if nKey == K_ESC
@@ -876,6 +876,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
             if NextKey() == 0
                ::IdleHook()
             endif
+            nKey:=inkey(0)
          else
             lSingleKeyProcess := .T.
             nKey := nPassedKey
@@ -884,7 +885,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
 
             IF !( ( bKeyBlock := setkey( nKey ) ) == NIL )
               eval( bKeyBlock )
-              return Self
+              loop
            endif
 
          do case
