@@ -1,5 +1,5 @@
 /*
- * $Id: spfiles.c,v 1.5 2002/03/26 05:06:58 ronpinkas Exp $
+ * $Id: spfiles.c,v 1.6 2002/03/26 15:27:16 ronpinkas Exp $
  */
 
 /*
@@ -53,21 +53,21 @@
 #include "hbapifs.h"
 #include "hbset.h"
 
-BOOL hb_spFile( BYTE * pFilename, BYTE RetPath[ _POSIX_PATH_MAX + 3 + 10 ] )
+BOOL hb_spFile( BYTE * pFilename, BYTE *pRetPath )
 {
    BYTE *Path;
    BOOL bIsFile = FALSE;
    PHB_FNAME pFilepath;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_spFile(%s, %p)", (char*) pFilename, RetPath));
+   HB_TRACE(HB_TR_DEBUG, ("hb_spFile(%s, %p)", (char*) pFilename, pRetPath));
 
-   if( RetPath )
+   if( pRetPath )
    {
-      Path = RetPath;
+      Path = pRetPath;
    }
    else
    {
-      Path = (BYTE *) hb_xgrab( _POSIX_PATH_MAX + 3 + 10 );
+      Path = (BYTE *) hb_xgrab( _POSIX_PATH_MAX + 1 );
    }
 
    pFilepath = hb_fsFNameSplit( (char*) pFilename );
@@ -102,14 +102,13 @@ BOOL hb_spFile( BYTE * pFilename, BYTE RetPath[ _POSIX_PATH_MAX + 3 + 10 ] )
 
    hb_xfree( pFilepath );
 
-   if( bIsFile == FALSE )
-   {
-      Path[0] = '\0';
-   }
-
-   if( RetPath == NULL )
+   if( pRetPath == NULL )
    {
       hb_xfree( Path );
+   }
+   else if( bIsFile == FALSE )
+   {
+      Path[0] = '\0';
    }
 
    return bIsFile;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3450 2004/09/20 00:40:02 druzus Exp $
+ * $Id: ChangeLog,v 1.3451 2004/09/21 02:40:34 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,37 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-21 04:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/workarea.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * optimized DBI_GETLOCKARRAY
+    + added DBI_VALIDBUFFER, DBI_LOCKCOUNT, DBI_CHILDCOUNT, DBI_DBFILTER,
+      DBI_BOF, DBI_EOF, DBI_FOUND, DBI_FCOUNT, DBI_ALIAS
+    + added DBOI_KEYSINCLUDED
+    + added setting in DBI_SHARED
+    * added workaround for memory leaks reported on program termination
+
+  * xharbour/include/hbapifs.h
+  * xharbour/source/rtl/spfiles.c
+    * change the BOOL hb_spFile( BYTE * pFilename,
+                                 BYTE *pRetPath[ _POSIX_PATH_MAX + 10 + 3 )
+      to BOOL hb_spFile( BYTE * pFilename, BYTE *pRetPath )
+      _POSIX_PATH_MAX defines the maximum path and file name length
+      and we should _NEVER_ exceed this value so the buffer for hb_spFile()
+      should be [ _POSIX_PATH_MAX + 1 ]
+
+  * xharbour/source/common/hbfsapi.c
+    * respect _POSIX_PATH_MAX as the buffer size in hb_fsFNameMerge()
+
+  * xharbour/include/hbapi.h
+  * xharbour/source/rtl/strcase.c
+    + added hb_strncat( char * pDest, const char * pSource, ULONG ulLen )
+      unlike the C strncat, this routine will always append a null and the
+      ulLen param is pDest size not pSource limit
 
 2004-09-20 23:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * include/inkey.ch

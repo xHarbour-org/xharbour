@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.27 2004/08/19 00:51:46 druzus Exp $
+ * $Id: workarea.c,v 1.28 2004/08/24 00:30:24 druzus Exp $
  */
 
 /*
@@ -558,13 +558,64 @@ ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    HB_TRACE(HB_TR_DEBUG, ("hb_waInfo(%p, %hu, %p)", pArea, uiIndex, pItem));
    HB_SYMBOL_UNUSED( pArea );
 
-   if( uiIndex == DBI_ISDBF || uiIndex == DBI_CANPUTREC )
+   switch ( uiIndex )
    {
-      hb_itemPutL( pItem, FALSE );
-      return SUCCESS;
+      case DBI_ISDBF:
+      case DBI_CANPUTREC:
+         hb_itemPutL( pItem, FALSE );
+         break;
+
+      case DBI_CHILDCOUNT:
+      {
+         LPDBRELINFO lpdbRelations = pArea->lpdbRelations;
+         USHORT uiCount = 0;
+         while( lpdbRelations )
+         {
+            uiCount++;
+            lpdbRelations = lpdbRelations->lpdbriNext;
+         }
+         hb_itemPutNI( pItem, uiCount );
+         break;
+      }
+
+      case DBI_BOF:
+         hb_itemPutL( pItem, pArea->fBof );
+         break;
+
+      case DBI_EOF:
+         hb_itemPutL( pItem, pArea->fEof );
+         break;
+
+      case DBI_DBFILTER:
+         if ( pArea->dbfi.abFilterText )
+            hb_itemCopy( pItem, pArea->dbfi.abFilterText );
+         else
+            hb_itemPutC( pItem, "" );
+         break;
+
+      case DBI_FOUND:
+         hb_itemPutL( pItem, pArea->fFound );
+         break;
+
+      case DBI_FCOUNT:
+         hb_itemPutL( pItem, pArea->uiFieldCount );
+         break;
+
+      case DBI_ALIAS:
+      {
+         char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
+         if ( SELF_ALIAS( pArea, ( BYTE * ) szAlias ) != SUCCESS )
+         {
+            return FAILURE;
+         }
+         hb_itemPutC( pItem, szAlias );
+         break;
+      }
+
+      default:
+         return FAILURE;
    }
-   else
-      return FAILURE;
+   return SUCCESS;
 }
 
 /*

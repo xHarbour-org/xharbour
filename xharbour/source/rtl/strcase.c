@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.16 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: strcase.c,v 1.17 2004/07/28 23:27:56 druzus Exp $
  */
 
 /*
@@ -232,6 +232,41 @@ HB_EXPORT char * hb_strncpy( char * pDest, const char * pSource, ULONG ulLen )
       *pDest++ = '\0';
    }
 
+   return pBuf;
+}
+
+/*
+ * This function copies szText to destination buffer.
+ * NOTE: Unlike the documentation for strncat, this routine will always append
+ *       a null and the ulLen param is pDest size not pSource limit
+ */
+HB_EXPORT char * hb_strncat( char * pDest, const char * pSource, ULONG ulLen )
+{
+   char *pBuf = pDest;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strncpy(%p, %s, %lu)", pDest, pSource, ulLen));
+
+   pDest[ ulLen ] ='\0';
+
+   while( ulLen && *pDest )
+   {
+      pDest++;
+      ulLen--;
+   }
+
+   while( ulLen && ( *pDest++ = *pSource++ ) != '\0' )
+   {
+      ulLen--;
+   }
+
+/* if someone will need this then please uncomment the cleaning the rest of
+   buffer. */
+/*
+   while (ulLen--)
+   {
+      *pDest++ = '\0';
+   }
+*/
    return pBuf;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.91 2004/09/03 01:34:59 druzus Exp $
+ * $Id: dbf1.c,v 1.92 2004/09/08 16:29:22 druzus Exp $
  */
 
 /*
@@ -525,14 +525,14 @@ static BOOL hb_dbfIsLocked( DBFAREAP pArea, ULONG ulRecNo )
 static void hb_dbfGetLockArray( DBFAREAP pArea, PHB_ITEM pItem )
 {
    ULONG ulCount;
-   PHB_ITEM pRecNo;
 
-   pRecNo = hb_itemNew( NULL );
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfGetLockArray(%p, %p)", pArea, pItem));
 
+   hb_arrayNew( pItem, pArea->ulNumLocksPos );
    for( ulCount = 0; ulCount < pArea->ulNumLocksPos; ulCount++ )
-      hb_arrayAdd( pItem, hb_itemPutNL( pRecNo, pArea->pLocksPos[ ulCount ] ) );
-   hb_itemRelease( pRecNo );
+   {
+      hb_itemPutNL( hb_arrayGetItemPtr( pItem, ulCount ), pArea->pLocksPos[ ulCount ] );
+   }
 }
 
 /*
@@ -1907,16 +1907,16 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutC( pItem, DBF_TABLEEXT );
          break;
 
+      case DBI_FULLPATH:
+         hb_itemPutC( pItem, pArea->szDataFileName);
+         break;
+
       case DBI_MEMOEXT:
          hb_itemPutC( pItem, "" );
          break;
 
       case DBI_MEMOBLOCKSIZE:
          hb_itemPutNI( pItem, pArea->uiMemoBlockSize );
-         break;
-
-      case DBI_FULLPATH:
-         hb_itemPutC( pItem, pArea->szDataFileName);
          break;
 
       case DBI_FILEHANDLE:
@@ -1928,15 +1928,30 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_SHARED:
-         hb_itemPutL( pItem, pArea->fShared );
-         break;
+      {
+         BOOL fShared = pArea->fShared;
 
+         if ( HB_IS_LOGICAL( pItem ) )
+         {
+            pArea->fShared = hb_itemGetL( pItem );
+         }
+         hb_itemPutL( pItem, fShared );
+         break;
+      }
       case DBI_ISFLOCK:
          hb_itemPutL( pItem, pArea->fFLocked );
          break;
 
       case DBI_ISREADONLY:
          hb_itemPutL( pItem, pArea->fReadonly );
+         break;
+
+      case DBI_VALIDBUFFER:
+         hb_itemPutL( pItem, pArea->fValidBuffer );
+         break;
+
+      case DBI_LOCKCOUNT:
+         hb_itemPutNL( pItem, pArea->ulNumLocksPos );
          break;
 
       case DBI_LOCKSCHEME:

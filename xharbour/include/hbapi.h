@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.144 2004/07/28 23:27:54 druzus Exp $
+ * $Id: hbapi.h,v 1.145 2004/09/05 22:53:11 peterrees Exp $
  */
 
 /*
@@ -458,7 +458,8 @@ extern ULONG    HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const ch
 extern char     HB_EXPORT * hb_strUpper( char * szText, ULONG ulLen ); /* convert an existing string buffer to upper case */
 extern char     HB_EXPORT * hb_strUpperCopy( char * szText, ULONG ulLen );
 extern char     HB_EXPORT * hb_strLower( char * szText, ULONG ulLen ); /* convert an existing string buffer to lower case */
-extern char     HB_EXPORT * hb_strncpy( char * pDest, const char * pSource, ULONG ulLen ); /* copy at most uiLen bytes from string buffer to another buffer and _always_ set 0 in destin buffer */
+extern char     HB_EXPORT * hb_strncpy( char * pDest, const char * pSource, ULONG ulLen ); /* copy at most ulLen bytes from string buffer to another buffer and _always_ set 0 in destin buffer */
+extern char     HB_EXPORT * hb_strncat( char * pDest, const char * pSource, ULONG ulLen ); /* copy at most ulLen-strlen(pDest) bytes from string buffer to another buffer and _always_ set 0 in destin buffer */
 extern char     HB_EXPORT * hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen );
 extern char     HB_EXPORT * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen ); /* copy an existing string buffer to another buffer, as upper case */
 extern char     HB_EXPORT * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen );

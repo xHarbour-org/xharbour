@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.34 2004/08/09 23:58:45 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.35 2004/08/23 15:40:03 druzus Exp $
  */
 
 /*
@@ -388,6 +388,7 @@ typedef struct
    LPCDXPAGE NodeList[ CDX_STACKSIZE ];   /* Stack of pages */
    BYTE     pLastKey[ CDX_MAXKEY ]; /* last key val */
    ULONG    ulLastRec;
+   BYTE *   pRecBuff;
 #ifndef HB_CDX_PACKTRAIL
    int      iLastTrl;         /* last key trailing spaces */
 #endif
@@ -487,6 +488,7 @@ typedef struct _CDXAREA
    LPCDXINDEX lpIndexes;         /* Pointer to indexes array  */
    USHORT     uiTag;             /* current tag focus */
    BYTE *     bCdxSortTab;       /* Table with storted characters */
+   LPCDXSORTINFO pSort;          /* Index build structur */
 
 } CDXAREA;
 

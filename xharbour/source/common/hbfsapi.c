@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.1.1.1 2001/12/21 10:44:34 ronpinkas Exp $
+ * $Id: hbfsapi.c,v 1.2 2003/07/30 02:16:50 paultucker Exp $
  */
 
 /*
@@ -217,11 +217,11 @@ char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
 
    /* Add path if specified */
    if( pFileName->szPath )
-      strcat( pszFileName, pFileName->szPath );
+      hb_strncat( pszFileName, pFileName->szPath, _POSIX_PATH_MAX );
 
    /*
       NOTE: be _very_ careful about 'optimising' this next section code!
-      (specifically, initialising szPathSep) as MSVC with /Oi
+      (specifically, initialising szPathSep) as MSVC with /Ni
       (or anything that infers it like /Ox) will cause you trouble.
     */
 
@@ -240,15 +240,13 @@ char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
              szPathSep[ 1 ] = '\0';
 
           */
-
-         strcat( pszFileName, szPathSep );
-
+         hb_strncat( pszFileName, szPathSep, _POSIX_PATH_MAX );
       }
    }
 
    /* Add filename (without extension) if specified */
    if( pszName )
-      strcat( pszFileName, pszName );
+      hb_strncat( pszFileName, pszName, _POSIX_PATH_MAX );
 
    /* Add extension if specified */
    if( pFileName->szExtension )
@@ -256,9 +254,9 @@ char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
       /* Add a dot if the extension doesn't have it */
       if( pFileName->szExtension[ 0 ] != '\0' &&
           pFileName->szExtension[ 0 ] != '.' )
-         strcat( pszFileName, "." );
+         hb_strncat( pszFileName, ".", _POSIX_PATH_MAX );
 
-      strcat( pszFileName, pFileName->szExtension );
+      hb_strncat( pszFileName, pFileName->szExtension, _POSIX_PATH_MAX );
    }
 
    HB_TRACE(HB_TR_INFO, ("hb_fsFNameMerge:   szPath: |%s|\n", pFileName->szPath));

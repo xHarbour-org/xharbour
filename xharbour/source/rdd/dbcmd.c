@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.128 2004/09/13 13:16:40 druzus Exp $
+ * $Id: dbcmd.c,v 1.129 2004/09/13 13:18:40 druzus Exp $
  */
 
 /*
@@ -1665,16 +1665,15 @@ HB_FUNC( DBDELETE )
 HB_FUNC( DBFILTER )
 {
    HB_THREAD_STUB
-   HB_ITEM Filter;
    AREAP pArea = HB_CURRENT_WA;
-
-   Filter.type = HB_IT_NIL;
 
    if( pArea )
    {
-      hb_itemPutC( &Filter, "" );
-      SELF_FILTERTEXT( pArea, &Filter );
-      hb_retc( (&Filter)->item.asString.value );
+      PHB_ITEM pFilter = hb_itemNew( NULL );
+      hb_itemPutC( pFilter, "" );
+      SELF_FILTERTEXT( pArea, pFilter );
+      hb_itemReturn( pFilter );
+      hb_itemRelease( pFilter );
    }
    else
       hb_retc( NULL );
@@ -2109,17 +2108,18 @@ HB_FUNC( DBRLOCK )
 HB_FUNC( DBRLOCKLIST )
 {
    HB_THREAD_STUB
-   HB_ITEM List;
+   PHB_ITEM pList;
    AREAP pArea = HB_CURRENT_WA;
 
-   List.type = HB_IT_NIL;
-   hb_arrayNew( &List, 0 );
+   pList = hb_itemNew( NULL );
+   hb_arrayNew( pList, 0 );
    if( pArea )
-      SELF_INFO( pArea, DBI_GETLOCKARRAY, &List );
+      SELF_INFO( pArea, DBI_GETLOCKARRAY, pList );
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBRLOCKLIST" );
 
-   hb_itemReturn( &List );
+   hb_itemReturn( pList );
+   hb_itemRelease( pList );
 }
 
 HB_FUNC( DBRUNLOCK )
@@ -2299,12 +2299,12 @@ static void hb_dbfStructure( PHB_ITEM pStruct )
 
 HB_FUNC( DBSTRUCT )
 {
-   HB_ITEM Struct;
+   PHB_ITEM pStruct;
 
-   Struct.type = HB_IT_NIL;
-
-   hb_dbfStructure( &Struct );
-   hb_itemReturn( &Struct );
+   pStruct = hb_itemNew( NULL );
+   hb_dbfStructure( pStruct );
+   hb_itemReturn( pStruct );
+   hb_itemRelease( pStruct );
 }
 
 HB_FUNC( DBTABLEEXT )
