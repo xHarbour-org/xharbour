@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.ch,v 1.4 2004/02/13 16:52:26 jonnymind Exp $
+ * $Id: inkey.ch,v 1.5 2004/02/19 23:43:09 jonnymind Exp $
  */
 
 /*
@@ -182,6 +182,8 @@
 #define K_ALT_DEL               419   /* * Alt-Del                       */
 #define K_ALT_BS                270   /* * Alt-Backspace                 */
 #define K_ALT_TAB               421   /* * Alt-Tab                       */
+
+#define K_CTRL_SH_TAB           423   /* * Ctrl-Shift-Tab                */
 
 /* Control keys */
 

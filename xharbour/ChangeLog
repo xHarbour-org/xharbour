@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2531 2004/03/09 10:06:44 andijahja Exp $
+ * $Id: ChangeLog,v 1.2532 2004/03/09 11:17:20 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-09 13:53 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * include/inkey.ch
+    ! added #define K_CTRL_SH_TAB 423
+  * source/rtl/gtwin/gtwin.c
+    ! added support of K_CTRL_SH_TAB
+    ! added lookup of inkey.ch K_CTRL_codes instead of fixed 1-26
 
 2004-03-09 08:21 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/rtl/dbdelim.prg

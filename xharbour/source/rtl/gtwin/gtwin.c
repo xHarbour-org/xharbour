@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.47 2004/02/17 18:44:15 andijahja Exp $
+ * $Id: gtwin.c,v 1.48 2004/03/05 23:00:04 andijahja Exp $
  */
 
 /*
@@ -170,6 +170,12 @@ int    s_mouseLast;  /* Last mouse button to be pressed                     */
 extern int hb_mouse_iCol;
 extern int hb_mouse_iRow;
 
+static int K_Ctrl[] = {
+  K_CTRL_A, K_CTRL_B, K_CTRL_C, K_CTRL_D, K_CTRL_E, K_CTRL_F, K_CTRL_G, K_CTRL_H,
+  K_CTRL_I, K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_M, K_CTRL_N, K_CTRL_O, K_CTRL_P,
+  K_CTRL_Q, K_CTRL_R, K_CTRL_S, K_CTRL_T, K_CTRL_U, K_CTRL_V, K_CTRL_W, K_CTRL_X,
+  K_CTRL_Y, K_CTRL_Z
+  };
 
 /* *********************************************************************** */
 
@@ -1441,7 +1447,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 if( dwState & NUMLOCK_ON ) fprintf( stdout, " NL" );
                 if( dwState & SCROLLLOCK_ON ) fprintf( stdout, " SL" );
                 if( dwState & SHIFT_PRESSED ) fprintf( stdout, " SH" );
-                fprintf( stdout, " " );
+                fprintf( stdout, "\n" );
              #endif
 
              if( ch == 224 )
@@ -1481,10 +1487,17 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 if( ( ( ch == 0 || ch == -32 || ch == -16 ) && ( dwState & ( SHIFT_PRESSED | LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )
                 || ( ( dwState & ( ENHANCED_KEY | LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED ) ) ) )
                 {
-                   extended = 1;
-                   #ifdef HB_DEBUG_KEYBOARD
-                      fprintf( stdout, "1" );
-                   #endif
+                   if( wChar == 9 && wKey == 15 && ( dwState & SHIFT_PRESSED ) && ( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )
+                   {
+                      ch = K_CTRL_SH_TAB;   /* Ctrl+Shift+TAB */
+                   }
+                   else
+                   {                   
+                      extended = 1;
+                      #ifdef HB_DEBUG_KEYBOARD
+                         fprintf( stdout, "1" );
+                      #endif
+                   }       
                 }
                 else if( ch == 0 )
                 {
@@ -1514,7 +1527,14 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                    #ifdef HB_DEBUG_KEYBOARD
                       fprintf( stdout, "@" );
                    #endif
-                   ch = wKey + 256;   /* Shift+TAB */
+                   ch = K_SH_TAB;   /* Shift+TAB */
+                }
+                else if( ch >= 1 && ch <= 26  && ( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )
+                {
+                   #ifdef HB_DEBUG_KEYBOARD
+                      fprintf( stdout, "?" );
+                   #endif
+                   ch = K_Ctrl[ch-1];
                 }
              }
              if( extended )
