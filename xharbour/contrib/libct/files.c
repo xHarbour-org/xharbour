@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.14 2004/02/15 20:21:39 andijahja Exp $
+ * $Id: files.c,v 1.15 2004/02/15 21:59:36 lculik Exp $
  */
 
 /*
@@ -1035,7 +1035,7 @@ HB_FUNC( FILEDELETE )
    USHORT uiAttr = HB_FA_ALL;
    BYTE *pDirSpec;
 
-   PHB_FNAME fname;
+   PHB_FNAME fname =NULL;
    BYTE *pCurDir;
    char cCurDsk;
 
@@ -1076,6 +1076,10 @@ HB_FUNC( FILEDELETE )
       }
       hb_fsChDrv( (BYTE ) cCurDsk );
       hb_fsChDir( pCurDir );
+
+      if ( fname )
+         hb_xfree( fname );
+
       hb_retl( bReturn );
    }
 
