@@ -313,7 +313,7 @@ STATIC aTransRules   := {}, aTransResults := {}
 STATIC aCommRules    := {}, aCommResults  := {}
 
 STATIC bDbgMatch := .F., bDbgExp := .F., bDbgPPO := .F., bLoadRules := .T., ;
-       bCount := .T., bCCH := .F., bCompile := .F., bStrict := .F.
+       bCount := .T., bCCH := .F., bCompile := .F., bStrict := .T.
 
 STATIC nIfDef := 0, abIfDef := {}, nIf := 0, abIf := {}
 
@@ -385,7 +385,7 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUIL
 
    IF sSource != NIL .AND. ( Upper( sSource ) == "-H" .OR. Upper( sSource ) == "--HELP" )
       sSwitch := "   PP filename[.ext] [-CCH] [-D<id>] [-D:E] [-D:M] [-D:P] [-I<path>] [-P] [-R]" + CRLF
-      sSwitch += "                     [-STRICT] [-U[ch-file]]" + CRLF + CRLF
+      sSwitch += "                     [-FIX] [-U[ch-file]]" + CRLF + CRLF
 
       sSwitch += [    -CCH     = Generate a .cch file (compiled command header).] + CRLF
       sSwitch += [    -D<id>   = #define <id>.] + CRLF
@@ -395,7 +395,7 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUIL
       sSwitch += [    -I<path> = #include file search path(s) (';' seperated).] + CRLF
       sSwitch += [    -P       = Generate .pp$ pre-processed output file.] + CRLF
       sSwitch += [    -R       = Run filename as a script.] + CRLF
-      sSwitch += [    -STRICT  = Strict Clipper compatability (clone Clipper PreProcessor bugs).] + CRLF
+      sSwitch += [    -FIX     = Do not clone Clipper PreProcessor bugs.] + CRLF
       sSwitch += [    -U       = Use command definitions set in <ch-file> (or none).] + CRLF
 
      	? sSwitch
@@ -512,8 +512,8 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUIL
       ENDIF
 
       /* Clone Clipper PreProcessor bugs. */
-      IF "-STRICT" $ sSwitch
-         bStrict := .T.
+      IF "-FIX" $ sSwitch
+         bStrict := .F.
       ENDIF
 
       /* Use alternate command defintions file, or none. */
@@ -594,7 +594,7 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUIL
          PP_PreProFile( sSource, sPPOExt )
       ENDIF
    ELSE
-      nRow := 1
+      nRow := 2
       nCol := 0
       RP_Dot()
    ENDIF
@@ -825,6 +825,8 @@ PROCEDURE RP_Dot()
    LOCAL aCpyCommRules, aCpyCommResults
    LOCAL aCpyTranRules, aCpyTranResults
 
+   LOCAL aKBCommands := Array( 16 ), nKBCommand := 1, nKBCommands := 1, nTemp
+
    #ifdef FW
        Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + CRLF + CRLF + [Please try Interpreter mode, using the -R switch...] )
        RETURN
@@ -853,12 +855,36 @@ PROCEDURE RP_Dot()
 
    @ 0,0 SAY "PP: "
    @ 0,4 SAY Space( 76 ) COLOR "N/R"
+   @ 1,0 SAY PadR( "RDD: " + Space( 6 ) + " | Area: " + Space( 2 ) + " | Dbf: " + Space( 10 ) + ;
+             " | Index: " + Space( 8 ) + " | # " + Space( 7 ) + "/" + Space( 7 ), MaxCol() + 1 )  ;
+              COLOR "N/BG"
+
+   aFill( aKBCommands, sLine )
+
+   SetKey(  5, { || IIF( nKBCommand >  1, sLine := aKBCommands[ --nKBCommand ], ) } )
+   SetKey( 24, { || IIF( nKBCommand < 16, sLine := aKBCommands[ ++nKBCommand ], ) } )
 
    DO WHILE .T.
+      sLine := aKBCommands[ nKBCommand ]
+
       @ MaxRow(), 00 SAY '.'
       @ MaxRow(), 01 GET sLine PICTURE '@KS79'
       SET CURSOR ON
       READ
+
+      IF ! sLine == aKBCommands[ nKBCommand ]
+         IF ( nTemp := aScan( aKBCommands, sLine ) ) == 0
+            aKBCommands[ nKBCommand ] := sLine
+         ENDIF
+      ENDIF
+
+      IF LastKey() == 27
+         EXIT
+      ELSEIF LastKey() == 13 .OR. LastKey == 24 .OR. LastKey() == 9
+         nKBCommand++
+      ELSEIF LastKey() == 5 .OR. LastKey() == 271
+         nKBCommand--
+      ENDIF
 
       sLine := StrTran( sLine,  Chr(9), " " )
 
@@ -882,6 +908,8 @@ PROCEDURE RP_Dot()
       ENDIF
 
    ENDDO
+
+   CLEAR SCREEN
 
 RETURN
 
@@ -1024,6 +1052,17 @@ STATIC PROCEDURE ExecuteLine( sPPed )
       @ 0,0 SAY "PP: "
       @ 0,4 SAY Pad( sPPed, 76 ) COLOR "N/R"
 
+      IF Empty( Alias() )
+         @ 1,0 SAY PadR( "RDD: " + Space( 6 ) + " | Area: " + Space( 2 ) + " | Dbf: " + Space( 10 ) + ;
+             " | Index: " + Space( 8 ) + " | # " + Space( 7 ) + "/" + Space( 7 ), MaxCol() + 1 )  ;
+              COLOR "N/BG"
+      ELSE
+         //@ 1,0 CLEAR TO 1, MaxCol()
+         @ 1,0 SAY PadR( "RDD: " + RddName() + " | Area: " + Str( Select(), 2 ) + " | Dbf: " + PadR( Alias(), 10 ) + ;
+                         " | Index: " + PadR( OrdName( IndexOrd() ), 8 ) + " | # " + Str( RecNo(), 7 ) + ;
+                         "/"  + Str( RecCount(), 7 ), MaxCol() + 1 );
+                   COLOR "N/BG"
+      ENDIF
    END SEQUENCE
 
 RETURN
@@ -3122,7 +3161,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                      Alert( [Class #DEFINE Rules size mismatch] )
                   ENDIF
                ENDIF
-          #ifdef __HARBOUR__ 
+          #ifdef __HARBOUR__
             ELSEIF sLine == "FIVEWIN.CH"
                IF ! s_lFWLoaded
                   s_lFWLoaded := .T.
@@ -3708,10 +3747,10 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                       WHILE nMatch > 1
                          nMatch--
                          IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
+                            nMatch++
                             EXIT
                          ENDIF
                       ENDDO
-                      nMatch++
                   #endif
 
                   /* Now search for the stopper. */
@@ -3896,6 +3935,11 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   ENDIF
                ENDDO
 
+               IF bDbgMatch
+                  ? "Skipped optionals to:", nMatch, "of:", nMatches
+                  WAIT
+               ENDIF
+
                IF nMatch > nMatches
                   sLine := ( PPOut( aResults[nRule], aMarkers ) + sPad + sWorkLine )
                   IF bDbgMatch
@@ -3922,14 +3966,14 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      ENDDO
 
                      IF bDbgMatch
-                        ? "Skipped to:", nMatch
+                        ? "Skipped same level to:", nMatch
                      ENDIF
 
                      // Because will LOOP
-                     nMatch--
+                     //nMatch--
 
                      /* Revert. */
-                     IF nOptional <> 0 .AND. aMP[2] < 0 .AND. asRevert[Abs(nOptional)] != NIL
+                     IF nOptional <> 0 /*.AND. aMP[2] < 0*/ .AND. asRevert[Abs(nOptional)] != NIL
                         sWorkLine := asRevert[Abs(nOptional)]
                         aMarkers  := aaRevertMarkers[Abs(nOptional)]
 
@@ -3981,10 +4025,10 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      WHILE nMatch > 1
                         nMatch--
                         IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
+                           nMatch++
                            EXIT
                         ENDIF
                      ENDDO
-                     nMatch++
                   ENDIF
 
                   nOptional := 0
@@ -4081,10 +4125,10 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                         WHILE nMatch > 1
                            nMatch--
                            IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
+                              nMatch++
                               EXIT
                            ENDIF
                         ENDDO
-                        nMatch++
 
                         nOptional := 0
 
@@ -4131,10 +4175,10 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                         WHILE nMatch > 1
                            nMatch--
                            IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
+                              nMatch++
                               EXIT
                            ENDIF
                         ENDDO
-                        nMatch++
 
                         nOptional := 0
 
@@ -8399,29 +8443,32 @@ STATIC FUNCTION InitRunRules()
  #ifdef WIN
    aAdd( aCommRules, { 'ALERT' , { {    1,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
  #endif
+
    aAdd( aCommRules, { '_HB_CLASS' , { {    1,   0, NIL, '*', NIL } } , .F. } )
    aAdd( aCommRules, { '_HB_MEMBER' , { {    1,   0, NIL, '*', NIL } } , .F. } )
    aAdd( aCommRules, { 'MEMVAR' , { {    1,   0, NIL, '*', NIL } } , .F. } )
-   aAdd( aCommRules, { 'EXTERNAL' , { {    1,   0, NIL, '!', NIL }, {    2,   1, ',', '<', NIL } } , .F. } )
+   aAdd( aCommRules, { 'EXTERNAL' , { {    1,   0, NIL, '!', NIL }, { 1002,   1, ',', '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'DECLARE' , { {    1,   0, NIL, '!', NIL }, {    2,   0, NIL, '<', NIL }, {    3,   0, NIL, '*', NIL } } , .F. } )
    aAdd( aCommRules, { 'IF' , { {    1,   0, NIL, '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'ELSEIF' , { {    1,   0, NIL, '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'ELSE' ,  , .F. } )
-   aAdd( aCommRules, { 'ENDIF' , { {    1,   1, NIL, '*', NIL } } , .F. } )
-   aAdd( aCommRules, { 'END' , { {    1,   1, NIL, '*', NIL } } , .F. } )
+   aAdd( aCommRules, { 'ENDIF' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
+   aAdd( aCommRules, { 'END' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
    aAdd( aCommRules, { 'DO' , { {    0,   0, 'CASE', NIL, NIL } } , .F. } )
    aAdd( aCommRules, { 'CASE' , { {    1,   0, NIL, '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'OTHERWISE' ,  , .F. } )
-   aAdd( aCommRules, { 'ENDCASE' , { {    1,   1, NIL, '*', NIL } } , .F. } )
+   aAdd( aCommRules, { 'ENDCASE' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
    aAdd( aCommRules, { 'FOR' , { {    1,   0, NIL, '<', NIL }, {    2,   0, ':=', '<', NIL }, {    3,   0, 'TO', '<', NIL }, {    4,   1, 'STEP', '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'FOR' , { {    1,   0, NIL, '<', NIL }, {    2,   0, '=', '<', NIL }, {    3,   0, 'TO', '<', NIL }, {    4,   1, 'STEP', '<', NIL } } , .F. } )
-   aAdd( aCommRules, { 'LOOP' , { {    1,   1, NIL, '*', NIL } } , .F. } )
-   aAdd( aCommRules, { 'EXIT' , { {    1,   1, NIL, '*', NIL } } , .F. } )
-   aAdd( aCommRules, { 'NEXT' , { {    1,   1, NIL, '*', NIL } } , .F. } )
+   aAdd( aCommRules, { 'LOOP' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
+   aAdd( aCommRules, { 'EXIT' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
+   aAdd( aCommRules, { 'NEXT' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
    aAdd( aCommRules, { 'DO' , { {    1,   0, 'WHILE', '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'WHILE' , { {    1,   0, NIL, '<', NIL } } , .F. } )
-   aAdd( aCommRules, { 'ENDDO' , { {    1,   1, NIL, '*', NIL } } , .F. } )
+   aAdd( aCommRules, { 'ENDDO' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
    aAdd( aCommRules, { 'DO' , { {    1,   0, NIL, '(', NIL }, {    0,   0, '.', NIL, NIL }, {    0,   0, 'PRG', NIL, NIL } } , .F. } )
+   aAdd( aCommRules, { 'DO' , { {    1,   0, NIL, '!', NIL } } , .F. } )
+   aAdd( aCommRules, { 'DO' , { {    1,   0, NIL, '!', NIL }, {    2,   0, 'WITH', '<', NIL }, { 1003,   1, ',', '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'INIT' , { {    1,   0, 'PROCEDURE', '!', NIL }, {    0,   1, '(', NIL, NIL }, {    0,  -1, ')', NIL, NIL } } , .F. } )
    aAdd( aCommRules, { 'EXIT' , { {    1,   0, 'PROCEDURE', '!', NIL }, {    0,   1, '(', NIL, NIL }, {    0,  -1, ')', NIL, NIL } } , .F. } )
    aAdd( aCommRules, { 'STATIC' , { {    1,   0, 'PROCEDURE', '!', NIL }, {    2,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
@@ -8466,6 +8513,7 @@ STATIC FUNCTION InitRunResults()
  #ifdef WIN
    aAdd( aCommResults, { { {   0, 'MessageBox( 0, CStr( ' }, {   0,   1 }, {   0, ' ), "xBaseScript for Windows", 0 )' } }, { -1,  1, -1} , { NIL }  } )
  #endif
+
    aAdd( aCommResults, { , , { NIL }  } )
    aAdd( aCommResults, { , , { NIL }  } )
    aAdd( aCommResults, { , , { NIL }  } )
@@ -8489,6 +8537,8 @@ STATIC FUNCTION InitRunResults()
    aAdd( aCommResults, { { {   0, 'PP__WHILE ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__ENDDO' } }, { -1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_Run( ' }, {   0,   1 }, {   0, ' + ".prg" )' } }, { -1,  2, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, ' ' }, {   0,   1 }, {   0, '()' } }, { -1,  1, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, ' ' }, {   0,   1 }, {   0, '( ' }, {   0,   2 }, {   0, '' }, {   3, ', ' }, {   3,   3 }, {   0, ' )' } }, { -1,  1, -1,  1, -1, -1,  1, -1} , { NIL, NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_PROC_INIT ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_PROC_EXIT ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_PROC_PRG ' }, {   0,   1 }, {   0, ' ; PP_LocalParams( { ' }, {   0,   2 }, {   0, ' } )' } }, { -1,  1, -1,  3, -1} , { NIL, NIL }  } )
