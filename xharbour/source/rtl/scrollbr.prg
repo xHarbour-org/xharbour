@@ -1,5 +1,5 @@
 /*
- * $Id: scrollbr.prg,v 1.4 2004/07/13 19:15:36 paultucker Exp $
+ * $Id: scrollbr.prg,v 1.5 2004/07/15 23:57:16 paultucker Exp $
  */
 
 /*
@@ -57,8 +57,6 @@
 
 #ifdef HB_COMPAT_C53
 
-MEMVAR hb_p_lShow
-
 CLASS HBScrollBar
 
    DATA BarLength
@@ -95,6 +93,8 @@ CLASS HBScrollBar
    DATA nStart INIT 0
    DATA nThumbPos INIT 1
    DATA nTotal INIT 100
+
+   DATA hb_p_lShow INIT .F.
 
    METHOD GetCurrent( nCurrent )
    METHOD GetEnd( nEnd )
@@ -161,41 +161,30 @@ METHOD Display() CLASS HBScrollBar
       cColor2 := __guicolor( ::ColorSpec, 2 )
 
       IF ::Orient == 1
-         SET COLOR TO (cColor1)
          nStart := ::Start
          nEnd   := ::End - 1
 
+         SET COLOR TO (cColor1)
          FOR nPos := nStart + 1 TO nEnd
-            Setpos( nPos, cOffSet )
-            ?? Substr( cStyle, 2, 1 )
+            DispOutAt( nPos, cOffSet, cStyle[ 2 ] )
          NEXT
 
          SET COLOR TO (cColor2)
-         Setpos( nStart, cOffSet )
-         ?? Substr( cStyle, 1, 1 )
-         Setpos( nStart + ::ThumbPos, cOffSet )
-         ?? Substr( cStyle, 3, 1 )
-         Setpos( nEnd + 1, cOffSet )
-         ?? Substr( cStyle, 4, 1 )
+         DispOutAt( nStart, cOffSet, cStyle[ 1 ] )
+         DispOutAt( nStart + ::ThumbPos, cOffSet, cStyle[ 3 ] )
+         DispOutAt( nEnd + 1, cOffSet, cStyle[ 4 ] )
 
       ELSE
 
-         SET COLOR TO (cColor1)
          nStart := ::Start
          nEnd   := ::End - 1
 
-         FOR nPos := nStart + 1 TO nEnd
-            Setpos( cOffSet, nPos )
-            ?? Substr( cStyle, 2, 1 )
-         NEXT
+         DispOutAt( cOffSet, nStart + 1, Replicate( cStyle[ 2 ], nEnd - nStart ), cColor1 )
 
          SET COLOR TO (cColor2)
-         Setpos( cOffSet, nStart )
-         ?? Substr( cStyle, 1, 1 )
-         Setpos( cOffSet, nStart + ::ThumbPos )
-         ?? Substr( cStyle, 3, 1 )
-         Setpos( cOffSet, nEnd + 1 )
-         ?? Substr( cStyle, 4, 1 )
+         DispOutAt( cOffSet, nStart, cStyle[ 1 ] )
+         DispOutAt( cOffSet, nStart + ::ThumbPos, cStyle[ 3 ] )
+         DispOutAt( cOffSet, nEnd + 1, cStyle[ 4 ] )
 
       ENDIF
 
@@ -283,30 +272,21 @@ METHOD Update() CLASS HBScrollBar
    IF !ThumbPos( Self )
    ELSEIF nThumbPos != ::ThumbPos
       lUpdated  := .T.
-      cCurColor := Setcolor()
       nCurRow   := Row()
       nCurCol   := Col()
-      SET COLOR TO (__guicolor(::ColorSpec, 1))
 
       Dispbegin()
 
       IF ::Orient == 1
-         Setpos( ::Start + nThumbPos, ::OffSet )
-         ?? Substr( ::Style, 2, 1 )
-         Set COLOR TO (__guicolor(::ColorSpec, 2))
-         Setpos( ::Start + ::ThumbPos, ::OffSet )
-         ?? Substr( ::Style, 3, 1 )
+         DispOutAt( ::Start + nThumbPos, ::OffSet, ::Style[ 2 ], __guicolor( ::ColorSpec, 1 ) )
+         DispOutAt( ::Start + ::ThumbPos, ::OffSet, ::Style[ 3 ], __guicolor( ::ColorSpec, 2 ) )
       ELSE
-         Setpos( ::OffSet, ::Start + nThumbPos )
-         ?? Substr( ::Style, 2, 1 )
-         SET COLOR TO (__guicolor(::ColorSpec, 2))
-         Setpos( ::OffSet, ::Start + ::ThumbPos )
-         ?? Substr( ::Style, 3, 1 )
+         DispOutAt( ::OffSet, ::Start + nThumbPos, ::Style[ 2 ], __guicolor( ::ColorSpec, 1 ) )
+         DispOutAt( ::OffSet, ::Start + ::ThumbPos, ::Style[ 3 ], __guicolor( ::ColorSpec, 2 ) )
       ENDIF
 
       Dispend()
 
-      SET COLOR TO (cCurColor)
       Setpos( nCurRow, nCurCol )
    ENDIF
 
@@ -387,9 +367,9 @@ METHOD GetThumbPos( nPos ) CLASS HBScrollBar
       ENDIF
 
       IF nPos == 0
-         hb_p_lShow := .F.
+         ::hb_p_lShow := .F.
       ELSE
-         hb_p_lShow := .T.
+         ::hb_p_lShow := .T.
       ENDIF
 
    ENDIF
@@ -421,9 +401,11 @@ STATIC FUNCTION ThumbPos( oScroll )
       RETURN .F.
    ENDIF
 
-   IF hb_p_lShow
+/*
+   IF oScroll:hb_p_lShow
       RETURN .T.
    ENDIF
+*/
 
    nCurrent   := oScroll:Current
    nBarLength := oScroll:BarLength
@@ -448,7 +430,6 @@ FUNCTION Scrollbar( nStart, nEnd, nOffSet, bsBlock, nOrient )
 
    LOCAL oScroll
    LOCAL cStyle
-   PUBLIC hb_p_lShow := .F.
 
    IF !( Isnumber( nStart ) ) .or. !( Isnumber( nEnd ) ) .or. !( Isnumber( nOffSet ) )
       RETURN Nil
