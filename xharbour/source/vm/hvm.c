@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.226 2003/07/05 17:38:45 lculik Exp $
+ * $Id: hvm.c,v 1.227 2003/07/06 16:59:44 lculik Exp $
  */
 
 /*
@@ -1934,6 +1934,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                dNewVal = pLocal->item.asDouble.value + iAdd;
             }
+            #ifndef HB_LONG_DOUBLE_OFF
+            else if( pLocal->type & HB_IT_LDOUBLE )
+            {
+               dNewVal = pLocal->item.asLDouble.value + iAdd;
+            }
+            #endif
 
             else if( HB_IS_DATE( pLocal ) )
             {
@@ -2058,6 +2064,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                dNewVal = pTop->item.asDouble.value + iAdd;
             }
+            #ifndef HB_LONG_DOUBLE_OFF
+            else if( pTop->type & HB_IT_LDOUBLE )
+            {
+               dNewVal = pTop->item.asDouble.value + iAdd;
+            }
+            #endif
             else if( HB_IS_DATE( pTop ) )
             {
                pTop->item.asDate.value += iAdd;
@@ -2886,7 +2898,7 @@ static void hb_vmNegate( void )
    {
       pItem->item.asDouble.value = -pItem->item.asLDouble.value;
       /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
-      pItem->item.asLDouble.length = 30 ;
+      pItem->item.asLDouble.length = 20 ;
    }
 #endif
 
@@ -4331,6 +4343,12 @@ static void hb_vmArrayPop( void )
          {
             bNewChar = (BYTE) pValue->item.asLong.value;
          }
+         #ifndef HB_LONG_DOUBLE_OFF
+         else if( pValue->type == HB_IT_LDOUBLE )
+         {
+            bNewChar = (BYTE) pValue->item.asLDouble.value;
+         }
+         #endif
          else
          {
             bNewChar = (BYTE) pValue->item.asDouble.value;
@@ -4601,7 +4619,14 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
          hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asDouble.value );
          pAlias->type = HB_IT_NIL;
          break;
-
+      #ifndef HB_LONG_DOUBLE_OFF
+      case HB_IT_LDOUBLE:
+         /* Alias was evaluated from an expression, (nWorkArea)->field
+          */
+         hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asLDouble.value );
+         pAlias->type = HB_IT_NIL;
+         break;
+     #endif
       case HB_IT_SYMBOL:
          /* Alias was specified using alias identifier, for example: al->field
           */
@@ -6118,6 +6143,11 @@ static double hb_vmPopNumber( void )
       case HB_IT_DOUBLE:
          dNumber = pItem->item.asDouble.value;
          break;
+      #ifndef HB_LONG_DOUBLE_OFF
+      case HB_IT_LDOUBLE:
+         dNumber = pItem->item.asLDouble.value;
+         break;
+      #endif
 
       case HB_IT_DATE:
          dNumber = (double) pItem->item.asDate.value;
@@ -6168,6 +6198,12 @@ static double hb_vmPopDouble( int * piDec )
          dNumber = pItem->item.asDouble.value;
          *piDec = pItem->item.asDouble.decimal;
          break;
+      #ifndef HB_LONG_DOUBLE_OFF
+      case HB_IT_LDOUBLE:
+         dNumber = pItem->item.asLDouble.value;
+         *piDec = 0;
+         break;
+      #endif
 
       case HB_IT_DATE:
          dNumber = (double) pItem->item.asDate.value;
