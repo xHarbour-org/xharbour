@@ -18,7 +18,7 @@ FUNCTION Main
    oApp := Application():Initialize()
 
    // splash screen
-   oSplash := TSplash():New( oApp, "visual_xharbour.bmp", 5000 )
+//   oSplash := TSplash():New( oApp, "visual_xharbour.bmp", 5000 )
 
    WITH OBJECT oApp
       WITH OBJECT :CreateFrame( 'MainFrame', MainFrame() )
@@ -38,7 +38,7 @@ FUNCTION Main
          // add the rebar
          WITH OBJECT :Add('Rebar', TRebar():New( oApp:MainFrame ) )
             // add the xmake toolbar
-            WITH OBJECT :Add( 'Tools', TToolBar():New( oApp:MainFrame:Rebar, 444, 15, , , 26, 26, 20, 20 ))
+            WITH OBJECT :Add( 'Tools', TToolBar():New( oApp:MainFrame:GetObj("Rebar"), 444, 15, , , 26, 26, 20, 20 ))
                :AddButton( "NewProj",      ToolButton():New( 0,,"New Project",10, {|o|MessageBox(,o:hint)} ) )
                :AddButton( "OpenProj",     ToolButton():New( 1,,"Open Project",11 ) )
                :AddButton( "Properties",   ToolButton():New( 2,,"Properties",12 ) )
@@ -63,11 +63,13 @@ FUNCTION Main
                SendMessage( :handle, TB_SETIMAGELIST, 0, hImg1 )
                //---------------------------------------------------------------------
             END
-            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :Tools:handle, 200, 52, 200, "", NIL )
+            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :GetObj("Tools"):handle, 200, 52, 200, "", NIL )
 
             // add the TabControl on the Rebarband
-            WITH OBJECT :Add( 'Tabs', TTabControl():New( oApp:MainFrame:Rebar, 445,  0,  0,  0,  0) )
-               :AddTab( "Standard" )
+            WITH OBJECT :Add( 'Tabs', TTabControl():New( oApp:MainFrame:GetObj("Rebar"), 445,  0,  0,  0,  0) )
+               
+               :AddTab( "StdTab", TabPage():New( oApp:MainFrame:GetObj("Rebar"):GetObj("Tabs"), "Standard" ) )
+               
                :AddTab( "Aditional" )
                :AddTab( "Win32" )
                :AddTab( "System" )
@@ -77,15 +79,15 @@ FUNCTION Main
                :AddTab( "Samples" )
                :AddTab( "Activex" )
             END
-            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :Tabs:handle, 550, 56, , "", NIL )
-            :Tabs:Configure()
+            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :GetObj("Tabs"):handle, 550, 56, , "", NIL )
+            :GetObj("Tabs"):Configure()
             
             // sets the controls toolbar on the TabControl
 
-            WITH OBJECT :Tabs:Tabs[1]
-               WITH OBJECT :Add( 'TabBand', TRebar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1] ) )
+            WITH OBJECT :GetObj("Tabs"):GetObj("StdTab") //:Tabs:StdTab
+               WITH OBJECT :Add( 'TabBand', TRebar():New( oApp:MainFrame:GetObj("Rebar"):GetObj("Tabs"):GetObj("StdTab") ) )
                   :SetStyle( WS_BORDER, .F. )
-                  WITH OBJECT :Add( 'StdTools', TToolBar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1]:TabBand, 444, 14, , , 28, 28, 20, 20 ) )
+                  WITH OBJECT :Add( 'StdTools', TToolBar():New( oApp:MainFrame:GetObj("Rebar"):GetObj("Tabs"):GetObj("StdTab"):GetObj("TabBand"), 444, 14, , , 28, 28, 20, 20 ) )
                      :SetStyle( TBSTYLE_CHECKGROUP )
 
                      aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
@@ -107,11 +109,11 @@ FUNCTION Main
                      //---------------------------------------------------------------------
                   END
 
-                  :AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
-                  :StdTools:DisableAll()
+                  :AddBand( NIL, RBBS_NOVERT, :GetObj("StdTools"):handle, 100, 30,  , "", NIL )
+                  :GetObj("StdTools"):DisableAll()
                   
                   //--------- sets a QUICK access to the control
-                  oApp:MainFrame:SetLink( 'StdBar', :StdTools )
+                  //oApp:MainFrame:SetLink( 'StdBar', :GetObj("StdTools") )
                END
             END
 
@@ -119,9 +121,8 @@ FUNCTION Main
          // add the main status bar
          WITH OBJECT :Add('Status',  TStatusBar():New( oApp:MainFrame, 'StatusBar', 1001 ) ) 
             :SetPanels( { 150,380,480,580,-1 } )
-            :SetPanelText( 0, "What32 API StatusBar" )
-            :SetPanelText( 2, "Enjoy" )
          END
+         :GetObj("Status"):SetPanelText( 0, "Visual xHarbour" )
          
          // add the object windows
          :Add( 'ObjTree', ObjTree():New( oApp:MainFrame ) )
@@ -176,15 +177,18 @@ CLASS ObjInspect FROM TForm
    // disallow window from being closed
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE ::InspTabs:Move(,,x,y,.t.),nil
+   METHOD OnSize(n,x,y)  INLINE ::GetObj("InspTabs"):Move(,,x,y,.t.),nil
 ENDCLASS
 
 METHOD OnCreate() CLASS ObjInspect
   local aRect := ::ClientRect()
   ::Add( 'InspTabs', TTabControl():New( self, 555,  0,  0, aRect[3], aRect[4]) )
-  ::InspTabs:AddTab( "Properties",'Test' )
-  ::InspTabs:AddTab( "Events" )
-  ::InspTabs:Configure()
+  ::GetObj("InspTabs"):AddTab( "Properties", "Test" )
+  ::GetObj("InspTabs"):AddTab( "Events", TabPage():New( ::GetObj("InspTabs"), "Events") )
+  ::GetObj("InspTabs"):Configure()
+  
+  ::GetObj("InspTabs"):GetObj("Events"):Add( 'btn', TButton():New( ::GetObj("InspTabs"):GetObj("Events"), 'OOPS', 500,  10, 10, 50, 20 ) )
+  
 return( super:OnCreate() )
 
 //----------------------------------------------------------------------------------------------

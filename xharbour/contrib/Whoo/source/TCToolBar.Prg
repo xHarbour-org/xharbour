@@ -164,8 +164,8 @@ METHOD AddButton( cName, oBtn ) CLASS TToolBar
    tbb:iString   := LEN(::aButtons)
    AADD(::aButtons,oBtn)
 
-   __objAddData( self, oBtn:name )
-   __ObjSetValueList( self, { { oBtn:name, oBtn } } )
+   //__objAddData( self, oBtn:name )
+   //__ObjSetValueList( self, { { oBtn:name, oBtn } } )
 
    SendMessage(::handle,TB_ADDBUTTONS,1,tbb:value)
    SendMessage(::handle,TB_ADDSTRING, 0,oBtn:Caption)

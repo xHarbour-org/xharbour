@@ -3,6 +3,7 @@
 
 #include "hbclass.ch"
 #include "windows.ch"
+#include "what32.ch"
 
 #Define RCF_DIALOG     0
 #Define RCF_WINDOW     1
@@ -16,6 +17,7 @@ CLASS TFrame FROM TWindow
    METHOD New()
    METHOD Add()
    METHOD SetLink()
+   METHOD GetObj()
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -30,18 +32,22 @@ METHOD New( oParent ) CLASS TFrame
    ::FormType  := RCF_WINDOW
    ::lRegister := .T.
    InitCommonControls()
-   InitCommonControlsEx(ICC_BAR_CLASSES)
+//   InitCommonControlsEx(ICC_BAR_CLASSES)
 
    return( super:New( oParent ) )
 
 *-----------------------------------------------------------------------------*
 
-METHOD Add( cName, oObj ) CLASS TFrame
+METHOD Add( cName, oObj, lCreate ) CLASS TFrame
    
+   DEFAULT lCreate TO .T.
    oObj:propname := cName
    ::SetLink( cName, oObj )
-   oObj:Create()
-   
+   IF lCreate
+      oObj:Create()
+   endif
+   AADD( ::Controls, oObj )
+
    return( oObj )
 
 *-----------------------------------------------------------------------------*
@@ -50,3 +56,12 @@ METHOD SetLink( cName, oObj ) CLASS TFrame
    __objAddData( self, cName )
    __ObjSetValueList( self, { { cName, oObj } } )
 return( oObj )
+
+*-----------------------------------------------------------------------------*
+
+METHOD GetObj( cName ) CLASS TFrame
+   local n:= ASCAN( ::Controls,{|o|o:propname==cName} )
+   if n>0
+      return( ::Controls[n] )
+   endif
+return(nil)

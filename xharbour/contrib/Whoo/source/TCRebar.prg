@@ -77,6 +77,7 @@ METHOD New( oParent ) CLASS TRebar
    ::ExStyle   := WS_EX_TOOLWINDOW
    ::Style     := WS_VISIBLE+WS_BORDER+WS_CHILD+WS_CLIPCHILDREN+WS_CLIPSIBLINGS+;
                   RBS_VARHEIGHT+RBS_BANDBORDERS+CCS_NODIVIDER+CCS_NOPARENTALIGN+CCS_TOP
+
    RETURN( self )
 
 *------------------------------------------------------------------------------*

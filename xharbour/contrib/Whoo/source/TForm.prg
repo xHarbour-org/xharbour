@@ -20,7 +20,7 @@ CLASS TForm FROM TWindow
    METHOD Del()
    METHOD ChildFromHandle( hHandle )
    METHOD ChildFromId( hHandle )
-
+   METHOD GetObj()
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -48,6 +48,7 @@ METHOD Add( cName, oObj, lCreate ) CLASS TForm
    IF lCreate
       oObj:Create()
    endif
+   AADD( ::Controls, oObj )
    RETURN( oObj )
 
 *-----------------------------------------------------------------------------*
@@ -81,3 +82,10 @@ METHOD ChildFromId( nId ) CLASS TForm
    return(nil)
 
 *-----------------------------------------------------------------------------*
+
+METHOD GetObj( cName ) CLASS TForm
+   local n:= ASCAN( ::Controls,{|o|o:propname==cName} )
+   if n>0
+      return( ::Controls[n] )
+   endif
+return(nil)
