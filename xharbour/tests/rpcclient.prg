@@ -1,6 +1,6 @@
 ************************************************************
 * rpcclient.prg
-* $Id: rpcclient.prg,v 1.4 2003/02/23 20:13:39 jonnymind Exp $
+* $Id: rpcclient.prg,v 1.5 2003/02/24 01:58:11 jonnymind Exp $
 * Test for tRpcClient class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -37,6 +37,7 @@ PROCEDURE Main( cNetwork )
       cNetwork := "127.0.0.255"
    ENDIF
 
+   INETINIT()
    // creating a client
    oRpc := tRpcClient( cNetwork )
 

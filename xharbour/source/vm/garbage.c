@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.43 2003/02/22 05:54:57 jonnymind Exp $
+ * $Id: garbage.c,v 1.44 2003/02/26 05:36:11 jonnymind Exp $
  */
 
 /*
@@ -521,7 +521,8 @@ void hb_gcCollect( void )
 */
 void hb_gcCollectAll( void )
 {
-   
+   HB_GARBAGE_PTR pAlloc, pDelete;
+
    /*JC1: in MT, GC collecting is not just -locked-: if a second thread
    wants to collect while another is doing collection, it will just wait
    for the first to finish and then return. Double garbage collecting is
@@ -590,9 +591,7 @@ void hb_gcCollectAll( void )
    * - freed (in their members)
    * - modified/released (in their strucure )
    *****/
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
-   
-   HB_GARBAGE_PTR pAlloc, pDelete;
+   HB_CRITICAL_LOCK( hb_threadContextMutex );   
 
    s_bCollecting = TRUE;
    s_uAllocated = 0;

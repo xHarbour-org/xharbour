@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.50 2003/02/22 05:54:57 jonnymind Exp $
+* $Id: thread.c,v 1.51 2003/02/26 05:36:11 jonnymind Exp $
 */
 
 /*
@@ -361,7 +361,7 @@ hb_create_a_thread(
          it is safe to set async cancellation mode */
       pthread_setcanceltype( PTHREAD_CANCEL_ASYNCHRONOUS , NULL );
    #else
-      pContext = Cargo->context;
+      pContext = pt->context;
    #endif
    
    pStack = pContext->stack;
