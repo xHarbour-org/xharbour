@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3264 2004/08/03 11:16:16 druzus Exp $
+ * $Id: ChangeLog,v 1.3265 2004/08/03 19:12:52 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-03 23:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/regex.c
+    ! fixed bug I introduced with bad casting - the problem of real
+      and complex solution still active.
 
 2004-08-03 17:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

@@ -6780,7 +6780,7 @@ HB_FUNC( HB_REGEXCOMP )
       cRegex = (char *) hb_xgrab( 3 + sizeof( re ) + nSize );
       memcpy( cRegex + 3 + sizeof( re ), re.re_pcre, nSize );
       (pcre_free)(re.re_pcre);
-      re.re_pcre = (pcre *) cRegex + 3 + sizeof( re );
+      re.re_pcre = (pcre *) ( cRegex + 3 + sizeof( re ) );
       memcpy( cRegex, "***", 3 );
       memcpy( cRegex + 3, &re, sizeof( re ) );
       hb_retclenAdoptRaw( cRegex, 3 + sizeof( re ) + nSize );
