@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.4 2002/05/25 16:22:12 lculik Exp $
+ * $Id: dbedit.prg,v 1.5 2003/01/27 03:37:23 walito Exp $
  */
 
 /*
@@ -302,8 +302,8 @@ FUNCTION dbEdit(;
          CASE K_CTRL_END   ; oBrowse:PanEnd() ; exit
          DEFAULT
             IF !dbEditCallUser( oBrowse, xUserFunc, nKey )
-               lWhile := .T.
-               EXIT
+               lWhile := .F.
+//               EXIT
             ENDIF
             lException := .T.
       END
