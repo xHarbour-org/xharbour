@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2081 2004/01/16 22:57:07 paultucker Exp $
+ * $Id: ChangeLog,v 1.2082 2004/01/17 00:05:56 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-16 17:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+  * tests/pp.prg
+    + Added Single and Double Quote as Extented Marker terminators.
 
 2004-01-16 16:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c

@@ -4761,7 +4761,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
   LOCAL  sMultiStopper, nSpaceAt, sNextStopper, cChar
   LOCAL  aExp
   LOCAL bErrHandler := ErrorBlock()
-  LOCAL nCommaAt, nAt
+  LOCAL nCommaAt, nAt, nDoubleAt, nSingleAt
 
   IF Empty( sLine )
      RETURN NIL
@@ -4860,13 +4860,21 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         s1 := Left( sLine, 1 )
 
         IF ! ( s1 $ "&(['" + '"' )
-            nSpaceAt := At( ' ', sLine )
-            nCommaAt := At( ',', sLine )
+            nSpaceAt  := At( ' ', sLine )
+            nCommaAt  := At( ',', sLine )
+            nDoubleAt := At( '"', sLine )
+            nSingleAt := At( "'", sLine )
 
-            IF nSpaceAt > 0 .AND. nSpaceAt < nCommaAt
-               nAt := nSpaceAt
-            ELSE
+            nAt := nSpaceAt
+
+            IF nCommaAt > 0 .AND. ( nAt == 0 .OR. nAt > nCommaAt )
                nAt := nCommaAt
+            ENDIF
+            IF nDoubleAt > 0 .AND. ( nAt == 0 .OR. nAt > nCommaAt )
+               nAt := nDoubleAt
+            ENDIF
+            IF nSingleAt > 0 .AND. ( nAt == 0 .OR. nAt > nCommaAt )
+               nAt := nSingleAt
             ENDIF
 
             IF nAt == 0
