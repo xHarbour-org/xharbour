@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.22 2002/01/23 16:48:31 ronpinkas Exp $
+ * $Id: hvm.c,v 1.23 2002/01/23 23:33:52 ronpinkas Exp $
  */
 
 /*
@@ -3089,7 +3089,7 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
 /* Object                          */
 /* ------------------------------- */
 
-#if 0
+#if 1
 void hb_vmMessage( PHB_SYMB pSymMsg ) /* sends a message to an object */
 {
    PHB_ITEM pTop = hb_stackTopItem();
