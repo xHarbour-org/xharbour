@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.32 2004/03/01 22:00:38 andijahja Exp $
+ * $Id: hbapifs.h,v 1.33 2004/03/02 08:21:54 andijahja Exp $
  */
 
 /*
@@ -145,7 +145,7 @@ extern USHORT   HB_EXPORT hb_fsWrite      ( FHANDLE hFileHandle, BYTE * pBuff, U
 extern ULONG    HB_EXPORT hb_fsWriteLarge ( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount ); /* write to an open file from a buffer (>64K) */
 extern FHANDLE  HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode );
 extern void     HB_EXPORT hb_fsDirectory( PHB_ITEM Dir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
-extern void     HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM Dir, char* szSkleton, char* szFName, char* szAttributes );
+extern void     HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM Dir, char* szSkleton, char* szFName, char* szAttributes, BOOL bMatchCase );
 
 /* Open a child process */
 extern FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename, FHANDLE *fhStdin, FHANDLE *fhStdout, FHANDLE *fhStderr, BOOL bBackground );
@@ -192,9 +192,9 @@ typedef struct
    char      szTime[ 9 ]; /* in HH:MM:SS format */
    USHORT    attr;
 #ifndef HB_LONG_LONG_OFF
-   LONGLONG  size; 
+   LONGLONG  size;
 #else
-   ULONG     size; 
+   ULONG     size;
 #endif
    void *    info; /* Pointer to the platform specific find info */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2454 2004/03/02 23:19:37 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2455 2004/03/03 00:07:26 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-02 17:37 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/regex.c
+    + added int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase )
+
+  * source/rtl/strmatch.c
+    + Implemnted TODO: hb_strMatchRegExp()
+
+  * include/hbapifs.h
+    + Added 5th paramater BOOL bMatchCase to hb_fsDirectoryCrawler()
+  * source/rtl/direct.c
+    + Added 5th paramater BOOL bMatchCase to hb_fsDirectoryCrawler()
+    + Added support for 3rd paramater <lMatchCase> to HB_FUNC( DIRECTORYRECURSE )
+    * Modified hb_fsDirectoryCrawler() to use new Wild2RegEx() and support bMatchCase argument.
 
 2004-03-03 01:15 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/utils/hbtest/hbtest.prg

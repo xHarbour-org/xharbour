@@ -1,5 +1,5 @@
 /*
- * $Id: strmatch.c,v 1.3 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: strmatch.c,v 1.1.1.1 2001/12/21 10:42:06 ronpinkas Exp $
  */
 
 /*
@@ -54,6 +54,8 @@
 
 #include "hbapi.h"
 
+#include "regex.h"
+
 static BOOL hb_strMatchDOS( const char * pszString, const char * pszMask )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strMatchDOS(%s, %s)", pszString, pszMask));
@@ -63,29 +65,43 @@ static BOOL hb_strMatchDOS( const char * pszString, const char * pszMask )
       if( *pszMask == '*' )
       {
          while( *pszMask == '*' )
+         {
             pszMask++;
+         }
 
          if( *pszMask == '\0' )
+         {
             return TRUE;
+         }
          else if( *pszMask == '?' )
+         {
             pszString++;
+         }
          else
          {
             while( toupper( *pszString ) != toupper( *pszMask ) )
             {
                if( *( ++pszString ) == '\0' )
+               {
                   return FALSE;
+               }
             }
+
             while( toupper( *pszString ) == toupper( *pszMask ) )
             {
                if( *( ++pszString ) == '\0' )
+               {
                   break;
+               }
             }
+
             pszMask++;
          }
       }
       else if( toupper( *pszMask ) != toupper( *pszString ) && *pszMask != '?' )
+      {
          return FALSE;
+      }
       else
       {
          pszMask++;
@@ -93,17 +109,25 @@ static BOOL hb_strMatchDOS( const char * pszString, const char * pszMask )
       }
    }
 
-   return ! ( ( *pszMask != '\0' && *pszString == '\0' && *pszMask != '*') ||
-              ( *pszMask == '\0' && *pszString != '\0' ) );
+   return ! ( ( *pszMask != '\0' && *pszString == '\0' && *pszMask != '*') || ( *pszMask == '\0' && *pszString != '\0' ) );
 }
 
-/* TODO: Replace it with a code that supports real regular expressions
- *
- */
 BOOL hb_strMatchRegExp( const char * szString, const char * szMask )
 {
+   regex_t re;
+   regmatch_t aMatches[1];
+   int CFlags = REG_EXTENDED, EFlags = 0;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_strMatchRegExp(%s, %s)", szString, szMask));
 
-   return hb_strMatchDOS( szString, szMask );
+   if( regcomp( &re, szMask, CFlags ) == 0 )
+   {
+      if( regexec( &re, szString, 1, aMatches, EFlags ) == 0 )
+      {
+         return aMatches[0].rm_so == 0 && aMatches[0].rm_eo == strlen( szString );
+      }
+   }
+
+   return FALSE;
 }
 

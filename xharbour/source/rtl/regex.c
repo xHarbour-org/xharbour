@@ -6626,6 +6626,66 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
    return FALSE;
 }
 
+/*
+ Converts OS Directory Wild Mask to an equivalent RegEx
+ Caller must allocate sRegEx with enough space for conversion.
+ returns the length of the resulting RegEx.
+ */
+int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase )
+{
+   char cChar;
+   int iLen = strlen( sWild );
+   int i, iLenResult;
+
+   if( ! bMatchCase )
+   {
+      strncpy( sRegEx, "(?i)", 4 );
+      iLenResult = 4;
+   }
+
+   strncpy( sRegEx, "\\b", 2 );
+   iLenResult = 2;
+
+   for( i = 0; i < iLen; i++ )
+   {
+      cChar = sWild[i];
+
+      switch( cChar )
+      {
+         case '*':
+            // Space NOT allowed as 1st. character.
+            if( i == 0 )
+            {
+               strncpy( sRegEx + iLenResult, "[^ ]", 4 );
+               iLenResult += 4;
+            }
+
+            strncpy( sRegEx + iLenResult, ".*", 2 );
+            iLenResult += 2;
+            break;
+
+         case '?':
+            strncpy( sRegEx + iLenResult, ".?", 2 );
+            break;
+
+         case '.':
+            strncpy( sRegEx + iLenResult, "\\.", 2 );
+            iLenResult += 2;
+            break;
+
+         default:
+            sRegEx[ iLenResult++ ] = cChar;
+      }
+   }
+
+   strncpy( sRegEx + iLenResult, "\\b", 2 );
+   iLenResult += 2;
+
+   sRegEx[ iLenResult ] = '\0';
+
+   return iLenResult;
+}
+
 // Returns array of Match + Sub-Matches.
 HB_FUNC( HB_REGEX )
 {
