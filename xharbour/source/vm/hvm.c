@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.162 2003/02/19 12:17:50 jonnymind Exp $
+ * $Id: hvm.c,v 1.163 2003/02/22 01:30:37 jonnymind Exp $
  */
 
 /*
@@ -5574,7 +5574,7 @@ static BOOL hb_vmPopLogical( void )
       else if( HB_IS_LONG( hb_stackItemFromTop( -1 ) ) )
          return ( ( * HB_VM_STACK.pPos )->item.asLong.value != 0 );
 
-      else 
+      else
          return ( ( * HB_VM_STACK.pPos )->item.asDouble.value != 0.0 );
    }
 #endif
@@ -6656,15 +6656,23 @@ HB_FUNC( HB_QSELF )
 {
    HB_THREAD_STUB
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
+   long lLevel = hb_parnl( 1 );
 
    // Outer function level.
    pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
+   while( lLevel > 0 && pBase != HB_VM_STACK.pItems )
+   {
+      lLevel--;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+   }
+
    // Outer while in Block.
    while( ( strcmp( ( *pBase )->item.asSymbol.value->szName, "EVAL" ) == 0 ||
             strcmp( ( *pBase )->item.asSymbol.value->szName, "__EVAL" ) == 0 ) &&
-           pBase != HB_VM_STACK.pItems )
+            pBase != HB_VM_STACK.pItems )
    {
+      lLevel--;
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
 
