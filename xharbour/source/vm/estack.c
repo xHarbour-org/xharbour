@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.53 2003/11/30 12:32:30 druzus Exp $
+ * $Id: estack.c,v 1.54 2003/12/05 04:11:48 jonnymind Exp $
  */
 
 /*
@@ -183,9 +183,9 @@ void hb_stackInit( void )
    /*JC1: Under threads, the stack is not present until it is created here. Notice that
      calling xgrab is an error also WITHOUT threads, as the xgrab routine accesses
      a variable (the stack) that cannot be initialized yet */
-   
+
    hb_stack.pItems = NULL;  // tell xgrab we are not ready
-   
+
    #ifndef HB_THREAD_SUPPORT
    hb_stack.pItems = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
 
@@ -483,8 +483,21 @@ void hb_stackDispLocal( void )
 void hb_stackDispCall( void )
 {
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
+   char buffer[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 32 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackDispCall()"));
+
+   if( HB_IS_ARRAY( *( pBase + 1 ) ) )
+   {
+      sprintf( buffer, HB_I_("Called from %s:%s(%i)"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+   }
+   else
+   {
+      sprintf( buffer, HB_I_("Called from %s(%i)"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
+   }
+
+   hb_conOutErr( buffer, 0 );
+   hb_conOutErr( hb_conNewLine(), 0 );
 
    while( pBase != HB_VM_STACK.pItems )
    {

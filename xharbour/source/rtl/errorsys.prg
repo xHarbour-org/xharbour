@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.25 2003/11/10 00:59:32 fsgiudice Exp $
+ * $Id: errorsys.prg,v 1.26 2003/11/12 14:19:01 jonnymind Exp $
  */
 
 /*
@@ -457,12 +457,15 @@ Return nil
 
 STATIC FUNCTION Arguments( oErr )
 
-   LOCAL nIndex := 0, xArg, cArguments := ""
+   LOCAL xArg, cArguments := ""
 
    IF ValType( oErr:Args ) == "A"
       FOR EACH xArg IN oErr:Args
-         nIndex++
-         cArguments += " [" + Str( nIndex, 2 ) + "] = Type: " + ValType( xArg ) + " Val: " + CStr( xArg )
+         cArguments += " [" + Str( HB_EnumIndex(), 2 ) + "] = Type: " + ValType( xArg )
+
+         IF xArg != NIL
+            cArguments +=  " Val: " + CStr( xArg )
+         ENDIF
       NEXT
    ENDIF
 

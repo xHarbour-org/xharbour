@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.34 2003/12/01 23:50:12 druzus Exp $
+ * $Id: win32ole.prg,v 1.35 2003/12/05 04:52:25 ronpinkas Exp $
  */
 
 /*
@@ -639,54 +639,98 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, u
    IF LEFT( cMsg, 1 ) == '_'
       cMsg := SubStr( cMsg, 2 )
 
-      IF nParams == 9
-         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
-      ELSEIF nParams == 8
-         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
-      ELSEIF nParams == 7
-         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
-      ELSEIF nParams == 6
-         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
-      ELSEIF nParams == 5
-         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
-      ELSEIF nParams == 4
-         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4 )
-      ELSEIF nParams == 3
-         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3 )
-      ELSEIF nParams == 2
-         uObj := ::Set( cMsg, @uParam1, @uParam2 )
-      ELSEIF nParams == 1
-         uObj := ::Set( cMsg, @uParam1 )
-      ELSE
-         uObj := ::Set( cMsg )
-      ENDIF
+      SWITCH nParams
+         CASE 9
+            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
+            EXIT
+         CASE 8
+            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
+            EXIT
+         CASE 7
+            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
+            EXIT
+         CASE 6
+            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
+            EXIT
+         CASE 5
+            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
+            EXIT
+         CASE 4
+            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4 )
+            EXIT
+         CASE 3
+            uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3 )
+            EXIT
+         CASE 2
+            uObj := ::Set( cMsg, @uParam1, @uParam2 )
+            EXIT
+         CASE 1
+            uObj := ::Set( cMsg, @uParam1 )
+            EXIT
+         CASE 0
+            uObj := ::Set( cMsg )
+            EXIT
+         DEFAULT
+           oErr := ErrorNew()
+           oErr:Args          := { Self, cMsg, HB_aParams() }
+           oErr:CanDefault    := .F.
+           oErr:CanRetry      := .F.
+           oErr:CanSubstitute := .T.
+           oErr:Description   := "Too many paramteres"
+           oErr:GenCode       := EG_OLEEXECPTION
+           oErr:Operation     := ::cClassName + ":" + cMsg
+           oErr:Severity      := ES_ERROR
+           oErr:SubCode       := -1
+           oErr:SubSystem     := "TOleAuto"
+      END
 
       // Reset in ::Set()
       //SetOleRefFlags()
    ELSE
-      IF nParams == 9
-         uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
-      ELSEIF nParams == 8
-         uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
-      ELSEIF nParams == 7
-         uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
-      ELSEIF nParams == 6
-         uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
-      ELSEIF nParams == 5
-         uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
-      ELSEIF nParams == 4
-         uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4 )
-      ELSEIF nParams == 3
-         uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3 )
-      ELSEIF nParams == 2
-         uObj := ::Invoke( cMsg, @uParam1, @uParam2 )
-      ELSEIF nParams == 1
-         uObj := ::Invoke( cMsg, @uParam1 )
-      ELSE
-         //TraceLog( ::cClassName )
-         uObj := ::Invoke( cMsg )
-         //TraceLog( ::cClassName )
-      ENDIF
+      SWITCH nParams
+         CASE 9
+            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
+            EXIT
+         CASE 8
+            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
+            EXIT
+         CASE 7
+            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
+            EXIT
+         CASE 6
+            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
+            EXIT
+         CASE 5
+            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
+            EXIT
+         CASE 4
+            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4 )
+            EXIT
+         CASE 3
+            uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3 )
+            EXIT
+         CASE 2
+            uObj := ::Invoke( cMsg, @uParam1, @uParam2 )
+            EXIT
+         CASE 1
+            uObj := ::Invoke( cMsg, @uParam1 )
+            EXIT
+         CASE 0
+            uObj := ::Invoke( cMsg )
+            EXIT
+         DEFAULT
+           oErr := ErrorNew()
+           oErr:Args          := { Self, cMsg, HB_aParams() }
+           oErr:CanDefault    := .F.
+           oErr:CanRetry      := .F.
+           oErr:CanSubstitute := .T.
+           oErr:Description   := "Too many paramteres"
+           oErr:GenCode       := EG_OLEEXECPTION
+           oErr:Operation     := ::cClassName + ":" + cMsg
+           oErr:Severity      := ES_ERROR
+           oErr:SubCode       := -1
+           oErr:SubSystem     := "TOleAuto"
+      END
 
       // Reset in ::Invoke()
       //SetOleRefFlags()
@@ -694,27 +738,40 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, u
       IF Ole2TxtError() != "S_OK"
          //TraceLog( cMsg )
 
-         IF nParams == 9
-            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
-         ELSEIF nParams == 8
-            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
-         ELSEIF nParams == 7
-            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
-         ELSEIF nParams == 6
-            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
-         ELSEIF nParams == 5
-            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
-         ELSEIF nParams == 4
-            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4 )
-         ELSEIF nParams == 3
-            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3 )
-         ELSEIF nParams == 2
-            uObj := ::Get( cMsg, @uParam1, @uParam2 )
-         ELSEIF nParams == 1
-            uObj := ::Get( cMsg, @uParam1 )
-         ELSE
-            uObj := ::Get( cMsg )
-         ENDIF
+         SWITCH nParams
+            CASE 9
+               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
+               EXIT
+            CASE 8
+               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
+               EXIT
+            CASE 7
+               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
+               EXIT
+            CASE 6
+               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
+               EXIT
+            CASE 5
+               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
+               EXIT
+            CASE 4
+               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4 )
+               EXIT
+            CASE 3
+               uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3 )
+               EXIT
+            CASE 2
+               uObj := ::Get( cMsg, @uParam1, @uParam2 )
+               EXIT
+            CASE 1
+               uObj := ::Get( cMsg, @uParam1 )
+               EXIT
+            CASE 0
+               uObj := ::Get( cMsg )
+               EXIT
+            DEFAULT
+               // Deatlt with above!
+         END
 
         // Reset in ::Get()
         //SetOleRefFlags()
@@ -726,7 +783,7 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, u
    IF ::bShowException
       IF Ole2TxtError() == "DISP_E_EXCEPTION"
          oErr := ErrorNew()
-         oErr:Args          := { Self, cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 }
+         oErr:Args          := { Self, cMsg, HB_aParams() }
          oErr:CanDefault    := .F.
          oErr:CanRetry      := .F.
          oErr:CanSubstitute := .T.
@@ -744,7 +801,7 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, u
          ENDIF
 
          oErr := ErrorNew()
-         oErr:Args          := { Self, cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 }
+         oErr:Args          := { Self, cMsg, HB_aParams() }
          oErr:CanDefault    := .F.
          oErr:CanRetry      := .F.
          oErr:CanSubstitute := .T.
@@ -758,10 +815,11 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, u
          RETURN Eval( ErrorBlock(), oErr )
       ENDIF
 
-      IF ValType( uObj ) == 'O'
-         uObj:cClassName := Self:cClassName + ':' + cMsg
-         //TraceLog( HB_ArrayId( uObj ), "*Returning: " + uObj:cClassName )
-      ENDIF
+   ENDIF
+
+   IF ValType( uObj ) == 'O'
+      uObj:cClassName := Self:cClassName + ':' + cMsg
+      //TraceLog( HB_ArrayId( uObj ), "*Returning: " + uObj:cClassName )
    ENDIF
 
 RETURN uObj
@@ -1845,6 +1903,10 @@ RETURN uObj
 
         case DISP_E_PARAMNOTOPTIONAL:
            hb_retc( "DISP_E_PARAMNOTOPTIONAL" );
+           break;
+
+          case MK_E_UNAVAILABLE:
+           hb_retc( "MK_E_UNAVAILABLE" );
            break;
 
         default:
