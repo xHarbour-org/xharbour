@@ -987,6 +987,10 @@ RETURN uObj
 
 	// -----------------------------------------------------------------------
 
+	//extern void pascal _pushstring( char * cParam );
+	//extern void pascal _pushint( int lParam );
+	//extern void pascal _pushdouble( double ndParam );
+
 	static far VARIANTARG RetVal;
 
 	static EXCEPINFO excep;
@@ -1429,7 +1433,7 @@ RETURN uObj
 	   IUnknown * pUnk = ( IUnknown * ) hb_parnl( 1 );
 	   COMFunc pFunc;
 	   COMFunc *vTbl;
-	   int i;
+	   int i, iParams = hb_pcount();
 	   double doubles[16];
 	   LPVOID ptros[16];
 
@@ -1438,52 +1442,102 @@ RETURN uObj
 	   vTbl += hb_parni( 2 ) + 2;
 	   pFunc = *vTbl;
 
-	   for ( i = hb_pcount(); i > 2; i-- )
-	      switch ( (hb_parinfo( i ) & ~HB_IT_BYREF) )
-	         {
+	   char *sString;
+	   int iInt;
+	   double dDouble;
+
+	   for ( i = iParams; i > 2; i-- )
+	   {
+	      switch ( ( hb_parinfo( i ) & ~HB_IT_BYREF) )
+	      {
 	         case HB_IT_STRING:
 	         case HB_IT_MEMO:
-	              break;
+                      //_pusstring( hb_parc( i ) );
+		      sString = hb_parc( i );
+		      __asm push sString
+                      break;
 
 	         case HB_IT_LOGICAL:
 	              if ( ISBYREF( i ) )
-	                 {
+	              {
 	                 ptros[ i ] = (LPVOID) hb_parl( i );
-	                 }
+	                 //_pushstring( (char *) &ptros[ i ] );
+			 sString = ( char * ) &ptros[ i ];
+			 __asm push sString
+	              }
+	              else
+                      {
+	                 //_pushint( hb_parl( i ) );
+			 iInt = hb_parl( i );
+			 __asm push iInt
+                      }
 	              break;
 
 	         case HB_IT_INTEGER:
 	         case HB_IT_LONG:
 	              if ( ISBYREF( i ) )
-	                 {
+	              {
 	                 ptros[ i ] = (LPVOID) hb_parnl( i );
-	                 }
+	                 //_pushstring( (char *) &ptros[ i ] );
+			 sString = ( char * ) &ptros[ i ];
+			 __asm push sString
+	              }
+	              else
+                      {
+	                 //_pushint( hb_parnl( i ) );
+			 iInt = hb_parnl( i );
+			 __asm push iInt
+                      }
 	              break;
 
 	         case HB_IT_DOUBLE:
 	              if ( ISBYREF( i ) )
-	                 {
+	              {
 	                 doubles[ i ] = hb_parnd( i );
-	                 }
+	                 //_pushstring( (char *) &doubles[ i ] );
+			 sString = ( char * ) &doubles[ i ];
+			 __asm push sString
+	              }
+	              else
+		      {
+	                 //_pushdouble( hb_parnd( i ) );
+			 dDouble = hb_parl( i );
+			 __asm push dDouble
+		      }
 	              break;
 
 	         case HB_IT_DATE:
 	              if ( ISBYREF( i ) )
-	                 {
+	              {
 	                 doubles[ i ] = DateToDbl( hb_pards( i ) );
-	                 }
+	                 //_pushstring( (char *) &doubles[ i ] );
+			 sString = ( char * ) &doubles[ i ];
+			 __asm push sString
+	              }
+	              else
+                      {
+	                 //_pushdouble( DateToDbl( hb_pards( i ) ) );
+			 dDouble = DateToDbl( hb_pards( i ) );
+			 __asm push dDouble
+                      }
 	              break;
 
 	         default:
+	              //_pushstring( NULL );
+		      sString = ( char * ) NULL;
+		      __asm push sString
 	              break;
-	         }
+	      }
+	   }
 
 	   nOleError = pFunc( pUnk );
 
-	   for ( i = 3; i <= hb_pcount(); i++ )
+	   for ( i = 3; i <= iParams; i++ )
+	   {
 	      if ( ISBYREF( i ) )
+	      {
 	         switch ( (hb_parinfo( i ) & ~HB_IT_BYREF) )
-	            {
+	         {
 	            case HB_IT_STRING:
 	            case HB_IT_MEMO:
 	                 hb_storc( (char *) hb_parc( i ), i );
@@ -1505,7 +1559,9 @@ RETURN uObj
 	            case HB_IT_DATE:
 	                 hb_stords( DblToDate( doubles[ i ] ), i );
 	                 break;
-	            }
+	         }
+              }
+           }
 
 	   hb_ret();
 	}
@@ -1661,6 +1717,23 @@ RETURN uObj
 	   hb_retc( cOut );
 	   hb_xfree( cOut );
 	}
+
+	/*
+	extern "C"
+        {
+		void pushstring( char * cParam )
+		{
+		}
+
+		void pushint( int lParam )
+		{
+		}
+
+		void pushdouble( double ndParam )
+		{
+		}
+        }
+	*/
 
 	//---------------------------------------------------------------------------//
 
