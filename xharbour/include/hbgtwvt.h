@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.21 2004/05/11 17:58:02 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.22 2004/05/14 12:33:48 vouchcac Exp $
  */
 
 /*
@@ -188,6 +188,7 @@ typedef struct global_data
   HPEN      penBlack;                  // Black pen to draw GDI elements
   HPEN      penWhiteDim;               // White dim pen to draw GDI elements
   HPEN      penDarkGray;               // Dark gray pen to draw GDI elements
+  HPEN      penGray;                   // Gray pen equivilant to Clipper White
   HPEN      currentPen;                // Handle to current pen settable at runtime
   HBRUSH    currentBrush;              // Handle to current brush settable by runtime
   HDC       hdc;                       // Handle to Windows Device Context

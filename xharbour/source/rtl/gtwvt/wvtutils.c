@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.0 2004/05/13 17:30:12 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.1 2004/05/14 12:33:59 vouchcac Exp $
  */
 
 /*
@@ -942,6 +942,13 @@ HB_FUNC( WVT_PASTEFROMCLIPBOARD )
       }
    }
    CloseClipboard();
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_KEYBOARD )
+{
+   hb_wvt_gtAddCharToInputQueue( hb_parnl( 1 ) );
 }
 
 //-------------------------------------------------------------------//

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.0 2004/05/13 17:30:12 vouchcac Exp $
+ * $Id: wvtcore.c,v 1.1 2004/05/14 12:33:59 vouchcac Exp $
  */
 
 /*
@@ -334,7 +334,7 @@ HB_FUNC( WVT_DRAWBOXGROUPRAISED )
 
 //-------------------------------------------------------------------//
 //
-//    Wvt_DrawImage( nTop, nLeft, nBottom, nRight, cImage/nPictureSlot )
+//    Wvt_DrawImage( nTop, nLeft, nBottom, nRight, cImage/nPictureSlot, aOffSet )
 //
 HB_FUNC( WVT_DRAWIMAGE )
 {
@@ -343,12 +343,12 @@ HB_FUNC( WVT_DRAWIMAGE )
    int   iLeft, iTop, iRight, iBottom;
 
    xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
-   iTop    = xy.y ;
-   iLeft   = xy.x ;
+   iTop    = xy.y + hb_parni( 6,1 );
+   iLeft   = xy.x + hb_parni( 6,2 ) ;
 
    xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 4 ) + 1, hb_parni( 3 ) + 1 );
-   iBottom = xy.y - 1;
-   iRight  = xy.x - 1;
+   iBottom = xy.y - 1 + hb_parni( 6,3 );
+   iRight  = xy.x - 1 + hb_parni( 6,4 );
 
    if ( ISNUM( 5 ) )
    {
@@ -1018,7 +1018,7 @@ HB_FUNC( WVT_DRAWLABELEX )
       oldTextAlign = SetTextAlign( _s->hdc, ( ISNIL( 4 ) ? TA_LEFT : hb_parni( 4 ) ) );
       oldFont      = ( HFONT ) SelectObject( _s->hdc, _s->hUserFonts[ iSlot ] );
 
-      //  Ground is Ready, Drat the Text
+      //  Ground is Ready, Draw Text
       //
       ExtTextOut( _s->hdc, xy.x, xy.y, 0, NULL, hb_parcx( 3 ), strlen( hb_parcx( 3 ) ), NULL );
 
@@ -1422,6 +1422,229 @@ HB_FUNC( WVT_RESTSCREEN )
    }
 
    hb_retl( bResult );
+}
+
+//-------------------------------------------------------------------//
+//
+// Wvt_CreateFont( cFontFace, nHeight, nWidth, nWeight, lItalic, lUnderline,
+//                 lStrikeout, nCharSet, nQuality, nEscapement )
+//
+HB_FUNC( WVT_CREATEFONT )
+{
+   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
+   LOGFONT  logfont;
+   HFONT    hFont;
+
+   logfont.lfEscapement     = ( ISNIL( 10 ) ? 0 : ( hb_parni( 10 ) * 10 ) );
+   logfont.lfOrientation    = 0;
+   logfont.lfWeight         = ( ISNIL(  4 ) ? 0 : hb_parni( 4 ) );
+   logfont.lfItalic         = ( ISNIL(  5 ) ? 0 : hb_parl(  5 ) );
+   logfont.lfUnderline      = ( ISNIL(  6 ) ? 0 : hb_parl(  6 ) );
+   logfont.lfStrikeOut      = ( ISNIL(  7 ) ? 0 : hb_parl(  7 ) );
+   logfont.lfCharSet        = ( ISNIL(  8 ) ? _s->CodePage : hb_parni( 8 ) );
+   logfont.lfOutPrecision   = 0;
+   logfont.lfClipPrecision  = 0;
+   logfont.lfQuality        = ( ISNIL( 9 ) ? DEFAULT_QUALITY : hb_parni( 9 ) );
+   logfont.lfPitchAndFamily = FF_DONTCARE;
+   logfont.lfHeight         = ( ISNIL(  2 ) ? _s->fontHeight : hb_parni( 2 ) );
+   logfont.lfWidth          = ( ISNIL(  3 ) ? ( _s->fontWidth < 0 ? -_s->fontWidth : _s->fontWidth ) : hb_parni( 3 ) );
+
+   strcpy( logfont.lfFaceName, ( ISNIL( 1 ) ? _s->fontFace : hb_parcx( 1 ) ) );
+
+   hFont = CreateFontIndirect( &logfont );
+   if ( hFont )
+   {
+      hb_retnl( ( ULONG ) hFont );
+   }
+   else
+   {
+      hb_retnl( 0 );
+   }
+}
+
+//-------------------------------------------------------------------//
+//
+//    WVT_DRAWLABELOBJ( nTop, nLeft, nBottom, nRight, cLabel, nAlignHorz, nAlignVert, nTextColor, nBkColor, hFont )
+//
+HB_FUNC( WVT_DRAWLABELOBJ )
+{
+   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
+   POINT    xy;
+   int      iTop, iLeft, iBottom, iRight, x, y;
+   RECT     rect;
+   HFONT    oldFont;
+   int      oldTextAlign, iAlignHorz, iAlignVert, iAlignH, iAlignV;
+   COLORREF oldBkColor, oldTextColor;
+   UINT     uiOptions;
+   SIZE     sz;
+
+   xy           = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   iTop         = xy.y;
+   iLeft        = xy.x;
+   xy           = hb_wvt_gtGetXYFromColRow( hb_parni( 4 )+1, hb_parni( 3 )+1 );
+   iBottom      = xy.y - 1;
+   iRight       = xy.x - 1;
+
+   iAlignHorz   = ( ISNIL( 6 ) ? 0 : hb_parni( 6 ) );
+   iAlignVert   = ( ISNIL( 7 ) ? 0 : hb_parni( 7 ) );
+
+   oldTextColor = SetTextColor( _s->hdc, ISNIL( 8 ) ? _s->foreground : ( COLORREF ) hb_parnl( 8 ) );
+   oldBkColor   = SetBkColor( _s->hdc, ISNIL( 9 ) ? _s->background : ( COLORREF ) hb_parnl( 9 ) );
+   oldFont      = ( HFONT ) SelectObject( _s->hdc, ( HFONT ) hb_parnl( 10 ) );
+
+   GetTextExtentPoint32( _s->hdc, hb_parcx( 5 ), strlen( hb_parcx( 5 ) ), &sz );
+
+   x = iLeft;
+   y = iTop;
+
+   switch ( iAlignHorz )
+   {
+      case 0:
+      {
+         iAlignH = TA_LEFT;
+      }
+      break;
+      case 1:
+      {
+         iAlignH = TA_RIGHT;
+         x = iRight;
+      }
+      break;
+      case 2:
+      {
+         iAlignH = TA_CENTER;
+         x = iLeft + ( ( iRight - iLeft + 1 ) / 2 );
+      }
+      break;
+   }
+
+   iAlignV = TA_TOP;
+
+   switch ( iAlignVert )
+   {
+      case 1:
+      {
+         y = iBottom - sz.cy;
+      }
+      break;
+      case 2:
+      {
+         y = iTop + ( ( iBottom - iTop + 1 - sz.cy ) / 2 ) ;
+      }
+      break;
+   }
+
+   oldTextAlign = SetTextAlign( _s->hdc, iAlignH | iAlignV );
+
+   rect.top     = iTop;
+   rect.left    = iLeft;
+   rect.bottom  = iBottom;
+   rect.right   = iRight;
+
+   uiOptions    = ETO_CLIPPED | ETO_OPAQUE ;
+
+   //  Ground is Ready, Draw Text
+   //
+   ExtTextOut( _s->hdc, x, y, uiOptions, &rect, hb_parcx( 5 ), strlen( hb_parcx( 5 ) ), NULL );
+
+   //  Restore Old Settings
+   //
+   SelectObject( _s->hdc, oldFont );
+   SetTextAlign( _s->hdc, oldTextAlign );
+   SetBkColor( _s->hdc, oldBkColor );
+   SetTextColor( _s->hdc, oldTextColor );
+
+   hb_retl( TRUE );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_DELETEOBJECT )
+{
+   hb_retl( DeleteObject( ( HANDLE ) hb_parnl( 1 ) ) );
+}
+
+//-------------------------------------------------------------------//
+//
+//    Wvt_DrawToolButtonState( nTop, nLeft, nBottom, nRight, nState )
+//
+HB_FUNC( WVT_DRAWTOOLBUTTONSTATE )
+{
+   GLOBAL_DATA *_s = hb_wvt_gtGetGlobalData();
+   POINT xy;
+   int   iTop, iLeft, iBottom, iRight;
+   int   iState = hb_parni( 5 );
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   iTop    = xy.y;
+   iLeft   = xy.x - 2;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 4 ) + 1, hb_parni( 3 ) + 1 );
+   iBottom = xy.y - 1 - 2;
+   iRight  = xy.x - 1 + 2;
+
+   switch ( iState )
+   {
+      case 0:     // Flat
+      {
+         SelectObject( _s->hdc, _s->penGray );
+
+         MoveToEx( _s->hdc, iRight, iTop, NULL );           // Right
+         LineTo( _s->hdc, iRight, iBottom + 1);
+
+         MoveToEx( _s->hdc, iLeft, iBottom, NULL );         // Bottom
+         LineTo( _s->hdc, iRight, iBottom );
+
+         MoveToEx( _s->hdc, iLeft, iTop, NULL );            // Left
+         LineTo( _s->hdc, iLeft, iBottom );
+
+         MoveToEx( _s->hdc, iLeft, iTop, NULL );            // Top
+         LineTo( _s->hdc, iRight, iTop );
+      }
+      break;
+
+      case 1:     // Raised
+      {
+         SelectObject( _s->hdc, _s->penBlack );
+
+         MoveToEx( _s->hdc, iRight, iTop, NULL );           // Right
+         LineTo( _s->hdc, iRight, iBottom+1 );
+
+         MoveToEx( _s->hdc, iLeft, iBottom, NULL );         // Bottom
+         LineTo( _s->hdc, iRight, iBottom );
+
+         SelectObject( _s->hdc, _s->penWhite );
+
+         MoveToEx( _s->hdc, iLeft, iTop, NULL );            // Left
+         LineTo( _s->hdc, iLeft, iBottom );
+
+         MoveToEx( _s->hdc, iLeft, iTop, NULL );            // Top
+         LineTo( _s->hdc, iRight, iTop );
+      }
+      break;
+
+      case 2:     // Recessed
+      {
+         SelectObject( _s->hdc, _s->penWhite );
+
+         MoveToEx( _s->hdc, iRight, iTop, NULL );           // Right
+         LineTo( _s->hdc, iRight, iBottom+1 );
+
+         MoveToEx( _s->hdc, iLeft, iBottom, NULL );         // Bottom
+         LineTo( _s->hdc, iRight, iBottom );
+
+         SelectObject( _s->hdc, _s->penBlack );
+
+         MoveToEx( _s->hdc, iLeft, iTop, NULL );            // Left
+         LineTo( _s->hdc, iLeft, iBottom );
+
+         MoveToEx( _s->hdc, iLeft, iTop, NULL );            // Top
+         LineTo( _s->hdc, iRight, iTop );
+      }
+      break;
+
+   }
+   hb_retl( TRUE );
 }
 
 //-------------------------------------------------------------------//

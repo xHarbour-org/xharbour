@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.103 2004/05/11 21:06:40 andijahja Exp $
+ * $Id: gtwvt.c,v 1.104 2004/05/14 12:33:58 vouchcac Exp $
  */
 
 /*
@@ -282,6 +282,7 @@ void HB_GT_FUNC( gt_Exit( void ) )
       DeleteObject( ( HPEN   ) _s.penWhiteDim  );
       DeleteObject( ( HPEN   ) _s.penBlack     );
       DeleteObject( ( HPEN   ) _s.penDarkGray  );
+      DeleteObject( ( HPEN   ) _s.penGray      );
       DeleteObject( ( HPEN   ) _s.currentPen   );
       DeleteObject( ( HBRUSH ) _s.currentBrush );
 
@@ -1431,6 +1432,7 @@ static void hb_wvt_gtCreateObjects( void )
    _s.penBlack     = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );
    _s.penWhiteDim  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 205,205,205 ) );
    _s.penDarkGray  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 150,150,150 ) );
+   _s.penGray      = CreatePen( PS_SOLID, 0, ( COLORREF ) _COLORS[ 7 ] );
 
    _s.currentPen   = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );
 
@@ -2293,12 +2295,12 @@ static void hb_wvt_gtCreateToolTipWindow( void )
    // Create the tooltip control.
    //
    hwndTT = CreateWindow( TOOLTIPS_CLASS, TEXT( "" ),
-                          WS_POPUP,
+                          WS_POPUP ,
                           CW_USEDEFAULT, CW_USEDEFAULT,
                           CW_USEDEFAULT, CW_USEDEFAULT,
                           NULL,
                           ( HMENU ) NULL,
-                          (HINSTANCE) hb_hInstance,
+                          ( HINSTANCE ) hb_hInstance,
                           NULL );
 
    SetWindowPos( hwndTT,
@@ -2315,7 +2317,7 @@ static void hb_wvt_gtCreateToolTipWindow( void )
    ti.uFlags    = TTF_SUBCLASS;
    ti.hwnd      = _s.hWnd;
    ti.uId       = 100000;
-   ti.hinst     = (HINSTANCE) hb_hInstance;
+   ti.hinst     = ( HINSTANCE ) hb_hInstance;
    ti.lpszText  = "";
    ti.rect.left = ti.rect.top = ti.rect.bottom = ti.rect.right = 0;
 
