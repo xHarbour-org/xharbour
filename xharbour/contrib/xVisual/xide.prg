@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.103 2002/10/28 12:04:19 what32 Exp $
+ * $Id: xide.prg,v 1.104 2002/10/28 13:32:55 what32 Exp $
  */
 
 /*
@@ -80,7 +80,7 @@ CLASS MainFrame FROM TForm
                                 ::top     := 0,;
                                 ::width   := GetWindowRect(GetDesktopWindow())[3],;
                                 ::height  := 125,;
-                                ::Icon    := LoadIcon(hInstance(),'0IDE'),;
+                                ::Icon    := LoadIcon( oApp:Instance,'0IDE'),;
                                 super:new( oParent )
 
    METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting xIDE ?','Exit', MB_YESNO ) == IDYES,;

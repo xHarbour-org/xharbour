@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.51 2002/10/29 01:04:09 ronpinkas Exp $
+ * $Id: xInspect.prg,v 1.52 2002/10/29 02:12:53 what32 Exp $
  */
 
 /*
@@ -44,6 +44,7 @@ CLASS ObjInspect FROM TForm
    VAR Browser  AS OBJECT
    VAR Objects  AS ARRAY INIT {}
    VAR CurObject AS OBJECT
+
    METHOD New( oParent ) INLINE ::Caption := 'Object Inspector',;
                                 ::left    := 0,;
                                 ::top     := 275,;
@@ -51,6 +52,7 @@ CLASS ObjInspect FROM TForm
                                 ::height  := 297,;
                                 ::ExStyle := WS_EX_TOOLWINDOW ,;
                                 super:new( oParent )
+
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
    METHOD OnSize(n,x,y)  INLINE  ::ComboBox1:Move(,,x,21,.t.),;
@@ -76,6 +78,7 @@ METHOD SetBrowserData( oObj, bCurrent ) CLASS ObjInspect
          FOR EACH aProp IN ::Browser:source
             aProp[2] := __objSendMsg( ::CurObject, aProp[1] )
          NEXT
+
          ::Browser:RefreshAll()
       ENDIF
    ELSE
@@ -98,7 +101,8 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------
 
 METHOD OnCreate() CLASS ObjInspect
-   local oTabs
+
+   LOCAL oTabs
 
    local aRect := ::ClientRect()
    local oCombo:= ComboInsp():New(  self, 100, 0, 0, aRect[3], 100 )
@@ -123,9 +127,12 @@ return( super:OnCreate() )
 //----------------------------------------------------------------------------------------------
 
 METHOD SaveVar(cText,nKey) CLASS ObjInspect
-   local cType, cVar, oObj
+
+   LOCAL cType, cVar, oObj
+
    cVar := ::Browser:source[::Browser:RecPos][1]
    cType:= valtype( __objSendMsg( ::CurObject, cVar ) )
+
    do case
       case cType == 'N'
            cText:=VAL(cText)
@@ -214,11 +221,14 @@ METHOD SetCurSel(n) CLASS ComboInsp
       ENDIF
 
       IF FormEdit != NIL
+      
          IF !FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ) .AND. ! FormEdit:oMask:Creating
             FormEdit:oMask:OnLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
             FormEdit:oMask:OnLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
          ENDIF
+         
       ENDIF
+      
    ENDIF
 
 RETURN Super:SetCurSel( n )
@@ -226,57 +236,74 @@ RETURN Super:SetCurSel( n )
 //---------------------------------------------------------------------------------
 
 METHOD DelObject( oObj ) CLASS ComboInsp
-   local n,x,y
+   LOCAL n,x,y
    IF ( n:= aScan( ::Parent:Objects, {|o|o:handle == oObj:handle} ))>0
-      for x:=1 to len(::Parent:Parent:ObjTree:TreeView1:Items)
-          if( y:=aScan( ::Parent:Parent:ObjTree:TreeView1:Items[x]:Items,{|o|o:cargo == oObj:handle} ))>0
+   
+      FOR x:=1 to len(::Parent:Parent:ObjTree:TreeView1:Items)
+      
+          IF( y:=aScan( ::Parent:Parent:ObjTree:TreeView1:Items[x]:Items,{|o|o:cargo == oObj:handle} ))>0
              ::Parent:Parent:ObjTree:TreeView1:Items[x]:Items[y]:Delete()
-             exit
-          endif
-      next
+             EXIT
+          ENDIF
+          
+      NEXT
+      
       aDel( ::Parent:Objects, n, .T. )
       ::DeleteString( n-1 )
       ::SetCurSel( n-2 )
    ENDIF
-return(nil)
+   
+RETURN nil
 
 //---------------------------------------------------------------------------------
 
 METHOD DrawItem( dis ) CLASS ComboInsp
-   LOCAL lselected
-   LOCAL aclip, aRect
+
+   LOCAL lSelected
+   LOCAL aClip, aRect
    LOCAL itemTxt, cText
    LOCAL nLen, n
-   lselected := And( dis:itemState, ODS_SELECTED ) > 0
-   aclip := { dis:rcItem:Left , dis:rcItem:Top  , ;
-              dis:rcItem:Right  , dis:rcItem:Bottom  }
+   
+   lSelected := And( dis:itemState, ODS_SELECTED ) > 0
+   
+   aClip := { dis:rcItem:Left,  dis:rcItem:Top, ;
+              dis:rcItem:Right, dis:rcItem:Bottom  }
+              
    IF And( dis:itemAction, ODA_DRAWENTIRE ) > 0 .OR. And( dis:itemAction, ODA_SELECT ) > 0
+   
       SetTextColor( dis:hDC  , GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_WINDOWTEXT )) )
       SetBkColor( dis:hDC  , GetSysColor(IF( lselected,COLOR_HIGHLIGHT,COLOR_WINDOW )) )
-      nLen := SendMessage( dis:hwndItem, CB_GETLBTEXTLEN, dis:itemID, 0 )
+      
+      nLen    := SendMessage( dis:hwndItem, CB_GETLBTEXTLEN, dis:itemID, 0 )
       itemTxt := Space( nLen + 1 )
       SendMessage( dis:hwndItem, CB_GETLBTEXT, dis:itemID, @itemTxt )
-      itemTxt:=left(itemTxt,nLen)
-      cText := ""
-      aRect := ACLONE(aClip)
-      for n:=1 to nLen+1
-          if substr(itemTxt,n,1)==chr(9).or.n==nLen+1
-             if n==nLen+1
-                SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_BTNSHADOW )) )
-             endif
-             exttextout( dis:hDC , dis:rcItem:Left + aRect[1]+2, dis:rcItem:Top , ;
+      
+      itemTxt :=left(itemTxt,nLen)
+      cText   := ""
+      aRect   := ACLONE(aClip)
+      FOR n := 1 to nLen + 1
+      
+          IF SubStr( itemTxt, n, 1) == chr(9) .or. n == nLen + 1
+             IF n == nLen + 1
+                SetTextColor( dis:hDC, GetSysColor( IF( lselected, COLOR_HIGHLIGHTTEXT,;
+                                                                   COLOR_BTNSHADOW ) ) )
+             ENDIF
+             ExtTextOut( dis:hDC, dis:rcItem:Left + aRect[1]+2, dis:rcItem:Top , ;
                                  ETO_OPAQUE + ETO_CLIPPED, aRect, cText )
-             cText:=""
-             aRect[1]+=80
-             loop
-          endif
-          cText+=substr(itemTxt,n,1)
-      next
-   endif
-   if And( dis:itemState, ODS_FOCUS ) > 0 .OR. And( dis:itemAction, ODA_FOCUS ) > 0
-      drawfocusrect( dis:hDC  , aclip )
-   endif
-return(1)
+             cText := ""
+             aRect[1] += 80
+             LOOP
+          ENDIF
+          
+          cText += SubStr( itemTxt, n, 1 )
+      NEXT
+      
+   ENDIF
+   IF And( dis:itemState, ODS_FOCUS ) > 0 .OR. And( dis:itemAction, ODA_FOCUS ) > 0
+      DrawfocusRect( dis:hDC, aclip )
+   ENDIF
+
+return( 1 )
 
 //---------------------------------------------------------------------------------
 
@@ -290,8 +317,11 @@ CLASS InspectBrowser FROM TWBrowse
 
 ENDCLASS
 
+//-------------------------------------------------------------------------------------------
+
 METHOD New( oParent ) CLASS InspectBrowser
-   local oCol1,oCol2, aProp := { {"",""} }
+
+   LOCAL oCol1,oCol2, aProp := { {"",""} }
 
    super:New( oParent, 150, 0, 0, 100, 100, aProp )
 
@@ -314,11 +344,15 @@ METHOD New( oParent ) CLASS InspectBrowser
    ::bOnDblClick   := {|o,x,y|::SetColControl(x,y)}
    ::Font          := oParent:Parent:font
 
-RETURN(self)
+RETURN self
+
+//-------------------------------------------------------------------------------------------
 
 METHOD SetColControl(x,y) CLASS InspectBrowser
-   local cType, cVar, aRect
-   if y==2
+
+   LOCAL cType, cVar, aRect
+   
+   if y == 2
 
       IF ::oCtrl != NIL
          ::oCtrl:Destroy()
@@ -349,7 +383,9 @@ METHOD SetColControl(x,y) CLASS InspectBrowser
       ENDCASE
    ENDIF
 
-RETURN(self)
+RETURN self
+
+//-------------------------------------------------------------------------------------------
 
 METHOD OnCommand(nwParam,nlParam) CLASS InspectBrowser
    LOCAL oList
@@ -378,23 +414,29 @@ METHOD OnCommand(nwParam,nlParam) CLASS InspectBrowser
                       oList:Create()
               ENDCASE
       ENDCASE
+      
    ENDIF
-RETURN(nil)
-
+   
+RETURN nil
 
 //------------------------------------------------------------------------------------------
 
 CLASS StringList FROM TPanel
+
    VAR nEProc PROTECTED
    METHOD New(oParent) INLINE ::resname := "StringList",;
                               ::Modal   := .T.,;
                               Super:New( oParent )
    METHOD OnCommand()
    METHOD OnCreate()
+
 ENDCLASS
 
+//-------------------------------------------------------------------------------------------
+
 METHOD OnCreate() CLASS StringList
-   local cText := "", cItem
+
+   LOCAL cText := "", cItem
 
    FOR EACH cItem IN oApp:MainFrame:ObjInspect:CurObject:Items:Text
       cText += ( cItem + CRLF )
@@ -404,10 +446,11 @@ METHOD OnCreate() CLASS StringList
 
    PostMessage( GetDlgItem( ::handle, 103 ), EM_SETSEL, 0, 0)
    SetDlgItemText( ::handle, 103, cText )
-
    SetDlgItemText( ::handle, 101, AllTrim( Str( Len( oApp:MainFrame:ObjInspect:CurObject:Items:Text ) ) ) + " Lines" )
 
 RETURN Self
+
+//-------------------------------------------------------------------------------------------
 
 METHOD OnCommand( nwParam ) CLASS StringList
    local n, cText, nPtr
@@ -415,7 +458,7 @@ METHOD OnCommand( nwParam ) CLASS StringList
 
    DO CASE
       CASE HIWORD(nwParam) == EN_CHANGE
-           n:=SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
+           n := SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
            IF nLines != n
               nLines := n
               SetDlgItemText( ::handle, 101, AllTrim( Str(nLines) ) + " Lines" )
@@ -446,4 +489,4 @@ METHOD OnCommand( nwParam ) CLASS StringList
            EndDialog( ::handle, IDCANCEL )
    ENDCASE
 
-return NIL
+RETURN NIL

@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.32 2002/10/28 17:23:59 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.33 2002/10/28 23:39:04 ronpinkas Exp $
  */
 
 /*
@@ -496,16 +496,24 @@ METHOD OnLButtonDown( wParam, x, y )
 
             IF Len( ::aSelected ) == 1 .and. ( nPos := aScan( ::aSelected[ 1, SEL_HOTAREAS ],{|a| ptInRect( a[1], {x,y} ) } ) ) > 0 // <= aHot
                ::nClick := ::aSelected[ 1, SEL_HOTAREAS, nPos, 2 ]
-               WinSetCursor( LoadCursor(, ::aSelected[ 1, SEL_HOTAREAS, nPos, 3 ] ) )
-               ::sizing := .T.
+               
+               IF wParam !=NIL
+                  WinSetCursor( LoadCursor(, ::aSelected[ 1, SEL_HOTAREAS, nPos, 3 ] ) )
+                  ::sizing := .T.
+               ENDIF
+               
               ELSE
                ::nClick := HTCAPTION
-               WinSetCursor( LoadCursor( hThisInstance, "FIST" ) )
+
+               IF wParam !=NIL
+                  WinSetCursor( LoadCursor( hThisInstance, "FIST" ) )
+                  ::moving := .T.
+               ENDIF
+               
                FOR EACH a IN ::aSelected
                    a[ SEL_ANCHORX ] := x - a[ SEL_OLDRECT, 1 ] // anchor X
                    a[ SEL_ANCHORY ] := y - a[ SEL_OLDRECT, 2 ] // anchor Y
                NEXT
-               ::moving := .T.
             ENDIF
             ::aEditRect := ::MoveCtrl( ::Handle, { x, y } )
 
@@ -530,7 +538,11 @@ METHOD OnLButtonDown( wParam, x, y )
 
       ::aSelected := {}
       ::nClick    := HTCLIENT
-      WinSetCursor( LoadCursor(, IDC_SIZEALL ) )
+      
+      IF wParam !=NIL
+         WinSetCursor( LoadCursor(, IDC_SIZEALL ) )
+      ENDIF
+      
       ::aEditRect := { x, y, x, y }
       ::selecting := .T.
       ::aClickPt  := { x, y }
@@ -541,11 +553,13 @@ METHOD OnLButtonDown( wParam, x, y )
 
    // ToolTips and Inspector selection
    IF lFound
-      ::ChangeInspector( 0 )
 
-      ::HintWindow:Activate(1)
-      ::HintWindow:TrackHint(1)
-      ::lHintActive := .T.
+      ::ChangeInspector( 0 )
+      IF wParam !=NIL
+         ::HintWindow:Activate(1)
+         ::HintWindow:TrackHint(1)
+         ::lHintActive := .T.
+      ENDIF
    ELSE
       ::ChangeInspector( 1 )
    ENDIF
@@ -768,7 +782,7 @@ METHOD OnLButtonUp( wParam, x, y )
    ::mousedown := .F.
    hDC := GetDC( ::Handle )
 
-   IF ::moving .OR. ::sizing
+   IF ( ::moving .OR. ::sizing ) .AND. wParam !=NIL
       IF len( ::aSelected ) > 1
          FOR EACH a In ::aSelected
             DrawFocusRect( hDC, a[ SEL_NEWRECT ] )
@@ -848,7 +862,9 @@ METHOD OnLButtonUp( wParam, x, y )
   // RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_UPDATENOW+RDW_ALLCHILDREN)
    ReleaseCapture()
    ::BringToTop()
-//   ::SetFocus()
+   IF wParam !=NIL
+      ::SetFocus()
+   ENDIF
    RETURN( NIL )
 
 *-----------------------------------------------------------------------------*
