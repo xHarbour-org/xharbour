@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.96 2003/09/19 17:05:49 ronpinkas Exp $
+ * $Id: hbmake.prg,v 1.97 2003/10/10 12:56:34 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -126,6 +126,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    SET DATE Ansi
    SET SCORE Off
    SET CENTURY ON
+   set trace on
 
    DEFAULT p1 TO ""
    DEFAULT p2 TO ""
@@ -527,9 +528,6 @@ FUNCTION ParseMakeFile( cFile )
          s_szProject   := cTemp
          s_aBuildOrder := ListAsArray2( cTemp, ":" )
 
-	 TRacelog(s_aMacros)
-
-      	 TRacelog(s_aMacros)
 
          IF ! s_lLibrary
             SetBuild()
@@ -714,14 +712,14 @@ FUNCTION SetBuild()
 
       cRead        := Alltrim( readln( @s_lEof ) )
       cCurrentRead := cRead
-      tracelog(cRead)
+
       aMacro       := ListAsArray2( cRead, " " )
 
         FOR EACH cMacro IN aMacro
 
          IF  "$" IN  cMacro
             Findmacro( cMacro , @cRead )
-      tracelog(cMacro)
+
             IF At( '$(PROJECT)', cCurrentRead ) > 0
 
                IF ! s_lGcc
@@ -942,14 +940,14 @@ FUNCTION CompileFiles()
 
                      __RUN( (cComm) )
                      cErrText := Memoread( (s_cLog) )
-                     lEnd     := 'Error E' $ cErrText
-
-                     IF ! s_lIgnoreErrors .AND. lEnd
+                     lEnd     := 'Error E' $   cErrText
+                     IF ! s_lIgnoreErrors .AND. lEnd 
                         IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog)) )
                         QUIT
                      ELSE
                         //                                Ferase( (s_cLog) )
                       ENDIF
+                     lEnd     := 'Error F' $   cErrText
 
                      cComm := cOld
 
@@ -1010,7 +1008,7 @@ FUNCTION CompileFiles()
                   nFile ++
                   __RUN( (cComm) )
                   cErrText := Memoread( (s_cLog) )
-                  lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
+                  lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText .or. "Error E" $ cErrText .or. "Error F" $ cErrText
 
                   IF ! s_lIgnoreErrors .AND. lEnd
                      IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog)) )
@@ -2125,9 +2123,9 @@ FUNCTION CompileUpdatedFiles()
 
                      __RUN( (cComm) )
                      cErrText := Memoread( (s_cLog) )
-                     lEnd     := 'Error E' $ cErrText
-
-                     IF ! s_lIgnoreErrors .AND. lEnd
+                     lEnd     := 'Error E' $ cErrText 
+                                        tracelog(lEnd)
+                     IF ! s_lIgnoreErrors .AND. lEnd 
                         IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit "  + (s_cLog)), __run( "Notepad " + (s_cLog) ) )
                         QUIT
                      ELSE
@@ -2183,7 +2181,7 @@ FUNCTION CompileUpdatedFiles()
 
                      __RUN( (cComm) )
                      cErrText := Memoread( (s_cLog) )
-                     lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
+                     lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText .or. "Error E" $ cErrText .or. "Error F" $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
                         IIF( "LINUX" IN Upper( Os() ) , __run( "mcedit " + (s_cLog) ), __run( "Notepad "  + (s_cLog) ) )
