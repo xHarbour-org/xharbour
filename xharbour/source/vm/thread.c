@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.79 2003/06/22 16:21:57 jonnymind Exp $
+* $Id: thread.c,v 1.80 2003/06/22 18:33:00 ronpinkas Exp $
 */
 
 /*
@@ -1860,11 +1860,8 @@ HB_FUNC( THREADSLEEP )
    HB_THREAD_STUB
    if( ! ISNUM( 1 ) )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "THREADSLEEP", 1, pArgs );
-      hb_itemRelease( pArgs );
-
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "THREADSLEEP", 1,
+         hb_param(1, HB_IT_ANY) );
       return;
    }
 
@@ -1878,11 +1875,8 @@ HB_FUNC( SECONDSSLEEP )
 
    if( ! ISNUM( 1 ) )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "THREADSLEEP", 1, pArgs );
-      hb_itemRelease( pArgs );
-
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SECONDSSLEEP", 1,
+         hb_param(1, HB_IT_ANY) );
       return;
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.36 2003/06/19 02:44:49 druzus Exp $
+ * $Id: dbcmd.c,v 1.37 2003/06/28 13:31:08 lculik Exp $
  */
 
 /*
@@ -3709,7 +3709,7 @@ HB_FUNC( DBEXISTS )
 
   if ( !pRDDNode )
   {
-    hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBDROP" );
+    hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBEXISTS" );
     return;
   }
 
