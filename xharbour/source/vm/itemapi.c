@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.26 2002/10/25 03:06:09 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.27 2002/10/25 07:59:27 andijahja Exp $
  */
 
 /*
@@ -81,7 +81,9 @@
  *
  */
 
+#if !defined(__DJGPP__)
 #include <math.h> /* For log() */
+#endif
 
 #include "hbapi.h"
 #include "hbfast.h"
