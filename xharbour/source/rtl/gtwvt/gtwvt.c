@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.44 2004/01/14 22:31:25 andijahja Exp $
+ * $Id: gtwvt.c,v 1.45 2004/01/14 23:02:05 jonnymind Exp $
  */
 
 /*
@@ -1606,7 +1606,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           hb_vmPushLong( ( LONG ) wParam  );
           hb_vmPushLong( ( LONG ) lParam  );
           hb_vmDo( 4 );
-          hb_itemGetNL( ( PHB_ITEM ) &hb_stack.Return );
+          hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
         }
       }
       else
@@ -1640,7 +1640,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           hb_vmPushNil();
           hb_vmPushLong( ( LONG ) hWnd    );
           hb_vmDo( 1 );
-          hb_itemGetNL( ( PHB_ITEM ) &hb_stack.Return );
+          hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
         }
       }
       else
@@ -1663,7 +1663,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         hb_vmPushNil();
         hb_vmPushLong( ( LONG ) hWnd );
         hb_vmDo( 1 );
-        hb_itemGetNL( ( PHB_ITEM ) &hb_stack.Return );
+        hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
       }
       return( 0 );
     }
@@ -2564,8 +2564,6 @@ static void gt_hbInitStatics( void )
   _s.fontWeight       = 0;
   _s.fontQuality      = DEFAULT_QUALITY;
   strcpy( _s.fontFace,"Terminal" );
-  _s.closeEvent       = 0;
-  _s.shutdownEvent    = 0;
   _s.LastMenuEvent    = 0;
   _s.MenuKeyEvent     = 1024;
   _s.CentreWindow     = TRUE;       // Default is to always display window in centre of screen
@@ -3354,30 +3352,6 @@ HB_FUNC(WVT_GETSCREENHEIGHT)
 
 //-------------------------------------------------------------------//
 
-HB_FUNC( WVT_SETCLOSEEVENT )
-{
-  int iEvent = -1;
-  if (ISNUM(1))
-  {
-    iEvent = hb_parnl(1) ;
-  }
-  hb_wvt_gtSetCloseEvent(iEvent);
-}
-
-//-------------------------------------------------------------------//
-
-HB_FUNC( WVT_SETSHUTDOWNEVENT )
-{
-  int iEvent = -1;
-  if (ISNUM(1))
-  {
-    iEvent = hb_parnl(1) ;
-  }
-  hb_wvt_gtSetShutdownEvent(iEvent);
-}
-
-//-------------------------------------------------------------------//
-
 HB_FUNC( WVT_SETWINDOWCENTRE )
 {
   hb_wvt_gtSetCentreWindow(hb_parl(1),hb_parl(2)) ;
@@ -3406,7 +3380,6 @@ HB_FUNC( WVT_GETTITLE )
   hb_wvt_gtGetWindowTitle( (char*) ucText, 1023);
   hb_retc((char*) ucText) ;
 }
-
 
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
