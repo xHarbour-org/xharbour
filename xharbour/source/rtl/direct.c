@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.3 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: direct.c,v 1.4 2003/07/05 17:40:42 lculik Exp $
  */
 
 /*
@@ -171,7 +171,7 @@ HB_FUNC( DIRECTORY )
 
             hb_arraySet( pSubarray, F_NAME, hb_itemPutC( pFilename, ffind->szName ) );
             #ifndef HB_LONG_DOUBLE_OFF
-            hb_arraySet( pSubarray, F_SIZE, hb_itemPutNLD( pSize, ffind->size ) );
+            hb_arraySet( pSubarray, F_SIZE, hb_itemPutNLL( pSize, ffind->size ) );
             #else
             hb_arraySet( pSubarray, F_SIZE, hb_itemPutNL( pSize, ffind->size ) );
             #endif
