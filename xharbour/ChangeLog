@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.557 2002/12/29 17:55:41 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.558 2002/12/29 19:58:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-30 00:26 UTC+0100 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * source/vm/thread.c
+  * include/thread.h
+    + Added hb_threadForbid* function family to manage Forbid Mutex type.
+
+  * source/vm/arrays.c
+  * source/vm/codebloc.c
+  * source/vm/fm.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+    * Added Forbid Mutex Method to allow concurrent updating of Garbage Collecting.
 
 2002-12-29 11:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   *  source/vm/arrays.c

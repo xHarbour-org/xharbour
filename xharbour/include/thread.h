@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.14 2002/12/26 02:48:47 jonnymind Exp $
+* $Id: thread.h,v 1.15 2002/12/29 08:32:41 ronpinkas Exp $
 */
 
 /*
@@ -173,6 +173,14 @@ typedef struct tag_HB_LWR_MUTEX
     int nCount;
 } HB_LWR_MUTEX;
 
+/* Forbidder mutex for xharbour */
+typedef struct tag_HB_FORBID_MUTEX
+{
+    HB_LWR_MUTEX Critical;
+    HB_CRITICAL_T Control;
+    int nCount;
+} HB_FORBID_MUTEX;
+
 
 extern HB_STACK hb_stack_general;
 extern HB_THREAD_CONTEXT *hb_ht_context;
@@ -192,5 +200,14 @@ extern HB_THREAD_CONTEXT *hb_threadGetCurrentContext( void );
 /* LWRM management */
 extern void hb_threadLock( HB_LWR_MUTEX *m );
 extern void hb_threadUnlock( HB_LWR_MUTEX *m );
+
+/* Forbidden mutex management */
+void hb_threadForbidenInit( HB_FORBID_MUTEX *Forbid );
+void hb_threadForbidenDestroy( HB_FORBID_MUTEX *Forbid );
+extern void hb_threadForbid( HB_FORBID_MUTEX * );
+extern void hb_threadAllow( HB_FORBID_MUTEX * );
+extern int hb_threadForbidenLockIfAllowed( HB_FORBID_MUTEX * );
+extern void hb_threadForbidenLock( HB_FORBID_MUTEX * );
+extern void hb_threadForbidenUnlock( HB_FORBID_MUTEX * );
 
 #endif

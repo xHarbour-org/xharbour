@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.138 2002/12/29 17:55:42 ronpinkas Exp $
+ * $Id: hvm.c,v 1.139 2002/12/29 19:58:43 ronpinkas Exp $
  */
 
 /*
@@ -94,10 +94,6 @@
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
-#endif
-
-#ifdef HB_THREAD_SUPPORT
-   extern HB_CRITICAL_T hb_gcCollectionMutex;
 #endif
 
 /* DEBUG only*/
@@ -280,6 +276,10 @@ USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
 
 static   HB_ITEM  s_aGlobals;         /* Harbour array to hold all application global variables */
 
+#ifdef HB_THREAD_SUPPORT
+   extern HB_FORBID_MUTEX hb_gcCollectionMutex;
+#endif
+
 /* 21/10/00 - maurilio.longo@libero.it
    This Exception Handler gets called in case of an abnormal termination of an harbour program and
    displays a full stack trace at the harbour language level */
@@ -339,7 +339,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
     /*JC1: initialization of thread aware stack */
     #ifdef HB_THREAD_SUPPORT
-       HB_CRITICAL_INIT( hb_gcCollectionMutex );
+       hb_threadForbidenInit( &hb_gcCollectionMutex );
        HB_TRACE( HB_TR_INFO, ("contextInit" ) );
        hb_threadInit();
     #endif
@@ -512,32 +512,31 @@ void HB_EXPORT hb_vmQuit( void )
 
    s_uiActionRequest = 0;         /* EXIT procedures should be processed */
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
-   //printf( "After Functions\n" );
+   //printf( "After Functions\r\n" );
 
    /* release all known items stored in subsystems */
    hb_rddShutDown();
-   //printf( "After RDD\n" );
+   //printf( "After RDD\r\n" );
 
    hb_idleShutDown();
-   //printf( "After Idle\n" );
+   //printf( "After Idle\r\n" );
 
    hb_errExit();
-   //printf( "After Err\n" );
+   //printf( "After Err\r\n" );
 
    hb_clsReleaseAll();
-   //printf( "After Class\n" );
-
+   //printf( "After Class\r\n" );
    hb_vmReleaseLocalSymbols();  /* releases the local modules linked list */
-   //printf( "After Symbols\n" );
+   //printf( "After Symbols\r\n" );
 
    hb_dynsymRelease();          /* releases the dynamic symbol table */
-   //printf( "After Dyn\n" );
+   //printf( "After Dyn\r\n" );
 
    hb_conRelease();             /* releases Console */
-   //printf( "After Con\n" );
+   //printf( "After Con\r\n" );
 
    hb_setRelease();             /* releases Sets */
-   //printf( "After Set\n" );
+   //printf( "After Set\r\n" );
 
    /* release all remaining items */
    hb_stackRemove( 0 );
@@ -553,25 +552,25 @@ void HB_EXPORT hb_vmQuit( void )
    {
       hb_arrayRelease( &s_aStatics );
    }
-   //printf( "\nAfter Statics\n" );
+   //printf( "After Statics\r\n" );
 
    if( s_aGlobals.type == HB_IT_ARRAY )
    {
       hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
       hb_arrayRelease( &s_aGlobals );
    }
-   //printf( "\nAfter Globals\n" );
+   //printf( "After Globals\r\n" );
 
    hb_memvarsRelease();    /* clear all PUBLIC variables */
-   //printf( "After Memvar\n" );
+   //printf( "After Memvar\r\n" );
 
    /* release all known garbage */
    //hb_gcCollectAll();
    hb_gcReleaseAll();
-   //printf( "After GC\n" );
+   //printf( "After GC\r\n" );
 
    hb_memvarsFree();    /* free memory allocated for memvars table */
-   //printf( "After memvarsFree\n" );
+   //printf( "After memvarsFree\r\n" );
 
    hb_stackFree();
    //printf( "After stackFree\n" );
@@ -582,7 +581,7 @@ void HB_EXPORT hb_vmQuit( void )
    //printf( "After xexit\n" );
 
    #ifdef HB_THREAD_SUPPORT
-       HB_CRITICAL_DESTROY( hb_gcCollectionMutex );
+       hb_threadForbidenDestroy( &hb_gcCollectionMutex );
    #endif
 
    exit( s_byErrorLevel );
@@ -3842,10 +3841,6 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
 
    itArray.type = HB_IT_NIL;
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-   #endif
-
    hb_vmArrayNew( &itArray, uiDimensions );
 
    while( uiDimensions-- )
@@ -3856,9 +3851,6 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
    hb_itemForwardValue( ( * HB_VM_STACK.pPos ), &itArray );
    hb_stackPush();
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-   #endif
 }
 
 static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array and fills it from the stack values */
@@ -3867,10 +3859,6 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
    ULONG ulPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayGen(%lu)", ulElements));
-
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-   #endif
 
    itArray.type = HB_IT_NIL;
    hb_arrayNew( &itArray, ulElements );
@@ -3897,9 +3885,6 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
       hb_stackPush();
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-   #endif
 }
 
 /* This function creates an array item using 'uiDimension' as an index
@@ -3911,8 +3896,6 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
    HB_ITEM_PTR pDim;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayNew(%p, %hu)", pArray, uiDimension));
-
-   // HB_CRITICAL_LOCK() - Protected an ENTRY POINT hb_vmArrayDim()!
 
    pDim = hb_stackItemFromTop( - uiDimension );
 
@@ -4990,11 +4973,7 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushBlock(%p, %p)", pCode, pSymbols));
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_BLOCK;
-
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-   #endif
-
+   
    uiLocals = pCode[ 5 ] + ( pCode[ 6 ] * 256 );
    ( * HB_VM_STACK.pPos )->item.asBlock.value =
          hb_codeblockNew( pCode + 7 + uiLocals * 2, /* pcode buffer         */
@@ -5013,9 +4992,6 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    ( * HB_VM_STACK.pPos )->item.asBlock.lineno = hb_stackBaseItem()->item.asSymbol.lineno;
    hb_stackPush();
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-   #endif
 }
 
 /* +0    -> HB_P_PUSHBLOCKSHORT
@@ -5029,10 +5005,6 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushBlockShort(%p, %p)", pCode, pSymbols));
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_BLOCK;
-
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-   #endif
 
    ( * HB_VM_STACK.pPos )->item.asBlock.value =
          hb_codeblockNew( pCode + 2,                /* pcode buffer         */
@@ -5051,9 +5023,6 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    ( * HB_VM_STACK.pPos )->item.asBlock.lineno = hb_stackBaseItem()->item.asSymbol.lineno;
    hb_stackPush();
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-   #endif
 }
 
 /* +0    -> HB_P_MPUSHBLOCK

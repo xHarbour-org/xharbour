@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.16 2002/12/28 05:43:47 ronpinkas Exp $
+ * $Id: fm.c,v 1.17 2002/12/29 08:32:41 ronpinkas Exp $
  */
 
 /*
@@ -134,12 +134,6 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    }
 
  #ifdef HB_FM_STATISTICS
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadLock( &hb_internal_monitor );
-      }
-   #endif
 
    s_lAllocations++;
 
@@ -217,13 +211,6 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xgrab(%lu) returning: %p", ulSize, (char *) pMem + sizeof( HB_MEMINFO ) ) );
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadUnlock( &hb_internal_monitor );
-      }
-   #endif
-
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
  #else
@@ -249,12 +236,6 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    }
 
  #ifdef HB_FM_STATISTICS
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadLock( &hb_internal_monitor );
-      }
-   #endif
 
    s_lAllocations++;
 
@@ -332,12 +313,6 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xgrab(%lu) returning: %p", ulSize, (char *) pMem + sizeof( HB_MEMINFO ) ) );
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadUnlock( &hb_internal_monitor );
-      }
-   #endif
 
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
@@ -364,13 +339,6 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    ULONG *pSig;
 
    HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xrealloc(%p, %lu)", pMem, ulSize));
-
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadLock( &hb_internal_monitor );
-      }
-   #endif
 
    s_lReAllocations++;
 
@@ -415,13 +383,6 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    if( s_pLastBlock == pMemBlock )
       s_pLastBlock = ( PHB_MEMINFO ) pMem;
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadUnlock( &hb_internal_monitor );
-      }
-   #endif
-
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
 #else
@@ -449,13 +410,6 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 #ifdef HB_FM_STATISTICS
 
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xfree(%p)", pMem ) );
-
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadLock( &hb_internal_monitor );
-      }
-   #endif
 
    s_lFreed++;
 
@@ -504,13 +458,6 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xfree(NULL)!"));
       hb_errInternal( HB_EI_XFREENULL, "hb_xfree(NULL)", NULL, NULL );
    }
-
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadUnlock( &hb_internal_monitor );
-      }
-   #endif
 
 #else
 
@@ -672,13 +619,6 @@ ULONG hb_xquery( USHORT uiMode )
    ULONG ulResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xquery(%hu)", uiMode));
-
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadLock( &hb_internal_monitor );
-      }
-   #endif
 
    /* TODO: Return the correct values instead of 9999 [vszakats] */
 
@@ -867,13 +807,6 @@ ULONG hb_xquery( USHORT uiMode )
    default:
       ulResult = 0;
    }
-
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadUnlock( &hb_internal_monitor );
-      }
-   #endif
 
    return ulResult;
 }

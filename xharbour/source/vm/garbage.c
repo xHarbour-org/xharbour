@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.28 2002/12/29 08:32:42 ronpinkas Exp $
+ * $Id: garbage.c,v 1.29 2002/12/29 17:55:42 ronpinkas Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ static ULONG s_uAllocated = 0;
 #endif
 
 #ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_T hb_gcCollectionMutex;
+   HB_FORBID_MUTEX hb_gcCollectionMutex;
 #endif
 
 /* Forward declaration.*/
@@ -171,10 +171,6 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
          pContextList = &( hb_threadGetCurrentContext()->GCList );
       }
       */
-      if( hb_ht_context )
-      {
-         hb_threadLock( &hb_internal_monitor );
-      }
    #endif
 
    #ifdef GC_RECYCLE
@@ -204,23 +200,10 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 
       HB_TRACE( HB_TR_DEBUG, ( "hb_gcAlloc %p in %p", pAlloc + 1, pAlloc ) );
 
-      #ifdef HB_THREAD_SUPPORT
-         if( hb_ht_context )
-         {
-            hb_threadUnlock( &hb_internal_monitor );
-         }
-      #endif
-
       return (void *)( pAlloc + 1 );   /* hide the internal data */
    }
    else
    {
-      #ifdef HB_THREAD_SUPPORT
-         if( hb_ht_context )
-         {
-            hb_threadUnlock( &hb_internal_monitor );
-         }
-      #endif
 
       return NULL;
    }
@@ -243,10 +226,6 @@ void hb_gcFree( void *pBlock )
       }
       */
 
-      if( hb_ht_context )
-      {
-         hb_threadLock( &hb_internal_monitor );
-      }
    #endif
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p)", pBlock ) );
@@ -254,13 +233,6 @@ void hb_gcFree( void *pBlock )
    if( s_bReleaseAll )
    {
       HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcFree(%p)", pBlock ) );
-
-      #ifdef HB_THREAD_SUPPORT
-         if( hb_ht_context )
-         {
-            hb_threadUnlock( &hb_internal_monitor );
-         }
-      #endif
 
       return;
    }
@@ -295,12 +267,6 @@ void hb_gcFree( void *pBlock )
       hb_errInternal( HB_EI_XFREENULL, NULL, NULL, NULL );
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadUnlock( &hb_internal_monitor );
-      }
-   #endif
 }
 
 static HB_GARBAGE_FUNC( hb_gcGripRelease )
@@ -314,11 +280,11 @@ static HB_GARBAGE_FUNC( hb_gcGripRelease )
 HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 {
    HB_GARBAGE_PTR pAlloc;
-
+   
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadLock( &hb_internal_monitor );
+         hb_threadForbidenLock( &hb_gcCollectionMutex );
       }
    #endif
 
@@ -356,11 +322,10 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
          memset( pItem, 0, sizeof( HB_ITEM ) );
          pItem->type = HB_IT_NIL;
       }
-
       #ifdef HB_THREAD_SUPPORT
          if( hb_ht_context )
          {
-            hb_threadUnlock( &hb_internal_monitor );
+            hb_threadForbidenUnlock( &hb_gcCollectionMutex );
          }
       #endif
 
@@ -371,22 +336,15 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
       #ifdef HB_THREAD_SUPPORT
          if( hb_ht_context )
          {
-             hb_threadUnlock( &hb_internal_monitor );
+            hb_threadForbidenUnlock( &hb_gcCollectionMutex );
          }
       #endif
-
       return NULL;
    }
 }
 
 void hb_gcGripDrop( HB_ITEM_PTR pItem )
 {
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadLock( &hb_internal_monitor );
-      }
-   #endif
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcGripDrop(%p)", pItem ) );
 
@@ -394,15 +352,15 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
    {
       HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcGripDrop(%p)", pItem ) );
 
-      #ifdef HB_THREAD_SUPPORT
-         if( hb_ht_context )
-         {
-            hb_threadUnlock( &hb_internal_monitor );
-         }
-      #endif
-
       return;
    }
+
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_threadForbidenLock( &hb_gcCollectionMutex );
+      }
+   #endif
 
    if( pItem )
    {
@@ -423,13 +381,13 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 
       HB_GARBAGE_FREE( pAlloc );
    }
-
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &hb_internal_monitor );
+         hb_threadForbidenUnlock( &hb_gcCollectionMutex );
       }
    #endif
+
 }
 
 /* Lock a memory pointer so it will not be released if stored
@@ -453,7 +411,7 @@ void * hb_gcLock( void * pBlock )
 
       if( hb_ht_context )
       {
-         hb_threadLock( &hb_internal_monitor );
+         hb_threadForbidenLock( &hb_gcCollectionMutex );
       }
    #endif
 
@@ -477,7 +435,7 @@ void * hb_gcLock( void * pBlock )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &hb_internal_monitor );
+         hb_threadForbidenUnlock( &hb_gcCollectionMutex );
       }
    #endif
 
@@ -505,7 +463,7 @@ void *hb_gcUnlock( void *pBlock )
 
       if( hb_ht_context )
       {
-         hb_threadLock( &hb_internal_monitor );
+         hb_threadForbidenLock( &hb_gcCollectionMutex );
       }
    #endif
 
@@ -531,7 +489,7 @@ void *hb_gcUnlock( void *pBlock )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &hb_internal_monitor );
+         hb_threadForbidenUnlock( &hb_gcCollectionMutex );
       }
    #endif
 
@@ -542,12 +500,6 @@ void *hb_gcUnlock( void *pBlock )
 */
 void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadLock( &hb_internal_monitor );
-      }
-   #endif
 
    if( HB_IS_BYREF( pItem ) )
    {
@@ -627,12 +579,6 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
    }
    /* all other data types don't need the GC */
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadUnlock( &hb_internal_monitor );
-      }
-   #endif
 }
 
 void hb_gcCollect( void )
@@ -650,15 +596,16 @@ void hb_gcCollectAll( void )
       return;
    }
 
-   //printf(  "Collecting...\n" );
-
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-         hb_threadLock( &hb_internal_monitor );
+         hb_threadForbidenLock( &hb_gcCollectionMutex );
       }
    #endif
+
+
+   //printf(  "Collecting...\n" );
+
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
 
@@ -826,8 +773,7 @@ void hb_gcCollectAll( void )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-         hb_threadUnlock( &hb_internal_monitor );
+         hb_threadForbidenUnlock( &hb_gcCollectionMutex );
       }
    #endif
 
@@ -837,13 +783,6 @@ void hb_gcCollectAll( void )
 void hb_gcReleaseAll( void )
 {
    HB_GARBAGE_PTR pAlloc, pDelete;
-
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadLock( &hb_internal_monitor );
-      }
-   #endif
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcReleaseAll()" ) );
 
@@ -928,12 +867,6 @@ void hb_gcReleaseAll( void )
 
    HB_TRACE( HB_TR_INFO, ( "DONE Release All" ) );
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadUnlock( &hb_internal_monitor );
-      }
-   #endif
 }
 
 /* service a single garbage collector step

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.20 2002/12/29 08:32:42 ronpinkas Exp $
+* $Id: thread.c,v 1.21 2002/12/29 17:55:42 ronpinkas Exp $
 */
 
 /*
@@ -1047,4 +1047,94 @@ void hb_threadUnlock( HB_LWR_MUTEX *lpMutex )
       }
    }
 }
+
+/*****************************************************/
+/* Forbid mutex management                           */
+
+void hb_threadForbidenInit( HB_FORBID_MUTEX *Forbid )
+{
+   HB_CRITICAL_INIT( Forbid->Control );
+   HB_CRITICAL_INIT( Forbid->Critical.Critical );
+   Forbid->Critical.Locker = 0;
+   Forbid->Critical.nCount = 0;
+   Forbid->nCount = 0;
+}
+
+void hb_threadForbidenDestroy( HB_FORBID_MUTEX *Forbid )
+{
+   HB_CRITICAL_DESTROY( Forbid->Control );
+   HB_CRITICAL_DESTROY( Forbid->Critical.Critical );
+}
+
+void hb_threadForbid( HB_FORBID_MUTEX *Forbid )
+{
+   /* Request for control section */
+   HB_CRITICAL_LOCK( Forbid->Control );
+   /* Now we'll lock the critical mutex if we are the first thread forbidding */
+   if ( Forbid->nCount == 0 )
+   {
+      hb_threadLock( &Forbid->Critical );
+   }
+
+   Forbid->nCount ++;
+
+   /* Now we can release the control section */
+   HB_CRITICAL_UNLOCK( Forbid->Control );
+}
+
+
+void hb_threadAllow( HB_FORBID_MUTEX *Forbid )
+{
+   /* Request for control section */
+   HB_CRITICAL_LOCK( Forbid->Control );
+   Forbid->nCount --;
+   /* Now we'll unlock critical no other threads are forbidding */
+   if ( Forbid->nCount == 0 )
+   {
+      hb_threadUnlock( &Forbid->Critical );
+   }
+
+   /* Now we can release the control section */
+   HB_CRITICAL_UNLOCK( Forbid->Control );
+}
+
+/** Locks a forbidding mutex only if not forbidden.
+If lock is forbidden returns immediately 0, while if it's allowed,
+lock is achieved and returns 1. */
+int hb_threadForbidenLockIfAllowed( HB_FORBID_MUTEX *Forbid )
+{
+   int ret;
+
+   /* Request for control section */
+   HB_CRITICAL_LOCK( Forbid->Control );
+
+   /* Are we able to require lock? Is there any forbidder around? */
+   if ( Forbid->nCount == 0 )
+   {
+      ret = 1;
+      hb_threadLock(  &Forbid->Critical );
+   }
+   else
+   {
+      ret = 0;
+   }
+
+   /* Now we can release the control section */
+   HB_CRITICAL_UNLOCK( Forbid->Control );
+
+   return ret;
+}
+
+/* Locks on a forbidding mutex, whether it is forbidden or not. */
+void hb_threadForbidenLock( HB_FORBID_MUTEX *Forbid )
+{
+   hb_threadLock( &Forbid->Critical );
+}
+
+/* Unlocks on a forbidding mutex, whether it is forbidden or not. */
+void hb_threadForbidenUnlock( HB_FORBID_MUTEX *Forbid )
+{
+   hb_threadUnlock( &Forbid->Critical );
+}
+
 #endif

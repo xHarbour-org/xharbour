@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.12 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.13 2002/12/29 19:58:43 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "hbstack.h"
 
 #ifdef HB_THREAD_SUPPORT
-   extern HB_CRITICAL_T hb_gcCollectionMutex;
+   extern HB_FORBID_MUTEX hb_gcCollectionMutex;
 #endif
 
 extern PHB_ITEM **hb_vm_pGlobals;
@@ -83,6 +83,10 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
 
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockNew(%p, %hu, %p, %p, %p)", pBuffer, uiLocals, pLocalPosTable, pSymbols, pGlobals));
+
+   #ifdef HB_THREAD_SUPPORT
+      hb_threadForbid( &hb_gcCollectionMutex );
+   #endif
 
    pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
@@ -192,6 +196,10 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
    pCBlock->ulCounter = 1;
 
    pCBlock->pGlobals  = pGlobals;
+   
+   #ifdef HB_THREAD_SUPPORT
+      hb_threadAllow( &hb_gcCollectionMutex );
+   #endif
 
    HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 
@@ -203,6 +211,10 @@ HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
    HB_CODEBLOCK_PTR pCBlock;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockMacroNew(%p, %i)", pBuffer, usLen));
+
+   #ifdef HB_THREAD_SUPPORT
+      hb_threadForbid( &hb_gcCollectionMutex );
+   #endif
 
    pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
@@ -224,6 +236,10 @@ HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
 
    pCBlock->pGlobals  = NULL;
 
+   #ifdef HB_THREAD_SUPPORT
+      hb_threadAllow( &hb_gcCollectionMutex );
+   #endif
+
    HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 
    return pCBlock;
@@ -240,7 +256,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
    if( pCBlock && (--pCBlock->ulCounter == 0) )
    {
       #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+         hb_threadForbid( &hb_gcCollectionMutex );
       #endif
 
       if( pCBlock->pLocals )
@@ -275,7 +291,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
       hb_gcFree( pCBlock );
 
       #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+         hb_threadAllow( &hb_gcCollectionMutex );
       #endif
    }
 }
