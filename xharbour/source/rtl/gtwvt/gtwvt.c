@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.71 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: gtwvt.c,v 1.72 2004/02/15 19:11:55 jonnymind Exp $
  */
 
 /*
@@ -3505,13 +3505,19 @@ static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
 
-HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC( _gt_Init_ ) )
+HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
-HB_CALL_ON_STARTUP_END( HB_GT_FUNC( _gt_Init_ ) )
-#if defined( HB_STATIC_STARTUP ) || ( ( ! defined( __GNUC__ ) ) && ( ! defined( _MSC_VER ) ) )
-   #pragma startup HB_GT_FUNC( _gt_Init_ )
+HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) && (! defined(__BORLANDC__)) )
+   #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 
+#if defined(__BORLANDC__)
+   HB_CALL_ON_STARTUP_BEGIN( startup_function__gtwvt )
+      hb_gtRegister( &gtInit );
+   HB_CALL_ON_STARTUP_END( startup_function__gtwvt )
+   #pragma startup startup_function__gtwvt
+#endif
 #endif  /* HB_MULTI_GT */
 
 //-------------------------------------------------------------------//

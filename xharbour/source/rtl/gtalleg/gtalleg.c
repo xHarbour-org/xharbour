@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.20 2004/02/06 17:07:28 jonnymind Exp $
+ * $Id: gtalleg.c,v 1.21 2004/02/13 09:22:47 andijahja Exp $
  */
 
 /*
@@ -1873,13 +1873,20 @@ HB_GT_ANNOUNCE( HB_GT_NAME )
 HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if defined(HB_STATIC_STARTUP) || ((!defined(__GNUC__)) && (!defined(_MSC_VER)) )
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) && (! defined(__BORLANDC__)) )
    #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 
+#if defined(__BORLANDC__)
+   HB_CALL_ON_STARTUP_BEGIN( startup_function__gtalleg )
+      hb_gtRegister( &gtInit );
+   HB_CALL_ON_STARTUP_END( startup_function__gtalleg )
+   #pragma startup startup_function__gtalleg
 #endif
 
-/* 
+#endif
+
+/*
 * this is necessary if you want to link with .so allegro libs
 * or when link staticalt and your linker will force to link main()
 * from allegro library not the harbour one
