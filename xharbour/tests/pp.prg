@@ -388,8 +388,11 @@ STATIC s_sPending
 STATIC s_lTrying := .F.
 STATIC s_lReturnRequested
 
-#define EXTERNAL_RECOVERY
+#ifdef __XHARBOUR__
+   static s_aDynProcedures := {}
+#endif
 
+#define EXTERNAL_RECOVERY
 #ifdef EXTERNAL_RECOVERY
    STATIC s_bExternalRecovery
 #endif
@@ -810,7 +813,7 @@ FUNCTION PP_ExecProcID( nProc, aParams )
 
     //TraceLog()
 
-    PP_ExecProcedure( s_aProcedures, nProc )
+    PP_ExecProcedure( s_aDynProcedures, nProc )
 
 RETURN s_xRet
 
@@ -1978,7 +1981,6 @@ PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
    LOCAL nBaseProc := s_nProcId, sPresetModule := s_sModule, nProc
    LOCAL bErrHandler, oError
-   LOCAL aProcedure
 
    IF bBlanks == NIL
       bBlanks := .T.
@@ -2024,12 +2026,6 @@ PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
          PP_PreProFile( cFile, sPPOExt, bBlanks )
          bCompile  := .F.
       ENDIF
-
-      #ifdef __XHARBOUR__
-         FOR EACH aProcedure IN s_aProcedures
-            PP_GenDynProcedure( aProcedure[1], HB_EnumIndex() )
-         NEXT
-      #endif
 
       PP_Exec( s_aProcedures, s_aInitExit, s_nProcId, aParams )
 
@@ -9331,15 +9327,27 @@ RETURN xRet
 FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
 
    LOCAL bErrHandler, oError, xRet
+   LOCAL aProcedure
 
    IF nLine == NIL
       nLine := 0
    ENDIF
 
+   s_aProcedures := aProcedures
+
+   #ifdef __XHARBOUR__
+      FOR EACH aProcedure IN aProcedures
+         IF aScan( s_aDynProcedures, aProcedure ) == 0
+            PP_GenDynProcedure( aProcedure[1], Len( s_aDynProcedures ) + 1 )
+            aAdd( s_aDynProcedures, aProcedure )
+         ENDIF
+      NEXT
+   #endif
+
+   bErrHandler := ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
+
    TRY
       IF HB_IsArray( aParams )
-         bErrHandler := ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
-
          SWITCH Len( aParams )
             CASE 0
                xRet := &cExp()
@@ -9398,6 +9406,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nProcId, aParams )
 
    LOCAL nProc, nProcs, xRet
    LOCAL oError, bErrHandler := ErrorBlock()
+   LOCAL aProcedure
 
    IF ValType( aParams ) == 'A'
       s_aParams := aParams
@@ -9405,11 +9414,22 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nProcId, aParams )
       s_aParams := {}
    ENDIF
 
+   s_aProcedures := aProcedures
+
    InitRules()
    InitResults()
 
    InitRunRules()
    InitRunResults()
+
+   #ifdef __XHARBOUR__
+      FOR EACH aProcedure IN s_aProcedures
+         IF aScan( s_aDynProcedures, aProcedure ) == 0
+            PP_GenDynProcedure( aProcedure[1], Len( s_aDynProcedures ) + 1 )
+            aAdd( s_aDynProcedures, aProcedure )
+         ENDIF
+      NEXT
+   #endif
 
    BEGIN SEQUENCE
       nProcs := Len( aInitExit[1] )

@@ -2459,6 +2459,8 @@
       #ifdef __XHARBOUR__
          #include "hbpcode.h"
 
+         //extern void OutputDebugValues( FILE *hFile, char *sFormat, ... );
+
          typedef union
          {
             BYTE *   pAsmData;                           /* The assembler bytes      */
@@ -2468,6 +2470,7 @@
 
          typedef struct
          {
+            int iID;
             PASM_CALL pAsm;
             BYTE *pcode;
             PHB_DYNS pDyn;
@@ -2482,10 +2485,22 @@
          {
             char *sFunctionName = hb_parc( 1 );
             short int iID = hb_parni( 2 );
-            BYTE *pcode = (BYTE *) hb_xgrab( 15 );
             PASM_CALL pDynFunc;
             PHB_DYNS pDynSym;
+            int i;
 
+            for( i = 0; i < s_iDyn; i++ )
+            {
+               if( s_pDynList[i].iID == iID && strcmp( s_pDynList[i].pDyn->pSymbol->szName, sFunctionName ) == 0 )
+               {
+                  hb_retl( 0 );
+                  return;
+               }
+            }
+
+            //OutputDebugValues( NULL, "Dyn: '%s'\n", sFunctionName );
+
+            BYTE *pcode = (BYTE *) hb_xgrab( 15 );
             pcode[ 0] = HB_P_PUSHSYMNEAR;
             pcode[ 1] = 34;                   /* PP_EXECPROCID */
 
@@ -2511,8 +2526,6 @@
 
             pDynFunc = hb_hrbAsmCreateFun( symbols, pcode );
 
-            //printf( "Dyn: '%s'\n", sFunctionName );
-
             pDynSym = hb_dynsymGet( sFunctionName );
             pDynSym->pSymbol->pFunPtr = pDynFunc->pFunPtr;
 
@@ -2520,6 +2533,7 @@
             {
                s_pDynList = (DYN_PROC *) hb_xgrab( sizeof( DYN_PROC ) );
 
+               s_pDynList[0].iID   = iID;
                s_pDynList[0].pAsm  = pDynFunc;
                s_pDynList[0].pcode = pcode;
                s_pDynList[0].pDyn  = pDynSym;
@@ -2528,12 +2542,15 @@
             {
                s_pDynList = (DYN_PROC *) hb_xrealloc( (void *) s_pDynList, ( s_iDyn + 1 ) * sizeof( DYN_PROC ) );
 
+               s_pDynList[s_iDyn].iID   = iID;
                s_pDynList[s_iDyn].pAsm  = pDynFunc;
                s_pDynList[s_iDyn].pcode = pcode;
                s_pDynList[s_iDyn].pDyn  = pDynSym;
             }
 
             s_iDyn++;
+
+            hb_retl( 1 );
          }
 
          HB_FUNC_STATIC( PP_RELEASEDYNPROCEDURES )
