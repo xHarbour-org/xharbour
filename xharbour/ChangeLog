@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1700 2003/11/12 02:01:04 druzus Exp $
+ * $Id: ChangeLog,v 1.1701 2003/11/12 08:44:31 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-12 09:30 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * source/rtl/valtype.c
+  * include/common.ch
+    * HB_ISCHAR() to HB_ISSTRING()
+    * HB_ISNUM() to HB_ISNUMERIC()
+    * HB_ISLOGIC() to HB_ISLOGICAL()
+
 2003-11-12 15:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/rtl/tgetlist.prg
     ! Minor modification to be more Clipper compatible when postblock
@@ -173,7 +181,6 @@
   * tests/serialize.prg
     + Added hash serialization test.
 
-
 2003-11-10 01:55 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
 
  *include\classes.h
@@ -249,7 +256,6 @@
 
   +tests\tstclsdbg.prg
      + a sample of debugging classes
-
 
 2003-11-10 01:34 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * hrbdll.bc

@@ -1,5 +1,5 @@
 /*
- * $Id: common.ch,v 1.2 2003/10/24 05:05:31 walito Exp $
+ * $Id: common.ch,v 1.3 2003/11/03 20:09:24 brianhays Exp $
  */
 
 /*
@@ -64,37 +64,37 @@
 #xtranslate ISNIL( <xValue> )       => ( HB_ISNIL( <xValue> ) )
 #xtranslate ISARRAY( <xValue> )     => ( HB_ISARRAY( <xValue> ) )
 #xtranslate ISBLOCK( <xValue> )     => ( HB_ISBLOCK( <xValue> ) )
-#xtranslate ISCHARACTER( <xValue> ) => ( HB_ISCHAR( <xValue> ) )
+#xtranslate ISCHARACTER( <xValue> ) => ( HB_ISSTRING( <xValue> ) )
 #xtranslate ISDATE( <xValue> )      => ( HB_ISDATE( <xValue> ) )
-#xtranslate ISLOGICAL( <xValue> )   => ( HB_ISLOGIC( <xValue> ) )
+#xtranslate ISLOGICAL( <xValue> )   => ( HB_ISLOGICAL( <xValue> ) )
 #xtranslate ISMEMO( <xValue> )      => ( HB_ISMEMO( <xValue> ) )
-#xtranslate ISNUMBER( <xValue> )    => ( HB_ISNUM( <xValue> ) )
+#xtranslate ISNUMBER( <xValue> )    => ( HB_ISNUMERIC( <xValue> ) )
 #xtranslate ISOBJECT( <xValue> )    => ( HB_ISOBJECT( <xValue> ) )
 
 #xtranslate VALTYPE( <Expr> ) == "A" => ( HB_ISARRAY( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) == "B" => ( HB_ISBLOCK( <Expr> ) )
-#xtranslate VALTYPE( <Expr> ) == "C" => ( HB_ISCHAR( <Expr> ) )
+#xtranslate VALTYPE( <Expr> ) == "C" => ( HB_ISSTRING( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) == "D" => ( HB_ISDATE( <Expr> ) )
-#xtranslate VALTYPE( <Expr> ) == "L" => ( HB_ISLOGIC( <Expr> ) )
-#xtranslate VALTYPE( <Expr> ) == "N" => ( HB_ISNUM( <Expr> ) )
+#xtranslate VALTYPE( <Expr> ) == "L" => ( HB_ISLOGICAL( <Expr> ) )
+#xtranslate VALTYPE( <Expr> ) == "N" => ( HB_ISNUMERIC( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) == "O" => ( HB_ISOBJECT( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) == "U" => ( HB_ISNIL( <Expr> ) )
 
 #xtranslate VALTYPE( <Expr> ) != "A" => !( HB_ISARRAY( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) != "B" => !( HB_ISBLOCK( <Expr> ) )
-#xtranslate VALTYPE( <Expr> ) != "C" => !( HB_ISCHAR( <Expr> ) )
+#xtranslate VALTYPE( <Expr> ) != "C" => !( HB_ISSTRING( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) != "D" => !( HB_ISDATE( <Expr> ) )
-#xtranslate VALTYPE( <Expr> ) != "L" => !( HB_ISLOGIC( <Expr> ) )
-#xtranslate VALTYPE( <Expr> ) != "N" => !( HB_ISNUM( <Expr> ) )
+#xtranslate VALTYPE( <Expr> ) != "L" => !( HB_ISLOGICAL( <Expr> ) )
+#xtranslate VALTYPE( <Expr> ) != "N" => !( HB_ISNUMERIC( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) != "O" => !( HB_ISOBJECT( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) != "U" => !( HB_ISNIL( <Expr> ) )
 
 #xtranslate VALTYPE( <Expr> ) <> "A" => !( HB_ISARRAY( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) <> "B" => !( HB_ISBLOCK( <Expr> ) )
-#xtranslate VALTYPE( <Expr> ) <> "C" => !( HB_ISCHAR( <Expr> ) )
+#xtranslate VALTYPE( <Expr> ) <> "C" => !( HB_ISSTRING( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) <> "D" => !( HB_ISDATE( <Expr> ) )
-#xtranslate VALTYPE( <Expr> ) <> "L" => !( HB_ISLOGIC( <Expr> ) )
-#xtranslate VALTYPE( <Expr> ) <> "N" => !( HB_ISNUM( <Expr> ) )
+#xtranslate VALTYPE( <Expr> ) <> "L" => !( HB_ISLOGICAL( <Expr> ) )
+#xtranslate VALTYPE( <Expr> ) <> "N" => !( HB_ISNUMERIC( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) <> "O" => !( HB_ISOBJECT( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) <> "U" => !( HB_ISNIL( <Expr> ) )
 

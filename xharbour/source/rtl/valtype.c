@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.4 2003/10/24 04:40:37 walito Exp $
+ * $Id: valtype.c,v 1.5 2003/11/09 23:16:39 jonnymind Exp $
  */
 
 /*
@@ -111,7 +111,7 @@ HB_FUNC( HB_ISNIL )
   hb_retl( ISNIL( 1 ) );
 }
 
-HB_FUNC( HB_ISCHAR )
+HB_FUNC( HB_ISSTRING )
 {
   hb_retl( ISCHAR( 1 ) );
 }
@@ -121,12 +121,12 @@ HB_FUNC( HB_ISMEMO )
   hb_retl( ISMEMO( 1 ) );
 }
 
-HB_FUNC( HB_ISNUM )
+HB_FUNC( HB_ISNUMERIC )
 {
   hb_retl( ISNUM( 1 ) );
 }
 
-HB_FUNC( HB_ISLOGIC )
+HB_FUNC( HB_ISLOGICAL )
 {
   hb_retl( ISLOG( 1 ) );
 }
