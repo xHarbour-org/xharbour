@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.93 2005/03/09 05:35:24 andijahja Exp $
+ * $Id: harbour.c,v 1.94 2005/03/10 23:19:38 andijahja Exp $
  */
 
 /*
@@ -5149,12 +5149,14 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                }
             }
 
+#if defined( HB_FORCE_CLOSE_DUMP_AREA )
             if ( iBeginDump != iEndDump )
             {
                hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_UNBALANCE_PRAGMAS, szPrg, NULL );
                iStatus = EXIT_FAILURE;
                return iStatus;
             }
+#endif
 
             /* Saving main file. */
             pFileName = hb_comp_pFileName;
