@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.53 2003/11/10 00:59:32 fsgiudice Exp $
+# $Id: makefile.nt,v 1.54 2003/11/16 01:56:15 ronpinkas Exp $
 #
 
 #
@@ -563,7 +563,7 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgis850.obj \
    $(OBJ_DIR)\msgit.obj \
    $(OBJ_DIR)\msgko.obj \
-   $(OBJ_DIR)\msglt.obj \
+   $(OBJ_DIR)\msgltwin.obj \
    $(OBJ_DIR)\msgpl852.obj \
    $(OBJ_DIR)\msgpliso.obj \
    $(OBJ_DIR)\msgplmaz.obj \

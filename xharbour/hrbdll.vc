@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.23 2003/11/10 00:59:32 fsgiudice Exp $
+# $Id: hrbdll.vc,v 1.24 2003/11/16 01:56:15 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -1557,6 +1557,9 @@ $(OBJ_DIR)\msgit.obj : $(LANG_DIR)\msgit.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\msgko.obj : $(LANG_DIR)\msgko.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\msgltwin.obj : $(LANG_DIR)\msgltwin.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\msgpl852.obj : $(LANG_DIR)\msgpl852.c
