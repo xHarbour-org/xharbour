@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1714 2003/11/12 21:51:06 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.1715 2003/11/12 23:56:54 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -1822,11 +1822,7 @@
       *
       * HB_RANDOMINT() --> returns 0 or 1, evenly distributed
       * HB_RANDOMINT( N ) --> returns an integer between 1 and N (inclusive)
-<<<<<<< ChangeLog
       * HB_RANDOMINT( x, y) --> Returns an integer number between x and y (inclusive)
-=======
-      * HB_RANDOMINT( x, y) --> Returns a real number between x and y (inclusive)
->>>>>>> 1.1592
       * The integer returned is of the longest type available
       */
 
