@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbf.h,v 1.4 2003/06/03 23:35:01 lculik Exp $
+ * $Id: hbdbf.h,v 1.5 2003/11/30 12:32:29 druzus Exp $
  */
 
 /*
@@ -71,9 +71,9 @@ typedef struct _DBFHEADER
    BYTE   bYear;
    BYTE   bMonth;
    BYTE   bDay;
-   ULONG  ulRecCount;
-   USHORT uiHeaderLen;
-   USHORT uiRecordLen;
+   BYTE   ulRecCount[ 4 ];
+   BYTE   uiHeaderLen[ 2 ];
+   BYTE   uiRecordLen[ 2 ];
    BYTE   bReserved1[ 16 ];
    BYTE   bHasTags;
    BYTE   bCodePage;

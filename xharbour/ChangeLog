@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2597 2004/03/18 14:24:26 druzus Exp $
+ * $Id: ChangeLog,v 1.2598 2004/03/18 14:39:54 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-18 22:43 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbdbf.h
+  * xharbour/source/rdd/dbf1.c
+    * small modification to force using DBF header fields as bytes
+      not USHORT/ULONG to reduce chance that someone will use it
+      directly in machine byte order dependent way
+
+  * xharbour/source/rtl/cdpapi.c
+    * STARTUP initialization modified to be the same as other CDPs use.
 
 2004-03-18 15:46 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
   * xharbour/source/vm/array.c

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.64 2004/02/27 16:01:11 andijahja Exp $
+ * $Id: dbf1.c,v 1.65 2004/03/02 00:28:18 druzus Exp $
  */
 
 /*
@@ -2721,8 +2721,8 @@ static ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
    pArea->fHasTags = dbHeader.bHasTags;
    pArea->bVersion = dbHeader.bVersion;
    pArea->bCodePage = dbHeader.bCodePage;
-   pArea->uiHeaderLen = HB_USHORT_FROM_LE( dbHeader.uiHeaderLen );
-   pArea->ulRecCount = HB_ULONG_FROM_LE( dbHeader.ulRecCount );
+   pArea->uiHeaderLen = HB_GET_LE_USHORT( dbHeader.uiHeaderLen );
+   pArea->ulRecCount = HB_GET_LE_ULONG( dbHeader.ulRecCount );
 
    pArea->fHasMemo = FALSE;
    return SUCCESS;

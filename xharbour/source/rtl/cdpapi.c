@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.12 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: cdpapi.c,v 1.13 2004/03/18 03:58:36 ronpinkas Exp $
  */
 
 /*
@@ -678,8 +678,18 @@ HB_FUNC( HB_TRANSLATE )
 HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_EN )
    hb_cdpRegister( &s_en_codepage );
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_EN )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+
+#if defined( HB_PRAGMA_STARTUP )
    #pragma startup hb_codepage_Init_EN
+#elif defined(_MSC_VER)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_EN = hb_codepage_Init_EN;
+   #pragma data_seg()
 #endif
 
 #endif /* HB_CDP_SUPPORT_OFF */
