@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.44 2004/03/05 15:22:53 andijahja Exp $
+ * $Id: win32ole.prg,v 1.45 2004/03/10 02:32:16 ronpinkas Exp $
  */
 
 /*
@@ -257,9 +257,12 @@ RETURN Self
 
 //--------------------------------------------------------------------
 
+// Destructor!
 PROCEDURE Release() CLASS TOleAuto
 
-   OleReleaseObject( ::hObj )
+   IF ! Empty( ::hObj )
+      OleReleaseObject( ::hObj )
+   ENDIF
 
 RETURN
 
@@ -586,6 +589,8 @@ METHOD Collection( xIndex, xValue ) CLASS TOleAuto
 
 	 LOCAL xRet
 
+   TraceLog( PCount(), xIndex, xValue )
+
    IF PCount() == 1
       RETURN ::Item( xIndex )
    ENDIF
@@ -827,10 +832,8 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, u
          oErr:SubSystem     := OLEExceptionSource()
 
          RETURN Eval( ErrorBlock(), oErr )
+
       ELSEIF ( cError := Ole2TxtError() ) != "S_OK"
-         IF cMsg == "END"
-            RETURN OleRelease( ::hObj )
-         ENDIF
 
          oErr := ErrorNew()
          oErr:Args          := { Self, cMsg, HB_aParams() }
@@ -1155,7 +1158,7 @@ RETURN uObj
                       hb_vmPushNil();
                       hb_vmDo( 0 );
 
-                      hb_itemForwardValue( &OleAuto, &(HB_VM_STACK).Return );
+                      hb_itemForwardValue( &OleAuto, &(HB_VM_STACK.Return) );
                    }
 
                    if( s_pSym_New && OleAuto.type )
@@ -1166,7 +1169,7 @@ RETURN uObj
                       hb_vmPushLong( ( LONG ) dParams->rgvarg[ n ].n1.n2.n3.pdispVal );
                       hb_vmSend( 1 );
 
-                      hb_itemForwardValue( aPrgParams[ n ], &(HB_VM_STACK).Return );
+                      hb_itemForwardValue( aPrgParams[ n ], &(HB_VM_STACK.Return) );
                    }
                    // Can't CLEAR this Variant
                    continue;
@@ -1269,7 +1272,7 @@ RETURN uObj
              hb_vmPushNil();
              hb_vmDo( 0 );
 
-             hb_itemForwardValue( &OleAuto, &(HB_VM_STACK).Return );
+             hb_itemForwardValue( &OleAuto, &(HB_VM_STACK.Return) );
           }
 
           if( s_pSym_New && OleAuto.type )
@@ -1466,7 +1469,7 @@ RETURN uObj
 
   //---------------------------------------------------------------------------//
 
-  HB_FUNC( OLERELEASEOBJECT ) // (hOleObject, szMethodName, uParams...)
+  HB_FUNC_STATIC( OLERELEASEOBJECT ) // (hOleObject, szMethodName, uParams...)
   {
      IDispatch * pDisp = ( IDispatch * ) hb_parnl( 1 );
 
@@ -1703,13 +1706,6 @@ RETURN uObj
   }
 
   //---------------------------------------------------------------------------//
-
-  HB_FUNC( OLERELEASE )  // ( hOleObject )
-  {
-     IUnknown * pUnk = ( IUnknown * ) hb_parnl( 1 );
-
-     hb_retnl( pUnk -> lpVtbl -> Release( pUnk ) );
-  }
 
   //---------------------------------------------------------------------------//
 

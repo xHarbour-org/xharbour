@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.78 2004/03/09 05:06:53 fsgiudice Exp $
+ * $Id: gtwvt.c,v 1.79 2004/03/10 10:24:18 vouchcac Exp $
  */
 
 /*
@@ -3002,10 +3002,10 @@ DWORD HB_EXPORT hb_wvt_gtSetWindowIconFromFile( char *icon )
     SendMessage( _s.hWnd, WM_SETICON, ICON_BIG  , ( LPARAM ) hIcon ); // Set Task List Icon
 
 //    DeleteObject( hIcon );
-//    DestroyIcon( hIcon ); 
+//    DestroyIcon( hIcon );
   }
+
   return( ( DWORD ) hIcon ) ;
-  return; 
 }
 
 //-------------------------------------------------------------------//

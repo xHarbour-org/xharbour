@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.353 2004/03/08 22:15:36 andijahja Exp $
+ * $Id: hvm.c,v 1.354 2004/03/09 10:07:05 andijahja Exp $
  */
 
 /*
@@ -747,7 +747,17 @@ int HB_EXPORT hb_vmQuit( void )
 #endif
 
    /* release all remaining items */
+   /*
+    * NO Need to perform individual hb_itemClear() since hb_gcCollectAll() will perform needed cleanup!
+    * This also avoids GPF trap related to Destructor using ProcName() etc.
    hb_stackRemove( 0 );
+   */
+   while( HB_VM_STACK.pPos > HB_VM_STACK.pItems )
+   {
+      --HB_VM_STACK.pPos;
+      ( *HB_VM_STACK.pPos )->type = HB_IT_NIL;
+   }
+
    //printf("After Stack\n" );
 
    if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )

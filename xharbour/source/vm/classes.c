@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.107 2004/03/08 22:15:36 andijahja Exp $
+ * $Id: classes.c,v 1.108 2004/03/09 10:07:05 andijahja Exp $
  */
 
 /*
@@ -3470,6 +3470,8 @@ void hb_mthAddTime( PMETHOD pMethod, ULONG ulClockTicks )
 
 void hb_clsFinalize( PHB_ITEM pObject )
 {
+   HB_THREAD_STUB
+
    SHORT uiClass;
 
    if( HB_IS_OBJECT( pObject ) )
@@ -3488,10 +3490,12 @@ void hb_clsFinalize( PHB_ITEM pObject )
 
       if( pClass->pDestructor )
       {
+         HB_ITEM SavedReturn;
          PHB_FUNC pDestructor = pClass->pDestructor;
 
-         // Avoid repeating calls.
-         pClass->pDestructor = NULL;
+         // Save the existing Return Value if any.
+         SavedReturn.type = HB_IT_NIL;
+         hb_itemForwardValue( &SavedReturn, &( HB_VM_STACK.Return ) );
 
          hb_symDestructor.pFunPtr = pDestructor;
 
@@ -3499,7 +3503,8 @@ void hb_clsFinalize( PHB_ITEM pObject )
          hb_vmPush( pObject ); // Do NOT Forward!!!
          hb_vmSend( 0 );
 
-         pClass->pDestructor = pDestructor;
+         // Restore the prior Return Value if any.
+         hb_itemForwardValue( &( HB_VM_STACK.Return ), &SavedReturn );
       }
    }
 }

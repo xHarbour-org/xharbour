@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2543 2004/03/10 13:50:22 andijahja Exp $
+ * $Id: ChangeLog,v 1.2544 2004/03/10 19:05:45 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-10 11:24 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * Corrected typo.
+
+  * source/rtl/win32ole.prg
+    * Corrected &(HB_VM_STACK).Return to &( HB_VM_STACK.Return )
+
+  * source/vm/classes.c
+    + Added logic to SAVE value of HB_VM_STACK.Return before executing Destructor and restoring after.
+    % Minor optimization
+
+  * source/vm/hvm.c
+    * Replaced hb_stackRemove(0) with plain reset of all items on stack to HB_IT_NIL,
+      and reset of HB_VM_STACK.pPos to HB_VM_STACK.pItems - this removed GPF Trap related
+      to execution of Destructors that might call ProcName() etc.. This is also more efficent
+      because GC will perform any needed cleanup of complex items, which is much faster
+      then indivifual hb_itemClear() on each item.
+
 2004-03-11 08:15 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rtl/achoice.prg
     - fix "CASE nKey == K_LBUTTONDOWN" where mouse clicked out of bounds
@@ -76,6 +95,16 @@
   + test/tstdelim.prg
     ! previously : 0.80 seconds
       now        : 0.22 seconds
+
+2004-03-09 19:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/win32ole.prg
+    - Removed OleRelease() - Function is NO LONGER needed and NO LONGER supported!
+    * Changed OleReleaseObject() to be STATIC
+
+    /*
+       This is to avoid possible GPF resulting from DOUBLE Release if Developer explictly called OleRelease().
+       Explicit release is therefore no longer supported and no longer needed.
+     */
 
 2004-03-09 18:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/win32ole.prg
