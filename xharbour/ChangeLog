@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.92 2002/03/06 06:21:12 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.93 2002/03/06 06:49:41 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-07 14:09 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * bin/bld.bat
+    + Added ole32 and oleaut32 libraries to the MSVC line.
+    + Added /FORCE:MULTIPLE to the link options of MSVC to allow for duplicate symbols.
+
+  * source/vm/arrays.c
+    - Commented out HB_IS_MEMVAR logic from hb_arrayReleaseGarbage()
+
+  * tests/pp.prg
+    ! Minor fix in PP_PreProTExt()
+    * Few refniments in display of errors.
+  * tests/pp_harb.ch
+    + Added self contained OLE Client based on Jose Gimenez's excelent work.
+
+  /* Now scripts have full access for COM Servers. */
 
 2002-03-05 22:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/fastitem.c
