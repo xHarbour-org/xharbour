@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.0 2003/12/22 01:18:59 peterrees Exp $
+ * $Id: hbgtwvt.h,v 1.1 2003/12/22 01:21:36 peterrees Exp $
  */
 
 /*
@@ -70,3 +70,4 @@ extern int HB_EXPORT hb_wvt_gtSetMenuKeyEvent(int iMenuKeyEvent);  // Set Key nu
 extern int HB_EXPORT hb_wvt_gtSetCodePage(int iCodePage);
 extern BOOL HB_EXPORT hb_wvt_gtSetAltF4Close( BOOL bCanClose);
 extern void HB_EXPORT hb_wvt_gtDoProcessMessages(void);
+extern BOOL HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent);
