@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.4 2003/02/03 11:15:20 mlombardo Exp $
+ * $Id: dbdelim.prg,v 1.5 2003/02/22 23:40:41 mlombardo Exp $
  */
 
 /*
@@ -56,33 +56,27 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.4 2003/02/03 11:15:20 mlombardo Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.5 2003/02/22 23:40:41 mlombardo Exp $" )
 
-#define AppendEOL( handle )       FWRITE( handle, CHR( 13 ) + CHR( 10 ) )
-#define AppendEOF( handle )       FWRITE( handle, CHR( 26 ) )
-#define AppendSep( handle, cSep ) FWRITE( handle, cSep )
+#define AppendEOL( handle )       FWrite( handle, CHR( 13 ) + CHR( 10 ) )
+#define AppendEOF( handle )       FWrite( handle, CHR( 26 ) )
+#define AppendSep( handle, cSep ) FWrite( handle, cSep )
 
-PROCEDURE __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
-
-   local index, handle, lWriteSep, cFileName := cFile, nStart, nCount, oErr
+PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
+   local index, handle, lWriteSep, nStart, nCount, oErr
    local cSeparator := ",", cDelim := CHR( 34 )
-   local Pos:=0
-   local nPosFl:=0
+   local Pos
+   local nPosFl
    local nDimBuff:=65535
-   local cByte :=""
-   local lunghezze:={}
-   local eol:=chr(13)+chr(10)
-   local contacamp:=0
-   local primariga:=.t.
-   local offset:=0
-   local rig:=0
-   local cont_r:=""
+   local cByte
+   local cont_r
    local Lfinefile:=.f.
    local nFileLen
    local cCharEol:=HB_OSNewLine()
    local nPosLasteol
    local lcisonoeol
    local lNoTerm
+   local aStruct
 
    // Process the delimiter argument.
    IF !EMPTY( cDelimArg )
@@ -91,8 +85,8 @@ PROCEDURE __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nR
          cSeparator := " "
       ELSE
          cDelim := LEFT( cDelimArg, 1 )
-      END IF
-   END IF
+      ENDIF
+   ENDIF
 
    // Process the file name argument.
    index := RAT( ".", cFileName )
@@ -102,12 +96,12 @@ PROCEDURE __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nR
       .OR. RAT( "\", cFileName ) > index
          // No, the file extension is in a directory name.
          index := 0
-      END IF
-   END IF
+      ENDIF
+   ENDIF
    IF index <= 0
       // No file name extension, so provide the default.
       cFileName += ".txt"
-   END IF
+   ENDIF
 
    // Determine where to start and how many records to process.
    IF nRecord != NIL
@@ -126,27 +120,27 @@ PROCEDURE __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nR
       // Followed by the FOR clause or the ALL clause.
       nStart := 0
       nCount := -1
-   END IF
+   ENDIF
    IF EMPTY( bFor )
       // This simplifies the test that determines whether or not to
       // use (i.e., import or export) any given processed record.
       bFor := {||.T.}
-   END IF
+   ENDIF
 
    IF lExport
       // COPY TO DELIMITED
       handle := FCREATE( cFileName )
-      IF handle == -1
+      IF handle == F_ERROR
          oErr := ErrorNew()
-         oErr:severity := ES_ERROR
-         oErr:genCode := EG_CREATE
-         oErr:subSystem := "DELIM"
-         oErr:subCode := 1002
-         oErr:description := HB_LANGERRMSG( oErr:genCode )
-         oErr:canRetry := .T.
+         oErr:severity   := ES_ERROR
+         oErr:genCode    := EG_CREATE
+         oErr:subSystem  := "DELIM"
+         oErr:subCode    := 1002
+         oErr:description:= HB_LANGERRMSG( oErr:genCode )
+         oErr:canRetry   := .T.
          oErr:canDefault := .T.
-         oErr:fileName := cFileName
-         oErr:osCode := FERROR()
+         oErr:fileName   := cFileName
+         oErr:osCode     := FERROR()
          Eval(ErrorBlock(), oErr)
       ELSE
          IF nStart > -1
@@ -155,12 +149,12 @@ PROCEDURE __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nR
                GO TOP
             ELSE
                GO (nStart)
-            END IF
-         END IF
+            ENDIF
+         ENDIF
          IF EMPTY( bWhile )
             // This simplifies the looping logic.
             bWhile := {||.T.}
-         END IF
+         ENDIF
          // Set up for the start of the first record.
          lWriteSep := .F.
          // Process the records to copy delimited.
@@ -172,7 +166,7 @@ PROCEDURE __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nR
                   FOR index := 1 TO FCOUNT()
                      IF lWriteSep
                         AppendSep( handle, cSeparator )
-                     END IF
+                     ENDIF
                      lWriteSep := ExportVar( handle, FIELDGET( index ), cDelim )
                   NEXT index
                ELSE
@@ -180,98 +174,98 @@ PROCEDURE __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nR
                   FOR index := 1 TO LEN( aFields )
                      IF lWriteSep
                         AppendSep( handle, cSeparator )
-                     END IF
+                     ENDIF
                      lWriteSep := ExportVar( handle, FIELDGET( FIELDPOS( aFields[ index ] ) ), cDelim )
                   NEXT index
-               END IF
+               ENDIF
                // Set up for the start of the next record.
                AppendEOL( handle )
                lWriteSep := .F.
-            END IF
+            ENDIF
             IF nCount != -1
                nCount--
-            END IF
+            ENDIF
             SKIP
-         END WHILE
+         ENDDO
          AppendEOF( handle )
-         FCLOSE( handle )
-      END IF
+         FClose( handle )
+      ENDIF
    ELSE
       // APPEND FROM DELIMITED
       handle := FOPEN( cFileName )
-      IF handle == -1
+      IF handle == F_ERROR
          oErr := ErrorNew()
-         oErr:severity := ES_ERROR
-         oErr:genCode := EG_OPEN
-         oErr:subSystem := "DELIM"
-         oErr:subCode := 1001
-         oErr:description := HB_LANGERRMSG( oErr:genCode )
-         oErr:canRetry := .T.
+         oErr:severity   := ES_ERROR
+         oErr:genCode    := EG_OPEN
+         oErr:subSystem  := "DELIM"
+         oErr:subCode    := 1001
+         oErr:description:= HB_LANGERRMSG( oErr:genCode )
+         oErr:canRetry   := .T.
          oErr:canDefault := .T.
-         oErr:fileName := cFileName
-         oErr:osCode := FERROR()
+         oErr:fileName   := cFileName
+         oErr:osCode     := FERROR()
          Eval(ErrorBlock(), oErr)
       ELSE
          IF EMPTY( bWhile )
             // This simplifies the looping logic.
             bWhile := {||.T.}
-         ENDIF 
+         ENDIF
          // ---------------------------------------
          // Please fill with the other test here
          // Marco Braida 2002
          // marcobra@elart.it
          // ---------------------------------------
 
-         nFileLen:=FSEEK(handle,0,FS_END)
-         nDimBuff:=min(nFileLen,nDimBuff)
-         cByte:=space(nDimBuff)
-         FSEEK(handle,0)
-         //	 cCharEol:=chr(13)
-         nPosLastEol:=0
-         do while .not. lFineFile
+         aStruct  := DBStruct()
+         nFileLen := FSeek(handle,0,FS_END)
+         nDimBuff := Min(nFileLen,nDimBuff)
+         cByte    := Space(nDimBuff)
+         FSeek(handle,0)
+         nPosLastEol := 0
+         Do While .not. lFineFile
             fseek(handle,nPoslastEol,FS_SET)   // forward the pointer
-            //we must not go after the eof
+            // we must not go after the eof
             lNoTerm := .F.
             if nPosLastEol + nDimBuff > nFileLen
                // change the buffer size
-               nDimBuff:=nFileLen-nPosLastEol
-               cByte:=space(nDimBuff)
-               Lfinefile:=.t. 
-               lNoTerm := right(cByte,2) != cCharEol
-            endif
+               nDimBuff  := nFileLen-nPosLastEol
+               cByte     := Space(nDimBuff)
+               Lfinefile := .t.
+               lNoTerm   := Right(cByte,2) != cCharEol
+            Endif
             // fill the buffer
-            cByte:=space(nDimBuff)
-            fread(handle,@cByte,nDimBuff)
-            //we test the last position of the last eol +1 in this buffer
-            if Lfinefile .and. lNoTerm
+            cByte := Space(nDimBuff)
+            FRead(handle,@cByte,nDimBuff)
+            // we test the last position of the last eol +1 in this buffer
+            If Lfinefile .and. lNoTerm
                cByte += cCharEol
-            EndIf
+            Endif
 
             nposfl := rat(cCharEol,cByte)
-            nPoslastEol+=if( nposfl == 0, len(cByte) ,nposfl)+1
-            //do this if in the buffer there are eol char
-            lcisonoeol:=.t.
+            nPoslastEol += if( nposfl == 0, len(cByte) ,nposfl)+1
+            // do this if in the buffer there are eol char
+            lcisonoeol := .t.
 
-            do while lcisonoeol
+            Do While lcisonoeol
                // the position of the first eol
                nposfl:=at(cCharEol,cByte)
                lcisonoeol:=(nPosfl>0)
                if lcisonoeol
                   // cut the row
-                  Pos:=1
-                  cont_r:=substr(cByte,Pos,nposfl-Pos)
+                  Pos := 1
+                  cont_r := Substr(cByte,Pos,nposfl-Pos)
                   if !(len(cont_r) == 0 .and. Lfinefile)
-                     appendtodb(cont_r,cSeparator)
+                     appendtodb(cont_r,cSeparator, aStruct)
                   endif
                   // skipping the line feed and now we are on a good char
-                  pos:=nposfl+2
-                  cont_r:=""
-                  //cut the row
-                  cByte:=substr(cByte,Pos)
+                  pos    := nposfl+2
+                  cont_r := ""
+                  // cut the row
+                  cByte:=Substr(cByte,Pos)
                endif
             enddo
          enddo
-         FCLOSE( handle )
+         FClose( handle )
       endif
    endif
 RETURN
@@ -279,16 +273,16 @@ RETURN
 STATIC FUNCTION ExportVar( handle, xField, cDelim )
    SWITCH VALTYPE( xField )
       CASE "C"
-         FWRITE( handle, cDelim + TRIM( xField ) + cDelim )
+         FWrite( handle, cDelim + TRIM( xField ) + cDelim )
          EXIT
       CASE "D"
-         FWRITE( handle, DTOS( xField ) )
+         FWrite( handle, DTOS( xField ) )
          EXIT
       CASE "L"
-         FWRITE( handle, iif( xField, "T", "F" ) )
+         FWrite( handle, iif( xField, "T", "F" ) )
          EXIT
       CASE "N"
-         FWRITE( handle, LTRIM( STR( xField ) ) )
+         FWrite( handle, LTRIM( STR( xField ) ) )
          EXIT
       DEFAULT
          RETURN .F.
@@ -296,50 +290,51 @@ STATIC FUNCTION ExportVar( handle, xField, cDelim )
 RETURN .T.
 
 
-STATIC FUNCTION appendtodb(row,cDelim)
+STATIC FUNCTION appendtodb(row,cDelim,aStruct)
 local lenrow:=len(row)
-local aStruct:=DBSTRUCT()
 local aMyVal:={}
-local ii:=1
-local npos:=0, nPosNext:=0
+local ii
+local npos, nPosNext
 local nDBFFields
-local cBuffer, cUPbuffer
+local cBuffer
 local vRes
-//if there is one field only there is no Delim and i put...
-row:=row+cDelim
-nPos:=at(cDelim,row)
-aadd( aMyval,substr(row,1,nPos-1) )
-do while .t.
-    nPosNext:=at(cDelim,row,npos+2)
-    if nPosNext=0
-       exit
-    endif
-    aadd( aMyVal,substr(row,npos+1,nPosnext-npos-1) )
-    nPos:=nPosnext    
-    if nPos>lenrow
-       exit
-    endif 
-enddo
-nDBFfields:=min(len(aMyVal),len(aStruct))
-append blank
 
-for ii:=1 to nDBFfields
-   cBuffer:=strtran(aMyval[ii],'"','')
-   SWITCH aStruct[ ii,2 ]
-      CASE "D"
-         vRes := HB_STOD( cBuffer )
-         EXIT
-      CASE "L"
-         cUPbuffer:=upper(cBuffer)
-         vRes := iif( cUPBuffer == "T" .or. cUPBuffer== "1" .or. cUPBuffer=="Y",.T.,.F. )
-         EXIT
-      CASE "N"
-         vRes := VAL( cBuffer )
-         EXIT
-      DEFAULT
-         vRes := cBuffer
-   END
+   // if there is one field only there is no Delim and i put...
+   row  += cDelim
+   nPos := at(cDelim,row)
+   aadd( aMyval,Substr(row,1,nPos-1) )
 
-   FIELDPUT(ii,vRes)
-next
-return .T. 
+   do while .t.
+      nPosNext := at(cDelim,row,npos+2)
+      if nPosNext = 0
+         exit
+      endif
+      aadd( aMyVal,Substr(row,npos+1,nPosnext-npos-1) )
+      nPos := nPosnext
+      if nPos > lenrow
+         exit
+      endif
+   enddo
+
+   nDBFfields := min(len(aMyVal),len(aStruct))
+   append blank
+
+   for ii := 1 to nDBFfields
+      cBuffer:=strtran(aMyval[ii],'"','')
+      SWITCH aStruct[ ii,2 ]
+         CASE "D"
+            vRes := HB_STOD( cBuffer )
+            EXIT
+         CASE "L"
+            vRes := Upper( cBuffer ) $ "T1Y"
+            EXIT
+         CASE "N"
+            vRes := VAL( cBuffer )
+            EXIT
+         DEFAULT
+            vRes := cBuffer
+      END
+
+      FIELDPUT(ii,vRes)
+   next
+return .T.
