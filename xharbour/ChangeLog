@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1354 2003/08/18 17:38:45 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1355 2003/08/18 17:42:42 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-18 11:24 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/proc.c
+    ! Corrected 2 typos.
 
 2003-08-18 19:28 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/hbi18n.c
@@ -57,9 +61,9 @@
 2003-08-16 00:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * doc\genhtm.rsp
     + added en\indirect.txt to doc build process
-  * doc\en\indirect.txt    
+  * doc\en\indirect.txt
     ! minor format to text
-    
+
 2003-08-16 03:50 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/thread.c
     ? Removing item cleanup for main stack.

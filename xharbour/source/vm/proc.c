@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.10 2003/06/20 18:25:39 ronpinkas Exp $
+ * $Id: proc.c,v 1.11 2003/08/15 22:17:26 ronpinkas Exp $
  */
 
 /*
@@ -147,7 +147,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
 
             if( pSelf->item.asBlock.value->pSelfBase )
             {
-               if( pSelf->item.asBlock.value->pSelfBase->uiClass < hb_clsMaxClasses() )
+               if( pSelf->item.asBlock.value->pSelfBase->uiClass <= hb_clsMaxClasses() )
                {
                   PCLASS pClass = hb_clsClassesArray() + ( pSelf->item.asBlock.value->pSelfBase->uiClass - 1 );
 
@@ -188,7 +188,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
       {
          if( HB_IS_OBJECT( pSelf ) ) /* it is a method name */
          {
-            if( pSelf->item.asArray.value->uiClass < hb_clsMaxClasses() )
+            if( pSelf->item.asArray.value->uiClass <= hb_clsMaxClasses() )
             {
                PCLASS pClass = hb_clsClassesArray() + ( pSelf->item.asArray.value->uiClass - 1 );
 
