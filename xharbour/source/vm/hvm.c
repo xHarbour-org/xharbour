@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.55 2002/04/17 21:05:49 ronpinkas Exp $
+ * $Id: hvm.c,v 1.56 2002/04/18 00:56:51 ronpinkas Exp $
  */
 
 /*
@@ -1455,9 +1455,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             }
             else if( HB_IS_STRING( pTop ) && pTop->item.asString.bChar )
             {
-               dNewVal = pTop->item.asString.value[0] + iAdd;
-               hb_stackPop();
-               hb_vmPushLong( (long) dNewVal );
+               pTop->type = HB_IT_LONG;
+               pTop->item.asLong.value  = pTop->item.asString.value[0] + iAdd;
+               pTop->item.asLong.length = 10;
+               //printf( "Added: %i, Result: %i", iAdd, pTop->item.asLong.value );
                break;
             }
             else if( HB_IS_DATE( pTop ) )
@@ -3480,9 +3481,15 @@ static void hb_vmArrayPop( void )
 
          if( pArray->item.asString.bStatic || *( pArray->item.asString.puiHolders ) > 1 )
          {
-            char *sNew = hb_strdup( pArray->item.asString.value );
+            char *sNew = hb_xgrab( pArray->item.asString.length + 1 );
 
-            hb_itemReleaseString( pArray );
+            memcpy( sNew, pArray->item.asString.value, pArray->item.asString.length );
+            sNew[ pArray->item.asString.length ] = '\0';
+
+            if( ! pArray->item.asString.bStatic )
+            {
+               hb_itemReleaseString( pArray );
+            }
 
             pArray->item.asString.value           =  sNew;
             pArray->item.asString.puiHolders      = (USHORT*) hb_xgrab( sizeof( USHORT ) );

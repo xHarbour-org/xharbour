@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.1.1.1 2001/12/21 10:41:13 ronpinkas Exp $
+ * $Id: chrasc.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -55,24 +55,39 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
+#include "hbstack.h"
+
+extern unsigned char hb_vm_acAscii[256][2];
 
 /* converts an ASCII code to a character value */
 HB_FUNC( CHR )
 {
    if( ISNUM( 1 ) )
    {
-      char szChar[ 2 ];
-
       /* NOTE: CA-Cl*pper's compiler optimizer will be wrong for those
                CHR() cases where the passed parameter is a constant which
                can be divided by 256 but it's not zero, in this case it
                will return an empty string instead of a Chr(0). [vszakats] */
 
-      /* Believe it or not, clipper does this! */
-      szChar[ 0 ] = hb_parnl( 1 ) % 256;
-      szChar[ 1 ] = '\0';
 
-      hb_retclen( szChar, 1 );
+      if( HB_IS_COMPLEX( &( hb_stack.Return ) ) )
+      {
+         if( HB_IS_STRING( &( hb_stack.Return ) ) )
+         {
+            hb_itemReleaseString( &( hb_stack.Return ) );
+         }
+         else
+         {
+            hb_itemFastClear( &( hb_stack.Return ) );
+         }
+      }
+
+      /* Believe it or not, clipper does this! */
+      hb_stack.Return.item.asString.value   = hb_vm_acAscii[ hb_parnl( 1 ) % 256 ];
+      hb_stack.Return.item.asString.length  = 1;
+      hb_stack.Return.item.asString.bStatic = TRUE;
+      hb_stack.Return.item.asString.bChar   = FALSE;
+      hb_stack.Return.type = HB_IT_STRING;
    }
    else
    {
