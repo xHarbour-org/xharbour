@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.82 2004/07/16 03:16:21 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.83 2004/07/24 23:08:33 guerra000 Exp $
  */
 
 /*
@@ -1491,7 +1491,7 @@ DispBegin()
                ::nFrozenCols > 0
                DispOutAT( nScreenRowT, nTPos-min(len(chSep), ncSepWidth), chSep, ::cColorSpec )
             endif
-            DispOutAT( nScreenRowT, nTPos, repl(right(chSep,1),nSpacePre), ::cColorSpec )
+            DispOutAT( nScreenRowT, nTPos, Replicate( Right( chSep, 1 ), nSpacePre ), ::cColorSpec )
          endif
 
          // we need to draw footSep for the nSpacePre gap
@@ -1502,7 +1502,7 @@ DispBegin()
                ::nFrozenCols > 0
                DispOutAT( nScreenRowB, nBPos-min(len(cfSep),ncSepWidth), cfSep, ::cColorSpec )
             endif
-            DispOutAT( nScreenRowB, nBPos, repl(right(cfSep,1),nSpacePre), ::cColorSpec )
+            DispOutAT( nScreenRowB, nBPos, Replicate( Right( cfSep, 1 ), nSpacePre ), ::cColorSpec )
          endif
 
          nTPos += nSpacePre
@@ -1528,7 +1528,7 @@ DispBegin()
          if nLeftCol>0 .and. n <> ::leftVisible .and. ::aColsInfo[ nLeftCol,o_Width ] > 0
             DispOutAT( nScreenRowT, nTPos-min(len(chSep),ncSepWidth), chSep, ::cColorSpec )
          endif
-         DispOutAT( nScreenRowT, nTPos, repl(right(chSep,1),::aColsInfo[ n, o_Width ]), ::cColorSpec )
+         DispOutAT( nScreenRowT, nTPos, Replicate( Right( chSep, 1 ), ::aColsInfo[ n, o_Width ] ), ::cColorSpec )
          nTPos += ::aColsInfo[ n,o_Width ]
 
          nTPos += nLCS
@@ -1542,13 +1542,13 @@ DispBegin()
          cfSep := if( ::aColsInfo[ n,o_Obj ]:FootSep == nil, ::FootSep, ;
                                  ::aColsInfo[ n,o_Obj ]:FootSep )
          if ::lHeadSep .and. len(chSep) > len(cfSep)
-            cfSep += repl(right(cfSep,1), len(chSep) - len(cfSep))
+            cfSep += Replicate( Right( cfSep, 1 ), Len( chSep ) - Len( cfSep ) )
          endif
 
          if nLeftCol>0 .and. n <> ::leftVisible .and. ::aColsInfo[ nLeftCol,o_Width ] > 0
             DispOutAT( nScreenRowB, nBPos-min(len(cfSep),ncSepWidth), cfSep, ::cColorSpec )
          endif
-         DispOutAT( nScreenRowB, nBPos, repl(right(cfSep,1),::aColsInfo[ n, o_Width ]), ::cColorSpec )
+         DispOutAT( nScreenRowB, nBPos, Replicate( Right( cfSep, 1 ), ::aColsInfo[ n, o_Width ] ), ::cColorSpec )
          nBPos += ::aColsInfo[ n,o_Width ]
 
          nBPos += nLCS
@@ -1559,11 +1559,11 @@ DispBegin()
    if nSpaceLast > 0
       // right gap of spaces (nSpaceLast) on Header
       if ::lHeadSep
-         DispOutAT( nScreenRowT, nTPos, repl(right(chSep,1),nSpaceLast), ::cColorSpec )
+         DispOutAT( nScreenRowT, nTPos, Replicate( Right( chSep, 1 ), nSpaceLast ), ::cColorSpec )
       endif
       // right gap of spaces (nSpaceLast) on Footer
       if ::lFootSep
-         DispOutAT( nScreenRowB, nBPos, repl(right(cfSep,1),nSpaceLast), ::cColorSpec )
+         DispOutAT( nScreenRowB, nBPos, Replicate( Right( cfSep, 1 ), nSpaceLast ), ::cColorSpec )
       endif
    endif
 
