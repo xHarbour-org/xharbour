@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.152 2004/05/18 06:24:45 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.153 2004/05/23 01:12:22 likewolf Exp $
  */
 
 /*
@@ -2705,9 +2705,10 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
            ptr      = ptri;
            ipos     = NextStopper( &ptr, tmpname );
-	   /* Don't call md_strAt() with an empty string as first arg! */
-	   if (*tmpname)
-	   {
+
+           /* Don't call md_strAt() with an empty string as first arg! */
+           if( *tmpname )
+           {
               ipos  = md_strAt( tmpname, ipos, strtopti, TRUE, TRUE, TRUE, TRUE );
            }
 
