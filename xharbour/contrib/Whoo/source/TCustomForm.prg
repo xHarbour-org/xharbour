@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.7 2002/11/13 02:13:57 what32 Exp $
+ * $Id: TCustomForm.prg,v 1.8 2002/11/17 09:03:42 what32 Exp $
  */
 
 /*
@@ -79,7 +79,7 @@ CLASS TCustomForm FROM TScrollingWinControl
     METHOD   WndProc                 virtual  //(var Message: TMessage); override;
     METHOD   Resizing                virtual  //(State: TWindowState); override;
 */
-
+/*
     PROPERTY ActiveMDIChild             //: TForm;
     PROPERTY AlphaBlend                 AS LOGICAL
     PROPERTY AlphaBlendValue            AS NUMERIC   //: Byte;
@@ -112,7 +112,7 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY Width                      //stored IsFormSizeStored;
 
     PROPERTY WindowMenu                 READ WindowMenu WRITE SetWindowMenu //: TMenuItem;
-
+*/
 /*
   PUBLIC:
     METHOD   Create                     CONSTRUCTOR //(AOwner: TComponent); override;

@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.67 2002/11/15 01:56:37 what32 Exp $
+ * $Id: xInspect.prg,v 1.68 2002/11/17 09:03:45 what32 Exp $
  */
 
 /*
@@ -42,24 +42,22 @@ GLOBAL EXTERNAL MainForm
 GLOBAL EXTERNAL ObjInspect
 GLOBAL EXTERNAL ObjTree
 GLOBAL InspTabs
-
+GLOBAL InspCombo
+GLOBAL InspBrowse
 CLASS ObjInspect FROM TForm
 
-   VAR Browser  AS OBJECT PROTECTED
-   VAR Combo    AS OBJECT PROTECTED
-   
-   VAR Objects  AS ARRAY INIT {}
-   
-   VAR CurObject AS OBJECT
+   DATA Browser   AS OBJECT PROTECTED
+
+   DATA Objects   AS ARRAY INIT {}
+   DATA CurObject AS OBJECT
 
    METHOD Create()
 
-
-   METHOD WMSize(n,x,y)  INLINE  IIF( ! ::Combo == NIL, ( ::Combo:Width := x,;
+   METHOD WMSize(n,x,y)  INLINE  IIF( ! InspCombo == NIL, ( InspCombo:Width := x,;
                                                           InspTabs:Move( , 25, x, y-25, .T. ),;
-                                                          ::browser:FWidth := InspTabs:Properties:ClientRect()[3],;
-                                                          ::browser:FHeight:= InspTabs:Properties:ClientRect()[4],;
-                                                          ::browser:Move( , , , , .T. ) ), ),;
+                                                          InspBrowse:FWidth := InspTabs:Properties:ClientRect()[3],;
+                                                          InspBrowse:FHeight:= InspTabs:Properties:ClientRect()[4],;
+                                                          InspBrowse:Move( , , , , .T. ) ), ),;
                                                           NIL
 
    METHOD SetBrowserData()
@@ -73,29 +71,36 @@ METHOD SetBrowserData( oObj, bCurrent ) CLASS ObjInspect
    LOCAL aProp
 
    IF ::CurObject == oObj
+
       IF bCurrent
          // Do nothing - already selected.
          RETURN Self
       ELSE
-         FOR EACH aProp IN ::Browser:source
+         FOR EACH aProp IN InspBrowse:source
             aProp[2] := __objSendMsg( ::CurObject, aProp[1] )
          NEXT
 
-         ::Browser:RefreshAll()
+         InspBrowse:RefreshAll()
       ENDIF
-   ELSE
-      ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
-      aSort( ::Browser:Source,,, {|x,y| x[1] < y[1] } )
-      aEval( ::Browser:Source, {|a|a[1] := Proper( a[1] ) } )
-      ::Browser:RefreshAll()
 
+   ELSE
+
+      InspBrowse:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
+   
+      aSort( InspBrowse:Source,,, {|x,y| x[1] < y[1] } )
+      aEval( InspBrowse:Source, {|a|a[1] := Proper( a[1] ) } )
+
+      InspBrowse:RefreshAll()
+    
       ::CurObject := oObj
+
    ENDIF
 
+
    IF oObj:ClassName == "TFORMEDIT"
-      oObj:XFMRoot()
+      FormEdit:XFMRoot()
    ELSE
-      oObj:Parent:XFMControl( , oObj, .F. )
+      FormEdit:XFMControl( , oObj, .F. )
    ENDIF
 
 RETURN Self
@@ -110,6 +115,8 @@ METHOD Create( oParent ) CLASS ObjInspect
 
    ::Super:Create( oParent )
 
+   ::Objects  := {}
+
    ::FCaption := "Object Inspector"
    ::Name     := "ObjInspect"
    ::FLeft    := 0
@@ -121,11 +128,11 @@ METHOD Create( oParent ) CLASS ObjInspect
    ::SetParent( MainForm )
 
    // ComboBox   
-   ::Combo := ComboInsp():Create( self )
-   ::Combo:FWidth := ::FWidth - 8
-   ::Combo:Style  := WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
-   ::Combo:SetParent( Self )
-   ::Combo:SetItemHeight( -1, 15 )
+   InspCombo := ComboInsp():Create( self )
+   InspCombo:FWidth := ::FWidth - 8
+   InspCombo:Style  := WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
+   InspCombo:SetParent( Self )
+   InspCombo:SetItemHeight( -1, 15 )
 
 
    // TabControls
@@ -147,7 +154,7 @@ METHOD Create( oParent ) CLASS ObjInspect
    oPage:Caption := "Events"
    oPage:SetParent( InspTabs )
 
-   ::Browser:=InspectBrowser():Create( InspTabs:Properties )
+   InspBrowse:=InspectBrowser():Create( InspTabs:Properties )
    
    OBjInspect := Self
 return( Self )
@@ -158,7 +165,7 @@ METHOD SaveVar(cText,nKey) CLASS ObjInspect
 
    LOCAL cType, cVar, oObj
 
-   cVar := ::Browser:source[::Browser:RecPos][1]
+   cVar := InspBrowse:source[InspBrowse:RecPos][1]
    cType:= valtype( __objSendMsg( ::CurObject, cVar ) )
 
    do case
@@ -173,25 +180,25 @@ METHOD SaveVar(cText,nKey) CLASS ObjInspect
    if __objSendMsg( ::CurObject, cVar ) != cText
       __objSendMsg( ::CurObject, "_"+cVar, cText )
 
-      ::Browser:source[::Browser:RecPos][2]:= cText
-      ::Browser:RefreshCurrent()
+      InspBrowse:source[InspBrowse:RecPos][2]:= cText
+      InspBrowse:RefreshCurrent()
 
 
 //------------------------------------- XFM UPDATE ---------------------------------------
       IF ::CurObject:ClassName == "TFORMEDIT"
-         ::CurObject:XFMRoot()
+         FormEdit:XFMRoot()
       ELSE
-         ::CurObject:Parent:XFMControl( , ::CurObject, .F. )
-         ::CurObject:Parent:oMask:Refresh()
+         FormEdit:XFMControl( , ::CurObject, .F. )
+         FormEdit:oMask:Refresh()
       ENDIF
 //----------------------------------------------------------------------------------------
-//      SetFocus(::Browser:handle)
+//      SetFocus(InspBrowse:handle)
    endif
 
    IF nKey==VK_UP .OR. nKey==VK_DOWN
-      PostMessage( ::Browser:handle, WM_KEYDOWN, nKey, 0 )
-      PostMessage( ::Browser:handle, WM_LBUTTONDBLCLK, 0, 0 )
-      ::Browser:RefreshAll()
+      PostMessage( InspBrowse:handle, WM_KEYDOWN, nKey, 0 )
+      PostMessage( InspBrowse:handle, WM_LBUTTONDBLCLK, 0, 0 )
+      InspBrowse:RefreshAll()
    ENDIF
 return(self)
 
@@ -220,18 +227,18 @@ METHOD MyOnClick(nwParam,nlParam) CLASS ComboInsp
    LOCAL oObj
 
    IF HiWord( nwParam ) == CBN_SELCHANGE
-      oObj := ::Parent:Objects[::GetCurSel()+1]
+      oObj := ObjInspect:Objects[::GetCurSel()+1]
 
-      IF ! ( ::Parent:CurObject == oObj )
-         ::Parent:SetBrowserData( oObj, .T. )
+      IF ! ( ObjInspect:CurObject == oObj )
+         ObjInspect:SetBrowserData( oObj, .T. )
       ENDIF
 
-      IF ( ! FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ) ) .AND. ( ! FormEdit:oMask:Creating ) ;
+      IF ( ! FormEdit:oMask:IsFocused( ObjInspect:CurObject:FHandle ) ) .AND. ( ! FormEdit:oMask:Creating ) ;
          .AND. ( ! FormEdit:oMask:mousedown ) .AND. ( ! FormEdit:oMask:moving ) .AND. ( ! FormEdit:oMask:sizing ) ;
          .AND. ( ! FormEdit:oMask:selecting )
 
-         FormEdit:oMask:WMLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
-         FormEdit:oMask:WMLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
+         FormEdit:oMask:WMLButtonDown( , ObjInspect:CurObject:Left + 4, ObjInspect:CurObject:Top + 4 )
+         FormEdit:oMask:WMLButtonUp( , ObjInspect:CurObject:Left + 4, ObjInspect:CurObject:Top + 4 )
       ENDIF
 
    ENDIF
@@ -240,9 +247,11 @@ RETURN 0
 
 //---------------------------------------------------------------------------------
 
-METHOD AddString(cText,oObj) CLASS ComboInsp
-   aadd(::Parent:Objects,oObj)
-return(super:AddString(cText))
+METHOD AddString( cText, oObj ) CLASS ComboInsp
+
+   aAdd( ObjInspect:Objects, oObj )
+
+RETURN Super:AddString( cText )
 
 //---------------------------------------------------------------------------------
 
@@ -251,23 +260,23 @@ METHOD SetCurSel(n) CLASS ComboInsp
    LOCAL oObj
 
    IF n < 0
-      ::Parent:Browser:source := { "", "" }
-      ::Parent:Browser:RefreshAll()
+      ObjInspect:Browser:source := { "", "" }
+      ObjInspect:Browser:RefreshAll()
    ELSE
-      oObj := ::Parent:Objects[ n + 1 ]
+      oObj := ObjInspect:Objects[ n + 1 ]
 
-      IF ! ( ::Parent:CurObject == oObj )
-         ::Parent:SetBrowserData( oObj, .T. )
+      IF ! ( ObjInspect:CurObject == oObj )
+         ObjInspect:SetBrowserData( oObj, .T. )
       ENDIF
 
       IF FormEdit != NIL
 
-         IF ( ! FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ) ) .AND. ( ! FormEdit:oMask:Creating ) ;
+         IF ( ! FormEdit:oMask:IsFocused( ObjInspect:CurObject:handle ) ) .AND. ( ! FormEdit:oMask:Creating ) ;
             .AND. ( ! FormEdit:oMask:mousedown ) .AND. ( ! FormEdit:oMask:moving ) .AND. ( ! FormEdit:oMask:sizing ) ;
             .AND. ( ! FormEdit:oMask:selecting )
 
-            FormEdit:oMask:WMLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
-            FormEdit:oMask:WMLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
+            FormEdit:oMask:WMLButtonDown( , ObjInspect:CurObject:Left + 4, ObjInspect:CurObject:Top + 4 )
+            FormEdit:oMask:WMLButtonUp( , ObjInspect:CurObject:Left + 4, ObjInspect:CurObject:Top + 4 )
          ENDIF
 
       ENDIF
@@ -280,7 +289,7 @@ RETURN Super:SetCurSel( n )
 
 METHOD DelObject( oObj ) CLASS ComboInsp
    LOCAL n,x,y
-   IF ( n:= aScan( ::Parent:Objects, {|o|o:handle == oObj:handle} ))>0
+   IF ( n:= aScan( ObjInspect:Objects, {|o|o:handle == oObj:handle} ))>0
 
       FOR x:=1 to Len( ObjTree:TreeView1:Items)
 
@@ -291,7 +300,7 @@ METHOD DelObject( oObj ) CLASS ComboInsp
 
       NEXT
 
-      aDel( ::Parent:Objects, n, .T. )
+      aDel( ObjInspect:Objects, n, .T. )
       ::DeleteString( n-1 )
       ::SetCurSel( n-2 )
    ENDIF
@@ -410,7 +419,7 @@ METHOD SetColControl(x,y) CLASS InspectBrowser
       ENDIF
 
       cVar := ::source[::RecPos][1]
-      cType:= valtype( __objSendMsg( ::Parent:Parent:Parent:CurObject, cVar ) )
+      cType:= valtype( __objSendMsg( ObjInspect:CurObject, cVar ) )
       DO CASE
          CASE cType == "L"
               aRect   := ::GetItemRect()
@@ -530,7 +539,7 @@ METHOD WMCommand( nwParam ) CLASS StringList
                ObjInspect:CurObject:Items:Add( AllTrim( cText ) )
            NEXT
 
-           ObjInspect:CurObject:Parent:XFMControl( , ObjInspect:CurObject, .F. )
+           FormEdit:XFMControl( , ObjInspect:CurObject, .F. )
            nLines := NIL
            EndDialog( ::handle, IDOK )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.58 2002/11/13 00:45:50 what32 Exp $
+ * $Id: TForm.prg,v 1.59 2002/11/14 07:59:26 what32 Exp $
  */
 
 /*
@@ -43,6 +43,8 @@
 *-----------------------------------------------------------------------------*
 
 CLASS TForm FROM TCustomForm //WinControl
+
+   DATA aaa EXPORTED
    DATA Modal        PROTECTED INIT .F.
    DATA resname      PROTECTED
    DATA xhBorder     PROTECTED

@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.21 2002/11/14 07:59:26 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.22 2002/11/17 09:03:41 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -170,7 +170,7 @@ CLASS TWBrowse FROM TWinControl
    DATA ColOffset          PROTECTED 
    DATA ColStyle           PROTECTED 
 
-   DATA objects            PROTECTED 
+   DATA objs              PROTECTED 
 
    DATA vScrollEx          PROTECTED 
 
@@ -387,7 +387,7 @@ METHOD Create( oParent ) CLASS TWBrowse
    ::ColBmpAlign  :={}
    ::ColStyle     :={}
    ::ColOffset    :={}
-   ::objects      :={}
+   ::objs         :={}
 
 /*
    if aHeader!=NIL
@@ -561,8 +561,8 @@ METHOD Configure(hNewImageList) CLASS TWBrowse
    IF hNewImageList<>NIL
       ::ImageList:=hNewImageList
    ENDIF
-   aEval(::objects,{|x| IF(!Empty(x[3]),DeleteObject(x[3]),NIL)})
-   ::objects :={}
+   aEval(::objs,{|x| IF(!Empty(x[3]),DeleteObject(x[3]),NIL)})
+   ::objs :={}
    ::LinePen:=CreatePen(PS_SOLID,0,::SepColor)
    ::ColWidths:={0}
 
@@ -582,7 +582,7 @@ METHOD Configure(hNewImageList) CLASS TWBrowse
    ::ColOffset:={}
    ::aFgColors:={}
    ::aBgColors:={}
-   ::objects :={}
+   ::objs :={}
 
    ::ColCount:=Len(::Columns)
    ::ColPos:=Max(1,MIN(::ColCount,::ColPos))

@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.43 2002/11/14 07:59:27 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.44 2002/11/17 09:03:45 what32 Exp $
  */
 
 /*
@@ -72,6 +72,8 @@ GLOBAL EXTERNAL MainForm
 
 GLOBAL EXTERNAL ObjTree
 GLOBAL EXTERNAL ObjInspect
+
+GLOBAL EXTERNAL InspTree
 // selected controls array elements
 
 #define SEL_HANDLE   1
@@ -159,6 +161,9 @@ METHOD Create( oParent ) CLASS oCtrlMask
    ::aEditRect := NIL
    ::aSelected := {}
    ::aClickPt  := {}
+   
+   ::Parent := oParent
+   ::SetParent( oParent )
 
 RETURN Self
 
@@ -171,7 +176,7 @@ METHOD WMRButtonDown()
    messagebox( ::FParent:Handle, "TrackPopupMenu comes here" )
    SetFocus( ::Handle )
 
-   RETURN( NIL )
+RETURN( NIL )
 
 
 
@@ -217,7 +222,7 @@ METHOD WMKeyDown( wParam, lParam )
 
          CASE wParam == VK_DELETE
             FOR EACH a IN ::aSelected()
-               IF !Empty( o := ::Parent:ChildFromHandle( a[1] ) )
+               IF !Empty( o := ::FParent:ChildFromHandle( a[1] ) )
                   o:Delete()
                ENDIF
             NEXT
@@ -400,7 +405,7 @@ METHOD WMKeyDown( wParam, lParam )
          ::moving := .F.
 
          FOR EACH a IN ::aSelected
-            oObj := ::Parent:ChildFromHandle( a[ SEL_HANDLE ] )
+            oObj := ::FParent:ChildFromHandle( a[ SEL_HANDLE ] )
             ObjInspect:SetBrowserData( oObj, .F. )
          NEXT
 
@@ -598,7 +603,7 @@ METHOD ChangeInspector( n )
    LOCAL Item, SubItem, hTreeItem, oObj
 
    IF n == 1
-      FOR EACH Item IN ObjTree:TreeView1:Items
+      FOR EACH Item IN InspTree:Items
           IF Item:cargo == ::FParent:handle
              Item:Select()
              nSelObj := ::handle
@@ -611,7 +616,7 @@ METHOD ChangeInspector( n )
 
    IF Len( ::aSelected ) == 1 .AND. nSelObj != ::aSelected[ 1 ][ SEL_HANDLE ]
       // need to tell the inspector
-      FOR EACH Item IN ObjTree:TreeView1:Items
+      FOR EACH Item IN InspTree:Items
           // Check TreeView subitems
           FOR EACH SubItem IN Item:Items
               IF SubItem:cargo == ::aSelected[ 1 ][ SEL_HANDLE ]
@@ -634,7 +639,7 @@ METHOD ChangeInspector( n )
       // Select the TreeView item
       IF hTreeItem != NIL
          IF ! ( ObjInspect:CurObject == oObj )
-            ObjTree:TreeView1:SelectItem( hTreeItem )
+            InspTree:SelectItem( hTreeItem )
             nSelObj := ::aSelected[ 1 ][ SEL_HANDLE ]
          ENDIF
       ENDIF
@@ -723,11 +728,11 @@ METHOD WMMouseMove( aParam, x, y )
                ENDIF
 
                lFound := .T.
-               oObj   := ::Parent:ChildFromHandle( hChild )
+               oObj   := ::FParent:ChildFromHandle( hChild )
 
                IF oObj == NIL
                   TraceLog( hChild )
-                  aEval( ::Parent:Controls, {|o| TraceLog( o:Name, o:Handle ) } )
+                  aEval( ::FParent:Controls, {|o| TraceLog( o:Name, o:Handle ) } )
                   EXIT
                ENDIF
 
@@ -821,7 +826,7 @@ METHOD WMLButtonUp( wParam, x, y )
        a[ SEL_OLDRECT ] := aClone( aRect )
 
        IF ::lChanged .AND. a[ SEL_HANDLE ] == ObjInspect:CurObject:handle
-          oObj := ::Parent:ChildFromHandle( a[ SEL_HANDLE ] )
+          oObj := ::FParent:ChildFromHandle( a[ SEL_HANDLE ] )
           ObjInspect:SetBrowserData( oObj, .F. )
        ENDIF
 
@@ -835,7 +840,7 @@ METHOD WMLButtonUp( wParam, x, y )
       IF ::creating
          ::creating := .F.
 
-         oObj := ::Parent:CreateControl( { ::aEditRect[ 1 ],;
+         oObj := FormEdit:CreateControl( { ::aEditRect[ 1 ],;
                                            ::aEditRect[ 2 ],;
                                            IF( ::aEditRect[ 3 ] - ::aEditRect[ 1 ] < MINX, NIL,;
                                                ::aEditRect[ 3 ] - ::aEditRect[ 1 ] ),;
@@ -888,49 +893,49 @@ METHOD MoveCtrl( hWnd, aPt )
    FOR EACH aChild IN ::aSelected
       AnchorX   := aChild[ SEL_ANCHORX ]
       AnchorY   := aChild[ SEL_ANCHORY ]
-      aOriginal := SnapRect( aChild[ SEL_OLDRECT ], ::Parent:xGrid, ::Parent:yGrid )
+      aOriginal := SnapRect( aChild[ SEL_OLDRECT ], ::FParent:xGrid, ::FParent:yGrid )
 
       DO CASE
       CASE ::nClick == HTCAPTION
          aRect := SnapRect( { aPt[1] - AnchorX, aPt[2] - AnchorY,;
                               aPt[1] + aOriginal[3] - aOriginal[1] - AnchorX,;
                               aPt[2] + aOriginal[4] - aOriginal[2] - AnchorY },;
-                              ::Parent:xGrid, ::Parent:yGrid )
+                              ::FParent:xGrid, ::FParent:yGrid )
 
       CASE ::nClick == HTTOP
-         aPt[2] := Snap( Min( aPt[2], aOriginal[4] - MINY ), ::Parent:yGrid )
+         aPt[2] := Snap( Min( aPt[2], aOriginal[4] - MINY ), ::FParent:yGrid )
          aRect  := { aOriginal[1], aPt[2], aOriginal[3], aOriginal[4] }
 
       CASE ::nClick == HTBOTTOM
-         aPt[2] := Snap( Max( aPt[2], aOriginal[2] + MINY ), ::Parent:yGrid )
+         aPt[2] := Snap( Max( aPt[2], aOriginal[2] + MINY ), ::FParent:yGrid )
          aRect  := { aOriginal[1], aOriginal[2], aOriginal[3], aPt[2] }
 
       CASE ::nClick == HTLEFT
-         aPt[1] := Snap( Min( aPt[1], aOriginal[3] - MINX), ::Parent:xGrid )
+         aPt[1] := Snap( Min( aPt[1], aOriginal[3] - MINX), ::FParent:xGrid )
          aRect  := { aPt[1], aOriginal[2], aOriginal[3], aOriginal[4] }
 
       CASE ::nClick == HTRIGHT
-         aPt[1] := Snap( Max( aPt[1], aOriginal[1] + MINX), ::Parent:xGrid )
+         aPt[1] := Snap( Max( aPt[1], aOriginal[1] + MINX), ::FParent:xGrid )
          aRect  := { aOriginal[1], aOriginal[2], aPt[1], aOriginal[4] }
 
       CASE ::nClick == HTTOPLEFT
-         aPt[1] := Snap( Min( aPt[1], aOriginal[3] - MINX), ::Parent:xGrid )
-         aPt[2] := Snap( Min( aPt[2], aOriginal[4] - MINY), ::Parent:yGrid )
+         aPt[1] := Snap( Min( aPt[1], aOriginal[3] - MINX), ::FParent:xGrid )
+         aPt[2] := Snap( Min( aPt[2], aOriginal[4] - MINY), ::FParent:yGrid )
          aRect  := { aPt[1], aPt[2], aOriginal[3], aOriginal[4] }
 
       CASE ::nClick == HTBOTTOMLEFT
-         aPt[1] := Snap( Min( aPt[1], aOriginal[3] - MINX ), ::Parent:xGrid )
-         aPt[2] := Snap( Max( aPt[2], aOriginal[2] + MINY ), ::Parent:yGrid )
+         aPt[1] := Snap( Min( aPt[1], aOriginal[3] - MINX ), ::FParent:xGrid )
+         aPt[2] := Snap( Max( aPt[2], aOriginal[2] + MINY ), ::FParent:yGrid )
          aRect:={ aPt[1], aOriginal[2], aOriginal[3], aPt[2] }
 
       CASE ::nClick == HTTOPRIGHT
-         aPt[1] := Snap( Max( aPt[1], aOriginal[1] + MINX ), ::Parent:xGrid )
-         aPt[2] := Snap( Min( aPt[2], aOriginal[4] - MINY ), ::Parent:yGrid )
+         aPt[1] := Snap( Max( aPt[1], aOriginal[1] + MINX ), ::FParent:xGrid )
+         aPt[2] := Snap( Min( aPt[2], aOriginal[4] - MINY ), ::FParent:yGrid )
          aRect  := { aOriginal[1], aPt[2], aPt[1], aOriginal[4] }
 
       CASE ::nClick == HTBOTTOMRIGHT
-         aPt[1] := Snap( Max( aPt[1], aOriginal[1] + MINX ), ::Parent:xGrid )
-         aPt[2] := Snap( Max( aPt[2], aOriginal[2] + MINY ), ::Parent:yGrid )
+         aPt[1] := Snap( Max( aPt[1], aOriginal[1] + MINX ), ::FParent:xGrid )
+         aPt[2] := Snap( Max( aPt[2], aOriginal[2] + MINY ), ::FParent:yGrid )
          aRect  := { aOriginal[1], aOriginal[2], aPt[1], aPt[2] }
 
       ENDCASE

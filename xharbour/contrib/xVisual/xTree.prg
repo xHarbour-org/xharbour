@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.23 2002/11/15 01:56:37 what32 Exp $
+ * $Id: xTree.prg,v 1.24 2002/11/17 09:03:45 what32 Exp $
  */
 
 /*
@@ -37,6 +37,8 @@ GLOBAL EXTERNAL MainForm
 GLOBAL EXTERNAL FormEdit
 GLOBAL EXTERNAL ObjInspect
 
+GLOBAL InspTree
+
 CLASS ObjTree FROM TForm
 
    VAR TreeRoot AS OBJECT
@@ -44,7 +46,7 @@ CLASS ObjTree FROM TForm
    
    METHOD Create()
    METHOD WMCreate()
-   METHOD WMSize(n,x,y)  INLINE ::oTree:Move( , , x, y, .t. )
+   METHOD WMSize(n,x,y)  INLINE InspTree:Move( , , x, y, .t. )
 
 ENDCLASS
 
@@ -74,14 +76,14 @@ METHOD WMCreate() CLASS ObjTree
    ImageList_AddMasked( hImg, hBmp, RGB( 0, 255, 255 ) )
    DeleteObject(hBmp)
 
-   ::oTree := TreeObj():Create( self )
+   InspTree := TreeObj():Create( self )
 
-   ::oTree:FWidth := ::FWidth
-   ::oTree:FHeight:= ::FHeight
+   InspTree:FWidth := ::FWidth
+   InspTree:FHeight:= ::FHeight
 
-   ::oTree:SetParent( Self )
+   InspTree:SetParent( Self )
 
-   TVSetImageList( ::oTree:FHandle, hImg, 0 )
+   TVSetImageList( InspTree:FHandle, hImg, 0 )
 
 RETURN Self
 

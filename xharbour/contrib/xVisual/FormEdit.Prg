@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.91 2002/11/14 07:59:27 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.92 2002/11/17 09:03:45 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -52,6 +52,10 @@ GLOBAL EXTERNAL FormEdit
 GLOBAL EXTERNAL ObjTree
 GLOBAL EXTERNAL ObjInspect
 GLOBAL EXTERNAL ObjEdit
+
+GLOBAL EXTERNAL InspCombo
+GLOBAL EXTERNAL InspTree
+
 /*
    For performance NOT using OS indpendant R/T function,
    this file only used in win32.
@@ -83,7 +87,7 @@ CLASS TFormEdit FROM TForm
 
    METHOD WMCreate()
    METHOD WMSize()
-//   METHOD WMMove()           INLINE ObjInspect:SetBrowserData( HB_QSelf(), .F. ),NIL
+   METHOD WMMove()           INLINE ObjInspect:SetBrowserData( HB_QSelf(), .T. ), NIL
    METHOD WMPaint()
    METHOD WMDestroy()
 
@@ -103,26 +107,11 @@ CLASS TFormEdit FROM TForm
 ENDCLASS
 
 //----------------------------------------------------------------------------//
-/*
-METHOD AddControl( oObj )
-
-   LOCAL oCtrl
-
-   oCtrl := Super:Add( oObj )
-
-   aAdd( ::aCtrl, oCtrl )
-   ::oMask:GetSiblings()
-   ::oMask:SetFocus()
-   ::oMask:Cursor := NIL
-   ::CtrlName := NIL
-
-   ::XFMControl( oObj:Name, oObj, .F. )
-
-RETURN oCtrl
-*/
-//----------------------------------------------------------------------------//
 
 METHOD Create( oParent ) CLASS TFormEdit 
+   LOCAL oBtn
+   LOCAL xRet
+   Local oTree
 
    ::Super:Create( oParent )
    
@@ -136,27 +125,64 @@ METHOD Create( oParent ) CLASS TFormEdit
    ::xGrid    := 8
    ::yGrid    := 8
    ::GridColor:=RGB(0,0,0)
-   ::OnCloseQuery := {|| MainForm:StdBar:Disable(), ObjInspect:ComboBox1:DelObject( HB_QSELF() ), NIL }
+   ::OnCloseQuery := {|| MainForm:StdBar:Disable(), InspCombo:DelObject( HB_QSELF() ), NIL }
+
+   FormEdit := Self
    
    ::XFMTop()
-   
    ::SetParent( MainForm )
-   
+
 RETURN Self
+
+//----------------------------------------------------------------------------//
+METHOD WMCreate() CLASS TFormEdit 
+
+   LOCAL oBtn
+   LOCAL xRet
+   Local oTree
+
+   ::SetGridSize()
+
+   MainForm:StdBar:Enable()
+   MainForm:Win32Bar:Enable()
+
+   ::oMask:=oCtrlMask():Create( self )
+   ::oMask:SetParent( Self )
+
+   ::oMask:GetSiblings()
+   ::oMask:BringToTop()
+   ::oMask:SetFocus()
+
+   InspCombo:AddString( ::Name + chr(9) + "TFORM", self)
+  
+   oTree := InspTree:Add( ::Name,, ::Fhandle )
+   oTree:Select()
+
+
+//   ::oMask:Hint:=""
+//   ::oMask:HintWindow:SetMaxTipWidth(10)
+RETURN NIL
+
+//--------------------------------------------------------------------------------------------
 
 METHOD WMSize( nFlag, Width, Height) CLASS TFormEdit 
 
    LOCAL aRect
 
-   IF ::oMask <> NIL
+   IF ::oMask != NIL
       aRect := GetClientRect(::FHandle)
-      ::oMask:Move( aRect[1], aRect[2], aRect[3], aRect[4], .T. )
+      
+      ::oMask:FLeft   := aRect[1]
+      ::oMask:FTop    := aRect[2]
+      ::oMask:FWidth  := aRect[3]
+      ::oMask:FHeight := aRect[4]
+      ::oMask:Move( , , , , .T. )
+      
       ::oMask:Refresh()
+      ObjInspect:SetBrowserData( Self, .T. )
    ENDIF
 
-//   ObjInspect:SetBrowserData( Self, .F. )
-
-RETURN NIL
+RETURN 0
 
 //----------------------------------------------------------------------------//
 
@@ -223,11 +249,13 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
       DO CASE
       CASE ::CtrlName == "Button"
          oObj := TButton():Create( self )
-         oObj:Caption := oObj:Name
+         oObj:FCaption := oObj:Name
+         oObj:SetParent( Self )
          
       CASE ::CtrlName == "Edit"
          oObj := TEdit():Create( self )
-         oObj:Caption := oObj:Name
+         oObj:FCaption := oObj:Name
+         oObj:SetParent( Self )
 
       CASE ::CtrlName=="Label"
          oObj := TStatic():Create( self )
@@ -305,11 +333,11 @@ METHOD SetControl( oObj ) CLASS TFormEdit
 
    ::XFMControl( oObj:name, oObj, .F. )
 
-   oObj:SetMethod( "Delete", {||ObjInspect:ComboBox1:DelObject( oObj ), ;
+   oObj:SetMethod( "Delete", {||InspCombo:DelObject( oObj ), ;
                               HB_QSELF():DelControl(), oObj:Parent:XFMControl( NIL, oObj, .T. ) } )
 
-   ObjInspect:ComboBox1:AddString( oObj:name + chr(9) + oObj:ClassName(), oObj )
-   oTree := ObjTree:TreeView1:Add( oObj:Name, 1, oObj:Fhandle )
+   InspCombo:AddString( oObj:name + chr(9) + oObj:ClassName(), oObj )
+   oTree := InspTree:Add( oObj:Name, 1, oObj:Fhandle )
    oTree:Select()
 
    IF !EMPTY( oObj:Controls )
@@ -330,7 +358,7 @@ METHOD GetUniquePropName(cName) CLASS TFormEdit
       nInd++
    ENDDO
 
-   RETURN(cName+AllTrim(Str(nInd)))
+RETURN(cName+AllTrim(Str(nInd)))
 
 
 //----------------------------------------------------------------------------//
@@ -353,36 +381,8 @@ METHOD SetGridSize(x,y) CLASS TFormEdit
    ::xBmpSize:=xSize
    ::yBmpSize:=ySize
 
-   RETURN(NIL)
+RETURN(NIL)
 
-//----------------------------------------------------------------------------//
-
-METHOD WMCreate() CLASS TFormEdit 
-
-   LOCAL oBtn
-   LOCAL xRet
-   Local oTree
-
-   ::SetGridSize()
-
-   MainForm:StdBar:Enable()
-   MainForm:Win32Bar:Enable()
-
-//   ObjInspect:ComboBox1:AddString( ::Name + chr(9) + "TFORM", self)
-   oTree     := ObjTree:TreeView1:Add( ::Name,, ::Fhandle )
-   oTree:Select()
-
-
-   ::oMask:=oCtrlMask():Create( self )
-   ::oMask:SetParent( Self )
-
-   ::oMask:GetSiblings()
-   ::oMask:BringToTop()
-   ::oMask:SetFocus()
-
-//   ::oMask:Hint:=""
-//   ::oMask:HintWindow:SetMaxTipWidth(10)
-RETURN NIL
 
 *------------------------------------------------------------------------------
 

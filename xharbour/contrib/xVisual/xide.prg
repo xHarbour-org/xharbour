@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.131 2002/11/15 02:12:52 what32 Exp $
+ * $Id: xide.prg,v 1.132 2002/11/17 09:03:45 what32 Exp $
  */
 
 /*
@@ -133,7 +133,7 @@ METHOD MainMenu() CLASS MainForm
    oMenuItem := TMenuItem():Create( oPopup )
    oMenuItem:Caption := "Exit"
    oMenuItem:Command := 200
-   oMenuItem:OnClick := {||MainForm:PostMessage(WM_SYSCOMMAND,SC_CLOSE)}
+   oMenuItem:OnClick := {||MainForm:PostMessage( WM_SYSCOMMAND, SC_CLOSE )}
    oMenuItem:AppendTo( oPopup:Handle )
 
    //With Object ::WindowMenu
