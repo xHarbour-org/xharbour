@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.h,v 1.5 2004/02/14 22:11:51 andijahja Exp $
+ * $Id: hbdate.h,v 1.6 2004/11/21 21:43:37 druzus Exp $
  */
 
 /*
@@ -69,7 +69,7 @@ extern void     HB_EXPORT hb_dateDecode( LONG julian, int * piYear, int * piMont
 extern void     HB_EXPORT hb_dateStrPut( char * szDate, int iYear, int iMonth, int iDay );
 extern void     HB_EXPORT hb_dateStrGet( const char * szDate, int * piYear, int * piMonth, int * piDay );
 extern char     HB_EXPORT * hb_dateDecStr( char * szDate, LONG lJulian );
-extern LONG     HB_EXPORT hb_dateEncStr( char * szDate );
+extern LONG     HB_EXPORT hb_dateEncStr( const char * szDate );
 
 HB_EXTERN_END
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.28 2005/01/25 10:47:49 druzus Exp $
+ * $Id: hbstack.h,v 1.29 2005/01/28 14:34:44 jacekp Exp $
  */
 
 /*
@@ -123,7 +123,7 @@ typedef struct
    #define hb_stackItemFromTop( n )    ( * ( HB_VM_STACK.pPos + (int)(n) ) )
    #define hb_stackItemFromBase( n )   ( ( *HB_VM_STACK.pBase )->item.asSymbol.paramcnt < 255 ? *( HB_VM_STACK.pBase + (int)(n) + 1 ) : *( HB_VM_STACK.pBase + (int)(n) + 1 + ( *HB_VM_STACK.pBase )->item.asSymbol.paramcnt - 256 ) )
    #define hb_stackTopOffset( )        ( HB_VM_STACK.pPos - HB_VM_STACK.pItems )
-   #define hb_stackBaseOffset( )       ( HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1)
+   #define hb_stackBaseOffset( )       ( HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1 )
    #define hb_stackTopItem( )          ( * HB_VM_STACK.pPos )
    #define hb_stackBaseItem( )         ( * HB_VM_STACK.pBase )
    #define hb_stackSelfItem( )         ( * ( HB_VM_STACK.pBase + 1 ) )

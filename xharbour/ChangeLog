@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3982 2005/03/30 21:24:30 andijahja Exp $
+ * $Id: ChangeLog,v 1.3983 2005/03/31 02:24:21 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,161 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-31 05:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/contrib/rdd_ads/adsfunc.c
+    * formatting and warning cleanup
+
+  * xharbour/include/ct.h
+  * xharbour/include/hbapi.h
+  * xharbour/include/hbapierr.h
+  * xharbour/include/hbapiitm.h
+  * xharbour/include/hbapilng.h
+  * xharbour/include/hbdate.h
+  * xharbour/include/hbstack.h
+  * xharbour/source/ct/ctc.c
+  * xharbour/source/rtl/dates.c
+  * xharbour/source/vm/errorapi.c
+  * xharbour/source/vm/extend.c
+  * xharbour/source/vm/fastitem.c
+  * xharbour/source/vm/itemapi.c
+    * the 'char *' parameters in hb_itemPutC[L], hb_itemPutDS, hb_retc[len],
+      hb_retds(), hb_errPut*, hb_errRT_*, hb_dateEncStr converted to 
+      'const char *' to avoid unnecessary casting in C++ mode. Please
+      always use 'cons char *' instead of 'char *' when you are 100%
+      sure it is really constant.
+    + added hb_pardl() and hb_stordl()
+
+  * xharbour/include/hbapirdd.h
+    * some (commented out yet) new fields in RDD structures
+
+  * xharbour/include/hbdbf.h
+    * extended field structure for autoincrement, nullable and system
+      columns
+
+  * xharbour/include/hbdefs.h
+    + added HB_INIT_FUNCNAME()/HB_EXIT_FUNCNAME()
+      HB_INITSTATICS_FUNCNAME()/HB_FUNC_INITSTATIC() macros
+      to keep all function name definitions/declarations in one place
+      for easier modifications.
+    * some small fixes to avoid multiple extern declarations
+
+  * xharbour/include/hbmath.h
+    * use math exception for __WATCOMC__ also is standard C mode
+
+  * harbour/include/hbvm.h
+  * harbour/source/vm/hvm.c
+    + added hb_vmEvalBlockOrMacro() - I cannot say I like it but RDD
+      expensively use such code to reduce the overhead with execution
+      codeblok created from compiled macros so I prefer to keep it
+      here as far as we do not have nicer solution.
+    * changed 'char *' to const 'char *' in hb_vmPushString()
+
+  * xharbour/include/hbrdddbf.h
+  * xharbour/include/dbinfo.ch
+    * initial support for encryption
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/include/hbrddntx.h
+
+  * xharbour/include/hbcomp.h
+  * xharbour/source/compiler/genc.c
+  * xharbour/source/compiler/harbour.c
+    * divide symbols for functions and others - it's Clipper compatible
+      and resolves the problem of registering static functions in dynamic
+      symbol table. It's exactly the same what Ryszard done recently in
+      Harbour.
+
+  * xharbour/source/rdd/dbcmd.c
+    * some minor modifications and cleanup in ORDCONDSET()/DBUSEARE()/
+      DBUSEARED() - DBUSEARED() will be removed soon.
+
+  * xharbour/source/rdd/dbf1.c
+    * initial support for encription
+    * add table extension (.dbf) in OPEN() method - it will be soon removed
+      from DBUSEAREA()
+    + added DBI_DB_VERSION/DBI_RDD_VERSION
+
+  * xharbour/source/rdd/workarea.c
+    ! fixed typo in DBI_FCOUNT
+    + added DBI_DB_VERSION/DBI_RDD_VERSION
+    ! use hb_vmEvalBlockOrMacro() in EVALBLOCK() method - EVALBLOCK()
+      should be able to execute objects produced by COMPILE() method.
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * many small fixes and improvements like dynamic scopes from code blocks,
+      cleaned scope code - now can be fully controlled by DBOI_* interface
+      so we can free the method used so far (IMHO it we badly understood
+      some method names and Clipper use it for totally differ things)
+      COMIX/CL5.3 compatible order of execution codeblocks in indexing.
+
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+    + added DBI_MEMOBLOCKSIZE
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * in practice nearly the whole code rewritten except of indexing.
+      I tried to keep working the memory indexing implemented by Alexander
+      but I never used them and I cannot find any documentation about them
+      so it's quite possible that I broke this code.
+      The indexing will be rewritten so - it has to be done because current
+      code will not work properly on nonintell machines.
+      Please test. For sure I fixed many existing problems but it's a new
+      code. Now DBFNTX supports most of DBFCDX features like dynamic descend
+      flag (ordDescend()) and other ord*() functions (also dynamic scopes
+      as codeblocks), has real seek last, etc. It should be noticeable faster
+      in SHARED mode and network environment.
+
+  * xharbour/source/rtl/hbserv.c
+    ! clear sigaction structure before use to avoid unexpected problems
+      with differ implementation in different systems
+
+  * xharbour/source/rtl/minmax.c
+    * use hb_retdl() to eliminate unnecessary conversions to string in and
+      then to Julian's day.
+
+  * xharbour/source/odbc/odbc.c
+  * xharbour/source/rtl/console.c
+  * xharbour/source/rtl/datec.c
+  * xharbour/source/rtl/diskspac.c
+  * xharbour/source/rtl/filesys.c
+  * xharbour/source/rtl/fstemp.c
+  * xharbour/source/rtl/gete.c
+  * xharbour/source/rtl/isprint.c
+  * xharbour/source/rtl/mlctopos.c
+  * xharbour/source/rtl/mpostolc.c
+  * xharbour/source/rtl/natmsg.c
+  * xharbour/source/rtl/spfiles.c
+  * xharbour/source/rtl/txtline.c
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtsln/kbsln.c
+  * xharbour/source/rtl/gtxvt/gtxvt.c
+  * xharbour/source/rtl/gtxwc/gtxwc.c
+  * xharbour/source/vm/classes.c
+  * xharbour/source/vm/memvars.c
+  * xharbour/source/vm/runner.c
+  * xharbour/source/vm/thread.c
+  * xharbour/utils/hbmake/hbmlang.c
+    * casting for C++ mode - now Harbour can be compiled by G++
+
+  * xharbour/source/vm/arrays.c
+    * restored the original behavior of hb_arrayGetDL()
+
+  * xharbour/source/vm/dynsym.c
+    * fixed possible memory leak in hb_dynsymNew()
+    * disable the scope checking in hb_dynsymNew()
+      - I left the code covered by '#if 0' - it's quite good comment ;-)
+
+  * xharbour/source/vm/eval.c
+    + added hb_itemDoCRef() - it can execute given xHarbour function from
+      C level passing chosen parameters by reference.
+
+  * xharbour/tests/speedtst.prg
+    + added to new tests to show the cost of early cloning the parameters
+      passed by reference - compare it with Harbour. Ron does we really
+      need it?
+
 2005-03-31 04:10 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * xharbour.spec
     ! updated version number

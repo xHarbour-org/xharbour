@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.57 2005/02/27 11:56:01 andijahja Exp $
+ * $Id: ads1.c,v 1.58 2005/02/28 10:17:28 andijahja Exp $
  */
 
 /*
@@ -3051,7 +3051,8 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
 
       case DBOI_BAGEXT:
          hb_itemPutC( pOrderInfo->itmResult,
-                ( ( pArea->iFileType == ADS_ADT ) ? ".adi" : ( pArea->iFileType == ADS_CDX ) ? ".cdx" : ".ntx" ) );
+                      ( ( pArea->iFileType == ADS_ADT ) ? ".adi" : 
+                        ( pArea->iFileType == ADS_CDX ) ? ".cdx" : ".ntx" ) );
          break;
 
       case DBOI_ORDERCOUNT:

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmath.h,v 1.11 2005/02/24 10:44:03 andijahja Exp $
+ * $Id: hbmath.h,v 1.12 2005/02/28 02:12:31 druzus Exp $
  */
 
 /*
@@ -73,7 +73,7 @@ HB_EXTERN_BEGIN
 #ifndef HB_NO_MATH_HANDLER
    #if defined(__WATCOMC__)
       #define HB_MATH_HANDLER
-      #if (__WATCOMC__ > 1000) && defined(__cplusplus)
+      #if (__WATCOMC__ > 1000) /* && defined(__cplusplus) */
          #define exception _exception
       #endif
    #elif defined(__BORLANDC__)

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.39 2005/01/25 10:47:48 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.40 2005/02/14 21:14:00 druzus Exp $
  */
 
 /*
@@ -70,6 +70,7 @@ HB_EXTERN_BEGIN
 #define CDX_MAXTAGNAMELEN                            10
 #define CDX_PAGELEN                                 512
 #define CDX_HEADERLEN                              1024
+#define CDX_HEADEREXPLEN          (CDX_HEADERLEN - 512)
 #define CDX_HEADERPAGES   ((CDX_HEADERLEN+CDX_PAGELEN-1)/CDX_PAGELEN)
 #define CDX_INT_FREESPACE              (CDX_PAGELEN-12) /* 500 */
 #define CDX_EXT_FREESPACE              (CDX_PAGELEN-24) /* 488 */
@@ -150,6 +151,39 @@ HB_EXTERN_BEGIN
 #define CDX_TYPE_COMPOUND      0x40    /* FoxPro */
 #define CDX_TYPE_STRUCTURE     0x80    /* FoxPro */
 
+/*
+ TODO like in SIXCDX:
+   switch ( indexOpt & ( CDX_TYPE_TEMPORARY | CDX_TYPE_CUSTOM ) )
+      case CDX_TYPE_TEMPORARY:
+         PARTIAL_RYO
+      case CDX_TYPE_CUSTOM:
+         PARTIAL_RYO | CHGONLY_RYO
+      case CDX_TYPE_TEMPORARY | CDX_TYPE_CUSTOM:
+         PARTIAL_RYO | NOUPDATE_RYO
+         if index key begin with:
+            'SXCHAR(' or 'SXNUM(' or 'SXDATE(' or 'SXLOG('
+         then
+            | TEMPLATE_RYO
+
+   sx_chill()  if ( ! NOUPDATE_RYO ) then set ( CHGONLY_RYO | PARTIAL_RYO )
+                  if ( indexOpt & ( CDX_TYPE_TEMPORARY | CDX_TYPE_CUSTOM ) !=
+                        CDX_TYPE_TEMPORARY | CDX_TYPE_CUSTOM )
+                  {
+                     indexOpt &= ~CDX_TYPE_CUSTOM;
+                     indexOpt |= CDX_TYPE_TEMPORARY
+                  }
+
+   sx_warm()   if ( ! NOUPDATE_RYO ) then clear CHGONLY_RYO
+                  if ( indexOpt & ( CDX_TYPE_TEMPORARY | CDX_TYPE_CUSTOM ) !=
+                        CDX_TYPE_TEMPORARY | CDX_TYPE_CUSTOM )
+                  {
+                     indexOpt |= CDX_TYPE_CUSTOM;
+                     indexOpt &= ~CDX_TYPE_TEMPORARY
+                  }
+
+   sx_freeze() set NOUPDATE_RYO
+                  indexOpt |= CDX_TYPE_TEMPORARY | CDX_TYPE_CUSTOM;
+*/
 typedef void ( * HB_EVALSCOPE_FUNC )( ULONG, BYTE *, ULONG, void * );
 
 /* CDX index node strucutres */
@@ -162,13 +196,14 @@ typedef struct _CDXTAGHEADER
    BYTE     keySize  [ 2 ];   /* key length */
    BYTE     indexOpt;         /* index options see CDX_TYPE_* */
    BYTE     indexSig;         /* index signature */
-   BYTE     reserved2[ 486 ];
+   BYTE     reserved2[ 484 ];
+   BYTE     ignoreCase[ 2 ];  /* 1 = ignore case, key converted to upper */
    BYTE     ascendFlg[ 2 ];   /* 0 = ascending  1 = descending */
    BYTE     forExpPos[ 2 ];   /* offset of filter expression */
    BYTE     forExpLen[ 2 ];   /* length of filter expression */
    BYTE     keyExpPos[ 2 ];   /* offset of key expression */
    BYTE     keyExpLen[ 2 ];   /* length of key expression */
-   BYTE     keyExpPool[ CDX_HEADERLEN - 512 ];
+   BYTE     keyExpPool[ CDX_HEADEREXPLEN ];
 } CDXTAGHEADER;
 typedef CDXTAGHEADER * LPCDXTAGHEADER;
 
@@ -287,6 +322,7 @@ typedef struct _CDXTAG
    USHORT   uiType;           /* a type of key expression value */
    USHORT   uiLen;            /* length of the key expression value */
    USHORT   nField;           /* Field number for simple (one field) key expersion */
+   BYTE     bTrail;           /* trailing character for shorter key value */
    BYTE     OptFlags;         /* index options flag */
    BOOL     AscendKey;        /* ascending/descending order flag */
    BOOL     UniqueKey;        /* unique order flag */
@@ -464,6 +500,7 @@ typedef struct _CDXAREA
    BOOL fRecordChanged;          /* Record changed */
    BOOL fAppend;                 /* TRUE if new record is added */
    BOOL fDeleted;                /* TRUE if record is deleted */
+   BOOL fEncrypted;              /* TRUE if record is encrypted */
    BOOL fUpdateHeader;           /* Update header of file */
    BOOL fFLocked;                /* TRUE if file is locked */
    BOOL fHeaderLocked;           /* TRUE if DBF header is locked */

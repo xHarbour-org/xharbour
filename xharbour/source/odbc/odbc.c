@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.26 2005/02/17 22:55:35 guerra000 Exp $
+ * $Id: odbc.c,v 1.27 2005/02/24 10:44:04 andijahja Exp $
  */
 
 /*
@@ -145,7 +145,7 @@ HB_FUNC( SQLDRIVERC ) /* HB_SQLDRIVERCONNECT( hDbc, @ cConnectString ) --> nRetC
    #elif defined(HB_OS_UNIX)
       RETCODE ret =  SQLDriverConnect( ( HDBC ) hb_parnl( 1 ),
                              0,
-                             hb_parcx( 2 ), strlen(hb_parcx(2)),
+                             (SQLCHAR *) hb_parcx( 2 ), strlen(hb_parcx(2)),
                              bBuffer1, 1024, &wLen, SQL_DRIVER_COMPLETE ) ;
 
    #endif

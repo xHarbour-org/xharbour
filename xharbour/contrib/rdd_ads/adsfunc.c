@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.51 2005/03/17 22:00:00 ptsarenko Exp $
+ * $Id: adsfunc.c,v 1.51 2005/03/17 20:24:02 ptsarenko Exp $
  */
 
 /*
@@ -82,23 +82,29 @@ BOOL bTestRecLocks = FALSE;             /* Debug Implicit locks */
 static HB_ITEM s_itmCobCallBack = HB_ITEM_NIL;
 #endif
 
-void hb_oemansi(char* pcString, LONG lLen)
+void hb_oemansi( char* pcString, LONG lLen )
 {
 #if defined(HB_OS_WIN_32)
    char * pszDst = ( char * ) hb_xgrab( lLen + 1 );
    OemToCharBuff( ( LPCSTR ) pcString, ( LPSTR ) pszDst, (DWORD) lLen );
    memcpy( pcString, pszDst, lLen );
    hb_xfree( pszDst );
+#else
+   HB_SYMBOL_UNUSED( pcString );
+   HB_SYMBOL_UNUSED( lLen );
 #endif
 }
 
-void hb_ansioem(char* pcString, LONG lLen)
+void hb_ansioem( char* pcString, LONG lLen )
 {
 #if defined(HB_OS_WIN_32)
    char * pszDst = ( char * ) hb_xgrab( lLen + 1 );
    CharToOemBuff( ( LPCSTR ) pcString, ( LPSTR ) pszDst, (DWORD) lLen );
    memcpy( pcString, pszDst, lLen );
    hb_xfree( pszDst );
+#else
+   HB_SYMBOL_UNUSED( pcString );
+   HB_SYMBOL_UNUSED( lLen );
 #endif
 }
 
@@ -1854,7 +1860,7 @@ HB_FUNC( ADSREINDEX )
    }
    else
    {
-      ulRetVal = AdsReindex( -1 ); // should return error!
+      ulRetVal = AdsReindex( ( ADSHANDLE ) -1 ); // should return error!
    }
 
    if( ulRetVal == AE_SUCCESS )

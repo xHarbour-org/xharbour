@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.9 2005/01/28 03:29:31 druzus Exp $
+ * $Id: dbinfo.ch,v 1.10 2005/02/04 01:11:54 druzus Exp $
  */
 
 /*
@@ -135,9 +135,10 @@
 #define DBRI_RECSIZE              3
 #define DBRI_RECNO                4
 #define DBRI_UPDATED              5
-#define DBRI_RAWRECORD            6
-#define DBRI_RAWMEMOS             7
-#define DBRI_RAWDATA              8
+#define DBRI_ENCRYPTED            6
+#define DBRI_RAWRECORD            7
+#define DBRI_RAWMEMOS             8
+#define DBRI_RAWDATA              9
 
 /* constants for some SCOPED DBOI_* parameter */
 #define DBRMI_FUNCTION  1
@@ -184,6 +185,8 @@
 #define DBI_LOCKSCHEME          128  /* Locking scheme used by RDD */
 #define DBI_ISREADONLY          129  /* Was the file opened readonly? */
 #define DBI_ROLLBACK            130  /* Rollback changes made to current record */
+#define DBI_PASSWORD            131  /* Set workarea password */
+#define DBI_ISENCRYPTED         132  /* The database is encrypted */
 
 #define DBI_USER               1000  /* User-defined DBI_ constants */
 

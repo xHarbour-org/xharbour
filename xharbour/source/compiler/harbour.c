@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.95 2005/03/11 22:00:23 andijahja Exp $
+ * $Id: harbour.c,v 1.97 2005/03/30 21:29:42 andijahja Exp $
  */
 
 /*
@@ -845,11 +845,11 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                   hb_comp_functions.pLast->wParamCount = hb_comp_functions.pLast->wParamNum;
                }
 
-               pSym = hb_compSymbolFind( szVarName, &wPos ); /* check if symbol exists already */
+               pSym = hb_compSymbolFind( szVarName, &wPos, FALSE ); /* check if symbol exists already */
 
                if( ! pSym )
                {
-                  pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos );
+                  pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos, FALSE );
                }
 
                pSym->cScope |= VS_MEMVAR;
@@ -902,11 +902,11 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
          case VS_PRIVATE:
             {
-               pSym = hb_compSymbolFind( szVarName, &wPos ); /* check if symbol exists already */
+               pSym = hb_compSymbolFind( szVarName, &wPos, FALSE ); /* check if symbol exists already */
 
                if( ! pSym )
                {
-                  pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos );
+                  pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos, FALSE );
                }
 
                pSym->cScope |= VS_MEMVAR;
@@ -957,11 +957,11 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
          case VS_PUBLIC:
             {
-               pSym = hb_compSymbolFind( szVarName, &wPos ); /* check if symbol exists already */
+               pSym = hb_compSymbolFind( szVarName, &wPos, FALSE ); /* check if symbol exists already */
 
                if( ! pSym )
                {
-                  pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos );
+                  pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos, FALSE );
                }
 
                pSym->cScope |= VS_MEMVAR;
@@ -1845,7 +1845,7 @@ PCOMDECLARED hb_compDeclaredAdd( char * szDeclaredName )
    return pDeclared;
 }
 
-PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos )
+PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, BOOL bFunction )
 {
    PCOMSYMBOL pSym;
 
@@ -1858,9 +1858,10 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos )
       pSym = ( PCOMSYMBOL ) hb_xgrab( sizeof( COMSYMBOL ) );
 
       pSym->szName = szSymbolName;
-      pSym->cScope = HB_FS_PUBLIC;
+      pSym->cScope = 0; /* HB_FS_PUBLIC; */
       pSym->cType = hb_comp_cVarType;
       pSym->pNext = NULL;
+      pSym->bFunc = bFunction;
 
       if( ! hb_comp_symbols.iCount )
       {
@@ -1962,7 +1963,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    hb_fsFNameMerge( szFileName, hb_FileName );
    hb_compFinalizeFunction();    /* fix all previous function returns offsets */
 
-   if( cScope & HB_FS_INIT || cScope & HB_FS_EXIT )
+   if( cScope & HB_FS_INITEXIT )
    {
       int iLen = strlen( szFunName );
       char *sDecorated = ( char * ) hb_xgrab( iLen + 2 );
@@ -2000,7 +2001,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    hb_comp_iFunctionCnt++;
 
-   pSym = hb_compSymbolFind( szFunName, NULL );
+   pSym = hb_compSymbolFind( szFunName, NULL, TRUE );
 
    if( pSym )
    {
@@ -2009,7 +2010,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    else
    {
       // There is not a symbol on the symbol table for this function name yet.
-      pSym = hb_compSymbolAdd( szFunName, NULL );
+      pSym = hb_compSymbolAdd( szFunName, NULL, TRUE );
 
       if( pSym )
       {
@@ -2070,11 +2071,11 @@ PINLINE hb_compInlineAdd( char * szFunName )
 
    if( szFunName )
    {
-      pSym = hb_compSymbolFind( szFunName, NULL );
+      pSym = hb_compSymbolFind( szFunName, NULL, TRUE );
 
       if( ! pSym )
       {
-         pSym = hb_compSymbolAdd( szFunName, NULL );
+         pSym = hb_compSymbolAdd( szFunName, NULL, TRUE );
       }
 
       if( pSym )
@@ -2124,7 +2125,7 @@ void hb_compAnnounce( char * szFunName )
 
       /* create a new procedure
        */
-      pSym = hb_compSymbolAdd( szFunName, NULL );
+      pSym = hb_compSymbolAdd( szFunName, NULL, TRUE );
       pSym->cScope = HB_FS_PUBLIC;
 
       pFunc = hb_compFunctionNew( szFunName, HB_FS_PUBLIC );
@@ -2262,7 +2263,7 @@ void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */
 
    while( hb_comp_pExterns )
    {
-      if( hb_compSymbolFind( hb_comp_pExterns->szName, NULL ) )
+      if( hb_compSymbolFind( hb_comp_pExterns->szName, NULL, TRUE ) )
       {
          if( ! hb_compFunCallFind( hb_comp_pExterns->szName ) )
          {
@@ -2271,7 +2272,7 @@ void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */
       }
       else
       {
-         hb_compSymbolAdd( hb_comp_pExterns->szName, NULL );
+         hb_compSymbolAdd( hb_comp_pExterns->szName, NULL, TRUE );
          hb_compFunCallAdd( hb_comp_pExterns->szName );
       }
 
@@ -2449,7 +2450,7 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
          while( pFunc )
          {
             bStatic = FALSE;
-            if( ( pFunc->cScope & ( HB_FS_INIT | HB_FS_EXIT ) ) == ( HB_FS_INIT | HB_FS_EXIT ) )
+            if( ( pFunc->cScope & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
             {
                /* we are in a codeblock used to initialize a static variable -
                 * skip to a function where this static variable was declared
@@ -2675,7 +2676,7 @@ PCOMDECLARED hb_compDeclaredFind( char * szDeclaredName )
    return NULL;
 }
 
-PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos )
+PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, BOOL bFunction )
 {
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
    USHORT wCnt = 0;
@@ -2689,24 +2690,23 @@ PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos )
    {
       if( ! strcmp( pSym->szName, szSymbolName ) )
       {
-         if( pwPos )
+         if( bFunction ? pSym->bFunc : !pSym->bFunc )
          {
-            *pwPos = wCnt;
+            if( pwPos )
+            {
+               *pwPos = wCnt;
+            }
+            return pSym;
          }
-
-         return pSym;
+      }
+      if( pSym->pNext )
+      {
+         pSym = pSym->pNext;
+         ++wCnt;
       }
       else
       {
-         if( pSym->pNext )
-         {
-            pSym = pSym->pNext;
-            ++wCnt;
-         }
-         else
-         {
-            return NULL;
-         }
+         return NULL;
       }
    }
    return NULL;
@@ -3301,11 +3301,11 @@ static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
 
    /* Check if this variable name is placed into the symbol table
     */
-   pSym = hb_compSymbolFind( szVarName, &wVar );
+   pSym = hb_compSymbolFind( szVarName, &wVar, FALSE );
 
    if( ! pSym )
    {
-      pSym = hb_compSymbolAdd( szVarName, &wVar );
+      pSym = hb_compSymbolAdd( szVarName, &wVar, FALSE );
    }
 
    pSym->cScope |= VS_MEMVAR;
@@ -3327,11 +3327,11 @@ static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
 void hb_compGenMessage( char * szMsgName )       /* sends a message to an object */
 {
    USHORT wSym;
-   PCOMSYMBOL pSym = hb_compSymbolFind( szMsgName, &wSym );
+   PCOMSYMBOL pSym = hb_compSymbolFind( szMsgName, &wSym, TRUE );
 
    if( ! pSym )
    {
-      pSym = hb_compSymbolAdd( szMsgName, &wSym );
+      pSym = hb_compSymbolAdd( szMsgName, &wSym, TRUE );
    }
 
    pSym->cScope |= HB_FS_MESSAGE;
@@ -3396,7 +3396,7 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
     * initialization function - if YES then we have to switch to a function
     * where the static variable was declared
     */
-   if( ( hb_comp_functions.pLast->cScope & ( HB_FS_INIT | HB_FS_EXIT ) ) == ( HB_FS_INIT | HB_FS_EXIT ) )
+   if( ( hb_comp_functions.pLast->cScope & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
    {
       pFunc = hb_comp_functions.pLast->pOwner;
    }
@@ -4051,7 +4051,7 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias )
    PCOMSYMBOL pSym;
    USHORT wSym;
 
-   if( ( pSym = hb_compSymbolFind( szSymbolName, &wSym ) ) != NULL )  /* the symbol was found on the symbol table */
+   if( ( pSym = hb_compSymbolFind( szSymbolName, &wSym, bFunction ) ) != NULL )  /* the symbol was found on the symbol table */
    {
       if( bFunction && ! hb_compFunCallFind( szSymbolName ) )
       {
@@ -4065,7 +4065,7 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias )
    }
    else
    {
-      pSym = hb_compSymbolAdd( szSymbolName, &wSym );
+      pSym = hb_compSymbolAdd( szSymbolName, &wSym, bFunction );
 
       if( bFunction )
       {
@@ -4214,7 +4214,7 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
       if( pFunc->pCode[ 0 ] == HB_P_STATICS &&
           pFunc->pCode[ 5 ] == HB_P_SFRAME )
       {
-         hb_compSymbolFind( hb_comp_pInitFunc->szName, &w );
+         hb_compSymbolFind( hb_comp_pInitFunc->szName, &w, TRUE );
          pFunc->pCode[ 1 ] = HB_LOBYTE( w );
          pFunc->pCode[ 2 ] = HB_HIBYTE( w );
          pFunc->pCode[ 6 ] = HB_LOBYTE( w );
@@ -4317,7 +4317,7 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
 
       if( pFunc->bFlags & FUN_USES_STATICS )
       {
-         hb_compSymbolFind( hb_comp_pInitFunc->szName, &w );
+         hb_compSymbolFind( hb_comp_pInitFunc->szName, &w, TRUE );
          pFunc->pCode[ 4 + iOffset ] = HB_LOBYTE( w );
          pFunc->pCode[ 5 + iOffset ] = HB_HIBYTE( w );
          bSkipSFRAME = FALSE;
@@ -4621,7 +4621,7 @@ void hb_compStaticDefStart( void )
       hb_comp_pInitFunc = hb_compFunctionNew( hb_strdup("(_INITSTATICS)"), HB_FS_INIT );
       hb_comp_pInitFunc->pOwner = hb_comp_functions.pLast;
       hb_comp_pInitFunc->bFlags = FUN_USES_STATICS | FUN_PROCEDURE;
-      hb_comp_pInitFunc->cScope = HB_FS_INIT | HB_FS_EXIT;
+      hb_comp_pInitFunc->cScope = HB_FS_INITEXIT;
       hb_comp_functions.pLast = hb_comp_pInitFunc;
 
       pBuffer[ 0 ] = HB_P_STATICS;
@@ -4671,7 +4671,7 @@ void hb_compGlobalsDefStart( void )
       hb_comp_pGlobalsFunc = hb_compFunctionNew( hb_strdup("[_INITGLOBALS]"), HB_FS_INIT );
       hb_comp_pGlobalsFunc->pOwner = hb_comp_functions.pLast;
       hb_comp_pGlobalsFunc->bFlags = FUN_PROCEDURE;
-      hb_comp_pGlobalsFunc->cScope = HB_FS_INIT | HB_FS_EXIT;
+      hb_comp_pGlobalsFunc->cScope = HB_FS_INITEXIT;
       hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
    }
    else
@@ -5208,7 +5208,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                hb_comp_pInitFunc->pCode[ 4 ] = HB_HIBYTE( hb_comp_iStaticCnt );
                hb_comp_pInitFunc->iStaticsBase = hb_comp_iStaticCnt;
 
-               pSym = hb_compSymbolAdd( hb_comp_pInitFunc->szName, NULL );
+               pSym = hb_compSymbolAdd( hb_comp_pInitFunc->szName, NULL, TRUE );
                pSym->cScope |= hb_comp_pInitFunc->cScope;
                hb_comp_functions.pLast->pNext = hb_comp_pInitFunc;
                hb_comp_functions.pLast = hb_comp_pInitFunc;
@@ -5224,7 +5224,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                {
                   PCOMSYMBOL pSym;
 
-                  pSym = hb_compSymbolAdd( hb_comp_pGlobalsFunc->szName, NULL );
+                  pSym = hb_compSymbolAdd( hb_comp_pGlobalsFunc->szName, NULL, TRUE );
                   pSym->cScope |= hb_comp_pGlobalsFunc->cScope;
                   hb_comp_functions.pLast->pNext = hb_comp_pGlobalsFunc;
                   hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
@@ -5248,8 +5248,8 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                {
                   PCOMSYMBOL pSym;
 
-                  pSym = hb_compSymbolAdd( hb_strdup( "{_REGISTERGLOBALS}" ), NULL );
-                  pSym->cScope = HB_FS_INIT | HB_FS_EXIT ;
+                  pSym = hb_compSymbolAdd( hb_strdup( "{_REGISTERGLOBALS}" ), NULL, TRUE );
+                  pSym->cScope = HB_FS_INITEXIT;
                }
             }
 
@@ -5315,7 +5315,8 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                      fprintf(hb_comp_VariableList,"\n");
                   }
 
-                  if( szFirstFunction == NULL && pFunc->szName[0] && ! ( pFunc->cScope & HB_FS_INIT || pFunc->cScope & HB_FS_EXIT ) )
+                  if( szFirstFunction == NULL && pFunc->szName[0] &&
+                      ( pFunc->cScope & HB_FS_INITEXIT ) == 0 )
                   {
                      szFirstFunction = pFunc->szName;
                   }
@@ -5326,17 +5327,11 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
                if( szFirstFunction )
                {
-                  PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
-
-                  while( pSym )
+                  PCOMSYMBOL pSym = hb_compSymbolFind( szFirstFunction,
+                                                       NULL, TRUE );
+                  if ( pSym )
                   {
-                     if( strcmp( pSym->szName, szFirstFunction ) == 0 )
-                     {
-                        pSym->cScope |= HB_FS_FIRST;
-                        break;
-                     }
-
-                     pSym = pSym->pNext;
+                     pSym->cScope |= HB_FS_FIRST;
                   }
                }
 

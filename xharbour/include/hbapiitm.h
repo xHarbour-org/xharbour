@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.34 2004/04/20 14:33:08 jacekp Exp $
+ * $Id: hbapiitm.h,v 1.35 2004/11/21 21:43:36 druzus Exp $
  */
 
 /*
@@ -96,14 +96,14 @@ extern PHB_ITEM  HB_EXPORT hb_itemParam        ( USHORT uiParam );
 #if 0           
 extern HB_ITEM   HB_EXPORT hb_itemParamStack   ( USHORT uiParam ) ;
 #endif          
-extern PHB_ITEM  HB_EXPORT hb_itemPutC         ( PHB_ITEM pItem, char * szText );
+extern PHB_ITEM  HB_EXPORT hb_itemPutC         ( PHB_ITEM pItem, const char * szText );
 extern PHB_ITEM  HB_EXPORT hb_itemPutCPtr      ( PHB_ITEM pItem, char * szText, ULONG ulLen );
 extern PHB_ITEM  HB_EXPORT hb_itemPutCRaw      ( PHB_ITEM pItem, char * szText, ULONG ulLen );
 extern PHB_ITEM  HB_EXPORT hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ulLen );
-extern PHB_ITEM  HB_EXPORT hb_itemPutCL        ( PHB_ITEM pItem, char * szText, ULONG ulLen );
+extern PHB_ITEM  HB_EXPORT hb_itemPutCL        ( PHB_ITEM pItem, const char * szText, ULONG ulLen );
 extern void      HB_EXPORT hb_itemSetCMemo     ( PHB_ITEM pItem );
 extern PHB_ITEM  HB_EXPORT hb_itemPutD         ( PHB_ITEM pItem, int iYear, int iMonth, int iDay );
-extern PHB_ITEM  HB_EXPORT hb_itemPutDS        ( PHB_ITEM pItem, char * szDate );
+extern PHB_ITEM  HB_EXPORT hb_itemPutDS        ( PHB_ITEM pItem, const char * szDate );
 extern PHB_ITEM  HB_EXPORT hb_itemPutDL        ( PHB_ITEM pItem, LONG lJulian );
 extern PHB_ITEM  HB_EXPORT hb_itemPutL         ( PHB_ITEM pItem, BOOL bValue );
 extern PHB_ITEM  HB_EXPORT hb_itemPutND        ( PHB_ITEM pItem, double dNumber );

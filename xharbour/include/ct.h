@@ -1,5 +1,5 @@
 /*
- * $Id: ct.h,v 1.1 2003/09/23 21:23:56 paultucker Exp $
+ * $Id: ct.h,v 1.1 2004/08/25 17:02:57 lf_sfnet Exp $
  */
 
 /*
@@ -72,12 +72,12 @@
 
 /* CT subsystem error throwing functions */
 extern USHORT ct_error (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
-                        char * szDescription, char * szOperation, USHORT uiOsCode,
-                        USHORT uiFlags, ULONG uiArgCount, ...);
+                        const char * szDescription, const char * szOperation,
+                        USHORT uiOsCode, USHORT uiFlags, ULONG uiArgCount, ...);
 
 extern PHB_ITEM ct_error_subst (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode, 
-                                char * szDescription, char * szOperation, USHORT uiOsCode,
-                                USHORT uiFlags, ULONG uiArgCount, ...);
+                                const char * szDescription, const char * szOperation,
+                                USHORT uiOsCode, USHORT uiFlags, ULONG uiArgCount, ...);
 
 /* set argument error behaviour */
 extern void ct_setargerrormode (int iMode);

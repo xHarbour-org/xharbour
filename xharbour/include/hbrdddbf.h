@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.17 2004/12/02 03:26:19 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.18 2005/02/14 21:14:01 druzus Exp $
  */
 
 /*
@@ -176,6 +176,7 @@ typedef struct _DBFAREA
    BOOL fRecordChanged;          /* Record changed */
    BOOL fAppend;                 /* TRUE if new record is added */
    BOOL fDeleted;                /* TRUE if record is deleted */
+   BOOL fEncrypted;              /* TRUE if record is encrypted */
    BOOL fUpdateHeader;           /* Update header of file */
    BOOL fFLocked;                /* TRUE if file is locked */
    BOOL fHeaderLocked;           /* TRUE if DBF header is locked */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapilng.h,v 1.6 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbapilng.h,v 1.7 2004/04/01 09:35:36 andijahja Exp $
  */
 
 /*
@@ -74,7 +74,7 @@ HB_EXTERN_BEGIN
 
 typedef struct _HB_LANG
 {
-   void * pItemList[ HB_LANG_ITEM_MAX_ ];
+   const void * pItemList[ HB_LANG_ITEM_MAX_ ];
 } HB_LANG, * PHB_LANG, * HB_LANG_PTR;
 
 /* Supported language list management */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.21 2004/11/21 21:43:37 druzus Exp $
+ * $Id: hbapirdd.h,v 1.22 2004/12/28 06:39:18 druzus Exp $
  */
 
 /*
@@ -203,11 +203,14 @@ typedef struct _DBORDERCONDINFO
    LONG     lRecno;
    BOOL     fRest;
    BOOL     fDescending;
+/* BOOL     fScoped; */
    BOOL     fAll;
    BOOL     fAdditive;
    BOOL     fUseCurrent;
    BOOL     fCustom;
    BOOL     fNoOptimize;
+/* BOOL     fTemporary; */
+/* BOOL     fUseFilter; */
    void *   lpvCargo;
 } DBORDERCONDINFO;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.87 2005/03/15 21:39:28 andijahja Exp $
+ * $Id: genc.c,v 1.88 2005/03/30 21:29:36 andijahja Exp $
  */
 
 /*
@@ -268,14 +268,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
          {
-            pFunc->szName[ strlen( pFunc->szName ) - 1 ] = '_';
-            fprintf( yyc, "HB_FUNC_INIT( _%s );\n", pFunc->szName );
+            fprintf( yyc, "HB_FUNC_INIT( %.*s );\n", strlen( pFunc->szName ) - 1, pFunc->szName );
          }
          /* Is it an EXIT FUNCTION/PROCEDURE */
          else if ( bIsExitFunction )
          {
-            pFunc->szName[ strlen( pFunc->szName ) - 1 ] = '_';
-            fprintf( yyc, "HB_FUNC_EXIT( _%s );\n", pFunc->szName );
+            fprintf( yyc, "HB_FUNC_EXIT( %.*s );\n", strlen( pFunc->szName ) - 1, pFunc->szName );
          }
          /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
@@ -405,7 +403,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             * we are using these two bits to mark the special function used to
             * initialize static variables
             */
-            fprintf( yyc, "{ \"(_INITSTATICS)\", HB_FS_INIT | HB_FS_EXIT, {hb_INITSTATICS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "{ \"(_INITSTATICS)\", HB_FS_INITEXIT, {hb_INITSTATICS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else if( pSym->szName[ 0 ] == '[' )
          {
@@ -413,7 +411,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             * we are using these two bits to mark the special function used to
             * initialize global variables
             */
-            fprintf( yyc, "{ \"(_INITGLOBALS)\", HB_FS_INIT | HB_FS_EXIT, {hb_INITGLOBALS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "{ \"(_INITGLOBALS)\", HB_FS_INITEXIT, {hb_INITGLOBALS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else if( pSym->szName[ 0 ] == '{' )
          {
@@ -421,20 +419,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             * we are using these two bits to mark the special function used to
             * initialize global variables
             */
-            fprintf( yyc, "{ \"hb_REGISTERGLOBALS\", HB_FS_INIT | HB_FS_EXIT, {hb_REGISTERGLOBALS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "{ \"hb_REGISTERGLOBALS\", HB_FS_INITEXIT, {hb_REGISTERGLOBALS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else
          {
-            if( pSym->cScope & HB_FS_INIT || pSym->cScope & HB_FS_EXIT )
-            {
-               pSym->szName[ strlen( pSym->szName ) - 1 ] = '$';
-               fprintf( yyc, "{ \"%s\", ", pSym->szName );
-               pSym->szName[ strlen( pSym->szName ) - 1 ] = '_';
-            }
-            else
-            {
-               fprintf( yyc, "{ \"%s\", ", pSym->szName );
-            }
+            fprintf( yyc, "{ \"%s\", ", pSym->szName );
 
             if( pSym->cScope & HB_FS_STATIC )
             {
@@ -463,20 +452,13 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                   fprintf( yyc, " | HB_FS_PUBLIC" );
                }
             }
-            else
+            else if ( hb_compCStaticSymbolFound( pSym->szName, TRUE ) )
             {
-               if ( hb_compCStaticSymbolFound( pSym->szName, TRUE ) )
-               {
-                  fprintf( yyc, "HB_FS_STATIC" );
+               fprintf( yyc, "HB_FS_STATIC" );
 
-                  if( pSym->cScope & HB_FS_PUBLIC )
-                  {
-                     fprintf( yyc, " | HB_FS_PUBLIC" );
-                  }
-               }
-               else
+               if( pSym->cScope & HB_FS_PUBLIC )
                {
-                  fprintf( yyc, "HB_FS_PUBLIC" );
+                  fprintf( yyc, " | HB_FS_PUBLIC" );
                   /*
                      We found first public function in program body and
                      make it starting procedure.
@@ -488,6 +470,10 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                      bSymFIRST = TRUE;
                   }
                }
+            }
+            else
+            {
+               fprintf( yyc, "HB_FS_PUBLIC" );
             }
 
             if( pSym->cScope & VS_MEMVAR )
@@ -511,9 +497,13 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                external called function */
             if( hb_compFunctionFind( pSym->szName ) ) /* is it a function defined in this module */
             {
-               if( pSym->cScope & HB_FS_INIT || pSym->cScope & HB_FS_EXIT )
+               if( pSym->cScope & HB_FS_INIT )
                {
-                  fprintf( yyc, ", {HB_FUNCNAME( _%s )}, (PHB_DYNS) 1 }", pSym->szName );
+                  fprintf( yyc, ", {HB_INIT_FUNCNAME( %.*s )}, (PHB_DYNS) 1 }", strlen( pSym->szName ) - 1, pSym->szName );
+               }
+               else if( pSym->cScope & HB_FS_EXIT )
+               {
+                  fprintf( yyc, ", {HB_EXIT_FUNCNAME( %.*s )}, (PHB_DYNS) 1 }", strlen( pSym->szName ) - 1, pSym->szName );
                }
                else
                {
@@ -664,12 +654,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
          {
-            fprintf( yyc, "HB_FUNC_INIT( _%s )", pFunc->szName );
+            fprintf( yyc, "HB_FUNC_INIT( %.*s )", strlen( pFunc->szName ) - 1, pFunc->szName );
          }
          /* Is it an EXIT FUNCTION/PROCEDURE */
          else if ( bIsExitFunction )
          {
-            fprintf( yyc, "HB_FUNC_EXIT( _%s )", pFunc->szName );
+            fprintf( yyc, "HB_FUNC_EXIT( %.*s )", strlen( pFunc->szName ) - 1, pFunc->szName );
          }
          /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
@@ -2669,7 +2659,7 @@ static HB_GENC_FUNC( hb_p_pushblock )
          * because at the time of C code generation we don't know
          * in which function was defined this local variable
          */
-      if( ( pFunc->cScope & ( HB_FS_INIT | HB_FS_EXIT ) ) != ( HB_FS_INIT | HB_FS_EXIT ) )
+      if( ( pFunc->cScope & HB_FS_INITEXIT ) != HB_FS_INITEXIT )
       {
          if( cargo->bVerbose )
          {

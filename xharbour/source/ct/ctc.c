@@ -1,5 +1,5 @@
 /*
- * $Id: ctc.c,v 1.3 2004/02/20 22:33:55 ronpinkas Exp $
+ * $Id: ctc.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
  */
 
 /*
@@ -60,8 +60,8 @@
 /* throwing a CT-subsystem error without value substitution
    - function adapted from errorapi.c */
 USHORT ct_error (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
-                 char * szDescription, char * szOperation, USHORT uiOsCode,
-                 USHORT uiFlags, ULONG uiArgCount, ...)
+                 const char * szDescription, const char * szOperation,
+                 USHORT uiOsCode, USHORT uiFlags, ULONG uiArgCount, ...)
 {
   USHORT uiAction;
   PHB_ITEM pError;
@@ -91,7 +91,8 @@ USHORT ct_error (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
   HB_TRACE(HB_TR_DEBUG, (")"));
 
   pError = hb_errRT_New (uiSeverity, CT_SUBSYSTEM, ulGenCode, ulSubCode,
-                         szDescription, szOperation, uiOsCode, uiFlags);
+                         ( char * ) szDescription, ( char * ) szOperation,
+                         uiOsCode, uiFlags);
 
   /* Assign the new array to the object data item. */
   hb_vmPushSymbol (hb_dynsymGet ("_ARGS")->pSymbol);
@@ -118,8 +119,8 @@ USHORT ct_error (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
 /* throwing a CT-subsystem error with value substitution
    - function adapted from errorapi.c */
 PHB_ITEM ct_error_subst (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
-                         char * szDescription, char * szOperation, USHORT uiOsCode,
-                         USHORT uiFlags, ULONG uiArgCount, ...)
+                         const char * szDescription, const char * szOperation,
+                         USHORT uiOsCode, USHORT uiFlags, ULONG uiArgCount, ...)
 {
   PHB_ITEM pRetVal;
   PHB_ITEM pError;
@@ -146,7 +147,8 @@ PHB_ITEM ct_error_subst (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
   HB_TRACE(HB_TR_DEBUG, (")"));
 
   pError = hb_errRT_New_Subst (uiSeverity, CT_SUBSYSTEM, ulGenCode, ulSubCode,
-                               szDescription, szOperation, uiOsCode, uiFlags);
+                               ( char * ) szDescription, ( char * ) szOperation,
+                               uiOsCode, uiFlags);
 
   /* Assign the new array to the object data item. */
   hb_vmPushSymbol (hb_dynsymGet ("_ARGS")->pSymbol);

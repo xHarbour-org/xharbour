@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.22 2005/02/28 02:12:31 druzus Exp $
+ * $Id: hbrddntx.h,v 1.23 2005/02/28 02:13:24 druzus Exp $
  */
 
 /*
@@ -76,11 +76,22 @@ HB_EXTERN_BEGIN
 #define NTX_IGNORE_REC_NUM                        0x0UL
 #define NTX_MAX_REC_NUM                    0xFFFFFFFFUL
 
-#define NTX_MAX_KEY          256      /* Max len of key */
-#define NTXBLOCKSIZE         1024     /* Size of block in NTX file */
-#define NTX_MAX_TAGNAME      12       /* Max len of tag name */
-/* #define NTX_LOCK_OFFSET      1000000000 */
-#define NTX_PAGES_PER_TAG    32
+#define NTX_DUMMYNODE                      0xFFFFFFFFUL
+
+#define NTX_FLAG_DEFALUT         0x06
+#define NTX_FLAG_FORITEM         0x01
+#define NTX_FLAG_CUSTOM          0x08
+#define NTX_FLAG_TEMPORARY       0x10
+#define NTX_FLAG_EXTLOCK         0x20
+#define NTX_FLAG_MASK            0x3F
+
+
+#define NTX_MAX_KEY           256      /* Max len of key */
+#define NTXBLOCKSIZE         1024      /* Size of block in NTX file */
+#define NTX_MAX_TAGNAME        12      /* Max len of tag name */
+#define NTX_HDR_UNUSED        473      /* the unused part of header */
+#define NTX_PAGES_PER_TAG      32
+#define NTX_STACKSIZE          32
 
 /* forward declarations
  */
@@ -91,10 +102,9 @@ struct _NTXINDEX;
 
 typedef struct _KEYINFO
 {
-   /* PHB_ITEM pItem; */
-   ULONG    Tag;
-   ULONG    Xtra;
-   char     key[ 1 ]; /* value of key */
+   ULONG    Tag;      /* page number */
+   ULONG    Xtra;     /* record number */
+   char     key[ 1 ]; /* key value */
 } KEYINFO;
 typedef KEYINFO * LPKEYINFO;
 
@@ -109,31 +119,37 @@ typedef struct HB_PAGEINFO_STRU
 {
    ULONG     Page;
    BOOL      Changed;
-   BOOL      lBusy;
+   int       iUsed;
    USHORT    uiKeys;
-   SHORT     CurKey;
    char*     buffer;
 } HB_PAGEINFO;
 typedef HB_PAGEINFO * LPPAGEINFO;
 
+typedef struct _HB_NTXSCOPE
+{
+   PHB_ITEM   scopeItem;
+   LPKEYINFO  scopeKey;
+   USHORT     scopeKeyLen;
+} HB_NTXSCOPE;
+typedef HB_NTXSCOPE * PHB_NTXSCOPE;
+
 typedef struct _TAGINFO
 {
    char *     TagName;
-   int        TagRoot;  /* tag number */
    char *     KeyExpr;
    char *     ForExpr;
    PHB_ITEM   pKeyItem;
    PHB_ITEM   pForItem;
-   PHB_ITEM   topScope;
-   PHB_ITEM   bottomScope;
+   HB_NTXSCOPE top;
+   HB_NTXSCOPE bottom;
    BOOL       fTagName;
+   BOOL       fUsrDescend;
    BOOL       AscendKey;
    BOOL       UniqueKey;
    BOOL       Custom;
    BOOL       TagChanged;
    BOOL       TagBOF;
    BOOL       TagEOF;
-   BOOL       NewRoot;
    BOOL       Memory;
    BYTE       KeyType;
    BYTE       OptFlags;
@@ -144,11 +160,13 @@ typedef struct _TAGINFO
    USHORT     KeyDec;
    USHORT     MaxKeys;
    LPTREESTACK stack;
+   USHORT     stackSize;
    USHORT     stackDepth;
    USHORT     stackLevel;
    ULONG      keyCount;
    ULONG      ulPagesDepth;
    ULONG      ulPages;
+   ULONG      ulPageLast;
    ULONG      ulPagesStart;
    LPKEYINFO  CurKeyInfo;
    LPPAGEINFO pages;
@@ -181,44 +199,27 @@ typedef NTXINDEX * LPNTXINDEX;
 
 typedef struct _NTXHEADER    /* Header of NTX file */
 {
-   UINT16   type;
-   UINT16   version;
-   UINT32   root;
-   UINT32   next_page;
-   UINT16   item_size;
-   UINT16   key_size;
-   UINT16   key_dec;
-   UINT16   max_item;
-   UINT16   half_page;
-   char     key_expr[ NTX_MAX_KEY ];
-   char     unique;
-   char     unknown1;
-   char     descend;
-   char     unknown2;
-   char     for_expr[ NTX_MAX_KEY ];
-   char     tag_name[ NTX_MAX_TAGNAME ];
-   char     custom;
+   BYTE  type[2];
+   BYTE  version[2];
+   BYTE  root[4];
+   BYTE  next_page[4];
+   BYTE  item_size[2];
+   BYTE  key_size[2];
+   BYTE  key_dec[2];
+   BYTE  max_item[2];
+   BYTE  half_page[2];
+   BYTE  key_expr[ NTX_MAX_KEY ];
+   BYTE  unique[1];
+   BYTE  unknown1[1];
+   BYTE  descend[1];
+   BYTE  unknown2[1];
+   BYTE  for_expr[ NTX_MAX_KEY ];
+   BYTE  tag_name[ NTX_MAX_TAGNAME ];
+   BYTE  custom[1];
+   BYTE  unused[ NTX_HDR_UNUSED ];
 } NTXHEADER;
 
 typedef NTXHEADER * LPNTXHEADER;
-
-typedef struct _NTXBUFFER    /* Header of each block in NTX file (only block
-                                with header has other format */
-{
-   UINT16   item_count;
-   UINT16   item_offset[ 1 ];
-} NTXBUFFER;
-
-typedef NTXBUFFER * LPNTXBUFFER;
-
-typedef struct _NTXITEM      /* each item in NTX block has following format */
-{
-   UINT32   page;     /* subpage (each key in subpage has < value like this key */
-   UINT32   rec_no;   /* RecNo of record with this key */
-   char     key[ 1 ]; /* value of key */
-} NTXITEM;
-
-typedef NTXITEM * LPNTXITEM;
 
 struct _NTXAREA;
 
@@ -287,6 +288,7 @@ typedef struct _NTXAREA
    BOOL fRecordChanged;          /* Record changed */
    BOOL fAppend;                 /* TRUE if new record is added */
    BOOL fDeleted;                /* TRUE if record is deleted */
+   BOOL fEncrypted;              /* TRUE if record is encrypted */
    BOOL fUpdateHeader;           /* Update header of file */
    BOOL fFLocked;                /* TRUE if file is locked */
    BOOL fHeaderLocked;           /* TRUE if DBF header is locked */
@@ -332,7 +334,7 @@ typedef NTXAREA * LPNTXAREA;
 #define ntxEof                   NULL
 #define ntxFound                 NULL
 static ERRCODE ntxGoBottom( NTXAREAP pArea );
-static ERRCODE ntxGoTo( NTXAREAP pArea, ULONG ulRecNo );
+#define ntxGoTo                  NULL
 #define ntxGoToId                NULL
 static ERRCODE ntxGoTop( NTXAREAP pArea );
 static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLast );

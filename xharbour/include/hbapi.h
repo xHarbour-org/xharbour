@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.156 2005/03/10 02:41:44 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.157 2005/03/30 21:28:47 andijahja Exp $
  */
 
 /*
@@ -250,6 +250,7 @@ extern ULONG    HB_EXPORT hb_parclen( int iParam, ... ); /* retrieve a string pa
 extern ULONG    HB_EXPORT hb_parcsiz( int iParam, ... ); /* retrieve a by-reference string parameter length, including terminator */
 extern char     HB_EXPORT * hb_pards( int iParam, ... ); /* retrieve a date as a string yyyymmdd */
 extern char     HB_EXPORT * hb_pardsbuff( char * szDate, int iParam, ... ); /* retrieve a date as a string yyyymmdd */
+extern LONG     HB_EXPORT hb_pardl( int iParam, ... ); /* retrieve a date as long integer - number of days from Julian's day */
 extern ULONG    HB_EXPORT hb_parinfa( int iParamNum, ULONG uiArrayIndex ); /* retrieve length or element type of an array parameter */
 extern int      HB_EXPORT hb_parinfo( int iParam ); /* Determine the param count or data type */
 extern int      HB_EXPORT hb_parl( int iParam, ... ); /* retrieve a logical parameter as an int */
@@ -325,8 +326,8 @@ extern LONGLONG HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric pa
     extern int   HB_EXPORT  hb_pcount( void );          /* returns the number of suplied parameters */
 
     extern void  HB_EXPORT  hb_ret( void );             /* post a NIL return value */
-    extern void  HB_EXPORT  hb_retc( char * szText );   /* returns a string */
-    extern void  HB_EXPORT  hb_retclen( char * szText, ULONG ulLen ); /* returns a string with a specific length */
+    extern void  HB_EXPORT  hb_retc( const char * szText );   /* returns a string */
+    extern void  HB_EXPORT  hb_retclen( const char * szText, ULONG ulLen ); /* returns a string with a specific length */
 
     extern void  HB_EXPORT  hb_retcAdopt( char * szText );
     extern void  HB_EXPORT  hb_retclenAdopt( char * szText, ULONG ulLen );
@@ -336,7 +337,7 @@ extern LONGLONG HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric pa
     extern void  HB_EXPORT  hb_retclenAdoptRaw( char * szText, ULONG ulLen );
     extern void  HB_EXPORT  hb_retclenAdoptRawStatic( char * szText, ULONG ulLen );
 
-    extern void  HB_EXPORT  hb_retds( char * szDate );  /* returns a date, must use yyyymmdd format */
+    extern void  HB_EXPORT  hb_retds( const char * szDate );  /* returns a date, must use yyyymmdd format */
     extern void  HB_EXPORT  hb_retd( int iYear, int iMonth, int iDay ); /* returns a date */
     extern void  HB_EXPORT  hb_retdl( LONG lJulian );   /* returns a LONG value as a julian date */
     extern void  HB_EXPORT  hb_retl( int iTrueFalse );  /* returns a logical integer */
@@ -363,6 +364,7 @@ extern void  HB_EXPORT  hb_storc( char * szText, int iParam, ... ); /* stores a 
 extern void  HB_EXPORT  hb_storclen( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
 extern void  HB_EXPORT  hb_storclenAdopt( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
 extern void  HB_EXPORT  hb_stords( char * szDate, int iParam, ... );   /* szDate must have yyyymmdd format */
+extern void  HB_EXPORT  hb_stordl( LONG lJulian, int iParam, ... ); /* stores a Julian's date value on a variable by reference */
 extern void  HB_EXPORT  hb_storl( int iLogical, int iParam, ... ); /* stores a logical integer on a variable by reference */
 extern void  HB_EXPORT  hb_storni( int iValue, int iParam, ... ); /* stores an integer on a variable by reference */
 extern void  HB_EXPORT  hb_stornl( LONG lValue, int iParam, ... ); /* stores a LONG on a variable by reference */
