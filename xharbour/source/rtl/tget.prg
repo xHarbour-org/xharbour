@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.44 2003/04/10 14:07:22 lculik Exp $
+ * $Id: tget.prg,v 1.45 2003/04/30 07:11:56 ronpinkas Exp $
  */
 
 /*
@@ -204,7 +204,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::Rejected   := .f.
    ::Row        := nRow
    ::SubScript  := NIL
-   //::Type       := ValType( ::Original )
+   ::Type       := ValType( ::Original )
    ::TypeOut    := .f.
    ::nDispPos   := 1
    ::nOldPos    := 0
@@ -212,7 +212,8 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::cDelimit   := if( SET(_SET_DELIMITERS), SET(_SET_DELIMCHARS), NIL )
    ::lMinusPrinted := .f.
 
-   ::cPicture    := cPicture
+   ::Picture    := cPicture
+   ::cPicture   := cPicture
    #ifdef HB_COMPAT_C53
    ::Caption    := ""
    ::CapRow     := 0
@@ -1657,5 +1658,4 @@ STATIC FUNCTION IsBadDate( cBuffer, cPicFunc )
    Next
 
  return .f.
-
 
