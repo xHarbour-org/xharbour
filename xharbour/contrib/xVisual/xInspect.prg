@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.32 2002/10/17 17:16:46 what32 Exp $
+ * $Id: xInspect.prg,v 1.33 2002/10/22 17:23:46 what32 Exp $
  */
 
 /*
@@ -87,34 +87,21 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------
 
 METHOD OnCreate() CLASS ObjInspect
-  local oCol, aProp, aHeads
 
-  local aRect := ::ClientRect()
-  local oCombo:= ComboInsp():New(  self, 100, 0, 0, aRect[3], 100 )
-  oCombo:Style:= WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
+   local aRect := ::ClientRect()
+   local oCombo:= ComboInsp():New(  self, 100, 0, 0, aRect[3], 100 )
+   oCombo:Style:= WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
 
-  ::Add( 'InspCombo', oCombo )
-  ::InspCombo:SetItemHeight( -1, 15 )
+   ::Add( 'InspCombo', oCombo )
+   ::InspCombo:SetItemHeight( -1, 15 )
 
-  ::Add( 'InspTabs', TTabControl():New( self, 101,  0,  25, aRect[3], aRect[4]-25) )
-  ::InspTabs:AddTab( "Properties")
-  ::InspTabs:AddTab( "Events", TabPage():New( ::InspTabs, "Events") )
-  ::InspTabs:Configure()
+   ::Add( 'InspTabs', TTabControl():New( self, 101,  0,  25, aRect[3], aRect[4]-25) )
+   ::InspTabs:AddTab( "Properties")
+   ::InspTabs:AddTab( "Events", TabPage():New( ::InspTabs, "Events") )
+   ::InspTabs:Configure()
 
-
-//------------------------------------------------------------------------ sets the browser
-
-aHeads:= { { "Property", 83,},;
-           { "Value",    80, {|cText,o,nKey|::SaveVar(cText,nKey)} }   }
-
-aProp := { {"",""} }  // initial data
-
-::Browser:=TWBrowse():New( ::InspTabs:Properties, 150, 0, 0, 100, 100, aProp, aHeads )
-::Browser:BgColor      := GetSysColor(COLOR_BTNFACE)
-::Browser:HiliteNoFocus:= GetSysColor(COLOR_BTNFACE)
-::Browser:wantHScroll  :=.F.
-::Browser:HeadHeight   := 0
-::Browser:Create()
+   ::Browser:=InspectBrowser():New( ::InspTabs:Properties )
+   ::Browser:Create()
 
 return( super:OnCreate() )
 
@@ -253,8 +240,43 @@ return(1)
 
 //---------------------------------------------------------------------------------
 
-FUNCTION ZeroInit(ostr)
-  ostr:buffer(replicate(chr( 0 ),ostr : sizeof()))
-  RETURN(NIL)
 
-//---------------------------------------------------------------------------------
+CLASS InspectBrowser FROM TWBrowse
+   METHOD New() CONSTRUCTOR
+   METHOD SetColControl()
+ENDCLASS
+
+METHOD New( oParent ) CLASS InspectBrowser
+   local oCol1,oCol2, aProp := { {"",""} }
+   super:New( oParent, 150, 0, 0, 100, 100, aProp )
+   ::BgColor      := GetSysColor(COLOR_BTNFACE)
+   ::HiliteNoFocus:= GetSysColor(COLOR_BTNFACE)
+   ::wantHScroll  :=.F.
+   ::HeadHeight   := 20
+
+   oCol1:= whColumn():Init( "Property",{|oCol,oB,n| asString(oB:source[n,1]) },DT_LEFT, 84 )
+   oCol1:VertAlign  := TA_CENTER
+   oCol1:Style      := TBC_MOVE + TBC_SIZE
+
+   oCol2:= whColumn():Init( "Value",   {|oCol,oB,n| asString(oB:source[n,2]) },DT_LEFT, 80 )
+   oCol2:VertAlign  := TA_CENTER
+   oCol2:Style      := TBC_MOVE + TBC_SIZE
+   oCol2:bSaveBlock := {|cText,o,nKey|::Parent:Parent:SaveVar(cText,nKey)}
+
+   ::AddColumn( oCol1 )
+   ::AddColumn( oCol2 )
+
+   ::bOnDblClick := {|o,x,y|::SetColControl(x,y)}
+   ::Font        := oParent:Parent:font
+
+RETURN(self)
+
+METHOD SetColControl(x,y) CLASS InspectBrowser
+   local cType, cVar
+   if y==2
+      cVar := ::source[::RecPos][1]
+//      cType:= valtype( __objSendMsg( oApp:MainFrame:ObjInsp:CurObject, cVar ) )
+      cType:= valtype( __objSendMsg( ::Parent:Parent:Parent:CurObject, cVar ) )
+      view cType
+   endif
+RETURN(self)

@@ -1,5 +1,5 @@
 /*
- * $Id: TCButton.prg,v 1.17 2002/10/17 17:16:20 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.6 2002/10/22 17:24:20 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -263,18 +263,18 @@ CLASS TWBrowse FROM TWinControl
    METHOD OnVScroll()
    METHOD OnHScroll()
 
-   METHOD Up()
-   METHOD Down()
-   METHOD Pgup()
-   METHOD Pgdown()
-   METHOD Home()
-   METHOD EndKey()
+   METHOD GoUp()
+   METHOD GoDown()
+   METHOD GoPgup()
+   METHOD GoPgdown()
+   METHOD GoHome()
+   METHOD GoEnd()
    METHOD PanLeft()
    METHOD PanRight()
    METHOD PanHome()
    METHOD PanEnd()
-   METHOD KeyLeft()
-   METHOD KeyRight()
+   METHOD GoLeft()
+   METHOD GoRight()
    METHOD GotoLine()
 
    METHOD Display()
@@ -347,8 +347,7 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight, Source, aHeader, bNotify
    ::Frozen          := 0
 
    ::Configured      :=.F.
-   ::Font            := GetMessageFont()
-   ::HeadFont        := GetMessageFont()
+//   ::Font            := GetMessageFont()
 
    // colours
 
@@ -457,6 +456,7 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight, Source, aHeader, bNotify
                  IF(::HitBottom,::RecPos:=::RecCount,)}
       ::bRecNo :={| | (::Source)->(RecNo())}
    ENDIF
+
    ::HeadText     :={}
    ::HeadAlign    :={}
    ::HeadBmps     :={}
@@ -573,7 +573,7 @@ METHOD Configure(hNewImageList) CLASS TWBrowse
       aAdd(::ColFgColors ,::Columns[i]:FgColor)
       aAdd(::ColAlign ,::Columns[i]:align)
       aAdd(::ColVAlign ,::Columns[i]:vertalign)
-      aAdd(::ColFonts ,::Columns[i]:FONT)
+      aAdd(::ColFonts ,::Columns[i]:Font)
       aAdd(::ColBmpAlign ,::Columns[i]:bmpAlign)
       aAdd(::ColOffset,::Columns[i]:Offset)
       aAdd(::ColStyle,::Columns[i]:style)
@@ -1142,11 +1142,13 @@ METHOD OnNotify( hdr, nlParam ) CLASS TWBrowse
          ENDIF
 
       CASE hdr:code == HDN_ENDDRAG
-         c:=peek(nlParam,nmHdr:sizeof())
-         a:=Bin2A(c,{{LONG,LONG,LONG},LONG,LONG,LONG})
-         IF ::OnEndDrag(a)
-            RETURN(1)
-         ENDIF
+         nmHdr:Pointer(nlParam, .f.)
+
+//         c:=peek(nlParam,nmHdr:sizeof())
+//         a:=Bin2A(c,{{LONG,LONG,LONG},LONG,LONG,LONG})
+//         IF ::OnEndDrag(a)
+//            RETURN(1)
+//         ENDIF
          
       CASE hdr:code==HDN_GETDISPINFO
       CASE hdr:code==HDN_ITEMCHANGING
@@ -1350,8 +1352,8 @@ METHOD Kill() CLASS TWBrowse
    IF ValType(::bKillBlock)=="B"
       EVAL(::bKillBlock)
    ENDIF
-   DeleteObject( ::Font )
-   DeleteObject( ::HeadFont )
+//   DeleteObject( ::Font )
+//   DeleteObject( ::HeadFont )
 RETURN(self)
 
 //---------------------------------------------------------------------------------------------
@@ -1561,7 +1563,7 @@ RETURN(.F.)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD Up(lInternal) CLASS TWBrowse
+METHOD GoUp(lInternal) CLASS TWBrowse
    LOCAL lTop
    IF ::RowPos> 1
       ::DeHilite(lInternal)
@@ -1583,7 +1585,7 @@ RETURN(self)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD Down(lInternal) CLASS TWBrowse
+METHOD GoDown(lInternal) CLASS TWBrowse
    LOCAL lBottom
    IF ::RowPos < ::RowCountUsable
       ::DeHilite(lInternal)
@@ -1605,7 +1607,7 @@ RETURN(self)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD Pgup(lInternal) CLASS TWBrowse
+METHOD GoPgup(lInternal) CLASS TWBrowse
    Local lTop:=.F.
    IF ::RowPos == 1
       EVAL(::bSkip,-1)
@@ -1625,7 +1627,7 @@ RETURN(self)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD Pgdown(lInternal) CLASS TWBrowse
+METHOD GoPgdown(lInternal) CLASS TWBrowse
    LOCAL lBottom:=.F.
    IF ::RowPos >= ::RowCountUsable .OR. ::RowPos >= LEN(::aData)
       EVAL(::bSkip,1)
@@ -1645,7 +1647,7 @@ RETURN(self)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD Home(lInternal) CLASS TWBrowse
+METHOD GoHome(lInternal) CLASS TWBrowse
    LOCAL lTop
    IF ::RowPos>1
       ::DeHilite(lInternal)
@@ -1666,7 +1668,7 @@ RETURN(self)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD EndKey(lInternal) CLASS TWBrowse
+METHOD GoEnd(lInternal) CLASS TWBrowse
    LOCAL lBottom
    LOCAL nLastLine := MIN(::RowCountUsable,::RecCount)
    IF ::RowPos < nLastLine
@@ -1688,7 +1690,7 @@ RETURN(self)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD KeyLeft(lInternal) CLASS TWBrowse
+METHOD GoLeft(lInternal) CLASS TWBrowse
    IF ::wantHiliteAll
       RETURN ::PanLeft(lInternal)
    ENDIF
@@ -1701,7 +1703,7 @@ RETURN(0)
 
 //---------------------------------------------------------------------------------------------
 
-METHOD KeyRight(lInternal) CLASS TWBrowse
+METHOD GoRight(lInternal) CLASS TWBrowse
    IF ::wantHiliteAll
       RETURN ::PanRight(lInternal)
    ENDIF
@@ -1802,7 +1804,7 @@ METHOD ScrollUp(n,lInternal) CLASS TWBrowse
       ::Display(IF(scrolled==n,scrolled,))
    ELSE
       ::RowPos:=1
-      ::Home(lInternal)
+      ::GoHome(lInternal)
       ::drawdata()
    ENDIF
 RETURN(scrolled)
@@ -1859,11 +1861,11 @@ METHOD ScrollDown(n,lInternal) CLASS TWBrowse
          EVAL(::bSkip,-(::RowCountVisible-::RowPos))
          ::Display(IF(scrolled==n,-scrolled,))
       ELSE //scrolled <> 0
-         ::EndKey(lInternal)
+         ::GoEnd(lInternal)
          ::drawdata()
       ENDIF
    ELSE
-      ::EndKey(lInternal)
+      ::GoEnd(lInternal)
       ::drawdata()
    ENDIF
 RETURN(scrolled)
@@ -1908,28 +1910,28 @@ METHOD OnKeyDown( nwParam, nlParam)  CLASS TWBrowse
             RETURN (0)
          ENDIF
       CASE nwParam==VK_UP
-         ::Up(.T.)
+         ::GoUp(.T.)
 
       CASE nwParam==VK_DOWN
-         ::Down(.T.)
+         ::GoDown(.T.)
 
       CASE nwParam==VK_NEXT
-         ::Pgdown(.T.)
+         ::GoPgDown(.T.)
 
       CASE nwParam==VK_PRIOR
-         ::Pgup(.T.)
+         ::GoPgUp(.T.)
 
       CASE nwParam==VK_END
-         ::EndKey(.T.)
+         ::GoEnd(.T.)
 
       CASE nwParam==VK_HOME
-         ::Home(.T.)
+         ::GoHome(.T.)
 
       CASE nwParam == VK_LEFT
-         ::KeyLeft(.T.)
+         ::GoLeft(.T.)
 
       CASE nwParam == VK_RIGHT
-         ::KeyRight(.T.)
+         ::GoRight(.T.)
 
       ENDCASE
    ENDIF
@@ -2241,22 +2243,22 @@ METHOD OnVScroll(nwParam, nlParam) CLASS TWBrowse
    SetFocus(::handle)
    DO CASE
    CASE nCode==SB_LINEUP
-      ::Up(.T.)
+      ::GoUp(.T.)
 
    CASE nCode==SB_LINEDOWN
-      ::Down(.T.)
+      ::GoDown(.T.)
 
    CASE nCode==SB_PAGEDOWN
-      ::Pgdown(.T.)
+      ::GoPgDown(.T.)
 
    CASE nCode==SB_PAGEUP
-      ::Pgup(.T.)
+      ::GoPgUp(.T.)
 
    CASE nCode==SB_TOP
-      ::Home(.T.)
+      ::GoHome(.T.)
 
    CASE nCode==SB_BOTTOM
-      ::EndKey(.T.)
+      ::GoEnd(.T.)
 
    CASE nCode==SB_THUMBPOSITION
       Eval(::bGoToPos,self,nPos)
@@ -2285,13 +2287,13 @@ METHOD OnHScroll(nwParam, nlParam) CLASS TWBrowse
    SetFocus(::handle)
    DO CASE
    CASE nCode==SB_LINEUP
-      ::KeyLeft(.T.)
+      ::GoLeft(.T.)
 
    CASE nCode==SB_PAGEUP
       ::PanLeft(.T.)
 
    CASE nCode==SB_LINEDOWN
-      ::KeyRight(.T.)
+      ::GoRight(.T.)
 
    CASE nCode==SB_PAGEDOWN
       ::PanRight(.T.)
@@ -2389,4 +2391,11 @@ STATIC FUNCTION _EditAsNumber(nproc,hWnd,nMsg,nwParam,nlParam,cpicture)
 RETURN(CallWindowProc(nproc,hWnd,nMsg,nwParam,nlParam))
 
 STATIC FUNCTION GetAColumn(a,i)
- RETURN whColumn():INIT(a[i][1],{|oCol,oB,n| asString(oB:source[n,i]) } ,DT_LEFT, a[i][2] )
+ RETURN whColumn():INIT( a[i][1],{|oCol,oB,n| asString(oB:source[n,i]) } ,DT_LEFT, a[i][2] )
+
+
+FUNCTION ZeroInit(ostr)
+  ostr:buffer(replicate(chr( 0 ),ostr : sizeof()))
+  RETURN(NIL)
+
+
