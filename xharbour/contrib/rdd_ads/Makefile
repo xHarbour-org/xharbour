@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2002/07/11 02:57:52 lculik Exp $
+# $Id: Makefile,v 1.2 2003/04/09 17:47:14 lculik Exp $
 #
 
 ROOT = ../../
@@ -20,5 +20,10 @@ ifneq ($(HB_ARCHITECTURE),dos)
 MT_LIBNAME=rddadsmt
 endif
 
-include $(TOP)$(ROOT)config/lib.cf
 include $(TOP)$(ROOT)config/header.cf
+INSTALL_RULE_HEADERS := $(INSTALL_RULE)
+include $(TOP)$(ROOT)config/lib.cf
+
+install::
+	$(INSTALL_RULE_HEADERS)
+
