@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.10 2003/10/27 15:06:14 toninhofwi Exp $
+ * $Id: tobject.prg,v 1.11 2003/11/10 00:59:32 fsgiudice Exp $
  */
 
 /*
@@ -350,19 +350,20 @@ FUNCTION __SetAssociativeCaseSensitive( lNew )
 RETURN lOld
 
 
+
 /*
-
-  This procedure is used to create structures using the
-  command STRUCTURE / MEMBER / ENDSTRUCTURE
-
-  Toninho@fwi.com.br
-
+ * (C) 2003 - Antonio Carlos Pantaglione
+ *            toninho@fwi.com.br
+ *
+ * This procedure is used to create structures using the
+ * command STRUCTURE / MEMBER / ENDSTRUCTURE.
+ * See also hbstruct.ch
+ *
 */
-procedure TAssociativeArrayMember( aName, cType, uInit, oObj )
 
-   local x := 0
+procedure HashAddMember( aName, cType, uInit, oObj )
 
-   local y := Len( aName )
+   local nLen := Len( aName ), n
 
    if !( cType == nil )
 
@@ -422,8 +423,8 @@ procedure TAssociativeArrayMember( aName, cType, uInit, oObj )
 
    endif
 
-   for x := 1 to y
-       oObj[ Upper( aName[ x ] ) ] = uInit
+   for n := 1 to nLen
+       oObj[ Upper( aName[ n ] ) ] = uInit
    next
 
 return

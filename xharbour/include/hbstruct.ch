@@ -1,5 +1,5 @@
 /*
- * $Id: hbstruct.ch,v 1.1 2003/10/27 15:06:14 toninhofwi Exp $
+ * $Id: hbstruct.ch,v 1.1 2003/10/29 16:35:03 toninhofwi Exp $
  */
 
 /*
@@ -49,23 +49,23 @@
 *
 */
 
-#ifndef _C_EXSTRUCT
-#define _C_EXSTRUCT
+#ifndef _H_STRUCTURE
+#define _H_STRUCTURE
 
-#xcommand STRUCTURE <oStruct> => <oStruct> := TAssociativeArray() ; #undef _TSTRUCT_ ; #define _TSTRUCT_ <oStruct>
-#xcommand STRUC <oStruct> => <oStruct> := TAssociativeArray() ; #undef _TSTRUCT_ ; #define _TSTRUCT_ <oStruct>
+#xcommand STRUCTURE <hStruct> => <hStruct> := Hash() ; #undef _TSTRUCT_ ; #define _TSTRUCT_ <hStruct>
+#xcommand STRUC <hStruct> => <hStruct> := Hash() ; #undef _TSTRUCT_ ; #define _TSTRUCT_ <hStruct>
 
 #xcommand MEMBER <cName, ...> ;
              [ AS <type:LOGICAL,NUMERIC,STRING,DATE,CODEBLOCK,ARRAY,OBJECT> ] ;
              [ LEN <nLen> ]          ;
              [ INIT <uValue> ]          ;
           => ;
-          TAssociativeArrayMember( {<(cName)>}, <(type)>, <uValue>, _TSTRUCT_ )
+          HashAddMember( {<(cName)>}, <(type)>, <uValue>, _TSTRUCT_ )
 
 #xcommand ENDSTRUCTURE =>
 #xcommand ENDSTRUC =>
 
-#translate DESTROY STRUCTURE <o> => <o> := nil
+#translate DESTROY STRUCTURE <hStruct> => <hStruct> := nil
 
 #endif
 
