@@ -4,8 +4,6 @@
 PROCEDURE Main()
 
   LOCAL nStart := Seconds()
-  LOCAL oMyObject := MyClass()
-  LOCAL MethodPtr := HB_ObjMsgPtr( oMyObject, "Count" )
 
   CLEAR SCREEN
 
@@ -17,23 +15,6 @@ PROCEDURE Main()
 
   WaitForThreads()
   @ 8, 0 SAY "Threads Time:" + Str( Seconds() - nStart )
-
-  nStart := Seconds()
-
-  StartThread ( MethodPtr, oMyObject, 10, "1st Thread:",     0,  5000 )
-  StartThread ( MethodPtr, oMyObject, 12, "2nd Thread:",  5000, 10000 )
-  StartThread ( MethodPtr, oMyObject, 14, "3rd Thread:", 10000, 15000 )
-
-  WaitForThreads()
-  @ 16, 0 SAY "[METHODS] Threads Time:" + Str( Seconds() - nStart )
-
-  nStart := Seconds()
-
-  MyThreadFunc( 18, "1st Run:",     0,  5000 )
-  MyThreadFunc( 20, "2nd Run:",  5000, 10000 )
-  MyThreadFunc( 22, "3rd Run:", 10000, 15000 )
-
-  @ 24, 0 SAY  "Sequential Time:" + Str( Seconds() - nStart )
 
 RETURN
 
@@ -58,15 +39,3 @@ PROCEDURE MyThreadFunc( nRow, cName, nStart, nMax )
 
 RETURN
 
-CLASS MyClass
-    METHOD Count( nRow, cName, nStart, nMax )
-ENDCLASS
-
-METHOD Count( nRow, cName, nStart, nMax ) CLASS MyClass
-  LOCAL i
-
-  FOR i := nStart TO nMax
-     @ nRow, 10 SAY cName + Str( i )
-  NEXT
-
-RETURN NIL

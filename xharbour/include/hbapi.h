@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.50 2002/12/28 05:43:47 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.51 2002/12/29 08:32:41 ronpinkas Exp $
  */
 
 /*
@@ -336,6 +336,7 @@ extern PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pArray, PHB_NESTED_CLONED pClo
 extern BOOL     HB_EXPORT hb_arraySort( PHB_ITEM pArray, ULONG * pulStart, ULONG * pulCount, PHB_ITEM pBlock ); /* sorts an array item */
 extern PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen ); /* Creates and returns an Array of n Elements from the Eval Stack - Does NOT pop the items. */
 extern PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase ); /* Creates and returns an Array of Generic Parameters for specified base symbol. */
+extern PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase ); /* Creates and returns GC-LOCKED an Array of Generic Parameters for specified base symbol. */
 
 /* string management */
 

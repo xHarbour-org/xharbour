@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.23 2002/12/30 00:16:52 ronpinkas Exp $
+* $Id: thread.c,v 1.24 2002/12/30 05:05:01 ronpinkas Exp $
 */
 
 /*
@@ -392,10 +392,14 @@ hb_create_a_thread(
 
     if( HB_IS_OBJECT( hb_arrayGetItemPtr( pt->args, 2 ) ) )
     {
+        hb_gcUnlock( pt->args->item.asArray.value );
+
         hb_vmSend( pt->count - 2 );
     }
     else
     {
+        hb_gcUnlock( pt->args->item.asArray.value );
+
         if( HB_IS_SYMBOL( pPointer ) )
         {
             hb_vmDo( pt->count - 2 );
@@ -474,7 +478,7 @@ HB_FUNC( STARTTHREAD )
        HB_THREAD_HANDLE th_h;
     #endif
 
-    pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+    pArgs = hb_arrayFromParamsLocked( HB_VM_STACK.pBase );
     pPointer  = hb_arrayGetItemPtr( pArgs, 1 );
 
     /* Error Checking */
