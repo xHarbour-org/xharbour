@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.45 2004/05/12 04:32:54 ronpinkas Exp $
+ * $Id: hbdefs.h,v 1.46 2004/05/12 14:11:21 lf_sfnet Exp $
  */
 
 /*
@@ -116,6 +116,7 @@
    #define INCL_DOSMISC
 
    #include <os2.h>
+   #define HB_LONG_LONG_OFF
    #define HB_DONT_DEFINE_BASIC_TYPES
 
 #elif defined( HB_OS_DOS )
@@ -238,6 +239,8 @@
    #endif
 #endif /* HB_LONG_LONG_OFF */
 
+#endif /* HB_DONT_DEFINE_BASIC_TYPES */
+
 /*
  * this is a hack and doesn't have to be true on some machines
  * please update it if necessary
@@ -256,7 +259,7 @@
 #if !defined( UINT32 )
 #  if UINT_MAX == 0xffffffff
       typedef UINT         UINT32;
-#     if ( ! defined( __XCC__ ) && ! defined( __MINGW32__ ) )      
+#     if ( ! defined( __XCC__ ) && ! defined( __MINGW32__ ) )
 #        define UINT32_MAX    UINT_MAX
 #        define INT32_MAX     INT_MAX
 #        define INT32_MIN     INT_MIN
@@ -273,22 +276,20 @@
 #if !defined( UINT64 ) && !defined( HB_LONG_LONG_OFF )
 #  if ULONG_MAX > UINT_MAX && UINT_MAX > USHORT_MAX
       typedef ULONG        UINT64;
-#     if ( ! defined( __XCC__ ) && ! defined( __MINGW32__ ) )            
+#     if ( ! defined( __XCC__ ) && ! defined( __MINGW32__ ) )
 #        define UINT64_MAX    ULONG_MAX
 #        define INT64_MAX     LONG_MAX
 #        define INT64_MIN     LONG_MIN
 #     endif
 #  else
       typedef ULONGLONG    UINT64;
-#     if ( ! defined( __XCC__ ) && ! defined( __MINGW32__ ) )                  
+#     if ( ! defined( __XCC__ ) && ! defined( __MINGW32__ ) )
 #        define UINT64_MAX    ULONGLONG_MAX
 #        define INT64_MAX     LONGLONG_MAX
 #        define INT64_MIN     LONGLONG_MIN
 #     endif
 #  endif
 #endif
-
-#endif /* HB_DONT_DEFINE_BASIC_TYPES */
 
 
 /* try to detect byte order if not explicitly set */
