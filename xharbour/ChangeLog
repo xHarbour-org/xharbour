@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2598 2004/03/18 14:39:54 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2599 2004/03/18 21:34:50 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-18 22:55 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/bsd/gcc.cf
+  * xharbour/config/darwin/gcc.cf
+  * xharbour/config/linux/gcc.cf
+    + force signed type of 'char' by '-fsigned-char' compiler switch
+      it's necessary for some machines which use 'char' as unsigned
+      8bit integer by default
 
 2004-03-18 22:43 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/hbdbf.h
