@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.3 2002/05/24 19:23:45 walito Exp $
+ * $Id: achoice.prg,v 1.4 2002/08/09 17:48:20 lculik Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
    DEFAULT nPos       TO 1                 // The number of the selected item
    DEFAULT nHiLiteRow TO 0                 // The row to be highlighted
 
-   IF nRight == 79
+   IF nRight == 79 .and. nLeft ==0
       nNumCols := 79
    ELSE
       nNumCols := nRight - nLeft + 1
@@ -506,9 +506,9 @@ STATIC PROCEDURE DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPo
    LOCAL nSaveCol := Col()                 // Position at start of routine
    LOCAL nRightPos := 0
 
-   IF nRight == 79
+   IF nRight == 79 .and. nLeft == 0
       nRightPos := nRight
-   ELSE
+   ELSE                            
       nRightPos := nRight - nLeft + 1 
    ENDIF
 
