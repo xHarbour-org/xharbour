@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.121 2003/11/26 21:58:35 jonnymind Exp $
+* $Id: thread.c,v 1.122 2003/11/26 22:09:10 jonnymind Exp $
 */
 
 /*
@@ -1184,7 +1184,7 @@ HB_FUNC( CREATEMUTEX )
    HB_MUTEX_STRUCT *mt;
 
    mt = (HB_MUTEX_STRUCT *)
-      hb_gcAlloc( sizeof( HB_BASEHASH ), hb_threadMutexFinalize );
+      hb_gcAlloc( sizeof( HB_MUTEX_STRUCT ), hb_threadMutexFinalize );
 
    HB_MUTEX_INIT( mt->mutex );
    HB_COND_INIT( mt->cond );

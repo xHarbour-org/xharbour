@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: mtstress.prg,v 1.7 2003/09/12 02:09:34 jonnymind Exp $
+* $Id: mtstress.prg,v 1.8 2003/10/18 01:15:19 jonnymind Exp $
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:
@@ -12,16 +12,23 @@
 #include "hbclass.ch"
 #include "hbmemory.ch"
 
+GLOBAL bShow
 
-PROCEDURE Main()
+PROCEDURE Main( cShow )
    REQUEST HB_Random
    LOCAL nStart;
 
    SET COLOR to w+/b
-   SET OUTPUT SAFETY ON
+   SET OUTPUT SAFETY OFF
 
    CLEAR SCREEN
    @2,15 SAY "X H A R B O U R - Multithreading / Stress tests"
+
+   IF cShow != NIL
+      bShow := .F.
+   ELSE
+      bShow := .T.
+   ENDIF
 
    nStart := Seconds()
 
@@ -65,13 +72,18 @@ PROCEDURE Stress( nId, nRow )
       aData := Array(Fcount())
       aFields(aData)
       GOTO Int( HB_Random( 1, Reccount() ) )
-      FOR nCount := 1 TO 100
+      FOR nCount := 1 TO 10000
          // this is to test if separate threads are able not to
          // change other areas or file pointers
          Select &nId
-         @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" DBF test " +;
-         Alltrim( Str( nCount ) ) + ": Record "+Alltrim( Str( Recno( ) ))+;
-            ":" +& ("FIELD->"+aData[1])
+         IF bShow
+            @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" DBF test " +;
+            Alltrim( Str( nCount ) ) + ": Record "+Alltrim( Str( Recno( ) ))+;
+               ":" +& ("FIELD->"+aData[1])
+         ELSE
+            cData := & ("FIELD->"+aData[1])
+         ENDIF
+
          SKIP // this will create a linear ramp that can be checked
          IF Eof()
             GOTO 1
@@ -83,8 +95,8 @@ PROCEDURE Stress( nId, nRow )
    //Step 1: foreach test
 
    @nRow,5 SAY Space( 80 )
-   aData := Array( 100 )
-   FOR nCount := 1 TO 100
+   aData := Array( 10000 )
+   FOR nCount := 1 TO 10000
       aData[ nCount ] := cRndVal[ Int( HB_Random(1, 21) ) ]
       @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Foreach pre-test " +;
           Alltrim( Str( nCount ) )
@@ -93,8 +105,12 @@ PROCEDURE Stress( nId, nRow )
    @nRow,5 SAY Space( 80 )
    nCount := 1
    FOR EACH cData IN aData
+      IF bShow
       @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Foreach test " +;
           Alltrim( Str( nCount ) ) + ": " + cData
+      ELSE
+         cData := cData + cData
+      ENDIF
       nCount ++
    NEXT
 
@@ -108,10 +124,13 @@ PROCEDURE Stress( nId, nRow )
    WITH OBJECT oTest
 
       FOR nCount := 1 TO 10000
+
          cData := :cFirst[ Int( HB_Random(1, 21) ) ] + :cSecond[ Int( HB_Random(1, 21)) ] + ;
                :cThird[ Int( HB_Random(1, 21) ) ] + :cFuorth[ Int( HB_Random(1, 21) ) ]
+         IF bShow
          @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" With Object test " +;
             Alltrim( Str( nCount ) ) + ": " + cData
+         ENDIF
          nCount ++
       NEXT
 
@@ -127,8 +146,12 @@ PROCEDURE Stress( nId, nRow )
       m->cMemVal += m->cRnd[ Int( HB_Random(1, 21) ) ]
       m->cMemVal += m->cRnd[ Int( HB_Random(1, 21) ) ]
       m->cMemVal += m->cRnd[ Int( HB_Random(1, 21) ) ]
-      @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Private test " +;
-       Alltrim( Str( nCount ) ) + ": "+m->cMemVal
+      if bShow
+         @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Private test " +;
+         Alltrim( Str( nCount ) ) + ": "+m->cMemVal
+      ELSE
+         cData := m->cMemVal
+      ENDIF
    NEXT
 
    // Step 4: Public Memvar test
@@ -139,8 +162,12 @@ PROCEDURE Stress( nId, nRow )
       m->var1 += m->cRnd[ Int( HB_Random(1, 21) ) ]
       m->var1 += m->cRnd[ Int( HB_Random(1, 21) ) ]
       m->var1 += m->cRnd[ Int( HB_Random(1, 21) ) ]
-      @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Memvar test " +;
-       Alltrim( Str( nCount ) ) + ": "+m->var1
+      IF bShow
+         @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Memvar test " +;
+         Alltrim( Str( nCount ) ) + ": "+m->var1
+      ELSE
+         cData := m->var1
+      ENDIF
    NEXT
 
    // Step 5: macro test
@@ -149,8 +176,10 @@ PROCEDURE Stress( nId, nRow )
    FOR nCount := 1 TO 10000
       cData := "cRndMem := cRnd[ Int( HB_Random(1, 21) ) ] + cRnd[ Int( HB_Random(1, 21) ) ] + cRnd[ Int( HB_Random(1, 21) ) ]"
       &cData
-      @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Macro test " +;
-       Alltrim( Str( nCount ) ) + ": "+ m->cRndMem
+      IF bShow
+         @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Macro test " +;
+         Alltrim( Str( nCount ) ) + ": "+ m->cRndMem
+      ENDIF
    NEXT
 
 
