@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 2.0 2003/07/01 05:13:35 maurifull Exp $
+ * $Id: dbedit.prg,v 1.9 2003/11/12 20:34:52 maurifull Exp $
  */
 
 /*
