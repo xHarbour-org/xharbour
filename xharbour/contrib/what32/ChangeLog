@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.52 2003/05/29 17:00:43 paultucker Exp $
+ * $Id: ChangeLog,v 1.53 2003/06/08 08:29:02 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-07-08 10:50 UTC+0100 Patrick Mast <patrick@winfakt.com>
+  * source/_winsys.c
+   * fixed GetCommandLine()
 
 2003-07-08 10:27 UTC+0100 Patrick Mast <patrick@winfakt.com>
   * source/_winsys.c

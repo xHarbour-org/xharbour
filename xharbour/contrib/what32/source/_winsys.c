@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.15 2003/05/29 17:01:16 paultucker Exp $
+ * $Id: _winsys.c,v 1.16 2003/06/08 08:29:06 patrickmast Exp $
  */
 
 // WHAT32
@@ -638,7 +638,7 @@ HB_FUNC( GETMODULEHANDLE )
 
 HB_FUNC( GETCOMMANDLINE )
 {
-   _retc( (LPSTR) GetCommandLine() );
+   hb_retc( (LPSTR) GetCommandLine() );
 }
 
 
@@ -1216,5 +1216,4 @@ HB_FUNC ( FILETIMETOSYSTEMTIME )
 }
 
 //---------------------------------------------------------------------//
-
 
