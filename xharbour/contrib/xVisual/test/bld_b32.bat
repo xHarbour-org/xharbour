@@ -3,10 +3,10 @@
 
 if exist error.log del error.log
 
-set HB_INSTALL=..\..
-set WHOO=..\whoo
+set HB_INSTALL=..\..\..
+set WHOO=..\..\whoo
 set BCC_DIR=c:\bcc55
-set WHAT32=..\what32
+set WHAT32=..\..\what32
 ECHO Compiling...
 
 %HB_INSTALL%\bin\harbour %1 -es2 -p -n -w -i%HB_INSTALL%\include;%WHAT32%\include > comp.log
