@@ -913,11 +913,13 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
       FOR nVar := 1 TO nVars
          s_aProcStack[s_nProcStack][4][nVar][1] := s_asLocals[nVar]
+         
          #ifdef __HARBOUR__
             s_aProcStack[s_nProcStack][4][nVar][2] := __MVGet( s_asLocals[nVar] )
          #else
             s_aProcStack[s_nProcStack][4][nVar][2] := &( s_asLocals[nVar] )
          #endif
+         
          __MXRelease( s_asLocals[nVar] )
          //Alert( [Released upper local: ] + s_asLocals[nVar] + [ in ] + aProc[1] )
          //TraceLog( [Released upper local: ] + s_asLocals[nVar] + [ in ] + aProc[1] )
@@ -934,7 +936,9 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
       FOR nVar := 1 TO nVars
          #ifdef __HARBOUR__
             __QQPub( s_aStatics[nVar][1] )
+            
             __MVPut( s_aStatics[nVar][1], s_aStatics[nVar][2] )
+            
             //Alert( [ReInstated static: ] + s_aStatics[nVar][1] + [ for ] + aProc[1] )
             //TraceLog( [ReInstated static: ] + s_aStatics[nVar][1] + [ for ] + aProc[1], s_aStatics[nVar][2] )
          #else
@@ -1188,6 +1192,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
       nVars := Len( s_aProcStack[s_nProcStack][4] )
       FOR nVar := 1 TO nVars
          aAdd( s_asLocals, s_aProcStack[s_nProcStack][4][nVar][1] )
+         
          #ifdef __HARBOUR__
             __QQPub( s_aProcStack[s_nProcStack][4][nVar][1] )
             __MVPut( s_aProcStack[s_nProcStack][4][nVar][1], s_aProcStack[s_nProcStack][4][nVar][2] )
@@ -2055,10 +2060,12 @@ RETURN 0
 
 PROCEDURE PP_LocalParams( aVars )
 
-   LOCAL nVar, nVars := Len( aVars ), xInit, nParams
+   LOCAL nVar, nVars := Len( aVars ), xInit, nParams, cVar
 
    //TraceLog( ValToPrg( s_aParams ) )
 
+//   MessageBox( 0, "PP_LocalParams", "Debug", 0 )
+   
    FOR nVar := 1 TO nVars
       IF ( nParams := Len( s_aParams ) ) > 0
          xInit := s_aParams[1]
@@ -2070,17 +2077,25 @@ PROCEDURE PP_LocalParams( aVars )
 
       //? nVar, aVars[nVar], xInit
       //Inkey(0)
+      
+      cVar := Upper( aVars[nVar] )
 
-      IF Type( "M->" + aVars[nVar] ) = 'U'
-         __QQPub( aVars[nVar] )
+    #ifdef __XHARBOUR__
+      IF aScan( s_asLocals, cVar, , , .T. ) == 0
+    #else
+      IF aScan( s_asLocals, {|cLocal| cLocal == cVar } ) == 0
+    #endif
+         __QQPub( cVar )
+         
          #ifdef __HARBOUR__
-            __MVPUT( aVars[nVar], xInit )
+            __MVPUT( cVar, xInit )
          #else
-            &( aVars[nVar] ) := xInit
+            &( cVar ) := xInit
          #endif
-         aAdd( s_asLocals, aVars[nVar] )
+         
+         aAdd( s_asLocals, cVar )
       ELSE
-         Eval( ErrorBlock(), ErrorNew( [PP], 2034, aVars[nVar], [ Declared Parameter redeclaration: ], aVars ) )
+         Eval( ErrorBlock(), ErrorNew( [PP], 2034, cVar, [ Declared Parameter redeclaration: ], aVars ) )
       ENDIF
    NEXT
 
@@ -2090,7 +2105,7 @@ RETURN
 
 PROCEDURE PP_Params( aVars )
 
-   LOCAL nVar, nVars := Len( aVars ), xInit, nParams
+   LOCAL nVar, nVars := Len( aVars ), xInit, nParams, cVar
 
    FOR nVar := 1 TO nVars
       IF ( nParams := Len( s_aParams ) ) > 0
@@ -2101,16 +2116,24 @@ PROCEDURE PP_Params( aVars )
          xInit := NIL
       ENDIF
 
-      IF Type( "M->" + aVars[nVar] ) = 'U'
-         __QQPub( aVars[nVar] )
+      cVar := Upper( aVars[nVar] )
+
+    #ifdef __XHARBOUR__
+      IF aScan( s_asLocals, cVar, , , .T. ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0 .AND. aScan( s_asPrivates, cVar, , , .T. ) == 0 .AND. aScan( s_asPublics, cVar, , , .T. ) == 0
+    #else
+      IF aScan( s_asLocals, {|cLocal| cLocal == cVar } ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0 .AND. aScan( s_asPrivates, {|cPrivate| cPrivate == cVar } ) == 0 .AND. aScan( s_asPublics, {|sPublic| sPublic == cVar } ) == 0
+    #endif
+         __QQPub( cVar )
+         
          #ifdef __HARBOUR__
-            __MVPut( aVars[nVar], xInit )
+            __MVPUT( cVar, xInit )
          #else
-            &( aVars[nVar] ) := xInit
+            &( cVar ) := xInit
          #endif
-         aAdd( s_asPrivates, aVars[nVar] )
+         
+         aAdd( s_asPrivates, cVar )
       ELSE
-         Eval( ErrorBlock(), ErrorNew( [PP], 2034, aVars[nVar], [ Declared Parameter redeclaration: ], aVars ) )
+         Eval( ErrorBlock(), ErrorNew( [PP], 2034, cVar, [ Declared Parameter redeclaration: ], aVars ) )
       ENDIF
    NEXT
 
@@ -2120,7 +2143,7 @@ RETURN
 
 PROCEDURE PP_Privates( aVars )
 
-   LOCAL nVar, nVars := Len( aVars ), nAt, cInit
+   LOCAL nVar, nVars := Len( aVars ), nAt, cInit, cVar
 
    FOR nVar := 1 TO nVars
       IF ( nAt := At( ":=", aVars[nVar] ) ) > 0
@@ -2130,20 +2153,24 @@ PROCEDURE PP_Privates( aVars )
          cInit := "NIL"
       ENDIF
 
+      cVar := Upper( aVars[nVar] )
+
     #ifdef __XHARBOUR__
-      IF aScan( s_asPrivates, aVars[nVar], , , .T. ) == 0
+      IF aScan( s_asLocals, cVar, , , .T. ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0 .AND. aScan( s_asPrivates, cVar, , , .T. ) == 0 .AND. aScan( s_asPublics, cVar, , , .T. ) == 0
     #else
-      IF aScan( s_asPrivates, {|sPrivate| sPrivate == aVars[nVar] } ) == 0
+      IF aScan( s_asLocals, {|cLocal| cLocal == cVar } ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0 .AND. aScan( s_asPrivates, {|cPrivate| cPrivate == cVar } ) == 0 .AND. aScan( s_asPublics, {|sPublic| sPublic == cVar } ) == 0
     #endif
-         __QQPub( aVars[nVar] )
+         __QQPub( cVar )
+         
          #ifdef __HARBOUR__
-            __MVPut( aVars[nVar], &( cInit ) )
+            __MVPut( cVar, &( cInit ) )
          #else
-            &( aVars[nVar] ) := &( cInit )
+            &( cVar ) := &( cInit )
          #endif
-         aAdd( s_asPrivates, aVars[nVar] )
+         
+         aAdd( s_asPrivates, cVar )
       ELSE
-         Eval( ErrorBlock(), ErrorNew( [PP], 2016, aVars[nVar], [ Private redeclaration: ], aVars ) )
+         Eval( ErrorBlock(), ErrorNew( [PP], 2016, cVar, [ Private redeclaration: ], aVars ) )
       ENDIF
    NEXT
 
@@ -2153,7 +2180,7 @@ RETURN
 
 PROCEDURE PP_Locals( aVars )
 
-   LOCAL nVar, nVars := Len( aVars ), nAt, cInit
+   LOCAL nVar, nVars := Len( aVars ), nAt, cInit, cVar
 
    FOR nVar := 1 TO nVars
       IF ( nAt := At( ":=", aVars[nVar] ) ) > 0
@@ -2163,16 +2190,24 @@ PROCEDURE PP_Locals( aVars )
          cInit := "NIL"
       ENDIF
 
-      IF Type( "M->" + aVars[nVar] ) = 'U' .OR. Upper( aVars[nVar] ) = "GETLIST"
-         __QQPub( aVars[nVar] )
+      cVar := Upper( aVars[nVar] )
+
+    #ifdef __XHARBOUR__
+      IF aScan( s_asLocals, cVar, , , .T. ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0
+    #else
+      IF aScan( s_asLocals, {|cLocal| cLocal == cVar } ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0 .AND. aScan( s_asPrivates, {|cPrivate| cPrivate == cVar } ) == 0 .AND. aScan( s_asPublics, {|sPublic| sPublic == cVar } ) == 0
+    #endif
+         __QQPub( cVar )
+         
          #ifdef __HARBOUR__
-            __MVPut( aVars[nVar], &( cInit ) )
+            __MVPut( cVar, &( cInit ) )
          #else
-            &( aVars[nVar] ) := &( cInit )
+            &( cVar ) := &( cInit )
          #endif
-         aAdd( s_asLocals, aVars[nVar] )
+         
+         aAdd( s_asLocals, cVar )
       ELSE
-         Eval( ErrorBlock(), ErrorNew( [PP], 2016, aVars[nVar], [ Local redeclaration: ], aVars ) )
+         Eval( ErrorBlock(), ErrorNew( [PP], 2016, cVar, [ Local redeclaration: ], aVars ) )
       ENDIF
    NEXT
 
@@ -2181,7 +2216,7 @@ RETURN
 
 PROCEDURE PP_Publics( aVars )
 
-   LOCAL nVar, nVars := Len( aVars ), nAt, cInit
+   LOCAL nVar, nVars := Len( aVars ), nAt, cInit, cVar
 
    FOR nVar := 1 TO nVars
       IF ( nAt := At( ":=", aVars[nVar] ) ) > 0
@@ -2191,20 +2226,24 @@ PROCEDURE PP_Publics( aVars )
          cInit := ".F."
       ENDIF
 
+      cVar := Upper( aVars[nVar] )
+
     #ifdef __XHARBOUR__
-      IF aScan( s_asPublics, aVars[nVar] ) == 0
+      IF aScan( s_asLocals, cVar, , , .T. ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0 .AND. aScan( s_asPrivates, cVar, , , .T. ) == 0 .AND. aScan( s_asPublics, cVar, , , .T. ) == 0
     #else
-      IF aScan( s_asPublics, {|sPublic| sPublic == aVars[nVar] } ) == 0
+      IF aScan( s_asLocals, {|cLocal| cLocal == cVar } ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0 .AND. aScan( s_asPrivates, {|cPrivate| cPrivate == cVar } ) == 0 .AND. aScan( s_asPublics, {|sPublic| sPublic == cVar } ) == 0
     #endif
-         __QQPub( aVars[nVar] )
+         __QQPub( cVar )
+         
          #ifdef __HARBOUR__
-            __MVPut( aVars[nVar], &( cInit ) )
+            __MVPut( cVar, &( cInit ) )
          #else
-            &( aVars[nVar] ) := &( cInit )
+            &( cVar ) := &( cInit )
          #endif
-         aAdd( s_asPublics, aVars[nVar] )
+         
+         aAdd( s_asPublics, cVar )
       ELSE
-         Eval( ErrorBlock(), ErrorNew( [PP], 2016, aVars[nVar], [ Public redeclaration: ], aVars ) )
+         Eval( ErrorBlock(), ErrorNew( [PP], 2016, cVar, [ Public redeclaration: ], aVars ) )
       ENDIF
    NEXT
 
@@ -2214,53 +2253,50 @@ RETURN
 
 PROCEDURE PP_Statics( aVars )
 
-   LOCAL nVar, nVars := Len( aVars ), nAt, cInit, cFirstStatic
-
-   IF ( nAt := At( ":=", aVars[1] ) ) > 0
-      cFirstStatic := RTrim( Left( aVars[1], nAt - 1 ) )
-   ELSE
-      cFirstStatic := aVars[1]
-   ENDIF
+   LOCAL nVar, nVars := Len( aVars ), nAt, cInit, cVar
 
    //TraceLog( s_aProc[1], ValToPrg( s_aStatics ) )
 
-   IF s_aStatics == NIL .OR. aScan( s_aStatics, {|aStatic| aStatic[1] == cFirstStatic } ) == 0
-      IF s_aStatics == NIL
-         s_aStatics := {}
+   IF s_aStatics == NIL
+      s_aStatics := {}
+   ENDIF
+      
+   FOR nVar := 1 TO nVars
+      IF ( nAt := At( ":=", aVars[nVar] ) ) > 0
+         cInit := LTrim( SubStr( aVars[nVar], nAt + 2 ) )
+         aVars[nVar] := RTrim( Left( aVars[nVar], nAt - 1 ) )
+      ELSE
+         cInit := "NIL"
       ENDIF
 
-      FOR nVar := 1 TO nVars
-         IF ( nAt := At( ":=", aVars[nVar] ) ) > 0
-            cInit := LTrim( SubStr( aVars[nVar], nAt + 2 ) )
-            aVars[nVar] := RTrim( Left( aVars[nVar], nAt - 1 ) )
-         ELSE
-            cInit := "NIL"
-         ENDIF
-
-         IF Type( "M->" + aVars[nVar] ) = 'U'
-            //Alert( [Creating static: ] + aVars[nVar] + [ in ] + s_aProc[1] )
-            __QQPub( aVars[nVar] )
-            //? "'" + aVars[nVar] + "'", M->&( aVars[ nVar ] )
-         //ELSE
-            //Alert( [Already PRESENT static: ] + aVars[nVar] + [ in ] + s_aProc[1] )
-         ENDIF
+      cVar := Upper( aVars[nVar] )
+      
+    #ifdef __XHARBOUR__
+      IF aScan( s_asLocals, cVar, , , .T. ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0
+    #else
+      IF aScan( s_asLocals, {|cLocal| cLocal == cVar } ) == 0 .AND. aScan( s_aStatics, {|aStatic| aStatic[1] == cVar } ) == 0
+    #endif
+         //Alert( [Creating static: ] + cVar + [ in ] + s_aProc[1] )
+         __QQPub( cVar )
 
          #ifdef __HARBOUR__
-            __MVPut( aVars[nVar], &( cInit ) )
+            __MVPut( cVar, &( cInit ) )
          #else
-            &( aVars[nVar] ) := &( cInit )
+            &( cVar ) := &( cInit )
          #endif
 
-         aAdd( s_aStatics, { aVars[nVar], NIL } )
-      NEXT
+         aAdd( s_aStatics, { cVar, NIL } )
+      ELSE
+         Eval( ErrorBlock(), ErrorNew( [PP], 2034, cVar, [ Declared Static redeclaration: ], aVars ) )
+      ENDIF   
+   NEXT
 
-      IF s_nProcStack > 0
-         IF Len( s_aProc ) == 2
-            aSize( s_aProc, 3 )
-         ENDIF
-
-         s_aProc[ 3 ] := s_aStatics
+   IF s_nProcStack > 0
+      IF Len( s_aProc ) == 2
+         aSize( s_aProc, 3 )
       ENDIF
+
+      s_aProc[ 3 ] := s_aStatics
    ENDIF
 
 RETURN

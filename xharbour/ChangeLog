@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3927 2005/03/09 21:07:30 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3928 2005/03/09 21:19:38 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-03-09 17:29 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * utils/xbscript/xbscript.prg
+    * Refined and more consistent PP_LocalParams() PP_Locals(), PP_Statics() PP_Params() PP_Privates() and PP_Publics()
+    
 2005-03-09 13:18 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
   * include/hberrors.h
     + Added:
