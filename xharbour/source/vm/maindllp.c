@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.3 2002/09/19 01:57:43 ronpinkas Exp $
+ * $Id: maindllp.c,v 1.4 2003/03/22 07:58:44 ronpinkas Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 
 #define HB_OS_WIN_32_USED
 
-//#include "hbtypes.h"
+#include "hbtypes.h"
 
 
 #if defined(HB_OS_WIN_32)
@@ -154,7 +154,7 @@ PHB_ITEM hb_paramError( int iParam ) /* Returns either the generic parameter or 
       pReturn=((HB_PARAMERROR)pParamError)(iParam);
    return pReturn;
 }
-int   hb_pcount( void )          /* returns the number of suplied parameters */
+int HB_EXPORT  hb_pcount( void )          /* returns the number of suplied parameters */
 {
    int iReturn;
    FARPROC pCounts=GetProcAddress(GetModuleHandle( NULL ), "_hb_pcount" );
