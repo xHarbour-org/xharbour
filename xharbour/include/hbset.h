@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.3 2002/03/27 05:57:02 horacioroldan Exp $
+ * $Id: hbset.h,v 1.4 2002/04/28 20:18:43 lculik Exp $
  */
 
 /*
@@ -208,8 +208,8 @@ extern int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * );
 extern void hb_setListenerNotify( HB_set_enum, HB_set_listener_enum );
 extern int hb_setListenerRemove( int );
 #if defined(HB_OS_WIN_32_USED)
-    extern void CloseWinPrinter();
-    extern void WinPrinterEject();           
+    extern void CloseWinPrinter( void );
+    extern void WinPrinterEject( void );
     extern void WriteStringtoPrint(const char * szString);
     extern int OpenWinPrinter(char * szPrinter);
 #endif
