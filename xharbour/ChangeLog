@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.638 2003/01/23 03:25:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.639 2003/01/23 05:00:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,8 @@
 
 2003-01-22 21:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/simplex.c
-    + Added bIgnoreWords to RESET_LEX() macro.
+    - Removed bStart from RESET_LEX()
+    + Added bIgnoreWords to RESET_LEX().
     + Added 1 missing RESET_LEX().
 
 2003-01-22 19:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
