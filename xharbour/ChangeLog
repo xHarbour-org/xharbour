@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1853 2003/12/11 14:44:51 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1854 2003/12/11 16:32:19 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,16 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-12-11 13:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/hbserv.c
+    + added to hrbdll.bc
+
 2003-12-11 17:22 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * config/dos/watcom.cf
   * config/w32/watcom.cf
-    * deleted x from the optimizations due to a known bug 
+    * deleted x from the optimizations due to a known bug
       in OpenWatcom
   * source/vm/errorapi.c
     * added #ifdef HB_OS_DOS to build under OpenWatcom DOS
   * utils/hbdict/hbdict.prg
-    * changed ThreadSleep(10) with HB_IDLESTATE() 
-      to build under OpenWatcom DOS 
+    * changed ThreadSleep(10) with HB_IDLESTATE()
+      to build under OpenWatcom DOS
 
 2003-12-11 15:48 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/hblog.prg

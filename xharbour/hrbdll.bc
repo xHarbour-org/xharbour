@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.32 2003/11/16 01:56:15 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.33 2003/11/26 00:05:17 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -130,6 +130,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\hbcrypt.obj \
   $(OBJ_DIR)\hblog.obj \
   $(OBJ_DIR)\hblognet.obj \
+  $(OBJ_DIR)\hbserv.obj \
   $(OBJ_DIR)\txml.obj \
   $(OBJ_DIR)\idle.obj \
   $(OBJ_DIR)\inkey.obj \
@@ -513,6 +514,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\hbcomprs.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\hbcrc32.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\hbcrypt.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbserv.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\txml.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\idle.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\inkey.obj             + >> hdll.tmp
@@ -1317,6 +1319,9 @@ $(OBJ_DIR)\hblognet.obj : $(OBJ_DIR)\hblognet.c
 
 $(OBJ_DIR)\hblognet.c : $(RTL_DIR)\hblognet.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\hbserv.obj : $(RTL_DIR)\hbserv.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC) $(CLIBFLAGS) -o$@ $**
