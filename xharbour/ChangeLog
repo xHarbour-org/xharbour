@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2134 2004/01/25 13:17:52 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2135 2004/01/25 15:07:09 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-25 20:07 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtapi.c
+    ! hb_gtGobjectInside() must return true if the area INTERSECTS with the given
+      object, and not just if the object is partially or completely inside the area
+      as it was before.
+      
+  * source/rtl/gtxvt/gtxvt.c
+    + Added X Clipping while drawing graphical objects to allow correctly
+      layering of graphical objects.
+
 2004-01-25 16:05 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * Makefile.bc
     + Added gtgraph support
-  
+
   * source/rtl/gtwvt/gtwvt.c
     + Added support for gtgraph
 
