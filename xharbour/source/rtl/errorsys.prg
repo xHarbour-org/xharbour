@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.40 2005/03/06 00:53:04 andijahja Exp $
+ * $Id: errorsys.prg,v 1.42 2005/03/06 06:27:57 andijahja Exp $
  */
 
 /*
@@ -228,7 +228,9 @@ Return cMessage
 STATIC FUNCTION LogError( oerr )
 
      LOCAL cScreen
-     LOCAL cLogFile    := 'error.log'
+     LOCAL aLogFile    := SET( _SET_ERRORLOG )
+     LOCAL cLogFile    := aLogFile[1]
+     LOCAL lAppendLog  := aLogFile[2]
      LOCAL nRange      := ( Maxcol() + 1 ) * 2
      LOCAL nStart      := 1
      LOCAL nFhandle
@@ -254,14 +256,30 @@ STATIC FUNCTION LogError( oerr )
      ENDIF
      //Alert( 'An error occured, Information will be ;written to error.log' )
 
-     nHandle := Fcreate( cLogFile, FC_NORMAL )
+     If !lAppendLog
+        nHandle := Fcreate( cLogFile, FC_NORMAL )
+     Else
+        If !File( cLogFile )
+           nHandle := Fcreate( cLogFile, FC_NORMAL )
+        Else
+           nHandle := Fopen( cLogFile, FO_READWRITE )
+           FSeek( nHandle, 0, FS_END )
+        Endif
+     Endif
+
+     If nHandle < 3 .and. lower( cLogFile ) != 'error.log'
+        // Force creating error.log in case supplied log file cannot
+        // be created for any reason
+        cLogFile := 'error.log'
+        nHandle := Fcreate( cLogFile, FC_NORMAL )
+     Endif
 
      If nHandle < 3
      Else
         FWriteLine( nHandle, Padc( ' Error log file ', 79, '*' ) )
         FWriteLine( nHandle, '' )
-        FWriteLine( nHandle, '' )
-        FWriteLine( nHandle, '' )
+        // FWriteLine( nHandle, '' )
+        // FWriteLine( nHandle, '' )
         FWriteLine( nHandle, 'Date ............: ' + Dtoc( Date() ) )
         FWriteLine( nHandle, 'Time ............: ' + Time() )
         FWriteLine( nHandle, 'Available Memory : ' + strvalue( Memory( 0 ) ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.30 2005/01/25 10:47:49 druzus Exp $
+ * $Id: hbset.h,v 1.31 2005/02/14 21:14:01 druzus Exp $
  */
 
 /*
@@ -139,7 +139,8 @@ typedef enum
    HB_SET_PRINTERJOB      = 115,
    HB_SET_HARDCOMMIT      = 116,
    HB_SET_FORCEOPT        = 117,
-   HB_SET_EOL             = 118
+   HB_SET_EOL             = 118,
+   HB_SET_ERRORLOG        = 119
 
 } HB_set_enum;
 
@@ -223,6 +224,8 @@ typedef struct
    BOOL    HB_SET_HARDCOMMIT;
    BOOL    HB_SET_FORCEOPT;
    PHB_ITEM HB_SET_EOL;
+   BOOL    HB_SET_APPENDERROR;
+   char    HB_SET_ERRORLOG[_POSIX_PATH_MAX];
 
 } HB_SET_STRUCT;
 

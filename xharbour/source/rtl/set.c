@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.59 2005/01/25 10:47:53 druzus Exp $
+ * $Id: set.c,v 1.60 2005/02/11 20:54:16 guerra000 Exp $
  */
 
 /*
@@ -1569,6 +1569,22 @@ HB_FUNC( SET )
          }
          break;
 
+      case HB_SET_ERRORLOG    :
+         hb_reta( 2 );
+         hb_storc( (char *) ( hb_set.HB_SET_ERRORLOG ), -1, 1 );
+         hb_storl( hb_set.HB_SET_APPENDERROR, -1, 2 );
+
+         if( args > 1 && HB_IS_STRING( pArg2 ) )
+         {
+            strcpy( hb_set.HB_SET_ERRORLOG, pArg2->item.asString.value );
+
+            if( args > 2 && HB_IS_LOGICAL( pArg3 ) )
+            {
+               hb_set.HB_SET_APPENDERROR = pArg3->item.asLogical.value;
+            }
+         }
+         break;
+
       default:
          /* Return NIL if called with invalid SET specifier */
          break;
@@ -1664,6 +1680,9 @@ void hb_setInitialize( void )
    hb_set.HB_SET_TRACE = TRUE; /* Default Trace to ON */
 
    strcpy( (char *) (hb_set.HB_SET_TRACEFILE), "trace.log" );
+
+   strcpy( (char *) (hb_set.HB_SET_ERRORLOG), "error.log" );
+   hb_set.HB_SET_APPENDERROR = FALSE;
 
    hb_set.HB_SET_TRACESTACK = HB_SET_TRACESTACK_ALL;
    hb_set.HB_SET_TYPEAHEAD = 50; hb_inkeyReset( TRUE ); /* Allocate keyboard typeahead buffer */

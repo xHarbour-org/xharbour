@@ -1,5 +1,5 @@
 /*
- * $Id: set.ch,v 1.15 2004/08/10 01:25:15 druzus Exp $
+ * $Id: set.ch,v 1.16 2004/09/06 19:25:52 mlombardo Exp $
  */
 
 /*
@@ -133,6 +133,7 @@
 #define _SET_HARDCOMMIT      116 /* Harbour extension */
 #define _SET_FORCEOPT        117 /* Harbour extension */
 #define _SET_EOL             118 /* Harbour extension */
+#define _SET_ERRORLOG        119 /* Harbour extension */
 
 #define HB_SET_BASE        100
 #define HB_SET_COUNT       15
