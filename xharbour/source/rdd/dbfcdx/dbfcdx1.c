@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.159 2004/09/08 16:29:23 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.160 2004/09/21 02:52:36 druzus Exp $
  */
 
 /*
@@ -7143,7 +7143,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                HB_MACRO_PTR pMacro;
                char * pForExpr = hb_itemGetCPtr( pOrderInfo->itmNewVal );
 
-               if ( SELF_COMPILE( ( AREAP ) pTag->pIndex->pArea, pForExpr ) == SUCCESS )
+               if ( SELF_COMPILE( ( AREAP ) pTag->pIndex->pArea, ( BYTE *) pForExpr ) == SUCCESS )
                /* TODO: RT error if SELF_COMPILE return FAILURE */
                {
                   pTag->pForItem = pTag->pIndex->pArea->valResult;

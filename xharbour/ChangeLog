@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3456 2004/09/21 04:06:50 peterrees Exp $
+ * $Id: ChangeLog,v 1.3457 2004/09/21 04:09:19 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-21 01:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rdd/dbfcdx/dbfcdx1.c
+    * cast at 7154
 
 2004-09-21 06:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/strcase.c
@@ -26,7 +30,10 @@
 
 2004-09-21 00:50 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com>
   * bin/hb-func.sh
-    ! when generating compile scripts(xhb-build) put the execution of gcc commands when linking to an log file(for user review on error)/hbmake use this
+    ! when generating compile scripts(xhb-build) put the execution of gcc
+    ! commands when linking to an log file(for user review on error)/hbmake
+    ! use this
+
 2004-09-20 20:28 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/strcase.c
   * source/common/hbstr.c
