@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.28 2002/10/06 05:00:24 andy_wos Exp $
+ * $Id: ChangeLog,v 1.29 2002/10/06 12:35:14 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-10-08 15:00 UCT+0530 Pritpal Bedi <vouch32@vouchcac.com>
+   * _WinINet.c
+     * FtpFindFirstFile()
+     * InternetFindNextFile()
+       Returns a WIN32_FIND_FILE structure instead of array ( thanks Andrew ).
+       Example how to call the functions is included. 
+       
 2002-10-06 18:00 UCT+0530 Pritpal Bedi <vouch32@vouchcac.com>
    * _WinINet.c
      * FtpFindFirstFile()

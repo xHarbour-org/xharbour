@@ -270,26 +270,6 @@ HB_FUNC ( FTPCOMMAND )
 
 //---------------------------------------------------------------------//
 /*
-typedef struct _WIN32_FIND_DATAA {
-    DWORD dwFileAttributes;
-    FILETIME ftCreationTime;
-    FILETIME ftLastAccessTime;
-    FILETIME ftLastWriteTime;
-    DWORD nFileSizeHigh;
-    DWORD nFileSizeLow;
-    DWORD dwReserved0;
-    DWORD dwReserved1;
-    CHAR   cFileName[ MAX_PATH ];
-    CHAR   cAlternateFileName[ 14 ];
-#ifdef _MAC
-    DWORD dwFileType;
-    DWORD dwCreatorType;
-    WORD  wFinderFlags;
-#endif
-} WIN32_FIND_DATAA, *PWIN32_FIND_DATAA, *LPWIN32_FIND_DATAA;
-*/
-
-/*
    HINTERNET FtpFindFirstFile(
        IN HINTERNET hConnect,
        IN LPCTSTR   lpszSearchFile,
@@ -299,32 +279,80 @@ typedef struct _WIN32_FIND_DATAA {
    );
 */
 //
-//   aDirInfo := array( 3 )
-//   hFind := FtpFindFirstFile( hInternet, '*.*', @aDirInfo )
+//   #include  'WinTypes.ch'
+//   #include  'cStruct.ch'
 //
-//   ? aDirInfo[ 1 ]  // File Name
-//   ? aDirInfo[ 2 ]  // File attribute in numeric, 16 for directory, 128 for file
-//   ? aDirInfo[ 3 ]  // File size in bytes
+//
+//   pragma pack(4)
+//
+//   typedef struct { ;
+//       DWORD    dwLowDateTime;
+//       DWORD    dwHighDateTime;
+//   } FILETIME
+//
+//   typedef struct { ;
+//       DWORD    dwFileAttributes;
+//       FILETIME ftCreationTime;
+//       FILETIME ftLastAccessTime;
+//       FILETIME ftLastWriteTime;
+//       DWORD    nFileSizeHigh;
+//       DWORD    nFileSizeLow;
+//       DWORD    dwReserved0;
+//       DWORD    dwReserved1;
+//       char     cFileName[ MAX_PATH ];
+//       char     cAlternateFileName[ 14 ];
+//   } WIN32_FIND_DATA
+//
+//
+//
+//   Function FtpDirectory( hInternet, cFileSpec )
+//   local hFile
+//   local FindData IS WIN32_FIND_DATA
+//   local cDirInfo := FindData:value
+// 
+//   DEFAULT cFileSpec TO '*.*'
+//
+//   hFind := FtpFindFirstFile( hInternet, cFileSpec, @cDirInfo )
+//   if hFind <> 0
+//      FindData:Buffer( cDirInfo )
+//      	
+//      ? FindData:cFileName:value                // Name
+//      ? FindData:dwFileAttributes               // Attribute in numeric, 16 for directory, 128 for file
+//      ? FindData:nFileSizeLow                   // Size in bytes
+//      ? findData:ftLastWriteTime:dwHighDateTime // Date, time in DWORD
+//   
+//      do while .t.
+//         if !InternetFindNextFile( hFind, @cDirInfo )
+//            exit
+//         endif
+//         FindData:Buffer( cDirInfo )
+//      	
+//         ? FindData:cFileName:value                // Name
+//         ? FindData:dwFileAttributes               // Attribute in numeric, 16 for directory, 128 for file
+//         ? FindData:nFileSizeLow                   // Size in bytes
+//         ? findData:ftLastWriteTime:dwHighDateTime // Date, time in DWORD
+//      enddo
+//
+//   endif
+//
+//   return nil
+//
 //
 HB_FUNC ( FTPFINDFIRSTFILE )
 {
    HINTERNET hInternet              = ( HINTERNET ) hb_parnl( 1 ) ;
    LPCTSTR   lpszSearchFile         = ISNIL( 2 ) ? TEXT ("*.*") : hb_parc( 2 ) ;
-   WIN32_FIND_DATA lpFindFileData ;
+   WIN32_FIND_DATA FindFileData ;
    DWORD     dwFlags                = ISNIL( 4 ) ? INTERNET_FLAG_NEED_FILE : hb_parnl( 4 ) ;
    DWORD_PTR dwContext              = ISNIL( 5 ) ? NULL : hb_parnl( 5 ) ;
    HINTERNET hResult ; 	
 
    hResult = FtpFindFirstFile( hInternet, lpszSearchFile, 
-			                            &lpFindFileData, dwFlags, dwContext ) ;
+			                            &FindFileData, dwFlags, dwContext ) ;
         
    if ( hResult )
       if ( ISBYREF( 3 ) )   	   
-      {
-         hb_storc ( lpFindFileData.cFileName        , 3, 1 ) ;
-	 hb_stornl( lpFindFileData.dwFileAttributes , 3, 2 ) ;
-	 hb_stornl( lpFindFileData.nFileSizeLow     , 3, 3 ) ;
-      }
+         hb_storclen( (char *) &FindFileData , sizeof( WIN32_FIND_DATA ), 3 ) ; 
 		
    hb_retnl( ( ULONG ) hResult ) ;
 }
@@ -337,36 +365,19 @@ HB_FUNC ( FTPFINDFIRSTFILE )
    );
 */
 //
-//   aDirInfo := array( 3 )
-//
-//   hFind := FtpFindFirstFile( hInternet, '*.*', @aDirInfo )
-//   if hFind <> 0
-//      do while InternetFindNextFile( hFind, @aDirInfo )
-//         ? aDirInfo[ 1 ]  // File Name
-//         ? aDirInfo[ 2 ]  // File attribute in numeric, 16 for directory, 128 for file
-//         ? aDirInfo[ 3 ]  // File size in bytes
-//      enddo
-//   endif
-//
-//
 HB_FUNC ( INTERNETFINDNEXTFILE )
 {
    HINTERNET       hFind       = ( HINTERNET ) hb_parnl( 1 ) ;
-   WIN32_FIND_DATA lpFindFileData ;
+   WIN32_FIND_DATA FindFileData ;
 	
-   if ( InternetFindNextFile( hFind, &lpFindFileData ) ) 
+   if ( InternetFindNextFile( hFind, &FindFileData ) ) 
       {   
-         hb_retl( TRUE );
+         hb_retl( TRUE ) ;
          if ( ISBYREF( 2 ) )
-         {
-            hb_storc ( lpFindFileData.cFileName        , 2, 1 ) ;
-	    hb_stornl( lpFindFileData.dwFileAttributes , 2, 2 ) ;
-	    hb_stornl( lpFindFileData.nFileSizeLow     , 2, 3 ) ;
-         }
+            hb_storclen( ( char * ) &FindFileData, sizeof( WIN32_FIND_DATA ), 2 ) ;  
       }
    else
-      hb_retl(FALSE) ;
-	
+      hb_retl( FALSE ) ;
 }
 
 //---------------------------------------------------------------------//
