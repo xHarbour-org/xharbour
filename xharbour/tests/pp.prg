@@ -658,8 +658,13 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
       nVars := Len( s_aProcStack[s_nProcStack][3] )
       FOR nVar := 1 TO nVars
          aAdd( s_asPrivates, s_aProcStack[s_nProcStack][3][nVar][1] )
-         __QQPub( s_aProcStack[s_nProcStack][3][nVar][1] )
-         &( s_aProcStack[s_nProcStack][3][nVar][1] ) := s_aProcStack[s_nProcStack][3][nVar][2]
+         #ifdef __HARBOUR__
+            //__QQPub( s_aProcStack[s_nProcStack][3][nVar][1] ) // *** Harbour Var was never released because of bug in __MXRelease() !!!
+            __MVPUT( s_aProcStack[s_nProcStack][3][nVar][1], s_aProcStack[s_nProcStack][3][nVar][2] )
+         #else
+            __QQPub( s_aProcStack[s_nProcStack][3][nVar][1] )
+            &( s_aProcStack[s_nProcStack][3][nVar][1] ) := s_aProcStack[s_nProcStack][3][nVar][2]
+         #endif
       NEXT
 
       /* Restoring Locals of parrent. */

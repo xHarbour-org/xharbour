@@ -34,6 +34,7 @@ CLASS  TInterpreter
    DATA aCompiledProcs
    DATA aInitExit
    DATA nProcs
+   DATA aScripHostGlobals    INIT {}
 
    METHOD New()              INLINE ( ::nProcs := 0, ::cText := "", ::acPPed := {}, ::aCompiledProcs := {}, ::aInitExit := { {}, {} }, Self )
 
@@ -49,6 +50,10 @@ CLASS  TInterpreter
    METHOD InitStdRules()     INLINE PP_InitStd()
    METHOD LoadClass()        INLINE PP_LoadClass()
    METHOD LoadFiveWin()      INLINE PP_LoadFw()
+
+   METHOD AddScriptHostGlobal( cName, pDisp )
+   METHOD AutomateScriptSiteGlobals()
+
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -93,6 +98,32 @@ METHOD Compile()
    ::nProcs := nProcId
 
 RETURN nProcId > 0
+
+//----------------------------------------------------------------------------//
+METHOD AddScriptHostGlobal( cName, pDisp )
+
+   aAdd( ::aScriptHostGlobals, { cName, pDisp } )
+
+   __QQPub( cName )
+   __MVPUT( cName, TOleAuto():New( pDisp ) )
+
+RETURN Self
+
+//----------------------------------------------------------------------------//
+METHOD AutomateScriptSiteGlobals()
+
+   LOCAL aGlobals := ::aScriptHostGlobals
+   LOCAL nGlobals := Len( aGlobals ), nGlobal
+   LOCAL cName, pDisp
+
+   FOR nGlobal := 1 TO nGlobals
+      cName := aGlobals[ nGlobal ][1]
+      pDisp := aGlobals[ nGlobal ][2]
+      __QQPub( cName )
+      __MVPUT( cName, TOleAuto():New( pDisp ) )
+   NEXT
+
+RETURN .T.
 
 //----------------------------------------------------------------------------//
 
