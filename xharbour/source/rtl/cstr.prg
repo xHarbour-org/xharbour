@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.2 2002/10/06 21:24:04 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.3 2002/10/09 06:46:59 ronpinkas Exp $
  */
 
 /*
@@ -221,7 +221,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName(), 1, { xVal, cName, nPad } )
    ENDCASE
 
-   TraceLog( cRet )
+   //TraceLog( cRet )
 
 RETURN cRet
 //--------------------------------------------------------------//

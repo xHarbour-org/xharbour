@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.11 2002/02/26 19:11:47 dholm Exp $
+ * $Id: hbstr.c,v 1.2 2002/03/06 06:21:14 ronpinkas Exp $
  */
 
 /*
@@ -111,7 +111,7 @@ char * hb_strupr( char * pszText )
    return pszText;
 }
 
-char * hb_strdup( const char * pszText )
+char * HB_EXPORT hb_strdup( const char * pszText )
 {
    char * pszDup;
    int iLen = strlen( pszText ) + 1;

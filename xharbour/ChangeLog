@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.462 2002/10/25 00:49:13 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.463 2002/10/25 01:25:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-24 20:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * dll_55.bat
+  * hrbdll.bc
+    * Modified to include all needed files.
+
+  * source/common/hbstr.c
+  * source/pp/pplib.c
+  * source/vm/estack.c
+  * source/vm/fastitem.c
+  * source/vm/itemapi.c
+    + Added missing HB_EXPORT qualifier.
+
+  * source/rtl/cstr.prg
+    - Removed TraceLog() call.
+
+  * tests/dll_b32.mak
+    + Added -DHB_NO_DEFAULT_STACK_MACROS
+
+  - lib/hbdll_bc.lib
+    - Removed import lib for BCC since now it can be built with standard make file dll_55.bat
 
 2002-10-24 18:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/dll_b32.mak

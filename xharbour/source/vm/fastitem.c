@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.35 2002/08/24 01:48:13 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.36 2002/10/09 20:43:00 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ extern char *hb_vm_acAscii[256];
 /* Forward decalarations. */
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
 
-void hb_itemPushForward( PHB_ITEM pItem )
+void HB_EXPORT hb_itemPushForward( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemPushForward(%p)", pItem ) );
 
@@ -76,7 +76,7 @@ void hb_itemPushForward( PHB_ITEM pItem )
    hb_stackPush();
 }
 
-void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
+void HB_EXPORT hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemForwardValue(%p, %p) %i", pDest, pSource, pDest->type ) );
 
@@ -105,7 +105,7 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
    pSource->type = HB_IT_NIL;
 }
 
-PHB_ITEM hb_itemReturn( PHB_ITEM pItem )
+PHB_ITEM HB_EXPORT hb_itemReturn( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturn(%p)", pItem ) );
 
@@ -117,7 +117,7 @@ PHB_ITEM hb_itemReturn( PHB_ITEM pItem )
    return pItem;
 }
 
-void hb_itemReleaseString( PHB_ITEM pItem )
+void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemReleaseString(%p), '%s'", pItem, pItem->item.asString.value ) );
 
@@ -137,7 +137,7 @@ void hb_itemReleaseString( PHB_ITEM pItem )
    //pItem->item.asString.length = 0;
 }
 
-void hb_itemClear( PHB_ITEM pItem )
+void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemClear(%p) type: %i", pItem, pItem->type ) );
 
@@ -167,7 +167,7 @@ void hb_itemClear( PHB_ITEM pItem )
    pItem->type = HB_IT_NIL;
 }
 
-void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
+void HB_EXPORT hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 {
    HB_ITEM temp;
 
@@ -185,7 +185,7 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
    memcpy( pItem1, &temp, sizeof( HB_ITEM ) );
 }
 
-void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
+void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemCopy(%p, %p)", pDest, pSource));
 
@@ -229,7 +229,7 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
    }
 }
 
-PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
+PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, char * szText )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
@@ -272,7 +272,7 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
    return pItem;
 }
 
-PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
+PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -316,7 +316,7 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
    return pItem;
 }
 
-PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
+PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -343,7 +343,7 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    return pItem;
 }
 
-PHB_ITEM hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
+PHB_ITEM HB_EXPORT hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRaw(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -369,7 +369,7 @@ PHB_ITEM hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
    return pItem;
 }
 
-PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
+PHB_ITEM HB_EXPORT hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRawStatic(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -393,7 +393,7 @@ PHB_ITEM hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
    return pItem;
 }
 
-PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
+PHB_ITEM HB_EXPORT hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
 {
    ULONG ulLen = strlen( szText );
 
@@ -420,7 +420,7 @@ PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
    return pItem;
 }
 
-PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
+PHB_ITEM HB_EXPORT hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCLStatic(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -445,7 +445,7 @@ PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
    return pItem;
 }
 
-PHB_ITEM hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
+PHB_ITEM HB_EXPORT hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
 
@@ -468,7 +468,7 @@ PHB_ITEM hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
    return pItem;
 }
 
-PHB_ITEM hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
+PHB_ITEM HB_EXPORT hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
 
@@ -491,7 +491,7 @@ PHB_ITEM hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
    return pItem;
 }
 
-void hb_itemFastClear( PHB_ITEM pItem )
+void HB_EXPORT hb_itemFastClear( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ( "hb_itemFastClear(%p) Type: %i", pItem, pItem->type ) );
 
@@ -518,7 +518,7 @@ void hb_itemFastClear( PHB_ITEM pItem )
    HB_TRACE_STEALTH(HB_TR_DEBUG, ( "DONE hb_itemFastClear(%p)", pItem ) );
 }
 
-void hb_itemPushStaticString( char * szText, ULONG length )
+void HB_EXPORT hb_itemPushStaticString( char * szText, ULONG length )
 {
    PHB_ITEM pTop = hb_stackTopItem();
 
@@ -533,7 +533,7 @@ void hb_itemPushStaticString( char * szText, ULONG length )
 }
 
 #undef hb_retcAdopt
-void hb_retcAdopt( char * szText )
+void HB_EXPORT hb_retcAdopt( char * szText )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdopt(%s)", szText ) );
 
@@ -558,7 +558,7 @@ void hb_retcAdopt( char * szText )
 }
 
 #undef hb_retclenAdopt
-void hb_retclenAdopt( char * szText, ULONG ulLen )
+void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
 {
    szText[ulLen] = '\0';
 
@@ -585,7 +585,7 @@ void hb_retclenAdopt( char * szText, ULONG ulLen )
 }
 
 #undef hb_retcStatic
-void hb_retcStatic( char * szText )
+void HB_EXPORT hb_retcStatic( char * szText )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcStatic(%s)", szText ) );
 
@@ -608,7 +608,7 @@ void hb_retcStatic( char * szText )
 }
 
 #undef hb_retclenStatic
-void hb_retclenStatic( char * szText, ULONG ulLen )
+void HB_EXPORT hb_retclenStatic( char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcStatic(%s)", szText ) );
 
@@ -778,7 +778,7 @@ USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pScanBaseArray, PHB_SCANNED_
    return uiCyclicCount;
 }
 
-BYTE hb_itemParamId( PHB_ITEM pItem )
+BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )
 {
    PHB_ITEM *pBase = hb_stack.pBase + 1;
    PHB_ITEM *pTop;

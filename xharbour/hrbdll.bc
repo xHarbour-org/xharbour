@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.5 2002/05/25 18:42:19 lculik Exp $
+# $Id: hrbdll.bc,v 1.6 2002/06/17 22:32:53 andijahja Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -13,7 +13,6 @@
 # BIN_DIR is defined in dll_55.bat, please adjust accordingly
 
 HARBOUR_EXE = bin\harbour.exe
-BCC_DIR     = c:\bcc55
 CC          = bcc32
 
 # 旼컴컴컴컴컴컴컴컴커
@@ -85,6 +84,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dates.obj \
   $(OBJ_DIR)\dateshb.obj \
   $(OBJ_DIR)\datesx.obj \
+  $(OBJ_DIR)\dbtotal.obj \
   $(OBJ_DIR)\defpath.obj \
   $(OBJ_DIR)\dbdelim.obj \
   $(OBJ_DIR)\dbsdf.obj \
@@ -329,6 +329,11 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msgsriso.obj \
   $(OBJ_DIR)\msgzhgb.obj \
   $(OBJ_DIR)\msgzhb5.obj \
+  $(OBJ_DIR)\ppcomp.obj \
+  $(OBJ_DIR)\ppcore.obj \
+  $(OBJ_DIR)\pplib.obj \
+  $(OBJ_DIR)\pptable.obj \
+  $(OBJ_DIR)\pragma.obj \
   $(OBJ_DIR)\gtwin.obj \
   $(OBJ_DIR)\mousewin.obj \
   $(OBJ_DIR)\dbgmenu.obj \
@@ -387,6 +392,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\dateshb.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\datesx.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\defpath.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\dbtotal.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbdelim.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbsdf.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\descend.obj           + >> hdll.tmp
@@ -448,6 +454,11 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\philes.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\philes53.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\philesx.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\ppcomp.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\ppcore.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\pplib.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\pptable.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\pragma.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\profiler.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\pushbtn.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\radiobtn.obj          + >> hdll.tmp
@@ -743,6 +754,12 @@ $(OBJ_DIR)\dbupdat.c : $(RDD_DIR)\dbupdat.prg
 $(OBJ_DIR)\dbupdat.obj : $(OBJ_DIR)\dbupdat.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\dbtotal.c : $(RDD_DIR)\dbtotal.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dbtotal.obj : $(OBJ_DIR)\dbtotal.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\sdf0.c : $(RDD_DIR)\sdf0.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
@@ -855,6 +872,18 @@ $(OBJ_DIR)\memvclip.obj : $(VM_DIR)\memvclip.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcount.obj : $(VM_DIR)\pcount.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\ppcomp.obj : $(PP_DIR)\ppcomp.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\pplib.obj : $(PP_DIR)\pplib.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\proc.obj : $(VM_DIR)\proc.c
