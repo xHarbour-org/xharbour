@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.17 2003/12/29 23:38:56 jonnymind Exp $
+ * $Id: hbapigt.h,v 1.18 2004/01/04 01:11:25 druzus Exp $
  */
 
 /*
@@ -203,6 +203,17 @@ extern int    HB_EXPORT hb_gtCurrentColor( void );
 extern char   HB_EXPORT * hb_gtVersion( void );
 #define hb_gtOutStd( pbyStr, ulLen ) hb_gt_OutStd( pbyStr, ulLen )
 #define hb_gtOutErr( pbyStr, ulLen ) hb_gt_OutErr( pbyStr, ulLen )
+
+/* GT Directed close request handler */
+extern void HB_EXPORT hb_gtHandleClose(void);
+extern BOOL HB_EXPORT hb_gtHandleShutdown(void);
+extern BOOL HB_EXPORT hb_gtSetCloseHandler(PHB_ITEM handler);
+extern PHB_ITEM HB_EXPORT hb_gtGetCloseHandler(void);
+
+extern int  HB_EXPORT   hb_gtGetCloseEvent( void );
+extern int  HB_EXPORT   hb_gtGetShutdownEvent( void );
+extern void HB_EXPORT   hb_gtSetCloseEvent( int iEvent );
+extern void HB_EXPORT   hb_gtSetShutdownEvent( int iEvent );
 
 /* Undocumented CA-Clipper 5.x GT API calls */
 

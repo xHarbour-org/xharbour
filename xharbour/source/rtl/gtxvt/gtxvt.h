@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.4 2004/01/05 04:54:30 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.5 2004/01/05 15:24:00 jonnymind Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 #ifndef HB_GTXVT_H
 #define HB_GTXVT_H
 
-#define HB_GT_NAME	XVT
+#define HB_GT_NAME   XVT
 
 #include "hbset.h"
 #include "hbvm.h"
@@ -146,9 +146,12 @@ typedef struct tag_ICM_UPDATE
 } ICM_DATA_UPDATE;
 
 /********************************************************************/
-
-#define XVT_STD_MASK    (ExposureMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | StructureNotifyMask | VisibilityChangeMask)
-
+/* X-server wise defaults */
+/* Standard event mask */
+#define XVT_STD_MASK    (ExposureMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | KeyPressMask | KeyReleaseMask | StructureNotifyMask )
+/* Class of the window name */
+#define XVT_CLASS_NAME  "xHBapp"
+/********************************************************************/
 /* Box char definitions - these are compatible with unicode, so that it can
    be used inside unicode char definitions*/
 

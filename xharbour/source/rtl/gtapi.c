@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.13 2003/11/07 21:52:38 jonnymind Exp $
+ * $Id: gtapi.c,v 1.14 2003/11/11 20:20:54 ronpinkas Exp $
  */
 
 /*
@@ -68,6 +68,9 @@
  * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
  *    hb_gtDrawShadow()
  *
+ * Copyright 2004 Giancarlo Niccolai <antispam at niccolai dot ws>
+ *   SetGTCloseHandler() system
+ *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -77,6 +80,8 @@
 #include "hbapigt.h"
 #include "hbset.h"
 #include "hb_io.h"
+#include "hbvm.h"
+#include "inkey.ch"
 
 static BOOL   s_bInit = FALSE;
 
@@ -92,6 +97,15 @@ static USHORT s_uiCursorStyle;
 static USHORT s_uiColorIndex;
 static USHORT s_uiColorCount;
 static int *  s_pColor;
+
+/* Close event returned by inkey for asynchronous GT kills */
+static int s_closeEvent = 0;
+static int s_shutdownEvent = 0;
+static BOOL s_closing = FALSE;
+static PHB_ITEM s_pOnClose = 0;
+
+// to spare time, I call this HB_FUN directly.
+extern void HB_EXPORT HB_FUN_HB_EXECFROMARRAY();
 
 /* masks: 0x0007     Foreground
           0x0070     Background
@@ -1149,4 +1163,121 @@ int HB_EXPORT hb_gtIndexedColor( int idx )
 int HB_EXPORT hb_gtCurrentColor()
 {
     return s_pColor[ s_uiColorIndex ];
+}
+
+/** Handles a request to close the program received by GT.
+   In moder systems, user may issue it's request to colose
+   the application in various way, i.e. sending a TERM
+   signal in POSIX systems, or asking the window manager
+   to close the window containing the application.
+
+   When this happens, the GT driver should call this function,
+   that will properly quit the application, or if a handler
+   is isntalled, ask the user about his intentions to close
+   the app.
+
+   Control will anyhow return to the GT: if the user request
+   to quit is accepted, a gentle vm_quit request will be
+   issued to the virtual machine, so the GT driver must return to
+   VM as soon as possible.
+*/
+
+void HB_EXPORT hb_gtHandleClose()
+{
+   // this can work only in single threading, but we MUST have just
+   // one thread that can send a close request even in MT.
+   if ( s_closing )
+   {
+      return;
+   }
+
+   s_closing = TRUE;
+
+   if (s_pOnClose == 0 )
+   {
+      if ( s_closeEvent == 0 )
+      {
+         hb_inkeyPut( HB_BREAK_FLAG ); // Pretend Alt+C pressed
+         //hb_inkeyPut( K_ALT_C );
+      }
+      else
+      {
+         hb_inkeyPut( s_closeEvent );
+      }
+   }
+   else {
+      hb_execFromArray( s_pOnClose );
+   }
+
+   s_closing = FALSE;
+}
+
+int HB_EXPORT hb_gtHandleShutdown()
+{
+   // this can work only in single threading, but we MUST have just
+   // one thread that can send a close request even in MT.
+   if ( s_closing )
+   {
+      return FALSE;
+   }
+
+   if ( ! s_shutdownEvent )
+   {
+      return FALSE;
+   }
+
+   hb_inkeyPut( s_shutdownEvent );
+   return TRUE;
+}
+
+BOOL HB_EXPORT hb_gtSetCloseHandler( PHB_ITEM handler )
+{
+   if ( s_pOnClose != 0 )
+   {
+      hb_itemRelease( s_pOnClose );
+   }
+
+   if ( HB_IS_ARRAY( handler ) )
+   {
+      s_pOnClose = hb_itemNew( 0 );
+      hb_itemCopy( s_pOnClose, handler );
+      hb_gcLock( s_pOnClose );
+      return TRUE;
+   }
+   else if ( HB_IS_STRING( handler ) || HB_IS_NUMERIC( handler ) || HB_IS_BLOCK( handler ) )
+   {
+      s_pOnClose = hb_itemNew( 0 );
+      hb_arrayNew( s_pOnClose, 1 );
+      hb_itemCopy( hb_arrayGetItemPtr( s_pOnClose, 1 ), handler );
+      hb_gcLock( s_pOnClose );
+      return TRUE;
+   }
+
+   return FALSE;
+}
+
+PHB_ITEM HB_EXPORT hb_gtGetCloseHandler()
+{
+   return s_pOnClose;
+}
+/******************************************************************/
+
+void HB_EXPORT hb_gtSetCloseEvent( int iEvent )
+{
+  s_closeEvent = iEvent;
+}
+
+void HB_EXPORT hb_gtSetShutdownEvent( int iEvent )
+{
+   s_shutdownEvent = iEvent;
+}
+
+int HB_EXPORT hb_gtGetCloseEvent( void )
+{
+  return( s_closeEvent );
+}
+
+int HB_EXPORT hb_gtGetShutdownEvent( void )
+{
+  return( s_shutdownEvent );
 }

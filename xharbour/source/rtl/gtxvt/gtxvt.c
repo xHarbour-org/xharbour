@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.9 2004/01/05 04:54:29 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.10 2004/01/05 15:24:00 jonnymind Exp $
  */
 
 /*
@@ -274,7 +274,7 @@ static const UnixBoxChar boxTranslate[ XVT_BOX_CHARS ] ={
 
 /******************************************************************/
 
-static void xvt_InitStatics( void );
+static void xvt_InitStatics( Display *dpy );
 static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS stat );
 static PXVT_BUFFER xvt_bufferNew( USHORT col, USHORT row, USHORT bkg );
 static BOOL xvt_bufferResize( PXVT_BUFFER buf,  USHORT cols, USHORT rows );
@@ -360,6 +360,10 @@ static int streamFeedback[2];
 // Pipe stream for input queue (wnd to app)
 static int streamChr[2];
 
+// cached value of DELETE WINDOW X atom
+Atom s_atom_delwin;
+Atom s_atom_clientprot;
+
 /**********************************************************************
 *                                                                     *
 * PART 1: XVT INTERNAL API FUNCTIONS                                  *
@@ -383,7 +387,7 @@ static int s_errorHandler( Display *dpy, XErrorEvent *e )
     return 1;
 }
 
-static void xvt_InitStatics(void)
+static void xvt_InitStatics( Display *dpy )
 {
    XSetErrorHandler( s_errorHandler );
 
@@ -391,12 +395,13 @@ static void xvt_InitStatics(void)
    s_modifiers.bAlt   = FALSE;
    s_modifiers.bAltGr = FALSE;
    s_modifiers.bShift = FALSE;
+
+   s_atom_delwin = XInternAtom( dpy, "WM_DELETE_WINDOW", 1);
 }
 
 /*** Prepare the default window ***/
 static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
 {
-   PHB_FNAME pFileName;
    Display *dpy;
    PXWND_DEF wnd;
 
@@ -412,8 +417,6 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
       return;
    }
 
-   xvt_InitStatics();
-
    // With NULL, it gets the DISPLAY environment variable.
    dpy = XOpenDisplay( NULL );
    if ( dpy == NULL )
@@ -422,12 +425,10 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
       return;
    }
 
+   xvt_InitStatics( dpy );
+
    xvt_statusQueryMouseBtns( status, dpy );
    wnd = xvt_windowCreate( dpy, buf, status );
-
-   pFileName = hb_fsFNameSplit( hb_cmdargARGV()[0] );
-   XStoreName( wnd->dpy, wnd->window, pFileName->szName );
-   hb_xfree( pFileName );
 
    XMapWindow( wnd->dpy, wnd->window );
    // ok, now we can inform the X manager about our new status:
@@ -548,6 +549,10 @@ static void xvt_bufferInvalidate( PXVT_BUFFER buf,
          case XVT_ICM_UPDATE:
             buf->bInvalid = FALSE;
             break;
+
+         case XVT_ICM_QUIT:
+            hb_gtHandleClose();
+            break;
       }
    }
 
@@ -667,6 +672,10 @@ static BOOL xvt_bufferDeqeueKey( PXVT_BUFFER buf, int *c )
                bRet = TRUE;
             break;
 
+            case XVT_ICM_QUIT:
+               hb_gtHandleClose();
+               break;
+
             default:
                bRet = FALSE;
                // Signal error?
@@ -782,6 +791,11 @@ static void xvt_windowResize( PXWND_DEF wnd )
 static void xvt_windowSetHints( PXWND_DEF wnd )
 {
    XSizeHints xsize;
+   XClassHint xclass;
+   PHB_FNAME pFileName = 0;
+   char **argv;
+   int argc;
+   int i;
 
    //xsize.flags = PWinGravity | PBaseSize | PResizeInc | PMinSize;
    xsize.flags = PWinGravity | PResizeInc | PMinSize;
@@ -794,6 +808,51 @@ static void xvt_windowSetHints( PXWND_DEF wnd )
    xsize.base_height = wnd->height;
 
    XSetWMNormalHints( wnd->dpy, wnd->window, &xsize);
+
+   // Signal that we are interested to know we are being destroyed
+   XSetWMProtocols(wnd->dpy, wnd->window, &s_atom_delwin, 1);
+
+   // sets application name.
+   // Application name is NOT window title; app name is the name that is
+   // used to retreive X database resources.
+   // on posix systems, check 1) for -name parameter, 2) for RESOURCE_NAME envvar,
+   // 3) for commandline program name.
+   argv = hb_cmdargARGV();
+   argc =hb_cmdargARGC();
+   xclass.res_name = 0;
+   for (i = 1; i < argc; i++ )
+   {
+      if ( strcmp( argv[i], "-name" ) == 0 && argc > i + 1 )
+      {
+         xclass.res_name = argv[i+1];
+         break;
+      }
+   }
+   // found?
+   if ( xclass.res_name == 0 )
+   {
+      xclass.res_name = getenv( "RESOURCE_NAME" );
+   }
+   // found?
+   if ( xclass.res_name == 0)
+   {
+      pFileName = hb_fsFNameSplit( argv[0] );
+      xclass.res_name = pFileName->szName;
+   }
+
+   xclass.res_class = XVT_CLASS_NAME;
+   XSetClassHint( wnd->dpy, wnd->window, &xclass );
+
+   // default window title is the same as application name
+   XStoreName( wnd->dpy, wnd->window, xclass.res_name );
+   XSetIconName( wnd->dpy, wnd->window, xclass.res_name );
+
+   //TODO: verify if name must stay until the end of the program or
+   //      it can be deleted now.
+   if ( pFileName )
+   {
+      hb_xfree( pFileName );
+   }
 }
 
 /*********** Update cursor height based on buffer cursor style **********/
@@ -2258,6 +2317,18 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
          wnd->bResizing = FALSE;
 
       break;
+
+      // Protocol request from the window manager (usually delete window)
+      case ClientMessage:
+         // yes; a delete request
+         if ( evt->xclient.data.l[0] == s_atom_delwin )
+         {
+            USHORT appMsg = XVT_ICM_QUIT;
+            //write( streamFeedback[1], &appMsg, sizeof( appMsg ) );
+            write( streamChr[1], &appMsg, sizeof( appMsg ) );
+         }
+      break;
+
    }
 }
 
@@ -2322,7 +2393,7 @@ static void xvt_processMessages( PXWND_DEF wnd )
                break;
 
                case XVT_ICM_QUIT:
-                  bLoop = FALSE;
+                  exit(0);
                   break;
             }
 
@@ -2344,8 +2415,9 @@ static void xvt_processMessages( PXWND_DEF wnd )
       }
 
       evt.type = 0;
-      while ( XCheckMaskEvent( wnd->dpy, XVT_STD_MASK, &evt) )
+      while ( XEventsQueued( wnd->dpy, QueuedAfterFlush) )
       {
+         XNextEvent( wnd->dpy, &evt );
          xvt_eventManage( wnd, &evt );
       }
 

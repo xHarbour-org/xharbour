@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.13 2003/12/28 22:25:34 druzus Exp $
+ * $Id: inkey.c,v 1.14 2004/01/07 02:04:45 peterrees Exp $
  */
 
 /*
@@ -183,6 +183,12 @@ int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
          {
             while( hb_inkeyNext( event_mask ) == 0 )
             {
+               // immediately break if a VM request is pending.
+               if ( hb_vmRequestQuery() != 0 )
+               {
+                  return 0;
+               }
+
                hb_idleState();
             }
             hb_idleReset();
@@ -204,6 +210,10 @@ int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
          while( hb_inkeyNext( event_mask ) == 0 && clock() < end_clock )
 #endif
          {
+            if ( hb_vmRequestQuery() != 0 )
+            {
+               return 0;
+            }
             hb_idleState();
          }
          hb_idleReset();
@@ -501,7 +511,7 @@ HB_FUNC( __KEYBOARD )
    }
 }
 
-void hb_inkeyPut( int ch )
+void HB_EXPORT hb_inkeyPut( int ch )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_inkeyPut(%d)", ch));
 

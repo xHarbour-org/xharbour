@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.42 2004/01/14 21:42:54 peterrees Exp $
+ * $Id: gtwvt.c,v 1.44 2004/01/14 22:31:25 andijahja Exp $
  */
 
 /*
@@ -140,8 +140,6 @@ static void    hb_wvt_gtSetInvalidRect( USHORT left, USHORT top, USHORT right, U
 static void    hv_wvt_gtDoInvalidateRect( void );
 
 static void    hb_wvt_gtHandleMenuSelection( int );
-static int     hb_wvt_gtGetCloseEvent( void );
-static int     hb_wvt_gtGetShutdownEvent( void );
 
 static POINT   hb_wvt_gtGetColRowFromXY( USHORT x, USHORT y );
 static RECT    hb_wvt_gtGetColRowFromXYRect( RECT xy );
@@ -1980,11 +1978,9 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
        * so windows ( and our app )doesn't shutdown
        * otherwise let the default handler take it
        */
-      int iEvent = hb_wvt_gtGetShutdownEvent();
-      if ( iEvent )
+      if ( hb_gtHandleShutdown() )
       {
-        hb_wvt_gtAddCharToInputQueue( iEvent );
-        return( 0 );
+         return 0;
       }
       break;
     }
@@ -1994,12 +1990,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       /* if an event has been set then return it otherwise
          fake an Alt+C
       */
-      int iEvent = hb_wvt_gtGetCloseEvent();
-      if ( !iEvent )
-      {
-        iEvent= HB_BREAK_FLAG ; // Pretend Alt+C pressed
-      }
-      hb_wvt_gtAddCharToInputQueue( iEvent );
+      hb_gtHandleClose();
       return( 0 );
     }
 
@@ -2708,19 +2699,6 @@ static void hb_wvt_gtHandleMenuSelection( int menuIndex )
   hb_wvt_gtAddCharToInputQueue( _s.MenuKeyEvent );
 }
 
-//-------------------------------------------------------------------//
-
-static int hb_wvt_gtGetCloseEvent( void )
-{
-  return( _s.closeEvent );
-}
-
-//-------------------------------------------------------------------//
-
-static int hb_wvt_gtGetShutdownEvent( void )
-{
-  return( _s.shutdownEvent );
-}
 
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
@@ -2874,20 +2852,6 @@ BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold
     DeleteObject( hFont );
   }
   return( bResult );
-}
-
-//-------------------------------------------------------------------//
-
-void HB_EXPORT hb_wvt_gtSetCloseEvent( int iEvent )
-{
-  _s.closeEvent = iEvent;
-}
-
-//-------------------------------------------------------------------//
-
-void HB_EXPORT hb_wvt_gtSetShutdownEvent( int iEvent )
-{
-  _s.shutdownEvent = iEvent;
 }
 
 //-------------------------------------------------------------------//

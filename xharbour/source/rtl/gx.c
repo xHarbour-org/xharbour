@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.4 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: gx.c,v 1.1.1.1 2001/12/21 10:41:43 ronpinkas Exp $
  */
 
 /*
@@ -57,12 +57,18 @@
  * Copyright 1999 Paul Tucker <ptucker@sympatico.ca>
  *    SETMODE()
  *
+ * Copyright 2004 Giancarlo Niccolai <antispam at niccolai dot ws >
+ *    SETGTCLOSEHANDLER()
+ *    GETGTCLOSEHANDLER()
+
  * See doc/license.txt for licensing terms.
  *
  */
 
 #include "hbapi.h"
 #include "hbapigt.h"
+#include "hbapiitm.h"
+#include "hbapierr.h"
 
 HB_FUNC( ISCOLOR )
 {
@@ -81,3 +87,47 @@ HB_FUNC( SETMODE )
                           ISNUM( 2 ) ? hb_parni( 2 ) : ( hb_gtMaxCol() + 1 ) ) == 0 );
 }
 
+
+HB_FUNC( SETGTCLOSEHANDLER )
+{
+   if ( hb_gtSetCloseHandler( hb_param(1, HB_IT_ANY ) ) == FALSE )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SETGTCLOSEHANDLER", 1, hb_paramError( 1 ) );
+   }
+}
+
+HB_FUNC( GETGTCLOSEHANDLER )
+{
+   PHB_ITEM pi = hb_gtGetCloseHandler();
+   if( pi == 0 )
+   {
+      hb_ret();
+   }
+   else {
+      hb_itemReturnCopy( pi );
+   }
+}
+
+HB_FUNC( SETCLOSEEVENT )
+{
+   PHB_ITEM pEvent = hb_param( 1, HB_IT_NUMERIC );
+   if ( pEvent == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SETCLOSEEVENT", 1, hb_paramError( 1 ) );
+   }
+   else {
+      hb_gtSetCloseEvent( hb_itemGetNL( pEvent ) );
+   }
+}
+
+HB_FUNC( SETSHUTDOWNEVENT )
+{
+   PHB_ITEM pEvent = hb_param( 1, HB_IT_NUMERIC );
+   if ( pEvent == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SETSHUTDOWNEVENT", 1, hb_paramError( 1 ) );
+   }
+   else {
+      hb_gtSetShutdownEvent( hb_itemGetNL( pEvent ) );
+   }
+}
