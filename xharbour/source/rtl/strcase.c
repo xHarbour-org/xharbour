@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.15 2003/10/27 09:09:54 paultucker Exp $
+ * $Id: strcase.c,v 1.16 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -199,6 +199,67 @@ HB_EXPORT char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG 
       lSLen--;
       ulLen--;
       pSource++;
+   }
+
+   while (ulLen--)
+   {
+      *pDest++ = '\0';
+   }
+
+   return pBuf;
+}
+
+/*
+ * This function copies szText to destination buffer.
+ * NOTE: Unlike the documentation for strncpy, this routine will always append
+ *       a null
+ */
+HB_EXPORT char * hb_strncpy( char * pDest, const char * pSource, ULONG ulLen )
+{
+   char *pBuf = pDest;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strncpy(%p, %s, %lu)", pDest, pSource, ulLen));
+
+   pDest[ ulLen ] ='\0';
+
+   while( ulLen && ( *pDest++ = *pSource++ ) != '\0' )
+   {
+      ulLen--;
+   }
+
+   while (ulLen--)
+   {
+      *pDest++ = '\0';
+   }
+
+   return pBuf;
+}
+
+/*
+ * This function copies trimed szText to destination buffer.
+ * NOTE: Unlike the documentation for strncpy, this routine will always append
+ *       a null
+ */
+HB_EXPORT char * hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen )
+{
+   char *pBuf = pDest;
+   LONG lSLen = strlen( pSource );
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strncpyTrim(%p, %s, %lu)", pDest, pSource, ulLen));
+
+   pDest[ ulLen ] ='\0';
+
+   while( lSLen && pSource[ lSLen - 1 ] == ' ')
+   {
+      lSLen--;
+   }
+
+   /* some compilers impliment toupper as a macro, and this has side effects! */
+   /* *pDest++ = toupper( *pSource++ ); */
+   while( ulLen && lSLen && ( *pDest++ = *pSource++ ) != '\0' )
+   {
+      lSLen--;
+      ulLen--;
    }
 
    while (ulLen--)

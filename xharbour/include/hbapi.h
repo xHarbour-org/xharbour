@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.142 2004/05/19 07:25:58 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.143 2004/07/21 23:03:49 fsgiudice Exp $
  */
 
 /*
@@ -458,6 +458,8 @@ extern ULONG    HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const ch
 extern char     HB_EXPORT * hb_strUpper( char * szText, ULONG ulLen ); /* convert an existing string buffer to upper case */
 extern char     HB_EXPORT * hb_strUpperCopy( char * szText, ULONG ulLen );
 extern char     HB_EXPORT * hb_strLower( char * szText, ULONG ulLen ); /* convert an existing string buffer to lower case */
+extern char     HB_EXPORT * hb_strncpy( char * pDest, const char * pSource, ULONG ulLen ); /* copy at most uiLen bytes from string buffer to another buffer and _always_ set 0 in destin buffer */
+extern char     HB_EXPORT * hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen );
 extern char     HB_EXPORT * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen ); /* copy an existing string buffer to another buffer, as upper case */
 extern char     HB_EXPORT * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen );
 extern double   HB_EXPORT hb_strVal( const char * szText, ... ); /* return the numeric value of a character string representation of a number */

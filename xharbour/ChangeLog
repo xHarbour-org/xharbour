@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3228 2004/07/28 22:28:08 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3229 2004/07/28 22:50:00 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-29 01:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapi.h
+  * xharbour/source/rtl/strcase.c
+    + two new functions: hb_strncpy() and hb_strncpyTrim() which works
+      in similar way to hb_strncpyUpper() and hb_strncpyUpperTrim()
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed problem with uppering KEY/FOR expressions and some additional
+      cleanups (mostly hb_strncpyUpper[Trim]() replaced by hb_strncpy[Trim]()
+
 2004-07-29 10:53 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rtl/fstemp.c
     - fix fsGetTempDirByCase() to test for NULL pointer pszTempDir
