@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.3 2003/05/29 20:44:23 druzus Exp $
+# $Id: xharbour.spec,v 1.4 2003/05/30 00:13:16 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -27,7 +27,7 @@
 %define hb_libs  vm pp rtl rdd dbfcdx dbfntx odbc macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca debug
 
 %define hb_cc    export HB_COMPILER="gcc"
-%define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3"
+%define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O2 $RPM_OPT_FLAGS"
 %define hb_arch  export HB_ARCHITECTURE="linux"
 %define hb_cmt   export HB_MT="%{hb_mt}"
 %define hb_cgt   export HB_GT_LIB="gt%{hb_gt}"
@@ -397,6 +397,26 @@ EOF
 chmod 755 $HB_BIN_INSTALL/%{hb_pref}-build
 $HB_BIN_INSTALL/%{hb_pref}-build mk-links
 
+mkdir -p $RPM_BUILD_ROOT/etc/{harbour,profile.d}
+install source/rtl/gtcrs/hb-charmap.def $RPM_BUILD_ROOT/etc/harbour/hb-charmap.def
+cat > $RPM_BUILD_ROOT/etc/harbour.cfg <<EOF
+CC=gcc
+CFLAGS=-c -I$_DEFAULT_INC_DIR -O2
+VERBOSE=YES
+DELTMP=YES
+EOF
+
+cat > $RPM_BUILD_ROOT/etc/profile.d/harb.sh <<EOF
+%{hb_cc}
+%{hb_arch}
+%{hb_bdir}
+%{hb_idir}
+%{hb_ldir}
+%{hb_cgt}
+export HB_LEX="SIMPLEX"
+export C_USR="-DHB_FM_STATISTICS_OFF -O2"
+EOF
+
 
 # Create PP
 pushd tests
@@ -539,6 +559,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc doc/en/
 %doc doc/es/
 
+%dir /etc/harbour
+/etc/harbour.cfg
+/etc/profile.d/harb.sh
+/etc/harbour/hb-charmap.def
 %{prefix}/bin/harbour
 %{prefix}/bin/hb-mkslib
 %{prefix}/bin/%{hb_pref}-build
