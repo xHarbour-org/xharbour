@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.23 2004/11/02 19:21:58 guerra000 Exp $
+ * $Id: achoice.prg,v 1.24 2004/12/06 01:15:11 guerra000 Exp $
  */
 
 /*
@@ -417,6 +417,8 @@ RETURN nRet
 #include "hbapi.h"
 #include "hbvm.h"
 #include "hbapierr.h"
+#include "hbapiitm.h"
+#include "hbstack.h"
 
 // Determines if any element is selectable
 HB_FUNC_STATIC( ISITEMSELECTABLE )
