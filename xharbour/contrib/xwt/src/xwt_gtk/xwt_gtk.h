@@ -52,6 +52,18 @@ typedef struct tag_xwt_gtk_image
    PHB_BASEARRAY owner;
 } XWT_GTK_IMAGE, *PXWT_GTK_IMAGE;
 
+
+typedef struct tag_xwt_gtk_layout
+{
+   int iMode;
+   GtkWidget *frame;
+   GtkWidget *layout; // it will be an HBox or a Vbox depending on iMode;
+   // We should not need an owner; leaving it here for future reference
+   // (Maybe option list boxes?)
+   PHB_BASEARRAY owner;
+} XWT_GTK_LAYOUT, *PXWT_GTK_LAYOUT;
+
+
 PXWT_WIDGET xwt_gtk_createButton( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createFrameWindow( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createLabel( PHB_ITEM pSelf );
@@ -62,9 +74,15 @@ PXWT_WIDGET xwt_gtk_createTextbox( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createWindow( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createImage( PHB_ITEM pSelf );
 
+PXWT_WIDGET xwt_gtk_createLayout( PHB_ITEM pSelf );
+
 void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
 void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
+BOOL xwt_gtk_loadimage( const char *fname );
 BOOL xwt_gtk_image_setSensible( PXWT_WIDGET wSelf );
-BOOL xwt_gtk_imageLoad( PXWT_WIDGET wSelf, const char *filename );
+
+BOOL xwt_gtk_layout_create_with_mode( PXWT_WIDGET wWidget, int mode );
+BOOL xwt_gtk_layout_set_box( PXWT_WIDGET wWidget );
+BOOL xwt_gtk_layout_reset_box( PXWT_WIDGET wWidget );
 
 #endif

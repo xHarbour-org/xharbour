@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.6 2003/04/01 22:36:27 gian Exp $
+   $Id: xwt.ch,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Definitions
 */
@@ -52,6 +52,13 @@
 #define XWT_PROP_CONTENT   20 // data * (number generally holds the size)
 #define XWT_PROP_RESOURCE  21 // Char * or number depending driver
 
+#define XWT_PROP_LAYMODE   30 // numeric, 0 or 1 (horiz/vert)
+#define XWT_PROP_PADDING   31 // numeric
+#define XWT_PROP_EXPAND    32 // BOOL
+#define XWT_PROP_FILL      33 // BOOL
+#define XWT_PROP_HOMOGENEOUS  34 // BOOL
+#define XWT_PROP_BOX       35    // BOOL
+#define XWT_PROP_BORDER    36    // Numeric
 
 #define XWT_PROP_FIXED      100 // bool
 #define XWT_PROP_MODAL      101 // bool
@@ -63,6 +70,10 @@
 
 /*User defined properties */
 #define XWT_PROP_USER       10000
+
+/* Widget layout mode */
+#define XWT_LM_HORIZ         0
+#define XWT_LM_VERT          1
 
 /* Widget visibility */
 #define XWT_VIS_HIDDEN       0
@@ -106,8 +117,7 @@
 #define XWT_TYPE_WINDOW   1
 #define XWT_TYPE_FRAME    2
 #define XWT_TYPE_PANE     3
-#define XWT_TYPE_VPANE    4
-#define XWT_TYPE_HPANE    5
+#define XWT_TYPE_LAYOUT   4
 #define XWT_TYPE_GRIDPANE 6
 
 #define XWT_TYPE_BUTTON   10

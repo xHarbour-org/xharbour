@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.3 2003/03/23 14:07:38 jonnymind Exp $
+ * $Id: Changelog,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,34 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-04-07 12:28 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  - src/hpane.prg
+  - src/vpane.prg
+  + src/layout.prg
+  + src/xwt_gtk/xwt_gtk_layout.c
+    ! The original idea of a vertical and an horizontal layout manager has been
+      converted in just one layout manager whose orientation must be decided
+      at creation moment.
+      Future implementation MAY alter this behavior and allow orientation
+      to be decided dynamically after widget creation.
+
+  * include/xwt.ch
+    + added defines for the layout object
+
+  * src/xwt_gtk/xwt_gtk.c
+  * src/xwt_gtk/xwt_gtk.h
+    + added management of layout object
+    ! fixed management of image object
+
+  - src/xwt_gtk/xwt_image.c
+  + src/xwt_gtk/xwt_gtk_image.c
+    ! fixed name of the file
+
+
+2003-04-03 13:04 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * README
+    + Added a technical note in README file. All interested develoers
+      are invited to read it.
 
 2003-04-02 02:51 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * INITIAL RELEASE

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.5 2003/03/28 14:44:40 gian Exp $
+   $Id: xwt_api.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -130,7 +130,7 @@ HB_FUNC( XWT_FASTRISEEVENT )
 
    /* free memory */
    hb_itemRelease( pEvent );
-   
+
    if( HB_VM_STACK.Return.type == HB_IT_LOGICAL && 
          HB_VM_STACK.Return.item.asLogical.value == TRUE )
    {
@@ -175,6 +175,9 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_VISIBLE:
       case XWT_PROP_FIXED:
       case XWT_PROP_MODAL:
+      case XWT_PROP_HOMOGENEOUS:
+      case XWT_PROP_EXPAND:
+      case XWT_PROP_FILL:
          prop.value.setting = hb_parl( 3 );
       break;
 
@@ -198,10 +201,13 @@ HB_FUNC( XWT_SETPROPERTY )
       break;
 
       //Numeric parameters
+      case XWT_PROP_PADDING:
+      case XWT_PROP_LAYMODE:
+      case XWT_PROP_BORDER:
       case XWT_PROP_VISIBILITY:
          prop.value.number = hb_parni( 3 );
       break;
-      
+
       //Array
       case XWT_PROP_SETMENUBAR:
       case XWT_PROP_RSTMENUBAR:
@@ -277,7 +283,7 @@ HB_FUNC( XWT_GETPROPERTY )
       case XWT_PROP_NAME:
          if( pParam1 != NULL )
          {
-            hb_itemPutC( pParam1, prop.value.text );
+            hb_itemPutC( pParam1, (const char *)prop.value.text );
             bRet = TRUE;
          }
       break;
