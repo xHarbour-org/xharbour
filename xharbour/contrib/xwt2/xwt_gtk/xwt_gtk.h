@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.3 2004/05/20 15:41:38 jonnymind Exp $
+   $Id: xwt_gtk.h,v 1.4 2004/05/21 12:21:34 jonnymind Exp $
 
    GTK interface
 */
@@ -55,7 +55,12 @@ typedef struct tag_xwt_gtk_base
    int width;
    int height;
    int nId;
+
    BOOL bBroadcast;
+   char * fgColor;   
+   char * bgColor;
+   char * textColor;   
+   char * baseColor;   
 } XWT_GTK_BASE, *PXWT_GTK_BASE;
 
 
@@ -324,4 +329,6 @@ BOOL xwt_gtk_disconnect( PXWT_WIDGET wWidget );
 
 int xwt_gtk_translate_key( unsigned int keyval );
 
+/**  Color utility **/
+//void widget_set_color( GtkWidget* entry, GdkColor* color, int component );
 #endif

@@ -3,16 +3,64 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_base.c,v 1.2 2004/05/17 09:27:11 jonnymind Exp $
+   $Id: xwt_gtk_base.c,v 1.3 2004/05/21 12:21:34 jonnymind Exp $
 
    GTK Base widget for XWT system.
 */
 
 #include "hbapi.h"
 #include "hashapi.h"
+#include "hbtrace.h"
 #include <xwt.ch>
+
 #include <xwt_api.h>
 #include <xwt_gtk.h>
+
+/* Added For Color support */
+
+#define FGCOLOR 1
+#define BGCOLOR 2
+#define BASECOLOR 3
+#define TEXTCOLOR 4
+
+void widget_set_color(GtkWidget* entry,GdkColor* color,int component)
+
+{
+   GtkStyle* newstyle;
+   gtk_widget_ensure_style(entry);
+
+   {
+
+      int i;
+      newstyle = gtk_style_copy(gtk_widget_get_style(entry));
+
+
+      for( i=0;i<5;++i) 
+      {
+         if (component & FGCOLOR)
+	 {
+            newstyle->fg[i] = *color;
+	 }
+         if (component &  BGCOLOR)
+	 {
+            newstyle->bg[i] = *color;
+         }
+         if (component &  TEXTCOLOR)
+	 {
+            newstyle->text[i] = *color;
+	 }    
+         if (component & BASECOLOR)
+	 {
+            newstyle->base[i] = *color;
+	 }    
+
+     }
+
+   }
+
+    gtk_widget_set_style(entry,newstyle);
+
+}
 
 /** Generic destructor common to many widgets */
 
@@ -328,6 +376,7 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    BOOL ret = TRUE;
    XWT_GTK_BASE *wSelf = (PXWT_GTK_BASE) widget->widget_data;
    GtkWidget *wTop = wSelf->top_widget( widget );
+   GtkWidget *wMain = wSelf->main_widget;
    char *szPropVal;
 
    if ( strcmp( prop, "x" ) == 0 )
@@ -395,6 +444,97 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
          ret = FALSE; // can't just give away focus
       }
    }
+   // fgcolor
+   else if ( strcmp( prop, "fgcolor" ) == 0 )
+   {
+   
+     GdkColor color;
+     wSelf->fgColor = hb_itemGetCPtr( pValue ) ;
+     gdk_color_parse (wSelf->fgColor, &color);
+     switch( widget->type )
+     {
+
+            case XWT_TYPE_TOGGLEBUTTON:
+            case XWT_TYPE_RADIOBUTTON:
+            case XWT_TYPE_CHECKBOX:
+      	       widget_set_color(wTop, &color,1);
+	       break;
+            case XWT_TYPE_BUTTON:	    
+	    case XWT_TYPE_LABEL:
+      	       widget_set_color(wMain, &color,1);
+	       break;
+      }	
+
+   }
+   
+   else if ( strcmp( prop, "bgcolor" ) == 0 )
+   {
+   
+     GdkColor color;
+     wSelf->bgColor = hb_itemGetCPtr( pValue ) ;
+     gdk_color_parse (wSelf->bgColor, &color);
+//     widget_set_color(GTK_LABEL(wMain), &color,2 );
+     switch( widget->type )
+     {
+
+            case XWT_TYPE_TOGGLEBUTTON:
+            case XWT_TYPE_RADIOBUTTON:
+            case XWT_TYPE_CHECKBOX:
+      	       widget_set_color(wTop, &color,1);
+	       break;
+            case XWT_TYPE_BUTTON:	    
+	    case XWT_TYPE_LABEL:	    
+      	       widget_set_color(wMain, &color,2);
+	       break;
+      }	
+
+   }
+
+   else if ( strcmp( prop, "textcolor" ) == 0 )
+   {
+      GdkColor color;
+      wSelf->textColor = hb_itemGetCPtr( pValue ) ;
+      gdk_color_parse (wSelf->textColor, &color);
+
+//      widget_set_color(GTK_LABEL(wMain), &color,4 );
+     switch( widget->type )
+     {
+
+            case XWT_TYPE_TOGGLEBUTTON:
+            case XWT_TYPE_RADIOBUTTON:
+            case XWT_TYPE_CHECKBOX:
+      	       widget_set_color(wTop, &color,1);
+	       break;
+            case XWT_TYPE_BUTTON:	    	    
+	    case XWT_TYPE_LABEL:	    
+      	       widget_set_color(wMain, &color,4);
+	       break;
+      }	
+
+   }
+   else if ( strcmp( prop, "basecolor" ) == 0 )
+   {
+      GdkColor color;
+      wSelf->baseColor = hb_itemGetCPtr( pValue ) ;
+      gdk_color_parse (wSelf->baseColor, &color);
+
+//      widget_set_color(GTK_LABEL(wMain), &color,3 );
+      switch( widget->type )
+      {
+
+            case XWT_TYPE_TOGGLEBUTTON:
+            case XWT_TYPE_RADIOBUTTON:
+            case XWT_TYPE_CHECKBOX:
+      	       widget_set_color(wTop, &color,1);
+	       break;
+            case XWT_TYPE_BUTTON:	    
+	    case XWT_TYPE_LABEL:	    
+      	       widget_set_color(wMain, &color,3);
+	       break;
+      }	
+
+   }
+
    else
    {
       ret = FALSE;
@@ -448,6 +588,34 @@ BOOL xwt_gtk_base_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    {
       hb_itemPutL( pValue, wSelf->bBroadcast );
    }
+   else if ( strcmp( prop, "fgcolor" ) == 0 )
+   {
+      if ( wSelf->fgColor )
+         hb_itemPutCPtr( pValue, wSelf->fgColor, 8);
+      else
+         hb_itemPutC( pValue,  ""  )	 ;
+   }
+   else if ( strcmp( prop, "bgcolor" ) == 0 )
+   { 
+      if ( wSelf->bgColor )
+         hb_itemPutCPtr( pValue, wSelf->bgColor, 8 );
+      else	 
+	 hb_itemPutC( pValue,  ""  );
+   }      
+   else if ( strcmp( prop, "textcolor" ) == 0 )
+   {
+      if ( wSelf->textColor )
+         hb_itemPutCPtr( pValue, wSelf->textColor, 8 );
+      else
+         hb_itemPutC( pValue,  ""  );	 
+   }   
+   else if ( strcmp( prop, "basecolor" ) == 0 )
+   {
+      if ( wSelf->baseColor )
+         hb_itemPutCPtr( pValue, wSelf->baseColor, 8 );
+      else
+         hb_itemPutC( pValue,  ""  );	 
+   }   
    else
    {
       ret = FALSE;
@@ -471,6 +639,38 @@ BOOL xwt_gtk_base_getall( PXWT_WIDGET widget, PHB_ITEM pRet )
    hb_hashAddChar( pRet, "height", hb_itemPutNI( &hbValue, wSelf->height ) );
    hb_hashAddChar( pRet, "id", hb_itemPutNI( &hbValue, wSelf->nId ) );
    hb_hashAddChar( pRet, "broadcast", hb_itemPutL( &hbValue, wSelf->bBroadcast ) );
+   if (!wSelf->fgColor )
+   {
+   hb_hashAddChar( pRet, "fgcolor", hb_itemPutC( &hbValue, "" ) ) ;
+   }
+   else
+   {
+      hb_hashAddChar( pRet, "fgcolor", hb_itemPutCPtr( &hbValue, wSelf->fgColor, 8 ) );
+   }
+   if(wSelf->baseColor  != NULL )
+   {
+      hb_hashAddChar( pRet, "basecolor", hb_itemPutCPtr( &hbValue, wSelf->baseColor, 8) );
+   }
+   else
+   {
+      hb_hashAddChar( pRet, "basecolor", hb_itemPutC( &hbValue, "" ) );
+   }
+   if( wSelf->textColor != NULL )
+   {
+      hb_hashAddChar( pRet, "textcolor", hb_itemPutCPtr( &hbValue, wSelf->textColor, 8 ) );   
+   }
+   else
+   {
+      hb_hashAddChar( pRet, "textcolor", hb_itemPutC( &hbValue, "" ) );      
+   }
+   if(  wSelf->bgColor  != NULL )
+   {
+      hb_hashAddChar( pRet, "bgcolor", hb_itemPutCPtr( &hbValue, wSelf->bgColor, 8  ) );   
+   }
+   else
+   {
+      hb_hashAddChar( pRet, "bgcolor", hb_itemPutC( &hbValue,  ""  ) );   
+   }
    if ( GTK_WIDGET_VISIBLE(wTop) )
    {
       hb_itemPutCRawStatic( &hbValue, "visible", 7 );

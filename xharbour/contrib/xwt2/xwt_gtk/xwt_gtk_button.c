@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_button.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
+   $Id: xwt_gtk_button.c,v 1.2 2004/05/17 09:27:11 jonnymind Exp $
 
    GTK interface - management of button widget
 */
@@ -139,6 +139,11 @@ BOOL xwt_gtk_createButton( PXWT_WIDGET xwtData )
    widget = (PXWT_GTK_IDWID) hb_xgrab( sizeof( XWT_GTK_IDWID ) );
    
    widget->INH( nId ) = 0;
+   widget->INH( fgColor ) = NULL;       
+   widget->INH( bgColor ) = NULL;          
+   widget->INH( textColor ) = NULL;          
+   widget->INH( baseColor ) = NULL;          
+   
    widget->INH( main_widget ) = button;
    widget->INH( top_widget ) = xwt_gtk_base_topwidget;
    strcpy(widget->szEventName, "clicked");

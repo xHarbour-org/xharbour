@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_label.c,v 1.5 2003/08/27 20:09:24 xthefull Exp $
+   $Id: xwt_gtk_label.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
 
    Label - Basic text label to draw on the screen
 */
@@ -12,17 +12,19 @@
 #include <xwt.ch>
 #include <xwt_api.h>
 #include <xwt_gtk.h>
-
+#include <hbtrace.h>
 static BOOL xwt_gtk_label_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
 {
    BOOL ret = TRUE;
    PXWT_GTK_BASE wSelf = (PXWT_GTK_BASE) widget->widget_data;
    GtkWidget *wMain = wSelf->main_widget;
-
+   
    if ( strcmp( prop, "text" ) == 0 )
    {
+
       gtk_label_set_label (GTK_LABEL(wMain), hb_itemGetCPtr( pValue ) );
    }
+   
    else {
       ret = xwt_gtk_sensible_setprop( widget, prop, pValue );
    }
@@ -79,6 +81,10 @@ BOOL xwt_gtk_createLabel( PXWT_WIDGET xwtData )
    sens = (PXWT_GTK_SENSIBLE) hb_xgrab( sizeof( XWT_GTK_SENSIBLE ) );
    
    sens->INH( INH( nId )) = 0;       
+   sens->INH( INH( fgColor )) = NULL;       
+   sens->INH( INH( bgColor )) = NULL;          
+   sens->INH( INH( textColor )) = NULL;          
+   sens->INH( INH( baseColor )) = NULL;          
    sens->INH( INH( main_widget )) = label;
    sens->INH( INH( top_widget )) = xwt_gtk_sensible_topwidget;
    sens->INH( align ) = NULL;
