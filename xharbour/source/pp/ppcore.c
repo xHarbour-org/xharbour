@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.132 2004/03/02 21:05:16 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.133 2004/03/06 19:54:31 ronpinkas Exp $
  */
 
 /*
@@ -2474,7 +2474,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 {
   BOOL endTranslation = FALSE;
   int ipos;
-  char * lastopti[ 64 ], * strtopti = NULL, * strtptri = NULL;
+  char * lastopti[ HB_PP_MAX_NESTED_OPTIONALS ], * strtopti = NULL, * strtptri = NULL;
   char * ptri = inputLine, * ptr, tmpname[ MAX_NAME ];
   int isWordInside = 0;
 
@@ -4014,8 +4014,8 @@ static BOOL CheckOptional( char * ptrmp, char * ptri, char * ptro, int * lenres,
    int save_numBr = s_numBrackets, save_Repeate = s_Repeate;
    BOOL endTranslation = FALSE;
    BOOL bResult = TRUE;
-   char * lastInputptr[ 5 ];
-   char * lastopti[ 3 ], *ptr;
+   char * lastInputptr[ HB_PP_MAX_NESTED_OPTIONALS ];
+   char * lastopti[ HB_PP_MAX_NESTED_OPTIONALS ], *ptr;
 
    HB_SYMBOL_UNUSED( com_or_tra );
 
@@ -4034,7 +4034,13 @@ static BOOL CheckOptional( char * ptrmp, char * ptri, char * ptro, int * lenres,
            s_numBrackets++;
            s_aIsRepeate[ s_Repeate ] = 0;
            lastInputptr[s_Repeate] = ptri;
-           lastopti[s_Repeate++] = ptrmp;
+           lastopti[s_Repeate] = ptrmp;
+		   s_Repeate++;
+           if( s_Repeate == HB_PP_MAX_NESTED_OPTIONALS )
+           {
+              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_OPTIONALS, NULL, NULL );
+           }
+
            ptrmp++;
            break;
 

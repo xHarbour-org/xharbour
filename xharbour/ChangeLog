@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2512 2004/03/06 20:12:53 druzus Exp $
+ * $Id: ChangeLog,v 1.2513 2004/03/07 00:01:17 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-06 17:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Apply recent HB_PP_MAX_NESTED_OPTIONALS fix to CheckOptional() too.
+
 2004-03-07 07:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/direct.c
     % directly assign values to subarrays w/o temporary medium in function:
