@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3627 2004/11/25 15:31:39 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3628 2004/11/25 17:10:12 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-25 16:36 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/gtwin/gtwin.c
+    * OSVERSIONINFO structure moved to a static variable.
+    + Added altgr_key item into tag_ClipKeyCode, for avoid conflicts
+      with characters typed with AltGr in foregin keyboards.
+    * "Upper row keys" hack under Win98 is only performed on Win9x
+      environment.
 
 2004-11-25 14:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * include/gfx.ch

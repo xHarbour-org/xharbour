@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.74 2004/10/28 04:33:25 paultucker Exp $
+ * $Id: gtwin.c,v 1.75 2004/11/24 02:48:45 guerra000 Exp $
  */
 
 /*
@@ -183,11 +183,14 @@ int    s_mouseLast;               /* Last mouse button to be pressed            
 extern int hb_mouse_iCol;
 extern int hb_mouse_iRow;
 
+static OSVERSIONINFO s_osv;
+
 typedef struct tag_ClipKeyCode {
     int key;
     int alt_key;
     int ctrl_key;
     int shift_key;
+    int altgr_key;
 } ClipKeyCode;
 
 #define CLIP_STDKEY_COUNT      96
@@ -197,102 +200,102 @@ typedef struct tag_ClipKeyCode {
 
 
 static const ClipKeyCode stdKeyTab[CLIP_STDKEY_COUNT] = {
-    { 32,                  0,             0,         0}, /* ' ' */
-    { 33,                  0,             0,         0}, /* '!' */
-    { 34,                  0,             0,         0}, /* '"' */
-    { 35,                  0,             0,         0}, /* '#' */
-    { 36,                  0,             0,         0}, /* '$' */
-    { 37,                  0,             0,         0}, /* '%' */
-    { 38,                  0,             0,         0}, /* '&' */
-    { 39,        K_ALT_QUOTE,             7,         0}, /* ''' */
-    { 40,                  0,             0,         0}, /* '(' */
-    { 41,                  0,             0,         0}, /* ')' */
-    { 42,                  0,             0,         0}, /* '*' */
-    { 43,                  0,             0,         0}, /* '+' */
-    { 44,        K_ALT_COMMA,             0,         0}, /* ',' */
-    { 45,        K_ALT_MINUS,           398,         0}, /* '-' */
-    { 46,       K_ALT_PERIOD,             0,         0}, /* '.' */
-    { 47,        K_ALT_SLASH,             0,         0}, /* '/' */
-    { 48,            K_ALT_0,             0,         0}, /* '0' */
-    { 49,            K_ALT_1,             0,         0}, /* '1' */
-    { 50,            K_ALT_2,           259,         0}, /* '2' */
-    { 51,            K_ALT_3,            27,         0}, /* '3' */
-    { 52,            K_ALT_4,            28,         0}, /* '4' */
-    { 53,            K_ALT_5,            29,         0}, /* '5' */
-    { 54,            K_ALT_6,            30,         0}, /* '6' */
-    { 55,            K_ALT_7,            31,         0}, /* '7' */
-    { 56,            K_ALT_8,           127,         0}, /* '8' */
-    { 57,            K_ALT_9,             0,         0}, /* '9' */
-    { 58,                  0,             0,         0}, /* ':' */
-    { 59,           K_ALT_SC,             0,         0}, /* ';' */
-    { 60,                  0,             0,         0}, /* '<' */
-    { 61,       K_ALT_EQUALS,             0,         0}, /* '=' */
-    { 62,                  0,             0,         0}, /* '>' */
-    { 63,                  0, K_CTRL_QUESTION,       0}, /* '?' */
-    { 64,                  0,             0,         0}, /* '@' */
-    { 65,            K_ALT_A,      K_CTRL_A,         0}, /* 'A' */
-    { 66,            K_ALT_B,      K_CTRL_B,         0}, /* 'B' */
-    { 67,            K_ALT_C,      K_CTRL_C,         0}, /* 'C' */
-    { 68,            K_ALT_D,      K_CTRL_D,         0}, /* 'D' */
-    { 69,            K_ALT_E,      K_CTRL_E,         0}, /* 'E' */
-    { 70,            K_ALT_F,      K_CTRL_F,         0}, /* 'F' */
-    { 71,            K_ALT_G,      K_CTRL_G,         0}, /* 'G' */
-    { 72,            K_ALT_H,      K_CTRL_H,         0}, /* 'H' */
-    { 73,            K_ALT_I,      K_CTRL_I,         0}, /* 'I' */
-    { 74,            K_ALT_J,      K_CTRL_J,         0}, /* 'J' */
-    { 75,            K_ALT_K,      K_CTRL_K,         0}, /* 'K' */
-    { 76,            K_ALT_L,      K_CTRL_L,         0}, /* 'L' */
-    { 77,            K_ALT_M,      K_CTRL_M,         0}, /* 'M' */
-    { 78,            K_ALT_N,      K_CTRL_N,         0}, /* 'N' */
-    { 79,            K_ALT_O,      K_CTRL_O,         0}, /* 'O' */
-    { 80,            K_ALT_P,      K_CTRL_P,         0}, /* 'P' */
-    { 81,            K_ALT_Q,      K_CTRL_Q,         0}, /* 'Q' */
-    { 82,            K_ALT_R,      K_CTRL_R,         0}, /* 'R' */
-    { 83,            K_ALT_S,      K_CTRL_S,         0}, /* 'S' */
-    { 84,            K_ALT_T,      K_CTRL_T,         0}, /* 'T' */
-    { 85,            K_ALT_U,      K_CTRL_U,         0}, /* 'U' */
-    { 86,            K_ALT_V,      K_CTRL_V,         0}, /* 'V' */
-    { 87,            K_ALT_W,      K_CTRL_W,         0}, /* 'W' */
-    { 88,            K_ALT_X,      K_CTRL_X,         0}, /* 'X' */
-    { 89,            K_ALT_Y,      K_CTRL_Y,         0}, /* 'Y' */
-    { 90,            K_ALT_Z,      K_CTRL_Z,         0}, /* 'Z' */
-    { 91,          K_ALT_OSB,             0,         0}, /* '[' */
-    { 92,    K_ALT_BACKSLASH,             0,         0}, /* '\' */
-    { 93,          K_ALT_CSB,             0,         0}, /* ']' */
-    { 94,            K_ALT_6,             0,         0}, /* '^' */
-    { 95,                  0,             0,         0}, /* '_' */
-    { 96,    K_ALT_BACKQUOTE,             0,         0}, /* '`' */
-    { 97,            K_ALT_A,      K_CTRL_A,         0}, /* 'a' */
-    { 98,            K_ALT_B,      K_CTRL_B,         0}, /* 'b' */
-    { 99,            K_ALT_C,      K_CTRL_C,         0}, /* 'c' */
-    {100,            K_ALT_D,      K_CTRL_D,         0}, /* 'd' */
-    {101,            K_ALT_E,      K_CTRL_E,         0}, /* 'e' */
-    {102,            K_ALT_F,      K_CTRL_F,         0}, /* 'f' */
-    {103,            K_ALT_G,      K_CTRL_G,         0}, /* 'g' */
-    {104,            K_ALT_H,      K_CTRL_H,         0}, /* 'h' */
-    {105,            K_ALT_I,      K_CTRL_I,         0}, /* 'i' */
-    {106,            K_ALT_J,      K_CTRL_J,         0}, /* 'j' */
-    {107,            K_ALT_K,      K_CTRL_K,         0}, /* 'k' */
-    {108,            K_ALT_L,      K_CTRL_L,         0}, /* 'l' */
-    {109,            K_ALT_M,      K_CTRL_M,         0}, /* 'm' */
-    {110,            K_ALT_N,      K_CTRL_N,         0}, /* 'n' */
-    {111,            K_ALT_O,      K_CTRL_O,         0}, /* 'o' */
-    {112,            K_ALT_P,      K_CTRL_P,         0}, /* 'p' */
-    {113,            K_ALT_Q,      K_CTRL_Q,         0}, /* 'q' */
-    {114,            K_ALT_R,      K_CTRL_R,         0}, /* 'r' */
-    {115,            K_ALT_S,      K_CTRL_S,         0}, /* 's' */
-    {116,            K_ALT_T,      K_CTRL_T,         0}, /* 't' */
-    {117,            K_ALT_U,      K_CTRL_U,         0}, /* 'u' */
-    {118,            K_ALT_V,      K_CTRL_V,         0}, /* 'v' */
-    {119,            K_ALT_W,      K_CTRL_W,         0}, /* 'w' */
-    {120,            K_ALT_X,      K_CTRL_X,         0}, /* 'x' */
-    {121,            K_ALT_Y,      K_CTRL_Y,         0}, /* 'y' */
-    {122,            K_ALT_Z,      K_CTRL_Z,         0}, /* 'z' */
-    {123,                282,            27,         0}, /* '{' */
-    {124,                299,            28,         0}, /* '|' */
-    {125,                283,            29,         0}, /* '}' */
-    {126,                297,           297,         0}, /* '~' */
-    {127,           K_ALT_BS,           127,         0}, /* '' */
+    { 32,                  0,             0,         0,             0}, // ' '
+    { 33,                  0,             0,         0,             0}, // '!'
+    { 34,                  0,             0,         0,             0}, // '"'
+    { 35,                  0,             0,         0,             0}, // '#'
+    { 36,                  0,             0,         0,             0}, // '$'
+    { 37,                  0,             0,         0,             0}, // '%'
+    { 38,                  0,             0,         0,             0}, // '&'
+    { 39,        K_ALT_QUOTE,             7,         0,             0}, // '''
+    { 40,                  0,             0,         0,             0}, // '('
+    { 41,                  0,             0,         0,             0}, // ')'
+    { 42,                  0,             0,         0,             0}, // '*'
+    { 43,                  0,             0,         0,             0}, // '+'
+    { 44,        K_ALT_COMMA,             0,         0,             0}, // ','
+    { 45,        K_ALT_MINUS,           398,         0,             0}, // '-'
+    { 46,       K_ALT_PERIOD,             0,         0,             0}, // '.'
+    { 47,        K_ALT_SLASH,             0,         0,             0}, // '/'
+    { 48,            K_ALT_0,             0,         0,       K_ALT_0}, // '0'
+    { 49,            K_ALT_1,             0,         0,       K_ALT_1}, // '1'
+    { 50,            K_ALT_2,           259,         0,       K_ALT_2}, // '2'
+    { 51,            K_ALT_3,            27,         0,       K_ALT_3}, // '3'
+    { 52,            K_ALT_4,            28,         0,       K_ALT_4}, // '4'
+    { 53,            K_ALT_5,            29,         0,       K_ALT_5}, // '5'
+    { 54,            K_ALT_6,            30,         0,       K_ALT_6}, // '6'
+    { 55,            K_ALT_7,            31,         0,       K_ALT_7}, // '7'
+    { 56,            K_ALT_8,           127,         0,       K_ALT_8}, // '8'
+    { 57,            K_ALT_9,             0,         0,       K_ALT_9}, // '9'
+    { 58,                  0,             0,         0,             0}, // ':'
+    { 59,           K_ALT_SC,             0,         0,             0}, // ';'
+    { 60,                  0,             0,         0,             0}, // '<'
+    { 61,       K_ALT_EQUALS,             0,         0,             0}, // '='
+    { 62,                  0,             0,         0,             0}, // '>'
+    { 63,                  0, K_CTRL_QUESTION,       0,             0}, // '?'
+    { 64,                  0,             0,         0,             0}, // '@'
+    { 65,            K_ALT_A,      K_CTRL_A,         0,       K_ALT_A}, // 'A'
+    { 66,            K_ALT_B,      K_CTRL_B,         0,       K_ALT_B}, // 'B'
+    { 67,            K_ALT_C,      K_CTRL_C,         0,       K_ALT_C}, // 'C'
+    { 68,            K_ALT_D,      K_CTRL_D,         0,       K_ALT_D}, // 'D'
+    { 69,            K_ALT_E,      K_CTRL_E,         0,       K_ALT_E}, // 'E'
+    { 70,            K_ALT_F,      K_CTRL_F,         0,       K_ALT_F}, // 'F'
+    { 71,            K_ALT_G,      K_CTRL_G,         0,       K_ALT_G}, // 'G'
+    { 72,            K_ALT_H,      K_CTRL_H,         0,       K_ALT_H}, // 'H'
+    { 73,            K_ALT_I,      K_CTRL_I,         0,       K_ALT_I}, // 'I'
+    { 74,            K_ALT_J,      K_CTRL_J,         0,       K_ALT_J}, // 'J'
+    { 75,            K_ALT_K,      K_CTRL_K,         0,       K_ALT_K}, // 'K'
+    { 76,            K_ALT_L,      K_CTRL_L,         0,       K_ALT_L}, // 'L'
+    { 77,            K_ALT_M,      K_CTRL_M,         0,       K_ALT_M}, // 'M'
+    { 78,            K_ALT_N,      K_CTRL_N,         0,       K_ALT_N}, // 'N'
+    { 79,            K_ALT_O,      K_CTRL_O,         0,       K_ALT_O}, // 'O'
+    { 80,            K_ALT_P,      K_CTRL_P,         0,       K_ALT_P}, // 'P'
+    { 81,            K_ALT_Q,      K_CTRL_Q,         0,       K_ALT_Q}, // 'Q'
+    { 82,            K_ALT_R,      K_CTRL_R,         0,       K_ALT_R}, // 'R'
+    { 83,            K_ALT_S,      K_CTRL_S,         0,       K_ALT_S}, // 'S'
+    { 84,            K_ALT_T,      K_CTRL_T,         0,       K_ALT_T}, // 'T'
+    { 85,            K_ALT_U,      K_CTRL_U,         0,       K_ALT_U}, // 'U'
+    { 86,            K_ALT_V,      K_CTRL_V,         0,       K_ALT_V}, // 'V'
+    { 87,            K_ALT_W,      K_CTRL_W,         0,       K_ALT_W}, // 'W'
+    { 88,            K_ALT_X,      K_CTRL_X,         0,       K_ALT_X}, // 'X'
+    { 89,            K_ALT_Y,      K_CTRL_Y,         0,       K_ALT_Y}, // 'Y'
+    { 90,            K_ALT_Z,      K_CTRL_Z,         0,       K_ALT_Z}, // 'Z'
+    { 91,          K_ALT_OSB,             0,         0,             0}, // '['
+    { 92,    K_ALT_BACKSLASH,             0,         0,             0}, // '\'
+    { 93,          K_ALT_CSB,             0,         0,             0}, // ']'
+    { 94,            K_ALT_6,             0,         0,             0}, // '^'
+    { 95,                  0,             0,         0,             0}, // '_'
+    { 96,    K_ALT_BACKQUOTE,             0,         0,             0}, // '`'
+    { 97,            K_ALT_A,      K_CTRL_A,         0,       K_ALT_A}, // 'a'
+    { 98,            K_ALT_B,      K_CTRL_B,         0,       K_ALT_B}, // 'b'
+    { 99,            K_ALT_C,      K_CTRL_C,         0,       K_ALT_C}, // 'c'
+    {100,            K_ALT_D,      K_CTRL_D,         0,       K_ALT_D}, // 'd'
+    {101,            K_ALT_E,      K_CTRL_E,         0,       K_ALT_E}, // 'e'
+    {102,            K_ALT_F,      K_CTRL_F,         0,       K_ALT_F}, // 'f'
+    {103,            K_ALT_G,      K_CTRL_G,         0,       K_ALT_G}, // 'g'
+    {104,            K_ALT_H,      K_CTRL_H,         0,       K_ALT_H}, // 'h'
+    {105,            K_ALT_I,      K_CTRL_I,         0,       K_ALT_I}, // 'i'
+    {106,            K_ALT_J,      K_CTRL_J,         0,       K_ALT_J}, // 'j'
+    {107,            K_ALT_K,      K_CTRL_K,         0,       K_ALT_K}, // 'k'
+    {108,            K_ALT_L,      K_CTRL_L,         0,       K_ALT_L}, // 'l'
+    {109,            K_ALT_M,      K_CTRL_M,         0,       K_ALT_M}, // 'm'
+    {110,            K_ALT_N,      K_CTRL_N,         0,       K_ALT_N}, // 'n'
+    {111,            K_ALT_O,      K_CTRL_O,         0,       K_ALT_O}, // 'o'
+    {112,            K_ALT_P,      K_CTRL_P,         0,       K_ALT_P}, // 'p'
+    {113,            K_ALT_Q,      K_CTRL_Q,         0,       K_ALT_Q}, // 'q'
+    {114,            K_ALT_R,      K_CTRL_R,         0,       K_ALT_R}, // 'r'
+    {115,            K_ALT_S,      K_CTRL_S,         0,       K_ALT_S}, // 's'
+    {116,            K_ALT_T,      K_CTRL_T,         0,       K_ALT_T}, // 't'
+    {117,            K_ALT_U,      K_CTRL_U,         0,       K_ALT_U}, // 'u'
+    {118,            K_ALT_V,      K_CTRL_V,         0,       K_ALT_V}, // 'v'
+    {119,            K_ALT_W,      K_CTRL_W,         0,       K_ALT_W}, // 'w'
+    {120,            K_ALT_X,      K_CTRL_X,         0,       K_ALT_X}, // 'x'
+    {121,            K_ALT_Y,      K_CTRL_Y,         0,       K_ALT_Y}, // 'y'
+    {122,            K_ALT_Z,      K_CTRL_Z,         0,       K_ALT_Z}, // 'z'
+    {123,                282,            27,         0,             0}, // '{'
+    {124,                299,            28,         0,             0}, // '|'
+    {125,                283,            29,         0,             0}, // '}'
+    {126,                297,           297,         0,             0}, // '~'
+    {127,           K_ALT_BS,           127,         0,      K_ALT_BS}, // ''
 };
 
 #define EXKEY_F1              ( 0 )
@@ -331,45 +334,45 @@ static const ClipKeyCode stdKeyTab[CLIP_STDKEY_COUNT] = {
 #define EXKEY_KPDIVIDE        (33 )
 
 static const ClipKeyCode extKeyTab[CLIP_EXTKEY_COUNT] = {
-    {K_F1,          K_ALT_F1,     K_CTRL_F1,   K_SH_F1}, /*  00 */
-    {K_F2,          K_ALT_F2,     K_CTRL_F2,   K_SH_F2}, /*  01 */
-    {K_F3,          K_ALT_F3,     K_CTRL_F3,   K_SH_F3}, /*  02 */
-    {K_F4,          K_ALT_F4,     K_CTRL_F4,   K_SH_F4}, /*  03 */
-    {K_F5,          K_ALT_F5,     K_CTRL_F5,   K_SH_F5}, /*  04 */
-    {K_F6,          K_ALT_F6,     K_CTRL_F6,   K_SH_F6}, /*  05 */
-    {K_F7,          K_ALT_F7,     K_CTRL_F7,   K_SH_F7}, /*  06 */
-    {K_F8,          K_ALT_F8,     K_CTRL_F8,   K_SH_F8}, /*  07 */
-    {K_F9,          K_ALT_F9,     K_CTRL_F9,   K_SH_F9}, /*  08 */
-    {K_F10,        K_ALT_F10,    K_CTRL_F10,  K_SH_F10}, /*  09 */
-    {K_F11,        K_ALT_F11,    K_CTRL_F11,  K_SH_F11}, /*  10 */
-    {K_F12,        K_ALT_F12,    K_CTRL_F12,  K_SH_F12}, /*  11 */
+    {K_F1,          K_ALT_F1,     K_CTRL_F1,   K_SH_F1,    K_ALT_F1}, //  00
+    {K_F2,          K_ALT_F2,     K_CTRL_F2,   K_SH_F2,    K_ALT_F2}, //  01
+    {K_F3,          K_ALT_F3,     K_CTRL_F3,   K_SH_F3,    K_ALT_F3}, //  02
+    {K_F4,          K_ALT_F4,     K_CTRL_F4,   K_SH_F4,    K_ALT_F4}, //  03
+    {K_F5,          K_ALT_F5,     K_CTRL_F5,   K_SH_F5,    K_ALT_F5}, //  04
+    {K_F6,          K_ALT_F6,     K_CTRL_F6,   K_SH_F6,    K_ALT_F6}, //  05
+    {K_F7,          K_ALT_F7,     K_CTRL_F7,   K_SH_F7,    K_ALT_F7}, //  06
+    {K_F8,          K_ALT_F8,     K_CTRL_F8,   K_SH_F8,    K_ALT_F8}, //  07
+    {K_F9,          K_ALT_F9,     K_CTRL_F9,   K_SH_F9,    K_ALT_F9}, //  08
+    {K_F10,        K_ALT_F10,    K_CTRL_F10,  K_SH_F10,   K_ALT_F10}, //  09
+    {K_F11,        K_ALT_F11,    K_CTRL_F11,  K_SH_F11,   K_ALT_F11}, //  10
+    {K_F12,        K_ALT_F12,    K_CTRL_F12,  K_SH_F12,   K_ALT_F12}, //  11
 
-    {K_UP,          K_ALT_UP,     K_CTRL_UP,   K_SH_UP}, /*  12 */
-    {K_DOWN,      K_ALT_DOWN,   K_CTRL_DOWN, K_SH_DOWN}, /*  13 */
-    {K_LEFT,      K_ALT_LEFT,   K_CTRL_LEFT, K_SH_LEFT}, /*  14 */
-    {K_RIGHT,    K_ALT_RIGHT,  K_CTRL_RIGHT,K_SH_RIGHT}, /*  15 */
-    {K_INS,        K_ALT_INS,    K_CTRL_INS,  K_SH_INS}, /*  16 */
-    {K_DEL,        K_ALT_DEL,    K_CTRL_DEL,  K_SH_DEL}, /*  17 */
-    {K_HOME,      K_ALT_HOME,   K_CTRL_HOME, K_SH_HOME}, /*  18 */
-    {K_END,        K_ALT_END,    K_CTRL_END,  K_SH_END}, /*  19 */
-    {K_PGUP,      K_ALT_PGUP,   K_CTRL_PGUP, K_SH_PGUP}, /*  20 */
-    {K_PGDN,      K_ALT_PGDN,   K_CTRL_PGDN, K_SH_PGDN}, /*  21 */
+    {K_UP,          K_ALT_UP,     K_CTRL_UP,   K_SH_UP,    K_ALT_UP}, //  12
+    {K_DOWN,      K_ALT_DOWN,   K_CTRL_DOWN, K_SH_DOWN,  K_ALT_DOWN}, //  13
+    {K_LEFT,      K_ALT_LEFT,   K_CTRL_LEFT, K_SH_LEFT,  K_ALT_LEFT}, //  14
+    {K_RIGHT,    K_ALT_RIGHT,  K_CTRL_RIGHT,K_SH_RIGHT, K_ALT_RIGHT}, //  15
+    {K_INS,        K_ALT_INS,    K_CTRL_INS,  K_SH_INS,   K_ALT_INS}, //  16
+    {K_DEL,        K_ALT_DEL,    K_CTRL_DEL,  K_SH_DEL,   K_ALT_DEL}, //  17
+    {K_HOME,      K_ALT_HOME,   K_CTRL_HOME, K_SH_HOME,  K_ALT_HOME}, //  18
+    {K_END,        K_ALT_END,    K_CTRL_END,  K_SH_END,   K_ALT_END}, //  19
+    {K_PGUP,      K_ALT_PGUP,   K_CTRL_PGUP, K_SH_PGUP,  K_ALT_PGUP}, //  20
+    {K_PGDN,      K_ALT_PGDN,   K_CTRL_PGDN, K_SH_PGDN,  K_ALT_PGDN}, //  21
 
-    {K_BS,          K_ALT_BS,           127,         0}, /*  22 */
-    {K_TAB,        K_ALT_TAB,    K_CTRL_TAB,  K_SH_TAB}, /*  23 */
-    {K_ESC,        K_ALT_ESC,         K_ESC,         0}, /*  24 */
+    {K_BS,          K_ALT_BS,           127,         0,    K_ALT_BS}, //  22
+    {K_TAB,        K_ALT_TAB,    K_CTRL_TAB,  K_SH_TAB,   K_ALT_TAB}, //  23
+    {K_ESC,        K_ALT_ESC,         K_ESC,         0,   K_ALT_TAB}, //  24
 
-    {K_ENTER,    K_ALT_ENTER,  K_CTRL_ENTER,K_SH_ENTER}, /*  25 */
+    {K_ENTER,    K_ALT_ENTER,  K_CTRL_ENTER,K_SH_ENTER, K_ALT_ENTER}, //  25
 
-    {K_ENTER,   KP_ALT_ENTER,  K_CTRL_ENTER,         0}, /*  26 */
-    {KP_CENTER,            0,     KP_CTRL_5,         0}, /*  27 */
-    {0,                    0, K_CTRL_PRTSCR,         0}, /*  28 */
-    {0,                    0, HB_BREAK_FLAG,         0}, /*  29 */
+    {K_ENTER,   KP_ALT_ENTER,  K_CTRL_ENTER,         0,KP_ALT_ENTER}, //  26
+    {KP_CENTER,            0,     KP_CTRL_5,         0,           0}, //  27
+    {0,                    0, K_CTRL_PRTSCR,         0,           0}, //  28
+    {0,                    0, HB_BREAK_FLAG,         0,           0}, //  29
 /* under win98 it seems that keypad / key is 'enhanced' */
-    {42,     KP_ALT_ASTERISK,KP_CTRL_ASTERISK,       0}, /*  30 */
-    {43,         KP_ALT_PLUS,  KP_CTRL_PLUS,         0}, /*  31 */
-    {45,        KP_ALT_MINUS, KP_CTRL_MINUS,         0}, /*  32 */
-    {47,        KP_ALT_SLASH, KP_CTRL_SLASH,         0}  /*  33 */
+    {42,     KP_ALT_ASTERISK,KP_CTRL_ASTERISK,    0,KP_ALT_ASTERISK}, //  30
+    {43,         KP_ALT_PLUS,  KP_CTRL_PLUS,         0, KP_ALT_PLUS}, //  31
+    {45,        KP_ALT_MINUS, KP_CTRL_MINUS,         0,KP_ALT_MINUS}, //  32
+    {47,        KP_ALT_SLASH, KP_CTRL_SLASH,         0,KP_ALT_SLASH}  //  33
 
 };
 
@@ -569,13 +572,12 @@ static void HB_GT_FUNC(gt_xInitScreenParam( void ))
 
 void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
-    OSVERSIONINFO osv;
     int i;
 
     /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
-    osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    GetVersionEx(&osv);
-    if (osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+    s_osv.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
+    GetVersionEx( &s_osv );
+    if( s_osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
     {
         s_dwAltGrBits = RIGHT_ALT_PRESSED;
     }
@@ -1651,13 +1653,13 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
             ch = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar;
 
-            if ( ( dwState & CAPSLOCK_ON ) && !( dwState & 0x001F ) )
+            // Under Win98, Upper row keys are affected by caps-lock
+            // and should not be.
+            // TODO: *** Fix it to foregin keyboards!!! ***
+            if ( ( dwState & CAPSLOCK_ON ) && !( dwState & 0x001F ) && s_osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
             {
                switch (wKey)
                {
-                  /* under Win98, Upper row keys are affected by caps-lock
-                     and should not be.
-                   */
                   case 2:
                   case 3:
                   case 4:
@@ -1845,9 +1847,13 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                      ch = K_CTRL_SH_TAB;
                   }
                }
-               else if( dwState & ( LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED ) )
+               else if( dwState & LEFT_ALT_PRESSED )
                {
                   ch = clipKey->alt_key;
+               }
+               else if( dwState & RIGHT_ALT_PRESSED )
+               {
+                  ch = clipKey->altgr_key;
                }
                else if( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) )
                {
@@ -2074,8 +2080,6 @@ static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat ))
 /* dDuration is in 'Ticks' (18.2 per second) */
 void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 {
-    OSVERSIONINFO osv;
-
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
 
     /*
@@ -2089,12 +2093,8 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
     /* keep the frequency in an acceptable range */
     dFrequency =   HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 );
 
-    /* What version of Windows are you running? */
-    osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    GetVersionEx(&osv);
-
     /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
-    if (osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+    if( s_osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
     {
        #if defined(__BORLANDC__) || defined( _MSC_VER )
           HB_GT_FUNC(gt_w9xTone( dFrequency, dDuration ));
@@ -2105,7 +2105,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 
     /* If Windows NT or NT2k, use wNtTone, which provides TONE()
        reset sequence support (new) */
-    else if (osv.dwPlatformId == VER_PLATFORM_WIN32_NT)
+    else if( s_osv.dwPlatformId == VER_PLATFORM_WIN32_NT )
     {
       HB_GT_FUNC(gt_wNtTone( dFrequency, dDuration ));
     }
