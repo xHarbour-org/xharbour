@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.29 2003/08/25 22:25:04 ronpinkas Exp $
+ * $Id: memvars.c,v 1.30 2003/09/03 01:28:56 ronpinkas Exp $
  */
 
 /*
@@ -332,11 +332,14 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
          s_globalTable = ( HB_VALUE_PTR ) hb_xrealloc( s_globalTable, sizeof( HB_VALUE ) * s_globalTableSize );
 
          #ifndef HB_ARRAY_USE_COUNTER
-            for( ulPos = 0; ulPos < ulValues; ulPos++ )
+            if( s_globalTable != pOldValues )
             {
-               if( ( s_globalTable + ulPos )->item.type == HB_IT_ARRAY )
+               for( ulPos = 0; ulPos < ulValues; ulPos++ )
                {
-                  hb_arrayResetHolder( ( s_globalTable + ulPos )->item.item.asArray.value, (void *) &( ( pOldValues + ulPos )->item ), (void * ) &( ( s_globalTable + ulPos )->item ) );
+                  if( ( s_globalTable + ulPos )->item.type == HB_IT_ARRAY )
+                  {
+                     hb_arrayResetHolder( ( s_globalTable + ulPos )->item.item.asArray.value, (void *) &( ( pOldValues + ulPos )->item ), (void * ) &( ( s_globalTable + ulPos )->item ) );
+                  }
                }
             }
          #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.61 2003/08/25 22:25:03 ronpinkas Exp $
+ * $Id: arrays.c,v 1.62 2003/09/03 12:51:36 paultucker Exp $
  */
 
 /*
@@ -236,11 +236,14 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                pBaseArray->pItems = ( PHB_ITEM ) hb_xrealloc( pBaseArray->pItems, sizeof( HB_ITEM ) * ulLen );
 
                #ifndef HB_ARRAY_USE_COUNTER
-                  for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
+                  if( pBaseArray->pItems != pOldItems )
                   {
-                     if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY )
+                     for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
                      {
-                        hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, ( pOldItems + ulPos ), ( pBaseArray->pItems + ulPos ) );
+                        if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY )
+                        {
+                           hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, ( pOldItems + ulPos ), ( pBaseArray->pItems + ulPos ) );
+                        }
                      }
                   }
                #endif
@@ -280,11 +283,14 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                   pBaseArray->pItems = ( PHB_ITEM ) hb_xrealloc( pBaseArray->pItems, sizeof( HB_ITEM ) * ulLen );
 
                   #ifndef HB_ARRAY_USE_COUNTER
-                     for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
+                     if( pBaseArray->pItems != pOldItems )
                      {
-                        if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY )
+                        for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
                         {
-                           hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, ( pOldItems + ulPos ), ( pBaseArray->pItems + ulPos ) );
+                           if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY )
+                           {
+                              hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, (void *) ( pOldItems + ulPos ), (void *) ( pBaseArray->pItems + ulPos ) );
+                           }
                         }
                      }
                   #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.36 2003/07/14 19:18:47 jonnymind Exp $
+ * $Id: estack.c,v 1.37 2003/07/14 23:27:56 jonnymind Exp $
  */
 
 /*
@@ -103,7 +103,6 @@ void hb_stackDec( void )
    }
 }
 
-
 void hb_stackPush( void )
 {
    LONG CurrIndex;   /* index of current top item */
@@ -120,6 +119,8 @@ void hb_stackPush( void )
    /* enough room for another item ? */
    if( !( TopIndex > CurrIndex ) )
    {
+      PHB_ITEM *pOldItems = HB_VM_STACK.pItems;
+
       LONG BaseIndex;   /* index of stack base */
 
       BaseIndex = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
@@ -129,12 +130,25 @@ void hb_stackPush( void )
       HB_VM_STACK.pItems = ( HB_ITEM_PTR * ) hb_xrealloc( ( void *)HB_VM_STACK.pItems, sizeof( HB_ITEM_PTR ) *
                                 ( HB_VM_STACK.wItems + STACK_EXPANDHB_ITEMS ) );
 
+      #ifndef HB_ARRAY_USE_COUNTER
+         if( HB_VM_STACK.pItems != pOldItems )
+         {
+            for( i = 0; i < HB_VM_STACK.wItems; ++i )
+            {
+               if( HB_VM_STACK.pItems[ i ]->type == HB_IT_ARRAY )
+               {
+                  hb_arrayResetHolder( HB_VM_STACK.pItems[ i ]->item.asArray.value, (void *) ( pOldItems[i] ), (void *) ( HB_VM_STACK.pItems[i] ) );
+               }
+            }
+         }
+      #endif
+
       /* fix possibly invalid pointers: */
       HB_VM_STACK.pPos = HB_VM_STACK.pItems + CurrIndex;
       HB_VM_STACK.pBase = HB_VM_STACK.pItems + BaseIndex;
       HB_VM_STACK.wItems += STACK_EXPANDHB_ITEMS;
 
-      for( i=CurrIndex + 1; i < HB_VM_STACK.wItems; ++i )
+      for( i = CurrIndex + 1; i < HB_VM_STACK.wItems; ++i )
       {
          HB_VM_STACK.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
       }
@@ -181,7 +195,7 @@ void hb_stackInit( void )
 }
 
 void hb_stackFree( void )
-{ 
+{
    #ifndef HB_THREAD_SUPPORT
    //JC1: Under threads, stack is freed by the hb_threadExit()
 
