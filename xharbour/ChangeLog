@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2898 2004/05/08 18:10:31 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2899 2004/05/08 19:32:43 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-08 13:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hash.c
+    ! Fixed multiple GPF Traps, related to uninitialized ->Type in elements of ->pKeys, and ->pValues arrays.
+    * Corrected dangerous usage of same variable (ulPos) in 2 different contexts within same function.
+    * Formated.
 
 2004-05-08 16:3 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/gtalleg/gtalleg.c
