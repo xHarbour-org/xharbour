@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.35 2003/11/10 11:49:47 druzus Exp $
+# $Id: xharbour.spec,v 1.36 2003/11/10 13:47:39 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -88,7 +88,7 @@ BuildPrereq:    gcc binutils bash bison ncurses ncurses-devel gpm-devel
 %{?_with_odbc:BuildRequires: unixodbc-devel}
 %else
 %{?_with_odbc:BuildRequires: unixODBC-devel}
-#endif
+%endif
 Requires:       gcc binutils bash sh-utils %{name}-lib = %{version}
 Provides:       %{name} harbour
 BuildRoot:      /tmp/%{name}-%{version}-root
