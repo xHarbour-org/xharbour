@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.4 2002/01/08 19:11:43 andijahja Exp $
+ * $Id: hbapiitm.h,v 1.5 2002/01/12 10:04:27 ronpinkas Exp $
  */
 
 /*
@@ -54,7 +54,6 @@
 #define HB_APIITM_H_
 
 #include "hbapi.h"
-#include "hbfast.h"
 
 #if defined(HB_EXTERN_C)
 extern "C" {
@@ -121,6 +120,7 @@ extern char *   hb_itemTypeStr  ( PHB_ITEM pItem );
 
 extern PHB_ITEM hb_itemParamPtr ( USHORT uiParam, int iMask );
 extern int      hb_itemStrCmp   ( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact ); /* our string compare */
+extern void     hb_itemCopy     ( PHB_ITEM pDest, PHB_ITEM pSource );
 extern void     hb_itemClear    ( PHB_ITEM pItem );
 extern PHB_ITEM hb_itemUnRef    ( PHB_ITEM pItem ); /* de-references passed variable */
 extern char *   hb_itemStr      ( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec ); /* convert a number to a string */

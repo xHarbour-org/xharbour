@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.1.1.1 2001/12/21 10:40:59 ronpinkas Exp $
+ * $Id: runner.c,v 1.2 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -298,7 +298,7 @@ HB_FUNC( __HRBRUN )
                 hb_vmDo( hb_pcount() - 1 );                   /* Run the thing !!!        */
 
                 pRetVal = hb_itemNew( NULL );
-                hb_itemFastCopy( pRetVal, &hb_stack.Return );
+                hb_itemCopy( pRetVal, &hb_stack.Return );
             }
 
             for( ul = 0; ul < ulSymbols; ul++ )    /* Check EXIT functions     */

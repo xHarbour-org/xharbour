@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.1.1.1 2001/12/21 10:47:31 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.2 2001/12/21 11:36:01 ronpinkas Exp $
  */
 
 /*
@@ -327,6 +327,11 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
             HB_EXPR_PCODE1( hb_compExprDelete, pParms );
             HB_EXPR_PCODE1( hb_compExprDelete, pName );
          }
+      }
+      else if( ( strcmp( "EVAL", pName->value.asSymbol ) == 0 ) && iCount )
+      {
+         /* Optimize Eval( bBlock, [ArgList] ) to: bBlock:Eval( [ArgList] ) */
+         return hb_compExprNewMethodCall( hb_compExprNewSend( pParms->value.asList.pExprList, "EVAL" ), hb_compExprNewArgList( pParms->value.asList.pExprList->pNext ) );
       }
       else if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_XBASE ) &&
           (( strcmp( "__DBLIST", pName->value.asSymbol ) == 0 ) && iCount >= 10) )

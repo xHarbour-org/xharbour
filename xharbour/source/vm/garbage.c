@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.5 2002/01/05 03:29:39 ronpinkas Exp $
+ * $Id: garbage.c,v 1.6 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -229,7 +229,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
       if( pOrigin )
       {
          pItem->type = HB_IT_NIL;
-         hb_itemFastCopy( pItem, pOrigin );
+         hb_itemCopy( pItem, pOrigin );
       }
       else
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: setkey.c,v 1.2 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: setkey.c,v 1.3 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -251,7 +251,7 @@ HB_FUNC( HB_SETKEYGET )
 
          if( pIsActive )
          {
-            hb_itemFastCopy( pIsActive, sk_list_tmp->pIsActive );
+            hb_itemCopy( pIsActive, sk_list_tmp->pIsActive );
          }
       }
    }

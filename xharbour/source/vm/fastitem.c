@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.8 2002/01/05 03:29:39 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.9 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -57,10 +57,8 @@
 #include "hbset.h"
 
 /* Forward decalarations. */
-void hb_itemFastCopy( PHB_ITEM pDest, PHB_ITEM pSource );
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
 
-/* Forward instead of copy. */
 void hb_itemPushForward( PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_itemPushForward(%p)", pItem));
@@ -75,8 +73,15 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
 
    if( pDest == pSource )
    {
-      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemFastCopy()", NULL );
+      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemCopy()", NULL );
    }
+
+ #ifdef HARBOUR_CLASSIC
+   hb_itemClear( pDest );
+   memcpy( pDest, pSource, sizeof( HB_ITEM ) );
+   pSource->type = HB_IT_NIL;
+   return;
+ #endif
 
    if( pDest->type )
    {
@@ -100,14 +105,20 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
 
 void hb_itemReleaseString( PHB_ITEM pItem )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_itemReleaseString(%p) %i, '%s'", pItem, *( pItem->item.asString.puiHolders ), pItem->item.asString.value ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_itemReleaseString(%p), '%s'", pItem, pItem->item.asString.value ) );
 
-   if( --*( pItem->item.asString.puiHolders ) == 0 )
+ #ifdef HARBOUR_CLASSIC
+   hb_xfree( pItem->item.asString.value );
+   pItem->item.asString.value = NULL;
+   return;
+ #endif
+
+
+   if( ! pItem->item.asString.bStatic )
    {
-      hb_xfree( pItem->item.asString.puiHolders );
-
-      if( ! pItem->item.asString.bStatic )
+      if( --*( pItem->item.asString.puiHolders ) == 0 )
       {
+         hb_xfree( pItem->item.asString.puiHolders );
          hb_xfree( pItem->item.asString.value );
       }
    }
@@ -117,13 +128,18 @@ void hb_itemReleaseString( PHB_ITEM pItem )
    //pItem->item.asString.length = 0;
 }
 
-void hb_itemFastCopy( PHB_ITEM pDest, PHB_ITEM pSource )
+void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemFastCopy(%p, %p)", pDest, pSource));
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemCopy(%p, %p)", pDest, pSource));
+
+ #ifdef HARBOUR_CLASSIC
+   hb_itemCopy( pDest, pSource );
+   return;
+ #endif
 
    if( pDest == pSource )
    {
-      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemFastCopy()", NULL );
+      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemCopy()", NULL );
    }
 
    if( pDest->type )
@@ -140,7 +156,7 @@ void hb_itemFastCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
-   if( HB_IS_STRING( pSource ) )
+   if( HB_IS_STRING( pSource ) && pSource->item.asString.bStatic == FALSE )
    {
       ++*( pSource->item.asString.puiHolders );
    }
@@ -190,8 +206,8 @@ void hb_itemPushStaticString( char * szText, ULONG length )
    HB_TRACE(HB_TR_DEBUG, ( "hb_itemPushStaticString( \"%s\", %lu ) %p", szText, length, pTop ) );
 
    pTop->type = HB_IT_STRING;
-   pTop->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
-   *( pTop->item.asString.puiHolders ) = 1;
+   //pTop->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
+   //*( pTop->item.asString.puiHolders ) = 1;
    pTop->item.asString.bStatic = TRUE;
    pTop->item.asString.length = length;
    pTop->item.asString.value = szText;

@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.2 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: debug.c,v 1.3 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -227,5 +227,5 @@ HB_FUNC( __VMVARLSET )
       pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
 
-   hb_itemFastCopy( *(pBase + 1 + hb_parni( 2 )), *(hb_stack.pBase + 4) );
+   hb_itemCopy( *(pBase + 1 + hb_parni( 2 )), *(hb_stack.pBase + 4) );
 }

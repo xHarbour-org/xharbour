@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.1.1.1 2001/12/21 10:43:00 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
  */
 
 /*
@@ -2280,7 +2280,7 @@ HB_FUNC( ORDCONDSET )
       if( pItem )
       {
          lpdbOrdCondInfo->itmCobFor = hb_itemNew( NULL );
-         hb_itemFastCopy( lpdbOrdCondInfo->itmCobFor, pItem );
+         hb_itemCopy( lpdbOrdCondInfo->itmCobFor, pItem );
       }
       else
          lpdbOrdCondInfo->itmCobFor = NULL;
@@ -2293,7 +2293,7 @@ HB_FUNC( ORDCONDSET )
       if( pItem )
       {
          lpdbOrdCondInfo->itmCobWhile = hb_itemNew( NULL );
-         hb_itemFastCopy( lpdbOrdCondInfo->itmCobWhile, pItem );
+         hb_itemCopy( lpdbOrdCondInfo->itmCobWhile, pItem );
       }
       else
          lpdbOrdCondInfo->itmCobWhile = NULL;
@@ -2302,7 +2302,7 @@ HB_FUNC( ORDCONDSET )
       if( pItem )
       {
          lpdbOrdCondInfo->itmCobEval = hb_itemNew( NULL );
-         hb_itemFastCopy( lpdbOrdCondInfo->itmCobEval, pItem );
+         hb_itemCopy( lpdbOrdCondInfo->itmCobEval, pItem );
       }
       else
          lpdbOrdCondInfo->itmCobEval = NULL;

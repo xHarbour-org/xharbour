@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.27 2002/01/12 10:04:23 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.28 2002/01/14 06:14:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,49 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-17 15:03 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapiitm.h
+    * Reinstated declaration of hb_itemCopy()
+
+  * source/vm/fastitem.c
+    * Renamed hb_itemFastCopy() to hb_itemCopy()
+
+  * source/rdd/dbcmd.c
+  * source/rdd/workarea.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/errorapi.c
+  * source/rtl/setkey.c
+  * source/vm/arrays.c
+  * source/vm/asort.c
+  * source/vm/classes.c
+  * source/vm/debug.c
+  * source/vm/garbage.c
+  * source/vm/itemapi.c
+  * source/vm/memvars.c
+  * source/vm/hvm.c
+  * source/vm/runner.c
+    * Reverted hb_itemFastCopy() to hb_itemCopy() (but now using String Sharing Version in source/vm/fastitem.c)
+
+  * source/rtl/filesys.c
+    * Temporarily reverted to X__WIN32__
+
+  * source/vm/hvm.c
+  * include/hbexpra.c
+    * Optimized Eval() processing, and added support for bBlock:Eval().
+
+  * tests/speed.prg
+    * Speed test from Marek Horodyski
+
+  /* On my Athlon 1Ghz XP Notebook xHarbour is almost 10 times faster than Harbour on this Eval() speed test.
+
+    Clipper :  4.17
+    xHarbour:  4.30
+    Harbour : 39.74 // Not a typo!
+
+    Actual single Eval() is almost 4-5 times faster.
+  */
 
 2002-01-13 22:10 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
   + tests/ppclass.ch

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.2 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: memvars.c,v 1.3 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -227,7 +227,7 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
    {
       if( bTrueMemvar )
       {
-         hb_itemFastCopy( &pValue->item, pSource );
+         hb_itemCopy( &pValue->item, pSource );
       }
       else
       {
@@ -438,9 +438,9 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
          /* value is already created */
          HB_ITEM_PTR pSetItem = &s_globalTable[ pDyn->hMemvar ].item;
          if( HB_IS_BYREF( pSetItem ) )
-            hb_itemFastCopy( hb_itemUnRef( pSetItem ), pItem );
+            hb_itemCopy( hb_itemUnRef( pSetItem ), pItem );
          else
-            hb_itemFastCopy( pSetItem, pItem );
+            hb_itemCopy( pSetItem, pItem );
       }
       else
       {
@@ -472,11 +472,11 @@ ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
          HB_ITEM_PTR pGetItem = &s_globalTable[ pDyn->hMemvar ].item;
          if( HB_IS_BYREF( pGetItem ) )
          {
-            hb_itemFastCopy( pItem, hb_itemUnRef( pGetItem ) );
+            hb_itemCopy( pItem, hb_itemUnRef( pGetItem ) );
          }
          else
          {
-            hb_itemFastCopy( pItem, pGetItem );
+            hb_itemCopy( pItem, pGetItem );
          }
          bSuccess = SUCCESS;
       }

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.2 2002/01/08 18:31:29 andijahja Exp $
+ * $Id: dbfcdx1.c,v 1.3 2002/01/12 10:04:27 ronpinkas Exp $
  */
 
 /*
@@ -1761,13 +1761,13 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                hb_vmPushSymbol( &hb_symEval );
                hb_vmPush( pTag->pForItem );
                hb_vmDo( 0 );
-               hb_itemFastCopy( pItem, &hb_stack.Return );
+               hb_itemCopy( pItem, &hb_stack.Return );
             }
             else
             {
                pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pTag->pForItem );
                hb_macroRun( pMacro );
-               hb_itemFastCopy( pItem, hb_stackItemFromTop( - 1 ) );
+               hb_itemCopy( pItem, hb_stackItemFromTop( - 1 ) );
                hb_stackPop();
             }
             bWhileOk = hb_itemGetL( pItem );
@@ -1783,13 +1783,13 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                hb_vmPushSymbol( &hb_symEval );
                hb_vmPush( pTag->pKeyItem );
                hb_vmDo( 0 );
-               hb_itemFastCopy( pItem, &hb_stack.Return );
+               hb_itemCopy( pItem, &hb_stack.Return );
             }
             else
             {
                pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pTag->pKeyItem );
                hb_macroRun( pMacro );
-               hb_itemFastCopy( pItem, hb_stackItemFromTop( - 1 ) );
+               hb_itemCopy( pItem, hb_stackItemFromTop( - 1 ) );
                hb_stackPop();
             }
 
@@ -3972,7 +3972,7 @@ ERRCODE hb_cdxOrderCreate( CDXAREAP pAreaCdx, LPDBORDERCREATEINFO pOrderInfo )
 
    /* Save for later use */
    pKeyExp = hb_itemNew( NULL );
-   hb_itemFastCopy( pKeyExp, pExpr );
+   hb_itemCopy( pKeyExp, pExpr );
 
    /* Get a blank record before testing expression */
    SELF_GOBOTTOM( ( AREAP ) pArea );
@@ -3993,7 +3993,7 @@ ERRCODE hb_cdxOrderCreate( CDXAREAP pAreaCdx, LPDBORDERCREATEINFO pOrderInfo )
       pExpMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pExpr );
       hb_macroRun( pExpMacro );
       pResult = pExpr;
-      hb_itemFastCopy( pResult, hb_stackItemFromTop( - 1 ) );
+      hb_itemCopy( pResult, hb_stackItemFromTop( - 1 ) );
    }
 
    uiType = hb_itemType( pResult );
@@ -4071,7 +4071,7 @@ ERRCODE hb_cdxOrderCreate( CDXAREAP pAreaCdx, LPDBORDERCREATEINFO pOrderInfo )
       if( pExpr )
       {
          pForExp = hb_itemNew( NULL );
-         hb_itemFastCopy( pForExp, pExpr );
+         hb_itemCopy( pForExp, pExpr );
       }
    }
 
@@ -4096,7 +4096,7 @@ ERRCODE hb_cdxOrderCreate( CDXAREAP pAreaCdx, LPDBORDERCREATEINFO pOrderInfo )
          pForMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pExpr );
          hb_macroRun( pForMacro );
          pResult = pExpr;
-         hb_itemFastCopy( pResult, hb_stackItemFromTop( - 1 ) );
+         hb_itemCopy( pResult, hb_stackItemFromTop( - 1 ) );
       }
       uiType = hb_itemType( pResult );
       hb_itemRelease( pResult );

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.1.1.1 2001/12/21 10:43:06 ronpinkas Exp $
+ * $Id: dbfntx1.c,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
  */
 
 /*
@@ -370,7 +370,7 @@ static void hb_ntxGetCurrentKey( LPTAGINFO pTag, LPKEYINFO pKey )
       switch( hb_itemType( &hb_stack.Return ) )
       {
          case HB_IT_STRING:
-            hb_itemFastCopy( pKey->pItem, &hb_stack.Return );
+            hb_itemCopy( pKey->pItem, &hb_stack.Return );
             break;
          case HB_IT_INTEGER:
          case HB_IT_LONG:
@@ -396,7 +396,7 @@ static void hb_ntxGetCurrentKey( LPTAGINFO pTag, LPKEYINFO pKey )
       switch( hb_itemType( hb_stackItemFromTop( - 1 ) ) )
       {
          case HB_IT_STRING:
-            hb_itemFastCopy( pKey->pItem, hb_stackItemFromTop( - 1 ) );
+            hb_itemCopy( pKey->pItem, hb_stackItemFromTop( - 1 ) );
             break;
          case HB_IT_INTEGER:
          case HB_IT_LONG:
@@ -430,7 +430,7 @@ static BOOL hb_ntxFindNextKey( LPTAGINFO pTag, BOOL lContinue )
    pKey = hb_ntxKeyNew( NULL );
    if( lContinue )
    {
-      hb_itemFastCopy( pKey->pItem,pTag->CurKeyInfo->pItem );
+      hb_itemCopy( pKey->pItem,pTag->CurKeyInfo->pItem );
       pTag->Owner->Owner->ulRecNo = pTag->CurKeyInfo->Xtra;
    }
    else
@@ -449,7 +449,7 @@ static BOOL hb_ntxFindNextKey( LPTAGINFO pTag, BOOL lContinue )
       if( pPage->CurKey < pPage->uiKeys )
       {
          /* printf( "\n\rhb_ntxFindNextKey - 2" ); */
-         hb_itemFastCopy( pTag->CurKeyInfo->pItem, ( pPage->pKeys+pPage->CurKey )->pItem );
+         hb_itemCopy( pTag->CurKeyInfo->pItem, ( pPage->pKeys+pPage->CurKey )->pItem );
          pTag->CurKeyInfo->Xtra = ( pPage->pKeys+pPage->CurKey )->Xtra;
          pTag->CurKeyInfo->Tag = pPage->Page;
          hb_ntxPageRelease( pPage );
@@ -475,7 +475,7 @@ static BOOL hb_ntxFindNextKey( LPTAGINFO pTag, BOOL lContinue )
                   pPage->CurKey = 0;
                }
             */
-               hb_itemFastCopy( pTag->CurKeyInfo->pItem, ( pPage->pKeys+pPage->CurKey )->pItem );
+               hb_itemCopy( pTag->CurKeyInfo->pItem, ( pPage->pKeys+pPage->CurKey )->pItem );
                pTag->CurKeyInfo->Xtra = ( pPage->pKeys+pPage->CurKey )->Xtra;
                pTag->CurKeyInfo->Tag = pPage->Page;
                hb_ntxPageRelease( pPage );
@@ -514,7 +514,7 @@ static BOOL hb_ntxPageReadNextKey( LPTAGINFO pTag, BOOL lContinue )
                pPage = pChildPage;
                pPage->CurKey = 0;
             }
-            hb_itemFastCopy( pTag->CurKeyInfo->pItem, ( pPage->pKeys+pPage->CurKey )->pItem );
+            hb_itemCopy( pTag->CurKeyInfo->pItem, ( pPage->pKeys+pPage->CurKey )->pItem );
             pTag->CurKeyInfo->Xtra = ( pPage->pKeys+pPage->CurKey )->Xtra;
             pTag->CurKeyInfo->Tag = pPage->Page;
             hb_ntxPageRelease( pPage );
@@ -545,7 +545,7 @@ static BOOL hb_ntxFindPrevKey( LPTAGINFO pTag, BOOL lContinue )
    pKey = hb_ntxKeyNew( NULL );
    if( lContinue )
    {
-      hb_itemFastCopy( pKey->pItem,pTag->CurKeyInfo->pItem );
+      hb_itemCopy( pKey->pItem,pTag->CurKeyInfo->pItem );
       pTag->Owner->Owner->ulRecNo = pTag->CurKeyInfo->Xtra;
    }
    else
@@ -579,7 +579,7 @@ static BOOL hb_ntxFindPrevKey( LPTAGINFO pTag, BOOL lContinue )
       if( pPage->CurKey >= 0 )
       {
          /* printf( "\n\rhb_ntxFindPrevKey - 2" ); */
-         hb_itemFastCopy( pTag->CurKeyInfo->pItem, ( pPage->pKeys+pPage->CurKey )->pItem );
+         hb_itemCopy( pTag->CurKeyInfo->pItem, ( pPage->pKeys+pPage->CurKey )->pItem );
          pTag->CurKeyInfo->Xtra = ( pPage->pKeys+pPage->CurKey )->Xtra;
          pTag->CurKeyInfo->Tag = pPage->Page;
          hb_ntxPageRelease( pPage );
@@ -596,7 +596,7 @@ static BOOL hb_ntxFindPrevKey( LPTAGINFO pTag, BOOL lContinue )
             /* printf( "\n\rhb_ntxFindPrevKey - 4 ( %d %d %ld)",pPage->CurKey, pPage->uiKeys,pTag->CurKeyInfo->Xtra ); */
             if( pPage->CurKey < pPage->uiKeys )
             {
-               hb_itemFastCopy( pTag->CurKeyInfo->pItem, ( pPage->pKeys+pPage->CurKey )->pItem );
+               hb_itemCopy( pTag->CurKeyInfo->pItem, ( pPage->pKeys+pPage->CurKey )->pItem );
                pTag->CurKeyInfo->Xtra = ( pPage->pKeys+pPage->CurKey )->Xtra;
                pTag->CurKeyInfo->Tag = pPage->Page;
                hb_ntxPageRelease( pPage );
@@ -641,7 +641,7 @@ static BOOL hb_ntxPageReadPrevKey( LPTAGINFO pTag, BOOL lContinue )
             pPage->CurKey--;
          if( pPage->CurKey >= 0 )
          {
-            hb_itemFastCopy( pTag->CurKeyInfo->pItem, ( pPage->pKeys+pPage->CurKey )->pItem );
+            hb_itemCopy( pTag->CurKeyInfo->pItem, ( pPage->pKeys+pPage->CurKey )->pItem );
             pTag->CurKeyInfo->Xtra = ( pPage->pKeys+pPage->CurKey )->Xtra;
             pTag->CurKeyInfo->Tag = pPage->Page;
             hb_ntxPageRelease( pPage );
@@ -683,7 +683,7 @@ static BOOL hb_ntxPageReadTopKey( LPPAGEINFO pPage, ULONG ulOffset )
       }
       else
       {
-         hb_itemFastCopy( pChildPage->TagParent->CurKeyInfo->pItem, pKey->pItem );
+         hb_itemCopy( pChildPage->TagParent->CurKeyInfo->pItem, pKey->pItem );
          pChildPage->TagParent->CurKeyInfo->Xtra = pKey->Xtra;
          pChildPage->TagParent->CurKeyInfo->Tag = pChildPage->Page;
          hb_ntxPageRelease( pChildPage );
@@ -711,7 +711,7 @@ static BOOL hb_ntxPageReadBottomKey( LPPAGEINFO pPage, ULONG ulOffset )
       else
       {
          pKey -= 1;
-         hb_itemFastCopy( pChildPage->TagParent->CurKeyInfo->pItem, pKey->pItem );
+         hb_itemCopy( pChildPage->TagParent->CurKeyInfo->pItem, pKey->pItem );
          pChildPage->TagParent->CurKeyInfo->Xtra = pKey->Xtra;
          pChildPage->TagParent->CurKeyInfo->Tag = pChildPage->Page;
          hb_ntxPageRelease( pChildPage );
@@ -1300,7 +1300,7 @@ static LPKEYINFO hb_ntxPageKeyDel( LPPAGEINFO pPage, SHORT pos, USHORT level )
          pKeyNew = hb_ntxKeyNew( &(pPage->pKeys[pos]) );
          pKeyNew->Tag = pPage->Page;
       }
-      hb_itemFastCopy( pPage->pKeys[pos].pItem, pKey->pItem );
+      hb_itemCopy( pPage->pKeys[pos].pItem, pKey->pItem );
       pPage->pKeys[pos].Tag = pKey->Tag;
       pPage->pKeys[pos].Xtra = pKey->Xtra;
       pPage->Changed = TRUE;
@@ -1777,13 +1777,13 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pTag->pKeyItem );
             hb_vmDo( 0 );
-            hb_itemFastCopy( pItem, &hb_stack.Return );
+            hb_itemCopy( pItem, &hb_stack.Return );
          }
          else
          {
             pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pTag->pKeyItem );
             hb_macroRun( pMacro );
-            hb_itemFastCopy( pItem, hb_stackItemFromTop( - 1 ) );
+            hb_itemCopy( pItem, hb_stackItemFromTop( - 1 ) );
             hb_stackPop();
          }
          switch( hb_itemType( pItem ) )
@@ -1950,7 +1950,7 @@ static ERRCODE hb_ntxHeaderLoad( LPNTXINDEX pIndex , char *ITN)
       return FAILURE;
    pExpr = pIndex->Owner->valResult;
    pKeyExp = hb_itemNew( NULL );
-   hb_itemFastCopy( pKeyExp, pExpr );
+   hb_itemCopy( pKeyExp, pExpr );
    pTag = ( LPTAGINFO ) hb_xgrab( sizeof( TAGINFO ) );
    memset( pTag, 0, sizeof( TAGINFO ) );
    pIndex->CompoundTag = pTag;
@@ -2125,7 +2125,7 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
              pArea->fFound = TRUE;
              return retvalue;
            }
-           hb_itemFastCopy( pKey2->pItem, pKey );
+           hb_itemCopy( pKey2->pItem, pKey );
            break;
         case HB_IT_INTEGER:
         case HB_IT_LONG:
@@ -2142,7 +2142,7 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
            hb_itemPutC( pKey2->pItem, szBuffer );
            break;
      }
-     /* hb_itemFastCopy( pKey2->pItem, pKey ); */
+     /* hb_itemCopy( pKey2->pItem, pKey ); */
      if ( bFindLast )
        pKey2->Tag = NTX_MAX_REC_NUM;
      else
@@ -2313,7 +2313,7 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
             if( fAppend || hb_ntxItemCompare( pKey->pItem, pTag->CurKeyInfo->pItem, TRUE ) )
             {
                pArea->lpCurIndex = lpIndex;
-               hb_itemFastCopy( pKeyOld->pItem, pTag->CurKeyInfo->pItem );
+               hb_itemCopy( pKeyOld->pItem, pTag->CurKeyInfo->pItem );
                pKeyOld->Xtra = pTag->CurKeyInfo->Xtra;
                pKeyOld->Tag = NTX_IGNORE_REC_NUM;
                if( pArea->fShared )
@@ -2473,7 +2473,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    }
    /* Save for later use */
    pKeyExp = hb_itemNew( NULL );
-   hb_itemFastCopy( pKeyExp, pExpr );
+   hb_itemCopy( pKeyExp, pExpr );
 
    /* Get a blank record before testing expression */
    SELF_GOBOTTOM( ( AREAP ) pArea );
@@ -2494,7 +2494,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       pExpMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pExpr );
       hb_macroRun( pExpMacro );
       pResult = pExpr;
-      hb_itemFastCopy( pResult, &hb_stack.Return );
+      hb_itemCopy( pResult, &hb_stack.Return );
    }
 
    uiType = hb_itemType( pResult );
@@ -2562,7 +2562,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       }
       /* Save for later use */
       pForExp = hb_itemNew( NULL );
-      hb_itemFastCopy( pForExp, pExpr );
+      hb_itemCopy( pForExp, pExpr );
    }
 
    /* Test conditional expression */
@@ -2585,7 +2585,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          pForMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pExpr );
          hb_macroRun( pForMacro );
          pResult = pExpr;
-         hb_itemFastCopy( pResult, &hb_stack.Return );
+         hb_itemCopy( pResult, &hb_stack.Return );
       }
       uiType = hb_itemType( pResult );
       hb_itemRelease( pResult );

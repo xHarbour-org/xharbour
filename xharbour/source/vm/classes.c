@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.4 2002/01/03 06:28:34 ronpinkas Exp $
+ * $Id: classes.c,v 1.5 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -1142,7 +1142,7 @@ HB_FUNC( __CLSADDMSG )
                   else
                   {
                      pNewMeth->pInitValue = hb_itemNew( NULL );
-                     hb_itemFastCopy( pNewMeth->pInitValue, pInit );
+                     hb_itemCopy( pNewMeth->pInitValue, pInit );
                   }
                }
             }
@@ -1169,7 +1169,7 @@ HB_FUNC( __CLSADDMSG )
                   else
                   {
                      pNewMeth->pInitValue = hb_itemNew( NULL );
-                     hb_itemFastCopy( pNewMeth->pInitValue, pInit );
+                     hb_itemCopy( pNewMeth->pInitValue, pInit );
                   }
                }
             }
@@ -1429,7 +1429,7 @@ HB_FUNC( __CLSNEW )
                         {
                            pInitValue = hb_itemNew( NULL );
 
-                           hb_itemFastCopy( pInitValue, pSprCls->pMethods[ ui ].pInitValue );
+                           hb_itemCopy( pInitValue, pSprCls->pMethods[ ui ].pInitValue );
                            pNewCls->pMethods[ uiAt + uiBucket ].pInitValue = pInitValue;
                         }
                      }
@@ -1602,7 +1602,7 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
                else
                {
                    pInit = hb_itemNew( NULL );
-                   hb_itemFastCopy( pInit, pMeth->pInitValue );
+                   hb_itemCopy( pInit, pMeth->pInitValue );
                }
 
                hb_arraySet( pClass->pClassDatas, pMeth->uiData, pInit );
@@ -1623,7 +1623,7 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
                else
                {
                   pInitValue = hb_itemNew( NULL );
-                  hb_itemFastCopy(pInitValue,  pMeth->pInitValue );
+                  hb_itemCopy(pInitValue,  pMeth->pInitValue );
                }
 
                hb_arraySet( pSelf, pMeth->uiData, pInitValue );
@@ -1647,7 +1647,7 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
                   else
                   {
                    pInit = hb_itemNew( NULL );
-                   hb_itemFastCopy( pInit, pMeth->pInitValue );
+                   hb_itemCopy( pInit, pMeth->pInitValue );
                   }
 
 
@@ -2304,7 +2304,7 @@ static HARBOUR hb___msgSuper( void )
    hb_arraySet( pCopy, 1 , pObject );
 
    /* Or Store original object as 1st elem */
-   /* hb_itemFastCopy( pCopy->item.asArray.value->pItems , pObject) ; */
+   /* hb_itemCopy( pCopy->item.asArray.value->pItems , pObject) ; */
 
    /* And transform it into a fake object */
    pCopy->item.asArray.value->uiPrevCls  = pObject->item.asArray.value->uiClass; /* backup of actual handel */

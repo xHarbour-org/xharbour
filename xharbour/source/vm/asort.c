@@ -1,5 +1,5 @@
 /*
- * $Id: asort.c,v 1.1.1.1 2001/12/21 10:40:46 ronpinkas Exp $
+ * $Id: asort.c,v 1.2 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -121,9 +121,9 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
       memcpy( pItems + p, pItems + lb, sizeof( HB_ITEM ) );
 #else
    hb_itemInit( &pivot );
-   hb_itemFastCopy( &pivot, pItems + p );
+   hb_itemCopy( &pivot, pItems + p );
    if( p != lb )
-      hb_itemFastCopy( pItems + p, pItems + lb );
+      hb_itemCopy( pItems + p, pItems + lb );
 #endif
 
    /* sort lb+1..ub based on pivot */
@@ -186,9 +186,9 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
          memcpy( pItems + i, &temp, sizeof( HB_ITEM ) );
 #else
          hb_itemInit( &temp );
-         hb_itemFastCopy( &temp, pItems + j );
-         hb_itemFastCopy( pItems + j, pItems + i );
-         hb_itemFastCopy( pItems + i, &temp );
+         hb_itemCopy( &temp, pItems + j );
+         hb_itemCopy( pItems + j, pItems + i );
+         hb_itemCopy( pItems + i, &temp );
          hb_itemClear( &temp );
 #endif
       }
@@ -204,8 +204,8 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
    memcpy( pItems + j, &pivot, sizeof( HB_ITEM ) );
 #else
    if( lb != j )
-      hb_itemFastCopy( pItems + lb, pItems + j );
-   hb_itemFastCopy( pItems + j, &pivot );
+      hb_itemCopy( pItems + lb, pItems + j );
+   hb_itemCopy( pItems + j, &pivot );
    hb_itemClear( &pivot );
 #endif
 

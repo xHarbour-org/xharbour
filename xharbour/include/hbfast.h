@@ -1,5 +1,5 @@
 /*
- * $Id: hbfast.h,v 1.4 2002/01/05 03:29:39 ronpinkas Exp $
+ * $Id: hbfast.h,v 1.5 2002/01/12 10:04:27 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,6 @@
    #endif
 
    extern void hb_itemPushForward( PHB_ITEM pItem );
-   extern void hb_itemFastCopy( PHB_ITEM pDest, PHB_ITEM pSource );
    extern void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
    extern void hb_itemReleaseString( PHB_ITEM pItem );
    extern void hb_itemFastClear( PHB_ITEM pItem );

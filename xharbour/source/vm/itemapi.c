@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.7 2002/01/05 03:29:39 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.8 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -113,7 +113,7 @@ PHB_ITEM hb_itemParam( USHORT uiParam )
 
    if( pItem )
    {
-      hb_itemFastCopy( pNew, pItem );
+      hb_itemCopy( pNew, pItem );
    }
 
    return pNew;
@@ -489,7 +489,7 @@ PHB_ITEM hb_itemReturn( PHB_ITEM pItem )
 
    if( pItem )
    {
-      hb_itemFastCopy( &hb_stack.Return, pItem );
+      hb_itemCopy( &hb_stack.Return, pItem );
    }
 
    return pItem;
@@ -898,9 +898,9 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
    temp.type = HB_IT_NIL;
 
    /*
-   hb_itemFastCopy( &temp, pItem2 );
-   hb_itemFastCopy( pItem2, pItem1 );
-   hb_itemFastCopy( pItem1, &temp );
+   hb_itemCopy( &temp, pItem2 );
+   hb_itemCopy( pItem2, pItem1 );
+   hb_itemCopy( pItem1, &temp );
    hb_itemClear( &temp );
    */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.1.1.1 2001/12/21 10:42:49 ronpinkas Exp $
+ * $Id: workarea.c,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
  */
 
 /*
@@ -926,7 +926,7 @@ ERRCODE hb_waFilterText( AREAP pArea, PHB_ITEM pFilter )
    HB_TRACE(HB_TR_DEBUG, ("hb_waFilterText(%p, %p)", pArea, pFilter));
 
    if( pArea->dbfi.abFilterText )
-      hb_itemFastCopy( pFilter, pArea->dbfi.abFilterText );
+      hb_itemCopy( pFilter, pArea->dbfi.abFilterText );
 
    return SUCCESS;
 }
@@ -1042,6 +1042,6 @@ ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
    if( ! pArea->valResult )
       pArea->valResult = hb_itemNew( NULL );
 
-   hb_itemFastCopy( pArea->valResult, hb_vmEvalBlock( pBlock ) );
+   hb_itemCopy( pArea->valResult, hb_vmEvalBlock( pBlock ) );
    return SUCCESS;
 }

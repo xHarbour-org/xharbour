@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.3 2002/01/02 04:40:08 ronpinkas Exp $
+ * $Id: arrays.c,v 1.4 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -124,7 +124,7 @@ BOOL hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
       {
          hb_arraySize( pArray, pBaseArray->ulLen + 1 );
          pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
-         hb_itemFastCopy( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
+         hb_itemCopy( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
 
          return TRUE;
       }
@@ -227,7 +227,7 @@ BOOL hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
 
          for( ulIndex--; ulIndex < ulLen - 1; ulIndex++ )       /* move items */
          {
-            hb_itemFastCopy( pBaseArray->pItems + ulIndex, pBaseArray->pItems + ( ulIndex + 1 ) );
+            hb_itemCopy( pBaseArray->pItems + ulIndex, pBaseArray->pItems + ( ulIndex + 1 ) );
          }
 
          hb_itemClear( pBaseArray->pItems + ( ulLen - 1 ) );
@@ -254,7 +254,7 @@ BOOL hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
          hb_itemClear( pBaseArray->pItems + ( ulLen - 1 ) );
 
          for( ulLen--; ulLen >= ulIndex; ulLen-- )          /* move items */
-            hb_itemFastCopy( pBaseArray->pItems + ulLen, pBaseArray->pItems + ( ulLen - 1 ) );
+            hb_itemCopy( pBaseArray->pItems + ulLen, pBaseArray->pItems + ( ulLen - 1 ) );
 
          hb_itemClear( pBaseArray->pItems + ulLen );
       }
@@ -271,7 +271,7 @@ BOOL hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      hb_itemFastCopy( pArray->item.asArray.value->pItems + ( ulIndex - 1 ), pItem );
+      hb_itemCopy( pArray->item.asArray.value->pItems + ( ulIndex - 1 ), pItem );
       return TRUE;
    }
    else
@@ -284,7 +284,7 @@ BOOL hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      hb_itemFastCopy( pItem, pArray->item.asArray.value->pItems + ( ulIndex - 1 ) );
+      hb_itemCopy( pItem, pArray->item.asArray.value->pItems + ( ulIndex - 1 ) );
       return TRUE;
    }
    else
@@ -429,7 +429,7 @@ BOOL hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
    if( HB_IS_ARRAY( pArray ) )
    {
       if( pArray->item.asArray.value->ulLen > 0 )
-         hb_itemFastCopy( pResult, pArray->item.asArray.value->pItems +
+         hb_itemCopy( pResult, pArray->item.asArray.value->pItems +
                              ( pArray->item.asArray.value->ulLen - 1 ) );
       else
          hb_itemClear( pResult );
@@ -469,7 +469,7 @@ BOOL hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * p
             ulCount = ulLen - ulStart + 1;
 
          for( ; ulCount > 0; ulCount--, ulStart++ )     /* set value items */
-            hb_itemFastCopy( pBaseArray->pItems + ( ulStart - 1 ), pValue );
+            hb_itemCopy( pBaseArray->pItems + ( ulStart - 1 ), pValue );
       }
 
       return TRUE;
@@ -763,7 +763,7 @@ BOOL hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart,
 
             for( ulTarget--, ulStart--; ulCount > 0; ulCount--, ulStart++, ulTarget++ )
             {
-               hb_itemFastCopy( pDstBaseArray->pItems + ulTarget, pSrcBaseArray->pItems + ulStart );
+               hb_itemCopy( pDstBaseArray->pItems + ulTarget, pSrcBaseArray->pItems + ulStart );
             }
          }
       }
@@ -928,7 +928,7 @@ PHB_ITEM hb_arrayFromStack( USHORT uiLen )
 
    for( uiPos = 0; uiPos < uiLen; uiPos++ )
    {
-      hb_itemFastCopy( pBaseArray->pItems + uiPos, hb_stackItemFromTop( uiPos - uiLen ) );
+      hb_itemCopy( pBaseArray->pItems + uiPos, hb_stackItemFromTop( uiPos - uiLen ) );
    }
 
    pArray->item.asArray.value = pBaseArray;
@@ -963,7 +963,7 @@ PHB_ITEM hb_arrayFromParams( PHB_ITEM *pBase )
 
    for( uiPos = 0; uiPos < uiPCount; uiPos++ )
    {
-      hb_itemFastCopy( pBaseArray->pItems + uiPos, *( pBase + uiPos + 2 ) );
+      hb_itemCopy( pBaseArray->pItems + uiPos, *( pBase + uiPos + 2 ) );
    }
 
    pArray->item.asArray.value = pBaseArray;

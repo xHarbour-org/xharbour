@@ -1,32 +1,19 @@
-Procedure MAin()
+Function Main()
+ Local Program := { , }, Condition := 1, body := 2, Counter := 1, TheEnd := 1000000, stop, start
 
-  local nFlex_Start, nFlex_Time
-  local nSimpLex_Start, nSimpLex_Time
+ Program[ condition] := { || Counter == TheEnd}
+ Program[      body] := { || Counter++}
+ ? start := Second()
 
-  nFlex_Start := Seconds()
+ // in Clipper :
+ // While !Program[ condition]:Eval() ; Program[ body]:Eval()
+ // why Harbour CodeBlocks don't have Eval() method ?!
 
-  ! HB external /i\5Frame\include /n /m
-  ! HB external /i\5Frame\include /n /m
-  ! HB external /i\5Frame\include /n /m
-  ! HB external /i\5Frame\include /n /m
-  ! HB external /i\5Frame\include /n /m
-
-  nFlex_Time := Seconds() - nFlex_Start
-
-  nSimpLex_Start := Seconds()
-
-  ! HBNEW external /i\5Frame\include /n /m
-  ! HBNEW external /i\5Frame\include /n /m
-  ! HBNEW external /i\5Frame\include /n /m
-  ! HBNEW external /i\5Frame\include /n /m
-  ! HBNEW external /i\5Frame\include /n /m
-
-  nSimpLex_Time := Seconds() - nSimpLex_Start
-
-  ? "Flex   :", nFlex_Time
-  ? "SimpLex:", nSimpLex_Time
-
-Return
-
+ While !Eval( Program[ condition]) ; Eval( Program[ body])
+ End
+ ? stop := Second()
+ ? '==============='
+ ? stop - start
+ Return
 
 
