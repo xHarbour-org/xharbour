@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.19 2004/02/24 17:27:18 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.20 2004/07/20 20:46:09 ronpinkas Exp $
  */
 
 /*
@@ -225,7 +225,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          RETURN ValToPrgExp( xVal )
 
       CASE 'P'
-         RETURN "HB_HexToNum('" + HB_NumToHex( xVal ) + "')"
+         RETURN "0x" + HB_NumToHex( xVal )
 
       CASE 'O'
          IF nPad == NIL

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.411 2004/07/26 10:38:08 ronpinkas Exp $
+ * $Id: hvm.c,v 1.412 2004/07/28 22:28:36 ronpinkas Exp $
  */
 
 /*
@@ -6120,17 +6120,14 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       pSelf = hb_itemUnRef( pSelf );
    }
 
-   if( HB_IS_BLOCK( pSelf ) && hb_cls_uiBlockClass == 0 )
+   if( HB_IS_BLOCK( pSelf ) && pSym == &hb_symEval )
    {
-      if( pSym == &( hb_symEval ) )
-      {
-         pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
-      }
-      else if( strncmp( pSym->szName, "EVAL", 4 ) == 0 )
-      {
-         pSym = &hb_symEval;
-         pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
-      }
+      pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
+   }
+   else if( HB_IS_BLOCK( pSelf ) && strncmp( pSym->szName, "EVAL", 4 ) == 0 )
+   {
+      pSym = &hb_symEval;
+      pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
    }
    else if( HB_IS_OBJECT( pSelf ) ||
             ( HB_IS_ARRAY( pSelf )   && hb_cls_uiArrayClass )     ||

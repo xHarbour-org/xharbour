@@ -3,8 +3,10 @@
 PROCEDURE Main()
 
    LOCAL aVar := {}
+   LOCAL bDisplay := {|xElement| Alert( xElement:AsString ) }
+   LOCAL pPointer := IIF( .T., @Main(), )
 
-   ENABLE TYPE CLASS ARRAY, CHARACTER, NUMERIC
+   ENABLE TYPE CLASS ALL
 
    CLS
 
@@ -16,11 +18,13 @@ PROCEDURE Main()
 
    Alert( "Found at pos: " + aVar:IndexOf( "Three" ):AsString )
 
-   aVar:Do( {|xElement| Alert( xElement:AsString ) } )
+   aVar:Do( bDisplay )
 
    aVar:AddAll( { 4, "Five", 6 } )
 
    ? aVar:AsString
+   ? bDisplay:AsString
+   ? pPointer:AsString
 
 RETURN
 

@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.12 2004/07/26 20:56:40 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.13 2004/07/28 22:28:34 ronpinkas Exp $
  */
 
 /*
@@ -672,7 +672,7 @@ ENDCLASS
 //----------------------------------------------------------------------------//
 
 CLASS POINTER FROM SCALAROBJECT FUNCTION _POINTER
-   METHOD AsString INLINE HB_NumToHex( HB_QSelf() )
+   METHOD AsString INLINE "0x" + HB_NumToHex( HB_QSelf() )
 ENDCLASS
 
 FUNCTION UnRef( xValue )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.19 2004/07/26 20:56:39 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.20 2004/07/28 22:28:34 ronpinkas Exp $
  */
 
 /*
@@ -222,6 +222,7 @@ DECLARE HBClass ;
 
 // ENABLE
 #xcommand ENABLE TYPE CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> [, <typeN: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER>] => _<type>() [;_<typeN>()]
+#xcommand ENABLE TYPE CLASS ALL => _Array(); _Block(); _Character(); _Date(); _Logical(); _Nil(); _Numeric(); _Pointer()
 
 #xcommand ASSOCIATE CLASS <ClassName> WITH TYPE <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> => ;
   __clsAssocType( IIF( __ClsGetHandleFromName( <(ClassName)> ) == 0, <ClassName>():ClassH, __ClsGetHandleFromName( <(ClassName)> ) ), #<type> )

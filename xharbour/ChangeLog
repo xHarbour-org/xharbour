@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3234 2004/07/29 16:01:17 vouchcac Exp $
+ * $Id: ChangeLog,v 1.3235 2004/07/29 21:16:22 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-29 16:53 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbclass.ch
+    + Added support for ENABLE CLASS TYPE ALL (thanks to Francesco)
+
+  * source/rtl/tclass.prg
+  * source/rtl/cstr.prg
+    * Minor improvement in ValToPrg() related to Pointer type.
+
+  * source/vm/hvm.c
+    ! Fixed minor bug related to BLOCK class support.
+
+  * tests/enbltype.prg
+    * Enhanced to show more types.
 
 2004-07-29 23:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbset.h
@@ -33,7 +47,7 @@
     - HB_FUNC( WVT_CREATEDIALOG )
     + HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
       Basic function to create modeless dialogs.
-    + A lot more functions supporting dialog creation and supporting 
+    + A lot more functions supporting dialog creation and supporting
       different behaviors.
 
   * xharbour/source/rtl/gtwvt/wvtpaint.prg
@@ -44,7 +58,7 @@
 
   * xharbour/include/hbgtwvt.h
     + #define WVT_DLGML_MAX   20
-    - _s.hDlgModeless 
+    - _s.hDlgModeless
     + HWND      hDlgModeless[ WVT_DLGML_MAX ]; // Handle to a modeless dialog
     + PHB_ITEM  pFunc[ WVT_DLGML_MAX ];        // Function pointer for WndProc
     + int       iType[ WVT_DLGML_MAX ];        // Type of Function Pointers - Function 1, Block 2, Method 3
@@ -53,15 +67,15 @@
     Updated to demonstrate modeless dialogs.
 
   /*
-      At present only 20 modeless dialogs at any given time can be opened. 
-      These dialogs can be created dynamically at run time or can be created   
+      At present only 20 modeless dialogs at any given time can be opened.
+      These dialogs can be created dynamically at run time or can be created
       any resource editor and embedded in .exe which can be called either with
-      Resource Id or Name. The behavior of such dialogs can be controlled 
-      through user function at prg level just like user function of 
+      Resource Id or Name. The behavior of such dialogs can be controlled
+      through user function at prg level just like user function of
       memoedit() or achoice() empowering the developer with precise control.
-      
-      At present I could only manipulate function pointers as callback WndProc, 
-      have tried hard to use code blocks or ( for future class methods ) but 
+
+      At present I could only manipulate function pointers as callback WndProc,
+      have tried hard to use code blocks or ( for future class methods ) but
       could not succeed. Hope someone will help in this direction.
   */
 
@@ -83,7 +97,7 @@
     ! Fixed REPLALL(), REPLLEFT(), REPLRIGHT(). Fix provided by Martin Vogel.
   + contrib/libct/replace.prg
     + Added a test for REPLALL(), REPLLEFT(), and REPLRIGHT().
-			
+
 2004-07-28 23:42 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * xdiff.txt
     * Updated to include NIL in native type related extensions.
