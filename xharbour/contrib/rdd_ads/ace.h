@@ -1,6 +1,6 @@
 /*******************************************************************************
 * Source File  : ace.h
-* Copyright    : 1996-2001 Extended Systems, Inc.
+* Copyright    : 1996-2002 Extended Systems, Inc.
 * Description  : This is the main header file for the Advantage Client
 *                Engine.  It contains the type definitions, constants,
 *                and prototypes for the APIs
@@ -10,22 +10,21 @@
 #define __ACE_INCLUDED__
 
 
-#if defined( unix )
-   #ifndef ADS_LINUX
-   #define ADS_LINUX
-   #endif
-#endif
-
 #if defined( ADS_LINUX )
-   /* #include "unixutils.h" */
-
+   #include "unixutils.h"
 
    #define ADS_PATH_DELIMITER    '/'
+
    #ifdef ASANLM
       #define delay(x) AdsSleep(x)
    #endif
 #endif
 
+#if defined( unix )
+   #ifndef ADS_LINUX
+      #define ADS_LINUX
+   #endif
+#endif
 
 #if defined( ADS_LINUX ) && defined( ACE )
    /* This makes the callback functions compile in linux */
@@ -35,16 +34,15 @@
 #endif  // ADS_LINUX && ACE
 
 
-#if defined(ADS_LINUX) || defined(__GNUC__)
+#ifdef ADS_LINUX
    #pragma pack( 1 )
 #else
    #pragma pack( push, 1 )
 #endif
 
 /* This forces a warning for single equals in if statements */
-#if defined( WIN32 ) && !defined( ADS_LINUX )
-   /* 16-bit compiler doesn't seem to like this */
-   /* MingWin reports "warning: ignoring pragma: )" */
+#ifdef WIN32
+   // 16-bit compiler doesn't seem to like this
    #pragma warning( error : 4706 )
 
    #define ADS_PATH_DELIMITER    '\\'
@@ -79,7 +77,7 @@
 
 #if defined( ASANLM ) || defined( ADS_LINUX ) || defined( ASANT ) || defined( NLM ) || defined( ADS_NT ) || defined( ADS_WIN9X ) || defined( STAND_ALONE_EXE )
    #define ENTRYPOINT
-#elif defined( WIN32 ) && !defined( __BORLANDC__ ) && ! defined( __GNUC__ )
+#elif defined( WIN32 ) && !defined( __BORLANDC__ )
    #define ENTRYPOINT _declspec( dllexport ) WINAPI
 #else
    #define ENTRYPOINT _export WINAPI
@@ -110,10 +108,17 @@
 #define ADS_COMPRESS_INTERNET    0x0000000C
 
 /* options for opening tables - can be ORed together */
-#define ADS_EXCLUSIVE            0x00000001
-#define ADS_READONLY             0x00000002
-#define ADS_SHARED               0x00000004
-#define ADS_CLIPPER_MEMOS        0x00000008
+#define ADS_EXCLUSIVE                     0x00000001
+#define ADS_READONLY                      0x00000002
+#define ADS_SHARED                        0x00000004
+#define ADS_CLIPPER_MEMOS                 0x00000008
+#define ADS_TABLE_PERM_READ               0x00000010
+#define ADS_TABLE_PERM_UPDATE             0x00000020
+#define ADS_TABLE_PERM_INSERT             0x00000040
+#define ADS_TABLE_PERM_DELETE             0x00000080
+#define ADS_REINDEX_ON_COLLATION_MISMATCH 0x00000100
+#define ADS_IGNORE_COLLATION_MISMATCH     0x00000200
+
 
 /* Options for creating indexes - can be ORed together */
 #define ADS_ASCENDING            0x00000000
@@ -382,7 +387,13 @@
 #define AE_DD_UNSUPPORTED_DEPLOYMENT    5166
 #define AE_INFO_AUTO_CREATION_OCCURRED  5168
 #define AE_INFO_COPY_MADE_BY_CLIENT     5169
-#define AE_DATABASE_REQUIRE_NEW_SERVER  5170
+#define AE_DATABASE_REQUIRES_NEW_SERVER 5170
+#define AE_COLUMN_PERMISSION_DENIED     5171
+#define AE_DATABASE_REQUIRES_NEW_CLIENT 5172
+#define AE_INVALID_LINK_NUMBER          5173
+#define AE_LINK_ACTIVATION_FAILED       5174
+#define AE_INDEX_COLLATION_MISMATCH     5175
+#define AE_ILLEGAL_USER_OPERATION       5176
 
 /* Available OEM Languages (for Clipper compatibility) */
 #define ADS_LANG_USA          "USA"
@@ -618,6 +629,11 @@ typedef struct
    UNSIGNED16  usMaxConnFailures;      /* Maximum Internet connection failures allowed. */
    UNSIGNED32  ulInternetKeepAlive;    /* In Milliseconds */
 
+   UNSIGNED16  usCompressionLevel;     /* Compression option at server.  ADS_COMPRESS_NEVER,
+                                        * ADS_COMPRESS_INTERNET, or ADS_COMPRESS_ALWAYS */
+   UNSIGNED16  usReserved5;            /* reserved */
+   UNSIGNED32  ulReserved6;            /* reserved */
+
    } ADS_MGMT_CONFIG_PARAMS;
 
 typedef struct
@@ -730,18 +746,20 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_MAX_PROPERTY_LEN     0xFFFE
 #define ADS_DD_MAX_OBJECT_NAME_LEN  200
 
-#define ADS_DD_TABLE_OBJECT          1
-#define ADS_DD_RELATION_OBJECT       2
-#define ADS_DD_INDEX_FILE_OBJECT     3
-#define ADS_DD_FIELD_OBJECT          4
-#define ADS_DD_COLUMN_OBJECT         4
-#define ADS_DD_INDEX_OBJECT          5
-#define ADS_DD_VIEW_OBJECT           6
-#define ADS_DD_VIEW_OR_TABLE_OBJECT  7  /* Used in AdsFindFirst/NextTable */
-#define ADS_DD_USER_OBJECT           8
-#define ADS_DD_USER_GROUP_OBJECT     9
-#define ADS_DD_PROCEDURE_OBJECT     10
-#define ADS_DD_DATABASE_OBJECT      11
+#define ADS_DD_TABLE_OBJECT              1
+#define ADS_DD_RELATION_OBJECT           2
+#define ADS_DD_INDEX_FILE_OBJECT         3
+#define ADS_DD_FIELD_OBJECT              4
+#define ADS_DD_COLUMN_OBJECT             4
+#define ADS_DD_INDEX_OBJECT              5
+#define ADS_DD_VIEW_OBJECT               6
+#define ADS_DD_VIEW_OR_TABLE_OBJECT      7  /* Used in AdsFindFirst/NextTable */
+#define ADS_DD_USER_OBJECT               8
+#define ADS_DD_USER_GROUP_OBJECT         9
+#define ADS_DD_PROCEDURE_OBJECT          10
+#define ADS_DD_DATABASE_OBJECT           11
+#define ADS_DD_LINK_OBJECT               12
+#define ADS_DD_TABLE_VIEW_OR_LINK_OBJECT 13  /* Used in v6.2 AdsFindFirst/NextTable */
 
 
 /* Common properties numbers < 100 */
@@ -762,7 +780,8 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_INTERNET_SECURITY_LEVEL 108
 #define ADS_DD_MAX_FAILED_ATTEMPTS     109
 #define ADS_DD_ALLOW_ADSSYS_NET_ACCESS 110
-
+#define ADS_DD_VERSION_MAJOR           111  /* properties for customer dd version */
+#define ADS_DD_VERSION_MINOR           112
 
 /* Table properties between 200 and 299 */
 #define ADS_DD_TABLE_VALIDATION_EXPR   200
@@ -781,6 +800,7 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_TABLE_DEFAULT_INDEX     213
 #define ADS_DD_TABLE_ENCRYPTION        214
 #define ADS_DD_TABLE_MEMO_BLOCK_SIZE   215
+#define ADS_DD_TABLE_PERMISSION_LEVEL  216
 
 /* Field properties between 300 - 399 */
 #define ADS_DD_FIELD_DEFAULT_VALUE     300
@@ -794,12 +814,12 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_FIELD_DECIMAL           308
 
 /* Index tag properties between 400 - 499 */
-#define ADS_DD_INDEX_FILE_NAME           400
-#define ADS_DD_INDEX_EXPRESSION          401
-#define ADS_DD_INDEX_CONDITION           402
-#define ADS_DD_INDEX_OPTIONS             403
-#define ADS_DD_INDEX_KEY_LENGTH          404
-#define ADS_DD_INDEX_KEY_TYPE            405
+#define ADS_DD_INDEX_FILE_NAME         400
+#define ADS_DD_INDEX_EXPRESSION        401
+#define ADS_DD_INDEX_CONDITION         402
+#define ADS_DD_INDEX_OPTIONS           403
+#define ADS_DD_INDEX_KEY_LENGTH        404
+#define ADS_DD_INDEX_KEY_TYPE          405
 
 /* RI properties between 500-599 */
 #define ADS_DD_RI_PARENT_GRAPH         500
@@ -809,17 +829,8 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_RI_FOREIGN_INDEX        504
 #define ADS_DD_RI_UPDATERULE           505
 #define ADS_DD_RI_DELETERULE           506
-
-/* Referential Integrity (RI) update and delete rules */
-#define ADS_DD_RI_CASCADE       1
-#define ADS_DD_RI_RESTRICT      2
-#define ADS_DD_RI_SETNULL       3
-#define ADS_DD_RI_SETDEFAULT    4
-
-/* Default Field Value Options */
-#define ADS_DD_DFV_UNKNOWN         1
-#define ADS_DD_DFV_NONE            2
-#define ADS_DD_DFV_VALUES_STORED   3
+#define ADS_DD_RI_NO_PKEY_ERROR        507
+#define ADS_DD_RI_CASCADE_ERROR        508
 
 /* User properties between 600-699 */
 #define ADS_DD_USER_GROUP_NAME         600
@@ -836,43 +847,75 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_PROC_INVOKE_OPTION      804
 
 /* Index file properties 900-999 */
-#define ADS_DD_INDEX_FILE_PATH           900
-#define ADS_DD_INDEX_FILE_PAGESIZE       901
+#define ADS_DD_INDEX_FILE_PATH         900
+#define ADS_DD_INDEX_FILE_PAGESIZE     901
 
 /*
  * Object rights properties 1001 - 1099 .  They can be used
  * with either user or user group objects.
  */
-#define ADS_DD_TABLES_RIGHTS      1001
-#define ADS_DD_VIEWS_RIGHTS       1002
-#define ADS_DD_PROCS_RIGHTS       1003
-#define ADS_DD_OBJECTS_RIGHTS     1004
-#define ADS_DD_FREE_TABLES_RIGHTS 1005
+#define ADS_DD_TABLES_RIGHTS           1001
+#define ADS_DD_VIEWS_RIGHTS            1002
+#define ADS_DD_PROCS_RIGHTS            1003
+#define ADS_DD_OBJECTS_RIGHTS          1004
+#define ADS_DD_FREE_TABLES_RIGHTS      1005
 
 /* User Properties 1101 - 1199 */
 #define ADS_DD_USER_PASSWORD           1101
 #define ADS_DD_USER_GROUP_MEMBERSHIP   1102
+#define ADS_DD_USER_BAD_LOGINS         1103
+
+/* User group Properties 1201 - 1299 */
+/* None at this moment. */
+
+/* Link properties 1301 - 1399 */
+#define ADS_DD_LINK_PATH               1300
+#define ADS_DD_LINK_OPTIONS            1301
+#define ADS_DD_LINK_USERNAME           1302
+
 
 #define ADS_DD_LEVEL_0  0
 #define ADS_DD_LEVEL_1  1
 #define ADS_DD_LEVEL_2  2
 
+/* Referential Integrity (RI) update and delete rules */
+#define ADS_DD_RI_CASCADE       1
+#define ADS_DD_RI_RESTRICT      2
+#define ADS_DD_RI_SETNULL       3
+#define ADS_DD_RI_SETDEFAULT    4
 
-/* User group Properties 1201 - 1299 */
-/* None at this moment. */
-/* Also object rights properties 1001 - 1099 */
+/* Default Field Value Options */
+#define ADS_DD_DFV_UNKNOWN         1
+#define ADS_DD_DFV_NONE            2
+#define ADS_DD_DFV_VALUES_STORED   3
 
 /* Supported permissions in the data dictionary */
-#define ADS_PERMISSION_READ         1
-#define ADS_PERMISSION_UPDATE       2
-#define ADS_PERMISSION_INSERT       3
-#define ADS_PERMISSION_DELETE       4
-#define ADS_PERMISSION_EXECUTE      5
-#define ADS_PERMISSION_INHERIT      6
+#define ADS_PERMISSION_READ         0x00000001
+#define ADS_PERMISSION_UPDATE       0x00000002
+#define ADS_PERMISSION_EXECUTE      0x00000004
+#define ADS_PERMISSION_INHERIT      0x00000008
+#define ADS_PERMISSION_INSERT       0x00000010
+#define ADS_PERMISSION_DELETE       0x00000020
+#define ADS_PERMISSION_LINK_ACCESS  0x00000040
 
 
+/* Link DD options */
+#define ADS_LINK_GLOBAL             0x00000001
+#define ADS_LINK_AUTH_ACTIVE_USER   0x00000002
+#define ADS_LINK_PATH_IS_STATIC     0x00000004
 
-/* stored procedure functions must be of this type */
+/*
+ * Table permission verification levels.
+ * level 1 is all columns searchable, even those without permission.
+ * level 2 is default. Permission to the column is required to search or filter on a column.
+ * level 3 is most restricted. Only static SQL cursor is allowed.
+ */
+#define ADS_DD_TABLE_PERMISSION_LEVEL_1   1
+#define ADS_DD_TABLE_PERMISSION_LEVEL_2   2
+#define ADS_DD_TABLE_PERMISSION_LEVEL_3   3
+
+
+   /* stored procedure functions must be of this type */
 #ifdef WINAPI
 typedef UNSIGNED32 (WINAPI *STORED_PROCEDURE_PTR)
 (
@@ -913,7 +956,7 @@ typedef UNSIGNED32 (WINAPI *SHUTDOWN_PROCEDURE_PTR)
    UNSIGNED8   *pucPassword    // (I) the user's password in encrypted form
 );
 
-#endif
+#endif // WINAPI
 
 /*
  * This macro allows a numeric field value to be passed into functions
@@ -935,7 +978,7 @@ UNSIGNED32 ENTRYPOINT AdsAddCustomKey( ADSHANDLE hIndex );
 
 UNSIGNED32 ENTRYPOINT AdsAppendRecord( ADSHANDLE hTable );
 
-UNSIGNED32 ENTRYPOINT AdsApplicationExit( void );
+UNSIGNED32 ENTRYPOINT AdsApplicationExit();
 
 UNSIGNED32 ENTRYPOINT AdsAtBOF( ADSHANDLE    hTable,
                                 UNSIGNED16   *pbBof );
@@ -1012,7 +1055,7 @@ UNSIGNED32 ENTRYPOINT AdsCopyTable( ADSHANDLE   hObj,
                                     UNSIGNED16  usFilterOption,
                                     UNSIGNED8   *pucFile );
 
-UNSIGNED32 ENTRYPOINT AdsCopyTableContents( ADSHANDLE    hObj,
+UNSIGNED32 ENTRYPOINT AdsCopyTableContents( ADSHANDLE    hObjFrom,
                                             ADSHANDLE    hTableTo,
                                             UNSIGNED16   usFilterOption );
 
@@ -1064,6 +1107,18 @@ UNSIGNED32 ENTRYPOINT AdsDDCreateRefIntegrity( ADSHANDLE  hDictionary,
                                                UNSIGNED16 usUpdateRule,
                                                UNSIGNED16 usDeleteRule );
 
+UNSIGNED32 ENTRYPOINT AdsDDCreateRefIntegrity62( ADSHANDLE  hDictionary,
+                                               UNSIGNED8  *pucRIName,
+                                               UNSIGNED8  *pucFailTable,
+                                               UNSIGNED8  *pucParentTableName,
+                                               UNSIGNED8  *pucParentTagName,
+                                               UNSIGNED8  *pucChildTableName,
+                                               UNSIGNED8  *pucChildTagName,
+                                               UNSIGNED16 usUpdateRule,
+                                               UNSIGNED16 usDeleteRule,
+                                               UNSIGNED8  *pucNoPrimaryError,
+                                               UNSIGNED8  *pucCascadeError );
+
 UNSIGNED32 ENTRYPOINT AdsDDRemoveRefIntegrity( ADSHANDLE  hDictionary,
                                                UNSIGNED8  *pucRIName );
 
@@ -1092,6 +1147,12 @@ UNSIGNED32 ENTRYPOINT AdsDDGetIndexProperty( ADSHANDLE  hObject,
                                              UNSIGNED16 usPropertyID,
                                              VOID       *pvProperty,
                                              UNSIGNED16 *pusPropertyLen );
+
+UNSIGNED32 ENTRYPOINT AdsDDGetLinkProperty( ADSHANDLE  hConnect,
+                                            UNSIGNED8  *pucLinkName,
+                                            UNSIGNED16 usPropertyID,
+                                            VOID       *pvProperty,
+                                            UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetTableProperty( ADSHANDLE  hObject,
                                              UNSIGNED8  *pucTableName,
@@ -1135,22 +1196,21 @@ UNSIGNED32 ENTRYPOINT AdsDDGetPermissions( ADSHANDLE  hDBConn,
                                            UNSIGNED8  *pucObjectName,
                                            UNSIGNED8  *pucParentName,
                                            UNSIGNED16 usGetInherited,
-                                           UNSIGNED8  *pucPermissions,
-                                           UNSIGNED16 *pusBufferLen );
+                                           UNSIGNED32 *pulPermissions );
 
 UNSIGNED32 ENTRYPOINT AdsDDGrantPermission( ADSHANDLE  hAdminConn,
                                             UNSIGNED16 usObjectType,
                                             UNSIGNED8  *pucObjectName,
                                             UNSIGNED8  *pucParentName,
                                             UNSIGNED8  *pucGrantee,
-                                            UNSIGNED16 usPermission );
+                                            UNSIGNED32 ulPermissions );
 
 UNSIGNED32 ENTRYPOINT AdsDDRevokePermission( ADSHANDLE  hAdminConn,
                                              UNSIGNED16 usObjectType,
                                              UNSIGNED8  *pucObjectName,
                                              UNSIGNED8  *pucParentName,
                                              UNSIGNED8  *pucGrantee,
-                                             UNSIGNED16 usPermission );
+                                             UNSIGNED32 ulPermissions );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetDatabaseProperty( ADSHANDLE  hDictionary,
                                         UNSIGNED16 usPropertyID,
@@ -1279,6 +1339,17 @@ UNSIGNED32 ENTRYPOINT AdsDDFindNextObject( ADSHANDLE  hObject,
 
 UNSIGNED32 ENTRYPOINT AdsDDFindClose( ADSHANDLE hObject, ADSHANDLE hFindHandle );
 
+UNSIGNED32 ENTRYPOINT AdsDDCreateLink( ADSHANDLE  hDBConn,
+                                       UNSIGNED8  *pucLinkAlias,
+                                       UNSIGNED8  *pucLinkedDDPath,
+                                       UNSIGNED8  *pucUserName,
+                                       UNSIGNED8  *pucPassword,
+                                       UNSIGNED32 ulOptions );
+
+UNSIGNED32 ENTRYPOINT AdsDDDropLink( ADSHANDLE  hDBConn,
+                                     UNSIGNED8  *pucLinkedDD,
+                                     UNSIGNED16 usDropGlobal );
+
 UNSIGNED32 ENTRYPOINT AdsDecryptRecord( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsDecryptTable( ADSHANDLE hTable );
@@ -1356,6 +1427,21 @@ UNSIGNED32 ENTRYPOINT AdsFindNextTable( ADSHANDLE hConnect,
                                         SIGNED32 lHandle,
                                         UNSIGNED8 *pucFileName,
                                         UNSIGNED16 *pusFileLen );
+
+UNSIGNED32 ENTRYPOINT AdsFindFirstTable62( ADSHANDLE  hConnect,
+                                           UNSIGNED8  *pucFileMask,
+                                           UNSIGNED8  *pucFirstDD,
+                                           UNSIGNED16 *pusDDLen,
+                                           UNSIGNED8  *pucFirstFile,
+                                           UNSIGNED16 *pusFileLen,
+                                           SIGNED32   *plHandle );
+
+UNSIGNED32 ENTRYPOINT AdsFindNextTable62( ADSHANDLE hConnect,
+                                          SIGNED32 lHandle,
+                                          UNSIGNED8 *pucDDName,
+                                          UNSIGNED16 *pusDDLen,
+                                          UNSIGNED8 *pucFileName,
+                                          UNSIGNED16 *pusFileLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetAllIndexes(
                               ADSHANDLE        hTable,
@@ -1595,6 +1681,16 @@ UNSIGNED32 ENTRYPOINT AdsGetMilliseconds(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               SIGNED32         *plTime );
+
+UNSIGNED32 ENTRYPOINT AdsGetActiveLinkInfo(
+                              ADSHANDLE         hDBConn,
+                              UNSIGNED16        usLinkNum,
+                              UNSIGNED8         *pucLinkInfo,
+                              UNSIGNED16        *pusBufferLen );
+
+UNSIGNED32 ENTRYPOINT AdsGetNumActiveLinks(
+                              ADSHANDLE         hDBConn,
+                              UNSIGNED16        *pusNumLinks );
 
 UNSIGNED32 ENTRYPOINT AdsGetNumFields(
                               ADSHANDLE        hTable,
@@ -2260,12 +2356,27 @@ UNSIGNED32 ENTRYPOINT AdsDDDeployDatabase( UNSIGNED8 *pucDestination,
                                            UNSIGNED16 usBackupFiles,
                                            UNSIGNED32 ulOptions );
 
+UNSIGNED32 ENTRYPOINT AdsVerifySQL( ADSHANDLE hStatement,
+                                    UNSIGNED8 *pucSQL );
+
+UNSIGNED32 ENTRYPOINT AdsDisableUniqueEnforcement( ADSHANDLE hConnection );
+
+UNSIGNED32 ENTRYPOINT AdsEnableUniqueEnforcement( ADSHANDLE hConnection );
+
+UNSIGNED32 ENTRYPOINT AdsDisableRI( ADSHANDLE hConnection );
+
+UNSIGNED32 ENTRYPOINT AdsEnableRI( ADSHANDLE hConnection );
+
+UNSIGNED32 ENTRYPOINT AdsDisableAutoIncEnforcement( ADSHANDLE hConnection );
+
+UNSIGNED32 ENTRYPOINT AdsEnableAutoIncEnforcement( ADSHANDLE hConnection );
+
 #ifdef __cplusplus
    }  /* extern "C" */
 #endif
 
 
-#if defined(ADS_LINUX) || defined(__GNUC__)
+#ifdef ADS_LINUX
    #pragma pack()
 #else
    #pragma pack( pop )
