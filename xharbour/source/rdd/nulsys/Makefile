@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:43:00 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2003/01/10 16:13:06 jonnymind Exp $
 #
 
 ROOT = ../../../
@@ -10,10 +10,8 @@ PRG_SOURCES=\
 	nulsys.prg \
 
 ifeq ($(HB_MT),MT)
-LIBNAME=nulsysmt
-ARCH_SUFFIX=_mt
-else
-LIBNAME=nulsys
+  MT_LIBNAME=nulsysmt
 endif
+LIBNAME=nulsys
 
 include $(TOP)$(ROOT)config/lib.cf
