@@ -92,6 +92,7 @@ METHOD OnDestroy()
 
 METHOD OnMenuCommand(oItem)
 
+   LOCAL oObj
    LOCAL nInd:=0
    LOCAL cName:=::GetUniquePropName(oItem:Text)
 
@@ -114,6 +115,9 @@ METHOD OnMenuCommand(oItem)
       IF !("2" $ cName) // only one status bar
         ::Add(cName, TStatusBar():New( self, cName, 507 ) )
       ENDIF
+   CASE oItem:Text=="TabControl"
+      oObj := ::Add(cName, TTabControl():New( self,     508, 50, 50, 200, 200 ) )
+      oObj:AddTab( "Tab1")
    ENDCASE
 
   RETURN(NIL)
