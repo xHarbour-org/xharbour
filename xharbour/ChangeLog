@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.938 2003/04/10 01:30:03 lculik Exp $
+ * $Id: ChangeLog,v 1.939 2003/04/10 16:51:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,6 +11,9 @@
 2003-04-10 09:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
     + Added excess space removal to CommandStuff()
+
+  * makefile.bc
+    * Removed -D__EXPORT__ from default flags.
 
    - tests/tst.prg
      - Removed non used file.
