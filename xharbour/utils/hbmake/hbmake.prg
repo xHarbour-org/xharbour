@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.82 2003/08/05 03:17:22 lculik Exp $
+ * $Id: hbmake.prg,v 1.83 2003/08/06 14:30:24 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -777,7 +777,7 @@ FUNCTION CompileFiles()
                IF nPos > 0
                   cComm := Strtran( cComm, "o$*", "o" + s_aCs[ nPos ] )
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
+                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                   Outstd( cComm )
                   Outstd( Hb_OsNewLine() )
                   __RUN( (cComm) )
@@ -848,7 +848,7 @@ FUNCTION CompileFiles()
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] ) 
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
+                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                   Outstd( " " )
                   Outstd( cComm )
                   Outstd( Hb_OsNewLine() )
@@ -973,7 +973,7 @@ FUNCTION CompileFiles()
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
+                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
 
                   @  4, 16 SAY cPrg
                   GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
@@ -1964,7 +1964,7 @@ FUNCTION CompileUpdatedFiles()
                      aAdd( aCtocompile, s_aCs[ nPos ] )
                      cComm := Strtran( cComm, "o$*", "o" + s_aCs[ nPos ] )
                      cComm := Strtran( cComm, "$**", s_aPrgs[ nFiles ] )
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 , " 2> "+ (s_cLog)," >>"+ (s_cLog))
+                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 , " > "+ (s_cLog)," >>"+ (s_cLog))
 
                      //                   Outstd( cComm )
                      //                   Outstd( Hb_OsNewLine() )
@@ -2022,7 +2022,7 @@ FUNCTION CompileUpdatedFiles()
                IF nPos > 0
                   cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                   cComm := Strtran( cComm, "$**", aCtocompile[ nFiles ] )
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
+                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                   Outstd( " " )
 
                   Outstd( cComm )
@@ -2065,7 +2065,7 @@ FUNCTION CompileUpdatedFiles()
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjsc[ nPos ] )
                      cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
+                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                      nFile ++
@@ -2126,7 +2126,7 @@ FUNCTION CompileUpdatedFiles()
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                      cComm := Strtran( cComm, "$**", cPrg )
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
+                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                      @  4, 16 SAY cPrg
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
 
