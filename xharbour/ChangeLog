@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3516 2004/10/22 11:26:35 paultucker Exp $
+ * $Id: ChangeLog,v 1.3517 2004/10/22 11:55:52 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-22 08:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/maxrow.c
+    * implement MaxRow(.t.) and MaxCol(.t.) to return max possible window
+    * size for the current screen mode.
+    * Usage at startup could be SetMode(MaxRow(.t.), MaxCol(.t.))
+  * source/rtl/makefile
+    - datesx.c
 
 2004-10-22 08:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/dates.c
