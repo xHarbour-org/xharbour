@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.26 2003/12/09 02:53:49 ronpinkas Exp $
+ * $Id: trpccli.prg,v 1.27 2003/12/11 14:44:52 jonnymind Exp $
  */
 
 /*
@@ -290,7 +290,7 @@ METHOD CheckServer( cRemote )
          IF InetErrorCode( skRemote ) == 0
             cData := Substr( cData + cData2, 7 )
             cData2 := HB_Deserialize( cData )
-            ::aServers := { {InetAddress( skRemote ), cData2} }
+            AAdd(::aServers, {InetAddress( skRemote ), cData2} )
             RETURN .T.
          ENDIF
       ENDIF
@@ -309,9 +309,11 @@ METHOD ScanFunctions(cFunc, cSerial ) CLASS tRPCClient
 #ifdef HB_THREAD_SUPPORT
    HB_MutexLock( ::mtxBusy )
    ::aFunctions = {}
+   ::aServers = {}
    HB_MutexUnlock( ::mtxBusy )
 #else
    ::aFunctions = {}
+   ::aServers = {}
 #endif
 
    InetDGramSend( ::skUDP, ::cNetwork, ::nUdpPort,;
@@ -361,7 +363,7 @@ METHOD UDPAccept() CLASS tRPCClient
    DO WHILE .T.
       nDatalen := InetDGramRecv( ::skUDP, @cData, 1400 )
 
-      IF ::UDPParse( cData, nDatalen )
+      IF nDataLen > 0 .and. ::UDPParse( cData, nDatalen )
          EXIT
       ENDIF
 
@@ -429,7 +431,7 @@ METHOD UDPParse( cData, nLen ) CLASS tRPCClient
 
    ENDCASE
 
-RETURN .T.
+RETURN .F.
 
 
 METHOD StopScan() CLASS tRPCClient
@@ -1024,12 +1026,17 @@ METHOD GetFunctionName( xId ) CLASS tRpcClient
 
    IF ValType( xID ) == "A"
       cData := xId[3]
-   ELSE
+   ELSEIF Len( ::aFunctions ) > 0
       cData := ::aFunctions[xId][3]
+   ELSE
+      cData := ""
    ENDIF
 
-   nPos := At( "(", cData )
-   cData := Substr( cData, 1, nPos-1 )
+   IF .not. Empty(cData)
+      nPos := At( "(", cData )
+      cData := Substr( cData, 1, nPos-1 )
+   ENDIF
+
 RETURN cData
 
 
@@ -1041,8 +1048,10 @@ METHOD GetServerName( xId ) CLASS tRpcClient
    ELSE
       IF Len( ::aFunctions ) > 0
          cData := ::aFunctions[xId][2]
-      ELSE
+      ELSEIF Len( ::aServers ) > 0
          cData := ::aServers[xId][2]
+      ELSE
+         cData := ""
       ENDIF
    ENDIF
 RETURN cData
@@ -1056,8 +1065,10 @@ METHOD GetServerAddress( xId ) CLASS tRpcClient
    ELSE
       IF .not. Empty( ::aFunctions )
          cData := ::aFunctions[xId][1]
-      ELSE
+      ELSEIF .not. Empty( ::aServers )
          cData := ::aServers[xId][1]
+      ELSE
+         cData := ""
       ENDIF
    ENDIF
 

@@ -1,6 +1,6 @@
 ************************************************************
 * rpcserver.prg
-* $Id: rpcserver.prg,v 1.8 2003/09/23 15:16:21 jonnymind Exp $
+* $Id: rpcserver.prg,v 1.9 2003/11/28 16:10:51 jonnymind Exp $
 * Test for tRpcServer and tRpcFunction class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -93,7 +93,7 @@ FUNCTION Terminating( oClient )
 RETURN .T.
 
 FUNCTION FuncError( oServer, cFunc, nError )
-   ? "ERROR in function call: ", InetAddress( oServer:skTCP ), nError, cFunc
+   ? "ERROR in function call: ", InetAddress( oServer:skRemote ), nError, cFunc
 RETURN .T.
 
 /* This function receives also a parameter: the userid for which the
