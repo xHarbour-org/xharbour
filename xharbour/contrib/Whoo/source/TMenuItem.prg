@@ -1,5 +1,5 @@
 /*
- * $Id: TMenuItem.prg,v 1.13 2003/01/09 08:21:47 what32 Exp $
+ * $Id: TMenuItem.prg,v 1.14 2003/01/23 03:47:09 what32 Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ CLASS TMenuItem FROM TComponent
    DATA FDefault   INIT .F.
 
    DATA PopUp
-
+   
    PROPERTY Enabled    READ FEnabled WRITE SetEnabled
    PROPERTY Command    READ FCommand WRITE SetCommand
    PROPERTY ImageIndex READ FImageIndex WRITE SetImageIndex
@@ -105,7 +105,7 @@ CLASS TMenuItem FROM TComponent
 
    METHOD Create() CONSTRUCTOR
    METHOD MenuSet()
-   METHOD AppendTo( oMenu, bRightToLeft )
+   METHOD AppendTo( HMenu, bRightToLeft )
    METHOD GetHandle
    METHOD UniqueCommand  INLINE ::FCommandID++
 //   METHOD PopulateMenu() INLINE  ::AppendTo( ::FHandle, ::MenuRightToLeft )
@@ -144,8 +144,6 @@ METHOD Create( oMenu ) CLASS TMenuItem
    ::FDefault   := .F.
    ::MenuItemInfo IS MENUITEMINFO
    
-   //aAdd( oMenu:aItems, self )
-
 Return Self
 
 *-----------------------------------------------------------------------------*
@@ -153,7 +151,7 @@ METHOD MenuSet( nTest, nOther) CLASS TMenuItem
 
    LOCAL nMask := Or(nTest, nOther)
 
-Return AND(GetMenuState(::oMenu:handle, ::Id, MF_BYCOMMAND), nMask) == nTest
+Return AND(GetMenuState(::oMenu:Fhandle, ::Id, MF_BYCOMMAND), nMask) == nTest
 
 METHOD AppendTo( HMenu, ARightToLeft ) CLASS TMenuItem
 
@@ -174,56 +172,42 @@ METHOD AppendTo( HMenu, ARightToLeft ) CLASS TMenuItem
   DEFAULT ARightToLeft TO .F.
   
   IF ::FVisible
-    Caption := ::FCaption
+     Caption := ::FCaption
 
-    IF ::GetCount() > 0
-       ::MenuItemInfo:hSubMenu := ::GetHandle()
-    ELSEIF ( ( ::Parent == NIL ) .OR. ( ::Parent:Parent <> NIL ) .OR. ! ( ::Parent:Owner:ClassName == "TMAINMENU" ) )
-      //Caption := Caption + Chr( 9 ) //+ ShortCutToText( ::FShortCut )
-    ENDIF
-    DEFAULT Caption TO "?"
-    ::SetParentComponent( Self )
-    IF LoWord( GetVersion() ) >= 4
+     IF ::GetCount() > 0
+        ::MenuItemInfo:hSubMenu := ::GetHandle()
+     ELSE
+        ::MenuItemInfo:hSubMenu := 0
+     ENDIF
+
+     DEFAULT Caption TO "?"
+
+     ::SetParentComponent( Self )
     
-       ::MenuItemInfo:cbSize := ::MenuItemInfo:SizeOf() //44 // Required for Windows 95
-       ::MenuItemInfo:fMask := MIIM_CHECKMARKS + MIIM_DATA + MIIM_ID + MIIM_STATE + MIIM_SUBMENU + MIIM_TYPE
-       ParentMenu := ::GetParentMenu()
-       IsOwnerDraw := .F. //ParentMenu != NIL .AND. Or( ParentMenu:IsOwnerDraw, ::FBitmap != NIL ) > 0 .AND. ! ::FBitmap:Empty
-       
-       
-       ::MenuItemInfo:fType := IRadios[ IIF( ::FRadioItem, 2, 1 ) ] + IBreaks[ IIF( ::FBreak, 2, 1 ) ] + ;
-                              ISeparators[ IIF( ::FCaption == '-', 2, 1 ) ] + IRTL[ IIF( ARightToLeft, 2, 1 ) ] + ;
-                              IOwnerDraw[ IIF( IsOwnerDraw, 2, 1 ) ]
+     ::MenuItemInfo:cbSize := ::MenuItemInfo:SizeOf() //44 // Required for Windows 95
+     ::MenuItemInfo:fMask := MIIM_CHECKMARKS + MIIM_DATA + MIIM_ID + MIIM_STATE + MIIM_SUBMENU + MIIM_TYPE
+     ParentMenu := ::GetParentMenu()
+     IsOwnerDraw := .F. //ParentMenu != NIL .AND. Or( ParentMenu:IsOwnerDraw, ::FBitmap != NIL ) > 0 .AND. ! ::FBitmap:Empty
+     
+     
+     ::MenuItemInfo:fType :=IRadios[ IIF( ::FRadioItem, 2, 1 ) ] + IBreaks[ IIF( ::FBreak, 2, 1 ) ] + ;
+                            ISeparators[ IIF( ::FCaption == '-', 2, 1 ) ] + IRTL[ IIF( ARightToLeft, 2, 1 ) ] + ;
+                            IOwnerDraw[ IIF( IsOwnerDraw, 2, 1 ) ]
 
-       ::MenuItemInfo:fState        := IChecks[ IIF( ::FChecked, 2, 1 ) ] + IEnables[ IIF( ::FEnabled, 2, 1 ) ] + IDefaults[ IIF( ::FDefault, 2, 1 ) ]
-       ::MenuItemInfo:wID           := ::Command
-       ::MenuItemInfo:hSubMenu      := 0
-       ::MenuItemInfo:hbmpChecked   := 0
-       ::MenuItemInfo:hbmpUnchecked := 0
-       ::MenuItemInfo:dwTypeData    := Caption
 
-       IF ::GetCount > 0
-          ::MenuItemInfo:hSubMenu := ::GetHandle()
-       ENDIF
+     ::MenuItemInfo:fState        := IChecks[ IIF( ::FChecked, 2, 1 ) ] + IEnables[ IIF( ::FEnabled, 2, 1 ) ] + IDefaults[ IIF( ::FDefault, 2, 1 ) ]
+     ::MenuItemInfo:wID           := ::FCommand
+     ::MenuItemInfo:hbmpChecked   := 0
+     ::MenuItemInfo:hbmpUnchecked := 0
+     ::MenuItemInfo:dwTypeData    := Caption
 
-       view InsertMenuItem( HMenu, -1, .T., ::MenuItemInfo:value )
-       
-    ELSE
-      NewFlags := Or( Breaks[ IIF( ::FBreak, 2, 1 ) ], ;
-                      Checks[ IIF( ::FChecked, 2, 1 ) ],;
-                      Enables[ IIF( ::FEnabled, 2, 1 ) ], ;
-                      Separators[ IIF( ::FCaption == '-', 2, 1 ) ], ;
-                      MF_BYPOSITION )
+     IF ::GetCount > 0
+        ::MenuItemInfo:hSubMenu := ::GetHandle()
+     ENDIF
 
-      IF ::GetCount > 0
-        InsertMenu( ::FMenu, -1, Or( MF_POPUP, NewFlags ), ::GetHandle, ::FCaption )
-      ELSE
-        InsertMenu( ::FMenu, -1, NewFlags, ::Command, Caption )
-      ENDIF
-    ENDIF
+     InsertMenuItem( HMenu, -1, .T., ::MenuItemInfo:value )
+     
   ENDIF
-
-//  ::PopUp := TPopup():New( Self, ::Caption )
 
 Return NIL
 
@@ -235,13 +219,8 @@ METHOD GetHandle() CLASS TMenuItem
       ELSE
          ::FHandle := CreateMenu()
       ENDIF
-
-      IF ::FHandle == 0
-         // Raise Error
-      ENDIF
-
-      ::PopulateMenu()
    ENDIF
+   //::PopulateMenu()
 
 Return ::FHandle
 
@@ -250,7 +229,7 @@ METHOD PopulateMenu() CLASS TMenuItem
    LOCAL MenuItem
 
    FOR EACH MenuItem IN ::FItems
-      MenuItem:AppendTo( ::FHandle, .F. )
+      MenuItem:AppendTo( MenuItem:FHandle )
    NEXT
 
 Return NIL
@@ -264,7 +243,6 @@ METHOD Insert( Index, Item ) CLASS TMenuItem
   IF ::FItems == NIL
      ::FItems := {}
   ENDIF
-
   IF ( Index >= 0 ) .AND. ( Index < Len( ::FItems ) )
     IF Item:GroupIndex < ::FItems[ Index]:GroupIndex
       Item:GroupIndex := ::FItems[Index]:GroupIndex
@@ -274,7 +252,6 @@ METHOD Insert( Index, Item ) CLASS TMenuItem
   //::VerifyGroupIndex( Index, Item.GroupIndex )
 
   aIns( ::FItems, Index, Item, .T. )
-
   Item:FOwner := Self
   Item:FOnChange := HB_ObjMsgPtr( Self, "SubItemChanged" )
 
@@ -371,7 +348,7 @@ METHOD SetCaption( Value ) CLASS TMenuItem
 
    IF Value != NIL .AND. ::FCaption != Value
       ::FCaption := Value
-      ::MenuItemInfo:dwTypeData    := ::FCaption
+      ::MenuItemInfo:dwTypeData := ::FCaption
       ::MenuItemInfo:fMask := MIIM_DATA
       ::MenuItemInfo:fMask := MIIM_CHECKMARKS + MIIM_DATA + MIIM_ID + MIIM_STATE + MIIM_SUBMENU + MIIM_TYPE
 
@@ -385,7 +362,7 @@ METHOD SetCommand( Value ) CLASS TMenuItem
 
    IF Value != NIL .AND. ::FCommand != Value
       ::FCommand := Value
-      ::MenuItemInfo:dwTypeData    := ::FCaption
+      ::MenuItemInfo:wID   := ::FCommand
       ::MenuItemInfo:fMask := MIIM_ID
       SetMenuItemInfo( ::FMenu:Handle, ::MenuItemInfo:wID, .T., ::MenuItemInfo:value )
       ::MenuChanged( .T. )
@@ -400,11 +377,11 @@ METHOD SetParentComponent( Value ) CLASS TMenuItem
       ::FParent:Remove( Self )
    ENDIF
    IF Value != NIL
-//      IF Value:IsDerivedFrom( "TMenu" )
+      IF Value:Owner:IsDerivedFrom( "TMenu" )
          aAdd( Value:Items, Self )
-//      ELSEIF Value:ClassName == "TMENUITEM"
-//         TMenuItem( Value ):Add( Self )
-//      ENDIF
+      ELSEIF Value:Owner:ClassName == "TMENUITEM"
+         TMenuItem( Value ):Add( Self )
+      ENDIF
    ENDIF
 
 RETURN NIL

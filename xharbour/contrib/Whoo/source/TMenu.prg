@@ -47,12 +47,14 @@ CLASS TMenu FROM TComponent
    PROPERTY OwnerDraw    READ FOwnerDraw
    PROPERTY Images       READ FImages
 
+   DATA aItems PROTECTED INIT {}
+   
    METHOD Create() CONSTRUCTOR
    METHOD GetHandle()
    METHOD SetWindowHandle()
    METHOD UpdateImage()
    METHOD IsOwnerDraw()
-
+   METHOD DeployMenu()
    METHOD AddPopUp()
    METHOD Set()
    METHOD GetItem(nId)
@@ -157,7 +159,6 @@ METHOD Set() CLASS TMenu
 METHOD GetItem( nId ) CLASS TMenu
 
    local n := aScan( ::aItems,{|o|o:id == nId} )
-
    if n > 0
       return( ::aItems[n] )
    endif
@@ -170,15 +171,24 @@ METHOD GetPos( nId ) CLASS TMenu
 Return( aScan( ::aItems,{|o|o:id == nId} ) )
 
 METHOD GetHandle() CLASS TMenu
-Return ::FItems:GetHandle()
+RETURN ::FItems:GetHandle()
+
 
 METHOD IsOwnerDraw() CLASS TMenu
-
    LOCAL Result 
-   
    IF ::FOwnerDraw == NIL
       ::FOwnerDraw := .F.
    ENDIF
-
    Result := ( ::OwnerDraw .OR. ::Images != NIL )
 RETURN Result
+
+
+METHOD DeployMenu() CLASS TMenu
+   LOCAL MenuItem, SubMenu
+   FOR EACH MenuItem IN ::aItems
+      MenuItem:AppendTo( ::FHandle )
+      FOR EACH SubMenu IN MenuItem:aItems
+         MenuItem:AppendTo( SubMenu:FMenu:FHandle )
+      NEXT
+   NEXT
+RETURN NIL

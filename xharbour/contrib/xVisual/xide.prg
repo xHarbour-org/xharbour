@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.138 2003/01/09 08:22:46 what32 Exp $
+ * $Id: xide.prg,v 1.139 2003/01/23 03:47:12 what32 Exp $
  */
 
 /*
@@ -115,33 +115,23 @@ METHOD MainMenu() CLASS MainForm
       oItem:Caption := "File"
       oItem:AppendTo( oMenu:Handle )
    
-         oSubItem := TMenuItem():Create( oMenu )
+         oSubItem := TMenuItem():Create( oItem )
+         oSubItem:Caption := "Open"
+         oSubItem:AppendTo( oItem:Handle )
+
+         oSubItem := TMenuItem():Create( oItem )
+         oSubItem:Caption := "-"
+         oSubItem:AppendTo( oItem:Handle )
+
+         oSubItem := TMenuItem():Create( oItem )
          oSubItem:Caption := "Exit"
          oSubItem:AppendTo( oItem:Handle )
 
+//   oMenu:GetHandle()
+//   oMenu:DeployMenu()
+
    ::SetMenu( oMenu )
-/*
-   oPopup:Caption := "File"
-   oPopup:AppendTo( ::WindowMenu:Handle )
-*/
-/*
-   oMenuItem := TMenuItem():Create( oPopup )
-   oMenuItem:Caption := "Editor"
-   oMenuItem:AppendTo( oPopup:Handle )
 
-   oMenuItem := TMenuItem():Create( oPopup )
-   oMenuItem:Caption := "Open"
-   oMenuItem:AppendTo( oPopup:Handle )
-
-   oMenuItem := TMenuItem():Create( Self )
-   oMenuItem:Caption := "-"
-   oMenuItem:AppendTo( oPopup:Handle )
-
-   oMenuItem := TMenuItem():Create( oPopup )
-   oMenuItem:Caption := "Exit"
-   oMenuItem:AppendTo( oPopup:Handle )
-
-*/
 RETURN Self
 
 //----------------------------------------------------------------------------------------------
