@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.4 2003/05/26 13:32:49 druzus Exp $
+ * $Id: gtcrs.h,v 1.5 2003/06/15 13:11:58 druzus Exp $
  */
 
 /*
@@ -64,6 +64,11 @@
 #include "hbapigt.h"
 #include "inkey.ch"
 #include "setcurs.ch"
+
+#ifndef HB_CDP_SUPPORT_OFF
+#include "hbapicdp.h"
+extern PHB_CODEPAGE s_cdpage;
+#endif
 
 #ifndef _POSIX_PATH_MAX
 #define _POSIX_PATH_MAX 256

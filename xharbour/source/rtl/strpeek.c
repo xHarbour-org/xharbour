@@ -1,13 +1,13 @@
 /*
- * $Id: is.c,v 1.3 2003/05/28 11:59:05 druzus Exp $
+ * $Id$
  */
 
 /*
- * Harbour Project source code:
- * IS*() string functions
+ * Harbour Project source code FlagShip compatible functions:
+ * STRPEEK(cStr,nPos)->nASC, STRPOKE(cStr,nPos,nASCval)->cStr
  *
- * Copyright 1999 Antonio Linares <alinares@fivetech.com>
- * www - http://www.harbour-project.org
+ * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,87 +50,53 @@
  *
  */
 
-#include <ctype.h>
-
 #include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbfast.h"
+#include "hbapierr.h"
 
-#ifndef HB_CDP_SUPPORT_OFF
-#include "hbapicdp.h"
-extern PHB_CODEPAGE s_cdpage;
-#endif
+#ifdef HB_COMPAT_FLAGSHIP
 
-/* determines if first char of string is letter */
-
-HB_FUNC( ISALPHA )
+HB_FUNC( STRPEEK )
 {
-   char * szString = hb_parc( 1 );
+   PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
 
-   if( szString != NULL )
+   if( pText && ISNUM( 2 ) )
    {
-      if( isalpha( ( unsigned char ) * szString ) )
-         hb_retl( TRUE );
-#ifndef HB_CDP_SUPPORT_OFF
-      else if( s_cdpage->nChars && szString[0] && 
-           ( strchr( s_cdpage->CharsUpper, *szString ) || strchr( s_cdpage->CharsLower, *szString ) ) )
-         hb_retl( TRUE );
-#endif
+      ULONG ulPos = hb_parnl( 2 );
+
+      if( ulPos > 0 && ulPos < pText->item.asString.length )
+         hb_retni( ( BYTE ) * ( pText->item.asString.value + ulPos - 1 ) );
       else
-         hb_retl( FALSE );
+         hb_retni( 0 );
    }
    else
-      hb_retl( FALSE );
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "STRPEEK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
 }
 
-/* determines if first char of string is digit */
 
-HB_FUNC( ISDIGIT )
+HB_FUNC( STRPOKE )
 {
-   char * szString = hb_parc( 1 );
+   PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
 
-   if( szString != NULL )
-      hb_retl( isdigit( ( unsigned char ) * szString ) );
-   else
-      hb_retl( FALSE );
-}
-
-/* determines if first char of string is upper-case */
-
-HB_FUNC( ISUPPER )
-{
-   char * szString = hb_parc( 1 );
-
-   if( szString != NULL )
+   if( pText && ISNUM( 2 ) && ISNUM( 3 ) )
    {
-      if( isupper( ( unsigned char ) * szString ) )
-         hb_retl( TRUE );
-#ifndef HB_CDP_SUPPORT_OFF
-      else if( s_cdpage->nChars && szString[0] && strchr( s_cdpage->CharsUpper, *szString ) )
-         hb_retl( TRUE );
-#endif
+      char * pszText = pText->item.asString.value;
+      ULONG ulLen = pText->item.asString.length;
+      ULONG ulPos = hb_parnl( 2 );
+
+      if( ulPos > 0 && ulPos < pText->item.asString.length )
+      {
+         char * pszNew = hb_xgrab( ulLen );
+	 memcpy( pszNew, pszText, ulLen );
+	 pszNew[ ulPos - 1 ] = (char) (hb_parnl( 3 ) & 0xff);
+         hb_retclenAdopt( pszNew, ulLen );
+      }
       else
-         hb_retl( FALSE );
+         hb_itemReturn( pText );
    }
    else
-      hb_retl( FALSE );
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "STRPOKE", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
 }
 
-/* determines if first char of string is lower-case */
-
-HB_FUNC( ISLOWER )
-{
-   char * szString = hb_parc( 1 );
-
-   if( szString != NULL )
-   {
-      if( islower( ( unsigned char ) * szString ) )
-         hb_retl( TRUE );
-#ifndef HB_CDP_SUPPORT_OFF
-      else if( s_cdpage->nChars && szString[0] && strchr( s_cdpage->CharsLower, *szString ) )
-         hb_retl( TRUE );
-#endif
-      else
-         hb_retl( FALSE );
-   }
-   else
-      hb_retl( FALSE );
-}
+#endif /* HB_COMPAT_FLAGSHIP */

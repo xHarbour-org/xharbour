@@ -1,11 +1,12 @@
 #
-# $Id: Makefile,v 1.1 2003/05/16 19:52:09 druzus Exp $
+# $Id: Makefile,v 1.2 2003/05/21 09:35:36 druzus Exp $
 #
 
 ROOT = ../../../
 
 C_SOURCES=\
 	gtnul.c \
+	gtext.c \
 
 LIBNAME=gtnul
 

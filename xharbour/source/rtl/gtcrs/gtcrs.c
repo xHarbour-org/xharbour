@@ -1,5 +1,5 @@
-;/*
- * $Id: gtcrs.c,v 1.12 2003/06/06 06:45:09 druzus Exp $
+/*
+ * $Id: gtcrs.c,v 1.13 2003/06/15 13:11:58 druzus Exp $
  */
 
 /*
@@ -133,6 +133,7 @@ typedef struct InOutBase {
     unsigned char *in_transtbl;
     unsigned char *out_transtbl;
     unsigned char *nation_transtbl;
+    int *charmap;
 
     int cursor, lcursor;
     int row, col;
@@ -887,7 +888,7 @@ void setKeyTrans(InOutBase *ioBase, unsigned char *ksrc, unsigned char *kdst )
 	memset(ioBase->in_transtbl, 0, 256);
 
 	for (n=0; n<256 && (c = ksrc[n]); n++)
-	    *(ioBase->in_transtbl+n) = kdst[n];
+	    *(ioBase->in_transtbl+c) = kdst[n];
 
     } else if (ioBase->in_transtbl != NULL) {
 	hb_xfree(ioBase->in_transtbl);
@@ -1228,34 +1229,29 @@ static char* tiGetS(char *capname)
     return ptr;
 }
 
-chtype get_acsc(InOutBase *ioBase, unsigned char ch)
+void get_acsc(InOutBase *ioBase, unsigned char c, chtype *pch)
 {
     unsigned char *ptr;
-    chtype retch = 0;
 
     if (ioBase->acsc != NULL)
 	for (ptr = ioBase->acsc; *ptr && *(ptr+1); ptr+=2)
-	    if (*ptr == ch)
+	    if (*ptr == c)
 	    {
-		retch = *(ptr+1) | A_ALTCHARSET;
-		break;
+		*pch = *(ptr+1) | A_ALTCHARSET;
+		return;
 	    }
 
-    retch = 0;
-    if ( !retch )
-	switch (ch)
-	{
-	    case '.':	retch = 'v' | A_NORMAL; break;
-	    case ',':	retch = '<' | A_NORMAL; break;
-	    case '+':	retch = '>' | A_NORMAL; break;
-	    case '-':	retch = '^' | A_NORMAL; break;
-	    case 'a':	retch = '#' | A_NORMAL; break;
-	    case '0':
-	    case 'h':	retch = get_acsc(ioBase, 'a'); break;
-	    default:	retch = ch | A_NORMAL;
-	}
-
-    return retch;
+    switch (c)
+    {
+	case '.':	*pch = 'v' | A_NORMAL; break;
+	case ',':	*pch = '<' | A_NORMAL; break;
+	case '+':	*pch = '>' | A_NORMAL; break;
+	case '-':	*pch = '^' | A_NORMAL; break;
+	case 'a':	*pch = '#' | A_NORMAL; break;
+	case '0':
+	case 'h':	get_acsc(ioBase, 'a', pch); break;
+	default:	*pch = c | A_ALTCHARSET;
+    }
 }
 
 static void init_keys(InOutBase *ioBase)
@@ -1566,13 +1562,85 @@ static int gt_setsize(InOutBase *ioBase, int rows, int cols)
     return ret;
 }
 
+void setDispTrans(InOutBase *ioBase, unsigned char *src, unsigned char *dst, int box )
+{
+    unsigned char c, d;
+    int i, aSet = 0;
+    chtype ch;
+
+    if (src && dst)
+	aSet = 1;
+
+    for (i = 0; i < 256; i++ )
+    {
+	ch = ioBase->charmap[i] & 0xffff;
+	switch ((ioBase->charmap[i] >> 16) & 0xff)
+	{
+	    case 1:
+		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_NORMAL;
+		break;
+	    case 2:
+		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_ALTCHARSET;
+		break;
+	    case 3:
+		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_PROTECT;
+		break;
+	    case 4:
+		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_ALTCHARSET | A_PROTECT;
+		break;
+	    case 5:
+		get_acsc(ioBase, ch & 0xff, &ch);
+		ioBase->std_chmap[i] = ioBase->box_chmap[i] = ch & ~A_CHARTEXT;
+		ch &= A_CHARTEXT;
+		break;
+	    case 0:
+	    default:
+		ioBase->std_chmap[i] = aSet ? A_ALTCHARSET : A_NORMAL;
+		ioBase->box_chmap[i] = A_ALTCHARSET;
+		break;
+	}
+	ioBase->std_chmap[i] |= ch;
+	ioBase->box_chmap[i] |= ch;
+
+	if ( (unsigned int) i != (ch & A_CHARTEXT) && 
+	     (ioBase->std_chmap[i] & A_ALTCHARSET) == 0 )
+	{
+	    if ( ioBase->out_transtbl == NULL )
+	    {
+		ioBase->out_transtbl = hb_xgrab(256);
+		memset(ioBase->out_transtbl, 0, 256);
+	    }
+	    ioBase->out_transtbl[i] = ch & A_CHARTEXT;
+	}
+    }
+    if (aSet)
+    {
+	for (i=0; i<256 && (c = src[i]); i++)
+	{
+	    d = dst[i];
+	    ioBase->std_chmap[c] = d | A_NORMAL;
+	    if (box)
+		ioBase->box_chmap[c] = d | A_NORMAL;
+	    if ( c != d )
+	    {
+		if (ioBase->out_transtbl == NULL)
+		{
+		    ioBase->out_transtbl = hb_xgrab(256);
+		    memset(ioBase->out_transtbl, 0, 256);
+		}
+		ioBase->out_transtbl[c] = d;
+	    }
+	}
+
+    }
+}
+
 static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_t termpid)
 {
     InOutBase *ioBase;
-    int transTbl[256], bg, fg;
+    int bg, fg;
     unsigned int i;
     char buf[256], *ptr, *crsterm = NULL;
-    chtype ch;
 
     ioBase = hb_xgrab(sizeof(*ioBase));
     memset(ioBase, 0, sizeof(*ioBase));
@@ -1661,42 +1729,11 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
     if ( ioBase->cvvis == NULL )
 	ioBase->cvvis = ioBase->cnorm;
     ioBase->acsc  = tiGetS("acsc");
-    HB_GT_FUNC(gt_chrmapinit(transTbl, term));
 
-    for (i = 0; i < 256; i++ ) {
-	ch = transTbl[i] & 0xffff;
-	switch ((transTbl[i] >> 16) & 0xff) {
-	    case 1:
-		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_NORMAL;
-		break;
-	    case 2:
-		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_ALTCHARSET;
-		break;
-	    case 3:
-		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_PROTECT;
-		break;
-	    case 4:
-		ioBase->std_chmap[i] = ioBase->box_chmap[i] = A_ALTCHARSET | A_PROTECT;
-		break;
-	    case 5:
-		ch = get_acsc(ioBase, ch & 0xff);
-		ioBase->std_chmap[i] = ioBase->box_chmap[i] = ch & A_ATTRIBUTES;
-		break;
-	    case 0:
-	    default:
-		ioBase->std_chmap[i] = A_NORMAL;
-		ioBase->box_chmap[i] = A_ALTCHARSET;
-		break;
-	}
-	ioBase->std_chmap[i] |= ch;
-	ioBase->box_chmap[i] |= ch;
-	if ( i != (ch & A_CHARTEXT) && 
-	     (ioBase->std_chmap[i] & A_ALTCHARSET) == 0 ) {
-	    if ( ioBase->out_transtbl == NULL )
-		ioBase->out_transtbl = hb_xgrab(256);
-	    ioBase->out_transtbl[i] = ch & A_CHARTEXT;
-	}
-    }
+    ioBase->charmap = hb_xgrab(256 * sizeof(int));
+    HB_GT_FUNC(gt_chrmapinit(ioBase->charmap, term));
+    setDispTrans(ioBase, NULL, NULL, 0 );
+
     ioBase->attr_mask = -1;
     if( has_colors() ) {
         /*  DOS->CURSES color maping
@@ -1815,6 +1852,9 @@ static void destroy_ioBase(InOutBase *ioBase)
 	fclose(ioBase->baseout);
 
     /* free allocated memory */
+    if (ioBase->charmap != NULL)
+	hb_xfree(ioBase->charmap);
+
     if (ioBase->in_transtbl != NULL)
 	hb_xfree(ioBase->in_transtbl);
 
@@ -2970,6 +3010,47 @@ int HB_GT_FUNC(gt_Kbd_State())
 
 /* *********************************************************************** */
 
+void HB_GT_FUNC(gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL bBox ))
+{
+#ifndef HB_CDP_SUPPORT_OFF
+    if ( !pszHostCDP || !*pszHostCDP )
+    {
+        pszHostCDP = s_cdpage->id;
+        if ( !pszHostCDP )
+            pszHostCDP = pszTermCDP;
+    }
+
+    if ( pszTermCDP && pszHostCDP )
+    {
+        PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
+                     cdpHost = hb_cdpFind( pszHostCDP );
+        if ( cdpTerm && cdpHost && 
+             cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+        {
+            char * pszHostLetters = hb_xgrab( cdpHost->nChars * 2 + 1 );
+            char * pszTermLetters = hb_xgrab( cdpTerm->nChars * 2 + 1 );
+
+            strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars + 1 );
+            strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars + 1 );
+            strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars + 1 );
+            strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars + 1 );
+
+            setDispTrans( s_ioBase, (unsigned char *) pszHostLetters,
+                                    (unsigned char *) pszTermLetters,
+				    bBox ? 1 : 0 );
+
+            hb_xfree( pszHostLetters );
+            hb_xfree( pszTermLetters );
+	}
+    }
+#else
+    HB_SYMBOL_UNUSED( pszTermCDP );
+    HB_SYMBOL_UNUSED( pszHostCDP );
+#endif
+}
+
+/* *********************************************************************** */
+
 int HB_GT_FUNC(gt_NewXTerm( void ))
 {
     InOutBase *ioBase;
@@ -3060,6 +3141,8 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->Tone                  = HB_GT_FUNC( gt_Tone );
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
+    /* extended GT functions */
+    gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
 }
 
 /* ********************************************************************** */

@@ -1,12 +1,12 @@
 /*
- * $Id: hbsetup.ch,v 1.1.1.1 2001/12/21 10:47:54 ronpinkas Exp $
+ * $Id$
  */
 
 /*
  * Harbour Project source code:
- * Header file for runtime configuration, common for Harbour and C level.
+ * SETDISPCP() extended GT functions
  *
- * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
+ * Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,11 +16,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
+ * along with this software; see the file COPYING.   If not, write to
  * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
  *
@@ -40,7 +40,7 @@
  * Project under the name Harbour.  If you copy code from other
  * Harbour Project or Free Software Foundation releases into a copy of
  * Harbour, as the General Public License permits, the exception does
- * not apply to the code that you add in this way.  To avoid misleading
+ * not apply to the code that you add in this way.   To avoid misleading
  * anyone as to the status of such modified files, you must delete
  * this exception notice from them.
  *
@@ -50,39 +50,21 @@
  *
  */
 
-/* NOTE: This file is also used by C code. */
+/* NOTE: User programs should never call this layer directly! */
 
-#ifndef HB_SETUP_CH_
-#define HB_SETUP_CH_
+/* *********************************************************************** */
 
-/* NOTE: You can select here, which features you want to include of the
-         different Clipper implementations. */
 
-#define HB_EXTENSION              /* Enable Harbour extensions */
+#include "hbapigt.h"
 
-#define HB_C52_UNDOC              /* Enable CA-Cl*pper 5.2e undocumented features */
-/* #define HB_C52_STRICT */       /* Enable CA-Cl*pper 5.2e strict compatibility */
-
-#define HB_COMPAT_C53             /* Enable CA-Cl*pper 5.3x extensions */
-#define HB_COMPAT_XPP             /* Enable Alaska Xbase++ extensions */
-/* #define HB_COMPAT_VO */        /* Enable CA-VO extensions */
-#define HB_COMPAT_FLAGSHIP */     /* Enable Flagship extensions */
-/* #define HB_COMPAT_FOXPRO */    /* Enable FoxPro extensions */
-/* #define HB_COMPAT_DBASE */     /* Enable dBase extensions */
-
-/* NOTE: HB_SHORTNAMES must be defined manually if the symbol name length is
-         set to 10 explicitly and not through the HB_C52_STRICT option
-         [vszakats] */
-
-/* Turn on short names support for the class engine */
-#ifdef HB_C52_STRICT
-   #define HB_SHORTNAMES
-#endif
-
-/* #define HB_FILE_VER_STATIC */  /* Enable inclusion of file version strings */
-
-/*#define HB_CLS_ENFORCERO */     /* Activate the RO checking on OO DATA    */
-                                  /* when not called from a constructor     */
-
-#endif /* HB_SETUP_CH_ */
-
+HB_FUNC( HB_SETDISPCP )
+{
+   if ( ISCHAR(1) )
+   {
+      if ( hb_pcount() == 2 && ISLOG(2) )
+         hb_gt_SetDispCP( hb_parc( 1 ), NULL, hb_parl( 2 ) );
+      else
+         hb_gt_SetDispCP( hb_parc( 1 ), hb_parc( 2 ), hb_parl( 3 ) );
+   }
+   hb_ret();  /* return NIL */
+}

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1137 2003/06/18 21:11:29 andijahja Exp $
+ * $Id: ChangeLog,v 1.1138 2003/06/18 22:54:55 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-19 01:00 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rtl/Makefile
+  * xharbour/include/hbsetup.ch
+  + xharbour/source/rtl/strpeek.c
+    + FlagShip strpeek/strpoke function added
+
+  * xharbour/source/rtl/gtnul/Makefile
+  * xharbour/source/rtl/gtnul/gtnul.c
+  + xharbour/source/rtl/gtnul/gtext.c
+  * xharbour/include/hbapigt.h
+  * xharbour/include/hbextern.h
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+  + xharbour/tests/dspchr.prg
+    + new function:
+             HB_SETDISPCP(<cTermCP> [,<cHostCP>] [,<lBoxChar>])
+      Works only if compiled with HB_MULTI_GT in GTCRS. Empty
+      version for other GTs in GTNUL. Developers of other GT
+      should implement it.
+      This function informs GT which character are letters
+      and optionally sets character translation between <cHostCP>
+      and <cTermCP>. If <cHostCP> is omitted then default code page
+      set by HB_SETCODEPAGE is taken instead.
+      <lBoxChar> switch if set informs GT that it should print letters
+      in <cHostCP> instead of semigraphics even if programmer use
+      box drawing functions. This switch is necessary because some code
+      pages have letters in places where semigraphic chars are stored in
+      CP-467 (eg. ISO-8859-x) so the GT have to know which character set
+      use to display chars G0 or G1.
+      Simple program (dspchr.prg) which demonstrates it added to tests
+      directory.
 
 2003-06-18 15:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c

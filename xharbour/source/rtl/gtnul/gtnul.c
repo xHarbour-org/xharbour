@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.6 2003/05/29 20:44:29 druzus Exp $
+ * $Id: gtnul.c,v 1.7 2003/06/15 13:11:58 druzus Exp $
  */
 
 /*
@@ -157,7 +157,7 @@ BOOL HB_EXPORT hb_gtRegister( PHB_GT_INIT gtInit )
 
 void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Init()"));
 
    s_uiDispCount = 0;
 
@@ -168,40 +168,40 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
 void HB_GT_FUNC(gt_Exit( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Exit()"));
 }
 
 USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_GetScreenWidth()"));
 
    return s_uiMaxCol;
 }
 
 USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenHeight()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_GetScreenHeight()"));
 
    return s_uiMaxRow;
 }
 
 SHORT HB_GT_FUNC(gt_Col( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_Col()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Col()"));
 
    return 0;
 }
 
 SHORT HB_GT_FUNC(gt_Row())
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_Row()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Row()"));
 
    return 0;
 }
 
 void HB_GT_FUNC(gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetPos(%hd, %hd, %hd)", iRow, iCol, iMethod));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_SetPos(%hd, %hd, %hd)", iRow, iCol, iMethod));
 
    HB_SYMBOL_UNUSED( iRow );
    HB_SYMBOL_UNUSED( iCol );
@@ -210,7 +210,7 @@ void HB_GT_FUNC(gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod ))
 
 BOOL HB_GT_FUNC(gt_AdjustPos( BYTE * pStr, ULONG ulLen ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_AdjustPos(%s, %lu)", pStr, ulLen ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_AdjustPos(%s, %lu)", pStr, ulLen ));
 
    HB_SYMBOL_UNUSED( pStr );
    HB_SYMBOL_UNUSED( ulLen );
@@ -220,35 +220,35 @@ BOOL HB_GT_FUNC(gt_AdjustPos( BYTE * pStr, ULONG ulLen ))
 
 USHORT HB_GT_FUNC(gt_GetCursorStyle( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetCursorStyle()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_GetCursorStyle()"));
 
    return SC_NONE;
 }
 
 void HB_GT_FUNC(gt_SetCursorStyle( USHORT uiCursorStyle ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetCursorStyle(%hu)", uiCursorStyle));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_SetCursorStyle(%hu)", uiCursorStyle));
 
    HB_SYMBOL_UNUSED( uiCursorStyle );
 }
 
 BOOL HB_GT_FUNC(gt_IsColor( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_IsColor()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_IsColor()"));
 
    return FALSE;
 }
 
 void HB_GT_FUNC(gt_DispBegin( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispBegin()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_DispBegin()"));
 
    ++s_uiDispCount;
 }
 
 void HB_GT_FUNC(gt_DispEnd())
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispEnd()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_DispEnd()"));
 
    if ( s_uiDispCount )
       --s_uiDispCount;
@@ -256,7 +256,7 @@ void HB_GT_FUNC(gt_DispEnd())
 
 USHORT HB_GT_FUNC(gt_DispCount())
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispCount()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_DispCount()"));
 
    return s_uiDispCount;
 }
@@ -264,7 +264,7 @@ USHORT HB_GT_FUNC(gt_DispCount())
 
 void HB_GT_FUNC(gt_Puts( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE * pbyStr, ULONG ulLen ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_Puts(%hu, %hu, %d, %p, %lu)", uiRow, uiCol, (int) byAttr, pbyStr, ulLen));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Puts(%hu, %hu, %d, %p, %lu)", uiRow, uiCol, (int) byAttr, pbyStr, ulLen));
 
    HB_SYMBOL_UNUSED( uiRow );
    HB_SYMBOL_UNUSED( uiCol );
@@ -275,14 +275,14 @@ void HB_GT_FUNC(gt_Puts( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE * pbyStr,
 
 int HB_GT_FUNC(gt_RectSize( USHORT rows, USHORT cols ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_RectSize(%hu, %hu)", rows, cols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_RectSize(%hu, %hu)", rows, cols));
 
    return rows * cols * 2;
 }
 
 void HB_GT_FUNC(gt_GetText( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE * pbyDst ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, uiBottom, uiRight, pbyDst));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_GetText(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, uiBottom, uiRight, pbyDst));
 
    HB_SYMBOL_UNUSED( uiTop );
    HB_SYMBOL_UNUSED( uiLeft );
@@ -293,7 +293,7 @@ void HB_GT_FUNC(gt_GetText( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT
 
 void HB_GT_FUNC(gt_PutText( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE * pbySrc ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, uiBottom, uiRight, pbySrc));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_PutText(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, uiBottom, uiRight, pbySrc));
 
    HB_SYMBOL_UNUSED( uiTop );
    HB_SYMBOL_UNUSED( uiLeft );
@@ -304,7 +304,7 @@ void HB_GT_FUNC(gt_PutText( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT
 
 void HB_GT_FUNC(gt_SetAttribute( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d)", uiTop, uiLeft, uiBottom, uiRight, (int) byAttr));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_SetAttribute(%hu, %hu, %hu, %hu, %d)", uiTop, uiLeft, uiBottom, uiRight, (int) byAttr));
 
    HB_SYMBOL_UNUSED( uiTop );
    HB_SYMBOL_UNUSED( uiLeft );
@@ -315,7 +315,7 @@ void HB_GT_FUNC(gt_SetAttribute( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, U
 
 void HB_GT_FUNC(gt_Scroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr, SHORT iRows, SHORT iCols ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_Scroll(%hu, %hu, %hu, %hu, %d, %hd, %hd)", uiTop, uiLeft, uiBottom, uiRight, (int) byAttr, iRows, iCols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Scroll(%hu, %hu, %hu, %hu, %d, %hd, %hd)", uiTop, uiLeft, uiBottom, uiRight, (int) byAttr, iRows, iCols));
 
    HB_SYMBOL_UNUSED( uiTop );
    HB_SYMBOL_UNUSED( uiLeft );
@@ -328,7 +328,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT 
 
 void HB_GT_FUNC(gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byChar, ULONG nLength ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_Replicate(%hu, %hu, %i, %i, %lu)", uiRow, uiCol, byAttr, byChar, nLength));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Replicate(%hu, %hu, %i, %i, %lu)", uiRow, uiCol, byAttr, byChar, nLength));
 
    HB_SYMBOL_UNUSED( uiRow );
    HB_SYMBOL_UNUSED( uiCol );
@@ -340,7 +340,7 @@ void HB_GT_FUNC(gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byCh
 USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
                           BYTE * pbyFrame, BYTE byAttr ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_box(%i, %i, %i, %i, %s, %hu)", Top, Left, Bottom, Right, pbyFrame, byAttr));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_box(%i, %i, %i, %i, %s, %hu)", Top, Left, Bottom, Right, pbyFrame, byAttr));
 
    HB_SYMBOL_UNUSED( Top );
    HB_SYMBOL_UNUSED( Left );
@@ -354,21 +354,21 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
 
 USHORT HB_GT_FUNC(gt_BoxD( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, BYTE byAttr ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_boxD(%i, %i, %i, %i, %s, %hu)", Top, Left, Bottom, Right, pbyFrame, byAttr));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_boxD(%i, %i, %i, %i, %s, %hu)", Top, Left, Bottom, Right, pbyFrame, byAttr));
 
    return hb_gt_Box( Top, Left, Bottom, Right, pbyFrame, byAttr );
 }
 
 USHORT HB_GT_FUNC(gt_BoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, BYTE byAttr ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_boxS(%i, %i, %i, %i, %s, %hu)", Top, Left, Bottom, Right, pbyFrame, byAttr));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_boxS(%i, %i, %i, %i, %s, %hu)", Top, Left, Bottom, Right, pbyFrame, byAttr));
 
    return hb_gt_Box( Top, Left, Bottom, Right, pbyFrame, byAttr );
 }
 
 USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE byAttr ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_HorizLine(%i, %i, %i, %hu, %hu)", Row, Left, Right, byChar, byAttr));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_HorizLine(%i, %i, %i, %hu, %hu)", Row, Left, Right, byChar, byAttr));
 
    if( Left < Right )
       hb_gt_Replicate( Row, Left, byAttr, byChar, Right - Left + 1 );
@@ -380,7 +380,7 @@ USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar,
 
 USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byAttr ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_VertLine(%i, %i, %i, %hu, %hu)", Col, Top, Bottom, byChar, byAttr));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_VertLine(%i, %i, %i, %hu, %hu)", Col, Top, Bottom, byChar, byAttr));
 
    HB_SYMBOL_UNUSED( Col );
    HB_SYMBOL_UNUSED( Top );
@@ -393,42 +393,42 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
 
 BOOL HB_GT_FUNC(gt_PreExt())
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_PreExt()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_PreExt()"));
 
    return TRUE;
 }
 
 BOOL HB_GT_FUNC(gt_PostExt())
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_PostExt()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_PostExt()"));
 
    return TRUE;
 }
 
 BOOL HB_GT_FUNC(gt_Suspend())
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_Suspend()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Suspend()"));
 
    return TRUE;
 }
 
 BOOL HB_GT_FUNC(gt_Resume())
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_Resume()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Resume()"));
 
    return TRUE;
 }
 
 void HB_GT_FUNC(gt_OutStd( BYTE * pbyStr, ULONG ulLen ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_OutStd(%s, %hu)", pbyStr, ulLen));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_OutStd(%s, %hu)", pbyStr, ulLen));
 
    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }
 
 void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_OutErr(%s, %hu)", pbyStr, ulLen));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_OutErr(%s, %hu)", pbyStr, ulLen));
 
    hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
 }
@@ -436,7 +436,7 @@ void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
 
 char * HB_GT_FUNC(gt_Version( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_Version()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Version()"));
 
    return "Harbour Terminal: NULL";
 }
@@ -446,7 +446,7 @@ char * HB_GT_FUNC(gt_Version( void ))
 
 BOOL HB_GT_FUNC(gt_SetMode( USHORT uiRows, USHORT uiCols ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", uiRows, uiCols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_SetMode(%hu, %hu)", uiRows, uiCols));
 
    HB_SYMBOL_UNUSED( uiRows );
    HB_SYMBOL_UNUSED( uiCols );
@@ -456,21 +456,21 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT uiRows, USHORT uiCols ))
 
 BOOL HB_GT_FUNC(gt_GetBlink())
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetBlink()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_GetBlink()"));
 
    return FALSE;
 }
 
 void HB_GT_FUNC(gt_SetBlink( BOOL bBlink ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetBlink(%d)", (int) bBlink));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_SetBlink(%d)", (int) bBlink));
 
    HB_SYMBOL_UNUSED( bBlink );
 }
 
 void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Tone(%lf, %lf)", dFrequency, dDuration));
 
    HB_SYMBOL_UNUSED( dFrequency );
    HB_SYMBOL_UNUSED( dDuration );
@@ -480,14 +480,14 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 
 int HB_GT_FUNC(gt_ExtendedKeySupport())
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_ExtendedKeySupport()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_ExtendedKeySupport()"));
 
    return 0;
 }
 
 int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_ReadKey(%d)", (int) eventmask));
 
    HB_SYMBOL_UNUSED( eventmask );
 
@@ -496,50 +496,61 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
 /* ********************************************************************** */
 
+void HB_GT_FUNC(gt_SetDispCP(char * pszTermCDP, char * pszHostCDP, BOOL bBox))
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_SetDispCP(%p, %p, %d)", pszTermCDP, pszHostCDP, (int) bBox));
+
+   HB_SYMBOL_UNUSED( pszTermCDP );
+   HB_SYMBOL_UNUSED( pszHostCDP );
+   HB_SYMBOL_UNUSED( bBox );
+}
+
+/* ********************************************************************** */
+
 void HB_GT_FUNC(mouse_Init( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouse_Init()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_Init()"));
 }
 
 void HB_GT_FUNC(mouse_Exit( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouse_Exit()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_Exit()"));
 }
 
 BOOL HB_GT_FUNC(mouse_IsPresent( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouse_IsPresent()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_IsPresent()"));
 
    return FALSE;
 }
 
 void HB_GT_FUNC(mouse_Show( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouse_Show()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_Show()"));
 }
 
 void HB_GT_FUNC(mouse_Hide( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouse_Hide()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_Hide()"));
 }
 
 int HB_GT_FUNC(mouse_Col( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouse_Col()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_Col()"));
 
    return 0;
 }
 
 int HB_GT_FUNC(mouse_Row( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouse_Row()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_Row()"));
 
    return 0;
 }
 
 void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouse_SetPos(%i, %i)", iRow, iCol));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_SetPos(%i, %i)", iRow, iCol));
 
    HB_SYMBOL_UNUSED( iRow );
    HB_SYMBOL_UNUSED( iCol );
@@ -547,7 +558,7 @@ void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
 
 BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouse_IsButtonPressed(%i)", iButton));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_IsButtonPressed(%i)", iButton));
 
    HB_SYMBOL_UNUSED( iButton );
 
@@ -556,14 +567,14 @@ BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
 
 int HB_GT_FUNC(mouse_CountButton( void ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouse_CountButton()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_CountButton()"));
 
    return 0;
 }
 
 void HB_GT_FUNC(mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouse_SetBounds(%i, %i, %i, %i)", iTop, iLeft, iBottom, iRight));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_SetBounds(%i, %i, %i, %i)", iTop, iLeft, iBottom, iRight));
 
    HB_SYMBOL_UNUSED( iTop );
    HB_SYMBOL_UNUSED( iLeft );
@@ -573,7 +584,7 @@ void HB_GT_FUNC(mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ))
 
 void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ))
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_mouse_GetBounds(%p, %p, %p, %p)", piTop, piLeft, piBottom, piRight));
+   HB_TRACE(HB_TR_DEBUG, ("hb_NUL_mouse_GetBounds(%p, %p, %p, %p)", piTop, piLeft, piBottom, piRight));
 
    HB_SYMBOL_UNUSED( piTop );
    HB_SYMBOL_UNUSED( piLeft );
@@ -810,6 +821,12 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
 
 /* ********************************************************************** */
 
+void hb_gt_SetDispCP(char * pszTermCDP, char * pszHostCDP, BOOL bBox)
+{
+   GT_FUNCS.SetDispCP( pszTermCDP, pszHostCDP, bBox );
+}
+/* ********************************************************************** */
+
 void hb_mouse_Init( void )
 {
     GT_FUNCS.mouse_Init();
@@ -915,6 +932,8 @@ static HB_GT_FUNCS GT_FUNCS = {
     ExtendedKeySupport:     HB_GT_FUNC( gt_ExtendedKeySupport ),
     ReadKey:                HB_GT_FUNC( gt_ReadKey ),
 
+    SetDispCP:              HB_GT_FUNC( gt_SetDispCP );
+
     mouse_Init:             HB_GT_FUNC( mouse_Init ),
     mouse_Exit:             HB_GT_FUNC( mouse_Exit ),
     mouse_IsPresent:        HB_GT_FUNC( mouse_IsPresent ),
@@ -934,7 +953,7 @@ static HB_GT_FUNCS GT_FUNCS = {
 
 static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
 {
-    HB_TRACE(HB_TR_DEBUG, ("hb_gtFnInit(%p)", gt_funcs));
+    HB_TRACE(HB_TR_DEBUG, ("hb_%s_gtFnInit(%p)", HB_GT_DRVNAME( HB_GT_NAME ), gt_funcs));
 
     gt_funcs->Init                  = HB_GT_FUNC( gt_Init );
     gt_funcs->Exit                  = HB_GT_FUNC( gt_Exit );
@@ -975,13 +994,16 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->Tone                  = HB_GT_FUNC( gt_Tone );
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
+
+    /* extended GT functions */
+    gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
 }
 
 /* ********************************************************************** */
 
 static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 {
-    HB_TRACE(HB_TR_DEBUG, ("hb_mouseFnInit(%p)", gt_funcs));
+    HB_TRACE(HB_TR_DEBUG, ("hb_%s_mouseFnInit(%p)", HB_GT_DRVNAME( HB_GT_NAME ), gt_funcs));
 
     gt_funcs->mouse_Init            = HB_GT_FUNC( mouse_Init );
     gt_funcs->mouse_Exit            = HB_GT_FUNC( mouse_Exit );

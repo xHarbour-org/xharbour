@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.8 2003/05/21 22:49:40 druzus Exp $
+ * $Id: hbapigt.h,v 1.9 2003/05/28 11:59:05 druzus Exp $
  */
 
 /*
@@ -273,6 +273,9 @@ extern USHORT hb_gt_VertLine( SHORT uiCol, SHORT uiTop, SHORT uiBottom, BYTE byC
 extern void   hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen );
 extern void   hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen );
 
+/* Private interface for extended GT functions listed below */
+extern void   hb_gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL bBox );
+
 /* Keyboard related declarations */
 
 #define HB_BREAK_FLAG 256 /* 256, because that's what DJGPP returns Ctrl+Break as.
@@ -437,6 +440,8 @@ typedef struct _HB_GT_FUNCS
     int     (* mouse_CountButton) ( void );
     void    (* mouse_SetBounds) ( int, int, int, int );
     void    (* mouse_GetBounds) ( int *, int *, int *, int * );
+    /* extended GT functions */
+    void    (* SetDispCP) ( char *, char *, BOOL );
 } HB_GT_FUNCS, * PHB_GT_FUNCS;
 
 typedef struct _HB_GT_INIT
@@ -490,6 +495,8 @@ extern USHORT HB_GT_FUNC( gt_VertLine( SHORT uiCol, SHORT uiTop, SHORT uiBottom,
 
 extern void   HB_GT_FUNC( gt_OutStd( BYTE * pbyStr, ULONG ulLen ) );
 extern void   HB_GT_FUNC( gt_OutErr( BYTE * pbyStr, ULONG ulLen ) );
+
+extern void   HB_GT_FUNC( gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL bBox ) );
 
 extern void   HB_GT_FUNC( mouse_Init( void ) );
 extern void   HB_GT_FUNC( mouse_Exit( void ) ) ;
