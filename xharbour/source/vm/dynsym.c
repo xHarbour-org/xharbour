@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.19 2004/11/21 21:44:26 druzus Exp $
+ * $Id: dynsym.c,v 1.20 2005/03/31 04:02:22 druzus Exp $
  */
 
 /*
@@ -107,7 +107,7 @@ PHB_SYMB HB_EXPORT hb_symbolNew( char * szName )      /* Create a new symbol */
 
    pSymbol = ( PHB_SYMB ) hb_xgrab( sizeof( HB_SYMB ) );
    pSymbol->szName = ( char * ) hb_xgrab( strlen( szName ) + 1 );
-   pSymbol->cScope = SYM_ALLOCATED; /* to know what symbols to release when exiting the app */
+   pSymbol->cScope = HB_FS_ALLOCATED; /* to know what symbols to release when exiting the app */
    strcpy( pSymbol->szName, szName );
    pSymbol->value.pFunPtr = NULL;
    pSymbol->pDynSym = NULL;
@@ -136,7 +136,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
         ) /* The DynSym existed without function pointer */
       {
          /* free runtime allocated symbols */
-         if ( pDynSym->pSymbol->cScope == SYM_ALLOCATED )
+         if ( ( pDynSym->pSymbol->cScope & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
          {
             hb_xfree( pDynSym->pSymbol->szName );
             hb_xfree( pDynSym->pSymbol );
@@ -655,20 +655,23 @@ USHORT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 /* JC1: this is called at VM termination, no need to lock */
 void HB_EXPORT hb_dynsymRelease( void )
 {
+   PHB_DYNS pDynSym;
    USHORT uiPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymRelease()"));
 
    for( uiPos = 0; uiPos < s_uiDynSymbols; uiPos++ )
    {
+      pDynSym = ( s_pDynItems + uiPos )->pDynSym;
+
       /* it is a allocated symbol ? */
-      if( ( s_pDynItems + uiPos )->pDynSym->pSymbol->cScope == SYM_ALLOCATED )
+      if( ( pDynSym->pSymbol->cScope & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
       {
-         hb_xfree( ( s_pDynItems + uiPos )->pDynSym->pSymbol->szName );
-         hb_xfree( ( s_pDynItems + uiPos )->pDynSym->pSymbol );
+         hb_xfree( pDynSym->pSymbol->szName );
+         hb_xfree( pDynSym->pSymbol );
       }
 
-      hb_xfree( ( s_pDynItems + uiPos )->pDynSym );
+      hb_xfree( pDynSym );
    }
 
    hb_xfree( s_pDynItems );

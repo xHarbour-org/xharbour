@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.448 2005/03/31 04:02:25 druzus Exp $
+ * $Id: hvm.c,v 1.449 2005/04/06 03:57:57 mlombardo Exp $
  */
 
 /*
@@ -6286,7 +6286,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 
    if( hb_stackItemFromTop( - ( uiParams + 1 ) )->type )
    {
-      TraceLog( NULL, "DIVERTED hb_vmDo() to hb_vmSend()\n" );
+      //TraceLog( NULL, "DIVERTED hb_vmDo() to hb_vmSend()\n" );
       hb_vmSend( uiParams );
       return;
    }
@@ -6298,7 +6298,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
       }
    #endif
 
-   TraceLog( NULL, "StackNewFrame %hu\n", uiParams );
+   //TraceLog( NULL, "StackNewFrame %hu\n", uiParams );
 
    pItem = hb_stackNewFrame( &sStackState, uiParams );
    pSym = pItem->item.asSymbol.value;
@@ -6306,7 +6306,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
    bDebugPrevState = s_bDebugging;
    s_bDebugging = FALSE;
 
-   TraceLog( NULL, "Symbol: '%s'\n", pSym->szName );
+   //TraceLog( NULL, "Symbol: '%s'\n", pSym->szName );
 
    if( HB_IS_NIL( pSelf ) ) /* are we sending a message ? */
    {
@@ -6362,7 +6362,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
       else
       {
          /* Attempt to call an undefined function
-         *  - generate unrecoverable runtime error
+          * - generate unrecoverable runtime error
           */
          PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
 

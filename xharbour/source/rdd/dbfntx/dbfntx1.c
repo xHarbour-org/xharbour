@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.101 2005/04/05 00:32:09 druzus Exp $
+ * $Id: dbfntx1.c,v 1.102 2005/04/05 22:26:08 druzus Exp $
  */
 
 /*
@@ -180,7 +180,7 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex );
  * On other machines it should not cause noticeable differences because
  * most of modern C compilers auto inline small functions
  */
-#if defined( HB_LITTLE_ENDIAN ) && !defined( HB_STRICT_ALIGNMENT ) && 0
+#if defined( HB_LITTLE_ENDIAN ) && !defined( HB_STRICT_ALIGNMENT )
 
 #define hb_ntxGetKeyCount(p)        HB_GET_LE_UINT16( (p)->buffer )
 #define hb_ntxSetKeyCount(p,n)      HB_PUT_LE_UINT16( (p)->buffer, (n) )

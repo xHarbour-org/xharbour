@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.35 2005/02/12 19:54:03 druzus Exp $
+ * $Id: workarea.c,v 1.36 2005/03/31 03:28:40 druzus Exp $
  */
 
 /*
@@ -1262,5 +1262,5 @@ ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
    if ( iCurrArea )
       hb_rddSelectWorkAreaNumber( iCurrArea );
 
-   return SUCCESS;
+   return hb_vmRequestQuery() ? FAILURE : SUCCESS;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.157 2005/03/30 21:28:47 andijahja Exp $
+ * $Id: hbapi.h,v 1.158 2005/03/31 03:15:15 druzus Exp $
  */
 
 /*
@@ -187,8 +187,6 @@ typedef struct
 typedef USHORT ERRCODE;
 #define SUCCESS            0
 #define FAILURE            1
-
-#define SYM_ALLOCATED ( ( HB_SYMBOLSCOPE ) -1 )
 
 extern HB_SYMB  hb_symEval;
 

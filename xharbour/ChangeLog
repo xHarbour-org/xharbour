@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4010 2005/04/06 03:57:32 mlombardo Exp $
+ * $Id: ChangeLog,v 1.4011 2005/04/06 05:45:48 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-06 14:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/vm/hvm.c
+    * commented active TraceLog()s
+
+  * xharbour/include/hbapi.h
+  * xharbour/include/hbvmpub.h
+  * xharbour/source/vm/dynsym.c
+    ! fixed the problem with conflict of SYM_ALLOCATED and HB_FS_PCODEFUNC
+      which can cause GPF at runtime.
+      Anyhow I would like to notice that in generated pcode only the
+      following bits should be set: HB_FS_STATIC, HB_FS_INIT, HB_FS_EXIT
+      All other things are redundant and not necessary. At runtime we need
+      only two additional flags: HB_FS_PCODEFUNC, HB_FS_ALLOCATED.
+      That's all. The startup symbol registration procedure should only
+      register symbols in dynamic symbol table if they are not:
+         HB_FS_STATIC | HB_FS_INIT | HB_FS_EXIT
+      Setting HB_FS_FIRST also doesn't make sense because we have to
+      set it in all compiled modules when we do not know the linking
+      order. Just simply it should be detected at runtime (what is
+      even already done) and we do not need HB_FS_FIRST for this job.
+      I want to make it soon.
+
+  * xharbour/source/rdd/workarea.c
+    * check in SELF_EVAL() method for hb_vmRequestQuery() to detect
+      'break/recover' in process
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * enable key macros for LE machines
 
 2005-04-06 12:45 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * source/odbc/odbc.c
