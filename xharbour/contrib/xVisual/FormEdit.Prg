@@ -27,6 +27,7 @@ GLOBAL EXTERNAL oApp
  CLASS TFormEdit FROM TForm
 
    CLASSDATA nForms  PROTECTED INIT 0
+   CLASSDATA aBases  PROTECTED INIT {}
 
    DATA oMask        PROTECTED
    DATA Editing      PROTECTED
@@ -75,6 +76,7 @@ GLOBAL EXTERNAL oApp
 
    METHOD XFMTop()
    METHOD XFMRoot()
+   METHOD XFMControl( cName, oControl )
    METHOD XFMTrace()
 
  END CLASS
@@ -83,13 +85,15 @@ GLOBAL EXTERNAL oApp
 
 METHOD Add( cName, oObj )
 
-   LOCAL oCtrl:=Super:Add( cName, oObj )
+   LOCAL oCtrl := Super:Add( cName, oObj )
 
    aAdd( ::aCtrl, oCtrl)
    ::oMask:GetSiblings()
    ::oMask:SetFocus()
    ::oMask:Cursor := NIL
    ::CtrlName := NIL
+
+   ::XFMControl( cName, oObj )
 
    RETURN(oCtrl)
 
@@ -338,14 +342,14 @@ METHOD XFMRoot() CLASS TFormEdit
    lOn := .T.
 
    aSize( ::aXFM[ XFM_Datas ], 0 )
-   aSize( ::aXFM[ XFM_Controls ], 0 )
+   //aSize( ::aXFM[ XFM_Controls ], 0 )
 
-   aDiff := __ObjGetValueDiff( TFormEdit():New( oApp:MainFrame, .F. ), Self )
+   aDiff := __ObjGetValueDiff( Self )
    ::nForms--
 
    FOR EACH aVar IN aDiff
       IF ValType( aVar[2] ) == 'O'
-         aAdd( ::aXFM[ XFM_Controls ], aVar )
+         //aAdd( ::aXFM[ XFM_Controls ], aVar )
       ELSE
          aAdd( ::aXFM[ XFM_Datas ], aVar )
       ENDIF
@@ -356,17 +360,26 @@ METHOD XFMRoot() CLASS TFormEdit
 RETURN Self
 
 //----------------------------------------------------------------------------//
+METHOD XFMControl( cName, oControl ) CLASS TFormEdit
+
+   LOCAL nControl, nBase
+
+   IF cName == NIL
+      nControl := aScan( ::aXFM[ XFM_Controls ], { |XFM| XFM[2] == oControl } )
+      nBase    := aScan( ::aBases, { | oBase | oBase:ClassH == oControl:ClassH } )
+
+      ::aXFM[ XFM_Controls ][ nControl ][ 3 ] := __ObjGetValueDiff( oControl, ::aBases[ nBase ] )
+   ELSE
+      aAdd( ::aXFM[ XFM_Controls ], { cName, oControl, {} } )
+      IF aScan( ::aBases, { | oBase | oBase:ClassH == oControl:ClassH } ) == 0
+         aAdd( ::aBases, __ClsInst( oControl:ClassH ) )
+      ENDIF
+   ENDIF
+
+RETURN Self
+
+//----------------------------------------------------------------------------//
 METHOD XFMTrace() CLASS TFormEdit
-   /*
-   OutputDebugString( "Header: " + Str( Len( ::aXFM[ XFM_Header ] ) ) + CRLF )
-   OutputDebugString( "Class: " + Str( Len( ::aXFM[ XFM_Class ] ) ) + CRLF )
-   OutputDebugString( "Datas: " + Str( Len( ::aXFM[ XFM_Datas ] ) ) + CRLF )
-   OutputDebugString( "Events: " + Str( Len( ::aXFM[ XFM_Events ] ) ) + CRLF )
-   OutputDebugString( "Controls: " + Str( Len( ::aXFM[ XFM_Controls ] ) ) + CRLF )
-   OutputDebugString( "EndClass: " + Str( Len( ::aXFM[ XFM_EndClass ] ) ) + CRLF )
-   OutputDebugString( "Methdos: " + Str( Len( ::aXFM[ XFM_Methods ] ) ) + CRLF )
-   OutputDebugString( "Footer: " + Str( Len( ::aXFM[ XFM_Footer ] ) ) + CRLF )
-   */
 
    SayMembers( ::aXFM )
 

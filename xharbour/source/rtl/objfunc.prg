@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.4 2002/10/05 08:16:43 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.5 2002/10/05 23:27:43 ronpinkas Exp $
  */
 
 /*
@@ -160,14 +160,18 @@ FUNCTION __objGetValueList( oObject, aExcept, nScope )
 
 RETURN aReturn
 
-FUNCTION __ObjGetValueDiff( oBase, oObject )
+FUNCTION __ObjGetValueDiff( oObject, oBase )
 
    LOCAL aBaseVars, aObjectVars
    LOCAL aReturn
    LOCAL nVar, aVar
 
-   IF ValType( oBase ) != 'O' .OR. ValType( oObject ) != 'O' .OR. oBase:ClassH != oObject:ClassH
+   IF ValType( oObject ) != 'O' .OR. ( oBase != NIL .AND. oObject:ClassH != oBase:ClassH )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
+   ENDIF
+
+   IF oBase == NIL
+      oBase := __clsInst( oObject:ClassH )
    ENDIF
 
    aBaseVars   := __objGetValueList( oBase  , NIL, HB_OO_CLSTP_EXPORTED )

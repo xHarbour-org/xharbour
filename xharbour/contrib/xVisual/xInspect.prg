@@ -63,7 +63,7 @@ METHOD SetBrowserData( oObj ) CLASS ObjInspect
    IF oObj:ClassName == "TFORMEDIT"
       oObj:XFMRoot()
    ELSE
-      oObj:Parent:XFMRoot()
+      oObj:Parent:XFMControl( , oObj )
    ENDIF
 
 RETURN Self
