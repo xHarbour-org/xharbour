@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.69 2004/04/22 10:10:53 bdj Exp $
+ * $Id: tbrowse.prg,v 1.70 2004/05/25 04:28:54 guerra000 Exp $
  */
 
 /*
@@ -240,6 +240,8 @@ CLASS TBrowse
    METHOD DrawARow()                      // Draws a single row in stabilize() method
    METHOD DispCellNormal()                // Most often used cell display method, removing all ifs and buts
    METHOD CheckRowsToBeRedrawn()
+   METHOD CheckRowPos()
+   METHOD AColInfo()
 
    DATA aRect                             // The rectangle specified with ColorRect()
    DATA aRectColor                        // The color positions to use in the rectangle specified with ColorRect()
@@ -627,6 +629,13 @@ METHOD Configure( nMode ) CLASS TBrowse
 //                        Columns Management
 //
 //-------------------------------------------------------------------//
+
+METHOD AColInfo( oCol ) CLASS Tbrowse
+
+   Return { oCol, valtype( Eval( oCol:block ) ), ::SetColumnWidth( oCol ),;
+                        '', '', '', 0, '', 0, oCol:DefColor, .f., '', .t. }
+
+//-------------------------------------------------------------------//
 //
 //   Adds a TBColumn object to the TBrowse object
 //
@@ -636,7 +645,9 @@ METHOD AddColumn( oCol ) CLASS TBrowse
 
    ::nColumns++
 
-   aadd( ::aColsInfo, { oCol, '', 0, '', '', '', 0, '', 0, {}, .f., '', .t. } )
+   //   aadd( ::aColsInfo, { oCol, '', 0, '', '', '', 0, '', 0, {}, .f., '', .t. } )
+   aadd( ::aColsInfo, ::AColInfo( oCol ) )
+
    ::AColumns := ::aColsInfo
 
    if ::nColumns == 1
@@ -659,13 +670,19 @@ METHOD InsColumn( nPos, oCol ) CLASS TBrowse
 
    if 0 < nPos //.AND. nPos <= ::nColumns
       ::Moved()
-
+/*
       if nPos > ::nColumns
          aAdd( ::aColsInfo, { oCol, valtype( Eval( oCol:block ) ), ::SetColumnWidth( oCol ),;
                                         '', '', '', 0, '', 0, oCol:DefColor, .f., '', .t. } )
       else
          aIns( ::aColsInfo, nPos, { oCol, valtype( Eval( oCol:block ) ), ::SetColumnWidth( oCol ),;
                                         '', '', '', 0, '', 0, oCol:DefColor, .f., '', .t. }, .t. )
+      endif
+*/
+      if nPos > ::nColumns
+         aAdd( ::aColsInfo, ::AColInfo( oCol ) )
+      else
+         aIns( ::aColsInfo, nPos, ::AColInfo( oCol ), .t. )
       endif
 
       ::aColumns := ::aColsInfo
@@ -692,9 +709,11 @@ METHOD SetColumn( nColumn, oCol ) CLASS TBrowse
       ::Moved()
 
       oOldCol := ::aColsInfo[ nColumn, o_Obj ]
-
+/*
       ::aColsInfo[ nColumn ] := { oCol, valtype( Eval( oCol:block ) ), ::SetColumnWidth( oCol ),;
                                               '', '', '', 0, '', 0, oCol:DefColor, .f., '', .t. }
+*/
+      ::aColsInfo[ nColumn ] := ::AColInfo( oCol )
 
       if !( ::lNeverDisplayed )
          ::Configure( 1 )
@@ -1389,6 +1408,7 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
    local chSep, cfSep, nSpacePre, nSpaceLast, nLeftCol
    local ccSep, ncSepWidth
 
+DispBegin()
    nSpacePre := INT( ( nWidth - ::nColsWidth ) / 2 )
    nSpaceLast := nWidth - nSpacePre - ::nColsWidth
 
@@ -1580,6 +1600,7 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
       next
    endif
 
+DispEnd()
    Return Self
 
 //---------------------------------------------------------------------//
@@ -1616,27 +1637,9 @@ METHOD ColorRect( aRect, aRectColor ) CLASS TBrowse
 //
 //-------------------------------------------------------------------//
 
-METHOD ForceStable() CLASS TBrowse
+METHOD CheckRowPos() CLASS TBrowse
    Local nAvail           // How many records are avaialble?
    Local lReset := .F.    // Reposition to row 1 required?
-
-   // This is a hack to force TBrowse honors initial rowpos
-   // This may be a very dirty approach
-
-   local i
-
-   If !::lInitRow
-      If ::rowPos != 1
-         for i := ::rowPos + 1 to ::rowCount
-            ::Down()
-            ::ForceStabilize()
-         next
-      else
-         ::ForceStabilize()
-      Endif
-   Endif
-
-   ::lInitRow := .T.
 
    // If ForceStable() is called after movement of data source
    // (in simple words, the record pointer is moved) where the
@@ -1666,7 +1669,6 @@ METHOD ForceStable() CLASS TBrowse
          Eval( ::SkipBlock, 0 - nAvail )
 
       EndIf
-
    EndIf
 
    If lReset   // So repositioning was required !
@@ -1681,7 +1683,33 @@ METHOD ForceStable() CLASS TBrowse
       // To ensure phase 1 is skipped
       ::nRecsToSkip := 0
 
+      ::RefreshAll()
    EndIf
+
+   Return Self
+
+//-------------------------------------------------------------------//
+
+METHOD ForceStable() CLASS TBrowse
+   LOCAL i
+
+   // This is a hack to force TBrowse honors initial rowpos
+   // This may be a very dirty approach
+   //
+   If !::lInitRow
+      If ::rowPos != 1
+         for i := ::rowPos + 1 to ::rowCount
+            ::Down()
+            ::ForceStabilize()
+         next
+      else
+         ::ForceStabilize()
+      Endif
+   Endif
+
+   ::lInitRow := .T.
+
+   ::CheckRowPos()
 
    //  Because forceStable is always needs whole tBrowse be redrawn
    //  no incremental stabilization is needed, so I am of the view that
@@ -1732,6 +1760,8 @@ METHOD Stabilize() CLASS TBrowse
       if ::freeze > 0
          ::SetFrozenCols( ::freeze )
       endif
+
+      ::CheckRowPos()   ///////////
    endif
 
    ColorSpec  := ::aColorSpec[ 1 ]

@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.7 2003/08/08 22:31:50 walito Exp $
+ * $Id: tbcolumn.prg,v 1.8 2004/04/20 05:18:43 bdj Exp $
  */
 
 /*
@@ -49,11 +49,14 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+//-------------------------------------------------------------------//
 
 #include "hbclass.ch"
 #include "hbsetup.ch"
 #include "common.ch"
 #include "tbrowse.ch"
+
+//-------------------------------------------------------------------//
 
 CLASS TBColumn
 
@@ -68,7 +71,7 @@ CLASS TBColumn
    DATA  HeadSep              // Heading separator character
    DATA  Picture              // Column picture string
 #ifdef HB_COMPAT_C53
-   DATA  PreBlock             // 
+   DATA  PreBlock             //
    DATA  PostBlock            //
 #endif
 
@@ -96,6 +99,8 @@ CLASS TBColumn
 
 ENDCLASS
 
+//-------------------------------------------------------------------//
+
 METHOD New( cHeading, bBlock ) CLASS TBColumn
 
    local xRes, cType, nTokenPos := 0, nL
@@ -108,7 +113,7 @@ METHOD New( cHeading, bBlock ) CLASS TBColumn
    ::ColSep   := nil
 
    ::nWidth   := nil
-   ::Heading  := cHeading
+   ::Heading  := if( valtype( cHeading ) == 'C', cHeading, ' ' )
 
    /* NOTE: needs to be initialized to an empty string or TBrowse()::WriteMLineText() does not work
             if there are columns which have a footing and others which don't
@@ -126,6 +131,7 @@ METHOD New( cHeading, bBlock ) CLASS TBColumn
 
 return Self
 
+//-------------------------------------------------------------------//
 
 METHOD SetWidth(n) CLASS TBColumn
 
@@ -137,6 +143,7 @@ METHOD SetWidth(n) CLASS TBColumn
 
 return n
 
+//-------------------------------------------------------------------//
 
 #ifdef HB_COMPAT_C53
 METHOD SetStyle( nMode, lSetting ) CLASS TBColumn
@@ -151,12 +158,15 @@ METHOD SetStyle( nMode, lSetting ) CLASS TBColumn
   IF ISLOGICAL( lSetting )
      ::aSetStyle[ nMode ] := lSetting
   ENDIF
- 
+
 RETURN lRet
 #endif
 
+//-------------------------------------------------------------------//
 
 function TBColumnNew(cHeading, bBlock)
 
 return TBColumn():New(cHeading, bBlock)
+
+//-------------------------------------------------------------------//
 
