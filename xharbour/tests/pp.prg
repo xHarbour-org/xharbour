@@ -207,8 +207,6 @@ STATIC s_acFlowType := {},  s_nFlowId := 0
 
 static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
 
-STATIC s_nBlock, s_nBlocks
-
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
   STATIC PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
@@ -563,10 +561,8 @@ RETURN s_xRet
 
 FUNCTION PP_ExecProcedure( aProc, sProcName )
 
-   LOCAL xErr
+   LOCAL nBlock, nBlocks := Len( aProc[2] ), xErr
    LOCAL nVar, nVars
-
-   s_nBlocks := Len( aProc[2] )
 
    IF s_nProcStack > 0
       /* Saving Privates of upper level. */
@@ -598,29 +594,30 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
    aAdd( s_aProcStack, { aProc[1], 0 } )
    s_nProcStack++
 
-   FOR s_nBlock := 1 TO s_nBlocks
-      IF aProc[2][s_nBlock][2] == NIL
-         IF aProc[2][s_nBlock][1] != 0 // Uncondtional Jump.
-            s_nBlock := aProc[2][s_nBlock][1]
+   FOR nBlock := 1 TO nBlocks
+      IF aProc[2][nBlock][2] == NIL
+         IF aProc[2][nBlock][1] != 0 // Uncondtional Jump.
+            nBlock := aProc[2][nBlock][1]
          ENDIF
       ELSE
-         s_aProcStack[ Len( s_aProcStack ) ][2] := aProc[2][s_nBlock][3] // Line No.
+         s_aProcStack[ Len( s_aProcStack ) ][2] := aProc[2][nBlock][3] // Line No.
 
          BEGIN SEQUENCE
 
-            IF aProc[2][s_nBlock][1] == 0
-               //? aProc[2][s_nBlock][3]
-               Eval( aProc[2][s_nBlock][2] )
+            IF aProc[2][nBlock][1] == 0
+               //? aProc[2][nBlock][3]
+               Eval( aProc[2][nBlock][2] )
             ELSE
-               IF ! Eval( aProc[2][s_nBlock][2] ) // Jump if FALSE.
-                  s_nBlock := aProc[2][s_nBlock][1]
+               IF ! Eval( aProc[2][nBlock][2] ) // Jump if FALSE.
+                  nBlock := aProc[2][nBlock][1]
                ENDIF
             ENDIF
 
          RECOVER USING xErr
-            //IF ValType( xErr ) == 'N'
-            //   PP_ExecProcedure( s_aProcedures[xErr] )
-            //ENDIF
+            IF ValType( xErr ) == 'L'
+               // Return from this procedure requested by PP_SetReturn()
+               EXIT
+            ENDIF
          END SEQUENCE
       ENDIF
    NEXT
@@ -1822,8 +1819,7 @@ PROCEDURE PP_SetReturn( xRet )
 
    s_xRet := xRet
 
-   // Force EXIT form the current procedure.
-   s_nBlock := s_nBlocks
+   BREAK .T.
 
 RETURN
 
@@ -2048,6 +2044,7 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
          ENDIF
 
          PP_ExecProcedure( aProcedures[nProc] )
+
          IF oErr:CanSubstitute
             RETURN ( s_xRet )
          ELSEIF oErr:CanDefault
@@ -2055,13 +2052,16 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
 						       sArgs + CRLF + ;
 									 PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + CRLF + ;
 									 ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
+
             RETURN  ( .F. )
          ELSE
             Alert( [No Recovery for: ] + "'" + oErr:Operation + "' " + oErr:Description + CRLF + ;
 						       sArgs + " " + CRLF + ;
 									 PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + CRLF + ;
 									 ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
-            BREAK nProc
+
+            oErr:Cargo := nProc
+            BREAK oErr
          ENDIF
       ENDIF
    ENDIF
@@ -2189,16 +2189,16 @@ RETURN nIf
 
    STATIC FUNCTION CompileNestedBlocks( sTemp, sMain )
 
-      LOCAL asBlocks, nNestedBlocks, Counter, aReplace
+      LOCAL asBlocks, nBlocks, Counter, aReplace
 
       asBlocks := asBlocks(sTemp )
-      nNestedBlocks  := Len( asBlocks )
+      nBlocks  := Len( asBlocks )
 
-      FOR Counter := 1 TO nNestedBlocks
+      FOR Counter := 1 TO nBlocks
          aReplace := CompileNestedBlocks( SubStr( asBlocks[Counter], 2 ), @sMain )
       NEXT
 
-      IF ProcName(1) == ProcName(0) // .AND. nNestedBlocks == 0
+      IF ProcName(1) == ProcName(0) // .AND. nBlocks == 0
          IF aReplace != NIL
             sTemp := StrTran( sTemp, aReplace[1], aReplace[2] )
          ELSE

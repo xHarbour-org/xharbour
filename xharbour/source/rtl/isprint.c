@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.5 2002/04/28 01:34:22 lculik Exp $
+ * $Id: isprint.c,v 1.6 2002/05/03 07:38:45 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,8 @@
 #include "hbapifs.h"
 #include "hbset.h"
 #include "hbapiitm.h"
-#if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
+
+#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
 
    #include <stdio.h>
    #include <malloc.h>
