@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.75 2003/12/15 06:08:46 jonnymind Exp $
+* $Id: thread.h,v 1.76 2003/12/19 07:30:01 ronpinkas Exp $
 */
 
 /*
@@ -72,7 +72,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 #define HB_MUTEX_SIGNATURE       0xF0316913
 
 /* Maximun number of cycles that can be completed by VM without stack unlock */
-#define HB_VM_UNLOCK_PERIOD 100
+#define HB_VM_UNLOCK_PERIOD 1000
 
 #if defined(HB_OS_WIN_32)
    #ifndef _WIN32_WINNT
@@ -338,6 +338,13 @@ typedef struct tag_HB_STACK
    LPAREANODE pCurrArea;  /* Pointer to a selected and valid area */
 
    struct tag_HB_STACK *next;
+
+
+   /* Background per-thread jobs */
+   PHB_ITEM *pBackgroundTasks;
+   BOOL bIamBackground;
+   USHORT uiBackgroundTask;
+   USHORT uiBackgroundMaxTask;
 
 #ifdef HB_OS_WIN_32
    HANDLE th_h;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.104 2003/12/07 13:35:02 jonnymind Exp $
+ * $Id: hbapi.h,v 1.105 2003/12/19 07:30:00 ronpinkas Exp $
  */
 
 /*
@@ -577,9 +577,18 @@ extern char * hb_macroGetType( PHB_ITEM pItem, BYTE Flags ); /* determine the ty
 extern char * hb_macroExpandString( char *szString, ULONG ulLength, BOOL *pbNewString ); /* expands valid '&' operator */
 
 /* idle states */
-extern void   hb_idleState( void ); /* services a single idle state */
-extern void   hb_idleReset( void ); /* services a single idle state */
-extern void   hb_idleShutDown( void ); /* closes all background tasks */
+extern void     hb_idleState( void ); /* services a single idle state */
+extern void     hb_idleReset( void ); /* reset idle state routine count*/
+extern void     hb_idleShutDown( void ); /* closes all idle state tasks */
+extern ULONG    hb_idleAddFunc( PHB_ITEM pBlock ); /* Adds a codeblock or an executable array */
+extern PHB_ITEM hb_idleDelFunc( ULONG ulID ); /* Deletes a prevuiously added codeblock */
+
+/* Background functions */
+extern void     hb_backgroundRun( void ); /* services a single background routine */
+extern void     hb_backgroundReset( void ); /* services a single idle state */
+extern void     hb_backgroundShutDown( void ); /* closes all background tasks */
+extern ULONG    hb_backgroundAddFunc( PHB_ITEM pBlock ); /* Adds a codeblock or an executable array */
+extern PHB_ITEM hb_backgroundDelFunc( ULONG ulID ); /* Deletes a prevuiously added codeblock */
 
 /* misc */
 extern char * hb_verPlatform( void ); /* retrieves a newly allocated buffer containing platform version */

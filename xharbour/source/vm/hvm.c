@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.300 2003/12/19 07:30:01 ronpinkas Exp $
+ * $Id: hvm.c,v 1.301 2003/12/19 10:39:35 ronpinkas Exp $
  */
 
 /*
@@ -852,14 +852,21 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
       if ( hb_set.HB_SET_BACKGROUNDTASKS )
       {
+      #ifndef HB_THREAD_SUPPORT
          static unsigned short s_iBackground = 0;
          // Run background functions every 5000 vm exec
          if( ++s_iBackground == 5000 )
          {
-            //hb_idleRun();
             hb_backgroundRun();
             s_iBackground = 0;
          }
+      #else
+         // Run background functions every unlock period
+         if( HB_VM_STACK.iPcodeCount == HB_VM_UNLOCK_PERIOD )
+         {
+            hb_backgroundRun();
+         }
+      #endif
       }
 
       switch( pCode[ w ] )

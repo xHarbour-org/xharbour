@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.11 2003/12/18 14:47:54 jonnymind Exp $
+ * $Id: bkgtsks.c,v 1.1 2003/12/19 01:41:11 fsgiudice Exp $
  */
 
 /*
@@ -63,11 +63,14 @@
 #define INCL_NOPMAPI
 #define HB_OS_WIN_32_USED
 
+#define HB_THRAED_OPTIMIZE_STACK
+#include "hbstack.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbset.h"
 #include "hbvm.h"
 #include "error.ch"
+
 #if defined(HB_OS_UNIX)
 #if defined(HB_OS_DARWIN)
    #include <unistd.h>    /* We need usleep() in Darwin */
@@ -76,6 +79,7 @@
 #endif
 #endif
 
+#ifndef HB_THREAD_SUPPORT
 /* list of background tasks
  * A pointer into an array of pointers to items with a codeblock
 */
@@ -89,10 +93,21 @@ static USHORT s_uiBackgroundTask = 0;
 
 /* number of tasks in the list */
 static USHORT s_uiBackgroundMaxTask = 0;
+#else
+
+#define s_pBackgroundTasks    HB_VM_STACK.pBackgroundTasks
+#define s_bIamBackground      HB_VM_STACK.bIamBackground
+#define s_uiBackgroundTask    HB_VM_STACK.uiBackgroundTask
+#define s_uiBackgroundMaxTask HB_VM_STACK.uiBackgroundMaxTask
+
+#endif
+
 
 /* RUN all tasks defined in background state */
 void hb_backgroundRun( void )
 {
+   HB_THREAD_STUB
+
    if( ! s_bIamBackground )
    {
       s_bIamBackground = TRUE;
@@ -124,6 +139,8 @@ void hb_backgroundRun( void )
 
 void hb_backgroundReset( void )
 {
+   HB_THREAD_STUB
+
    if( s_uiBackgroundTask == s_uiBackgroundMaxTask )
    {
       s_uiBackgroundTask = 0;
@@ -133,6 +150,8 @@ void hb_backgroundReset( void )
 /* close all active background task on program exit */
 void hb_backgroundShutDown( void )
 {
+   HB_THREAD_STUB
+
    if( s_pBackgroundTasks )
    {
       do
@@ -160,6 +179,8 @@ HB_FUNC( HB_BACKGROUNDRESET )
 
 ULONG hb_backgroundAddFunc( PHB_ITEM pBlock )
 {
+   HB_THREAD_STUB
+
    ++s_uiBackgroundMaxTask;
    if( !s_pBackgroundTasks )
    {
@@ -188,6 +209,8 @@ ULONG hb_backgroundAddFunc( PHB_ITEM pBlock )
 /* add a new background task and return its handle */
 HB_FUNC( HB_BACKGROUNDADD )
 {
+   HB_THREAD_STUB
+
    HB_ITEM_PTR pBlock = hb_param( 1, HB_IT_ANY );
 
    if( HB_IS_BLOCK( pBlock ) || HB_IS_ARRAY( pBlock ) )
@@ -200,6 +223,7 @@ HB_FUNC( HB_BACKGROUNDADD )
 
 PHB_ITEM hb_backgroundDelFunc( ULONG ulID )
 {
+   HB_THREAD_STUB
    SHORT iTask;
    PHB_ITEM pItem = NULL;
 
@@ -244,6 +268,7 @@ PHB_ITEM hb_backgroundDelFunc( ULONG ulID )
 /* Delete a task with given handle and return a codeblock with this task */
 HB_FUNC( HB_BACKGROUNDDEL )
 {
+   HB_THREAD_STUB
    PHB_ITEM pItem = NULL;
 
    if( s_pBackgroundTasks && ( hb_parinfo( 1 ) & HB_IT_NUMERIC ) )
