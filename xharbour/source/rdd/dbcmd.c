@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.52 2003/09/15 16:39:26 druzus Exp $
+ * $Id: dbcmd.c,v 1.53 2003/10/01 17:41:47 paultucker Exp $
  */
 
 /*
@@ -4383,15 +4383,21 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
 
   USHORT   i,f;
   PHB_ITEM fieldValue;
+  char * szName;
 
   fieldValue = hb_itemNew( NULL );
+  szName = ( char * ) hb_xgrab( ( ( AREAP ) pAreaTo)->uiMaxFieldNameLength + 1 );
 
   for( i = 0 ; i < pAreaTo->uiFieldCount; i++ )
   {
+
+    SELF_FIELDNAME( ( AREAP ) pAreaTo, i + 1, szName );
+
     /* field in the list?*/
-    if ( pFields == NULL || IsFieldIn( ( ( PHB_DYNS )(pAreaTo->lpFields + i)->sym )->pSymbol->szName, pFields ) )
+    if ( pFields == NULL || IsFieldIn( szName, pFields ) )
     {
-      f = hb_rddFieldIndex( pAreaFrom, (( PHB_DYNS )(pAreaTo->lpFields + i)->sym )->pSymbol->szName );
+
+      f = hb_rddFieldIndex( pAreaFrom, szName );
 
       if( f )
       {
@@ -4411,6 +4417,7 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
     }
   }
 
+  hb_xfree( szName );
   hb_itemRelease( fieldValue );
 }
 
@@ -4537,9 +4544,7 @@ static ERRCODE rddMoveRecords( char *cAreaFrom, char *cAreaTo, PHB_ITEM pFields,
               {
                  s_pCurrArea = s_pCurrAreaSaved;
               }
-
               SELF_APPEND( ( AREAP ) pAreaTo, FALSE );      /*put a new one on TO Area*/
-
               if( cAreaFrom )
               {
                  s_pCurrArea = pAreaRelease;
