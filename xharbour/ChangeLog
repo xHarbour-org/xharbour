@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3830 2005/02/17 07:37:55 andijahja Exp $
+ * $Id: ChangeLog,v 1.3831 2005/02/17 07:53:22 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-17 15:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  + makefile.gc
+  + make_gc.bat
+    * another approach of building xHarbour with MinGW under Windows
+
+    /*
+    Note: Initial upload, only for ST. Modification for MT is appreciated.
+    */
+
 2005-02-17 14:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * utils/hbpp/hbpp.c
     * make consistent function declaration hb_pp_fopen()
