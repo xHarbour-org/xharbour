@@ -100,6 +100,9 @@
          #ifdef PGS
             REQUEST SR_PGS
          #endif
+         #ifdef ORACLE
+            REQUEST SR_Oracle
+         #endif
       #endif
 
       #ifdef ZIP

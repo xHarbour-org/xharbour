@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.4 2004/10/26 01:59:01 ronpinkas Exp $
+ * $Id: browse.prg,v 1.5 2004/11/08 18:58:10 ronpinkas Exp $
  */
 
 /*
@@ -299,7 +299,8 @@ return
 static function DOGET( oBrowse, lValue )
 
    local bIns, lScore, lExit, cData, oGet, nExitState, nIndexKey, ;
-      xKeyValue, lSuccess, nCursor, xData, cForExp
+      xKeyValue, lSuccess, nCursor, xData, cForExp, lSave
+
    oBrowse:hittop(.F.)
    statline(oBrowse, lValue)
    do while ( !oBrowse:stabilize() )
@@ -312,12 +313,21 @@ static function DOGET( oBrowse, lValue )
    if ( !Empty(nIndexKey) )
       xKeyValue := &nIndexKey
    endif
+
    cData := oBrowse:getcolumn(oBrowse:colpos())
    xData := eval(cData:block())
-   oGet := getnew(Row(), Col(), { |_1| iif( PCount() == 0, xData, ;
-      xData := _1 ) }, "mGetVar", Nil, oBrowse:colorspec())
+
+   IF ValType( Eval( cData:Block ) ) == 'M'
+      xData := MemoEdit( xData, Row(), Col(), oBrowse:nBottom, oBrowse:nRight, .T. )
+      lSave := LastKey() == K_CTRL_W
+      oBrowse:RefreshAll()
+   ELSE
+      oGet := getnew(Row(), Col(), { |_1| iif( PCount() == 0, xData, xData := _1 ) }, "mGetVar", Nil, oBrowse:colorspec())
+      lSave := ReadModal({oGet})
+   ENDIF
    lSuccess := .F.
-   if ( ReadModal({oGet}) )
+
+   if lSave
       if ( lValue .AND. RecNo() == LastRec() + 1 )
          append blank
       endif
@@ -330,6 +340,7 @@ static function DOGET( oBrowse, lValue )
          lSuccess := .T.
       endif
    endif
+
    if ( lSuccess )
       freshorder(oBrowse)
       nExitState := 0

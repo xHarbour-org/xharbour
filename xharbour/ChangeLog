@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3853 2005/02/21 17:04:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3854 2005/02/22 04:35:25 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-21 23:17 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/rtl/browse.prg
+    + Added logic to use MemoEdit when editing a MEMO field.
+      /* I know it's not Clipper compatible, but if no reasonable objections,
+         I believe we should have such minimal support for memo fields. */
+
+  * utils/xbscript/xbscript.prg
+    + Added guarded request for SR_ORACLE
 
 2005-02-21 23:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * hrbdll.pc
