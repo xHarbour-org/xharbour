@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.58 2003/12/18 00:40:29 andijahja Exp $
+ * $Id: itemapi.c,v 1.59 2003/12/18 21:12:44 ronpinkas Exp $
  */
 
 /*
@@ -1530,7 +1530,7 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
 
 #ifndef HB_LONG_LONG_OFF
                case HB_IT_LONGLONG:
-                  iBytes = sprintf( szResult, "%*Li", iWidth, pNumber->item.asLongLong.value );
+                  iBytes = sprintf( szResult, "%*I64i", iWidth, pNumber->item.asLongLong.value );
                   break;
 #endif
 

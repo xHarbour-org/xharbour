@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2039 2004/01/11 22:03:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2040 2004/01/12 14:05:31 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-12 02:14 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/vm/itemapi.c
+    * correct printf format for longlong support
+    * (files > 4gb were showing mod 4gb)
+
 2004-01-12 21:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   *include/hbgwvt.h
    ! Add file ID
