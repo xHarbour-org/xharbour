@@ -188,14 +188,15 @@ Return( aScan( ::aItems,{|o|o:id == nId} ) )
 METHOD GetHandle() CLASS TMenu
    LOCAL hMenu, lpMenuInfo
    IF ::FHandle == NIL
-      lpMenuInfo IS MENUINFO
+//      lpMenuInfo IS MENUINFO
       
-      lpMenuInfo:cbsize  := lpMenuInfo:SizeOf()
-      lpMenuInfo:fMask   := MIM_STYLE
-      lpMenuInfo:dwStyle := MNS_NOTIFYBYPOS
+//      lpMenuInfo:cbsize  := lpMenuInfo:SizeOf()
+//      lpMenuInfo:fMask   := MIM_STYLE
+//      lpMenuInfo:dwStyle := MNS_NOTIFYBYPOS
       
       hMenu := ::FItems:GetHandle()
-      view hMenu, SetMenuInfo( hMenu, lpMenuInfo:value )
+      //SetMenuInfo( hMenu, lpMenuInfo:value )
+
    ENDIF
 RETURN hMenu
 

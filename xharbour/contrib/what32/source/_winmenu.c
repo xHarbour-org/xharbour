@@ -277,13 +277,13 @@ HB_FUNC( GETMENUINFO )
 // WINUSERAPI BOOL WINAPI SetMenuInfo( IN HMENU, IN LPCMENUINFO);
 
 
-
+/*
 HB_FUNC( SETMENUINFO )
 {
    LPCMENUINFO lpcmenuInfo =(LPCMENUINFO) hb_param( 2, HB_IT_STRING )->item.asString.value;
    hb_retl( SetMenuInfo( (HMENU) hb_parnl( 1 ), lpcmenuInfo ) ) ;
 }
-
+*/
 
 
 //-----------------------------------------------------------------------------

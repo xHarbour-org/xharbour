@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.36 2003/01/09 08:21:33 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.37 2003/01/27 11:54:01 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -249,10 +249,9 @@ METHOD tbProc(hWnd,nMsg,nwParam,nlParam) CLASS TToolBar
           ELSEIF ValType( xAction ) == "N"
              HB_Exec( xAction, ::aButtons[n] )
           ENDIF
-         ELSE
-          RETURN CallWindowProc( ::ntProc, hWnd, nMsg, nwParam, nlParam )
 
        ENDIF
+       RETURN CallWindowProc( ::ntProc, hWnd, nMsg, nwParam, nlParam )
 
 
    CASE nMsg==WM_NOTIFY
