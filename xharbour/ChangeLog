@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1621 2003/10/23 09:01:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1622 2003/10/23 10:04:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-23 02:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Added missing () to 2 expressions involving && and || which caused a silly bad bug (discovered by Przemek).
 
 2003-10-23 03:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/cstruct.ch

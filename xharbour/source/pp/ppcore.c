@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.83 2003/10/20 20:54:42 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.84 2003/10/23 09:01:32 ronpinkas Exp $
  */
 
 /*
@@ -4028,7 +4028,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
            if( *expreal != '\0' )
            {
               /* Ron Pinkas added 2000-01-21 */
-              if( *expreal == '&' && ( pTemp = strpbrk( expreal + 1, "&." ) ) == NULL || pTemp - expreal >= lenitem - 1 )
+              if( *expreal == '&' && ( ( pTemp = strpbrk( expreal + 1, "&." ) ) == NULL || pTemp - expreal >= lenitem - 1 ) )
               {
                  i = 0;
                  if( ! ifou )
@@ -4063,7 +4063,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
     else
     {
        /* Ron Pinkas added 2000-01-21 */
-       if( *expreal == '&' && ( pTemp = strpbrk( expreal + 1, "&." ) ) == NULL || pTemp - expreal >= lenreal - 1 )
+       if( *expreal == '&' && ( ( pTemp = strpbrk( expreal + 1, "&." ) ) == NULL || pTemp - expreal >= lenreal - 1 ) )
        {
           rmlen--;
 
