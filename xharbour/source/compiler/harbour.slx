@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.35 2003/06/20 20:57:56 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.36 2003/06/20 21:29:17 ronpinkas Exp $
  */
 
 /*
@@ -1058,6 +1058,7 @@ static int hb_comp_SLX_CustomAction( int x )
                iLastToken == WANTS_ID ||
                iLastToken == WITH ||
                iLastToken == REJECT_OP ||
+               iLastToken == GET ||
                IS_OP( iLastToken )
              )
            {

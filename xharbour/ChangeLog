@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1485 2003/09/16 02:21:49 lculik Exp $
+ * $Id: ChangeLog,v 1.1486 2003/09/16 12:38:38 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-09-16 08:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.slx
+    + Aded GET support to HB_In logic.
+
+  * source/rtl/filesys.c
+    + Added few missing HB_THREAD_STUB
+
 2003-16-09 09:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + make_deb.sh
     ! Build an debian package
   + debian/*
     ! Files need to build an debian package
 
-  Notice , I don't to see this files on harbour repository, it give to me many 
+  Notice , I don't to see this files on harbour repository, it give to me many
   work to has this work properly
 
 2003-15-09 23:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>

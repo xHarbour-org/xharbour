@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.50 2003/09/14 18:07:23 jonnymind Exp $
+ * $Id: filesys.c,v 1.51 2003/09/15 18:58:28 jonnymind Exp $
  */
 
 /*
@@ -529,6 +529,7 @@ BYTE HB_EXPORT * hb_filecase(char *str) {
 FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 {
    HB_THREAD_STUB
+
    FHANDLE hFileHandle ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsPOpen(%p, %s)", pFilename, pMode));
@@ -747,14 +748,14 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
    char **argv;
    int size;
    char *command;
-   
+
    #ifdef HB_OS_WIN_32
    int pid;
    #define pipe(x)   _pipe( x, 2048, _O_BINARY )
    #else
    pid_t pid;
    #endif
-   
+
    errno = 0;
    if( fhStdin != 0 && pipe( hPipeIn ) != 0 )
    {
@@ -763,9 +764,9 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
    }
 
    if( fhStdout != 0 && pipe( hPipeOut ) != 0 )
-   {      
+   {
       hb_fsSetError( errno );
-      if ( fhStdin != 0 ) 
+      if ( fhStdin != 0 )
       {
          close( hPipeIn[0] );
          close( hPipeIn[1] );
@@ -1044,7 +1045,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
          hPipeErrRd = hPipeOutRd;
          hPipeErrWr = hPipeOutWr;
       }
-      
+
       if ( !CreatePipe( &hPipeErrRd, &hPipeErrWr, &secatt, 0 ) )
       {
          hb_fsSetError( (USHORT) GetLastError() );
@@ -1055,41 +1056,41 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
 
    // parameters are included in the command string
    pos = (char *) pFilename;
-   while( *pos && *pos != ' ' && *pos != '\\' ) 
+   while( *pos && *pos != ' ' && *pos != '\\' )
    {
       pos++;
    }
-   
+
    ulSize = (unsigned) (pos - (char *)pFilename );
-   if ( ulSize > 254 || *pos == '\\' ) 
+   if ( ulSize > 254 || *pos == '\\' )
    {
       // absolute path. We are ok
       strncpy( fullCommand, pFilename, 1023);
       fullCommand[1023] = '\0';
    }
    else
-   {   
+   {
       memcpy( cmdName, pFilename, ulSize );
       cmdName[ulSize+1] = 0;
       // find the command in the path
       SearchPath( NULL, cmdName, NULL, 1024, fullCommand, &filePart );
    }
 
-   if ( *pos && *pos != '\\') 
+   if ( *pos && *pos != '\\')
    {
       completeCommand = (char *) hb_xgrab( strlen( fullCommand ) + strlen( pos ) +2);
-      sprintf( completeCommand, "%s %s",  fullCommand, pos+1); 
+      sprintf( completeCommand, "%s %s",  fullCommand, pos+1);
    }
-   else 
+   else
    {
       completeCommand = (char *) hb_xgrab( strlen( fullCommand ) + 1);
-      strcpy( completeCommand, fullCommand); 
+      strcpy( completeCommand, fullCommand);
    }
-   
+
    memset( &si, 0, sizeof( si ) );
    si.cb = sizeof( si );
 
-   if ( bBackground ) 
+   if ( bBackground )
    {
       // using show_hide AND using invalid handlers for unused streams
       si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
@@ -1098,13 +1099,13 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       si.hStdInput = hPipeInRd;
       si.hStdOutput = hPipeOutWr;
       si.hStdError = hPipeErrWr;
-      
+
       iFlags |= DETACHED_PROCESS;
    }
-   else 
+   else
    {
       si.dwFlags = STARTF_USESTDHANDLES;
-      
+
       if ( fhStdin != NULL )
       {
          si.hStdInput = hPipeInRd;
@@ -1112,7 +1113,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       else
       {
          si.hStdInput = GetStdHandle( STD_INPUT_HANDLE );
-      }   
+      }
 
       if ( fhStdout != NULL )
       {
@@ -1121,7 +1122,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       else
       {
          si.hStdOutput = GetStdHandle( STD_OUTPUT_HANDLE );
-      }   
+      }
 
       if ( fhStderr != NULL )
       {
@@ -1130,9 +1131,9 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       else
       {
          si.hStdError = GetStdHandle( STD_ERROR_HANDLE );
-      }   
+      }
    }
-   
+
    if ( !CreateProcess( NULL,
       completeCommand,
       NULL,
@@ -1207,7 +1208,7 @@ ret_close_1:
       CloseHandle( hPipeInWr );
    }
 }
-   
+
 #else
 
    HB_SYMBOL_UNUSED( pFilename );
@@ -2893,6 +2894,8 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
 
 USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 {
+   HB_THREAD_STUB
+
    USHORT uiResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsChDrv(%d)", (int) nDrive));
@@ -2971,6 +2974,8 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 
 USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
 {
+   HB_THREAD_STUB
+
    USHORT uiResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsIsDrv(%d)", (int) nDrive));
@@ -3167,6 +3172,8 @@ BOOL HB_EXPORT hb_fsEof( FHANDLE hFileHandle )
 
 USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDirBuff(%hu)", uiDrive));
 
    HB_SYMBOL_UNUSED( uiDrive );
