@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.8 2003/12/03 13:01:24 mauriliolongo Exp $
+ * $Id: val.c,v 1.9 2004/02/09 06:30:17 walito Exp $
  */
 
 /*
@@ -225,7 +225,7 @@ HB_FUNC( VAL )
 
          iDec = iLen - iWidth - 1;
 
-         if( iWidth == 0 )
+         if( iWidth == 0 || iDec == 0 )
          {
             iWidth++;
          }

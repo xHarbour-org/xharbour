@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: pack.c,v 1.1 2004/02/01 22:52:07 likewolf Exp $
  *
  * xHarbour Project source code:
  * CT3 CHARPACK() and CHARUNPACK() functions.
@@ -98,7 +98,7 @@ HB_FUNC( CHARPACK )
    
    if (hb_parni(2) == 0)
    {
-      unsigned char *out = hb_xgrab(len * 3 + 2);
+      unsigned char *out = (unsigned char *) hb_xgrab(len * 3 + 2);
       int n_in = 0, n_out = 0;
 
       out[n_out++] = 158;
@@ -117,12 +117,12 @@ HB_FUNC( CHARPACK )
          n_in += n_count;
       }
       if (n_out < len)
-        hb_retclen(out, n_out);
+        hb_retclen((char *) out, n_out);
       hb_xfree(out);
       if (n_out < len)
         return;
    }
-   hb_retclen(in, len);
+   hb_retclen((char *) in, len);
 }
 
 
@@ -131,7 +131,7 @@ static unsigned char *buf_append(char *buf, unsigned *buf_size, unsigned count,
 {
    if (*buf_len + count > *buf_size) {
       *buf_size = HB_MAX(*buf_len + count, *buf_size + 32768);
-      buf = hb_xrealloc(buf, *buf_size);
+      buf = (char *) hb_xrealloc(buf, *buf_size);
    }
    memset(buf + *buf_len, c, count);
    *buf_len += count;
@@ -183,23 +183,23 @@ HB_FUNC( CHARUNPACK )
    {
       if (!(in[0] == 158 && in[1] == 158))
       {
-         hb_retclen(in, len);
+         hb_retclen((char *) in, len);
          return;
       }
-      out = hb_xgrab(buf_size);
+      out = (unsigned char *) hb_xgrab(buf_size);
       for (i = 2; i <= len - 3; i += 3)
       {
          if (in[i] != 0)
          {
             hb_xfree(out);
-            hb_retclen(in, len);
+            hb_retclen((char *) in, len);
             return;
          }
-         out = buf_append(out, &buf_size, in[i + 1], in[i + 2], &out_len);
+         out = buf_append((char *) out, &buf_size, in[i + 1], in[i + 2], &out_len);
       }
-      hb_retclen(out, out_len);
+      hb_retclen((char *) out, out_len);
       hb_xfree(out);
       return;
    }
-   hb_retclen(in, len);
+   hb_retclen((char *) in, len);
 }
