@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.9 2003/04/22 08:12:56 mauriliolongo Exp $
+# $Id: Makefile,v 1.10 2003/06/20 17:32:42 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -48,10 +48,14 @@ C_SOURCES=\
 	proc.c       \
 	pvalue.c     \
 	runner.c     \
-	thread.c     \
+
 
 PRG_SOURCES=\
 	harbinit.prg \
+
+ifneq ($(HB_ARCHITECTURE),dos)
+    C_SOURCES +=    thread.c     
+endif
 
 ifeq ($(HB_MT),MT)
    MT_LIBNAME=vmmt

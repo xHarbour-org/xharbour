@@ -1,7 +1,7 @@
 *****************************************************
 * HB I18N dictionary editor
 *
-* $Id: hbdict.prg,v 1.6 2003/09/05 01:15:34 jonnymind Exp $
+* $Id: hbdict.prg,v 1.7 2003/09/11 13:12:05 jonnymind Exp $
 *
 * Usage: hbdict <infile> <outfile>
 *
@@ -417,7 +417,9 @@ METHOD KeyboardHook( nKey ) CLASS THBdictEdit
 RETURN nKey
 
 METHOD IdleHook() CLASS THBDictEdit
+#ifndef DJGPP     
    ThreadSleep( 10 ) // release CPU
+#endif
 RETURN Self
 
 

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:45:37 ronpinkas Exp $
+# $Id: Makefile,v 1.3 2003/09/11 13:12:05 jonnymind Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -10,6 +10,10 @@ ROOT = ../../
 
 PRG_SOURCES=\
 	hbdict.prg 
+
+ifeq ($(HB_ARCHITECTURE),dos)
+    PRG_USR := -DDJGPP     
+endif
 
 PRG_MAIN=hbdict.prg
 

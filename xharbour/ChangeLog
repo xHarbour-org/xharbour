@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1582 2003/10/10 17:21:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1583 2003/10/10 17:22:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-11 10:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/hbservice.c
+    ! protect the code with #if !defined(__DJGPP__)/#endif
+  * source/vm/Makefile
+    ! exclude thread.c from djgpp compilation
+  * utils/hbdict/hbdict.prg
+    !   ThreadSleep( 10 ) only added if DJGPP is not defined
+  * utils/hbdict/Makefile
+    !   added PRG_USR = -DDJGPP when compiling with djgpp
 
 2003-10-10 10:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbver.h
