@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.57 2003/12/11 09:02:05 andijahja Exp $
+ * $Id: filesys.c,v 1.58 2003/12/29 11:16:51 druzus Exp $
  */
 
 /*
@@ -1876,7 +1876,16 @@ USHORT  HB_EXPORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount 
          // allowing async cancelation here
          HB_TEST_CANCEL_ENABLE_ASYN
 
-         bError = WriteFile( DostoWinHandle(hFileHandle), pBuff, uiCount, &dwWritten, NULL );
+         if ( uiCount )
+         {
+             bError = WriteFile( DostoWinHandle(hFileHandle), pBuff, uiCount, &dwWritten, NULL );
+         }
+         else
+         {
+             dwWritten = 0;
+             SetFilePointer( DostoWinHandle(hFileHandle), 0L, NULL, FILE_CURRENT );
+             bError = SetEndOfFile( DostoWinHandle(hFileHandle) );
+         }
          HB_DISABLE_ASYN_CANC
 
          if (!bError)
@@ -2037,7 +2046,16 @@ ULONG   HB_EXPORT hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCo
       BOOL bError;
       HB_STACK_UNLOCK
 
-      bError = WriteFile( DostoWinHandle( hFileHandle), pBuff, ulCount, &ulWritten, NULL );
+      if( ulCount )
+      {
+         bError = WriteFile( DostoWinHandle( hFileHandle), pBuff, ulCount, &ulWritten, NULL );
+      }
+      else
+      {
+          ulWritten = 0;
+          SetFilePointer( DostoWinHandle(hFileHandle), 0L, NULL, FILE_CURRENT );
+          bError = SetEndOfFile( DostoWinHandle(hFileHandle) );
+      }
 
       HB_STACK_LOCK
 
