@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3369 2004/08/29 18:30:10 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3371 2004/08/29 22:55:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-29 22:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+   * Changelog,v 1.3371
+   * xharbour/utils/hbmake/hbmake.prg
+     + fixed bound error when create a new makefile. 
+
+   * xharbour/utils/hbmake/hbmutils.prg
+     + create GetHarbourDir() function to avoid error when a lib is missing
+       at xharbour\lib.
+     + added new hbct and hbtip libs to external list libs.
+     + added standard xharbour copyright text.
+     - removed libct to external lib list.
+
+   * xharbour/utils/hbmake/tmake.prg
+     + added standard xharbour copyright text.
 
 2004-08-29 22:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/xharbour.spec

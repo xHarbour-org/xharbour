@@ -1,3 +1,53 @@
+/*
+ * $Id: hbmutils.prg,v 1.1 2004/08/29 22:40:00 modalsist Exp $
+ */
+/*
+ * Harbour Project source code:
+ * hbmutils.prg - utils for hbmake.
+ *
+ * Copyright 2000,2001,2002,2003,2004 Luiz Rafael Culik <culikr@uol.com.br>
+ * www - http://www.harbour-project.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ *
+ * As a special exception, the Harbour Project gives permission for
+ * additional uses of the text contained in its release of Harbour.
+ *
+ * The exception is that, if you link the Harbour libraries with other
+ * files to produce an executable, this does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * Your use of that executable is in no way restricted on account of
+ * linking the Harbour library code into it.
+ *
+ * This exception does not however invalidate any other reasons why
+ * the executable file might be covered by the GNU General Public License.
+ *
+ * This exception applies only to the code released by the Harbour
+ * Project under the name Harbour.  If you copy code from other
+ * Harbour Project or Free Software Foundation releases into a copy of
+ * Harbour, as the General Public License permits, the exception does
+ * not apply to the code that you add in this way.  To avoid misleading
+ * anyone as to the status of such modified files, you must delete
+ * this exception notice from them.
+ *
+ * If you write modifications of your own for Harbour, it is your choice
+ * whether to permit this exception to apply to your modifications.
+ * If you do not wish that, delete this exception notice.
+ *
+ */
 
 #include "common.ch"
 #ifndef __HARBOUR__
@@ -7,6 +57,7 @@
     DECLARE Exten( cExt as string, nType as numeric ) as string
     DECLARE GetSourceFiles( lSubDir as logical ) as ARRAY
     DECLARE GetDirs( cPat as USUAL ) as Array
+    DECLARE GetHarbourDir() as String
     DECLARE GetBccDir() as String
     DECLARE GetVccDir() as String
     DECLARE GetMakeDir() as String
@@ -155,6 +206,26 @@ STATIC FUNCTION GetDirs( cPattern, lGcc )
           ), "" ) } )
 
 RETURN ( aDir )
+
+FUNCTION GetHarbourDir()
+
+   LOCAL cPath   := ''
+   LOCAL cEnv    := GETE( "PATH" )
+   LOCAL aEnv    := HB_ATokens( cEnv, ";" )
+   LOCAL nPos
+   LOCAL cCurEnv := ""
+
+   FOR EACH cCurEnv IN aEnv
+
+      IF FILE( cCurEnv + '\harbour.exe' ) .OR. FILE( UPPER( cCurEnv ) + '\HARBOUR.EXE' )
+         cPath := cCurEnv
+         cPath := LEFT( cPath, RAT( '\', cPath ) - 1 )
+         EXIT
+      ENDIF
+
+   NEXT
+
+RETURN cPath
 
 FUNCTION GetBccDir()
 
@@ -394,7 +465,7 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
                       'rddads' + cSuffix, ;
                       'ace32' + cSuffix, ;
                       'libnf' + cSuffix, ;
-                      'libct' + cSuffix, ;
+                      'hbct' + cSuffix, ;
                       'html' + cSuffix, ;
                       'libgt' + cSuffix, ;
                       'libmisc' + cSuffix, ;
@@ -414,7 +485,8 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
                       'dbfcdxmt' + cSuffix, ;
                       'macromt' + cSuffix,;
                       'codepage' + cSuffix,;
-                      'gtnul' + cSuffix }
+                      'gtnul' + cSuffix,;
+                      'hbtip'+ cSuffix }
 
    LOCAL aReturnLibs := {}
    LOCAL aLibs       := DIRECTORY( clibs )
@@ -439,23 +511,24 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
 
 RETURN aReturnLibs
 
-FUNCTION Getlibs( lGcc, cDir )
+FUNCTION GetLibs( lGcc, cDir )
 
    LOCAL lLinux        := AT( 'linux', LOWER( OS() ) ) > 0
    LOCAL cEnv          := GETENV( "HB_LIB_INSTALL" )
-   LOCAL ainstaledlibs := Getinstaledlibs( IIF( ! lLinux, IIF( ! lGcc, cDir + "\*.lib", cDir + "\*.a" ),  '/usr/lib/xharbour/*.a' ), lGcc )
-   LOCAL aLibsDesc     := { { "Harbour Ct3 library - Libct",  IIF( lGcc, 'ct.a', 'libct.lib' ) }, ;
-                        { "Harbour Misc library - Libmisc", IIF( lGcc, 'misc.a', 'libmisc.lib' ) }, ;
-                        { "Harbour html library - Htmllib", 'html' + IIF( lGcc, '.a', '.lib' ) }, ;
-                        { "Harbour Nanfor library - Libnf", IIF( lGcc, 'nf.a', 'libnf.lib' ) }, ;
-                        { "Harbour Gt library - Libgt", 'gt' + IIF( lGcc, '.a', '.lib' ) }, ;
-                        { "Harbour Zip library ", IIF( ISWIN(),'hbzip','ziparchive') + IIF( lGcc, '.a', '.lib' ) + IIF( lLinux, ' stdc++.a z.a', ' ' ) }, ;
-                        { "Harbour Hbole library Hbole", 'hbole' + IIF( lGcc, '.a', '.lib' ) + ' ole2' + IIF( lGcc, '.a', '.lib' ) }, ;
-                        { "Harbour Mysql library - MySql", 'mysql' + IIF( lGcc, '.a', '.lib' )}, ;
-                        { "Harbour Postgres library - hbpg", 'libhbpg' + IIF( lGcc, '.a', '.lib' )}, ;
-                        { "Harbour Samples library - Samples", 'samples' + IIF( lGcc, '.a', '.lib' ) } }
+   LOCAL aInstaledLibs := GetInstaledLibs( IIF( ! lLinux, IIF( ! lGcc, cDir + "\*.lib", cDir + "\*.a" ),  '/usr/lib/xharbour/*.a' ), lGcc )
+   LOCAL aLibsDesc   := { { "Harbour CT3        library - Hbct"   ,  IIF( lGcc, 'ct.a', 'hbct.lib' ) }, ;
+                          { "Harbour Misc       library - Libmisc", IIF( lGcc, 'misc.a', 'libmisc.lib' ) }, ;
+                          { "Harbour Html       library - Htmllib", 'html' + IIF( lGcc, '.a', '.lib' ) }, ;
+                          { "Harbour NanFor     library - Libnf"  , IIF( lGcc, 'nf.a', 'libnf.lib' ) }, ;
+                          { "Harbour GT         library - Libgt"  , 'gt' + IIF( lGcc, '.a', '.lib' ) }, ;
+                          { "Harbour Zip        library - Hbzip"  , IIF( ISWIN(),'hbzip','ziparchive') + IIF( lGcc, '.a', '.lib' ) + IIF( lLinux, ' stdc++.a z.a', ' ' ) }, ;
+                          { "Harbour Ole        library - HbOle"  , 'hbole' + IIF( lGcc, '.a', '.lib' ) + ' ole2' + IIF( lGcc, '.a', '.lib' ) }, ;
+                          { "Harbour MySql      library - MySql"  , 'mysql' + IIF( lGcc, '.a', '.lib' )}, ;
+                          { "Harbour PostGreSql library - hbpg"   , 'libhbpg' + IIF( lGcc, '.a', '.lib' )}, ;
+                          { "Harbour Samples    library - Samples", 'samples' + IIF( lGcc, '.a', '.lib' ) },;
+                          { "Harbour TIP        library - Hbtip"  , 'hbtip' + IIF( lGcc, '.a', '.lib' ) } }
 
-   AEVAL( ainstaledlibs, { | x | AADD( aLibsDesc, { "User - " + x + " Library", x } ) } )
+   AEVAL( aInstaledLibs, { | x | AADD( aLibsDesc, { "User - " + x + " Library", x } ) } )
 
 RETURN aLibsDesc
 
