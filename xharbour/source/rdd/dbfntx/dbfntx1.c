@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.86 2004/11/23 04:25:57 druzus Exp $
+ * $Id: dbfntx1.c,v 1.87 2004/12/28 06:39:22 druzus Exp $
  */
 
 /*
@@ -444,7 +444,7 @@ static ULONG hb_ntxTagKeyNo( LPTAGINFO pTag )
 
    if( pTag->Owner->Owner->fShared && !pTag->Memory )
    {
-      while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK ) );
+      while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_SHARED | FLX_WAIT ) );
       pTag->Owner->Locked = TRUE;
    }
 
@@ -522,7 +522,7 @@ static ULONG hb_ntxTagKeyCount( LPTAGINFO pTag )
 
    if( pTag->Owner->Owner->fShared && !pTag->Memory )
    {
-      while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK ) );
+      while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_SHARED | FLX_WAIT ) );
       pTag->Owner->Locked = TRUE;
    }
    else if( pTag->keyCount )
@@ -1158,7 +1158,7 @@ static void hb_ntxTagKeyGoTo( LPTAGINFO pTag, BYTE bTypRead, BOOL * lContinue )
    {
       if( pTag->Owner->Owner->fShared && !pTag->Owner->Locked && !pTag->Memory )
       {
-         while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK ) );
+         while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_SHARED | FLX_WAIT ) );
          wasLocked = pTag->Owner->Locked;
          pTag->Owner->Locked = TRUE;
       }
@@ -3036,7 +3036,7 @@ static BOOL hb_ntxOrdKeyAdd( LPTAGINFO pTag )
    {
       pKey->Tag = 0;
       if( pTag->Owner->Owner->fShared && !pTag->Memory )
-         while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK ) );
+         while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_WAIT ) );
       hb_ntxTagKeyAdd( pTag, pKey );
       if( pTag->Owner->Owner->fShared && !pTag->Memory )
       {
@@ -3062,7 +3062,7 @@ static BOOL hb_ntxOrdKeyDel( LPTAGINFO pTag )
    pKey = hb_ntxKeyNew( NULL,pTag->KeyLength );
    hb_ntxGetCurrentKey( pTag, pKey );
    if( pTag->Owner->Owner->fShared && !pTag->Memory )
-      while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK ) );
+      while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_WAIT ) );
    pTag->stackLevel = 0;
    if( hb_ntxInTopScope( pTag, pTag->CurKeyInfo->key ) &&
          hb_ntxInBottomScope( pTag, pTag->CurKeyInfo->key ) &&
@@ -3221,7 +3221,7 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
 
      if( pArea->fShared && !pTag->Memory )
      {
-        while( !hb_fsLock( pArea->lpCurTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK ) );
+        while( !hb_fsLock( pArea->lpCurTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_SHARED | FLX_WAIT ) );
         pArea->lpCurTag->Owner->Locked = TRUE;
      }
      lRecno = hb_ntxTagKeyFind( pTag, pKey2, keylen, &result, bSoftSeek );
@@ -3417,7 +3417,8 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                {
                   pArea->lpCurTag = pTag;
                   if( pArea->fShared && !pTag->Memory )
-                     while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK ) );
+                     while( !hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_LOCK | FLX_WAIT ) );
+                  pTag->Owner->Locked = TRUE;
                   if( !pArea->fNtxAppend && !fAppend && pTag->InIndex )
                   {
                      LPKEYINFO pKeyOld = hb_ntxKeyNew( pTag->CurKeyInfo,pTag->KeyLength );
@@ -3454,6 +3455,7 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                   {
                      hb_ntxPageFree( pTag,FALSE );
                      hb_fsLock( pTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_UNLOCK );
+                     pTag->Owner->Locked = FALSE;
                   }
                }
                hb_ntxKeyFree( pKey );
@@ -4121,9 +4123,13 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
    pIndex = hb_ntxIndexNew( pArea );
 
    /* Index file could be opened with FO_READ only in exclusive readonly mode
-      to allow locking in other modes  */
-   uiFlags =  !pArea->fShared && pArea->fReadonly  ? FO_READ : FO_READWRITE;
-   uiFlags |= pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE;
+      to allow locking in other modes
+      Alexander, it's not proper solution. It will cause that you cannot open
+      readonly files in exclusive mode. Shared locks should be used instead
+      this hack for readonly mode.
+    */
+   uiFlags = ( pArea->fReadonly ? FO_READ : FO_READWRITE ) |
+             ( pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE );
 
    do
    {
