@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.7 2002/05/24 04:58:58 walito Exp $
+ * $Id: console.c,v 1.8 2002/06/13 22:15:38 lculik Exp $
  */
 
 /*
@@ -422,7 +422,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
             hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
 #if defined(HB_OS_WIN_32)          
          else
-            WinPrinterEject();
+            WriteStringtoPrint("\x0C\x0D");
 #endif
          s_uiPRow = s_uiPCol = 0;
       }
@@ -442,16 +442,19 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
 
       if( ( uiProw == s_uiPRow ) && ( uiPcol < s_uiPCol ) )
       {
-         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D", 1 );
-         s_uiPCol = 0;
+         if (!hb_set.hb_set_winprinter)   {
+             hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D", 1 );
+             s_uiPCol = 0;
+             }
+         #if defined(HB_OS_WIN_32)
+         else
+            {
+             WriteStringtoPrint("\x0D");
+             s_uiPCol = 0;
+             }
+      #endif
+
       }
-#if defined(HB_OS_WIN_32)
-      else
-      {
-         WriteStringtoPrint("\x0D");
-         s_uiPCol = 0;
-      }
-#endif
 
 
       for( uiCount = s_uiPCol; uiCount < uiPcol; uiCount++ )
