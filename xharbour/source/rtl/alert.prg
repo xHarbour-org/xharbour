@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.3 2002/05/23 01:21:12 ronpinkas Exp $
+ * $Id: alert.prg,v 1.5 2002/11/06 18:57:22 lculik Exp $
  */
 
 /*
@@ -48,6 +48,7 @@ STATIC s_lNoAlert
 #endif
 
 FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
+
    LOCAL nChoice
    LOCAL aSay, nPos, nWidth, nOpWidth, nInitRow, nInitCol, nEval
    LOCAL nKey, aPos, nCurrent, aHotkey, aOptionsOK
@@ -60,8 +61,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
    LOCAL nOldDispCount
    LOCAL nCount
-   LOCAL nIndex, nLen
-   Local cNew,cOld,cTemp
+   LOCAL nIndex, nLen, sCopy
 
 #ifdef HB_COMPAT_C53
    LOCAL nMRow, nMCol
@@ -70,8 +70,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
    /* TOFIX: Clipper decides at runtime, whether the GT is linked in,
              if it is not, the console mode is choosen here. [vszakats] */
    LOCAL lConsole := .F.
-    cOld:=xMessage
-    cNew:=""
+
 #ifdef HB_C52_UNDOC
 
    DEFAULT s_lNoAlert TO hb_argCheck( "NOALERT" )
@@ -86,7 +85,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
 #ifdef HB_C52_STRICT
 
-   IF !ISCHARACTER( xMessage )
+   IF ! ISCHARACTER( xMessage )
       RETURN NIL
    ENDIF
 
@@ -113,42 +112,27 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
    ELSE
 
       DO CASE
-      CASE ValType( xMessage ) $ "CM" /* Do nothing, just speed up things */
-      CASE ValType( xMessage ) == "N" ; xMessage := LTrim( Str( xMessage ) )
-      CASE ValType( xMessage ) == "D" ; xMessage := DToC( xMessage )
-      CASE ValType( xMessage ) == "L" ; xMessage := iif( xMessage, ".T.", ".F." )
-      CASE ValType( xMessage ) == "O" ; xMessage := xMessage:className + " Object"
-      CASE ValType( xMessage ) == "B" ; xMessage := "{||...}"
-      OTHERWISE                       ; xMessage := "NIL"
+         CASE ValType( xMessage ) $ "CM"
+            /* Do nothing, just speed up things */
+
+         CASE ValType( xMessage ) == "N"
+            xMessage := LTrim( Str( xMessage ) )
+
+         CASE ValType( xMessage ) == "D"
+            xMessage := DToC( xMessage )
+
+         CASE ValType( xMessage ) == "L"
+            xMessage := iif( xMessage, ".T.", ".F." )
+
+         CASE ValType( xMessage ) == "O"
+            xMessage := xMessage:className + " Object"
+
+         CASE ValType( xMessage ) == "B"
+            xMessage := "{||...}"
+
+         OTHERWISE
+            xMessage := "NIL"
       ENDCASE
-     if Len(cOld) >60
-      WHILE LEN(cOld) > 0
-
-        IF AT( ';' , cOld ) > 0 //Dont do this  if ; exist
-            EXIT
-        ENDIF
-
-        IF LEN( cOld ) < 60
-
-            xMessage += cOld
-            EXIT
-
-        ENDIF
-
-      cTemp := SubStr( cOld , 1 , 60 )
-      nPos  := Rat(' ',cTemp)
-
-      IF nPos > 0
-          cNew += SubStr( cTemp , 1 , nPos ) + ';'
-
-          cOld := SubStr( cOld , nPos + 1 )
-      ENDIF
-
-    xMessage := cNew
-
-    ENDDO
-
-     endif
 
       DO WHILE ( nPos := At( ';', xMessage ) ) != 0
          AAdd( aSay, Left( xMessage, nPos - 1 ) )
@@ -157,6 +141,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
       AAdd( aSay, xMessage )
 
       nIndex := 0
+
       FOR EACH xMessage IN aSay
          nIndex++
 
@@ -171,12 +156,13 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
                nPos := 58
             ENDIF
 
+            sCopy := xMessage
             aSay[ nIndex ] := RTrim( Left( xMessage, nPos ) )
 
             IF Len( aSay ) == nIndex
-               aAdd( aSay, SubStr( xMessage, nPos + 1 ) )
+               aAdd( aSay, SubStr( sCopy, nPos + 1 ) )
             ELSE
-               aIns( aSay, nIndex + 1, SubStr( xMessage, nPos + 1 ), .T. )
+               aIns( aSay, nIndex + 1, SubStr( sCopy, nPos + 1 ), .T. )
             ENDIF
         ENDIF
       NEXT

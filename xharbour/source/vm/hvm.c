@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.123 2002/10/24 17:59:27 ronpinkas Exp $
+ * $Id: hvm.c,v 1.124 2002/10/27 14:41:37 lculik Exp $
  */
 
 /*
@@ -904,6 +904,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
             hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
+
+            // Incase EXIT was used.
+            hb_itemClear( hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] );
 
             w++;
             break;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.481 2002/11/07 05:05:51 walito Exp $
+ * $Id: ChangeLog,v 1.482 2002/11/09 00:50:08 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-08 23:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Fixed reset of Enumration Var when EXIT used from FOR EACH loop.
+
+  * source/rtl/alert.prg
+    - Removed wrong and ugly "fix" to line wrapping in Alert().
+    ! Fixed line wrapping, resulting from Enum Var now being a Refernce to the enumerated element.
+
+    /* Luiz, you should NOT attempt to fix code that you clearly don't understand - better ask! */
+
 2002-11-08 22:45 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
     ! Added Gauge bar to show compiling progress
@@ -47,7 +58,7 @@
   * make_vc.bat
     * if building Harbour under NT, will use the alternate makefile.nt
     * for faster builds.
-    * if you would prefer not to use batch mode, 
+    * if you would prefer not to use batch mode,
     *  run make_vc /y (just like nmake)
 
 2002-11-04 19:30 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
