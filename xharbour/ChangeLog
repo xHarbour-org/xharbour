@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.418 2002/10/04 18:24:23 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.419 2002/10/05 00:32:08 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-10-04 23:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    + Added new PRG function HB_QWith() to retuen the WITH object (equivalent to : by itself, which is not supported).
+
+  + contrib/xVisual/xide.ch
+    + New include file to be used by xIDE generated code.
+      Added support for nested:
+
+        CONTROL <control> FROM <class>
+          :property := <value>
+          [...]
+        END CONTROL
+
+      within the form class declaration.
 
 2002-10-04 17:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/objfunc.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.107 2002/09/24 03:26:12 ronpinkas Exp $
+ * $Id: hvm.c,v 1.108 2002/09/24 04:23:54 ronpinkas Exp $
  */
 
 /*
@@ -6097,6 +6097,11 @@ HB_FUNC( HB_EXEC )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_Exec", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
+}
+
+HB_FUNC( HB_QWITH )
+{
+   hb_itemCopy( &hb_stack.Return, &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ) );
 }
 
 HB_FUNC( __OPCOUNT ) /* it returns the total amount of opcodes */
