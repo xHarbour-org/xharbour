@@ -53,7 +53,6 @@
 *+--------------------------------------------------------------------
 *+
 *+    Class HDO_ODBC_Connection
-*+    Manages HDO_ODBC_ Windows ODBC Connections
 *+
 *+--------------------------------------------------------------------
 *+
@@ -61,6 +60,9 @@ CLASS HDO_ODBC_Connection FROM HBClass
 
    DATA Provider
    DATA ConnectionString
+   DATA Error
+   DATA ErrorMsg
+   DATA Debug
 
    DATA hEnv
    DATA hDbc
@@ -87,6 +89,9 @@ METHOD New( cCnn ) CLASS HDO_ODBC_Connection
    SQLDriverC( ::hDbc, ::ConnectionString, @xBuf )     // Connects to Driver
    ::Provider := xBuf
 
+   ::Error := FALSE
+   ::Debug := FALSE
+
 RETURN Self
 
 METHOD Close() CLASS HDO_ODBC_Connection
@@ -97,20 +102,30 @@ METHOD Close() CLASS HDO_ODBC_Connection
 
 RETURN NIL
 
-METHOD SQLError( hStmt ) CLASS HDO_ODBC_Connection
+METHOD SQLError( hStmt, cStmt ) CLASS HDO_ODBC_Connection
 
    LOCAL cSqlState, cErrorMsg
 
    SQLError( ::hEnv, ::hDbc, hStmt, @cSqlState,, @cErrorMsg )
 
-   alert( left( cErrorMsg, 70 ) + ";" + "SQLSTATE: " + cSqlState )
+   if empty( cStmt )
+      cStmt := ""
+   else
+      cStmt += ";"
+   endif
 
-RETURN NIL
+   ::Error := TRUE
+   ::ErrorMsg := left( cErrorMsg, 256 ) + ";" + cStmt + "SQLSTATE: " + cSqlState
+
+   if ::Debug
+      alert( ::ErrorMsg )
+   endif
+
+   RETURN NIL
 
 *+--------------------------------------------------------------------
 *+
 *+    Class HDO_ODBC_Command
-*+    Manages HDO_ODBC_ Windows ODBC Commands
 *+
 *+--------------------------------------------------------------------
 *+
@@ -125,6 +140,7 @@ CLASS HDO_ODBC_Command FROM HBClass
    METHOD Prepare()
    METHOD Execute()
    METHOD ExecuteDir()
+   METHOD ExecuteReader()
    METHOD GetScalar()
    METHOD Close()
  
@@ -145,15 +161,39 @@ RETURN Self
 
 METHOD Prepare() CLASS HDO_ODBC_Command
 
-RETURN SQLPrepare( ::hStmt, ::CommandText )
+   LOCAL xRet
+
+   xRet := SQLPrepare( ::hStmt, ::CommandText )
+   
+   if xRet <> SQL_SUCCESS   
+      ::ActiveConnection:SQLError( ::CommandText:hStmt, ::CommandText )
+   endif
+
+RETURN xRet
 
 METHOD Execute() CLASS HDO_ODBC_Command
 
-RETURN SQLExecute( ::hStmt )
+   LOCAL xRet
+
+   xRet := SQLExecute( ::hStmt )
+   
+   if xRet <> SQL_SUCCESS   
+      ::ActiveConnection:SQLError( ::hStmt, ::CommandText )
+   endif
+
+RETURN xRet
 
 METHOD ExecuteDir() CLASS HDO_ODBC_Command
 
-RETURN SQLExecDir( ::hStmt, ::CommandText )
+   LOCAL xRet
+
+   xRet := SQLExecDir( ::hStmt, ::CommandText )
+   
+   if xRet <> SQL_SUCCESS   
+      ::ActiveConnection:SQLError( ::hStmt, ::CommandText )
+   endif
+
+RETURN xRet
 
 METHOD GetScalar( xValue ) CLASS HDO_ODBC_Command
 
@@ -167,6 +207,14 @@ METHOD GetScalar( xValue ) CLASS HDO_ODBC_Command
 
 RETURN xRet
 
+METHOD ExecuteReader() CLASS HDO_ODBC_Command
+
+   if SQLExecDir( ::hStmt, ::CommandText ) <> SQL_SUCCESS
+      ::ActiveConnection:SQLError( ::hStmt, ::CommandText )
+   endif
+
+RETURN HDO_ODBC_Reader( Self )
+
 METHOD Close() CLASS HDO_ODBC_Command
 
    SQLFreeStm( ::hStmt )
@@ -178,24 +226,20 @@ RETURN nil
 *+--------------------------------------------------------------------
 *+
 *+    Class HDO_ODBC_Reader
-*+    Manages HDO_ODBC_ Windows ODBC Readers
 *+
 *+--------------------------------------------------------------------
 *+
 CLASS HDO_ODBC_Reader FROM HBClass
 
-   DATA ActiveCommand
-   DATA ActiveConnection
-   
+   DATA oCmd
    DATA hStmt
 
    DATA aFields
    DATA aValues
    DATA nNumFields
 
-   METHOD New()
-   METHOD Open()
-   METHOD CLOSE()
+   METHOD New( oCmd )
+   METHOD Close()
 
    METHOD FieldPos( cField )
    METHOD Fields( cField )
@@ -205,12 +249,9 @@ CLASS HDO_ODBC_Reader FROM HBClass
 
 ENDCLASS
 
-METHOD New() CLASS HDO_ODBC_Reader
+METHOD New( oCmd ) CLASS HDO_ODBC_Reader
 
-RETURN Self
-
-METHOD Open( cSql, oCnn ) CLASS HDO_ODBC_Reader
-
+   LOCAL nStmt
    LOCAL i
    LOCAL nRet
    LOCAL nCols
@@ -221,62 +262,40 @@ METHOD Open( cSql, oCnn ) CLASS HDO_ODBC_Reader
    LOCAL nDecs
    LOCAL nNul
 
-   IF empty( oCnn )
+   if !empty( oCmd ) .and. !oCmd:ActiveConnection:Error
 
-      RETURN SQL_ERROR
+      nStmt := oCmd:hStmt
 
-   ENDIF
+      SQLNumRes( nStmt, @nCols )
+      ::nNumFields := nCols
 
-   ::ActiveConnection := oCnn
+      ::aFields := TAssociativeArray()
 
-   // SQL statement is mandatory
-   IF empty( cSQL )
+      FOR i := 1 TO nCols
 
-      // TODO: Some error here
-      // SQL Statement not defined
+         SQLDescrib( nStmt, i, @cName, 255, @nNameLen, @nType, ;
+                     @nSize, @nDecs, @nNul )
 
-      RETURN SQL_ERROR
+         ::aFields[ cName ] := { i, cName, nType, nSize, nDecs, ( nNul != 0 ) }
 
-   ENDIF
+      NEXT
 
-   // Allocates and executes the statement
-   ::ActiveCommand := HDO_ODBC_Command():New( cSql, oCnn )
+      ::hStmt := nStmt
+      ::oCmd := oCmd
+ 
+   endif
 
-   IF ::ActiveCommand:ExecuteDir() <> SQL_SUCCESS
-      oCnn:SQLError( ::ActiveCommand:hStmt )
-      RETURN SQL_ERROR
-   ENDIF
-               
-   ::hStmt := ::ActiveCommand:hStmt
-   
-   SQLNumRes( ::hStmt, @nCols )
-   ::nNumFields := nCols
+   RETURN Self
 
-   ::aFields := TAssociativeArray() // array( nCols )
-
-   FOR i := 1 TO nCols
-
-      SQLDescrib( ::hStmt, i, @cName, 255, @nNameLen, @nType, ;
-                  @nSize, @nDecs, @nNul )
-
-      ::aFields[ cName ] := { i, cName, nType, nSize, nDecs, ( nNul != 0 ) }
-
-   NEXT
-
-   RETURN SQL_SUCCESS
-
-// Closes the dataset
 METHOD CLOSE() CLASS HDO_ODBC_Reader
 
    ::aFields := nil
    ::aValues := nil
 
-   // Frees the statement
-   ::ActiveCommand:Close()
+   ::oCmd:Close()
 
 RETURN NIL
 
-// Returns the Field number from a Field name
 METHOD FieldPos( cField ) CLASS HDO_ODBC_Reader
 
    LOCAL aField
@@ -333,7 +352,7 @@ FUNCTION Buf2Var( nType, xBuffer )
             exit
          CASE SQL_TIMESTAMP 
          CASE SQL_DATE
-            xValue := stod( substr(xBuffer,1,4) + substr(xBuffer,6,2) + substr(xBuffer,9,2) )         
+            xValue := SqlStoD( xBuffer )
             exit
          CASE SQL_NUMERIC
          CASE SQL_DECIMAL

@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.16 2004/03/28 15:12:02 likewolf Exp $
+ * $Id: odbc.c,v 1.17 2004/04/26 12:29:45 lf_sfnet Exp $
  */
 
 /*
@@ -439,7 +439,7 @@ HB_FUNC( SQLEXECUTESCALAR )
 {
    HSTMT hStmt;
    SDWORD lLen;
-   BYTE bBuffer[ 255+1 ];
+   BYTE bBuffer[ 256 ];
    SWORD wResult;
 
    wResult = SQLAllocStmt( ( HDBC ) hb_parnl( 2 ), &hStmt );
@@ -463,4 +463,15 @@ HB_FUNC( SQLEXECUTESCALAR )
    SQLFreeStmt( ( HSTMT ) hStmt, 0 );
    
 }
+
+HB_FUNC( SQLSTOD )
+{
+   char *szSqlDate = hb_parcx( 1 ); /* YYYY-MM-DD */
+   char szHrbDate[8];               /* YYYYMMDD */
+  
+   sprintf( szHrbDate, "%c%c%c%c%c%c%c%c", szSqlDate[0], szSqlDate[1], szSqlDate[2], szSqlDate[3], szSqlDate[5], szSqlDate[6], szSqlDate[8], szSqlDate[9] ); 
+ 
+   hb_retds( szHrbDate );
+}
+
 #endif
