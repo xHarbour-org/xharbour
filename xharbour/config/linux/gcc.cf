@@ -1,15 +1,21 @@
 #
-# $Id: gcc.cf,v 1.30 2004/12/04 22:37:46 druzus Exp $
+# $Id: gcc.cf,v 1.31 2005/01/15 18:58:08 lf_sfnet Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
+
+ifeq ($(HB_COMPILER),gpp)
+   HB_CMP = g++
+else
+   HB_CMP = $(HB_COMPILER)
+endif
 
 OBJ_EXT = .o
 EXE_EXT =
 LIB_PREF = lib
 LIB_EXT = .a
 
-CC = $(CCACHE) gcc
+CC = $(CCACHE) $(HB_CMP)
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
@@ -38,7 +44,7 @@ endif
 endif
 
 
-LD = gcc
+LD = $(HB_CMP)
 LD_OUT = -o
 
 # Add all libraries specified in HB_USER_LIBS.

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4003 2005/04/04 17:49:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4004 2005/04/05 00:30:25 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2005-04-05 02:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+2005-04-05 03:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/linux/gcc.cf
+  + xharbour/config/linux/gpp.cf
+    + added GNU make file for GCC in C++ mode (g++)
+      to eliminate synchronization of two files in the future I made
+      a small trick and gpp.cf include gcc.cf which is still the base one
+
+2005-04-05 02:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/odbc/odbc.c
     * casting
 

@@ -1,0 +1,5 @@
+#
+# $Id: gcc.cf,v 1.31 2005/01/15 18:58:08 lf_sfnet Exp $
+#
+
+include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/gcc.cf
