@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.41 2004/03/05 08:59:29 andijahja Exp $
+ * $Id: arrayshb.c,v 1.42 2004/03/26 05:17:27 ronpinkas Exp $
  */
 
 /*
@@ -617,7 +617,8 @@ HB_FUNC( HB_ATOKENS )
 
       for( i = 0; i < pLine->item.asString.length; i++ )
       {
-         if( bSkipStrings && pLine->item.asString.value[i] == '"' || pLine->item.asString.value[i] == '\'' )
+         if( bSkipStrings && ( pLine->item.asString.value[i] == '"'
+                               || pLine->item.asString.value[i] == '\'' ) )
          {
             char cTerminator = pLine->item.asString.value[i];
 

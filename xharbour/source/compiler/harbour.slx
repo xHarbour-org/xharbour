@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.46 2004/02/20 00:25:23 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.47 2004/03/22 03:16:00 ronpinkas Exp $
  */
 
 /*
@@ -1482,7 +1482,8 @@ static void hb_compCheckIllegalChar( char * szName )
    {
       if( !isalnum( (int) szName[ iSz ] ) && (int) szName [ iSz ] != '_' )
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ILLEGAL_CHARACTER, hb_vm_acAscii[ szName [ iSz ] ], NULL );
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ILLEGAL_CHARACTER,
+                          hb_vm_acAscii[ (int)(unsigned char) szName [ iSz ] ], NULL );
       }
    }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.14 2004/03/16 17:38:21 mlombardo Exp $
+ * $Id: odbc.c,v 1.15 2004/03/18 03:56:08 ronpinkas Exp $
  */
 
 /*
@@ -91,7 +91,6 @@
 #endif
 
 #include <limits.h>
-#include <malloc.h>
 #include <math.h>
 #include <stdlib.h>
 #include <ctype.h>

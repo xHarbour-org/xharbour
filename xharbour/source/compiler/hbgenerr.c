@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.15 2004/02/18 10:50:44 andijahja Exp $
+ * $Id: hbgenerr.c,v 1.16 2004/03/24 08:08:30 andijahja Exp $
  */
 
 /*
@@ -152,7 +152,7 @@ void hb_compGenError( char * szErrors[], char cPrefix, int iError, const char * 
    if( cPrefix == 'F' && iError == HB_PP_ERR_UNKNOWN_RESULTMARKER )
    {
       /* AJ: Some compilers performs [f]printf("<%s>",string) incorrecltly */
-      printf("Unknown result marker %s%s%s in #directive", "<", szError1, ">", szError2 );
+      printf( "Unknown result marker %s%s%s in #directive", "<", szError1, ">" );
    }
    else
    {
