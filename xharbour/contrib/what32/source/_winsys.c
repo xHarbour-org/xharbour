@@ -157,23 +157,27 @@ HB_FUNC( MULDIV )
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI SystemParametersInfoA( IN UINT uiAction, IN UINT uiParam, IN OUT PVOID pvParam, IN UINT fWinIni);
 
-/*
+// note: correct parameters must be passed, as per API requirements 
 
 HB_FUNC( SYSTEMPARAMETERSINFO )
 {
-   PVOID pvParam  ;
-
-   // Your code goes here
-
-   hb_retl( SystemParametersInfo( (UINT) hb_parni( 1 ),
-                                  (UINT) hb_parni( 2 ),
-                                  pvParam             ,
+   VOID *pvParam = (char * ) hb_param( 3, HB_IT_STRING )->item.asString.value;  // can be just about anything
+                                                                                // be careful, refer to docs.
+   if ( SystemParametersInfo( (UINT) hb_parni( 1 )             ,
+                                  (UINT) hb_parni( 2 )         ,
+                                  ISNIL( 3 ) ? NULL : pvParam  ,
                                   (UINT) hb_parni( 4 )
-                                ) ) ;
+                            ) ) 
+   {
+      if ( ! ISNIL( 3 ) )
+         hb_storclen( ( char *) pvParam, hb_parclen( 3 ), 3 ) ;
+      
+      hb_retl( TRUE ) ; 
+   }
+   else
+      hb_retl( FALSE ) ;
+
 }
-
-*/
-
 
 
 //-----------------------------------------------------------------------------
@@ -1012,11 +1016,3 @@ HB_FUNC ( GETCURRENTTHREADID )
 }
 
 
-HB_FUNC( GETMESSAGEFONT )
-{
-   HFONT hFont ;
-   NONCLIENTMETRICS ncm ;
-   ncm.cbSize = sizeof( NONCLIENTMETRICS );
-   SystemParametersInfo( SPI_GETNONCLIENTMETRICS, sizeof(ncm), &ncm , 0 );
-   hb_retnl( (LONG) CreateFontIndirect(&ncm.lfMessageFont) );
-}

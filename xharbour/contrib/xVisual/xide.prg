@@ -2,11 +2,10 @@
 #include "wingdi.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "wintypes.ch"
-#include "cstruct.ch"
 #include "debug.ch"
 
 static oApp
+
 
 //-------------------------------------------------------------------------------------------
 
@@ -72,7 +71,7 @@ METHOD MainCommands( nwParam, nlParam ) CLASS MainFrame
            oForm := SubForm1():New( self )
            oForm:Create()
    endcase
-return( 0 )
+return( super:OnCommand() )
 
 
 //-------------------------------------------------------------------------------------------
@@ -96,7 +95,7 @@ ENDCLASS
 
 METHOD CreateSub() CLASS SubForm1
 
-   local oCtrl
+   local oBtn
 
    ::WindowMenu := TMenu():New()
 
@@ -107,13 +106,10 @@ METHOD CreateSub() CLASS SubForm1
       
    ::SetWindowMenu()
 
-   oCtrl := TControl():New( self, 500 )
-   
-   oCtrl:Caption := 'Testing a Button'
-   oCtrl:Width   := 200
-   oCtrl:Height  := 100
-   oCtrl:Create()
-
+   oBtn := TButton():New( self, 500, 0, 0, 200, 100 )
+   oBtn:Caption := 'Testing a Button'
+   oBtn:Create()
+   oBtn:SetFocus()
 return( super:OnCreate() )
 
 //----------------------------------
@@ -172,3 +168,4 @@ METHOD DrawGrid(hDC,nGran) CLASS SubForm1
    DeleteObject( hBmp )
    DeleteObject( hPen )
 return(0)
+

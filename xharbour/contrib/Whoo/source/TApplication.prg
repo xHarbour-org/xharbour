@@ -4,8 +4,10 @@ GLOBAL oAppl
 #include "what32.ch"
 #include "windows.ch"
 #include "debug.ch"
+#include "wingdi.ch"
 
 GLOBAL EXTERNAL lPrevInstance
+
 
 CLASS Application
    
@@ -110,3 +112,4 @@ METHOD CreateFrame( cName, oFrame ) CLASS Application
    oFrame:Create()
    
 return( oFrame )
+

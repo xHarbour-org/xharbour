@@ -1,18 +1,56 @@
 
 //Clipper-like Alert function
 
-#Include "..\include\WINDOWS.CH"
+#Include "windows.ch"
 #Include "What32.ch"
-#DEFINE SHOWDEBUG
 #Include 'debug.ch'
 #Include 'wingdi.ch'
 
 #Include 'wintypes.ch'
 #Include 'cstruct.ch'
 
+#define SPI_GETNONCLIENTMETRICS    41
+
 #Define CTYPE_BOOL 5
 
 //#DEFINE NTRIM( n ) AllTrim( str( n ) )
+
+pragma pack(4)
+
+typedef struct tagLOGFONT { ;
+   LONG lfHeight; 
+   LONG lfWidth; 
+   LONG lfEscapement; 
+   LONG lfOrientation; 
+   LONG lfWeight; 
+   BYTE lfItalic; 
+   BYTE lfUnderline; 
+   BYTE lfStrikeOut; 
+   BYTE lfCharSet; 
+   BYTE lfOutPrecision; 
+   BYTE lfClipPrecision; 
+   BYTE lfQuality; 
+   BYTE lfPitchAndFamily; 
+   TCHAR lfFaceName[LF_FACESIZE]; 
+} LOGFONT; 
+
+typedef struct tagNONCLIENTMETRICS { ;
+    UINT    cbSize; 
+    int     iBorderWidth; 
+    int     iScrollWidth; 
+    int     iScrollHeight; 
+    int     iCaptionWidth; 
+    int     iCaptionHeight; 
+    LOGFONT lfCaptionFont; 
+    int     iSmCaptionWidth; 
+    int     iSmCaptionHeight; 
+    LOGFONT lfSmCaptionFont; 
+    int     iMenuWidth; 
+    int     iMenuHeight; 
+    LOGFONT lfMenuFont; 
+    LOGFONT lfStatusFont; 
+    LOGFONT lfMessageFont; 
+} NONCLIENTMETRICS
 
 
 
@@ -723,7 +761,7 @@ NEXT
 
 RETURN(c)
 
-*-----------------------------------------------------------------------------*
+//-----------------------------------------------------------------------------
 
 Function FontCreate(cFont,nSize,lBold,lItalic,lVert,lUnder)
 local aFont,hFont,nAngle
@@ -735,4 +773,17 @@ nAngle:=IIF(lVert,900,0)
 aFont := {nSize, 0, nAngle, nAngle, IIF(lBold,700,0), lItalic, lUnder, .F., 1, 1, 0, 0, 0, cFont}
 hFont := CreateFont(aFont)
 return hFont
+
+//-----------------------------------------------------------------------------
+
+FUNCTION GetMessageFont() // retrieves the current font used in MessageBox
+
+   local cBuff, n
+   local ncm IS NONCLIENTMETRICS
+   ncm:cbSize := ncm:sizeof()
+   cBuff := ncm:value
+   SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm:sizeof(), @cBuff, 0 )
+   ncm:Buffer( cBuff )
+   
+Return( CreateFontIndirect( ncm:lfMessageFont:value ) )
 
