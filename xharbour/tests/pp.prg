@@ -73,6 +73,8 @@
 
       REQUEST ErrorSys
 
+      EXTERN dbClearRel
+
       EXTERN CreateObject
       EXTERN GetActiveObject
 
@@ -402,7 +404,7 @@ STATIC s_lReturnRequested
    STATIC s_bExternalRecovery
 #endif
 
-STATIC s_cVer := "1.0.RC5"
+STATIC s_cVer := "1.0.RC6"
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
