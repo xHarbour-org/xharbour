@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.2 2002/04/26 06:52:49 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.3 2002/07/30 06:59:58 ronpinkas Exp $
  */
 
 /*
@@ -141,6 +141,7 @@ STATIC FUNCTION New( cClassName, xSuper )
 
    LOCAL Self := QSelf()
    LOCAL nSuper, i
+   LOCAL cSuper
 
    IF ISARRAY( xSuper ) .AND. Len( xSuper ) >= 1
       ::acSuper := xSuper
@@ -162,12 +163,15 @@ STATIC FUNCTION New( cClassName, xSuper )
    ::aInlines    := {}
    ::aVirtuals   := {}
 
-   FOR i := 1 TO nSuper
-      IF ! ISCHARACTER( ::acSuper[ i ] )
+   i := -1
+   FOR EACH cSuper IN ::acSuper
+      IF ! ISCHARACTER( cSuper )
+         i := HB_EnumIndex()
          EXIT
       ENDIF
+//      i++
    NEXT
-   IF i < nSuper
+   IF i > 0
       nSuper := i - 1
       ASize( ::acSuper, nSuper)
    ENDIF
@@ -187,24 +191,23 @@ STATIC PROCEDURE Create(MetaClass)
    LOCAL hClass
    LOCAL ahSuper := Array( nLen )
    LOCAL nExtraMsgs := Len( ::aMethods ) +  ( 2 * Len( ::aClsDatas ) ) + Len( ::aInlines ) + Len( ::aVirtuals )
+   LOCAL cDato
 
 /* Self:Class := MetaClass */
 
    IF nLen == 0
       hClass := __ClsNew( ::cName, nLenDatas, nExtraMsgs )
    ELSE                                         // Multi inheritance
-      FOR n := 1 TO nLen
-         ahSuper[ n ] := __clsInstSuper( Upper( ::acSuper[ n ] ) ) // Super handle available
+//      n := 1
+      FOR EACH cDato IN ::acSuper
+         ahSuper[ HB_EnumIndex() ] := __clsInstSuper( Upper( cDato ) ) // Super handle available
       NEXT
 
       hClass := __ClsNew( ::cName, nLenDatas + nlen, nExtraMsgs, ahSuper )
 
-      nDataBegin   += __cls_CntData( ahSuper[ 1 ] )        // Get offset for new Datas
-      nClassBegin  += __cls_CntClsData( ahSuper[ 1 ] )     // Get offset for new ClassData
-
-      FOR n := 2 TO nLen
-         nDataBegin   += __cls_CntData( ahSuper[ n ] )        // Get offset for new DATAs
-         nClassBegin  += __cls_CntClsData( ahSuper[ n ] )     // Get offset for new ClassData
+      FOR EACH cDato IN ahSuper
+         nDataBegin   += __cls_CntData( cDato )        // Get offset for new Datas
+         nClassBegin  += __cls_CntClsData( cDato )     // Get offset for new ClassData
       NEXT
 
       __clsAddMsg( hClass, Upper( ::acSuper[ 1 ] ), ++nDataBegin, HB_OO_MSG_SUPER, ahSuper[ 1 ], HB_OO_CLSTP_CLASS + 1 )
@@ -230,38 +233,39 @@ STATIC PROCEDURE Create(MetaClass)
 
    //Local message...
 
-   FOR n := 1 TO nLenDatas
-      __clsAddMsg( hClass, ::aDatas[ n ][ HB_OO_DATA_SYMBOL ]       , n + nDataBegin, ;
-                   HB_OO_MSG_DATA, ::aDatas[ n ][ HB_OO_DATA_VALUE ], ::aDatas[ n ][ HB_OO_DATA_SCOPE ],;
-                   ::aDatas[ n ][ HB_OO_DATA_PERSISTENT ] )
-      __clsAddMsg( hClass, "_" + ::aDatas[ n ][ HB_OO_DATA_SYMBOL ] , n + nDataBegin, ;
-                   HB_OO_MSG_DATA,                                  , ::aDatas[ n ][ HB_OO_DATA_SCOPE ] )
+//   n := 1
+   FOR EACH cDato IN ::aDatas
+      __clsAddMsg( hClass, cDato[ HB_OO_DATA_SYMBOL ]       , HB_EnumIndex() + nDataBegin, ;
+                   HB_OO_MSG_DATA, cDato[ HB_OO_DATA_VALUE ], cDato[ HB_OO_DATA_SCOPE ],;
+                   cDato[ HB_OO_DATA_PERSISTENT ] )
+      __clsAddMsg( hClass, "_" + cDato[ HB_OO_DATA_SYMBOL ] , HB_EnumIndex() + nDataBegin, ;
+                   HB_OO_MSG_DATA,                          , cDato[ HB_OO_DATA_SCOPE ] )
+//      n++
    NEXT
 
-   nLen := Len( ::aMethods )
-   FOR n := 1 TO nLen
-      __clsAddMsg( hClass, ::aMethods[ n ][ HB_OO_MTHD_SYMBOL ], ::aMethods[ n ][ HB_OO_MTHD_PFUNCTION ], HB_OO_MSG_METHOD, NIL, ::aMethods[ n ][ HB_OO_MTHD_SCOPE ],;
-                   ::aMethods[ n ][ HB_OO_MTHD_PERSISTENT ] )
+   FOR EACH cDato IN ::aMethods
+      __clsAddMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ], HB_OO_MSG_METHOD, NIL, cDato[ HB_OO_MTHD_SCOPE ],;
+                   cDato[ HB_OO_MTHD_PERSISTENT ] )
    NEXT
 
-   nLen := Len( ::aClsDatas )
-   FOR n := 1 TO nLen
-      __clsAddMsg( hClass, ::aClsDatas[ n ][ HB_OO_CLSD_SYMBOL ]      , n + nClassBegin,;
-                   HB_OO_MSG_CLASSDATA, ::aClsDatas[ n ][ HB_OO_CLSD_VALUE ], ::aClsDatas[ n ][ HB_OO_CLSD_SCOPE ] )
-      __clsAddMsg( hClass, "_" + ::aClsDatas[ n ][ HB_OO_CLSD_SYMBOL ], n + nClassBegin,;
-                   HB_OO_MSG_CLASSDATA,                                     , ::aClsDatas[ n ][ HB_OO_CLSD_SCOPE ] )
+//   n := 1
+   FOR EACH cDato IN ::aClsDatas
+      __clsAddMsg( hClass, cDato[ HB_OO_CLSD_SYMBOL ]      , HB_EnumIndex() + nClassBegin,;
+                   HB_OO_MSG_CLASSDATA, cDato[ HB_OO_CLSD_VALUE ], cDato[ HB_OO_CLSD_SCOPE ] )
+      __clsAddMsg( hClass, "_" + cDato[ HB_OO_CLSD_SYMBOL ], HB_EnumIndex() + nClassBegin,;
+                   HB_OO_MSG_CLASSDATA,                    , cDato[ HB_OO_CLSD_SCOPE ] )
+//      n++
    NEXT
 
-   nLen := Len( ::aInlines )
-   FOR n := 1 TO nLen
-      __clsAddMsg( hClass, ::aInlines[ n ][ HB_OO_MTHD_SYMBOL ], ::aInlines[ n ][ HB_OO_MTHD_PFUNCTION ],;
-                   HB_OO_MSG_INLINE, NIL, ::aInlines[ n ][ HB_OO_MTHD_SCOPE ],;
-                   ::aInlines[ n ][ HB_OO_MTHD_PERSISTENT ] )
+   FOR EACH cDato IN ::aInlines
+      __clsAddMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ],;
+                   HB_OO_MSG_INLINE, NIL, cDato[ HB_OO_MTHD_SCOPE ],;
+                   cDato[ HB_OO_MTHD_PERSISTENT ] )
    NEXT
 
-   nLen := Len( ::aVirtuals )
-   FOR n := 1 TO nLen
-      __clsAddMsg( hClass, ::aVirtuals[ n ], n, HB_OO_MSG_VIRTUAL )
+//   n := 1
+   FOR EACH cDato IN ::aVirtuals
+      __clsAddMsg( hClass, cDato, HB_EnumIndex(), HB_OO_MSG_VIRTUAL )
    NEXT
 
    IF ::nOnError != NIL
@@ -306,20 +310,24 @@ STATIC PROCEDURE AddMultiData( cType, xInit, nScope, aData, lNoInit, lPersistent
 
    LOCAL Self := QSelf()
    LOCAL i
-   LOCAL nParam := Len( aData )
+   LOCAL nParam // := Len( aData )
+   LOCAL cData
 
-   FOR i := 1 TO nParam
-      IF ! ISCHARACTER( aData[ i ] )
+   i := -1
+   FOR EACH cData IN aData
+      IF ! ISCHARACTER( cData )
+         i := HB_EnumIndex()
          EXIT
       ENDIF
+//      i++
    NEXT
-   IF i < nParam
+   IF i > 0
       nParam := i - 1
       ASize( aData, nParam )
    ENDIF
 
-   FOR i := 1 TO nParam
-      ::AddData( aData[ i ], xInit, cType, nScope, lNoInit, lPersistent )
+   FOR EACH cData IN aData
+      ::AddData( cData, xInit, cType, nScope, lNoInit, lPersistent )
    NEXT
 
    RETURN
@@ -351,20 +359,24 @@ STATIC PROCEDURE AddMultiClsData( cType, xInit, nScope, aData, lNoInit )
 
    LOCAL Self := QSelf()
    LOCAL i
-   LOCAL nParam := Len( aData )
+   LOCAL nParam // := Len( aData )
+   LOCAL cData
 
-   FOR i := 1 TO nParam
-      IF ! ISCHARACTER( aData[ i ] )
+   i := -1
+   FOR EACH cData IN aData
+      IF ! ISCHARACTER( cData )
+         i := HB_EnumIndex()
          EXIT
       ENDIF
+//      i++
    NEXT
-   IF i < nParam
+   IF i > 0
       nParam := i - 1
       ASize( aData, nParam )
    ENDIF
 
-   FOR i := 1 TO nParam
-      ::AddClassData( aData[ i ], xInit, cType, nScope, lNoInit )
+   FOR EACH cData IN aData
+      ::AddClassData( cData, xInit, cType, nScope, lNoInit )
    NEXT
 
    RETURN
