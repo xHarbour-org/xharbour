@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.550 2002/12/24 06:45:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.551 2002/12/25 15:26:07 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-12-26 03:38 UTC+0100  Giancarlo Niccolai <giancarlo@niccolai.ws>
+
+* include/thread.h
+  source/vm/thread.c
+  + Added multiplatform lightweight reentrant mutex to be used internally by x-harbour
+  + hb_LWRM_lock( HB_LWR_MUTEX *lpMutex ) / hb_LWRM_unlock( HB_LWR_MUTEX *lpMutex )
+
+* source/rtl/console.c
+  * Changed the internal mutex to a lightweight reentrant mutex
+
+* source/rtl/idle.c
+   % Added a "marker" around the point that generates an error in MT. Will have to work it
+   out in the next days
+
+* source/rtl/inet.c
+  * Commented out mutex sections; will have to decide if keep them (and turn them into LWRM or
+    remove them) in the next few days
+
+* source/vm/fm.c
+  source/vm/garbage.c
+  ! Added mutex around concurrent allocation/deallocation of shared memory.
+  
 2002-25-12 12:20 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tbrowse.prg
     ! Fix, PanLeft() and PanRight() methods.

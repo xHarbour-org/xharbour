@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.12 2002/12/21 14:35:34 jonnymind Exp $
+* $Id: thread.h,v 1.13 2002/12/23 00:14:22 ronpinkas Exp $
 */
 
 /*
@@ -144,7 +144,8 @@ typedef struct {
 } HB_MUTEX_STRUCT;
 
 /* Context */
-typedef struct tag_HB_THREAD_CONTEXT {
+typedef struct tag_HB_THREAD_CONTEXT 
+{
     HB_THREAD_T th_id;
 #if defined(HB_OS_WIN_32)
     HB_THREAD_HANDLE th_h;
@@ -156,15 +157,29 @@ typedef struct tag_HB_THREAD_CONTEXT {
 } HB_THREAD_CONTEXT;
 
 /* Parameters passed for thread creation */
-typedef struct tag_HB_THREAD_PARAM {
+typedef struct tag_HB_THREAD_PARAM
+{
     HB_THREAD_T th_id;
     PHB_ITEM args;
     USHORT count;
 } HB_THREAD_PARAM;
 
+/* Ligthweight system indepented reentrant mutex, used internally by harbour */
+typedef struct tag_HB_LWR_MUTEX
+{
+    HB_THREAD_T Locker;
+    HB_CRITICAL_T Critical;
+    int nCount;
+} HB_LWR_MUTEX;
+
+
 extern HB_STACK hb_stack_general;
 extern HB_THREAD_CONTEXT *hb_ht_context;
+/* Monitor for sync access to the context library */
 extern HB_CRITICAL_T context_monitor;
+
+/* Monitor for sync useage of sequential VM processing */
+extern HB_LWR_MUTEX hb_internal_monitor;
 
 extern void hb_createContext( void );
 extern void hb_destroyContext( void );
@@ -172,5 +187,9 @@ extern void hb_destroyContextFromHandle( HB_THREAD_HANDLE th_h );
 extern void hb_threadInit( void );
 extern void hb_threadExit( void );
 extern HB_THREAD_CONTEXT *hb_getCurrentContext( void );
+
+/* LWRM management */
+extern void hb_LWRM_lock( HB_LWR_MUTEX *m );
+extern void hb_LWRM_unlock( HB_LWR_MUTEX *m );
 
 #endif

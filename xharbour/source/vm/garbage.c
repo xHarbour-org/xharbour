@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.24 2002/09/23 00:40:37 ronpinkas Exp $
+ * $Id: garbage.c,v 1.25 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -125,6 +125,7 @@ static HB_GARBAGE_FUNC( hb_gcGripRelease );
 
 static void hb_gcLink( HB_GARBAGE_PTR *pList, HB_GARBAGE_PTR pAlloc )
 {
+
    if( *pList )
    {
       /* add new block at the logical end of list */
@@ -137,10 +138,12 @@ static void hb_gcLink( HB_GARBAGE_PTR *pList, HB_GARBAGE_PTR pAlloc )
    {
       *pList = pAlloc->pNext = pAlloc->pPrev = pAlloc;
    }
+
 }
 
 static void hb_gcUnlink( HB_GARBAGE_PTR *pList, HB_GARBAGE_PTR pAlloc )
 {
+
    pAlloc->pPrev->pNext = pAlloc->pNext;
    pAlloc->pNext->pPrev = pAlloc->pPrev;
 
@@ -159,6 +162,10 @@ static void hb_gcUnlink( HB_GARBAGE_PTR *pList, HB_GARBAGE_PTR pAlloc )
 void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 {
    HB_GARBAGE_PTR pAlloc;
+
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
 
    #ifdef GC_RECYCLE
       if( s_pAvailableBaseArrays && ulSize == sizeof( HB_BASEARRAY ) )
@@ -183,22 +190,35 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 
       HB_TRACE( HB_TR_DEBUG, ( "hb_gcAlloc %p in %p", pAlloc + 1, pAlloc ) );
 
+      #ifdef HB_THREAD_SUPPORT
+         hb_LWRM_unlock( &hb_internal_monitor );
+      #endif
       return (void *)( pAlloc + 1 );   /* hide the internal data */
    }
    else
    {
+      #ifdef HB_THREAD_SUPPORT
+         hb_LWRM_unlock( &hb_internal_monitor );
+      #endif
       return NULL;
    }
+
 }
 
 /* release a memory block allocated with hb_gcAlloc() */
 void hb_gcFree( void *pBlock )
 {
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p)", pBlock ) );
 
    if( s_bReleaseAll )
    {
       HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcFree(%p)", pBlock ) );
+      #ifdef HB_THREAD_SUPPORT
+         hb_LWRM_unlock( &hb_internal_monitor );
+      #endif
       return;
    }
 
@@ -227,6 +247,10 @@ void hb_gcFree( void *pBlock )
    {
       hb_errInternal( HB_EI_XFREENULL, NULL, NULL, NULL );
    }
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
+
 }
 
 static HB_GARBAGE_FUNC( hb_gcGripRelease )
@@ -240,6 +264,10 @@ static HB_GARBAGE_FUNC( hb_gcGripRelease )
 HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 {
    HB_GARBAGE_PTR pAlloc;
+
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
 
    #ifdef GC_RECYCLE
       if( s_pAvailableItems )
@@ -275,21 +303,36 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
          pItem->type = HB_IT_NIL;
       }
 
+      #ifdef HB_THREAD_SUPPORT
+         hb_LWRM_unlock( &hb_internal_monitor );
+      #endif
       return pItem;
    }
    else
    {
+      #ifdef HB_THREAD_SUPPORT
+         hb_LWRM_unlock( &hb_internal_monitor );
+      #endif
+
       return NULL;
    }
 }
 
 void hb_gcGripDrop( HB_ITEM_PTR pItem )
 {
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
+
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcGripDrop(%p)", pItem ) );
 
    if( s_bReleaseAll )
    {
       HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcGripDrop(%p)", pItem ) );
+      #ifdef HB_THREAD_SUPPORT
+         hb_LWRM_unlock( &hb_internal_monitor );
+      #endif
+
       return;
    }
 
@@ -311,6 +354,10 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
       hb_gcUnlink( &s_pLockedBlock, pAlloc );
       HB_GARBAGE_FREE( pAlloc );
    }
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
+
 }
 
 /* Lock a memory pointer so it will not be released if stored
@@ -318,6 +365,10 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 */
 void * hb_gcLock( void * pBlock )
 {
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
+
    if( pBlock )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pBlock;
@@ -332,6 +383,9 @@ void * hb_gcLock( void * pBlock )
       ++pAlloc->locked;
    }
 
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
    return pBlock;
 }
 
@@ -340,6 +394,10 @@ void * hb_gcLock( void * pBlock )
 */
 void *hb_gcUnlock( void *pBlock )
 {
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
+
    if( pBlock )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pBlock;
@@ -355,6 +413,9 @@ void *hb_gcUnlock( void *pBlock )
          }
       }
    }
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
 
    return pBlock;
 }
@@ -363,6 +424,10 @@ void *hb_gcUnlock( void *pBlock )
 */
 void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
+
    if( HB_IS_BYREF( pItem ) )
    {
       pItem = hb_itemUnRef( pItem );
@@ -440,6 +505,9 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       }
    }
    /* all other data types don't need the GC */
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
 }
 
 void hb_gcCollect( void )
@@ -454,6 +522,10 @@ void hb_gcCollectAll( void )
 {
    //extern PHB_ITEM **hb_vm_pGlobals;
    //extern short    hb_vm_iGlobals;
+
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
 
@@ -473,22 +545,22 @@ void hb_gcCollectAll( void )
       /* Step 2 - sweep */
       /* check all known places for blocks they are referring */
       hb_vmIsLocalRef();
-      //printf( "After LocalRef\n" );
+      //printf( "After LocalRef\r\n" );
 
       hb_vmIsStaticRef();
-      //printf( "After StaticRef\n" );
+      //printf( "After StaticRef\r\n" );
 
       hb_vmIsGlobalRef();
-      //printf( "After Globals\n" );
+      //printf( "After Globals\r\n" );
 
       hb_memvarsIsMemvarRef();
-      //printf( "After MemvarRef\n" );
+      //printf( "After MemvarRef\r\n" );
 
       hb_gcItemRef( &(HB_VM_STACK.Return) );
-      //printf( "After ReturnRef\n" );
+      //printf( "After ReturnRef\r\n" );
 
       hb_clsIsClassRef();
-      //printf( "After ClassRef\n" );
+      //printf( "After ClassRef\r\n" );
 
       HB_TRACE( HB_TR_INFO, ( "Locked Scan" ) );
 
@@ -610,11 +682,18 @@ void hb_gcCollectAll( void )
        */
       s_uUsedFlag ^= HB_GC_USED_FLAG;
    }
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
 }
 
 void hb_gcReleaseAll( void )
 {
    HB_GARBAGE_PTR pAlloc, pDelete;
+
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcReleaseAll()" ) );
 
@@ -698,6 +777,10 @@ void hb_gcReleaseAll( void )
    s_bReleaseAll = FALSE;
 
    HB_TRACE( HB_TR_INFO, ( "DONE Release All" ) );
+
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
 }
 
 /* service a single garbage collector step

@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.12 2002/12/04 23:06:59 likewolf Exp $
+ * $Id: fm.c,v 1.13 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -134,6 +134,9 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    }
 
  #ifdef HB_FM_STATISTICS
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
 
    s_lAllocations++;
 
@@ -211,6 +214,9 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xgrab(%lu) returning: %p", ulSize, (char *) pMem + sizeof( HB_MEMINFO ) ) );
 
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
  #else
@@ -236,6 +242,9 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    }
 
  #ifdef HB_FM_STATISTICS
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
 
    s_lAllocations++;
 
@@ -313,6 +322,10 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xgrab(%lu) returning: %p", ulSize, (char *) pMem + sizeof( HB_MEMINFO ) ) );
 
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
+
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
 #else
@@ -332,6 +345,9 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 {
 #ifdef HB_FM_STATISTICS
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
 
    PHB_MEMINFO pMemBlock;
    ULONG ulMemSize;
@@ -382,6 +398,9 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    if( s_pLastBlock == pMemBlock )
       s_pLastBlock = ( PHB_MEMINFO ) pMem;
 
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
 #else
@@ -407,6 +426,10 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 void hb_xfree( void * pMem )            /* frees fixed memory */
 {
 #ifdef HB_FM_STATISTICS
+
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
 
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xfree(%p)", pMem ) );
 
@@ -456,6 +479,10 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xfree(NULL)!"));
       hb_errInternal( HB_EI_XFREENULL, "hb_xfree(NULL)", NULL, NULL );
    }
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
+
 #else
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xfree(%p)", pMem));
@@ -614,6 +641,10 @@ void * hb_xmemset( void * pDestArg, int iFill, ULONG ulLen )
 ULONG hb_xquery( USHORT uiMode )
 {
    ULONG ulResult;
+
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xquery(%hu)", uiMode));
 
@@ -804,6 +835,10 @@ ULONG hb_xquery( USHORT uiMode )
    default:
       ulResult = 0;
    }
+
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
 
    return ulResult;
 }

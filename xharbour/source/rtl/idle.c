@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.3 2002/07/17 15:51:45 ronpinkas Exp $
+ * $Id: idle.c,v 1.4 2002/12/04 23:06:58 likewolf Exp $
  */
 
 /*
@@ -157,6 +157,7 @@ static void hb_releaseCPU( void )
 /* performs all tasks defined for idle state */
 void hb_idleState( void )
 {
+
    if( ! s_bIamIdle )
    {
       s_bIamIdle = TRUE;
@@ -164,7 +165,9 @@ void hb_idleState( void )
       if( hb_vm_bCollectGarbage )
       {
          hb_vm_bCollectGarbage = FALSE;
+/* #ifndef HB_THREAD_SUPPORT */
          hb_gcCollectAll();
+/* #endif */
          s_bIamIdle = FALSE;
          return;
       }
@@ -191,6 +194,9 @@ void hb_idleState( void )
 
       s_bIamIdle = FALSE;
    }
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_unlock( &hb_internal_monitor );
+#endif
 }
 
 void hb_idleReset( void )

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.16 2002/12/23 00:14:22 ronpinkas Exp $
+* $Id: thread.c,v 1.17 2002/12/24 06:42:21 ronpinkas Exp $
 */
 
 /*
@@ -54,19 +54,16 @@
 *
 */
 
-#if defined( HB_OS_DARWIN )
-#include <stdlib.h>
-#else
-#include <malloc.h>
-#endif
 
-#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
 #if defined( HB_OS_DARWIN )
-#include <unistd.h>    /* We need usleep() in Darwin */
+   #include <stdlib.h>
+   #include <unistd.h>    /* We need usleep() in Darwin */
 #else
-#include <time.h>
-#include <sys/time.h>
-#endif
+   #include <malloc.h>
+   #ifdef HB_OS_UNIX
+      #include <sys/time.h>
+      #include <time.h>
+   #endif
 #endif
 
 #include "hbapi.h"
@@ -76,6 +73,7 @@
 
 HB_THREAD_CONTEXT *hb_ht_context;
 HB_CRITICAL_T context_monitor;
+HB_LWR_MUTEX hb_internal_monitor;
 HB_THREAD_CONTEXT *last_context;
 
 void hb_createContext( void )
@@ -318,6 +316,7 @@ void hb_threadInit( void )
 {
     hb_ht_context = NULL;
     HB_CRITICAL_INIT( context_monitor );
+    HB_CRITICAL_INIT( hb_internal_monitor.Critical );
     last_context = NULL;
 }
 
@@ -337,6 +336,7 @@ void hb_threadExit( void )
     }
 
     HB_CRITICAL_DESTROY( context_monitor );
+    HB_CRITICAL_DESTROY( hb_internal_monitor.Critical );
 }
 
 #ifdef HB_OS_WIN_32
@@ -964,3 +964,29 @@ void hb_SignalObjectAndWait( HB_COND_T hToSignal, HB_MUTEX_T hToWaitFor, DWORD d
 }
 #endif
 
+void hb_LWRM_lock( HB_LWR_MUTEX *lpMutex )
+{
+   if ( lpMutex->Locker == HB_CURRENT_THREAD() )
+   {
+      lpMutex->nCount++;
+   }
+   else
+   {
+      HB_CRITICAL_LOCK( lpMutex->Critical );
+      lpMutex->nCount = 1;
+      lpMutex->Locker = HB_CURRENT_THREAD();
+   }
+}
+
+void hb_LWRM_unlock( HB_LWR_MUTEX *lpMutex )
+{
+   if ( lpMutex->Locker == HB_CURRENT_THREAD() )
+   {
+      lpMutex->nCount--;
+      if ( lpMutex->nCount == 0 )
+      {
+         lpMutex->Locker = 0;
+         HB_CRITICAL_UNLOCK( lpMutex->Critical );
+      }
+   }
+}
