@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.401 2004/05/30 20:44:11 ronpinkas Exp $
+ * $Id: hvm.c,v 1.402 2004/06/04 03:27:50 ronpinkas Exp $
  */
 
 /*
@@ -5857,7 +5857,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
       if( pFunc )
       {
          #ifndef HB_NO_PROFILER
-            if( bProfiler && pSym->pDynSym )
+            if( bProfiler && pSym->pDynSym && pSym->pDynSym != (PHB_DYNS) 1 )
             {
                pSym->pDynSym->ulRecurse++;
             }
@@ -5879,7 +5879,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
          HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
 
          #ifndef HB_NO_PROFILER
-            if( bProfiler && pSym->pDynSym )
+            if( bProfiler && pSym->pDynSym && pSym->pDynSym != (PHB_DYNS) 1 )
             {
                pSym->pDynSym->ulCalls++;                   /* profiler support */
 
@@ -5888,6 +5888,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
                {
                   pSym->pDynSym->ulTime += clock() - ulClock; /* profiler support */
                }
+
                pSym->pDynSym->ulRecurse--;
             }
          #endif
@@ -6901,9 +6902,11 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
 
    #if 0
       printf( "Symbol: %s\n", pSym->szName );
-      if( pSym->pDynSym )
+
+      if( pSym->pDynSym && pSym->pDynSym != (PHB_DYNS) 1 )
       {
          printf( "Module: %p\n", pSym->pDynSym->pModuleSymbols );
+
          if( pSym->pDynSym->pModuleSymbols )
          {
             printf( "ModuleName: %s\n", pSym->pDynSym->pModuleSymbols->szModuleName );
