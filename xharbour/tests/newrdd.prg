@@ -1,18 +1,20 @@
 //
-// $Id: newrdd.prg,v 1.4 2000/11/08 17:28:24 rglab Exp $
+// $Id: newrdd.prg,v 1.1.1.1 2001/12/21 10:46:02 ronpinkas Exp $
 //
+
+#define TESTED_RDD "DBFDBT"
+REQUEST _DBFDBT
 
 function Main()
 
    local nI, aArray
 
-   REQUEST _DBF
-   rddSetDefault( "DBF" )
+   rddSetDefault( TESTED_RDD )
 
    SET EXCLUSIVE OFF
    CLS
 
-   dbUseArea( .T., "DBF", "test", "TESTDBF", .T., .F. )
+   dbUseArea( .T., TESTED_RDD, "test", "TESTDBF", .T., .F. )
    ? "RecCount:", TESTDBF->( RecCount() )
    ? "Used:", TESTDBF->( Used() )
    ? "Select:", TESTDBF->( Select() )
@@ -301,13 +303,13 @@ function Main()
    CLS
 
    ? 'NEWRDD->( dbCloseArea() )'
-   ? 'dbUseArea( .T., "DBF", "newrdd", "NEWRDD", .F., .F. )'
+   ? 'dbUseArea( .T., TESTED_RDD, "newrdd", "NEWRDD", .F., .F. )'
    ? 'nI := 1'
    ? 'NEWRDD->( __dbPack( { || QOut( nI ), nI++ } ) )'
    ? '? "RecCount:", NEWRDD->( RecCount() )'
    ? ""
    NEWRDD->( dbCloseArea() )
-   dbUseArea( .T., "DBF", "newrdd", "NEWRDD", .F., .F. )
+   dbUseArea( .T., TESTED_RDD, "newrdd", "NEWRDD", .F., .F. )
 
    ? "Press any key to continue..."
    InKey( 0 )
@@ -334,8 +336,8 @@ function Main()
    CLS
 
    ? 'NEWRDD->( dbCloseArea() )'
-   ? 'SORT ON FIRST /DC, AGE /D TO NEWRDD'
-   ? 'dbUseArea( .T., "DBF", "newrdd", "NEWRDD", .F., .F. )'
+   ? 'SORT ON FIRST /DC, AGE /D TO newrdd'
+   ? 'dbUseArea( .T., TESTED_RDD, "newrdd", "NEWRDD", .F., .F. )'
    ? '? "RecCount:", NEWRDD->( RecCount() )'
    ? 'for nI := 1 to 8'
    ? '   ? NEWRDD->FIRST, NEWRDD->AGE'
@@ -355,9 +357,9 @@ function Main()
 
    NEWRDD->( dbCloseArea() )
    Select( "TESTDBF" )
-   SORT ON FIRST /DC, AGE /D TO NEWRDD
+   SORT ON FIRST /DC, AGE /D TO newrdd
 
-   dbUseArea( .T., "DBF", "newrdd", "NEWRDD", .F., .F. )
+   dbUseArea( .T., TESTED_RDD, "newrdd", "NEWRDD", .F., .F. )
    ? "RecCount:", NEWRDD->( RecCount() )
    for nI := 1 to 8
       ? NEWRDD->FIRST, NEWRDD->AGE
