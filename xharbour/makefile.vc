@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.100 2004/05/14 12:33:58 vouchcac Exp $
+# $Id: makefile.vc,v 1.101 2004/05/20 21:09:17 ronpinkas Exp $
 #
 
 #
@@ -170,6 +170,7 @@ SAMPLES_LIB      =$(LIB_DIR)\samples.lib
 VM_LIB           =$(LIB_DIR)\vm.lib
 VMMT_LIB         =$(LIB_DIR)\vm$(MT).lib
 VM_LIB_OPT_CON   =$(LIB_DIR)\optcon.lib
+DLL_MAIN_LIB     =$(LIB_DIR)\dllmain.lib
 VM_LIB_OPT_GUI   =$(LIB_DIR)\optgui.lib
 VMMT_LIB_OPT_CON =$(LIB_DIR)\optcon$(MT).lib
 VMMT_LIB_OPT_GUI =$(LIB_DIR)\optgui$(MT).lib
@@ -252,6 +253,7 @@ LIBLIST = \
    $(VM_LIB) \
    $(VM_LIB_OPT_CON) \
    $(VM_LIB_OPT_GUI) \
+   $(DLL_MAIN_LIB) \   
    $(MACRO_LIB) \
    $(HB_GT_LIB) \
    $(SAMPLES_LIB) \
@@ -891,6 +893,10 @@ VM_LIB_OBJS = \
    \
    $(OBJ_DIR)$(MT)\harbinit.obj
 
+DLL_MAIN_OBJS = \
+   $(OBJ_DIR)$(MT)\mainstd.obj \
+   $(OBJ_DIR)$(MT)\mainwin.obj 
+
 #
 # GTCGI.LIB rules
 #
@@ -1354,6 +1360,9 @@ $(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
    lib /out:$@ $**
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
+   lib /out:$@ $**
+
+$(DLL_MAIN_LIB) : $(DLL_MAIN_OBJS)
    lib /out:$@ $**
 
 !endif

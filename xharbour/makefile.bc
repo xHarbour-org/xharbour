@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.95 2004/05/14 12:33:58 vouchcac Exp $
+# $Id: makefile.bc,v 1.96 2004/05/20 21:09:16 ronpinkas Exp $
 #
 
 #
@@ -214,6 +214,7 @@ SAMPLES_LIB    = $(LIB_DIR)\samples.lib
 VM_STLIB         = $(VM_LIB)
 VM_LIB_OPT_CON   = $(LIB_DIR)\optcon.lib
 VM_LIB_OPT_GUI   = $(LIB_DIR)\optgui.lib
+DLL_MAIN_LIB     = $(LIB_DIR)\dllmain.lib
 RTL_STLIB        = $(RTL_LIB)
 MACRO_STLIB      = $(MACRO_LIB)
 RDD_STLIB        = $(RDD_LIB)
@@ -951,6 +952,10 @@ SAMPLES_LIB_OBJS =  \
 ODBC_LIB_OBJS =       \
    $(OBJ_DIR)\odbc.obj \
    $(OBJ_DIR)\todbc.obj
+   
+DLL_MAIN_LIB_OBJS = \
+   $(VM_OBJ_DIR)\mainstd.obj \
+   $(VM_OBJ_DIR)\mainwin.obj 
 
 
 #
@@ -978,6 +983,7 @@ all: \
    $(CODEPAGE_LIB) \
    $(SAMPLES_LIB) \
    $(ODBC_LIB) \
+   $(DLL_MAIN_LIB) \
    $(HBRUN_EXE) \
    $(HBPP_EXE) \
    $(HBTEST_EXE) \
@@ -1192,6 +1198,14 @@ $(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
     IF EXIST "$(ODBC_LIB)" $(DEL) "$(ODBC_LIB)" > NUL
     $(LINKER) "$(ODBC_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
+$(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
+    IF EXIST "$(DLL_MAIN_LIB)" $(DEL) "$(DLL_MAIN_LIB)" > NUL
+    $(LINKER) "$(DLL_MAIN_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 

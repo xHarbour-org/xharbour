@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3004 2004/05/29 00:25:53 kaddath Exp $
+ * $Id: ChangeLog,v 1.3005 2004/05/29 21:49:23 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,7 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-05- 22:50 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
 
 2004-05-30 01:50 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * bin/hb-func.sh
@@ -26,10 +27,12 @@
     ! Fixed GPF trap related to releasing class methods before release of datas inlines
       (which might refer back to a method)
 
-2004-05-28 12:10 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
-  * contrib/rdd_ads/adsfunc.c
-    ! fixed gpf in adsKeyCount() when no params provided
-
+2004-05-30  11:40 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * makefile.bc
+    makefile.vc
+    makefile.nt
+    ! added dllmain.lib tobe generate(for usage with xharbour dll)
+    
 2004-05-28 22:50 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   + make_bsd.sh
   * bin/hb-func.sh
