@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2267 2004/02/11 22:43:45 paultucker Exp $
+ * $Id: ChangeLog,v 1.2268 2004/02/12 07:37:56 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-12 20:20 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbdefs.h
+   * casting in LONGLONG declaration for compilers which don't 
+     have their own definitions in limits.h
+
 2004-02-12 14:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * utils/hbtest/hbtest.prg
   + utils/hbtest/rt_ccall.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.25 2004/01/26 14:59:46 druzus Exp $
+ * $Id: hbdefs.h,v 1.26 2004/01/26 16:41:43 druzus Exp $
  */
 
 /*
@@ -173,7 +173,7 @@
       #elif defined(LONG_LONG_MAX)
          #define LONGLONG_MAX       LONG_LONG_MAX
       #else
-         #define LONGLONG_MAX       (ULONGLONG_MAX>>1)
+         #define LONGLONG_MAX       ((LONGLONG) ( ULONGLONG_MAX >> 1 ))
       #endif
       #if defined(LLONG_MIN)
          #define LONGLONG_MIN       LLONG_MIN
