@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.19 2003/11/10 01:48:29 jonnymind Exp $
+ * $Id: hbsrlraw.c,v 1.20 2004/01/11 14:03:39 andijahja Exp $
  */
 
 /*
@@ -418,6 +418,11 @@ ULONG hb_serialNextRaw( char *cBuf )
             ulCount --;
          }
       return ulData;
+      
+       case 'Q':
+         ulNext = 9;
+         ulCount = (ULONG) hb_getlen8( ( BYTE *) (cBuf + 1) );
+      return ulCount+9;
 
       case 'Z': return 1;
     }

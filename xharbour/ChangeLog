@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2191 2004/01/31 05:51:27 likewolf Exp $
+ * $Id: ChangeLog,v 1.2192 2004/01/31 08:24:25 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-31 22:15 UTC+0200 Tommi Rouvali <tommi@rouvali.com>
+  * source/rtl/hbserial.prg
+  * source/rtl/hbsrlraw.c
+    * RPC object serialization now uses HBPersistent class methods, if object inherits from it.
 
 2004-01-31 00:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/cstr.prg
