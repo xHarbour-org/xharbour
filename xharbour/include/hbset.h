@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.12 2003/10/18 01:15:18 jonnymind Exp $
+ * $Id: hbset.h,v 1.13 2003/10/18 02:38:45 jonnymind Exp $
  */
 
 /*
@@ -53,11 +53,6 @@
 
 #ifndef HB_SET_H_
 #define HB_SET_H_
-#if defined(HB_OS_WIN_32) || defined(__WIN32__)
-#if !defined(HB_OS_WIN_32_USED)
-#define HB_OS_WIN_32_USED
-#endif
-#endif
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapigt.h"
@@ -233,12 +228,6 @@ typedef void HB_SET_LISTENER_CALLBACK( HB_set_enum, HB_set_listener_enum );
 extern int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * );
 extern void hb_setListenerNotify( HB_set_enum, HB_set_listener_enum );
 extern int hb_setListenerRemove( int );
-#if defined(HB_OS_WIN_32_USED)
-    extern void CloseWinPrinter( void );
-    extern void WinPrinterEject( void );
-    extern void WriteStringtoPrint(const char * szString);
-    extern int OpenWinPrinter(char * szPrinter);
-#endif
 
 #if defined(HB_EXTERN_C)
 }
