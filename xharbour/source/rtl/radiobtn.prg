@@ -1,5 +1,5 @@
 /*
- * $Id: radiobtn.prg,v 1.3 2004/02/15 20:09:31 jonnymind Exp $
+ * $Id: radiobtn.prg,v 1.4 2004/07/13 19:15:36 paultucker Exp $
  */
 
 /*
@@ -52,7 +52,6 @@
 
 
 #include "hbclass.ch"
-#include "hbsetup.ch"
 #include "color.ch"
 #include "common.ch"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: radiogrp.prg,v 1.8 2003/11/21 13:22:35 lculik Exp $
+ * $Id: radiogrp.prg,v 1.9 2004/07/13 19:15:36 paultucker Exp $
  */
 
 /*
@@ -51,7 +51,6 @@
  */
 
 #include "hbclass.ch"
-#include "hbsetup.ch"
 #include "color.ch"
 #include "common.ch"
 

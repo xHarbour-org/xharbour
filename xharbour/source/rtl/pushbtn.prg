@@ -1,5 +1,5 @@
 /*
- * $Id: pushbtn.prg,v 1.6 2003/02/20 20:04:56 lculik Exp $
+ * $Id: pushbtn.prg,v 1.7 2004/07/13 19:15:32 paultucker Exp $
  */
 
 /*
@@ -50,7 +50,6 @@
  *
  */
 
-#include 'hbsetup.ch'
 #include 'hbclass.ch'
 #include "color.ch"
 #include "common.ch"
@@ -360,9 +359,10 @@ RETURN oPushButton
 
 FUNCTION _GETNUMCOL( Arg1 )
 
-   LOCAL aColors := { { "N+", 8 }, { "B+", 9 }, { "G+", 10 }, { "BG+", 11 }, ;
-                      { "R+", 12 }, { "RB+", 13 }, { "GR+", 14 }, { "W+", 15 }, { "BG", 3 }, { "RB", 5 }, ;
-                      { "GR", 6 }, { "B", 1 }, { "G", 2 }, { "R", 4 }, { "W", 7 } }
+   LOCAL aColors := { { "N+", 8 },  { "B+", 9 },   { "G+", 10 },  { "BG+", 11 }, ;
+                      { "R+", 12 }, { "RB+", 13 }, { "GR+", 14 }, { "W+", 15 },;
+                      { "BG", 3 },  { "RB", 5 },   { "GR", 6 },   { "B", 1 }, ;
+                      { "G", 2 },   { "R", 4 },    { "W", 7 } }
    LOCAL nPos    := At( "/", Arg1 )
    LOCAL nReturn
 
@@ -371,7 +371,7 @@ FUNCTION _GETNUMCOL( Arg1 )
    ELSEIF ( nPos == 1 )
       Arg1 := ""
    ENDIF
-
+ 
    nReturn := Ascan( aColors, { | a, b | a[ 1 ] == arg1 } )
 
    IF nReturn > 0
