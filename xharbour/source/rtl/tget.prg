@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.75 2004/05/27 14:13:30 lculik Exp $
+ * $Id: tget.prg,v 1.76 2004/05/28 01:50:13 lculik Exp $
  */
 
 /*
@@ -1762,7 +1762,7 @@ STATIC FUNCTION BuildGetColor(cColorSpec)
    IF ( len( cColorSpec ) == 3 .or. Len( cColorSpec ) == 4 ) .AND. AT(',', cColorSpec ) == 0 
    // replicate to 4 colors pairs as clipper do
       cCur := cColorSpec
-      cColorSpec := cCur + "," + cCur + "," + cCur + "," + cCur   
+      cColorSpec := cCur + "," + cCur + "," + cCur + "," + cCur + "," + cCur + "," + cCur   
    ENDIF
 
    // now process color acording to set intensity setting
