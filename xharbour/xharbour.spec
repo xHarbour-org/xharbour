@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.4 2003/05/30 00:13:16 druzus Exp $
+# $Id: xharbour.spec,v 1.5 2003/05/30 01:29:19 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -54,7 +54,7 @@ Vendor:         %{hb_host}
 URL:            http://%{hb_host}/
 Source:         %{name}-%{version}.src.tar.gz
 Packager:       Przemys³aw Czerpak <druzus@polbox.com>
-BuildPrereq:    gcc binutils bash flex bison ncurses ncurses-devel slang-devel gpm-devel
+BuildPrereq:    gcc binutils bash bison ncurses ncurses-devel slang-devel gpm-devel
 Requires:       gcc binutils bash sh-utils %{name}-lib = %{version}
 Provides:       %{name}
 BuildRoot:      /tmp/%{name}-%{version}-root
