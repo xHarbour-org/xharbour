@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.120 2003/11/26 21:17:24 ronpinkas Exp $
+* $Id: thread.c,v 1.121 2003/11/26 21:58:35 jonnymind Exp $
 */
 
 /*
@@ -1234,35 +1234,6 @@ HB_FUNC( MUTEXLOCK )
       HB_STACK_LOCK;
    }
 }
-
- /*JC1: this will always be called when cancellation is delayed */
- HB_FUNC( DESTROYMUTEX )
- {
-    HB_THREAD_STUB
-
-    HB_MUTEX_STRUCT *Mutex;
-    PHB_ITEM pMutex = hb_param( 1, HB_IT_POINTER );
-
-    if( pMutex == NULL )
-    {
-       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-
-       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "DESTROYMUTEX", 1, pArgs );
-       hb_itemRelease( pArgs );
-
-       return;
-    }
-
-    Mutex = (HB_MUTEX_STRUCT *)  pMutex->item.asPointer.value;
-
-    hb_threadUnlinkMutex( Mutex );
-
-    HB_MUTEX_DESTROY( Mutex->mutex );
-    HB_COND_DESTROY( Mutex->cond );
-    hb_arrayRelease( Mutex->aEventObjects );
-    hb_itemClear( pMutex );
-    hb_xfree( Mutex );
- }
 
 /*JC1: this will always be called when cancellation is delayed */
 HB_FUNC( MUTEXUNLOCK )
