@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.244 2002/05/24 01:26:51 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.245 2002/05/24 02:35:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-23 19:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/pptable.c
+    + Added support for INDEX clause to INDEX commands.
+    * Minor correction to representation of #define _DFSET ...
+
+  * include/hbver.h
+    * Updated ChangeLog entries.
+
+  /* I'll greatly aprreciated one more cicle of build confirmation. */
 
 2002-05-23 19:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
