@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id$
+* $Id: tipclientftp.prg,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -62,11 +62,11 @@ RETURN Self
 
 METHOD Open() CLASS tIPClientFTP
 
-   IF .not. ::super:Open()
+   IF Len( ::oUrl:cUserid ) == 0 .or. Len( ::oUrl:cPassword ) == 0
       RETURN .F.
    ENDIF
 
-   IF Empty ( ::oUrl:cUserid ) .or. Empty ( ::oUrl:cPassword )
+   IF .not. ::super:Open()
       RETURN .F.
    ENDIF
 
@@ -81,6 +81,7 @@ METHOD Open() CLASS tIPClientFTP
          ENDIF
       ENDIF
    ENDIF
+   ? "Reply", ::cReply
 RETURN .F.
 
 
@@ -100,7 +101,7 @@ METHOD GetReply() CLASS tIPClientFTP
    ENDDO
 
    // 4 and 5 are error codes
-   IF InetErrorCode( ::SocketCon ) != 0 .or. ::cReply[1] > '4'
+   IF InetErrorCode( ::SocketCon ) != 0 .or. ::cReply[1] >= '4'
       RETURN .F.
    ENDIF
 RETURN .T.
@@ -326,17 +327,17 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClientFTP
    IF .not. ::bInitialized
 
       IF Empty( ::oUrl:cFile )
-         RETURN .F.
+         RETURN -1
       ENDIF
 
       IF .not. Empty( ::oUrl:cPath )
          IF .not. ::CWD( ::oUrl:cPath )
-            RETURN .F.
+            RETURN -1
          ENDIF
       ENDIF
 
       IF .not. ::Stor( ::oUrl:cFile )
-         RETURN .F.
+         RETURN -1
       ENDIF
       // now channel is open
       ::bInitialized := .T.

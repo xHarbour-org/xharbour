@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.3 2003/03/23 14:07:38 jonnymind Exp $
+ * $Id: Changelog,v 1.4 2003/06/16 00:41:28 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-22 06:42 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * tipclientftp.prg
+    ! Write() implementation of this client was returining a
+      logical instead of a number. Fixed
+
+  * tests/tiptest.prg
+    * Timeout set to 20 seconds
 
 
 2003-06-15 02:40 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>

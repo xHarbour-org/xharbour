@@ -1,7 +1,7 @@
 *****************************************************
 * TEST of TIP libs (for higher level URI interface)
 *
-* $Id$
+* $Id: tiptest.prg,v 1.1 2003/02/22 16:44:47 jonnymind Exp $
 *
 * Usage: This file is similar to a wget command
 *
@@ -48,7 +48,7 @@
 #include "tip.ch"
 
 PROCEDURE MAIN( cUrl, cFile )
-   LOCAL elem, bWrite := .F.
+   LOCAL bWrite := .F.
    LOCAL oUrl, oClient
    LOCAL cData
 
@@ -69,6 +69,8 @@ PROCEDURE MAIN( cUrl, cFile )
    ENDIF
 
    oClient := tIPClient():New( oUrl )
+   oClient:nConnTimeout := 20000
+
 
    IF Empty( oClient )
       @4,5 SAY "Invalid url " + cUrl
