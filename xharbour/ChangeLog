@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2075 2004/01/16 14:45:12 paultucker Exp $
+ * $Id: ChangeLog,v 1.2076 2004/01/16 16:54:36 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-16 09:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed few GPF traps in hb_ppPlatform() introduced by recent addition.
+      /* pzszName was never allocated but was passed to strcat()! */
+    + Added missing braces to flow structures.
 
 2004-01-16 11:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makallbc.bat
@@ -36,7 +42,7 @@
    + Added workstation type for Windows NT 4.0, Windows 2000 Professional, and Windows XP Home Edition or Professional.
    + Added server type for Windows Server 2003, Windows 2000 and Windows NT 4.0.
    (Credits to Pedro Gil)
- 
+
 2004-01-16 09:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   * source/rtl/file.c
     ! hb_fsFile fix changed to use hb_Filetrim
