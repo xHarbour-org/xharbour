@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.42 2003/01/05 06:50:35 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.43 2003/02/17 04:18:16 andijahja Exp $
  */
 
 /*
@@ -1744,7 +1744,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
                      HB_EXPR_PTR pStart  = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
 
-                     if( pStart->ExprType == HB_ET_NUMERIC && pStart->value.asNum.NumType == HB_ET_LONG && pStart->value.asNum.lVal == 1 )
+                     if( pStart->ExprType == HB_ET_NUMERIC && pStart->value.asNum.NumType == HB_ET_LONG && pStart->value.asNum.lVal == 1 && pSelf->ulLength > 0 )
                      {
                         // Delete the pre-optimization components.
                         // Skipping the first 2 elements of the list, as they are used by the optimization.
@@ -1754,10 +1754,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                         pSelf->ExprType = HB_ET_ARRAYAT;
                         pSelf->value.asList.pExprList = pString;
-                        if ( pSelf->ulLength > 0 )
-                           pStart->value.asNum.lVal      = -1;
-                        else
-                           pStart->value.asNum.lVal      =  1;
+                        pStart->value.asNum.lVal      =  1;
                         pSelf->value.asList.pIndex    = pStart;
                      }
                   }
