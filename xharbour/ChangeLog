@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.171 2002/04/26 06:52:49 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.172 2002/04/26 11:06:46 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-25 13:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/memoedit.prg
+    * Readded old Support for Set key defined Keys on Edit() method
 
 2002-04-25 08:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/tbrowse.prg

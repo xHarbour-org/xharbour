@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.15 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: memoedit.prg,v 1.1.1.1 2001/12/21 10:41:13 ronpinkas Exp $
  */
 
 /*
@@ -104,7 +104,7 @@ METHOD Edit() CLASS TMemoEditor
    // NOTE: K_ALT_W is not compatible with clipper exit memo and save key, but I cannot discriminate
    //       K_CTRL_W and K_CTRL_END from harbour code.
    local aConfigurableKeys := {K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_V, K_ALT_W, K_ESC }
-
+   local bKeyBlock
    // If I have an user function I need to trap configurable keys and ask to
    // user function if handle them the standard way or not
    if ::lEditAllow .AND. ISCHARACTER(::xUserFunction)
@@ -116,8 +116,11 @@ METHOD Edit() CLASS TMemoEditor
          if NextKey() == 0
             ::IdleHook()
          endif
-
          nKey := Inkey(0)
+       if ! ( ( bKeyBlock := Setkey( nKey ) ) == NIL )
+          eval( bKeyBlock )
+          return Self
+       endif
 
          // Is it a configurable key ?
          if AScan(aConfigurableKeys, nKey) > 0
