@@ -43,7 +43,7 @@ PROCEDURE Main()
    LOCAL kf4     := SetKey( K_F4, {|| Wvt_WindowExpand( -1 ) } )
    LOCAL kf5     := SetKey( K_F5, {|| VouBrowse() } )
 	LOCAL nMaxRows:= MaxRow()
-	   
+
    LOCAL cLabel  := 'xHarbour simulated GUI.'
 
    SET DATE BRITISH
@@ -65,8 +65,8 @@ PROCEDURE Main()
    aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2, 4, nMaxRows-2, 18 ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2,20, nMaxRows-2, 30 ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2,32, nMaxRows-2, 42 ) } )
-   aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2,44, nMaxRows-2, 54 ) } )         
-   
+   aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2,44, nMaxRows-2, 54 ) } )
+
    aLastPaint := Wvt_SetBlocks( aBlocks )
 
    scr := SaveScreen( 0,0,maxrow(),maxcol() )
@@ -81,7 +81,7 @@ PROCEDURE Main()
    @ nMaxRows-2,20 say ' F3 Expand '     COLOR 'N/W'
    @ nMaxRows-2,32 say ' F4 Shrink '     COLOR 'N/W'
 	@ nMaxRows-2,44 say ' F5 Browse '     COLOR 'N/W'
-	
+
    @  6, nColGet SAY '< Date >'
    @  9, nColGet SAY '<' + PadC( 'Name', 33 ) + '>'
    @ 12, nColGet SAY '<' + PadC( 'Address', 33 ) + '>'
@@ -105,7 +105,7 @@ PROCEDURE Main()
    SetKey( K_F3, kf3 )
    SetKey( K_F4, kf4 )
    SetKey( K_F5, kf5 )
-   
+
 RETURN
 
 //-------------------------------------------------------------------//
@@ -129,16 +129,16 @@ PROCEDURE GuiGets_1()
    LOCAL kf3        := SetKey( K_F3, {|| Wvt_WindowExpand( 1 ) } )
    LOCAL kf4        := SetKey( K_F4, {|| Wvt_WindowExpand( -1 ) } )
    LOCAL cLabel     := 'VOUCH, that GROWS with you'
-   LOCAL aPallet    := Wvt_GetPallete()
-   LOCAL aNewPallet := aclone( aPallet )
-   
-   // Change the values of pallatte arbitrarily though yu can fine tune 
+   LOCAL aPalette   := Wvt_GetPalette()
+   LOCAL aNewPalette:= aclone( aPalette )
+
+   // Change the values of pallatte arbitrarily though yu can fine tune
    // these values with realistic values.
    //
-   aNewPallet[ 8 ] := aNewPallet[ 8 ] + 100000
-   
-   Wvt_SetPallete( aNewPallet )
-   
+   aNewPalette[ 8 ] := aNewPalette[ 8 ] + 100000
+
+   Wvt_SetPalette( aNewPalette )
+
    aAdd( aBlocks, {|| Wvt_SetFont( 'Courier New', 24 ) } )
    aAdd( aBlocks, {|| Wvt_SetIcon( 'DIA_EXCL.ico' ) } )
    aAdd( aBlocks, {|| Wvt_SetTitle( 'Vouch Gets 2' ) } )
@@ -177,7 +177,7 @@ PROCEDURE GuiGets_1()
    // Restore Environment
    //
    Wvt_setBlocks( aLastPaint )
-   Wvt_SetPallete( aPallet )
+   Wvt_SetPalette( aPalette )
    SetColor( clr )
    RestScreen( 0,0,maxrow(),maxcol(), scr )
 
@@ -197,7 +197,7 @@ RETURN 0
 
 //-------------------------------------------------------------------//
 //      Wvt_SetFocus() must be a FUNCTION in your application
-//      needs to process messages sent through WM_SETFOCUS message 
+//      needs to process messages sent through WM_SETFOCUS message
 //      received by the window.
 //-------------------------------------------------------------------//
 FUNCTION Wvt_SetFocus( hWnd )
@@ -213,7 +213,7 @@ RETURN nil
 
 //-------------------------------------------------------------------//
 //      Wvt_KillFocus() must be a FUNCTION in your application
-//      needs to process messages sent through WM_KILLFOCUS message 
+//      needs to process messages sent through WM_KILLFOCUS message
 //      received by the window.
 //-------------------------------------------------------------------//
 FUNCTION Wvt_KillFocus( hWnd )
@@ -293,7 +293,7 @@ FUNCTION VouBrowse()
 	LOCAL cScr    := SaveScreen( 0,0,maxrow(),maxcol() )
 
 	STATIC nStyle := 0
-		   					
+
 	USE 'TEST' NEW
    if NetErr()
       return nil
@@ -301,7 +301,7 @@ FUNCTION VouBrowse()
    info_:= DbStruct()
 
 	oBrowse := TBrowseNew( nTop + 3, nLeft + 2, nBottom - 1, nRight - 2 )
-	
+
    oBrowse:ColSep        = '  '
    oBrowse:HeadSep       = '__'
    oBrowse:GoTopBlock    = { || dbGoTop() }
@@ -318,23 +318,23 @@ FUNCTION VouBrowse()
    if nStyle > 5
       nStyle := 0
    endif
-      
+
    Wvt_SetPen( nStyle, 0, rgb( 210,1210,210 ) )
-   
+
    nStyle++
-      
+
    aAdd( aBlocks, {|| Wvt_SetIcon( 'DIA_EXCL.ico' ) } )
    aAdd( aBlocks, {|| Wvt_SetTitle( 'WVT Gui TBrowse()' ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nTop, nLeft, nBottom, nRight ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxRecessed( nTop+3, nLeft+2, nBottom-1, nRight-2 ) } )
    aAdd( aBlocks, {|| Wvt_DrawGridHorz( oBrowse:nTop+3, oBrowse:nLeft, oBrowse:nRight, oBrowse:nBottom - oBrowse:nTop - 2 ) } )
 	aAdd( aBlocks, {|| Wvt_DrawGridVert( oBrowse:nTop, oBrowse:nBottom, oBrowse:aColumnsSep, len( oBrowse:aColumnsSep ) ) } )
-	
+
    aLastPaint := Wvt_SetBlocks( aBlocks )
 
 	DispBox( 0, 0, maxrow(), maxcol(), '         ', 'N/W' )
 	DispOutAt( nTop + 1, nleft, padc( CurDrive()+':\'+CurDir()+'\'+'Test.dbf', nRight - nLeft + 1 ), 'W+/W' )
-		
+
 	While !lEnd
       oBrowse:ForceStable()
 
@@ -391,17 +391,17 @@ FUNCTION VouBrowse()
 
       endcase
    end
-   
+
 	Wvt_SetPen( 0 )
    Wvt_setBlocks( aLastPaint )
-   
+
    DevPos( nRow, nCol )
    SetColor( cColor )
    SetCursor( nCursor )
-   
+
 	DBCloseArea()
    RestScreen( 0,0, maxrow(),maxcol(), cScr )
-		
+
 RETURN nil
 //-------------------------------------------------------------------//
 STATIC FUNCTION DbSkipBlock( n, oTbr )
@@ -410,7 +410,7 @@ STATIC FUNCTION DbSkipBlock( n, oTbr )
 
    if n = 0
       DBSkip( 0 )
-      
+
    elseif n > 0
       do while nSkipped != n .and. TBNext( oTbr )
          nSkipped++

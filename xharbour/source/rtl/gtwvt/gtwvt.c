@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.51 2004/01/15 22:31:59 peterrees Exp $
+ * $Id: gtwvt.c,v 1.52 2004/01/17 02:36:21 fsgiudice Exp $
  */
 
 /*
@@ -4051,4 +4051,140 @@ HB_FUNC( WVT_DRAWGRIDVERT )
 //                    End of Graphic Functions
 //
 //-------------------------------------------------------------------//
+
+//-------------------------------------------------------------------//
+//
+//                    Clipboard functions
+//
+//  (C) 2004 Francesco Saverio Giudice <info@fsgiudice.com>
+//
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETCLIPBOARD )
+{
+   HGLOBAL   hglb;
+   LPTSTR    lptstr;
+   ULONG     ul;
+
+   if ( !IsClipboardFormatAvailable(CF_TEXT) )
+   {
+     hb_ret();
+   }
+
+   if (!OpenClipboard( NULL ))
+   {
+     hb_ret();
+   }
+
+   hglb = GetClipboardData(CF_TEXT);
+   if (hglb != NULL)
+   {
+      lptstr = GlobalLock(hglb);
+      if (lptstr != NULL)
+      {
+         hb_retc( lptstr );
+         GlobalUnlock(hglb);
+      }
+   }
+   CloseClipboard();
+}
+
+HB_FUNC( WVT_SETCLIPBOARD )
+{
+   LPTSTR  lptstrCopy;
+   HGLOBAL hglbCopy;
+   char *  cText;
+   int     nLen;
+
+   if ( !IsClipboardFormatAvailable(CF_TEXT) )
+   {
+     hb_retl( FALSE );
+     return;
+   }
+
+   // Check params
+   if ( !ISCHAR(1) )
+   {
+     hb_retl( FALSE );
+     return;
+   }
+
+   if (!OpenClipboard( NULL ))
+   {
+     hb_retl( FALSE );
+     return;
+   }
+   EmptyClipboard();
+
+   // Get text from PRG
+   cText = hb_parc(1);
+   nLen  = hb_parclen(1);
+
+   // Allocate a global memory object for the text.
+
+   hglbCopy = GlobalAlloc(GMEM_MOVEABLE, nLen * sizeof(TCHAR));
+   if (hglbCopy == NULL)
+   {
+       CloseClipboard();
+       hb_retl( FALSE );
+       return;
+   }
+
+   // Lock the handle and copy the text to the buffer.
+
+   lptstrCopy = GlobalLock(hglbCopy);
+   memcpy(lptstrCopy, cText, nLen * sizeof(TCHAR));
+   lptstrCopy[nLen] = (TCHAR) 0;    // null character
+   GlobalUnlock(hglbCopy);
+
+   // Place the handle on the clipboard.
+
+   SetClipboardData(CF_TEXT, hglbCopy);
+
+   CloseClipboard();
+   hb_retl( TRUE );
+}
+
+HB_FUNC( WVT_PASTEFROMCLIPBOARD )
+{
+   HGLOBAL   hglb;
+   LPTSTR    lptstr;
+   ULONG     ul;
+
+   if ( !IsClipboardFormatAvailable(CF_TEXT) )
+   {
+     hb_ret();
+   }
+
+   if (!OpenClipboard( NULL ))
+   {
+     hb_ret();
+   }
+
+   hglb = GetClipboardData(CF_TEXT);
+   if (hglb != NULL)
+   {
+      lptstr = GlobalLock(hglb);
+      if (lptstr != NULL)
+      {
+         //TraceLog( NULL, "Clipboard %s\n", (LPSTR) lptstr );
+         //TraceLog( NULL, "Clipboard size %u\n", GlobalSize(hglb) );
+
+         for ( ul=0; ul < GlobalSize(hglb); ul++ )
+         {
+            hb_wvt_gtAddCharToInputQueue( (int) lptstr[ ul ] );
+            //TraceLog( NULL, "Value %i\n", (int) lptstr[ ul ] );
+         }
+         GlobalUnlock(hglb);
+      }
+   }
+   CloseClipboard();
+}
+
+//-------------------------------------------------------------------//
+//
+//                    End of Clipboard Functions
+//
+//-------------------------------------------------------------------//
+
 

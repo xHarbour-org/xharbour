@@ -48,6 +48,7 @@ PROCEDURE Main()
    LOCAL cLabel  := 'xHarbour simulated GUI.'
 
    SET DATE BRITISH
+   SET CONFIRM ON
 
    SetColor( 'N/W' )
    CLS   // Pay attention, CLS clears graphic objects, so it must the first screen command
@@ -91,6 +92,9 @@ PROCEDURE Main()
    @ 15, nColGet GET get_4
    @ 17, nColGet GET get_5
    @ 17, 61      GET get_6 PICTURE '@Z 9999999.99'
+
+   SetKey( K_CTRL_C, {|| WVT_CopyToClipboard() } )
+   SetKey( K_CTRL_V, {|| WVT_PasteFromClipboard() } )
 
    READ
 
@@ -261,7 +265,7 @@ PROCEDURE VouBrowse()
    setCursor( 0 )
    USE 'TEST' NEW
    IF NetErr()
-      RETURN NIL
+      RETURN
    ENDIF
    aStruct := DbStruct()
 

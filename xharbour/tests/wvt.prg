@@ -1,5 +1,5 @@
 /*
- * $Id: dumpvar.prg,v 1.4 2004/01/03 20:51:47 fsgiudice Exp $
+ * $Id: wvt.prg,v 1.1 2004/01/17 02:36:21 fsgiudice Exp $
  */
 
 /*
@@ -277,6 +277,28 @@ PROCEDURE WVT_PopWindow()
      aSize( WVT_Stack, Len( WVT_Stack ) - 1 )
   ENDIF
   //__OutDebug( "WVT_PopWindow(): WVT_Stack", WVT_Stack )
+RETURN
+
+PROCEDURE WVT_PasteFromClipboard()
+   LOCAL cPaste := WVT_GetClipboard()
+   LOCAL nPos
+   LOCAL oGet   := GetActive()
+   //__OutDebug( cPaste )
+   IF cPaste <> NIL .AND. oGet <> NIL
+      IF ( nPos := AT( HB_OSNewLine(), cPaste ) ) > 0
+         __Keyboard( Substr( cPaste, 1, nPos - 1 ) )
+      ELSE
+         __Keyboard( cPaste )
+      ENDIF
+   ENDIF
+RETURN
+
+PROCEDURE WVT_CopyToClipboard()
+   LOCAL oGet   := GetActive()
+   //__OutDebug( cPaste )
+   IF oGet <> NIL
+      WVT_SetClipBoard( cStr( oGet:buffer ) )
+   ENDIF
 RETURN
 
 FUNCTION WVT_PAINT( hWnd, msg, wParam, lParam )

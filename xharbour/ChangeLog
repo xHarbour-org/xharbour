@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2086 2004/01/17 15:12:25 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2087 2004/01/17 17:50:34 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-17 22:50 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    + Added clipboard functions
+      WVT_GETCLIPBOARD, WVT_SETCLIPBOARD, WVT_PASTEFROMCLIPBOARD
+  + tests/wvt.prg
+    + Added clipboard prg related functions
+      WVT_PasteFromClipboard(), WVT_CopyToClipboard()
+  + tests/wvtguie.prg
+    * Added keys for clipboard
+
+  /*
+    Now we can use clipboard!
+    Actually it is a simple method:
+    assign
+    SetKey( K_CTRL_C, {|| WVT_CopyToClipboard() } )
+    SetKey( K_CTRL_V, {|| WVT_PasteFromClipboard() } )
+
+    then a simple idea, when copy to clipboard I copy the entire
+    oGet:buffer, instead when paste I send the clipboard to
+    keyboard buffer but only if there is an active Get
+    This permit to me to don't think to selection at the moment.
+
+    To build these prgs use:
+    bldtest /wvt wvtguie wvt
+  */
 
 2004-01-17 16:00 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
   * source/rtl/filesys.c
