@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5 2004/01/17 22:02:14 andijahja Exp $
+ * $Id: ChangeLog,v 1.6 2004/01/19 22:00:50 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-02 19:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   + contrib/unicode/hbencode.c
+     ! corrections on YYENCODE_FILE() and YYENCODE_FILE_BY_CHUNK() functions:
+       * fix wrong file size when file name supplied with path
+       * change run time error codes
+       * fix wrong byte count in YYENCODE_FILE_BY_CHUNK() so that encoded file
+         was excessive by one byte.
+
+2004-02-02 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   + contrib/unicode/hbencode.c
+     + added the following file encoding functions:
+       + UUENCODE_FILE()
+       + UUENCODE_FILE_BY_CHUNK()
+       + B64ENCODE_FILE()
+       + B64ENCODE_FILE_BY_CHUNK()
+       + YYENCODE_FILE()
+       + YYENCODE_FILE_BY_CHUNK()
+
+   * contrib/unicode/make_b32.bat
+   * contrib/unicode/makefile.bc
+   * contrib/unicode/makefile.vc
+     + add hbencode.obj file dependency
+
+   * contrib/unicode/hbc7.c
+   * contrib/unicode/hbcc.prg
+   * contrib/unicode/hbcrc16.c
+   * contrib/unicode/hbcrc32.c
+   * contrib/unicode/hbcrpt32.c
+   * contrib/unicode/hbcrpt128.c
+   * contrib/unicode/hbcu.c
+   * contrib/unicode/hbcx.c
+   * contrib/unicode/hbcy.c
+   * contrib/unicode/hbhex.c
+     ! source code re-formatting
+
 2004-01-20 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    * contrib/unicode/hbcc.prg
    * contrib/unicode/hbc7.c

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbencode.c,v 1.1 2004/02/02 10:12:40 andijahja Exp $
  */
 
 /*
@@ -141,7 +141,7 @@ YYENCODE_FILE_BY_CHUNK( <cFileInput>, <nLinePerFile>, [<cFilemask>] ) -> int
 */
 
 /*
-  Note: New error codes 8001 up to 8004 are created here.
+  Note: New error codes 8001 up to 8006 are created here.
         Feel free to change them if so needed
 */
 
@@ -880,7 +880,7 @@ HB_FUNC( YYENCODE_FILE )
 
    pFileName = hb_fsFNameSplit(pIn->item.asString.value);
    sprintf( pszFileName, "%s%s",pFileName->szName,pFileName->szExtension);
-   filelen = hb_fsFSize( (BYTE *) pszFileName, TRUE );
+   filelen = hb_fsFSize( (BYTE *) pIn->item.asString.value, TRUE );
 
    if ( !pOut )
    {
@@ -939,17 +939,17 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
 
    if ( !pIn )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 8005, NULL, "YYENCODE_FILE", 1, hb_paramError( 1 ) );
+      hb_errRT_BASE_SubstR( EG_ARG, 8006, NULL, "YYENCODE_FILE_BY_CHUNK", 1, hb_paramError( 1 ) );
    }
 
    if ( !pLine )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 8005, NULL, "YYENCODE_FILE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      hb_errRT_BASE_SubstR( EG_ARG, 8006, NULL, "YYENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 
    pFileName = hb_fsFNameSplit(pIn->item.asString.value);
    sprintf( pszFileName, "%s%s",pFileName->szName,pFileName->szExtension);
-   filelen = hb_fsFSize( (BYTE *) pszFileName, TRUE );
+   filelen = hb_fsFSize( (BYTE *) pIn->item.asString.value, TRUE );
 
    if ( !pOut )
    {
@@ -1003,27 +1003,23 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
             iPart ++;
             nTotalEncoded += nBytes;
 
-            sprintf( szYYEFileName, "%s%i%s", cMask, iPart,".yye" );
-
-            fDes = fopen( szYYEFileName, "wb");
-
-            nBytes = (( pLine->item.asLong.value * 130 ) + 42 );
+            nBytes = (( pLine->item.asLong.value * 130 ) + 100 );
 
             if (( nTotalEncoded + nBytes ) > filelen )
             {
                nBytes = filelen - nTotalEncoded;
             }
 
-            iResult = yEncode( fDes, pszFileName, fSrc, nBytes, iPart, filelen );
+            if ( nBytes )
+            {
+               sprintf( szYYEFileName, "%s%i%s", cMask, iPart,".yye" );
+               fDes = fopen( szYYEFileName, "wb");
+               iResult = yEncode( fDes, pszFileName, fSrc, nBytes, iPart, filelen );
+            }
 
          }
          else
          {
-            if ( fDes )
-            {
-               fclose( fDes );
-            }
-
             break;
          }
       }
