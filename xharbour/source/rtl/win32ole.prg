@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.2 2002/05/02 23:22:05 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.3 2002/05/03 00:34:02 ronpinkas Exp $
  */
 
 /*
@@ -55,12 +55,6 @@
 FUNCTION CreateObject( cString )
 
 RETURN TOleAuto():New( cString )
-
-//----------------------------------------------------------------------------//
-
-FUNCTION Alert( cMsg, aOptions )
-
-RETURN MessageBox( 0, cMsg, "xHarbour", 0 )
 
 //----------------------------------------------------------------------------//
 
