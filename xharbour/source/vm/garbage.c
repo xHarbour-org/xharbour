@@ -1,5 +1,6 @@
+
 /*
- * $Id: garbage.c,v 1.60 2003/11/09 23:16:39 jonnymind Exp $
+ * $Id: garbage.c,v 1.61 2003/11/24 15:15:26 lf_sfnet Exp $
  */
 
 /*
@@ -548,15 +549,11 @@ void hb_gcCollectAll()
    /* is anoter garbage in action? */
    #ifdef HB_THREAD_SUPPORT
       HB_MUTEX_LOCK( hb_runningStacks.Mutex );
-      if ( s_bCollecting == TRUE || s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
+      if ( s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
       {
          HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
          return;
       }
-      hb_runningStacks.content.asLong--;
-      HB_VM_STACK.bInUse = FALSE;
-      HB_COND_SIGNAL( hb_runningStacks.Cond );
-      s_bCollecting = TRUE;
 
       hb_threadWaitForIdle();
 
@@ -579,10 +576,6 @@ void hb_gcCollectAll()
          return;
       }
    #endif
-
-   /* Prevents startThread from being executed,
-      and stopThread from destroyng the stack */
-   HB_CRITICAL_LOCK( hb_threadStackMutex );
 
    /* By hypotesis, only one thread will be granted the right to be here;
    so cheching for consistency of s_pCurrBlock further is useless.*/
@@ -765,21 +758,20 @@ void hb_gcCollectAll()
    */
    s_uUsedFlag ^= HB_GC_USED_FLAG;
 
-   /* Step 5: release all the locks on the scanned objects */
+   /* Step 5: garbage requests will be now allowed again. */
+   s_bCollecting = FALSE;
+   
+   /* Step 6: release all the locks on the scanned objects */
    /* Put itself back on machine execution count */
-
-   /* Unblocks all threads */
-   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
-
+   
    #if defined( HB_THREAD_SUPPORT )
       HB_VM_STACK.uiIdleInspecting--;
       hb_runningStacks.aux = 0;
+      HB_VM_STACK.bInUse = TRUE;
       // this will also signal the changed situation.
-      HB_STACK_LOCK
+      HB_COND_SIGNAL( hb_runningStacks.Cond );
    #endif
 
-   /* Step 6: garbage requests will be now allowed again. */
-   s_bCollecting = FALSE;
 }
 
 /* JC1: THREAD UNSAFE
@@ -875,21 +867,6 @@ void hb_gcReleaseAll( void )
    HB_TRACE( HB_TR_INFO, ( "DONE Release All" ) );
 }
 
-void hb_gcInit( void )
-{
-   #ifdef HB_THREAD_SUPPORT
-      //hb_threadForbidenInit( &hb_gcCollectionForbid );
-      //HB_CRITICAL_INIT( s_GawMutex );
-   #endif
-}
-
-void hb_gcExit( void )
-{
-   #ifdef HB_THREAD_SUPPORT
-      //hb_threadForbidenDestroy( &hb_gcCollectionForbid );
-      //HB_CRITICAL_DESTROY( s_GawMutex );
-   #endif
-}
 
 /* service a single garbage collector step
  * Check a single memory block if it can be released

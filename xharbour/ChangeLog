@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1768 2003/11/26 03:17:24 likewolf Exp $
+ * $Id: ChangeLog,v 1.1769 2003/11/26 03:21:42 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-26 06:45 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/hvm.c
+  * source/vm/thread.c
+  * source/vm/garbage.c
+  * include/thread.c
+    ! Fix and optimization of threading model; Isomorphic model between all
+      architectures is now achieved.
+
+  * include/hbapi.c
+    - Removed now useless gcInit() and gcExit()
+
+  * mtgc.c
+    + Added a parameter to do checks without screen printouts (more speed,
+      more contention, more stress test!)
 
 2003-11-26 06:10 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/vm/fm.c

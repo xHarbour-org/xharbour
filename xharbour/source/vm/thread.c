@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.116 2003/11/12 13:49:14 jonnymind Exp $
+* $Id: thread.c,v 1.117 2003/11/12 15:04:59 jonnymind Exp $
 */
 
 /*
@@ -87,45 +87,18 @@
 
 #ifdef HB_THREAD_SUPPORT
 
+   #undef HB_CLEANUP_PUSH
+   #undef HB_CLEANUP_POP
+   #undef HB_CLEANUP_POP_EXEC
+   #define HB_CLEANUP_PUSH( x, y )
+   #define HB_CLEANUP_POP
+   #define HB_CLEANUP_POP_EXEC
+
 // FROM MEMVARS.C:
 //TODO:Move this in an appropriate file
 #define TABLE_INITHB_VALUE   100
 #define TABLE_EXPANDHB_VALUE  50
 
-/* Creating a trylock for systems that have to use LWR */
-#if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
-
-/* To be honest, this implementation is far from being thread safe;
-   TODO: better implementation, but I argue it will ALWAYS be better
-   to implement system specific solution, where available.
-*/
-
-static HB_CRITICAL_T s_mtxTryLock;
-
-BOOL hb_critical_trylock( HB_CRITICAL_T *lpMutex )
-{
-   HB_CRITICAL_LOCK( s_mtxTryLock );
-   if ( HB_SAME_THREAD( lpMutex->Locker, HB_CURRENT_THREAD()) )
-   {
-      lpMutex->nCount++;
-      HB_CRITICAL_UNLOCK( s_mtxTryLock );
-      return TRUE;
-   }
-   else
-   {
-      if ( lpMutex->nCount > 0 )
-      {
-         HB_CRITICAL_UNLOCK( s_mtxTryLock );
-         return FALSE;
-      }
-      HB_CRITICAL_LOCK( lpMutex->Critical );
-      lpMutex->nCount = 1;
-      lpMutex->Locker = HB_CURRENT_THREAD();
-      HB_CRITICAL_UNLOCK( s_mtxTryLock );
-   }
-}
-
-#endif  //LWR mutexes for OS without them.
 
 HB_STACK *hb_ht_stack = 0;
 HB_STACK *last_stack;
@@ -156,12 +129,8 @@ HB_EXPORT HB_CRITICAL_T hb_garbageAllocMutex;
 HB_EXPORT HB_CRITICAL_T hb_outputMutex;
 HB_EXPORT HB_CRITICAL_T hb_mutexMutex;
 HB_EXPORT HB_CRITICAL_T hb_cancelMutex;
-HB_EXPORT HB_CRITICAL_T hb_fenceMutex;
 
 HB_EXPORT HB_SHARED_RESOURCE hb_runningStacks;
-#ifdef HB_OS_WIN_32
-   HB_SHARED_RESOURCE hb_idleQueueRes;
-#endif
 
 BOOL hb_bIdleFence;
 
@@ -201,7 +170,8 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->pMethod = NULL;
    tc->Return.type = HB_IT_NIL;
    tc->bInUse = FALSE;
-
+   tc->iPcodeCount = 0;
+   
    tc->errorHandler = NULL;
    tc->errorBlock = hb_itemNew( NULL );
    tc->aTryCatchHandlerStack = hb_itemNew( NULL );
@@ -209,7 +179,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    /* VM requests and recover sequence */
    tc->uiActionRequest = 0;
    tc->lRecoverBase = 0;
-
+   
    hb_arrayNew( tc->aTryCatchHandlerStack, 0 );
    hb_gcLock(  tc->aTryCatchHandlerStack );
    tc->iLaunchCount = 0;
@@ -219,11 +189,11 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
       tc->th_h = NULL;
       tc->bCanceled = FALSE;
       tc->bCanCancel = FALSE;
-      /*
+      
       tc->iCleanCount = 0;
       tc->pCleanUp = (HB_CLEANUP_FUNC *) hb_xgrab( sizeof( HB_CLEANUP_FUNC ) * HB_MAX_CLEANUPS );
       tc->pCleanUpParam = (void **) hb_xgrab( sizeof( void *) * HB_MAX_CLEANUPS );
-      */
+      
    #endif
 
    for( i = 0; i < tc->wItems; i++ )
@@ -458,12 +428,12 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       hb_xfree( pStack->hMemvars );
 */
 
-   /*
+   
    #ifdef HB_OS_WIN_32
-   free( pStack->pCleanUp );
-   free( pStack->pCleanUpParam );
+   hb_xfree( pStack->pCleanUp );
+   hb_xfree( pStack->pCleanUpParam );
    #endif
-   */
+   
 
    // Free only if we are not destroing the main stack
    if ( pStack != &hb_stack )
@@ -668,11 +638,12 @@ HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *pMtx )
 void hb_threadCancelInternal( )
 {
    HB_THREAD_STUB
+   int iCount;
 
    /* Make sure we are not going to be canceled */
    HB_DISABLE_ASYN_CANC;
 
-/*
+
    iCount = HB_VM_STACK.iCleanCount;
    while ( iCount > 0 )
    {
@@ -680,7 +651,7 @@ void hb_threadCancelInternal( )
       HB_VM_STACK.pCleanUp[ iCount ]( HB_VM_STACK.pCleanUpParam[ iCount ]);
    }
    // the stack must have been destroyed by the last cleanup function
-*/
+
    hb_threadTerminator( &HB_VM_STACK );
    ExitThread( 0 );
 }
@@ -815,6 +786,8 @@ void hb_rawMutexForceUnlock( void * mtx )
    pthread_cleanup_push( hb_threadTerminator, NULL );
 #endif
 
+   HB_STACK_LOCK
+   
    // call errorsys() to initialize errorblock
    pExecSym = hb_dynsymFind( "ERRORSYS" );
 
@@ -1094,7 +1067,6 @@ HB_FUNC( STOPTHREAD )
             Mutex->waiting--;
       }
    }
-
 }
 
 
@@ -1623,6 +1595,7 @@ HB_EXPORT void hb_threadWaitAll()
    {
       hb_runningStacks.content.asLong--;
       HB_VM_STACK.bInUse = FALSE;
+      HB_COND_SIGNAL( hb_runningStacks.Cond );   
    }
 
    while ( hb_ht_stack->next != NULL )
@@ -1735,18 +1708,19 @@ void hb_threadResetAux( void *ptr )
 {
    ((HB_SHARED_RESOURCE *) ptr)->aux = 0;
    HB_COND_SIGNAL( hb_runningStacks.Cond );
+   HB_MUTEX_UNLOCK(  hb_runningStacks.Mutex );
 }
 
 /* hb_runningStacks mutex must be held before calling this function */
 void hb_threadWaitForIdle( void )
 {
-   HB_THREAD_STUB
+   //HB_THREAD_STUB
 
    /* Are we already idle inspectors ? */
-   if ( HB_VM_STACK.uiIdleInspecting )
+   /*if ( HB_VM_STACK.uiIdleInspecting )
    {
       return;
-   }
+   }*/
 
    /* Do we have to set an idle fence? */
    if ( hb_bIdleFence )
@@ -1755,14 +1729,19 @@ void hb_threadWaitForIdle( void )
       hb_runningStacks.aux = 1;
    }
 
+   hb_runningStacks.content.asLong --;
+   
    HB_CLEANUP_PUSH( hb_threadResetAux, hb_runningStacks );
-   /* wait until the road is clear */
+   /* wait until the road is clear (only WE are running) */
    while ( hb_runningStacks.content.asLong != 0 )
    {
       HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );
    }
    /* blocks all threads here if not blocked before */
    hb_runningStacks.aux = 1;
+   /* And also prevents other idle inspectors to go */
+   hb_runningStacks.content.asLong ++;
+   
    // no need to signal, no one must be awaken
    HB_CLEANUP_POP;
 }
@@ -1806,12 +1785,10 @@ void hb_threadInit( void )
    hb_bIdleFence = TRUE;
 
    #ifdef HB_OS_WIN_32
-      HB_CRITICAL_INIT( hb_fenceMutex );
       HB_CRITICAL_INIT( hb_cancelMutex );
 
       hb_dwCurrentStack = TlsAlloc();
       TlsSetValue( hb_dwCurrentStack, (void *)&hb_stack );
-      HB_SHARED_INIT( hb_idleQueueRes, 0 );
    #else
       pthread_key_create( &hb_pkCurrentStack, NULL );
       pthread_setspecific( hb_pkCurrentStack, (void *)&hb_stack );
@@ -1856,8 +1833,6 @@ void hb_threadCloseHandles( void )
    #ifdef HB_OS_WIN_32
       TlsFree( hb_dwCurrentStack );
       HB_CRITICAL_DESTROY( hb_cancelMutex );
-      HB_SHARED_DESTROY( hb_idleQueueRes );
-      HB_CRITICAL_DESTROY( hb_fenceMutex );
    #else
       HB_COND_DESTROY(hb_threadStackCond);
       pthread_key_delete( hb_pkCurrentStack );
@@ -1926,7 +1901,8 @@ void hb_threadCondSignal( HB_WINCOND_T *cond )
          LeaveCriticalSection( &cond->mtxUnblockLock );
          return;
       }
-      cond->nWaitersToUnblock += nSignalsToIssue=cond->nWaitersBlocked;
+      nSignalsToIssue = cond->nWaitersBlocked;
+      cond->nWaitersToUnblock += nSignalsToIssue;
       cond->nWaitersBlocked = 0;
    }
    else if ( cond->nWaitersBlocked > cond->nWaitersGone ) { // HARMLESS RACE CONDITION!
@@ -1948,18 +1924,18 @@ void hb_threadCondSignal( HB_WINCOND_T *cond )
 
 
 /** Timed wait */
+
 BOOL hb_threadCondWait( HB_WINCOND_T *cond, HANDLE mutex , DWORD dwTimeout )
 {
    HB_THREAD_STUB
 
    register int nSignalsWasLeft;
-   register int nWaitersWasGone;
    register int bTimeout;
 
    WaitForSingleObject( cond->semBlockLock, INFINITE );
    cond->nWaitersBlocked++;
    ReleaseSemaphore( cond->semBlockLock, 1, NULL );
-
+   
    HB_MUTEX_UNLOCK( mutex );
 
    HB_TEST_CANCEL_ENABLE_ASYN
@@ -1977,27 +1953,7 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, HANDLE mutex , DWORD dwTimeout )
 
    if ( (nSignalsWasLeft = cond->nWaitersToUnblock) != 0)
    {
-      if ( bTimeout ) {                       // timeout (or canceled)
-         if ( cond->nWaitersBlocked != 0) {
-            cond->nWaitersBlocked--;
-         }
-         else {
-            cond->nWaitersGone++;
-         }
-      }
-
-      if ( --cond->nWaitersToUnblock == 0)
-      {
-         if ( cond->nWaitersBlocked != 0)
-         {
-            ReleaseSemaphore( cond->semBlockLock, 1, NULL );
-            nSignalsWasLeft = 0;
-         }
-         else if ( (nWaitersWasGone = cond->nWaitersGone) != 0)
-         {
-            cond->nWaitersGone = 0;
-         }
-      }
+      cond->nWaitersToUnblock--;
    }
    else if ( ++cond->nWaitersGone == 2000000000L )
    {
@@ -2010,13 +1966,6 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, HANDLE mutex , DWORD dwTimeout )
 
    if ( nSignalsWasLeft == 1 )
    {
-      if ( nWaitersWasGone != 0)
-      {
-         while ( nWaitersWasGone-- )
-         {
-            WaitForSingleObject( cond->semBlockQueue, INFINITE );
-         }
-      }
       ReleaseSemaphore( cond->semBlockLock,1, NULL );
    }
 

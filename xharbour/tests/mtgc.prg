@@ -8,7 +8,7 @@
 *
 * (C) 2003 Giancarlo Niccolai & Ron Pinkas
 *
-* $Id: mtgc.prg,v 1.15 2003/10/18 01:15:19 jonnymind Exp $
+* $Id: mtgc.prg,v 1.16 2003/10/18 14:13:33 jonnymind Exp $
 *
 * This programs allocates Garbage Collectable objects in
 * subthreads, and force the collection in a crossed thread
@@ -19,11 +19,18 @@
 * the MT system.
 *
 
-#include "hbclass.ch"
 #include "hbmemory.ch"
 
-PROCEDURE Main()
+GLOBAL bDisplay
+
+PROCEDURE Main( cDisplay )
   LOCAL nStart;
+
+  IF cDisplay != NIL
+     bDisplay := .F.
+  ELSE
+     bDisplay := .T.
+  ENDIF
 
   SET OUTPUT SAFETY OFF
   set color to w+/b
@@ -93,7 +100,9 @@ PROCEDURE MyThreadFunc( nRow, cName, nStart, nMax )
   LOCAL i, aVar, cTest
 
   FOR i := nStart TO nMax
-     @ nRow, 10 SAY cName + Str( i )
+     IF bDisplay
+        @ nRow, 10 SAY cName + Str( i )
+     ENDIF
 
      aVar := { 1 }
      aVar[1] := Array( 50 )
@@ -101,10 +110,13 @@ PROCEDURE MyThreadFunc( nRow, cName, nStart, nMax )
      aVar[1][1] := aVar
      aVar := &cTest
 
-     @ nRow, 40 SAY "Before:" + Str( Memory( HB_MEM_USED ) )
-     HB_GCALL( .T. )
-     @ nRow, 60 SAY "After:" + Str( Memory( HB_MEM_USED ) )
-
+     IF bDisplay
+        @ nRow, 40 SAY "Before:" + Str( Memory( HB_MEM_USED ) )
+        HB_GCALL( .T. )
+        @ nRow, 60 SAY "After:" + Str( Memory( HB_MEM_USED ) )
+     ELSE
+         HB_GCALL( .T. )
+     ENDIF
   NEXT
 
 RETURN

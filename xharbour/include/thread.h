@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.63 2003/10/18 16:20:03 jonnymind Exp $
+* $Id: thread.h,v 1.64 2003/10/19 00:17:35 jonnymind Exp $
 */
 
 /*
@@ -72,7 +72,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 #define HB_THREAD_MAX_UNIQUE_ID  32000
 
 /* Maximun number of cycles that can be completed by VM without stack unlock */
-#define HB_VM_UNLOCK_PERIOD 20
+#define HB_VM_UNLOCK_PERIOD 100
 
 #if defined(HB_OS_WIN_32)
    #ifndef _WIN32_WINNT
@@ -147,9 +147,18 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    }
 
 
-   #define HB_CLEANUP_PUSH(X,Y)
-   #define HB_CLEANUP_POP
-   #define HB_CLEANUP_POP_EXEC
+   #define HB_CLEANUP_PUSH(X,Y) {\
+      HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ] = (X);\
+      HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount ] = (void *)&(Y);\
+      HB_VM_STACK.iCleanCount++;\
+   }
+      
+   #define HB_CLEANUP_POP (HB_VM_STACK.iCleanCount--);
+   
+   #define HB_CLEANUP_POP_EXEC {\
+      HB_VM_STACK.iCleanCount--;\
+      HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ]( HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount ]);\
+   }
 
 #ifdef __cplusplus
 extern "C" {
@@ -226,7 +235,6 @@ extern "C" {
       }\
       hb_runningStacks.content.asLong++;\
       HB_VM_STACK.bInUse = TRUE;\
-      HB_COND_SIGNAL( hb_runningStacks.Cond );\
    }\
    HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );\
 }
@@ -284,6 +292,9 @@ typedef struct tag_HB_STACK
 
    UINT th_vm_id;
 
+   /* Pcode releasing accounting */
+   int iPcodeCount;
+   
    HB_THREAD_T th_id;
    /* Is this thread going to run a method? */
    BOOL bIsMethod;
@@ -367,11 +378,10 @@ typedef struct tag_HB_STACK
    HANDLE th_h;
    BOOL bCanceled; /* set when there is a cancel request and bInUse is true */
    BOOL bCanCancel;
-   /* Windows cleanup functions are working, but currently uneeded;
-   So the are left here in [LEFTOVER] status
+   /* Windows cleanup functions */
    HB_CLEANUP_FUNC *pCleanUp;
    void **pCleanUpParam;
-   int iCleanCount;*/
+   int iCleanCount;
 #endif
 
 } HB_STACK;
@@ -415,44 +425,6 @@ typedef struct tag_HB_SHARED_RESOURCE
    HB_COND_DESTROY( pshr.Cond ); \
 }
 
-#define HB_COND_EQUAL         0
-#define HB_COND_GREATER       1
-#define HB_COND_GREATER_EQUAL 2
-#define HB_COND_LESS          3
-#define HB_COND_INC           1
-#define HB_COND_SET           0
-
-#include <hbtrace.h>
-/* Lightweight macro for condition check */
-/*   TraceLog( "mtgc.log", "FILE %s(%d): BEGINWAIT: %d   THID: %d\r\n", __FILE__, __LINE__, pshr.content.asLong, HB_CURRENT_THREAD() ); */
-#define HB_SET_SHARED( pshr, pMode, pValue ) \
-{\
-   HB_MUTEX_LOCK( pshr.Mutex );\
-   pshr.content.asLong = pMode == HB_COND_INC ? pshr.content.asLong + pValue : pValue;\
-   HB_COND_SIGNAL( pshr.Cond );\
-   HB_MUTEX_UNLOCK( pshr.Mutex );\
-}
-
-/* Lightweight macro for condition check */
-#define HB_WAIT_SHARED( pshr, cond, pData, pMode, pValue ) \
-{\
-   HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, pshr.Mutex );\
-   HB_MUTEX_LOCK( pshr.Mutex );\
-   while ( 1 ) \
-   {\
-      if ( (cond == HB_COND_EQUAL && (long) pData == pshr.content.asLong) ||\
-         (cond == HB_COND_GREATER && pshr.content.asLong > (long) pData) ||\
-         (cond == HB_COND_GREATER_EQUAL && pshr.content.asLong >= (long) pData) || \
-         (cond == HB_COND_LESS && pshr.content.asLong < (long) pData) )\
-         break;\
-      HB_COND_WAIT( pshr.Cond, pshr.Mutex );\
-   }\
-   pshr.content.asLong = pMode == HB_COND_INC ? pshr.content.asLong + pValue : pValue;\
-   HB_COND_SIGNAL( pshr.Cond );\
-   HB_MUTEX_UNLOCK( pshr.Mutex );\
-   HB_CLEANUP_POP;\
-}
-
 /** JC1:
    In MT libs, every function accessing stack will record the HB_STACK
    (provided by hb_threadGetCurrentContext()) into a local Stack variable, and
@@ -468,66 +440,6 @@ typedef struct tag_HB_SHARED_RESOURCE
    #define HB_THREAD_STUB
 #endif
 
-/* LWRM management */
-
-/* JC1: If we want flat mutex, this section should be uncommented
-extern void hb_threadLock( HB_LWR_MUTEX *m );
-extern void hb_threadUnlock( HB_LWR_MUTEX *m );
-*/
-
-/** AUTO reentrant mutex if using UNIX */
-/** JC1: we'll be using it in POSIX implementation without reentrant mutexes */
-#if 0
-/* Ligthweight system indepented reentrant mutex, used internally by harbour */
-typedef struct tag_HB_LWR_MUTEX
-{
-    HB_THREAD_T Locker;
-    HB_CRITICAL_T Critical;
-    int nCount;
-} HB_LWR_MUTEX;
-
-   ! defined( HB_OS_LINUX )
-
-    #define HB_CRITICAL_T               HB_LWR_MUTEX
-    #define HB_CRITICAL_INIT( x )       \
-            { \
-               HB_CRITICAL_INIT( x.Critical );    \
-               x.Locker = 0; \
-               x.nCount = 0; \
-            }
-
-    #define HB_CRITICAL_DESTROY( x )    HB_CRITICAL_DESTROY( x.Critical )
-
-    #define HB_CRITICAL_LOCK( lpMutex )  \
-         { \
-            if ( lpMutex.Locker == HB_CURRENT_THREAD() )\
-            {\
-               lpMutex.nCount++;\
-            }\
-            else\
-            {\
-               HB_CRITICAL_LOCK( lpMutex.Critical );\
-               lpMutex.nCount = 1;\
-               lpMutex.Locker = HB_CURRENT_THREAD();\
-            }\
-         }
-
-    BOOL hb_critical_mutex_trylock( HB_CRITICAL_T *lpMutex );
-    #define HB_CRITICAL_TRYLOCK( Mutex )   hb_critical_mutex_trylock( &(Mutex) )
-
-    #define HB_CRITICAL_UNLOCK( lpMutex ) \
-         {\
-            if ( lpMutex.Locker == HB_CURRENT_THREAD() )\
-            {\
-               lpMutex.nCount--;\
-               if ( lpMutex.nCount == 0 )\
-               {\
-                  lpMutex.Locker = 0;\
-                  HB_CRITICAL_UNLOCK( lpMutex.Critical );\
-               }\
-            }\
-         }
-#endif
 
 /* More elegant guard of a small section of code */
 #define HB_THREAD_GUARD( mutex, code )\
@@ -561,11 +473,6 @@ extern HB_CRITICAL_T hb_mutexMutex;
 
 /* count of running stacks; set to -1 to block stacks from running */
 extern HB_SHARED_RESOURCE hb_runningStacks;
-#ifdef HB_OS_WIN_32
-   /* Fence guard for windows */
-   extern HB_CRITICAL_T hb_fenceMutex;
-   extern HB_SHARED_RESOURCE hb_idleQueueRes;
-#endif
 
 /* regulates idle aware threads to be fenced or free */
 extern BOOL hb_bIdleFence;
@@ -610,11 +517,6 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
 
 /* Win 32 specific functions */
 #ifdef HB_OS_WIN_32
-   DWORD hb_SignalObjectAndWait( HB_MUTEX_T hToSignal, HB_COND_T hToWaitFor, DWORD dwMillisec, BOOL bUnused );
-   void hb_threadSuspendAll( void );
-   void hb_threadResumeAll( void );
-   void hb_threadSubscribeIdle( HB_IDLE_FUNC );
-   void hb_threadCallIdle( void );
    void hb_threadCancelInternal( void );
 
    BOOL hb_threadCondInit( HB_WINCOND_T *cond );
@@ -637,8 +539,6 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
    #define HB_THREAD_GUARD( mutex, code ) { code; }
 
    #define HB_TEST_CANCEL
-   #define HB_SET_SHARED( x, y, z )
-   #define HB_WAIT_SHARED( x, y, z, k, m )
    #define HB_STACK_LOCK
    #define HB_STACK_UNLOCK
    #define HB_CLEANUP_PUSH( x, y )

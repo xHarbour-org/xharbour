@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.283 2003/11/24 15:15:26 lf_sfnet Exp $
+ * $Id: hvm.c,v 1.284 2003/11/26 03:17:48 likewolf Exp $
  */
 
 /*
@@ -402,8 +402,6 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       b_MouseEnable = FALSE;
 #endif
 
-   hb_gcInit();
-
    /* initialize internal data structures */
    s_aStatics.type = HB_IT_NIL;
    s_iErrorLevel = 0;
@@ -752,9 +750,6 @@ int HB_EXPORT hb_vmQuit( void )
    hb_xexit();
    //printf("After xexit\n" );
 
-   hb_gcExit();
-   //printf("After gcExit\n" );
-
    hb_traceExit();
    //printf("After traceExit\n" );
 
@@ -771,9 +766,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 {
    HB_THREAD_STUB
 
-#ifdef HB_THREAD_SUPPORT
-   int iCount = 0;
-#endif
    LONG w = 0;
    BOOL bCanRecover = FALSE;
    ULONG ulPrivateBase;
@@ -852,12 +844,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 #endif
       /* JC1: we can proceed here only if not in garbage collecting */
 #if defined(HB_THREAD_SUPPORT)
-      if ( iCount == 0 )
+ /*     if ( HB_VM_STACK.iPcodeCount == 0 )
       {
          HB_DISABLE_ASYN_CANC;
          HB_STACK_LOCK;
       }
-      iCount++;
+      HB_VM_STACK.iPcodeCount++;*/
 #endif
       switch( pCode[ w ] )
       {
@@ -3130,8 +3122,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               HB_STACK_UNLOCK;
-               HB_TEST_CANCEL_ENABLE_ASYN;
+               //HB_STACK_UNLOCK;
+               //HB_TEST_CANCEL_ENABLE_ASYN;
                break;
             }
          }
@@ -3142,8 +3134,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_vm_bQuitRequest = TRUE;
             #endif
 
-            HB_STACK_UNLOCK;
-            HB_TEST_CANCEL_ENABLE_ASYN;
+            //HB_STACK_UNLOCK;
+            //HB_TEST_CANCEL_ENABLE_ASYN;
             break;
          }
          else if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
@@ -3152,20 +3144,29 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              * (from macro evaluation)
              */
             s_uiActionRequest = 0;
-            HB_STACK_UNLOCK;
-            HB_TEST_CANCEL_ENABLE_ASYN;
+            // no need to unlock the stack
+            //HB_STACK_UNLOCK;
+            //HB_TEST_CANCEL_ENABLE_ASYN;
             break;
          }
       }
 
       /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
       #if defined( HB_THREAD_SUPPORT )
-         if( iCount == HB_VM_UNLOCK_PERIOD )
+         if( HB_VM_STACK.iPcodeCount == HB_VM_UNLOCK_PERIOD )
          {
+            HB_VM_STACK.iPcodeCount = 0;
             HB_STACK_UNLOCK;
             HB_TEST_CANCEL_ENABLE_ASYN;
-            iCount = 0;
+
+            /* This would be a GOOD place where to do things that are
+             interruptable and may take a long time; we can also move
+             the above or the below code slice to embrace VM regions
+             that are acting as interruptable cleanup routines */
+            HB_DISABLE_ASYN_CANC;
+            HB_STACK_LOCK;
          }
+         HB_VM_STACK.iPcodeCount++;
       #endif
    }
 
