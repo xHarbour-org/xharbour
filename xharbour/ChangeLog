@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.1223 2003/07/07 13:22:50 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1224 2003/07/07 18:41:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-08 07:51 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * source/rtl/Makefile
+  + source/rtl/hbbitfield.c
+    + Added following functions:
+      HB_BitAnd( nOperand1, nOperand2 ) --> nResult
+      HB_BitOr( nOperand1, nOperand2 ) --> nResult
+      HB_BitXor( nOperand1, nOperand2 ) --> nResult
+      HB_BitNot( nOperand ) --> nResult
+      HB_BitSet( nOperand, nBitToSet ) --> nResult
+      HB_BitReset( nOperand, nBitToReset ) --> nResult
+      HB_BitShift( nOperand, nPositions ) --> nResult
+      HB_BitIsSet( nOperand, nBitToCheck ) --> lIsSet
+
+      All this functions automatically converts integers and
+      long integers so that the returned result has the same
+      capacity as the widest parameter.
+      Also, check for numeric int or long parameter passing
+      is done, or an error is risen.
+      nPosition parameter in HB_BitShift can be positive (to
+      shift left) or negative (to shift right).
+
+  + source/rtl/bitfield.prg
+    + Added test for bitfield operations
+
+  Update & check for windows is on its way.
+
 
 2003-07-07 11:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * contrib/Whoo/source/TCBrowser.prg
@@ -51,6 +78,13 @@
       /*
          This fixes "Internal error: invalid language selected."
       */
+
+2003-07-07 03:48 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * source/vm/thread.c
+    ! removed some warnings
+  * source/vm/itemapi.c
+    ! When defining HB_LONG_DOUBLE_OFF to disable the long double
+      extensions, was not compiling in line 1500. Fixed
 
 2003-07-06 22:00 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   + bin/bld_solib.sh
