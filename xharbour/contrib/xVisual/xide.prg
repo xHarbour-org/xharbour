@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.89 2002/10/16 17:56:57 what32 Exp $
+ * $Id: xide.prg,v 1.90 2002/10/16 21:24:41 fsgiudice Exp $
  */
 
 /*
@@ -222,6 +222,7 @@ METHOD MainStatusBar() CLASS MainFrame
    ::Status:SetPanels( { 150,380,480,580,-1 } )
    ::Status:SetPanelText( 0, "Visual xHarbour" )
 return(self)
+
 
 //----------------------------------------------------------------------------------------------
 
