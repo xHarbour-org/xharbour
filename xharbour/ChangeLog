@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3177 2004/07/21 11:34:20 vouchcac Exp $
+ * $Id: ChangeLog,v 1.3178 2004/07/21 20:59:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-07-22 09:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/file.c
+    - hb_fsFile() changed so FILE() is Clipper compatible when using wildcards '*' & '?'
 
 2004-07-21 13:58 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/compiler/harbour.c
