@@ -1,5 +1,5 @@
 /*
- * $Id: sitesvr.prg,v 1.6 2003/02/19 20:20:29 jonnymind Exp $
+ * $Id: sitesvr.prg,v 1.7 2003/04/13 23:55:26 jonnymind Exp $
  */
 
 ***********************************************************
@@ -65,7 +65,6 @@ PROCEDURE Main( cPort)
 
    hView   := StartThread( @ViewUpdate(), Socket )
    hAccept := StartThread( @AcceptIncoming(), Socket )
-   ThreadSleep(200)
 
    DO WHILE .T.
       cCommand := Space( 50 )
@@ -234,8 +233,7 @@ PROCEDURE ServeClient( Socket )
    *** Now we process the request:
    ProcessRequest( Socket, @cRequest, @aFields, cPostData )
 
-   *** The segmentation fault should be here.
-   InetClose( Socket )
+   InetDestroy( Socket )
    MutexLock( MutexCount )
    g_nUserCount--
    MutexUnlock( MutexCount )
@@ -283,7 +281,6 @@ PROCEDURE ProcessRequest( Socket, cRequest, aFields, cPostData )
    ENDIF
 
    InetSendAll( Socket, @cReply )
-   ThreadSleep( 100 )
 RETURN
 
 ******************************************
