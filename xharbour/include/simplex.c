@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.13 2005/02/26 09:43:29 ronpinkas Exp $
+ * $Id: simplex.c,v 1.14 2005/02/27 05:51:59 ronpinkas Exp $
  */
 
 /*
@@ -795,6 +795,10 @@ int SimpLex_GetNextToken( void )
                    DEBUG_INFO( printf(  "Reducing NewLine '%c'\n", chr ) );
                    bIgnoreWords = FALSE;
                    bNewLine = TRUE;
+
+                   /* Reset. */
+                   sSelf[0] = '\0';
+
                    return (int) chr;
                }
             }

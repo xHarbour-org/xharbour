@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3889 2005/02/28 10:17:25 andijahja Exp $
+ * $Id: ChangeLog,v 1.3890 2005/02/28 11:56:04 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-28 11:27 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * include/simplex.c
+    * Added 1 missing reset of sSelf[0].
+
 2005-02-28 19:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/pplib.c
   * contrib/libnf/color2n.c
@@ -145,7 +150,7 @@
   * xharbour/include/hbsetup.h
     * added auto detection for LINUX, SUNOS and HPUX - this code
       should also be cleaned to give deterministic results
-    
+
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
     * some minor modifications
     ! fixed counting EOF and other "out of scope" records in ordKeyPos()
