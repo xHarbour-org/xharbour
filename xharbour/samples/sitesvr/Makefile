@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2003/02/12 11:23:30 jonnymind Exp $
+# $Id: Makefile,v 1.7 2003/02/13 01:22:35 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -21,5 +21,6 @@ LIBS=\
 	macro \
 	ppmt \
 	common \
+	
 
 include $(TOP)$(ROOT)config/bin.cf

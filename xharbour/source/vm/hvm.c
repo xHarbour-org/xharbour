@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.159 2003/02/12 19:26:17 map Exp $
+ * $Id: hvm.c,v 1.160 2003/02/18 23:54:57 jonnymind Exp $
  */
 
 /*
@@ -6388,8 +6388,9 @@ HB_FUNC( HB_EXEC )
 }
 
 
-/* JC1: HB_ExecFromArray executes a function using contents of an array as parameter list 
+/* JC1: HB_ExecFromArray executes a function using contents of an array as parameter list
 * Format is:
+* HB_ExecFromArray( aArray ) // aArray = { @Func(),...} or any other format
 * HB_ExecFromArray( @Func(), aArray )
 * HB_ExecFromArray( oObject, @Method(), aArray )
 */
@@ -6401,7 +6402,7 @@ HB_FUNC( HB_EXECFROMARRAY )
    PHB_DYNS pExecSym = NULL;
    PHB_FUNC pFunc;
    int i;
-   ULONG ulLen;
+   ULONG ulLen, ulStart = 1;
 
    if( HB_IS_OBJECT( pFirst ) && hb_pcount() == 3)
    {
@@ -6431,6 +6432,39 @@ HB_FUNC( HB_EXECFROMARRAY )
       // prepare stack to launch the function
       pArgs = hb_param( 2, HB_IT_ARRAY );
    }
+   else if( pFirst->type == HB_IT_ARRAY )
+   {
+      pString = hb_arrayGetItemPtr( pFirst, 1 );
+      pArgs = pFirst;
+      if( HB_IS_OBJECT( pString ) &&  hb_arrayLen( pFirst ) >= 2 )
+      {
+         pSelf = pString;
+         pString = hb_arrayGetItemPtr( pFirst, 2 );
+
+         if( pString->type == HB_IT_STRING )
+         {
+            pFunc = (PHB_FUNC) hb_objHasMsg( pSelf, pString->item.asString.value );
+         }
+         else if( pString->type == HB_IT_LONG )
+         {
+            pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+         }
+         pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+         ulStart = 3;
+      }
+      else if( pString->type == HB_IT_STRING )
+      {
+         pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pString ) );
+         ulStart = 2;
+      }
+      else if( pString->type == HB_IT_LONG )
+      {
+         pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+         pExecSym = hb_dynsymFindFromFunction( pFunc );
+         ulStart = 2;
+      }
+
+   }
 
    if( pExecSym == NULL || pArgs == NULL)
    {
@@ -6452,18 +6486,18 @@ HB_FUNC( HB_EXECFROMARRAY )
    ulLen = hb_arrayLen( pArgs );
 
    // pushing the contents of the array
-   for( i = 1; i <= ulLen; i ++ )
+   for( i = ulStart; i <= ulLen; i ++ )
    {
       hb_vmPush( hb_arrayGetItemPtr( pArgs, i ) );
    }
 
    if( pSelf )
    {
-      hb_vmSend( ulLen );
+      hb_vmSend( ulLen - ulStart + 1 );
    }
    else
    {
-      hb_vmDo( ulLen );
+      hb_vmDo( ulLen - ulStart + 1);
    }
 }
 

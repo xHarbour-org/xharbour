@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.734 2003/02/19 02:07:13 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.735 2003/02/19 02:25:29 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-19 11:15 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/hvm.c
+    + Added LISP like array direct call to HB_ExecFromArray:
+      HB_ExecFromArray( aArray )
+      Where aArray must have one of the following formats:
+      aArray := { @Func(), param1 .. paramN }
+      aArray := { "FunctionName", param1 .. paramN }
+      aArray := { oObject, "MethodName", param1 .. paramN }
+      aArray := { oObject, nMethodID, param1 .. paramN }
+      NOTE: HB_ExecFromArray() Returns the data returned by
+      the called function or method.
+
+  * tests/exec.prg
+    + test to demonstrate this new features
 
 2003-02-19 03:03 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * include/hbclass.ch

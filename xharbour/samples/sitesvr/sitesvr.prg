@@ -1,5 +1,5 @@
 /*
- * $Id: sitesvr.prg,v 1.3 2003/01/15 20:23:26 jonnymind Exp $
+ * $Id: sitesvr.prg,v 1.4 2003/02/13 01:22:35 jonnymind Exp $
  */
 
 ***********************************************************
@@ -71,7 +71,7 @@ PROCEDURE Main( cPort)
 
       @ 5, 5 SAY "Enter Command      : " GET cCommand
       HBConsoleUnlock()
-      READ
+      *READ
 
       cCommand := Trim( cCommand )
 
