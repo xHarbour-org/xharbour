@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2918 2004/05/10 21:19:05 andijahja Exp $
+ * $Id: ChangeLog,v 1.2919 2004/05/11 01:22:37 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-11 14:10 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/libct/ctmisc.prg
+    ! Fixed CENTER() to accept NIL value as the first parameter.
 
 2004-05-11 03:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/config/bsd/gcc.cf

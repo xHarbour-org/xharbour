@@ -1,5 +1,5 @@
 /*
- * $Id: ctmisc.prg,v 1.1 2003/03/04 21:04:26 lculik Exp $
+ * $Id: ctmisc.prg,v 1.2 2004/03/03 19:27:13 likewolf Exp $
  */
 
 /*
@@ -57,6 +57,7 @@
 MEMVAR GetList
 
 FUNCTION CENTER( c, n, p )
+   DEFAULT c TO ""
    RETURN PadC( AllTrim( c ), n, p )
 
 FUNCTION CSETCURS( l )
