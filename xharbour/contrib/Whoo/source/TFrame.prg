@@ -27,6 +27,7 @@
 #include "windows.ch"
 #include "what32.ch"
 #include "error.ch"
+#include "debug.ch"
 
 #Define RCF_DIALOG     0
 #Define RCF_WINDOW     1
@@ -92,6 +93,7 @@ METHOD Add( oObj ) CLASS TFrame
       NEXT
 
       oObj:Name := oObj:ControlName + AllTrim( Str( nInst ) )
+      view oObj:Name
    ENDIF
 
    ::SetLink( oObj )

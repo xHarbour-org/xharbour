@@ -1,5 +1,5 @@
 /*
- * $Id: TComponent.prg,v 1.5 2002/11/08 02:51:37 ronpinkas Exp $
+ * $Id: TComponent.prg,v 1.6 2002/11/08 02:54:49 ronpinkas Exp $
  */
 
 /*
@@ -27,6 +27,8 @@
  * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
  *
  */
+
+GLOBAL EXTERNAL oApp
 
 #include "windows.ch"
 #include "HbClass.ch"
@@ -106,8 +108,10 @@ ENDCLASS
 
 METHOD Create( oOwner ) CLASS TComponent
 
-   oOwner:InsertComponent( Self )
-
+   IF ! oOwnew == oApp
+      oOwner:InsertComponent( Self )
+   ENDIF
+   
 RETURN( Self )
 
 
@@ -117,7 +121,7 @@ METHOD InsertComponent( oComponent ) CLASS TComponent
 
   //ValidateRename( oComponent, '', oComponent:FName )
 
-  ::Insert(oComponent)
+  ::Insert( oComponent )
 
   //oComponent.SetReference( .T. )
   //IF And( csDesigning, ComponentState )

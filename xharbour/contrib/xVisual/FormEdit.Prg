@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.81 2002/11/05 21:40:09 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.82 2002/11/08 01:36:01 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -86,9 +86,9 @@ GLOBAL EXTERNAL FormEdit
                                     ::xGrid    := 8          ,;
                                     ::yGrid    := 8          ,;
                                     ::GridColor:=RGB(0,0,0) ,;
+                                    ::XFMTop(),;
                                     super:Create( oParent ) ,;
                                     ::GetHandle(),;
-                                    ::XFMTop(),;
                                     Self
 
 

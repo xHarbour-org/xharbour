@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.37 2002/10/30 21:39:29 ronpinkas Exp $
+ * $Id: CtrlMask.Prg,v 1.38 2002/11/08 01:36:01 what32 Exp $
  */
 
 /*
@@ -127,17 +127,18 @@ ENDCLASS
 
 METHOD Create( oParent ) CLASS oCtrlMask
 
-   ::left      := 0
-   ::top       := 0
-   ::width     := oParent:width
-   ::height    := oParent:height
+   ::Fleft      := 0
+   ::Ftop       := 0
+   ::Fwidth     := oParent:Fwidth
+   ::Fheight    := oParent:Fheight
+   
    ::style     := WS_CHILD + WS_VISIBLE
    ::WinClass  := "CTRLMASK"
    ::ControlName := "CTRLMASK"
    ::color     := GetStockObject( NULL_BRUSH )
    ::ExStyle   := WS_EX_TRANSPARENT
    ::Cursor    := 0
-   ::Caption   := ""
+   ::FCaption   := ""
    ::lRegister := .T.
    ::WndProc   := 'FormProc'
    ::Msgs      := -1

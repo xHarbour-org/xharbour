@@ -1,5 +1,5 @@
 /*
- * $Id: xPad.prg,v 1.8 2002/11/07 20:05:57 what32 Exp $
+ * $Id: xPad.prg,v 1.9 2002/11/08 01:36:01 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -189,7 +189,7 @@ typedef struct tagTEXTMETRIC {;
 //---------------------------------------------------------------------------------------------
 CLASS ObjEdit FROM TForm
 
-   DATA oEd
+   DATA SourceEdit
   
    METHOD Create()
    
@@ -209,10 +209,10 @@ METHOD Create( oParent ) CLASS ObjEdit
 
    ::GetHandle()
 
-   ::oEd := oEdit():New( ::FHandle )
+   ::SourceEdit := oEdit():New( ::FHandle )
    ResetProcedure( ::FHandle )
-   ::oEd:configure()
-   ::oEd:subclass()
+   ::SourceEdit:configure()
+   ::SourceEdit:subclass()
    UpdateWindow( ::FHandle )
 
 return( Self )

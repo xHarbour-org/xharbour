@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.116 2002/11/07 23:01:39 what32 Exp $
+ * $Id: xide.prg,v 1.117 2002/11/08 01:36:01 what32 Exp $
  */
 
 /*
@@ -118,10 +118,10 @@ METHOD MainToolBar() CLASS MainFrame
    LOCAL n, oTool, oSplash
    LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab
 
-   ::Add( TRebar():Create( MainFrame ) )
+   TRebar():Create( MainFrame )
 
     // add the xmake toolbar
-   WITH OBJECT ::Add( TToolBar():Create( MainFrame ) )
+   WITH OBJECT TToolBar():Create( MainFrame )
       ToolButton():Create( ::ToolBar1 ):Hint := "New Project"
       ToolButton():Create( ::ToolBar1 ):Hint := "Open Project"
       ToolButton():Create( ::ToolBar1 ):Hint := "Properties"
@@ -150,7 +150,7 @@ METHOD MainToolBar() CLASS MainFrame
    ::Rebar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolBar1:handle, 200, 52, 200, "", NIL )
    // add the TabControl on the Rebarband
 
-   WITH OBJECT ::Add( ToolTabs():Create( MainFrame ) )
+   WITH OBJECT ToolTabs():Create( MainFrame )
       :AddTab( "StdTab", TabPage():Create( MainFrame:ToolTabs ) )
       :StdTab:Caption := "Standard"
       
@@ -171,7 +171,7 @@ METHOD MainToolBar() CLASS MainFrame
 
    // sets the controls toolbar on the TabControl
    With Object ::ToolTabs:StdTab
-      :Add( TRebar():Create( MainFrame:ToolTabs:StdTab ) )
+      TRebar():Create( MainFrame:ToolTabs:StdTab )
       :Rebar1:SetStyle( WS_BORDER, .F. )
       With Object :Add( StdTools():Create( MainFrame:ToolTabs:StdTab ) )
          :GetHandle()
@@ -203,7 +203,7 @@ METHOD MainToolBar() CLASS MainFrame
 
 //----------------------------------------------------------------------------------------------
    With Object ::ToolTabs:Win32
-      :Add( TRebar():Create( MainFrame:ToolTabs:Win32 ) )
+      TRebar():Create( MainFrame:ToolTabs:Win32 )
       :Rebar1:SetStyle( WS_BORDER, .F. )
       With Object :Add( WinTools():Create( ::ToolTabs:Win32 ) )
          :GetHandle()
@@ -242,11 +242,13 @@ return(self)
 //----------------------------------------------------------------------------------------------
 
 METHOD MainStatusBar() CLASS MainFrame
-   ::Add( TStatusBar():Create( Self ) )
-   ::StatusBar1:Id      := 1001
+
+   TStatusBar():Create( Self )
+
    ::StatusBar1:Caption := 'StatusBar'
    ::StatusBar1:SetPanels( { 150,380,480,580,-1 } )
    ::StatusBar1:SetPanelText( 0, "Visual xHarbour" )
+
 return(self)
 
 //----------------------------------------------------------------------------------------------
