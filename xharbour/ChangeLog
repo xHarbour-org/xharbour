@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.86 2002/03/01 21:15:55 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.87 2002/03/04 07:05:30 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-04 11:48 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * source/rdd/dbfcdx/dbfcdx1.c
+     ! fixed bug seek and set deleted on, reported by Lorenzo Fiorini
+       also fix bug with set filter
+     ! fixed bug with ordkeyno() and ordkeycount(),
+       reported by Manuel Mercado Gómez
 
 2002-03-03 23:10 UTC-0800 Brian Hays <bhays@abacuslaw.com>
    * source/rtl/persist.prg
