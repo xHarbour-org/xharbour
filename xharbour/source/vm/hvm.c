@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.83 2002/06/24 04:17:20 ronpinkas Exp $
+ * $Id: hvm.c,v 1.84 2002/07/05 19:53:30 ronpinkas Exp $
  */
 
 /*
@@ -4009,9 +4009,7 @@ void hb_vmDo( USHORT uiParams )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDo(%hu)", uiParams));
 
-   /*
-   printf( "\VmDo nItems: %i Params: %i Extra %i\n", hb_stack.pPos - hb_stack.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
-   */
+   //printf( "\VmDo nItems: %i Params: %i Extra %i\n", hb_stack.pPos - hb_stack.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
 
    if( hb_vm_iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] + 2 ) ) ) && pItem->item.asSymbol.value == hb_vm_apExtraParamsSymbol[hb_vm_iExtraParamsIndex - 1] )
    {
@@ -4150,7 +4148,6 @@ void hb_vmSend( USHORT uiParams )
    if( hb_vm_bWithObject )
    {
       hb_vm_bWithObject = FALSE;
-      //( * ( hb_stack.pBase + 1 ) ) = &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] );
       hb_itemCopy( * ( hb_stack.pBase + 1 ), &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ) ) ;
    }
 
@@ -4190,9 +4187,7 @@ void hb_vmSend( USHORT uiParams )
          USHORT nPos;
          USHORT uiClass;
 
-         /*
-         printf( "\n VmSend Method: %s \n", pSym->szName );
-         */
+         //printf( "\n VmSend Method: %s \n", pSym->szName );
          uiClass = pSelfBase->uiClass;
 
          pRealSelf = hb_itemNew( NULL ) ;
@@ -4206,7 +4201,7 @@ void hb_vmSend( USHORT uiParams )
          /* Push current SuperClass handle */
          lPopSuper = TRUE ;
 
-         if ( ! pSelf->item.asArray.value->puiClsTree )
+         if( ! pSelf->item.asArray.value->puiClsTree )
          {
             pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
             pSelf->item.asArray.value->puiClsTree[0]=0;
@@ -5677,8 +5672,10 @@ HB_FUNC( ERRORLEVEL )
             accepts other types also and considers them zero. [vszakats] */
 
    if( hb_pcount() >= 1 )
+   {
       /* Only replace the error level if a parameter was passed */
       s_byErrorLevel = hb_parni( 1 );
+   }
 }
 
 void hb_vmRequestQuit( void )
@@ -5924,7 +5921,72 @@ HB_FUNC( HB_FUNCPTR )
    }
    else
    {
-      hb_vmPushLong( 0 );
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_FuncPtr", 1, hb_paramError( 1 ) );
+   }
+}
+
+HB_FUNC( HB_EXEC )
+{
+   PHB_ITEM pPointer = *( hb_stack.pBase + 1 + 1 );
+
+   if ( pPointer->type == HB_IT_LONG )
+   {
+      PHB_FUNC pFunc = (PHB_FUNC) hb_itemGetNL( pPointer );
+      PHB_ITEM pSelf;
+      PHB_DYNS pExecSym;
+      int iParams;
+
+      if( hb_pcount() >= 2 )
+      {
+         if( HB_IS_OBJECT( *( hb_stack.pBase + 1 + 2 ) ) )
+         {
+            pSelf = *( hb_stack.pBase + 1 + 2 );
+            pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+         }
+         else
+         {
+            pSelf = NULL;
+         }
+
+         iParams = hb_pcount() - 2;
+      }
+      else
+      {
+         pSelf = NULL;
+         iParams = 0;
+         hb_vmPushNil();
+      }
+
+      if( pSelf == NULL )
+      {
+         pExecSym = hb_dynsymFindFromFunction( pFunc );
+      }
+
+      if( pExecSym == NULL )
+      {
+         hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_Exec", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+         return;
+      }
+
+      //printf( "Sym: %p Name: %s\n", pExecSym, pExecSym->pSymbol->szName );
+
+      // Changing the Pointer item to a Symbol Item, so that we don't have to re-push paramters.
+      pPointer->type = HB_IT_SYMBOL;
+      pPointer->item.asSymbol.value = pExecSym->pSymbol;
+      pPointer->item.asSymbol.stackbase = hb_stackTopOffset() - 2 - iParams;
+
+      if( pSelf )
+      {
+         hb_vmSend( iParams );
+      }
+      else
+      {
+         hb_vmDo( iParams );
+      }
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_Exec", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.23 2002/06/21 19:18:27 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.24 2002/07/23 01:36:43 ronpinkas Exp $
  */
 
 /*
@@ -462,7 +462,9 @@ extern PHB_DYNS hb_dynsymFind( char * szName );   /* finds a dynamic symbol */
 extern PHB_DYNS hb_dynsymFindName( char * szName ); /* converts to uppercase and finds a dynamic symbol */
 extern void     hb_dynsymLog( void );             /* displays all dynamic symbols */
 extern void     hb_dynsymRelease( void );         /* releases the memory of the dynamic symbol table */
-extern void     hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ); /* enumerates all dynamic symbols */
+extern USHORT   hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ); /* enumerates all dynamic symbols */
+extern PHB_DYNS hb_dynsymFindFromFunction( PHB_FUNC pFunc ); /* returns a dynamic symbol for a given function pointer. */
+extern PHB_DYNS hb_dynsymPos( USHORT uiPos ); /* returns a dynamic symbol from a position index. */
 
 /* Command line and environment argument management */
 extern void HB_EXPORT hb_cmdargInit( int argc, char * argv[] ); /* initialize command line argument API's */

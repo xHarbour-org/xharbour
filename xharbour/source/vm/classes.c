@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.13 2002/04/26 06:52:49 ronpinkas Exp $
+ * $Id: classes.c,v 1.14 2002/06/13 22:46:04 ronpinkas Exp $
  */
 
 /*
@@ -830,9 +830,13 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc 
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetMthd(%p, %p)", pObject, pMessage));
 
    if( pObject->type == HB_IT_ARRAY )
+   {
       uiClass = pObject->item.asArray.value->uiClass;
+   }
    else
+   {
       uiClass = 0;
+   }
 
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -843,7 +847,6 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc 
 
       while( uiAt != uiLimit )
       {
-
          if( pClass->pMethods[ uiAt ].pMessage == pMsg )
          {
             pMethod = pClass->pMethods + uiAt;
@@ -852,7 +855,9 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc 
             s_pMethod = pMethod ;
 
             if( hb_bProfiler )
+            {
                pMethod->ulCalls++; /* Profiler */
+            }
 
             return pFunction;
          }
@@ -953,9 +958,13 @@ ULONG hb_objHasMsg( PHB_ITEM pObject, char *szString )
    HB_TRACE(HB_TR_DEBUG, ("hb_objHasMsg(%p, %s)", pObject, szString));
 
    if( pDynSym )
+   {
       return ( ULONG ) hb_objGetMthd( pObject, pDynSym->pSymbol, FALSE );
+   }
    else
+   {
       return 0;
+   }
 }
 
 
@@ -1771,11 +1780,14 @@ HB_FUNC( __OBJHASMSG )
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
 
    if( pObject && pString )
-      hb_retl( hb_objHasMsg( pObject, pString->item.asString.value ) != 0 );
+   {
+      hb_retl( hb_objHasMsg( pObject, pString->item.asString.value ) );
+   }
    else
-      hb_errRT_BASE( EG_ARG, 3000, NULL, "__OBJHASMSG", 0 );
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "__ObjHasMsg", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
 }
-
 
 /*
  * <oNew> := __objClone( <oOld> )
@@ -1848,7 +1860,7 @@ HB_FUNC( __OBJSENDMSG )
    PHB_ITEM pObject  = hb_param( 1, HB_IT_OBJECT );
    USHORT uiPCount = hb_pcount();
 
-   if( uiPCount>=2 && pObject )    /* Object & message passed */
+   if( uiPCount >= 2 && pObject )    /* Object & message passed */
    {
                     /*hb_dynsymFindName( hb_parc(2) );*/
       PHB_DYNS pMsg = hb_dynsymGet( hb_parc(2) );
@@ -2634,5 +2646,57 @@ HB_FUNC( __CLSGETPROPERTIES )
    }
 
    hb_itemRelease( hb_itemReturn( pReturn ) );
+}
+
+PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction )
+{
+   USHORT uiClass;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_clsSymbolFromFunction(%p, %p)", pObject, pFunction));
+
+   if( pObject->type == HB_IT_ARRAY )
+   {
+      uiClass = pObject->item.asArray.value->uiClass;
+   }
+   else
+   {
+      uiClass = 0;
+   }
+
+   if( uiClass && uiClass <= s_uiClasses )
+   {
+      PCLASS pClass  = s_pClasses + ( uiClass - 1 );
+      USHORT ui;
+      USHORT uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET );
+
+      for( ui = 0; ui < uiLimit; ui++ )
+      {
+         if( pClass->pMethods[ ui ].pFunction == pFunction )
+         {
+            //printf( "Function %i Name: %s\n", pFunction, pClass->pMethods[ ui ].pMessage->pSymbol->szName );
+            return pClass->pMethods[ ui ].pMessage;
+         }
+      }
+   }
+
+   return NULL;
+}
+
+/*
+ * <nPtr> := HB_ObjMsgPtr( <oObj>, <cMessage> )
+ */
+HB_FUNC( HB_OBJMSGPTR )
+{
+   PHB_ITEM pObject = hb_param( 1, HB_IT_OBJECT );
+   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
+
+   if( pObject && pString )
+   {
+      hb_retnl( hb_objHasMsg( pObject, pString->item.asString.value ) );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_ObjMsgPtr", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
 }
 

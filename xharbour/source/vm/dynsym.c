@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.53 2001/11/06 06:29:15 brianhays Exp $
+ * $Id: dynsym.c,v 1.1.1.1 2001/12/21 10:41:04 ronpinkas Exp $
  */
 
 /*
@@ -74,7 +74,9 @@ void hb_dynsymLog( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymLog()"));
 
    for( uiPos = 0; uiPos < s_uiDynSymbols; uiPos++ )   /* For all dynamic symbols */
+   {
       printf( "%i %s\n", uiPos + 1, s_pDynItems[ uiPos ].pDynSym->pSymbol->szName );
+   }
 }
 
 PHB_SYMB hb_symbolNew( char * szName )      /* Create a new symbol */
@@ -307,7 +309,7 @@ PHB_DYNS hb_dynsymFind( char * szName )
    return NULL;
 }
 
-void hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
+USHORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 {
    BOOL bCont = TRUE;
    USHORT uiPos;
@@ -315,7 +317,11 @@ void hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymEval(%p, %p)", pFunction, Cargo));
 
    for( uiPos = 0; uiPos < s_uiDynSymbols && bCont; uiPos++ )
+   {
       bCont = ( pFunction )( s_pDynItems[ uiPos ].pDynSym, Cargo );
+   }
+
+   return uiPos;
 }
 
 void hb_dynsymRelease( void )
@@ -337,6 +343,34 @@ void hb_dynsymRelease( void )
    }
 
    hb_xfree( s_pDynItems );
+}
+
+PHB_DYNS hb_dynsymFindFromFunction( PHB_FUNC pFunc )
+{
+   USHORT uiPos;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmFindSymbolFromFunction(%p)", pFunc ));
+
+   for( uiPos = 0; uiPos < s_uiDynSymbols; uiPos++ )
+   {
+      if( s_pDynItems[ uiPos ].pDynSym->pFunPtr == pFunc )
+      {
+         return s_pDynItems[ uiPos ].pDynSym;
+      }
+   }
+
+   return NULL;
+}
+
+// NOT TESTED YET!!!
+PHB_DYNS hb_dynsymPos( USHORT uiPos )
+{
+   if( uiPos < s_uiDynSymbols )
+   {
+      return s_pDynItems[ uiPos ].pDynSym;
+   }
+
+   return NULL;
 }
 
 #ifdef HB_EXTENSION

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.318 2002/07/23 17:44:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.319 2002/07/23 18:58:25 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-07-23 19:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+  * source/vm/dynsym.c
+    * Changed hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ) to return USHORT position of last scanned symbol.
+    + PHB_DYNS hb_dynsymFindFromFunction( PHB_FUNC pFunc ); /* returns a dynamic symbol for a given function pointer. */
+    + PHB_DYNS hb_dynsymPos( USHORT uiPos ); /* returns a dynamic symbol from a position index. */
+
+  * source/vm/classes.c
+    + PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction )
+    + HB_ObjMsgPtr( oObj, cMessage ) -> nFuncPointer
+
+  * source/vm/hvm.c
+    + HB_Exec( nFuncPointer [, oSelf] [, xParam1 ] [, xParamN ] ... )
+
+  + tests/testexec.prg
+    + New test to demonstrate HB_FuncPtr(), HB_ObjMsgPtr(), HB_Exec()
 
 2002-07-23 11:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c
