@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.31 2004/03/28 16:02:38 likewolf Exp $
+ * $Id: errorsys.prg,v 1.32 2004/04/02 12:09:23 srobert Exp $
  */
 
 /*
@@ -258,7 +258,7 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, '' )
         FWriteLine( nHandle, 'Date ............: ' + Dtoc( Date() ) )
         FWriteLine( nHandle, 'Time ............: ' + Time() )
-        FWriteLine( nHandle, 'Avaliable Memory : ' + strvalue( Memory( 0 ) ) )
+        FWriteLine( nHandle, 'Available Memory : ' + strvalue( Memory( 0 ) ) )
 
         IF Type( "Select()" ) == "UI"
            FWriteLine( nHandle, 'Current Area ....:' + strvalue( &("Select()") ) )
@@ -384,7 +384,7 @@ STATIC FUNCTION LogError( oerr )
 
 
         /*
-        FWriteLine( nHandle, padc(" Avaliable Memory Variables ",maxcol(),'+') )
+        FWriteLine( nHandle, padc(" Available Memory Variables ",maxcol(),'+') )
         FWriteLine( nHandle, "" )
         Save All Like * To errormem
         nMemHandle := Fopen( 'errormem.mem', FO_READWRITE )

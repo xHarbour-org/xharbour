@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.135 2004/04/04 19:50:29 fsgiudice Exp $
+ * $Id: hbapi.h,v 1.136 2004/04/14 20:28:25 andijahja Exp $
  */
 
 /*
@@ -596,6 +596,7 @@ typedef struct HB_MACRO_    /* a macro compiled pcode container */
    ULONG  pos;             /* current position inside of compiled string */
    int    Flags;           /* some flags we may need */
    int    status;          /* status of compilation */
+   HB_ITEM_PTR pError;     /* error object returned from the parser */
    ULONG  supported;       /* various flags for supported capabilities */
    int    FlexState;       /* internal flex state during parsing */
    HB_PCODE_INFO_PTR pCodeInfo;  /* pointer to pcode buffer and info */

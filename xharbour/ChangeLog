@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2788 2004/04/14 22:39:09 andijahja Exp $
+ * $Id: ChangeLog,v 1.2789 2004/04/15 08:16:05 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-15 20:05 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * doc/en/hb_macro.txt
+  * include/hbapi.h
+  * include/hbmacro.h
+  * source/vm/macro.c
+    - Reverted my previous Type() Clipper-compatibility fix, which was
+      incorrect.
+    ! Fixed Type() to be Clipper-compatible on undeclared memvars.
+      Modeled after Ryszard Glab's Harbour fix, but with small changes to
+      make it work in xHarbour.
+  * tests/macro.prg
+    ! Fixed to reflect real Clipper behaviour, some checks added.
+  * source/rtl/errorsys.prg
+    * Fixed a typo.
 
 2004-04-15 01:15 UTC-0800 Brian Hays <bhays@abacuslaw.com>
 
