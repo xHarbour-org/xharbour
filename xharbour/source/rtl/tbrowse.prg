@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.40 2003/05/07 20:05:53 walito Exp $
+ * $Id: tbrowse.prg,v 1.41 2003/05/12 04:50:58 walito Exp $
  */
 
 /*
@@ -961,6 +961,7 @@ METHOD GoTop() CLASS TBrowse
    ::Moved()
 
    Eval( ::goTopBlock )
+   Eval( ::skipBlock,0 ) // required for compatibility
    ::nLastRetrieved := 1
    ::nNewRowPos     := 1
    ::RefreshAll()
@@ -1479,8 +1480,8 @@ METHOD ForceStable() CLASS TBrowse
       // nNewRowPos and nLastRetrieved have to be updated
       // as we will entering phase 2 of stabilization
 
-      ::RowPos := ::nNewRowPos := ::nLastRetrieved := ;
-                  If( Abs( nAvail ) + 1 > ::RowPos, ::RowPos, Abs( nAvail ) + 1 )
+//      ::RowPos := ::nNewRowPos := ::nLastRetrieved := ;
+//                  If( Abs( nAvail ) + 1 > ::RowPos, ::RowPos, Abs( nAvail ) + 1 )
       ::Moved()
 
       // To ensure phase 1 is skipped
