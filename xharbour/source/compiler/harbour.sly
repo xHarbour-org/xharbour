@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.36 2003/02/28 10:37:20 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.37 2003/03/04 02:55:14 ronpinkas Exp $
  */
 
 /*
@@ -543,7 +543,8 @@ ArrayAlias  : Array ALIASOP            { $$ = $1; }
 
 /* Literal array access
  */
-ArrayAt     : Array ArrayIndex   { $$ = $2; }
+ArrayAt     : Array ArrayIndex        { $$ = $2; }
+            | LiteralValue ArrayIndex { $$ = $2; }
 ;
 
 ArrayAtAlias : ArrayAt ALIASOP      { $$ = $1; }
@@ -758,7 +759,6 @@ AliasExpr  : NumAlias PareExpList         { $$ = hb_compExprNewAliasExpr( $1, $2
 /* Array expressions access
  */
 VariableAt  : NilValue      ArrayIndex    { $$ = $2; }
-            | LiteralValue  ArrayIndex    { $$ = $2; }
             | CodeBlock     ArrayIndex    { $$ = $2; }
             | Logical       ArrayIndex    { $$ = $2; }
             | SelfValue     ArrayIndex    { $$ = $2; }

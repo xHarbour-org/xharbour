@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.811 2003/03/07 13:32:09 jonnymind Exp $
+ * $Id: ChangeLog,v 1.812 2003/03/07 16:19:33 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,8 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-07 15:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+  * source/compiler/harbour.slx
+  * source/macro/macro.slx
+  * source/compiler/harbour.sly
+  * include/hbexprb.c
+  * source/compiler/exproptb.c
+    + Added support for LITERAL strings followed by ArrayIndex.
+
 2003-03-07 13:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
-  * utils/hbmake/hbmake.prg  
+  * utils/hbmake/hbmake.prg
     ! Readded the Selection if main source code back
   * utils/hbmake/hbmutils.prg
     ! minor change on libnames( in GetLibraries() function)
@@ -24,7 +33,7 @@
       to extend it's usage also on their systems.
       Also, that warning prevented scrips from detecting that link has
       been completed sucessfully.
-    
+
 
 2003-03-07 12:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/file.c
@@ -32,7 +41,7 @@
   * source/rtl/set.c
     ! I put back the case for file operations under UNIX, but set the
       default for unix systems to "MIXED" case and "/" file separator.
-  
+
 2003-03-07 13:30 UTC+0300 Phil Krylov <phil@mail.ru>
   * source/rtl/binnum.c
     ! Use little-endian values on all platforms in BIN2L()

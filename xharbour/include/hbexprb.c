@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.45 2003/02/20 01:49:03 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.46 2003/02/28 10:37:19 ronpinkas Exp $
  */
 
 /*
@@ -337,7 +337,11 @@ static HB_EXPR_FUNC( hb_compExprUseString )
       case HB_EA_REDUCE:
          break;
       case HB_EA_ARRAY_AT:
-         hb_compErrorType( pSelf );
+         #ifdef HB_C52_STRICT
+            hb_compErrorType( pSelf );
+         #else
+            // xHarbour supports Literal Strings as Arrays.
+         #endif
          break;
       case HB_EA_ARRAY_INDEX:
          hb_compErrorIndex( pSelf );     /* string cannot be used as index element */
