@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.2 2002/01/03 03:53:44 ronpinkas Exp $
+ * $Id: hbapiitm.h,v 1.3 2002/01/04 21:24:50 andijahja Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 #define HB_APIITM_H_
 
 #include "hbapi.h"
+#include "hbfast.h"
 
 #if defined(HB_EXTERN_C)
 extern "C" {
@@ -129,15 +130,6 @@ extern PHB_ITEM hb_itemValToStr ( PHB_ITEM pItem ); /* Convert any scalar to a s
 extern char *   hb_itemPadConv  ( PHB_ITEM pItem, char * buffer, ULONG * pulSize );
 extern void     hb_itemSwap     ( PHB_ITEM pItem1, PHB_ITEM pItem2 );
 
-/* Declartion of function in fastitem.c */
-
-extern void hb_itemPushForward( PHB_ITEM pItem );
-extern void hb_itemShareValue( PHB_ITEM pDest, PHB_ITEM pSource );
-extern void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
-extern void hb_itemVarAssign( PHB_ITEM pVar );
-extern void hb_itemPushEnvelopeString( char * szText, ULONG length );
-extern void hb_retcAdopt( char * szText );
-extern void hb_retclenAdopt( char * szText, ULONG ulLen );
 
 #if defined(HB_EXTERN_C)
 }
