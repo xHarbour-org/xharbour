@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.20 2004/04/14 20:59:10 andijahja Exp $
+ * $Id: hbusage.c,v 1.21 2004/04/17 10:11:08 andijahja Exp $
  */
 
 /*
@@ -175,6 +175,7 @@ void hb_compPrintCredits( void )
            "Luiz Rafael Culik <culik@sl.conex.net>\n"
            "Manuel Ruiz <mrt@joca.es>\n"
            "Marcelo Lombardo <lombardo@uol.com.br>\n"
+           "Marek Paliwoda <paliwoda@inetia.pl>\n"
            "Matteo Baccan <baccan@isanet.it>\n"
            "Matthew Hamilton <mhamilton@bunge.com.au>\n"
            "Mauricio Abre <maurifull@datafull.com>\n"
