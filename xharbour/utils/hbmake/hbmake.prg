@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.102 2003/11/24 23:48:43 lculik Exp $
+ * $Id: hbmake.prg,v 1.103 2003/11/27 00:07:08 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1298,6 +1298,7 @@ FUNC CreateMakeFile( cFile )
          s_lMt           := oMake:lMt
          s_nWarningLevel := oMake:cWarningLevel
          cTopFile        := PadR(oMake:cTopModule,20," ")
+         cResName        := oMake:cRes
       ELSE
          SetColor("W/N,N/W")
          CLS
@@ -1590,7 +1591,7 @@ FUNC CreateMakeFile( cFile )
 
       READ
 
-      IF !file(cTopFile)
+      IF !file(ALLTRIM(cTopFile))
          IF s_nLang=1 // PT
             Alert("Arquivo "+alltrim(cTopFile)+" n∆o encontrado.")
          ELSEIF s_nLang=3
@@ -1603,7 +1604,7 @@ FUNC CreateMakeFile( cFile )
       ENDIF
 
    END
-   cTopFile := AllTrim( cTopFile )
+
 
    IF s_lExternalLib
       aLibs := Getlibs( s_lGcc, GetMakeDir() + '\lib' )

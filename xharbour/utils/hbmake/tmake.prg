@@ -66,7 +66,8 @@ Data  aOut           init {}
 Data  cFilesToAdd    init 5
 Data  lMT            init .F.
 Data  cWarningLevel  init 0
-Data  cTopModule     init "" 
+Data  cTopModule     init ""
+Data  cRes           init ""
 
 Method New()
 method Reset()
@@ -950,8 +951,10 @@ Method ReadMakefile(cFile) //class thbmake
     LOCAL aTempCFiles := {}
     Local nHandle
     Local cObjitem
+    Local cRes        := ""
+    Local cItem
     LOCAL lLinux      := At( 'linux', Lower( Os() ) ) > 0
-    Local lExtended:=.t.,szProject
+    Local lExtended   := .T., szProject
 
     nHandle := FT_FUSE( cFile )
     IF nHandle < 0
@@ -1178,6 +1181,10 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
                 IF atemp[ 1 ] == "RESFILES"
 
                     ::aRes := Listasarray2( ::replacemacros( atemp[ 2 ] ), " " )
+
+                    FOR EACH cItem in :: aRes
+                       ::cRes += cItem +" "
+                    NEXT
 
                 ENDIF
 
