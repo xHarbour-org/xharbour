@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.74 2003/11/24 15:15:22 lf_sfnet Exp $
+# $Id: makefile.bc,v 1.75 2003/12/04 13:39:06 jonnymind Exp $
 #
 
 #
@@ -244,6 +244,7 @@ GTDOS_LIB    = $(LIB_DIR)\gtdos.lib
 GTPCA_LIB    = $(LIB_DIR)\gtpca.lib
 GTSTD_LIB    = $(LIB_DIR)\gtstd.lib
 GTWIN_LIB    = $(LIB_DIR)\gtwin.lib
+GTNUL_LIB    = $(LIB_DIR)\gtnul.lib
 
 HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
 HBPP_EXE     = $(BIN_DIR)\hbpp.exe
@@ -287,7 +288,8 @@ HB_GT_LIBS = \
    $(GTCGI_LIB) \
    $(GTPCA_LIB) \
    $(GTSTD_LIB) \
-   $(GTWIN_LIB)
+   $(GTWIN_LIB) \
+   $(GTNUL_LIB)
 
 !if !$d(HB_GT_LIB)
    HB_GT_LIB = $(GTWIN_LIB)
@@ -745,6 +747,14 @@ GTWIN_LIB_OBJS = \
    $(OBJ_DIR)\gtwin.obj \
    $(OBJ_DIR)\mousewin.obj
 
+#
+# GTNUL.LIB rules
+#
+
+GTNUL_LIB_OBJS = \
+   $(OBJ_DIR)\gtnul.obj \
+   $(OBJ_DIR)\gtext.obj
+
 CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cdpesdos.obj \
    $(OBJ_DIR)\cdpeswin.obj \
@@ -1060,6 +1070,14 @@ $(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
 $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
     IF EXIST "$(GTWIN_LIB)" $(DEL) "$(GTWIN_LIB)" > NUL
     $(LINKER) "$(GTWIN_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
+$(GTNUL_LIB) : $(GTNUL_LIB_OBJS)
+    IF EXIST "$(GTNUL_LIB)" $(DEL) "$(GTNUL_LIB)" > NUL
+    $(LINKER) "$(GTNUL_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
@@ -2574,6 +2592,16 @@ $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+#
+# GTNUL.LIB dependencies
+#
+
+$(OBJ_DIR)\gtnul.obj : $(RTL_DIR)\gtnul\gtnul.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\gtext.obj : $(RTL_DIR)\gtnul\gtext.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 #

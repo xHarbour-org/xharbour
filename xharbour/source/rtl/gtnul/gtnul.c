@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.11 2003/07/31 18:56:12 druzus Exp $
+ * $Id: gtnul.c,v 1.12 2003/07/31 19:41:34 druzus Exp $
  */
 
 /*
@@ -1050,8 +1050,15 @@ HB_GT_ANNOUNCE( HB_GT_NAME );
 HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
 HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) && (! defined(__BORLANDC__)) )
    #pragma startup HB_GT_FUNC(_gt_Init_)
+#endif
+
+#if defined(__BORLANDC__)
+   HB_CALL_ON_STARTUP_BEGIN( startup_function__gtnul )
+      hb_gtRegister( &gtInit );
+   HB_CALL_ON_STARTUP_END( startup_function__gtnul )
+   #pragma startup startup_function__gtnul
 #endif
 
 #endif  /* HB_MULTI_GT */
