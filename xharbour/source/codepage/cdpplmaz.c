@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cdpplmaz.c,v 1.1 2003/05/16 19:52:06 druzus Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 
 /* Language name: Polish */
 /* ISO language code (2 chars): PL */
-/* Codepage: MAZ */
+/* Codepage: Mazovia */
 
 #include <ctype.h>
 #include "hbapi.h"

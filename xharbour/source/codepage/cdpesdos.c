@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cdpesdos.c,v 1.1 2003/05/16 19:52:06 druzus Exp $
  */
 
 /*
@@ -51,9 +51,9 @@
  *
  */
 
-/* Language name: Spanish MS-DOS */
-/* ISO language code (2 chars): ES (please look it up in /doc/lang_id.txt) */
-/* Codepage: ES */
+/* Language name: Spanish */
+/* ISO language code (2 chars): ES */
+/* Codepage: 850 */
 
 #include <ctype.h>
 #include "hbapi.h"

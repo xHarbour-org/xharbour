@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cdpeswin.c,v 1.1 2003/05/16 19:52:06 druzus Exp $
  */
 
 /*
@@ -51,9 +51,9 @@
  *
  */
 
-/* Language name: Spanish WIN */
-/* ISO language code (2 chars): ES (please look it up in /doc/lang_id.txt) */
-/* Codepage: ES */
+/* Language name: Spanish */
+/* ISO language code (2 chars): ES */
+/* Codepage: ISO-8859-1 */
 
 #include <ctype.h>
 #include "hbapi.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: cdpslwin.c,v 1.1 2003/06/16 17:19:15 alkresin Exp $
+ * $Id: cdpslwin.c,v 1.1 2003/06/19 22:39:02 druzus Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 
 /* Language name: Slovenian */
 /* ISO language code (2 chars): SL */
-/* Codepage: 1250 */
+/* Codepage: Windows-1250 */
 
 #include <ctype.h>
 #include "hbapi.h"

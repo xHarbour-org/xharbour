@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cdpgewin.c,v 1.1 2003/05/16 19:52:06 druzus Exp $
  */
 
 /*
@@ -51,9 +51,9 @@
  *
  */
 
-/* Language name: German WIN*/
-/* ISO language code (2 chars): DE (please look it up in /doc/lang_id.txt) */
-/* Codepage: DE */
+/* Language name: German */
+/* ISO language code (2 chars): DE */
+/* Codepage: ISO-8859-1 */
 
 #include <ctype.h>
 #include "hbapi.h"
