@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.ch,v 1.2 2004/01/26 14:59:46 druzus Exp $
+ * $Id: inkey.ch,v 1.3 2004/02/07 19:29:47 vouchcac Exp $
  */
 
 /*
@@ -65,8 +65,10 @@
 #define INKEY_LUP               4
 #define INKEY_RDOWN             8
 #define INKEY_RUP               16
+#define INKEY_MMIDDLE           32  /* Mask for middle button events */
+#define INKEY_MWHEEL            64  /* Mask for mouse wheel events */
 #define INKEY_KEYBOARD          128
-#define INKEY_ALL               159
+#define INKEY_ALL               255
 
 #define HB_INKEY_RAW            256 /* Harbour extension */
 #define HB_INKEY_EXTENDED       512 /* Harbour extension */
