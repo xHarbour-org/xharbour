@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.43 2003/08/25 21:22:00 druzus Exp $
+ * $Id: filesys.c,v 1.44 2003/08/26 15:08:51 jonnymind Exp $
  */
 
 /*
@@ -97,6 +97,8 @@
    This has been corrected by ptucker
  */
 
+#define X__WIN32__
+
 #ifndef HB_OS_WIN_32_USED
    #define HB_OS_WIN_32_USED
 #endif
@@ -132,7 +134,8 @@
    #include <sys/stat.h>
    #include <fcntl.h>
    #include <errno.h>
-
+   #include <process.h>
+   
    #if defined(__CYGWIN__)
       #include <io.h>
    #endif
@@ -170,6 +173,7 @@
    #include <share.h>
    #include <fcntl.h>
    #include <direct.h>
+   #include <process.h>
    #if defined(__BORLANDC__)
       #include <dir.h>
       #include <dos.h>
@@ -640,6 +644,76 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
    return hFileHandle;
 }
 
+#ifndef X__WIN32__
+
+int s_parametrize( char *out, char *in )
+{
+   int count = 0;  // we'll have at least one token
+
+   // removes leading spaces
+   while ( *in && isspace(*in) )
+      in++;
+   if (! *in ) return 0;
+
+   while ( *in ) {
+      if ( *in == '\"' || *in == '\'')
+      {
+         char quote = *in;
+         in++;
+         while ( *in && *in != quote ) {
+            if ( *in == '\\' ) {
+               in++;
+            }
+            if ( *in ) {
+               *out = *in;
+               out ++;
+               in++;
+            }
+         }
+         if (*in) {
+            in++;
+         }
+         if ( *in ) {
+            *out = '\0';
+         }
+         // out++ will be done later; if in is done,
+         // '\0' will be added at loop exit.
+      }
+      else if (! isspace( *in ) ) {
+         *out = *in;
+         in++;
+         out++;
+      }
+      else {
+         *out = '\0';
+         count ++;
+         while (*in && isspace( *in ) )
+            in++;
+         out++;
+      }
+   }
+   *out = '\0';
+   count ++;
+
+   return count;
+}
+
+char **s_argvize( char *params, int size )
+{
+   int i;
+   char **argv = (char **) hb_xgrab( sizeof( char * ) * ( size + 1 ) );
+
+   for( i = 0; i < size; i ++ )
+   {
+      argv[i] = params;
+      while (*params) params++;
+      params++;
+   }
+   return argv;
+}
+
+#endif
+
 /*
 JC1: Piping functions
 hb_fsOpenProcess creates a process and get the control of the 4 main
@@ -658,82 +732,188 @@ On success, a valid FHandle is returned, and FError returns
 zero. On error, -1 is returned and FError() returns nonzero.
 */
 
-FHANDLE HB_EXPORT hb_fsOpenProcess( BYTE * pFilename,
+FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       FHANDLE *fhStdin,
       FHANDLE *fhStdout,
-      FHANDLE *fhStderr)
+      FHANDLE *fhStderr,
+      BOOL bBackground
+      )
 {
-   HB_THREAD_STUB
    FHANDLE hRet = FS_ERROR;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpenProcess(%s, %p, %p, %p )",
       pFilename, fhStdin, fhStdout, fhStderr));
 
-#if defined(OS_UNIX_COMPATIBLE)
+#if defined(OS_UNIX_COMPATIBLE) || ( defined( HB_OS_WIN_32 ) && ! defined( X__WIN32__) )
    {
 #ifndef MAXFD
     #define MAXFD		1024
 #endif
    FHANDLE hPipeIn[2], hPipeOut[2], hPipeErr[2];
+   FHANDLE hNull;
+   char **argv;
+   int size;
+   char *command;
+   
+   #ifdef HB_OS_WIN_32
+   int pid;
+   #define pipe(x)   _pipe( x, 2048, _O_BINARY )
+   #else
    pid_t pid;
-
-   //JC1: unlocking the stack to allow cancelation points
-   HB_STACK_UNLOCK;
-
+   #endif
+   
    errno = 0;
-   if( pipe( hPipeIn ) != 0 ||
-      pipe( hPipeOut ) != 0 ||
-      pipe( hPipeErr ) != 0
-   ) {
+   if( fhStdin != 0 && pipe( hPipeIn ) != 0 )
+   {
       hb_fsSetError( errno );
       return (FHANDLE) -1;
    }
+   
+   if( fhStdout != 0 && pipe( hPipeOut ) != 0 )
+   {      
+      hb_fsSetError( errno );
+      if ( fhStdin != 0 ) 
+      {
+         close( hPipeIn[0] );
+         close( hPipeIn[1] );
+      }
+      return (FHANDLE) -1;
+   }
+   
+   
+   if( fhStderr != 0 )
+   {
+      if( fhStderr != fhStdout )
+      {
+         if ( pipe( hPipeErr ) != 0) 
+         {
+            hb_fsSetError( errno );
+            if ( fhStdin != 0 ) 
+            {
+               close( hPipeIn[0] );
+               close( hPipeIn[1] );
+            }
+            if ( fhStdout != 0 ) 
+            {
+               close( hPipeOut[0] );
+               close( hPipeOut[1] );
+            }
+            return (FHANDLE) -1;
+         }
+      }
+      else
+      {
+         hPipeErr[0] = hPipeOut[0];
+         hPipeErr[1] = hPipeOut[1];
+      }
+   }
 
+   
+   #ifdef HB_OS_WIN_32
+   {
+      int oldstdin, oldstdout, oldstderr;
+      int iFlags;
+      
+      hNull = open("NUL:", O_RDWR);
+
+      oldstdin = dup( 0 );
+      oldstdout = dup( 1 );
+      oldstderr = dup( 2 );
+
+      if ( fhStdin != 0 )
+      {
+         dup2( hPipeIn[ 0 ], 0 );
+      }
+      else if ( bBackground )
+      {
+         dup2( hNull, 0 );
+      }
+
+      if ( fhStdout != 0 )
+      {
+         dup2( hPipeOut[ 1 ], 1 );
+      }
+      else if ( bBackground )
+      {
+         dup2( hNull, 1 );
+      }
+
+      if ( fhStderr != 0 )
+      {
+         dup2( hPipeErr[ 1 ], 2 );
+      }
+      else if ( bBackground )
+      {
+         dup2( hNull, 2 );
+      }
+
+      command = hb_xgrab( strlen(pFilename) + 2 );
+      size = s_parametrize( command, pFilename );
+      argv = s_argvize( command, size );
+      argv[size] = 0;
+
+      #if !defined(__BORLANDC__)
+      iFlags = _P_NOWAIT;
+      pid = _spawnvp( iFlags, argv[0], argv );
+      #else
+      iFlags = P_NOWAIT;
+      pid = spawnvp( iFlags, argv[0], argv );
+      #endif
+      
+      hb_xfree( command );
+      hb_xfree( argv );
+
+      dup2( oldstdin, 0 );
+      dup2( oldstdout, 1 );
+      dup2( oldstderr, 2 );
+   }
+   if ( pid < 0 )                     
+   
+   #else
    if( ( pid = fork() ) == -1 )
+   #endif
    {
       hb_fsSetError( errno );
       // closing unused handles should be nice
       // TODO: check fs_Popen to close handles.
-      close( hPipeIn[0] );
-      close( hPipeIn[1] );
-      close( hPipeOut[0] );
-      close( hPipeOut[1] );
-      close( hPipeErr[0] );
-      close( hPipeErr[1] );
+      if ( fhStdin != 0 ) 
+      {
+         close( hPipeIn[0] );
+         close( hPipeIn[1] );
+      }
+      
+      if ( fhStdout != 0 ) 
+      {
+         close( hPipeOut[0] );
+         close( hPipeOut[1] );
+      }
+      
+      if ( fhStderr != 0 && fhStderr != fhStdout )
+      {
+         close( hPipeErr[0] );
+         close( hPipeErr[1] );
+      }
       return (FHANDLE) -1;
    }
 
    if( pid != 0 ) {
       // I am the father
-      close( hPipeIn[0] );
-      close( hPipeOut[1] );
-      close( hPipeErr[1] );
-
-      if ( fhStdin == 0 )
-      {
-         close( hPipeIn[1] );
-      }
-      else
+      if ( fhStdin != 0 ) 
       {
          *fhStdin = hPipeIn[1];
+         close( hPipeIn[0] );
       }
-
-      if ( fhStdout == 0 )
-      {
-         close( hPipeOut[0] );
-      }
-      else
+      
+      if ( fhStdin != 0 ) 
       {
          *fhStdout = hPipeOut[0];
+         close( hPipeOut[1] );
       }
-
-      if ( fhStderr == 0 )
-      {
-         close( hPipeErr[0] );
-      }
-      else
+      
+      if ( fhStderr != 0 && fhStderr != fhStdout )
       {
          *fhStderr = hPipeErr[0];
+         close( hPipeErr[1] );
       }
 
       // father is done.
@@ -742,19 +922,27 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( BYTE * pFilename,
 
    }
    // I am che child
+   #ifndef HB_OS_WIN_32
    else
    {
-      FHANDLE hNull;
-
+      command = hb_xgrab( strlen(pFilename) + 2 );
+      size = s_parametrize( command, pFilename );
+      argv = s_argvize( command, size );
+      argv[size] = 0;
+      
+/*
       // temporary solution
       char *argv[4];
       argv[0] = "sh";
       argv[1] = "-c";
       argv[2] = ( char * ) pFilename;
-      argv[3] = ( char * ) 0;
+      argv[3] = ( char * ) 0; */
       // drop uncontrolled streams
-      hNull = open("/dev/null", O_RDWR);
-
+      if ( bBackground )
+      {
+         hNull = open("/dev/null", O_RDWR);
+      }
+      
       close( hPipeIn[ 1 ] ); // we don't write to stdin
       close( hPipeOut[0] );
       close( hPipeErr[0] );
@@ -764,16 +952,16 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( BYTE * pFilename,
       {
          dup2( hPipeIn[ 0 ], 0 );
       }
-      else
+      else if ( bBackground ) 
       {
-         dup2( hNull, 0 );
+            dup2( hNull, 0 );
       }
 
       if ( fhStdout != 0 )
       {
          dup2( hPipeOut[ 1 ], 1 );
       }
-      else
+      else if ( bBackground )
       {
          dup2( hNull, 1 );
       }
@@ -782,7 +970,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( BYTE * pFilename,
       {
          dup2( hPipeErr[ 1 ], 2 );
       }
-      else
+      else if ( bBackground )
       {
          dup2( hNull, 2 );
       }
@@ -796,13 +984,224 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( BYTE * pFilename,
       // ????
       setuid(getuid());
       setgid(getgid());
-
-      execv("/bin/sh", argv );
+      
+      execv(argv[0], argv );
    }
+   #endif
+}
+
+#elif defined( X__WIN32__ )
+{
+   STARTUPINFO si;
+   PROCESS_INFORMATION proc;
+   ULONG ulSize;
+   int iSize;
+   DWORD iRet;
+   DWORD iFlags=0;
+   char fullCommand[1024], cmdName[256];
+   char *completeCommand, *pos;
+   char *filePart;
+   SECURITY_ATTRIBUTES secatt;
+ 
+   HANDLE hPipeInRd=INVALID_HANDLE_VALUE, hPipeInWr=INVALID_HANDLE_VALUE;
+   HANDLE hPipeOutRd=INVALID_HANDLE_VALUE, hPipeOutWr=INVALID_HANDLE_VALUE;
+   HANDLE hPipeErrRd=INVALID_HANDLE_VALUE, hPipeErrWr=INVALID_HANDLE_VALUE;
+
+   // prepare security attributes
+   secatt.nLength = sizeof( secatt );
+   secatt.lpSecurityDescriptor = NULL;
+   secatt.bInheritHandle = TRUE;
+
+   if ( fhStdin != NULL )
+   {
+      if ( !CreatePipe( &hPipeInRd, &hPipeInWr, &secatt, 0 ) )
+      {
+         hb_fsSetError( GetLastError() );
+         return FS_ERROR;
+      }
    }
-   HB_STACK_LOCK;
+   
+   if ( fhStdout != NULL )
+   {
+      if ( !CreatePipe( &hPipeOutRd, &hPipeOutWr, &secatt, 0 ) )
+      {
+         hb_fsSetError( GetLastError() );
+         hRet = FS_ERROR;
+         goto ret_close_1;
+      }
+   }
 
+   if ( fhStderr != NULL )
+   {
+      if ( fhStderr == fhStdout )
+      {
+         hPipeErrRd = hPipeOutRd;
+         hPipeErrWr = hPipeOutWr;
+      }
+      
+      if ( !CreatePipe( &hPipeErrRd, &hPipeErrWr, &secatt, 0 ) )
+      {
+         hb_fsSetError( GetLastError() );
+         hRet = FS_ERROR;
+         goto ret_close_2;
+      }
+   }
+         
+   // parameters are included in the command string
+   pos = (char *) pFilename;
+   while( *pos && *pos != ' ' && *pos != '\\' ) 
+   {
+      pos++;
+   }
+   
+   ulSize = (unsigned) (pos - (char *)pFilename );
+   if ( ulSize > 254 || *pos == '\\' ) 
+   {
+      // absolute path. We are ok
+      strncpy( fullCommand, pFilename, 1023);
+      fullCommand[1023] = '\0';
+   }
+   else
+   {   
+      memcpy( cmdName, pFilename, ulSize );
+      cmdName[ulSize+1] = 0;
+      // find the command in the path
+      SearchPath( NULL, cmdName, NULL, 1024, fullCommand, &filePart );
+   }
 
+   if ( *pos && *pos != '\\') 
+   {
+      completeCommand = (char *) hb_xgrab( strlen( fullCommand ) + strlen( pos ) +2);
+      sprintf( completeCommand, "%s %s",  fullCommand, pos+1); 
+   }
+   else 
+   {
+      completeCommand = (char *) hb_xgrab( strlen( fullCommand ) + 1);
+      strcpy( completeCommand, fullCommand); 
+   }
+   
+   memset( &si, 0, sizeof( si ) );
+   si.cb = sizeof( si );
+
+   if ( bBackground ) 
+   {
+      // using show_hide AND using invalid handlers for unused streams
+      si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+      si.wShowWindow = SW_HIDE;
+      
+      si.hStdInput = hPipeInRd;
+      si.hStdOutput = hPipeOutWr;
+      si.hStdError = hPipeErrWr;
+      
+      iFlags |= DETACHED_PROCESS;
+   }
+   else 
+   {
+      si.dwFlags = STARTF_USESTDHANDLES;
+      
+      if ( fhStdin != NULL )
+      {
+         si.hStdInput = hPipeInRd;
+      }
+      else
+      {
+         si.hStdInput = GetStdHandle( STD_INPUT_HANDLE );
+      }   
+
+      if ( fhStdout != NULL )
+      {
+         si.hStdOutput = hPipeOutWr;
+      }
+      else
+      {
+         si.hStdOutput = GetStdHandle( STD_OUTPUT_HANDLE );
+      }   
+
+      if ( fhStderr != NULL )
+      {
+         si.hStdError = hPipeErrWr;
+      }
+      else
+      {
+         si.hStdError = GetStdHandle( STD_ERROR_HANDLE );
+      }   
+   }
+   
+   if ( !CreateProcess( NULL,
+      completeCommand,
+      NULL,
+      NULL,
+      TRUE, //Inerhit handles!
+      iFlags,
+      NULL,
+      NULL,
+      &si,
+      &proc
+      ) )
+   {
+      hb_fsSetError( GetLastError() );
+      hRet = FS_ERROR;
+      hb_xfree( completeCommand );
+      goto ret_close_3;
+   }
+   else
+   {
+      hb_xfree( completeCommand );
+
+      hRet = HandleToLong( proc.hProcess );
+      
+      if ( fhStdin != NULL )
+      {
+         *fhStdin = HandleToLong( hPipeInWr );
+         CloseHandle( hPipeInRd );
+      }
+      if ( fhStdout != NULL )
+      {
+         *fhStdout = HandleToLong( hPipeOutRd );
+         CloseHandle( hPipeOutWr );
+      }
+      if ( fhStderr != NULL )
+      {
+         *fhStderr = HandleToLong( hPipeErrRd );
+         CloseHandle( hPipeErrWr );
+      }            
+      
+      CloseHandle( proc.hThread ); // unused
+   }
+
+   return hRet;
+
+ret_close_3:
+   if ( hPipeErrRd != INVALID_HANDLE_VALUE )
+   {
+      CloseHandle( hPipeErrRd );
+   }
+   if ( hPipeErrWr != INVALID_HANDLE_VALUE )
+   {
+      CloseHandle( hPipeErrWr );
+   }
+   
+ret_close_2:
+   if ( hPipeOutRd != INVALID_HANDLE_VALUE )
+   {
+      CloseHandle( hPipeOutRd );
+   }
+   if ( hPipeOutWr != INVALID_HANDLE_VALUE )
+   {
+      CloseHandle( hPipeOutWr );
+   }
+
+ret_close_1:
+   if ( hPipeInRd != INVALID_HANDLE_VALUE )
+   {
+      CloseHandle( hPipeInRd );
+   }
+   if ( hPipeInWr != INVALID_HANDLE_VALUE )
+   {
+      CloseHandle( hPipeInWr );
+   }
+}
+   
 #else
 
    HB_SYMBOL_UNUSED( pFilename );
@@ -831,6 +1230,8 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
    int iRetStatus = -1;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsProcessValue(%d, %d )", fhProc, bWait));
+
+   hb_fsSetError( 0 );
 
 #if defined(OS_UNIX_COMPATIBLE)
 {
@@ -868,7 +1269,64 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
       }
    }
 }
+#elif defined( HB_OS_WIN_32 ) && ! defined( X__WIN32__ )
+{
+   int iPid;
+   
+   HB_SYMBOL_UNUSED( bWait );
 
+   HB_STACK_UNLOCK
+   HB_TEST_CANCEL_ENABLE_ASYN
+   #ifdef __BORLANDC__
+      iPid = cwait( &iRetStatus, (int) fhProc, 0 );
+   #else
+      iPid = _cwait( &iRetStatus, (int) fhProc, 0 );
+   #endif
+   HB_DISABLE_ASYN_CANC
+   HB_STACK_LOCK;
+   
+   if ( iPid != (int) fhProc )
+   {
+      iRetStatus = -1;
+   } 
+}   
+#elif defined( X__WIN32__ )
+{
+   DWORD dwTime;
+   DWORD dwResult;
+   
+   if ( ! bWait ) 
+   {
+      dwTime = 0;
+   }
+   else
+   {
+      dwTime = INFINITE;
+   }
+   
+   HB_STACK_UNLOCK
+   HB_TEST_CANCEL_ENABLE_ASYN
+   dwResult = WaitForSingleObject( DostoWinHandle(fhProc), dwTime );
+   HB_DISABLE_ASYN_CANC
+   HB_STACK_LOCK;
+   
+   if ( dwResult == WAIT_OBJECT_0 )
+   {
+      if ( GetExitCodeProcess( DostoWinHandle(fhProc), &dwResult ) )
+      {
+         iRetStatus = (int) dwResult;
+      }
+      else
+      {
+         hb_fsSetError( GetLastError() );
+         iRetStatus = -2;
+      }
+   }
+   else
+   {
+      iRetStatus = -1;
+   }
+}   
 #else
 
    HB_SYMBOL_UNUSED( fhProc );
@@ -895,6 +1353,8 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
    BOOL bRet = FALSE;
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCloseProcess(%d, %d )", fhProc, bGentle));
 
+   hb_fsSetError( 0 );
+   
 #if defined(OS_UNIX_COMPATIBLE)
 {
    int iSignal = bGentle ? SIGTERM : SIGKILL;
@@ -905,6 +1365,32 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
    }
 }
 
+#elif defined( HB_OS_WIN_32 ) && !defined( X__WIN32__ )
+{
+   HANDLE hProc;
+   
+   hProc = OpenProcess( PROCESS_TERMINATE, FALSE, fhProc );
+   
+   if ( hProc != NULL )
+   {
+      bRet = (TerminateProcess( hProc, bGentle ? 0:1 ) != 0);
+      if ( ! bRet )
+      {
+         hb_fsSetError( GetLastError() );
+      }   
+   }
+   else
+   {
+      hb_fsSetError( GetLastError() );
+   }
+}
+#elif defined( X__WIN32__ )
+   bRet = (TerminateProcess( DostoWinHandle( fhProc ), bGentle ? 0:1 ) != 0);
+   if ( ! bRet )
+   {
+      hb_fsSetError( GetLastError() );
+   }   
+   
 #else
 
    HB_SYMBOL_UNUSED( fhProc );

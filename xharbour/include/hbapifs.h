@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.19 2003/08/25 21:21:59 druzus Exp $
+ * $Id: hbapifs.h,v 1.20 2003/08/26 15:08:51 jonnymind Exp $
  */
 
 /*
@@ -144,7 +144,7 @@ extern USHORT   HB_EXPORT hb_fsWrite      ( FHANDLE hFileHandle, BYTE * pBuff, U
 extern ULONG    HB_EXPORT hb_fsWriteLarge ( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount ); /* write to an open file from a buffer (>64K) */
 extern FHANDLE  HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode );
 /* Open a child process */
-extern FHANDLE HB_EXPORT hb_fsOpenProcess( BYTE * pFilename, FHANDLE *fhStdin, FHANDLE *fhStdout, FHANDLE *fhStderr);
+extern FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename, FHANDLE *fhStdin, FHANDLE *fhStdout, FHANDLE *fhStderr, BOOL bBackground );
 extern BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle );
 int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait );
 
