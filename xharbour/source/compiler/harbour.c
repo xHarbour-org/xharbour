@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.194 2001/12/15 11:22:28 vszakats Exp $
+ * $Id: harbour.c,v 1.1.1.1 2001/12/21 10:44:08 ronpinkas Exp $
  */
 
 /*
@@ -113,6 +113,7 @@ BOOL           hb_comp_bForceMemvars = FALSE;             /* holds if memvars ar
 BOOL           hb_comp_bDebugInfo = FALSE;                /* holds if generate debugger required info */
 char           hb_comp_szPrefix[ 20 ] = { '\0' };         /* holds the prefix added to the generated symbol init function name (in C output currently) */
 int            hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE; /* C code generation should be verbose (use comments) or not */
+BOOL           hb_comp_bNoStartUp = FALSE;                /* C code with or without HB_FS_FIRST */
 int            hb_comp_iExitLevel = HB_EXITLEVEL_DEFAULT; /* holds if there was any warning during the compilation process */
 HB_PATHNAMES * hb_comp_pIncludePath = NULL;
 int            hb_comp_iFunctionCnt;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.20 2002/01/05 03:29:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.21 2002/01/05 19:28:46 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-01-06 14:00:00 UTC+0700 Andi Jahja <andijahja@cbn.net.id>
+   * source/compiler/harbour.c
+     + BOOL hb_comp_bNoStartUp = FALSE, initialization for option to create
+       C-source with startup flag ( HB_FS_FIRST ).
+   * source/compiler/cmdcheck.c
+     + additional arguments to switch /n :
+       /n or /n0 = do not generate implicit procedure but generate
+        startup flag ( HB_FS_FIRST )
+       /n1 = do not generate implicit procedure and startup flag ( HB_FS_FIRST )
+       /n- = forces implicit procedure generation
+   * source/compiler/genc.c
+     + switch /n1 creates C-Source with no HB_FS_FIRST ( no startup )
+   * source/compiler/hbusage.c
+     ! bump copyright year to 2002
+     + add info on switch /n1
+   * include/hbdefs.h
+     + add argument __EXPORT__ for exporting functions so that exports
+       will be done only on explicit request by #define __EXPORT__ in makefile
+       or make switch ( -D__EXPORT__ )
+     ! typo : _declspec => __declspec
+   * include/hbcomp.h
+     + BOOL hb_comp_bNoStartUp, public variable for generating C-source with
+       no_startup flag ( HB_FS_FIRST ) option.
+   + hrbdll.bc
+     makefile for harbour.dll with Borland CPP 5.5.1
+   + dll_55.bat
+     batch file to create harbour.dll with Borland CPP 5.5.1
+   * tests/dll55.bat
+     batch file to create application with harbour.dll ( BCC 5.5.1 )
+   * tests/dll.mak
+     makefile to create application with harbour.dll ( BCC 5.5.1 )
+
 2002-01-05 17:45 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
    * include/hbfsapi.h
      * under Win32 FHANDLE is typedef to long

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.75 2001/12/14 09:32:51 vszakats Exp $
+ * $Id: hbcomp.h,v 1.1.1.1 2001/12/21 10:47:40 ronpinkas Exp $
  */
 
 /*
@@ -450,6 +450,7 @@ extern BOOL           hb_comp_bForceMemvars;
 extern BOOL           hb_comp_bDebugInfo;
 extern char           hb_comp_szPrefix[ 20 ];
 extern int            hb_comp_iGenCOutput;
+extern BOOL           hb_comp_bNoStartUp;
 extern int            hb_comp_iExitLevel;
 extern int            hb_comp_iFunctionCnt;
 extern char           hb_comp_cVarType;

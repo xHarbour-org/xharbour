@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.49 2001/12/16 11:12:22 vszakats Exp $
+ * $Id: cmdcheck.c,v 1.1.1.1 2001/12/21 10:44:22 ronpinkas Exp $
  */
 
 /*
@@ -273,6 +273,25 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                        /* Accept rest as part of #define and continue with next Args[]. */
                        j = strlen( Args[i] );
+                       continue;
+
+                     case 'n' :
+                     case 'N' :
+                       /* Required argument */
+                       if ( Args[i][j + 1] )
+                       {
+                          /* Optional argument */
+                          Switch[2] = Args[i][j + 1];
+                          Switch[3] = '\0';
+                          j += 2;
+                       }
+                       else
+                       {
+                          /* No optional argument */
+                          Switch[2] = '\0';
+                          j += 1;
+                       }
+                       hb_compChkEnvironVar( (char*) Switch );
                        continue;
 
                      case 'o' :
@@ -656,10 +675,29 @@ void hb_compChkEnvironVar( char * szSwitch )
 
              case 'n':
              case 'N':
-                if( *( s + 1 ) == '-' )
-                   hb_comp_bStartProc = TRUE;
-                else
+                /*
+                   -n1 no start up procedure and no implicit start up procedure
+                */
+                if( *( s + 1 ) == '1' )
+                   {
                    hb_comp_bStartProc = FALSE;
+                   hb_comp_bNoStartUp = TRUE;
+                   }
+                /*
+                   -n or -n0 no implicit start up procedure
+                */
+                else if ( ( *( s + 1 ) == '0' ) || ( *( s + 1 ) == '\0' ) )
+                   hb_comp_bStartProc = FALSE;
+                /*
+                   -n- ceates implicit start up procedure
+                */
+                else if( *( s + 1 ) == '-' )
+                   hb_comp_bStartProc = TRUE;
+                /*
+                   invalid command
+                */
+                else
+                   hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
                 break;
 
              case 'o':

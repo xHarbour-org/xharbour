@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.37 2001/12/17 14:03:42 vszakats Exp $
+ * $Id: hbusage.c,v 1.1.1.1 2001/12/21 10:44:25 ronpinkas Exp $
  */
 
 /*
@@ -76,7 +76,9 @@ void hb_compPrintUsage( char * szSelf )
            "\n          %ck               compilation mode (type -k? for more data)",
            "\n          %cl               suppress line number information",
            "\n          %cm               compile module only",
-           "\n          %cn               no implicit starting procedure",
+           "\n          %cn[<type>]       no implicit starting procedure (default)",
+           "\n                           <type>: 0=no implicit starting procedure",
+           "\n                                   1=no starting procedure at all",
            "\n          %co<path>         object file drive and/or path",
            "\n          %cp               generate pre-processed output (.ppo) file",
            "\n          %cq               quiet",
@@ -180,6 +182,5 @@ void hb_compPrintLogo( void )
 {
    printf( "Harbour Compiler %d.%d.%d (%s)\n",
       HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
-   printf( "Copyright 1999-2001, http://www.harbour-project.org/\n" );
+   printf( "Copyright 1999-2002, http://www.harbour-project.org/\n" );
 }
-
