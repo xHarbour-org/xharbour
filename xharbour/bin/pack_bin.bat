@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: pack_bin.bat,v 1.2 2004/09/22 14:50:56 ronpinkas Exp $
+rem $Id: pack_bin.bat,v 1.3 2004/10/04 15:48:00 ronpinkas Exp $
 rem
 
 rem RDDADS separate from this, include headers and readme
@@ -12,14 +12,22 @@ rem set hb_compiler=bcc32
 
 set hb_ver=0.99.2
 
-if not "%hb_architecture%" == "linux"   set hb_archbin=zip
-if not "%hb_architecture%" == "linux"   set hb_archopt=-D -X
-if not "%hb_architecture%" == "linux"   set hb_archoptr=-D -X -r
-if not "%hb_architecture%" == "linux"   set hb_ext=.zip
-if     "%hb_architecture%" == "linux"   set hb_archbin=tar
-if     "%hb_architecture%" == "linux"   set hb_archopt=-czf --no-recursion
-if     "%hb_architecture%" == "linux"   set hb_archoptr=-czf
-if     "%hb_architecture%" == "linux"   set hb_ext=.tar.gz
+if "%hb_architecture%" == "linux" GOTO set_linux
+
+set hb_archbin=zip
+set hb_archopt=-D -X
+set hb_archoptr=-D -X -r
+set hb_ext=.zip
+
+GOTO set_file
+
+:SET_LINUX
+set hb_archbin=tar
+set hb_archopt=-czf --no-recursion
+set hb_archoptr=-czf
+set hb_ext=.tar.gz
+
+:SET_FILE
 
 set hb_filename=xharbour-%hb_ver%.bin.%hb_architecture%.%hb_compiler%%hb_ext%
 
@@ -49,11 +57,13 @@ if     "%hb_compiler%"     == "msvc"    %hb_archbin% %hb_archopt%  %hb_filename%
 if     "%hb_architecture%" == "linux"   %hb_archbin% %hb_archopt%  %hb_filename% bin/*.
 if not "%hb_architecture%" == "linux"   %hb_archbin% %hb_archopt%  %hb_filename% bin/harbour.exe
 rem if not "%hb_architecture%" == "linux"   %hb_archbin% %hb_archopt%  %hb_filename% bin/*.EXE
-                                        %hb_archbin% %hb_archoptr% %hb_filename% doc/*.txt doc/en/*.txt
-                                        %hb_archbin% %hb_archoptr% %hb_filename% doc/*.txt doc/es/*.txt
+                                        %hb_archbin% %hb_archoptr% %hb_filename% doc/*.txt doc/en/*.txt doc/es/*.txt
                                         %hb_archbin% %hb_archopt%  %hb_filename% include/*.api
                                         %hb_archbin% %hb_archopt%  %hb_filename% include/*.ch
                                         %hb_archbin% %hb_archopt%  %hb_filename% include/*.h
+
+                                        %hb_archbin% %hb_archopt%  %hb_filename% COPYING
+
 if     "%hb_compiler%"     == "gcc"     %hb_archbin% %hb_archopt%  %hb_filename% lib/*.a
 if     "%hb_compiler%"     == "mingw32" %hb_archbin% %hb_archopt%  %hb_filename% lib/*.a
 if     "%hb_compiler%"     == "djgpp"   %hb_archbin% %hb_archopt%  %hb_filename% lib/*.a
@@ -71,7 +81,6 @@ if exist %hb_filename% del %hb_filename%
 
 if     "%hb_compiler%"     == "bcc16"   %hb_archbin% %hb_archopt%  %hb_filename% bin/b16/*.tds
 if     "%hb_compiler%"     == "bcc32"   %hb_archbin% %hb_archopt%  %hb_filename% bin/b32/*.tds
-if     "%hb_compiler%"     == "msvc"    %hb_archbin% %hb_archopt%  %hb_filename% bin/vc/*.tds
 
 if     "%hb_compiler%"     == "bcc16"   %hb_archbin% %hb_archopt%  %hb_filename% bin/b16/*.map
 if     "%hb_compiler%"     == "bcc32"   %hb_archbin% %hb_archopt%  %hb_filename% bin/b32/*.map
@@ -86,4 +95,3 @@ if     "%hb_compiler%"     == "mingw32" %hb_archbin% %hb_archopt%  %hb_filename%
 if     "%hb_compiler%"     == "djgpp"   %hb_archbin% %hb_archopt%  %hb_filename% make_gnu.log
 if     "%hb_compiler%"     == "rsxnt"   %hb_archbin% %hb_archopt%  %hb_filename% make_gnu.log
 if     "%hb_compiler%"     == "rsx32"   %hb_archbin% %hb_archopt%  %hb_filename% make_gnu.log
-
