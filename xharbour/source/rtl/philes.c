@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.16 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: philes.c,v 1.17 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -129,7 +129,7 @@ HB_FUNC( FWRITE )
    if( ISNUM( 1 ) && ISCHAR( 2 ) )
       hb_retnl( hb_fsWriteLarge( hb_parnl( 1 ),
                                  ( BYTE * ) hb_parcx( 2 ),
-                                 ISNUM( 3 ) ? hb_parnl( 3 ) : hb_parclen( 2 ) ) );
+                                 ISNUM( 3 ) ? (ULONG) hb_parnl( 3 ) : hb_parclen( 2 ) ) );
    else
       hb_retnl( 0 );
 }

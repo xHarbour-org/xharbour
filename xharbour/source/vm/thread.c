@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.160 2004/03/06 12:56:59 jonnymind Exp $
+* $Id: thread.c,v 1.161 2004/03/29 18:04:02 ronpinkas Exp $
 */
 
 /*
@@ -916,13 +916,14 @@ void hb_threadCancelInternal( )
 */
 void hb_threadTerminator( void *pData )
 {
+   HB_MUTEX_STRUCT *pMtx;
+
 #ifdef HB_OS_WIN_32
    HB_STACK *_pStack_ = (HB_STACK *) pData;
 #else
    HB_STACK *_pStack_ = pthread_getspecific( hb_pkCurrentStack );
+   HB_SYMBOL_UNUSED( pData );
 #endif
-
-   HB_MUTEX_STRUCT *pMtx;
 
 #ifndef HB_OS_WIN_32
    pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2688 2004/03/30 18:52:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2689 2004/03/30 19:59:23 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-31 00:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/fparse.c
+  * xharbour/source/rtl/hbcomprs.c
+  * xharbour/source/rtl/hbffind.c
+  * xharbour/source/rtl/hbrandom.c
+  * xharbour/source/rtl/philes.c
+  * xharbour/source/vm/hash.c
+  * xharbour/source/vm/inet.c
+  * xharbour/source/vm/thread.c
+    * warning fixed
+
+  * xharbour/source/rtl/filesys.c
+    * fixed warnings
+    * some small fixes for errno settings and cleanups
 
 2004-03-30 02:45 UTC-0500 Sylvain Robert (s.robert/at/videotron.ca)
 * contrib\hbzlib\zipcomp.cpp

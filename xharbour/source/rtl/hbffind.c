@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.19 2004/03/04 21:51:50 andijahja Exp $
+ * $Id: hbffind.c,v 1.20 2004/03/21 12:01:26 likewolf Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.19 2004/03/04 21:51:50 andijahja Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.20 2004/03/21 12:01:26 likewolf Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -820,6 +820,8 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
       char     string[ _POSIX_PATH_MAX + 1 ];
       char     dirname[ _POSIX_PATH_MAX + 1 ];
       char *   pos;
+
+      HB_SYMBOL_UNUSED( uiAttr );
 
       ffind->info = ( void * ) hb_xgrab( sizeof( HB_FFIND_INFO ) );
       info = ( PHB_FFIND_INFO ) ffind->info;

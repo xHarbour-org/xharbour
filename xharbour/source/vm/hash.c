@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.30 2004/03/18 14:39:55 jonnymind Exp $
+ * $Id: hash.c,v 1.31 2004/03/29 17:04:19 ronpinkas Exp $
  */
 
 /*
@@ -2258,7 +2258,7 @@ HB_FUNC( HCOPY )
 
    ulLen   = hb_hashLen(pSource);
    ulStart = pStart == NULL ? 1 : hb_itemGetNL( pStart );
-   ulCount = pEnd   == NULL ? ulLen - ulStart + 1 : hb_itemGetNL( pEnd );
+   ulCount = pEnd   == NULL ? ulLen - ulStart + 1 : (ULONG) hb_itemGetNL( pEnd );
 
    if ( ulStart < 1 ||  ulCount <= 0 || ulStart + ulCount > ulLen)
    {

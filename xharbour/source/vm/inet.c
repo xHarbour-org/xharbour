@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.43 2004/03/07 00:01:19 andijahja Exp $
+* $Id: inet.c,v 1.44 2004/03/18 04:05:28 ronpinkas Exp $
 */
 
 /*
@@ -95,6 +95,7 @@
 void hb_inetLinuxSigusrHandle( int sig )
 {
    // nothing to do
+   HB_SYMBOL_UNUSED( sig );
 }
 #endif
 

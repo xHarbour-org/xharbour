@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.10 2004/03/19 17:42:23 likewolf Exp $
+ * $Id: fparse.c,v 1.11 2004/03/20 10:44:34 andijahja Exp $
  */
 
 /*
@@ -617,7 +617,6 @@ HB_FUNC( FCHARCOUNT )
 {
    FILE *inFile ;
    PHB_ITEM pSrc = hb_param(1, HB_IT_STRING);
-   ULONG ulCharCount = 0;
    ULONG ulResult = 0;
    int ch;
 

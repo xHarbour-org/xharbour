@@ -1,5 +1,5 @@
 /*
- * $Id: hbrandom.c,v 1.9 2004/02/10 13:16:18 andijahja Exp $
+ * $Id: hbrandom.c,v 1.10 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 #endif
 
 /* Globally available data, no need to MT it */
-volatile static int s_bInit = 0;
+static volatile int s_bInit = 0;
  
 /*
 * HB_RANDOM
