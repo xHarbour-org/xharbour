@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.49 2002/01/26 20:16:17 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.50 2002/01/26 21:13:58 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-26 21:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/errorapi.c
+  * source/vm/fastitem.c
+  * source/vm/itemapi.c
+    * Improved tracing calls.
+
+  * source/vm/hvm.c
+    * Modified HB_P_PUSHSTR* to support non terminated strings from modules compiled with Harbour.
+    ! Fixed minor bug in HB_P_LOCALNEARADDINT
+
+  * source/rtl/left.c
+    ! Optimized Left() (if called by non xHarbour compiled module).
 
 2002-01-26 13:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbdbf.h
@@ -36,7 +49,7 @@
 
 2002-01-25 21:24 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
-    * Chabged HB_P_FUNCTION* to use hb_vmFunction() instead of hb_vmDo()
+    * Changed HB_P_FUNCTION* to use hb_vmFunction() instead of hb_vmDo()
     * Added Clear Logic of hb_stack.Return to hb_vmFunction()
 
 2002-01-25 18:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>

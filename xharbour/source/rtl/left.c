@@ -1,13 +1,13 @@
 /*
- * $Id: left.c,v 1.1.1.1 2001/12/21 10:41:47 ronpinkas Exp $
+ * $Id: left.c,v 1.0 2002/01/26 02:03:43 ronpinkas Exp $
  */
 
 /*
- * Harbour Project source code:
- * LEFT() function
+ * xHarbour Project source code:
+ * Left() function
  *
- * Copyright 1999 Antonio Linares <alinares@fivetech.com>
- * www - http://www.harbour-project.org
+ * Copyright 2001 Ron Pinkas <ron@@ronpinkas.com>
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,56 +24,67 @@
  * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
  *
- * As a special exception, the Harbour Project gives permission for
- * additional uses of the text contained in its release of Harbour.
+ * As a special exception, xHarbour license gives permission for
+ * additional uses of the text contained in its release of xHarbour.
  *
- * The exception is that, if you link the Harbour libraries with other
+ * The exception is that, if you link the xHarbour libraries with other
  * files to produce an executable, this does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
  * Your use of that executable is in no way restricted on account of
- * linking the Harbour library code into it.
+ * linking the xHarbour library code into it.
  *
  * This exception does not however invalidate any other reasons why
  * the executable file might be covered by the GNU General Public License.
  *
- * This exception applies only to the code released by the Harbour
- * Project under the name Harbour.  If you copy code from other
- * Harbour Project or Free Software Foundation releases into a copy of
- * Harbour, as the General Public License permits, the exception does
+ * This exception applies only to the code released with this xHarbour
+ * explicit exception.  If you add/copy code from other sources,
+ * as the General Public License permits, the above exception does
  * not apply to the code that you add in this way.  To avoid misleading
  * anyone as to the status of such modified files, you must delete
  * this exception notice from them.
  *
- * If you write modifications of your own for Harbour, it is your choice
+ * If you write modifications of your own for xHarbour, it is your choice
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
- *
  */
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 #include "hbapierr.h"
+#include "hbstack.h"
 
 /* returns the left-most n characters in string */
-
 HB_FUNC( LEFT )
 {
    PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
 
    if( pText && ISNUM( 2 ) )
    {
-      long lLen = hb_parnl( 2 );
+      char *sLeft, *sString = pText->item.asString.value;
+      long lLeft = hb_parnl( 2 );
+      ULONG lLen = pText->item.asString.length;
 
-      if( lLen > ( long ) hb_itemGetCLen( pText ) )
+      HB_TRACE( HB_TR_DEBUG, ("Left( '%s', %i ) %i", sString, lLeft, lLen ) );
+
+      /* Must come first, because negative signed always greater than unsigned! */
+      if( lLeft <= 0 )
       {
-         lLen = ( long ) hb_itemGetCLen( pText );
+         hb_retclen( "", 0 );
+         return;
       }
-      else if( lLen < 0 )
+      else if( lLeft >= lLen )
       {
-         lLen = 0;
+         /* No need to retain the 1st parameter - Recycle. */
+         hb_itemForwardValue( &hb_stack.Return, pText );
+         return;
       }
 
-      hb_retclen( hb_itemGetCPtr( pText ), lLen );
+      sLeft = (char*) hb_xgrab( lLeft + 1 );
+      memcpy( sLeft, sString, lLeft );
+      sLeft[ lLeft ] = '\0';
+
+      hb_retclenAdopt( sLeft, lLeft );
    }
    else
    {

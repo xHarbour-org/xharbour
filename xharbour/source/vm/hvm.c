@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.28 2002/01/26 05:58:06 ronpinkas Exp $
+ * $Id: hvm.c,v 1.29 2002/01/26 20:16:19 ronpinkas Exp $
  */
 
 /*
@@ -1087,18 +1087,39 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSTR") );
          {
             USHORT uiSize = pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 );
-            hb_itemPushStaticString( ( char * ) pCode + w + 3, ( ULONG )( uiSize - 1 ) );
-            //hb_vmPushString( ( char * ) pCode + w + 3, ( ULONG )( uiSize ) - 1 );
+            char *sString = ( char * ) ( pCode ) + w + 3;
+
+            /* uiSize guranteed to not be 0 (or HB_P_PUSHSTRSHORT would be used!) */
+            if( sString[uiSize - 1] == '\0' )
+            {
+               hb_itemPushStaticString( sString, ( ULONG )( uiSize - 1 ) );
+            }
+            else
+            {
+               hb_vmPushString( sString, ( ULONG )( uiSize ) );
+            }
             w += ( 3 + uiSize );
             break;
          }
 
          case HB_P_PUSHSTRSHORT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSTRSHORT") );
-            hb_itemPushStaticString( ( char * ) pCode + w + 2, ( ULONG )( pCode[ w + 1 ] - 1 ) );
-            //hb_vmPushString( ( char * ) pCode + w + 2, ( ULONG )( pCode[ w + 1 ] ) - 1 );
-            w += ( 2 + pCode[ w + 1 ] );
+         {
+            BYTE uiSize = pCode[ w + 1 ];
+            char *sString = ( char * ) ( pCode ) + w + 2;
+
+            if( uiSize && sString[uiSize - 1] == '\0' )
+            {
+               hb_itemPushStaticString( sString, ( ULONG ) ( uiSize - 1 ) );
+            }
+            else
+            {
+               hb_vmPushString( sString, ( ULONG ) uiSize );
+            }
+
+            w += ( 2 + uiSize );
             break;
+         }
 
          case HB_P_PUSHBLOCK:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHBLOCK") );
@@ -1228,8 +1249,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                if( pResult )
                {
                   hb_itemForwardValue( pLocal, pResult );
-                  break;
                }
+
+               break;
             }
 
             if( pLocal->type & HB_IT_DOUBLE )
@@ -2060,6 +2082,7 @@ static void hb_vmPlus( void )
       }
       else
       {
+         HB_TRACE( HB_TR_DEBUG, ( "Error! String overflow in hb_vmPlus()" ) );
          hb_errRT_BASE( EG_STROVERFLOW, 1209, NULL, "+", 2, pItem1, pItem2 );
       }
    }
@@ -3456,7 +3479,9 @@ void hb_vmDo( USHORT uiParams )
             HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
          }
 
+         HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
          pFunc();
+         HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
 
          if( bProfiler && pSym->pDynSym )
          {
@@ -3483,7 +3508,8 @@ void hb_vmDo( USHORT uiParams )
    }
    else
    {
-      printf( "\nERROR, hb_vmDo() called to execute '%s' with a non NIL self value.\n", pSym->szName );
+      HB_TRACE( HB_TR_ERROR, ( "hb_vmDo() internal logic error, Symbol: '%s' Fun: %p, Self Type: %i", pSym->szName, pSym->pFunPtr, pSelf->type ) );
+      fprintf( stderr, "Error! hb_vmDo() internal logic failure, Symbol: '%s' Fun: %p, Self Type: %i", pSym->szName, pSym->pFunPtr, pSelf->type );
       exit(1);
    }
 
@@ -3515,7 +3541,7 @@ void hb_vmSend( USHORT uiParams )
    PHB_BASEARRAY pSelfBase;
    BOOL lPopSuper;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmSend(%hu)", uiParams));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmSend(%hu)", uiParams ) );
 
    //printf( "\n VmSend nItems: %i Params: %i Extra %i\n", hb_stack.pPos - hb_stack.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
 
@@ -3604,7 +3630,7 @@ void hb_vmSend( USHORT uiParams )
 
       pFunc();
 
-      if ( pSym != &hb_symEval && lPopSuper && pSelfBase->puiClsTree )
+      if ( ( pSym != &hb_symEval ) && lPopSuper && pSelfBase->puiClsTree )
       {
          USHORT nPos = pSelfBase->puiClsTree[0] - 1;
 
@@ -3661,7 +3687,11 @@ void hb_vmSend( USHORT uiParams )
       }
    }
 
+   HB_TRACE(HB_TR_DEBUG, ("Done hb_vmSend()"));
+
    hb_stackOldFrame( &sStackState );
+
+   HB_TRACE(HB_TR_DEBUG, ("Restored Stack hb_vmSend()"));
 
    if( s_bDebugging )
    {
@@ -3700,8 +3730,12 @@ static HARBOUR hb_vmDoBlock( void )
 
    hb_codeblockEvaluate( pBlock );
 
+   HB_TRACE(HB_TR_DEBUG, ("Done hb_vmDoBlock()"));
+
    /* restore stack pointers */
    ( hb_stackBaseItem() )->item.asSymbol.lineno = uiLine;
+
+   HB_TRACE(HB_TR_DEBUG, ("Restored Satck hb_vmDoBlock()"));
 }
 
 /* Evaluates a passed codeblock item with no arguments passed to a codeblock
@@ -3947,7 +3981,7 @@ static void hb_vmDebuggerShowLine( USHORT uiLine ) /* makes the debugger shows a
 
 void hb_vmPush( PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPush(%p) type: %i", pItem, pItem->type ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmPush(%p) type: %i", pItem, pItem->type ) );
 
    hb_itemCopy( hb_stackTopItem(), pItem );
    hb_stackPush();
@@ -4133,7 +4167,7 @@ void hb_vmPushString( char * szText, ULONG length )
 
 void hb_vmPushSymbol( PHB_SYMB pSym )
 {
-   HB_TRACE( HB_TR_DEBUG, ("hb_vmPushSymbol(%p) \"%s\"", pSym, pSym->szName ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_vmPushSymbol(%p) \"%s\"", pSym, pSym->szName ) );
 
    ( hb_stackTopItem() )->type = HB_IT_SYMBOL;
    ( hb_stackTopItem() )->item.asSymbol.value = pSym;

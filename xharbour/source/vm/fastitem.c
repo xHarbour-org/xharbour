@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.14 2002/01/21 09:11:56 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.15 2002/01/26 02:03:43 ronpinkas Exp $
  */
 
 /*
@@ -61,7 +61,7 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
 
 void hb_itemPushForward( PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemPushForward(%p)", pItem));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemPushForward(%p)", pItem ) );
 
    hb_itemForwardValue( hb_stackTopItem(), pItem );
    hb_stackPush();
@@ -69,7 +69,7 @@ void hb_itemPushForward( PHB_ITEM pItem )
 
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
 {
-   HB_TRACE( HB_TR_DEBUG, ("hb_itemForwardValue(%p, %p) %i", pDest, pSource, pDest->type ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemForwardValue(%p, %p) %i", pDest, pSource, pDest->type ) );
 
    if( pDest == pSource )
    {
@@ -110,15 +110,15 @@ PHB_ITEM hb_itemReturn( PHB_ITEM pItem )
 
 void hb_itemReleaseString( PHB_ITEM pItem )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_itemReleaseString(%p), '%s'", pItem, pItem->item.asString.value ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemReleaseString(%p), '%s'", pItem, pItem->item.asString.value ) );
 
    if( pItem->item.asString.bStatic == FALSE )
    {
       if( --*( pItem->item.asString.puiHolders ) == 0 )
       {
-         HB_TRACE( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.puiHolders ) );
+         HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.puiHolders ) );
          hb_xfree( pItem->item.asString.puiHolders );
-         HB_TRACE( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.value ) );
+         HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.value ) );
          hb_xfree( pItem->item.asString.value );
       }
    }
@@ -130,7 +130,7 @@ void hb_itemReleaseString( PHB_ITEM pItem )
 
 void hb_itemClear( PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemClear(%p)", pItem));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemClear(%p) type: %i", pItem, pItem->type ) );
 
    if( HB_IS_STRING( pItem ) )
    {
@@ -162,7 +162,7 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 {
    HB_ITEM temp;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemSwap(%p, %p)", pItem1, pItem2));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemSwap(%p, %p)", pItem1, pItem2));
 
    /*
    temp.type = HB_IT_NIL;
@@ -178,7 +178,7 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 
 void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemCopy(%p, %p)", pDest, pSource));
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemCopy(%p, %p)", pDest, pSource));
 
    if( pDest == pSource )
    {
@@ -219,7 +219,7 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
 PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
    if( pItem )
    {
@@ -251,7 +251,7 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
 
 PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
 
    if( pItem )
    {
@@ -285,7 +285,7 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
 
 PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
 
    if( pItem )
    {
@@ -312,7 +312,7 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 
 void hb_itemFastClear( PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ( "hb_itemFastClear(%p) Type: %i", pItem, pItem->type ) );
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ( "hb_itemFastClear(%p) Type: %i", pItem, pItem->type ) );
 
    if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
@@ -332,14 +332,14 @@ void hb_itemFastClear( PHB_ITEM pItem )
 
    pItem->type    = HB_IT_NIL;
 
-   HB_TRACE(HB_TR_DEBUG, ( "DONE hb_itemFastClear(%p)", pItem ) );
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ( "DONE hb_itemFastClear(%p)", pItem ) );
 }
 
 void hb_itemPushStaticString( char * szText, ULONG length )
 {
    PHB_ITEM pTop = hb_stackTopItem();
 
-   HB_TRACE(HB_TR_DEBUG, ( "hb_itemPushStaticString( \"%s\", %lu ) %p %p", szText, length, pTop, szText ) );
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ( "hb_itemPushStaticString( \"%s\", %lu ) %p %p", szText, length, pTop, szText ) );
 
    pTop->type = HB_IT_STRING;
    //pTop->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
@@ -353,7 +353,7 @@ void hb_itemPushStaticString( char * szText, ULONG length )
 
 void hb_retcAdopt( char * szText )
 {
-   HB_TRACE( HB_TR_INFO, ("hb_retcAdopt(%s) %p", &hb_stack.Return, szText ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdopt(%s) %p", &hb_stack.Return, szText ) );
 
    if( ( &hb_stack.Return )->type )
    {
@@ -379,7 +379,7 @@ void hb_retclenAdopt( char * szText, ULONG ulLen )
 {
    szText[ulLen] = '\0';
 
-   HB_TRACE( HB_TR_INFO, ("hb_retclenAdopt( %p, %lu ) %p \"%s\"", szText, ulLen, &hb_stack.Return, szText ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( %p, %lu ) %p \"%s\"", szText, ulLen, &hb_stack.Return, szText ) );
 
    if( ( &hb_stack.Return )->type )
    {
