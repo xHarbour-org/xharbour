@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.139 2002/12/29 19:58:43 ronpinkas Exp $
+ * $Id: hvm.c,v 1.141 2002/12/30 05:05:01 ronpinkas Exp $
  */
 
 /*
@@ -280,6 +280,8 @@ USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
 
 static   HB_ITEM  s_aGlobals;         /* Harbour array to hold all application global variables */
 
+static BOOL s_fmInit = TRUE;
+
 /* 21/10/00 - maurilio.longo@libero.it
    This Exception Handler gets called in case of an abnormal termination of an harbour program and
    displays a full stack trace at the harbour language level */
@@ -330,18 +332,19 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
    FILE *fpTrace;
 
-#if defined(HB_OS_OS2)
-   EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
-   APIRET rc = NO_ERROR;                           /* Return code                   */
-#endif
+   #if defined(HB_OS_OS2)
+      EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
+      APIRET rc = NO_ERROR;                           /* Return code                   */
+   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmInit()"));
 
     #ifdef HB_THREAD_SUPPORT
        HB_TRACE( HB_TR_INFO, ("contextInit" ) );
        hb_threadInit();
-       hb_gcInit();
     #endif
+
+    hb_gcInit();
 
    /* initialize internal data structures */
    s_aStatics.type = HB_IT_NIL;
@@ -371,8 +374,11 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    s_aGlobals.type = HB_IT_NIL;
    hb_arrayNew( &s_aGlobals, 0 );
 
+   /* Moved to respective main!
    HB_TRACE( HB_TR_INFO, ("xinit" ) );
    hb_xinit();
+   */
+
    HB_TRACE( HB_TR_INFO, ("errInit" ) );
    hb_errInit();
    HB_TRACE( HB_TR_INFO, ("stackInit" ) );
@@ -580,9 +586,7 @@ void HB_EXPORT hb_vmQuit( void )
    hb_xexit();
    //printf( "After xexit\n" );
 
-   #ifdef HB_THREAD_SUPPORT
-       hb_gcExit();
-   #endif
+   hb_gcExit();
 
    exit( s_byErrorLevel );
 }
@@ -5665,6 +5669,12 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
    int iPCodeVer = 0, iLen;
    char *sModule;
    BOOL bFree = FALSE;
+
+   if( s_fmInit )
+   {
+      s_fmInit = FALSE;
+      hb_xinit();
+   }
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pModuleSymbols));
 

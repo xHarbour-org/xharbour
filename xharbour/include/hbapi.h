@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.51 2002/12/29 08:32:41 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.52 2002/12/30 06:52:58 ronpinkas Exp $
  */
 
 /*
@@ -167,6 +167,9 @@ typedef struct HB_GARBAGE_
    USHORT locked;              /* locking counter */
    USHORT used;                /* used/unused block */
 } HB_GARBAGE, *HB_GARBAGE_PTR;
+
+extern void hb_gcInit( void );
+extern void hb_gcExit( void );
 
 extern HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
 extern void   hb_gcGripDrop( HB_ITEM_PTR pItem );

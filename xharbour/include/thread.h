@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.16 2002/12/29 23:32:42 jonnymind Exp $
+* $Id: thread.h,v 1.17 2002/12/30 05:05:01 ronpinkas Exp $
 */
 
 /*
@@ -59,9 +59,6 @@
 #include "hbdefs.h"
 #include "hbstack.h"
 #include "hbapierr.h"
-
-extern void hb_gcInit( void );
-extern void hb_gcExit( void );
 
 #if defined( HB_OS_WIN_32 )
    #ifndef _WIN32_WINNT
