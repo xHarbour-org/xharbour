@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael
 
-   $Id: button.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: filesel.prg,v 1.1 2003/04/14 22:35:07 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -13,6 +13,7 @@
 
 CLASS XWTFileSel FROM XWTWidget
    METHOD New( cText )
+   METHOD GetFile()
 ENDCLASS
 
 METHOD New( cText ) CLASS XWTFileSel
@@ -20,5 +21,13 @@ METHOD New( cText ) CLASS XWTFileSel
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_FILESEL )
    IF .not. Empty( cText )
       XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cText )
-   ENDIF
+   ENDIF  
 RETURN Self
+
+METHOD GetFile() Class XWTFileSel
+   LOCAL cFile := Space( 100 )
+   IF  XWT_GetProperty(::oRawWidget,XWT_PROP_FILENAME,@cFile)
+	return cFile   
+ENDIF
+
+RETURN ""    	

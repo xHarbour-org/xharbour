@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.6 2003/04/12 23:47:15 jonnymind Exp $
+   $Id: xwt_api.c,v 1.7 2003/04/14 22:35:07 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -217,6 +217,7 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_IMAGE:
       case XWT_PROP_NAME:
       case XWT_PROP_FILEMASK:
+      case XWT_PROP_FILENAME:
          prop.value.text = hb_parc( 3 );
       break;
 
@@ -328,6 +329,7 @@ HB_FUNC( XWT_GETPROPERTY )
       case XWT_PROP_IMAGE:
       case XWT_PROP_NAME:
       case XWT_PROP_FILEMASK:
+      case XWT_PROP_FILENAME:
          if( pParam1 != NULL )
          {
             hb_itemPutC( pParam1, (char *)prop.value.text );

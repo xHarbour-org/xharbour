@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_image.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: xwt_gtk_fileselect.c,v 1.1 2003/04/14 22:35:07 jonnymind Exp $
 
    GTK interface - File Selection Box 
 */
@@ -30,7 +30,7 @@ static void file_ok_sel( GtkWidget *widget,  gpointer cb_data )
    // itemPutC uses the char* parameter as it were const: it does not
    // mangles with that, it just creates a new local copy of the param.
    hb_itemPutC( &itmFileName, ( char *) fname );
-
+   gtk_widget_destroy(xwtFilew->main_widget);   
    //rising the updated event, to signal that we have a candidate filename
    xwt_rise_event( &Self, XWT_E_UPDATED, 1, &itmFileName );
 }

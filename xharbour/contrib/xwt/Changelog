@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.7 2003/04/12 23:47:02 jonnymind Exp $
+ * $Id: Changelog,v 1.8 2003/04/14 22:34:51 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-04-17 20:35 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * src/filesel.prg
+    + GetFile() Method
+  * src/xwt_gtk/xwt_gtk_fileselct.c
+    * Rewrited Ok_button call back
+  * include/xwt.ch       
+    + XWT_PROP_FILENAME 81
+  * src/xwt_api.c
+  * src/xwt_gtk/xwt_gtk.c    
+    * Added code to proper Get and Set Properties on FileSelection Dialog
+     
 2003-04-15 00:35 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   + src/filesel.prg
   + src/xwt_gtk/xwt_gtk_fileselct.c

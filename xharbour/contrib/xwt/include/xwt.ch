@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.6 2003/04/12 23:47:15 jonnymind Exp $
+   $Id: xwt.ch,v 1.7 2003/04/14 22:35:07 jonnymind Exp $
 
    Definitions
 */
@@ -78,6 +78,7 @@
 #define XWT_PROP_RADIOGROUP    71 // Pointer
 
 #define XWT_PROP_FILEMASK  80
+#define XWT_PROP_FILENAME  81
 
 #define XWT_PROP_FIXED      100 // bool
 #define XWT_PROP_MODAL      101 // bool

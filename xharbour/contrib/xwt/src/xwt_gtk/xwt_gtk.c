@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.7 2003/04/12 23:47:15 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.8 2003/04/14 22:35:07 jonnymind Exp $
 
    Global declarations, common functions
 */
@@ -27,7 +27,6 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             return TRUE;
          }
       return FALSE;
-
 
       case XWT_PROP_EDITABLE:
       //TODO
@@ -331,6 +330,10 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
       return FALSE;
 
+      case XWT_PROP_FILENAME:
+         gtk_file_selection_set_filename(GTK_FILE_SELECTION(wMain), prop->value.text);
+         return TRUE;
+
       case XWT_PROP_ATTACH:
 
          if( wWidget->type == XWT_TYPE_GRID )
@@ -601,6 +604,11 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             return TRUE;
          }
       return FALSE;
+
+      case XWT_PROP_FILENAME:
+         prop->value.text = gtk_file_selection_get_filename( GTK_FILE_SELECTION( wSelf ) );
+         return TRUE;
+
 
       case XWT_PROP_BOX:
          if( wWidget->type == XWT_TYPE_LAYOUT ||  wWidget->type == XWT_TYPE_PANE || wWidget->type == XWT_TYPE_GRID )
