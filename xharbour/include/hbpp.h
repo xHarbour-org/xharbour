@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.43 2001/12/14 09:32:51 vszakats Exp $
+ * $Id: hbpp.h,v 1.1.1.1 2001/12/21 10:47:41 ronpinkas Exp $
  */
 
 /*
@@ -82,7 +82,7 @@ typedef struct _COMMANDS
    struct _COMMANDS * last;
 } COMMANDS;
 
-#define HB_PP_STR_SIZE  12288
+#define HB_PP_STR_SIZE  16384
 #define HB_PP_BUFF_SIZE 4096
 
 #define HB_SKIPTABSPACES( sptr ) while( *sptr == ' ' || *sptr == '\t' ) ( sptr )++
