@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.12 2004/01/15 01:30:57 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.13 2004/01/15 12:58:26 jonnymind Exp $
  */
 
 /*
@@ -366,6 +366,10 @@ Atom s_atom_delwin;
 Atom s_atom_clientprot;
 XPoint s_FillerPts[2][16*16];
 int s_countPoints[2];
+
+// we try to connect in initialization, so we can immediately
+// report a critical error
+Display *s_Xdisplay;
 
 /**********************************************************************
 *                                                                     *
@@ -2757,6 +2761,9 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
    s_iStdOut = iFilenoStdout;
    s_iStdErr = iFilenoStderr;
 
+   // In case of a fatal error, immediately stops
+   //s_Xdisplay = XOpenDisplay( NULL );
+
    /* Prepare the GT to be started as soon as possible,
       but don't start it NOW */
    s_buffer = xvt_bufferNew( XVT_DEFAULT_COLS, XVT_DEFAULT_ROWS, 0x07 );
@@ -3640,10 +3647,29 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
 void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 {
+   XKeyboardControl kbc;
+   Display *disp;
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
-   // to be done.
-   HB_SYMBOL_UNUSED( dFrequency );
-   HB_SYMBOL_UNUSED( dDuration );
+
+   // we need our own instance of the display
+   disp = XOpenDisplay( NULL );
+   if ( disp )
+   {
+      kbc.bell_percent = 50;
+      kbc.bell_pitch = dFrequency;
+      kbc.bell_duration = dDuration/ 18.0 * 1000.0;
+
+      XChangeKeyboardControl( disp,
+         KBBellPercent | KBBellPitch | KBBellDuration,
+         &kbc
+         );
+      XBell( disp, 100 );
+      // this also flushes the request
+      XCloseDisplay( disp );
+   }
+   // anyhow, perform a sleep
+   usleep( kbc.bell_duration * 1000 );
+
 }
 
 /* *********************************************************************** */

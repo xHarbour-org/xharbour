@@ -8,18 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-
-2004-01-15 19:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
-   * xharbour/source/rtl/gtwvt/gtwvt.c
-     Formatting .
-     Changed location of Wvt_GETRGBCOLOR() function in appropriate group
+2004-01-15 14:58 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    + Added gt_tone() implementation :-))
 
 2004-01-15 14:07 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/gtxvt/gtxvt.c
     ! Faster and cleaner interprocess synchronization
     ! Main application receives a hb_vmRequestQuit if the window's child
       is killed externally.
-      
+
 2004-01-15 02:29 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/gtxvt/gtxvt.c
     ! Better handling of the dialogs between the two processes.

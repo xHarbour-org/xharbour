@@ -1,5 +1,5 @@
 /*
- * $Id: sound.prg,v 1.1.1.1 2001/12/21 10:46:26 ronpinkas Exp $
+ * $Id: sound.prg,v 1.2 2004/01/06 21:29:11 paultucker Exp $
  */
 
 function main()
@@ -16,4 +16,5 @@ local start := seconds(), stop
    stop := seconds()
    qout( "stop    ", stop )
    qout( "duration", ( stop - start ), "(should be close to 1.5)" )
+   //Inkey(0)
 return nil
