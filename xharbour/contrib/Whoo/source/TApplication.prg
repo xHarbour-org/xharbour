@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.28 2002/10/22 17:24:20 what32 Exp $
+ * $Id: TApplication.prg,v 1.29 2002/10/25 21:29:10 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -105,7 +105,7 @@ METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
 
    DEFAULT oParent TO self
 
-   TraceLog( cForm, oForm )
+   TraceLog( cForm, oForm, oForm:PropName )
 
    __objAddData( Self, cForm )
    oForm := if( oForm != NIL, oForm:New( oParent ), TForm():New( oParent ) )

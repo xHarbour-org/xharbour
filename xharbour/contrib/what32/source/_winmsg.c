@@ -144,25 +144,31 @@ HB_FUNC ( SENDMESSAGE )
 
 HB_FUNC ( SENDDLGITEMMESSAGE )
 {
-  char *cText = NULL ;
+   char *cText;
+   PHB_ITEM pText = hb_param( 5, HB_IT_STRING );
 
-   if( ISCHAR(5) && hb_parcsiz(5) )
+   if( pText )
    {
-      cText = (char*) hb_xgrab( hb_parcsiz(5) );
-      hb_xmemcpy( cText, hb_parc(5), hb_parcsiz(5) );
+      cText = (char*) hb_xgrab( pText->item.asString.length + 1 );
+      hb_xmemcpy( cText, pText->item.asString.value, pText->item.asString.length + 1 );
+   }
+   else
+   {
+      cText = NULL;
    }
 
    hb_retnl( (LONG) SendDlgItemMessage( (HWND) hb_parnl( 1 ) ,
                                         (int)  hb_parni( 2 ) ,
                                         (UINT) hb_parni( 3 ) ,
                                         (ISNIL(4) ? 0 : (WPARAM) hb_parnl( 4 ))   ,
-                                        (ISCHAR(5) ? (LPARAM) cText : (LPARAM) hb_parnl( 5 ))
+                                        (cText ? (LPARAM) cText : (LPARAM) hb_parnl( 5 ))
                                       )
             );
 
-  if( ISBYREF( 5 ) )
+  // Will be ignored if not BYREF.
+  if( pText )
   {
-     hb_storclen( cText, hb_parcsiz( 5 ), 5 ) ;
+     hb_storclen( cText, pText->item.asString.length, 5 ) ;
   }
 
   if( cText )
@@ -221,7 +227,7 @@ HB_FUNC ( PEEKMESSAGE )
      }
   else
      hb_retl ( 0 ) ;
- 
+
 }
 
 
@@ -298,7 +304,7 @@ HB_FUNC( SENDMESSAGETIMEOUT )
                                         (LPARAM) hb_parnl( 4 ),
                                         (UINT) hb_parni( 5 )  ,
                                         (UINT) hb_parni( 6 )  ,
-                                        lpdwResult            
+                                        lpdwResult
                                       ) ) ;
 }
 
@@ -353,7 +359,7 @@ HB_FUNC( WAITMESSAGE )
 HB_FUNC( WAITFORINPUTIDLE )
 {
    hb_retnl( (LONG) WaitForInputIdle( (HANDLE) hb_parnl( 1 ),
-                                      (DWORD) hb_parnl( 2 ) 
+                                      (DWORD) hb_parnl( 2 )
                                     ) ) ;
 }
 
@@ -390,7 +396,7 @@ HB_FUNC( MSGWAITFORMULTIPLEOBJECTS )
                                                (HANDLE) hb_parnl( 2 ),
                                                hb_parl( 3 )          ,
                                                (DWORD) hb_parnl( 4 ) ,
-                                               (DWORD) hb_parnl( 5 ) 
+                                               (DWORD) hb_parnl( 5 )
                                              ) ) ;
 }
 
@@ -404,7 +410,7 @@ HB_FUNC( MSGWAITFORMULTIPLEOBJECTSEX )
                                                  (HANDLE) hb_parnl( 2 ),
                                                  (DWORD) hb_parnl( 3 ) ,
                                                  (DWORD) hb_parnl( 4 ) ,
-                                                 (DWORD) hb_parnl( 5 ) 
+                                                 (DWORD) hb_parnl( 5 )
                                                ) ) ;
 }
 
@@ -426,7 +432,7 @@ HB_FUNC( SENDMESSAGECALLBACK )
                                  (WPARAM) hb_parnl( 3 ),
                                  (LPARAM) hb_parnl( 4 ),
                                  lpResultCallBack      ,
-                                 dwData                
+                                 dwData
                                ) ) ;
 }
 
@@ -487,7 +493,7 @@ HB_FUNC( REGISTERDEVICENOTIFICATION )
 
    hb_retnl( (LONG) RegisterDeviceNotification( (HANDLE) hb_parnl( 1 ),
                                                 NotificationFilter    ,
-                                                (DWORD) hb_parnl( 3 ) 
+                                                (DWORD) hb_parnl( 3 )
                                               ) ) ;
 }
 
@@ -514,7 +520,7 @@ HB_FUNC( ATTACHTHREADINPUT )
 
    hb_retl( AttachThreadInput( (DWORD) hb_parnl( 1 ) ,
                                (DWORD) hb_parnl( 2 ) ,
-                               hb_parl( 3 )          
+                               hb_parl( 3 )
                              ) ) ;
 }
 
