@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.105 2002/03/12 03:02:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.106 2002/03/14 19:14:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-03-15 2:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source\rtl\tget.prg
+    * METHOD _Delete()
+     * modification to be more Clip*r compliant and behaviour.
+      * changes in the logic of the function.
+        before, the function only erased the character under the cursor.
+        now it drags the other characters.
+        dragging is limited by the non editable characters.
+    * METHOD Insert()
+     * modification to be more Clip*r compliant and behaviour.
+      * changes in the logic of the function.
+        now insert a character and displaces to the right the rest of
+        the characters until the first non editable character.
+  * source\rtl\tgetlist.prg
+    * METHOD GetPostValidate()
+     * modification to be more Clip*r compliant and behaviour.
+      - eliminate call to SetFocus() when BadDate = .T., this fix makes
+        that the buffer is not erased if the date is incorrect.
+  Synched with Harbour.
 
 2002-03-13 21:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.sly
