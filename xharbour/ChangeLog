@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2687 2004/03/30 18:37:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2688 2004/03/30 18:52:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-30 02:45 UTC-0500 Sylvain Robert (s.robert/at/videotron.ca)
+* contrib\hbzlib\zipcomp.cpp
+    hb_CompressFile()
+    ! Convert Filename to lower case for HB_OS_WIN_32 only, this is done
+      only when verifying the File to add to the archive with the archive
+      file name to prevent infinite loop. Under windows Test.zip and test.zip
+      are the same. The file in the archive respect the case
 
 2004-03-30 11:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/arrays.c
