@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1167 2003/06/22 21:19:18 andijahja Exp $
+ * $Id: ChangeLog,v 1.1168 2003/06/22 22:29:15 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-06-23 09:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/vm/cmdarg.c
+  * source/rtl/gtapi.c
+  * source/rtl/gtwin/gtwin.c
+    + Add support for executable command line //NOMOUSE to disable mouse on
+      Win32 console mode
+
 2003-06-23 05:25 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/vm/hvm.c
     ! move ulClock of hv_vmDo() into #ifndef HB_NO_PROFILER loop

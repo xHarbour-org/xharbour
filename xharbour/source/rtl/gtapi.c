@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.5 2003/02/21 12:15:48 iananderson Exp $
+ * $Id: gtapi.c,v 1.6 2003/04/02 09:33:44 iananderson Exp $
  */
 
 /*
@@ -101,6 +101,14 @@ static int *  s_pColor;
           0x8000     Underline background
  */
 
+/*
+ To disable mouse at run time by passing NOMOUSE upon running
+ executable
+*/
+#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
+extern BOOL b_MouseEnable;
+#endif
+
 /* gt API functions */
 
 void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
@@ -109,6 +117,12 @@ void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
 
    s_pColor = ( int * ) hb_xgrab( ( HB_CLR_MAX_ + 1 ) * sizeof( int ) );
    s_uiColorCount = HB_CLR_MAX_ + 1;
+
+#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
+   if( hb_cmdargCheck( "NOMOUSE" ) )
+      /* Mouse is disabled here */
+      b_MouseEnable = FALSE;
+#endif
 
    hb_gt_Init( s_iFilenoStdin, s_iFilenoStdout, s_iFilenoStderr );
 

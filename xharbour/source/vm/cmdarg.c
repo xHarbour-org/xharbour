@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.3 2003/01/02 20:14:09 ronpinkas Exp $
+ * $Id: cmdarg.c,v 1.4 2003/01/02 23:10:13 ronpinkas Exp $
  */
 
 /*
@@ -52,6 +52,14 @@
 
 #include "hbapi.h"
 #include "hbmemory.ch"
+
+/* To disable mouse in Windows Console Mode
+   This variable will be set to FALSE upon
+   initialization of gt -> hb_gt_Init()
+*/
+#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
+BOOL b_MouseEnable = TRUE;
+#endif
 
 /* Command line argument management */
 static int     s_argc = 0;

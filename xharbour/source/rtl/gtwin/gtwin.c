@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.15 2003/05/16 19:52:12 druzus Exp $
+ * $Id: gtwin.c,v 1.16 2003/05/21 09:35:37 druzus Exp $
  */
 
 /*
@@ -80,6 +80,7 @@
 
 #define HB_OS_WIN_32_USED
 
+
 #include "hbapi.h"
 #include "hbapigt.h"
 #include "hbapifs.h"
@@ -95,6 +96,11 @@
 #if defined( _MSC_VER )
   #include <conio.h>
 #endif
+
+/*
+ To disable mouse, initialization was made in cmdarg.c
+*/
+extern BOOL b_MouseEnable;
 
 /* *********************************************************************** */
 
@@ -406,8 +412,15 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
     if( s_HInput != INVALID_HANDLE_VALUE )
     {
-        SetConsoleMode( s_HInput, ENABLE_MOUSE_INPUT );
-        HB_GT_FUNC(mouse_Init());
+        if( b_MouseEnable )
+        {
+           /* With Mouse */
+           SetConsoleMode( s_HInput, ENABLE_MOUSE_INPUT );
+           HB_GT_FUNC(mouse_Init());
+        }
+        else
+           /* NOMOUSE */
+           SetConsoleMode( s_HInput, 0x00000 );
     }
 }
 
@@ -438,7 +451,8 @@ void HB_GT_FUNC(gt_Exit( void ))
     /* Remove Ctrl+Break handler */
     SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), FALSE );
 
-    HB_GT_FUNC(mouse_Exit());
+    if( b_MouseEnable )
+       HB_GT_FUNC(mouse_Exit());
 }
 
 /* *********************************************************************** */
@@ -1457,8 +1471,9 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 #endif
           }
        }
-       else if( eventmask & ~( INKEY_KEYBOARD | INKEY_RAW )
+       else if( b_MouseEnable && eventmask & ~( INKEY_KEYBOARD | INKEY_RAW )
                          && s_irInBuf[ s_cNumIndex ].EventType == MOUSE_EVENT )
+
        {
 
           hb_mouse_iCol = s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwMousePosition.X;
