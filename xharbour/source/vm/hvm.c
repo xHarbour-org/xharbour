@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.439 2005/02/17 12:03:56 likewolf Exp $
+ * $Id: hvm.c,v 1.440 2005/02/24 10:44:13 andijahja Exp $
  */
 
 /*
@@ -1933,7 +1933,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_vmLocalName( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ),
                             ( char * ) pCode + w + 3 );
             w += 3;
-            while( pCode[ w++ ] );
+            while( pCode[ w++ ] ) {}
             break;
 
          case HB_P_STATICNAME:
@@ -1945,13 +1945,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                             ( char * ) pCode + w + 4 );
 */
             w += 4;
-            while( pCode[ w++ ] );
+            while( pCode[ w++ ] ) {}
             break;
 
          case HB_P_MODULENAME:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_MODULENAME") );
             hb_vmModuleName( ( char * ) pCode + w + 1 );
-            while( pCode[ w++ ] );
+            while( pCode[ w++ ] ) {}
             break;
 
          case HB_P_ENDBLOCK:

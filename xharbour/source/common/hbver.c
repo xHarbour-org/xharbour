@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.21 2005/02/24 10:44:03 andijahja Exp $
+ * $Id: hbver.c,v 1.22 2005/02/25 10:43:47 andijahja Exp $
  */
 
 /*
@@ -356,7 +356,7 @@ char * hb_verPlatform( void )
             int i;
 
             /* Skip the leading spaces (Win95B, Win98) */
-            for( i = 0; osVer.szCSDVersion[ i ] != '\0' && isspace( ( BYTE ) osVer.szCSDVersion[ i ] ); i++ );
+            for( i = 0; osVer.szCSDVersion[ i ] != '\0' && isspace( ( BYTE ) osVer.szCSDVersion[ i ] ); i++ ) {}
 
             if( osVer.szCSDVersion[ i ] != '\0' )
             {

@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.109 2005/01/11 08:44:09 druzus Exp $
+ * $Id: itemapi.c,v 1.110 2005/02/24 10:44:14 andijahja Exp $
  */
 
 /*
@@ -1794,7 +1794,7 @@ char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, ULONG * pulSize, BOOL * bFreeRe
             /* remove leading spaces if any, a little bit redundant but
              * I don't want to complicate the API interface more. Druzus
              */
-            for ( i = 0; buffer[i] == ' '; i++ );
+            for ( i = 0; buffer[i] == ' '; i++ ) {}
 
             if ( i > 0 )
             {

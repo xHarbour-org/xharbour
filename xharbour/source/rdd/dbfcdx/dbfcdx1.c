@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.185 2005/02/14 21:14:05 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.186 2005/02/24 10:44:05 andijahja Exp $
  */
 
 /*
@@ -1917,7 +1917,7 @@ static void hb_cdxPageLeafInitSpace( LPCDXPAGE pPage )
    SHORT iLen = pPage->TagParent->uiLen;
    BYTE  bBits;
 
-   for ( bBits = 0; iLen; bBits++, iLen >>= 1 );
+   for ( bBits = 0; iLen; bBits++, iLen >>= 1 ) {}
    pPage->ReqByte = 3;
    pPage->RNBits  = 24 - ( bBits << 1 );
    pPage->DCBits  = pPage->TCBits = bBits;
@@ -2721,7 +2721,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
             bMax = iLen - 6 - HB_MAX( pPtr[ iKeys * iLen - 1 ], bMax );
 #endif
             for ( j = 0; j < bMax &&
-                         pPtr[ ( iKeys - 1 ) * iLen + j ] == pbKey[ j ]; j++ );
+                         pPtr[ ( iKeys - 1 ) * iLen + j ] == pbKey[ j ]; j++ ) {}
 #ifdef HB_CDX_DSPDBG_INFO
             printf("\r\nbDup=%d, bTrl=%d ", j, iLen - 6 - bMax ); fflush(stdout);
 #endif

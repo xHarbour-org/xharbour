@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.109 2005/02/14 21:14:02 druzus Exp $
+ * $Id: dbf1.c,v 1.110 2005/02/24 10:44:04 andijahja Exp $
  */
 
 /*
@@ -341,7 +341,7 @@ static ERRCODE hb_dbfUnlockRecord( DBFAREAP pArea, ULONG ulRecNo )
 
    /* Search the locked record */
    for( ulCount = 0; ulCount < pArea->ulNumLocksPos &&
-                     pArea->pLocksPos[ ulCount ] != ulRecNo; ulCount++ );
+                     pArea->pLocksPos[ ulCount ] != ulRecNo; ulCount++ ) {}
 
    if( ulCount < pArea->ulNumLocksPos )
    {

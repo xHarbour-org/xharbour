@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.52 2004/09/03 07:01:18 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.53 2004/11/21 21:44:25 druzus Exp $
  */
 
 /*
@@ -551,7 +551,7 @@ HB_FUNC( HB_AEXPRESSIONS )
             }
             else
             {
-               while( ++i < pLine->item.asString.length  && pLine->item.asString.value[i] != ']'  );
+               while( ++i < pLine->item.asString.length  && pLine->item.asString.value[i] != ']'  ) {}
             }
             bArray = FALSE;
             break;
@@ -562,12 +562,12 @@ HB_FUNC( HB_AEXPRESSIONS )
             break;
 
          case '"' :
-            while( ++i < pLine->item.asString.length && pLine->item.asString.value[i] != '"'  );
+            while( ++i < pLine->item.asString.length && pLine->item.asString.value[i] != '"'  ) {}
             bArray = FALSE;
             break;
 
          case '\'' :
-            while( ++i < pLine->item.asString.length && pLine->item.asString.value[i] != '\''  );
+            while( ++i < pLine->item.asString.length && pLine->item.asString.value[i] != '\''  ) {}
             bArray = FALSE;
             break;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.192 2005/01/09 06:08:25 likewolf Exp $
+ * $Id: ppcore.c,v 1.193 2005/02/13 01:22:44 ronpinkas Exp $
  */
 
 /*
@@ -676,7 +676,7 @@ char * hb_ppPlatform( void )
             int i;
 
             /* Skip the leading spaces (Win95B, Win98) */
-            for( i = 0; osVer.szCSDVersion[ i ] != '\0' && isspace( ( BYTE ) osVer.szCSDVersion[ i ] ); i++ );
+            for( i = 0; osVer.szCSDVersion[ i ] != '\0' && isspace( ( BYTE ) osVer.szCSDVersion[ i ] ); i++ ) {}
 
             if( osVer.szCSDVersion[ i ] != '\0' )
             {
@@ -1423,7 +1423,7 @@ static DEFINES * DefSearch( char * defname, BOOL * isNew )
     if( stdef->name != NULL )
     {
        for( j=0; *(stdef->name+j) == *(defname+j) &&
-               *(stdef->name+j) != '\0'; j++ );
+               *(stdef->name+j) != '\0'; j++ ) {}
        if( *(stdef->name+j) == *(defname+j) )
        {
           if( isNew )
@@ -1450,7 +1450,7 @@ static COMMANDS * ComSearch( char * cmdname, COMMANDS * stcmdStart )
 
       for( j=0; (*(stcmd->name+j)==toupper(*(cmdname+j))) &&
               (*(stcmd->name+j)!='\0') &&
-              ((stcmd->com_or_xcom)? 1:(j<4 || ISNAME(*(cmdname+j+1)))); j++ );
+              ((stcmd->com_or_xcom)? 1:(j<4 || ISNAME(*(cmdname+j+1)))); j++ ) {}
       if( (*(stcmd->name+j)==toupper(*(cmdname+j))) ||
            ( !stcmd->com_or_xcom && j >= 4 && *(stcmd->name+j)!='\0'
              && *(cmdname+j) == '\0' ) )
@@ -1475,7 +1475,7 @@ static COMMANDS * TraSearch( char * cmdname, COMMANDS * sttraStart )
   {
      for( j=0; *(sttra->name+j)==toupper(*(cmdname+j)) &&
              *(sttra->name+j)!='\0' &&
-             ((sttra->com_or_xcom)? 1:(j<4 || ISNAME(*(cmdname+j+1)))); j++ );
+             ((sttra->com_or_xcom)? 1:(j<4 || ISNAME(*(cmdname+j+1)))); j++ ) {}
      if( *(sttra->name+j)==toupper(*(cmdname+j)) ||
           ( !sttra->com_or_xcom && j >= 4 &&
             *(sttra->name+j)!='\0' && *(cmdname+j) == '\0' ) )
@@ -5933,7 +5933,7 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
     }
   }
 
-  while(--readed >= 0 && ( buffer[readed] == ' ' || buffer[readed] == '\t') );
+  while(--readed >= 0 && ( buffer[readed] == ' ' || buffer[readed] == '\t') ) {}
 
   /* rglab: start */
   if( cha == '\n' && readed < 0 )
@@ -6399,7 +6399,7 @@ static BOOL strincmp( char * ptro, char ** ptri, BOOL lTrunc )
 
   for( ; **ptri != ',' && **ptri != '\16' && **ptri != '\17' &&
          **ptri != '\1' && **ptri != '\0' && toupper(**ptri)==toupper(*ptro);
-        ptro++, (*ptri)++ );
+        ptro++, (*ptri)++ ) {}
   co = *(ptro-1);
   ci = **ptri;
 
