@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbcrc32.c,v 1.2 2003/05/20 03:45:31 lculik Exp $
+ * $Id: hbcrc32.c,v 1.3 2003/05/20 03:45:31 lculik Exp $
  */
 
 /*
@@ -113,7 +113,7 @@ static void make_crc_table()
   poly = 0L;
   for (n = 0; n < sizeof(p)/sizeof(Byte); n++)
     poly |= 1L << (31 - p[n]);
-
+ 
   for (n = 0; n < 256; n++)
   {
     c = (ULONG)n;
@@ -235,8 +235,8 @@ HB_FUNC( HB_CRC32)
       ulSum = (ULONG) hb_parnl( 2 );
    }
 
-   hb_retnd( (long)
-      crc32( ulSum, (const unsigned char *) ( pString->item.asString.value ), pString->item.asString.length ) );
+   hb_retnd( (long) 
+      crc32( ulSum, ( const BYTE *) pString->item.asString.value, pString->item.asString.length ) );
 }
 
 

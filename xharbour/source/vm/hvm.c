@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.201 2003/05/26 01:26:26 ronpinkas Exp $
+ * $Id: hvm.c,v 1.202 2003/05/26 02:40:23 ronpinkas Exp $
  */
 
 /*
@@ -6673,7 +6673,6 @@ void hb_vmRequestCancel( void )
       char buffer[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 2 ];
       int i = 1, i2;
       unsigned short uLine;
-      PHB_ITEM * pBase;
 
       hb_conOutErr( hb_conNewLine(), 0 );
       sprintf( buffer, "Cancelled at: %s (%i)", hb_stackBaseItem()->item.asSymbol.value->szName, hb_stackBaseItem()->item.asSymbol.lineno );
@@ -7244,7 +7243,7 @@ HB_FUNC( HB_QSELF )
    {
       if( lLevel <= 0 && HB_IS_BLOCK( *( pBase + 1 ) ) )
       {
-         PHB_ITEM pBlock = *( pBase + 1 ), pLocal1;
+         PHB_ITEM pBlock = *( pBase + 1 );
 
          if( pBlock->item.asBlock.value->pSelfBase )
          {
@@ -7355,7 +7354,7 @@ HB_FUNC( HB_RESTOREBLOCK )
             PHB_ITEM pSelf = hb_param( 2, HB_IT_ARRAY );
 
             Block.type = HB_IT_BLOCK;
-            Block.item.asBlock.value = hb_codeblockMacroNew( (unsigned char *) ( PCode.item.asString.value ), PCode.item.asString.length );
+            Block.item.asBlock.value = hb_codeblockMacroNew( (unsigned char *) ( PCode.item.asString.value ), ( USHORT )PCode.item.asString.length );
             Block.item.asBlock.value->pSymbols = pModuleSymbols->pModuleSymbols;
             Block.item.asBlock.paramcnt = ParamCount.item.asInteger.value;
 

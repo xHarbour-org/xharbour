@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.4 2003/02/09 00:10:23 ronpinkas Exp $
+ * $Id: hbinit.h,v 1.5 2003/05/24 00:29:09 ronpinkas Exp $
  */
 
 /*
@@ -123,7 +123,10 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
       static int func( void ) {
 
-   #define HB_CALL_ON_STARTUP_END( func ) return 1; } \
+   #define HB_CALL_ON_STARTUP_END( func ) \
+          _HB_CALL_ON_STARTUP_END( func )
+
+   #define _HB_CALL_ON_STARTUP_END( func ) return 1; } \
       static int static_int_##func = func();
 
 #elif defined(_MSC_VER)
@@ -143,7 +146,12 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
       static int func( void ) {
 
-   #define HB_CALL_ON_STARTUP_END( func ) return 1; } \
+   /* this allows any macros to be preprocessed first
+      so that token pasting is handled correctly */
+   #define HB_CALL_ON_STARTUP_END( func ) \
+          _HB_CALL_ON_STARTUP_END( func )
+
+   #define _HB_CALL_ON_STARTUP_END( func ) return 1; } \
       static int static_int_##func = func();
 
 #elif defined(__WATCOMC__)
@@ -162,7 +170,10 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
       static int func( void ) {
 
-   #define HB_CALL_ON_STARTUP_END( func ) return 1; }; \
+   #define HB_CALL_ON_STARTUP_END( func ) \
+          _HB_CALL_ON_STARTUP_END( func )
+
+   #define _HB_CALL_ON_STARTUP_END( func ) return 1; }; \
       static int static_int_##func = func();
 
 #elif defined( __LCC__ )
@@ -180,7 +191,10 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
       static int func( void ) {
 
-   #define HB_CALL_ON_STARTUP_END( func ) return 1; } \
+   #define HB_CALL_ON_STARTUP_END( func ) \
+          _HB_CALL_ON_STARTUP_END( func )
+
+   #define _HB_CALL_ON_STARTUP_END( func ) return 1; } \
       static int static_int_##func = func();
 
 #endif

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.48 2003/05/20 00:33:37 lculik Exp $
+# $Id: makefile.vc,v 1.49 2003/05/26 02:40:23 ronpinkas Exp $
 #
 
 #
@@ -64,6 +64,9 @@ DEL = del
 !ifdef HB_MT
 MT           =MT
 HB_MT        =-MT -DHB_THREAD_SUPPORT
+!else
+!undef MT
+!undef HB_MT
 !endif
 
 # SimpLex is the only supported Scanner in xHarbour.
@@ -83,6 +86,7 @@ OBJ_DIR      =obj\vc
 INCLUDE_DIR  =include
 COMMON_DIR   =source\common
 COMPILER_DIR =source\compiler
+CODEPAGE_DIR =source\codepage
 DEBUG_DIR    =source\debug
 LANG_DIR     =source\lang
 MACRO_DIR    =source\macro
@@ -126,13 +130,18 @@ HARBOURFLAGS =$(HARBOURFLAGS) -dPDF
 !endif
 
 !ifdef HB_MT
-HARBOURFLAGS = $(HARBOURFLAGS) -DHB_THREAD_SUPPORT
+HARBOURFLAGS =$(HARBOURFLAGS) -DHB_THREAD_SUPPORT
+!endif
+
+!ifdef HB_MULTI_GT
+C_FLAGS      =$(C_FLAGS) -DHB_MULTI_GT
 !endif
 
 #
 # Macros to access our library names
 #
 
+CODEPAGE_LIB =$(LIB_DIR)\codepage.lib
 COMMON_LIB   =$(LIB_DIR)\common.lib
 DBFCDX_LIB   =$(LIB_DIR)\dbfcdx.lib
 DBFCDXMT_LIB =$(LIB_DIR)\dbfcdx$(MT).lib
@@ -156,13 +165,14 @@ VMMT_LIB     =$(LIB_DIR)\vm$(MT).lib
 
 GTCGI_LIB    =$(LIB_DIR)\gtcgi.lib
 GTDOS_LIB    =$(LIB_DIR)\gtdos.lib
+GTNUL_LIB    =$(LIB_DIR)\gtnul.lib
 GTPCA_LIB    =$(LIB_DIR)\gtpca.lib
 GTSTD_LIB    =$(LIB_DIR)\gtstd.lib
 GTWIN_LIB    =$(LIB_DIR)\gtwin.lib
 
 HARBOUR_EXE  =$(BIN_DIR)\harbour.exe
 HBPP_EXE     =$(BIN_DIR)\hbpp.exe
-HBRUN_EXE    =$(BIN_DIR)\hbrun.exe
+HBRUN_EXE    =$(BIN_DIR)\hbrun$(MT).exe
 HBTEST_EXE   =$(BIN_DIR)\hbtest.exe
 HBDOC_EXE    =$(BIN_DIR)\hbdoc.exe
 HBMAKE_EXE   =$(BIN_DIR)\hbmake.exe
@@ -175,6 +185,7 @@ HBMAKE_EXE   =$(BIN_DIR)\hbmake.exe
 
 HB_GT_LIBS = \
    $(GTCGI_LIB) \
+   $(GTNUL_LIB) \
    $(GTPCA_LIB) \
    $(GTSTD_LIB) \
    $(GTWIN_LIB)
@@ -195,10 +206,10 @@ HB_GT_LIB = $(LIB_DIR)\$(HB_GT_LIB).lib
 
 # override builtin
 
-.c.obj::
+.c.obj:
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-.cpp.obj::
+.cpp.obj:
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 #
@@ -210,6 +221,7 @@ HB_GT_LIB = $(LIB_DIR)\$(HB_GT_LIB).lib
 LIBLIST = \
    $(RTL_LIB) \
    $(COMMON_LIB) \
+   $(CODEPAGE_LIB) \
    $(DEBUG_LIB) \
    $(MACRO_LIB) \
    $(PP_LIB) \
@@ -223,6 +235,7 @@ LIBLIST = \
    $(SAMPLES_LIB) \
    $(ODBC_LIB)
 
+!ifdef HB_MT
 LIBLISTMT = \
    $(RTLMT_LIB) \
    $(PPMT_LIB) \
@@ -231,6 +244,7 @@ LIBLISTMT = \
    $(DBFNTXMT_LIB) \
    $(VMMT_LIB) \
    $(ODBCMT_LIB)
+!endif
 
 #
 # macro.lib needs to be listed twice
@@ -247,7 +261,9 @@ LIBS = \
 LIBS2 = \
    $(LIBS) \
    user32.lib \
-   winspool.lib
+   winspool.lib \
+   ole32.lib \
+   oleaut32.lib
 
 #
 # RTL.LIB rules
@@ -270,6 +286,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\binnum.obj \
    $(OBJ_DIR)$(MT)\binnumx.obj \
    $(OBJ_DIR)$(MT)\box.obj \
+   $(OBJ_DIR)$(MT)\cdpapi.obj \
    $(OBJ_DIR)$(MT)\chrasc.obj \
    $(OBJ_DIR)$(MT)\colorind.obj \
    $(OBJ_DIR)$(MT)\console.obj \
@@ -490,6 +507,26 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgzhb5.obj
 
 #
+# CODEPAGE.LIB rules
+#
+
+{$(CODEPAGE_DIR)}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+CODEPAGE_LIB_OBJS = \
+   $(OBJ_DIR)\cdpesdos.obj \
+   $(OBJ_DIR)\cdpeswin.obj \
+   $(OBJ_DIR)\cdpgedos.obj \
+   $(OBJ_DIR)\cdpgewin.obj \
+   $(OBJ_DIR)\cdpla850.obj \
+   $(OBJ_DIR)\cdppl852.obj \
+   $(OBJ_DIR)\cdppliso.obj \
+   $(OBJ_DIR)\cdpplmaz.obj \
+   $(OBJ_DIR)\cdpru866.obj \
+   $(OBJ_DIR)\cdpruwin.obj \
+   $(OBJ_DIR)\cdprukoi.obj
+
+#
 # MACRO.LIB rules
 #
 
@@ -708,6 +745,16 @@ GTDOS_LIB_OBJS = \
    $(OBJ_DIR)\mousedos.obj
 
 #
+# GTNUL.LIB rules
+#
+
+{$(RTL_DIR)\gtnul}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+GTNUL_LIB_OBJS = \
+   $(OBJ_DIR)\gtnul.obj
+
+#
 # GTPCA.LIB rules
 #
 
@@ -779,6 +826,7 @@ TARGETS= \
    $(HARBOUR_EXE) \
    $(LIBLIST) \
    $(LIBLISTMT) \
+   $(HB_GT_LIBS) \
    $(HBRUN_EXE) \
    $(HBPP_EXE) \
    $(HBTEST_EXE) \
@@ -805,10 +853,10 @@ CLEAN:
    -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
    -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
    -@if exist $(OBJ_DIR)\*.pch $(DEL) $(OBJ_DIR)\*.pch > nul
-   -@if exist $(OBJ_DIR)MT\*.obj $(DEL) $(OBJ_DIR)MT\*.obj > nul
-   -@if exist $(OBJ_DIR)MT\*.c $(DEL) $(OBJ_DIR)MT\*.c > nul
-   -@if exist $(OBJ_DIR)MT\*.h $(DEL) $(OBJ_DIR)MT\*.h > nul
-   -@if exist $(OBJ_DIR)MT\*.pch $(DEL) $(OBJ_DIR)MT\*.pch > nul
+   -@if exist $(OBJ_DIR)mt\*.obj $(DEL) $(OBJ_DIR)mt\*.obj > nul
+   -@if exist $(OBJ_DIR)mt\*.c $(DEL) $(OBJ_DIR)mt\*.c > nul
+   -@if exist $(OBJ_DIR)mt\*.h $(DEL) $(OBJ_DIR)mt\*.h > nul
+   -@if exist $(OBJ_DIR)mt\*.pch $(DEL) $(OBJ_DIR)mt\*.pch > nul
    -@if exist $(LIB_DIR)\*.lib $(DEL) $(LIB_DIR)\*.lib > nul
    -@if exist $(BIN_DIR)\*.exe $(DEL) $(BIN_DIR)\*.exe > nul
    -@if exist $(BIN_DIR)\*.map $(DEL) $(BIN_DIR)\*.map > nul
@@ -826,10 +874,10 @@ $(HBPP_EXE) : \
 $(HBRUN_EXE) : \
    $(HBRUN_DIR)\hbrun.prg \
    $(HBRUN_DIR)\external.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
-   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbrun.c \
-                                      $(OBJ_DIR)\external.c \
-                       -o $(HBRUN_EXE) /link $(L_DFLAGSNMT) $(LIBS2) ole32.lib oleaut32.lib
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
+   $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)$(MT)\ $(OBJ_DIR)$(MT)\hbrun.c \
+                                        $(OBJ_DIR)$(MT)\external.c \
+                       -o $(HBRUN_EXE) /link $(L_DFLAGS) $(LIBLISTMT) $(LIBS2)
 
 #
 # HBTEST.EXE rules
@@ -915,6 +963,7 @@ $(HBDOC_EXE) : \
 
 $(HBMAKE_EXE) : \
    $(HBMAKE_DIR)\hbmake.prg \
+   $(HBMAKE_DIR)\tmake.prg \
    $(HBMAKE_DIR)\hbmutils.prg \
    $(HBMAKE_DIR)\radios.prg \
    $(HBMAKE_DIR)\checks.prg \
@@ -926,12 +975,13 @@ $(HBMAKE_EXE) : \
    $(HBMAKE_DIR)\prb_stak.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
    $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbmake.c \
+                                      $(OBJ_DIR)\tmake.c \
                                       $(OBJ_DIR)\hbmutils.c \
-                                      $(OBJ_DIR)\radios.c \
-                                      $(OBJ_DIR)\checks.c \
                                       $(OBJ_DIR)\fclass1.c \
                                       $(OBJ_DIR)\ffile1.c \
                                       $(OBJ_DIR)\ft_funcs.c \
+                                      $(OBJ_DIR)\radios.c \
+                                      $(OBJ_DIR)\checks.c \
                                       $(OBJ_DIR)\pickarry.c \
                                       $(OBJ_DIR)\pickfile.c \
                                       $(OBJ_DIR)\prb_stak.c \
@@ -999,6 +1049,9 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
    lib /out:$@ $**
 
+$(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
+   lib /out:$@ $**
+
 $(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
    lib /out:$@ $**
 
@@ -1027,6 +1080,9 @@ $(VM_LIB) : $(VM_LIB_OBJS)
    lib /out:$@ $**
 
 $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
+   lib /out:$@ $**
+
+$(GTNUL_LIB) : $(GTNUL_LIB_OBJS)
    lib /out:$@ $**
 
 $(GTPCA_LIB) : $(GTPCA_LIB_OBJS)

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.31 2003/05/10 01:46:28 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.32 2003/05/15 01:52:30 andijahja Exp $
  */
 
 /*
@@ -1577,7 +1577,12 @@ HB_FUNC( __DBLOCATE )
          bFor = hb_itemGetL( pNewFor );
       }
 
-      while( !( ( AREAP ) s_pCurrArea->pArea )->fEof && lNext-- > 0 && bWhile && !bFor )
+      if( pNext )
+         lNext = hb_parnl( 3 );
+      else
+         lNext = 0xffffffffu;  /* maxed out */
+
+      while( !( ( AREAP ) s_pCurrArea->pArea )->fEof && lNext-- != 0 && bWhile && !bFor )
       {
          SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.21 2003/03/17 20:17:48 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.22 2003/03/28 00:51:21 ronpinkas Exp $
  */
 
 /*
@@ -1436,7 +1436,7 @@ RETURN uObj
                                            lDispID,
                                            &IID_NULL,
                                            LOCALE_USER_DEFAULT,
-                                           wFlags,
+                                           ( unsigned short )wFlags,
                                            &dParams,
                                            NULL,    // No return value
                                            &excep,

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1050 2003/05/26 00:27:49 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1051 2003/05/26 02:44:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,49 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-05-26 01:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/pp/ppcore.c
+    - local ifou (unused) at 1575
+  * source/rtl/win32ole.prg
+    * cast at 1443
+  * source/rtl/gtnul/gtnul.c
+    * cast at 594
+  * source/rtl/hbcrc32.c
+    * cast at 239
+  * source/rdd/dbcmd.c
+    __Dblocate() : correct use of Next in While case (around 1580)
+  * source/vm/hvm.c
+    - pBase (unused) at 6676
+    - pLocal1 (unused) at 7246
+    * cast at 7357
+    * change ulLine to uLine in hb_vmRequestCancel (ron caught this)
+  * source/vm/thread.c
+    - th_h (unused) at 1597 (ron caught this too)
+  * make_vc.bat
+    * display the name of the makefile being used.
+  * makefile.nt
+  * makefile.vc
+    + source/rtl/cdpapi.c
+    + source/rtl/gtnul/gtnul.c
+    + source/Codepage/*
+    + utils/hbmake/tmake.prg
+    + codepage.lib
+    + gtcgi.lib
+    + gtnul.lib
+    + gtpca.lib
+    + gtstd.lib
+    + ole32.lib
+    + oleaut32.lib
+    + hbrunmt.exe
+  * include/hbinit.h
+    ! rename HB_CALL_ON_STARTUP_END( func ) to _HB_CALL_ON_STARTUP_END( func )
+      When a Token is used in a longer identifier, no string substitution takes
+      place.  Because we need the expanded version of the token, we do it like
+      this.
+    + /* this allows any macros to be preprocessed first
+         so that token pasting is handled correctly */
+      #define HB_CALL_ON_STARTUP_END( func ) \
+             _HB_CALL_ON_STARTUP_END( func )
 
 2003-05-25 19:43 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * makefile.nt
@@ -75,7 +118,7 @@
       which then forwards it to hb_compGenCCode() and hb_compGenCObj()
 
   * source/compiler/genc.c
-    + Added logic to conver '\' to '/' in __PRG_SOURCE__ to correct display problem.
+    + Added logic to convert '\' to '/' in __PRG_SOURCE__ to correct display problem.
     + Added logic to use source file path when generating __PRG_SOURCE__
 
   * source/vm/extend.c

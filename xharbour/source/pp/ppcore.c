@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.70 2003/05/19 18:43:46 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.71 2003/05/26 00:19:15 ronpinkas Exp $
  */
 
 /*
@@ -1572,7 +1572,6 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
   char sToken[MAX_NAME];
   char * ptri, * ptro, * ptrb;
   int lenToken, i, ipos, isdvig, lens, iOffset;
-  int ifou;
   int kolpass = 0;
   DEFINES * stdef;
   COMMANDS * stcmd;

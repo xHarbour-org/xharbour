@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: make_vc.bat,v 1.9 2003/04/09 19:47:17 paultucker Exp $
+rem $Id: make_vc.bat,v 1.10 2003/04/09 20:12:39 paultucker Exp $
 rem 
 
 rem ---------------------------------------------------------------
@@ -50,6 +50,8 @@ if "%1" == "CLEAN" goto CLEAN
 :BUILD
 
    SET HB_MT=
+echo.
+echo using %mk_file%
    nmake /f %MK_FILE% %1 %2 %3 > make_vc.log
    if errorlevel 1 goto BUILD_ERR
    SET HB_MT=MT

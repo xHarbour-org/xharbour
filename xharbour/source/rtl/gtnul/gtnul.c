@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.2 2003/05/17 18:25:01 druzus Exp $
+ * $Id: gtnul.c,v 1.3 2003/05/21 09:35:36 druzus Exp $
  */
 
 /*
@@ -591,7 +591,7 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
    if (iPos == -1)
    {
       char * errmsg = "\r\nInternal error : screen driver initialization failure\r\n";
-      hb_fsWriteLarge( iFilenoStderr, errmsg, strlen( errmsg ) );
+      hb_fsWriteLarge( iFilenoStderr, ( BYTE *) errmsg, strlen( errmsg ) );
       exit( 20 );
    }
    s_gtInit[ iPos ]->gtInit( &GT_FUNCS );
