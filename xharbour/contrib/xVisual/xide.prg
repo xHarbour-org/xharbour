@@ -168,10 +168,16 @@ return(self)
 //----------------------------------------------------------------------------------------------
 
 CLASS ObjEdit FROM TForm
+   METHOD New( oParent ) INLINE ::Caption := 'xIde Quick Editor',;
+                                ::left    := 100,;
+                                ::top     := 100,;
+                                ::width   := 300,;
+                                ::height  := 300,;
+                                super:new( oParent )
    METHOD OnCreate()
 ENDCLASS
 
 METHOD OnCreate() CLASS ObjEdit
    local aRect := ::ClientRect()
-   ::Add('QuickEdit', TEdit():New( self, 'edit', 101,  0,0, aRect[3], aRect[4] ) )
+   ::Add('QuickEdit', TEdit():New( self, "", 101,  0,0, aRect[3], aRect[4] ) )
 return(nil)

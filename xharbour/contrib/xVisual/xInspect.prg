@@ -49,7 +49,6 @@ ENDCLASS
 
 //-------------------------------------------------------------------------------------------------
 METHOD SetBrowserData( oObj ) CLASS ObjInspect
-   ::Parent:ObjEdit:QuickEdit:SetText('oops')
    
    ::CurObject := oObj
 
@@ -172,7 +171,12 @@ return(super:AddString(cText))
 //---------------------------------------------------------------------------------
 
 METHOD SetCurSel(n) CLASS ComboInsp
-   ::Parent:SetBrowserData( ::Parent:Objects[n+1] )
+   IF n<0
+      ::Parent:Browser:source:={"",""}
+      ::Parent:Browser:RefreshAll()
+     else
+      ::Parent:SetBrowserData( ::Parent:Objects[n+1] )
+   endif
 return(super:SetCurSel(n))
 
 //---------------------------------------------------------------------------------
