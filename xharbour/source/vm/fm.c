@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.32 2003/05/16 22:03:50 ronpinkas Exp $
+ * $Id: fm.c,v 1.33 2003/05/25 17:03:19 jonnymind Exp $
  */
 
 /*
@@ -934,3 +934,9 @@ HB_FUNC( MEMORY )
    HB_THREAD_STUB
    hb_retnl( hb_xquery( hb_parni( 1 ) ) );
 }
+
+#ifdef HB_FM_STATISTICS
+HB_FUNC( HB_FM_STAT ) {};
+#else
+HB_FUNC( HB_FM_NOSTAT ) {};
+#endif

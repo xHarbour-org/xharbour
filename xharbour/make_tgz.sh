@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id$
+# $Id: make_tgz.sh,v 1.1 2003/06/23 17:41:15 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -10,7 +10,9 @@
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
 
+Rel="$Release$"
 name="xharbour"
+hb_ver="0.81.0"
 hb_lnkso="yes"
 hb_pref="xhb"
 hb_libs="vm pp rtl rdd dbfcdx dbfntx odbc macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca debug"
@@ -26,11 +28,12 @@ export HB_BIN_INSTALL="/usr/bin"
 export HB_INC_INSTALL="/usr/include/${name}"
 export HB_LIB_INSTALL="/usr/lib/${name}"
 
+# buid
 umask 022
 make clean
 make
 
-
+# install
 if [ -z "$TMPDIR" ]; then TMPDIR="/tmp"; fi
 HB_INST_PREF="$TMPDIR/xHarbour.bin.$$"
 rm -fR "${HB_INST_PREF}"
@@ -46,6 +49,25 @@ mkdir -p $HB_BIN_INSTALL
 mkdir -p $HB_INC_INSTALL
 mkdir -p $HB_LIB_INSTALL
 make -i install
+
+# build fm lib with memory statistic
+pushd source/vm
+    TMP_C_USR=$C_USR
+    C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
+    rm -f fm.o
+    make fm.o
+    ar -r $HB_LIB_INSTALL/libfm.a fm.o
+    rm -f fm.o
+    make fm.o 'HB_LIBCOMP_MT=YES'
+    ar -r $HB_LIB_INSTALL/libfmmt.a fm.o
+    rm -f fm.o
+    C_USR=$TMP_C_USR
+popd
+
+# Keep the size of the binaries to a minimim.
+strip $HB_BIN_INSTALL/*
+# Keep the size of the libraries to a minimim.
+strip --strip-debug $HB_LIB_INSTALL/*
 
 install -m755 bin/hb-mkslib.sh $HB_BIN_INSTALL/hb-mkslib
 hb_libs="vm pp rtl rdd dbfcdx dbfntx odbc macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca debug"
@@ -106,6 +128,7 @@ HB_GT="${HB_GT_LIB#gt}"
 
 
 HB_GT_REQ=""
+HB_FM_REQ=""
 _TMP_FILE_="/tmp/hb-build-\$USER-\$\$.c"
 
 ## parse params
@@ -126,6 +149,8 @@ while [ \$n -lt \${#P[@]} ]; do
 	-shared)    HB_STATIC="no" ;;
 	-mt)        HB_MT="MT" ;;
 	-gt*)       HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
+	-fmstat)    HB_FM_REQ="STAT" ;;
+	-nofmstat)  HB_FM_REQ="NOSTAT" ;;
 	-*)         p="\${v}" ;;
 	*)          [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
     esac
@@ -151,9 +176,9 @@ HB_GT_REQ=\`echo \${HB_GT_REQ}|tr a-z A-Z\`
 # set environment variables
 export HB_ARCHITECTURE="${HB_ARCHITECTURE}"
 export HB_COMPILER="${HB_COMPILER}"
-export HB_BIN_INSTALL="${_DEFAULT_BIN_DIR}"
-export HB_INC_INSTALL="${_DEFAULT_INC_DIR}"
-export HB_LIB_INSTALL="${_DEFAULT_LIB_DIR}"
+[ -z "\${HB_BIN_INSTALL}" ] && export HB_BIN_INSTALL="${_DEFAULT_BIN_DIR}"
+[ -z "\${HB_INC_INSTALL}" ] && export HB_INC_INSTALL="${_DEFAULT_INC_DIR}"
+[ -z "\${HB_LIB_INSTALL}" ] && export HB_LIB_INSTALL="${_DEFAULT_LIB_DIR}"
 
 # be sure that ${name} binaries are in your path
 export PATH="\${HB_BIN_INSTALL}:\${PATH}"
@@ -161,21 +186,24 @@ export PATH="\${HB_BIN_INSTALL}:\${PATH}"
 HB_PATHS="-I\${HB_INC_INSTALL}"
 GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
 
+HARBOUR_LIBS=""
 if [ "\${HB_STATIC}" = "yes" ]; then
-    HARBOUR_LIBS=""
-    for l in ${hb_libs}
-    do
-	[ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-	[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
-    done
-    HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
+    libs="${hb_libs}"
 else
-    if [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib${name}mt.so" ]; then
-	HARBOUR_LIBS="-l${name}mt"
-    else
-	HARBOUR_LIBS="-l${name}"
-    fi
+    l="${name}"
+    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.so" ] && l="\${l}mt"
+    [ -f "\${HB_LIB_INSTALL}/lib\${l}.so" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+    libs="debug"
 fi
+for l in \${libs}
+do
+    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
+    [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+done
+HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
+l="fm"
+[ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
+[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="-l\${l} \${HARBOUR_LIBS}"
 
 FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
 FOUTO="\${DIROUT}/\${FILEOUT%.*}.o"
@@ -189,8 +217,8 @@ hb_cc()
 
 hb_link()
 {
-    if [ -n "\${HB_GT_REQ}" ]; then
-	hb_gt_request \${HB_GT_REQ} > \${_TMP_FILE_} && \\
+    if [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_FM_REQ}" ]; then
+	hb_lnk_request > \${_TMP_FILE_} && \\
 	gcc "\$@" "\${_TMP_FILE_}" \${GCC_PATHS} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
     else
 	gcc "\$@" \${GCC_PATHS} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
@@ -204,26 +232,33 @@ hb_cmp()
     rm -f "\${FOUTC}"
 }
 
-hb_gt_request()
+hb_lnk_request()
 {
     echo "#include \\"hbapi.h\\""
-    if [ "\${HB_STATIC}" = "yes" ]; then
-	for gt in "\$@"; do
+    if [ "\${HB_STATIC}" = "yes" ] || [ -n "\${HB_FM_REQ}" ]; then
+	for gt in \${HB_GT_REQ}; do
 	    echo "extern HB_FUNC( HB_GT_\${gt} );"
 	done
-	echo "void hb_gt_ForceLink_build( void )"
+	if [ -n "\${HB_FM_REQ}" ]; then
+	    echo "extern HB_FUNC( HB_FM_\${HB_FM_REQ} );"
+	fi
+	echo "void hb_lnk_ForceLink_build( void )"
 	echo "{"
-	for gt in "\$@"; do
-	    echo "HB_FUNCNAME( HB_GT_\${gt} )();"
+	for gt in \${HB_GT_REQ}; do
+	    echo "   HB_FUNCNAME( HB_GT_\${gt} )();"
 	done
+	if [ -n "\${HB_FM_REQ}" ]; then
+	    echo "   HB_FUNCNAME( HB_FM_\${HB_FM_REQ} )();"
+	fi
 	echo "}"
     fi
-    if [ -n "\$1" ]; then
+    gt="\${HB_GT_REQ%% *}"
+    if [ -n "\$gt" ]; then
 	echo "#include \\"hbinit.h\\""
 	echo "extern char * s_defaultGT;"
-	echo "HB_CALL_ON_STARTUP_BEGIN( hb_gt_SetDefault_build )"
-	echo "   s_defaultGT = \\"\$1\\";"
-	echo "HB_CALL_ON_STARTUP_END( hb_gt_SetDefault_build )"
+	echo "HB_CALL_ON_STARTUP_BEGIN( hb_lnk_SetDefault_build )"
+	echo "   s_defaultGT = \\"\$gt\\";"
+	echo "HB_CALL_ON_STARTUP_END( hb_lnk_SetDefault_build )"
     fi
 }
 
@@ -273,6 +308,7 @@ $HB_BIN_INSTALL/xhbmk pp -n -w -D_DEFAULT_INC_DIR=\"${_DEFAULT_INC_DIR}\"
 install -m755 -s pp $HB_BIN_INSTALL/pp
 ln -s pp $HB_BIN_INSTALL/pprun
 install -m644 rp_dot.ch $HB_INC_INSTALL/
+rm -f pp
 popd
 
 # check if we should rebuild tools with shared libs
@@ -280,7 +316,7 @@ if [ "${hb_lnkso}" = yes ]
 then
     export L_USR="-L${HB_LIB_INSTALL} -lxharbour -lncurses -lslang -lgpm"
 
-    for utl in hbmake hbrun hbpp hbdoc
+    for utl in hbmake hbrun hbpp hbdoc hbtest
     do
 	pushd utils/${utl}
 	rm -fR "./${HB_ARCHITECTURE}"
@@ -290,5 +326,5 @@ then
     done
 fi
 
-tar -czvf xharbour.bin.tar.gz --owner=root --group=root -C "${HB_INST_PREF}" .
+tar -czvf ${name}-${hb_ver}.bin.tar.gz --owner=root --group=root -C "${HB_INST_PREF}" .
 rm -fR "${HB_INST_PREF}"

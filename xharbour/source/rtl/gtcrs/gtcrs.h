@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.5 2003/06/15 13:11:58 druzus Exp $
+ * $Id: gtcrs.h,v 1.6 2003/06/19 00:07:59 druzus Exp $
  */
 
 /*
@@ -64,6 +64,7 @@
 #include "hbapigt.h"
 #include "inkey.ch"
 #include "setcurs.ch"
+#include "hbapifs.h"
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.44 2003/06/22 21:19:22 andijahja Exp $
+ * $Id: harbour.c,v 1.45 2003/06/23 14:04:15 andijahja Exp $
  */
 
 /*
@@ -483,6 +483,12 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
    {
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMFREE, NULL, NULL );
    }
+}
+
+ULONG hb_xquery( USHORT uiMode )
+{
+   HB_SYMBOL_UNUSED( uiMode );
+   return 0;
 }
 
 void hb_conOutErr( char * pStr, ULONG ulLen )

@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.9 2003/06/23 17:41:15 druzus Exp $
+# $Id: xharbour.spec,v 1.10 2003/06/25 01:38:50 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -212,6 +212,20 @@ mkdir -p $HB_LIB_INSTALL
 
 make -i install
 
+# build fm lib with memory statistic
+pushd source/vm
+    TMP_C_USR=$C_USR
+    C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
+    rm -f fm.o
+    make fm.o
+    ar -r $HB_LIB_INSTALL/libfm.a fm.o
+    rm -f fm.o
+    make fm.o 'HB_LIBCOMP_MT=YES'
+    ar -r $HB_LIB_INSTALL/libfmmt.a fm.o
+    rm -f fm.o
+    C_USR=$TMP_C_USR
+popd
+
 # Keep the size of the binaries to a minimim.
 strip $HB_BIN_INSTALL/*
 # Keep the size of the libraries to a minimim.
@@ -275,6 +289,7 @@ HB_GT="%{hb_gt}"
 
 
 HB_GT_REQ=""
+HB_FM_REQ=""
 _TMP_FILE_="/tmp/hb-build-\$USER-\$\$.c"
 
 ## parse params
@@ -295,6 +310,8 @@ while [ \$n -lt \${#P[@]} ]; do
 	-shared)    HB_STATIC="no" ;;
 	-mt)        HB_MT="MT" ;;
 	-gt*)       HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
+	-fmstat)    HB_FM_REQ="STAT" ;;
+	-nofmstat)  HB_FM_REQ="NOSTAT" ;;
 	-*)         p="\${v}" ;;
 	*)          [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
     esac
@@ -330,21 +347,24 @@ export PATH="\${HB_BIN_INSTALL}:\${PATH}"
 HB_PATHS="-I\${HB_INC_INSTALL}"
 GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
 
+HARBOUR_LIBS=""
 if [ "\${HB_STATIC}" = "yes" ]; then
-    HARBOUR_LIBS=""
-    for l in %{hb_libs}
-    do
-	[ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-	[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
-    done
-    HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
+    libs="%{hb_libs}"
 else
-    if [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib%{name}mt.so" ]; then
-	HARBOUR_LIBS="-l%{name}mt"
-    else
-	HARBOUR_LIBS="-l%{name}"
-    fi
+    l="%{name}"
+    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.so" ] && l="\${l}mt"
+    [ -f "\${HB_LIB_INSTALL}/lib\${l}.so" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+    libs="debug"
 fi
+for l in \${libs}
+do
+    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
+    [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+done
+HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
+l="fm"
+[ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
+[ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="-l\${l} \${HARBOUR_LIBS}"
 
 FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
 FOUTO="\${DIROUT}/\${FILEOUT%.*}.o"
@@ -358,8 +378,8 @@ hb_cc()
 
 hb_link()
 {
-    if [ -n "\${HB_GT_REQ}" ]; then
-	hb_gt_request \${HB_GT_REQ} > \${_TMP_FILE_} && \\
+    if [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_FM_REQ}" ]; then
+	hb_lnk_request > \${_TMP_FILE_} && \\
 	gcc "\$@" "\${_TMP_FILE_}" \${GCC_PATHS} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
     else
 	gcc "\$@" \${GCC_PATHS} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
@@ -373,26 +393,33 @@ hb_cmp()
     rm -f "\${FOUTC}"
 }
 
-hb_gt_request()
+hb_lnk_request()
 {
     echo "#include \\"hbapi.h\\""
-    if [ "\${HB_STATIC}" = "yes" ]; then
-	for gt in "\$@"; do
+    if [ "\${HB_STATIC}" = "yes" ] || [ -n "\${HB_FM_REQ}" ]; then
+	for gt in \${HB_GT_REQ}; do
 	    echo "extern HB_FUNC( HB_GT_\${gt} );"
 	done
-	echo "void hb_gt_ForceLink_build( void )"
+	if [ -n "\${HB_FM_REQ}" ]; then
+	    echo "extern HB_FUNC( HB_FM_\${HB_FM_REQ} );"
+	fi
+	echo "void hb_lnk_ForceLink_build( void )"
 	echo "{"
-	for gt in "\$@"; do
-	    echo "HB_FUNCNAME( HB_GT_\${gt} )();"
+	for gt in \${HB_GT_REQ}; do
+	    echo "   HB_FUNCNAME( HB_GT_\${gt} )();"
 	done
+	if [ -n "\${HB_FM_REQ}" ]; then
+	    echo "   HB_FUNCNAME( HB_FM_\${HB_FM_REQ} )();"
+	fi
 	echo "}"
     fi
-    if [ -n "\$1" ]; then
+    gt="\${HB_GT_REQ%% *}"
+    if [ -n "\$gt" ]; then
 	echo "#include \\"hbinit.h\\""
 	echo "extern char * s_defaultGT;"
-	echo "HB_CALL_ON_STARTUP_BEGIN( hb_gt_SetDefault_build )"
-	echo "   s_defaultGT = \\"\$1\\";"
-	echo "HB_CALL_ON_STARTUP_END( hb_gt_SetDefault_build )"
+	echo "HB_CALL_ON_STARTUP_BEGIN( hb_lnk_SetDefault_build )"
+	echo "   s_defaultGT = \\"\$gt\\";"
+	echo "HB_CALL_ON_STARTUP_END( hb_lnk_SetDefault_build )"
     fi
 }
 
@@ -501,6 +528,8 @@ all this scripts accept command line switches:
 -gt<hbgt>               # link with <hbgt> GT driver, can be repeated to
                         # link with more GTs. The first one will be default
                         # on runtime
+-fmstat                 # link with memory statistic lib
+-nofmstat               # do not link with memory statistic lib
 
 link options work only with "%{hb_pref}lnk" and "%{hb_pref}mk" and has no effect
 in "%{hb_pref}cc" and "%{hb_pref}cmp"

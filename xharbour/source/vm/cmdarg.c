@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.5 2003/06/23 02:49:30 andijahja Exp $
+ * $Id: cmdarg.c,v 1.6 2003/06/24 04:34:39 ronpinkas Exp $
  */
 
 /*
@@ -312,7 +312,8 @@ void hb_cmdargProcessVM( void )
 
       {
          char buffer[ 128 ];
-         sprintf( buffer, "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ) );
+         //sprintf( buffer, "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ) );
+         sprintf( buffer, "DS avail=%luKB  OS avail=%luKB  EMM avail=%luKB  MemStat:%s", hb_xquery( HB_MEM_BLOCK ), hb_xquery( HB_MEM_VM ), hb_xquery( HB_MEM_EMS ), hb_xquery( HB_MEM_USEDMAX ) ? "On" : "Off" );
          hb_conOutErr( buffer, 0 );
          hb_conOutErr( hb_conNewLine(), 0 );
       }

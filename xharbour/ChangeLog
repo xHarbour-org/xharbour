@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1189 2003/06/26 01:29:13 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1190 2003/06/26 03:58:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-26 14:10 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/common/hbver.c
+    ! fixed some minor mistakes in information report by hb_verBuildInfo()
+    * reporting memory tracing and statistics now dynamically checks type
+      of used fm module.
+
+  * xharbour/source/compiler/harbour.c
+    * added empty hb_xquery() for above changes.
+
+  * xharbour/source/vm/fm.c
+    added two function HB_FUNCNAME(HB_FM_STAT()) and
+    HB_FUNCNAME(HB_FM_NOSTAT()) for choosing proper FM module.
+    Now user can add to his .prg sources: REQUEST HB_FM_[NO]STA and
+    force to link one of the FM module using shared or static libs.
+
+  * xharbour/source/vm/cmdarg.c
+    * //INFO extended to report type of FM module
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+    * small changes to allow working hb_conOutErr() and hb_conOutStd()
+      after hb_conRelease()
+
+  * xharbour/make_tgz.sh
+  * xharbour/xharbour.spec
+    * changes for linking with DEBUG and new FM lib.
 
 2003-06-25 20:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/pptable.c

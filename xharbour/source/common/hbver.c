@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.3 2002/01/27 22:30:07 ronpinkas Exp $
+ * $Id: hbver.c,v 1.4 2002/10/15 03:18:00 andijahja Exp $
  */
 
 /*
@@ -76,6 +76,7 @@
 
 #include "hbapi.h"
 #include "hbver.h"
+#include "hbmemory.ch"
 
 #if defined(HB_OS_WIN_32)
 
@@ -575,7 +576,7 @@ void hb_verBuildInfo( void )
    hb_conOutErr( hb_conNewLine(), 0 );
 
    hb_conOutErr( "Multisoft Flagship compatible extensions: ", 0 );
-#if defined( HB_FLAGSHIP_VO )
+#if defined( HB_COMPAT_FLAGSHIP )
    hb_conOutErr( "Yes", 0 );
 #else
    hb_conOutErr( "No", 0 );
@@ -583,7 +584,7 @@ void hb_verBuildInfo( void )
    hb_conOutErr( hb_conNewLine(), 0 );
 
    hb_conOutErr( "Microsoft FoxPro compatible extensions: ", 0 );
-#if defined( HB_FOXPRO_VO )
+#if defined( HB_COMPAT_FOXPRO )
    hb_conOutErr( "Yes", 0 );
 #else
    hb_conOutErr( "No", 0 );
@@ -591,7 +592,7 @@ void hb_verBuildInfo( void )
    hb_conOutErr( hb_conNewLine(), 0 );
 
    hb_conOutErr( "dBase compatible extensions: ", 0 );
-#if defined( HB_DBASE_VO )
+#if defined( HB_COMPAT_DBASE )
    hb_conOutErr( "Yes", 0 );
 #else
    hb_conOutErr( "No", 0 );
@@ -631,11 +632,14 @@ void hb_verBuildInfo( void )
    hb_conOutErr( hb_conNewLine(), 0 );
 
    hb_conOutErr( "Memory tracing and statistics: ", 0 );
+   hb_conOutErr( hb_xquery( HB_MEM_USEDMAX ) != 0 ? "On" : "Off", 0 );
+/*
 #if defined( HB_FM_STATISTICS )
    hb_conOutErr( "On", 0 );
 #else
    hb_conOutErr( "Off", 0 );
 #endif
+*/
    hb_conOutErr( hb_conNewLine(), 0 );
 
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.16 2003/06/23 17:41:17 druzus Exp $
+ * $Id: gtcrs.c,v 1.17 2003/06/23 22:45:19 druzus Exp $
  */
 
 /*
@@ -88,6 +88,8 @@ static volatile BOOL s_BreakFlag = FALSE;
 static volatile BOOL s_InetrruptFlag = FALSE;
 
 static volatile BOOL s_WinSizeChangeFlag = FALSE;
+
+static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 typedef struct evtFD {
     int fd;
@@ -2054,10 +2056,15 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
     if ( !s_ioBase )
     {
+	s_iStdIn  = iFilenoStdin;
+	s_iStdOut = iFilenoStdout;
+	s_iStdErr = iFilenoStderr;
 #ifdef HB_GT_CRS_TTYHACK
-	int ittyfd;
-	if ( (ittyfd = open("/dev/tty",O_RDWR)) != -1)
-	    iFilenoStdin = iFilenoStdout = ittyfd;
+	{
+	    int ittyfd;
+	    if ( (ittyfd = open("/dev/tty",O_RDWR)) != -1)
+		iFilenoStdin = iFilenoStdout = ittyfd;
+	}
 #endif
 	set_signals();
 	ioBase = create_ioBase( NULL, iFilenoStdin, iFilenoStdout, iFilenoStderr, -1 );
@@ -2306,14 +2313,19 @@ void HB_GT_FUNC(gt_OutStd( BYTE * pbyStr, ULONG ulLen ))
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_OutStd(%s, %hu)", pbyStr, ulLen));
 
-    if (s_ioBase->baseout != NULL && s_ioBase->base_outfd == s_ioBase->stdoutfd)
+    if (s_ioBase)
     {
-        HB_GT_FUNC(gt_DispBegin());
-        hb_gtWriteCon( pbyStr, ulLen );
-        HB_GT_FUNC(gt_DispEnd());
+	if (s_ioBase->baseout != NULL && s_ioBase->base_outfd == s_ioBase->stdoutfd)
+	{
+	    HB_GT_FUNC(gt_DispBegin());
+	    hb_gtWriteCon( pbyStr, ulLen );
+	    HB_GT_FUNC(gt_DispEnd());
+	}
+	else
+	    gt_outstd( s_ioBase, pbyStr, ulLen );
     }
     else
-        gt_outstd( s_ioBase, pbyStr, ulLen );
+	hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }
 
 /* *********************************************************************** */
@@ -2321,8 +2333,10 @@ void HB_GT_FUNC(gt_OutStd( BYTE * pbyStr, ULONG ulLen ))
 void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_OutErr(%s, %hu)", pbyStr, ulLen));
-
-    gt_outerr( s_ioBase, pbyStr, ulLen );
+    if (s_ioBase)
+	gt_outerr( s_ioBase, pbyStr, ulLen );
+    else
+	hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
 }
 
 /* *********************************************************************** */
