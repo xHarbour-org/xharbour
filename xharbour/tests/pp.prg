@@ -2086,8 +2086,8 @@ PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
    IF s_sModule == cFile
       TraceLog( s_aProcedures, s_aInitExit, s_nProcId, aParams )
    ELSE
-      //s_nProcId := 0; s_aProcedures := {}; s_aInitExit := { {}, {} }
-      //s_asPrivates := {}; s_asPublics := {}; s_asLocals := {}; s_asStatics := {}; s_aParams := {}
+      s_nProcId := 0; s_aProcedures := {}; s_aInitExit := { {}, {} }
+      s_asPrivates := {}; s_asPublics := {}; s_asLocals := {}; s_asStatics := {}; s_aParams := {}
 
       s_sModule := cFile
       bCompile  := .T.
@@ -2362,13 +2362,12 @@ FUNCTION RP_Run_Err( oErr, aProcedures, nLine )
    ENDIF
 
    TraceLog( s_sModule, nLine, "Sorry, R/T Error: [" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) +  "] '" + oErr:Operation + "' '" + oErr:Description + "' " + sArgs + " " + PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
-
+   //TraceLog( s_sModule, nLine, oErr:Description, oErr:SubSystem, oErr:Operation, sArgs, PP_ProcName() )
    Alert( [Line: ] + Str( nLine ) + [ R/T Error: ] + "[" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) + "] '" + oErr:Operation + "';" + ;
           oErr:Description + ;
           sArgs + ;
           PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ");" + ;
 					ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
-
    //BREAK oErr
    __Quit()
 
@@ -9037,8 +9036,8 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks )
 
    //ErrorBlock( {|oErr| RP_PPText_Err( oErr, SubStr( sLines, nClose + 1, nOpen - ( nClose + 1 ) ), 0 ) } )
 
-   WHILE ( nOpen := At( Chr(10), sLines, nOpen + 1 ) ) > 0
-      //TraceLog( nClose, nOpen )
+   WHILE ( nOpen := At( Chr(10), sLines, nOpen + 1 ) ) > 0 .AND. nOpen > nClose
+      //TraceLog( sLines, Len( sLines ), nOpen, nClose )
       aAdd( asLines, RTrim( LTrim( SubStr( sLines, nClose + 1, nOpen - ( nClose + 1 ) ) ) ) )
       //TraceLog( Len( asLines ), aTail( asLines ) )
       nClose := nOpen

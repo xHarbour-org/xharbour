@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.21 2003/03/07 05:32:42 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.22 2003/03/16 06:00:33 jonnymind Exp $
  */
 
 /*
@@ -244,9 +244,10 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
    if( pCBlock && (--pCBlock->ulCounter == 0) )
    {
-      if( pCBlock->procname && strchr( pCBlock->procname, ':' ) )
+      if( pCBlock->pSelfBase )
       {
-         hb_xfree( pCBlock->procname );
+         pCBlock->pSelfBase->uiHolders--;
+         pCBlock->pSelfBase = NULL;
       }
 
       if( pCBlock->pLocals )
@@ -290,9 +291,10 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
 
    HB_TRACE(HB_TR_INFO, ("hb_codeblockDeleteGarbage(%p)", Cargo));
 
-   if( pCBlock->procname && strchr( pCBlock->procname, ':' ) )
+   if( pCBlock->pSelfBase )
    {
-      hb_xfree( pCBlock->procname );
+      pCBlock->pSelfBase->uiHolders--;
+      pCBlock->pSelfBase = NULL;
    }
 
    /* free space allocated for local variables

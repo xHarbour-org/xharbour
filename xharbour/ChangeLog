@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1151 2003/06/20 18:00:55 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1152 2003/06/20 18:14:58 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-20 11:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * makefile.bc
+    - Removed -DHB_FM_STATISTICS_OFF because standard build by developers should still have memory leak reporting.
+
+  * source/vm/hvm.c
+    % Optimized ->procname handling in hb_vmPushBlock() - no longer allocating any memory.
+
+  * source/vm/codebloc.c
+    - Removed conditional hb_xfree() of ->procname - no longer needed.
+    + Added logic to reset ->pSelfBase->uiHolders in hb_codeblockDelete() and hb_codeblockDeleteGarbag()
+
+  * source/vm/proc.c
+    ! Fixed and optimized handling of Blocks and Methods.
+
+  * tests/pp.prg
+  * tests/prgscrpt.prg
+    * Minor corrections.
 
 2003-06-20 20:15 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   * makefile.bc
@@ -16,7 +34,7 @@
 2003-06-20 19:59 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   + include/hbi18n.h
     + Ops, forgot in last commit ;-)
-    
+
 2003-06-20 19:50 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   * include/hbcomp.h
   * include/hbpp.h
@@ -53,6 +71,7 @@
   * xharbour/source/codepage/cdpslwin.c
     * corrections in code page description.
 
+>>>>>>> 1.1151
 2003-06-19 02:05 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   - xharbour/source/codepage/cdpla850.c
   + xharbour/source/codepage/cdppt850.c

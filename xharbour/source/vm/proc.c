@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.8 2003/06/18 08:57:02 ronpinkas Exp $
+ * $Id: proc.c,v 1.9 2003/06/18 19:28:58 ronpinkas Exp $
  */
 
 /*
@@ -138,10 +138,20 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
          {
             strcpy( szName, hb_objGetRealClsName( pSelf, ( *pBase )->item.asSymbol.value->szName ) );
             strcat( szName, ":" );
+            strcat( szName, ( *pBase )->item.asSymbol.value->szName );
          }
          else if( HB_IS_BLOCK( pSelf ) )  /* it is a Block Evaluation. */
          {
-            strcat( szName, "(b)" );
+            strcpy( szName, "(b)" );
+
+            if( pSelf->item.asBlock.value->pSelfBase )
+            {
+               PCLASS pClass = hb_clsClassesArray() + ( pSelf->item.asBlock.value->pSelfBase->uiClass - 1 );
+
+               strcat( szName, pClass->szName );
+               strcat( szName, ":" );
+            }
+
             strcat( szName, pSelf->item.asBlock.value->procname );
          }
          else

@@ -3,7 +3,6 @@ Procedure Main( sMsg )
    LOCAL sText, sPPed, asPPed, oInterpreter := TInterpreter():New()
 
    oInterpreter:AddLine( "/* Sample Script for embedded PP "   )
-   oInterpreter:AddLine( "/* Sample Script for embedded PP "   )
    oInterpreter:AddLine( " have fun... */"                     )
    oInterpreter:AddLine( ""                                    )
    oInterpreter:AddLine( "Procedure Test( cMacroVar, xValue )" )

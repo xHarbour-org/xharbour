@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1116 2003/06/15 13:11:56 druzus Exp $
+ * $Id: ChangeLog.015,v 1.1 2003/06/15 14:26:28 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -253,7 +253,7 @@
       + Module Scope.
       + Persistent Blocks.
 
-2003-05-03 12:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
+2003-06-03 12:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   * source/rdd/dbcmd.c
     ! fixed problem that was causing GPF with DbCreate()/DBUseArea() functions(added an new paramter for specifing the codepage)
   * source/pp/pptable.c
