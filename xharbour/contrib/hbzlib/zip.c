@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.8 2002/06/23 03:46:39 walito Exp $
+ * $Id: zip.c,v 1.1 2002/06/30 19:48:56 lculik Exp $
  */
 
 /*
@@ -117,6 +117,7 @@ HB_FUNC(HB_ZIPFILEBYTDSPAN)
     }
      
 }
+
 HB_FUNC(HB_ZIPFILEBYPKSPAN)
 {
     if( ISCHAR(1) && ISCHAR(2))
@@ -135,6 +136,7 @@ HB_FUNC(HB_ZIPFILEBYPKSPAN)
     }
      
 }
+
 HB_FUNC(HB_UNZIPFILE)
 
 {
@@ -233,16 +235,19 @@ HB_FUNC(HB_UNZIPFILEINDEX)
     }
 
 }
-
+/*
 HB_FUNC(HB_ZIPINMEMORY)
 {
     hb_retl(hb_CreateZipInMemory(hb_parc(1),hb_parc(2)));
 }
 
-/*
+
 HB_FUNC(HB_SAVEZIPFROMMEMORY)
 {
     hb_retl(hb_SaveZipFileFromMemory());
 }
 */
-
+HB_FUNC(TRANSFERFROMIP)
+{
+   hb_retl(hb_TransferFilesFromzip(hb_parc(1),hb_parc(2),hb_param(3,HB_IT_ARRAY)));
+}

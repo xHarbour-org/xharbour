@@ -1,7 +1,11 @@
-// ZipFile.cpp: implementation of the ZipFiles class.
-// Part of the ZipArchive library
-// 
-// Copyright (C) 2000 - 2001 Tadeusz Dracz.
+////////////////////////////////////////////////////////////////////////////////
+// $Workfile: ZipFile.cpp $
+// $Archive: /ZipArchive_STL/ZipFile.cpp $
+// $Date: 02-03-23 14:05 $ $Author: Tadeusz Dracz $
+////////////////////////////////////////////////////////////////////////////////
+// This source file is part of the ZipArchive library source distribution and
+// is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
@@ -11,9 +15,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "zipfile.h"
-#include "zipexception.h"
-#include "zipplatform.h"
+#include "ZipFile.h"
+#include "ZipException.h"
+#include "ZipPlatform.h"
 
 #include <fcntl.h>
 
@@ -29,20 +33,25 @@ CZipFile::CZipFile()
 
 
 
-void CZipFile::ThrowError()
+void CZipFile::ThrowError() const
 {
 	CZipException::Throw(errno, m_szFileName);
 }
 
 
-DWORD CZipFile::GetLength()
+ZIP_ULONGLONG CZipFile::GetLength() const
 {
-
-	DWORD dwLen, dwCur;
-	dwCur = Seek(0L, current);
-	dwLen = Seek(0L, end);
-	Seek(dwCur, begin);
-	return dwLen;
+// cannot use Seek here, Seek is not const
+	long lLen, lCur;
+	lCur = lseek(m_hFile, 0, current);
+	if (lCur == -1)
+		ThrowError();
+	lLen = lseek(m_hFile, 0, end);
+	// first get back
+	lseek(m_hFile, lCur, begin);
+	if (lLen == -1)
+		ThrowError();
+	return lLen;
 
 }
 
@@ -51,7 +60,11 @@ bool CZipFile::Open(LPCTSTR lpszFileName, UINT openFlags, bool bThrow)
 {
 	if (!IsClosed())
 		Close();
+#ifndef __GNUC__
 	UINT iNewFlags = O_BINARY;
+#else
+	UINT iNewFlags = 0;
+#endif
 	bool bReadOnly = false;
 	if (openFlags & CZipFile::modeCreate)
 		iNewFlags |= O_CREAT;
@@ -80,9 +93,9 @@ bool CZipFile::Open(LPCTSTR lpszFileName, UINT openFlags, bool bThrow)
 }
 
 
-void CZipFile::SetLength(long nNewLen)
+void CZipFile::SetLength(ZIP_ULONGLONG nNewLen)
 {
-	ZipPlatform::TruncateFile(m_hFile, nNewLen);	
+	ZipPlatform::TruncateFile(m_hFile, (DWORD)nNewLen);
 }
 
 
@@ -92,10 +105,10 @@ void  CZipFile::Flush()
 		ThrowError();
 }
 
-CZipFile::operator HFILE()
+CZipFile::operator HANDLE()
 {
-	HFILE hf = ZipPlatform::GetFileSystemHandle(m_hFile);
-	if (hf == -1)
+	int fh = ZipPlatform::GetFileSystemHandle(m_hFile);
+	if (fh == -1)
 		ThrowError();
-	return hf;
+	return (HANDLE)fh;
 }

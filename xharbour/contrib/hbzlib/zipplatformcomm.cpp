@@ -1,7 +1,11 @@
-// ZipPlatformComm.cpp - functions portable across the systems
-// Part of the ZipArchive library
-// 
-// Copyright (C) 2000 - 2001 Tadeusz Dracz.
+////////////////////////////////////////////////////////////////////////////////
+// $Workfile: ZipPlatformComm.cpp $
+// $Archive: /ZipArchive/ZipPlatformComm.cpp $
+// $Date: 02-01-19 18:03 $ $Author: Tadeusz Dracz $
+////////////////////////////////////////////////////////////////////////////////
+// This source file is part of the ZipArchive library source distribution and
+// is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
@@ -12,7 +16,7 @@
 
 
 #include "stdafx.h"
-#include "zipplatform.h"
+#include "ZipPlatform.h"
 
 using namespace ZipPlatform;
 

@@ -1,6 +1,6 @@
-///////////////////////////////////////////////////////////////////////////////
-// $Workfile: stdafx.cpp $
-// $Archive: /ZipArchive/stdafx.cpp $
+////////////////////////////////////////////////////////////////////////////////
+// $Workfile: ZipString.cpp $
+// $Archive: /ZipArchive/ZipString.cpp $
 // $Date: 02-01-19 18:03 $ $Author: Tadeusz Dracz $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
@@ -14,7 +14,12 @@
 // For the licensing details see the file License.txt
 ////////////////////////////////////////////////////////////////////////////////
 
-
-#include "stdafx.h"
-
-
+#include "ZipString.h"
+	
+ZIPSTRINGCOMPARE GetCZipStrCompFunc(bool bCaseSensitive, bool bCollate)
+{
+	if (bCollate)
+		return bCaseSensitive ? & CZipString::Collate : & CZipString::CollateNoCase;
+	else
+		return bCaseSensitive ? & CZipString::Compare : & CZipString::CompareNoCase;
+}

@@ -1,7 +1,11 @@
-// ZipPathComponent.cpp: implementation of the CZipPathComponent class.
-// Part of the ZipArchive library
-// 
-// Copyright (C) 2000 - 2001 Tadeusz Dracz.
+////////////////////////////////////////////////////////////////////////////////
+// $Workfile: ZipPathComponent.cpp $
+// $Archive: /ZipArchive/ZipPathComponent.cpp $
+// $Date: 02-01-19 18:03 $ $Author: Tadeusz Dracz $
+////////////////////////////////////////////////////////////////////////////////
+// This source file is part of the ZipArchive library source distribution and
+// is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
@@ -11,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "zippathcomponent.h"
+#include "ZipPathComponent.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -23,31 +27,30 @@ CZipPathComponent::~CZipPathComponent()
 
 }
 
-void CZipPathComponent::SetFullPath(const CZipString& szFullPath)
+void CZipPathComponent::SetFullPath(LPCTSTR lpszFullPath)
 {
+
 	TCHAR szDrive[_MAX_DRIVE];
 	TCHAR szDir[_MAX_DIR];
 	TCHAR szFname[_MAX_FNAME];
 	TCHAR szExt[_MAX_EXT];
-	m_szPrefix.Empty();
-	CZipString szTempPath = szFullPath;
-	LPCTSTR szWinUNC = {_T("\\\\?\\UNC\\")};
-	LPCTSTR szUnic  = {_T("\\\\?\\")};
-	LPCTSTR szUNC = {_T("\\\\")};
 	
 	
-	if (szTempPath.Left(8) == szWinUNC) // UNC path meeting Windows File Name Conventions required for some functions
+	CZipString szTempPath(lpszFullPath);
+	const CZipString szPrefix = _T("\\\\?\\unc\\");
+	int i = -1, iLen = szPrefix.GetLength();
+	if (iLen > szTempPath.GetLength())
+		iLen = szTempPath.GetLength();
+	CZipString szPossiblePrefix = szTempPath.Left(iLen);
+	szPossiblePrefix.MakeLower(); // must perform case insensitive comparison
+	while (++i < iLen && szPossiblePrefix[i] == szPrefix[i]); 
+	if (i == 2 || i == 4 || i == 8) // unc path, unicode path or unc path meeting windows file name conventions
 	{
-		szTempPath = szTempPath.Mid(8);
-		m_szPrefix = szWinUNC;
+		m_szPrefix = szTempPath.Left(i);
+		szTempPath = szTempPath.Mid(i);		
 	}
-	else if (szTempPath.Left(4) == szUnic) // Unicode path
-	{
-		szTempPath = szTempPath.Mid(4);
-		m_szPrefix = szUnic;
-	}
-	else if (szTempPath.Left(2) == szUNC) // UNC path
-		m_szPrefix = szUNC;
+	else
+		m_szPrefix.Empty();
 
 	_tsplitpath(szTempPath, szDrive , szDir, szFname, szExt);
 	m_szDrive = szDrive;
@@ -56,14 +59,14 @@ void CZipPathComponent::SetFullPath(const CZipString& szFullPath)
 	m_szDirectory.TrimLeft(m_cSeparator);
 	m_szDirectory.TrimRight(m_cSeparator);
 	SetExtension(szExt);
-	m_szFileName = szFname;
+	m_szFileTitle = szFname;
 }
 
 
-CZipString CZipPathComponent::GetNoDrive()
+CZipString CZipPathComponent::GetNoDrive() const
 {
 	CZipString szPath = m_szDirectory;
-	CZipString szFileName = GetFullFileName();
+	CZipString szFileName = GetFileName();
 	if (!szFileName.IsEmpty() && !szPath.IsEmpty())
 		szPath += m_cSeparator;
 

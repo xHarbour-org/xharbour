@@ -1,7 +1,11 @@
-// ZipStorage.cpp: implementation of the CZipStorage class.
-// Part of the ZipArchive library
-// 
-// Copyright (C) 2000 - 2001 Tadeusz Dracz.
+////////////////////////////////////////////////////////////////////////////////
+// $Workfile: ZipStorage.cpp $
+// $Archive: /ZipArchive/ZipStorage.cpp $
+// $Date: 02-08-07 10:30 $ $Author: Tadeusz Dracz $
+////////////////////////////////////////////////////////////////////////////////
+// This source file is part of the ZipArchive library source distribution and
+// is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
@@ -11,10 +15,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "zipstorage.h"
-#include "ziparchive.h"
+#include "ZipStorage.h"
+#include "ZipArchive.h"
 // #include "ZipPathComponent.h"
-#include "zipplatform.h"
+#include "ZipPlatform.h"
 
 //////////////////////////////////////////////////////////////////////
 // disk spanning objectives:
@@ -23,12 +27,13 @@
 // - each file has a data descriptor preceded by the signature
 //	(bit 3 set in flag);
 
+int CZipActionCallback::m_iStep = 256;
 
 char CZipStorage::m_gszExtHeaderSignat[] = {0x50, 0x4b, 0x07, 0x08};
 CZipStorage::CZipStorage()
 {
-	m_pCallbackData = m_pChangeDiskFunc = NULL;
-	m_iWriteBufferSize = 65535;
+	m_pChangeDiskFunc = NULL;
+	m_iWriteBufferSize = 65536;
 	m_iCurrentDisk = -1;
 	m_pFile = NULL;
 }
@@ -80,6 +85,7 @@ void CZipStorage::Open(LPCTSTR szPathName, int iMode, int iVolumeSize)
 
 	if ((iMode == CZipArchive::zipCreate) ||(iMode == CZipArchive::zipCreateSpan)) // create new archive
 	{
+		m_bReadOnly = false;
 		m_iCurrentDisk = 0;
 		if (iMode == CZipArchive::zipCreate)
 		{
@@ -110,9 +116,10 @@ void CZipStorage::Open(LPCTSTR szPathName, int iMode, int iVolumeSize)
 	}
 	else // open existing
 	{
+		m_bReadOnly = iMode == CZipArchive::zipOpenReadOnly;
 		OpenFile(szPathName, CZipFile::modeNoTruncate |
-			((iMode == CZipArchive::zipOpenReadOnly) ? CZipFile::modeRead : CZipFile::modeReadWrite));
-		// m_uData, m_bAllowModif i m_iSpanMode are automatically set during reading the central dir
+			(m_bReadOnly ? CZipFile::modeRead : CZipFile::modeReadWrite));
+		// m_uData, i m_iSpanMode are automatically set during reading the central dir
 		m_iSpanMode = iVolumeSize == 0 ? suggestedAuto : suggestedTd;
 	}
 		
@@ -141,11 +148,6 @@ void CZipStorage::Open(CZipMemFile& mf, int iMode)
 }
 
 
-int CZipStorage::IsSpanMode()
-{
-	return m_iSpanMode == noSpan ? 0 : (m_bNewSpan ? 1 : -1);
-}
-
 void CZipStorage::ChangeDisk(int iNumber)
 {
 	if (iNumber == m_iCurrentDisk)
@@ -167,10 +169,6 @@ bool CZipStorage::OpenFile(LPCTSTR lpszName, UINT uFlags, bool bThrow)
 	return m_pFile->Open(lpszName, uFlags | CZipFile::shareDenyWrite, bThrow);
 }
 
-int CZipStorage::GetCurrentDisk()
-{
-	return m_iCurrentDisk;
-}
 
 CZipString CZipStorage::ChangePkzipRead()
 {
@@ -187,32 +185,42 @@ CZipString CZipStorage::ChangeTdRead()
 	return szTemp;
 }
 
-void CZipStorage::Close(bool bAfterException)
+CZipString CZipStorage::RenameLastFileInTDSpan()
 {
+	ASSERT(m_iSpanMode == tdSpan);
+		// give to the last volume the zip extension
+	CZipString szFileName = m_pFile->GetFilePath();
+	CZipString szNewFileName = GetTdVolumeName(true);
+	if (!m_bInMemory)
+	{
+		m_pFile->Flush();
+		m_pFile->Close();
+	}
+	if (ZipPlatform::FileExists(szNewFileName))
+		ZipPlatform::RemoveFile(szNewFileName);
+	ZipPlatform::RenameFile(szFileName, szNewFileName);
+	return szNewFileName;
+}
+
+CZipString CZipStorage::Close(bool bAfterException)
+{
+	bool bClose = true;
+	CZipString sz;
 	if (!bAfterException)
 	{
 		Flush();
 		if ((m_iSpanMode == tdSpan) && (m_bNewSpan))
 		{
-			// give to the last volume the zip extension
-			CZipString szFileName = m_pFile->GetFilePath();
-			CZipString szNewFileName = GetTdVolumeName(true);
-			if (!m_bInMemory)
-				m_pFile->Close();
-			if (ZipPlatform::FileExists(szNewFileName))
-				ZipPlatform::RemoveFile(szNewFileName);
-			ZipPlatform::RenameFile(szFileName, szNewFileName);
-		}
-		else
-		{
-			if (!m_bInMemory)
-				m_pFile->Close();
+			sz = RenameLastFileInTDSpan();
+			bClose = false;// already closed in RenameLastFileInTDSpan
 		}
 	}
-	else
+	if (sz.IsEmpty())
+		sz = m_pFile->GetFilePath();
+	if (bClose && !m_bInMemory)
 	{
-		if (!m_bInMemory)
-				m_pFile->Close();
+		FlushFile();
+		m_pFile->Close();
 	}
 		
 
@@ -221,9 +229,10 @@ void CZipStorage::Close(bool bAfterException)
 	m_iCurrentDisk = -1;
 	m_iSpanMode = noSpan;
 	m_pFile = NULL;
+	return sz;
 }
 
-CZipString CZipStorage::GetTdVolumeName(bool bLast, LPCTSTR lpszZipName)
+CZipString CZipStorage::GetTdVolumeName(bool bLast, LPCTSTR lpszZipName) const
 {
 	CZipString szFilePath = lpszZipName ? lpszZipName : (LPCTSTR)m_pFile->GetFilePath();
 	CZipPathComponent zpc(szFilePath);
@@ -254,7 +263,11 @@ void CZipStorage::NextDisk(int iNeeded, LPCTSTR lpszFileName)
 	else
 		szFileName =  GetTdVolumeName(false, lpszFileName);
 
-	m_pFile->Close();
+	if (!m_pFile->IsClosed())
+	{
+		m_pFile->Flush();
+		m_pFile->Close();
+	}
 
 	if (bPkSpan)
 	{
@@ -289,18 +302,23 @@ void CZipStorage::NextDisk(int iNeeded, LPCTSTR lpszFileName)
 void CZipStorage::CallCallback(int iCode, CZipString szTemp)
 {
 	ASSERT(m_pChangeDiskFunc);
-	if (!(*m_pChangeDiskFunc)(m_iCurrentDisk + 1, iCode, m_pCallbackData))
+	m_pChangeDiskFunc->m_szExternalFile = szTemp;
+	m_pChangeDiskFunc->m_uDiskNeeded = m_iCurrentDisk + 1;
+	if (!m_pChangeDiskFunc->Callback(iCode))
 		CZipException::Throw(CZipException::aborted, szTemp);
 }
 
-DWORD CZipStorage::GetFreeVolumeSpace()
+DWORD CZipStorage::GetFreeVolumeSpace() const
 {
 	ASSERT (m_iSpanMode == pkzipSpan);
 	CZipString szTemp = m_pFile->GetFilePath();
 	if (szTemp.IsEmpty()) // called once when creating a disk spanning archive
 		return 0;
 	else
-		return ZipPlatform::GetDeviceFreeSpace(szTemp);
+	{
+		CZipPathComponent zpc(szTemp);
+		return ZipPlatform::GetDeviceFreeSpace(zpc.GetFilePath());
+	}
 }
 
 
@@ -388,7 +406,7 @@ void CZipStorage::WriteInternalBuffer(const char *pBuf, DWORD uSize)
 	}
 }
 
-DWORD CZipStorage::VolumeLeft()
+DWORD CZipStorage::VolumeLeft() const
 {
 	// for pkzip span m_uCurrentVolSize is updated after each flush()
 	return m_uCurrentVolSize  - m_uBytesInWriteBuffer - ((m_iSpanMode == pkzipSpan) ? 0 : m_iBytesWritten);
@@ -396,7 +414,8 @@ DWORD CZipStorage::VolumeLeft()
 
 void CZipStorage::Flush()
 {
-	m_iBytesWritten += m_uBytesInWriteBuffer;
+	if (m_iSpanMode != noSpan)
+		m_iBytesWritten += m_uBytesInWriteBuffer;
 	if (m_uBytesInWriteBuffer)
 	{
 		m_pFile->Write(m_pWriteBuffer, m_uBytesInWriteBuffer);
@@ -407,15 +426,32 @@ void CZipStorage::Flush()
 		// not completly written clusters, write operation may start from 
 		// the new cluster
 		m_uCurrentVolSize = GetFreeVolumeSpace();
+	
 }
 
-DWORD CZipStorage::GetPosition()
+
+
+void CZipStorage::FinalizeSpan()
 {
-	return m_pFile->GetPosition() + m_uBytesInWriteBuffer;
+	ASSERT(IsSpanMode() == 1); // span in creation
+	ASSERT(!m_bInMemory);
+
+	CZipString szFileName;
+	if ((m_iSpanMode == tdSpan) && (m_bNewSpan))
+		szFileName = RenameLastFileInTDSpan();
+	else
+	{
+		szFileName = m_pFile->GetFilePath();
+		// the file is already closed
+		m_pFile->Close();
+	}
+	m_bNewSpan = false;
+	if (m_iCurrentDisk == 0) // one-disk span was converted to normal archive
+		m_iSpanMode = noSpan;
+	else
+		m_iTdSpanData = m_iCurrentDisk;
+	
+	OpenFile(szFileName, CZipFile::modeNoTruncate | (m_iSpanMode == noSpan ? CZipFile::modeReadWrite : CZipFile::modeRead));
+	
 }
 
-
-DWORD CZipStorage::GetFreeInBuffer()
-{
-	return m_pWriteBuffer.GetSize() - m_uBytesInWriteBuffer;
-}

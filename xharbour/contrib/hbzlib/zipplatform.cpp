@@ -1,7 +1,11 @@
-// ZipPlatform.cpp: implementation of the ZipPlatform namespace.
-// Part of the ZipArchive library
-// 
-// Copyright (C) 2000 - 2001 Tadeusz Dracz.
+////////////////////////////////////////////////////////////////////////////////
+// $Workfile: ZipPlatform.cpp $
+// $Archive: /ZipArchive/ZipPlatform.cpp $
+// $Date: 02-03-23 2:12 $ $Author: Tadeusz Dracz $
+////////////////////////////////////////////////////////////////////////////////
+// This source file is part of the ZipArchive library source distribution and
+// is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
@@ -12,10 +16,10 @@
 
 
 #include "stdafx.h"
-#include "zipplatform.h"
-#include "zipfileheader.h"
-#include "zipexception.h"
-#include "zipautobuffer.h"
+#include "ZipPlatform.h"
+#include "ZipFileHeader.h"
+#include "ZipException.h"
+#include "ZipAutoBuffer.h"
 #include <sys/stat.h>
 
 #if defined _MSC_VER && !defined __BORLANDC__ /*_MSC_VER may be defined in Borland after converting the VC project */
@@ -27,34 +31,90 @@
 #include <direct.h>
 #include <io.h>
 #include <time.h> 
+#include "ZipPathComponent.h"
+#include "ZipCompatibility.h"
 
+const TCHAR CZipPathComponent::m_cSeparator = _T('\\');
 
-#include "zippathcomponent.h"
-TCHAR CZipPathComponent::m_cSeparator = _T('\\');
-
-#include "zipcompatibility.h"
 
 #ifndef _UTIMBUF_DEFINED
 #define _utimbuf utimbuf 
 #endif
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 DWORD ZipPlatform::GetDeviceFreeSpace(LPCTSTR lpszPath)
 {
 	DWORD SectorsPerCluster, BytesPerSector, NumberOfFreeClusters, TotalNumberOfClusters;
 	CZipPathComponent zpc (lpszPath);
+	CZipString szDrive = zpc.GetFileDrive();
 	if (!GetDiskFreeSpace(
-		zpc.GetFileDrive(),
+		szDrive,
 		&SectorsPerCluster,
 		&BytesPerSector,
 		&NumberOfFreeClusters,
 		&TotalNumberOfClusters))
-			return 0;
+	{
+		CZipPathComponent::AppendSeparator(szDrive); // in spite of what is written in MSDN it is sometimes needed (on fixed disks)
+		if (!GetDiskFreeSpace(
+			szDrive,
+			&SectorsPerCluster,
+			&BytesPerSector,
+			&NumberOfFreeClusters,
+			&TotalNumberOfClusters))
+		
+				return 0;
+	}
 	__int64 total = SectorsPerCluster * BytesPerSector * NumberOfFreeClusters;
 	return (DWORD)total;
 }
+
+bool ZipPlatform::GetFileSize(LPCTSTR lpszFileName, DWORD& dSize)
+{
+	HANDLE f = CreateFile(lpszFileName, GENERIC_READ, FILE_SHARE_READ, 
+		NULL, OPEN_EXISTING, 0, NULL);
+	if (!f)
+		return false;
+	DWORD dwSize;
+	dwSize = ::GetFileSize(f, NULL);
+	CloseHandle(f);
+	if (dwSize == 0xFFFFFFFF)
+		return false;
+	dSize = dwSize;
+	return true;
+}
+
+CZipString ZipPlatform::GetTmpFileName(LPCTSTR lpszPath, DWORD iSizeNeeded)
+{
+		TCHAR empty[] = _T("");
+		CZipString tempPath;
+		bool bCheckTemp = true;
+		if (lpszPath)
+		{
+			tempPath = lpszPath;
+			bCheckTemp = GetDeviceFreeSpace(tempPath) < iSizeNeeded;
+
+		}
+		if (bCheckTemp)
+		{
+			DWORD size = GetTempPath(0, NULL);
+			if (size == 0)
+				return empty;
+		
+			GetTempPath(size, tempPath.GetBuffer(size));
+			tempPath.ReleaseBuffer();
+			if (GetDeviceFreeSpace(tempPath) < iSizeNeeded)
+			{
+				if (!GetCurrentDirectory(tempPath) || GetDeviceFreeSpace(tempPath) < iSizeNeeded)
+					return empty;
+			}
+		}
+		CZipString tempName;
+		if (!GetTempFileName(tempPath, _T("ZAR"), 0, tempName.GetBuffer(_MAX_PATH)))
+			return empty;
+		tempName.ReleaseBuffer();
+		return tempName;
+}
+
+
 bool ZipPlatform::GetCurrentDirectory(CZipString& sz)
 {
 	DWORD i = ::GetCurrentDirectory(0, NULL);
@@ -98,14 +158,14 @@ bool ZipPlatform::GetFileModTime(LPCTSTR lpFileName, time_t & ttime)
 	return false;
 
 	ttime = st.st_mtime;
-	return true;
+	return ttime != -1;
 }
 
 bool ZipPlatform::SetFileModTime(LPCTSTR lpFileName, time_t ttime)
 {
 	struct _utimbuf ub;
 	ub.actime = time(NULL);
-	ub.modtime = ttime;
+	ub.modtime = ttime == -1 ? time(NULL) : ttime; // if wrong file time, set it to the current
 	return _tutime(lpFileName, &ub) == 0;
 }
 
@@ -149,16 +209,25 @@ ZIPINLINE void ZipPlatform::AnsiOem(CZipAutoBuffer& buffer, bool bAnsiToOem)
 		OemToCharBuffA(buffer, buffer, buffer.GetSize());
 }
 
-ZIPINLINE  void ZipPlatform::RemoveFile(LPCTSTR lpszFileName)
+ZIPINLINE  bool ZipPlatform::RemoveFile(LPCTSTR lpszFileName, bool bThrow)
 {
 	if (!::DeleteFile((LPTSTR)lpszFileName))
-		CZipException::Throw(CZipException::notRemoved, lpszFileName);
+		if (bThrow)
+			CZipException::Throw(CZipException::notRemoved, lpszFileName);
+		else 
+			return false;
+	return true;
 
 }
-ZIPINLINE  void ZipPlatform::RenameFile( LPCTSTR lpszOldName, LPCTSTR lpszNewName )
+ZIPINLINE  bool ZipPlatform::RenameFile( LPCTSTR lpszOldName, LPCTSTR lpszNewName, bool bThrow)
 {
 	if (!::MoveFile((LPTSTR)lpszOldName, (LPTSTR)lpszNewName))
-		CZipException::Throw(CZipException::notRenamed, lpszOldName);
+		if (bThrow)
+			CZipException::Throw(CZipException::notRenamed, lpszOldName);
+		else 
+			return false;
+	return true;
+
 }
 ZIPINLINE  bool ZipPlatform::IsDirectory(DWORD uAttr)
 {
@@ -169,14 +238,24 @@ ZIPINLINE  bool ZipPlatform::CreateDirectory(LPCTSTR lpDirectory)
 	return ::CreateDirectory(lpDirectory, NULL) != 0;
 }
 
-// ZIPINLINE  DWORD ZipPlatform::GetDefaultAttributes()
-// {
-// 	return FILE_ATTRIBUTE_ARCHIVE;
-// }
+ZIPINLINE  DWORD ZipPlatform::GetDefaultAttributes()
+{
+	return 0x81a40020; // make it readable under Unix
+}
+
+ZIPINLINE  DWORD ZipPlatform::GetDefaultDirAttributes()
+{
+	return 0x41ff0010; // make it readable under Unix
+}
 
 ZIPINLINE  int ZipPlatform::GetSystemID()
 {
 	return ZipCompatibility::zcDosFat;
+}
+
+ZIPINLINE bool ZipPlatform::GetSystemCaseSensitivity()
+{
+	return false;
 }
 
 #ifdef _UNICODE	
@@ -267,4 +346,6 @@ int ZipPlatform::GetFileSystemHandle(int iDes)
 {
 	return _get_osfhandle(iDes);
 }
+
+
 #endif //_MFC_VER

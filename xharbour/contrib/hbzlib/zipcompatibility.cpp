@@ -1,7 +1,11 @@
-// ZipCompatibility.cpp: implementation of the ZipCompatibility class.
-// Part of the ZipArchive library
-// 
-// Copyright (C) 2000 - 2001 Tadeusz Dracz.
+////////////////////////////////////////////////////////////////////////////////
+// $Workfile: ZipCompatibility.cpp $
+// $Archive: /ZipArchive/ZipCompatibility.cpp $
+// $Date: 02-01-19 18:03 $ $Author: Tadeusz Dracz $
+////////////////////////////////////////////////////////////////////////////////
+// This source file is part of the ZipArchive library source distribution and
+// is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
@@ -11,11 +15,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "zipcompatibility.h"
-#include "zipplatform.h"
-#include "zipexception.h"
-#include "zipautobuffer.h"
-#include "zipfileheader.h"
+#include "ZipCompatibility.h"
+#include "ZipPlatform.h"
+#include "ZipException.h"
+#include "ZipAutoBuffer.h"
+#include "ZipFileHeader.h"
 enum iInternalAttr
 {
 	attROnly	= 0x01,	
@@ -134,7 +138,10 @@ DWORD AttrUnix(DWORD uAttr, bool bFrom)
 			uNewAttr |= (CREATE_GROUP_PERMISSIONS (2) |
 								  CREATE_USER_PERMISSIONS (2));
 		if (uAttr & attDir) 
-			uNewAttr |= UNIX_DIRECTORY_ATTRIBUTE | attDir /*necessary for other archivers (such as Info-Zip)*/;
+			uNewAttr |= UNIX_DIRECTORY_ATTRIBUTE | attDir;
+		else
+			uNewAttr |= UNIX_FILE_ATTRIBUTE;
+
 	}
 
 	return uNewAttr;	
@@ -158,7 +165,7 @@ DWORD AttrMac(DWORD uAttr, bool )
 ZIPINLINE bool ZipCompatibility::IsPlatformSupported(int iCode)
 {
 	return iCode == zcDosFat || iCode == zcUnix || iCode == zcMacintosh
-		|| iCode == zcNtfs || iCode == zcOs2Hpfs || iCode >= 11;
+		|| iCode == zcNtfs || iCode == zcOs2Hpfs;
 }
 
 
@@ -166,7 +173,7 @@ void ZipCompatibility::FileNameUpdate(CZipFileHeader& header, bool bFromZip)
 {
 	int iSysHeader = header.GetSystemCompatibility();
 	int iCurSystem = ZipPlatform::GetSystemID();
-	if (bFromZip)
+	if (bFromZip) 
 	{
 		if (iCurSystem == zcDosFat)
 			SlashBackslashChg(header.m_pszFileName, true);
