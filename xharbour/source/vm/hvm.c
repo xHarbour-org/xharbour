@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.374 2004/04/06 22:20:04 ronpinkas Exp $
+ * $Id: hvm.c,v 1.375 2004/04/07 03:10:15 andijahja Exp $
  */
 
 /*
@@ -2178,7 +2178,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
                 pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
 
-                if( (*pGlobals)[ iGlobal ]->type & HB_IT_STRING && ( (*pGlobals)[ iGlobal ]->item.asString.bStatic || *( (*pGlobals)[ iGlobal ]->item.asString.puiHolders ) > 1 ) )
+                if( (*pGlobals)[ iGlobal ]->type & HB_IT_STRING && ( (*pGlobals)[ iGlobal ]->item.asString.bStatic || *( (*pGlobals)[ iGlobal ]->item.asString.pulHolders ) > 1 ) )
                 {
                    char *sString = (char*) hb_xgrab( (*pGlobals)[ iGlobal ]->item.asString.length + 1 );
 
@@ -2191,8 +2191,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                    (*pGlobals)[ iGlobal ]->item.asString.value = sString;
                    (*pGlobals)[ iGlobal ]->item.asString.bStatic = FALSE;
-                   (*pGlobals)[ iGlobal ]->item.asString.puiHolders = (ULONG *) hb_xgrab( sizeof( ULONG ) );
-                   *( (*pGlobals)[ iGlobal ]->item.asString.puiHolders ) = 1;
+                   (*pGlobals)[ iGlobal ]->item.asString.pulHolders = (ULONG *) hb_xgrab( sizeof( ULONG ) );
+                   *( (*pGlobals)[ iGlobal ]->item.asString.pulHolders ) = 1;
                 }
 
                 hb_stackPush();
@@ -2251,6 +2251,15 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                else if( HB_IS_LONGLONG( pLocal ) )
                {
                   lVal = pLocal->item.asLongLong.value;
+               }
+               else
+               {
+                  lVal = hb_itemGetNLL( pLocal );
+               }
+            #else
+               else
+               {
+                  lVal = hb_itemGetNL( pLocal );
                }
             #endif
 
@@ -2394,6 +2403,15 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                {
                   lVal = pTop->item.asLongLong.value;
                }
+               else
+               {
+                  lVal = hb_itemGetNLL( pTop );
+               }
+            #else
+               else
+               {
+                  lVal = hb_itemGetNL( pTop );
+               }
             #endif
 
                lNewVal = lVal + iAdd;
@@ -2508,13 +2526,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      memcpy( sString, pString->item.asString.value, iNewLen );
                      sString[ iNewLen ] = '\0';
                      pString->item.asString.bStatic = FALSE;
-                     pString->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+                     pString->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
 
-                     *( pString->item.asString.puiHolders ) = 1;
+                     *( pString->item.asString.pulHolders ) = 1;
                      pString->item.asString.value = sString;
                      pString->item.asString.length = iNewLen;
                   }
-                  else if( *( pString->item.asString.puiHolders ) == 1 )
+                  else if( *( pString->item.asString.pulHolders ) == 1 )
                   {
                      pString->item.asString.value[ iNewLen ] = '\0';
                      pString->item.asString.length = iNewLen;
@@ -2527,8 +2545,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                      hb_itemReleaseStringX( pString );
 
-                     pString->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-                     *( pString->item.asString.puiHolders ) = 1;
+                     pString->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+                     *( pString->item.asString.pulHolders ) = 1;
                      pString->item.asString.value = sString;
                      pString->item.asString.length = iNewLen;
                   }
@@ -2562,12 +2580,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      memcpy( sString, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
                      sString[ iNewLen ] = '\0';
                      pString->item.asString.bStatic = FALSE;
-                     pString->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-                  *( pString->item.asString.puiHolders ) = 1;
+                     pString->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+                  *( pString->item.asString.pulHolders ) = 1;
                      pString->item.asString.value = sString;
                      pString->item.asString.length = iNewLen;
                   }
-                  else if( *( pString->item.asString.puiHolders ) == 1 )
+                  else if( *( pString->item.asString.pulHolders ) == 1 )
                   {
                      memmove( pString->item.asString.value, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
                      pString->item.asString.value[ iNewLen ] = '\0';
@@ -2581,8 +2599,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                      hb_itemReleaseStringX( pString );
 
-                     pString->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-                     *( pString->item.asString.puiHolders ) = 1;
+                     pString->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+                     *( pString->item.asString.pulHolders ) = 1;
                      pString->item.asString.value = sString;
                      pString->item.asString.length = iNewLen;
                   }
@@ -3372,7 +3390,7 @@ static void hb_vmPlus( void )
       {
          ULONG ulNewLen   = ulLen1 + ulLen2; char *pNewString;
 
-         if( pItem1->item.asString.bStatic || ( *( pItem1->item.asString.puiHolders ) > 1 ) )
+         if( pItem1->item.asString.bStatic || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
          {
              pNewString = ( char * ) hb_xgrab( ulNewLen + 1 );
 
@@ -3381,8 +3399,8 @@ static void hb_vmPlus( void )
              hb_itemReleaseString( pItem1 );
 
              pItem1->type = HB_IT_STRING;
-             pItem1->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-             *( pItem1->item.asString.puiHolders ) = 1;
+             pItem1->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+             *( pItem1->item.asString.pulHolders ) = 1;
              pItem1->item.asString.bStatic = FALSE;
          }
          else
@@ -3495,8 +3513,8 @@ static void hb_vmMinus( void )
          HB_TRACE( HB_TR_DEBUG, ( "Released hb_vmMinus() Created \"%s\"", pNewString ) );
 
          //pItem1->type = HB_IT_STRING;
-         pItem1->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-         *( pItem1->item.asString.puiHolders ) = 1;
+         pItem1->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+         *( pItem1->item.asString.pulHolders ) = 1;
          pItem1->item.asString.bStatic = FALSE;
          pItem1->item.asString.value   = pNewString;
 
@@ -4698,32 +4716,30 @@ static void hb_vmArrayPush( void )
       lIndex = ( LONG ) pIndex->item.asLongLong.value;
    }
 #endif
- #ifndef HB_C52_STRICT
-   else if( HB_IS_STRING( pIndex ) )
+#ifndef HB_C52_STRICT
+   else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
    {
-      if( pIndex->item.asString.length == 1 )
-      {
-         lIndex = ( LONG ) pIndex->item.asString.value[0];
-      }
-      else if( HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
-      {
-         hb_dynsymLock();
-         hb_vmPushSymbol( hb_dynsymGetCase( pIndex->item.asString.value )->pSymbol );
-         hb_dynsymUnlock();
-         hb_itemPushForward( pArray );
-
-         hb_vmSend( 0 );
-
-         // Pop pIndex.
-         hb_stackPop();
-
-         // Recycle pArray.
-         hb_itemForwardValue( pArray, &(HB_VM_STACK.Return ) );
-
-         return;
-      }
+      lIndex = ( LONG ) pIndex->item.asString.value[0];
    }
- #endif
+   else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) &&
+            strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
+   {
+      hb_dynsymLock();
+      hb_vmPushSymbol( hb_dynsymGetCase( pIndex->item.asString.value )->pSymbol );
+      hb_dynsymUnlock();
+      hb_itemPushForward( pArray );
+
+      hb_vmSend( 0 );
+
+      // Pop pIndex.
+      hb_stackPop();
+
+      // Recycle pArray.
+      hb_itemForwardValue( pArray, &(HB_VM_STACK.Return ) );
+
+      return;
+   }
+#endif
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
@@ -4761,7 +4777,7 @@ static void hb_vmArrayPush( void )
       if( lIndex > 0 && (ULONG) lIndex <= pArray->item.asArray.value->ulLen )
       {
         #ifdef HB_ARRAY_USE_COUNTER
-         if( pArray->item.asArray.value->uiHolders > 1 )
+         if( pArray->item.asArray.value->ulHolders > 1 )
         #else
          if( pArray->item.asArray.value->pOwners->pNext )
         #endif
@@ -4933,63 +4949,61 @@ static void hb_vmArrayPop( void )
       lIndex = ( LONG ) pIndex->item.asLongLong.value;
    }
 #endif
- #ifndef HB_C52_STRICT
-   else if( HB_IS_STRING( pIndex ) )
+#ifndef HB_C52_STRICT
+   else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
    {
-      if( pIndex->item.asString.length == 1 )
-      {
-         lIndex = ( LONG ) pIndex->item.asString.value[0];
-      }
-      else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
-      {
-         char szMessage[ HB_SYMBOL_NAME_LEN ];
+      lIndex = ( LONG ) pIndex->item.asString.value[0];
+   }
+   else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) &&
+            strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
+   {
+      char szMessage[ HB_SYMBOL_NAME_LEN ];
 
-         szMessage[0] = '_';
-         szMessage[1] = '\0';
-         strcat( szMessage, pIndex->item.asString.value );
+      szMessage[0] = '_';
+      szMessage[1] = '\0';
+      strcat( szMessage, pIndex->item.asString.value );
 
-         // Optimized - recycling the parameters.
-         #if 1
-            // Swap - pIndex no longer needed.
-            hb_itemForwardValue( pIndex, pValue );
+      // Optimized - recycling the parameters.
+      #if 1
+         // Swap - pIndex no longer needed.
+         hb_itemForwardValue( pIndex, pValue );
 
-            // Recycle pValue as Message.
-            pValue->type = HB_IT_SYMBOL;
-            hb_dynsymLock();
-            pValue->item.asSymbol.value = hb_dynsymGetCase( szMessage )->pSymbol;
-            hb_dynsymUnlock();
-            pValue->item.asSymbol.stackbase = HB_VM_STACK.pPos - 3 - HB_VM_STACK.pItems;
-            pValue->item.asSymbol.uiSuperClass = 0;
+         // Recycle pValue as Message.
+         pValue->type = HB_IT_SYMBOL;
+         hb_dynsymLock();
+         pValue->item.asSymbol.value = hb_dynsymGetCase( szMessage )->pSymbol;
+         hb_dynsymUnlock();
+         pValue->item.asSymbol.stackbase = HB_VM_STACK.pPos - 3 - HB_VM_STACK.pItems;
+         pValue->item.asSymbol.uiSuperClass = 0;
 
-            if( HB_IS_BYREF( hb_stackItemFromTop( -2 ) ) )
-            {
-               hb_itemCopy( hb_stackItemFromTop( -2 ), pArray );
-            }
-
-            hb_vmSend( 1 );
-         #else
-            hb_dynsymLock();
-            hb_vmPushSymbol( hb_dynsymGetCase( szMessage )->pSymbol );
-            hb_dynsymUnlock();
-            hb_vmPush( pArray );
-            hb_vmPush( pValue );
-
-            hb_vmSend( 1 );
-
-            hb_stackPop();
-            hb_stackPop();
-            hb_stackPop();
-         #endif
-
-         if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
+         if( HB_IS_BYREF( hb_stackItemFromTop( -2 ) ) )
          {
-            hb_itemClear( &(HB_VM_STACK.Return) );
+            hb_itemCopy( hb_stackItemFromTop( -2 ), pArray );
          }
 
-         return;
+         hb_vmSend( 1 );
+      #else
+         hb_dynsymLock();
+         hb_vmPushSymbol( hb_dynsymGetCase( szMessage )->pSymbol );
+         hb_dynsymUnlock();
+         hb_vmPush( pArray );
+         hb_vmPush( pValue );
+
+         hb_vmSend( 1 );
+
+         hb_stackPop();
+         hb_stackPop();
+         hb_stackPop();
+      #endif
+
+      if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
+      {
+         hb_itemClear( &(HB_VM_STACK.Return) );
       }
+
+      return;
    }
- #endif
+#endif
    else
    {
       hb_errRT_BASE( EG_ARG, 1069, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 3, pArray, pIndex, pValue );
@@ -5062,7 +5076,7 @@ static void hb_vmArrayPop( void )
             bNewChar = (BYTE) pValue->item.asDouble.value;
          }
 
-         if( pArray->item.asString.bStatic || *( pArray->item.asString.puiHolders ) > 1 )
+         if( pArray->item.asString.bStatic || *( pArray->item.asString.pulHolders ) > 1 )
          {
             char *sNew = (char *) hb_xgrab( pArray->item.asString.length + 1 );
 
@@ -5075,8 +5089,8 @@ static void hb_vmArrayPop( void )
             }
 
             pArray->item.asString.value           =  sNew;
-            pArray->item.asString.puiHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-            *( pArray->item.asString.puiHolders ) = 1;
+            pArray->item.asString.pulHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+            *( pArray->item.asString.pulHolders ) = 1;
             pArray->item.asString.bStatic         = FALSE;
          }
 
@@ -6534,8 +6548,8 @@ HB_EXPORT void hb_vmPushString( char * szText, ULONG length )
    hb_xmemcpy( szTemp, szText, length );
    szTemp[ length ] = '\0';
 
-   pTop->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-   *( pTop->item.asString.puiHolders ) = 1;
+   pTop->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   *( pTop->item.asString.pulHolders ) = 1;
    pTop->type = HB_IT_STRING;
    pTop->item.asString.bStatic = FALSE;
    pTop->item.asString.length = length;
@@ -6623,7 +6637,7 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
       //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
 
       #ifdef HB_ARRAY_USE_COUNTER
-         ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
+         ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->ulHolders++;
       #else
          hb_arrayRegisterHolder( ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase, (void *) ( ( * HB_VM_STACK.pPos )->item.asBlock.value ) );
       #endif
@@ -6679,7 +6693,7 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
       //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
 
       #ifdef HB_ARRAY_USE_COUNTER
-         ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
+         ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->ulHolders++;
       #else
          hb_arrayRegisterHolder( ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase, (void *) ( ( * HB_VM_STACK.pPos )->item.asBlock.value ) );
       #endif
@@ -6735,7 +6749,7 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
       //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
 
       #ifdef HB_ARRAY_USE_COUNTER
-         ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
+         ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->ulHolders++;
       #else
          hb_arrayRegisterHolder( ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase, (void *) ( ( * HB_VM_STACK.pPos )->item.asBlock.value ) );
       #endif
@@ -6919,7 +6933,7 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
 
       pLocal = *( HB_VM_STACK.pBase + iLocal + 1 );
 
-      if( pLocal->type & HB_IT_STRING && ( pLocal->item.asString.bStatic || *( pLocal->item.asString.puiHolders ) > 1 ) )
+      if( pLocal->type & HB_IT_STRING && ( pLocal->item.asString.bStatic || *( pLocal->item.asString.pulHolders ) > 1 ) )
       {
          char *sString = (char*) hb_xgrab( pLocal->item.asString.length + 1 );
 
@@ -6932,8 +6946,8 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
 
          pLocal->item.asString.value = sString;
          pLocal->item.asString.bStatic = FALSE;
-         pLocal->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-         *( pLocal->item.asString.puiHolders ) = 1;
+         pLocal->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+         *( pLocal->item.asString.pulHolders ) = 1;
       }
 
       pTop->item.asRefer.BasePtr.itemsbasePtr = &HB_VM_STACK.pItems;
@@ -6983,7 +6997,7 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushStaticByRef(%hu)", uiStatic));
 
-   if( pReference->type & HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.puiHolders ) > 1 ) )
+   if( pReference->type & HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.pulHolders ) > 1 ) )
    {
       char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
 
@@ -6996,8 +7010,8 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
 
       pReference->item.asString.value = sString;
       pReference->item.asString.bStatic = FALSE;
-      pReference->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-      *( pReference->item.asString.puiHolders ) = 1;
+      pReference->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+      *( pReference->item.asString.pulHolders ) = 1;
    }
 
    pTop->type = HB_IT_BYREF;
@@ -7007,7 +7021,7 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
    pTop->item.asRefer.BasePtr.pBaseArray = s_aStatics.item.asArray.value;
 
    #ifdef HB_ARRAY_USE_COUNTER
-      s_aStatics.item.asArray.value->uiHolders++;
+      s_aStatics.item.asArray.value->ulHolders++;
    #else
        hb_arrayRegisterHolder( s_aStatics.item.asArray.value, (void *) pTop );
    #endif
@@ -8173,9 +8187,9 @@ static void hb_itemReleaseStringX( PHB_ITEM pItem )
    This is a copy of hb_itemReleaseString() with logic for
    checking bStatic flag removed.
    */
-   if( --*( pItem->item.asString.puiHolders ) == 0 )
+   if( --*( pItem->item.asString.pulHolders ) == 0 )
    {
-      hb_xfree( pItem->item.asString.puiHolders );
+      hb_xfree( pItem->item.asString.pulHolders );
       hb_xfree( pItem->item.asString.value );
    }
 }
@@ -8405,7 +8419,7 @@ HB_FUNC( HB_RESTOREBLOCK )
                Block.item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
 
                #ifdef HB_ARRAY_USE_COUNTER
-                  Block.item.asBlock.value->pSelfBase->uiHolders++;
+                  Block.item.asBlock.value->pSelfBase->ulHolders++;
                #else
                   hb_arrayRegisterHolder( Block.item.asBlock.value->pSelfBase, (void *) ( Block.item.asBlock.value ) );
                #endif

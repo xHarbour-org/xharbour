@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.26 2004/02/25 12:40:28 lculik Exp $
+ * $Id: hbvmpub.h,v 1.27 2004/04/02 04:30:51 ronpinkas Exp $
  */
 
 /*
@@ -184,7 +184,7 @@
        ULONG           length;
        char            *value;
        BOOL            bStatic;
-       ULONG           *puiHolders; /* number of holders of this string */
+       ULONG           *pulHolders; /* number of holders of this string */
     };
 
     struct hb_struSymbol
@@ -241,7 +241,7 @@
     {
        PHB_ITEM pItems;       /* pointer to the array items */
        ULONG    ulLen;        /* number of items in the array */
-       USHORT   uiHolders;    /* number of holders of this array */
+       ULONG    ulHolders;    /* number of holders of this array */
        USHORT   uiClass;      /* offset to the classes base if it is an object */
        USHORT   uiPrevCls;    /* for fixing after access super */
        USHORT * puiClsTree;   /* remember array of super called ID Tree  */

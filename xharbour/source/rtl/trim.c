@@ -1,5 +1,5 @@
 /*
- * $Id: trim.c,v 1.7 2004/02/21 14:39:01 andijahja Exp $
+ * $Id: trim.c,v 1.8 2004/02/25 15:39:16 lculik Exp $
  */
 
 /*
@@ -91,8 +91,8 @@ static PHB_ITEM hb_itemPutCLM( PHB_ITEM pItem, char * szText, ULONG ulLen, BOOL 
    }
    else
    {
-      pItem->item.asString.puiHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-      *( pItem->item.asString.puiHolders ) = 1;
+      pItem->item.asString.pulHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+      *( pItem->item.asString.pulHolders ) = 1;
       pItem->item.asString.bStatic         = FALSE;
       pItem->item.asString.length          = ulLen;
       pItem->item.asString.value           = ( char * ) hb_xgrab( ulLen + 1 );

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.105 2004/04/03 00:27:04 druzus Exp $
+ * $Id: arrays.c,v 1.106 2004/04/03 01:51:02 ronpinkas Exp $
  */
 
 /*
@@ -118,7 +118,7 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
    }
 
    #ifdef HB_ARRAY_USE_COUNTER
-      pBaseArray->uiHolders = HB_ARRAY_COUNTER_DEFAULT_HOLDERS;
+      pBaseArray->ulHolders = HB_ARRAY_COUNTER_DEFAULT_HOLDERS;
    #else
       pBaseArray->pOwners = NULL;
       hb_arrayRegisterHolder( pBaseArray, (void *) pItem );
@@ -487,12 +487,12 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
       pItem->item.asRefer.BasePtr.pBaseArray = pArray->item.asArray.value;
 
       #ifdef HB_ARRAY_USE_COUNTER
-         pArray->item.asArray.value->uiHolders++;
+         pArray->item.asArray.value->ulHolders++;
       #else
           hb_arrayRegisterHolder( pArray->item.asArray.value, (void *) pItem );
       #endif
 
-      if( pElement->type == HB_IT_STRING && ( pElement->item.asString.bStatic || *( pElement->item.asString.puiHolders ) > 1 ) )
+      if( pElement->type == HB_IT_STRING && ( pElement->item.asString.bStatic || *( pElement->item.asString.pulHolders ) > 1 ) )
       {
          char *sString = (char*) hb_xgrab( pElement->item.asString.length + 1 );
 
@@ -503,8 +503,8 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
 
          pElement->item.asString.value = sString;
          pElement->item.asString.bStatic = FALSE;
-         pElement->item.asString.puiHolders = (ULONG *) hb_xgrab( sizeof( ULONG ) );
-         *( pElement->item.asString.puiHolders ) = 1;
+         pElement->item.asString.pulHolders = (ULONG *) hb_xgrab( sizeof( ULONG ) );
+         *( pElement->item.asString.pulHolders ) = 1;
       }
 
       return TRUE;
@@ -1098,7 +1098,7 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
 
       // To avoid DOUBLE freeing - when poped off in hb_clsFinalize()
       #ifdef HB_ARRAY_USE_COUNTER
-         FakedObject.item.asArray.value->uiHolders = 1;
+         FakedObject.item.asArray.value->ulHolders = 1;
       #else
          hb_arrayRegisterHolder( pBaseArray, (void *) &FakedObject );
       #endif
@@ -1106,7 +1106,7 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
       hb_clsFinalize( &FakedObject );
 
       #ifdef HB_ARRAY_USE_COUNTER
-         FakedObject.item.asArray.value->uiHolders = 0;
+         FakedObject.item.asArray.value->ulHolders = 0;
       #else
 	     // Avoid infinite recursion - we know this is the only pOwner
          //hb_arrayReleaseHolder( pBaseArray, (void *) &FakedObject );

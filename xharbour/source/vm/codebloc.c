@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.41 2004/04/03 01:51:02 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.42 2004/04/06 22:20:04 ronpinkas Exp $
  */
 
 /*
@@ -275,7 +275,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
       if( pCBlock->pSelfBase )
       {
          #ifdef HB_ARRAY_USE_COUNTER
-            pCBlock->pSelfBase->uiHolders--;
+            pCBlock->pSelfBase->ulHolders--;
          #else
             PHB_BASEARRAY pSelfBase = pCBlock->pSelfBase;
 

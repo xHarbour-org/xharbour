@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.66 2004/04/03 03:28:12 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.67 2004/04/03 23:48:18 ronpinkas Exp $
  */
 
 /*
@@ -149,16 +149,16 @@ void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
 
    if( pItem->item.asString.bStatic == FALSE )
    {
-      if( *( pItem->item.asString.puiHolders ) == 0 )
+      if( *( pItem->item.asString.pulHolders ) == 0 )
       {
          hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature String Release detected: '%s'", pItem->item.asString.value, NULL );
       }
 
-      if( --*( pItem->item.asString.puiHolders ) == 0  )
+      if( --*( pItem->item.asString.pulHolders ) == 0  )
       {
-         HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.puiHolders ) );
-         hb_xfree( pItem->item.asString.puiHolders );
-         //pItem->item.asString.puiHolders = NULL;
+         HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.pulHolders ) );
+         hb_xfree( pItem->item.asString.pulHolders );
+         //pItem->item.asString.pulHolders = NULL;
 
          HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.value ) );
          hb_xfree( pItem->item.asString.value );
@@ -193,12 +193,12 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
       case HB_IT_ARRAY :
       {
          #ifdef HB_ARRAY_USE_COUNTER
-           if( pItem->item.asArray.value->uiHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
+           if( pItem->item.asArray.value->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
            {
               hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
            }
 
-           if( --( pItem->item.asArray.value->uiHolders ) == 0 )
+           if( --( pItem->item.asArray.value->ulHolders ) == 0 )
            {
               hb_arrayRelease( pItem );
            }
@@ -226,12 +226,12 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
             FakeArray.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
 
             #ifdef HB_ARRAY_USE_COUNTER
-               if( pItem->item.asRefer.BasePtr.pBaseArray->uiHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
+               if( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
                {
                   hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
                }
 
-               if( --( pItem->item.asRefer.BasePtr.pBaseArray->uiHolders ) == 0 )
+               if( --( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders ) == 0 )
                {
                   hb_arrayRelease( &FakeArray );
                }
@@ -276,12 +276,12 @@ void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
       case HB_IT_ARRAY :
       {
          #ifdef HB_ARRAY_USE_COUNTER
-           if( pItem->item.asArray.value->uiHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
+           if( pItem->item.asArray.value->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
            {
               hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
            }
 
-           if( --( pItem->item.asArray.value->uiHolders ) == 0 )
+           if( --( pItem->item.asArray.value->ulHolders ) == 0 )
            {
               hb_arrayRelease( pItem );
            }
@@ -309,12 +309,12 @@ void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
             FakeArray.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
 
             #ifdef HB_ARRAY_USE_COUNTER
-               if( pItem->item.asRefer.BasePtr.pBaseArray->uiHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
+               if( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
                {
                   hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
                }
 
-               if( --( pItem->item.asRefer.BasePtr.pBaseArray->uiHolders ) == 0 )
+               if( --( pItem->item.asRefer.BasePtr.pBaseArray->ulHolders ) == 0 )
                {
                   hb_arrayRelease( &FakeArray );
                }
@@ -391,7 +391,7 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
    {
       if( pSource->item.asString.bStatic == FALSE )
       {
-         ++*( pSource->item.asString.puiHolders );
+         ++*( pSource->item.asString.pulHolders );
       }
 
       return;
@@ -407,7 +407,7 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       case HB_IT_ARRAY :
       {
          #ifdef HB_ARRAY_USE_COUNTER
-            pSource->item.asArray.value->uiHolders++;
+            pSource->item.asArray.value->ulHolders++;
          #else
              hb_arrayRegisterHolder( pDest->item.asArray.value, (void *) pDest );
          #endif
@@ -427,7 +427,7 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
          if( pSource->item.asRefer.offset == 0 )
          {
             #ifdef HB_ARRAY_USE_COUNTER
-               pSource->item.asRefer.BasePtr.pBaseArray->uiHolders++;
+               pSource->item.asRefer.BasePtr.pBaseArray->ulHolders++;
             #else
                hb_arrayRegisterHolder( pSource->item.asRefer.BasePtr.pBaseArray, (void *) pSource->item.asRefer.BasePtr.pBaseArray );
             #endif
@@ -470,8 +470,8 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, char * szText )
    }
    else
    {
-      pItem->item.asString.puiHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-      *( pItem->item.asString.puiHolders ) = 1;
+      pItem->item.asString.pulHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+      *( pItem->item.asString.pulHolders ) = 1;
       pItem->item.asString.bStatic         = FALSE;
       pItem->item.asString.length          = strlen( szText );
       pItem->item.asString.value           = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
@@ -513,8 +513,8 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
    }
    else
    {
-      pItem->item.asString.puiHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-      *( pItem->item.asString.puiHolders ) = 1;
+      pItem->item.asString.pulHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+      *( pItem->item.asString.pulHolders ) = 1;
       pItem->item.asString.bStatic         = FALSE;
       pItem->item.asString.length          = ulLen;
       pItem->item.asString.value           = ( char * ) hb_xgrab( ulLen + 1 );
@@ -542,8 +542,8 @@ PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    }
 
    pItem->type = HB_IT_STRING;
-   pItem->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-   *( pItem->item.asString.puiHolders ) = 1;
+   pItem->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   *( pItem->item.asString.pulHolders ) = 1;
    pItem->item.asString.bStatic = FALSE;
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
@@ -570,8 +570,8 @@ PHB_ITEM HB_EXPORT hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
    }
 
    pItem->type = HB_IT_STRING;
-   pItem->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-   *( pItem->item.asString.puiHolders ) = 1;
+   pItem->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   *( pItem->item.asString.pulHolders ) = 1;
    pItem->item.asString.bStatic = FALSE;
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
@@ -732,8 +732,8 @@ void HB_EXPORT hb_retcAdopt( char * szText )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-   *( ( &(HB_VM_STACK.Return) )->item.asString.puiHolders ) = 1;
+   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length  = strlen( szText );
@@ -756,8 +756,8 @@ void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-   *( ( &(HB_VM_STACK.Return) )->item.asString.puiHolders ) = 1;
+   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length  = ulLen;
@@ -778,8 +778,8 @@ void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-   *( ( &(HB_VM_STACK.Return) )->item.asString.puiHolders ) = 1;
+   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length  = ulLen;
@@ -799,8 +799,8 @@ void HB_EXPORT hb_retclenAdoptRawStatic( char * szText, ULONG ulLen )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-   *( ( &(HB_VM_STACK.Return) )->item.asString.puiHolders ) = 1;
+   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+   *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = TRUE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length  = ulLen;

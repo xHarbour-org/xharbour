@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.73 2004/04/03 11:47:11 jonnymind Exp $
+ * $Id: memvars.c,v 1.74 2004/04/06 22:20:04 ronpinkas Exp $
  */
 
 /*
@@ -868,7 +868,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
 
          pReference = &s_globalTable[ pDyn->hMemvar ].item;
 
-         if( pReference->type & HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.puiHolders ) > 1 ) )
+         if( pReference->type & HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.pulHolders ) > 1 ) )
          {
             char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
 
@@ -881,8 +881,8 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
 
             pReference->item.asString.value = sString;
             pReference->item.asString.bStatic = FALSE;
-            pReference->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-            *( pReference->item.asString.puiHolders ) = 1;
+            pReference->item.asString.pulHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+            *( pReference->item.asString.pulHolders ) = 1;
          }
 
          /* value is already created */
@@ -955,7 +955,7 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
    itName.item.asString.value  = szVarName;
    itName.item.asString.length = *pulLen;
    itName.item.asString.bStatic = TRUE;
-   itName.item.asString.puiHolders = NULL;
+   itName.item.asString.pulHolders = NULL;
 
    hb_dynsymLock();
    pDynVar = hb_memvarFindSymbol( &itName );

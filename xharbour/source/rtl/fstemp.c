@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.10 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: fstemp.c,v 1.11 2004/04/06 01:50:55 druzus Exp $
  */
 
 /*
@@ -63,6 +63,33 @@
 
 static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * pszPrefix )
 {
+   BOOL fResult;
+
+#if defined(HB_WIN32_IO)
+
+   char cTempDir[ _POSIX_PATH_MAX + 1 ];
+
+   /* TODO: Implement this: */
+   HB_SYMBOL_UNUSED( pszPrefix );
+
+   if ( pszDir != NULL && pszDir[0] != '\0' )
+   {
+      strncpy( (char *) cTempDir, (const char *) pszDir, _POSIX_PATH_MAX );
+   }
+   else
+   {
+      if ( ! GetTempPath( ( DWORD ) _POSIX_PATH_MAX, cTempDir ) )
+      {
+         hb_fsSetIOError( FALSE, 0 );
+         return FALSE;
+      }
+   }
+   cTempDir[ _POSIX_PATH_MAX ] = '\0';
+
+   fResult = GetTempFileName( cTempDir, "xht", 0, (char *) pszBuffer );
+
+#else
+
    /* TODO: Implement these: */
    HB_SYMBOL_UNUSED( pszDir );
    HB_SYMBOL_UNUSED( pszPrefix );
@@ -72,10 +99,12 @@ static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * p
              at least this large. */
 
    pszBuffer[ 0 ] = '\0';
+   fResult = ( tmpnam( ( char * ) pszBuffer ) != NULL );
 
-   tmpnam( ( char * ) pszBuffer );
+#endif
 
-   return pszBuffer[ 0 ] != '\0';
+   hb_fsSetIOError( fResult, 0 );
+   return fResult;
 }
 
 /* NOTE: The buffer must be at least _POSIX_PATH_MAX chars long */
@@ -106,7 +135,6 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
       }
    }
 
-   hb_fsSetIOError( FALSE, 0 );
    return FS_ERROR;
 }
 #else
@@ -117,7 +145,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
 {
    /* less attemps */
    USHORT nAttemptLeft = 99;
-   FHANDLE fd;
+   FHANDLE fd = -1;
 
    HB_SYMBOL_UNUSED( uiAttr );
 
@@ -146,16 +174,13 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
 
    strcat(pszName, "XXXXXX" );
 
-   while( --nAttemptLeft )
+   while( fd == -1 && --nAttemptLeft )
    {
-      if( (fd = (FHANDLE) mkstemp( pszName ) ) != -1 )
-      {
-         return fd;
-      }
+      fd = (FHANDLE) mkstemp( pszName );
    }
 
-   hb_fsSetError( FS_ERROR );
-   return FS_ERROR;
+   hb_fsSetIOError( fd != -1, 0 );
+   return fd != -1 ? fd : FS_ERROR;
 }
 
 #endif
@@ -166,8 +191,8 @@ HB_FUNC( HB_FTEMPCREATE )
 {
    BYTE szName[ _POSIX_PATH_MAX + 1 ];
 
-   hb_retni( hb_fsCreateTemp( ( BYTE * ) hb_parcx( 1 ),
-                              ( BYTE * ) hb_parcx( 2 ),
+   hb_retni( hb_fsCreateTemp( ( BYTE * ) hb_parc( 1 ),
+                              ( BYTE * ) hb_parc( 2 ),
                               ISNUM( 3 ) ? hb_parni( 3 ) : FC_NORMAL,
                               szName ) );
 

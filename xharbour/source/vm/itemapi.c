@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.91 2004/04/02 04:30:52 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.92 2004/04/03 01:51:03 ronpinkas Exp $
  */
 
 /*
@@ -1169,7 +1169,7 @@ void hb_itemClear( PHB_ITEM pItem )
   }
   else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
   {
-     if( ( pItem->item.asArray.value )->uiHolders && --( pItem->item.asArray.value )->uiHolders == 0 )
+     if( ( pItem->item.asArray.value )->ulHolders && --( pItem->item.asArray.value )->ulHolders == 0 )
      {
         hb_arrayRelease( pItem );
      }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2770 2004/04/08 00:14:00 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2771 2004/04/08 10:25:33 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,45 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-08 15:36 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/set.c
+    * use hb_fsCreateTemp() for temporary files and Windows Printer.
+      To Windows users: please test it.
+
+  * xharbour/source/rtl/fstemp.c
+    * hb_fsTempName() now can use Win32 API for HB_WIN32_IO
+      Thanks to Sylvian - I left intentionaly the logic with create
+      (not open) to force truncating and avoid possible race condition
+      problem, if it will make any troubles please inform me.
+
+  * xharbour/include/hbdefs.h
+  * xharbour/include/hbvmpub.h
+  * xharbour/source/rtl/hbxml.c
+  * xharbour/source/rtl/trim.c
+  * xharbour/source/vm/arrays.c
+  * xharbour/source/vm/classes.c
+  * xharbour/source/vm/codebloc.c
+  * xharbour/source/vm/debug.c
+  * xharbour/source/vm/fastitem.c
+  * xharbour/source/vm/fm.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/itemapi.c
+  * xharbour/source/vm/memvars.c
+    * puiHolders cahnge to pulHolders and uiHolders to ulHolders,
+      both are ULONG now. This resolves GPF problem when array
+      was shared more then 2^16 times, f.e.:
+        a:=array(100000)
+	b:={"default"}
+	afill(a,b)
+
+  * xharbour/source/vm/hvm.c
+    ! fixed the bug I reported a week ago in hb_vmArrayPush()/hb_vmArrayPop()
+      when pIndex was string with differ length then 1 and pArray was not
+      an object which inherits from TASSOCIATIVEARRAY
+      I didn't want to do that myself but if no one else has wanted to clean
+      it so far, I had to. Please test.
+
 2004-04-08 17:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * contrib/rdd_ads/ace.h
     ! replace dllexport with dllimport

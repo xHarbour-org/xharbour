@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.113 2004/03/25 16:02:42 ronpinkas Exp $
+ * $Id: classes.c,v 1.114 2004/04/08 00:14:15 ronpinkas Exp $
  */
 
 /*
@@ -2114,7 +2114,7 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
                         pInit->item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
 
                         #ifdef HB_ARRAY_USE_COUNTER
-                           pInit->item.asBlock.value->pSelfBase->uiHolders++;
+                           pInit->item.asBlock.value->pSelfBase->ulHolders++;
                         #else
                            hb_arrayRegisterHolder( pInit->item.asBlock.value->pSelfBase, (void *) pInit );
                         #endif
@@ -2153,7 +2153,7 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
                      pInitValue->item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
 
                      #ifdef HB_ARRAY_USE_COUNTER
-                        pInitValue->item.asBlock.value->pSelfBase->uiHolders++;
+                        pInitValue->item.asBlock.value->pSelfBase->ulHolders++;
                      #else
                         hb_arrayRegisterHolder( pInitValue->item.asBlock.value->pSelfBase, (void *) pInitValue );
                      #endif
@@ -2194,7 +2194,7 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
                         pInit->item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
 
                         #ifdef HB_ARRAY_USE_COUNTER
-                           pInit->item.asBlock.value->pSelfBase->uiHolders++;
+                           pInit->item.asBlock.value->pSelfBase->ulHolders++;
                         #else
                            hb_arrayRegisterHolder( pInit->item.asBlock.value->pSelfBase, (void *) pInit );
                         #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.34 2004/04/06 09:58:23 andijahja Exp $
+ * $Id: hbdefs.h,v 1.35 2004/04/07 03:10:14 andijahja Exp $
  */
 
 /*
@@ -69,6 +69,9 @@
    #if defined( HB_WIN32_IO )
       #undef HB_WIN32_IO
    #endif
+#endif
+#if defined( HB_WIN32_IO ) && !defined( HB_OS_WIN_32_USED )
+   #define HB_OS_WIN_32_USED
 #endif
 
 /* Include windows.h if applicable and requested */

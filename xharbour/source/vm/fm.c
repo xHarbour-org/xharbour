@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.58 2004/02/25 15:10:58 lculik Exp $
+ * $Id: fm.c,v 1.59 2004/04/04 13:35:18 map Exp $
  */
 
 /*
@@ -155,8 +155,8 @@ void hb_paraniodMemInit( void *pMem, ULONG ulSize )
    if( !bParanoidMemInit )
    {
       itmMemStat.type = HB_IT_STRING;
-      itmMemStat.item.asString.puiHolders = (ULONG*) malloc( sizeof( ULONG ) );
-      *( itmMemStat.item.asString.puiHolders ) = 1;
+      itmMemStat.item.asString.pulHolders = (ULONG*) malloc( sizeof( ULONG ) );
+      *( itmMemStat.item.asString.pulHolders ) = 1;
       itmMemStat.item.asString.bStatic = FALSE;
       itmMemStat.item.asString.length  = strlen(pszMemStat);
       itmMemStat.item.asString.value   = pszMemStat;
@@ -178,9 +178,9 @@ void hb_paraniodMemCheck( void *pMem )
 
    if( ! bLoop &&
        ( pMem == pszMemStat ||
-         pMem == itmMemStat.item.asString.puiHolders ||
-         itmMemStat.item.asString.puiHolders == NULL ||
-         *( itmMemStat.item.asString.puiHolders ) != 1 ) )
+         pMem == itmMemStat.item.asString.pulHolders ||
+         itmMemStat.item.asString.pulHolders == NULL ||
+         *( itmMemStat.item.asString.pulHolders ) != 1 ) )
    {
       bLoop = TRUE;
       hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xfree(%p) [Paranoid Test] Pointer Overflow '%s'", (char *) pMem, (char *) pMem );

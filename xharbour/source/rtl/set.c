@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.44 2004/03/03 19:37:55 mlombardo Exp $
+ * $Id: set.c,v 1.45 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -251,9 +251,11 @@ static void close_binary( FHANDLE handle )
       hb_fsClose( handle );
       hb_fsSetError( user_ferror );
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
-      if (hb_set.hb_set_winprinter && (hb_set.hb_set_printhan == handle) && s_PrintFileName[0]) {
-         hb_PrintFileRaw( (BYTE *)s_PrinterName, (BYTE *)s_PrintFileName, (BYTE *)( hb_set.hb_set_printerjob ? hb_set.hb_set_printerjob : s_PrintFileName)) ;
-        hb_fsDelete((BYTE *) s_PrintFileName )  ;
+      if ( hb_set.hb_set_winprinter && ( hb_set.hb_set_printhan == handle ) && s_PrintFileName[0] )
+      {
+         hb_PrintFileRaw( (BYTE *) s_PrinterName, (BYTE *) s_PrintFileName, 
+                          (BYTE *) ( hb_set.hb_set_printerjob ? hb_set.hb_set_printerjob : s_PrintFileName ) ) ;
+         hb_fsDelete( (BYTE *) s_PrintFileName );
       }
 #endif
    }
@@ -280,22 +282,23 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
    USHORT user_ferror;
    FHANDLE handle;
    PHB_FNAME pFilename;
-   char path[ _POSIX_PATH_MAX + 1 ];
-   BOOL bPipe = FALSE;
+   char path[ _POSIX_PATH_MAX + 1 ], *szPrnFile ;
+   BOOL bPipe = FALSE, bTemp = FALSE;
    HB_TRACE(HB_TR_DEBUG, ("open_handle(%s, %d, %s, %d)", file_name, (int) bAppend, def_ext, (int) set_specifier));
 
    user_ferror = hb_fsError(); /* Save the current user file error code */
    /* Create full filename */
 
-
-     #if defined(OS_UNIX_COMPATIBLE)
-      if( ( bPipe = ( set_specifier == HB_SET_PRINTFILE && \
-                      (char) *file_name == '|' ) ) ) {
-         file_name++;
-         bAppend = FALSE;
-      }
-   #endif
-   if( ! bPipe ) {
+   szPrnFile = path;
+#if defined(OS_UNIX_COMPATIBLE)
+   if( ( bPipe = ( set_specifier == HB_SET_PRINTFILE && (char) *file_name == '|' ) ) )
+   {
+      szPrnFile = file_name;
+      file_name++;
+   }
+#endif
+   if( ! bPipe )
+   {
       pFilename = hb_fsFNameSplit( file_name );
 
       if( ! pFilename->szPath && hb_set.HB_SET_DEFAULT )
@@ -304,29 +307,27 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
          pFilename->szExtension = def_ext;
 
       hb_fsFNameMerge( path, pFilename );
-      hb_xfree(pFilename) ;
+      hb_xfree( pFilename ) ;
 
       strcpy(s_PrinterName, file_name) ;
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
-      if (set_specifier == HB_SET_PRINTFILE) {
-        if (hb_stricmp(s_PrinterName,"prn")==0 ) {
-          DWORD nSize= _POSIX_PATH_MAX ;
-          hb_GetDefaultPrinter((LPTSTR) s_PrinterName,&nSize);
-          if (!s_PrinterName[0])
-            strcpy(s_PrinterName,"lpt1") ;
-        }
-        hb_set.hb_set_winprinter= hb_PrinterExists(s_PrinterName) ;
-        if (hb_set.hb_set_winprinter) {
-          TCHAR cTempDir[_POSIX_PATH_MAX + 1] ;
-          GetTempPath((DWORD) _POSIX_PATH_MAX, cTempDir);  // We must use temp file as in WTS/Citrix/Network
-          if (!GetTempFileName(cTempDir, "xht", 0,path)) { //  using PrinterName+'.prn' will not work
-             hb_fsSetError( ( USHORT ) GetLastError()) ; /* TODO: Change Errors to Long from Short */
-             hb_errRT_TERM( EG_CREATE, 2014, NULL, path, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY );
-          }
-        }
+      if ( set_specifier == HB_SET_PRINTFILE )
+      {
+         if ( hb_stricmp( s_PrinterName, "prn" ) == 0 )
+         {
+            DWORD nSize= _POSIX_PATH_MAX ;
+            hb_GetDefaultPrinter( (LPTSTR) s_PrinterName, &nSize );
+            if ( !s_PrinterName[0] )
+               strcpy( s_PrinterName, "lpt1" ) ;
+         }
+         hb_set.hb_set_winprinter = hb_PrinterExists( s_PrinterName );
+         if ( hb_set.hb_set_winprinter )
+         {
+            szPrnFile = s_PrintFileName;
+            bTemp = TRUE;
+         }
       }
 #endif
-      strcpy(s_PrintFileName, path) ;
    }
 
    /* Open the file either in append (bAppend) or truncate mode (!bAppend), but
@@ -339,25 +340,27 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
    {
       BOOL bCreate = FALSE;
 
-      if( bPipe )
-        handle = hb_fsPOpen( ( BYTE * ) file_name, ( BYTE * ) "w" );
+      if ( bPipe )
+         handle = hb_fsPOpen( ( BYTE * ) file_name, ( BYTE * ) "w" );
+      else if ( bTemp )
+         handle = hb_fsCreateTemp( NULL, NULL, FC_NORMAL, ( BYTE * ) s_PrintFileName );
       else
       {
-         if( bAppend )
+         if ( bAppend )
          {  /* Append mode */
-            if( hb_fsFile( ( BYTE * ) path ) )
+            if( hb_fsFile( ( BYTE * ) szPrnFile ) )
             {  /* If the file already exists, open it (in read-write mode, in
                   case of non-Unix and text modes). */
-               handle = hb_fsOpen( ( BYTE * ) path, FO_READWRITE);
+               handle = hb_fsOpen( ( BYTE * ) szPrnFile, FO_READWRITE);
                if( handle != FS_ERROR )
                {  /* Position to EOF */
-               #if ! defined(OS_UNIX_COMPATIBLE)
+#if defined(OS_UNIX_COMPATIBLE)
+                  hb_fsSeek( handle, 0, FS_END );
+#else
                   /* Non-Unix needs special binary vs. text file handling */
                   if( set_specifier == HB_SET_PRINTFILE )
                   {  /* PRINTFILE is binary and needs no special handling. */
-               #endif
                      hb_fsSeek( handle, 0, FS_END );
-               #if ! defined(OS_UNIX_COMPATIBLE)
                   }
                   else
                   {  /* All other files are text files and may have an EOF
@@ -368,15 +371,15 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
                      if( cEOF == '\x1A' )             /* If it's an EOF, */
                         hb_fsSeek( handle, -1, FS_END ); /* Then write over it. */
                   }
-               #endif
-                }
-             }
+#endif
+               }
+            }
             else bCreate = TRUE; /* Otherwise create a new file. */
-          }
+         }
          else bCreate = TRUE; /* Always create a new file for overwrite mode. */
 
          if( bCreate )
-            handle = hb_fsCreate( ( BYTE * ) path, FC_NORMAL );
+            handle = hb_fsCreate( ( BYTE * ) szPrnFile, FC_NORMAL );
       }
 
       if( handle == FS_ERROR )
@@ -386,11 +389,11 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
          /* NOTE: using switch() here will result in a compiler warning.
                   [vszakats] */
          if( set_specifier == HB_SET_ALTFILE )
-            uiAction = hb_errRT_TERM( EG_CREATE, 2013, NULL, path, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY );
+            uiAction = hb_errRT_TERM( EG_CREATE, 2013, NULL, szPrnFile, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY );
          else if( set_specifier == HB_SET_PRINTFILE )
-            uiAction = hb_errRT_TERM( EG_CREATE, 2014, NULL, path, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY );
+            uiAction = hb_errRT_TERM( EG_CREATE, 2014, NULL, szPrnFile, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY );
          else if( set_specifier == HB_SET_EXTRAFILE )
-            uiAction = hb_errRT_TERM( EG_CREATE, 2015, NULL, path, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY );
+            uiAction = hb_errRT_TERM( EG_CREATE, 2015, NULL, szPrnFile, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY );
          else
             uiAction = E_DEFAULT;
 
@@ -1582,7 +1585,7 @@ void hb_setRelease( void )
    if( hb_set.HB_SET_MFILEEXT  )  hb_xfree( hb_set.HB_SET_MFILEEXT );
    if( hb_set.HB_SET_PATH )       hb_xfree( hb_set.HB_SET_PATH );
    if( hb_set.HB_SET_PRINTFILE )  hb_xfree( hb_set.HB_SET_PRINTFILE );
-   if( hb_set.hb_set_printerjob )  hb_xfree( hb_set.hb_set_printerjob );
+   if( hb_set.hb_set_printerjob ) hb_xfree( hb_set.hb_set_printerjob );
 
    hb_set.HB_SET_TYPEAHEAD = -1; hb_inkeyReset( TRUE ); /* Free keyboard typeahead buffer */
 
