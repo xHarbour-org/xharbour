@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.30 2002/08/08 00:03:13 lculik Exp $
+ * $Id: hbmake.prg,v 1.31 2002/08/31 14:34:27 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1233,6 +1233,7 @@ FUNC crtmakfile( cFile )
     LOCAL lLinux         := At( 'linux', Lower( Os() ) ) > 0
     LOCAL nWriteFiles    := 0
     Local cResName       := Space(50)
+    Local aSelFiles 
 
     nLinkHandle := Fcreate( cFile )
     WriteMakeFileHeader()
@@ -1245,10 +1246,10 @@ FUNC crtmakfile( cFile )
     @  1, 23 SAY aLangMessages[ 29 ] 
     @  1, 40 GET cCompiler radio { "BCC", "MSVC", "GCC" } VALID !Empty( cCompiler )        
     @  1, 48 SAY aLangMessages[ 30 ] 
-    @  1, 64 GET lFwh checkbox caption "Use FWH"          WHEN Cos == "Win32"              
-    @  2, 64 GET lcw checkbox caption "Use C4W"           WHEN Cos == "Win32"              
-    @  3, 64 GET lRddads checkbox caption "Use RddAds"    WHEN Cos == "Win32" .OR. Cos == "Linux"
-    @  4, 64 Get lMiniGui checkbox caption "Use Minigui"  WHEN Cos == "Win32"
+    @  1, 64 GET lFwh checkbox caption "Use FWH"          WHEN Cos == "Win32"   style "[o ]"           
+    @  2, 64 GET lcw checkbox caption "Use C4W"           WHEN Cos == "Win32"              style "[o ]"
+    @  3, 64 GET lRddads checkbox caption "Use RddAds"    WHEN Cos == "Win32" .OR. Cos == "Linux" style "[o ]"
+    @  4, 64 Get lMiniGui checkbox caption "Use Minigui"  WHEN Cos == "Win32" style "[o ]"
 
     READ
 
@@ -1270,16 +1271,16 @@ FUNC crtmakfile( cFile )
     @  5, 40 SAY "Obj Files Dir" GET cObjDir PICT "@s15" 
     ATTENTION( aLangMessages[ 31 ] , 6 )
 
-    @  7,  1 GET lautomemvar checkbox caption aLangMessages[ 32 ]
-    @  7, 40 GET lvarismemvar checkbox caption aLangMessages[ 33 ] 
-    @  8,  1 GET lDebug checkbox caption  aLangMessages[ 34 ]
-    @  8, 40 GET lSupressline checkbox caption aLangMessages[ 35 ] 
-    @  9,  1 GET lGenppo checkbox caption aLangMessages[ 36 ] 
-    @  9, 40 GET lCompMod checkbox caption aLangMessages[ 37 ] 
+    @  7,  1 GET lautomemvar checkbox caption aLangMessages[ 32 ]  style "[o ]"
+    @  7, 40 GET lvarismemvar checkbox caption aLangMessages[ 33 ] style "[o ]" 
+    @  8,  1 GET lDebug checkbox caption  aLangMessages[ 34 ]      style "[o ]"
+    @  8, 40 GET lSupressline checkbox caption aLangMessages[ 35 ] style "[o ]"
+    @  9,  1 GET lGenppo checkbox caption aLangMessages[ 36 ]      style "[o ]"
+    @  9, 40 GET lCompMod checkbox caption aLangMessages[ 37 ]     style "[o ]"
     @ 10,  1 SAY aLangMessages[ 38 ]   GET cUserDef     PICT "@s15"
     @ 10, 40 SAY aLangMessages[ 39 ]  GET cUserInclude PICT "@s15"
-    @ 11,  1 GET lExternalLib checkbox caption aLangMessages[ 40 ]
-    @ 11, 40 get lXFwh checkbox caption "Xharbour FWH"
+    @ 11,  1 GET lExternalLib checkbox caption aLangMessages[ 40 ] style "[o ]"
+    @ 11, 40 get lXFwh checkbox caption "Xharbour FWH"             style "[o ]"
     @ 12,  1 Say "Resource file Name" Get CResName 
     READ
 
@@ -1473,6 +1474,9 @@ FUNC crtmakfile( cFile )
     Aeval( aout, { | x, y | aout[ y ] := Trim( Substr( aOut[ y ], 1, At( ' ', aout[ y ] ) ) ) } )
     aOut := Asort( aOut )
 
+    aSelFiles := GetSelFiles( aIn , aOut )
+
+    aSort( aSelFiles )
     IF Len( aOut ) == 1
 
         cTopFile := aOut[ 1 ]
@@ -1483,11 +1487,10 @@ FUNC crtmakfile( cFile )
 
         IF !lrecurse
 
-            cTopFile := pickfile( "*.prg" )
+              cTopFile := pickaFile(aSelFiles)
 
         ELSE
-            asort(ain)
-            cTopFile := pickafile( ain )
+            cTopFile := pickafile( aSelFiles )            
 
         ENDIF
 
@@ -3825,3 +3828,22 @@ FUNCTION BuildLangArray( cLang )
 
     RETURN aLang
 
+FUNCTION GetSelFiles(aIn,aOut)
+
+    Local aRet:={}
+    Local cItem
+    Local nPos
+
+    FOR EACH cItem IN ain
+
+        nPos:=ascan(aOut,{|x,y| x == left(cItem,at(' ',citem)-1)})
+
+        IF nPos >0
+
+            AADD(aRet,cItem)
+
+        ENDIF
+
+    NEXT
+
+RETURN aRet

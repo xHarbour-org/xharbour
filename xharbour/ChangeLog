@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.388 2002/09/19 21:07:22 lculik Exp $
+ * $Id: ChangeLog,v 1.390 2002/09/20 19:48:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-09-20 23:40 UTC -0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * utils/hbmake/hbmake.prg  
+    * Minor changes.
+        - The select Main file, only allow to select between all files need by the app
+        - The select main file is now sorted
 
 2002-09-20 12:44 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h
