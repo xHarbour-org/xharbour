@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.136 2004/12/28 23:00:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.137 2004/01/06 10:15:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -69,7 +69,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion := "1.136"
+STATIC s_cHbMakeVersion := "1.137"
 STATIC s_lPrint        := .F.
 STATIC s_nHandle
 STATIC s_aDefines      := {}
@@ -132,6 +132,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    LOCAL nLang    := GETUSERLANG()
 
    cls
+
 
    Ferase( s_cLinker )
    SET(39,159)
@@ -218,7 +219,20 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       cFile := ""
    ENDIF
 
-   IF ( Empty( cFile ) .AND. ! s_lEditMode )
+   IF empty(cFile)
+      IF s_nLang=1
+         s_cMsg := "Nome de arquivo inv†lido."
+      ELSEIF s_nLang=3
+         s_cMsg := "Nombre de fichero invalido."
+      ELSE
+         s_cMsg := "Invalid file name."
+      ENDIF
+      alert( s_cMsg )
+      RETURN NIL
+   ENDIF
+
+
+   IF ( empty(cFile) .and. !s_lEditMode)
       IF s_nLang=1
          s_cMsg := "Arquivo n∆o encontrado."
       ELSEIF s_nLang=3
@@ -229,6 +243,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       alert( s_cMsg )
       RETURN NIL
    ENDIF
+
 
    // We have at least one parameter . check IF is an valid file name
 
@@ -242,11 +257,11 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
          IF ! s_lEditMode
             IF s_nLang=1
-               s_cMsg := "Arquivo n∆o encontrado."
+               s_cMsg := cFile+" n∆o encontrado."
             ELSEIF s_nLang=3
-               s_cMsg := "Fichero no encontrado."
+               s_cMsg := cFile+" no encontrado."
             ELSE
-               s_cMsg := "File not found."
+               s_cMsg := cFile+" not found."
             ENDIF
             Alert( s_cMsg )
             RETURN NIL
@@ -255,6 +270,8 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       ENDIF
 
    ENDIF
+
+
 
    s_cLog := Substr( cFile,1 , AT(".",cFile) -1) + ".out"
    s_AppName := Substr( cFile,1 , AT(".",cFile) -1)
@@ -359,6 +376,7 @@ FUNCTION ParseMakeFile( cFile )
 
 
    s_nHandle := FT_FUSE( cFile )
+
 
    IF s_nHandle < 0
       RETURN .F.
@@ -1413,10 +1431,39 @@ FUNCTION CreateMakeFile( cFile )
       IF nOption == 1 // create a new makefile
 
          s_nLinkHandle := FCreate( cFile )
+
+         if s_nLinkHandle == F_ERROR
+            IF s_nLang = 1      // brazilian portuguese 
+               s_cMsg := cFile + " n∆o pode ser criado."
+            ELSEIF s_nLang = 3  // spanish
+               s_cMsg := cFile + " no pode ser criado."
+            ELSE                // english
+               s_cMsg := cFile + " cannot be created."
+            ENDIF
+            Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+            RETURN NIL
+         endif
+
+
          WriteMakeFileHeader()
          lNew := .T.
 
       ELSEIF nOption == 2 // edit the makefile
+
+         // verify if cfile can be openned 
+         if FOpen( cFile, FO_WRITE ) == F_ERROR
+            IF s_nLang = 1      // brazilian portuguese 
+               s_cMsg := cFile + " n∆o pode ser aberto para ediá∆o."
+            ELSEIF s_nLang = 3  // spanish
+               s_cMsg := cFile + " no pode ser abierto para edici¢n."
+            ELSE                // english
+               s_cMsg := cFile + " cannot be openned to edit."
+            ENDIF
+            Alert( s_cMsg+" FERROR ("+LTrim(Str(FError()))+")" )
+            RETURN NIL
+         else
+            FClose( cFile )
+         endif
 
          oMake :=ThbMake():new()
          oMake:cMakefile:=cFile
@@ -1475,7 +1522,8 @@ FUNCTION CreateMakeFile( cFile )
    Setcolor( 'w/b+,b+/w,w+/b,w/b+,w/b,w+/b' )
    @  0,  0, Maxrow(), Maxcol() BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) + Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
 
-   Attention( s_aLangMessages[ 27 ], 0 )
+   Attention( "HbMake - v"+HbMakeVersion() + space(10)+s_aLangMessages[ 27 ], 0 )
+//   Attention( s_aLangMessages[ 27 ], 0 )
    Attention( s_aLangMessages[ 47 ], maxrow() )
    @  1,  1 SAY s_aLangMessages[ 28 ]
 
@@ -3941,8 +3989,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    cParam := Strtran( cParam, "-r", "-R" )
    cParam := Strtran( cParam, "-l", "-L" )
 
-  IF  "-EX" IN cParam   .OR.  "-ELX" IN cParam
-
+   IF  "-EX" IN cParam   .OR.  "-ELX" IN cParam
       IF  "-ELX" IN cParam
          s_lLibrary := .T.
       ENDIF
