@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.44 2003/08/26 15:08:51 jonnymind Exp $
+ * $Id: filesys.c,v 1.45 2003/08/27 10:29:14 jonnymind Exp $
  */
 
 /*
@@ -96,8 +96,6 @@
 
    This has been corrected by ptucker
  */
-
-#define X__WIN32__
 
 #ifndef HB_OS_WIN_32_USED
    #define HB_OS_WIN_32_USED

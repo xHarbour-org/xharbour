@@ -1,6 +1,6 @@
 ***********************************************************
 * process.prg
-* $Id: regextest.prg,v 1.3 2003/08/23 10:48:21 jonnymind Exp $
+* $Id: process.prg,v 1.1 2003/08/26 15:08:51 jonnymind Exp $
 * Test for process oriented functions
 * Read from streams and manage sub processes.
 *
@@ -28,6 +28,7 @@ PROCEDURE Main( cProc, cSend )
    ? "Launching process", cProc
    hProc := HB_OpenProcess( cProc , @hIn, @hOut, @hErr )
    ? "Process handler:", hProc
+   ? "Error: ", FError()
 
    ? "Sending", cSend
    FWrite( hIn, cSend )
@@ -55,7 +56,13 @@ PROCEDURE Main( cProc, cSend )
    ? "Waiting for process termination"
    ? "Return code", HB_ProcessValue( hProc )
 
+   FClose( hProc )
+   FClose( hIn )
+   FClose( hOut )
+   FClose( hErr )
+
    ? "Done. Press any key to terminate"
    Inkey(0)
+
    ?
 RETURN

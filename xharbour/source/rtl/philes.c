@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.10 2003/08/26 15:08:51 jonnymind Exp $
+ * $Id: philes.c,v 1.11 2003/08/27 02:13:47 ronpinkas Exp $
  */
 
 /*
@@ -295,18 +295,20 @@ HB_FUNC( HB_OPENPROCESS )
    PHB_ITEM pIn = hb_param( 2, HB_IT_BYREF );
    PHB_ITEM pOut = hb_param( 3, HB_IT_BYREF );
    PHB_ITEM pErr = hb_param( 4, HB_IT_BYREF );
+   PHB_ITEM pBackground = hb_param( 5, HB_IT_LOGICAL );
 
    FHANDLE fhIn, fhOut, fhErr;
    FHANDLE *pfhIn, *pfhOut, *pfhErr;
    FHANDLE fhProcess;
+   BOOL bBackground;
 
    if ( szName == NULL )
    {
       hb_errRT_BASE( EG_ARG, 4001,
          "First parameter (process name) is mandatory",
-         "HB_OPENPROCESS", 4,
+         "HB_OPENPROCESS", 5,
             hb_paramError( 1 ), hb_paramError( 2 ),  hb_paramError( 3 ),
-            hb_paramError( 4 ) );
+            hb_paramError( 4 ), hb_paramError( 5 ) );
       return;
    }
 
@@ -318,10 +320,18 @@ HB_FUNC( HB_OPENPROCESS )
          "All the given file handle parameters must be by reference",
          "HB_OPENPROCESS", 4,
             hb_paramError( 1 ), hb_paramError( 2 ),  hb_paramError( 3 ),
-            hb_paramError( 4 ));
+            hb_paramError( 4 ), hb_paramError( 5 ));
       return;
    }
 
+   if ( pBackground == NULL )
+   {
+      bBackground = FALSE;
+   }
+   else 
+   {
+      bBackground = hb_itemGetL( pBackground );
+   }
 
    if ( pIn != NULL )
    {
@@ -349,8 +359,7 @@ HB_FUNC( HB_OPENPROCESS )
    {
       pfhErr = NULL;
    }
-
-   fhProcess = hb_fsOpenProcess( (unsigned char*) szName, pfhIn, pfhOut, pfhErr );
+   fhProcess = hb_fsOpenProcess( szName, pfhIn, pfhOut, pfhErr, bBackground );
 
    if ( fhProcess != FS_ERROR )
    {
@@ -364,7 +373,7 @@ HB_FUNC( HB_OPENPROCESS )
          hb_itemPutNL( pOut, fhOut );
       }
 
-      if ( pErr != NULL )
+      if ( pErr != NULL && pErr != pOut)
       {
          hb_itemPutNL( pErr, fhErr );
       }
