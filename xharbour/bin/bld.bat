@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.30 2003/12/13 16:52:09 ronpinkas Exp $
+rem $Id: bld.bat,v 1.31 2003/12/21 21:31:52 druzus Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -186,7 +186,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
    if not "%HB_COMPILER%" == "watcom" goto END
 
-      wpp386 -j -w3 -d2 -5s -5r -fp5 -oxehtz -zq -zt0 -bt=DOS %1.c -fo=%1.obj
+      wpp386 -j -w3 -d2 -5s -5r -fp5 -oehtz -s -zq -zt0 -bt=DOS %1.c -fo=%1.obj
       echo debug all OP osn=DOS OP stack=65536 OP CASEEXACT OP stub=cwstub.exe NAME %1.exe > build.tmp
       echo FILE %1.obj >> build.tmp
       echo LIB debug.lib >> build.tmp
@@ -245,7 +245,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 :C_WATCOM
    if not "%HB_COMPILER%" == "watcom"  goto end
 
-   wpp386 -j -w3 -d2 -5s -5r -fp5 -oxehtz -zq -zt0 -mf -bt=NT %1.c -fo=%1.obj
+   wpp386 -j -w3 -d2 -5s -5r -fp5 -oehtz -s -zq -zt0 -mf -bt=NT %1.c -fo=%1.obj
    echo debug all OP osn=NT OP stack=65536 OP CASEEXACT NAME %1.exe > build.tmp
    echo FILE %1.obj >> build.tmp
    echo LIB debug.lib >> build.tmp
@@ -266,6 +266,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    echo LIB winspool.lib >> build.tmp
    echo LIB oleaut32.lib >> build.tmp
    echo LIB uuid.lib >> build.tmp
+   echo LIB comctl32.lib >> build.tmp
    wlink @build.tmp
    del build.tmp
    goto END

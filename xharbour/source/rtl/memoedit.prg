@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.12 2003/09/17 13:45:35 toninhofwi Exp $
+ * $Id: memoedit.prg,v 1.13 2003/12/21 21:12:44 peterrees Exp $
  */
 
 /*
@@ -179,81 +179,83 @@ METHOD HandleUserKey(nKey, nUserKey) CLASS TMemoEditor
    local aUnHandledKeys := {K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T,;
                             K_CTRL_U, K_F1, K_F2, K_F3, K_F4, K_F5, K_F6, K_F7, K_F8, K_F9, K_F10, K_F11, K_F12}
 
-   Switch nUserKey
-      // I won't reach this point during ME_INIT since ME_DEFAULT ends initialization phase of MemoEdit()
-      case ME_DEFAULT
-         // HBEditor is not able to handle keys with a value higher than 256
-         if (nKey <= 256 .OR. nKey == K_ALT_W .or. nKey == K_CTRL_W) .AND. !(nKey IN aUnHandledKeys)
-            super:Edit(nKey)
-         endif
-         exit
+   if nUserKey <> nil
+      Switch nUserKey
+         // I won't reach this point during ME_INIT since ME_DEFAULT ends initialization phase of MemoEdit()
+         case ME_DEFAULT
+            // HBEditor is not able to handle keys with a value higher than 256
+            if (nKey <= 256 .OR. nKey == K_ALT_W .or. nKey == K_CTRL_W) .AND. !(nKey IN aUnHandledKeys)
+               super:Edit(nKey)
+            endif
+            exit
 
-      // TOFIX: Not clipper compatible, see teditor.prg
+         // TOFIX: Not clipper compatible, see teditor.prg
 
-      case 1
-      case 2
-      case 3
-      case 4
-      case 5
-      case 6
-      case 7
-      case 8
-      case 9
-      case 10
-      case 11
-      case 12
-      case 13
-      case 14
-      case 15
-      case 16
-      case 17
-      case 18
-      case 19
-      case 20
-      case 21
-      case 22
-      case 23
-      case 24
-      case 25
-      case 26
-      case 27
-      case 28
-      case 29
-      case 30
-      case 31
-      case K_ALT_W
-      case K_CTRL_W
-         if !(nUserKey IN aUnHandledKeys)
-            super:Edit(nUserKey)
-         endif
-         exit
+         case 1
+         case 2
+         case 3
+         case 4
+         case 5
+         case 6
+         case 7
+         case 8
+         case 9
+         case 10
+         case 11
+         case 12
+         case 13
+         case 14
+         case 15
+         case 16
+         case 17
+         case 18
+         case 19
+         case 20
+         case 21
+         case 22
+         case 23
+         case 24
+         case 25
+         case 26
+         case 27
+         case 28
+         case 29
+         case 30
+         case 31
+         case K_ALT_W
+         case K_CTRL_W
+            if !(nUserKey IN aUnHandledKeys)
+               super:Edit(nUserKey)
+            endif
+            exit
 
-      case ME_DATA
-         if nKey <= 256 .AND. !( nKey IN aUnHandledKeys )
-            super:Edit(nKey)
-         endif
-         exit
+         case ME_DATA
+            if nKey <= 256 .AND. !( nKey IN aUnHandledKeys )
+               super:Edit(nKey)
+            endif
+            exit
 
-      case ME_TOGGLEWRAP
-         ::lWordWrap := !::lWordWrap
-         exit
+         case ME_TOGGLEWRAP
+            ::lWordWrap := !::lWordWrap
+            exit
 
-      case ME_TOGGLESCROLL
-         // TODO: HBEditor does not support vertical scrolling of text inside window without moving cursor position
-         exit
+         case ME_TOGGLESCROLL
+            // TODO: HBEditor does not support vertical scrolling of text inside window without moving cursor position
+            exit
 
-      case ME_WORDRIGHT
-         ::MoveCursor(K_CTRL_RIGHT)
-         exit
+         case ME_WORDRIGHT
+            ::MoveCursor(K_CTRL_RIGHT)
+            exit
 
-      case ME_BOTTOMRIGHT
-         ::MoveCursor(K_CTRL_END)
-         exit
+         case ME_BOTTOMRIGHT
+            ::MoveCursor(K_CTRL_END)
+            exit
 
-      default
-         // Do nothing
+         default
+            // Do nothing
 
-   end
+      end
+   endif
 
 return Self
 
