@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.48 2004/03/16 21:31:37 lf_sfnet Exp $
+ * $Id: win32ole.prg,v 1.49 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -1084,26 +1084,66 @@ RETURN uObj
                 }
                 break;
 
-              case HB_IT_OBJECT:
+              case HB_IT_ARRAY:
               {
                  pArgs[ n ].n1.n2.vt = VT_EMPTY;
 
-                 if( strcmp( hb_objGetClsName( uParam ), "TOLEAUTO" ) == 0 )
+                 if( ! HB_IS_OBJECT( uParam ) )
                  {
+                    SAFEARRAYBOUND rgsabound;
+                    PHB_ITEM       elem;
+                    long           count;
+                    long           i;
+
+                    count = hb_arrayLen( uParam );
+
+                    rgsabound.cElements = count;
+                    rgsabound.lLbound = 0;
+                    pArgs[ n ].n1.n2.vt        = VT_ARRAY | VT_VARIANT;
+                    pArgs[ n ].n1.n2.n3.parray = SafeArrayCreate( VT_VARIANT, 1, &rgsabound );
+
                     if( s_pSym_hObj )
                     {
-                       hb_vmPushSymbol( s_pSym_hObj->pSymbol );
-                       hb_vmPush( uParam );
-                       hb_vmSend( 0 );
-                       //TraceLog( NULL, "\n#%i Dispatch: %ld\n", n, hb_parnl( -1 ) );
-                       pArgs[ n ].n1.n2.vt = VT_DISPATCH;
-                       pArgs[ n ].n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
-                       //printf( "\nDispatch: %p\n", pArgs[ n ].n1.n2.n3.pdispVal );
+                       for( i = 0; i < count; i++ )
+                       {
+                          elem = hb_arrayGetItemPtr( uParam, i+1 );
+
+                          if( strcmp( hb_objGetClsName( elem ), "TOLEAUTO" ) == 0 )
+                          {
+                             VARIANT mVariant;
+
+                             VariantInit( &mVariant );
+
+                             hb_vmPushSymbol( s_pSym_hObj->pSymbol );
+                             hb_vmPush( elem );
+                             hb_vmSend( 0 );
+
+                             mVariant.n1.n2.vt = VT_DISPATCH;
+                             mVariant.n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
+                             SafeArrayPutElement( pArgs[ n ].n1.n2.n3.parray, &i, &mVariant );
+                          }
+                       }
                     }
                  }
                  else
                  {
-                    TraceLog( NULL, "Class: '%s' not suported!\n", hb_objGetClsName( uParam ) );
+                    if( strcmp( hb_objGetClsName( uParam ), "TOLEAUTO" ) == 0 )
+                    {
+                       if( s_pSym_hObj )
+                       {
+                          hb_vmPushSymbol( s_pSym_hObj->pSymbol );
+                          hb_vmPush( uParam );
+                          hb_vmSend( 0 );
+                          //TraceLog( NULL, "\n#%i Dispatch: %ld\n", n, hb_parnl( -1 ) );
+                          pArgs[ n ].n1.n2.vt = VT_DISPATCH;
+                          pArgs[ n ].n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
+                          //printf( "\nDispatch: %p\n", pArgs[ n ].n1.n2.n3.pdispVal );
+                       }
+                    }
+                    else
+                    {
+                       TraceLog( NULL, "Class: '%s' not suported!\n", hb_objGetClsName( uParam ) );
+                    }
                  }
               }
               break;
@@ -1233,6 +1273,9 @@ RETURN uObj
                    //TraceLog( NULL, "***NOT REF*** Dispatch %p\n", dParams->rgvarg[ n ].n1.n2.n3.pdispVal );
                    // Can'r CLEAR this Variant.
                    continue;
+
+                 case VT_ARRAY | VT_VARIANT:
+                   SafeArrayDestroy( dParams->rgvarg[ n ].n1.n2.n3.parray );
               }
            }
 
@@ -1361,6 +1404,57 @@ RETURN uObj
           hb_ret();
           break;
 
+        case VT_ARRAY | VT_VARIANT:
+        {
+           long     i, nFrom, nTo;
+           VARIANT  mElem;
+           PHB_ITEM pResult = hb_itemArrayNew( 0 );
+           PHB_ITEM pAdd;
+
+           SafeArrayGetLBound( RetVal.n1.n2.n3.parray, 1, &nFrom );
+           SafeArrayGetUBound( RetVal.n1.n2.n3.parray, 1, &nTo );
+
+           for ( i = nFrom; i <= nTo; i++ )
+           {
+              VariantInit( &mElem );
+              SafeArrayGetElement( RetVal.n1.n2.n3.parray, &i, &mElem );
+
+              if( mElem.n1.n2.vt == VT_DISPATCH && mElem.n1.n2.n3.pdispVal )
+              {
+                 pAdd = hb_itemNew( NULL );
+                 pAdd->type = HB_IT_NIL;
+
+                 if( s_pSym_OleAuto )
+                 {
+                    hb_vmPushSymbol( s_pSym_OleAuto->pSymbol );
+                    hb_vmPushNil();
+                    hb_vmDo( 0 );
+
+                    hb_itemForwardValue( pAdd, &hb_stack.Return );
+                 }
+
+                 if( s_pSym_New && pAdd->type )
+                 {
+                    hb_vmPushSymbol( s_pSym_New->pSymbol );
+                    hb_vmPush( pAdd );
+                    hb_vmPushLong( ( LONG ) mElem.n1.n2.n3.pdispVal );
+                    hb_vmSend( 1 );
+
+                    mElem.n1.n2.n3.pdispVal -> lpVtbl -> AddRef( mElem.n1.n2.n3.pdispVal );
+                 }
+
+                 hb_arrayAdd( pResult, pAdd );
+                 hb_itemRelease( pAdd );
+              }
+
+              VariantClear( &mElem );
+           }
+
+           hb_itemRelease( hb_itemReturn( pResult ) );
+        }
+        break;
+/*- end ----------------------------->8-------------------------------------*/
+
         default:
           //printf( "Default %i!\n", RetVal.n1.n2.vt );
           if( s_nOleError == S_OK )
@@ -1393,7 +1487,7 @@ RETURN uObj
 
      wCLSID = AnsiToWide( hb_parcx( 1 ) );
 
-     if ( hb_parcx( 1 )[ 0 ] == '{' )
+     if( hb_parcx( 1 )[ 0 ] == '{' )
      {
         s_nOleError = CLSIDFromString( wCLSID, (LPCLSID) &ClassID );
      }
@@ -1406,9 +1500,9 @@ RETURN uObj
 
      //TraceLog( NULL, "Result: %i\n", s_nOleError );
 
-     if ( hb_pcount() == 2 )
+     if( hb_pcount() == 2 )
      {
-        if ( hb_parcx( 2 )[ 0 ] == '{' )
+        if( hb_parcx( 2 )[ 0 ] == '{' )
         {
            wCLSID = AnsiToWide( hb_parcx( 2 ) );
            s_nOleError = CLSIDFromString( wCLSID, &iid );
@@ -1422,7 +1516,7 @@ RETURN uObj
         riid = &iid;
      }
 
-     if ( s_nOleError == S_OK )
+     if( s_nOleError == S_OK )
      {
         //TraceLog( NULL, "Class: %i\n", ClassID );
         s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, riid, (void **) &pDisp );
@@ -1444,11 +1538,11 @@ RETURN uObj
 
      s_nOleError = S_OK;
 
-     if ( ( s_nOleError == S_OK ) || ( s_nOleError == (HRESULT) S_FALSE) )
+     if( ( s_nOleError == S_OK ) || ( s_nOleError == (HRESULT) S_FALSE) )
      {
         wCLSID = AnsiToWide( hb_parcx( 1 ) );
 
-        if ( hb_parcx( 1 )[ 0 ] == '{' )
+        if( hb_parcx( 1 )[ 0 ] == '{' )
         {
            s_nOleError = CLSIDFromString( wCLSID, (LPCLSID) &ClassID );
         }
@@ -1462,9 +1556,9 @@ RETURN uObj
 
         hb_xfree( wCLSID );
 
-        if ( hb_pcount() == 2 )
+        if( hb_pcount() == 2 )
         {
-           if ( hb_parcx( 2 )[ 0 ] == '{' )
+           if( hb_parcx( 2 )[ 0 ] == '{' )
            {
               wCLSID = AnsiToWide( hb_parcx( 2 ) );
               s_nOleError = CLSIDFromString( wCLSID, &iid );
@@ -1478,11 +1572,11 @@ RETURN uObj
            riid = &iid;
         }
 
-        if ( s_nOleError == S_OK )
+        if( s_nOleError == S_OK )
         {
            s_nOleError = GetActiveObject( &ClassID, NULL, &pUnk );
 
-           if ( s_nOleError == S_OK )
+           if( s_nOleError == S_OK )
            {
               s_nOleError = pUnk->lpVtbl->QueryInterface( pUnk, riid, (void **) &pDisp );
            }
@@ -1765,7 +1859,7 @@ RETURN uObj
              break;
 
            case HB_IT_LOGICAL:
-             if ( ISBYREF( i ) )
+             if( ISBYREF( i ) )
              {
                 ptros[ i ] = (LPVOID) hb_parl( i );
                 sString = ( char * ) &ptros[ i ];
@@ -1780,7 +1874,7 @@ RETURN uObj
 
            case HB_IT_INTEGER:
            case HB_IT_LONG:
-             if ( ISBYREF( i ) )
+             if( ISBYREF( i ) )
              {
                 ptros[ i ] = (LPVOID) hb_parnl( i );
                 sString = ( char * ) &ptros[ i ];
@@ -1794,7 +1888,7 @@ RETURN uObj
              break;
 
            case HB_IT_DOUBLE:
-             if ( ISBYREF( i ) )
+             if( ISBYREF( i ) )
              {
                 doubles[ i ] = hb_parnd( i );
                 sString = ( char * ) &doubles[ i ];
@@ -1808,7 +1902,7 @@ RETURN uObj
              break;
 
            case HB_IT_DATE:
-             if ( ISBYREF( i ) )
+             if( ISBYREF( i ) )
              {
                 doubles[ i ] = DateToDbl( hb_pards( i ) );
                 sString = ( char * ) &doubles[ i ];
@@ -1832,7 +1926,7 @@ RETURN uObj
 
      for ( i = 3; i <= iParams; i++ )
      {
-        if ( ISBYREF( i ) )
+        if( ISBYREF( i ) )
         {
            switch ( (hb_parinfo( i ) & ~HB_IT_BYREF) )
            {

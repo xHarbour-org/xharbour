@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.45 2004/02/19 18:15:57 andijahja Exp $
+ * $Id: harbour.slx,v 1.46 2004/02/20 00:25:23 ronpinkas Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 #define IS_OP( x ) ( x == DEC || x == INASSIGN || x == ALIASOP || x == PLUSEQ || x == MINUSEQ || x == MULTEQ || x == DIVEQ || \
                      x == EXPEQ || x == MODEQ || x == '=' || x == LIKE || x == MATCH || x == STEP || x == TO )
 
-static int iCloseSquare = 0, iWantsEOL, iWantsEXP, iWantsID, iWantsVAR;
+static int iWantsEOL, iWantsEXP, iWantsID, iWantsVAR;
 
 static unsigned char iIdentifier = 0;
 static char *sIdOnHold, *s_sLastBlock = NULL;

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.13 2003/12/12 20:36:49 ronpinkas Exp $
+ * $Id: macro.slx,v 1.14 2004/03/21 10:33:03 ronpinkas Exp $
  */
 
 /*
@@ -82,8 +82,6 @@
 #undef IF_BELONG_LEFT
    #define IF_BELONG_LEFT(chr) if( iLastToken == IDENTIFIER || iLastToken == ']' || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || \
                                    iLastToken == '}' || iLastToken == LITERAL || iLastToken == FIELD || /*iLastToken == SELF ||*/ iLastToken == QSELF || iLastToken == IIF )
-
-static char *sIdOnHold;
 
 static HB_MACRO_PTR pMacro;
 static YYSTYPE *pYYLVAL;

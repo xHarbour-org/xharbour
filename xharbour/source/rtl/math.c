@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.12 2004/03/03 21:45:22 likewolf Exp $
+ * $Id: math.c,v 1.13 2004/03/05 15:22:53 andijahja Exp $
  */
 
 /*
@@ -371,12 +371,12 @@ int hb_matherr (HB_MATH_EXCEPTION * pexc)
 
     /* Assign the new array to the object data item. */
     hb_vmPushSymbol (hb_dynsymGet ("_ARGS")->pSymbol);
-    hb_vmPush (pError);
-    hb_vmPush (&Array);
+    hb_vmPush( pError );
+    hb_vmPush( &Array );
     hb_vmDo (1);
 
     /* Release the Array. */
-    hb_itemClear (&Array);
+    hb_itemClear( &Array );
 
     /* launch error codeblock */
     pMatherrResult = hb_errLaunchSubst (pError);
@@ -471,54 +471,54 @@ HB_MATH_HANDLERPROC hb_mathGetHandler (void)
 static PHB_ITEM spMathErrorBlock = NULL;
 static HB_MATH_HANDLERPROC sPrevMathHandler = NULL;
 
-static int hb_matherrblock (HB_MATH_EXCEPTION * pexc)
+static int hb_matherrblock( HB_MATH_EXCEPTION * pexc )
 {
   int retval;
 
   /* call codeblock for both case: handled and unhandled exceptions */
 
-  if (spMathErrorBlock != NULL)
+  if( spMathErrorBlock )
   {
     PHB_ITEM pRet;
-    HB_ITEM pArray, pType, pFuncname, pError, pArg1, pArg2, pRetval, pHandled;
+    HB_ITEM Array, Type, Funcname, Error, Arg1, Arg2, Retval, Handled;
 
-    pArray.type = HB_IT_NIL;
-    pType.type = HB_IT_NIL;
-    pFuncname.type = HB_IT_NIL;
-    pError.type = HB_IT_NIL;
-    pArg1.type = HB_IT_NIL;
-    pArg2.type = HB_IT_NIL;
-    pRetval.type = HB_IT_NIL;
-    pHandled.type = HB_IT_NIL;
+    Array.type = HB_IT_NIL;
+    Type.type = HB_IT_NIL;
+    Funcname.type = HB_IT_NIL;
+    Error.type = HB_IT_NIL;
+    Arg1.type = HB_IT_NIL;
+    Arg2.type = HB_IT_NIL;
+    Retval.type = HB_IT_NIL;
+    Handled.type = HB_IT_NIL;
 
-    hb_itemPutNI    (&pType    , pexc->type);
-    hb_itemPutC     (&pFuncname, pexc->funcname);
-    hb_itemPutC     (&pError   , pexc->error);
-    hb_itemPutND    (&pArg1    , pexc->arg1);
-    hb_itemPutND    (&pArg2    , pexc->arg2);
-    hb_itemPutNDLen (&pRetval  , pexc->retval, pexc->retvalwidth, pexc->retvaldec);
-    hb_itemPutL     (&pHandled , pexc->handled);
+    hb_itemPutNI( &Type, pexc->type );
+    hb_itemPutC( &Funcname, pexc->funcname );
+    hb_itemPutC( &Error, pexc->error );
+    hb_itemPutND( &Arg1, pexc->arg1 );
+    hb_itemPutND( &Arg2, pexc->arg2 );
+    hb_itemPutNDLen( &Retval, pexc->retval, pexc->retvalwidth, pexc->retvaldec );
+    hb_itemPutL( &Handled, pexc->handled );
 
-    hb_arrayNew (&pArray,2);
-    hb_arraySetForward (&pArray, 1, &pRetval);
-    hb_arraySetForward (&pArray, 2, &pHandled);
+    hb_arrayNew( &Array, 2 );
+    hb_arraySetForward( &Array, 1, &Retval );
+    hb_arraySetForward( &Array, 2, &Handled );
 
     /* launch error codeblock that can
        a) change the members of the array = {dRetval, lHandled} to set the return value of the math C RTL routine and
           the <exception handled flag> and it
        b) can return an integer value to set the return value of matherr().
        NOTE that these values are only used if lHandled was .F. and is set to .T. within the codeblock */
-    pRet = hb_itemDo (spMathErrorBlock, 6, pType, pFuncname, pError, pArg1, pArg2, pArray);
+    pRet = hb_itemDo( spMathErrorBlock, 6, &Type, &Funcname, &Error, &Arg1, &Arg2, &Array );
 
-    hb_itemClear( &pType );
-    hb_itemClear( &pFuncname );
-    hb_itemClear( &pError );
-    hb_itemClear( &pArg1 );
-    hb_itemClear( &pArg2 );
-    hb_itemClear( &pRetval );
-    hb_itemClear( &pHandled );
+    //hb_itemClear( &Type );
+    hb_itemClear( &Funcname );
+    hb_itemClear( &Error );
+    //hb_itemClear( &Arg1 );
+    //hb_itemClear( &Arg2 );
+    //hb_itemClear( &Retval );
+    //hb_itemClear( &Handled );
 
-    if (pexc->handled)
+    if( pexc->handled )
     {
       /* math exception has already been handled, so codeblock call above was only informative */
       retval = 1;
@@ -526,30 +526,32 @@ static int hb_matherrblock (HB_MATH_EXCEPTION * pexc)
     else
     {
       /* exception handled by codeblock ? */
-      // pHandled = hb_itemArrayGet (pArray, 2);
-      hb_arrayGet( &pArray, 2, &pHandled );
-      if (&pHandled != NULL)
+      // Handled = hb_itemArrayGet (Array, 2);
+      hb_arrayGet( &Array, 2, &Handled );
+
+      if( &Handled != NULL )
       {
-        pexc->handled = hb_itemGetL (&pHandled);
-        hb_itemClear (&pHandled);
+         pexc->handled = hb_itemGetL( &Handled );
+         //hb_itemClear( &Handled );
       }
 
-      if (pexc->handled)
+      if( pexc->handled )
       {
         /* YES ! */
         /* extract retval for math routine and matherr() */
-        // pRetval = hb_itemArrayGet (pArray, 1);
-        hb_arrayGet( &pArray, 1, &pRetval );
-        if (&pRetval != NULL)
+        // pRetval = hb_itemArrayGet (Array, 1);
+        hb_arrayGet( &Array, 1, &Retval );
+
+        if( HB_IS_NUMERIC( &Retval ) )
         {
-          pexc->retval = hb_itemGetND (&pRetval);
-          hb_itemGetNLen (&pRetval, &(pexc->retvalwidth), &(pexc->retvaldec));
-          hb_itemClear (&pRetval);
+           pexc->retval = hb_itemGetND( &Retval );
+           hb_itemGetNLen( &Retval, &(pexc->retvalwidth), &(pexc->retvaldec) );
+           //hb_itemClear( &Retval );
         }
-        if ((pRet != NULL) && HB_IS_NUMERIC (pRet))
+        if( pRet && HB_IS_NUMERIC( pRet ) )
         {
-          retval = hb_itemGetNI (pRet); /* block may also return 0 to force C math lib warnings */
-          hb_itemRelease (pRet);
+           retval = hb_itemGetNI( pRet ); /* block may also return 0 to force C math lib warnings */
+           hb_itemRelease( pRet );
         }
         else
         {
@@ -562,7 +564,8 @@ static int hb_matherrblock (HB_MATH_EXCEPTION * pexc)
         retval = 1;
       }
     }
-    hb_itemClear (&pArray);
+
+    hb_itemClear( &Array );
   }
   else
   {
@@ -582,7 +585,8 @@ static int hb_matherrblock (HB_MATH_EXCEPTION * pexc)
       retval = (*sPrevMathHandler)(pexc);
     }
   }
-  return (retval);
+
+  return retval;
 }
 
 /* set/get math error block */
@@ -603,12 +607,7 @@ HB_FUNC (MATHERRORBLOCK)  /* ([<nNewErrorBlock>]) -> <nOldErrorBlock> */
   }
   else
   {
-    HB_ITEM oldMathError;
-    // hb_itemInit (&oldMathError);
-    ( &oldMathError )->type = HB_IT_NIL;
-    hb_itemCopy (&oldMathError, spMathErrorBlock);
-    hb_itemReturn (&oldMathError);
-    // hb_itemClear (&oldMathError);
+    hb_itemReturnCopy( spMathErrorBlock );
   }
 
   if (hb_pcount() > 0)
@@ -617,18 +616,19 @@ HB_FUNC (MATHERRORBLOCK)  /* ([<nNewErrorBlock>]) -> <nOldErrorBlock> */
     PHB_ITEM pNewErrorBlock = hb_param (1, HB_IT_BLOCK);
     if (pNewErrorBlock != NULL)
     {
-      if (spMathErrorBlock == NULL)
+      if( spMathErrorBlock == NULL )
       {
-        spMathErrorBlock = hb_itemNew (NULL);
+         spMathErrorBlock = hb_itemNew( NULL );
       }
-      hb_itemCopy (spMathErrorBlock, pNewErrorBlock);
+
+      hb_itemCopy( spMathErrorBlock, pNewErrorBlock );
     }
     else
     {
       /* a parameter other than a block has been passed -> delete error handler ! */
-      if (spMathErrorBlock != NULL)
+      if( spMathErrorBlock )
       {
-        hb_itemRelease (spMathErrorBlock);
+        hb_itemRelease( spMathErrorBlock );
         spMathErrorBlock = NULL;
       }
     }
