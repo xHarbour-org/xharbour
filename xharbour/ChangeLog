@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2014 2004/01/07 20:00:03 peterrees Exp $
+ * $Id: ChangeLog,v 1.2015 2004/01/07 20:06:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-07 21:29 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * contrib/firebird/make_b32.bat
+    * Removed auto definition of FBDIR var and added error message.
+      So the user HAVE to define it
+   * tests/bldwvt.bat
+     * changed to save old HB_GT_LIB and CFLAGS state and
+       restore them on exit.
 
 2004-01-07 12:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/gtwvt/gtwvt.c

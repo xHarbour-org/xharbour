@@ -3,7 +3,7 @@
 rem Create environment vars and folders
 
 rem Check if already exists a FireBird env var
-IF %FBDIR%. == . SET FBDIR=c:\tools\firebird
+IF %FBDIR%. == . GOTO ERROR
 rem echo.FBDIR=%FBDIR%
 echo.
 
@@ -45,6 +45,17 @@ if "%1" == "CLEAN" goto CLEAN
    if exist obj\b32\firebird.obj   del obj\b32\firebird.obj
    if exist obj\b32\TFirebird.c    del obj\b32\TFirebird.c
    if exist obj\b32\TFirebird.obj  del obj\b32\TFirebird.obj
+   goto EXIT
+
+:ERROR
+   echo.
+   echo.Error! FBDIR not defined.
+   echo.
+   echo.Please define the FBDIR environment var that point to your
+   echo.Firebird install dir.
+   echo.
+   echo.i.e.: set FBDIR=c:\Firebird\Firebird_1_5
+   echo.
    goto EXIT
 
 :EXIT

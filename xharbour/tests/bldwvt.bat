@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldtest.bat
 rem *
-rem * $Id: bldtest.bat,v 1.3 2003/11/10 21:33:19 fsgiudice Exp $
+rem * $Id: bldwvt.bat,v 1.1 2004/01/06 10:15:41 vouchcac Exp $
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *
@@ -20,6 +20,8 @@ rem ***********************************************************
 
 rem Saving current HB_MT state
 set OLDENVMT=%HB_MT%
+set OLDHB_GT_LIB=%HB_GT_LIB%
+set OLDCFLAGS=%CFLAGS%
 
 set HB_ARCHITECTURE=w32
 set HB_COMPILER=bcc32
@@ -104,4 +106,8 @@ echo.
 :ENDSET
 rem Restore Old MT Setting
 set HB_MT=%OLDENVMT%
+set HB_GT_LIB=%OLDHB_GT_LIB%
+set CFLAGS=%OLDCFLAGS%
 set OLDENVMT=
+set OLDHB_GT_LIB=
+set OLDCFLAGS=
