@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.1 2004/02/15 03:12:49 andijahja Exp $
+ * $Id: fparse.c,v 1.2 2004/02/18 10:50:45 andijahja Exp $
  */
 
 /*
@@ -168,7 +168,7 @@ HB_FUNC( FPARSE )
    FILE *inFile ;
    PHB_ITEM pSrc = hb_param(1, HB_IT_STRING);
    PHB_ITEM pDelim = hb_param(2, HB_IT_STRING);
-   PHB_ITEM pArray , pItem;
+   HB_ITEM pTemp, pArray, pItem;
    char *string ;
    char **tokens;
    int iToken, iCharCount = 0;
@@ -201,14 +201,17 @@ HB_FUNC( FPARSE )
    nByte = pDelim ? (BYTE) pDelim->item.asString.value[0] : (BYTE) 44;
 
    /* the main array */
-   pArray = hb_itemNew( NULL );
-   hb_arrayNew( pArray, 0 );
+   pArray.type = HB_IT_NIL;
+   hb_arrayNew( &pArray, 0 );
 
    /* book memory for line to read */
    string = (char*) hb_xgrab( MAX_READ + 1 );
 
    /* container for parsed line */
-   pItem = hb_itemNew( NULL );
+   pItem.type = HB_IT_NIL;
+
+   /* holder for parsed text */
+   pTemp.type = HB_IT_NIL;
 
    /* read the file until EOF */
    while ( file_read ( inFile, string, &iCharCount ) )
@@ -217,16 +220,16 @@ HB_FUNC( FPARSE )
       tokens = hb_tokensplit ( string, nByte, iCharCount ) ;
 
       /* prepare empty array */
-      hb_arrayNew( pItem, 0 );
+      hb_arrayNew( &pItem, 0 );
 
       /* add parsed text to array */
       for (iToken = 0; tokens [iToken]; iToken++)
       {
-         hb_arrayAddForward( pItem, hb_itemPutC( NULL, tokens [iToken] ) );
+         hb_arrayAddForward( &pItem, hb_itemPutC( &pTemp, tokens [iToken] ) );
       }
 
       /* add array containing parsed text to main array */
-      hb_arrayAddForward( pArray, pItem );
+      hb_arrayAddForward( &pArray, &pItem );
 
       /* clean up */
       tokens--;
@@ -235,7 +238,7 @@ HB_FUNC( FPARSE )
    }
 
    /* return main array */
-   hb_itemForwardValue( &(HB_VM_STACK).Return, pArray );
+   hb_itemForwardValue( &(HB_VM_STACK).Return, &pArray );
 
    /* clean up */
    hb_xfree( string );

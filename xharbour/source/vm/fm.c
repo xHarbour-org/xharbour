@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.55 2004/02/14 01:29:44 andijahja Exp $
+ * $Id: fm.c,v 1.56 2004/02/14 19:47:33 andijahja Exp $
  */
 
 /*
@@ -860,7 +860,7 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
          if ( hLog )
          {
             fprintf( hLog, "Block %i %p (size %lu) %s(%i), \"%s\"\n",
-               ui,
+               ui-1,
                (char *) ( pMemBlock + 1 ),
                pMemBlock->ulSize,
                pMemBlock->szProcName,
