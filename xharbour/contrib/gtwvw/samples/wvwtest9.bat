@@ -29,7 +29,7 @@ goto selesai
 
 :invalid
 echo this program is for compiling wvwtest9.prg et all
-echo usage: tb (without parameter)
+echo usage: wvwtest9 (without parameter)
 goto selesai
 
 :brcfail

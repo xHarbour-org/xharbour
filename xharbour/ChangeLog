@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3735 2005/01/13 04:31:26 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3736 2005/01/13 04:41:18 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -15,6 +15,9 @@
     + Combobox functions and some other changes.
       Please see details in the changelog on contrib/gtwvw/doc/whatsnew.txt
       starting at change date 2005-11-25.
+      And one important note:
+      Andi Jahja has made revisions to gtwvw that it is now compileable
+      by MSVC/OW/PellesC/XCC/MinGW32. Thanks!!!.
 
   * contrib/gtwvw/samples/wvwtest9.bat
   * contrib/gtwvw/samples/wvwtest9.bc

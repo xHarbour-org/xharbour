@@ -25,10 +25,10 @@ RESP_FILE = wvwtest9.rsp
 #
 # EXE dependency to OBJ:
 #
-C:tb.EXE : \
+C:wvwtest9.EXE : \
   wvwtest9.obj \
   wvwmouse.obj \
-  winapi.obj 
+  winapi.obj
       ilink32 $(LFLAGS) -t @$(RESP_FILE)
 
 # C to OBJ compile rule:

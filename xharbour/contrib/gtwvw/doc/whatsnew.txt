@@ -1,8 +1,135 @@
 /*
- * whatsnew.txt
- * What's new in GTWVW since the last release.
- * Copyright 2004 Budyanto Dj. <budyanto@centrin.net.id>
+ * $Id: whatsnew.txt $
  */
+
+/*
+ * whatsnew.txt
+ * This doc used to contain what's new in GTWVW since the last release.
+ * Now it serves as a change log. Any changes to GTWVW should be listed
+ * in this doc.
+ *
+ * NOTES:
+ * Dates in this doc are dates of changes, not CVS commit dates.
+ * For some reasons the date of changes are sometimes [largely] different
+ * with the date of commiting to CVS.
+ *
+ * Budyanto Dj. <budyanto@centrin.net.id>
+ */
+
+ 2005/01/12:
+ * gtwvw.c
+ * hbgtwvw.h
+   * Many type castings by Andi Jahja to allow GTWVW to be compiled in
+     MSVC/OW/PellesC/XCC/MinGW32. Thanks!!!
+
+ 2004/12/31:
+ * gtwvw.c
+   Sync with =Id: gtwvt.c,v 1.140 2004/12/28 20:32:33 ptsarenko Exp =
+    * use CF_OEMTEXT parameter for clipboard functions for OEM charsets
+      by Pavel Tsarenko.
+
+ 2004/12/23:
+ * gtwvw.c
+   ! HB_FUNC( WVW_SETICON ) should pass hb_parc(3) instead of hb_parcx(3) to
+     hb_wvw_gtSetWindowIcon() in order to allow proper NULL checking there.
+     (hb_parcx(3) never returns NULL, even if param 3 is NIL.
+
+ 2004/12/22:
+ Combobox (dropdown listbox) is introduced.
+ This feature is accessible throug the WVW_CB* functions.
+ (See IMPORTANT NOTES below regarding WVW_CBADDSTRING() and WVW_CBSETCURSEL())
+
+ Side Effects:
+ * WVW_ID_BASE_PUSHBUTTON is now 64000 (was 65000).
+   It means we may not have Menu Id >= 64000 now.
+
+ New .PRG callable Functions: (combobox functions):
+ + WVW_CBcreate( [nWinNum], nTop, nLeft, nWidth, aText, bBlock, nListLines, ;
+                            nReserved, nKbdType, aOffset)
+ + WVW_CBdestroy( [nWinNum], nCBid )
+ + WVW_CBsetFocus( [nWinNum], nComboId )
+ + WVW_CBisFocused( [nWinNum], nComboId )
+ + WVW_CBenable( [nWinNum], nComboId, [lEnable] )
+ + WVW_CBsetcodeblock( [nWinNum], nCBid, bBlock )
+ + WVW_CBSetFont([nWinNum], cFontFace, nHeight, nWidth, nWeight, nQUality,;
+                            lItalic, lUnderline, lStrikeout
+ + WVW_CBsetIndex( [nWinNum], nCBid, nIndex )
+ + WVW_CBgetIndex( [nWinNum], nCBid )
+ + WVW_CBfindString( [nWinNum], nCBid, cString )
+ + WVW_CBGetCurText( [nWinNum], nCBid )
+
+ IMPORTANT NOTICE:
+ * WVW_CBADDSTRING() and WVW_CBSETCURSEL() are NOT part of the above WVW_CB* functions family.
+   These two functions are adopted from gtwvt (long time ago), and I keep these names to
+   keep gtwvw's "historical links" to gtwvt unbroken.
+
+ TODO:
+ Create a sample of how to integrate combobox into regular GET system.
+
+ 2004/11/25:
+ Synchronizing with:
+ =Id: hbgtwvt.h,v 1.32 2004/11/23 17:04:20 lf_sfnet Exp =
+ =Id: gtwvt.c,v 1.138 2004/11/25 01:54:13 guerra000 Exp =
+ =Id: wvtutils.c,v 1.19 2004/11/23 17:04:23 lf_sfnet Exp =
+ (wvtcore.c is not changed since last sync:
+ =Id: wvtcore.c,v 1.10 2004/08/30 14:10:20 vouchcac Exp =
+ )
+
+ ------------------
+ Summary of changes
+ ------------------
+ Applying the following change from gtwvt by Lorenzo Fiorini:
+ * hbgtwvw.ch
+ * wvtutils.c
+ * gtwvt.c
+   * added support for named icons in the resources
+
+ -------
+ Details
+ -------
+ * hbgtwvw.ch
+   * change in hb_wvw_gtSetWindowIcon() prototype (added lpicon parm)
+
+ * gtwvw.c
+   * hb_wvw_gtSetWindowIcon() added one optional parm
+   * WVW_SETICON() added one optional parm
+
+
+ 2004/11/23:
+ * gtwvw.c:
+   + HB_GT_FUNC( gt_ProcessMessages )
+
+ 2004/11/23:
+ * gtwvw.c:
+   * FlashWindowEx is replaced with FlashWindow to make gtwvw
+     work in Win95
+
+ 2004/11/14:
+ * hbgtwvw.h
+   * WIN_DATA:
+     + int iLSpaceColor;  /* line space color */
+ * gtwvw.c:
+   + static int  s_iDefLSpaceColor = -1;
+   * hb_wvw_gtFillLineSpace(): use pWindowData->iLSpaceColor, or not
+   + WVW_SetDefLSpaceColor()
+   + WVW_SetLSpaceColor()
+
+/**************************** BETA1-3 published at this point **/
+
+ 2004/11/01:
+ * gtwvw.c
+   ! WVW_DRAWLABELOBJ(): bottom point +1, right point +1
+
+ 2004/10/26:
+ Synchronizing with:
+ =Id: gtwvt.c,v 1.135 2004/10/24 09:43:45 oh1 Exp =
+
+ * gtwvw.c
+   * blank char for screen ' ' --> hb_ctGetClearB()
+   + GTI_VIEWMAXWIDTH
+   + GTI_VIEWMAXHEIGHT
+   These don't seem to be correctly implemented.
+   See gtwin about what they should do.
 
 /****************************************************************
  * Release Date: 2004/10/25 (CVS contrib)
