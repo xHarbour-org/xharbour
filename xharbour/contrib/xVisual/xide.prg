@@ -21,9 +21,8 @@ FUNCTION Main
    WITH OBJECT oApp
 
       WITH OBJECT :CreateFrame( 'MainFrame', MainFrame() )
-         :SetBkBrush( COLOR_APPWORKSPACE+1 )
          :WindowMenu := TMenu():New()
-
+         :SetStyle( WS_THICKFRAME, .F. )
          WITH OBJECT :WindowMenu
             :AddPopup('File')
 
