@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.2 2002/03/06 03:52:09 ronpinkas Exp $
+ * $Id: dbsdf.prg,v 1.3 2002/10/01 20:29:06 lculik Exp $
  */
 
 /*
@@ -55,14 +55,14 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbsdf.prg,v 1.2 2002/03/06 03:52:09 ronpinkas Exp $" )
+HB_FILE_VER( "$Id: dbsdf.prg,v 1.3 2002/10/01 20:29:06 lculik Exp $" )
 
 #define AppendEOL( handle ) FWRITE( handle, CHR( 13 ) + CHR( 10 ) )
 #define AppendEOF( handle ) FWRITE( handle, CHR( 26 ) )
 #define SkipEOL( handle ) FSEEK( handle, 2, FS_RELATIVE )
 
 PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest )
-   LOCAL index, handle, cFileName := cFile, nStart, nCount, oErr, nFileLen, aStruct
+   LOCAL index, handle, cFileName := cFile, nStart, nCount, oErr, nFileLen, aStruct, cField
 
    // Process the file name argument.
    index := RAT( ".", cFileName )
@@ -142,9 +142,9 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
                   NEXT index
                ELSE
                   // Process the specified fields.
-                  FOR index := 1 TO LEN( aFields )
-                     ExportFixed( handle, FIELDGET( FIELDPOS( aFields[ index ] ) ) )
-                  NEXT index
+                  FOR EACH cField IN aFields
+                     ExportFixed( handle, FIELDGET( FIELDPOS( cField ) ) )
+                  NEXT
                END IF
                // Set up for the start of the next record.
                AppendEOL( handle )
@@ -189,9 +189,9 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
                NEXT index
             ELSE
                // Process the specified fields.
-               FOR index := 1 TO LEN( aFields )
-                  FieldPut( FIELDPOS( aFields[ index ] ),ImportFixed( handle,FIELDPOS( aFields[ index ] ),aStruct ) )
-               NEXT index
+               FOR EACH cField IN aFields
+                  FieldPut( FIELDPOS( cField ), ImportFixed( handle, FIELDPOS( cField ), aStruct ) )
+               NEXT
             END IF
             // Set up for the start of the next record.
             SkipEOL( handle )
