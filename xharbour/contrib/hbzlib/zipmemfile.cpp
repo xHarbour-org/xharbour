@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipMemFile.cpp $
 // $Archive: /ZipArchive/ZipMemFile.cpp $
-// $Date: 2003/08/20 19:33:40 $ $Author: lculik $
+// $Date: 2003/09/12 20:10:13 $ $Author: paultucker $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -17,7 +17,7 @@
 #include "stdafx.h"
 #include "zipmemfile.h"
 #include "zipexception.h"
-
+#include "hbapi.h"
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
