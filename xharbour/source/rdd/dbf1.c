@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.32 2003/06/26 01:29:15 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.33 2003/07/05 13:10:14 lculik Exp $
  */
 
 /*
@@ -1249,11 +1249,13 @@ ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    {
       if( HB_IS_MEMO( pItem ) || HB_IS_STRING( pItem ) )
 #ifndef HB_CDP_SUPPORT_OFF
+{
          hb_cdpTranslate( pItem->item.asString.value, s_cdpage, pArea->cdPage );
 #endif
          uiError = hb_dbfPutMemo( pArea, uiIndex, pItem ) ? SUCCESS : EDBF_DATAWIDTH;
 #ifndef HB_CDP_SUPPORT_OFF
          hb_cdpTranslate( pItem->item.asString.value, pArea->cdPage,s_cdpage );
+}
 #endif
       else
          uiError = EDBF_DATATYPE;
