@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.46 2003/04/18 23:34:14 lculik Exp $
+# $Id: makefile.vc,v 1.47 2003/05/08 03:28:04 lculik Exp $
 #
 
 #
@@ -299,6 +299,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\gx.obj \
    $(OBJ_DIR)$(MT)\hardcr.obj \
    $(OBJ_DIR)$(MT)\hbcompress.obj \
+   $(OBJ_DIR)$(MT)\hbcrc32.obj \
    $(OBJ_DIR)$(MT)\hbffind.obj \
    $(OBJ_DIR)$(MT)\hbrandom.obj \
    $(OBJ_DIR)$(MT)\hbsrlraw.obj \

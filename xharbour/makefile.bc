@@ -1,5 +1,5 @@
-#
-# $Id: makefile.bc,v 1.44 2003/05/08 03:28:04 lculik Exp $
+
+# $Id: makefile.bc,v 1.45 2003/05/16 22:03:44 ronpinkas Exp $
 #
 
 #
@@ -327,6 +327,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbrandom.obj \
    $(RTL_OBJ_DIR)\hbcompress.obj \
    $(RTL_OBJ_DIR)\hbcrypt.obj \
+   $(RTL_OBJ_DIR)\hbcrc32.obj \
    $(RTL_OBJ_DIR)\hbchecksum.obj \
    $(RTL_OBJ_DIR)\hbhextonum.obj \
    $(RTL_OBJ_DIR)\hbffind.obj \
@@ -1647,6 +1648,10 @@ $(RTL_OBJ_DIR)\hbcompress.obj : $(RTL_DIR)\hbcompress.c
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbchecksum.obj : $(RTL_DIR)\hbchecksum.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(RTL_OBJ_DIR)\hbcrc32.obj : $(RTL_DIR)\hbcrc32.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
