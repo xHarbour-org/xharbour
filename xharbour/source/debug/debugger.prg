@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.33 2004/04/19 09:53:53 likewolf Exp $
+ * $Id: debugger.prg,v 1.34 2004/04/20 12:48:12 likewolf Exp $
  */
 
 /*
@@ -1772,7 +1772,8 @@ METHOD ShowCodeLine( nProc ) CLASS TDebugger
             ::oWndCode:SetCaption( ::cPrgName )
             ::oWndCode:Refresh()       // to force the window caption to update
          endif
-         ::GoToLine( nLine )
+         ::oBrwText:SetActiveLine( nLine )
+         ::GotoLine( nLine )
       endif
 
    endif
@@ -2052,6 +2053,11 @@ METHOD GotoLine( nLine ) CLASS TDebugger
       SetPos( nRow, nCol )
       SetCursor( SC_SPECIAL1 )
    endif
+   SetPos( nRow, nCol )
+   
+   // Store cursor position to be restored by ::oWndCode:bGotFocus
+   ::oWndCode:cargo[ 1 ] := nRow
+   ::oWndCode:cargo[ 2 ] := nCol
 
 return nil
 
@@ -2453,7 +2459,7 @@ return Self
 
 METHOD Locate( nMode ) CLASS TDebugger
 
-   local cValue
+   local cValue, lFound
 
    DEFAULT nMode TO 0
 
@@ -2465,7 +2471,13 @@ METHOD Locate( nMode ) CLASS TDebugger
 
    ::cSearchString := cValue
 
-return ::oBrwText:Search( ::cSearchString, ::lCaseSensitive, 0 )
+   lFound := ::oBrwText:Search( ::cSearchString, ::lCaseSensitive, 0 )
+   
+   // Save cursor position to be restored by ::oWndCode:bGotFocus
+   ::oWndCode:cargo[ 1 ] := Row()
+   ::oWndCode:cargo[ 2 ] := Col()
+
+RETURN lFound
 
 METHOD FindNext() CLASS TDebugger
 
@@ -2475,8 +2487,12 @@ METHOD FindNext() CLASS TDebugger
       lFound := ::Locate( 1 )
    else
       lFound := ::oBrwText:Search( ::cSearchString, ::lCaseSensitive, 1 )
-   endif
 
+      // Save cursor position to be restored by ::oWndCode:bGotFocus
+      ::oWndCode:cargo[ 1 ] := Row()
+      ::oWndCode:cargo[ 2 ] := Col()
+   endif
+   
 return lFound
 
 METHOD FindPrevious() CLASS TDebugger
@@ -2487,6 +2503,10 @@ METHOD FindPrevious() CLASS TDebugger
       lFound := ::Locate( 2 )
    else
       lFound := ::oBrwText:Search( ::cSearchString, ::lCaseSensitive, 2 )
+
+      // Save cursor position to be restored by ::oWndCode:bGotFocus
+      ::oWndCode:cargo[ 1 ] := Row()
+      ::oWndCode:cargo[ 2 ] := Col()
    endif
 
 return lFound
@@ -2511,7 +2531,7 @@ METHOD SearchLine() CLASS TDebugger
    cLine := ::InputBox( "Line number", "1" )
 
    if Val( cLine ) > 0
-      ::oBrwText:GotoLine ( Val( cLine ) )
+      ::GotoLine ( Val( cLine ) )
    endif
 
 return nil

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.7 2004/03/02 01:08:35 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.8 2004/03/30 09:29:55 mauriliolongo Exp $
  */
 
 /*
@@ -58,15 +58,15 @@
 
 // Color definitions and positions inside ::cColorSpec
 #define  CLR_CODE       0        // color of code
-#define  CLR_CURSOR     1        // color of hilighted line
+#define  CLR_CURSOR     1        // color of highlighted line (the line to be executed)
 #define  CLR_BKPT       2        // color of breakpoint line
-#define  CLR_HIBKPT     3        // color of hilighted breakpoint line
+#define  CLR_HIBKPT     3        // color of highlighted breakpoint line
 
 
 CLASS TBrwText FROM HBEditor
 
    DATA  cFileName      // the name of the browsed file
-   DATA  nActiveLine    // Active line inside Code Window (last executed one)
+   DATA  nActiveLine    // Active line inside Code Window (the line to be executed)
 
    DATA  aBreakPoints   // Array with line numbers of active Break Points
 
@@ -81,7 +81,8 @@ CLASS TBrwText FROM HBEditor
    METHOD   RefreshCurrent()
    METHOD   ForceStable() INLINE NIL
 
-   METHOD   GotoLine(n)                      // Moves active line cursor, that is it hilights last executed line of code
+   METHOD   GotoLine(n)                      // Moves active line cursor
+   METHOD   SetActiveLine( n )               // Sets the line to be executed
 
    METHOD   GetLine(nRow)                    // Redefine HBEditor method to add line number
    METHOD   LineColor(nRow)                  // Redefine HBEditor method to handle line coloring
@@ -131,20 +132,17 @@ METHOD RefreshCurrent() CLASS TBrwText
 return Self
 
 
-METHOD GotoLine(n) CLASS TBrwText
-
-   // We need to set active line before calling ::RefreshLine() since ::LineColor()
-   // uses nActiveLine to decide which color to use to paint line
+METHOD SetActiveLine( n ) CLASS TBrwText
    ::nActiveLine := n
-   ::RefreshLine()
-
-   Super:GotoLine(n)
-   // I need to call ::RefreshLine() here because HBEditor does not repaint current line
-   // if it needs not to and without this explicit call I don't see ActiveLine cursor movement
-   ::RefreshLine()
-
+   ::RefreshWindow()
 return Self
 
+
+METHOD GotoLine(n) CLASS TBrwText
+
+  Super:GotoLine(n)
+
+return Self
 
 METHOD GetLine(nRow) CLASS TBrwText
 
@@ -153,24 +151,19 @@ return iif(::lLineNumbers, AllTrim(Str(nRow)) + ": ", "") + Super:GetLine(nRow)
 
 METHOD LineColor(nRow) CLASS TBrwText
 
-   local cColor, lHilited, lBreak
+   local cColor, lHilited, lBreak, lExec, nIndex := CLR_CODE
 
    lHilited := (nRow == ::nActiveLine)
    lBreak := AScan(::aBreakPoints, nRow) > 0
 
-   if lHilited .AND. lBreak
-      cColor := hb_ColorIndex(::cColorSpec, CLR_HIBKPT)
-
-   elseif lHilited
-      cColor := hb_ColorIndex(::cColorSpec, CLR_CURSOR)
-
-   elseif lBreak
-      cColor := hb_ColorIndex(::cColorSpec, CLR_BKPT)
-
-   else
-      cColor := hb_ColorIndex(::cColorSpec, CLR_CODE)
-
+   if lHilited
+     nIndex += CLR_CURSOR
    endif
+   if lBreak
+     nIndex += CLR_BKPT
+   endif
+
+   cColor := hb_ColorIndex(::cColorSpec, nIndex)
 
 return cColor
 
