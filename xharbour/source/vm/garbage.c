@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.40 2003/02/20 00:28:59 jonnymind Exp $
+ * $Id: garbage.c,v 1.41 2003/02/22 01:30:36 jonnymind Exp $
  */
 
 /*
@@ -540,20 +540,20 @@ void hb_gcCollect( void )
 */
 void hb_gcCollectAll( void )
 {
-   /* Even if not locked, a read only non-critical variable here 
-     should not be a problem */
-   if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
-   {
-      return;
-   }
-
+   /*JC1: in MT, GC collecting is not just -locked-: if a second thread
+   wants to collect while another is doing collection, it will just wait
+   for the first to finish and then return. Double garbage collecting is
+   TO BE AVOIDED
+   */
    #ifdef HB_THREAD_SUPPORT
       BOOL bWait = FALSE;
-      /*JC1: in MT, GC collecting is not just -locked-: if a second thread
-      wants to collect while another is doing collection, it will just wait
-      for the first to finish and then return. Double garbage collecting is
-      TO BE AVOIDED
-      */
+
+      /* Even if not locked, a read only non-critical variable here
+      should not be a problem */
+      if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
+      {
+         return;
+      }
 
       /* ensure that noone is writing GAW now */
       HB_CRITICAL_LOCK( s_GawMutex );
@@ -577,6 +577,11 @@ void hb_gcCollectAll( void )
          return;
       }
 
+   #else
+      if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
+      {
+         return;
+      }
    #endif
 
 
