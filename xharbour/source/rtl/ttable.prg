@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.prg,v 1.1 2002/12/24 00:42:47 lculik Exp $
+ * $Id: ttable.prg,v 1.2 2003/01/27 03:44:13 walito Exp $
  */
 
 /*
@@ -282,22 +282,21 @@ RETURN ( .F. )      // Not locked
 FUNCTION NetOpenFiles( aFiles )
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-   LOCAL i
-   LOCAL n
    LOCAL nRet := 0
+   LOCAL xFile, cIndex
 
-   FOR i := 1 TO LEN( aFiles )
+   FOR EACH xFile IN aFiles
 
-      IF !FILE( aFiles[ i, 1 ] )
+      IF !FILE( xFile[ 1 ] )
          nRet := - 1
          EXIT
       ENDIF
 
-      IF NetDbUse( aFiles[ i, 1 ], aFiles[ i, 2 ], snNetDelay, "DBFCDX" )
-         IF VALTYPE( aFiles[ i, 3 ] ) == "A"
-            FOR n := 1 TO LEN( aFiles[ i, 3 ] )
-               IF FILE( aFiles[ i, 3, n ] )
-                  ORDLISTADD( aFiles[ i, 3, n ] )
+      IF NetDbUse( xFile[ 1 ], xFile[ 2 ], snNetDelay, "DBFCDX" )
+         IF VALTYPE( xFile[ 3 ] ) == "A"
+            FOR EACH cIndex IN xFile[ 3 ]
+               IF FILE( cIndex )
+                  ORDLISTADD( cIndex )
                ELSE
                   nRet := - 3
                   EXIT
@@ -578,7 +577,6 @@ METHOD NEW( cAlias ) CLASS RECORD
    ::aFields := ARRAY( ( ::alias )->( FCOUNT() ) )
 
    aStruc := ( ::alias )->( DBSTRUCT() )
-#ifdef __XHARBOUR__
 
    FOR EACH aItem in ::aFields
       i          := HB_EnumIndex()
@@ -591,28 +589,17 @@ METHOD NEW( cAlias ) CLASS RECORD
       oFld:Alias := ::alias
       aItem      := oFld
    NEXT
-#else
-   FOR i := 1 TO LEN( ::aFields )
-      oFld           := oField()
-      oFld:order     := i
-      oFld:Name      := ( ::alias )->( FIELDNAME( i ) )
-      oFld:Type      := aStruc[ i, 2 ]
-      oFld:LEN       := aStruc[ i, 3 ]
-      oFld:Dec       := aStruc[ i, 4 ]
-      oFld:Alias     := ::alias
-      ::aFields[ i ] := oFld
-   NEXT
-#endif
 
 RETURN Self
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 METHOD GET() CLASS RECORD
 
-   LOCAL i
-   FOR i := 1 TO LEN( ::aFields )
-      ::aFields[ i ]:GET()
-      ::buffer[ i ] := ::aFields[ i ] :value
+   LOCAL xField
+
+   FOR EACH xField IN ::aFields
+      xField:GET()
+      ::buffer[ HB_EnumIndex() ] := xField:value
    NEXT
 
 RETURN Self
@@ -620,11 +607,12 @@ RETURN Self
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 METHOD Put() CLASS RECORD
 
-   LOCAL i
-   FOR i := 1 TO LEN( ::aFields )
-      IF ::aFields[ i ] :Value <> ::buffer[ i ]
-         ::aFields[ i ]:PUT( ::buffer[ i ] )
-         ::buffer[ i ] := ::aFields[ i ] :value
+   LOCAL xField
+
+   FOR EACH xField IN ::aFields
+      IF xField:Value <> ::buffer[ HB_EnumIndex() ]
+         xField:PUT( ::buffer[ HB_EnumIndex() ] )
+         ::buffer[ HB_EnumIndex() ] := xField:value
       ENDIF
    NEXT
 
@@ -992,7 +980,7 @@ METHOD READ( lKeepBuffer ) CLASS Table
    DEFAULT lKeepBuffer TO .F.
 
    //? len( ::Buffer )
-#ifdef __XHARBOUR__
+
    FOR Each Buffer in ::Buffer
       
       i      := HB_EnumIndex()
@@ -1004,17 +992,6 @@ METHOD READ( lKeepBuffer ) CLASS Table
 
    NEXT
 
-#else
-
-   FOR i := 1 TO LEN( ::Buffer )
-      ::Buffer[ i ] := ( ::Alias )->( FIELDGET( i ) )
-
-      adata[ 1, 1 ] := ( ::Alias )->( FIELDNAME( i ) )
-      adata[ 1, 2 ] := ( ::Alias )->( FIELDGET( i ) )
-      __ObjSetValueList( Self, aData )
-
-   NEXT
-#endif
    IF ( lKeepBuffer == .T. ) .or. ( ::lMonitor == .T. )
       AADD( ::ReadBuffers, { ( ::Alias )->( RECNO() ), ::Buffer } )
    ENDIF
@@ -1035,7 +1012,7 @@ METHOD ReadBlank( lKeepBuffer ) CLASS Table
 
    ( ::Alias )->( DBGOBOTTOM() )
    ( ::Alias )->( DBSKIP( 1 ) )         // go EOF
-#ifdef __XHARBOUR__
+
    FOR each Buffer in ::Buffer
       i      := HB_EnumIndex()
       Buffer := ( ::Alias )->( FIELDGET( i ) )
@@ -1045,17 +1022,6 @@ METHOD ReadBlank( lKeepBuffer ) CLASS Table
       __ObjSetValueList( Self, aData )
 
    NEXT
-#else
-   FOR i := 1 TO LEN( ::Buffer )
-      ::Buffer[ i ] := ( ::Alias )->( FIELDGET( i ) )
-
-      adata[ 1, 1 ] := ( ::Alias )->( FIELDNAME( i ) )
-      adata[ 1, 2 ] := ( ::Alias )->( FIELDGET( i ) )
-      __ObjSetValueList( Self, aData )
-
-   NEXT
-
-#endif
 
    IF ( lKeepBuffer == .T. ) .or. ( ::lMonitor == .T. )
       AADD( ::ReadBuffers, { ( ::Alias )->( RECNO() ), ::Buffer } )
@@ -1074,14 +1040,16 @@ METHOD Write( lKeepBuffer ) CLASS Table
    LOCAL nSel       := SELECT( ::Alias )
    LOCAL nOrd       := ( ::Alias )->( ORDSETFOCUS() )
    LOCAL aData      := __objGetValueList( Self )
+   LOCAL xBuffer
    LOCAL n
+
    DEFAULT lKeepBuffer TO .F.
 
    IF ( lKeepBuffer == .T. ) .or. ( ::lMonitor == .T. )
 
       // --> save old record in temp buffer
-      FOR i := 1 TO ( ::Alias )->( FCOUNT() )
-         aOldBuffer[ i ] := ( ::Alias )->( FIELDGET( i ) )
+      FOR EACH xBuffer IN aOldBuffer
+         xBuffer := ( ::Alias )->( FIELDGET( HB_EnumIndex() ) )
       NEXT
 
       AADD( ::WriteBuffers, { ( ::Alias )->( RECNO() ), aOldBuffer } )
@@ -1113,7 +1081,6 @@ RETURN ( .T. )
 // 컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�
 METHOD BUFWrite( aBuffer ) CLASS Table
 
-   LOCAL i
    LOCAL aOldBuffer := ARRAY( ( ::Alias )->( FCOUNT() ) )
    LOCAL nSel       := SELECT( ::Alias )
    LOCAL nOrd       := ( ::Alias )->( ORDSETFOCUS() )
@@ -1127,18 +1094,11 @@ METHOD BUFWrite( aBuffer ) CLASS Table
    ENDIF
 
    ( ::Alias )->( ORDSETFOCUS( 0 ) )
-#ifdef __XHARBOUR__
+
    FOR each Buffer in aBuffer
-      i := HB_EnumIndex()
-      ( ::Alias )->( FIELDPUT( i, Buffer ) )
+      ( ::Alias )->( FIELDPUT( HB_EnumIndex(), Buffer ) )
    NEXT
 
-#else
-
-   FOR i := 1 TO LEN( aBuffer )
-      ( ::Alias )->( FIELDPUT( i, aBuffer[ i ] ) )
-   NEXT
-#endif
    ( ::Alias )->( DBSKIP( 0 ) )
    IF ::isNet
       ( ::Alias )->( DBRUNLOCK() )
@@ -1196,6 +1156,7 @@ METHOD Undo( nBuffer, nLevel ) CLASS Table
    LOCAL lRet      := .F.
    LOCAL lDelState := SET( _SET_DELETED )
    LOCAL nRec      :=::RECNO()
+   LOCAL aBuffers
 
    DEFAULT nBuffer TO _WRITE_BUFFER
 
@@ -1211,14 +1172,14 @@ METHOD Undo( nBuffer, nLevel ) CLASS Table
 
          SET( _SET_DELETED, .F. )       // make deleted records visible temporarily...
 
-         DEFAULT nLevel TO LEN( ::DeleteBuffers )
-
          nLen := LEN( ::deleteBuffers )
 
-         IF nLevel == 0                 // DO ALL...
-            FOR i := 1 TO LEN( ::deleteBuffers )
+         DEFAULT nLevel TO nLen
 
-               ( ::Alias )->( DBGOTO( ::deleteBuffers[ i, 1 ] ) )
+         IF nLevel == 0 .OR. nLevel == nLen     // DO ALL...
+            FOR EACH aBuffers IN ::deleteBuffers
+
+               ( ::Alias )->( DBGOTO( aBuffers[ 1 ] ) )
 
                IF ( ::Alias )->( NetRecall() )
                   lRet := .T.
@@ -1228,32 +1189,27 @@ METHOD Undo( nBuffer, nLevel ) CLASS Table
 
             NEXT
 
-            IF lRet == .T.
-               FOR i := 1 TO LEN( ::deleteBuffers )
-                  ADEL( ::DeleteBuffers, i )
-                  ASIZE( ::DeleteBuffers, LEN( ::DeleteBuffers ) - 1 )
-               NEXT
+            IF lRet
+               ::deleteBuffers := {}
             ENDIF
 
          ELSE       // DO CONTROLLED...
 
-            FOR i := nLen TO ( nLen - nLevel ) + 1
+            FOR EACH aBuffers IN ::deleteBuffers
+               IF HB_EnumIndex() > ( nLen - nLevel )
 
-               ( ::Alias )->( DBGOTO( ::deleteBuffers[ i, 1 ] ) )
+                  ( ::Alias )->( DBGOTO( aBuffers[ 1 ] ) )
 
-               IF ( ::Alias )->( NetRecall() )
-                  lRet := .T.
-               ELSE
-                  lRet := .F.
+                  IF ( ::Alias )->( NetRecall() )
+                     lRet := .T.
+                  ELSE
+                     lRet := .F.
+                  ENDIF
                ENDIF
-
             NEXT
 
-            IF lRet == .T.
-               FOR i := nLen TO ( nLen - nLevel ) + 1
-                  ADEL( ::DeleteBuffers, i )
-                  ASIZE( ::DeleteBuffers, LEN( ::DeleteBuffers ) - 1 )
-               NEXT
+            IF lRet
+               ASIZE( ::deleteBuffers, ( nLen - nLevel ) )
             ENDIF
 
          ENDIF
@@ -1265,16 +1221,16 @@ METHOD Undo( nBuffer, nLevel ) CLASS Table
    CASE _WRITE_BUFFER
       IF !EMPTY( ::WriteBuffers )
 
-         DEFAULT nLevel TO LEN( ::WriteBuffers )
          nLen := LEN( ::WriteBuffers )
+         DEFAULT nLevel TO nLen
 
-         IF nLevel == 0                 // Do All...
+         IF nLevel == 0 .OR. nLen == nLevel   // Do All...
 
-            FOR i := 1 TO LEN( ::writeBuffers )             //nLen
+            FOR EACH aBuffers IN ::writeBuffers
 
-               ( ::Alias )->( DBGOTO( ::WriteBuffers[ i, 1 ] ) )
+               ( ::Alias )->( DBGOTO( aBuffers[ 1 ] ) )
 
-               IF ::BufWrite( ::WriteBuffers[ i, 2 ] )
+               IF ::BufWrite( aBuffers[ 2 ] )
                   lRet := .T.
                ELSE
                   ALERT( "Rollback Failed..." )
@@ -1282,38 +1238,30 @@ METHOD Undo( nBuffer, nLevel ) CLASS Table
                ENDIF
             NEXT
 
-            IF lRet == .t.
-
+            IF lRet
                // erase entries
-               FOR i := 1 TO LEN( ::WriteBuffers )
-                  ADEL( ::WriteBuffers, i )
-                  ASIZE( ::WriteBuffers, LEN( ::WriteBuffers ) - 1 )
-               NEXT
-
+               ::WriteBuffers := {}
             ENDIF
 
          ELSE       // do controlled...
 
-            FOR i := nLen TO ( nLen - nLevel ) + 1
+            FOR EACH aBuffers IN ::writeBuffers
+               IF HB_EnumIndex() > ( nLen - nLevel )
 
-               ( ::Alias )->( DBGOTO( ::WriteBuffers[ i, 1 ] ) )
+                  ( ::Alias )->( DBGOTO( aBuffers[ 1 ] ) )
 
-               IF ::BufWrite( ::WriteBuffers[ i, 2 ] )
-                  lRet := .T.
-               ELSE
-                  ALERT( "Rollback Failed..." )
-                  lRet := .F.
+                  IF ::BufWrite( aBuffers[ 2 ] )
+                     lRet := .T.
+                  ELSE
+                     ALERT( "Rollback Failed..." )
+                     lRet := .F.
+                  ENDIF
                ENDIF
             NEXT
 
             // erase entries
             IF lRet == .t.
-
-               FOR i := nLen TO ( nLen - nLevel ) + 1
-                  ADEL( ::WriteBuffers, i )
-                  ASIZE( ::WriteBuffers, LEN( ::WriteBuffers ) - 1 )
-               NEXT
-
+               ASIZE( ::WriteBuffers, ( nLen - nLevel ) )
             ENDIF
 
          ENDIF
