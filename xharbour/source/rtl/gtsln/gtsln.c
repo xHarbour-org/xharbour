@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.24 2004/06/09 15:51:04 druzus Exp $
+ * $Id: gtsln.c,v 1.25 2004/06/09 16:42:56 druzus Exp $
  */
 
 /*
@@ -307,6 +307,24 @@ static void hb_sln_setACSCtrans( void )
       s_outputTab[ 16 ] = s_outputTab[ 26 ] = chArrow[ 1 ];
       s_outputTab[ 25 ] = s_outputTab[ 31 ] = chArrow[ 2 ];
       s_outputTab[ 24 ] = s_outputTab[ 30 ] = chArrow[ 3 ];
+
+#ifdef HB_SLN_UTF8
+      /*
+       * There is a bug in SLANG lib patched for UTF-8 support
+       * SLSMG_UTEE_CHAR_TERM is reverted with SLSMG_DTEE_CHAR_TERM
+       * They should be mapped:
+       *    SLSMG_UTEE_CHAR_TERM = 'w'
+       *    SLSMG_DTEE_CHAR_TERM = 'v'
+       * Below it's a hack for this version of slang which fix the
+       * problem.
+       */
+      if ( SLSMG_UTEE_CHAR_TERM == 'v' )
+      {
+         SLch = s_outputTab[ 193 ];
+         s_outputTab[ 193 ] = s_outputTab[ 194 ];
+         s_outputTab[ 194 ] = SLch;
+      }
+#endif
    }
 }
 
