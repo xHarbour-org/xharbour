@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2003/12/07 19:36:17 druzus Exp $
+# $Id: Makefile,v 1.5 2003/12/13 17:55:10 druzus Exp $
 #
 
 ROOT = ./
@@ -17,10 +17,10 @@ ifneq ($(SHLVL),)
 HB_POSTINST = $(TOP)$(ROOT)bin/postinst.sh
 else
 ifeq ($(HB_ARCHITECTURE),dos)
-HB_POSTINST = $(TOP)$(ROOT)bin/postinst.bat
+HB_POSTINST = $(subst /,\,$(TOP)$(ROOT)bin/postinst.bat)
 else
 ifeq ($(HB_ARCHITECTURE),w32)
-HB_POSTINST = $(TOP)$(ROOT)bin/postinst.bat
+HB_POSTINST = $(subst /,\,$(TOP)$(ROOT)bin/postinst.bat)
 endif
 endif
 endif

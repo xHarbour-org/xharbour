@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3399 2004/09/03 16:01:45 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3400 2004/09/03 16:08:22 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-03 18:45 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * xharbour/Makefile
+    * replaced / with \ for dos and win32 to fix an error msg
+    * at the end of make -s install
 
 2004-09-03 18:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbffpt/dbffpt1.c
