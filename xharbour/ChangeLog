@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3554 2004/10/27 21:50:11 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3555 2004/10/28 04:33:07 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-28 15:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  + contrib/gtwvw/samples
+  + contrib/gtwvw/samples/bldwvw.bat
+  + contrib/gtwvw/samples/inpfocus.prg
+  + contrib/gtwvw/samples/maincoor.prg
+  + contrib/gtwvw/samples/prog0.prg
+  + contrib/gtwvw/samples/prog1.prg
+  + contrib/gtwvw/samples/prog2.prg
+  + contrib/gtwvw/samples/readme.txt
+  + contrib/gtwvw/samples/winapi.c
+  + contrib/gtwvw/samples/wvt2wvw.ch
+  + contrib/gtwvw/samples/wvwmouse.prg
+  + contrib/gtwvw/samples/wvwtest9.bat
+  + contrib/gtwvw/samples/wvwtest9.bc
+  + contrib/gtwvw/samples/wvwtest9.prg
+  + contrib/gtwvw/samples/wvwtest9.rc
+  + contrib/gtwvw/samples/wvwtest9.rsp
+  + contrib/gtwvw/samples/wvwtest9.xml
+  + contrib/gtwvw/samples/def2.bmp
+  + contrib/gtwvw/samples/dia_excl.ico
+  + contrib/gtwvw/samples/vouch1.bmp
+  + contrib/gtwvw/samples/vouch1.gif
+  + contrib/gtwvw/samples/test.dbf
+    * some samples for gtwvw.
 
 2004-10-28 00:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gx.c
@@ -26,7 +51,7 @@
     ! fixed non-terminal output
 
   * source/rtl/maxrow.c
-    ! reverted the last own changes 
+    ! reverted the last own changes
 
 2004-10-27 10:20 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/compiler/calconst.c
