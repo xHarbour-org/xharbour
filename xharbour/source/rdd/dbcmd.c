@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.79 2004/02/23 13:08:26 andijahja Exp $
+ * $Id: dbcmd.c,v 1.80 2004/02/24 18:20:36 jonnymind Exp $
  */
 
 /*
@@ -2216,6 +2216,10 @@ HB_FUNC( DBSETFILTER )
          SELF_SETFILTER( ( AREAP ) s_pCurrArea->pArea, &pFilterInfo );
          if( !pText )
             hb_itemRelease( pFilterInfo.abFilterText );
+      }
+      else
+      {
+         SELF_CLEARFILTER( ( AREAP ) s_pCurrArea->pArea );
       }
    }
    else
