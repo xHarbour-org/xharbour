@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2040 2004/01/12 14:05:31 andijahja Exp $
+ * $Id: ChangeLog,v 1.2041 2004/01/12 19:13:29 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -12,6 +12,8 @@
   * source/vm/itemapi.c
     * correct printf format for longlong support
     * (files > 4gb were showing mod 4gb)
+  * source/rtl/hbffind.c
+    * slightly reworked an instance where msvc wasn't handling longlong math properly.
 
 2004-01-12 21:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   *include/hbgwvt.h
