@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.114 2004/01/16 14:51:22 paultucker Exp $
+ * $Id: ppcore.c,v 1.115 2004/01/16 17:11:56 ronpinkas Exp $
  */
 
 /*
@@ -449,13 +449,13 @@ char * hb_ppPlatform( void )
             char szHost[ 128 ];
 
             if( regs.h.al == 0x01 || regs.h.al == 0xFF )
-			{
+            {
                sprintf( szHost, " (Windows 2.x)" );
-			}
+            }
             else
-			{
+            {
                sprintf( szHost, " (Windows %d.%02d)", regs.h.al, regs.h.ah );
-			}
+            }
 
             strcat( szPlatform, szHost );
          }
@@ -468,9 +468,9 @@ char * hb_ppPlatform( void )
          HB_DOS_INT86( 0x21, &regs, &regs );
 
          if( regs.HB_XREGS.bx == 0x3205 )
-		 {
+         {
             strcat( szPlatform, " (Windows NT/2000)" );
-		 }
+         }
       }
 
       /* Host OS detection: OS/2 */
@@ -484,9 +484,13 @@ char * hb_ppPlatform( void )
             char szHost[ 128 ];
 
             if( regs.h.al == 20 && regs.h.ah > 20 )
+            {
                sprintf( szHost, " (OS/2 %d.%02d)", regs.h.ah / 10, regs.h.ah % 10 );
+            }
             else
+            {
                sprintf( szHost, " (OS/2 %d.%02d)", regs.h.al / 10, regs.h.ah );
+            }
 
             strcat( szPlatform, szHost );
          }
@@ -509,14 +513,14 @@ char * hb_ppPlatform( void )
             sprintf( szPlatform, "OS/2 %ld.%02ld", aulQSV[ QSV_VERSION_MAJOR - 1 ] / 10, aulQSV[ QSV_VERSION_MINOR - 1 ] );
          }
          else
-		 {
+         {
             sprintf( szPlatform, "OS/2 %2.2f", ( float ) aulQSV[ QSV_VERSION_MINOR - 1 ] / 10 );
-		 }
+         }
       }
       else
-	  {
+      {
          sprintf( szPlatform, "OS/2" );
-	  }
+      }
    }
 
 #elif defined(HB_OS_WIN_32)
@@ -535,38 +539,38 @@ char * hb_ppPlatform( void )
             case VER_PLATFORM_WIN32_WINDOWS:
 
                if( osVer.dwMajorVersion == 4 && osVer.dwMinorVersion < 10 )
-			   {
+               {
                   strcpy( szName, "Windows 95" );
-			   }
+               }
                else if( osVer.dwMajorVersion == 4 && osVer.dwMinorVersion == 10 )
-			   {
+               {
                   strcpy( szName, "Windows 98" );
-			   }
+               }
                else
-			   {
+               {
                   strcpy( szName,  "Windows ME" );
-			   }
+               }
 
                break;
 
             case VER_PLATFORM_WIN32_NT:
 
                if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 2 )
-			   {
+               {
                   strcpy( szName, "Windows Server 2003" );
-			   }
+               }
                else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 1 )
-			   {
+               {
                   strcpy( szName, "Windows XP" );
-			   }
+               }
                else if( osVer.dwMajorVersion == 5 )
-			   {
+               {
                   strcpy( szName, "Windows 2000" );
-			   }
+               }
                else
-			   {
+               {
                   strcpy( szName, "Windows NT" );
-			   }
+               }
 
                /* test for specific product on Windows NT 4.0 SP6 and later */
 
@@ -583,17 +587,17 @@ char * hb_ppPlatform( void )
                      if( osVerEx.wProductType == VER_NT_WORKSTATION )
                      {
                         if( osVerEx.dwMajorVersion == 4 )
-						{
+                        {
                            strcat( szName, " Workstation 4.0" );
-						}
+                        }
                         else if( osVerEx.wSuiteMask & VER_SUITE_PERSONAL )
-						{
+                        {
                            strcat( szName, " Home Edition" );
-						}
+                        }
                         else
-						{
+                        {
                            strcat( szName, " Professional" );
-						}
+                        }
                      }
 
                      /* server type */
@@ -603,49 +607,49 @@ char * hb_ppPlatform( void )
                         if( osVerEx.dwMajorVersion == 5 && osVerEx.dwMinorVersion == 2 )
                         {
                            if( osVerEx.wSuiteMask & VER_SUITE_DATACENTER )
-						   {
+                           {
                               strcat( szName, " Datacenter Edition" );
-						   }
+                           }
                            else if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
-						   {
+                           {
                               strcat( szName, " Enterprise Edition" );
-						   }
+                           }
                            else if( osVerEx.wSuiteMask == VER_SUITE_BLADE )
-						   {
+                           {
                               strcat( szName, " Web Edition" );
-						   }
+                           }
                            else
-						   {
+                           {
                               strcat( szName, " Standard Edition" );
-						   }
+                           }
                         }
 
                         else if( osVerEx.dwMajorVersion == 5 && osVerEx.dwMinorVersion == 0 )
                         {
                            if( osVerEx.wSuiteMask & VER_SUITE_DATACENTER )
-						   {
+                           {
                               strcat( szName, " Datacenter Server" );
-						   }
+                           }
                            else if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
-						   {
+                           {
                               strcat( szName, " Advanced Server" );
-						   }
+                           }
                            else
-						   {
+                           {
                               strcat( szName, " Server" );
-						   }
+                           }
                         }
 
                         else
                         {
                            if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
-						   {
+                           {
                               strcat( szName, " Server 4.0, Enterprise Edition" );
-						   }
+                           }
                            else
-						   {
+                           {
                               strcat( szName, " Server 4.0" );
-						   }
+                           }
                         }
                      }
                   }
@@ -681,9 +685,9 @@ char * hb_ppPlatform( void )
          }
       }
       else
-	  {
+      {
          sprintf( szPlatform, "Windows" );
-	  }
+      }
    }
 
 #elif defined(HB_OS_UNIX)
@@ -692,7 +696,6 @@ char * hb_ppPlatform( void )
       struct utsname un;
 
       uname( &un );
-
       sprintf( szPlatform, "%s %s", un.sysname, un.release );
    }
 
