@@ -1,0 +1,3877 @@
+/*
+ * $Id: ChangeLog,v 1.2283 2004/02/14 08:24:25 ronpinkas Exp $
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2004-02-14 00:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/thread.c
+    * Typo UNIT -> UINT
+    /* Andi, I'm surprised you used manual changes instead of S&R. */
+
+2004-02-14 08:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/common/hbfhnd.c
+  * source/common/reserved.c
+  * source/pp/ppcore.c
+  * source/vm/hvm.c
+  * source/vm/arrays.c
+  * source/vm/arrayshb.c
+  * source/vm/classes.c
+  * source/vm/eval.c
+  * source/vm/fastitem.c
+  * source/vm/fm.c
+  * source/vm/inet.c
+  * source/vm/runner.c
+  * source/vm/thread.c
+  * source/rtl/binnum.c
+  * source/rtl/cdpapi.c
+  * source/rtl/chrasc.c
+  * source/rtl/filesys.c
+  * source/rtl/fssize.c
+  * source/rtl/fstemp.c
+  * source/rtl/gtapi.c
+  * source/rtl/hbcomprs.c
+  * source/rtl/hbcrypt.c
+  * source/rtl/hbffind.c
+  * source/rtl/hbserv.c
+  * source/rtl/is.c
+  * source/rtl/philes.c
+  * source/rtl/regex.c
+  * source/rtl/set.c
+  * source/rtl/strcase.c
+  * source/rtl/tprinter.c
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtalleg/ssf.c
+  * source/rdd/dbfntx/dbfntx1.c
+    ! changes to using xHarbour typedefs:
+      unsigned char  -> BYTE
+      unsigned int   -> UINT
+      unsigned short -> USHORT
+      unsigned long  -> ULONG
+      and so the corresponding PTR typedef
+
+    /*
+    IMHO, we have to agree to one simple convention in xHarbour coding
+    practice, ie. always use typedefs as per xHarbour API.
+    */
+
+2004-02-13 16:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    + Added few missing initializations of asSymbol.uiSuperClass
+  * source/vm/proc.c
+    * Minor revision.
+
+2004-02-13 21:14 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  - xharbour/tests/gt_info.prg
+  + xharbour/tests/gtinfo.prg
+    * file renamed
+
+2004-02-13 19:24 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/achoice.prg
+    * Added mouse support: a click selects, dbl click emulates K_ENTER
+      and mousewheel goes pgup/down
+
+  * source/rtl/gtxvt/gtxvt.c
+    * Added support for mouse wheel
+      (As currently middle mouse button is a shortcut for fast paste, and
+       all X applications are invited to follow this behavior, I have not
+       yet implemented middle mouse button up/down).
+
+  * tests/ac_test.prg
+    * Added an inkey() at the end to allow results display in windowed GTs.
+
+2004-02-13 17:53 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/menuto.prg
+    * Temporary change of MENUTO mouse behavior; waiting for comments
+
+  * tests/menutest.prg
+    * Added mouse events; visual upgrade.
+
+  * include/inkey.ch
+    * Added bitfield event mask for middle mouse and mouse wheel
+
+2004-02-13 12:04 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rtl/round.c
+    * fixed hacked version of hb_numRound when argument is 0
+
+2004-02-13 16:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/proc.c
+    ! casting.
+
+  * source/rtl/gtgraph.c
+  * source/rtl/hbsrlraw.c
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtalleg/gtalleg.c
+    ! code clean-up ( mostly, consistent declaration of variable type to be
+      compared with passed parameter)
+
+    /*
+    I am sorry but the little thing is like the following sample.
+    It is known that every C compiler does automatically expand values upon
+    comparing but IMHO, an explicit type declaration is better (CMIIW).
+
+    void foo ( ULONG ulSize )
+    {
+       int ui; // int changed to ULONG
+       ......
+
+       if ( ulSize > ui )
+       .......
+    }
+    */
+
+2004-02-12 23:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbvmpub.h
+    + Added member uiSuperClass to struct hb_struSymbol
+  * source/vm/hvm.c
+    + Added initilazation of asSymbol.uiSuperClass in hb_vmPushSymbol()
+    + Added assignment of asSymbol.uiSuperClass in hb_vmSend() when Super Cast is used.
+
+  * source/vm/classes.c
+    % Minor optimization of hb___msgSuper()
+
+  * source/vm/proc.c
+    ! Fixed hb_procinfo() to correctly report Source Module and Class Name of objects.
+
+    /*
+       I belive we finally have fully correct reporting of the Object Context for every call,
+       as well as the correct source module.
+     */
+
+2004-02-13 00:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * include/hbexprc.c
+    % Optimize INCrement & DECrement operators if are using LOCAL vars.
+      Use HB_P_LOCALNEARADDINT instead of HB_P_INC o HB_P_DEC.
+
+2004-02-13 04:55 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/itemapi.c
+  * source/rtl/val.c
+    ! fixes to LONGLONG support for MSVC
+      (Many thanks to Przemek)
+
+2004-02-13 04:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rdd/dbcmd.c
+    ! fixes to DBUSEAREAD():
+      * codePageId did not processed (caused GPF with BCC)
+      * unreleased memory block when opening non-existent DBF
+
+    /*
+    BTW, what is this function supposed to serve for ?
+    */
+
+2004-02-13 02:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rdd/dbf1.c
+    ! fix unreleased memory block when creating a dbf while a file with
+      same filename is currently open.
+
+2004-02-12 20:20 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbdefs.h
+   * casting in LONGLONG declaration for compilers which don't
+     have their own definitions in limits.h
+
+2004-02-12 14:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * utils/hbtest/hbtest.prg
+  + utils/hbtest/rt_ccall.prg
+    ! Add some routines to test common interface.
+
+  * makefile.bc
+  * makefile.vc
+  * makefile.nt
+   ! add rt_ccall.prg file dependency
+
+2004-02-11 17:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.nt
+  * hrbdll.vc
+  * hrbdll.bc
+    + source/rtl/filestat.c
+
+2004-02-12 04:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/itemapi.c
+  * source/rtl/val.c
+    ! temporary solution for MSVC when LONGLONG is enabled.
+
+    /*
+    --- WARNING ---
+    This is a real hack for MSVC. xHarbour will process LONGLONG as double
+    when LONGLONG is enabled. Sufficient comments have been written to correct
+    the situation once a solution is found. The effect of this hacking should
+    not be noticable at PRG level. The result of hbtest.exe is a proof.
+    */
+
+2004-02-12 02:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/filestat.c
+    ! fix compilation for MSVC
+
+  * source/rtl/val.c
+    ! re-introduce fixes for MSVC to work properly without LONGLONG.
+      ( MSVC with LONGLONG is still a problem )
+
+2004-02-11 09:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed getExpReal() support for List Marker, when the input is a comma (implied NIL).
+
+2004-02-11 17:06 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * makefile.bc
+  * makefile.vc
+    + Added compilation of filestat.c (plz. someone check under VC)
+
+  * source/rtl/filestat.c
+    ! Fixed Windows and "unknown system" compilation
+    ! Declared INVALID_FILE_ATTRIBUTES if not present (BORLANDC
+      headers/free version lacks it).
+
+  * source/rtl/dateshb.c
+    ! TimeOfDay() Returns 00:00:00 if seconds == 0; check to see how
+      is done on hb_pcount() instead of hb_parni()
+
+2004-02-11 16:11 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/Makefile
+  + source/rtl/filestat.c
+    + Added function FileStats() that retrevies advanced statistics
+      from file AND directories:
+      FileStats( cName, [@cAttrib], [@nSize], [@dCreated], [@nTimeC],
+         [@dAccessed], [@nTimeA] ) --> lExists
+
+      cName: filename or directory specification, both relative or abs.
+      cAttrib: Character (clipper-like) attribute specification(*)
+      nSize: Size of file; LONGLONG if enabled in compilation
+      dCreated, nTimeC: Creation time, if available, or modifcation time.
+      dAccessed, nTimeA: Last Access time.
+      Times are in seconds from midnight.
+
+      /*
+         Waiting for timestamp variable...
+         (*) Uses a slightly different version of UNIX translated
+         attrchars. Added some character to get SYMLINKS, FIFO,
+         and the like.
+      */
+
+
+  * source/rtl/dateshb.c
+    + Added function TimeOfDay( [nSeconds] ): without parameter, it returns
+      exactly as Time(); with parameters, it formats the seconds as it
+      were passed into Time() function.
+
+  + tests/filestat.prg
+    + Added a test for filestats.
+
+2004-02-11 08:50 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+   * contrib/htmllib/edit.prg
+     contrib/htmllib/oframe.prg
+     contrib/htmllib/ohtm.prg
+     contrib/htmllib/include/default.ch
+     contrib/htmllib/include/html.ch
+     ! minor fix to some method on this classes since it was not matching the def on html.ch
+
+
+2004-02-11 02:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/vm/hvm.c
+    * hb_vmCalcDoubleWidth() to not use sprintf which is slow and
+      inefficient.
+    ! fixed default double num size calculation
+
+  * xharbour/source/vm/itemapi.c
+    * fixed LONGLONG support for MINGW32 MSVC and LCC
+
+  * xharbour/source/rtl/val.c
+    * reenabled LONGLONG support in VAL for MSVC
+
+  * xharbour/utils/hbtest/rt_math.prg
+    ! LONLONG_MIN is -9223372036854775808 not -9223372036854775807
+      To your knowledge: if this test doesn't fail then it means
+      that it's not LONGLONG number but double. Proper behavior for
+      LONGLONG should be:
+         !  968 MAIN_MATH(260)  val("9223372036854775807")
+                Result: 9223372036854775807
+              Expected: 9223372036854776000
+      We hacked in some places xHarbour libs for LONGLONG support
+      but compiler doesn't operates on LONGLONG but on DOUBLE.
+      It simply means that all number in source code never becomes
+      LONGLONG if they exceed double precision. Please try:
+         ? val( "9223372036854775807"),  9223372036854775807
+         ? val("-9223372036854775807"), -9223372036854775807
+         ? val("-9223372036854775808"), -9223372036854775808
+         ? val( "9223372036854775807") ==  9223372036854775807
+         ? val("-9223372036854775807") == -9223372036854775807
+         ? val("-9223372036854775808") == -9223372036854775808
+      The results should be differ.
+      It cause a lot of side effects. The worst ones can cause
+      strange incompatibilities with Clipper on shared access
+      to the same database when very big numbers are used.
+      It's totally out of programmer control. All Clipper logic
+      (reproduced in xHarbour) to round number to 15/16 significant
+      digits now fails.
+      I cannot say I like it. I cleaned what I could without big
+      revolution in compiler but now your move. I would like
+      to hear your opinion.
+
+2004-02-11 05:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * utils/hbtest/rt_str.prg
+    - remmed line 65. It is redundant with hb_math.prg line 341.
+
+  * source/rtl/val.c
+    * hack (!!) for MSVC pending elegant solution to overlow.
+
+2004-02-10 20:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/hbrandom.c
+  * source/rtl/gtgraph.c
+  * source/vm/hash.c
+  * source/vm/hvm.c
+    ! corrections when LONGLONG feature is disabled.
+
+  * contrib/libct/pack.c
+    ! castings
+
+2004-02-09 22:43 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Minor fix in truncmp()
+    * Reveresed logic in truncmp() (and callers) to return TRUE on success and FALSE on failure.
+    * Renamed truncmp() to MatchToken()
+
+2004-02-10 03:03 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/contrib/libct/pack.c
+    ! fixed casting for OpenWatcom compilation
+
+  * xharbour/source/rtl/val.c
+    ! fixed small incompatibilities with Clipper
+
+2004-02-09 16:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/itemapi.c
+    ! Fixed MSVC support in hb_itemStrBuf(). MSVC snprintf() returns -1 for overflow
+      instead of needed size.
+
+2004-02-09 22:27 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/vm/itemapi.c
+   * removed redundant code for infinit check. For all C compilers
+     we are using which support finite() or isinf()/isnan() we should
+     define proper HB_FINITE_DBL macro - it will be faster and will
+     recognize other "bad" double values. Now MSVC is not supported
+     and use old code
+
+2004-02-09 16:12 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/rtl/readline.c
+     ! HB_FREADLINE() now returns -1 if EOF is found
+     ! fixed hb_fsReadLine() buffer overrun
+     ! hb_fsReadLine() now returns a bEOF param
+
+2004-02-09 10:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/itemapi.c
+    * Corrected snprintf() support for MSVC
+
+2004-02-09 18:52 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/gtinfo.ch
+  * xharbour/source/rtl/gtcgi/gtcgi.c
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtdos/gtdos.c
+  * xharbour/source/rtl/gtpca/gtpca.c
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtstd/gtstd.c
+  * xharbour/source/rtl/gtwin/gtwin.c
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/rtl/gtxvt/gtxvt.c
+  * xharbour/source/rtl/gtxvt/gtxvt.h
+   + new GT_INFO params GTI_INPUTFD and GTI_OUTPUTFD
+
+  * xharbour/include/hbapi.h
+   * removed third parameters in hb_numRound
+
+  * xharbour/source/rtl/round.c
+   ! fixed some bugs introduced recently
+   * hb_numRound rewritten - it's based on Harbour version with small
+     hack to speed it up - it's about 4 times faster now.
+
+  * xharbour/include/hbapiitm.h
+  * xharbour/source/vm/itemapi.c
+   + new function hb_itemStrBuf, is similar to hb_itemStr but buffer has
+     to be allocated by caller. hb_itemStr internally call hb_itemStrBuf
+     !!! Important: I used snprintf() function to avoid allocating very
+     big buffer for number. snprintf should be supported by all compilers
+     we are using (it's ISO/IEC 9899:1999 standard) but if not then please
+     not change hb_itemStrBuf but simply write own version of snprintf
+
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+   * hb_itemStrBuf used instead of sprintf conversion. It's very important
+     to have the same conversion everywhere. It allows to remove all hacks
+     for -0.0 double and leave it only in hb_itemStrBuf and resolves some
+     other problems with different conversions for very big number when
+     str returns differ value then we store in database
+
+I would like to talk about numerical conversion on xHarbour devel when it
+will work, now it's like /dev/null for me. So if it's possible please
+only correct the bugs I might introduce but not add new extensions.
+
+2004-02-09 17:48 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/gx.c
+    ! OPS... I left in a little debug code ;-)
+
+2004-02-09 17:35 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/gx.c
+    ! Now returning always a STRING type, independently on the
+      parameters.
+
+  * source/rtl/gtxvt/gtxvt.c
+    ! gt_GetClipboardSize() was not updating X clipboard statius,
+      returning outdated data.
+
+2004-02-09 19:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/hbzlib/zipnew.cpp
+    * castings.
+
+  * source/compiler/hbfunchk.c
+  * source/rtl/str.c
+    * allow STR() to receive 4th parameter as Logical to ltrim returned value.
+      ( WARNING: This is an xHarbour extension )
+
+    /*
+    If 4th parameter is passed, the 2nd and 3rd will be ignored if not passed,
+    thus maintained Clipper error handling compatibility. The 4th parameter is
+    handy to replace quite frequently used phrase: LTrim( Str( nVal ) ). So,
+    instead of using Ltrim(Str(nVal)), users can used Str( nVal,,,.T. )
+    */
+
+2004-02-09 03:25 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/vm/extend.c
+  * include/hbapi.h
+    + New functions hb_retnint and hb_retnintlen
+  * source/rtl/round.c
+    % Optimized and corrected algorithm.
+      Thank you Andi for your test.
+  * source/rtl/val.c
+    % Optimized for integer values. Now is compatible with LONGLONG numbers.
+      Thank you Andi, too.
+
+2004-02-09 11:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * utils/hbtest/rt_array.prg
+    * change return value to xHarbour specific.
+      ( -> in xHarbour, Array( 1, 0, "A" ) is a valid expression )
+
+2004-02-09 09:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * utils/hbtest/rt_math.prg
+    + Add some math test on rounding and longlong values
+
+2004-02-09 00:20 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+  * contrib/hbzlib/zipnew.cpp
+    !fixed all unzip function. it was not respecting the directory to extract the files
+    Reported by Synvain Robert and Patrick Mast
+
+2004-02-08 07:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/round.c
+    ! change pow10( n ) to pow( 10, n ) for MSVC.
+
+2004-02-08 13:04 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/gtapi.c
+    ! removed extra chr(0) character when pasting shorter clipboard
+      on an already existing variable.
+   * source/rtl/gtstd/gtstd.c
+    + Added clipboard support (I just forgot to add them to this files),
+      removing dummy funcs from Andi (thanks for having pointed it out).
+
+2004-02-08 01:25 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * include\hbapi.h
+  * source\rdd\dbfntx\dbfntx1.c
+  * source\rdd\dbf1.c
+  * source\rtl\round.c
+  * source\vm|itemapi.c
+    ! Improvement in the algorithm of round.
+    ! INT() now return an integer number.
+    ! ROUND() now return an integer when nDec is equal o greather than 0.
+
+2004-02-08 04:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtnul/gtnul.c
+    * function prototype declaration for hb_gtFindNoNul()
+
+2004-02-08 03:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtstd/gtstd.c
+    + add dummy functions for clipboard thingies
+
+2004-02-08 03:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/harbour.c
+    * remove unused variable
+
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtwin/gtwin.c
+    * remmed unused variables
+
+  * source/rtl/gtapi.c
+    * void unused parameter
+
+2004-02-08 01:13 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/include/inkey.ch
+    + #define K_MBUTTONDOWN           1008   // Middle Button Down
+    + #define K_MBUTTONUP             1009   // Middle Button Up
+    + #define K_MDBLCLK               1010   // Middle Button Double Click
+    + #define K_MMLEFTDOWN            1011   // Mouse Move Left Down
+    + #define K_MMRIGHTDOWN           1012   // Mouse Move Right Down
+    + #define K_MMMIDDLEDOWN          1013   // Mouse Move Middle Down
+    + #define K_MWFORWARD             1014   // Mouse Wheel Forward
+    + #define K_MWBACKWARD            1015   // Mouse Wheel Backward
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    ! Updated to support above Inkey() constants.
+
+2004-02-02 11:00 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+  * contrib/tip/tipclient.prg
+    contrib/tip/tipclientsmtp.prg
+    ! minor fix to open methods
+
+2004-02-07 12:20 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rtl/gtcrs/Makefile
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+  * xharbour/source/rtl/gtcrs/chrmap.c
+  * xharbour/bin/hb-func.sh
+    * added support to older version of ncurses 1.94 (the same one used
+      by FlagShip)
+
+  * xharbour/source/rtl/gtapi.c
+  * xharbour/source/rtl/gtnul/gtnul.c
+    * fixed Clipboard function declaration
+
+Just small info about adding new functions into GT because all time
+I have to fix sth.
+1. HB_GT_FUNC() can be used only inside gt* driver
+2. add <newFunc> into HB_GT_FUNCS structure
+3. add function HB_GT_FUNC(gt_<newFunc>(...)) into GTNUL in dummy
+   or basic version.
+4. add wrapper for multi GT mode into GTNUL
+    [...] hb_gt_<newFunc>(...)
+    {
+	[return] GT_FUNCS.<newFunc>(...);
+    }
+5. Now it's safe to use hb_gt_<newFunc>(...) function in MULTI_GT mode
+   for all GT
+6. implement this function in other GT if you want,
+   if you will do that the function can be used in non MULTI_GT mode too.
+7. If you don't have enough time/knowlage/... to implement function
+   in all GT add upper level implementation which use hb_gt_<newFunc>(...)
+   into rtl/gtnul/gtext.c. It cause that this function will not be used
+   in single GT mode\ and you don't break anything.
+
+2004-02-07 00:21 UTC-0600 Vicente Guerra <vic@guerra.com.mx>
+  * source/rdd/dbf1.c
+    ! Now it's possible to open DBF files from Visual FoxPro 6 (only with
+      standard field types).
+
+2004-02-07 10:12 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/genc.c
+    ! minor correction on parsing static symbol name
+
+2004-02-06 19:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtwvt/gtwin.h
+    + Added OS clipboard support.
+
+  * source/rtl/gtapi.c
+  * source/rtl/gx.c
+    ! fixed some little overflows
+
+  * tests/clipbrd.prg
+    * Added some comment.
+
+2004-02-06 18:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  + tests/clipbrd.prg
+    + Added test for clipboard functions
+
+2004-02-06 18:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  M include/hbapigt.h
+  M source/rtl/gtapi.c
+  M source/rtl/gx.c
+    + Added gt driver HB_GT_FUNC():
+      extern void HB_EXPORT hb_gt_GetClipboard( char *szData, ULONG *pulMaxSize );
+      extern void HB_EXPORT hb_gt_SetClipboard( char *szData, ULONG ulSize );
+      extern ULONG HB_EXPORT hb_gt_GetClipboardSize( void );
+      (already updated MULTI_GT table).
+
+    + Added C interfaces for above functions:
+      extern void HB_EXPORT hb_gtGetClipboard( char *szData, ULONG *pulMaxSize );
+      extern void HB_EXPORT hb_gtSetClipboard( char *szData, ULONG ulSize );
+      extern ULONG HB_EXPORT hb_gtGetClipboardSize( void );
+      extern void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize );
+
+    + They have following prg interfaces:
+      GTSETCLIPBOARD( cData )
+      GTGETCLIPBOARD( [cData] ) --> cData
+      GTGETCLIPBOARDSIZE() --> nSize
+      GTPASTECLIPBOARD()
+
+    * source/rtl/gt_tpl/gt_tpl.c
+    * source/rtl/gtalleg/gtalleg.c
+    * source/rtl/gtcgi/gtcgi.c
+    * source/rtl/gtcrs/gtcrs.c
+    * source/rtl/gtdos/gtdos.c
+    * source/rtl/gtnul/gtnul.c
+    * source/rtl/gtos2/gtos2.c
+    * source/rtl/gtpca/gtpca.c
+    * source/rtl/gtsln/gtsln.c
+      + Added support for internal clipboard.
+      (not tested but should not give any problem).
+
+    * source/rtl/gtxvt/gtxvt.c
+    * source/rtl/gtxvt/gtxvt.h
+      + Added support for X clipboard, in writingm, reading and pushing
+        from X/clients (support for X middle mouse button paste).
+      + Added support for synchronous InterProcess communication (will be used
+        later for some nasty thing I have to finish)
+      ! Fixed CTRL + C and other lower CTRL + "X" keystores.
+
+2004-02-06 19:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/genc.c
+    ! minor correction to previous changes ( trim right static function
+      symbol name )
+
+  * tests/xhbenc.prg
+    ! minor modifications to show time elapsed.
+
+2004-02-06 00:25 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/gtalleg.c
+    ! Fixed gt_Scroll() bug not properly clearing disp rows/cols
+
+2004-02-05 19:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * contrib/winprn/tprint.prg
+     ! change 'static HB_FUNC' construct to 'HB_FUNC_STATIC'
+
+   * source/vm/hvm.c
+     ! remove first parameter of hb_vmStaticName() as it is not used
+
+   * include/hbcomp.h
+   * source/compiler/harbour.c
+   * source/compiler/gencobj.c
+     ! remove third parameter of hb_compGenCCode() and hb_compGenCObj()
+
+   * source/compiler/gen.c
+     ! fix generation of functions protos if there are C-IN-LINE codes
+       in a PRG program body.
+
+    /*
+     This fix sample per below:
+
+     / --
+     |  proc main()
+     |  foo1()
+     |  foo2()
+     |  foo3()
+     |
+     |  #PRAGMA BEGINDUMP
+     |  HB_FUNC_STATIC( FOO1 ){}
+     |  HB_FUNC_STATIC( FOO2 ){}
+     |  HB_FUNC_STATIC( FOO3 ){}
+     |  #PRAGMA ENDDUMP
+     \ --
+
+    Previously, xHarbour generates static function protos as externs while they
+    should actually be statics. This is wrong (inconsistent declaration as per
+    function body) and is not always acceptable to all C compilers.
+    Open Watcom is one of those.
+
+    IMPORTANT NOTE:
+    Declaration of static C functions in a PRG program body should always use
+    xHarbour macros ie. HB_FUNC_STATIC. Use of 'static HB_FUNC' should be
+    discouraged.
+   */
+
+2004-02-04 13:28 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtwin/gtwin.c
+    ! Commented out the following lines in IgnoreKeyCodes:
+      case 40: /* Circle Accent */
+      case 41: /* Tick Accent */
+      In Italian keyboards the correspond to # and ù; other international
+      keyboards may have other meaningful characters there as well.
+
+      /* I don't know why you wished to ingore those chars, but anything
+         you wanted to do MUST be done in a different way.
+      */
+
+2004-02-05 00:03 UTC-0600 Vicente Guerra <vic@guerra.com.mx>
+  * makefile.bc
+    ! $(CFLAGS) was overwritten when hbrunmt.exe is created.
+
+2004-02-04 20:00 UTC-0300 Walter Negro
+  * source/rtl/scrollbr.prg
+    ! Fix 4th parameter is optional.
+
+2004-02-04 09:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  - contrib/hbzlib/zipcollections.cpp
+  - contrib/hbzlib/zipinternalinfo.cpp
+  * contrib/hbzlib/makefile.vc
+    - Removed files not included in latest Ziparchive sources.
+
+2004-02-03 19:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    - Removed redundant logic related to item.asBlock.value->pSelfBase
+
+  /* This appears to fix a GPF trap which occasionaly triggered at some FWH apps. */
+
+2004-02-03 17:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/win32ole.prg
+    ! Fixed GPF trap in DblToDate()
+
+2004-02-04 08:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * source/rdd/dbcmd.c
+     ! overlooked to remove hb_xfree( szFileName ) on function DBUSEAREA()
+
+2004-02-04 08:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * source/rdd/dbf1.c
+   * source/rdd/dbcmd.c
+     ! corrections to avoid possibility of GPF because hb_xfree() tries to
+       release pOpenInfo->abName.
+
+2004-02-03 14:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbgtwvt.h
+    * Rearranged headers inclusion.
+
+  * source/rtl/gtwvt/gtwvt.c
+    * Corrected few NULL to 0 and removed unused variable.
+
+2004-02-04 03:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/debug.c
+    + add wrappers for :
+      __VMSTKGLIST()
+      __VMSTKGCOUNT()
+
+2004-02-03 19:50 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   ! fix for duplicating trailing spaces in keys. It was possible to make
+     a situation where key was stored with trailing space in duplicate
+     part and even overwrite key buffer
+
+  * xharbour/source/vm/fm.c
+   * redundant initialization of static variables in hb_xinit() which
+      cause problem when memory was allocated in C init procedures removed
+
+  - xharbour/tests/ERRSYSW.prg
+  + xharbour/tests/errsysw.prg
+  - xharbour/tests/InitRun.prg
+  + xharbour/tests/initrun.prg
+  - xharbour/tests/wvtgui.PRG
+  + xharbour/tests/wvtgui.prg
+   * upper letters in filenames changed to lower
+
+2004-02-03 10:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/gtnul/gtnul.c
+    * Added missing return value to hb_gt_info()
+
+  * tests/pp.prg
+    * Version RC5
+
+2004-02-03 13:10 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/gtalleg.c
+    ! Fixed typos
+
+2004-02-03 21:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_ChooseColor( nRGBInit, aRGB16, nFlags )
+    + Wvt_ChooseFont( cFontName, nHeight, nWidth, nWeight, nQuality, lItalic, lUnderline, lStrikeOut )
+    + Wvt_SetMousePos( nRow, nCol )
+      Forces the mouse pointer to rest at the nRow, nCol, in the mid of top and bottom of nRow.
+
+  * xharbour/include/hbgtwvt.h
+    + #include <commdlg.h>
+
+  * xhatbour/tests/wvtgui.prg
+    * Updated to demonstrate above functions.
+
+2004-02-03 15:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   * small debug info added
+
+  * xharbour/source/rtl/gtnul/gtnul.c
+   + hb_gt_info() added to GTNUL. Now there is no necessary to implement
+     gt_info in each GT
+
+  * xharbour/source/rtl/Makefile
+   * TAB to SPACE conversion
+
+  * xharbour/source/rtl/gtalleg/gtalleg.c
+   ! fixes for non C99 compilers (eg. GCC 2.9x in default mode)
+
+  * xharbour/source/rtl/gtcrs/chrmap.c
+   * s_szDefaultCharMapFile changed to global
+
+  * xharbour/config/linux/gcc.cf
+  * xharbour/config/linux/global.cf
+   * small changes for GTALLEG
+
+2004-02-03 18:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/tbrowse.prg
+    - Removed Method _ForceStable() and merged the code.
+    * Optinimized ::DispCell() to display respecting oColumn:width.
+    * ::HitTest() now returns correct column and row position as per Clipper 5.3b.
+
+2004-02-03 13:33 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    ! gtxvt now grabs (passively) the keyboard.
+      This means that it takes precedence over Window Manager
+      keyboard mapping. The net effect of this is that CTRL colors
+      works under KDE and other heavy window managers.
+
+2004-02-02 22:40 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+ * source/rtl/filesys.c
+   ! functions hb_fsMkdir()/hb_fsRmdir()/hb_fsChdir() was returning wrong
+     error codes on windows if operation was not sucessffuly
+
+2004-02-02 16:44 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * bin/bld.bat
+    * Include hbzip.lib in MSVC libs list only if exists.
+
+  * include/hbinit.h
+    ! Fixed MSVC HB_INIT_SYMBOLS_END macro to return 0 (MSVC 7 compatability).
+
+  * source/rtl/win32ole.prg
+    * Minor optimization
+
+2004-02-02 11:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapigt.h
+    + Added missing HB_EXPORT to hb_gt_hasChanged()
+
+2004-02-02 16:49 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * /contrib/winprn/Makefile
+     * added make gnu Makefile
+  * /contrib/winprn/makefile.b32
+     * renamed old makefile into makefile.b32
+
+2004-02-02 15:36 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+   * source/rtl/gtalleg/gtalleg.c
+     * fix a typo iParm should be iParam
+
+2004-02-02 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * tests/videotst.prg
+    ! fix typo : SET GTMODE INLINE => SET GTMODE TO INLINE
+
+  * tests/xhbwav.prg
+  * tests/xhbmidi.prg
+    ! fixes on return values and some simplification
+
+  + tests/sample.wav
+  + tests/xhbwav.prg
+    ! Sample program to play wav file with gtalleg
+
+  + tests/sample.pcx
+  + tests/xhbpic.prg
+    ! Sample program to view graphic files with gtalleg while playing sound
+
+  + tests/xhbenc.prg
+    + test program for file encoding
+
+  + contrib/unicode/hbencode.c
+    + added the following file encoding functions:
+      + UUENCODE_FILE()
+      + UUENCODE_FILE_BY_CHUNK()
+      + B64ENCODE_FILE()
+      + B64ENCODE_FILE_BY_CHUNK()
+      + YYENCODE_FILE()
+      + YYENCODE_FILE_BY_CHUNK()
+
+  * contrib/unicode/make_b32.bat
+  * contrib/unicode/makefile.bc
+  * contrib/unicode/makefile.vc
+    + add hbencode.obj file dependency
+
+  * contrib/unicode/hbc7.c
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcrc16.c
+  * contrib/unicode/hbcrc32.c
+  * contrib/unicode/hbcrpt32.c
+  * contrib/unicode/hbcrpt128.c
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbcy.c
+  * contrib/unicode/hbhex.c
+    ! source code re-formatting
+
+
+2004-02-02 00:39 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtalleg/gtalleg.c
+  * source/rtl/gtcgi/gtcgi.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtdos/gtdos.c
+  * source/rtl/gtnul/gtnul.c
+  * source/rtl/gtos2/gtos2.c
+  * source/rtl/gtpca/gtpca.c
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtstd/gtstd.c
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtxvt/gtxvt.c
+    ! Added gt_info implementation to all the gts. (currently they all return
+      that the GT is uncapable to do graphic. Expert of single GTs are invited
+      to update them).
+
+  * tests/gt_info.prg
+    ! GTInfo() ALWAYS returns an integer; the check GTInfo(GTI_ISGRAPHIC) == .T.
+      is not valid, as it returns 0 for nongraphic screens and 1 for graphic screens.
+      In future, value greater than 1 may indicate particular graphic abilities.
+
+2004-02-02 00:07 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+   * include/hbapigt.h
+   * source/rtl/gtapi.c
+   * source/rtl/gx.c
+   * source/rtl/gtalleg/gtalleg.c
+     * GTInfo() is now in gx.c, and calls the C frontend hb_gt_info(..) in
+       gtapi.c; hb_multigt has been updated accordingly;
+       gtalleg.c has an implementation of HB_GT_FUNC( gt_info );
+     * Added "info" filed to the HB_MULTI_GT strucutre. Currently only GT
+       alleg has implemented it, so a call on GTInfo() under another GT will
+       cause immediate GPF.
+     * Work in progress to add event driven GT interface (removing termination
+         handlers and the like).
+
+   * source/vm/thread.c
+     * Minor formatting.
+
+2004-02-01 17:50 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/gtalleg.c
+    ! Screen Width/Height/Depth query prior to gt initialization now return correct values
+
+2004-02-02 01:55 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/libct/files.c
+    ! Fixed SetFDaTi() to work similarly to the original.
+  + contrib/libct/pack.c
+    + Implemented CharPack() and CharUnpack() (only the RLE method for now).
+  * contrib/libct/Makefile
+    + Added pack.c.
+  + contrib/libct/tests/pack.prg
+    + A test for CharPack() and CharUnpack().
+  + contrib/libct/tests/fdati.prg
+    + A test for FileDate(), FileTime() and SetFDaTi().
+  * contrib/libct/tests/Makefile
+    + Added fdati.prg and pack.prg.
+
+2004-02-01 17:38 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.nt
+  * makefile.vc
+    * corrected to compile gtalleg if HB_GTALLEG is set
+
+2004-02-01 17:50 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/gtalleg.c
+    ! Screen Width/Height/Depth query prior to gt initialization now return correct values
+
+2004-02-01 19:36 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * doc/thread.txt
+    ! updated documentation
+
+2004-02-01 12:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * contrib/libct/dattime3.prg
+    * formatting, tabs, slight logical reordering
+
+2004-02-01 12:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * contrib/libct/disk.c
+    - tabs
+    * casts
+  * contrib/libct/settime.c
+    * call parnl instead of parnd in waitperiod
+  * contrib/libct/makefile.vc
+  * contrib/libct/makefile.bc
+    * reordered
+  * contrib/libct/util.prg
+    * correct typo
+
+2004-02-01 09:40 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
+  + contrib/libct/settime.c
+  + contrib/libct/diskutil.prg
+  + contrib/libct/util.prg
+  + contrib/libct/disk.c
+  + contrib/libct/dattime3.prg
+    Added new files that add support for to functions on libct
+    DeleteFile(),DirMake(),DirName(),DriveType(),FileMove(),DiskFormat(),
+    DiskFree(),DiskReady(),DiskReadyW(),DiskTotal(),DiskUsed(),FileValid(),
+    FloppyType(),RenameFile(),SetDate(),SetTime(),ShowTime(),TimeValid(),
+    WaitPeriod(),Default(),IsDir(),Occurs(),WhatWin()
+    All function come with Docs
+    Original functions that was in .c files was using only winapi. where
+    possible, the functions was changes to use xharbour hbapifs, so it can become
+    multi platform functions
+  * contrib/libct/Makefile*
+    ! all makefiles updated
+  * contrib/rcc_ads/doc/en/adsfuncs.txt
+    ! Fixed problem on file processing by hbdoc
+  + doc/gendoc.bat
+    !new .bat to generate docs
+  * doc/xharbour.rsp
+    ! added the new files from libct to process
+
+
+
+2004-01-31 21:25 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  + include/gtinfo.ch
+    + Added following helper constants:
+      GTI_ISGRAPHIC     - Query only
+      GTI_SCREENWIDTH   - Query/Set
+      GTI_SCREENHEIGHT  - Query/Set
+      GTI_SCREENDEPTH   - Query/Set
+      GTI_FONTSIZE      - Query/Set
+      GTI_FONTWIDTH     - Query/Set
+      GTI_DESKTOPWIDTH  - Query only
+      GTI_DESKTOPHEIGHT - Query only
+      GTI_DESKTOPDEPTH  - Query only
+  * include/Makefile
+    + Added gtinfo.ch to PRG_HEADERS
+  * source/rtl/gtalleg/gtalleg.c
+    + New PRG level GTInfo() function to query/set gfx gt info
+    ! Reverted change to defaulting 16 bpp under DOS & Linux FB
+  * source/rtl/gtalleg/ssf.h
+    * Changed ssfFrame.thickdir to unsigned char
+  + tests/gt_info.prg
+    + New test to show GTInfo() usage
+
+2004-01-31 22:15 UTC+0200 Tommi Rouvali <tommi@rouvali.com>
+  * source/rtl/hbserial.prg
+  * source/rtl/hbsrlraw.c
+    * RPC object serialization now uses HBPersistent class methods, if object inherits from it.
+
+2004-01-31 00:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/cstr.prg
+    * Minor correction to ValToPrgExp() for Objects.
+
+  * source/rtl/objfunc.prg
+    * Changed default Scope in __ObjGetValueDiff() to HB_OO_CLSTP_EXPORTED + HB_OO_CLSTP_PUBLISHED
+
+2004-01-31 09:00 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/debug/debugger.prg
+    ! Fixed some typos from my previous commits.
+    ! Merged in the latest Harbour debugger fixes by Ryszard Glab.
+
+2004-01-30 23:50 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * tests/xhbmidi.prg
+  * tests/xhbwav.prg
+    ! Fixed to run under Allegro 5.x api
+
+2004-01-31 07:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  + tests/sample.mid
+  + tests/xhbmidi.prg
+    ! Sample program to play midi file with gtalleg
+
+2004-01-30 15:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Uncommented call to hb_vmSymbolInit_RT() - this call is important to maintain Cllipper compatibility
+      since function refernced by Indedx Files may not be explictly specified in executable.
+
+2004-01-30 10:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+    + Added logic to reset HB_OO_CLSTP_PUBLISHED for the assignment twin property ('_' ) in HB_FUNC( __CLSADDMSG )
+    + Added support for HB_OO_CLSTP_PUBLISHED scope in HB_FUNC( __CLSGETPROPERTIESANDVALUES )
+
+    /*
+       I recommend that we discourage the usage of PERSISTENT Flag, in favour of the PUBLISHED scope which provides
+       same functionality but in a more elegant fashion.
+    */
+
+2004-01-30 13:55 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/ssf.h
+  * source/rtl/gtalleg/gtalleg.c
+    ! Don't try X Windows modes if Allegro was compiled only for FB use
+
+2004-01-30 16:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * source/rdd/dbf1.c
+   * source/rdd/dbcmd.c
+     ! fix to some memory leaks when:
+       % opening a dbf with same alias
+       % opening a dbf which does not exist
+       % opening a dbf with memo but no DBT/FPT found
+       % opening a corrupted dbf
+
+2004-01-30 03:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.nt
+  * makefile.vc
+    * build source\rtl\gtalleg if HB_GTALLEG is defined.
+
+2004-01-29 23:20 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/gtalleg.c
+    * Try 16 bit modes first, then 8 bit under DOS & Linux FB
+  * makefile.bc
+    + Added conditional gtalleg compilation
+
+2004-01-30 03:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_rpm.sh
+  * xharbour/xharbour.spec
+    * auto detect allegro-devel installed and build gtalleg
+    + new switch '--with allegro' to force allegro building
+      when allegro-devel not installed from RPM
+
+  * xharbour/bin/hb-func.sh
+    * buily gtalleg as static lib only to not force linking with
+      allegro libs. If user wants to use allegro in his apps he has
+      to use -gtalleg swich in xhb* scripts or add to his prg sources:
+      REQUEST HB_GT_ALLEG
+
+  * xharbour/source/rtl/gtalleg/gtalleg.c
+    * _mangled_main added to allow linking with shared allegro libs
+
+2004-01-30 07:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/debug.c
+    + add wrappers (some 3rd-party-libs still use these ones) for :
+      __VMSTKLCOUNT()
+      __VMPARLLIST()
+      __VMSTKLLIST()
+      __VMVARLGET()
+      __VMVARLSET()
+
+2004-01-30 00:25 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/hbi18n.c
+  * source/compiler/harbour.c
+    ! Default International language name was not correctly saved into the HIL
+      table.
+
+  * source/rtl/teditor.prg
+    ! Wraping when space was hit was done even if wordwrapping was off (and
+      Wrap column was set to 0, causing soft newlines everywhere).
+
+2004-01-30 05:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/hvm.c
+    + add wrappers (some 3rd-party-libs still use these ones) for :
+      __VMVARSLIST()
+      __VMVARSLEN()
+      __VMVARSGET()
+      __VMVARSSET()
+
+2004-01-30 04:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtalleg/gtalleg.c
+  * source/rtl/gtalleg/ssf.c
+    ! code formatting.
+
+  + source/rtl/gtalleg/makefile.bc
+  + source/rtl/gtalleg/makefile.vc
+  + source/rtl/gtalleg/make_b32.bat
+  + source/rtl/gtalleg/make_vc.bat
+    ! makefiles for gtalleg.lib
+
+2004-01-29 15:30 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
+  *contrib/libct/ctwin.prg
+   ! fixed problem on achoice method
+
+2004-01-29 17:40 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * doc/en/hvm.txt
+    * Updated HB_DBG_* function names.
+  * source/debug/debugger.prg
+    ! Fixed codeblock tracing (thanks to Lorenzo Fiorini)
+
+2004-01-29 17:25 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  + Merged in the remaining Harbour debugger updates by Ryszard Glab:
+  * source/debug/dbgmenu.prg
+  * source/debug/dbgtmenu.prg
+  * source/debug/dbgtmitm.prg
+  * source/debug/dbgtwin.prg
+  * source/debug/debugger.prg
+  * source/debug/tbrwtext.prg
+    + Added Tracepoints support.
+    + Added Watchpoints support.
+    + Added support for Codeblock trace.
+    + Added support for Preprocessed code.
+    + Added monitoring of local variables used in a codeblock.
+    ! Local variables are displyed correctly while browsing the callstack.
+    ! Static variables are now displayed only for the current file.
+    ! Fixed TRACE command.
+    ! Other minor fixes to make the debugger usable.
+  * include/hbextern.ch
+  * source/vm/debug.c
+  * source/vm/hvm.c
+    * Renamed __VM* functions to HB_DBG_VM*; fixed support for local
+      variables inside codeblocks; added item dereferencing to
+      HB_DBG_VMVARLGET() and HB_DBG_VMVARLSET().
+    + Added hb_dbg_ProcLevel() which returns the size of procedure stack
+      calls.
+    ! Fixed hb_vmStaticName(), hb_dbg_vmVarSGet(), hb_dbg_varSSet() to use
+      the static variables frame.
+  * tests/debugtst.prg
+  * tests/funcarr.prg
+  * tests/inherit.prg
+  * tests/objarr.prg
+  * tests/objasign.prg
+    * Updated the names of HB_DBG_* functions.
+
+2004-01-29 18:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtalleg/gtalleg.c
+    ! fixed memory leak.
+
+2004-01-28 15:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbclass.ch
+    * Minor fix to :super: support when class definition folowed by OOP code.
+
+2004-01-29 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/tget.prg
+    ! Fixed bug in get class when using "@9" picture with strings
+      Credits to: Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+
+2004-01-29 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtalleg/gtalleg.c
+    * castings for MSVC
+    * function prototype void hb_gt_DoCursor( void ) to please BCC
+
+2004-01-28 23:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/w32/bcc32.cf
+   * fixes for GNU make compilation
+
+  * xharbour/source/rtl/cdpapi.c
+  * xharbour/include/hbapicdp.h
+   * set poper unicode table for "EN" CDP
+
+2004-01-28 17:40 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbset.h
+  * include/set.ch
+  * source/pp/pptable.c
+  * source/rtl/set.c
+    + Added support for SET GTMODE TO DETACHED|INLINE
+      (also with Set( _HB_SET_GTMODE, "..." )
+      Defaults to detached (hb_set.HB_SET_GTMODE == 1 )
+
+  *source/rtl/gtxvt/gtxvt.c
+    ! Now GT MODE can be inline (single process) or detached
+      (dobule process). Inline process screen refresh is updated
+      when there are screen updates or inkey() polls.
+
+  * tests/videotst.prg
+  * tests/vidtest.prg
+  * tests/regextest.prg
+    * Testing using SET GtMode ...
+
+
+2004-01-28 13:10 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+  * utils/hbmake/hbmake.prg
+    ! minor fix
+
+2004-01-28 15:40 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbrdddbf.h
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * default locking scheme for VFP changed to make it compatible with
+      Clipper (cl52 and cl53+cdxlock.obj) for DBF without structural
+      index files
+
+  * xharbour/source/rtl/cdpapi.c
+    * temporary commented out redundant if statement there are unnecessary
+      for u16
+
+  + xharbour/contrib/unicode/cst/vendor/misc/pl-maz.txt
+    + unicode table for Polish Mazovia charset
+
+2004-01-28 10:30 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/compiler/harbour.c
+    ! Don't use HB_P_BASELINE/HB_P_LINEOFFSET optimizations inside codeblocks
+      because hb_comp_ulLastLinePos is not valid there.
+    ! Fixed generation of pcode in codeblocks with no local variables or
+      parameters (merged in from Harbour, by Ryszard Glab).
+    + Generate module name inside '(_INITSTATICS)' function if -b option
+      is used (merged in from Harbour, by Ryszard Glab).
+
+2004-01-28 14:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/harbour.c
+    * fix typo "intenrational" -> "international"
+
+  * source/compiler/hbusage.c
+    * fix long outstanding fatal bug in "Credit" section by adding the
+      following ppls:
+        Andi Jahja <xharbour@cbn.net.id>
+        Antonio Carlos Pantaglione <toninho@fwi.com.br>
+        Charles Kwon <Charles@fivetech.net>
+        Francesco Saverio Giudice <info@fsgiudice.com>
+        Giancarlo Niccolai <gc@niccolai.ws>
+        Lorenzo Fiorini <lorenzo_fiorini@tin.it>
+        Marcelo Lombardo <lombardo@uol.com.br>
+        Mauricio Abre <maurifull@datafull.com>
+        Peter Rees <peter@rees.co.nz>
+        Phil Krylov <phil@newstar.rinet.ru>
+        Przemyslaw Czerpak <druzus@polbox.com>
+        Pritpal Bedi <pritpal@vouchcac.com>
+        Tommi Rouvali <tommi@rouvali.com>
+
+2004-01-28 1:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/ssf.h
+    + Added defines to allow gtalleg & ssf to be compiled under 4.x Allegro branches
+  * source/rtl/gtalleg/ssf.c
+    + Added function to render strings
+  * source/rtl/gtalleg/fixedth.sfc
+    + Double box chars redirected to single ones by now, so apps don't miss their boxes (mixed boxed chars still does nothing)
+  * source/rtl/gtalleg/gtalleg.c
+    % Some speed improvements, mainly with static text
+    + Added support for recently introduced 'graphics objects' by Gian
+    ! Some fixes for mouse and keyboard events
+  * xharbour.spec
+  * config/linux/global.cf
+  * config/linux/gcc.cf
+  * bin/pack_src.sh
+  * bin/hb-func.sh
+    + Added gtAlleg compilation for Linux :)
+
+2004-01-27 17:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed md_strAt() to match a search for '['
+
+2004-01-28 04:45:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/files.c
+    ! castings
+
+2004-01-27 19:35 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
+  * source/vm/itemapi.c
+    ! fixes to hb_itemStr and  hb_itemString (mask for sprintf I64d on linux
+     give  functions like directory return an ******* insted of numeric)
+
+2004-01-28 10:20 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/file.c
+    * hb_fsFile() update to fail on Win32 for a directory. Fixes FILE()
+    * hb_fsIsDirectory() update to correctly report Win32 directory if
+      last character of *pFilename == '\'
+  * /source/rtl/hbffind.c
+    * hb_fsFindFirst() for Win32. Update to be Clipper compatible when
+      last character of *pszFileName == '\'. Clipper appears to add "*.*"
+      This change fixes DIRECTORY()
+
+      ( Note: These change MAY be required for DOS, OS2, UNIX & MAC )
+
+2004-01-27 09:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Moved Done label in hb_vmExecute() below line restoring Private Base, becuase CodeBlocks do not affect Private Base.
+
+2004-01-27 18:15 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/compiler/harbour.c
+    * Fixed a memory leak introduced by recent changes. Thanks to Andi Jahja.
+
+2004-01-27 14:50 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+    * fixed generation of line number's pcode related to the debugger
+      (merged in from Harbour, by Ryszard Glab)
+  * source/debug/dbgmenu.prg
+  * source/debug/debugger.prg
+    * added support for "Run to cursor" command; minor fixes in
+      breakpoints handling (some code lines are not allowed to set a
+      breakpoint and run to cursor)
+      (merged in from Harbour, by Ryszard Glab)
+
+2004-01-27 13:00 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  + include/hbdebug.ch
+  * include/hbcomp.h
+  * include/hbexprb.c
+  * source/compiler/exproptb.c
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbfix.c
+  * source/debug/debugger.prg
+  * source/macro/macrob.c
+  * source/vm/hvm.c
+    * Merged in a part of recent updates to Harbour by Ryszard Glab:
+      * generate correct pcode with static variable name when debug info
+        is requested (previously did not work with -gc0).
+      * the pcode of a codeblock contains the module name (in debug mode).
+      * changed the parameters of __dbgEntry() to make it more flexible.
+      * fixed monitoring of local and static variables in debugger
+      * when a codeblock is evaluated debugger shows the code where the
+        codeblock was created
+  * source/vm/fm.c
+    * Fixed a typo.
+
+2004-01-26 20:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * hrbdll.vc
+    - Commented out uc437.c ( hb_uniTbl_437 already defined in cdpapi.c )
+      /* Not sure what is the desirable fix, or why the redundancy. */
+
+2004-01-26 20:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+    * Fixed typo to recent optimization of __CLS_PARAM()
+
+2004-01-27 04:39 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * hrbdll.bc
+    * fixed build, missed to update a section.
+
+2004-01-27 04:19 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  + tests/tbrowse.prg
+  + tests/tbcolumn.prg
+  + tests/tstbrwdb.prg
+    New Tbrowse class
+
+    /*
+    I've completly rewrote from scratch the TBrowse class, it is based on Virtual Screen
+    as reported from Hannes Ziegler in his TBMORE.TXT (thanks to him and to Andi for the suggest)
+    but it is NOT binary compatible for choice, because i've adopted the xHarbour enhancements.
+    It's a work in progress !
+    There are a lot of fixes that i have to do.
+    Actually are not implemented some functionality like colors and panning.
+    To test it you can do:
+
+    bldtest tstbrwdb tbrowse tbcolumn  (to test the new tbrowse)
+    or
+    bldtest tstbrwdb                   (to test with the current tbrowse)
+
+    I hope you like it.
+    Francesco
+    */
+
+2004-01-26 19:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapigt.h
+  * source/rtl/gtapi.c
+    * Corrected HB_EXPORT qualifier to precede complex type in function declarations/definitions
+
+2004-01-26 18:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/dynsym.c
+  * include/thread.h
+  * include/hbapi.h
+    -+ Moved definition of DYNHB_ITEM to hbapi
+
+  * include/hbapi.h
+  * source/vm/dynsym.c
+    + HB_EXPORT PDYNHB_ITEM hb_dynsymItems( void );
+    + HB_EXPORT USHORT    * hb_dynsymCount( void );
+
+  * source/rtl/terror.prg
+    + Added logic to intercept and stop recusrive errors.
+
+  * source/vm/classes.c
+    % Optimized __CLS_PARAM()
+
+  * source/rtl/inkey.c
+  * source/rtl/set.c
+  * source/vm/dynsym.c
+  * source/vm/errorapi.c
+  * source/vm/fm.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+    * Revised Init/Exit rutines to allow multiple sets of hb_vmInit()/hb_vmQuit()
+
+  * tests/pp.prg
+  * tests/pp_harb.ch
+    * Minor revision.
+
+2004-01-27 03:54 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  ! tests/tbrowse.prg -> tbrowse_old.prg
+    Renamed tbrowse.prg to make space for the new tbrowse
+
+2004-01-26 22:40 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * makefile.bc
+  * makefile.vc
+  * makefile.nt
+  * hrbdll.bc
+  * hrbdll.vc
+    * updated to compile new codepage files added from Przemyslaw
+
+    /* I've tested BCC version. Please check other files */
+
+2004-01-26 16:30 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/dbedit.prg
+    ! Better approach for the bug causing DbEdit() to quit inmediatly if
+      LastKey() is K_ESC or K_ENTER
+
+2004-01-26 19:40 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed bug when user codeblock/macro in one of index expresions
+      call lastrec() (or any other functions which reposition seek file
+      offset on DBF file handle)
+    ! fixed bug when indexing with BDF with index relation active
+
+2004-01-26 17:10 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbdefs.h
+   * fixed my typo and redefining [U]LONGLONG_* if they allready exist
+     (OpenWatcom)
+
+2004-01-26 15:56 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbdefs.h
+    + added [U]LLONG_MAX/MIN support for older GCC version or compilation
+      without g99 flag
+
+  * xharbour/config/linux/gcc.cf
+    - removed g99 flag - I have nothing against GNU99 standard but this
+      flag allows to use some extensions which can make a trouble with
+      porting to other system/compilers so I don't want to set it as
+      default until it won't be strictly necessary for father developing
+
+  * xharbour/contrib/libct/Makefile
+    - setlast.c removed - now is a part of RTL
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * debug code divided into two parts enabled by macros HB_CDX_DBGCODE
+      and HB_CDX_DBGCODE_EXT. First macro doesn't give a big overhead
+      and can be enabled by default, the second slow down very much making
+      deep index structure analyzes. I did this looking for bug in
+      GCC 3.3.2 and -)3 optimization. I've found where the problem was
+      and changed the code to workaround this bug (I think we should inform
+      GCC team about it) but the funny thing was that the enabling old
+      debug code cause to compile dbfcdx.c correctly. Before my wrk.ard.
+      the bug could be seen only with HB_CDX_DBGCODE_EXT without
+      HB_CDX_DBGCODE. Now I'm thinking about Windows and BCC. I'm not
+      BCC user and cannot say much about current Windows version but I
+      remember that old BCC 3.1 has some strange bugs when full optimization
+      is enabled. In some cases I'm sure that some bugs raports on xhb-news
+      cannot appears so I think it could be problem with buggy optimization
+      in this compiler. Maybe I'm wrong but if any of you use DBFCDX with
+      BCC I would like to ask you to test DBFCDX compiled with different
+      debug macro compilation: HB_CDX_DBGCODE & HB_CDX_DBGCODE_EXT,
+      HB_CDX_DBGCODE, HB_CDX_DBGCODE_EXT
+
+  * xharbour/include/inkey.ch
+    + KP_CENTER definition added
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+    * use KP_CENTER instead of 332
+
+  * xharbour/include/hbapicdp.h
+  * xharbour/source/rtl/cdpapi.c
+  * xharbour/source/codepage/Makefile
+  * xharbour/source/codepage/cdp_tpl.c
+  * xharbour/source/codepage/cdpesdos.c
+  * xharbour/source/codepage/cdpeswin.c
+  * xharbour/source/codepage/cdpgedos.c
+  * xharbour/source/codepage/cdpgewin.c
+  * xharbour/source/codepage/cdphr1250.c
+  * xharbour/source/codepage/cdphr852.c
+  * xharbour/source/codepage/cdpltwin.c
+  * xharbour/source/codepage/cdppl852.c
+  * xharbour/source/codepage/cdppliso.c
+  * xharbour/source/codepage/cdpplmaz.c
+  * xharbour/source/codepage/cdpplwin.c
+  * xharbour/source/codepage/cdppt850.c
+  * xharbour/source/codepage/cdpptiso.c
+  * xharbour/source/codepage/cdpru866.c
+  * xharbour/source/codepage/cdprukoi.c
+  * xharbour/source/codepage/cdpruwin.c
+  * xharbour/source/codepage/cdpsl852.c
+  * xharbour/source/codepage/cdpsliso.c
+  * xharbour/source/codepage/cdpslwin.c
+  * xharbour/source/codepage/cdpsrwin.c
+  + xharbour/source/codepage/uc1250.c
+  + xharbour/source/codepage/uc1251.c
+  + xharbour/source/codepage/uc1257.c
+  + xharbour/source/codepage/uc437.c
+  + xharbour/source/codepage/uc850.c
+  + xharbour/source/codepage/uc852.c
+  + xharbour/source/codepage/uc866.c
+  + xharbour/source/codepage/uc8859_1.c
+  + xharbour/source/codepage/uc8859_2.c
+  + xharbour/source/codepage/uckoi8.c
+  + xharbour/source/codepage/ucmaz.c
+    + basic unicode support for curently defined code pages
+
+  * xharbour/source/rdd/dbf1.c
+    * tabs replaced by spaces
+
+2004-01-26 04:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * contrib/libct/makefile.bc
+  * contrib/libct/makefile.vc
+    + numlohi.c
+
+2004-01-26 14:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_Minimize()
+      Minimizes the application window. Useful when application is engaged in
+      long uninterrupted tasks.
+
+    + Wvt_Maximize()
+      Maximizes, I mean, restores to normal position the previously minimized
+      application window.
+
+    + Wvt_SetOnTop()
+      Forces the application window to be as the TOPMOST window. Useful when a
+      compulsory input is required, or, where developer wants that no other window
+      is allowed to operlap application window.
+
+    + Wvt_SetAsNormal()
+      Restores windows TOPMOST attributes to normal. It is default, maens, any other
+      window on the Desktop can be brought in focus overlapping application window.
+
+    + Wvt_SaveScreen( nTop, nLeft, nBottom, nRight )
+      Saves the designated rectangle in an array with three elelments, viz.,
+      { nWidth, nHeight, hBitmap }. The bitmap image of the rectanle is retained
+      in memory until Wvt_RestScreen() is called. So it is important that
+      Wvt_RestScreen() must be called when current program returns.
+
+    + Wvt_RestScreen( nTop, nLeft, nBottom, nRight, aSavedScreen )
+      Flushes the bitmap referenced in <aSavedScreen> onto the designated rectangle.
+      This function must be called after Wvt_SaveScreen() just not to exhaust
+      GDI resources of Windows.
+
+    ! Wvt_DrawLine( nTop, nLeft, nBottom, nRight, nOrientation, nFormat, nAlign, ;
+                                                       nStyle, nThick, nRgbColor )
+      Line drawing has been made more user friendly.
+
+    ! Formatting and logocal ordering of functions.
+
+  * xharbour/tests/wvtgui.prg
+    Enhanced to demonstrate above functions. A beautiful ststus bar is added. And much more.
+
+    /*   Francesco, will you please update above functionality to wvtgui.ch and wvt.prg?   */
+
+2004-01-26 02:38 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    - removed debug printout...
+    ! setting appMsg to zero before trying to read it.
+
+2004-01-26 04:20 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  + contrib/libct/numlohi.c
+    + Implemented NumLow() and NumHigh().
+  * contrib/libct/Makefile
+    + Added numlohi.c.
+
+2004-01-26 03:35 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/libct/files.c
+    + Implemented SetFDaTi() for Win32 and Unix.
+
+2004-01-26 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/lang/msgeo.c
+  * source/lang/msgfr.c
+  * source/lang/msgko.c
+  * source/lang/msgsrwin.c
+    ! added missing commas on array members.
+
+2004-01-25 15:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+   * makefile.bc
+   * makefile.vc
+   * makefile.nt
+     * synchronise, slight re-ording
+   * source\rtl\gtwvt\gtwvt.c
+     * casts
+
+2004-01-25 20:07 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtapi.c
+    ! hb_gtGobjectInside() must return true if the area INTERSECTS with the given
+      object, and not just if the object is partially or completely inside the area
+      as it was before.
+
+  * source/rtl/gtxvt/gtxvt.c
+    + Added X Clipping while drawing graphical objects to allow correctly
+      layering of graphical objects.
+
+2004-01-25 16:05 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * Makefile.bc
+    + Added gtgraph support
+
+  * source/rtl/gtwvt/gtwvt.c
+    + Added support for gtgraph
+
+2004-01-25 19:05 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rdd/dbfcdx/dbfcdx1.c
+    * corrections on recently commited changes on casts.
+
+  * source/rtl/gtgraph.c
+    ! add type castings
+
+2004-01-25 13:56 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapigt.h
+  * source/rtl/gtapi.c
+    + Objects are now drawn last-to-first, and the internal objects are
+      represented as a linked list.
+    ! Fixed castings.
+
+  * source/rtl/gtgraph.c
+    + Added prgfunction GtRGB( nRed, nGreen, nBlue [,nAlpha] )
+      Values can be float from 0 to 1 or integers from 0 to 65635 (256*256-1).
+      REMEMBER TO USE 1.0 to signify "full" for one color, if using the float
+      numbers.
+
+  * source/rtl/gtxvt/gtxvt.c
+    ! Before, color codes were ranging from 0 to 255, while they are
+      corrected now in gtapi so that they ranges from 0 to 65635; corrections
+      here to cope with this.
+
+  * tests/gtgrap.prg
+    + Added tests to demonstrate both this features.
+
+2004-01-25 10:40 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+  *config/linux/gcc.cf
+    !added -std=gnu99 as standart option.otherwise xharbour wont compile on linux due LLONG_MAX is undefined
+
+2004-01-24 15:30 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+  * utils/hbmake/hbmake.prg
+    ! fix to not exit on editor mode if no files is found
+    ! added support for postgres
+  * utils/hbmake/hbmutils.prg
+    !added postgres to lib list
+
+
+2004-01-24 17:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapigt.h
+  * source/rtl/gtapi.c
+    + Added support for graphical objects under GT terminal:
+      hb_gtAddGobject( HB_GT_GOBJECT *gobject );
+      hb_gtDestroyGobject( HB_GT_GOBJECT *gobject );
+      hb_gtClearGobjects( void );
+      hb_gt_gcolorFromString( char *color_name );
+      hb_gtGobjectInside( HB_GT_GOBJECT *gobject,
+                        int x1, int y1, int x2, int y2 );
+
+  * source/rtl/gtxvt/gtxvt.c
+    + Added rendering of graphical objects.
+    % Greatly optimized color change for text data.
+
+  + source/rtl/Makefile
+  + source/rtl/gtgraph.c
+    + Added PRG level interface for graphical objects under GT
+      (functions like GTPoint(), GTLine() goes there; future functions as
+       GtSetForeground() should go there too).
+
+  + tests/gtgrap.prg
+    + Added a small test for gtgraph ability.
+
+
+2004-01-23 22:05 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rdd/dbf1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rtl/file.c
+  * source/rtl/direct.c
+  * source/vm/arrayshb.c
+  * source/vm/inet.c
+  * contrib/rdd_ads/ads1.c
+  * contrib/libnf/n2color.c
+  * contrib/libnf/ftattr.c
+  * contrib/libct/files.c
+  * contrib/libct/ctc.c
+    * code clean up ( remove unused variables and unnecessary variable
+      initializations, and add some type casts )
+
+2004-01-22 20:10 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/inkey.c
+    + Copy SETLASTKEY() function from LIBCT.
+
+2004-01-22 18:35 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/dbedit.prg
+    ! Fixed a bug causing DbEdit() to quit inmediatly if LastKey() == K_ESC | K_ENTER
+  * source/rtl/gtalleg/gtalleg.c
+    ! Fixed mouse events to be reported at FontHeight and FontWidth multiples
+
+2004-01-22 18:50 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+  * source/odbc/todbc.prg
+    ! fixed method Open. Fix provided by Alexandre Bassanesi
+
+2004-01-22 00:40 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/tpopup.prg
+    ! Yet another bug making MenuBar crash when pressed right button or ALT+<nonshortcut>
+      Where <nonshortcut> is any key not used as a MenuBar shortcut
+
+2004-01-22 00:20 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/tpopup.prg
+    ! Checking for correct coords when menu first open()ed
+
+2004-01-21 23:50 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/gtalleg.c
+    + Added mouse events handling in gt_ReadKey()
+
+2004-01-21 21:50 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/gtalleg.c
+  * source/rtl/gtalleg/ssf.h
+  * source/rtl/gtalleg/ssf.c
+  * source/rtl/gtalleg/fixedth.c
+    ! Fixed file Id assignment
+
+2004-01-22 13:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /contrib/winprn/tprint.prg
+     + added MSVC castings
+     + initialised pDevMode to NULL in SETDOCUMENTPROPERTIES()
+         thanks to Andi Jahja
+
+2004-01-22 12:46 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /contrib/winprn/tprint.prg
+     + added hb_ret() to ENUMFONTS()
+  * /source/rtl/inkey.c
+     + adding hb_ret() SETINKEYAFTERBLOCK() & SETINKEYBEFOREBLOCK()
+
+2004-01-21 20:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * source/vm/itemapi.c
+     ! Return value missing in hb_itemPutNLen().
+
+2004-01-21 19:45 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/ssf.h
+    - Removed old (testing stage) defines
+
+2004-01-21 20:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * source/vm/itemapi.c
+     + Support for LONGLONG in hb_itemPutNLen()
+     ! Apply correctly the With to LONG number in hb_itemPutNLLen()
+       when the With passed is out of range.
+   * source/vm/hvm.c
+     + Support for LONGLONG in hb_vmPushNumType()
+
+2004-01-21 19:45 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  ! include/hbapigt.h
+    + Added missing #define _alleg _ALLEG directive
+
+2004-01-21 19:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  + source/rtl/gtalleg/Makefile
+  + source/rtl/gtalleg/gtalleg.c
+    + New Allegro based gt.
+  + source/rtl/gtalleg/ssf.h
+  + source/rtl/gtalleg/ssf.c
+    + New Simple Scalable Font library.
+  + source/rtl/gtalleg/fixedth.c
+    + Fixed Thin font (gtalleg default)
+      NOTE: INCOMPLETE, some chars are missing while another ones needs review.
+
+2004-01-21 19:05 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/vm/hvm.c
+    ! Fix some error in hb_vmDec() introduced in my last commit.
+    ! Restore an commented out code in hb_vmInc().
+
+2004-01-22 11:03 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /contrib/winprn/tprint.prg
+     + in TPRINT class method ::Create() call ::Destroy()
+       to clean up previous printing if any ( avoids possible memory leak )
+
+2004-01-22 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/vm/memvars.c
+     - remove hb_itemRelease() from __MVSYMBOLINFO()
+  * /contrib/winprn/tprint.prg
+     - remove hb_itemRelease() from ENUMFONTS()
+
+2004-01-21 09:24 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/itemapi.c
+    * Commented out redundant conditions related to LONGLONG and latest aritmetic optimizations.
+
+  * source/vm/hvm.c
+    * Commented out redundant conditions related to LONGLONG and latest aritmetic optimizations.
+    ! Fixed typo in hb_vmDec() was using ++ instead of -- (for Doubles)
+    /* HBTEST back to 13 errors. */
+
+2003-01-21 10:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * include/hbapi.h
+   * include/hbapiitm.h
+   * include/hbdefs.h
+   * include/hbvm.h
+   * source/vm/itemapi.c
+   * source/vm/hvm.c
+     % Optimizations in the arithmetic operations of interger numbers.
+       Now the arithmetic operations with integer numbers are faster than
+       with numbers in floating point.
+
+2004-01-21 18:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/genc.c
+    ! overlooked fix on critical section.
+
+2004-01-21 13:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/harbour.c
+  * source/compiler/genc.c
+    ! harbour.exe now supports long PRG file name with white space.
+    ! fixes to use original PRG file name as part of symbol name.
+
+2004-01-21 17:09 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /contrib/winprn/tprint.prg
+     + CreateFont() - fix iWidth calculation if iDiv < 0
+
+2004-01-21 00:55 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/saverest.c
+    ! Check for valid coords
+      TPopup:open is passing coords upside down to savescreen()
+      which then all gts return very weird rectsizes.
+
+2004-01-21 13:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  + /contrib/winprn - new (basic) Windows GDI printing class & test program
+     + tprint.prg
+     + testprn.prg
+     + makefile
+     * Possible standard Windows printing for GDI mode
+     *   - Uploaded for review and discussion regarding inclusion in
+     *     base RTL
+     *  Note: makefile is for BCC55
+
+2003-01-20 0:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/gtwin/gtwin.c
+    ! Fix restore of original Windows'console size.
+      This fix is visible in Win2000 and WinXP if use buffer size
+      greater than window size.
+
+2004-01-20 01:20 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+  ! source/rtl/teditor.prg
+    ! fixed browseText() which affect memoedit( clipper docs says that CTRL+W is an
+     valid key to exit an memoedit even in view mode
+
+2004-01-19 16:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed bug in SearnRep() when instanciating group with non repetable.
+    - Removed redundant IsInStr() and replaced with ANSI strchr()
+
+2004-01-20 03:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/tests/wvtgui.prg
+    ! Updated to ( still under heavy changes ) reflect the Wvt_DrawButton()
+      functionality. First two buttons are functional. Just move the
+      mouse over them, try to keep left button pressed and release them,
+      inside the button as well as outside.
+    + Few small .ico files to demonstrate the button usage.
+
+      The push button functionality is under changes and some functionality may change.
+
+2004-01-20 02:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_DrawButton( nTop, nLeft, nBottom, nRight, cText, cImage, nFormat, ;
+                      nTextColor, nBkColor, nImageAt )
+      Draws a push button with/or text/image and animates with mouse movements and
+      responds to mouse clicks.
+    + hb_wvt_gtMouseEvent()
+      Moved the code to handle mouse events from ever growing loop of hb_wvt_gtWndProc().
+
+    + hb_wvt_gtDrawBoxRecessed()
+    + hb_wvt_ftDrawBoxRaised()
+    + hb_vt_gtDrawOutline()
+      The code in its counterpart functions WVT_Draw...() has beed bifurcated.
+
+    ! Formatted.
+
+  * xharbour/include/hbgtwvt.h
+    + BOOL HB_EXPORT hb_wvt_gtDrawBoxRaised( int iTop, int iLeft, int iBottom, int iRight );
+    + BOOL HB_EXPORT hb_wvt_gtDrawBoxRecessed( int iTop, int iLeft, int iBottom, int iRight );
+    + BOOL HB_EXPORT hb_wvt_gtDrawOutline( int iTop, int iLeft, int iBottom, int iRight );
+
+    + One more member to GLOBAL_DATA _s.pSymWVT_MOUSE to handle the mouse events callback
+      function WVT_Mouse() at application level.
+
+2004-01-19 12:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/macro/macro.y
+    + Added few more explict error handlers to avoid memory leaks.
+
+  * tests/pp.prg
+    ! Fixed RP_Dot() to not terminate on errors.
+
+2004-01-19 09:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Fixed gpf trap related to recent changes to Extended Match Marker.
+
+  * tests/pp.prg
+    * Fixed few typos related to recent changes to Extended Match Marker.
+    * Minor fix to PPOut() when repetead group has only single value of non repeated marker.
+    * Renamed Version() to PP_Version()
+    ! Fixed support of #include when processing text.
+
+  * tests/pp_harb.ch
+    * Work in progress to correct support for Line Number and Module Name.
+
+2004-01-18 21:46 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapigt.h
+  * source/rtl/gtapi.c
+  * source/rtl/gx.c
+    + Added function SetGtResizeEvent( nEventId ) to be used from PRG;
+      GT modules willing to declare that they have their size changed can
+      call hb_gtHandleResize(). This will cause nEventId to be queued in inkey()
+      loops.
+      + Added functions hb_gtSetResizeEvent() and hb_gtGetResizeEvent()
+
+  * source/rtl/gtxvt/gtxvt.c
+    + Using hb_gtHandleResize() when the scree is resized.
+
+  + tests/gtevent.prg
+    + Added a test for this AND future GT generated events.
+
+2004-01-18 08:05 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.vc
+    + EXTRALIB support
+    + /INCLUDE:__matherr for hbdoc and hbmake
+  * makefile.nt
+    + /INCLUDE:__matherr for hbdoc and hbmake
+
+2004-01-18 11:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    ! Fixed a couple of errors in box char drawing.
+
+2004-01-18 09:30 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * config/bsd/gcc.cf
+  * config/darwin/gcc.cf
+    ! Changed -Iinclude to -I$(TOP)/include. Maybe this is needed for
+      other architectures, too? This fixes, e.g., libct compilation.
+    ! Under BSD slang still needs curses.
+  * contrib/libct/Makefile
+    * A cosmetic change.
+  * source/rtl/gtcrs/gtcrs.c
+    ! Include <libutil.h> instead of <pty.h> on BSD.
+
+2004-01-18 07:25 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * contrib/libct/bit1.c
+  * contrib/libct/bit3.c
+    * Changed remaining Clipper API from clipdefs.h to xHarbour API. This
+      fixes compilation with MinGW.
+
+2004-01-17 22:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/pp/ppcore.c
+  * source/common/hbver.c
+    * correct hb_ppPlatform() and hb_verPlatform() for consistancy
+  * tests/pp.prg
+    made Func Version() static
+
+2004-01-18 06:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! type castings
+
+2004-01-17 23:39 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * WVT_SETCLIPBOARD - Fixed lenght of string stored in clipboard
+
+2004-01-18 05:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/filesys.c
+    ! type castings
+
+  * source/rtl/tget.prg
+    ! .. get x pic "9x9x" not working. Fixed.
+
+  + source/rtl/gtcgi/cgiread.c
+    ! PRG level functions for CGIREAD() and CGIWRITE() to fix certain CGI
+      problems for Win32 - there seems to be no stdin binary reads so
+      while trying to upload a binary file through a CGI webform, you get
+      broken file and even when sending text data you get wrong bytecount
+      due to \r\n -> \n translation (ANY Win32 C compiler treats stdin/stdout
+      as having "terminal" flag).
+      Credits to: "Dmitry V. Korzhov" <dk@april26.spb.ru>
+
+2004-01-17 22:50 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    + Added clipboard functions
+      WVT_GETCLIPBOARD, WVT_SETCLIPBOARD, WVT_PASTEFROMCLIPBOARD
+  + tests/wvt.prg
+    + Added clipboard prg related functions
+      WVT_PasteFromClipboard(), WVT_CopyToClipboard()
+  + tests/wvtguie.prg
+    * Added keys for clipboard
+
+  /*
+    Now we can use clipboard!
+    Actually it is a simple method:
+    assign
+    SetKey( K_CTRL_C, {|| WVT_CopyToClipboard() } )
+    SetKey( K_CTRL_V, {|| WVT_PasteFromClipboard() } )
+
+    then a simple idea, when copy to clipboard I copy the entire
+    oGet:buffer, instead when paste I send the clipboard to
+    keyboard buffer but only if there is an active Get
+    This permit to me to don't think to selection at the moment.
+
+    To build these prgs use:
+    bldtest /wvt wvtguie wvt
+  */
+
+2004-01-17 16:00 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
+  * source/rtl/filesys.c
+    + hb_fileNameConv()  function added
+    * All calls to hb_filecase change to hb_fileNameConv()
+  * source/rtl/direct.c
+    source/rtl/file.c
+    source/rdd/dbcmd.c
+    source/rdd/dbfcdx/dbfcdx1.c
+    source/rtl/dbfntx/dbfntx1.c
+    contrib/libct/files.c
+     * All calls to hb_filecase change to hb_fileNameConv()
+  * include/hbapifs.h
+    + hb_fileNameConv() prototype
+
+
+2004-01-17 16:11 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    + Added support for X buffer paste.
+      (as standard X application, paste is currently done via pressing middle
+       mouse button).
+
+2004-01-17 03:30 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    + Changed function name *Pallete to *Palette
+  + tests/wvtgui.ch
+    + Added WVT preprocessor commands
+  + tests/wvt.prg
+    + Added functions to serve preprocessor commands
+  + tests/wvtguie.prg
+    * Rewrote wvtgui.prg using the new commands
+
+  /*
+    If ppl working on WVT accepts this news i'll move wvtgui.ch to include folder
+    and wvt.prg in source/rtl/gtwvt
+
+    To build these prgs use:
+    bldtest /wvt wvtguie wvt
+  */
+
+2004-01-16 17:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+  * tests/pp.prg
+    + Added Single and Double Quote as Extented Marker terminators.
+
+2004-01-16 16:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+  * tests/pp.prg
+    * Reverted Extented Marker matching to use delimiter based logic, but added ',' as a delimiter.
+
+2004-01-16 17:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  + include/hbwbase.h
+    * replacement for those MSVC users without the Platform SDK
+  * source/pp/ppcore.c
+  * source/common/hbver.c
+    * changed to use hbwbase.h
+
+2004-01-16 17:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/common/hbver.c
+    * Create our own OSVERSIONINFOEX for those that don't have the
+    * MS Platform SDK installed.
+
+2004-01-16 16:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/pp/ppcore.c
+    * cosmetic changes
+
+2004-01-16 09:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapigt.h
+    + Added missing HB_EXPORT to recent additions.
+
+2004-01-16 09:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed few GPF traps in hb_ppPlatform() introduced by recent addition.
+      /* pzszName was never allocated but was passed to strcat()! */
+    + Added missing braces to flow structures.
+
+2004-01-16 11:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makallbc.bat
+  * makallvc.bat
+    + contrib/unicode
+  * contrib/unicode/makefile.vc
+    + INCLUDE_DIR
+
+2004-01-16 09:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/common/hbver.c
+  * source/pp/ppcore.c
+    * cast osversionex to osversion (is winbase.h wrong?)
+  * source/rtl/filesys.c
+    * casts in hb_fileTrim
+
+2004-01-16 14:15 UTC+0100 Ignacio Ortiz <iozuniga@ozs.com>
+* xharbour/source/common/hbver.c
+   + Added define VER_SUITE_PERSONAL
+   + Added define VER_SUITE_BLADE
+   + Added support for detecting Windows Server 2003.
+   + Added workstation type for Windows NT 4.0, Windows 2000 Professional, and Windows XP Home Edition or Professional.
+   + Added server type for Windows Server 2003, Windows 2000 and Windows NT 4.0.
+* xharbour/source/pp/ppcore.c
+   + Added define VER_SUITE_PERSONAL
+   + Added define VER_SUITE_BLADE
+   + Added support for detecting Windows Server 2003.
+   + Added workstation type for Windows NT 4.0, Windows 2000 Professional, and Windows XP Home Edition or Professional.
+   + Added server type for Windows Server 2003, Windows 2000 and Windows NT 4.0.
+   (Credits to Pedro Gil)
+
+2004-01-16 09:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * source/rtl/file.c
+    ! hb_fsFile fix changed to use hb_Filetrim
+  * source/rtl/filesys.c
+    ! hb_fsOpen() and hb_fsCreate()
+    + Added hb_Filetrim() function
+  * source/rtl/set.c
+    ! Added support to _SET_TRIMFILENAME (this set when enable (default is false),
+    remove trailing blanks on the right of filename */
+  * include/hbapifs.h
+    ! added hb_Filetrim() prototype
+  * include/hbset.h
+    ! added SET_TRIMFILENAME member to hb_set
+  * include/set.ch
+    ! added _SET_TRIMFILENAME s 112
+  * utils/hbmake/hbmake.prg
+    ! minor fix when request mysql usage on windows(was liking mysqlclient.lib insted od libmysql.lib)
+  * utils/hbmake/tmake.prg
+    !added gtwvt to members for later makefile edit
+
+
+2004-01-15 16:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/transfrm.c
+    * Minor fix to recent change.
+
+  * source/pp/ppcore.c
+  * tests/pp.prg
+    * Added .\/ as continuations characters for Extended Markers.
+
+2004-01-16 11:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+     - WVT_SETFONT()/hb_wvt_gtSetFont() change so parameter fontWidth can be < 0
+        if fontWidth is < 0 then the width of character is forced and tm.tmAveCharWidth is not used
+        Allow precise control over width of characters but if abused will produce weird display
+
+2004-01-16 08:40 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/inkey.c
+    + inkey() - Reset LASTKEY() value to return of SETINKEYAFTERBLOCK()
+
+2004-01-15 11:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+  * tests/pp.prg
+    ! Fixed Extended MArker to use NextToken() instead of looking for space delimiter.
+
+2004-01-15 10:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/transfrm.c
+    ! Fix for case when a picture function has no space before a '9'
+
+2004-01-15 17:50 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+   * source/include/hbgtwvt.h
+     * fix include for OpenWatcom 1.2
+   * source/rtl/gtwvt/gtwvt.c
+     * fix K_CTRL_A-Z management
+
+2004-01-15 20:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + WVT_GETPALLETE() -> aRGBColors
+    + WVT_SETPALLETE( aRGBColors )
+    Retuens and set the new pallete values.
+
+  * xharbour/tests/wvtgui.prg
+    Enhanced to demonstrate the usage of Wvt_GetPallete() and Wvt_SetPallete().
+
+  /* Few  hours back I had made this entry but is not found now */
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    ! Formatted.
+    * Changed the sequence of some functions to their respective groups.
+
+2004-01-15 14:58 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    + Added gt_tone() implementation :-))
+
+2004-01-15 14:07 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    ! Faster and cleaner interprocess synchronization
+    ! Main application receives a hb_vmRequestQuit if the window's child
+      is killed externally.
+
+2004-01-15 02:29 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    ! Better handling of the dialogs between the two processes.
+    ! Faster drawing of box characters (removed trice repainting)
+    ! Faster drawing of dot fillers (using the idea of Premizlav).
+      (need fixing in case of font change).
+    ! Using Premyslaw's color definitions (they looks more like dos).
+
+2004-01-15 01:11 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    + Added WVT_GETRGBCOLOR that returns the correspondant RBG value of
+      a color ( i.e. use WVT_GetRGBColor( hb_ColorToN( "W" ) ) )
+  * tests/gtclose.prg
+    * Fixed typo
+
+2004-01-15 13:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+     - redo hb_stack with HB_VM_STACK overwritten
+     - remove
+        WVT_SETCLOSEEVENT(nEventNumber)
+        WVT_SETSHUTDOWNEVENT(nEventNumber)
+        Use new xHarbour wide functions
+  * /include/hbgtwvt.h
+     - remove redundant shutdownEvent & closeEvent defines and variables
+
+2004-01-14 23:53 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapigt.h
+  * source/rtl/gtapi.c
+    + Added functions
+      void HB_EXPORT hb_gtHandleClose(void);
+      BOOL HB_EXPORT hb_gtHandleShutdown(void);
+      BOOL HB_EXPORT hb_gtSetCloseHandler(PHB_ITEM handler);
+      PHB_ITEM HB_EXPORT hb_gtGetCloseHandler(void);
+
+      int  HB_EXPORT   hb_gtGetCloseEvent( void );
+      int  HB_EXPORT   hb_gtGetShutdownEvent( void );
+      void HB_EXPORT   hb_gtSetCloseEvent( int iEvent );
+      void HB_EXPORT   hb_gtSetShutdownEvent( int iEvent );
+
+  * source/rtl/gx.c
+    + Added functions
+      SETGTCLOSEHANDLER()
+      GETGTCLOSEHANDLER()
+      SETCLOSEEVENT()
+      GETCLOSEEVENT()
+        As this events are now XHARBOUR WIDE, and can be generated by
+        ALL the gt by calling the hb_gtHandleClose() and
+        hb_gtHandleShutdown(), developers should remove local versions
+        of this implementations
+
+  * source/rtl/inkey.c
+    ! A pending request to VM interrupts immediately a wait
+
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxvt/gtxvt.h
+    * Using hb_gtHandleClose and hb_gtHandleShutdown to handle
+      relative events.
+    ! Now the application and it's forked VT are dialogating gracefully.
+
+  * source/rtl/gtwvt/gtwvt.c
+    * Using hb_gtHandleClose and hb_gtHandleShutdown to handle
+      relative events.
+
+  * tests/gtclose.prg
+    + Added a test to demonstrate working of the different close handlers.
+      PLEASE CHECK IT.
+
+2004-01-15 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/file.c
+  * source/rtl/gtwvt/gtwvt.c
+    * castings for MSVC
+
+2004-01-15 11:21 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+     - replace hb_stack with HB_VM_STACK
+
+2004-01-15 10:47 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * Fix typo's in previous changelog
+
+2004-01-15 10:44 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+    + Fix translation of CTRL-A-Z to inkey.ch value of K_CTRL_A-Z
+
+    + added functions for creating and managing menus
+        WVT_CREATEMENU() -> nMenuHandle
+        WVT_SETMENU(nMenuHandle)
+        WVT_APPENDMENU(nMenuHandle, nMenuType, nMenuIdentifier, cMenuCaption)
+        WVT_DELETEMENU(nMenuHandle, nPosition, nDeleteMethod )
+        WVT_DESTROYMENU(nMenuHandle )
+        WVT_ENABLEMENUITEM(nMenuHandle, nItemId, nMethod)
+        WVT_GETLASTMENUEVENT() -> Identifier for last menu event
+        WVT_SETMENUKEYEVENT(nEventToReturnForMenuEvents ) ( Default ==1024 )
+
+    + added other useful utility functions
+        WVT_GETSCREENWIDTH() -> Return screen width in pixels
+        WVT_GETSCREENHEIGHT() -> return screen height in pixels
+        WVT_SETCLOSEEVENT(nEventNumber) -> set a K_ value to return if 'X' clicked or WM_CLOSE is received
+                                        need to add handler with SetKey(K_CLOSE, { || CloseHandler() }
+                                        The default behaviour is to return HB_BREAK_FLAG
+        WVT_SETSHUTDOWNEVENT(nEventNumber) -> event to return for WM_SHUTDOWN message
+                                        need to add handler with SetKey(K_SHUTDOWN, { || ShutdownHandler() }
+        WVT_SETWINDOWCENTRE( .T. or .F.) -> Tells WVT whether to create window centred
+        WVT_SETALTF4CLOSE( .T. or .F. ) -> Allow Alt+F4 to issue WM_CLOSE
+        WVT_PROCESSMESSAGES() -> Call WVT's event loop
+        WVT_GETTITLE() -> Get the current window title
+
+
+2004-01-14 11:00 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  *source/rtl/file.c
+    ! fixed an problem with trainling blanks on filename, which was returning
+      wrong results
+      FUNCTION Main()
+         ? File('t.prg')
+         ? File('t.prg ')
+      RETURN NIL
+      Prior this fix return was
+      windows : TRUE,TRUE
+      linux :   TRUE,FALSE
+      now all return TRUE
+
+2004-01-14 18:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     !  if ( !b_MouseEnable || !_s.MouseMove|| ( wParam == MK_LBUTTON ) || ( wParam == MK_RBUTTON ) )
+     changed to :
+        if ( !b_MouseEnable || !_s.MouseMove )
+
+2004-01-13 2:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * contrib/tip/tipclient.prg
+    ! Fixed few tIPClientSMTP to tIPClient
+  * contrib/tip/base64x.c
+    ! Added missing type cast.
+
+2004-01-13 23:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/tests/wvtgui.prg
+     Enhanced . Simulated Push Buttons, but without event handelling.
+
+2004-01-13 16:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + Wvt_DrawGridHorz( nTop, nLeft, nRight, nRows )
+       Draws horizontal grid begining nTop through nTop + nRows with the
+       pen set with Wvt_SetPen()
+
+     + Wvt_DrawGridVert( nTop, nBottom, aCols, nCols )
+       Draws vertical grid begining aCols[ 1 ] through aCols[ n ] with the
+       pen set with Wvt_SetPen().
+
+   * xharbour/tests/wvtgui.prg
+     Enhanced . Press F5 repeatedly to bring GUI TBrowse in focus. It
+     exploits above two functions to draw hotizontal and vertical grid.
+
+   * xharbour/source/rtl/tbrowse.prg
+     + DATA aColumnsSep, an array to hold the nColumn where seperator is
+       displayed. This array is used to draw vertical grid of GUI Tbrowse above.
+
+2004-01-12 22:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * tests/wvtgui.PRG
+     * Generalized, optimized, and formated.
+
+2004-01-12 07:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * source/rtl/filesys.c
+     ! translate EACCES to 5 for Clipper compatibility (MSVC)
+
+2004-01-13 00:05 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * tests/bldtest.bat
+    * Fixed BLDDEFAULT test if no parameter was passed.
+
+2004-01-12 17:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/vm/itemapi.c
+    * padconv Printf I64 instead of L
+  * source/rtl/abs.c
+    * lNumber decl is LONGLONG
+  * source/rtl/empty.c
+    * correct Empty( LONGLONG )
+
+2004-01-12 16:04 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/hbffind.c
+    * Calculation was incorrect.  (off by 1 per 4 gb)
+
+2004-01-12 14:31 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * tests/dirtest.prg
+     * widen picture format by 2
+
+2004-01-12 14:29 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/hbffind.c
+    * further cast required...
+
+2004-01-12 14:14 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/vm/itemapi.c
+    * correct printf format for longlong support
+    * (files > 4gb were showing mod 4gb)
+  * source/rtl/hbffind.c
+    * slightly reworked an instance where msvc wasn't handling longlong math properly.
+
+2004-01-12 21:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  *include/hbgwvt.h
+   ! Add file ID
+
+2004-01-11 14:02 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/debug.c
+    ! Fixed GPF Trap in __VMPARLLIST() due to missing test on asSymbol.paramcnt (for > 255 )
+    ! Fixed GPF Trap in AddToArray() due to uninitialized asString.bStatic
+
+    /*
+       I performed a golbal search in all c sources for "= HB_IT_STRING"
+       and found only 1 more instance in memvars.c where .bStatic and
+       .puiHolder were not initialized. I also search for .paramcnt and
+       found no other instance.
+    */
+
+  * source/vm/memvars.c
+    ! Fixed GPF Trap related to unitinialized asString.bStatic
+
+2004-01-12 10:24 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+    + Handle K_CTRL_TAB
+
+2004-01-12 09:35 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/persist.prg
+   + ::LoadFromText() - fix to work with Version 1 saved data
+
+2004-01-11 13:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * include/hbgtwvt.h
+    * move CINTERFACE decl for proper msvc c++ mode handling.
+
+2004-01-11 20:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! remove unwanted ; in line 3721
+
+  * source/compiler/genc.c
+  * source/vm/extend.c
+  * source/vm/arrays.c
+  * source/rtl/readline.c
+  * source/rtl/hbrandom.c
+  * source/rtl/hbsrlraw.c
+  * source/rtl/bkgtsks.c
+  * source/rdd/dbf1.c
+  * contrib/rdd_ads/ads1.c
+    * code clean-up (mostly removal of unused variables) and castings
+
+2004-01-10 23:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed getExpReal() to not be greedy when matching Extended Marker (Clipper compatibility)
+
+2004-01-10 16:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * utils/hbmake/hbmake.prg
+     ! minor fix on linux compilation
+
+2004-01-10 16:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + static void hb_wvt_gtCreateCaret()
+     + static void hb_wvt_gtKillCaret
+       The above functions are called in hb_wvt_gtSetFont() instead of
+       SendMessage( _s.hWnd, WM_KILLFOCUS, 0, 0 ) and
+       SendMessage( _s.hWnd, WM_SETFOCUS, 0, 0 )
+       because these messages were generating the recursive calls.
+
+     + Callback functions for Window messages WM_SETFOCUS and WM_KILLFOCUS are
+       activated as Wvt_SetFocus() and Wvt_KillFocus() at the PRG level.
+
+     ! Wvt_DrawBoxRaised(), Wvt_DrawBoxRecessed()
+       Fixed right-bottom corner values.
+
+   * xharbour/include/hbgtwvt.h
+     + Added members to GLOBAL_DATA _s : pSymWVT_SETFOCUS and pSymWVT_KILLFOCUS
+       to hold handle to PRG functions Wvt_SetFocus() and Wvt_KillFocus().
+
+   * xharbour/tests/wvtgui.prg
+     Amended to reflect Wvt_SetFocus() and Wvt_LostFocus() functionality.
+
+2004-01-10 14:30 UTC+0200 Tommi Rouvali <tommi@rouvali.com>
+   * xharbour/source/rtl/trpc.prg
+     ! Fixed RPC function names are now incase sensitive
+
+2004-01-10 16:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + New members in GLOBAL_DATA _s : currentPen, currentBrush
+
+     + Wvt_SetPen( nPenStyle, nWidth, nColor )
+       Sets the _s.currentPen with handle to Pen created with above parameters.
+
+     + Wvt_SetBrush( nBrushStyle, nColor, [ nHatch ] )
+       Sets the _s.currentBrush with handle to Brush created with above parameters.
+
+       _s.currentPen and _s.currentBrush will be used to draw following GUI elements.
+
+     + Wvt_DrawRectangle( nTop, nLeft, nBottom, nRight )
+       Rectangle thus drawan will be inside the above parameters.
+
+     + Wvt_DrawRoundRect( nTop, nLeft, nBottom, nRight, nPixelsRoundHeight, nPixelsRoundWidth )
+       Rectangle thus drawan will be inside the above parameters. The corners will be rounded
+       honouring  nPixelsRoundHeight, nPixelsRoundWidth.
+
+     + Wvt_DrawEllipse( nTop, nLeft, nBottom, nRight )
+       Draws a circle inside the above parameters.
+
+   * xharbour/include/hbgtwvt.h
+     + Members to GLOBAL_DATA _s : currentPen, currentBrush
+
+   * xharbour/tests/wvtgui.prg
+     * Enhanced to support new functions.
+
+2004-01-10 11:45 UTC+0100 Ignacio Ortiz <iozuniga@ozs.com>
+  * source/vm/extend.c
+    !Fixed random GPFs
+      /* Credits to Jose F. Gimenez */
+
+2004-01-10 02:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/cstruct.prg
+  * source/vm/arrayshb.c
+    ! Fixed some GPF trap, and optimized.
+
+  * source/rtl/errorsys.prg
+    + Added (windows specific and guarded) support for registration of a PRG Function as a GPF Handler.
+
+  + include/hbexcept.ch
+    + New (windows specific and guarded) exception handling.
+
+  + tests/testgpf.prg
+    + New sample to demonstrate PRG level GPF Handler on Windows.
+
+2004-01-10 13:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + Wvt_DrawOutline( nTop, nLeft, nBottom, nRight )
+       Draws a one pixel black outline for given rectangle.
+     + Wvt_DrawLine( nTop, nLeft, nBottom, nRight )
+       This functions draws a horizontal line at the middle of ( nBottom - nTop + 1 ).
+     ! Wvt_DrawBoxGet()
+       Right and Bottom edged corrected.
+
+2004-01-09 21:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * contrib/what32/include/wintypes.ch
+    + Added few missing types.
+
+  * include/cstruct.ch
+  * source/rtl/cstruct.prg
+    * Improved to allow a Structure Tag to be used in Structure Definitions.
+    * Improved to allow a Structure Synonyms to be used in Structure Definitions.
+    * Improved to allow astruct prefix to the Tag Name to be used in Structure Definitions.
+    + Added support for LONGLONG and ULONGLONG
+      /* Now practically full C syntax is supported */
+
+  * include/hberrors.h
+  * source/pp/ppcore.c
+    * Changed cMarkerCount and cGroupCount to unsigned char
+    + Added logic to detect too many instanciations and generate an Error instead of GPF.
+
+2004-01-09 16:50 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * utils/hbmake/hbmake.prg
+    ! added support for gtwvt/xwt as grafical
+
+2004-01-09 09:33 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/gtwvt/gtwvt.c
+    * updated tone handling to be consistant with gtwin
+
+2004-01-09 09:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * bin/bld.bat
+    * corrected compiler checking
+    * updated msvc section for gtwvt support
+
+2004-01-09 00:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbgtwvt.h
+    * Minor MSVC correction
+
+2004-01-08 14:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + Wvt_DrawBoxGroupRaised( nTop, nLeft, nBottom, nRight )
+     ! Wvt_SetMouseMove( lSetMove )
+       Now the function returns the previous state of mouse movement set flag.
+
+2004-01-07 15:10 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+   * source/rtl/gtwvt/gtwvt.c
+     * add HB_OS_WIN_32_USED and changed includes to fix mingw32/OpenWatcom compile
+
+2004-01-07 12:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     * Wvt_DrawBoxGet()
+       Optimized to use _s.hdc instead of GetDC()/ReleaseDC() calls.
+     * Added Some comments.
+
+     /*
+         The above three messages were deletd from the changeLog, reported by
+         Francessco. And as I do not know how to, I am adding them again.
+         Why these message deleted, I do not know.
+     */
+
+2004-01-08 15:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/bldtest.bat
+    * Fixed to show help if called with no params (was hung).
+    * Clean after %2.c|obj|tds and %3.c|obj|tds if existing.
+    + Added support for /WVT or /wvt and logic to allow multiple arguments support.
+
+2004-01-08 14:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_DrawBoxGroupRaised( nTop, nLeft, nBottom, nRight )
+    ! Wvt_SetMouseMove( lSetMove )
+      Now the function returns the previous state of mouse movement set flag.
+
+2004-01-07 15:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/tget.prg
+    * Changed HIDDEN to PROTECTED scope
+
+2004-01-08 12:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * include/hbgtwvt.h
+    * update contents to == include/hbwvt.h
+  * include/hbwvt.h
+    - Delete file
+
+2004-01-07 21:29 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * contrib/firebird/make_b32.bat
+    * Removed auto definition of FBDIR var and added error message.
+      So the user HAVE to define it
+   * tests/bldwvt.bat
+     * changed to save old HB_GT_LIB and CFLAGS state and
+       restore them on exit.
+
+2004-01-07 12:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/gtwvt/gtwvt.c
+    - Moved declaration definitions and #includes to new include/hbwvt.h
+    + Added HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void );
+  + include/hbwvt.h
+    + Moved declaration definitions and #includes to new include/hbwvt.h
+
+  * source/pp/ppcore.c
+    * Corrected typo
+
+2004-01-08 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+    * remove "if ( attr != ' ' )" in hb_wvt_gtSetStringInTextBuffer()
+    * added error checking to hb_wvt_gtDrawImage()
+
+2004-01-07 22:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * Wvt_DrawLabel()
+      Optimized.
+
+2004-01-07 15:10 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rtl/gtwvt/gtwvt.c
+    * add HB_OS_WIN_32_USED and changed includes
+      to fix mingw32/OpenWatcom compile
+
+2004-01-07 12:54 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapifs.h
+  * source/rtl/filehb.c
+  * source/rtl/file.c
+    + Added function IsDirectory() with backend hb_fsIsDirectory() to
+      tell if a given path is an existing directory.
+
+2004-01-07 12:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * Wvt_DrawBoxGet()
+      Optimized to use _s.hdc instead of GetDC()/ReleaseDC() calls.
+    * Added Some comments.
+
+2004-01-07 15:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/inkey.c
+    + SETINKEYBEFOREBLOCK()
+    + SETINKEYAFTERBLOCK()
+        Codeblock that can be set to be called inside INKEY() - before & after
+  * doc/en/input.txt
+    + documentation for SETINKEYBEFOREBLOCK() & SETINKEYAFTERBLOCK()
+
+2004-01-07 12:51 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/memoedit.prg
+  * source/rtl/teditor.prg
+    + passed Self to SETKEY() codeblock call -> Eval( bKeyBlock, Self )
+       ( gives access to Self:GetText() etc.. in codeblock )
+
+2004-01-07 12:20 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + move hb_dynsymFind( "WVT_PAINT" ) call out of wndProc
+   + into GLOBAL_DATA/gt_hbInitStatics()
+
+2004-01-07 10:42 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * doc/en/var.txt
+    + Documentation for: __MVSYMBOLINFO()
+
+2004-01-06 16:28 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * tests/sound.prg
+    + comments
+
+2004-01-07 10:15 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/persist.prg
+   + ReplaceBracketsInString() to handle strings where all 3 delimiters are present
+   * Optimised code for previous changes made
+  * source/vm/memvars.c
+   + HB_FUNC( __MVSYMBOLINFO ) returns array of array of {"SymbolName", xValue}
+  * source/rtl/tget.prg
+   + METHOD Undo() CLASS Get - Fix to work correctly
+
+2004-01-06 16:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * bin/bld.bat
+    * msvc support for gtwvt
+
+2004-01-07 02:34 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/hbusage.c
+    * replace year 2003 with 2004
+  * source/rtl/gtwvt/gtwvt.c
+    * fixes for MSVC compilation
+
+2004-01-06 15:00 utc+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_GetFontInfo()
+      Returns the current font name,height,width,weight,quality.
+    + GUI primitive functions:
+      + Wvt_DrawBoxGet( nRow, nCol, nWidth )
+      + Wvt_DrawBoxRaised( nTop, nLeft, nBottom, nRight )
+      + Wvt_DrawBoxRecessed( nTop, nLeft, nBottom, nRight )
+      + Wvt_DrawBoxGroup( nTop, nLeft, nBottom, nRight )
+      + Wvt_DrawImage( nTop, nLefy, nBottom, nRight, cAnyGraphicFileName )
+      + Wvt_DrawLabel( nRow, nCol, cLabel, nAlign, nAngle, cTextColor, cBackColor, ;
+                       cFontFace, nFontHeight, nFontWidth, nFontWeight, nFontQuality, ;
+                       nCharSet, lItalic, lUnderline, lStrikeout )
+   + xharbour/tests/wvtgui.prg
+   + xharbour/tests/bldwvt.bat
+     * bldwvt wvtgui
+
+     /*
+        These area few GUI primitive functions and hope a lot more will come up.
+        I have handelled the focus change and restore through WVT_PAINT function
+        to be written in the application code which executes a series of code blocks
+        whenever a WM_PAINT message is received by the window.
+
+        I propose that WVT_PAINT, or something lik that, function be part of standard GT
+        which should in turn executes all code blocks put on a stack by the user. The
+        primary job of those code blocks will be to call GUI functions with appropriate
+        parameter.
+
+        This concept has been shown in tests/wvtgui.prg. This window console offers
+        immense possibilities to be explored and incorporated and hope that
+        everybody will contribute to what Peter Rees has made possible.
+     */
+
+2004-01-06 04:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/compiler/hbpcode.c
+    * corrections for -gc3
+
+2004-01-06 02:50 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * contrib/pgsql/Makefile
+    ! fixed include path
+  ! contrib/pgsql/postgres.c
+    ! fixed compilation error
+    ITEM -> PHB_ITEM
+
+2004-01-05 13:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbver.h
+  * bin/!pack_bin.bat
+  * bin/!pack_src.bat
+  * xharbour.spec
+    * Changed to 0.92.0
+
+2004-01-05 16:06 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makallvc.bat
+  * makallbc.bat
+    + contrib/firebird
+    + contrib/pgsql
+  * source/rtl/gtwin/gtwin.c
+    * fixed up comments on tone.
+
+2004-01-05 19:50 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * bin/bld.bat
+    * add -lgdi32 -lcomctl32 to mingw32 for gtwvt
+  * source/rtl/gtwvt/gtwvt.c
+    * add HB_OS_WIN_32_USED and changed includes order
+      to fix mingw32 warnings
+  * source/rtl/filesys.c
+    * add a __WATCOMC__ to fix OpenWatcom/W32 ferror()
+  * config/bsd/gcc.cf
+  * config/dos/djgpp.cf
+  * config/linux/gcc.cf
+  * config/w32/mingw32.cf
+    * add support of HB_USER_LIBS to link users libs
+  * config/prg.cf
+  * config/rules.cf
+  + config/dos/clipper.cf
+    * add support of HB_COMPILER=clipper to build clipper applications
+
+2004-01-05 16:28 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxvt/gtxvt.h
+    * Now the system implements twin process coordination; one process
+      manages the window and the other (bound to the xharbour VM) manages
+      the buffer.
+
+2004-01-05 05:50 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxvt/gtxvt.h
+    ! GT is now initialized only after screen output is done
+    * internal api rationlaization
+    * preliminary works for process splitting.
+
+2004-01-05 01:00 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * utils/hbmake.prg
+    utils/hbmutils.prg
+    ! minor fix for lib files include on linux
+
+2004-01-04 21:45 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * contrib/libct/net.c
+    ! code formated and optimized
+
+2004-01-04 15:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * contrib/libct/net.c
+    ! Fixed few places where low level c worker was using hb_retl(...) instead of return,
+      and HB_FUNC() was using return instead of hbretl().
+
+2004-01-05 09:12 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + remove if (attr!=' ') test from hb_wvt_gtSetColors()
+
+2004-01-04 11:37 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/gtwin/gtwin.c
+    * Tone related optimisations.
+
+2004-01-04 11:15 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  + contrib/libct/net.c
+    ! functions for CT3 Network subsistem provided by Eduardo Fernandes <eduardo@modalsistemas.com.br>
+    Docs for functions includes
+  * contrib/libct/Makefile.bc
+    contrib/libct/Makefile.vc
+    contrib/libct/Makefile
+    ! updated makefiles to include net.c
+
+2004-01-05 05:50 UTC+0100 Giancarlo Niccolai
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxvt/gtxvt.h
+    ! GT is now initialized only after screen output is done
+    * internal api rationlaization
+    * preliminary works for process splitting.
+
+2004-01-03 20:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * makefile.nt
+  * makefile.vc
+    + Fixed support for LFLAGS
+
+  * source/rtl/gtwvt/gtwvt.c
+    * MSVC type cast.
+
+2004-01-03 19:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/cmdcheck.c
+    ! Fixed -gc default to -gc2 instead of -gc3
+    (BTW Andi, -gc3 generates a GPF with sample like testole.prg)
+
+  * source/rtl/win32ole.prg
+    * Removed | DISPATCH_METHOD from wFlags in HB_FUNC( OLESETPROPERTY )
+
+2004-01-04 02:05 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbapigt.h
+    * GTALLEG added for MULTI GT compilation
+
+  * xharbour/source/rtl/gtwin/gtwin.c
+    * fixed bug in tone for win9x I introduce recently. Thanks to Andi.
+
+2004-01-03 21:41 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * Fixed colors BRIGHT_BLUE and BRIGHT_RED to be closest to clipper colors
+    + Added application name title
+
+  * source/rtl/dumpvar.prg
+    + Added __OutDebug() function
+      This function permit to have more (...) parameters to display with
+      hb_outdebug()
+
+  * contrib/firebird/make_b32.bat
+  * contrib/firebird/makefile.bc
+    * Changed for auto creation of fbclient.lib
+      ! Set environment var FBDIR=path/of/firebird
+
+2004-01-03 15:04 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.h
+  * source/rtl/gtxvt/gtxvt.h
+    ! Minor fixups
+
+  * config/bsd/gcc.cf
+  * config/linux/gcc.cf
+    + Added support for gtxvt in utils
+
+  * config/linux/global.cf
+    - removed support for gtQTc
+
+2004-01-03 16:30 utc+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * More formatting.
+
+2004-01-03 15:00 utc+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * More formatting for easier grasping.
+    * More color compatibility with console.
+    + hb_wvt_gtSetIconFromFile( char *icon )
+    + Added Prg level functions to exploit wvt functionality ( REQUEST these in your main() ):
+      + Wvt_SetIcon( ncIcon )
+      + Wvt_SetFont( cFontName, nHeight, nWidth, nWeight, nQuality )
+      + Wvt_SetTitle( cTitle )
+      + Wvt_SetWindowPos( nX, nY )
+      + Wvt_GetWindowHandle()
+      + Wvt_SetCodePage( nCodePage )
+      + Wvt_CenterWindow( lCenter, lPaint )
+      + Wvt_SetMouseMove( lMove )
+
+	  These functions need be implemented at GT level but is only possible
+        when someone implements them in proper way. Till then only for WVT.
+
+        When changing the fonts I could not control the box characters.
+        Hopefully Peter may get it done.
+
+  * xharbour/include/hbgtwvt.h
+    + Added extern hb_wvt_gtSetIconFromFile( char *icon )
+
+2004-01-02 18:20 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_tgz.sh
+  * xharbour/xharbour.spec
+  * xharbour/bin/hb-func.sh
+    + XLIB support for gtxvt
+
+2004-01-02 15:10 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  + contrib\pgsql\Changelog
+  + contrib\pgsql\make_b32.bat
+  + contrib\pgsql\Makefile
+  + contrib\pgsql\makefile.bc
+  + contrib\pgsql\postgres.c
+  + contrib\pgsql\README
+  + contrib\pgsql\TPostgres.prg
+  + contrib\pgsql\tests\dbf2pg.prg
+  + contrib\pgsql\tests\Makefile
+  + contrib\pgsql\tests\simple.prg
+  + contrib\pgsql\tests\stress.prg
+  + contrib\pgsql\tests\test.prg
+    + Xharbour  functions and classes for PostgreSQL
+
+2004-01-02 14:59 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rtl/gtxvt/gtxvt.c
+    * fixed for gcc < 3.0 compilation
+
+2004-02-01 12:37 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    ! Fixed a wrong box character
+
+2004-01-02 12:06 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxvt/gtxvt.h
+    ! Fixed visualization of box characters (they were missing some
+      corners before.
+    + Complete visualization of ALL box characters, including
+      partially double and single chars.
+
+2003-12-31 14:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/debug/debugger.prg
+    * another fix to callstack management
+    * still buggy but seems to work in more cases than before
+
+2003-12-31 11:50 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    + Added dynamic resizing of the VT while running.
+    ! Added Window Manager Hints: this helps window managers to resize correctly
+      the console; i.e. the console is now resized at discrete multiples of
+      font width/height.
+
+2003-12-31 08:00 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+  + source/rtl/gtxvt/gtxvt.h
+    + Now the virtual buffer of gtxvt is unicode. It's slower, as
+      many transformations are required, but is fast enough.
+    + Added support for DOS semigraphic characters. Fillers (full
+      and partial squares), single and double border boxes are
+      now drawn in the terminal INDEPENDENTLY from the underlying
+      font (they are drawn "manually" via draw functions).
+      (mixed style semigraphic characters are still missing though).
+
+
+2003-12-30 22:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  + contrib\firebird\firebird.c
+  + contrib\firebird\tfirebird.prg
+  + contrib\firebird\README
+  + contrib\firebird\make_b32.bat
+  + contrib\firebird\Makefile
+  + contrib\firebird\makefile.bc
+  + contrib\firebird\tests\Makefile
+  + contrib\firebird\tests\stress.prg
+  + contrib\firebird\tests\simple.prg
+  + contrib\firebird\tests\test.prg
+  + contrib\firebird\tests\testapi.c
+  + contrib\firebird\tests\README
+    + Xharbour  functions and classes for Firebird Acess Provided by Rodrigo Moreno
+
+
+2003-12-29 11:41 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_gnu.bat
+  * xharbour/make_gnu.cmd
+  * xharbour/make_gnu.sh
+  * xharbour/bin/!pack_src.bat
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/pack_src.sh
+    + gtxvt support added
+
+2003-12-31 11:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + Handle K_ALT_1 - 0, K_ALT_A - Z  for all Keyboard mappings
+
+2003-12-31 09:37 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + removed redundant static BOOL lMouseDown, rMouseDown
+   + Made default to not activate System Menu when Alt key pressed on it's own
+
+2003-12-30  11:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.slx
+    * Added HB_TEXT to IF_BELONG_LEFT (fixed Text[...] support).
+
+2003-12-30 10:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  + lib/bcc640mt.lib
+    + Added mt version of bcc640.lib
+  ! bin/bld.bat
+    ! on MT compilation with bcc32 compiler use bcc640mt.lib
+  ! utils/hbmake/hbmake.prg
+    ! if use MT libs options is selected, use bcc640mt.lib
+
+2003-12-30 12:45 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * bin/bld.bat
+    * changed -gc0 to -gc to help the debug of the pcode
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+    * strip relative path from the debug informations
+  * source/debug/debugger.prg
+    * fix callstack management
+    * add lookup to HB_DBG_PATH before PATH to look for prg sources
+
+2003-12-30 11:20 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtxvt/gtxvt.c
+    * Fixed a problem with gcc < ver. 3
+
+2003-12-30 00:38 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapigt.h
+  * config/linux/global.cf
+  + source/rtl/gtxvt/Makefile
+  + source/rtl/gtxvt/gtxvt.c
+    + Added GTXVT: Xwindows virtual terminal for unices
+
+  * source/vm/thread.c
+    ! Fixed threadsleep() to be interrupt compliant and hb_treadKillAll()
+      that may have caused deadlocks.
+
+  * tests/Makefile
+    - Remove compilation of gtQTc samples
+    + Added compilation of gtxvt; just set HB_GT_LIB=gtxvt and you'll have
+      your tests compiled with "make test" in x virtual terminal.
+
+  * tests/mousetst.prg
+    ! Added support for mouse with more than 3 buttons.
+  * tests/service.prg
+    ! Using the console to write timer data.
+
+  * source/rtl/hblog.prg
+
+2003-12-29  14:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed wrong conversion of [...] to "..." when strotrim was called from CommandStuff()
+      by adding logic to reset s_bArray based on the value of the KEY of the rule.
+
+2003-12-29 22:56 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/dos/watcom.cf
+    - removed -ol optimization
+
+  * xharbour/config/w32/watcom.cf
+    + added proper include directory
+
+  * xharbour/source/rtl/gtdos/gtdos.c
+    * time sync before tone for Clipper compatibility
+
+2003-12-29  11:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+  * source/rtl/seconds.c
+    * Added HB_EXPORT to hb_secondsCPU()
+
+  * source/rtl/gtwin/gtwin.c
+    * MSVC compilation
+
+2003-12-29 16:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * utils/hbdoc/genng.prg
+    utils/hbdoc/genrtf.prg
+     ! REPL() calls changes to replicate()
+
+2003-12-29 11:00 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * source/rtl/hbffind.c
+   ! added error 25 to winToDosError
+
+2003-12-29 10:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * xharbour/source/rtl/filesys.c
+   ! Fix to hb_fsWrite and hb_fsWriteLarge on Win32 api section, when number of bytes to write is 0
+
+2003-12-29 11:41 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/contrib/libct/strfile.prg
+   * fixed strfile() - we still haven't SETSHARE()/GETSHARE()/SETFCREATE()
+     when they will be implemented this function has to be updated
+
+  * xharbour/source/rtl/filesys.c
+   * added errorcodes conversion for OpenWatcom.
+     full conversion table for all compilers is on my TODO list
+     but with low priority
+
+  * xharbour/source/rtl/gtpca/gtpca.c
+   ! small fix for OpenWatcom
+
+2003-12-29 14:26 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + added K_LDBLCLK & K_RDBLCLK support
+   + Turn off K_MOUSEMOVE handling by default ( see hbgtwvt.h )
+  * include/hbgtwvt.h
+   + added extern BOOL HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent)
+   *     - allows mouse movement events to be handled
+
+2003-12-29 02:25 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  + doc/en/bkgtsks.txt
+  * doc/en/set.txt
+    + Added background tasks documentation.
+
+2003-12-28 23:14 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/rules.cf
+   * small fixes
+
+  * xharbour/config/dos/djgpp.cf
+   * fixed include dirs
+
+  * xharbour/config/dos/watcom.cf
+   * fixed include dirs
+   * some optimizations enabled - Loernzo please check your sources
+     if it will break anything I would like to know so I'll rewert it.
+
+  * xharbour/xharbour.spec
+   * fixed missing "'" in PLD detection
+   * Aurox distro detection added
+
+  * xharbour/source/vm/errorapi.c
+   * small change to cause GPF in DJGPP for //ERRGPF switch.
+
+  * xharbour/contrib/libct/keyset.c
+   * fixed missing ")"
+
+  * xharbour/contrib/libct/files.c
+   * disabled some part of code to compile it with OpenWatcom
+     It should be reverted and OpenWatcom support added.
+
+  * xharbour/source/rtl/inkey.c
+   * replaced fixed 100 with sysconf(_SC_CLK_TCK)
+
+  * xharbour/include/hbapi.h
+  * xharbour/source/rtl/idle.c
+   + added new function: void hb_idleSleep( double dSeconds )
+     we have new feature: background task, they should be served
+     in idle loops too. So instead of changing a lot of files
+     to add such support I created new function hb_idleSleep
+     and replaced all idle loops with timer I found with call to it.
+     I want to group all this functions in one place (Giancarlo,
+     I'm thinking about ThreadSleep too) and then add support for
+     asynchronous background task execution for these platforms where
+     it is possible eliminating counters, time checking and
+     keyboard polling from main VM loop just after 0.92
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtdos/gtdos.c
+  * xharbour/source/rtl/gtnul/gtnul.c
+  * xharbour/source/rtl/gtpca/gtpca.c
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtwin/gtwin.c
+   * replaced idle loops with timer with hb_idleSleep()
+     Paul I live some comments in GTWIN gt_tone() function.
+     Can you read it and check if it works.
+
+  * xharbour/source/vm/Makefile
+   + thread.c has to be compiled on DOS too as far as it has functions
+     which are used in ST programs (SECONDSSLEEP())
+
+  * xharbour/source/vm/thread.c
+   + added support for DOS OpenWatcom
+
+2003-12-27 13:10 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/bkgtsks.c
+    * Fixed dSeconds initialization.
+
+2003-12-27 12:20 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * hrbdll.bc
+    + source/vm/thread.c
+
+2003-12-27 03:40 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/bkgtsks.c
+    * Completed background tasks.
+      Added a structure contains all informations about tasks.
+      Now we have time in milliseconds after the task will be executed
+      and Active flag that defines if the task has to be executed or not.
+    on C level
+    * ULONG hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive )
+      Add a new task:
+      - pBlock     = can be a codeblock or an array as defined in hb_ExecFromArray()
+      - nMillisec  = number of milliseconds the task have to run, default 0 = always run
+      - bActive    = .T. the task is active
+    + BOOL hb_backgroundActive( ULONG ulID, BOOL bActive )
+    + int hb_backgroundTime( ULONG ulID, int nMillisec )
+    + PHB_BACKGROUNDTASK hb_backgroundFind( ULONG ulID )
+      internal function that returns the task
+    on PRG level
+    * hb_BackgroundAdd( bBlock|aArray, nMillisec, lActive ) --> nID
+    + hb_backgroundActive( nID, lActive ) --> lOldActive
+    + hb_backgroundTime( nID, nMillisec ) --> nOldTime
+
+  * source/vm/hvm.c
+    * Changed background counter to 1000 vm exec.
+  * include/hbapi.h
+    + added support for new background functions and HB_BACKGROUNDTASK structure
+  * include/thread.h
+    * changed support for background defines
+  * tests/bkgtest.prg
+    * Updated with new and complete tests
+
+2003-12-26 22:46 utc+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * More formatting to make it more readable,
+    * Colors made 100% compatible with console window.
+    * K_MOUSEMOVE functionality added.
+
+2003-12-26 14:05 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * include/struct.ch
+    ! AutoAdd is set to .F. to prevent creation of new datas outside structure/endstructure.
+      Now we get a bound error, instead having an item added to a structure.
+
+2003-12-24 17:15 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * bin/hb-funcs.sh
+    ! conectiva was prefix by rh insted of cl, fixed
+
+2003-12-24 17:10 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * contrib/mysql/Makefile
+    ! Minor fix
+
+2003-12-24 10:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/valtype.c
+    ! Fix HB_ISNUMBER(), now return FALSE for CHAR(1)
+    Reported by Toninho
+
+2003-12-24  02:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * MSVC fixes
+
+  * source/rdd/dbfcdx/dbfcdx1.h
+    + Added #pragma pack support for MSVC
+
+2003-12-23 16:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * contrib/what32/source/_windraw.c
+  * contrib/what32/source/_winfont.c
+  * contrib/what32/source/_wingdi.c
+  * contrib/what32/source/_winhead.c
+  * contrib/what32/source/_winlv.c
+  * contrib/what32/source/_winmisc.c
+  * contrib/what32/source/_winscrlb.c
+  * contrib/what32/source/_winsock.c
+  * contrib/what32/source/whatutil.prg
+  * contrib/what32/source/wincore.prg
+    * Replaced direct access to hb_stack with API access.
+    * Minor corrections.
+
+2003-12-23 23:48 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/w32/mingw32.cf
+    * grouped xHarbour libraries to resolve problem with cyclic cross
+      referenced and gdi32, comctl32 libs added for linking with GTWVT
+
+  * xharbour/bin/hb-func.sh
+    * gdi32, comctl32 libs added for linking with GTWVT
+
+  * xharbour/make_tgz.sh
+  * xharbour/xharbour.spec
+    * remove unnecessary now definitions
+
+2003-12-23 17:50 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtwvt/gtwvt.c
+    ! Fixed color values to be more DOS-like
+
+2003-12-24 08:33 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/persist.prg
+  + Handle string enclosed in [] when replacing CHR(13) & CHR(10)
+
+2003-12-24 07:17 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/persist.prg
+  + fixed for save data prior to "// HBPersistent Ver 2.0"
+
+2003-12-23 21:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * source/rtl/gtwvt/gtwvt.c
+     * #define WHITE RGB( 0xC6, 0xC6, oxC6 )
+       White color more near to terminal screen.
+     * Formatting to make it more tangible to new comers.
+
+2003-12-22 22:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/rdd/dbcmd.c
+     * Fixes to HB_FUNC( SELECT ) and HB_FUNC( DBSETRELATION ) related to last change.
+
+2003-12-23 15:51 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/gtwvt/gtwvt.c
+  + Fix handling of K_LBUTTONUP & K_RBUTTONUP
+
+2003-12-23 15:51 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/vm/mainwin.c
+  + update to use HB_FM_WIN32_ALLOC so malloc() is default not LocalAlloc()
+
+2003-12-23 01:44 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/dos/dir.cf
+  * xharbour/config/dos/global.cf
+  * xharbour/config/dos/install.cf
+  * xharbour/config/w32/global.cf
+    * small cleanups
+
+  * xharbour/include/hbsetup.h
+  * xharbour/source/vm/fm.c
+    + new macro HB_FM_WIN32_ALLOC which enable Win API
+      LocalAlloc()/LocalFree() instead of C malloc()/free()
+    * HB_FM_WIN32_ALLOC is disable by default
+
+  + xharbour/tests/speedtst.prg
+    + simple program for speed test added
+
+2003-12-23 13:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/persist.prg
+  + fixed bug if CHR(13) or CHR(10) embedded in character string variable
+  +       and also if character string length > 254 character
+  +       i.e. removed use of MLCOUNT() / MEMOLINE()
+
+2003-12-23 07:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    * modify castings on hb_hInstance and hb_hPrevInstance for MSVC.
+
+2003-12-22 22:47 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/dos/watcom.cf
+  * xharbour/config/w32/msvc.cf
+  * xharbour/config/w32/watcom.cf
+  * xharbour/source/rtl/gtwin/gtwin.c
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/rtl/gtwin/mousewin.c
+    * small fixes for HB_MULTI_GT mode
+
+2003-12-22 12:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/rdd/dbcmd.c
+     * Removed redundant logic by calling hb_rddSelectWorkAreaAlias() instead of hb_rddSelect().
+     * Some formating.
+
+   /*
+      Przemek, can you please review, I belive it makes the code and error handling more consistent.
+      but I'd like you to confirm it's ok.
+    */
+
+2003-12-22 10:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcomp.c
+    * Protected unconditional call to hb_pp_WrStr()
+
+2003-12-22 08:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * contrib/what32/_winserial.c
+    ! Fixed handling of 2nd param in HB_FUNC( TRANSMITCOMMCHAR )
+
+2003-12-22 08:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcomp.c
+    * Corrected typo that caused parse error if no -P used.
+
+2003-12-22 15:00 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * bin/bld.bat
+  * config/w32/watcom.cf
+    * gtwvt needs comctl32.lib
+  * source/rtl/memoedit.prg
+    * avoid rt errors when nUserKey == nil
+
+2003-12-21 20:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed handling of multiple escapes (//) to allow generation of escape in nested #directive
+      (reported by Francesco)
+
+  * source/pp/ppcomp.c
+    + Added logic to generate output for nested #directives genreated by pre-processing (Clipper compatibility).
+
+2003-12-22 15:07 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * fixed HB_GT_FUNC(gt_SetAttribute( )) so hb_shadow() works correctly
+
+2003-12-22 14:25 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * moved /source/rtl/gtwvt/gtwvt.h to /include/hbgtwvt.h
+  + added version no/Id line to gtwvt.c & hbgtwvt.h
+  + Changed "Peter Rose" to "Peter Rees" in this Changelog :-)
+
+2003-12-22 07:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * source/rtl/gtwvt/gtwvt.c
+     * fixed compilation under MSVC
+
+2003-12-22 00:30 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/vm/hvm.c
+    ! Fixed background counter.
+      Moved to global vm level so it will not be cleared on vmExecute() exit.
+      Thanks to Giancarlo Niccolai.
+  * source/rtl/bkgtsks.c
+    on C level
+    + void hb_backgroundRunSingle( void ) - to run a single background task manually
+    on PRG level
+    * HB_BackgroundRun( [ nTaskID ] )     - passing nTaskID returned from HB_BackgroundAdd()
+                                            it is possible to run manually a single task
+                                          - without parameter all tasks will be run
+  * include/hbapi.h
+    + added support for hb_backgroundRunSingle()
+  * tests/bkgtest.prg
+    * Updated with other tests
+  * makefile.bc
+  * makefile.vc
+  * makefile.nt
+    * updated for new GTWVT written by Peter Rees  (great job Peter)
+      /*
+      for ppl who want test it set:
+      HB_GT_LIB=gtwvt
+      CFLAGS=-W   (plus other flags already present)
+      then you can compile tests with bldtest.bat in tests folder
+      */
+
+2003-12-21 22:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_gnu.bat
+  * xharbour/make_gnu.cmd
+  * xharbour/make_gnu.sh
+  * xharbour/make_mingw.sh
+  * xharbour/bin/!pack_src.bat
+  * xharbour/bin/bld.bat
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/pack_src.sh
+  * xharbour/config/w32/global.cf
+  * xharbour/include/hbapigt.h
+  + xharbour/source/rtl/gtwvt/Makefile
+    * updated for new GTWVT written by Peter Rees
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * casting for OpenWatcom (and probably other C++) compilation.
+
+2003-12-22 10:11 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/memoedit.prg
+  + fixed bug where cUserfunction:= .F. was not being respected
+
+2003-12-22 08:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  + added source/rtl/gtwvt gtwvt.c gtwvt.h
+  * new Windows colsole mode gt system
+
+
+2003-12-21 00:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/valtype.c
+    + NEW Function HB_ISNULL()
+      Used to optimize LEN(x)==0 or LEN(x)!=0 (see include/common.ch)
+        where x can be of type: STRING, ARRAY or HASH
+  * include/common.ch
+    + #xtranslate for HB_ISPOINTER()
+    + #xtranslate for HB_ISNULL()
+
+2003-12-20 23:45 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * contrib/mysql/Makefile
+    * Indented
+  * contrib/mysql/mysql.c
+    % Code optimization
+  * contrib/mysql/tmysql.prg
+    ! Fix minor bug in type of data.
+
+2003-12-20 23:15 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/sprintf.prg
+    ! Fixed bug returning '%' before numbers
+  * source/rtl/dbedit.prg
+    * Compatibility issue: Clipper displays dbedit() even if dbf empty, then calls UserFunc
+
+2003-12-20 12:08 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rtl/net.c
+    * added a trick to fix NETNAME() with OpenWatcom 1.1 DOS
+    a better solution is welcome
+
+2003-12-20 11:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/vm/cmdarg.c
+    * use the //F:n parameter to open more than 20 files
+      with OpenWatcom 1.1 DOS
+  * config/rules.cf
+  * config/w32/watcom.cf
+  * config/dos/watcom.cf
+    * all libraries now look for HB_LIB_COMPILE path
+    * added support of HB_USER_LIBS to build user apps
+    with gnu make and the config dir can be used for user applications
+    simply copying the config dir in the user app tree, creating Makefiles like
+    xHarbour ones using lib, bin, dir config files and adding app libraries to HB_USER_LIBS.
+    The build script should set HB_BIN_COMPILE, HB_LIB_COMPILE, HB_INC_COMPILE to xHarbour directories
+    and use HB_USER_FLAGS for app defines flags and include dirs
+
+2003-12-19 00:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/sprintf.prg
+    + Added xHarbour header
+  * source/rtl/dbedit.prg
+    ! Ignoring UserFunc return code in initialization
+      (some ppl use dbedit() to show data & return 0 inmediatly in UserFunc)
+    ! Moved Top/Bottom detection after TBrowse stabilization
+  * tests/dbedit.prg
+    + Added hitTop/Bottom test code
+
+2003-12-19 17:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+  * source/vm/garbage.c
+    * synched HB_EXPORT declarations.
+
+2003-12-19 13:00 UTC+0600
+  * source/rtl/teditor.prg
+    + complete rewrite of key methods, multiple bug fixes
+
+2003-12-19 23:28 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/bkgtsks.c
+    ! Ops, the error has been copied here... Fixed.
+
+2003-12-19 23:06 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/idle.c
+    ! Ops, I had introduced a little error in recording the old address of the
+      codeblock. Fixed.
+
+2003-12-19 17:32 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/thread.h
+    % Thread VM Cancelation is now tested each 5000 loops instead of 1000.
+      Again, this seems to speed up normal MT programs by a good deal.
+
+2003-12-19 17:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapi.h
+    + added hb_background* functions definitions
+    + added hb_idleAddFunc() and hb_idleDelFunc functions definitions
+
+  * include/thread.h
+    % Thread VM Cancelation is now tested each 1000 loops instead of 100.
+      This seems to speed up normal MT programs by a good deal.
+    + Added support for background functions under MT.
+
+  * source/vm/hvm.c
+  * source/vm/thread.c
+  * source/rtl/bkgtsks.c
+    + Added support for background functions under MT.
+
+
+2003-12-19 02:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Fixed GPF trap related to un-initialized .type before passed to hb_hashGet().
+
+2003-12-18 23:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbstack.h
+  * source/vm/estack.c
+    + Added HB_EXPORT HB_STACK hb_GetStack()
+
+  * include/thread.h
+    + added #ifndef HB_VM_STACK before #define HB_VM_STACK
+
+  * include/hbapi.h
+  * source/vm/garbage.c
+  * source/vm/memvars.c
+    + Added few missing HB_EXPORT qulifiers.
+
+  * source/vm/hvm.c
+    * Minor formatting.
+
+2003-12-19 04:21 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/vm/hvm.c
+    forgot to signal in changelog before
+    * updated to run background functions every 5000 cycles of vm machine
+      ! PLEASE REMEMBER that background function must do FAST work
+        otherwise all prg will decrease speed
+
+  * tests/bkgtest.prg
+    + Added other tests to show use of Background functions
+
+2003-12-18 22:41 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  + source/rtl/sprintf.prg
+    + initial sprintf() version with basic conversions
+      Thanks to Walter Negro for telling me the hope of a printf() availability
+  * source/rtl/Makefile
+    + Added printf.prg to PRG_SOURCES
+  * include/std.ch
+    + translate printf(...) to ? sprintf(...)
+  + test/printf.prg
+    + basic printf() test
+
+2003-12-19 02:31 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  + source/rtl/bkgtsks.c
+    ! Added:
+      At C Level
+      void hb_backgroundRun( void )
+      void hb_backgroundReset( void )
+      void hb_backgroundShutDown( void )
+      ULONG hb_backgroundAddFunc( PHB_ITEM pBlock )
+      PHB_ITEM hb_backgroundDelFunc( ULONG ulID )
+
+      At PRG Level
+      HB_BackgroundAdd()
+      HB_BackgroundDel()
+      HB_BackgroundRun()
+      HB_BackgroundReset()
+
+    Now we can have multitasking on ST !
+    This is done as an extension of idle state.
+    Background functions works on every vmExecute() call,
+    so PAY ATTENTION in use of them! A wrong use will make your prg very SLOW.
+    Background functions are operative throught a SET BACKGROUND TASKS ON|OFF
+    or Set( _SET_BACKGROUNDTASKS, .T.|.F. )
+    Default is set to FALSE.
+    Even it is set to FALSE, you can call it explicitly using HB_BackgroundRun()
+    i.e. inside HB_Idle*() functions.
+
+  * include/hbset.h
+  * include/set.ch
+  * source/pp/pptable.c
+  * source/rtl/set.c
+  * source/rtl/Makefile
+  * makefile.bc
+  * makefile.vc
+  * makefile.nt
+  * hrbdll.bc
+  * hrbdll.vc
+    * touched for background functions
+
+
+  + tests/bkgtest.prg
+    + Added tests to show use of Background functions
+
+2003-12-18 12:10 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/compiler/harbour.c
+    * casting added
+
+  - xharbour/Changelog.012
+  - xharbour/Changelog.013
+  + xharbour/ChangeLog.012
+  + xharbour/ChangeLog.013
+    * renamed Changelog to ChangeLog
+
+2003-12-18 13:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/abs.c
+  * source/rtl/chrasc.c
+  * source/vm/extend.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+    ! Fixed numeric context of char subtype to be consistent.
+
+  * utils/hbtest/rt_math.prg
+  * utils/hbtest/rt_str.prg
+  * utils/hbtest/rt_stra.prg
+    * Corrected expected values of expressions involving numeric context of char subtype.
+
+2003-12-18 17:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbstruct.ch
+    ! Hash() must be set case insensitive at creation to
+      provide coherently the oStru:c1 grammar
+  * tests/struct.prg
+    * more intensive tests
+
+2003-12-18 15:46 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/idle.c
+    + Added hb_idleAddFunc() and hb_idleDelFunc() as
+      C callable frontends for HB_IdleAdd() and HB_IdleDel()
+    + Idle functions can now be both codeblocks and
+      executable arrays (that is, array that can be passed
+      to hb_execFromArray()). This allows to dynamically
+      create (or change) idle functions, even from C programs,
+      very easily.
+    ! HB_IdleDel() could possibly have caused GPF. Luckily,
+      it is seldom used.
+
+  + tests/idletest.prg
+    + Added tests for executable array and codeblock idle
+      functions; added a test also for HB_IdleDel
+      (now working).
+
+2003-12-18 12:10 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/linux/gcc.cf
+    * Ups, sorry missing '(' ')' added
+
+2003-12-18 11:52 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_tgz.sh
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/postinst.sh
+  * xharbour/config/linux/gcc.cf
+  * xharbour/config/w32/mingw32.cf
+    * small fixes and formating
+
+2003-12-18 07:41 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/itemapi.c
+    * remove un-needed routine to copy double number to a string which
+      may cause slowness in applications.
+
+2003-12-17 15:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed compilation of <> in #directives.
+
+  * source/rtl/console.c
+    + Added OutputDebugString() in hb_conOutErr() if under Windows.
+
+  * source/vm/estack.c
+    * Minor formatting.
+
+2003-12-17 15:40 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tobject.prg
+    % Optimize and reformatted code.
+    %! Fix and optimize TAssociativeArray_GetKeyPos().
+
+2003-12-16 19:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+    ! Fixed INIT/EXIT Procedures to be more Clipper compatible
+      Don't conflict with other symbols of same name, and use $ as suffix like in Clipper.
+
+2003-12-16 12:15 UTC+1200 Peter Rees <peter@rees.co.nz>
+  * source/vm/mainwin.c
+    *fixed to make sure terminating '\0' is on final parameter
+
+2003-12-15 14:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  + source/codepage/CDPHR1250.C
+  + source/codepage/CDPHR852.C
+  + source/lang/MSGHR1250.C
+    + Added new files contributed by Vladimir Miholic [mailto:Vladimir.Miholic@sk.hinet.hr]
+
+  * source/lang/msghr852.c
+    Update contributed by Vladimir Miholic [mailto:Vladimir.Miholic@sk.hinet.hr]
+
+  * hrbdll.bc
+  * makefile.bc
+    + Added support for new hr1250 language and hr852 and hr1250 codepage files.
+
+2003-12-16 08:43 UTC+1200 Peter Rees <peter@rees.co.nz>
+  *  restored 4 changelog entries below
+
+2003-12-15 15:24 UTC+1200 Peter Rees <peter@rees.co.nz>
+  * source/vm/mainwin.c
+    *added LocalFree( pArgs ) after hb_vmQuit() to. Ok on Win9X now.
+
+2003-12-15 15:24 UTC+1200 Peter Rees <peter@rees.co.nz>
+  * source/vm/mainwin.c
+    *remove LocalFree( pArgs ) as causes problem with Win9X
+
+2003-12-15 11:41 UTC+1200 Peter Rees <peter@rees.co.nz>
+  * source/vm/mainwin.c
+    *fix last change for exception if only parameter is "
+       e.g. test "
+
+2003-12-15 11:11 UTC+1200 Peter Rees <peter@rees.co.nz>
+  * source/vm/mainwin.c
+    *altered to handle command line quoted parameters correctly for Windows
+       e.g. test "Param 1" param2 "Param 3"
+
+2003-12-15 15:08 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/vm/cmdarg.c
+    * fixed memory leak in hb_cmdargGet. Warning if the second param
+      is FALSE then returned value cannot be directly used but only
+      tested for (not) NULL
+
+2003-12-15 07:06 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/thread.c
+  * include/thread.h
+    ! Compilation of __thread keyword allowed only for gcc >= 3
+    + Added macro
+       -DHB_THREAD_TLS_BUG
+    Without it, the compilation of -DHB_THREAD_TLS_KEYWORD is exactly
+    like on windows, that is, faster. Platforms having the GCC bug must
+    add this define to avoid immediate Seg fault.
+
+2003-12-15 05:02 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/thread.c
+    ! fixed windows compilation
+
+2003-12-15 03:30 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/arrays.c
+    ! removed an old useless comment
+
+  * source/vm/fm.c
+    * romoved a useless ceck in if
+
+  * source/vm/memvars.c
+    * changed _pStack_ in HB_VM_STACK
+
+  * include/thread.h
+  * source/vm/thread.c
+    + Added __thread TLS variable to access stack instead of
+      hb_getCurrentStack();
+      This change is now available only with
+         -DHB_THREAD_TLS_KEYWORD
+      defined
+
+
+2003-12-14 12:27 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/contrib/libct/Makefile
+    - removed C_USR=... - it disabled user C switches
+
+2003-12-14 13:42 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/genc.c
+    * allow xHarbour to produce C file for inline C routines contained in a PRG
+      file eventhough the PRG file does not contain a single PRG routine.
+
+2003-12-13 17:57 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/hblog.prg
+    % Optimized to use FOR EACH/
+    * Minor formating.
+
+2003-12-13 21:07 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * hrbdll.bc
+    + source/rtl/readline.c
+
+2003-12-14 02:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/macro.c
+    * add #include "hbfast.h" to please MSVC
+  * source/rtl/readline.c
+    * some type casts for MSVC
+
+2003-12-13 11:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hash.c
+    + Added Owners Management support.
+    * Minor optimizations and formating.
+
+  * tests/hash.prg
+    * Minor formating
+
+2003-12-13 19:10 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/tests/rddspeed.prg
+    * close and then reopen database after index creation to workaround
+      Clipper bug. After index creation Clipper lose index locking
+      and works like in exclusive mode when in fact it's shared mode.
+
+2003-12-13 18:52 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * typo in comment fixed
+
+  * xharbour/Makefile
+  * xharbour/bin/hb-func.sh
+  * xharbour/config/dir.cf
+  * xharbour/config/install.cf
+  * xharbour/config/dos/install.cf
+  * xharbour/config/linux/install.cf
+  * xharbour/config/w32/install.cf
+    ! fixed redundant pass in 'install' I introduced recently
+    * next changes and cleanups for msys build
+
+2003-12-13 12:43 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * hrbdll.vc
+  * makefile.nt
+  * makefile.vc
+    + source/rtl/readline.c
+
+2003-12-13 14:45 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/rtl/readline.c
+     ! Optimized and improved HB_FREADLINE()
+  * source/vm/dbsdf.prg
+     ! Fixed APPEND FROM SDF (now using HB_FREADLINE() to read txt lines)
+  * source/tests/dbsdf.prg
+     + Sample test to APPEND FROM SDF
+  * source/tests/tstline.prg
+     + Sample test to HB_FREADLINE()
+
+2003-12-13 08:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * bin/bld.bat
+     + Added support for %HB_USER_LIBS% for BCC32 and MSVC
+
+   * source/vm/macro.c
+     ! Fixed another lurking bug resulting from premature release of item containing string to be parsed.
+
+2003-12-13 14:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * ChangeLog
+    * Rename ChangeLog to ChangeLog.017
+    * Add new ChangeLog
+  * source/vm/hvm.c
+    * minor changes to fix representation of -0 value (I hope this is the last part)
+

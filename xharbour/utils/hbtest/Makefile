@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2000/04/14 20:01:22 vszel Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:44:36 ronpinkas Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -20,6 +20,7 @@ PRG_SOURCES=\
 	rt_str.prg   \
 	rt_stra.prg  \
 	rt_trans.prg \
+	rt_ccall.prg \
 
 PRG_MAIN=hbtest.prg
 
