@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2718 2004/04/02 11:13:18 srobert Exp $
+ * $Id: ChangeLog,v 1.2719 2004/04/02 12:08:26 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-02 14:33 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  + xharbour/source/rtl/gtnul/gtsys.c
+    + GTSYS added. It forces to link in MULTI GT mode the default
+      build GT. Without it GTNUL pass all reference so smart linkers
+      drop any other GT libs on if you don't add to your sources
+         REQUEST HB_GT_<gtname>
+      So far such REQUEST with default build GT was inside gtnul.c
+      so final program always has to be linked with the default GT.
+      Now user can disable this feature by adding to his sources:
+         ANNOUNCE GTSYS
+      This is the same mechanism as RDD use in RDDSYS()
+      Sorry I missed to add this file in my previous commit()
+
+  * xharbour/tests/bldtest/Makefile
+    * fixed typo
 
 2004-04-02 07:16 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
   * source/rtl/errorsys.prg

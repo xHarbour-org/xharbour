@@ -1,12 +1,12 @@
 #
-# $Id: Makefile,v 1.1 2004/03/18 04:28:31 druzus Exp $
+# $Id: Makefile,v 1.2 2004/03/18 14:24:29 druzus Exp $
 #
 
 ROOT = ../../
 
 C_SOURCES=\
 
-C_MAIN=endian.c
+C_MAIN=bldtest.c
 
 LIBS=\
 
