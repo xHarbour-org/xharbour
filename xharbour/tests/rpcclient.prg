@@ -1,6 +1,6 @@
 ************************************************************
 * rpcclient.prg
-* $Id: rpcclient.prg,v 1.1 2003/02/16 03:03:45 jonnymind Exp $
+* $Id: rpcclient.prg,v 1.2 2003/02/16 14:06:21 jonnymind Exp $
 * Test for tRpcClient class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -38,7 +38,7 @@ PROCEDURE Main( cNetwork )
    ENDIF
 
    // creating a client
-   oRpc := tRpcClient():New( cNetwork )
+   oRpc := tRpcClient( cNetwork )
 
    @3,5 SAY "Scanning (sync) for server in the network " + cNetwork
    nRow := 4
@@ -121,6 +121,7 @@ PROCEDURE Main( cNetwork )
       // but they are almost essential in async mode.
       oRpc:bOnFunctionProgress := {|x,y| Progress( x, y ) }
       oRpc:bOnFunctionReturn := { |x| FuncComplete( x ) }
+      oRpc:bOnFunctionFail := { |x| FuncHadFailed( x ) }
 
       // now building a 512 lengt string, that will be compresed
       cBase := ""
@@ -142,8 +143,12 @@ PROCEDURE Main( cNetwork )
          @nRow, nPos SAY "."
          nPos++
          ThreadSleep( 100 )
+         IF nPos > 120
+            nRow++
+            @nRow,10 say "Async test failed"
+            lComplete := .T.
+         ENDIF
       ENDDO
-
 
    ELSE
       @nRow, 10 SAY "Can't Connect with  " + oRpc:aFunctions[1][2]
@@ -192,3 +197,10 @@ FUNCTION FuncComplete( oResult  )
       nRow++
 RETURN .T.
 
+/* Called when function is complete */
+FUNCTION FuncHadFailed( cDesc  )
+      lComplete := .T.
+      nRow++
+      @nRow, 10 SAY "Function FAILED internally! " 
+      nRow++
+RETURN .T.

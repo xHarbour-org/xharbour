@@ -1,6 +1,6 @@
 ************************************************************
 * rpcserver.prg
-* $Id: rpcserver.prg,v 1.1 2003/02/16 03:03:45 jonnymind Exp $
+* $Id: rpcserver.prg,v 1.2 2003/02/16 14:06:21 jonnymind Exp $
 * Test for tRpcServer and tRpcFunction class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -30,6 +30,12 @@ PROCEDURE Main()
    oSv := tRPCService():New()
    oSv:cServerName := "CksumTest"
    oSv:Add( oProc )
+   oSv:bOnServerScan := {|x| Scans( x ) }
+   oSv:bOnFunctionScan := {|x| Scanf( x ) }
+   oSv:bOnClientConnect := {|x| Connecting( x ) }
+   oSv:bOnClientLogin := {|x| Entering( x ) }
+   oSv:bOnClientLogout := {|x| Exiting( x ) }
+   oSv:bOnClientTerminate := {|x| Terminating( x ) }
 
    // server is starting
    oSv:Start( .T. )
@@ -42,16 +48,16 @@ RETURN
 
 CLASS tRpcFunctionTest from tRpcFunction
    // You just need to overrun the RUN method
-   Method Run( aParams, skRemote )
+   Method Run( aParams, oClient )
    // the socket is needed only if you want to give a progress indicator
 ENDCLASS
 
 
-METHOD Run( aParams, skRemote ) class tRpcFunctionTest
+METHOD Run( aParams, oClient ) class tRpcFunctionTest
    LOCAL nSum, i
 
    // signal that function is starting (not necessary, just for test)
-   ::SendProgress( skRemote, 0 )
+   oClient:SendProgress( 0 )
 
    IF .not. ::CheckTypes( aParams )
       RETURN NIL
@@ -62,7 +68,7 @@ METHOD Run( aParams, skRemote ) class tRpcFunctionTest
       nSum += asc(aParams[1][i])
       // signal a progress each 50 characters
       IF i % 50 == 0
-         ::SendProgress( skRemote, i / Len( aParams[1] ) * 100, Str(nSum, 10 ) )
+         oClient:SendProgress( i / Len( aParams[1] ) * 100, Str(nSum, 10 ) )
          // simulate some burdensome operation
          ThreadSleep( 200 )
       ENDIF
@@ -70,4 +76,27 @@ METHOD Run( aParams, skRemote ) class tRpcFunctionTest
 
 RETURN Str(nSum, 10)
 
+PROCEDURE Scanf( oServer )
+   @8, 10 say "Function scanning from " + InetAddress( oServer:skUDP )+ "         "
+RETURN .T.
 
+PROCEDURE Scans( oServer )
+   @9, 10 say "Server scanning from " + InetAddress( oServer:skUDP )+ "         "
+RETURN .T.
+
+
+PROCEDURE Connecting( oClient )
+   @10, 10 say "Serving connection from " + InetAddress( oClient:skRemote )
+RETURN .T.
+
+PROCEDURE Entering( oClient )
+   @11, 10 say "Client " + oClient:cUserID  + " has entered         "
+RETURN .T.
+
+PROCEDURE Exiting( oClient )
+   @12, 10 say "Client " + oClient:cUserID  + " has logged out         "
+RETURN .T.
+
+PROCEDURE Terminating( oClient )
+   @13, 10 say "Client " + oClient:cUserID  + " has terminated operations         "
+RETURN .T.

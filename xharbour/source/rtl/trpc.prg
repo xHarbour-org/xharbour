@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.2 2003/02/16 03:03:41 jonnymind Exp $
+ * $Id: trpc.prg,v 1.3 2003/02/16 14:06:21 jonnymind Exp $
  */
 
 /*
@@ -135,6 +135,10 @@
       "OK"
       "NO"
    92 - GOODBYE
+
+   93 - Encripted login
+      <LEN8> Total length
+      +Symbolic id, '|', ENCRYPTED(USERID:PASSWORD)
 */
 
 #include "hbclass.ch"
@@ -153,12 +157,11 @@ CLASS tRPCFunction
 
    CLASSDATA cPattern INIT HB_RegexComp( "^C:[0-9]{1,6}$|^A$|^D$|^N:[0-9]{1,2}(,[0-9]{1,2})?$")
 
-   METHOD New( cFname, cSerial, cFret, aParams )
+   METHOD New( cFname, cSerial, cFret, aParams ) CONSTRUCTOR
    METHOD CheckTypes( aParams )
    METHOD CheckParam( cParam )
    METHOD Describe()
-   METHOD Run( aParams, skNotify ) VIRTUAL
-   METHOD SendProgress( skNotify, nProgress )
+   METHOD Run( aParams, oClient ) VIRTUAL
 ENDCLASS
 
 
@@ -172,7 +175,7 @@ METHOD New( cFname, cSerial, cFret, aParams, nAuthLevel ) CLASS tRPCFunction
       Alert( "Serial value not valid" )
       QUIT
    ENDIF
-   
+
    IF nAuthLevel < 1
       Alert( "Authorization level must be at least 1" )
       QUIT
@@ -227,12 +230,304 @@ METHOD Describe() CLASS tRPCFunction
 RETURN cRet
 
 
-METHOD SendProgress( skNotify, nProgress, oData )
+/***********************************************************
+* Connection manager class; this manages a single connection
+************************************************************/
+
+CLASS tRPCServeCon
+   /* back reference to the parent to get callback blocks */
+   DATA oServer
+   /* Socket, mutex and thread */
+   DATA skRemote
+   DATA mtxBusy
+   DATA thSelf INIT -1
+
+   /* Assigned authorization level */
+   DATA nAuthLevel
+
+   /* Encription mode */
+   DATA nEncMode INIT 0
+   DATA cXScramblerKey
+
+   /* User ID */
+   DATA cUserId
+
+   METHOD New( oCaller, skRemote ) CONSTRUCTOR
+   METHOD Destroy()
+
+   /* Managing async */
+   METHOD Start()
+   METHOD Stop()
+   METHOD Run( lEncrypt )
+
+   /* Utilty */
+   METHOD GetAuth()
+   METHOD GetFunction()
+   METHOD GetFunctionComp()
+   METHOD LaunchFunction()
+   METHOD SendProgress( nProgress, aData )
+
+   METHOD Encrypt(cDataIn)
+   METHOD Decrypt(cDataIn)
+
+ENDCLASS
+
+
+METHOD New( oParent, skIn ) CLASS tRPCServeCon
+   ::oServer := oParent
+   ::skRemote := skIn
+   ::mtxBusy := CreateMutex()
+RETURN Self
+
+
+METHOD Destroy() CLASS tRPCServeCon
+   MutexLock( ::mtxBusy )
+   IF ::skRemote != NIL
+      InetDestroy( ::skRemote )
+      ::skRemote := NIL
+   ENDIF
+   MutexUnlock( ::mtxBusy )
+   DestroyMutex( ::mtxBusy )
+RETURN .T.
+
+
+METHOD Start() CLASS tRPCServeCon
+   LOCAL lRet := .F.
+
+   MutexLock( ::mtxBusy )
+   IF ::thSelf < 0
+      ::thSelf := StartThread( Self, "RUN" )
+      lRet := .T.
+   ENDIF
+   MutexUnlock( ::mtxBusy )
+
+RETURN lRet
+
+
+METHOD Stop() CLASS tRPCServeCon
+   LOCAL lRet := .F.
+
+   MutexLock( ::mtxBusy )
+   IF ::thSelf > 0
+      StopThread( ::thSelf )
+      ::thSelf := -1
+      lRet := .T.
+   ENDIF
+   MutexUnlock( ::mtxBusy )
+
+RETURN lRet
+
+
+METHOD Run() CLASS tRPCServeCon
+   LOCAL cCode := Space( 6 )
+   LOCAL lBreak := .F.
+
+
+   DO WHILE InetErrorCode( ::skRemote ) == 0 .and. .not. lBreak
+
+      /* Get the request code */
+      InetRecvAll( ::skRemote, @cCode, 6 )
+      IF InetErrorCode( ::skRemote ) != 0
+         EXIT
+      ENDIF
+
+      //lBreak := .T.
+      DO CASE
+
+         /* Read autorization request */
+         CASE cCode == "XHBR90"
+            lBreak := ::GetAuth( .F. )
+
+         /* Read encrypted autorization request */
+         CASE cCode == "XHBR93"
+            lBreak := ::GetAuth( .T. )
+
+         /* Close connection */
+         CASE cCode == "XHBR92"
+            ::oServer:OnClientLogout( Self )
+            lBreak := .T.
+
+         /* Execute function */
+         CASE cCode == "XHBR20"
+            lBreak := ::GetFunction()
+
+         /* Execute function */
+         CASE cCode == "XHBR21"
+            lBreak := ::GetFunctionComp()
+      ENDCASE
+
+   ENDDO
+
+   // signaling termination of this thread
+   ::oServer:Terminating( Self )
+   // Destroy resources just before termination
+   ::Destroy()
+RETURN .T.
+
+
+METHOD GetAuth( lEncrypt ) CLASS tRPCServeCon
+   LOCAL cLength := Space(8), nLen, nPos
+   LOCAL cUserID, cPassword, cEncId
+   LOCAL lBreak := .T.
+   LOCAL cReadIn := Space(1024)
+
+   IF InetRecvAll( ::skRemote, @cLength, 8 ) == 8
+      nLen := HB_GetLen8( cLength )
+
+      IF (lEncrypt .and. nLen > 52 ) .or. ( .not. lEncrypt .and. nLen > 37 )
+         RETURN .T.
+      ENDIF
+
+      IF InetRecvAll( ::skRemote, @cReadin, nLen ) == nLen
+         IF lEncrypt
+            nPos := At( "|", cReadin )
+            IF nPos > 0
+               cEncID := Substr( cReadin, 1, nPos - 1)
+               ::oServer:GetEncription( cEncID, Self )
+               cReadin := ::Decrypt( Substr( cReadin, nPos + 1 ) )
+            ELSE
+               RETURN .T.
+            ENDIF
+         ENDIF
+
+         nPos := At( ":", cReadin )
+         IF nPos > 0
+            lBreak:= .F.
+            cUserID := Substr(cReadin, 1, nPos-1 )
+            cPassword := Substr( cReadin, nPos+1, nLen - nPos  )
+            ::nAuthLevel := ::oServer:Authorize( cUserid, cPassword )
+            IF ::nAuthLevel == 0
+               InetSendAll( ::skRemote, "XHBR91NO" )
+               lBreak := .T.
+            ELSE
+               ::cUserId := cUserId
+               ::oServer:OnClientLogin( Self )
+               InetSendAll( ::skRemote, "XHBR91OK" )
+            ENDIF
+         ENDIF
+      ENDIF
+   ENDIF
+RETURN lBreak
+
+
+METHOD GetFunction() CLASS tRPCServeCon
+   LOCAL cLength := Space(8), nLen
+   LOCAL cData
+   LOCAL lBreak := .T.
+
+   IF InetRecvAll( ::skRemote, @cLength, 8 ) == 8
+      nLen := HB_GetLen8( cLength )
+      IF nLen < 65000
+         cData := Space( nLen )
+         IF InetRecvAll( ::skRemote, @cData, nLen ) == nLen
+            ::oServer:OnClientRequest( Self, 20, cData )
+            lBreak := .not. ::LaunchFunction( cData )
+         ENDIF
+      ENDIF
+   ENDIF
+
+RETURN lBreak
+
+
+METHOD GetFunctionComp() CLASS tRPCServeCon
+   LOCAL cLength := Space(8), cOrigLen := Space(8), nLen, nOrigLen
+   LOCAL cData
+   LOCAL lBreak := .T.
+
+   IF InetRecvAll( ::skRemote, @cOrigLen, 8 ) == 8
+      nOrigLen := HB_GetLen8( cOrigLen )
+
+      IF InetRecvAll( ::skRemote, @cLength, 8 ) == 8
+         nLen := HB_GetLen8( cLength )
+
+         IF nLen < 65000
+            cData := Space( nLen )
+            IF InetRecvAll( ::skRemote, @cData, nLen ) == nLen
+               // decompress data
+               cData := HB_Uncompress( nOrigLen, cData )
+               IF .not. Empty( cData )
+                  ::oServer:OnClientRequest( Self, 21, cData )
+                  lBreak := .not. ::LaunchFunction( cData )
+               ENDIF
+            ENDIF
+         ENDIF
+      ENDIF
+   ENDIF
+RETURN lBreak
+
+
+METHOD LaunchFunction( cData ) CLASS tRPCServeCon
+   LOCAL cSer, aParam
+   LOCAL cFuncName, oFunc
+   LOCAL cOrigLen, cCompLen
+   LOCAL oRet
+
+   cSer := HB_DeserialBegin( cData )
+   cFuncName := HB_DeserialNext( cSer )
+   aParam := HB_DeserialNext( cSer )
+
+   //let's try to run this function.
+   oFunc := ::oServer:Find( cFuncName )
+   IF Empty(oFunc)
+      // signal error
+      ::oServer:OnFunctionError( Self,00 )
+      InetSendAll( ::skRemote, "XHBR4000" )
+      // request socket closing
+      RETURN .F.
+   ENDIF
+
+   // check for level
+   IF oFunc:nAuthLevel > ::nAuthLevel
+      // signal error
+      ::oServer:OnFunctionError( Self,01 )
+      InetSendAll( ::skRemote, "XHBR4001" )
+      // request socket closing
+      RETURN .F.
+   ENDIF
+
+   //check for parameters
+   IF Empty( aParam ) .or. .not. oFunc:CheckTypes( aParam )
+      // signal error
+      ::oServer:OnFunctionError( Self,02 )
+      InetSendAll( ::skRemote, "XHBR4002" )
+      // request socket closing
+      RETURN .F.
+   ENDIF
+
+   IF InetErrorCode( ::skRemote ) == 0
+      // for now, just run it
+      oRet := oFunc:Run( aParam, Self )
+
+      // Internal error?
+      IF oRet == NIL
+         ::oServer:OnFunctionError( Self, 10 )
+         InetSendAll( ::skRemote, "XHBR4010" )
+      ELSE
+         cData := HB_Serialize( oRet )
+         cOrigLen := HB_CreateLen8( Len( cData ) )
+         ::oServer:OnFunctionReturn( Self, cData )
+         // should we compress it ?
+
+         IF Len( cData ) > 512
+            cData := HB_Compress( cData )
+            cCompLen := HB_CreateLen8( Len( cData ) )
+            InetSendAll( ::skRemote, "XHBR31" + cOrigLen + cCompLen + cData )
+         ELSE
+            InetSendAll( ::skRemote, "XHBR30" + cOrigLen + cData )
+         ENDIF
+      ENDIF
+   ENDIF
+
+RETURN .T.
+
+
+METHOD SendProgress( nProgress, oData ) CLASS tRPCServeCon
    LOCAL cOrigLen, cCompLen, lRet := .T.
    LOCAL cData
 
+   ::oServer:OnFunctionProgress( Self, nProgress, oData )
    IF Empty( oData )
-      InetSendAll( skNotify, "XHBR33" + HB_Serialize( nProgress ) )
+      InetSendAll( ::skRemote, "XHBR33" + HB_Serialize( nProgress ) )
    ELSE
       cData := HB_Serialize( oData )
       cOrigLen := HB_CreateLen8( Len( cData ) )
@@ -240,18 +535,24 @@ METHOD SendProgress( skNotify, nProgress, oData )
       IF Len( cData ) > 512
          cData := HB_Compress( cData )
          cCompLen := HB_CreateLen8( Len( cData ) )
-         InetSendAll( skNotify, "XHBR35" + HB_Serialize( nProgress ) +;
+         InetSendAll(::skRemote, "XHBR35" + HB_Serialize( nProgress ) +;
                 cOrigLen + cCompLen + cData )
       ELSE
-         InetSendAll( skNotify, "XHBR34" + HB_Serialize( nProgress ) + cOrigLen + cData )
+         InetSendAll( ::skRemote, "XHBR34" + HB_Serialize( nProgress ) + cOrigLen + cData )
       ENDIF
    ENDIF
 
-   IF InetErrorCode( skNotify ) != 0
+   IF InetErrorCode( ::skRemote ) != 0
       lRet := .F.
    ENDIF
 
 RETURN lRet
+
+METHOD Encrypt(cDataIn) CLASS tRPCServeCon
+RETURN cDataIn
+
+METHOD Decrypt(cDataIn) CLASS tRPCServeCon
+RETURN cDataIn
 
 /************************************
 * RPC SERVICE
@@ -273,9 +574,24 @@ CLASS tRPCService
    DATA skUdp
    DATA skServer
 
+   /* Code blocks corresponding to event handlers */
    DATA bAuthorize
+   DATA bGetEncryption
+   DATA bOnFunctionScan
+   DATA bOnServerScan
+   DATA bOnClientConnect
+   DATA bOnClientLogin
+   DATA bOnClientRequest
+   DATA bOnFunctionProgress
+   DATA bOnFunctionError
+   DATA bOnFunctionReturn
+   DATA bOnClientLogout
+   DATA bOnClientTerminate
 
-   METHOD New() Constructor
+   METHOD New() CONSTRUCTOR
+
+   /* Block run on client connection request */
+   DATA bConnection
 
    /* Function management */
    METHOD Add( oFunction )
@@ -287,21 +603,29 @@ CLASS tRPCService
    /* General services */
    METHOD Start( lStartUdp )
    METHOD Stop()
+   METHOD StartService( skIn )
+   METHOD Terminating( oConnection )
 
    /* Tcp services */
    METHOD Accept()
-   METHOD GetAuth( skIn, nAuthlevel, nAuthCount )
-   METHOD GetFunction( skIn, nAuthLevel )
-   METHOD GetFunctionComp( skIn, nAuthLevel )
-   METHOD LaunchFunction( skIn, cData, nAuthLevel )
 
    /* UDP services */
-   METHOD ServeConnection()
    METHOD UdpListen()
    METHOD UDPParseRequest()
 
    /* to be overloaded */
    METHOD Authorize( cUserid, cPassword )
+   METHOD GetEncryption( cId, oClient )
+   METHOD OnFunctionScan()
+   METHOD OnServerScan( )
+   METHOD OnClientConnect( oClient )
+   METHOD OnClientLogin( oClient )
+   METHOD OnClientRequest( oClient, nRequest, cData )
+   METHOD OnFunctionProgress( oClient, nProgress, aData )
+   METHOD OnFunctionError( oClient, nError )
+   METHOD OnFunctionReturn( oClient, aData )
+   METHOD OnClientLogout( oClient )
+   METHOD OnClientTerminate( oClient )
 
 ENDCLASS
 
@@ -316,7 +640,7 @@ METHOD Add( oFunction )
 
    MutexLock( ::mtxBusy )
    nElem := AScan( ::aFunctions, {|x| oFunction:cName == x:cName})
-   IF nElem == 0
+   IF nElem == 0g
       Aadd( ::aFunctions  , oFunction )
       lRet := .T.
    ENDIF
@@ -417,8 +741,8 @@ METHOD Stop() CLASS tRPCService
    InetDestroy( ::skServer )
    InetDestroy( ::skUdp )
    FOR EACH oElem IN ::aServing
-      StopThread( oElem[1] )
-      InetDestroy( oElem[2] )
+      StopThread( oElem:thSelf )
+      InetDestroy( oElem:skRemote )
    NEXT
    ASize( ::aServing, 0 )
 
@@ -428,203 +752,26 @@ RETURN .T.
 
 
 METHOD Accept() CLASS tRPCService
-   LOCAL skIn, thID
+   LOCAL skIn
 
    DO WHILE .T.
       skIn := InetAccept( ::skServer )
       // todo: better sync
-      MutexLock( ::mtxBusy )
-      thID := StartThread( Self, "ServeConnection", skIn )
-      AAdd( ::aServing, { thID, skIN } )
-      MutexUnlock( ::mtxBusy )
+      ::StartService( skIn )
    ENDDO
 RETURN .T.
 
 
-METHOD ServeConnection( skIn ) CLASS tRPCService
-   LOCAL nToken
-   LOCAL cCode := Space( 6 )
-   LOCAL lBreak := .F.
-   LOCAL nAuthLevel := 0
-   LOCAL nAuthCount := 0
+METHOD StartService( skIn ) CLASS tRPCService
+   LOCAL oService
 
-
-   DO WHILE InetErrorCode( skIn ) == 0 .and. .not. lBreak
-
-      /* Get the request code */
-      InetRecvAll( skIn, @cCode, 6 )
-      IF InetErrorCode( skIn ) != 0
-         EXIT
-      ENDIF
-
-      lBreak := .T.
-      DO CASE
-
-         /* Read autorization request */
-         CASE cCode == "XHBR90"
-            lBreak := ::GetAuth( skIn, @nAuthLevel, @nAuthCount )
-
-         /* Close connection */
-         CASE cCode == "XHBR92"
-            lBreak := .T.
-
-         /* Execute function */
-         CASE cCode == "XHBR20"
-            lBreak := ::GetFunction( skIn, nAuthLevel )
-
-         /* Execute function */
-         CASE cCode == "XHBR21"
-            lBreak := ::GetFunctionComp( skIn, nAuthLevel )
-      ENDCASE
-
-   ENDDO
-
-
-   // signaling termination of this thread
    MutexLock( ::mtxBusy )
-   InetDestroy( skIn )
-   nToken := AScan( ::aServing, {|x| x[1] == ThreadGetCurrent() } )
-   ADel( ::aServing, nToken )
-   ASize( ::aServing, Len( ::aServing ) -1 )
+   oService := tRpcServeCon():New( Self, skIn )
+   AAdd( ::aServing, oService )
+   oService:Start()
    MutexUnlock( ::mtxBusy )
+   ::OnClientConnect( oService )
 RETURN .T.
-
-
-METHOD GetAuth( skIn, nAuthLevel, nAuthCount ) CLASS tRPCService
-   LOCAL cLength := Space(8), nLen, nPos
-   LOCAL cUserID, cPassword
-   LOCAL lBreak := .T.
-   LOCAL cReadIn := Space(1024)
-
-   IF InetRecvAll( skIn, @cLength, 8 ) == 8
-      nLen := HB_GetLen8( cLength )
-      IF nLen < 33
-         IF InetRecvAll( skIn, @cReadin, nLen ) == nLen
-            nPos := At( ":", cReadin )
-            IF nPos > 0
-               lBreak:= .F.
-               cUserID := Substr(cReadin, 1, nPos-1 )
-               cPassword := Substr( cReadin, nPos+1, nLen - nPos  )
-               nAuthLevel := ::Authorize( cUserid, cPassword )
-               IF nAuthLevel == 0
-                  nAuthCount ++
-                  InetSendAll( skIn, "XHBR91NO" )
-                  IF nAuthCount > 2
-                     lBreak := .T.
-                  ENDIF
-               ELSE
-                  nAuthCount = 0
-                  InetSendAll( skIn, "XHBR91OK" )
-               ENDIF
-            ENDIF
-         ENDIF
-      ENDIF
-   ENDIF
-RETURN lBreak
-
-
-METHOD GetFunction( skIn, nAuthLevel ) CLASS tRPCService
-   LOCAL cLength := Space(8), nLen
-   LOCAL cData
-   LOCAL lBreak := .T.
-
-   IF InetRecvAll( skIn, @cLength, 8 ) == 8
-      nLen := HB_GetLen8( cLength )
-      IF nLen < 65000
-         cData := Space( nLen )
-         IF InetRecvAll( skIn, @cData, nLen ) == nLen
-            lBreak := .not. ::LaunchFunction( skIn, cData, nAuthLevel )
-         ENDIF
-      ENDIF
-   ENDIF
-
-RETURN lBreak
-
-
-METHOD LaunchFunction( skIn, cData, nAuthLevel ) CLASS tRPCService
-   LOCAL cSer, aParam
-   LOCAL cFuncName, oFunc
-   LOCAL cOrigLen, cCompLen
-   LOCAL oRet
-
-   cSer := HB_DeserialBegin( cData )
-   cFuncName := HB_DeserialNext( cSer )
-   aParam := HB_DeserialNext( cSer )
-
-   //let's try to run this function.
-   oFunc := ::Find( cFuncName )
-   IF Empty(oFunc)
-      // signal error
-      InetSendAll( skIn, "XHBR4000" )
-      // request socket closing
-      RETURN .F.
-   ENDIF
-
-   // check for level
-   IF oFunc:nAuthLevel > nAuthLevel
-      // signal error
-      InetSendAll( skIn, "XHBR4001" )
-      // request socket closing
-      RETURN .F.
-   ENDIF
-
-   //check for parameters
-   IF Empty( aParam ) .or. .not. oFunc:CheckTypes( aParam )
-      // signal error
-      InetSendAll( skIn, "XHBR4002" )
-      // request socket closing
-      RETURN .F.
-   ENDIF
-
-   IF InetErrorCode( skIn ) == 0
-      // for now, just run it
-      oRet := oFunc:Run( aParam, skIn )
-
-      // Internal error?
-      IF oRet == NIL
-         InetSendAll( skIn, "XHBR4010" )
-      ELSE
-         cData := HB_Serialize( oRet )
-         cOrigLen := HB_CreateLen8( Len( cData ) )
-         // do we should compress it ?
-         IF Len( cData ) > 512
-            cData := HB_Compress( cData )
-            cCompLen := HB_CreateLen8( Len( cData ) )
-            InetSendAll( skIn, "XHBR31" + cOrigLen + cCompLen + cData )
-         ELSE
-            InetSendAll( skIn, "XHBR30" + cOrigLen + cData )
-         ENDIF
-      ENDIF
-   ENDIF
-
-RETURN .T.
-
-
-METHOD GetFunctionComp( skIn, nAuthLevel ) CLASS tRPCService
-   LOCAL cLength := Space(8), cOrigLen := Space(8), nLen, nOrigLen
-   LOCAL cData
-   LOCAL lBreak := .T.
-
-   IF InetRecvAll( skIn, @cOrigLen, 8 ) == 8
-      nOrigLen := HB_GetLen8( cOrigLen )
-
-      IF InetRecvAll( skIn, @cLength, 8 ) == 8
-         nLen := HB_GetLen8( cLength )
-
-         IF nLen < 65000
-            cData := Space( nLen )
-            IF InetRecvAll( skIn, @cData, nLen ) == nLen
-               // decompress data
-               cData := HB_Uncompress( nOrigLen, cData )
-               IF .not. Empty( cData )
-                  lBreak := .not. ::LaunchFunction( skIn, cData, nAuthLevel )
-               ENDIF
-            ENDIF
-         ENDIF
-      ENDIF
-   ENDIF
-RETURN lBreak
-
 
 METHOD UDPListen( ) CLASS tRPCService
    LOCAL cData := Space( 1000 )
@@ -651,6 +798,9 @@ METHOD UDPParseRequest( cData, nPacketLen ) CLASS tRPCService
 
       /* XHRB00 - server scan */
       CASE cCode == "XHBR00"
+         IF .not. ::OnServerScan()
+            RETURN .F.
+         ENDIF
          IF nPacketLen > 6
             cMatch := HB_Deserialize( Substr( cData, 7 ) )
             IF HB_RegexMatch( cMatch, ::cServerName )
@@ -664,6 +814,9 @@ METHOD UDPParseRequest( cData, nPacketLen ) CLASS tRPCService
 
       /* XRB01 - Function scan */
       CASE cCode == "XHBR01"
+         IF .not. ::OnFunctionScan()
+            RETURN .F.
+         ENDIF
          /* minimal length to be valid */
          IF nPacketLen > 24
             cSerial := HB_DeserialBegin( Substr( cData, 7 ) )
@@ -693,6 +846,20 @@ METHOD UDPParseRequest( cData, nPacketLen ) CLASS tRPCService
 RETURN .T.
 
 
+METHOD Terminating( oConnection ) CLASS tRPCService
+   LOCAL nToken
+
+   ::OnClientTerminate( oConnection )
+   MutexLock( ::mtxBusy )
+   nToken := AScan( ::aServing, {|x| x == oConnection } )
+   IF nToken > 0
+      ADel( ::aServing, nToken )
+      ASize( ::aServing, Len( ::aServing ) -1 )
+   ENDIF
+   MutexUnlock( ::mtxBusy )
+RETURN .T.
+
+
 /* Default authorization will ALWAYS return 1 if a bAuthorize block is not provided */
 METHOD Authorize( cUserid, cPassword ) CLASS tRPCService
    IF ::bAuthorize != NIL
@@ -701,4 +868,68 @@ METHOD Authorize( cUserid, cPassword ) CLASS tRPCService
 RETURN 1
 
 
+METHOD GetEncryption( cId, oClient ) CLASS tRPCService
+   IF ::bGetEncryption != NIL
+      RETURN Eval( ::bGetEncryption, cId, oClient )
+   ENDIF
+RETURN 0
 
+METHOD OnFunctionScan() CLASS tRPCService
+   IF ::bOnFunctionScan != NIL
+      RETURN Eval( ::bOnFunctionScan, Self )
+   ENDIF
+RETURN .T.
+
+METHOD OnServerScan() CLASS tRPCService
+   IF ::bOnServerScan != NIL
+      RETURN Eval( ::bOnServerScan, Self )
+   ENDIF
+RETURN .T.
+
+METHOD OnClientConnect( oClient ) CLASS tRPCService
+   IF ::bOnClientConnect != NIL
+      RETURN Eval( ::bOnClientConnect, oClient )
+   ENDIF
+RETURN .T.
+
+METHOD OnClientLogin( oClient ) CLASS tRPCService
+   IF ::bOnClientLogin != NIL
+      Eval( ::bOnClientLogin, oClient )
+   ENDIF
+RETURN .T.
+
+METHOD OnClientRequest( oClient, nRequest, cData ) CLASS tRPCService
+   IF ::bOnClientRequest != NIL
+      RETURN Eval( ::bOnClientRequest, oClient, nRequest, cData )
+   ENDIF
+RETURN .T.
+
+METHOD OnFunctionProgress( oClient, nProgress, aData ) CLASS tRPCService
+   IF ::bOnFunctionProgress != NIL
+      RETURN Eval( ::bOnFunctionProgress, oClient, nProgress, aData )
+   ENDIF
+RETURN .T.
+
+METHOD OnFunctionError( oClient, nError ) CLASS tRPCService
+   IF ::bOnFunctionError != NIL
+      RETURN Eval( ::bOnFunctionError, nError )
+   ENDIF
+RETURN .T.
+
+METHOD OnFunctionReturn( oClient, aData ) CLASS tRPCService
+   IF ::bOnFunctionReturn != NIL
+      RETURN Eval( ::bOnFunctionReturn, oClient, aData )
+   ENDIF
+RETURN .T.
+
+METHOD OnClientLogout( oClient ) CLASS tRPCService
+   IF ::bOnClientLogout != NIL
+      RETURN Eval( ::bOnClientLogout, oClient )
+   ENDIF
+RETURN .T.
+
+METHOD OnClientTerminate( oClient ) CLASS tRPCService
+   IF ::bOnClientTerminate != NIL
+      RETURN Eval( ::bOnClientTerminate, oClient )
+   ENDIF
+RETURN .T.

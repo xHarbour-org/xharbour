@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.3 2003/02/16 13:04:43 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.4 2003/02/16 14:06:21 jonnymind Exp $
  */
 
 /*
@@ -96,7 +96,7 @@ CLASS tRPCClient
    DATA mtxBusy INIT CreateMutex()
    DATA oResult
 
-   METHOD New( cNetwork )
+   METHOD New( cNetwork ) CONSTRUCTOR
    METHOD ScanServers( cName, nTime )
    METHOD ScanFunctions( cName, cSerial, nTime )
    METHOD StartScan()
@@ -151,6 +151,7 @@ RETURN Self
 METHOD Destroy() CLASS tRPCClient
 
    MutexLock( ::mtxBusy )
+      ::Disconnect()
       IF .not. Empty( ::skTcp )
          InetDestroy( ::skTcp )
       ENDIF
@@ -374,8 +375,8 @@ METHOD Call( cFunction, aParams, nTime ) CLASS tRPCClient
    ENDIF
 
    MutexLock( ::mtxBusy )
-   // already active ?
-   IF ::thTcpAccept > 0
+   // already active or not already connected
+   IF ::thTcpAccept > 0 .or. ::skTCP == NIL .or. ::nStatus < 3
       MutexUnlock( ::mtxBusy )
       RETURN NIL
    ENDIF

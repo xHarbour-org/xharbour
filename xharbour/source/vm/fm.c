@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.19 2002/12/30 19:44:00 ronpinkas Exp $
+ * $Id: fm.c,v 1.20 2002/12/31 15:03:28 lculik Exp $
  */
 
 /*
@@ -118,7 +118,7 @@ static PHB_MEMINFO s_pLastBlock = NULL;
 
 
 #ifdef HB_THREAD_SUPPORT
-   static HB_CRITICAL_T s_CriticalMutex;
+HB_CRITICAL_T hb_allocMutex;
 #endif
 
 #endif
@@ -141,7 +141,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
  #ifdef HB_FM_STATISTICS
 
    #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( s_CriticalMutex );
+      HB_CRITICAL_LOCK( hb_allocMutex );
    #endif
 
    s_lAllocations++;
@@ -151,7 +151,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    if( ! pMem )
    {
       #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+         HB_CRITICAL_UNLOCK( hb_allocMutex );
       #endif
 
       return NULL;
@@ -225,15 +225,24 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xalloc(%lu) returning: %p", ulSize, (char *) pMem + sizeof( HB_MEMINFO ) ) );
 
    #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
+      HB_CRITICAL_UNLOCK( hb_allocMutex );
    #endif
 
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
  #else
 
-   return malloc( ulSize );
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_LOCK( hb_allocMutex );
+   #endif
 
+   pMem = malloc( ulSize );
+
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_UNLOCK( hb_allocMutex );
+   #endif
+
+   return pMem
  #endif
 }
 
@@ -255,7 +264,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
  #ifdef HB_FM_STATISTICS
 
    #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( s_CriticalMutex );
+      HB_CRITICAL_LOCK( hb_allocMutex );
    #endif
 
    s_lAllocations++;
@@ -265,7 +274,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    if( ! pMem )
    {
       #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+         HB_CRITICAL_UNLOCK( hb_allocMutex );
       #endif
 
       hb_errInternal( HB_EI_XGRABALLOC, NULL, NULL, NULL );
@@ -339,14 +348,22 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xgrab(%lu) returning: %p", ulSize, (char *) pMem + sizeof( HB_MEMINFO ) ) );
 
    #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
+      HB_CRITICAL_UNLOCK( hb_allocMutex );
    #endif
 
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
 #else
 
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_LOCK( hb_allocMutex );
+   #endif
+
    pMem = malloc( ulSize );
+
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_UNLOCK( hb_allocMutex );
+   #endif
 
    if( ! pMem )
    {
@@ -369,7 +386,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xrealloc(%p, %lu)", pMem, ulSize));
 
    #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( s_CriticalMutex );
+      HB_CRITICAL_LOCK( hb_allocMutex );
    #endif
 
    s_lReAllocations++;
@@ -377,7 +394,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    if( ! pMem )
    {
       #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+         HB_CRITICAL_UNLOCK( hb_allocMutex );
       #endif
 
       hb_errInternal( HB_EI_XREALLOCNULL, NULL, NULL, NULL );
@@ -386,7 +403,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    if( ulSize == 0 )
    {
       #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+         HB_CRITICAL_UNLOCK( hb_allocMutex );
       #endif
 
       hb_errInternal( HB_EI_XREALLOCNULLSIZE, NULL, NULL, NULL );
@@ -397,7 +414,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
    {
       #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+         HB_CRITICAL_UNLOCK( hb_allocMutex );
       #endif
 
       hb_errInternal( HB_EI_XREALLOCINV, NULL, NULL, NULL );
@@ -410,7 +427,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    if( *pSig != HB_MEMINFO_SIGNATURE )
    {
       #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+         HB_CRITICAL_UNLOCK( hb_allocMutex );
       #endif
 
       hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xrealloc()", NULL, NULL );
@@ -428,7 +445,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    if( ! pMem )
    {
       #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+         HB_CRITICAL_UNLOCK( hb_allocMutex );
       #endif
 
       hb_errInternal( HB_EI_XREALLOC, NULL, NULL, NULL );
@@ -461,7 +478,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    }
 
    #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
+      HB_CRITICAL_UNLOCK( hb_allocMutex );
    #endif
 
    return ( char * ) pMem + sizeof( HB_MEMINFO );
@@ -480,7 +497,15 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
       hb_errInternal( HB_EI_XREALLOCNULLSIZE, NULL, NULL, NULL );
    }
 
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_LOCK( hb_allocMutex );
+   #endif
+
    pMem = realloc( pMem, ulSize );
+
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_UNLOCK( hb_allocMutex );
+   #endif
 
    if( ! pMem )
    {
@@ -499,7 +524,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xfree(%p)", pMem ) );
 
    #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( s_CriticalMutex );
+      HB_CRITICAL_LOCK( hb_allocMutex );
    #endif
 
    s_lFreed++;
@@ -514,7 +539,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
          //printf( "hb_xfree() Invalid Pointer %p %s", (char *) pMem, (char *) pMem );
 
          #ifdef HB_THREAD_SUPPORT
-            HB_CRITICAL_UNLOCK( s_CriticalMutex );
+            HB_CRITICAL_UNLOCK( hb_allocMutex );
          #endif
 
          hb_errInternal( HB_EI_XFREEINV, "hb_xfree() Invalid Pointer %p %s", (char *) pMem, (char *) pMem );
@@ -525,7 +550,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       if( *pSig != HB_MEMINFO_SIGNATURE )
       {
          #ifdef HB_THREAD_SUPPORT
-            HB_CRITICAL_UNLOCK( s_CriticalMutex );
+            HB_CRITICAL_UNLOCK( hb_allocMutex );
          #endif
 
          hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xfree(%p) Pointer Overflow '%s'", (char *) pMem, (char *) pMem );
@@ -555,7 +580,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       free( ( void * ) pMemBlock );
 
       #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+         HB_CRITICAL_UNLOCK( hb_allocMutex );
       #endif
    }
    else
@@ -563,7 +588,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xfree(NULL)!"));
 
       #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
+         HB_CRITICAL_UNLOCK( hb_allocMutex );
       #endif
 
       hb_errInternal( HB_EI_XFREENULL, "hb_xfree(NULL)", NULL, NULL );
@@ -575,7 +600,16 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 
    if( pMem )
    {
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_LOCK( hb_allocMutex );
+      #endif
+
       free( pMem );
+
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_UNLOCK( hb_allocMutex );
+      #endif
+
    }
    else
    {
@@ -607,7 +641,7 @@ void HB_EXPORT hb_xinit( void ) /* Initialize fixed memory subsystem */
 
    #ifdef HB_FM_STATISTICS
       #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_INIT( s_CriticalMutex );
+         HB_CRITICAL_INIT( hb_allocMutex );
       #endif
    #endif
 }
@@ -619,7 +653,7 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 #ifdef HB_FM_STATISTICS
 
    #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( s_CriticalMutex );
+      HB_CRITICAL_LOCK( hb_allocMutex );
    #endif
 
    if( s_lMemoryBlocks || hb_cmdargCheck( "INFO" ) )
@@ -662,8 +696,8 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
    }
 
    #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
-      HB_CRITICAL_DESTROY( s_CriticalMutex );
+      HB_CRITICAL_UNLOCK( hb_allocMutex );
+      HB_CRITICAL_DESTROY( hb_allocMutex );
    #endif
 
 #endif
@@ -746,12 +780,9 @@ ULONG hb_xquery( USHORT uiMode )
    ULONG ulResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xquery(%hu)", uiMode));
-   #ifdef HB_FM_STATISTICS
 
-      #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_LOCK( s_CriticalMutex );
-      #endif
-
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_LOCK( hb_allocMutex );
    #endif
    /* TODO: Return the correct values instead of 9999 [vszakats] */
 
@@ -940,10 +971,8 @@ ULONG hb_xquery( USHORT uiMode )
    default:
       ulResult = 0;
    }
-   #ifdef HB_FM_STATISTICS
-      #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
-      #endif
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_UNLOCK( hb_allocMutex );
    #endif
    return ulResult;
 }

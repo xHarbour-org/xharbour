@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.43 2003/02/13 01:22:35 jonnymind Exp $
+* $Id: thread.c,v 1.44 2003/02/19 10:51:14 jonnymind Exp $
 */
 
 /*
@@ -79,13 +79,17 @@ HB_CRITICAL_T hb_threadContextMutex;
 HB_THREAD_CONTEXT *last_context;
 HB_THREAD_T hb_main_thread_id;
 
+extern HB_CRITICAL_T hb_allocMutex;
+
 HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th )
 {
    HB_THREAD_CONTEXT *p;
    HB_THREAD_CONTEXT *tc;
    int i;
 
+   HB_CRITICAL_LOCK( hb_allocMutex );
    tc = (HB_THREAD_CONTEXT *) malloc( sizeof( HB_THREAD_CONTEXT));
+
    tc->th_id = th;
 
    tc->stack       = ( HB_STACK *) malloc( sizeof( HB_STACK ) );
@@ -107,6 +111,7 @@ HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th )
    {
       tc->stack->pItems[ i ] = (HB_ITEM *) malloc( sizeof( HB_ITEM ) );
    }
+   HB_CRITICAL_UNLOCK( hb_allocMutex );
 
    ( * (tc->stack->pPos) )->type = HB_IT_NIL;
 
@@ -170,6 +175,7 @@ void hb_threadDestroyContext( HB_THREAD_T th_id )
       // Only for secondary Stacks.
       HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
+
       /* Free each element of the stack */
       for( i = 0; i < p->stack->wItems; ++i )
       {
@@ -178,10 +184,14 @@ void hb_threadDestroyContext( HB_THREAD_T th_id )
             hb_itemClear( p->stack->pItems[ i ] );
          }
 
+         HB_CRITICAL_LOCK( hb_allocMutex );
          free( p->stack->pItems[ i ] );
+         HB_CRITICAL_UNLOCK( hb_allocMutex );
       }
 
       /* Free the stack */
+      HB_CRITICAL_LOCK( hb_allocMutex );
+
       free( p->stack->pItems );
       free( p->stack );
 
@@ -193,6 +203,8 @@ void hb_threadDestroyContext( HB_THREAD_T th_id )
 
       /* Free the context */
       free( p );
+      HB_CRITICAL_UNLOCK( hb_allocMutex );
+
    }
    else
    {
@@ -505,7 +517,10 @@ HB_FUNC( STARTTHREAD )
       return;
    }
 
+   HB_CRITICAL_LOCK( hb_allocMutex );
    pt = (HB_THREAD_PARAM *) malloc( sizeof( HB_THREAD_PARAM ) );
+   HB_CRITICAL_UNLOCK( hb_allocMutex );
+
    pt->pArgs = pArgs;
    pt->uiCount = hb_pcount();
    pt->bIsMethod = bIsMethod;

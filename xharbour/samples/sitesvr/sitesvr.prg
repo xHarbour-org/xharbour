@@ -1,5 +1,5 @@
 /*
- * $Id: sitesvr.prg,v 1.4 2003/02/13 01:22:35 jonnymind Exp $
+ * $Id: sitesvr.prg,v 1.5 2003/02/19 10:16:31 jonnymind Exp $
  */
 
 ***********************************************************
@@ -18,6 +18,7 @@
 GLOBAL g_nUserCount
 GLOBAL g_nTotalCount
 GLOBAL MutexDB
+GLOBAL MutexCount
 EXTERN BuildDBF
 
 PROCEDURE Main( cPort)
@@ -38,6 +39,7 @@ PROCEDURE Main( cPort)
    g_nTotalCount := 0
 
    MutexDB := CreateMutex()
+   MutexCount := CreateMutex()
 
    CLEAR SCREEN
 
@@ -71,7 +73,7 @@ PROCEDURE Main( cPort)
 
       @ 5, 5 SAY "Enter Command      : " GET cCommand
       HBConsoleUnlock()
-      *READ
+      READ
 
       cCommand := Trim( cCommand )
 
@@ -120,8 +122,10 @@ PROCEDURE ViewUpdate( Socket )
       @ 6, 9 SAY "Looping "
       @ 7, 5 SAY "Main socket status : " + InetErrorDesc( Socket ) + ;
                  "(" + Trim( Str( InetErrorCode( Socket ) ) ) + ")"
+      MutexLock( MutexCount )
       @ 8, 5 SAY "Connected Users    : " + Str( g_nUserCount )
       @ 9, 5 SAY "Total users        : " + Str( g_nTotalCount )
+      MutexUnlock( MutexCount )
 
       @ nRow, nCol
       HBConsoleUnlock()
@@ -145,8 +149,10 @@ PROCEDURE AcceptIncoming( Socket )
       Com := InetAccept( Socket )
 
       IF InetErrorCode( Com ) == 0
+         MutexLock( MutexCount )
          g_nUserCount++
          g_nTotalCount++
+         MutexUnlock( MutexCount )
 
          StartThread( @ServeClient(), com )
          HB_GcAll( .T. )
@@ -220,7 +226,9 @@ PROCEDURE ServeClient( Socket )
 
    *** The segmentation fault should be here.
    InetClose( Socket )
+   MutexLock( MutexCount )
    g_nUserCount--
+   MutexUnlock( MutexCount )
 
 RETURN
 
