@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1691 2003/11/10 22:00:47 andijahja Exp $
+ * $Id: ChangeLog,v 1.1692 2003/11/10 22:28:35 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-11 02:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_rpm.sh
+    * small changes for detecting packages on connectiva
+
+  * xharbour/xharbour.spec
+    - remove build requires for mysql and odbc. This packages used to
+      have different names in different distros so we will have to set
+      long list for for them inside spec. I think they should be check
+      in make_rpm.sh and if user installed them manually then can use
+      --force switch
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    + freeing all pages allocated by tag in ORDDESTROY() implemented.
+      Clipper doesn't do that (It can only remove whole index file
+      when you remove all orders or when you recreate a tag which is
+      the one in the bug and has the same name as the bug) but I think
+      it will be useful.
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    + detecting FPT files without signature and disabling GC for them
+    + detecting old Harbour FPT files
 
 2003-11-10 14:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/codebloc.c

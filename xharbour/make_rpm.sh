@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.12 2003/11/10 11:49:47 druzus Exp $
+# $Id: make_rpm.sh,v 1.13 2003/11/10 13:47:39 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -49,7 +49,8 @@ NEED_RPM="gcc binutils bash bison ncurses ncurses-devel gpm-devel"
 
 FORCE=""
 BUGGY_RPM=""
-if [ -f /etc/conectiva-release ]; then
+if [ -f /etc/conectiva-release ]
+then
     BUGGY_RPM="yes"
 fi
 
@@ -63,28 +64,27 @@ do
         INST_PARAM="${INST_PARAM} $1"
         if [ "${LAST}" = "--with" ]
         then
-	    if [ "${BUGGY_RPM}" = "yes" ] 
-	    then
+            if  [ -f /etc/conectiva-release ]
+            then
                [ "$1" = "mysql" ] && NEED_RPM="${NEED_RPM} MySQL-devel"
                [ "$1" = "odbc" ] && NEED_RPM="${NEED_RPM} unixodbc-devel"
-	    else    
+            else    
                [ "$1" = "mysql" ] && NEED_RPM="${NEED_RPM} mysql-devel"
                [ "$1" = "odbc" ] && NEED_RPM="${NEED_RPM} unixODBC-devel"
-	    fi
+            fi
         fi
     fi
     LAST="$1"
     shift
 done
 
-if [ "${BUGGY_RPM}" = "yes" ] 
+if test_reqrpm "MySQL-devel" || test_reqrpm "mysql-devel"
+then 
+    INST_PARAM="${INST_PARAM} --with mysql"
+fi
+if test_reqrpm "unixodbc-devel" || test_reqrpm "unixODBC-devel"
 then
-   test_reqrpm "MySQL-devel" && INST_PARAM="${INST_PARAM} --with mysql"
-   test_reqrpm "unixodbc-devel" && INST_PARAM="${INST_PARAM} --with odbc"
-else
-echo "b"
-   test_reqrpm "mysql-devel" && INST_PARAM="${INST_PARAM} --with mysql"
-   test_reqrpm "unixODBC-devel" && INST_PARAM="${INST_PARAM} --with odbc"
+    INST_PARAM="${INST_PARAM} --with odbc"
 fi
 
 TOINST_LST=""

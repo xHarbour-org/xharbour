@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.4 2003/09/09 09:47:16 paultucker Exp $
+ * $Id: dbffpt1.c,v 1.5 2003/09/15 16:39:26 druzus Exp $
  */
 
 /*
@@ -545,7 +545,7 @@ static ERRCODE hb_fptGCfreeBlock( FPTAREAP pArea, LPMEMOGCTABLE pGCtable,
       }
       if ( !fChanged )
       {
-         if ( pGCtable->usItems < pGCtable->usMaxItem )
+         if ( pGCtable->usItems <= pGCtable->usMaxItem )
          {
             if ( pGCtable->pGCitems == NULL )
             {
@@ -2048,11 +2048,15 @@ static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo )
    if ( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &fptHeader, sizeof( FPTHEADER ) ) >= 512 )
    {
       pArea->uiMemoBlockSize = HB_GET_BE_USHORT( &fptHeader.blockSize );
-
+      pArea->bMemoType = 0;
       /* Check for compatibility with Harbour memo headers */
       if ( memcmp( fptHeader.signature1, "Harbour", 7 ) == 0 )
       {
-         pArea->bMemoType = MEMO_FPT_HB;
+         /* hack for detecting old harbour FPT files without FLEX support */
+         if ( HB_GET_BE_ULONG( &fptHeader.signature2 ) == FPTIT_TEXT )
+            pArea->bMemoType = MEMO_FPT_SIXHB;
+         else
+            pArea->bMemoType = MEMO_FPT_HB;
       }
       /* Check for compatibility with SIX memo headers */
       else if ( memcmp( fptHeader.signature1, "SIxMemo", 7 ) == 0 )
@@ -2069,7 +2073,7 @@ static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo )
            memcmp( fptHeader.signature2, "FlexFile3\003", 10) == 0 )
       {
          pArea->bMemoType = MEMO_FPT_FLEX;
-         if ( pArea->uiMemoBlockSize == 0)
+         if ( pArea->uiMemoBlockSize == 0 )
             pArea->uiMemoBlockSize = HB_GET_LE_USHORT( &fptHeader.flexSize );
       }
    }

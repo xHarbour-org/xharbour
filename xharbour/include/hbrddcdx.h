@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.19 2003/11/05 03:32:48 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.20 2003/11/10 11:49:48 druzus Exp $
  */
 
 /*
@@ -232,7 +232,7 @@ typedef struct _CDXPAGE
    SHORT    bufKeyLen;                    /* and maybe temporary overwriten when adding  */
    SHORT    iFree;                        /* new key to interior node record.            */
    BYTE *   pKeyBuf;                      /* pointer to uncompressed leaf page key pool  */
-   //SHORT    iKeyInBuf;
+   /* SHORT    iKeyInBuf; */
 
    struct _CDXPAGE * Owner;
    struct _CDXPAGE * Child;

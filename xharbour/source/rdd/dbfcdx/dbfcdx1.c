@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.78 2003/11/10 11:49:48 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.79 2003/11/10 16:42:27 paultucker Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
  *
  */
 
-#define HB_CDX_DBGCODE_OFF
+//#define HB_CDX_DBGCODE_OFF
 //#define HB_CDX_DSPDBG_INFO
 //#define HB_CDP_SUPPORT_OFF
 //#define HB_CDX_DBGTIME
@@ -1100,7 +1100,9 @@ static void hb_cdxIndexCheckVersion( LPCDXINDEX pIndex )
    }
    ulFree = HB_GET_LE_ULONG( &byBuf[0] );
    ulVer = HB_GET_BE_ULONG( &byBuf[4] );
-   if ( ulVer != pIndex->ulVersion || ulFree != pIndex->freePage )
+   if ( !pIndex->fShared )
+      pIndex->ulVersion = pIndex->freePage;
+   else if ( ulVer != pIndex->ulVersion || ulFree != pIndex->freePage )
    {
       pIndex->nextAvail = CDX_DUMMYNODE;
       pIndex->ulVersion = ulVer;
@@ -1148,7 +1150,7 @@ static BOOL hb_cdxIndexLockWrite( LPCDXINDEX pIndex )
 
    if ( pIndex->lockRead )
       hb_errInternal( 9105, "hb_cdxIndexLockRead: writeLock after readLock.", "", "" );
-   if ( pIndex->lockWrite > 0 || !pIndex->fShared )
+   if ( pIndex->lockWrite > 0 )
    {
       pIndex->lockWrite++;
       return TRUE;
@@ -1156,15 +1158,21 @@ static BOOL hb_cdxIndexLockWrite( LPCDXINDEX pIndex )
    if ( pIndex->lockWrite != 0 )
       hb_errInternal( 9105, "hb_cdxIndexLockWrite: bad count of locks.", "", "" );
 
-   while (! (ret = hb_fsLock ( pIndex->hFile, CDX_LOCKOFFSET, CDX_LOCKSIZE,
-                               FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT ) ) );
+   if ( pIndex->fShared )
+      ret = TRUE;
+   else
+   {
+      while (! (ret = hb_fsLock ( pIndex->hFile, CDX_LOCKOFFSET, CDX_LOCKSIZE,
+                                  FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT ) ) );
+   }
    if ( !ret )
       /* TODO: change into RT error dbfcdx/1038 */
       hb_errInternal( 9107, "hb_cdxIndexLockWrite: lock failure.", "", "" );
    if ( ret )
    {
       pIndex->lockWrite++;
-      hb_cdxIndexCheckVersion( pIndex );
+      if ( !pIndex->fShared || pIndex->nextAvail == CDX_DUMMYNODE )
+         hb_cdxIndexCheckVersion( pIndex );
    }
    return ret;
 }
@@ -1245,6 +1253,17 @@ static BOOL hb_cdxIndexUnLockWrite( LPCDXINDEX pIndex )
    }
    else
    {
+      if ( pIndex->ulVersion != pIndex->freePage )
+      {
+         BYTE byBuf[4];
+         HB_PUT_LE_ULONG( &byBuf[0], pIndex->freePage );
+         if ( hb_fsSeek( pIndex->hFile, 0x04, FS_SET ) != 0x04 ||
+              hb_fsWrite( pIndex->hFile, byBuf, 4) != 4 )
+         {
+            hb_errInternal( EDBF_WRITE, "Write in index page failed (ver.ex)", "", "" );
+         }
+         pIndex->ulVersion = pIndex->freePage;
+      }
       pIndex->fChanged = FALSE;
    }
    return TRUE;
@@ -3801,6 +3820,28 @@ static void hb_cdxTagIndexTagNew( LPCDXTAG pTag,
 }
 
 /*
+ * free page and all child pages
+ */
+static void hb_cdxIndexFreePages( LPCDXPAGE pPage )
+{
+   if ( ( pPage->PageType & CDX_NODE_LEAF ) == 0 )
+   {
+      LPCDXPAGE pChildPage;
+      SHORT iKey;
+
+      for ( iKey = 0; iKey < pPage->iKeys; iKey++ )
+      {
+         pChildPage = hb_cdxPageNew( pPage->TagParent, NULL, 
+                                     hb_cdxPageGetKeyPage( pPage, iKey ) );
+         if ( pChildPage )
+            hb_cdxIndexFreePages( pChildPage );
+      }
+   }
+   pPage->PageType = CDX_NODE_UNUSED;
+   hb_cdxPageFree( pPage, FALSE );
+}
+
+/*
  * remove Tag from Bag
  */
 static void hb_cdxIndexDelTag( LPCDXINDEX pIndex, char * szTagName )
@@ -3817,7 +3858,18 @@ static void hb_cdxIndexDelTag( LPCDXINDEX pIndex, char * szTagName )
       if ( hb_cdxTagKeyFind( pIndex->pCompound, pKey ) > 0 )
       {
          hb_cdxPageKeyDelete( pIndex->pCompound->RootPage );
-         /* TODO: !!! free header and all pages used by order */
+         if ( pTag != pIndex->TagList || pTag->pNext != NULL )
+         {
+            LPCDXPAGE pPage;
+
+            hb_cdxTagOpen( pTag );
+            pPage = pTag->RootPage;
+            hb_cdxTagClose( pTag );
+            if ( pPage )
+               hb_cdxIndexFreePages( pPage );
+            pTag->TagChanged = FALSE;
+            hb_cdxIndexPutAvailPage( pIndex, pTag->TagBlock, TRUE );
+         }
       }
       *pTagPtr = pTag->pNext;
       hb_cdxTagFree( pTag );
@@ -3837,7 +3889,9 @@ static LPCDXTAG hb_cdxIndexAddTag( LPCDXINDEX pIndex, char * szTagName,
    LPCDXTAG pTag, *pTagPtr;
    LPCDXKEY pKey;
 
-   /* Delete previous tag first to free the place for new one */
+   /* Delete previous tag first to free the place for new one
+    * its redundant Tag should be already deleted
+    */
    hb_cdxIndexDelTag( pIndex, szTagName );
 
    /* Create new tag an add to tag list */
@@ -5440,7 +5494,6 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
 {
    ULONG ulRecNo;
    BOOL fNewFile, fOpenedIndex;
-   FHANDLE hFile;
    PHB_ITEM pKeyExp, pForExp, pResult;
    HB_MACRO_PTR pExpMacro, pForMacro;
    char * szFileName, * szCpndTagName, * szTagName;
@@ -5634,9 +5687,11 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
 
    pIndex = hb_cdxFindBag( pArea, szFileName );
    fOpenedIndex = ( pIndex != NULL );
+   fNewFile = FALSE;
 
    if ( !fOpenedIndex )
    {
+      FHANDLE hFile;
       fNewFile = ! hb_spFile( ( BYTE * ) szFileName, szSpFile );
       if ( fNewFile )
       {
@@ -5676,46 +5731,44 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          /* TODO: check if index file is not corrupted */
          /* cut corrupted files */
          fNewFile = ( hb_fsSeek( hFile, 0, FS_END ) <= sizeof( CDXTAGHEADER ) );
-         hb_fsSeek( hFile, 0, FS_SET );
-         if ( fNewFile )
-            hb_fsWrite( hFile, NULL, 0 );
       }
-
-      hb_cdxIndexLockWrite( pIndex );
-      if ( fNewFile )
-      {
-         hb_cdxIndexDropAvailPage( pIndex );
-         pIndex->nextAvail = pIndex->freePage = 0;
-         pIndex->pCompound = hb_cdxTagNew( pIndex, szCpndTagName, CDX_DUMMYNODE );
-         pIndex->pCompound->OptFlags = CDX_TYPE_COMPACT | CDX_TYPE_COMPOUND | CDX_TYPE_STRUCTURE;
-         hb_cdxTagIndexTagNew( pIndex->pCompound, NULL, NULL, 'C', 10, NULL, NULL,
-                               TRUE, FALSE, FALSE );
-      }
-      else
-      {
+      if ( !fNewFile )
          hb_cdxIndexLoad( pIndex, szCpndTagName );
-         /* Delete new tag if exist */
-         hb_cdxIndexDelTag( pIndex, szTagName );
-      }
-
-      /* Update DBF header */
-      if ( !pArea->fHasTags )
-      {
-         pFileName = hb_fsFNameSplit( pArea->szDataFileName );
-         hb_strncpyUpper( szFileName, pFileName->szName, CDX_MAXTAGNAMELEN );
-         hb_xfree( pFileName );
-         if ( strcmp( szFileName, szCpndTagName ) == 0 )
-         {
-            pArea->fHasTags = TRUE;
-            SELF_WRITEDBHEADER( ( AREAP ) pArea );
-         }
-      }
    }
-   else /* if ( fOpenedIndex ) */
+
+   hb_cdxIndexLockWrite( pIndex );
+   if ( !fNewFile )
    {
-      hb_cdxIndexLockWrite( pIndex );
       /* Delete new tag if exist */
       hb_cdxIndexDelTag( pIndex, szTagName );
+      fNewFile = ( pIndex->TagList == NULL );
+   }
+
+   if ( fNewFile )
+   {
+      hb_fsSeek( pIndex->hFile, 0, FS_SET );
+      hb_fsWrite( pIndex->hFile, NULL, 0 );
+      hb_cdxIndexDropAvailPage( pIndex );
+      if ( pIndex->pCompound != NULL )
+         hb_cdxTagFree( pIndex->pCompound );
+      pIndex->nextAvail = pIndex->freePage = 0;
+      pIndex->pCompound = hb_cdxTagNew( pIndex, szCpndTagName, CDX_DUMMYNODE );
+      pIndex->pCompound->OptFlags = CDX_TYPE_COMPACT | CDX_TYPE_COMPOUND | CDX_TYPE_STRUCTURE;
+      hb_cdxTagIndexTagNew( pIndex->pCompound, NULL, NULL, 'C', 10, NULL, NULL,
+                            TRUE, FALSE, FALSE );
+   }
+
+   /* Update DBF header */
+   if ( !pArea->fHasTags )
+   {
+      pFileName = hb_fsFNameSplit( pArea->szDataFileName );
+      hb_strncpyUpper( szFileName, pFileName->szName, CDX_MAXTAGNAMELEN );
+      hb_xfree( pFileName );
+      if ( strcmp( szFileName, szCpndTagName ) == 0 )
+      {
+         pArea->fHasTags = TRUE;
+         SELF_WRITEDBHEADER( ( AREAP ) pArea );
+      }
    }
    hb_xfree( szFileName );
 
