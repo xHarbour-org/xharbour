@@ -1,5 +1,5 @@
 /*
- * $Id: mpostolc.c,v 1.2 2001/12/05 18:44:47 vszakats Exp $
+ * $Id: mpostolc.c,v 1.1.1.1 2001/12/21 10:41:48 ronpinkas Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 
 HB_FUNC( MPOSTOLC )
 {
-   char * pszString    = ISCHAR( 1 ) ? hb_parc( 1 ) : "";
+   char * pszString    = ISCHAR( 1 ) ? hb_parcx( 1 ) : "";
    ULONG  ulLineLength = ISNUM( 2 ) ? hb_parni( 2 ) : 79;
    ULONG  ulPos        = ISNUM( 3 ) ? hb_parnl( 3 ) : 1;
    ULONG  ulTabLength  = ISNUM( 4 ) ? hb_parni( 4 ) : 4;

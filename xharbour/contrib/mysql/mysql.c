@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.7 2004/03/04 21:49:09 peterrees Exp $
+ * $Id: mysql.c,v 1.8 2004/03/17 01:24:04 lculik Exp $
  */
 
 /*
@@ -85,9 +85,9 @@
 HB_FUNC(SQLCONNECT) // MYSQL *mysql_real_connect(MYSQL*, char * host, char * user, char * password, char * db, uint port, char *, uint flags)
 {
    MYSQL * mysql;
-   const char *szHost=hb_parc( 1 );
-   const char *szUser=hb_parc( 2 );
-   const char *szPass=hb_parc( 3 );
+   const char *szHost=hb_parcx( 1 );
+   const char *szUser=hb_parcx( 2 );
+   const char *szPass=hb_parcx( 3 );
    unsigned int port  = ISNUM( 4 ) ? ( unsigned int ) hb_parni(4) :  MYSQL_PORT;
    unsigned int flags = ISNUM( 5 ) ? ( unsigned int ) hb_parni(5) :  0;
 #if MYSQL_VERSION_ID > 32200
@@ -127,7 +127,7 @@ HB_FUNC(SQLCLOSE) // void mysql_close(MYSQL *mysql)
 
 HB_FUNC(SQLSELECTD) // int mysql_select_db(MYSQL *, char *)
 {
-   const   char *db=hb_parc(2);
+   const   char *db=hb_parcx(2);
    hb_retnl((long) mysql_select_db((MYSQL *)_parnl(1), db));
 }
 
@@ -351,7 +351,7 @@ HB_FUNC(DATATOSQL)
 
    if ( iSize )
    {
-     FromBuffer = hb_parc( 1 ) ;
+     FromBuffer = hb_parcx( 1 ) ;
      ToBuffer = ( char *) hb_xgrab( ( iSize*2 ) + 1 );
      if ( ToBuffer )
      {
@@ -377,7 +377,7 @@ HB_FUNC(DATATOSQL)
 HB_FUNC(FILETOSQLBINARY)
 {
    BOOL bResult = FALSE ;
-   char *szFile=hb_parc(1);
+   char *szFile=hb_parcx(1);
    int fHandle, iSize;
    char *ToBuffer;
    char *FromBuffer;

@@ -1,5 +1,5 @@
 /*
- * $Id: rat.c,v 1.1.1.1 2001/12/21 10:42:00 ronpinkas Exp $
+ * $Id: rat.c,v 1.2 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -62,8 +62,8 @@ HB_FUNC( RAT )
 
       if( lPos >= 0 )
       {
-         char * pszSub = hb_parc( 1 );
-         char * pszText = hb_parc( 2 );
+         char * pszSub = hb_parcx( 1 );
+         char * pszText = hb_parcx( 2 );
          BOOL bFound = FALSE;
 
          while( lPos >= 0 && !bFound )

@@ -1,5 +1,5 @@
 /*
- * $Id: saverest.c,v 1.5 2002/10/22 02:17:10 paultucker Exp $
+ * $Id: saverest.c,v 1.6 2004/01/21 03:58:35 maurifull Exp $
  */
 
 /*
@@ -90,5 +90,5 @@ HB_FUNC( RESTSCREEN )
                  hb_parni( 2 ), /* Defaults to zero on bad type */
                  ISNUM( 3 ) ? hb_parni( 3 ) : hb_gtMaxRow(),
                  ISNUM( 4 ) ? hb_parni( 4 ) : hb_gtMaxCol(),
-                 ( void * ) hb_parc( 5 ) );
+                 ( void * ) hb_parcx( 5 ) );
 }

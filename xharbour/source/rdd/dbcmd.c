@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.94 2004/03/12 19:32:53 andijahja Exp $
+ * $Id: dbcmd.c,v 1.95 2004/03/17 02:29:00 druzus Exp $
  */
 
 /*
@@ -1450,14 +1450,14 @@ HB_FUNC( DBCREATE )
    PHB_FNAME pFileName;
    PHB_ITEM pStruct, pFieldDesc;
    BOOL bOpen;
-   BYTE * codePageId = (BYTE*) hb_parc(6);
+   BYTE * codePageId = (BYTE*) hb_parcx(6);
 
    hb_ret();
 
    szFileName[0] = '\0';
    if ( ISCHAR( 1 ) )
    {
-      strncpy( szFileName, hb_parc( 1 ), _POSIX_PATH_MAX );
+      strncpy( szFileName, hb_parcx( 1 ), _POSIX_PATH_MAX );
    }
    pStruct = hb_param( 2 , HB_IT_ARRAY );
 
@@ -1536,7 +1536,7 @@ HB_FUNC( DBCREATE )
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
       }
 
-      hb_strncpyUpper( cDriverBuffer, hb_parc( 3 ), uiLen );
+      hb_strncpyUpper( cDriverBuffer, hb_parcx( 3 ), uiLen );
       szDriver = cDriverBuffer;
    }
    else
@@ -1545,12 +1545,12 @@ HB_FUNC( DBCREATE )
    }
 
    pFileName = hb_fsFNameSplit( szFileName );
-   // strncpy( szAlias, hb_parc( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+   // strncpy( szAlias, hb_parcx( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
    szAlias[0] = '\0';
 
    if( ISCHAR(5) )
    {
-      strncat( szAlias, hb_parc( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      strncat( szAlias, hb_parcx( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
    }
 
    uiLen = strlen( szAlias );
@@ -2194,7 +2194,7 @@ HB_FUNC( DBSELECTAREA )
 
    if( ISCHAR( 1 ) )
    {
-      char *szAlias = hb_parc( 1 );
+      char *szAlias = hb_parcx( 1 );
       USHORT ulLen = strlen( szAlias );
 
       if( ulLen >= 1 && szAlias[ 0 ] >= '0' && szAlias[ 0 ] <= '9' )
@@ -2439,7 +2439,7 @@ HB_FUNC( DBUSEAREA )
    USHORT uiLen;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
-   BYTE * codePageId = (BYTE*) hb_parc(7);
+   BYTE * codePageId = (BYTE*) hb_parcx(7);
    char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
 
@@ -2468,7 +2468,7 @@ HB_FUNC( DBUSEAREA )
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
       }
 
-      hb_strncpyUpper( szDriverBuffer, hb_parc( 2 ), uiLen );
+      hb_strncpyUpper( szDriverBuffer, hb_parcx( 2 ), uiLen );
       szDriver = szDriverBuffer;
    }
    else
@@ -2476,13 +2476,13 @@ HB_FUNC( DBUSEAREA )
       szDriver = s_szDefDriver;
    }
 
-   if( ! ISCHAR(3) || ( strlen( hb_parc( 3 ) ) == 0 ) )
+   if( ! ISCHAR(3) || ( strlen( hb_parcx( 3 ) ) == 0 ) )
    {
       hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
       return;
    }
 
-   strncpy( szFileName, hb_parc( 3 ), _POSIX_PATH_MAX );
+   strncpy( szFileName, hb_parcx( 3 ), _POSIX_PATH_MAX );
    /* Convert FileName accoring to Sets (_SET_DIRCASE,_SET_FILECASE,_SET_DIRSEPARATOR) */
    hb_fileNameConv( szFileName );
 
@@ -2492,7 +2492,7 @@ HB_FUNC( DBUSEAREA )
 
    if( ISCHAR(4) )
    {
-      strncat( szAlias, hb_parc( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      strncat( szAlias, hb_parcx( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
    }
 
    if( strlen( szAlias ) == 0 )
@@ -2537,7 +2537,7 @@ HB_FUNC( DBUSEAREA )
    }
 
    *szFileName = '\0';
-   strncat( szFileName, hb_parc( 3 ), _POSIX_PATH_MAX );
+   strncat( szFileName, hb_parcx( 3 ), _POSIX_PATH_MAX );
 
    if( ! pFileName->szExtension )
    {
@@ -2710,7 +2710,7 @@ HB_FUNC( FIELDPOS )
 
    if( s_pCurrArea )
    {
-      char *szFieldName = hb_parc( 1 );
+      char *szFieldName = hb_parcx( 1 );
 
       if( szFieldName )
       {
@@ -2985,7 +2985,7 @@ HB_FUNC( ORDCONDSET )
    if( s_pCurrArea )
    {
       lpdbOrdCondInfo = ( LPDBORDERCONDINFO ) hb_xgrab( sizeof( DBORDERCONDINFO ) );
-      szFor = hb_parc( 1 );
+      szFor = hb_parcx( 1 );
       /* ulLen = strlen( szFor ); */
       if( ISCHAR(1) && ( ( ulLen = strlen( szFor ) ) > 0 ) )
       {
@@ -3000,7 +3000,7 @@ HB_FUNC( ORDCONDSET )
       if( ISCHAR( 17 ) && ( ulLen = hb_parclen( 17 ) ) > 0 )
       {
          lpdbOrdCondInfo->abWhile = ( BYTE * ) hb_xgrab( ulLen + 1 );
-         strcpy( ( char * ) lpdbOrdCondInfo->abWhile, hb_parc( 17 ) );
+         strcpy( ( char * ) lpdbOrdCondInfo->abWhile, hb_parcx( 17 ) );
       }
       else
       {
@@ -3069,8 +3069,8 @@ HB_FUNC( ORDCREATE )
 
    if( s_pCurrArea )
    {
-      dbOrderInfo.abBagName = ( BYTE * ) hb_parc( 1 );
-      dbOrderInfo.atomBagName = ( BYTE * ) hb_parc( 2 );
+      dbOrderInfo.abBagName = ( BYTE * ) hb_parcx( 1 );
+      dbOrderInfo.atomBagName = ( BYTE * ) hb_parcx( 2 );
       dbOrderInfo.abExpr = hb_param( 3, HB_IT_STRING );
       if( ( ( dbOrderInfo.abBagName == NULL || strlen( ( char * ) dbOrderInfo.abBagName ) == 0 ) &&
             ( dbOrderInfo.atomBagName == NULL || strlen( ( char * ) dbOrderInfo.atomBagName ) == 0 ) ) ||
@@ -3558,7 +3558,7 @@ HB_FUNC( RDDREGISTER )
       if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
 
-      hb_strncpyUpper( szDriver, hb_parc( 1 ), uiLen );
+      hb_strncpyUpper( szDriver, hb_parcx( 1 ), uiLen );
       /*
        * hb_rddRegister returns:
        *
@@ -3631,7 +3631,7 @@ HB_FUNC( SELECT )
    char * szAlias;
    ULONG ulLen;
 
-   szAlias = hb_parc( 1 );
+   szAlias = hb_parcx( 1 );
    ulLen = strlen( szAlias );
 
    if( ulLen == 0 && ISCHAR( 1 ))
@@ -3689,7 +3689,7 @@ HB_FUNC( __RDDSETDEFAULT )
          s_szDefDriver = ( char * ) hb_xgrab( uiLen + 1 );
       }
 
-      hb_strncpyUpper( s_szDefDriver, hb_parc( 1 ), uiLen );
+      hb_strncpyUpper( s_szDefDriver, hb_parcx( 1 ), uiLen );
    }
 }
 
@@ -3712,7 +3712,7 @@ HB_FUNC( RDDSETDEFAULT )
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
       }
 
-      hb_strncpyUpper( szNewDriver, hb_parc( 1 ), uiLen );
+      hb_strncpyUpper( szNewDriver, hb_parcx( 1 ), uiLen );
 
       if( ! hb_rddFindNode( szNewDriver, NULL ) )
       {
@@ -3753,7 +3753,7 @@ HB_FUNC( DBSETDRIVER )
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
       }
 
-      hb_strncpyUpper( szNewDriver, hb_parc( 1 ), uiLen );
+      hb_strncpyUpper( szNewDriver, hb_parcx( 1 ), uiLen );
 
       if( !hb_rddFindNode( szNewDriver, NULL ) )
       {
@@ -3866,7 +3866,7 @@ HB_FUNC( DBSETRELATION )
       {
          LPAREANODE pCurrArea = s_pCurrArea;
 
-         szAlias = hb_parc( 1 );
+         szAlias = hb_parcx( 1 );
          hb_rddSelectWorkAreaAlias( szAlias );
 
          if( hb_vmRequestQuery() )
@@ -4281,7 +4281,7 @@ HB_FUNC( DBDROP )
   char      *szDriver;
 
   if ( ISCHAR( 2 ) ) /* we have a VIA RDD parameter */
-    szDriver = hb_parc( 2 );
+    szDriver = hb_parcx( 2 );
   else
     szDriver = s_szDefDriver;
 
@@ -4311,7 +4311,7 @@ HB_FUNC( DBEXISTS )
   char * szDriver;
 
   if ( ISCHAR( 3 ) ) /* we have a VIA RDD parameter */
-    szDriver = hb_parc( 3 );
+    szDriver = hb_parcx( 3 );
   else
     szDriver = s_szDefDriver;
 
@@ -4777,7 +4777,7 @@ HB_FUNC( __DBAPP )
 {
   if( ISCHAR( 1 ) )
   {
-    rddMoveRecords(  hb_parc( 1 ),                /* File From */
+    rddMoveRecords(  hb_parcx( 1 ),                /* File From */
                      NULL,                        /* TO current area */
                      hb_param( 2, HB_IT_ARRAY ),  /* Fields */
                      hb_param( 3, HB_IT_BLOCK ),  /* For */
@@ -4785,7 +4785,7 @@ HB_FUNC( __DBAPP )
                      hb_parnl( 5 ),               /* Next */ /* Defaults to zero on bad type */
                      hb_parnl( 6 ),               /* Record */ /* Defaults to zero on bad type */
                      hb_parl( 7 ),                /* Rest */ /* Defaults to zero on bad type */
-                     ISCHAR( 8 ) ? hb_parc( 8 ) : NULL ); /* RDD */
+                     ISCHAR( 8 ) ? hb_parcx( 8 ) : NULL ); /* RDD */
   }
 }
 
@@ -4794,14 +4794,14 @@ HB_FUNC( __DBCOPY )
   if( ISCHAR( 1 ) )
   {
     rddMoveRecords(  NULL,                        /* fro CURRENT Area */
-                     hb_parc( 1 ),                /* To File */
+                     hb_parcx( 1 ),                /* To File */
                      hb_param( 2, HB_IT_ARRAY ),  /* Fields */
                      hb_param( 3, HB_IT_BLOCK ),  /* For */
                      hb_param( 4, HB_IT_BLOCK ),  /* While */
                      hb_parnl( 5 ),               /* Next */ /* Defaults to zero on bad type */
                      hb_parnl( 6 ),               /* Record */ /* Defaults to zero on bad type */
                      hb_parl( 7 ),                /* Rest */ /* Defaults to zero on bad type */
-                     ISCHAR( 8 ) ? hb_parc( 8 ) : NULL ); /* RDD */
+                     ISCHAR( 8 ) ? hb_parcx( 8 ) : NULL ); /* RDD */
   }
 }
 
@@ -4810,7 +4810,7 @@ HB_FUNC( DBUSEAREAD )
    HB_THREAD_STUB
    char * szDriver;
    char szFileName[ _POSIX_PATH_MAX + 1 ];
-   BYTE * codePageId = (BYTE*) hb_parc(7);
+   BYTE * codePageId = (BYTE*) hb_parcx(7);
    USHORT uiLen;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
@@ -4838,13 +4838,13 @@ HB_FUNC( DBUSEAREAD )
       if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
 
-      hb_strncpyUpper( szDriverBuffer, hb_parc( 2 ), uiLen );
+      hb_strncpyUpper( szDriverBuffer, hb_parcx( 2 ), uiLen );
       szDriver = szDriverBuffer;
    }
    else
       szDriver = s_szDefDriver;
 
-   // szFileName = hb_parc( 3 );
+   // szFileName = hb_parcx( 3 );
    // if( strlen( hb_parclen(3) ) == 0 )
    if( hb_parclen(3) == 0 )
    // if( strlen( szFileName ) == 0 )
@@ -4854,7 +4854,7 @@ HB_FUNC( DBUSEAREAD )
    }
 
    pFileName = hb_fsFNameSplit( szFileName );
-   strncpy( szAlias, hb_parc( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+   strncpy( szAlias, hb_parcx( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
    if( strlen( szAlias ) == 0 )
       strncpy( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
    uiLen = strlen( szAlias );
@@ -4883,7 +4883,7 @@ HB_FUNC( DBUSEAREAD )
    }
 
    // szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-   strncpy( szFileName, hb_parc( 3 ), _POSIX_PATH_MAX );
+   strncpy( szFileName, hb_parcx( 3 ), _POSIX_PATH_MAX );
 /*   if( !pFileName->szExtension )
    {
       pFileExt = hb_itemPutC( NULL, "" );
@@ -5321,7 +5321,7 @@ HB_FUNC( __DBDELIM )
    {
       PHB_ITEM pError = NULL;
       BOOL bExport = hb_parl( 1 );
-      char *cFileName = hb_parc( 2 );
+      char *cFileName = hb_parcx( 2 );
       PHB_ITEM pDelimArg = hb_param( 3, HB_IT_STRING );
       char *cDelimArg;
       PHB_ITEM pFields = hb_param( 4, HB_IT_ARRAY );
@@ -5398,7 +5398,7 @@ HB_FUNC( __DBDELIM )
       // COPY TO DELIMITED
       if ( bExport )
       {
-         // Try to create text file 
+         // Try to create text file
          do
          {
             handle = hb_fsCreate( (BYTE*) szFileName, FC_NORMAL );
@@ -5460,11 +5460,11 @@ HB_FUNC( __DBDELIM )
       // APPEND FROM DELIMITED
       else
       {
-         // Container to pass to AppendToDb() 
+         // Container to pass to AppendToDb()
          HB_ITEM pDelimitedFile;
          HB_ITEM pSep;
 
-         // NIL them at the first place 
+         // NIL them at the first place
          pDelimitedFile.type = HB_IT_NIL;
          pSep.type = HB_IT_NIL;
 
@@ -5473,7 +5473,7 @@ HB_FUNC( __DBDELIM )
          {
             handle = hb_fsOpen( (BYTE*) szFileName, FO_READ | FO_COMPAT );
 
-            // Booo error in opening file 
+            // Booo error in opening file
             if( handle == F_ERROR )
             {
                // Only create object once in this loop
@@ -5491,7 +5491,7 @@ HB_FUNC( __DBDELIM )
 
                hb_errPutOsCode( pError, hb_fsError() );
 
-               // Execute the error handler 
+               // Execute the error handler
                bRetry = hb_errLaunch( pError );
             }
             else
@@ -5506,14 +5506,14 @@ HB_FUNC( __DBDELIM )
             pError = NULL;
          }
 
-         // We don't need this handle as the process is done in FPARSEEX() 
+         // We don't need this handle as the process is done in FPARSEEX()
          hb_fsClose( handle );
 
-         // Assign value to HB_ITEM 
+         // Assign value to HB_ITEM
          hb_itemPutC( &pSep, (char*) cSeparator );
          hb_itemPutC( &pDelimitedFile, szFileName );
 
-         // The Job is being done here 
+         // The Job is being done here
          hb_AppendToDb( &pDelimitedFile, &pSep );
 
          // Clean ups

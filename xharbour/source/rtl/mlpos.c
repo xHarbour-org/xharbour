@@ -1,5 +1,5 @@
 /*
- * $Id: mlpos.c,v 1.7 2001/06/07 15:25:54 dholm Exp $
+ * $Id: mlpos.c,v 1.1.1.1 2001/12/21 10:41:52 ronpinkas Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 
 HB_FUNC( MLPOS )
 {
-   char * pszString    = ISCHAR( 1 ) ? hb_parc( 1 ) : "";
+   char * pszString    = ISCHAR( 1 ) ? hb_parcx( 1 ) : "";
    ULONG  ulLineLength = hb_parni( 2 );
    ULONG  ulLine       = hb_parni( 3 );
    ULONG  ulTabLength  = ISNUM( 4 ) ? hb_parni( 4 ) : 4;

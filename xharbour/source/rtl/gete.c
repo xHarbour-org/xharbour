@@ -1,5 +1,5 @@
 /*
- * $Id: gete.c,v 1.8 2001/12/16 11:12:22 vszakats Exp $
+ * $Id: gete.c,v 1.4 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -102,8 +102,8 @@ HB_FUNC( GETENV )
 
          szValue = hb_getenv( pszName );
 
-         hb_retc( szValue && szValue[ 0 ] != '\0' ? szValue : ( ( ISCHAR( 2 ) ? hb_parc( 2 ) : "" ) ) );
-         
+         hb_retc( szValue && szValue[ 0 ] != '\0' ? szValue : ( ( ISCHAR( 2 ) ? hb_parcx( 2 ) : "" ) ) );
+
          if( szValue )
             hb_xfree( ( void * ) szValue );
       }

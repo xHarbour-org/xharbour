@@ -6693,7 +6693,7 @@ HB_FUNC( WILD2REGEX )
    HB_THREAD_STUB
 #endif
    char sRegEx[ _POSIX_PATH_MAX ];
-   int iLen = Wild2RegEx( hb_parc( 1 ), sRegEx, hb_parl( 2 ) );
+   int iLen = Wild2RegEx( hb_parcx( 1 ), sRegEx, hb_parl( 2 ) );
 
    hb_retclen( sRegEx, iLen );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.25 2004/03/11 02:30:57 ronpinkas Exp $
+ * $Id: inkey.c,v 1.26 2004/03/11 04:22:27 ronpinkas Exp $
  */
 
 /*
@@ -469,7 +469,7 @@ HB_FUNC( __KEYBOARD )
 
       if( size != 0 )
       {
-         BYTE * fPtr = ( BYTE * ) hb_parc( 1 );
+         BYTE * fPtr = ( BYTE * ) hb_parcx( 1 );
 
          /* It might be just a request to clear the buffer */
          if( *fPtr )

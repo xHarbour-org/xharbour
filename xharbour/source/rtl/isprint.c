@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.24 2003/11/12 00:01:16 peterrees Exp $
+ * $Id: isprint.c,v 1.25 2003/12/12 10:16:06 druzus Exp $
  */
 
 /*
@@ -168,10 +168,10 @@ HB_FUNC( ISPRINTER )
       char DefaultPrinter[MAXBUFFERSIZE];
       DWORD pdwBufferSize = MAXBUFFERSIZE;
       hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize);
-      hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parc( 1 ) : (char*)DefaultPrinter ) );
+      hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parcx( 1 ) : (char*)DefaultPrinter ) );
    }
    #else
-      hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parc( 1 ) : "LPT1" ) );
+      hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parcx( 1 ) : "LPT1" ) );
    #endif
 }
 
@@ -323,7 +323,7 @@ HB_FUNC( XISPRINTER )
   char DefaultPrinter[MAXBUFFERSIZE];
   DWORD pdwBufferSize = MAXBUFFERSIZE;
   hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize);
-  hb_retnl( hb_printerIsReadyn( ISCHAR( 1 ) ? hb_parc( 1 ) : (char*)DefaultPrinter ) );
+  hb_retnl( hb_printerIsReadyn( ISCHAR( 1 ) ? hb_parcx( 1 ) : (char*)DefaultPrinter ) );
 }
 
 #endif

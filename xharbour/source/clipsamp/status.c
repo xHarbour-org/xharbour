@@ -1,5 +1,5 @@
 /*
- * $Id: status.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
+ * $Id: status.c,v 1.2 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -78,7 +78,7 @@ HB_FUNC( STATUSNEW )
    hb_itemArrayPut( pReturn, ST_COL, pItem );
    hb_itemRelease( pItem );
 
-   pItem = hb_itemPutC( NULL, ( ISCHAR( ST_COLOR ) ? hb_parc( ST_COLOR ) : "W+/N" ) );
+   pItem = hb_itemPutC( NULL, ( ISCHAR( ST_COLOR ) ? hb_parcx( ST_COLOR ) : "W+/N" ) );
    hb_itemArrayPut( pReturn, ST_COLOR, pItem );
    hb_itemRelease( pItem );
 

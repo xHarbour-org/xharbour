@@ -1,5 +1,5 @@
 /*
- * $Id: memoline.c,v 1.7 2003/07/18 12:58:17 lculik Exp $
+ * $Id: memoline.c,v 1.8 2003/07/30 06:59:25 brianhays Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 
 HB_FUNC( MEMOLINE )
 {
-   char * pszString    = ISCHAR( 1 ) ? hb_parc( 1 ) : "";
+   char * pszString    = ISCHAR( 1 ) ? hb_parcx( 1 ) : "";
    ULONG  ulLineLength = ISNUM( 2 ) ? hb_parni( 2 ) : 79;
    ULONG  ulLineNumber = ISNUM( 3 ) ? hb_parni( 3 ) : 1;
    ULONG  ulTabLength  = ISNUM( 4 ) ? hb_parni( 4 ) : 4;
@@ -188,7 +188,7 @@ HB_FUNC( MEMOLINE )
 
 HB_FUNC( MEMOLINELONG )
 {
-   char * pszString    = ISCHAR( 1 ) ? hb_parc( 1 ) : "";
+   char * pszString    = ISCHAR( 1 ) ? hb_parcx( 1 ) : "";
    ULONG  ulLineLength = ISNUM( 2 ) ? hb_parni( 2 ) : 79;
    ULONG  ulLineNumber = ISNUM( 3 ) ? hb_parni( 3 ) : 1;
    ULONG  ulTabLength  = ISNUM( 4 ) ? hb_parni( 4 ) : 4;

@@ -1,5 +1,5 @@
 /*
- * $Id: mouseapi.c,v 1.4 2003/06/28 21:51:26 lculik Exp $
+ * $Id: mouseapi.c,v 1.5 2003/10/07 22:25:46 paultucker Exp $
  */
 
 /*
@@ -276,7 +276,7 @@ HB_FUNC( MRESTSTATE )
 
       USHORT uiPos;
 
-      BYTE * pBuffer = ( BYTE * ) hb_parc( 1 );
+      BYTE * pBuffer = ( BYTE * ) hb_parcx( 1 );
 
       uiPos = 0;
       iRow = *( pBuffer + uiPos );

@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.13 2004/03/03 13:20:55 lf_sfnet Exp $
+ * $Id: odbc.c,v 1.14 2004/03/16 17:38:21 mlombardo Exp $
  */
 
 /*
@@ -124,12 +124,12 @@ HB_FUNC( SQLDRIVERC ) /* HB_SQLDRIVERCONNECT( hDbc, @ cConnectString ) --> nRetC
    #if defined(HB_OS_WIN_32)
       RETCODE ret =  SQLDriverConnect( ( HDBC ) hb_parnl( 1 ),
                              GetDesktopWindow(),
-                             (unsigned char *) hb_parc( 2 ), strlen(hb_parc(2)),
+                             (unsigned char *) hb_parcx( 2 ), strlen(hb_parcx(2)),
                              bBuffer1, 1024, &wLen, SQL_DRIVER_COMPLETE ) ;
    #elif defined(HB_OS_UNIX)
       RETCODE ret =  SQLDriverConnect( ( HDBC ) hb_parnl( 1 ),
                              0,
-                             hb_parc( 2 ), strlen(hb_parc(2)),
+                             hb_parcx( 2 ), strlen(hb_parcx(2)),
                              bBuffer1, 1024, &wLen, SQL_DRIVER_COMPLETE ) ;
 
    #endif
@@ -140,12 +140,12 @@ HB_FUNC( SQLDRIVERC ) /* HB_SQLDRIVERCONNECT( hDbc, @ cConnectString ) --> nRetC
 HB_FUNC( SQLCONNECT ) /* HB_SQLCONNECT( hDbc, cDSN, cUseName, cPassword ) --> nRetCode */
 {
       RETCODE ret =  SQLConnect( ( HDBC ) hb_parnl( 1 ),
-                                 (unsigned char*) hb_parc( 2 ),
-                                 strlen( hb_parc(2) ),
-                                 (unsigned char*) hb_parc( 3 ),
-                                 strlen( hb_parc(3) ),
-                                 (unsigned char*) hb_parc( 4 ),
-                                 strlen( hb_parc(4) ) );
+                                 (unsigned char*) hb_parcx( 2 ),
+                                 strlen( hb_parcx(2) ),
+                                 (unsigned char*) hb_parcx( 3 ),
+                                 strlen( hb_parcx(3) ),
+                                 (unsigned char*) hb_parcx( 4 ),
+                                 strlen( hb_parcx(4) ) );
    hb_retni( ret );
 }
 
@@ -179,7 +179,7 @@ HB_FUNC( SQLFREESTM ) /* HB_SQLFREESTMT( hStmt, nType ) --> nRetCode */
 
 HB_FUNC( SQLEXECDIR )  /* HB_SQLEXECDIRECT( hStmt, cStatement ) --> nRetCode */
 {
-   hb_retni( SQLExecDirect( ( HSTMT ) hb_parnl( 1 ), (unsigned char*) hb_parc( 2 ), hb_parclen( 2 ) ) );
+   hb_retni( SQLExecDirect( ( HSTMT ) hb_parnl( 1 ), (unsigned char*) hb_parcx( 2 ), hb_parclen( 2 ) ) );
 }
 
 HB_FUNC( SQLFETCH )   /* HB_SQLFETCH( hStmt ) --> nRetCode */
@@ -380,13 +380,13 @@ HB_FUNC( SQLGETINFO ) // hDbc, nType, @cResult
 HB_FUNC( SQLSETCONNECTOPTION ) // hDbc, nOption, uOption
 {
    hb_retnl( ( LONG ) SQLSetConnectOption( ( HDBC ) hb_parnl( 1 ), ( UWORD ) hb_parnl( 2 ),
-           ( UDWORD ) ISCHAR( 3 ) ? ( LONG ) hb_parc( 3 ) : hb_parnl( 3 ) ) );
+           ( UDWORD ) ISCHAR( 3 ) ? ( LONG ) hb_parcx( 3 ) : hb_parnl( 3 ) ) );
 }
 
 HB_FUNC( SQLSETSTMTOPTION ) // hStmt, nOption, uOption )  --> nRetCode
 {
    hb_retnl( ( LONG ) SQLSetStmtOption( ( SQLHSTMT ) hb_parnl( 1 ), ( UWORD ) hb_parnl( 2 ),
-           ( UDWORD ) ISCHAR( 3 ) ? ( LONG ) hb_parc( 3 ) : hb_parnl( 3 ) ) );
+           ( UDWORD ) ISCHAR( 3 ) ? ( LONG ) hb_parcx( 3 ) : hb_parnl( 3 ) ) );
 }
 
 HB_FUNC( SQLGETCONNECTOPTION ) // hDbc, nOption, @cOption

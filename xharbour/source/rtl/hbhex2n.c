@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
+ * $Id: hbhex2n.c,v 1.2 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -118,7 +118,7 @@ HB_FUNC( HB_HEXTONUM )
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_HEXTONUM", 1, hb_param(1,HB_IT_ANY) );
       return;
    }
-   cHex = hb_parc( 1 );
+   cHex = hb_parcx( 1 );
 
    while ( *cHex )
    {

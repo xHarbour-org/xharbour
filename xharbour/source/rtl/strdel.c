@@ -1,5 +1,5 @@
 /*
- * $Id: strdel.c,v 1.0 Exp $
+ * $Id: strdel.c,v 1.1 2003/09/13 20:19:53 walito Exp $
  */
 
 /*
@@ -58,13 +58,13 @@ HB_FUNC( STRDEL )
 {
    if( ISCHAR( 1 ) && ISCHAR( 2 ) )
    {
-      char * szText = hb_parc( 1 );
+      char * szText = hb_parcx( 1 );
       ULONG ulText = hb_parclen( 1 );
       ULONG ulDel = hb_parclen( 2 );
 
       if( ulDel > 0 && ulText > 0 )
       {
-         char * szDel = hb_parc( 2 );
+         char * szDel = hb_parcx( 2 );
          ULONG ulPosTxt = 0;
          ULONG ulResult = 0;
          ULONG ulPosDel = 0;

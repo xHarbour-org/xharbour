@@ -1,5 +1,5 @@
 /*
- * $Id: diskspac.c,v 1.3 2003/02/16 16:00:42 likewolf Exp $
+ * $Id: diskspac.c,v 1.4 2004/02/14 21:01:16 andijahja Exp $
  */
 
 /*
@@ -205,7 +205,7 @@ HB_FUNC( DISKSPACE )
 
    {
       struct statfs st;
-      char *szName = ISCHAR( 1 ) ? hb_parc( 1 ) : "/";
+      char *szName = ISCHAR( 1 ) ? hb_parcx( 1 ) : "/";
 
       HB_SYMBOL_UNUSED( uiDrive );
 

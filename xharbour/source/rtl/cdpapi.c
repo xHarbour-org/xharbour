@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.11 2004/01/28 22:02:37 druzus Exp $
+ * $Id: cdpapi.c,v 1.12 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -646,15 +646,15 @@ HB_FUNC( HB_SETCODEPAGE )
    hb_retc( s_cdpage->id );
 
    if( ISCHAR(1) )
-      hb_cdpSelectID( hb_parc( 1 ) );
+      hb_cdpSelectID( hb_parcx( 1 ) );
 }
 
 HB_FUNC( HB_TRANSLATE )
 {
    char *szResult;
-   char *szIn = hb_parc(1);
-   char *szIdIn = hb_parc(2);
-   char *szIdOut = hb_parc(3);
+   char *szIn = hb_parcx(1);
+   char *szIdIn = hb_parcx(2);
+   char *szIdOut = hb_parcx(3);
    int  ilen;
    PHB_CODEPAGE cdpIn;
    PHB_CODEPAGE cdpOut;

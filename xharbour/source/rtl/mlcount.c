@@ -1,5 +1,5 @@
 /*
- * $Id: mlcount.c,v 1.1.1.1 2001/12/21 10:42:22 ronpinkas Exp $
+ * $Id: mlcount.c,v 1.2 2002/03/30 19:22:23 map Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 
 HB_FUNC( MLCOUNT )
 {
-   char * pszString    = ISCHAR( 1 ) ? hb_parc( 1 ) : "";
+   char * pszString    = ISCHAR( 1 ) ? hb_parcx( 1 ) : "";
    ULONG  ulLineLength = ISNUM( 2 ) ? hb_parni( 2 ) : 79;
    ULONG  ulTabLength  = ISNUM( 3 ) ? hb_parni( 3 ) : 4;
    ULONG  ulLastSpace  = 0;

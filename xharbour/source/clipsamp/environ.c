@@ -1,5 +1,5 @@
 /*
- * $Id: environ.c,v 1.2 2001/06/14 21:20:43 dholm Exp $
+ * $Id: environ.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
  */
 
 /*
@@ -61,7 +61,7 @@ HB_FUNC( FILEPATH )
 {
    if( ISCHAR( 1 ) )
    {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parc( 1 ) );
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
       hb_retc( pFileName->szPath );
       hb_xfree( pFileName );
    }
@@ -75,7 +75,7 @@ HB_FUNC( FILEBASE )
 {
    if( ISCHAR( 1 ) )
    {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parc( 1 ) );
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
       hb_retc( pFileName->szName );
       hb_xfree( pFileName );
    }
@@ -89,7 +89,7 @@ HB_FUNC( FILEEXT )
 {
    if( ISCHAR( 1 ) )
    {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parc( 1 ) );
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
       hb_retc( ( pFileName->szExtension ) + 1 ); /* Skip the dot */
       hb_xfree( pFileName );
    }
@@ -103,7 +103,7 @@ HB_FUNC( FILEDRIVE )
 {
    if( ISCHAR( 1 ) )
    {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parc( 1 ) );
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
       hb_retclen( pFileName->szDrive, 1 ); /* Only the drive letter */
       hb_xfree( pFileName );
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.8 2003/11/27 21:44:54 likewolf Exp $
+ * $Id: fstemp.c,v 1.9 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -170,8 +170,8 @@ HB_FUNC( HB_FTEMPCREATE )
 {
    BYTE szName[ _POSIX_PATH_MAX + 1 ];
 
-   hb_retni( hb_fsCreateTemp( ( BYTE * ) hb_parc( 1 ),
-                              ( BYTE * ) hb_parc( 2 ),
+   hb_retni( hb_fsCreateTemp( ( BYTE * ) hb_parcx( 1 ),
+                              ( BYTE * ) hb_parcx( 2 ),
                               ISNUM( 3 ) ? hb_parni( 3 ) : FC_NORMAL,
                               szName ) );
 

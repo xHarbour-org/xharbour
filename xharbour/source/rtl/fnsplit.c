@@ -1,5 +1,5 @@
 /*
- * $Id: fnsplit.c,v 1.3 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: fnsplit.c,v 1.1.1.1 2001/12/21 10:41:35 ronpinkas Exp $
  */
 
 /*
@@ -57,7 +57,7 @@ HB_FUNC( HB_FNAMESPLIT )
 {
    if( ISCHAR( 1 ) )
    {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parc( 1 ) );
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
 
       hb_storc( pFileName->szPath, 2 );
       hb_storc( pFileName->szName, 3 );
@@ -73,10 +73,10 @@ HB_FUNC( HB_FNAMEMERGE )
    HB_FNAME pFileName;
    char szFileName[ _POSIX_PATH_MAX ];
 
-   pFileName.szPath = ISCHAR( 1 ) ? hb_parc( 1 ) : NULL;
-   pFileName.szName = ISCHAR( 2 ) ? hb_parc( 2 ) : NULL;
-   pFileName.szExtension = ISCHAR( 3 ) ? hb_parc( 3 ) : NULL;
-   pFileName.szDrive = ISCHAR( 4 ) ? hb_parc( 4 ) : NULL;
+   pFileName.szPath = ISCHAR( 1 ) ? hb_parcx( 1 ) : NULL;
+   pFileName.szName = ISCHAR( 2 ) ? hb_parcx( 2 ) : NULL;
+   pFileName.szExtension = ISCHAR( 3 ) ? hb_parcx( 3 ) : NULL;
+   pFileName.szDrive = ISCHAR( 4 ) ? hb_parcx( 4 ) : NULL;
 
    hb_retc( hb_fsFNameMerge( szFileName, &pFileName ) );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.14 2003/05/29 22:55:01 paultucker Exp $
+ * $Id: trace.c,v 1.15 2003/05/30 05:36:40 paultucker Exp $
  */
 
 /*
@@ -142,7 +142,7 @@ HB_FUNC( HB_TRACELEVEL )
 
 HB_FUNC( HB_TRACESTRING )
 {
-   HB_TRACE(HB_TR_ALWAYS, (hb_parc( 1 )) );
+   HB_TRACE(HB_TR_ALWAYS, (hb_parcx( 1 )) );
 }
 
 #endif

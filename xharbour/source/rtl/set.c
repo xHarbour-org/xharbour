@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.43 2004/03/03 03:31:18 mlombardo Exp $
+ * $Id: set.c,v 1.44 2004/03/03 19:37:55 mlombardo Exp $
  */
 
 /*
@@ -422,7 +422,7 @@ HB_FUNC( __SETCENTURY )
       hb_set.hb_set_century = hb_parl( 1 );
    else if( ISCHAR( 1 ) )
    {
-      char * szString = hb_parc( 1 );
+      char * szString = hb_parcx( 1 );
       ULONG ulLen = hb_parclen( 1 );
 
       if( ulLen >= 2

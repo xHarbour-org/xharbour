@@ -36,7 +36,7 @@ HB_FUNC( HB_SYSLOGOPEN )
       // when RUNNING on a win98.
       if ( s_IsWindowsNt() )
       {
-         s_RegHandle = RegisterEventSource(NULL, (LPCTSTR) hb_parc(1));
+         s_RegHandle = RegisterEventSource(NULL, (LPCTSTR) hb_parcx(1));
          hb_retl( TRUE );
       }
       else {
@@ -47,7 +47,7 @@ HB_FUNC( HB_SYSLOGOPEN )
          hb_retl( FALSE );
       #endif
    #elif defined( HB_OS_UNIX ) || defined( HB_OS_LINUX )
-      openlog( hb_parc(1), LOG_NDELAY | LOG_NOWAIT | LOG_PID, LOG_USER );
+      openlog( hb_parcx(1), LOG_NDELAY | LOG_NOWAIT | LOG_PID, LOG_USER );
       hb_retl( TRUE );
    #else
       hb_retl( FALSE );
@@ -85,7 +85,7 @@ HB_FUNC( HB_SYSLOGMESSAGE )
       WORD logval;
       if ( s_IsWindowsNt() )
       {
-         char *szMsg = hb_parc(1);
+         char *szMsg = hb_parcx(1);
          switch( hb_parni(2) )
          {
             case HB_LOG_CRITICAL: logval = EVENTLOG_ERROR_TYPE; break;
@@ -132,7 +132,7 @@ HB_FUNC( HB_SYSLOGMESSAGE )
             logval = LOG_DEBUG;
       }
 
-      syslog( logval, "[%lX]: %s", hb_parnl(3), hb_parc(1) );
+      syslog( logval, "[%lX]: %s", hb_parnl(3), hb_parcx(1) );
       hb_retl( TRUE );
    #else
       hb_retl( FALSE );

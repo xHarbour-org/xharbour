@@ -1,5 +1,5 @@
 /*
- * $Id: setcolor.c,v 1.1.1.1 2001/12/21 10:42:02 ronpinkas Exp $
+ * $Id: setcolor.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ char * hb_conSetColor( char * szColor )
 
 HB_FUNC( SETCOLOR )
 {
-   hb_retc( hb_conSetColor( ISCHAR( 1 ) ? hb_parc( 1 ) : NULL ) );
+   hb_retc( hb_conSetColor( ISCHAR( 1 ) ? hb_parcx( 1 ) : NULL ) );
 }
 
 HB_FUNC( COLORSELECT )
@@ -96,7 +96,7 @@ HB_FUNC( SETBLINK )
 HB_FUNC( HB_COLORTON )
 {
    if( ISCHAR( 1 ) )
-      hb_retni( hb_gtColorToN( hb_parc( 1 ) ) );
+      hb_retni( hb_gtColorToN( hb_parcx( 1 ) ) );
    else
       hb_retni( 0 );
 }

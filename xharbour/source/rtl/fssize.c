@@ -1,5 +1,5 @@
 /*
- * $Id: fssize.c,v 1.2 2003/11/11 20:20:54 ronpinkas Exp $
+ * $Id: fssize.c,v 1.3 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -103,7 +103,7 @@ ULONG hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
 
 HB_FUNC( HB_FSIZE )
 {
-   hb_retnl( ISCHAR( 1 ) ? hb_fsFSize( ( BYTE * ) hb_parc( 1 ),
+   hb_retnl( ISCHAR( 1 ) ? hb_fsFSize( ( BYTE * ) hb_parcx( 1 ),
                                        ISLOG( 2 ) ? hb_parl( 2 ) : TRUE ) : 0 );
 }
 

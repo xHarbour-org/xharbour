@@ -1,5 +1,5 @@
 /*
- * $Id: hboutdbg.c,v 1.5 2003/12/03 23:26:54 fsgiudice Exp $
+ * $Id: hboutdbg.c,v 1.6 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -201,7 +201,7 @@ HB_FUNC( HB_OUTDEBUG )
 
          if( select( s_iDebugFd + 1, NULL, &wrds, NULL, &tv ) > 0 )
          {
-            write( s_iDebugFd, hb_parc(1), hb_parclen(1) );
+            write( s_iDebugFd, hb_parcx(1), hb_parclen(1) );
             write( s_iDebugFd, "\n", 1 );
          }
       }
@@ -210,7 +210,7 @@ HB_FUNC( HB_OUTDEBUG )
 
    if( ISCHAR(1) )
    {
-      OutputDebugString( hb_parc(1) );
+      OutputDebugString( hb_parcx(1) );
    }
 
    #endif

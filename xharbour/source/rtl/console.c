@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.42 2004/02/18 10:50:45 andijahja Exp $
+ * $Id: console.c,v 1.43 2004/03/02 00:28:18 druzus Exp $
  */
 /*
  * Harbour Project source code:
@@ -570,7 +570,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
       char szOldColor[ CLR_STRLEN ];
 
       hb_gtGetColorStr( szOldColor );
-      hb_gtSetColorStr( hb_parc( 2 ) );
+      hb_gtSetColorStr( hb_parcx( 2 ) );
 
       hb_conOut( 1, hb_conOutDev );
 
@@ -599,7 +599,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
       char szOldColor[ CLR_STRLEN ];
 
       hb_gtGetColorStr( szOldColor );
-      hb_gtSetColorStr( hb_parc( 2 ) );
+      hb_gtSetColorStr( hb_parcx( 2 ) );
 
       pszString = hb_itemString( hb_param( 1, HB_IT_ANY ), &ulLen, &bFreeReq );
 
@@ -642,7 +642,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
       char szOldColor[ CLR_STRLEN ];
 
       hb_gtGetColorStr( szOldColor );
-      hb_gtSetColorStr( hb_parc( 4 ) );
+      hb_gtSetColorStr( hb_parcx( 4 ) );
 
       pszString = hb_itemString( hb_param( 3, HB_IT_ANY ), &ulLen, &bFreeReq );
 

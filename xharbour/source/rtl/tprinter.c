@@ -109,7 +109,7 @@ BOOL hb_PrinterExists(LPTSTR pPrinterName) {
 HB_FUNC( PRINTEREXISTS ) {
   BOOL Result = FALSE ;
   if ISCHAR(1)
-    Result = hb_PrinterExists(hb_parc(1)) ;
+    Result = hb_PrinterExists(hb_parcx(1)) ;
   hb_retl(Result) ;
 }
 
@@ -176,7 +176,7 @@ BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR 
 HB_FUNC(PRINTERPORTTONAME) {
   char szDefaultPrinter[MAXBUFFERSIZE];
   DWORD pdwBufferSize = MAXBUFFERSIZE;
-  if( ISCHAR(1) && hb_parclen(1)>0 && hb_GetPrinterNameByPort( ( LPTSTR ) &szDefaultPrinter , &pdwBufferSize , hb_parc(1)) )
+  if( ISCHAR(1) && hb_parclen(1)>0 && hb_GetPrinterNameByPort( ( LPTSTR ) &szDefaultPrinter , &pdwBufferSize , hb_parcx(1)) )
     hb_retc(szDefaultPrinter);
   else
     hb_retc("");
@@ -226,9 +226,9 @@ HB_FUNC( PRINTFILERAW )  {
   UCHAR *cPrinterName, *cFileName, *cDocName ;
   DWORD Result = -1 ;
   if (ISCHAR(1) && ISCHAR(2)) {
-    cPrinterName= (UCHAR *) hb_parc(1) ;
-    cFileName= (UCHAR *) hb_parc(2) ;
-    cDocName = ( ISCHAR(3) ? (UCHAR *) hb_parc(3) : cFileName ) ;
+    cPrinterName= (UCHAR *) hb_parcx(1) ;
+    cFileName= (UCHAR *) hb_parcx(2) ;
+    cDocName = ( ISCHAR(3) ? (UCHAR *) hb_parcx(3) : cFileName ) ;
     Result = hb_PrintFileRaw(cPrinterName, cFileName, cDocName) ;
   }
   hb_retnl(Result) ;

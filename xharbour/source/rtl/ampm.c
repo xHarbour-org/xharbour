@@ -1,5 +1,5 @@
 /*
- * $Id: ampm.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: ampm.c,v 1.3 2002/01/03 03:53:44 ronpinkas Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 
 HB_FUNC( AMPM )
 {
-   char * pszTime = hb_parc( 1 );
+   char * pszTime = hb_parcx( 1 );
    ULONG  ulTimeLen = hb_parclen( 1 );
    char * pszResult = ( char * ) hb_xgrab( HB_MAX( ulTimeLen, 2 ) + 3 + 1 );
    USHORT uiHour = ( USHORT ) hb_strVal( pszTime, ulTimeLen );

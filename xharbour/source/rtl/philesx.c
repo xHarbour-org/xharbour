@@ -1,5 +1,5 @@
 /*
- * $Id: philesx.c,v 1.1.1.1 2001/12/21 10:41:57 ronpinkas Exp $
+ * $Id: philesx.c,v 1.2 2003/07/30 14:07:41 druzus Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ HB_FUNC( CURDRIVE )
 
    if( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 )
    {
-      while( hb_fsChDrv( ( BYTE )( toupper( *hb_parc( 1 ) ) - 'A' ) ) != 0 )
+      while( hb_fsChDrv( ( BYTE )( toupper( *hb_parcx( 1 ) ) - 'A' ) ) != 0 )
       {
          USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 9999, "Operating system error", "CURDRIVE", 0, EF_CANDEFAULT | EF_CANRETRY, 1, hb_paramError( 1 ) );
 

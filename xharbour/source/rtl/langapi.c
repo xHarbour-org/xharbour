@@ -1,5 +1,5 @@
 /*
- * $Id: langapi.c,v 1.6 2003/06/30 17:08:57 ronpinkas Exp $
+ * $Id: langapi.c,v 1.7 2003/07/23 22:09:30 druzus Exp $
  */
 
 /*
@@ -238,7 +238,7 @@ HB_FUNC( HB_LANGSELECT )
 {
    hb_retc( hb_langID() );
 
-   hb_langSelectID( hb_parc( 1 ) );
+   hb_langSelectID( hb_parcx( 1 ) );
 }
 
 HB_FUNC( HB_LANGNAME )

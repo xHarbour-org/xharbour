@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.7 2004/03/10 02:54:53 andijahja Exp $
+ * $Id: fparse.c,v 1.8 2004/03/10 20:19:36 andijahja Exp $
  */
 
 /*
@@ -677,7 +677,7 @@ HB_FUNC( FPARSELINE )
    {
       PHB_ITEM pDelim = hb_param( 2, HB_IT_STRING );
 
-      hb_ParseLine( &Return, hb_parc(1), pDelim ? pDelim->item.asString.value[ 0 ] : (int) ',', &iWords );
+      hb_ParseLine( &Return, hb_parcx(1), pDelim ? pDelim->item.asString.value[ 0 ] : (int) ',', &iWords );
    }
 
    hb_itemReturn( &Return );

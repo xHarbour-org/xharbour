@@ -1,5 +1,5 @@
 /*
- * $Id: box.c,v 1.5 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: box.c,v 1.1.1.1 2001/12/21 10:41:12 ronpinkas Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ HB_FUNC( DISPBOX )
 
    if( pTop && pLeft && pBottom && pRight )
    {
-      char * pszColor = ISCHAR( 6 ) ? hb_parc( 6 ) : NULL;
+      char * pszColor = ISCHAR( 6 ) ? hb_parcx( 6 ) : NULL;
       char szOldColor[ CLR_STRLEN ];
 
       if( pszColor )
@@ -77,7 +77,7 @@ HB_FUNC( DISPBOX )
                    hb_itemGetNI( pLeft),
                    hb_itemGetNI( pBottom ),
                    hb_itemGetNI( pRight ),
-                   ( BYTE * ) hb_parc( 5 ) );
+                   ( BYTE * ) hb_parcx( 5 ) );
 
       else if( ISNUM( 5 ) && hb_parni( 5 ) == 2 )
          hb_gtBoxD( hb_itemGetNI( pTop ),

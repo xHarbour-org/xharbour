@@ -1,5 +1,5 @@
 /*
- * $Id: is.c,v 1.5 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: is.c,v 1.6 2004/02/22 20:37:40 andijahja Exp $
  */
 
 /*
@@ -63,14 +63,14 @@ extern PHB_CODEPAGE s_cdpage;
 
 HB_FUNC( ISALPHA )
 {
-   char * szString = hb_parc( 1 );
+   char * szString = hb_parcx( 1 );
 
    if( szString != NULL )
    {
       if( isalpha( ( BYTE ) * szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
-      else if( s_cdpage->nChars && szString[0] && 
+      else if( s_cdpage->nChars && szString[0] &&
            ( strchr( s_cdpage->CharsUpper, *szString ) || strchr( s_cdpage->CharsLower, *szString ) ) )
          hb_retl( TRUE );
 #endif
@@ -85,7 +85,7 @@ HB_FUNC( ISALPHA )
 
 HB_FUNC( ISDIGIT )
 {
-   char * szString = hb_parc( 1 );
+   char * szString = hb_parcx( 1 );
 
    if( szString != NULL )
       hb_retl( isdigit( ( BYTE ) * szString ) );
@@ -97,7 +97,7 @@ HB_FUNC( ISDIGIT )
 
 HB_FUNC( ISUPPER )
 {
-   char * szString = hb_parc( 1 );
+   char * szString = hb_parcx( 1 );
 
    if( szString != NULL )
    {
@@ -118,7 +118,7 @@ HB_FUNC( ISUPPER )
 
 HB_FUNC( ISLOWER )
 {
-   char * szString = hb_parc( 1 );
+   char * szString = hb_parcx( 1 );
 
    if( szString != NULL )
    {
@@ -139,7 +139,7 @@ HB_FUNC( ISLOWER )
 
 HB_FUNC( ISALNUM )
 {
-   char * szString = hb_parc( 1 );
+   char * szString = hb_parcx( 1 );
 
    if( szString != NULL )
    {
@@ -155,7 +155,7 @@ HB_FUNC( ISALNUM )
 
 HB_FUNC( ISCNTRL )
 {
-   char * szString = hb_parc( 1 );
+   char * szString = hb_parcx( 1 );
 
    if( szString != NULL )
    {
@@ -171,7 +171,7 @@ HB_FUNC( ISCNTRL )
 
 HB_FUNC( ISGRAPH )
 {
-   char * szString = hb_parc( 1 );
+   char * szString = hb_parcx( 1 );
 
    if( szString != NULL )
    {
@@ -188,7 +188,7 @@ HB_FUNC( ISGRAPH )
 
 HB_FUNC( ISPRINT )
 {
-   char * szString = hb_parc( 1 );
+   char * szString = hb_parcx( 1 );
 
    if( szString != NULL )
    {
@@ -205,7 +205,7 @@ HB_FUNC( ISPRINT )
 
 HB_FUNC( ISPUNCT )
 {
-   char * szString = hb_parc( 1 );
+   char * szString = hb_parcx( 1 );
 
    if( szString != NULL )
    {
@@ -222,7 +222,7 @@ HB_FUNC( ISPUNCT )
 
 HB_FUNC( ISSPACE )
 {
-   char * szString = hb_parc( 1 );
+   char * szString = hb_parcx( 1 );
 
    if( szString != NULL )
    {
@@ -238,7 +238,7 @@ HB_FUNC( ISSPACE )
 
 HB_FUNC( ISXDIGIT )
 {
-   char * szString = hb_parc( 1 );
+   char * szString = hb_parcx( 1 );
 
    if( szString != NULL )
    {
@@ -254,7 +254,7 @@ HB_FUNC( ISXDIGIT )
 
 HB_FUNC( ISASCII )
 {
-   char * szString = hb_parc( 1 );
+   char * szString = hb_parcx( 1 );
 
    if( szString != NULL )
    {

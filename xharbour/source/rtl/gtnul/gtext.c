@@ -1,5 +1,5 @@
 /*
- * $Id: gtext.c,v 1.2 2003/06/19 22:39:02 druzus Exp $
+ * $Id: gtext.c,v 1.3 2003/07/23 12:35:57 druzus Exp $
  */
 
 /*
@@ -63,9 +63,9 @@ HB_FUNC( HB_SETDISPCP )
    if ( ISCHAR(1) )
    {
       if ( hb_pcount() == 2 && ISLOG(2) )
-         hb_gt_SetDispCP( hb_parc( 1 ), NULL, hb_parl( 2 ) );
+         hb_gt_SetDispCP( hb_parcx( 1 ), NULL, hb_parl( 2 ) );
       else
-         hb_gt_SetDispCP( hb_parc( 1 ), hb_parc( 2 ), hb_parl( 3 ) );
+         hb_gt_SetDispCP( hb_parcx( 1 ), hb_parcx( 2 ), hb_parl( 3 ) );
    }
    hb_ret();  /* return NIL */
 }
@@ -74,7 +74,7 @@ HB_FUNC( HB_SETKEYCP )
 {
    if ( ISCHAR(1) )
    {
-      hb_gt_SetKeyCP( hb_parc( 1 ), hb_parc( 2 ) );
+      hb_gt_SetKeyCP( hb_parcx( 1 ), hb_parcx( 2 ) );
    }
    hb_ret();  /* return NIL */
 }
@@ -85,13 +85,13 @@ HB_FUNC( HB_SETTERMCP )
    {
       if ( hb_pcount() == 2 && ISLOG(2) )
       {
-         hb_gt_SetDispCP( hb_parc( 1 ), NULL, hb_parl( 2 ) );
-         hb_gt_SetKeyCP( hb_parc( 1 ), NULL );
+         hb_gt_SetDispCP( hb_parcx( 1 ), NULL, hb_parl( 2 ) );
+         hb_gt_SetKeyCP( hb_parcx( 1 ), NULL );
       }
       else
       {
-         hb_gt_SetDispCP( hb_parc( 1 ), hb_parc( 2 ), hb_parl( 3 ) );
-         hb_gt_SetKeyCP( hb_parc( 1 ), hb_parc( 2 ) );
+         hb_gt_SetDispCP( hb_parcx( 1 ), hb_parcx( 2 ), hb_parl( 3 ) );
+         hb_gt_SetKeyCP( hb_parcx( 1 ), hb_parcx( 2 ) );
       }
    }
    hb_ret();  /* return NIL */

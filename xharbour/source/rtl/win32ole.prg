@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.47 2004/03/12 18:20:09 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.48 2004/03/16 21:31:37 lf_sfnet Exp $
  */
 
 /*
@@ -995,7 +995,7 @@ RETURN uObj
               case HB_IT_MEMO:
                 if( bByRef )
                 {
-                   wString = AnsiToWide( hb_parc( nArg ) );
+                   wString = AnsiToWide( hb_parcx( nArg ) );
                    hb_itemReleaseString( uParam );
                    uParam->item.asString.value = (char *) SysAllocString( wString );
                    hb_xfree( wString );
@@ -1005,7 +1005,7 @@ RETURN uObj
                 else
                 {
                    pArgs[ n ].n1.n2.vt   = VT_BSTR;
-                   wString = AnsiToWide( hb_parc( nArg ) );
+                   wString = AnsiToWide( hb_parcx( nArg ) );
                    pArgs[ n ].n1.n2.n3.bstrVal = SysAllocString( wString );
                    hb_xfree( wString );
                 }
@@ -1391,9 +1391,9 @@ RETURN uObj
      LPIID riid = (LPIID) &IID_IDispatch;
      IDispatch * pDisp = NULL;
 
-     wCLSID = AnsiToWide( hb_parc( 1 ) );
+     wCLSID = AnsiToWide( hb_parcx( 1 ) );
 
-     if ( hb_parc( 1 )[ 0 ] == '{' )
+     if ( hb_parcx( 1 )[ 0 ] == '{' )
      {
         s_nOleError = CLSIDFromString( wCLSID, (LPCLSID) &ClassID );
      }
@@ -1408,15 +1408,15 @@ RETURN uObj
 
      if ( hb_pcount() == 2 )
      {
-        if ( hb_parc( 2 )[ 0 ] == '{' )
+        if ( hb_parcx( 2 )[ 0 ] == '{' )
         {
-           wCLSID = AnsiToWide( hb_parc( 2 ) );
+           wCLSID = AnsiToWide( hb_parcx( 2 ) );
            s_nOleError = CLSIDFromString( wCLSID, &iid );
            hb_xfree( wCLSID );
         }
         else
         {
-           memcpy( ( LPVOID ) &iid, hb_parc( 2 ), sizeof( iid ) );
+           memcpy( ( LPVOID ) &iid, hb_parcx( 2 ), sizeof( iid ) );
         }
 
         riid = &iid;
@@ -1446,9 +1446,9 @@ RETURN uObj
 
      if ( ( s_nOleError == S_OK ) || ( s_nOleError == (HRESULT) S_FALSE) )
      {
-        wCLSID = AnsiToWide( hb_parc( 1 ) );
+        wCLSID = AnsiToWide( hb_parcx( 1 ) );
 
-        if ( hb_parc( 1 )[ 0 ] == '{' )
+        if ( hb_parcx( 1 )[ 0 ] == '{' )
         {
            s_nOleError = CLSIDFromString( wCLSID, (LPCLSID) &ClassID );
         }
@@ -1464,15 +1464,15 @@ RETURN uObj
 
         if ( hb_pcount() == 2 )
         {
-           if ( hb_parc( 2 )[ 0 ] == '{' )
+           if ( hb_parcx( 2 )[ 0 ] == '{' )
            {
-              wCLSID = AnsiToWide( hb_parc( 2 ) );
+              wCLSID = AnsiToWide( hb_parcx( 2 ) );
               s_nOleError = CLSIDFromString( wCLSID, &iid );
               hb_xfree( wCLSID );
            }
            else
            {
-              memcpy( ( LPVOID ) &iid, hb_parc( 2 ), sizeof( iid ) );
+              memcpy( ( LPVOID ) &iid, hb_parcx( 2 ), sizeof( iid ) );
            }
 
            riid = &iid;
@@ -1558,7 +1558,7 @@ RETURN uObj
 
      //printf( "1\n" );
 
-     wMember = AnsiToWide( hb_parc( 2 ) );
+     wMember = AnsiToWide( hb_parcx( 2 ) );
      s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
      hb_xfree( wMember );
 
@@ -1578,7 +1578,7 @@ RETURN uObj
                                              &excep,
                                              &uArgErr ) ;
 
-        //TraceLog( NULL, "Invoke '%s' Result: %p\n", hb_parc(2), s_nOleError );
+        //TraceLog( NULL, "Invoke '%s' Result: %p\n", hb_parcx(2), s_nOleError );
 
         FreeParams( &dParams );
 
@@ -1586,7 +1586,7 @@ RETURN uObj
      }
      else
      {
-        //TraceLog( NULL, "Invoke GetIDsOfNames '%s' Error: %p\n", hb_parc(2), s_nOleError );
+        //TraceLog( NULL, "Invoke GetIDsOfNames '%s' Error: %p\n", hb_parcx(2), s_nOleError );
      }
   }
 
@@ -1603,7 +1603,7 @@ RETURN uObj
 
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
-     wMember = AnsiToWide( hb_parc( 2 ) );
+     wMember = AnsiToWide( hb_parcx( 2 ) );
      s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
      hb_xfree( wMember );
 
@@ -1616,14 +1616,14 @@ RETURN uObj
         if( dParams.rgvarg[0].n1.n2.vt == VT_DISPATCH )
         {
            wFlags = DISPATCH_PROPERTYPUTREF;// | DISPATCH_METHOD;
-           //TraceLog( NULL, "SetProperty '%s' BYREF\n", hb_parc(2) );
+           //TraceLog( NULL, "SetProperty '%s' BYREF\n", hb_parcx(2) );
         }
         else
         {
            wFlags = DISPATCH_PROPERTYPUT;// | DISPATCH_METHOD;
         }
 
-        //TraceLog( NULL, "SetProperty '%s' Args: %i\n", hb_parc(2), dParams.cArgs );
+        //TraceLog( NULL, "SetProperty '%s' Args: %i\n", hb_parcx(2), dParams.cArgs );
 
         s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                            lDispID,
@@ -1635,7 +1635,7 @@ RETURN uObj
                                            &excep,
                                            &uArgErr );
 
-        //TraceLog( NULL, "SetProperty '%s' Result: %p\n", hb_parc(2), s_nOleError );
+        //TraceLog( NULL, "SetProperty '%s' Result: %p\n", hb_parcx(2), s_nOleError );
 
         FreeParams( &dParams );
 
@@ -1643,7 +1643,7 @@ RETURN uObj
      }
      else
      {
-        //TraceLog( NULL, "SetProperty GetIDsOfNames '%s' Error: %p\n", hb_parc(2), s_nOleError );
+        //TraceLog( NULL, "SetProperty GetIDsOfNames '%s' Error: %p\n", hb_parcx(2), s_nOleError );
      }
   }
 
@@ -1661,7 +1661,7 @@ RETURN uObj
 
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
-     wMember = AnsiToWide( hb_parc( 2 ) );
+     wMember = AnsiToWide( hb_parcx( 2 ) );
      s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
      hb_xfree( wMember );
 
@@ -1679,7 +1679,7 @@ RETURN uObj
                                            &excep,
                                            &uArgErr );
 
-        //TraceLog( NULL, "GetProperty '%s' Result: %p\n", hb_parc(2), s_nOleError );
+        //TraceLog( NULL, "GetProperty '%s' Result: %p\n", hb_parcx(2), s_nOleError );
 
         FreeParams( &dParams );
 
@@ -1687,7 +1687,7 @@ RETURN uObj
      }
      else
      {
-        //TraceLog( NULL, "GetProperty GetIDsOfNames '%s' Error: %p\n", hb_parc(2), s_nOleError );
+        //TraceLog( NULL, "GetProperty GetIDsOfNames '%s' Error: %p\n", hb_parcx(2), s_nOleError );
      }
   }
 
@@ -1702,15 +1702,15 @@ RETURN uObj
 
      s_nOleError = S_OK;
 
-     if( hb_parc( 2 )[ 0 ] == '{' )
+     if( hb_parcx( 2 )[ 0 ] == '{' )
      {
-        wiid = AnsiToWide( hb_parc( 2 ) );
+        wiid = AnsiToWide( hb_parcx( 2 ) );
         s_nOleError = CLSIDFromString( wiid, &iid );
         hb_xfree( wiid );
      }
      else
      {
-        memcpy( ( LPVOID ) &iid, hb_parc( 2 ), sizeof( iid ) );
+        memcpy( ( LPVOID ) &iid, hb_parcx( 2 ), sizeof( iid ) );
      }
 
      if( s_nOleError == S_OK )
@@ -1760,7 +1760,7 @@ RETURN uObj
         {
            case HB_IT_STRING:
            case HB_IT_MEMO:
-             sString = hb_parc( i );
+             sString = hb_parcx( i );
              __asm push sString
              break;
 
@@ -1838,7 +1838,7 @@ RETURN uObj
            {
               case HB_IT_STRING:
               case HB_IT_MEMO:
-                hb_storc( (char *) hb_parc( i ), i );
+                hb_storc( (char *) hb_parcx( i ), i );
                 break;
 
               case HB_IT_LOGICAL:
@@ -1983,7 +1983,7 @@ RETURN uObj
   {
      UINT uLen;
      BSTR wString;
-     char *cString = hb_parc( 1 );
+     char *cString = hb_parcx( 1 );
 
      if( cString == NULL )
      {
@@ -2004,7 +2004,7 @@ RETURN uObj
   HB_FUNC( WIDETOANSI )  // ( cWideStr, nLen ) -> cAnsiStr
   {
      UINT uLen;
-     BSTR wString = ( BSTR ) hb_parc( 1 );
+     BSTR wString = ( BSTR ) hb_parcx( 1 );
      char *cString;
 
      uLen = SysStringLen( wString ) + 1;
@@ -2020,7 +2020,7 @@ RETURN uObj
 
   HB_FUNC( MESSAGEBOX )
   {
-     hb_retni( MessageBox( ( HWND ) hb_parnl( 1 ), hb_parc( 2 ), hb_parc( 3 ), hb_parni( 4 ) ) );
+     hb_retni( MessageBox( ( HWND ) hb_parnl( 1 ), hb_parcx( 2 ), hb_parcx( 3 ), hb_parni( 4 ) ) );
   }
 
   //---------------------------------------------------------------------------//

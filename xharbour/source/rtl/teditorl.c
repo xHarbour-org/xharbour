@@ -1,5 +1,5 @@
 /*
- * $Id: teditorl.c,v 1.1.1.1 2001/12/21 10:42:08 ronpinkas Exp $
+ * $Id: teditorl.c,v 1.2 2003/11/10 00:59:32 fsgiudice Exp $
  */
 
 /*
@@ -157,9 +157,9 @@ HB_FUNC( __STRTOKEN )
    char * pszText;
    ULONG ulLen;
 
-   pszText = hb_strToken( hb_parc( 1 ), hb_parclen( 1 ),
+   pszText = hb_strToken( hb_parcx( 1 ), hb_parclen( 1 ),
                           hb_parnl( 2 ),
-                          ISCHAR( 3 ) ? *hb_parc( 3 ) : ' ',
+                          ISCHAR( 3 ) ? *hb_parcx( 3 ) : ' ',
                           &ulLen );
 
    hb_retclen( pszText, ulLen );
@@ -172,7 +172,7 @@ HB_FUNC( __STRTOKEN )
 */
 HB_FUNC( __STRTKPTR )
 {
-   char * pszString = hb_parc( 1 );
+   char * pszString = hb_parcx( 1 );
    ULONG ulStrLen = hb_parclen( 1 );
    ULONG ulLen;
    ULONG ulPos = hb_parnl( 2 );
@@ -186,7 +186,7 @@ HB_FUNC( __STRTKPTR )
 
    pszText = hb_strToken( pszString, ulStrLen,
                           1,
-                          ISCHAR( 3 ) ? *hb_parc( 3 ) : ' ',
+                          ISCHAR( 3 ) ? *hb_parcx( 3 ) : ' ',
                           &ulLen );
 
    /* return position to start next search from */
@@ -207,8 +207,8 @@ HB_FUNC( __STRTOKENCOUNT )
 {
    ULONG ulCounter;
 
-   ulCounter = hb_strTokenCount( hb_parc( 1 ), hb_parclen( 1 ),
-                          ISCHAR( 2 ) ? *hb_parc( 2 ) : ' ' );
+   ulCounter = hb_strTokenCount( hb_parcx( 1 ), hb_parclen( 1 ),
+                          ISCHAR( 2 ) ? *hb_parcx( 2 ) : ' ' );
 
    hb_retnl( ulCounter );
 }

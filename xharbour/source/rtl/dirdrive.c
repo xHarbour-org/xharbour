@@ -1,5 +1,5 @@
 /*
- * $Id: dirdrive.c,v 1.4 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: dirdrive.c,v 1.1.1.1 2001/12/21 10:41:28 ronpinkas Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ HB_FUNC( DIRCHANGE )
    USHORT uiErrorOld = hb_fsError();
 
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fsChDir( ( BYTE * ) hb_parc( 1 ) ) ? 0 : hb_fsError() );
+      hb_retni( hb_fsChDir( ( BYTE * ) hb_parcx( 1 ) ) ? 0 : hb_fsError() );
    else
       hb_retni( -1 );
 
@@ -79,7 +79,7 @@ HB_FUNC( MAKEDIR )
    USHORT uiErrorOld = hb_fsError();
 
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fsMkDir( ( BYTE * ) hb_parc( 1 ) ) ? 0 : hb_fsError() );
+      hb_retni( hb_fsMkDir( ( BYTE * ) hb_parcx( 1 ) ) ? 0 : hb_fsError() );
    else
       hb_retni( -1 );
 
@@ -91,7 +91,7 @@ HB_FUNC( DIRREMOVE )
    USHORT uiErrorOld = hb_fsError();
 
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fsRmDir( ( BYTE * ) hb_parc( 1 ) ) ? 0 : hb_fsError() );
+      hb_retni( hb_fsRmDir( ( BYTE * ) hb_parcx( 1 ) ) ? 0 : hb_fsError() );
    else
       hb_retni( -1 );
 
@@ -105,7 +105,7 @@ HB_FUNC( ISDISK )
    USHORT uiErrorOld = hb_fsError();
 
    hb_retl( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-            hb_fsIsDrv( ( BYTE )( toupper( *hb_parc( 1 ) ) - 'A' ) ) == 0 :
+            hb_fsIsDrv( ( BYTE )( toupper( *hb_parcx( 1 ) ) - 'A' ) ) == 0 :
             FALSE );
 
    hb_fsSetError( uiErrorOld );
@@ -116,7 +116,7 @@ HB_FUNC( DISKCHANGE )
    USHORT uiErrorOld = hb_fsError();
 
    hb_retl( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-            hb_fsChDrv( ( BYTE )( toupper( *hb_parc( 1 ) ) - 'A' ) ) == 0 :
+            hb_fsChDrv( ( BYTE )( toupper( *hb_parcx( 1 ) ) - 'A' ) ) == 0 :
             FALSE );
 
    hb_fsSetError( uiErrorOld );

@@ -1,5 +1,5 @@
 /*
- * $Id: datesx.c,v 1.5 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: datesx.c,v 1.1.1.1 2001/12/21 10:41:25 ronpinkas Exp $
  */
 
 /*
@@ -60,9 +60,9 @@
 HB_FUNC( STOD )
 {
 #ifdef HB_FAST_STOD
-   hb_retds( hb_parc( 1 ) );
+   hb_retds( hb_parcx( 1 ) );
 #else
-   hb_retds( ( ISCHAR( 1 ) && hb_parclen( 1 ) == 8 ) ? hb_parc( 1 ) : "        " );
+   hb_retds( ( ISCHAR( 1 ) && hb_parclen( 1 ) == 8 ) ? hb_parcx( 1 ) : "        " );
 #endif
 }
 

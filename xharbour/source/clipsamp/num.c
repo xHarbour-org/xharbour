@@ -1,5 +1,5 @@
 /*
- * $Id: num.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
+ * $Id: num.c,v 1.2 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -85,7 +85,7 @@ HB_FUNC( FLOOR )
    hb_retnl( ( LONG ) floor( hb_parnd( 1 ) ) );
 }
 
-/* NumAsLog10( <nNumber> ) --> nLog10 
+/* NumAsLog10( <nNumber> ) --> nLog10
    Convert a positive number to log base 10
 */
 HB_FUNC( NUMASLOG10 )
@@ -195,13 +195,13 @@ HB_FUNC( NUMASCURRENCY )
 
       ulLen = strlen( ptr );
 
-      memcpy( szCurrency, hb_parc( 2 ), ulSymbolLen );
+      memcpy( szCurrency, hb_parcx( 2 ), ulSymbolLen );
       memcpy( szCurrency + ulSymbolLen, ptr, ulLen );
    }
    else
    {
       memcpy( szCurrency, ptr, ulLen );
-      memcpy( szCurrency + ulLen, hb_parc( 2 ), ulSymbolLen );
+      memcpy( szCurrency + ulLen, hb_parcx( 2 ), ulSymbolLen );
    }
 
    if( szBuffer )

@@ -1,5 +1,5 @@
 /*
- * $Id: copyfile.c,v 1.42 2001/06/07 15:25:54 dholm Exp $
+ * $Id: copyfile.c,v 1.1.1.1 2001/12/21 10:41:15 ronpinkas Exp $
  */
 
 /*
@@ -137,7 +137,7 @@ HB_FUNC( __COPYFILE )
 {
    if( ISCHAR( 1 ) && ISCHAR( 2 ) )
    {
-      if( ! hb_fsCopy( hb_parc( 1 ), hb_parc( 2 ) ) )
+      if( ! hb_fsCopy( hb_parcx( 1 ), hb_parcx( 2 ) ) )
          hb_retl( FALSE );
    }
    else

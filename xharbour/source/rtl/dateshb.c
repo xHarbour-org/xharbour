@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.6 2004/02/14 21:01:16 andijahja Exp $
+ * $Id: dateshb.c,v 1.7 2004/02/23 10:01:42 andijahja Exp $
  */
 
 /*
@@ -86,7 +86,7 @@ HB_FUNC( CTOD )
 {
    if( ISCHAR( 1 ) )
    {
-      char * szDate = hb_parc( 1 );
+      char * szDate = hb_parcx( 1 );
       int d_value = 0, m_value = 0, y_value = 0;
       char szDateFormat[ 9 ];
 
@@ -221,9 +221,9 @@ HB_FUNC( DTOS )
 HB_FUNC( HB_STOD )
 {
 #ifdef HB_FAST_STOD
-   hb_retds( hb_parc( 1 ) );
+   hb_retds( hb_parcx( 1 ) );
 #else
-   hb_retds( ( ISCHAR( 1 ) && hb_parclen( 1 ) == 8 ) ? hb_parc( 1 ) : "        " );
+   hb_retds( ( ISCHAR( 1 ) && hb_parclen( 1 ) == 8 ) ? hb_parcx( 1 ) : "        " );
 #endif
 }
 

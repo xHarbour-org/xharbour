@@ -1,5 +1,5 @@
 /*
- * $Id: run.c,v 1.1.1.1 2001/12/21 10:42:01 ronpinkas Exp $
+ * $Id: run.c,v 1.2 2004/02/18 21:35:56 druzus Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ HB_FUNC( __RUN )
     defined(__WATCOMC__) || defined(__IBMCPP__) || defined(__GNUC__)
    if( ISCHAR( 1 ) && hb_gtSuspend() == 0 )
    {
-      system( hb_parc( 1 ) );
+      system( hb_parcx( 1 ) );
 
       if( hb_gtResume() != 0 )
       {

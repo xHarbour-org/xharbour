@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.22 2004/02/13 09:22:47 andijahja Exp $
+ * $Id: hbsrlraw.c,v 1.23 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -142,7 +142,7 @@ ULONG hb_getlen8( BYTE *cStr )
 
 HB_FUNC( HB_GETLEN8 )
 {
-   BYTE *cStr = (BYTE *) hb_parc( 1 );
+   BYTE *cStr = (BYTE *) hb_parcx( 1 );
    if ( cStr == NULL || hb_parclen( 1 ) < 4 )
    {
       hb_retnl( -1l );
@@ -164,7 +164,7 @@ HB_FUNC( HB_GETLEN8 )
 HB_FUNC( HB_SERIALIZESIMPLE )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
-   
+
    BYTE *cRet;
    ULONG ulRet;
 
@@ -221,7 +221,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
          cRet[1] = (BYTE)'L';
          hb_createlen8( cRet + 2, pItem->item.asLong.value );
       break;
-      
+
 #ifndef HB_LONG_LONG_OFF
       case HB_IT_LONGLONG:
          ulRet = 10;

@@ -1,5 +1,5 @@
 /*
- * $Id: pplib.c,v 1.1 2003/03/21 00:06:31 ronpinkas Exp $
+ * $Id: pplib.c,v 1.2 2004/02/20 22:33:59 ronpinkas Exp $
  */
 
 /*
@@ -130,7 +130,7 @@ HB_FUNC( __PP_INIT )
 
    if( ISCHAR( 1 ) )
    {
-      char * pPath = hb_parc( 1 );
+      char * pPath = hb_parcx( 1 );
       char * pDelim;
 
       while( ( pDelim = strchr( pPath, OS_PATH_LIST_SEPARATOR ) ) != NULL )
@@ -160,7 +160,7 @@ HB_FUNC( __PP_PATH )
    if( ISCHAR( 1 ) )
    {
       char * cDelim;
-      char * cPath = hb_parc( 1 );
+      char * cPath = hb_parcx( 1 );
 
       while( ( cDelim = strchr( cPath, OS_PATH_LIST_SEPARATOR ) ) != NULL )
         {
@@ -196,7 +196,7 @@ HB_FUNC( __PPADDRULE )
 {
    if( ISCHAR( 1 ) )
    {
-      char * ptr = hb_parc( 1 );
+      char * ptr = hb_parcx( 1 );
       char * hb_buffer;
 
       HB_SKIPTABSPACES( ptr );
@@ -240,7 +240,7 @@ HB_EXPORT HB_FUNC( __PREPROCESS )
          /*   hb_pp_Init();   */
 
          slen = HB_MIN( hb_parclen( 1 ), HB_PP_STR_SIZE - 1 );
-         memcpy( pText, hb_parc( 1 ), slen );
+         memcpy( pText, hb_parcx( 1 ), slen );
          pText[ slen ] = 0; /* Preprocessor expects null-terminated string */
          memset( pOut, 0, HB_PP_STR_SIZE );
 

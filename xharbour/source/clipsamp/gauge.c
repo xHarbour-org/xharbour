@@ -1,5 +1,5 @@
 /*
- * $Id: gauge.c,v 1.3 2004/03/06 02:32:37 andijahja Exp $
+ * $Id: gauge.c,v 1.4 2004/03/07 21:42:51 andijahja Exp $
  */
 
 /*
@@ -96,15 +96,15 @@ HB_FUNC( GAUGENEW )
       ( hb_parni( B_RIGHT ) < hb_parni( B_LEFT ) + 4 ?
       hb_parni( B_LEFT ) + 4 : hb_parni( B_RIGHT ) ) : 0 ) );
 
-   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BACKCOLOR),( ISCHAR( B_BACKCOLOR ) ? hb_parc( B_BACKCOLOR ) : "W/N" )) ;
-   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCOLOR), ( ISCHAR( B_BARCOLOR ) ? hb_parc( B_BARCOLOR ) : "W+/N" ));
+   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BACKCOLOR),( ISCHAR( B_BACKCOLOR ) ? hb_parcx( B_BACKCOLOR ) : "W/N" )) ;
+   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCOLOR), ( ISCHAR( B_BARCOLOR ) ? hb_parcx( B_BARCOLOR ) : "W+/N" ));
 
    hb_itemPutL( hb_arrayGetItemPtr( &Return, B_DISPLAYNUM ),
       !( ISNUM( B_RIGHT ) &&
       ISNUM( B_LEFT ) &&
       ( hb_parni( B_RIGHT ) < hb_parni( B_LEFT ) + 9 ) ) );
 
-   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCHAR),( ISCHAR( B_BARCHAR ) ? hb_parc( B_BARCHAR ) : ( char * ) '\xdb'));
+   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCHAR),( ISCHAR( B_BARCHAR ) ? hb_parcx( B_BARCHAR ) : ( char * ) '\xdb'));
    hb_itemPutC( hb_arrayGetItemPtr( &Return, B_PERCENT), 0 );
 
    hb_itemReturn( &Return );

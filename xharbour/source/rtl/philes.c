@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.15 2003/11/11 20:20:54 ronpinkas Exp $
+ * $Id: philes.c,v 1.16 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -67,7 +67,7 @@
 HB_FUNC( FOPEN )
 {
    if( ISCHAR( 1 ) )
-      hb_retnl( hb_fsOpen( ( BYTE * ) hb_parc( 1 ),
+      hb_retnl( hb_fsOpen( ( BYTE * ) hb_parcx( 1 ),
                            ISNUM( 2 ) ? hb_parni( 2 ) : FO_READ | FO_COMPAT ) );
    else
       hb_errRT_BASE( EG_ARG, 2021, NULL, "FOPEN", 2, hb_paramError( 1 ), hb_paramError( 2 ) ); /* NOTE: Undocumented but existing Clipper Run-time error */
@@ -76,7 +76,7 @@ HB_FUNC( FOPEN )
 HB_FUNC( FCREATE )
 {
    if( ISCHAR( 1 ) )
-      hb_retnl( hb_fsCreate( ( BYTE * ) hb_parc( 1 ),
+      hb_retnl( hb_fsCreate( ( BYTE * ) hb_parcx( 1 ),
                              ISNUM( 2 ) ? hb_parni( 2 ) : FC_NORMAL ) );
    else
       hb_retnl( FS_ERROR );
@@ -87,7 +87,7 @@ HB_FUNC( FCREATE )
 HB_FUNC( HB_FCREATE )
 {
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fsCreateEx( ( BYTE * ) hb_parc( 1 ),
+      hb_retni( hb_fsCreateEx( ( BYTE * ) hb_parcx( 1 ),
                                ISNUM( 2 ) ? hb_parni( 2 ) : FC_NORMAL,
                                ISNUM( 3 ) ? hb_parni( 3 ) : FO_COMPAT ) );
    else
@@ -113,7 +113,7 @@ HB_FUNC( FREAD )
          /* NOTE: Warning, the read buffer will be directly modified,
                   this is normal here ! [vszakats] */
          ulRead = hb_fsReadLarge( hb_parnl( 1 ),
-                                  ( BYTE * ) hb_parc( 2 ),
+                                  ( BYTE * ) hb_parcx( 2 ),
                                   ulRead );
       else
          ulRead = 0;
@@ -128,7 +128,7 @@ HB_FUNC( FWRITE )
 {
    if( ISNUM( 1 ) && ISCHAR( 2 ) )
       hb_retnl( hb_fsWriteLarge( hb_parnl( 1 ),
-                                 ( BYTE * ) hb_parc( 2 ),
+                                 ( BYTE * ) hb_parcx( 2 ),
                                  ISNUM( 3 ) ? hb_parnl( 3 ) : hb_parclen( 2 ) ) );
    else
       hb_retnl( 0 );
@@ -162,7 +162,7 @@ HB_FUNC( FERASE )
    hb_fsSetError( 3 );
 
    hb_retni( ( ISCHAR( 1 ) &&
-               hb_fsDelete( ( BYTE * ) hb_parc( 1 ) ) ) ? 0 : -1 );
+               hb_fsDelete( ( BYTE * ) hb_parcx( 1 ) ) ) ? 0 : -1 );
 }
 
 HB_FUNC( FRENAME )
@@ -170,7 +170,7 @@ HB_FUNC( FRENAME )
    hb_fsSetError( 2 );
 
    hb_retni( ( ISCHAR( 1 ) && ISCHAR( 2 ) &&
-               hb_fsRename( ( BYTE * ) hb_parc( 1 ), ( BYTE * ) hb_parc( 2 ) ) ) ? 0 : -1 );
+               hb_fsRename( ( BYTE * ) hb_parcx( 1 ), ( BYTE * ) hb_parcx( 2 ) ) ) ? 0 : -1 );
 }
 
 HB_FUNC( FSEEK )
@@ -224,7 +224,7 @@ HB_FUNC( CURDIR )
    BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
 
    hb_fsCurDirBuff( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-      ( USHORT )( toupper( *hb_parc( 1 ) ) - 'A' + 1 ) : 0, pbyBuffer, _POSIX_PATH_MAX + 1 );
+      ( USHORT )( toupper( *hb_parcx( 1 ) ) - 'A' + 1 ) : 0, pbyBuffer, _POSIX_PATH_MAX + 1 );
 
    hb_retcAdopt( ( char * ) pbyBuffer );
 
@@ -251,7 +251,7 @@ HB_FUNC( CURDIRX )
    USHORT uiErrorOld = hb_fsError();
    BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
    hb_fsCurDirBuffEx( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-      ( USHORT )( toupper( *hb_parc( 1 ) ) - 'A' + 1 ) : 0, pbyBuffer, _POSIX_PATH_MAX + 1 );
+      ( USHORT )( toupper( *hb_parcx( 1 ) ) - 'A' + 1 ) : 0, pbyBuffer, _POSIX_PATH_MAX + 1 );
    hb_retcAdopt( ( char * ) pbyBuffer );
 
    hb_fsSetError( uiErrorOld );
@@ -296,7 +296,7 @@ HB_FUNC( HB_OSDRIVESEPARATOR )
 
 HB_FUNC( HB_OPENPROCESS )
 {
-   char *szName = hb_parc( 1 );
+   char *szName = hb_parcx( 1 );
    PHB_ITEM pIn = hb_param( 2, HB_IT_BYREF );
    PHB_ITEM pOut = hb_param( 3, HB_IT_BYREF );
    PHB_ITEM pErr = hb_param( 4, HB_IT_BYREF );

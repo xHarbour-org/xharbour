@@ -1,5 +1,5 @@
 /*
- * $Id: stuff.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: stuff.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,7 @@ HB_FUNC( STUFF )
 {
    if( ISCHAR( 1 ) && ISNUM( 2 ) && ISNUM( 3 ) && ISCHAR( 4 ) )
    {
-      char * szText = hb_parc( 1 );
+      char * szText = hb_parcx( 1 );
       ULONG ulText = hb_parclen( 1 );
       ULONG ulPos = hb_parnl( 2 );
       ULONG ulDel = hb_parnl( 3 );
@@ -80,7 +80,7 @@ HB_FUNC( STUFF )
          char * szResult = ( char * ) hb_xgrab( ulTotalLen + 1 );
 
          hb_xmemcpy( szResult, szText, ulPos );
-         hb_xmemcpy( szResult + ulPos, hb_parc( 4 ), ulInsert );
+         hb_xmemcpy( szResult + ulPos, hb_parcx( 4 ), ulInsert );
          hb_xmemcpy( szResult + ulPos + ulInsert, szText + ulPos + ulDel, ulText - ( ulPos + ulDel ) );
 
          szResult[ ulTotalLen ] = '\0';

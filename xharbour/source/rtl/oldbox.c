@@ -1,5 +1,5 @@
 /*
- * $Id: oldbox.c,v 1.10 2001/11/07 13:56:33 vszakats Exp $
+ * $Id: oldbox.c,v 1.1.1.1 2001/12/21 10:42:07 ronpinkas Exp $
  */
 
 /*
@@ -65,10 +65,10 @@ HB_FUNC( __BOX )
 
    if( pTop && pLeft && pBottom && pRight )
       hb_gtBox( hb_itemGetNI( pTop ),
-                hb_itemGetNI( pLeft), 
-                hb_itemGetNI( pBottom ), 
+                hb_itemGetNI( pLeft),
+                hb_itemGetNI( pBottom ),
                 hb_itemGetNI( pRight ),
-                ( BYTE * ) ( ISCHAR( 5 ) ? hb_parc( 5 ) : " " ) );
+                ( BYTE * ) ( ISCHAR( 5 ) ? hb_parcx( 5 ) : " " ) );
 }
 
 HB_FUNC( __BOXD )
@@ -80,8 +80,8 @@ HB_FUNC( __BOXD )
 
    if( pTop && pLeft && pBottom && pRight )
       hb_gtBoxD( hb_itemGetNI( pTop ),
-                 hb_itemGetNI( pLeft), 
-                 hb_itemGetNI( pBottom ), 
+                 hb_itemGetNI( pLeft),
+                 hb_itemGetNI( pBottom ),
                  hb_itemGetNI( pRight ) );
 }
 
@@ -94,8 +94,8 @@ HB_FUNC( __BOXS )
 
    if( pTop && pLeft && pBottom && pRight )
       hb_gtBoxS( hb_itemGetNI( pTop ),
-                 hb_itemGetNI( pLeft), 
-                 hb_itemGetNI( pBottom ), 
+                 hb_itemGetNI( pLeft),
+                 hb_itemGetNI( pBottom ),
                  hb_itemGetNI( pRight ) );
 }
 

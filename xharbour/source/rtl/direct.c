@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.39 2004/03/04 22:30:07 andijahja Exp $
+ * $Id: direct.c,v 1.40 2004/03/07 00:01:19 andijahja Exp $
  */
 
 /*
@@ -502,6 +502,6 @@ HB_FUNC( DIRECTORY )
    HB_ITEM Dir;
 
    Dir.type = HB_IT_NIL;
-   hb_fsDirectory( &Dir, hb_parc(1), hb_parc(2), hb_parl(3), hb_parl(4) );
+   hb_fsDirectory( &Dir, hb_parcx(1), hb_parcx(2), hb_parl(3), hb_parl(4) );
    hb_itemForwardValue( &(HB_VM_STACK).Return, &Dir );
 }
