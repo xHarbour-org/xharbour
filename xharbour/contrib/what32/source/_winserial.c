@@ -278,13 +278,13 @@ CommConfig:buffer( cCommConfig )
 */
 HB_FUNC( GETDEFAULTCOMMCONFIG )
 {
-   char * Buffer = hb_xgrab( sizeof( COMMCONFIG ) );
+   char * Buffer = (char *) hb_xgrab( sizeof( COMMCONFIG ) );
    DWORD size = sizeof( COMMCONFIG );
 
    if ( GetDefaultCommConfig( ( LPCTSTR ) hb_parc( 1 ), ( COMMCONFIG * ) Buffer, &size ) == 0 )
    {
       hb_xfree( Buffer ) ;
-      Buffer = hb_xgrab( size ) ;
+      Buffer = (char *) hb_xgrab( size ) ;
       if ( GetDefaultCommConfig( ( LPCTSTR ) hb_parc( 1 ), ( COMMCONFIG * ) Buffer, &size ) == 0 )
       {
          hb_xfree( Buffer ) ;
