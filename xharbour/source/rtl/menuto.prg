@@ -1,5 +1,5 @@
 /*
- * $Id: menuto.prg,v 1.10 2003/10/23 09:01:35 ronpinkas Exp $
+ * $Id: menuto.prg,v 1.11 2003/10/23 23:30:29 lculik Exp $
  */
 
 /*
@@ -195,17 +195,24 @@ function __MenuTo( bBlock, cVariable )
 
          // check for keystrokes
          Switch nKey
-         case 1001
-            exit
 
-         case 1002
-         case 1006
+         case K_MOUSEMOVE
             if ( ( nMouseClik := hittest(s_aLevel[ nPointer-1 ], mrow(), mcol()) ) > 0 )
                 n := nMouseClik
             endif
-            if ( nKey == 1006 )
-                lExit := .T.
+            EXIT
+
+         case K_LBUTTONDOWN
+         case K_LDBLCLK
+            if ( ( nMouseClik := hittest(s_aLevel[ nPointer-1 ], mrow(), mcol()) ) > 0 )
+                n := nMouseClik
             endif
+            /** JC: TEMPORARY CHANGE
+              I want to know the opinion of other developers about dbl click in menuto
+            */
+            //if ( nKey == 1006 )
+                lExit := .T.
+            //endif
             exit
 
          case K_DOWN
