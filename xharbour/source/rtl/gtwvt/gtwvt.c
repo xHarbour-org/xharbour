@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.94 2004/04/23 07:29:11 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.95 2004/04/25 07:19:48 vouchcac Exp $
  */
 
 /*
@@ -89,6 +89,10 @@
 
 #ifndef CC_ANYCOLOR
    #define CC_ANYCOLOR 0x00000100
+#endif
+
+#ifndef IDC_HAND
+   #define IDC_HAND MAKEINTRESOURCE(32649)
 #endif
 
 //-------------------------------------------------------------------//
