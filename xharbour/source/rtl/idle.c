@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.2 2002/01/21 09:11:56 ronpinkas Exp $
+ * $Id: idle.c,v 1.3 2002/07/17 15:51:45 ronpinkas Exp $
  */
 
 /*
@@ -72,7 +72,11 @@
 #include "hbvm.h"
 #include "error.ch"
 #if defined(HB_OS_UNIX)
+#if defined(HB_OS_DARWIN)
+   #include <unistd.h>    /* We need usleep() in Darwin */
+#else
    #include <time.h>
+#endif
 #endif
 
 /* list of background tasks
@@ -134,11 +138,15 @@ static void hb_releaseCPU( void )
    }
 
 #elif defined(HB_OS_UNIX)
+   #if defined(HB_OS_DARWIN)
+  usleep( 1 );
+   #else
   {
      static struct timespec nanosecs = { 0, 1000 };
      /* NOTE: it will sleep at least 10 miliseconds (forced by kernel) */
      nanosleep( &nanosecs, NULL );
   }
+   #endif
 #else
 
   /* Do nothing */

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.129 2002/11/14 21:46:19 ronpinkas Exp $
+ * $Id: hvm.c,v 1.130 2002/11/25 05:09:01 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,11 @@
  */
 
 #ifndef __MPW__
-   #include <malloc.h>
+   #ifdef HB_OS_DARWIN
+      #include <stdlib.h>     /* There is no malloc.h in Darwin */
+   #else
+      #include <malloc.h>
+   #endif
 #endif
 
 #include <math.h>

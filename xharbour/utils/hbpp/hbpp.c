@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.16 2001/12/17 14:03:42 vszakats Exp $
+ * $Id: hbpp.c,v 1.1.1.1 2001/12/21 10:44:59 ronpinkas Exp $
  */
 
 /*
@@ -63,7 +63,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <malloc.h>     /* required for allocating and freeing memory */
+
+#ifdef HB_OS_DARWIN
+   #include <stdlib.h>     /* There is no malloc.h in Darwin */
+#else
+   #include <malloc.h>     /* required for allocating and freeing memory */
+#endif
 
 #include "hbpp.h"
 #include "hbcomp.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.509 2002/12/01 04:03:47 walito Exp $
+ * $Id: ChangeLog,v 1.510 2002/12/04 06:24:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-05 01:23 UTC+0300 Phil Krylov <phil@mail.ru>
+  + make_drw.sh
+     + Added a GNU-make starter for Darwin
+  + config/darwin/dir.cf
+  + config/darwin/gcc.cf
+  + config/darwin/global.cf
+  + config/darwin/install.cf
+    + New GNU Make System modules for Darwin
+  * doc/gmake.txt
+    + Added documentation for darwin/gcc
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/vm/fm.c
+  * source/vm/hvm.c
+  * utils/hbpp/hbpp.c
+    + #include <stdlib.h> instead of <malloc.h> on Darwin
+  * source/rtl/idle.c
+    + Added 'usleep(1);' to hb_releaseCPU() for Darwin
+    + Added '#include <unistd.h>' on Darwin
 
 2002-12-03 22:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbcomp.h

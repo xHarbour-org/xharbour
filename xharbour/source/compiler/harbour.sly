@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.27 2002/11/24 17:50:36 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.28 2002/12/04 06:24:07 ronpinkas Exp $
  */
 
 /*
@@ -33,7 +33,11 @@
  * 2) Support this syntax: nPtr := @Hello()
  */
 
-#include <malloc.h>
+#ifdef HB_OS_DARWIN
+   #include <stdlib.h>     /* There is no malloc.h in Darwin */
+#else
+   #include <malloc.h>
+#endif
 
 #include "hbcomp.h"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.27 2002/11/25 18:42:15 ronpinkas Exp $
+ * $Id: harbour.c,v 1.28 2002/12/04 06:24:07 ronpinkas Exp $
  */
 
 /*
@@ -95,7 +95,11 @@
 #ifdef _MSC_VER
    #include <windows.h>
 #else
-   #include <malloc.h>     /* required for allocating and freeing memory */
+   #ifdef HB_OS_DARWIN
+      #include <stdlib.h>     /* There is no malloc.h in Darwin */
+   #else
+      #include <malloc.h>     /* required for allocating and freeing memory */
+   #endif
 #endif
 
 #include <errno.h>

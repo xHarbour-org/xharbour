@@ -1,5 +1,5 @@
 /*
- * $Id: gmake.txt,v 1.24 2001/12/05 21:04:28 dholm Exp $
+ * $Id: gmake.txt,v 1.1.1.1 2001/12/21 10:48:07 ronpinkas Exp $
  */
 
 INTRODUCTION
@@ -28,7 +28,7 @@ of the VM library:
 
 --  Cut here  ---------------------------------------
 #
-# $Id: gmake.txt,v 1.24 2001/12/05 21:04:28 dholm Exp $
+# $Id: gmake.txt,v 1.1.1.1 2001/12/21 10:48:07 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -59,7 +59,7 @@ Let's look at another Makefile, this one for the Harbour compiler:
 
 --  Cut here  ---------------------------------------
 #
-# $Id: gmake.txt,v 1.24 2001/12/05 21:04:28 dholm Exp $
+# $Id: gmake.txt,v 1.1.1.1 2001/12/21 10:48:07 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -85,7 +85,7 @@ in this Makefile are those appropriate to build a stand-alone binary.
 One final Makefile, this one from the source directory:
 
 #
-# $Id: gmake.txt,v 1.24 2001/12/05 21:04:28 dholm Exp $
+# $Id: gmake.txt,v 1.1.1.1 2001/12/21 10:48:07 ronpinkas Exp $
 #
 
 --  Cut here  ---------------------------------------
@@ -238,6 +238,11 @@ For Watcom C/C++ 10.x (default Makefile creates DOS4G extender executables)
         (Add for example:
 	 SHELL=C:\COMMAND.COM C:\ E=2048 /P
 	 to your CONFIG.SYS )
+
+For GCC on Darwin:
+  HB_ARCHITECTURE   darwin
+  HB_COMPILER       gcc
+  HB_GT_LIB         gtstd
 
 If you issue a "make install", it will try to install your header,
 executable and library files into directories given by

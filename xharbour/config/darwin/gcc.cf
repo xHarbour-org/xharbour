@@ -1,0 +1,79 @@
+#
+# $Id: gcc.cf,v 1.4 2002/09/27 20:51:49 map Exp $
+#
+
+include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
+
+OBJ_EXT = .o
+EXE_EXT =
+LIB_PREF = lib
+LIB_EXT = .a
+
+CC = $(CCACHE) gcc
+CC_IN = -c
+CC_OUT = -o
+CPPFLAGS = -no-cpp-precomp -I. -I$(HB_INC_COMPILE)
+ifeq ($(HB_LEX),SIMPLEX)
+CFLAGS = -Wall -g -DSIMPLEX
+else
+CFLAGS = -Wall -g
+endif
+CFLAGS += -DHB_OS_BSD -DHB_OS_DARWIN
+
+LD = gcc
+LD_OUT = -o
+
+# Add all libraries specified in CONTRIBS and LIBS.
+ifeq ($(HB_LIB_COMPILE),)
+LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
+LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+else
+LINKPATHS += -L$(HB_LIB_COMPILE)
+endif
+####LINKLIBS += -Wl,--start-group
+LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
+LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
+
+# If LIBS specifies the rdd library, add all DB drivers.
+ifeq ($(findstring rdd,$(LIBS)),rdd)
+LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
+LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
+endif
+
+# Add the specified GT driver library
+ifeq ($(findstring rtl,$(LIBS)),rtl)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKLIBS += -l$(HB_GT_LIB)
+endif
+
+# HB_SCREEN_LIB: empty, or one of ncurses, slang
+ifeq ($(HB_GT_LIB),gtcrs)
+HB_SCREEN_LIB:=ncurses
+else
+ifeq ($(HB_GT_LIB),gtsln)
+HB_SCREEN_LIB:=slang
+endif
+endif
+
+ifneq ($(HB_SCREEN_LIB),)
+LINKLIBS += -l$(HB_SCREEN_LIB)
+endif
+
+# HB_GPM_MOUSE: use gpm mouse driver
+ifeq ($(HB_GPM_MOUSE),yes)
+####LINKLIBS += -lgpm
+endif
+
+LINKLIBS += -lm
+#### -Wl,--end-group
+
+LDFLAGS = $(LINKPATHS)
+LD_RULE = $(LD) $(CFLAGS) $(LD_OUT) $@ $^ $(LDFLAGS) $(L_USR) $(LINKLIBS)
+
+#AR = ar
+#ARFLAGS = $(A_USR)
+#AR_RULE = $(AR) $(ARFLAGS) r $@ $^ || $(RM) $@
+LIBTOOL = libtool
+LIBTOOLFLAGS = $(LIBTOOL_USR)
+AR_RULE = $(LIBTOOL) -static $(LIBTOOLFLAGS) -o $@ $^ || $(RM) $@
+include $(TOP)$(ROOT)config/rules.cf
