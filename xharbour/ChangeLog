@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3346 2004/08/26 16:04:51 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3347 2004/08/27 03:09:35 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,6 +11,8 @@
 2004-08-27 00:05 UTC-0300 Walter Negro <anegro at overnet.com.ar>
   * source/vm/thread.c
     ! Fixed hb_threadIsLocalRef() in With Object section. (possible GPF Trap).
+  * source/vm/hvm.c
+    ! Fixed hb_vmIsLocalRef() in With Object section. (possible GPF Trap).
 
 2004-08-26 18:01 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/filesys.c
