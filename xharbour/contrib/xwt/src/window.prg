@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: window.prg,v 1.5 2003/03/28 14:44:40 gian Exp $
+   $Id: window.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -60,3 +60,4 @@ METHOD SetModal( bModal ) CLASS XWTWindow
    
 RETURN bRes
 */
+

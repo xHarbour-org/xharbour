@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwtcmd.ch,v 1.2 2003/08/27 02:47:49 lculik Exp $
+   $Id: xwtcmd.ch,v 1.3 2003/08/27 20:53:44 lculik Exp $
 
    Definitions
 */
@@ -23,11 +23,11 @@
 
 
 // Button ----------------------------------------------------------------------
-#xcommand DEFINE BUTTON <oBtn> [ TEXT <cText> ] [ MOVE <x>,<y> ][ OF <oParent> ];
-          => <oBtn> := XWTButton():New( <cText>, <x>, <y>, <oParent> )
+#xcommand DEFINE BUTTON <oBtn> [ TEXT <cText> ] [ MOVE <x>,<y> ][ OF <oParent> ] [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>] [BGCOLOR <bgclr>]  [BASECOLOR <baclr>]  [TEXTCOLOR <Txtclr>] ;
+          => <oBtn> := XWTButton():New( <cText>, <x>, <y>, <oParent>, <(cFont)>, <nSize>, <(clr)>, <(bgclr)>, <(baclr)> ,<(Txtclr)>)
 
-#xcommand @ <x>,<y> BUTTON <oBtn> [ TEXT <cText>] [ OF <oParent> ];
-          => <oBtn> := XWTButton():New( <cText>, <x>, <y>, <oParent>)
+#xcommand @ <x>,<y> BUTTON <oBtn> [ TEXT <cText>] [ OF <oParent> ] [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>] [BGCOLOR <bgclr>]  [BASECOLOR <baclr>]  [TEXTCOLOR <Txtclr>];
+          => <oBtn> := XWTButton():New( <cText>, <x>, <y>, <oParent>, <(cFont)>,<nSize>,<(clr)>, <(bgclr)>, <(baclr)> ,<(Txtclr)>)
 
 // Label -------------------------------------------------------------------------
 #xcommand DEFINE LABEL <oLabel> [ TEXT <cText> ] [ MOVE <x>,<y> ] [ OF <oParent> ] [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>];

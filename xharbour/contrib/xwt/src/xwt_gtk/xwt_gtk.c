@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.17 2003/08/27 02:47:19 lculik Exp $
+   $Id: xwt_gtk.c,v 1.18 2003/08/27 20:52:07 lculik Exp $
 
    Global declarations, common functions
 */
@@ -11,6 +11,35 @@
 #include <hbapi.h>
 #include <xwt_gtk.h>
 #include <xwt_api.h>
+#define FGCOLOR 1
+#define BGCOLOR 2
+#define BASECOLOR 3
+#define TEXTCOLOR 4
+
+/*
+ Static function to change an color of an widget for buttons,checkboxes/radios and others
+*/
+void widget_set_color(GtkWidget* entry,GdkColor* color,int component)
+{
+    gtk_widget_ensure_style(entry);
+    GtkStyle* newstyle;
+    {
+	int i;
+        newstyle = gtk_style_copy(gtk_widget_get_style(entry));
+
+        for( i=0;i<5;++i) {
+            if (component & FGCOLOR)
+                newstyle->fg[i] = *color;
+            if (component &  BGCOLOR)
+                newstyle->bg[i] = *color;
+            if (component &  TEXTCOLOR)
+                newstyle->text[i] = *color;
+            if (component & BASECOLOR)
+                newstyle->base[i] = *color;
+        };
+    };
+    gtk_widget_set_style(entry,newstyle);
+}
 
 BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 {
@@ -524,12 +553,15 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
 	        gtk_widget_modify_style(GTK_BUTTON(wMain) , style);
+		break;
             case XWT_TYPE_LABEL:
 	        gtk_widget_modify_style(GTK_LABEL(wMain) , style);
+		break;
             case XWT_TYPE_MENUITEM:
 	    {
 	       PXWT_GTK_MENUITEM itm = (PXWT_GTK_MENUITEM) wWidget->widget_data;
                gtk_widget_modify_style(GTK_LABEL( itm->label ) , style);
+	       break;
 	    }	
         }		
 	 return TRUE;
@@ -538,6 +570,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
       case XWT_PROP_FGCOLOR:
       {
+        int i; 
         GdkColor color;
         gdk_color_parse (prop->color.fg, &color);
         switch( wWidget->type )
@@ -546,14 +579,14 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_TOGGLEBUTTON:
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
-	        gtk_widget_modify_fg (wSelf, GTK_STATE_NORMAL, &color);
+		widget_set_color(wSelf, &color,FGCOLOR);
 		break;
             case XWT_TYPE_LABEL:
-            gtk_widget_modify_fg ((GtkWidget*)wMain, GTK_STATE_NORMAL, &color);
+                gtk_widget_modify_fg ((GtkWidget*)wMain, GTK_STATE_NORMAL, &color);
+		break;
 	    case XWT_TYPE_MENUITEM:
 	        gtk_widget_modify_fg (wSelf, GTK_STATE_NORMAL, &color);
-	    	    
-            break;
+    	        break;
 
          }
 
@@ -570,10 +603,11 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_TOGGLEBUTTON:
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
-	        gtk_widget_modify_bg (wSelf, GTK_STATE_NORMAL, &color);
+		widget_set_color(wSelf, &color,BGCOLOR);
 		break;
             case XWT_TYPE_LABEL:
-            gtk_widget_modify_bg ((GtkWidget*)wMain, GTK_STATE_NORMAL, &color);
+        	gtk_widget_modify_bg ((GtkWidget*)wMain, GTK_STATE_NORMAL, &color);
+    		break;
 	    case XWT_TYPE_MENUITEM:
 	        gtk_widget_modify_bg (wSelf, GTK_STATE_NORMAL, &color);
 	    	    
@@ -595,10 +629,12 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_TOGGLEBUTTON:
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
-	        gtk_widget_modify_base (wSelf, GTK_STATE_NORMAL, &color);
+		widget_set_color(wSelf, &color,BASECOLOR);
+	    
 		break;
             case XWT_TYPE_LABEL:
             gtk_widget_modify_base ((GtkWidget*)wMain, GTK_STATE_NORMAL, &color);
+	    break;	    
 	    case XWT_TYPE_MENUITEM:
 	        gtk_widget_modify_base (wSelf, GTK_STATE_NORMAL, &color);
 	    	    
@@ -619,10 +655,11 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_TOGGLEBUTTON:
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
-	        gtk_widget_modify_text (wSelf, GTK_STATE_NORMAL, &color);
+    		widget_set_color(wSelf, &color,TEXTCOLOR);
 		break;
             case XWT_TYPE_LABEL:
             gtk_widget_modify_text ((GtkWidget*)wMain, GTK_STATE_NORMAL, &color);
+break;	    
 	    case XWT_TYPE_MENUITEM:
 	        gtk_widget_modify_text (wSelf, GTK_STATE_NORMAL, &color);
 	    	    
