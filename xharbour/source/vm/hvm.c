@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.2 2001/12/23 18:01:37 ronpinkas Exp $
+ * $Id: hvm.c,v 1.3 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -74,6 +74,7 @@
 #include <time.h>
 
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbstack.h"
 #include "hbapierr.h"
 #include "hbapiitm.h"
@@ -586,7 +587,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_FUNCTION:
             hb_itemClear( &hb_stack.Return );
             hb_vmDo( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
-            hb_itemCopy( hb_stackTopItem(), &hb_stack.Return );
+            hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
             hb_stackPush();
             w += 3;
             break;
@@ -594,7 +595,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_FUNCTIONSHORT:
             hb_itemClear( &hb_stack.Return );
             hb_vmDo( pCode[ w + 1 ] );
-            hb_itemCopy( hb_stackTopItem(), &hb_stack.Return );
+            hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
             hb_stackPush();
             w += 2;
             break;
@@ -602,7 +603,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_SEND:
             hb_itemClear( &hb_stack.Return );
             hb_vmSend( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
-            hb_itemCopy( hb_stackTopItem(), &hb_stack.Return );
+            hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
             hb_stackPush();
             w += 3;
             break;
@@ -610,7 +611,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_SENDSHORT:
             hb_itemClear( &hb_stack.Return );
             hb_vmSend( pCode[ w + 1 ] );
-            hb_itemCopy( hb_stackTopItem(), &hb_stack.Return );
+            hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
             hb_stackPush();
             w += 2;
             break;
@@ -1569,7 +1570,7 @@ static void hb_vmNegate( void )
       if( pResult )
       {
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -1638,7 +1639,7 @@ static void hb_vmPlus( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -1713,7 +1714,7 @@ static void hb_vmMinus( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -1748,7 +1749,7 @@ static void hb_vmMult( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -1775,7 +1776,7 @@ static void hb_vmDivide( void )
 
          if( pResult )
          {
-            hb_vmPush( pResult );
+            hb_itemPushForward( pResult );
             hb_itemRelease( pResult );
          }
       }
@@ -1805,7 +1806,7 @@ static void hb_vmDivide( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -1833,7 +1834,7 @@ static void hb_vmModulus( void )
 
          if( pResult )
          {
-            hb_vmPush( pResult );
+            hb_itemPushForward( pResult );
             hb_itemRelease( pResult );
          }
       }
@@ -1853,7 +1854,7 @@ static void hb_vmModulus( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -1891,7 +1892,7 @@ static void hb_vmPower( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -1922,7 +1923,7 @@ static void hb_vmInc( void )
       if( pResult )
       {
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -1953,7 +1954,7 @@ static void hb_vmDec( void )
       if( pResult )
       {
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -2043,7 +2044,7 @@ static void hb_vmEqual( BOOL bExact )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -2105,7 +2106,7 @@ static void hb_vmNotEqual( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -2158,7 +2159,7 @@ static void hb_vmLess( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -2205,7 +2206,7 @@ static void hb_vmLessEqual( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -2252,7 +2253,7 @@ static void hb_vmGreater( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -2299,7 +2300,7 @@ static void hb_vmGreaterEqual( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -2333,7 +2334,7 @@ static void hb_vmInstring( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -2360,7 +2361,7 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
       if( pResult )
       {
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
       else
@@ -2378,7 +2379,7 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
       if( pResult )
       {
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
       else
@@ -2396,7 +2397,7 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
       if( pResult )
       {
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
       else
@@ -2435,7 +2436,7 @@ static void hb_vmNot( void )
       if( pResult )
       {
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -2468,7 +2469,7 @@ static void hb_vmAnd( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -2501,7 +2502,7 @@ static void hb_vmOr( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -2536,7 +2537,7 @@ static void hb_vmArrayPush( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_vmPush( pResult );
+         hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
 
@@ -2634,7 +2635,7 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
    while( uiDimensions-- )
       hb_stackPop();
 
-   hb_itemCopy( ( hb_stackTopItem() ), &itArray );
+   hb_itemForwardValue( ( hb_stackTopItem() ), &itArray );
    hb_itemClear( &itArray );
    hb_stackPush();
 }
@@ -2654,7 +2655,7 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
    for( ulPos = 0; ulPos < ulElements; ulPos++ )
       hb_stackPop();
 
-   hb_itemCopy( ( hb_stackTopItem() ), &itArray );
+   hb_itemForwardValue( ( hb_stackTopItem() ), &itArray );
    hb_itemClear( &itArray );
    hb_stackPush();
 }
@@ -2715,7 +2716,7 @@ void hb_vmMessage( PHB_SYMB pSymMsg ) /* sends a message to an object */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmMessage(%p, %s)", pSymMsg, pSymMsg->szName));
 
-   hb_itemCopy( hb_stackTopItem(), hb_stackItemFromTop( -1 ) ); /* moves the object forward */
+   hb_itemForwardValue( hb_stackTopItem(), hb_stackItemFromTop( -1 ) ); /* moves the object forward */
    hb_itemClear( hb_stackItemFromTop( -1 ) );
    ( hb_stackItemFromTop( -1 ) )->type = HB_IT_SYMBOL;
    ( hb_stackItemFromTop( -1 ) )->item.asSymbol.value = pSymMsg;
@@ -3368,7 +3369,7 @@ void hb_vmFunction( USHORT uiParams )
 
    hb_itemClear( &hb_stack.Return );
    hb_vmDo( uiParams );
-   hb_itemCopy( hb_stackTopItem(), &hb_stack.Return );
+   hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
    hb_stackPush();
 }
 
@@ -3478,7 +3479,7 @@ static void hb_vmEndBlock( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmEndBlock()"));
 
    hb_stackDec();                               /* make the last item visible */
-   hb_itemCopy( &hb_stack.Return, hb_stackTopItem() ); /* copy it */
+   hb_itemForwardValue( &hb_stack.Return, hb_stackTopItem() ); /* copy it */
    hb_itemClear( hb_stackTopItem() );               /* and now clear it */
 }
 
@@ -3487,7 +3488,7 @@ static void hb_vmRetValue( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRetValue()"));
 
    hb_stackDec();                               /* make the last item visible */
-   hb_itemCopy( &hb_stack.Return, hb_stackTopItem() ); /* copy it */
+   hb_itemForwardValue( &hb_stack.Return, hb_stackTopItem() ); /* copy it */
    hb_itemClear( hb_stackTopItem() );               /* now clear it */
 }
 
@@ -3498,7 +3499,7 @@ static void hb_vmDebuggerEndProc( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDebuggerEndProc()"));
 
    hb_itemInit( &item );
-   hb_itemCopy( &item, &hb_stack.Return ); /* saves the previous returned value */
+   hb_itemForwardValue( &item, &hb_stack.Return ); /* saves the previous returned value */
 
    s_bDebugShowLines = FALSE;
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
@@ -3508,7 +3509,7 @@ static void hb_vmDebuggerEndProc( void )
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
 
-   hb_itemCopy( &hb_stack.Return, &item ); /* restores the previous returned value */
+   hb_itemForwardValue( &hb_stack.Return, &item ); /* restores the previous returned value */
    hb_itemClear( &item );
 }
 
@@ -4569,7 +4570,7 @@ HB_FUNC( __VMVARSLIST )
 {
    PHB_ITEM pStatics = hb_arrayClone( &s_aStatics, NULL );
 
-   hb_itemCopy( &hb_stack.Return, pStatics );
+   hb_itemForwardValue( &hb_stack.Return, pStatics );
    hb_itemRelease( pStatics );
 }
 

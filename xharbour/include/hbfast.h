@@ -1,5 +1,5 @@
 /*
- * $Id: hbfast.h,v 1.0 2001/12/22 06:36:17 ronpinkas Exp $
+ * $Id: hbfast.h,v 1.1 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
       extern "C" {
    #endif
 
+   extern void hb_itemPushForward( PHB_ITEM pItem );
    extern void hb_itemShareValue( PHB_ITEM pDest, PHB_ITEM pSource );
    extern void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
    extern void hb_itemPushEnvelopeString( char * szText, ULONG length );

@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.2 2001/12/22 06:36:17 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.3 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -471,7 +471,9 @@ PHB_ITEM hb_itemReturn( PHB_ITEM pItem )
    HB_TRACE(HB_TR_DEBUG, ("hb_itemReturn(%p)", pItem));
 
    if( pItem )
-      hb_itemCopy( &hb_stack.Return, pItem );
+   {
+      hb_itemForwardValue( &hb_stack.Return, pItem );
+   }
 
    return pItem;
 }
@@ -799,7 +801,11 @@ void hb_itemClear( PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_itemClear(%p)", pItem));
 
-   if( HB_IS_STRING( pItem ) )
+   if( pItem->bShadow )
+   {
+      HB_TRACE( HB_TR_INFO, ( "*** SHADOW hb_itemClear(%p) type: %i", pItem, pItem->type ) );
+   }
+   else if( HB_IS_STRING( pItem ) )
    {
       if( pItem->item.asString.value )
       {

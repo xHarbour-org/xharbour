@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5 2001/12/24 23:34:47 lculik Exp $
+ * $Id: ChangeLog,v 1.6 2001/12/30 01:21:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2001-12-29 19:26 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
+  * xharbour/include/hbfast.h
+  * xharbour/source/vm/fastitem.c
+    + void hb_itemPushForward( PHB_ITEM pItem );
+
+  * xharbour/source/vm/estack.c
+  * xharbour/source/vm/itemapi.c
+  * xharbour/source/vm/hvm.c
+    ! Optimized many hb_vmPush() to new hb_itemPushForward()
+    ! Optimized many hb_itemCopy() to new hb_itemForwardValue()
+
+  /*
+     After this 2nd optimization installment, xHarbour is now about 10-15% faster than Harbour.
+     For example on my 1Ghz Notebook, hbtest.exe (output directed to file) takes 0.85 Second,
+     as oppose to Harbour's 0.97 Second.
+
+     All tests run fine.
+  */
 
 2001-12-29 17:16 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/makefile.bc

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.0 2001/12/22 06:36:17 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.1 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -54,6 +54,17 @@
 #include "hbapierr.h"
 #include "hbdate.h"
 #include "hbset.h"
+
+/* Forward decalarations. */
+void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
+
+void hb_itemPushForward( PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPush(%p)", pItem));
+
+   hb_itemForwardValue( hb_stackTopItem(), pItem );
+   hb_stackPush();
+}
 
 void hb_itemShareValue( PHB_ITEM pDest, PHB_ITEM pSource )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.10 2001/12/17 16:01:45 vszakats Exp $
+ * $Id: estack.c,v 1.1.1.1 2001/12/21 10:40:35 ronpinkas Exp $
  */
 
 /*
@@ -81,7 +81,10 @@ void hb_stackPop( void )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
 
    if( ( * hb_stack.pPos )->type != HB_IT_NIL )
+   {
       hb_itemClear( * hb_stack.pPos );
+   }
+   ( * hb_stack.pPos )->bShadow = FALSE;
 }
 
 void hb_stackDec( void )
@@ -139,6 +142,7 @@ void hb_stackPush( void )
    /* now, push it: */
    hb_stack.pPos++;
    ( * hb_stack.pPos )->type = HB_IT_NIL;
+   ( * hb_stack.pPos )->bShadow = FALSE;
 }
 
 void hb_stackInit( void )
