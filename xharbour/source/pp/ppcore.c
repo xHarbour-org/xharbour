@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.20 2002/06/09 19:25:13 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.21 2002/06/11 20:17:04 ronpinkas Exp $
  */
 
 /*
@@ -963,7 +963,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
             { exptype = '3'; i++; }
           else if( *(mpatt+i) == '(' )   /* Extended expression match marker */
             { exptype = '4'; i++; }
-          else if( *(mpatt+i) == '!' )   /* Extended expression match marker */
+          else if( *(mpatt+i) == '!' )   /* Minimal expression match marker */
             { exptype = '5'; i++; }
           ptr = mpatt + i;
           while( *ptr != '>' )
@@ -2085,7 +2085,28 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
      }
   }
 
-  if( *(exppatt+2) == '4' )       /*  ----  extended match marker  */
+  if( *(exppatt+2) == '5' )       /*  ----  minimal match marker  */
+  {
+     /* Copying a real expression to 'expreal' */
+     if( !lenreal )
+     {
+        lenreal = getExpReal( expreal, ptri, FALSE, maxlenreal, FALSE );
+     }
+
+     /*
+     printf("Len: %i Pat: %s Exp: %s\n", lenreal, exppatt, expreal );
+     */
+
+     if( lenreal && IsIdentifier( expreal ) )
+     {
+        SearnRep( exppatt,expreal,lenreal,ptro,lenres);
+     }
+     else
+     {
+        return 0;
+     }
+  }
+  else if( *(exppatt+2) == '4' )       /*  ----  extended match marker  */
   {
      if( !lenreal ) lenreal = getExpReal( expreal, ptri, FALSE, maxlenreal, FALSE );
      {
@@ -2155,14 +2176,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
      if( rezrestr == 0 )
      {
         /* If restricted match marker doesn't correspond to real parameter */
-        if( s_numBrackets )
-        {
-            return 0;
-        }
-        else
-        {
-            return 0;
-        }
+        return 0;
      }
   }
   else if( *(exppatt+2) == '1' )  /*  ---- list match marker  */
