@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1590 2003/10/14 02:51:21 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1591 2003/10/14 15:24:04 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -15,7 +15,7 @@
   * include/hbver.h
     * Signaled as Build 91.1 and updated last change log to this entry.
 
-  Taged CVS as "Build 91-1"
+  Taged CVS as "Build-91-1"
 
 2003-10-13 19:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
