@@ -1,5 +1,5 @@
 ##################################
-# $Id: Rules.make,v 1.6 2003/11/28 14:46:33 lf_sfnet Exp $
+# $Id: Rules.make,v 1.7 2003/12/18 14:34:44 jonnymind Exp $
 #
 # Rules for making simwin
 #
@@ -20,12 +20,16 @@
 LINKER = ar
 CC = gcc
 ifeq ($(HB_COMPILER),mingw32)
-   CFLAGS += -Wall -mno-cygwin -mms-bitfields -mwindows -I.
+   CFLAGS += -Wall -mno-cygwin -fms-extensions -mms-bitfields -mwindows -I.
+   ifeq ($(HB_MULTI_GT),yes)
+      GT_LIBS=-lgtnul -lgtwin
+   endif
 else
    CFLAGS += -Wall -I.
 endif
 LIBRARIAN = ranlib
-GT_LIBS=-lgtcgi
+
+GT_LIBS += -lgtcgi
 
 #libraries for binary building
 ifeq ($(HB_MT),MT)
@@ -35,7 +39,7 @@ LIBFILES_ = -ldebug -lvm -lrtl $(GT_LIBS)  -llang -lrdd -lrtl -lvm -lmacro -lpp 
 endif
 
 ifeq ($(HB_COMPILER),mingw32)
-   LIBFILES_ += -luser32 -lgdi32 -lcomdlg32 -lwinspool
+   LIBFILES_ += -luser32 -lwinspool -lole32 -loleaut32 -luuid -lgdi32 -lcomctl32 -lcomdlg32 -lodbc32
    EXETYPE=.exe
 else
    LIBFILES_ += -lgpm
