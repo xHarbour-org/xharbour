@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.26 2004/06/17 13:35:08 druzus Exp $
+ * $Id: gtsln.c,v 1.27 2004/09/08 00:17:14 druzus Exp $
  */
 
 /*
@@ -284,7 +284,7 @@ static void hb_sln_setACSCtrans( void )
             case SLSMG_UARROW_CHAR  :   chArrow[ 3 ] = SLch; break;
             case SLSMG_BOARD_CHAR   :   chBoard[ 0 ] = SLch; break;
             case SLSMG_CKBRD_CHAR   :   chBoard[ 1 ] = SLch; break;
-            case SLSMG_BLOCK_CHAR   :   chBoard[ 2 ] = SLch; break; 
+            case SLSMG_BLOCK_CHAR   :   chBoard[ 2 ] = SLch; break;
 #endif
          }
       }
@@ -1516,7 +1516,7 @@ void HB_GT_FUNC(gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL fBox ))
 {
 #ifndef HB_CDP_SUPPORT_OFF
    PHB_CODEPAGE cdpTerm = NULL, cdpHost = NULL;
-   
+
    cdpHost = hb_cdpFind( pszHostCDP );
    if ( pszHostCDP && *pszHostCDP )
       cdpHost = hb_cdpFind( pszHostCDP );
@@ -1557,6 +1557,34 @@ void HB_GT_FUNC(gt_SetKeyCP( char * pszTermCDP, char * pszHostCDP ))
 }
 
 /* *********************************************************************** */
+
+
+/* ********** Graphics API ********** */
+
+int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
+{
+  HB_SYMBOL_UNUSED( iType );
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( iBottom );
+  HB_SYMBOL_UNUSED( iRight );
+  HB_SYMBOL_UNUSED( iColor );
+
+  return 0;
+}
+
+void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) )
+{
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( cBuf );
+  HB_SYMBOL_UNUSED( iColor );
+  HB_SYMBOL_UNUSED( iSize );
+  HB_SYMBOL_UNUSED( iWidth );
+}
+
+/* ******** Graphics API end ******** */
+
 
 #ifdef HB_MULTI_GT
 
@@ -1610,6 +1638,9 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+    gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
+    gt_funcs->gfxText               = HB_GT_FUNC( gt_gfxText );
+
 }
 
 /* ********************************************************************** */

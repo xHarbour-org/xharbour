@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.44 2004/09/01 01:13:59 druzus Exp $
+ * $Id: gtcrs.c,v 1.45 2004/09/08 00:17:13 druzus Exp $
  */
 
 /*
@@ -3583,7 +3583,34 @@ HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
    return iRet;
 }
 
+
 /* *********************************************************************** */
+
+/* ********** Graphics API ********** */
+
+int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
+{
+  HB_SYMBOL_UNUSED( iType );
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( iBottom );
+  HB_SYMBOL_UNUSED( iRight );
+  HB_SYMBOL_UNUSED( iColor );
+
+  return 0;
+}
+
+void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) )
+{
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( cBuf );
+  HB_SYMBOL_UNUSED( iColor );
+  HB_SYMBOL_UNUSED( iSize );
+  HB_SYMBOL_UNUSED( iWidth );
+}
+
+/* ******** Graphics API end ******** */
 
 #ifdef HB_MULTI_GT
 
@@ -3637,6 +3664,8 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+    gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
+    gt_funcs->gfxText               = HB_GT_FUNC( gt_gfxText );
 }
 
 /* ********************************************************************** */
