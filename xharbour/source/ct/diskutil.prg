@@ -1,5 +1,5 @@
 /*
- * $Id: diskutil.prg,v 1.5 2005/01/17 20:31:00 modalsist Exp $
+ * $Id: diskutil.prg,v 1.5 2005/01/18 00:39:18 modalsist Exp $
  */
 /*
  * xHarbour Project source code.
@@ -218,9 +218,9 @@ RETURN (nRet)
 *-----------------------------------
 FUNCTION DiskReady( cDrive , lMode )
 *-----------------------------------
-LOCAL lRETURN
+   LOCAL lReturn, cCurrent := DiskName()
 
-   default( @cDrive , DiskName() )
+   default( @cDrive , cCurrent )
    default( @lMode , .F. )
 // lMode -> True = Windows/DOS mode. If a disk is not ready, open a dialog.
 //          False = Bios mode. If a disk is not ready don´t open a dialog.
@@ -234,26 +234,31 @@ LOCAL lRETURN
    ENDIF
 
    IF lMode
-      lRETURN := DiskChange( cDrive ) // Windows/Dos access mode. xHarbour RTL. Source
-   ELSE                               // is in "dirdrive.c".
-      lRETURN := IsDisk( cDrive )     // Bios access mode. xHarbour RTL. Source is in
-   ENDIF                              // "dirdrive.c".
+      // Windows/DOS access mode. xHarbour RTL. Source is in "dirdrive.c".
+      lReturn := DiskChange( cDrive )
+      IF lReturn
+         DiskChange( cCurrent )
+      ENDIF
+   ELSE
+      // Bios access mode. xHarbour RTL. Source is in "dirdrive.c".
+      lReturn := IsDisk( cDrive )
+   ENDIF
 
-RETURN ( lRETURN )
+RETURN ( lReturn )
 
 
 
 *------------------------------------
 FUNCTION DiskReadyW( cDrive , lMode )
 *------------------------------------
-LOCAL nHd,cFile,lRETURN
+   LOCAL nHd, cFile, lReturn := .F., cCurrent := DiskName()
 
-   default( @cDrive , DiskName() )
+   default( @cDrive , cCurrent )
    default( @lMode  , .T. )
 // lMode -> Windows/DOS write ready mode. Same as DiskReady().
 
    IF empty(cDrive) .OR. !isalpha(cDrive)
-      cDrive := DiskName()
+      cDrive := cCurrent
    ENDIF
 
    IF valtype(lMode) != "L"
@@ -267,16 +272,13 @@ LOCAL nHd,cFile,lRETURN
          IF nHd > 0
             FClose( nHd )
             FErase( cFile )
-            RETURN .T.
-         ELSE
-            RETURN .F.
+            lReturn := .T.
          ENDIF
-   ELSE
-      RETURN .F.
+         DiskChange( cCurrent )
+      ENDIF
    ENDIF
-ENDIF
 
-RETURN .F.
+RETURN lReturn
 
 
 *---------------------------

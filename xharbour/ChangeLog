@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3753 2005/01/17 22:30:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3753 2005/01/18 00:37:38 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-19 13:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/ct/diskutil.prg
+    ! DISKREADY() and DISKREADYW() try to restore the current drive after
+      checking.
 
 2005-01-17 22:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/ct/diskutil.prg
