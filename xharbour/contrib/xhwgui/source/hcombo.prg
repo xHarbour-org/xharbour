@@ -36,7 +36,8 @@ CLASS HComboBox INHERIT HControl
    METHOD Activate()
    METHOD Redefine( oWnd,nId,vari,bSetGet,aItems,oFont,bInit,bSize,bDraw,bChange,cTooltip )
    METHOD Init( aCombo, nCurrent )
-
+   METHOD Refresh()     
+   METHOD Setitem( nPos )
 ENDCLASS
 
 METHOD New( oWndParent,nId,vari,bSetGet,nStyle,nLeft,nTop,nWidth,nHeight,aItems,oFont, ;
@@ -115,6 +116,29 @@ Local i
          ComboSetString( ::handle, ::value )
       ENDIF
    ENDIF
+Return Nil
+
+METHOD Refresh() CLASS HComboBox
+        Local vari
+        IF ::bSetGet != Nil
+                vari := Eval( ::bSetGet )
+        ENDIF
+
+        ::value := Iif( vari==Nil .OR. Valtype(vari)!="N",1,vari ) 
+        ::SetItem(::value )
+Return Nil
+
+METHOD SetItem(nPos) CLASS HComboBox
+        ::value := nPos
+        SendMessage( ::handle, CB_SETCURSEL, nPos - 1, 0)
+        
+        IF ::bSetGet != Nil
+                Eval( ::bSetGet, ::value )
+        ENDIF
+        
+        IF ::bChangeSel != Nil
+                Eval( ::bChangeSel, ::value, Self )
+        ENDIF
 Return Nil
 
 Static Function __Valid( oCtrl )

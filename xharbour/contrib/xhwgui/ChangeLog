@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.16 2004/02/18 11:32:24 lculik Exp $
+ * $Id: ChangeLog,v 1.1 2004/02/19 02:54:22 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-02-19 09:00 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  * source/hcombo.prg
+    ! Add new method, refresh(), setitem()    
+    
 2004-02-18 23:00 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   + imported hwgui sources into xharbour repository
-
 
 2004-02-18 08:40 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   + source/hmonthc.prg
