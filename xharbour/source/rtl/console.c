@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.50 2004/05/11 14:07:12 jonnymind Exp $
+ * $Id: console.c,v 1.51 2004/07/19 21:27:48 peterrees Exp $
  */
 /*
  * Harbour Project source code:
@@ -486,46 +486,44 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 HB_FUNC( PROW ) /* Returns the current printer row position */
 {
    HB_THREAD_STUB
-   hb_retni( ( int ) s_uiPRow );
+   hb_retnl( ( long ) s_uiPRow );
 }
 
 HB_FUNC( PCOL ) /* Returns the current printer row position */
 {
    HB_THREAD_STUB
-   hb_retni( ( int ) s_uiPCol );
+   hb_retnl( ( long ) s_uiPCol );
 }
 
-static void hb_conDevPos( SHORT iRow, SHORT iCol )
+static void hb_conDevPos( USHORT uiRow, USHORT uiCol )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_conDevPos(%hd, %hd)", iRow, iCol));
+   HB_TRACE(HB_TR_DEBUG, ("hb_conDevPos(%hd, %hd)", uiRow, uiCol));
 
    /* Position printer if SET DEVICE TO PRINTER and valid printer file
       otherwise position console */
    if( (hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 )) {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      iCol += hb_set.HB_SET_MARGIN;
+      uiCol += ( USHORT ) hb_set.HB_SET_MARGIN;
 
-      if (iRow < s_uiPRow) {
+      if ( uiRow < s_uiPRow) {
          hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C", 1 );
          s_uiPRow = s_uiPCol = 0;
       }
-      for ( ; s_uiPRow < iRow ; s_uiPRow++ ) {
+      for ( ; s_uiPRow < uiRow ; s_uiPRow++ ) {
         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
         s_uiPCol = 0 ;
       }
-/*  Removed to make Clipper compatible
-      if ( iCol < s_uiPCol) {
+      if ( uiCol < s_uiPCol) {
         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D", 1 );
         s_uiPCol = 0 ;
       }
-*/
-      for ( ; s_uiPCol < iCol ; s_uiPCol++)
+      for ( ; s_uiPCol < uiCol ; s_uiPCol++)
         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
 
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
    else {
-      hb_gtSetPos( iRow, iCol );
+      hb_gtSetPos( ( SHORT ) uiRow,  ( SHORT ) uiCol );
    }
 
 }
@@ -540,7 +538,7 @@ HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
    HB_CONSOLE_SAFE_LOCK
    if( ISNUM( 1 ) && ISNUM( 2 ) )
    {
-      hb_conDevPos( hb_parni( 1 ), hb_parni( 2 ) );
+      hb_conDevPos( ( USHORT ) hb_parnl( 1 ), ( USHORT ) hb_parni( 2 ) );
    }
    HB_CONSOLE_SAFE_UNLOCK
 }
@@ -554,8 +552,8 @@ HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
    HB_CONSOLE_SAFE_LOCK
    if( ISNUM( 1 ) && ISNUM( 2 ) )
    {
-      s_uiPRow = ( USHORT ) hb_parni( 1 );
-      s_uiPCol = ( USHORT ) hb_parni( 2 );
+      s_uiPRow = ( USHORT ) hb_parnl( 1 );
+      s_uiPCol = ( USHORT ) hb_parnl( 2 );
    }
    HB_CONSOLE_SAFE_UNLOCK
 }
@@ -568,7 +566,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
 
    if( ISNUM( 3 ) && ISNUM( 4 ) )
    {
-      hb_conDevPos( hb_parni( 3 ), hb_parni( 4 ) );
+      hb_conDevPos( ( USHORT ) hb_parnl( 3 ), ( USHORT ) hb_parnl( 4 ) );
    }
 
    if( ISCHAR( 2 ) )

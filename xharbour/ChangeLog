@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3170 2004/07/19 21:11:14 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3171 2004/07/19 21:27:20 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-07-20 12:10 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/console.c
+    - revert previous change to hb_conDevPos()
+      ( it broke another Clipper compatible when PRINTing to file via @ x,y SAY )
+    - apply correct fix to s_uiPRow & s_uiPCol
+      fix casting & hb_conDevPos() parameters -> USHORT not SHORT
+
 2004-07-20 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rtl/console.c
     - hb_conDevPos() changed to be Clipper compatible when PRINTing to file via @ x,y SAY
