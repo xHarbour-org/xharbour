@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.82 2002/02/16 03:49:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.83 2002/02/19 18:57:44 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-02-21 06:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tget.prg
+    * METHOD ::ParsePict() - The change is because if ::Original it is not
+          numeric, it would generate an error.
+
+    - METHOD ::Undo() - Delete assignment to ::buffer because
+          ::VarPut( ::Original, .t. ) makes this assignment.
+
+    - METHOD ::VarPut() - Delete ::nDispLen := NIL line, because
+          ::Picture() makes this assignment.
+                      - Revert changes of Ignacio Ortiz because the
+          problem was with ::nDispLen and not with empty cPicture.
+
+    - METHOD ::Block() - Delete ::nDispLen := NIL line, because
+          ::Picture() makes this assignment.
+
+    * METHOD ::Picture() - Add ::nDispLen := NIL line, reset the variable.
+          Only ::ParsePict() can load a value that can differ of
+          nMaxLen.
+
+    ! METHOD ::KillFocus() - Change position of lines, hasfocus should be
+          before the call to Putmask.
+          This makes that in numeric fields, points or comas are not
+          shown before the numbers.
+
+    * and other previous modifications coming from Harbour-project
+      by Walter Negro and Ignacio Ortiz
+
+  * source/rtl/tgetlist.prg
+    * minor modification
+    * fixed with display previous to call to PostBlock()
 
 2002-02-17 20:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
    * source/vm/itemapi.c
