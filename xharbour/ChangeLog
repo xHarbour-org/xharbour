@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.99 2002/03/10 00:13:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.100 2002/03/10 18:34:37 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -15,6 +15,19 @@
   *utils/hbmake/hbmake.prg
    utils/hbmake/hbmtuils.prg
     * Sync with harbour
+
+2002-03-10 10:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+    + Added support for new HB_P_BASELINE
+    ! Finalized implementation of line numder optimization.
+
+  * tests/pp.prg
+    + Added resetting logic to PP_RunFile()
 
 2002-03-09 16:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.c

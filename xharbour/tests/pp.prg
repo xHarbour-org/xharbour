@@ -1767,17 +1767,26 @@ PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
       ENDIF
    ENDIF
 
-   s_sModule := cFile
-   bCompile  := .T.
-   PP_PreProFile( cFile, sPPOExt, bBlanks )
-   bCompile  := .F.
+   //TraceLog( cFile, s_sModule, s_aProcedures, s_aInitExit, s_nProcId, aParams )
+
+   IF s_sModule == cFile
+      //TraceLog( s_aProcedures, s_aInitExit, s_nProcId, aParams )
+   ELSE
+      s_nProcId := 0; s_aProcedures := {}; s_aInitExit := { {}, {} }
+      s_asPrivates := {}; s_asPublics := {}; s_asLocals := {}; s_asStatics := {}; s_aParams := {}
+
+      s_sModule := cFile
+      bCompile  := .T.
+      PP_PreProFile( cFile, sPPOExt, bBlanks )
+      bCompile  := .F.
+   ENDIF
 
    PP_Exec( s_aProcedures, s_aInitExit, s_nProcId, aParams )
 
    #ifdef __CLIPPER__
       Memory(-1)
    #else
-
+      HB_GCALL()
    #endif
 
    s_sModule := sPresetModule

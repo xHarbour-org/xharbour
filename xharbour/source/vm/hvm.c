@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.42 2002/03/09 20:04:24 ronpinkas Exp $
+ * $Id: hvm.c,v 1.43 2002/03/10 00:13:09 ronpinkas Exp $
  */
 
 /*
@@ -236,6 +236,8 @@ int hb_vm_iExtraIndex;
 /* Request for some action - stop processing of opcodes
  */
 static USHORT   s_uiActionRequest;
+
+static int s_iBaseLine;
 
 /* 21/10/00 - maurilio.longo@libero.it
    This Exception Handler gets called in case of an abnormal termination of an harbour program and
@@ -770,12 +772,33 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
             break;
 
+         case HB_P_BASELINE:
+            s_iBaseLine = pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 );
+            (* hb_stack.pBase)->item.asSymbol.lineno = s_iBaseLine;
+
+            //printf( "BASE Proc: %s Line: %i\n", (* hb_stack.pBase)->item.asSymbol.value->szName, (* hb_stack.pBase)->item.asSymbol.lineno );
+
+            if( s_bDebugging && s_bDebugShowLines )
+            {
+               hb_vmDebuggerShowLine( s_iBaseLine );
+            }
+
+            w += 3;
+
+            HB_TRACE(HB_TR_INFO, ("Opcode: HB_P_LINE: %s (%i)", (* hb_stack.pBase)->item.asSymbol.value->szName, (* hb_stack.pBase)->item.asSymbol.lineno));
+
+            break;
+
          case HB_P_LINE:
             (* hb_stack.pBase)->item.asSymbol.lineno = pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 );
+
+            //printf( "Proc: %s Line: %i\n", (* hb_stack.pBase)->item.asSymbol.value->szName, (* hb_stack.pBase)->item.asSymbol.lineno );
+
             if( s_bDebugging && s_bDebugShowLines )
             {
                hb_vmDebuggerShowLine( (* hb_stack.pBase)->item.asSymbol.lineno );
             }
+
             w += 3;
 
             HB_TRACE(HB_TR_INFO, ("Opcode: HB_P_LINE: %s (%i)", (* hb_stack.pBase)->item.asSymbol.value->szName, (* hb_stack.pBase)->item.asSymbol.lineno));
@@ -783,7 +806,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             break;
 
          case HB_P_LINEOFFSET:
-            (* hb_stack.pBase)->item.asSymbol.lineno += (unsigned char) pCode[ w + 1 ];
+            (* hb_stack.pBase)->item.asSymbol.lineno = s_iBaseLine + (unsigned char) pCode[ w + 1 ];
 
             if( s_bDebugging && s_bDebugShowLines )
             {
@@ -3552,6 +3575,7 @@ void hb_vmDo( USHORT uiParams )
    BOOL     bDebugPrevState;
    ULONG    ulClock = 0;
    BOOL     bProfiler = hb_bProfiler; /* because profiler state may change */
+   int      iPresetBase = s_iBaseLine;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDo(%hu)", uiParams));
 
@@ -3648,21 +3672,24 @@ void hb_vmDo( USHORT uiParams )
    }
 
    s_bDebugging = bDebugPrevState;
+
+   s_iBaseLine = iPresetBase;
 }
 
 void hb_vmSend( USHORT uiParams )
 {
-   PHB_ITEM pItem;
-   PHB_SYMB pSym;
+   PHB_ITEM       pItem;
+   PHB_SYMB       pSym;
    HB_STACK_STATE sStackState;
-   PHB_ITEM pSelf;
-   PHB_FUNC pFunc = NULL;
-   BOOL bDebugPrevState;
-   ULONG ulClock = 0;
-   void *pMethod;
-   BOOL bProfiler = hb_bProfiler; /* because profiler state may change */
-   PHB_BASEARRAY pSelfBase;
-   BOOL lPopSuper;
+   PHB_ITEM       pSelf;
+   PHB_FUNC       pFunc = NULL;
+   BOOL           bDebugPrevState;
+   ULONG          ulClock = 0;
+   void           *pMethod;
+   BOOL           bProfiler = hb_bProfiler; /* because profiler state may change */
+   PHB_BASEARRAY  pSelfBase;
+   BOOL           lPopSuper;
+   int            iPresetBase = s_iBaseLine;
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmSend(%hu)", uiParams ) );
 
@@ -3827,6 +3854,8 @@ void hb_vmSend( USHORT uiParams )
    }
 
    s_bDebugging = bDebugPrevState;
+
+   s_iBaseLine = iPresetBase;
 }
 
 static HARBOUR hb_vmDoBlock( void )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.4 2002/01/30 04:10:05 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.5 2002/03/09 19:09:43 ronpinkas Exp $
  */
 
 /*
@@ -177,6 +177,7 @@ static BYTE s_pcode_len[] = {
    3,        /* HB_P_RIGHT,                */
    5,        /* HB_P_SUBSTR,               */
    0,        /* HB_P_MPUSHSTR,             */
+   3,        /* HB_P_BASELINE,             */
    2         /* HB_P_LINEOFFSET            */
 };
 

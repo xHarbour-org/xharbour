@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.5 2002/01/30 04:10:05 ronpinkas Exp $
+ * $Id: hbfix.c,v 1.6 2002/03/09 19:09:43 ronpinkas Exp $
  */
 
 /*
@@ -395,6 +395,7 @@ static HB_FIX_FUNC_PTR s_fixlocals_table[] =
    NULL,                       /* HB_P_RIGHT,                */
    NULL,                       /* HB_P_SUBSTR,               */
    NULL,                       /* HB_P_MPUSHSTR,             */
+   NULL,                       /* HB_P_BASELINE              */
    NULL                        /* HB_P_LINEOFFSET            */
 };
 

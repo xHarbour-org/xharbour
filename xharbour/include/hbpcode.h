@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.4 2002/01/30 04:10:04 ronpinkas Exp $
+ * $Id: hbpcode.h,v 1.5 2002/03/09 19:09:43 ronpinkas Exp $
  */
 
 /*
@@ -196,9 +196,10 @@ typedef enum
    HB_P_RIGHT,                 /* 130 Optimized Right(). */
    HB_P_SUBSTR,                /* 131 Optimized SubStr() */
    HB_P_MPUSHSTR,              /* 132 Macro compiled Pushed String. */
-   HB_P_LINEOFFSET,            /* 133 Line Number Offset. */
+   HB_P_BASELINE,              /* 133 Line Number Offset. */
+   HB_P_LINEOFFSET,            /* 134 Line Number Offset. */
 /* NOTE: This have to be the last definition */
-   HB_P_LAST_PCODE             /* 134 this defines the number of defined pcodes */
+   HB_P_LAST_PCODE             /* 135 this defines the number of defined pcodes */
 } HB_PCODE;
 
 #endif /* HB_PCODE_H_ */

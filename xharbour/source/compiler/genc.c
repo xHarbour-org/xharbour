@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.6 2002/01/30 04:10:04 ronpinkas Exp $
+ * $Id: genc.c,v 1.7 2002/03/09 19:09:43 ronpinkas Exp $
  */
 
 /*
@@ -29,6 +29,8 @@
 #include <assert.h>
 
 #include "hbcomp.h"
+
+static int hb_comp_iBaseLine;
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc );
 static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc );
@@ -752,15 +754,24 @@ static HB_GENC_FUNC( hb_p_lessequal )
 static HB_GENC_FUNC( hb_p_line )
 {
    if( cargo->bVerbose )
+   {
       fprintf( cargo->yyc, "/* %05li */ ", lPCodePos );
+   }
    else
+   {
       fprintf( cargo->yyc, "\t" );
-   fprintf( cargo->yyc, "HB_P_LINE, %i, %i,",
-            pFunc->pCode[ lPCodePos + 1 ],
-            pFunc->pCode[ lPCodePos + 2 ] );
+   }
+
+   fprintf( cargo->yyc, "HB_P_LINE, %i, %i,", pFunc->pCode[ lPCodePos + 1 ], pFunc->pCode[ lPCodePos + 2 ] );
+
    if( cargo->bVerbose )
-      fprintf( cargo->yyc, "\t/* %i */", pFunc->pCode[ lPCodePos + 1 ] + pFunc->pCode[ lPCodePos + 2 ] * 256 );
+   {
+      hb_comp_iBaseLine = pFunc->pCode[ lPCodePos + 1 ] + pFunc->pCode[ lPCodePos + 2 ] * 256;
+      fprintf( cargo->yyc, "\t/* %i */", hb_comp_iBaseLine );
+   }
+
    fprintf( cargo->yyc, "\n" );
+
    return 3;
 }
 
@@ -1957,11 +1968,49 @@ static HB_GENC_FUNC( hb_p_substr )
 
 static HB_GENC_FUNC( hb_p_lineoffset )
 {
-   fprintf( cargo->yyc, "\tHB_P_LINEOFFSET, %i,",
-            pFunc->pCode[ lPCodePos + 1 ] );
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "/* %05li */ ", lPCodePos );
+   }
+   else
+   {
+      fprintf( cargo->yyc, "\t" );
+   }
+
+   fprintf( cargo->yyc, "HB_P_LINEOFFSET, %i,", pFunc->pCode[ lPCodePos + 1 ] );
+
+   if( cargo->bVerbose )
+   {
+      hb_comp_iBaseLine += pFunc->pCode[ lPCodePos + 1 ];
+      fprintf( cargo->yyc, "\t/* %i */", hb_comp_iBaseLine  );
+   }
+   fprintf( cargo->yyc, "\n" );
+
+   return 2;
+}
+
+static HB_GENC_FUNC( hb_p_baseline )
+{
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "/* %05li */ ", lPCodePos );
+   }
+   else
+   {
+      fprintf( cargo->yyc, "\t" );
+   }
+
+   fprintf( cargo->yyc, "HB_P_BASELINE, %i, %i,", pFunc->pCode[ lPCodePos + 1 ], pFunc->pCode[ lPCodePos + 2 ] );
+
+   if( cargo->bVerbose )
+   {
+      hb_comp_iBaseLine = pFunc->pCode[ lPCodePos + 1 ] + pFunc->pCode[ lPCodePos + 2 ] * 256;
+      fprintf( cargo->yyc, "\t/* %i */", hb_comp_iBaseLine );
+   }
 
    fprintf( cargo->yyc, "\n" );
-   return 2;
+
+   return 3;
 }
 
 /* NOTE: The  order of functions have to match the order of opcodes
@@ -2103,6 +2152,7 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_right,
    hb_p_substr,
    hb_p_dummy,
+   hb_p_baseline,
    hb_p_lineoffset
 };
 

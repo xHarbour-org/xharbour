@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.5 2002/03/09 20:04:23 ronpinkas Exp $
+ * $Id: harbour.c,v 1.6 2002/03/10 00:13:09 ronpinkas Exp $
  */
 
 /*
@@ -145,7 +145,7 @@ INLINES        hb_comp_inlines;
 /* various compatibility flags (-k switch) */
 ULONG          hb_comp_Supported;
 
-int hb_comp_iLastLine;
+int hb_comp_iBaseLine;
 int hb_comp_ulLastOffsetPos;
 
 /* EXTERNAL statement can be placed into any place in a function - this flag is
@@ -1457,7 +1457,6 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    PCOMSYMBOL   pSym;
    PFUNCTION pFunc;
    char * szFunction;
-   int iLine = hb_comp_iLine - 1;
 
    hb_compFinalizeFunction();    /* fix all previous function returns offsets */
 
@@ -1510,7 +1509,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    hb_compGenPCode3( HB_P_FRAME, 0, 0, ( BOOL ) 0 );   /* frame for locals and parameters */
    hb_compGenPCode3( HB_P_SFRAME, 0, 0, ( BOOL ) 0 );     /* frame for statics variables */
 
-   hb_comp_iLastLine = hb_comp_iLine;
+   hb_comp_iBaseLine = 0;
 
    if( hb_comp_bDebugInfo )
    {
@@ -2432,18 +2431,32 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
 {
    if( hb_comp_bLineNumbers && ! hb_comp_bDontGenLineNum )
    {
-      int iOffset = hb_comp_iLine - hb_comp_iLastLine;
-
-      hb_comp_iLastLine = hb_comp_iLine;
+      int iLine = hb_comp_iLine - 1;
+      int iOffset = hb_comp_iLine - hb_comp_iBaseLine;
 
       //printf( "Line: %i, Offset %i LastPos %i, Pos %i\n", hb_comp_iLine, iOffset, hb_comp_ulLastOffsetPos, hb_comp_functions.pLast->lPCodePos );
 
-      // We want each function to start with actual line number not offset. hb_comp_ulLastLinePos is reset every top of function.
-      if( hb_comp_ulLastLinePos && iOffset > -1 && iOffset < 256 )
+      if( hb_comp_iBaseLine == 0 )
+      {
+         hb_comp_iBaseLine = hb_comp_iLine;
+         hb_comp_ulLastLinePos = hb_comp_functions.pLast->lPCodePos;
+         hb_compGenPCode3( HB_P_BASELINE, HB_LOBYTE( iLine ), HB_HIBYTE( iLine ), ( BOOL ) 0 );
+      }
+      else if( iOffset < 256 )
       {
          if( iOffset )
          {
-            if( ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastOffsetPos ) > 2 ) || hb_comp_bDebugInfo )
+            if( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastLinePos ) == 3 )
+            {
+               if( hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos ] == HB_P_BASELINE )
+               {
+                  hb_comp_iBaseLine = hb_comp_iLine;
+               }
+
+               hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +1 ] = HB_LOBYTE( iLine );
+               hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +2 ] = HB_HIBYTE( iLine );
+            }
+            else if( ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastOffsetPos ) > 2 ) || hb_comp_bDebugInfo )
             {
                hb_comp_ulLastOffsetPos = hb_comp_functions.pLast->lPCodePos;
                hb_compGenPCode2( HB_P_LINEOFFSET, (BYTE) iOffset, ( BOOL ) 0 );
@@ -2456,15 +2469,11 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
       }
       else if( ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastLinePos ) > 3 ) || hb_comp_bDebugInfo )
       {
-         int iLine = hb_comp_iLine - 1;
-
          hb_comp_ulLastLinePos = hb_comp_functions.pLast->lPCodePos;
          hb_compGenPCode3( HB_P_LINE, HB_LOBYTE( iLine ), HB_HIBYTE( iLine ), ( BOOL ) 0 );
       }
       else
       {
-         int iLine = hb_comp_iLine - 1;
-
          hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +1 ] = HB_LOBYTE( iLine );
          hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +2 ] = HB_HIBYTE( iLine );
       }
@@ -3830,7 +3839,7 @@ static void hb_compInitVars( void )
    hb_comp_bAnyWarning      = FALSE;
 
    hb_comp_iLine           = 1;
-   hb_comp_iLastLine       = 1;
+   hb_comp_iBaseLine       = 0;
    hb_comp_iFunctionCnt    = 0;
    hb_comp_iErrorCount     = 0;
    hb_comp_cVarType        = ' ';
