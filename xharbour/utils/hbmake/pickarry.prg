@@ -1,5 +1,5 @@
 /*
- * $Id: pickarry.prg,v 1.10 2005/01/17 20:42:00 modalsist Exp $
+ * $Id: pickarry.prg,v 1.12 2005/03/31 16:54:00 modalsist Exp $
  */
  * xHarbour Project source code:
  * hbmake.prg xHarbour make utility main file
@@ -77,13 +77,14 @@ DEFAULT cTitle to ""
 DEFAULT lLib to .F.
 
 
-   someitems := 0
+   SOMEITEMS := 0
 
-   putscreen()
+   PutScreen()
+
    Setcolor( 'gr+/rb,b+/w,w+/b,w/b+,w/b,w+/b' )
+
    @ T - 2, L - 1 CLEAR TO b + 1, r + 1
    @ T - 2, L say cTitle
-// @ T - 1, L - 1 CLEAR TO b + 1, r + 1
    @ T - 1, L - 1 TO b + 1, r + 1 double
 
    FOR x := 1 TO NUM_ELEMS
@@ -133,7 +134,10 @@ DEFAULT lLib to .F.
 
    Clear TypeAhead
 
+
    WHILE nChoice != 0
+
+      @T,L CLEAR TO b, r
 
       nChoice := AChoice( T, L, b, r, IN_ARRAY,, 'keys', nChoice, 1 )
 
@@ -141,7 +145,7 @@ DEFAULT lLib to .F.
 
          if lAllowAll
 
-            if lAdd
+            if lAdd   // only if F5 was pressed
 
                For nChoice :=  1 to NUM_ELEMS
 
@@ -168,7 +172,7 @@ DEFAULT lLib to .F.
               IF lIsChecked
                  SOMEITEMS --
               ELSE
-                SOMEITEMS ++
+                 SOMEITEMS ++
               ENDIF
 
               nChoice ++
@@ -187,8 +191,6 @@ DEFAULT lLib to .F.
             ELSE
                SOMEITEMS ++
             ENDIF
-
-            nChoice ++
 
          endif
 
@@ -217,6 +219,7 @@ FUNCTION Keys( MODE )
 LOCAL RETVAL := AC_CONT
 LOCAL THEKEY := Lastkey()
 
+
    IF MODE = AC_HITTOP 
       KEYBOARD Chr( 30 )
 
@@ -225,9 +228,9 @@ LOCAL THEKEY := Lastkey()
 
    ELSEIF MODE = AC_EXCEPT 
 
-      IF THEKEY = 32
+      IF THEKEY = 32       // space bar to select/unselect
          RETVAL := AC_SELECT
-      ELSEIF THEKEY == -4 //F5
+      ELSEIF THEKEY == -4  // F5 (select all itens)
          lAdd := !lAdd
          RETVAL := AC_SELECT
       ELSEIF THEKEY = 27

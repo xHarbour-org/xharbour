@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.142 2005/03/14 11:11:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.143 2005/03/31 16:55:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -69,7 +69,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion := "1.142"
+STATIC s_cHbMakeVersion := "1.143"
 STATIC s_lPrint          := .F.
 STATIC s_aDefines        := {}
 STATIC s_aBuildOrder     := {}
