@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.4 2003/08/18 12:13:46 druzus Exp $
+# $Id: makefile.bc,v 1.5 2003/09/08 12:56:52 druzus Exp $
 #
 
 #
@@ -359,7 +359,7 @@ $(OBJ_DIR)\screen1.obj : $(TOOLS_DIR)\screen1.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\setlast.obj : $(OBJ_DIR)\setlast.c
+$(OBJ_DIR)\setlast.obj : $(TOOLS_DIR)\setlast.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
