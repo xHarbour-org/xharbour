@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.66 2004/03/22 23:32:29 andijahja Exp $
+ * $Id: genc.c,v 1.67 2004/03/22 23:39:56 andijahja Exp $
  */
 
 /*
@@ -150,7 +150,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
    hb_strupr( hb_comp_FileAsSymbol );
 
    {
-       int iTmp = strlen(hb_comp_FileAsSymbol);
+       int iTmp = strlen( hb_comp_FileAsSymbol );
        int iCh;
 
        for ( iCh = 0; iCh < iTmp; iCh ++ )
@@ -161,6 +161,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
                ( hb_comp_FileAsSymbol[ iCh ] == '%' ) ||
                ( hb_comp_FileAsSymbol[ iCh ] == '\'') ||
                ( hb_comp_FileAsSymbol[ iCh ] == ')' ) ||
+               ( hb_comp_FileAsSymbol[ iCh ] == '(' ) ||
                ( hb_comp_FileAsSymbol[ iCh ] == ' ' ) ||
                ( hb_comp_FileAsSymbol[ iCh ] == '-' ) ||
                ( hb_comp_FileAsSymbol[ iCh ] == '@' ) ||
