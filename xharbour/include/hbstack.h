@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.3 2002/01/21 23:20:31 mauriliolongo Exp $
+ * $Id: hbstack.h,v 1.2 2002/01/21 23:42:31 ronpinkas Exp $
  */
 
 /*
@@ -85,10 +85,10 @@ typedef struct
    LONG iStatics;
 } HB_STACK_STATE;    /* used to save/restore stack state in hb_vmDo)_ */
 
-#if defined(HB_STACK_MACROS)
+#if 1 //defined(HB_STACK_MACROS)
 
 #define hb_stackItemFromTop( n )    ( * ( hb_stack.pPos + (n) ) )
-#define hb_stackItemFromBase( n )   ( * ( hb_stack.pBase + (n) + 1 ) )
+#define hb_stackItemFromBase( n )   ( ( *hb_stack.pBase )->item.asSymbol.paramcnt < 255 ? *( hb_stack.pBase + (n) + 1 ) : *( hb_stack.pBase + (n) + 1 + ( *hb_stack.pBase )->item.asSymbol.paramcnt - 256 ) )
 #define hb_stackTopOffset( )        ( hb_stack.pPos - hb_stack.pItems )
 #define hb_stackBaseOffset( )       ( hb_stack.pBase - hb_stack.pItems + 1)
 #define hb_stackTopItem( )          ( * hb_stack.pPos )
