@@ -8,8 +8,9 @@ Syntax:
    -----------
 
    C STRUCTURE <strucName> [Align <nAlign>]
-     MEMBER <memberName>   AS <CTYPEDEF>
-     ...
+     MEMBER <memberName> AS <CTYPEDEF>
+     [ MEMBER <memberName> AS C STRUCTURE <strucName> ]
+     [ ... ]
    END C STRUCTURE
 
 
