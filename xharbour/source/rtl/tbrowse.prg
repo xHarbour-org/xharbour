@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.68 2004/04/20 05:18:43 bdj Exp $
+ * $Id: tbrowse.prg,v 1.69 2004/04/22 10:10:53 bdj Exp $
  */
 
 /*
@@ -1623,12 +1623,11 @@ METHOD ForceStable() CLASS TBrowse
    // This is a hack to force TBrowse honors initial rowpos
    // This may be a very dirty approach
 
-   local i, nInitRow
+   local i
 
    If !::lInitRow
-      nInitRow  := ::RowPos
-      If nInitRow != 1
-         for i := 1 to nInitRow - 1
+      If ::rowPos != 1
+         for i := ::rowPos + 1 to ::rowCount
             ::Down()
             ::ForceStabilize()
          next
