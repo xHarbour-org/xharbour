@@ -45,6 +45,7 @@ CLASS TComboBox FROM TControl
    METHOD GetCount()                INLINE ::SendMessage( CB_GETCOUNT, 0, 0)
    METHOD GetCurSel()               INLINE ::SendMessage( CB_GETCURSEL, 0, 0)
    METHOD Dir(nAttr, cFileSpec)     INLINE ::SendMessage( CB_DIR, nAttr, cFileSpec)
+   METHOD SetItemHeight(n,nHeight)  INLINE ::SendMessage( CB_SETITEMHEIGHT, n, nHeight )
    METHOD OnCreate()
    METHOD CBProc()
 ENDCLASS
@@ -74,6 +75,7 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight, lOdraw ) CLASS TComboBox
 
 METHOD OnCreate() CLASS TComboBox
 if ::oDraw
+   ::SetItemHeight( -1, 15 )
    ::npProc := SetProcedure( ::Parent:handle, HB_ObjMsgPtr( self, "CBProc" ), {WM_DRAWITEM}, self)
 endif
 return(super:OnCreate())
