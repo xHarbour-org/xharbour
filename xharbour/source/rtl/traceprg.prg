@@ -1,5 +1,5 @@
 /*
- * $Id: traceprg.prg,v 1.2 2002/01/31 05:40:18 ronpinkas Exp $
+ * $Id: traceprg.prg,v 1.3 2002/01/31 05:57:24 ronpinkas Exp $
  */
 
 /*
@@ -52,15 +52,15 @@
 #DEFINE  CRLF HB_OsNewLine()
 
 //--------------------------------------------------------------//
-FUNCTION TraceLog( p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 )
+FUNCTION TraceLog( ... )
 
-   LOCAL FileHandle, ProcName, Counter := 1, aParams, nParams := PCount()
+   LOCAL FileHandle, Counter := 0, ProcName, aParams, xParam
 
    IF ! SET( _SET_TRACE )
       RETURN .T.
    ENDIF
 
-   aParams := { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 }
+   aParams := HB_aParams()
 
    FileHandle := FOpen( 'Trace.Log', 1 )
 
@@ -72,8 +72,8 @@ FUNCTION TraceLog( p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, 
       FWrite( FileHandle, space(30) + ProcName + '(' + Str( Procline( Counter), 5 ) + ')' + CRLF )
    ENDDO
 
-   FOR Counter := 1 to nParams
-      FWrite( FileHandle, '>>>' + CStr( aParams[Counter] ) + '<<<' + CRLF )
+   FOR EACH xParam IN aParams
+      FWrite( FileHandle, '>>>' + CStr( xParam ) + '<<<' + CRLF )
    NEXT
 
    FWrite( FileHandle, CRLF )
