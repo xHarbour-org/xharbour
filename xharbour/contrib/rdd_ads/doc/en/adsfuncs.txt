@@ -1,5 +1,5 @@
 /*
- * $Id: adsfuncs.txt,v 1.5 2002/12/17 18:52:55 brianhays Exp $
+ * $Id: adsfuncs.txt,v 1.1 2003/06/01 14:00:31 lculik Exp $
  */
 
 /*
@@ -143,7 +143,7 @@
  *      ADS_AOF_ADD_RECORD      Add the record to the AOF (set the bit). This is the default operation.
  *      ADS_AOF_REMOVE_RECORD   Remove the record from the AOF (clear the bit).
  *      ADS_AOF_TOGGLE_RECORD   Switch the record into or out of the AOF.
- *  </table>
+ *      </table>
  *  $RETURNS$
  *      <nError>  ADS error code, or 0 for success.
  *  $DESCRIPTION$
@@ -586,8 +586,6 @@
  *      file is opened, the current setting is used for that file until it is
  *      closed. Different files can have different locking modes by changing
  *      the setting before opening a second file.
- *  $EXAMPLES$
- *  $TESTS$
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
@@ -670,7 +668,6 @@
  *      DLLs doing all the indexing. So to do progress meters
  *      you need to implement this.
  *  $EXAMPLES$
- *       <table>
  *       FUNCTION Main()
  *          ...
  *          AdsRegCallBack( {|nPercent| outputstuff(nPercent)}  )
@@ -685,8 +682,6 @@
  *          ? "output stuff", nPercent
  *       RETURN inkey() == 27
  *       /*  If press ESC, returns .T. to abort.   */
- *      </table>
- *  $TESTS$
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
