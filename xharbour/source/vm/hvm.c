@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.88 2002/08/09 16:50:55 ronpinkas Exp $
+ * $Id: hvm.c,v 1.89 2002/08/11 04:03:32 ronpinkas Exp $
  */
 
 /*
@@ -2777,7 +2777,7 @@ static void hb_vmDec( void )
    {
       pItem->item.asDate.value--;
    }
-   if( HB_IS_NUMERIC( pItem ) )
+   else if( HB_IS_NUMERIC( pItem ) )
    {
       int iDec, iType = pItem->type;
       double dNumber = hb_vmPopDouble( &iDec );
