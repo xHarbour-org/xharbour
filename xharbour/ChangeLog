@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.293 2002/06/29 13:03:33 lculik Exp $
+ * $Id: ChangeLog,v 1.294 2002/06/30 19:51:43 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-07-02 10:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/filesys.c
+    source/common/hbffind.c
+    ! Fixed Error values for djgpp(Djgpp error.h values is diferent from other C compilers)
+  * utils/hbtest/rt_file.prg
+    * Fixed the test for File( cFileName ), The file exist when this test is done, so i've correct the error value
+       
 2002-06-30 17:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + contrib/hbzlib/*.*
     + Added all files need to build hbzlib and zlib

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.13 2002/04/01 21:09:17 ronpinkas Exp $
+ * $Id: filesys.c,v 1.14 2002/04/17 17:16:09 lculik Exp $
  */
 
 /*
@@ -271,6 +271,14 @@ static USHORT s_uiErrorLast = 0;
    #define LARGE_MAX ( UINT_MAX - 1L )
 #endif
 
+#ifdef __WIN32__
+   #if !defined(__BORLANDC__)
+      extern int WintoDosError(DWORD dwError);
+   #else
+      extern int __IOerror(int dosErr);
+      extern int __NTerror     (void);
+   #endif
+#endif
 /* Convert HARBOUR flags to IO subsystem flags */
 
 #if defined(HB_FS_FILE_IO)
@@ -1115,10 +1123,20 @@ BOOL hb_fsDelete( BYTE * pFilename )
    HB_TRACE(HB_TR_DEBUG, ("hb_fsDelete(%s)", (char*) pFilename));
 
 #if defined(HB_OS_WIN_32)
-
+/*
+   errno = 0;
    bResult = DeleteFile( ( char * ) pFilename );
-   s_uiErrorLast = ( USHORT ) GetLastError();
-
+   errno = ( USHORT ) GetLastError();
+   s_uiErrorLast = errno;
+*/
+   if ((bResult = DeleteFile( ( char * ) pFilename ))==0)
+      #if !defined(__BORLANDC__)
+         errno=WintoDosError(GetLastError());
+      #else
+         __NTerror();
+      #endif
+   s_uiErrorLast = errno;
+   
 #elif defined(HAVE_POSIX_IO)
 
    errno = 0;
@@ -1149,8 +1167,17 @@ BOOL hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 
 #if defined(HB_OS_WIN_32)
 
-   bResult = MoveFile( ( char * ) pOldName, ( char * ) pNewName );
-   s_uiErrorLast = ( USHORT ) GetLastError();
+/*   bResult = MoveFile( ( char * ) pOldName, ( char * ) pNewName );
+   s_uiErrorLast = ( USHORT ) GetLastError(); */
+   errno=0;
+   if ((bResult = MoveFile( ( char * ) pOldName, ( char * ) pNewName ))==0)
+      #if !defined(__BORLANDC__)
+         errno=WintoDosError(GetLastError());
+      #else
+         __NTerror();
+      #endif
+   s_uiErrorLast = errno;
+
 
 #elif defined(HB_FS_FILE_IO)
 

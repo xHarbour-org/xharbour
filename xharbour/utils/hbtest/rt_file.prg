@@ -1,5 +1,5 @@
 /*
- * $Id: rt_file.prg,v 1.3 2001/05/15 13:02:07 vszakats Exp $
+ * $Id: rt_file.prg,v 1.1.1.1 2001/12/21 10:44:40 ronpinkas Exp $
  */
 
 /*
@@ -209,7 +209,7 @@ FUNCTION Main_FILE()
    TEST_LINE( TESTFIER( FErase( "NOT_HERE.$$$" ) )                     , 'E: 2      R: -1'                 )
    TEST_LINE( TESTFIER( FRename( "NOT_HERE.$$$", 'A' ) )               , 'E: 2      R: -1'                 )
 
-   TEST_LINE( TESTFIER( File( cFileName ) )                            , "E: 2      R: .T."    )
+   TEST_LINE( TESTFIER( File( cFileName ) )                            , "E: 0      R: .T."    )
    TEST_LINE( TESTFIER( File( "NOT_HERE.$$$" ) )                       , "E: 2      R: .F."    )
 
    FErase("$$FILEIO.TMP")
