@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.51 2003/06/20 20:58:53 walito Exp $
+ * $Id: tget.prg,v 1.52 2003/06/22 05:34:29 ronpinkas Exp $
  */
 
 /*
@@ -1606,6 +1606,11 @@ METHOD HitTest(mrow,mcol) CLASS GET
         if ::row != mrow
            return HTNOWHERE
         endif
+
+        IF ::ndispLen == NIL
+           ::nDispLen := 1
+        ENDIF
+
         if mcol >= ::col .and. mcol <= ::col+::ndispLen+if( ::cDelimit == NIL, 0, 2 )
            return HTCLIENT
         endif
