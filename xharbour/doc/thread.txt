@@ -49,10 +49,12 @@ StartThread
       but it will wait until proper thread resources have been allocated into
       the virtual machine.
 
-      The return value is a Thread identifier; rarely, it could assume the
-      value of 0 if the operating system can't start any more thread due to
-      i.e. limited resources; Any way, the programmer is advised to consider
-      it being an unusable kind of object.
+      The return value is a Thread Pseudo Object. This pseudo object carries
+      data about the state of the thread; if the function call is sucessful,
+      IsValidThread( THREAID ) will return .T.
+      The thread pseudo object is used in all the functions of the multithreading
+      system, and remains valid even after child thread termination, so you can
+      safely store this value somewhere and use it later on.
 
 StopThread
 
@@ -95,11 +97,75 @@ ThreadGetCurrent
       ThreadGetCurrent()  --> THREAD
 
    Description
+      [THIS FUNCTION IS NOW DEPRECATED IN FAVOR OF GETCURRENTTHREAD]
 
-      This function returns the thread handle of the current thread. This 
-      object can be stored and can be used by other threads to refer to this 
-      one, to stop it with StopThread() or KillThread(), or to join it using
-      JoinThread().
+
+GetCurrentThread
+
+   Syntax
+      GetCurrentThread()  --> THREAD
+
+   Description
+      This function returns a thread pseudo object identifying of the current
+      thread. This object can be stored and can be used by other threads to
+      refer to this one, to stop it with StopThread() or KillThread(), or to join
+      it using JoinThread(). It can be used also to determine if a given thread
+      pseudo object is referencing this thread wit the function IsSameThread().
+
+
+GetThreadId
+
+   Syntax
+      GetThreadId( THREAD )  --> nThreadNumber
+
+   Description
+      This function returns the number that xharbour virtual machine associates
+      with each thread it creates. For every implementation, under every
+      operating system, it is granted that:
+
+      1) Main thread ID is 1:
+         Procedure MAIN()
+            GetThreadId( GetCurrentThread() ) == 1
+
+      2) Thread ID are assigned sequentially:
+         TH1 := StartThread( ... )
+         TH2 := StartThread( ... )
+         GetThreadId( TH1 ) < GetThreadId( TH2 )
+
+      3) If two thread Pseudo Objects have the same ID, they reference
+         the same thread:
+         IF GetThreadId( TH1 ) == GetThreadId( TH2 )
+            //TH1 and TH2 are referencing the same thread
+
+      4) An invalid parameter, or an invalid thread object, rises an error.
+
+
+
+IsValidThread
+
+   Syntax
+      IsValidThread( xThing ) --> lValid
+
+   Description
+      This function returns true if the given parameter is a valid thread
+      pseudo object, that is:
+      1) if the parameter is exactly of kind THREAD
+      2) if the thread is started or going to start correctly.
+
+
+
+
+IsSameThread
+
+   Syntax
+      IsSameThread( TH1, TH2 ) --> lAreSame
+
+   Description
+      Returns true if TH1 and TH2 are the same, or are referencing the same
+      valid thread.
+      If one or both the parameters refer to invalid threads, an error is
+      risen.
+
 
 
 JoinThread
@@ -156,10 +222,12 @@ To achieve this results, the mutex must be shared among several threads. This
 can be done by passing the mutex as one of the StartThread parameters, or 
 having the mutex as a global variable.
 
-CreateMutex
+NOTE: the functions in this section may be preceded with HB_ prefix.
+
+MutexCreate
    
    Syntax
-      CreateMutex() --> MUTEX
+      MutexCreate() --> MUTEX
 
    Description
       Creates a mutex. You should store the return value in a global module 
@@ -167,16 +235,12 @@ CreateMutex
       threads.
 
 DestroyMutex
-   
+
    Syntax
       DestroyMutex( MUTEX ) --> NIL
 
    Description
-      This function will destroy the mutex and will free all resources 
-      associated with it; calling DestroyMutex on a mutex that is still in 
-      use has unpredictable results. For this reason, this function should
-      be used only on program termination, or when the program can be sure
-      the mutex won't be used anymore.
+      [THIS FUNCTION IS DEPRECATED AND SHOULD NEVER BE USED]
 
 
 MutexLock
@@ -189,10 +253,35 @@ MutexLock
       locked by any other thread; when the mutex is free, the execution of
       the current thread continues and the mutex is locked so that any other
       thread trying to achieve a lock will have to wait.
+
       xHarbour mutexes are reentrant. This means that the thread that is
       currently the owner of the lock on the mutex could possibly lock again
       the same mutex any number of times, provided it calls MutexUnlock() the
       same number of times MutexLock() is called.
+
+      Xharbour support cancellable mutex waits. This means that a thread may
+      be canceled while waiting for a mutex. If this happens, the canceled
+      thread will NOT hold the mutex. If a thread is canceled while holding
+      a mutex, the mutex will be automatically freed.
+
+      Anyhow, avoid it. If you feel the need to cancel a thread waiting or
+      holding a mutex, there's something wrong with your multithreading
+      programming technique. This support is provided only for emergency
+      recovery.
+
+
+MutexTryLock
+
+   Syntax
+      MutexTryLock( MUTEX ) --> lAchieved
+
+   Description
+      This functions acts as MutexLock, but if the lock cannot be immediately
+      achieved, the function returns false. If lock has been achieved, it
+      returns true.
+
+
+
 
 MutexUnlock
 
@@ -201,11 +290,12 @@ MutexUnlock
 
    Default
       Unlocks the target mutex; if  one thread was waiting to achieve a lock on
-      that mutex, it will be resumed as soon as possible. If more than one 
+      that mutex, it will be resumed as soon as possible. If more than one
       thread was waiting, the resumed thread could be any one of the waiting 
       thread, depending on a scheme varying from system to system. Any way, 
       operative systems ensures that the lock is granted to each thread in 
       a fair way.
+
 
 Subscribe
    
@@ -240,7 +330,7 @@ Subscribe
       is resumed after notification or after the timeout is passed, the lock on
       the mutex is achieved again before the control passes to the next 
       instruction.
-      This allows ?stop and go? programming schemes, where the subscribing
+      This allows "stop and go" programming schemes, where the subscribing
       thread locks a resources, does some operations, then put itself in a 
       waiting state, allowing other threads to lock the mutex at their needs;
       then, when that other threads notify the waiting one, they must release 
@@ -331,34 +421,3 @@ NotifyAll
       function).
 
       
-
-Console locking functions
--------------------------
-   
-Although single text based console input/output operations, like @...SAY...GET, 
-are thread safe, some threads might be willing to execute a set of screen 
-related commands without being interrupted by other threads. Although this 
-can be achieved by sharing a mutex created using CreateMutex() among the 
-involved threads, xHBthreads puts the internal console mutex at programmer's 
-disposal.
-
-
-HBConsoleLock
-   
-   Syntax
-      HBConsoleLock() --> NIL
-   
-   Description
-      Achieve the lock on the xHarbour console. The thread that succeeds in 
-      locking the console will be able to access console input/output in an
-      exclusive manner.
-      
-
-HBConsoleUnlock
-   
-   Syntax
-      HBConsoleUnlock() --> NIL
-
-   Description
-         Releases the lock on xHarbour console.
-
