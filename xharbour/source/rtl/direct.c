@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.10 2002/01/15 03:21:36 paultucker Exp $
+ * $Id: direct.c,v 1.3 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -170,7 +170,11 @@ HB_FUNC( DIRECTORY )
             char buffer[ 32 ];
 
             hb_arraySet( pSubarray, F_NAME, hb_itemPutC( pFilename, ffind->szName ) );
+            #ifndef HB_LONG_DOUBLE_OFF
+            hb_arraySet( pSubarray, F_SIZE, hb_itemPutNLD( pSize, ffind->size ) );
+            #else
             hb_arraySet( pSubarray, F_SIZE, hb_itemPutNL( pSize, ffind->size ) );
+            #endif
             hb_arraySet( pSubarray, F_DATE, hb_itemPutDL( pDate, ffind->lDate ) );
             hb_arraySet( pSubarray, F_TIME, hb_itemPutC( pTime, ffind->szTime ) );
             hb_arraySet( pSubarray, F_ATTR, hb_itemPutC( pAttr, hb_fsAttrDecode( ffind->attr, buffer ) ) );

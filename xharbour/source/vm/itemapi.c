@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.38 2003/05/28 11:59:07 druzus Exp $
+ * $Id: itemapi.c,v 1.39 2003/06/06 06:45:10 druzus Exp $
  */
 
 /*
@@ -446,6 +446,12 @@ BOOL HB_EXPORT hb_itemGetL( PHB_ITEM pItem )
 
          case HB_IT_DOUBLE:
             return pItem->item.asDouble.value != 0.0;
+
+         #ifndef HB_LONG_DOUBLE_OFF
+         case HB_IT_LDOUBLE:
+            return pItem->item.asLDouble.value != 0.0;
+         #endif
+
       }
    }
 
@@ -462,6 +468,11 @@ double HB_EXPORT hb_itemGetND( PHB_ITEM pItem )
       {
          case HB_IT_DOUBLE:
             return pItem->item.asDouble.value;
+
+         #ifndef HB_LONG_DOUBLE_OFF
+         case HB_IT_LDOUBLE:
+            return (double) pItem->item.asLDouble.value;
+         #endif
 
          case HB_IT_INTEGER:
             return ( double ) pItem->item.asInteger.value;
@@ -917,6 +928,20 @@ void HB_EXPORT hb_itemGetNLen( PHB_ITEM pItem, int * piWidth, int * piDecimal )
    {
       switch( pItem->type )
       {
+        #ifndef HB_LONG_DOUBLE_OFF
+         case HB_IT_LDOUBLE:
+            if( piWidth )
+            {
+               *piWidth = ( int ) pItem->item.asLDouble.length;
+            }
+
+            if( piDecimal )
+            {
+               *piDecimal = ( int ) pItem->item.asLDouble.decimal;
+            }
+            break;
+         #endif
+
          case HB_IT_DOUBLE:
             if( piWidth )
             {
@@ -1029,6 +1054,9 @@ char HB_EXPORT * hb_itemTypeStr( PHB_ITEM pItem )
       case HB_IT_INTEGER:
       case HB_IT_LONG:
       case HB_IT_DOUBLE:
+      #ifndef HB_LONG_DOUBLE_OFF
+      case HB_IT_LDOUBLE:
+      #endif
          return "N";
 
       case HB_IT_STRING:
@@ -1331,15 +1359,22 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
 
          /* Be paranoid and use a large amount of padding */
          szResult = ( char * ) hb_xgrab( HB_MAX_DOUBLE_LENGTH );
-
-         if( HB_IS_DOUBLE( pNumber ) || iDec != 0 )
+         #ifndef HB_LONG_DOUBLE_OFF
+         if(HB_IS_LDOUBLE( pNumber ) ||  HB_IS_DOUBLE( pNumber ) || iDec != 0  )
+         #else
+         if( HB_IS_DOUBLE( pNumber ) || iDec != 0  )
+         #endif
          {
+         #ifndef HB_LONG_DOUBLE_OFF
+            long double dNumber = hb_itemGetNLD( pNumber );
+         #else
             double dNumber = hb_itemGetND( pNumber );
-
+         #endif
             /* #if defined(__BORLANDC__) || defined(__WATCOMC__) */
             /* added infinity check for Borland C [martin vogel] */
             #if defined(__WATCOMC__)
             #else
+            #
             static double s_dInfinity = 0;
             static double s_bInfinityInit = FALSE;
 
@@ -1395,6 +1430,13 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                   dNumber = hb_numRound( dNumber, iDec );
                }
 
+               #ifndef HB_LONG_DOUBLE_OFF
+               if( HB_IS_LDOUBLE( pNumber ) && iDec < pNumber->item.asDouble.decimal )
+               {
+                  dNumber = hb_numRound( dNumber, iDec );
+               }
+               #endif
+
                if( dNumber != 0.0 )
                {
                   iDecR = 15 - ( int ) log10( fabs( dNumber ) );
@@ -1412,13 +1454,23 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                {
                   if( iDec == 0 )
                   {
+                     #ifndef HB_LONG_DOUBLE_OFF
+                     iBytes = sprintf( szResult, "%*.0Lf", iSize, dNumber );
+                     #else
                      iBytes = sprintf( szResult, "%*.0f", iSize, dNumber );
+                     #endif
+
                   }
                   else
                   {
                      if( iDec <=  iDecR )
                      {
+                        #ifndef HB_LONG_DOUBLE_OFF
+                        iBytes = sprintf( szResult, "%*.*Lf", iSize, iDec, dNumber );
+                        #else
                         iBytes = sprintf( szResult, "%*.*f", iSize, iDec, dNumber );
+                        #endif
+
                      }
                      else
                      {
@@ -1426,8 +1478,12 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                         {
                            iDecR++;
                         }
-
+                        #ifndef HB_LONG_DOUBLE_OFF
+                        iBytes = sprintf( szResult, "%*.*Lf%0*u", iSize-iDec+iDecR, iDecR, dNumber, iDec-iDecR, 0 );
+                        #else
                         iBytes = sprintf( szResult, "%*.*f%0*u", iSize-iDec+iDecR, iDecR, dNumber, iDec-iDecR, 0 );
+                        #endif
+
                      }
                   }
                }
@@ -1435,11 +1491,20 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                {
                   if( iDec == 0 )
                   {
+                     #ifndef HB_LONG_DOUBLE_OFF
+                     iBytes = sprintf( szResult, "%*.0Lf%0*u", iSize + iDecR , dNumber / pow( 10.0, ( double ) ( -iDecR ) ), -iDecR, 0 );
+                     #else
                      iBytes = sprintf( szResult, "%*.0f%0*u", iSize + iDecR , dNumber / pow( 10.0, ( double ) ( -iDecR ) ), -iDecR, 0 );
+                     #endif
+
                   }
                   else
                   {
+                     #ifndef HB_LONG_DOUBLE_OFF
+                     iBytes = sprintf( szResult, "%*.0Lf%0*u.%0*u", (iSize + iDecR - iDec - 1) > 0 ? iSize + iDecR - iDec - 1 : iSize - iDec - 1  , dNumber / pow( 10.0, ( double ) ( -iDecR ) ), -iDecR, 0, iDec, 0 );
+                     #else
                      iBytes = sprintf( szResult, "%*.0f%0*u.%0*u", (iSize + iDecR - iDec - 1) > 0 ? iSize + iDecR - iDec - 1 : iSize - iDec - 1  , dNumber / pow( 10.0, ( double ) ( -iDecR ) ), -iDecR, 0, iDec, 0 );
+                     #endif
                   }
                }
             }
@@ -1520,6 +1585,9 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
          }
          break;
 
+      #ifndef HB_LONG_DOUBLE_OFF
+      case HB_IT_LDOUBLE:
+      #endif
       case HB_IT_DOUBLE:
       case HB_IT_INTEGER:
       case HB_IT_LONG:
@@ -1605,6 +1673,17 @@ char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, char * buffer, ULONG * pulSize 
          szText = buffer;
          *pulSize = strlen( szText );
       }
+      #ifndef HB_LONG_DOUBLE_OFF
+      else if( HB_IS_LDOUBLE( pItem ) )
+      {
+         int iDecimal;
+
+         hb_itemGetNLen( pItem, NULL, &iDecimal );
+         sprintf( buffer, "%.*f", iDecimal, hb_itemGetNLD( pItem ) );
+         szText = buffer;
+         *pulSize = strlen( szText );
+      }
+      #endif
       else
       {
          szText = NULL;
@@ -1640,3 +1719,109 @@ PHB_ITEM HB_EXPORT hb_itemValToStr( PHB_ITEM pItem )
 
    return pResult;
 }
+#ifndef HB_LONG_DOUBLE_OFF
+long double HB_EXPORT hb_itemGetNLD( PHB_ITEM pItem )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetND(%p)", pItem));
+
+   if( pItem )
+   {
+      switch( pItem->type )
+      {
+         case HB_IT_LDOUBLE:
+            return pItem->item.asLDouble.value;
+
+         case HB_IT_DOUBLE:
+            return ( long double ) pItem->item.asDouble.value;
+
+         case HB_IT_INTEGER:
+            return ( long double ) pItem->item.asInteger.value;
+
+         case HB_IT_LONG:
+            return ( long double ) pItem->item.asLong.value;
+
+         case HB_IT_DATE:
+            return ( long double ) pItem->item.asDate.value;
+
+         case HB_IT_LOGICAL:
+            return ( long double ) pItem->item.asLogical.value;
+
+         case HB_IT_STRING:
+            return ( long double ) pItem->item.asString.value[0];
+      }
+   }
+
+   return 0;
+}
+
+
+PHB_ITEM HB_EXPORT hb_itemPutNLD( PHB_ITEM pItem, long double dNumber )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutND(%p, %lf)", pItem, dNumber));
+
+   
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_LDOUBLE;
+   pItem->item.asLDouble.length = ( dNumber >= 10000000000000000.0 || dNumber <= -1000000000000000.0 ) ? 30 : 10;
+   pItem->item.asLDouble.decimal = hb_set.HB_SET_DECIMALS;
+   pItem->item.asLDouble.value = dNumber;
+   
+
+   return pItem;
+}
+PHB_ITEM HB_EXPORT hb_itemPutNLDLen( PHB_ITEM pItem, long double dNumber, int iWidth, int iDec )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutNLDLen(%p, %lf, %d, %d)", pItem, dNumber, iWidth, iDec));
+
+   
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   if( iWidth <= 0 || iWidth > 99 )
+   {
+      #if defined (__BORLANDC__)
+      /* Borland C compiled app crashes if a "NaN" double is compared with another double [martin vogel] */
+      if (_isnan (dNumber))
+      {
+         iWidth = 30;
+      }
+      else
+      #endif
+
+      iWidth = ( dNumber >= 10000000000000000.0 || dNumber <= -1000000000000000.0 ) ? 30 : 10;
+   }
+
+   if( iDec < 0 )
+   {
+      iDec = hb_set.HB_SET_DECIMALS;
+   }
+
+   pItem->type = HB_IT_LDOUBLE;
+   pItem->item.asLDouble.length = iWidth;
+   pItem->item.asLDouble.decimal = iDec;
+   pItem->item.asLDouble.value = dNumber;
+   
+
+   return pItem;
+}
+#endif

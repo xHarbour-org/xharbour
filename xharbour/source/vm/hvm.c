@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.224 2003/06/30 21:42:23 andijahja Exp $
+ * $Id: hvm.c,v 1.225 2003/07/01 08:17:45 ronpinkas Exp $
  */
 
 /*
@@ -1934,6 +1934,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                dNewVal = pLocal->item.asDouble.value + iAdd;
             }
+
             else if( HB_IS_DATE( pLocal ) )
             {
                pLocal->item.asDate.value += iAdd;
@@ -2880,6 +2881,15 @@ static void hb_vmNegate( void )
       /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
       pItem->item.asDouble.length = ( pItem->item.asDouble.value >= 10000000000.0 || pItem->item.asDouble.value <= -999999999.0 ) ? 20 : 10;
    }
+#ifndef HB_LONG_DOUBLE_OFF
+   else if( HB_IS_LDOUBLE( pItem ) )
+   {
+      pItem->item.asDouble.value = -pItem->item.asLDouble.value;
+      /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
+      pItem->item.asDouble.length = ( pItem->item.asLDouble.value >= 10000000000000000.0 || pItem->item.asLDouble.value <= -99999999999999.0 ) ? 30 : 10;
+   }
+#endif
+
    else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
    {
       pItem->item.asInteger.value = - pItem->item.asString.value[0];
@@ -3990,6 +4000,12 @@ static void hb_vmArrayPush( void )
    {
       lIndex = ( long ) pIndex->item.asDouble.value;
    }
+#ifndef HB_LONG_DOUBLE_OFF
+   else if( HB_IS_LDOUBLE( pIndex ) )
+   {
+      lIndex = ( long ) pIndex->item.asLDouble.value;
+   }
+#endif
  #ifndef HB_C52_STRICT
    else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
    {
@@ -4200,6 +4216,12 @@ static void hb_vmArrayPop( void )
    {
       lIndex = ( long ) pIndex->item.asDouble.value;
    }
+#ifndef HB_LONG_DOUBLE_OFF
+   else if( HB_IS_LDOUBLE( pIndex ) )
+   {
+      lIndex = ( long ) pIndex->item.asLDouble.value;
+   }
+#endif
  #ifndef HB_C52_STRICT
    else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
    {
@@ -4437,7 +4459,11 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
       case HB_IT_DOUBLE:
          ulElements = ( ULONG ) pDim->item.asDouble.value;
          break;
-
+      #ifndef HB_LONG_DOUBLE_OFF
+      case HB_IT_LDOUBLE:
+         ulElements = ( ULONG ) pDim->item.asLDouble.value;
+         break;
+      #endif
       default:
          /* NOTE: Clipper creates empty array if non-numeric value is
           * specified as dimension and stops further processing.

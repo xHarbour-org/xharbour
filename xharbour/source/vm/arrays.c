@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.50 2003/05/23 03:27:08 ronpinkas Exp $
+ * $Id: arrays.c,v 1.51 2003/05/25 17:03:18 jonnymind Exp $
  */
 
 /*
@@ -1420,4 +1420,22 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    }
 }
 
+#ifndef HB_LONG_DOUBLE_OFF
+long double HB_EXPORT hb_arrayGetNLD( PHB_ITEM pArray, ULONG ulIndex )
+{
+   double dRet;
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetND(%p, %lu)", pArray, ulIndex));
 
+   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
+      dRet = hb_itemGetNLD( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
+   else
+   {
+      dRet = 0;
+   }
+   
+   return dRet;
+}
+
+#endif

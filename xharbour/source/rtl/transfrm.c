@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.17 2003/05/16 19:52:08 druzus Exp $
+ * $Id: transfrm.c,v 1.18 2003/05/28 11:59:06 druzus Exp $
  */
 
 /*
@@ -438,7 +438,11 @@ HB_FUNC( TRANSFORM )
 
       else if( HB_IS_NUMERIC( pValue ) )
       {
+      #ifndef HB_LONG_DOUBLE_OFF
+         long double   dPush;
+      #else
          double   dPush;
+      #endif
 
          int      iOrigWidth;
          int      iOrigDec;
@@ -458,8 +462,11 @@ HB_FUNC( TRANSFORM )
          BOOL     bFound = FALSE;
          BOOL     bInit  = FALSE;
          BOOL     bPDec  = FALSE;
-
+      #ifndef HB_LONG_DOUBLE_OFF
+         dValue = hb_itemGetNLD( pValue );
+      #else
          dValue = hb_itemGetND( pValue );
+      #endif
          hb_itemGetNLen( pValue, &iOrigWidth, &iOrigDec );
 
          /* Support date function for numbers */
@@ -520,8 +527,11 @@ HB_FUNC( TRANSFORM )
             iWidth = iOrigWidth;                       /* Push original width      */
             iDec = iOrigDec;                           /* Push original decimals   */
          }
-
+     #ifndef HB_LONG_DOUBLE_OFF
+         pNumber = hb_itemPutNLDLen( NULL, dPush, -1, iDec );
+     #else
          pNumber = hb_itemPutNDLen( NULL, dPush, -1, iDec );
+     #endif
          pWidth = hb_itemPutNI( NULL, iWidth + ( ( ulPicLen || iDec == 0 ) ? 0 : ( iDec + 1 ) ) );
          pDec = hb_itemPutNI( NULL, iDec );
 
