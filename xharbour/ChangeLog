@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3833 2005/02/17 12:03:44 likewolf Exp $
+ * $Id: ChangeLog,v 1.3834 2005/02/17 12:22:25 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-16 11:15 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/teditor.prg
+    ! Fixed detection of EOL at the end of the text to edit.
+
 2005-02-17 19:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * makefile.gc
   * make_gc.bat

@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.57 2005/02/08 18:35:34 ronpinkas Exp $
+/* $Id: teditor.prg,v 1.58 2005/02/16 17:22:01 guerra000 Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.57 2005/02/08 18:35:34 ronpinkas Exp $
+/* $Id: teditor.prg,v 1.58 2005/02/16 17:22:01 guerra000 Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -1917,7 +1917,7 @@ STATIC function Text2Array( cString, nWordWrapCol )
    nEOLLen := Len( cEOL )
 
    // __StrTkPtr() needs that string to be tokenized be terminated with a token delimiter
-   if Rat( cEOL, cString ) <> Len( cString ) - nEOLLen + 1
+   if ! Right( cString, Len( cEOL ) ) == cEOL
       cString += cEOL
    endif
 
@@ -2034,4 +2034,3 @@ METHOD BrowseText( nPassedKey, lHandleOneKey ) CLASS HBEditor
 return nil
 
 //-------------------------------------------------------------------//
-
