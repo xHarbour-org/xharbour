@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclient.prg,v 1.9 2004/02/07 12:53:55 lculik Exp $
+* $Id: tipclient.prg,v 1.10 2004/02/07 13:04:02 lculik Exp $
 ************************************************/
 /* 2004-01-13
   Enhaced tip cliente to conenct to secure smtp servers by Luiz Rafael Culik
@@ -41,6 +41,9 @@ CLASS tIPClient
    DATA nLastWrite
 
    DATA bEof
+
+   /** Gauge control; it can be a codeblock or a function pointer. */
+   DATA exGauge
 
    METHOD New( oUrl, oCredentials )
    METHOD Open()
@@ -210,27 +213,43 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
    LOCAL nFin
    LOCAL cData
    LOCAL nLen
+   LOCAL nSize, nSent
 
    ::nStatus := 0
    nFin := Fopen( cFile, FO_READ )
-   tracelog(nFin,cFile)
    IF nFin < 0
       RETURN .F.
+   ENDIF
+   nSize := FSeek( nFin, 0, 2 )
+   FSeek( nFin, 0 )
+
+
+   // allow initialization of the gauge
+   nSent := 0
+   IF ! Empty( ::exGauge )
+      HB_ExecFromArray( ::exGauge, {nSent, nSize, Self} )
    ENDIF
 
    ::nStatus := 1
    cData := Space( 1024 )
    nLen := Fread( nFin, @cData, 1024 )
-   tracelog(cdata,nlen)
+
    DO WHILE nLen > 0
       IF ::Write( @cData, nLen ) != nLen
          Fclose( nFin )
          RETURN .F.
       ENDIF
+      nSent += nLen
+      IF ! Empty( ::exGauge )
+         HB_ExecFromArray( ::exGauge, {nSent, nSize, Self} )
+      ENDIF
       nLen := Fread( nFin, @cData, 1024 )
-   tracelog(cdata,nlen)
    ENDDO
-   ::Commit()
+
+   // it may happen that the file has lenght 0
+   IF nSent > 0
+      ::Commit()
+   ENDIF
 
    ::nStatus := 2
    Fclose( nFin )

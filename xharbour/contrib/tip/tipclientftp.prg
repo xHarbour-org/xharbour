@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclientftp.prg,v 1.5 2003/11/20 16:44:33 jonnymind Exp $
+* $Id: tipclientftp.prg,v 1.6 2003/11/28 16:05:40 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -182,8 +182,18 @@ METHOD TransferStart() CLASS tIPClientFTP
 RETURN .F.
 
 METHOD Commit() CLASS tIPClientFTP
+   InetClose( ::SocketCon )
    ::SocketCon := ::SocketControl
-   IF ::GetReply() .and. ::GetReply()
+   IF .not. ::GetReply()
+      RETURN .F.
+   ENDIF
+
+   // error code?
+   IF ::cReply[1] == "5"
+      RETURN .F.
+   ENDIF
+
+   IF ::GetReply() .and. ::cReply[1] != "5"
       RETURN .T.
    ENDIF
 RETURN .F.
@@ -321,8 +331,10 @@ METHOD Read( nLen ) CLASS tIPClientFTP
    ENDIF
 RETURN cRet
 
-
-METHOD Write( cData, nLen, bCommit ) CLASS tIPClientFTP
+*
+* FTP transfer wants commit only at end.
+*
+METHOD Write( cData, nLen ) CLASS tIPClientFTP
    IF .not. ::bInitialized
 
       IF Empty( ::oUrl:cFile )
@@ -342,4 +354,4 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClientFTP
       ::bInitialized := .T.
    ENDIF
 
-RETURN ::super:Write( cData, nLen, bCommit )
+RETURN ::super:Write( cData, nLen, .F. )

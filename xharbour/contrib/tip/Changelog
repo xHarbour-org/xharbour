@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.26 2003/12/10 13:30:46 jonnymind Exp $
+ * $Id: Changelog,v 1.27 2004/01/14 00:11:06 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-07 17:05 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * Rules.make
+    + Added support for making with GTXVT
+
+  * tipclient.prg
+    + Added gauge support in WriteFromFile
+      (TODO: add it in ReadFromFile )
+      (TODO: detect file sizes in downloads)
+
+  * tipclientftp.prg
+    + Fixed transfer startup/shutdown sequence
+
+  * tests/tiptest.prg
+    + Added gauge for writing files
+
 2004-01-13 22:10 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   * tipclient.prg
     ! Added support for ESMTP Servers and write method enhaced for multiples

@@ -1,6 +1,6 @@
 #
 # Rules for making a generic xharbour library or program
-# $Id: Rules.make,v 1.5 2003/11/30 14:41:50 jonnymind Exp $
+# $Id: Rules.make,v 1.6 2003/12/01 00:19:39 jonnymind Exp $
 #
 # (C) Giancarlo Niccolai 2003
 #
@@ -32,6 +32,9 @@ ifeq ($(HB_ARCHITECTURE),linux)
    endif
    ifeq ($(HB_GT_LIB),gtcrs)
       GT_LIBS=-lgtcrs -lncurses -lgpm
+   endif
+   ifeq ($(HB_GT_LIB),gtxvt)
+      GT_LIBS=-lgtxvt -L/usr/X11/lib -lX11
    endif
    ifeq ($(HB_GT_LIB),gtcgi)
       GT_LIBS=-lgtcgi

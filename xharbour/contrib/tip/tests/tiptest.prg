@@ -1,7 +1,7 @@
 *****************************************************
 * TEST of TIP libs (for higher level URI interface)
 *
-* $Id: tiptest.prg,v 1.2 2003/06/22 04:43:57 jonnymind Exp $
+* $Id: tiptest.prg,v 1.3 2003/11/14 12:01:53 jonnymind Exp $
 *
 * Usage: This file is similar to a wget command
 *
@@ -91,6 +91,10 @@ PROCEDURE MAIN( cUrl, cFile )
       ENDIF
 
       IF oClient:nAccessMode == TIP_WO .or. ( oClient:nAccessMode == TIP_RW .and. bWrite )
+         oClient:exGauge := { | done, size| ShowGauge(done, size ) }
+         /* Can be also:
+            oClient:exGauge := {| done, size, oConnection | dothing( done, size, oConnection) }
+         */
          IF oClient:WriteFromFile( cFile )
             @7,5 SAY "Data sucessfully sent"
          ELSE
@@ -137,3 +141,11 @@ PROCEDURE Terminate()
    QUIT
 RETURN
 
+PROCEDURE ShowGauge( nSent, nSize )
+   @6,5 SAY "Sending: " + Replicate( Chr(176), 60 )
+   // nSent may be zero
+   IF nSent > 0
+      @6,14 SAY Replicate( Chr(219), 60 * nSent/nSize )
+   ENDIF
+
+RETURN
