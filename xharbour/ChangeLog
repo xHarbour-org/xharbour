@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.530 2002/12/16 16:33:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.531 2002/12/17 04:21:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-17 12:40 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/tget.prg
+    ! Fix, UpdateBuffer() should not actualize the variable if the value
+      was not modified.
+
+    Reported by Francisco Gamboa and Horacio Roldan
 
 2002-12-16 20:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h
