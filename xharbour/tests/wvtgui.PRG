@@ -59,7 +59,7 @@ get_1 := ctod( '04/01/04' )
 Wvt_SetFont( 'Courier New', 18 )
 // aadd( aBlocks, {|| Wvt_SetFont( 'Courier New', 18 ) } )
 
-aadd( aBlocks, {|| Wvt_SetIcon( 'c:\creative.acp\icons\vr_1.ico' ) } )
+aadd( aBlocks, {|| Wvt_SetIcon( 'vr_1.ico' ) } )
 aadd( aBlocks, {|| Wvt_SetTitle( 'Vouch' ) } )
 aadd( aBlocks, {|| Wvt_DrawLabel( 1,40, cLabel,6,, rgb(255,255,255), ;
                       rgb(198,198,198), 'Arial', 26, , , , , .t., .t. ) } )
@@ -67,7 +67,7 @@ aadd( aBlocks, {|| Wvt_DrawBoxRaised( nTop, nLft, nBtm, nRgt ) } )
 aadd( aBlocks, {|| Wvt_DrawBoxRecessed( 7, 61, 13, 70 ) } )
 aadd( aBlocks, {|| Wvt_DrawBoxGroup( 15, 59, 18, 72 ) } )
 aadd( aBlocks, {|| Wvt_DrawBoxGroup( 5, 6, 19, 44 ) } )
-aadd( aBlocks, {|| Wvt_DrawImage( 8,62,12,69, 'c:\creative.acp\icons\vouch1.bmp' ) } )
+aadd( aBlocks, {|| Wvt_DrawImage( 8,62,12,69, 'vouch1.bmp' ) } )
 aadd( aBlocks, {|| Wvt_DrawBoxRecessed( 7, 48, 13, 55 ) } )
 aadd( aBlocks, {|| aeval( box_, {|o_| Wvt_DrawBoxGet( o_[ 1 ], o_[ 2 ], o_[ 3 ] ) } ) } )
 
@@ -139,7 +139,7 @@ local aGetsParam := ;
 
 
 aadd( aBlocks, {|| Wvt_SetFont( 'Courier New', 24 ) } )
-aadd( aBlocks, {|| Wvt_SetIcon( 'c:\creative.acp\icons\DIA_EXCL.ico' ) } )
+aadd( aBlocks, {|| Wvt_SetIcon( 'DIA_EXCL.ico' ) } )
 aadd( aBlocks, {|| Wvt_SetTitle( 'Vouch Gets 2' ) } )
 aadd( aBlocks, {|| Wvt_DrawBoxGroup( 5, 6, 19, 72 ) } )
 aadd( aBlocks, {|| aeval( box_, {|o_| Wvt_DrawBoxGet( o_[ 1 ], o_[ 2 ], o_[ 3 ] ) } ) } )
