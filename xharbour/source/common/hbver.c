@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.16 2004/04/14 20:59:10 andijahja Exp $
+ * $Id: hbver.c,v 1.17 2004/04/17 09:22:47 andijahja Exp $
  */
 
 /*
@@ -396,6 +396,20 @@ char * hb_verPlatform( void )
 
    return szPlatform;
 }
+
+BOOL hb_iswinnt(void)
+{
+#if defined(HB_OS_WIN_32)
+
+  OSVERSIONINFO osvi ;
+  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+  GetVersionEx (&osvi);
+  return(osvi.dwPlatformId == VER_PLATFORM_WIN32_NT); // && osvi.dwMajorVersion >= 4);
+#else
+  return FALSE ;
+#endif
+}
+
 
 /* NOTE: The caller must free the returned buffer. [vszakats] */
 

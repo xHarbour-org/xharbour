@@ -64,12 +64,19 @@ BOOL hb_GetPrinterNameByPort(LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR p
 
 #define MAXBUFFERSIZE 255
 
-static BOOL isWinNt(void) {
-  OSVERSIONINFO osvi ;
-  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-  GetVersionEx (&osvi);
-  return(osvi.dwPlatformId == VER_PLATFORM_WIN32_NT); // && osvi.dwMajorVersion >= 4);
+static BOOL isLegacyDevice( LPTSTR pPrinterName)
+{
+   BOOL bLegacyDev = FALSE ;
+   int n = 0 ;
+   LPTSTR pszPrnDev[] = { "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "com1", "com2", "com3", "com4", NULL } ;
+   while ( pszPrnDev[ n ] && !bLegacyDev )
+   {
+      bLegacyDev = ( hb_strnicmp( pPrinterName, pszPrnDev[ n ], strlen( pszPrnDev[ n ] ) ) == 0 ) ;
+      n++ ;
+   }
+   return( bLegacyDev ) ;
 }
+
 
 BOOL hb_PrinterExists(LPTSTR pPrinterName) {
   BOOL Result = FALSE ;
@@ -78,19 +85,11 @@ BOOL hb_PrinterExists(LPTSTR pPrinterName) {
   HANDLE hPrinter ;
   ULONG needed = 0 , returned=0, a;
   HB_TRACE(HB_TR_DEBUG, ("hb_PrinterExists(%s)", pPrinterName));
-  if (!strchr( pPrinterName, OS_PATH_LIST_SEPARATOR ) &&
-     (hb_strnicmp(pPrinterName,"lpt1",4)!=0) &&
-     (hb_strnicmp(pPrinterName,"lpt2",4)!=0) &&
-     (hb_strnicmp(pPrinterName,"lpt3",4)!=0) &&
-     (hb_strnicmp(pPrinterName,"lpt4",4)!=0) &&
-     (hb_strnicmp(pPrinterName,"lpt5",4)!=0) &&
-     (hb_strnicmp(pPrinterName,"lpt6",4)!=0) &&
-     (hb_strnicmp(pPrinterName,"com1",4)!=0) &&
-     (hb_strnicmp(pPrinterName,"com2",4)!=0) &&
-     (hb_strnicmp(pPrinterName,"com3",4)!=0) &&
-     (hb_strnicmp(pPrinterName,"com4",4)!=0) &&
-     (hb_strnicmp(pPrinterName,"con",3)!=0)) {  // Don't bother with test if '\' in string
-    if (isWinNt()) {  // Use EnumPrinter() here because much faster than OpenPrinter()
+  if (!strchr( pPrinterName, OS_PATH_LIST_SEPARATOR )
+      && !isLegacyDevice( pPrinterName ) )
+
+    {  // Don't bother with test if '\' in string
+    if (hb_iswinnt()) {  // Use EnumPrinter() here because much faster than OpenPrinter()
       EnumPrinters(Flags,NULL,4,(LPBYTE) NULL,0,&needed,&returned) ;
       if (needed > 0) {
         pPrinterEnum4 = buffer4 = ( PRINTER_INFO_4 * ) hb_xgrab( needed ) ;
@@ -261,7 +260,7 @@ HB_FUNC(GETPRINTERS) {
   if (ISLOG(1))
     bPrinterNamesOnly = !hb_parl(1) ;
 
-  if (isWinNt()) {
+  if ( hb_iswinnt() ) {
     EnumPrinters(Flags,NULL,4,(LPBYTE) NULL,0,&needed,&returned) ;
     if (needed > 0) {
       pPrinterEnum4 = buffer4 = ( PRINTER_INFO_4 * ) hb_xgrab( needed ) ;
