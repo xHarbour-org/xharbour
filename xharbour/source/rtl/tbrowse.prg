@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.17 2002/11/19 06:03:25 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.18 2002/12/05 20:52:21 walito Exp $
  */
 
 /*
@@ -374,7 +374,7 @@ return Self
 
 METHOD Configure( nMode ) CLASS TBrowse
 
-   local n, nHeight, aCol, xVal, nFreeze
+   local n, nHeight, aCol, xVal, nFreeze, oErr
 
    ::lHeaders     := .F.
    ::lFooters     := .F.
