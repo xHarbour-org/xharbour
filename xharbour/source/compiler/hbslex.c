@@ -1,5 +1,5 @@
 /*
- * $Id: hbslex.c,v 1.4 2000/08/16 03:09:07 ronpinkas Exp $
+ * $Id: hbslex.c,v 1.1.1.1 2001/12/21 10:43:52 ronpinkas Exp $
  */
 
 #include "hbcomp.h"
@@ -14,6 +14,8 @@
 #define MAX_STREAM_EXCLUSIONS                       2
 
 #define TOKEN_SIZE             HB_SYMBOL_NAME_LEN + 1
+
+#define YY_BUF_SIZE HB_PP_STR_SIZE
 
 #define SLX_RULES "harbour.slx"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.128 2002/11/14 07:59:28 what32 Exp $
+ * $Id: hvm.c,v 1.129 2002/11/14 21:46:19 ronpinkas Exp $
  */
 
 /*
@@ -126,7 +126,7 @@ static void    hb_vmLess( void );            /* checks if the latest - 1 value i
 static void    hb_vmLessEqual( void );       /* checks if the latest - 1 value is less than or equal the latest, removes both and leaves result */
 static void    hb_vmGreater( void );         /* checks if the latest - 1 value is greater than the latest, removes both and leaves result */
 static void    hb_vmGreaterEqual( void );    /* checks if the latest - 1 value is greater than or equal the latest, removes both and leaves result */
-static void    hb_vmInstring( void );        /* check whether string 1 is contained in string 2 */
+static void    hb_vmInstringOrArray( void ); /* check whether string 1 is contained in string 2 */
 static void    hb_vmForTest( void );         /* test for end condition of for */
 
 /* Operators (logical) */
@@ -719,9 +719,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             w++;
             break;
 
+            // Also used for Arrays!!!
          case HB_P_INSTRING:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_INSTRING") );
-            hb_vmInstring();
+            hb_vmInstringOrArray();
             w++;
             break;
 
@@ -3273,7 +3274,7 @@ static void hb_vmGreaterEqual( void )
    }
 }
 
-static void hb_vmInstring( void )
+static void hb_vmInstringOrArray( void )
 {
    PHB_ITEM pItem1;
    PHB_ITEM pItem2;
@@ -3292,7 +3293,18 @@ static void hb_vmInstring( void )
       hb_vmPushLogical( bResult );
    }
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpInstring" ) )
+   {
       hb_vmOperatorCall( pItem1, pItem2, "__OPINSTRING" );
+   }
+   else if( HB_IS_ARRAY( pItem2 ) )
+   {
+      BOOL bResult = hb_arrayScan( pItem2, pItem1, NULL, NULL );
+
+      hb_stackPop();
+      hb_stackPop();
+
+      hb_vmPushLogical( bResult );
+   }
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1109, NULL, "$", 2, pItem1, pItem2 );

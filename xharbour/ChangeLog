@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.503 2002/11/24 05:30:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.504 2002/11/24 17:50:34 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-24 21:07 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/simplex.c
+  * source/compiler/hbslex.c
+  * source/compiler/harbour.slx
+    ! Speed optimizations.
+
+  * source/compiler/harbour.slx
+    + Added support for IN as an Operator. Syntax is: <exp> IN <ArrayOrStringExp> => .T./.F.
+
+  * source/vm/hvm.c
+    + Added array support for HB_P_INSTRING.
+    * Renamed hb_vmInString() to hb_vmInStringOrArray()
+
+  + tests/testin.prg
+    + New test for IN operator.
+
+  /*
+     NOTE: IN operator is about 25% faster than aScan(...) > 0
+  */
 
 2002-11-24 09:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbcomp.h
