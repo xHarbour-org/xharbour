@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.77 2003/09/11 06:56:41 ronpinkas Exp $
+ * $Id: arrays.c,v 1.78 2003/09/11 17:27:08 ronpinkas Exp $
  */
 
 /*
@@ -1065,10 +1065,9 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
                 char szProc[64], szModule[64];
                 USHORT uiLine;
 
-                hb_procinfo( 0, szProc, &uiLine, szModule  );
-
                 if( pOwners->pOwner != (void *) pArray )
                 {
+                   hb_procinfo( 0, szProc, &uiLine, szModule  );
                    TraceLog( NULL, "Warning! (1) Residual owner %p of array %p [%s->%s(%i)]\n",
                                    pOwners, pArray->item.asArray.value,
                                    szModule, szProc, uiLine );

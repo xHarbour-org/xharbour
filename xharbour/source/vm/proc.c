@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.15 2003/09/11 17:59:02 druzus Exp $
+ * $Id: proc.c,v 1.16 2003/09/12 15:28:47 ronpinkas Exp $
  */
 
 /*
@@ -130,7 +130,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
    }
 
    // Called from hb_vmQuit().
-   if( HB_VM_STACK.pPos == pBase )
+   if( HB_VM_STACK.pPos == HB_VM_STACK.pItems )
    {
       if( szName )
       {
