@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.22 2002/06/17 18:21:21 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.23 2002/06/21 19:18:27 ronpinkas Exp $
  */
 
 /*
@@ -4238,6 +4238,20 @@ static int NextName( char ** sSource, char * sDest )
         continue;
      }
      /* End - Ron Pinkas added 2001-02-21 */
+     /* Ron Pinkas added 2002-07-17 */
+     else if( (*sSource)[0] == '.' && toupper( (*sSource)[1] ) == 'T' && (*sSource)[2] == '.' )
+     {
+        (*sSource) += 3;
+        cLastChar = ' ';
+        continue;
+     }
+     else if( (*sSource)[0] == '.' && toupper( (*sSource)[1] ) == 'F' && (*sSource)[2] == '.' )
+     {
+        (*sSource) += 3;
+        cLastChar = ' ';
+        continue;
+     }
+     /* End - Ron Pinkas added 2002-07-17 */
      else if( **sSource == '\'' )
      {
         /* Ron Pinkas added 2000-11-08 */
