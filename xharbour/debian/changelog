@@ -1,0 +1,9 @@
+xharbour (0.82.0-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- root <root@luizr>  Fri,  5 Sep 2003 10:09:00 -0300
+
+Local variables:
+mode: debian-changelog
+End:

@@ -1,0 +1,33 @@
+#!/bin/sh
+name="xharbour"
+dname="xHarbour"
+version="0.82.0"
+releasen="0"
+platform="rh73"
+prefix="/usr"
+hb_pref="xhb"
+hb_gt="crs"
+hb_gpm="yes"
+hb_mt="MT"
+hb_mgt="yes"
+hb_lnkso=yes
+hb_libs="vm pp rtl rdd dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca odbc ct debug profiler"
+
+export HB_COMPILER="gcc"
+export C_USR="-DHB_FM_STATISTICS_OFF -O3"
+export HB_ARCHITECTURE="linux"
+export HB_MT=MT
+export HB_GT_LIB=gtcrs
+export HB_GPM_MOUSE=yes
+export HB_MULTI_GT=yes
+
+export HB_BIN_INSTALL="/usr/src/xh/debian/tmp/usr/bin"
+export HB_INC_INSTALL="/usr/src/xh/debian/tmp/usr/include/xharbour"
+export HB_LIB_INSTALL="/usr/src/xh/debian/tmp/usr/lib/xharbour"
+export RPM_BUILD_ROOT=/usr/src/xh/debian/tmp
+
+hb_host="www.xharbour.org"
+readme="README.RPM"
+pushd contrib/libct
+make
+popd

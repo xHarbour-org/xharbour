@@ -1,0 +1,42 @@
+Source: xharbour
+Section: development
+Priority: optional
+Maintainer: Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
+Standards-Version: 3.2.1
+
+Package: xharbour
+Architecture: any
+Depends: ${shlibs:Depends},xharbour-libs (= ${Source-Version})
+Description: Free software Clipper compatible compiler
+ XHarbour is a CA-Clipper compatible compiler for multiple platforms. This
+ package includes a compiler, pre-processor, header files, virtual machine
+ and documentation.
+ See README.RPM in the documentation directory for information specific to
+ this RPM distribution.
+ 
+Package: xharbour-libs
+Architecture: any
+Provides: libxharbour-libs
+Description: Missing
+
+Package: xharbour-static
+Architecture: any
+Description: Missing
+ XHarbour is a Clipper compatible compiler.
+ This package provides XHarbour static runtime libraries for static
+ program linking.
+ 
+Package: xharbour-pp
+Architecture: all
+Depends: xharbour (= ${Source-Version})
+Description: Clipper/Harbour/xBase compatible Pre-Processor, DOT prompt and interpreter
+ XHarbour is a Clipper compatible compiler.
+ This package provides XHarbour PP. It has 3 personalities which are tied
+ tightly together.
+ 1. What is supposed to be 100% Clipper compatible Pre-Processor
+   (with some extensions).
+ 2. DOT prompt, which suppose to allow most of Clipper syntax.
+ 3. Finally, PP is a limited Clipper/Harbour/xBase Interpreter. Subject 
+   to those same few limitations it can execute most of Harbour syntax.
+   You can write your own xBase scripts by adding to your .prg files
+   #!/usr/bin/pprun

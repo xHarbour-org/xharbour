@@ -1,0 +1,12 @@
+usr/bin
+usr/sbin
+usr/lib
+usr/include
+usr/include/xharbour
+usr/lib/xharbour
+etc
+etc/profile.d
+etc/harbour
+usr/share/doc/xharbour
+usr/share/doc/xharbour/en
+usr/share/doc/xharbour/es
