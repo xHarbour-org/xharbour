@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.12 2003/11/14 01:18:01 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.13 2004/01/28 23:55:47 ronpinkas Exp $
  */
 
 /*
@@ -469,20 +469,17 @@ DECLARE HBClass ;
 #ifdef STRICT_OO
   #xcommand METHOD <MethodName> [ AS <type> ] OPERATOR <op> [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<ov: OVERRIDE>] => ;
     _HB_MEMBER <MethodName>()  [ AS <type> ];;
-    s_oClass:AddMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ) ;;
-    s_oClass:AddInline( <(op)>, {|Self| Self:<MethodName>() }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) );;
+    s_oClass:AddMethod( <(op)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ) ;;
     #xcommand METHOD <MethodName> \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>
 #else
   #xcommand METHOD <MethodName> [ AS <type> ] OPERATOR <op> [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<ov: OVERRIDE>] => ;
     _HB_MEMBER <MethodName>()  [ AS <type> ];;
-    s_oClass:AddMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ) ;;
-    s_oClass:AddInline( <(op)>, {|Self| Self:<MethodName>() }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) );;
+    s_oClass:AddMethod( <(op)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ) ;;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[\<anyParams>])
 
   #xcommand METHOD <MethodName>( [<params,...>] ) [ AS <type> ] OPERATOR <op> [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<ov: OVERRIDE>] => ;
     _HB_MEMBER <MethodName>([<params>])  [ AS <type> ];;
-    s_oClass:AddMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ) ;;
-    s_oClass:AddInline( <(op)>, {|Self [,<params>] | Self:<MethodName>( [<params>] ) }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) );;
+    s_oClass:AddMethod( <(op)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ) ;;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[\<anyParams>])
 #endif
 
