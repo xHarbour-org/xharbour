@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.22 2002/12/29 08:32:41 ronpinkas Exp $
+ * $Id: estack.c,v 1.23 2003/01/14 23:45:37 jonnymind Exp $
  */
 
 /*
@@ -66,7 +66,8 @@
 HB_STACK hb_stack;
 
 #ifdef HB_THREAD_SUPPORT
-   #include "thread.h"
+
+#include "thread.h"
 
 HB_STACK *hb_stackGetCurrentStack( void )
 {
@@ -80,11 +81,28 @@ HB_STACK *hb_stackGetCurrentStack( void )
       return hb_threadGetContext( HB_CURRENT_THREAD() )->stack;
    }
 }
+
+/** JC1:
+   Turning on stack usage optimization. In MT libs, every function
+   accessing stack will record the HB_STACK (provided by
+   hb_threadGetCurrentStack()) into a local Stack variable, and
+   this variable will be accessed instead of HB_VM_STACK.
+*/
+#undef HB_VM_STACK
+#define HB_VM_STACK (*Stack)
+#define HB_THREAD_STUB  HB_STACK *Stack = hb_stackGetCurrentStack();
+
+#else
+
+#define HB_THREAD_STUB
+
 #endif
 /* ------------------------------- */
 
 void hb_stackPop( void )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPop()"));
 
    if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems )
@@ -104,6 +122,8 @@ void hb_stackPop( void )
 
 void hb_stackDec( void )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_stackDec()"));
 
    if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems )
@@ -114,6 +134,7 @@ void hb_stackDec( void )
 
 void hb_stackFree( void )
 {
+   HB_THREAD_STUB
    LONG i;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackFree()"));
@@ -133,6 +154,8 @@ void hb_stackPush( void )
    LONG CurrIndex;   /* index of current top item */
    LONG TopIndex;    /* index of the topmost possible item */
    LONG i;
+   
+   HB_THREAD_STUB
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPush()"));
 
@@ -191,6 +214,7 @@ void hb_stackInit( void )
 
 void hb_stackRemove( LONG lUntilPos )
 {
+   HB_THREAD_STUB
    HB_ITEM_PTR * pEnd = HB_VM_STACK.pItems + lUntilPos;
 
    while( HB_VM_STACK.pPos > pEnd )
@@ -201,6 +225,8 @@ void hb_stackRemove( LONG lUntilPos )
 
 HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
 {
+   HB_THREAD_STUB
+
    HB_ITEM_PTR pItem = hb_stackItemFromTop( - uiParams - 2 );   /* procedure name */
 
    if( ! HB_IS_SYMBOL( pItem ) )
@@ -223,6 +249,8 @@ HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
 
 void hb_stackOldFrame( HB_STACK_STATE * pStack )
 {
+   HB_THREAD_STUB
+
    while( HB_VM_STACK.pPos > HB_VM_STACK.pBase )
    {
       hb_stackPop();
@@ -232,9 +260,40 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
    HB_VM_STACK.iStatics = pStack->iStatics;
 }
 
+#undef hb_stackTopOffset
+LONG HB_EXPORT hb_stackTopOffset( void )
+{
+   HB_THREAD_STUB
+   return HB_VM_STACK.pPos - HB_VM_STACK.pItems;
+}
+
+#undef hb_stackBaseOffset
+LONG HB_EXPORT hb_stackBaseOffset( void )
+{
+   HB_THREAD_STUB
+   return HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1;
+}
+
+
+/**
+ JC1: from that point on, stack optimization is no longer needed:
+ We have all small functions that reference stack only once, and
+ to do a simple operation, so putting them in the local function
+ stack instead of calling the getCurrentStack() function directly
+ is just a waste of time. For this reason, we reset the standard
+ HB_VM_STACK.
+**/
+#undef HB_VM_STACK
+#if defined( HB_THREAD_SUPPORT )
+   #define HB_VM_STACK (* hb_stackGetCurrentStack() )
+#else
+   #define HB_VM_STACK hb_stack
+#endif
+
 #undef hb_stackItem
 HB_ITEM_PTR HB_EXPORT hb_stackItem( LONG iItemPos )
 {
+
    if( iItemPos < 0 )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
 
@@ -244,6 +303,7 @@ HB_ITEM_PTR HB_EXPORT hb_stackItem( LONG iItemPos )
 #undef hb_stackItemFromTop
 HB_ITEM_PTR HB_EXPORT hb_stackItemFromTop( int nFromTop )
 {
+
    if( nFromTop > 0 )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
 
@@ -253,6 +313,7 @@ HB_ITEM_PTR HB_EXPORT hb_stackItemFromTop( int nFromTop )
 #undef hb_stackItemFromBase
 HB_ITEM_PTR HB_EXPORT hb_stackItemFromBase( int nFromBase )
 {
+
    if( nFromBase <= 0 )
    {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
@@ -288,18 +349,6 @@ HB_ITEM_PTR HB_EXPORT hb_stackBaseItem( void )
 HB_ITEM_PTR HB_EXPORT hb_stackSelfItem( void )
 {
    return * ( HB_VM_STACK.pBase + 1 );
-}
-
-#undef hb_stackTopOffset
-LONG HB_EXPORT hb_stackTopOffset( void )
-{
-   return HB_VM_STACK.pPos - HB_VM_STACK.pItems;
-}
-
-#undef hb_stackBaseOffset
-LONG HB_EXPORT hb_stackBaseOffset( void )
-{
-   return HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1;
 }
 
 /* NOTE: DEBUG function */

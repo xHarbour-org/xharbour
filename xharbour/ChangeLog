@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.667 2003/01/31 19:37:30 jonnymind Exp $
+ * $Id: ChangeLog,v 1.668 2003/01/31 21:07:42 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-01 13:46 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  ! source/vm/thread.c
+    ! Fixed an error introduced by my on last optimization tests.
+      Now it seems that MT is pretty stable also under GC. There
+      are still minor problems, but now it goes great.
+      
+  % source/vm/estack.c
+    % Optimized MT programs, so that estack calls hb_threadGetCurrentStack()
+      only once per function.
+  
+  * tests/mtgc.prg
+    * cleaned up the code and added an header.
+    
+  + doc/thread.txt
+    + Thread api reference: functions in thread.c and their description.
+
 
 2003-01-31 18:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tpopup.prg

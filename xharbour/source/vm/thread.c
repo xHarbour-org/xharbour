@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.39 2003/01/27 23:07:53 jonnymind Exp $
+* $Id: thread.c,v 1.40 2003/01/31 19:37:38 jonnymind Exp $
 */
 
 /*
@@ -206,41 +206,40 @@ HB_THREAD_CONTEXT *hb_threadGetContext( HB_THREAD_T id )
    HB_THREAD_CONTEXT *p;
 
    //printf( "Requested context for %ld\r\n", id);
-   if( last_context && last_context->th_id == id )
-   {
-      return last_context;
-   }
 
    HB_CRITICAL_LOCK( hb_threadContextMutex );
 
-   p = hb_ht_context;
-
-   while( p && p->th_id != id )
+   if( last_context && last_context->th_id == id )
    {
-      p = p->next;
+      p = last_context;
    }
+   else {
 
-   if( p )
-   {
-      last_context = p;
+      p = hb_ht_context;
+
+      while( p && p->th_id != id )
+      {
+         p = p->next;
+      }
+
+      if( p )
+      {
+         last_context = p;
+      }
+      else
+      {
+         char errdat[64];
+
+         sprintf( errdat, "Context not found for Thread %ld",  (long) id );
+         hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadGetCurrentContext", 0 );
+      }
+
    }
 
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
-   if ( p )
-   {
-      //printf( "Found context %p;%ld\r\n", p, p->th_id);
-      return p;
-   }
-   else
-   {
-      char errdat[64];
+   return p;
 
-      sprintf( errdat, "Context not found for Thread %ld",  (long) id );
-      hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadGetCurrentContext", 0 );
-
-      return NULL;
-   }
 }
 
 void hb_threadInit( void )
