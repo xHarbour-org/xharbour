@@ -1,6 +1,6 @@
 #
 # Rules for making a generic xharbour library or program
-# $Id$
+# $Id: Rules.make,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
 #
 # (C) Giancarlo Niccolai 2003
 #
@@ -67,21 +67,26 @@ all:$(TARGET)
 
 .PHONY: clean
 
-%.o: %.prg
-	harbour -I$(HB_INCLUDE) $(PRG_USR) -n -w2 -go $<
+%.c: %.prg
+	$(HB_BIN_INSTALL)/harbour -I$(HB_INC_INSTALL) $(INCLUDE) $(PRG_USR) -n -w2 $<
+
+%.o: %.c
+	$(CC) -c -I$(HB_INC_INSTALL) $(INCLUDE) $(C_USR) $<
 
 $(TARGET): $(OBJECTS)
 ifeq ( lib , $(patsubst %.a, lib, $(TARGET)))
 	$(LINKER) -r $(TARGET) $(OBJECTS)
 	$(LIBRARIAN) $(TARGET)
 else
-	$(CC) -o $(TARGET) $(OBJECTS) $(LIBDIR) $(LIBS) $(LIBFILES) \
+	$(CC) -o $(TARGET) $(OBJECTS) -L$(HB_LIB_INSTALL) $(LIBDIR) $(LIBS) $(LIBFILES) \
 		-ldebug $(MTLIBS) -lmacro  -lpp  -llang  -lcommon\
 		$(GT_LIBS) -lm
 endif
 
 clean:
 	rm -f *.o
+	rm -f *.c
+	rm -f *~
 	rm -f $(TARGET)
 
 install: $(TARGET)
@@ -90,3 +95,4 @@ ifeq ( lib , $(patsubst %.a, lib, $(TARGET)))
 else
 	cp -f $(TARGET) $(HB_BIN_INSTALL)
 endif
+

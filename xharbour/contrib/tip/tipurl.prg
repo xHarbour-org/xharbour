@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id$
+* $Id: tipurl.prg,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 
@@ -172,10 +172,11 @@ METHOD BuildAddress() CLASS tURL
       cRet += "/"
       IF .not. Empty( ::cPath )
          IF At( "/", ::cPath ) == 1
-            cRet += Substr( ::cPath, 2 ) + "/"
+            cRet += Substr( ::cPath, 2 )
          ELSE
-            cRet += ::cPath + "/"
+            cRet += ::cPath
          ENDIF
+         cRet += "/"
       ENDIF
       IF .not. Empty( ::cFile )
          cRet += ::cFile
@@ -199,7 +200,7 @@ RETURN cRet
 METHOD BuildQuery( ) CLASS tURL
    LOCAL cLine
 
-   cLine := ::cPath
+   cLine := ::cPath + "/"
    IF .not. Empty( ::cFile )
       cLine += ::cFile
       IF .not. Empty( ::cQuery )

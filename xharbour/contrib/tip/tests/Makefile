@@ -1,9 +1,9 @@
 #
-# $Id: Makefile,v 1.5 2003/01/10 22:21:24 jonnymind Exp $
+# $Id: Makefile,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
 #
 
 TARGET=tiptest
-HB_INCLUDE=$(HB_INC_INSTALL):../include
+INCLUDE=-I../include
 LIBS=-lhbtip
 LIBDIR=-L../
 
