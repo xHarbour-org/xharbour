@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclienthttp.prg,v 1.2 2003/02/22 21:26:49 jonnymind Exp $
+* $Id: tipclienthttp.prg,v 1.3 2003/11/05 11:06:41 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -19,6 +19,7 @@ CLASS tIPClientHTTP FROM tIPClient
    DATA nVersion
    DATA nSubversion
    DATA bChunked
+   DATA hHeaders     INIT  {=>}
 
    METHOD New()
    METHOD GetRequest( cQuery )
@@ -32,6 +33,7 @@ METHOD New() CLASS tIPClientHTTP
    ::nDefaultPort := 80
    ::nConnTimeout := 5000
    ::bChunked := .F.
+   HSetCaseMatch( ::hHeaders, .F. )
 RETURN Self
 
 
@@ -61,6 +63,7 @@ RETURN .F.
 
 METHOD ReadHeaders() CLASS tIPClientHTTP
    LOCAL cLine, nPos, aVersion
+   LOCAL aHead
 
    // Now reads the fields and set the content lenght
    cLine := InetRecvLine( ::SocketCon, @nPos, 500 )
@@ -83,7 +86,16 @@ METHOD ReadHeaders() CLASS tIPClientHTTP
 
    ::nLength := -1
    ::bChunked := .F.
+   cLine := InetRecvLine( ::SocketCon, @nPos, 500 )
+
    DO WHILE InetErrorCode( ::SocketCon ) == 0 .and. Len( cLine ) > 0
+      aHead := HB_RegexSplit( ":", cLine,,, 1 )
+      IF aHead == NIL .or. Len( aHead ) != 2
+         LOOP
+      ENDIF
+
+      ::hHeaders[ aHead[1] ] := LTrim(aHead[2])
+
       IF At( "content-length:", lower(cLine) ) > 0
          cLine := Substr( cLine, 16 )
          ::nLength := Val( cLine )
