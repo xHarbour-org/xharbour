@@ -135,7 +135,7 @@ PROCEDURE Main()
 
    dDate := ctod( '04/01/04' )
 
-   Wvt_SetFont( 'Courier New', 18 )
+   Wvt_SetFont( 'Courier New', 18, 0, 0 )
    Wvt_SetMouseMove( .t. )
    
    //  Force mouse pointer right below the xHarbour label

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.54 2004/03/14 13:37:20 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.55 2004/03/14 16:47:53 vouchcac Exp $
  */
 
 /*
@@ -291,10 +291,10 @@ ENDCLASS
 
 METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
 
-   default  nTop    to 0
-   default  nLeft   to 0
-   default  nBottom to MaxRow()
-   default  nRight  to MaxCol()
+   DEFAULT  nTop    TO 0
+   DEFAULT  nLeft   TO 0
+   DEFAULT  nBottom TO MaxRow()
+   DEFAULT  nRight  TO MaxCol()
 
    ::nwTop           := nTop
    ::nwLeft          := nLeft
@@ -487,6 +487,10 @@ METHOD Configure( nMode ) CLASS TBrowse
 
       endif
    next
+
+   if empty( ::aColorSpec )
+      ::aColorSpec := Color2Array( ::cColorSpec )
+   endif
 
    if nMode == 1
       return Self
@@ -2892,7 +2896,7 @@ static Function ArrayToList( aArray )
 
 //-------------------------------------------------------------------//
 
-static function Color2array( cColorSpec )
+static function Color2Array( cColorSpec )
    Local n
    Local a_:= {}
    Local cToken := ','

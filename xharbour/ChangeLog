@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2570 2004/03/14 13:42:42 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2571 2004/03/14 16:50:09 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-14 23:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/tbrowse.prg
+    * A small bug fix introduced at previous commit where ::aColorSpec was not set in ::configure().
+
+  * xharbour/tests/wvtgui.prg
+    * Synchronized with recent changes in gtwvt. 
 
 2004-03-14 22:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/tbrowse.prg
