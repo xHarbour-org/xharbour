@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.57 2004/05/07 16:20:53 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.58 2004/11/21 21:44:20 druzus Exp $
  */
 
 /*
@@ -1004,7 +1004,9 @@ RETURN uObj
                 break;
 
               case HB_IT_INTEGER:
+#if HB_LONG_MAX == HB_INT_MAX
               case HB_IT_LONG:
+#endif
                 if( bByRef )
                 {
                    pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I4;
@@ -1017,6 +1019,21 @@ RETURN uObj
                    pArgs[ n ].n1.n2.n3.lVal = hb_parnl( nArg );
                 }
                 break;
+
+#if HB_LONG_MAX > HB_INT_MAX
+              case HB_IT_LONG:
+                if( bByRef )
+                {
+                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I8;
+                   pArgs[ n ].n1.n2.n3.pllVal = &( uParam->item.asLongLong.value ) ;
+                }
+                else
+                {
+                   pArgs[ n ].n1.n2.vt = VT_I8;
+                   pArgs[ n ].n1.n2.n3.llVal = hb_parnll( nArg );
+                }
+                break;
+#endif
 
               case HB_IT_DOUBLE:
                 if( bByRef )
