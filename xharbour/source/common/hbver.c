@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.15 2004/04/07 12:36:59 andijahja Exp $
+ * $Id: hbver.c,v 1.16 2004/04/14 20:59:10 andijahja Exp $
  */
 
 /*
@@ -73,6 +73,7 @@
 
 #include "hbapi.h"
 #include "hbver.h"
+#include "hbcomp.h"
 #include "hbmemory.ch"
 
 #if defined(HB_OS_WIN_32)
@@ -404,6 +405,7 @@ char * hb_verCompiler( void )
    char * szName;
    int iVerMajor;
    int iVerMinor;
+   int iVerPatch = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_verCompiler()"));
 
@@ -456,6 +458,10 @@ char * hb_verCompiler( void )
    iVerMajor = _MSC_VER / 100;
    iVerMinor = _MSC_VER % 100;
 
+   #if defined(_MSC_FULL_VER)
+      iVerPatch = _MSC_FULL_VER - ( _MSC_VER * 10000 );
+   #endif
+
 #elif defined(__BORLANDC__)
 
    szName = "Borland C++";
@@ -484,7 +490,20 @@ char * hb_verCompiler( void )
 
 #elif defined(__WATCOMC__)
 
-   szName = "Watcom C/C++";
+   #if defined( __cplusplus )
+      #if defined( HB_OS_WIN_32 )
+         szName = "Open Watcom C++32";
+      #else
+         szName = "Open Watcom C++16";
+      #endif
+   #else
+      #if defined( HB_OS_WIN_32 )
+         szName = "Open Watcom C32";
+      #else
+         szName = "Open Watcom C16";
+      #endif
+   #endif
+
    iVerMajor = __WATCOMC__ / 100;
    iVerMinor = __WATCOMC__ % 100;
 
@@ -508,7 +527,9 @@ char * hb_verCompiler( void )
 
    iVerMajor = __GNUC__;
    iVerMinor = __GNUC_MINOR__;
-
+   #if defined(__GNUC_PATCHLEVEL__)
+      iVerPatch = __GNUC_PATCHLEVEL__;
+   #endif
 #else
 
    szName = ( char * ) NULL;
@@ -518,7 +539,18 @@ char * hb_verCompiler( void )
 #endif
 
    if( szName )
-      sprintf( pszCompiler, "%s %hd.%hd", szName, iVerMajor, iVerMinor );
+      if( iVerPatch != 0 )
+      {
+         #if defined(_MSC_VER)
+            sprintf( pszCompiler, "%s %hd.%02d.%hd", szName, iVerMajor, iVerMinor, iVerPatch );
+         #else
+            sprintf( pszCompiler, "%s %hd.%hd.%hd", szName, iVerMajor, iVerMinor, iVerPatch );
+         #endif
+      }
+      else
+      {
+         sprintf( pszCompiler, "%s %hd.%hd", szName, iVerMajor, iVerMinor );
+      }
    else
       strcpy( pszCompiler, "(unknown)" );
 
