@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.5 2002/01/29 08:43:52 ronpinkas Exp $
+# $Id: makefile.vc,v 1.6 2002/01/31 05:08:29 ronpinkas Exp $
 #
 
 #
@@ -377,6 +377,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\browdbx.obj \
    $(OBJ_DIR)\browse.obj \
    $(OBJ_DIR)\checkbox.obj \
+   $(OBJ_DIR)\cstr.obj \
    $(OBJ_DIR)\dbedit.obj \
    $(OBJ_DIR)\dbdelim.obj \
    $(OBJ_DIR)\dbsdf.obj \

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.5 2002/01/19 14:15:41 ronpinkas Exp $
+# $Id: makefile.bc,v 1.6 2002/01/31 05:08:29 ronpinkas Exp $
 #
 
 #
@@ -333,6 +333,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\browdbx.obj \
    $(OBJ_DIR)\browse.obj \
    $(OBJ_DIR)\checkbox.obj \
+   $(OBJ_DIR)\cstr.obj \
    $(OBJ_DIR)\dbedit.obj \
    $(OBJ_DIR)\dbdelim.obj \
    $(OBJ_DIR)\dbsdf.obj \
@@ -1265,6 +1266,13 @@ $(OBJ_DIR)\console.obj : $(RTL_DIR)\console.c
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\copyfile.obj : $(RTL_DIR)\copyfile.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\cstr.c : $(RTL_DIR)\cstr.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\cstr.obj : $(OBJ_DIR)\cstr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 

@@ -1,10 +1,10 @@
 /*
- * $Id: traceprg.prg,v 1.2 2002/01/31 05:40:18 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.0 2002/01/31 05:40:18 ronpinkas Exp $
  */
 
 /*
  * xHarbour Project source code:
- * PRG Tracing System
+ * CStr( xAnyType ) -> String
  *
  * Copyright 2001 Ron Pinkas <ron@@ronpinkas.com>
  * www - http://www.xharbour.org
@@ -49,36 +49,45 @@
  *
  */
 
-#DEFINE  CRLF HB_OsNewLine()
-
 //--------------------------------------------------------------//
-FUNCTION TraceLog( p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 )
+FUNCTION CStr( xExp )
 
-   LOCAL FileHandle, ProcName, Counter := 1, aParams, nParams := PCount()
+   LOCAL cType
 
-   IF ! SET( _SET_TRACE )
-      RETURN .T.
+   IF xExp == NIL
+      RETURN 'NIL'
    ENDIF
 
-   aParams := { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 }
+   cType := ValType( xExp )
 
-   FileHandle := FOpen( 'Trace.Log', 1 )
+   DO CASE
+      CASE cType = 'C'
+         RETURN xExp
 
-   FSeek( FileHandle, 0, 2 )
+      CASE cType = 'D'
+         RETURN dToc( xExp )
 
-   FWrite( FileHandle, '[' + ProcName(1) + '] (' + Str( Procline(1), 5 ) + ') Called from: '  + CRLF )
+      CASE cType = 'L'
+         RETURN IIF( xExp, '.T.', '.F.' )
 
-   DO WHILE ! ( ( ProcName := ProcName( ++Counter ) ) == '' )
-      FWrite( FileHandle, space(30) + ProcName + '(' + Str( Procline( Counter), 5 ) + ')' + CRLF )
-   ENDDO
+      CASE cType = 'N'
+         RETURN Str( xExp )
 
-   FOR Counter := 1 to nParams
-      FWrite( FileHandle, '>>>' + CStr( aParams[Counter] ) + '<<<' + CRLF )
-   NEXT
+      CASE cType = 'M'
+         RETURN xExp
 
-   FWrite( FileHandle, CRLF )
+      CASE cType = 'A'
+         RETURN "{ Array of " +  LTrim( Str( Len( xExp ) ) ) + " Items }"
 
-   FClose(FileHandle)
+      CASE cType = 'B'
+         RETURN '{|| Block }'
 
-RETURN .T.
+      CASE cType = 'O'
+         RETURN "{ " + xExp:ClassName() + " Object }"
+
+      OTHERWISE
+         RETURN "Type: " + cType
+   ENDCASE
+
+RETURN ""
 //--------------------------------------------------------------//
