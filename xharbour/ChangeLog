@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.781 2003/02/26 14:40:08 jonnymind Exp $
+ * $Id: ChangeLog,v 1.782 2003/02/26 16:20:58 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-02-26 17:51 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/thread.c
+    ! Linux version of last commit was missing a ";". Now
+      compiles and runs fine.
 
 
 2003-02-26 17:14 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.52 2003/02/26 06:14:00 jonnymind Exp $
+* $Id: thread.c,v 1.53 2003/02/26 14:38:39 jonnymind Exp $
 */
 
 /*
@@ -407,7 +407,7 @@ hb_create_a_thread(
       uiParam = 2;
    }
 
-   
+
    for( ; uiParam <= pt->uiCount; uiParam++ )
    {
       hb_itemCopy( (*pPos), hb_arrayGetItemPtr( pt->pArgs, uiParam ) );
@@ -415,9 +415,9 @@ hb_create_a_thread(
       (*pPos)->type = HB_IT_NIL;
    }
    pStack->pPos = pPos;
-   
+
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-   
+
    if( pt->bIsMethod )
    {
       hb_vmSend( pt->uiCount - 2 );
@@ -426,13 +426,13 @@ hb_create_a_thread(
    {
       hb_vmDo( pt->uiCount - 1 );
    }
-   
+
    HB_CRITICAL_LOCK( hb_threadContextMutex );
    pContext = hb_threadUnlinkContext( tCurrent );
    hb_threadDestroyContext( pContext );
-   
+
    hb_itemRelease( pt->pArgs );
-   
+
    HB_CRITICAL_LOCK( hb_allocMutex );
    free( pt );
    HB_CRITICAL_UNLOCK( hb_allocMutex );
@@ -621,7 +621,7 @@ HB_FUNC( STARTTHREAD )
 #else
    if( pthread_create( &th_id, NULL, hb_create_a_thread, (void * ) pt ) == 0 )
    {
-      HB_THREAD_CONTEXT *context = hb_threadCreateContext( th_id )
+      HB_THREAD_CONTEXT *context = hb_threadCreateContext( th_id );
       hb_threadLinkContext( context );
 #endif
       pt->context = context;
