@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.132 2002/05/14 20:24:04 dholm Exp $
+ * $Id: dbfntx1.c,v 1.134 2002/06/22 16:20:33 alkresin Exp $
  */
 
 /*
@@ -131,9 +131,6 @@
 HB_FUNC( _DBFNTX );
 HB_FUNC( DBFNTX_GETFUNCTABLE );
 
-#undef HB_PRG_PCODE_VER
-#define HB_PRG_PCODE_VER HB_PCODE_VER
-
 HB_INIT_SYMBOLS_BEGIN( dbfntx1__InitSymbols )
 { "_DBFNTX",             HB_FS_PUBLIC, HB_FUNCNAME( _DBFNTX ),             0 },
 { "DBFNTX_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( DBFNTX_GETFUNCTABLE) , 0 }
@@ -195,7 +192,7 @@ static int hb_ntxItemCompare( char* s1, char* s2, int ilen1, int ilen2, BOOL Exa
 
 static ULONG* hb_ntxKeysInPage( ULONG ulRecCount, USHORT maxkeys )
 {
-  double dSum = 0, koeff, _maxkeys = (double) maxkeys,
+  double dSum = 0, koeff, _maxkeys = (double) maxkeys, 
          recCount = (double)ulRecCount, dMul = 1;
   int iLevel = 0, i, j;
   ULONG *lpArray;
@@ -1188,7 +1185,7 @@ static void hb_ntxPageSave( LPTAGINFO pTag, LPPAGEINFO pPage )
 {
    ( ( LPNTXBUFFER ) pPage->buffer )->item_count = pPage->uiKeys;
    hb_fsSeek( pTag->Owner->DiskFile, pPage->Page, FS_SET );
-   hb_fsWrite( pTag->Owner->DiskFile, (unsigned char *) pPage->buffer, NTXBLOCKSIZE );
+   hb_fsWrite( pTag->Owner->DiskFile, (BYTE *) pPage->buffer, NTXBLOCKSIZE );
    pPage->Changed = FALSE;
 }
 
@@ -1253,7 +1250,7 @@ static LPPAGEINFO hb_ntxPageLoad( LPTAGINFO pTag, ULONG ulOffset )
    pPage->Page = ulOffset;
 
    hb_fsSeek( pTag->Owner->DiskFile, ulOffset, FS_SET );
-   if( hb_fsRead( pTag->Owner->DiskFile, (unsigned char *) pPage->buffer, NTXBLOCKSIZE )
+   if( hb_fsRead( pTag->Owner->DiskFile, (BYTE *) pPage->buffer, NTXBLOCKSIZE )
             != NTXBLOCKSIZE )
       return NULL;
 
@@ -3101,7 +3098,7 @@ static ERRCODE ntxSkipRaw( NTXAREAP pArea, LONG lToSkip )
      BOOL lContinue = FALSE;
      ULONG ulRecNo = pArea->ulRecNo;
 
-     if ( pArea->fBof )
+     if ( pArea->fBof && !pArea->fEof )
         SELF_GOTOP( ( AREAP ) pArea );
 
      if ( lToSkip == 0 )

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.197 2002/05/04 20:48:26 horacioroldan Exp $
+ * $Id: dbcmd.c,v 1.199 2002/06/14 16:24:18 alkresin Exp $
  */
 
 /*
@@ -261,29 +261,36 @@ static void hb_rddCheck( void )
  */
 static void hb_rddCloseAll( void )
 {
-   int nCycl = 0;
-   LPAREANODE pAreaNode;
+   BOOL isParents = TRUE, isFinish = FALSE;
+   LPAREANODE pAreaNode,pCurrArea;
    HB_TRACE(HB_TR_DEBUG, ("hb_rddCloseAll()"));
 
-   while( nCycl < 2 )
+   while( isParents )
    {
       pAreaNode = s_pWorkAreas;
+      isParents = FALSE;
       while( pAreaNode )
       {
-         s_pCurrArea = pAreaNode;
+         pCurrArea = pAreaNode;
          pAreaNode = pAreaNode->pNext;
-         if( ( !nCycl && ( ( AREAP ) s_pCurrArea->pArea )->lpdbRelations ) ||
-             (  nCycl && s_pCurrArea->pArea ) )
+         if ( isFinish )
          {
-            SELF_CLOSE( ( AREAP ) s_pCurrArea->pArea );
-            SELF_RELEASE( ( AREAP ) s_pCurrArea->pArea );
-            // hb_xfree( s_pCurrArea->pArea );
-            s_pCurrArea->pArea = NULL;
+            SELF_RELEASE( ( AREAP ) pCurrArea->pArea );
+            pCurrArea->pArea = NULL;
+            hb_xfree( pCurrArea );
          }
-         if( nCycl == 1 )
-            hb_xfree( s_pCurrArea );
+         else if( pCurrArea->pArea )
+         {
+            if( ( ( AREAP ) pCurrArea->pArea )->uiParents )
+               isParents = TRUE;
+            else
+            {
+               SELF_CLOSE( ( AREAP ) pCurrArea->pArea );
+            }
+         }
       }
-      nCycl ++;
+      if( !isParents && !isFinish )
+         isParents = isFinish = TRUE;
    }
 
    s_uiCurrArea = 1;
@@ -605,39 +612,6 @@ static USHORT hb_rddFieldIndex( AREAP pArea, char * szName )
 /*
  * -- FUNCTIONS ACCESSED FROM VIRTUAL MACHINE --
  */
-
-USHORT hb_rddGetCurrentFieldPos( char * szName )
-{
-   USHORT uiCount;
-   LPFIELD pField;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddFieldIndex(%s)", szName));
-
-   if( s_pCurrArea )
-   {
-      pField = ( (AREAP) s_pCurrArea->pArea )->lpFields;
-   }
-   else
-   {
-      return 0;
-   }
-
-   uiCount = 0;
-
-   while( pField )
-   {
-      ++uiCount;
-
-      if( strcmp( szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName ) == 0 )
-      {
-         return uiCount;
-      }
-
-      pField = pField->lpfNext;
-   }
-
-   return 0;
-}
 
 /*
  * Return the current WorkArea number.
@@ -3613,7 +3587,7 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
 }
 
 /* move the Field Data between areas by name */
-static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, BOOL bNameMatch )
+static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, BOOL bNameMatch, LPAREANODE s )
 {
   USHORT   i, f=1;
   PHB_ITEM fieldValue;
@@ -3628,8 +3602,12 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, BOO
         f = hb_rddFieldIndex( pAreaTo, (( PHB_DYNS )(pAreaFrom->lpFields + i)->sym )->pSymbol->szName );
       if ( f )
       {
+        LPAREANODE s_curr = s_pCurrArea; 
         SELF_GETVALUE( pAreaFrom, i+1, fieldValue );
+        if( s )
+           s_pCurrArea = s;
         SELF_PUTVALUE( pAreaTo, f++, fieldValue );
+        s_pCurrArea = s_curr;
       }
     }
   }
@@ -3728,8 +3706,12 @@ static ERRCODE rddMoveRecords( char *cAreaFrom, char *cAreaTo, PHB_ITEM pFields,
       {
          if ( bFor )
          {
+            if ( cAreaFrom )
+               s_pCurrArea = s_pCurrAreaSaved;
             SELF_APPEND( ( AREAP ) pAreaTo, FALSE );      /*put a new one on TO Area*/
-            rddMoveFields( pAreaFrom, pAreaTo, pFields, bNameMatch ); /*move the data*/
+            if ( cAreaFrom )
+               s_pCurrArea = pAreaRelease;
+            rddMoveFields( pAreaFrom, pAreaTo, pFields, bNameMatch,(cAreaFrom)?s_pCurrAreaSaved:NULL ); /*move the data*/
          }
          if ( lRec == 0 || pFor )  /*not only one record? Or there's a For clause?*/
             keepGoing = TRUE;
