@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.3 2001/05/14 21:04:43 brianhays Exp $
+rem $Id: make_b32.bat,v 1.2 2002/08/15 04:47:06 ronpinkas Exp $
 rem
 
 if "%1" == "clean" goto CLEAN
@@ -14,6 +14,7 @@ if "%1" == "CLEAN" goto CLEAN
 :BUILD_OK
 
    copy ..\..\lib\b32\rddads.lib ..\..\lib\*.* > nul
+   if exist ..\..\lib\b32\rddads.bak del ..\..\lib\b32\rddads.bak
    goto EXIT
 
 :BUILD_ERR

@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.94 2005/01/15 17:39:54 bdj Exp $
+ * $Id: tget.prg,v 1.95 2005/03/01 21:23:29 andijahja Exp $
  */
 
 /*
@@ -777,14 +777,14 @@ METHOD Untransform( cBuffer ) CLASS Get
                        SubStr( cBuffer, ::LastEditable() + 1 )
 
          else
-	    if "R" IN ::cPicFunc
-	       lUntransform := Empty( ::buffer )
-	    endif
-	    if lUntransform
+            if "R" IN ::cPicFunc
+               lUntransform := Empty( ::buffer )
+            endif
+            if lUntransform
                cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + ;
                           StrTran( SubStr( cBuffer, ::FirstEditable( ), ;
-                                                 ::LastEditable( ) - ::FirstEditable( ) + 1 ), ;
-                                        ",", " " ) + ;
+                                                    ::LastEditable( ) - ::FirstEditable( ) + 1 ), ;
+                                           ",", " " ) + ;
                           SubStr( cBuffer, ::LastEditable() + 1 )
             endif
          endif
@@ -793,10 +793,10 @@ METHOD Untransform( cBuffer ) CLASS Get
             // cMaskDel += iif( ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == ".", " ", "X" )
             if lUntransform
                cMaskDel += iif( ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == ".", " ", "X" )
-	    endif
+            endif
             if ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == "."
-	       nPad ++
-	    endif
+               nPad ++
+            endif
          next
       endif
 
