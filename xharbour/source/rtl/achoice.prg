@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.15 2004/02/13 18:25:36 jonnymind Exp $
+ * $Id: achoice.prg,v 1.16 2004/02/19 02:59:06 andijahja Exp $
  */
 
 /*
@@ -47,8 +47,6 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
    LOCAL cKey
 
    LOCAL bSelect   := {|x,y| if(ISLOGICAL(x), x, if(!Empty( x ), (y := &( x ),if(ISLOGICAL(y), y, .T.)), .T.)) }
-
-   LOCAL bInit     := .F.
 
    ColorSelect( CLR_STANDARD )
 
@@ -112,12 +110,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
 
    DO WHILE !lFinished
 
-      IF !bInit
-         bInit := .T.
-         if nPos == 1
-            SetPos( nTop, nLeft )
-         endif
-      ENDIF
+      SetPos( nTop + ( nPos - nAtTop ), nLeft )
 
       SWITCH nMode
       CASE AC_IDLE
