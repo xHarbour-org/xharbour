@@ -1,5 +1,5 @@
 /*
- * $Id: hboutdbg.c,v 1.3 2003/12/03 13:01:22 mauriliolongo Exp $
+ * $Id: hboutdbg.c,v 1.4 2003/12/03 14:00:49 mauriliolongo Exp $
  */
 
 /*
@@ -206,7 +206,7 @@ HB_FUNC( HB_OUTDEBUG )
          }
       }
    }
-   #elif defined(HB_OS_WIN32)
+   #elif defined(__WIN32__)
 
    if( ISCHAR(1) )
    {
