@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.14 2004/06/10 10:36:15 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.15 2004/06/12 16:58:27 likewolf Exp $
  */
 
 /*
@@ -82,6 +82,8 @@ CLASS TBrwText FROM HBEditor
    METHOD   RefreshCurrent()
    METHOD   ForceStable() INLINE NIL
 
+   METHOD   Resize( nTop, nLeft, nBottom, nRight )
+
    METHOD   GotoLine(n)                      // Moves active line cursor
    METHOD   SetActiveLine( n )               // Sets the line to be executed
 
@@ -141,6 +143,16 @@ return Self
 METHOD RefreshCurrent() CLASS TBrwText
    ::RefreshLine()
 return Self
+
+
+/* This method is to restore correct cursor position after Super:Resize() */
+METHOD Resize( nTop, nLeft, nBottom, nRight ) CLASS TBrwText
+   LOCAL nRow
+
+   nRow := ::nRow
+   Super:Resize( nTop, nLeft, nBottom, nRight )
+   ::GotoLine( nRow )
+RETURN Self
 
 
 METHOD SetActiveLine( n ) CLASS TBrwText

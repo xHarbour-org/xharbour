@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtwin.prg,v 1.7 2004/03/12 12:37:25 likewolf Exp $
+ * $Id: dbgtwin.prg,v 1.8 2004/03/31 08:13:52 lf_sfnet Exp $
  */
 
 /*
@@ -155,7 +155,7 @@ METHOD ShowCaption CLASS TDbWindow
 return nil
 
 METHOD SetFocus( lOnOff ) CLASS TDbWindow
-
+  
    if ! lOnOff .and. ::bLostFocus != nil
       Eval( ::bLostFocus, Self )
    endif
@@ -207,9 +207,13 @@ METHOD Refresh() CLASS TDbWindow
 return nil
 
 METHOD Show( lFocused ) CLASS TDbWindow
+   LOCAL nRow, nCol
 
    DEFAULT lFocused TO ::lFocused
 
+   nRow := Row()
+   nCol := Col()
+   
    ::cBackImage := SaveScreen( ::nTop, ::nLeft, ::nBottom + iif( ::lShadow, 1, 0 ),;
                               ::nRight + iif( ::lShadow, 2, 0 ) )
    SetColor( ::cColor )
@@ -223,6 +227,7 @@ METHOD Show( lFocused ) CLASS TDbWindow
    ::ShowCaption()
    ::lVisible := .t.
 
+   SetPos( nRow, nCol )
 return nil
 
 METHOD ShowModal() CLASS TDbWindow

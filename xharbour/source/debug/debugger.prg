@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.45 2004/06/30 10:05:15 likewolf Exp $
+ * $Id: debugger.prg,v 1.46 2004/07/09 11:52:09 likewolf Exp $
  */
 
 /*
@@ -1443,6 +1443,9 @@ METHOD HandleEvent() CLASS TDebugger
          otherwise
               if ( nPopup := ::oPullDown:GetHotKeyPos( __dbgAltToKey( nKey ) ) ) != 0
                  if ::oPullDown:nOpenPopup != nPopup
+                    if ::oWndCode:lFocused
+                       Eval( ::oWndCode:bLostFocus )
+                    endif
                     SetCursor( SC_NONE )
                     ::oPullDown:ShowPopup( nPopup )
                  endif
@@ -1493,6 +1496,11 @@ METHOD HideVars() CLASS TDebugger
    ::oWndVars:Hide()
    ::oWndCode:nTop := 1
    ::oBrwText:Resize( ::oWndCode:nTop+1 )
+   IF ::oWndCode:lFocused
+      ::oWndCode:cargo[ 1 ] := Row()
+      ::oWndCode:cargo[ 2 ] := Col()
+   ENDIF
+   
    if ::aWindows[ ::nCurrentWindow ] == ::oWndVars
       ::NextWindow()
    ENDIF
@@ -2066,7 +2074,13 @@ METHOD ResizeWindows( oWindow ) CLASS TDebugger
   IF oWindow2 != NIL
     oWindow2:hide()
   ENDIF
+  
   ::oWndCode:Resize( nTop )
+  IF ::oWndCode:lFocused
+    ::oWndCode:cargo[ 1 ] := Row()
+    ::oWndCode:cargo[ 2 ] := Col()
+  ENDIF
+
   IF oWindow2 != NIL
     oWindow2:show()
   ENDIF
