@@ -9,8 +9,11 @@ ENDCLASS
 
 //----------------------------------------------------------------------------//
 
-METHOD New() CLASS TForm
+METHOD New( oParent ) CLASS TForm
+
+   super:New( oParent )
    ::bProc := {| hWnd, nMsg, nwParam, nlParam| ::FormProc( hWnd, nMsg, nwParam, nlParam ) }
    ::Msgs  := -1
-return Self
+
+return( self )
 

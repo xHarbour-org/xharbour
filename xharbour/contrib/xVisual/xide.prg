@@ -7,7 +7,8 @@ FUNCTION Main
    LOCAL oApp, oMain, oPopup, oMenu, oItem
    oApp  := Application():New()
    
-   oApp:CreateForm( oMain )
+   oMain := oApp:CreateForm( Form1() )
+   
 //   oMain := Form1():New()
 //   oMain:Create()
    

@@ -5,7 +5,9 @@ static oAppl
 CLASS Application
    
    DATA Instance
-
+   DATA handle
+   DATA aForms    INIT {}
+   
    METHOD New() CONSTRUCTOR
    METHOD Run()
    
@@ -40,10 +42,9 @@ RETURN(0)
 
 METHOD CreateForm( oForm ) CLASS Application
    
-   oForm:New()
-  
+   oForm:New(self)
    oForm:Create()
 
-return(oForm)
+return( oForm )
 
 function App() ; return( oAppl )
