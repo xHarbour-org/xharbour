@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3918 2005/03/07 02:19:38 paultucker Exp $
+ * $Id: ChangeLog,v 1.3919 2005/03/07 10:16:48 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-07 22:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/gtwin/gtwin.c
+    * Console handle state save and restore during __run()
+    * (the proper version)
+
 2005-03-07 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/errorsys.prg
     ! HB_BUILDDATE() was trapped in #ifdef __PLATFORM__Windows. Fixed. :-(

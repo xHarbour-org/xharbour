@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.86 2005/02/27 11:56:06 andijahja Exp $
+ * $Id: gtwin.c,v 1.87 2005/03/07 02:19:45 paultucker Exp $
  */
 
 /*
@@ -160,7 +160,7 @@ static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 static HANDLE s_HInput  = INVALID_HANDLE_VALUE;
 static HANDLE s_HOutput = INVALID_HANDLE_VALUE;
-static DWORD  s_dwmode;
+static DWORD  s_dwimode, s_dwomode;
 static CONSOLE_SCREEN_BUFFER_INFO s_csbi,     /* active screen mode */
                                   s_origCsbi; /* to restore screen mode on exit */
 
@@ -1436,12 +1436,15 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
 BOOL HB_GT_FUNC(gt_Suspend())
 {
 
-   GetConsoleMode( s_HInput, &s_dwmode );
+
+   GetConsoleMode( s_HInput, &s_dwimode );
+   GetConsoleMode( s_HOutput, &s_dwomode );
+   SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), FALSE );
+   SetConsoleCtrlHandler( NULL, TRUE );
    if( b_MouseEnable )
    {
-      SetConsoleMode( s_HInput, s_dwmode & ~ENABLE_MOUSE_INPUT );
+      SetConsoleMode( s_HInput, s_dwimode & ~ENABLE_MOUSE_INPUT );
    }
-   SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), FALSE );
 
    return TRUE;
 }
@@ -1450,14 +1453,16 @@ BOOL HB_GT_FUNC(gt_Suspend())
 
 BOOL HB_GT_FUNC(gt_Resume())
 {
-   if( b_MouseEnable )
-   {
-/*      HB_GT_FUNC(mouse_Init()); */
-   }
 
-   SetConsoleMode( s_HInput, s_dwmode );
+   SetConsoleCtrlHandler( NULL, FALSE );
+   SetConsoleMode( s_HInput, s_dwimode );
+   SetConsoleMode( s_HOutput, s_dwomode );
    HB_GT_FUNC(gt_xSetCursorStyle());
+
+/*
+   TODO:
    SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), TRUE );
+*/
 
    return TRUE;
 }
