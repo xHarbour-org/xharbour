@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtmenu.prg,v 1.16 2003/05/30 07:34:43 antoniolinares Exp $
+ * $Id: dbgtmenu.prg,v 1.4 2003/06/17 10:53:26 iananderson Exp $
  */
 
 /*
@@ -81,6 +81,7 @@ CLASS TDbMenu  /* debugger menu */
    METHOD Display()
    METHOD EvalAction()
    METHOD GetHotKeyPos( nKey )
+   METHOD GetItemByIdent( uIdent )
    METHOD GetItemOrdByCoors( nRow, nCol )
    METHOD GoBottom()
    METHOD GoDown() INLINE ::aItems[ ::nOpenPopup ]:bAction:GoRight()
@@ -263,6 +264,26 @@ METHOD GetItemOrdByCoors( nRow, nCol ) CLASS TDbMenu
    next
 
 return 0
+
+METHOD GetItemByIdent( uIdent ) CLASS TDbMenu
+  
+   local n, oItem
+  
+   for n := 1 to Len( ::aItems )
+      IF( VALTYPE(::aItems[n]:bAction) == 'O' )
+         oItem := ::aItems[n]:bAction:GetItemByIdent( uIdent )
+         IF( oItem != NIL )
+            RETURN oItem
+         ENDIF
+      ELSE
+         if VALTYPE(::aItems[ n ]:Ident) == VALTYPE(uIdent) .AND.;
+            ::aItems[n]:Ident == uIdent
+            return ::aItems[ n ]
+         ENDIF
+      endif
+   next
+
+return NIL
 
 METHOD GoBottom() CLASS TDbMenu
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtwin.prg,v 1.11 2003/06/14 13:50:32 antoniolinares Exp $
+ * $Id: dbgtwin.prg,v 1.4 2003/06/17 10:55:37 iananderson Exp $
  */
 
 /*
@@ -70,6 +70,7 @@ CLASS TDbWindow  // Debugger windows and dialogs
    DATA   bKeyPressed, bPainted, bLButtonDown, bLDblClick
    DATA   lShadow, lVisible
    DATA   Cargo
+   DATA   Browser
 
    METHOD New( nTop, nLeft, nBottom, nRight, cCaption, cColor )
    METHOD Hide()
@@ -83,7 +84,7 @@ CLASS TDbWindow  // Debugger windows and dialogs
    METHOD ShowModal()
    METHOD LButtonDown( nMRow, nMCol )
    METHOD LDblClick( nMRow, nMCol )
-   METHOD LoadColors() INLINE ::cColor := __DbgColors()[ 1 ]
+   METHOD LoadColors()
    METHOD Move()
    METHOD KeyPressed( nKey )
    METHOD Refresh()
@@ -165,6 +166,10 @@ METHOD SetFocus( lOnOff ) CLASS TDbWindow
       Eval( ::bPainted, Self )
    endif
 
+   IF( ::Browser != NIL )
+      ::Browser:RefreshAll()
+   ENDIF
+
    DispEnd()
 
    if lOnOff .and. ::bGotFocus != nil
@@ -189,7 +194,11 @@ METHOD Refresh() CLASS TDbWindow
    if ::bPainted != nil
       Eval( ::bPainted, Self )
    endif
-
+   
+   IF( ::Browser != NIL )
+      ::Browser:RefreshAll()
+   ENDIF
+ 
    DispEnd()
 
 return nil
@@ -326,3 +335,13 @@ METHOD KeyPressed( nKey ) CLASS TDbWindow
    endif
 
 return nil
+
+METHOD LoadColors() CLASS TDbWindow
+   LOCAL aClr:=__DbgColors()
+  
+   ::cColor := aClr[ 1 ]
+   IF( ::Browser!=NIL )
+      ::Browser:ColorSpec := aClr[ 2 ] + "," + aClr[ 5 ] + "," + aClr[ 3 ]
+   ENDIF
+
+RETURN nil

@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.6 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: debug.c,v 1.7 2004/01/11 22:04:12 ronpinkas Exp $
  */
 
 /*
@@ -89,7 +89,7 @@ static void AddToArray( PHB_ITEM pItem, PHB_ITEM pReturn, ULONG ulPos )
 }
 
 /* $Doc$
- * $FuncName$     <nVars> __vmStkGCount()
+ * $FuncName$     <nVars> hb_dbg_vmStkGCount()
  * $Description$  Returns the length of the global stack
  * $End$ */
 static USHORT hb_stackLenGlobal( void )
@@ -107,16 +107,16 @@ static USHORT hb_stackLenGlobal( void )
    return uiCount;
 }
 
-HB_FUNC( __VMSTKGCOUNT )
+HB_FUNC( HB_DBG_VMSTKGCOUNT )
 {
    hb_retni( hb_stackLenGlobal() );
 }
 
 /* $Doc$
- * $FuncName$     <aStack> __vmStkGList()
+ * $FuncName$     <aStack> hb_dbg_vmStkGList()
  * $Description$  Returns the global stack
  * $End$ */
-HB_FUNC( __VMSTKGLIST )
+HB_FUNC( HB_DBG_VMSTKGLIST )
 {
    PHB_ITEM pReturn;
    PHB_ITEM * pItem;
@@ -135,7 +135,7 @@ HB_FUNC( __VMSTKGLIST )
 }
 
 /* $Doc$
- * $FuncName$     <nVars> __vmStkLCount( <nProcLevel> )
+ * $FuncName$     <nVars> hb_dbg_vmStkLCount( <nProcLevel> )
  * $Description$  Returns params plus locals amount of the nProcLevel function
  * $End$ */
 static USHORT hb_stackLen( int iLevel )
@@ -154,7 +154,7 @@ static USHORT hb_stackLen( int iLevel )
    return uiCount;
 }
 
-HB_FUNC( __VMSTKLCOUNT )
+HB_FUNC( HB_DBG_VMSTKLCOUNT )
 {
    int iLevel = hb_parni( 1 ) + 1;
 
@@ -162,7 +162,7 @@ HB_FUNC( __VMSTKLCOUNT )
 }
 
 /* $Doc$
- * $FuncName$     <aStack> __vmStkLList()
+ * $FuncName$     <aStack> hb_dbg_vmStkLList()
  * $Description$  Returns the stack of the calling function
  *                "[<symbol>]"  Means symbol.
  *
@@ -172,7 +172,7 @@ HB_FUNC( __VMSTKLCOUNT )
  *                [x+1 .. y] Locals
  *                [y+1 ..]   Pushed data
  * $End$ */
-HB_FUNC( __VMSTKLLIST )
+HB_FUNC( HB_DBG_VMSTKLLIST )
 {
    PHB_ITEM pReturn;
    PHB_ITEM * pItem;
@@ -192,13 +192,13 @@ HB_FUNC( __VMSTKLLIST )
 }
 
 /* $Doc$
- * $FuncName$     <aParam> __vmParLGet()
+ * $FuncName$     <aParam> hb_dbg_vmParLGet()
  * $Description$  Returns the passed parameters of the calling function
  * $End$ */
                /* TODO : put bLocals / bParams      */
                /* somewhere for declared parameters */
                /* and locals                        */
-HB_FUNC( __VMPARLLIST )
+HB_FUNC( HB_DBG_VMPARLLIST )
 {
    int iLevel = hb_parni( 1 ) + 1;
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
@@ -227,28 +227,53 @@ HB_FUNC( __VMPARLLIST )
    hb_itemRelease( hb_itemReturn( pReturn ) );
 }
 
-HB_FUNC( __VMVARLGET )
+static void hb_dbgStop(void)
 {
-   int iLevel = hb_parni( 1 ) + 1;
-   PHB_ITEM * pBase = HB_VM_STACK.pBase;
-
-   while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
-   {
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-   }
-
-   hb_itemCopy( &(HB_VM_STACK.Return), *(pBase + 1 + hb_parni( 2 )) );
 }
 
-HB_FUNC( __VMVARLSET )
+HB_FUNC( HB_DBG_VMVARLGET )
 {
    int iLevel = hb_parni( 1 ) + 1;
+   int iLocal = hb_parni( 2 );
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
 
    while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
    {
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
+   if( iLocal > SHRT_MAX )
+   {
+      hb_dbgStop();
+      iLocal -= USHRT_MAX;
+      iLocal--;
+   }
+   if( iLocal >= 0 )
+     hb_itemCopy( &(HB_VM_STACK.Return), hb_itemUnRef( *(pBase + 1 + iLocal) ) );
+   else
+     hb_itemCopy( &(HB_VM_STACK.Return), hb_codeblockGetVar( *(pBase+1), ( LONG ) iLocal ) );
+}
 
-   hb_itemCopy( *(pBase + 1 + hb_parni( 2 )), *(HB_VM_STACK.pBase + 4) );
+HB_FUNC( HB_DBG_VMVARLSET )
+{
+   int iLevel = hb_parni( 1 ) + 1;
+   int iLocal = hb_parni( 2 );
+   PHB_ITEM * pBase = HB_VM_STACK.pBase;
+   PHB_ITEM pLocal;
+
+   while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
+   {
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+   }
+
+   if( iLocal > SHRT_MAX )
+   {
+      iLocal -= USHRT_MAX;
+      iLocal--;
+   }
+   if( iLocal >= 0 )
+     pLocal = *(pBase + 1 + iLocal);
+   else
+     pLocal = hb_codeblockGetVar( *(pBase+1), ( LONG ) iLocal );
+   
+   hb_itemCopy( hb_itemUnRef(pLocal), *(HB_VM_STACK.pBase + 4) );
 }

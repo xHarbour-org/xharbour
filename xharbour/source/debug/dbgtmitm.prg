@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtmitm.prg,v 1.5 2001/12/15 11:22:28 vszakats Exp $
+ * $Id: dbgtmitm.prg,v 1.1.1.1 2001/12/21 10:43:44 ronpinkas Exp $
  */
 
 /*
@@ -63,20 +63,25 @@ CLASS TDbMenuItem
    DATA cPrompt
    DATA bAction
    DATA lChecked
+   DATA Ident
 
-   METHOD New( cPrompt, bAction, lChecked )
+   ACCESS Checked() INLINE ::lChecked
+   ASSIGN Checked(lOnOff) INLINE ::lChecked:=lOnOff
+
+   METHOD New( cPrompt, bAction, lChecked, xIdent )
    METHOD Display( cClrText, cClrHotKey )
    METHOD Toggle() INLINE ::lChecked := ! ::lChecked
 
 ENDCLASS
 
-METHOD New( cPrompt, bAction, lChecked ) CLASS TDbMenuItem
+METHOD New( cPrompt, bAction, lChecked, xIdent ) CLASS TDbMenuItem
 
    DEFAULT lChecked TO .f.
 
    ::cPrompt  := cPrompt
    ::bAction  := bAction
    ::lChecked := lChecked
+   ::Ident    := xIdent
 
 return Self
 

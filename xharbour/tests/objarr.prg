@@ -1,5 +1,5 @@
 //
-// $Id: objarr.prg,v 1.3 2001/09/10 22:04:29 vszakats Exp $
+// $Id: objarr.prg,v 1.1.1.1 2001/12/21 10:46:02 ronpinkas Exp $
 //
 
 //
@@ -55,9 +55,9 @@ Function Main
    QOut( "To the power 3   : ", ToChar( o:x ) )
 
    QOut( "Global stack" )
-   Debug( __vmStkGList() )
+   Debug( hb_dbg_vmStkGList() )
    QOut( "Statics")
-   Debug( __vmVarSList() )
+   Debug( hb_dbg_vmVarSList() )
 return NIL
 
 Function TNumber()                              // Very simple class

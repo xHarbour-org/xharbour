@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2173 2004/01/28 23:54:33 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2174 2004/01/29 11:45:36 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-29 17:25 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  + Merged in the remaining Harbour debugger updates by Ryszard Glab:
+  * source/debug/dbgmenu.prg
+  * source/debug/dbgtmenu.prg
+  * source/debug/dbgtmitm.prg
+  * source/debug/dbgtwin.prg
+  * source/debug/debugger.prg
+  * source/debug/tbrwtext.prg
+    + Added Tracepoints support.
+    + Added Watchpoints support.
+    + Added support for Codeblock trace.
+    + Added support for Preprocessed code.
+    + Added monitoring of local variables used in a codeblock.
+    ! Local variables are displyed correctly while browsing the callstack.
+    ! Static variables are now displayed only for the current file.
+    ! Fixed TRACE command.
+    ! Other minor fixes to make the debugger usable.
+  * include/hbextern.ch
+  * source/vm/debug.c
+  * source/vm/hvm.c
+    * Renamed __VM* functions to HB_DBG_VM*; fixed support for local
+      variables inside codeblocks; added item dereferencing to
+      HB_DBG_VMVARLGET() and HB_DBG_VMVARLSET().
+    + Added hb_dbg_ProcLevel() which returns the size of procedure stack
+      calls.
+    ! Fixed hb_vmStaticName(), hb_dbg_vmVarSGet(), hb_dbg_varSSet() to use
+      the static variables frame.
+  * tests/debugtst.prg
+  * tests/funcarr.prg
+  * tests/inherit.prg
+  * tests/objarr.prg
+  * tests/objasign.prg
+    * Updated the names of HB_DBG_* functions.
+
 2004-01-29 18:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/gtalleg/gtalleg.c
     ! fixed memory leak.

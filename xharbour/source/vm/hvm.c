@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.310 2004/01/27 09:56:10 likewolf Exp $
+ * $Id: hvm.c,v 1.311 2004/01/27 17:57:14 ronpinkas Exp $
  */
 
 /*
@@ -272,6 +272,9 @@ static BOOL     s_bDebuggerIsWorking; /* to know when __DBGENTRY is beeing invok
 #define  HB_RECOVER_BASE      -2
 #define  HB_RECOVER_ADDRESS   -3
 #define  HB_RECOVER_VALUE     -4
+
+/* Stores level of procedures call stack */
+static ULONG    s_ulProcLevel = 0;
 
 
 char *hb_vm_sNull = "";
@@ -4738,8 +4741,8 @@ static void hb_vmArrayPush( void )
              *
              * The SubStr() should return "", while the aTail("") should return NIL (Invalid Argument).
              *
-             * We choose the SubStr() context as the more appropriate, because the Invalid Arguemnt context
-             * is of questionable compabtibilty value.
+             * We choose the SubStr() context as the more appropriate, because the Invalid Argument context
+             * is of questionable compatibilty value.
              *
              hb_itemClear( hb_stackItemFromTop( -1 ) );
              */
@@ -4862,12 +4865,12 @@ static void hb_vmArrayPop( void )
          szMessage[0] = '_';
          szMessage[1] = '\0';
          strcat( szMessage, pIndex->item.asString.value );
-         // Optimized - recycling the paramaters.
+         // Optimized - recycling the parameters.
          #if 1
             // Swap - pIndex no longer needed.
             hb_itemForwardValue( pIndex, pValue );
 
-            // Recicle pValue as Message.
+            // Recycle pValue as Message.
             pValue->type = HB_IT_SYMBOL;
             hb_dynsymLock();
             pValue->item.asSymbol.value = hb_dynsymGetCase( szMessage )->pSymbol;
@@ -5359,6 +5362,8 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 
    //printf( "\VmDo nItems: %i Params: %i Extra %i\n", HB_VM_STACK.pPos - HB_VM_STACK.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
 
+   s_ulProcLevel++;
+
    #ifndef HB_THREAD_SUPPORT
       if( hb_vm_iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] + 2 ) ) ) && pItem->item.asSymbol.value == hb_vm_apExtraParamsSymbol[hb_vm_iExtraParamsIndex - 1] )
       {
@@ -5464,6 +5469,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
    }
 
    s_bDebugging = bDebugPrevState;
+   s_ulProcLevel--;
 
    s_iBaseLine = iPresetBase;
 }
@@ -5529,6 +5535,8 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    }
 
    //printf( "\n VmSend nItems: %i Params: %i Extra %i\n", HB_VM_STACK.pPos - HB_VM_STACK.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
+
+   s_ulProcLevel++;
 
    #ifndef HB_THREAD_SUPPORT
       if( hb_vm_iExtraParamsIndex && HB_IS_SYMBOL( pItem = hb_stackItemFromTop( -( uiParams + hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] + 2 ) ) ) && pItem->item.asSymbol.value == hb_vm_apExtraParamsSymbol[hb_vm_iExtraParamsIndex - 1] )
@@ -5770,7 +5778,8 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    }
 
    s_bDebugging = bDebugPrevState;
-
+   s_ulProcLevel--;
+   
    s_iBaseLine = iPresetBase;
 }
 
@@ -5935,17 +5944,11 @@ static void hb_vmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticNam
    hb_dynsymUnlock();
    hb_vmPushNil();
    hb_vmPushLongConst( HB_DBG_STATICNAME );
-   if( bIsGlobal )
-   {
-      hb_vmPushLongConst( hb_arrayLen( &s_aStatics ) - s_uiStatics );
-   }
-   else
-   {
-      hb_vmPushLongConst( HB_VM_STACK.iStatics + uiStatic );
-   }
+   hb_vmPushLongConst( HB_VM_STACK.iStatics );  /* current static frame */
+   hb_vmPushLongConst( uiStatic );  /* variable index */
    hb_vmPushString( szStaticName, strlen( szStaticName ) );
    s_bDebuggerIsWorking = TRUE;
-   hb_vmDo( 3 );
+   hb_vmDo( 4 );
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
 }
@@ -7683,13 +7686,6 @@ void hb_vmRequestCancel( void )
    }
 }
 
-void hb_vmRequestDebug( void )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestCancel()"));
-
-   s_bDebugRequest = TRUE;
-}
-
 void hb_vmRequestReset( void )
 {
    HB_THREAD_STUB
@@ -7699,7 +7695,19 @@ void hb_vmRequestReset( void )
    s_uiActionRequest = 0;
 }
 
-HB_FUNC( INVOKEDEBUG )
+
+/* ------------------------------ */
+/* The debugger support functions */
+/* ------------------------------ */
+
+void hb_vmRequestDebug( void )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestCancel()"));
+
+   s_bDebugRequest = TRUE;
+}
+
+HB_FUNC( HB_DBG_INVOKEDEBUG )
 {
    HB_THREAD_STUB
 
@@ -7709,10 +7717,10 @@ HB_FUNC( INVOKEDEBUG )
 }
 
 /* $Doc$
- * $FuncName$     <aStat> __vmVarSList()
+ * $FuncName$     <aStat> hb_dbg_vmVarSList()
  * $Description$  Return a clone of the statics array.
  * $End$ */
-HB_FUNC( __VMVARSLIST )
+HB_FUNC( HB_DBG_VMVARSLIST )
 {
    HB_THREAD_STUB
 
@@ -7723,10 +7731,10 @@ HB_FUNC( __VMVARSLIST )
 }
 
 /* $Doc$
- * $FuncName$     <nStatics> __vmVarSLen()
+ * $FuncName$     <nStatics> hb_dbg_vmVarSLen()
  * $Description$  Return the statics array length.
  * $End$ */
-HB_FUNC( __VMVARSLEN )
+HB_FUNC( HB_DBG_VMVARSLEN )
 {
    HB_THREAD_STUB
 
@@ -7734,26 +7742,36 @@ HB_FUNC( __VMVARSLEN )
 }
 
 /* $Doc$
- * $FuncName$     <xStat> __vmVarSGet(<nStatic>)
+ * $FuncName$     <xStat> hb_dbg_vmVarSGet(<nStatic>,<nOffset>)
  * $Description$  Return a specified statics
  * $End$ */
-HB_FUNC( __VMVARSGET )
+HB_FUNC( HB_DBG_VMVARSGET )
 {
    HB_THREAD_STUB
 
-   hb_itemCopy( &(HB_VM_STACK.Return), s_aStatics.item.asArray.value->pItems + hb_parni( 1 ) - 1 );
+   hb_itemCopy( &(HB_VM_STACK.Return),
+                s_aStatics.item.asArray.value->pItems + hb_parni( 1 ) + hb_parni( 2 ) - 1 );
 }
 
 /* $Doc$
- * $FuncName$     __vmVarSSet(<nStatic>,<uValue>)
+ * $FuncName$     hb_dbg_vmVarSSet(<nStatic>,<nOffset>,<uValue>)
  * $Description$  Sets the value of a specified statics
  * $End$ */
-HB_FUNC( __VMVARSSET )
+HB_FUNC( HB_DBG_VMVARSSET )
 {
    HB_THREAD_STUB
 
-   hb_itemCopy( s_aStatics.item.asArray.value->pItems + hb_parni( 1 ) - 1, * ( HB_VM_STACK.pBase + 3 ) );
+   hb_itemCopy( s_aStatics.item.asArray.value->pItems + hb_parni(1) + hb_parni(2) - 1,
+                hb_itemParamPtr( 3, HB_IT_ANY ) );
 }
+
+HB_FUNC( HB_DBG_PROCLEVEL )
+{
+   HB_THREAD_STUB
+
+   hb_retnl( s_ulProcLevel - 1 );   /* Don't count self */
+}
+
 
 /* ------------------------------------------------------------------------ */
 /* The garbage collector interface */

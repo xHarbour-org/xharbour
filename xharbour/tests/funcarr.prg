@@ -1,5 +1,5 @@
 //
-// $Id: funcarr.prg,v 1.2 1999/10/06 10:26:44 vszel Exp $
+// $Id: funcarr.prg,v 1.1.1.1 2001/12/21 10:45:47 ronpinkas Exp $
 //
 
 //
@@ -50,9 +50,9 @@ Function Main
    QOut( "To the power 3   : ", aFunc()[1] )
 
    QOut( "Global stack" )
-   Debug( __vmStkGList() )        // Please note a is a reference to aArray !
+   Debug( hb_dbg_vmStkGList() )        // Please note a is a reference to aArray !
    QOut( "Statics")
-   Debug( __vmVarSList() )
+   Debug( hb_dbg_vmVarSList() )
 return NIL
 
 Function aFunc()

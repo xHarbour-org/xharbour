@@ -1,5 +1,5 @@
 //
-// $Id: inherit.prg,v 1.4 2001/09/10 22:04:29 vszakats Exp $
+// $Id: inherit.prg,v 1.1.1.1 2001/12/21 10:45:52 ronpinkas Exp $
 //
 
 #include "set.ch"
@@ -56,7 +56,7 @@ function Main()
    oFrom:Dispose()
    oTo:Dispose()
 
-//   Debug( __vmStkGList() )  // Stack is OK!
+//   Debug( hb_dbg_vmStkGList() )  // Stack is OK!
 
 return nil
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbgmenu.prg,v 1.2 2003/06/17 10:50:07 iananderson Exp $
+ * $Id: dbgmenu.prg,v 1.3 2004/01/27 11:45:13 likewolf Exp $
  */
 
 /*
@@ -53,10 +53,11 @@
 #include "hbclass.ch"
 
 #xcommand MENU [<oMenu>] => [ <oMenu> := ] TDbMenu():New()
-#xcommand MENUITEM [ <oMenuItem> PROMPT ] <cPrompt> [ ACTION <uAction,...> ] ;
-   [ <checked: CHECK, CHECKED> ] => ;
+#xcommand MENUITEM [ <oMenuItem> PROMPT ] <cPrompt> ;
+          [ IDENT <nIdent> ] [ ACTION <uAction,...> ] ;
+          [ <checked: CHECK, CHECKED> ] => ;
    [ <oMenuItem> := ] TDbMenu():AddItem( TDbMenuItem():New( <cPrompt>,;
-   [{|Self|<uAction>}] ,[<.checked.>] ) )
+   [{|Self|<uAction>}], [<.checked.>], [<nIdent>] ) )
 #xcommand SEPARATOR => TDbMenu():AddItem( TDbMenuItem():New( "-" ) )
 #xcommand ENDMENU => ATail( TDbMenu():aMenus ):Build()
 
@@ -68,12 +69,14 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
    local oMonoDisplay
    local oPublic, oPrivate, oStatic, oLocal, oAll, oSort
    local oCallStack
+   local oCBTrace
+   local oPPo
 
    MENU oMenu
       MENUITEM " ~File "
       MENU
          MENUITEM " ~Open..."         ACTION oDebugger:Open()
-         MENUITEM " ~Resume"          ACTION Alert( "Not implemented yet!" )
+         MENUITEM " ~Resume"          ACTION oDebugger:Resume()
          MENUITEM " O~S Shell"        ACTION oDebugger:OSShell()
          SEPARATOR
          MENUITEM " e~Xit    Alt-X "  ACTION oDebugger:Exit(), oDebugger:Hide(), __Quit()
@@ -108,17 +111,17 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
          MENUITEM " ~Trace            F10"  ACTION oDebugger:Trace()
          MENUITEM " ~Go                F5"  ACTION oDebugger:Go()
          MENUITEM " to ~Cursor         F7"  ACTION oDebugger:ToCursor()
-         MENUITEM " ~Next routine Ctrl-F5"  ACTION Alert( "Not implemented yet!" )
+         MENUITEM " ~Next routine Ctrl-F5"  ACTION oDebugger:NextRoutine()
          SEPARATOR
          MENUITEM " s~Peed..."              ACTION oDebugger:Speed()
       ENDMENU
 
       MENUITEM " ~Point "
       MENU
-         MENUITEM " ~Watchpoint..."         ACTION Alert( "Not implemented yet!" )
-         MENUITEM " ~Tracepoint..."         ACTION Alert( "Not implemented yet!" )
+         MENUITEM " ~Watchpoint..."         ACTION oDebugger:WatchPointAdd()
+         MENUITEM " ~Tracepoint..."         ACTION oDebugger:TracePointAdd()
          MENUITEM " ~Breakpoint   F9 "      ACTION oDebugger:ToggleBreakPoint()
-         MENUITEM " ~Delete..."             ACTION Alert( "Not implemented yet!" )
+         MENUITEM " ~Delete..."             ACTION oDebugger:WatchPointDel()
       ENDMENU
 
       MENUITEM " ~Monitor "
@@ -146,13 +149,15 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
 
       MENUITEM " ~Options "
       MENU
-         MENUITEM " ~Preprocessed Code"     ACTION Alert( "Not implemented yet!" )
+         MENUITEM oPPo PROMPT " ~Preprocessed Code" IDENT "PPO" ;
+            ACTION IIF( oDebugger:OpenPPO(), oPPo:Toggle(), NIL )
          MENUITEM oLineNumbers PROMPT " ~Line Numbers" ;
             ACTION ( oDebugger:LineNumbers(), oLineNumbers:Toggle() ) CHECKED
-         MENUITEM " ~Exchange Screens"      ACTION Alert( "Not implemented yet!" )
-         MENUITEM " swap on ~Input"         ACTION Alert( "Not implemented yet!" )
-         MENUITEM " code~Block Trace"       ACTION Alert( "Not implemented yet!" )
-         MENUITEM " ~Menu Bar"              ACTION Alert( "Not implemented yet!" )
+         MENUITEM " ~Exchange Screens"      ACTION oDebugger:NotSupported()
+         MENUITEM " swap on ~Input"         ACTION oDebugger:NotSupported()
+         MENUITEM oCBTrace PROMPT " code~Block Trace" ;
+            ACTION ( oDebugger:CodeblockTrace(), oCBTrace:Toggle() ) CHECKED
+         MENUITEM " ~Menu Bar"              ACTION oDebugger:NotSupported()
          MENUITEM oMonoDisplay PROMPT " mono ~Display" ;
             ACTION ( oDebugger:MonoDisplay(), oMonoDisplay:Toggle() )
          MENUITEM " ~Colors..."             ACTION oDebugger:Colors()
@@ -167,12 +172,12 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
       MENU
          MENUITEM " ~Next      Tab "        ACTION oDebugger:NextWindow()
          MENUITEM " ~Prev   Sh-Tab"         ACTION oDebugger:PrevWindow()
-         MENUITEM " ~Move"                  ACTION Alert( "Not implemented yet!" )
-         MENUITEM " ~Size"                  ACTION Alert( "Not implemented yet!" )
-         MENUITEM " ~Zoom       F2"         ACTION Alert( "Not implemented yet!" )
-         MENUITEM " ~Iconize"               ACTION Alert( "Not implemented yet!" )
+         MENUITEM " ~Move"                  ACTION oDebugger:NotSupported()
+         MENUITEM " ~Size"                  ACTION oDebugger:NotSupported()
+         MENUITEM " ~Zoom       F2"         ACTION oDebugger:NotSupported()
+         MENUITEM " ~Iconize"               ACTION oDebugger:NotSupported()
          SEPARATOR
-         MENUITEM " ~Tile"                  ACTION Alert( "Not implemented yet!" )
+         MENUITEM " ~Tile"                  ACTION oDebugger:NotSupported()
       ENDMENU
 
       MENUITEM " ~Help "

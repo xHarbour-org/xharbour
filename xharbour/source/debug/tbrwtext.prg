@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.2 2002/12/01 04:00:26 walito Exp $
+ * $Id: tbrwtext.prg,v 1.3 2003/06/17 11:12:31 iananderson Exp $
  */
 
 /*
@@ -71,6 +71,9 @@ CLASS TBrwText FROM HBEditor
    DATA  aBreakPoints   // Array with line numbers of active Break Points
 
    DATA  lLineNumbers   // If .T. source code lines are preceded by their number
+
+   ACCESS colorSpec INLINE ::cColorSpec
+   ASSIGN colorSpec(cClr) INLINE ::cColorSpec:=cClr
 
    METHOD   New(nTop, nLeft, nBottom, nRight, cFileName, cColor)
 
