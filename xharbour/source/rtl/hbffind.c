@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.26 2004/07/30 13:45:36 mauriliolongo Exp $
+ * $Id: hbffind.c,v 1.27 2004/11/21 21:44:19 druzus Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.26 2004/07/30 13:45:36 mauriliolongo Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.27 2004/11/21 21:44:19 druzus Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -516,10 +516,10 @@ static void hb_fsFindFill( PHB_FFIND ffind )
          }
          else
          {
-            ffind->size =         info->pFindFileData.nFileSizeLow + 
-                 ( ( HB_FOFFSET ) info->pFindFileData.nFileSizeHigh << 32 ) +
+            ffind->size = ( HB_FOFFSET ) info->pFindFileData.nFileSizeLow +
+                 ( ( HB_FOFFSET ) info->pFindFileData.nFileSizeHigh << 32 );
          }
-      raw_attr = ( USHORT ) info->pFindFileData.dwFileAttributes;
+         raw_attr = ( USHORT ) info->pFindFileData.dwFileAttributes;
       }
 
 
