@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.97 2004/12/01 00:17:02 peterrees Exp $
+ * $Id: dbf1.c,v 1.98 2004/12/01 10:55:13 lf_sfnet Exp $
  */
 
 /*
@@ -259,8 +259,6 @@ static ULONG hb_dbfCalcRecCount( DBFAREAP pArea )
  */
 static BOOL hb_dbfReadRecord( DBFAREAP pArea )
 {
-   PHB_ITEM pError;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfReadRecord(%p)", pArea));
 
    if( pArea->fEof )
@@ -282,20 +280,8 @@ static BOOL hb_dbfReadRecord( DBFAREAP pArea )
       }
    }
 
-   /* Read data */
-   hb_fsSeek( pArea->hDataFile, pArea->uiHeaderLen + ( pArea->ulRecNo - 1 ) *
-              pArea->uiRecordLen, FS_SET );
-   if( hb_fsRead( pArea->hDataFile, pArea->pRecord, pArea->uiRecordLen ) !=
-       pArea->uiRecordLen )
-   {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_READ );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READ ) );
-      hb_errPutSubCode( pError, EDBF_READ );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+   if ( SELF_GETREC( ( AREAP ) pArea, NULL ) == FAILURE )
       return FALSE;
-   }
 
    /* Set flags */
    pArea->fValidBuffer = pArea->fPositioned = TRUE;
@@ -308,24 +294,12 @@ static BOOL hb_dbfReadRecord( DBFAREAP pArea )
  */
 static BOOL hb_dbfWriteRecord( DBFAREAP pArea )
 {
-   PHB_ITEM pError;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfWriteRecord(%p)", pArea));
 
-   /* Write data */
-   hb_fsSeek( pArea->hDataFile, pArea->uiHeaderLen + ( pArea->ulRecNo - 1 ) *
-              pArea->uiRecordLen, FS_SET );
-   if( hb_fsWrite( pArea->hDataFile, pArea->pRecord, pArea->uiRecordLen ) !=
-       pArea->uiRecordLen )
-   {
-      pError = hb_errNew();
-      hb_errPutGenCode( pError, EG_WRITE );
-      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_WRITE ) );
-      hb_errPutSubCode( pError, EDBF_WRITE );
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_itemRelease( pError );
+   if ( SELF_PUTREC( ( AREAP ) pArea, NULL ) == FAILURE )
       return FALSE;
-   }
+
+   pArea->fRecordChanged = FALSE;
    pArea->fDataFlush = TRUE;
    return TRUE;
 }
@@ -409,9 +383,8 @@ static ERRCODE hb_dbfLockRecord( DBFAREAP pArea, ULONG ulRecNo, BOOL * pResult,
       return SUCCESS;
    }
 
-   /* TODO: what is this ??? */
-   if( ulRecNo <= 0 )
-      ulRecNo = 1;
+   if( ulRecNo == 0 )
+      ulRecNo = pArea->ulRecNo;
 
    if( bExclusive )
       hb_dbfUnlockAllRecords( pArea );
@@ -444,7 +417,7 @@ static ERRCODE hb_dbfLockRecord( DBFAREAP pArea, ULONG ulRecNo, BOOL * pResult,
       pArea->ulNumLocksPos ++;
       * pResult = TRUE;
       if( !pArea->fPositioned )
-         hb_dbfGoTo( pArea, pArea->ulRecNo );
+         SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo );
       else if ( !pArea->fRecordChanged )
          pArea->fValidBuffer = FALSE;
    }
@@ -471,7 +444,7 @@ static ERRCODE hb_dbfLockFile( DBFAREAP pArea, BOOL * pResult )
       * pResult = pArea->fFLocked;
 
       if( !pArea->fPositioned )
-         hb_dbfGoTo( pArea, pArea->ulRecNo );
+         SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo );
       else if ( !pArea->fRecordChanged )
          pArea->fValidBuffer = FALSE;
    }
@@ -890,7 +863,7 @@ static ERRCODE hb_dbfGoTop( DBFAREAP pArea )
    pArea->fTop = TRUE;
    pArea->fBottom = FALSE;
 
-   if( hb_dbfGoTo( pArea, 1 ) == FAILURE )
+   if( SELF_GOTO( ( AREAP ) pArea, 1 ) == FAILURE )
       return FAILURE;
 
    return SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
@@ -1123,6 +1096,38 @@ static ERRCODE hb_dbfFlush( DBFAREAP pArea )
 }
 
 /*
+ * Replace the current record.
+ */
+static ERRCODE hb_dbfGetRec( DBFAREAP pArea, BYTE ** pBuffer )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfGetRec(%p, %p)", pArea, pBuffer));
+
+   if ( pBuffer != NULL )
+   {
+      *pBuffer = pArea->pRecord;
+   }
+   else
+   {
+      /* Read data from file */
+      hb_fsSeek( pArea->hDataFile, pArea->uiHeaderLen + ( pArea->ulRecNo - 1 ) *
+                 pArea->uiRecordLen, FS_SET );
+      if( hb_fsRead( pArea->hDataFile, pArea->pRecord, pArea->uiRecordLen ) !=
+          pArea->uiRecordLen )
+      {
+         PHB_ITEM pError = hb_errNew();
+
+         hb_errPutGenCode( pError, EG_READ );
+         hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READ ) );
+         hb_errPutSubCode( pError, EDBF_READ );
+         SELF_ERROR( ( AREAP ) pArea, pError );
+         hb_itemRelease( pError );
+         return FAILURE;
+      }
+   }
+   return SUCCESS;
+}
+
+/*
  * Obtain the current value of a field.
  */
 static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
@@ -1294,10 +1299,8 @@ static ERRCODE hb_dbfGoCold( DBFAREAP pArea )
    if( pArea->fRecordChanged )
    {
       /* Write current record */
-      if( !hb_dbfWriteRecord( pArea ) )
+      if ( ! hb_dbfWriteRecord( pArea ) )
          return FAILURE;
-
-      pArea->fRecordChanged = FALSE;
 
       if( pArea->fAppend )
       {
@@ -1353,11 +1356,32 @@ static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfPutRec(%p, %p)", pArea, pBuffer));
 
-   if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
-      return FAILURE;
+   if ( pBuffer != NULL )
+   {
+      if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
+         return FAILURE;
 
-   /* Copy data to buffer */
-   memcpy( pArea->pRecord, pBuffer, pArea->uiRecordLen );
+      /* Copy data to buffer */
+      memcpy( pArea->pRecord, pBuffer, pArea->uiRecordLen );
+   }
+   else if( pArea->fRecordChanged )
+   {
+      /* Write data to file */
+      hb_fsSeek( pArea->hDataFile, pArea->uiHeaderLen + ( pArea->ulRecNo - 1 ) *
+                 pArea->uiRecordLen, FS_SET );
+      if( hb_fsWrite( pArea->hDataFile, pArea->pRecord, pArea->uiRecordLen ) !=
+          pArea->uiRecordLen )
+      {
+         PHB_ITEM pError = hb_errNew();
+
+         hb_errPutGenCode( pError, EG_WRITE );
+         hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_WRITE ) );
+         hb_errPutSubCode( pError, EDBF_WRITE );
+         SELF_ERROR( ( AREAP ) pArea, pError );
+         hb_itemRelease( pError );
+         return FAILURE;
+      }
+   }
    return SUCCESS;
 }
 
@@ -2584,7 +2608,7 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
    ulRecIn = 1;
    while ( ulRecIn <= pArea->ulRecCount )
    {
-      hb_dbfGoTo( pArea, ulRecIn );
+      SELF_GOTO( ( AREAP ) pArea, ulRecIn );
       hb_dbfReadRecord( pArea );
 
       /* Execute the Code Block */
@@ -2608,7 +2632,6 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
          {
             pArea->ulRecNo = ulRecOut;
             hb_dbfWriteRecord( pArea );
-            pArea->fRecordChanged = FALSE;
          }
       }
       ulRecIn++;
@@ -2628,7 +2651,7 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
       /* Force write new header */
       pArea->fUpdateHeader = TRUE;
    }
-   return hb_dbfGoTo( pArea, 1 );
+   return SELF_GOTO( ( AREAP ) pArea, 1 );
 }
 
 /*
@@ -2657,7 +2680,7 @@ static ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo )
    ulRecNo = 1;
    if( pSortInfo->dbtri.dbsci.itmRecID )
    {
-      uiError = hb_dbfGoTo( pArea, hb_itemGetNL( pSortInfo->dbtri.dbsci.itmRecID ) );
+      uiError = SELF_GOTO( ( AREAP ) pArea, hb_itemGetNL( pSortInfo->dbtri.dbsci.itmRecID ) );
       bMoreRecords = bLimited = TRUE;
    }
    else if( pSortInfo->dbtri.dbsci.lNext )
@@ -2671,7 +2694,7 @@ static ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo )
       if( !pSortInfo->dbtri.dbsci.itmCobWhile &&
           ( !pSortInfo->dbtri.dbsci.fRest ||
             !hb_itemGetL( pSortInfo->dbtri.dbsci.fRest ) ) )
-         uiError = hb_dbfGoTop( pArea );
+         uiError = SELF_GOTOP( ( AREAP ) pArea );
       bMoreRecords = TRUE;
       bLimited = FALSE;
    }
@@ -2715,7 +2738,7 @@ static ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo )
       if( bMoreRecords && bLimited )
          bMoreRecords = ( --ulRecNo > 0 );
       if( bMoreRecords )
-         uiError = hb_dbfSkip( pArea, 1 );
+         uiError = SELF_SKIP( ( AREAP ) pArea, 1 );
    }
 
    /* Copy last records */
@@ -2822,7 +2845,7 @@ static ERRCODE hb_dbfZap( DBFAREAP pArea )
 
    pArea->fUpdateHeader = TRUE;
    pArea->ulRecCount = 0;
-   hb_dbfGoTo( pArea, 0 );
+   SELF_GOTO( ( AREAP ) pArea, 0 );
 
    /* Zap memo file */
    if( pArea->fHasMemo )
@@ -3073,12 +3096,12 @@ static ERRCODE hb_dbfLock( DBFAREAP pArea, LPDBLOCKINFO pLockInfo )
       {
          case DBLM_EXCLUSIVE:
             return hb_dbfLockRecord( pArea, pArea->ulRecNo, &pLockInfo->fResult,
-                                     ( pLockInfo->uiMethod == DBLM_EXCLUSIVE ) );
+                                     TRUE );
 
          case DBLM_MULTIPLE:
             return hb_dbfLockRecord( pArea, hb_itemGetNL( pLockInfo->itmRecID ),
                                      &pLockInfo->fResult,
-                                     ( pLockInfo->uiMethod == DBLM_EXCLUSIVE ) );
+                                     FALSE );
 
          case DBLM_FILE:
             return hb_dbfLockFile( pArea, &pLockInfo->fResult );

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.71 2004/05/19 07:26:00 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.72 2004/08/26 08:00:33 ronpinkas Exp $
  */
 
 /*
@@ -389,53 +389,51 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
-   if( pSource->type & HB_IT_STRING )
+   if( HB_IS_COMPLEX( pSource ) )
    {
-      if( pSource->item.asString.bStatic == FALSE )
+      if( pSource->type & HB_IT_STRING )
       {
-         ++*( pSource->item.asString.pulHolders );
+         if( pSource->item.asString.bStatic == FALSE )
+         {
+            ++*( pSource->item.asString.pulHolders );
+         }
+         return;
+      }
+      else if( pSource->type & HB_IT_MEMVAR ) // intentionally & instead of ==
+      {
+         hb_memvarValueIncRef( pSource->item.asMemvar.value );
+         return;
       }
 
-      return;
-   }
-   else if( pSource->type & HB_IT_MEMVAR ) // intentionally & instead of ==
-   {
-      hb_memvarValueIncRef( pSource->item.asMemvar.value );
-      return;
-   }
-
-   switch( pSource->type )
-   {
-      case HB_IT_ARRAY :
+      switch( pSource->type )
       {
-         #ifdef HB_ARRAY_USE_COUNTER
-            pSource->item.asArray.value->ulHolders++;
-         #else
-             hb_arrayRegisterHolder( pDest->item.asArray.value, (void *) pDest );
-         #endif
-
-         break;
-      }
-
-      case HB_IT_BLOCK :
-      {
-         pSource->item.asBlock.value->ulCounter++;
-
-         break;
-      }
-
-      case HB_IT_BYREF :
-      {
-         if( pSource->item.asRefer.offset == 0 )
+         case HB_IT_ARRAY :
          {
             #ifdef HB_ARRAY_USE_COUNTER
-               pSource->item.asRefer.BasePtr.pBaseArray->ulHolders++;
+               pSource->item.asArray.value->ulHolders++;
             #else
-               hb_arrayRegisterHolder( pSource->item.asRefer.BasePtr.pBaseArray, (void *) pSource->item.asRefer.BasePtr.pBaseArray );
+                hb_arrayRegisterHolder( pDest->item.asArray.value, (void *) pDest );
             #endif
+            break;
          }
 
-         break;
+         case HB_IT_BLOCK :
+         {
+            pSource->item.asBlock.value->ulCounter++;
+            break;
+         }
+         case HB_IT_BYREF :
+         {
+            if( pSource->item.asRefer.offset == 0 )
+            {
+               #ifdef HB_ARRAY_USE_COUNTER
+                  pSource->item.asRefer.BasePtr.pBaseArray->ulHolders++;
+               #else
+                  hb_arrayRegisterHolder( pSource->item.asRefer.BasePtr.pBaseArray, (void *) pSource->item.asRefer.BasePtr.pBaseArray );
+               #endif
+            }
+            break;
+         }
       }
    }
 }

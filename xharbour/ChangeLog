@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3648 2004/12/01 15:16:10 aleytys Exp $
+ * $Id: ChangeLog,v 1.3649 2004/12/01 20:03:33 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-02 04:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+    + added -xbgtk switch for easy linking with Phil's xbgtk lib
+
+  * xharbour/include/hbrdddbf.h
+  * xharbour/source/rdd/dbf1.c
+    + added SELF_GETREC() methods
+    * change DBF RDD internals to call SELF_{GET,PUT}REC() method
+      for internal direct record reading/writing with NULL buffer
+      pointer - for future use with CRYPT RDD
+    ! replaced some direct calls to hb_dbf*() functions with proper
+      methods - it could cause troubles for some upper level RDDs
+      which need control over such methods
+
+  * xharbour/source/rtl/gtapi.c
+    ! fixed the problem caused by incompatibilities between 
+      screen functions in CT for Window 0 - it works a little bit
+      differ
+
+  * xharbour/source/vm/memvars.c
+    * temporary disabled (waiting for a global fix) the line which
+      fixes the memory leaks but can cause memvar item clearing in
+      some cases.
+      IMHO memory leak is better then RT error.
+
+  * xharbour/include/hbstack.h
+  * xharbour/source/vm/asort.c
+  * xharbour/source/vm/estack.c
+  * xharbour/source/vm/fastitem.c
+  * xharbour/source/vm/hvm.c
+    + added some simple hacks with inlining some very often used
+      functions by macros and some small improvements in most often
+      executed places - it gives nearly 10% speed up on PCODE evaluation.
+
 2004-12-02 09:03 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rtl/idle.c
     - remove redundant functions

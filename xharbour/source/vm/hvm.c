@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.423 2004/11/01 05:38:11 likewolf Exp $
+ * $Id: hvm.c,v 1.424 2004/11/21 21:44:27 druzus Exp $
  */
 
 /*
@@ -4118,7 +4118,35 @@ static void hb_vmModulus( void )
    pItem1 = hb_stackItemFromTop( -2 );
    pItem2 = hb_stackItemFromTop( -1 );
 
-   if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
+   if( HB_IS_NUMINT( pItem1 ) && HB_IS_NUMINT( pItem2 ) )
+   {
+      HB_LONG lDivisor = hb_itemGetNInt( pItem2 );
+
+      if ( lDivisor == 0 )
+      {
+         PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1340, NULL, "/", 2, pItem1, pItem2 );
+
+         if( pResult )
+         {
+            hb_stackPop();
+            hb_stackPop();
+            hb_vmPush( pResult );
+            hb_itemRelease( pResult );
+         }
+      }
+      else
+      {
+         hb_stackPop(); /* pop divisor from the stack */
+
+         /* NOTE: Clipper always returns the result of modulus
+                  with the SET number of decimal places. */
+         if ( hb_set.HB_SET_DECIMALS == 0 )
+            hb_vmPushNumInt( hb_vmPopHBLong() % lDivisor );
+         else
+            hb_vmPushDouble( ( double ) ( hb_vmPopHBLong() % lDivisor ), hb_set.HB_SET_DECIMALS );
+      }
+   }
+   else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
       int iType2 = pItem2->type, iType1 = pItem1->type;
       double dDivisor = hb_itemGetND( pItem2 );

@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.34 2004/11/21 21:43:16 druzus Exp $
+# $Id: hb-func.sh,v 1.35 2004/11/26 14:33:19 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -137,6 +137,7 @@ if [ \$# = 0 ]; then
     -gt<hbgt>           # link with <hbgt> GT driver, can be repeated to
                         # link with more GTs. The first one will be
                         #      the default at runtime
+    -xbgtk              # link with xbgtk library (xBase GTK+ interface)
     -fmstat             # link with the memory statistics lib
     -nofmstat           # do not link with the memory statistics lib (default)
     -[no]strip          # strip (no strip) binaries
@@ -175,6 +176,7 @@ HB_GT_REQ=""
 HB_FM_REQ=""
 HB_STRIP="yes"
 HB_MAIN_FUNC=""
+HB_XBGTK=""
 [ -n "\$TMPDIR" ] || TMPDIR="\$TMP"
 [ -n "\$TMPDIR" ] || TMPDIR="\$TEMP"
 [ -n "\$TMPDIR" ] || TMPDIR="/tmp"
@@ -197,6 +199,7 @@ while [ \$n -lt \${#P[@]} ]; do
         -static)     HB_STATIC="yes" ;;
         -fullstatic) HB_STATIC="full" ;;
         -shared)     HB_STATIC="no" ;;
+        -xbgtk)      HB_XBGTK="yes" ;;
         -mt)         HB_MT="MT" ;;
         -gt*)        HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
         -fmstat)     HB_FM_REQ="STAT" ;;
@@ -277,6 +280,9 @@ if [ "\${HB_STATIC}" = "full" ]; then
     LINK_OPT="\${LINK_OPT} -static"
     HB_STATIC="yes"
 fi
+if [ "\${HB_XBGTK}" = "yes" ]; then
+    SYSTEM_LIBS="\${SYSTEM_LIBS} `pkg-config --libs gtk+-2.0`"
+fi
 
 HB_LNK_REQ=""
 for gt in \${HB_GT_REQ}; do
@@ -317,6 +323,9 @@ do
         fi
     fi
 done
+if [ "\${HB_XBGTK}" = "yes" ]; then
+    HARBOUR_LIBS="\${HARBOUR_LIBS} -lxbgtk"
+fi
 if [ "\${HB_ARCHITECTURE}" = "darwin" ] || [ "\${HB_ARCHITECTURE}" = "sunos" ]; then
     HARBOUR_LIBS="\${HARBOUR_LIBS} \${HARBOUR_LIBS}"
 else

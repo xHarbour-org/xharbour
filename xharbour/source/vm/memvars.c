@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.87 2004/10/20 20:19:40 ronpinkas Exp $
+ * $Id: memvars.c,v 1.88 2004/10/26 04:56:49 ronpinkas Exp $
  */
 
 /*
@@ -792,7 +792,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
          }
 
          // Count this new value.
-         s_globalTable[ pDyn->hMemvar ].counter = 1;
+         /* s_globalTable[ pDyn->hMemvar ].counter = 1; */
       }
       else
       {

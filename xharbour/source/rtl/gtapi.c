@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.49 2004/11/26 17:46:31 druzus Exp $
+ * $Id: gtapi.c,v 1.50 2004/11/26 21:58:24 druzus Exp $
  */
 
 /*
@@ -1318,7 +1318,7 @@ USHORT HB_EXPORT hb_gtWrite( BYTE * pStr, ULONG ulLength )
                           HB_GT_SET_POS_AFTER );
 
       /* Test End of line */
-      if ( s_Width > 0 && s_iCol > ct_ULCol )
+      if ( ct_NCur > 0 && s_Width > 0 && s_iCol > ct_ULCol )
       {
          if ( s_iRow < ct_ULRow )
             hb_gtSetPosContext( s_iRow - ct_UFRow + 1, 0, HB_GT_SET_POS_AFTER );
@@ -1379,7 +1379,7 @@ USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr,
                           HB_GT_SET_POS_AFTER );
 
       /* Test End of line */
-      if ( s_Width > 0 && s_iCol > ct_ULCol )
+      if ( ct_NCur > 0 && s_Width > 0 && s_iCol > ct_ULCol )
       {
          if ( s_iRow < ct_ULRow )
             hb_gtSetPosContext( s_iRow - ct_UFRow + 1, 0, HB_GT_SET_POS_AFTER );

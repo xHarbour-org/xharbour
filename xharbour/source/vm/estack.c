@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.66 2004/08/17 19:32:51 ronpinkas Exp $
+ * $Id: estack.c,v 1.67 2004/11/21 21:44:26 druzus Exp $
  */
 
 /*
@@ -77,6 +77,7 @@ HB_EXPORT HB_STACK hb_GetStack( void )
 
 /* ------------------------------- */
 
+#undef hb_stackPop
 void HB_EXPORT hb_stackPop( void )
 {
    HB_THREAD_STUB
@@ -98,6 +99,7 @@ void HB_EXPORT hb_stackPop( void )
    }
 }
 
+#undef hb_stackDec
 void HB_EXPORT hb_stackDec( void )
 {
    HB_THREAD_STUB
@@ -110,11 +112,11 @@ void HB_EXPORT hb_stackDec( void )
    }
 }
 
+#undef hb_stackPush
 void HB_EXPORT hb_stackPush( void )
 {
    LONG CurrIndex;   /* index of current top item */
    LONG TopIndex;    /* index of the topmost possible item */
-   LONG i;
 
    HB_THREAD_STUB
 
@@ -131,6 +133,7 @@ void HB_EXPORT hb_stackPush( void )
       #endif
 
       LONG BaseIndex;   /* index of stack base */
+      LONG i;
 
       BaseIndex = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
 
@@ -178,6 +181,31 @@ void HB_EXPORT hb_stackPush( void )
    ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
 }
 
+void hb_stackIncrease( void )
+{
+   LONG BaseIndex;   /* index of stack base */
+   LONG CurrIndex;   /* index of current top item */
+   LONG i;
+
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackIncrease()"));
+
+   BaseIndex = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
+   CurrIndex = HB_VM_STACK.pPos - HB_VM_STACK.pItems;
+
+   /* no, make more headroom: */
+   /* hb_stackDispLocal(); */
+   HB_VM_STACK.pItems = ( HB_ITEM_PTR * ) hb_xrealloc( ( void *) HB_VM_STACK.pItems, sizeof( HB_ITEM_PTR ) *
+                             ( HB_VM_STACK.wItems + STACK_EXPANDHB_ITEMS ) );
+
+   /* fix possibly modified by realloc pointers: */
+   HB_VM_STACK.pPos = HB_VM_STACK.pItems + CurrIndex;
+   HB_VM_STACK.pBase = HB_VM_STACK.pItems + BaseIndex;
+   HB_VM_STACK.wItems += STACK_EXPANDHB_ITEMS;
+   for( i = CurrIndex + 1; i < HB_VM_STACK.wItems; ++i )
+      HB_VM_STACK.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
+}
 
 void hb_stackInit( void )
 {
