@@ -388,6 +388,8 @@ STATIC s_sPending
 STATIC s_lTrying := .F.
 STATIC s_lReturnRequested
 
+STATIC s_bExternalRecovery
+
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
   STATIC PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
@@ -625,15 +627,15 @@ STATIC s_lReturnRequested
       InitResults()
 
       IF Len( aDefRules ) != Len( aDefResults )
-         Alert( [#DEFINE Rules size mismatch] )
+         Eval( ErrorBlock(), ErrorNew( [PP], 1003, [Pre-Processing], [#DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
       ENDIF
 
       IF Len( aTransRules ) != Len( aTransResults )
-         Alert( [#TRANSLATE Rules size mismatch] )
+         Eval( ErrorBlock(), ErrorNew( [PP], 1003, [Pre-Processing], [#TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
       ENDIF
 
       IF Len( aCommRules ) != Len( aCommResults )
-         Alert( [#DEFINE Rules size mismatch] )
+         Eval( ErrorBlock(), ErrorNew( [PP], 1003, [Pre-Processing], [#COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
       ENDIF
 
       CompileDefine( "__PP__" )
@@ -642,7 +644,7 @@ STATIC s_lReturnRequested
       #endif
    ELSE
       IF sCH == NIL
-         Alert( [Not using standard rules.] )
+         PP_Warning( [Not using standard rules.] )
       ENDIF
    ENDIF
 
@@ -713,89 +715,98 @@ FUNCTION PP_ExecMethod( sProcName, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
       nProc := aScan( s_aProcedures, {|aProc| aProc[1] == sProc } )
    ENDIF
 
-   IF nProc > 0
-      s_xRet := NIL
-
+   #ifdef __XHARBOUR__
+      s_aParams := HB_aParams()
+      aDel( s_aParams, 1, .T. )
+   #else
       nParams := PCount()
       s_aParams := {}
-#ifdef __CLIP__
-   FOR i := 2 TO nParams
-      aAdd( s_aParams, Param( i ) )
-   NEXT
-#else
-      DO CASE
-         CASE nParams == 0
-         CASE nParams == 1
-            aAdd( s_aParams, p1 )
-         CASE nParams == 2
-            aAdd( s_aParams, p1 )
-            aAdd( s_aParams, p2 )
-         CASE nParams == 3
-            aAdd( s_aParams, p1 )
-            aAdd( s_aParams, p2 )
-            aAdd( s_aParams, p3 )
-         CASE nParams == 4
-            aAdd( s_aParams, p1 )
-            aAdd( s_aParams, p2 )
-            aAdd( s_aParams, p3 )
-            aAdd( s_aParams, p4 )
-         CASE nParams == 5
-            aAdd( s_aParams, p1 )
-            aAdd( s_aParams, p2 )
-            aAdd( s_aParams, p3 )
-            aAdd( s_aParams, p4 )
-            aAdd( s_aParams, p5 )
-         CASE nParams == 6
-            aAdd( s_aParams, p1 )
-            aAdd( s_aParams, p2 )
-            aAdd( s_aParams, p3 )
-            aAdd( s_aParams, p4 )
-            aAdd( s_aParams, p5 )
-            aAdd( s_aParams, p6 )
-         CASE nParams == 7
-            aAdd( s_aParams, p1 )
-            aAdd( s_aParams, p2 )
-            aAdd( s_aParams, p3 )
-            aAdd( s_aParams, p4 )
-            aAdd( s_aParams, p5 )
-            aAdd( s_aParams, p6 )
-            aAdd( s_aParams, p7 )
-         CASE nParams == 8
-            aAdd( s_aParams, p1 )
-            aAdd( s_aParams, p2 )
-            aAdd( s_aParams, p3 )
-            aAdd( s_aParams, p4 )
-            aAdd( s_aParams, p5 )
-            aAdd( s_aParams, p6 )
-            aAdd( s_aParams, p7 )
-            aAdd( s_aParams, p8 )
-         CASE nParams == 9
-            aAdd( s_aParams, p1 )
-            aAdd( s_aParams, p2 )
-            aAdd( s_aParams, p3 )
-            aAdd( s_aParams, p4 )
-            aAdd( s_aParams, p5 )
-            aAdd( s_aParams, p6 )
-            aAdd( s_aParams, p7 )
-            aAdd( s_aParams, p8 )
-            aAdd( s_aParams, p9 )
-      ENDCASE
-#endif
 
-      PP_ExecProcedure( s_aProcedures[nProc] )
+      #ifdef __CLIP__
+         FOR i := 2 TO nParams
+            aAdd( s_aParams, Param( i ) )
+         NEXT
+      #else
+         nParams--
+
+         DO CASE
+            CASE nParams == 1
+               aAdd( s_aParams, p1 )
+            CASE nParams == 2
+               aAdd( s_aParams, p1 )
+               aAdd( s_aParams, p2 )
+            CASE nParams == 3
+               aAdd( s_aParams, p1 )
+               aAdd( s_aParams, p2 )
+               aAdd( s_aParams, p3 )
+            CASE nParams == 4
+               aAdd( s_aParams, p1 )
+               aAdd( s_aParams, p2 )
+               aAdd( s_aParams, p3 )
+               aAdd( s_aParams, p4 )
+            CASE nParams == 5
+               aAdd( s_aParams, p1 )
+               aAdd( s_aParams, p2 )
+               aAdd( s_aParams, p3 )
+               aAdd( s_aParams, p4 )
+               aAdd( s_aParams, p5 )
+            CASE nParams == 6
+               aAdd( s_aParams, p1 )
+               aAdd( s_aParams, p2 )
+               aAdd( s_aParams, p3 )
+               aAdd( s_aParams, p4 )
+               aAdd( s_aParams, p5 )
+               aAdd( s_aParams, p6 )
+            CASE nParams == 7
+               aAdd( s_aParams, p1 )
+               aAdd( s_aParams, p2 )
+               aAdd( s_aParams, p3 )
+               aAdd( s_aParams, p4 )
+               aAdd( s_aParams, p5 )
+               aAdd( s_aParams, p6 )
+               aAdd( s_aParams, p7 )
+            CASE nParams == 8
+               aAdd( s_aParams, p1 )
+               aAdd( s_aParams, p2 )
+               aAdd( s_aParams, p3 )
+               aAdd( s_aParams, p4 )
+               aAdd( s_aParams, p5 )
+               aAdd( s_aParams, p6 )
+               aAdd( s_aParams, p7 )
+               aAdd( s_aParams, p8 )
+            CASE nParams == 9
+               aAdd( s_aParams, p1 )
+               aAdd( s_aParams, p2 )
+               aAdd( s_aParams, p3 )
+               aAdd( s_aParams, p4 )
+               aAdd( s_aParams, p5 )
+               aAdd( s_aParams, p6 )
+               aAdd( s_aParams, p7 )
+               aAdd( s_aParams, p8 )
+               aAdd( s_aParams, p9 )
+         ENDCASE
+      #endif
+   #endif
+
+   IF nProc > 0
+      s_xRet := NIL
+      PP_ExecProcedure( s_aProcedures, nProc )
    ELSE
-      Alert( [Missing Method: ] + sProcName )
+      Eval( ErrorBlock(), ErrorNew( [PP], 1004, sProcName, [Missing Method: ], s_aParams ) )
    ENDIF
 
 RETURN s_xRet
 
 //--------------------------------------------------------------//
 
-FUNCTION PP_ExecProcedure( aProc, sProcName )
+FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
+   LOCAL aProc := aProcedures[nProc]
    LOCAL nBlock, nBlocks := Len( aProc[2] ), xErr
    LOCAL nVar, nVars
    LOCAL anRecover := {}, acRecover := {}, lRecover := .F.
+   LOCAL bErrHandler
+   LOCAL aBlocks, aCode, OpCode
 
    IF s_nProcStack > 0
       /* Saving Privates of upper level. */
@@ -833,22 +844,32 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
    s_nProcStack++
    s_lReturnRequested := .F.
 
-   FOR nBlock := 1 TO nBlocks
+   #ifdef __XHARBOUR__
+      SET( _SET_ERRORLOOP, SET( _SET_ERRORLOOP ) + 8 )
+   #endif
 
-      IF ValType( aProc[2][nBlock][2] ) == 'B'
-         s_aProcStack[ Len( s_aProcStack ) ][2] := aProc[2][nBlock][3] // Line No.
+   aBlocks := aProc[2]
+
+   bErrHandler := ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
+
+   FOR nBlock := 1 TO nBlocks
+      aCode := aBlocks[nBlock]
+      OpCode  := aCode[2]
+
+      IF ValType( OpCode ) == 'B'
+         s_aProcStack[ Len( s_aProcStack ) ][2] := aCode[3] // Line No.
 
          BEGIN SEQUENCE
 
-            //TraceLog( "Line: " + Str( aProc[2][nBlock][3], 3 ) )
+            //TraceLog( "Line: " + Str( aCode[3], 3 ) )
 
-            IF aProc[2][nBlock][1] == 0
-               //? aProc[2][nBlock][3]
-               Eval( aProc[2][nBlock][2] )
+            IF aCode[1] == 0
+               //? aCode[3]
+               Eval( OpCode )
             ELSE
-               IF ! Eval( aProc[2][nBlock][2] ) // Jump if FALSE.
-                  nBlock := aProc[2][nBlock][1]
-                  //TraceLog( "Jump: " + Str( aProc[2][nBlock][3], 3 ) )
+               IF ! Eval( OpCode ) // Jump if FALSE.
+                  nBlock := aCode[1]
+                  //TraceLog( "Jump: " + Str( aCode[3], 3 ) )
                ENDIF
             ENDIF
 
@@ -864,7 +885,7 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
             ELSE
                IF Len( anRecover ) > 0
                   IF ! Empty( acRecover[ Len( acRecover ) ] )
-                     TraceLog( acRecover[ Len( acRecover ) ] )
+                     //TraceLog( acRecover[ Len( acRecover ) ] )
                      M->&( acRecover[ Len( acRecover ) ] ) := xErr
                   ENDIF
 
@@ -877,45 +898,50 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
 
          END SEQUENCE
 
-      ELSEIF aProc[2][nBlock][2] == PP_OP_JUMP
+      ELSEIF OpCode == PP_OP_JUMP
 
-         nBlock := aProc[2][nBlock][1]
+         nBlock := aCode[1]
 
-      ELSEIF aProc[2][nBlock][2] == PP_OP_TRY
+      ELSEIF OpCode == PP_OP_TRY
 
-         aAdd( acRecover, aProc[2][nBlock][1][1] ) // Catcher Var
-         aAdd( anRecover, aProc[2][nBlock][1][2] ) // Recovery Address
+         aAdd( acRecover, aCode[1][1] ) // Catcher Var
+         aAdd( anRecover, aCode[1][2] ) // Recovery Address
 
          s_lTrying := .T.
 
-      ELSEIF aProc[2][nBlock][2] == PP_OP_ENDTRY
+      ELSEIF OpCode == PP_OP_ENDTRY
 
          aSize( acRecover, Len( acRecover ) - 1 )
          aSize( anRecover, Len( anREcover ) - 1 )
 
          s_lTrying := .F.
 
-      ELSEIF aProc[2][nBlock][2] == PP_OP_BEGIN
+      ELSEIF OpCode == PP_OP_BEGIN
 
-         aAdd( acRecover, aProc[2][nBlock][1][1] ) // Catcher Var
-         aAdd( anRecover, aProc[2][nBlock][1][2] ) // Recovery Address
+         aAdd( acRecover, aCode[1][1] ) // Catcher Var
+         aAdd( anRecover, aCode[1][2] ) // Recovery Address
 
-      ELSEIF aProc[2][nBlock][2] == PP_OP_ENDBEGIN
+      ELSEIF OpCode == PP_OP_ENDBEGIN
 
          aSize( acRecover, Len( acRecover ) - 1 )
          aSize( anRecover, Len( anREcover ) - 1 )
 
-      //ELSEIF aProc[2][nBlock][2] == PP_OP_NOOP
+      //ELSEIF OpCode == PP_OP_NOOP
 
          // Do nothing.
 
       ELSE
 
-          Alert( "Internal Error! Unsupported OPCode." )
-          __Quit()
+          Eval( bErrHandler, ErrorNew( [PP], 1005, ProcName(), [Unsupported OPCode.], { aProc, nBlock } ) )
 
       ENDIF
    NEXT
+
+   ErrorBlock( bErrHandler )
+
+   #ifdef __XHARBOUR__
+      SET( _SET_ERRORLOOP, SET( _SET_ERRORLOOP ) - 8 )
+   #endif
 
    /* Releasing Privates created by the Procedure */
    nVars := Len( s_asPrivates )
@@ -986,6 +1012,8 @@ PROCEDURE RP_Dot()
 
    LOCAL aKBCommands := Array( 16 ), nKBCommand := 1, nTemp, bKey5, bKey24
 
+   LOCAL bErrHandler
+
    #ifdef FW
        Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + [;;Please try Interpreter mode, using the -R switch...] )
        RETURN
@@ -1021,7 +1049,7 @@ PROCEDURE RP_Dot()
       aCpyTranResults := aClone( aTransResults )
    #endif
 
-   ErrorBlock( {|oErr| RP_Dot_Err( oErr ) } )
+   bErrHandler := ErrorBlock( {|oErr| RP_Dot_Err( oErr ) } )
 
    CLEAR SCREEN
    SET SCOREBOARD OFF
@@ -1102,6 +1130,8 @@ PROCEDURE RP_Dot()
    ENDDO
 
    CLEAR SCREEN
+
+   ErrorBlock( bErrHandler )
 
 RETURN
 
@@ -1273,10 +1303,12 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
    LOCAL nJumps, nJump
    LOCAL sCounter, sStart, sEnd, sStep
    LOCAL Dummy
+   LOCAL bErrHandler, oError
 
    ExtractLeadingWS( @sPPed )
    DropTrailingWS( @sPPed )
 
+   bErrHandler := ErrorBlock( {|oErr| Break( oErr )} )
    //TraceLog( s_sModule, sPPed, nLine )
 
    BEGIN SEQUENCE
@@ -1318,6 +1350,10 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
             ENDIF
 
             IF sBlock = "PP_PROC"
+               IF Len( aProcedures[ nProcId ][2] ) > 0
+                  bProc := {|| PP_ExecProcedure( &nProcID ) }
+               ENDIF
+
                sSymbol := Upper( LTrim( SubStr( sBlock, At( ' ', sBlock ) ) ) )
                aSize( aProcedures, ++nProcId )
 
@@ -1367,7 +1403,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__NEXT"
 
                      IF s_nCompLoop == 0 .OR. s_aLoopJumps[ s_nCompLoop ][3] != "F"
-                        Alert( [NEXT does not match FOR] )
+                        Eval( bErrHandler, ErrorNew( [PP], 2029, [Parse], [NEXT does not match FOR], sBlock ) )
                      ELSE
                         aAdd( aProcedures[ nProcId ][2], { 0, s_aLoopJumps[ s_nCompLoop ][4], nLine } ) // STEP
                         aAdd( aProcedures[ nProcId ][2], { s_aLoopJumps[ s_nCompLoop ][1] - 1, PP_OP_JUMP, nLine } ) // Loop back
@@ -1413,7 +1449,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__CATCH"
 
                      IF s_acFlowType[ s_nFlowId ] != "T"
-                        Alert( [CATCH with no TRY in sight!] )
+                        Eval( bErrHandler, ErrorNew( [PP], 2046, [Parse], [CATCH with no TRY in sight!], sBlock ) )
                      ELSE
                         aAdd( aProcedures[ nProcId ][2], { NIL, PP_OP_JUMP, nLine } ) // Unconditional Jump to END
 
@@ -1427,7 +1463,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__RECOVER"
 
                      IF s_acFlowType[ s_nFlowId ] != "B"
-                        Alert( [CATCH with no TRY in sight!] )
+                        Eval( bErrHandler, ErrorNew( [PP], 2046, [Parse], [RECOVER with no TRY in sight!], sBlock ) )
                      ELSE
                         aAdd( aProcedures[ nProcId ][2], { NIL, PP_OP_JUMP, nLine } ) // Unconditional Jump to END
 
@@ -1451,7 +1487,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__LOOP"
 
                      IF s_nCompLoop == 0
-                        Alert( [LOOP with no loop in sight!] )
+                        Eval( bErrHandler, ErrorNew( [PP], 2012, [Parse], [LOOP with no loop in sight!], sBlock ) )
                      ELSE
                         IF s_aLoopJumps[ s_nCompLoop ][3] == "F"
                            aAdd( aProcedures[ nProcId ][2], { 0, s_aLoopJumps[ s_nCompLoop ][4], nLine } ) // STEP
@@ -1465,7 +1501,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__EXIT"
 
                      IF s_nCompLoop == 0
-                        Alert( [EXIT with no loop in sight!] )
+                        Eval( bErrHandler, ErrorNew( [PP], 2011, [Parse], [EXIT with no loop in sight!], sBlock ) )
                      ELSE
                         aAdd( aProcedures[ nProcId ][2], { 0, PP_OP_JUMP, nLine } ) // Place holder for unconditional Jump to END.
                         aAdd( s_aLoopJumps[ s_nCompLoop ][2], Len( aProcedures[ nProcId ][2] ) ) // Address of line to later place unconditional Jump instruction into.
@@ -1478,7 +1514,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      //aSize( s_acFlowType, s_nFlowId )
 
                      IF s_nCompLoop == 0
-                        Alert( [ENDDO does not match WHILE] )
+                        Eval( bErrHandler, ErrorNew( [PP], 2028, [Parse], [ENDDO does not match WHILE], sBlock ) )
                      ELSE
                         aAdd( aProcedures[ nProcId ][2], { s_aLoopJumps[ s_nCompLoop ][1] - 1, PP_OP_JUMP, nLine } ) // Loop back
                         aProcedures[ nProcId ][2][ s_aLoopJumps[s_nCompLoop][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
@@ -1508,7 +1544,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__CASE"
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "C" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Alert( [CASE does not match DO CASE] )
+                        Eval( bErrHandler, ErrorNew( [PP], 2031, [Parse], [CASE does not match DO CASE], sBlock ) )
                         LOOP
                      ELSE
                         IF s_aIfJumps[ s_nCompIf ][1] > 0
@@ -1524,7 +1560,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__OTHERWISE"
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "C" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Alert( [OTHERWISE does not match DO CASE] )
+                        Eval( bErrHandler, ErrorNew( [PP], 2031, [Parse], [OTHERWISE does not match DO CASE], sBlock ) )
                      ELSE
                         s_aIfJumps[ s_nCompIf ][4] := .T.
 
@@ -1543,7 +1579,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      //aSize( s_acFlowType, s_nFlowId )
 
                      IF s_nCompIf == 0
-                        Alert( [ENDCASE with no DO CASE in sight!] )
+                        Eval( bErrHandler, ErrorNew( [PP], 2030, [Parse], [ENDCASE with no DO CASE in sight!], sBlock ) )
                      ELSE
                         IF s_aIfJumps[ s_nCompIf ][1] > 0
                            aProcedures[ nProcId ][2][ s_aIfJumps[s_nCompIf][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
@@ -1573,7 +1609,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__ELSEIF"
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Alert( [ELSEIF does not match IF] )
+                        Eval( bErrHandler, ErrorNew( [PP], 2026, [Parse], [ELSEIF does not match IF], sBlock ) )
                         LOOP
                      ELSE
                         IF s_aIfJumps[ s_nCompIf ][1] > 0
@@ -1589,7 +1625,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__ELSE"
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Alert( [ELSE does not match IF] )
+                        Eval( bErrHandler, ErrorNew( [PP], 2025, [Parse], [ELSE does not match IF], sBlock ) )
                      ELSE
                         s_aIfJumps[ s_nCompIf ][4] := .T.
 
@@ -1606,7 +1642,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      //aSize( s_acFlowType, s_nFlowId )
 
                      IF s_nCompIf == 0
-                        Alert( [ENDIF does not match IF] )
+                        Eval( bErrHandler, ErrorNew( [PP], 2027, [Parse], [ENDIF does not match IF], sBlock ) )
                      ELSE
                         aProcedures[ nProcId ][2][ s_aIfJumps[s_nCompIf][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
 
@@ -1624,11 +1660,8 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__END"
 
                      IF s_nCompIf == 0 .AND. s_nCompLoop == 0
-
-                        Alert( [END with no Flow-Control structure in sight!] )
-
+                        Eval( bErrHandler, ErrorNew( [PP], 2027, [Parse], [END with no Flow-Control structure in sight!], sBlock ) )
                      ELSE
-
                         IF s_acFlowType[ s_nFlowId ] $ "FW"
 
                            IF s_acFlowType[ s_nFlowId ] $ "F"
@@ -1715,6 +1748,18 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
       ENDDO
 
+   RECOVER USING oError
+      IF( ValType( oError ) == 'O' )
+         //TraceLog( oError:SubSystem, oError:Operation, oError:Description )
+         IF oError:Operation == '&'
+            oError:SubSystem := "PP"
+            oError:Operation := "Parse"
+            oError:Description := "Syntax Error, Line: " + Str( nLine, 5 )
+            oError:Args := { sBlock }
+         ENDIF
+
+         Eval( bErrHandler, oError )
+      ENDIF
    END SEQUENCE
 
 RETURN aProcedures
@@ -1726,6 +1771,8 @@ FUNCTION PP_ProcName( nLevel )
    IF nLevel == NIL
       nLevel := 0
    ENDIF
+
+   TraceLog( s_nProcStack, nLevel )
 
    IF nLevel >= 0 .AND. nLevel < s_nProcStack
       RETURN s_aProcStack[ s_nProcStack - nLevel ][1]
@@ -1767,7 +1814,7 @@ PROCEDURE PP_LocalParams( aVars )
          &( aVars[nVar] ) := xInit
          aAdd( s_asLocals, aVars[nVar] )
       ELSE
-         Alert( PP_ProcName() + " (" + LTrim( Str( PP_ProcLine() ) ) +  ")" + [ Declared Parameter redeclaration: ] + aVars[nVar] )
+         Eval( ErrorBlock(), ErrorNew( [PP], 2034, aVars[nVar], [ Declared Parameter redeclaration: ], aVars ) )
       ENDIF
    NEXT
 
@@ -1793,7 +1840,7 @@ PROCEDURE PP_Params( aVars )
          &( aVars[nVar] ) := xInit
          aAdd( s_asPrivates, aVars[nVar] )
       ELSE
-         Alert( PP_ProcName() + " (" + LTrim( Str( PP_ProcLine() ) ) +  ")" + [ Parameter redeclaration: ] + aVars[nVar] )
+         Eval( ErrorBlock(), ErrorNew( [PP], 2034, aVars[nVar], [ Declared Parameter redeclaration: ], aVars ) )
       ENDIF
    NEXT
 
@@ -1822,7 +1869,7 @@ PROCEDURE PP_Privates( aVars )
          &( aVars[nVar] ) := &( cInit )
          aAdd( s_asPrivates, aVars[nVar] )
       ELSE
-         Alert( PP_ProcName() + " (" + LTrim( Str( PP_ProcLine() ) ) +  ")" + [ Private redeclaration: ] + aVars[nVar] )
+         Eval( ErrorBlock(), ErrorNew( [PP], 2016, aVars[nVar], [ Private redeclaration: ], aVars ) )
       ENDIF
    NEXT
 
@@ -1847,7 +1894,7 @@ PROCEDURE PP_Locals( aVars )
          &( aVars[nVar] ) := &( cInit )
          aAdd( s_asLocals, aVars[nVar] )
       ELSE
-         Alert( [Local redeclaration: ] + aVars[nVar] )
+         Eval( ErrorBlock(), ErrorNew( [PP], 2016, aVars[nVar], [ Local redeclaration: ], aVars ) )
       ENDIF
    NEXT
 
@@ -1875,7 +1922,7 @@ PROCEDURE PP_Publics( aVars )
          &( aVars[nVar] ) := &( cInit )
          aAdd( s_asPublics, aVars[nVar] )
       ELSE
-         Alert( [Public redeclaration: ] + aVars[nVar] )
+         Eval( ErrorBlock(), ErrorNew( [PP], 2016, aVars[nVar], [ Public redeclaration: ], aVars ) )
       ENDIF
    NEXT
 
@@ -1905,7 +1952,7 @@ PROCEDURE PP_Statics( aVars )
        #else
          IF aScan( aVars, {|sVar| sVar == aVars[nVar] }, 1, nVar - 1 ) > 0
        #endif
-            Alert( [Type: ] + Type( aVars[nVar] ) + [ Static redeclaration: '] + aVars[nVar] )
+            Eval( ErrorBlock(), ErrorNew( [PP], 2016, aVars[nVar], [ Static redeclaration: ], aVars ) )
          ENDIF
       ENDIF
    NEXT
@@ -1917,58 +1964,67 @@ RETURN
 PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
    LOCAL nBaseProc := s_nProcId, sPresetModule := s_sModule, nProc
+   LOCAL bErrHandler, oError
 
    IF bBlanks == NIL
       bBlanks := .T.
    ENDIF
 
-   IF ! s_lRunLoaded
-      s_lRunLoaded := .T.
+   bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
 
-      IF File( "rp_run.ch" )
-         Alert( "oops!!!" )
-         PP_PreProFile( "rp_run.ch" )
-      ELSE
-         InitRunRules()
-         InitRunResults()
+   BEGIN SEQUENCE
 
-         IF Len( aDefRules ) != Len( aDefResults )
-            Alert( [Run #DEFINE Rules size mismatch] )
-         ENDIF
+      IF ! s_lRunLoaded
+         s_lRunLoaded := .T.
 
-         IF Len( aTransRules ) != Len( aTransResults )
-            Alert( [Run #TRANSLATE Rules size mismatch] )
-         ENDIF
+         IF File( "rp_run.ch" )
+            PP_PreProFile( "rp_run.ch" )
+         ELSE
+            InitRunRules()
+            InitRunResults()
 
-         IF Len( aCommRules ) != Len( aCommResults )
-            Alert( [Run #DEFINE Rules size mismatch] )
+            IF Len( aDefRules ) != Len( aDefResults )
+               Eval( bErrHandler, ErrorNew( [PP], 9001, [Rules], [#DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+            ENDIF
+
+            IF Len( aTransRules ) != Len( aTransResults )
+               Eval( bErrHandler, ErrorNew( [PP], 9001, [Rules], [#TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+            ENDIF
+
+            IF Len( aCommRules ) != Len( aCommResults )
+               Eval( bErrHandler, ErrorNew( [PP], 9001, [Rules], [#COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+            ENDIF
          ENDIF
       ENDIF
-   ENDIF
 
-   //TraceLog( cFile, s_sModule, s_aProcedures, s_aInitExit, s_nProcId, aParams )
+      //TraceLog( cFile, s_sModule, s_aProcedures, s_aInitExit, s_nProcId, aParams )
 
-   IF s_sModule == cFile
-      TraceLog( s_aProcedures, s_aInitExit, s_nProcId, aParams )
-   ELSE
-      s_nProcId := 0; s_aProcedures := {}; s_aInitExit := { {}, {} }
-      s_asPrivates := {}; s_asPublics := {}; s_asLocals := {}; s_asStatics := {}; s_aParams := {}
+      IF s_sModule == cFile
+         TraceLog( s_aProcedures, s_aInitExit, s_nProcId, aParams )
+      ELSE
+         s_nProcId := 0; s_aProcedures := {}; s_aInitExit := { {}, {} }
+         s_asPrivates := {}; s_asPublics := {}; s_asLocals := {}; s_asStatics := {}; s_aParams := {}
 
-      s_sModule := cFile
-      bCompile  := .T.
-      PP_PreProFile( cFile, sPPOExt, bBlanks )
-      bCompile  := .F.
-   ENDIF
+         s_sModule := cFile
+         bCompile  := .T.
+         PP_PreProFile( cFile, sPPOExt, bBlanks )
+         bCompile  := .F.
+      ENDIF
 
-   PP_Exec( s_aProcedures, s_aInitExit, s_nProcId, aParams )
+      PP_Exec( s_aProcedures, s_aInitExit, s_nProcId, aParams )
 
-   #ifdef __CLIPPER__
-      Memory(-1)
-   #else
-      HB_GCALL()
-   #endif
+      #ifdef __CLIPPER__
+         Memory(-1)
+      #else
+         HB_GCALL()
+      #endif
 
-   s_sModule := sPresetModule
+      s_sModule := sPresetModule
+   RECOVER USING oError
+      Eval( bErrHandler, oError )
+   END
+
+   ErrorBlock( bErrHandler )
 
 RETURN
 
@@ -2028,7 +2084,6 @@ PROCEDURE RP_Dot_Err( oErr )
       NEXT
    ENDIF
 
-   TraceLog( [Sorry, could not execute: ] + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
    Alert( [Sorry, could not execute: ] + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
 
    BREAK
@@ -2037,163 +2092,26 @@ PROCEDURE RP_Dot_Err( oErr )
 
 //--------------------------------------------------------------//
 
-PROCEDURE RP_PPText_Err( oErr, sLine, nLine )
+FUNCTION RP_Run_Err( oErr, aProcedures )
 
-   LOCAL Counter, xArg, sArgs := ";"
+   LOCAL nProc, sProc
+   LOCAL oRecover, lSuccess
 
-   IF ValType( oErr:Args ) == 'A' .AND. Len( oErr:Args ) > 0
-      sArgs := ";Arguments: "
+   oErr:ProcName   := PP_ProcName()
+   oErr:ProcLine   := PP_ProcLine()
+   oErr:ModuleName := s_sFile
 
-      FOR Counter := 1 TO Len( oErr:Args )
-         xArg := oErr:Args[Counter]
-
-         DO CASE
-            CASE xArg == NIL
-               sArgs += "NIL; "
-
-            CASE ValType( xArg ) == 'A'
-               sArgs += "{}; "
-
-            CASE ValType( xArg ) == 'B'
-               sArgs += "{|| }; "
-
-            CASE ValType( xArg ) == 'C'
-               sArgs += '"' + xArg + '"; '
-
-            CASE ValType( xArg ) == 'D'
-               sArgs +=  dtoc( xArg ) + "; "
-
-            CASE ValType( xArg ) == 'L'
-               sArgs += IIF( xArg, ".T.; ", ".F.; " )
-
-            CASE ValType( xArg ) == 'N'
-               sArgs +=  Str( xArg ) + "; "
-
-            CASE ValType( xArg ) == 'O'
-               sArgs +=  "{o}"
-
-            OTHERWISE
-               sArgs +=  '[' + ValType( xArg ) + "]; "
-         ENDCASE
-      NEXT
-   ENDIF
-
-   TraceLog( [Line: ] + Str( nLine, 4 ) + [ could not compile: ] + "'" + sLine + "';" + oErr:Description + sArgs + ProcName(2) + '[' + Str( ProcLine(2) ) + ']' )
-   Alert( [Line: ] + Str( nLine, 4 ) + [ could not compile: ] + "'" + sLine + "';" + oErr:Description + sArgs + ProcName(2) + '[' + Str( ProcLine(2) ) + ']' )
-
-   BREAK
-
-//RETURN // Unreacable code
-
-//--------------------------------------------------------------//
-
-PROCEDURE RP_Comp_Err( oErr, sLine, nLine )
-
-   LOCAL Counter, xArg, sArgs := ";"
-
-   ErrorBlock( {|e| TraceLog( e:Description, e:SubSystem, e:SubCode, e:Args ), __Quit() } )
-
-   IF ValType( oErr:Args ) == 'A' .AND. Len( oErr:Args ) > 0
-      sArgs := ";Arguments: "
-
-      FOR Counter := 1 TO Len( oErr:Args )
-         xArg := oErr:Args[Counter]
-
-         DO CASE
-            CASE xArg == NIL
-               sArgs += "NIL; "
-
-            CASE ValType( xArg ) == 'A'
-               sArgs += "{}; "
-
-            CASE ValType( xArg ) == 'B'
-               sArgs += "{|| }; "
-
-            CASE ValType( xArg ) == 'C'
-               sArgs += '"' + xArg + '"; '
-
-            CASE ValType( xArg ) == 'D'
-               sArgs +=  dtoc( xArg ) + "; "
-
-            CASE ValType( xArg ) == 'L'
-               sArgs += IIF( xArg, ".T.; ", ".F.; " )
-
-            CASE ValType( xArg ) == 'N'
-               sArgs +=  Str( xArg ) + "; "
-
-            CASE ValType( xArg ) == 'O'
-               sArgs +=  "{o}"
-
-            OTHERWISE
-               sArgs +=  '[' + ValType( xArg ) + "]; "
-         ENDCASE
-      NEXT
-   ENDIF
-
-   TraceLog( [Line: ] + Str( nLine, 4 ) + [ could not compile: ] + "'" + sLine + "'" + oErr:Description + sArgs + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
-   Alert( [Line: ] + Str( nLine, 4 ) + [ could not compile:] + ";'" + sLine + "';" + oErr:Description + sArgs + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
-
-   BREAK
-
-//RETURN // Unreacable code
-
-//--------------------------------------------------------------//
-
-FUNCTION RP_Run_Err( oErr, aProcedures, nLine )
-
-   LOCAL Counter, xArg, sArgs := ";", nProc, sProc
-   LOCAL oRecover
-
-   IF nLine == NIL
-      nLine := 0
-   ENDIF
-
-   IF ValType( oErr:Args ) == 'A' .AND. Len( oErr:Args ) > 0
-      sArgs := ";Arguments: "
-
-      FOR Counter := 1 TO Len( oErr:Args )
-         xArg := oErr:Args[Counter]
-
-         DO CASE
-            CASE xArg == NIL
-               sArgs += "NIL; "
-
-            CASE ValType( xArg ) == 'A'
-               sArgs += "{}; "
-
-            CASE ValType( xArg ) == 'B'
-               sArgs += "{|| }; "
-
-            CASE ValType( xArg ) == 'C'
-               sArgs += '"' + xArg + '"; '
-
-            CASE ValType( xArg ) == 'D'
-               sArgs +=  dtoc( xArg ) + "; "
-
-            CASE ValType( xArg ) == 'L'
-               sArgs += IIF( xArg, ".T.; ", ".F.; " )
-
-            CASE ValType( xArg ) == 'N'
-               sArgs +=  Str( xArg ) + "; "
-
-            CASE ValType( xArg ) == 'O'
-               sArgs +=  "{o}; "
-
-            OTHERWISE
-               sArgs +=  '[' + ValType( xArg ) + "]; "
-         ENDCASE
-      NEXT
-   ENDIF
+   oRecover := oErr
 
    IF oErr:SubCode == 1001
       IF s_sModule != NIL
-         sProc := s_sModule + oErr:Operation //ProcName( 2 + 2 )
+         sProc := s_sModule + oErr:Operation
          nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
       ELSE
          nProc := 0
       ENDIF
       IF nProc == 0
-         sProc := oErr:Operation //ProcName( 2 + 2 )
+         sProc := oErr:Operation
          nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
       ENDIF
 
@@ -2205,46 +2123,36 @@ FUNCTION RP_Run_Err( oErr, aProcedures, nLine )
             s_aParams := {}
          ENDIF
 
+         lSuccess := .T.
+
          BEGIN SEQUENCE
-            PP_ExecProcedure( aProcedures[nProc] )
+            PP_ExecProcedure( aProcedures, nProc )
          RECOVER USING oRecover
-            //TraceLog( "Forward Return to RECOVER!" )
-            Break( oRecover )
+            lSuccess := .F.
+            oRecover:Cargo := oErr
          END
 
-         IF oErr:CanSubstitute
-            RETURN ( s_xRet )
-         ELSEIF oErr:CanDefault
-            Alert( [Must Default: ] + "'" + oErr:Operation + "' '" + oErr:Description + ;
-                   sArgs + ";" + ;
-                   PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ");" + ;
-									 ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
-
-            RETURN  ( .F. )
-         ELSE
-            Alert( [No Recovery for: ] + "'" + oErr:Operation + "' " + oErr:Description + ;
-                   sArgs + ;
-                   PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ");" + ;
-                   ProcName(2) + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
-
-            oErr:Cargo := nProc
-            BREAK oErr
+         IF lSuccess
+            RETURN s_xRet
          ENDIF
       ENDIF
    ENDIF
 
-   TraceLog( s_sModule, nLine, "Sorry, R/T Error: [" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) +  "] '" + oErr:Operation + "' '" + oErr:Description + "' " + sArgs + " " + PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
-   //TraceLog( s_sModule, nLine, oErr:Description, oErr:SubSystem, oErr:Operation, sArgs, PP_ProcName() )
+   oRecover:ProcName   := PP_ProcName()
+   oRecover:ProcLine   := PP_ProcLine()
+   oRecover:ModuleName := s_sFile
 
-   IF s_lTrying == .F.
-      Alert( [Line: ] + Str( nLine ) + [ R/T Error: ] + "[" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) + "] '" + oErr:Operation + "';" + ;
-             oErr:Description + ;
-             sArgs + ;
-             PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ");" + ;
-             ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
+   IF s_bExternalRecovery != NIL
+      s_xRet := Eval( s_bExternalRecovery, oRecover )
+
+      IF oRecover:SubCode == 1003 .AND. ( ValType( s_xRet ) != "L" .OR. s_xRet == .F. )
+         Break( oRecover )
+      ENDIF
+
+      RETURN s_xRet
    ENDIF
 
-   BREAK oErr
+   Break( oRecover )
 
 RETURN NIL // Unreacable code
 
@@ -2297,7 +2205,7 @@ FUNCTION __SetEnd()
    IF nIf > 0
       nIf--
    ELSE
-      Alert( [END with no IF in sight!] )
+      Eval( ErrorBlock(), ErrorNew( [PP], 9002, [Flow], [END with no IF in sight!] ) )
    ENDIF
 
 RETURN nIf
@@ -2347,7 +2255,7 @@ FUNCTION __SetEndCase()
    IF nIf > 0
       nIf--
    ELSE
-      Alert( [ENDCASE with no DO CASE in sight!] )
+      Eval( ErrorBlock(), ErrorNew( [PP], 9002, [Flow], [ENDCAE with no DOCASE in sight!] ) )
    ENDIF
 
 RETURN nIf
@@ -2465,14 +2373,17 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
    LOCAL hSource, sBuffer, sLine, nPosition, sExt, cPrev
    LOCAL nLen, nMaxPos, cChar := '', nClose, nBase, nNext, nLine := 0
    LOCAL sRight, nPath := 0, nPaths := Len( s_asPaths ), nNewLine
-   LOCAL sPath := "", cError, sPrevFile := s_sFile
+   LOCAL sPath := "", oError, sPrevFile := s_sFile
    LOCAL sTmp, nLastPosition := 0
+   LOCAL bErrHandler
 
    IF At( '.', sSource ) == 0
      sSource += ".prg"
    ENDIF
 
    s_sFile := sSource
+
+   bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
 
    hSource := FOpen( sSource, 64 )
    IF hSource == -1
@@ -2484,8 +2395,10 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
    ENDIF
 
    IF hSource == -1
-      Alert( [ERROR! opening: ]+ "[" + sSource + "]" + [ O/S Error: ] + Str( FError(), 2 ) )
-      s_sFile := sPrevFile
+      Eval( bErrHandler, ErrorNew( [PP], 3007, sSource, [ERROR! opening: ] + Str( FError(), 2 ),  ) )
+      IF ! Empty( sPrevFile )
+         s_sFile := sPrevFile
+      ENDIF
       RETURN .F.
    ENDIF
 
@@ -2509,8 +2422,10 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
             hPP := FCreate( sSource + sPPOExt )
          ENDIF
          IF hPP == -1
-            Alert( [ERROR! creating '.pp$' file, O/S Error: ] + Str( FError(), 2 ) )
-            s_sFile := sPrevFile
+            Eval( bErrHandler, ErrorNew( [PP], 3006, sSource + sPPOExt, [Can't create preprocessed output file: ] + Str( FError(), 2 ),  ) )
+            IF ! Empty( sPrevFile )
+               s_sFile := sPrevFile
+            ENDIF
             RETURN .F.
          ENDIF
       ENDIF
@@ -2525,10 +2440,6 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
 
    sBuffer   := Space( PP_BUFFER_SIZE )
    sLine     := ''
-
-   IF bCompile
-      ErrorBlock( {|oErr| RP_Comp_Err( oErr, sLine, nLine ) } )
-   ENDIF
 
    BEGIN SEQUENCE
 
@@ -2566,7 +2477,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                       //FSeek( hSource, -1, 1 )
                       nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                       IF nLen < 2
-                         Alert( [ERROR! Unterminated '/**/' ] + "[" + Str( ProcLine() ) + "]" )
+                         Eval( bErrHandler, ErrorNew( [PP], 2083, [Pre-Process], [Unterminated /* */ comment],  ) )
                       ENDIF
                       nMaxPos   := nLen - 1
                       TraceLog( "***" )
@@ -2605,7 +2516,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                          BREAK "//"
                       ENDIF
                       nMaxPos   := nLen - 1
-                      TraceLog( "***" )
+                      //TraceLog( "***" )
                       nPosition := 0
                       LOOP
                    ELSE
@@ -2738,7 +2649,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                       //FSeek( hSource, -1, 1 )
                       nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                       IF nLen < 2
-                         BREAK "*"
+                         BREAK "#!"
                       ENDIF
                       nMaxPos   := nLen - 1
                       nPosition := 1
@@ -2921,14 +2832,22 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
 
    ENDDO
 
-   RECOVER USING cError
-      IF ValType( cError ) == 'C'
-         TraceLog( "No EOL after: ", cError )
+   RECOVER USING oError
+      IF ValType( oError ) == 'C'
+         //TraceLog( "No EOL after: ", cError )
          //Alert( [No EOL after: ] + cError )
+         oError := ErrorNew( [PP], 1002, [Pre-Process], [Missing EOL], { sLine, oError } )
       ENDIF
+
+      IF ValType( oError ) == 'O'
+         Eval( bErrHandler, oError )
+      ENDIF
+
       nPosition := nMaxPos + 2
       sLine := ""
    END SEQUENCE
+
+   ErrorBlock( bErrHandler )
 
    //? '"' + SubStr( Left( sBuffer, nLen ), nPosition ) + '"', nLen, nPosition
 
@@ -2984,7 +2903,9 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
    //? "Done: " + sSource
    //WAIT
 
-   s_sFile := sPrevFile
+   IF ! Empty( sPrevFile )
+      s_sFile := sPrevFile
+   ENDIF
 
 RETURN .T.
 
@@ -3000,10 +2921,11 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    LOCAL nLen, nCycles := 0, aDefined := {}, aTranslated := {}, aCommanded := {}
    LOCAL nPosition
    //LOCAL nIdAt, sRight
-   LOCAL sError
+   LOCAL oError
    LOCAL sBackupLine
    LOCAL sSkipped
    LOCAL bArrayPrefix
+   LOCAL bErrHandler
 
    #ifdef __XHARBOUR__
       LOCAL sTemp
@@ -3013,451 +2935,542 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
    //TraceLog( sLine )
 
-   IF Left( LTrim( sLine ), 1 ) != '#'
-       nPosition := 0
-       WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
-          nPendingLines++
-          aSize( aPendingLines, nPendingLines )
+   bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
 
-          nPosition++
-          aIns( aPendingLines, nPosition )
-          aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
+   BEGIN SEQUENCE
 
-          //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
-          sLine := LTrim( SubStr( sLine, nNewLineAt + 1 ) )
-       ENDDO
+      IF Left( LTrim( sLine ), 1 ) != '#'
+          nPosition := 0
+          WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
+             nPendingLines++
+             aSize( aPendingLines, nPendingLines )
 
-       IF nPosition > 0
-          IF ! Empty( sLine )
-              nPendingLines++
-              aSize( aPendingLines, nPendingLines )
+             nPosition++
+             aIns( aPendingLines, nPosition )
+             aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
 
-              nPosition++
-              aIns( aPendingLines, nPosition )
-              aPendingLines[ nPosition ] := sLine
+             //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
+             sLine := LTrim( SubStr( sLine, nNewLineAt + 1 ) )
+          ENDDO
+
+          IF nPosition > 0
+             IF ! Empty( sLine )
+                 nPendingLines++
+                 aSize( aPendingLines, nPendingLines )
+
+                 nPosition++
+                 aIns( aPendingLines, nPosition )
+                 aPendingLines[ nPosition ] := sLine
+             ENDIF
+
+             //? "Pending #", nPendingLines, sLine, aPendingLines[nPendingLines]
+             sLine := aPendingLines[1]
+             aDel( aPendingLines, 1 )
+             nPendingLines--
           ENDIF
-
-          //? "Pending #", nPendingLines, sLine, aPendingLines[nPendingLines]
-          sLine := aPendingLines[1]
-          aDel( aPendingLines, 1 )
-          nPendingLines--
-       ENDIF
-   ENDIF
-
-   WHILE .T.
-      //? "Processing: '" + sLine + "'"
-      //? nPendingLines, nIfDef, IIF( nIfDef > 0, abIfDef[nIfDef] , )
-      //WAIT
-
-      IF nCycles < MAX_CICLES
-         nCycles++
-      ELSE
-         TraceLog( "Circularity!", sLine )
-         Alert( [ERROR! Circularity detected ]+"[" + sSource + "(" + LTrim( Str( nLine ) ) + ")]" )
-         ? sLine
-         BREAK
       ENDIF
 
-      IF sLine == NIL
-         sLine := ''
-         sLeft := ''
-      ELSE
-         sLeft := ExtractLeadingWS( @sLine )
-      ENDIF
+      WHILE .T.
+         //? "Processing: '" + sLine + "'"
+         //? nPendingLines, nIfDef, IIF( nIfDef > 0, abIfDef[nIfDef] , )
+         //WAIT
 
-      IF sLine == ''
-         IF nPendingLines > 0
-            sLine := aPendingLines[1]
-            aDel( aPendingLines, 1 )
-            nPendingLines--
-
-            LOOP
+         IF nCycles < MAX_CICLES
+            nCycles++
+         ELSE
+            //TraceLog( "Circularity!", sLine )
+            //Alert( [ERROR! Circularity detected ]+"[" + sSource + "(" + LTrim( Str( nLine ) ) + ")]" )
+            //? sLine
+            Eval( bErrHandler, ErrorNew( [PP], 2083, [Pre-Process], [Ciruclarity Detected],  ) )
          ENDIF
 
-         EXIT
-      ENDIF
-
-      IF s_sIncludeFile != NIL
-         IF ! Empty( sSource )
-            aAdd( asOutLines, "#line " + LTrim( Str( nLine ) ) + ' "' + Upper( sSource ) + '"' )
-         ENDIF
-         s_sIncludeFile := NIL
-      ENDIF
-
-      //? "Processing: '" + sLine +"'"
-      //WAIT
-
-      IF Left( sLine, 1 ) == '#'
-
-         sLine := LTrim( SubStr( sLine, 2 ) )
-         sDirective := RTrim( Upper( NextToken( @sLine ) ) )
-
-         IF ( nLen := Len( sDirective ) ) < 4
-            Alert( [ERROR! Unknown directive: ] + "'" + sDirective + "' " + sSource )
+         IF sLine == NIL
             sLine := ''
-            LOOP
+            sLeft := ''
+         ELSE
+            sLeft := ExtractLeadingWS( @sLine )
          ENDIF
 
-         IF sDirective == Left( "IFDEF", nLen ) .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
+         IF sLine == ''
+            IF nPendingLines > 0
+               sLine := aPendingLines[1]
+               aDel( aPendingLines, 1 )
+               nPendingLines--
 
-            nIfDef++
-            aSize( abIfDef, nIfDef )
-            abIfDef[ nIfDef ] := .F.
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == Left( "IFNDEF", nLen ) .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
-
-            nIfDef++
-            aSize( abIfDef, nIfDef )
-            abIfDef[ nIfDef ] := .F.
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == "ELSE" .AND. nIfDef > 1 .AND. ! abIfDef[ nIfDef - 1 ]
-
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == "ELSE"
-
-            abIfDef[ nIfDef ] := ! abIfDef[ nIfDef ]
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == Left( "ENDIF", nLen )
-
-            IF nIfDef > 0
-               nIfDef--
-            ELSE
-               Alert( [ERROR! #endif with no #ifdef in sight] )
+               LOOP
             ENDIF
 
-            sLine := ''
-            LOOP
+            EXIT
+         ENDIF
+
+         IF s_sIncludeFile != NIL
+            IF ! Empty( sSource )
+               aAdd( asOutLines, "#line " + LTrim( Str( nLine ) ) + ' "' + Upper( sSource ) + '"' )
+            ENDIF
+            s_sIncludeFile := NIL
+         ENDIF
+
+         //? "Processing: '" + sLine +"'"
+         //WAIT
+
+         IF Left( sLine, 1 ) == '#'
+
+            sLine := LTrim( SubStr( sLine, 2 ) )
+            sDirective := RTrim( Upper( NextToken( @sLine ) ) )
+
+            IF ( nLen := Len( sDirective ) ) < 4
+               Eval( bErrHandler, ErrorNew( [PP], 3010, [Pre-Process], [Unknown directive: ] + sDirective,  ) )
+               sLine := ''
+               LOOP
+            ENDIF
+
+            IF sDirective == Left( "IFDEF", nLen ) .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
+
+               nIfDef++
+               aSize( abIfDef, nIfDef )
+               abIfDef[ nIfDef ] := .F.
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == Left( "IFNDEF", nLen ) .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
+
+               nIfDef++
+               aSize( abIfDef, nIfDef )
+               abIfDef[ nIfDef ] := .F.
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == "ELSE" .AND. nIfDef > 1 .AND. ! abIfDef[ nIfDef - 1 ]
+
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == "ELSE"
+
+               abIfDef[ nIfDef ] := ! abIfDef[ nIfDef ]
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == Left( "ENDIF", nLen )
+
+               IF nIfDef > 0
+                  nIfDef--
+               ELSE
+                  Eval( bErrHandler, ErrorNew( [PP], 2069, [Pre-Process], [#endif with no #ifdef in sight],  ) )
+               ENDIF
+
+               sLine := ''
+               LOOP
+
+            ENDIF
+
+            IF nIfDef > 0 .AND. ! abIfDef[nIfDef]
+               //? "Ignored: " + sLine
+               sLine := ''
+               LOOP
+            ENDIF
+
+            ExtractLeadingWS( @sLine )
+
+            #ifdef __XHARBOUR__
+               FOR EACH sTemp IN aPendingLines
+                  IF sTemp != NIL .AND. sTemp[1] != '#'
+                     sLine += '; ' + sTemp
+                     sTemp := NIL
+                  ELSE
+                     EXIT
+                  ENDIF
+               NEXT
+            #else
+               FOR nPendLine := 1 TO nPendingLines
+                  IF aPendingLines[ nPendLine ] != NIL .AND. Left( aPendingLines[ nPendLine ], 1 ) != '#'
+                     sLine += '; ' + aPendingLines[ nPendLine ]
+                     aPendingLines[ nPendLine ] := NIL
+                  ELSE
+                     EXIT
+                  ENDIF
+               NEXT
+            #endif
+
+            #ifdef OUTPUT_DIRECTIVES
+               aAdd( asOutLines, "/* #" + sDirective + " " + sLine + " */"  )
+            #endif
+
+            IF sDirective == Left( "DEFINE", nLen )
+
+               CompileDefine( sLine )
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == Left( "ERROR", nLen )
+
+               Eval( bErrHandler, ErrorNew( [PP], 2069, [#error], sLine,  ) )
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == Left( "UNDEF", nLen )
+
+               RemoveDefine( sLine )
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == Left( "IFDEF", nLen )
+
+               SetIfDef( sLine, .T. )
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == Left( "IFNDEF", nLen )
+
+               SetIfDef( sLine, .F. )
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == Left( "INCLUDE", nLen )
+
+               ExtractLeadingWS( @sLine )
+               DropTrailingWS( @sLine )
+
+               // Strip the ""
+               sLine := SubStr( sLine, 2, Len( sLine ) - 2 )
+
+               IF Upper( sLine ) == "RP_RUN.CH" .AND. s_lRunLoaded
+                  // already loaded.
+               ELSEIF Upper( sLine ) == "HBCLASS.CH"
+                  IF ! s_lClsLoaded
+                     s_lClsLoaded := .T.
+                     InitClsRules()
+                     InitClsResults()
+                     IF Len( aDefRules ) != Len( aDefResults )
+                        Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+                     ENDIF
+                     IF Len( aTransRules ) != Len( aTransResults )
+                        Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+                     ENDIF
+                     IF Len( aCommRules ) != Len( aCommResults )
+                        Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+                     ENDIF
+                  ENDIF
+
+             #ifdef FW
+               ELSEIF Upper( sLine ) == "FIVEWIN.CH"
+                  IF ! s_lFWLoaded
+                     s_lFWLoaded := .T.
+                     IF ! s_lClsLoaded
+                        s_lClsLoaded := .T.
+                        InitClsRules()
+                        InitClsResults()
+                        IF Len( aDefRules ) != Len( aDefResults )
+                           Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+                        ENDIF
+                        IF Len( aTransRules ) != Len( aTransResults )
+                           Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+                        ENDIF
+                        IF Len( aCommRules ) != Len( aCommResults )
+                           Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+                        ENDIF
+                     ENDIF
+
+                     InitFWRules()
+                     InitFWResults()
+
+                     IF Len( aDefRules ) != Len( aDefResults )
+                        Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [FW #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+                     ENDIF
+                     IF Len( aTransRules ) != Len( aTransResults )
+                        Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [FW #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+                     ENDIF
+                     IF Len( aCommRules ) != Len( aCommResults )
+                        Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [FW #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+                     ENDIF
+                  ENDIF
+             #endif
+
+             #ifdef MINIGUI
+               ELSEIF Upper( sLine ) == "MINIGUI.CH"
+                  IF ! s_lMiniGUILoaded
+                     s_lMiniGUILoaded := .T.
+                     IF ! s_lClsLoaded
+                        s_lClsLoaded := .T.
+                        InitClsRules()
+                        InitClsResults()
+                        IF Len( aDefRules ) != Len( aDefResults )
+                           Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+                        ENDIF
+                        IF Len( aTransRules ) != Len( aTransResults )
+                           Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+                        ENDIF
+                        IF Len( aCommRules ) != Len( aCommResults )
+                           Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+                        ENDIF
+                     ENDIF
+
+                     InitMiniGUIRules()
+                     InitMiniGUIResults()
+
+                     IF Len( aDefRules ) != Len( aDefResults )
+                        Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [MINIGUI #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+                     ENDIF
+                     IF Len( aTransRules ) != Len( aTransResults )
+                        Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [MINIGUI #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+                     ENDIF
+                     IF Len( aCommRules ) != Len( aCommResults )
+                        Eval( bErrHandler, ErrorNew( [PP], 1003, [Pre-Processing], [MINIGUI #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+                     ENDIF
+                  ENDIF
+             #endif
+
+               ELSE
+                  PP_PreProFile( sLine ) // Intentionally not using s_sIncludeFile
+
+                  /* Recursion safety - don't use the Static might be modified. */
+                  s_sIncludeFile := sLine
+               ENDIF
+
+               sLine := ''
+               LOOP
+
+            ELSE
+
+               IF Left( sDirective, 1 ) == 'X'
+                  bX := .T.
+                  sDirective := SubStr( sDirective, 2 )
+                  nLen--
+               ELSE
+                  bX := .F.
+               ENDIF
+
+               IF sDirective == Left( 'TRANSLATE', nLen )
+
+                  CompileRule( sLine, aTransRules, aTransResults, bX, .T. )
+                  sLine := ''
+                  LOOP
+
+               ELSEIF sDirective == Left( 'COMMAND', nLen )
+
+                  CompileRule( sLine, aCommRules, aCommResults, bX, .T. )
+                  sLine := ''
+                  LOOP
+
+               ELSE
+
+                  Eval( bErrHandler, ErrorNew( [PP], 3010, [Pre-Process], [Unknown directive: ] + sDirective,  ) )
+                  sLine := ''
+                  LOOP
+
+               ENDIF
+
+            ENDIF
 
          ENDIF
+
+         #ifdef PP_RECURSIVE
+            s_bRecursive := .T.
+         #endif
+
+       BEGIN SEQUENCE
 
          IF nIfDef > 0 .AND. ! abIfDef[nIfDef]
             //? "Ignored: " + sLine
             sLine := ''
-            LOOP
-         ENDIF
-
-         ExtractLeadingWS( @sLine )
-
-         #ifdef __XHARBOUR__
-            FOR EACH sTemp IN aPendingLines
-               IF sTemp != NIL .AND. sTemp[1] != '#'
-                  sLine += '; ' + sTemp
-                  sTemp := NIL
-               ELSE
-                  EXIT
-               ENDIF
-            NEXT
-         #else
-            FOR nPendLine := 1 TO nPendingLines
-               IF aPendingLines[ nPendLine ] != NIL .AND. Left( aPendingLines[ nPendLine ], 1 ) != '#'
-                  sLine += '; ' + aPendingLines[ nPendLine ]
-                  aPendingLines[ nPendLine ] := NIL
-               ELSE
-                  EXIT
-               ENDIF
-            NEXT
-         #endif
-
-         #ifdef OUTPUT_DIRECTIVES
-            aAdd( asOutLines, "/* #" + sDirective + " " + sLine + " */"  )
-         #endif
-
-         IF sDirective == Left( "DEFINE", nLen )
-
-            CompileDefine( sLine )
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == Left( "ERROR", nLen )
-
-            Alert( "#error " + sLine )
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == Left( "UNDEF", nLen )
-
-            RemoveDefine( sLine )
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == Left( "IFDEF", nLen )
-
-            SetIfDef( sLine, .T. )
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == Left( "IFNDEF", nLen )
-
-            SetIfDef( sLine, .F. )
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == Left( "INCLUDE", nLen )
-
-            ExtractLeadingWS( @sLine )
-            DropTrailingWS( @sLine )
-
-            // Strip the ""
-            sLine := SubStr( sLine, 2, Len( sLine ) - 2 )
-
-            IF Upper( sLine ) == "RP_RUN.CH" .AND. s_lRunLoaded
-               // already loaded.
-            ELSEIF Upper( sLine ) == "HBCLASS.CH"
-               IF ! s_lClsLoaded
-                  s_lClsLoaded := .T.
-                  InitClsRules()
-                  InitClsResults()
-                  IF Len( aDefRules ) != Len( aDefResults )
-                     Alert( [Class #DEFINE Rules size mismatch] )
-                  ENDIF
-                  IF Len( aTransRules ) != Len( aTransResults )
-                     Alert( [Class #TRANSLATE Rules size mismatch] )
-                  ENDIF
-                  IF Len( aCommRules ) != Len( aCommResults )
-                     Alert( [Class #DEFINE Rules size mismatch] )
-                  ENDIF
-               ENDIF
-
-          #ifdef FW
-            ELSEIF Upper( sLine ) == "FIVEWIN.CH"
-               IF ! s_lFWLoaded
-                  s_lFWLoaded := .T.
-                  IF ! s_lClsLoaded
-                     s_lClsLoaded := .T.
-                     InitClsRules()
-                     InitClsResults()
-                     IF Len( aDefRules ) != Len( aDefResults )
-                        Alert( [Class #DEFINE Rules size mismatch] )
-                     ENDIF
-                     IF Len( aTransRules ) != Len( aTransResults )
-                        Alert( [Class #TRANSLATE Rules size mismatch] )
-                     ENDIF
-                     IF Len( aCommRules ) != Len( aCommResults )
-                        Alert( [Class #DEFINE Rules size mismatch] )
-                     ENDIF
-                  ENDIF
-                  InitFWRules()
-                  InitFWResults()
-                  IF Len( aDefRules ) != Len( aDefResults )
-                     Alert( [FW #DEFINE Rules size mismatch] )
-                  ENDIF
-                  IF Len( aTransRules ) != Len( aTransResults )
-                     Alert( [FW #TRANSLATE Rules size mismatch] )
-                  ENDIF
-                  IF Len( aCommRules ) != Len( aCommResults )
-                     Alert( [FW #DEFINE Rules size mismatch] )
-                  ENDIF
-               ENDIF
-          #endif
-
-          #ifdef MINIGUI
-            ELSEIF Upper( sLine ) == "MINIGUI.CH"
-               IF ! s_lMiniGUILoaded
-                  s_lMiniGUILoaded := .T.
-                  IF ! s_lClsLoaded
-                     s_lClsLoaded := .T.
-                     InitClsRules()
-                     InitClsResults()
-                     IF Len( aDefRules ) != Len( aDefResults )
-                        Alert( [Class #DEFINE Rules size mismatch] )
-                     ENDIF
-                     IF Len( aTransRules ) != Len( aTransResults )
-                        Alert( [Class #TRANSLATE Rules size mismatch] )
-                     ENDIF
-                     IF Len( aCommRules ) != Len( aCommResults )
-                        Alert( [Class #DEFINE Rules size mismatch] )
-                     ENDIF
-                  ENDIF
-                  InitMiniGUIRules()
-                  InitMiniGUIResults()
-                  IF Len( aDefRules ) != Len( aDefResults )
-                     Alert( [MiniGUI #DEFINE Rules size mismatch] )
-                  ENDIF
-                  IF Len( aTransRules ) != Len( aTransResults )
-                     Alert( [MiniGUI #TRANSLATE Rules size mismatch] )
-                  ENDIF
-                  IF Len( aCommRules ) != Len( aCommResults )
-                     Alert( [MiniGUI #DEFINE Rules size mismatch] )
-                  ENDIF
-               ENDIF
-          #endif
-
-            ELSE
-               PP_PreProFile( sLine ) // Intentionally not using s_sIncludeFile
-
-               /* Recursion safety - don't use the Static might be modified. */
-               s_sIncludeFile := sLine
-            ENDIF
-
-            sLine := ''
-            LOOP
-
-         ELSE
-
-            IF Left( sDirective, 1 ) == 'X'
-               bX := .T.
-               sDirective := SubStr( sDirective, 2 )
-               nLen--
-            ELSE
-               bX := .F.
-            ENDIF
-
-            IF sDirective == Left( 'TRANSLATE', nLen )
-
-               CompileRule( sLine, aTransRules, aTransResults, bX, .T. )
-               sLine := ''
-               LOOP
-
-            ELSEIF sDirective == Left( 'COMMAND', nLen )
-
-               CompileRule( sLine, aCommRules, aCommResults, bX, .T. )
-               sLine := ''
-               LOOP
-
-            ELSE
-
-               Alert( [ERROR! Unknown directive: ] + "'" + sDirective + "' " + sSource )
-               sLine := ''
-               LOOP
-
-            ENDIF
-
-         ENDIF
-
-      ENDIF
-
-      #ifdef PP_RECURSIVE
-         s_bRecursive := .T.
-      #endif
-
-    BEGIN SEQUENCE
-
-      IF nIfDef > 0 .AND. ! abIfDef[nIfDef]
-         //? "Ignored: " + sLine
-         sLine := ''
-         BREAK
-      ENDIF
-
-      //TraceLog( sLine )
-      s_sPending := ""
-      aEval( aPendingLines, {|s| IIF( s != NIL, s_sPending += '; ' + s, ) } )
-
-      sBackupLine := sLine
-      sPassed     := ""
-      DO WHILE ( sToken := NextIdentifier( @sLine, @sSkipped ) ) != NIL
-         //? "Token = '"  + sToken + "'"
-         //WAIT
-
-         sPassed += sSkipped
-
-         // Save incase MatchRule fails.
-         #ifdef USE_C_BOOST
-            bArrayPrefix := GetArrayPrefix()
-         #else
-            bArrayPrefix := s_bArrayPrefix
-         #endif
-
-         IF ( nRule := MatchRule( sToken, @sLine, aDefRules, aDefResults, .F., .F. ) ) > 0
-            //? "DEFINED: " + sLine
-            //WAIT
-
-            aAdd( aDefined, nRule )
-
-            nPosition := 0
-            WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
-               nPendingLines++
-               IF nPendingLines > Len( aPendingLines )
-                  aSize( aPendingLines, nPendingLines )
-               ENDIF
-
-               nPosition++
-               aIns( aPendingLines, nPosition )
-               aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
-
-               #ifdef REVIEW
-                  IF Left( aPendingLines[ nPosition ], 1 ) == '#' .AND. ! bCompile
-                     aAdd( asOutLines, aPendingLines[ nPosition ] )
-                  ENDIF
-               #endif
-
-               //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
-               sLine := LTrim( SubStr( sLine, nNewLineAt + 1 ) )
-            ENDDO
-
-            IF nPosition == 0
-               #ifdef REVIEW
-                  IF Left( sLine, 1 ) == '#' .AND. ! bCompile
-                     aAdd( asOutLines, sLine )
-                  ENDIF
-               #endif
-
-               sLine := sLeft + sPassed + sLine
-            ELSE
-               IF ! Empty( sLine )
-                   nPendingLines++
-                   IF nPendingLines > Len( aPendingLines )
-                      aSize( aPendingLines, nPendingLines )
-                   ENDIF
-
-                   nPosition++
-                   aIns( aPendingLines, nPosition )
-                   aPendingLines[ nPosition ] := sLine
-               ENDIF
-
-               //? "Pending #", nPendingLines, sLine, aPendingLines[nPendingLines]
-               sLine := sLeft + sPassed + aPendingLines[1]
-               aDel( aPendingLines, 1 )
-               nPendingLines--
-            ENDIF
-
-            // Re-Reprocess the line ...
             BREAK
-         ELSE
-            // Restore since MatchRule() faild.
-            #ifdef USE_C_BOOST
-               SetArrayPrefix( bArrayPrefix )
-            #else
-               s_bArrayPrefix := bArrayPrefix
-            #endif
          ENDIF
 
-         sPassed += sToken
-      ENDDO
+         //TraceLog( sLine )
+         s_sPending := ""
+         aEval( aPendingLines, {|s| IIF( s != NIL, s_sPending += '; ' + s, ) } )
 
-      // Now process Translates...
-      //? "After Defines:", sLine
-
-      sLine := sBackupLine
-
-      sPassed := ""
-      DO WHILE ( sToken := NextToken( @sLine ) ) != NIL
-         //? "Token = '"  + sToken + "'"
-         //WAIT
-
-         // Save incase MatchRule fails.
-         #ifdef USE_C_BOOST
-            bArrayPrefix := GetArrayPrefix()
-         #else
-            bArrayPrefix := s_bArrayPrefix
-         #endif
-
-         IF ( nRule := MatchRule( sToken, @sLine, aTransRules, aTransResults, .F., .T. ) ) > 0
-            //? "TRANSLATED: " + sLine
+         sBackupLine := sLine
+         sPassed     := ""
+         DO WHILE ( sToken := NextIdentifier( @sLine, @sSkipped ) ) != NIL
+            //? "Token = '"  + sToken + "'"
             //WAIT
 
-            IF sPassed == "" .AND. aScan( aTranslated, nRule ) > 0
-               BREAK( "Cyclic directive: #translate " + sToken )
+            sPassed += sSkipped
+
+            // Save incase MatchRule fails.
+            #ifdef USE_C_BOOST
+               bArrayPrefix := GetArrayPrefix()
+            #else
+               bArrayPrefix := s_bArrayPrefix
+            #endif
+
+            IF ( nRule := MatchRule( sToken, @sLine, aDefRules, aDefResults, .F., .F. ) ) > 0
+               //? "DEFINED: " + sLine
+               //WAIT
+
+               aAdd( aDefined, nRule )
+
+               nPosition := 0
+               WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
+                  nPendingLines++
+                  IF nPendingLines > Len( aPendingLines )
+                     aSize( aPendingLines, nPendingLines )
+                  ENDIF
+
+                  nPosition++
+                  aIns( aPendingLines, nPosition )
+                  aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
+
+                  #ifdef REVIEW
+                     IF Left( aPendingLines[ nPosition ], 1 ) == '#' .AND. ! bCompile
+                        aAdd( asOutLines, aPendingLines[ nPosition ] )
+                     ENDIF
+                  #endif
+
+                  //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
+                  sLine := LTrim( SubStr( sLine, nNewLineAt + 1 ) )
+               ENDDO
+
+               IF nPosition == 0
+                  #ifdef REVIEW
+                     IF Left( sLine, 1 ) == '#' .AND. ! bCompile
+                        aAdd( asOutLines, sLine )
+                     ENDIF
+                  #endif
+
+                  sLine := sLeft + sPassed + sLine
+               ELSE
+                  IF ! Empty( sLine )
+                      nPendingLines++
+                      IF nPendingLines > Len( aPendingLines )
+                         aSize( aPendingLines, nPendingLines )
+                      ENDIF
+
+                      nPosition++
+                      aIns( aPendingLines, nPosition )
+                      aPendingLines[ nPosition ] := sLine
+                  ENDIF
+
+                  //? "Pending #", nPendingLines, sLine, aPendingLines[nPendingLines]
+                  sLine := sLeft + sPassed + aPendingLines[1]
+                  aDel( aPendingLines, 1 )
+                  nPendingLines--
+               ENDIF
+
+               // Re-Reprocess the line ...
+               BREAK
             ELSE
-               aAdd( aTranslated, nRule )
+               // Restore since MatchRule() faild.
+               #ifdef USE_C_BOOST
+                  SetArrayPrefix( bArrayPrefix )
+               #else
+                  s_bArrayPrefix := bArrayPrefix
+               #endif
             ENDIF
+
+            sPassed += sToken
+         ENDDO
+
+         // Now process Translates...
+         //? "After Defines:", sLine
+
+         sLine := sBackupLine
+
+         sPassed := ""
+         DO WHILE ( sToken := NextToken( @sLine ) ) != NIL
+            //? "Token = '"  + sToken + "'"
+            //WAIT
+
+            // Save incase MatchRule fails.
+            #ifdef USE_C_BOOST
+               bArrayPrefix := GetArrayPrefix()
+            #else
+               bArrayPrefix := s_bArrayPrefix
+            #endif
+
+            IF ( nRule := MatchRule( sToken, @sLine, aTransRules, aTransResults, .F., .T. ) ) > 0
+               //? "TRANSLATED: " + sLine
+               //WAIT
+
+               IF sPassed == "" .AND. aScan( aTranslated, nRule ) > 0
+                  //BREAK( "Cyclic directive: #translate " + sToken )
+                  Eval( bErrHandler, ErrorNew( "PP", 2079, [Pre-Process], [Ciruclarity Detected], { sToken } ) )
+               ELSE
+                  aAdd( aTranslated, nRule )
+               ENDIF
+
+               IF Empty( s_sPending )
+                  nPendingLines := 0
+                  aSize( aPendingLines, 0 )
+               ENDIF
+
+               nPosition := 0
+               WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
+                  nPendingLines++
+                  IF nPendingLines > Len( aPendingLines )
+                     aSize( aPendingLines, nPendingLines )
+                  ENDIF
+
+                  nPosition++
+                  aIns( aPendingLines, nPosition )
+                  aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
+
+                  #ifdef REVIEW
+                     IF Left( aPendingLines[ nPosition ], 1 ) == '#' .AND. ! bCompile
+                        aAdd( asOutLines, aPendingLines[ nPosition ] )
+                     ENDIF
+                  #endif
+
+                  //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
+                  sLine := SubStr( sLine, nNewLineAt + 1 )
+               ENDDO
+
+               IF nPosition == 0
+                  #ifdef REVIEW
+                     IF Left( sLine, 1 ) == '#' .AND. ! bCompile
+                        aAdd( asOutLines, sLine )
+                     ENDIF
+                  #endif
+
+                  sLine := sLeft + sPassed + sLine
+               ELSE
+                  IF ! Empty( sLine )
+                     nPendingLines++
+                     IF nPendingLines > Len( aPendingLines )
+                        aSize( aPendingLines, nPendingLines )
+                     ENDIF
+
+                     nPosition++
+                     aIns( aPendingLines, nPosition )
+                     aPendingLines[ nPosition ] := sLine
+                  ENDIF
+                  //? "Pending #", nPendingLines, sLine, aPendingLines[nPendingLines]
+                  sLine := sLeft + sPassed + aPendingLines[1]
+                  aDel( aPendingLines, 1 )
+                  nPendingLines--
+               ENDIF
+
+               BREAK
+            ELSE
+               // Restore since MatchRule() faild.
+               #ifdef USE_C_BOOST
+                  SetArrayPrefix( bArrayPrefix )
+               #else
+                  s_bArrayPrefix := bArrayPrefix
+               #endif
+            ENDIF
+
+            sPassed += sToken
+         ENDDO
+
+         sLine := sPassed //sBackupLine
+
+         sToken := NextToken( @sLine )
+
+         IF sToken != NIL .AND. ( nRule := MatchRule( sToken, @sLine, aCommRules, aCommResults, .T., .T. ) ) > 0
+            //? "COMMANDED: " + sLine
+            //? '"' + sLeft +'"', '"' + sPassed + '"'
+            //WAIT
+
+            /*
+            IF aScan( aCommanded, nRule ) > 0
+               Alert( [Cyclic directive: #command ] + sToken )
+               BREAK
+            ELSE
+               aAdd( aCommanded, nRule )
+            ENDIF
+            */
 
             IF Empty( s_sPending )
                nPendingLines := 0
@@ -3481,8 +3494,8 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                   ENDIF
                #endif
 
-               //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
-               sLine := SubStr( sLine, nNewLineAt + 1 )
+               //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPosition]
+               sLine := LTrim( SubStr( sLine, nNewLineAt + 1 ) )
             ENDDO
 
             IF nPosition == 0
@@ -3492,10 +3505,11 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                   ENDIF
                #endif
 
-               sLine := sLeft + sPassed + sLine
+               sLine := sLeft + sLine
             ELSE
                IF ! Empty( sLine )
                   nPendingLines++
+
                   IF nPendingLines > Len( aPendingLines )
                      aSize( aPendingLines, nPendingLines )
                   ENDIF
@@ -3504,143 +3518,65 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                   aIns( aPendingLines, nPosition )
                   aPendingLines[ nPosition ] := sLine
                ENDIF
-               //? "Pending #", nPendingLines, sLine, aPendingLines[nPendingLines]
-               sLine := sLeft + sPassed + aPendingLines[1]
+
+               //? "Pending #", nPendingLines,  sLine, aPendingLines[nPosition]
+               sLine := sLeft + aPendingLines[1]
                aDel( aPendingLines, 1 )
                nPendingLines--
             ENDIF
 
             BREAK
-         ELSE
-            // Restore since MatchRule() faild.
-            #ifdef USE_C_BOOST
-               SetArrayPrefix( bArrayPrefix )
-            #else
-               s_bArrayPrefix := bArrayPrefix
-            #endif
          ENDIF
 
-         sPassed += sToken
+         aAdd( asOutLines, sLeft + sPassed )
+         sLine := ""
+
+       RECOVER USING oError
+
+         IF ValType( oError ) == 'O'
+            //Alert( oError )
+            Break( oError ) // We have another wrapper outside.
+         ENDIF
+
+         LOOP
+
+       END SEQUENCE
+
       ENDDO
 
-      sLine := sPassed //sBackupLine
+      #ifdef PP_RECURSIVE
+         s_bRecursive := .F.
+      #endif
 
-      sToken := NextToken( @sLine )
+      sOut   := ""
+      nLines := Len( asOutLines )
 
-      IF sToken != NIL .AND. ( nRule := MatchRule( sToken, @sLine, aCommRules, aCommResults, .T., .T. ) ) > 0
-         //? "COMMANDED: " + sLine
-         //? '"' + sLeft +'"', '"' + sPassed + '"'
+      //? nLines
+      //WAIT
+
+      FOR Counter := 1 TO nLines
+         //? Counter, asOutLines[Counter]
          //WAIT
+          sOut += asOutLines[Counter]
+          IF Counter < nLines
+             sOut += ' ;'
+          ENDIF
+      NEXT
 
-         /*
-         IF aScan( aCommanded, nRule ) > 0
-            Alert( [Cyclic directive: #command ] + sToken )
-            BREAK
-         ELSE
-            aAdd( aCommanded, nRule )
-         ENDIF
-         */
-
-         IF Empty( s_sPending )
-            nPendingLines := 0
-            aSize( aPendingLines, 0 )
-         ENDIF
-
-         nPosition := 0
-         WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
-            nPendingLines++
-            IF nPendingLines > Len( aPendingLines )
-               aSize( aPendingLines, nPendingLines )
-            ENDIF
-
-            nPosition++
-            aIns( aPendingLines, nPosition )
-            aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
-
-            #ifdef REVIEW
-               IF Left( aPendingLines[ nPosition ], 1 ) == '#' .AND. ! bCompile
-                  aAdd( asOutLines, aPendingLines[ nPosition ] )
-               ENDIF
-            #endif
-
-            //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPosition]
-            sLine := LTrim( SubStr( sLine, nNewLineAt + 1 ) )
-         ENDDO
-
-         IF nPosition == 0
-            #ifdef REVIEW
-               IF Left( sLine, 1 ) == '#' .AND. ! bCompile
-                  aAdd( asOutLines, sLine )
-               ENDIF
-            #endif
-
-            sLine := sLeft + sLine
-         ELSE
-            IF ! Empty( sLine )
-               nPendingLines++
-
-               IF nPendingLines > Len( aPendingLines )
-                  aSize( aPendingLines, nPendingLines )
-               ENDIF
-
-               nPosition++
-               aIns( aPendingLines, nPosition )
-               aPendingLines[ nPosition ] := sLine
-            ENDIF
-
-            //? "Pending #", nPendingLines,  sLine, aPendingLines[nPosition]
-            sLine := sLeft + aPendingLines[1]
-            aDel( aPendingLines, 1 )
-            nPendingLines--
-         ENDIF
-
-         BREAK
+      IF ! Empty( sOut )
+         //? "Returning: " + sOut
+         //WAIT
+         //TraceLog( sOut )
       ENDIF
 
-      aAdd( asOutLines, sLeft + sPassed )
-      sLine := ""
-
-    RECOVER USING sError
-
-      IF sError != NIL
-         Alert( sError )
-         BREAK
+      IF bCompile
+         PP_CompileLine( sOut, nLine, s_aProcedures, s_aInitExit, @s_nProcId )
       ENDIF
+   RECOVER USING oError
+      Eval( bErrHandler, oError )
+   END SEQUENCE
 
-      LOOP
-
-    END SEQUENCE
-
-   ENDDO
-
-   #ifdef PP_RECURSIVE
-      s_bRecursive := .F.
-   #endif
-
-   sOut   := ""
-   nLines := Len( asOutLines )
-
-   //? nLines
-   //WAIT
-
-   FOR Counter := 1 TO nLines
-      //? Counter, asOutLines[Counter]
-      //WAIT
-       sOut += asOutLines[Counter]
-       IF Counter < nLines
-          sOut += ' ;'
-       ENDIF
-   NEXT
-
-   IF ! Empty( sOut )
-      //? "Returning: " + sOut
-      //WAIT
-      //TraceLog( sOut )
-   ENDIF
-
-   IF bCompile
-      PP_CompileLine( sOut, nLine, s_aProcedures, s_aInitExit, @s_nProcId )
-   ENDIF
+   ErrorBlock( bErrHandler )
 
 RETURN sOut
 
@@ -3657,6 +3593,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
    LOCAL bRepeatableMatched
    LOCAL aaRevertMarkers := {}
    LOCAL nBackup, nLevel, bTestDependant
+   LOCAL bErrHandler := ErrorBlock()
 
    nRules   := Len( aRules )
 
@@ -4055,8 +3992,8 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   ENDIF
                ELSE
                   IF ValType( aMarkers ) != 'A' .OR. nMarkerId > Len( aMarkers )
-                     TraceLog( "Oops", nRule, sKey, nMarkerId, ValType( aMarkers ), IIF( ValType( aMarkers ) == 'A', Len( aMarkers ) , "No array" ) )
-                     Alert( [Unexpected case ] + "[" + Str( Procline() ) + "]" )
+                     //TraceLog( "Oops", nRule, sKey, nMarkerId, ValType( aMarkers ), IIF( ValType( aMarkers ) == 'A', Len( aMarkers ) , "No array" ) )
+                     Eval( bErrHandler, ErrorNew( [PP], 3010, [Pre-Process], [Unexpected case], { nRule, sKey, nMarkerId, aMarkers } ) )
                   ELSE
                      aMarkers[nMarkerId] := xMarker
                   ENDIF
@@ -4534,7 +4471,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
 
    ENDDO
 
-   Alert( [ERROR! Logic failure] )
+   Eval( ErrorBlock(), ErrorNew( [PP], 3010, [Match-Rule], [Logic Failure],  ) )
 
 RETURN 0
 
@@ -4557,8 +4494,8 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
 
    // *** To be removed after final testing !!!
    IF Left( sLine, 1 ) == ' '
-      TraceLog( "!!!Left Pad: " + sLine )
-      Alert( [!!!Left Pad: ] + sLine )
+      //TraceLog( "!!!Left Pad: " + sLine )
+      //Alert( [!!!Left Pad: ] + sLine )
       sLine := LTrim( sLine )
    ENDIF
 
@@ -4758,8 +4695,8 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
 
       ELSE
 
-         TraceLog( "Unexpected case: " + sLine )
-         Alert( [Unexpected case: ] + sLine )
+         //TraceLog( "Unexpected case: " + sLine )
+         Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unexpected case], { sLine } ) )
          sReturn := sLine
 
       ENDIF
@@ -4824,6 +4761,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
   LOCAL  sWorkLine, sPrimaryStopper, nStoppers, nStopper, sStopLine, sStopper
   LOCAL  sMultiStopper, nSpaceAt, sNextStopper, cChar
   LOCAL  aExp
+  LOCAL bErrHandler := ErrorBlock()
 
   IF Empty( sLine )
      RETURN NIL
@@ -5059,7 +4997,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                     ENDIF
                  ENDIF
               ELSE
-                 Alert( [ERROR! Invalid '&' at: ] + sExp + sNextToken )
+                 Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Invalid &], { sExp, sNextToken } ) )
                  EXIT
               ENDIF
            ENDIF
@@ -5086,8 +5024,8 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               //TraceLog( "Content from: " + sLine )
               sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
               IF sTemp == NIL
-                 TraceLog( "ERROR!(1) No content at: '" + sLine + "' After: " + sExp, sLine  )
-                 Alert( [ERROR!(1) No content at: ] + "'" + sLine + "'"+[ After: ] + sExp  )
+                 //TraceLog( "ERROR!(1) No content at: '" + sLine + "' After: " + sExp, sLine  )
+                 Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced (], { sExp } ) )
                  EXIT
               ELSE
                  sExp +=  sTemp
@@ -5096,15 +5034,15 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
               sToken := NextToken( @sLine ) // Close
               IF sToken == NIL
-                 TraceLog( "ERROR!(2) Unbalanced '(' at: " + sExp, sLine )
-                 Alert( [ERROR!(2) Unbalanced '(' at: ] + sExp )
+                 //TraceLog( "ERROR!(2) Unbalanced '(' at: " + sExp, sLine )
+                 Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced (], { sExp } ) )
                  EXIT
               ELSEIF Left( sToken, 1 ) == ')'
                  sExp += sToken
               ELSE
                  sLine := sToken + sLine
-                 TraceLog( "ERROR!(3) Unbalanced '(' Found: '" +  sToken + "' at: " + sExp, sLine )
-                 Alert( [ERROR!(3) Unbalanced '(' Found: ] + "'" +  sToken + "'"+[ at: ] + sExp )
+                 Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced (], { sExp } ) )
+                 //TraceLog( "ERROR!(3) Unbalanced '(' Found: '" +  sToken + "' at: " + sExp, sLine )
                  EXIT
               ENDIF
            ENDIF
@@ -5137,8 +5075,8 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               ELSE
                  sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
                  IF sTemp == NIL
-                    TraceLog( "ERROR! Unbalanced '{|...' at: " + sExp )
-                    Alert( [ERROR! Unbalanced '{|...' at: ] + sExp )
+                    //TraceLog( "ERROR! Unbalanced '{|...' at: " + sExp )
+                    Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {|...], { sExp } ) )
                     EXIT
                  ELSE
                     sExp += sTemp
@@ -5156,16 +5094,16 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                        s_bArrayPrefix := .F.
                     #endif
                  ELSE
-                    TraceLog( "ERROR! Unbalanced '{|...|' at: " + sExp, sNextToken, sNextLine )
-                    Alert( [ERROR! Unbalanced '{|...|' at: ] + sExp )
+                    //TraceLog( "ERROR! Unbalanced '{|...|' at: " + sExp, sNextToken, sNextLine )
+                    Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {|...|], { sExp } ) )
                     EXIT
                  ENDIF
               ENDIF
 
               sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
               IF sTemp == NIL
-                 TraceLog( "ERROR! Empty '{||'" )
-                 Alert( [ERROR! Empty '{||'] )
+                 //TraceLog( "ERROR! Empty '{||'" )
+                 Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {||], { sExp } ) )
                  EXIT
               ELSE
                  sExp +=  sTemp
@@ -5173,15 +5111,15 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
               sToken := NextToken( @sLine ) // Close
               IF sToken == NIL
-                 TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                 Alert( [ERROR! Unbalanced '{' at: ] + sExp )
+                 //TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
+                 Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {], { sExp } ) )
                  EXIT
               ELSEIF Left( sToken, 1 ) == '}'
                  sExp += sToken
               ELSE
                  sLine := sToken + sLine
-                 TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                 Alert( [ERROR! Unbalanced '{' at: ] + sExp )
+                 //TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
+                 Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {|], { sExp } ) )
                  EXIT
               ENDIF
            ELSE
@@ -5200,8 +5138,8 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               ELSE
                  sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
                  IF sTemp == NIL
-                    TraceLog( "ERROR! Unbalanced '{...'", sLine )
-                    Alert( [ERROR! Unbalanced '{...'] )
+                    //TraceLog( "ERROR! Unbalanced '{...'", sLine )
+                    Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {...], { sExp } ) )
                     EXIT
                  ELSE
                     sExp +=  sTemp
@@ -5209,15 +5147,15 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
                  sToken := NextToken( @sLine ) // Close
                  IF sToken == NIL
-                    TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                    Alert( [ERROR! Unbalanced '{' at: ] + sExp )
+                    //TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
+                    Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {], { sExp } ) )
                     EXIT
                  ELSEIF Left( sToken, 1 ) == '}'
                     sExp += sToken
                  ELSE
                     sLine := sToken + sLine
-                    TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                    Alert( [ERROR! Unbalanced '{' at: ] + sExp )
+                    //TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
+                    Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {], { sExp } ) )
                     EXIT
                  ENDIF
               ENDIF
@@ -5232,7 +5170,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            sExp  += sToken
            sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
            IF sTemp == NIL
-              Alert( [ERROR! Unbalanced ] + "'['" + [ at: ] + sExp )
+              Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced [], { sExp } ) )
               EXIT
            ELSE
               sExp += sTemp
@@ -5240,13 +5178,13 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
            sToken := NextToken( @sLine ) // Close
            IF sToken == NIL
-              Alert( [ERROR! Unbalanced ] + "'['" + [ at: ] + sExp )
+              Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced [], { sExp } ) )
               EXIT
            ELSEIF Left( sToken, 1 ) == ']'
               sExp += sToken
            ELSE
               sLine := sToken + sLine
-              Alert( [ERROR! Unbalanced ] + "'['" + [ at: ] + sExp )
+              Eval( bErrHandler, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced [], { sExp } ) )
               EXIT
            ENDIF
 
@@ -5326,8 +5264,8 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
      //TraceLog( sExp, sLastToken, sLine, nLen, sToken, sNextToken )
 
      IF sLastToken == NIL .OR. Right( sLastToken, 1 ) == ' '
-        TraceLog( sExp, sLastToken, sLine, nLen, sToken, sNextToken )
-        Alert( "??? " + sExp )
+        //TraceLog( sExp, sLastToken, sLine, nLen, sToken, sNextToken )
+        //Alert( "??? " + sExp )
         EXIT
      ENDIF
 
@@ -6029,6 +5967,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    LOCAL nMarkerID
    LOCAL nTempMP
    LOCAL nTokenLen
+   LOCAL bErrHandler := ErrorBlock()
 
    /*
    nMarkerID
@@ -6072,7 +6011,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    #endif
 
    IF nNext == 0
-      Alert( [ERROR! Invalid translation format: ] + sRule )
+      Eval( ErrorBlock(), ErrorNew( [PP], 2059, [Compile-Rule], [Missing => in #directive], { sRule } ) )
       RETURN .F.
    ELSE
       sResult := SubStr( sRule, nNext + nTokenLen )
@@ -6211,7 +6150,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                      sRule := SubStr( sRule, 2 )
                      ExtractLeadingWS( @sRule )
                   ELSE
-                     Alert( [ERROR! Unblanced MP: '<*' : '] + sRule + "'" )
+                     Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<*'], { sRule } ) )
                   ENDIF
 
                   aMatch := { nId, nOptional, sAnchor, cType, NIL }
@@ -6226,7 +6165,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sAnchor := NIL
                   LOOP
                ELSE
-                  Alert( [ERROR! Unblanced MP: '<*' : '] + sRule + "'" )
+                  Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<*'], { sRule } ) )
                   RETURN .F.
                ENDIF
 
@@ -6257,7 +6196,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                      sRule := SubStr( sRule, 2 )
                      ExtractLeadingWS( @sRule )
                   ELSE
-                     Alert( [ERROR! Unblanced MP: '<(' : '] + sRule + "'" )
+                     Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<('], { sRule } ) )
                   ENDIF
 
                   aMatch := { nId, nOptional, sAnchor, cType, NIL }
@@ -6272,7 +6211,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sAnchor := NIL
                   LOOP
                ELSE
-                  Alert( [ERROR! Unblanced MP: '<(' : '] + sRule + "'" )
+                  Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<('], { sRule } ) )
                   RETURN .F.
                ENDIF
 
@@ -6303,7 +6242,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                      sRule := SubStr( sRule, 2 )
                      ExtractLeadingWS( @sRule )
                   ELSE
-                     Alert( [ERROR! Unblanced MP: '<!' : '] + sRule + "'" )
+                     Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<!'], { sRule } ) )
                   ENDIF
 
                   aMatch := { nId, nOptional, sAnchor, cType, NIL }
@@ -6318,7 +6257,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sAnchor := NIL
                   LOOP
                ELSE
-                  Alert( [ERROR! Unblanced MP: '<!' : '] + sRule + "'" )
+                  Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<!'], { sRule } ) )
                   RETURN .F.
                ENDIF
 
@@ -6412,7 +6351,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                      aAdd( aWords, Upper( RTrim( Left( sRule, nCloseAt - 1 ) ) ) )
                      EXIT
                   ELSE
-                     Alert( [ERROR! Unblanced MP: ''<:' at: ] + sRule )
+                     Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<:'], { sRule } ) )
                      RETURN .F.
                   ENDIF
                ENDIF
@@ -6453,7 +6392,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                nOptional := ( -nOptional )
             ENDIF
          ELSE
-            Alert( [ERROR! Unbalanced MP: '<' at: ] + sRule )
+            Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<'], { sRule } ) )
             RETURN .F.
          ENDIF
 
@@ -6510,8 +6449,8 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       ELSE
 
          // Some token sneaked in ...
-         TraceLog( "UnExpected Case: " + sRule + "[" + Str( ProcLine() ) + "]" )
-         Alert( [UnExpected Case: ] + sRule + "[" + Str( ProcLine() ) + "]" )
+         //TraceLog( "UnExpected Case: " + sRule + "[" + Str( ProcLine() ) + "]" )
+         Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unexpected case], { sRule } ) )
 
          IF ! ( sAnchor == NIL )
             //TraceLog( "ORPHAN ANCHOR: " + sAnchor )
@@ -6539,8 +6478,8 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    ENDIF
 
    IF nOptional <> 0
-      TraceLog( "ERROR Unclose Optional group, nOptional = " + Str( nOptional, 3 ), aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5] )
-      Alert( [ERROR! Unclosed Optional group, nOptional = ] + Str( nOptional, 3 ) + " [" + Str( ProcLine(0), 4 ) + "]" )
+      //TraceLog( "ERROR Unclose Optional group, nOptional = " + Str( nOptional, 3 ), aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5] )
+      Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unclosed Optional group], { sRule, nOptional } ) )
       BREAK
    ENDIF
 
@@ -6637,11 +6576,11 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
             ENDDO
 
             IF nCloseOptionalAt > 0
-               TraceLog( "Skipped: " + SubStr( sResult, nOptionalAt, nCloseOptionalAt - nOptionalAt + 1 ) )
+               //TraceLog( "Skipped: " + SubStr( sResult, nOptionalAt, nCloseOptionalAt - nOptionalAt + 1 ) )
                sResult := Left( sResult, nOptionalAt - 1 ) + SubStr( sResult, nCloseOptionalAt + 1 )
                LOOP
             ELSE
-               Alert( [ERROR! Unclosed repeatable group.;] + SubStr( sResult, nOptionalAt ) )
+               Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unclosed repeatable group], { sResult, nOptionalAt } ) )
                BREAK
             ENDIF
          ENDIF
@@ -6660,8 +6599,8 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
             ENDDO
 
             IF nCloseOptionalAt == 0
-               TraceLog( "RP Scan:", nAt, nMarkerAt, nOptionalAt, nCloseOptionalAt, sResult )
-               Alert( [ERROR! Unclosed repeatable group.;] + SubStr( sResult, nOptionalAt ) )
+               //TraceLog( "RP Scan:", nAt, nMarkerAt, nOptionalAt, nCloseOptionalAt, sResult )
+               Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unclosed repeatable group], { sResult, nOptionalAt } ) )
                BREAK
             ENDIF
          ELSE
@@ -6679,8 +6618,8 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   nMarkerAt   := 0
                ENDIF
             ELSE
-               TraceLog( "RP Scan:", nAt, nMarkerAt, nOptionalAt, nCloseOptionalAt, sResult )
-               Alert( [ERROR! Unclosed repeatable group.;] + SubStr( sResult, nOptionalAt ) )
+               //TraceLog( "RP Scan:", nAt, nMarkerAt, nOptionalAt, nCloseOptionalAt, sResult )
+               Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unclosed repeatable group], { sResult, nOptionalAt } ) )
                BREAK
             ENDIF
          ENDIF
@@ -6706,7 +6645,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       IF nOptionalAt > 0
 
          IF nOptional <> 0
-            Alert( [ERROR! Nested repeatable RP.;] + sResult )
+            Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Nested repeatable group], { sResult } ) )
             BREAK
          ELSE
             nOptional := -1
@@ -6778,7 +6717,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ">", sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: '<-' : '] + sTemp + "'" )
+               Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '<-'], { sResult } ) )
             ELSE
                sTemp := RTrim( Left( sResult, nNext - 1 ) )
                IF Right( sTemp, 1 ) == '-'
@@ -6794,7 +6733,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
-                     Alert( [ERROR! Unrecognized RP: '<-' : '] + sTemp + "'" )
+                     Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unrecognized RP '<-'], { sResult, sTemp } ) )
                   ELSE
                      aRP := { nOptional, nId }
                      aAdd( aResult, aRP )
@@ -6808,7 +6747,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( '>', sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: '#<' ] )
+               Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '#<'], { sResult } ) )
             ELSE
                /*nType := 2*/
                sTemp := RTrim( Left( sResult, nNext - 1 ) )
@@ -6822,7 +6761,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                sResult := SubStr( sResult, nNext + 1 )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
-                  Alert( [ERROR! Unrecognized RP: '#<' : ] + sTemp )
+                  Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unrecognized RP '<-'], { sResult, sTemp } ) )
                ELSE
                   aRP := { nOptional, nId }
                   aAdd( aResult, aRP )
@@ -6838,7 +6777,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ">", sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: '<"' : '] + sTemp + "'" )
+               Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '<"'], { sResult } ) )
             ELSE
                sTemp := RTrim( Left( sResult, nNext - 1 ) )
                IF Right( sTemp, 1 ) == '"'
@@ -6854,7 +6793,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
-                     Alert( [ERROR! Unrecognized RP: '<"' : '] + sTemp + "'" )
+                     Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unrecgnized RP '<"'], { sResult, sTemp } ) )
                   ELSE
                      aRP := { nOptional, nId }
                      aAdd( aResult, aRP )
@@ -6871,7 +6810,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ">", sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: '<(' : '] + sTemp + "'" )
+               Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '<('], { sResult } ) )
             ELSE
                sTemp := RTrim( Left( sResult, nNext - 1 ) )
                IF Right( sTemp, 1 ) == ')'
@@ -6887,7 +6826,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
-                     Alert( [ERROR! Unrecognized RP: '<(' : '] + sTemp + "'" )
+                     Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unrecognized RP '<('], { sResult, sTemp } ) )
                   ELSE
                      aRP := { nOptional, nId }
                      aAdd( aResult, aRP )
@@ -6904,7 +6843,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ">", sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: '<{' : '] + sTemp + "'" )
+               Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '<{'], { sResult } ) )
             ELSE
                sTemp := RTrim( Left( sResult, nNext - 1 ) )
                IF Right( sTemp, 1 ) == '}'
@@ -6920,7 +6859,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
-                     Alert( [ERROR! Unrecognized RP: '<{' : '] + sTemp + "'" )
+                     Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unreconized RP '<{'], { sResult, sTemp } ) )
                   ELSE
                      aRP := { nOptional, nId }
                      aAdd( aResult, aRP )
@@ -6937,7 +6876,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ">", sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: '<.' : '] + sResult + "'" )
+               Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '<.'], { sResult } ) )
             ELSE
                sTemp := RTrim( Left( sResult, nNext - 1 ) )
                IF Right( sTemp, 1 ) == '.'
@@ -6953,7 +6892,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
-                     Alert( [ERROR! Unrecognized RP: '<.' : '] + sTemp + "'" )
+                     Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unrecognized RP '<.'], { sResult, sTemp } ) )
                   ELSE
                      aRP := { nOptional, nId }
                      aAdd( aResult, aRP )
@@ -6966,7 +6905,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( '>', sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: '<' : '] + sResult + "'" )
+               Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '<'], { sResult } ) )
             ELSE
                /* <x> Regular */
                nType := 1
@@ -6982,7 +6921,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
                   aEval( aMarkers, {|sMarker| TraceLog( sResult, sTemp, sMarker ) } )
-                  Alert( [ERROR! Unrecognized RP: '<']+" : '" + sTemp + "'" )
+                  Eval( bErrHandler, ErrorNew( [PP], 2059, [Compile-Rule], [Unrecognized RP '<'], { sResult, sTemp } ) )
                ELSE
                   aRP := { nOptional, nId }
                   aAdd( aResult, aRP )
@@ -7011,8 +6950,8 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    ENDDO
 
    IF nOptional <> 0
-      TraceLog( "ERROR! Internal logic failure, nOptional = " + Str( nOptional, 3 ) + " [" + Str( ProcLine(0), 4 ) + "]", aRP[1], aRP[2] )
-      Alert( [ERROR! Internal logic failure, nOptional = ] + Str( nOptional, 3 ) + " [" + Str( ProcLine(0), 4 ) + "]" )
+      //TraceLog( "ERROR! Internal logic failure, nOptional = " + Str( nOptional, 3 ) + " [" + Str( ProcLine(0), 4 ) + "]", aRP[1], aRP[2] )
+      Eval( bErrHandler, ErrorNew( [PP], 9003, [Compile-Rule], [Internal logic failure], { sResult, nOptional } ) )
       BREAK
    ENDIF
 
@@ -7257,7 +7196,8 @@ STATIC FUNCTION CompileDefine( sRule )
    DropTrailingWS( @sKey, @sPad )
 
    IF ( nId := aScan( aDefRules, {|aDefine| aDefine[1] == sKey } ) ) > 0
-      Alert( [Redefinition of ] + "'" + sKey + "'" + [ in file: ] + s_sFile )
+      PP_Warning( [Redefinition of ] + "'" + sKey + "'" + [ in file: ] + s_sFile )
+
       aRule      := aDefRules[nId]
       //aRule[1]   := sKey
       aRule[2]   := {}
@@ -9074,7 +9014,7 @@ RETURN .T.
 PROCEDURE PP_RunInit( aProcedures, aInitExit, nLine )
 
    IF ValType( aProcedures ) != 'A' .OR. ValType( aInitExit ) != 'A'
-      Alert( [Invalid parameters to: ] + ProcName() + [ must be Arrays!] )
+      Eval( ErrorBlock(), ErrorNew( [PP], 9004, [Run-Init], [Invalid parameters], { aProcedures, aInitExit, nLine } ) )
    ELSE
       aSize( aProcedures, 0 )
 
@@ -9082,8 +9022,6 @@ PROCEDURE PP_RunInit( aProcedures, aInitExit, nLine )
       aInitExit[1] := {}
       aInitExit[2] := {}
    ENDIF
-
-   ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures, nLine ) } )
 
    InitRules()
    InitResults()
@@ -9294,11 +9232,11 @@ FUNCTION PP_RunText( sLines, bPP, aParams )
    LOCAL aProcedures := {}, aInitExit := { {}, {} }, nProcId := 0, ;
          nLine, nLines, xRet, asLines := {}, nOpen, nClose, sLine
 
+   LOCAL bErrHandler, oError
+
    IF bPP == NIL
       bPP := .T.
    ENDIF
-
-   PP_RunInit( aProcedures, aInitExit, @nLine )
 
    IF bPP
       PP_PreProText( sLines, asLines )
@@ -9317,17 +9255,25 @@ FUNCTION PP_RunText( sLines, bPP, aParams )
       ENDIF
    ENDIF
 
-   ErrorBlock( {|oErr| RP_Comp_Err( oErr, asLines[nLine], nLine ) } )
+   //ErrorBlock( {|oErr| RP_Comp_Err( oErr, asLines[nLine], nLine ) } )
+   bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
 
-   nLines := Len( asLines )
-   FOR nLine := 1 TO nLines
-      sLine := asLines[nLine]
-      IF sLine != NIL
-         PP_CompileLine( sLine, nLine, aProcedures, aInitExit, @nProcId )
-      ENDIF
-   NEXT
+   BEGIN SEQUENCE
+      nLines := Len( asLines )
+      FOR nLine := 1 TO nLines
+         sLine := asLines[nLine]
+         IF sLine != NIL
+            PP_CompileLine( sLine, nLine, aProcedures, aInitExit, @nProcId )
+         ENDIF
+      NEXT
+   RECOVER USING oError
+      Eval( bErrHandler, oError )
+   END SEQUENCE
 
-RETURN PP_Exec( aProcedures, aInitExit, nProcId, aParams )
+   PP_RunInit( aProcedures, aInitExit, @nLine )
+   xRet := PP_Exec( aProcedures, aInitExit, nProcId, aParams )
+
+RETURN xRet
 
 //--------------------------------------------------------------//
 FUNCTION PP_RunArray( asLines, aParams )
@@ -9335,23 +9281,99 @@ FUNCTION PP_RunArray( asLines, aParams )
    LOCAL aProcedures := {}, aInitExit := { {}, {} }, nProcId := 0, ;
          nLine, nLines, nOpen, nClose
 
+   LOCAL bErrHandler, oError, xRet
+
+   //ErrorBlock( {|oErr| RP_Comp_Err( oErr, asLines[nLine], nLine ) } )
+   bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
+
+   BEGIN SEQUENCE
+      nLines := Len( asLines )
+      FOR nLine := 1 TO nLines
+         IF asLines[nLine] != NIL
+            PP_CompileLine( asLines[nLine], nLine, aProcedures, aInitExit, @nProcId )
+         ENDIF
+      NEXT
+   RECOVER USING oError
+      Eval( bErrHandler, oError )
+   END SEQUENCE
+
    PP_RunInit( aProcedures, aInitExit, @nLine )
+   xRet := PP_Exec( aProcedures, aInitExit, nProcId, aParams )
 
-   ErrorBlock( {|oErr| RP_Comp_Err( oErr, asLines[nLine], nLine ) } )
+RETURN xRet
 
-   nLines := Len( asLines )
-   FOR nLine := 1 TO nLines
-      IF asLines[nLine] != NIL
-         PP_CompileLine( asLines[nLine], nLine, aProcedures, aInitExit, @nProcId )
+#ifdef __XHARBOUR__
+//--------------------------------------------------------------//
+FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
+
+   LOCAL bErrHandler, oError, xRet
+
+   IF nLine == NIL
+      nLine := 0
+   ENDIF
+
+   TRY
+      IF HB_IsArray( aParams )
+         bErrHandler := ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
+
+         SWITCH Len( aParams )
+            CASE 0
+               xRet := &cExp()
+               EXIT
+
+            CASE 1
+               xRet := &cExp( aParams[1] )
+               EXIT
+
+            CASE 2
+               xRet := &cExp( aParams[1], aParams[2] )
+               EXIT
+
+            CASE 3
+               xRet := &cExp( aParams[1], aParams[2], aParams[3] )
+               EXIT
+
+            CASE 4
+               xRet := &cExp( aParams[1], aParams[2], aParams[3], aParams[4] )
+               EXIT
+
+            CASE 5
+               xRet := &cExp( aParams[1], aParams[2], aParams[3], aParams[4], aParams[5] )
+               EXIT
+
+            CASE 6
+               xRet := &cExp( aParams[1], aParams[2], aParams[3], aParams[4], aParams[5], aParams[6] )
+               EXIT
+
+            CASE 7
+               xRet := &cExp( aParams[1], aParams[2], aParams[3], aParams[4], aParams[5], aParams[6], aParams[7] )
+               EXIT
+
+            CASE 8
+               xRet := &cExp( aParams[1], aParams[2], aParams[3], aParams[4], aParams[5], aParams[6], aParams[7], aParams[8] )
+               EXIT
+
+            DEFAULT
+               xRet := &cExp( aParams[1], aParams[2], aParams[3], aParams[4], aParams[5], aParams[6], aParams[7], aParams[8], aParams[9] )
+         END
+      ELSE
+         xRet := &cExp
       ENDIF
-   NEXT
+   CATCH oError
+      //Alert( "(" + oError:ProcName + "[" + Str( oError:ProcLine, 5 ) + "]) " + ProcName() + ":" + oError:Operation + "->" + oError:Description )
+      Eval( bErrHandler, oError )
+   END
 
-RETURN PP_Exec( aProcedures, aInitExit, nProcId, aParams )
+   ErrorBlock( bErrHandler )
+
+RETURN xRet
+#endif
 
 //--------------------------------------------------------------//
 FUNCTION PP_Exec( aProcedures, aInitExit, nProcId, aParams )
 
    LOCAL nProc, nProcs, xRet
+   LOCAL oError, bErrHandler := ErrorBlock()
 
    IF ValType( aParams ) == 'A'
       s_aParams := aParams
@@ -9359,31 +9381,32 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nProcId, aParams )
       s_aParams := {}
    ENDIF
 
-   ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures, s_aProcStack[ Len( s_aProcStack ) ][2] ) } )
-
    InitRules()
    InitResults()
 
    InitRunRules()
    InitRunResults()
 
-   nProcs := Len( aInitExit[1] )
-   FOR nProc := 1 TO nProcs
-      PP_ExecProcedure( aProcedures[ aInitExit[1][nProc] ] )
-   NEXT
+   BEGIN SEQUENCE
+      nProcs := Len( aInitExit[1] )
+      FOR nProc := 1 TO nProcs
+         PP_ExecProcedure( aProcedures, aInitExit[1][nProc] )
+      NEXT
 
-   FOR nProc := 1 TO nProcId
-      IF aScan( aInitExit[1], nProc ) == 0 .AND. aScan( aInitExit[2], nProc ) == 0
-         xRet := PP_ExecProcedure( aProcedures[nProc] )
-         EXIT
-      ENDIF
-   NEXT
+      FOR nProc := 1 TO nProcId
+         IF aScan( aInitExit[1], nProc ) == 0 .AND. aScan( aInitExit[2], nProc ) == 0
+            xRet := PP_ExecProcedure( aProcedures, nProc )
+            EXIT
+         ENDIF
+      NEXT
 
-   nProcs := Len( aInitExit[2] )
-   FOR nProc := 1 TO nProcs
-      PP_ExecProcedure( aProcedures[ aInitExit[2][nProc] ] )
-   NEXT
-
+      nProcs := Len( aInitExit[2] )
+      FOR nProc := 1 TO nProcs
+         PP_ExecProcedure( aProcedures, aInitExit[2][nProc] )
+      NEXT
+   RECOVER USING oError
+      Eval( bErrHandler, oError )
+   END SEQUENCE
    //TraceLog( xRet )
 
 RETURN xRet
@@ -9433,6 +9456,24 @@ PROCEDURE PP_LoadDot()
       InitDotResults()
    ENDIF
 
+RETURN
+
+//--------------------------------------------------------------//
+FUNCTION PP_RecoveryBlock( bRetryRecovery )
+
+   LOCAL bPresetBlock
+
+   IF PCount() > 0
+      bPresetBlock := s_bExternalRecovery
+      s_bExternalRecovery := bRetryRecovery
+      RETURN bPresetBlock
+   ENDIF
+
+RETURN s_bExternalRecovery
+
+//--------------------------------------------------------------//
+PROCEDURE PP_Warning( cMsg )
+   ? cMsg
 RETURN
 
 //--------------------------------------------------------------//

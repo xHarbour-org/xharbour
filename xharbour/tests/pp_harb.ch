@@ -23,6 +23,8 @@
 
 #ifdef __HARBOUR__
 
+  #define HB_CLS_NOTOBJECT
+
   #include "hbclass.ch"
 
   //----------------------------------------------------------------------------//
@@ -45,6 +47,12 @@
      METHOD Compile()
      METHOD Run()
      METHOD RunFile( cFile, aParams, cPPOExt, bBlanks ) INLINE PP_Run( cFile, aParams, cPPOExt, bBlanks )
+
+     #ifdef __XHARBOUR__
+        METHOD IsProcedure( cName )
+        METHOD EvalExpression()
+        METHOD RecoverSiteGlobals( oErr )
+     #endif
 
      METHOD ClearRules()       INLINE PP_ResetRules()
      METHOD InitStdRules()     INLINE PP_InitStd()
@@ -69,51 +77,173 @@
   METHOD Run( p1, p2, p3, p4, p5, p6, p7, p8, p9 ) CLASS  TInterpreter
 
      LOCAL aParams := HB_aParams(), xRet
+     LOCAL bErrHandler
+     LOCAL bRecoveryBlock
 
-     IF Empty( ::cText )
-        RETURN .F.
+     IF Len( ::aScriptHostGlobals ) > 0
+        ErrorBlock( {|e| Break( e ) } )
      ENDIF
 
+     bErrHandler := ErrorBlock( {|e| Break(e) } )
+
      IF ::nProcs == 0
-        ::Compile()
+        BEGIN SEQUENCE
+           ::Compile()
+        RECOVER USING xRet
+           ErrorBlock( bErrHandler )
+           RETURN xRet
+        END SEQUENCE
      ENDIF
 
      IF ::nProcs > 0
-        xRet := PP_Exec( ::aCompiledProcs, ::aInitExit, ::nProcs, aParams )
+        BEGIN SEQUENCE
+           IF Len( ::aScriptHostGlobals ) > 0
+              bRecoveryBlock := PP_RecoveryBlock( {|oErr| Self:RecoverSiteGlobals( oErr ) } )
+           ENDIF
+           xRet := PP_Exec( ::aCompiledProcs, ::aInitExit, ::nProcs, aParams )
+        RECOVER USING xRet
+           // xRet will be returned below.
+        END SEQUENCE
+
+        IF Len( ::aScriptHostGlobals ) > 0
+           PP_RecoveryBlock( bRecoveryBlock )
+        ENDIF
      ENDIF
+
+     ErrorBlock( bErrHandler )
 
   RETURN xRet
 
   //----------------------------------------------------------------------------//
+  #ifdef __XHARBOUR__
+  METHOD IsProcedure( cName ) CLASS  TInterpreter
+
+     cName := Upper( cName )
+
+  RETURN aScan( ::aCompiledProcs, {|aProc| aProc[1] == cName } ) > 0
+
+  //----------------------------------------------------------------------------//
+
+  METHOD EvalExpression( cExp, aParams ) CLASS  TInterpreter
+
+     LOCAL bErrHandler := ErrorBlock( {|e| Break(e) } )
+     LOCAL bRecoveryBlock, xRet
+
+     IF Len( ::aScriptHostGlobals ) > 0
+        bRecoveryBlock := PP_RecoveryBlock( {|oErr| Self:RecoverSiteGlobals( oErr ) } )
+     ENDIF
+
+     BEGIN SEQUENCE
+        IF aParams != NIL .AND. cExp[-1] == ')'
+           cExp[-2] := 0
+        ENDIF
+        cExp := Upper( cExp )
+        //Alert( "EvalExp: " + cExp )
+        xRet := PP_Eval( cExp, aParams, ::aCompiledProcs )
+     RECOVER USING xRet
+        // xRet will be returned below.
+     END SEQUENCE
+
+     IF Len( ::aScriptHostGlobals ) > 0
+        PP_RecoveryBlock( bRecoveryBlock )
+     ENDIF
+
+     ErrorBlock( bErrHandler )
+
+  RETURN xRet
+
+  //----------------------------------------------------------------------------//
+  METHOD RecoverSiteGlobals( oErr )
+
+      LOCAL Global, xRet
+
+      //Alert( ProcName() + ":" + oErr:Operation + "->" + oErr:Description )
+
+      SWITCH oErr:SubCode
+         CASE 1001
+         //CASE 1003
+            FOR EACH Global IN ::aScriptHostGlobals
+                //Alert( "Trying: "  + oErr:Operation + " with: " + Global[1] )
+
+                TRY
+                   xRet := Global[3]:&( oErr:Operation )
+                CATCH xRet
+                   //Alert( "OLE Error: " + xRet:Operation + "->" + xRet:Description )
+                END
+
+                IF ! xRet:ClassName == "ERROR"
+                   EXIT
+                ENDIF
+            NEXT
+
+            EXIT
+
+         DEFAULT
+            TraceLog( oErr )
+      END
+
+      IF oErr:SubCode == 1003
+/*
+         IF xRet:ClassName == "TOLEAUTO"
+            __QQPub( oErr:Operation )
+            __MVPUT( oErr:Operation, xRet )
+            RETURN .T.
+         ELSE
+            RETURN .F.
+         ENDIF
+*/
+         RETURN .F.
+      ENDIF
+
+  RETURN xRet
+  #endif
+  //----------------------------------------------------------------------------//
   METHOD Compile() CLASS  TInterpreter
 
      LOCAL nLine, nLines, sLine, nProcId := 0
+     LOCAL bErrHandler, oError
 
      IF Empty( ::cText )
         RETURN .F.
      ENDIF
 
-     IF Len( ::acPPed ) == 0
-        PP_InitStd()
-        PP_LoadRun()
-        ::cPPed          := PP_PreProText( ::cText, ::acPPed, .T., .F. )
-        ::aCompiledProcs := {}
-        ::aInitExit      := { {}, {} }
+     IF Len( ::aScriptHostGlobals ) > 0
+        ErrorBlock( {|e| Break( e ) } )
      ENDIF
 
-     IF Len( ::aCompiledProcs ) == 0
-        ErrorBlock( {|oErr| RP_Comp_Err( oErr, ::acPPed[nLine], nLine ) } )
+     bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
 
-        PP_ModuleName( "_TINTERPRETER_" )
+     BEGIN SEQUENCE
 
-        nLines := Len( ::acPPed )
-        FOR nLine := 1 TO nLines
-           sLine := ::acPPed[nLine]
-           IF sLine != NIL
-              PP_CompileLine( sLine, nLine, ::aCompiledProcs, ::aInitExit, @nProcId )
-           ENDIF
-        NEXT
-     ENDIF
+        IF Len( ::acPPed ) == 0
+           PP_InitStd()
+           PP_LoadRun()
+           ::cPPed          := PP_PreProText( ::cText, ::acPPed, .T., .F. )
+           ::aCompiledProcs := {}
+           ::aInitExit      := { {}, {} }
+        ENDIF
+
+        IF Len( ::aCompiledProcs ) == 0
+           PP_ModuleName( "_TINTERPRETER_" )
+
+           BEGIN SEQUENCE
+              nLines := Len( ::acPPed )
+              FOR nLine := 1 TO nLines
+                 sLine := ::acPPed[nLine]
+                 IF sLine != NIL
+                    PP_CompileLine( sLine, nLine, ::aCompiledProcs, ::aInitExit, @nProcId )
+                 ENDIF
+              NEXT
+           RECOVER USING oError
+              nProcID := 0
+              Eval( bErrHandler, oError )
+           END SEQUENCE
+
+        ENDIF
+
+     END SEQUENCE
+
+     ErrorBlock( bErrHandler )
 
      ::nProcs := nProcId
 
@@ -127,7 +257,7 @@
 
        LOCAL oGlobal := TOleAuto():New( pDisp, cName )
 
-       aAdd( ::aScriptHostGlobals, { cName, pDisp } )
+       aAdd( ::aScriptHostGlobals, { cName, pDisp, oGlobal } )
 
        __QQPub( cName )
        __MVPUT( cName, oGlobal )

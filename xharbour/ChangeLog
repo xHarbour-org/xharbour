@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1799 2003/11/30 12:32:27 druzus Exp $
+ * $Id: ChangeLog,v 1.1800 2003/11/30 18:11:40 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-30 18:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * tests/pp.prg
+   * tests/pp_harb.ch
+     * Replaced all Alert()s on erros with code to raise errors.
+     * Restructured code to catch and forward errors.
+     * Many optimizations
+
 2003-11-30 16:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   ! utils/hbmake/hbmake.prg
   ! utils/tmake/tmake.prg
     % minor fix + restore an importante Field from makefile on edit mode
-
 
 2003-11-30 13:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/config/dos/watcom.cf
@@ -78,8 +84,8 @@
     ! Removed hb_vm_aiExtra* from C file and moved to .h
       Be careful in future.
       * tests/Makefile
-      
-    + Added an $Extra_Libs variable for greater flexibility in 
+
+    + Added an $Extra_Libs variable for greater flexibility in
        makefile linking.
 
 2003-11-30 11:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
@@ -255,7 +261,7 @@ for main function.
   * source/vm/itemapi.c
     + small modification to #ifdefs to support OpenWatcom
   * config/dos/watcom.cf
-    + a smaller HB_FLAGS for OpenWatcom/DOS32 
+    + a smaller HB_FLAGS for OpenWatcom/DOS32
   * config/w32/watcom.cf
     + modified for OpenWatcom/W32 ( still not working )
 
@@ -335,7 +341,7 @@ for main function.
 
   * tests/mtcomplex.prg
     ! DestroyMutex() does not exists anymore
- 
+
 2003-11-26 14:43 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbapi.h
   * include/hbapiitm.h
