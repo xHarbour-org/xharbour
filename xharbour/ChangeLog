@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.580 2003/01/03 20:16:17 jonnymind Exp $
+ * $Id: ChangeLog,v 1.581 2003/01/04 04:33:09 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-01-04 09:54 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+
+  Modified SiteSrv example to build dbf on fly to avoid unix/windows conversion
+  removed site.dbf, dbt and indexes.
+
+    + samples/sitesrv/blddbf.prg
+       + create site.dbf, indexes and add default data
+    * samples/sitesrv/sitesrv.prg
+       * to call blddbf
+
 2003-01-04 05:28 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   + doc/inet.txt
     + Added basic documentation for Inet api
-    
+
   + samples/sitesvr
   + samples/sitesvr/Makefile
   + samples/sitesvr/SITE.DBF
