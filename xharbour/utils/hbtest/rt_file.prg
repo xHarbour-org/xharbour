@@ -1,5 +1,5 @@
 /*
- * $Id: rt_file.prg,v 1.2 2002/07/02 13:24:09 lculik Exp $
+ * $Id: rt_file.prg,v 1.3 2003/01/16 16:56:34 walito Exp $
  */
 
 /*
@@ -204,6 +204,13 @@ FUNCTION Main_FILE()
 #endif
    TEST_LINE( TESTFIER( FClose( fhnd ) )                               , 'E: 0      R: .T.'                )
    TEST_LINE( TESTFIER( FClose( fhnd ) )                               , 'E: 6      R: .F.'                )
+
+   nFlags := FO_EXCLUSIVE
+   fhnd := FOpen( cFileName, nFlags )
+   fhnd := FOpen( cFileName, nFlags )
+
+   TEST_LINE( FError()                                                 , 5 )
+   FClose( fhnd )
    TEST_LINE( TESTFIER( FErase( "NOT_HERE.$$$" ) )                     , 'E: 2      R: -1'                 )
    TEST_LINE( TESTFIER( FErase( 1 ) )                                  , 'E: 3      R: -1'                 )
    TEST_LINE( TESTFIER( FErase( "NOT_HERE.$$$" ) )                     , 'E: 2      R: -1'                 )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2723 2004/04/02 18:29:48 srobert Exp $
+ * $Id: ChangeLog,v 1.2724 2004/04/02 18:46:06 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-03 02:55 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * utils/hbtest/rt_file.prg
+    + add routine to test FError() upon "Access denied"
 
 2004-04-02 14:00 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
   * source/rdd/dbf1.c
