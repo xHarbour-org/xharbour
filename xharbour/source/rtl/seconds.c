@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.2 2003/02/11 03:08:40 druzus Exp $
+ * $Id: seconds.c,v 1.3 2003/02/11 11:13:38 what32 Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 #include <time.h>
 #if defined( HB_OS_BSD)
    #include <sys/time.h>
+   #include <sys/times.h>
 #elif defined( OS_UNIX_COMPATIBLE )
    #include <sys/timeb.h>
    #include <sys/times.h>

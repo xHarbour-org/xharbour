@@ -1,5 +1,5 @@
 /*
- * $Id: diskspac.c,v 1.1.1.1 2001/12/21 10:41:28 ronpinkas Exp $
+ * $Id: diskspac.c,v 1.2 2003/02/11 03:08:40 druzus Exp $
  */
 
 /*
@@ -63,7 +63,11 @@
 #include "hbapi.h"
 #include "hbapierr.h"
 #include "hbapifs.h"
-#if defined(HB_OS_UNIX)
+
+#if defined(HB_OS_BSD)
+   #include <sys/param.h>
+   #include <sys/mount.h>
+#elif defined(HB_OS_UNIX)
    #include <sys/vfs.h>
 #endif
 
