@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.4 2004/10/26 00:38:46 ronpinkas Exp $
+ * $Id: calconst.c,v 1.5 2004/10/27 16:54:19 ronpinkas Exp $
  */
 
 /*
@@ -292,11 +292,26 @@ char * NextTokenInConstant( char **pExp )
 
       (*pExp)++;
    }
+   else if( (*pExp)[0] == '#' )
+   {
+      sToken[0] = '!';
+      sToken[1] = '=';
+      sToken[2] = '\0';
+
+      (*pExp)++;
+   }
    else if( (*pExp)[0] == '.' && toupper( (*pExp)[1] ) == 'A' && toupper( (*pExp)[2] ) == 'N' && toupper( (*pExp)[3] ) == 'D' && toupper( (*pExp)[4] ) == '.' )
    {
       sToken[0] = '&';
       sToken[1] = '&';
       sToken[2] = '\0';
+
+      (*pExp) += 5;
+   }
+   else if( (*pExp)[0] == '.' && toupper( (*pExp)[1] ) == 'N' && toupper( (*pExp)[2] ) == 'O' && toupper( (*pExp)[3] ) == 'T' && toupper( (*pExp)[4] ) == '.' )
+   {
+      sToken[0] = '!';
+      sToken[1] = '\0';
 
       (*pExp) += 5;
    }
