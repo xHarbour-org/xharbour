@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.317 2004/02/10 13:16:18 andijahja Exp $
+ * $Id: hvm.c,v 1.318 2004/02/11 04:02:54 druzus Exp $
  */
 
 /*
@@ -5608,6 +5608,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
          //printf( "\n VmSend Method: %s \n", pSym->szName );
          uiClass = pSelfBase->uiClass;
+         pItem->item.asSymbol.uiSuperClass = uiClass;
 
          pRealSelf = hb_itemNew( NULL ) ;
 
@@ -5723,7 +5724,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          if( nPos )
          {
             pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos + 1) );
-            pSelfBase->puiClsTree[0]=nPos;
+            pSelfBase->puiClsTree[0] = nPos;
          }
          else
          {
@@ -6412,27 +6413,26 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_vmPushSymbol(%p) \"%s\"", pSym, pSym->szName ) );
 
    #if 0
-   printf( "Symbol: %s\n", pSym->szName );
-   if( pSym->pDynSym )
-   {
-      printf( "Module: %p\n", pSym->pDynSym->pModuleSymbols );
-      if( pSym->pDynSym->pModuleSymbols )
+      printf( "Symbol: %s\n", pSym->szName );
+      if( pSym->pDynSym )
       {
-         printf( "ModuleName: %s\n", pSym->pDynSym->pModuleSymbols->szModuleName );
+         printf( "Module: %p\n", pSym->pDynSym->pModuleSymbols );
+         if( pSym->pDynSym->pModuleSymbols )
+         {
+            printf( "ModuleName: %s\n", pSym->pDynSym->pModuleSymbols->szModuleName );
+         }
       }
-   }
    #endif
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_SYMBOL;
    ( * HB_VM_STACK.pPos )->item.asSymbol.value = pSym;
    ( * HB_VM_STACK.pPos )->item.asSymbol.stackbase = hb_stackTopOffset();
+   ( * HB_VM_STACK.pPos )->item.asSymbol.uiSuperClass = 0;
 
-   #if 1
    if( pSym == &( hb_symEval ) && HB_VM_STACK.pBase && (* HB_VM_STACK.pBase)->type == HB_IT_SYMBOL && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym )
    {
       pSym->pDynSym->pModuleSymbols = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols;
    }
-   #endif
 
    hb_stackPush();
 }

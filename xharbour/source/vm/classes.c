@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.92 2004/01/27 04:08:42 ronpinkas Exp $
+ * $Id: classes.c,v 1.93 2004/01/30 18:12:17 ronpinkas Exp $
  */
 
 /*
@@ -935,7 +935,7 @@ HB_EXPORT USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
       uiCurCls = uiClass;
    }
 
-   while (uiClsTree)
+   while( uiClsTree )
    {
       if( uiCurCls && uiCurCls <= s_uiClasses )
       {
@@ -949,7 +949,7 @@ HB_EXPORT USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
             if( pClass->pMethods[ uiAt ].pMessage == pMsg )
             {
                uiClass = (pClass->pMethods + uiAt)->uiSprClass;
-               uiClsTree=1; /* Flag Value */
+               uiClsTree = 1; /* Flag Value */
                break;
             }
 
@@ -966,7 +966,6 @@ HB_EXPORT USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
       {
          uiCurCls = pObject->item.asArray.value->puiClsTree[uiClsTree] ;
       }
-
    }
 
    return uiClass;
@@ -3146,36 +3145,26 @@ static HARBOUR hb___msgEval( void )
  *
  * Internal function to return a superobject
  */
-//static HARBOUR hb___msgSuper( void )
-//{
-//   PHB_ITEM pObject = hb_stackSelfItem();
-//
-//   pObject->item.asArray.value->uiPrevCls  = pObject->item.asArray.value->uiClass; /* backup of actual handel */
-//   pObject->item.asArray.value->uiClass    = (HB_VM_STACK.pMethod)->uiSprClass;                /* superclass handel casting */
-//
-//   hb_itemCopy( &(HB_VM_STACK.Return), pObject );
-//}
-
 static HARBOUR hb___msgSuper( void )
 {
    HB_THREAD_STUB
 
    PHB_ITEM pObject = hb_stackSelfItem();
    //ULONG ulLen = pObject->item.asArray.value->ulLen;
-   PHB_ITEM pCopy = hb_itemArrayNew(1);
+   HB_ITEM Super;
+
+   Super.type = HB_IT_NIL;
+   hb_arrayNew( &Super, 1 );
 
    /* Now save the Self object as the 1st elem. */
-   hb_arraySet( pCopy, 1 , pObject );
-
-   /* Or Store original object as 1st elem */
-   /* hb_itemCopy( pCopy->item.asArray.value->pItems , pObject) ; */
+   hb_arraySet( &Super, 1 , pObject );
 
    /* And transform it into a fake object */
-   pCopy->item.asArray.value->uiPrevCls  = pObject->item.asArray.value->uiClass; /* backup of actual handel */
-   pCopy->item.asArray.value->uiClass    = (HB_VM_STACK.pMethod)->uiSprClass;                /* superclass handel casting */
-   pCopy->item.asArray.value->puiClsTree = NULL;
+   Super.item.asArray.value->uiPrevCls  = pObject->item.asArray.value->uiClass; /* backup of actual handel */
+   Super.item.asArray.value->uiClass    = (HB_VM_STACK.pMethod)->uiSprClass;                /* superclass handel casting */
+   Super.item.asArray.value->puiClsTree = NULL;
 
-   hb_itemRelease( hb_itemReturn( pCopy ) );
+   hb_itemReturn( &Super );
 }
 
 /*

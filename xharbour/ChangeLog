@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2272 2004/02/12 22:00:25 andijahja Exp $
+ * $Id: ChangeLog,v 1.2273 2004/02/13 03:15:40 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-12 23:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbvmpub.h
+    + Added member uiSuperClass to struct hb_struSymbol
+  * source/vm/hvm.c
+    + Added initilazation of asSymbol.uiSuperClass in hb_vmPushSymbol()
+    + Added assignment of asSymbol.uiSuperClass in hb_vmSend() when Super Cast is used.
+
+  * source/vm/classes.c
+    % Minor optimization of hb___msgSuper()
+
+  * source/vm/proc.c
+    ! Fixed hb_procinfo() to correctly report Source Module and Class Name of objects.
+
+    /*
+       I belive we finally have fully correct reporting of the Object Context for every call,
+       as well as the correct source module.
+     */
 
 2004-02-13 00:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * include/hbexprc.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.22 2003/11/26 21:58:35 jonnymind Exp $
+ * $Id: hbvmpub.h,v 1.23 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -193,6 +193,7 @@
        USHORT lineno;
        USHORT paramcnt;
        PHB_SYMB value;
+       UINT uiSuperClass;
     };
 
 #ifndef HB_LONG_LONG_OFF

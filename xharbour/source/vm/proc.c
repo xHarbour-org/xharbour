@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.16 2003/09/12 15:28:47 ronpinkas Exp $
+ * $Id: proc.c,v 1.17 2003/09/13 19:14:30 ronpinkas Exp $
  */
 
 /*
@@ -158,7 +158,15 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
       {
          if( HB_IS_OBJECT( pSelf ) )  /* it is a method name */
          {
-            strcpy( szName, hb_objGetRealClsName( pSelf, ( *pBase )->item.asSymbol.value->szName ) );
+            if( ( *pBase )->item.asSymbol.uiSuperClass )
+            {
+               strcpy( szName, ( hb_clsClassesArray() + ( *pBase )->item.asSymbol.uiSuperClass - 1 )->szName );
+            }
+            else
+            {
+               strcpy( szName, hb_objGetClsName( pSelf ) );
+            }
+
             strcat( szName, ":" );
             strcat( szName, ( *pBase )->item.asSymbol.value->szName );
          }
@@ -209,9 +217,37 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
       {
          if( HB_IS_OBJECT( pSelf ) ) /* it is a method name */
          {
-            if( pSelf->item.asArray.value->uiClass <= hb_clsMaxClasses() )
+            // Find the real module where the Method is defined.
+            USHORT uiSuperClass;
+
+            if( ( *pBase )->item.asSymbol.uiSuperClass )
             {
-               PCLASS pClass = hb_clsClassesArray() + ( pSelf->item.asArray.value->uiClass - 1 );
+               uiSuperClass = ( *pBase )->item.asSymbol.uiSuperClass;
+            }
+            else
+            {
+               if( pSelf->item.asArray.value->puiClsTree && pSelf->item.asArray.value->puiClsTree[0] )
+               {
+                  // Save.
+                  UINT uiPos = pSelf->item.asArray.value;
+
+                  // Hide.
+                  pSelf->item.asArray.value->puiClsTree[0] = 0;
+
+                  uiSuperClass = hb_objGetRealCls( pSelf, ( *pBase )->item.asSymbol.value->szName );
+
+                  // Restore.
+                  pSelf->item.asArray.value->puiClsTree[0] = uiPos;
+               }
+               else
+               {
+                  uiSuperClass = hb_objGetRealCls( pSelf, ( *pBase )->item.asSymbol.value->szName );
+               }
+            }
+
+            if( uiSuperClass <= hb_clsMaxClasses() )
+            {
+               PCLASS pClass = hb_clsClassesArray() + uiSuperClass - 1;
 
                if( pClass->pModuleSymbols && pClass->pModuleSymbols->szModuleName )
                {
