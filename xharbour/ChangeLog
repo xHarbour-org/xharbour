@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3305 2004/08/13 11:17:19 alexstrickland Exp $
+ * $Id: ChangeLog,v 1.3306 2004/08/14 07:57:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,45 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-14 11:48 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tget.prg
+    ! Incompatibility with clipper when ::buffer is filled with blanks and
+      a decimal value is then inserted. See this sample:
+
+      function main()
+
+   		LOCAL ncValore := 21.00
+   		LOCAL cPicture := "@ZE ##,###.##"
+   		LOCAL oGet :=  GetNew( 1 , 1 ,;
+                       { |x| Iif( pCount() == 0 , ncValore , ncValore := x ) } , , cPicture )
+
+   		oGet:SetFocus()
+   		oGet:pos := oGet:DecPos + 1
+   		oGet:Clear   := .F.
+   		oGet:Changed := .T.
+   		oGet:Buffer := Transform( 0 , oGet:Picture )
+   		oGet:Insert("1")
+   		oGet:Assign()
+   		? oGet:VarGet()
+   		? oGet:Untransform()
+   		? ncValore
+	  return
+
+	  Without this fix clipper prints .10 .10 .10 while xharbour  1 1 1,
+	  with this fix harbour prints .1 .1 .1
+
+	! ::setFocus() on clipper does not set ::minus to .T. when edited var
+	  has a negative value.
+
+   /* NB: I think that tget.prg should not use exported iVars to keep
+		  internal values, for example ::minus is used in this way but
+		  clipper says that ::minus is .T. only when a "-" is pressed
+		  and ::buffer has a value of 0, every other change should reset
+		  it to .F.
+		  I have the impression that other iVars could not strictly follow
+		  clipper behaviour.
+   */
 
 2004-08-14 00:57 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/classes.h

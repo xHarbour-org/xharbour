@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.88 2004/08/08 20:59:35 mauriliolongo Exp $
+ * $Id: tget.prg,v 1.89 2004/08/12 01:14:31 mauriliolongo Exp $
  */
 
 /*
@@ -576,12 +576,15 @@ METHOD SetFocus() CLASS Get
          if ::decpos == 0
             ::decpos := iif( ::buffer == NIL, NIL, Len( ::buffer ) + 1 )
          endif
+         /* No, tested with clipper, ::minus .F. on ::setFocus of a negative variable get
          ::minus := ( xVarGet < 0 )
+         */
+         ::lMinusPrinted := ( xVarGet < 0 )
       else
          ::decpos := NIL
-         ::minus  := .f.
+         ::lMinusPrinted := ::minus  := .f.
       endif
-      ::lMinusPrinted := ::minus
+
 
       if ::type == "D"
          ::BadDate := IsBadDate( ::buffer, ::cPicFunc )
@@ -699,11 +702,11 @@ METHOD Untransform( cBuffer ) CLASS Get
 
    DEFAULT cBuffer TO ::buffer
 
-/*
+   /*
    if !::lEdit
       return ::VarGet()
    endif
-*/
+   */
    if cBuffer == NIL
       return NIL
    endif
@@ -726,14 +729,12 @@ METHOD Untransform( cBuffer ) CLASS Get
       exit
 
    case "N"
-
-//      ::minus := .f.
       if "X" IN ::cPicFunc
          if Right( cBuffer, 2 ) == "DB"
             ::minus := .t.
          endif
       endif
-      if !::minus
+      if ! ::minus
          for nFor := 1 to ::nMaxLen
             if ::IsEditable( nFor ) .and. IsDigit( SubStr( cBuffer, nFor, 1 ) )
                exit
@@ -744,7 +745,18 @@ METHOD Untransform( cBuffer ) CLASS Get
             endif
          next
       endif
-      cBuffer := Space( ::FirstEditable() - 1 ) + SubStr( cBuffer, ::FirstEditable(), ::LastEditable() - ::FirstEditable() + 1 )
+
+      /* 14/08/2004 - <maurilio.longo@libero.it>
+                      If there should be a decimal point (or comma) but this is missing
+                      re-add it. Clipper does it. A little sample is inside ChangeLog
+                      for this fix.
+      */
+      if ::decPos < Len( cBuffer ) .AND. Empty( cBuffer[ ::decPos ] )
+         cBuffer[ ::decPos ] := iif( "E" IN ::cPicFunc .or. ::lDecRev, ",", "." )
+      endif
+
+      cBuffer := Space( ::FirstEditable() - 1 ) + ;
+                 SubStr( cBuffer, ::FirstEditable(), ::LastEditable() - ::FirstEditable() + 1 )
 
       if "D" IN ::cPicFunc
          for nFor := ::FirstEditable( ) to ::LastEditable( )
@@ -752,14 +764,28 @@ METHOD Untransform( cBuffer ) CLASS Get
          next
       else
          if "E" IN ::cPicFunc .or. ::lDecRev
-            cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + StrTran( SubStr( cBuffer, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ".", " " ) + SubStr( cBuffer, ::LastEditable() + 1 )
-            cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + StrTran( SubStr( cBuffer, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ",", "." ) + SubStr( cBuffer, ::LastEditable() + 1 )
+            cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + ;
+                       StrTran( SubStr( cBuffer, ::FirstEditable( ), ;
+                                                 ::LastEditable( ) - ::FirstEditable( ) + 1 ), ;
+                                        ".", " " ) +;
+                       SubStr( cBuffer, ::LastEditable() + 1 )
+
+            cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + ;
+                       StrTran( SubStr( cBuffer, ::FirstEditable( ), ;
+                                                 ::LastEditable( ) - ::FirstEditable( ) + 1 ), ;
+                                        ",", "." ) + ;
+                       SubStr( cBuffer, ::LastEditable() + 1 )
+
          else
-            cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + StrTran( SubStr( cBuffer, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ",", " " ) + SubStr( cBuffer, ::LastEditable() + 1 )
+            cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + ;
+                       StrTran( SubStr( cBuffer, ::FirstEditable( ), ;
+                                                 ::LastEditable( ) - ::FirstEditable( ) + 1 ), ;
+                                        ",", " " ) + ;
+                       SubStr( cBuffer, ::LastEditable() + 1 )
          endif
 
          for nFor := ::FirstEditable( ) to ::LastEditable( )
-            cMaskDel += if( ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == ".", " ", "X" )
+            cMaskDel += iif( ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == ".", " ", "X" )
          next
       endif
 
@@ -776,7 +802,16 @@ METHOD Untransform( cBuffer ) CLASS Get
                  // It replace left, right and medium spaces.
                  // Don't replace for Alltrim()
 
-//      xValue  := 0 + Val( cBuffer )    // 0 + ... avoids setting the
+      //xValue  := 0 + Val( cBuffer )    // 0 + ... avoids setting the
+
+      /* 13/08/2004 - <maurilio.longo@libero.it>
+                    We're talking about a number and a few lines of code before this
+                    point ::minus is set to .T. if there is a "-(" inside number and
+                    a few lines after we make a Val(cBuffer), so, this buffer has to
+                    contain only numbers (and a "-" or ".", at max);
+                    that said, while there was this loop?
+                    I've replaced it with the iif( ::minus... ) which is shorter and
+                    evaluates correctly a buffer containing "  -.10"
 
       if ::minus
          For each cChar in cBuffer
@@ -791,9 +826,9 @@ METHOD Untransform( cBuffer ) CLASS Get
          else
             cBuffer := "-" + cBuffer
          endif
-      endif
+      endif */
 
-      xValue  := Val( cBuffer )
+      xValue := iif( ::minus, -Val( cBuffer ), Val( cBuffer ) )
       exit
 
    case "L"
@@ -842,7 +877,7 @@ METHOD overstrike( cChar ) CLASS Get
 
    if ! ::lEdit
       ::lEdit  := .t.
-//      ::buffer := ::PutMask( ::VarGet(), .t. )
+      //::buffer := ::PutMask( ::VarGet(), .t. )
    endif
 
    if ::pos == 0
@@ -859,13 +894,13 @@ METHOD overstrike( cChar ) CLASS Get
 
    ::buffer := SubStr( ::buffer, 1, ::Pos - 1 ) + cChar + SubStr( ::buffer, ::Pos + 1 )
 
-// To conform UPDATED() behaviour with that of Clipper
+   // To conform UPDATED() behaviour with that of Clipper
    ::Changed := .T.
 
-// UPDATED() function previously did not return .T. even if a key press is
-// accepted.
-//   ::Changed := ValType( ::Original ) != ValType( ::unTransform() ) .or.;
-//                !( ::unTransform() == ::Original )
+   // UPDATED() function previously did not return .T. even if a key press is
+   // accepted.
+   //   ::Changed := ValType( ::Original ) != ValType( ::unTransform() ) .or.;
+   //                !( ::unTransform() == ::Original )
    ::Right( .f. )
 
    if ::type == "D"
@@ -911,7 +946,7 @@ METHOD Insert( cChar ) CLASS Get
 
    if ! ::lEdit
       ::lEdit  := .t.
-//      ::buffer := ::PutMask( ::VarGet(), .t. )
+      //::buffer := ::PutMask( ::VarGet(), .t. )
    endif
 
    if ::pos == 0
@@ -942,13 +977,13 @@ METHOD Insert( cChar ) CLASS Get
       ::buffer := Left( Substr( ::buffer, 1, ::Pos-1 ) + cChar + Substr( ::buffer, ::Pos ), ::nMaxEdit )
    endif
 
-// To conform UPDATED() behaviour with that of Clipper
+   // To conform UPDATED() behaviour with that of Clipper
    ::Changed := .T.
 
-// UPDATED() function previously did not return .T. even if a key press is
-// accepted.
-//   ::Changed := ValType( ::Original ) != ValType( ::unTransform() ) .or.;
-//                !( ::unTransform() == ::Original )
+   // UPDATED() function previously did not return .T. even if a key press is
+   // accepted.
+   //   ::Changed := ValType( ::Original ) != ValType( ::unTransform() ) .or.;
+   //                !( ::unTransform() == ::Original )
    ::Right( .f. )
 
    if ::type == "D"
@@ -1231,9 +1266,9 @@ METHOD Input( cChar ) CLASS Get
    if ! Empty( ::cPicMask )
       cPic  := Substr( ::cPicMask, ::pos, 1 )
 
-//      cChar := Transform( cChar, cPic )
-// Above line eliminated because some get picture template symbols for
-// numeric input not work in text input. eg: $ and *
+      //      cChar := Transform( cChar, cPic )
+      // Above line eliminated because some get picture template symbols for
+      // numeric input not work in text input. eg: $ and *
 
       Switch cPic
       case "A"
@@ -1359,11 +1394,11 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
       endif
    endif
 
-/*
+   /*
    if ::nMaxLen == NIL
       ::nMaxLen := Len( cBuffer )
    endif
-*/
+   */
 
    ::nMaxLen  := Len( cBuffer )
    ::nMaxEdit := ::nMaxLen
