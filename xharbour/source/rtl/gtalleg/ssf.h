@@ -62,8 +62,6 @@
 
 #include <allegro.h>
 
-// typedef char AL_BITMAP;
-
 typedef enum {
     SSF_NONE,
     SSF_LINE,
@@ -86,7 +84,6 @@ typedef enum {
 typedef struct _ssfFrame {
     char ftype;
     unsigned short left, top, right, bottom, thick, thickdir;
-//    char thickdir;
 } ssfFrame;
 
 typedef struct _ssfGlyph {
