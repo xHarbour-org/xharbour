@@ -1,44 +1,66 @@
 /*
- * $Id: telepath.prg,v 1.2 2004/08/16 14:30:18 mauriliolongo Exp $
+ * $Id: telepath.prg,v 1.3 2004/08/16 14:37:13 mauriliolongo Exp $
  */
 
-////////////////////////////////////////////////////////////////////////////////////////
-////
-//// This .prg is meant to be compiled with Flagship and provide some of the functionality
-//// of the Telepathy serial library from Extrasensory Inc.
-////
-//// I wrote this originally on RedHat Linux 5.1 and I've tested it on RedHat 6.2.  Your
-//// mileage may vary.
-////
-//// I only ported the parts of Telepathy that I needed.  If you need other parts of the
-//// telepathy libarary, Use the Source...
-////
-//// Feel free to use, modify, distribute, hack, kludge, append, extend or whatever you like
-//// to this source code.  You can (at your own risk) compile it into any program you wish
-//// and sell or freely distribute the resulting application.
-////
-//// Though I use this code in a production environment for a program that my company actually
-//// sells, I make no promises (expressed or implied) about its stability, functionality,
-//// effectiveness or anything else.  I warn you now that if you use my code, you're doing
-//// so at your own risk and it will probably blow up your computer.  But that's a risk
-//// you'll just have to take.
-////
-//// This is freeware.  But if you actually use this in your program, please send me email
-//// at dan@boba-fett.net.  I'd just be curious to see if anyone ever uses it.
-////
-//// The one license request that I make is that if you find a bug, pretty please send me
-//// email about it.
-////
-//// - Dan Levitt
-////
-//////////////////////////////////////////////////////////////////////////////////////////
+/*
+ * Harbour Project source code:
+ * Telepathy emulation library
+ *
+ * Copyright 2000, 2001 Dan Levitt <dan@boba-fett.net>
+ * www - http://www.harbour-project.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ *
+ * As a special exception, the Harbour Project gives permission for
+ * additional uses of the text contained in its release of Harbour.
+ *
+ * The exception is that, if you link the Harbour libraries with other
+ * files to produce an executable, this does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * Your use of that executable is in no way restricted on account of
+ * linking the Harbour library code into it.
+ *
+ * This exception does not however invalidate any other reasons why
+ * the executable file might be covered by the GNU General Public License.
+ *
+ * This exception applies only to the code released by the Harbour
+ * Project under the name Harbour.  If you copy code from other
+ * Harbour Project or Free Software Foundation releases into a copy of
+ * Harbour, as the General Public License permits, the exception does
+ * not apply to the code that you add in this way.  To avoid misleading
+ * anyone as to the status of such modified files, you must delete
+ * this exception notice from them.
+ *
+ * If you write modifications of your own for Harbour, it is your choice
+ * whether to permit this exception to apply to your modifications.
+ * If you do not wish that, delete this exception notice.
+ *
+ */
 
+/*
+   This is based upon a library originally made by Dan Levitt <dan@boba-fett.net>
+   (see README and ChangeLog). The original files have been committed as v1.0,
+   so you can always retrieve them (see CVS docs on how to)
 
-// xHarbour Port by Luiz Rafael Culik Guimaraes (culikr@brturbo.com)
+   First xHarbour Port by Luiz Rafael Culik Guimaraes (culikr@brturbo.com)
+*/
 
 
 #pragma begindump
-    #include "hbapi.h"
+   #include "hbapi.h"
    #include <sys/ioctl.h>
    #include <unistd.h>
    #include <sys/stat.h>
