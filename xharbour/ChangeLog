@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3683 2004/12/18 16:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3683 2004/12/18 13:49:44 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2004-12-19 00:40 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+  * contrib/gtwvw/gtwvw.c
+    ! Fix potential GPF in hb_wv*_key_ansi_to_oem() function due
+      to too small a buffer.
 
 2004-12-18 16:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
    * source/rtl/win32prn.prg

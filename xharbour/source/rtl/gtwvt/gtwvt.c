@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.137 2004/11/24 18:31:06 lf_sfnet Exp $
+ * $Id: gtwvt.c,v 1.138 2004/11/25 01:54:13 guerra000 Exp $
  */
 
 /*
@@ -1661,8 +1661,8 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
 
 static int hb_wvt_key_ansi_to_oem( int c )
 {
-   char pszAnsi[1];
-   char pszOem[1];
+   char pszAnsi[4];
+   char pszOem[4];
 
    sprintf( pszAnsi, "%c", c );
    CharToOemBuff( ( LPCSTR ) pszAnsi, ( LPTSTR ) pszOem, 1 );
@@ -3366,16 +3366,16 @@ void HB_EXPORT hb_wvt_gtSetWindowTitle( char * title )
 DWORD HB_EXPORT hb_wvt_gtSetWindowIcon( int icon, char *lpIconName )
 {
   HICON hIcon;
- 
+
   if( lpIconName == NULL )
 {
    hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( icon ) );
   }
   else
   {
-    hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, lpIconName );     
+    hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, lpIconName );
   }
-  
+
   if ( hIcon )
   {
     SendMessage( _s.hWnd, WM_SETICON, ICON_SMALL, ( LPARAM )hIcon ); // Set Title Bar ICON
@@ -4043,8 +4043,8 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
          return (long) hb_wvt_gtSetWindowIconFromFile( (char *) vpParam  );
 
       case GTI_ICONRES:
-         return (long) hb_wvt_gtSetWindowIcon( iParam, (char *) vpParam );      
-         
+         return (long) hb_wvt_gtSetWindowIcon( iParam, (char *) vpParam );
+
 
       case GTI_VIEWMAXWIDTH:
          return _GetScreenWidth();

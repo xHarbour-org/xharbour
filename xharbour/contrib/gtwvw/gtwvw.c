@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.3 2004/11/13 18:56:43 bdj Exp $
+ * $Id: gtwvw.c,v 1.4 2004/11/24 04:13:48 bdj Exp $
  */
 
 /*
@@ -2957,8 +2957,8 @@ static void hb_wvw_gtResetWindowSize( WIN_DATA * pWindowData, HWND hWnd )
 
 static int hb_wvw_key_ansi_to_oem( int c )
 {
-   char pszAnsi[1];
-   char pszOem[1];
+   char pszAnsi[4];
+   char pszOem[4];
 
    sprintf( pszAnsi, "%c", c );
    CharToOemBuff( ( LPCSTR ) pszAnsi, ( LPTSTR ) pszOem, 1 );
