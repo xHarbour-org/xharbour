@@ -24,7 +24,7 @@ FUNCTION Main
          :WindowMenu := TMenu():New()
          :SetStyle( WS_THICKFRAME, .F. )
          WITH OBJECT :WindowMenu
-            :AddPopup('File')
+            :AddPopup('&Test')
 
             WITH OBJECT :Popup
                :AddItem( 'Editor'  , 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )

@@ -77,7 +77,6 @@ METHOD OnSize(nFlag,Width,Height)
 
 METHOD OnMenuCommand(oItem)
 
-   LOCAL a:=__objGetValueList( self )
    LOCAL nInd:=0
    LOCAL cName:=::GetUniquePropName(oItem:Text)
 
@@ -97,8 +96,9 @@ METHOD OnMenuCommand(oItem)
    CASE oItem:Text=="ListBox"
       ::Add(cName, TListBox():New(  self,        506, 200, 40 ) )
    CASE oItem:Text=="StatusBar"
-      ::Add(cName, TStatusBar():New( self, cName, 507 ) )
-
+      IF !("2" $ cName) // only one status bar
+        ::Add(cName, TStatusBar():New( self, cName, 507 ) )
+      ENDIF
    ENDCASE
 
   RETURN(NIL)

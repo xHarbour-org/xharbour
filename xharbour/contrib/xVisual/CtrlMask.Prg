@@ -10,12 +10,17 @@ TODO:
 - add asymetric grid ( x <> y )     <- done
 - add lSnap flag
 - revise (improve) snapping
+  - snap only the mouse drag position
+    ( and only if moved )
+  - snap draw steps only - position of the control
+  - separate method for control snapping
+  - preserve custom grid offset and custom control size
 - revise min size protection for controls
 - add notifications for object inspector
 - add external object (selective+group) selection/deselection
 - add object tabbing                                <- done
 - add send to the back/front
-- mouse right click
+- mouse right click - trackpopup
 - tooltip with position coords
 - add UNDO ( only last operation as in Delphi ).
 - direct text editing ( on char ? pass keystrokes to selected control ?)
@@ -26,7 +31,6 @@ TODO:
   ( replace focus rect with your own. )
 
 */
-
 
 *************************************************
 
@@ -42,8 +46,21 @@ TODO:
 
 GLOBAL EXTERNAL hThisInstance
 
+// selected controls array elements
+
+#define SEL_HANDLE   1
+#define SEL_OLDRECT  2
+#define SEL_ANCHORX  3
+#define SEL_ANCHORY  4
+#define SEL_HOTAREAS 5
+#define SEL_NEWRECT  6
+
+// min control sixe
+
 #define MINX 5
 #define MINY 5
+
+// resizing handle size
 
 #define HANDLESIZE 5
 
@@ -158,6 +175,7 @@ METHOD OnRButtonDown()
 
 METHOD OnKeyDown( wParam, lParam )
 
+     LOCAL o
      LOCAL cKbd
      LOCAL lShift
      LOCAL lCtrl
@@ -184,8 +202,14 @@ METHOD OnKeyDown( wParam, lParam )
             RETURN(NIL)
 
          CASE wParam==VK_DELETE
-            messagebox(::Parent:Handle,"Delete without warning")
-            SetFocus(::Handle)
+            FOR EACH a IN ::aSelected()
+               IF !Empty(o:=::Parent:ChildFromHandle(a[1]))
+                  o:Delete()
+               ENDIF
+            NEXT
+            ::aSelected:={}
+            ::nClick:=HTCLIENT
+             SetFocus(::Handle)
             RETURN(NIL)
 
          CASE wParam==VK_ESCAPE // ESC unselect ?
@@ -197,7 +221,7 @@ METHOD OnKeyDown( wParam, lParam )
             RETURN(NIL)
 
          CASE wParam==VK_TAB
-            IF (n:=aScan(::aSiblings,{|h| h==::aSelected[1,1]}))==0
+            IF (n:=aScan(::aSiblings,{|h| h==::aSelected[1,SEL_HANDLE]}))==0
                IF len(::aSiblings)>0
                   n:=1
                ENDIF
@@ -208,7 +232,7 @@ METHOD OnKeyDown( wParam, lParam )
                ELSE
                   n:=IF(len(::aSiblings) = n,1,n+1)
                ENDIF
-               IF (::aSiblings[n] <> ::aSelected[1,1] ) .OR. len(::aSelected) > 1
+               IF (::aSiblings[n] <> ::aSelected[1,SEL_HANDLE] ) .OR. len(::aSelected) > 1
                   aRect:=GetWindowRect(::aSiblings[n])
                   RectScreenToClient(::Handle,aRect)
                   ::aSelected:={{::aSiblings[n],aclone(aRect),0,0,{},{}}}   // handle,rect,anchorX,anchorY,aHot
@@ -231,10 +255,10 @@ METHOD OnKeyDown( wParam, lParam )
                t:=1
             ENDIF
             FOR EACH a IN ::aSelected
-               aRect:=GetWindowRect(a[1])
+               aRect:=GetWindowRect(a[SEL_HANDLE])
                RectScreenToClient(::Handle,aRect)
-               a[2]:=aClone(aRect)
-               IF a[2,4] >= acRect[4]
+               a[SEL_OLDRECT]:=aClone(aRect)
+               IF a[SEL_OLDRECT,4] >= acRect[4]
                   lOnBorder:=.T.
                   EXIT
                ENDIF
@@ -248,10 +272,10 @@ METHOD OnKeyDown( wParam, lParam )
                t:=-1
             ENDIF
             FOR EACH a IN ::aSelected
-               aRect:=GetWindowRect(a[1])
+               aRect:=GetWindowRect(a[SEL_HANDLE])
                RectScreenToClient(::Handle,aRect)
-               a[2]:=aClone(aRect)
-               IF (lCtrl .AND. (a[2,2] <= 0)) .OR. (lShift .AND. (a[2,4]-a[2,2] <= MINY ))
+               a[SEL_OLDRECT]:=aClone(aRect)
+               IF (lCtrl .AND. (a[SEL_OLDRECT,2] <= 0)) .OR. (lShift .AND. (a[SEL_OLDRECT,4]-a[SEL_OLDRECT,2] <= MINY ))
                   lOnBorder:=.T.
                   EXIT
                ENDIF
@@ -265,10 +289,10 @@ METHOD OnKeyDown( wParam, lParam )
                l:=-1
             ENDIF
             FOR EACH a IN ::aSelected
-               aRect:=GetWindowRect(a[1])
+               aRect:=GetWindowRect(a[SEL_HANDLE])
                RectScreenToClient(::Handle,aRect)
-               a[2]:=aClone(aRect)
-               IF (lCtrl .AND. (a[2,1] <= 0 )) .OR. (lShift .AND. (a[2,3]-a[2,1] <= MINX ))
+               a[SEL_OLDRECT]:=aClone(aRect)
+               IF (lCtrl .AND. (a[SEL_OLDRECT,1] <= 0 )) .OR. (lShift .AND. (a[SEL_OLDRECT,3]-a[SEL_OLDRECT,1] <= MINX ))
                   lOnBorder:=.T.
                   EXIT
                ENDIF
@@ -282,10 +306,10 @@ METHOD OnKeyDown( wParam, lParam )
                l:=1
             ENDIF
             FOR EACH a IN ::aSelected
-               aRect:=GetWindowRect(a[1])
+               aRect:=GetWindowRect(a[SEL_HANDLE])
                RectScreenToClient(::Handle,aRect)
-               a[2]:=aClone(aRect)
-               IF a[2,3] >= acRect[3]
+               a[SEL_OLDRECT]:=aClone(aRect)
+               IF a[SEL_OLDRECT,3] >= acRect[3]
                   lOnBorder:=.T.
                   EXIT
                ENDIF
@@ -295,12 +319,13 @@ METHOD OnKeyDown( wParam, lParam )
 
          IF !lOnBorder
             FOR EACH a IN ::aSelected
-               InvalidateRect(::Parent:Handle,a[2],.T.) // for statics
-               a[2,1]+=l
-               a[2,2]+=t
-               a[2,3]+=r
-               a[2,4]+=b
-               MoveWindow(a[1],a[2,1],a[2,2],a[2,3]-a[2,1],a[2,4]-a[2,2],.T.)
+               InvalidateRect(::Parent:Handle,a[SEL_OLDRECT],.T.) // for statics
+               a[SEL_OLDRECT,1]+=l
+               a[SEL_OLDRECT,2]+=t
+               a[SEL_OLDRECT,3]+=r
+               a[SEL_OLDRECT,4]+=b
+               MoveWindow(a[SEL_HANDLE],a[SEL_OLDRECT,1],a[SEL_OLDRECT,2],;
+                          a[SEL_OLDRECT,3]-a[SEL_OLDRECT,1],a[SEL_OLDRECT,4]-a[SEL_OLDRECT,2],.T.)
             NEXT
          ENDIF
 
@@ -327,7 +352,7 @@ METHOD OnPaint(hDC)
          IF len(::aSelected) > 1
             FOR EACH a In ::aSelected
                //FrameRect(hDC,a[6],hBrush)
-               DrawFocusRect(hDC,a[6])
+               DrawFocusRect(hDC,a[SEL_NEWRECT])
             NEXT
          ELSE
            // FrameRect(hDC,::aEditRect,hBrush)
@@ -337,7 +362,10 @@ METHOD OnPaint(hDC)
          //hBrush:=GetStockObject( if( len(::aSelected) > 1, DKGRAY_BRUSH, BLACK_BRUSH ) )
          FOR EACH a In ::aSelected
            n++
-           ::aSelected[n,5]:=DrawHandles(hDC,a[2],if( len(::aSelected) > 1,COLOR_BTNSHADOW+1,COLOR_WINDOWTEXT+1))
+           ::aSelected[n,SEL_HOTAREAS]:=DrawHandles(hDC,a[SEL_OLDRECT],;
+                                                    if( len(::aSelected) > 1,;
+                                                        COLOR_BTNSHADOW+1,;
+                                                        COLOR_WINDOWTEXT+1))
          NEXT
       ENDIF
    ENDIF
@@ -352,12 +380,12 @@ METHOD Refresh()
    LOCAL a
 
    FOR EACH a IN ::aSelected
-      aRect:=GetWindowRect(a[1])
+      aRect:=GetWindowRect(a[SEL_HANDLE])
       RectScreenToClient(::Handle,aRect)
-      a[2]:=aClone(aRect)
+      a[SEL_OLDRECT]:=aClone(aRect)
    NEXT
    InvalidateRect(::Parent:Handle,,.T.)
-   ReleaseCapture()
+   //ReleaseCapture()
    ::BringToTop()
    ::SetFocus()
 
@@ -384,21 +412,21 @@ METHOD OnLButtonDown( wParam, x, y )
       aWRect:=GetWindowRect(hChild)
       IF PtInRect(aWRect,aPt)
          lFound:=.T.
-         IF aScan(::aSelected,{|a| a[1]==hChild })==0
+         IF aScan(::aSelected,{|a| a[SEL_HANDLE]==hChild })==0
             aRect:=aClone(aWRect)
             RectScreenToClient(::Handle,aRect)
             ::aSelected:={{hChild,aclone(aRect),x-aRect[1],y-aRect[2],{},{}}}   // handle,rect,anchorX,anchorY,aHot
          ENDIF
-         IF Len(::aSelected)==1 .and. (nPos:=aScan(::aSelected[1,5],{|a| ptInRect(a[1],{x,y})})) > 0 // <= aHot
-            ::nClick:=::aSelected[1,5,nPos,2]
-            WinSetCursor(LoadCursor(,::aSelected[1,5,nPos,3]))
+         IF Len(::aSelected)==1 .and. (nPos:=aScan(::aSelected[1,SEL_HOTAREAS],{|a| ptInRect(a[1],{x,y})})) > 0 // <= aHot
+            ::nClick:=::aSelected[1,SEL_HOTAREAS,nPos,2]
+            WinSetCursor(LoadCursor(,::aSelected[1,SEL_HOTAREAS,nPos,3]))
             ::sizing:=.T.
          ELSE
             ::nClick:=HTCAPTION
             WinSetCursor(LoadCursor(hThisInstance,"FIST"))
             FOR EACH a IN ::aSelected
-                a[3]:=x-a[2,1] // anchor X
-                a[4]:=y-a[2,2] // anchor Y
+                a[SEL_ANCHORX]:=x-a[SEL_OLDRECT,1] // anchor X
+                a[SEL_ANCHORY]:=y-a[SEL_OLDRECT,2] // anchor Y
             NEXT
             ::moving:=.T.
          ENDIF
@@ -448,7 +476,7 @@ METHOD OnMouseMove( aParam,x,y)
       IF len(::aSelected) > 1
          FOR EACH a In ::aSelected
            // FrameRect(hDC,a[6],hBrush)
-            DrawFocusRect(hDC,a[6])
+            DrawFocusRect(hDC,a[SEL_NEWRECT])
          NEXT
       ELSE
         //FrameRect(hDC,::aEditRect,hBrush)
@@ -460,7 +488,7 @@ METHOD OnMouseMove( aParam,x,y)
          ::MoveCtrl(::Handle,aPt)
          FOR EACH a In ::aSelected
           // FrameRect(hDC,a[6],hBrush)
-           DrawFocusRect(hDC,a[6])
+           DrawFocusRect(hDC,a[SEL_NEWRECT])
          NEXT
       ELSE
          ::aEditRect:=::MoveCtrl(::Handle,aPt)
@@ -473,8 +501,8 @@ METHOD OnMouseMove( aParam,x,y)
       ClientToScreen(::Handle,aPt)
       FOR EACH hChild IN ::aSiblings
          IF PtInRect(GetWindowRect(hChild),aPt)
-            IF Len(::aSelected) == 1 .and. ::aSelected[1,1]==hChild
-               IF (nPos:=aScan(::aSelected[1,5],{|a| ptInRect(a[1],{x,y})})) > 0
+            IF Len(::aSelected) == 1 .and. ::aSelected[1,SEL_HANDLE]==hChild
+               IF (nPos:=aScan(::aSelected[1,SEL_HOTAREAS],{|a| ptInRect(a[1],{x,y})})) > 0
                   WinSetCursor(LoadCursor(,::aSelected[1,5,nPos,3]))
                ELSE
                   WinSetCursor(LoadCursor(hThisInstance,"HAND"))
@@ -523,10 +551,11 @@ METHOD OnLButtonUp( wParam, x, y )
    endif
    ::MoveCtrl( ,aPt)
    FOR EACH a IN ::aSelected
-      MoveWindow(a[1],a[6,1],a[6,2],a[6,3]-a[6,1],a[6,4]-a[6,2],.T. )
+      MoveWindow(a[SEL_HANDLE],a[SEL_NEWRECT,1],a[SEL_NEWRECT,2],;
+                 a[SEL_NEWRECT,3]-a[SEL_NEWRECT,1],a[SEL_NEWRECT,4]-a[SEL_NEWRECT,2],.T. )
       aRect:=GetWindowRect(a[1])
       RectScreenToClient(::Handle,aRect)
-      a[2]:=aClone(aRect)
+      a[SEL_OLDRECT]:=aClone(aRect)
    NEXT
 
    IF ::selecting
@@ -540,7 +569,6 @@ METHOD OnLButtonUp( wParam, x, y )
          IF !empty(IntersectRect( aRect, ::aEditRect ))
             aAdd(::aSelected,{hChild, aclone(aRect),0,0,{},{}}) // handle,rect,anchorX,anchorY,aHot
          ENDIF
-
       NEXT
    ENDIF
 
@@ -565,71 +593,72 @@ METHOD MoveCtrl(hWnd,aPt)
 
    FOR EACH aChild IN ::aSelected
 
-   AnchorX:=aChild[3]
-   AnchorY:=aChild[4]
-   aOriginal:=SnapRect(aChild[2],::Parent:xGrid,::Parent:yGrid)
+      AnchorX:=aChild[SEL_ANCHORX]
+      AnchorY:=aChild[SEL_ANCHORY]
+      aOriginal:=SnapRect(aChild[SEL_OLDRECT],::Parent:xGrid,::Parent:yGrid)
 
-   DO CASE
-   CASE ::nClick==HTCAPTION
-      //MoveWindow(hWnd,aPt[1]-AnchorX,aPt[2]-::AnchorY,aOriginal[3]-aOriginal[1],aOriginal[4]-aOriginal[2],.t.)
+      DO CASE
+      CASE ::nClick==HTCAPTION
+         //MoveWindow(hWnd,aPt[1]-AnchorX,aPt[2]-::AnchorY,aOriginal[3]-aOriginal[1],aOriginal[4]-aOriginal[2],.t.)
 
-      aRect:=SnapRect({aPt[1]-AnchorX,aPt[2]-AnchorY,;
-              aPt[1]+aOriginal[3]-aOriginal[1]-AnchorX,;
-              aPt[2]+aOriginal[4]-aOriginal[2]-AnchorY},::Parent:xGrid,::Parent:yGrid)
+         aRect:=SnapRect({aPt[1]-AnchorX,aPt[2]-AnchorY,;
+                         aPt[1]+aOriginal[3]-aOriginal[1]-AnchorX,;
+                         aPt[2]+aOriginal[4]-aOriginal[2]-AnchorY},;
+                         ::Parent:xGrid,::Parent:yGrid)
 
-   CASE ::nClick==HTTOP
-      aPt[2]:=Snap(Min(aPt[2],aOriginal[4]-MINY),::Parent:yGrid)
-      //MoveWindow(hWnd,aOriginal[1],aPt[2],aOriginal[3]-aOriginal[1],aOriginal[4]-aPt[2],.t.)
-      aRect:={aOriginal[1],aPt[2],aOriginal[3],aOriginal[4]}
+      CASE ::nClick==HTTOP
+         aPt[2]:=Snap(Min(aPt[2],aOriginal[4]-MINY),::Parent:yGrid)
+         //MoveWindow(hWnd,aOriginal[1],aPt[2],aOriginal[3]-aOriginal[1],aOriginal[4]-aPt[2],.t.)
+         aRect:={aOriginal[1],aPt[2],aOriginal[3],aOriginal[4]}
 
-   CASE ::nClick==HTBOTTOM
-      aPt[2]:=Snap(Max(aPt[2],aOriginal[2]+MINY),::Parent:yGrid)
-      //MoveWindow(hWnd,aOriginal[1],aOriginal[2],aOriginal[3]-aOriginal[1],aPt[2]-aOriginal[2],.t.)
-      aRect:={aOriginal[1],aOriginal[2],aOriginal[3],aPt[2]}
+      CASE ::nClick==HTBOTTOM
+         aPt[2]:=Snap(Max(aPt[2],aOriginal[2]+MINY),::Parent:yGrid)
+         //MoveWindow(hWnd,aOriginal[1],aOriginal[2],aOriginal[3]-aOriginal[1],aPt[2]-aOriginal[2],.t.)
+         aRect:={aOriginal[1],aOriginal[2],aOriginal[3],aPt[2]}
 
-   CASE ::nClick==HTLEFT
-      aPt[1]:=Snap(Min(aPt[1],aOriginal[3]-MINX),::Parent:xGrid)
-      //MoveWindow(hWnd,aPt[1],aOriginal[2],aOriginal[3]-aPt[1],aOriginal[4]-aOriginal[2],.t.)
-      aRect:={aPt[1],aOriginal[2],aOriginal[3],aOriginal[4]}
+      CASE ::nClick==HTLEFT
+         aPt[1]:=Snap(Min(aPt[1],aOriginal[3]-MINX),::Parent:xGrid)
+         //MoveWindow(hWnd,aPt[1],aOriginal[2],aOriginal[3]-aPt[1],aOriginal[4]-aOriginal[2],.t.)
+         aRect:={aPt[1],aOriginal[2],aOriginal[3],aOriginal[4]}
 
-   CASE ::nClick==HTRIGHT
-      aPt[1]:=Snap(Max(aPt[1],aOriginal[1]+MINX),::Parent:xGrid)
-      //MoveWindow(hWnd,aOriginal[1],aOriginal[2],aPt[1]-aOriginal[1],aOriginal[4]-aOriginal[2],.t.)
-      aRect:={aOriginal[1],aOriginal[2],aPt[1],aOriginal[4]}
+      CASE ::nClick==HTRIGHT
+         aPt[1]:=Snap(Max(aPt[1],aOriginal[1]+MINX),::Parent:xGrid)
+         //MoveWindow(hWnd,aOriginal[1],aOriginal[2],aPt[1]-aOriginal[1],aOriginal[4]-aOriginal[2],.t.)
+         aRect:={aOriginal[1],aOriginal[2],aPt[1],aOriginal[4]}
 
-   CASE ::nClick==HTTOPLEFT
-      aPt[1]:=Snap(Min(aPt[1],aOriginal[3]-MINX),::Parent:xGrid)
-      aPt[2]:=Snap(Min(aPt[2],aOriginal[4]-MINY),::Parent:yGrid)
-      //MoveWindow(hWnd,aOriginal[1],aOriginal[2],aPt[1]-aOriginal[1],aOriginal[4]-aOriginal[2],.t.)
-      aRect:={aPt[1],aPt[2],aOriginal[3],aOriginal[4]}
+      CASE ::nClick==HTTOPLEFT
+         aPt[1]:=Snap(Min(aPt[1],aOriginal[3]-MINX),::Parent:xGrid)
+         aPt[2]:=Snap(Min(aPt[2],aOriginal[4]-MINY),::Parent:yGrid)
+         //MoveWindow(hWnd,aOriginal[1],aOriginal[2],aPt[1]-aOriginal[1],aOriginal[4]-aOriginal[2],.t.)
+         aRect:={aPt[1],aPt[2],aOriginal[3],aOriginal[4]}
 
-   CASE ::nClick==HTBOTTOMLEFT
-      aPt[1]:=Snap(Min(aPt[1],aOriginal[3]-MINX),::Parent:xGrid)
-      aPt[2]:=Snap(Max(aPt[2],aOriginal[2]+MINY),::Parent:yGrid)
-      //MoveWindow(hWnd,aPt[1],aOriginal[2],aOriginal[3]-aPt[1],aPt[2]-aOriginal[2],.t.)
-      aRect:={aPt[1],aOriginal[2],aOriginal[3],aPt[2]}
-      view aRect
+      CASE ::nClick==HTBOTTOMLEFT
+         aPt[1]:=Snap(Min(aPt[1],aOriginal[3]-MINX),::Parent:xGrid)
+         aPt[2]:=Snap(Max(aPt[2],aOriginal[2]+MINY),::Parent:yGrid)
+         //MoveWindow(hWnd,aPt[1],aOriginal[2],aOriginal[3]-aPt[1],aPt[2]-aOriginal[2],.t.)
+         aRect:={aPt[1],aOriginal[2],aOriginal[3],aPt[2]}
 
-   CASE ::nClick==HTTOPRIGHT
-      aPt[1]:=Snap(Max(aPt[1],aOriginal[1]+MINX),::Parent:xGrid)
-      aPt[2]:=Snap(Min(aPt[2],aOriginal[4]-MINY),::Parent:yGrid)
-      //MoveWindow(hWnd,aOriginal[1],aPt[2],aPt[1]-aOriginal[1],aOriginal[4]-aOriginal[2],.t.)
-      aRect:={aOriginal[1],aPt[2],aPt[1],aOriginal[4]}
+      CASE ::nClick==HTTOPRIGHT
+         aPt[1]:=Snap(Max(aPt[1],aOriginal[1]+MINX),::Parent:xGrid)
+         aPt[2]:=Snap(Min(aPt[2],aOriginal[4]-MINY),::Parent:yGrid)
+         //MoveWindow(hWnd,aOriginal[1],aPt[2],aPt[1]-aOriginal[1],aOriginal[4]-aOriginal[2],.t.)
+         aRect:={aOriginal[1],aPt[2],aPt[1],aOriginal[4]}
 
-   CASE ::nClick==HTBOTTOMRIGHT
-      aPt[1]:=Snap(Max(aPt[1],aOriginal[1]+MINX),::Parent:xGrid)
-      aPt[2]:=Snap(Max(aPt[2],aOriginal[2]+MINY),::Parent:yGrid)
-      //MoveWindow(hWnd,aOriginal[1],aOriginal[2],aPt[1]-aOriginal[1],aPt[2]-aOriginal[2],.t.)
-      aRect:={aOriginal[1],aOriginal[2],aPt[1],aPt[2]}
+      CASE ::nClick==HTBOTTOMRIGHT
+         aPt[1]:=Snap(Max(aPt[1],aOriginal[1]+MINX),::Parent:xGrid)
+         aPt[2]:=Snap(Max(aPt[2],aOriginal[2]+MINY),::Parent:yGrid)
+         //MoveWindow(hWnd,aOriginal[1],aOriginal[2],aPt[1]-aOriginal[1],aPt[2]-aOriginal[2],.t.)
+         aRect:={aOriginal[1],aOriginal[2],aPt[1],aPt[2]}
 
-   ENDCASE
+      ENDCASE
 
-       aChild[6]:=aclone(aRect)
+      aChild[6]:=aclone(aRect)
 
    NEXT
 
    IF ::nClick==HTCLIENT
-      aRect:={Min(aPt[1],::aClickPt[1]),Min(aPt[2],::aClickPt[2]),Max(aPt[1],::aClickPt[1]),Max(aPt[2],::aClickPt[2])}
+      aRect:={Min(aPt[1],::aClickPt[1]),Min(aPt[2],::aClickPt[2]),;
+              Max(aPt[1],::aClickPt[1]),Max(aPt[2],::aClickPt[2])}
 
    ENDIF
 
