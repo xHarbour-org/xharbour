@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.60 2002/04/22 23:09:58 ronpinkas Exp $
+ * $Id: hvm.c,v 1.61 2002/04/23 05:01:41 ronpinkas Exp $
  */
 
 /*
@@ -303,13 +303,13 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_stack.pItems = NULL; /* keep this here as it is used by fm.c */
    hb_stack.Return.type = HB_IT_NIL;
 
-   for ( hb_vm_wWithObjectCounter = 0; hb_vm_wWithObjectCounter++; hb_vm_wWithObjectCounter < HB_MAX_WITH_OBJECTS )
+   for ( hb_vm_wWithObjectCounter = 0; hb_vm_wWithObjectCounter < HB_MAX_WITH_OBJECTS; hb_vm_wWithObjectCounter++  )
    {
       hb_vm_aWithObject[ hb_vm_wWithObjectCounter ].type = HB_IT_NIL;
    }
    hb_vm_wWithObjectCounter = 0;
 
-   for ( hb_vm_wEnumCollectionCounter = 0; hb_vm_wEnumCollectionCounter++; hb_vm_wEnumCollectionCounter < HB_MAX_ENUMERATIONS )
+   for ( hb_vm_wEnumCollectionCounter = 0; hb_vm_wEnumCollectionCounter < HB_MAX_ENUMERATIONS; hb_vm_wEnumCollectionCounter++ )
    {
       hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type = HB_IT_NIL;
       hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
