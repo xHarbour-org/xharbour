@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.49 2003/11/28 23:18:32 walito Exp $
+ * $Id: tbrowse.prg,v 1.50 2004/01/13 16:17:13 vouchcac Exp $
  */
 
 /*
@@ -192,7 +192,6 @@ CLASS TBrowse
                                           // nMode is an undocumented parameter in CA-Cl*pper
    METHOD DeHilite()                      // Dehighlights the current cell
    METHOD ForceStable()                   // Performs a full stabilization
-   METHOD _ForceStable()                  // Performs a full stabilization
    METHOD ForceStabilize()                // Identical to Stabilize but usable with ForceStable()
    METHOD Hilite()                        // Highlights the current cell
    METHOD Invalidate()                    // Forces entire redraw during next stabilization
@@ -581,7 +580,7 @@ METHOD Configure( nMode ) CLASS TBrowse
    ::SetFrozenCols( nFreeze, .t. )
 
 #ifdef HB_COMPAT_C53
-   ::Rect := { ::nwTop + ::nHeaderHeight, ::nwLeft, ::nwBottom - ::nHeaderHeight, ::nwRight }
+   ::Rect := { ::nwTop + ::nHeaderHeight + if( ::lHeadSep, 1, 0 ), ::nwLeft, ::nwBottom - ::nFooterHeight - if( ::lFootSep, 1, 0 ), ::nwRight }
 //   for n := ::nwLeft to ::nwRight
 //      aadd( ::aVisibleCols, n )
 //   next
@@ -1461,32 +1460,28 @@ return Self
 //-------------------------------------------------------------------//
 
 METHOD ForceStable() CLASS TBrowse
+   Local nAvail           // How many records are avaialble?
+   Local lReset := .F.    // Reposition to row 1 required?
 
    // This is a hack to force TBrowse honors initial rowpos
    // This may be a very dirty approach
 
    local i, nInitRow
-
+   
    If !::lInitRow
       nInitRow  := ::RowPos
       If nInitRow != 1
          for i := 1 to nInitRow - 1
             ::Down()
-            ::_ForceStable()
+            ::ForceStabilize()
          next
       else
-         ::_Forcestable()
+         ::ForceStabilize()
       Endif
-   else
-      ::_Forcestable()
    Endif
 
    ::lInitRow := .T.
-
-   Return self
-
-METHOD _ForceStable() CLASS TBrowse
-
+	   
    // If ForceStable() is called after movement of data source
    // (in simple words, the record pointer is moved) where the
    // movement was not effected by TBrowse (e.g user set scope)
@@ -1496,68 +1491,50 @@ METHOD _ForceStable() CLASS TBrowse
    // to paiting relative to current cursor row.  If sufficient data is not
    // available then reset position to row 1.
 
-   Local nAvail           // How many records are avaialble?
-   Local lReset := .F.    // Reposition to row 1 required?
-
    If ::nRecsToSkip == 0  // Ensure that you do not reset the painting
                           // of a movement caused by TBrowse methods
 
       If ::RowPos # 1     // No repositioning is required if current
                           // cursor row is one
 
-         nAvail := EvalSkipBlock( ::SkipBlock, 0 - ::RowPos - 1 )
+         nAvail := Eval( ::SkipBlock, 0 - ::RowPos - 1 )
+
          // You should reposition only if there are too few records
          // available or there are more than sufficient records
-         // available.  If there are exact number of records
-         // leave it.
-
+         // available.  If there are exact number of records leave it.
+         // 
          lReset := Abs( nAvail ) + 1 # ::RowPos
 
          // Place back the data source pointer to where it was
-
-         EvalSkipBlock( ::SkipBlock, 0 - nAvail )
-
-         // ::GoBottom() go to top first, but need phase 2 of stabilization.
-         // See form of work of ::GoBottom.
-
-         IF nAvail == 0 .and. ::nLastRetrieved == 0
-            ::Moved()
-            lReset := .F.
-         ENDIF
+         // 
+         Eval( ::SkipBlock, 0 - nAvail )
 
       EndIf
 
    EndIf
 
-
    If lReset   // So repositioning was required !
-
-      // OK Here
 
       // nNewRowPos and nLastRetrieved have to be updated
       // as we will entering phase 2 of stabilization
 
-     // ::RowPos := ::nNewRowPos := ::nLastRetrieved := ;
-     //            If( Abs( nAvail ) + 1 > ::RowPos, ::RowPos, Abs( nAvail ) + 1 )
-
-     // ::Moved()
+      ::RowPos := ::nNewRowPos := ::nLastRetrieved := ;
+                  If( Abs( nAvail ) + 1 > ::RowPos, ::RowPos, Abs( nAvail ) + 1 )
+      ::Moved()
 
       // To ensure phase 1 is skipped
       ::nRecsToSkip := 0
 
    EndIf
 
-//   while !::Stabilize()
-//   end
-
    //  Because forceStable is always needs whole tBrowse be redrawn
    //  no incremental stabilization is needed, so I am of the view that
    //  instead of Stabilize() method be called incrementaly, an identical
    //  method will be more appropriate but with single call.
-
+   //
    ::ForceStabilize()
 
-return Self
+   Return self
 
 //-------------------------------------------------------------------//
 
@@ -2392,12 +2369,12 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
    case "M"
       nCol := Col()
       DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
-      DispOut( Space( nWidth - nLen ) )
+      DispOut( Space( nWidth - nLen ), cColor )
       exit
 
    case "N"
       if nWidth > nLen
-         DispOut( Space( nWidth - nLen ) )
+         DispOut( Space( nWidth - nLen ), cColor )
       endif
       nCol := Col()
       DispOut( PadL( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
@@ -2406,14 +2383,14 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
    case "D"
       nCol := Col()
       DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
-      DispOut( Space( nWidth - nLen ) )
+      DispOut( Space( nWidth - nLen ), cColor )
       exit
 
    case "L"
       DispOut( Space( Int( nWidth / 2 ) ) )
       nCol := Col()
       DispOut( iif( ftmp, "T", "F" ), cColor )
-      DispOut( Space( nWidth - Int( nWidth / 2 ) - 1 ) )
+      DispOut( Space( nWidth - Int( nWidth / 2 ) - 1 ), cColor )
       exit
 
    default
@@ -2661,7 +2638,7 @@ return nReturn
 //-------------------------------------------------------------------//
 
 Method hitTest( mrow,mcol ) CLASS TBROWSE
-  Local nVisCol
+  Local i, nVisCol
   ::mRowPos := ::rowPos
   ::mColPos := ::colPos
 
@@ -2676,12 +2653,23 @@ Method hitTest( mrow,mcol ) CLASS TBROWSE
 
   ::mRowPos := mRow - ::rect[ 1 ] + 1
 
-  for each nVisCol in ::aVisibleCols
-     if nVisCol > mcol
-        ::mColpos := nVisCol
+  nVisCol := len( ::aColumnsSep )
+
+  if nVisCol == 0
+    ::mColPos := 1
+
+  elseif mcol >= ::aColumnsSep[ nVisCol ]
+    ::mColPos := nVisCol + 1
+
+  else 
+    for i := 1 to nVisCol
+      if mcol < ::aColumnsSep[ i ]
+        ::mColPos := i
         exit
-     endif
-  next
+      endif
+    next
+
+  endif 
 
 return HTCELL
 
@@ -2721,7 +2709,6 @@ function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
    if oBrowse:hittest( nMouseRow, nMouseCol ) == -5121
 
       n := oBrowse:mrowpos - oBrowse:rowpos
-
 
       do while ( n < 0 )
          n++
@@ -2796,6 +2783,8 @@ static function LenVal( xVal, cType, cPict )
 
 return nLen
 
+//-------------------------------------------------------------------//
+
 static function ColorToDisp( aColor, nColor )
 
    if Len( aColor ) >= nColor
@@ -2804,6 +2793,7 @@ static function ColorToDisp( aColor, nColor )
 
 return { 1, 2, 1, 1 }[ nColor ]
 
+//-------------------------------------------------------------------//
 
 static Function ArrayToList( aArray )
 
@@ -2816,7 +2806,6 @@ next
 cList := substr(cList,1,len(cList)-2)
 return cList
 
-
 //-------------------------------------------------------------------//
 //
 //                   Function to Activate TBrowse
@@ -2826,3 +2815,6 @@ return cList
 function TBrowseNew( nTop, nLeft, nBottom, nRight )
 
 return TBrowse():New( nTop, nLeft, nBottom, nRight )
+
+//-------------------------------------------------------------------//
+
