@@ -118,7 +118,7 @@ HB_FUNC( HB_HEXTONUM )
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_HEXTONUM", 1, hb_param(1,HB_IT_ANY) );
       return;
    }
-   cHex = hb_parcx( 1 );
+   cHex = hb_parc( 1 );
 
    while ( *cHex )
    {
@@ -148,3 +148,128 @@ HB_FUNC( HB_HEXTONUM )
    hb_retnl( (LONG) ulNum  );
 }
 
+HB_FUNC( HB_STRTOHEX )
+{
+   char *outbuff;
+   char *cStr;
+   char *c;
+   USHORT i, len;
+   int iCipher, iNum;
+
+   if( ! ISCHAR(1) )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_STRTOHEX", 1, hb_param(1,HB_IT_ANY) );
+      return;
+   }
+
+   cStr = hb_parc( 1 );
+   len = hb_parclen( 1 );
+   outbuff = hb_xgrab( (len * 2) + 1 );
+   c = outbuff;
+
+   for( i = 0; i < len; i++ )
+   {
+
+      iNum = cStr[i];
+      c[0] = '0';
+      c[1] = '0';
+
+      iCipher = iNum % 16;
+      if ( iCipher < 10 )
+      {
+         c[1] = '0' + iCipher;
+      }
+      else
+      {
+         c[1] = 'A' + (iCipher - 10 );
+      }
+      iNum >>=4;
+
+      iCipher = iNum % 16;
+      if ( iCipher < 10 )
+      {
+         c[0] = '0' + iCipher;
+      }
+      else
+      {
+         c[0] = 'A' + (iCipher - 10 );
+      }
+
+      c+=2;
+   }
+
+   outbuff[len*2] = '\0';
+   hb_retc( outbuff );
+}
+
+HB_FUNC( HB_HEXTOSTR )
+{
+   char *outbuff;
+   char *cStr;
+   char c;
+   USHORT i, len, nalloc;
+   int iCipher, iNum;
+
+   if( ! ISCHAR(1) )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_STRTOHEX", 1, hb_param(1,HB_IT_ANY) );
+      return;
+   }
+
+   cStr = hb_parc( 1 );
+   len = hb_parclen( 1 );
+   nalloc = (USHORT) (len/2);
+   outbuff = hb_xgrab( nalloc + 1 );
+// printf( "                           larg %i, out %i\n", len, nalloc );
+   for( i = 0; i < nalloc; i++ )
+   {
+      // First byte
+
+      c = *cStr;
+      iNum = 0;
+      iNum <<= 4;
+      iCipher = 0;
+
+      if ( c >= '0' && c <= '9' )
+      {
+         iCipher = (ULONG) ( c - '0' );
+      }
+      else if ( c >= 'A' && c <= 'F' )
+      {
+         iCipher = (ULONG) ( c - 'A' )+10;
+      }
+      else if ( c >= 'a' && c <= 'f' )
+      {
+         iCipher = (ULONG) ( c - 'a' )+10;
+      }
+
+      iNum += iCipher;
+      cStr++;
+
+      // Second byte
+
+      c = *cStr;
+      iNum <<= 4;
+      iCipher = 0;
+
+      if ( c >= '0' && c <= '9' )
+      {
+         iCipher = (ULONG) ( c - '0' );
+      }
+      else if ( c >= 'A' && c <= 'F' )
+      {
+         iCipher = (ULONG) ( c - 'A' )+10;
+      }
+      else if ( c >= 'a' && c <= 'f' )
+      {
+         iCipher = (ULONG) ( c - 'a' )+10;
+      }
+
+      iNum += iCipher;
+      cStr++;
+      outbuff[i] = iNum;
+   }
+
+   outbuff[nalloc] = '\0';
+   hb_retc( outbuff );
+}
