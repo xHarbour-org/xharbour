@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2209 2004/02/03 10:41:25 lculik Exp $
+ * $Id: ChangeLog,v 1.2210 2004/02/03 12:32:52 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-03 18:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/tbrowse.prg
+    - Removed Method _ForceStable() and merged the code.
+    * Optinimized ::DispCell() to display respecting oColumn:width.
+    * ::HitTest() now returns correct column and row position as per Clipper 5.3b.
 
 2004-02-03 13:33 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/gtxvt/gtxvt.c
