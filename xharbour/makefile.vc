@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.47 2003/05/08 03:28:04 lculik Exp $
+# $Id: makefile.vc,v 1.48 2003/05/20 00:33:37 lculik Exp $
 #
 
 #
@@ -230,7 +230,7 @@ LIBLISTMT = \
    $(DBFCDXMT_LIB) \
    $(DBFNTXMT_LIB) \
    $(VMMT_LIB) \
-   $(ODBCMT_LIB) 
+   $(ODBCMT_LIB)
 
 #
 # macro.lib needs to be listed twice
@@ -829,7 +829,7 @@ $(HBRUN_EXE) : \
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
    $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbrun.c \
                                       $(OBJ_DIR)\external.c \
-                       -o $(HBRUN_EXE) /link $(L_DFLAGSNMT) $(LIBS2)
+                       -o $(HBRUN_EXE) /link $(L_DFLAGSNMT) $(LIBS2) ole32.lib oleaut32.lib
 
 #
 # HBTEST.EXE rules

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.200 2003/05/26 00:19:16 ronpinkas Exp $
+ * $Id: hvm.c,v 1.201 2003/05/26 01:26:26 ronpinkas Exp $
  */
 
 /*
@@ -6559,7 +6559,7 @@ PSYMBOLS hb_vmFindModuleByName( char *szModuleName )
 {
    PSYMBOLS pLastSymbols = s_pSymbols;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmFindModule(%p)", pModuleSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmFindModuleByName(%s)", szModuleName));
 
    do
    {
@@ -7313,7 +7313,7 @@ HB_FUNC( HB_SAVEBLOCK )
          hb_itemPutC( &ModuleName, pModuleSymbols->szModuleName );
 
          PCode.type = HB_IT_NIL;
-         hb_itemPutCL( &PCode, ( pBlock->item.asBlock.value )->pCode, ( pBlock->item.asBlock.value )->uLen );
+         hb_itemPutCL( &PCode, (char *) ( ( pBlock->item.asBlock.value )->pCode ), ( pBlock->item.asBlock.value )->uLen );
 
          ParamCount.type = HB_IT_NIL;
          hb_itemPutNI( &ParamCount, pBlock->item.asBlock.paramcnt );
@@ -7355,7 +7355,7 @@ HB_FUNC( HB_RESTOREBLOCK )
             PHB_ITEM pSelf = hb_param( 2, HB_IT_ARRAY );
 
             Block.type = HB_IT_BLOCK;
-            Block.item.asBlock.value = hb_codeblockMacroNew( PCode.item.asString.value, PCode.item.asString.length );
+            Block.item.asBlock.value = hb_codeblockMacroNew( (unsigned char *) ( PCode.item.asString.value ), PCode.item.asString.length );
             Block.item.asBlock.value->pSymbols = pModuleSymbols->pModuleSymbols;
             Block.item.asBlock.paramcnt = ParamCount.item.asInteger.value;
 

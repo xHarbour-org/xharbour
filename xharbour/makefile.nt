@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.25 2003/04/18 23:34:13 lculik Exp $
+# $Id: makefile.nt,v 1.26 2003/05/20 00:33:38 lculik Exp $
 #
 
 #
@@ -865,7 +865,7 @@ $(HBRUN_EXE) : \
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
    $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbrun.c \
                                       $(OBJ_DIR)\external.c \
-                       -o $(HBRUN_EXE) /link $(L_DFLAGSNMT) $(LIBS2)
+                       -o $(HBRUN_EXE) /link $(L_DFLAGSNMT) $(LIBS2) ole32.lib oleaut32.lib
 
 #
 # HBTEST.EXE rules
