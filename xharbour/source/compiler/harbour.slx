@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.13 2002/09/16 05:34:02 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.14 2002/09/17 06:27:24 ronpinkas Exp $
  */
 
 /*
@@ -266,6 +266,7 @@ LANGUAGE_KEY_WORDS_ARE {
 
 /* Words. */
 LANGUAGE_WORDS_ARE {
+                     LEX_WORD( "..."                            ) AS_TOKEN( EPSILON            + DONT_REDUCE ),
                      LEX_WORD( ".F."                            ) AS_TOKEN( FALSEVALUE         + DONT_REDUCE ),
                      LEX_WORD( ".N."                            ) AS_TOKEN( FALSEVALUE         + DONT_REDUCE ),
                      LEX_WORD( ".T."                            ) AS_TOKEN( TRUEVALUE          + DONT_REDUCE ),

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.112 2002/10/06 21:24:04 ronpinkas Exp $
+ * $Id: hvm.c,v 1.113 2002/10/07 15:17:18 ronpinkas Exp $
  */
 
 /*
@@ -4117,8 +4117,6 @@ void hb_vmDo( USHORT uiParams )
 
       if( pFunc )
       {
-         //short iGlobal;
-
          if( bProfiler && pSym->pDynSym )
          {
             pSym->pDynSym->ulRecurse++;
@@ -4559,6 +4557,18 @@ static void hb_vmFrame( BYTE bLocals, BYTE bParams )
    int iTotal, iExtra;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmFrame(%d, %d)", (int) bLocals, (int) bParams));
+
+   if( bParams == 255 )
+   {
+      ( *hb_stack.pBase )->item.asSymbol.paramcnt += 256;
+
+      while( bLocals-- > 0 )
+      {
+         hb_vmPushNil();
+      }
+
+      return;
+   }
 
    iExtra = hb_pcount() - bParams;
 
@@ -5103,15 +5113,21 @@ static void hb_vmPushLocal( SHORT iLocal )
 static void hb_vmPushLocalByRef( SHORT iLocal )
 {
    HB_ITEM_PTR pTop = ( * hb_stack.pPos );
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLocalByRef(%hd)", iLocal));
 
    pTop->type = HB_IT_BYREF;
    /* we store its stack offset instead of a pointer to support a dynamic stack */
-   pTop->item.asRefer.value = iLocal;
    pTop->item.asRefer.offset = hb_stackBaseOffset();
 
    if( iLocal >= 0 )
    {
+      // SomeFunc( ... ) - Variable paramaters.
+      if( ( *hb_stack.pBase )->item.asSymbol.paramcnt > 255 )
+      {
+         iLocal += ( *hb_stack.pBase )->item.asSymbol.paramcnt - 256;
+      }
+
       if( ( * ( hb_stack.pBase + iLocal + 1 ) )->type == HB_IT_STRING && ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.bStatic )
       {
          char *sString = (char*) hb_xgrab( ( * ( hb_stack.pBase + iLocal + 1 ) )->item.asString.length + 1 );
@@ -5134,6 +5150,9 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
       */
       pTop->item.asRefer.BasePtr.block = (hb_stackSelfItem())->item.asBlock.value;
    }
+
+   pTop->item.asRefer.value = iLocal;
+
    hb_stackPush();
 }
 

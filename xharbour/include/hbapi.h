@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.37 2002/10/06 21:24:04 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.38 2002/10/09 03:43:21 druzus Exp $
  */
 
 /*
@@ -177,7 +177,7 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
    #include "hbapiitm.h"
    #include "hbstack.h"
 
-    #define hb_pcount()                          ( ( int ) ( * hb_stack.pBase )->item.asSymbol.paramcnt )
+    #define hb_pcount()                          ( ( int ) ( ( ( * hb_stack.pBase )->item.asSymbol.paramcnt < 255 ) ? ( * hb_stack.pBase )->item.asSymbol.paramcnt : ( * hb_stack.pBase )->item.asSymbol.paramcnt - 256 ) )
 
     #define hb_ret()                             hb_itemClear( &hb_stack.Return )
     #define hb_reta( ulLen )                     hb_arrayNew( &hb_stack.Return, ulLen )

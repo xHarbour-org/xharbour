@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.8 2002/09/20 19:48:20 ronpinkas Exp $
+ * $Id: extend.c,v 1.9 2002/09/21 05:21:07 ronpinkas Exp $
  */
 
 /*
@@ -589,7 +589,7 @@ int  HB_EXPORT hb_pcount( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_pcount()"));
 
-   return ( int ) ( hb_stackBaseItem() )->item.asSymbol.paramcnt;
+   return ( int )( ( hb_stackBaseItem() )->item.asSymbol.paramcnt < 255 ? ( hb_stackBaseItem() )->item.asSymbol.paramcnt : ( hb_stackBaseItem() )->item.asSymbol.paramcnt - 256 );
 }
 
 #undef hb_ret

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.6 2002/04/21 01:39:17 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.7 2002/09/16 05:34:02 ronpinkas Exp $
  */
 
 /*
@@ -85,11 +85,12 @@ char * hb_comp_szErrors[] =
    "Too many inline blocks %s",
    "Inline C requires C output generation, use -gc[n]",
    "Missing ENDTEXT",
-   "Optimized local [%s] out of range, after offsetting %s PARAMETERS.",
+   "Optimized Local [%s] out of range, after offsetting %s PARAMETERS.",
    "WITH Message [%s] with no WITH OBJECT in sight.",
    "Misplaced Global declaration \'%s\'.",
    "Too many Global declarations \'%s\'.",
-   "External Global declaration can not include initializer \'%s\'."
+   "External Global declaration can not include initializer \'%s\'.",
+   "Too many Paramaters declarations \'%s\'."
 };
 
 /* Table with parse warnings */

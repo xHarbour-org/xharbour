@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.23 2002/10/05 23:27:43 ronpinkas Exp $
+ * $Id: arrays.c,v 1.24 2002/10/07 15:17:18 ronpinkas Exp $
  */
 
 /*
@@ -370,7 +370,7 @@ BOOL hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      PHB_ITEM pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
+      //PHB_ITEM pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
 
       if( HB_IS_COMPLEX( pItem ) )
       {
@@ -1082,6 +1082,12 @@ PHB_ITEM hb_arrayFromParams( PHB_ITEM *pBase )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams()"));
 
    pArray->type = HB_IT_ARRAY;
+
+   // SomeFunc( ... ) Variable paramaters.
+   if( uiPCount > 255 )
+   {
+      uiPCount -= 256;
+   }
 
    if( uiPCount > 0 )
    {

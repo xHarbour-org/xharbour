@@ -1,5 +1,5 @@
 /*
- * $Id: pcount.c,v 1.5 2001/04/12 18:56:30 dholm Exp $
+ * $Id: pcount.c,v 1.1.1.1 2001/12/21 10:40:58 ronpinkas Exp $
  */
 
 /*
@@ -58,5 +58,5 @@ HB_FUNC( PCOUNT )
    /* Skip current function */
    PHB_ITEM pBase = hb_stackItem( ( hb_stackBaseItem() )->item.asSymbol.stackbase );
 
-   hb_retni( pBase->item.asSymbol.paramcnt );
+   hb_retni( pBase->item.asSymbol.paramcnt < 255 ? pBase->item.asSymbol.paramcnt : pBase->item.asSymbol.paramcnt - 256 );
 }

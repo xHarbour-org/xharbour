@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.429 2002/10/08 21:28:10 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.430 2002/10/09 03:43:19 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,40 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-09 13:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.sly
+    + New token EPSILON
+    * Modied Function and Procedure definition to allow new Syntax:
+         FUNCTION Foo( ... )
+         PROCEDURE Foo( ... )
+      - Variable paramaters functions are flags as 255 paramaters.
+
+  * source/compiler/harbour.slx
+    + Added support for new token EPSILON
+
+  * source/compiler/harbour.c
+    + Added logic to avoid paramater count correction when 255.
+    + Added logic to generate error if more then 255 locals, or params, since HB_P_FRAME supports only BYTE for each.
+
+  * include/hberrors.h
+    + #define HB_COMP_ERR_TOOMANY_PARAMS              58
+  * source/compiler/hbgenerr.c
+    + "Too many Paramaters declarations \'%s\'."
+
+  * include/hbapi.h
+  * source/vm/estack.c
+  * source/vm/extend.c
+  * source/vm/arrays.c
+  * source/vm/fastitem.c
+  * source/vm/hvm.c
+  * source/vm/pcount.c
+    + Added support for variable number paramaters <...> in functions.
+      - Actual number of paramaters signified as 256 + actual paramaters.
+      - Related logic offset LOCALs access when .paramcnt > 255 ( + .paramcnt - 256 ).
+
+  * source/pp/ppcore.c
+    * Corrected type cast.
 
 2002-10-09 04:53 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * source/rtl/gtwin/gtwin.c
@@ -19,7 +53,7 @@
   * source/rtl/console.c
     * Fixed ACCEPT to respect SET CONSOLE and similar sets.
     * hb_conOutAlt() is global function now.
-    
+
 2002-10-08 14:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg
     * Fixed initialization of cLastChar in NextIdentifier()

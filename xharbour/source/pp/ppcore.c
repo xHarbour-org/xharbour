@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.32 2002/09/30 07:26:27 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.33 2002/09/30 21:26:46 ronpinkas Exp $
  */
 
 /*
@@ -1038,7 +1038,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
   {
      if( *(mpatt+i) == '<' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
      {
-        if( (unsigned ) lastchar == 255 )
+        if( (unsigned char) lastchar == 255 )
         {
            hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_MARKERS, NULL, NULL );
         }

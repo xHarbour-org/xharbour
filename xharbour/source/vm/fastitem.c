@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.34 2002/06/17 08:07:36 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.35 2002/08/24 01:48:13 ronpinkas Exp $
  */
 
 /*
@@ -781,8 +781,17 @@ USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pScanBaseArray, PHB_SCANNED_
 BYTE hb_itemParamId( PHB_ITEM pItem )
 {
    PHB_ITEM *pBase = hb_stack.pBase + 1;
-   PHB_ITEM *pTop  = pBase + (*hb_stack.pBase)->item.asSymbol.paramcnt + 1;
+   PHB_ITEM *pTop;
    BYTE iId = 1;
+
+   if( (*hb_stack.pBase)->item.asSymbol.paramcnt < 256 )
+   {
+      pTop = pBase + (*hb_stack.pBase)->item.asSymbol.paramcnt + 1;
+   }
+   else
+   {
+      pTop = pBase + (*hb_stack.pBase)->item.asSymbol.paramcnt + 1 - 256;
+   }
 
    while( pBase < pTop )
    {

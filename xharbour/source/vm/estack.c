@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.11 2002/03/22 15:06:37 map Exp $
+ * $Id: estack.c,v 1.12 2002/05/24 01:25:39 horacioroldan Exp $
  */
 
 /*
@@ -237,9 +237,20 @@ HB_ITEM_PTR hb_stackItemFromTop( int nFromTop )
 HB_ITEM_PTR hb_stackItemFromBase( int nFromBase )
 {
    if( nFromBase <= 0 )
+   {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
+   }
 
-   return ( * ( hb_stack.pBase + nFromBase + 1 ) );
+   //printf( "Local %i Params: %i\n", nFromBase, ( *hb_stack.pBase )->item.asSymbol.paramcnt );
+
+   if( ( *hb_stack.pBase )->item.asSymbol.paramcnt < 255 )
+   {
+      return ( * ( hb_stack.pBase + nFromBase + 1 ) );
+   }
+   else
+   {
+      return ( * ( hb_stack.pBase + nFromBase + 1 + ( *hb_stack.pBase )->item.asSymbol.paramcnt - 256 ) );
+   }
 }
 
 HB_ITEM_PTR hb_stackTopItem( void )

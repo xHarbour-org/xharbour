@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.21 2002/09/23 00:40:37 ronpinkas Exp $
+ * $Id: harbour.c,v 1.22 2002/09/23 17:50:44 ronpinkas Exp $
  */
 
 /*
@@ -645,6 +645,11 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
          case ( VS_PARAMETER | VS_PRIVATE ):
             {
+               if( hb_comp_functions.pLast->wParamCount >= 254 )
+               {
+                  hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_PARAMS, szVarName, NULL );
+               }
+
                if( ++hb_comp_functions.pLast->wParamNum > hb_comp_functions.pLast->wParamCount )
                {
                   hb_comp_functions.pLast->wParamCount = hb_comp_functions.pLast->wParamNum;
@@ -3432,7 +3437,9 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
          pFunc->wParamCount = PCount;
       }
       else
+      {
          hb_compFixFuncPCode( pFunc );
+      }
 
       if( pFunc->iNOOPs )
          hb_compOptimizeJumps();
@@ -3565,7 +3572,13 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
              */
             pFunc->pCode[ 1 ] = ( BYTE )( bLocals );
          }
-         pFunc->pCode[ 2 ] = ( BYTE )( pFunc->wParamCount );
+
+         // SomeFunc( ... ) - Variable number paramaters.
+         if( pFunc->pCode[ 2 ] < 255 )
+         {
+            pFunc->pCode[ 2 ] = ( BYTE )( pFunc->wParamCount );
+         }
+
          bSkipFRAME = FALSE;
       }
       else
