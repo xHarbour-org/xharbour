@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.79 2004/03/24 10:17:22 druzus Exp $
+ * $Id: filesys.c,v 1.80 2004/03/24 11:46:42 druzus Exp $
  */
 
 /*
@@ -2681,11 +2681,11 @@ void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
    #if defined(_POSIX_SYNCHRONIZED_IO)
       /* faster - flushes data buffers only, without updating directory info
       */
-      hb_fsSetError( ( fdatasync( hFileHandle ) < -1 ) ? FS_ERROR : 0);
+      hb_fsSetError( ( fdatasync( hFileHandle ) == -1 ) ? errno : 0 );
    #else
       /* slower - flushes all file data buffers and i-node info
       */
-      hb_fsSetError( ( fsync( hFileHandle ) < -1 ) ? FS_ERROR : 0);
+      hb_fsSetError( ( fsync( hFileHandle ) == -1 ) ? errno : 0 );
    #endif
 
 #elif defined(__WATCOMC__)
@@ -2697,6 +2697,13 @@ void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
 
 #elif defined(HB_FS_FILE_IO) && !defined(HB_OS_OS2) && !defined(HB_OS_UNIX)
 
+   /* This hack is very dangerous. POSIX standard define that if _ANY_
+      file handle is closed all locks set by the process on the file
+      pointed by this descriptor are removed. It doesn't matter they
+      were done using different descriptor. It means that we now clean
+      all locks on hFileHandle with the code below if the OS is POSIX
+      compilant. I vote to disable it.
+    */
    {
       int dup_handle;
 
@@ -3334,7 +3341,7 @@ USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulL
 }
 
 #ifdef X__WIN32__
-HANDLE DostoWinHandle( FHANDLE fHandle)
+HANDLE DostoWinHandle( FHANDLE fHandle )
 {
    HANDLE hHandle = LongToHandle( fHandle );
 
