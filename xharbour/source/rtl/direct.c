@@ -261,54 +261,48 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
    }
 }
 
-static char *hb_stripfilepath ( char *name )
-{
-   char *path_end;
-
-   path_end = strrchr( name, '\\' );
-
-   if ( path_end == NULL )
-   {
-      path_end = strrchr( name, '/' );
-   }
-
-   if ( path_end != NULL )
-   {
-      memmove( name, path_end + 1, strlen( path_end ) );
-   }
-
-   return( name );
-}
-
 static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName, char* szAttributes, BOOL bMatchCase )
 {
    ULONG ui, uiLen = pRecurse->item.asArray.value->ulLen;
+   // Arbitary value which should be enough
+   char sRegEx[ _POSIX_PATH_MAX + _POSIX_PATH_MAX ];
+
+   Wild2RegEx( szFName, sRegEx, bMatchCase );
 
    for ( ui = 0; ui < uiLen; ui ++ )
    {
       PHB_ITEM pEntry = hb_arrayGetItemPtr( pRecurse, ui + 1 );
       char *szEntry = hb_arrayGetC( pEntry, 1 );
-      // Arbitary value which should be enough
-      char sRegEx[ _POSIX_PATH_MAX + _POSIX_PATH_MAX ];
 
-
-      Wild2RegEx( szFName, sRegEx, bMatchCase );
       if ( szEntry[ strlen( szEntry ) - 1 ] != '.' )
       {
          if ( hb_fsIsDirectory( ( BYTE * ) szEntry ) )
          {
-            char *szSubdir = hb_xstrcpy(NULL,szEntry,"\\",HB_DIR_ALL_FILES_MASK,NULL);
+            char *szSubdir = hb_xstrcpy( NULL, szEntry, "\\", HB_DIR_ALL_FILES_MASK, NULL );
             HB_ITEM SubDir;
+
             SubDir.type = HB_IT_NIL;
             hb_fsDirectory( &SubDir, szSubdir, szAttributes, FALSE, TRUE );
+
             hb_fsDirectoryCrawler( &SubDir, pResult, szFName, szAttributes, bMatchCase );
+
             hb_xfree( szSubdir );
             hb_itemClear( &SubDir );
          }
          else
          {
-            hb_stripfilepath( szEntry );
-            if( hb_strMatchRegExp( (const char *) szEntry, (const char *) sRegEx ) )
+            char *sFileName = strrchr( szEntry, OS_PATH_DELIMITER );
+
+            if( sFileName == NULL )
+            {
+               sFileName = szEntry;
+            }
+            else
+            {
+               sFileName++;
+            }
+
+            if( hb_strMatchRegExp( (const char *) sFileName, (const char *) sRegEx ) )
             {
                hb_arrayAddForward( pResult, pEntry );
             }
@@ -404,7 +398,7 @@ HB_FUNC( DIRECTORYRECURSE )
          }
       }
 
-      if ( (fDirSpec = hb_fsFNameSplit( pDirSpec->item.asString.value)) !=NULL )
+      if( ( fDirSpec = hb_fsFNameSplit( pDirSpec->item.asString.value ) ) != NULL )
       {
          if( fDirSpec->szDrive == NULL )
          {
@@ -421,13 +415,19 @@ HB_FUNC( DIRECTORYRECURSE )
             fDirSpec->szPath = (char*) hb_fsCurDir( hb_fsCurDrv() );
          }
 
-         szRecurse = bAddDrive ? hb_xstrcpy( NULL,fDirSpec->szDrive,":\\",fDirSpec->szPath,"\\",HB_DIR_ALL_FILES_MASK,NULL):
-                     hb_xstrcpy( NULL,fDirSpec->szPath,HB_DIR_ALL_FILES_MASK,NULL);
+         if( bAddDrive )
+         {
+            szRecurse =  hb_xstrcpy( NULL, fDirSpec->szDrive, ":\\", fDirSpec->szPath, "\\", HB_DIR_ALL_FILES_MASK, NULL );
+         }
+         else
+         {
+            szRecurse = hb_xstrcpy( NULL, fDirSpec->szPath, HB_DIR_ALL_FILES_MASK, NULL );
+         }
 
-         szFName = hb_xstrcpy( NULL,fDirSpec->szName,fDirSpec->szExtension,NULL);
+         szFName = hb_xstrcpy( NULL, fDirSpec->szName, fDirSpec->szExtension, NULL );
       }
 
-      hb_fsDirectoryRecursive( &Dir, szRecurse, szFName, szAttributes, bMatchCase );
+      hb_fsDirectoryRecursive( &Dir, szRecurse, szFName, hb_parc(2), bMatchCase );
 
       hb_itemForwardValue( &(HB_VM_STACK).Return, &Dir );
 
@@ -460,6 +460,7 @@ HB_FUNC( DIRECTORYRECURSE )
 HB_FUNC( DIRECTORY )
 {
    HB_ITEM Dir;
+
    Dir.type = HB_IT_NIL;
    hb_fsDirectory( &Dir, hb_parc(1), hb_parc(2), hb_parl(3), hb_parl(4) );
    hb_itemForwardValue( &(HB_VM_STACK).Return, &Dir );
