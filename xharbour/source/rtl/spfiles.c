@@ -1,5 +1,5 @@
 /*
- * $Id: spfiles.c,v 1.4 2002/03/16 03:14:22 ronpinkas Exp $
+ * $Id: spfiles.c,v 1.5 2002/03/26 05:06:58 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ BOOL hb_spFile( BYTE * pFilename, BYTE RetPath[ _POSIX_PATH_MAX + 3 + 10 ] )
    }
    else
    {
-      Path = hb_xgrab( _POSIX_PATH_MAX + 3 + 10 );
+      Path = (BYTE *) hb_xgrab( _POSIX_PATH_MAX + 3 + 10 );
    }
 
    pFilepath = hb_fsFNameSplit( (char*) pFilename );
