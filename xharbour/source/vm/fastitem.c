@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.5 2002/01/04 02:12:03 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.6 2002/01/04 07:15:23 ronpinkas Exp $
  */
 
 /*
@@ -137,15 +137,32 @@ void hb_itemVarAssign( PHB_ITEM pVar )
 
    HB_TRACE( HB_TR_DEBUG, ("hb_itemAssign(%p, %p)", pVar ) );
 
-   if( pVar->type == pValue->type && pVar->type == HB_IT_STRING && pVar->item.asString.value == pValue->item.asString.value )
+   if( pVar->type == HB_IT_STRING )
    {
-      pValue->type = HB_IT_NIL;
+      if( pValue->type == HB_IT_STRING && pVar->item.asString.value == pValue->item.asString.value )
+      {
+         pValue->type = HB_IT_NIL;
+         return;
+      }
+      else
+      {
+         long i;
+
+         for( i = 2; i < hb_stack.wItems; ++i )
+         {
+            if( hb_stack.pItems[ i ]->bShadow && hb_stack.pItems[ i ]->type == HB_IT_STRING &&
+                hb_stack.pItems[ i ]->item.asString.value == pVar->item.asString.value )
+            {
+               /* Shadow caster about to change, must get a true copy before value is lost. */
+               hb_stack.pItems[ i ]->item.asString.value = hb_itemGetC( pVar );
+               hb_stack.pItems[ i ]->bShadow = FALSE;
+            }
+         }
+      }
    }
-   else
-   {
-      hb_itemCopy( pVar, pValue );
-      hb_itemClear( pValue );
-   }
+
+   hb_itemCopy( pVar, pValue );
+   hb_itemClear( pValue );
 }
 
 void hb_itemPushEnvelopeString( char * szText, ULONG length )

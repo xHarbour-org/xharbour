@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.15 2002/01/04 02:12:02 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.16 2002/01/04 07:15:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-04 09:49 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/fastitem.c
+    + Added more security logic to hb_itemVarAssign()
 
 2002-01-03 23:09 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
   * include/hbfast.h
