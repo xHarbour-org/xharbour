@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.60 2004/01/27 09:56:08 likewolf Exp $
+ * $Id: harbour.c,v 1.61 2004/01/27 11:45:13 likewolf Exp $
  */
 
 /*
@@ -4368,8 +4368,6 @@ void hb_compCodeBlockEnd( void )
       iLocalPos = -1;
       while( wLocalsCnt-- )
       {
-         pBuffer = ( BYTE * ) hb_xgrab( strlen( pVar->szName ) + 4 );
-         
          pBuffer = ( BYTE * ) hb_xgrab( strlen( pVar->szName ) + 4 );
          
          pBuffer[0] = HB_P_LOCALNAME;

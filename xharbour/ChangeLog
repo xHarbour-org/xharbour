@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-27 18:15 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/compiler/harbour.c
+    * Fixed a memory leak introduced by recent changes. Thanks to Andi Jahja.
+
 2004-01-27 14:50 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/compiler/harbour.c
   * source/compiler/harbour.sly
@@ -15,7 +19,7 @@
       (merged in from Harbour, by Ryszard Glab)
   * source/debug/dbgmenu.prg
   * source/debug/debugger.prg
-    * added support for 'Run to cursor" command; minor fixes in
+    * added support for "Run to cursor" command; minor fixes in
       breakpoints handling (some code lines are not allowed to set a
       breakpoint and run to cursor)
       (merged in from Harbour, by Ryszard Glab)
