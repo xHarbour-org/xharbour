@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.8 2003/11/04 00:25:33 lculik Exp $
+# $Id: makefile.bc,v 1.9 2003/11/05 00:09:42 lculik Exp $
 #
 
 #
@@ -158,7 +158,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\screen2.obj \
    $(OBJ_DIR)\time.obj \
-   $(OBJ_DIR)\strcopy.obj \
+   $(OBJ_DIR)\strfile.obj \
    $(OBJ_DIR)\fcopy.obj
 
 
