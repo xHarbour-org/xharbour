@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.358 2004/03/12 12:37:25 likewolf Exp $
+ * $Id: hvm.c,v 1.359 2004/03/17 02:29:01 druzus Exp $
  */
 
 /*
@@ -6580,7 +6580,8 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
    ( * HB_VM_STACK.pPos )->item.asSymbol.stackbase = hb_stackTopOffset();
    ( * HB_VM_STACK.pPos )->item.asSymbol.uiSuperClass = 0;
 
-   if( pSym == &( hb_symEval ) && HB_VM_STACK.pBase && (* HB_VM_STACK.pBase)->type == HB_IT_SYMBOL && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym )
+   if( pSym == &( hb_symEval ) && HB_VM_STACK.pBase && (* HB_VM_STACK.pBase)->type == HB_IT_SYMBOL &&
+	   (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
    {
       pSym->pDynSym->pModuleSymbols = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols;
    }

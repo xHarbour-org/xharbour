@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.20 2004/02/14 00:22:08 ronpinkas Exp $
+ * $Id: proc.c,v 1.21 2004/02/24 03:10:26 ronpinkas Exp $
  */
 
 /*
@@ -277,8 +277,9 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
          }
          else
          {
-            if( pBase &&
+            if( pBase && ( *pBase )->type == HB_IT_SYMBOL &&
                 ( *pBase )->item.asSymbol.value->pDynSym &&
+                ( *pBase )->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 &&
                 ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols &&
                 ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName )
             {

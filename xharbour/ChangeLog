@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2588 2004/03/17 01:36:33 lculik Exp $
+ * $Id: ChangeLog,v 1.2589 2004/03/17 02:28:59 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-17 00:37 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.sly
+  * source/compiler/harbour.c
+    ! Fixed generation of symbols of STATIC Functions to NOT include HB_FS_PUBLIC unless indeed true.
+
+  * source/vm/errorapi.c
+  * source/vm/hvm.c
+  * source/vm/proc.c
+    ! Fixed GPF trap related to item.asSymbol.value->pDynSym possibly being (PHB_DYNS) 1.
 
 2004-03-17 03:40 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
@@ -29,7 +39,7 @@
   * xharbour/source/vm/maindllp.c
     * some long to LONG conversion. I intentionally change it in
       some comments too to make it more clear for programmers which
-      maybe confused on 64bit machines. Andy and others many thanks 
+      maybe confused on 64bit machines. Andy and others many thanks
       for already done conversion. It looks much more clear.
 
   I would like to ask you about all places you know where memory pointer

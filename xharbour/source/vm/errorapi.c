@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.37 2004/02/23 10:01:43 andijahja Exp $
+ * $Id: errorapi.c,v 1.38 2004/03/03 21:45:23 likewolf Exp $
  */
 
 /*
@@ -230,7 +230,9 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errNew()"));
 
-   if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
+   if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && 
+	   (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 &&
+	   (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
    {
       szModuleName = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName;
    }

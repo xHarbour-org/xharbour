@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.73 2004/03/16 02:40:26 andijahja Exp $
+ * $Id: harbour.c,v 1.74 2004/03/17 00:17:57 ronpinkas Exp $
  */
 
 /*
@@ -769,6 +769,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                }
 
                pSym = hb_compSymbolFind( szVarName, &wPos ); /* check if symbol exists already */
+
                if( ! pSym )
                {
                   pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos );
@@ -815,6 +816,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
          case VS_PRIVATE:
             {
                pSym = hb_compSymbolFind( szVarName, &wPos ); /* check if symbol exists already */
+
                if( ! pSym )
                {
                   pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos );
@@ -859,6 +861,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
          case VS_PUBLIC:
             {
                pSym = hb_compSymbolFind( szVarName, &wPos ); /* check if symbol exists already */
+
                if( ! pSym )
                {
                   pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos );
@@ -1848,15 +1851,20 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    pSym = hb_compSymbolFind( szFunName, NULL );
 
-   if( ! pSym )
+   if( pSym )
    {
-      /* there is not a symbol on the symbol table for this function name */
-      pSym = hb_compSymbolAdd( szFunName, NULL );
+      pSym->cScope |= cScope;
    }
-
-   if( pSym && cScope != HB_FS_PUBLIC )
+   else
    {
-      pSym->cScope |= cScope; /* we may have a non public function and a object message */
+      // There is not a symbol on the symbol table for this function name yet.
+      pSym = hb_compSymbolAdd( szFunName, NULL );
+
+      if( pSym )
+      {
+         // Intentionally '=' instead of '|=' - Don't assume PUBLIC.
+         pSym->cScope = cScope;
+      }
    }
 
    pFunc = hb_compFunctionNew( szFunName, cScope );
@@ -1912,6 +1920,7 @@ PINLINE hb_compInlineAdd( char * szFunName )
    if( szFunName )
    {
       pSym = hb_compSymbolFind( szFunName, NULL );
+
       if( ! pSym )
       {
          pSym = hb_compSymbolAdd( szFunName, NULL );
@@ -2092,20 +2101,25 @@ void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */
    PEXTERN pDelete;
 
    if( hb_comp_bDebugInfo )
+   {
       hb_compExternAdd( hb_strdup( "__DBGENTRY" ) );
+   }
 
    while( hb_comp_pExterns )
    {
       if( hb_compSymbolFind( hb_comp_pExterns->szName, NULL ) )
       {
-            if( ! hb_compFunCallFind( hb_comp_pExterns->szName ) )
+         if( ! hb_compFunCallFind( hb_comp_pExterns->szName ) )
+         {
             hb_compFunCallAdd( hb_comp_pExterns->szName );
+         }
       }
       else
       {
-             hb_compSymbolAdd( hb_comp_pExterns->szName, NULL );
-             hb_compFunCallAdd( hb_comp_pExterns->szName );
+         hb_compSymbolAdd( hb_comp_pExterns->szName, NULL );
+         hb_compFunCallAdd( hb_comp_pExterns->szName );
       }
+
       pDelete  = hb_comp_pExterns;
       hb_comp_pExterns = hb_comp_pExterns->pNext;
       hb_xfree( ( void * ) pDelete );
@@ -3042,18 +3056,26 @@ static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
    /* Check if this variable name is placed into the symbol table
     */
    pSym = hb_compSymbolFind( szVarName, &wVar );
+
    if( ! pSym )
    {
       pSym = hb_compSymbolAdd( szVarName, &wVar );
    }
+
    pSym->cScope |= VS_MEMVAR;
 
    if( bPCode == HB_P_PUSHALIASEDFIELD && wVar <= 255 )
+   {
       hb_compGenPCode2( HB_P_PUSHALIASEDFIELDNEAR, ( BYTE ) wVar, ( BOOL ) 1 );
+   }
    else if( bPCode == HB_P_POPALIASEDFIELD && wVar <= 255 )
+   {
       hb_compGenPCode2( HB_P_POPALIASEDFIELDNEAR, ( BYTE ) wVar, ( BOOL ) 1 );
+   }
    else
+   {
       hb_compGenPCode3( bPCode, HB_LOBYTE( wVar ), HB_HIBYTE( wVar ), ( BOOL ) 1 );
+   }
 }
 
 void hb_compGenMessage( char * szMsgName )       /* sends a message to an object */
@@ -3061,11 +3083,13 @@ void hb_compGenMessage( char * szMsgName )       /* sends a message to an object
    USHORT wSym;
    PCOMSYMBOL pSym = hb_compSymbolFind( szMsgName, &wSym );
 
-   if( ! pSym )  /* the symbol was not found on the symbol table */
+   if( ! pSym )
    {
       pSym = hb_compSymbolAdd( szMsgName, &wSym );
    }
+
    pSym->cScope |= HB_FS_MESSAGE;
+
    hb_compGenPCode3( HB_P_MESSAGE, HB_LOBYTE( wSym ), HB_HIBYTE( wSym ), ( BOOL ) 1 );
 }
 
@@ -3711,10 +3735,12 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias )
    }
    else
    {
-      hb_compSymbolAdd( szSymbolName, &wSym );
+      pSym = hb_compSymbolAdd( szSymbolName, &wSym );
 
       if( bFunction )
       {
+         // Don't make any assumption about the Scope of the Function.
+         pSym->cScope = 0;
          hb_compFunCallAdd( szSymbolName );
       }
    }
@@ -4232,12 +4258,12 @@ void hb_compStaticDefStart( void )
       hb_compGenPCodeN( pBuffer, 5, 0 );
 
       hb_compGenPCode3( HB_P_SFRAME, 0, 0, ( BOOL ) 0 );     /* frame for statics variables */
-      
+
       if( hb_comp_bDebugInfo )
       {
          BYTE * pBuffer;
          int iFileLen = strlen( hb_comp_files.pLast->szFileName );
-         
+
          pBuffer = ( BYTE * ) hb_xgrab( 2 + iFileLen );
          pBuffer[0] = HB_P_MODULENAME;
          memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) hb_comp_files.pLast->szFileName, iFileLen+1 );
@@ -4368,7 +4394,7 @@ void hb_compCodeBlockEnd( void )
    {
       /* NOTE: 5 = BYTE( size ) + USHORT( wParams ) + USHORT( wLocals ) */
       wSize += 5 + wLocals * 2;
-      
+
       hb_compGenPCode3( HB_P_PUSHBLOCK, HB_LOBYTE( wSize ), HB_HIBYTE( wSize ), ( BOOL ) 0 );
       hb_compGenPCode2( HB_LOBYTE( pCodeblock->wParamCount ), HB_HIBYTE( pCodeblock->wParamCount ), ( BOOL ) 0 );
       hb_compGenPCode2( HB_LOBYTE( wLocals ), HB_HIBYTE( wLocals ), ( BOOL ) 0 );
@@ -4389,7 +4415,7 @@ void hb_compCodeBlockEnd( void )
       BYTE * pBuffer;
       int iFileLen = strlen( hb_comp_files.pLast->szFileName );
       int iFuncLen = strlen( pFunc->szName );
-      
+
       pBuffer = ( BYTE * ) hb_xgrab( 3 + iFileLen + iFuncLen );
       pBuffer[0] = HB_P_MODULENAME;
       memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) hb_comp_files.pLast->szFileName, iFileLen );
@@ -4404,27 +4430,27 @@ void hb_compCodeBlockEnd( void )
       while( wLocalsCnt-- )
       {
          int iVarLen = strlen( pVar->szName );
-         
+
          pBuffer = ( BYTE * ) hb_xgrab( iVarLen + 4 );
-         
+
          pBuffer[0] = HB_P_LOCALNAME;
          pBuffer[1] = HB_LOBYTE( iLocalPos );
          pBuffer[2] = HB_HIBYTE( iLocalPos );
          iLocalPos--;
-         
+
          memcpy( ( BYTE * ) ( & ( pBuffer[3] ) ), pVar->szName, iVarLen + 1 );
-         
+
          hb_compGenPCodeN( pBuffer, iVarLen + 4 , 0 );
-         
+
          hb_xfree( pBuffer );
-         
+
          pFree = pVar;
-         
+
          pVar = pVar->pNext;
          hb_xfree( ( void * ) pFree );
       }
    }
-   
+
    hb_compGenPCodeN( pCodeblock->pCode, pCodeblock->lPCodePos, ( BOOL ) 0 );
    hb_compGenPCode1( HB_P_ENDBLOCK ); /* finish the codeblock */
 
