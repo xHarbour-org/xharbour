@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.116 2004/05/23 09:10:02 lf_sfnet Exp $
+ * $Id: dbcmd.c,v 1.117 2004/05/23 22:10:41 lf_sfnet Exp $
  */
 
 /*
@@ -5433,10 +5433,10 @@ static void hb_destroyFBuffer( PHB_FILEBUF pFileBuf )
 
 static PHB_FILEBUF hb_createFBuffer( FHANDLE hFile, ULONG ulSize )
 {
-   PHB_FILEBUF pFileBuf = hb_xgrab( sizeof( HB_FILEBUF ) );
+   PHB_FILEBUF pFileBuf = ( PHB_FILEBUF )hb_xgrab( sizeof( HB_FILEBUF ) );
 
    pFileBuf->hFile = hFile;
-   pFileBuf->pBuf = hb_xgrab( ulSize );
+   pFileBuf->pBuf = ( BYTE * )hb_xgrab( ulSize );
    pFileBuf->ulSize = ulSize;
    pFileBuf->ulPos = 0;
    return pFileBuf;
@@ -5537,7 +5537,7 @@ static BOOL hb_ExportBufSqlVar( PHB_FILEBUF pFileBuf, PHB_ITEM pValue, char *cDe
 
 // Export DBF content to a SQL script file
 static LONG hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
-                        char *cDelim, char *cSep, BYTE *cEsc, int nCount, char *cTable, FHANDLE handle,
+                        char *cDelim, char *cSep, char *cEsc, int nCount, char *cTable, FHANDLE handle,
                         BOOL bAppend, BOOL bInsert, BOOL bRecno )
 {
    HB_THREAD_STUB
