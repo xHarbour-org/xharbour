@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldtest.bat
 rem *
-rem * $Id: bldtest.bat,v 1.4 2004/01/08 23:47:31 ronpinkas Exp $
+rem * $Id: bldtest.bat,v 1.5 2004/01/08 23:49:35 ronpinkas Exp $
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *
@@ -42,13 +42,13 @@ echo.BldTest.bat - /? or /h to display options
 echo.
 
 :ARGUMENTS
-rem Check MT build request
+rem Check parameters
 IF %1.==/MT. GOTO SETMT
 IF %1.==/mt. GOTO SETMT
 IF %1.==/WVT. GOTO SETWVT
 IF %1.==/wvt. GOTO SETWVT
 
-IF %BLDDEFAULT%==N GOTO CALLBLD
+IF %BLDDEFAULT%.==N. GOTO CALLBLD
 GOTO SETDEFAULT
 
 :SETMT
@@ -127,9 +127,11 @@ echo. prgname   = Name of prg file to compile without extension [.prg]
 echo.
 
 :ENDSET
-rem Restore Old MT Setting
+rem Restore Old Settings
 set HB_MT=%OLDENVMT%
 set HB_GT_LIB=%OLDENVGT%
 set CFLAGS=%OLDENVC%
+set OLDENVGT=
+set OLDENVC=
 set OLDENVMT=
 set BLDDEFAULT=
