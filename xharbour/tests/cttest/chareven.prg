@@ -1,5 +1,5 @@
 /*
- * $Id: chareven.prg,v 1.1 2003/03/04 21:05:45 lculik Exp $
+ * $Id: chareven.prg,v 1.1 2004/08/25 17:03:02 lf_sfnet Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
  */
 
 
-#include "../ct.ch"
+#include "ct.ch"
 
 
 procedure main

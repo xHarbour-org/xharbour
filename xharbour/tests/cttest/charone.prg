@@ -1,5 +1,5 @@
 /*
- * $Id: charone.prg,v 1.2 2004/07/23 08:53:07 likewolf Exp $
+ * $Id: charone.prg,v 1.1 2004/08/25 17:03:02 lf_sfnet Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
  */
 
 
-//#include "../ct.ch"
+//#include "ct.ch"
 
 
 procedure main
