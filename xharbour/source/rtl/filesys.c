@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.20 2002/12/15 23:06:02 ronpinkas Exp $
+ * $Id: filesys.c,v 1.21 2003/01/06 14:11:47 lculik Exp $
  */
 
 /*
@@ -280,8 +280,9 @@ static USHORT s_uiErrorLast = 0;
       extern int __NTerror     (void);
    #endif
 
-   HANDLE DostoWinHandle( FHANDLE fHandle);
-
+   #if defined(X__WIN32__)
+       HANDLE DostoWinHandle( FHANDLE fHandle);
+   #endif
 #endif
 /* Convert HARBOUR flags to IO subsystem flags */
 
@@ -524,7 +525,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
          dwFlags |= GENERIC_READ;
          break;
       }
-      
+
 /*      if( uiFlags & FO_READWRITE )
          dwFlags |= GENERIC_READ | GENERIC_WRITE;
 
@@ -547,7 +548,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
          case FO_EXCLUSIVE:
             dwShare = 0;
             break;
-      }       
+      }
       errno = 0;
 
       hFile = ( HANDLE ) CreateFile( ( char * ) pFilename, dwFlags,
@@ -737,7 +738,7 @@ void    HB_EXPORT hb_fsClose( FHANDLE hFileHandle )
             errno=WintoDosError(GetLastError());
          #else
             __NTerror();
-         #endif        
+         #endif
 
    #else
    if ( hFileHandle > -1 )
@@ -812,7 +813,7 @@ USHORT  HB_EXPORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
    #if defined(X__WIN32__)
       {
          DWORD dwRead ;
-         BOOL bError;     
+         BOOL bError;
          bError=ReadFile( DostoWinHandle(hFileHandle), pBuff, (DWORD)uiCount, &dwRead, NULL );
          if (!bError)
             errno = GetLastError();
@@ -1444,7 +1445,12 @@ void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
 
 #if defined(HB_OS_WIN_32)
 
-   FlushFileBuffers( ( HANDLE ) DostoWinHandle(hFileHandle) );
+   #if defined(X__WIN32__)
+      FlushFileBuffers( ( HANDLE ) DostoWinHandle(hFileHandle) );
+   #else
+      FlushFileBuffers( ( HANDLE ) hFileHandle );
+   #endif
+
    s_uiErrorLast = ( USHORT ) GetLastError();
 
 #elif defined(HB_OS_OS2)
