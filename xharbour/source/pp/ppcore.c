@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.130 2004/02/29 07:28:25 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.131 2004/02/29 23:10:42 ronpinkas Exp $
  */
 
 /*
@@ -928,7 +928,7 @@ int hb_pp_ParseDefine( char * sLine )
 
      if( *sLine == '(' ) /* If pseudofunction was found */
      {
-        int iParamLen, iParamsLen = 0, iLen = strlen( sLine ) ;
+        int iParamLen, iParamsLen = 0;
 
         sLine++;
         iParams = 0;
@@ -940,7 +940,7 @@ int hb_pp_ParseDefine( char * sLine )
            if( ISID( *sLine ) && ( iParamLen = NextName( &sLine, (char *) sParam ) ) > 0 )
            {
               char *pTmp;
-              int iPos;
+              int iPos, iLen = strlen( sLine );
 
               iParams++;
 
@@ -952,10 +952,9 @@ int hb_pp_ParseDefine( char * sLine )
 
               while( ( iPos = md_strAt( (char *) sParam, iParamLen, pTmp, TRUE, FALSE, FALSE, FALSE )) > 0 )
               {
-                 hb_pp_Stuff( sMarker, pTmp + iPos - 1, 2, iParamLen, iLen );
-
-                 iLen = iLen + 2 - iParamLen;
-                 pTmp = pTmp + ( ( iParamLen > 2 ) ? iParamLen - 2 : 2 );
+                 hb_pp_Stuff( sMarker, pTmp + iPos - 1, 2, iParamLen, iLen - iPos + 1 );
+                 pTmp += ( iPos + 1 );
+                 iLen -= ( iPos + 1 + ( iParamLen - 2 ) );
               }
 
               sParams[iParamsLen++] = '\1';
