@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2655 2004/03/25 19:18:23 druzus Exp $
+ * $Id: ChangeLog,v 1.2656 2004/03/25 21:23:38 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-25 14:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    + Added missing extern declarations of Win32_OleInitialize() and Win32_OleUnInitialize()
+
 2004-03-26 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * contrib/winprn/tprint.prg
     - Swapped dwUnderLine & dwItalic in call to CreateFont() in HB_FUNC( CREATEFONT )

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.363 2004/03/22 17:44:28 mauriliolongo Exp $
+ * $Id: hvm.c,v 1.364 2004/03/25 18:54:15 ronpinkas Exp $
  */
 
 /*
@@ -120,9 +120,12 @@
    HB_EXTERN_END
 #endif
 
-/* Mouse Disabling */
-#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
-extern BOOL b_MouseEnable;
+#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+   /* Mouse Disabling */
+   extern BOOL b_MouseEnable;
+
+   extern void Win32_OleInitialize( void );
+   extern void Win32_OleUnInitialize( void );
 #endif
 
 /* DEBUG only*/
