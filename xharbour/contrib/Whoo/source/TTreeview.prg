@@ -1,5 +1,5 @@
 /*
- * $Id: TTreeview.prg,v 1.8 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TTreeview.prg,v 1.9 2002/10/14 01:36:55 fsgiudice Exp $
  */
 
 /*
@@ -38,7 +38,8 @@
 
 //----------------------------------------------------------------------------//
 
-CLASS TTreeView FROM TWinControl
+//CLASS TTreeView FROM TWinControl
+CLASS TTreeView FROM TCustomControl
 
    DATA Items     PROTECTED INIT {}
    DATA ImageList PROTECTED

@@ -1,62 +1,55 @@
-#BCC
-VERSION=BCB.01
-!ifndef BCB
-BCB = $(MAKEDIR)
-!endif
-
-!ifndef BHC
-BHC = $(HMAKEDIR)
-!endif
- 
-RECURSE= YES 
- 
-OBJ = ..\..\obj\b32
-SRC06 = Source 
-PROJECT = $(BHC)\lib\what32.lib 
-OBJFILES = $(OBJ)\Debug.obj $(OBJ)\Errorsys.obj $(OBJ)\WhatUtil.obj $(OBJ)\WinCDlg.obj $(OBJ)\WinComm.obj $(OBJ)\WinCore.obj $(OBJ)\WinIni.obj $(OB) 
-PRGFILES = $(SRC06)\Debug.prg $(SRC06)\Errorsys.prg $(SRC06)\WhatUtil.Prg $(SRC06)\WinCDlg.PRG $(SRC06)\WinComm.Prg $(SRC06)\WinCore.Prg $(SRC06)\WinIni.Prg $(PS) 
-OBJCFILES = $(OBJ)\_WinBmp.obj $(OBJ)\_WinWnd.obj $(OBJ)\_WinView.obj $(OBJ)\_WinText.obj $(OBJ)\_WinTab.obj $(OBJ)\_WinSys.obj $(OBJ)\_WinShell.obj $(OBJ)\_WinScrlB.obj $(OBJ)\_WinRgn.obj $(OBJ)\_WinReg.obj //
- $(OBJ)\_WinRect.obj $(OBJ)\_WinPrn.obj $(OBJ)\_WinPen.obj $(OBJ)\_WinMsg.obj $(OBJ)\_WinMous.obj $(OBJ)\_WinMisc.obj $(OBJ)\_WinMeta.obj $(OBJ)\_WinMenu.obj $(OBJ)\_WinMem.obj $(OBJ)\_WinMAPI.obj //
- $(OBJ)\_WinMain.obj $(OBJ)\_WinLV.obj $(OBJ)\_WinKbrd.obj $(OBJ)\_WinIni.obj $(OBJ)\_WinILst.obj $(OBJ)\_WinIcon.obj $(OBJ)\_WinHead.obj $(OBJ)\_WinGDI.obj $(OBJ)\_WinFont.obj $(OBJ)\_WinDraw.obj //
- $(OBJ)\_WinDLL.obj $(OBJ)\_WinDlg.obj $(OBJ)\_WinDir.obj $(OBJ)\_WinDC.obj $(OBJ)\_WinDate.obj $(OBJ)\_WinCret.obj $(OBJ)\_WinComm.obj $(OBJ)\_WinClpb.obj $(OBJ)\_WinCDlg.obj $(OBJ)\_WinCall.obj //
- $(OBJ)\_WinBrsh.obj $(OBC) 
-CFILES = $(SRC06)\_WinBmp.c $(SRC06)\_WinWnd.c $(SRC06)\_WinView.c $(SRC06)\_WinText.c $(SRC06)\_WinTab.c $(SRC06)\_WinSys.c $(SRC06)\_WinShell.c $(SRC06)\_WinScrlB.c $(SRC06)\_WinRgn.c $(SRC06)\_WinReg.c //
- $(SRC06)\_WinRect.c $(SRC06)\_WinPrn.c $(SRC06)\_WinPen.c $(SRC06)\_WinMsg.c $(SRC06)\_WinMous.c $(SRC06)\_WinMisc.c $(SRC06)\_WinMeta.c $(SRC06)\_WinMenu.c $(SRC06)\_WinMem.c $(SRC06)\_WinMAPI.c //
- $(SRC06)\_WinMain.c $(SRC06)\_WinLV.c $(SRC06)\_WinKbrd.c $(SRC06)\_WinIni.c $(SRC06)\_WinILst.c $(SRC06)\_WinIcon.c $(SRC06)\_WinHead.c $(SRC06)\_WinGDI.c $(SRC06)\_WinFont.c $(SRC06)\_WinDraw.c //
- $(SRC06)\_WinDLL.c $(SRC06)\_WinDlg.c $(SRC06)\_WinDir.c $(SRC06)\_WinDC.c $(SRC06)\_WinDate.c $(SRC06)\_WinCret.c $(SRC06)\_WinComm.c $(SRC06)\_WinClpb.c $(SRC06)\_WinCDlg.c $(SRC06)\_WinCall.c //
- $(SRC06)\_WinBrsh.c $(CF) 
-RESFILES =
-RESDEPEN = $(RESFILES)
-DEFFILE = 
-HARBOURFLAGS =  -Iinclude  -l  -m 
-CFLAG1 =  -OS $(CFLAGS) -d -L$(BHC)\lib;$(FWH)\lib -c
-CFLAG2 =  -I$(BHC)\include;$(BCB)\include;include
-RFLAGS = 
-LFLAGS = /P32 /0
-IFLAGS = 
-LINKER = tlib $(LFLAGS) $(PROJECT)
- 
-ALLOBJ =  $(OBJFILES) $(OBJCFILES)
-ALLRES = $(RESDEPEN)
-ALLLIB = 
-.autodepend
- 
-#COMMANDS
-.cpp.obj:
-$(BCB)\BIN\bcc32 $(CFLAG1) $(CFLAG2) -o$* $**
- 
-.c.obj:
-$(BCB)\BIN\bcc32 -I$(BHC)\include $(CFLAG1) $(CFLAG2) -o$* $**
- 
-.prg.obj:
-$(BHC)\bin\harbour -n -go /p -I$(BHC)\include $(HARBOURFLAGS) -Iinclude -o$* $**
- 
-.rc.res:
-$(BCB)\BIN\brcc32 $(RFLAGS) $<
- 
-#BUILD
- 
-$(PROJECT): $(CFILES) $(OBJFILES)
-    $(BCB)\BIN\$(LINKER) @&&!
-    $(ALLOBJ)
-!
++C:\xharbour\contrib\what32\Obj\debug.Obj &
++C:\xharbour\contrib\what32\Obj\errorsys.Obj &
++C:\xharbour\contrib\what32\Obj\imports.Obj &
++C:\xharbour\contrib\what32\Obj\whatutil.Obj &
++C:\xharbour\contrib\what32\Obj\wincdlg.Obj &
++C:\xharbour\contrib\what32\Obj\wincomm.Obj &
++C:\xharbour\contrib\what32\Obj\wincore.Obj &
++C:\xharbour\contrib\what32\Obj\winini.Obj &
++C:\xharbour\contrib\what32\Obj\WinRBar.Obj &
++C:\xharbour\contrib\what32\Obj\WinTabs.Obj &
++C:\xharbour\contrib\what32\Obj\WinTBar.Obj &
++C:\xharbour\contrib\what32\Obj\_winbmp.Obj &
++C:\xharbour\contrib\what32\Obj\_winbrsh.Obj &
++C:\xharbour\contrib\what32\Obj\_wincall.Obj &
++C:\xharbour\contrib\what32\Obj\_wincdlg.Obj &
++C:\xharbour\contrib\what32\Obj\_winclpb.Obj &
++C:\xharbour\contrib\what32\Obj\_wincomm.Obj &
++C:\xharbour\contrib\what32\Obj\_wincret.Obj &
++C:\xharbour\contrib\what32\Obj\_windate.Obj &
++C:\xharbour\contrib\what32\Obj\_windc.Obj &
++C:\xharbour\contrib\what32\Obj\_windir.Obj &
++C:\xharbour\contrib\what32\Obj\_windlg.Obj &
++C:\xharbour\contrib\what32\Obj\_windll.Obj &
++C:\xharbour\contrib\what32\Obj\_windraw.Obj &
++C:\xharbour\contrib\what32\Obj\_winfont.Obj &
++C:\xharbour\contrib\what32\Obj\_wingdi.Obj &
++C:\xharbour\contrib\what32\Obj\_winhead.Obj &
++C:\xharbour\contrib\what32\Obj\_winicon.Obj &
++C:\xharbour\contrib\what32\Obj\_winilst.Obj &
++C:\xharbour\contrib\what32\Obj\_WININET.Obj &
++C:\xharbour\contrib\what32\Obj\_winini.Obj &
++C:\xharbour\contrib\what32\Obj\_winkbrd.Obj &
++C:\xharbour\contrib\what32\Obj\_winlv.Obj &
++C:\xharbour\contrib\what32\Obj\_winmain.Obj &
++C:\xharbour\contrib\what32\Obj\_winmapi.Obj &
++C:\xharbour\contrib\what32\Obj\_winmem.Obj &
++C:\xharbour\contrib\what32\Obj\_winmenu.Obj &
++C:\xharbour\contrib\what32\Obj\_winmeta.Obj &
++C:\xharbour\contrib\what32\Obj\_winmisc.Obj &
++C:\xharbour\contrib\what32\Obj\_winmous.Obj &
++C:\xharbour\contrib\what32\Obj\_winmsg.Obj &
++C:\xharbour\contrib\what32\Obj\_winpen.Obj &
++C:\xharbour\contrib\what32\Obj\_winprn.Obj &
++C:\xharbour\contrib\what32\Obj\_winrect.Obj &
++C:\xharbour\contrib\what32\Obj\_winreg.Obj &
++C:\xharbour\contrib\what32\Obj\_winrgn.Obj &
++C:\xharbour\contrib\what32\Obj\_winscrlb.Obj &
++C:\xharbour\contrib\what32\Obj\_winshell.Obj &
++C:\xharbour\contrib\what32\Obj\_winsys.Obj &
++C:\xharbour\contrib\what32\Obj\_wintab.Obj &
++C:\xharbour\contrib\what32\Obj\_WinTBar.Obj &
++C:\xharbour\contrib\what32\Obj\_wintext.Obj &
++C:\xharbour\contrib\what32\Obj\_WinTree.Obj &
++C:\xharbour\contrib\what32\Obj\_winview.Obj &
++C:\xharbour\contrib\what32\Obj\_winwnd.Obj

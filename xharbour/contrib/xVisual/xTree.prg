@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.3 2002/10/06 02:50:59 ronpinkas Exp $
+ * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
  */
 
 /*
@@ -41,6 +41,7 @@ CLASS ObjTree FROM TForm
                                 ::top     := 125,;
                                 ::width   := 200,;
                                 ::height  := 150,;
+                                ::ExStyle := WS_EX_TOOLWINDOW ,;
                                 super:new( oParent )
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
@@ -56,8 +57,10 @@ METHOD OnCreate() CLASS ObjTree
    DeleteObject(hBmp)
 
    ::Add('tree', TreeObj():New( self, 100,  0,  0, 100, 100) )
+   
    TVSetImageList(::Tree:handle, hImg, 0 )
 RETURN(nil)
+
 
 CLASS TreeObj FROM TTreeView
    METHOD Add()
@@ -70,3 +73,4 @@ METHOD Add( cText, nImg ) CLASS TreeObj
       ::Parent:TreeRoot:Add( cText, nImg )
    endif
 return(nil)
+

@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.83 2002/10/13 23:19:28 what32 Exp $
+ * $Id: xide.prg,v 1.84 2002/10/14 01:37:47 fsgiudice Exp $
  */
 
 /*
@@ -186,6 +186,7 @@ METHOD MainToolBar() CLASS MainFrame
             oApp:MainFrame:SetLink( 'StdBar', :GetObj("StdTools") )
          End
       End
+
 //----------------------------------------------------------------------------------------------
 
       With Object :Tabs:Win32

@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.16 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.17 2002/10/14 01:36:55 fsgiudice Exp $
  */
 /*
  * xHarbour Project source code:
@@ -75,7 +75,8 @@ typedef struct {;
     UINT      uflags;
 } TOOLTIPTEXT
 
-CLASS TToolBar FROM TWinControl
+//CLASS TToolBar FROM TWinControl
+CLASS TToolBar FROM TCustomControl
 
    DATA Caption PROTECTED INIT ""
    DATA Left    INIT    0

@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.17 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TabControl.Prg,v 1.18 2002/10/14 01:36:55 fsgiudice Exp $
  */
 /*
  * xHarbour Project source code:
@@ -42,7 +42,8 @@ IMPORT C STRUCTURE NMHDR
 
 *-----------------------------------------------------------------------------*
 
-CLASS TTabControl FROM TWinControl
+//CLASS TTabControl FROM TWinControl
+CLASS TTabControl FROM TCustomControl
 
    DATA Caption PROTECTED INIT ""
    DATA Left    INIT    0
