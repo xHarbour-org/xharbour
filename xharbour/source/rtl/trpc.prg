@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.17 2003/04/18 18:30:53 jonnymind Exp $
+ * $Id: trpc.prg,v 1.18 2003/04/18 18:41:26 jonnymind Exp $
  */
 
 /*
@@ -503,7 +503,7 @@ METHOD Run() CLASS tRPCServeCon
          /* Execute function */
          CASE cCode == "XHBR20"
             aData := ::RecvFunction( .F., .F. )
-            IF .not. Empty( aData )
+            IF aData != NIL
                lBreak := .not. ::FuncCall( aData[2] )
             ELSE
                lBreak := .T.
@@ -512,7 +512,7 @@ METHOD Run() CLASS tRPCServeCon
          /* Execute function */
          CASE cCode == "XHBR21"
             aData := ::RecvFunction( .T., .F. )
-            IF .not. Empty( aData )
+            IF aData != NIL
                lBreak := .not. ::FuncCall( aData[2] )
             ELSE
                lBreak := .T.
@@ -521,7 +521,7 @@ METHOD Run() CLASS tRPCServeCon
          /* Loop function */
          CASE cCode == "XHBR22"
             aData := ::RecvFunction( .F., .T. )
-            IF .not. Empty( aData )
+            IF aData != NIL
                lBreak := .not. ::FuncLoopCall( aData[1], aData[2] )
             ELSE
                lBreak := .T.
@@ -530,7 +530,7 @@ METHOD Run() CLASS tRPCServeCon
          /* Loop function - compressed */
          CASE cCode == "XHBR23"
             aData := ::RecvFunction( .T., .T. )
-            IF .not. Empty( aData )
+            IF aData != NIL
                lBreak := .not. ::FuncLoopCall( aData[1], aData[2] )
             ELSE
                lBreak := .T.
@@ -539,7 +539,7 @@ METHOD Run() CLASS tRPCServeCon
          /* Foreach function */
          CASE cCode == "XHBR24"
             aData := ::RecvFunction( .F., .T. )
-            IF .not. Empty( aData )
+            IF aData != NIL
                lBreak := .not. ::FuncForeachCall( aData[1], aData[2] )
             ELSE
                lBreak := .T.
@@ -548,7 +548,7 @@ METHOD Run() CLASS tRPCServeCon
          /* Foreach function - compressed*/
          CASE cCode == "XHBR25"
             aData := ::RecvFunction( .T., .T. )
-            IF .not. Empty( aData )
+            IF aData  != NIL
                lBreak := .not. ::FuncForeachCall( aData[1], aData[2] )
             ELSE
                lBreak := .T.
@@ -732,13 +732,13 @@ METHOD FuncCall( cData ) CLASS tRPCServeCon
 
    /* Deserialize all elements */
    cSer := HB_DeserialBegin( cData )
-   IF Empty( cSer )
+   IF cSer == NIL
       RETURN .F.
    ENDIF
    cFuncName := HB_DeserialNext( cSer )
    aParams := HB_DeserialNext( cSer )
 
-   IF Empty( aParams )
+   IF aParams == NIL
       RETURN .F.
    ENDIF
 
@@ -762,7 +762,7 @@ METHOD FuncLoopCall( cMode, cData ) CLASS tRPCServeCon
    cFuncName := HB_DeserialNext( cSer )
    aParams := HB_DeserialNext( cSer )
 
-   IF Empty( aParams )
+   IF aParams == NIL
       RETURN .F.
    ENDIF
 
@@ -785,7 +785,7 @@ METHOD FuncForeachCall( cMode, cData ) CLASS tRPCServeCon
    aParams := HB_DeserialNext( cSer )
    aItems := HB_DeserialNext( cSer )
 
-   IF Empty( aItems )
+   IF aItems  == NIL
       RETURN .F.
    ENDIF
 
@@ -819,7 +819,7 @@ METHOD LaunchFunction( cFuncName, aParams, nMode, aDesc ) CLASS tRPCServeCon
    ENDIF
 
    //check for parameters
-   IF Empty( aParams ) .or. .not. oFunc:CheckTypes( aParams )
+   IF aParams == NIL .or. .not. oFunc:CheckTypes( aParams )
       // signal error
       ::oServer:OnFunctionError( Self, cFuncName,02 )
       InetSendAll( ::skRemote, "XHBR4002" )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.966 2003/04/18 22:09:45 jonnymind Exp $
+ * $Id: ChangeLog,v 1.967 2003/04/18 23:34:15 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-19 06:52 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/trpc.prg
+    ! Now RPC functions without parameters are allowed, and the
+      server didn't know that :-)
+
+  * tests/rpcclient.prg
+    ! Minor formatting
 
 2003-04-18 20:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * makefile.bc
