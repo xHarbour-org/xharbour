@@ -1,5 +1,5 @@
 /*
- * $Id: sitesvr.prg,v 1.1 2003/01/10 22:17:58 jonnymind Exp $
+ * $Id: sitesvr.prg,v 1.2 2003/01/12 22:30:07 fsgiudice Exp $
  */
 
 ***********************************************************
@@ -29,7 +29,7 @@ PROCEDURE Main( cPort)
 
    BuildDBF()
 
-   IF cPort == NIL
+   IF Empty( cPort ) .OR. Val( cPort ) == 0
       cPort := "8085"
    ENDIF
 
@@ -142,8 +142,7 @@ PROCEDURE AcceptIncoming( Socket )
          g_nUserCount++
          g_nTotalCount++
 
-         *StartThread( @ServeClient(), com )
-         ServeClient( Com )
+         StartThread( @ServeClient(), com )
          HB_GcAll( .T. )
       ELSE
          InetDestroy( Com )
@@ -454,6 +453,7 @@ RETURN
 
 FUNCTION AdminEditPageMask( nID )
    LOCAL cReply, cName, cID, nParent
+   LOCAL bFound
 
    MutexLock( MutexDB )
    SET ORDER TO 1
@@ -465,13 +465,15 @@ FUNCTION AdminEditPageMask( nID )
       nID     := FIELD->ID + 1
       APPEND BLANK
       REPLACE ID WITH nID, PARENT WITH nParent
+      bFound := .T.
    ELSE
       SEEK nID
+      bFound := Found()
    ENDIF
 
    cReply := "<HTML><HEAD><TITLE>Modify record</TITLE></HEAD><BODY>"
 
-   IF .NOT. Found()
+   IF .NOT. bFound
       cReply += "<P>ERROR: record not found"
    ELSE
       cName  := AllTrim( FIELD->NAME )
