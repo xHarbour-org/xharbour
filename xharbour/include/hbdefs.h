@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.46 2004/05/12 14:11:21 lf_sfnet Exp $
+ * $Id: hbdefs.h,v 1.47 2004/05/12 18:50:51 mauriliolongo Exp $
  */
 
 /*
@@ -258,7 +258,9 @@
 #endif
 #if !defined( UINT32 )
 #  if UINT_MAX == 0xffffffff
-      typedef UINT         UINT32;
+#     if !( defined( __MINGW32__ ) && defined( _BASETSD_H ) )
+         typedef UINT         UINT32;
+#     endif
 #     if ( ! defined( __XCC__ ) && ! defined( __MINGW32__ ) )
 #        define UINT32_MAX    UINT_MAX
 #        define INT32_MAX     INT_MAX
@@ -282,7 +284,9 @@
 #        define INT64_MIN     LONG_MIN
 #     endif
 #  else
-      typedef ULONGLONG    UINT64;
+#     if !( defined( __MINGW32__ ) && defined( _BASETSD_H ) )
+         typedef ULONGLONG    UINT64;
+#     endif
 #     if ( ! defined( __XCC__ ) && ! defined( __MINGW32__ ) )
 #        define UINT64_MAX    ULONGLONG_MAX
 #        define INT64_MAX     LONGLONG_MAX
