@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.170 2004/09/30 23:24:26 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.171 2004/10/05 22:30:41 ronpinkas Exp $
  */
 
 /*
@@ -3649,9 +3649,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       }
       /* End - END - Added by Ron Pinkas 2000-11-05 */
 
-      #if 0
-         printf( "State: %i Char:%c\n", State, **ptri );
-      #endif
+      //printf( "State: %i Char:%c\n", State, **ptri );
 
       switch( State )
       {
@@ -4234,9 +4232,11 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                }
                while( **ptri == ' ' );
 
+               //printf( "After ws: '%c'\n", **ptri );
+
                if( State == STATE_EXPRES_ID )
                {
-                  if( ( **ptri == '+' && *( * ptri + 1 ) == '+' ) || ( **ptri == '-' && *( * ptri + 1 ) == '-' ) )
+                  if( ( **ptri == '+' && *( *ptri + 1 ) == '+' ) || ( **ptri == '-' && *( *ptri + 1 ) == '-' ) )
                   {
                      cLastChar = **ptri;
 
@@ -4255,27 +4255,13 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
                      (*ptri)++;
                      lens++;
-                  }
-                  else if( **ptri == '[' )
-                  {
-                     cLastChar = **ptri;
-
-                     if( expreal )
-                     {
-                        *expreal++ = **ptri;
-                     }
-
-                     (*ptri)++;
-                     lens++;
-
-                     StBr2++;
                   }
 
                   // Terminate STATE_EXPRES_ID
                   State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
                }
 
-               cLastChar = ' ';
+               //printf( "Next: '%c' State %i\n", **ptri, State);
                continue;
             }
             /* Ron Pinkas added 2000-06-14 */

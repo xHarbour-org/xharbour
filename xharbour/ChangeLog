@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3490 2004/10/04 22:47:19 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3491 2004/10/05 22:30:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-05 18:33 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/pp/ppcore.c
+    ! Fixed typo, and removed (no longer needed) explicit logic for '[' after ws in STATE_EXPRES_ID
 
 2004-10-05 15:28 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c
