@@ -6389,7 +6389,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    DO WHILE ! ( sResult == '' )
       nOffset := 0
       nOptionalAt := At( '[', sResult )
-      WHILE nOPtionalAt > 1 .AND. SubStr( sResult, nOffset + nOptionalAt - 1, 1 ) == '\'
+      WHILE nOPtionalAt > 1 .AND. SubStr( sResult, nOptionalAt - 1, 1 ) == '\'
          nOffset += nOptionalAt
          nOptionalAt := At( '[', SubStr( sResult, nOffset + 1 ) )
       ENDDO
@@ -6401,10 +6401,11 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       IF nOptionalAt == 0
          nMarkerAt := At( '<', sResult )
          WHILE nMarkerAt > 0
-            IF nMarkerAt > 1 .AND. SubStr( sResult, nOffset + nMarkerAt - 1, 1 ) == '\'
+            IF nMarkerAt > 1 .AND. SubStr( sResult, nMarkerAt - 1, 1 ) == '\'
                nOffset   += nMarkerAt
                nMarkerAt := At( '<', sResult, nOffset + 1 )
-            ELSEIF nMarkerAt > 0 .AND. SubStr( sResult, nOffset + nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
+               //TraceLog( sResult, nOffset, nMarkerAt )
+            ELSEIF nMarkerAt > 0 .AND. SubStr( sResult, nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
                nOffset   += nMarkerAt + 1
                nMarkerAt := At( '<', sResult, nOffset + 1 )
             ELSE
@@ -6414,10 +6415,11 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       ELSE
          nMarkerAt := At( '<', sResult )
          WHILE nMarkerAt > 0
-            IF nMarkerAt > 1 .AND. nOffset + nMarkerAt < nOptionalAt .AND. SubStr( sResult, nOffset + nMarkerAt - 1, 1 ) == '\'
+            IF nMarkerAt > 1 .AND. nMarkerAt < nOptionalAt .AND. SubStr( sResult, nMarkerAt - 1, 1 ) == '\'
                nOffset   += nMarkerAt
                nMarkerAt := At( '<', sResult, nOffset + 1 )
-            ELSEIF nMarkerAt > 0 .AND. nOffset + nMarkerAt < nOptionalAt .AND. SubStr( sResult, nOffset + nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
+               //TraceLog( sResult, nOffset, nMarkerAt )
+            ELSEIF nMarkerAt > 0 .AND. nMarkerAt < nOptionalAt .AND. SubStr( sResult, nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
                nOffset   += nMarkerAt + 1
                nMarkerAt := At( '<', sResult, nOffset + 1 )
             ELSE
@@ -6716,7 +6718,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                sResult := SubStr( sResult, nNext + 1 )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
-                  aEval( aMarkers, {|sMarker| TraceLog( sTemp, sMarker ) } )
+                  aEval( aMarkers, {|sMarker| TraceLog( sResult, sTemp, sMarker ) } )
                   Alert( [ERROR! Unrecognized RP: '<']+" : '" + sTemp + "'" )
                ELSE
                   aRP := { nOptional, nId }
