@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3760 2005/01/21 18:27:46 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3761 2005/01/21 18:41:13 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-22 12:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * minor fix: use *_GOTO( pArea, 0 ) instead
+      of *_GOTO( pArea, pArea->ulRecCount+1000 )
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * fixed function name in error message. I would like to ask
+      all of you who use DBFCDX for tests of new index procedure.
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/rtl/gtwvt/wvtcore.c
+  * xharbour/source/rtl/gtwvt/wvtutils.c
+    * separated the GT code and Windows extensions
+      now wvtcore.c, wvtutils.c, wvtclass.prg, wvtpaint.prg can be
+      moved to separate library (I hope - not tested)
 
 2005-01-21 19:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/make_gnu.sh

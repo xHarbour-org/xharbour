@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.88 2004/12/28 08:35:19 druzus Exp $
+ * $Id: dbfntx1.c,v 1.89 2004/12/31 11:56:09 druzus Exp $
  */
 
 /*
@@ -619,7 +619,7 @@ static ERRCODE hb_ntxGoEof( NTXAREAP pArea )
    LPTAGINFO lpCurTag = pArea->lpCurTag;
 
    pArea->lpCurTag = NULL;
-   retvalue = SUPER_GOTO( ( AREAP ) pArea, pArea->ulRecCount+1000 );
+   retvalue = SUPER_GOTO( ( AREAP ) pArea, 0 );
    if( pArea->ulRecCount )
       pArea->fBof = lpCurTag->TagBOF = FALSE;
    pArea->fEof = lpCurTag->TagEOF = TRUE;

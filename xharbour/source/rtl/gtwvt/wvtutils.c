@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.20 2005/01/09 06:08:25 likewolf Exp $
+ * $Id: wvtutils.c,v 1.21 2005/01/21 18:41:40 druzus Exp $
  */
 
 /*
@@ -102,10 +102,17 @@ HB_EXTERN_END
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
-void HB_EXPORT hb_wvt_wvtUtils( void )
+/* get pointer to WVT GlobalData structure at startup */
+HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_wvt_Init_ )
+static void HB_EXPORT hb_wvt_wvtUtils( void )
 {
    _s = hb_wvt_gtGetGlobalData();
 }
+HB_CALL_ON_STARTUP_END( _hb_startup_gt_wvt_Init_ )
+
+#if defined( HB_PRAGMA_STARTUP )
+   #pragma startup _hb_startup_gt_wvt_Init_
+#endif
 
 //-------------------------------------------------------------------//
 //

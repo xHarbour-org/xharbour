@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.140 2004/12/28 20:32:33 ptsarenko Exp $
+ * $Id: gtwvt.c,v 1.141 2005/01/13 10:30:31 bdj Exp $
  */
 
 /*
@@ -267,9 +267,6 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
     _s.hdc        = GetDC( _s.hWnd );
     _s.hCompDC    = CreateCompatibleDC( _s.hdc );
     hb_wvt_gtInitGui();
-
-    hb_wvt_wvtCore();
-    hb_wvt_wvtUtils();
 
     if( b_MouseEnable )
     {

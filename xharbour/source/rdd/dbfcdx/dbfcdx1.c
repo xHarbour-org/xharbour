@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.174 2005/01/15 11:12:21 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.175 2005/01/19 23:36:34 druzus Exp $
  */
 
 /*
@@ -7907,7 +7907,7 @@ static void hb_cdxSortGetPageKey( LPCDXSORTINFO pSort, ULONG ulPage,
       if ( hb_fsSeek( pSort->hTempFile, pSort->pSwapPage[ ulPage ].nOffset, SEEK_SET ) != pSort->pSwapPage[ ulPage ].nOffset ||
            hb_fsReadLarge( pSort->hTempFile, pSort->pSwapPage[ ulPage ].pKeyPool, ulSize ) != ulSize )
       {
-         hb_errInternal( 9999, "hb_cdxSortOrderPages: Read error from temporary file.", "", "" );
+         hb_errInternal( 9999, "hb_cdxSortGetPageKey: Read error from temporary file.", "", "" );
       }
       pSort->pSwapPage[ ulPage ].nOffset += ulSize;
       pSort->pSwapPage[ ulPage ].ulKeyBuf = ulKeys;
