@@ -1,5 +1,3 @@
-#include "hbclass.ch"
-
 PROCEDURE Main()
 
     LOCAL MyAssocArray := TAssociativeArray()
