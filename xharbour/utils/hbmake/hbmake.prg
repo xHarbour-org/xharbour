@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.63 2003/04/01 23:15:34 lculik Exp $
+ * $Id: hbmake.prg,v 1.64 2003/04/05 00:55:49 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1513,6 +1513,11 @@ FUNC CreateMakeFile( cFile )
 
       IF s_lVcc .OR. s_lBcc
 
+         IF s_lVcc // remove bcc640.lib form msvc
+            cDefBccLibs   := StrTran( cDefBccLibs, "bcc640.lib ", "")
+            cDefBccLibsMt := StrTran( cDefBccLibsMt, "bcc640.lib ", "")
+         ENDIF
+
          IF ! lMt
             cOldLib := cDefBccLibs
          ELSE
@@ -1652,7 +1657,7 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" +IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
       fWrite( s_nLinkHandle, "CFLAG2 =  -c" +" -I" + Alltrim( cUserInclude ) + " " + CRLF )
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
-      fWrite( s_nLinkHandle, "LFLAGS = /LIBPATH:$(BCB)\lib;$(BHC)\lib;$(C4W)\lib /SUBSYSTEM:CONSOLE" + CRLF )
+      fWrite( s_nLinkHandle, "LFLAGS = /LIBPATH:$(BCB)\lib;$(BHC)\lib;$(C4W)\lib /SUBSYSTEM:CONSOLE" +IIF(lMt, " /Nodefaultlib:LIBC "," /Nodefaultlib:LIBCMT " ) + CRLF )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LINKER = link" + CRLF )
       fWrite( s_nLinkHandle, " " + CRLF )
@@ -1724,7 +1729,7 @@ FUNC CreateMakeFile( cFile )
 
    @ 20,5 Say "Build app" get cBuild PICT "!" Valid cBuild $"YNS"
    READ
-   IF "YS" IN cBuild
+   IF "YS" $ cBuild
       ResetInternalVars()
       cls
       Main( cFile, " -F")
