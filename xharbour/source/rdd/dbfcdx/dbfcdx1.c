@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.46 2003/06/11 23:29:20 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.47 2003/06/26 01:29:15 ronpinkas Exp $
  */
 
 /*
@@ -3982,8 +3982,12 @@ static BYTE hb_cdxPageKeyLeafBalance( LPCDXPAGEINFO pPage )
          /* Delete parent key */
          pKey = hb_cdxPageGetKey( pPage, nFirstChild + j - 1 );
          pKeyTmp = pKey->pNext;
-         pKey->pNext = pKeyTmp->pNext;
-         hb_cdxKeyFree( pKeyTmp );
+         if ( pKeyTmp  && pKeyTmp->pNext)
+            pKey->pNext = pKeyTmp->pNext;
+           /* Hope my logic is not wrong, But pages should only be release if the pointer is valid */
+         if (  pKeyTmp ) 
+            hb_cdxKeyFree( pKeyTmp );        
+
          pPage->uiKeys--;
 
          childs[j]->Owner    = NULL;

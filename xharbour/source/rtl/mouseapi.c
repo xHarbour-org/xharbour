@@ -1,5 +1,5 @@
 /*
- * $Id: mouseapi.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: mouseapi.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,7 @@
 
 static BOOL   s_bVisible = FALSE;
 static USHORT s_uiDoubleClickSpeed = 168; /* In milliseconds */
-static int    s_iLeftButton = 1;
+static int    s_iLeftButton = 0;
 static int    s_iRightButton = 1;
 
 /* NOTE: Mouse initialization is called directly from low level GT driver

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1195 2003/06/27 20:57:58 druzus Exp $
+ * $Id: ChangeLog,v 1.1196 2003/06/28 13:31:05 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-28 18:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rdd/dbfcdx/dbfcdx1.c
+    ! Fixed Gpf's reported by Bob Owen (problem was beteen lines 3984 and 3991)
+      it was attemting to free an NULL Page pointer 
+  *source/rtl/mouseapi.c
+    ! minor Fix static int    s_iLeftButton = 1;  --> static int    s_iLeftButton = 0;
 
 2003-06-28 10:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rdd/dbcmd.c
