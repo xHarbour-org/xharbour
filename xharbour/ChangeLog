@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.804 2003/03/06 21:03:59 walito Exp $
+ * $Id: ChangeLog,v 1.805 2003/03/07 03:04:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-07 01:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tbrowse.prg
+    ! Fix new bug in initialization and more Clipper compatibility.
+
 2003-03-06 19:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbvmpub.h
-    - Removed lineno memebr from struct hb_struBlcok.
+    - Removed lineno member from struct hb_struBlcok.
     + Added procname, and lineno members to struct _HB_CODEBLOCK.
 
   * source/vm/hvm.c
