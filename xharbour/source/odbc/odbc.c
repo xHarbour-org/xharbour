@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.11 2003/11/24 16:57:26 lf_sfnet Exp $
+ * $Id: odbc.c,v 1.12 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -196,6 +196,7 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
 
    lLen       = ( SDWORD )( hb_parnl( 4 ) ? hb_parnl( 4 ) : 64 );
    bBuffer    = hb_xgrab( lLen+1 );
+   bOut       = NULL;
    lInitBuff  = (int) lLen;
    wType      = ( hb_parni( 3 ) ? hb_parni( 3 ) : SQL_BINARY );
 

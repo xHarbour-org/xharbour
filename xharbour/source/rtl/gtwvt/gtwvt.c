@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.75 2004/02/17 18:44:15 andijahja Exp $
+ * $Id: gtwvt.c,v 1.76 2004/02/23 00:07:19 peterrees Exp $
  */
 
 /*
@@ -74,6 +74,8 @@
 *         Graphical object system and event system.
 *         GTINFO() And GTO_* implementation.
 */
+
+#define HB_OS_WIN_32_USED
 
 #include "hbgtwvt.h"
 

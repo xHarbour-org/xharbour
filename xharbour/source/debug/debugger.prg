@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.24 2004/02/20 02:29:14 likewolf Exp $
+ * $Id: debugger.prg,v 1.25 2004/02/28 00:39:21 likewolf Exp $
  */
 
 /*
@@ -2849,7 +2849,7 @@ METHOD Step() CLASS TDebugger
   endif
   ::RestoreAppStatus()
   ::Exit()
-RETURN
+RETURN nil
 
 
 
