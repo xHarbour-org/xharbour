@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.8 2004/02/14 21:01:17 andijahja Exp $
+* $Id: hbserv.c,v 1.9 2004/02/21 04:45:19 ronpinkas Exp $
 */
 
 /*
@@ -50,14 +50,14 @@
 *
 */
 
-#include "hbserv.ch"
-
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbfast.h"
 #include "hbapierr.h"
 #include "hbapifs.h"
 #include "hbvm.h"
+#include "hbserv.h"
+
 #include <stdio.h>
 
 #if !defined(HB_OS_DOS) && !defined(HB_OS_DARWIN) // dos and Darwin can't compile this module
@@ -754,6 +754,19 @@ HB_EXPORT BOOL hb_isService()
 }
 
 /**
+* Clean up when system exits
+* Called from hb_vmQuit()
+*/
+
+HB_EXPORT void hb_seriviceExit()
+{
+   if( !sp_hooks == NULL )
+   {
+      hb_itemRelease( sp_hooks );
+   }
+}
+
+/**
 * Returns true if the current program is a service, that is if HB_StartService() has
 * Been called.
 */
@@ -820,6 +833,7 @@ HB_FUNC( HB_PUSHSIGNALHANDLER )
    HB_CRITICAL_LOCK( s_ServiceMutex );
 
    hb_arrayAdd( sp_hooks, pHandEntry );
+   hb_itemRelease( pHandEntry );
 
    HB_CRITICAL_UNLOCK( s_ServiceMutex );
 }
@@ -838,7 +852,13 @@ HB_FUNC( HB_POPSIGNALHANDLER )
       {
          hb_arrayDel( sp_hooks, nLen );
          hb_arrayDel( sp_hooks, nLen -1 );
+         hb_arraySize( sp_hooks, nLen -2 );
          hb_retl( TRUE );
+         if( hb_arrayLen( sp_hooks ) == 0 )
+         {
+            hb_itemRelease( sp_hooks );
+            sp_hooks = NULL;              /* So it can be reinitilized */
+         }
       }
       else
       {

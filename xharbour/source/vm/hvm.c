@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.337 2004/02/25 15:32:49 lculik Exp $
+ * $Id: hvm.c,v 1.338 2004/02/25 16:03:12 lculik Exp $
  */
 
 /*
@@ -101,6 +101,7 @@
 #include "hbdebug.ch"
 
 #include "hbi18n.h"
+#include "hbserv.h"
 #include "hashapi.h"
 
 #include "hbmemory.ch"
@@ -737,6 +738,8 @@ int HB_EXPORT hb_vmQuit( void )
    hb_backgroundShutDown();
 
    hb_i18nExit();
+
+   hb_seriviceExit();
 
    hb_errExit();
    //printf("After Err\n" );
@@ -2471,7 +2474,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      sString[ iNewLen ] = '\0';
                      pString->item.asString.bStatic = FALSE;
                      pString->item.asString.puiHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-                                            
+
                      *( pString->item.asString.puiHolders ) = 1;
                      pString->item.asString.value = sString;
                      pString->item.asString.length = iNewLen;
