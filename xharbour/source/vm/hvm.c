@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.120 2002/10/15 19:32:05 ronpinkas Exp $
+ * $Id: hvm.c,v 1.121 2002/10/17 14:46:07 ronpinkas Exp $
  */
 
 /*
@@ -5549,7 +5549,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
       if( sModule )
       {
          iLen = strlen( sModule );
-         if( iLen > 2 && sModule[ iLen - 2 ] == '.' && toupper( sModule[ iLen - 1 ] ) == 'C' )
+         if( ( iLen > 2 && sModule[ iLen - 2 ] == '.' ) || ( iLen > 3 && sModule[ iLen - 3 ] == '.' ) || ( iLen > 4 && sModule[ iLen - 4 ] == '.' ) )
          {
             iPCodeVer = va_arg( ap, int );
          }

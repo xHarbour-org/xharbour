@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.454 2002/10/22 02:08:21 paultucker Exp $
+ * $Id: ChangeLog,v 1.455 2002/10/22 02:37:03 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-22-19 13:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Changed hb_vmProcessSymbols() to support extensions other than .c for compiled modules.
 
 2002-10-21 23:35 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/common/hbffind.c
