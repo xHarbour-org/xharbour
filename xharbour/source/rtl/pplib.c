@@ -1,5 +1,5 @@
 /*
- * $Id: pplib.c,v 1.3 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: pplib.c,v 1.4 2004/04/07 03:10:15 andijahja Exp $
  */
 
 /*
@@ -91,6 +91,9 @@ BOOL           hb_comp_bForceMemvars = FALSE;             /* holds if memvars ar
 BOOL           hb_comp_bDebugInfo = FALSE;                /* holds if generate debugger required info */
 int            hb_comp_iExitLevel = HB_EXITLEVEL_DEFAULT; /* holds if there was any warning during the compilation process */
 FILE *         hb_comp_yyppo = NULL;
+
+BOOL           hb_comp_bTracePP = FALSE;
+FILE           *hb_comp_PPTrace = NULL;
 
 static jmp_buf s_env;
 

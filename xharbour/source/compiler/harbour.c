@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.85 2004/08/05 16:41:45 paultucker Exp $
+ * $Id: harbour.c,v 1.86 2004/08/18 19:15:38 paultucker Exp $
  */
 
 /*
@@ -264,6 +264,10 @@ extern void yyrestart( FILE * );
 */
 BOOL hb_comp_iGenVarList = FALSE;
 FILE *hb_comp_VariableList = NULL;
+
+/* PreProcessor Tracing support. */
+BOOL hb_comp_bTracePP = FALSE;
+FILE *hb_comp_PPTrace = NULL;
 
 /* ************************************************************************* */
 
@@ -4895,6 +4899,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
    {
       char szFileName[ _POSIX_PATH_MAX ], szFileLiteral[ _POSIX_PATH_MAX + 2 ];
       char szPpoName[ _POSIX_PATH_MAX ];
+      char szPptName[ _POSIX_PATH_MAX ];
       char szHILName[ _POSIX_PATH_MAX ];
       char szVarListName[ _POSIX_PATH_MAX ];
       char *szSourceExtension /*, *szSourcePath */;
@@ -4931,10 +4936,24 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
          hb_comp_pFileName->szExtension = ".ppo";
          hb_fsFNameMerge( szPpoName, hb_comp_pFileName );
          hb_comp_yyppo = fopen( szPpoName, "w" );
+
          if( ! hb_comp_yyppo )
          {
             hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_CREATE_PPO, szPpoName, NULL );
             iStatus = EXIT_FAILURE;
+         }
+
+         if( hb_comp_bTracePP )
+         {
+            hb_comp_pFileName->szExtension = ".ppt";
+            hb_fsFNameMerge( szPptName, hb_comp_pFileName );
+            hb_comp_PPTrace = fopen( szPptName, "w" );
+
+            if( ! hb_comp_PPTrace )
+            {
+               hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_CREATE_PPT, szPptName, NULL );
+               iStatus = EXIT_FAILURE;
+            }
          }
       }
 
@@ -5042,6 +5061,12 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
             {
                fclose( hb_comp_yyppo );
                hb_comp_yyppo = NULL;
+
+               if( hb_comp_PPTrace )
+               {
+                  fclose( hb_comp_PPTrace );
+                  hb_comp_PPTrace = NULL;
+               }
             }
 
             /* Saving main file. */

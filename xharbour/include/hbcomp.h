@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.29 2004/05/12 02:25:24 druzus Exp $
+ * $Id: hbcomp.h,v 1.30 2004/08/05 17:11:13 paultucker Exp $
  */
 
 /*
@@ -549,6 +549,10 @@ extern ULONG          hb_comp_Supported;
 
 extern PVAR           hb_comp_pGlobals;
 extern short          hb_comp_iGlobals;
+
+/* PreProcessor Tracing support. */
+extern BOOL           hb_comp_bTracePP;
+extern FILE           *hb_comp_PPTrace;
 
 /* /GC command line setting types */
 #define HB_COMPGENC_COMPACT     0

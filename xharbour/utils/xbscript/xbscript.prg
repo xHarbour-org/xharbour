@@ -1978,7 +1978,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ENDIF
                ELSE
                   nAt := At( '=', sBlock )
-                  IF nAt > 1 .AND. SubStr( sBlock, nAt - 1, 1 ) != ':'
+                  IF nAt > 1 .AND. SubStr( sBlock, nAt - 1, 1 ) != ':' .AND. SubStr( sBlock, nAt + 1, 1 ) != '='
                      nAt--
                      FOR nPos := 1 TO nAt
                         cChr := SubStr( sBlock, nPos, 1 )
@@ -3514,6 +3514,9 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
                ExtractLeadingWS( @sLine )
                DropTrailingWS( @sLine )
+
+               // Added Oct-16-2004 to support #defines a nd translates.
+               sLine := PP_PreProLine( sLine )
 
                // Strip the ""
                sLine := SubStr( sLine, 2, Len( sLine ) - 2 )
@@ -9368,6 +9371,7 @@ STATIC FUNCTION InitRunRules()
    aAdd( aTransRules, { 'PROCNAME' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
    aAdd( aTransRules, { 'PROCLINE' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
    aAdd( aTransRules, { 'HB_ENUMINDEX' , { {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+   aAdd( aTransRules, { 'IN' , { {    1,   0, NIL, '<', NIL } } , .T. } )
 
    /* Commands */
    aAdd( aCommRules, { '_HB_CLASS' , { {    1,   0, NIL, '<', NIL } } , .F. } )
@@ -9452,6 +9456,7 @@ STATIC FUNCTION InitRunResults()
    aAdd( aTransResults, { { {   0, 'PP_ProcName( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aTransResults, { { {   0, 'PP_ProcLine( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aTransResults, { { {   0, 'PP_EnumIndex()' } }, { -1} ,  } )
+   aAdd( aTransResults, { { {   0, '$ ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
 
    /* Commands Results*/
    aAdd( aCommResults, { , , { NIL }  } )

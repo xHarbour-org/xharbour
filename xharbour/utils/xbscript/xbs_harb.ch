@@ -159,7 +159,7 @@
            sLine := acPPed[nLine]
            IF sLine != NIL
               //TraceLog( "COMPLE: " + sLine )
-              PP_CompileLine( sLine, nLine, aCompiledProcs, aInitExit, @nProcId )
+              PP_CompileLine( sLine, nLine - nStart + 1, aCompiledProcs, aInitExit, @nProcId )
            ENDIF
         NEXT
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.17 2004/04/14 22:39:19 andijahja Exp $
+ * $Id: cmdcheck.c,v 1.18 2004/07/07 04:39:36 ronpinkas Exp $
  */
 
 /*
@@ -325,6 +325,23 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                        /* Accept rest as OutputPath and continue with next Args[]. */
                        j = strlen( Args[i] );
+                       continue;
+
+                     case 'p' :
+                     case 'P' :
+                       if ( Args[i][j + 1] )
+                       {
+                          Switch[2] = Args[i][j + 1];
+                          Switch[3] = '\0';
+                          j += 2;
+                       }
+                       else
+                       {
+                          /* No optional argument */
+                          Switch[2] = '\0';
+                          j += 1;
+                       }
+                       hb_compChkEnvironVar( (char*) Switch );
                        continue;
 
                      case 'q' :
@@ -803,16 +820,31 @@ void hb_compChkEnvironVar( char * szSwitch )
                 }
                 break;
 
-             /* Added for preprocessor needs */
              case 'p':
              case 'P':
-                if( *( s + 1 ) == '-' )
+                if( *( s + 1 ) == 't' || *( s + 1 ) == 'T' )
                 {
-                   hb_comp_bPPO = 0;
+                   if( *( s + 2 ) == '-' )
+                   {
+                      hb_comp_bPPO     = 0;
+                      hb_comp_bTracePP = 0;
+                   }
+                   else
+                   {
+                      hb_comp_bPPO     = 1;
+                      hb_comp_bTracePP = 1;
+                   }
                 }
                 else
                 {
-                   hb_comp_bPPO = 1;
+                   if( *( s + 1 ) == '-' )
+                   {
+                      hb_comp_bPPO = 0;
+                   }
+                   else
+                   {
+                      hb_comp_bPPO = 1;
+                   }
                 }
                 break;
 

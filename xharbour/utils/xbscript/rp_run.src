@@ -128,3 +128,5 @@
 #XTRANSLATE ProcLine( [<n>] ) => PP_ProcLine( <n> )
 
 #XTRANSLATE HB_EnumIndex() => PP_EnumIndex()
+
+#XTRANSLATE IN <x> => $ <x>

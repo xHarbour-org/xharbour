@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3499 2004/10/14 23:47:00 peterrees Exp $
+ * $Id: ChangeLog,v 1.3501 2004/10/18 10:23:44 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-19 20:13 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/pp/ppcore.c
+    + Added support for #directive expanasions in #include directives.
+  * include/hbcomp.h
+  * include/hberrors.h
+  * source/compiler/cmdcheck.c
+  * source/compiler/harbour.c
+  * source/compiler/hbgenerr.c
+  * source/compiler/hbusage.c
+  * source/pp/ppcore.c
+  * source/rtl/pplib.c
+    + Added support for -PT command line argument, to generate Pre-processor trace (.ppt) file.
+
+  * utils/xbscript/rp_run.src
+  * utils/xbscript/xbs_harb.ch
+  * utils/xbscript/xbscript.prg
+    + Added support for IN operator.
 
 2004-10-18 14:18 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * make_drw.sh

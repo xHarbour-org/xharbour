@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.15 2004/02/18 10:50:44 andijahja Exp $
+ * $Id: hberrors.h,v 1.16 2004/03/06 19:54:31 ronpinkas Exp $
  */
 
 /*
@@ -121,6 +121,7 @@ HB_EXTERN_BEGIN
 #define HB_COMP_ERR_INVALID_CONSTANT            59
 #define HB_COMP_ERR_CREATE_HIL                  60
 #define HB_COMP_ERR_ILLEGAL_CHARACTER           61
+#define HB_COMP_ERR_CREATE_PPT                  62
 
 #define HB_COMP_WARN_AMBIGUOUS_VAR              1
 #define HB_COMP_WARN_MEMVAR_ASSUMED             2

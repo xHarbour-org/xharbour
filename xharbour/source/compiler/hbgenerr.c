@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.17 2004/03/28 15:12:02 likewolf Exp $
+ * $Id: hbgenerr.c,v 1.18 2004/04/05 00:16:03 andijahja Exp $
  */
 
 /*
@@ -93,7 +93,8 @@ char * hb_comp_szErrors[] =
    "Too many Parameter declarations \'%s\'.",
    "Invalid SWITCH Constant \'%s\'.",
 /* 60 */   "Cannot write HIL table to \'%s\'.",
-   "Illegal character \'%s\'."
+   "Illegal character \'%s\'.",
+   "Can't create preprocessed tracing file: \'%s\'"
 };
 
 /* Table with parse warnings */
