@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2721 2004/04/02 13:48:31 srobert Exp $
+ * $Id: ChangeLog,v 1.2722 2004/04/02 17:54:29 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-02 13:30 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
+  * source/rtl/filesys.c
+    * hb_fsCreate() set the error to _doserrno if possible for MSVC
 
 2004-04-02 20:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/vm/fastitem.c
