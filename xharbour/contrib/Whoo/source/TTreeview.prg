@@ -36,11 +36,24 @@
 
 CLASS TTreeView FROM TControl
 
-   DATA   Items
-   DATA   Option
-   DATA   Action
-   DATA   ImageList
-   DATA   bChanged
+   DATA Items     PROTECTED INIT {}
+   DATA ImageList PROTECTED
+   DATA bChanged  PROTECTED
+
+   DATA Caption PROTECTED INIT ""
+   DATA Left    INIT    0
+   DATA Top     INIT    0
+   DATA Width   INIT  160
+   DATA Height  INIT  160
+
+   DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_TABSTOP+TVS_HASBUTTONS+TVS_HASLINES+TVS_LINESATROOT
+   DATA ExStyle INIT  WS_EX_CLIENTEDGE
+
+   DATA lRegister PROTECTED INIT .F.
+   DATA lControl  PROTECTED INIT .T.
+   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_NOTIFY,WM_SIZE,WM_MOVE}
+   DATA WndProc   PROTECTED INIT 'ControlProc'
+   DATA Name      PROTECTED INIT "SysTreeView32"
 
    METHOD New() CONSTRUCTOR
 
@@ -58,24 +71,13 @@ ENDCLASS
 
 //----------------------------------------------------------------------------//
 
-METHOD New( oParent, nId, nTop, nLeft, nWidth, nHeight ) CLASS TTreeView
-
-   ::Style  := OR(WS_CHILD+WS_VISIBLE+WS_TABSTOP+TVS_HASBUTTONS+TVS_HASLINES+TVS_LINESATROOT,::Style)
-   ::Id     := nId
-   ::Parent := oParent
-   ::Top    := nTop
-   ::Left   := nLeft
-   ::Height := nHeight
-   ::Width  := nWidth
-   ::name   := "SysTreeView32"
-   ::Items  := {}
-   ::lRegister := .F.
-   ::lControl  := .T.
-   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_NOTIFY,WM_SIZE,WM_MOVE}, ::Msgs )
-   ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
-   ::Caption   := ""
-   ::ExStyle   := OR(WS_EX_CLIENTEDGE,::ExStyle)
-return Self
+METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TTreeView
+   ::id        := nId
+   ::Left      := IFNIL( nLeft,   ::Left,   nLeft  )
+   ::Top       := IFNIL( nTop,    ::Top,    nTop   )
+   ::width     := IFNIL( nWidth,  ::width , nWidth )
+   ::Height    := IFNIL( nHeight, ::height, nHeight)
+return( super:New( oParent ) )
 
 //----------------------------------------------------------------------------//
 

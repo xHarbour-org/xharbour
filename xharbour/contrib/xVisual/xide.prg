@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.76 2002/10/06 23:54:06 what32 Exp $
+ * $Id: xide.prg,v 1.77 2002/10/07 03:45:38 what32 Exp $
  */
 
 /*
@@ -107,7 +107,7 @@ return(self)
 
 METHOD MainToolBar() CLASS MainFrame
    local n, oTool, oSplash
-   LOCAL hImg1,hImg2,hBmp,aStdTab
+   LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab
    With Object ::Add('Rebar', TRebar():New( oApp:MainFrame ) )
       // add the xmake toolbar
       With Object :Add( 'Tools', TToolBar():New( oApp:MainFrame:GetObj("Rebar"), 444, 15, , , 26, 26, 20, 20, 14 ))
@@ -141,7 +141,7 @@ METHOD MainToolBar() CLASS MainFrame
       With Object :Add( 'Tabs', TTabControl():New( oApp:MainFrame:GetObj("Rebar"), 445,  0,  0,  0,  0) )
          :AddTab( "StdTab", TabPage():New( oApp:MainFrame:GetObj("Rebar"):GetObj("Tabs"), "Standard" ) )
          :AddTab( "Aditional" )
-         :AddTab( "Win32" )
+         :AddTab( "Win32", TabPage():New( oApp:MainFrame:GetObj("Rebar"):GetObj("Tabs"), "Win32" ) )
          :AddTab( "System" )
          :AddTab( "Internet" )
          :AddTab( "Dialogs" )
@@ -176,12 +176,48 @@ METHOD MainToolBar() CLASS MainFrame
                DeleteObject(hBmp)
                SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
                //---------------------------------------------------------------------
+
             End
             :AddBand( NIL, RBBS_NOVERT, :GetObj("StdTools"):handle, 100, 30,  , "", NIL )
             :GetObj("StdTools"):DisableAll()
 
             //--------- sets a QUICK access to the control
             oApp:MainFrame:SetLink( 'StdBar', :GetObj("StdTools") )
+         End
+      End
+//----------------------------------------------------------------------------------------------
+
+      With Object :Tabs:Win32
+         With Object :Add( 'TabWin32', TRebar():New( oApp:MainFrame:Rebar:Tabs:Win32 ) )
+            :SetStyle( WS_BORDER, .F. )
+            With Object :Add( 'Win32Tools', TToolBar():New( oApp:MainFrame:Rebar:Tabs:Win32:TabWin32, 445, 14, , , 28, 28, 20, 20 ) )
+
+               :SetStyle( TBSTYLE_CHECKGROUP )
+
+               aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', '', '', '', ;
+                                '', '', '', '', '', '', ;
+                                '', '', '' }
+               for n:=0 to 16
+                   oTool := ToolButton():New( n,,aStdTab[n+1], 250+n )
+                   oTool:Action := {|oItem| oApp:Form1:OnMenuCommand(oItem) }
+                   oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
+                   :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
+               next
+
+               // ----------------------------------------------------   set imagelist
+               hImg2:= ImageList_Create( 24, 24, ILC_COLORDDB+ILC_MASK )
+               hBmp := LoadImage( hInstance(), "WIN32", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
+               ImageList_AddMasked( hImg2, hBmp, RGB( 0, 255, 255 ) )
+               DeleteObject(hBmp)
+               SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
+               //---------------------------------------------------------------------
+
+            End
+            :AddBand( NIL, RBBS_NOVERT, :GetObj("Win32Tools"):handle, 100, 30,  , "", NIL )
+            :GetObj("Win32Tools"):DisableAll()
+
+            //--------- sets a QUICK access to the control
+            oApp:MainFrame:SetLink( 'Win32Bar', :GetObj("Win32Tools") )
          End
       End
    End

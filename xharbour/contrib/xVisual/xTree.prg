@@ -1,5 +1,5 @@
 /*
- * $Id: xtree.prg,v 1.0 2002/10/05 06:27:24 ronpinkas Exp $
+ * $Id: xTree.prg,v 1.3 2002/10/06 02:50:59 ronpinkas Exp $
  */
 
 /*
@@ -41,7 +41,6 @@ CLASS ObjTree FROM TForm
                                 ::top     := 125,;
                                 ::width   := 200,;
                                 ::height  := 150,;
-                                ::ExStyle := WS_EX_TOOLWINDOW ,;
                                 super:new( oParent )
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
@@ -61,14 +60,8 @@ METHOD OnCreate() CLASS ObjTree
 RETURN(nil)
 
 CLASS TreeObj FROM TTreeView
-   METHOD New() CONSTRUCTOR
    METHOD Add()
 ENDCLASS
-
-METHOD New( oObj, nId, nL, nT, nW, nH ) CLASS TreeObj
-   ::Style := WS_CLIPSIBLINGS
-   ::ExStyle := WS_EX_ACCEPTFILES
-return( super:New( oObj, nId, nL, nT, nW, nH ) )
 
 METHOD Add( cText, nImg ) CLASS TreeObj
    if empty( ::Parent:TreeRoot )

@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.56 2002/10/07 02:19:17 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.57 2002/10/09 06:46:59 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -230,11 +230,12 @@ METHOD CreateControl(aRect)
          ENDIF
       CASE ::CtrlName=="TabControl"
          oObj:=::Add(cName, TTabControl():New( self,        508, aRect[1], aRect[2], aRect[3], aRect[4] ) )
-         oObj:AddTab( "Tab1",  'TEST' )
+         oObj:AddTab( "Tab1" )
          oObj:configure()
       CASE ::CtrlName=="GroupBox"
          oObj:=::Add(cName, TGroupBox():New(   self, cName, 509, aRect[1], aRect[2], aRect[3], aRect[4] ) )
-
+      CASE ::CtrlName=="TreeView"
+         oObj:=::Add(cName, TTreeView():New(   self,        510, aRect[1], aRect[2], aRect[3], aRect[4] ) )
       OTHERWISE // unknown name
 
          ::CtrlName:=NIL
@@ -245,6 +246,7 @@ METHOD CreateControl(aRect)
       if oObj!=NIL
         // oObj:SetMethod("OnMove",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1,::oMask:moving,::oMask:sizing )})
         // oObj:SetMethod("OnSize",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1,::oMask:moving,::oMask:sizing )})
+
          oObj:SetMethod("Delete",{||oApp:MainFrame:ObjInsp:InspCombo:DelObject( oObj ), ;
                                     HB_QSELF():DelControl(), oObj:Parent:XFMControl( NIL, oObj, .T. ) } )
 
@@ -252,9 +254,11 @@ METHOD CreateControl(aRect)
          oApp:MainFrame:ObjInsp:InspCombo:SetCurSel(oApp:MainFrame:ObjInsp:InspCombo:GetCount()-1)
          ::Parent:ObjTree:Tree:Add( oObj:PropName,1 )
          ::Parent:ObjTree:Tree:Expand()
+
       endif
    ENDIF
    ::Parent:StdBar:CheckButton( 150, .T. )
+   ::Parent:Win32Bar:CheckButton( 250, .T. )
 
    RETURN(oObj)
 
@@ -304,6 +308,7 @@ METHOD CreateSub()
    ::SetGridSize()
 
    ::Parent:StdBar:EnableAll()
+   ::Parent:Win32Bar:EnableAll()
 
    ::Parent:ObjInsp:InspCombo:AddString(::PropName+chr(9)+"TFORM",self)
    ::Parent:ObjInsp:InspCombo:SetCurSel(::Parent:ObjInsp:InspCombo:GetCount()-1)
