@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.147 2004/04/14 22:39:19 andijahja Exp $
+ * $Id: ppcore.c,v 1.148 2004/04/30 01:20:47 ronpinkas Exp $
  */
 
 /*
@@ -3406,7 +3406,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
    // Extended Match Marker
    if( cMarkerType == '4' && strchr( "\"&(['", ( *ptri )[0] ) == NULL )
    {
-      char *pTmp = strpbrk( *ptri, " ,\"'" );
+      char *pTmp = strpbrk( *ptri, " ,\"'=" );
 
       if( pTmp )
       {

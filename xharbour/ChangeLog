@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2875 2004/05/04 18:38:57 kaddath Exp $
+ * $Id: ChangeLog,v 1.2876 2004/05/05 10:10:23 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-06 12:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    + Added '=' as an explicit terminator of Extended Marker in getExpReal() (Clipper compatability).
+
+  * source/rtl/direct.c
+    % Minor optimization - in general we should NOT use temporary item for Return Result.
+      Please use &HB_VM_STACK.Return directly - this happens in MANY MANY places.
 
 2004-05-05 12:08 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/filesys.c

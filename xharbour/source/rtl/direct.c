@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.46 2004/03/31 09:19:54 andijahja Exp $
+ * $Id: direct.c,v 1.47 2004/04/05 22:38:27 lculik Exp $
  */
 
 /*
@@ -110,8 +110,6 @@ extern char *hb_vm_acAscii[256];
 #else
    #define HB_DIR_ALL_FILES_MASK        "*.*"
 #endif
-
-// extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
 
 static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT uiMask, PHB_FNAME fDirSpec, BOOL bFullPath, BOOL bDirOnly )
 {
@@ -503,9 +501,5 @@ HB_FUNC( DIRECTORYRECURSE )
 
 HB_FUNC( DIRECTORY )
 {
-   HB_ITEM Dir;
-
-   Dir.type = HB_IT_NIL;
-   hb_fsDirectory( &Dir, hb_parcx(1), hb_parcx(2), hb_parl(3), hb_parl(4) );
-   hb_itemForwardValue( &(HB_VM_STACK).Return, &Dir );
+   hb_fsDirectory( &(HB_VM_STACK).Return, hb_parcx(1), hb_parcx(2), hb_parl(3), hb_parl(4) );
 }
