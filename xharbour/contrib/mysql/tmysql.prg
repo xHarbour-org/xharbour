@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.0 2002/12/01 13:56:03 lculik Exp $
+ * $Id: tmysql.prg,v 1.1 2003/02/03 05:21:06 walito Exp $
  */
 
 /*
@@ -231,7 +231,7 @@ METHOD MakePrimaryKeyWhere() CLASS TMySQLRow
 
          // if a part of a primary key has been changed, use original value
          if ::aDirty[ HB_EnumIndex() ]
-            cWhere += ClipValue2SQL( ::aOldValue[ HB_EnumIndex() ], aFiled[ MYSQL_FS_TYPE ] )
+            cWhere += ClipValue2SQL( ::aOldValue[ HB_EnumIndex() ], aField[ MYSQL_FS_TYPE ] )
          else
             cWhere += ClipValue2SQL( ::aRow[ HB_EnumIndex() ], aField[ MYSQL_FS_TYPE ] )
          endif
