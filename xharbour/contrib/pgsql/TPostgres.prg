@@ -1088,18 +1088,14 @@ Return cQuery
 
 
 Static Function DataToSql(xField)
-        Local cType, result 
+        Local cType, result := 'NULL'
 
         cType := ValType(xField)
         
         if cType == "C" .or. cType == "M"
                 result := "'"+ strtran(xField, "'", ' ') + "'"
-        elseif cType == "D"
-                if Empty(xfield)
-                        result := 'NULL'
-                else                        
-                        result := "'" + StrZero(month(xField),2) + '/' + StrZero(day(xField),2) + '/' + StrZero(Year(xField),4) + "'"
-                end
+        elseif cType == "D" .and. ! Empty(xField)
+                result := "'" + StrZero(month(xField),2) + '/' + StrZero(day(xField),2) + '/' + StrZero(Year(xField),4) + "'"
         elseif cType == "N"
                 result := str(xField)
         elseif cType == "L"
