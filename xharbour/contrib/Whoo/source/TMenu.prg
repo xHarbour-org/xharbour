@@ -17,7 +17,13 @@ CLASS TMenu
    METHOD New() CONSTRUCTOR
    METHOD AddPopUp()
    METHOD Set()
-   METHOD GetItem()
+   METHOD GetItem(nId)
+   METHOD GetPos(nId)
+   METHOD Check(nId)   INLINE CheckMenuItem(  ::handle, nId, MF_BYCOMMAND + MF_CHECKED )
+   METHOD UnCheck(nId) INLINE CheckMenuItem(  ::handle, nId, MF_BYCOMMAND + MF_UNCHECKED )
+   METHOD Enable(nId)  INLINE EnableMenuItem( ::handle, nId, MF_BYCOMMAND + MF_ENABLED )
+   METHOD Disable(nId) INLINE EnableMenuItem( ::handle, nId, MF_BYCOMMAND + MF_DISABLED )
+   METHOD Gray(nId)    INLINE EnableMenuItem( ::handle, nId, MF_BYCOMMAND + MF_GRAYED )
 
 ENDCLASS
 
@@ -55,12 +61,14 @@ METHOD Set() CLASS TMenu
 *-----------------------------------------------------------------------------*
 
 METHOD GetItem( nId ) CLASS TMenu
-
    local n:= aScan( ::aItems,{|o|o:id == nId} )
-
    if n>0
       return( ::aItems[n] )
    endif
-
    return( nil )
+
+*-----------------------------------------------------------------------------*
+
+METHOD GetPos( nId ) CLASS TMenu
+   return( aScan( ::aItems,{|o|o:id == nId} ) )
 
