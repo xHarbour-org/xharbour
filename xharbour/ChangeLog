@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.979 2003/04/21 23:21:21 jonnymind Exp $
+ * $Id: ChangeLog,v 1.980 2003/04/22 08:12:48 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-04-22 10:53 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/vm/itemapi.c
+    ! Added non-finite tests for os2.gcc, and w32.rsxnt,
+      which fixes the problems that they had with evaluating str(log(-1)).
+
+      NOTE: Change borrowed from Harbour
 
 
 2003-04-22 09:53 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
