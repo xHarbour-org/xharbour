@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_gc.bat,v 1.2 2005/02/17 12:22:26 andijahja Exp $
+rem $Id: make_gc.bat,v 1.3 2005/02/17 12:41:20 andijahja Exp $
 rem
 rem Batch File For Building xHarbour with MinGW32 under Windows
 rem
@@ -21,8 +21,8 @@ rem SET xHarbour Working Root Directory Here
 rem Set up our environment for output files here
 rem Let them be like that
 @set BIN_DIR=bin\gcc
-@set OBJ_DIR=lib\gcc
-@set LIB_DIR=obj\gcc
+@set OBJ_DIR=obj\gcc
+@set LIB_DIR=lib\gcc
 
 rem Set up our BIN paths
 @set _PATH=%PATH%
