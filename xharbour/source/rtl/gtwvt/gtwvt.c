@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.125 2004/08/22 17:20:12 lf_sfnet Exp $
+ * $Id: gtwvt.c,v 1.126 2004/08/30 14:10:19 vouchcac Exp $
  */
 
 /*
@@ -196,7 +196,6 @@ static void    hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPAR
 static void    hb_wvt_gtCreateToolTipWindow( void );
 static void    hb_wvt_gtRestGuiState( LPRECT rect );
 static void    hb_wvt_gtInitGui( void );
-static void    hb_wvt_gtInitClipBoard( void );
 
 //-------------------------------------------------------------------//
 //
@@ -3671,36 +3670,34 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 {
    LPTSTR  lptstrCopy;
    HGLOBAL hglbCopy;
-   // char *  cText;
-   // int     nLen;
+
+/*  This poses problems when some other application copies a bitmap on the
+    clipboard. The only way to set text to clipboard is made possible
+    only if another application copies some text on the clipboard.
 
    if ( !IsClipboardFormatAvailable( CF_TEXT ) )
    {
      return;
    }
-
-   hb_wvt_gtInitClipBoard();
-
+*/
    if ( ! OpenClipboard( NULL ) )
    {
-     hb_retl( FALSE );
      return;
    }
    EmptyClipboard();
 
-
    // Allocate a global memory object for the text.
    //
    hglbCopy = GlobalAlloc( GMEM_MOVEABLE, ( ulSize+1 ) * sizeof( TCHAR ) );
-   if ( hglbCopy == NULL )
+   if ( ! hglbCopy )
    {
-       CloseClipboard();
+      CloseClipboard();
+      return;
    }
 
    // Lock the handle and copy the text to the buffer.
    //
    lptstrCopy = ( LPSTR ) GlobalLock( hglbCopy );
-
    memcpy( lptstrCopy, szData, ( ulSize+1 ) * sizeof( TCHAR ) );
 
    lptstrCopy[ ulSize+1 ] = ( TCHAR ) 0;    // null character
@@ -3717,56 +3714,33 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 
 ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 {
-   HGLOBAL   hglb;
-   LPTSTR    lptstr;
-   int ret;
+   HGLOBAL hglb;
+   LPTSTR  lptstr;
+   int     ret;
 
    if ( !IsClipboardFormatAvailable( CF_TEXT ) )
    {
      return 0;
    }
 
-   if (!OpenClipboard( NULL ))
+   if ( ! OpenClipboard( NULL ) )
    {
      return 0;
    }
 
-   hglb = GetClipboardData(CF_TEXT);
-   ret = 0;
-   if (hglb != NULL)
+   hglb = GetClipboardData( CF_TEXT );
+   ret  = 0;
+   if ( hglb != NULL )
    {
-      lptstr = (LPSTR) GlobalLock(hglb);
-      if (lptstr != NULL)
+      lptstr = ( LPSTR ) GlobalLock( hglb );
+      if ( lptstr != NULL )
       {
          ret = strlen( lptstr );
-         GlobalUnlock(hglb);
+         GlobalUnlock( hglb );
       }
    }
    CloseClipboard();
    return ret;
-}
-
-//-------------------------------------------------------------------//
-
-static void hb_wvt_gtInitClipBoard( void )
-{
-   if ( OpenClipboard( NULL ) )
-   {
-      LPTSTR  lptstrCopy;
-      HGLOBAL hglbCopy;
-
-      hglbCopy = GlobalAlloc( GMEM_MOVEABLE, ( 2 ) * sizeof( TCHAR ) );
-      if ( ! hglbCopy  )
-      {
-         CloseClipboard();
-      }
-      lptstrCopy = ( LPSTR ) GlobalLock( hglbCopy );
-      lptstrCopy[ 1 ] = ( TCHAR ) 0;
-
-      GlobalUnlock( hglbCopy );
-      SetClipboardData( 1, hglbCopy );
-      CloseClipboard();
-   }
 }
 
 //-------------------------------------------------------------------//

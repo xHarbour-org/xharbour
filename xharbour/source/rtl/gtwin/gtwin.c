@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.64 2004/08/30 16:51:21 mauriliolongo Exp $
+ * $Id: gtwin.c,v 1.65 2004/08/31 07:05:26 mauriliolongo Exp $
  */
 
 /*
@@ -1990,10 +1990,15 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
    // char *  cText;
    // int     nLen;
 
+/*  This poses problems when some other application copies a bitmap on the 
+    clipboard. The only way to set text to clipboard is made possible
+    only if another application copies some text on the clipboard.
+
    if ( !IsClipboardFormatAvailable( CF_TEXT ) )
    {
      return;
    }
+*/
 
    if ( ! OpenClipboard( NULL ) )
    {
