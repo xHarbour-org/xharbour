@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.17 2003/06/20 00:24:14 druzus Exp $
+# $Id: hrbdll.bc,v 1.18 2003/06/25 13:42:28 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -112,6 +112,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\gtapiu.obj \
   $(OBJ_DIR)\gx.obj \
   $(OBJ_DIR)\hardcr.obj \
+  $(OBJ_DIR)\hbbitfield.obj \
   $(OBJ_DIR)\hbffind.obj \
   $(OBJ_DIR)\idle.obj \
   $(OBJ_DIR)\inkey.obj \
@@ -454,6 +455,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\gtapiu.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\gx.obj                + >> hdll.tmp
   echo. $(OBJ_DIR)\hardcr.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbbitfield.obj        + >> hdll.tmp
   echo. $(OBJ_DIR)\hbffind.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\idle.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\inkey.obj             + >> hdll.tmp
@@ -1183,6 +1185,9 @@ $(OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hbbitfield.obj : $(RTL_DIR)\hbbitfield.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
