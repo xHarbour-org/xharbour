@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.375 2004/04/07 03:10:15 andijahja Exp $
+ * $Id: hvm.c,v 1.376 2004/04/08 13:26:54 druzus Exp $
  */
 
 /*
@@ -7778,7 +7778,7 @@ HB_FUNC( ERRORLEVEL )
    }
 }
 
-void hb_vmRequestQuit( void )
+void HB_EXPORT hb_vmRequestQuit( void )
 {
    HB_THREAD_STUB
 
@@ -7787,7 +7787,7 @@ void hb_vmRequestQuit( void )
    s_uiActionRequest = HB_QUIT_REQUESTED;
 }
 
-void hb_vmRequestEndProc( void )
+void HB_EXPORT hb_vmRequestEndProc( void )
 {
    HB_THREAD_STUB
 
@@ -7796,7 +7796,7 @@ void hb_vmRequestEndProc( void )
    s_uiActionRequest = HB_ENDPROC_REQUESTED;
 }
 
-void hb_vmRequestBreak( PHB_ITEM pItem )
+void HB_EXPORT hb_vmRequestBreak( PHB_ITEM pItem )
 {
    HB_THREAD_STUB
 
@@ -7819,14 +7819,14 @@ void hb_vmRequestBreak( PHB_ITEM pItem )
    }
 }
 
-USHORT hb_vmRequestQuery( void )
+USHORT HB_EXPORT hb_vmRequestQuery( void )
 {
    HB_THREAD_STUB
 
    return s_uiActionRequest;
 }
 
-void hb_vmRequestCancel( void )
+void HB_EXPORT hb_vmRequestCancel( void )
 {
    HB_THREAD_STUB
 
@@ -7863,7 +7863,7 @@ void hb_vmRequestCancel( void )
    }
 }
 
-void hb_vmRequestReset( void )
+void HB_EXPORT hb_vmRequestReset( void )
 {
    HB_THREAD_STUB
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.17 2004/03/17 02:29:00 druzus Exp $
+ * $Id: hbvm.h,v 1.18 2004/03/31 09:19:54 andijahja Exp $
  */
 
 /*
@@ -68,13 +68,13 @@ extern HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol );
 extern void    hb_vmSymbolInit_RT( void );   /* initialization of runtime support symbols */
 
 /* Harbour virtual machine escaping API */
-extern void    hb_vmRequestBreak( PHB_ITEM pItem );
-extern void    hb_vmRequestCancel( void );
+extern void    HB_EXPORT hb_vmRequestBreak( PHB_ITEM pItem );
+extern void    HB_EXPORT hb_vmRequestCancel( void );
 extern void    hb_vmRequestDebug( void );
-extern void    hb_vmRequestEndProc( void );
-extern USHORT  hb_vmRequestQuery( void );
-extern void    hb_vmRequestQuit( void );
-extern void    hb_vmRequestReset( void );
+extern void    HB_EXPORT hb_vmRequestEndProc( void );
+extern USHORT  HB_EXPORT hb_vmRequestQuery( void );
+extern void    HB_EXPORT hb_vmRequestQuit( void );
+extern void    HB_EXPORT hb_vmRequestReset( void );
 
 /* Return values of hb_vmRequestQuery() */
 #define HB_QUIT_REQUESTED       1   /* immediately quit the application */
