@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.25 2003/12/09 02:53:49 ronpinkas Exp $
+ * $Id: trpc.prg,v 1.26 2003/12/11 14:44:52 jonnymind Exp $
  */
 
 /*
@@ -1288,7 +1288,7 @@ METHOD Find( cName ) class tRPCService
    LOCAL oRet := NIL
 
    HB_MutexLock( ::mtxBusy )
-   nElem := AScan( ::aFunctions, {|x| cName == x:cName})
+   nElem := AScan( ::aFunctions, {|x| upper(cName) == upper(x:cName)})
    IF nElem != 0
       oRet := ::aFunctions[ nElem ]
    ENDIF
