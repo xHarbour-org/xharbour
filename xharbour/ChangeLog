@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3496 2004/10/14 17:10:55 druzus Exp $
+ * $Id: ChangeLog,v 1.3497 2004/10/14 17:51:00 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-15 00:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed seek when SOFTSEEK OFF and the first found key is
+      is out of scope range.
 
 2004-10-14 19:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

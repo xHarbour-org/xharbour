@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.164 2004/10/14 17:11:22 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.165 2004/10/14 17:51:02 druzus Exp $
  */
 
 /*
@@ -5870,7 +5870,7 @@ static ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyItm, BOO
       ulRec = hb_cdxTagKeyFind( pTag, pKey );
       if ( ( ulRec == 0 && ! fSoftSeek ) || pTag->TagEOF )
          fEOF = TRUE;
-      else if ( fSoftSeek )
+      else /* if ( fSoftSeek ) */
       {
          if ( ! hb_cdxBottomScope( pTag ) )
             fEOF = TRUE;
