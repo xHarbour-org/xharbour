@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: postgres.c,v 1.9 2004/04/26 14:55:04 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
