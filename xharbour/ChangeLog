@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3352 2004/08/27 05:54:06 paultucker Exp $
+ * $Id: ChangeLog,v 1.3353 2004/08/27 07:20:50 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-08-27 09:20 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+	* source/ct/fcopy.prg
+	  + readded to ct lib with standard xharbour copyright disclaimer and
+	    original one which made this file public domain.
+	* source/ct/Makefile
+	  + added fcopy.prg
+   * /makefile.bc
+     + added fcopy.prg
 
 2004-08-27 00:20 UTC-0800 Brian Hays <bhays@abacuslaw.com>
   * contrib/rdd_ads/ads1.c

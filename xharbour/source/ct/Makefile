@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.20 2004/08/19 01:17:26 druzus Exp $
+# $Id: Makefile,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -77,6 +77,7 @@ PRG_SOURCES= \
 	dattime2.prg \
 	dattime3.prg \
 	diskutil.prg \
+        fcopy.prg \
 	invrtwin.prg \
 	numconv.prg \
 	screen2.prg \

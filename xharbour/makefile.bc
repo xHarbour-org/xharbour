@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.103 2004/08/25 23:50:01 kaddath Exp $
+# $Id: makefile.bc,v 1.104 2004/08/27 05:42:13 paultucker Exp $
 #
 
 #
@@ -1025,6 +1025,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)\dbftools.obj \
    $(OBJ_DIR)\disk.obj \
    $(OBJ_DIR)\exponent.obj \
+   $(OBJ_DIR)\fcopy.obj \
    $(OBJ_DIR)\files.obj \
    $(OBJ_DIR)\finan.obj \
    $(OBJ_DIR)\ftoc.obj \
