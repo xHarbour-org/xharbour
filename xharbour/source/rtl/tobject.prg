@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.1.1.1 2001/12/21 10:42:08 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.2 2003/03/08 22:59:13 ronpinkas Exp $
  */
 
 /*
@@ -184,10 +184,13 @@ FUNCTION TAssociativeArray
    STATIC s_hClass
 
    IF s_hClass == NIL
-      s_hClass := __clsNew( "TASSOCIATIVEARRAY", 1, 0 )
+      s_hClass := __clsNew( "TASSOCIATIVEARRAY", 2, 0 )
 
       __clsAddMsg( s_hClass,   "$Members", 1, HB_OO_MSG_DATA, {}, HB_OO_CLSTP_HIDDEN )
       __clsAddMsg( s_hClass,  "_$Members", 1, HB_OO_MSG_DATA,   , HB_OO_CLSTP_HIDDEN )
+
+      __clsAddMsg( s_hClass,    "$Values", 2, HB_OO_MSG_DATA, {}, HB_OO_CLSTP_HIDDEN )
+      __clsAddMsg( s_hClass,   "_$Values", 2, HB_OO_MSG_DATA,   , HB_OO_CLSTP_HIDDEN )
 
       __clsAddMsg( s_hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
    ENDIF
@@ -197,7 +200,7 @@ RETURN __clsInst( s_hClass )
 STATIC FUNCTION TAssociativeArray_OnError( xParam )
 
     LOCAL cMsg := __GetMessage()
-    LOCAL aMembers := QSelf()[1]
+    LOCAL aMembers := QSelf()[1], aValues := QSelf()[2]
     LOCAL bAssign := .F.
     LOCAL nMsg
 
@@ -206,20 +209,21 @@ STATIC FUNCTION TAssociativeArray_OnError( xParam )
        cMsg := SubStr( cMsg, 2 )
     ENDIF
 
-    nMsg := aScan( aMembers, {|aMembers| aMembers[1] == cMsg } )
+    nMsg := aScan( aMembers, cMsg, , , .T. )
 
     IF nMsg = 0
        IF bAssign
-          aAdd( aMembers, { cMsg, xParam } )
+          aAdd( aMembers, cMsg )
+          aAdd( aValues, xParam )
        ELSE
           //Throw( ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
           Eval( ErrorBlock(), ErrorNew( "TAssociativeArray", 1001, cMsg, "Message Not found.", HB_aParams() ) )
        ENDIF
     ELSE
        IF bAssign
-          aMembers[nMsg][2] := xParam
+          aValues[nMsg]:= xParam
        ELSE
-          RETURN aMembers[nMsg][2]
+          RETURN aValues[nMsg]
        ENDIF
     ENDIF
 
