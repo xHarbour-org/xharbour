@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2638 2004/03/23 22:30:20 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2639 2004/03/24 02:57:48 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-24 00:30 UTC-0300 Luiz Rafael Culik Guimaraes<culikr@brturbo.com>
+  ! utils/hbmake/hbmake.prg
+    ! minor fix
+
+
+2004-03-24 00:12 UTC-0300 Luiz Rafael Culik Guimaraes<culikr@brturbo.com>
+  All changes bello by Sylvain Robert
+* contrib\hbzlib\zipnew.cpp
+  ! restore the file with revision 1.18
+
+* contrib\hbzlib\zip.c
+  ! move the change to directory logic from zipnew.cpp in hb_unzipsel() to zip.c in hb_unzipfile()
+    because it was impossible to decompress the file in/from the current directory
+  ! hb_zipfile() raise a runtime error if the 4 paramater is passed and it's not a codeblock
+  ! hb_unzipfile() change the Regex from "*.*" to "*" because file without
+    extension were ignored !
+
+* contrib\hbzlib\zipcomp.cpp
+  ! hb_compressfile() added logic to verify if the current file to add in the
+    archive file is not the current archive file to avoid infinite loop
+
+
+
 
 2004-03-24 08:45 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/tbrowse.prg
@@ -99,6 +122,12 @@
   ! source/vm/hvm.c
     ! hb_vmInit() to build on OS/2 GCC HB_Trace() call must be after EXCEPTIONREGISTRATIONRECORD
       definition, really don't know why :|
+
+2004-03-22 11:06 UTC-0300 Luiz Rafael Culik Guimaraes<culikr@brturbo.com>
+  ! contrib/hbzlib/zipnew.cpp
+  ! contrib/hbzlib/zip.c
+    ! Fixed related to change directory and not restoring on exist
+    provided by sylvain robert and fixes problem reported on news://news.xharbour.com
 
 2004-03-22 11:06 UTC-0300 Luiz Rafael Culik Guimaraes<culikr@brturbo.com>
   ! contrib/hbzlib/zipnew.cpp
