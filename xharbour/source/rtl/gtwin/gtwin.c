@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.61 2004/08/27 05:42:19 paultucker Exp $
+ * $Id: gtwin.c,v 1.62 2004/08/27 06:00:23 paultucker Exp $
  */
 
 /*
@@ -619,8 +619,13 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
            HB_GT_FUNC(mouse_Init());
         }
         else
+        {
            /* NOMOUSE */
-           SetConsoleMode( s_HInput, 0x00000 );
+           DWORD dwmode;
+
+           GetConsoleMode( s_HInput, &dwmode );
+           SetConsoleMode( s_HInput, dwmode & ~ENABLE_MOUSE_INPUT );
+        }
     }
 }
 
