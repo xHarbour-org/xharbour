@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.74 2004/02/16 16:11:20 jonnymind Exp $
+ * $Id: gtwvt.c,v 1.75 2004/02/17 18:44:15 andijahja Exp $
  */
 
 /*
@@ -70,7 +70,7 @@
 /*
 * Individual authors:
 * (C) 2003-2004 Giancarlo Niccolai <gc at niccolai dot ws>
-*         Standard xplatform GT Info system, 
+*         Standard xplatform GT Info system,
 *         Graphical object system and event system.
 *         GTINFO() And GTO_* implementation.
 */
@@ -708,7 +708,7 @@ BOOL HB_GT_FUNC( gt_SetMode( USHORT row, USHORT col ) )
          DeleteObject( hFont );
          }
       }
-      else 
+      else
       {
          hb_wvt_gtAllocSpBuffer( row, col );
       }
@@ -2136,7 +2136,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
     case WM_MBUTTONUP:
     case WM_MBUTTONDBLCLK:
     case WM_MOUSEMOVE:
-    case WM_MOUSEWHEEL:    
+    case WM_MOUSEWHEEL:
     {
        hb_wvt_gtMouseEvent( hWnd, message, wParam, lParam );
        return( 0 );
@@ -2450,19 +2450,26 @@ static BOOL hb_wvt_gtTextOut( HDC hdc,  USHORT col, USHORT row, LPCTSTR lpString
 {
   BOOL Result ;
   POINT xy;
+  RECT rClip;
+  long nFontCX = _s.PTEXTSIZE.x;
+  long nFontCY = _s.PTEXTSIZE.y;
+
 
   if ( cbString > _s.COLS ) // make sure string is not too long
   {
     cbString = _s.COLS;
   }
   xy = hb_wvt_gtGetXYFromColRow( col, row );
+  SetRect(&rClip, xy.x, xy.y, xy.x+cbString*nFontCX, xy.y+nFontCY);
   if ( _s.FixedFont )
   {
-    Result = TextOut( hdc, xy.x, xy.y, lpString, cbString );
+    Result = ExtTextOut(hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString,cbString, NULL);
+//    Result = TextOut( hdc, xy.x, xy.y, lpString, cbString );
   }
   else
   {
-    Result = ExtTextOut( hdc, xy.x, xy.y, 0, NULL, lpString, cbString, _s.FixedSize ) ;
+    Result = ExtTextOut(hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString,cbString, _s.FixedSize);
+//    Result = ExtTextOut( hdc, xy.x, xy.y, 0, NULL, lpString, cbString, _s.FixedSize ) ;
   }
   return( Result ) ;
 }
@@ -2640,7 +2647,7 @@ static void gt_hbInitStatics( void )
   _s.fontWeight       = FW_NORMAL;
   _s.fontQuality      = DEFAULT_QUALITY;
   strcpy( _s.fontFace,"Terminal" );
-  
+
   _s.LastMenuEvent    = 0;
   _s.MenuKeyEvent     = 1024;
   _s.CentreWindow     = TRUE;       // Default is to always display window in centre of screen
@@ -2851,15 +2858,15 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
         if      ( keyState == MK_LBUTTON )
         {
-           keyCode = K_MMLEFTDOWN; 
+           keyCode = K_MMLEFTDOWN;
         }
         else if ( keyState == MK_RBUTTON )
         {
-           keyCode = K_MMRIGHTDOWN; 
+           keyCode = K_MMRIGHTDOWN;
         }
         else if ( keyState == MK_MBUTTON )
         {
-           keyCode = K_MMMIDDLEDOWN; 
+           keyCode = K_MMMIDDLEDOWN;
         }
         else
         {
@@ -3345,13 +3352,13 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
          {
             *pulMaxSize = iLen;
          }
-         
+
          // still nothing ?
          if ( *pulMaxSize == 0 )
          {
             return;
          }
-         
+
          memcpy( szData, lptstr, *pulMaxSize );
          szData[*pulMaxSize] = '\0';
          GlobalUnlock(hglb);
@@ -3439,9 +3446,9 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
 {
    int iOldValue;
-   
+
    HB_SYMBOL_UNUSED( vpParam );
-   
+
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
@@ -3462,7 +3469,7 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
                  // resize the window based on new fonts
                  //
                  hb_wvt_gtResetWindowSize( _s.hWnd );
-         
+
                  // force resize of caret
                  //
                  hb_wvt_gtKillCaret();
@@ -3471,9 +3478,9 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
                DeleteObject( hFont );
             }
          }
-      return iOldValue;         
+      return iOldValue;
 
-      
+
       case GTI_FONTWIDTH:
          iOldValue = (int) _s.PTEXTSIZE.x;
          if ( bUpdate )
@@ -3481,31 +3488,31 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
             // store font status for next operation on fontsize
             _s.fontWidth = iParam;
          }
-      return iOldValue;  
+      return iOldValue;
 
-      
+
       case GTI_FONTWEIGHT:
          switch( _s.fontWeight )
-         {   
+         {
             case FW_THIN:
             case FW_EXTRALIGHT:
             case FW_LIGHT:
                iOldValue = GTI_FONTW_THIN;
             break;
-               
+
             case FW_DONTCARE:
             case FW_NORMAL:
-            case FW_MEDIUM: 
+            case FW_MEDIUM:
                iOldValue = GTI_FONTW_NORMAL;
             break;
-            
-            case FW_SEMIBOLD: 
+
+            case FW_SEMIBOLD:
             case FW_BOLD:
-            case FW_EXTRABOLD: 
+            case FW_EXTRABOLD:
             case FW_HEAVY:
                iOldValue = GTI_FONTW_BOLD;
          }
-         
+
          if ( bUpdate )
          {
             // store font status for next operation on fontsize
@@ -3513,35 +3520,35 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
             {
                case GTI_FONTW_THIN:
                   _s.fontWeight = FW_LIGHT;
-                  
+
                case GTI_FONTW_NORMAL:
                   _s.fontWeight = FW_NORMAL;
                break;
-               
+
                case GTI_FONTW_BOLD:
                   _s.fontWeight = FW_BOLD;
             }
          }
-      return iOldValue;  
+      return iOldValue;
 
-      
+
       case GTI_FONTQUALITY:
          switch( _s.fontQuality )
          {
             case ANTIALIASED_QUALITY:
                iOldValue = GTI_FONTQ_HIGH;
             break;
-           
+
             case DEFAULT_QUALITY:
             case DRAFT_QUALITY:
                iOldValue = GTI_FONTQ_NORMAL;
             break;
-            
+
             case NONANTIALIASED_QUALITY:
             case PROOF_QUALITY:
                iOldValue = GTI_FONTQ_DRAFT;
          }
-               
+
          if ( bUpdate )
          {
             switch( iParam )
@@ -3553,14 +3560,14 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
                case GTI_FONTQ_NORMAL:
                   _s.fontQuality = DEFAULT_QUALITY;
                break;
-               
+
                case GTI_FONTQ_DRAFT:
                   _s.fontQuality = DRAFT_QUALITY;
             }
          }
       return iOldValue;
-            
-                   
+
+
       case GTI_SCREENHEIGHT:
          iOldValue = _s.PTEXTSIZE.y * _s.ROWS;
          if ( bUpdate )
@@ -3568,69 +3575,69 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
             HB_GT_FUNC( gt_SetMode( iParam/_s.PTEXTSIZE.y , _s.COLS ) );
          }
       return iOldValue;
-      
-      
+
+
       case GTI_SCREENWIDTH:
          iOldValue = _s.PTEXTSIZE.x * _s.COLS;
          if ( bUpdate )
          {
             HB_GT_FUNC( gt_SetMode( _s.ROWS, iParam/_s.PTEXTSIZE.x ) );
-         }      
+         }
       return iOldValue;
-      
-      
+
+
       case GTI_DESKTOPWIDTH:
       {
          RECT rDesk;
          HWND hDesk;
-         
+
          hDesk = GetDesktopWindow();
          GetWindowRect( hDesk, &rDesk );
-         return rDesk.right - rDesk.left; 
+         return rDesk.right - rDesk.left;
       }
-   
-      
+
+
       case GTI_DESKTOPHEIGHT:
       {
          RECT rDesk;
          HWND hDesk = GetDesktopWindow();
          GetWindowRect( hDesk, &rDesk );
-         return rDesk.bottom - rDesk.top; 
+         return rDesk.bottom - rDesk.top;
       }
-           
+
       case GTI_DESKTOPCOLS:
       {
          RECT rDesk;
          HWND hDesk;
-         
+
          hDesk = GetDesktopWindow();
          GetClientRect( hDesk, &rDesk );
-         
-         return (rDesk.right - rDesk.left) / _s.PTEXTSIZE.x; 
+
+         return (rDesk.right - rDesk.left) / _s.PTEXTSIZE.x;
       }
-      
-      
+
+
       case GTI_DESKTOPROWS:
       {
          RECT rDesk;
          HWND hDesk;
-         
+
          hDesk = GetDesktopWindow();
          GetClientRect( hDesk, &rDesk );
-         
-         return (rDesk.bottom - rDesk.top) / _s.PTEXTSIZE.y; 
+
+         return (rDesk.bottom - rDesk.top) / _s.PTEXTSIZE.y;
       }
-      
+
       case GTI_INPUTFD:
          return (int) GetStdHandle( STD_INPUT_HANDLE );
-      
+
       case GTI_OUTPUTFD:
          return (int) GetStdHandle( STD_INPUT_HANDLE );
-      
+
       case GTI_ERRORFD:
          return (int) GetStdHandle( STD_ERROR_HANDLE );
    }
-   
+
    // DEFAULT: there's something wrong if we are here.
    return -1;
 }
@@ -3919,17 +3926,17 @@ HB_FUNC( WVT_GETCLIPBOARD )
 {
     HGLOBAL   hglb;
     LPTSTR    lptstr;
- 
+
     if ( !IsClipboardFormatAvailable(CF_TEXT) )
     {
       hb_ret();
     }
- 
+
     if (!OpenClipboard( NULL ))
     {
       hb_ret();
     }
- 
+
     hglb = GetClipboardData(CF_TEXT);
     if (hglb != NULL)
     {

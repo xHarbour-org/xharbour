@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.19 2004/01/27 03:06:59 ronpinkas Exp $
+ * $Id: inkey.c,v 1.20 2004/02/15 15:58:02 jonnymind Exp $
  */
 
 /*
@@ -400,7 +400,7 @@ HB_FUNC( SETINKEYBEFOREBLOCK )
   USHORT uiPCount = hb_pcount();
   if ( s_inKeyBlockBefore )
   {
-    hb_itemReturn( s_inKeyBlockBefore );
+    hb_itemReturnCopy( s_inKeyBlockBefore );
   }
   else
   {
@@ -408,13 +408,14 @@ HB_FUNC( SETINKEYBEFOREBLOCK )
   }
   if ( uiPCount > 0 )
   {
+    if ( s_inKeyBlockBefore )
+    {
+      hb_itemRelease(s_inKeyBlockBefore) ;
+      s_inKeyBlockBefore= NULL;
+    }
     if ( ISBLOCK(1) )
     {
-    s_inKeyBlockBefore = hb_itemNew( hb_param( 1, HB_IT_BLOCK ));
-    }
-    else if ( ISNIL(1) )
-    {
-      s_inKeyBlockBefore= NULL;
+      s_inKeyBlockBefore = hb_itemNew( hb_param( 1, HB_IT_BLOCK ));
     }
   }
 }
@@ -424,21 +425,22 @@ HB_FUNC( SETINKEYAFTERBLOCK )
   USHORT uiPCount = hb_pcount();
   if ( s_inKeyBlockAfter )
   {
-    hb_itemReturn( s_inKeyBlockAfter );
+    hb_itemReturnCopy( s_inKeyBlockAfter );
   }
   else
-  {
+ {
     hb_ret() ;
   }
   if ( uiPCount > 0 )
   {
+    if ( s_inKeyBlockAfter )
+    {
+      hb_itemRelease(s_inKeyBlockAfter) ;
+      s_inKeyBlockAfter= NULL;
+    }
     if ( ISBLOCK(1) )
     {
-      s_inKeyBlockAfter = hb_itemNew( hb_param( 1, HB_IT_BLOCK ) );
-    }
-    else if ( ISNIL(1) )
-    {
-      s_inKeyBlockAfter= NULL;
+      s_inKeyBlockAfter = hb_itemNew( hb_param( 1, HB_IT_BLOCK ));
     }
   }
 }
