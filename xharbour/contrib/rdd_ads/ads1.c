@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.22 2003/11/02 02:57:47 toninhofwi Exp $
+ * $Id: ads1.c,v 1.23 2003/11/03 20:09:24 brianhays Exp $
  */
 
 /*
@@ -2724,11 +2724,13 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
       case DBOI_POSITION :
          if( phIndex )
          {
-            AdsGetKeyNum  ( phIndex, ADS_RESPECTFILTERS, &pul32);
+            UNSIGNED16 usFilterOption = ( pArea->dbfi.itmCobExpr ? ADS_RESPECTFILTERS : ADS_RESPECTSCOPES ) ;
+            AdsGetKeyNum( phIndex, usFilterOption, &pul32);
          }
          else
          {
-            AdsGetRecordNum  ( pArea->hTable, ADS_RESPECTFILTERS, &pul32);
+            UNSIGNED16 usFilterOption = ( pArea->dbfi.itmCobExpr ? ADS_RESPECTFILTERS : ADS_IGNOREFILTERS ) ;
+            AdsGetRecordNum( pArea->hTable, usFilterOption, &pul32);
          }
          /*
             TODO: This count will be wrong if server doesn't know full filter!
@@ -2820,7 +2822,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          */
          if( phIndex )
          {
-            AdsGetScope  ( phIndex, ADS_BOTTOM, aucBuffer, &pusLen);
+            AdsGetScope( phIndex, ADS_BOTTOM, aucBuffer, &pusLen);
 
             if( pusLen )               /* had a scope, walk it. Skips obey filters */
             {
@@ -2829,7 +2831,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
                AdsGotoTop  ( phIndex );
                AdsAtEOF( pArea->hTable, (UNSIGNED16 *)&(pArea->fEof) );
 
-               while ( AdsSkip ( phIndex, 1 ) != AE_NO_CURRENT_RECORD && !pArea->fEof )
+               while ( AdsSkip( phIndex, 1 ) != AE_NO_CURRENT_RECORD && !pArea->fEof )
                {
                   AdsAtEOF( pArea->hTable, (UNSIGNED16 *)&(pArea->fEof) );
                   pul32++;
@@ -2839,7 +2841,8 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
             }
             else                           /*  no scope set */
             {
-               AdsGetRecordCount  ( phIndex, ADS_RESPECTFILTERS, &pul32);
+               UNSIGNED16 usFilterOption = ( pArea->dbfi.itmCobExpr ? ADS_RESPECTFILTERS : ADS_IGNOREFILTERS ) ;
+               AdsGetRecordCount( phIndex, usFilterOption, &pul32);
             }
          }
          else
@@ -3492,7 +3495,7 @@ HB_FUNC( ADSSETRELKEYPOS )
       {
          if( pArea->hOrdCurrent )
          {
-            hb_retnl(AdsSetRelKeyPos  ( pArea->hOrdCurrent, pdPos)) ;
+            hb_retnl(AdsSetRelKeyPos( pArea->hOrdCurrent, pdPos)) ;
          }
          else
          {

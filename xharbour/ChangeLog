@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1652 2003/11/04 00:31:59 lculik Exp $
+ * $Id: ChangeLog,v 1.1653 2003/11/04 08:31:01 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-04 01:55 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+    * added an optimization for ordKeyNo() and dbOrderInfo(DBOI_POSITION)
+
+  * contrib/rdd_ads/doc/en/readme.txt
+    * added a page about speed and performance issues.
+  * contrib/rdd_ads/doc/en/adsfunc.txt
+    * fixed docs for AdsGetRelKeyPos (it only operates on the current index)
+    * added docs for AdsSetRelKeyPos, AdsTestRecLocks( <lOnOff> ),
+         AdsIsExprValid(cExp) and AdsGetLastError()
+
 
 2003-11-04 09:22 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/make_tgz.sh
