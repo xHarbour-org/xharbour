@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: gtsys.c,v 1.1 2004/04/02 12:26:39 druzus Exp $
  */
 
 /*
@@ -58,25 +58,24 @@
 #  define HB_MULTI_GT
 #endif
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_NAME	NUL
+#define HB_GT_NAME      NUL
 
 #include "hbapigt.h"
 
-HB_FUNC( GTSYS )
-{
 #if defined(HB_DEFAULT_GT)
-   HB_GT_REQUEST( HB_DEFAULT_GT );
+   HB_GT_REQUEST( HB_DEFAULT_GT )
 #elif defined(HB_GT_LIB)
-   HB_GT_REQUEST( HB_GT_LIB );
+   HB_GT_REQUEST( HB_GT_LIB )
 #elif defined(HB_OS_LINUX)
-   HB_GT_REQUEST( HB_GT_CRS );
+   HB_GT_REQUEST( CRS )
 #elif defined(HB_OS_WIN_32)
-   HB_GT_REQUEST( HB_GT_WIN );
+   HB_GT_REQUEST( WIN )
 #elif defined(HB_OS_DOS)
-   HB_GT_REQUEST( HB_GT_DOS );
+   HB_GT_REQUEST( DOS )
 #elif defined(HB_OS_OS2)
-   HB_GT_REQUEST( HB_GT_OS2 );
+   HB_GT_REQUEST( OS2 )
 #else
-   HB_GT_REQUEST( HB_GT_STD );
+   HB_GT_REQUEST( STD )
 #endif
-}
+
+HB_FUNC( GTSYS ) {}

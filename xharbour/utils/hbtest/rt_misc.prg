@@ -1,5 +1,5 @@
 /*
- * $Id: rt_misc.prg,v 1.3 2003/07/16 11:12:43 andijahja Exp $
+ * $Id: rt_misc.prg,v 1.4 2004/03/03 00:07:37 druzus Exp $
  */
 
 /*
@@ -762,7 +762,7 @@ STATIC FUNCTION HB_TString()
       oClass:AddInline( "/"    , {| self, nVal  | Left( ::cValue, Len( ::cValue ) / nVal ) } )
       oClass:AddInline( "%"    , {| self, cTest | ::cValue + " % " + cTest } )
       oClass:AddInline( "^"    , {| self, cTest | ::cValue + " ^ " + cTest } )
-      oClass:AddInline( "**"   , {| self, cTest | ::cValue + " ** " + cTest } )
+      oClass:AddInline( "**"   , {| self, cTest | ::cValue + " ^ " + cTest } )
       oClass:AddInline( "!"    , {| self        | Descend( ::cValue ) } )
       oClass:AddInline( ".NOT.", {| self        | Descend( ::cValue ) } )
       oClass:AddInline( ".AND.", {| self, cTest | ::cValue + " AND " + cTest } )

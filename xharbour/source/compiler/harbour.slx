@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.47 2004/03/22 03:16:00 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.48 2004/03/28 15:12:02 likewolf Exp $
  */
 
 /*
@@ -515,7 +515,7 @@ LANGUAGE_RULES_ARE {
    #define YY_INPUT( buf, result, max_size ) result = yy_lex_input( buf, max_size );
 
 #undef CUSTOM_ACTION
-   #define CUSTOM_ACTION(x) x = hb_comp_SLX_CustomAction( x )
+   #define CUSTOM_ACTION(x) hb_comp_SLX_CustomAction( x )
 
 #undef STREAM_EXCEPTION
    #define STREAM_EXCEPTION( sPair, cChar ) \

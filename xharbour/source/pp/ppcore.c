@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.142 2004/03/20 23:24:46 druzus Exp $
+ * $Id: ppcore.c,v 1.143 2004/03/21 21:19:05 ronpinkas Exp $
  */
 
 /*
@@ -3694,6 +3694,19 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                   lens++;
                   continue;
                   /* END - Ron Pinkas added 2000-05-03 */
+               }
+               else if( **ptri=='*' && *(*ptri+1) == '*' )
+               {
+                  /* Clipper replaces ** with ^ operator */
+                  if( expreal != NULL )
+                  {
+                     *expreal++ = '^';
+                  }
+                  (*ptri) +=2;
+                  lens++;
+                  cLastChar = '^';
+                  State = STATE_EXPRES;
+                  continue;
                }
                else
                /* Ron Pinkas end 2000-06-02 */

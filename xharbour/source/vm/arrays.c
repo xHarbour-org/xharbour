@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.103 2004/04/01 22:00:42 druzus Exp $
+ * $Id: arrays.c,v 1.104 2004/04/02 04:30:51 ronpinkas Exp $
  */
 
 /*
@@ -1164,7 +1164,7 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
       hb_xfree( pItems );
 
       pBaseArray->pItems = NULL;
-      pBaseArray->ulLen = 4070707070; //Intentionally - debugging flag indicating array was explictly released.
+      pBaseArray->ulLen = 4070707070U; //Intentionally - debugging flag indicating array was explictly released.
    }
 
    HB_TRACE( HB_TR_INFO, ( "Release pBaseArray %p", pBaseArray ) );
@@ -1540,7 +1540,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pItems ) );
       hb_xfree( pBaseArray->pItems );
       pBaseArray->pItems = NULL;
-      pBaseArray->ulLen = 4171717171; //Intentionally - debugging flag indicating array was released by GC.
+      pBaseArray->ulLen = 4171717171U; //Intentionally - debugging flag indicating array was released by GC.
    }
 
    // Has to be AFTER the array elements have been released!

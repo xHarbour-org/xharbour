@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.14 2004/03/21 10:33:03 ronpinkas Exp $
+ * $Id: macro.slx,v 1.15 2004/03/22 03:16:00 ronpinkas Exp $
  */
 
 /*
@@ -238,7 +238,7 @@ LANGUAGE_RULES_ARE {
   #define ELEMENT_TOKEN(x,y) hb_macro_SLX_ElementToken(x,y)
 
 #undef CUSTOM_ACTION
-   #define CUSTOM_ACTION(x) x = hb_macro_SLX_CustomAction( x, aiHold, &iHold, (char*) sToken  )
+   #define CUSTOM_ACTION(x) hb_macro_SLX_CustomAction( x, aiHold, &iHold, (char*) sToken  )
 
 #undef LEX_USER_SETUP
    #define LEX_USER_SETUP() if( pYYLVAL == NULL ){ pYYLVAL = yylval_ptr; } HB_SYMBOL_UNUSED( pMacro );
