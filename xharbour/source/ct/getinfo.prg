@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: getinfo.prg,v 1.2 2004/12/02 13:25:53 aleytys Exp $
  */
 /*
  * xHarbour Project source code:
@@ -66,14 +66,8 @@ FUNCTION SaveGets()
 RETURN aGetList
 
 FUNCTION RestGets( aGetList )
-  LOCAL lSuccess := .T.
-  TRY
-    GetList := aGetList
-  CATCH oErr
-    lSucess := .F.
-  END
 
-RETURN lSuccess
+RETURN ( GetList := aGetList ) <> NIL
 */
 
 FUNCTION CountGets()
