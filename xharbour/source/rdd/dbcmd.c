@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.60 2003/11/27 00:39:01 lculik Exp $
+ * $Id: dbcmd.c,v 1.61 2003/11/30 10:02:46 druzus Exp $
  */
 
 /*
@@ -2388,10 +2388,10 @@ HB_FUNC( DBUSEAREA )
    }
 
  /* Convert FileName accoring to Sets (_SET_DIRCASE,_SET_FILECASE,_SET_DIRSEPARATOR) */
-   szTempFile = hb_filecase( hb_strdup( ( char * ) szFileName ) );
+   szTempFile = (char *) hb_filecase( hb_strdup( szFileName ) );
 
    pFileName = hb_fsFNameSplit( szTempFile );
-   
+
    hb_xfree( szTempFile );
 
    szAlias[0] = '\0';

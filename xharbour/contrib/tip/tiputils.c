@@ -4,16 +4,20 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tiputils.prg,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
+* $Id: tiputils.c,v 1.1 2003/12/01 00:19:40 jonnymind Exp $
 ************************************************/
 
 #include "hbapi.h"
 #include <time.h>
 
+#ifdef _MSC_VER
+   #include <windows.h>
+#endif
+
 /************************************************************
 * Useful internet timestamp based on RFC822
 */
-         
+
 HB_FUNC( TIP_TIMESTAMP )
 {
    PHB_ITEM pDate = hb_param( 2, HB_IT_DATE );
@@ -22,7 +26,7 @@ HB_FUNC( TIP_TIMESTAMP )
    char szDate[9];
    struct tm tmTime;
 
-   char *szRet = hb_xgrab( 48 );
+   char *szRet = (char *) hb_xgrab( 48 );
 
    #if defined( HB_OS_WIN_32 )
    if ( !pDate )
