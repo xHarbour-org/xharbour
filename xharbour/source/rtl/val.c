@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.14 2004/02/11 21:18:45 andijahja Exp $
+ * $Id: val.c,v 1.15 2004/02/12 22:00:26 andijahja Exp $
  */
 
 /*
@@ -104,11 +104,16 @@ double HB_EXPORT hb_strVal( const char * szText, ... )
 
    dResult = atof( szText );
 
+#if 0
    // Maybe -0.00
+   /* AJ: Commented 2004-02-16 because it seems that minus zero problem
+      has been dissapread even without this hack
+   */
    if( dResult == -0.00 )
    {
       dResult = 0.0;
    }
+#endif
 
    //printf( "String: >%s< Val:%f\n", szText, dResult );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: rt_math.prg,v 1.4 2004/02/09 02:29:28 andijahja Exp $
+ * $Id: rt_math.prg,v 1.5 2004/02/11 04:02:54 druzus Exp $
  */
 
 /*
@@ -255,6 +255,9 @@ FUNCTION Main_MATH()
 
    // AJ: Added 2004-02-09
    TEST_LINE( Round(val("-0.12"),0)           , 0                )
+   // AJ: Added 2004-02-16
+   TEST_LINE( 0 * - 1                          , 0                )
+
    /* VAL() */
    // The followings are MIN and MAX of LONGLONG and ULONGLONG
    TEST_LINE( val( "9223372036854775807") , 9223372036854775807 )

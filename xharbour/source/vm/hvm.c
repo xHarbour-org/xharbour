@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.321 2004/02/14 01:29:45 andijahja Exp $
+ * $Id: hvm.c,v 1.322 2004/02/14 21:01:18 andijahja Exp $
  */
 
 /*
@@ -3588,9 +3588,14 @@ static void hb_vmMult( void )
       double d2 = hb_vmPopDouble( &iDec2 );
       double d1 = hb_vmPopDouble( &iDec1 );
 
+#if 0
+      /* AJ: Commented 2004-02-16 because it seems that minus zero problem
+      has been dissapread even without this hack
+      */
       if ( ( d1 * d2 ) == -0 )
          hb_vmPushNumType( 0, iDec1 + iDec2, iType1, iType2 );
       else
+#endif
          hb_vmPushNumType( d1 * d2, iDec1 + iDec2, iType1, iType2 );
    }
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMult" ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.12 2004/02/01 22:52:07 likewolf Exp $
+ * $Id: files.c,v 1.13 2004/02/15 12:08:22 lculik Exp $
  */
 
 /*
@@ -178,7 +178,14 @@ static USHORT osToHarbourMask(  USHORT usMask  )
    return usRetMask;
 }
 
-
+#if defined( _MSC_VER )
+   #if !defined( DIRECTORY )
+      #define DIRECTORY 0x08
+   #endif
+   #if !defined( DRIVE )
+      #define DRIVE     0x10
+   #endif
+#endif
 
 HB_FUNC( FILEATTR )
 {
@@ -1047,7 +1054,7 @@ HB_FUNC( FILEDELETE )
       if( ( ffind = hb_fsFindFirst( ( const char *)pDirSpec, uiAttr ) ) != NULL )
       {
 
-         if( (fname = hb_fsFNameSplit( pDirSpec )) !=NULL )
+         if( (fname = hb_fsFNameSplit( (char*) pDirSpec )) !=NULL )
          {
            if( (fname && DRIVE)==1 )
                hb_fsChDrv( ( BYTE ) fname->szDrive );
