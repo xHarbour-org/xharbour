@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.37 2005/01/09 01:41:06 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.38 2005/03/08 17:47:01 mauriliolongo Exp $
  */
 
 /*
@@ -504,9 +504,13 @@ RETURN QSelf()
 //---------------------------------------------------------------------------//
 STATIC Function Reset()
 
-   LOCAL xProperty
+   LOCAL xProperty, nProperties := Len( QSelf() ) - CLASS_PROPERTIES
 
    FOR EACH xProperty IN QSelf()
+      IF HB_EnumIndex() > nProperties
+         EXIT
+      ENDIF
+
       IF HB_IS_CStructure( xProperty )
          xProperty:Reset()
       ELSE
