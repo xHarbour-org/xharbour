@@ -9903,7 +9903,7 @@ RETURN xRet
 
 #ifdef __XHARBOUR__
 //--------------------------------------------------------------//
-FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
+FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
 
    LOCAL bErrHandler, oError, xRet
    LOCAL aProcedure, bPreset, aPresetProcedures
@@ -9933,7 +9933,23 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
       #endif
 	 ENDIF
 
-   bErrHandler := ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
+   IF bScriptProc
+      PP_ExecProcedure( s_aProcedures, aScan( aProcedures, {|aProc| aProc[1] == cExp } ) )
+
+      IF bPreset
+         s_aProcedures := aPresetProcedures
+
+         #ifdef __XHARBOUR__
+            #ifdef DYN
+               PP_ReleaseDynProcedures( nPresetDyn )
+            #endif
+         #endif
+      ENDIF
+
+      RETURN s_xRet
+   ElSE
+      bErrHandler := ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
+   ENDIF
 
    TRY
       IF HB_IsArray( aParams )

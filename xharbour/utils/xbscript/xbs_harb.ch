@@ -253,7 +253,7 @@
 
   //----------------------------------------------------------------------------//
   #ifdef __XHARBOUR__
-    METHOD EvalExpression( cExp, aParams ) CLASS  TInterpreter
+    METHOD EvalExpression( cExp, aParams, nLine, bScriptProc ) CLASS  TInterpreter
 
        LOCAL bErrHandler := ErrorBlock( {|e| Break(e) } ), xRet
 
@@ -271,7 +271,7 @@
           ENDIF
           cExp := Upper( cExp )
           //Alert( "EvalExp: " + cExp )
-          xRet := PP_Eval( cExp, aParams, ::aCompiledProcs )
+          xRet := PP_Eval( cExp, aParams, ::aCompiledProcs, nLine, bScriptProc )
        RECOVER USING xRet
           // xRet will be returned below.
        END SEQUENCE
@@ -2103,6 +2103,8 @@
            if( iProcedures == 0 )
            {
               TraceLog( NULL, "*** EMPTY *** PP_GENDYNPROCEDURES()\n" );
+              hb_retnl( iBase );
+              return;
            }
 
            //TraceLog( NULL, "PP_GenDynProcedures() %i %i\n", iBase, iProcedures );
