@@ -22,7 +22,17 @@
 #define SQL_FLOAT                       6
 #define SQL_REAL                        7
 #define SQL_DOUBLE                      8
-#define SQL_VARCHAR                     12
+#define SQL_DATE                             9
+#define SQL_TIME                            10
+#define SQL_TIMESTAMP                       11
+#define SQL_VARCHAR                         12
+#define SQL_BIT                             -7
+#define SQL_LONGVARCHAR                     -1
+#define SQL_LONGVARBINARY                   -4
+#define SQL_BIGINT                          -5
+#define SQL_TINYINT                         -6
+
+#define SQL_NVARCHAR 		                 -9
 
 #define SQL_TYPE_NULL                   0
 #define SQL_TYPE_MIN                                    SQL_BIT

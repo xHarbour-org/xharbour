@@ -1,5 +1,5 @@
 /*
- * $Id: todbc.prg,v 1.1 2003/03/29 22:38:11 lculik Exp $
+ * $Id: todbc.prg,v 1.2 2003/06/20 19:14:45 mlombardo Exp $
  */
 /*
  * Harbour Project source code:
@@ -379,7 +379,6 @@ METHOD Open() CLASS TODBC
                      @ nColSize, @nDecimals, @nNul )
 
          aadd( ::Fields, TODBCField():New() )
-
          ::Fields[ len( ::Fields ) ] :FieldID   := i
          ::Fields[ len( ::Fields ) ] :FieldName := cColName
          ::Fields[ len( ::Fields ) ] :DataSize  := nNameLen
@@ -388,20 +387,23 @@ METHOD Open() CLASS TODBC
          ::Fields[ len( ::Fields ) ] :AllowNull := ( nNul != 0 )
 
       NEXT
+      
 
       // Do we cache recordset?
       IF ::lCacheRS
         ::aRecordSet:={}
-
         WHILE ::Fetch( SQL_FETCH_NEXT, 1 ) == SQL_SUCCESS
+
           aCurRow :={}
           FOR i := 1 TO nCols
+        
             aadd(aCurRow,::Fields[i]:value)
           NEXT
           aadd(::aRecordSet,aCurRow)
         END
 
         ::nRecCount := len(::aRecordSet)
+    
       ENDIF
 
       // Newly opened recordset - we are on first row
@@ -504,6 +506,7 @@ METHOD Fetch( nFetchType, nOffset ) CLASS TODBC
      // Change Recno according to nFetchType and nOffset
      DO CASE
        CASE nFetchType == SQL_FETCH_NEXT
+
          IF ( ::nRecNo == ::nRecCount )
            nResult := SQL_NO_DATA_FOUND
          ELSE
@@ -518,7 +521,7 @@ METHOD Fetch( nFetchType, nOffset ) CLASS TODBC
            nResult := SQL_SUCCESS
            nPos := ::nRecNo - 1
          ENDIF
-
+       
        CASE nFetchType == SQL_FETCH_FIRST
          nResult := SQL_SUCCESS
          nPos := 1
@@ -548,11 +551,13 @@ METHOD Fetch( nFetchType, nOffset ) CLASS TODBC
      ENDCASE
 
    ELSE           // apearently we don't have
-     nResult := SQLFetchSc( ::hStmt, nFetchType, nOffSet )
+     nResult := SQLFetch( ::hStmt /*, nFetchType, nOffSet */)
+       
    ENDIF
 
    IF nResult == SQL_SUCCESS .or. nResult == SQL_SUCCESS_WITH_INFO
       nResult := SQL_SUCCESS
+
       ::LoadData(nPos)
       ::lBof := .F.
    ELSE
@@ -680,12 +685,13 @@ METHOD eof() CLASS TODBC
    LOCAL lResult := .F.
 
    // Do we have any data in recordset?
+   
    if ::nRecCount > 0
       lResult := ( ::nRecNo > ::nRecCount )
    else
       lResult := .T.
    endif
-
+   
 RETURN ( lResult )
 
 /*-----------------------------------------------------------------------*/
@@ -721,21 +727,56 @@ RETURN ( ::nRecCount )
 
 METHOD LoadData(nPos) CLASS TODBC
 
-   LOCAL xRet
+   LOCAL uData
    LOCAL i
+   local nType
 
    FOR i := 1 TO len( ::Fields )
 
-     xRet := space( 64 )
+     uData := space( 64 )
      IF ::lCacheRS .AND. ::Active
         IF nPos > 0 .and. nPos <= ::nRecCount
-          xRet := ::aRecordSet[ nPos,i ]
+          uData := ::aRecordSet[ nPos,i ]
         ENDIF
      ELSE
-        SQLGetData( ::hStmt, ::Fields[ i ]:FieldID, SQL_CHAR, len( xRet ), @xRet )
+     
+        SQLGetData( ::hStmt, ::Fields[ i ]:FieldID, SQL_CHAR, len( uData ), @uData)
+
      ENDIF
-     ::Fields[ i ] :Value := xRet
-   NEXT
+     nType := ::Fields[ i ]:DataType
+
+     do case
+     case nType == SQL_LONGVARCHAR
+        uData := AllTrim( uData )
+
+     case nType == SQL_CHAR .or. nType == SQL_VARCHAR .or. nType == SQL_NVARCHAR
+        uData := PadR( uData, ::Fields[ i ]:DataSize )
+
+     case nType == SQL_TIMESTAMP .or. nType == SQL_DATE
+        uData := stod( substr(uData,1,4) + substr(uData,6,2) + substr(uData,9,2) )
+
+     case nType == SQL_BIT .or. nType == SQL_SMALLINT
+        uData = Val( uData ) == 1
+
+     case  nType == SQL_NUMERIC;
+         .or. nType == SQL_DECIMAL;
+         .or. nType == SQL_DOUBLE;
+         .or. nType == SQL_INTEGER;
+         .or. nType == SQL_INTEGER;
+         .or. nType == SQL_FLOAT;
+         .or. nType == SQL_REAL
+         IF VALTYPE(UDATA) =="C" 
+            udata := strtran(uData,",",".")
+            uData := Round( Val(uData), ::Fields[ i ]:DataSize )
+         ENDIF      
+            uData := SetNumLen( uData, ::Fields[ i ]:DataSize ,::Fields[ i ]:DataDecs   )
+       
+     endcase
+     
+   ::Fields[ i ]:Value := uData
+   
+   next
+   
 
 RETURN ( NIL )
 

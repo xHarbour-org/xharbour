@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.8 2003/07/22 16:16:24 mlombardo Exp $
+ * $Id: odbc.c,v 1.9 2003/09/29 14:56:49 mlombardo Exp $
  */
 
 /*
@@ -419,6 +419,10 @@ HB_FUNC( SQLCOMMIT ) // hEnv, hDbc
 HB_FUNC( SQLROLLBACK )  // hEnv, hDbc
 {
    hb_retni( SQLTransact( ( HENV ) hb_parnl( 1 ), ( HDBC ) hb_parnl( 2 ), SQL_ROLLBACK ) );
+}
+HB_FUNC( SETNUMLEN )  /* SETNUMLEN( nValue, nSize, nDecimals ) ==> nValue (nSize, nDec) */
+{
+   hb_retnlen( hb_parnd( 1 ), hb_parnl( 2 ), hb_parnl( 3 ) );
 }
 
 #endif
