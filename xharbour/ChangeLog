@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3168 2004/07/19 16:11:48 lculik Exp $
+ * $Id: ChangeLog,v 1.3169 2004/07/19 20:58:40 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-19 15:54 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/valtype.c
+    ! Fixed HB_ISNULL() to prevent loosing of similar-but-not-the-same
+      item types (i.e. MEMO as STRING type).
+
 2004-07-20 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rtl/filesys.c
     - hb_fsRename() changed to respect SET( HB_SET_FILECASE/DIRCASE )

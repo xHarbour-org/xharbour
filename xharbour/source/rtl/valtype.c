@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.8 2003/12/21 03:21:45 walito Exp $
+ * $Id: valtype.c,v 1.9 2003/12/24 13:08:21 walito Exp $
  */
 
 /*
@@ -170,19 +170,21 @@ HB_FUNC( HB_ISNULL )
 
    if( pItem )
    {
-       switch( pItem->type )
-       {
-          case HB_IT_STRING:
-             hb_retl( pItem->item.asString.length == 0 );
-             return;
-          case HB_IT_ARRAY :
-             hb_retl( pItem->item.asArray.value->ulLen == 0 );
-             return;
-          case HB_IT_HASH :
-             hb_retl( hb_hashLen( pItem ) == 0 );
-             return;
-       }
+      if( HB_IS_STRING( pItem ) )
+      {
+         hb_retl( pItem->item.asString.length == 0 );
+         return;
+      }
+      else if( HB_IS_ARRAY( pItem ) )
+      {
+         hb_retl( pItem->item.asArray.value->ulLen == 0 );
+         return;
+      }
+      else if( HB_IS_HASH( pItem ) )
+      {
+         hb_retl( hb_hashLen( pItem ) == 0 );
+         return;
+      }
    }
-
    hb_errRT_BASE_SubstR( EG_ARG, 1111, NULL, "HB_ISNULL", 1, hb_paramError( 1 ) );
 }
