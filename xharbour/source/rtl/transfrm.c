@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.28 2004/03/05 13:26:04 andijahja Exp $
+ * $Id: transfrm.c,v 1.29 2004/03/11 13:43:29 andijahja Exp $
  */
 
 /*
@@ -221,6 +221,7 @@ HB_FUNC( TRANSFORM )
          BOOL bAnyPic = FALSE;
          BOOL bFound  = FALSE;
 
+#if 0
          /* ================================================================= */
          /* HACKS !                                                           */
          /* To solve Transform ( "1234567890", "@9" )                         */
@@ -241,7 +242,7 @@ HB_FUNC( TRANSFORM )
             szPic = szPicNew;
             ulPicLen = strlen( szPic );
          }
-
+#endif
          /* Grab enough */
          /* Support date function for strings */
          if( ( uiPicFlags & PF_DATE ) ||
@@ -530,7 +531,7 @@ HB_FUNC( TRANSFORM )
 
          dValue = hb_itemGetND( pValue );
          hb_itemGetNLen( pValue, &iOrigWidth, &iOrigDec );
-
+#if 0
          /* ================================================================= */
          /* HACKS !                                                           */
          /* To solve Transform ( 1234567890, "@9" )                           */
@@ -551,7 +552,7 @@ HB_FUNC( TRANSFORM )
             szPic = szPicNew;
             ulPicLen = strlen( szPic );
          }
-
+#endif
          /* Support date function for numbers */
          if( uiPicFlags & PF_DATE )
          {
