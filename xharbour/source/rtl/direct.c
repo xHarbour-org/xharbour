@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.9 2003/12/05 04:52:25 ronpinkas Exp $
+ * $Id: direct.c,v 1.10 2004/01/17 17:52:59 lculik Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ HB_FUNC( DIRECTORY )
 {
    PHB_ITEM  pDirSpec = hb_param( 1, HB_IT_STRING );
    PHB_ITEM  pAttributes = hb_param( 2, HB_IT_STRING );
-   BYTE *    szDirSpec = NULL;
+   BYTE *    szDirSpec;
    USHORT    uiMask;
 
 /*
