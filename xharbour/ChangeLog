@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3686 2004/12/19 19:47:45 kaddath Exp $
+ * $Id: ChangeLog,v 1.3687 2004/12/20 09:34:45 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-20 14:40 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/codepage/Makefile
+    ! Fixed separator (some systems don't like spaces between file
+      name and backslash)
+  * source/ct/files.c
+    ! Changes to HP-UX
+  * include/inet.h
+    ! HP-UX needs XOPEN_SOURCE_EXTENDED defined.
+  * source/rtl/filesys.c
+    ! Hack to fdatasync() prototype in HP-UX
 
 2004-12-20 10:32 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/gtos2/gtos2.c

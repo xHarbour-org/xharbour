@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.125 2004/11/08 18:50:17 paultucker Exp $
+ * $Id: filesys.c,v 1.126 2004/11/21 21:44:18 druzus Exp $
  */
 
 /*
@@ -170,6 +170,11 @@
 #if defined(__MPW__)
    #include <fcntl.h>
 #endif
+
+#if defined(HB_OS_HPUX)
+   extern int fdatasync(int fildes);
+#endif
+
 #if defined(HB_OS_DOS)
    #include <dos.h>
 #endif

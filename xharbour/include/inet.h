@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.21 2003/11/11 20:20:53 ronpinkas Exp $
+* $Id: inet.h,v 1.22 2003/11/28 16:10:50 jonnymind Exp $
 */
 
 /*
@@ -71,6 +71,11 @@
 
          extern char *hstrerror( int i );
       #else
+
+         #if defined( HB_OS_HPUX )
+            #define _XOPEN_SOURCE_EXTENDED
+         #endif
+
          #define HB_SOCKET_T int
          #include <unistd.h>
          #include <sys/types.h>
