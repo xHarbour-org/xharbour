@@ -1,0 +1,205 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETFCREATE()
+ *  $CATEGORY$
+ *      CT3 file functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SETFCREATE([<nNewFileAttr>]) --> <nOldFileAttr>
+ *  $ARGUMENTS$
+ *      <nNewFileAttr> - a file attribute for a new file
+ *  $RETURNS$
+ *      Returns the current default attribute or the previous file
+ *      attribute, if the parameter is specified.
+ *  $DESCRIPTION$
+ *      Default attribute for creating with CA-Clipper Tools functions
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is strfile.c, library is hbbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      CSETSAFETY()
+ *  $CATEGORY$
+ *      CT3 file functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      CSETSAFETY([<lNewSwitch>]) --> <lOldSwitch>
+ *  $ARGUMENTS$
+ *      <lNewSwitch> Designates whether existing files should not be
+ *     overwritten during CA-Clipper Tools file operations.
+ *     Designates .F. for yes; .T. for no.
+ *  $RETURNS$
+ *      Returns the current setting for the CA-Clipper Tools safety
+ *      mode switch; or if <lNewSwitch> is passed, the previous setting.
+ *  $DESCRIPTION$
+ *      Queries/sets the safety mode switch
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is strfile.c, library is hbbct.
+ *  $SEEALSO$
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      STRFILE()
+ *  $CATEGORY$
+ *      CT3 file functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      STRFILE(<cCharacterstring>, <cFile>, [<lOverwrite>],
+ *              [<nOffset>], [<lCutOff>]) --> nRecordedByte
+ *  $ARGUMENTS$
+ *   <cCharacterstring>  Designates the character string to write to a file.
+ *   <cFile>  Designates a file name.  Drive and path designations
+ *     are permitted, but no wildcards.
+ *   <lOverwrite>  If not designated or designated as .F., determines
+ *     whether or not a new file is created.  When .T., it writes to an
+ *     existing file.  The default is create new file (.F.).
+ *   <nOffset>  Designates an offset within the file from which the
+ *   <cCharacterstring> string is to be written.  The default is End of file.
+ *   <lCutOff>  When this optional parameter is designated as .T., the
+ *     function truncates the file if data written ends before the last file
+ *     byte.  The default is no cut off (.F.).
+ *  $RETURNS$
+ *      Returns the actual number of bytes written.
+ *  $DESCRIPTION$
+ *      Writes a string to a file
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is strfile.c, library is hbbct.
+ *  $SEEALSO$
+ *      FILESTR()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      FILESTR()
+ *  $CATEGORY$
+ *      CT3 file functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      FILESTR(<cFile>, [<nLength>], [<nOffset>], [<lCtrl_Z>]) -->
+ *              cCharacterstring
+ *  $ARGUMENTS$
+ *   <cFile>  Designates the file from which a string is read.
+ *   <nLength>  Designates how many characters you want to read from a
+ *     file (up to a maximum of 65520 bytes).  The default is read all
+ *     characters.
+ *   <nOffset>  Designates an offset within the file from which the
+ *   <nLength> characters or the rest of the file, are read.  The default is
+ *     from the first character (0).
+ *   <lCtrl_Z>  If this parameter is designated as .T., only data up to
+ *     the first Ctrl_Z is read in.  The default is read all data (.F.).
+ *  $RETURNS$
+ *      Returns the string read in from the designated file.
+ *  $DESCRIPTION$
+ *      Reads a portion of a file into a string
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is strfile.c, library is hbbct.
+ *  $SEEALSO$
+ *      STRFILE()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SCREENFILE()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SCREENFILE(<cFileName>, [<lOverwrite>], [<nOffset>]), [<lTrim>] -->
+ *                 nBytesWritten
+ *  $ARGUMENTS$
+ *   <cFileName>  Designates the name and path of the screen file.
+ *   <lOverwrite>  Designates whether you are to append to an existing
+ *     file (.T.), or to overwrite it (.F.).  The default is overwrite (.F.).
+ *   <nOffset>  Designates the file offset from which you append, when
+ *   <lOverwrite> is designated as .T..  The default is the end of file.
+ *   <lTrim>  If this optional parameter is designated as .T., the
+ *     function trims the file when the written data ends and before the last
+ *     byte of the file.  The default is do not trim (.F.).
+ *  $RETURNS$
+ *      Returns the number of bytes written to the screen file.
+ *  $DESCRIPTION$
+ *      Writes screen content to a file
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is strfile.c, library is hbbct.
+ *  $SEEALSO$
+ *      FILESCREEN()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      FILESCREEN()
+ *  $CATEGORY$
+ *      CT3 video functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      FILESCREEN(<cFileName>, [<nOffset>]) --> nByte
+ *  $ARGUMENTS$
+ *   <cFileName>  Designates the name and path of the screen file.
+ *   <nOffset>  Designates from which part of the file offset the screen
+ *     is to be read.  The default is the beginning of file.
+ *  $RETURNS$
+ *      Returns the number of bytes read.
+ *  $DESCRIPTION$
+ *      Reads screen content from a file
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is strfile.c, library is hbbct.
+ *  $SEEALSO$
+ *      SCREENFILE()
+ *  $END$
+ */

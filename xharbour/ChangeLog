@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3635 2004/11/26 21:58:14 druzus Exp $
+ * $Id: ChangeLog,v 1.3637 2004/11/28 18:00:00 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-28 23:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  + source/ct/strfile.c
+    + added: SETFCREATE(), CSETSAFETY(), STRFILE(), FILESTR(),
+             SCREENFILE(), FILESCREEN() functions
+
+  * makefile.bc
+  * makefile.nt
+  * makefile.vc
+  * makefile.wc
+  * hrbdll.bc
+  * hrbdll.vc
+  * hrbdll.wc
+  * source/ct/Makefile
+    + Added support for source/ct/strfile.c
+
+  + tests/cttest/strfile.prg
+    + added tests for STRFILE(), FILESTR(),
+                      SCREENFILE(), FILESCREEN() functions
+  * tests/cttest/Makefile
+    + Added support for tests/cttest/strfile.prg
+
+  + doc/en/ct/strfile.txt
+    + Added documentation for functions from source/ct/strfile.c
 
 2004-11-26 21:58 UTC+0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/gtwin/gtwin.c

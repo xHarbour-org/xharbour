@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2004/08/25 17:03:01 lf_sfnet Exp $
+# $Id: Makefile,v 1.3 2004/11/28 18:00:00 ptsarenko Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -78,6 +78,7 @@ PRG_SOURCES=\
 	rangerepl.prg \
 	setatlik.prg \
 	strdiff.prg \
+	strfile.prg \
 	tab.prg \
 	token.prg \
 	token2.prg \

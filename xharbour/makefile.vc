@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.128 2004/11/10 15:23:46 paultucker Exp $
+# $Id: makefile.vc,v 1.130 2004/11/28 18:00:00 ptsarenko Exp $
 #
 
 #
@@ -1141,6 +1141,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\setclear.obj \
    $(OBJ_DIR)$(MT)\settime.obj \
    $(OBJ_DIR)$(MT)\strdiff.obj \
+   $(OBJ_DIR)$(MT)\strfile.obj \
    $(OBJ_DIR)$(MT)\strswap.obj \
    $(OBJ_DIR)$(MT)\tab.obj \
    $(OBJ_DIR)$(MT)\token1.obj \

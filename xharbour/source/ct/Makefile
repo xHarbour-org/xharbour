@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.9 2004/11/14 15:29:12 aleytys Exp $
+# $Id: Makefile,v 1.11 2004/11/28 18:00:00 ptsarenko Exp $
 #
 
 ROOT = ../../
@@ -60,6 +60,7 @@ C_SOURCES = \
    setclear.c \
    settime.c \
    strdiff.c \
+   strfile.c \
    strswap.c \
    tab.c \
    token1.c \
