@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.181 2004/10/22 16:48:00 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.182 2004/10/25 17:30:05 ronpinkas Exp $
  */
 
 /*
@@ -867,12 +867,9 @@ int hb_pp_ParseDirective( char * sLine )
      }
 
      szExpandedLine[0] = '\0';
-     hb_pp_ParseExpression( sLine, szExpandedLine );
 
-     if( szExpandedLine[0] )
-     {
-        sLine = szExpandedLine;
-     }
+     pTemp = sLine;
+     hb_pp_ParseExpression( pTemp, szExpandedLine );
 
      ParseIf( sLine ); /* --- #if  --- */
   }
@@ -930,12 +927,8 @@ int hb_pp_ParseDirective( char * sLine )
             }
 
            szExpandedLine[0] = '\0';
-           hb_pp_ParseExpression( sLine, szExpandedLine );
-
-           if( szExpandedLine[0] )
-           {
-              sLine = szExpandedLine;
-           }
+           pTemp = sLine;
+           hb_pp_ParseExpression( pTemp, szExpandedLine );
 
            hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = CalcConstant( &sLine ) ? 1 : 0;
         }
@@ -988,18 +981,14 @@ int hb_pp_ParseDirective( char * sLine )
   {
      if( i >= 4 && i <= 7 && memcmp( sDirective, "INCLUDE", i ) == 0 )
      {    /* --- #include --- */
-        char cDelimChar;
+        char cDelimChar, *pTemp;
 
         if( *sLine != '\"' && *sLine != '\'' && *sLine != '<' )
         {
            // Ron Pinkas added Oct-16-2004 to allow support of #defines #translates etc.
            szExpandedLine[0] = '\0';
-           hb_pp_ParseExpression( sLine, szExpandedLine );
-
-           if( szExpandedLine[0] )
-           {
-              sLine = szExpandedLine;
-           }
+           pTemp = sLine;
+           hb_pp_ParseExpression( pTemp, szExpandedLine );
 
            if( *sLine != '\"' && *sLine != '\'' && *sLine != '<' )
            {

@@ -1,5 +1,5 @@
 /*
- * $Id: pplib.c,v 1.6 2004/10/22 02:40:35 ronpinkas Exp $
+ * $Id: pplib.c,v 1.7 2004/10/23 12:02:09 druzus Exp $
  */
 
 /*
@@ -250,11 +250,11 @@ HB_FUNC( __PREPROCESS )
          HB_SKIPTABSPACES( ptr );
 
          if( !hb_pp_topDefine )
-            hb_pp_Table();
-         if( hb_pp_ParseExpression( ptr, pOut ) > 0 )
          {
-            /* Some error here? */
+            hb_pp_Table();
          }
+
+         hb_pp_ParseExpression( ptr, pOut );
 
          hb_retc( pText ); /* Preprocessor returns parsed line in input buffer */
       }
