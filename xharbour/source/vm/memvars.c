@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.66 2004/03/08 22:15:37 andijahja Exp $
+ * $Id: memvars.c,v 1.67 2004/03/18 04:05:28 ronpinkas Exp $
  */
 
 /*
@@ -688,35 +688,23 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
    * again this detached variable.
    */
 
-   if( --pValue->counter <= 0 )
+   if( pValue->counter > 0 )
    {
-      if( HB_IS_STRING( &pValue->item ) )
-      {
-         hb_itemReleaseString( &pValue->item );
-      }
-      else if( HB_IS_ARRAY( &pValue->item ) )
-      {
-         #ifndef HB_ARRAY_USE_COUNTER
-            if( pValue->item.item.asArray.value )
-            {
-               hb_arrayReleaseHolderGarbage( pValue->item.item.asArray.value, &pValue->item );
-            }
-         #endif
-      }
-      else if( HB_IS_COMPLEX( &pValue->item ) )
-      {
-         hb_itemClear( &pValue->item );
-      }
+   	  if( --pValue->counter == 0 )
+   	  {
+   	     if( HB_IS_STRING( &pValue->item ) )
+   	     {
+   	        hb_itemReleaseString( &pValue->item );
+   	     }
 
-      pValue->item.type = HB_IT_NIL;
+   	     #ifndef HB_THREAD_SUPPORT
+   	        hb_memvarRecycle( hValue );
+   	     #else
+   	        hb_memvarRecycleMT( hValue, &HB_VM_STACK );
+   	     #endif
 
-      #ifndef HB_THREAD_SUPPORT
-         hb_memvarRecycle( hValue );
-      #else
-         hb_memvarRecycleMT( hValue, &HB_VM_STACK );
-      #endif
-
-      HB_TRACE(HB_TR_INFO, ("Memvar item (%i) deleted", hValue));
+   	     HB_TRACE(HB_TR_INFO, ("Memvar item (%i) deleted", hValue));
+   	  }
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.9 2004/02/03 00:43:25 ronpinkas Exp $
+ * $Id: hbinit.h,v 1.10 2004/02/17 18:44:12 andijahja Exp $
  */
 
 /*
@@ -165,7 +165,7 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_CALL_ON_STARTUP_END( func ) \
           _HB_CALL_ON_STARTUP_END( func )
 
-   #define _HB_CALL_ON_STARTUP_END( func ) return 1; } \
+   #define _HB_CALL_ON_STARTUP_END( func ) return 0; } \
       static int static_int_##func = func();
 
 #elif defined(__WATCOMC__)

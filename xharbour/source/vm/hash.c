@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.29 2004/02/25 03:31:59 mlombardo Exp $
+ * $Id: hash.c,v 1.30 2004/03/18 14:39:55 jonnymind Exp $
  */
 
 /*
@@ -1563,13 +1563,52 @@ BOOL HB_EXPORT hb_hashRelease( PHB_ITEM pHash )
    }
 }
 
-
 /* This releases hash when called from the garbage collector */
 HB_GARBAGE_FUNC( hb_hashReleaseGarbage )
 {
    PHB_BASEHASH pBaseHash = ( PHB_BASEHASH ) Cargo;
    HB_TRACE( HB_TR_INFO, ( "hb_hashReleaseGarbage( %p )", pBaseHash ) );
-   hb_hashReleaseBase( pBaseHash );
+
+   if( pBaseHash->ulLen > 0 )
+   {
+      PHB_ITEM pKey = pBaseHash->pKeys;
+      PHB_ITEM pValue = pBaseHash->pValues;
+      ULONG ulLen = pBaseHash->ulLen;
+
+      while( ulLen-- )
+      {
+         HB_TRACE( HB_TR_INFO, ( "Hash Key %p, Value %p, type:%i", pKey, pValue, pValue->type ) );
+
+		 // All other complex items will be released directly bt the GC.
+         if( HB_IS_STRING( pValue ) )
+         {
+            hb_itemReleaseString( pValue );
+         }
+
+		 // All other complex items will be released directly bt the GC.
+         if( HB_IS_STRING( pKey ) )
+         {
+            hb_itemReleaseString( pKey );
+         }
+
+         pKey++;
+         pValue++;
+      }
+   }
+
+   if ( pBaseHash->pKeys )
+   {
+      HB_TRACE( HB_TR_INFO, ( "Release pKeys %p", pBaseHash->pKeys ) );
+      hb_xfree( pBaseHash->pKeys );
+      pBaseHash->pKeys = NULL;
+
+      HB_TRACE( HB_TR_INFO, ( "Release pValues %p", pBaseHash->pValues ) );
+      hb_xfree( pBaseHash->pValues );
+      pBaseHash->pValues = NULL;
+   }
+
+   HB_TRACE( HB_TR_INFO, ( "Release pBaseHash %p", pBaseHash ) );
+   hb_gcFree( ( void * ) pBaseHash );
 }
 
 PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pKeys, PHB_ITEM pHash )

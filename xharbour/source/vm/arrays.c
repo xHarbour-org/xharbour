@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.96 2004/03/18 04:05:27 ronpinkas Exp $
+ * $Id: arrays.c,v 1.97 2004/03/18 14:39:55 jonnymind Exp $
  */
 
 /*
@@ -1636,66 +1636,26 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
    if( pBaseArray->pItems )
    {
-      PHB_ITEM pItems = pBaseArray->pItems, pItem;
+      PHB_ITEM pItem;
       ULONG ulLen = pBaseArray->ulLen;
 
-      // HACK! Avoid possible recursion problem when one of the items in turn points to this Array.
-      pBaseArray->pItems = (PHB_ITEM) 1;
-
-      pItem = pItems;
+      pItem = pBaseArray->pItems;
 
       while( ulLen-- )
       {
          HB_TRACE( HB_TR_INFO, ( "Array Item %p type:%i", pItem, pItem->type ) );
 
-          /*-----------------12/21/2001 8:01PM----------------
-           * The item is not released because it was not
-           * allocated by the GC, its just a portion of the
-           * pItems chunk, which will be released as one piece.
-           * --------------------------------------------------*/
+		 // All other complex types will be released directly by the GC.
          if( HB_IS_STRING( pItem ) )
          {
             hb_itemReleaseString( pItem );
-         }
-         else if( HB_IS_ARRAY( pItem ) )
-         {
-            #ifdef HB_ARRAY_USE_COUNTER
-               if( pItem->item.asArray.value == pBaseArray )
-               {
-                  // Cyclic!
-               }
-               else
-               {
-                  /*
-                   * We do NOT need to process arrays, because they will be directly released by GC if not refernced.
-                  hb_itemClear( pItem );
-                  */
-               }
-            #else
-               if( pItem->item.asArray.value )
-               {
-                  hb_arrayReleaseHolderGarbage( pItem->item.asArray.value, pItem );
-               }
-            #endif
-         }
-         else if( HB_IS_MEMVAR( pItem ) )
-         {
-            hb_memvarValueDecGarbageRef( pItem->item.asMemvar.value );
-         }
-         else if( HB_IS_COMPLEX( pItem ) )
-         {
-            /*
-             * Avoid cyclic problems like a code block refernce in this array, may have been released already as garbage!.
-             * If we attemp to refernce it here, we might get a GPF. If it's not refernce elsewhere it will be released anyway.
-            hb_itemClear( pItem );
-             */
          }
 
          ++pItem;
       }
 
       HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pItems ) );
-      hb_xfree( pItems );
+      hb_xfree( pBaseArray->pItems );
       pBaseArray->pItems = NULL;
    }
 
