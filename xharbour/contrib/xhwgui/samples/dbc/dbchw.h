@@ -1,0 +1,110 @@
+#define IDM_ABOUT      1000
+#define IDM_NEW        1001
+#define IDM_OPEN       1002
+#define IDM_CLOSE      1003
+#define IDM_PRINT      1004
+#define IDM_CONFIG     1005
+#define IDM_FONT       1006
+#define IDM_EXIT       1007
+
+#define IDM_INDSEL     1011
+#define IDM_INDNEW     1012
+#define IDM_INDOPEN    1013
+#define IDM_INDCLOSE   1014
+
+#define IDM_FIELMOD    1022
+#define IDM_FIELEDIT   1023
+
+#define IDM_LOCATE     1031
+#define IDM_CONTIN     1032
+#define IDM_SEEK       1033
+#define IDM_FILTER     1034
+#define IDM_GOTO       1035
+
+#define  IDM_REPLACE   1041
+#define  IDM_DELETE    1042
+#define  IDM_RECALL    1043
+#define  IDM_COUNT     1044
+#define  IDM_SUM       1045
+#define  IDM_APPFROM   1046
+#define  IDM_COPYTO    1047
+#define  IDM_REINDEX   1048
+#define  IDM_PACK      1049
+#define  IDM_ZAP       1050
+#define  IDM_SCRIPT    1051
+#define  IDM_MEMO      1052
+#define  IDM_SETREL    1053
+
+#define  IDM_VIEWOPEN  1061
+#define  IDM_VIEWSAVE  1062
+
+#define IDM_QUENEW     1071
+#define IDM_QUEOPEN    1072
+#define IDM_QUEEDIT    1073
+
+#define IDM_CALCUL     1081
+#define IDM_DSCRIPT    1082
+
+#define IDM_TILE       1091
+#define IDM_CASCADE    1092
+
+#define IDC_EDIT1	116
+#define IDC_COMBOBOX3	117
+#define IDC_CHECKBOX4	112
+#define IDC_CHECKBOX5	113
+#define IDC_CHECKBOX6	114
+#define IDC_GROUPBOX1	115
+#define IDC_RADIOBUTTON1	118
+#define IDC_RADIOBUTTON2	119
+#define IDC_GROUPBOX2	120
+#define IDC_RADIOBUTTON3	121
+#define IDC_RADIOBUTTON4	122
+#define IDC_RADIOBUTTON5	123
+#define IDC_TEXT1	24
+
+#define IDC_EDIT2	101
+#define IDC_CHECKBOX1	102
+#define IDC_EDIT3	103
+#define IDC_EDIT4	104
+#define IDC_CHECKBOX2	105
+#define IDC_EDIT5	106
+#define IDC_TEXT2	107
+
+#define ID_BROWSE	110
+
+#define IDC_TEXTHEAD	101
+#define IDC_EDIT6	102
+#define IDC_TEXTMSG	110
+
+#define IDC_COMBOBOX1	101
+#define IDC_EDIT7	102
+#define IDC_GROUPBOX3	103
+#define IDC_RADIOBUTTON6	104
+#define IDC_RADIOBUTTON7	105
+#define IDC_RADIOBUTTON8	106
+#define IDC_EDITRECN	111
+#define IDC_EDITFOR	107
+
+#define IDC_EDITQUERY   101
+#define IDC_BTNEXEC	102
+#define IDC_BTNSAVE	103
+
+#define IDC_EDITCALC	101
+
+#define IDC_EDIT8	101
+#define IDC_PUSHBUTTON1	102
+#define IDC_OWNB1	108
+#define IDC_BMP1	109
+
+#define IDC_COMBOBOX2	102
+#define IDC_PUSHBUTTON2	106
+#define IDC_PUSHBUTTON3	107
+#define IDC_PUSHBUTTON4	108
+#define IDC_PUSHBUTTON5	109
+
+#define IDC_BUTTONBRW   101
+#define IDC_EDITDWITH   107
+#define IDC_GROUPBOX4	108
+#define IDC_RADIOBUTTON9	109
+#define IDC_RADIOBUTTON10	110
+#define IDC_RADIOBUTTON11	112

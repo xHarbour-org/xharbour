@@ -1,0 +1,231 @@
+# $Id: makefile.gcc,v 1.3 2003/12/01 12:57:38 lculik Exp $
+# makefile for MINGW compiler
+# Building of libhwgui.a - Harbour Win32 GUI library
+
+HRB_DIR = d:/harbour
+INC_DIR = include
+OBJ_DIR = obj
+LIB_DIR = lib
+SRC_DIR = source
+CFLAGS = -Wall -mno-cygwin -O3 -mcpu=pentium
+
+all: \
+   $(LIB_DIR)/libhwgui.a \
+   $(LIB_DIR)/libprocmisc.a \
+   $(LIB_DIR)/libhwg_qhtm.a
+
+$(LIB_DIR)/libhwgui.a : \
+   $(OBJ_DIR)/commond.o \
+   $(OBJ_DIR)/control.o \
+   $(OBJ_DIR)/dialog.o \
+   $(OBJ_DIR)/draw.o \
+   $(OBJ_DIR)/drawtext.o \
+   $(OBJ_DIR)/freeimg.o \
+   $(OBJ_DIR)/media_c.o \
+   $(OBJ_DIR)/menu_c.o \
+   $(OBJ_DIR)/message.o \
+   $(OBJ_DIR)/misc.o \
+   $(OBJ_DIR)/registry.o \
+   $(OBJ_DIR)/resource.o \
+   $(OBJ_DIR)/richedit.o \
+   $(OBJ_DIR)/shellapi.o \
+   $(OBJ_DIR)/wbrowse.o \
+   $(OBJ_DIR)/window.o \
+   $(OBJ_DIR)/wprint.o \
+   $(OBJ_DIR)/drawwidg.o \
+   $(OBJ_DIR)/errorsys.o \
+   $(OBJ_DIR)/guimain.o \
+   $(OBJ_DIR)/hbrowse.o \
+   $(OBJ_DIR)/hcheck.o \
+   $(OBJ_DIR)/hcombo.o \
+   $(OBJ_DIR)/hcontrol.o \
+   $(OBJ_DIR)/hdatepic.o \
+   $(OBJ_DIR)/hdialog.o \
+   $(OBJ_DIR)/hedit.o \
+   $(OBJ_DIR)/hfreeimg.o \
+   $(OBJ_DIR)/hfrmtmpl.o \
+   $(OBJ_DIR)/hgraph.o \
+   $(OBJ_DIR)/hownbtn.o \
+   $(OBJ_DIR)/hpanel.o \
+   $(OBJ_DIR)/hprinter.o \
+   $(OBJ_DIR)/hprogres.o \
+   $(OBJ_DIR)/hradio.o \
+   $(OBJ_DIR)/hriched.o \
+   $(OBJ_DIR)/hsayimg.o \
+   $(OBJ_DIR)/hsplit.o \
+   $(OBJ_DIR)/htab.o \
+   $(OBJ_DIR)/htimer.o \
+   $(OBJ_DIR)/htree.o \
+   $(OBJ_DIR)/hupdown.o \
+   $(OBJ_DIR)/hwindow.o \
+   $(OBJ_DIR)/menu.o \
+   $(OBJ_DIR)/video.o \
+   $(OBJ_DIR)/tmci.o \
+   $(OBJ_DIR)/repexec.o
+	ar rc $@ $^
+
+$(OBJ_DIR)/control.o  : $(SRC_DIR)/control.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/commond.o  : $(SRC_DIR)/commond.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/dialog.o   : $(SRC_DIR)/dialog.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/draw.o     : $(SRC_DIR)/draw.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/drawtext.o : $(SRC_DIR)/drawtext.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/freeimg.o : $(SRC_DIR)/freeimg.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/media_c.o   : $(SRC_DIR)/media_c.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/menu_c.o   : $(SRC_DIR)/menu_c.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/message.o  : $(SRC_DIR)/message.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/misc.o  : $(SRC_DIR)/misc.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/registry.o : $(SRC_DIR)/registry.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/resource.o : $(SRC_DIR)/resource.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/richedit.o  : $(SRC_DIR)/richedit.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/shellapi.o : $(SRC_DIR)/shellapi.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/wbrowse.o  : $(SRC_DIR)/wbrowse.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/window.o   : $(SRC_DIR)/window.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/wprint.o   : $(SRC_DIR)/wprint.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+
+$(OBJ_DIR)/errorsys.o : $(OBJ_DIR)/errorsys.c
+$(OBJ_DIR)/hdialog.o  : $(OBJ_DIR)/hdialog.c
+$(OBJ_DIR)/hwindow.o  : $(OBJ_DIR)/hwindow.c
+$(OBJ_DIR)/hcontrol.o : $(OBJ_DIR)/hcontrol.c
+$(OBJ_DIR)/hedit.o    : $(OBJ_DIR)/hedit.c
+$(OBJ_DIR)/hcheck.o   : $(OBJ_DIR)/hcheck.c
+$(OBJ_DIR)/hradio.o   : $(OBJ_DIR)/hradio.c
+$(OBJ_DIR)/hcombo.o   : $(OBJ_DIR)/hcombo.c
+$(OBJ_DIR)/hdatepic.o : $(OBJ_DIR)/hdatepic.c
+$(OBJ_DIR)/hupdown.o  : $(OBJ_DIR)/hupdown.c
+$(OBJ_DIR)/hsayimg.o  : $(OBJ_DIR)/hsayimg.c
+$(OBJ_DIR)/hsplit.o   : $(OBJ_DIR)/hsplit.c
+$(OBJ_DIR)/htab.o     : $(OBJ_DIR)/htab.c
+$(OBJ_DIR)/htimer.o   : $(OBJ_DIR)/htimer.c
+$(OBJ_DIR)/htree.o    : $(OBJ_DIR)/htree.c
+$(OBJ_DIR)/hriched.o  : $(OBJ_DIR)/hriched.c
+$(OBJ_DIR)/guimain.o  : $(OBJ_DIR)/guimain.c
+$(OBJ_DIR)/menu.o     : $(OBJ_DIR)/menu.c
+$(OBJ_DIR)/video.o    : $(OBJ_DIR)/video.c
+$(OBJ_DIR)/tmci.o     : $(OBJ_DIR)/tmci.c
+$(OBJ_DIR)/hbrowse.o  : $(OBJ_DIR)/hbrowse.c
+$(OBJ_DIR)/hownbtn.o  : $(OBJ_DIR)/hownbtn.c
+$(OBJ_DIR)/hpanel.o   : $(OBJ_DIR)/hpanel.c
+$(OBJ_DIR)/hprinter.o : $(OBJ_DIR)/hprinter.c
+$(OBJ_DIR)/hprogres.o : $(OBJ_DIR)/hprogres.c
+$(OBJ_DIR)/drawwidg.o : $(OBJ_DIR)/drawwidg.c
+$(OBJ_DIR)/repexec.o  : $(OBJ_DIR)/repexec.c
+$(OBJ_DIR)/hfreeimg.o : $(OBJ_DIR)/hfreeimg.c
+$(OBJ_DIR)/hfrmtmpl.o : $(OBJ_DIR)/hfrmtmpl.c
+$(OBJ_DIR)/hgraph.o   : $(OBJ_DIR)/hgraph.c
+
+$(OBJ_DIR)/errorsys.c   : $(SRC_DIR)/errorsys.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hdialog.c    : $(SRC_DIR)/hdialog.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hwindow.c    : $(SRC_DIR)/hwindow.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hcontrol.c   : $(SRC_DIR)/hcontrol.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hedit.c      : $(SRC_DIR)/hedit.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hcheck.c     : $(SRC_DIR)/hcheck.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hradio.c     : $(SRC_DIR)/hradio.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hcombo.c     : $(SRC_DIR)/hcombo.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hdatepic.c   : $(SRC_DIR)/hdatepic.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hupdown.c    : $(SRC_DIR)/hupdown.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hsayimg.c    : $(SRC_DIR)/hsayimg.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hsplit.c     : $(SRC_DIR)/hsplit.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/htab.c       : $(SRC_DIR)/htab.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/htimer.c     : $(SRC_DIR)/htimer.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/htree.c      : $(SRC_DIR)/htree.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hriched.c    : $(SRC_DIR)/hriched.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/guimain.c    : $(SRC_DIR)/guimain.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/menu.c       : $(SRC_DIR)/menu.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/video.c       : $(SRC_DIR)/video.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/tmci.c       : $(SRC_DIR)/tmci.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hbrowse.c    : $(SRC_DIR)/hbrowse.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hownbtn.c    : $(SRC_DIR)/hownbtn.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hpanel.c     : $(SRC_DIR)/hpanel.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hprinter.c   : $(SRC_DIR)/hprinter.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hprogres.c   : $(SRC_DIR)/hprogres.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/drawwidg.c   : $(SRC_DIR)/drawwidg.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/repexec.c    : $(SRC_DIR)/repexec.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hfreeimg.c   : $(SRC_DIR)/hfreeimg.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hfrmtmpl.c   : $(SRC_DIR)/hfrmtmpl.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/hgraph.c     : $(SRC_DIR)/hgraph.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+
+$(LIB_DIR)/libprocmisc.a : \
+   $(OBJ_DIR)/arr2str.o \
+   $(OBJ_DIR)/blowfish.o \
+   $(OBJ_DIR)/procini.o \
+   $(OBJ_DIR)/procs7.o \
+   $(OBJ_DIR)/procscri.o
+	ar rc $@ $^
+
+$(OBJ_DIR)/arr2str.o  : $(SRC_DIR)/procmisc/arr2str.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/blowfish.o : $(SRC_DIR)/procmisc/blowfish.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+$(OBJ_DIR)/procini.o  : $(OBJ_DIR)/procini.c
+$(OBJ_DIR)/procs7.o   : $(OBJ_DIR)/procs7.c
+$(OBJ_DIR)/procscri.o : $(OBJ_DIR)/procscri.c
+
+$(OBJ_DIR)/procini.c    : $(SRC_DIR)/procmisc/procini.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/procs7.c     : $(SRC_DIR)/procmisc/procs7.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+$(OBJ_DIR)/procscri.c   : $(SRC_DIR)/procmisc/procscri.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+
+$(LIB_DIR)/libhwg_qhtm.a : $(OBJ_DIR)/hqhtm.o $(OBJ_DIR)/hwg_qhtm.o
+	ar rc $@ $^
+
+$(OBJ_DIR)/hqhtm.c    : $(SRC_DIR)/qhtm/hqhtm.prg
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+
+#$(OBJ_DIR)/hqhtm.o  : $(OBJ_DIR)/hqhtm.c
+$(OBJ_DIR)/hwg_qhtm.o  : $(SRC_DIR)/qhtm/hwg_qhtm.c
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^
+
+.prg.c:
+	$(HRB_DIR)/bin\harbour.exe $^ -n -w -I$(HRB_DIR)/include -i$(INC_DIR) -d__WINDOWS__ -o$@ $^
+
+.c.o:
+	gcc $(CFLAGS) -c -I$(INC_DIR) -I$(HRB_DIR)/include -o $@ $^

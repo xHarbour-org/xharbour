@@ -1,0 +1,25 @@
+FUNCTION Form1
+LOCAL oDlg
+
+/* Designer: declaration of controls */
+   INIT DIALOG oDlg TITLE "Form1" ;
+        AT 79,146 SIZE 500,302
+   @ 72,15 SAY "Номер:" SIZE 55,22 STYLE SS_RIGHT 
+   @ 130,15 EDITBOX "" SIZE 41,24 
+   @ 21,39 SAY "Наименование:" SIZE 108,22 
+   @ 130,39 EDITBOX "" SIZE 248,24 
+   @ 130,63 EDITBOX "" SIZE 87,24 
+   @ 130,87 EDITBOX "" SIZE 80,24 
+   @ 64,63 SAY "Баланс:" SIZE 63,22 STYLE SS_RIGHT 
+   @ 64,87 SAY "Код:" SIZE 63,22 STYLE SS_RIGHT 
+   @ 60,172 EDITBOX "" SIZE 420,24 
+   @ 60,196 EDITBOX "" SIZE 420,24 
+   @ 60,220 EDITBOX "" SIZE 420,24 
+   @ 92,129 BUTTON "Маска для начислений" SIZE 166,25 
+   @ 78,260 BUTTON "Ok" SIZE 80,32 
+   @ 196,260 BUTTON "Отмена" SIZE 80,32 
+   @ 24,172 SAY "Q3=" SIZE 34,22 STYLE SS_RIGHT 
+   @ 4,196 SAY "Сумма=" SIZE 54,22 STYLE SS_RIGHT 
+   @ 23,220 SAY "Q1=" SIZE 34,22 STYLE SS_RIGHT 
+   ACTIVATE DIALOG oDlg
+RETURN

@@ -1,0 +1,13 @@
+// Print users
+Private aUsers
+  aResult := DoSql( "Select host,user From user" )
+  if aResult[1] == 0
+     if OpenReport( "userprn.rpt","users" )
+        PrintReport()
+        MsgInfo( "Done!","Script result" )
+     else
+        MsgStop( "Can't open report" )
+     endif
+  else
+     MsgStop( "Error executing query" )
+  endif

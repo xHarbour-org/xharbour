@@ -1,0 +1,1 @@
+d:\harbour\bin\harbour %1 /n /gh /I..\include
