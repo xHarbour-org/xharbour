@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.8 2002/05/30 04:07:15 walito Exp $
+ * $Id: tbrowse.prg,v 1.9 2002/06/21 20:44:46 walito Exp $
  */
 
 /*
@@ -1310,10 +1310,10 @@ METHOD DispCell( nColumn, nColor ) CLASS TBrowse
 
    do case
    case cType $ "CM"
-      DispOut( PadL(Transform(ftmp, cPict), nWidth ), cColor )
+      DispOut( PadR(Transform(ftmp, cPict), nWidth ), cColor )
 
    case cType == "N"
-      DispOut( PadR(Transform(ftmp, cPict), nWidth ), cColor )
+      DispOut( PadL(Transform(ftmp, cPict), nWidth ), cColor )
 
    case cType == "D"
       cPict := iif(cPict == "", "@D", cPict)
