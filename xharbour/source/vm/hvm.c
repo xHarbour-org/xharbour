@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.393 2004/05/10 21:19:10 andijahja Exp $
+ * $Id: hvm.c,v 1.394 2004/05/11 01:22:41 druzus Exp $
  */
 
 /*
@@ -2740,7 +2740,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                hb_vmPush( hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "SWITCH", 1, pTop ) );
             }
 
-            w += 5;
+            w += 1 + sizeof( LONG );
             break;
          }
 
