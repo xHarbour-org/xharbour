@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.133 2004/05/20 13:53:12 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.134 2004/05/21 13:33:49 druzus Exp $
  */
 
 /*
@@ -4140,10 +4140,15 @@ static void hb_cdxTagGoBottom( LPCDXTAG pTag )
  */
 static void hb_cdxTagSkipNext( LPCDXTAG pTag )
 {
+   BOOL fPos = CURKEY_RAWPOS( pTag );
+
    if ( pTag->CurKey->rec != 0 )
    {
       if ( !hb_cdxTopScope( pTag ) )
+      {
+         fPos = FALSE;
          hb_cdxTagGoTop( pTag );
+      }
       else
          hb_cdxTagKeyRead( pTag, NEXT_RECORD );
    }
@@ -4152,7 +4157,7 @@ static void hb_cdxTagSkipNext( LPCDXTAG pTag )
       pTag->CurKey->rec = 0;
       pTag->TagEOF = TRUE;
    }
-   else
+   else if ( fPos )
    {
       pTag->rawKeyPos++;
       CURKEY_SETRAWPOS( pTag );
@@ -4164,8 +4169,13 @@ static void hb_cdxTagSkipNext( LPCDXTAG pTag )
  */
 static void hb_cdxTagSkipPrev( LPCDXTAG pTag )
 {
+   BOOL fPos = CURKEY_RAWPOS( pTag );
+
    if ( pTag->CurKey->rec == 0 )
+   {
+      fPos = FALSE;
       hb_cdxTagGoBottom( pTag );
+   }
    else
       hb_cdxTagKeyRead( pTag, PREV_RECORD );
 
@@ -4174,7 +4184,7 @@ static void hb_cdxTagSkipPrev( LPCDXTAG pTag )
       hb_cdxTagGoTop( pTag );
       pTag->TagBOF = TRUE;
    }
-   else
+   else if ( fPos )
    {
       pTag->rawKeyPos--;
       CURKEY_SETRAWPOS( pTag );
@@ -5121,20 +5131,20 @@ static LONG hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
          PHB_ITEM pRecNo;
          ULONG ulRec;
          USHORT uiTag;
-         LPDBRELINFO lpdbRelations;
+//         LPDBRELINFO lpdbRelations;
 
          uiTag = pArea->uiTag;
          pArea->uiTag = hb_cdxGetTagNumber( pArea, pTag );
          /* remove relations when skiping: it's faster and resolve problem
           * when child can repos on skip */
-         lpdbRelations = pArea->lpdbRelations;
-         pArea->lpdbRelations = NULL;
-   
+//         lpdbRelations = pArea->lpdbRelations;
+//         pArea->lpdbRelations = NULL;
+
          pRecNo = hb_itemPutNL( NULL, 0 );
          SELF_RECNO( ( AREAP ) pArea, pRecNo );
          ulRec = hb_itemGetNL( pRecNo );
          hb_itemRelease( pRecNo );
-   
+
          SELF_GOTOP( ( AREAP ) pArea );
          while ( !pArea->fEof )
          {
@@ -5143,7 +5153,7 @@ static LONG hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
          }
          SELF_GOTO( ( AREAP ) pArea, ulRec );
          /* restore relations and current order */
-         pArea->lpdbRelations = lpdbRelations;
+//         pArea->lpdbRelations = lpdbRelations;
          pArea->uiTag = uiTag;
          if ( pTag )
          {
@@ -5235,15 +5245,17 @@ static LONG hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
          PHB_ITEM pRecNo;
          ULONG ulRec;
          USHORT uiTag;
-         LPDBRELINFO lpdbRelations;
-   
+//         LPDBRELINFO lpdbRelations;
+
+         /* TODO !!!: check for EOF and current filter */
+
          uiTag = pArea->uiTag;
          pArea->uiTag = hb_cdxGetTagNumber( pArea, pTag );
          /* remove relations when skiping: it's faster and resolve problem
           * when child can repos on skip */
-         lpdbRelations = pArea->lpdbRelations;
-         pArea->lpdbRelations = NULL;
-   
+//         lpdbRelations = pArea->lpdbRelations;
+//         pArea->lpdbRelations = NULL;
+
          pRecNo = hb_itemPutNL( NULL, 0 );
          SELF_RECNO( ( AREAP ) pArea, pRecNo );
          ulRec = hb_itemGetNL( pRecNo );
@@ -5255,7 +5267,7 @@ static LONG hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
          } while ( !( ( AREAP ) pArea )->fBof );
          SELF_GOTO( ( AREAP ) pArea, ulRec );
          /* restore relations and current order */
-         pArea->lpdbRelations = lpdbRelations;
+//         pArea->lpdbRelations = lpdbRelations;
          pArea->uiTag = uiTag;
          if ( pTag )
          {
@@ -5328,8 +5340,11 @@ static LONG hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
                }
             }
          }
-         pTag->rawKeyPos = lKeyNo;
-         CURKEY_SETRAWPOS( pTag );
+         if ( lKeyNo != 0 )
+         {
+            pTag->rawKeyPos = lKeyNo;
+            CURKEY_SETRAWPOS( pTag );
+         }
       }
       hb_cdxIndexUnLockRead( pTag->pIndex );
    }
@@ -5350,6 +5365,7 @@ static LONG hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
 static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, BOOL fFilters )
 {
    ERRCODE retval;
+   ULONG ulKeyCnt = ulKeyNo;
 
    /* TODO: what with deleted flag? */
    if ( fFilters && ! pArea->dbfi.itmCobExpr )
@@ -5362,14 +5378,17 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
       USHORT uiTag = pArea->uiTag;
       pArea->uiTag = hb_cdxGetTagNumber( pArea, pTag );
       retval = SELF_GOTOP( ( AREAP ) pArea );
-      while ( !pArea->fEof && --ulKeyNo )
+      while ( !pArea->fEof && --ulKeyCnt )
          retval = SELF_SKIP( ( AREAP ) pArea, 1 );
       pArea->uiTag = uiTag;
+      if ( pTag && pArea->fPositioned )
+      {
+         pTag->logKeyPos = ulKeyNo;
+         CURKEY_SETLOGPOS( pTag );
+      }
    }
    else if ( pTag )
    {
-      ULONG ulKeyCnt = ulKeyNo;
-
       hb_cdxIndexLockRead( pTag->pIndex );
       if ( pTag->topScopeKey || pTag->bottomScopeKey || pTag->UsrUnique )
       {
@@ -5458,14 +5477,15 @@ static ERRCODE hb_cdxGoBottom( CDXAREAP pArea )
    retval = SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
 
    if ( retval != FAILURE && pArea->fPositioned )
+   {
       retval = SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
 
-   if ( CURKEY_LOGCNT( pTag ) )
-   {
-      pTag->logKeyPos = pTag->logKeyCount;
-      CURKEY_SETLOGPOS( pTag );
+      if ( CURKEY_LOGCNT( pTag ) && pArea->fPositioned )
+      {
+         pTag->logKeyPos = pTag->logKeyCount;
+         CURKEY_SETLOGPOS( pTag );
+      }
    }
-
    hb_cdxIndexUnLockRead( pTag->pIndex );
 
    return retval;
@@ -5602,15 +5622,15 @@ static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip )
       {
          if ( pArea->fEof )
          {
-            if ( lToSkip == 1 && ulPos != 0 && !CURKEY_LOGCNT( pTag ) )
+            if ( lToSkip == 1 && ulPos && !CURKEY_LOGCNT( pTag ) )
             {
                pTag->logKeyCount = ulPos;
                pTag->curKeyState |= CDX_CURKEY_LOGCNT;
             }
          }
-         else
+         else if ( ulPos )
          {
-            pTag->logKeyPos += lToSkip;
+            pTag->logKeyPos += lToSkip - ( ulPos ? 0 : 1 );
             pTag->logKeyRec = pArea->ulRecNo;
          }
       }
@@ -5619,9 +5639,9 @@ static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip )
          pTag->logKeyPos = 1;
          CURKEY_SETLOGPOS( pTag );
       }
-      else
+      else if ( ulPos )
       {
-         pTag->logKeyPos += lToSkip;
+         pTag->logKeyPos += lToSkip + ( ulPos ? 0 : 1 );
          pTag->logKeyRec = pArea->ulRecNo;
       }
    }
