@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.253 2002/05/25 18:31:10 lculik Exp $
+ * $Id: ChangeLog,v 1.254 2002/05/26 00:01:13 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-30 00:55 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tbrowse.prg
+    + Add two instance variables, nRow and nCol. Existing in Clipper 5.3.
+      Only was modified the Hilite and SetPos method, for save in
+      this variables, the position of cursor.
 
 2002-05-25 21:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tget.prg
