@@ -20,7 +20,7 @@
 #include "dbedit.ch"
 
 Function Main()
-Local aCols := {{"PadR(AllTrim(FIRST)+' '+AllTrim(LAST),30)", {|x| IIf(SALARY<10000, {3,2}, IIf(SALARY<100000,{1,2},{4,5}))}},;
+   Local aCols := {{"PadR(AllTrim(FIRST)+' '+AllTrim(LAST),30)", {|x| IIf(FIELD->SALARY<10000, {3,2}, IIf(FIELD->SALARY<100000,{1,2},{4,5}))}},;
                 "CITY",;
                 "SALARY"}
 
@@ -33,6 +33,7 @@ Local aCols := {{"PadR(AllTrim(FIRST)+' '+AllTrim(LAST),30)", {|x| IIf(SALARY<10
 Return Nil
 
 Function TstFnc(nMode, nCol, oTBR)
+LOCAL GetList := {}
 Local nRet := DE_CONT
 
   Do Case

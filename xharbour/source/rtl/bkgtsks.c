@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.1 2003/12/19 01:41:11 fsgiudice Exp $
+ * $Id: bkgtsks.c,v 1.2 2003/12/19 16:14:01 jonnymind Exp $
  */
 
 /*
@@ -202,7 +202,7 @@ ULONG hb_backgroundAddFunc( PHB_ITEM pBlock )
    }
    else
    {
-      return ( ULONG ) pBlock->item.asArray.value;    /* TODO: access to pointers from harbour code */
+      return ( ULONG ) pBlock->item.asBlock.value;    /* TODO: access to pointers from harbour code */
    }
 }
 
