@@ -1,5 +1,5 @@
 /*
- * $Id: TComponent.prg,v 1.4 2002/11/05 21:39:58 what32 Exp $
+ * $Id: TComponent.prg,v 1.5 2002/11/08 02:51:37 ronpinkas Exp $
  */
 
 /*
@@ -72,7 +72,8 @@ CLASS TComponent FROM TPersistent
    METHOD GetTypeInfo            VIRTUAL   // PROTECTED
    METHOD GetTypeInfoCount       VIRTUAL   // PROTECTED
    METHOD HasParent              VIRTUAL
-   METHOD InsertComponent
+   METHOD InsertComponent( oComponent )
+   METHOD Insert( oComponent )
    METHOD Invoke                 VIRTUAL   // PROTECTED
    METHOD IsImplementorOf        VIRTUAL
    METHOD Loaded                 VIRTUAL   // PROTECTED
@@ -118,7 +119,7 @@ METHOD InsertComponent( oComponent ) CLASS TComponent
 
   ::Insert(oComponent)
 
-  oComponent.SetReference(True)
+  //oComponent.SetReference( .T. )
   //IF And( csDesigning, ComponentState )
   //   oComponent:SetDesigning(True)
   //ENDIF
