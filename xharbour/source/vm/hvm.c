@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.23 2002/01/23 23:33:52 ronpinkas Exp $
+ * $Id: hvm.c,v 1.24 2002/01/24 02:47:20 ronpinkas Exp $
  */
 
 /*
@@ -3089,20 +3089,18 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
 /* Object                          */
 /* ------------------------------- */
 
-#if 1
 void hb_vmMessage( PHB_SYMB pSymMsg ) /* sends a message to an object */
 {
-   PHB_ITEM pTop = hb_stackTopItem();
+   PHB_ITEM pItemMsg = hb_stackItemFromTop( -1 );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmMessage(%p, %s)", pSymMsg, pSymMsg->szName));
 
-   pTop->type = HB_IT_SYMBOL;
-   pTop->item.asSymbol.value = pSymMsg;
-   pTop->item.asSymbol.stackbase = hb_stackTopOffset();
-
+   hb_itemForwardValue( hb_stackTopItem(), pItemMsg ); /* moves the object forward */
+   pItemMsg->type = HB_IT_SYMBOL;
+   pItemMsg->item.asSymbol.value = pSymMsg;
+   pItemMsg->item.asSymbol.stackbase = hb_stackTopOffset() - 1;
    hb_stackPush();
 }
-#endif
 
 static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSymbol )
 {
@@ -3638,9 +3636,16 @@ HB_ITEM_PTR hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ... )
 
 void hb_vmFunction( USHORT uiParams )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmFunction(%hu)", uiParams));
+   HB_TRACE( HB_TR_DEBUG, ("hb_vmFunction(%hu)", uiParams ) );
 
-   hb_vmDo( uiParams );
+   if( hb_stackItemFromTop( - ( uiParams + 1 ) )->type )
+   {
+      hb_vmSend( uiParams );
+   }
+   else
+   {
+      hb_vmDo( uiParams );
+   }
 
    hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
    hb_stackPush();
@@ -3819,7 +3824,7 @@ static void hb_vmDebuggerShowLine( USHORT uiLine ) /* makes the debugger shows a
 
 void hb_vmPush( PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPush(%p)", pItem));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPush(%p) type: %i", pItem, pItem->type ) );
 
    hb_itemCopy( hb_stackTopItem(), pItem );
    hb_stackPush();
