@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.5 2003/01/02 01:21:29 ronpinkas Exp $
+ * $Id: trace.c,v 1.6 2003/01/02 20:14:09 ronpinkas Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include "hbapi.h"
 #include "hbtrace.h"
+#include "hbapierr.h"
 
 #ifdef HB_EXTENSION
 
@@ -59,9 +60,10 @@
    static HB_CRITICAL_T s_CriticalMutex;
 #endif
 
-void hb_traceInit( long bNoAutoCreate )
+void hb_traceInit( void )
 {
    FILE *fpTrace;
+   PHB_DYNS pTraceLog = hb_dynsymFind( "TRACELOG" );
 
    #ifdef HB_THREAD_SUPPORT
       #ifdef HB_OS_WIN_32
@@ -69,7 +71,7 @@ void hb_traceInit( long bNoAutoCreate )
       #endif
    #endif
 
-   if( ! bNoAutoCreate )
+   if( pTraceLog && pTraceLog->pSymbol->pFunPtr )
    {
         /* Create trace.log for tracing. */
         fpTrace = fopen( "trace.log", "w" );
@@ -78,10 +80,10 @@ void hb_traceInit( long bNoAutoCreate )
         {
            fclose( fpTrace );
         }
-        //else
-        //{
-           //hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
-        //}
+        else
+        {
+           hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
+        }
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.575 2003/01/02 09:05:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.576 2003/01/02 20:14:08 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-02 15:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbtrace.h
+  * source/rtl/trace.c
+  * source/vm/cmdarg.c
+    - Removed param from hb_traceInit()
+    + Added logic to auto create trace.log ONLY if application makes use of TraceLog().
 
 2003-01-02 12:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbtrace.h

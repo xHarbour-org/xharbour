@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.2 2002/01/26 21:13:58 ronpinkas Exp $
+ * $Id: cmdarg.c,v 1.3 2003/01/02 20:14:09 ronpinkas Exp $
  */
 
 /*
@@ -315,5 +315,5 @@ void hb_cmdargProcessVM( void )
       hb_verBuildInfo();
    }
 
-   hb_traceInit( hb_cmdargCheck( "NOTRACE" ) );
+   hb_traceInit();
 }

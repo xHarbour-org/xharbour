@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.h,v 1.6 2003/01/02 01:23:15 ronpinkas Exp $
+ * $Id: hbtrace.h,v 1.7 2003/01/02 20:14:09 ronpinkas Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 extern "C" {
 #endif
 
-extern void hb_traceInit( long bNoAutoCreate );
+extern void hb_traceInit( void );
 extern void hb_traceExit( void );
 extern void TraceLog( const char * sFile, const char * sTraceMsg, ... );
 
