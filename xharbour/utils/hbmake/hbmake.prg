@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.109 2004/01/10 16:13:00 lculik Exp $
+ * $Id: hbmake.prg,v 1.110 2004/01/16 11:35:08 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -51,7 +51,7 @@
 #include "fileio.ch"
 #include "common.ch"
 #include "radios.ch"
-
+//#include "wvtgui.ch"
 #define EOL Hb_OsNewLine()
 #define CRLF Hb_OsNewLine()
 #xtranslate TimeToSec(<x>) => ( ( Val( Substr( <x>, 1, 2 ) ) * 3600 ) +( Val( Substr( <x>, 4, 2 ) ) * 60 ) + ( Val( Substr( <x>, 7, 2 ) ) ) )
@@ -1888,7 +1888,7 @@ FUNC CreateMakeFile( cFile )
 	 nPos := aScan( aLibsOut, { | z | At( "mysql", Lower( z ) ) > 0 } )
 	 
 	 if nPos >0 
-	    cLibs += " mysqlclient.lib"
+        cLibs += " libmysql.lib"
 	 endif 
 
          IF ! s_lMt
