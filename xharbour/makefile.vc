@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.75 2003/11/09 23:48:09 jonnymind Exp $
+# $Id: makefile.vc,v 1.76 2003/11/10 00:59:32 fsgiudice Exp $
 #
 
 #
@@ -527,6 +527,7 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgis850.obj \
    $(OBJ_DIR)\msgit.obj \
    $(OBJ_DIR)\msgko.obj \
+   $(OBJ_DIR)\msltwin.obj \
    $(OBJ_DIR)\msgpl852.obj \
    $(OBJ_DIR)\msgpliso.obj \
    $(OBJ_DIR)\msgplmaz.obj \
@@ -552,6 +553,7 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cdpeswin.obj \
    $(OBJ_DIR)\cdpgedos.obj \
    $(OBJ_DIR)\cdpgewin.obj \
+   $(OBJ_DIR)\cdpltwin.obj \
    $(OBJ_DIR)\cdppt850.obj \
    $(OBJ_DIR)\cdpptiso.obj \
    $(OBJ_DIR)\cdppl852.obj \

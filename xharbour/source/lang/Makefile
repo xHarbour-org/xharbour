@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2003/05/16 19:52:07 druzus Exp $
+# $Id: Makefile,v 1.4 2003/06/17 22:10:22 druzus Exp $
 #
 
 ROOT = ../../
@@ -30,6 +30,7 @@ C_SOURCES=\
 	msgis850.c   \
 	msgit.c      \
 	msgko.c      \
+	msgltwin.c   \
 	msgpl852.c   \
 	msgpliso.c   \
 	msgplmaz.c   \

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.30 2003/11/10 00:32:13 jonnymind Exp $
+# $Id: hrbdll.bc,v 1.31 2003/11/10 00:59:32 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -352,6 +352,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msgis850.obj \
   $(OBJ_DIR)\msgit.obj \
   $(OBJ_DIR)\msgko.obj \
+  $(OBJ_DIR)\msgltwin.obj \
   $(OBJ_DIR)\msgpl852.obj \
   $(OBJ_DIR)\msgpliso.obj \
   $(OBJ_DIR)\msgplmaz.obj \
@@ -393,6 +394,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cdpeswin.obj \
   $(OBJ_DIR)\cdpgedos.obj \
   $(OBJ_DIR)\cdpgewin.obj \
+  $(OBJ_DIR)\cdpltwin.obj \
   $(OBJ_DIR)\cdppt850.obj \
   $(OBJ_DIR)\cdpptiso.obj \
   $(OBJ_DIR)\cdppl852.obj \
@@ -452,6 +454,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\cdpeswin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpgedos.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpgewin.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cdpltwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdppt850.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpptiso.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cdppl852.obj          + >> hdll.tmp
@@ -739,6 +742,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\msgis850.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgit.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\msgko.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgltwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgpl852.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgpliso.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgplmaz.obj          + >> hdll.tmp
@@ -1830,6 +1834,9 @@ $(OBJ_DIR)\msgit.obj : $(LANG_DIR)\msgit.c
 $(OBJ_DIR)\msgko.obj : $(LANG_DIR)\msgko.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\msgltwin.obj : $(LANG_DIR)\msgltwin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\msgpl852.obj : $(LANG_DIR)\msgpl852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -2023,6 +2030,9 @@ $(OBJ_DIR)\cdpgedos.obj : $(CODEPAGE_DIR)\cdpgedos.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdpgewin.obj : $(CODEPAGE_DIR)\cdpgewin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cdpltwin.obj : $(CODEPAGE_DIR)\cdpltwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdppt850.obj : $(CODEPAGE_DIR)\cdppt850.c

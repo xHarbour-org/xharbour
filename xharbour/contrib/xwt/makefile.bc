@@ -1,4 +1,4 @@
-# $Id: makefile.bc,v 1.8 2003/10/14 23:12:00 jonnymind Exp $
+# $Id: makefile.bc,v 1.9 2003/11/15 17:05:27 jonnymind Exp $
 #
 
 #
@@ -111,10 +111,8 @@ CFLAGS               = -I$(INCLUDE_DIR);src\xwt_win -d
 $(C_USR) -5 -6 -O2 -a8 $(CFLAGS) -D__WIN32__
 CLIBFLAGS            = -c $(CFLAGS) $(CLIBFLAGS)
 CLIBFLAGSDEBUG       = -v $(CLIBFLAGS)
-HARBOURFLAGS         = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR)
-$(HARBOURFLAGS)
+HARBOURFLAGS         = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LDFLAGS              = $(LDFLAGS)
-
 
 #
 # Macros to access our library names

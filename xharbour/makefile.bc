@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.70 2003/11/09 23:16:36 jonnymind Exp $
+# $Id: makefile.bc,v 1.71 2003/11/10 00:59:32 fsgiudice Exp $
 #
 
 #
@@ -532,6 +532,7 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgis850.obj \
    $(OBJ_DIR)\msgit.obj \
    $(OBJ_DIR)\msgko.obj \
+   $(OBJ_DIR)\msgltwin.obj \
    $(OBJ_DIR)\msgpl852.obj \
    $(OBJ_DIR)\msgpliso.obj \
    $(OBJ_DIR)\msgplmaz.obj \
@@ -749,6 +750,7 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cdpeswin.obj \
    $(OBJ_DIR)\cdpgedos.obj \
    $(OBJ_DIR)\cdpgewin.obj \
+   $(OBJ_DIR)\cdpltwin.obj \
    $(OBJ_DIR)\cdppt850.obj \
    $(OBJ_DIR)\cdpptiso.obj \
    $(OBJ_DIR)\cdppl852.obj \
@@ -2329,6 +2331,9 @@ $(OBJ_DIR)\msgit.obj : $(LANG_DIR)\msgit.c
 $(OBJ_DIR)\msgko.obj : $(LANG_DIR)\msgko.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\msgltwin.obj : $(LANG_DIR)\msgltwin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\msgpl852.obj : $(LANG_DIR)\msgpl852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -2584,6 +2589,9 @@ $(OBJ_DIR)\cdpgedos.obj : $(CODEPAGE_DIR)\cdpgedos.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdpgewin.obj : $(CODEPAGE_DIR)\cdpgewin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cdpltwin.obj : $(CODEPAGE_DIR)\cdpltwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdppt850.obj : $(CODEPAGE_DIR)\cdppt850.c
