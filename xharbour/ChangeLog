@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.458 2002/10/22 21:20:12 paultucker Exp $
+ * $Id: ChangeLog,v 1.459 2002/10/22 22:48:38 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-22 18:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/itemapi.c
+    ! Fixed bug in hb_itemStrCmp() when SET EXACT is ON, and not ussing == (and tested string is only spaces).
 
 2002-10-22 15:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/macro.c

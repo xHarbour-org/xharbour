@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.23 2002/09/21 05:21:07 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.24 2002/09/28 06:55:07 map Exp $
  */
 
 /*
@@ -1048,13 +1048,13 @@ int hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
    {
       /* SET EXACT ON and not using == */
       /* Don't include trailing spaces */
-      while( ulLenFirst > 0 && szFirst[ ulLenFirst - 1 ] == ' ' ) ulLenFirst--;
-      while( ulLenSecond > 0 && szSecond[ ulLenSecond - 1 ] == ' ' ) ulLenSecond--;
+      while( ulLenFirst > 1 && szFirst[ ulLenFirst - 1 ] == ' ' ) ulLenFirst--;
+      while( ulLenSecond > 1 && szSecond[ ulLenSecond - 1 ] == ' ' ) ulLenSecond--;
    }
 
    ulMinLen = ulLenFirst < ulLenSecond ? ulLenFirst : ulLenSecond;
 
-   /* One of the strings is empty */
+   /* Both strings not empty */
    if( ulMinLen )
    {
       for( ulCounter = 0; ulCounter < ulMinLen && !iRet; ulCounter++ )
