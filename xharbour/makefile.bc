@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.57 2003/07/08 06:14:47 jonnymind Exp $
+# $Id: makefile.bc,v 1.58 2003/07/08 22:23:54 andijahja Exp $
 #
 
 #
@@ -77,6 +77,7 @@ LIB_DIR = lib\b16
 !else
 
 CC = bcc32
+LINKER = TLIB
 # NOTE: Using TASM for some reason, this should be normally TASM32.
 #       I'll leave it to TASM until a better solution is found
 AS = tasm
@@ -872,461 +873,151 @@ all: \
 #
 
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
-   $(ECHO) + $(OBJ_DIR)\hbfhnd.obj     &  > common.rsp
-   $(ECHO) + $(OBJ_DIR)\hbfsapi.obj    & >> common.rsp
-   $(ECHO) + $(OBJ_DIR)\hbgete.obj     & >> common.rsp
-   $(ECHO) + $(OBJ_DIR)\hbhash.obj     & >> common.rsp
-   $(ECHO) + $(OBJ_DIR)\hbstr.obj      & >> common.rsp
-   $(ECHO) + $(OBJ_DIR)\hbtrace.obj    & >> common.rsp
-   $(ECHO) + $(OBJ_DIR)\hbver.obj      & >> common.rsp
-   $(ECHO) + $(OBJ_DIR)\expropt1.obj   & >> common.rsp
-   $(ECHO) + $(OBJ_DIR)\expropt2.obj   & >> common.rsp
-   $(ECHO) + $(OBJ_DIR)\reserved.obj     >> common.rsp
-   if exist $(COMMON_LIB) $(DEL) $(COMMON_LIB) > NUL
-   TLIB $(COMMON_LIB) @common.rsp $(ARFLAGS)
-   if exist common.rsp $(DEL) common.rsp > NUL
+    TLIB "$(COMMON_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
-   $(ECHO) + $(CDX_OBJ_DIR)\dbfcdx1.obj &  > dbfcdx.rsp
-   $(ECHO) + $(CDX_OBJ_DIR)\dbfcdx0.obj   >> dbfcdx.rsp
-   if exist $(DBFCDX_LIB) $(DEL) $(DBFCDX_LIB) > NUL
-   TLIB $(DBFCDX_LIB) @dbfcdx.rsp $(ARFLAGS)
-   if exist dbfcdx.rsp $(DEL) dbfcdx.rsp > NUL
+    TLIB "$(DBFCDX_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
-   $(ECHO) + $(NTX_OBJ_DIR)\dbfntx1.obj &  > dbfntx.rsp
-   $(ECHO) + $(NTX_OBJ_DIR)\dbfntx0.obj   >> dbfntx.rsp
-   if exist $(DBFNTX_LIB) $(DEL) $(DBFNTX_LIB) > NUL
-   TLIB $(DBFNTX_LIB) @dbfntx.rsp $(ARFLAGS)
-   if exist dbfntx.rsp $(DEL) dbfntx.rsp > NUL
+    $(LINKER) "$(DBFNTX_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
-   $(ECHO) + $(OBJ_DIR)\dbgmenu.obj   &  > debug.rsp
-   $(ECHO) + $(OBJ_DIR)\dbgtmenu.obj  & >> debug.rsp
-   $(ECHO) + $(OBJ_DIR)\dbgtmitm.obj  & >> debug.rsp
-   $(ECHO) + $(OBJ_DIR)\dbgtwin.obj   & >> debug.rsp
-   $(ECHO) + $(OBJ_DIR)\debugger.obj  & >> debug.rsp
-   $(ECHO) + $(OBJ_DIR)\dbghelp.obj   & >> debug.rsp
-   $(ECHO) + $(OBJ_DIR)\dbgtarr.obj   & >> debug.rsp
-   $(ECHO) + $(OBJ_DIR)\dbgtobj.obj   & >> debug.rsp
-   $(ECHO) + $(OBJ_DIR)\tbrwtext.obj  & >> debug.rsp
-   $(ECHO) + $(OBJ_DIR)\dbgwa.obj       >> debug.rsp
-   if exist $(DEBUG_LIB) $(DEL) $(DEBUG_LIB) > NUL
-   TLIB $(DEBUG_LIB) @debug.rsp $(ARFLAGS)
-   if exist debug.rsp $(DEL) debug.rsp > NUL
+    $(LINKER) "$(DEBUG_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(LANG_LIB) : $(LANG_LIB_OBJS)
-   $(ECHO) + $(OBJ_DIR)\msgca.obj       &  > lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgcs852.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgcsiso.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgcskam.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgcswin.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgde.obj       & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgen.obj       & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgeo.obj       & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msges.obj       & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgeu.obj       & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgfr.obj       & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msggl.obj       & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msghe862.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msghewin.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msghr852.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msghriso.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msghu852.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msghucwi.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msghuwin.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgid.obj       & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgis850.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgit.obj       & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgko.obj       & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgpl852.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgpliso.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgplmaz.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgpt.obj       & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgro.obj       & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgru866.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgruwin.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgsr852.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgsrwin.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgsriso.obj    & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgzhgb.obj     & >> lang.rsp
-   $(ECHO) + $(OBJ_DIR)\msgzhb5.obj       >> lang.rsp
-   if exist $(LANG_LIB) $(DEL) $(LANG_LIB) > NUL
-   TLIB $(LANG_LIB) @lang.rsp $(ARFLAGS)
-   if exist lang.rsp $(DEL) lang.rsp > NUL
+    $(LINKER) "$(LANG_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(MACRO_LIB) : $(MACRO_LIB_OBJS)
-   $(ECHO) + $(MACRO_OBJ_DIR)\macroy.obj  &  > macro.rsp
-   $(ECHO) + $(MACRO_OBJ_DIR)\macroa.obj  & >> macro.rsp
-   $(ECHO) + $(MACRO_OBJ_DIR)\macrob.obj  & >> macro.rsp
-   $(ECHO) + $(MACRO_OBJ_DIR)\macroc.obj  & >> macro.rsp
-   $(ECHO) + $(MACRO_OBJ_DIR)\macroslx.obj  >> macro.rsp
-   if exist $(MACRO_LIB) $(DEL) $(MACRO_LIB) > NUL
-   TLIB $(MACRO_LIB) @macro.rsp $(ARFLAGS)
-   if exist macro.rsp $(DEL) macro.rsp > NUL
+    $(LINKER) "$(MACRO_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
-   $(ECHO) + $(OBJ_DIR)\nulsys.obj  > nulsys.rsp
-   if exist $(NULSYS_LIB) $(DEL) $(NULSYS_LIB) > NUL
-   TLIB $(NULSYS_LIB) @nulsys.rsp $(ARFLAGS)
-   if exist nulsys.rsp $(DEL) nulsys.rsp > NUL
+    $(LINKER) "$(NULSYS_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(PP_LIB) : $(PP_LIB_OBJS)
-   $(ECHO) + $(PP_OBJ_DIR)\ppcore.obj  &  > pp.rsp
-   $(ECHO) + $(PP_OBJ_DIR)\ppcomp.obj  & >> pp.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\pplib.obj  & >> pp.rsp
-   $(ECHO) + $(PP_OBJ_DIR)\pptable.obj & >> pp.rsp
-   $(ECHO) + $(PP_OBJ_DIR)\pragma.obj    >> pp.rsp
-   if exist $(PP_LIB) $(DEL) $(PP_LIB) > NUL
-   TLIB $(PP_LIB) @pp.rsp $(ARFLAGS)
-   if exist pp.rsp $(DEL) pp.rsp > NUL
+    $(LINKER) "$(PP_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(RDD_LIB) : $(RDD_LIB_OBJS)
-   $(ECHO) + $(RDD_OBJ_DIR)\dbcmd.obj      &  > rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\workarea.obj   & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\dbf1.obj       & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\dbnubs.obj     & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\delim1.obj     & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\sdf1.obj       & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\dbf0.obj       & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\dbfuncs.obj    & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\dbtotal.obj    & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\dblist.obj     & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\dbsort.obj     & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\hbdbsort.obj   & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\dbstrux.obj    & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\dbupdat.obj    & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\delim0.obj     & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\rddord.obj     & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\rddsys.obj     & >> rddlib.rsp
-   $(ECHO) + $(RDD_OBJ_DIR)\sdf0.obj         >> rddlib.rsp
-   if exist $(RDD_LIB) $(DEL) $(RDD_LIB) > NUL
-   TLIB $(RDD_LIB) @rddlib.rsp $(ARFLAGS)
-   if exist rddlib.rsp $(DEL) rddlib.rsp > NUL
+    $(LINKER) "$(RDD_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(RTL_LIB) : $(RTL_LIB_OBJS)
-   $(ECHO) + $(RTL_OBJ_DIR)\abs.obj         &  > rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\accept.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\ampm.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\at.obj          & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\binnum.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\binnumx.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\box.obj         & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\cdpapi.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\chrasc.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\colorind.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\console.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\copyfile.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\datec.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\dates.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\dateshb.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\datesx.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\defpath.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\descend.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\dirdrive.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\direct.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\diskspac.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\disksphb.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\empty.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\file.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\filehb.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\filesys.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\fkmax.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\fnsplit.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\fssize.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\fstemp.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\gete.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\gt.obj          & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\gtapi.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\gtapiu.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\gx.obj          & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hardcr.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hbbitfield.obj  & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hbcompress.obj  & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hbcrypt.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hbcrc32.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hbchecksum.obj  & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hbhextonum.obj  & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hbffind.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hbrandom.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hbreadini.obj   & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hbxml.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\idle.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\inkey.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\is.obj          & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\isprint.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\langapi.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\left.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\len.obj         & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\lennum.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\math.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\maxrow.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\memofile.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\memoline.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\minmax.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\mlcount.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\mlpos.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\mlctopos.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\mpostolc.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\mod.obj         & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\mouseapi.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\mousex.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\mtran.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\natmsg.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\net.obj         & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\oemansi.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\oldbox.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\oldclear.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\pad.obj         & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\padc.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\padl.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\padr.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\philes.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\philes53.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\philesx.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\rat.obj         & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\regex.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\replic.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\right.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\round.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\run.obj         & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\samples.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\saverest.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\scroll.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\seconds.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\set.obj         & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\setcolor.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\setcurs.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\setkey.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\setpos.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\setposbs.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\shadow.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\soundex.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\space.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\spfiles.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\str.obj         & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\strcase.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\strings.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\strmatch.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\strpeek.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\strtran.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\strzero.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\stuff.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\substr.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\teditorl.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tone.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tprint.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tprinter.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\trace.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\transfrm.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\trim.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\type.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\val.obj         & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\valtostr.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\valtype.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\version.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\word.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\xhelp.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\xsavescr.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\achoice.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\adir.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\alert.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\arrayblk.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\browdb.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\browdbx.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\browse.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\checkbox.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\color53.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\cstr.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\cstruct.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\dbedit.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\dbdelim.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\dbsdf.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\devoutp.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\dircmd.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\dummy.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\errorsys.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\fieldbl.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\getlist.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\getsys.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hbsrlraw.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\hbserial.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\input.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\listbox.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\memoedit.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\memvarbl.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\menuto.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\mssgline.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\objfunc.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\perfuncs.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\persist.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\profiler.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\pushbtn.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\radiobtn.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\radiogrp.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\readkey.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\readvar.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\scrollbr.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\setfunc.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\setta.obj       & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tbcolumn.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tbrowse.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tclass.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\teditor.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\terror.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\text.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tget.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tgetint.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tgetlist.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tlabel.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tmenuitm.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tobject.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\tpopup.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\traceprg.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\treport.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\trpc.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\trpccli.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\ttable.obj      & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\ttextlin.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\ttopbar.obj     & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\txml.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\typefile.obj    & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\wait.obj        & >> rtl.rsp
-   $(ECHO) + $(RTL_OBJ_DIR)\win32ole.obj      >> rtl.rsp
-   if exist $(RTL_LIB) $(DEL) $(RTL_LIB) > NUL
-   TLIB $(RTL_LIB) @rtl.rsp $(ARFLAGS)
-   if exist rtl.rsp $(DEL) rtl.rsp > NUL
+    $(LINKER) "$(RTL_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(VM_LIB) : $(VM_LIB_OBJS)
-   $(ECHO) + $(VM_OBJ_DIR)\arrays.obj      &  > vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\arrayshb.obj    & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\asort.obj       & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\break.obj       & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\classes.obj     & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\cmdarg.obj      & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\codebloc.obj    & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\debug.obj       & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\do.obj          & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\dynlibhb.obj    & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\dynsym.obj      & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\errorapi.obj    & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\estack.obj      & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\eval.obj        & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\evalhb.obj      & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\extend.obj      & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\fm.obj          & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\garbage.obj     & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\hbi18n.obj      & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\hvm.obj         & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\inet.obj        & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\initexit.obj    & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\initsymb.obj    & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\itemapi.obj     & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\fastitem.obj    & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\macro.obj       & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\maindll.obj     & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\mainstd.obj     & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\mainwin.obj     & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\memvars.obj     & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\memvclip.obj    & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\pcount.obj      & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\proc.obj        & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\pvalue.obj      & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\runner.obj      & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\thread.obj      & >> vm.rsp
-   $(ECHO) + $(VM_OBJ_DIR)\harbinit.obj      >> vm.rsp
-   if exist $(VM_LIB) $(DEL) $(VM_LIB) > NUL
-   TLIB $(VM_LIB) @vm.rsp $(ARFLAGS)
-   if exist vm.rsp $(DEL) vm.rsp > NUL
+    $(LINKER) "$(VM_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(VM_LIB_OPT_CON) : $(VM_LIB_OPT_CON_OBJS)
-   $(ECHO) + $(OPT_CON_OBJ_DIR)\hvm.obj      &  > optcon.rsp
-   $(ECHO) + $(OPT_CON_OBJ_DIR)\classes.obj  & >> optcon.rsp
-   $(ECHO) + $(OPT_CON_OBJ_DIR)\fm.obj         >> optcon.rsp
-   if exist $(VM_LIB_OPT_CON) $(DEL) $(VM_LIB_OPT_CON) > NUL
-   TLIB $(VM_LIB_OPT_CON) @optcon.rsp $(ARFLAGS)
-   if exist optcon.rsp $(DEL) optcon.rsp > NUL
+    $(LINKER) "$(VM_LIB_OPT_CON)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(VM_LIB_OPT_GUI) : $(VM_LIB_OPT_GUI_OBJS)
-   $(ECHO) + $(OPT_GUI_OBJ_DIR)\hvm.obj     &  > optgui.rsp
-   $(ECHO) + $(OPT_GUI_OBJ_DIR)\classes.obj & >> optgui.rsp
-   $(ECHO) + $(OPT_GUI_OBJ_DIR)\fm.obj        >> optgui.rsp
-   if exist $(VM_LIB_OPT_GUI) $(DEL) $(VM_LIB_OPT_GUI) > NUL
-   TLIB $(VM_LIB_OPT_GUI) @optgui.rsp $(ARFLAGS)
-   if exist optgui.rsp $(DEL) optgui.rsp > NUL
+    $(LINKER) "$(VM_LIB_OPT_GUI)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
-   $(ECHO) + $(OBJ_DIR)\gtcgi.obj     &  > gtcgi.rsp
-   $(ECHO) + $(OBJ_DIR)\mousecgi.obj    >> gtcgi.rsp
-   if exist $(GTCGI_LIB) $(DEL) $(GTCGI_LIB) > NUL
-   TLIB $(GTCGI_LIB) @gtcgi.rsp $(ARFLAGS)
-   if exist gtcgi.rsp $(DEL) gtcgi.rsp > NUL
+    $(LINKER) "$(GTCGI_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(GTDOS_LIB) : $(GTDOS_LIB_OBJS)
-   $(OBJ_DIR)\gtdos.obj     &  > gtdos.rsp
-   $(OBJ_DIR)\mousedos.obj    >> gtdos.rsp
-   if exist $(GTDOS_LIB) $(DEL) $(GTDOS_LIB) > NUL
-   TLIB $(GTDOS_LIB) @gtdos.rsp $(ARFLAGS)
-   if exist gtdos.rsp $(DEL) gtdos.rsp > NUL
+    $(LINKER) "$(GTDOS_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
-   $(ECHO) + $(OBJ_DIR)\gtpca.obj    &  > gtpca.rsp
-   $(ECHO) + $(OBJ_DIR)\mousepca.obj   >> gtpca.rsp
-   if exist $(GTPCA_LIB) $(DEL) $(GTPCA_LIB) > NUL
-   TLIB $(GTPCA_LIB) @gtpca.rsp $(ARFLAGS)
-   if exist gtpca.rsp $(DEL) gtpca.rsp > NUL
+    $(LINKER) "$(GTPCA_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
-   $(ECHO) + $(OBJ_DIR)\gtstd.obj     &  > gtstd.rsp
-   $(ECHO) + $(OBJ_DIR)\mousestd.obj    >> gtstd.rsp
-   if exist $(GTSTD_LIB) $(DEL) $(GTSTD_LIB) > NUL
-   TLIB $(GTSTD_LIB) @gtstd.rsp $(ARFLAGS)
-   if exist gtstd.rsp $(DEL) gtstd.rsp > NUL
+    $(LINKER) "$(GTSTD_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
-   $(ECHO) + $(OBJ_DIR)\gtwin.obj    &  > gtwin.rsp
-   $(ECHO) + $(OBJ_DIR)\mousewin.obj   >> gtwin.rsp
-   if exist $(GTWIN_LIB) $(DEL) $(GTWIN_LIB) > NUL
-   TLIB $(GTWIN_LIB) @gtwin.rsp $(ARFLAGS)
-   if exist gtwin.rsp $(DEL) gtwin.rsp > NUL
+    $(LINKER) "$(GTWIN_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
-   $(ECHO) + $(OBJ_DIR)\cdpesdos.obj &  > codepage.rsp
-   $(ECHO) + $(OBJ_DIR)\cdpeswin.obj & >> codepage.rsp
-   $(ECHO) + $(OBJ_DIR)\cdpgedos.obj & >> codepage.rsp
-   $(ECHO) + $(OBJ_DIR)\cdpgewin.obj & >> codepage.rsp
-   $(ECHO) + $(OBJ_DIR)\cdppt850.obj & >> codepage.rsp
-   $(ECHO) + $(OBJ_DIR)\cdpptiso.obj & >> codepage.rsp
-   $(ECHO) + $(OBJ_DIR)\cdppl852.obj & >> codepage.rsp
-   $(ECHO) + $(OBJ_DIR)\cdppliso.obj & >> codepage.rsp
-   $(ECHO) + $(OBJ_DIR)\cdpplmaz.obj & >> codepage.rsp
-   $(ECHO) + $(OBJ_DIR)\cdpru866.obj & >> codepage.rsp
-   $(ECHO) + $(OBJ_DIR)\cdpruwin.obj & >> codepage.rsp
-   $(ECHO) + $(OBJ_DIR)\cdpsrwin.obj & >> codepage.rsp
-   $(ECHO) + $(OBJ_DIR)\cdprukoi.obj   >> codepage.rsp
-   if exist $(CODEPAGE_LIB) $(DEL) $(CODEPAGE_LIB) > NUL
-   TLIB $(CODEPAGE_LIB) @codepage.rsp $(ARFLAGS)
-   if exist codepage.rsp $(DEL) codepage.rsp > NUL
+    $(LINKER) "$(CODEPAGE_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
-   $(ECHO) + $(SAM_OBJ_DIR)\environ.obj  &  > samples.rsp
-   $(ECHO) + $(SAM_OBJ_DIR)\date.obj     & >> samples.rsp
-   $(ECHO) + $(SAM_OBJ_DIR)\dbf.obj      & >> samples.rsp
-   $(ECHO) + $(SAM_OBJ_DIR)\gauge.obj    & >> samples.rsp
-   $(ECHO) + $(SAM_OBJ_DIR)\num.obj      & >> samples.rsp
-   $(ECHO) + $(SAM_OBJ_DIR)\stack.obj    & >> samples.rsp
-   $(ECHO) + $(SAM_OBJ_DIR)\status.obj   & >> samples.rsp
-   $(ECHO) + $(SAM_OBJ_DIR)\time.obj       >> samples.rsp
-   if exist $(SAMPLES_LIB) $(DEL) $(SAMPLES_LIB) > NUL
-   TLIB $(SAMPLES_LIB) @samples.rsp $(ARFLAGS)
-   if exist samples.rsp $(DEL) samples.rsp > NUL
+    $(LINKER) "$(SAMPLES_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
-   $(ECHO) + $(OBJ_DIR)\odbc.obj   &  > odbc.rsp
-   $(ECHO) + $(OBJ_DIR)\todbc.obj    >> odbc.rsp
-   if exist $(ODBC_LIB) $(DEL) $(ODBC_LIB) > NUL
-   TLIB $(ODBC_LIB) @odbc.rsp $(ARFLAGS)
-   if exist odbc.rsp $(DEL) odbc.rsp > NUL
+    $(LINKER) "$(ODBC_LIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
 
 #
 # OPTCON.LIB dependencies

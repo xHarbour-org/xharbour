@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1227 2003/07/08 20:19:30 andijahja Exp $
+ * $Id: ChangeLog,v 1.1228 2003/07/08 22:23:54 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-07-09 01:13 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
+  * makefile.bc
+    ! Modified the linking process of OBJ files
+      to fix a command line parse error for windows.
+      Now make auto-generate temp files.
+
 2003-07-09 05:20 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * makefile.bc
     Change the linking process of OBJ files in such a way so that now
@@ -21,12 +27,12 @@
 
 2003-07-08 07:51 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   * makefile.bc
-    + added compilation of hbbitfield.c 
+    + added compilation of hbbitfield.c
     (please, someone add it also to makefile.vc)
 
   * tests/bitfield.prg
     ! fixed a little typo
-  
+
 2003-07-08 07:51 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   * source/rtl/Makefile
   + source/rtl/hbbitfield.c
