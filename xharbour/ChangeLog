@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2896 2004/05/08 16:32:53 likewolf Exp $
+ * $Id: ChangeLog,v 1.2897 2004/05/08 17:40:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-08 20:05 UTC+0200 Francesco Saverio Giudice <info / at / fsgiudice.com>
+  * source/rtl/gtxvt/gtxvt.c
+    - removed HB_INKEY_EXTENDED checks that now it's not defined
+    /*
+      this was in line 4106 where there is still HB_INKEY_RAW, but this
+      is still defined. Is it necessary ?
+
+      Lorenzo ?
+      BTW great work.
+    */
 
 2004-05-08 10:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.slx
