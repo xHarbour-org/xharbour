@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.412 2002/09/30 07:26:27 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.413 2002/09/30 21:26:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-10-01 08:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+   * source/rtl/tget.prg
+     ! Change behaviour of function UPDATED() to conform with Clipper which
+       will return .T. if a key press is succesfully accepted even the
+       value of the get is not changed. This was done by assigning .T.
+       in ::OverStrike() and ::Insert().
+       Thanks to "Peter Rees" <peter@rees.co.nz> for good observation.
 
 2002-09-30 14:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hberrors.h
