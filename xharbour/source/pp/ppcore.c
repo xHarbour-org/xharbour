@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.7 2002/03/06 03:43:31 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.8 2002/03/11 22:38:52 ronpinkas Exp $
  */
 
 /*
@@ -4158,7 +4158,7 @@ static BOOL OpenInclude( char * szFileName, HB_PATHNAMES * pSearch, PHB_FNAME pM
   PHB_FNAME pFileName;
   PFILE pFile;
 
-  HB_TRACE(HB_TR_DEBUG, ("OpenInclude(%s, %p, %p, %p, %d)", szFileName, pSearch, pMainFileName, fptr, (int) bStandardOnly));
+  HB_TRACE(HB_TR_DEBUG, ("OpenInclude('%s', %p, %p, %p, %i, '%s')", szFileName, pSearch, pMainFileName, bStandardOnly, szInclude));
 
   errno = 0;
   if( bStandardOnly )

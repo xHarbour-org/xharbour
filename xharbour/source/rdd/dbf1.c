@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.106 2002/02/05 05:05:58 horacioroldan Exp $
+ * $Id: dbf1.c,v 1.8 2002/03/06 06:21:14 ronpinkas Exp $
  */
 
 /*
@@ -548,15 +548,13 @@ static void hb_dbfGetMemo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 /*
  * Write memo data.
  */
-static void hb_dbfWriteMemo( DBFAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULONG ulLen,
-                             ULONG * ulStoredBlock )
+static void hb_dbfWriteMemo( DBFAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULONG ulLen, ULONG * ulStoredBlock )
 {
    BYTE pBlock[ DBT_BLOCKSIZE ];
    BOOL bNewBlock;
    ULONG ulNewBlock, ulNextBlock;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbfWriteMemo(%p, %lu, %p, %lu, %p)", pArea, ulBlock, pItem,
-                           ulLen, ulNewBlock));
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfWriteMemo(%p, %lu, %p, %lu, %p)", pArea, ulBlock, pItem, ulLen, ulStoredBlock));
 
    memset( pBlock, 0x1A, DBT_BLOCKSIZE );
    bNewBlock = !( ulBlock && ulLen < DBT_BLOCKSIZE - 1 );
