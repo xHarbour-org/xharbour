@@ -174,7 +174,7 @@ SELF_CONTAINED_WORDS_ARE {
 #define HB_WANTS_EXP     LEX_CUSTOM_ACTION - 2048
 
 /* WORDS can NOT use HB_WANTS_EXP, instead must use HB_AFTER_EXP. */
-#define HB_AFTER_EXP     LEX_CUSTOM_ACTION - 2560 /* LIKE, MATCH */
+#define HB_AFTER_EXP     LEX_CUSTOM_ACTION - 2560 /* LIKE, MATCH, STEP, TO */
 
 /* When 2 identifiers are correct syntax like in class declaration, we have to temporarily store the 2nd identifier. */
 #define HB_ID_ON_HOLD    LEX_CUSTOM_ACTION -  5
