@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.25 2003/07/14 19:18:47 jonnymind Exp $
+ * $Id: extend.c,v 1.26 2003/07/15 00:57:04 jonnymind Exp $
  */
 
 /*
@@ -112,7 +112,8 @@ PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
       }
       else
       {
-         if( iMask == HB_IT_NUMERIC && HB_IS_NUMERIC( pItem ) )
+         #define HB_IS_REAL_NUMERIC( p ) ( p )->type & HB_IT_NUMERIC
+         if( iMask == HB_IT_NUMERIC && HB_IS_REAL_NUMERIC( pItem ) )
          {
             return pItem;
          }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1264 2003/07/18 12:58:16 lculik Exp $
+ * $Id: ChangeLog,v 1.1265 2003/07/18 18:06:46 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-07-19 04:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+   * source/vm/extend.c
+   * source/vm/arrayshb.c
+   * source/rtl/space.c
+   * source/rtl/abs.c
+   * source/rtl/round.c
+   * source/rtl/strzero.c
+   * source/rtl/strtran.c
+   * source/rtl/str.c
+   * source/rtl/substr.c
+   * source/rtl/chrasc.c
+   * source/rtl/left.c
+   * source/rtl/replic.c
+   * source/rtl/mod.c
+   * source/rtl/math.c
+     * Minor modification on NUMERIC definition.
+
+     /*
+     There are confusions about the following two definitions:
+
+     #define ISNUM( n )  \
+        ( hb_param( n, HB_IT_NUMERIC ) != NULL )
+
+     #define HB_IS_NUMERIC( p ) \
+        ( ( p )->type & HB_IT_NUMERIC || HB_IS_DATE(p) || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
+
+     IMO, these definitions are not consistent with the other template.
+     I was confused :-(
+     */
 
 2003-07-18 19:51 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * include/thread.h

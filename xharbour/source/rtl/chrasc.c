@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.9 2003/01/05 20:20:02 ronpinkas Exp $
+ * $Id: chrasc.c,v 1.10 2003/07/13 22:21:25 andijahja Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ extern char *hb_vm_acAscii[256];
 HB_FUNC( CHR )
 {
 
-   if ( hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) != NULL )
+   if ( hb_param( 1, HB_IT_NUMERIC ) )
    {
       /* NOTE: CA-Cl*pper's compiler optimizer will be wrong for those
                CHR() cases where the passed parameter is a constant which

@@ -1,5 +1,5 @@
 /*
- * $Id: mod.c,v 1.1.1.1 2001/12/21 10:41:52 ronpinkas Exp $
+ * $Id: mod.c,v 1.2 2003/07/13 22:21:25 andijahja Exp $
  */
 
 /*
@@ -66,8 +66,8 @@
 
 HB_FUNC( MOD )
 {
-   PHB_ITEM pNumber  = hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
-   PHB_ITEM pNumber2 = hb_param( 2, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
+   PHB_ITEM pNumber  = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM pNumber2 = hb_param( 2, HB_IT_NUMERIC );
 
    if( pNumber && pNumber2 )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.29 2003/06/06 14:46:50 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.30 2003/07/13 22:21:26 andijahja Exp $
  */
 
 /*
@@ -105,7 +105,7 @@ HB_FUNC( ARRAY )
       for( iParam = 1; iParam <= iPCount; iParam++ )
       {
 
-         if ( ! hb_param( iParam, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
+         if ( ! hb_param( iParam, HB_IT_NUMERIC ) )
          // if( ! ISNUM( iParam ) )
          {
             bError = TRUE;

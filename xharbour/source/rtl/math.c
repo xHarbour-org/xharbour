@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.6 2003/06/06 17:47:27 mbirdyg Exp $
+ * $Id: math.c,v 1.7 2003/07/13 22:21:25 andijahja Exp $
  */
 
 /*
@@ -554,7 +554,7 @@ HB_FUNC (MATHERRORBLOCK)  /* ([<nNewErrorBlock>]) -> <nOldErrorBlock> */
 HB_FUNC (EXP)
 {
 //if (ISNUM (1))
-  if ( hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) != NULL )
+  if ( hb_param( 1, HB_IT_NUMERIC ) )
   {
     HB_MATH_EXCEPTION hb_exc;
     double dResult;
@@ -600,7 +600,7 @@ HB_FUNC (LOG)
 {
 
 //if (ISNUM (1))
-  if ( hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) != NULL )
+  if ( hb_param( 1, HB_IT_NUMERIC ) )
   {
     HB_MATH_EXCEPTION hb_exc;
     double dResult;
@@ -649,7 +649,7 @@ HB_FUNC (LOG)
 HB_FUNC (SQRT)
 {
 //if (ISNUM (1))
-  if ( hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) != NULL )
+  if ( hb_param( 1, HB_IT_NUMERIC ) )
   {
     HB_MATH_EXCEPTION hb_exc;
     double dResult;
