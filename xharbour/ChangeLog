@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3220 2004/07/27 13:19:28 druzus Exp $
+ * $Id: ChangeLog,v 1.3221 2004/07/27 16:56:02 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-27 12:29 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xdiff.txt
+    * Updated to include: OVERRIDE CLASS, EXTEND CLASS, EXTENDABLE Native Types, NATIVE Types as OOP objects, BIT Operators
+
 2004-07-27 19:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * include/inkey.ch
     + added K_SH_BS to simulate K_CTRL_SH_TAB in gtcrs
   * include/gtinfo.ch
   * source/rtl/gtwvt/gtwvt.c
-    + added GTI_WINTITLE, GTI_ICONFILE, GTI_CODEPAGE to easy 
+    + added GTI_WINTITLE, GTI_ICONFILE, GTI_CODEPAGE to easy
       windows MULTI_GT
 
 2004-07-27 15:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
@@ -81,6 +85,8 @@
 
   * include/hbclass.ch
     + Added support for new syntax:
+      ENABLE TYPE CLASS ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NUMERIC|POINTER
+
       EXTEND [TYPE] ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NUMERIC|POINTER WITH METHOD <SomeFunc>
       EXTEND [TYPE] ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NUMERIC|POINTER WITH MESSAGE <SomeMessage> METHOD <SomeFunc>
 

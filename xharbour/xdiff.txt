@@ -1,6 +1,109 @@
 As it stands at this point, xHarbour offers many syntax
 extensions over Harbour and Clipper, including:
 
+OVERRIDE CLASS:
+---------------
+
+The OVERRIDE CLASS syntax allows the xHarbour developer to override the
+behaviour of any existing class (including native type classes) using the
+flowwing syntax:
+
+   OVERRIDE METHOD <SomeMethod> [IN] CLASS <SomeClass> WITH [METHOD] <SomeFunc>
+   [SCOPE <Scope>]
+
+For sample usage please review tests\override.prg
+
+
+EXTEND CLASS:
+-------------
+
+The EXTEND CLASS syntax allows the xHarbour developer to extend any existing
+class (including native type classes) using the flowwing syntax:
+
+   EXTEND CLASS <SomeClass> WITH METHOD <SomeFunc>
+   EXTEND CLASS <SomeClass> WITH METHOD <SomeFunc>
+   EXTEND CLASS <SomeClass> WITH MESSAGE <SomeMessage> METHOD <SomeFunc>
+
+For sample usage please review tests\extend.prg
+
+
+EXTENDABLE Native Types:
+------------------------
+
+Native xHarbour types may be extended using the following syntax:
+
+   EXTEND [TYPE] ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NUMERIC|POINTER
+   WITH METHOD <SomeFunc>
+
+or:
+
+   EXTEND [TYPE] ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NUMERIC|POINTER
+   WITH MESSAGE <SomeMessage> METHOD <SomeFunc>
+
+The above will then allow utilization of native types as OOP Objects with
+regard to the specified method[s].
+
+[NOTE, you do not need to use ENABLE TYPE CLASS syntax to utilize this
+extension.]
+
+For sample usage please review tests\exttype.prg
+
+
+NATIVE Types as OOP objects:
+----------------------------
+
+You may usee the following syntax to anable OOP support for native types:
+
+   ENABLE TYPE CLASS ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NUMERIC|POINTER
+
+The above will allow usage as follow:
+
+   ? 3:AsString + " apples."
+
+All native types support the :AsString() method. Arrays support:
+
+   Add( xValue )
+   AddAll( oCollection )
+   AtIndex( nPos )
+   AtPut( nPos, xValue )
+   Append( xValue )
+   AsString()
+   Collect( bCollect )
+   Copy()
+   DeleteAt( nPos )
+   Do( bBlock )
+   IndexOf( xValue )
+   Init( nLen )
+   InsertAt( nPos, xValue )
+   Remove( xValue )
+   Scan( bScan )
+
+as well as a simulated size property
+
+Other types most notably CHARACTER will likely offer most of the above Array
+support plus few additional methods.
+
+
+BIT Operators:
+--------------
+
+xHarbour support (including compile time optimization) BIT operations:
+
+   AND, OR, XOR, SHIFT RIGHT, SHIFT LEFT
+
+Except for 'XOR' C syntax is used:
+   &  == and
+   |  == or
+   ^^ == xor
+   >> == shift right
+   << == shift left
+
+Please NOTE that 'AND' (&) *requires* trailing white space, or else MACRO
+Context will be assumed, to maintain Clipper compatability.
+
+Please review tests\tstbitop.prg for a sample.
+
+
 HASH Variable type:
 -------------------
    Hashes are mainly arrays with non numerical keys
@@ -252,8 +355,14 @@ NOTE: This syntax is modeled after the C 'switch' flow control. It offers
       great speed benefit [30-300%] over DO CASE flow control, but is
       restricted to comparing only constants.
 
-      Constants may be: Integers, Longs, or Single Character
-      Strings [much like in C]
+      Constants may be: Numerics (only Integers, Longs), Single Character,
+      Strings [much like in C], and any combination of the above using the
+      following operators:
+
+         +, -, & (BIT and), and | (BIT or)
+
+      Additionally valid contants may be
+      enclosed within ().
 
 WARNING: Those NOT familiar with the C switch flow control, should understand
          that unlike DO CASE, you MUST explicitly use the EXIT statement or
