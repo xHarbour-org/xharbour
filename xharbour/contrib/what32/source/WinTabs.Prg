@@ -439,7 +439,7 @@ METHOD SetUnicodeFormat( lUnicode ) CLASS TabControl
    RETURN TabCtrl_SetUnicodeFormat( ::hTab, lUnicode )
 
 *-----------------------------------------------------------------------------*
-
+/*
 METHOD Configure( )
         
    LOCAL aTab   := GetClientRect( ::hTab )
@@ -521,7 +521,7 @@ FUNCTION TransferChildren( hDlg, hPage, lShow )
    ENDDO
 
    RETURN( aChildren )
-
+*/
 *-----------------------------------------------------------------------------*
 
 METHOD TabSubClass( hDlg, nMsg, nwParam, nlParam )
