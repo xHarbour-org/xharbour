@@ -189,6 +189,7 @@ CLASS TWindow FROM TWindowBase
     METHOD OnMouseMove()                    VIRTUAL // FSG - to be implemented
     METHOD OnMove()                         VIRTUAL // FSG - to be implemented
     METHOD OnNCDestroy()                    //VIRTUAL // FSG - to be implemented
+    METHOD OnNCMouseMove()                  VIRTUAL
     METHOD OnNotify()                       VIRTUAL // FSG - to be implemented
 
 //    METHOD OnPaint()                        VIRTUAL // FSG - to be implemented
@@ -203,6 +204,7 @@ CLASS TWindow FROM TWindowBase
     METHOD OnSize()                         VIRTUAL // FSG - to be implemented
     METHOD OnSysColourChanged()             VIRTUAL // FSG - to be implemented
     METHOD OnSysCommand()                   VIRTUAL // FSG - to be implemented
+    METHOD OnTimer()                        VIRTUAL // FSG - to be implemented
     METHOD OnVScroll()                      VIRTUAL // FSG - to be implemented
 
     //METHOD PopEventHandler()                VIRTUAL // FSG - to be implemented
@@ -704,6 +706,8 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
          //         ::hWnd = nil
          //     endif
          //     ::Axit()
+         CASE nMsg == WM_NCMOUSEMOVE
+              nRet := ::OnNCMouseMove( wParam, lParam )
          CASE nMsg == WM_MOVE   // x, y
               nRet := ::OnMove(LoWord(lParam), HiWord(lParam))
          CASE nMsg == WM_NOTIFY
@@ -722,8 +726,8 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
               nRet := ::OnSize(wParam, LoWord(lParam), HiWord(lParam))
          CASE nMsg == WM_SYSCOMMAND
               nRet := ::OnSysCommand(wParam, LoWord(lParam), HiWord(lParam))
-         //CASE nMsg == WM_TIMER
-         //     nRet := ::OnTimer(wParam)
+         CASE nMsg == WM_TIMER
+              nRet := ::OnTimer( wParam )
          //CASE nMsg == WM_QUERYENDSESSION
          //     nRet := ::OnQueryEndSession()
          CASE nMsg == WM_VSCROLL
