@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.9 2002/02/16 02:29:32 ronpinkas Exp $
+ * $Id: estack.c,v 1.10 2002/03/20 15:22:06 ronpinkas Exp $
  */
 
 /*
@@ -381,7 +381,7 @@ void hb_vmIsLocalRef( void )
       HB_ITEM_PTR * pItem = hb_stack.pPos - 1;
       while( pItem != hb_stack.pItems )
       {
-         if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_ARRAY | HB_IT_BLOCK) )
+         if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
             hb_gcItemRef( *pItem );
          --pItem;
       }
