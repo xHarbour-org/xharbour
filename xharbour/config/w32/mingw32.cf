@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.12 2003/11/12 17:44:08 lculik Exp $
+# $Id: mingw32.cf,v 1.13 2003/12/18 10:55:31 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -50,11 +50,12 @@ else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
 
+# our libs have a lot of cross referenced now and we have to group them
+# untill we don't clean them
+LINKLIBS += -Wl,--start-group
+
 LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
-
-# This library is needed for CharToOemBuff() and OemToCharBuff() support.
-LINKLIBS += -luser32 -lwinspool
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rddmt,$(LIBS)),rddmt)
@@ -95,12 +96,14 @@ ifneq ($(LNK_USR_LIB),)
 LINKLIBS += $(foreach lib, $(LNK_USR_LIB), -l$(lib))
 endif
 
-LINKLIBS += -luser32 -lwinspool -lole32 -loleaut32 -luuid -lwsock32 -lws2_32
-
 # The -) option could be appropriate to link against libraries with
 # cyclic dependencies, but I think it is not really necessary if the
 # libraries are kept in proper order.
 # LINKLIBS += -Wl,-)
+LINKLIBS += -Wl,--end-group
+
+LINKLIBS += -luser32 -lwinspool -lgdi32 -lcomctl32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32
+
 
 # NOTE: The empty line directly before 'endef' HAVE TO exist!
 # It causes that every echo command will be separated by LF

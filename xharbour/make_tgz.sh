@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.22 2003/12/12 10:16:02 druzus Exp $
+# $Id: make_tgz.sh,v 1.23 2003/12/18 10:55:30 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -21,8 +21,6 @@ hb_archfile="${name}-${hb_ver}${hb_platform}.bin.tar.gz"
 hb_instfile="${name}-${hb_ver}${hb_platform}.inst.sh"
 hb_lnkso="yes"
 hb_pref="xhb"
-hb_libs="vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca debug profiler"
-hb_libsc="ct nf rddads"
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 if [ -z "$HB_ARCHITECTURE" ]; then export HB_ARCHITECTURE=linux; fi
 if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=gcc; fi
