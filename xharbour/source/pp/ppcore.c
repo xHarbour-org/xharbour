@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.82 2003/10/20 18:44:41 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.83 2003/10/20 20:54:42 ronpinkas Exp $
  */
 
 /*
@@ -257,7 +257,7 @@ char * hb_pp_szWarnings[] =
 
 void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
 {
-   static COMMANDS sC___IIF = { 0, "IF", "([\1A00],[\1B00],[\1C00] )", "IIF(\1A00,\1B00,\1C00 )", NULL };
+   static COMMANDS sC___IIF = { 0, "IF", "(\16\1A00\17,\16\1B00\17,\16\1C00\17 )", "IIF(\1A00,\1B00,\1C00 )", NULL };
 
    HB_TRACE(HB_TR_DEBUG, ("hb_pp_SetRules()"));
 
@@ -1098,50 +1098,51 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
   mpatt[0] = '\0';
 
   HB_TRACE(HB_TR_DEBUG, ("ParseCommand(%s, %d, %d, %d)", sLine, com_or_xcom, com_or_tra, bRemove));
+  //printf( "%s\n", sLine );
 
   HB_SKIPTABSPACES( sLine );
 
   #if 0
-  /* JFL 2000-09-19 */
-  /* This was the original line as Alexander wrote it */
-  /* while( *sLine != '\0' && *sLine != ' ' && *sLine != '\t' && *sLine != '<' && *sLine != '=' && ( *sLine != '(' || ipos == 0 ) ) */
-  /* Now the line #xtranslate = name(.. => will be allowed */
-  ipos = 0;
+     /* JFL 2000-09-19 */
+     /* This was the original line as Alexander wrote it */
+     /* while( *sLine != '\0' && *sLine != ' ' && *sLine != '\t' && *sLine != '<' && *sLine != '=' && ( *sLine != '(' || ipos == 0 ) ) */
+     /* Now the line #xtranslate = name(.. => will be allowed */
+     ipos = 0;
 
-  /* I changed it to the following to allow < and = to be the first char within a translate or xtranslate */
-  while( *sLine != '\0' && *sLine != ' ' && *sLine != '\t' && ( *sLine != '<' || ipos == 0 ) && ( *sLine != '=' || ipos == 0 ) && ( *sLine != '(' || ipos == 0 ) )
-  {
-     /* Ron Pinkas added 2000-01-24 */
-     if( ! ISNAME( *sLine ) )
+     /* I changed it to the following to allow < and = to be the first char within a translate or xtranslate */
+     while( *sLine != '\0' && *sLine != ' ' && *sLine != '\t' && ( *sLine != '<' || ipos == 0 ) && ( *sLine != '=' || ipos == 0 ) && ( *sLine != '(' || ipos == 0 ) )
      {
-        /* Ron Pinkas added 2002-02-15 */
-        if( *sLine == '[' && ipos )
+        /* Ron Pinkas added 2000-01-24 */
+        if( ! ISNAME( *sLine ) )
         {
-           break;
-        }
+           /* Ron Pinkas added 2002-02-15 */
+           if( *sLine == '[' && ipos )
+           {
+              break;
+           }
 
-        if( IS_2CHAR_OPERATOR( sLine ) )
-        {
-           *(cmdname+ipos++) = *sLine++;
-           *(cmdname+ipos++) = *sLine++;
-           break;
+           if( IS_2CHAR_OPERATOR( sLine ) )
+           {
+              *(cmdname+ipos++) = *sLine++;
+              *(cmdname+ipos++) = *sLine++;
+              break;
+           }
+           else
+           {
+              *(cmdname+ipos++) = *sLine++;
+              break;
+           }
         }
-        else
-        {
-           *(cmdname+ipos++) = *sLine++;
-           break;
-        }
+        /* END, Ron Pinkas added 2000-01-24 */
+
+        *(cmdname+ipos++) = *sLine++;
      }
-     /* END, Ron Pinkas added 2000-01-24 */
+     *(cmdname+ipos) = '\0';
 
-     *(cmdname+ipos++) = *sLine++;
-  }
-  *(cmdname+ipos) = '\0';
-
-  if( !ipos )
-  {
-     return;
-  }
+     if( !ipos )
+     {
+        return;
+     }
   #else
 
      ipos = hb_pp_NextToken( &sLine );
@@ -1326,7 +1327,15 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
   while( *(mpatt+i) != '\0' )
   {
-     if( *(mpatt+i) == '<' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
+     if( *(mpatt+i) == '[' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
+     {
+        mpatt[i] = '\16';
+     }
+     else if( *(mpatt+i) == ']' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
+     {
+        mpatt[i] = '\17';
+     }
+     else if( *(mpatt+i) == '<' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
      {
         if( (unsigned char) lastchar == 255 )
         {
@@ -1553,6 +1562,21 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
      i++;
   }
+
+  i = 0;
+  while( rpatt[i] != '\0' )
+  {
+     if( rpatt[i] == '[' && ( i == 0 || rpatt[ i - 1 ] != '\\' ) )
+     {
+        rpatt[i] = '\16';
+     }
+     else if( rpatt[i] == ']' && ( i == 0 || rpatt[ i - 1 ] != '\\' ) )
+     {
+        rpatt[i] = '\17';
+     }
+
+     i++;
+  }
 }
 
 static COMMANDS * AddCommand( char * cmdname )
@@ -1600,18 +1624,62 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
   do
   {
+     BOOL bRule;
+
     Top:
      //printf( "  *** Line: >%s<\n", sLine );
 
      ptro = sOutLine;
      ptri = sLine + isdvig;
 
-     ipos = md_strAt( ";", 1, ptri, TRUE, FALSE, FALSE, FALSE );
+     while( ptri[0] == ' ' || ptri[0] == '\t' )
+     {
+        ptri++;
+     }
+     if( ptri[0] == '#' && strchr( "xXcCtT", ptri[1] ) )
+     {
+        bRule = TRUE;
+     }
+     else
+     {
+        bRule = FALSE;
+     }
+     ptri = sLine + isdvig;
+
+     ipos = md_strAt( ";", 1, ptri, TRUE, FALSE, bRule, FALSE );
 
      if( ipos > 0 )
      {
         s_pTerminator = ( ptri + ipos - 1 );
-        *s_pTerminator = '\0';
+
+        /*
+           Clipper considers a ';' as an integral part of #<directive> for dynamically generated directives.
+           but it considers 2 successive #<directive>s dynamically generated as independent new entities.
+         */
+        if( bRule )
+        {
+           char *pLine = s_pTerminator + 1;
+
+           while( pLine[0] == ' ' || pLine[0] == '\t' || pLine[0] == ';' )
+           {
+              pLine++;
+           }
+
+           if( pLine[0] == '#' || pLine[0] == '\0' )
+           {
+              *s_pTerminator = '\0';
+           }
+           else
+           {
+              ipos = 0;
+              s_pTerminator = NULL;
+              //printf( "Keep together: >%s<\n", ptri );
+           }
+        }
+        else
+        {
+           *s_pTerminator = '\0';
+        }
      }
      else
      {
@@ -2103,7 +2171,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
      {
         HB_SKIPTABSPACES( ptrmp );
 
-        if( *ptrmp == '[' && !s_numBrackets && !strtopti )
+        if( *ptrmp == '\16' && !s_numBrackets && !strtopti )
         {
            #ifdef DEBUG_OPTIONAL
               printf( "SQUARE: >%s<\n", ptrmp );
@@ -2147,7 +2215,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
         switch( *ptrmp )
         {
-        case '[':
+        case '\16':
           if( !s_numBrackets )
           {
              isWordInside = 0;
@@ -2168,7 +2236,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
           break;
 
-        case ']':
+        case '\17':
           if( s_Repeate )
           {
              s_Repeate--;
@@ -2359,13 +2427,13 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
         {
            switch( *ptrmp )
            {
-              case '[':
+              case '\16':
                 ptrmp++;
                 SkipOptional( &ptrmp );
                 ptrmp++;
                 break;
 
-              case ']':
+              case '\17':
                 ptrmp++;
                 break;
 
@@ -2495,23 +2563,23 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
 
   ptrtemp = *ptrmp;
 
-  if( *(exppatt+2) != '2' && *ptrtemp == ']' )
+  if( *(exppatt+2) != '2' && *ptrtemp == '\17' )
   {
      ptrtemp++;
      HB_SKIPTABSPACES( ptrtemp );
 
-     while( *ptrtemp == '[' )
+     while( *ptrtemp == '\16' )
      {
         nBra = 0;
         ptrtemp++;
 
-        while( ( *ptrtemp != ']' || nBra ) && *ptrtemp != '\0')
+        while( ( *ptrtemp != '\17' || nBra ) && *ptrtemp != '\0')
         {
-           if( *ptrtemp == '[' )
+           if( *ptrtemp == '\16' )
            {
               nBra++;
            }
-           else if( *ptrtemp == ']' )
+           else if( *ptrtemp == '\17' )
            {
               nBra --;
            }
@@ -2523,7 +2591,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
      }
   }
 
-  if( *(exppatt+2) != '2' && *ptrtemp != '\1' && *ptrtemp != ',' && *ptrtemp != '[' && *ptrtemp != ']' && *ptrtemp != '\0' )
+  if( *(exppatt+2) != '2' && *ptrtemp != '\1' && *ptrtemp != ',' && *ptrtemp != '\16' && *ptrtemp != '\17' && *ptrtemp != '\0' )
   {
      // Stopper for the expression.
      lenreal = strincpy( expreal, ptrtemp );
@@ -3277,11 +3345,11 @@ static BOOL TestOptional( char *ptr1, char *ptr2 )
 
   while( ptr1 <= ptr2 )
   {
-     if( *ptr1 == '[' )
+     if( *ptr1 == '\16' )
      {
         nbr++;
      }
-     else if( *ptr1 == ']' )
+     else if( *ptr1 == '\17' )
      {
         if( nbr )
         {
@@ -3353,7 +3421,7 @@ static BOOL CheckOptional( char * ptrmp, char * ptri, char * ptro, int * lenres,
 
       switch( *ptrmp )
       {
-         case '[' :
+         case '\16' :
            s_numBrackets++;
            s_aIsRepeate[ s_Repeate ] = 0;
            lastInputptr[s_Repeate] = ptri;
@@ -3361,7 +3429,7 @@ static BOOL CheckOptional( char * ptrmp, char * ptri, char * ptro, int * lenres,
            ptrmp++;
            break;
 
-         case ']' :
+         case '\17' :
            if( s_numBrackets == save_numBr )
            {
               endTranslation = TRUE;
@@ -3453,12 +3521,12 @@ static BOOL CheckOptional( char * ptrmp, char * ptri, char * ptro, int * lenres,
       {
          HB_SKIPTABSPACES( ptrmp );
 
-         if( *ptrmp == '[' )
+         if( *ptrmp == '\16' )
          {
             ptrmp++;
             SkipOptional( &ptrmp );
          }
-         else if( *ptrmp == ']' )
+         else if( *ptrmp == '\17' )
          {
             break;
          }
@@ -3484,24 +3552,25 @@ static void SkipOptional( char ** ptri )
 
   HB_TRACE(HB_TR_DEBUG, ("SkipOptional(%p)", ptri));
 
-  while( **ptri != ']' || nbr )
-    {
-      switch( **ptri ) {
-      case '[':  nbr++; break;
-      case ']':  nbr--; break;
-      case '\1':
-        (*ptri) += 3;
-        if( *(*ptri-1) == '2' )
-          while( **ptri != '>' ) (*ptri)++;
-        break;
-      }
-      (*ptri)++;
-    }
-  if( **ptri == ']' && s_numBrackets > 0 )
-    {
-      if( s_Repeate ) s_Repeate--;
-      s_numBrackets--; (*ptri)++;
-    }
+  while( **ptri != '\17' || nbr )
+  {
+     switch( **ptri ) {
+     case '\16':  nbr++; break;
+     case '\17':  nbr--; break;
+     case '\1':
+       (*ptri) += 3;
+       if( *(*ptri-1) == '2' )
+         while( **ptri != '>' ) (*ptri)++;
+       break;
+     }
+     (*ptri)++;
+  }
+
+  if( **ptri == '\17' && s_numBrackets > 0 )
+  {
+     if( s_Repeate ) s_Repeate--;
+     s_numBrackets--; (*ptri)++;
+  }
 }
 
 static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, int * lenres )
@@ -3580,7 +3649,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
          ptr2 = ptrOut + ifou + 3;
 
-         while( *ptr2 != ']' || *(ptr2-1) == '\\' )
+         while( *ptr2 != '\17' || *(ptr2-1) == '\\' )
          {
             if( *ptr2 == '\1' )
             {
@@ -3635,12 +3704,12 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
                             ptr[ j ]++;
 
-                            if( ptr[ j ] == '[' )
+                            if( ptr[ j ] == '\16' )
                             {
                                ptr[ j ]++;
                             }
 
-                            if( ptr[ j ] == ']' )
+                            if( ptr[ j ] == '\17' )
                             {
                                ptr[ j ]++;
                             }
@@ -4031,7 +4100,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
 
            if( *expreal != '\0' )
            {
-               if( *expreal == '&' && ( pTemp = strpbrk( expreal + 1, "&." ) ) && pTemp - expreal < lenitem )
+               if( *expreal == '&' && ( pTemp = strpbrk( expreal + 1, "&." ) ) != NULL && pTemp - expreal < lenitem )
                {
                    i = (ifou)? 3:2;
                    pp_rQuotes( expreal, sQuotes );
@@ -4079,7 +4148,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
         }
         while( ifou > 0 );
     }
-    else if( *expreal == '&' && ( pTemp = strpbrk( expreal + 1, "&." ) ) && pTemp - expreal < lenitem )
+    else if( *expreal == '&' && ( pTemp = strpbrk( expreal + 1, "&." ) ) != NULL && pTemp - expreal < lenitem )
     {
         pp_rQuotes( expreal, sQuotes );
         hb_pp_Stuff( sQuotes, ptro, 2, 4, lenres );
@@ -4719,6 +4788,11 @@ static char * PrevSquare( char * ptr, char * bound, int * kolmark )
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("PrevSquare(%s, %s, %p, %i)", ptr, bound, kolmark, ( kolmark ? *kolmark: 0 )));
 
+   /*
+    TODO: Have to add support for Extended Literal Strings.
+    Note that this loop scans from Left to Right!!!
+   */
+
    while( ptr > bound )
    {
       if( State == STATE_QUOTE1 )
@@ -4729,27 +4803,30 @@ static char * PrevSquare( char * ptr, char * bound, int * kolmark )
       {
          if( *ptr == '\"' )  State = STATE_NORMAL;
       }
-      /** Added by Giancarlo Niccolai 2003-06-20 */
-      else if( State == STATE_QUOTE4 )
-      {
-         if( *ptr == '\"' && ptr[-1] != '\\' )  State = STATE_NORMAL;
-      }
-      /* END */
       else
       {
-         /** Added by Giancarlo Niccolai 2003-06-20 */
-         if( IS_ESC_STRING( *ptr ) ) State = STATE_QUOTE4;
-         /* END */
-         else if( *ptr == '\"' && *(ptr-1) != '\\' ) State = STATE_QUOTE2;
-         else if( *ptr == '\'' && *(ptr-1) != '\\' ) State = STATE_QUOTE1;
-         else if( kolmark && *ptr == '\1' ) (*kolmark)++;
-         else if( ( *ptr == '[' || *ptr == ']' ) && *(ptr-1) != '\\' )
+         if( *ptr == '\"' && *(ptr-1) != '\\' )
+         {
+            State = STATE_QUOTE2;
+         }
+         else if( *ptr == '\'' && *(ptr-1) != '\\' )
+         {
+            State = STATE_QUOTE1;
+         }
+         else if( kolmark && *ptr == '\1' )
+         {
+            (*kolmark)++;
+         }
+         else if( ( *ptr == '\16' || *ptr == '\17' ) )
+         {
             break;
+         }
       }
+
       ptr--;
    }
 
-   return ( *ptr == '[' && State == STATE_NORMAL ) ? ptr : NULL;
+   return ( *ptr == '\16' && State == STATE_NORMAL ) ? ptr : NULL;
 }
 
 static int IsInStr( char symb, char * s )
@@ -4854,7 +4931,7 @@ static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
         }
      }
 
-     if( **ptri == ' ' || **ptri == ',' || **ptri == '[' || **ptri == ']' || **ptri == '\1' || toupper( **ptri ) != toupper( **ptro ) )
+     if( **ptri == ' ' || **ptri == ',' || **ptri == '\16' || **ptri == '\17' || **ptri == '\1' || toupper( **ptri ) != toupper( **ptro ) )
      {
         break;
      }
@@ -4866,7 +4943,7 @@ static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
   co = *(*ptro-1);
   ci = **ptri;
 
-  if( ( ( ci == ' ' || ci == ',' || ci == '[' || ci == ']' || ci == '\1' || ci == '\0' ) &&
+  if( ( ( ci == ' ' || ci == ',' || ci == '\16' || ci == '\17' || ci == '\1' || ci == '\0' ) &&
         ( ( ! ISNAME( **ptro ) && ISNAME( co ) ) || ( ! ISNAME( co ) ) ) ) )
   {
      /*
@@ -4917,13 +4994,14 @@ static BOOL strincmp( char * ptro, char ** ptri, BOOL lTrunc )
 
   HB_TRACE(HB_TR_DEBUG, ("strincmp(%s, %p)", ptro, ptri));
 
-  for( ; **ptri != ',' && **ptri != '[' && **ptri != ']' &&
+  for( ; **ptri != ',' && **ptri != '\16' && **ptri != '\17' &&
          **ptri != '\1' && **ptri != '\0' && toupper(**ptri)==toupper(*ptro);
         ptro++, (*ptri)++ );
   co = *(ptro-1);
   ci = **ptri;
-  if( ( ( ci == ' ' || ci == ',' || ci == '[' ||
-          ci == ']' || ci == '\1' || ci == '\0' ) &&
+
+  if( ( ( ci == ' ' || ci == ',' || ci == '\16' ||
+          ci == '\17' || ci == '\1' || ci == '\0' ) &&
         ( ( !ISNAME(*ptro) && ISNAME(co) ) ||
           ( !ISNAME(co) ) ) ) )
     return FALSE;
@@ -4943,7 +5021,7 @@ static int strincpy( char * ptro, char * ptri )
 
   while( *ptri )
   {
-     if( *ptri == ' ' || *ptri == ',' || *ptri == '[' || *ptri == ']' || *ptri == '\1' )
+     if( *ptri == ' ' || *ptri == ',' || *ptri == '\16' || *ptri == '\17' || *ptri == '\1' )
      {
         break;
      }
@@ -5986,7 +6064,7 @@ int hb_pp_NextToken( char** pLine )
 
       goto Done;
    }
-   else if ( strchr( "+-*/:=^!&()[]{}@,|<>#%?$~", sLine[0] ) )
+   else if ( strchr( "+-*/:=^!&()[]{}@,|<>#%?$~\16\17", sLine[0] ) )
    {
       s_sToken[0] = sLine[0];
       s_sToken[1] = '\0';
@@ -5995,7 +6073,7 @@ int hb_pp_NextToken( char** pLine )
    }
    else
    {
-      // Todo Generic Error.
+      // TODO: Generic Error.
       //printf( "\nUnexpected case: %s\n", sLine );
       //getchar();
       s_sToken[0] = sLine[0];

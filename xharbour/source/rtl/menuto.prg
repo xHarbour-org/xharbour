@@ -1,5 +1,5 @@
 /*
- * $Id: menuto.prg,v 1.8 2002/12/07 23:49:35 lculik Exp $
+ * $Id: menuto.prg,v 1.9 2003/01/27 03:40:53 walito Exp $
  */
 
 /*
@@ -36,9 +36,9 @@ function __AtPrompt( nRow, nCol, cPrompt, cMsg, cColor)
 
    // add to the static array
    aadd( s_aLevel[ s_nPointer ], { nRow, nCol, cPrompt, cMsg, cColor } )
-   
+
    // put this prompt on the screen right now
-   DispOutAt( nRow, nCol, cPrompt, if( cColor <> NIL , cColor , NIL ) )
+   DispOutAt( nRow, nCol, cPrompt, cColor )
 
    return .f.
 
@@ -102,7 +102,7 @@ function __MenuTo( bBlock, cVariable )
 
       //
 
-      nSaveCursor := setcursor( iif( Set( _SET_INTENSITY ), SC_NONE, NIL ) )
+      nSaveCursor := setcursor( IIF( Set( _SET_INTENSITY ), SC_NONE, NIL ) )
       cSaveReadVar := ReadVar( upper( cVariable ) )
       xMsg := ""
       nMsgCol := 0
@@ -144,25 +144,27 @@ function __MenuTo( bBlock, cVariable )
 
          if s_aLevel[ s_nPointer - 1 , n , 5 ] <> nil
              aColor := COLORARRAY( s_aLevel[ s_nPointer - 1 , n , 5 ] )
-             cFrontColor := IF( EMPTY( aColor[ 1 ] ) , NIL , aColor[ 1 ] )
-             cBackColor  := IF( LEN( aColor ) > 1 , aColor[2], NIL )
+             cFrontColor := IIF( EMPTY( aColor[ 1 ] ) , NIL , aColor[ 1 ] )
+             cBackColor  := IIF( LEN( aColor ) > 1 , aColor[2], NIL )
          endif
 
-         if Set( _SET_INTENSITY )
-            if(cBackColor<> Nil ,cBackColor, ColorSelect( CLR_ENHANCED ))
-         endif
+         IF Set( _SET_INTENSITY )
+            IF cBackColor <> Nil
+               ColorSelect( CLR_ENHANCED )
+            ENDIF
+         ENDIF
 
          // highlight the prompt
          DispOutAt( s_aLevel[ nPointer - 1, n, 1 ],;
                     s_aLevel[ nPointer - 1, n, 2 ],;
                     s_aLevel[ nPointer - 1, n, 3 ],;
-                    if(cBackColor<> nil,cBackColor,nil))
+                    cBackColor )
 
-         if Set( _SET_INTENSITY )
-
-              if(cFrontColor <> nil ,cFrontColor, ColorSelect( CLR_STANDARD ))
-         //   ColorSelect( CLR_STANDARD )
-         endif
+         IF Set( _SET_INTENSITY )
+            IF cFrontColor <> nil
+              ColorSelect( CLR_STANDARD )
+            ENDIF
+         ENDIF
 
          if lExit
             exit
@@ -209,14 +211,14 @@ function __MenuTo( bBlock, cVariable )
          case K_DOWN
          case K_RIGHT
             if ++n > nArrLen
-               n := iif( Set( _SET_WRAP ), 1, nArrLen )
+               n := IIF( Set( _SET_WRAP ), 1, nArrLen )
             endif
             exit
 
          case K_UP
          case K_LEFT
             if --n < 1
-               n := iif( Set( _SET_WRAP ), nArrLen, 1 )
+               n := IIF( Set( _SET_WRAP ), nArrLen, 1 )
             endif
             exit
 
@@ -253,7 +255,7 @@ function __MenuTo( bBlock, cVariable )
             DispOutAt( s_aLevel[ nPointer - 1, q, 1 ],;
                        s_aLevel[ nPointer - 1, q, 2 ],;
                        s_aLevel[ nPointer - 1, q, 3 ],;
-                       if( cFrontColor <> nil , cFrontColor , nil ) )
+                       cFrontColor )
          endif
 
       enddo
