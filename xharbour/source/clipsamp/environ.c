@@ -1,5 +1,5 @@
 /*
- * $Id: environ.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
+ * $Id: environ.c,v 1.2 2004/03/18 03:54:43 ronpinkas Exp $
  */
 
 /*
@@ -85,16 +85,27 @@ HB_FUNC( FILEBASE )
 
 /* FileExt( <cFile> ) --> cFileExt
 */
-HB_FUNC( FILEEXT )
+
+
+HB_FUNC(FILEEXT )
 {
    if( ISCHAR( 1 ) )
    {
       PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
-      hb_retc( ( pFileName->szExtension ) + 1 ); /* Skip the dot */
+      if( pFileName->szExtension != NULL )
+      {
+         hb_retc( ( pFileName->szExtension ) + 1 ); * Skip the dot *
+      }
+      else
+      {
+         hb_retc( "" );
+      }
       hb_xfree( pFileName );
    }
    else
+   {
       hb_retc( "" );
+   }
 }
 
 /* FileDrive( <cFile> ) --> cFileDrive
