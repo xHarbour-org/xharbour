@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.40 2004/10/26 00:10:00 oh1 Exp $
+ * $Id: gtapi.c,v 1.41 2004/10/26 20:02:48 oh1 Exp $
  */
 
 /*
@@ -1094,9 +1094,13 @@ USHORT HB_EXPORT hb_gtSetPos( SHORT iRow, SHORT iCol )
 
    s_iRow          = iRow;
    s_iCol          = iCol;
-   ct_WCur->iRow   = s_iRow - ct_UFRow;
-   ct_WCur->iCol   = s_iCol - ct_UFCol;
-   ct_WCur->ScNone = s_ScNone;
+
+   if (ct_WCur != NULL) /* bdj: ct_WCur may == NULL during init */
+   {
+      ct_WCur->iRow   = s_iRow - ct_UFRow;
+      ct_WCur->iCol   = s_iCol - ct_UFCol;
+      ct_WCur->ScNone = s_ScNone;
+   }
 
    return 0;
 }

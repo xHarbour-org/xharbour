@@ -387,8 +387,11 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
        */
       hb_errRT_TERM( EG_CREATE, 10001, "WINAPI CreateWindow() failed", "hb_gt_Init()", 0, 0 );
     }
+
     pFileName = hb_fsFNameSplit( hb_cmdargARGV()[0] );
+
     hb_wvw_gtSetWindowTitle( 0, pFileName->szName );
+
     hb_xfree( pFileName );
 
     hb_wvw_gtCreateObjects(0);
@@ -401,6 +404,7 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
 
       hb_wvw_gtCreateToolTipWindow(s_pWindows[0]);
     }
+
 }
 
 /*-------------------------------------------------------------------*/
@@ -920,7 +924,7 @@ void HB_GT_FUNC( gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
     fpBuff  = ucBuff  ;
   }
 
-  memset( fpBlank, ' ', iLength );
+  memset( fpBlank, hb_ctGetClearB(), iLength );
 
   iColOld = iColNew = usLeft;
   iColSize = iLength -1;
@@ -2102,6 +2106,13 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
       case GTI_ICONRES:
          return (long) hb_wvw_gtSetWindowIcon( s_usCurWindow, iParam );
 
+      /* TODO: these two doesn't seem right. see gtwin about what they're supposed to do */
+      case GTI_VIEWMAXWIDTH:
+         return pWindowData->COLS;
+
+      case GTI_VIEWMAXHEIGHT:
+         return pWindowData->ROWS;
+
    }
 
    /* DEFAULT: there's something wrong if we are here. */
@@ -3122,6 +3133,7 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
   {
     case WM_CREATE:
     {
+
       bRet = hb_wvw_gtInitWindow( pWindowData, hWnd, pWindowData->COLS, pWindowData->ROWS );
 
       return( bRet );
@@ -3366,12 +3378,15 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
       if (usWinNum == s_usNumWindows-1)
       {
+
         if (!s_bMainCoordMode)
         {
+
           hb_gtSetPos(pWindowData->caretPos.y, pWindowData->caretPos.x);
         }
         else
         {
+
           hb_gtSetPos(pWindowData->caretPos.y + hb_wvw_gtRowOfs( usWinNum ),
                       pWindowData->caretPos.x + hb_wvw_gtColOfs( usWinNum ));
         }
@@ -5536,10 +5551,12 @@ static USHORT hb_wvw_gtSetCurWindow( USHORT usWinNum )
    *tell GTAPI about the new maxrow(), maxcol()
    */
   s_bQuickSetMode = TRUE;
+
   hb_gtSetMode( s_pWindows[ s_usCurWindow ]->ROWS, s_pWindows[ s_usCurWindow ]->COLS );
   s_bQuickSetMode = FALSE;
 
   /* tell GTAPI about the new row(), col() */
+
   hb_gtSetPos( s_pWindows[ s_usCurWindow ]->caretPos.y,
                s_pWindows[ s_usCurWindow ]->caretPos.x );
   /* done updating GTAPI's statics......... */
@@ -6225,6 +6242,7 @@ HB_FUNC( WVW_LCLOSEWINDOW )
   {
 
     s_bQuickSetMode = TRUE;
+
     hb_gtSetMode( s_pWindows[ s_usNumWindows-1 ]->ROWS, s_pWindows[ s_usNumWindows-1 ]->COLS );
     s_bQuickSetMode = FALSE;
   }
@@ -6408,6 +6426,7 @@ HB_FUNC( WVW_ADDROWS )
     s_usCurWindow = usWinNum;
 
     s_bQuickSetMode = TRUE;
+
     hb_gtSetMode( pWindowData->ROWS, pWindowData->COLS );
     s_bQuickSetMode = FALSE;
 

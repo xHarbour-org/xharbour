@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3545 2004/10/26 20:15:47 oh1 Exp $
+ * $Id: ChangeLog,v 1.3546 2004/10/27 04:15:47 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-27 11:25 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+    * blank char for screen ' ' --> hb_ctGetClearB()
+    + GTI_VIEWMAXWIDTH, GTI_VIEWMAXHEIGHT
+    These changes are synchronization with gtwvt 1.135.
+    Notes: GTI_VIEWMAXWIDTH, GTI_VIEWMAXHEIGHT are adopted 'as is' from gtwvt.
+           They don't seem to be correctly implemented. See gtwin about what they should do.
 
 2004-10-27 11:15 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * source/rtl/gtapi.c
