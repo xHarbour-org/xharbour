@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.56 2003/11/30 12:32:30 druzus Exp $
+ * $Id: fastitem.c,v 1.57 2004/02/14 01:29:44 andijahja Exp $
  */
 
 /*
@@ -104,13 +104,7 @@ void HB_EXPORT hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
    }
 
    /* Forward. */
-   // memcpy( pDest, pSource, sizeof( HB_ITEM ) );
-   _asm {
-      mov edi, pDest;
-      mov esi, pSource;
-      mov ecx, 6;  /* sizeof( HB_ITEM ) = 24 bytes / 4 = 6 */
-      rep movsd;
-   }
+   memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
    #ifndef HB_ARRAY_USE_COUNTER
       if( HB_IS_ARRAY( pSource ) && pSource->item.asArray.value )
@@ -298,13 +292,7 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       }
    }
 
-   // memcpy( pDest, pSource, sizeof( HB_ITEM ) );
-   _asm {
-      mov edi, pDest;
-      mov esi, pSource;
-      mov ecx, 6;  /* sizeof( HB_ITEM ) = 24 bytes / 4 = 6 */
-      rep movsd;
-   }
+   memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
    if( HB_IS_STRING( pSource ) )
    {
