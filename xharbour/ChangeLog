@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3226 2004/07/28 19:48:45 maurifull Exp $
+ * $Id: ChangeLog,v 1.3227 2004/07/28 20:56:10 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-28 15:13 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/classes.h
+  * source/vm/classes.c
+  * include/hbclass.ch
+  * source/rtl/tclass.prg
+    + Added support for native class NIL
+
+  * source/vm/hvm.c
+    ! Fixed hb_vmSend() to support scope resolution for native types.
+
+  * source/rtl/tclass.prg
+    ! Optimized METHOD :Create() to use __ClsGetHandleFromName( cDato )
+
+  * include/hbclass.ch
+    + Added support for new INLINE clause for
+         EXTEND [TYPE] ...
+         EXTEND CLASS ...
+
+    + Added support for new syntax:
+         ASSOCIATE CLASS <ClassName> WITH TYPE ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NIL|NUMERIC|POINTER
+
+  * tests/extend.prg
+  * tests/exttype.prg
+    * Enhanced to show new INLINE clause.
+
+  + tests/associat.prg
+    + New sample to demonstrate new ASSOCIATE CLASS syntax
 
 2004-07-28 22:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbf1.c

@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.11 2004/07/26 10:38:07 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.12 2004/07/26 20:56:40 ronpinkas Exp $
  */
 
 /*
@@ -186,12 +186,22 @@ STATIC PROCEDURE Create( MetaClass )
    LOCAL ahSuper := Array( nLen )
    LOCAL nExtraMsgs := Len( ::aMethods ) +  ( 2 * Len( ::aClsDatas ) ) + Len( ::aInlines ) + Len( ::aVirtuals )
    LOCAL cDato
+   LOCAL hSuper
 
    IF nLen == 0
       hClass := __ClsNew( ::cName, nLenDatas, nExtraMsgs )
    ELSE                                         // Multi inheritance
       FOR EACH cDato IN ::acSuper
-         ahSuper[ HB_EnumIndex() ] := __clsInstSuper( Upper( cDato ) ) // Super handle available
+         hSuper := __ClsGetHandleFromName( cDato )
+         IF hSuper == 0
+            ahSuper[ HB_EnumIndex() ] := __clsInstSuper( Upper( cDato ) )
+         ELSE
+            ahSuper[ HB_EnumIndex() ] := hSuper
+         ENDIF
+
+         IF ahSuper[ HB_EnumIndex() ] == 0
+            Throw( ErrorNew( "TClass", 1003, ProcName(), "Could not locate super: " + cDato, HB_aParams() ) )
+         ENDIF
       NEXT
 
       hClass := __ClsNew( ::cName, nLenDatas + nlen, nExtraMsgs, ahSuper )
@@ -645,6 +655,12 @@ ENDCLASS
 
 CLASS LOGICAL FROM SCALAROBJECT FUNCTION _LOGICAL
    METHOD AsString INLINE IIF( HB_QSelf(), ".T.", ".F." )
+ENDCLASS
+
+//----------------------------------------------------------------------------//
+
+CLASS NIL FROM SCALAROBJECT FUNCTION _NIL
+   METHOD AsString INLINE "NIL"
 ENDCLASS
 
 //----------------------------------------------------------------------------//

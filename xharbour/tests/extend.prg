@@ -8,7 +8,7 @@ PROCEDURE Main()
 
    EXTEND CLASS GET WITH MESSAGE AsString METHOD GetAsString
 
-   EXTEND CLASS NUMERIC WITH METHOD Plus
+   EXTEND CLASS NUMERIC WITH MESSAGE Plus( xArgument ) INLINE Self + Val( xArgument )
 
    ? 3:AsString + " test"
 
@@ -18,12 +18,6 @@ PROCEDURE Main()
    ? GetList[1]:AsString()
 
 RETURN
-
-STATIC FUNCTION Plus( xArgument )
-
-   LOCAl Self := HB_QSelf()
-
-RETURN Self + Val( xArgument )
 
 STATIC FUNCTION GetAsString
 

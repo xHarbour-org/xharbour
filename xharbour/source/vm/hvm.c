@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.410 2004/07/22 15:36:51 vouchcac Exp $
+ * $Id: hvm.c,v 1.411 2004/07/26 10:38:08 ronpinkas Exp $
  */
 
 /*
@@ -6133,12 +6133,13 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       }
    }
    else if( HB_IS_OBJECT( pSelf ) ||
-            ( HB_IS_ARRAY( pSelf ) && hb_cls_uiArrayClass ) ||
-            ( HB_IS_BLOCK( pSelf ) && hb_cls_uiBlockClass ) ||
-            ( HB_IS_STRING( pSelf ) && hb_cls_uiCharacterClass ) ||
-            ( HB_IS_DATE( pSelf ) && hb_cls_uiDateClass ) ||
-            ( HB_IS_LOGICAL( pSelf ) && hb_cls_uiLogicalClass ) ||
-            ( HB_IS_NUMERIC( pSelf ) && hb_cls_uiNumericClass ) ||
+            ( HB_IS_ARRAY( pSelf )   && hb_cls_uiArrayClass )     ||
+            ( HB_IS_BLOCK( pSelf )   && hb_cls_uiBlockClass )     ||
+            ( HB_IS_STRING( pSelf )  && hb_cls_uiCharacterClass ) ||
+            ( HB_IS_DATE( pSelf )    && hb_cls_uiDateClass )      ||
+            ( HB_IS_LOGICAL( pSelf ) && hb_cls_uiLogicalClass )   ||
+            ( HB_IS_NIL( pSelf )     && hb_cls_uiNilClass )       ||
+            ( HB_IS_NUMERIC( pSelf ) && hb_cls_uiNumericClass )   ||
             ( HB_IS_POINTER( pSelf ) && hb_cls_uiPointerClass )
           )               /* Object passed            */
    {
@@ -6187,25 +6188,31 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
                }
 
                /* and take back the good pSelfBase */
-               pSelfBase = (&RealSelf)->item.asArray.value;
+               if( HB_IS_OBJECT( &RealSelf ) )
+               {
+                  pSelfBase = (&RealSelf)->item.asArray.value;
+               }
 
                /* Now I should exchnage it with the current stacked value */
                hb_itemSwap( pSelf, &RealSelf );
                hb_itemClear( &RealSelf ) ; /* and release the fake one */
 
                /* Push current SuperClass handle */
-               lPopSuper = TRUE ;
-
-               if( ! pSelf->item.asArray.value->puiClsTree )
+               if( HB_IS_OBJECT( pSelf ) )
                {
-                  pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
-                  pSelf->item.asArray.value->puiClsTree[0]=0;
-               }
+                  lPopSuper = TRUE ;
 
-               nPos = pSelfBase->puiClsTree[0] + 1;
-               pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
-               pSelfBase->puiClsTree[0] = nPos ;
-               pSelfBase->puiClsTree[ nPos ] = uiClass;
+                  if( ! pSelf->item.asArray.value->puiClsTree )
+                  {
+                     pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
+                     pSelf->item.asArray.value->puiClsTree[0] = 0;
+                  }
+
+                  nPos = pSelfBase->puiClsTree[0] + 1;
+                  pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
+                  pSelfBase->puiClsTree[0] = nPos ;
+                  pSelfBase->puiClsTree[ nPos ] = uiClass;
+               }
             }
          }
       }

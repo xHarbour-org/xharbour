@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.125 2004/07/26 10:38:07 ronpinkas Exp $
+ * $Id: classes.c,v 1.126 2004/07/27 18:04:23 ronpinkas Exp $
  */
 
 /*
@@ -180,7 +180,7 @@ static BOOL     s_bClsAutoInit = TRUE;
 /* static PHB_DYNS s_msgClass     = NULL; */
 
 USHORT hb_cls_uiArrayClass = 0, hb_cls_uiBlockClass = 0, hb_cls_uiCharacterClass = 0, hb_cls_uiDateClass = 0,
-       hb_cls_uiLogicalClass = 0, hb_cls_uiNumericClass = 0, hb_cls_uiPointerClass = 0;
+       hb_cls_uiLogicalClass = 0, hb_cls_uiNilClass = 0, hb_cls_uiNumericClass = 0, hb_cls_uiPointerClass = 0;
 
 HB_SYMB  hb_symDestructor = { "__Destructor", HB_FS_PUBLIC, {NULL}, NULL };
 
@@ -927,6 +927,10 @@ HB_EXPORT USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
             uiClass = hb_cls_uiLogicalClass;
             break;
 
+         case HB_IT_NIL:
+            uiClass = hb_cls_uiNilClass;
+            break;
+
          case HB_IT_INTEGER:
          case HB_IT_LONG:
          case HB_IT_DOUBLE:
@@ -1067,7 +1071,7 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetMthd(%p, '%s', %i)", pObject, pMsg->pSymbol->szName, lAllowErrFunc, bConstructor));
 
-   //TraceLog( NULL, "Message: %s -> hb_objGetMthd(%p, '%s', %i)\n", pMessage->szName, pObject, pMsg->pSymbol->szName, lAllowErrFunc, bConstructor );
+   //TraceLog( NULL, "Type: %i Class: %s Message: %s -> hb_objGetMthd(%p, '%s', %i)\n", pObject->type, hb_objGetClsName( pObject ), pMessage->szName, pObject, pMsg->pSymbol->szName, lAllowErrFunc, bConstructor );
 
    if( HB_IS_OBJECT( pObject ) )
    {
@@ -1095,6 +1099,10 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
 
          case HB_IT_LOGICAL :
             uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_NIL:
+            uiClass = hb_cls_uiNilClass;
             break;
 
          case HB_IT_INTEGER:
@@ -1302,6 +1310,10 @@ HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 
          case HB_IT_LOGICAL :
             uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_NIL:
+            uiClass = hb_cls_uiNilClass;
             break;
 
          case HB_IT_INTEGER:
@@ -1886,6 +1898,7 @@ HB_FUNC( __CLSNEW )
          if( i == 1 ) /* This is the first superclass */
          {
             HB_TRACE( HB_TR_DEBUG, ( "Class: %s Super: %s Known: %i + Super %i\n", pNewCls->szName, pSprCls->szName, uiKnownMethods, pSprCls->uiMethods ) );
+            //TraceLog( NULL, "Class: %s Super: %s Known: %i + Super %i\n", pNewCls->szName, pSprCls->szName, uiKnownMethods, pSprCls->uiMethods );
 
             pNewCls->uiHashKey = pSprCls->uiHashKey + ( ( ( BASE_METHODS > uiKnownMethods ? BASE_METHODS : uiKnownMethods ) / BUCKET ) * 2 ) ;
 
@@ -2117,6 +2130,10 @@ HB_FUNC( __CLSNEW )
    {
       hb_cls_uiLogicalClass = s_uiClasses;
    }
+   else if( strcmp( pNewCls->szName, "NIL" ) == 0 )
+   {
+      hb_cls_uiNilClass = s_uiClasses;
+   }
    else if( strcmp( pNewCls->szName, "NUMERIC" ) == 0 )
    {
       hb_cls_uiNumericClass = s_uiClasses;
@@ -2125,8 +2142,6 @@ HB_FUNC( __CLSNEW )
    {
       hb_cls_uiPointerClass = s_uiClasses;
    }
-
-   //TraceLog( NULL, "Class >%s< >%s< %i\n", hb_parc(1), pNewCls->szName, hb_cls_uiNumericClass );
 
    hb_retni( s_uiClasses );
 }
@@ -3036,6 +3051,10 @@ HB_FUNC( __CLASSH )
          uiClass = hb_cls_uiLogicalClass;
          break;
 
+      case HB_IT_NIL :
+         uiClass = hb_cls_uiNilClass;
+         break;
+
       case HB_IT_INTEGER:
       case HB_IT_LONG:
       case HB_IT_DOUBLE:
@@ -3125,6 +3144,10 @@ static HARBOUR hb___msgClsH( void )
          uiClass = hb_cls_uiLogicalClass;
          break;
 
+      case HB_IT_NIL :
+         uiClass = hb_cls_uiNilClass;
+         break;
+
       case HB_IT_INTEGER:
       case HB_IT_LONG:
       case HB_IT_DOUBLE:
@@ -3192,6 +3215,10 @@ static HARBOUR hb___msgClsParent( void )
 
          case HB_IT_LOGICAL :
             uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_NIL :
+            uiClass = hb_cls_uiNilClass;
             break;
 
          case HB_IT_INTEGER:
@@ -3292,6 +3319,10 @@ static HARBOUR hb___msgClsFullSel( void )
 
          case HB_IT_LOGICAL :
             uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_NIL :
+            uiClass = hb_cls_uiNilClass;
             break;
 
          case HB_IT_INTEGER:
@@ -3421,6 +3452,10 @@ static HARBOUR hb___msgClsSel( void )
             uiClass = hb_cls_uiLogicalClass;
             break;
 
+         case HB_IT_NIL :
+            uiClass = hb_cls_uiNilClass;
+            break;
+
          case HB_IT_INTEGER:
          case HB_IT_LONG:
          case HB_IT_DOUBLE:
@@ -3539,6 +3574,10 @@ static HARBOUR hb___msgEvalInline( void )
             uiClass = hb_cls_uiLogicalClass;
             break;
 
+         case HB_IT_NIL :
+            uiClass = hb_cls_uiNilClass;
+            break;
+
          case HB_IT_INTEGER:
          case HB_IT_LONG:
          case HB_IT_DOUBLE:
@@ -3642,6 +3681,10 @@ static HARBOUR hb___msgSuper( void )
             uiClass = hb_cls_uiLogicalClass;
             break;
 
+         case HB_IT_NIL :
+            uiClass = hb_cls_uiNilClass;
+            break;
+
          case HB_IT_INTEGER:
          case HB_IT_LONG:
          case HB_IT_DOUBLE:
@@ -3722,6 +3765,10 @@ HARBOUR hb___msgGetClsData( void )
             uiClass = hb_cls_uiLogicalClass;
             break;
 
+         case HB_IT_NIL :
+            uiClass = hb_cls_uiNilClass;
+            break;
+
          case HB_IT_INTEGER:
          case HB_IT_LONG:
          case HB_IT_DOUBLE:
@@ -3784,6 +3831,10 @@ HARBOUR hb___msgSetClsData( void )
 
          case HB_IT_LOGICAL :
             uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_NIL :
+            uiClass = hb_cls_uiNilClass;
             break;
 
          case HB_IT_INTEGER:
@@ -4118,6 +4169,10 @@ HB_FUNC( __CLSGETPROPERTIESANDVALUES )
             uiClass = hb_cls_uiLogicalClass;
             break;
 
+         case HB_IT_NIL :
+            uiClass = hb_cls_uiNilClass;
+            break;
+
          case HB_IT_INTEGER:
          case HB_IT_LONG:
          case HB_IT_DOUBLE:
@@ -4203,6 +4258,10 @@ HB_FUNC( __CLSGETIVARNAMESANDVALUES )
 
          case HB_IT_LOGICAL :
             uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_NIL :
+            uiClass = hb_cls_uiNilClass;
             break;
 
          case HB_IT_INTEGER:
@@ -4293,6 +4352,10 @@ PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction )
 
          case HB_IT_LOGICAL :
             uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_NIL :
+            uiClass = hb_cls_uiNilClass;
             break;
 
          case HB_IT_INTEGER:
@@ -4395,6 +4458,7 @@ HB_FUNC( __CLSGETHANDLEFROMNAME )
           ( strcmp( szClass, "CHARACTER" ) == 0 ) ||
           ( strcmp( szClass, "DATE" )      == 0 ) ||
           ( strcmp( szClass, "LOGICAL" )   == 0 ) ||
+          ( strcmp( szClass, "NIL" )       == 0 ) ||
           ( strcmp( szClass, "NUMERIC" )   == 0 ) ||
           ( strcmp( szClass, "POINTER" )   == 0 ) )
       {
@@ -4402,7 +4466,6 @@ HB_FUNC( __CLSGETHANDLEFROMNAME )
          //__clsNew( szClass, 0, 0, 0 );
          HB_FUNCNAME( __CLSNEW )();
          uiClass = s_uiClasses;
-         //TraceLog( NULL, "Class >%s< %i %i\n", szClass, uiClass, hb_cls_uiNumericClass );
       }
    }
 
@@ -4472,4 +4535,47 @@ HB_FUNC( __SETCLASSAUTOINIT )
    }
 
    hb_retl( bOldClsAutoInit );
+}
+
+HB_FUNC( __CLSASSOCTYPE )
+{
+   USHORT uiClass = (USHORT) hb_parni( 1 );
+   char *szType = hb_parcx(2);
+
+   if( strcmp( szType, "ARRAY" ) == 0 )
+   {
+      hb_cls_uiArrayClass = uiClass;
+   }
+   else if( strcmp( szType, "BLOCK" ) == 0 )
+   {
+      hb_cls_uiBlockClass = uiClass;
+   }
+   else if( strcmp( szType, "CHARACTER" ) == 0 )
+   {
+      hb_cls_uiCharacterClass = uiClass;
+   }
+   else if( strcmp( szType, "DATE" ) == 0 )
+   {
+      hb_cls_uiDateClass = uiClass;
+   }
+   else if( strcmp( szType, "LOGICAL" ) == 0 )
+   {
+      hb_cls_uiLogicalClass = uiClass;
+   }
+   else if( strcmp( szType, "NIL" ) == 0 )
+   {
+      hb_cls_uiNilClass = uiClass;
+   }
+   else if( strcmp( szType, "NUMERIC" ) == 0 )
+   {
+      hb_cls_uiNumericClass = uiClass;
+   }
+   else if( strcmp( szType, "POINTER" ) == 0 )
+   {
+      hb_cls_uiPointerClass = uiClass;
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
 }

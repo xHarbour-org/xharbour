@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.18 2004/07/26 10:38:07 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.19 2004/07/26 20:56:39 ronpinkas Exp $
  */
 
 /*
@@ -182,30 +182,51 @@ DECLARE HBClass ;
 #xcommand EXTEND CLASS <!Class!> WITH MESSAGE <Message> METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
   <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), <(Message)>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
 
+#xcommand EXTEND CLASS <!Class!> WITH MESSAGE <Message> INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), <(Message)>, {|Self| <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+
+#xcommand EXTEND CLASS <!Class!> WITH MESSAGE <Message>( <params,...> ) INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), <(Message)>, {|Self, <params>| <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
 
 // EXTEND native type classes.
-#xcommand OVERRIDE METHOD <Message> [IN] CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> WITH [METHOD] <!Method!> [SCOPE <Scope>] => ;
+#xcommand OVERRIDE METHOD <Message> [IN] CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH [METHOD] <!Method!> [SCOPE <Scope>] => ;
   _<type>(); __clsModMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, @<Method>(), IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ) )
 
-#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> WITH <data: DATA, VAR> <!Data!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH <data: DATA, VAR> <!Data!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
   _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), #<Data>, __cls_IncData( __ClsGetHandleFromName( #<type> ) ), HB_OO_MSG_PROPERTY, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
 
-#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> WITH METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
   _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), #<Method>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
 
-#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> WITH MESSAGE <Message> METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH MESSAGE <Message> METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
   _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
 
+#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH MESSAGE <Message> INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self| <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+
+#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH MESSAGE <Message>( <params,...> ) INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self, <params>| <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
 
 // Extend native type (NOT using standard classes)
-#xcommand EXTEND [TYPE] <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> WITH METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+#xcommand EXTEND [TYPE] <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
   __clsAddMsg( __ClsGetHandleFromName( #<type> ), #<Method>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
 
-#xcommand EXTEND [TYPE] <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> WITH MESSAGE <Message> METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+#xcommand EXTEND [TYPE] <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH MESSAGE <Message> METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
   __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
 
+#xcommand EXTEND [TYPE] <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH MESSAGE <Message> INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self| <code>}, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+
+#xcommand EXTEND [TYPE] <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH MESSAGE <Message>(<params,...>) INLINE <code,...> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, {|Self, <params>| <code>}, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+
 // ENABLE
-#xcommand ENABLE TYPE CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> [, <typeN: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER>] => _<type>() [;_<typeN>()]
+#xcommand ENABLE TYPE CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> [, <typeN: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER>] => _<type>() [;_<typeN>()]
+
+#xcommand ASSOCIATE CLASS <ClassName> WITH TYPE <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> => ;
+  __clsAssocType( IIF( __ClsGetHandleFromName( <(ClassName)> ) == 0, <ClassName>():ClassH, __ClsGetHandleFromName( <(ClassName)> ) ), #<type> )
+
+#xcommand EXTERNAL <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> [, <*rest*>] => _<type>() [; EXTERNAL <rest>]
 
 #ifdef HB_CLS_ALLOWCLASS  /* DONT DECLARE IT ! WORK IN PROGRESS !!! */
 
@@ -215,10 +236,10 @@ DECLARE HBClass ;
 
 #xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] => ;
    _HB_CLASS <ClassName> ;;
-   [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
    <static> function <ClassName>(...) ;;
       static s_oClass ;;
       local MetaClass,nScope ;;
+      [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
       nScope := HB_OO_CLSTP_EXPORTED ;;
       if s_oClass == NIL ;;
          s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():new( <(ClassName)> , __HB_CLS_PAR ( [ <(SuperClass1)> ] [ ,<(SuperClassN)> ] ) ) ) ;;
@@ -241,10 +262,10 @@ DECLARE HBClass ;
 
 #xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] => ;
    _HB_CLASS <ClassName> ;;
-   [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
    <static> function <ClassName>(...) ;;
       static s_oClass  ;;
       local MetaClass,nScope ;;
+      [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
       nScope := HB_OO_CLSTP_EXPORTED ;;
       if s_oClass == NIL ;;
          s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():new( <(ClassName)> , __HB_CLS_PAR ( [ <(SuperClass1)> ] [ ,<(SuperClassN)> ] ) ) ) ;;
@@ -272,11 +293,11 @@ DECLARE HBClass ;
 
 #xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] => ;
    _HB_CLASS <ClassName> ;;
-   [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
    <static> function <ClassName>(...) ;;
       static s_oClass ;;
       local oClassInstance ;;
       local nScope ;;
+      [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
       nScope := HB_OO_CLSTP_EXPORTED ;;
       if s_oClass == NIL ;;
          s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():new( <(ClassName)> , __HB_CLS_PAR ( [ <(SuperClass1)> ] [ ,<(SuperClassN)> ] ) ) ) ;;
@@ -294,11 +315,11 @@ DECLARE HBClass ;
 
 #xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] FUNCTION <FuncName> => ;
    _HB_CLASS <ClassName> ;;
-   [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
    <static> function <FuncName>(...) ;;
       static s_oClass ;;
       local oClassInstance ;;
       local nScope ;;
+      [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
       nScope := HB_OO_CLSTP_EXPORTED ;;
       if s_oClass == NIL ;;
          s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():new( <(ClassName)> , __HB_CLS_PAR ( [ <(SuperClass1)> ] [ ,<(SuperClassN)> ] ) ) ) ;;

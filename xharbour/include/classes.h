@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.12 2004/03/03 11:41:10 ronpinkas Exp $
+ * $Id: classes.h,v 1.13 2004/07/26 10:38:07 ronpinkas Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ typedef struct
 extern HB_SYMB  hb_symDestructor;
 
 extern USHORT hb_cls_uiArrayClass, hb_cls_uiBlockClass, hb_cls_uiCharacterClass, hb_cls_uiDateClass,
-       hb_cls_uiLogicalClass, hb_cls_uiNumericClass, hb_cls_uiPointerClass;
+       hb_cls_uiLogicalClass, hb_cls_uiNilClass, hb_cls_uiNumericClass, hb_cls_uiPointerClass;
 
 extern void     hb_clsReleaseAll( void );    /* releases all defined classes */
 extern PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction );
