@@ -1,0 +1,41 @@
+/*
+ * $Id: ChangeLog,v 1.0 2004/12/14 18:39:00 marcosgambeta Exp $
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2004-12-14 18:18 UTC-0300 Marcos Antonio Gambeta <marcosgambeta@uol.com.br>
+  + samples/pegged/build.bat
+  + samples/pegged/ChangeLog
+  + samples/pegged/gpl.txt
+  + samples/pegged/pegged.prg
+  + samples/pegged/pegged.rc
+  + samples/pegged/pegged.wri
+  + samples/pegged/recurses/about.bmp
+  + samples/pegged/recurses/back.bmp
+  + samples/pegged/recurses/back.wav
+  + samples/pegged/recurses/default.bmp
+  + samples/pegged/recurses/empty.bmp
+  + samples/pegged/recurses/exit.bmp
+  + samples/pegged/recurses/game1.bmp
+  + samples/pegged/recurses/game2.bmp
+  + samples/pegged/recurses/game3.bmp
+  + samples/pegged/recurses/game4.bmp
+  + samples/pegged/recurses/game5.bmp
+  + samples/pegged/recurses/game6.bmp
+  + samples/pegged/recurses/game7.bmp
+  + samples/pegged/recurses/game8.bmp
+  + samples/pegged/recurses/help.bmp
+  + samples/pegged/recurses/jump.wav
+  + samples/pegged/recurses/mark.wav
+  + samples/pegged/recurses/marked.bmp
+  + samples/pegged/recurses/new.bmp
+  + samples/pegged/recurses/pegged.ico
+  + samples/pegged/recurses/wallpaper.bmp
+  + samples/pegged/recurses/win.wav
+    First beta version of the game Pegged, created with xHarbour and WHAT32.
+

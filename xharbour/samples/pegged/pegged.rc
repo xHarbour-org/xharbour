@@ -1,0 +1,99 @@
+/*
+   Pegged v1.0 Beta 1
+   Copyright (C) 2004 Marcos Antonio Gambeta
+
+   Contact: marcosgambeta@yahoo.com.br
+
+   Website: http://geocities.yahoo.com.br/marcosgambeta/
+
+   This file is part of the program "Pegged".
+
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License
+   as published by the Free Software Foundation; either version 2
+   of the License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*/
+
+MAINICON          ICON                recurses\pegged.ico
+
+IMAGE_NEW         BITMAP              recurses\new.bmp
+IMAGE_BACK        BITMAP              recurses\back.bmp
+IMAGE_GAME1       BITMAP              recurses\game1.bmp
+IMAGE_GAME2       BITMAP              recurses\game2.bmp
+IMAGE_GAME3       BITMAP              recurses\game3.bmp
+IMAGE_GAME4       BITMAP              recurses\game4.bmp
+IMAGE_GAME5       BITMAP              recurses\game5.bmp
+IMAGE_GAME6       BITMAP              recurses\game6.bmp
+IMAGE_GAME7       BITMAP              recurses\game7.bmp
+IMAGE_GAME8       BITMAP              recurses\game8.bmp
+IMAGE_HELP        BITMAP              recurses\help.bmp
+IMAGE_ABOUT       BITMAP              recurses\about.bmp
+IMAGE_EXIT        BITMAP              recurses\exit.bmp
+
+IMAGE_EMPTY       BITMAP              recurses\empty.bmp
+IMAGE_DEFAULT     BITMAP              recurses\default.bmp
+IMAGE_MARKED      BITMAP              recurses\marked.bmp
+
+WALLPAPER         BITMAP              recurses\wallpaper.bmp
+
+WAV_JUMP          WAVE                recurses\jump.wav
+WAV_WIN           WAVE                recurses\win.wav
+WAV_MARK          WAVE                recurses\mark.wav
+WAV_BACK          WAVE                recurses\back.wav
+
+ABOUT DIALOG DISCARDABLE  20, 40, 195, 161
+STYLE DS_MODALFRAME | WS_OVERLAPPED | WS_CAPTION | WS_VISIBLE | WS_SYSMENU | DS_CENTER
+CAPTION "About Pegged"
+FONT 8, "Arial"
+BEGIN
+	CONTROL "Program",                    100, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE, 9, 9, 140, 10
+	CONTROL "Pegged",                     101, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE, 9, 21, 140, 10
+	CONTROL "Version",                    102, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE, 9, 34, 140, 10
+	CONTROL "1.0 beta 1",                 103, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE, 9, 46, 140, 10
+	CONTROL "Author",                     106, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE, 9, 58, 140, 10
+	CONTROL "Marcos Antonio Gambeta",     107, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE, 9, 71, 140, 10
+	CONTROL "E-mail",                     109, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE, 9, 83, 140, 10
+	CONTROL "marcosgambeta@yahoo.com.br", 110, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE, 9, 95, 140, 10
+	CONTROL "Licence",                    113, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE, 9, 106, 140, 10
+	CONTROL "Free Software (GPL)",        114, "STATIC", SS_LEFT | WS_CHILD | WS_VISIBLE, 9, 119, 140, 10
+	CONTROL "OK",                         IDOK, "BUTTON", BS_DEFPUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 71, 137, 40, 14
+END
+
+1 VERSIONINFO
+FILEVERSION 1,0
+PRODUCTVERSION 1,0
+FILEOS 0x4
+FILETYPE 0x1
+{
+BLOCK "StringFileInfo"
+{
+	BLOCK "041604b0"
+	{
+		VALUE "FileDescription", "Pegged\000"
+		VALUE "FileVersion", "1.0 Beta 1\000"
+		VALUE "InternalName", "Pegged\000"
+		VALUE "LegalCopyright", "Copyright © 2004 by Marcos Antonio Gambeta\000"
+		VALUE "LegalTrademarks", ""
+		VALUE "OriginalFilename", "pegged.exe"
+		VALUE "CompanyName", ""
+		VALUE "ProductName", "Pegged\000"
+		VALUE "ProductVersion", "1.0 Beta 1\000"
+		VALUE "Comments", "Developed with xHarbour and WHAT32\000"
+	}
+}
+
+BLOCK "VarFileInfo"
+{
+	VALUE "Translation", 0x0416 0x04B0
+}
+}
+
