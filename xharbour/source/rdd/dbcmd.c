@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.64 2003/12/10 18:30:22 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.65 2003/12/22 20:22:13 ronpinkas Exp $
  */
 
 /*
@@ -2139,8 +2139,26 @@ HB_FUNC( DBSELECTAREA )
 
    if( ISCHAR( 1 ) )
    {
-      hb_rddSelectWorkAreaAlias( hb_parc( 1 ) );
-      uiNewArea = s_uiCurrArea;
+      char *szAlias = hb_parc( 1 );
+      USHORT ulLen = strlen( szAlias );
+
+      if( ulLen >= 1 && szAlias[ 0 ] >= '0' && szAlias[ 0 ] <= '9' )
+      {
+         uiNewArea = atoi( szAlias );
+      }
+      else if( ulLen == 1 && toupper( szAlias[ 0 ] ) >= 'A' && toupper( szAlias[ 0 ] ) <= 'K' )
+      {
+         uiNewArea = toupper( szAlias[ 0 ] ) - 'A' + 1;
+      }
+      else if( ulLen == 1 && toupper( szAlias[ 0 ] ) == 'M' )
+      {
+         uiNewArea = 0;
+      }
+      else
+      {
+         hb_rddSelectWorkAreaAlias( szAlias );
+         uiNewArea = s_uiCurrArea;
+      }
    }
    else
    {
@@ -3772,6 +3790,8 @@ HB_FUNC( DBSETRELATION )
       }
       else
       {
+         LPAREANODE pCurrArea = s_pCurrArea;
+
          szAlias = hb_parc( 1 );
          hb_rddSelectWorkAreaAlias( szAlias );
 
@@ -3781,6 +3801,8 @@ HB_FUNC( DBSETRELATION )
          }
 
          uiChildArea = s_uiCurrArea;
+         s_pCurrArea = pCurrArea;
+         s_uiCurrArea = ( ( AREAP ) s_pCurrArea->pArea )->uiArea;
       }
 
       LOCK_AREA
@@ -3792,8 +3814,10 @@ HB_FUNC( DBSETRELATION )
             s_pArea = pAreaNode; /* Select a valid WorkArea */
             break;
          }
+
          pAreaNode = pAreaNode->pNext;
       }
+
       if( !s_pArea )
       {
          hb_errRT_BASE( EG_NOALIAS, EDBCMD_NOALIAS, NULL, szAlias, 0 );
@@ -3811,7 +3835,9 @@ HB_FUNC( DBSETRELATION )
       UNLOCK_AREA
    }
    else
+   {
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSETRELATION" );
+   }
 }
 
 
