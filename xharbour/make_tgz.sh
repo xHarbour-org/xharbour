@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.42 2005/01/30 06:45:42 druzus Exp $
+# $Id: make_tgz.sh,v 1.43 2005/02/12 19:54:01 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -269,8 +269,8 @@ if [ -n "${hb_instfile}" ]; then
    fi
    cat > "${hb_instfile}" <<EOF
 #!/bin/sh
-if [ "\$1" == "--extract" ]; then
-    sed -e '1,/^HB_INST_EOF\$/ d' \$0 > "${hb_archfile}"
+if [ "\$1" = "--extract" ]; then
+    sed -e '1,/^HB_INST_EOF\$/ d' "\$0" > "${hb_archfile}"
     exit
 fi
 if [ \`id -u\` != 0 ]; then
@@ -282,7 +282,7 @@ read ASK
 if [ "\${ASK}" != "y" ] && [ "\${ASK}" != "Y" ]; then
     exit 1
 fi
-(sed -e '1,/^HB_INST_EOF\$/ d' \$0 | gzip -cd | $TAR xvf - -C /) ${DO_LDCONFIG}
+(sed -e '1,/^HB_INST_EOF\$/ d' "\$0" | gzip -cd | $TAR xvf - -C /) ${DO_LDCONFIG}
 exit \$?
 HB_INST_EOF
 EOF

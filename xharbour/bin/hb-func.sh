@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.49 2005/02/19 21:07:45 likewolf Exp $
+# $Id: hb-func.sh,v 1.50 2005/02/19 21:23:02 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -29,7 +29,7 @@ get_hbplatform()
         [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
         [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' aurox-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
         [ "${id}" = "" ] && id=`[ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/'`
-        [ "${id}" = "" ] && id=`uname -sr | tr '[A-Z]' '[a-z]'`
+        [ "${id}" = "" ] && id=`uname -sr | tr '[ A-Z]' '[_a-z]'`
         case "${id}" in
             mingw*) id="mingw" ;;
             *) ;;
