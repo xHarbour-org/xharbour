@@ -1,5 +1,5 @@
 /*
- * $Id: rtf.prg,v 1.9 2001/04/15 03:04:00 lculik Exp $
+ * $Id: rtf.prg,v 1.1.1.1 2001/12/21 10:45:39 ronpinkas Exp $
  */
 
 /*
@@ -65,6 +65,8 @@ CLASS TRTF
 
    DATA cFile
    DATA nHandle
+   DATA aIdh init {}
+   DATA lastId init 100
    METHOD WriteHeader()
    METHOD New( cFile )
    METHOD WritePar( cPar, cIden )
@@ -218,15 +220,22 @@ METHOD WriteTitle( cTitle, cTopic, cOne ,cCat) CLASS TRTF
       cTemp := HB_OEMTOANSI( ALLTRIM( cTitle ) )
       cTemp := STRTRAN( cTemp, "@", "x" )
    ENDIF
+   nPos := AT( "#", cTitle )
 
+   IF nPos > 0
+      cTemp := ALLTRIM( HB_OEMTOANSI( STRTRAN( cTemp, "#", "\#" ) ) )
+   ENDIF
    cTopic := ALLTRIM( HB_OEMTOANSI( cTopic ) )
+   cTemp := StrTran( cTemp, " ","_")
 
-   cWrite := '{\f6' + CRLF + ;
-             '  #{\footnote \pard\fs20 # ' + "IDH_" + cTemp + ' }' + CRLF + ;
-             '  ${\footnote \pard\fs20 $ ' + ALLTRIM( cTopic ) + ' }' + CRLF + ;
-             '  K{\footnote \pard\fs20 K ' + UPPERLOWER(ALLTRIM( cTopic ))+";" + UPPERLOWER(ALLTRIM( cCat ))+ ' }' + CRLF + ;
-             '  A{\footnote \pard\fs20 A ' + UPPERLOWER(ALLTRIM( cTopic )) +' }' + CRLF + ;
-             '}' + CRLF
+   Aadd( ::aIdh, {"IDH_" + cTemp,::lastid++})
+
+   cWrite := CRLF + ;
+             '  {#{\footnote \pard\fs20 {' + "IDH_" + cTemp + ' }}}' + CRLF + ;
+             '  {${\footnote \pard\fs20 {' + ALLTRIM( cTopic ) + ' }}}' + CRLF + ;
+             '  {K{\footnote \pard\fs20 {' + UPPERLOWER(ALLTRIM( cTopic ))+";" + UPPERLOWER(ALLTRIM( cCat ))+ ' }}}' + CRLF + ;
+             '  {A{\footnote \pard\fs20 {' + UPPERLOWER(ALLTRIM( cTopic )) +' }}}' + CRLF + ;
+              CRLF
              /*" ; " + UPPERLOWER(cCat) +" , " +UPPERLOWER(ALLTRIM( strtran(cTopic,"()","" )))+ */
    aadd(aWww,{cTopic,"IDH_"+cTemp,cCat})
    nPos := ascan(aResult,{|a| UPPER(a) == UPPER(cCat)})
@@ -257,10 +266,10 @@ METHOD WriteJumpTitle( cTitle, cTopic ) CLASS TRTF
 
    cTopic := ALLTRIM( HB_OEMTOANSI( cTopic ) )
 
-   cWrite := '{\f6' + CRLF + ;
-             '  #{\footnote \pard\fs20 # ' + "IDH_" + cTemp + ' }' + CRLF + ;
-             '  ${\footnote \pard\fs20 $ ' + ALLTRIM( cTopic ) + ' }' + CRLF + ;
-             '}' + CRLF
+   cWrite :=  CRLF + ;
+             '  #{\footnote \pard\fs20 ' + "IDH_" + cTemp + ' }' + CRLF + ;
+             '  ${\footnote \pard\fs20 ' + ALLTRIM( cTopic ) + ' }' + CRLF + ;
+             CRLF
 
    FWRITE( Self:nHandle, cWrite )
 

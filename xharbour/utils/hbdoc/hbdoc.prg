@@ -1,5 +1,6 @@
+
 /*
- * $Id: hbdoc.prg,v 1.36 2001/07/22 21:06:18 lculik Exp $
+ * $Id: hbdoc.prg,v 1.1.1.1 2001/12/21 10:45:36 ronpinkas Exp $
  */
 
 /*
@@ -53,8 +54,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2001/07/22 21:06:18 $
- * Revision..: $Revision: 1.36 $
+ * Date......: $Date: 2001/12/21 10:45:36 $
+ * Revision..: $Revision: 1.1.1.1 $
  * Log file..: $Logfile:     $
  *
  *
@@ -174,6 +175,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
    LOCAL aMetaContents:={}
    Local aTemp:={}
    LOCAL lAdded:=.f.
+   Local aRtfid
    PUBLIC theHandle
    PUBLIC aDirList
    PUBLIC aDocInfo    := {}
@@ -345,7 +347,8 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
             ELSEIF lNorton
                ProcessFiles()
             ELSEIF lRtf
-               ProcessRtf()
+               aRtfid := ProcessRtf()
+               tracelog(aRtfid,aRtfid[1])
             ELSEIF lPdf
             #ifdef PDF
                ProcessPDF(.t.)
@@ -383,7 +386,8 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
             ProcessPDF(.f.)
          #endif
          ELSEIF lRtf
-            ProcessRtf()
+             aRtfid := ProcessRtf()
+                            tracelog(aRtfid,aRtfid[1])
          ELSEIF lWww
             ProcessWww()
          ELSEIF lChm
@@ -493,13 +497,18 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
       FWRITE( nHpj, "harbour.rtf" + CRLF )
       FWRITE( nHpj, '[CONFIG]' + CRLF + 'contents()' + CRLF + 'prev()' + CRLF + 'next()' + CRLF + 'BrowseButtons()' + CRLF )
       FWRITE( nHpj, '[WINDOWS]' + CRLF + 'Commands="Harbour Commands",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +'API="Harbour Commands",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF +       'Error="Harbour Run Time Errors",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF + 'Tools="Harbour Tools",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF + 'Class="Harbour OOP Commands",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF + 'Funca="Harbour Run Time Functions A-M",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF + 'Funcn="Harbour Run Time Functions N-_",(653,102,360,600),20736,(r14876671),(r12632256),f2' + CRLF + 'Main="HARBOUR",(117,100,894,873),60672,(r14876671),(r12632256),f2' + CRLF )
+      FWRITE( nHpj, '[MAP]'+CRLF)
+      for each ppp in aRtfid
+      fwrite(nHpj, "#define "+ppp[1] +" " + str(ppp[2])+CRLF)
+      next
+
       FCLOSE( nHpj )
       nHpj := FCREATE( lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +".cnt"  )
       FWRITE( nHpj, ':Base '+ lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +".hlp"+ CRLF )
       FWRITE( nHpj, ':Title '+cTitle+CRLF)
       FWRITE( nHpj, ':Index '+lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +'='+lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +".hlp"+ CRLF )
       FWRITE( nHpj, '1 Harbour'+CRLF)
-      asort(aWww,,,{|x,y| x[3]+x[1]<y[3]+y[1]})
+      asort(      aWww,,,{|x,y| x[3]+x[1]<y[3]+y[1]})
       for ppp:=1 to len(aWww)
           if aWww[ppp,3]=='Document'
              fWrite( nHpj, '2 '+aWww[ppp,1]+"="+aWww[ppp,2]+">Main"+CRLF)
@@ -551,6 +560,8 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
              fWrite( nHpj, '2 '+aWww[ppp,1]+"="+aWww[ppp,2]+">API"+CRLF)
           endif
       Next
+
+
     fClose(nHpj)
 set console off
    ELSEIF lWWW
