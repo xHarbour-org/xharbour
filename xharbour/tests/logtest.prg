@@ -1,6 +1,6 @@
 ************************************************************
 * logtest.prg
-* $Id: logtest.prg,v 1.2 2003/07/10 22:04:16 jonnymind Exp $
+* $Id: logtest.prg,v 1.3 2003/07/13 19:34:34 jonnymind Exp $
 *
 * Demonstrates the standard log system
 * See inline help strings to know how to use this
@@ -46,14 +46,15 @@ Procedure MAIN()
 
    SET COLOR TO w+/b
    CLEAR SCREEN
-   @1,20 SAY "X H A R B O U R - Log test "
+   @1,22 SAY "X H A R B O U R - Log test "
    @3,3 SAY "Select a log priority and then write a string in the field."
    @4,3 SAY "The string will be reported to the log with this predecence:"
    @5,5 SAY "To the file logtest.log: only INFO or above"
    @6,5 SAY "To the system log: only error or critical."
-   @7,5 SAY "To 'console': all messages. Press F1 to activate EMAIL log"
-   @8,3 SAY "Press ESC to select another priority; Press it again to exit."
-   @9,3 SAY "** To demonstrate self log file rolling feature, log file limit is set to 2K"
+   @7,5 SAY "To a monitor internet port: connect to this host at port 7761."
+   @8,5 SAY "To 'console': all messages. Press F1 to activate EMAIL log"
+   @9,3 SAY "Press ESC to select another priority; Press it again to exit."
+   @10,3 SAY "** To demonstrate self log file rolling feature, log file limit is set to 2K"
 
    // Log can be initialized in any moment
    // Other than the HB_Logger class, there is a "standard log" that is
@@ -61,9 +62,9 @@ Procedure MAIN()
    // The following instructions are preprocessor wrappers.
 
    // preparing a "virual console"
-   @22,0 SAY "Virtual console  ----------------------------------------"
-   @23,0 SAY Space( 80 )
-   @23,0
+   @21,0 SAY "---- Virtual console  ----------------------------------------"
+   @22,0 SAY Space( 80 )
+   @22,0
 
    INIT LOG ON ;
       File( "logtest.log", HB_LOG_INFO, 2, 5 ), ;
@@ -82,8 +83,8 @@ Procedure MAIN()
    // a demo of how the log works from within a program
    // LOG can accept also a set of strings or variables separated by commas
    // PRIO[RITY] is optional, If omitted, will log as INFO
-   @23,0 SAY Space( 80 )
-   @23,0
+   @22,0 SAY Space( 80 )
+   @22,0
    LOG "LogTest", "Hello", "debug" PRIO HB_LOG_DEBUG
 
    @13,30 SAY "Insert message to log below:"
@@ -92,18 +93,18 @@ Procedure MAIN()
    nChoice := 1
    SET KEY K_F1 TO ActivateEmail()
    DO WHILE nChoice > 0
-      MakeBox( 11,2, 19, 25 )
-      @11,5 SAY  "Select Level: "
-      nChoice := Achoice(12, 4, 18, 24 , aLevelNames)
+      MakeBox( 12,2, 20, 25 )
+      @12,5 SAY  "Select Level: "
+      nChoice := Achoice(13, 4, 19, 24 , aLevelNames)
 
-      IF nChoice > 0
+      IF nChoice > 0 .and. LastKey() != K_F1
          DO While LastKey() != K_ESC
             @14,30 GET cMessage
             READ
-            IF LastKey() != K_ESC
+            IF LastKey() != K_ESC .and. LastKey() != K_F1
                // Preparing virtual console
-               @23,0 SAY Space(80)
-               @23,0
+               @22,0 SAY Space(80)
+               @22,0
 
                LOG cMessage PRIO aLevels[ nChoice ]
                cMessage := Space( 45 )
@@ -113,8 +114,8 @@ Procedure MAIN()
    ENDDO
 
    // Log closing creates a log INFO message
-   @23,0 SAY Space(80)
-   @23,0
+   @22,0 SAY Space(80)
+   @22,0
    // closing the log
    CLOSE LOG
 
