@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4 2001/12/23 18:01:36 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5 2001/12/24 23:34:47 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,76 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2001-12-29 17:16 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
+  * xharbour/makefile.bc
+  * xharbour/makefile.vc
+  * xharbour/source/vm/Makefile
+    + Added support for new source/vm/fastitem.c
+
+  * xharbour/include/hbapi.h
+    + Added member bShadow to HB_ITEM structure.
+
+  + xharbour/include/hbfast.h
+  + xharbour/source/vm/fastitem.c
+    + New functions:
+       void hb_itemShareValue( PHB_ITEM pDest, PHB_ITEM pSource );
+       void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
+       void hb_itemPushEnvelopeString( char * szText, ULONG length );
+       void hb_retcAdopt( char * szText );
+       void hb_retclenAdopt( char * szText, ULONG ulLen );
+
+  * xharbour/include/hbexprb.c
+    * Now includes terminating NULL in generated strings of PCODE.
+
+  * xharbour/source/vm/fm.c
+    + Tracing info.
+
+  * xharbour/source/vm/hvm.c
+    ! Support for additional NULL in PCODE strings.
+
+  * xharbour/source/vm/itemapi.c
+  * xharbour/source/rtl/ampm.c
+  * xharbour/source/rtl/chrasc.c
+  * xharbour/source/rtl/colorind.c
+  * xharbour/source/rtl/datec.c
+  * xharbour/source/rtl/dateshb.c
+  * xharbour/source/rtl/descend.c
+  * xharbour/source/rtl/fkmax.c
+  * xharbour/source/rtl/gete.c
+  * xharbour/source/rtl/hardcr.c
+  * xharbour/source/rtl/langapi.c
+  * xharbour/source/rtl/left.c
+  * xharbour/source/rtl/memoline.c
+  * xharbour/source/rtl/mouseapi.c
+  * xharbour/source/rtl/mtran.c
+  * xharbour/source/rtl/net.c
+  * xharbour/source/rtl/oemansi.c
+  * xharbour/source/rtl/padc.c
+  * xharbour/source/rtl/padl.c
+  * xharbour/source/rtl/padr.c
+  * xharbour/source/rtl/philes.c
+  * xharbour/source/rtl/replic.c
+  * xharbour/source/rtl/right.c
+  * xharbour/source/rtl/saverest.c
+  * xharbour/source/rtl/setcolor.c
+  * xharbour/source/rtl/space.c
+  * xharbour/source/rtl/strcase.c
+  * xharbour/source/rtl/strtran.c
+  * xharbour/source/rtl/strzero.c
+  * xharbour/source/rtl/stuff.c
+  * xharbour/source/rtl/substr.c
+  * xharbour/source/rtl/transfrm.c
+  * xharbour/source/rtl/trim.c
+  * xharbour/source/rtl/type.c
+  * xharbour/source/rtl/valtostr.c
+  * xharbour/source/rtl/version.c
+    * First installment of an overhaul optimization of the RT.
+      so far only taking advantage of hb_retc[]Adopt() from fastitem.c.
+
+      After thoutough testings system appears stable and already faster
+      than Harbour.
+
 2001-12-24 21:35 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
    * utils/hbmake/hbmake.prg
      * Some minor fixes to both edit mode

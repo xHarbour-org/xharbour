@@ -1,5 +1,5 @@
 /*
- * $Id: strtran.c,v 1.8 2001/04/12 18:56:29 dholm Exp $
+ * $Id: strtran.c,v 1.1.1.1 2001/12/21 10:42:06 ronpinkas Exp $
  */
 
 /*
@@ -174,25 +174,36 @@ HB_FUNC( STRTRAN )
                            i++;
                         }
                      }
-                     hb_retclen( szResult, ulLength );
-                     hb_xfree( szResult );
+
+                     hb_retclenAdopt( szResult, ulLength );
                   }
                   else
+                  {
                      hb_retclen( szText, ulText );
+                  }
                }
                else
+               {
                   hb_retclen( szText, ulText );
+               }
             }
             else
+            {
                hb_retclen( szText, ulText );
+            }
          }
          else
+         {
             hb_retclen( szText, ulText );
+         }
       }
       else
+      {
          hb_errRT_BASE_SubstR( EG_ARG, 1126, NULL, "STRTRAN", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) ); /* NOTE: Undocumented but existing Clipper Run-time error [vszakats] */
+      }
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1126, NULL, "STRTRAN", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) ); /* NOTE: Undocumented but existing Clipper Run-time error [vszakats] */
+   }
 }
-

@@ -1,5 +1,5 @@
 /*
- * $Id: type.c,v 1.16 2001/06/14 21:20:43 dholm Exp $
+ * $Id: type.c,v 1.1.1.1 2001/12/21 10:42:18 ronpinkas Exp $
  */
 
 /*
@@ -58,8 +58,12 @@ HB_FUNC( TYPE )
    HB_ITEM_PTR pItem = hb_param( 1, HB_IT_STRING );
 
    if( pItem )
+   {
       hb_retc( hb_macroGetType( pItem ) );
+   }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1121, NULL, "TYPE", 1, hb_paramError( 1 ) );
+   }
 }
 

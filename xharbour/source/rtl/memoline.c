@@ -1,5 +1,5 @@
 /*
- * $Id: memoline.c,v 1.27 2001/08/30 16:56:59 ignacioortiz Exp $
+ * $Id: memoline.c,v 1.1.1.1 2001/12/21 10:42:21 ronpinkas Exp $
  */
 
 /*
@@ -154,7 +154,7 @@ HB_FUNC( MEMOLINE )
    if( ulPos < ulLen || (ulLineNumber == ulLines && ulLineEnd >= ulLineBegin) )
    {
       ULONG ulSpAdded = 0;
-      char * pszLine = ( char * ) hb_xgrab( ulLineLength );
+      char * pszLine = ( char * ) hb_xgrab( ulLineLength + 1 );
 
       memset( pszLine, ' ', ulLineLength );
 
@@ -171,10 +171,11 @@ HB_FUNC( MEMOLINE )
 
       }
 
-      hb_retclen( pszLine, ulLineLength );
-      hb_xfree( pszLine );
+      hb_retclenAdopt( pszLine, ulLineLength );
    }
    else
+   {
       hb_retc( "" );
+   }
 }
 

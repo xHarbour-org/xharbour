@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.23 2001/08/07 21:28:23 dholm Exp $
+ * $Id: net.c,v 1.1.1.1 2001/12/21 10:41:53 ronpinkas Exp $
  */
 
 /*
@@ -97,11 +97,10 @@ HB_FUNC( NETNAME )
    {
       char * pszValue = ( char * ) hb_xgrab( MAXGETHOSTNAME + 1 );
       pszValue[ 0 ] = '\0';
-     
+
       gethostname( pszValue, MAXGETHOSTNAME );
-     
-      hb_retc( pszValue );
-      hb_xfree( pszValue );
+
+      hb_retcAdopt( pszValue );
    }
 
 #elif defined(HB_OS_DOS)
@@ -110,28 +109,27 @@ HB_FUNC( NETNAME )
       {
          char * pszValue = ( char * ) hb_xgrab( MAXGETHOSTNAME + 1 );
          pszValue[ 0 ] = '\0';
-        
+
          gethostname( pszValue, MAXGETHOSTNAME );
-        
-         hb_retc( pszValue );
-         hb_xfree( pszValue );
+
+         hb_retcAdopt( pszValue );
       }
    #else
       {
          char szValue[ 16 ];
          union REGS regs;
-      
+
          regs.HB_XREGS.ax = 0x5E00;
-      
+
          {
             struct SREGS sregs;
-      
+
             regs.HB_XREGS.dx = FP_OFF( szValue );
             sregs.ds = FP_SEG( szValue );
-      
+
             HB_DOS_INT86X( 0x21, &regs, &regs, &sregs );
          }
-      
+
          hb_retc( regs.h.ch == 0 ? "" : szValue );
       }
    #endif
@@ -146,8 +144,7 @@ HB_FUNC( NETNAME )
 
       GetComputerName( pszValue, &ulLen );
 
-      hb_retc( pszValue );
-      hb_xfree( pszValue );
+      hb_retcAdopt( pszValue );
    }
 
 #else

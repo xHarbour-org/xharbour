@@ -1,5 +1,5 @@
 /*
- * $Id: replic.c,v 1.7 2001/04/12 18:56:29 dholm Exp $
+ * $Id: replic.c,v 1.1.1.1 2001/12/21 10:42:01 ronpinkas Exp $
  */
 
 /*
@@ -79,16 +79,20 @@ HB_FUNC( REPLICATE )
                szPtr += ulLen;
             }
 
-            hb_retclen( szResult, ulLen * lTimes );
-            hb_xfree( szResult );
+            hb_retclenAdopt( szResult, ulLen * lTimes );
          }
          else
+         {
             hb_errRT_BASE_SubstR( EG_STROVERFLOW, 1234, NULL, "REPLICATE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+         }
       }
       else
+      {
          hb_retc( "" );
+      }
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1106, NULL, "REPLICATE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
 }
-

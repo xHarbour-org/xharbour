@@ -1,5 +1,5 @@
 /*
- * $Id: setcolor.c,v 1.33 2001/12/05 18:44:47 vszakats Exp $
+ * $Id: setcolor.c,v 1.1.1.1 2001/12/21 10:42:02 ronpinkas Exp $
  */
 
 /*
@@ -86,7 +86,9 @@ HB_FUNC( SETBLINK )
    hb_retl( bPreviousBlink );
 
    if( ISLOG( 1 ) )
+   {
       hb_gtSetBlink( hb_parl( 1 ) );
+   }
 }
 
 #ifdef HB_EXTENSION

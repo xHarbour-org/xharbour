@@ -1,5 +1,5 @@
 /*
- * $Id: langapi.c,v 1.18 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: langapi.c,v 1.1.1.1 2001/12/21 10:41:47 ronpinkas Exp $
  */
 
 /*
@@ -223,8 +223,7 @@ HB_FUNC( HB_LANGSELECT )
 HB_FUNC( HB_LANGNAME )
 {
    char * pszName = hb_langName();
-   hb_retc( pszName );
-   hb_xfree( pszName );
+   hb_retcAdopt( pszName );
 }
 
 HB_FUNC( HB_LANGERRMSG )

@@ -1,5 +1,5 @@
 /*
- * $Id: padc.c,v 1.2 2001/04/12 18:24:41 dholm Exp $
+ * $Id: padc.c,v 1.1.1.1 2001/12/21 10:41:55 ronpinkas Exp $
  */
 
 /*
@@ -83,18 +83,20 @@ HB_FUNC( PADC )
 
          szResult[ lLen ] = '\0';
 
-         hb_retclen( szResult, lLen );
-         hb_xfree( szResult );
+         hb_retclenAdopt( szResult, lLen );
       }
       else
       {
          if( lLen < 0 )
+         {
             lLen = 0;
+         }
 
          hb_retclen( szText, lLen );
       }
    }
    else
+   {
       hb_retc( "" );
+   }
 }
-

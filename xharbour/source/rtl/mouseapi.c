@@ -1,5 +1,5 @@
 /*
- * $Id: mouseapi.c,v 1.20 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: mouseapi.c,v 1.1.1.1 2001/12/21 10:41:52 ronpinkas Exp $
  */
 
 /*
@@ -235,7 +235,7 @@ HB_FUNC( MSAVESTATE )
                   sizeof( int ) +
                   sizeof( int );
 
-   BYTE * pBuffer = ( BYTE * ) hb_xgrab( uiLen );
+   BYTE * pBuffer = ( BYTE * ) hb_xgrab( uiLen + 1 );
 
    hb_mouseGetBounds( &iTop, &iLeft, &iBottom, &iRight );
 
@@ -254,9 +254,7 @@ HB_FUNC( MSAVESTATE )
    uiPos += sizeof( int );
    *( pBuffer + uiPos ) = iRight;
 
-   hb_retclen( ( char * ) pBuffer, uiLen );
-
-   hb_xfree( pBuffer );
+   hb_retclenAdopt( ( char * ) pBuffer, uiLen );
 }
 
 HB_FUNC( MRESTSTATE )

@@ -1,5 +1,5 @@
 /*
- * $Id: mtran.c,v 1.34 2001/06/14 21:20:43 dholm Exp $
+ * $Id: mtran.c,v 1.1.1.1 2001/12/21 10:41:53 ronpinkas Exp $
  */
 
 /*
@@ -99,11 +99,11 @@ HB_FUNC( MEMOTRAN )
       ULONG ulResultLen;
 
       hb_strMemotran( pszResult, &ulResultLen, hb_itemGetCPtr( pString ), hb_itemGetCLen( pString ), cHardcr, cSoftcr );
-      hb_retclen( pszResult, ulResultLen );
-
-      hb_xfree( pszResult );
+      hb_retclenAdopt( pszResult, ulResultLen );
    }
    else
+   {
       hb_retc( "" );
+   }
 }
 

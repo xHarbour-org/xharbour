@@ -1,5 +1,5 @@
 /*
- * $Id: ampm.c,v 1.5 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: ampm.c,v 1.1.1.1 2001/12/21 10:41:11 ronpinkas Exp $
  */
 
 /*
@@ -87,11 +87,12 @@ HB_FUNC( AMPM )
       bAM = FALSE;
    }
    else
+   {
       bAM = ( uiHour != 12 );
+   }
 
    strcpy( pszResult + ulTimeLen, bAM ? " am" : " pm" );
 
-   hb_retclen( pszResult, ulTimeLen + 3 );
-   hb_xfree( pszResult );
+   hb_retclenAdopt( pszResult, ulTimeLen + 3 );
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: oemansi.c,v 1.19 2001/12/05 18:44:47 vszakats Exp $
+ * $Id: oemansi.c,v 1.1.1.1 2001/12/21 10:41:53 ronpinkas Exp $
  */
 
 /*
@@ -72,8 +72,7 @@ HB_FUNC( HB_ANSITOOEM )
 
       CharToOemBuff( ( LPCSTR ) hb_itemGetCPtr( pString ), ( LPSTR ) pszDst, ulLen );
 
-      hb_retclen( pszDst, ulLen );
-      hb_xfree( pszDst );
+      hb_retclenAdopt( pszDst, ulLen );
    }
 #else
       hb_itemReturn( pString );
@@ -94,8 +93,7 @@ HB_FUNC( HB_OEMTOANSI )
 
       OemToCharBuff( ( LPCSTR ) hb_itemGetCPtr( pString ), ( LPSTR ) pszDst, ulLen );
 
-      hb_retclen( pszDst, ulLen );
-      hb_xfree( pszDst );
+      hb_retclenAdopt( pszDst, ulLen );
    }
 #else
       hb_itemReturn( pString );

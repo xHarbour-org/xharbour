@@ -1,5 +1,5 @@
 /*
- * $Id: padr.c,v 1.2 2001/04/12 18:24:41 dholm Exp $
+ * $Id: padr.c,v 1.1.1.1 2001/12/21 10:41:55 ronpinkas Exp $
  */
 
 /*
@@ -76,20 +76,24 @@ HB_FUNC( PADR )
          cPad = ( ISCHAR( 3 ) ? *( hb_parc( 3 ) ) : ' ' );
 
          for( lPos = ( long ) ulSize; lPos < lLen; lPos++ )
+         {
             szResult[ lPos ] = cPad;
+         }
 
-         hb_retclen( szResult, ( ULONG ) lLen );
-         hb_xfree( szResult );
+         hb_retclenAdopt( szResult, ( ULONG ) lLen );
       }
       else
       {
          if( lLen < 0 )
+         {
             lLen = 0;
+         }
 
          hb_retclen( szText, lLen );
       }
    }
    else
+   {
       hb_retc( "" );
+   }
 }
-

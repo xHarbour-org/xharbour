@@ -1,5 +1,5 @@
 /*
- * $Id: descend.c,v 1.41 2001/06/14 21:20:43 dholm Exp $
+ * $Id: descend.c,v 1.1.1.1 2001/12/21 10:41:27 ronpinkas Exp $
  */
 
 /*
@@ -75,16 +75,21 @@ HB_FUNC( DESCEND )
       if( HB_IS_STRING( pItem ) )
       {
          ULONG ulLen = hb_itemGetCLen( pItem );
-         char * szBuffer = ( char * ) hb_xgrab( ulLen );
+         char * szBuffer = ( char * ) hb_xgrab( ulLen + 1 );
          hb_strDescend( szBuffer, hb_itemGetCPtr( pItem ), ulLen );
-         hb_retclen( szBuffer, ulLen );
-         hb_xfree( szBuffer );
+         hb_retclenAdopt( szBuffer, ulLen );
       }
       else if( HB_IS_DATE( pItem ) )
+      {
          hb_retnl( 5231808 - hb_itemGetDL( pItem ) );
+      }
       else if( HB_IS_NUMERIC( pItem ) )
+      {
          hb_retnd( -1 * hb_itemGetND( pItem ) );
+      }
       else if( HB_IS_LOGICAL( pItem ) )
+      {
          hb_retl( ! hb_itemGetL( pItem ) );
+      }
    }
 }

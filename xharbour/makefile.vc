@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.1.1.1 2001/12/21 10:39:09 ronpinkas Exp $
+# $Id: makefile.vc,v 1.228 2001/12/21 15:31:30 vszakats Exp $
 #
 
 #
@@ -79,6 +79,9 @@ ECHO = echo.
 # You might need to set 'ECHO=echo.' - but don't set 'DEL=del.' !!!
 DEL = del
 !endif
+
+# SimpLex is the only supported Scanner in xHarbour.
+HB_LEX = SIMPLEX
 
 MK_FILE      = makefile.vc
 MK_FLAGS     = $(MAKEFLAGS: =)
@@ -273,8 +276,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\datesx.obj \
    $(OBJ_DIR)\defpath.obj \
    $(OBJ_DIR)\descend.obj \
-   $(OBJ_DIR)\dir.obj \
    $(OBJ_DIR)\dirdrive.obj \
+   $(OBJ_DIR)\direct.obj \
    $(OBJ_DIR)\diskspac.obj \
    $(OBJ_DIR)\disksphb.obj \
    $(OBJ_DIR)\do.obj \
@@ -650,6 +653,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)\initexit.obj \
    $(OBJ_DIR)\initsymb.obj \
    $(OBJ_DIR)\itemapi.obj \
+   $(OBJ_DIR)\fatitem.obj \
    $(OBJ_DIR)\macro.obj \
    $(OBJ_DIR)\maindll.obj \
    $(OBJ_DIR)\mainstd.obj \

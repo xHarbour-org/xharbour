@@ -1,5 +1,5 @@
 /*
- * $Id: padl.c,v 1.3 2001/04/12 18:24:41 dholm Exp $
+ * $Id: padl.c,v 1.1.1.1 2001/12/21 10:41:55 ronpinkas Exp $
  */
 
 /*
@@ -76,20 +76,24 @@ HB_FUNC( PADL )
          cPad = ( ISCHAR( 3 ) ? *( hb_parc( 3 ) ) : ' ' );
 
          for(; lPos > 0; lPos-- )
+         {
             szResult[ lPos - 1 ] = cPad;
+         }
 
-         hb_retclen( szResult, lLen );
-         hb_xfree( szResult );
+         hb_retclenAdopt( szResult, lLen );
       }
       else
       {
          if( lLen < 0 )
+         {
             lLen = 0;
+         }
 
          hb_retclen( szText, lLen );
       }
    }
    else
+   {
       hb_retc( "" );
+   }
 }
-

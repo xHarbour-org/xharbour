@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.78 2001/12/23 09:19:10 vszakats Exp $
+ * $Id: hbapi.h,v 1.2 2001/12/23 18:01:37 ronpinkas Exp $
  */
 
 /*
@@ -214,6 +214,7 @@ struct hb_struSymbol
 typedef struct _HB_ITEM
 {
    USHORT type;
+   BOOL bShadow;
    union
    {
       struct hb_struArray   asArray;

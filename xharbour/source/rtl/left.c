@@ -1,5 +1,5 @@
 /*
- * $Id: left.c,v 1.8 2001/04/12 18:56:29 dholm Exp $
+ * $Id: left.c,v 1.1.1.1 2001/12/21 10:41:47 ronpinkas Exp $
  */
 
 /*
@@ -65,13 +65,18 @@ HB_FUNC( LEFT )
       long lLen = hb_parnl( 2 );
 
       if( lLen > ( long ) hb_itemGetCLen( pText ) )
+      {
          lLen = ( long ) hb_itemGetCLen( pText );
+      }
       else if( lLen < 0 )
+      {
          lLen = 0;
+      }
 
       hb_retclen( hb_itemGetCPtr( pText ), lLen );
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "LEFT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
 }
-

@@ -1,5 +1,5 @@
 /*
- * $Id: valtostr.c,v 1.5 2001/04/04 01:05:08 dholm Exp $
+ * $Id: valtostr.c,v 1.1.1.1 2001/12/21 10:42:19 ronpinkas Exp $
  */
 
 /*
@@ -61,10 +61,14 @@ HB_FUNC( HB_VALTOSTR )
    BOOL bFreeReq;
    char * buffer = hb_itemString( hb_param( 1, HB_IT_ANY ), &ulLen, &bFreeReq );
 
-   hb_retclen( buffer, ulLen );
-
    if( bFreeReq )
-      hb_xfree( buffer );
+   {
+      hb_retclenAdopt( buffer, ulLen );
+   }
+   else
+   {
+      hb_retclen( buffer, ulLen );
+   }
 }
 
 #endif

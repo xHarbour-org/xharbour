@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.15 2001/12/21 17:00:03 vszakats Exp $
+ * $Id: philes.c,v 1.2 2001/12/21 22:00:49 ronpinkas Exp $
  */
 
 /*
@@ -146,7 +146,7 @@ HB_FUNC( FERASE )
 {
    hb_fsSetError( 3 );
 
-   hb_retni( ( ISCHAR( 1 ) && 
+   hb_retni( ( ISCHAR( 1 ) &&
                hb_fsDelete( ( BYTE * ) hb_parc( 1 ) ) ) ? 0 : -1 );
 }
 
@@ -154,7 +154,7 @@ HB_FUNC( FRENAME )
 {
    hb_fsSetError( 2 );
 
-   hb_retni( ( ISCHAR( 1 ) && ISCHAR( 2 ) && 
+   hb_retni( ( ISCHAR( 1 ) && ISCHAR( 2 ) &&
                hb_fsRename( ( BYTE * ) hb_parc( 1 ), ( BYTE * ) hb_parc( 2 ) ) ) ? 0 : -1 );
 }
 
@@ -185,15 +185,17 @@ HB_FUNC( FREADSTR )
 
          /* NOTE: Clipper will not return zero chars from this functions. */
 
-         hb_retc( ( char * ) buffer );
-
-         hb_xfree( buffer );
+         hb_retcAdopt( ( char * ) buffer );
       }
       else
+      {
          hb_retc( "" );
+      }
    }
    else
+   {
       hb_retc( "" );
+   }
 }
 
 /* NOTE: This function should not return the leading and trailing */
@@ -209,8 +211,7 @@ HB_FUNC( CURDIR )
    hb_fsCurDirBuff( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
       ( USHORT )( toupper( *hb_parc( 1 ) ) - 'A' + 1 ) : 0, pbyBuffer, _POSIX_PATH_MAX + 1 );
 
-   hb_retc( ( char * ) pbyBuffer );
-   hb_xfree( pbyBuffer );
+   hb_retcAdopt( ( char * ) pbyBuffer );
 
    hb_fsSetError( uiErrorOld );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.7 2001/04/12 18:56:29 dholm Exp $
+ * $Id: chrasc.c,v 1.1.1.1 2001/12/21 10:41:13 ronpinkas Exp $
  */
 
 /*
@@ -75,7 +75,9 @@ HB_FUNC( CHR )
       hb_retclen( szChar, 1 );
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1104, NULL, "CHR", 1, hb_paramError( 1 ) );
+   }
 }
 
 /* converts a character value to an ASCII code */

@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.1.1.1 2001/12/21 10:40:53 ronpinkas Exp $
+ * $Id: fm.c,v 1.2 2001/12/22 06:36:17 ronpinkas Exp $
  */
 
 /*
@@ -179,6 +179,8 @@ void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on fail
    if( s_lMemoryMaxBlocks < s_lMemoryBlocks )
       s_lMemoryMaxBlocks = s_lMemoryBlocks;
 
+   HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xgrab(%lu) returning: %p", ulSize, (char *) pMem + sizeof( HB_MEMINFO ) ) );
+
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
 #else
@@ -264,7 +266,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 {
 #ifdef HB_FM_STATISTICS
 
-   HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xfree(%p)", pMem));
+   HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xfree(%p)", pMem ) );
 
    if( pMem )
    {

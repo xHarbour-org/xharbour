@@ -1,5 +1,5 @@
 /*
- * $Id: space.c,v 1.7 2001/04/12 18:56:29 dholm Exp $
+ * $Id: space.c,v 1.1.1.1 2001/12/21 10:42:05 ronpinkas Exp $
  */
 
 /*
@@ -72,12 +72,15 @@ HB_FUNC( SPACE )
          /* hb_errRT_BASE( EG_STROVERFLOW, 1233, NULL, "SPACE" ); */
 
          hb_xmemset( szResult, ' ', lLen );
-         hb_retclen( szResult, lLen );
-         hb_xfree( szResult );
+         hb_retclenAdopt( szResult, lLen );
       }
       else
+      {
          hb_retc( "" );
+      }
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1105, NULL, "SPACE", 1, hb_paramError( 1 ) );
+   }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: colorind.c,v 1.3 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: colorind.c,v 1.1.1.1 2001/12/21 10:41:14 ronpinkas Exp $
  */
 
 /*
@@ -94,9 +94,13 @@ HB_FUNC( HB_COLORINDEX )
          hb_retclen( pszColor + ulColorPos, ulColorLen );
       }
       else
+      {
          hb_retc( "" );
+      }
    }
    else
+   {
       hb_retc( "" );
+   }
 }
 

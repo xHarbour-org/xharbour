@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.6 2001/06/15 17:59:21 dholm Exp $
+ * $Id: version.c,v 1.1.1.1 2001/12/21 10:42:19 ronpinkas Exp $
  */
 
 /*
@@ -66,21 +66,18 @@
 HB_FUNC( OS )
 {
    char * pszPlatform = hb_verPlatform();
-   hb_retc( pszPlatform );
-   hb_xfree( pszPlatform );
+   hb_retcAdopt( pszPlatform );
 }
 
 HB_FUNC( HB_COMPILER )
 {
    char * pszCompiler = hb_verCompiler();
-   hb_retc( pszCompiler );
-   hb_xfree( pszCompiler );
+   hb_retcAdopt( pszCompiler );
 }
 
 HB_FUNC( VERSION )
 {
    char * pszVersion = hb_verHarbour();
-   hb_retc( pszVersion );
-   hb_xfree( pszVersion );
+   hb_retcAdopt( pszVersion );
 }
 

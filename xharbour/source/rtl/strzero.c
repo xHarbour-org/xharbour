@@ -1,5 +1,5 @@
 /*
- * $Id: strzero.c,v 1.9 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: strzero.c,v 1.1.1.1 2001/12/21 10:42:06 ronpinkas Exp $
  */
 
 /*
@@ -116,13 +116,15 @@ HB_FUNC( STRZERO )
                   szResult[ ulPos++ ] = '0';
             }
 
-            hb_retc( szResult );
-            hb_xfree( szResult );
+            hb_retcAdopt( szResult );
          }
          else
+         {
             hb_retc( "" );
+         }
       }
       else
+      {
 #ifdef HB_C52_STRICT
          /* NOTE: In CA-Cl*pper STRZERO() is written in Clipper, and will call
                   STR() to do the job, the error (if any) will also be thrown
@@ -131,5 +133,6 @@ HB_FUNC( STRZERO )
 #else
          hb_errRT_BASE_SubstR( EG_ARG, 9999, NULL, "STRZERO", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
 #endif
+      }
    }
 }

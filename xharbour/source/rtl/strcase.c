@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.10 2001/11/22 01:47:12 brianhays Exp $
+ * $Id: strcase.c,v 1.1.1.1 2001/12/21 10:42:05 ronpinkas Exp $
  */
 
 /*
@@ -69,6 +69,36 @@ char * hb_strLower( char * szText, ULONG ulLen )
    return szText;
 }
 
+char * hb_strLowerCopy( char * szText, ULONG ulLen )
+{
+   char *szCopy = hb_xgrab( ulLen + 1 );
+   ULONG i;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strLowerCopy(%s, %lu)", szText, ulLen));
+
+   for( i = 0; i < ulLen; i++ )
+   {
+      szCopy[ i ] = tolower( szText[ i ] );
+   }
+
+   return szCopy;
+}
+
+char * hb_strUpperCopy( char * szText, ULONG ulLen )
+{
+   char *szCopy = hb_xgrab( ulLen + 1 );
+   ULONG i;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strUpperCopy(%s, %lu)", szText, ulLen));
+
+   for( i = 0; i < ulLen; i++ )
+   {
+      szCopy[ i ] = toupper( szText[ i ] );
+   }
+
+   return szCopy;
+}
+
 /* converts szText to upper case. Does not create a new string! */
 char * hb_strUpper( char * szText, ULONG ulLen )
 {
@@ -129,15 +159,15 @@ HB_FUNC( LOWER )
 
    if( pText )
    {
-      char * pszBuffer = hb_itemGetC( pText );
-      ULONG ulLen = hb_itemGetCLen( pText );
+      char * pszBuffer = pText->item.asString.value;
+      ULONG ulLen = pText->item.asString.length;
 
-      hb_retclen( hb_strLower( pszBuffer, ulLen ), ulLen );
-
-      hb_itemFreeC( pszBuffer );
+      hb_retclenAdopt( hb_strLowerCopy( pszBuffer, ulLen ), ulLen );
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1103, NULL, "LOWER", 1, hb_paramError( 1 ) );
+   }
 }
 
 /* converts string to upper case */
@@ -147,13 +177,13 @@ HB_FUNC( UPPER )
 
    if( pText )
    {
-      char * pszBuffer = hb_itemGetC( pText );
-      ULONG ulLen = hb_itemGetCLen( pText );
+      char * pszBuffer = pText->item.asString.value;
+      ULONG ulLen = pText->item.asString.length;
 
-      hb_retclen( hb_strUpper( pszBuffer, ulLen ), ulLen );
-
-      hb_itemFreeC( pszBuffer );
+      hb_retclenAdopt( hb_strUpperCopy( pszBuffer, ulLen ), ulLen );
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1102, NULL, "UPPER", 1, hb_paramError( 1 ) );
+   }
 }

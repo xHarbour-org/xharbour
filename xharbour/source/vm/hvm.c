@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.1.1.1 2001/12/21 10:40:44 ronpinkas Exp $
+ * $Id: hvm.c,v 1.2 2001/12/23 18:01:37 ronpinkas Exp $
  */
 
 /*
@@ -968,13 +968,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_PUSHSTR:
          {
             USHORT uiSize = pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 );
-            hb_vmPushString( ( char * ) pCode + w + 3, ( ULONG ) uiSize );
+            hb_vmPushString( ( char * ) pCode + w + 3, ( ULONG )( uiSize ) - 1 );
             w += ( 3 + uiSize );
             break;
          }
 
          case HB_P_PUSHSTRSHORT:
-            hb_vmPushString( ( char * ) pCode + w + 2, ( ULONG ) pCode[ w + 1 ] );
+            hb_vmPushString( ( char * ) pCode + w + 2, ( ULONG )( pCode[ w + 1 ] ) - 1 );
             w += ( 2 + pCode[ w + 1 ] );
             break;
 
@@ -2948,20 +2948,18 @@ void hb_vmDo( USHORT uiParams )
               /* Push current SuperClass handle */
               lPopSuper = TRUE ;
 
-              if( ! pSelf->item.asArray.value->puiClsTree )
+              if ( ! pSelf->item.asArray.value->puiClsTree)
               {
-                 pSelf->item.asArray.value->puiClsTree = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
-                 HB_TRACE( HB_TR_INFO, ( "Allocated Tree, %p", pSelf->item.asArray.value->puiClsTree ) );
-
-                 pSelf->item.asArray.value->puiClsTree[0] = 0;
+               pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
+               pSelf->item.asArray.value->puiClsTree[0]=0;
               }
 
-              nPos = pSelfBase->puiClsTree[0] + 1;
+              nPos=pSelfBase->puiClsTree[0]+1;
               pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * ( nPos + 1 ) );
-              HB_TRACE( HB_TR_INFO, ( "Re-Allocated Tree, %p, %u", pSelfBase->puiClsTree, sizeof( USHORT ) * ( nPos + 1 ) ) );
 
-              pSelfBase->puiClsTree[0]      = nPos ;
+              pSelfBase->puiClsTree[0] = nPos ;
               pSelfBase->puiClsTree[ nPos ] = uiClass;
+
             }
          }
       }
@@ -2969,42 +2967,34 @@ void hb_vmDo( USHORT uiParams )
       if( pFunc )
       {
          if( bProfiler )
-         {
             pMethod = hb_mthRequested();
-         }
 
-         if( hb_bTracePrgCalls )
-         {
+         if ( hb_bTracePrgCalls )
             HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
-         }
 
          pFunc();
 
-         if( lPopSuper && pSelfBase->puiClsTree )
+         if (lPopSuper && pSelfBase->puiClsTree)
          {
-            USHORT nPos = pSelfBase->puiClsTree[0] - 1;
-            /* POP SuperClass handle */
 
-            if( nPos )
+           USHORT nPos=pSelfBase->puiClsTree[0]-1;
+           /* POP SuperClass handle */
+
+           if (nPos)
             {
-               pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos + 1) );
-               HB_TRACE( HB_TR_INFO, ( "Re-Allocated Tree, %p, %u", pSelfBase->puiClsTree, sizeof( USHORT ) * ( nPos + 1 ) ) );
-
-               pSelfBase->puiClsTree[0] = nPos;
+             pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos + 1) );
+             pSelfBase->puiClsTree[0]=nPos;
             }
-            else
+           else
             {
-               hb_xfree( pSelfBase->puiClsTree );
-               HB_TRACE( HB_TR_INFO, ( "Released Tree, %p", pSelfBase->puiClsTree ) );
-
-               pSelfBase->puiClsTree = NULL ;
+             hb_xfree(pSelfBase->puiClsTree);
+             pSelfBase->puiClsTree = NULL ;
             }
+
          }
 
          if( bProfiler )
-         {
             hb_mthAddTime( pMethod, clock() - ulClock );
-         }
       }
       else if( pSym->szName[ 0 ] == '_' )
       {
@@ -3025,15 +3015,12 @@ void hb_vmDo( USHORT uiParams )
 
       if( pFunc )
       {
-         if( bProfiler && pSym->pDynSym )
-         {
+         if( bProfiler && pSym->pDynSym ) {
             pSym->pDynSym->ulRecurse++;
          }
 
          if ( hb_bTracePrgCalls )
-         {
             HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
-         }
 
          pFunc();
 
@@ -3042,14 +3029,12 @@ void hb_vmDo( USHORT uiParams )
             pSym->pDynSym->ulCalls++;                   /* profiler support */
 
             /* Time spent has to be added only inside topmost call of a recursive function */
-            if( pSym->pDynSym->ulRecurse == 1 )
-            {
+            if( pSym->pDynSym->ulRecurse == 1 ) {
                pSym->pDynSym->ulTime += clock() - ulClock; /* profiler support */
             }
          }
 
-         if( bProfiler && pSym->pDynSym )
-         {
+         if( bProfiler && pSym->pDynSym ) {
             pSym->pDynSym->ulRecurse--;
          }
       }
@@ -3065,11 +3050,8 @@ void hb_vmDo( USHORT uiParams )
    }
 
    hb_stackOldFrame( &sStackState );
-
    if( s_bDebugging )
-   {
       hb_vmDebuggerEndProc();
-   }
 
    s_bDebugging = bDebugPrevState;
 }
@@ -3120,75 +3102,64 @@ void hb_vmSend( USHORT uiParams )
 
             if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
             {
-               PHB_ITEM pRealSelf;
-               USHORT nPos;
-               USHORT uiClass;
+              PHB_ITEM pRealSelf;
+              USHORT nPos;
+              USHORT uiClass;
 
-               /*
-               printf( "\n VmSend Method: %s \n", pSym->szName );
-               */
-               uiClass = pSelfBase->uiClass;
+              /*
+              printf( "\n VmSend Method: %s \n", pSym->szName );
+              */
+              uiClass = pSelfBase->uiClass;
 
-               pRealSelf = hb_itemNew( NULL ) ;
-               hb_itemCopy(pRealSelf ,pSelf->item.asArray.value->pItems) ;  // hb_arrayGetItemPtr(pSelf,1) ;
-               /* and take back the good pSelfBase */
-               pSelfBase = pRealSelf->item.asArray.value;
-               /* Now I should exchnage it with the current stacked value */
-               hb_itemSwap( pSelf, pRealSelf );
-               hb_itemRelease(pRealSelf) ; /* and release the fake one */
+              pRealSelf = hb_itemNew( NULL ) ;
+              hb_itemCopy(pRealSelf ,pSelf->item.asArray.value->pItems) ;  // hb_arrayGetItemPtr(pSelf,1) ;
+              /* and take back the good pSelfBase */
+              pSelfBase = pRealSelf->item.asArray.value;
+              /* Now I should exchnage it with the current stacked value */
+              hb_itemSwap( pSelf, pRealSelf );
+              hb_itemRelease(pRealSelf) ; /* and release the fake one */
 
-               /* Push current SuperClass handle */
-               lPopSuper = TRUE ;
+              /* Push current SuperClass handle */
+              lPopSuper = TRUE ;
 
 
-               if ( ! pSelf->item.asArray.value->puiClsTree )
-               {
-                  pSelf->item.asArray.value->puiClsTree = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
-                  HB_TRACE( HB_TR_INFO, ( "Allocated Tree, %p, %u", pSelf->item.asArray.value->puiClsTree ) );
+              if ( ! pSelf->item.asArray.value->puiClsTree)
+              {
+               pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
+               pSelf->item.asArray.value->puiClsTree[0]=0;
+              }
 
-                  pSelf->item.asArray.value->puiClsTree[0] = 0;
-               }
-
-               nPos=pSelfBase->puiClsTree[0] + 1;
-               pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * ( nPos + 1 ) ) ;
-               HB_TRACE( HB_TR_INFO, ( "Re-Allocated Tree, %p, %u", pSelfBase->puiClsTree, sizeof( USHORT ) * ( nPos + 1 ) ) );
-
-               pSelfBase->puiClsTree[0]      = nPos ;
-               pSelfBase->puiClsTree[ nPos ] = uiClass;
+              nPos=pSelfBase->puiClsTree[0]+1;
+              pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
+              pSelfBase->puiClsTree[0] = nPos ;
+              pSelfBase->puiClsTree[ nPos ] = uiClass;
             }
 
             if( pFunc )
             {
                if( bProfiler )
-               {
                   pMethod = hb_mthRequested();
-               }
 
                if ( hb_bTracePrgCalls )
-               {
                   HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
-               }
 
                pFunc();
 
-               if( lPopSuper && pSelfBase->puiClsTree )
+               if (lPopSuper && pSelfBase->puiClsTree)
                {
-                  USHORT nPos=pSelfBase->puiClsTree[0]-1;
-                  /* POP SuperClass handle */
-                  if (nPos)
-                  {
-                     pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos + 1) );
-                     HB_TRACE( HB_TR_INFO, ( "Re-Allocated Tree, %p, %u", pSelfBase->puiClsTree, sizeof( USHORT ) * ( nPos + 1 ) ) );
+                USHORT nPos=pSelfBase->puiClsTree[0]-1;
+                /* POP SuperClass handle */
+                if (nPos)
+                 {
+                  pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos + 1) );
+                  pSelfBase->puiClsTree[0]=nPos;
+                 }
+                else
+                 {
+                  hb_xfree(pSelfBase->puiClsTree);
+                  pSelfBase->puiClsTree = NULL ;
+                 }
 
-                     pSelfBase->puiClsTree[0] = nPos;
-                  }
-                  else
-                  {
-                     hb_xfree( pSelfBase->puiClsTree );
-                     HB_TRACE( HB_TR_INFO, ( "Released Tree, %p", pSelfBase->puiClsTree ) );
-
-                     pSelfBase->puiClsTree = NULL ;
-                  }
                }
 
                if( bProfiler )
@@ -3735,16 +3706,18 @@ void hb_vmPushString( char * szText, ULONG length )
    ( hb_stackTopItem() )->type = HB_IT_STRING;
    ( hb_stackTopItem() )->item.asString.length = length;
    ( hb_stackTopItem() )->item.asString.value = szTemp;
+
    hb_stackPush();
 }
 
 void hb_vmPushSymbol( PHB_SYMB pSym )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushSymbol(%p)", pSym));
+   HB_TRACE( HB_TR_DEBUG, ("hb_vmPushSymbol(%p) \"%s\"", pSym, pSym->szName ) );
 
    ( hb_stackTopItem() )->type = HB_IT_SYMBOL;
    ( hb_stackTopItem() )->item.asSymbol.value = pSym;
    ( hb_stackTopItem() )->item.asSymbol.stackbase = hb_stackTopOffset();
+
    hb_stackPush();
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: fkmax.c,v 1.4 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: fkmax.c,v 1.1.1.1 2001/12/21 10:41:35 ronpinkas Exp $
  */
 
 /*
@@ -79,9 +79,13 @@ HB_FUNC( FKLABEL )
          hb_retc( szName );
       }
       else
+      {
          hb_retc( "" );
+      }
    }
    else
+   {
       hb_retc( "" );
+   }
 }
 

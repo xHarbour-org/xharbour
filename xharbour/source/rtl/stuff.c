@@ -1,5 +1,5 @@
 /*
- * $Id: stuff.c,v 1.4 2001/04/12 18:56:29 dholm Exp $
+ * $Id: stuff.c,v 1.1.1.1 2001/12/21 10:42:06 ronpinkas Exp $
  */
 
 /*
@@ -83,13 +83,15 @@ HB_FUNC( STUFF )
          hb_xmemcpy( szResult + ulPos + ulInsert, szText + ulPos + ulDel, ulText - ( ulPos + ulDel ) );
 
          szResult[ ulTotalLen ] = '\0';
-         hb_retclen( szResult, ulTotalLen );
-         hb_xfree( szResult );
+         hb_retclenAdopt( szResult, ulTotalLen );
       }
       else
+      {
          hb_retc( "" );
+      }
    }
    else
+   {
       hb_retc( "" );
+   }
 }
-

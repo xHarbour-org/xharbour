@@ -1,5 +1,5 @@
 /*
- * $Id: hardcr.c,v 1.34 2001/06/14 21:20:43 dholm Exp $
+ * $Id: hardcr.c,v 1.1.1.1 2001/12/21 10:41:43 ronpinkas Exp $
  */
 
 /*
@@ -80,11 +80,12 @@ HB_FUNC( HARDCR )
       char * pszBuffer = hb_itemGetC( pString );
       ULONG ulStringLen = hb_itemGetCLen( pString );
 
-      hb_retclen( hb_strHardCR( pszBuffer, ulStringLen ), ulStringLen );
-
-      hb_itemFreeC( pszBuffer );
+      /* hb_strHardCR() actually returns its 1st paramater, in this case pszBuffer. */
+      hb_retclenAdopt( hb_strHardCR( pszBuffer, ulStringLen ), ulStringLen );
    }
    else
+   {
       hb_retc( "" );
+   }
 }
 

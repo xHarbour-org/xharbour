@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.1.1.1 2001/12/21 10:41:08 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.2 2001/12/22 06:36:17 ronpinkas Exp $
  */
 
 /*
@@ -789,7 +789,10 @@ void hb_itemInit( PHB_ITEM pItem )
    HB_TRACE(HB_TR_DEBUG, ("hb_itemInit(%p)", pItem));
 
    if( pItem )
+   {
       pItem->type = HB_IT_NIL;
+      pItem->bShadow = FALSE;
+   }
 }
 
 void hb_itemClear( PHB_ITEM pItem )
@@ -804,8 +807,7 @@ void hb_itemClear( PHB_ITEM pItem )
          pItem->item.asString.value = NULL;
       }
 
-      /* should not be needed.
-      pItem->item.asString.length = 0; */
+      pItem->item.asString.length = 0;
    }
    else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
@@ -824,6 +826,7 @@ void hb_itemClear( PHB_ITEM pItem )
    }
 
    pItem->type = HB_IT_NIL;
+   pItem->bShadow = FALSE;
 }
 
 /* Internal API, not standard Clipper */
@@ -843,13 +846,14 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
    }
 
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
+   pDest->bShadow = FALSE;
 
    if( HB_IS_STRING( pSource ) )
    {
+      HB_TRACE( HB_TR_INFO, ("will copy %p, \"%s\"", pSource->item.asString.value, pSource->item.asString.value ) );
       pDest->item.asString.value = ( char * ) hb_xgrab( pSource->item.asString.length + 1 );
       hb_xmemcpy( pDest->item.asString.value, pSource->item.asString.value, pSource->item.asString.length );
       pDest->item.asString.value[ pSource->item.asString.length ] = '\0';
-      // why was missing??? pDest->item.asString.length = pSource->item.asString.length;
    }
    else if( HB_IS_ARRAY( pSource ) )
    {
@@ -860,7 +864,9 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       ( pSource->item.asBlock.value )->ulCounter++;
    }
    else if( HB_IS_MEMVAR( pSource ) )
+   {
       hb_memvarValueIncRef( pSource->item.asMemvar.value );
+   }
 }
 
 void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )

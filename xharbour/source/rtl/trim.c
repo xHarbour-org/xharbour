@@ -1,5 +1,5 @@
 /*
- * $Id: trim.c,v 1.12 2001/12/05 18:44:47 vszakats Exp $
+ * $Id: trim.c,v 1.1.1.1 2001/12/21 10:42:04 ronpinkas Exp $
  */
 
 /*
@@ -102,7 +102,9 @@ HB_FUNC( LTRIM )
       hb_retclen( szText, ulLen );
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1101, NULL, "LTRIM", 1, hb_paramError( 1 ) );
+   }
 }
 
 /* trims trailing spaces from a string */

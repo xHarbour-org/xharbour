@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.26 2001/12/15 22:54:07 vszakats Exp $
+ * $Id: hbexprb.c,v 1.1.1.1 2001/12/21 10:47:48 ronpinkas Exp $
  */
 
 /*
@@ -337,7 +337,7 @@ static HB_EXPR_FUNC( hb_compExprUseString )
          break;
       case HB_EA_PUSH_PCODE:
          {
-            HB_EXPR_PCODE2( hb_compGenPushString, pSelf->value.asString.string, pSelf->ulLength );
+            HB_EXPR_PCODE2( hb_compGenPushString, pSelf->value.asString.string, pSelf->ulLength + 1 );
             if( hb_compExprCheckMacroVar( pSelf->value.asString.string ) )
                HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_MACROTEXT );
          }

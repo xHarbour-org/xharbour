@@ -1,5 +1,5 @@
 /*
- * $Id: gete.c,v 1.8 2001/12/16 11:12:22 vszakats Exp $
+ * $Id: gete.c,v 1.1.1.1 2001/12/21 10:42:16 ronpinkas Exp $
  */
 
 /*
@@ -102,18 +102,31 @@ HB_FUNC( GETENV )
 
          szValue = hb_getenv( pszName );
 
-         hb_retc( szValue && szValue[ 0 ] != '\0' ? szValue : ( ( ISCHAR( 2 ) ? hb_parc( 2 ) : "" ) ) );
-         
-         if( szValue )
-            hb_xfree( ( void * ) szValue );
+         if( szValue && szValue[ 0 ] )
+         {
+            hb_retcAdopt( szValue );
+         }
+         else
+         {
+            hb_retc( ISCHAR( 2 ) ? hb_parc( 2 ) : "" );
+
+            if( szValue )
+            {
+               hb_xfree( ( void * ) szValue );
+            }
+         }
       }
       else
+      {
          hb_retc( "" );
+      }
 
       hb_itemFreeC( pszName );
    }
    else
+   {
       hb_retc( "" );
+   }
 }
 
 /* NOTE: Undocumented Clipper function. [vszakats] */

@@ -1,5 +1,5 @@
 /*
- * $Id: substr.c,v 1.8 2001/04/12 18:56:29 dholm Exp $
+ * $Id: substr.c,v 1.1.1.1 2001/12/21 10:42:07 ronpinkas Exp $
  */
 
 /*
@@ -99,13 +99,21 @@ HB_FUNC( SUBSTR )
             lLen = ( long ) hb_itemGetCLen( pText ) - lPos;
 
          if( lLen > 0 )
+         {
             hb_retclen( hb_itemGetCPtr( pText ) + lPos, lLen );
+         }
          else
+         {
             hb_retc( "" );
+         }
       }
       else
+      {
          hb_retc( "" );
+      }
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1110, NULL, "SUBSTR", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
+   }
 }
