@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.94 2004/09/22 18:09:09 druzus Exp $
+ * $Id: dbf1.c,v 1.95 2004/11/21 21:43:51 druzus Exp $
  */
 
 /*
@@ -1239,7 +1239,7 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             }
             else
             {
-               hb_itemPutNLLen( pItem, ( HB_LONG ) ( fDbl ? dVal : lVal ),
+               hb_itemPutNLLen( pItem, ( LONG ) ( fDbl ? dVal : lVal ),
                                 ( int ) pField->uiLen );
             }
          }
@@ -1545,7 +1545,7 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       SELF_ERROR( ( AREAP ) pArea, pError );
       hb_itemRelease( pError );
       return SUCCESS;
-   //   return FAILURE;
+     /* return FAILURE; */
    }
 
    /* Update deleted flag */

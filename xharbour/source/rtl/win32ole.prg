@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.58 2004/11/21 21:44:20 druzus Exp $
+ * $Id: win32ole.prg,v 1.59 2004/11/22 15:35:09 druzus Exp $
  */
 
 /*
@@ -117,6 +117,10 @@ RETURN TOleAuto():GetActiveObject( cString )
    #ifdef __MINGW32__
       // Missing in oleauto.h
       WINOLEAUTAPI VarR8FromDec(DECIMAL *pdecIn, DOUBLE *pdblOut);
+   #endif
+
+   #if ( defined(__MINGW32__) || ( defined(__WATCOMC__) && !defined(__FORCE_LONG_LONG__) ) )
+      #define HB_LONG_LONG_OFF
    #endif
 
    static HRESULT  s_nOleError;
@@ -1004,14 +1008,23 @@ RETURN uObj
                 break;
 
               case HB_IT_INTEGER:
-#if HB_LONG_MAX == HB_INT_MAX
-              case HB_IT_LONG:
-#endif
+#if HB_INT_MAX == INT16_MAX
+                if( bByRef )
+                {
+                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I2;
+                   pArgs[ n ].n1.n2.n3.piVal = &( uParam->item.asInteger.value ) ;
+                }
+                else
+                {
+                   pArgs[ n ].n1.n2.vt = VT_I2;
+                   pArgs[ n ].n1.n2.n3.iVal = hb_parni( nArg );
+                }
+                break;
+#else
                 if( bByRef )
                 {
                    pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I4;
-                   pArgs[ n ].n1.n2.n3.plVal = &( uParam->item.asLong.value ) ;
-                   uParam->type = HB_IT_LONG;
+                   pArgs[ n ].n1.n2.n3.plVal = (long *) &( uParam->item.asInteger.value ) ;
                 }
                 else
                 {
@@ -1019,21 +1032,32 @@ RETURN uObj
                    pArgs[ n ].n1.n2.n3.lVal = hb_parnl( nArg );
                 }
                 break;
-
-#if HB_LONG_MAX > HB_INT_MAX
+#endif
               case HB_IT_LONG:
+#if HB_LONG_MAX == INT32_MAX || defined( HB_LONG_LONG_OFF )
+                if( bByRef )
+                {
+                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I4;
+                   pArgs[ n ].n1.n2.n3.plVal = (long *) &( uParam->item.asLong.value ) ;
+                }
+                else
+                {
+                   pArgs[ n ].n1.n2.vt = VT_I4;
+                   pArgs[ n ].n1.n2.n3.lVal = hb_parnl( nArg );
+                }
+#else
                 if( bByRef )
                 {
                    pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I8;
-                   pArgs[ n ].n1.n2.n3.pllVal = &( uParam->item.asLongLong.value ) ;
+                   pArgs[ n ].n1.n2.n3.pllVal = &( uParam->item.asLong.value ) ;
                 }
                 else
                 {
                    pArgs[ n ].n1.n2.vt = VT_I8;
                    pArgs[ n ].n1.n2.n3.llVal = hb_parnll( nArg );
                 }
-                break;
 #endif
+                break;
 
               case HB_IT_DOUBLE:
                 if( bByRef )
@@ -1219,9 +1243,16 @@ RETURN uObj
                    break;
 
                  case VT_BYREF | VT_I4:
-                   //printf( "Long %ld\n", dParams->rgvarg[ n ].n1.n2.n3.iVal );
-                   hb_itemPutNL( aPrgParams[ n ], ( LONG ) dParams->rgvarg[ n ].n1.n2.n3.iVal );
+                   //printf( "Long %ld\n", dParams->rgvarg[ n ].n1.n2.n3.lVal );
+                   hb_itemPutNL( aPrgParams[ n ], ( LONG ) dParams->rgvarg[ n ].n1.n2.n3.lVal );
                    break;
+
+#ifndef HB_LONG_LONG_OFF
+                 case VT_BYREF | VT_I8:
+                   //printf( "Long %Ld\n", dParams->rgvarg[ n ].n1.n2.n3.llVal );
+                   hb_itemPutNLL( aPrgParams[ n ], ( LONGLONG ) dParams->rgvarg[ n ].n1.n2.n3.llVal );
+                   break;
+#endif
 
                  case VT_BYREF | VT_R8:
                    //printf( "Double\n" );
@@ -1343,6 +1374,13 @@ RETURN uObj
         case VT_UINT:
           hb_retnl( ( LONG ) RetVal.n1.n2.n3.lVal );
           break;
+
+#ifndef HB_LONG_LONG_OFF
+        case VT_I8:     // LongLong (8 bytes)
+        case VT_UI8:
+          hb_retnll( ( LONGLONG ) RetVal.n1.n2.n3.llVal );
+          break;
+#endif
 
         case VT_R4:     // Single
           hb_retnd( RetVal.n1.n2.n3.fltVal );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3606 2004/11/22 00:15:59 druzus Exp $
+ * $Id: ChangeLog,v 1.3607 2004/11/22 15:35:01 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-22 22:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/win32ole.prg
+    ! fixed my previous commit
+    * some modifications based on OpenWatcom Ole header files - please
+      check and fix me if necessary.
+
+  * xharbour/source/rdd/dbf1.c
+    * minor formating and casting
 
 2004-11-22 16:32 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/odbc/odbc.c
