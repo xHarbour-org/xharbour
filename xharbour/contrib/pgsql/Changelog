@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.14 2004/04/27 18:06:29 rodrigo_moreno Exp $
+ * $Id: Changelog,v 1.15 2004/04/30 18:23:06 rodrigo_moreno Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-02 18:00 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  * postgres.c
+    + Add new functions for handling asynchronous/nonblocking queries
+    ! Fixed warnings
+  + tests/async.prg
+    + sample showing howto use the asynchronous queries    
 
 2004-04-30 15:00 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   + postgres.ch

@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.9 2004/04/26 14:55:04 rodrigo_moreno Exp $
+ * $Id: postgres.c,v 1.10 2004/04/28 20:07:51 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -84,16 +84,14 @@
 
 HB_FUNC(PQCONNECT)
 {
-    const char conninfo[128];
-    PGconn         *conn;
-    PHB_ITEM   db_handle;
+    char        conninfo[128];
+    PGconn      *conn;
 
     if (hb_pcount() == 5)
-    {    
         sprintf(conninfo, "dbname = %s host = %s user = %s password = %s port = %i",
-                                           hb_parc(1), hb_parc(2), hb_parc(3), hb_parc(4), hb_parni(5) );
-        conn = PQconnectdb(conninfo);
-    }    
+                                           hb_parc(1), hb_parc(2), hb_parc(3), hb_parc(4), (int) hb_parni(5) );
+
+    conn = PQconnectdb(conninfo);
     hb_retptr( conn );
 }
 
@@ -399,4 +397,63 @@ HB_FUNC(PQRESULTSTATUS)
         hb_retni(PQresultStatus(( PGresult * ) hb_parpointer(1) ));
 }
 
+/* Asynchronous functions 
+ * ----------------------
+ *
+ * With this functions, we can send multiples queries using the PQsendQuery, just separate by ";".
+ * Use PQgetResult to return result pointer, but use PQconsumeInput once and PQisbusy to check if there is result
+ *
+*/
+
+HB_FUNC(PQSENDQUERY)
+{
+    int res = 0;        
+
+    if (hb_pcount() == 2)
+        res = PQsendQuery(( PGconn * ) hb_parpointer(1), hb_parc(2));
+
+    hb_retl( res );        
+}
+
+HB_FUNC(PQGETRESULT)
+{
+    PGresult   *res;
+
+    if (hb_parinfo(1))
+        res = PQgetResult(( PGconn * ) hb_parpointer(1));
+
+    /* when null, no more result to catch */
+    if (res)
+        hb_retptr( res );        
+}
+
+HB_FUNC(PQCONSUMEINPUT)
+{
+    int res = 0;        
+
+    if (hb_parinfo(1))
+        res = PQconsumeInput(( PGconn * ) hb_parpointer(1));
+
+    hb_retl( res );        
+}
+
+HB_FUNC(PQISBUSY)
+{
+    int res = 0;        
+
+    if (hb_parinfo(1))
+        res = PQisBusy(( PGconn * ) hb_parpointer(1));
+
+    hb_retl( res );        
+}
+
+HB_FUNC(PQREQUESTCANCEL)
+{
+    int res = 0;        
+
+    if (hb_parinfo(1))
+        res = PQrequestCancel(( PGconn * ) hb_parpointer(1));
+
+    hb_retl( res );        
+}
 
