@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1462 2003/09/13 21:00:14 walito Exp $
+ * $Id: ChangeLog,v 1.1463 2003/09/13 21:57:16 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,7 +11,9 @@
 2003-09-13 19:00 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
   * include/hbcompress.h
     ! re enable the #ifdef __cplusplus section, otherwise hbzip wont link with borland c
- 
+  * contrib/hbzlib/makefile.bc
+    ! fixed some errors
+
 
 2003-09-13 17:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * makefile.bc
