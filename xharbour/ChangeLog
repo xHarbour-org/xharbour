@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3311 2004/08/16 14:20:41 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3312 2004/08/17 09:50:36 alexstrickland Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-17 12:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/direct.c
+    * fixed problem with DIRECTORYRECURSE() - this function still
+      has to be rewritten - it's not thread safe.
 
 2004-08-17 11:50 UTC+0200 Alex Strickland <sscc@mweb.co.za>
   * source/vm/extend.c

@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.52 2004/07/30 13:45:36 mauriliolongo Exp $
+ * $Id: direct.c,v 1.53 2004/08/04 14:48:10 druzus Exp $
  */
 
 /*
@@ -273,7 +273,8 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
 static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BOOL bInit )
 {
    static regex_t re;
-   static BOOL bInitReg = FALSE, fResult = FALSE;
+   static BOOL bInitReg = FALSE;
+   BOOL fResult = FALSE;
    regmatch_t aMatches[1];
    int CFlags = REG_EXTENDED, EFlags = 0;
 
@@ -289,6 +290,7 @@ static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BO
    if( !szString && !szMask )
    {
       /* resetting initialization flag */
+      regfree( &re );
       bInitReg = FALSE;
       return FALSE;
    }
@@ -299,7 +301,6 @@ static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BO
       {
          fResult = aMatches[0].rm_so == 0 && aMatches[0].rm_eo == (int) strlen( szString );
       }
-      regfree( &re );
    }
 
    return fResult;
