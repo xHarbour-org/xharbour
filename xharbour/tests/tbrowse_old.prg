@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.61 2001/08/06 23:20:52 lculik Exp $
+ * $Id: tbrowse.prg,v 1.1.1.1 2001/12/21 10:46:29 ronpinkas Exp $
  */
 
 /*
