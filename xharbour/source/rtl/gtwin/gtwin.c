@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.32 2004/01/04 01:11:25 druzus Exp $
+ * $Id: gtwin.c,v 1.33 2004/01/04 16:39:01 paultucker Exp $
  */
 
 /*
@@ -1706,7 +1706,7 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
 }
 
 /* *********************************************************************** */
-
+/* dDurat is in seconds */
 static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
 {
     INT uLSB,uMSB;
@@ -1717,16 +1717,12 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
     /* sync with internal clock with very small time period */
     hb_idleSleep( 0.01 );
 
-    /* Clipper ignores Tone() requests if Frequency is less than
-       < 20 hz (and so should we) to maintain compatibility .. */
+    /* Clipper ignores Tone() requests (but delays anyway) if Frequency is
+       less than < 20 hz (and so should we) to maintain compatibility .. */
 
     if ( dFreq >= 20.0 )
     {
-
-      /* Setup Sound Control Port Registers.. */
-
-      /* select timer channel 2 */
-
+      /* Setup Sound Control Port Registers and timer channel 2 */
       hb_Outp9x(67, 182) ;
 
       lAdjFreq = (ULONG)( 1193180 / dFreq ) ;
@@ -1758,6 +1754,7 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
 
       /* Read back current Port value for Reset */
       /* disable Speaker Data & Timer gate bits */
+      /* (11111100B is bitmask to disable sound) */
       /* Turn off the Speaker ! */
 
       hb_Outp9x(97, hb_Inp9x( 97 ) & 0xFC);
@@ -1771,13 +1768,13 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
 #endif
 
 /* *********************************************************************** */
-
+/* dDurat is in seconds */
 static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat ))
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_wNtTone(%lf, %lf)", dFreq, dDurat));
 
-    /* Clipper ignores Tone() requests if Frequency is less than < 20 hz
-       Windows minimum is 37... */
+    /* Clipper ignores Tone() requests (but delays anyway) if Frequency is
+       less than < 20 hz.  Windows NT minimum is 37... */
 
     /* sync with internal clock with very small time period */
     hb_idleSleep( 0.01 );
@@ -1793,16 +1790,22 @@ static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat ))
 }
 
 /* *********************************************************************** */
-
-
+/* dDuration is in 'Ticks' (18.2 per second) */
 void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 {
     OSVERSIONINFO osv;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
 
-    /* Convert from seconds to ticks */
+    /*
+      According to the Clipper NG, the duration in 'ticks' is truncated to the
+      interger portion  ... Depending on the platform, xHarbour allows a finer
+      resolution, but the minimum is 1 tick (for compatibility)
+     */
+    /* Convert from ticks to seconds */
     dDuration  = ( HB_MIN( HB_MAX( 1.0, dDuration ), ULONG_MAX ) ) / 18.2;
+
+    /* keep the frequency in an acceptable range */
     dFrequency =   HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 );
 
     /* What version of Windows are you running? */

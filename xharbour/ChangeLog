@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1994 2004/01/05 15:24:00 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1995 2004/01/05 18:59:27 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-01-05 19:50 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+2004-01-05 16:06 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makallvc.bat
+  * makallbc.bat
+    + contrib/firebird
+    + contrib/pgsql
+  * source/rtl/gtwin/gtwin.c
+    * fixed up comments on tone.
+
+2004-01-05 19:50 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * bin/bld.bat
     * add -lgdi32 -lcomctl32 to mingw32 for gtwvt
   * source/rtl/gtwvt/gtwvt.c
