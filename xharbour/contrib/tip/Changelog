@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.15 2003/11/28 23:56:46 jonnymind Exp $
+ * $Id: Changelog,v 1.16 2003/11/29 03:22:03 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-30 15:37 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * tipencoder.prg
+  * tipencoderbase64.prg
+    + Added basic encoder system classes. More encoders incoming...
+
+  * tests/Makefile
+  + tests/Makefile.base64test
+  + tests/base64test.prg
+    + tests for encoders.
+    
 2003-11-29 04:23 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * tipclienthttp.prg
     + Added field ::cUserAgent to mimic various User-Agents
