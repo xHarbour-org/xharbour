@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3072 2004/06/16 00:07:22 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3073 2004/06/16 06:40:15 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-17 01:58 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/transfrm.c
+    ! Removed "K" from the hack for "@9"... "K" doesn't take effect
+      in the transformed output itself.
+
+  * source/rtl/errorsys.prg
+    ! Bottom line from screen was missing in the error.log's screen
+      dump.
 
 2004-06-15 23:38 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbclass.ch

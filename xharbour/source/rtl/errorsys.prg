@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.35 2004/05/21 00:33:06 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.36 2004/06/04 03:27:50 ronpinkas Exp $
  */
 
 /*
@@ -372,7 +372,7 @@ STATIC FUNCTION LogError( oerr )
             //FWriteLine( nHandle, "" )
             FWriteLine( nHandle, "+" + Replicate( '-', Maxcol() + 1 ) + "+" )
             //FWriteLine( nHandle, "" )
-            For nCount := 1 To Maxrow()
+            For nCount := 1 To Maxrow() + 1
                cOutString := ''
                cSubString := Substr( cScreen, nStart, nRange )
                For nForLoop := 1 To nRange step 2

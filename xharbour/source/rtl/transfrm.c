@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.32 2004/03/16 15:07:34 andijahja Exp $
+ * $Id: transfrm.c,v 1.34 2004/03/18 12:32:29 andijahja Exp $
  */
 
 /*
@@ -234,7 +234,7 @@ HB_FUNC( TRANSFORM )
 
                if ( strchr( szTmp, 'D' ) == NULL )
                {
-                  if( strchr( "RKEBCSLXZ", szTmp[1] ) == NULL )
+                  if( strchr( "REBCSLXZ", szTmp[1] ) == NULL )
                   {
                      szPicNew = (char*) hb_xgrab( ulExpLen + 1 );
 
