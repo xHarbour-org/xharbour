@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1713 2003/11/12 20:43:43 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1714 2003/11/12 21:51:06 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-13 00:45 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/hboutdebug.c
+    ! Prevents opening xterm if 1) xterm is not found or 2) not using X (under
+      UNIX).
+    ! Better error checking and recover system.
 
 2003-11-12 22:48 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
  * source\rtl\dumpvar.prg
