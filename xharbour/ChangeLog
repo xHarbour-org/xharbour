@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2455 2004/03/03 00:07:26 druzus Exp $
+ * $Id: ChangeLog,v 1.2456 2004/03/03 01:33:32 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -16,10 +16,10 @@
     + Implemnted TODO: hb_strMatchRegExp()
 
   * include/hbapifs.h
-    + Added 5th paramater BOOL bMatchCase to hb_fsDirectoryCrawler()
+    + Added 5th parameter BOOL bMatchCase to hb_fsDirectoryCrawler()
   * source/rtl/direct.c
-    + Added 5th paramater BOOL bMatchCase to hb_fsDirectoryCrawler()
-    + Added support for 3rd paramater <lMatchCase> to HB_FUNC( DIRECTORYRECURSE )
+    + Added 5th parameter BOOL bMatchCase to hb_fsDirectoryCrawler()
+    + Added support for 3rd parameter <lMatchCase> to HB_FUNC( DIRECTORYRECURSE )
     * Modified hb_fsDirectoryCrawler() to use new Wild2RegEx() and support bMatchCase argument.
 
 2004-03-03 01:15 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
