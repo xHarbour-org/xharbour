@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.135 2004/05/21 21:26:40 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.136 2004/05/22 13:11:11 druzus Exp $
  */
 
 /*
@@ -4535,8 +4535,18 @@ static LPCDXINDEX hb_cdxFindBag( CDXAREAP pArea, char * szBagName )
    {
       hb_xfree( pFileName );
       pFileName = hb_fsFNameSplit( pIndex->szFileName );
-      if ( !hb_stricmp( pFileName->szName, szBaseName ) && ( !szBasePath || 
-           ( pFileName->szPath && hb_stricmp( pFileName->szPath, szBasePath ) ) ) )
+
+      /*
+       * It seems that checking for path creates troubles on Windows
+       * (probably some SET PATH problems)
+       * temporary disabled - I'll return to it later. TODO!
+       */
+#if 0
+      if ( !hb_stricmp( pFileName->szName, szBaseName ) && ( !szBasePath ||
+           ( pFileName->szPath && hb_stricmp( pFileName->szPath, szBasePath ) )
+#else
+      if ( !hb_stricmp( pFileName->szName, szBaseName ) )
+#endif
             break;
       pIndex = pIndex->pNext;
    }

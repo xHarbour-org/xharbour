@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.35 2004/03/31 02:16:43 druzus Exp $
+ * $Id: gtcrs.c,v 1.36 2004/05/07 15:33:31 lf_sfnet Exp $
  */
 
 /*
@@ -1586,7 +1586,8 @@ static int gt_setsize(InOutBase *ioBase, int rows, int cols)
 
 void setKeyTrans(InOutBase *ioBase, unsigned char *ksrc, unsigned char *kdst )
 {
-    unsigned char n, c;
+    unsigned char c;
+    int n;
 
     if (ksrc && kdst) {
 	if (ioBase->in_transtbl == NULL)

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2983 2004/05/24 10:04:26 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2984 2004/05/24 10:31:36 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-24 15:35 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! workaroud for path comparision on Windows in hb_cdxFindBag()
+      It disables path checking (as it was before) so it's not
+      possible to create two indexes with the same name but in
+      different directories. The real solution will be done later
+      when I will find where exactly the problem is.
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+    ! fixed bug with bad size of used integer type in setKeyTrans()
 
 2004-05-24 12:30 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
   * include/hbmath.h
