@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.103 2004/05/04 17:03:31 jonnymind Exp $
+ * $Id: filesys.c,v 1.104 2004/05/05 10:10:35 mauriliolongo Exp $
  */
 
 /*
@@ -1215,7 +1215,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       hb_xfree( completeCommand );
       hb_fsSetError( 0 );
       hRet = HandleToLong( proc.hProcess );
-      *ProcessID = proc.dwProcessID;
+      *ProcessID = proc.dwProcessId;
 
       if ( fhStdin != NULL )
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.16 2004/04/25 11:26:13 andijahja Exp $
+ * $Id: tprint.prg,v 1.17 2004/04/26 09:32:06 andijahja Exp $
  */
 
 /*
@@ -517,7 +517,7 @@ ENDCLASS
 #pragma BEGINDUMP
 
 #include <windows.h>
-#include "hbapi.h"
+#include "hbapiitm.h"
 
 #ifndef INVALID_FILE_SIZE
    #define INVALID_FILE_SIZE (DWORD)0xFFFFFFFF
