@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.39 2002/12/06 17:37:31 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.40 2002/12/07 02:54:53 ronpinkas Exp $
  */
 
 /*
@@ -2338,10 +2338,23 @@ static HB_EXPR_FUNC( hb_compExprUseVariable )
 
 static HB_EXPR_FUNC( hb_compExprUseSend )
 {
+   USHORT iVar;
    switch( iMessage )
    {
       case HB_EA_REDUCE:
          {
+            #ifdef HB_MACRO_SUPPORT
+
+               iVar = hb_compLocalVarGetPos( (pSelf->value.asMessage.pObject)->value.asSymbol, HB_MACRO_PARAM );
+
+               if( (pSelf->value.asMessage.pObject)->ExprType == HB_ET_VARIABLE && iVar == 0 )
+               {
+                  /* Change VARIABLE to MEMVAR->VARIABLE
+                  */
+                  pSelf->value.asMessage.pObject = hb_compExprNewAliasVar( hb_compExprNewAlias("MEMVAR"), pSelf->value.asMessage.pObject );
+               }
+            #endif
+
             pSelf->value.asMessage.pObject = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_REDUCE ), HB_MACRO_PARAM );
 
             if( pSelf->value.asMessage.pParms )  /* Is it a method call ? */

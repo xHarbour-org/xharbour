@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.582 2003/01/04 08:56:59 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.583 2003/01/04 13:14:07 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-05 02:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * include\hbexprb.c
+    ! Changes in hb_compExprUseSend() optimizer to transform anyvar:anymessage
+      into memvar->anyvar:anymessage during macro compilation (Cl*pper 
+      compatibility)
 
 2003-01-04 14:09 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * samples/sitesvr/Makefile
