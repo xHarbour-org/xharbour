@@ -1,5 +1,5 @@
 /*
- * $Id: var.txt,v 1.1.1.1 2001/12/21 10:49:18 ronpinkas Exp $
+ * $Id: var.txt,v 1.2 2002/07/14 16:35:31 walito Exp $
  */
 
 /*
@@ -20,6 +20,9 @@
  *
  * Copyright 2002 Walter Negro <anegro@overnet.com.ar>
  *    Documentation for: HB_ISBYREF()
+ *
+ * Copyright 2004 Peter Rees <peter@rees.co.nz>
+ *    Documentation for: __MVSYMBOLINFO()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -470,6 +473,42 @@
  *      __MVPUT()
  *  $FILES$
  *      Library is vm
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      __MVSYMBOLINFO()
+ *  $CATEGORY$
+ *      Variable Management
+ *  $ONELINER$
+ *      This function returns an array of array of MEMVAR's {"SymbolName", xSymbolValue}
+ *  $SYNTAX$
+ *      __MVSYMBOLINFO()  --> <aValue>
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      a 2 dimentional array of { "SymbolName", xSymbolValue}
+ *  $DESCRIPTION$
+ *      This function returns the names and values of all
+ *      PRIVATE and PUBLIC variables in an array
+ *  $EXAMPLES$
+ *      FUNCTION ShowSymbols()
+ *      LOCAL x, aSym:= __MYSYMBOLINFO()
+ *      CLS
+ *      FOR x:= 1 TO LEN(aSym)
+ *        ? PAD(aSym[x,1],10),aSym[x,2]
+ *      NEXT x
+ *      WAIT
+ *   </fixed>
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is a Harbour extension
+ *  $FILES$
+ *      Library is vm
+ *  $SEEALSO$
+ *    __MV*() functions
  *  $END$
  */
 
