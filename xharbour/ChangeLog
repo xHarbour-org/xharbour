@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1404 2003/09/03 01:28:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1405 2003/09/03 10:35:18 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-09-03 08:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.vc
+    * minor formatting.
+  * include/hbtrace.h
+    - #include "hbsetup.h" (redundant)
+  * include/hbdefs.h
+    * add BOOL cast to TRUE and FALSE
+  * source/pp/ppcore.c
+    * change param 2 to NULL from FALSE in DefSearch Call at 1676
+  * source/rdd/dbfcdx/dbfcdx1.c
+    * a number of casts.
+  * source/rtl/filesys.c
+    * casts on a couple of GetLastError() calls
+    * this seriously needs to be fixed.
+  * source/rtl/hbsrlraw.c
+    * ifdefed a call to hb_retnll() in hb_getLen8()
+    * one logic shortcut at 299
+  * source/rtl/tprinter.c
+    * removed #define WINVER
+    * please don't do this.
+  * source/vm/arrays.c
+    * move delcaration of szProc and szModule to inside #ifdef
+  * source/vm/eval.c
+    * casts to ulLen in calls to hb_vmFunction
+
 2003-09-03 17:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * source/rtl/inkey.c
      ! More keyboard remapping when CapsLock is ON.

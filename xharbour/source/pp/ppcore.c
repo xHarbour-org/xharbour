@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.77 2003/07/14 19:18:46 jonnymind Exp $
+ * $Id: ppcore.c,v 1.78 2003/08/09 18:49:49 ronpinkas Exp $
  */
 
 /*
@@ -1673,7 +1673,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
               printf( "Define: >%s< Line: >%s<\n", sToken, ptri );
            #endif
 
-           if( ( stdef = DefSearch( sToken, FALSE ) ) == NULL )
+           if( ( stdef = DefSearch( sToken, NULL ) ) == NULL )
            {
               goto NextName;
            }

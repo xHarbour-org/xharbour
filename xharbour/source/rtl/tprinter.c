@@ -204,7 +204,9 @@ BOOL THarbourPrinter_NewPage()
 
 #define MAXBUFFERSIZE 250
 
-#define WINVER  0x0500
+/* WHY OH WHY ARE YOU DOING THIS?????? */
+   /* #define WINVER  0x0500 */
+
 BOOL THarbourPrinter_DPGetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
 {
    BOOL bFlag;

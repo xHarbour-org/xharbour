@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.47 2003/08/27 12:07:31 jonnymind Exp $
+ * $Id: filesys.c,v 1.48 2003/08/31 12:26:07 patrickmast Exp $
  */
 
 /*
@@ -1395,12 +1395,12 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
       bRet = (TerminateProcess( hProc, bGentle ? 0:1 ) != 0);
       if ( ! bRet )
       {
-         hb_fsSetError( GetLastError() );
+         hb_fsSetError( ( USHORT ) GetLastError() );
       }
    }
    else
    {
-      hb_fsSetError( GetLastError() );
+      hb_fsSetError( ( USHORT ) GetLastError() );
    }
 }
 #elif defined( X__WIN32__ )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.15 2003/07/23 12:35:57 druzus Exp $
+ * $Id: hbsrlraw.c,v 1.16 2003/07/24 01:55:58 jonnymind Exp $
  */
 
 /*
@@ -141,7 +141,11 @@ HB_FUNC( HB_GETLEN8 )
    }
    else
    {
+#ifndef HB_LONG_LONG_OFF
+      hb_retnll( hb_getlen8( cStr ) );
+#else
       hb_retnl( hb_getlen8( cStr ) );
+#endif
    }
 }
 
@@ -292,14 +296,7 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
       break;
 
       case 'L':
-         if(cBuf[1] == 'T' )
-         {
-            hb_retl( 1 );
-         }
-         else
-         {
-            hb_retl( 0 );
-         }
+         hb_retl( cBuf[1] == 'T' );
       break;
 
       case 'N':

@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.7 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: eval.c,v 1.8 2003/08/14 23:49:46 jonnymind Exp $
  */
 
 /*
@@ -472,7 +472,7 @@ HB_FUNC( HB_EXECFROMARRAY )
       {
          hb_vmPush( hb_arrayGetItemPtr( pArgs, i ) );
       }
-      hb_vmFunction( ulLen );
+      hb_vmFunction( ( USHORT ) ulLen );
       return;
    }
    else if( pFirst->type == HB_IT_ARRAY )
@@ -515,7 +515,7 @@ HB_FUNC( HB_EXECFROMARRAY )
          {
             hb_vmPush( hb_arrayGetItemPtr( pArgs, i ) );
          }
-         hb_vmFunction( ulLen-1 );
+         hb_vmFunction( ( USHORT ) ulLen-1 );
          return;
       }
    }
@@ -618,7 +618,7 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
       {
          hb_vmPush( hb_arrayGetItemPtr( pArgs, i ) );
       }
-      hb_vmFunction( ulLen-1 );
+      hb_vmFunction( ( USHORT ) ulLen-1 );
       return TRUE;
    }
 

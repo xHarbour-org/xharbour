@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.15 2003/07/19 22:08:05 jonnymind Exp $
+ * $Id: hbdefs.h,v 1.16 2003/07/23 12:35:57 druzus Exp $
  */
 
 /*
@@ -143,9 +143,9 @@
    typedef unsigned long ULONG;
 
    #undef FALSE
-   #define FALSE  0
+   #define FALSE  (BOOL) 0
    #undef TRUE
-   #define TRUE   !0
+   #define TRUE   (BOOL) !0
 
 #endif /* HB_DONT_DEFINE_BASIC_TYPES */
 

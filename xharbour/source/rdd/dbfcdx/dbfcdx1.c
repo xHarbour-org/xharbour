@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.61 2003/08/27 17:03:52 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.62 2003/09/03 00:34:01 ronpinkas Exp $
  */
 
 /*
@@ -977,7 +977,7 @@ static void hb_xfptReadItemSx( FHANDLE hMemoFile, PHB_ITEM pItem )
       case 0x0400 : /* CLIP_IT_CHAR */
          ulLen = *(short *)(&itmBuffer[2]);  /* only 2 bytes for SIX compatibility */
          pStr = (char *) hb_xgrab( ulLen + 1 );
-         hb_fsRead( hMemoFile, (unsigned char *) pStr, ulLen );
+         hb_fsRead( hMemoFile, (BYTE *) pStr, ( USHORT ) ulLen );
          hb_itemPutCPtr( pItem, pStr, ulLen );
          break;
 
@@ -1030,8 +1030,8 @@ static ULONG hb_xfptWriteItemSx( FHANDLE hMemoFile, PHB_ITEM pItem )
          {
             ulLen = 65535;
          }
-         *(short *)(&itmBuffer[0]) = 0x8000; /* CLIP_IT_ARRAY */
-         *(short *)(&itmBuffer[2]) = ulLen;  /* only 2 bytes for SIX compatibility */
+         *(short *)(&itmBuffer[0]) = (USHORT) 0x8000; /* CLIP_IT_ARRAY */
+         *(short *)(&itmBuffer[2]) = (USHORT) ulLen;  /* only 2 bytes for SIX compatibility */
          hb_fsWrite( hMemoFile, itmBuffer, 14 );
          for ( i = 1 ; i <= ulLen ; i++ )
          {
@@ -1091,7 +1091,7 @@ static ULONG hb_xfptWriteItemSx( FHANDLE hMemoFile, PHB_ITEM pItem )
          ulSize += ulLen;
          if ( ulLen > 0 )
          {
-            hb_fsWrite( hMemoFile, (unsigned char *) (pItem->item.asString.value), ulLen );
+            hb_fsWrite( hMemoFile, (BYTE *) (pItem->item.asString.value), ( USHORT ) ulLen );
          }
          break;
 
@@ -1309,13 +1309,13 @@ static int hb_cdxKeyCompare( LPCDXKEYINFO pKey1, LPCDXKEYINFO pKey2, PHB_CODEPAG
 #endif
 
       if ( iResult == 0 ) {
-         unsigned char c1, c2;
+         BYTE c1, c2;
          iPos = iLimit;
          iLimit = ( pKey1->realLength > pKey2->realLength ) ? pKey2->realLength : pKey1->realLength;
          while( iResult == 0 && iPos < iLimit )
          {
-            c1 = (unsigned char) ( ( iPos < pKey1->length ) ? ( pKey1->Value[ iPos ]) : ' ' );
-            c2 = (unsigned char) ( ( iPos < pKey2->length ) ? ( pKey2->Value[ iPos ]) : ' ' );
+            c1 = (BYTE) ( ( iPos < pKey1->length ) ? ( pKey1->Value[ iPos ]) : ' ' );
+            c2 = (BYTE) ( ( iPos < pKey2->length ) ? ( pKey2->Value[ iPos ]) : ' ' );
 #ifndef HB_CDP_SUPPORT_OFF
             /* for nation sorting support */
             iResult = hb_cdpcharcmp( c1, c2, cdpage );
@@ -5267,7 +5267,10 @@ static BOOL hb_cdxSortSwapGetNextKey( LPSORTINFO pSort, LONG * pKeyRec, BYTE * p
    BYTE   winKeyLen;
    char * winKeyVal;
    int iResult = 1;
-   winPage = winKeyLen = winKeyRec = 0; /* this way some compilers don't emit warnings */
+
+   /* this way some compilers don't emit warnings */
+   winPage = winKeyLen = 0;
+   winKeyRec = 0;
    winKeyVal = NULL;
    for ( nPage = 0 ; nPage < pSort->nSwapPages ; nPage++) {
       pPage = pSort->pSwapPage + nPage;
