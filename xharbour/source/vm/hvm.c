@@ -2391,7 +2391,7 @@ static void hb_vmPlus( void )
       if( ( double ) ( ( double ) ulLen1 + ( double ) ulLen2 ) < ( double ) ULONG_MAX )
       {
          ULONG ulNewLen   = ulLen1 + ulLen2; char *pNewString;
-         if( pItem1->item.asString.bStatic )
+         if( pItem1->item.asString.bStatic || ( *( pItem1->item.asString.puiHolders ) > 1 ) )
          {
              pNewString = ( char * ) hb_xgrab( ulNewLen + 1 );
              hb_xmemcpy( pNewString, pItem1->item.asString.value, ulLen1 );
