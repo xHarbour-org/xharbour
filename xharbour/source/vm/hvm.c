@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.235 2003/07/15 09:15:34 andijahja Exp $
+ * $Id: hvm.c,v 1.236 2003/07/16 02:07:28 andijahja Exp $
  */
 
 /*
@@ -2188,8 +2188,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               PHB_ITEM pAdd    = hb_itemPutNI( NULL, ( int ) iAdd );
-               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pTop, pAdd );
+               PHB_ITEM pAdd = hb_itemPutNI( NULL, ( int ) iAdd );
+               PHB_ITEM pResult;
+
+               if( iAdd>0 )
+                  pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pTop, pAdd );
+               else
+               {
+                  pAdd->item.asInteger.value *= -1 ;
+                  pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pTop, pAdd );
+               }
 
                hb_itemRelease( pAdd );
 

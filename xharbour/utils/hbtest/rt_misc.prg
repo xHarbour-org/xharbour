@@ -1,5 +1,5 @@
 /*
- * $Id: rt_misc.prg,v 1.1.1.1 2001/12/21 10:44:57 ronpinkas Exp $
+ * $Id: rt_misc.prg,v 1.2 2003/07/13 22:21:26 andijahja Exp $
  */
 
 /*
@@ -196,7 +196,7 @@ FUNCTION Main_MISC()
    TEST_LINE( TFORNEXT( .T., .F., NIL )       , .T.                                       )
    TEST_LINE( TFORNEXT( .F., .F., NIL )       , "E BASE 1086 Argument error ++ A:1:L:.F. F:S" )
    TEST_LINE( TFORNEXT( 100, 101, NIL )       , 102                                       )
-   TEST_LINE( TFORNEXT( "A", "A", NIL )       , "E BASE 1086 Argument error ++ A:1:C:A F:S"        )
+   TEST_LINE( TFORNEXT( "A", "A", NIL )       , "B" )
    TEST_LINE( TFORNEXT( NIL, NIL, NIL )       , "E BASE 1075 Argument error > A:2:U:NIL;U:NIL F:S" )
    TEST_LINE( TFORNEXT( .F., .T.,   1 )       , "E BASE 1081 Argument error + A:2:L:.F.;N:1 F:S"   )
    TEST_LINE( TFORNEXT( .F., .T.,  -1 )       , .F.                                       )
@@ -208,8 +208,7 @@ FUNCTION Main_MISC()
    TEST_LINE( TFORNEXT( 101, 100,  -1 )       , 99                                        )
    TEST_LINE( TFORNEXT( "A", "A", "A" )       , "E BASE 1073 Argument error < A:1:C:AA F:S")
    TEST_LINE( TFORNEXT( "A", "B", "A" )       , "E BASE 1073 Argument error < A:1:C:AA F:S")
-   TEST_LINE( TFORNEXT( "B", "A", "A" )       , "E BASE 1073 Argument error < A:2:C:A;N:0 F:S"     )
-   TEST_LINE( TFORNEXT( NIL, NIL, NIL )       , "E BASE 1075 Argument error > A:2:U:NIL;U:NIL F:S" )
+   TEST_LINE( TFORNEXT( "B", "A", "A" )       , "B" )
 
    TEST_LINE( TFORNEXTX(   1, 10,NIL )        , "FTTTTTTTTTTT"                            )
    TEST_LINE( TFORNEXTX(  10,  1,NIL )        , "FT"                                      )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.56 2003/06/20 17:32:41 jonnymind Exp $
+ * $Id: hbexprb.c,v 1.57 2003/07/13 18:28:17 walito Exp $
  */
 
 /*
@@ -1746,7 +1746,8 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         }
                      }
                      // SubStr( Str, n, 1 ) => Str[n]
-                     else if( usCount == 3 && pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
+//                   else if( usCount == 3 && pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
+                     else if( usCount == 3 && pLen->ExprType == HB_ET_LONG && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
                      {
                         // Delete the pre-optimization components.
                         // Skipping the first 2 elements of the list, as they are used by the optimization.

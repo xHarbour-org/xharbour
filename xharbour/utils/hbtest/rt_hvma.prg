@@ -1,5 +1,5 @@
 /*
- * $Id: rt_hvma.prg,v 1.1.1.1 2001/12/21 10:44:44 ronpinkas Exp $
+ * $Id: rt_hvma.prg,v 1.2 2003/07/13 22:21:26 andijahja Exp $
  */
 
 /*
@@ -203,7 +203,7 @@ FUNCTION Main_HVMA()
    TEST_LINE( -(10.505)                       , -10.505                            )
    TEST_LINE( -(100000)                       , -100000                            )
    TEST_LINE( -(-10)                          , 10                                 )
-   TEST_LINE( -("1")                          , "E BASE 1080 Argument error - A:1:C:1 F:S"         )
+   TEST_LINE( -("1")                          , -49 )
 
    TEST_LINE( "AA" $ 1                        , "E BASE 1109 Argument error $ A:2:C:AA;N:1 F:S"    )
    TEST_LINE( scString $ 1                    , "E BASE 1109 Argument error $ A:2:C:HELLO;N:1 F:S" )
