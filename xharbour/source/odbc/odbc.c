@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.28 2005/03/31 03:18:14 druzus Exp $
+ * $Id: odbc.c,v 1.29 2005/04/05 00:32:07 druzus Exp $
  */
 
 /*
@@ -314,7 +314,11 @@ HB_FUNC( SQLCOLATTRIBUTE )
     SQLSMALLINT wNumPtr   = hb_parni( 7 );
     WORD        wResult   = SQLColAttribute( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ), hb_parni( 3 ),
                                              (unsigned char*) bBuffer, hb_parni( 5 ), &wBufLen,
+#if defined(__DMC__)
+                                             (SQLINTEGER FAR*) &wNumPtr );
+#else
                                              (SQLPOINTER) &wNumPtr );
+#endif
 
     if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
     {

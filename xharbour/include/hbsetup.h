@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.34 2005/03/30 21:29:18 andijahja Exp $
+ * $Id: hbsetup.h,v 1.35 2005/04/05 22:26:06 druzus Exp $
  */
 
 /*
@@ -394,7 +394,7 @@
       #define NEED_DUMMY_RETURN
    #endif
 #else
-   #if defined(_MSC_VER)
+   #if defined(_MSC_VER) || defined(__DMC__)
       #define snprintf _snprintf
    #endif
 #endif
