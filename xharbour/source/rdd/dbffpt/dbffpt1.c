@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.26 2004/09/03 08:20:11 druzus Exp $
+ * $Id: dbffpt1.c,v 1.27 2004/09/03 08:39:54 druzus Exp $
  */
 
 /*
@@ -2002,7 +2002,7 @@ static ERRCODE hb_fptGetVarLen( FPTAREAP pArea, USHORT uiIndex, ULONG * pLength 
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
       ERRCODE uiError = SUCCESS;
-      BOOL bLocked;
+      BOOL bLocked, bDeleted;
 #if defined( HB_FPT_USE_READLOCK )
       ULONG ulOffset;
 #endif
@@ -2011,6 +2011,9 @@ static ERRCODE hb_fptGetVarLen( FPTAREAP pArea, USHORT uiIndex, ULONG * pLength 
          return FAILURE;
 
 #if defined( HB_FPT_USE_READLOCK )
+      if ( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
+         return FAILURE;
+
       if ( bLocked || hb_fptReadLock( pArea, uiIndex, &ulOffset ) )
 #else
       if ( bLocked || hb_fptFileLockSh( pArea, TRUE ) )
@@ -2020,10 +2023,11 @@ static ERRCODE hb_fptGetVarLen( FPTAREAP pArea, USHORT uiIndex, ULONG * pLength 
          /* Force read record? */
          if ( !bLocked )
             pArea->fValidBuffer = FALSE;
-#endif
+
          /* update any pending relations and reread record if necessary */
-         uiError = SELF_DELETED( ( AREAP ) pArea, &bLocked );
+         uiError = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
          if ( uiError == SUCCESS )
+#endif
             *pLength = hb_fptGetMemoLen( pArea, uiIndex - 1 );
 
          if ( !bLocked )
@@ -2059,7 +2063,7 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
       ERRCODE uiError;
-      BOOL bLocked;
+      BOOL bLocked, bDeleted;
 #if defined( HB_FPT_USE_READLOCK )
       ULONG ulOffset;
 #endif
@@ -2068,6 +2072,9 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          return FAILURE;
 
 #if defined( HB_FPT_USE_READLOCK )
+      if ( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
+         return FAILURE;
+
       if ( bLocked || hb_fptReadLock( pArea, uiIndex, &ulOffset ) )
 #else
       if ( bLocked || hb_fptFileLockSh( pArea, TRUE ) )
@@ -2077,11 +2084,13 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          /* Force read record? */
          if ( !bLocked )
             pArea->fValidBuffer = FALSE;
-#endif
          /* update any pending relations and reread record if necessary */
-         uiError = SELF_DELETED( ( AREAP ) pArea, &bLocked );
+         uiError = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
+
          if ( uiError == SUCCESS )
+#endif
             uiError = hb_fptGetMemo( pArea, uiIndex - 1, pItem );
+
          if ( !bLocked )
          {
 #if defined( HB_FPT_USE_READLOCK )
@@ -2129,7 +2138,7 @@ static ERRCODE hb_fptPutValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
-      /* Force read record */
+      /* update any pending relations and reread record if necessary */
       if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
          return FAILURE;
 

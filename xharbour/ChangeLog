@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3398 2004/09/03 13:45:13 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3399 2004/09/03 16:01:45 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-03 18:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+   ! fixed the buggy merge I've done (with some CVS help ;-)) from my and
+     Peter changes - I hope now it's OK.
 
 2004-09-03 17:55 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/source/compiler/gencobj.c
