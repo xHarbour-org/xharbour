@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.4 2003/03/09 00:06:46 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.5 2003/03/09 17:30:37 ronpinkas Exp $
  */
 
 /*
@@ -233,18 +233,23 @@ static function HBObject_Error( cDesc, cClass, cMsg, nCode )
 
        LOCAL hClass
        LOCAL  aMember, nSeq := 1
+       LOCAL aKeys := {}
 
        // Intentionally creating NEW Class for every instance - Don't change!
        IF ValType( aInit ) == 'A'
-          hClass := __clsNew( "TASSOCIATIVEARRAY", Len( aInit ), 0 )
+          hClass := __clsNew( "TASSOCIATIVEARRAY", Len( aInit ), 1 )
 
           FOR EACH aMember IN aInit
              __clsAddMsg( hClass,       aMember[1], nSeq++, HB_OO_MSG_DATA, aMember[2] )
              __clsAddMsg( hClass, '_' + aMember[1], nSeq  , HB_OO_MSG_DATA )
+             aAdd( aKeys, aMember[1] )
           NEXT
        ELSE
-          hClass := __clsNew( "TASSOCIATIVEARRAY", 0, 0 )
+          hClass := __clsNew( "TASSOCIATIVEARRAY", 0, 1 )
        ENDIF
+
+       // Intentionally using DEATCHED Local.
+       __clsAddMsg( hClass, "Keys"     , {|Self, cKey | IIF( cKey == NIL, , aAdd( aKeys, cKey ) ), aKeys }, HB_OO_MSG_INLINE )
 
        __clsAddMsg( hClass, "__OnError", @TAssociativeArray_OnError(), HB_OO_MSG_ONERROR )
 
@@ -262,6 +267,8 @@ static function HBObject_Error( cDesc, cClass, cMsg, nCode )
 
            __clsAddMsg( hClass, cMsg     , nSeq, HB_OO_MSG_DATA )
            __clsAddMsg( hClass, cProperty, nSeq, HB_OO_MSG_DATA )
+
+           QSelf():Keys( cProperty )
 
            QSelf()[ cProperty ] := xParam
         ELSE

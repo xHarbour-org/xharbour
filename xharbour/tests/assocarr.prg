@@ -1,34 +1,48 @@
 PROCEDURE Main()
 
-    LOCAL MyAssocArray1 := TAssociativeArray()
-    LOCAL MyAssocArray2 := TAssociativeArray()
-    LOCAL MyAssocArray3 := { "Name" => "Ron", "Age" => 41, "Street" => "2013 Roadrunner Ave." }
-    LOCAL xProperty
+    LOCAL aaContact  := TAssociativeArray()
+    LOCAL aaSalary   := TAssociativeArray()
+    LOCAL aaEmployee := TAssociativeArray()
+    LOCAL xProperty, xSub, oErr
 
-    MyAssocArray1[ "Name" ] := "John"
-    MyAssocArray1[ "Age" ]  := 33
+    // Array Syntax.
+    aaSalary[ "Hourly" ] := 12.00
+    aaSalary[ "Tax" ]  := 30.00
 
-    ? MyAssocArray1[ "Name" ]
-    ? MyAssocArray1[ "Age" ]
-    ?
-
-    ? MyAssocArray1[1]
-    ? MyAssocArray1[2]
-    ?
+    // Litral Syntax.
+    aaContact  := { "First" => "John", "Last" => "Doe", "Phone" => "555-1212" }
 
     // OOP Syntax:
-    MyAssocArray2:Street := "123 Some St."
-    MyAssocArray2:City := "Los Angeles"
+    aaEmployee:Contact := aaContact
+    aaEmployee:Salary  := aaSalary
 
     TRY
-       ? MyAssocArray2[ "Name" ] // Error! - Does not exist in THIS Array.
+       ? aaContact[ "Hourly" ] // Error! - Does not exist in THIS Array.
+    CATCH oErr
+       ? "Caught:", oErr:Description, oErr:Operation
+       ?
     END
-    ? MyAssocArray2:Street
-    ? MyAssocArray2:City
+
+    // Mixed Syntax.
+    ? aaEmployee:Contact["First"]
+    ? aaEmployee:Contact:Last
     ?
 
-    FOR EACH xProperty IN MyAssocArray3
-       ? xProperty
+    FOR EACH xProperty IN aaEmployee:Keys
+
+       IF aaEmployee[ xProperty ]:ClassName == "TASSOCIATIVEARRAY"
+          ?
+          ? xProperty
+          ? "-------"
+
+          FOR EACH xSub IN aaEmployee[ xProperty ]:Keys
+             ? "     Key:", xSub
+             ? "   Value:", aaEmployee[ xProperty][ xSub ]
+          NEXT
+       ELSE
+          ? "  Key:", xProperty
+          ? "Value:", aaEmployee[ xProperty ]
+       ENDIF
     NEXT
     ?
 

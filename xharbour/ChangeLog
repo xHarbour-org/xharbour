@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.821 2003/03/09 17:30:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.822 2003/03/09 21:40:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-09 14:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/tobject.prg
+    + Added support for Method Keys to class TAssociativeArray.
+
+  * tests/assocarr.prg
+    * Added sample of Method Keys, plus revised for more real world sample.
 
 2003-03-09 13:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.slx
