@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.25 2003/01/04 13:14:09 jonnymind Exp $
+* $Id: inet.c,v 1.1 2003/01/05 06:50:36 ronpinkas Exp $
 */
 
 /*
@@ -54,6 +54,11 @@
 #include "hbstack.h"
 #include "inet.h"
 
+#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
+#endif
+
 
 #ifndef HB_NO_DEFAULT_INET
 static int s_iSessions = 0;
@@ -85,7 +90,7 @@ HB_FUNC( INETCLEANUP )
 
 HB_FUNC( INETSERVER )
 {
-   int iPort, iPort1;
+   int iPort;
    int iOpt = 1;
    HB_SOCKET_STRUCT *Socket;
    int iListen;
@@ -119,11 +124,10 @@ HB_FUNC( INETSERVER )
    /* Reusable socket; under unix, do not wait it is unused */
    setsockopt( Socket->com, SOL_SOCKET, SO_REUSEADDR, (const char *) &iOpt, sizeof( iOpt ));
 
-   iPort  = hb_parni( 1 );
-   iPort1 = (iPort & 0xff00) >> 8 | (iPort & 0x00ff) << 8;
+   iPort  = htons( hb_parni( 1 ) );
 
    Socket->remote.sin_family = AF_INET;
-   Socket->remote.sin_port = iPort1;
+   Socket->remote.sin_port = iPort;
    Socket->remote.sin_addr.s_addr = INADDR_ANY;
 
    if ( ISNUM( 2 ) )
@@ -872,7 +876,7 @@ HB_FUNC( INETADDRESS )
    PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
 
    HB_SOCKET_STRUCT *Socket;
-   char addr[24];
+   char *addr;
 
    if( pSocket == NULL )
    {
@@ -886,12 +890,7 @@ HB_FUNC( INETADDRESS )
 
    //HB_CRITICAL_INET_LOCK( Socket->Mutex );
 
-   sprintf( addr, "%d.%d.%d.%d",
-      (int) (Socket->remote.sin_addr.s_addr & 0x000000ff),
-      (int) (( Socket->remote.sin_addr.s_addr & 0x0000ff00)>>8),
-      (int) (( Socket->remote.sin_addr.s_addr & 0x00ff0000) >>16),
-      (int) (Socket->remote.sin_addr.s_addr >> 24)
-   );
+   addr = inet_ntoa( Socket->remote.sin_addr );
 
    //HB_CRITICAL_INET_UNLOCK( Socket->Mutex );
 
@@ -915,7 +914,7 @@ HB_FUNC( INETPORT )
 
    Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
 
-   iPort = (Socket->remote.sin_port & 0xff00) >>8 | (Socket->remote.sin_port & 0x00ff) << 8;
+   iPort = ntohs( Socket->remote.sin_port );
 
    hb_retni( iPort );
 }
@@ -925,11 +924,11 @@ HB_FUNC( INETCONNECT )
    PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
 
    HB_SOCKET_STRUCT *Socket;
-   int iPort, iPort1;
+   int iPort;
    struct hostent *Host;
    int iOpt = 1;
 
-   if( pHost == NULL )
+   if( pHost == NULL || !ISNUM(2) )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCONNECT", 1, pArgs );
@@ -971,17 +970,135 @@ HB_FUNC( INETCONNECT )
       return;
    }
 
-   iPort = hb_parni( 2 );
-
-   iPort1 = ( iPort & 0xff00) >>8 | ( iPort & 0x00ff ) << 8;
+   iPort = htons( hb_parni( 2 ) );
 
    Socket->remote.sin_family = AF_INET;
-   Socket->remote.sin_port= iPort1;
-   Socket->remote.sin_addr.s_addr =
-      ((unsigned char ) Host->h_addr_list[0][0]) |
-      ( (unsigned int) ( (unsigned char ) Host->h_addr_list[0][1] ) ) << 8 |
-      ( (unsigned int) ( (unsigned char ) Host->h_addr_list[0][2] ) ) << 16 |
-      ( (unsigned int) ( (unsigned char ) Host->h_addr_list[0][3] ) ) << 24;
+   Socket->remote.sin_port= iPort;
+   Socket->remote.sin_addr.s_addr = (*(unsigned int *)Host->h_addr_list[0]);
+
+   if( connect( Socket->com, (struct sockaddr *) &Socket->remote, sizeof(Socket->remote) ) )
+   {
+      HB_SOCKET_SET_ERROR( Socket );
+   }
+
+   hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+}
+
+HB_FUNC( INETGETHOSTS )
+{
+   PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM aHosts;
+   struct hostent *Host;
+   char **cHosts;
+
+   if( pHost == NULL )
+   {
+      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETHOSTS", 1, pArgs );
+      hb_itemRelease( pArgs );
+      return;
+   }
+
+   Host = gethostbyname( pHost->item.asString.value );
+
+   if( Host == NULL )
+   {
+      hb_ret();
+      return;
+   }
+
+   aHosts = hb_itemArrayNew( 0 );
+
+   cHosts = Host->h_addr_list;
+   while( *cHosts ) {
+      pHost = hb_itemPutC( NULL, inet_ntoa( *( (struct in_addr *)*cHosts ) ) );
+      hb_arrayAdd( aHosts, pHost );
+      hb_itemRelease( pHost );
+
+      cHosts++;
+   }
+
+   hb_itemRelease( hb_itemReturn( aHosts ) );
+
+}
+
+HB_FUNC( INETGETALIAS )
+{
+   PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM aHosts;
+   struct hostent *Host;
+   char **cHosts;
+
+   if( pHost == NULL )
+   {
+      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETHOSTS", 1, pArgs );
+      hb_itemRelease( pArgs );
+      return;
+   }
+
+   Host = gethostbyname( pHost->item.asString.value );
+
+   if( Host == NULL )
+   {
+      hb_ret();
+      return;
+   }
+
+   aHosts = hb_itemArrayNew( 0 );
+
+   cHosts = Host->h_aliases;
+   while( *cHosts ) {
+      pHost = hb_itemPutC( NULL, *cHosts );
+      hb_arrayAdd( aHosts, pHost );
+      hb_itemRelease( pHost );
+
+      cHosts++;
+   }
+
+   hb_itemRelease( hb_itemReturn( aHosts ) );
+
+}
+
+HB_FUNC( INETCONNECTIP )
+{
+   PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
+
+   HB_SOCKET_STRUCT *Socket;
+   int iPort;
+   int iOpt = 1;
+
+   if( pHost == NULL || ! ISNUM( 2 ) )
+   {
+      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETCONNECT", 1, pArgs );
+      hb_itemRelease( pArgs );
+      return;
+   }
+
+   HB_SOCKET_INIT( Socket );
+
+   /* Creates comm socket */
+   #if defined(HB_OS_WIN_32)
+      Socket->com = socket( AF_INET, SOCK_STREAM, 0);
+   #else
+      Socket->com = socket( PF_INET, SOCK_STREAM, 0);
+   #endif
+
+   setsockopt( Socket->com, SOL_SOCKET, SO_KEEPALIVE, (const char *) &iOpt , sizeof( iOpt ));
+
+   if( Socket->com == -1 )
+   {
+      HB_SOCKET_SET_ERROR( Socket );
+      hb_retclenAdoptRaw( (char *) Socket, sizeof( HB_SOCKET_STRUCT ) );
+      return;
+   }
+
+   iPort = htons( hb_parni( 2 ) );
+
+   Socket->remote.sin_family = AF_INET;
+   Socket->remote.sin_port= iPort;
+   inet_aton( pHost->item.asString.value, &Socket->remote.sin_addr );
 
    if( connect( Socket->com, (struct sockaddr *) &Socket->remote, sizeof(Socket->remote) ) )
    {
