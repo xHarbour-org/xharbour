@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.23 2004/10/22 11:26:44 paultucker Exp $
+ * $Id: gtdos.c,v 1.24 2004/10/23 12:02:10 druzus Exp $
  */
 
 /*
@@ -871,7 +871,7 @@ int HB_GT_FUNC(gt_RectSize( USHORT rows, USHORT cols ))
 
 void HB_GT_FUNC(gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE * dest ))
 {
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p)", usTop, usLeft, usBottom, usRight, dest));
 
 
@@ -1030,7 +1030,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
       unsigned char * fpBlank = ( unsigned char * ) hb_xgrab( iLength );
       unsigned char * fpBuff = ( unsigned char * ) hb_xgrab( iLength * 2 );
 
-      memset( fpBlank, ' ', iLength );
+      memset( fpBlank, hb_ctGetClearB(), iLength );
 
       iColOld = iColNew = usLeft;
       if( iCols >= 0 )
@@ -1869,7 +1869,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
-    
+
     /* Graphics API */
     gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
 }

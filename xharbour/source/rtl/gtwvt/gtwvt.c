@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.133 2004/09/28 03:25:17 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.134 2004/10/22 11:26:47 paultucker Exp $
  */
 
 /*
@@ -687,7 +687,7 @@ void HB_GT_FUNC( gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
     fpBuff  = ucBuff  ;
   }
 
-  memset( fpBlank, ' ', iLength );
+  memset( fpBlank, hb_ctGetClearB(), iLength );
 
   iColOld = iColNew = usLeft;
   iColSize = iLength -1;
@@ -4540,5 +4540,3 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
 }
 
 //-------------------------------------------------------------------//
-
-

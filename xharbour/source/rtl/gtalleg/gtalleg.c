@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.31 2004/09/08 00:17:12 druzus Exp $
+ * $Id: gtalleg.c,v 1.32 2004/10/22 11:26:43 paultucker Exp $
  */
 
 /*
@@ -241,10 +241,10 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 {
    int iRet;
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 #endif
-   
+
    s_iStdIn = iFilenoStdin;
    s_iStdOut = iFilenoStdout;
    s_iStdErr = iFilenoStderr;
@@ -266,7 +266,7 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
 void HB_GT_FUNC(gt_Exit( void ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
 #endif
 
@@ -287,7 +287,7 @@ void HB_GT_FUNC(gt_Exit( void ))
 
 USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth(%d)"));
 #endif
 
@@ -296,7 +296,7 @@ USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
 
 USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenHeight()"));
 #endif
 
@@ -305,7 +305,7 @@ USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
 
 SHORT HB_GT_FUNC(gt_Col( void ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Col()"));
 #endif
 
@@ -314,7 +314,7 @@ SHORT HB_GT_FUNC(gt_Col( void ))
 
 SHORT HB_GT_FUNC(gt_Row( void ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Row()"));
 #endif
 
@@ -323,7 +323,7 @@ SHORT HB_GT_FUNC(gt_Row( void ))
 
 void HB_GT_FUNC(gt_SetPos( SHORT sRow, SHORT sCol, SHORT sMethod ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetPos(%hd, %hd, %hd)", sRow, sCol, sMethod));
 #endif
 
@@ -337,7 +337,7 @@ void HB_GT_FUNC(gt_SetPos( SHORT sRow, SHORT sCol, SHORT sMethod ))
 
 BOOL HB_GT_FUNC(gt_AdjustPos( BYTE *pStr, ULONG ulLen ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_AdjustPos(%s, %lu)", pStr, ulLen));
 #endif
 
@@ -349,7 +349,7 @@ BOOL HB_GT_FUNC(gt_AdjustPos( BYTE *pStr, ULONG ulLen ))
 
 BOOL HB_GT_FUNC(gt_IsColor( void ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_IsColor()"));
 #endif
 
@@ -358,7 +358,7 @@ BOOL HB_GT_FUNC(gt_IsColor( void ))
 
 USHORT HB_GT_FUNC(gt_GetCursorStyle( void ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetCursorStyle()"));
 #endif
 
@@ -367,7 +367,7 @@ USHORT HB_GT_FUNC(gt_GetCursorStyle( void ))
 
 void HB_GT_FUNC(gt_SetCursorStyle( USHORT usStyle ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetCursorStyle(%hu)", usStyle));
 #endif
 
@@ -398,7 +398,7 @@ static void HB_GT_FUNC(gt_ScreenUpdate( void ))
    int gcolor;
    char gtext[256];
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ScreenUpdate()"));
 #endif
 
@@ -531,7 +531,7 @@ static void HB_GT_FUNC(gt_ScreenUpdate( void ))
 
 void HB_GT_FUNC(gt_DispBegin( void ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispBegin()"));
 #endif
 
@@ -545,7 +545,7 @@ void HB_GT_FUNC(gt_DispBegin( void ))
 
 void HB_GT_FUNC(gt_DispEnd( void ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispEnd()"));
 #endif
 
@@ -566,7 +566,7 @@ void HB_GT_FUNC(gt_DispEnd( void ))
 
 USHORT HB_GT_FUNC(gt_DispCount( void ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispCount()"));
 #endif
 
@@ -575,7 +575,7 @@ USHORT HB_GT_FUNC(gt_DispCount( void ))
 
 BOOL HB_GT_FUNC(gt_GetBlink( void ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetBlink()"));
 #endif
 
@@ -584,7 +584,7 @@ BOOL HB_GT_FUNC(gt_GetBlink( void ))
 
 void HB_GT_FUNC(gt_SetBlink( BOOL bBlink ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetBlink()"));
 #endif
 
@@ -593,7 +593,7 @@ void HB_GT_FUNC(gt_SetBlink( BOOL bBlink ))
 
 int HB_GT_FUNC(gt_RectSize( USHORT usRows, USHORT usCols ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_RectSize(%hu, %hu)", usRows, usCols));
 #endif
 
@@ -610,7 +610,7 @@ char * HB_GT_FUNC(gt_Version( int iType ))
 
 BOOL HB_GT_FUNC(gt_Suspend())
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Suspend()"));
 #endif
 
@@ -619,7 +619,7 @@ BOOL HB_GT_FUNC(gt_Suspend())
 
 BOOL HB_GT_FUNC(gt_Resume())
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Resume()"));
 #endif
 
@@ -628,7 +628,7 @@ BOOL HB_GT_FUNC(gt_Resume())
 
 BOOL HB_GT_FUNC(gt_PreExt())
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_PreExt()"));
 #endif
 
@@ -637,7 +637,7 @@ BOOL HB_GT_FUNC(gt_PreExt())
 
 BOOL HB_GT_FUNC(gt_PostExt())
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_PostExt()"));
 #endif
 
@@ -665,7 +665,7 @@ void HB_GT_FUNC(gt_Puts( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE *pbyStr, 
    USHORT uL = usCol + ulLen, uR = usCol;
    BOOL lUpd = FALSE;
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Puts(%hu, %hu, %d, %p, %lu)", usRow, usCol, (int) byAttr, pbyStr, ulLen));
 #endif
 
@@ -710,7 +710,7 @@ void HB_GT_FUNC(gt_Replicate( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE byCh
    int i, l;
    BYTE pbyBuf[256];
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("gt_Replicate(%hu, %hu, %d, %c, %lu)", usRow, usCol, (int) byAttr, (char) byChar, ulLen));
 #endif
 
@@ -730,7 +730,7 @@ void HB_GT_FUNC(gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
 {
    USHORT x, y, z;
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("gt_GetText(%hu, %hu, %hu, %hu, %p)", usTop, usLeft, usBottom, usRight, pbyDst));
 #endif
 
@@ -784,7 +784,7 @@ void HB_GT_FUNC(gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
    USHORT uT, uL, uB, uR;
    BOOL lUpd = FALSE;
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("gt_PutText(%hu, %hu, %hu, %hu, %p)", usTop, usLeft, usBottom, usRight, pbySrc));
 #endif
 
@@ -855,7 +855,7 @@ void HB_GT_FUNC(gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, U
 {
    USHORT x, y, z;
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("gt_SetAttribute(%hu, %hu, %hu, %hu, %d)", usTop, usLeft, usBottom, usRight, (int) byAttr));
 #endif
 
@@ -916,7 +916,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
    BYTE *pbyScr;
    HB_GT_GOBJECT *gobject;
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Scroll(%hu, %hu, %hu, %hu, %d, %hd, %hd)", usTop, usLeft, usBottom, usRight, (int) byAttr, iRows, iCols));
 #endif
 
@@ -1017,7 +1017,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
 
    for ( i = usT; i < usB ; i++ )
    {
-      HB_GT_FUNC(gt_Replicate(i, usL, byAttr, ' ', usR - usL + 1));
+      HB_GT_FUNC(gt_Replicate(i, usL, byAttr, hb_ctGetClearB(), usR - usL + 1));
    }
 
    HB_GT_FUNC(gt_DispEnd());
@@ -1057,7 +1057,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
    short ixFP = 0, iyFP = 0;
    BOOL lMode = FALSE, lPrev = FALSE;
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", usRows, usCols ));
 #endif
 
@@ -1084,20 +1084,20 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
    if ( usRows > 11 && usCols > 23 && usRows < 129 && usCols < 257 )
    {
 #if defined(AL_GFX_XWINDOWS)
-#ifdef DEBUG   
+#ifdef DEBUG
       HB_TRACE(HB_TR_DEBUG, ("trying X DGA2 mode"));
 #endif
       iRet = al_set_gfx_mode( AL_GFX_XDGA2, iWidth, iHeight, 0, 0 );
       if ( iRet != 0 )
       {
-#ifdef DEBUG   
+#ifdef DEBUG
          HB_TRACE(HB_TR_DEBUG, ("trying X DGA mode"));
 #endif
          iRet = al_set_gfx_mode( AL_GFX_XDGA, iWidth, iHeight, 0, 0 );
       }
       if ( iRet != 0 )
       {
-#ifdef DEBUG   
+#ifdef DEBUG
          HB_TRACE(HB_TR_DEBUG, ("trying X Windows mode"));
 #endif
          iRet = al_set_gfx_mode( AL_GFX_XWINDOWS, iWidth, iHeight, 0, 0 );
@@ -1106,7 +1106,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
 #if defined (ALLEGRO_UNIX) | defined(ALLEGRO_LINUX) | defined(ALLEGRO_DOS)
       if ( iRet != 0 )
       {
-#ifdef DEBUG   
+#ifdef DEBUG
          HB_TRACE(HB_TR_DEBUG, ("trying VBE/AF mode"));
 #endif
          iRet = al_set_gfx_mode( AL_GFX_VBEAF, iWidth, iHeight, 0, 0 );
@@ -1115,7 +1115,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
 #if defined(ALLEGRO_UNIX) | defined(ALLEGRO_LINUX)
       if ( iRet != 0 )
       {
-#ifdef DEBUG   
+#ifdef DEBUG
          HB_TRACE(HB_TR_DEBUG, ("trying fb console mode"));
 #endif
          iRet = al_set_gfx_mode( AL_GFX_FBCON, iWidth, iHeight, 0, 0 );
@@ -1125,7 +1125,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       // Try a windowed mode first
       if ( iRet != 0 )
       {
-#ifdef DEBUG   
+#ifdef DEBUG
          HB_TRACE(HB_TR_DEBUG, ("trying autodetect windowed mode"));
 #endif
          iRet = al_set_gfx_mode( AL_GFX_AUTODETECT_WINDOWED, iWidth, iHeight, 0, 0 );
@@ -1134,14 +1134,14 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       // GDI is slower, but it is more likely to bring a windowed mode than DirectX
       if ( iRet != 0 )
       {
-#ifdef DEBUG   
+#ifdef DEBUG
          HB_TRACE(HB_TR_DEBUG, ("trying GDI windowed mode"));
 #endif
          iRet = al_set_gfx_mode( AL_GFX_GDI, iWidth, iHeight, 0, 0 );
       }
       if ( iRet != 0 )
       {
-#ifdef DEBUG   
+#ifdef DEBUG
          HB_TRACE(HB_TR_DEBUG, ("trying DirectX windowed mode"));
 #endif
          iRet = al_set_gfx_mode( AL_GFX_DIRECTX_WIN, iWidth, iHeight, 0, 0 );
@@ -1149,7 +1149,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
 #endif
       if ( iRet != 0 )
       {
-#ifdef DEBUG   
+#ifdef DEBUG
          HB_TRACE(HB_TR_DEBUG, ("trying autodetect console mode"));
 #endif
          iRet = al_set_gfx_mode( AL_GFX_AUTODETECT, iWidth, iHeight, 0, 0 );
@@ -1158,7 +1158,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       {
       /* If that fails (ie, plain DOS or Linux VESA Framebuffer)
          ensure to get any available gfx mode */
-#ifdef DEBUG   
+#ifdef DEBUG
          HB_TRACE(HB_TR_DEBUG, ("trying safe mode"));
 #endif
          iRet = al_set_gfx_mode(AL_GFX_SAFE, iWidth, iHeight, 0, 0 );
@@ -1305,7 +1305,7 @@ USHORT HB_GT_FUNC(gt_Box( SHORT sTop, SHORT sLeft, SHORT sBottom, SHORT sRight, 
    USHORT usRet = 1;
    SHORT x, y, sWidth, sHeight;
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Box(%d, %d, %d, %d, %s, %d)", sTop, sLeft, sBottom, sRight, (char *) szBox, (int) byAttr));
 #endif
 
@@ -1454,7 +1454,7 @@ USHORT HB_GT_FUNC(gt_HorizLine( SHORT sRow, SHORT sLeft, SHORT sRight, BYTE byCh
 {
    USHORT usRet = 1;
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_HorizLine(%hd, %hd, %hd, %c, %d)", sRow, sLeft, sRight, byChar, (int) byAttr));
 #endif
 
@@ -1484,7 +1484,7 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT sCol, SHORT sTop, SHORT sBottom, BYTE byCha
 {
    USHORT usRet = 1, i;
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_VertLine(%hd, %hd, %hd, %c, %d)", sCol, sTop, sBottom, byChar, (int) byAttr));
 #endif
 
@@ -1515,7 +1515,7 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT sCol, SHORT sTop, SHORT sBottom, BYTE byCha
 
 void HB_GT_FUNC(gt_Tone( double dFreq, double dInterval ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFreq, dInterval));
 #endif
 
@@ -1529,7 +1529,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
    int i;
    BOOL lKey = FALSE;
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
 #endif
 
@@ -1840,10 +1840,10 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
    int iOldValue = 0;
    int iWidth, iHeight;
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Info(%d, %d, %d, %p)", iMsgType, bUpdate, iParam, vpParam));
 #endif
-   
+
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
@@ -1942,10 +1942,10 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
 int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
 {
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_gfxPrimitive(%d, %d, %d, %d, %d, %d)", iType, iTop, iLeft, iBottom, iRight, iColor));
 #endif
-   
+
    if ( s_pbyScrBuffer == NULL )
    {
       HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
@@ -2031,7 +2031,7 @@ void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iS
    {
       ssfSetFontSize( ssfDefaultFont, (unsigned short) iSize);
    }
-   
+
    ssfDrawText( al_screen, ssfDefaultFont, cBuf, iLeft, iTop, iColor );
 
    if ( iSize )
@@ -2082,7 +2082,7 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gtFnInit(%p)", gt_funcs));
 #endif
 
@@ -2138,7 +2138,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
 static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 {
 
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseFnInit(%p)", gt_funcs));
 #endif
 
@@ -2187,7 +2187,7 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 */
 int _mangled_main( int argc, char * argv[] )
 {
-#ifdef DEBUG   
+#ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("_mangled_main(%d, %p)", argc, argv));
 #endif
 

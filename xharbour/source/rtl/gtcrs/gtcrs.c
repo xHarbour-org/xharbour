@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.47 2004/10/22 11:26:44 paultucker Exp $
+ * $Id: gtcrs.c,v 1.48 2004/10/23 12:02:10 druzus Exp $
  */
 
 /*
@@ -2791,7 +2791,7 @@ HB_GT_FUNC( gt_Scroll
       unsigned char *fpBuff =
          ( unsigned char * ) hb_xgrab( iLength * sizeof( chtype ) );
 
-      memset( fpBlank, ' ', iLength );
+      memset( fpBlank, hb_ctGetClearB(), iLength );
 
       iColOld = iColNew = usLeft;
       if ( iCols >= 0 )

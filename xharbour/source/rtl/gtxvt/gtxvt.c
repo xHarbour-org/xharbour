@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.48 2004/10/22 11:26:48 paultucker Exp $
+ * $Id: gtxvt.c,v 1.49 2004/10/23 12:02:11 druzus Exp $
  */
 
 /*
@@ -3703,7 +3703,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
    }
 
    s_buffer->background = byAttr;
-   memset( fpBlank, ' ', iLength );
+   memset( fpBlank, hb_ctGetClearB(), iLength );
 
    iColOld = iColNew = usLeft;
    iColSize = iLength -1;
@@ -4755,4 +4755,3 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 
 /* *********************************************************************** */
-

@@ -1,5 +1,5 @@
 /*
- * $Id: gt_tpl.c,v 1.9 2004/09/08 00:17:12 druzus Exp $
+ * $Id: gt_tpl.c,v 1.10 2004/10/22 11:26:43 paultucker Exp $
  */
 
 /*
@@ -467,7 +467,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
       unsigned char * fpBlank = ( unsigned char * ) hb_xgrab( iLength );
       unsigned char * fpBuff = ( unsigned char * ) hb_xgrab( iLength * HB_GT_FUNC(gt_RectSize( 1, 1 ) ) );
 
-      memset( fpBlank, ' ', iLength );
+      memset( fpBlank, hb_ctGetClearB(), iLength );
 
       iColOld = iColNew = usLeft;
       if( iCols >= 0 )

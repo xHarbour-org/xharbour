@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.29 2004/10/22 11:26:45 paultucker Exp $
+ * $Id: gtsln.c,v 1.30 2004/10/23 12:02:11 druzus Exp $
  */
 
 /*
@@ -957,7 +957,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
         unsigned char * fpBlank = ( unsigned char * ) hb_xgrab( iLength );
         unsigned char * fpBuff = ( unsigned char * ) hb_xgrab( iLength * sizeof( SLsmg_Char_Type ) );
 
-        memset( fpBlank, ' ', iLength );
+        memset( fpBlank, hb_ctGetClearB(), iLength );
 
         iColOld = iColNew = usLeft;
         if( iCols >= 0 )

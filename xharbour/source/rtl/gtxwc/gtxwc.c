@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.2 2004/10/22 11:26:48 paultucker Exp $
+ * $Id: gtxwc.c,v 1.3 2004/10/23 12:02:12 druzus Exp $
  */
 
 /*
@@ -2038,9 +2038,9 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
          printf("Event: FocusIn\r\n"); fflush(stdout);
 #endif
          XRefreshKeyboardMapping( &evt->xmapping );
-         wnd->keyModifiers.bCtrl  = 
-         wnd->keyModifiers.bAlt   = 
-         wnd->keyModifiers.bAltGr = 
+         wnd->keyModifiers.bCtrl  =
+         wnd->keyModifiers.bAlt   =
+         wnd->keyModifiers.bAltGr =
          wnd->keyModifiers.bShift = FALSE;
          break;
 
@@ -2123,7 +2123,7 @@ static BOOL hb_xvt_gtAllocColor( PXWND_DEF wnd, XColor *pColor )
       do
       {
          uiClosestColor = -1;
-         /* 
+         /*
           * Look for the color that best approximates the desired one
           * and has not been checked so far and try to allocate it.
           * If allocation fails, it must mean that the color was read-write
@@ -2511,7 +2511,7 @@ static void hb_xvt_gtInvalidateChar( PXWND_DEF wnd,
       if ( wnd->rInvalidChr.right  < right  ) wnd->rInvalidChr.right  = right;
       if ( wnd->rInvalidChr.bottom < bottom ) wnd->rInvalidChr.bottom = bottom;
    }
-   /* 
+   /*
     * It's a race condition in async update mode.
     * wnd->fInvalidChr has to be set _always_ after update region is defined
     * to make sure that screen will be updated (sometimes maybe twice but
@@ -2929,7 +2929,7 @@ static void hb_xvt_gtDestroyWndDef( PXWND_DEF wnd )
       hb_xfree( wnd->pChars );
    if ( wnd->pColors )
       hb_xfree( wnd->pColors );
-/* 
+/*
    if ( wnd->pAttribs )
       hb_xfree( wnd->pAttribs );
 */
@@ -3378,7 +3378,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
       fpBuff  = ucBuff  ;
    }
 
-   memset( fpBlank, ' ', iLength );
+   memset( fpBlank, hb_ctGetClearB(), iLength );
 
    iColOld = iColNew = usLeft;
    iColSize = iLength -1;
@@ -3573,7 +3573,7 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
       {
          HB_GT_FUNC(gt_Replicate( Top, Col, byAttr, szBox[ 1 ], Width + ( (Right - Left) > 1 ? -2 : 0 ) )); /* Top line */
       }
-      if( Height > 1 && ( Right - Left) > 1 && 
+      if( Height > 1 && ( Right - Left) > 1 &&
           Right < sWidth && Top >= 0 && Top < sHeight )
       {
          HB_GT_FUNC(gt_xPutch( Top, Right, byAttr, szBox[ 2 ] )); /* Upper right corner */
