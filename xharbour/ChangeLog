@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1929 2003/12/22 22:11:48 druzus Exp $
+ * $Id: ChangeLog,v 1.1930 2003/12/22 23:58:11 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-12-23 13:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/persist.prg
+  + fixed bug if CHR(13) or CHR(10) embedded in character string variable
+  +       and also if character string length > 254 character
+  +       i.e. removed use of MLCOUNT() / MEMOLINE()
+
 2003-12-23 07:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/gtwvt/gtwvt.c
     * modify castings on hb_hInstance and hb_hPrevInstance for MSVC.
