@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.17 2002/12/16 06:08:03 ronpinkas Exp $
+# $Id: makefile.bc,v 1.18 2002/12/18 13:43:53 ronpinkas Exp $
 #
 
 #
@@ -253,6 +253,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\gx.obj \
    $(OBJ_DIR)\hardcr.obj \
    $(OBJ_DIR)\idle.obj \
+   $(OBJ_DIR)\inet.obj \
    $(OBJ_DIR)\inkey.obj \
    $(OBJ_DIR)\is.obj \
    $(OBJ_DIR)\isprint.obj \
@@ -1483,6 +1484,10 @@ $(OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
 $(OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\inet.obj : $(RTL_DIR)\inet.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\inkey.obj : $(RTL_DIR)\inkey.c
    $(CC) $(CLIBFLAGS) -o$@ $**

@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.2 2002/12/19 22:25:25 jonnymind Exp $
+* $Id: inet.h,v 1.3 2002/12/20 10:11:31 ronpinkas Exp $
 */
 
 /*
@@ -61,6 +61,13 @@
     #include <winsock.h>
     #include <windows.h>
     #define HB_INET_CLOSE( x )    closesocket( x )
+
+    #define SHUT_RDWR    2
+
+    #define MSG_NOSIGNAL 0x4000 /* Do not generate SIGPIPE.  */
+    #define MSG_DONTWAIT 0x40   /* Nonblocking IO.  */
+    #define MSG_WAITALL  0x100  /* Wait for a full request.  */
+    //#define MSG_PEEK     0x02   /* Peek at incoming messages.  */ Already defined (different value).
 #else
     #define HB_SOCKET_T int
     #include <unistd.h>
