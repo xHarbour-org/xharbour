@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.121 2004/06/09 10:09:46 lf_sfnet Exp $
+ * $Id: dbcmd.c,v 1.122 2004/06/30 22:50:42 marcosgambeta Exp $
  */
 
 /*
@@ -1378,14 +1378,11 @@ HB_FUNC( __DBCONTINUE )
       return;
 
    pArea->fFound = FALSE;
-   SELF_SKIP( pArea, 1 );
-   if( pArea->fEof )
-      return;
-
-   pArea->fFound = hb_itemGetL( hb_vmEvalBlock( pArea->dbsi.itmCobFor ) );
-   while( !pArea->fEof && !pArea->fFound )
+   while( !pArea->fFound )
    {
       SELF_SKIP( pArea, 1 );
+      if( pArea->fEof )
+         return;
       pArea->fFound = hb_itemGetL( hb_vmEvalBlock( pArea->dbsi.itmCobFor ) );
    }
 }
