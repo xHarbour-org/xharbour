@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.51 2004/12/02 03:26:20 druzus Exp $
+ * $Id: gtapi.c,v 1.52 2004/12/05 23:28:24 oh1 Exp $
  */
 
 /*
@@ -2315,7 +2315,7 @@ static void hb_ctWSDisp( HB_CT_WND * wnd )
    if( wnd->NCur > 0 && wnd->ShadowA != -1 )
    {
       hb_ctShadow( wnd->WFRow, wnd->WFCol, wnd->WLRow, wnd->WLCol,
-                   wnd->ShadowA );
+                   ( BYTE ) wnd->ShadowA );
    }
 }
 /****************************************************************************/
@@ -2554,10 +2554,12 @@ SHORT HB_EXPORT hb_ctWFormat( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol )
 void HB_EXPORT hb_ctWMode( BOOL MFRow, BOOL MFCol, BOOL MLRow, BOOL MLCol )
 {
 
-   if( MFRow == FALSE || MFRow == TRUE ) ct_MFRow = MFRow;
-   if( MFCol == FALSE || MFCol == TRUE ) ct_MFCol = MFCol;
-   if( MLRow == FALSE || MLRow == TRUE ) ct_MLRow = MLRow;
-   if( MLCol == FALSE || MLCol == TRUE ) ct_MLCol = MLCol;
+   /* these casts should not be required....*/
+
+   if( MFRow == (BOOL) FALSE || MFRow == (BOOL) TRUE ) ct_MFRow = MFRow;
+   if( MFCol == (BOOL) FALSE || MFCol == (BOOL) TRUE ) ct_MFCol = MFCol;
+   if( MLRow == (BOOL) FALSE || MLRow == (BOOL) TRUE ) ct_MLRow = MLRow;
+   if( MLCol == (BOOL) FALSE || MLCol == (BOOL) TRUE ) ct_MLCol = MLCol;
 
    return;
 }
@@ -2683,7 +2685,7 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
    if( lDel || ct_WCur->ShadowA != -1 )
    {
       for( j = 0; j < ct_WCur->WNRow; j++ )
-         hb_gtRepChar( j, 0, ct_ClearB, ct_WCur->WNCol );
+         hb_gtRepChar( j, 0, ( BYTE ) ct_ClearB, ct_WCur->WNCol );
 
       hb_gtSetPos( 0, 0 );
    }
@@ -2936,7 +2938,7 @@ BOOL HB_EXPORT hb_ctWSetMove( BOOL Mode )
 {
    BOOL p_MMode = ct_MMode;
 
-   if( Mode == FALSE || Mode == TRUE ) ct_MMode = Mode;
+   if( Mode == (BOOL) FALSE || Mode == ( BOOL ) TRUE ) ct_MMode = Mode;
 
    return p_MMode;
 }

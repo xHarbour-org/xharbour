@@ -1,5 +1,5 @@
 /*
- * $Id: winreg.prg, $
+ * $Id: winreg.prg,v 1.1 2004/12/08 01:01:08 peterrees Exp $
  */
 
 /*
@@ -212,11 +212,10 @@ static HKEY regkeykey(ULONG nKey)
 
 HB_FUNC_STATIC( WINREGCREATEKEYEX  )
 {
-  unsigned char *cKey;
   HKEY hWnd = ( HKEY ) hb_parnl( 8 );
   ULONG rVal= -1, nresult = hb_parnl( 9 );
-  cKey = hb_parc( 2 );
-  if ( RegCreateKeyEx( regkeykey( hb_parnl( 1 ) ), cKey, hb_parnl( 3 ), NULL, hb_parnl( 5 ), hb_parnl( 6 ), NULL, &hWnd, &nresult ) == ERROR_SUCCESS )
+
+  if ( RegCreateKeyEx( regkeykey( hb_parnl( 1 ) ), ( const char *) hb_parc( 2 ), hb_parnl( 3 ), NULL, hb_parnl( 5 ), hb_parnl( 6 ), NULL, &hWnd, &nresult ) == ERROR_SUCCESS )
   {
     rVal = ERROR_SUCCESS;
     if ( ISBYREF( 8 ) )
@@ -248,24 +247,26 @@ HB_FUNC_STATIC( WINREGOPENKEYEX )
 
 HB_FUNC_STATIC( WINREGQUERYVALUEEX )
 {
-  unsigned char *cValue, *cKey ;
+  BYTE *cValue;
+  const char *cKey ;
   DWORD nSize = 0, nType ;
-  cKey = hb_parc( 2 ) ;
+
+  cKey = ( const char *) hb_parc( 2 ) ;
   if ( RegQueryValueEx( regkeykey( hb_parnl( 1 ) ), cKey, 0, &nType, 0, &nSize ) == ERROR_SUCCESS )
   {
     if ( nSize > 0 )
     {
-      cValue = hb_xgrab( nSize );
+      cValue = ( BYTE *) hb_xgrab( nSize );
       if ( cValue )
       {
-        RegQueryValueEx( regkeykey( hb_parnl( 1 ) ), cKey, 0, &nType, cValue, &nSize );
+        RegQueryValueEx( regkeykey( hb_parnl( 1 ) ), cKey, 0, &nType, ( BYTE *) cValue, &nSize );
         if ( ISBYREF( 4 ) )
         {
           hb_stornl( nType, 4 );
         }
         if ( ISBYREF( 5 ) )
         {
-          hb_storclen( cValue, nSize, 5 );
+          hb_storclen( ( char *) cValue, nSize, 5 );
         }
         hb_xfree( cValue );
       }
@@ -280,13 +281,15 @@ HB_FUNC_STATIC( WINREGQUERYVALUEEX )
 
 HB_FUNC_STATIC( WINREGSETVALUEEX )
 {
-  unsigned char *cValue, *cKey;
+  const char *cKey;
+  BYTE *cValue;
   DWORD nType, nSpace;
+
   cKey = hb_parc( 2 );
   nType = hb_parnl( 4 );
   if ( nType != REG_DWORD )
   {
-    cValue = hb_parc( 5 );
+    cValue = ( BYTE *) hb_parc( 5 );
     hb_retni( RegSetValueEx( regkeykey( hb_parnl( 1 ) ), cKey, 0, nType, ( BYTE *) cValue, hb_parclen( 5 ) + 1 ) );
   }
   else
