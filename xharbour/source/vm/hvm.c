@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.261 2003/09/11 06:56:41 ronpinkas Exp $
+ * $Id: hvm.c,v 1.262 2003/09/12 02:09:34 jonnymind Exp $
  */
 
 /*
@@ -617,6 +617,10 @@ void HB_EXPORT hb_vmQuit( void )
    }
 
    //printf("\nvmQuit()\n" );
+   #ifdef HB_THREAD_SUPPORT
+      hb_threadKillAll();
+      hb_threadWaitAll();
+   #endif
 
    #ifdef HB_MACRO_STATEMENTS
      hb_pp_Free();

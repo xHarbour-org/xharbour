@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.103 2003/09/11 12:08:28 jonnymind Exp $
+* $Id: thread.c,v 1.104 2003/09/14 18:07:24 jonnymind Exp $
 */
 
 /*
@@ -1678,7 +1678,7 @@ void hb_threadWaitAll()
 
    // check for the main stack to be the only one left
    HB_CRITICAL_LOCK( hb_threadStackMutex );
-   while( hb_ht_stack->next != NULL && hb_vmRequestQuery() != HB_QUIT_REQUESTED )
+   while( hb_ht_stack->next != NULL )
    {
       HB_CRITICAL_UNLOCK( hb_threadStackMutex );
       HB_STACK_UNLOCK;
@@ -1696,10 +1696,6 @@ void hb_threadWaitAll()
       HB_CRITICAL_LOCK( hb_threadStackMutex );
    }
    HB_CRITICAL_UNLOCK( hb_threadStackMutex );
-
-   if (hb_vmRequestQuery() != HB_QUIT_REQUESTED) {
-      hb_threadKillAll();
-   }
 }
 
 void hb_threadKillAll()
@@ -1718,6 +1714,7 @@ void hb_threadKillAll()
       #ifndef HB_OS_WIN_32
          // Allows the target thread to cleanup if and when needed.
          pthread_cancel( pStack->th_id );
+         pthread_join( pStack->th_id, NULL );
       #else
          /* Shell locking the thread */
          HB_CRITICAL_LOCK( hb_cancelMutex );
