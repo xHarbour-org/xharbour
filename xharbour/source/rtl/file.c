@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.2 2002/10/27 14:41:38 lculik Exp $
+ * $Id: file.c,v 1.3 2003/01/12 11:55:22 lculik Exp $
  */
 
 /*
@@ -65,10 +65,12 @@ BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
    {
       hb_fsFindClose( ffind );
       hb_xfree(pFilename);
+      hb_fsSetError( 0 );
       return TRUE;
    }
    else {
       hb_xfree(pFilename);
+      hb_fsSetError( 0 );
       return FALSE;
       }
 }
