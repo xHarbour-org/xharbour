@@ -1,5 +1,5 @@
 /*
- * $Id: ttopbar.prg,v 1.5 2004/03/25 13:15:45 lculik Exp $
+ * $Id: ttopbar.prg,v 1.7 2004/07/15 09:29:55 lculik Exp $
  */
 
 /*
@@ -738,11 +738,12 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
               ::Current:=0
             ENDIF
             ::Select(nSave)
-            IF ( nRETURN != 0 )
+// A menu should always exit after an execute call (Clipper compatibility)
+//            IF ( nRETURN != 0 )
                lWhile := .F.
                ::Current:=0
                EXIT
-            ENDIF
+//            ENDIF
 
          ENDIF
          EXIT
@@ -833,10 +834,11 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
             IF ( nNewItem == ::oMenu:Current )
                oMenuMsg:Show( Self, .F. )
                nRETURN := ::Execute()
-               IF ( nRETURN != 0 )
+// A menu should always exit after an execute call (Clipper compatibility)
+//               IF ( nRETURN != 0 )
                   lWhile := .F.
                   EXIT
-               ENDIF
+//               ENDIF
             ENDIF
 
          ELSE
@@ -870,10 +872,11 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
                IF ( ! ::PushMenu( .T. ) )
                   oMenuMsg:Show( Self, .F. )
                   nRETURN := ::Execute()
-                  IF ( nRETURN != 0 )
+// A menu should always exit after an execute call (Clipper compatibility)
+//                  IF ( nRETURN != 0 )
                      lWhile := .F.
                      EXIT
-                  ENDIF
+//                  ENDIF
                ENDIF
                oMenuMsg:Show( Self, .T. )
 
@@ -915,10 +918,11 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
                ELSE
                   oMenuMsg:Show( Self, .F. )
                   nRETURN := ::Execute()
-                  IF ( nRETURN != 0 )
+// A menu should always exit after an execute call (Clipper compatibility)
+//                  IF ( nRETURN != 0 )
                      lWhile := .F.
                      EXIT
-                  ENDIF
+//                  ENDIF
                ENDIF
                oMenuMsg:Show( Self, .T. )
             ENDIF

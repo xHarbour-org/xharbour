@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3960 2005/03/18 10:34:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3960 2005/03/18 13:38:53 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-18 13:40 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/ttopbar.prg
+    ! Modal METHOD must always exit its execution when an item executed
+      (Clipper compatibe)
 
 2005-03-18 10:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com>
   * xharbour/ct/disk.c
