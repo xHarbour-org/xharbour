@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.35 2003/06/20 00:24:14 druzus Exp $
+# $Id: makefile.nt,v 1.36 2003/06/24 04:34:38 ronpinkas Exp $
 #
 
 #
@@ -164,28 +164,32 @@ C_FLAGS      =$(C_FLAGS) -DHB_MULTI_GT
 # Macros to access our library names
 #
 
-CODEPAGE_LIB =$(LIB_DIR)\codepage.lib
-COMMON_LIB   =$(LIB_DIR)\common.lib
-DBFCDX_LIB   =$(LIB_DIR)\dbfcdx.lib
-DBFCDXMT_LIB =$(LIB_DIR)\dbfcdx$(MT).lib
-DBFNTX_LIB   =$(LIB_DIR)\dbfntx.lib
-DBFNTXMT_LIB =$(LIB_DIR)\dbfntx$(MT).lib
-DEBUG_LIB    =$(LIB_DIR)\debug.lib
-LANG_LIB     =$(LIB_DIR)\lang.lib
-MACRO_LIB    =$(LIB_DIR)\macro.lib
-MACROMT_LIB  =$(LIB_DIR)\macro$(MT).lib
-NULSYS_LIB   =$(LIB_DIR)\nulsys.lib
-ODBC_LIB     =$(LIB_DIR)\hbodbc.lib
-ODBCMT_LIB   =$(LIB_DIR)\hbodbc$(MT).lib
-PP_LIB       =$(LIB_DIR)\pp.lib
-PPMT_LIB     =$(LIB_DIR)\pp$(MT).lib
-RDD_LIB      =$(LIB_DIR)\rdd.lib
-RDDMT_LIB    =$(LIB_DIR)\rdd$(MT).lib
-RTL_LIB      =$(LIB_DIR)\rtl.lib
-RTLMT_LIB    =$(LIB_DIR)\rtl$(MT).lib
-SAMPLES_LIB  =$(LIB_DIR)\samples.lib
-VM_LIB       =$(LIB_DIR)\vm.lib
-VMMT_LIB     =$(LIB_DIR)\vm$(MT).lib
+CODEPAGE_LIB     =$(LIB_DIR)\codepage.lib
+COMMON_LIB       =$(LIB_DIR)\common.lib
+DBFCDX_LIB       =$(LIB_DIR)\dbfcdx.lib
+DBFCDXMT_LIB     =$(LIB_DIR)\dbfcdx$(MT).lib
+DBFNTX_LIB       =$(LIB_DIR)\dbfntx.lib
+DBFNTXMT_LIB     =$(LIB_DIR)\dbfntx$(MT).lib
+DEBUG_LIB        =$(LIB_DIR)\debug.lib
+LANG_LIB         =$(LIB_DIR)\lang.lib
+MACRO_LIB        =$(LIB_DIR)\macro.lib
+MACROMT_LIB      =$(LIB_DIR)\macro$(MT).lib
+NULSYS_LIB       =$(LIB_DIR)\nulsys.lib
+ODBC_LIB         =$(LIB_DIR)\hbodbc.lib
+ODBCMT_LIB       =$(LIB_DIR)\hbodbc$(MT).lib
+PP_LIB           =$(LIB_DIR)\pp.lib
+PPMT_LIB         =$(LIB_DIR)\pp$(MT).lib
+RDD_LIB          =$(LIB_DIR)\rdd.lib
+RDDMT_LIB        =$(LIB_DIR)\rdd$(MT).lib
+RTL_LIB          =$(LIB_DIR)\rtl.lib
+RTLMT_LIB        =$(LIB_DIR)\rtl$(MT).lib
+SAMPLES_LIB      =$(LIB_DIR)\samples.lib
+VM_LIB           =$(LIB_DIR)\vm.lib
+VMMT_LIB         =$(LIB_DIR)\vm$(MT).lib
+VM_LIB_OPT_CON   =$(LIB_DIR)\optcon.lib
+VM_LIB_OPT_GUI   =$(LIB_DIR)\optgui.lib
+VMMT_LIB_OPT_CON =$(LIB_DIR)\optcon$(MT).lib
+VMMT_LIB_OPT_GUI =$(LIB_DIR)\optgui$(MT).lib
 
 GTCGI_LIB    =$(LIB_DIR)\gtcgi.lib
 GTDOS_LIB    =$(LIB_DIR)\gtdos.lib
@@ -254,6 +258,8 @@ LIBLIST = \
    $(DBFNTX_LIB) \
    $(NULSYS_LIB) \
    $(VM_LIB) \
+   $(VM_LIB_OPT_CON) \
+   $(VM_LIB_OPT_GUI) \
    $(MACRO_LIB) \
    $(HB_GT_LIB) \
    $(SAMPLES_LIB) \
@@ -268,6 +274,8 @@ LIBLISTMT = \
    $(DBFCDXMT_LIB) \
    $(DBFNTXMT_LIB) \
    $(VMMT_LIB) \
+   $(VMMT_LIB_OPT_CON) \
+   $(VMMT_LIB_OPT_GUI) \
    $(ODBCMT_LIB)
 !endif
 
@@ -355,9 +363,13 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbcompress.obj \
    $(OBJ_DIR)$(MT)\hbcrc32.obj \
    $(OBJ_DIR)$(MT)\hbcrypt.obj \
+   $(OBJ_DIR)$(MT)\hbchecksum.obj \
+   $(OBJ_DIR)$(MT)\hbhextonum.obj \
    $(OBJ_DIR)$(MT)\hbffind.obj \
    $(OBJ_DIR)$(MT)\hbrandom.obj \
+   $(OBJ_DIR)$(MT)\hbreadini.obj \
    $(OBJ_DIR)$(MT)\hbsrlraw.obj \
+   $(OBJ_DIR)$(MT)\hbxml.obj \
    $(OBJ_DIR)$(MT)\idle.obj \
    $(OBJ_DIR)$(MT)\inkey.obj \
    $(OBJ_DIR)$(MT)\is.obj \
@@ -496,6 +508,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ttable.obj \
    $(OBJ_DIR)$(MT)\ttextlin.obj \
    $(OBJ_DIR)$(MT)\ttopbar.obj \
+   $(OBJ_DIR)$(MT)\txml.obj \
    $(OBJ_DIR)$(MT)\typefile.obj \
    $(OBJ_DIR)$(MT)\wait.obj \
    $(OBJ_DIR)$(MT)\win32ole.obj
@@ -716,6 +729,38 @@ COMMON_LIB_OBJS = \
    $(OBJ_DIR)\reserved.obj
 
 #
+# OPTCON.LIB rules
+#
+
+{$(VM_DIR)}.c{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.obj::
+   $(CC) $(CLIBFLAGS) -DHB_FM_STATISTICS_OFF -DHB_NO_PROFILER -Fo$(OBJ_DIR)$(MT)\OPT\CONSOLE\ $<
+
+{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.obj::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\OPT\CONSOLE\ $<
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(VM_LIB_OPT_CON)2
+
+VM_LIB_OPT_CON_OBJS = \
+   $(OBJ_DIR)$(MT)\OPT\CONSOLE\hvm.obj \
+   $(OBJ_DIR)$(MT)\OPT\CONSOLE\classes.obj \
+   $(OBJ_DIR)$(MT)\OPT\CONSOLE\fm.obj
+
+#
+# OPTGUI.LIB rules
+#
+
+{$(VM_DIR)}.c{$(OBJ_DIR)$(MT)\OPT\GUI}.obj::
+   $(CC) $(CLIBFLAGS) -DHB_FM_STATISTICS_OFF -DHB_NO_PROFILER -DHB_GUI -Fo$(OBJ_DIR)$(MT)\OPT\GUI\ $<
+
+{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\GUI}.obj::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\OPT\GUI\ $<
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(VM_LIB_OPT_GUI)2
+
+VM_LIB_OPT_GUI_OBJS = \
+   $(OBJ_DIR)$(MT)\OPT\GUI\hvm.obj \
+   $(OBJ_DIR)$(MT)\OPT\GUI\classes.obj \
+   $(OBJ_DIR)$(MT)\OPT\GUI\fm.obj
+
+#
 # VM.LIB rules
 #
 
@@ -893,6 +938,10 @@ all: \
 !endif
 
 CLEAN:
+   -@if exist $(OBJ_DIR)\opt\console\*.obj $(DEL) $(OBJ_DIR)\opt\console\*.obj > nul
+   -@if exist $(OBJ_DIR)\opt\gui\*.obj $(DEL) $(OBJ_DIR)\opt\gui\*.obj > nul
+   -@if exist $(OBJ_DIR)mt\opt\console\*.obj $(DEL) $(OBJ_DIR)mt\opt\console\*.obj > nul
+   -@if exist $(OBJ_DIR)mt\opt\gui\*.obj $(DEL) $(OBJ_DIR)mt\opt\gui\*.obj > nul
    -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
    -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
    -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
@@ -1082,6 +1131,12 @@ $(DBFNTXMT_LIB) : $(DBFNTX_LIB_OBJS)
 $(VMMT_LIB) : $(VM_LIB_OBJS)
    lib /out:$@ $**
 
+$(VMMT_LIB_OPT_CON): $(VM_LIB_OPT_CON_OBJS)
+   lib /out:$@ $**
+
+$(VMMT_LIB_OPT_GUI): $(VM_LIB_OPT_GUI_OBJS)
+   lib /out:$@ $**
+
 $(MACROMT_LIB) : $(MACRO_LIB_OBJS)
    lib /out:$@ $**
 
@@ -1124,6 +1179,12 @@ $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
    lib /out:$@ $**
 
 $(VM_LIB) : $(VM_LIB_OBJS)
+   lib /out:$@ $**
+
+$(VM_LIB_OPT_CON): $(VM_LIB_OPT_CON_OBJS)
+   lib /out:$@ $**
+
+$(VM_LIB_OPT_GUI): $(VM_LIB_OPT_GUI_OBJS)
    lib /out:$@ $**
 
 $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
@@ -1190,6 +1251,8 @@ $(DBFCDX_LIB)2 : $(DBFCDX_LIB_OBJS)
 $(DBFNTX_LIB)2 : $(DBFNTX_LIB_OBJS)
 $(NULSYS_LIB)2 : $(NULSYS_LIB_OBJS)
 $(VM_LIB)2     : $(VM_LIB_OBJS)
+$(VM_LIB_OPT_CON)2 : $(VM_LIB_OPT_CON_OBJS)
+$(VM_LIB_OPT_GUI)2 : $(VM_LIB_OPT_GUI_OBJS)
 $(GTCGI_LIB)2  : $(GTCGI_LIB_OBJS)
 $(GTPCA_LIB)2  : $(GTPCA_LIB_OBJS)
 $(GTSTD_LIB)2  : $(GTSTD_LIB_OBJS)

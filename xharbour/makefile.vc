@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.57 2003/06/20 00:24:14 druzus Exp $
+# $Id: makefile.vc,v 1.59 2003/06/24 08:37:21 andijahja Exp $
 #
 
 #
@@ -324,14 +324,15 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\gtapiu.obj \
    $(OBJ_DIR)$(MT)\gx.obj \
    $(OBJ_DIR)$(MT)\hardcr.obj \
-   $(OBJ_DIR)$(MT)\hbrandom.obj \
    $(OBJ_DIR)$(MT)\hbcompress.obj \
-   $(OBJ_DIR)$(MT)\hbcrypt.obj \
    $(OBJ_DIR)$(MT)\hbcrc32.obj \
+   $(OBJ_DIR)$(MT)\hbcrypt.obj \
    $(OBJ_DIR)$(MT)\hbchecksum.obj \
    $(OBJ_DIR)$(MT)\hbhextonum.obj \
    $(OBJ_DIR)$(MT)\hbffind.obj \
+   $(OBJ_DIR)$(MT)\hbrandom.obj \
    $(OBJ_DIR)$(MT)\hbreadini.obj \
+   $(OBJ_DIR)$(MT)\hbsrlraw.obj \
    $(OBJ_DIR)$(MT)\hbxml.obj \
    $(OBJ_DIR)$(MT)\idle.obj \
    $(OBJ_DIR)$(MT)\inkey.obj \
@@ -432,7 +433,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\fieldbl.obj \
    $(OBJ_DIR)$(MT)\getlist.obj \
    $(OBJ_DIR)$(MT)\getsys.obj \
-   $(OBJ_DIR)$(MT)\hbsrlraw.obj \
    $(OBJ_DIR)$(MT)\hbserial.obj \
    $(OBJ_DIR)$(MT)\input.obj \
    $(OBJ_DIR)$(MT)\listbox.obj \
@@ -476,6 +476,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\typefile.obj \
    $(OBJ_DIR)$(MT)\wait.obj \
    $(OBJ_DIR)$(MT)\win32ole.obj
+
 
 #
 # LANG.LIB rules
@@ -744,6 +745,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\codebloc.obj \
    $(OBJ_DIR)$(MT)\debug.obj \
    $(OBJ_DIR)$(MT)\do.obj \
+   $(OBJ_DIR)$(MT)\dynlibhb.obj \
    $(OBJ_DIR)$(MT)\dynsym.obj \
    $(OBJ_DIR)$(MT)\errorapi.obj \
    $(OBJ_DIR)$(MT)\estack.obj \
