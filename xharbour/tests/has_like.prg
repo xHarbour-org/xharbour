@@ -19,6 +19,6 @@ PROCEDURE Main()
 
       ?
    NEXT
-
+Inkey( 0 )
 RETURN
 

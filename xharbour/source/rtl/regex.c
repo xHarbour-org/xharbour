@@ -6430,6 +6430,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
    regmatch_t aMatches[REGEX_MAX_GROUPS];
    int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
    int i;
+   int iMaxMatch = REGEX_MAX_GROUPS;
 
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
    PHB_ITEM pNewLine = hb_param( 4, HB_IT_LOGICAL );
@@ -6473,8 +6474,13 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       aMatches[0].rm_eo = pRegEx->item.asString.length;
    }
 
+   if( cRequest > 0 )
+   {
+      iMaxMatch = 1;
+   }
+
    aMatches[0].rm_so = 0;
-   if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
+   if( regexec( pReg, pString->item.asString.value, iMaxMatch, aMatches, EFlags ) == 0 )
    {
       switch ( cRequest )
       {
@@ -6516,8 +6522,8 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                str += aMatches[ 0 ].rm_eo;
                iCount++;
             }
-            while ( *str && (iMax == 0 | iMax > iCount) && 
-                  regexec( pReg, str, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 );
+            while ( *str && (iMax == 0 | iMax > iCount) &&
+                  regexec( pReg, str, 1, aMatches, EFlags ) == 0 );
 
             /* last match must be done also in case that str is empty; this would
                mean an empty split field at the end of the string */
