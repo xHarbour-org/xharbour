@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.152 2003/01/23 03:25:12 ronpinkas Exp $
+ * $Id: hvm.c,v 1.153 2003/01/23 21:47:59 andijahja Exp $
  */
 
 /*
@@ -1764,6 +1764,33 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                pTop->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
             }
 
+            break;
+         }
+
+         case HB_P_SWITCHCASE:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_ADDINT") );
+         {
+            PHB_ITEM pTop = hb_stackItemFromTop( -1 );
+            long lCase = HB_PCODE_MKLONG( &( pCode[ w + 1 ] ) );
+
+            if( pTop->type & HB_IT_INTEGER )
+            {
+               hb_vmPushLogical( (long) ( pTop->item.asInteger.value ) == lCase );
+            }
+            else if( pTop->type & HB_IT_LONG )
+            {
+               hb_vmPushLogical( pTop->item.asLong.value == lCase );
+            }
+            else if( pTop->type & HB_IT_STRING && pTop->item.asString.length == 1 )
+            {
+               hb_vmPushLogical( (long) ( pTop->item.asString.value[0] ) == lCase );
+            }
+            else
+            {
+               hb_vmPush( hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "SWITCH", 1, pTop ) );
+            }
+
+            w += 5;
             break;
          }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.28 2002/11/12 17:24:14 ronpinkas Exp $
+ * $Id: genc.c,v 1.29 2003/01/21 04:56:18 likewolf Exp $
  */
 
 /*
@@ -2273,6 +2273,24 @@ static HB_GENC_FUNC( hb_p_popglobal )
     return 2;
  }
 
+static HB_GENC_FUNC( hb_p_switchcase )
+{
+   fprintf( cargo->yyc, "\tHB_P_SWITCHCASE, %i, %i, %i, %i,",
+            pFunc->pCode[ lPCodePos + 1 ],
+            pFunc->pCode[ lPCodePos + 2 ],
+            pFunc->pCode[ lPCodePos + 3 ],
+            pFunc->pCode[ lPCodePos + 4 ] );
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %li */", HB_PCODE_MKLONG( &( pFunc->pCode[ lPCodePos + 1 ] ) ) );
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return 1 + sizeof( long );
+}
+
 /* NOTE: The order of functions has to match the order of opcodes
  *       mnemonics
  */
@@ -2424,7 +2442,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_pushglobal,
    hb_p_popglobal,
    hb_p_pushglobalref,
-   hb_p_enumindex
+   hb_p_enumindex,
+   hb_p_switchcase
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.15 2002/11/12 17:24:14 ronpinkas Exp $
+ * $Id: hbfix.c,v 1.16 2003/01/21 04:56:18 likewolf Exp $
  */
 
 /*
@@ -102,7 +102,7 @@ static HB_FIX_FUNC( hb_p_pushblock )
    {
       BYTE * pLocal = &( pFunc->pCode[ lPCodePos ] );
       USHORT wLocal = HB_PCODE_MKUSHORT( pLocal );
-      
+
       wLocal += pFunc->wParamCount;
       pLocal[ 0 ] = HB_LOBYTE( wLocal );
       pLocal[ 1 ] = HB_HIBYTE( wLocal );
@@ -494,7 +494,8 @@ static HB_FIX_FUNC_PTR s_fixlocals_table[] =
    NULL,                       /* HB_P_PUSHGLOBAL,           */
    NULL,                       /* HB_P_POPGLOBAL,            */
    NULL,                       /* HB_P_PUSHGLOBALREF,        */
-   NULL                        /* HB_P_ENUMINDEX             */
+   NULL,                       /* HB_P_ENUMINDEX             */
+   NULL                        /* HB_P_SWITCHCASE            */
 };
 
 void hb_compFixFuncPCode( PFUNCTION pFunc )

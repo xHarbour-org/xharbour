@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.7 2002/09/16 05:34:02 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.8 2002/10/09 20:42:59 ronpinkas Exp $
  */
 
 /*
@@ -90,7 +90,8 @@ char * hb_comp_szErrors[] =
    "Misplaced Global declaration \'%s\'.",
    "Too many Global declarations \'%s\'.",
    "External Global declaration can not include initializer \'%s\'.",
-   "Too many Paramaters declarations \'%s\'."
+   "Too many Paramaters declarations \'%s\'.",
+   "Invalid SWITCH Constant \'%s\'."
 };
 
 /* Table with parse warnings */

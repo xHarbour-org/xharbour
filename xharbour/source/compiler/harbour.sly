@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.30 2002/12/08 20:10:50 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.31 2003/01/16 01:30:34 ronpinkas Exp $
  */
 
 /*
@@ -116,6 +116,7 @@ USHORT hb_comp_wIfCounter       = 0;
 USHORT hb_comp_wWhileCounter    = 0;
 USHORT hb_comp_wCaseCounter     = 0;
 USHORT hb_comp_wWithObjCounter  = 0;
+ULONG  hb_comp_lLastSwitchPos   = 0;
 
 char * hb_comp_buffer; /* yacc input buffer */
 
@@ -182,6 +183,7 @@ static void hb_compDebugStart( void ) { };
 %token WITHOBJ FOREACH EPSILON
 %token ENUM
 %token TRY CATCH
+%token SWITCH DEFAULT
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
@@ -218,7 +220,7 @@ static void hb_compDebugStart( void ) { };
 %type <iNumber> IfBegin VarList ExtVarList
 %type <iNumber> FieldList
 %type <lNumber> WhileBegin
-%type <pVoid>   IfElseIf Cases
+%type <pVoid>   IfElseIf Cases SwitchCases
 %type <asExpr>  Argument ArgList BlockExpList BlockVarList BlockNoVar
 %type <asExpr>  DoName DoProc DoArgument DoArgList
 %type <asExpr>  PareExpList1 PareExpList2 PareExpList3 PareExpListN
@@ -252,6 +254,7 @@ static void hb_compDebugStart( void ) { };
 %type <asExpr>  FieldAlias FieldVarAlias
 %type <asExpr>  PostOp
 %type <asExpr>  Get GetVar GetA GetVarArray GetArgList
+%type <asExpr>  Constant
 
 %%
 
@@ -1743,6 +1746,7 @@ EnumMembers : IdentName { hb_compEnumMemberAdd( $1 ); }
 
 ExecFlow   : IfEndif
            | DoCase
+           | Switch
            | DoWhile
            | ForNext
            | ForEach
@@ -1865,10 +1869,137 @@ Cases      : CASE { hb_compLinePush(); } Expression Crlf
                }
            ;
 
-Otherwise  : OTHERWISE Crlf { hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; }
+Otherwise  : OTHERWISE Crlf
+               {
+                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+               }
+
                 EmptyStats
+
            | Otherwise OTHERWISE { hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_MAYHEM_IN_CASE, NULL, NULL ); } Crlf
                 EmptyStats
+           ;
+
+Switch    : SwitchBegin
+                SwitchCases
+             EndSwitch
+               {
+                  hb_compLoopEnd();
+                  //hb_compElseIfFix( $2 ); // No default BREAK in SWITCH.
+                  hb_compGenPCode1( HB_P_POP );
+               }
+
+           | SwitchBegin
+                SwitchCases
+                Default
+             EndSwitch
+               {
+                  hb_compLoopEnd();
+                  //hb_compElseIfFix( $2 );
+                  hb_compGenPCode1( HB_P_POP );
+               }
+           ;
+
+EndSwitch  : END
+               {
+                  --hb_comp_wCaseCounter;
+
+                  if( hb_comp_lLastSwitchPos )
+                  {
+                     hb_comp_functions.pLast->lPCodePos -= 5;
+                     hb_comp_lLastSwitchPos = 0;
+                  }
+
+                  hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
+               }
+           ;
+
+SwitchBegin : SWITCH Expression { ++hb_comp_wCaseCounter; hb_compExprGenPush( $2 ); hb_compLoopStart(); } Crlf
+            ;
+
+SwitchCases : CASE { hb_compLinePush(); } Constant Crlf
+               {
+                  hb_compGenPCode1( HB_P_SWITCHCASE );
+                  hb_compGenPCode4( HB_LOBYTE( $3->value.asNum.lVal ), HB_HIBYTE( $3->value.asNum.lVal ), HB_LOBYTE( HB_HIWORD( $3->value.asNum.lVal ) ), HB_HIBYTE( HB_HIWORD( $3->value.asNum.lVal ) ), FALSE );
+                  hb_compExprDelete( $3 );
+                  $<iNumber>$ = hb_compGenJumpFalse( 0 );
+               }
+             EmptyStats
+               {
+                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+
+                  //$$ = hb_compElseIfGen( 0, hb_compGenJump( 0 ) ); // No default BREAK in SWITCH.
+
+                  if( hb_comp_functions.pLast->pCode[ hb_comp_functions.pLast->lPCodePos - 4 ] == HB_P_JUMPFAR )
+                  {
+                     hb_comp_lLastSwitchPos = 0;
+                  }
+                  else
+                  {
+                     hb_comp_lLastSwitchPos = hb_compGenJump( 0 ); // Skip over NEXT HB_P_SWITCHCASE
+                  }
+
+                  hb_compGenJumpHere( $<iNumber>5 );
+               }
+
+           | SwitchCases CASE { hb_compLinePush(); } Constant Crlf
+               {
+                  hb_compGenPCode1( HB_P_SWITCHCASE );
+                  hb_compGenPCode4( HB_LOBYTE( $4->value.asNum.lVal ), HB_HIBYTE( $4->value.asNum.lVal ), HB_LOBYTE( HB_HIWORD( $4->value.asNum.lVal ) ), HB_HIBYTE( HB_HIWORD( $4->value.asNum.lVal ) ), FALSE );
+                  hb_compExprDelete( $4 );
+                  $<iNumber>$ = hb_compGenJumpFalse( 0 );
+
+                  if( hb_comp_lLastSwitchPos )
+                  {
+                     hb_compGenJumpHere( hb_comp_lLastSwitchPos );
+                  }
+               }
+             EmptyStats
+               {
+                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+
+                  //$$ = hb_compElseIfGen( $1, hb_compGenJump( 0 ) ); // No default BREAK in SWITCH.
+
+                  if( hb_comp_functions.pLast->pCode[ hb_comp_functions.pLast->lPCodePos - 4 ] == HB_P_JUMPFAR )
+                  {
+                     hb_comp_lLastSwitchPos = 0;
+                  }
+                  else
+                  {
+                     hb_comp_lLastSwitchPos = hb_compGenJump( 0 ); // Skip over NEXT HB_P_SWITCHCASE
+                  }
+
+                  hb_compGenJumpHere( $<iNumber>6 );
+               }
+           ;
+
+Constant   : NUM_INTEGER         { $$ = hb_compExprNewLong( $1.iNumber ); }
+           | NUM_LONG            { $$ = hb_compExprNewLong( $1.lNumber ); }
+           | LITERAL             {
+                                    if( $1[1] == '\0' )
+                                    {
+                                       $$ = hb_compExprNewLong( (long) $1[0] );
+                                    }
+                                    else
+                                    {
+                                       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_CONSTANT, $1, NULL );
+                                       $$ = hb_compExprNewLong( 0 );
+                                    }
+                                 }
+           ;
+
+Default    : DEFAULT
+               EmptyStats
+               {
+                  // Correct last JUMP generated by SWITCHCASE to Skip the DEFAULT section.
+                  if( hb_comp_lLastSwitchPos )
+                  {
+                     hb_compGenJumpHere( hb_comp_lLastSwitchPos );
+                     hb_comp_lLastSwitchPos = 0;
+                  }
+
+                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+               }
            ;
 
 DoWhile    : WhileBegin Expression Crlf
