@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.8 2003/11/21 13:03:29 jonnymind Exp $
+ * $Id: txml.prg,v 1.9 2003/11/23 14:44:35 jonnymind Exp $
  */
 
 /*
@@ -59,6 +59,7 @@ CLASS TXMLNode
    DATA nType
    DATA cName
    DATA aAttributes
+   DATA nBeginLine
    DATA cData
 
    DATA oNext
@@ -329,6 +330,7 @@ CLASS TXmlDocument
    DATA nStatus
    DATA nError
    DATA nLine
+   DATA oErrorNode
    DATA nNodeCount
 
    METHOD New( xElem, nStyle )        CONSTRUCTOR

@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.h,v 1.4 2003/11/21 13:03:29 jonnymind Exp $
+ * $Id: hbxml.h,v 1.5 2004/03/17 02:29:00 druzus Exp $
  */
 
 /*
@@ -83,8 +83,6 @@
 
 #define MXML_EOF                  -256
 
-#define MXML_MAX_NAME_LEN     128
-#define MXML_MAX_ATTRIB_LEN   256
 #define MXML_ALLOC_BLOCK      128
 #define MXML_MAX_DEPTH        64
 
@@ -208,7 +206,7 @@ typedef struct tag_mxml_self_growing_string
 
 
 /* Tag oriented operations */
-PHB_ITEM mxml_node_new( void );
+PHB_ITEM mxml_node_new( PHB_ITEM pDoc );
 PHB_ITEM mxml_node_clone( PHB_ITEM tg );
 PHB_ITEM mxml_node_clone_tree( PHB_ITEM tg );
 
@@ -232,7 +230,7 @@ typedef struct _hbxml_attribute {
    PHB_ITEM pValue;
 } HBXML_ATTRIBUTE, *PHBXML_ATTRIBUTE;
 
-MXML_STATUS mxml_attribute_read( MXML_REFIL *data, PHB_ITEM doc, PHBXML_ATTRIBUTE dest, int style );
+MXML_STATUS mxml_attribute_read( MXML_REFIL *data, PHB_ITEM doc, PHB_ITEM pNode, PHBXML_ATTRIBUTE dest, int style );
 MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHBXML_ATTRIBUTE attr, int style );
 
 /* Refil routines */
@@ -265,6 +263,7 @@ void mxml_output_func_to_sgs( MXML_OUTPUT *out, char *s, int len );
 /* Self growing string routines */
 MXML_SGS *mxml_sgs_new( void );
 void mxml_sgs_destroy( MXML_SGS *sgs );
+char *mxml_sgs_extract( MXML_SGS *sgs );
 MXML_STATUS mxml_sgs_append_char( MXML_SGS *sgs, char c );
 MXML_STATUS mxml_sgs_append_string_len( MXML_SGS *sgs, char *s, int slen );
 MXML_STATUS mxml_sgs_append_string( MXML_SGS *sgs, char *s );

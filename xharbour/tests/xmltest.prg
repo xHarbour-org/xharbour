@@ -1,6 +1,6 @@
 ************************************************************
 * xmltest.prg
-* $Id: xmltest.prg,v 1.4 2003/06/17 10:16:10 jonnymind Exp $
+* $Id: xmltest.prg,v 1.5 2003/06/30 23:06:27 jonnymind Exp $
 *
 * Test for XML routines of Xharbour rtl (MXML/HBXML)
 *
@@ -58,11 +58,14 @@ PROCEDURE Main( cFileName, cNode, cAttrib, cValue, cData )
    @3,10 SAY "File " + cFileName + " Opened. Processing XML."
 
    xmlDoc := TXmlDocument():New( hFile )
+
    IF xmlDoc:nStatus != HBXML_STATUS_OK
       @4,10 SAY "Error While Processing File: "
       @5,10 SAY "On Line: " + AllTrim( Str( xmlDoc:nLine ) )
       @6,10 SAY "Error: " + HB_XmlErrorDesc( xmlDoc:nError )
-      @8,10 SAY "Program Terminating, press any key"
+      @7,10 SAY "Tag Error on tag: " + xmlDoc:oErrorNode:cName
+      @8,10 SAY "Tag Begun on line: " + AllTrim( Str( xmlDoc:oErrorNode:nBeginLine ) )
+      @10,10 SAY "Program Terminating, press any key"
       Inkey( 0 )
       RETURN
    ENDIF
