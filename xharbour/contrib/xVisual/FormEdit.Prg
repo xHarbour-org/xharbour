@@ -183,9 +183,11 @@ METHOD CreateControl(aRect)
            oObj:=::Add(cName, TStatusBar():New( self, cName, 507 ) )
          ENDIF
       CASE ::CtrlName=="TabControl"
-         oObj := ::Add(cName, TTabControl():New( self,     508, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::Add(cName, TTabControl():New( self,        508, aRect[1], aRect[2], aRect[3], aRect[4] ) )
          oObj:AddTab( "Tab1",  'TEST' )
          oObj:configure()
+      CASE ::CtrlName=="GroupBox"
+         oObj:=::Add(cName, TGroupBox():New(   self, cName, 509, aRect[1], aRect[2], aRect[3], aRect[4] ) )
 
       OTHERWISE // unknown name
 
