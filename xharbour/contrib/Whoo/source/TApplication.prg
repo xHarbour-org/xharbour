@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.54 2003/05/28 03:09:43 paultucker Exp $
+ * $Id: TApplication.prg,v 1.55 2003/12/09 02:53:49 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -128,8 +128,6 @@ METHOD CreateForm( oForm, oTarget ) CLASS Application
    //oForm:Name := oForm:ClassName() //ControlName + AllTrim( Str( Len( ::AppForms ) + 1 ) )
    //__objAddData( Self, oForm:Name )
    //__ObjSetValueList( self, { { oForm:Name, oForm } } )
-
-   TraceLog( oForm:Caption, oForm:Top, oForm:Left, oForm:Height, oForm:Width )
 
 
    //aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
