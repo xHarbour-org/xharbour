@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.2 2003/05/28 11:59:05 druzus Exp $
+ * $Id: cdpapi.c,v 1.3 2003/06/17 19:47:49 lculik Exp $
  */
 
 /*
@@ -290,6 +290,7 @@ void HB_EXPORT hb_cdpnTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdp
    unsigned int i;
 
    if( cdpIn != cdpOut && cdpIn->nChars == cdpOut->nChars )
+   {
       int nAddLower = (cdpIn->lLatin)? 6:0;
       for( i=0; i<nChars; i++,psz++ )
       {
@@ -302,6 +303,7 @@ void HB_EXPORT hb_cdpnTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdp
                         cdpOut->CharsLower[n-cdpOut->nChars-nAddLower]:cdpOut->CharsUpper[n];
          }
       }
+   }
 }
 
 int HB_EXPORT hb_cdpcmp( char* szFirst, char* szSecond, ULONG ulLen, PHB_CODEPAGE cdpage, ULONG* piCounter )
