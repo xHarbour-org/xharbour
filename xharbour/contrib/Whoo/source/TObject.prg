@@ -1,5 +1,5 @@
 /*
- * $Id:  Exp $
+ * $Id: TObject.prg,v 1.3 2002/10/16 21:17:00 fsgiudice Exp $
  */
 /*
  * xHarbour Project source code:
@@ -32,7 +32,7 @@
 * NOT USE THIS CLASS DIRECTLY !!!
 */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "HbClass.ch"
 #include "what32.ch"
 #include "debug.ch"
@@ -76,30 +76,30 @@ CLASS TObject  // FROM HBObject
 
     // FSG - as Delphi
     METHOD AfterConstruction()           VIRTUAL
-	METHOD BeforeDestruction()           VIRTUAL
-	METHOD ClassInfo()                   VIRTUAL  // FSG - to be implemented
-	//METHOD ClassName                            // FSG - already have from harbour
-	METHOD ClassNameIs( cName )          INLINE  Upper( cName ) == ::ClassName
-	METHOD ClassParent()                 INLINE  ::Super
-	METHOD ClassType                     VIRTUAL  // FSG - to be implemented
-	METHOD CleanupInstance               VIRTUAL  // FSG - to be implemented
-	METHOD Create                        VIRTUAL  // FSG - to be implemented
-	METHOD DefaultHandler                VIRTUAL
-	METHOD Destroy                       VIRTUAL
-	METHOD Dispatch                      VIRTUAL
-	METHOD FieldAddress                  VIRTUAL  // FSG - to be implemented
-	METHOD Free                          INLINE  IIF( Self <> NIL, ::Destroy(), NIL ), Self := NIL
-	METHOD FreeInstance                  VIRTUAL
-	METHOD GetInterface                  VIRTUAL  // FSG - to be implemented
-	METHOD GetInterfaceEntry             VIRTUAL  // FSG - to be implemented
+   METHOD BeforeDestruction()           VIRTUAL
+   METHOD ClassInfo()                   VIRTUAL  // FSG - to be implemented
+   //METHOD ClassName                            // FSG - already have from harbour
+   METHOD ClassNameIs( cName )          INLINE  Upper( cName ) == ::ClassName
+   METHOD ClassParent()                 INLINE  ::Super
+   METHOD ClassType                     VIRTUAL  // FSG - to be implemented
+   METHOD CleanupInstance               VIRTUAL  // FSG - to be implemented
+   METHOD Create                        VIRTUAL  // FSG - to be implemented
+   METHOD DefaultHandler                VIRTUAL
+   METHOD Destroy                       VIRTUAL
+   METHOD Dispatch                      VIRTUAL
+   METHOD FieldAddress                  VIRTUAL  // FSG - to be implemented
+   METHOD Free                          INLINE  IIF( Self <> NIL, ::Destroy(), NIL ), Self := NIL
+   METHOD FreeInstance                  VIRTUAL
+   METHOD GetInterface                  VIRTUAL  // FSG - to be implemented
+   METHOD GetInterfaceEntry             VIRTUAL  // FSG - to be implemented
     METHOD GetInterfaceTable             VIRTUAL  // FSG - to be implemented
-	METHOD InheritsFrom( cGrandFather )  INLINE  ::IsDerivedFrom( cGrandFather AS STRING )
-	METHOD InitInstance                  VIRTUAL  // FSG - to be implemented
-	METHOD InstanceSize                  VIRTUAL  // FSG - to be implemented
-	METHOD MethodAddress                 VIRTUAL  // FSG - to be implemented
-	METHOD MethodName                    VIRTUAL  // FSG - to be implemented
-	METHOD NewInstance                   VIRTUAL
-	METHOD SafeCallException             VIRTUAL  // FSG - to be implemented
+   METHOD InheritsFrom( cGrandFather )  INLINE  ::IsDerivedFrom( cGrandFather AS STRING )
+   METHOD InitInstance                  VIRTUAL  // FSG - to be implemented
+   METHOD InstanceSize                  VIRTUAL  // FSG - to be implemented
+   METHOD MethodAddress                 VIRTUAL  // FSG - to be implemented
+   METHOD MethodName                    VIRTUAL  // FSG - to be implemented
+   METHOD NewInstance                   VIRTUAL
+   METHOD SafeCallException             VIRTUAL  // FSG - to be implemented
 
 
     // Mine

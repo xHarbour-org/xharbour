@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.24 2002/11/17 09:03:45 what32 Exp $
+ * $Id: xTree.prg,v 1.25 2002/11/18 06:24:20 what32 Exp $
  */
 
 /*
@@ -27,11 +27,10 @@
  *
  */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "hbclass.ch"
-#include "imglist.ch"
+#Include "commctrl.ch"
 #include "debug.ch"
-#include "TreeView.ch"
 
 GLOBAL EXTERNAL MainForm
 GLOBAL EXTERNAL FormEdit

@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomTab.prg,v 1.1 2002/10/31 04:08:43 what32 Exp $
+ * $Id: TCustomTab.prg,v 1.2 2002/11/07 20:05:56 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -26,11 +26,11 @@
  *
  */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "HbClass.ch"
 #include "what32.ch"
 #include "debug.ch"
-#Include "tabctrl.ch"
+#Include "commctrl.ch"
 
 *------------------------------------------------------------------------------*
 

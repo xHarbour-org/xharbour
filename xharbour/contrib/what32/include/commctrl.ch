@@ -424,7 +424,7 @@
 #define HDF_IMAGE                 2048
 
 #define HDM_GETITEMCOUNT        (HDM_FIRST + 0)
-#define Header_GetItemCount(hwndHD) \
+//#define Header_GetItemCount(hwndHD) \
 
 
 #define HDM_INSERTITEMA         (HDM_FIRST + 1)
@@ -436,11 +436,11 @@
 #define HDM_INSERTITEM          HDM_INSERTITEMA
 #endif
 
-#define Header_InsertItem(hwndHD, i, phdi) \
+//#define Header_InsertItem(hwndHD, i, phdi) \
 
 
 #define HDM_DELETEITEM          (HDM_FIRST + 2)
-#define Header_DeleteItem(hwndHD, i) \
+//#define Header_DeleteItem(hwndHD, i) \
 
 
 #define HDM_GETITEMA            (HDM_FIRST + 3)
@@ -452,7 +452,7 @@
 #define HDM_GETITEM             HDM_GETITEMA
 #endif
 
-#define Header_GetItem(hwndHD, i, phdi) \
+//#define Header_GetItem(hwndHD, i, phdi) \
 
 
 #define HDM_SETITEMA            (HDM_FIRST + 4)
@@ -464,14 +464,14 @@
 #define HDM_SETITEM             HDM_SETITEMA
 #endif
 
-#define Header_SetItem(hwndHD, i, phdi) \
+//#define Header_SetItem(hwndHD, i, phdi) \
 
 
 #define HD_LAYOUT  HDLAYOUT
 
 
 #define HDM_LAYOUT              (HDM_FIRST + 5)
-#define Header_Layout(hwndHD, playout) \
+//#define Header_Layout(hwndHD, playout) \
 
 
 #define HHT_NOWHERE                  1
@@ -492,31 +492,31 @@
 
 
 #define HDM_GETITEMRECT         (HDM_FIRST + 7)
-#define Header_GetItemRect(hwnd, iItem, lprc) \
+//#define Header_GetItemRect(hwnd, iItem, lprc) \
 
 
 #define HDM_SETIMAGELIST        (HDM_FIRST + 8)
-#define Header_SetImageList(hwnd, himl) \
+////#define Header_SetImageList(hwnd, himl) \
 
 
 #define HDM_GETIMAGELIST        (HDM_FIRST + 9)
-#define Header_GetImageList(hwnd) \
+//#define Header_GetImageList(hwnd) \
 
 
 #define HDM_ORDERTOINDEX        (HDM_FIRST + 15)
-#define Header_OrderToIndex(hwnd, i) \
+//#define Header_OrderToIndex(hwnd, i) \
 
 
 #define HDM_CREATEDRAGIMAGE     (HDM_FIRST + 16)  // wparam = which item (by index)
-#define Header_CreateDragImage(hwnd, i) \
+//#define Header_CreateDragImage(hwnd, i) \
 
 
 #define HDM_GETORDERARRAY       (HDM_FIRST + 17)
-#define Header_GetOrderArray(hwnd, iCount, lpi) \
+//#define Header_GetOrderArray(hwnd, iCount, lpi) \
 
 
 #define HDM_SETORDERARRAY       (HDM_FIRST + 18)
-#define Header_SetOrderArray(hwnd, iCount, lpi) \
+//#define Header_SetOrderArray(hwnd, iCount, lpi) \
 
 // lparam = int array of size HDM_GETITEMCOUNT
 // the array specifies the order that all items should be displayed.
@@ -527,7 +527,7 @@
 
 
 #define HDM_SETHOTDIVIDER          (HDM_FIRST + 19)
-#define Header_SetHotDivider(hwnd, fPos, dw) \
+//#define Header_SetHotDivider(hwnd, fPos, dw) \
 
 // convenience message for external dragdrop
 // wParam = BOOL  specifying whether the lParam is a dwPos of the cursor
@@ -536,28 +536,28 @@
 
 
 #define HDM_SETBITMAPMARGIN          (HDM_FIRST + 20)
-#define Header_SetBitmapMargin(hwnd, iWidth) \
+//#define Header_SetBitmapMargin(hwnd, iWidth) \
 
 
 #define HDM_GETBITMAPMARGIN          (HDM_FIRST + 21)
-#define Header_GetBitmapMargin(hwnd) \
+//#define Header_GetBitmapMargin(hwnd) \
 
 
 
 #define HDM_SETUNICODEFORMAT   CCM_SETUNICODEFORMAT
-#define Header_SetUnicodeFormat(hwnd, fUnicode)  \
+//#define Header_SetUnicodeFormat(hwnd, fUnicode)  \
 
 
 #define HDM_GETUNICODEFORMAT   CCM_GETUNICODEFORMAT
-#define Header_GetUnicodeFormat(hwnd)  \
+//#define Header_GetUnicodeFormat(hwnd)  \
 
 
 #define HDM_SETFILTERCHANGETIMEOUT  (HDM_FIRST+22)
-#define Header_SetFilterChangeTimeout(hwnd, i) \
+//#define Header_SetFilterChangeTimeout(hwnd, i) \
 
 
 #define HDM_EDITFILTER          (HDM_FIRST+23)
-#define Header_EditFilter(hwnd, i, fDiscardChanges) \
+//#define Header_EditFilter(hwnd, i, fDiscardChanges) \
 
 
 // Clear filter takes -1 as a column value to indicate that all
@@ -565,9 +565,9 @@
 // only receive a single filter changed notification.
 
 #define HDM_CLEARFILTER         (HDM_FIRST+24)
-#define Header_ClearFilter(hwnd, i) \
+//#define Header_ClearFilter(hwnd, i) \
 
-#define Header_ClearAllFilters(hwnd) \
+//#define Header_ClearAllFilters(hwnd) \
 
 
 #define HDN_ITEMCHANGINGA           (HDN_FIRST-0)

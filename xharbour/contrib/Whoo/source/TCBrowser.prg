@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.22 2002/11/17 09:03:41 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.23 2002/11/18 06:24:19 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -29,16 +29,14 @@
  *
  */
 
-#INCLUDE 'windows.ch'
+#include "winuser.ch"
+#include "commctrl.ch"
 #INCLUDE 'commdlg.ch'
-#INCLUDE 'header.ch'
 #INCLUDE "inkey.ch"
-#INCLUDE "accel.ch"
 #INCLUDE "cstruct.ch"
 #INCLUDE "wintypes.ch"
 #INCLUDE "hbclass.ch"
 #INCLUDE 'What32.ch'
-#INCLUDE "imglist.ch"
 #Include "wingdi.ch"
 #include "debug.ch"
 

@@ -2198,10 +2198,10 @@
 /*
  * Special HWND value for use with PostMessage() and SendMessage()
  */
-#define HWND_BROADCAST  ((HWND) 65535)
+#define HWND_BROADCAST  65535
 
 //#if(WINVER >=   1280)
-#define HWND_MESSAGE     ((HWND)-3)
+#define HWND_MESSAGE     -3
 //#endif // WINVER >= 0x0500
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TCCombo.prg,v 1.24 2002/11/05 21:39:58 what32 Exp $
+ * $Id: TCCombo.prg,v 1.25 2002/11/07 20:05:55 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -27,7 +27,7 @@
  */
 
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "HbClass.ch"
 #include "what32.ch"
 #include "wingdi.ch"

@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.47 2002/11/13 00:45:50 what32 Exp $
+ * $Id: TApplication.prg,v 1.48 2002/11/14 07:59:26 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -28,12 +28,13 @@
 
 
 
+#include "winuser.ch"
+#include "commctrl.ch"
+
 #include "hbclass.ch"
 #include "what32.ch"
-#include "windows.ch"
 #include "debug.ch"
 #include "wingdi.ch"
-#include "tabctrl.ch"
 #include "classex.ch"
 #include "WinTypes.ch"
 #include "cstruct.ch"

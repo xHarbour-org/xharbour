@@ -1,5 +1,5 @@
 /*
- * $Id: TOpenDialog.prg,v 1.1 2002/10/28 04:01:57 what32 Exp $
+ * $Id: TOpenDialog.prg,v 1.2 2002/11/01 08:15:25 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -26,7 +26,7 @@
  *
  */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "commdlg.ch"
 #include "HbClass.ch"
 #include "what32.ch"

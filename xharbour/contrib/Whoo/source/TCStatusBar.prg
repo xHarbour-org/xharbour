@@ -1,5 +1,5 @@
 /*
- * $Id: TCStatusBar.prg,v 1.20 2002/11/08 03:24:31 what32 Exp $
+ * $Id: TCStatusBar.prg,v 1.21 2002/11/19 00:47:01 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -26,8 +26,8 @@
  *
  */
 
-#Include "windows.ch"
-#Include "statbar.ch"
+#include "winuser.ch"
+#Include "commctrl.ch"
 #Include "hbclass.ch"
 #include "wintypes.ch"
 #include "what32.ch"

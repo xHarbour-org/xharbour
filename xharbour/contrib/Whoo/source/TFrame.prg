@@ -24,7 +24,7 @@
  */
 
 #include "hbclass.ch"
-#include "windows.ch"
+#include "winuser.ch"
 #include "what32.ch"
 #include "error.ch"
 #include "debug.ch"

@@ -28,7 +28,7 @@
  *
  */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "hbclass.ch"
 #include "what32.ch"
 #include "classex.ch"

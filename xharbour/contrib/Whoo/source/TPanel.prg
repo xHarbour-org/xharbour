@@ -1,5 +1,5 @@
 /*
- * $Id: TPanel.prg,v 1.16 2002/11/13 00:45:50 what32 Exp $
+ * $Id: TPanel.prg,v 1.17 2002/11/15 01:56:35 what32 Exp $
  */
 
 /*
@@ -28,7 +28,7 @@
  */
 
 #include "hbclass.ch"
-#include "windows.ch"
+#include "winuser.ch"
 #include "what32.ch"
 
 #Define RCF_DIALOG     0

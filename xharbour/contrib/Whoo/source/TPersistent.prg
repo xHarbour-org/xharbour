@@ -1,5 +1,5 @@
 /*
- * $Id: TPersistent.prg,v 1.3 2002/10/16 21:17:00 fsgiudice Exp $
+ * $Id: TPersistent.prg,v 1.4 2002/10/17 09:59:15 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -26,7 +26,8 @@
  * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
  *
  */
-#include "windows.ch"
+
+#include "winuser.ch"
 #include "HbClass.ch"
 #include "what32.ch"
 #include "debug.ch"

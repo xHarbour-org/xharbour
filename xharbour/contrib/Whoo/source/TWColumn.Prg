@@ -1,13 +1,5 @@
-
-//#DEFINE SHOWDEBUG
-//#Include "debug.ch"
-
-//#define   MAKELONG(nLow, nHigh)   ((nLow) + (nHigh) * 65536)
-//#define   MAKEWORD(nLow, nHigh)   ((nLow) + (nHigh) * 256)
-
 #INCLUDE "hbclass.ch"
-#INCLUDE 'windows.ch'
-//#Include 'header.ch'
+#include "winuser.ch"
 #INCLUDE "what32.ch"
 #INCLUDE "WinGdi.ch"
 

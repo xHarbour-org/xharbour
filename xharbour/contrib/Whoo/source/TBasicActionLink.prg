@@ -1,5 +1,5 @@
 /*
- * $Id:  Exp $
+ * $Id: TBasicActionLink.prg,v 1.1 2002/11/07 02:45:06 fsgiudice Exp $
  */
 
 /*
@@ -27,7 +27,7 @@
  *
  */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "hbclass.ch"
 #include "what32.ch"
 #include "classex.ch"

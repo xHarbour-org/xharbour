@@ -1,5 +1,5 @@
 /*
- * $Id: xPad.prg,v 1.13 2002/11/19 08:00:04 what32 Exp $
+ * $Id: xPad.prg,v 1.14 2002/11/20 06:03:15 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -134,11 +134,10 @@ Static aGlobals:={}
 
 // defines and includes
 
-#Include "windows.ch"
+#Include "winuser.ch"
 #Include 'hbclass.ch'
 #Include 'what32.ch'
 #Include 'commdlg.ch'
-#Include 'accel.ch'
 #Include 'WinGdi.ch'
 #Include 'WinTypes.ch'
 #Include 'cstruct.ch'

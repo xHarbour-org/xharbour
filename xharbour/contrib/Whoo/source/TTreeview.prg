@@ -1,5 +1,5 @@
 /*
- * $Id: TTreeview.prg,v 1.18 2002/11/07 20:05:56 what32 Exp $
+ * $Id: TTreeview.prg,v 1.19 2002/11/11 23:18:02 what32 Exp $
  */
 
 /*
@@ -28,9 +28,9 @@
  */
 
 #include "hbclass.ch"
-#include "windows.ch"
+#include "winuser.ch"
 #include "what32.ch"
-#include "TreeView.ch"
+#include "commctrl.ch"
 #include "wingdi.ch"
 #include "wintypes.ch"
 #include "cstruct.ch"

@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.136 2002/12/24 17:26:11 what32 Exp $
+ * $Id: xide.prg,v 1.137 2002/12/31 08:17:13 what32 Exp $
  */
 
 /*
@@ -27,14 +27,13 @@
  *
  */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "wingdi.ch"
 #include "common.ch"
 #include "hbclass.ch"
 #include "debug.ch"
 #include "what32.ch"
-#Include "toolbar.ch"
-#Include "winlview.ch"
+#Include "commctrl.ch"
 #include "wintypes.ch"
 #include "cstruct.ch"
 

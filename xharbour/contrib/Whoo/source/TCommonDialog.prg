@@ -1,5 +1,5 @@
 /*
- * $Id: TCommonDialog.prg,v 1.5 2002/10/27 01:29:25 what32 Exp $
+ * $Id: TCommonDialog.prg,v 1.1 2002/10/28 04:01:57 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -26,7 +26,7 @@
  *
  */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "HbClass.ch"
 #include "what32.ch"
 #include "debug.ch"

@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.98 2002/11/19 21:00:22 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.99 2002/11/20 06:03:14 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -25,13 +25,13 @@
  *
  */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "wingdi.ch"
 #include "HbClass.ch"
 #include "what32.ch"
 #include "wintypes.ch"
 #Include "cstruct.ch"
-#include "toolbar.ch"
+#Include "commctrl.ch"
 #include "debug.ch"
 
 #define XFM_Header   1

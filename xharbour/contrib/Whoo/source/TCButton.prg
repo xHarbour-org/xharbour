@@ -1,5 +1,5 @@
 /*
- * $Id: TCButton.prg,v 1.22 2002/11/07 20:05:55 what32 Exp $
+ * $Id: TCButton.prg,v 1.23 2002/11/19 00:47:01 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -26,7 +26,7 @@
  *
  */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "HbClass.ch"
 #include "what32.ch"
 #include "debug.ch"

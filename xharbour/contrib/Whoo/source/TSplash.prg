@@ -1,5 +1,5 @@
 /*
- * $Id: TSplash.prg,v 1.10 2002/11/14 07:59:26 what32 Exp $
+ * $Id: TSplash.prg,v 1.11 2002/11/17 09:03:42 what32 Exp $
  */
 
 /*
@@ -28,7 +28,7 @@
  */
 
 #include "hbclass.ch"
-#include "windows.ch"
+#include "winuser.ch"
 #include "debug.ch"
 #include "what32.ch"
 

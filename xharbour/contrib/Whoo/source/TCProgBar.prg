@@ -1,5 +1,5 @@
 /*
- * $Id: TCProgBar.prg,v 1.13 2002/11/19 00:47:01 what32 Exp $
+ * $Id: TCProgBar.prg,v 1.14 2002/11/19 08:00:00 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -26,12 +26,12 @@
  *
  */
 
-#Include "windows.ch"
+#include "winuser.ch"
 #Include "hbclass.ch"
 #include "what32.ch"
 #Include "debug.ch"
 #INCLUDE "WinGdi.ch"
-#INCLUDE "progbar.ch"
+#INCLUDE "commctrl.ch"
 #INCLUDE "classex.ch"
 
 CLASS TProgressBar FROM TCustomControl

@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.23 2002/11/19 00:47:01 what32 Exp $
+ * $Id: TCListBox.prg,v 1.24 2002/11/19 03:47:35 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -27,16 +27,12 @@
  */
 
 #include "classex.ch"
-#include "windows.ch"
+#include "winuser.ch"
 #include "HbClass.ch"
 #include "what32.ch"
 #include "wintypes.ch"
 #include "cstruct.ch"
 #include "debug.ch"
-
-#define LB_OKAY             0
-#define LB_ERR              (-1)
-#define LB_ERRSPACE         (-2)
 
 IMPORT C STRUCTURE RECT
 

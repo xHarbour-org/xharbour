@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.71 2002/12/24 17:26:11 what32 Exp $
+ * $Id: xInspect.prg,v 1.72 2002/12/31 08:17:13 what32 Exp $
  */
 
 /*
@@ -27,14 +27,13 @@
  *
  */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "wingdi.ch"
 #include "hbclass.ch"
 #include "what32.ch"
 #include "wintypes.ch"
 #include "cstruct.ch"
 #include "debug.ch"
-#include "accel.ch"
 
 GLOBAL EXTERNAL Application
 GLOBAL EXTERNAL FormEdit

@@ -1,5 +1,5 @@
 /*
- * $Id: TMenuItem.prg,v 1.11 2002/11/13 02:13:57 what32 Exp $
+ * $Id: TMenuItem.prg,v 1.12 2002/12/24 17:26:08 what32 Exp $
  */
 
 /*
@@ -27,7 +27,7 @@
  *
  */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "hbclass.ch"
 #include "what32.ch"
 #include "debug.ch"

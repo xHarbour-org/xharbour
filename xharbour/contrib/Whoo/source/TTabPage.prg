@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.24 2002/10/29 02:12:38 what32 Exp $
+ * $Id: TTabPage.prg,v 1.1 2002/10/31 04:08:44 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -24,10 +24,10 @@
  *
  */
 
-#Include "windows.ch"
+#include "winuser.ch"
 #include "hbclass.ch"
 #Include 'debug.ch'
-#Include "tabctrl.ch"
+#Include "commctrl.ch"
 #Include "wintypes.ch"
 #Include "cstruct.ch"
 #Include "winGdi.ch"

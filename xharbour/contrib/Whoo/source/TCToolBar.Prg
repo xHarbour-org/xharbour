@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.34 2002/11/17 09:03:42 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.35 2002/12/31 08:17:10 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -26,16 +26,13 @@
  *
  */
 
-#Include "windows.ch"
+#include "winuser.ch"
 #include "hbclass.ch"
-#Include "toolbar.ch"
+#Include "commctrl.ch"
 #Include 'debug.ch'
-#Include "tabctrl.ch"
 #Include "wintypes.ch"
 #Include "cstruct.ch"
 #Include 'what32.ch'
-#Include "tooltips.ch"
-#Include "winlview.ch"
 #include "classex.ch"
 
 GLOBAL EXTERNAL Application

@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.11 2002/11/19 00:47:01 what32 Exp $
+ * $Id: TCustomForm.prg,v 1.12 2002/12/24 17:26:08 what32 Exp $
  */
 
 /*
@@ -28,7 +28,7 @@
  */
 GLOBAL EXTERNAL Application
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "hbclass.ch"
 #include "what32.ch"
 #include "classex.ch"

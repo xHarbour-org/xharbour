@@ -1,5 +1,5 @@
 /*
- * $Id: TStrings.prg,v 1.4 2002/10/31 08:18:20 what32 Exp $
+ * $Id: TStrings.prg,v 1.5 2002/11/05 21:39:58 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -26,7 +26,7 @@
  *
  */
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "HbClass.ch"
 #include "what32.ch"
 #include "wintypes.ch"

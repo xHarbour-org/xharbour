@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.46 2002/11/19 08:00:03 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.47 2002/11/20 06:03:14 what32 Exp $
  */
 
 /*
@@ -57,12 +57,11 @@ TODO:
 *************************************************
 
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "wingdi.ch"
 #include "common.ch"
 #include "hbclass.ch"
 #include "debug.ch"
-#include "accel.ch"
 
 #define ASWORD( nUword ) if( ( nUword > 32768 ),(nUword-65536),nUword )
 

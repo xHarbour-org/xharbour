@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.32 2002/11/19 08:00:00 what32 Exp $
+ * $Id: TCRebar.prg,v 1.33 2002/12/31 08:17:10 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -26,7 +26,7 @@
  *
  */
 
-#Include "windows.ch"
+#include "winuser.ch"
 #include "hbclass.ch"
 #Include "wintypes.ch"
 #Include "cstruct.ch"
@@ -35,10 +35,40 @@ pragma pack(4)
 
 #Include "winstruc.ch"
 #Include 'what32.ch'
-#Include "toolbar.ch"
-#Include "rbstruct.ch"
+#Include "commctrl.ch"
 #Include "debug.ch"
 #Include "classex.ch"
+
+typedef struct tagREBARINFO;
+{;
+    UINT        cbSize;
+    UINT        fMask;
+    HIMAGELIST  himl;
+}   REBARINFO, FAR *LPREBARINFO
+
+typedef struct tagREBARBANDINFOA;
+{;
+    UINT        cbSize;
+    UINT        fMask;
+    UINT        fStyle;
+    COLORREF    clrFore;
+    COLORREF    clrBack;
+    LPSTR       lpText;
+    UINT        cch;
+    int         iImage;
+    HWND        hwndChild;
+    UINT        cxMinChild;
+    UINT        cyMinChild;
+    UINT        cx;
+    HBITMAP     hbmBack;
+    UINT        wID;
+    UINT        cyChild;
+    UINT        cyMaxChild;
+    UINT        cyIntegral;
+    UINT        cxIdeal;
+    LPARAM      lParam;
+    UINT        cxHeader;
+}   REBARBANDINFO, FAR *LPREBARBANDINFOA;
 
 *------------------------------------------------------------------------------*
 

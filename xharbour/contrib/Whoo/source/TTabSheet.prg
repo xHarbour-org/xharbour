@@ -1,5 +1,5 @@
 /*
- * $Id: TTabSheet.prg,v 1.1 2002/10/31 04:08:44 what32 Exp $
+ * $Id: TTabSheet.prg,v 1.2 2002/11/07 20:05:56 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -26,10 +26,10 @@
  *
  */
 
-#Include "windows.ch"
+#include "winuser.ch"
 #include "hbclass.ch"
 #Include 'debug.ch'
-#Include "tabctrl.ch"
+#Include "commctrl.ch"
 #Include "wintypes.ch"
 #Include "cstruct.ch"
 #Include "winGdi.ch"

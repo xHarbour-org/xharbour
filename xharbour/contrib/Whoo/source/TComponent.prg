@@ -1,5 +1,5 @@
 /*
- * $Id: TComponent.prg,v 1.11 2002/11/12 05:38:34 ronpinkas Exp $
+ * $Id: TComponent.prg,v 1.12 2002/11/13 00:45:50 what32 Exp $
  */
 
 /*
@@ -30,7 +30,7 @@
 
 GLOBAL EXTERNAL Application
 
-#include "windows.ch"
+#include "winuser.ch"
 #include "HbClass.ch"
 #include "what32.ch"
 #include "debug.ch"

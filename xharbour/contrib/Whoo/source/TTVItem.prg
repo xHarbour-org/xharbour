@@ -1,5 +1,5 @@
 /*
- * $Id: TTVItem.prg,v 1.7 2002/10/28 12:03:52 what32 Exp $
+ * $Id: TTVItem.prg,v 1.8 2002/11/11 23:18:02 what32 Exp $
  */
 
 /*
@@ -27,7 +27,7 @@
  *
  */
 #include "hbclass.ch"
-#include "windows.ch"
+#include "winuser.ch"
 #include "what32.ch"
 
 #define TV_FIRST          4352   // 0x1100
