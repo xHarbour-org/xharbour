@@ -6,8 +6,9 @@
 #DEFINE SHOWDEBUG
 #Include 'debug.ch'
 
-#Include '..\include\wintypes.ch'
-#Include '..\include\cstruct.ch'
+#Include 'wintypes.ch'
+#Include 'cstruct.ch'
+
 #Define CTYPE_BOOL 5
 
 //#DEFINE NTRIM( n ) AllTrim( str( n ) )
