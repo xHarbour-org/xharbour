@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3006 2004/05/30 14:41:11 lculik Exp $
+ * $Id: ChangeLog,v 1.3007 2004/05/30 16:09:45 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-31 00:35 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * make_drw.sh
+  * bin/hb-func.sh
+  * config/darwin/gcc.cf
+  * config/darwin/global.cf
+    ! Fixes to compilation on Darwin.
+  * include/thread.h
+    ! Fixed a bug which I introduced in my previous commit (thanks, Przemyslaw!).
+    + Added recursive mutexes emulation for platforms that don't have
+      recursive mutexes (e.g., Darwin 5.5.2).
 
 2004-05-30 01:50 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * bin/hb-func.sh

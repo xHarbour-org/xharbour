@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.17 2004/05/28 18:51:21 likewolf Exp $
+# $Id: hb-func.sh,v 1.18 2004/05/29 21:49:25 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -286,7 +286,11 @@ do
         fi
     fi
 done
-HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
+if [ `uname` = "Darwin" ]; then
+    HARBOUR_LIBS="\${HARBOUR_LIBS} \${HARBOUR_LIBS}"
+else
+    HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
+fi
 l="fm"
 [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
 if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.9 2004/03/18 21:46:52 druzus Exp $
+# $Id: gcc.cf,v 1.10 2004/05/11 01:22:40 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -13,22 +13,22 @@ CC = $(CCACHE) gcc
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -fsigned-char -no-cpp-precomp -I. -I$(TOP)include -I$(HB_INC_COMPILE)
-CFLAGS = -Wall -W -g
+CFLAGS = -Wall -W
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
 endif
 CFLAGS += -DHB_OS_BSD -DHB_OS_DARWIN
-CFLAGS += -DHB_BIG_ENDIAN
+CFLAGS += -DHB_BIG_ENDIAN -DHB_NO_RECURSIVE_MUTEXES
 
 ifeq ($(HB_LIBCOMP_MT),)
 #always add thread support if not compiling a lib and using vmmt
 ifeq ($(findstring vmmt,$(LIBS)),vmmt)
-CFLAGS+= -DHB_THREAD_SUPPORT
+CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE -pthread
 endif
 else
 #Add thread support to lib compilation only if compiling a _mt lib
 ifeq ($(HB_LIBCOMP_MT),YES)
-CFLAGS+= -DHB_THREAD_SUPPORT
+CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
 HB_MT_FLAGS = -DHB_THREAD_SUPPORT
 endif
 endif
@@ -37,6 +37,10 @@ endif
 LD = gcc
 LD_OUT = -o
 
+# Add all libraries specified in HB_USER_LIBS.
+LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
+
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
 LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
@@ -44,7 +48,7 @@ LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
 
 #Adding MT libs on need
 ifeq ($(findstring vmmt,$(LIBS)),vmmt)
-LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH)_mt/)
+LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(patsubst %mt,%,$(lib))/$(ARCH_DIR)_mt)
 endif
 
 else
@@ -52,13 +56,31 @@ LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
 
 # LINKLIBS += -Wl,--start-group
-LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
+LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rddmt,$(LIBS)),rddmt)
-LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)_mt)
-LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv)mt)
+#DBFNTX and DBFCDX are MTzed
+ifeq ($(findstring dbfcdx,$(HB_DB_DRIVERS)),dbfcdx)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfcdx/$(ARCH)_mt
+LINKLIBS += -ldbfcdxmt
+endif
+ifeq ($(findstring dbfntx,$(HB_DB_DRIVERS)),dbfntx)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH)_mt
+LINKLIBS += -ldbfntxmt
+endif
+
+#DBFDBT and DBFFTP are not MTzed
+ifeq ($(findstring dbfdbt,$(HB_DB_DRIVERS)),dbfdbt)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH)
+LINKLIBS += -ldbfdbt
+endif
+ifeq ($(findstring dbfftp,$(HB_DB_DRIVERS)),dbfftp)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfftp/$(ARCH)
+LINKLIBS += -ldbfftp
+endif
+
 else
 ifeq ($(findstring rdd,$(LIBS)),rdd)
 LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
@@ -83,7 +105,6 @@ else
 ifeq ($(HB_GT_LIB),gtsln)
 HB_SCREEN_LIB:=slang
 endif
-endif
 
 ifneq ($(HB_SCREEN_LIB),)
 LINKLIBS += -l$(HB_SCREEN_LIB)
@@ -94,15 +115,17 @@ ifeq ($(HB_GT_LIB),gtsln)
 LINKLIBS += -lncurses
 endif
 
+ifeq ($(HB_GT_LIB),gtxvt)
+LINKLIBS += -lX11
+LINKPATHS +=-L/usr/X11R6/lib
+endif
+
 # HB_GPM_MOUSE: use gpm mouse driver
 # Actually, there is no gpm on BSD.
 ifeq ($(HB_GPM_MOUSE),yes)
 LINKLIBS += -lgpm
 endif
 
-#it never hurts if MT is enabled.
-ifeq ($(HB_MT),MT)
-LINKLIBS += -lpthread
 endif
 
 LINKLIBS += -lm

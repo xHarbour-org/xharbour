@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.88 2004/05/24 10:31:44 jonnymind Exp $
+* $Id: thread.h,v 1.89 2004/05/28 18:51:21 likewolf Exp $
 */
 
 /*
@@ -274,12 +274,13 @@ extern PPVOID hb_dwCurrentStack;
    #include <errno.h>
    #define HB_THREAD_T                 pthread_t
 
+#ifndef HB_NO_RECURSIVE_MUTEXES
    #define HB_CRITICAL_T               pthread_mutex_t
    /* ODD: this definition is missing on some linux headers;
       we should remove it when this bug is fixed */
    int pthread_mutexattr_setkind_np( pthread_mutexattr_t * attr, int kind );
    /* Some Unices (e.g., FreeBSD 4.8) don't have this define: */
-   #ifndef PTHREAD_MUTEX_RECURSIVE_NP
+   #ifdef HB_OS_BSD
       #define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
    #endif
    #define HB_CRITICAL_INIT( x )       \
@@ -294,6 +295,57 @@ extern PPVOID hb_dwCurrentStack;
    #define HB_CRITICAL_LOCK( x )       pthread_mutex_lock( &(x) )
    #define HB_CRITICAL_UNLOCK( x )     pthread_mutex_unlock( &(x) )
    #define HB_CRITICAL_TRYLOCK( x )    ( pthread_mutex_trylock( &(x) ) != EBUSY )
+#else
+   /* Some Unices (e.g., Darwin 5.2.2) don't have recursive mutexes;
+    * we have to implement them manually. -- Ph.K. */
+   typedef struct
+   {
+      pthread_mutex_t lock; \
+      HB_THREAD_T owner; \
+      ULONG count; \
+   } HB_RECURSIVE_MUTEX_T;
+   
+   #define HB_CRITICAL_T               HB_RECURSIVE_MUTEX_T
+   #define HB_CRITICAL_INIT( x ) \
+      { \
+         (x).owner = 0; \
+	 (x).count = 0; \
+	 pthread_mutex_init( &((x).lock), NULL ); \
+      }
+   #define HB_CRITICAL_DESTROY( x )    ( (x).owner == 0 ? pthread_mutex_destroy( &((x).lock) ) : 0 )
+   #define HB_CRITICAL_LOCK( x ) \
+      { \
+         HB_THREAD_T self = pthread_self(); \
+	 if ( pthread_equal( self, (x).owner ) ) \
+	 { \
+	    (x).count++; \
+	 } \
+	 else \
+	 { \
+	    pthread_mutex_lock( &((x).lock) ); \
+	    (x).owner = self; \
+	    (x).count = 1; \
+	 } \
+      }
+   #define HB_CRITICAL_UNLOCK( x ) \
+      { \
+         HB_THREAD_T self = pthread_self(); \
+	 if ( pthread_equal( self, (x).owner ) ) \
+	 { \
+	    if ( --(x).count < 1 ) \
+	    { \
+	       (x).owner = 0; \
+	       pthread_mutex_unlock( &((x).lock) ); \
+	    } \
+	 } \
+      }
+   #define HB_CRITICAL_TRYLOCK( x ) \
+      ( pthread_equal( pthread_self(), (x).owner ) \
+        ? ( (x).count++, TRUE ) \
+	: ( ( pthread_mutex_trylock( &((x).lock) ) != EBUSY ) \
+	    ? ( (x).owner = pthread_self(), (x).count = 1, TRUE ) \
+	    : FALSE ) )
+#endif
 
    #define HB_MUTEX_T                  HB_CRITICAL_T
    #define HB_MUTEX_INIT( x )          HB_CRITICAL_INIT( x )
@@ -305,8 +357,13 @@ extern PPVOID hb_dwCurrentStack;
 
    #define HB_COND_T                   pthread_cond_t
    #define HB_COND_INIT( x )           pthread_cond_init( &(x), NULL )
+#ifndef HB_NO_RECURSIVE_MUTEXES
    #define HB_COND_WAIT( x, y )        pthread_cond_wait( &(x), &(y) )
    #define HB_COND_WAITTIME( x, y, t )  hb_condTimeWait( &(x) , &(y), t )
+#else
+   #define HB_COND_WAIT( x, y )        pthread_cond_wait( &(x), &((y).lock) )
+   #define HB_COND_WAITTIME( x, y, t ) hb_condTimeWait( &(x), &((y).lock), t )
+#endif
    #define HB_COND_SIGNAL( x )         pthread_cond_broadcast( &(x) )
    #define HB_COND_DESTROY( x )        pthread_cond_destroy( &(x) )
 
