@@ -1,5 +1,5 @@
 //
-// $Id: dirtest.prg,v 1.1 1999/10/04 18:46:28 vszel Exp $
+// $Id: dirtest.prg,v 1.1.1.1 2001/12/21 10:45:44 ronpinkas Exp $
 //
 
 // directory test
@@ -20,7 +20,7 @@ SET CENTURY ON
 for x := 1 to len(adir)
    outstd(cNewLine)
    outstd(padr(adir[x,1], 20), "|", ;
-          transform(adir[x,2], "9,999,999,999"), "|", ;
+          transform(adir[x,2], "999,999,999,999"), "|", ;
           adir[x,3], "|", ;
           adir[x,4], "|", ;
           adir[x,5])
