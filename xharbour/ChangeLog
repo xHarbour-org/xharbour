@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1235 2003/07/10 14:20:45 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1236 2003/07/10 15:19:44 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-10 23:10 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * include/hbdefs.h
+    ! Fixed ULONGLONG under windows.
 
 2003-07-10 17:10 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/empty.c
@@ -21,7 +25,7 @@
   * include/hbapi.h
     ! fixed LONG LONG api name ( hb_itemGetNDL and similar names was from the 
       old "long double" soupport)
-    ! HB_IT_LONGLONG is now 0x0040; 0x0015 (as it was before) 
+    ! HB_IT_LONGLONG is now 0x0040; 0x0015 (as it was before)
       would have fooled  many bit-oriented ifs.
 
   * include/hbdefs.h
