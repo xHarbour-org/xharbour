@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.10 2002/09/20 19:48:20 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.11 2002/09/21 05:21:07 ronpinkas Exp $
  */
 
 /*
@@ -315,7 +315,7 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
  */
 void hb_codeblockEvaluate( HB_ITEM_PTR pItem )
 {
-   int iStatics = hb_stack.iStatics;
+   int iStatics = HB_VM_STACK.iStatics;
    /*
    PHB_ITEM **Saved_pGlobals = hb_vm_pGlobals;
    short      Saved_iGlobals = hb_vm_iGlobals;
@@ -344,9 +344,9 @@ void hb_codeblockEvaluate( HB_ITEM_PTR pItem )
    hb_vm_iGlobals = pItem->item.asBlock.value->iGlobals;
    */
 
-   hb_stack.iStatics = pItem->item.asBlock.statics;
+   HB_VM_STACK.iStatics = pItem->item.asBlock.statics;
    hb_vmExecute( pItem->item.asBlock.value->pCode, pItem->item.asBlock.value->pSymbols, pItem->item.asBlock.value->pGlobals );
-   hb_stack.iStatics = iStatics;
+   HB_VM_STACK.iStatics = iStatics;
 
    /*
    hb_vm_pGlobals = Saved_pGlobals;

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.32 2002/12/16 06:02:47 ronpinkas Exp $
+ * $Id: arrays.c,v 1.33 2002/12/18 13:43:57 ronpinkas Exp $
  */
 
 /*
@@ -671,8 +671,10 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
                hb_vmPushNumber( ( double ) ( ulStart + 1 ), 0 );
                hb_vmSend( 2 );
 
-               if( HB_IS_LOGICAL( &hb_stack.Return ) && hb_stack.Return.item.asLogical.value )
+               if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) && HB_VM_STACK.Return.item.asLogical.value )
+               {
                   return ulStart + 1;                  /* arrays start from 1 */
+               }
             }
          }
          else if( HB_IS_STRING( pValue ) ) // Must precede HB_IS_NUMERIC()
@@ -1114,9 +1116,9 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 {
    PHB_ITEM pArray = hb_itemNew( NULL );
    PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
-   USHORT uiPos, uiPCount = (* pBase)->item.asSymbol.paramcnt;
+   USHORT uiPos, uiPCount = (*pBase)->item.asSymbol.paramcnt;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
 
    pArray->type = HB_IT_ARRAY;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.22 2002/10/20 02:09:53 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.23 2002/10/20 21:44:22 ronpinkas Exp $
  */
 
 /*
@@ -116,7 +116,9 @@ HB_FUNC( ARRAY )
       }
 
       if( ! bError )
-         hb_arrayNewRagged( &hb_stack.Return, 1 );
+      {
+         hb_arrayNewRagged( &(HB_VM_STACK.Return), 1 );
+      }
    }
 }
 
@@ -129,7 +131,7 @@ HB_FUNC( AADD )
       PHB_ITEM pValue = hb_param( 2, HB_IT_ANY );
 
       if( pValue && hb_arrayAdd( pArray, pValue ) )
-         hb_itemCopy( &hb_stack.Return, pValue );
+         hb_itemCopy( &(HB_VM_STACK.Return), pValue );
       else
          hb_errRT_BASE( EG_BOUND, 1187, NULL, "AADD", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
@@ -161,7 +163,7 @@ HB_FUNC( ASIZE )
 
       hb_arraySize( pArray, HB_MAX( lSize, 0 ) );
 
-      hb_itemCopy( &hb_stack.Return, pArray ); /* ASize() returns the array itself */
+      hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* ASize() returns the array itself */
    }
 #ifdef HB_COMPAT_C53 /* From CA-Cl*pper 5.3a */
    else
@@ -174,7 +176,7 @@ HB_FUNC( ATAIL )
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
 
    if( pArray )
-      hb_arrayLast( pArray, &hb_stack.Return );
+      hb_arrayLast( pArray, &(HB_VM_STACK.Return) );
 }
 
 HB_FUNC( AINS )
@@ -204,7 +206,7 @@ HB_FUNC( AINS )
       }
     #endif
 
-      hb_itemCopy( &hb_stack.Return, pArray ); /* AIns() returns the array itself */
+      hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* AIns() returns the array itself */
    }
 }
 
@@ -234,7 +236,7 @@ HB_FUNC( ADEL )
       }
     #endif
 
-      hb_itemCopy( &hb_stack.Return, pArray ); /* ADel() returns the array itself */
+      hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* ADel() returns the array itself */
    }
 }
 
@@ -254,7 +256,7 @@ HB_FUNC( AFILL )
          /* Explicy ulCount of 0 - Nothing to do! */
          if( ISNUM(4) && ulCount == 0 )
          {
-            hb_itemCopy( &hb_stack.Return, pArray ); /* AFill() returns the array itself */
+            hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
             return;
          }
 
@@ -266,7 +268,7 @@ HB_FUNC( AFILL )
          else if( ulStart < 0 )
          {
             /* Clipper aborts if negative start. */
-            hb_itemCopy( &hb_stack.Return, pArray ); /* AFill() returns the array itself */
+            hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
             return;
          }
 
@@ -285,7 +287,7 @@ HB_FUNC( AFILL )
             else
             {
                /* Clipper aborts if negative count and start is not at 1. */
-               hb_itemCopy( &hb_stack.Return, pArray ); /* AFill() returns the array itself */
+               hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
                return;
             }
          }
@@ -293,7 +295,7 @@ HB_FUNC( AFILL )
          hb_arrayFill( pArray, pValue, (ULONG) ulStart, (ULONG) ulCount );
       }
 
-      hb_itemCopy( &hb_stack.Return, pArray ); /* AFill() returns the array itself */
+      hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
    }
    else
    {
@@ -345,7 +347,7 @@ HB_FUNC( AEVAL )
                     ISNUM( 3 ) ? &ulStart : NULL,
                     ISNUM( 4 ) ? &ulCount : NULL );
 
-      hb_itemCopy( &hb_stack.Return, hb_stackItemFromBase( 1 ) ); /* AEval() returns the array itself */
+      hb_itemCopy( &(HB_VM_STACK.Return), hb_stackItemFromBase( 1 ) ); /* AEval() returns the array itself */
    }
    else
       hb_errRT_BASE( EG_ARG, 2017, NULL, "AEVAL", 4, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
@@ -372,7 +374,7 @@ HB_FUNC( ACOPY )
                        ISNUM( 5 ) ? &ulTarget : NULL );
       }
 
-      hb_itemCopy( &hb_stack.Return, hb_stackItemFromBase( 2 ) ); /* ACopy() returns the target array */
+      hb_itemCopy( &(HB_VM_STACK.Return), hb_stackItemFromBase( 2 ) ); /* ACopy() returns the target array */
    }
 }
 
@@ -397,7 +399,7 @@ HB_FUNC( HB_APARAMS )
 
 HB_FUNC( HB_AEXPRESSIONS )
 {
-   PHB_ITEM pArray = &hb_stack.Return;
+   PHB_ITEM pArray = &(HB_VM_STACK.Return);
    PHB_ITEM pLine  = hb_param( 1, HB_IT_STRING );
    size_t i, iOffset = 0;
    int iParans = 0, iArrays = 0, iIndexs = 0;
@@ -498,7 +500,7 @@ HB_FUNC( HB_ATOKENS )
 
    if( pLine )
    {
-      PHB_ITEM pArray = &hb_stack.Return;
+      PHB_ITEM pArray = &(HB_VM_STACK.Return);
       PHB_ITEM pToken = hb_itemNew( NULL );
       char cDelimiter = pDelim ? pDelim->item.asString.value[0] : 32;
       size_t i, iOffset = 0;
@@ -623,7 +625,7 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
                {
                   hb_objSendMsg( pStructure, "ACTYPES", 0 );
 
-                  uiMemberSize = SizeOfCStructure( &hb_stack.Return, uiAlign  );
+                  uiMemberSize = SizeOfCStructure( &(HB_VM_STACK.Return), uiAlign  );
                }
                else
                {
@@ -835,7 +837,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                {
                   hb_objSendMsg( pStructure, "ACTYPES", 0 );
 
-                  uiMemberSize = SizeOfCStructure( &hb_stack.Return, uiAlign  );
+                  uiMemberSize = SizeOfCStructure( &(HB_VM_STACK.Return), uiAlign  );
                }
                else
                {
@@ -1354,7 +1356,7 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
 
       Buffer = ArrayToStructure( aVar, aDef, uiAlign, &uiSize );
 
-      hb_itemPutCRaw( &hb_stack.Return, (char *) Buffer, uiSize );
+      hb_itemPutCRaw( &(HB_VM_STACK.Return), (char *) Buffer, uiSize );
    }
    else
    {
@@ -1456,7 +1458,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
                {
                   hb_objSendMsg( pStructure, "ACTYPES", 0 );
 
-                  uiMemberSize = SizeOfCStructure( &hb_stack.Return, uiAlign  );
+                  uiMemberSize = SizeOfCStructure( &(HB_VM_STACK.Return), uiAlign  );
                }
                else
                {
@@ -1577,10 +1579,10 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
             unsigned int uiNestedSize, uiNestedAlign;
 
             hb_objSendMsg( pStructure, "NALIGN", 0 );
-            uiNestedAlign = ( &hb_stack.Return )->item.asInteger.value;
+            uiNestedAlign = ( &(HB_VM_STACK.Return) )->item.asInteger.value;
 
             hb_objSendMsg( pStructure, "ACTYPES", 0 );
-            uiNestedSize = SizeOfCStructure( &hb_stack.Return, uiNestedAlign );
+            uiNestedSize = SizeOfCStructure( &(HB_VM_STACK.Return), uiNestedAlign );
 
             if( HB_IS_OBJECT( pStructure ) )
             {
@@ -1671,7 +1673,7 @@ HB_FUNC( HB_STRUCTURETOARRAY )
          bAdopt = FALSE;
       }
 
-      hb_itemForwardValue( &hb_stack.Return, pRet = StructureToArray( Buffer, aDef, uiAlign, bAdopt ) );
+      hb_itemForwardValue( &(HB_VM_STACK.Return), pRet = StructureToArray( Buffer, aDef, uiAlign, bAdopt ) );
 
       hb_itemRelease( pRet );
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.7 2002/05/02 13:42:05 map Exp $
+ * $Id: runner.c,v 1.8 2002/05/16 02:28:38 ronpinkas Exp $
  */
 
 /*
@@ -455,7 +455,7 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
        hb_vmDo( hb_pcount() - 1 );                   /* Run the thing !!!        */
 
        pRetVal = hb_itemNew( NULL );
-       hb_itemCopy( pRetVal, &hb_stack.Return );
+       hb_itemCopy( pRetVal, &(HB_VM_STACK.Return) );
    }
 
    for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )    /* Check EXIT functions     */

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.36 2002/10/09 20:43:00 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.37 2002/10/25 03:06:09 ronpinkas Exp $
  */
 
 /*
@@ -111,7 +111,7 @@ PHB_ITEM HB_EXPORT hb_itemReturn( PHB_ITEM pItem )
 
    if( pItem )
    {
-      hb_itemForwardValue( &hb_stack.Return, pItem );
+      hb_itemForwardValue( &(HB_VM_STACK.Return), pItem );
    }
 
    return pItem;
@@ -537,24 +537,24 @@ void HB_EXPORT hb_retcAdopt( char * szText )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdopt(%s)", szText ) );
 
-   if( ( &hb_stack.Return )->type )
+   if( ( &(HB_VM_STACK.Return) )->type )
    {
-      if( HB_IS_STRING( &hb_stack.Return ) )
+      if( HB_IS_STRING( &(HB_VM_STACK.Return) ) )
       {
-         hb_itemReleaseString( &hb_stack.Return );
+         hb_itemReleaseString( &(HB_VM_STACK.Return) );
       }
       else
       {
-         hb_itemFastClear( &hb_stack.Return );
+         hb_itemFastClear( &(HB_VM_STACK.Return) );
       }
    }
 
-   ( &hb_stack.Return )->type = HB_IT_STRING;
-   ( &hb_stack.Return )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
-   *( ( &hb_stack.Return )->item.asString.puiHolders ) = 1;
-   ( &hb_stack.Return )->item.asString.bStatic = FALSE;
-   ( &hb_stack.Return )->item.asString.value   = szText;
-   ( &hb_stack.Return )->item.asString.length  = strlen( szText );
+   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+   ( &(HB_VM_STACK.Return) )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+   *( ( &(HB_VM_STACK.Return) )->item.asString.puiHolders ) = 1;
+   ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
+   ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.length  = strlen( szText );
 }
 
 #undef hb_retclenAdopt
@@ -564,24 +564,24 @@ void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
 
-   if( ( &hb_stack.Return )->type )
+   if( ( &(HB_VM_STACK.Return) )->type )
    {
-      if( HB_IS_STRING( &hb_stack.Return ) )
+      if( HB_IS_STRING( &(HB_VM_STACK.Return) ) )
       {
-         hb_itemReleaseString( &hb_stack.Return );
+         hb_itemReleaseString( &(HB_VM_STACK.Return) );
       }
       else
       {
-         hb_itemFastClear( &hb_stack.Return );
+         hb_itemFastClear( &(HB_VM_STACK.Return) );
       }
    }
 
-   ( &hb_stack.Return )->type = HB_IT_STRING;
-   ( &hb_stack.Return )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
-   *( ( &hb_stack.Return )->item.asString.puiHolders ) = 1;
-   ( &hb_stack.Return )->item.asString.bStatic = FALSE;
-   ( &hb_stack.Return )->item.asString.value   = szText;
-   ( &hb_stack.Return )->item.asString.length  = ulLen;
+   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+   ( &(HB_VM_STACK.Return) )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+   *( ( &(HB_VM_STACK.Return) )->item.asString.puiHolders ) = 1;
+   ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
+   ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.length  = ulLen;
 }
 
 #undef hb_retcStatic
@@ -589,22 +589,22 @@ void HB_EXPORT hb_retcStatic( char * szText )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcStatic(%s)", szText ) );
 
-   if( ( &hb_stack.Return )->type )
+   if( ( &(HB_VM_STACK.Return) )->type )
    {
-      if( HB_IS_STRING( &hb_stack.Return ) )
+      if( HB_IS_STRING( &(HB_VM_STACK.Return) ) )
       {
-         hb_itemReleaseString( &hb_stack.Return );
+         hb_itemReleaseString( &(HB_VM_STACK.Return) );
       }
       else
       {
-         hb_itemFastClear( &hb_stack.Return );
+         hb_itemFastClear( &(HB_VM_STACK.Return) );
       }
    }
 
-   ( &hb_stack.Return )->type = HB_IT_STRING;
-   ( &hb_stack.Return )->item.asString.bStatic = TRUE;
-   ( &hb_stack.Return )->item.asString.value   = szText;
-   ( &hb_stack.Return )->item.asString.length  = strlen( szText );
+   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+   ( &(HB_VM_STACK.Return) )->item.asString.bStatic = TRUE;
+   ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.length  = strlen( szText );
 }
 
 #undef hb_retclenStatic
@@ -612,22 +612,22 @@ void HB_EXPORT hb_retclenStatic( char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcStatic(%s)", szText ) );
 
-   if( ( &hb_stack.Return )->type )
+   if( ( &(HB_VM_STACK.Return) )->type )
    {
-      if( HB_IS_STRING( &hb_stack.Return ) )
+      if( HB_IS_STRING( &(HB_VM_STACK.Return) ) )
       {
-         hb_itemReleaseString( &hb_stack.Return );
+         hb_itemReleaseString( &(HB_VM_STACK.Return) );
       }
       else
       {
-         hb_itemFastClear( &hb_stack.Return );
+         hb_itemFastClear( &(HB_VM_STACK.Return) );
       }
    }
 
-   ( &hb_stack.Return )->type = HB_IT_STRING;
-   ( &hb_stack.Return )->item.asString.bStatic = TRUE;
-   ( &hb_stack.Return )->item.asString.value   = szText;
-   ( &hb_stack.Return )->item.asString.length  = ulLen;
+   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+   ( &(HB_VM_STACK.Return) )->item.asString.bStatic = TRUE;
+   ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.length  = ulLen;
 }
 
 HB_FUNC( ARRAYCYCLICCOUNT )
@@ -780,17 +780,17 @@ USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pScanBaseArray, PHB_SCANNED_
 
 BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )
 {
-   PHB_ITEM *pBase = hb_stack.pBase + 1;
+   PHB_ITEM *pBase = HB_VM_STACK.pBase + 1;
    PHB_ITEM *pTop;
    BYTE iId = 1;
 
-   if( (*hb_stack.pBase)->item.asSymbol.paramcnt < 256 )
+   if( hb_stackBaseItem()->item.asSymbol.paramcnt < 256 )
    {
-      pTop = pBase + (*hb_stack.pBase)->item.asSymbol.paramcnt + 1;
+      pTop = pBase + hb_stackBaseItem()->item.asSymbol.paramcnt + 1;
    }
    else
    {
-      pTop = pBase + (*hb_stack.pBase)->item.asSymbol.paramcnt + 1 - 256;
+      pTop = pBase + hb_stackBaseItem()->item.asSymbol.paramcnt + 1 - 256;
    }
 
    while( pBase < pTop )

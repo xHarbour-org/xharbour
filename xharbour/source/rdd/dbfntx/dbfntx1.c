@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.24 2002/10/12 00:38:26 horacioroldan Exp $
+ * $Id: dbfntx1.c,v 1.26 2002/11/13 18:49:00 horacioroldan Exp $
  */
 
 /*
@@ -329,7 +329,7 @@ static BOOL checkLogicalExpr( PHB_ITEM pForItem, PHB_ITEM pItem )
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pForItem );
       hb_vmSend( 0 );
-      hb_itemCopy( pItem, &hb_stack.Return );
+      hb_itemCopy( pItem, &(HB_VM_STACK.Return) );
    }
    else
    {
@@ -570,7 +570,7 @@ static USHORT hb_ntxGetKeyType( LPTAGINFO pTag )
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pTag->pKeyItem );
       hb_vmSend( 0 );
-      return hb_itemType( &hb_stack.Return );
+      return hb_itemType( &(HB_VM_STACK.Return) );
    }
    else
    {
@@ -774,22 +774,22 @@ static void hb_ntxGetCurrentKey( LPTAGINFO pTag, LPKEYINFO pKey )
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pTag->pKeyItem );
       hb_vmSend( 0 );
-      switch( hb_itemType( &hb_stack.Return ) )
+      switch( hb_itemType( &(HB_VM_STACK.Return) ) )
       {
          case HB_IT_STRING:
-            strcpy( pKey->key, (&hb_stack.Return)->item.asString.value );
+            strcpy( pKey->key, (&(HB_VM_STACK.Return))->item.asString.value );
             break;
          case HB_IT_INTEGER:
          case HB_IT_LONG:
          case HB_IT_DOUBLE:
-            strcpy( pKey->key, numToStr( &hb_stack.Return, szBuffer, pTag->KeyLength, pTag->KeyDec ) );
+            strcpy( pKey->key, numToStr( &(HB_VM_STACK.Return), szBuffer, pTag->KeyLength, pTag->KeyDec ) );
             break;
         case HB_IT_DATE:
-           hb_itemGetDS( &hb_stack.Return, szBuffer );
+           hb_itemGetDS( &(HB_VM_STACK.Return), szBuffer );
            strcpy( pKey->key,szBuffer );
            break;
         case HB_IT_LOGICAL:
-           szBuffer[0] = ( hb_itemGetL( &hb_stack.Return ) ? 'T':'F' );
+           szBuffer[0] = ( hb_itemGetL( &(HB_VM_STACK.Return) ) ? 'T':'F' );
            szBuffer[1] = 0;
            strcpy( pKey->key, szBuffer );
            break;
@@ -2518,7 +2518,7 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pTag->pKeyItem );
             hb_vmSend( 0 );
-            hb_itemCopy( pItem, &hb_stack.Return );
+            hb_itemCopy( pItem, &(HB_VM_STACK.Return) );
          }
          else
          {
@@ -3445,7 +3445,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       pExpMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pExpr );
       hb_macroRun( pExpMacro );
       pResult = pExpr;
-      hb_itemCopy( pResult, &hb_stack.Return );
+      hb_itemCopy( pResult, &(HB_VM_STACK.Return) );
    }
 
    uiType = hb_itemType( pResult );
@@ -3535,7 +3535,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          pForMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pExpr );
          hb_macroRun( pForMacro );
          pResult = pExpr;
-         hb_itemCopy( pResult, &hb_stack.Return );
+         hb_itemCopy( pResult, &(HB_VM_STACK.Return) );
       }
       uiType = hb_itemType( pResult );
       if( uiType != HB_IT_LOGICAL )

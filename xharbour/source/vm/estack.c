@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.15 2002/10/25 03:06:09 ronpinkas Exp $
+ * $Id: estack.c,v 1.16 2002/12/18 13:43:57 ronpinkas Exp $
  */
 
 /*
@@ -63,17 +63,17 @@
 
 /* ------------------------------- */
 
+HB_STACK hb_stack;
+
 #ifdef HB_THREAD_SUPPORT
    #include "thread.h"
-
-   HB_STACK hb_stack_general;
 
    HB_STACK *hb_getCurrentStack( void )
    {
       // Most common first.
       if( hb_ht_context == NULL )
       {
-         return &hb_stack_general;
+         return &hb_stack;
       }
       else
       {
@@ -112,12 +112,10 @@
          {
             // TODO: Add Error Message.
             HB_MUTEX_UNLOCK( &context_monitor );
-            return &hb_stack_general;
+            return &hb_stack;
          }
       }
    }
-#else
-   HB_STACK hb_stack;
 #endif
 
 /* ------------------------------- */
@@ -126,18 +124,18 @@ void hb_stackPop( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPop()"));
 
-   if( --hb_stack.pPos < hb_stack.pItems )
+   if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems )
    {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
    }
 
-   if( HB_IS_COMPLEX( *hb_stack.pPos ) )
+   if( HB_IS_COMPLEX( *HB_VM_STACK.pPos ) )
    {
-      hb_itemClear( *hb_stack.pPos );
+      hb_itemClear( *HB_VM_STACK.pPos );
    }
    else
    {
-      ( *hb_stack.pPos )->type = HB_IT_NIL;
+      ( *HB_VM_STACK.pPos )->type = HB_IT_NIL;
    }
 }
 
@@ -145,8 +143,10 @@ void hb_stackDec( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stackDec()"));
 
-   if( --hb_stack.pPos < hb_stack.pItems )
+   if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems )
+   {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
+   }
 }
 
 void hb_stackFree( void )
@@ -155,12 +155,12 @@ void hb_stackFree( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackFree()"));
 
-   i = hb_stack.wItems - 1;
+   i = HB_VM_STACK.wItems - 1;
    while( i >= 0 )
    {
-      hb_xfree( hb_stack.pItems[ i-- ] );
+      hb_xfree( HB_VM_STACK.pItems[ i-- ] );
    }
-   hb_xfree( hb_stack.pItems );
+   hb_xfree( HB_VM_STACK.pItems );
 }
 
 void hb_stackPush( void )
@@ -171,33 +171,37 @@ void hb_stackPush( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPush()"));
 
-   CurrIndex = hb_stack.pPos - hb_stack.pItems;
-   TopIndex  = hb_stack.wItems - 1;
+   CurrIndex = HB_VM_STACK.pPos - HB_VM_STACK.pItems;
+   TopIndex  = HB_VM_STACK.wItems - 1;
 
    /* enough room for another item ? */
    if( !( TopIndex > CurrIndex ) )
    {
       LONG BaseIndex;   /* index of stack base */
 
-      BaseIndex = hb_stack.pBase - hb_stack.pItems;
+      BaseIndex = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
 
       /* no, make more headroom: */
       /* hb_stackDispLocal(); */
-      hb_stack.pItems = ( HB_ITEM_PTR * ) hb_xrealloc( ( void *)hb_stack.pItems, sizeof( HB_ITEM_PTR ) *
-                                ( hb_stack.wItems + STACK_EXPANDHB_ITEMS ) );
+      HB_VM_STACK.pItems = ( HB_ITEM_PTR * ) hb_xrealloc( ( void *)HB_VM_STACK.pItems, sizeof( HB_ITEM_PTR ) *
+                                ( HB_VM_STACK.wItems + STACK_EXPANDHB_ITEMS ) );
 
       /* fix possibly invalid pointers: */
-      hb_stack.pPos = hb_stack.pItems + CurrIndex;
-      hb_stack.pBase = hb_stack.pItems + BaseIndex;
-      hb_stack.wItems += STACK_EXPANDHB_ITEMS;
-      for( i=CurrIndex + 1; i < hb_stack.wItems; ++i )
-         hb_stack.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
+      HB_VM_STACK.pPos = HB_VM_STACK.pItems + CurrIndex;
+      HB_VM_STACK.pBase = HB_VM_STACK.pItems + BaseIndex;
+      HB_VM_STACK.wItems += STACK_EXPANDHB_ITEMS;
+
+      for( i=CurrIndex + 1; i < HB_VM_STACK.wItems; ++i )
+      {
+         HB_VM_STACK.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
+      }
       /* hb_stackDispLocal(); */
    }
 
    /* now, push it: */
-   hb_stack.pPos++;
-   ( * hb_stack.pPos )->type = HB_IT_NIL;
+   HB_VM_STACK.pPos++;
+
+   ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
 }
 
 void hb_stackInit( void )
@@ -206,6 +210,7 @@ void hb_stackInit( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackInit()"));
 
+   // Optimized to directly accessing hb_stack instead of HB_VM_STACK
    hb_stack.pItems = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
    hb_stack.pBase  = hb_stack.pItems;
    hb_stack.pPos   = hb_stack.pItems;     /* points to the first stack item */
@@ -221,7 +226,9 @@ void hb_stackInit( void )
 
 void hb_stackRemove( LONG lUntilPos )
 {
-   HB_ITEM_PTR * pEnd = hb_stack.pItems + lUntilPos;
+   HB_ITEM_PTR * pEnd = HB_VM_STACK.pItems + lUntilPos;
+
+   // Optimized to directly accessing hb_stack instead of HB_VM_STACK
    while( hb_stack.pPos > pEnd )
    {
       hb_stackPop();
@@ -239,12 +246,12 @@ HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
       hb_errInternal( HB_EI_VMNOTSYMBOL, NULL, "hb_vmDo()", NULL );
    }
 
-   pStack->lBaseItem = hb_stack.pBase - hb_stack.pItems;
-   pStack->iStatics = hb_stack.iStatics;
+   pStack->lBaseItem = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
+   pStack->iStatics = HB_VM_STACK.iStatics;
 
    pItem->item.asSymbol.lineno = 0;
    pItem->item.asSymbol.paramcnt = uiParams;
-   hb_stack.pBase = hb_stack.pItems + pItem->item.asSymbol.stackbase;
+   HB_VM_STACK.pBase = HB_VM_STACK.pItems + pItem->item.asSymbol.stackbase;
    pItem->item.asSymbol.stackbase = pStack->lBaseItem;
 
    return pItem;
@@ -252,13 +259,13 @@ HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
 
 void hb_stackOldFrame( HB_STACK_STATE * pStack )
 {
-   while( hb_stack.pPos > hb_stack.pBase )
+   while( HB_VM_STACK.pPos > HB_VM_STACK.pBase )
    {
       hb_stackPop();
    }
 
-   hb_stack.pBase = hb_stack.pItems + pStack->lBaseItem;
-   hb_stack.iStatics = pStack->iStatics;
+   HB_VM_STACK.pBase = HB_VM_STACK.pItems + pStack->lBaseItem;
+   HB_VM_STACK.iStatics = pStack->iStatics;
 }
 
 #undef hb_stackItem
@@ -267,7 +274,7 @@ HB_ITEM_PTR HB_EXPORT hb_stackItem( LONG iItemPos )
    if( iItemPos < 0 )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
 
-   return ( * ( hb_stack.pItems + iItemPos ) );
+   return ( * ( HB_VM_STACK.pItems + iItemPos ) );
 }
 
 #undef hb_stackItemFromTop
@@ -276,7 +283,7 @@ HB_ITEM_PTR HB_EXPORT hb_stackItemFromTop( int nFromTop )
    if( nFromTop > 0 )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
 
-   return ( * ( hb_stack.pPos + nFromTop ) );
+   return ( * ( HB_VM_STACK.pPos + nFromTop ) );
 }
 
 #undef hb_stackItemFromBase
@@ -287,28 +294,28 @@ HB_ITEM_PTR HB_EXPORT hb_stackItemFromBase( int nFromBase )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
    }
 
-   //printf( "Local %i Params: %i\n", nFromBase, ( *hb_stack.pBase )->item.asSymbol.paramcnt );
+   //printf( "Local %i Params: %i\n", nFromBase, hb_stackBaseItem()->item.asSymbol.paramcnt );
 
-   if( ( *hb_stack.pBase )->item.asSymbol.paramcnt < 255 )
+   if( hb_stackBaseItem()->item.asSymbol.paramcnt < 255 )
    {
-      return ( * ( hb_stack.pBase + nFromBase + 1 ) );
+      return ( * ( HB_VM_STACK.pBase + nFromBase + 1 ) );
    }
    else
    {
-      return ( * ( hb_stack.pBase + nFromBase + 1 + ( *hb_stack.pBase )->item.asSymbol.paramcnt - 256 ) );
+      return ( * ( HB_VM_STACK.pBase + nFromBase + 1 + hb_stackBaseItem()->item.asSymbol.paramcnt - 256 ) );
    }
 }
 
 #undef hb_stackTopItem
 HB_ITEM_PTR HB_EXPORT hb_stackTopItem( void )
 {
-    return * hb_stack.pPos;
+    return * HB_VM_STACK.pPos;
 }
 
 #undef hb_stackBaseItem
 HB_ITEM_PTR HB_EXPORT hb_stackBaseItem( void )
 {
-   return * hb_stack.pBase;
+   return * HB_VM_STACK.pBase;
 }
 
 /* Returns SELF object, an evaluated codeblock or NIL for normal func/proc
@@ -316,19 +323,19 @@ HB_ITEM_PTR HB_EXPORT hb_stackBaseItem( void )
 #undef hb_stackSelfItem
 HB_ITEM_PTR HB_EXPORT hb_stackSelfItem( void )
 {
-   return * ( hb_stack.pBase + 1 );
+   return * ( HB_VM_STACK.pBase + 1 );
 }
 
 #undef hb_stackTopOffset
 LONG HB_EXPORT hb_stackTopOffset( void )
 {
-   return hb_stack.pPos - hb_stack.pItems;
+   return HB_VM_STACK.pPos - HB_VM_STACK.pItems;
 }
 
 #undef hb_stackBaseOffset
 LONG HB_EXPORT hb_stackBaseOffset( void )
 {
-   return hb_stack.pBase - hb_stack.pItems + 1;
+   return HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1;
 }
 
 /* NOTE: DEBUG function */
@@ -339,11 +346,11 @@ void hb_stackDispLocal( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_stackDispLocal()"));
 
    printf( hb_conNewLine() );
-   printf( HB_I_("Virtual Machine Stack Dump at %s(%i):"), ( *(hb_stack.pBase) )->item.asSymbol.value->szName, ( *(hb_stack.pBase) )->item.asSymbol.lineno );
+   printf( HB_I_("Virtual Machine Stack Dump at %s(%i):"), ( *(HB_VM_STACK.pBase) )->item.asSymbol.value->szName, ( *(HB_VM_STACK.pBase) )->item.asSymbol.lineno );
    printf( hb_conNewLine() );
    printf( "--------------------------" );
 
-   for( pBase = hb_stack.pBase; pBase <= hb_stack.pPos; pBase++ )
+   for( pBase = HB_VM_STACK.pBase; pBase <= HB_VM_STACK.pPos; pBase++ )
    {
       printf( hb_conNewLine() );
 
@@ -404,15 +411,15 @@ void hb_stackDispLocal( void )
 
 void hb_stackDispCall( void )
 {
-   PHB_ITEM * pBase = hb_stack.pBase;
+   PHB_ITEM * pBase = HB_VM_STACK.pBase;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackDispCall()"));
 
-   while( pBase != hb_stack.pItems )
+   while( pBase != HB_VM_STACK.pItems )
    {
       char buffer[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 32 ];
 
-      pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
       if( ( *( pBase + 1 ) )->type == HB_IT_ARRAY )
          sprintf( buffer, HB_I_("Called from %s:%s(%i)"), hb_objGetClsName( *(pBase + 1) ),
@@ -439,11 +446,12 @@ void hb_vmIsLocalRef( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
 
-   if( hb_stack.pPos > hb_stack.pItems )
+   if( HB_VM_STACK.pPos > HB_VM_STACK.pItems )
    {
       /* the eval stack is not cleared yet */
-      HB_ITEM_PTR * pItem = hb_stack.pPos - 1;
-      while( pItem != hb_stack.pItems )
+      HB_ITEM_PTR * pItem = HB_VM_STACK.pPos - 1;
+
+      while( pItem != HB_VM_STACK.pItems )
       {
          if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
             hb_gcItemRef( *pItem );
@@ -458,7 +466,7 @@ void hb_vmIsLocalRef( void )
 
 WINBASEAPI LONG WINAPI UnhandledExceptionFilter( struct _EXCEPTION_POINTERS * ExceptionInfo )
 {
-   PHB_ITEM *pBase = hb_stack.pBase;
+   PHB_ITEM *pBase = HB_VM_STACK.pBase;
 
    char msg[ ( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 32 ) * 32 ];
 
@@ -481,9 +489,9 @@ WINBASEAPI LONG WINAPI UnhandledExceptionFilter( struct _EXCEPTION_POINTERS * Ex
 
       strcat( msg, buffer );
 
-      pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
-   while( pBase != hb_stack.pItems );
+   while( pBase != HB_VM_STACK.pItems );
 
    MessageBox( NULL, msg, HB_I_("Harbour Exception"), MB_ICONSTOP );
 
@@ -501,7 +509,7 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
                              PCONTEXTRECORD               p3,
                              PVOID                        pv) {
 
-   PHB_ITEM *pBase = hb_stack.pBase;
+   PHB_ITEM *pBase = HB_VM_STACK.pBase;
 
    HB_SYMBOL_UNUSED(p1);
    HB_SYMBOL_UNUSED(p2);
@@ -525,9 +533,9 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
                      ( *pBase )->item.asSymbol.value->szName,
                      ( *pBase )->item.asSymbol.lineno );
 
-         pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
       }
-      while( pBase != hb_stack.pItems );
+      while( pBase != HB_VM_STACK.pItems );
    }
 
    return XCPT_CONTINUE_SEARCH;          /* Exception not resolved... */

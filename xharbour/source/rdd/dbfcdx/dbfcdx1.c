@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.96 2002/05/13 03:55:13 horacioroldan Exp $
+ * $Id: dbfcdx1.c,v 1.30 2002/11/13 18:46:13 horacioroldan Exp $
  */
 
 /*
@@ -1259,7 +1259,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                hb_vmPushSymbol( &hb_symEval );
                hb_vmPush( pTag->pForItem );
                hb_vmSend( 0 );
-               hb_itemCopy( pItem, &hb_stack.Return );
+               hb_itemCopy( pItem, &(HB_VM_STACK.Return) );
             }
             else
             {
@@ -1281,7 +1281,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                hb_vmPushSymbol( &hb_symEval );
                hb_vmPush( pTag->pKeyItem );
                hb_vmSend( 0 );
-               hb_itemCopy( pItem, &hb_stack.Return );
+               hb_itemCopy( pItem, &(HB_VM_STACK.Return) );
             }
             else
             {
@@ -1939,7 +1939,7 @@ static void hb_cdxTagTagLoad( LPCDXTAG pTag )
    This line must be replace the next one when hb_macroRun is fixed.
    By now it do the work as only string keys are supported.
 
-   switch( hb_itemType( &hb_stack.Return ) )
+   switch( hb_itemType( &(HB_VM_STACK.Return) ) )
     */
    switch( hb_itemType( hb_stackItemFromTop( -1 ) ) )
    {
@@ -4557,7 +4557,7 @@ ERRCODE hb_cdxGoTo( CDXAREAP pArea, ULONG ulRecNo )
           hb_vmPushSymbol( &hb_symEval );
           hb_vmPush( pTag->pKeyItem );
           hb_vmSend( 0 );
-          hb_cdxKeyPutItem( pKey, &hb_stack.Return );
+          hb_cdxKeyPutItem( pKey, &(HB_VM_STACK.Return) );
       }
       else
       {
@@ -5008,7 +5008,7 @@ ERRCODE hb_cdxGoCold( CDXAREAP pArea )
                   hb_vmPushSymbol( &hb_symEval );
                   hb_vmPush( pTag->pForItem );
                   hb_vmSend( 0 );
-                  bForOk = hb_itemGetL( &hb_stack.Return );
+                  bForOk = hb_itemGetL( &(HB_VM_STACK.Return) );
                }
                else
                {
@@ -5029,7 +5029,7 @@ ERRCODE hb_cdxGoCold( CDXAREAP pArea )
                 hb_vmPushSymbol( &hb_symEval );
                 hb_vmPush( pTag->pKeyItem );
                 hb_vmSend( 0 );
-                hb_cdxKeyPutItem( pKey, &hb_stack.Return );
+                hb_cdxKeyPutItem( pKey, &(HB_VM_STACK.Return) );
             }
             else
             {
@@ -5166,7 +5166,7 @@ ERRCODE hb_cdxGoHot( CDXAREAP pArea )
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pTag->pKeyItem );
             hb_vmSend( 0 );
-            hb_cdxKeyPutItem( pKey, &hb_stack.Return );
+            hb_cdxKeyPutItem( pKey, &(HB_VM_STACK.Return) );
          }
          else
          {

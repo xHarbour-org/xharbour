@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.19 2002/10/27 14:41:37 lculik Exp $
+ * $Id: dbcmd.c,v 1.20 2002/11/29 08:59:57 what32 Exp $
  */
 
 /*
@@ -1476,13 +1476,13 @@ HB_FUNC( __DBLOCATE )
    pRecord  = hb_param( 4, HB_IT_NUMERIC );
    pRest    = hb_param( 5, HB_IT_LOGICAL );
    pNewRest = NULL;
-   
+
    if( pWhile )
    {
       pNewRest = hb_itemPutL( NULL, TRUE );
       pScopeInfo.fRest = pNewRest;
    }
-   
+
    if( !pFor )
    {
       pNewFor = hb_itemPutL( NULL, TRUE );
@@ -1491,41 +1491,41 @@ HB_FUNC( __DBLOCATE )
    {
       pNewFor = hb_itemNew( pFor );
    }
-   
+
    pScopeInfo.itmCobFor = pNewFor;
-   
+
    if( !pRest )
    {
       pNewRest = hb_itemPutL( pNewRest, FALSE );
       pScopeInfo.fRest = pNewRest;
    }
-   
+
    SELF_SETLOCATE( ( AREAP ) s_pCurrArea->pArea, &pScopeInfo );
-   
+
    ( ( AREAP ) s_pCurrArea->pArea )->fFound = FALSE;
-   
+
    if( pRecord )
    {
       SELF_GOTOID( ( AREAP ) s_pCurrArea->pArea, pRecord );
-      
+
       if( ( ( AREAP ) s_pCurrArea->pArea )->fEof )
       {
          goto ExitLocate ;
       }
-      
+
       if( hb_itemType( pWhile ) == HB_IT_BLOCK )
       {
          bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
-      }   
+      }
       else
       {
          bWhile = TRUE;
       }
-      
+
       if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
       {
          bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
-         
+
          ( ( AREAP ) s_pCurrArea->pArea )->fFound = ( bWhile && bFor );
       }
       else
@@ -1543,20 +1543,20 @@ HB_FUNC( __DBLOCATE )
       {
          bWhile = TRUE;
       }
-      
+
       if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
       {
          bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
-      }   
+      }
       else
       {
          bFor = hb_itemGetL( pNewFor );
       }
-      
+
       while( !( ( AREAP ) s_pCurrArea->pArea )->fEof && lNext-- > 0 && bWhile && !bFor )
       {
          SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
-         
+
          if( ( ( AREAP ) s_pCurrArea->pArea )->fEof  )
          {
             bFor = FALSE;
@@ -1571,7 +1571,7 @@ HB_FUNC( __DBLOCATE )
             {
                bWhile = TRUE;
             }
-            
+
             if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
             {
                bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
@@ -1582,18 +1582,18 @@ HB_FUNC( __DBLOCATE )
             }
          }
       }
-      
+
       ( ( AREAP ) s_pCurrArea->pArea )->fFound = bFor;
    }
    else if( pNext )
    {
       lNext = hb_parnl( 3 );
-      
+
       if( ( ( AREAP ) s_pCurrArea->pArea )->fEof || lNext <= 0 )
       {
          goto ExitLocate ;
       }
-      
+
       if( hb_itemType( pWhile ) == HB_IT_BLOCK )
       {
          bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
@@ -1602,7 +1602,7 @@ HB_FUNC( __DBLOCATE )
       {
          bWhile = TRUE;
       }
-      
+
       if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
       {
          bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
@@ -1611,11 +1611,11 @@ HB_FUNC( __DBLOCATE )
       {
          bFor = hb_itemGetL( pNewFor );
       }
-      
+
       while( !( ( AREAP ) s_pCurrArea->pArea )->fEof && lNext-- > 0 && bWhile && !bFor )
       {
          SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
-         
+
          if( ( ( AREAP ) s_pCurrArea->pArea )->fEof  )
          {
             bFor = FALSE;
@@ -1630,7 +1630,7 @@ HB_FUNC( __DBLOCATE )
             {
                bWhile = TRUE;
             }
-            
+
             if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
             {
                bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
@@ -1641,7 +1641,7 @@ HB_FUNC( __DBLOCATE )
             }
          }
       }
-      
+
       ( ( AREAP ) s_pCurrArea->pArea )->fFound = bFor;
    }
    else if( hb_itemGetL( pRest ) )
@@ -1658,7 +1658,7 @@ HB_FUNC( __DBLOCATE )
       {
          bWhile = TRUE;
       }
-      
+
       if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
       {
          bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
@@ -1667,11 +1667,11 @@ HB_FUNC( __DBLOCATE )
       {
          bFor = hb_itemGetL( pNewFor );
       }
-      
+
       while( !( ( AREAP ) s_pCurrArea->pArea )->fEof && bWhile && !bFor )
       {
          SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
-         
+
          if( ( ( AREAP ) s_pCurrArea->pArea )->fEof  )
          {
             bFor = FALSE;
@@ -1686,7 +1686,7 @@ HB_FUNC( __DBLOCATE )
             {
                bWhile = TRUE;
             }
-            
+
             if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
             {
                bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
@@ -1694,21 +1694,21 @@ HB_FUNC( __DBLOCATE )
             else
             {
                bFor = hb_itemGetL( pNewFor );
-            }   
+            }
          }
       }
-      
+
       ( ( AREAP ) s_pCurrArea->pArea )->fFound = bFor;
    }
    else
    {
       SELF_GOTOP( ( AREAP ) s_pCurrArea->pArea );
-      
+
       if( ( ( AREAP ) s_pCurrArea->pArea )->fEof )
       {
          goto ExitLocate ;
       }
-      
+
       if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
       {
          bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
@@ -1717,11 +1717,11 @@ HB_FUNC( __DBLOCATE )
       {
          bFor = hb_itemGetL( pNewFor );
       }
-      
+
       while( !( ( AREAP ) s_pCurrArea->pArea )->fEof && !bFor )
       {
          SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
-         
+
          if( ( ( AREAP ) s_pCurrArea->pArea )->fEof  )
          {
             bFor = FALSE;
@@ -1738,7 +1738,7 @@ HB_FUNC( __DBLOCATE )
             }
          }
       }
-      
+
       ( ( AREAP ) s_pCurrArea->pArea )->fFound = bFor;
    }
 
@@ -1971,7 +1971,7 @@ HB_FUNC( DBSTRUCT )
    PHB_ITEM pItem, pData;
    USHORT uiFields, uiCount;
 
-   hb_arrayNew( &hb_stack.Return, 0 );
+   hb_arrayNew( &(HB_VM_STACK.Return), 0 );
 
    if( s_pCurrArea )
    {
@@ -1989,7 +1989,7 @@ HB_FUNC( DBSTRUCT )
          hb_arraySet( pItem, 3, pData );
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_DEC, pData );
          hb_arraySet( pItem, 4, pData );
-         hb_arrayAdd( &hb_stack.Return, pItem );
+         hb_arrayAdd( &(HB_VM_STACK.Return), pItem );
       }
       hb_itemRelease( pItem );
       hb_itemRelease( pData );
@@ -2365,9 +2365,9 @@ HB_FUNC( LOCK )
 HB_FUNC( LUPDATE )
 {
    if( !s_pCurrArea )
-      hb_itemPutDS( &hb_stack.Return, "" );
+      hb_itemPutDS( &(HB_VM_STACK.Return), "" );
    else
-      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_LASTUPDATE, &hb_stack.Return );
+      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_LASTUPDATE, &(HB_VM_STACK.Return) );
 }
 
 HB_FUNC( NETERR )
@@ -2886,14 +2886,14 @@ HB_FUNC( RDDLIST )
    LPRDDNODE pRddNode;
 
    hb_rddCheck();
-   hb_arrayNew( &hb_stack.Return, 0 );
+   hb_arrayNew( &(HB_VM_STACK.Return), 0 );
    pName = hb_itemNew( NULL );
    pRddNode = s_pRddList;
    uiType = hb_parni( 1 );       /* 0 all types of RDD's */
    while( pRddNode )
    {
       if( ( uiType == 0 ) || ( pRddNode->uiType == uiType ) )
-         hb_arrayAdd( &hb_stack.Return, hb_itemPutC( pName, pRddNode->szName ) );
+         hb_arrayAdd( &(HB_VM_STACK.Return), hb_itemPutC( pName, pRddNode->szName ) );
       pRddNode = pRddNode->pNext;
    }
    hb_itemRelease( pName );

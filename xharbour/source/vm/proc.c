@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.1.1.1 2001/12/21 10:40:58 ronpinkas Exp $
+ * $Id: proc.c,v 1.2 2002/03/26 05:06:59 ronpinkas Exp $
  */
 
 /*
@@ -111,7 +111,7 @@ HB_FUNC( PROCFILE )
 
 char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
 {
-   PHB_ITEM * pBase = hb_stack.pBase;
+   PHB_ITEM * pBase = HB_VM_STACK.pBase;
    BOOL bBlock = FALSE ;
 
    // Default and safety to empty string.
@@ -120,18 +120,18 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
       szName[0] = '\0';
    }
 
-   while( iLevel-- > 0 && pBase != hb_stack.pItems )
+   while( iLevel-- > 0 && pBase != HB_VM_STACK.pItems )
    {
-      pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
 
    if( iLevel < 0 )
    {
       /* Is it a block evaluation or inline method? if so back one more ... */
       if( ( strcmp( ( *pBase )->item.asSymbol.value->szName, "EVAL" ) == 0 ||
-            strcmp( ( *pBase )->item.asSymbol.value->szName, "__EVAL" ) == 0 ) &&  pBase != hb_stack.pItems )
+            strcmp( ( *pBase )->item.asSymbol.value->szName, "__EVAL" ) == 0 ) &&  pBase != HB_VM_STACK.pItems )
       {
-         pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
          bBlock = TRUE ;
       }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: thread.c,v 1.2 2002/12/18 14:35:50 ronpinkas Exp $
+ * $Id: thread.c,v 1.3 2002/12/18 14:55:19 ronpinkas Exp $
  */
 
 /*
@@ -283,7 +283,7 @@ hb_create_a_thread(
 HB_FUNC( STARTTHREAD )
 {
    PHB_ITEM pPointer;
-   PHB_ITEM pargs = hb_arrayFromParams( hb_stack.pBase );
+   PHB_ITEM pargs = hb_arrayFromParams( HB_VM_STACK.pBase );
    HB_THREAD_T thid;
    HB_THREAD_PARAM *pt;
 
@@ -298,9 +298,9 @@ HB_FUNC( STARTTHREAD )
 
       if( hb_pcount() >= 2 )
       {
-         if( HB_IS_OBJECT( *( hb_stack.pBase + 1 + 2 ) ) )
+         if( HB_IS_OBJECT( *( HB_VM_STACK.pBase + 1 + 2 ) ) )
          {
-            pSelf = *( hb_stack.pBase + 1 + 2 );
+            pSelf = *( HB_VM_STACK.pBase + 1 + 2 );
             pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
          }
       }

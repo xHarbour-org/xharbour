@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.28 2002/10/18 05:15:55 ronpinkas Exp $
+ * $Id: classes.c,v 1.29 2002/12/17 04:21:42 ronpinkas Exp $
  */
 
 /*
@@ -458,7 +458,7 @@ void hb_clsIsClassRef( void )
 
 static void hb_clsScope( PHB_ITEM pObject, PMETHOD pMethod )
 {
-   PHB_ITEM * pBase = hb_stack.pBase;
+   PHB_ITEM * pBase = HB_VM_STACK.pBase;
    PHB_ITEM pCaller;
    LONG iLevel = 1;
    BOOL bRetVal = FALSE ;
@@ -481,29 +481,29 @@ static void hb_clsScope( PHB_ITEM pObject, PMETHOD pMethod )
       szSelfNameMsg       = pMessage->pSymbol->szName  ;
       szSelfNameRealClass = hb_objGetRealClsName( pObject, pMessage->pSymbol->szName );
 
-      while( ( iLevel-- > 0 ) && pBase != hb_stack.pItems )
-        pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+      while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
+        pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
       szCallerNameMsg = ( *pBase )->item.asSymbol.value->szName ;
 
       /* Is it an inline ? if so back one more ... */
-      if ( ( strcmp( szCallerNameMsg, "__EVAL" ) == 0 ) &&  pBase != hb_stack.pItems)
+      if ( ( strcmp( szCallerNameMsg, "__EVAL" ) == 0 ) &&  pBase != HB_VM_STACK.pItems)
        {
-        pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+        pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
         szCallerNameMsg = ( *pBase )->item.asSymbol.value->szName ;
        }
 
       /* Is it an eval ? if so back another one more ... */
-      if ( ( strcmp( szCallerNameMsg, "EVAL" ) == 0 ) &&  pBase != hb_stack.pItems)
+      if ( ( strcmp( szCallerNameMsg, "EVAL" ) == 0 ) &&  pBase != HB_VM_STACK.pItems)
        {
-        pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+        pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
         szCallerNameMsg = ( *pBase )->item.asSymbol.value->szName ;
        }
 
       /* Is it an Aeval ? if so back another one more ... */
-      if ( ( strcmp( szCallerNameMsg, "AEVAL" ) == 0 ) &&  pBase != hb_stack.pItems)
+      if ( ( strcmp( szCallerNameMsg, "AEVAL" ) == 0 ) &&  pBase != HB_VM_STACK.pItems)
        {
-        pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+        pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
         szCallerNameMsg = ( *pBase )->item.asSymbol.value->szName ;
        }
 
@@ -1865,8 +1865,8 @@ HB_FUNC( __CLSMSGASSIGNED )
    }
 
 
-   hb_stack.Return.type = HB_IT_LOGICAL;
-   hb_stack.Return.item.asLogical.value = FALSE;
+   HB_VM_STACK.Return.type = HB_IT_LOGICAL;
+   HB_VM_STACK.Return.item.asLogical.value = FALSE;
 
    if( uiClass && uiClass <= s_uiClasses && pString )
    {
@@ -1897,7 +1897,7 @@ HB_FUNC( __CLSMSGASSIGNED )
 
             if( pFunc != hb___msgVirtual )         /* NON Virtual method */
             {
-               hb_stack.Return.item.asLogical.value = TRUE;
+               HB_VM_STACK.Return.item.asLogical.value = TRUE;
             }
          }
       }
@@ -2229,9 +2229,9 @@ HB_FUNC( __CLASSSEL )
 /* to be used from Classes ERROR HANDLER method */
 HB_FUNC( __GETMESSAGE )
 {
-   PHB_ITEM * pBase = hb_stack.pBase;
+   PHB_ITEM * pBase = HB_VM_STACK.pBase;
 
-   pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+   pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
    hb_retc( ( *pBase )->item.asSymbol.value->szName );
 }
@@ -2243,13 +2243,13 @@ HB_FUNC( __CLSPARENT )
 
 HB_FUNC( __SENDER )
 {
-   PHB_ITEM * pBase = hb_stack.pBase;
+   PHB_ITEM * pBase = HB_VM_STACK.pBase;
    PHB_ITEM oSender = NULL;
    USHORT iLevel = 3;
 
-   while( iLevel > 0 && pBase != hb_stack.pItems )
+   while( iLevel > 0 && pBase != HB_VM_STACK.pItems )
    {
-      pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
       oSender = *( pBase + 1 );
 
       if( ( iLevel-- == 2 && oSender->type != HB_IT_BLOCK ) || oSender->type == HB_IT_NIL )
@@ -2258,7 +2258,7 @@ HB_FUNC( __SENDER )
 
    if( iLevel == 0 && oSender != NULL && oSender->type == HB_IT_OBJECT )
    {
-      hb_itemCopy( &hb_stack.Return, oSender );
+      hb_itemCopy( &(HB_VM_STACK.Return), oSender );
    }
 }
 
@@ -2521,7 +2521,7 @@ static HARBOUR hb___msgEval( void )
 //   pObject->item.asArray.value->uiPrevCls  = pObject->item.asArray.value->uiClass; /* backup of actual handel */
 //   pObject->item.asArray.value->uiClass    = s_pMethod->uiSprClass;                /* superclass handel casting */
 //
-//   hb_itemCopy( &hb_stack.Return, pObject );
+//   hb_itemCopy( &(HB_VM_STACK.Return), pObject );
 //}
 
 static HARBOUR hb___msgSuper( void )
@@ -2552,7 +2552,7 @@ static HARBOUR hb___msgSuper( void )
 /*
 static HARBOUR hb___msgClass( void )
 {
-   hb_itemCopy( &hb_stack.Return, hb_stackSelfItem() );
+   hb_itemCopy( &(HB_VM_STACK.Return), hb_stackSelfItem() );
 }
 */
 
@@ -2566,7 +2566,7 @@ static HARBOUR hb___msgGetClsData( void )
    USHORT uiClass = ( hb_stackSelfItem() )->item.asArray.value->uiClass;
 
    if( uiClass && uiClass <= s_uiClasses )
-      hb_arrayGet( s_pClasses[ uiClass - 1 ].pClassDatas, s_pMethod->uiData, &hb_stack.Return );
+      hb_arrayGet( s_pClasses[ uiClass - 1 ].pClassDatas, s_pMethod->uiData, &(HB_VM_STACK.Return) );
 }
 
 
@@ -2586,7 +2586,7 @@ static HARBOUR hb___msgSetClsData( void )
       hb_arraySet( s_pClasses[ uiClass - 1 ].pClassDatas, s_pMethod->uiData, pReturn );
    }
 
-   hb_itemCopy( &hb_stack.Return, pReturn );
+   hb_itemCopy( &(HB_VM_STACK.Return), pReturn );
 }
 
 /*
@@ -2599,7 +2599,7 @@ static HARBOUR hb___msgGetShrData( void )
    USHORT uiSprCls = s_pMethod->uiSprClass;
 
    if( uiSprCls && uiSprCls <= s_uiClasses )
-      hb_arrayGet( s_pClasses[ uiSprCls - 1 ].pClassDatas, s_pMethod->uiDataShared, &hb_stack.Return );
+      hb_arrayGet( s_pClasses[ uiSprCls - 1 ].pClassDatas, s_pMethod->uiDataShared, &(HB_VM_STACK.Return) );
 }
 
 /*
@@ -2618,7 +2618,7 @@ static HARBOUR hb___msgSetShrData( void )
       hb_arraySet( s_pClasses[ uiSprCls - 1 ].pClassDatas, s_pMethod->uiDataShared, pReturn );
    }
 
-   hb_itemCopy( &hb_stack.Return, pReturn );
+   hb_itemCopy( &(HB_VM_STACK.Return), pReturn );
 }
 
 /*
@@ -2635,7 +2635,7 @@ static HARBOUR hb___msgGetData( void )
    if( uiIndex > ( USHORT ) hb_arrayLen( pObject ) ) /* Resize needed */
       hb_arraySize( pObject, uiIndex ); /* Make large enough */
 
-   hb_arrayGet( pObject, uiIndex, &hb_stack.Return );
+   hb_arrayGet( pObject, uiIndex, &(HB_VM_STACK.Return) );
 }
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.5 2002/10/25 07:57:22 andijahja Exp $
+ * $Id: hbstack.h,v 1.6 2002/12/18 13:43:55 ronpinkas Exp $
  */
 
 /*
@@ -84,6 +84,25 @@ typedef struct
    char     szDate[ 9 ];  /* last returned date from _pards() yyyymmdd format */
 } HB_STACK;
 
+#ifndef HB_NO_DEFAULT_THREADS
+   #define HB_THREAD_SUPPORT
+#endif
+
+/* JC1: test for macro accessing the stack */
+#if defined( HB_THREAD_SUPPORT ) && ! defined(HB_COMP_H_)
+   #include "thread.h"
+   extern HB_STACK *hb_getCurrentStack( void );
+
+   //#define HB_VM_STACK ( hb_ht_context ? (* hb_getCurrentStack() ) : hb_stack ) // Compiler disallow this optimization.
+   #define HB_VM_STACK (* hb_getCurrentStack() )
+#else
+   #define HB_VM_STACK hb_stack
+#endif
+
+#ifndef HB_NO_DEFAULT_STACK_MACROS
+    #define HB_STACK_MACROS
+#endif
+
 extern HB_STACK hb_stack;
 
 typedef struct
@@ -92,19 +111,15 @@ typedef struct
    LONG iStatics;
 } HB_STACK_STATE;    /* used to save/restore stack state in hb_vmDo)_ */
 
-#ifndef HB_NO_DEFAULT_STACK_MACROS
-    #define HB_STACK_MACROS
-#endif
-
 #ifdef HB_STACK_MACROS
-    #define hb_stackItemFromTop( n )    ( * ( hb_stack.pPos + (n) ) )
-    #define hb_stackItemFromBase( n )   ( ( *hb_stack.pBase )->item.asSymbol.paramcnt < 255 ? *( hb_stack.pBase + (n) + 1 ) : *( hb_stack.pBase + (n) + 1 + ( *hb_stack.pBase )->item.asSymbol.paramcnt - 256 ) )
-    #define hb_stackTopOffset( )        ( hb_stack.pPos - hb_stack.pItems )
-    #define hb_stackBaseOffset( )       ( hb_stack.pBase - hb_stack.pItems + 1)
-    #define hb_stackTopItem( )          ( * hb_stack.pPos )
-    #define hb_stackBaseItem( )         ( * hb_stack.pBase )
-    #define hb_stackSelfItem( )         ( * ( hb_stack.pBase + 1 ) )
-    #define hb_stackItem( iItemPos )    ( * ( hb_stack.pItems + iItemPos ) )
+    #define hb_stackItemFromTop( n )    ( * ( HB_VM_STACK.pPos + (n) ) )
+    #define hb_stackItemFromBase( n )   ( ( *HB_VM_STACK.pBase )->item.asSymbol.paramcnt < 255 ? *( HB_VM_STACK.pBase + (n) + 1 ) : *( HB_VM_STACK.pBase + (n) + 1 + ( *HB_VM_STACK.pBase )->item.asSymbol.paramcnt - 256 ) )
+    #define hb_stackTopOffset( )        ( HB_VM_STACK.pPos - HB_VM_STACK.pItems )
+    #define hb_stackBaseOffset( )       ( HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1)
+    #define hb_stackTopItem( )          ( * HB_VM_STACK.pPos )
+    #define hb_stackBaseItem( )         ( * HB_VM_STACK.pBase )
+    #define hb_stackSelfItem( )         ( * ( HB_VM_STACK.pBase + 1 ) )
+    #define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + iItemPos ) )
 #else
     extern HB_ITEM_PTR HB_EXPORT hb_stackItemFromTop( int nFromTop );
     extern HB_ITEM_PTR HB_EXPORT hb_stackItemFromBase( int nFromBase );
@@ -128,18 +143,6 @@ extern void    hb_stackFree( void );       /* releases all memory used by the st
 extern void    hb_stackPush( void );       /* pushes an item on to the stack */
 extern void    hb_stackPop( void );        /* pops an item from the stack */
 extern void    hb_stackInit( void );       /* initializes the stack */
-
-#ifndef HB_NO_DEFAULT_THREADS
-   #define HB_THREAD_SUPPORT
-#endif
-
-/* JC1: test for macro accessing the stack */
-#if defined( HB_THREAD_SUPPORT ) && ! defined(HB_COMP_H_)
-   #include "thread.h"
-   extern HB_STACK *hb_getCurrentStack( void );
-   //#define hb_stack ( hb_ht_context ? (* hb_getCurrentStack() ) : hb_stack_general ) // Compiler disallow this optimization.
-   #define hb_stack (* hb_getCurrentStack() )
-#endif
 
 #if defined(HB_EXTERN_C)
 }

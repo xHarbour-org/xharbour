@@ -1,5 +1,5 @@
 /*
- * $Id: asort.c,v 1.5 2002/01/22 00:23:28 ronpinkas Exp $
+ * $Id: asort.c,v 1.6 2002/01/27 09:01:57 ronpinkas Exp $
  */
 
 /*
@@ -136,7 +136,7 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
             hb_vmPush( &pivot );
             hb_vmSend( 2 );
 
-            if( ( HB_IS_LOGICAL( &hb_stack.Return ) ? hb_stack.Return.item.asLogical.value : hb_itemIsLess( pItems + i, &pivot ) ) )
+            if( ( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) ? HB_VM_STACK.Return.item.asLogical.value : hb_itemIsLess( pItems + i, &pivot ) ) )
                i++;
             else
                break;
@@ -150,7 +150,7 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
             hb_vmPush( pItems + j );
             hb_vmSend( 2 );
 
-            if( ( HB_IS_LOGICAL( &hb_stack.Return ) ? hb_stack.Return.item.asLogical.value : hb_itemIsLess( &pivot, pItems + j ) ) )
+            if( ( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) ? HB_VM_STACK.Return.item.asLogical.value : hb_itemIsLess( &pivot, pItems + j ) ) )
                j--;
             else
                break;
@@ -269,7 +269,7 @@ HB_FUNC( ASORT )
                     ISNUM( 3 ) ? &ulCount : NULL,
                     hb_param( 4, HB_IT_BLOCK ) );
 
-      hb_itemCopy( &hb_stack.Return, pArray ); /* ASort() returns the array itself */
+      hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* ASort() returns the array itself */
    }
 }
 

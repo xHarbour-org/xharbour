@@ -1,5 +1,5 @@
 /*
- * $Id: setkey.c,v 1.4 2002/01/17 23:20:47 ronpinkas Exp $
+ * $Id: setkey.c,v 1.5 2002/01/27 09:01:57 ronpinkas Exp $
  */
 
 /*
@@ -195,7 +195,7 @@ HB_FUNC( SETKEY )
 
             if( pIsActiveResults == NULL || ! HB_IS_LOGICAL( pIsActiveResults ) || hb_itemGetL( pIsActiveResults ) )
 #endif
-               hb_itemCopy( &hb_stack.Return, sk_list_tmp->pAction );
+               hb_itemCopy( &(HB_VM_STACK.Return), sk_list_tmp->pAction );
          }
       }
       else

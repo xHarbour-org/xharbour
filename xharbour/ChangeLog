@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.534 2002/12/18 13:46:02 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.535 2002/12/18 17:00:29 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,50 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-19 10:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+  * include/hbstack.h
+  * include/thread.h
+  * source/rdd/dbcmd.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/chrasc.c
+  * source/rtl/do.c
+  * source/rtl/errorapi.c
+  * source/rtl/left.c
+  * source/rtl/memofile.c
+  * source/rtl/oemansi.c
+  * source/rtl/setkey.c
+  * source/rtl/str.c
+  * source/rtl/transfrm.c
+  * source/vm/arrays.c
+  * source/vm/arrayshb.c
+  * source/vm/asort.c
+  * source/vm/classes.c
+  * source/vm/codebloc.c
+  * source/vm/debug.c
+  * source/vm/estack.c
+  * source/vm/eval.c
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/fm.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+  * source/vm/memvars.c
+  * source/vm/proc.c
+  * source/vm/pvalue.c
+  * source/vm/runner.c
+  * source/vm/thread.c
+    + Added new macro HB_VM_STACK
+    * Cleaned all references to hb_stack to use new macro HB_VM_STACK
+
+ /*
+    xHarbour with MT support is again compatible with all 3rd party LIBs.
+    There is NO LONGER any need to use -DHB_NO_DEFAULT_THREADS other then
+    for research purposes.
+  */
 
 2002-12-18 08:43 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * makefile.nt

@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.5 2002/04/23 05:01:41 ronpinkas Exp $
+ * $Id: chrasc.c,v 1.6 2002/05/06 02:52:07 ronpinkas Exp $
  */
 
 /*
@@ -71,24 +71,24 @@ HB_FUNC( CHR )
                will return an empty string instead of a Chr(0). [vszakats] */
 
 
-      if( HB_IS_COMPLEX( &( hb_stack.Return ) ) )
+      if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
       {
-         if( HB_IS_STRING( &( hb_stack.Return ) ) )
+         if( HB_IS_STRING( &(HB_VM_STACK.Return) ) )
          {
-            hb_itemReleaseString( &( hb_stack.Return ) );
+            hb_itemReleaseString( &(HB_VM_STACK.Return) );
          }
          else
          {
-            hb_itemFastClear( &( hb_stack.Return ) );
+            hb_itemFastClear( &(HB_VM_STACK.Return) );
          }
       }
 
       /* Believe it or not, clipper does this! */
-      ( &hb_stack.Return )->item.asString.value   = hb_vm_acAscii[ (unsigned char) hb_parnl( 1 ) ];
-      ( &hb_stack.Return )->item.asString.length  = 1;
-      ( &hb_stack.Return )->item.asString.bStatic = TRUE;
-      //( &hb_stack.Return )->item.asString.bChar   = TRUE;
-      ( &hb_stack.Return )->type = HB_IT_STRING;
+      ( &(HB_VM_STACK.Return) )->item.asString.value   = hb_vm_acAscii[ (unsigned char) hb_parnl( 1 ) ];
+      ( &(HB_VM_STACK.Return) )->item.asString.length  = 1;
+      ( &(HB_VM_STACK.Return) )->item.asString.bStatic = TRUE;
+      //( &(HB_VM_STACK.Return) )->item.asString.bChar   = TRUE;
+      ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
    }
    else
    {

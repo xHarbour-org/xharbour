@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.28 2002/11/11 04:22:49 walito Exp $
+ * $Id: itemapi.c,v 1.29 2002/12/15 23:06:03 ronpinkas Exp $
  */
 
 /*
@@ -538,7 +538,7 @@ PHB_ITEM hb_itemReturn( PHB_ITEM pItem )
 
    if( pItem )
    {
-      hb_itemCopy( &hb_stack.Return, pItem );
+      hb_itemCopy( &(HB_VM_STACK.Return), pItem );
    }
 
    return pItem;

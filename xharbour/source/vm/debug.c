@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.4 2002/01/17 23:20:47 ronpinkas Exp $
+ * $Id: debug.c,v 1.5 2002/01/27 09:01:57 ronpinkas Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ static USHORT hb_stackLenGlobal( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackLenGlobal()"));
 
-   for( pItem = hb_stack.pItems; pItem++ <= hb_stack.pPos; uiCount++ );
+   for( pItem = HB_VM_STACK.pItems; pItem++ <= HB_VM_STACK.pPos; uiCount++ );
 
    return uiCount;
 }
@@ -118,8 +118,10 @@ HB_FUNC( __VMSTKGLIST )
 
    pReturn = hb_itemArrayNew( uiLen );           /* Create a transfer array  */
 
-   for( pItem = hb_stack.pItems; pItem <= hb_stack.pPos; pItem++ )
+   for( pItem = HB_VM_STACK.pItems; pItem <= HB_VM_STACK.pPos; pItem++ )
+   {
       AddToArray( *pItem, pReturn, uiPos++ );
+   }
 
    hb_itemRelease( hb_itemReturn( pReturn ) );
 }
@@ -130,15 +132,15 @@ HB_FUNC( __VMSTKGLIST )
  * $End$ */
 static USHORT hb_stackLen( int iLevel )
 {
-   PHB_ITEM * pBase = hb_stack.pBase;
+   PHB_ITEM * pBase = HB_VM_STACK.pBase;
    USHORT uiCount = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackLen()"));
 
-   while( ( iLevel-- > 0 ) && pBase != hb_stack.pItems )
+   while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
    {
-      uiCount = pBase - ( hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase ) - 2;
-      pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+      uiCount = pBase - ( HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase ) - 2;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
 
    return uiCount;
@@ -166,14 +168,14 @@ HB_FUNC( __VMSTKLLIST )
 {
    PHB_ITEM pReturn;
    PHB_ITEM * pItem;
-   PHB_ITEM * pBase = hb_stack.pItems + ( *(hb_stack.pBase) )->item.asSymbol.stackbase;
+   PHB_ITEM * pBase = HB_VM_STACK.pItems + hb_stackBaseItem()->item.asSymbol.stackbase;
 
    USHORT uiLen = hb_stackLen( 1 );
    USHORT uiPos = 1;
 
    pReturn = hb_itemArrayNew( uiLen );           /* Create a transfer array  */
 
-   for( pItem = pBase; pItem < hb_stack.pBase; pItem++ )
+   for( pItem = pBase; pItem < HB_VM_STACK.pBase; pItem++ )
       AddToArray( *pItem, pReturn, uiPos++ );
 
    hb_itemRelease( hb_itemReturn( pReturn ) );
@@ -189,13 +191,13 @@ HB_FUNC( __VMSTKLLIST )
 HB_FUNC( __VMPARLLIST )
 {
    int iLevel = hb_parni( 1 ) + 1;
-   PHB_ITEM * pBase = hb_stack.pBase;
+   PHB_ITEM * pBase = HB_VM_STACK.pBase;
    PHB_ITEM pReturn;
    PHB_ITEM * pItem;
    USHORT uiLen, uiPos = 1;
 
-   while( ( iLevel-- > 0 ) && pBase != hb_stack.pItems )
-      pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+   while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
    uiLen = ( * pBase )->item.asSymbol.paramcnt;
    pReturn = hb_itemArrayNew( uiLen );           /* Create a transfer array  */
@@ -209,23 +211,23 @@ HB_FUNC( __VMPARLLIST )
 HB_FUNC( __VMVARLGET )
 {
    int iLevel = hb_parni( 1 ) + 1;
-   PHB_ITEM * pBase = hb_stack.pBase;
+   PHB_ITEM * pBase = HB_VM_STACK.pBase;
 
-   while( ( iLevel-- > 0 ) && pBase != hb_stack.pItems )
-      pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+   while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
-   hb_itemCopy( &hb_stack.Return, *(pBase + 1 + hb_parni( 2 )) );
+   hb_itemCopy( &(HB_VM_STACK.Return), *(pBase + 1 + hb_parni( 2 )) );
 }
 
 HB_FUNC( __VMVARLSET )
 {
    int iLevel = hb_parni( 1 ) + 1;
-   PHB_ITEM * pBase = hb_stack.pBase;
+   PHB_ITEM * pBase = HB_VM_STACK.pBase;
 
-   while( ( iLevel-- > 0 ) && pBase != hb_stack.pItems )
+   while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
    {
-      pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
 
-   hb_itemCopy( *(pBase + 1 + hb_parni( 2 )), *(hb_stack.pBase + 4) );
+   hb_itemCopy( *(pBase + 1 + hb_parni( 2 )), *(HB_VM_STACK.pBase + 4) );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: thread.h,v 1.0 2002/10/25 03:06:09 ronpinkas Exp $
+ * $Id: thread.h,v 1.1 2002/12/18 13:43:55 ronpinkas Exp $
  */
 
 /*
@@ -95,7 +95,6 @@ typedef struct tag_HB_THREAD_PARAM {
     USHORT count;
 } HB_THREAD_PARAM;
 
-extern HB_STACK hb_stack_general;
 extern HB_THREAD_CONTEXT *hb_ht_context;
 extern HB_MUTEX_T context_monitor;
 

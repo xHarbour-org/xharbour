@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.9 2002/07/24 14:43:44 walito Exp $
+ * $Id: transfrm.c,v 1.10 2002/08/08 19:36:08 ronpinkas Exp $
  */
 
 /*
@@ -811,7 +811,7 @@ HB_FUNC( TRANSFORM )
    {
       if( HB_IS_STRING( pValue ) )
       {
-         hb_itemCopy( &hb_stack.Return, pValue );
+         hb_itemCopy( &(HB_VM_STACK.Return), pValue );
       }
       else if( HB_IS_DATE( pValue ) ) // Must precede HB_IS_NUMERIC()
       {

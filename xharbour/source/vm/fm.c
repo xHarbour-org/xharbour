@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.11 2002/08/26 00:29:55 ronpinkas Exp $
+ * $Id: fm.c,v 1.12 2002/12/04 23:06:59 likewolf Exp $
  */
 
 /*
@@ -179,7 +179,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    }
    else
    {
-      if( hb_stack.pItems && ( hb_stack.pBase != hb_stack.pItems ) )
+      if( HB_VM_STACK.pItems && ( HB_VM_STACK.pBase != HB_VM_STACK.pItems ) )
       {
           /* PRG line number */
          ( ( PHB_MEMINFO ) pMem )->uiProcLine = ( hb_stackBaseItem() )->item.asSymbol.lineno;
@@ -281,7 +281,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    }
    else
    {
-      if( hb_stack.pItems && ( hb_stack.pBase != hb_stack.pItems ) )
+      if( HB_VM_STACK.pItems && ( HB_VM_STACK.pBase != HB_VM_STACK.pItems ) )
       {
          /* PRG line number */
          ( ( PHB_MEMINFO ) pMem )->uiProcLine = ( hb_stackBaseItem() )->item.asSymbol.lineno;
@@ -790,11 +790,11 @@ ULONG hb_xquery( USHORT uiMode )
       break;
 
    case HB_MEM_STACKITEMS: /* Harbour extension (Total items allocated for the stack)      */
-      ulResult = hb_stack.wItems;
+      ulResult = HB_VM_STACK.wItems;
       break;
 
    case HB_MEM_STACK:      /* Harbour extension (Total memory size used by the stack [bytes]) */
-      ulResult = hb_stack.wItems * sizeof( HB_ITEM );
+      ulResult = HB_VM_STACK.wItems * sizeof( HB_ITEM );
       break;
 
    case HB_MEM_STACK_TOP : /* Harbour extension (Total items currently on the stack)      */

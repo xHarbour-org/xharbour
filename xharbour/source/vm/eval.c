@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.5 2002/01/22 00:23:28 ronpinkas Exp $
+ * $Id: eval.c,v 1.6 2002/06/13 22:46:05 ronpinkas Exp $
  */
 
 /*
@@ -134,7 +134,7 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
          hb_vmDo( pEvalInfo->paramCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemForwardValue( pResult, &hb_stack.Return );
+         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
       }
       else if( HB_IS_BLOCK( pEvalInfo->pItems[ 0 ] ) )
       {
@@ -149,7 +149,7 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
          hb_vmSend( pEvalInfo->paramCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemForwardValue( pResult, &hb_stack.Return );
+         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
       }
       else
       {
@@ -231,7 +231,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
             hb_vmDo( ( unsigned short ) ulPCount );
 
             pResult = hb_itemNew( NULL );
-            hb_itemForwardValue( pResult, &hb_stack.Return );
+            hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
          }
          else
          {
@@ -260,7 +260,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
          hb_vmSend( ( unsigned short ) ulPCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemForwardValue( pResult, &hb_stack.Return );
+         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
       }
       else if( HB_IS_SYMBOL( pItem ) )
       {
@@ -284,7 +284,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
          hb_vmDo( ( unsigned short ) ulPCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemForwardValue( pResult, &hb_stack.Return );
+         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
       }
       else
       {
@@ -335,7 +335,7 @@ PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
          hb_vmDo( ( unsigned short ) ulPCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemForwardValue( pResult, &hb_stack.Return );
+         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
       }
       else
       {
@@ -351,7 +351,7 @@ PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 }
 
 /*
- * Notice that these two functions place the result at hb_stack.Return,
+ * Notice that these two functions place the result at HB_VM_STACK.Return,
  * that you may access its value using a _par...( -1 ).
  */
 
