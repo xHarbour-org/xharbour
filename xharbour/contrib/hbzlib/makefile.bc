@@ -30,7 +30,7 @@ IDE_LinkFLAGS32 =  -L$(BCB)\LIB
 LinkerLocalOptsAtC32_ziparddll =  -L$(BCB)\LIB -Tpe -ap -c
 ResLocalOptsAtC32_ziparddll = 
 BLocalOptsAtC32_ziparddll = 
-CompInheritOptsAt_ziparddll = -I$(BCB)\INCLUDE -Iinclude -I\xharbour\include;. -DZLIB_DLL;WIN32 -u
+CompInheritOptsAt_ziparddll = -I$(BCB)\INCLUDE -Iinclude -I\xharbour\include;. -DZLIB_DLL;WIN32;ASSERT -u -v -y
 LinkerInheritOptsAt_ziparddll = -x
 LinkerOptsAt_ziparddll = $(LinkerLocalOptsAtC32_ziparddll)
 ResOptsAt_ziparddll = $(ResLocalOptsAtC32_ziparddll)
@@ -179,7 +179,6 @@ BccW32.cfg :
 -vi
 -Ve
 -6
--a8
 -R-
 -H-
 -5
