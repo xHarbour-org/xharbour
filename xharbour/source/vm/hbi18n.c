@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.2 2003/06/21 06:59:23 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.3 2003/06/21 07:17:55 jonnymind Exp $
  */
 
 /*
@@ -61,10 +61,11 @@
 
 #include <fcntl.h>
 #include <errno.h>
-#include <io.h>
 
 #ifndef HB_OS_WIN_32
    #include <unistd.h>
+#else
+   #include <io.h>
 #endif
 
 
@@ -167,7 +168,7 @@ char * hb_i18n_build_table_filename( char *i18n_dir, char *language )
 
    if ( strlen( i18n_dir ) > 0 )
    {
-      path = hb_xgrab(
+      path = ( char *) hb_xgrab(
          strlen( i18n_dir ) +
          strlen( language ) +
          strlen( HB_I18N_TAB_EXT) + 3 ); // '/', dot and '\0'
@@ -180,7 +181,7 @@ char * hb_i18n_build_table_filename( char *i18n_dir, char *language )
    }
    else
    {
-      path = hb_xgrab(
+      path = ( char *) hb_xgrab(
          strlen( language ) +
          strlen( HB_I18N_TAB_EXT) + 2 ); // dot and '\0'
 
