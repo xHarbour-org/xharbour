@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.6 2002/01/12 10:04:28 ronpinkas Exp $
+ * $Id: garbage.c,v 1.7 2002/01/17 23:20:48 ronpinkas Exp $
  */
 
 /*
@@ -262,7 +262,7 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 
       HB_TRACE( HB_TR_INFO, ( "Drop %p %p", pItem, pAlloc ) );
 
-      if( pItem->type )
+      if( HB_IS_COMPLEX( pItem ) )
       {
          hb_itemClear( pItem );    /* clear value stored in this item */
       }

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.12 2002/01/20 19:18:20 andijahja Exp $
+ * $Id: fastitem.c,v 1.13 2002/01/20 20:55:50 ronpinkas Exp $
  */
 
 /*
@@ -69,14 +69,14 @@ void hb_itemPushForward( PHB_ITEM pItem )
 
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
 {
-   HB_TRACE( HB_TR_DEBUG, ("hb_itemForwardValue(%p, %p)", pDest, pSource ) );
+   HB_TRACE( HB_TR_DEBUG, ("hb_itemForwardValue(%p, %p) %i", pDest, pSource, pDest->type ) );
 
    if( pDest == pSource )
    {
-      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemFastCopy()", NULL );
+      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemForwardValue()", NULL );
    }
 
-   if( pDest->type )
+   if( HB_IS_COMPLEX( pDest ) )
    {
       if( HB_IS_STRING( pDest ) )
       {
@@ -94,6 +94,18 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
    /* Now fake clear the transferer. */
    //pSource->item.asString.bStatic = FALSE;
    pSource->type = HB_IT_NIL;
+}
+
+PHB_ITEM hb_itemReturn( PHB_ITEM pItem )
+{
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturn(%p)", pItem ) );
+
+   if( pItem )
+   {
+      hb_itemForwardValue( &hb_stack.Return, pItem );
+   }
+
+   return pItem;
 }
 
 void hb_itemReleaseString( PHB_ITEM pItem )
@@ -154,10 +166,9 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 
    /*
    temp.type = HB_IT_NIL;
-   hb_itemCopy( &temp, pItem2 );
-   hb_itemCopy( pItem2, pItem1 );
-   hb_itemCopy( pItem1, &temp );
-   hb_itemClear( &temp );
+   hb_itemForwardValue( &temp, pItem2 );
+   hb_itemForwardValue( pItem2, pItem1 );
+   hb_itemForwardValue( pItem1, &temp );
    */
 
    memcpy( &temp, pItem2, sizeof( HB_ITEM ) );
@@ -174,7 +185,7 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemCopy()", NULL );
    }
 
-   if( pDest->type )
+   if( HB_IS_COMPLEX( pDest ) )
    {
       if( HB_IS_STRING( pDest ) && pDest->item.asString.value )
       {
@@ -212,7 +223,10 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -241,7 +255,10 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -272,7 +289,10 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.3 2002/01/12 10:04:28 ronpinkas Exp $
+ * $Id: memvars.c,v 1.4 2002/01/17 23:20:48 ronpinkas Exp $
  */
 
 /*
@@ -129,7 +129,10 @@ void hb_memvarsRelease( void )
       {
          if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
          {
-            hb_itemClear( &s_globalTable[ ulCnt ].item );
+            if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
+            {
+               hb_itemClear( &s_globalTable[ ulCnt ].item );
+            }
             s_globalTable[ ulCnt ].counter = 0;
          }
       }
@@ -370,7 +373,15 @@ void hb_memvarValueDecRef( HB_HANDLE hValue )
       */
       if( --pValue->counter == 0 )
       {
-         hb_itemClear( &pValue->item );
+         if( HB_IS_COMPLEX( &pValue->item ) )
+         {
+            hb_itemClear( &pValue->item );
+         }
+         else
+         {
+            ( &pValue->item )->type = HB_IT_NIL;
+         }
+
          hb_memvarRecycle( hValue );
 
          HB_TRACE(HB_TR_INFO, ("Memvar item (%i) deleted", hValue));
@@ -406,7 +417,10 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
       if( --pValue->counter == 0 )
       {
          if( HB_IS_STRING( &pValue->item ) )
-             hb_itemClear( &pValue->item );
+         {
+            hb_itemReleaseString( &pValue->item );
+         }
+
          hb_memvarRecycle( hValue );
 
          HB_TRACE(HB_TR_INFO, ("Memvar item (%i) deleted", hValue));
@@ -728,7 +742,15 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
          {
             if( hb_stricmp( pDynVar->pSymbol->szName, pMemvar->item.asString.value ) == 0 )
             {
-               hb_itemClear( &s_globalTable[ pDynVar->hMemvar ].item );
+               if( HB_IS_COMPLEX( &s_globalTable[ pDynVar->hMemvar ].item ) )
+               {
+                  hb_itemClear( &s_globalTable[ pDynVar->hMemvar ].item );
+               }
+               else
+               {
+                  ( &s_globalTable[ pDynVar->hMemvar ].item )->type = HB_IT_NIL;
+               }
+
                ulBase = 0;
             }
          }
@@ -763,10 +785,28 @@ static void hb_memvarReleaseWithMask( char *szMask, BOOL bInclude )
          if( bInclude )
          {
             if( ( szMask[ 0 ] == '*') || hb_strMatchRegExp( pDynVar->pSymbol->szName, szMask ) )
-               hb_itemClear( &s_globalTable[ pDynVar->hMemvar ].item );
+            {
+               if( HB_IS_COMPLEX( &s_globalTable[ pDynVar->hMemvar ].item ) )
+               {
+                  hb_itemClear( &s_globalTable[ pDynVar->hMemvar ].item );
+               }
+               else
+               {
+                  ( &s_globalTable[ pDynVar->hMemvar ].item )->type = HB_IT_NIL;
+               }
+            }
          }
          else if( ! hb_strMatchRegExp( pDynVar->pSymbol->szName, szMask ) )
-            hb_itemClear( &s_globalTable[ pDynVar->hMemvar ].item );
+         {
+            if( HB_IS_COMPLEX( &s_globalTable[ pDynVar->hMemvar ].item ) )
+            {
+               hb_itemClear( &s_globalTable[ pDynVar->hMemvar ].item );
+            }
+            else
+            {
+               ( &s_globalTable[ pDynVar->hMemvar ].item )->type = HB_IT_NIL;
+            }
+         }
       }
    }
 }
@@ -989,16 +1029,23 @@ HB_FUNC( __MVPUBLIC )
                ULONG j, ulLen = hb_arrayLen( pMemvar );
                HB_ITEM VarItem;
 
-               hb_itemInit( &VarItem );
+               ( &VarItem )->type = HB_IT_NIL;
+
                for( j = 1; j <= ulLen; j++ )
                {
                   hb_arrayGet( pMemvar, j, &VarItem );
                   hb_memvarCreateFromItem( &VarItem, VS_PUBLIC, NULL );
-                  hb_itemClear( &VarItem );
+
+                  if( HB_IS_COMPLEX( &VarItem ) )
+                  {
+                     hb_itemClear( &VarItem );
+                  }
                }
             }
             else
+            {
                hb_memvarCreateFromItem( pMemvar, VS_PUBLIC, NULL );
+            }
          }
       }
    }
@@ -1025,16 +1072,23 @@ HB_FUNC( __MVPRIVATE )
                ULONG j, ulLen = hb_arrayLen( pMemvar );
                HB_ITEM VarItem;
 
-               hb_itemInit( &VarItem );
+               ( &VarItem )->type = HB_IT_NIL;
+
                for( j = 1; j <= ulLen; j++ )
                {
                   hb_arrayGet( pMemvar, j, &VarItem );
                   hb_memvarCreateFromItem( &VarItem, VS_PRIVATE, NULL );
-                  hb_itemClear( &VarItem );
+
+                  if( HB_IS_COMPLEX( &VarItem ) )
+                  {
+                     hb_itemClear( &VarItem );
+                  }
                }
             }
             else
+            {
                hb_memvarCreateFromItem( pMemvar, VS_PRIVATE, NULL );
+            }
          }
       }
    }
@@ -1061,16 +1115,23 @@ HB_FUNC( __MVXRELEASE )
                ULONG j, ulLen = hb_arrayLen( pMemvar );
                HB_ITEM VarItem;
 
-               hb_itemInit( &VarItem );
+               ( &VarItem )->type = HB_IT_NIL;
+
                for( j = 1; j <= ulLen; j++ )
                {
                   hb_arrayGet( pMemvar, j, &VarItem );
                   hb_memvarRelease( &VarItem );
-                  hb_itemClear( &VarItem );
+
+                  if( HB_IS_COMPLEX( &VarItem ) )
+                  {
+                     hb_itemClear( &VarItem );
+                  }
                }
             }
             else
+            {
                hb_memvarRelease( pMemvar );
+            }
          }
       }
    }
@@ -1148,6 +1209,7 @@ HB_FUNC( __MVDBGINFO )
             /* szName points directly to a symbol name - it cannot be released
              */
          }
+
          hb_itemReturn( pValue );
          /* pValue points directly to the item structure used by this variable
           * this item cannot be released
@@ -1189,9 +1251,11 @@ HB_FUNC( __MVGET )
       {
          HB_ITEM retValue;
 
-         hb_itemInit( &retValue );
+         ( &retValue )->type = HB_IT_NIL;
+
          hb_memvarGetValue( &retValue, pDynVar->pSymbol );
-         hb_itemClear( hb_itemReturn( &retValue ) );
+
+         hb_itemReturn( &retValue );
       }
       else
       {
@@ -1214,13 +1278,17 @@ HB_FUNC( __MVGET )
                {
                   HB_ITEM retValue;
 
-                  hb_itemInit( &retValue );
+                  ( &retValue )->type = HB_IT_NIL;
+
                   hb_memvarGetValue( &retValue, pDynVar->pSymbol );
-                  hb_itemClear( hb_itemReturn( &retValue ) );
+
+                  hb_itemReturn( &retValue );
+
                   uiAction = E_DEFAULT;
                }
             }
          }
+
          hb_errRelease( pError );
       }
    }
@@ -1269,6 +1337,7 @@ HB_FUNC( __MVPUT )
           */
          hb_memvarCreateFromDynSymbol( hb_dynsymGet( pName->item.asString.value ), VS_PRIVATE, pValue );
       }
+
       hb_itemReturn( pValue );
    }
    else
@@ -1283,7 +1352,10 @@ HB_FUNC( __MVPUT )
       HB_ITEM_PTR pRetValue = hb_errRT_BASE_Subst( EG_ARG, 3010, NULL, NULL, 1, hb_paramError( 1 ) );
 
       if( pRetValue )
+      {
          hb_itemRelease( pRetValue );
+      }
+
       hb_itemReturn( pValue );
    }
 }
@@ -1542,11 +1614,15 @@ HB_FUNC( __MVRESTORE )
                   HB_DYNS_PTR pDynVar = hb_memvarFindSymbol( pName );
 
                   if( pDynVar )
+                  {
                      /* variable was declared somwhere - assign a new value */
                      hb_memvarSetValue( pDynVar->pSymbol, pItem );
+                  }
                   else
+                  {
                      /* attempt to assign a value to undeclared variable create the PRIVATE one */
                      hb_memvarCreateFromDynSymbol( hb_dynsymGet( pName->item.asString.value ), VS_PRIVATE, pItem );
+                  }
 
                   hb_itemReturn( pItem );
                }

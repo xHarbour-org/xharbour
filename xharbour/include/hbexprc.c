@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.14 2001/12/15 22:54:07 vszakats Exp $
+ * $Id: hbexprc.c,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -168,23 +168,19 @@ void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
              pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
          {
             iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
-         }
-         else
-         {
-            iIncrement = 0;
-         }
 
-         if( iIncrement && ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
-         {
-            if( bOpEq == HB_P_MINUS )
+            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
             {
-               iIncrement = -iIncrement;
+               if( bOpEq == HB_P_MINUS )
+               {
+                  iIncrement = -iIncrement;
+               }
+
+               hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
+               return;
             }
-
-            hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
-            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
-
-            return;
          }
       }
     #endif
@@ -258,24 +254,21 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
              pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
          {
             iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
-         }
-         else
-         {
-            iIncrement = 0;
-         }
 
-         if( iIncrement && ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
-         {
-            if( bOpEq == HB_P_MINUS )
+            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
             {
-               iIncrement = -iIncrement;
+               if( bOpEq == HB_P_MINUS )
+               {
+                  iIncrement = -iIncrement;
+               }
+
+               hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+
+               return;
             }
-
-            hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
-
-            return;
          }
       }
+
     #endif
 
       /* push old value */

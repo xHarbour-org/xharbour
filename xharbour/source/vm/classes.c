@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.5 2002/01/12 10:04:28 ronpinkas Exp $
+ * $Id: classes.c,v 1.6 2002/01/17 23:20:47 ronpinkas Exp $
  */
 
 /*
@@ -1548,8 +1548,9 @@ HB_FUNC( __CLSINST )
    pSelf = hb_clsInst( ( USHORT ) hb_parni( 1 ));
 
    if( pSelf )
+   {
       hb_itemRelease( hb_itemReturn( pSelf ) );
-
+   }
 }
 
 /*
@@ -1582,38 +1583,43 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
       pMeth = pClass->pMethods;
       for( uiAt = 0; uiAt < uiLimit; uiAt++, pMeth++ )
       {
-
          /* Init Classdata (inherited and not) if needed */
          if( pMeth->pInitValue )
          {
 
-          if( pMeth->pFunction == hb___msgGetClsData && !( pMeth->bClsDataInitiated ) )
-           {
-            HB_ITEM init;
-            PHB_ITEM pInit;
-
-            hb_itemInit( &init );
-            hb_arrayGet( pClass->pClassDatas, pMeth->uiData, &init );
-            if( init.type == HB_IT_NIL )
+            if( pMeth->pFunction == hb___msgGetClsData && !( pMeth->bClsDataInitiated ) )
             {
+               HB_ITEM init;
+               PHB_ITEM pInit;
 
-               if( HB_IS_ARRAY( pMeth->pInitValue ) )
-                pInit = hb_arrayClone( pMeth->pInitValue, NULL );
-               else
+               ( &init )->type = HB_IT_NIL;
+
+               hb_arrayGet( pClass->pClassDatas, pMeth->uiData, &init );
+
+               if( init.type == HB_IT_NIL )
                {
-                   pInit = hb_itemNew( NULL );
-                   hb_itemCopy( pInit, pMeth->pInitValue );
+                  if( HB_IS_ARRAY( pMeth->pInitValue ) )
+                  {
+                     pInit = hb_arrayClone( pMeth->pInitValue, NULL );
+                  }
+                  else
+                  {
+                     pInit = hb_itemNew( NULL );
+                     hb_itemCopy( pInit, pMeth->pInitValue );
+                  }
+
+                  hb_arraySet( pClass->pClassDatas, pMeth->uiData, pInit );
+                  hb_itemRelease( pInit );
+                  pMeth->bClsDataInitiated = 1;
                }
 
-               hb_arraySet( pClass->pClassDatas, pMeth->uiData, pInit );
-               hb_itemRelease(pInit);
-               pMeth->bClsDataInitiated = 1;
-
+               if( HB_IS_COMPLEX( &init ) )
+               {
+                  hb_itemClear( &init );
+               }
             }
-            hb_itemClear( &init );
-           }
-           else if( pMeth->pFunction == hb___msgGetData ) /* is a DATA but not herited */
-           {
+            else if( pMeth->pFunction == hb___msgGetData ) /* is a DATA but not herited */
+            {
                PHB_ITEM pInitValue ;
 
                if( HB_IS_ARRAY( pMeth->pInitValue ) )
@@ -1628,16 +1634,16 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
 
                hb_arraySet( pSelf, pMeth->uiData, pInitValue );
                hb_itemRelease( pInitValue );
-
-           }
-           else if( pMeth->pFunction == hb___msgGetShrData && !( pMeth->bClsDataInitiated ) )
-           {
+            }
+            else if( pMeth->pFunction == hb___msgGetShrData && !( pMeth->bClsDataInitiated ) )
+            {
                /* Init Shared Classdata as needed, we only need to init the first */
                /* not inherited classdata array where all shared will point to    */
                HB_ITEM init;
                PHB_ITEM pInit;
 
-               hb_itemInit( &init );
+               ( &init )->type = HB_IT_NIL;
+
                hb_arrayGet( pClass->pClassDatas, pMeth->uiData, &init );
                if( init.type == HB_IT_NIL )
                {
@@ -1652,11 +1658,15 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
 
 
                   hb_arraySet( pClass->pClassDatas, pMeth->uiData, pInit );
-                  hb_itemRelease(pInit);
+                  hb_itemRelease( pInit );
                   pMeth->bClsDataInitiated = 1;
                }
-               hb_itemClear( &init );
-           }
+
+               if( HB_IS_COMPLEX( &init ) )
+               {
+                  hb_itemClear( &init );
+               }
+            }
          }
       }
    }
@@ -1842,7 +1852,7 @@ HB_FUNC( __CLSINSTSUPER )
    if( hb_pcount() >= 1 )
    {
 
-      char * cString=hb_parc(1);
+      char *cString = hb_parc( 1 );
       PHB_DYNS pDynSym = hb_dynsymFind( cString );
 
       if( pDynSym )                             /* Find function            */
@@ -1853,7 +1863,7 @@ HB_FUNC( __CLSINSTSUPER )
          hb_vmPushNil();
          hb_vmFunction( 0 );                         /* Execute super class      */
 
-         if( HB_IS_OBJECT( &hb_stack.Return ) )
+         if( HB_IS_OBJECT( hb_stackItemFromTop( -1 ) ) )
          {
             for( uiClass = 0; ! bFound && uiClass < s_uiClasses; uiClass++ )
             {                                      /* Locate the entry         */
@@ -1865,17 +1875,21 @@ HB_FUNC( __CLSINSTSUPER )
             }
          }
          else
+         {
             hb_errRT_BASE( EG_ARG, 3002, "Super class does not return an object", "__CLSINSTSUPER", 0 );
+         }
       }
       else
+      {
          hb_errRT_BASE( EG_ARG, 3003, "Cannot find super class", "__CLSINSTSUPER", 0 );
+      }
    }
 
    if( ! bFound )
+   {
       hb_retni( 0 );
+   }
 }
-
-
 
 /*
  * <nSeq> = __cls_CntClsData( <hClass> )
@@ -2029,7 +2043,9 @@ HB_FUNC( __SENDER )
    }
 
    if( iLevel == 0 && oSender != NULL && oSender->type == HB_IT_OBJECT )
+   {
       hb_itemReturn( oSender );
+   }
 }
 
 /*
@@ -2240,20 +2256,23 @@ static HARBOUR hb___msgEvalInline( void )
    USHORT uiParam;
    USHORT uiPCount=hb_pcount();
 
-   hb_itemInit( &block );
+   ( &block )->type = HB_IT_NIL;
+
    hb_arrayGet( s_pClasses[ uiClass - 1 ].pInlines, s_pMethod->uiData, &block );
 
    hb_vmPushSymbol( &hb_symEval );
    hb_vmPush( &block );
-   hb_vmPush( hb_stackSelfItem() );                     /* Push self                */
+   hb_vmPush( hb_stackSelfItem() );            /* Push self                */
+
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
+   {
       hb_vmPush( hb_stackItemFromBase( uiParam ) );
+   }
 
    hb_vmDo( ( USHORT ) (uiPCount + 1 ) );     /* Self is also an argument */
 
-   hb_itemClear( &block );                       /* Release block            */
+   hb_codeblockDelete( &block );              /* Release block            */
 }
-
 
 /*
  * __msgEval()
@@ -2352,8 +2371,9 @@ static HARBOUR hb___msgSetClsData( void )
    PHB_ITEM pReturn = hb_stackItemFromBase( 1 );
 
    if( uiClass && uiClass <= s_uiClasses )
-      hb_arraySet( s_pClasses[ uiClass - 1 ].pClassDatas,
-                   s_pMethod->uiData, pReturn );
+   {
+      hb_arraySet( s_pClasses[ uiClass - 1 ].pClassDatas, s_pMethod->uiData, pReturn );
+   }
 
    hb_itemReturn( pReturn );
 }
@@ -2383,8 +2403,9 @@ static HARBOUR hb___msgSetShrData( void )
    PHB_ITEM pReturn = hb_stackItemFromBase( 1 );
 
    if( uiSprCls && uiSprCls <= s_uiClasses )
-      hb_arraySet( s_pClasses[ uiSprCls - 1 ].pClassDatas,
-                   s_pMethod->uiDataShared, pReturn );
+   {
+      hb_arraySet( s_pClasses[ uiSprCls - 1 ].pClassDatas, s_pMethod->uiDataShared, pReturn );
+   }
 
    hb_itemReturn( pReturn );
 }
@@ -2419,7 +2440,9 @@ static HARBOUR hb___msgSetData( void )
 
    /* will arise only if the class has been modified after first instance */
    if( uiIndex > ( USHORT ) hb_arrayLen( pObject ) ) /* Resize needed ? */
+   {
       hb_arraySize( pObject, uiIndex ); /* Make large enough */
+   }
 
    hb_arraySet( pObject, uiIndex, pReturn );
 

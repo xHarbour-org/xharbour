@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.14 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: hvm.c,v 1.15 2002/01/20 19:19:37 andijahja Exp $
  */
 
 /*
@@ -390,7 +390,12 @@ void HB_EXPORT hb_vmQuit( void )
 
    /* release all remaining items */
    hb_stackRemove( 0 );
-   hb_itemClear( &hb_stack.Return );
+
+   if( HB_IS_COMPLEX( &hb_stack.Return ) )
+   {
+      hb_itemClear( &hb_stack.Return );
+   }
+
    hb_arrayRelease( &s_aStatics );
    hb_memvarsRelease();    /* clear all PUBLIC variables */
 
@@ -592,10 +597,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             break;
 
          case HB_P_FUNCTION:
-            if( (&hb_stack.Return)->type )
-            {
-               hb_itemClear( &hb_stack.Return );
-            }
             hb_vmDo( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
             hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
             hb_stackPush();
@@ -603,10 +604,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             break;
 
          case HB_P_FUNCTIONSHORT:
-            if( (&hb_stack.Return)->type )
-            {
-               hb_itemClear( &hb_stack.Return );
-            }
             hb_vmDo( pCode[ w + 1 ] );
             hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
             hb_stackPush();
@@ -614,9 +611,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             break;
 
          case HB_P_SEND:
-            if( (&hb_stack.Return)->type )
+            if( HB_IS_COMPLEX( &hb_stack.Return ) )
             {
                hb_itemClear( &hb_stack.Return );
+            }
+            else
+            {
+               ( &hb_stack.Return )->type = HB_IT_NIL;
             }
 
             hb_vmSend( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
@@ -636,9 +637,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             break;
 
          case HB_P_SENDSHORT:
-            if( (&hb_stack.Return)->type )
+            if( HB_IS_COMPLEX( &hb_stack.Return ) )
             {
                hb_itemClear( &hb_stack.Return );
+            }
+            else
+            {
+               ( &hb_stack.Return )->type = HB_IT_NIL;
             }
 
             hb_vmSend( pCode[ w + 1 ] );
@@ -1098,6 +1103,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_LOCALNEARADDINT:
          {
             PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
+            short iAdd = ( short ) ( pCode[ w + 2 ] + ( pCode[ w + 3 ] * 256 ) );
             double dNewVal;
 
             if( HB_IS_BYREF( pLocal ) )
@@ -1107,14 +1113,25 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
             if( HB_IS_NUMERIC( pLocal ) )
             {
-               dNewVal = (double) ( pLocal->item.asInteger.value + ( short ) ( pCode[ w + 2 ] + ( pCode[ w + 3 ] * 256 ) ) );
+               if( pLocal->type & HB_IT_INTEGER )
+               {
+                  dNewVal = pLocal->item.asInteger.value + iAdd;
+               }
+               else if( pLocal->type & HB_IT_LONG )
+               {
+                  dNewVal = pLocal->item.asLong.value + iAdd;
+               }
+               else //if( pLocal->type & HB_IT_DOUBLE )
+               {
+                  dNewVal = pLocal->item.asDouble.value + iAdd;
+               }
             }
             else
             {
-               PHB_ITEM pStep = hb_itemPutNI( NULL, ( int ) ( ( short ) ( pCode[ w + 2 ] + ( pCode[ w + 3 ] * 256 ) ) ) );
-               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, pStep );
+               PHB_ITEM pAdd = hb_itemPutNI( NULL, ( int ) iAdd );
+               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, pAdd );
 
-               hb_itemRelease( pStep );
+               hb_itemRelease( pAdd );
 
                if( pResult )
                {
@@ -1157,9 +1174,76 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                pLocal = hb_itemUnRef( pLocal );
             }
 
-            hb_itemPutNI( pLocal, iNewVal );
+            if( HB_IS_COMPLEX( pLocal ) )
+            {
+               hb_itemClear( pLocal );
+            }
+            pLocal->type = HB_IT_INTEGER;
+            pLocal->item.asInteger.length = 10;
+            pLocal->item.asInteger.value = iNewVal;
 
             w += 4;
+            break;
+         }
+
+         case HB_P_LOCALNEARSETSTR:
+
+         case HB_P_ADDINT:
+         {
+            PHB_ITEM pTop = hb_stackItemFromTop( -1 );
+            short iAdd = ( short ) ( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
+            double dNewVal;
+
+            if( HB_IS_NUMERIC( pTop ) )
+            {
+               if( pTop->type & HB_IT_INTEGER )
+               {
+                  dNewVal = pTop->item.asInteger.value + iAdd;
+               }
+               else if( pTop->type & HB_IT_LONG )
+               {
+                  dNewVal = pTop->item.asLong.value + iAdd;
+               }
+               else //if( pTop->type & HB_IT_DOUBLE )
+               {
+                  dNewVal = pTop->item.asDouble.value + iAdd;
+               }
+            }
+            else
+            {
+               PHB_ITEM pAdd    = hb_itemPutNI( NULL, ( int ) iAdd );
+               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pTop, pAdd );
+
+               hb_itemRelease( pAdd );
+
+               if( pResult )
+               {
+                  hb_itemForwardValue( pTop, pResult );
+                  w += 3;
+                  break;
+               }
+            }
+
+            if( pTop->type & HB_IT_DOUBLE )
+            {
+               pTop->item.asDouble.value = dNewVal;
+            }
+            else if( SHRT_MIN <= dNewVal && dNewVal <= SHRT_MAX )
+            {
+               pTop->item.asInteger.value = ( int ) dNewVal;
+            }
+            else if( LONG_MIN <= dNewVal && dNewVal <= LONG_MAX )
+            {
+               pTop->item.asLong.value = ( long ) dNewVal;
+            }
+            else
+            {
+               pTop->item.asDouble.value = dNewVal;
+               pTop->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
+               pTop->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
+            }
+
+            w += 3;
             break;
          }
 
@@ -1296,12 +1380,27 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             /* Pops a value from the eval stack and uses it to set
              * a new value of the given field
              */
+         {
+            PHB_ITEM pTop;
+
             hb_rddPutFieldValue( ( hb_stackItemFromTop(-1) ), pSymbols + ( USHORT ) ( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) ) );
             hb_stackDec();
-            hb_itemClear( ( hb_stackTopItem() ) );
+
+            pTop = hb_stackTopItem();
+
+            if( HB_IS_COMPLEX( pTop ) )
+            {
+               hb_itemClear( pTop );
+            }
+            else
+            {
+               pTop->type = HB_IT_NIL;
+            }
+
             HB_TRACE(HB_TR_INFO, ("(hb_vmPopField)"));
             w += 3;
             break;
+         }
 
          case HB_P_POPLOCAL:
             hb_vmPopLocal( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
@@ -1319,17 +1418,34 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             break;
 
          case HB_P_POPMEMVAR:
+         {
+            PHB_ITEM pTop;
+
             hb_stackDec();
-            hb_memvarSetValue( pSymbols + ( USHORT ) ( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) ), ( hb_stackTopItem() ) );
-            hb_itemClear( ( hb_stackTopItem() ) );
+
+            pTop = hb_stackTopItem();
+
+            hb_memvarSetValue( pSymbols + ( USHORT ) ( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) ), pTop );
+
+            if( HB_IS_COMPLEX( pTop ) )
+            {
+               hb_itemClear( pTop );
+            }
+            else
+            {
+               pTop->type = HB_IT_NIL;
+            }
+
             HB_TRACE(HB_TR_INFO, ("(hb_vmPopMemvar)"));
             w += 3;
             break;
+         }
 
          case HB_P_POPVARIABLE:
          {
             USHORT uiParams;
             PHB_DYNS pDyn;
+            PHB_ITEM pTop;
 
             /* Pops a value from the eval stack and uses it to set
              * a new value of a variable of unknown type.
@@ -1352,8 +1468,20 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                if( hb_rddFieldPut( ( hb_stackItemFromTop(-1) ), pSymbols + uiParams ) == FAILURE )
                   hb_memvarSetValue( pSymbols + uiParams, ( hb_stackItemFromTop(-1) ) );
             }
+
             hb_stackDec();
-            hb_itemClear( ( hb_stackTopItem() ) );
+
+            pTop = hb_stackTopItem();
+
+            if( HB_IS_COMPLEX( pTop ) )
+            {
+               hb_itemClear( pTop );
+            }
+            else
+            {
+               pTop->type = HB_IT_NIL;
+            }
+
             HB_TRACE(HB_TR_INFO, ("(hb_vmPopVariable)"));
             w += 3;
             break;
@@ -1540,12 +1668,26 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_MPOPFIELD:
          {
             HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
+            PHB_ITEM pTop;
+
             /* Pops a value from the eval stack and uses it to set
             * a new value of the given field
             */
             hb_rddPutFieldValue( ( hb_stackItemFromTop(-1) ), ( *pDynSym )->pSymbol );
+
             hb_stackDec();
-            hb_itemClear( ( hb_stackTopItem() ) );
+
+            pTop = hb_stackTopItem();
+
+            if( HB_IS_COMPLEX( pTop ) )
+            {
+               hb_itemClear( pTop );
+            }
+            else
+            {
+               pTop->type = HB_IT_NIL;
+            }
+
             HB_TRACE(HB_TR_INFO, ("(hb_vmMPopField)"));
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
@@ -1554,9 +1696,23 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_MPOPMEMVAR:
          {
             HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
+            PHB_ITEM pTop;
+
             hb_stackDec();
-            hb_memvarSetValue( ( *pDynSym )->pSymbol, ( hb_stackTopItem() ) );
-            hb_itemClear( ( hb_stackTopItem() ) );
+
+            pTop = hb_stackTopItem();
+
+            hb_memvarSetValue( ( *pDynSym )->pSymbol, pTop );
+
+            if( HB_IS_COMPLEX( pTop ) )
+            {
+               hb_itemClear( pTop );
+            }
+            else
+            {
+               pTop->type = HB_IT_NIL;
+            }
+
             HB_TRACE(HB_TR_INFO, ("(hb_vmMPopMemvar)"));
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
@@ -1767,8 +1923,6 @@ static void hb_vmPlus( void )
    }
    else if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
-      HB_TRACE( HB_TR_DEBUG, ( "***hb_vmPlus( %p, %p) (%u)\"%s\" + (%u)\"%s\"", pItem1, pItem2, pItem1->item.asString.length, pItem1->item.asString.value, pItem2->item.asString.length, pItem2->item.asString.value ) );
-
       if( ( double ) ( ( double ) pItem1->item.asString.length + ( double ) pItem2->item.asString.length ) < ( double ) ULONG_MAX )
       {
          ULONG ulLen1     = pItem1->item.asString.length;
@@ -1778,7 +1932,6 @@ static void hb_vmPlus( void )
          hb_xmemcpy( pNewString, pItem1->item.asString.value, ulLen1 );
 
          hb_itemReleaseString( pItem1 );
-         HB_TRACE( HB_TR_DEBUG, ( "Released hb_vmPlus() Created \"%s\"", pNewString ) );
 
          hb_xmemcpy( pNewString + ulLen1, pItem2->item.asString.value, pItem2->item.asString.length );
 
@@ -1789,11 +1942,7 @@ static void hb_vmPlus( void )
          pItem1->item.asString.length  = ulNewLen;
          pItem1->item.asString.value[ ulNewLen ] = '\0';
 
-         HB_TRACE( HB_TR_DEBUG, ( "!!! hb_vmPlus() %u \"%s\"", pItem1->item.asString.length, pItem1->item.asString.value ) );
-
          hb_stackPop();
-
-         HB_TRACE( HB_TR_DEBUG, ( "--- hb_vmPlus() \"%s\" \"%s\"", pItem1->item.asString.value, hb_stackItemFromTop(-1)->item.asString.value ) );
       }
       else
       {
@@ -2761,12 +2910,13 @@ static void hb_vmArrayPush( void )
             */
             HB_ITEM item;
 
-            hb_itemInit( &item );
+            ( &item )->type = HB_IT_NIL;
+
             hb_arrayGet( pArray, ulIndex, &item );
+
             hb_stackPop();
 
-            hb_itemCopy( hb_stackItemFromTop( -1 ), &item );
-            hb_itemClear( &item );
+            hb_itemForwardValue( hb_stackItemFromTop( -1 ), &item );
          }
       }
       else
@@ -2932,7 +3082,6 @@ static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSy
    ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
    ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
 
-   hb_itemClear( &hb_stack.Return );       /* clear return value */
    hb_vmPush( &ItemMsg );
    hb_vmPush( pObjItem );                             /* Push object              */
    hb_vmPush( pMsgItem );                             /* Push argument            */
@@ -2946,8 +3095,7 @@ static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSy
     * NOTE: for performance reason we don't pop the second argument.
     * We can replace the second argument with the return value.
     */
-   hb_itemClear( pObjItem );
-   hb_itemCopy( pObjItem, &hb_stack.Return );
+   hb_itemForwardValue( pObjItem, &hb_stack.Return );
 }
 
 static void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
@@ -2963,7 +3111,15 @@ static void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
    ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
    ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
 
-   hb_itemClear( &hb_stack.Return );       /* clear return value */
+   if( HB_IS_COMPLEX( &hb_stack.Return ) )
+   {
+      hb_itemClear( &hb_stack.Return );       /* clear return value */
+   }
+   else
+   {
+      ( &hb_stack.Return )->type = HB_IT_NIL;
+   }
+
    hb_vmPush( &ItemMsg );
    hb_vmPush( pObjItem );                             /* Push object */
 
@@ -2973,8 +3129,7 @@ static void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
     * NOTE: for performance reason we don't pop it and we don't push the
     * return value. We can replace the last element with the new value.
     */
-   hb_itemClear( pObjItem );
-   hb_itemCopy( pObjItem, &hb_stack.Return );
+   hb_itemForwardValue( pObjItem, &hb_stack.Return );
 }
 
 /* ------------------------------- */
@@ -3032,8 +3187,12 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
 
             cAlias = hb_macroExpandString( pAlias->item.asString.value, pAlias->item.asString.length, &bNewString );
             bSuccess = hb_rddSelectWorkAreaAlias( cAlias );
+
             if( bNewString )
+            {
                hb_xfree( cAlias );
+            }
+
             hb_itemClear( pAlias );
          }
          break;
@@ -3041,14 +3200,29 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
       default:
          {
             PHB_ITEM pSubstVal = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, pAlias );
+
             if( pSubstVal )
+            {
                bSuccess = hb_vmSelectWorkarea( pSubstVal );
+            }
             else
+            {
                bSuccess = FAILURE;
-            hb_itemClear( pAlias );
+            }
+
+            if( HB_IS_COMPLEX( pAlias ) )
+            {
+               hb_itemClear( pAlias );
+            }
+            else
+            {
+               pAlias->type = HB_IT_NIL;
+            }
          }
+
          break;
    }
+
    return bSuccess;
 }
 
@@ -3099,7 +3273,9 @@ void hb_vmDo( USHORT uiParams )
    }
 
    if( bProfiler )
+   {
       ulClock = ( ULONG ) clock();
+   }
 
    hb_inkeyPoll();           /* Poll the console keyboard */
 
@@ -3117,13 +3293,17 @@ void hb_vmDo( USHORT uiParams )
       PHB_BASEARRAY pSelfBase = NULL;
 
       if( pSym == &( hb_symEval ) && HB_IS_BLOCK( pSelf ) )
+      {
          pFunc = pSym->pFunPtr;                 /* __EVAL method = function */
+      }
       else
       {
          pFunc = hb_objGetMethod( pSelf, pSym );
+
          if( HB_IS_OBJECT( pSelf ) )               /* Object passed            */
          {
             pSelfBase = pSelf->item.asArray.value;
+
             if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
             {
               PHB_ITEM pRealSelf;
@@ -3136,28 +3316,29 @@ void hb_vmDo( USHORT uiParams )
               uiClass=pSelfBase->uiClass;
 
               pRealSelf = hb_itemNew( NULL ) ;
-              hb_itemCopy(pRealSelf ,pSelf->item.asArray.value->pItems) ;  // hb_arrayGetItemPtr(pSelf,1) ;
+              hb_itemCopy( pRealSelf, pSelf->item.asArray.value->pItems );  // hb_arrayGetItemPtr(pSelf,1) ;
+
               /* and take back the good pSelfBase */
               pSelfBase = pRealSelf->item.asArray.value;
+
               /* Now I should exchnage it with the current stacked value */
               hb_itemSwap( pSelf, pRealSelf );
-              hb_itemRelease(pRealSelf) ; /* and release the fake one */
+              hb_itemRelease( pRealSelf ) ; /* and release the fake one */
 
               /* Push current SuperClass handle */
               lPopSuper = TRUE ;
 
               if ( ! pSelf->item.asArray.value->puiClsTree)
               {
-               pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
-               pSelf->item.asArray.value->puiClsTree[0]=0;
+                 pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
+                 pSelf->item.asArray.value->puiClsTree[0]=0;
               }
 
-              nPos=pSelfBase->puiClsTree[0]+1;
+              nPos = pSelfBase->puiClsTree[0] + 1;
               pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * ( nPos + 1 ) );
 
               pSelfBase->puiClsTree[0] = nPos ;
               pSelfBase->puiClsTree[ nPos ] = uiClass;
-
             }
          }
       }
@@ -3165,10 +3346,14 @@ void hb_vmDo( USHORT uiParams )
       if( pFunc )
       {
          if( bProfiler )
+         {
             pMethod = hb_mthRequested();
+         }
 
          if ( hb_bTracePrgCalls )
+         {
             HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
+         }
 
          pFunc();
 
@@ -3178,31 +3363,34 @@ void hb_vmDo( USHORT uiParams )
            USHORT nPos=pSelfBase->puiClsTree[0]-1;
            /* POP SuperClass handle */
 
-           if (nPos)
-            {
-             pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos + 1) );
-             pSelfBase->puiClsTree[0]=nPos;
-            }
+           if( nPos )
+           {
+              pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos + 1) );
+              pSelfBase->puiClsTree[0]=nPos;
+           }
            else
-            {
-             hb_xfree(pSelfBase->puiClsTree);
-             pSelfBase->puiClsTree = NULL ;
-            }
-
+           {
+              hb_xfree(pSelfBase->puiClsTree);
+              pSelfBase->puiClsTree = NULL ;
+           }
          }
 
          if( bProfiler )
+         {
             hb_mthAddTime( pMethod, clock() - ulClock );
+         }
       }
       else if( pSym->szName[ 0 ] == '_' )
       {
          PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
+
          hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, NULL, pSym->szName + 1, 1, pArgsArray );
          hb_itemRelease( pArgsArray );
       }
       else
       {
          PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
+
          hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, NULL, pSym->szName, 1, pArgsArray );
          hb_itemRelease( pArgsArray );
       }
@@ -3213,12 +3401,15 @@ void hb_vmDo( USHORT uiParams )
 
       if( pFunc )
       {
-         if( bProfiler && pSym->pDynSym ) {
+         if( bProfiler && pSym->pDynSym )
+         {
             pSym->pDynSym->ulRecurse++;
          }
 
          if ( hb_bTracePrgCalls )
+         {
             HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
+         }
 
          pFunc();
 
@@ -3227,12 +3418,14 @@ void hb_vmDo( USHORT uiParams )
             pSym->pDynSym->ulCalls++;                   /* profiler support */
 
             /* Time spent has to be added only inside topmost call of a recursive function */
-            if( pSym->pDynSym->ulRecurse == 1 ) {
+            if( pSym->pDynSym->ulRecurse == 1 )
+            {
                pSym->pDynSym->ulTime += clock() - ulClock; /* profiler support */
             }
          }
 
-         if( bProfiler && pSym->pDynSym ) {
+         if( bProfiler && pSym->pDynSym )
+         {
             pSym->pDynSym->ulRecurse--;
          }
       }
@@ -3242,6 +3435,7 @@ void hb_vmDo( USHORT uiParams )
           *  - generate unrecoverable runtime error
           */
          PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
+
          hb_errRT_BASE_SubstR( EG_NOFUNC, 1001, NULL, pSym->szName, 1, pArgsArray );
          hb_itemRelease( pArgsArray );
       }
@@ -3254,7 +3448,9 @@ void hb_vmDo( USHORT uiParams )
    HB_TRACE(HB_TR_DEBUG, ("Restored OldFrame hb_vmDo(%hu)", uiParams));
 
    if( s_bDebugging )
+   {
       hb_vmDebuggerEndProc();
+   }
 
    s_bDebugging = bDebugPrevState;
 }
@@ -3306,7 +3502,9 @@ void hb_vmSend( USHORT uiParams )
          }
 
          if ( hb_bTracePrgCalls )
+         {
             HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
+         }
 
          pFunc();
 
@@ -3320,7 +3518,8 @@ void hb_vmSend( USHORT uiParams )
             }
          }
 
-         if( bProfiler && pSym->pDynSym ) {
+         if( bProfiler && pSym->pDynSym )
+         {
             pSym->pDynSym->ulRecurse--;
          }
       }
@@ -3562,9 +3761,9 @@ void hb_vmFunction( USHORT uiParams )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmFunction(%hu)", uiParams));
 
-   hb_itemClear( &hb_stack.Return );
    hb_vmDo( uiParams );
-   hb_itemCopy( hb_stackTopItem(), &hb_stack.Return );
+
+   hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
    hb_stackPush();
 }
 
@@ -3634,7 +3833,17 @@ static void hb_vmFrame( BYTE bLocals, BYTE bParams )
 
    while( iExtra > 0 )
    {
-      hb_itemClear( hb_stackItemFromTop( -iExtra ) );
+      PHB_ITEM pExtra = hb_stackItemFromTop( -iExtra );
+
+      if( HB_IS_COMPLEX( pExtra ) )
+      {
+         hb_itemClear( pExtra );
+      }
+      else
+      {
+         pExtra->type = HB_IT_NIL;
+      }
+
       iExtra--;
    }
 
@@ -3696,8 +3905,9 @@ static void hb_vmDebuggerEndProc( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDebuggerEndProc()"));
 
-   hb_itemInit( &item );
-   hb_itemCopy( &item, &hb_stack.Return ); /* saves the previous returned value */
+   ( &item )->type = HB_IT_NIL;
+
+   hb_itemForwardValue( &item, &hb_stack.Return ); /* saves the previous returned value */
 
    s_bDebugShowLines = FALSE;
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
@@ -4466,11 +4676,6 @@ static void hb_vmPopLocal( SHORT iLocal )
        */
       hb_itemForwardValue( hb_codeblockGetVar( hb_stackSelfItem(), iLocal ), hb_stackTopItem() );
    }
-
-   /*-----------------1/3/2002 10:47PM-----------------
-    * Cleard in hb_itemAssign()
-    * --------------------------------------------------*/
-   /*hb_itemClear( ( hb_stackTopItem() ) );*/
 }
 
 static void hb_vmPopStatic( USHORT uiStatic )
@@ -4491,11 +4696,6 @@ static void hb_vmPopStatic( USHORT uiStatic )
    {
       hb_itemForwardValue( pStatic, hb_stackTopItem() );
    }
-
-   /*-----------------1/3/2002 10:47PM-----------------
-    * Cleard in hb_itemAssign()
-    * --------------------------------------------------*/
-   /*hb_itemClear( ( hb_stackTopItem() ) );*/
 }
 
 

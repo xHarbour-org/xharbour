@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.33 2002/01/20 19:21:33 andijahja Exp $
+ * $Id: ChangeLog,v 1.34 2002/01/20 20:55:49 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,51 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-21 01:00 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + Added #define HB_IS_COMPLEX() and #define HB_IS_SIMPLE().
+
+  * include/hbapiitm.h
+    - Removed unneeded hb_itemInit()
+
+  * source/vm/itemapi.c
+    - Removed unneeded hb_itemInit()
+    - #defed out hb_itemReturn()
+    ! Optimized calls to hb_itemClear()
+
+  * include/hbexprb.c
+  * include/hbexprc.c
+    * Minor improvments
+    + Added optimization for + HB_IT_INTEGER.
+
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+    + Added HB_P_ADDINT.
+
+  * source/vm/arrays.c
+    ! Optimized aDel, aIns, and aSize()
+
+  * source/vm/fastitem.c
+    + Added hb_itemReturn() utilizing hb_itemForwardValue()
+    ! Optimized calls to hb_itemClear()
+
+  * source/rtl/errorapi.c
+  * source/rtl/idle.c
+  * source/vm/asort.c
+  * source/vm/classes.c
+  * source/vm/estack.c
+  * source/vm/extend.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+    ! Optimized calls to hb_itemClear()
+
+  * tests/speed.prg
+  * tests/tstloop.prg
+    * More tests.
 
 2002-01-20 12:03 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/itemapi.c

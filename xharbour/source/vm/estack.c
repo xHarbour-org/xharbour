@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.4 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: estack.c,v 1.5 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -80,9 +80,13 @@ void hb_stackPop( void )
    if( --hb_stack.pPos < hb_stack.pItems )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
 
-   if( ( * hb_stack.pPos )->type != HB_IT_NIL )
+   if( HB_IS_COMPLEX( *hb_stack.pPos ) )
    {
-      hb_itemClear( * hb_stack.pPos );
+      hb_itemClear( *hb_stack.pPos );
+   }
+   else
+   {
+      ( *hb_stack.pPos )->type = HB_IT_NIL;
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.26 2001/12/15 22:54:07 vszakats Exp $
+ * $Id: hbexprb.c,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -2088,9 +2088,7 @@ static HB_EXPR_FUNC( hb_compExprUsePlusEq )
          break;
 
       case HB_EA_PUSH_PCODE:
-         {
-            HB_EXPR_PCODE2( hb_compExprPushOperEq, pSelf, HB_P_PLUS );
-         }
+         HB_EXPR_PCODE2( hb_compExprPushOperEq, pSelf, HB_P_PLUS );
          break;
 
       case HB_EA_POP_PCODE:
@@ -3111,6 +3109,27 @@ static HB_EXPR_FUNC( hb_compExprUsePlus )
          break;
       case HB_EA_PUSH_PCODE:
          {
+          #if defined( HB_MACRO_SUPPORT )
+
+            /* This optimization is not applicable in Macro Compiler. */
+
+          #else
+
+            short iIncrement;
+
+            if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
+                pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
+            {
+               iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+
+               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+               hb_compGenPCode3( HB_P_ADDINT, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+
+               break;
+            }
+
+          #endif
+
             HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_PUSH_PCODE );
             HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PLUS );

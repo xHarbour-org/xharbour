@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.82 2001/12/31 07:38:10 andijahja Exp $
+ * $Id: hbapi.h,v 1.5 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -104,6 +104,9 @@ extern "C" {
 #define HB_IS_SYMBOL( p )  HB_IS_OF_TYPE( p, HB_IT_SYMBOL )
 #define HB_IS_MEMVAR( p )  HB_IS_OF_TYPE( p, HB_IT_MEMVAR )
 #define HB_IS_POINTER( p ) HB_IS_OF_TYPE( p, HB_IT_POINTER )
+
+#define HB_IS_COMPLEX( p )  ( ( p )->type  && ( HB_IS_STRING( p ) || HB_IS_BLOCK( p ) || HB_IS_ARRAY( p ) || HB_IS_MEMVAR( p ) ) )
+#define HB_IS_SIMPLE( p ) ( ! HB_IS_COMPLEX( p ) )
 
 #define ISNIL( n )         ( hb_param( n, HB_IT_ANY ) == NULL || HB_IS_NIL( hb_param( n, HB_IT_ANY ) ) ) /* NOTE: Intentionally using a different method */
 #define ISCHAR( n )        ( hb_param( n, HB_IT_STRING ) != NULL )

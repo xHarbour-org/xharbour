@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.75 2001/12/15 11:22:28 vszakats Exp $
+ * $Id: hbpcode.c,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -172,6 +172,7 @@ static BYTE s_pcode_len[] = {
    4,        /* HB_P_LOCALNEARADDINT,      */
    4,        /* HB_P_LOCALNEARSETINT,      */
    0,        /* HB_P_LOCALNEARSETSTR,      */
+   3,        /* HB_P_ADDINT,               */
    3,        /* HB_P_LEFT,                 */
    3,        /* HB_P_RIGHT,                */
    5,        /* HB_P_SUBSTR,               */

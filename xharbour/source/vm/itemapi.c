@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.10 2002/01/20 19:17:45 andijahja Exp $
+ * $Id: itemapi.c,v 1.11 2002/01/20 20:55:51 ronpinkas Exp $
  */
 
 /*
@@ -463,6 +463,8 @@ void * hb_itemGetPtr( PHB_ITEM pItem )
       return NULL;
 }
 
+/* Defed out - using FastApi Version in source/vm/fastitem.c. */
+#if 0
 PHB_ITEM hb_itemReturn( PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_itemReturn(%p)", pItem));
@@ -474,6 +476,7 @@ PHB_ITEM hb_itemReturn( PHB_ITEM pItem )
 
    return pItem;
 }
+#endif
 
 /* Internal Item API. Use this with care. */
 
@@ -483,7 +486,10 @@ PHB_ITEM hb_itemPutDS( PHB_ITEM pItem, char * szDate )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -502,7 +508,10 @@ PHB_ITEM hb_itemPutD( PHB_ITEM pItem, long lYear, long lMonth, long lDay )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -521,7 +530,10 @@ PHB_ITEM hb_itemPutDL( PHB_ITEM pItem, long lJulian )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -540,7 +552,10 @@ PHB_ITEM hb_itemPutL( PHB_ITEM pItem, BOOL bValue )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -559,7 +574,10 @@ PHB_ITEM hb_itemPutND( PHB_ITEM pItem, double dNumber )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -580,7 +598,10 @@ PHB_ITEM hb_itemPutNI( PHB_ITEM pItem, int iNumber )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -600,7 +621,10 @@ PHB_ITEM hb_itemPutNL( PHB_ITEM pItem, long lNumber )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -640,7 +664,10 @@ PHB_ITEM hb_itemPutNDLen( PHB_ITEM pItem, double dNumber, int iWidth, int iDec )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -671,7 +698,10 @@ PHB_ITEM hb_itemPutNILen( PHB_ITEM pItem, int iNumber, int iWidth )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -696,7 +726,10 @@ PHB_ITEM hb_itemPutNLLen( PHB_ITEM pItem, long lNumber, int iWidth )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -721,7 +754,10 @@ PHB_ITEM hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
 
    if( pItem )
    {
-      hb_itemClear( pItem );
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
    }
    else
    {
@@ -828,18 +864,6 @@ char * hb_itemTypeStr( PHB_ITEM pItem )
 
 /* Internal API, not standard Clipper */
 
-void hb_itemInit( PHB_ITEM pItem )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemInit(%p)", pItem));
-
-   if( pItem )
-   {
-      pItem->type    = HB_IT_NIL;
-   }
-}
-
-/* Internal API, not standard Clipper */
-
 /* Defed out - using String Sharing Versions in source/vm/fastitem.c. */
 #if 0
 void hb_itemClear( PHB_ITEM pItem )
@@ -867,8 +891,6 @@ void hb_itemClear( PHB_ITEM pItem )
   }
 
   pItem->type    = HB_IT_NIL;
-
-  HB_TRACE(HB_TR_DEBUG, ( "DONE hb_itemClear(%p)", pItem ) );
 }
 
 void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )

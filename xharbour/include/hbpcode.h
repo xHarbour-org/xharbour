@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.19 2001/08/07 08:11:51 ronpinkas Exp $
+ * $Id: hbpcode.h,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -191,11 +191,12 @@ typedef enum
    HB_P_LOCALNEARADDINT,       /* 125 Add/Subtract specified int into specified local without using the stack. */
    HB_P_LOCALNEARSETINT,       /* 126 Set specified int into specified local without using the stack.*/
    HB_P_LOCALNEARSETSTR,       /* 127 Set specified string into specified local without using the stack.*/
-   HB_P_LEFT,                  /* 128 Optimized Left(). */
-   HB_P_RIGHT,                 /* 129 Optimized Right(). */
-   HB_P_SUBSTR,                /* 130 Optimized SubStr() */
+   HB_P_ADDINT,                /* 128 Add/Subtract specified int onto Stack Top value without extra push/pop. */
+   HB_P_LEFT,                  /* 129 Optimized Left(). */
+   HB_P_RIGHT,                 /* 130 Optimized Right(). */
+   HB_P_SUBSTR,                /* 131 Optimized SubStr() */
 /* NOTE: This have to be the last definition */
-   HB_P_LAST_PCODE             /* 126 this defines the number of defined pcodes */
+   HB_P_LAST_PCODE             /* 132 this defines the number of defined pcodes */
 } HB_PCODE;
 
 #endif /* HB_PCODE_H_ */

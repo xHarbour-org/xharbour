@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.22 2001/11/04 17:35:56 vszakats Exp $
+ * $Id: idle.c,v 1.1.1.1 2001/12/21 10:41:36 ronpinkas Exp $
  */
 
 /*
@@ -75,7 +75,7 @@
    #include <time.h>
 #endif
 
-/* list of background tasks 
+/* list of background tasks
  * A pointer into an array of pointers to items with a codeblock
 */
 static HB_ITEM_PTR * s_pIdleTasks = NULL;
@@ -266,7 +266,7 @@ HB_FUNC( HB_IDLEDEL )
          pItem = s_pIdleTasks[ iTask ];
          if( ulID == ( ULONG ) pItem->item.asBlock.value )
          {
-             hb_itemClear( hb_itemReturn( pItem ) ); /* return a codeblock */
+             hb_itemReturn( pItem ); /* return a codeblock */
 
              --s_uiIdleMaxTask;
              if( s_uiIdleMaxTask )

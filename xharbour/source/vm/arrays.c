@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.4 2002/01/12 10:04:28 ronpinkas Exp $
+ * $Id: arrays.c,v 1.5 2002/01/17 23:20:47 ronpinkas Exp $
  */
 
 /*
@@ -83,8 +83,10 @@ BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayNew(%p, %lu)", pItem, ulLen));
 
-   hb_itemClear( pItem );
-
+   if( HB_IS_COMPLEX( pItem ) )
+   {
+      hb_itemClear( pItem );
+   }
    pItem->type = HB_IT_ARRAY;
 
    if( ulLen > 0 )
@@ -170,7 +172,9 @@ BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
             pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( ulLen * sizeof( HB_ITEM ) );
 
             for( ulPos = 0; ulPos < ulLen; ulPos++ )
+            {
                ( pBaseArray->pItems + ulPos )->type = HB_IT_NIL;
+            }
          }
          else
          {
@@ -180,14 +184,23 @@ BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
 
                /* set value for new items */
                for( ulPos = pBaseArray->ulLen; ulPos < ulLen; ulPos++ )
+               {
                   ( pBaseArray->pItems + ulPos )->type = HB_IT_NIL;
+               }
             }
             else if( pBaseArray->ulLen > ulLen )
             {
                /* release old items */
                for( ulPos = ulLen; ulPos < pBaseArray->ulLen; ulPos++ )
                {
-                  hb_itemClear( pBaseArray->pItems + ulPos );
+                  if( HB_IS_COMPLEX( pBaseArray->pItems + ulPos ) )
+                  {
+                     hb_itemClear( pBaseArray->pItems + ulPos );
+                  }
+                  else
+                  {
+                     ( pBaseArray->pItems + ulPos )->type = HB_IT_NIL;
+                  }
                }
 
                if( ulLen == 0 )
@@ -208,7 +221,9 @@ BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
       return TRUE;
    }
    else
+   {
       return FALSE;
+   }
 }
 
 BOOL hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
@@ -223,20 +238,27 @@ BOOL hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
       {
          PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
 
-         hb_itemClear( pBaseArray->pItems + ( ulIndex - 1 ) );
-
          for( ulIndex--; ulIndex < ulLen - 1; ulIndex++ )       /* move items */
          {
-            hb_itemCopy( pBaseArray->pItems + ulIndex, pBaseArray->pItems + ( ulIndex + 1 ) );
+            hb_itemForwardValue( pBaseArray->pItems + ulIndex, pBaseArray->pItems + ( ulIndex + 1 ) );
          }
 
-         hb_itemClear( pBaseArray->pItems + ( ulLen - 1 ) );
+         if( HB_IS_COMPLEX( pBaseArray->pItems + ( ulLen - 1 ) ) )
+         {
+            hb_itemClear( pBaseArray->pItems + ( ulLen - 1 ) );
+         }
+         else
+         {
+            ( pBaseArray->pItems + ( ulLen - 1 ) )->type = HB_IT_NIL;
+         }
       }
 
       return TRUE;
    }
    else
+   {
       return FALSE;
+   }
 }
 
 BOOL hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
@@ -251,12 +273,19 @@ BOOL hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
       {
          PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
 
-         hb_itemClear( pBaseArray->pItems + ( ulLen - 1 ) );
-
          for( ulLen--; ulLen >= ulIndex; ulLen-- )          /* move items */
-            hb_itemCopy( pBaseArray->pItems + ulLen, pBaseArray->pItems + ( ulLen - 1 ) );
+         {
+            hb_itemForwardValue( pBaseArray->pItems + ulLen, pBaseArray->pItems + ( ulLen - 1 ) );
+         }
 
-         hb_itemClear( pBaseArray->pItems + ulLen );
+         if( HB_IS_COMPLEX( pBaseArray->pItems + ulLen ) )
+         {
+            hb_itemClear( pBaseArray->pItems + ulLen );
+         }
+         else
+         {
+            ( pBaseArray->pItems + ulLen )->type = HB_IT_NIL;
+         }
       }
 
       return TRUE;
@@ -285,13 +314,22 @@ BOOL hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       hb_itemCopy( pItem, pArray->item.asArray.value->pItems + ( ulIndex - 1 ) );
+
       return TRUE;
    }
    else
    {
-      hb_itemClear( pItem );
-      return FALSE;
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+      else
+      {
+         pItem->type = HB_IT_NIL;
+      }
    }
+
+   return FALSE;
 }
 
 char * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
@@ -429,15 +467,32 @@ BOOL hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
    if( HB_IS_ARRAY( pArray ) )
    {
       if( pArray->item.asArray.value->ulLen > 0 )
-         hb_itemCopy( pResult, pArray->item.asArray.value->pItems +
-                             ( pArray->item.asArray.value->ulLen - 1 ) );
+      {
+         hb_itemCopy( pResult, pArray->item.asArray.value->pItems + ( pArray->item.asArray.value->ulLen - 1 ) );
+      }
       else
-         hb_itemClear( pResult );
+      {
+         if( HB_IS_COMPLEX( pResult ) )
+         {
+            hb_itemClear( pResult );
+         }
+         else
+         {
+            pResult->type = HB_IT_NIL;
+         }
+      }
 
       return TRUE;
    }
 
-   hb_itemClear( pResult );
+   if( HB_IS_COMPLEX( pResult ) )
+   {
+      hb_itemClear( pResult );
+   }
+   else
+   {
+      pResult->type = HB_IT_NIL;
+   }
 
    return FALSE;
 }
@@ -662,7 +717,10 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
              * allocated by the GC, its just a portion of the
              * pItems chunk, which will be released as one piece.
              * --------------------------------------------------*/
-             hb_itemClear( pItem );
+            if( HB_IS_COMPLEX( pItem ) )
+            {
+               hb_itemClear( pItem );
+            }
 
             ++pItem;
          }
@@ -1000,7 +1058,10 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
            * allocated by the GC, its just a portion of the
            * pItems chunk, which will be released as one piece.
            * --------------------------------------------------*/
-          hb_itemClear( pItem );
+         if( HB_IS_COMPLEX( pItem ) )
+         {
+            hb_itemClear( pItem );
+         }
 
          ++pItem;
       }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.5 2002/01/12 10:04:27 ronpinkas Exp $
+ * $Id: hbapiitm.h,v 1.6 2002/01/17 23:20:47 ronpinkas Exp $
  */
 
 /*
@@ -91,7 +91,6 @@ extern long     hb_itemGetNL    ( PHB_ITEM pItem );
 extern void     hb_itemGetNLen  ( PHB_ITEM pItem, int * piWidth, int * piDec );
 extern void *   hb_itemGetPtr   ( PHB_ITEM pItem );
 extern PHB_ITEM hb_itemNew      ( PHB_ITEM pNull );
-extern void     hb_itemInit     ( PHB_ITEM pItem );
 extern USHORT   hb_itemPCount   ( void );
 extern PHB_ITEM hb_itemParam    ( USHORT uiParam );
 extern PHB_ITEM hb_itemPutC     ( PHB_ITEM pItem, char * szText );

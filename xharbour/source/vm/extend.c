@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.21 2001/12/29 20:56:11 lculik Exp $
+ * $Id: extend.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -106,7 +106,7 @@ PHB_ITEM  HB_EXPORT hb_paramError( int iParam )
 
    if( pParam == NULL )
    {
-      hb_itemClear( &s_NIL );
+      ( &s_NIL )->type = HB_IT_NIL;
       pParam = &s_NIL;
    }
 
@@ -485,7 +485,14 @@ void  HB_EXPORT hb_ret( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_ret()"));
 
-   hb_itemClear( &hb_stack.Return );
+   if( HB_IS_COMPLEX( &hb_stack.Return ) )
+   {
+      hb_itemClear( &hb_stack.Return );
+   }
+   else
+   {
+      ( &hb_stack.Return )->type = HB_IT_NIL;
+   }
 }
 
 void  HB_EXPORT hb_reta( ULONG ulLen )  /* undocumented hb_reta() */

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.102 2002/01/08 08:59:52 patrickmast Exp $
+ * $Id: genc.c,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -1843,6 +1843,20 @@ static HB_GENC_FUNC( hb_p_localnearsetint )
    return 4;
 }
 
+static HB_GENC_FUNC( hb_p_addint )
+{
+   fprintf( cargo->yyc, "\tHB_P_ADDINT, %i, %i,", pFunc->pCode[ lPCodePos + 1 ], pFunc->pCode[ lPCodePos + 2 ] );
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %i*/", ( short ) ( pFunc->pCode[ lPCodePos + 1 ] + pFunc->pCode[ lPCodePos + 2 ] * 256 ) );
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return 3;
+}
+
 static HB_GENC_FUNC( hb_p_localnearsetstr )
 {
 
@@ -2075,6 +2089,7 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_localnearaddint,
    hb_p_localnearsetint,
    hb_p_localnearsetstr,
+   hb_p_addint,
    hb_p_left,
    hb_p_right,
    hb_p_substr
