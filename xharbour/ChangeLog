@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2693 2004/03/31 03:36:46 druzus Exp $
+ * $Id: ChangeLog,v 1.2694 2004/03/31 04:39:55 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-31 11:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * Wvt_Paint() now receives no parameters. nTop,nLeft,nBottom,nRight are shifted to 
+      _s.rowStart, _s.rowStop, _s.colStart, _s.colStop. The necessary changes are
+      made to hb_wvt_gtWndProc() function. 
+    + Wvt_GetPaintRect() -> { nTop,nLeft,nBottom,nRight }
+      It can be called if the rectangle to repaint needs to be known in Wvt_Paint().
+
+      This enhancement has decreased the window refreshtime marginally.
+
 2004-03-31 16:52 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/gtwvt/gtwvt.c
     - remove debug printf() & some redundant commented code
