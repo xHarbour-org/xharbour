@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.11 2003/10/01 04:39:39 ronpinkas Exp $
+ * $Id: strcase.c,v 1.13 2003/10/07 12:41:50 paultucker Exp $
  */
 
 /*
@@ -117,6 +117,8 @@ HB_EXPORT char * hb_strUpperCopy( char * szText, ULONG ulLen )
       for( i = 0; i < ulLen; i++ )
          szCopy[ i ] = toupper( (unsigned char) szText[ i ] );
    szCopy[ i ] = '\0';
+
+   fprintf( stderr, "STRCUC %d %d %d %s\n", ulLen,i,strlen( szCopy ), szCopy );
 
    return szCopy;
 }
