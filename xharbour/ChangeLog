@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2530 2004/03/09 05:06:52 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2531 2004/03/09 10:06:44 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-09 08:21 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/rtl/dbdelim.prg
+    ! Fixed bug in APPEND FROM DELIMITED to import strings with """ and ","
+      inside strings, reported by Elaine Steinberg
+    * Optimized to use HB_FReadLine()
+
 2004-03-09 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/hvm.c     -> hb_vmRegisterGlobals()
   * source/vm/classes.c -> __CLSNEW()

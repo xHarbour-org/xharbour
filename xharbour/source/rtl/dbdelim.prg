@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.5 2003/02/22 23:40:41 mlombardo Exp $
+ * $Id: dbdelim.prg,v 1.6 2003/10/01 18:01:06 paultucker Exp $
  */
 
 /*
@@ -56,13 +56,17 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.5 2003/02/22 23:40:41 mlombardo Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.6 2003/10/01 18:01:06 paultucker Exp $" )
 
 #define AppendEOL( handle )       FWrite( handle, CHR( 13 ) + CHR( 10 ) )
 #define AppendEOF( handle )       FWrite( handle, CHR( 26 ) )
 #define AppendSep( handle, cSep ) FWrite( handle, cSep )
 
+#define UNIX_EOL        chr(10)
+#define WINDOWS_EOL     chr(13)+chr(10)
+
 PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
+
    local index, handle, lWriteSep, nStart, nCount, oErr
    local cSeparator := ",", cDelim := CHR( 34 )
    local Pos
@@ -77,6 +81,8 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
    local lcisonoeol
    local lNoTerm
    local aStruct
+   local nOptmLen := 0
+   local cLine
 
    // Process the delimiter argument.
    IF !EMPTY( cDelimArg )
@@ -210,60 +216,25 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
             // This simplifies the looping logic.
             bWhile := {||.T.}
          ENDIF
-         // ---------------------------------------
-         // Please fill with the other test here
-         // Marco Braida 2002
-         // marcobra@elart.it
-         // ---------------------------------------
 
          aStruct  := DBStruct()
          nFileLen := FSeek(handle,0,FS_END)
          nDimBuff := Min(nFileLen,nDimBuff)
          cByte    := Space(nDimBuff)
          FSeek(handle,0)
-         nPosLastEol := 0
-         Do While .not. lFineFile
-            fseek(handle,nPoslastEol,FS_SET)   // forward the pointer
-            // we must not go after the eof
-            lNoTerm := .F.
-            if nPosLastEol + nDimBuff > nFileLen
-               // change the buffer size
-               nDimBuff  := nFileLen-nPosLastEol
-               cByte     := Space(nDimBuff)
-               Lfinefile := .t.
-               lNoTerm   := Right(cByte,2) != cCharEol
-            Endif
-            // fill the buffer
-            cByte := Space(nDimBuff)
-            FRead(handle,@cByte,nDimBuff)
-            // we test the last position of the last eol +1 in this buffer
-            If Lfinefile .and. lNoTerm
-               cByte += cCharEol
-            Endif
 
-            nposfl := rat(cCharEol,cByte)
-            nPoslastEol += if( nposfl == 0, len(cByte) ,nposfl)+1
-            // do this if in the buffer there are eol char
-            lcisonoeol := .t.
+         Do While FSEEK( handle,0,FS_RELATIVE ) + 1 < nFileLen
 
-            Do While lcisonoeol
-               // the position of the first eol
-               nposfl:=at(cCharEol,cByte)
-               lcisonoeol:=(nPosfl>0)
-               if lcisonoeol
-                  // cut the row
-                  Pos := 1
-                  cont_r := Substr(cByte,Pos,nposfl-Pos)
-                  if !(len(cont_r) == 0 .and. Lfinefile)
-                     appendtodb(cont_r,cSeparator, aStruct)
-                  endif
-                  // skipping the line feed and now we are on a good char
-                  pos    := nposfl+2
-                  cont_r := ""
-                  // cut the row
-                  cByte:=Substr(cByte,Pos)
-               endif
-            enddo
+            HB_FReadLine( handle, @cLine, { WINDOWS_EOL, UNIX_EOL }, nOptmLen )
+
+            /* Next HB_FReadLine will be optimized */
+            nOptmLen := len( cLine ) + 1
+
+            If !Empty( cLine )
+               // Blank lines are not imported
+               AppendToDb( cLine, cSeparator, aStruct )
+            EndIf
+
          enddo
          FClose( handle )
       endif
@@ -290,26 +261,28 @@ STATIC FUNCTION ExportVar( handle, xField, cDelim )
 RETURN .T.
 
 
-STATIC FUNCTION appendtodb(row,cDelim,aStruct)
-local lenrow:=len(row)
-local aMyVal:={}
-local ii
-local npos, nPosNext
-local nDBFFields
-local cBuffer
-local vRes
+STATIC FUNCTION AppendToDb(cLine,cDelim,aStruct)
 
-   // if there is one field only there is no Delim and i put...
-   row  += cDelim
-   nPos := at(cDelim,row)
-   aadd( aMyval,Substr(row,1,nPos-1) )
+   local lenrow:=len(cLine)
+   local aMyVal:={}
+   local ii
+   local npos, nPosNext
+   local nDBFFields
+   local cBuffer
+   local vRes
+
+   // if there is one field and no Delim, this is added
+
+   cLine  += cDelim
+   nPos := atToken(cDelim,cLine)
+   aadd( aMyval,Substr(cLine,1,nPos-1) )
 
    do while .t.
-      nPosNext := at(cDelim,row,npos+2)
+      nPosNext := AtToken(cDelim,cLine,npos+2)
       if nPosNext = 0
          exit
       endif
-      aadd( aMyVal,Substr(row,npos+1,nPosnext-npos-1) )
+      aadd( aMyVal,Substr(cLine,npos+1,nPosnext-npos-1) )
       nPos := nPosnext
       if nPos > lenrow
          exit
@@ -320,7 +293,7 @@ local vRes
    append blank
 
    for ii := 1 to nDBFfields
-      cBuffer:=strtran(aMyval[ii],'"','')
+      cBuffer:=RemoveQuote(aMyval[ii])
       SWITCH aStruct[ ii,2 ]
          CASE "D"
             vRes := HB_STOD( cBuffer )
@@ -337,4 +310,40 @@ local vRes
 
       FIELDPUT(ii,vRes)
    next
+
 return .T.
+
+Static Function AtToken( cToken, cLine, nStart )
+
+   local nPos := 0, cChar, lOpenPair := .F., i
+
+   If nStart == NIL
+      nStart := 1
+   EndIf
+
+   For i = nStart to len( cLine )
+      cChar := cLine[i]
+      If cChar == '"'
+         lOpenPair := !lOpenPair
+      EndIf
+      If (!lOpenPair) .and. cChar == cToken
+         nPos := i
+         Exit
+      EndIf
+   Next
+
+Return nPos
+
+Static Function RemoveQuote( cStr )
+
+   // This function can be optimized!!
+
+   cStr := alltrim(cStr)
+   If SubStr(cStr,1,1) == '"'
+      cStr := SubStr(cStr,2)
+   EndIf
+   If SubStr(cStr,len(cStr),1) == '"'
+      cStr := SubStr(cStr,1,len(cStr)-1)
+   EndIf
+
+Return cStr
