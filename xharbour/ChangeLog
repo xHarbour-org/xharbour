@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.24 2002/01/08 18:33:44 andijahja Exp $
+ * $Id: ChangeLog,v 1.25 2002/01/08 19:13:26 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-10-01 22:10 GMT-3 Luiz Rafael Culik <culik@sl.conex.net>
+  * source/common/hbffind.c
+    * Now works properly on linux
+  * utils/hbmake/hbmake.prg
+    utils/hbmake/hbmutils.prg
+    * Some fixes for linux
+  * source/rtl/listbox.prg
+    * Some formatting
+  * source/rtl/direct.c
+    source/rtl/isprint.c
+    * Sync with harbour  
 2002-01-09 02:15:00 UTC+0700 Andi Jahja <andijahja@cbn.net.id>
    * include/hbapiitm.h
      ! remove declarations of fastitem.c functions and add include

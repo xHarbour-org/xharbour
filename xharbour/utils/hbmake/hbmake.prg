@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.5 2001/12/31 10:29:41 lculik Exp $
+ * $Id: hbmake.prg,v 1.46 2002/01/06 11:24:18 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -119,7 +119,6 @@ If Pcount() == 0
    ShowHelp()
    Return NIL
 Endif
-
 //__traceprgcalls(.t.)
 //Local oProfile := HBProfile():new()
 //   __setProfiler( .T. )
@@ -185,6 +184,7 @@ if lEditMode
 Return nil
 endif
 cls
+
 parsemakfi( cFile )
 If lPrint
    PrintMacros()
@@ -228,12 +228,11 @@ Local lCfgFound := .F.
 Local aTempCFiles := {}
 local lLinux:=at('linux',lower(os()))>0
 nHandle := FT_FUSE( cFile )
-? nhandle
 If nHandle < 0
    Return nil
 Endif
 cBuffer := Trim( Substr( ReadLN( @lEof ), 1 ) )
-? cbuffer
+
 Aadd( aDefines, { "HMAKEDIR",  GetMakeDir() } )
 If lBcc
    Aadd( aDefines, { "MAKEDIR", GetBccDir() } )
@@ -261,7 +260,7 @@ While !leof
   Endif
 
   cTemp := Trim( Substr( ReadLN( @lEof ), 1 ) )
-? CtEMP
+
   aTemp := listasArray2( Alltrim( cTemp ), "=" )
   If lmacrosec
      If Alltrim( Left( ctemp, 7 ) ) <> '!ifndef' .and. Alltrim( Left( ctemp, 6 ) ) <> "!endif" .and. Alltrim( Left( ctemp, 7 ) ) <> '!iffile' .and. Alltrim( Left( ctemp, 7 ) ) <> '!stdout' .and. Alltrim( Left( ctemp, 6 ) ) <> '!ifdef'
@@ -938,6 +937,7 @@ Local aLibs,aLibsin:={},aLibsout:={}
 local lExternalLib:=.f.
 Local cOldLib:=""
 Local cHtmlLib:=""
+local lLinux:=at('linux',lower(os()))>0
 
 nLinkHandle := Fcreate( cFile )
 WriteMakeFileHeader()
@@ -993,18 +993,18 @@ if !empty(cobjDir)
 endif
 amacros:=GetSourceDirMacros(lGcc,cos)
 if lLinux
-cObjDir:=alltrim(cObjDir)
-if !empty(cObjDir)
-cObjDir+='/'
-endif
-cTest:=cObjDir+'/'
+    cObjDir:=alltrim(cObjDir)
+    if !empty(cObjDir)
+        cObjDir+='/'
+    endif
+    cTest:=cObjDir
+    
 else
-cObjDir:=alltrim(cObjDir)
-if !empty(cObjDir)
-cObjDir+='\'
-endif
-
-cTest:=upper(cObjDir)+'\'
+    cObjDir:=alltrim(cObjDir)
+    if !empty(cObjDir)
+	cObjDir+='\'
+    endif
+    cTest:=upper(cObjDir)+'\'
 endif
 
 aeval(amacros,{|x,y|cItem:=substr(x[2],1,len(x[2])),if(at(citem,cTest)>0,(amacros[y,1]:='OBJ',amacros[y,2]:=cObjDir),)})
@@ -1624,8 +1624,8 @@ function fileisnewer(cFile,as)
 local nCount := 0
 IF !lextended
 For nCount:=1 to len(aPrgs)
-         adir := { cFile,, filedate( cFile ), filetime( cFile ), ;
-                   as[nCount], filedate( as[nCount] ), filetime( as[nCount] )}
+         adir := { cFile,, hbmake_filedate( cFile ), hbmake_filetime( cFile ), ;
+                   as[nCount], hbmake_filedate( as[nCount] ), hbmake_filetime( as[nCount] )}
          if empty( adir[ 7 ] )
             adir[ 2 ] := .t.
          else
@@ -1633,8 +1633,8 @@ For nCount:=1 to len(aPrgs)
          endif
 next
 else
-         adir := { cFile,, filedate( cFile ), filetime( cFile ), ;
-                   as, filedate( as ), filetime( as )}
+         adir := { cFile,, hbmake_filedate( cFile ), hbmake_filetime( cFile ), ;
+                   as, hbmake_filedate( as ), hbmake_filetime( as )}
          if empty( adir[ 7 ] )
             adir[ 2 ] := .t.
          else
@@ -2244,7 +2244,7 @@ Local cPath AS STRING := ''
 Local lFound AS LOGICAL := .f.
 Local cEnv  AS STRING 
 Local aEnv as Array of String
-
+local lLinux := at('linux',lower(os()))>0
 Local nPos
 if !lLinux .or. lOs2
    cEnv:= Gete( "PATH" )+";"+curdir()
@@ -2262,13 +2262,15 @@ else
       lFound:=.t.
       cPath='/etc/harbour.cfg'
    endif
-   if file('/usr/local/etc/harbour.cfg')
-      lFound:=.t.
-      cPath='/usr/local/etc/harbour.cfg'
+   if !lfound
+       if file('/usr/local/etc/harbour.cfg')
+          lFound:=.t.
+          cPath:='/usr/local/etc/harbour.cfg'
+       endif
    endif
 endif
 cCfg:=cPath
-?' findHarbourcfg',ccfg,lfound
+
 Return lFound
 
 function TestforPrg(cFile)
@@ -2422,7 +2424,7 @@ return cParam
 Function ShowHelp()
    Local cOs:=OS()
    ?? "Harbour Make Utility"
-   ? "Copyright 2000-2002 Luiz Rafael Culik <culik@sl.conex.net>"
+   ? "Copyright 2000,2001,2002 Luiz Rafael Culik <culik@sl.conex.net>"
    ? ""
    ? "Syntax:  hbmake cFile [options]"
    ? ""
