@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.37 2003/06/28 13:31:08 lculik Exp $
+ * $Id: dbcmd.c,v 1.38 2003/07/04 16:21:28 jonnymind Exp $
  */
 
 /*
@@ -1953,7 +1953,28 @@ HB_FUNC( DBSELECTAREA )
       {
          if( ( uiNewArea = hb_rddSelect( szAlias ) ) == 0 )
          {
-            hb_errRT_BASE( EG_NOALIAS, EDBCMD_NOALIAS, NULL, szAlias, 0 );
+            USHORT uiAction = E_RETRY;
+            HB_ITEM_PTR pError;
+
+            pError = hb_errRT_New( ES_ERROR, NULL, EG_NOALIAS, EDBCMD_NOALIAS,
+                                   NULL, szAlias, 0, EF_CANRETRY );
+
+            while( uiAction == E_RETRY )
+            {
+               uiAction = hb_errLaunch( pError );
+
+               if( uiAction == E_RETRY )
+               {
+                  if( ( uiNewArea = hb_rddSelect( szAlias ) ) == 0 )
+                  {
+                     uiNewArea = hb_rddSelect( szAlias );
+                     uiAction = E_DEFAULT;
+                  }
+               }
+            }
+
+            hb_errRelease( pError );
+            // hb_errRT_BASE( EG_NOALIAS, EDBCMD_NOALIAS, NULL, szAlias, 0 );
             return;
          }
       }
