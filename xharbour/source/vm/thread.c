@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.97 2003/08/03 02:47:42 jonnymind Exp $
+* $Id: thread.c,v 1.98 2003/08/16 01:55:48 jonnymind Exp $
 */
 
 /*
@@ -405,15 +405,13 @@ void hb_threadDestroyStack( HB_STACK *pStack )
          }
       }
    }
-   
-   printf( "TH:Before clearing return\n" );
+
    /* Eventually free the return value of the stack */
    if( HB_IS_COMPLEX( &(pStack->Return) ) )
    {
-      hb_itemClear( &(pStack->Return) );   
+      hb_itemClear( &(pStack->Return) );
    }
-  
-   printf( "TH:Before err\n" );
+
    /* Error handler is never allocated; it resides in the stack, or
       is owned by callers. */
    if( pStack->errorBlock && pStack->errorBlock->type != HB_IT_NIL )
@@ -424,7 +422,6 @@ void hb_threadDestroyStack( HB_STACK *pStack )
          hb_itemClear( pStack->errorBlock );
       }
    }
-   printf( "TH:Before pitems\n" );
    /* Free each element of the stack */
    for( i = 0; i < pStack->wItems; i++ )
    {
@@ -435,7 +432,6 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    hb_xfree( pStack->pItems );
 
    // releases this thread's memvars
-   printf( "TH:Before handlers\n" );
 
    if( pStack != &hb_stack )
    {
@@ -446,7 +442,6 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       // Main thread should have them removed before arriving here.
       hb_memvarsRelease( pStack );
    }
-   printf( "TH:Before memvars\n" );
 
    hb_memvarsFree( pStack );
 
@@ -1880,7 +1875,6 @@ void hb_threadInit( void )
 
 void hb_threadExit( void )
 {
-   printf( "TH:In threadexit stack\n" );
    hb_threadKillAll();
    hb_threadWaitAll();
 
