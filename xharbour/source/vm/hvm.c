@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.113 2002/10/07 15:17:18 ronpinkas Exp $
+ * $Id: hvm.c,v 1.114 2002/10/09 20:43:00 ronpinkas Exp $
  */
 
 /*
@@ -877,7 +877,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_itemForwardValue( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_stackItemFromTop( -1 ) );
             hb_stackPop();
 
-            if( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_ARRAY )
+            if( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_ARRAY && hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_STRING )
             {
                hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_itemPutNI( * hb_stack.pPos, 1 ) );
             }
@@ -3604,7 +3604,7 @@ static void hb_vmArrayPush( void )
       {
          if( pArray->item.asString.bStatic )
          {
-            pArray->item.asString.value   = hb_vm_acAscii[ (unsigned char) ( pArray->item.asString.value[lIndex] ) ];
+            pArray->item.asString.value = hb_vm_acAscii[ (unsigned char) ( pArray->item.asString.value[lIndex] ) ];
          }
          else
          {
@@ -3617,7 +3617,6 @@ static void hb_vmArrayPush( void )
          }
 
          pArray->item.asString.length  = 1;
-         //pArray->item.asString.bChar   = TRUE;
       }
       else if( bStrIndex )
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.24 2002/10/07 15:17:18 ronpinkas Exp $
+ * $Id: arrays.c,v 1.25 2002/10/09 20:42:59 ronpinkas Exp $
  */
 
 /*
@@ -75,6 +75,8 @@
 #include "hbapilng.h"
 #include "hbvm.h"
 #include "hbstack.h"
+
+extern char *hb_vm_acAscii[256];
 
 BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
 {
@@ -368,14 +370,14 @@ BOOL hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetByRef(%p, %lu, %p) Base: %p Items: %p", pArray, ulIndex, pItem, pArray->item.asArray.value, pArray->item.asArray.value->pItems));
 
+   if( HB_IS_COMPLEX( pItem ) )
+   {
+      hb_itemClear( pItem );
+   }
+
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      //PHB_ITEM pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
-
-      if( HB_IS_COMPLEX( pItem ) )
-      {
-         hb_itemClear( pItem );
-      }
+      PHB_ITEM pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
 
       pItem->type = HB_IT_BYREF;
 
@@ -383,7 +385,6 @@ BOOL hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
       pItem->item.asRefer.offset = 0; // Because 0 will be translated as a STATIC in hb_itemUnref();
       pItem->item.asRefer.BasePtr.itemsbase = &( pArray->item.asArray.value->pItems );
 
-    #if IS_THIS_NEEDED
       if( pElement->type == HB_IT_STRING && pElement->item.asString.bStatic )
       {
          char *sString = (char*) hb_xgrab( pElement->item.asString.length + 1 );
@@ -395,21 +396,22 @@ BOOL hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
          pElement->item.asString.puiHolders = (USHORT *) hb_xgrab( sizeof( USHORT ) );
          *( pElement->item.asString.puiHolders ) = 1;
       }
-    #endif
 
       return TRUE;
    }
-   else
+   else if( HB_IS_STRING( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asString.length )
    {
-      if( HB_IS_COMPLEX( pItem ) )
-      {
-         hb_itemClear( pItem );
-      }
-      else
-      {
-         pItem->type = HB_IT_NIL;
-      }
+      unsigned char cChar = pArray->item.asString.value[ ulIndex - 1 ];
+
+      pItem->type = HB_IT_STRING;
+      pItem->item.asString.value   = hb_vm_acAscii[ cChar ];
+      pItem->item.asString.bStatic = TRUE;
+      pItem->item.asString.length  = 1;
+
+      return TRUE;
    }
+
+   pItem->type = HB_IT_NIL;
 
    return FALSE;
 }
