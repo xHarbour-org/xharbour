@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.751 2003/02/21 12:17:14 iananderson Exp $
+ * $Id: ChangeLog,v 1.752 2003/02/21 15:08:02 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-21 16:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/thread.c
+    ! Some thread unsafe operation have been guarded with mutex
+    * Using CREATE_SUSPENDED to mangle with thread context under 
+      windows.
+  * source/vm/inet.c
+  * source/vm/hvm.c
+    ! warning removal
 
 2003-02-21 12:02 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   ! make_b32.bat

@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.15 2003/02/13 01:22:35 jonnymind Exp $
+* $Id: inet.c,v 1.16 2003/02/14 10:58:07 paultucker Exp $
 */
 
 /*
@@ -11,18 +11,18 @@
 *                Marcelo Lombardo [marcelo.lombardo@newage-software.com.br]
 * www - http://www.xharbour.org
 *
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
+* this program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
-* This program is distributed in the hope that it will be useful,
+* this program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
+* MERCHANTABILITY or FITNESS for A PARTICULAR PURPOSE.  See the
+* GNU General public License for more details.
 *
-* You should have received a copy of the GNU General Public License
-* along with this software; see the file COPYING.  If not, write to
+* You should have received a copy of the GNU General public License
+* along with this software; see the file COPYING.  if not, write to
 * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
 *
@@ -31,23 +31,23 @@
 *
 * The exception is that, if you link the xHarbour libraries with other
 * files to produce an executable, this does not by itself cause the
-* resulting executable to be covered by the GNU General Public License.
+* resulting executable to be covered by the GNU General public License.
 * Your use of that executable is in no way restricted on account of
 * linking the xHarbour library code into it.
 *
-* This exception does not however invalidate any other reasons why
-* the executable file might be covered by the GNU General Public License.
+* this exception does not however invalidate any other reasons why
+* the executable file might be covered by the GNU General public License.
 *
-* This exception applies only to the code released with this xHarbour
-* explicit exception.  If you add/copy code from other sources,
-* as the General Public License permits, the above exception does
+* this exception applies only to the code released with this xHarbour
+* explicit exception.  if you add/copy code from other sources,
+* as the General public License permits, the above exception does
 * not apply to the code that you add in this way.  To avoid misleading
 * anyone as to the status of such modified files, you must delete
 * this exception notice from them.
 *
-* If you write modifications of your own for xHarbour, it is your choice
+* if you write modifications of your own for xHarbour, it is your choice
 * whether to permit this exception to apply to your modifications.
-* If you do not wish that, delete this exception notice.
+* if you do not wish that, delete this exception notice.
 *
 */
 #include "hbapi.h"
@@ -685,7 +685,6 @@ HB_FUNC( INETRECVALL )
    {
       iBufferLen = HB_SENDRECV_BUFFER_SIZE > iMax-iReceived ? iMax-iReceived : HB_SENDRECV_BUFFER_SIZE;
 
-      iLen = 0;
       if( hb_selectReadSocket( Socket ) )
       {
          iLen = recv( Socket->com, Buffer + iReceived, iBufferLen, MSG_NOSIGNAL );
@@ -1402,7 +1401,7 @@ HB_FUNC( INETACCEPT )
 
    /*
    * Accept can (and should) be asynchronously stopped by closing the
-   * accepting socket. This will make the wait to terminate, and the
+   * accepting socket. this will make the wait to terminate, and the
    * calling program will be notivfied through the status of the
    * returned socket.
    */
