@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.h,v 1.5 2004/01/28 04:14:34 maurifull Exp $
+ * $Id: ssf.h,v 1.6 2004/01/30 17:05:07 maurifull Exp $
  */
 
 /*
@@ -133,6 +133,8 @@
 #define AL_KEY_F12 KEY_F12
 #define al_desktop_color_depth desktop_color_depth
 #define al_set_color_depth set_color_depth
+#define al_bitmap_color_depth bitmap_color_depth
+#define al_get_desktop_resolution get_desktop_resolution
 #define al_install_timer install_timer
 #define al_screen screen
 #define al_set_gfx_mode set_gfx_mode
@@ -173,6 +175,7 @@
 #define al_draw_circle_fill circlefill
 #define al_draw_triangle triangle
 #define al_blit blit
+#define al_clear_to_color clear_to_color
 #endif
 
 typedef enum {
@@ -196,7 +199,8 @@ typedef enum {
 
 typedef struct _ssfFrame {
     char ftype;
-    unsigned short left, top, right, bottom, thick, thickdir;
+    unsigned short left, top, right, bottom, thick;
+    unsigned char thickdir;
 } ssfFrame;
 
 typedef struct _ssfGlyph {

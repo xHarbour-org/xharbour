@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.9 2004/01/30 02:29:48 maurifull Exp $
+ * $Id: gtalleg.c,v 1.10 2004/01/30 17:05:07 maurifull Exp $
  */
 
 /*
@@ -62,12 +62,14 @@
 #include "hbset.h"
 #include "hbvm.h"
 #include "inkey.ch"
+#include "gtinfo.ch"
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 static int s_iMsButtons, s_iMSBoundTop, s_iMSBoundLeft, s_iMSBoundBottom, s_iMSBoundRight;
 static int s_iMSX, s_iMSY;
 static BYTE s_byMSButtons;
 static USHORT s_usScrWidth = 80, s_usScrHeight = 25;
+static USHORT s_usGFXWidth = 0, s_usGFXHeight = 0;
 static USHORT s_usUpdTop, s_usUpdLeft, s_usUpdBottom, s_usUpdRight;
 static USHORT s_usDispCount, s_usCursorStyle;
 static SHORT s_sCurCol, s_sCurRow;
@@ -75,6 +77,7 @@ static BYTE * s_pbyScrBuffer = NULL;
 static int s_pClr[16];
 static BYTE s_byFontSize = 16, s_byFontWidth = 8;
 static AL_BITMAP *bmp;
+BOOL lClearInit = TRUE;
 
 static void hb_gt_DoCursor( void );
 
@@ -231,9 +234,10 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
    if ( iRet > 0 )
    {
       al_set_color_depth(iRet);
-   } else
-   {
-      al_set_color_depth(16);
+//  setting depth to 16 defaults to a 320x200x8bpp under DOS if no matching mode :(
+//   } else
+//   {
+//      al_set_color_depth(16);
    }
 }
 
@@ -961,14 +965,24 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
 
    if ( s_pbyScrBuffer != NULL )
    {
-      hb_xfree( s_pbyScrBuffer );
-      s_pbyScrBuffer = NULL;
+      if ( lClearInit )
+      {
+         hb_xfree( s_pbyScrBuffer );
+         s_pbyScrBuffer = NULL;
+      }
       al_destroy_bitmap(bmp);
       lPrev = TRUE;
    }
 
-   iWidth = s_byFontWidth * usCols;
-   iHeight = s_byFontSize * usRows;
+   if ( ( s_usGFXWidth != 0 ) && ( s_usGFXHeight != 0 ) )
+   {
+     iWidth = (int) s_usGFXWidth;
+     iHeight = (int) s_usGFXHeight;
+   } else
+   {
+     iWidth = s_byFontWidth * usCols;
+     iHeight = s_byFontSize * usRows;
+   }
    if ( usRows > 11 && usCols > 23 && usRows < 129 && usCols < 257 )
    {
 #if defined(AL_GFX_XWINDOWS)
@@ -1071,12 +1085,12 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       // NOW: Calculate proper font size
       // eg: Linux vesafb (doesn't support mode switching)
       //     or for DOS, we'll mostly request unavailable resolutions
-      if ( AL_SCREEN_W > s_byFontWidth * s_usScrWidth )
+      if ( AL_SCREEN_W != s_byFontWidth * s_usScrWidth )
       {
          ixFP = (BYTE) (AL_SCREEN_W / s_usScrWidth) * 2;
       }
 
-      if ( AL_SCREEN_H > s_byFontSize * s_usScrHeight )
+      if ( AL_SCREEN_H != s_byFontSize * s_usScrHeight )
       {
          iyFP = (BYTE) (AL_SCREEN_H / s_usScrHeight);
          if ( iyFP % 2 == 1 )
@@ -1126,9 +1140,16 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       s_pClr[14] = al_make_color(0xFF, 0xFF, 0x55);  // yellow
       s_pClr[15] = al_make_color(0xFF, 0xFF, 0xFF);  // bright white
 
-      s_pbyScrBuffer = (BYTE *) hb_xgrab( s_usScrWidth * s_usScrHeight * 2 );
-      memset( s_pbyScrBuffer, 0, s_usScrWidth * s_usScrHeight * 2 );
       bmp = al_create_system_bitmap(AL_SCREEN_W, AL_SCREEN_H);
+      if ( lClearInit )
+      {
+         s_pbyScrBuffer = (BYTE *) hb_xgrab( s_usScrWidth * s_usScrHeight * 2 );
+         memset( s_pbyScrBuffer, 0, s_usScrWidth * s_usScrHeight * 2 );
+      } else
+      {
+         al_clear_to_color( bmp, s_pClr[s_pbyScrBuffer[1] >> 4] );
+         al_clear_to_color( al_screen, s_pClr[s_pbyScrBuffer[1] >> 4] );
+      }
 
       if ( bmp == NULL )
       {
@@ -1146,6 +1167,18 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       hb_gt_DoCursor();  // show initial cursor
     }
 
+    if ( !lClearInit )
+    {
+       s_usUpdTop = 0;
+       s_usUpdLeft = 0;
+       s_usUpdBottom = s_usScrHeight - 1;
+       s_usUpdRight = s_usScrWidth - 1;
+       HB_GT_FUNC(gt_ScreenUpdate());
+    }
+
+    lClearInit = TRUE;
+    s_usGFXWidth = 0;
+    s_usGFXHeight = 0;
     return lMode;
 }
 
@@ -1721,3 +1754,75 @@ int _mangled_main( int argc, char * argv[] )
    return hb_vmQuit();
 }
 void *_mangled_main_address = _mangled_main;
+
+/*
+ * GTInfo() implementation
+ *
+ */
+HB_FUNC( GTINFO )
+{
+   int iWidth, iHeight;
+   int iInfo = hb_itemGetNI( hb_param( 1, HB_IT_NUMERIC ) );
+
+   switch ( iInfo )
+   {
+      case GTI_ISGRAPHIC:
+         hb_retl( TRUE );
+	 break;
+      case GTI_SCREENWIDTH:
+         hb_retni( AL_SCREEN_W );
+	 iWidth = hb_itemGetNI( hb_param( 2, HB_IT_NUMERIC ) );
+	 if ( iWidth > 0 )
+	 {
+	    s_usGFXWidth = (USHORT) iWidth;
+//            lClearInit = ( s_pbyScrBuffer == NULL );
+//            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+	 }
+	 break;
+      case GTI_SCREENHEIGHT:
+         hb_retni( AL_SCREEN_H );
+	 iHeight = hb_itemGetNI( hb_param( 2, HB_IT_NUMERIC ) );
+	 if ( iHeight > 0 )
+	 {
+	    s_usGFXHeight = (USHORT) iHeight;
+	    lClearInit = ( s_pbyScrBuffer == NULL );
+            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+	 }
+	 break;
+      case GTI_SCREENDEPTH:
+         hb_retni( al_bitmap_color_depth( al_screen ) );
+	 int iDepth = hb_itemGetNI( hb_param( 2, HB_IT_NUMERIC ) );
+	 if ( ( iDepth == 8 ) || ( iDepth == 15 ) || ( iDepth == 16 ) || ( iDepth == 24 ) || ( iDepth == 32 ) )
+	 {
+	    al_set_color_depth( iDepth );
+	    lClearInit = ( s_pbyScrBuffer == NULL );
+            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+	 }
+	 break;
+      case GTI_FONTSIZE:
+         hb_retni( s_byFontSize );
+	 int iSize = hb_itemGetNI( hb_param( 2, HB_IT_NUMERIC ) );
+	 if ( iSize > 0 && iSize < 256 )
+	 {
+	    s_byFontSize = (char) iSize;
+	    s_byFontWidth = s_byFontSize / 2;
+	    lClearInit = ( s_pbyScrBuffer == NULL );
+            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+	 }
+	 break;
+      case GTI_FONTWIDTH:
+         hb_retni( s_byFontWidth );
+	 break;
+      case GTI_DESKTOPWIDTH:
+	 al_get_desktop_resolution( &iWidth, &iHeight );
+         hb_retni( iWidth );
+	 break;
+      case GTI_DESKTOPHEIGHT:
+	 al_get_desktop_resolution( &iWidth, &iHeight );
+         hb_retni( iHeight );
+	 break;
+      case GTI_DESKTOPDEPTH:
+         hb_retni( al_desktop_color_depth() );
+	 break;
+   }
+}
