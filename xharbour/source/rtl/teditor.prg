@@ -28,7 +28,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.32 2004/04/22 07:38:17 vouchcac Exp $
+/* $Id: teditor.prg,v 1.33 2004/04/22 12:01:37 likewolf Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -155,6 +155,7 @@ CLASS HBEditor
    METHOD  GotoCol( nCol )                                  // Put line nCol at cursor position
    METHOD  GotoPos( nRow, nCol, lForceRefresh )
    METHOD  GetText()                                        // Returns aText as a string ( for MemoEdit() )
+   METHOD  GetTextIndex()                                   // Return current cursor position in text.
 
    METHOD  RefreshWindow()                                  // Redraw a window
    METHOD  RefreshLine()                                    // Redraw a line
@@ -1664,6 +1665,27 @@ METHOD GetText() CLASS HBEditor
    cString += ::aText[ ::naTextLen ]:cText
 
 return cString
+
+METHOD GetTextIndex() CLASS HBEditor
+   LOCAL nPos := 0
+   LOCAL oItem, nCount
+   LOCAL nEol := Len(HB_OSNewLine())
+
+   // Using outer IF strategy to be more fast
+   IF ::lWordWrap
+      FOR nCount := 1 TO ::nRow - 1
+         oItem := ::aText[ nCount ]
+         nPos += iif( oItem:lSoftCR, 0 , nEol ) + Len( oItem:cText )
+      NEXT
+   ELSE
+      FOR nCount := 1 TO ::nRow - 1
+         oItem := ::aText[ nCount ]
+         nPos += Len( oItem:cText ) + nEol
+      NEXT
+   ENDIF
+
+   nPos += ::nCol
+RETURN nPos
 
 //-------------------------------------------------------------------//
 

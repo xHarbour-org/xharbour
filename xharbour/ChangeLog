@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2841 2004/04/27 22:33:27 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2842 2004/04/28 09:59:12 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-28 16:20 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
+  * source/rtl/teditor.prg
+    + Added method GetTextIndex() to retreive current row/col meaning in
+      text position. The number returned is the character index inside
+      the text where the cursor is currently hanging (or was hanging when
+      callbacks function has been called).
 
 2004-04-28 02:55 UTC-0800 Brian Hays <bhays@abacuslaw.com>
 
