@@ -2459,7 +2459,9 @@
       #ifdef __XHARBOUR__
          #include "hbpcode.h"
 
-         //extern void OutputDebugValues( FILE *hFile, char *sFormat, ... );
+         #ifdef AX
+            extern void OutputDebugValues( FILE *hFile, char *sFormat, ... );
+         #endif
 
          typedef union
          {
@@ -2487,6 +2489,8 @@
             short int iID = hb_parni( 2 );
             PASM_CALL pDynFunc;
             PHB_DYNS pDynSym;
+
+            /*
             int i;
 
             for( i = 0; i < s_iDyn; i++ )
@@ -2497,6 +2501,7 @@
                   return;
                }
             }
+            */
 
             //OutputDebugValues( NULL, "Dyn: '%s'\n", sFunctionName );
 
@@ -2559,6 +2564,13 @@
 
             for( i = 0; i < s_iDyn; i++ )
             {
+               #if 0
+               OutputDebugValues( NULL, "Release #%i Dyn: '%s' %p, %p, %p\n", s_pDynList[i].iID, s_pDynList[i].pDyn->pSymbol->szName,
+                                 s_pDynList[i].pAsm,
+                                 s_pDynList[i].pcode,
+                                 s_pDynList[i].pDyn->pSymbol->pFunPtr );
+               #endif
+
                hb_xfree( (void *) ( s_pDynList[i].pAsm ) );
                hb_xfree( (void *) ( s_pDynList[i].pcode ) );
                hb_xfree( (void *) ( s_pDynList[i].pDyn->pSymbol->pFunPtr ) );
@@ -2566,6 +2578,7 @@
 
             if( s_iDyn )
             {
+               s_iDyn = 0;
                hb_xfree( (void *) s_pDynList );
             }
          }
