@@ -28,14 +28,12 @@ static tcolor
 static rcolor
 static tbrush
 static rbrush
-static lxLabels,lyLabels,lLegends,lCage,lxGrid,lyGrid,lTop3,lData,lReversed,lOutLine
+static lxLabels,lyLabels,lLegends,lCage,lxGrid,lyGrid,lTop3,lData,lReversed,lOutLine,nTest
 
 
 #DEFINE SHOWDEBUG
 #include "hbclass.ch"
 #Include "windows.ch"
-#include "wintypes.ch"
-#Include "cstruct.ch"
 #Include "commdlg.ch"
 #Include "WinLView.ch"
 #Include "debug.ch"
@@ -43,6 +41,8 @@ static lxLabels,lyLabels,lLegends,lCage,lxGrid,lyGrid,lTop3,lData,lReversed,lOut
 #Include "toolbar.ch"
 #Include "accel.ch"
 #INCLUDE "WinGdi.ch"
+#include "wintypes.ch"
+#Include "cstruct.ch"
 
 #define C_RED         RGB(255,0,0)
 #define C_DARKRED     RGB(128, 0, 0)
@@ -237,6 +237,18 @@ typedef struct tagCOLORSCHEME {;
     COLORREF clrBtnShadow;
 } COLORSCHEME
 
+typedef struct tagDRAWITEMSTRUCT {;
+    UINT  CtlType; 
+    UINT  CtlID; 
+    UINT  itemID; 
+    UINT  itemAction; 
+    UINT  itemState; 
+    HWND  hwndItem; 
+    HDC   hDC; 
+    RECT  rcItem; 
+    DWORD itemData; 
+} DRAWITEMSTRUCT
+  
 *-----------------------------------------------------------------------------*
 
 FUNCTION WinMain()
@@ -259,6 +271,7 @@ RddSetDefault( "DBFCDX" )
 AddFontResource("Digiface.TTF")
 
 wcText:lpszClassName := "TextView"
+
 RegisterClass( wcText)
 
 wcTB:lpszClassName := "TB"
@@ -271,17 +284,24 @@ hBrush:=CreatePatternBrush(hBmp)
 wcMain:hIcon         := hIcon
 wcMain:hbrBackground := hBrush
 wcMain:lpszClassName := "Demo"
+
+view 'oops'
+
 RegisterClass( wcMain,,{ | hWnd, nMsg, nwParam, nlParam | MainWndProc( hWnd, nMsg, nwParam, nlParam ) } , - 1 )
 DeleteObject(hBmp)
 
+view 'registered'
+
 hWnd := CreateWindow("Demo","WHAT32 (Windows & Harbour Advanced Technologies) - DEMO" + chr( 0 ),WS_OVERLAPPEDWINDOW+WS_CLIPCHILDREN,100, 100, 450, 300,0 )
+
+view 'created'
 
 InitCommonControls()
 
 hIcon := LoadImage(hInstance(), "comp", IMAGE_ICON, 16, 16)
 
 oStat:=StatusBar():Init(WS_CHILD + WS_VISIBLE ,, hWnd, 100)
-oStat:SetPanels( { 150,380,480,580,-1 } )
+oStat:SetPanels( { 150,380,480,580,-1,660 } )
 oStat:SetPanelIcon( 0, hIcon )
 oStat:SetPanelText( 0, "What32 API StatusBar" )
 oStat:SetPanelText( 2, "Enjoy" )
@@ -439,7 +459,9 @@ AppendMenu( hPopupMenu, MF_SEPARATOR )
 AppendMenu( hPopupMenu, MF_ENABLED + MF_STRING, 106, "&Quick Browse"  )
 AppendMenu( hPopupMenu, MF_SEPARATOR )
 AppendMenu( hPopupMenu, MF_ENABLED + MF_STRING, 100, "E&xit"  )
+
 AppendMenu( hMenu     , MF_ENABLED + MF_POPUP , hPopupMenu , "&Dialogs",  )
+
 hPopupMenu:=CreatePopupMenu( )
 AppendMenu( hPopupMenu, MF_ENABLED + MF_STRING,201, "MessageBoxEx with &TIME-OUT" )
 AppendMenu( hPopupMenu, MF_ENABLED + MF_STRING,207, "MessageBoxEx with &Flashing Caption" )
@@ -487,10 +509,10 @@ DO CASE
         DeleteObject(hBmp)
         DeleteObject(hFont)
    CASE nMsg == WM_PAINT
-        hDC:=BeginPaint(hDlg,@cPaint)
-        DrawGlyph(hDC,410,80,143,100,hBmp,RGB(255,0,0),.F.)
-        EndPaint(hDlg,cPaint)
-        return(1)
+//        hDC:=BeginPaint(hDlg,@cPaint)
+//        DrawGlyph(hDC,410,80,143,100,hBmp,RGB(255,0,0),.F.)
+//        EndPaint(hDlg,cPaint)
+//        return(1)
    CASE nMsg == WM_INITDIALOG
         UpdateWindow(hToolBar)
         InitCommonControlsEx(ICC_DATE_CLASSES)
@@ -556,12 +578,14 @@ local oListView,hIcon1,hIcon2,hIcon3,n,hDC,hC,aRect,nPix
 static hFont,hBrush
 DO CASE
 //-------------------------------- this is for XP compatibility ONLY
+/*
    CASE nMsg == WM_CTLCOLORDLG
         SetBrushOrgEx(nwParam, 11,11,NIL)
         return(GetStockObject(NULL_BRUSH))
    CASE nMsg == WM_CTLCOLORSTATIC
         SetBkMode(nwParam,1)
         return(GetStockObject(NULL_BRUSH))
+*/
 //------------------------------------------------------------------
 
    CASE nMsg == WM_DESTROY
@@ -617,11 +641,13 @@ STATIC oListView
 STATIC lGrid:=.T.
 DO CASE
 //-------------------------------- this is for XP compatibility ONLY
+/*
    CASE nMsg == WM_CTLCOLORDLG
         return(GetStockObject(NULL_BRUSH))
    CASE nMsg == WM_CTLCOLORSTATIC
         SetBkMode(nwParam,1)
         return(GetStockObject(NULL_BRUSH))
+*/
 //------------------------------------------------------------------
 
    CASE nMsg == WM_DESTROY
@@ -692,11 +718,13 @@ local dDate:=DATE()
 static hFont
 DO CASE
 //-------------------------------- this is for XP compatibility ONLY
+/*
    CASE nMsg == WM_CTLCOLORDLG
         return(GetStockObject(NULL_BRUSH))
    CASE nMsg == WM_CTLCOLORSTATIC
         SetBkMode(nwParam,1)
         return(GetStockObject(NULL_BRUSH))
+*/
 //------------------------------------------------------------------
    CASE nMsg == WM_DESTROY
         deleteobject(hFont)
@@ -735,7 +763,11 @@ function QuestionProc(hDlg,nMsg,nwParam,nlparam)
 local nProc
 do case
    case nmsg==WM_INITDIALOG
-        nProc := SetProcedure(GetDlgItem(hDlg,1),{|hWnd,nMsg,nwParam,nlParam| funproc(nProc,hWnd,nMsg,nwParam,nlParam)},WM_MOUSEMOVE)
+
+//        nProc := SetProcedure(GetDlgItem(hDlg,1),{|hWnd,nMsg,nwParam,nlParam| funproc(nProc,hWnd,nMsg,nwParam,nlParam)},WM_MOUSEMOVE)
+
+        nTest := SetProcedure( hDlg, HB_FuncPtr("funproc"), {WM_MOUSEMOVE} )
+
         return(1)
    case nmsg==WM_SYSCOMMAND
         if nwparam==SC_CLOSE
@@ -795,7 +827,7 @@ if nmsg==WM_MOUSEMOVE
    movewindow(hWnd,arect[1]+xOff,arect[2]+yOff,arect[3]-arect[1],arect[4]-arect[2],.t.)
    return(0)
 endif
-return CallWindowProc(nProc, hWnd,nMsg, nwParam,nlParam)
+return CallWindowProc(nTest, hWnd, nMsg, nwParam,nlParam)
 
 FUNCTION ZeroInit(ostr)
   ostr:buffer(replicate(chr( 0 ),ostr : sizeof()))
@@ -1038,9 +1070,10 @@ ENDCASE
 return(0)
 
 FUNCTION QBrowseProc( hDlg, nMsg, nwParam, nlParam )
-local aStruc,o,oBrowse,oCol1,oCol2,oCol3
+local aStruc,o,oBrowse,oCol1,oCol2,oCol3,oTB
 DO CASE
    CASE nMsg == WM_INITDIALOG
+
         USE TEST ALIAS TEST NEW SHARED
         aStruc:=DBSTRUCT()
         GO TOP
@@ -1069,6 +1102,7 @@ DO CASE
            ADD COLUMN "Dec"   DATA {|oCol,oB,n| asString(oB:source[n,4]) } WIDTH 40
            o:wantHScroll:=.F.
         END BROWSE
+
    CASE nMsg == WM_COMMAND
         DO CASE
            CASE nwParam == IDCANCEL
@@ -1700,4 +1734,3 @@ Return(CallWindowProc(nproc,hWnd,nMsg,nwParam,nlParam))
 
 
 *----------------------------------------------------------------------------*
-
