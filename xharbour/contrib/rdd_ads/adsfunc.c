@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.33 2004/03/31 02:16:42 druzus Exp $
+ * $Id: adsfunc.c,v 1.34 2004/04/01 22:00:41 druzus Exp $
  */
 
 /*
@@ -1808,7 +1808,7 @@ HB_FUNC( ADSCONNECT60 )
 
    UNSIGNED32 ulRetVal ;
    UNSIGNED8  *pucServerPath = (UNSIGNED8  *) hb_parcx( 1 );
-   UNSIGNED16 usServerTypes  = hb_parnl( 2 );
+   UNSIGNED16 usServerTypes  = ( UNSIGNED16 ) hb_parni( 2 );
    UNSIGNED8  *pucUserName   = ISCHAR( 3 ) ? (UNSIGNED8  *) hb_parcx( 3 ) : NULL ;
    UNSIGNED8  *pucPassword   = ISCHAR( 4 ) ? (UNSIGNED8  *) hb_parcx( 4 ) : NULL ;
    UNSIGNED32 ulOptions      = ISNUM( 5 ) ? hb_parnl( 5 ) : ADS_DEFAULT ;
@@ -1936,7 +1936,7 @@ HB_FUNC( ADSDDSETDATABASEPROPERTY )
       case ADS_DD_ADMIN_PASSWORD:
       case ADS_DD_ENCRYPT_TABLE_PASSWORD:
       {
-         ulRetVal = AdsDDSetDatabaseProperty(adsConnectHandle, ulProperty, hb_itemGetCPtr( pParam ), hb_itemGetCLen( pParam ) );
+         ulRetVal = AdsDDSetDatabaseProperty(adsConnectHandle, ulProperty, hb_itemGetCPtr( pParam ), ( UNSIGNED16 ) hb_itemGetCLen( pParam ) );
          break;
       }
       case ADS_DD_MAX_FAILED_ATTEMPTS:
@@ -2003,7 +2003,7 @@ HB_FUNC( ADSTESTLOGIN )
 
    UNSIGNED32 ulRetVal ;
    UNSIGNED8  *pucServerPath = (UNSIGNED8  *) hb_parcx( 1 );
-   UNSIGNED16 usServerTypes  = hb_parnl( 2 );
+   UNSIGNED16 usServerTypes  = ( UNSIGNED16 ) hb_parni( 2 );
    UNSIGNED8  *pucUserName   = ISCHAR( 3 ) ? (UNSIGNED8  *) hb_parcx( 3 ) : NULL ;
    UNSIGNED8  *pucPassword   = ISCHAR( 4 ) ? (UNSIGNED8  *) hb_parcx( 4 ) : NULL ;
    UNSIGNED32 ulOptions      = ISNUM( 5 ) ? hb_parnl( 5 ) : ADS_DEFAULT ;
