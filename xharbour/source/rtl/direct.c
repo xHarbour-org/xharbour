@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.6 2003/07/13 18:11:57 walito Exp $
+ * $Id: direct.c,v 1.7 2003/12/02 12:25:55 lculik Exp $
  */
 
 /*
@@ -112,6 +112,7 @@ HB_FUNC( DIRECTORY )
 {
    PHB_ITEM  pDirSpec = hb_param( 1, HB_IT_STRING );
    PHB_ITEM  pAttributes = hb_param( 2, HB_IT_STRING );
+   BYTE *    szDirSpec = NULL;
    USHORT    uiMask;
 
 /*
@@ -150,9 +151,12 @@ HB_FUNC( DIRECTORY )
          uiMask = HB_FA_LABEL;
       }
 
-   /* Get the file list */
+   szDirSpec = pDirSpec ? 
+               hb_filecase( hb_strdup( ( char * ) hb_itemGetCPtr( pDirSpec ) ) ) : 
+               (BYTE *) HB_DIR_ALL_FILES_MASK;
 
-   if( ( ffind = hb_fsFindFirst( pDirSpec ? hb_itemGetCPtr( pDirSpec ) : HB_DIR_ALL_FILES_MASK, uiMask ) ) != NULL )
+   /* Get the file list */
+   if( ( ffind = hb_fsFindFirst( szDirSpec, uiMask ) ) != NULL )
    {
       PHB_ITEM pFilename = hb_itemNew( NULL );
       PHB_ITEM pSize = hb_itemNew( NULL );
@@ -195,6 +199,10 @@ HB_FUNC( DIRECTORY )
       hb_itemRelease( pAttr );
 
       hb_fsFindClose( ffind );
+   }
+   if ( pDirSpec )
+   {
+      hb_xfree( szDirSpec );
    }
 
    hb_itemRelease( hb_itemReturn( pDir ) );
