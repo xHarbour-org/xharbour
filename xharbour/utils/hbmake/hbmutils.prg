@@ -12,7 +12,7 @@
     DECLARE GetMakeDir() as String
     DECLARE HB_ARGV( n as numeric ) as string
     DECLARE HbMake_FileDate( c as String ) as string
-    DECLARE ListAsArray2( cString as String, cSep as String ) as Array
+
 #endif
 
 FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
@@ -163,7 +163,7 @@ FUNCTION GetBccDir()
 
    LOCAL cPath   := ''
    LOCAL cEnv    := GETE( "PATH" )
-   LOCAL aEnv    := ListAsArray2( cEnv, ";" )
+   LOCAL aEnv    := HB_ATokens( cEnv, ";" )
    LOCAL nPos
    LOCAL cCurEnv := ""
 
@@ -183,7 +183,7 @@ FUNCTION GetVccDir()
 
    LOCAL cPath   := ''
    LOCAL cEnv    := GETE( "PATH" )
-   LOCAL aEnv    := ListAsArray2( cEnv, ";" )
+   LOCAL aEnv    := HB_ATokens( cEnv, ";" )
    LOCAL nPos 
    LOCAL cCurEnv := ""
 
@@ -223,23 +223,6 @@ FUNCTION Exten( cExt, nType )
 
 RETURN cTemp
 
-FUNCTION ListAsArray2( cList, cDelimiter )
-
-   LOCAL nPos 
-   LOCAL aList  := {}              // Define an empty array
-
-   IF cDelimiter = NIL
-      cDelimiter := ","
-   ENDIF
-   //
-   DO WHILE ( nPos := AT( cDelimiter, cList ) ) != 0
-      AADD( aList, ALLTRIM( SUBSTR( cList, 1, nPos - 1 ) ) )                    // Add a new element
-      cList := SUBSTR( cList, nPos + 1 )
-
-   ENDDO
-   AADD( aList, ALLTRIM( cList ) )      // Add final element
-   //
-RETURN aList        // Return the array
 
 FUNCTION GetMakeDir()
 
@@ -446,7 +429,7 @@ RETURN aLibsDesc
 
 FUNCTION DIR_MULTI( cFileMaskList, cAttr )
 
-   LOCAL aList := ListAsArray2( cFileMaskList, "|" )
+   LOCAL aList := HB_ATokens( cFileMaskList, "|" )
 
    AEVAL( aList, { | tmp, tmp1 | aList[ tmp1 ] := DIRECTORY( tmp, cAttr ) } )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.40 2003/02/25 03:44:36 walito Exp $
+ * $Id: tget.prg,v 1.41 2003/03/26 20:32:49 iananderson Exp $
  */
 
 /*
@@ -102,6 +102,8 @@ CLASS Get
    DATA Message
    DATA Caption
    DATA nLastExitState
+   DATA CapRow
+   DATA CapCol
    #endif
 
    DATA cColorSpec   HIDDEN   // Used only for METHOD ColorSpec
@@ -213,6 +215,8 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::Picture    := cPicture
    #ifdef HB_COMPAT_C53
    ::Caption    := ""
+   ::CapRow     := 0
+   ::CapCol     := 0
    #endif
 return Self
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.h,v 1.11 2002/05/23 01:21:12 ronpinkas Exp $
+ * $Id: hbver.h,v 1.12 2002/05/24 02:55:23 ronpinkas Exp $
  */
 
 /*
@@ -55,14 +55,14 @@
 
 #define HB_VER_LEX "SimpLex"
 #define HB_VER_MAJOR    0       /* Major version number */
-#define HB_VER_MINOR    73      /* Minor version number */
+#define HB_VER_MINOR    80      /* Minor version number */
 #define HB_VER_REVISION 0       /* Revision number */
 
 /* TOFIX: Ideally these should be generated dynamically, until
           then, they should be updated by the builder. [vszakats] */
 
-#define HB_VER_LENTRY   "2002-05-23 19:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>"
-#define HB_VER_CHLCVS   "ChangeLog,v 1.246"
+#define HB_VER_LENTRY   "2003-03-28 21:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>"
+#define HB_VER_CHLCVS   "ChangeLog,v 1.887"
 #define HB_VER_C_USR    ""
 #define HB_VER_L_USR    ""
 #define HB_VER_PRG_USR  ""

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.56 2003/03/27 07:44:56 ronpinkas Exp $
+ * $Id: hbmake.prg,v 1.57 2003/03/28 22:11:51 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -296,7 +296,7 @@ FUNCTION ParseMakeFile( cFile )
 
       ENDIF
 
-      aTemp := ListAsArray2( Alltrim( cTemp ), "=" )
+      aTemp := Hb_ATokens( Alltrim( cTemp ), "=" )
 
       IF lmacrosec
 
@@ -319,7 +319,7 @@ FUNCTION ParseMakeFile( cFile )
                      ENDIF
 
                      IF aTemp[ 1 ] == "LIBFILES" .AND. ! lMt
-                        aLib := ListAsArray2( aTemp[ 2 ], ' ' )
+                        aLib := Hb_ATokens( aTemp[ 2 ], ' ' )
 
                         FOR each aLibx in aLib
 
@@ -371,57 +371,57 @@ FUNCTION ParseMakeFile( cFile )
             ENDIF
 
             IF aTemp[ 1 ] == "OBJFILES"
-               s_aObjs := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
+               s_aObjs := Hb_ATokens( replacemacros( aTemp[ 2 ] ), " " )
             ENDIF
 
             IF aTemp[ 1 ] == "OBJCFILES"
-               aTemp1 := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
+               aTemp1 := Hb_ATokens( replacemacros( aTemp[ 2 ] ), " " )
 
                IF Len( aTemp1 ) == 1
 
                   IF ! Empty( aTemp[ 1 ] )
-                      s_aObjsC := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
+                      s_aObjsC := Hb_ATokens( replacemacros( aTemp[ 2 ] ), " " )
                    ENDIF
 
                ELSE
-                  s_aObjsC := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
+                  s_aObjsC := Hb_ATokens( replacemacros( aTemp[ 2 ] ), " " )
                ENDIF
 
             ENDIF
 
             IF aTemp[ 1 ] == "PRGFILES"
-               s_aPrgs     := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
+               s_aPrgs     := Hb_ATokens( replacemacros( aTemp[ 2 ] ), " " )
                s_lExtended := .T.
                lCfgFound := Findharbourcfg( @cCfg )
             ENDIF
 
             IF aTemp[ 1 ] == "PRGFILE"
-               s_aPrgs := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
+               s_aPrgs := Hb_ATokens( replacemacros( aTemp[ 2 ] ), " " )
             ENDIF
 
             IF aTemp[ 1 ] == "CFILES"
 
                IF s_lExtended
-                  aTempCFiles := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
+                  aTempCFiles := Hb_ATokens( replacemacros( aTemp[ 2 ] ), " " )
 
                   IF ( Len( aTempCFiles ) == 1 )
 
                      IF ! Empty( aTempCFiles[ 1 ] )
-                        s_aCs := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
+                        s_aCs := Hb_ATokens( replacemacros( aTemp[ 2 ] ), " " )
                      ENDIF
 
                   ELSE
-                     s_aCs := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
+                     s_aCs := Hb_ATokens( replacemacros( aTemp[ 2 ] ), " " )
                   ENDIF
 
                ELSE
-                  s_aCs := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
+                  s_aCs := Hb_ATokens( replacemacros( aTemp[ 2 ] ), " " )
                ENDIF
 
             ENDIF
 
             IF aTemp[ 1 ] == "RESFILES"
-               s_aRes := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
+               s_aRes := Hb_ATokens( replacemacros( aTemp[ 2 ] ), " " )
             ENDIF
 
          ELSE
@@ -442,7 +442,7 @@ FUNCTION ParseMakeFile( cFile )
 
       IF lbuildSec
          s_szProject   := cTemp
-         s_aBuildOrder := ListAsArray2( cTemp, ":" )
+         s_aBuildOrder := Hb_ATokens( cTemp, ":" )
 
          IF ! s_lLibrary
             SetBuild()
@@ -507,7 +507,7 @@ FUNCTION Checkdefine( cTemp )
       cTemp := Substr( cTemp, 1, At( "/..", cTemp ) - 1 )
    ENDIF
 
-   aSet := ListAsArray2( cTemp, "=" )
+   aSet := Hb_ATokens( cTemp, "=" )
    nPos := aScan( s_aDefines, { | x | x[ 1 ] == aSet[ 1 ] } )
 
    IF nPos = 0
@@ -532,10 +532,10 @@ FUNCTION Setcommands( cTemp )
    LOCAL aTempMacros  := {}
    LOCAL aLocalMacros := {}
 
-   aTempMacros := ListAsArray2( cREad, " " )
+   aTempMacros := Hb_ATokens( cREad, " " )
 
    aEval( aTempMacros, { | xMacro | IIF( At( "$", xMacro ) > 0, ;
-                         IIF( At( ";", xMacro ) > 0, ( aLocalMacros := ListAsArray2( xMacro, ";" ), ;
+                         IIF( At( ";", xMacro ) > 0, ( aLocalMacros := Hb_ATokens( xMacro, ";" ), ;
                          aEval( aLocalMacros, { | x | Findmacro( x, @cRead ) } ) ), ;
                          Findmacro( xMacro, @cRead ) ), ) } )
    aAdd( s_aCommands, { cTemp, cRead } )
@@ -581,9 +581,9 @@ FUNCTION ReplaceMacros( cMacros )
    LOCAL aTempMacros  := {}
    LOCAL aLocalMacros := {}
 
-   aTempMacros := ListAsArray2( cMacros, " " )
+   aTempMacros := Hb_ATokens( cMacros, " " )
    aEval( aTempMacros, { | xMacro | IIF(  "$" IN xMacro , ;
-                         IIF(  ";" IN xMacro , ( aLocalMacros := ListAsArray2( xMacro, ";" ), ;
+                         IIF(  ";" IN xMacro , ( aLocalMacros := Hb_ATokens( xMacro, ";" ), ;
                          aEval( aLocalMacros, { | x | Findmacro( x, @cMacros ) } ) ), ;
                          Findmacro( xMacro, @cMacros ) ), ) } )
 
@@ -602,17 +602,17 @@ FUNCTION SetBuild()
 
    cRead     := Alltrim( readln( @s_lEof ) )
    s_szProject := cRead
-   aMacro    := ListAsArray2( cRead, ":" )
+   aMacro    := Hb_ATokens( cRead, ":" )
 
    IF Len( aMacro ) > 1
-      aTemp := ListAsArray2( aMacro[ 2 ], " " )
+      aTemp := Hb_ATokens( aMacro[ 2 ], " " )
       aEval( aTemp, { | xItem | aAdd( s_aBuildOrder, xItem ) } )
    ENDIF
 
    aAdd( s_aBuildOrder, aMacro[ 1 ] )
    cRead := Strtran( cRead, "@&&!", "" )
 
-   aMacro := ListAsArray2( cRead, '\' )
+   aMacro := Hb_ATokens( cRead, '\' )
 
    aEval( aMacro, { | xMacro |  IIF(  "$" IN xmacro , Findmacro( xMacro, @cRead ), ) } )
 
@@ -627,7 +627,7 @@ FUNCTION SetBuild()
 
       cRead        := Alltrim( readln( @s_lEof ) )
       cCurrentRead := cRead
-      aMacro       := ListAsArray2( cRead, " " )
+      aMacro       := Hb_ATokens( cRead, " " )
 
         FOR EACH cMacro IN aMacro
 
@@ -678,7 +678,7 @@ FUNCTION CompileFiles()
    LOCAL nCount
    LOCAL nFiles
    LOCAL cErrText := ""
-   LOCAL aOrder   := ListAsArray2( s_aBuildOrder[ 2 ], " " )
+   LOCAL aOrder   := Hb_ATokens( s_aBuildOrder[ 2 ], " " )
    LOCAL lEnd     := .f.
    LOCAL xItem
    LOCAL lLinux   :=  'linux' IN  Lower( Os() )
@@ -976,7 +976,7 @@ FUNCTION GetParaDefines( cTemp )
       cTemp := Substr( cTemp, 1, At( "/..", cTemp ) - 1 )
    ENDIF
 
-   aSet := ListAsArray2( cTemp, "=" )
+   aSet := Hb_ATokens( cTemp, "=" )
    nPos := aScan( s_aDefines, { | x | x[ 1 ] == aSet[ 1 ] } )
 
    IF nPos == 0
@@ -1133,7 +1133,7 @@ FUNC CreateMakeFile( cFile )
    READ
 
    IF ! Empty( cUserDef )
-      aUserDefs := ListasArray2(Alltrim( cUserDef ), ";")
+      aUserDefs := Hb_ATokens(Alltrim( cUserDef ), ";")
 
       FOR EACH cCurrentDef in aUserDefs
          cDefHarOpts += " -D" + Alltrim( cCurrentDef ) + " "
@@ -1723,7 +1723,7 @@ FUNC CreateMakeFile( cFile )
 
    @ 20,5 Say "Build app" get cBuild PICT "!" Valid cBuild $"YNS"
    READ
-   IF "YS" IN cBuild
+   IF "YS" $ cBuild
       ResetInternalVars()
       cls
       Main( cFile, " -F")
@@ -1740,7 +1740,7 @@ FUNCTION CompileUpdatedFiles()
    LOCAL nCount
 
    LOCAL aCtocompile := {}
-   LOCAL aOrder      := ListAsArray2( s_aBuildOrder[ 2 ], " " )
+   LOCAL aOrder      := Hb_ATokens( s_aBuildOrder[ 2 ], " " )
    LOCAL lEnd
    LOCAL cErrText    := ""
    LOCAL xItem
@@ -2095,7 +2095,7 @@ FUNC CreateLibMakeFile( cFile )
    READ
 
    IF ! Empty( cUserDef )
-      aUserDefs := ListasArray2(Alltrim( cUserDef ), ";")
+      aUserDefs := Hb_ATokens(Alltrim( cUserDef ), ";")
 
       FOR EACH cCurrentDef in aUserDefs
          cDefHarOpts += " -D" + Alltrim( cCurrentDef ) + " "
@@ -2493,16 +2493,16 @@ FUNCTION setlibBuild()
    cRead       := Alltrim( readln( @s_lEof ) )
    s_nLinkHandle := Fcreate( s_cLinker )
    s_szProject   := cRead
-   aMacro      := ListAsArray2( cRead, ":" )
+   aMacro      := Hb_ATokens( cRead, ":" )
 
    IF Len( aMacro ) > 1
-      aTemp := ListAsArray2( aMacro[ 2 ], " " )
+      aTemp := Hb_ATokens( aMacro[ 2 ], " " )
       aEval( aTemp, { | xItem | aAdd( s_aBuildOrder, xItem ) } )
    ENDIF
 
    aAdd( s_aBuildOrder, aMacro[ 1 ] )
    cRead  := Strtran( cRead, "@&&!", "" )
-   aMacro := ListAsArray2( cRead, '\' )
+   aMacro := Hb_ATokens( cRead, '\' )
    aEval( aMacro, { | xMacro | Findmacro( xMacro, @cRead ) } )
 
    IF s_lBcc .OR. s_lVcc
@@ -2513,7 +2513,7 @@ FUNCTION setlibBuild()
 
    FOR nPos := 1 TO 7
       cRead  := Alltrim( readln( @s_lEof ) )
-      aMacro := ListAsArray2( cRead, " " )
+      aMacro := Hb_ATokens( cRead, " " )
 
       FOR ncount := 1 TO Len( aMacro )
 
@@ -2525,7 +2525,7 @@ FUNCTION setlibBuild()
                cLib := "lib" + cRead
             ELSEIF ( aMacro[ nCount ] == "$(ALLOBJ)" )
                Findmacro( aMacro[ nCount ], @cRead )
-               aCurObjs := ListAsArray2( cRead, " " )
+               aCurObjs := Hb_ATokens( cRead, " " )
 
                FOR nObjPos := 1 TO Len( aCurObjs )
 
@@ -2637,7 +2637,7 @@ FUNCTION Checkifdef( cTemp )
             cRead := Substr( cRead, 1, At( "/..", cRead ) - 1 )
          ENDIF
 
-         aSet := ListAsArray2( cRead, "=" )
+         aSet := Hb_ATokens( cRead, "=" )
          nPos := aScan( s_aDefines, { | x | x[ 1 ] == cTemp } )
 
          IF nPos > 0
@@ -2664,7 +2664,7 @@ FUNCTION Checkifdef( cTemp )
                         EXIT
                      ENDIF
 
-                     aSet := ListAsArray2( cRead, "=" )
+                     aSet := Hb_ATokens( cRead, "=" )
                      aAdd( s_aMacros, { aSet[ 1 ], aSet[ 2 ] } )
                    ENDDO
 
@@ -2757,7 +2757,7 @@ FUNCTION Findharbourcfg( cCfg )
 
    IF ! lLinux .OR. s_lOs2
       cEnv := Gete( "PATH" ) + ";" + Curdir()
-      aEnv := ListAsArray2( cEnv, ";" )
+      aEnv := Hb_ATokens( cEnv, ";" )
 
       FOR nPos := 1 TO Len( aEnv )
 
@@ -2834,7 +2834,7 @@ FUNCTION GetGccDir()
       cPath := "."
    ELSE
       cEnv := Gete( "PATH" )
-      aEnv := ListAsArray2( cEnv, ";" )
+      aEnv := Hb_ATokens( cEnv, ";" )
 
       FOR nPos := 1 TO Len( aEnv )
 
@@ -3061,7 +3061,7 @@ FUNCTION ProcessParameters( cParams )
       cParams := "-D" + Strtran( cParams, "-D", ";" )
       cParams := Strtran( cParams, "-D;", "-D" )
 
-      aDef := ListAsArray2( Alltrim( Substr( cParams, 3 ) ), ";" )
+      aDef := Hb_ATokens( Alltrim( Substr( cParams, 3 ) ), ";" )
       aEval( aDef, { | xDef | IIF( At( '=', xDef ) > 0, GetParaDefines( xDef ), ) } )
    ENDIF
 
