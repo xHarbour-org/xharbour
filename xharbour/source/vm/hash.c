@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.27 2004/02/21 06:09:25 ronpinkas Exp $
+ * $Id: hash.c,v 1.28 2004/02/22 04:24:44 jonnymind Exp $
  */
 
 /*
@@ -1480,8 +1480,6 @@ void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_hashReleaseBase( %p )", pBaseHash ) );
 
-   TraceLog( NULL, "Releasing BaseHash %p %i\n", pBaseHash, pBaseHash->ulAllocated );
-
    // Called recursively from hb_hashReleaseGarbage!
    if( pBaseHash->ulAllocated == 0 )
    {
@@ -1570,11 +1568,7 @@ BOOL HB_EXPORT hb_hashRelease( PHB_ITEM pHash )
 HB_GARBAGE_FUNC( hb_hashReleaseGarbage )
 {
    PHB_BASEHASH pBaseHash = ( PHB_BASEHASH ) Cargo;
-
-   TraceLog( NULL, "Here!!!\n" );
-
    HB_TRACE( HB_TR_INFO, ( "hb_hashReleaseGarbage( %p )", pBaseHash ) );
-
    hb_hashReleaseBase( pBaseHash );
 }
 
