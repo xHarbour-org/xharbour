@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.35 2002/10/29 03:34:33 what32 Exp $
+ * $Id: TApplication.prg,v 1.36 2002/10/29 06:11:59 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -115,7 +115,7 @@ METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
    __ObjSetValueList( self, { { oForm:Name, oForm } } )
 
    WITH OBJECT oForm
-      TraceLog( :Caption, :Top, :Left, :Height, :Width )
+      //TraceLog( :Caption, :Top, :Left, :Height, :Width )
 
       :Create()
 
