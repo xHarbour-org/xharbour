@@ -1,5 +1,5 @@
 #
-# $Id: rules.cf,v 1.8 2003/12/28 22:25:33 druzus Exp $
+# $Id: rules.cf,v 1.9 2004/01/05 18:59:28 lf_sfnet Exp $
 #
 
 # How to run yacc.
@@ -81,11 +81,11 @@ endif
 ifeq ($(HB_COMPILER),clipper)
 # Rule to generate a OBJ file from a PRG file.
 %$(OBJ_EXT) : $(GRANDP)%.prg
-	$(HB) $(subst /,\,$?)) $(PRG_USR) $(HB_FLAGS)
+	$(HB) $(subst /,\,$?)) $(HB_FLAGS) $(PRG_USR)
 else
 # Rule to generate a C file from a PRG file.
 %.c : $(GRANDP)%.prg
-	$(HB) $? $(PRG_USR) $(HB_FLAGS)
+	$(HB) $? $(HB_FLAGS) $(PRG_USR)
 endif
 
 ifeq ($(SHLVL),) # COMMAND.COM

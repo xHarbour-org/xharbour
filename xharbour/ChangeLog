@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3271 2004/08/04 20:46:23 ath1 Exp $
+ * $Id: ChangeLog,v 1.3272 2004/08/04 20:57:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-05 01:20 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * config/rules.cf
+    ! fixed order of flags in rule to make a .c file from a .prg one
+      $(PRG_USR) needs to be after $(HB_FLAGS) or it is not possible
+      to change a default flag.
 
 2004-08-04 13:58 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/compiler/harbour.slx
