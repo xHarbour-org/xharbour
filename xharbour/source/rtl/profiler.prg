@@ -1,12 +1,12 @@
 /*
- * $Id: profiler.prg,v 1.19 2002/01/03 22:11:57 vszakats Exp $
+ * $Id: profiler.prg,v 1.21 2002/01/24 10:30:07 davep Exp $
  */
 
 /*
  * Harbour Project source code:
  * Profiler reporting classes
  *
- * Copyright 2001 Dave Pearson <davep@davep.org>
+ * Copyright 2001,2002 Dave Pearson <davep@davep.org>
  * http://www.davep.org/
  *
  * This program is free software; you can redistribute it and/or modify
@@ -292,6 +292,22 @@ Method describe Class HBProfileMethod
 Return( "Method" )
 
 ////////////////////////////////////////////////////////////////////////////
+// Class: HBProfileOPCode
+
+Create Class HBProfileOPCode Inherit HBProfileEntity
+
+   Exported:
+
+      Method describe
+
+End Class
+
+/////
+
+Method describe Class HBProfileOPCode
+Return( "OPCode" )
+
+////////////////////////////////////////////////////////////////////////////
 // Class: HBProfile
 
 Create Class HBProfile
@@ -313,6 +329,8 @@ Create Class HBProfile
 
    Protected:
 
+      Method gatherFunctions
+      Method gatherMethods
       Method reset
       Method ignoreSymbol
 
@@ -345,21 +363,11 @@ Return( ( left( cSymbol, len( cProfPrefix ) ) == cProfPrefix ) .Or. ( cSymbol ==
 
 /////
 
-Method gather Class HBProfile
+Method gatherFunctions Class HBProfile
 Local lProfile  := __setProfiler( .F. )
 Local nSymCount := __DynSCount()
 Local cName
-Local aPInfo
-Local cClass
-Local nMembers
-Local aMembers
-Local nMember
 Local n
-
-   // Reset the profile.
-   ::reset()
-
-   // First, collect function call data.
 
    // For each known symbol.
    // TODO: Question: Will the symbol count have changed because
@@ -379,9 +387,19 @@ Local n
 
    Next
 
-   // Now collect classes.
+   __setProfiler( lProfile )
 
-   n := 1
+Return( self )
+
+/////
+
+Method gatherMethods Class HBProfile
+Local lProfile  := __setProfiler( .F. )
+Local n         := 1
+Local cClass
+Local nMembers
+Local aMembers
+Local nMember
 
    // For each class in the environment...
    Do While !empty( cClass := __className( n ) )
@@ -397,7 +415,7 @@ Local n
             // If we've got a member name...
             If !empty( aMembers[ nMember ] )
                // Add it to the profile.
-               aadd( ::aProfile, HbProfileMethod():new( cClass + ":" + aMembers[ nMember ], __GetMsgPrf( n, aMembers[ nMember ] ) ) )
+               aadd( ::aProfile, HBProfileMethod():new( cClass + ":" + aMembers[ nMember ], __GetMsgPrf( n, aMembers[ nMember ] ) ) )
             EndIf
 
          Next
@@ -407,6 +425,24 @@ Local n
       ++n
 
    EndDo
+
+   __setProfiler( lProfile )
+
+Return( self )
+
+/////
+
+Method gather Class HBProfile
+Local lProfile  := __setProfiler( .F. )
+
+   // Reset the profile.
+   ::reset()
+
+   // Gather function calls
+   ::gatherFunctions()
+
+   // Gather method calls
+   ::gatherMethods()   
 
    __setProfiler( lProfile )
 
@@ -502,6 +538,54 @@ Local nSeconds := 0
    __setProfiler( lProfile )
 
 Return( nSeconds )
+
+////////////////////////////////////////////////////////////////////////////
+// Class: HBProfileLowLevel
+
+Create Class HBProfileLowLevel Inherit HBProfile
+
+   Exported:
+
+      Method gather
+
+   Protected:
+
+      Method gatherOPCodes
+
+End Class
+
+/////
+
+Method gather Class HBProfileLowLevel
+Local lProfile := __setProfiler( .F. )
+
+   // Gather functions and methods.
+   ::super:gather()
+
+   // Also gather opcodes.   
+   ::gatherOPCodes()
+
+   __setProfiler( lProfile )
+
+Return( self )
+
+/////
+
+Method gatherOPCodes Class HBProfileLowLevel
+Local nMax := __opcount()
+Local cName
+Local nOP
+
+   // Loop over all the harbour OP codes. Note that they start at 0.
+   For nOP := 0 To ( nMax - 1 )
+      // If we're not ignoring this opcode.
+      If !::ignoreSymbol( cName := "OPCODE( " + padl( nOP, 3 ) + " )" )
+         // Add it to the profile.
+         aadd( ::aProfile, HBProfileOPCode():new( cName, __OpGetPrf( nOP ) ) )
+      EndIf
+   Next
+
+Return( self )
 
 ////////////////////////////////////////////////////////////////////////////
 // Class: HBProfileReport

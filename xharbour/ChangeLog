@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.55 2002/01/27 19:14:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.56 2002/01/27 22:30:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-28 20:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    ! Clipper marks Optional Match Marker that's *not* used in Result Rule as REPEATing Marker.
+
+  * source/rtl/tget.prg
+  * source/rdd/dbf1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/profiler.prg
+    * Synched with following Harbour changes:
+        2002-01-28 12:36 UTC+0100 Ignacio Ortiz <ignacio@fivetech.com>
+          * source/rtl/tget.prg
+            * Bug fixed in VarPut() method, reported by Lorenzo Fiorini
+
+        2002-01-28 14:21 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+          * source/rdd/dbf1.c
+            * Bug fixed in dbfGetMemo(), reported by Jos© Luis Capel
+
+        2002-01-28 13:50 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+          * source/rdd/dbfntx/dbfntx1.c
+            ! Bug fixed in ntxGoBottom(), reported by Lorenzo Fiorini
+
+        2002-01-24 10:27 UTC+0000 Dave Pearson <davep@davep.org>
+           * source/rtl/profiler.prg
+             * HBProfileLowLevel:gatherOPCodes() wasn't making a call to
+               HBProfile:ignoreSymbol() to allow for opcode filtering in sub
+               classes. Fixed.
+             * Improved the formatting of OPCODE names so that they sort
+               properly.
+
+        2002-01-24 10:03 UTC+0000 Dave Pearson <davep@davep.org>
+           * source/rtl/profiler.prg
+             + Added class HBProfileOPCode.
+             + Added class HBProfileLowLevel. It inherits from HBProfile and adds
+               OPCODE usage entries.
 
 2002-01-27 14:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c

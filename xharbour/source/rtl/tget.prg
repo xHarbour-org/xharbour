@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.53 2002/01/09 10:02:59 ignacioortiz Exp $
+ * $Id: tget.prg,v 1.54 2002/01/28 11:36:55 ignacioortiz Exp $
  */
 
 /*
@@ -439,6 +439,9 @@ METHOD VarPut( xValue ) CLASS Get
 
    if ::block != nil
       Eval( ::block, xValue )
+      ::Type     := ValType( xValue )
+      ::nDispLen := NIL
+      ::Picture( ::cPicture )
    endif
 
 return xValue

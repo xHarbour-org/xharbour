@@ -5774,7 +5774,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    aLIST
    */
 
-   // *** Processing STOP Words below, because processing RP may discover repeatable rooted by non optional marker and correct the root to optional!
+   // *** Processing STOP Words below!
 
    /*
    ? ''
@@ -6183,39 +6183,17 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       BREAK
    ENDIF
 
-#ifdef POSSIBLE_WORK_IN_PROGRESS
+
+   /* Processing Repeatable Flag of Match Markers. */
+   /* Note additional correction done in subsequent processing of STOP Words, below... */
    nResults := Len( aResult )
    FOR Counter := nResults TO 1 STEP -1
+      aRP := aResult[Counter]
 
       /* Correcting the ID of the Marker this result depends upon. */
-      IF aResult[Counter][1] > 0
-         nOptional := aResult[Counter][1]
-         nMarker   := aResult[Counter][2]
-      ELSEIF aResult[Counter][1] < 0
-         aResult[Counter][1] := nOptional
-      ENDIF
-
-      IF ValType( aResult[Counter][2] ) == 'C'
-         aResult[Counter][2] := StrTran( aResult[Counter][2], '\', '' )
-         //? "RP #", Counter, aResult[Counter][1], '"' + aResult[Counter][2] + '"'
-      ELSE
-         /* Marking the respective Match Marker as Repeatable, if it is OPTIONAL. */
-         IF nOptional > 0
-            aEval( aRule[2], { |aMP| IIF( aMP[1] == nMarker .AND. aMP[2] <> 0, aMP[1] += 1000, ) } )
-         ENDIF
-
-         //? "RP #", Counter, aResult[Counter][1], aResult[Counter][2]
-      ENDIF
-   NEXT
-#endif
-
-   nResults := Len( aResult )
-   FOR Counter := nResults TO 1 STEP -1
-
-      /* Correcting the ID of the Marker this result depends upon. */
-      IF aResult[Counter][1] > 0
-         nOptional := aResult[Counter][1]
-         nMarker   := aResult[Counter][2]
+      IF aRP[1] > 0
+         nOptional := aRP[1]
+         nMarker   := aRP[2]
 
          //? "Repeatable: ", nMarker, "Root: ", nOptional
 
@@ -6246,15 +6224,15 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
             ENDIF
             //WAIT
          ENDIF
-      ELSEIF aResult[Counter][1] < 0
-         aResult[Counter][1] := nOptional
+      ELSEIF aRP[1] < 0
+         aRP[1] := nOptional
       ENDIF
 
-      IF ValType( aResult[Counter][2] ) == 'C'
-         aResult[Counter][2] := StrTran( aResult[Counter][2], '\', '' )
-         //? "RP #", Counter, aResult[Counter][1], '"' + aResult[Counter][2] + '"'
+      IF ValType( aRP[2] ) == 'C'
+         aRP[2] := StrTran( aRP[2], '\', '' )
+         //? "RP #", Counter, aRP[1], '"' + aRP[2] + '"'
       ELSE
-         //? "RP #", Counter, aResult[Counter][1], aResult[Counter][2]
+         //? "RP #", Counter, aRP[1], aRP[2]
       ENDIF
    NEXT
 
@@ -6267,6 +6245,14 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
    FOR Counter := 1 TO nMatches
       aMatch := aRule[2][Counter]
+
+      /* If optional, which is *not* used as a result, Clipper makes it repeatable. */
+      IF aMatch[1] < 1000 .AND. aMatch[1] > 0 .AND. aMatch[2] > 0
+         IF aScan( aResult, { |aRP| ValType( aRP[2] ) == 'N' .AND. aRP[2] == aMatch[1] } ) == 0
+            TraceLog( "Warning - Marker #" + Str( aMatch[1] ) + " not utilized in Result Rule", sRuleCopy )
+            aMatch[1] += 1000
+         ENDIF
+      ENDIF
 
       /* Optional group start (marker), no anchor, and not a restricted pattern - have to build stop words list! */
       IF aMatch[1] > 0 .AND. aMatch[2] > 0 .AND. aMatch[3] == NIL .AND. aMatch[4] != ':'
