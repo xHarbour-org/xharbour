@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.71 2004/02/19 18:15:57 andijahja Exp $
+ * $Id: harbour.c,v 1.72 2004/03/16 01:42:44 andijahja Exp $
  */
 
 /*
@@ -3541,8 +3541,19 @@ void hb_compGenPushAliasedVar( char * szVarName,
                }
                else
                {
-                  hb_comp_AmbiguousVar = TRUE;
-                  hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_AMBIGUOUS_VAR, szVarName, NULL );
+                  // Look in Public symbol table
+                  USHORT wPos;
+                  PCOMSYMBOL pSym = hb_compSymbolFind( szVarName, &wPos );
+
+                  if( pSym )
+                  {
+                     hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
+                  }
+                  else
+                  {
+                     hb_comp_AmbiguousVar = TRUE;
+                     hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_AMBIGUOUS_VAR, szVarName, NULL );
+                  }
                }
             }
             else
