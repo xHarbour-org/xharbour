@@ -1,5 +1,5 @@
 /*
- * $Id: rt_trans.prg,v 1.5 2001/05/15 13:02:07 vszakats Exp $
+ * $Id: rt_trans.prg,v 1.1.1.1 2001/12/21 10:44:54 ronpinkas Exp $
  */
 
 /*
@@ -411,14 +411,14 @@ FUNCTION Main_TRANS()
    TEST_LINE( Transform("ABCDEFG", "@DB" )                 , "AB.DE.G"                     )
    TEST_LINE( Transform("  CDEFG", "@DB" )                 , ".DE.G  "                     )
    TEST_LINE( Transform("ABCDEFG", "@DBZ" )                , "       "                     )
-   TEST_LINE( Transform(".", "@E" )                        , " "                           )
+   TEST_LINE( Transform(".", "@E" )                        , Chr(0)                           )
    TEST_LINE( Transform(",", "@E" )                        , "."                           )
-   TEST_LINE( Transform("..", "@E" )                       , ","+Chr(0)+""                 )
+   TEST_LINE( Transform("..", "@E" )                       , Chr(0)+Chr(0)                )
    TEST_LINE( Transform(",,", "@E" )                       , ".."                          )
-   TEST_LINE( Transform(",.,", "@E" )                      , ",,."                         )
-   TEST_LINE( Transform(".,.", "@E" )                      , ""+Chr(0)+".."                )
-   TEST_LINE( Transform("OPI", "@E ." )                    , ""+Chr(0)+",."                )
-   TEST_LINE( Transform("JKL", "@E ," )                    , ""+Chr(0)+"P."                )
+   TEST_LINE( Transform(",.,", "@E" )                      , Chr(0) + Chr(0) + "/"                         )
+   TEST_LINE( Transform(".,.", "@E" )                      , Chr(0) + Chr(0) + "/"                )
+   TEST_LINE( Transform("OPI", "@E ." )                    , Chr(0) + Chr(0) + "/"                )
+   TEST_LINE( Transform("JKL", "@E ," )                    , Chr(0) + Chr(0) + "/"                )
    TEST_LINE( Transform("OPI", "@ER ." )                   , "I .OP.  "                    )
    TEST_LINE( Transform("JKL", "@ER ," )                   , "L .JK.  "                    )
    TEST_LINE( Transform("OPI", "@ER" )                     , "I .OP.  "                    )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1261 2003/07/17 19:19:34 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1262 2003/07/17 21:11:03 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-07-18 10:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+   * source/rtl/transfrm.c
+     * Additional "@E" handler to be more Clipper compatible
+
+   * utils/hbtest/rt_trans.prg
+     * Change Clipper (expected) return values:
+
+       Calls                    From           To
+       Transform(".","@E")      " "            Chr(0)
+       Transform("..","@E")     "," + Chr(0)   Chr(0) + Chr(0)
+       Transform(",.,","@E")    ",,."          Chr(0) + Chr(0) + "/"
+       Transform(".,.","@E")    Chr(0) + ".."  Chr(0) + Chr(0) + "/"
+       Transform("OPI","@E .")  Chr(0) + ",."  Chr(0) + Chr(0) + "/"
+       Transform("JKL","@E ,")  Chr(0) + "P."  Chr(0) + Chr(0) + "/"
+
+       /*
+       I do not know how the original author arrived at the previous results.
+       hbtest.exe's error now: 10
+       */
 
 2003-07-17 23:11 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/hbxml.c

@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.21 2003/07/06 17:00:31 lculik Exp $
+ * $Id: transfrm.c,v 1.22 2003/07/06 17:25:30 lculik Exp $
  */
 
 /*
@@ -94,6 +94,7 @@
 #define PF_WIDTH      0x0800   /* @S */
 #define PF_PARNEGWOS  0x1000   /* @) Similar to PF_PARNEG but without leading spaces */
 
+extern char *hb_vm_acAscii[256];
 
 HB_FUNC( TRANSFORM )
 {
@@ -216,7 +217,6 @@ HB_FUNC( TRANSFORM )
          BOOL bFound  = FALSE;
 
          /* Grab enough */
-
          /* Support date function for strings */
          if( ( uiPicFlags & PF_DATE ) ||
            ( ( uiPicFlags & PF_BRITISH ) && ( uiPicFlags & PF_REMAIN ) ) )
@@ -226,6 +226,43 @@ HB_FUNC( TRANSFORM )
             szPic = szPicDate;
             ulPicLen = strlen( szPicDate );
          }
+
+         /* ======================================================= */
+         /* This is a special case handler to be Clipper compatible */
+         /* ======================================================= */
+         if ( ( uiPicFlags & PF_BRITISH ) && ( ulExpLen <= 3 ) )
+         {
+            char *pTmp = hb_itemGetCPtr( pPic );
+            if ( hb_stricmp( pTmp, "@E" ) == 0 || hb_stricmp( pTmp, "@E ." ) == 0 || hb_stricmp( pTmp, "@E ," ) == 0 )
+            {
+               if ( ulExpLen == 3 )
+               {
+                  char *szRetVal = (char*) hb_xgrab( 3 );
+                  hb_xmemset( szRetVal, 0 , 3 );
+                  szRetVal[2] = 47;
+                  hb_retclen( szRetVal, 3 );
+                  hb_xfree( szRetVal );
+                  return;
+               }
+               else if ( ulExpLen == 2 && hb_stricmp( szExp , ".." ) == 0 )
+               {
+                  char *szRetVal = (char*) hb_xgrab( 2 );
+                  hb_xmemset( szRetVal, 0 , 2 );
+                  hb_retclen( szRetVal, 2 );
+                  hb_xfree( szRetVal );
+                  return;
+               }
+               else if ( ulExpLen == 1 && hb_stricmp( szExp , "." ) == 0 )
+               {
+                  char *szRetVal = (char*) hb_xgrab( 1 );
+                  hb_xmemset( szRetVal, 0 , 1 );
+                  hb_retclen( szRetVal, 1 );
+                  hb_xfree( szRetVal );
+                  return;
+               }
+            }
+         }
+
          szResult = ( char * ) hb_xgrab( ulExpLen + ulPicLen + 1 );
          ulResultPos = 0;
 
