@@ -1,0 +1,61 @@
+/*
+ * $Id: hb_apiit.txt,v 1.1.1.1 2001/12/21 10:48:34 ronpinkas Exp $
+ */
+
+/*
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.xharbour.org
+ *
+ * Copyright 2003-2004 Giancarlo Niccolai <gc /at/ niccolai /dot/ ws>
+ *
+ * See doc/license.txt for licensing terms.
+ *
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_SERVICE()
+ *  $CATEGORY$
+ *      Service management & IPC
+ *  $ONELINER$
+ *      Service oriented program startup
+ *  $SYNTAX$
+ *      HB_SERVICE( lDetach ) 
+ *  $ARGUMENTS$
+ *      <lDetach>
+ *  $RETURNS$
+ *
+ *  $DESCRIPTION$
+ *      Starts a service oriented program.
+ *
+ *      This was formerly used to install a signal handler, so that HB_PUSHSIGNALHANDLER
+ *      routine family may work from that point on. Now, signal handlers are 
+ *      self-installed by those routines; currently, HB_SERVICE() does something
+ *      only when lDetach is set to true.
+ *
+ *      When this happens, the current process is detached from the console, in
+ *      a system specific way. Under UNIX, the process is forked and the parent
+ *      is terminated, so that only the child is left alive; this grants the
+ *      child to work independently by any lanucher that may have started it (be it
+ *      a console, a shell or a X Window Manager). Threads, variables and previously
+ *      existing signal handlers are preserved.
+ *
+ *      Under windows, the console (if present) is detached. By calling this function before
+ *      any GT output, it's possible to effectively hide the program execution, so that
+ *      it can be put in autoexec.bat, win.ini RUN= entry, or windows registry RUN 
+ *      key(s) and run in the background.
+ *
+ *      In future, this function will also hook Win32 service support, where available.
+ *
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      New to Xharbour
+ *  $FILES$
+ *      Library is rtl
+ *  $PLATFORMS$
+ *      UNIX, MS-Windows
+ *  $SEEALSO$
+ *      HB_PUSHSIGNALHANDLER
+ *  $END$
+ */

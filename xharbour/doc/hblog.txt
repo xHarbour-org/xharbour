@@ -5,10 +5,10 @@
 
                               Giancarlo Niccolai
 
-                               gian@nccolai.ws
+                              antispam@nccolai.ws
 
 
-$Id: hblog.txt,v 1.1 2003/08/01 16:56:52 jonnymind Exp $
+$Id: hblog.txt,v 1.2 2003/08/02 18:08:27 lculik Exp $
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -433,7 +433,7 @@ $Id: hblog.txt,v 1.1 2003/08/01 16:56:52 jonnymind Exp $
  *      to the logging application; if not given, a dummy data is provided.
  *      Anyway, you should provide a valid sender address because:
  *      1) The mail server may check for the domain of the sender, or even
- *         for the whole sender address, before allowing mail go get through.
+ *         for the whole sender address, before allowing mail to get through.
  *      2) An incorrect from: address may cause anti-spam filters to block the
  *         mail.
  *      3) A correct from: address may help to filter the messages and move them
@@ -513,7 +513,7 @@ $Id: hblog.txt,v 1.1 2003/08/01 16:56:52 jonnymind Exp $
  *      THE STANDARD LOGGER COMMANDS
  *      ============================
  *      
- *      To simplify the tast of writing applications that uses the standard
+ *      To simplify the task of writing applications that uses the standard
  *      logger api, a set of commands have been added in "hblog.ch"
  *      
  *      The commands and the API calls can be seamlessy mixed; using them
@@ -594,7 +594,7 @@ $Id: hblog.txt,v 1.1 2003/08/01 16:56:52 jonnymind Exp $
  *      the standard logger channels. Usually, log channels record both
  *      their opening and their closing issuing a default message at info
  *      priority; this helps to track when a program stopped working due to
- *      "natural" reasons, i.e. when last a program has been used correctly
+ *      "natural" reasons, i.e. when a program has been closed correctly
  *      by a user.
  *      
  *  $END$

@@ -1,0 +1,169 @@
+
+                 X H A R B O U R - Multiplatform error/signal handling
+
+                              User API description
+
+                               Giancarlo Niccolai
+
+                              antispam@nccolai.ws
+     
+                              
+ABSTRACT
+========
+
+Signal handling it's a necessary task for server applications, which receives
+messages in the form of signals in UNIX and UNIX-like systems. Under windows
+system, it's possible to commuincate in a similar way by sending windows 
+messages to applications.
+
+Hard error management, as floating point exception and page fault, is 
+implemented as a special error handling system under MS-Windows, while it is
+implemented as signal communication in UNIX systems.
+
+This api provides a very simple, portable and reliable way to deal both with
+hard errors and inter process communications via signals/messages; the api
+is integrated with both the MultiThreading Xharbour extension and the service
+support (which detaches the applications from the system console, making it
+behaving as a real background process).
+
+
+CONCEPTS
+========
+
+Error/Signal handling in xharbour is done via a multiplatform abstraction of
+the E/S types. To make things simpler, an application relevant MS-Widnows 
+message, an hard error and a Unix signal are all identified with the generic
+name of "signal". The application may intercept one or more of this signals
+sending them to a certain routine, called signal handler. Signal handlers
+may be pushed in a kind of stack, so that the last signal handler pushed
+is called first, and it may or may not decide to continue the program, and
+so call previously pushed signal handlers.
+
+
+HANDLED SIGNALS
+===============
+
+A list of handled signals is in hbserv.ch; they can be mixed with '+'
+operator, so that a signal handler may intercept more than one signal.
+
+Handled siganls are:
+   
+   - HB_SIGNAL_QUIT: system has requested the application to quit;
+      usually this is due to a SIGTERM unix signal or WM_CLOSE 
+      windows message.
+                     
+   - HB_SIGNAL_INTERRUPT: The process has been interrupted; this is
+      due to a SIGINT under unix, which may also be simulated via a
+      CTRL+C keystore sent on an unmanaged console (many xharbour
+      Graphic Terminals emulators intercept CTRL+C on their own).
+      
+   - HB_SIGNAL_REFRESH: System signal that tells the application that
+      its configuration files have chaged; a reload/restart of the
+      system is in order. Under windows, this is mapped into WM_USER
+      windows message.
+
+   - HB_SIGNAL_MATHERR: a mathematical exception has appened; divisons
+      by zero, overflows and underflows are common examples.
+      
+   - HB_SIGNAL_FAULT: An unguarded page fault has happened. This is
+      known as SIGSEGV or SIGILL for unix and as a General Protection 
+      Fault under Windows.
+
+   - HB_SIGNAL_USER1: An hook to allow the process a rudimental (but
+      effective) IPC with other applications; this maps to SIGUSR1
+      into UNIX systems, and WM_USER+1 under Windows systems.
+   
+   - HB_SIGNAL_USER2: Seconday hook for simple IPC; Maps to SIGUSR2
+      under UNIX, and WM_USER+2 under Windows.
+
+   - HB_SIGNAL_UNKNOWN: Unused under windows; maps to all other 
+      signals under UNIX, like i.e. SIGPIPE and similar exotic
+      signals.
+      
+   - HB_SIGNAL_ALL: maps all known signals.
+
+
+API
+===
+
+PROCEDURE HB_PushSignalHandler( nSignalMask , xCallableRoutine )
+
+   Push a signal handler xCallableRoutine; it can be a @Routine() like
+   method handler, a "ruotineName" string or a {||codeblock}.
+   nSignalMask is a combination of HB_SIGNAL_* that can be summed up
+   to catch more than one signal.
+   
+   It's possible to push one generic handler and then more focused ones,
+   like in this example:
+   
+      HB_PushSignalHandler( HB_SIGNAL_ALL, @ManageAll() )
+      HB_PushSignalHandler( HB_SIGNAL_USER1 + HB_SIGNAL_USER2 , @ManageUsrRequest() )
+      HB_PushSignalHandler( HB_SIGNAL_QUIT, @ManageQuit() )
+      
+   Pushing a singal handler over existing ones temporarily "disables" the
+   underlying signal handlers. 
+   
+   The signal handler routine has this format:
+   
+   FUNCTION HandlerRoutine( aParams ) --> nRequest
+   
+   aParams is an array which has the following elements (defined in
+   hbserv.ch):
+   
+   HB_SERVICE_OSSIGNAL - signal type number; under windows, it's 0 for 
+         WM_MESSAGE emulated signals and 1 for Windows Error management.
+   HB_SERVICE_OSSUBSIG - subsignal type number; it's a siginfo specifier
+         under unix (usually used to determine SIGFPE, SIGSEGV and SIGILL
+         reasons), and code that determines the type of error under windows.
+   HB_SERVICE_OSERROR - errno or GetLastError() number at error rising moment.
+   HB_SERVICE_ADDRESS - address where the error has been detected, if
+         applicable.
+   HB_SERVICE_PROCESS - process ID that rised the signal (may be different from
+         current process ID in IPC error signaling).
+   HB_SERVICE_UID - User ID owner of the interrupted process.
+
+   Some of this values are highly system dependant; another routine is provied
+   to get a consistent error message depending on the values inside this array,
+   so minimal elaboration is needed at program level.
+
+   The handler routine must NEVER call Quit(); instead, it must return one
+   of the following values:
+      
+   HB_SERVICE_CONTINUE - Continue the program from where it has been stopped,
+         or at continue into the next signal handler if present.
+   HB_SERVICE_HANDLED - signal is handled; continue where the program has
+         been stopped ignoring other underlying signal handlers.
+   HB_SERVICE_QUIT - Condition error is too critical; program must terminate.
+   
+   Notice that it's impossible to continue the program when an hard error
+   as a page fault has been detected; in that case, the program receives
+   another signal (or error under windows) that cannot be masked and is
+   forcefully terminated.
+   
+   
+PROCEDURE HB_PopSignalHandler()
+   Removes last pushed signal handler (if present).
+   
+   NEVER call this function from inside a signal handler.
+   
+   
+FUNCTION HB_SignalDesc( nSignal, nSubSignal ) --> cDesc
+   Returns a string description of a given signal and subsignal (index 1 and 2 
+   of the array passed to the signal handler).
+   
+PROCEDURE HB_ServiceLoop()
+
+   Xharbour VM is not yet capable to intercept and dispatch WM_ windows 
+   messages. To allow HB_SIGNAL_QUIT, HB_SIGNAL_USER1 and HB_SIGNAL_USER2 
+   handlers to work correctly, is necessary to call periodically the function 
+   HB_ServiceLoop(). This function is meant for those program that, having
+   not an I/O console or display or window, must anyhow collect garbage
+   and, under windows, listen to the windows message loop. Applications
+   that wants to respond consistently to QUIT, USER1 and USER2 messages
+   across platforms must call this function somewhere in the main program
+   loop; MS-Windows programs that have already a message loop may call
+   this function inside it, as this only gets the messages it is 
+   interested in without interferring with other mesasges the application
+   may be listening for.
+   
+   
