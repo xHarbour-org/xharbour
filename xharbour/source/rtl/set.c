@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.56 2004/09/16 21:34:57 peterrees Exp $
+ * $Id: set.c,v 1.57 2004/10/27 21:50:18 guerra000 Exp $
  */
 
 /*
@@ -7,7 +7,7 @@
  * Set functions
  *
  * Copyright 1999-2001 David G. Holm <dholm@jsd-llc.com>
- * www - http://www.harbour-project.org
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ static HB_PATHNAMES * sp_set_path;
       extern BOOL hb_isLegacyDevice( LPTSTR pPrinterName);
 #endif
 char s_PrintFileName[ _POSIX_PATH_MAX + 1 ], s_PrinterName[ _POSIX_PATH_MAX + 1 ];
-BOOL s_HaveSetPrinterName ;
+BOOL s_isDefaultPrinterDevice;    // Printer is the default device
 static void hb_setFreeSetPath( void )
 {
    /* Free all set paths */
@@ -112,7 +112,7 @@ static void hb_setFreeSetPath( void )
 
 HB_EXPORT HB_SET_STRUCT *hb_GetSetStructPtr( void )
 {
-	return &hb_set;
+   return &hb_set;
 }
 
 static char set_char( PHB_ITEM pItem, char oldChar )
@@ -237,14 +237,6 @@ static char * set_string( PHB_ITEM pItem, char * szOldString )
    return szString;
 }
 
-static void hb_set_SetDefaultPrinter(void) {
-   if (hb_set.HB_SET_PRINTFILE)
-     hb_xfree(hb_set.HB_SET_PRINTFILE) ;
-   hb_set.HB_SET_PRINTFILE = ( char * ) hb_xgrab( 4 );
-   memcpy( hb_set.HB_SET_PRINTFILE, "PRN", 4 ); /* Default printer device */
-  }
-
-
 static void close_binary( FHANDLE handle )
 {
    HB_TRACE(HB_TR_DEBUG, ("close_binary(%p)", handle));
@@ -266,6 +258,7 @@ static void close_binary( FHANDLE handle )
 #endif
    }
 }
+
 static void close_text( FHANDLE handle )
 {
    HB_TRACE(HB_TR_DEBUG, ("close_text(%p)", handle));
@@ -420,6 +413,64 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
    }
    hb_fsSetError( user_ferror ); /* Restore the current user file error code */
    return handle;
+}
+
+// Sets default printer device
+static void hb_set_SetDefaultPrinter( void )
+{
+   if( hb_set.HB_SET_PRINTFILE )
+   {
+      hb_xfree( hb_set.HB_SET_PRINTFILE );
+   }
+
+   #ifdef HB_OS_UNIX
+      hb_set.HB_SET_PRINTFILE = ( char * ) hb_xgrab( 5 );
+      memcpy( hb_set.HB_SET_PRINTFILE, "|lpr", 5 );
+   #else
+      hb_set.HB_SET_PRINTFILE = ( char * ) hb_xgrab( 4 );
+      memcpy( hb_set.HB_SET_PRINTFILE, "PRN", 4 );
+   #endif
+
+   s_isDefaultPrinterDevice = TRUE;
+}
+
+// Initializes printer if needed
+BOOL hb_set_SetPrinterStart( void )
+{
+   BOOL bDone;
+
+   if( hb_set.hb_set_printhan != FS_ERROR )
+   {
+      // It's already open
+      bDone = TRUE;
+   }
+   else if( ! s_isDefaultPrinterDevice )
+   {
+      // It's not the default printer device... can't it be opened?
+      bDone = FALSE;
+   }
+   else
+   {
+      // Opens printer
+      hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, FALSE, ".prn", HB_SET_PRINTER );
+      bDone = ( hb_set.hb_set_printhan != FS_ERROR );
+   }
+
+   return bDone;
+}
+
+// Closes default printer if needed
+void hb_set_SetPrinterStop( void )
+{
+   if( hb_set.hb_set_printhan != FS_ERROR  &&  // It's open
+       s_isDefaultPrinterDevice            &&  // It's the default printer device
+       ! hb_set.HB_SET_PRINTER             &&  // SET PRINTER OFF
+       hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) != 0 )   // SET DEVICE TO SCREEN
+   {
+      // Closes printer
+      close_binary( hb_set.hb_set_printhan );
+      hb_set.hb_set_printhan = FS_ERROR;
+   }
 }
 
 HB_FUNC( SETCANCEL )
@@ -763,14 +814,29 @@ HB_FUNC( SET )
          break;
 
       case HB_SET_DEVICE     :
-         if( hb_set.HB_SET_DEVICE ) hb_retc( hb_set.HB_SET_DEVICE );
-         else hb_retc( NULL );
+         if( hb_set.HB_SET_DEVICE )
+         {
+            hb_retc( hb_set.HB_SET_DEVICE );
+         }
+         else
+         {
+            hb_retc( NULL );
+         }
 
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
+            hb_set.HB_SET_DEVICE = set_string( pArg2, hb_set.HB_SET_DEVICE );
 
             /* If the print file is not already open, open it in overwrite mode. */
-           hb_set.HB_SET_DEVICE = set_string( pArg2, hb_set.HB_SET_DEVICE );
+            if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 )
+            {
+               hb_set_SetPrinterStart();
+            }
+            else
+            {
+               hb_set_SetPrinterStop();
+            }
+
          }
          break;
 
@@ -1036,41 +1102,30 @@ HB_FUNC( SET )
 
       case HB_SET_PRINTER    :
          hb_retl( hb_set.HB_SET_PRINTER );
-         if( args > 1 ) {
-            BOOL bWasOn = hb_set.HB_SET_PRINTER ;
+         if( args > 1 )
+         {
             hb_set.HB_SET_PRINTER = set_logical( pArg2, hb_set.HB_SET_PRINTER );
 
-            // Only do next section if command "SET PRINTER TO [<xcDevice> | <xcFile>]" has not been used.
-            // This makes "SET PRINTER ON/OFF" Clipper compatible
-            if ( !s_HaveSetPrinterName ) {
-              if ( bWasOn && !hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR ) {
-                close_binary( hb_set.hb_set_printhan );
-                hb_set.hb_set_printhan = FS_ERROR;
-              }
-              else if ( !bWasOn && hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan == FS_ERROR ) {
-                if (hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0)
-                  hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, FALSE, ".prn", HB_SET_PRINTER );
-              }
+            if( hb_set.HB_SET_PRINTER )
+            {
+               hb_set_SetPrinterStart();
+            }
+            else
+            {
+               hb_set_SetPrinterStop();
             }
          }
          break;
 
       case HB_SET_PRINTFILE  :
       {
-         BOOL bOpen=TRUE;
-
          if( hb_set.HB_SET_PRINTFILE )
          {
-           hb_retc( hb_set.HB_SET_PRINTFILE );
+            hb_retc( hb_set.HB_SET_PRINTFILE );
          }
          else
          {
             hb_retc( NULL );
-         }
-
-         if( args > 1 && ! HB_IS_NIL( pArg2 ) )
-         {
-            hb_set.HB_SET_PRINTFILE = set_string( pArg2, hb_set.HB_SET_PRINTFILE );
          }
 
          if( args > 2 )
@@ -1084,19 +1139,23 @@ HB_FUNC( SET )
 
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
+            hb_set.HB_SET_PRINTFILE = set_string( pArg2, hb_set.HB_SET_PRINTFILE );
+
             close_binary( hb_set.hb_set_printhan );
             hb_set.hb_set_printhan = FS_ERROR;
-            s_HaveSetPrinterName = FALSE ;
 
-            if (hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0  && bOpen)  {
-              hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, bFlag, ".prn", HB_SET_PRINTFILE );
-              s_HaveSetPrinterName = TRUE ;
+            if( hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0 )
+            {
+               hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, bFlag, ".prn", HB_SET_PRINTFILE );
+               s_isDefaultPrinterDevice = FALSE;
+            }
+            else
+            {
+               hb_set_SetDefaultPrinter(); // Make sure there is a default print file name "PRN"
             }
          }
-        if (hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) == 0)
-          hb_set_SetDefaultPrinter() ; // Make sure there is a default print file name "PRN"
-         break;
       }
+      break;
 
       case HB_SET_SCOREBOARD :
          hb_retl( hb_set.HB_SET_SCOREBOARD );
@@ -1567,16 +1626,11 @@ void hb_setInitialize( void )
    hb_set.HB_SET_PATH[ 0 ] = '\0';
    hb_set.HB_SET_PRINTER = FALSE;
 
-#ifdef HB_OS_UNIX
-   hb_set.HB_SET_PRINTFILE = ( char * ) hb_xgrab( 5 );
-   memcpy( hb_set.HB_SET_PRINTFILE, "|lpr", 5 ); /* Default printer device */
-#else
-   hb_set.HB_SET_PRINTFILE=NULL;
-   hb_set_SetDefaultPrinter() ;
-#endif
+   hb_set.HB_SET_PRINTFILE = NULL;
+   hb_set_SetDefaultPrinter();
 
    hb_set.hb_set_printhan = FS_ERROR;
-   hb_set.hb_set_winhan=FS_ERROR;
+   hb_set.hb_set_winhan = FS_ERROR;
    hb_set.HB_SET_SCOREBOARD = TRUE;
    hb_set.HB_SET_SCROLLBREAK = TRUE;
    hb_set.HB_SET_SOFTSEEK = FALSE;
@@ -1620,7 +1674,6 @@ void hb_setInitialize( void )
 
    sp_sl_first = sp_sl_last = NULL;
    s_next_listener = 1;
-   s_HaveSetPrinterName = FALSE ;
 
    /* Listener test (2 of 2)
    {

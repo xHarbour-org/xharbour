@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.53 2004/10/23 23:00:00 oh1 Exp $
+ * $Id: console.c,v 1.53 2004/10/23 23:31:30 oh1 Exp $
  */
 /*
  * Harbour Project source code:
@@ -128,6 +128,9 @@ static int    s_iFilenoStdout;
 static int    s_iFilenoStderr;
 
 #endif
+
+extern BOOL hb_set_SetPrinterStart( void );
+extern void hb_set_SetPrinterStop( void );
 
 /****************************************************************************/
 void hb_conInit( void )
@@ -491,11 +494,13 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 
    HB_CONSOLE_SAFE_LOCK
 
-   if( ( ( hb_stricmp(hb_set.HB_SET_DEVICE, "PRINTER" ) == 0) || hb_set.HB_SET_PRINTER ) && hb_set.hb_set_printhan != FS_ERROR ) {
+   if( hb_set_SetPrinterStart() )
+   {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C", 1 ); // Peter Rees: 29/10/2003 8:52a.m. Clipper does not send "\x0D"
 //      hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D\x0C", 2 );
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
+      hb_set_SetPrinterStop();
    }
 
    s_uiPRow = s_uiPCol = 0;

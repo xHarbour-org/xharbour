@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3585 2004/11/04 19:50:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3586 2004/11/05 04:37:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-07 15:09 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/set.c
+    * Moved Unix default printer device to hb_set_SetDefaultPrinter().
+    * Changed "s_HaveSetPrinterName" to "s_isDefaultPrinterDevice"
+    * Minor formatting.
+    * Modified the PRINTER open/close system. Centralized to be
+      accesible "anywhere", respecting an output to file or the
+      "real" printer, and verifying not interrupt an active
+      SET PRINTER ON / SET DEVICE TO PRINTER.
+      Reported by Jose Arias Vega.
+  * source/rtl/console.c
+    ! EJECT now can work if printer device is not already initialized.
 
 2004-11-04 20:36 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c
