@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.61 2003/11/30 10:02:46 druzus Exp $
+ * $Id: dbcmd.c,v 1.62 2003/12/01 03:41:03 ronpinkas Exp $
  */
 
 /*
@@ -4836,8 +4836,8 @@ HB_FUNC( DBSKIPPER )
    HB_THREAD_STUB
 
    if( s_pCurrArea )
-   {  long  nSkipped   = 0;
-      long  nRecs      = 1;
+   {  LONG nSkipped    = 0;
+      LONG nRecs       = 1;
       BOOL bBEof       = TRUE;
       if( hb_pcount() > 0 )
       {

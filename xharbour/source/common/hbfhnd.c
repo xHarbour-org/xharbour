@@ -1,5 +1,5 @@
 /*
- * $Id: hbfhnd.c,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: hbfhnd.c,v 1.3 2002/01/20 15:56:55 lculik Exp $
  */
 
 /*
@@ -115,7 +115,7 @@ unsigned int _RTLENTRY _openfd[_NFILE_] =
 unsigned int _RTLENTRY _pidtab[_NFILE_];
 
 #ifdef __WIN32__
-   unsigned long _RTLENTRY _handles[_NFILE_];
+   unsigned LONG _RTLENTRY _handles[_NFILE_];
 #endif
 
 void hb_files_setup( void )

@@ -1,5 +1,5 @@
 /*
- * $Id: status.c,v 1.3 2001/11/12 14:09:13 andijahja Exp $
+ * $Id: status.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
  */
 
 /*
@@ -99,7 +99,7 @@ HB_FUNC( STATUSUPDATE )
    if( pArray )
    {
       char * szDisplay  = "|/-\\";
-      long lCurrent = hb_arrayGetNL( pArray, ST_CURRENT );
+      LONG lCurrent = hb_arrayGetNL( pArray, ST_CURRENT );
       char * szOldColor[ CLR_STRLEN ];
       PHB_ITEM pCurrent = hb_itemNew( NULL );
 

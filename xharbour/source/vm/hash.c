@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.17 2003/11/29 02:26:43 jonnymind Exp $
+ * $Id: hash.c,v 1.18 2003/12/03 11:16:08 jonnymind Exp $
  */
 
 /*
@@ -427,9 +427,9 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
 
             // Resize old page
             pPageBase->ulLen = pPageBase->ulLen - pNewBase->ulLen;
-            pPageBase->pKeys = hb_xrealloc( pPageBase->pKeys, 
+            pPageBase->pKeys = ( PHB_ITEM ) hb_xrealloc( pPageBase->pKeys, 
                pPageBase->ulLen * sizeof( HB_ITEM ) );
-            pPageBase->pValues = hb_xrealloc( pPageBase->pValues, 
+            pPageBase->pValues = ( PHB_ITEM ) hb_xrealloc( pPageBase->pValues, 
                pPageBase->ulLen * sizeof( HB_ITEM ) );
             pPageBase->ulAllocated = pPageBase->ulLen;
 

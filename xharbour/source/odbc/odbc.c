@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.10 2003/10/13 03:37:28 lculik Exp $
+ * $Id: odbc.c,v 1.11 2003/11/24 16:57:26 lf_sfnet Exp $
  */
 
 /*
@@ -343,7 +343,7 @@ HB_FUNC( SQLERROR ) //  hEnv, hDbc, hStmt, @ cErrorClass, @ nType, @ cErrorMsg
    SWORD wLen;
 
    hb_retni( SQLError( ( HENV ) hb_parnl( 1 ), ( HDBC ) hb_parnl( 2 ),
-                       ( HSTMT ) hb_parnl( 3 ), bBuffer1, (long *) &lError,
+                       ( HSTMT ) hb_parnl( 3 ), bBuffer1, (LONG *) &lError,
                        szErrorMsg, 256, &wLen ) );
 
    hb_storc( (char *) bBuffer1, 4 );
@@ -355,7 +355,7 @@ HB_FUNC( SQLROWCOUN )
 {
     SQLUINTEGER  uiRowCountPtr = hb_parni( 2 );
     WORD         wResult       = SQLRowCount( ( HSTMT ) hb_parnl( 1 ),
-                                              (long *) &uiRowCountPtr );
+                                              ( LONG * ) &uiRowCountPtr );
 
     if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
     {

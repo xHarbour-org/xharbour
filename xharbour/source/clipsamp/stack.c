@@ -1,5 +1,5 @@
 /*
- * $Id: stack.c,v 1.2 2001/06/14 21:20:43 dholm Exp $
+ * $Id: stack.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
  */
 
 /*
@@ -79,7 +79,7 @@ HB_FUNC( STACKPUSH )
 HB_FUNC( STACKPOP )
 {
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-   long ulLen = hb_arrayLen( pArray );
+   LONG ulLen = hb_arrayLen( pArray );
    PHB_ITEM pLast = hb_itemNew( NULL );
 
    if( ulLen )

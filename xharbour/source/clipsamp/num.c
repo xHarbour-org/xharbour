@@ -1,5 +1,5 @@
 /*
- * $Id: num.c,v 1.4 2002/06/24 19:58:23 dholm Exp $
+ * $Id: num.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
  */
 
 /*
@@ -66,7 +66,7 @@
 */
 HB_FUNC( CEILING )
 {
-   hb_retnl( (long) ceil( hb_parnd( 1 ) ) );
+   hb_retnl( ( LONG ) ceil( hb_parnd( 1 ) ) );
 }
 
 /* DtoR( <nDegrees> ) --> nRadians
@@ -82,7 +82,7 @@ HB_FUNC( DTOR )
 */
 HB_FUNC( FLOOR )
 {
-   hb_retnl( (long) floor( hb_parnd( 1 ) ) );
+   hb_retnl( ( LONG ) floor( hb_parnd( 1 ) ) );
 }
 
 /* NumAsLog10( <nNumber> ) --> nLog10 
@@ -168,7 +168,7 @@ HB_FUNC( SIGN )
 {
    if( ISNUM( 1 ) )
    {
-      long lNumber = hb_parnl( 1 );
+      LONG lNumber = hb_parnl( 1 );
 
       hb_retni( lNumber == 0 ? 0 : ( lNumber > 0 ? 1 : -1 ) );
    }
@@ -180,7 +180,7 @@ HB_FUNC( SIGN )
 HB_FUNC( NUMASCURRENCY )
 {
    char * szBuffer = hb_itemStr( hb_param( 1, HB_IT_NUMERIC ), NULL, NULL );
-   long ulSymbolLen = hb_itemGetCLen( hb_param( 2, HB_IT_STRING ) );
+   LONG ulSymbolLen = hb_itemGetCLen( hb_param( 2, HB_IT_STRING ) );
    char * ptr = szBuffer;
    char * szCurrency;
    ULONG ulLen;

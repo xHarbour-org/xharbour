@@ -1,5 +1,5 @@
 /*
- * $Id: date.c,v 1.3 2001/06/14 21:20:43 dholm Exp $
+ * $Id: date.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 */
 HB_FUNC( MDY )
 {
-   long lYear, lMonth, lDay;
+   LONG lYear, lMonth, lDay;
    char szDate[ 9 ];
    char szFormatted[ 11 ];
    char * szReturn;
@@ -88,7 +88,7 @@ HB_FUNC( MDY )
 */
 HB_FUNC( DMY )
 {
-   long lYear, lMonth, lDay;
+   LONG lYear, lMonth, lDay;
    char szDate[ 9 ];
    char szFormatted[ 11 ];
    char * szReturn;
@@ -116,13 +116,13 @@ HB_FUNC( DMY )
 */
 HB_FUNC( DATEASAGE )
 {
-   long lAge = 0;
+   LONG lAge = 0;
    PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
 
    if( pDate )
    {
-      long lYear, lMonth, lDay;
-      long lThisYear, lThisMonth, lThisDay;
+      LONG lYear, lMonth, lDay;
+      LONG lThisYear, lThisMonth, lThisDay;
 
       hb_dateToday( &lThisYear, &lThisMonth, &lThisDay );
       hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
@@ -144,11 +144,11 @@ HB_FUNC( DATEASAGE )
 */
 HB_FUNC( ADDMONTH )
 {
-   long lMonths = hb_parnl( 2 );
-   long lYear, lMonth, lDay;
+   LONG lMonths = hb_parnl( 2 );
+   LONG lYear, lMonth, lDay;
 
    int iLimit, iMonthAdd, iYearAdd;
-   long lNew;
+   LONG lNew;
 
    hb_dateDecode( hb_parnl( 1 ), &lYear, &lMonth, &lDay );
 
@@ -190,7 +190,7 @@ HB_FUNC( DATEASARRAY )
    if( pDate )
    {
       PHB_ITEM pItem;
-      long lYear, lMonth, lDay;
+      LONG lYear, lMonth, lDay;
 
       hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
 
@@ -231,7 +231,7 @@ HB_FUNC( DATEISLEAP )
 
    if( pDate )
    {
-      long lYear, lMonth, lDay;
+      LONG lYear, lMonth, lDay;
 
       hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.22 2003/06/29 07:25:38 andijahja Exp $
+ * $Id: hbpcode.c,v 1.23 2003/07/13 22:21:25 andijahja Exp $
  */
 
 /*
@@ -306,7 +306,7 @@ static BYTE s_pcode_len[] = {
    3,        /* HB_P_PUSHLOCAL,            */
    2,        /* HB_P_PUSHLOCALNEAR,        */
    3,        /* HB_P_PUSHLOCALREF,         */
-   1 + sizeof( long ),        /* HB_P_PUSHLONG,             */
+   1 + sizeof( LONG ),        /* HB_P_PUSHLONG,             */
    3,        /* HB_P_PUSHMEMVAR,           */
    3,        /* HB_P_PUSHMEMVARREF,        */
    1,        /* HB_P_PUSHNIL,              */
@@ -355,7 +355,7 @@ static BYTE s_pcode_len[] = {
    2,        /* HB_P_POPGLOBAL,            */
    2,        /* HB_P_PUSHGLOBALREF,        */
    1,        /* HB_P_ENUMINDEX,            */
-   1 + sizeof( long ), /* HB_P_SWITCHCASE, */
+   1 + sizeof( LONG ), /* HB_P_SWITCHCASE, */
    1,        /* HB_P_LIKE,                 */
    1,        /* HB_P_MATCH                 */
    1,        /* HB_P_PUSHMACROREF          */

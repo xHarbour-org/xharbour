@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.5 2003/06/26 12:37:08 druzus Exp $
+ * $Id: hbver.c,v 1.6 2003/06/27 05:05:35 ronpinkas Exp $
  */
 
 /*
@@ -173,7 +173,7 @@ char * hb_verPlatform( void )
 #elif defined(HB_OS_OS2)
 
    {
-      unsigned long aulQSV[ QSV_MAX ] = { 0 };
+      unsigned LONG aulQSV[ QSV_MAX ] = { 0 };
       APIRET rc;
 
       rc = DosQuerySysInfo( 1L, QSV_MAX, ( void * ) aulQSV, sizeof( ULONG ) * QSV_MAX );

@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.55 2003/11/01 06:00:54 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.56 2003/11/26 03:17:49 likewolf Exp $
  */
 
 /*
@@ -151,7 +151,7 @@ static void hb_compDebugStart( void ) { };
 {
    char * string;       /* to hold a string returned by lex */
    int    iNumber;      /* to hold a temporary integer number */
-   long   lNumber;      /* to hold a temporary long number */
+   LONG   lNumber;      /* to hold a temporary long number */
    struct
    {
       int    iNumber;      /* to hold a number returned by lex */
@@ -159,7 +159,7 @@ static void hb_compDebugStart( void ) { };
    } valInteger;
    struct
    {
-      long   lNumber;      /* to hold a long number returned by lex */
+      LONG   lNumber;      /* to hold a long number returned by lex */
       char * szValue;
    } valLong;
    struct
@@ -2149,7 +2149,7 @@ Constant   : NUM_INTEGER         { $$ = hb_compExprNewLong( $1.iNumber ); }
            | LITERAL             {
                                     if( $1[1] == '\0' )
                                     {
-                                       $$ = hb_compExprNewLong( (long) $1[0] );
+                                       $$ = hb_compExprNewLong( (LONG) $1[0] );
                                     }
                                     else
                                     {

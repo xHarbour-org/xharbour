@@ -1,5 +1,5 @@
 /*
- * $Id: mousewin.c,v 1.3 2003/05/21 09:35:37 druzus Exp $
+ * $Id: mousewin.c,v 1.4 2003/10/06 03:29:00 lculik Exp $
  */
 
 /*
@@ -63,10 +63,10 @@
 #else
    #if ! defined(HB_DONT_DEFINE_BASIC_TYPES)
       #undef WORD                            /* 2 bytes unsigned */
-      typedef unsigned short int WORD;
+      typedef USHORT WORD;
 
       #undef DWORD                           /* 4 bytes unsigned */
-      typedef unsigned long DWORD;
+      typedef ULONG DWORD;
    #endif
 #endif
 

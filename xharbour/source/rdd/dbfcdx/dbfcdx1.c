@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.88 2003/11/26 09:55:08 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.89 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -346,7 +346,7 @@ static void hb_cdxDspTags( LPCDXINDEX pIndex )
 
 #ifdef HB_CDX_DBGTIME
 #include <sys/time.h>
-typedef long long CDXDBGTIME;
+typedef LONGLONG CDXDBGTIME;
 
 static CDXDBGTIME cdxTimeIntBld = 0;
 static CDXDBGTIME cdxTimeExtBld = 0;
@@ -4543,7 +4543,7 @@ static ERRCODE hb_cdxSkipUnique( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward )
 /*
  * return number of keys in order
  */
-static long hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
+static LONG hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
 {
    ULONG lKeyCount = 0;
 
@@ -4636,7 +4636,7 @@ static long hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
 /*
  * return logical key position in order
  */
-static long hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
+static LONG hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
 {
    ULONG lKeyNo = 0;
 
@@ -7070,7 +7070,7 @@ static LPSORTINFO hb_cdxSortNew( LPCDXTAG pTag, BOOL bUnique )
       pSort->NodeShift++;
    }
    pSort->ChunkSize = pSort->ChunkLimit;
-   pSort->ChunkList = ( long * ) hb_xgrab( pSort->ChunkSize * sizeof( LONG ) );
+   pSort->ChunkList = ( LONG * ) hb_xgrab( pSort->ChunkSize * sizeof( LONG ) );
    memset( pSort->ChunkList, 0, pSort->ChunkSize * sizeof( LONG ) );
    P = ( BYTE * ) hb_xgrab( pSort->SortChunk * sizeof( BYTE ) );
    memset( P, 0, pSort->SortChunk * sizeof( BYTE ) );
@@ -7791,7 +7791,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
             switch( hb_itemType( pItem ) )
             {
                case HB_IT_STRING:
-                  hb_cdxSortInsertWord( pSort, (long) pArea->ulRecNo,
+                  hb_cdxSortInsertWord( pSort, ( LONG ) pArea->ulRecNo,
                                         pItem->item.asString.value,
                                         HB_CDXMAXKEY( pItem->item.asString.length ) );
                   break;

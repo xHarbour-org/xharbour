@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.40 2003/10/27 21:23:36 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.41 2003/11/01 06:00:54 ronpinkas Exp $
  */
 
 /*
@@ -72,7 +72,7 @@ static char *sIdOnHold, *s_sLastBlock = NULL;
 static char *sTextFunction, *sTextReset;
 
 char *     hb_comp_SLX_LastBlock( BOOL bReset );
-long       hb_comp_SLX_Hex2L( char* sHex );
+LONG       hb_comp_SLX_Hex2L( char* sHex );
 static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen );
 static int hb_comp_SLX_InterceptAction( int iRet );
 static int hb_comp_SLX_CustomAction( int x );
@@ -771,7 +771,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       /* Hex Number */
       if( yytext[0] == '0' && yytext[1] == 'X' )
       {
-         long lNumber = hb_comp_SLX_Hex2L( yytext + 2 );
+         LONG lNumber = hb_comp_SLX_Hex2L( yytext + 2 );
 
          if( ( double ) SHRT_MIN <= lNumber && lNumber <= ( double ) SHRT_MAX )
          {
@@ -821,7 +821,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             }
             else if( ( double )LONG_MIN <= yylval.valDouble.dNumber && yylval.valDouble.dNumber <= ( double )LONG_MAX )
             {
-               yylval.valLong.lNumber = ( long ) yylval.valDouble.dNumber;
+               yylval.valLong.lNumber = ( LONG ) yylval.valDouble.dNumber;
                yylval.valLong.szValue = yytext;
                iRet = NUM_LONG;
             }
@@ -843,10 +843,10 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    return iRet;
 }
 
-long hb_comp_SLX_Hex2L( char* sHex )
+LONG hb_comp_SLX_Hex2L( char* sHex )
 {
    int i, iExp = 0, iLen = strlen( sHex ) - 1;
-   long lVal, lSum = 0;
+   LONG lVal, lSum = 0;
    char cChar;
 
    while( iLen >= 0 )

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.26 2003/10/26 18:41:52 jonnymind Exp $
+ * $Id: gtwin.c,v 1.27 2003/11/11 20:20:54 ronpinkas Exp $
  */
 
 /*
@@ -109,10 +109,10 @@ extern BOOL b_MouseEnable;
 #else
    #if ! defined(HB_DONT_DEFINE_BASIC_TYPES)
       #undef WORD                            /* 2 bytes unsigned */
-      typedef unsigned short int WORD;
+      typedef USHORT WORD;
 
       #undef DWORD                           /* 4 bytes unsigned */
-      typedef unsigned long DWORD;
+      typedef ULONG DWORD;
    #endif
 #endif
 
@@ -308,7 +308,7 @@ static BOOL WINAPI HB_GT_FUNC(gt_CtrlHandler( DWORD dwCtrlType ))
 {
    BOOL bHandled;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_CtrlHandler(%lu)", (unsigned long) dwCtrlType));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_CtrlHandler(%lu)", (ULONG) dwCtrlType));
 
    switch( dwCtrlType )
    {

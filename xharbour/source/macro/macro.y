@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.9 2003/04/03 04:15:15 ronpinkas Exp $
+ * $Id: macro.y,v 1.10 2003/05/25 17:03:18 jonnymind Exp $
  */
 
 /*
@@ -137,7 +137,7 @@ extern void yyerror( char * ); /* parsing error management function */
 {
    char * string;       /* to hold a string returned by lex */
    int    iNumber;      /* to hold a temporary integer number */
-   long   lNumber;      /* to hold a temporary long number */
+   LONG   lNumber;      /* to hold a temporary long number */
    struct
    {
       int    iNumber;      /* to hold a number returned by lex */
@@ -145,7 +145,7 @@ extern void yyerror( char * ); /* parsing error management function */
    } valInteger;
    struct
    {
-      long   lNumber;      /* to hold a long number returned by lex */
+      LONG   lNumber;      /* to hold a long number returned by lex */
       char * szValue;
    } valLong;
    struct

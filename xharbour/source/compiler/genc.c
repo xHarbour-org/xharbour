@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.50 2003/09/09 01:32:26 druzus Exp $
+ * $Id: genc.c,v 1.51 2003/10/06 21:31:35 ronpinkas Exp $
  */
 
 /*
@@ -1753,7 +1753,7 @@ static HB_GENC_FUNC( hb_p_pushlong )
    if( cargo->bVerbose ) fprintf( cargo->yyc, "\t/* %li */", HB_PCODE_MKLONG( &( pFunc->pCode[ lPCodePos + 1 ] ) ) );
    fprintf( cargo->yyc, "\n" );
 
-   return 1 + sizeof( long );
+   return 1 + sizeof( LONG );
 }
 
 static HB_GENC_FUNC( hb_p_pushmemvar )
@@ -2019,7 +2019,7 @@ static HB_GENC_FUNC( hb_p_statics )
    PVAR pVar;
    USHORT wVar = 0, i;
    char chr;
-   long lByteCount = 5;
+   LONG lByteCount = 5;
 
    fprintf( cargo->yyc, "\tHB_P_STATICS, %i, %i, %i, %i,",
             pFunc->pCode[ lPCodePos + 1 ],
@@ -2484,7 +2484,7 @@ static HB_GENC_FUNC( hb_p_switchcase )
 
    fprintf( cargo->yyc, "\n" );
 
-   return 1 + sizeof( long );
+   return 1 + sizeof( LONG );
 }
 
 static HB_GENC_FUNC( hb_p_like )

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.101 2003/11/26 20:16:07 likewolf Exp $
+ * $Id: ppcore.c,v 1.102 2003/12/03 13:01:21 mauriliolongo Exp $
  */
 
 /*
@@ -483,7 +483,7 @@ char * hb_ppPlatform( void )
 #elif defined(HB_OS_OS2)
 
    {
-      unsigned long aulQSV[ QSV_MAX ] = { 0 };
+      ULONG aulQSV[ QSV_MAX ] = { 0 };
       APIRET rc;
 
       rc = DosQuerySysInfo( 1L, QSV_MAX, ( void * ) aulQSV, sizeof( ULONG ) * QSV_MAX );
@@ -5045,7 +5045,7 @@ int hb_pp_WrStr( FILE * handl_o, char * buffer )
 static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, BOOL checkPrth, BOOL bRule, BOOL bUpper )
 {
   int State = STATE_NORMAL;
-  long lPos = 0, lSubPos = 0;
+  LONG lPos = 0, lSubPos = 0;
   int kolPrth = 0, kolSquare = 0, kolFig = 0;
   char cLastChar = '\0';
 

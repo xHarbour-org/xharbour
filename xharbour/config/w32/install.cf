@@ -1,12 +1,19 @@
 #
-# $Id: install.cf,v 1.1 1999/10/05 13:00:09 vszel Exp $
+# $Id: install.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
 #
 
 ifeq ($(SHLVL),) # COMMAND.COM
 
+# We have to use script to overcome the DOS limit of max 128 characters
+# NOTE: The empty line directly before 'endef' HAVE TO exist!
+# It causes that every commands will be separated by LF
+define inst_file
+$(CP) $(file) $(subst /,\,$(INSTALL_DIR))
+
+endef
+
 INSTALL_LIST = $(subst /,\,$(INSTALL_OBJS))
-INSTALL_RULE =\
-	$(COMSPEC) /c FOR %f IN ($(INSTALL_LIST)) DO COPY %f $(subst /,\,$(INSTALL_DIR))
+INSTALL_RULE = $(foreach file, $(INSTALL_LIST), $(inst_file))
 
 else  # bash
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1816 2003/12/03 16:34:49 lculik Exp $
+ * $Id: ChangeLog,v 1.1817 2003/12/03 23:26:45 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,45 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-04 10:25 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/w32/install.cf
+    * changed to workaround COMMAND.COM line length limit
+
+  * xharbour/config/dos/watcom.cf
+  * xharbour/config/w32/watcom.cf
+    * debug information changed from -d2 to -d1
+      (-d2 disable some speed optimizations)
+
+  * xharbour/source/vm/hash.c
+    * added casting for hb_xrealloc
+
+  * xharbour/source/clipsamp/date.c
+  * xharbour/source/clipsamp/num.c
+  * xharbour/source/clipsamp/stack.c
+  * xharbour/source/clipsamp/status.c
+  * xharbour/source/common/expropt1.c
+  * xharbour/source/common/expropt2.c
+  * xharbour/source/common/hbfhnd.c
+  * xharbour/source/common/hbver.c
+  * xharbour/source/compiler/genc.c
+  * xharbour/source/compiler/harbour.c
+  * xharbour/source/compiler/harbour.slx
+  * xharbour/source/compiler/harbour.sly
+  * xharbour/source/compiler/hbpcode.c
+  * xharbour/source/macro/macro.slx
+  * xharbour/source/macro/macro.y
+  * xharbour/source/odbc/odbc.c
+  * xharbour/source/pp/ppcore.c
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rtl/gtdos/gtdos.c
+  * xharbour/source/rtl/gtwin/gtwin.c
+  * xharbour/source/rtl/gtwin/mousewin.c
+    * changed 'long' to LONGm the same operation has to be done
+      for files in xharbour/source/rtl and xharbour/source/vm yet.
+      This is necessary if we want to port xHarbour to any platform
+      where long is not 32bit integer (fe. ITANIUM)
 
 2003-12-04 00:17 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * source/rtl/hboutdbg.c

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.53 2003/11/26 03:17:49 likewolf Exp $
+ * $Id: harbour.c,v 1.54 2003/12/01 23:50:12 druzus Exp $
  */
 
 /*
@@ -3153,7 +3153,7 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
 void hb_compGenPopAliasedVar( char * szVarName,
                               BOOL bPushAliasValue,
                               char * szAlias,
-                              long lWorkarea )
+                              LONG lWorkarea )
 {
    if( bPushAliasValue )
    {
@@ -3437,7 +3437,7 @@ void hb_compGenPushMemVarRef( char * szVarName ) /* generates the pcode to push 
 void hb_compGenPushAliasedVar( char * szVarName,
                                BOOL bPushAliasValue,
                                char * szAlias,
-                               long lWorkarea )
+                               LONG lWorkarea )
 {
    if( bPushAliasValue )
    {
@@ -3545,7 +3545,7 @@ void hb_compGenPushFunCall( char * szFunName )
 }
 
 /* generates the pcode to push a long number on the virtual machine stack */
-void hb_compGenPushLong( long lNumber )
+void hb_compGenPushLong( LONG lNumber )
 {
    if( lNumber == 0 )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.7 2003/05/21 09:35:36 druzus Exp $
+ * $Id: gtdos.c,v 1.8 2003/11/30 10:02:47 druzus Exp $
  */
 
 /*
@@ -119,7 +119,7 @@
 #if !defined(__DJGPP__)
    #ifndef MK_FP
       #define MK_FP( seg, off ) \
-         ((void FAR *)(((unsigned long)(seg) << 16)|(unsigned)(off)))
+         ((void FAR *)(((ULONG)(seg) << 16)|(unsigned)(off)))
    #endif
 #endif
 
@@ -736,7 +736,7 @@ static void hb_gt_xPutch( USHORT cRow, USHORT cCol, BYTE attr, BYTE ch )
      }
      else
      {
-        long ch_attr;
+        LONG ch_attr;
         ch_attr = ( ch << 8 ) | attr;
         puttext( cCol + 1, cRow + 1, cCol + 1, cRow + 1, &ch_attr );
      }

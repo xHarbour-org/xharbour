@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.10 2003/11/11 20:20:53 ronpinkas Exp $
+ * $Id: macro.slx,v 1.11 2003/11/22 09:33:33 ronpinkas Exp $
  */
 
 /*
@@ -90,7 +90,7 @@ static YYSTYPE *pYYLVAL;
 
 static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char *sToken );
 static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen );
-long hb_macro_SLX_Hex2L( char* sHex );
+LONG hb_macro_SLX_Hex2L( char* sHex );
 
 void * yy_bytes_buffer( char * pBuffer, int iBufSize );
 
@@ -338,7 +338,7 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
 
       if( yytext[0] == '0' && yytext[1] == 'X' )
       {
-      	 long lNumber = hb_macro_SLX_Hex2L( yytext + 2 );
+      	 LONG lNumber = hb_macro_SLX_Hex2L( yytext + 2 );
 
       	 if( ( double ) LONG_MIN <= lNumber && lNumber <= ( double ) LONG_MAX )
       	 {
@@ -375,7 +375,7 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       	 {
             if( ( double )LONG_MIN <= pYYLVAL->valDouble.dNumber && pYYLVAL->valDouble.dNumber <= ( double )LONG_MAX )
             {
-            	pYYLVAL->valLong.lNumber = ( long ) pYYLVAL->valDouble.dNumber;
+            	pYYLVAL->valLong.lNumber = ( LONG ) pYYLVAL->valDouble.dNumber;
             	pYYLVAL->valLong.szValue = yytext;
             	iRet = NUM_LONG;
             }
@@ -394,10 +394,10 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    return iRet;
 }
 
-long hb_macro_SLX_Hex2L( char* sHex )
+LONG hb_macro_SLX_Hex2L( char* sHex )
 {
    int i, iExp = 0, iLen = strlen( sHex ) - 1;
-   long lVal, lSum = 0;
+   LONG lVal, lSum = 0;
    char cChar;
 
    while( iLen >= 0 )

@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.8 2003/10/15 01:16:58 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.9 2003/10/26 03:34:10 ronpinkas Exp $
  */
 
 /*
@@ -199,7 +199,7 @@ HB_EXPR_PTR hb_compExprNewDouble( double dValue, BYTE ucWidth, BYTE ucDec )
    return pExpr;
 }
 
-HB_EXPR_PTR hb_compExprNewLong( long lValue )
+HB_EXPR_PTR hb_compExprNewLong( LONG lValue )
 {
    HB_EXPR_PTR pExpr;
 

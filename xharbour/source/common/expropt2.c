@@ -1,5 +1,5 @@
 /*
- * $Id: expropt2.c,v 1.2 2002/04/15 05:06:44 ronpinkas Exp $
+ * $Id: expropt2.c,v 1.3 2002/12/06 17:37:39 ronpinkas Exp $
  */
 
 /*
@@ -86,7 +86,7 @@ HB_EXPR_PTR hb_compExprReduceMod( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
 
             if( ( double ) LONG_MIN <= dVal && dVal <= ( double ) LONG_MAX )
             {
-               pSelf->value.asNum.lVal = ( long ) dVal;
+               pSelf->value.asNum.lVal = ( LONG ) dVal;
                pSelf->value.asNum.bDec = 0;
                pSelf->value.asNum.NumType = HB_ET_LONG;
             }
@@ -135,7 +135,7 @@ HB_EXPR_PTR hb_compExprReduceDiv( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
                if( fmod( dVal, 1.0 ) == 0.0 )
                {
                   /* Return integer results as long */
-                  pSelf->value.asNum.lVal = ( long ) dVal;
+                  pSelf->value.asNum.lVal = ( LONG ) dVal;
                   pSelf->value.asNum.bDec = 0;
                   pSelf->value.asNum.NumType = HB_ET_LONG;
                }
@@ -224,7 +224,7 @@ HB_EXPR_PTR hb_compExprReduceMult( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
 
             if( ( double ) LONG_MIN <= dVal && dVal <= ( double ) LONG_MAX )
             {
-               pSelf->value.asNum.lVal = ( long ) dVal;
+               pSelf->value.asNum.lVal = ( LONG ) dVal;
                pSelf->value.asNum.bDec = 0;
                pSelf->value.asNum.NumType = HB_ET_LONG;
             }
@@ -298,7 +298,7 @@ HB_EXPR_PTR hb_compExprReduceMinus( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
 
             if( ( double ) LONG_MIN <= dVal && dVal <= ( double ) LONG_MAX )
             {
-               pSelf->value.asNum.lVal = ( long ) dVal;
+               pSelf->value.asNum.lVal = ( LONG ) dVal;
                pSelf->value.asNum.bDec = 0;
                pSelf->value.asNum.NumType = HB_ET_LONG;
             }
@@ -380,7 +380,7 @@ HB_EXPR_PTR hb_compExprReducePlus( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
 
             if( ( double ) LONG_MIN <= dVal && dVal <= ( double ) LONG_MAX )
             {
-               pSelf->value.asNum.lVal = ( long ) dVal;
+               pSelf->value.asNum.lVal = ( LONG ) dVal;
                pSelf->value.asNum.bDec = 0;
                pSelf->value.asNum.NumType = HB_ET_LONG;
             }
