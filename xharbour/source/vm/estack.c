@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.41 2003/09/10 06:07:32 ronpinkas Exp $
+ * $Id: estack.c,v 1.42 2003/09/11 06:56:41 ronpinkas Exp $
  */
 
 /*
@@ -130,6 +130,11 @@ void hb_stackPush( void )
       HB_VM_STACK.pItems = ( HB_ITEM_PTR * ) hb_xrealloc( (void *) HB_VM_STACK.pItems, sizeof( HB_ITEM_PTR ) *
                                 ( HB_VM_STACK.wItems + STACK_EXPANDHB_ITEMS ) );
 
+      /* fix possibly invalid pointers: */
+      HB_VM_STACK.pPos = HB_VM_STACK.pItems + CurrIndex;
+      HB_VM_STACK.pBase = HB_VM_STACK.pItems + BaseIndex;
+      HB_VM_STACK.wItems += STACK_EXPANDHB_ITEMS;
+
       #ifndef HB_ARRAY_USE_COUNTER
          if( HB_VM_STACK.pItems != pOldItems )
          {
@@ -146,11 +151,6 @@ void hb_stackPush( void )
             //TraceLog( NULL, "New Stack: %p\n", HB_VM_STACK.pItems );
          }
       #endif
-
-      /* fix possibly invalid pointers: */
-      HB_VM_STACK.pPos = HB_VM_STACK.pItems + CurrIndex;
-      HB_VM_STACK.pBase = HB_VM_STACK.pItems + BaseIndex;
-      HB_VM_STACK.wItems += STACK_EXPANDHB_ITEMS;
 
       for( i = CurrIndex + 1; i < HB_VM_STACK.wItems; i++ )
       {
