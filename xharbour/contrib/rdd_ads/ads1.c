@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.29 2004/02/16 06:40:55 paultucker Exp $
+ * $Id: ads1.c,v 1.30 2004/02/20 22:33:55 ronpinkas Exp $
  */
 
 /*
@@ -159,7 +159,7 @@ void adsSetListener_callback( HB_set_enum setting, HB_set_listener_enum when )
 }
 
 
-static void commonError( ADSAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char* filename )
+static void commonError( ADSAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char * filename, USHORT uiFlags )
 {
    PHB_ITEM pError;
 
@@ -172,6 +172,10 @@ static void commonError( ADSAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, cha
       hb_errPutFileName( pError, filename );
    }
 
+   if ( uiFlags )
+   {
+      hb_errPutFlags( pError, uiFlags );
+   }
    SUPER_ERROR( ( AREAP ) pArea, pError );
 
    hb_itemRelease( pError );
@@ -571,7 +575,7 @@ static ERRCODE adsGoToId( ADSAREAP pArea, PHB_ITEM pItem )
    }
    else
    {
-      commonError( pArea, EG_DATATYPE, 1020, NULL );
+      commonError( pArea, EG_DATATYPE, 1020, NULL, 0 );
       return FAILURE;
    }
 }
@@ -595,6 +599,12 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
    UNSIGNED8 szText[ADS_MAX_KEY_LENGTH];
 
    HB_TRACE(HB_TR_DEBUG, ("adsSeek(%p, %d, %p, %d)", pArea, bSoftSeek, pKey, bFindLast));
+
+   if( ! pArea->hOrdCurrent )
+   {
+      commonError( pArea, EG_NOORDER, 1201, NULL, EF_CANDEFAULT );
+      return FAILURE;
+   }
 
    if( bFindLast )
    {
@@ -1431,7 +1441,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       if( !pbLocked  )
       {
-         commonError( pArea, EG_UNLOCKED, EDBF_UNLOCKED, NULL );
+         commonError( pArea, EG_UNLOCKED, EDBF_UNLOCKED, NULL, 0 );
          //hb_errRT_DBCMD( EG_LOCK, EDBF_UNLOCKED, "Record not locked", "adsPutValue" );
       }
    }
@@ -1516,7 +1526,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
    if( bTypeError )
    {
-      commonError( pArea, EG_DATATYPE, 1020, NULL );
+      commonError( pArea, EG_DATATYPE, 1020, NULL, 0 );
       pArea->fRecordChanged = FALSE;
       /* bh:
          It seems wrong for this to be reset if OTHER fields have been
@@ -1538,19 +1548,19 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    {
       if( ulRetVal == AE_LOCK_FAILED || ulRetVal == AE_RECORD_NOT_LOCKED )
       {
-         commonError( pArea, EG_UNLOCKED, EDBF_UNLOCKED, NULL );
+         commonError( pArea, EG_UNLOCKED, EDBF_UNLOCKED, NULL, 0 );
       }
       else if( ulRetVal == AE_TABLE_READONLY )
       {
-         commonError( pArea, EG_READONLY, EDBF_READONLY, NULL );
+         commonError( pArea, EG_READONLY, EDBF_READONLY, NULL, 0 );
       }
       else if( ulRetVal == AE_DATA_TOO_LONG )
       {
-         commonError( pArea, EG_WRITE, (USHORT) ulRetVal, NULL );
+         commonError( pArea, EG_WRITE, ( USHORT ) ulRetVal, NULL, 0 );
       }
       else
       {
-         commonError( pArea, EG_WRITE, (USHORT) ulRetVal, NULL );
+         commonError( pArea, EG_WRITE, ( USHORT ) ulRetVal, NULL, 0 );
       }
 
       return FAILURE;
@@ -2004,7 +2014,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       {
          if( ulRetVal != 1001 && ulRetVal != 7008 )     /* 1001 and 7008 are standard ADS Open Errors that will usually be sharing issues */
          {
-            commonError( pArea, EG_OPEN, ( USHORT ) ulRetVal, ( char * ) pOpenInfo->abName );
+            commonError( pArea, EG_OPEN, ( USHORT ) ulRetVal, ( char * ) pOpenInfo->abName, 0 );
          }
 
          return FAILURE;                /* just set neterr  */
@@ -2181,7 +2191,7 @@ static ERRCODE adsPack( ADSAREAP pArea )
 
    if( pArea->fShared )
    {
-      commonError( pArea, EG_SHARED, 1023, NULL );
+      commonError( pArea, EG_SHARED, 1023, NULL, 0 );
       return FAILURE;
    }
 
@@ -2306,7 +2316,7 @@ static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
    UNSIGNED8 pucName[ADS_MAX_TAG_NAME];
    UNSIGNED16 pusLen = ADS_MAX_TAG_NAME;
    UNSIGNED16 usOrder;
-   UNSIGNED32 ulRetVal;
+   UNSIGNED32 ulRetVal = AE_SUCCESS;
    HB_TRACE(HB_TR_DEBUG, ("adsOrderListFocus(%p, %p)", pArea, pOrderInfo));
 
    if( !pArea->hOrdCurrent )
@@ -2318,7 +2328,7 @@ static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
      AdsGetIndexName( pArea->hOrdCurrent, pucName, &pusLen);
    }
 
-   pOrderInfo->itmResult = hb_itemPutCL( pOrderInfo->itmResult, (char*)pucName, pusLen );
+   pOrderInfo->itmResult = hb_itemPutCL( pOrderInfo->itmResult, ( char * ) pucName, pusLen );
 
    if( pOrderInfo->itmOrder )
    {
@@ -2363,6 +2373,7 @@ static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
       }
       if( ulRetVal != AE_SUCCESS )
       {
+         pArea->hOrdCurrent = 0;
          return FAILURE;
       }
       pArea->hOrdCurrent = phIndex;
@@ -2491,7 +2502,7 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 
    if( ulRetVal != AE_SUCCESS )
    {
-      commonError( pArea, EG_CREATE, ( USHORT ) ulRetVal, (char*) pOrderInfo->abBagName );
+      commonError( pArea, EG_CREATE, ( USHORT ) ulRetVal, ( char * ) pOrderInfo->abBagName, 0 );
       return FAILURE;
    }
    else

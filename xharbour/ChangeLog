@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2359 2004/02/21 21:14:10 andijahja Exp $
+ * $Id: ChangeLog,v 1.2360 2004/02/22 00:33:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-22 16:50 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+     Imported fixes from Harbour :
+   2004-02-19 12:48 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+      * contrib/rdd_ads/ads1.c
+      ! adsSeek() now raises a runtime error 1201 if no index is active
+      ! adsOrderListAdd() sets order to 0 if an invalid or non-existent tag is provided
+         The above two were added to keep Clipper compatibility
+      + Added 5th param to commonError() in order to provide uiFlags, like other RDD's
+
 
 2004-02-22 16:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/hbxml.c
