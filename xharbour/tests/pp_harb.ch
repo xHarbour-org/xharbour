@@ -40,7 +40,8 @@
      DATA aScriptHostGlobals   INIT {}
      DATA bWantsErrorObject    INIT .T.
      DATA nStartLine           INIT 1
-     DATA cName
+     DATA cName                INIT ""
+     DATA nID                  INIT 0
 
      METHOD New()              INLINE ( Self )
 
@@ -82,6 +83,7 @@
 
      LOCAL nLine, nLines, sLine, nProcID := ::nProcs
      LOCAL bErrHandler, oError
+     LOCAL nStart, acPPed, aCompiledProcs, aInitExit
 
      IF Empty( ::cText )
         RETURN .F.
@@ -104,6 +106,7 @@
            ::nProcs             := 0
            ::aScriptHostGlobals := {}
            ::nNextStartProc     := 1
+	   ::nID                := 0
         ELSE
            ::nNextStartProc := nProcID + 1
         ENDIF
@@ -111,10 +114,34 @@
         ::cPPed += PP_PreProText( ::cText, ::acPPed, .T., .F., ::nStartLine, ::cName )
         nLines  := Len( ::acPPed )
 
-        FOR nLine := ::nCompiledLines + 1 TO nLines
-           sLine := ::acPPed[nLine]
+	acPPed := ::acPPed
+        nStart := ::nCompiledLines + 1
+        FOR nLine := nStart TO nLines
+	   IF ! Empty( acPPed[ nLine ] )
+	      EXIT
+	   ENDIF
+	NEXT
+
+	// No Code!
+	IF nLine > nLines
+	   Break( ErrorNew( [PP], 1003, [TInterpreter], [Nothing to compile], { acPPed } ) )
+	ELSE
+	   nStart := nLine
+	ENDIF
+
+        IF nProcID > 0
+	   IF ! Left( acPPed[nStart], 7 ) == "PP_PROC"
+	      acPPed[ nStart ] := "PP_PROC Implied_Main" + LTrim( Str( ::nID++ ) ) + ";" + acPPed[ nStart ]
+	   ENDIF
+	ENDIF
+
+	aCompiledProcs := ::aCompiledProcs
+	aInitExit      := ::aInitExit
+
+        FOR nLine := nStart TO nLines
+           sLine := acPPed[nLine]
            IF sLine != NIL
-              PP_CompileLine( sLine, nLine, ::aCompiledProcs, ::aInitExit, @nProcId )
+              PP_CompileLine( sLine, nLine, aCompiledProcs, aInitExit, @nProcId )
            ENDIF
         NEXT
 
@@ -128,6 +155,7 @@
          nProcID := -1
 
          IF ! ::bWantsErrorObject
+	    ::cText := ""
             Eval( bErrHandler, oError )
          ENDIF
 
@@ -135,14 +163,17 @@
 
      ErrorBlock( bErrHandler )
 
+     ::cText := ""
+
+     IF nProcID > 0
+        ::nProcs := nProcId
+        ::cCompiledText += ::cText
+        ::nCompiledLines := nLines
+     ENDIF
+
      IF ::bWantsErrorObject .AND. oError:ClassName == "ERROR"
         RETURN oError
      ENDIF
-
-     ::nProcs := nProcId
-     ::cCompiledText += ::cText
-     ::nCompiledLines := nLines
-     ::cText := ""
 
   RETURN nProcId > 0
 
