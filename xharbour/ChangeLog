@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3960 2005/03/18 13:38:53 modalsist Exp $
+ * $Id: ChangeLog,v 1.3961 2005/03/18 16:38:45 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-03-18 13:03 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * source/pp/ppcore.c
+    * Removed '|' '*' '/' '^' '%' and "->" from list of invalid startup tokens for normal Match Marker in getExpReal()
+  * utils/xbscript/xbscript.prg
+    * Added '/', '\', '^', '%', '>', '<' '#', '$' '?', '->', '**', '!=', '<>', '>=', '<=' as valid startup tokens
+
+  /*
+     I'm confident this Clipper behaviour is a BUG, because valid expressions
+     can never start with any of those tokens, but Clipper itself exploit this
+     behaviour in it's implemenatation of SAVE ALL LIKE * to ... :-(
+  */
+
 2005-03-18 13:40 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/ttopbar.prg
     ! Modal METHOD must always exit its execution when an item executed
@@ -15,8 +27,8 @@
 
 2005-03-18 10:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com>
   * xharbour/ct/disk.c
-    * Minor fix in volume function line 269, changed: 
-    * strnpy( sRootBuf, fname->szPath, 2) to strnpy( sRootBuf, fname->szPath, 3) 
+    * Minor fix in volume function line 269, changed:
+    * strnpy( sRootBuf, fname->szPath, 2) to strnpy( sRootBuf, fname->szPath, 3)
     * to add trailing backslash.
 
   * xharbour/tests/cttests/volget.prg, volset.prg, volser.prg

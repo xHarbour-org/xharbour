@@ -5395,7 +5395,8 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
      IF nLen == 1
 
-        IF s1 $ "-+!:@|." // *** Very ODD Clipper consider '|' and '.' a continuation token !!!
+        // *** Very ODD Clipper considers '|', '.', '*' '/', '\', '^', '%', '>', '<' '#', '$' '?' a valid startup/continuation token !!!
+        IF s1 $ "-+!:@|.*/^%><#$?"
            sExp += sToken
            LOOP
 
@@ -5639,7 +5640,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
            sLastToken := "]"
            // Continue  2nd level checks below.
-        ELSEIF s1 $ "*/=^><!$%#)}]?"
+        ELSEIF s1 $ "=)}]"
            sLine := sToken + sLine
            EXIT
         ELSEIF s1 == ","
@@ -5663,10 +5664,11 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
      ELSEIF nLen == 2
 
-        IF s2 $ '++\--'
+        // Odd, Clipper considers '->', '**', '!=', '<>', '>=', '<=' as valid startup tokens!!!
+        IF s2 $ '++\--\->\**\!=\<>\>=\<='
            sExp += sToken
            LOOP
-        ELSEIF s2 $ "->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%="
+        ELSEIF s2 $ "==\:=\+=\-=\*=\^=\/=\%="
            sLine := sToken + sLine
            EXIT
         ELSE

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.201 2005/03/15 18:02:51 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.202 2005/03/17 02:07:16 ronpinkas Exp $
  */
 
 /*
@@ -3828,10 +3828,9 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       goto Done;
    }
 
-   // Was:  "}]),|=*/^%" removed '/' to allow for Unix Paths starting with '/'
-   if( strchr( "}]),|=*^%", ( *ptri )[0] ) ||
-       ( strchr( ":-+", ( *ptri )[0] ) && ( *ptri )[1] == '=' ) ||
-       ( ( *ptri )[0] == '-' && ( *ptri )[1] == '>' ) )
+   // Was: "}]),|=" removed '/' to allow for Unix Paths starting with '/'
+   // 2005-03-18 removed: '|' '*' '/' '^' '%' and "->" which are valid startup tokens in Clipper (strange!).
+   if( strchr( "}]),=", ( *ptri )[0] ) || ( strchr( ":-+", ( *ptri )[0] ) && ( *ptri )[1] == '=' ) )
    {
       if( ! ( cMarkerType == '1' && ( *ptri )[0] == ',' ) )
       {
