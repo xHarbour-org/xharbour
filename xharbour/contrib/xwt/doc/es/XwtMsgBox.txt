@@ -1,0 +1,60 @@
+   /*
+
+    (c)2003 Rafa Carmona ( Thefull )
+    12/05/2003 23:21
+
+    Funcion XWT_MsgBox()
+
+   */
+
+   Funcion       : XWT_MsgBox( cMessage, nButtonType, nMsgType )
+   Fichero       : /xwt/src/msgbox.prg
+   INTERFACE GTK : /xwt/src/xwt_gtk/Xwt_gtk_msgbox.c
+   DRIVER        : XWT_drv_msgbox(, cMessage, nButtonType, nMsgType )
+
+   La funcion XWT_MsgBox nos permite mostrar un dialogo de forma rapida con un
+   texto y unos botones los cuales nos permite selecionar una u otra action,
+   por ejemplo, si queremos borrar un registro y que nos enseñe los botones de
+   'YES' o 'NO'.
+
+   El funcionamiento es muy simple:
+
+   // Si se a escogido el boton de 'YES'
+     IF XWT_MsgBox( " ¿ Realmente quieres hacerlo ?", ;
+                    XWT_MSGBOX_YES + XWT_MSGBOX_NO, ;
+                    XWT_MSGBOX_QUESTION ) == XWT_MSGBOX_YES
+            ..action a ejecutar si se a escogido el boton de 'YES' .....
+     ELSE
+           .. de lo contrario...
+     ENDIF
+
+     Ahora analicemos mejor el paso de parametros:
+
+     cMesage     = Muestra el texto a enseñar en el dialogo.
+
+     nButtonType = Muestra los botones que quieres que salgan en el dialogo.
+
+                    #define XWT_MSGBOX_OK        1
+                    #define XWT_MSGBOX_CANCEL    2
+                    #define XWT_MSGBOX_CLOSE     4
+                    #define XWT_MSGBOX_ABORT     8
+                    #define XWT_MSGBOX_RETRY     16
+                    #define XWT_MSGBOX_YES       32
+                    #define XWT_MSGBOX_NO        64
+
+                   Para mostrar mas de un boton, se aplica una simple suma.
+                   XWT_MSGBOX_OK + XWT_MSGBOX_CANCEL + XWT_MSG_CLOSE nos
+                   mostraria 3 botones en el dialogo
+
+     nMsgTye     = Tipo de ICONO que nos muestra en el dialogo.
+
+                   #define XWT_MSGBOX_INFO     1
+                   #define XWT_MSGBOX_QUESTION 2
+                   #define XWT_MSGBOX_ERROR    3
+                   #define XWT_MSGBOX_WARNING  4
+
+     Valor de Retorno:
+     El resultado devuelto sera el valor de uno de los 3 botones que hemos
+     definido, para saber cual de ellos es el que hemos escogido.
+     Siguiendo el ejemplo anterior, si pulsamos el boton de XWT_MSGBOX_NO
+     el valor devuelto por XWT_Msgbox sera 64.
