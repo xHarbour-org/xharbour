@@ -441,20 +441,20 @@ HB_FUNC( BF_ENCRYPT )
    if( ISNIL(2) )
    {
       key = (unsigned char *) hb_xgrab( 5 );
-      strcpy( key,keyDefault );
+      strcpy( (char*) key,keyDefault );
       iKeylen = 4;
    }
    else if( ( iKeylen = hb_parclen(2) ) < 4 )
    {
       key = (unsigned char *) hb_xgrab( 5 );
-      strcpy( key,hb_parc( 2 ) );
-      strncat( key,keyDefault,4-iKeylen );
+      strcpy( (char*) key,hb_parc( 2 ) );
+      strncat( (char*) key,keyDefault,4-iKeylen );
       iKeylen = 4;
    }
    else
    {
       key = (unsigned char *) hb_xgrab( iKeylen+1 );
-      strcpy( key,hb_parc( 2 ) );
+      strcpy( (char*) key,hb_parc( 2 ) );
    }
 
    Blowfish_Init( &ctx, key, iKeylen );
@@ -476,7 +476,7 @@ HB_FUNC( BF_ENCRYPT )
    for( ul=0; ul<ulPairs; ul++ )
       Blowfish_Encrypt( &ctx, (unsigned long*)(ptro+ul*8), (unsigned long*)(ptro+ul*8+4) );
 
-   hb_retclen( ptro,ulPairs*8 );
+   hb_retclen( (char*) ptro,ulPairs*8 );
    hb_xfree( key );
    hb_xfree( ptro );
 
@@ -496,20 +496,20 @@ HB_FUNC( BF_DECRYPT )
    if( ISNIL(2) )
    {
       key = (unsigned char *) hb_xgrab( 5 );
-      strcpy( key,keyDefault );
+      strcpy( (char*) key,keyDefault );
       iKeylen = 4;
    }
    else if( ( iKeylen = hb_parclen(2) ) < 4 )
    {
       key = (unsigned char *) hb_xgrab( 5 );
-      strcpy( key,hb_parc( 2 ) );
-      strncat( key,keyDefault,4-iKeylen );
+      strcpy( (char*) key,hb_parc( 2 ) );
+      strncat( (char*) key,keyDefault,4-iKeylen );
       iKeylen = 4;
    }
    else
    {
       key = (unsigned char *) hb_xgrab( iKeylen+1 );
-      strcpy( key,hb_parc( 2 ) );
+      strcpy( (char*) key,hb_parc( 2 ) );
    }
 
    Blowfish_Init( &ctx, key, iKeylen );
@@ -530,7 +530,7 @@ HB_FUNC( BF_DECRYPT )
    if( iDiff > 10 || *(ptro+1) )
       hb_ret();
    else
-      hb_retclen( ptro+2,ulLen-iDiff );
+      hb_retclen( (char*) (ptro+2),ulLen-iDiff );
    hb_xfree( key );
    hb_xfree( ptro );
 
