@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.30 2003/03/12 15:39:35 walito Exp $
+ * $Id: tbrowse.prg,v 1.31 2003/04/01 22:18:05 iananderson Exp $
  */
 
 /*
@@ -117,7 +117,6 @@ CLASS TBrowse
 
    DATA autoLite              // Logical value to control highlighting
    DATA cargo                 // User-definable variable
-   DATA colPos                // Current cursor column position
    DATA goBottomBlock         // Code block executed by TBrowse:goBottom()
    DATA goTopBlock            // Code block executed by TBrowse:goTop()
    DATA hitBottom             // Indicates the end of available data
@@ -140,6 +139,8 @@ CLASS TBrowse
    ASSIGN border( cBorder )  INLINE ::SetBorder( cBorder )
    ACCESS colorSpec          INLINE ::cColorSpec   // Color table for the TBrowse display
    ASSIGN colorSpec(cColor)  INLINE ::cColorSpec := cColor, ::lConfigured := .f.
+   ACCESS colPos             INLINE ::nColPos
+   ASSIGN colPos(nColPos)    INLINE ::nColPos := ncolPos, ::lConfigured := .f.
 
    ACCESS nBottom            INLINE ::nwBottom +  iif(::cBorder=="",0,1)
    ASSIGN nBottom( nBottom ) INLINE ::nwBottom := nBottom - iif(::cBorder=="",0,1), ::lConfigured := .f.
@@ -242,6 +243,7 @@ CLASS TBrowse
    DATA nNewRowPos                        // Next position of data source (after first phase of stabilization)
    DATA nLastRetrieved                    // Position, relative to first row, of last retrieved row (with an Eval(::SkipBlock, n))
    DATA nRowData                          // Row, first row of data
+   DATA nColPos
 
    DATA nwBottom              // Bottom row number for the TBrowse display
    DATA nwLeft                // Leftmost column for the TBrowse display
@@ -297,7 +299,7 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::AutoLite        := .T.
    ::leftVisible     := 1
    ::rightVisible    := 1
-   ::ColPos          := 1
+   ::nColPos         := 1
    ::HitBottom       := .F.
    ::HitTop          := .F.
    ::lHitTop         := .F.
@@ -381,13 +383,13 @@ METHOD Configure( nMode ) CLASS TBrowse
 
    default nMode to 0
 
-   ::lHeaders     := .F.
-   ::lFooters     := .F.
-   ::lRedrawFrame := .T.
-   ::lHeadSep     := !Empty( ::cHeadSep )
-   ::lFootSep     := !Empty( ::cFootSep )
-
    if nMode < 2 .or. ::lNeverDisplayed
+
+      ::lHeaders     := .F.
+      ::lFooters     := .F.
+      ::lRedrawFrame := .T.
+      ::lHeadSep     := !Empty( ::cHeadSep )
+      ::lFootSep     := !Empty( ::cFootSep )
 
       // Are there column headers to paint ?
       FOR EACH aCol IN ::aColsInfo
@@ -596,7 +598,7 @@ METHOD AddColumn( oCol ) CLASS TBrowse
 
    if ::nColumns == 1
       ::leftVisible := 1
-      ::ColPos      := 1
+      ::nColPos     := 1
    endif
 
    ::Configure(1)
@@ -676,16 +678,16 @@ METHOD DelColumn( nPos ) CLASS TBrowse
 
    oCol := ::aColsInfo[ nPos, o_Obj ]
 
-   if nPos == ::ColPos .or. nPos == ::nColumns .or.;
-              ::ColPos == ::nColumns .or. ::rightVisible == ::nColumns
+   if nPos == ::nColPos .or. nPos == ::nColumns .or.;
+              ::nColPos == ::nColumns .or. ::rightVisible == ::nColumns
 
       if ::leftVisible == ::rightVisible
          ::leftVisible--
       endif
       ::rightVisible--
 //      ::colPos++
-      if ::colPos == ::nColumns
-         ::colpos--
+      if ::ncolPos == ::nColumns
+         ::ncolpos--
       endif
    endif
 
@@ -756,7 +758,7 @@ METHOD SetFrozenCols( nHowMany, lLeft ) CLASS TBrowse
          ::RefreshAll()
       endif
 
-      if ( ::nFrozenCols < nOldFreeze .or. ::ColPos <= ::nFrozenCols .or.;
+      if ( ::nFrozenCols < nOldFreeze .or. ::nColPos <= ::nFrozenCols .or.;
            ::nFrozenWidth < nOldFrozenWidth ) .and. ::nFrozenCols > 0
          FOR EACH aCol IN ::aColsInfo
             // Reset column widths
@@ -791,7 +793,7 @@ METHOD SetFrozenCols( nHowMany, lLeft ) CLASS TBrowse
 
       if lLeft
          if ::nFrozenCols > 0
-            if ::ColPos <= ::nFrozenCols
+            if ::nColPos <= ::nFrozenCols
                do while .t.
                   ::leftVisible := ::LeftDetermine()
 
@@ -809,11 +811,11 @@ METHOD SetFrozenCols( nHowMany, lLeft ) CLASS TBrowse
                do while .t.
                   ::leftVisible := ::LeftDetermine()
 
-                  if ::ColPos >= ::leftVisible .and. ::ColPos <= ::rightVisible
+                  if ::nColPos >= ::leftVisible .and. ::nColPos <= ::rightVisible
                      exit
                   endif
 
-                  if ::ColPos < ::rightVisible
+                  if ::nColPos < ::rightVisible
                      ::rightVisible--
                   else
                      ::rightVisible++
@@ -824,7 +826,7 @@ METHOD SetFrozenCols( nHowMany, lLeft ) CLASS TBrowse
             do while .t.
                ::leftVisible := ::LeftDetermine()
 
-               if ::ColPos >= ::leftVisible
+               if ::nColPos >= ::leftVisible
                   exit
                endif
 
@@ -963,8 +965,8 @@ METHOD Home() CLASS TBrowse
 
    ::Moved()
 
-   if ::ColPos != ::leftVisible
-      ::ColPos := ::leftVisible
+   if ::nColPos != ::leftVisible
+      ::nColPos := ::leftVisible
       ::lRedrawFrame := .T.
       ::RefreshCurrent()
    endif
@@ -977,8 +979,8 @@ METHOD End() CLASS TBrowse
 
    ::Moved()
 
-   if ::ColPos < ::rightVisible
-      ::ColPos := ::rightVisible
+   if ::nColPos < ::rightVisible
+      ::nColPos := ::rightVisible
       ::lRedrawFrame := .T.
       ::RefreshCurrent()
    endif
@@ -991,13 +993,13 @@ METHOD _Right() CLASS TBrowse
 
    ::Moved()
 
-   if ::ColPos < ::rightVisible
-      ::ColPos++
+   if ::nColPos < ::rightVisible
+      ::nColPos++
    else
-      if ::ColPos < ::nColumns
+      if ::nColPos < ::nColumns
          ::rightVisible++
          ::leftVisible := ::LeftDetermine()
-         ::ColPos++
+         ::nColPos++
          ::lRedrawFrame := .T.
          ::RefreshAll()
       endif
@@ -1013,16 +1015,16 @@ METHOD _Left() CLASS TBrowse
 
    ::Moved()
 
-   if ::ColPos > ::leftVisible .or.;
-         ( ::ColPos <= ::nFrozenCols + 1 .and. ::ColPos > 1 )
-      ::ColPos--
+   if ::nColPos > ::leftVisible .or.;
+         ( ::nColPos <= ::nFrozenCols + 1 .and. ::nColPos > 1 )
+      ::nColPos--
    else
-      if ::ColPos <= Max( ::leftVisible, ::nFrozenCols ) .AND. ::ColPos > 1
+      if ::nColPos <= Max( ::leftVisible, ::nFrozenCols ) .AND. ::nColPos > 1
          while leftVis == ::leftVisible
             ::rightVisible--
             ::leftVisible := ::LeftDetermine()
          end
-         ::ColPos--
+         ::nColPos--
          ::lRedrawFrame := .T.
          ::RefreshAll()
       endif
@@ -1036,15 +1038,15 @@ METHOD PanEnd() CLASS TBrowse
 
    ::Moved()
 
-   if ::ColPos < ::nColumns
+   if ::nColPos < ::nColumns
       if ::rightVisible <  ::nColumns
          ::rightVisible := ::nColumns
          ::leftVisible  := ::LeftDetermine()
-         ::ColPos       := ::RightVisible
+         ::nColPos      := ::RightVisible
          ::lRedrawFrame := .T.
          ::RefreshAll()
       else
-         ::ColPos       := ::RightVisible
+         ::nColPos      := ::RightVisible
          ::RefreshCurrent()
       endif
    endif
@@ -1057,14 +1059,14 @@ METHOD PanHome() CLASS TBrowse
 
    ::Moved()
 
-   if ::ColPos > 1
+   if ::nColPos > 1
       if ::leftVisible > ::nFrozenCols + 1
          ::leftVisible  := ::nFrozenCols + 1
-         ::ColPos       := 1
+         ::nColPos      := 1
          ::RefreshAll()
          ::lRedrawFrame := .T.
       else
-         ::ColPos       := 1
+         ::nColPos      := 1
          ::RefreshCurrent()
       endif
    endif
@@ -1075,7 +1077,7 @@ return Self
 
 METHOD PanLeft() CLASS TBrowse
 
-   local n := ::ColPos - ::leftVisible
+   local n := ::nColPos - ::leftVisible
    local leftVis := ::leftVisible
 
    ::Moved()
@@ -1085,9 +1087,9 @@ METHOD PanLeft() CLASS TBrowse
          ::rightVisible--
          ::leftVisible := ::LeftDetermine()
       end
-      if ::nFrozenCols > 0 .and. ::ColPos <= ::nFrozenCols
+      if ::nFrozenCols > 0 .and. ::nColPos <= ::nFrozenCols
       else
-         ::ColPos    := Min( ::leftVisible + n, ::rightVisible )
+         ::nColPos    := Min( ::leftVisible + n, ::rightVisible )
       endif
       ::lRedrawFrame := .T.
       ::RefreshAll()
@@ -1099,16 +1101,16 @@ return Self
 
 METHOD PanRight() CLASS TBrowse
 
-   local n := ::ColPos - ::leftVisible
+   local n := ::nColPos - ::leftVisible
 
    ::Moved()
 
    if ::rightVisible < ::nColumns
       ::rightVisible++
       ::leftVisible  := ::LeftDetermine()
-      if ::nFrozenCols > 0 .and. ::ColPos <= ::nFrozenCols
+      if ::nFrozenCols > 0 .and. ::nColPos <= ::nFrozenCols
       else
-         ::ColPos    := Min( ::leftVisible + n, ::rightVisible )
+         ::nColPos   := Min( ::leftVisible + n, ::rightVisible )
       endif
       ::lRedrawFrame := .T.
       ::RefreshAll()
@@ -1177,7 +1179,7 @@ METHOD PosCursor() CLASS TBrowse
 
    local nRow      := ::RowPos + ::nRowData
    local nCol
-   local aColsInfo := ::aColsInfo[ ::colpos ]
+   local aColsInfo := ::aColsInfo[ ::ncolpos ]
    LOCAL nWidth    := aColsInfo[ o_Width ]
    LOCAL nLen      := aColsInfo[ o_WidthCell ]
 
@@ -1211,7 +1213,7 @@ return Self
 METHOD HowManyCol() CLASS TBrowse
 
    local aColsInfo    := ::aColsInfo
-   local colPos       := ::colPos
+   local colPos       := ::ncolPos
    local rightVisible := ::rightVisible
    local leftVisible  := ::leftVisible
    local nColumns     := ::nColumns
@@ -2212,7 +2214,7 @@ return .F.
 METHOD DeHilite() CLASS TBrowse
 
    local nRow := ::RowPos + ::nRowData
-   local nCol := ::ColPos, nCurCol
+   local nCol := ::nColPos, nCurCol
    local lColorRect := .f.
 
    SetPos( nRow, ::aColsInfo[ nCol, o_Obj ]:colPos )
@@ -2234,7 +2236,7 @@ return Self
 METHOD Hilite() CLASS TBrowse
 
    local nRow := ::RowPos + ::nRowData
-   local nCol := ::ColPos, nCurCol
+   local nCol := ::nColPos, nCurCol
    local lColorRect := .f.
 
    // Start of cell
@@ -2380,7 +2382,7 @@ METHOD MGotoYX( nRow, nCol ) CLASS TBrowse
 
       enddo
 
-      ::ColPos := nI
+      ::nColPos := nI
 
       // Force redraw of current row with new cell position
       //
@@ -2566,7 +2568,7 @@ return nReturn
 Method hitTest( mrow,mcol ) CLASS TBROWSE
   Local nVisCol
   ::mRowPos := ::rowPos
-  ::mColPos := ::colPos
+  ::mColPos := ::ncolPos
 
 
   if mRow< ::rect[ 1 ] .or. mRow > ::rect[ 3 ]
@@ -2625,7 +2627,7 @@ function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
          oBrowse:down()
       enddo
 
-      n := oBrowse:mcolpos - oBrowse:colpos
+      n := oBrowse:mcolpos - oBrowse:ncolpos
 
       do while ( n < 0 )
          n++
