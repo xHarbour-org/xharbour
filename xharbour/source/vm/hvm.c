@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.81 2002/06/17 20:39:02 andijahja Exp $
+ * $Id: hvm.c,v 1.82 2002/06/19 21:52:48 ronpinkas Exp $
  */
 
 /*
@@ -268,7 +268,7 @@ BOOL    hb_vm_bWithObject = FALSE;
 
 HB_ITEM  hb_vm_aEnumCollection[ HB_MAX_ENUMERATIONS ];
 PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
-USHORT   hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
+ULONG    hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
 USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
 
 /* 21/10/00 - maurilio.longo@libero.it

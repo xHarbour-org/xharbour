@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.286 2002/06/21 21:02:07 walito Exp $
+ * $Id: ChangeLog,v 1.287 2002/06/22 02:30:18 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-06-23 21:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Increased FOR_EACH counter to ULONG from USHORT.
+
 2002-06-21 23:25 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + lib/bcc640.lib
     + Lib for extending the number of open files for xharbour for bcc32
   * bin/bld.bat
     utils/hbmake/hbmake.prg
      * Added bcc640.lib to be linked when Bcc32 is used
-
 
 2002-06-21 17:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/getsys.prg
