@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1314 2003/08/01 11:36:02 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1315 2003/08/01 12:16:46 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,14 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-08-01 12:30 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/rdd/dbfntx/dbfntx1.c
+    ! Error "Cannot find current key" in ntxGoCold() now raises a run
+      time error in the calling method, instead of hang up the application.
+      The problem itself is not fixed yet.
+
 2003-08-01 14:19 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rdd/dbcmd.c
     ! Fixed initialization of mutex under windows
     ! Removed an unlock over nonlocked mutex that causes windows hang
 
   * tests/mtstress.prg
-    + Added "shared" to the USE of DBF test; without it, the system 
-      (obviously) hangs, with threads waiting for each other to release 
+    + Added "shared" to the USE of DBF test; without it, the system
+      (obviously) hangs, with threads waiting for each other to release
       the lock on the file.
 
 2003-08-01 13:41 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>

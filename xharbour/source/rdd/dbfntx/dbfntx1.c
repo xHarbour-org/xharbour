@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.55 2003/07/16 13:46:54 andijahja Exp $
+ * $Id: dbfntx1.c,v 1.56 2003/07/16 17:03:04 druzus Exp $
  */
 
 /*
@@ -3323,8 +3323,9 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                      if( hb_ntxTagFindCurrentKey( pTag, hb_ntxPageLoad( pTag,0 ), pKeyOld, FALSE, FALSE ) )
                      {
                          printf( "\n\rntxGoCold: Cannot find current key:" );
-                         pTag = pTag->pNext;
-                         continue;
+                         /* pTag = pTag->pNext;
+                         continue; */
+                         return FAILURE;
                      }
                      pPage = hb_ntxPageLoad( pTag,pTag->CurKeyInfo->Tag );
                      pPage->CurKey =  hb_ntxPageFindCurrentKey( pPage,pTag->CurKeyInfo->Xtra ) - 1;
@@ -3960,7 +3961,7 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
    szFileName[ 0 ] = '\0';
    strcpy( szFileName, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
    szFileName =  (char*) hb_filecase( szFileName );
-		
+
    if( strlen( szFileName ) == 0 )
    {
       hb_xfree( szFileName );
