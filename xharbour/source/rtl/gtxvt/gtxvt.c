@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.13 2004/01/15 12:58:26 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.14 2004/01/15 13:48:27 jonnymind Exp $
  */
 
 /*
@@ -2289,6 +2289,23 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
                      status->lastMouseEvent = K_RBUTTONUP;
                   }
                }
+               else
+               {
+                  /* paste content of the paste buffer */
+                  if ( evt->type == ButtonPress )
+                  {
+                     int aprop, atarget, asel;
+
+                     asel = XInternAtom( wnd->dpy, "PRIMARY", 1 );
+                     aprop = XInternAtom( wnd->dpy, "CUT_BUFFER0", 1 );
+                     atarget = XInternAtom( wnd->dpy, "STRING", 1 );
+
+                     XConvertSelection( wnd->dpy,
+                        asel, atarget, aprop,
+                        wnd->window,
+                        CurrentTime );
+                  }
+               }
             break;
 
             case Button3:
@@ -2365,6 +2382,37 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
             //write( streamFeedback[1], &appMsg, sizeof( appMsg ) );
             write( streamChr[1], &appMsg, sizeof( appMsg ) );
          }
+      break;
+
+      // Notifies of sucessful cut&paste recival
+      case SelectionNotify:
+      {
+         XTextProperty text;
+         int npos, data;
+         USHORT appMsg = XVT_ICM_KEYSTORE;
+
+         // have we got a property to read?
+         if ( evt->xselection.property != None )
+         {
+            if ( XGetTextProperty( wnd->dpy,
+                  wnd->window, &text, evt->xselection.property) != 0 )
+            {
+               for( npos = 0; npos < text.nitems; npos++ )
+               {
+                  switch (text.format)
+                  {
+                     case 8: data = (int) text.value[npos]; break;
+                     case 16: data = (int) ((unsigned short *)text.value)[npos]; break;
+                     case 32: data = (int) ((unsigned int *)text.value)[npos]; break;
+                     default: data = 0;
+                  }
+                  write( streamChr[1], &appMsg, sizeof( appMsg ) );
+                  write( streamChr[1], &data, sizeof( data ) );
+               }
+               //XFree( buf1 );
+            }
+         }
+      }
       break;
 
    }

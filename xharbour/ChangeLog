@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2084 2004/01/17 02:36:21 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2085 2004/01/17 02:39:10 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-17 16:11 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    + Added support for X buffer paste.
+      (as standard X application, paste is currently done via pressing middle
+       mouse button).
 
 2004-01-17 03:30 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * source/rtl/gtwvt/gtwvt.c
