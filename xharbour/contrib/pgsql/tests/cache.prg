@@ -1,5 +1,5 @@
 /*
- * $Id: cache.prg,v 1.1 2004/06/21 18:43:38 rodrigo_moreno Exp $
+ * $Id: cache.prg,v 1.2 2004/06/24 20:35:47 rodrigo_moreno Exp $
  *
  * This samples show how to use dbf to cache postgres records.
  *
@@ -101,14 +101,11 @@ Function SQLApplyUpdates()
   Local cAlias := Upper(Alias())
   Local i, x
   Local aField := {}
-  Local lDeleted
   Local oQuery
   Local oRow
   Local lUpdate
   Local lError := .F.
   Local cError 
-  
-  lDeleted := set(_SET_DELETED, .F.)
   
   i := ASCAN(aTableTemp, {|aVal| aVal[DB_ALIAS] == cAlias})   
   
@@ -121,24 +118,28 @@ Function SQLApplyUpdates()
       
       IF i > oQuery:Lastrec()
         /* Verifica se eh um registro novo */
-        oRow := oQuery:GetBlankRow()
+        if ! Deleted()
+            oRow := oQuery:GetBlankRow()
 
-        FOR x := 1 TO FCount()
-          if oRow:Fieldpos( Fieldname(x) ) != 0
-            oRow:FieldPut(Fieldname(x), Fieldget(x))
-          endif            
-        NEXT
+            FOR x := 1 TO FCount()
+              if oRow:Fieldpos( Fieldname(x) ) != 0
+                oRow:FieldPut(Fieldname(x), Fieldget(x))
+              endif            
+            NEXT
 
-        cError := oQuery:Append(oRow)
-        lError := ! Empty(cError)
+            oQuery:Append(oRow)        
+            cError := oQuery:Error()
+            lError := oQuery:NetErr()
+        endif            
       ELSE
           
         oRow := oQuery:GetRow(i)
         lUpdate := .F.
 
         IF Deleted()
-          cError := oQuery:Delete(oRow)
-          lError := ! Empty(cError)
+          oQuery:Delete(oRow)          
+          cError := oQuery:Error()
+          lError := oQuery:NetErr()
         
         ELSE
           /* Faz update, mas compara quais campos sao diferentes */
@@ -152,8 +153,9 @@ Function SQLApplyUpdates()
           NEXT
           
           IF lUpdate
-            cError := oQuery:Update(oRow)
-            lError := ! Empty(cError)
+            oQuery:Update(oRow)           
+            cError := oQuery:Error()
+            lError := oQuery:NetErr()
           END
         END
       END
@@ -168,7 +170,6 @@ Function SQLApplyUpdates()
     Alert(cError)
   END
     
-  set(_SET_DELETED, lDeleted)  
 Return ! lError
 
   

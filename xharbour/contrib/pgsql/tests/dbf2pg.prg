@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: dbf2pg.prg,v 1.5 2004/04/30 18:23:35 rodrigo_moreno Exp $
  *
  * Harbour Project source code:
  * dbf2pg.prg - converts a .dbf file into a Postgres table
@@ -77,6 +77,7 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15,
    Local nRecno := 0
    Local lTruncate := .F.
    Local lUseTrans := .F.
+   Local cPath := 'public'
 
    SET CENTURY ON
    SET EPOCH TO 1960
@@ -130,6 +131,9 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15,
       case cTok == "-r"
          nRecno := val(hb_PValue(i++))
 
+      case cTok == "-e"
+         cPath := hb_PValue(i++)
+
       otherwise
          help()
          quit
@@ -145,7 +149,7 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15,
    USE (cFile) SHARED
    aDbfStruct := DBStruct()
 
-   oServer := TPQServer():New(cHostName, cDatabase, cUser, cPassWord)
+   oServer := TPQServer():New(cHostName, cDatabase, cUser, cPassWord, nil, cPath)
    if oServer:NetErr()
       ? oServer:Error()
       quit
@@ -164,6 +168,7 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15,
          endif
       endif
       oServer:CreateTable(cTable, aDbfStruct)
+
       if oServer:NetErr()
          ? oServer:Error()
          FWrite( nHandle, "Error: " + oServer:Error() + CRLF )
@@ -253,11 +258,11 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15,
          end
       next
 
-      cError := oTable:Append(oRecord)
+      oTable:Append(oRecord)
       
-      if ! Empty(cError) 
+      if oTable:NetErr()
          ?
-         ? "Error Record: ", recno(), left(cError,50)
+         ? "Error Record: ", recno(), left(oTable:Error(),70)
          ? 
          FWrite( nHandle, "Error at record: " + Str(recno()) + " Description: " + cError + CRLF )         
       else
@@ -310,6 +315,8 @@ procedure Help()
    ? "-s use transaction"
    ? "-m commit interval"
    ? "-r insert only record number"
+   ? "-e search path"
+   
    ? ""
 
 return

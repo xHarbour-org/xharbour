@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.22 2004/06/18 14:01:20 rodrigo_moreno Exp $
+ * $Id: Changelog,v 1.23 2004/06/21 18:43:35 rodrigo_moreno Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-13 11:30 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  * TPostgres.prg
+    * Improved control over error messages
+    ! Fixed small bugs
+  * tests/dbf2pg.prg
+  * tests/cache.prg
+    ! changed to handle error messages
+    
 2004-06-22 15:40 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   * TPostgres.prg
     ! Fixed bug regading primary keys, but with arrays

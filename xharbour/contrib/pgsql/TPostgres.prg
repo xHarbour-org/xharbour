@@ -59,6 +59,8 @@ CLASS TPQServer
     DATA     lTrans
     DATA     lallCols  INIT .T.
     DATA     Schema    INIT 'public'
+    DATA     lError    INIT .F.
+    DATA     cError    INIT ''
    
     METHOD   New( cHost, cDatabase, cUser, cPass, nPort, Schema )
     METHOD   Destroy()            INLINE PQClose(::pDb)
@@ -73,8 +75,8 @@ CLASS TPQServer
     METHOD   Execute( cQuery )    INLINE ::Query(cQuery)
     METHOD   SetSchema( cSchema )
 
-    METHOD   NetErr()             INLINE PQstatus(::pDb) != CONNECTION_OK
-    METHOD   Error()              INLINE PQerrormessage(::pDb)
+    METHOD   NetErr()             INLINE ::lError
+    METHOD   Error()              INLINE ::cError
     
     METHOD   TableExists( cTable )
     METHOD   ListTables()
@@ -91,15 +93,21 @@ METHOD New( cHost, cDatabase, cUser, cPass, nPort, Schema ) CLASS TPQserver
     
     ::pDB := PQconnect(cDatabase, cHost, cUser, cPass, nPort)
     
-    if ! Empty(Schema) 
-        ::SetSchema(Schema)
-    else        
-        res := PQexec( ::pDB, 'SELECT current_schema()' )        
-        if PQresultStatus(res) == PGRES_TUPLES_OK
-            ::Schema := PQgetvalue( res, 1, 1 )
-        endif
-        PQclear(res)
-    endif                
+    if PQstatus(::pDb) != CONNECTION_OK
+        ::lError := .T.
+        ::cError := PQerrormessage(::pDb)           
+        
+    else                
+        if ! Empty(Schema) 
+            ::SetSchema(Schema)
+        else        
+            res := PQexec( ::pDB, 'SELECT current_schema()' )        
+            if PQresultStatus(res) == PGRES_TUPLES_OK
+                ::Schema := PQgetvalue( res, 1, 1 )
+            endif
+            PQclear(res)
+        endif                
+    endif
     
 RETURN self
 
@@ -117,29 +125,53 @@ RETURN result
 
 
 METHOD StartTransaction() CLASS TPQserver
-    Local pQuery, lError
+    Local res, lError
     
-    pQuery := PQexec( ::pDB, 'BEGIN' )        
-    lError := PQresultstatus( pQuery ) != PGRES_COMMAND_OK
-    PQclear(pQuery)
+    res    := PQexec( ::pDB, 'BEGIN' )        
+    lError := PQresultstatus(res) != PGRES_COMMAND_OK
+
+    if lError
+        ::lError := .T.
+        ::cError := PQresultErrormessage(res)       
+    else
+        ::lError := .F.
+        ::cError := ''    
+    endif
+    PQclear(res)    
 RETURN lError
 
 
 METHOD Commit() CLASS TPQserver
-    Local pQuery, lError
+    Local res, lError
     
-    pQuery := PQexec( ::pDB, 'COMMIT' )    
-    lError := PQresultstatus( pQuery ) != PGRES_COMMAND_OK
-    PQclear(pQuery)
+    res    := PQexec( ::pDB, 'COMMIT' )    
+    lError := PQresultstatus(res) != PGRES_COMMAND_OK
+    
+    if lError
+        ::lError := .T.
+        ::cError := PQresultErrormessage(res)       
+    else
+        ::lError := .F.
+        ::cError := ''    
+    endif
+    PQclear(res)
 RETURN lError
 
     
 METHOD Rollback() CLASS TPQserver
-    Local pQuery, lError
+    Local res, lError
     
-    pQuery := PQexec( ::pDB, 'ROLLBACK' )    
-    lError := PQresultstatus( pQuery ) != PGRES_COMMAND_OK
-    PQclear(pQuery)
+    res    := PQexec( ::pDB, 'ROLLBACK' )    
+    lError := PQresultstatus(res) != PGRES_COMMAND_OK
+
+    if lError
+        ::lError := .T.
+        ::cError := PQresultErrormessage(res)       
+    else
+        ::lError := .F.
+        ::cError := ''    
+    endif
+    PQclear(res)
 RETURN lError
 
 
@@ -163,7 +195,12 @@ METHOD TableExists( cTable ) CLASS TPQserver
     
     if PQresultstatus(res) == PGRES_TUPLES_OK
         result := (PQlastrec(res) != 0)
-    end
+        ::lError := .F.
+        ::cError := ''    
+    else
+        ::lError := .T.
+        ::cError := PQresultErrormessage(res)       
+    endif
     
     PQclear(res)
 RETURN result    
@@ -184,8 +221,13 @@ METHOD ListTables() CLASS TPQserver
     if PQresultstatus(res) == PGRES_TUPLES_OK
         For i := 1 to PQlastrec(res)
             aadd( result, PQgetvalue( res, i, 1 ) )
-        Next            
-    end
+        Next                    
+        ::lError := .F.
+        ::cError := ''            
+    else
+        ::lError := .T.
+        ::cError := PQresultErrormessage(res)       
+    endif
     
     PQclear(res)
 RETURN result  
@@ -293,13 +335,18 @@ METHOD TableStruct( cTable ) CLASS TPQserver
             end                
 
         Next
-    end
+        ::lError := .F.
+        ::cError := ''    
+    else
+        ::lError := .T.
+        ::cError := PQresultErrormessage(res)               
+    endif
     
     PQclear(res)
 RETURN result  
 
 METHOD CreateTable( cTable, aStruct ) CLASS TPQserver
-    Local result := .t.
+    Local result := .T.
     Local cQuery
     Local res
     Local i
@@ -332,11 +379,16 @@ METHOD CreateTable( cTable, aStruct ) CLASS TPQserver
             cQuery += ','
         end    
     Next
-
+    
     res := PQexec( ::pDB, cQuery )
         
     if PQresultstatus(res) != PGRES_COMMAND_OK
-        result := .f.
+        result := .F.
+        ::lError := .T.
+        ::cError := PQresultErrormessage(res)       
+    else
+        ::lError := .F.
+        ::cError := ''            
     end
     
     PQclear(res)
@@ -344,13 +396,18 @@ RETURN result
 
 
 METHOD DeleteTable( cTable  ) CLASS TPQserver
-    Local result := .t.
+    Local result := .T.
     Local res
 
     res := PQexec( ::pDB, 'DROP TABLE ' + ::Schema + '.' + cTable  )
     
     if PQresultstatus(res) != PGRES_COMMAND_OK
-        result := .f.
+        result := .F.
+        ::lError := .T.
+        ::cError := PQresultErrormessage(res)       
+    else
+        ::lError := .F.
+        ::cError := ''            
     end
     
     PQclear(res)
@@ -366,6 +423,9 @@ CLASS TPQQuery
     DATA     lEof
     DATA     lClosed
     DATA     lallCols INIT .T.
+
+    DATA     lError   INIT .F.
+    DATA     cError   INIT ''
 
     DATA     cQuery
     DATA     nRecno
@@ -391,8 +451,8 @@ CLASS TPQQuery
     METHOD   Lastrec()          INLINE ::nLastrec
     METHOD   Goto(nRecno)       
 
-    METHOD   NetErr()           INLINE PQresultStatus(::pQuery) != PGRES_COMMAND_OK .and. PQresultStatus(::pQuery) != PGRES_TUPLES_OK 
-    METHOD   Error()            INLINE PQresultErrormessage(::pQuery)       
+    METHOD   NetErr()           INLINE ::lError
+    METHOD   Error()            INLINE ::cError    
 
     METHOD   FCount()           INLINE ::nFields
     METHOD   FieldName( nField )
@@ -441,7 +501,6 @@ RETURN .T.
 
 METHOD Refresh(lQuery) CLASS TPQquery
     Local res
-    Local result
     Local cTableCodes := ''
     Local cFieldCodes := ''
     Local aStruct := {}
@@ -456,15 +515,13 @@ METHOD Refresh(lQuery) CLASS TPQquery
     
     ::Destroy()
 
-    ::lBof := .F.
-    ::lEof := .F.
-    ::lClosed := .F.
-    
-    ::nRecno := 0
-    ::nFields := 0
-    ::nLastrec := 0
-    
-    ::aStruct := {}
+    ::lBof     := .F.
+    ::lEof     := .F.
+    ::lClosed  := .F.    
+    ::nRecno   := 0
+    ::nFields  := 0
+    ::nLastrec := 0    
+    ::aStruct  := {}
 
     if lQuery
         res := PQexec( ::pDB, ::cQuery )
@@ -561,18 +618,21 @@ METHOD Refresh(lQuery) CLASS TPQquery
             ::aStruct := aStruct        
         endif
     
-        result := .T.            
+        ::lError := .F.
+        ::cError := ''    
     
     elseif PQresultstatus(res) == PGRES_COMMAND_OK
-        result := .T.
+        ::lError := .F.
+        ::cError := ''    
         
     else
-        result := .F.            
+        ::lError := .T.
+        ::cError := PQresultErrormessage(res)       
     endif            
     
     ::pQuery := res
 
-RETURN result    
+RETURN ! ::lError
     
     
 METHOD Struct() CLASS TPQquery
@@ -617,10 +677,9 @@ RETURN .T.
 METHOD FieldPos( cField ) CLASS TPQquery
     Local result  := 0
     
-    if ! ::NetErr()
+    if PQresultstatus(::pQuery) == PGRES_TUPLES_OK     
         result := AScan( ::aStruct, {|x| x[1] == trim(Lower(cField)) })
     end        
-
 RETURN result
     
 
@@ -631,10 +690,9 @@ METHOD FieldName( nField ) CLASS TPQquery
         nField := ::Fieldpos(nField)
     endif
         
-    if ! ::NetErr() .and. nField >= 1 .and. nField <= len(::aStruct)
+    if PQresultstatus(::pQuery) == PGRES_TUPLES_OK .and. nField >= 1 .and. nField <= len(::aStruct)
         result := ::aStruct[nField, 1]    
-    endif
-    
+    endif    
 RETURN result
 
 
@@ -645,10 +703,9 @@ METHOD FieldType( nField ) CLASS TPQquery
         nField := ::Fieldpos(nField)
     endif
 
-    if ! ::NetErr() .and. nField >= 1 .and. nField <= len(::aStruct)
+    if PQresultstatus(::pQuery) == PGRES_TUPLES_OK .and. nField >= 1 .and. nField <= len(::aStruct)
         result := ::aStruct[nField, 2]    
-    end
-    
+    end    
 RETURN result
 
 
@@ -659,7 +716,7 @@ METHOD FieldLen( nField ) CLASS TPQquery
         nField := ::Fieldpos(nField)
     endif
 
-    if ! ::NetErr() .and. nField >= 1 .and. nField <= len(::aStruct)
+    if PQresultstatus(::pQuery) == PGRES_TUPLES_OK .and. nField >= 1 .and. nField <= len(::aStruct)
         result := ::aStruct[nField, 3]    
     end
 RETURN result
@@ -672,14 +729,13 @@ METHOD FieldDec( nField ) CLASS TPQquery
         nField := ::Fieldpos(nField)
     endif
     
-    if ! ::NetErr() .and. nField >= 1 .and. nField <= len(::aStruct)
+    if PQresultstatus(::pQuery) == PGRES_TUPLES_OK .and. nField >= 1 .and. nField <= len(::aStruct)
         result := ::aStruct[nField, 4]    
     end
 RETURN result
 
 
 METHOD Delete(oRow) CLASS TPQquery
-    Local result 
     Local res
     Local i
     Local nField
@@ -700,22 +756,29 @@ METHOD Delete(oRow) CLASS TPQquery
 
             if i <> len(::aKeys)
                 cWhere += ' and '
-            end                    
+            endif
         Next                        
 
         if ! (cWhere == '')
             res := PQexecParams( ::pDB, 'DELETE FROM ' + ::Schema + '.' + ::Tablename + ' WHERE ' + cWhere, aParams)    
+
             if PQresultstatus(res) != PGRES_COMMAND_OK            
-                result := PQresultErrorMessage(res)
+                ::lError := .T.
+                ::cError := PQresultErrormessage(res)       
+            else             
+                ::lError := .F.
+                ::cError := ''
             endif                
             PQclear(res)
         end            
-    end
-RETURN result
+    else
+        ::lError := .T.
+        ::cError := 'There is no primary keys or query is a joined table'        
+    endif
+RETURN ! ::lError
 
 
 METHOD Append( oRow ) CLASS TPQquery
-    Local result
     Local cQuery
     Local i
     Local res
@@ -724,14 +787,14 @@ METHOD Append( oRow ) CLASS TPQquery
     Local nParams := 0
 
     ::SetKey()
-
+    
     if ! Empty(::Tablename)
         cQuery := 'INSERT INTO ' + ::Schema + '.' + ::Tablename + '('
         For i := 1 to oRow:FCount()
             if ::lallCols .or. oRow:changed(i)
                 lChanged := .t.
                 cQuery += oRow:Fieldname(i) + ','
-            end                
+            endif                
         Next
 
         cQuery := Left( cQuery, len(cQuery) - 1 ) +  ') VALUES (' 
@@ -741,21 +804,29 @@ METHOD Append( oRow ) CLASS TPQquery
                 nParams++
                 cQuery += '$' + ltrim(str(nParams)) + ','
                 aadd( aParams, ValueToString(oRow:FieldGet(i)) )
-            end                
+            endif                
         Next
         
         cQuery := Left( cQuery, len(cQuery) - 1  ) + ')'
-
+    
         if lChanged
             res := PQexecParams( ::pDB, cQuery, aParams)    
+
             if PQresultstatus(res) != PGRES_COMMAND_OK            
-                result := PQresultErrorMessage(res)
+                ::lError := .T.
+                ::cError := PQresultErrormessage(res)       
+            else             
+                ::lError := .F.
+                ::cError := ''
             endif                
 
             PQclear(res)
-        end            
-    end            
-RETURN result
+        endif            
+    else
+        ::lError := .T.
+        ::cError := 'Cannot insert in a joined table, or unknown error'                
+    endif
+RETURN ! ::lError
 
 
 METHOD Update(oRow) CLASS TPQquery
@@ -801,12 +872,22 @@ METHOD Update(oRow) CLASS TPQquery
             cQuery := Left( cQuery, len(cQuery) - 1 ) + ' WHERE ' + cWhere                        
             
             res := PQexecParams( ::pDB, cQuery, aParams)    
+
             if PQresultstatus(res) != PGRES_COMMAND_OK            
-                result := PQresultErrorMessage(res)
-            endif        
+                ::lError := .T.
+                ::cError := PQresultErrormessage(res)       
+            else             
+                ::lError := .F.
+                ::cError := ''
+            endif                
+
+            PQclear(res)
         end            
-    end            
-RETURN result
+    else        
+        ::lError := .T.
+        ::cError := 'Cannot insert in a joined table, or unknown error'                
+    endif
+RETURN ! ::lError
 
 
 METHOD FieldGet( nField, nRow ) CLASS TPQquery
@@ -821,7 +902,7 @@ METHOD FieldGet( nField, nRow ) CLASS TPQquery
         nField := ::Fieldpos(nField)
     endif
                     
-    if ! ::NetErr().and. nField >= 1 .and. nField <= ::nFields .and. ! ::lclosed
+    if nField >= 1 .and. nField <= ::nFields .and. ! ::lclosed .and. PQresultstatus(::pQuery) == PGRES_TUPLES_OK
         
         if ISNIL(nRow)
             nRow := ::nRecno
@@ -887,7 +968,7 @@ METHOD Getrow( nRow ) CLASS TPQquery
     
     DEFAULT nRow TO ::nRecno
     
-    if ! ::NetErr().and. ! ::lclosed 
+    if ! ::lclosed .and. PQresultstatus(::pQuery) == PGRES_TUPLES_OK
         
         if nRow > 0 .and. nRow <= ::nLastRec
 
