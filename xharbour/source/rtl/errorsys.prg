@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.32 2004/04/02 12:09:23 srobert Exp $
+ * $Id: errorsys.prg,v 1.33 2004/04/15 16:04:31 likewolf Exp $
  */
 
 /*
@@ -152,6 +152,12 @@ STATIC FUNCTION DefError( oError )
                      Return .F.
             Endcase
          Endif
+     Else
+        If Empty( oError:osCode )
+           nChoice := Alert( cMessage )
+        Else
+           nChoice := Alert( cMessage + ";" + cDOSError )
+        Endif
      ENDIF
 
      // "Quit" selected
