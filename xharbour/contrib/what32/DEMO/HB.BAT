@@ -6,8 +6,8 @@ del comp.log
 rem *** Create C source if PRG exists
 IF NOT EXIST %1.prg  GOTO MAKEOBJ
 
-rem harbour %1 /w /n /m /gc0 /es2 /i%HB_INC_INSTALL% > comp.log
-harbour %1 /w /p /n /m /gc0 /es2 /i%HB_INC_INSTALL%;include /o%1 >> comp.log
+rem harbour %1 /w /n /m /gc0 /es2 /i..\..\..\include > comp.log
+harbour %1 /w /p /n /m /gc0 /es2 /i..\..\..\include;..\include;include /o%1 >> comp.log
 @type comp.log
 
 IF ERRORLEVEL 1 GOTO EXIT
@@ -15,7 +15,7 @@ IF ERRORLEVEL 1 GOTO EXIT
 :MAKEOBJ
 rem *** Create OBJ from C
 
-bcc32 -DHB_API_MACROS -M -c -O2 -e%1 -I%HB_INC_INSTALL% %1.c > comp.log
+bcc32 -DHB_API_MACROS -M -c -O2 -e%1 -I..\..\..\include %1.c > comp.log
 @type comp.log
 
 IF ERRORLEVEL 1 GOTO EXIT

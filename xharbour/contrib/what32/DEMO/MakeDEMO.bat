@@ -2,6 +2,8 @@ del demo.exe
 CLS
 @ECHO OFF
 
+IF '%HB_INSTALL%'=='' SET HB_INSTALL=..\..\..
+
 echo c0w32.obj + > b32.bc
 
 rem Compile demo
@@ -12,8 +14,8 @@ IF ERRORLEVEL 1 GOTO EXIT
 :ENDCOMPILE
 echo , demo.exe, + >> b32.bc
 echo demo.map, + >> b32.bc
-echo c:\what32a\lib\what32.lib +  >>  b32.bc
-echo c:\what32a\lib\whatplus.lib +  >>  b32.bc
+echo ..\lib\what32.lib +  >>  b32.bc
+echo ..\lib\whatplus.lib +  >>  b32.bc
 echo %HB_INSTALL%\lib\rtl.lib + >> b32.bc
 echo %HB_INSTALL%\lib\vm.lib + >> b32.bc
 echo %HB_INSTALL%\lib\gtwin.lib + >> b32.bc
