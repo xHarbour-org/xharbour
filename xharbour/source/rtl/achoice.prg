@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.5 2002/08/09 17:56:57 lculik Exp $
+ * $Id: achoice.prg,v 1.6 2002/08/28 00:27:41 lculik Exp $
  */
 
 /*
@@ -55,24 +55,23 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
 
    DEFAULT nTop       TO 0                 // The topmost row of the window
    DEFAULT nLeft      TO 0                 // The leftmost column of the window
-   DEFAULT nBottom    TO MaxRow() + 1      // The bottommost row of the window
-   DEFAULT nRight     TO MaxCol() + 1      // The rightmost column of the window
+   DEFAULT nBottom    TO MaxRow()          // The bottommost row of the window
+   DEFAULT nRight     TO MaxCol()          // The rightmost column of the window
                       
    DEFAULT acItems    TO {}                // The items from which to choose
    DEFAULT xSelect    TO .T.               // Array or logical, what is selectable
    DEFAULT nPos       TO 1                 // The number of the selected item
    DEFAULT nHiLiteRow TO 0                 // The row to be highlighted
 
-   IF nRight == 79 .and. nLeft ==0
-      nNumCols := 80  
-   ELSE
-      nNumCols := nRight - nLeft + 1
-   ENDIF
-
    IF nRight > MaxCol()
-      nRight--
+      nRight := MaxCol()
    ENDIF
 
+   IF nBottom > MaxRow()
+      nBottom := MaxRow()
+   ENDIF
+
+   nNumCols := nRight - nLeft + 1
    nNumRows := nBottom - nTop + 1
 
 
@@ -508,13 +507,6 @@ STATIC PROCEDURE DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPo
    LOCAL nIndex                            // Array index
    LOCAL nSaveRow := Row()                 // Position at start of routine
    LOCAL nSaveCol := Col()                 // Position at start of routine
-   LOCAL nRightPos := 0
-
-   IF nRight == 79 .and. nLeft == 0
-      nRightPos := 80
-   ELSE                            
-      nRightPos := nRight - nLeft + 1 
-   ENDIF 
 
    Default nRowsClr to nNumRows
 
@@ -526,7 +518,7 @@ STATIC PROCEDURE DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPo
       nIndex := nCntr + nAtTop - 1
 
       IF INRANGE( 1, nIndex, nArrLen )
-         DispLine( acItems[ nIndex ], nRow, nLeft, Eval( bSelect, alSelect[ nIndex ] ), nIndex == nPos, nRightPos)
+         DispLine( acItems[ nIndex ], nRow, nLeft, Eval( bSelect, alSelect[ nIndex ] ), nIndex == nPos, nRight - nLeft + 1 )
       ELSE
          ColorSelect( CLR_STANDARD )
          DispOutAt( nRow, nLeft, Space( nRight - nLeft + 1 ) )
