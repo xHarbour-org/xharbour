@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1640 2003/10/31 12:28:58 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.1641 2003/11/01 06:00:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-01 14:10 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * contrib/rdd_ads/adsfunc.c
+  * contrib/rdd_ads/doc/en/adsfuncs.txt
+    + Added 2nd (ignored) & 3rd params to adsKeyNo() in order to perform like OrdKeyNo() for other RDD's.
+      The default remains ADS_IGNOREFILTERS for compatibility (like adsKeyCount() does).
+      Thanks to Luis Krause Mantilla for this.
 
 2003-10-31 22:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.slx

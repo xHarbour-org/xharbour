@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.18 2003/09/21 06:49:21 brianhays Exp $
+ * $Id: adsfunc.c,v 1.19 2003/09/29 12:09:59 iananderson Exp $
  */
 
 /*
@@ -367,10 +367,22 @@ HB_FUNC( ADSKEYNO )
    UNSIGNED8 ordNum;
    UNSIGNED32 pulKey;
    ADSHANDLE hIndex;
+   UNSIGNED16 usFilterOption = ADS_IGNOREFILTERS;
 
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
    {
+      if( hb_pcount() > 2 )             /* 2nd parameter: unsupported Bag Name */
+      {
+         if( ISNUM( 3 ) )
+            usFilterOption = hb_parni( 3 );
+         else
+         {
+            hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSKEYNO" );
+            return;
+         }
+      }
+
       if( hb_pcount() > 0 )
       {
          if( ISNUM( 1 ) )
@@ -383,17 +395,17 @@ HB_FUNC( ADSKEYNO )
             ordName = (UNSIGNED8*)hb_parc( 1 );
             AdsGetIndexHandle( pArea->hTable, ordName, &hIndex );
          }
-         AdsGetKeyNum  ( hIndex, ADS_IGNOREFILTERS, &pulKey);
+         AdsGetKeyNum( hIndex, usFilterOption, &pulKey );
       }
       else
       {
-         if( pArea->hOrdCurrent != 0)
+         if( pArea->hOrdCurrent != 0 )
          {
             hIndex = pArea->hOrdCurrent;
-            AdsGetKeyNum  ( hIndex, ADS_IGNOREFILTERS, &pulKey);
+            AdsGetKeyNum( hIndex, usFilterOption, &pulKey );
          }
          else
-            AdsGetRecordNum  ( pArea->hTable, ADS_IGNOREFILTERS, &pulKey);
+            AdsGetRecordNum( pArea->hTable, usFilterOption, &pulKey );
       }
 
       hb_retnl( pulKey );
