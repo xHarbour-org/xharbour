@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.19 2003/02/16 00:00:12 jonnymind Exp $
+# $Id: Makefile,v 1.20 2003/02/23 20:13:38 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -151,6 +151,7 @@ PRG_SOURCES=\
         getsys.prg   \
         input.prg    \
         hbserial.prg \
+        hbreadini.prg \
         listbox.prg  \
         memoedit.prg \
         memvarbl.prg \
