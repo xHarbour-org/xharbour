@@ -1,0 +1,242 @@
+GUIMAIN.PRG:
+  WriteStatus( hWnd, nPart, cText )
+     Writes to the status window
+  VColor( cColor )
+     Converts color from a string with Windows hex format to number
+  GetChildWindowsNumber
+     Returns current number of child MDI windows
+  MsgGet( cTitle, cText, nStyle )
+  EndWindow()
+  PropertySheet( hParentWindow, aPages, cTitle, lModeless, lNoApply, lWizard )
+
+  dlgCreateGet( aDlg, id, initValue, bValid )
+  dlgCreateRadioGet( aDlg, arIds, idInit, bValid )
+  dlgCreateComboGet( aDlg, id, arr, nItem, bValid )
+  dlgReadGets( aDlg )
+  IsGetUpdated( aDlg,nId )
+  dlgGet( aDlg,nId )
+  dlgGetInitial( aDlg,nId )
+  WChoice( arr, cTitle, nLeft, nTop, oFont, clrT, clrB, clrTSel, clrBSel )
+  ShowProgress( nStep,maxPos,nRange,cTitle,oWnd,x1,y1,width,height )
+  HdSerial( cDrive )
+  
+
+HOWNBTN.PRG
+  SetOwnBtnSelected( aBtn )
+
+HBROWSE.PRG:
+  Createarlist( mslist, arr )
+  CreateList( aBrowse )
+
+PRINTER.PRG:
+  PrintPreview( hDCprint, hEmf )
+
+REPEXEC.PRG:
+  ClonePaintRep( ar )
+  SetPaintRep( ar )
+  OpenReport( fname,repName )
+  RecalcForm( aPaintRep,nFormWidth )
+  PrintReport( printerName )
+
+MENU.PRG:
+  BuildMenu( aMenu, hWnd, aWnd, nPosParent )
+
+COMMOND.C:
+  Selectfont
+     Calls standard Windows dialog for font selecting, returns font handle
+  Selectfile
+     Calls standard Windows dialog for file opening, returns file path and name   
+  Savefile
+     Calls standard Windows dialog for file saving, returns file path and name
+  Printsetup
+
+CONTROL.C:
+  Movewindow
+  Createprogressbar
+  Updateprogressbar
+  Setprogressbar
+  Addtooltip
+  Createupdowncontrol
+  Setupdown
+  Getparent
+  Loadcursor
+  Setcursor
+
+DIALOG.C:
+  Enddialog
+  Getdlgitem
+  Getdlgctrlid
+  Setdlgitemtext
+  Setdlgitemint
+  Getdlgitemtext
+  Getedittext
+  Checkdlgbutton
+  Checkradiobutton
+  Isdlgbuttonchecked
+  Comboaddstring
+  Combosetstring
+  Getnotifycode
+
+DRAW.C:
+  Invalidaterect
+  Rectangle
+  Drawline
+  Fillrect
+  Redrawwindow
+  Drawbutton
+  Loadbitmap
+  Drawbitmap
+  Getbitmapsize
+  Openbitmap
+  Getsyscolor
+  Createpen
+  Createsolidbrush
+  Selectobject
+  Deleteobject
+  Getdc
+  Releasedc
+
+DRAWTEXT.C:
+ Definepaintstru
+ Beginpaint
+ Endpaint
+ Deletedc
+ Textout
+ Drawtext
+ Gettextmetric
+ Gettextsize
+ Getclientrect
+ Getwindowrect
+ Getclientarea
+ Settextcolor
+ Setbkcolor
+ Gettextcolor
+ Exttextout
+ Writestatuswindow
+ Windowfromdc
+ CreateFont( fontName, nWidth, hHeight [,fnWeight] [,fdwChaeSet], 
+               [,fdwItalic] [,fdwUnderline] [,fdwStrikeOut]  ) --> hFont
+        Creates font with given attributes,
+        returns font handle
+ SetCtrlFont( hWnd, ctrlId, hFont )
+ Oemtoansi
+ Ansitooem
+
+MESSAGE.C:
+  Msginfo( cMessage [, cTitle] )
+  Msgstop( cMessage [, cTitle] )
+  Msgokcancel( cMessage [, cTitle] )
+  Msgyesno( cMessage [, cTitle] )
+  MsgBeep( [ nSound ] )
+  MsgExclamation( cMessage, [, cTitle ] )
+  MsgRetryCancel( cMessage, [, cTitle ] )
+
+MISC.C
+  Hwg_setdlgresult 
+  Setcapture 
+  Releasecapture 
+  Copystringtoclipboard 
+  Getstockobject 
+  Loword 
+  Hiword 
+  Hwg_bitor 
+  Hwg_bitand 
+  Hwg_bitandinverse 
+  Setbit 
+  Checkbit 
+  Hwg_sin 
+  Hwg_cos 
+  Clienttoscreen 
+  Screentoclient 
+  Hwg_getcursorpos 
+  Getcurrentdir 
+  Winexec 
+  Getkeyboardstate 
+  Getwindowsdir 
+  Getsystemdir 
+  Gettempdir 
+  Shellabout 
+  Getdesktopwidth
+  Getdesktopheight
+
+
+WBROWSE.C:
+  Setscrollinfo
+  Getscrollrange
+  Getscrollpos
+  Setscrollpos
+  Setwindowpos
+
+WINDOW.C:
+ Createstatuswindow( hwndParent, nStatusID, nParts, pArray )
+       CreateStatusWindow - creates a status window and divides it into  
+       the specified number of parts, returns the handle to the status window. 
+       hwndParent - parent window for the status window 
+       nStatusID - child window identifier 
+       nParts - number of parts into which to divide the status window 
+       pArray - Array with Lengths of parts, if first item == 0, status window
+                will be divided into equal parts.
+
+ Sendmessage( hWnd, nMsg, wParam, lParam )
+
+ Postmessage( hWnd, nMsg, wParam, lParam )
+
+  Setfocus
+  Setdlgresult
+  Enablewindow
+  Destroywindow
+  Hidewindow
+  Showwindow
+  Iswindowenabled
+  SetWindowText( hWnd, cText )
+          Set caption (cText) for given window (hWnd)
+
+  GetActiveWindow()
+          Returns handle of active window
+
+  Getinstance()
+          Returns instance of the application
+
+  Loword( nDouble )
+          Returns low word of a double type number
+
+  Hiword( nDouble )
+          Returns high word of a double type number
+
+  Copystringtoclipboard
+  Setbit
+  Checkbit
+
+PRINT.C:
+  Openprinter
+  Opendefaultprinter
+  Startdoc
+  Enddoc
+  Startpage
+  Endpage
+  Getdevicearea
+  Createenhmetafile
+  Createmetafile
+  Closeenhmetafile
+  Deleteenhmetafile
+  Playenhmetafile
+  Printenhmetafile
+
+PRNALONE.C:
+  Printsetup
+  Openprinter
+  Opendefaultprinter
+  Startdoc
+  Enddoc
+  Startpage
+  Endpage
+  Deletedc
+  Getdevicearea
+  Drawtext
+
+MENU_C.C:
+  Checkmenuitem
+  Ischeckedmenuitem
+  Enablemenuitem
+  Isenabledmenuitem
+
