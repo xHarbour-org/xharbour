@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.190 2003/04/20 22:46:10 jonnymind Exp $
+ * $Id: hvm.c,v 1.191 2003/04/21 03:05:18 jonnymind Exp $
  */
 
 /*
@@ -4775,8 +4775,13 @@ void hb_vmSend( USHORT uiParams )
    }
    else if( HB_IS_OBJECT( pSelf ) )               /* Object passed            */
    {
-      lPopSuper = FALSE;
       pFunc     = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor );
+      if( uiParams == 1 && pFunc == hb___msgGetData )
+      {
+         pFunc = hb___msgSetData;
+      }
+
+      lPopSuper = FALSE;
       pSelfBase = pSelf->item.asArray.value;
 
       if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
