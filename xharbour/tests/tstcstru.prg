@@ -88,7 +88,8 @@ Return
 
   HB_FUNC( GETFROMC )
   {
-     MY_STRUCTURE *MyStructure = hb_xgrab( sizeof( MY_STRUCTURE ) ), *MyStructure2 = hb_xgrab( sizeof( MY_STRUCTURE ) );
+     MY_STRUCTURE *MyStructure = (MY_STRUCTURE *) hb_xgrab( sizeof( MY_STRUCTURE ) );
+     MY_STRUCTURE *MyStructure2 = (MY_STRUCTURE* )hb_xgrab( sizeof( MY_STRUCTURE ) );
 
      MyStructure->sName = "From C";
      MyStructure->cAge  = 99;
@@ -102,7 +103,7 @@ Return
      MyStructure2->dHeight = 1.11;
      MyStructure2->pNext = NULL;
 
-     printf( "\n\n\n\nMyStructure %p, MyStructure2: %p, MyStructure.pNext: %p\n", MyStructure, MyStructure2, MyStructure->pNext );
+     //printf( "\n\n\n\nMyStructure %p, MyStructure2: %p, MyStructure.pNext: %p\n", MyStructure, MyStructure2, MyStructure->pNext );
      //printf( "Sizeof: %i %i\n", sizeof( MY_STRUCTURE ), sizeof( MyStructure2.pNext ) );
 
      hb_retclenAdopt( (char *) MyStructure, sizeof( MY_STRUCTURE ) );
