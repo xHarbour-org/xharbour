@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1810 2003/12/02 11:46:57 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.1811 2003/12/02 12:25:53 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-03 12:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/garbage.c
+  * source/rtl/console.c
+    ! Fixed a potential conflict during canclelation while idle inspecting and
+      printing...
+
+  * source/vm/hash.c
+    * hb_xrealloc() was called without reassigning the returned pointer; should
+      have been working anyway as it was used only to reduce page sizes, but
+      it is better to reassign the pointer each time.
+  
+  * source/vm/classes.c
+    ! Added hash to deep initialization types for INIT clauses.  
 
 2003-01-02 10:25 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * include/hbapifs.ch

@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.37 2003/10/28 19:55:05 peterrees Exp $
+ * $Id: console.c,v 1.38 2003/11/09 15:59:53 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -89,14 +89,12 @@
    #define HB_CONSOLE_SAFE_LOCK\
       HB_CLEANUP_PUSH( hb_set.HB_SET_OUTPUTSAFETY ? s_doNothing : hb_rawMutexForceUnlock, hb_outputMutex );\
       if ( hb_set.HB_SET_OUTPUTSAFETY ) {\
-         HB_STACK_UNLOCK;\
          HB_CRITICAL_LOCK( hb_outputMutex );\
       }
 
    #define HB_CONSOLE_SAFE_UNLOCK \
       if ( hb_set.HB_SET_OUTPUTSAFETY ) {\
          HB_CRITICAL_UNLOCK( hb_outputMutex );\
-         HB_STACK_LOCK;\
       }\
       HB_CLEANUP_POP;
 

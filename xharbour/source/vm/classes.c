@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.86 2003/11/26 21:58:35 jonnymind Exp $
+ * $Id: classes.c,v 1.87 2003/11/26 23:01:22 jonnymind Exp $
  */
 
 /*
@@ -1468,6 +1468,10 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, long lID_or_FuncPointer_or_B
                   {
                      pNewMeth->pInitValue = hb_arrayClone( pInit, NULL );
                   }
+                  else if( HB_IS_HASH( pInit ) )
+                  {
+                     pNewMeth->pInitValue = hb_hashClone( pInit );
+                  }
                   else
                   {
                      pNewMeth->pInitValue = hb_itemNew( NULL );
@@ -1496,6 +1500,10 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, long lID_or_FuncPointer_or_B
                   if( HB_IS_ARRAY( pInit ) )
                   {
                      pNewMeth->pInitValue = hb_arrayClone( pInit, NULL );
+                  }
+                  else if( HB_IS_HASH( pInit ) )
+                  {
+                     pNewMeth->pInitValue = hb_hashClone( pInit );
                   }
                   else
                   {
@@ -1878,6 +1886,10 @@ HB_FUNC( __CLSNEW )
                            {
                               pNewCls->pMethods[ uiAt + uiBucket ].pInitValue = hb_arrayClone( pSprCls->pMethods[ ui ].pInitValue, NULL );
                            }
+                           else if( HB_IS_HASH( pSprCls->pMethods[ ui ].pInitValue ) )
+                           {
+                              pNewCls->pMethods[ uiAt + uiBucket ].pInitValue = hb_hashClone( pSprCls->pMethods[ ui ].pInitValue );
+                           }
                            else
                            {
                               pInitValue = hb_itemNew( NULL );
@@ -2065,6 +2077,10 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
                   {
                      pInit = hb_arrayClone( pMeth->pInitValue, NULL );
                   }
+                  else if( HB_IS_HASH( pMeth->pInitValue ) )
+                  {
+                     pInit = hb_hashClone( pMeth->pInitValue );
+                  }
                   else
                   {
                      pInit = hb_itemNew( NULL );
@@ -2089,6 +2105,10 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
                {
                   pInitValue = hb_arrayClone( pMeth->pInitValue, NULL );
                }
+               else if( HB_IS_HASH( pMeth->pInitValue ) )
+               {
+                  pInitValue = hb_hashClone( pMeth->pInitValue );
+               }
                else
                {
                   pInitValue = hb_itemNew( NULL );
@@ -2112,7 +2132,13 @@ static PHB_ITEM hb_clsInst( USHORT uiClass )
                {
 
                   if( HB_IS_ARRAY( pMeth->pInitValue ) )
-                   pInit = hb_arrayClone( pMeth->pInitValue, NULL );
+                  {
+                     pInit = hb_arrayClone( pMeth->pInitValue, NULL );
+                  }
+                  else if( HB_IS_HASH( pMeth->pInitValue ) )
+                  {
+                     pInit = hb_hashClone( pMeth->pInitValue );
+                  }
                   else
                   {
                    pInit = hb_itemNew( NULL );

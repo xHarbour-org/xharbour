@@ -1,6 +1,6 @@
 
 /*
- * $Id: garbage.c,v 1.66 2003/11/27 17:57:50 jonnymind Exp $
+ * $Id: garbage.c,v 1.67 2003/11/28 20:39:14 jonnymind Exp $
  */
 
 /*
@@ -61,6 +61,7 @@
 #include "hbapierr.h"
 #include "hbvm.h"
 #include "error.ch"
+#include "hashapi.h"
 
 #define HB_GC_COLLECTION_JUSTIFIED 64
 
@@ -533,13 +534,16 @@ void hb_gcCollectAll()
 
    /* is anoter garbage in action? */
    #ifdef HB_THREAD_SUPPORT
-      HB_SHARED_LOCK( hb_runningStacks );
+      HB_CRITICAL_LOCK( hb_garbageAllocMutex );
       if ( s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
       {
-         HB_SHARED_UNLOCK( hb_runningStacks );
+         HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
          return;
       }
+      HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
 
+      HB_SHARED_LOCK( hb_runningStacks );
+      
       hb_threadWaitForIdle();
 
       /* We are now idle inspectors. Currently, this is useless for
