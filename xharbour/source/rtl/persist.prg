@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.16 2003/12/23 18:14:57 peterrees Exp $
+ * $Id: persist.prg,v 1.17 2003/12/23 19:31:27 peterrees Exp $
  */
 
 /*
@@ -58,6 +58,12 @@
  *    SaveToText()
  *    General rewrite.
  *
+ * Copyright 2004 Peter Rees <peter@rees.co.nz>
+ *    ReplaceBracketsInString()
+ *    ReplaceCRLFInString()
+ *    ArrayFromLFString()
+ *    + Update to handle strings > 254 characters & embedded CHR(13)/CHR(10)/'[]'
+ *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -80,12 +86,10 @@ ENDCLASS
 METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
 
    EXTERN HB_RestoreBlock
-   LOCAL aLines:= ArrayFromLFString(cObjectText)
-   LOCAL nLines := LEN(aLines)
-   LOCAL nLine  := 1, cLine
+   LOCAL aLines, nLines, nLine := 1, cLine
    LOCAL lStart := .T., aObjects := {}, nObjectLevel := 0
-   LOCAL cTextCopy, nAt
-
+   LOCAL nAt
+   LOCAL cVersion2:= "// HBPersistent Ver 2.0"
    MEMVAR oObject
    PRIVATE oObject := QSelf()
 
@@ -93,12 +97,13 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
       lIgnoreBadIVars := .f.
    ENDIF
 
-   cLine := RTrim(aLines[1])
 
-   IF cLine == "// HBPersistent Ver 2.0"
-      nLine++
+   IF LEFT(cObjectText, LEN(cVersion2)) == cVersion2
+      aLines := ArrayFromLFString(cObjectText)
+      nLines := LEN(aLines)
+      nLine  := 2
    ELSE
-      cTextCopy := ""
+      aLines:= {}
       nLines := MLCount( cObjectText, 254 )
       DO WHILE nLine <= nLines
          cLine := LTrim( MemoLine( cObjectText, 254, nLine ) )
@@ -109,11 +114,10 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
             ENDIF
          ENDIF
 
-         cTextCopy += cLine + HB_OsNewLine()
+         AADD(aLines,cLine + HB_OsNewLine())
 
          nLine++
       ENDDO
-      aLines := ArrayFromLFString(cTextCopy)
       nLines := LEN(aLines)
       nLine  := 1
    ENDIF
@@ -296,6 +300,7 @@ STATIC FUNCTION ValToText( xValue )
          IF cQuote IN xValue
             cQuote := "'"
             IF cQuote IN xValue
+               xValue:= ReplaceBracketsInString(xValue)
                cText := "["+ xValue + "]"
             ELSE
                cText := cQuote + xValue + cQuote
@@ -328,22 +333,56 @@ RETURN cText
 
 STATIC FUNCTION ReplaceCRLFInString(cText)
   LOCAL cCR:= CHR(13), cLF:= CHR(10), cQuoteOpen, cQuoteClose
+
   cQuoteClose:= cQuoteOpen:= cText[1]
-  IF cQuoteOpen='['
+
+  IF cQuoteOpen=='['
     cQuoteClose:= ']'
   ENDIF
-  IF cCR $ cText
+
+  IF cCR IN cText
     cText:= STRTRAN(cText, cCR, cQuoteClose+"+CHR(13)+"+cQuoteOpen)
   ENDIF
-  IF cLF $ cText
+
+  IF cLF IN cText
     cText:= STRTRAN(cText, cLF, cQuoteClose+"+CHR(10)+"+cQuoteOpen)
   ENDIF
+
   RETURN(cText)
 
-STATIC FUNCTION ArrayFromLFString(cString)
+STATIC FUNCTION ReplaceBracketsInString(cText)
+  LOCAL cTemp, nPos, nLen
+
+  IF '[' IN cText .OR. ']' IN cText
+    cTemp:= cText
+    cText:= ""
+    nLen:= LEN(cTemp)
+
+    FOR nPos:= 1 TO nLen
+
+      SWITCH cTemp[nPos]
+        CASE '['
+          cText+="]+CHR(91)+["
+          EXIT
+        CASE ']'
+          cText+="]+CHR(93)+["
+          EXIT
+        DEFAULT
+          cText+= cTemp[nPos]
+      END
+
+    NEXT nPos
+
+  ENDIF
+
+  RETURN(cText)
+
+FUNCTION ArrayFromLFString(cString)
   LOCAL cDelim:= CHR(10), nStart:=1, nStop, aResult:= {}, nLen
   LOCAL nCnt:= 0
+
   cString:= STRTRAN(cString,CHR(13)) // Get rid of CR
+
   IF RIGHT(cString,1) != cDelim
     cString+= cDelim // Add a trailing LF if last character is not one
   ENDIF
@@ -354,4 +393,6 @@ STATIC FUNCTION ArrayFromLFString(cString)
     AADD(aResult, SUBSTR(cString, nStart, nStop- nStart))
     nStart:= nStop+1
   ENDDO
-  RETURN(aResult)  
+
+  RETURN(aResult)
+
