@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.7 2002/03/05 08:18:26 alkresin Exp $
+ * $Id: dbsdf.prg,v 1.2 2002/03/06 03:52:09 ronpinkas Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbsdf.prg,v 1.7 2002/03/05 08:18:26 alkresin Exp $" )
+HB_FILE_VER( "$Id: dbsdf.prg,v 1.2 2002/03/06 03:52:09 ronpinkas Exp $" )
 
 #define AppendEOL( handle ) FWRITE( handle, CHR( 13 ) + CHR( 10 ) )
 #define AppendEOF( handle ) FWRITE( handle, CHR( 26 ) )
@@ -218,7 +218,7 @@ RETURN .T.
 
 STATIC FUNCTION ImportFixed( handle, index, aStruct )
    LOCAL cBuffer := Space(aStruct[ index,3 ])
-   FREAD( handle, @cBuffer, aStruct[ index,3 ] )
+   FREAD( handle, @cBuffer, aStruct[ index,3 ])
    DO CASE
       CASE aStruct[ index,2 ] == "C"
          RETURN cBuffer
@@ -226,7 +226,9 @@ STATIC FUNCTION ImportFixed( handle, index, aStruct )
          RETURN HB_STOD( cBuffer )
       CASE aStruct[ index,2 ] == "L"
          RETURN iif( cBuffer == "T",.T.,.F. )
-      CASE aStruct[ index,2 ] == "N"
+      CASE aStruct[ index,2 ] == "N" .or. aStruct[ index,2 ] == "DOUBLE" .or. ;
+        aStruct[ index,2 ] == "INTEGER" .or. aStruct[ index,2 ] == "CURDOUBLE" .or. ;
+         aStruct[ index,2 ] == "AUTOINC" 
          RETURN VAL( cBuffer )
    END CASE
 RETURN cBuffer
