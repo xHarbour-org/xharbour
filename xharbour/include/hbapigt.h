@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.36 2004/10/23 23:00:00 oh1 Exp $
+ * $Id: hbapigt.h,v 1.36 2004/10/23 23:35:05 oh1 Exp $
  */
 
 /*
@@ -357,32 +357,32 @@ typedef struct _hb_gt_wnd
    HB_GT_GOBJECT * hb_gt_gobjects_end;
 } HB_CT_WND;
 
-extern SHORT      HB_EXPORT hb_ctGetClearA( void );
-extern SHORT      HB_EXPORT hb_ctGetClearB( void );
-extern SHORT      HB_EXPORT hb_ctSetClearA( SHORT nClearA );
-extern SHORT      HB_EXPORT hb_ctSetClearB( SHORT nClearB );
-extern int        HB_EXPORT hb_ctSetCurColor( int iColor );
-extern SHORT      HB_EXPORT hb_ctSetPos( SHORT iRow, SHORT iCol );
-extern SHORT      HB_EXPORT hb_ctShadow( SHORT iTop, SHORT iLeft, SHORT iBottom, SHORT iRight, BYTE byAttr );
-extern SHORT      HB_EXPORT hb_ctMaxCol( BOOL lMode );
-extern SHORT      HB_EXPORT hb_ctMaxRow( BOOL lMode );
-extern SHORT      HB_EXPORT hb_ctWAClose( void );
-extern SHORT      HB_EXPORT hb_ctWBoard( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
-extern SHORT      HB_EXPORT hb_ctWCenter( BOOL WCen );
-extern SHORT      HB_EXPORT hb_ctWClose( void );
-extern HB_CT_WND* HB_EXPORT hb_ctWCurrent( void );
-extern SHORT      HB_EXPORT hb_ctWFormat( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
-extern void       HB_EXPORT hb_ctWFree( HB_CT_WND * wnd );
-extern void       HB_EXPORT hb_ctWMode( BOOL MFRow, BOOL MFCol, BOOL MLRow, BOOL MLCol );
-extern SHORT      HB_EXPORT hb_ctWMove( SHORT FRow, SHORT FCol );
-extern HB_CT_WND* HB_EXPORT hb_ctWNew( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
-extern SHORT      HB_EXPORT hb_ctWNum( void );
-extern SHORT      HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol, BOOL lDel );
-extern SHORT      HB_EXPORT hb_ctWSelect( SHORT iwnd );
-extern BOOL       HB_EXPORT hb_ctWSetMove( BOOL Mode );
-extern SHORT      HB_EXPORT hb_ctWSetShadow( SHORT nAttr );
-extern void       HB_EXPORT hb_ctWStack( SHORT ** Stac, SHORT * SMax );
-extern SHORT      HB_EXPORT hb_ctWStep( SHORT nRow, SHORT nCol );
+extern SHORT      HB_EXPORT  hb_ctGetClearA( void );
+extern SHORT      HB_EXPORT  hb_ctGetClearB( void );
+extern SHORT      HB_EXPORT  hb_ctSetClearA( SHORT nClearA );
+extern SHORT      HB_EXPORT  hb_ctSetClearB( SHORT nClearB );
+extern int        HB_EXPORT  hb_ctSetCurColor( int iColor );
+extern SHORT      HB_EXPORT  hb_ctSetPos( SHORT iRow, SHORT iCol );
+extern SHORT      HB_EXPORT  hb_ctShadow( SHORT iTop, SHORT iLeft, SHORT iBottom, SHORT iRight, BYTE byAttr );
+extern SHORT      HB_EXPORT  hb_ctMaxCol( BOOL lMode );
+extern SHORT      HB_EXPORT  hb_ctMaxRow( BOOL lMode );
+extern SHORT      HB_EXPORT  hb_ctWAClose( void );
+extern SHORT      HB_EXPORT  hb_ctWBoard( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
+extern SHORT      HB_EXPORT  hb_ctWCenter( BOOL WCen );
+extern SHORT      HB_EXPORT  hb_ctWClose( void );
+extern HB_EXPORT  HB_CT_WND* hb_ctWCurrent( void );
+extern SHORT      HB_EXPORT  hb_ctWFormat( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
+extern void       HB_EXPORT  hb_ctWFree( HB_CT_WND * wnd );
+extern void       HB_EXPORT  hb_ctWMode( BOOL MFRow, BOOL MFCol, BOOL MLRow, BOOL MLCol );
+extern SHORT      HB_EXPORT  hb_ctWMove( SHORT FRow, SHORT FCol );
+extern HB_EXPORT  HB_CT_WND* hb_ctWNew( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
+extern SHORT      HB_EXPORT  hb_ctWNum( void );
+extern SHORT      HB_EXPORT  hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol, BOOL lDel );
+extern SHORT      HB_EXPORT  hb_ctWSelect( SHORT iwnd );
+extern BOOL       HB_EXPORT  hb_ctWSetMove( BOOL Mode );
+extern SHORT      HB_EXPORT  hb_ctWSetShadow( SHORT nAttr );
+extern void       HB_EXPORT  hb_ctWStack( SHORT ** Stac, SHORT * SMax );
+extern SHORT      HB_EXPORT  hb_ctWStep( SHORT nRow, SHORT nCol );
 
 /* Private interface listed below. these are common to all platforms */
 

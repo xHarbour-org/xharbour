@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3537 2004/10/25 13:18:38 druzus Exp $
+ * $Id: ChangeLog,v 1.3538 2004/10/25 17:05:33 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-25 10:28 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbapigt.h
+    * Corrected usage of HB_EXPORT with complex types.
+
+  * source/pp/ppcore.c
+    + Added implementation of defined() pseudo function in #if and #elif directives.
 
 2004-10-25 12:01 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/gtapi.c

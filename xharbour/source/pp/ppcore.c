@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.180 2004/10/22 05:40:53 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.181 2004/10/22 16:48:00 ronpinkas Exp $
  */
 
 /*
@@ -828,6 +828,44 @@ int hb_pp_ParseDirective( char * sLine )
 
   if( i == 2 && memcmp( sDirective, "IF", 2 ) == 0 )
   {
+     char *pTemp = sLine, *pDefined = pTemp;
+     char sID[ MAX_NAME ];
+
+     while( ( pDefined = strstr( pDefined, "defined" ) ) != NULL )
+     {
+        pTemp = pDefined + 7;
+        HB_SKIPTABSPACES( pTemp );
+
+        if( pTemp[0] != '(' )
+        {
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_INVALID_CONSTANT_EXPRESSION, pTemp, NULL );
+        }
+
+        pTemp++;
+
+        NextName( &pTemp, sID );
+
+        HB_SKIPTABSPACES( pTemp );
+
+        if( pTemp[0] != ')' )
+        {
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_INVALID_CONSTANT_EXPRESSION, pTemp, NULL );
+        }
+
+        pTemp++;
+
+        //printf( "Replace %.*s\n", pTemp - pDefined, pDefined );
+
+        if( DefSearch( sID, NULL ) )
+        {
+           hb_pp_Stuff( "1", pDefined, 1, pTemp - pDefined, strlen( pDefined ) );
+        }
+        else
+        {
+           hb_pp_Stuff( "0", pDefined, 1, pTemp - pDefined, strlen( pDefined ) );
+        }
+     }
+
      szExpandedLine[0] = '\0';
      hb_pp_ParseExpression( sLine, szExpandedLine );
 
@@ -853,6 +891,44 @@ int hb_pp_ParseDirective( char * sLine )
         }
         else if( hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] == 0 )
         {
+            char *pTemp = sLine, *pDefined = pTemp;
+            char sID[ MAX_NAME ];
+
+            while( ( pDefined = strstr( pDefined, "defined" ) ) != NULL )
+            {
+               pTemp = pDefined + 7;
+               HB_SKIPTABSPACES( pTemp );
+
+               if( pTemp[0] != '(' )
+               {
+                  hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_INVALID_CONSTANT_EXPRESSION, pTemp, NULL );
+               }
+
+               pTemp++;
+
+               NextName( &pTemp, sID );
+
+               HB_SKIPTABSPACES( pTemp );
+
+               if( pTemp[0] != ')' )
+               {
+                  hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_INVALID_CONSTANT_EXPRESSION, pTemp, NULL );
+               }
+
+               pTemp++;
+
+               //printf( "Replace %.*s\n", pTemp - pDefined, pDefined );
+
+               if( DefSearch( sID, NULL ) )
+               {
+                  hb_pp_Stuff( "1", pDefined, 1, pTemp - pDefined, strlen( pDefined ) );
+               }
+               else
+               {
+                  hb_pp_Stuff( "0", pDefined, 1, pTemp - pDefined, strlen( pDefined ) );
+               }
+            }
+
            szExpandedLine[0] = '\0';
            hb_pp_ParseExpression( sLine, szExpandedLine );
 
