@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.2 2003/12/08 01:45:07 mlombardo Exp $
+ * $Id: readline.c,v 1.3 2003/12/08 03:42:14 mlombardo Exp $
  */
 
 /*
@@ -59,72 +59,98 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
-USHORT HB_EXPORT hb_fsReadLine( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiMaxLineLen, char ** Term, int * iTermSizes, USHORT iTerms  )
+#define READING_BLOCK      512
+
+BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT uiBuffLen, char ** Term, int * iTermSizes, USHORT iTerms  )
 {
-   USHORT uiPosTerm, read, iPos, uiPosition;
-   BOOL bFound;
+   USHORT uiPosTerm, iPos, uiPosition;
+   BOOL bFound, bEof;
+   USHORT nTries, uiSize;
+   long lRead, lOffset;
+   BYTE * pBuff;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %p, %hu, %p, %p, %hu)", hFileHandle, pBuff, uiMaxLineLen, Term, iTermSizes, iTerms ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %hu, %p, %p, %hu)", hFileHandle, uiBuffLen, Term, iTermSizes, iTerms ));
 
-   /* read from file */
-   read = hb_fsRead( hFileHandle, pBuff, uiMaxLineLen );
+   bFound  = 0;
+   nTries  = 0;
+   lOffset = 0;
+   uiSize  = uiBuffLen;
 
-   /* scan the read buffer */
+   if (uiBuffLen < 10)
+      uiBuffLen = READING_BLOCK;
 
-   if (read>0)
+   pBuff = hb_xgrab( uiBuffLen );
+
+   do
    {
-      for( iPos=0; iPos<read; iPos++ )
+      if(nTries>0)
       {
-         bFound = 0;
-         for( uiPosTerm=0;uiPosTerm < iTerms;uiPosTerm++)
+         /* pBuff can be enlarged to hold the line as needed.. */
+         uiSize = (uiBuffLen*(nTries+1))+1;
+         pBuff = (BYTE *) hb_xrealloc(pBuff, uiSize );
+         lOffset += lRead;
+      }
+
+      /* read from file */
+      lRead = hb_fsReadLarge( hFileHandle, pBuff + lOffset, uiSize-lOffset );
+
+      /* scan the read buffer */
+
+      if (lRead>0)
+      {
+         for( iPos=0; iPos<lRead; iPos++ )
          {
-            /* Compare with the LAST char in every terminator */
-            if( pBuff[iPos] == Term[uiPosTerm][iTermSizes[uiPosTerm]-1] && (iTermSizes[uiPosTerm]-1) <= iPos )
+            for( uiPosTerm=0;uiPosTerm < iTerms;uiPosTerm++)
             {
-               bFound = 1;
-               for(uiPosition=0; uiPosition < (iTermSizes[uiPosTerm]-1); uiPosition++)
+               /* Compare with the LAST char in every terminator */
+               if( pBuff[lOffset+iPos] == Term[uiPosTerm][iTermSizes[uiPosTerm]-1] && (iTermSizes[uiPosTerm]-1) <= (iPos+lOffset) )
                {
-                  if(Term[uiPosTerm][uiPosition] != pBuff[ (iPos-iTermSizes[uiPosTerm])+uiPosition+1 ])
+                  bFound = 1;
+                  for(uiPosition=0; uiPosition < (iTermSizes[uiPosTerm]-1); uiPosition++)
                   {
-                     bFound = 0;
+                     if(Term[uiPosTerm][uiPosition] != pBuff[ lOffset+(iPos-iTermSizes[uiPosTerm])+uiPosition+1 ])
+                     {
+                        bFound = 0;
+                        break;
+                     }
+                  }
+                  if(bFound)
+                  {
                      break;
                   }
                }
-               if(bFound)
-               {
-                  break;
-               }
+            }
+            if(bFound)
+            {
+               break;
             }
          }
          if(bFound)
          {
-            break;
+            pBuff[lOffset+iPos-iTermSizes[uiPosTerm]+1] = '\0';
+            /* Set handle pointer in the end of the line */
+            hb_fsSeek( hFileHandle, (((lRead-((long)iPos)))*-1)+1, FS_RELATIVE );
+            return( pBuff );
          }
       }
-      if(bFound)
-      {
-         pBuff[iPos-iTermSizes[uiPosTerm]+1] = '\0';
-         /* Set handle pointer in the end of the line */
-         hb_fsSeek( hFileHandle, (((((long)read)-((long)iPos)))*-1)+1, FS_RELATIVE );
-         return( iPos-iTermSizes[uiPosTerm] );
-      }
+      nTries++;
    }
-   return( read );
+   while ((!bFound) && lRead > 0 );
+   return( pBuff );
 }
 
-/* PRG level fReadLine( <Handle>, <@buffer>, [<MaxLineLen>], [<aTerminators | cTerminator>] ) */
+/* PRG level fReadLine( <Handle>, <@buffer>, [<aTerminators | cTerminator>], [<nReadingBlock>] ) */
 
-HB_FUNC( FREADLINE )
+HB_FUNC( HB_FREADLINE )
 {
    PHB_ITEM pTerm1, pOpt;
-   PHB_ITEM pResult     = hb_param( 2, HB_IT_BYREF );
-   PHB_ITEM pMaxSize    = hb_param( 3, HB_IT_NUMERIC );
    FHANDLE hFileHandle  = (FHANDLE) hb_parnl( 1 );
    char ** Term;
    BYTE * pBuffer;
    int * iTermSizes;
-   int result;
-   USHORT iMax, i, iTerms;
+   long result;
+   long lSize = hb_parnl(4);
+   USHORT i, iTerms;
 
    if( (!ISBYREF( 2 )) || (!ISNUM( 1 )) )
    {
@@ -134,11 +160,11 @@ HB_FUNC( FREADLINE )
       return;
    }
 
-   if( ISARRAY( 4 ) || ISCHAR( 4 ) )
+   if( ISARRAY( 3 ) || ISCHAR( 3 ) )
    {
-      if( ISARRAY( 4 ) )
+      if( ISARRAY( 3 ) )
       {
-         pTerm1  = hb_param( 4, HB_IT_ARRAY );
+         pTerm1  = hb_param( 3, HB_IT_ARRAY );
          iTerms = (int) pTerm1->item.asArray.value->ulLen;
 
          if( iTerms <= 0 )
@@ -162,7 +188,7 @@ HB_FUNC( FREADLINE )
       }
       else
       {
-         pTerm1        = hb_param( 4, HB_IT_STRING );
+         pTerm1        = hb_param( 3, HB_IT_STRING );
          Term          = (char**) hb_xgrab( sizeof(char*) );
          iTermSizes    = (int *) hb_xgrab( sizeof(int) );
          Term[0]       = (char *) pTerm1->item.asString.value;
@@ -179,25 +205,14 @@ HB_FUNC( FREADLINE )
       iTermSizes[0] = 2;
    }
 
-   if( pMaxSize )
-   {
-      iMax = hb_itemGetNI( pMaxSize );
-   }
-   else
-   {
-      iMax = pResult->item.asString.length;
-   }
+   if( lSize == 0 )
+      lSize = READING_BLOCK ;
 
-   pBuffer = ( BYTE * ) pResult->item.asString.value;
-   result  = hb_fsReadLine( hFileHandle, pBuffer, iMax, Term, iTermSizes, iTerms  );
+   pBuffer = hb_fsReadLine( hFileHandle, lSize, Term, iTermSizes, iTerms  );
 
-   if( result > 0 )
-   {
-      /* It works, I hope this is not a crime :-| */
-      pResult->item.asString.length = result+1;
-   }
-
-   hb_retnl( result );
+   hb_storc( pBuffer, 2 );
+   hb_xfree( pBuffer );
+   hb_retnl( hb_fsError() );
    hb_xfree( Term );
    hb_xfree( iTermSizes );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1863 2003/12/13 07:20:28 andijahja Exp $
+ * $Id: ChangeLog,v 1.1864 2003/12/13 16:52:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-13 14:45 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/rtl/readline.c
+     ! Optimized and improved HB_FREADLINE()
+  * source/vm/dbsdf.prg
+     ! Fixed APPEND FROM SDF (now using HB_FREADLINE() to read txt lines)
+  * source/tests/dbsdf.prg
+     + Sample test to APPEND FROM SDF
+  * source/tests/tstline.prg
+     + Sample test to HB_FREADLINE()
 
 2003-12-13 08:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * bin/bld.bat

@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.7 2003/10/01 17:41:47 paultucker Exp $
+ * $Id: dbsdf.prg,v 1.8 2003/10/21 14:40:35 paultucker Exp $
  */
 
 /*
@@ -57,11 +57,13 @@
 
 #define AppendEOL( handle ) FWrite( handle, CHR( 13 ) + CHR( 10 ) )
 #define AppendEOF( handle ) FWrite( handle, CHR( 26 ) )
-#define SkipEOL( handle ) FSEEK( handle, 2, FS_RELATIVE )
+
+#define UNIX_EOL        chr(10)
+#define WINDOWS_EOL     chr(13)+chr(10)
 
 PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest )
    LOCAL index, handle, cFileName := cFile, nStart, nCount, oErr, nFileLen, cField
-   LOCAL lLineEnd
+   LOCAL lLineEnd, cLine, nOptmLen := 0
 
    // Process the file name argument.
    index := RAT( ".", cFileName )
@@ -177,17 +179,25 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
             bWhile := {||.T.}
          ENDIF
          nFileLen := FSEEK( handle,0,FS_END )
+
          FSEEK( handle,0 )
+
          WHILE FSEEK( handle,0,FS_RELATIVE ) + 1 < nFileLen
             APPEND BLANK
+
+            HB_FReadLine( handle, @cLine, { WINDOWS_EOL, UNIX_EOL }, nOptmLen )
+
+            /* Next HB_FReadLine will be optimized */
+            nOptmLen := len( cLine ) + 1
+
             lLineEnd := .F.
             IF EMPTY( aFields )
                // Process all fields.
                FOR index := 1 TO FCOUNT()
                   if ! FieldType( index ) == "M"
-                     FieldPut( index, ImportFixed( handle, index, @lLineEnd ) )
+                     FieldPut( index, ImportFixed( @cLine, index, @lLineEnd ) )
                   Endif
-                  IF lLineEnd                   // Se é Fim-de-Linha vai p/ o proximo registro
+                  IF lLineEnd
                      EXIT
                   ENDIF
                NEXT index
@@ -195,17 +205,18 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
                // Process the specified fields.
                FOR EACH cField IN aFields
                   if ! FieldType( index := FieldPos( cField ) ) == "M"
-                     FieldPut( index, ImportFixed( handle, index, @lLineEnd ) )
+                     FieldPut( index, ImportFixed( @cLine, index, @lLineEnd ) )
                   endif
-                  IF lLineEnd                   // Se é Fim-de-Linha vai p/ o proximo registro
+                  IF lLineEnd
                      EXIT
                   ENDIF
                NEXT
             ENDIF
-            // Set up for the start of the next record.
-            SkipEOL( handle )
+
          ENDDO
+
          FClose( handle )
+
       ENDIF
    ENDIF
 Return
@@ -229,20 +240,22 @@ STATIC FUNCTION ExportFixed( handle, xField )
    END
 Return .T.
 
-STATIC FUNCTION ImportFixed( handle, index, lLineEnd )
-   LOCAL cBuffer, nCR, nBytes, cType
+STATIC FUNCTION ImportFixed( cLine, index, lLineEnd )
+
+   LOCAL cBuffer, nBytes, cType, nLen
 
    if ! Empty( cType := FieldType( index ) )
 
-      cBuffer := Space( nCr := FieldLen( index ) )
-      nBytes  := FRead( handle, @cBuffer, nCr )
-      nCR     := at( CHR(13), cBuffer )
+      nLen     := FieldLen( index )
+      cBuffer  := SubStr( cLine, 1, min(len(cLine),nLen) )
+      lLineEnd := nLen >= len( cLine )
 
-      IF ( lLineEnd := (nCR > 0) )
-         cBuffer  := SubStr( cBuffer, 1, nCR - 1 )
-         FSEEK( handle, (nBytes - nCR +1) * -1, FS_RELATIVE )
-      ENDIF
-      
+      If lLineEnd
+         cLine := ""
+      Else
+         cLine    := SubStr( cLine, nLen + 1 )
+      EndIf
+
       Do Case // don't switch()
          CASE cType == "C"                     /* default return */
          CASE cType == "N" .or. ;
