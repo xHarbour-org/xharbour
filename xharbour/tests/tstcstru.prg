@@ -1,5 +1,6 @@
 #include "cstruct.ch"
 
+// Different Alignment
 C STRUCTURE MyNestedStructure Align 1
   Member c1[2] AS CTYPE_CHAR
   Member l2    AS CTYPE_LONG
@@ -10,7 +11,9 @@ C STRUCTURE MyStructure Align 4
   Member cAge     AS CTYPE_CHAR
   Member uiWeight AS CTYPE_UNSIGNED_INT
   Member dHeight  AS CTYPE_DOUBLE
+  // This is IN-PLACE - Note INPLACE clause.
   Member Nested   AS INPLACE C STRUCTURE MyNestedStructure
+  // This is DETACHED (default).
   Member pNext    AS C STRUCTURE MyStructure
 END C STRUCTURE
 
@@ -23,12 +26,15 @@ Procedure Main()
    oStructure:uiWeight := 35
    oStructure:dHeight  := 1.10
 
+   // Automatic initialization of In-Place Structure Members.
    WITH OBJECT oStructure:Nested
+       // Automatic initialization of Array Members.
        :c1[1] := 65
        :c1[2] := 0
        :l2 := 10000
    END WITH
 
+   // Manualy initialize DETACHED Structure Member.
    oStructure:pNext := C STRUCTURE MyStructure
    WITH OBJECT oStructure:pNext
        :sName    := "Nested"
@@ -41,10 +47,13 @@ Procedure Main()
        :Nested:l2 := 20000
    END WITH
 
+   // Here we send it as a true C Structure to a C Function.
    DemoTransferToC( oStructure:Value )
 
+   // Here we receive a true C Structure from a C Function.
    oStructure:Buffer( DemoTransferFromC() )
 
+   // Show us the values in our PRG Structure.
    oStructure:SayMembers( "   " )
 
 Return
@@ -89,6 +98,7 @@ Return
 
   HB_FUNC( DEMOTRANSFERFROMC )
   {
+     // We need not worry about Memory Management - will be automatically released!
      MY_STRUCTURE *MyStructure = (MY_STRUCTURE *) hb_xgrab( sizeof( MY_STRUCTURE ) );
      MY_STRUCTURE *MyStructure2 = (MY_STRUCTURE*) hb_xgrab( sizeof( MY_STRUCTURE ) );
 
