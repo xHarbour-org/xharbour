@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3164 2004/07/16 23:01:38 lculik Exp $
+ * $Id: ChangeLog,v 1.3165 2004/07/18 14:35:28 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-18 10:54 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/pp/ppcore.c
+    * Minor correction to recent fix in SearnRep()
+
 2004-07-18 11:30 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com
   * source/rtl/set.c
-    include/hbset.h 
+    include/hbset.h
     ! exported  hb_setGetFirstSetPath( void )
       Added HB_SET_STACK macro to access hb_set structure
-
 
 2004-07-16 20:00 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com
   * source/vm/runner.c

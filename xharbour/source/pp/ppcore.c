@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.160 2004/07/03 09:52:02 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.161 2004/07/15 21:01:49 ronpinkas Exp $
  */
 
 /*
@@ -4459,11 +4459,11 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
    #ifdef DEBUG_MARKERS
       if( s_bReplacePat )
       {
-         printf( "Replace '%s' with '%s' Len: %i, in '%s'\n", exppatt, expreal, lenreal, ptro );
+         printf( "Replace '%s' with '%s' Len: %i, in '%.*s'\n", exppatt, expreal, lenreal, *lenres, ptro );
       }
       else
       {
-         printf( "Scan '%s' with '%s' Len: %i, in '%s'\n", exppatt, expreal, lenreal, ptro );
+         printf( "Scan '%s' with '%s' Len: %i, in '%.*s'\n", exppatt, expreal, lenreal, *lenres, ptro );
       }
    #endif
 
@@ -4744,7 +4744,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                             while( ( i = hb_strAt( exppatt, 2, ptr + iOffset, lennew - iOffset ) ) > 0 )
                             {
                                #ifdef DEBUG_MARKERS
-                                  printf( "   Expand: '%s' at %i len: %i\n", exppatt, i, lennew );
+                                  printf( "   Expand: '%s' at %i in >%.*s< len: %i\n", exppatt, i, lennew - iOffset, ptr + iOffset, lennew - iOffset );
                                #endif
 
                                // Ron Pinkas added July-15-2004
@@ -4753,18 +4753,18 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
                                // Ron Pinkas revised July-15-2004 to use the corrected iOffset.
                                // Ron Pinkas iOffset and iResidualOffset added June-03-2003.
-                               i = ReplacePattern( exppatt[2], expreal, lenreal, ptr + iOffset - 1, *lenres - ( ptr + iOffset - 1 - ptro ) );
+                               i = ReplacePattern( exppatt[2], expreal, lenreal, ptr + iOffset - 1, *lenres - iOffset + 1 );
 
                                // Ron Pinkas added July-15-2004
                                // New Start of search (after replaced value).
-                               iOffset += lenreal;
+                               iOffset += lenreal - 1;
 
                                lennew += i;
                                iResidualOffset += i;
                                *lenres += i;
 
                                #ifdef DEBUG_MARKERS
-                                  printf( "lennew: %i, Offset: %i\n", lennew, iOffset );
+                                  printf( "i: %i lennew: %i, iOffset: %i new target %.*s\n", i, lennew, iOffset, lennew - iOffset, ptr + iOffset );
                                #endif
                             }
 
@@ -4777,7 +4777,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                             *(expnew + lennew) = '\0';
 
                             #ifdef DEBUG_MARKERS
-                               printf( "   expnew >%s<, lennew: %i\n", expnew, lennew );
+                               printf( "   expnew >%.*s<, lennew: %i\n", lennew, expnew, lennew );
                             #endif
 
                         #else
@@ -4799,18 +4799,19 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                             }
 
                             #ifdef DEBUG_MARKERS
-                               printf( "(2) Replaced Non Repeatable into Residual Group >%s<, lennew: %i, strlen: %i\n", ptr, lennew, strlen(ptr) - 2 );
+                               printf( "(2) Replaced Non Repeatable into Residual Group, lenres: %i, >%s<, lennew: %i, strlen: %i\n", *lenres, ptr, lennew, strlen(ptr) - 2 );
                             #endif
                         #endif
 
                         // Ron Pinkas added + iResidualOffset June-03-2003
-                        hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres - ( ptr - ptro ) + 1 + iResidualOffset );
+                        hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres );
 
                         #ifdef DEBUG_MARKERS
                            printf( "lenres: %i ptr2 - ptr: %i ptr - ptro: %i lennew: %i Line after residual: >%s<\n", *lenres, ptr2 - ptr, ptr - ptro, lennew, ptro );
                         #endif
 
-                        *lenres += lennew + iResidualOffset;
+                        // Ron Pinkas revised July-17-2004 - iResidualOffset already added to lenres in loop above.
+                        *lenres += lennew;// + iResidualOffset;
 
                         isdvig = ptr - ptro + ( ptr2 - ptr - 1 ) + lennew + iResidualOffset;
 
@@ -4879,7 +4880,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
    }
 
    #ifdef DEBUG_MARKERS
-      printf( "Replaced '%s' with '%s' => >%s<\n\n", exppatt, expreal, ptro );
+      printf( "Replaced '%s' with '%s' => >%.*s<\n\n", exppatt, expreal, *lenres, ptro );
    #endif
 }
 
