@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2860 2004/05/02 10:47:47 druzus Exp $
+ * $Id: ChangeLog,v 1.2861 2004/05/02 12:00:32 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-02 15:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    % some improvements in sorting algorithm to reduce number of
+      memcpy calls. The results of indexing database with 1'000'000
+      records on Linux (Athlon XP 2000) are quite nice:
+         creating index (D)...   1.79 sec.      558659 records per sec.
+         creating index (C)...   2.03 sec.      492853 records per sec.
 
 2004-05-02 14:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

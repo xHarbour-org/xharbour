@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.127 2004/05/02 10:47:48 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.128 2004/05/02 12:00:50 druzus Exp $
  */
 
 /*
@@ -7026,6 +7026,67 @@ static int hb_cdxQuickSortCompare( LPCDXSORTINFO pSort, BYTE * pKey1, BYTE * pKe
    return i;
 }
 
+#define HB_CDX_SORT_OPT
+
+#ifdef HB_CDX_SORT_OPT
+static BOOL hb_cdxQSort( LPCDXSORTINFO pSort, BYTE * pSrc, BYTE * pBuf, LONG lKeys )
+{
+   if ( lKeys > 1 )
+   {
+      int iLen = pSort->keyLen + 4;
+      LONG l1, l2;
+      BYTE * pPtr1, * pPtr2, *pDst;
+      BOOL f1, f2;
+
+      l1 = lKeys >> 1;
+      l2 = lKeys - l1;
+      pPtr1 = &pSrc[ 0 ];
+      pPtr2 = &pSrc[ l1 * iLen ];
+
+      f1 = hb_cdxQSort( pSort, pPtr1, &pBuf[ 0 ], l1 );
+      f2 = hb_cdxQSort( pSort, pPtr2, &pBuf[ l1 * iLen ], l2 );
+      if ( f1 )
+      {
+         pDst = pBuf;
+      }
+      else
+      {
+         pDst = pSrc;
+         pPtr1 = &pBuf[ 0 ];
+      }
+      if ( !f2 )
+      {
+         pPtr2 = &pBuf[ l1 * iLen ];
+      }
+      while ( l1 > 0 && l2 > 0 )
+      {
+         if ( hb_cdxQuickSortCompare( pSort, pPtr1, pPtr2 ) < 0 )
+         {
+            memcpy( pDst, pPtr1, iLen );
+            pPtr1 += iLen;
+            l1--;
+         }
+         else
+         {
+            memcpy( pDst, pPtr2, iLen );
+            pPtr2 += iLen;
+            l2--;
+         }
+         pDst += iLen;
+      }
+      if ( l1 > 0 )
+      {
+         memcpy( pDst, pPtr1, iLen * l1 );
+      }
+      else if ( l2 > 0 && f1 == f2 )
+      {
+         memcpy( pDst, pPtr2, iLen * l2 );
+      }
+      return !f1;
+   }
+   return TRUE;
+}
+#else
 static void hb_cdxQSort( LPCDXSORTINFO pSort, BYTE * pSrc, BYTE * pBuf, LONG lKeys )
 {
    if ( lKeys > 1 )
@@ -7038,6 +7099,7 @@ static void hb_cdxQSort( LPCDXSORTINFO pSort, BYTE * pSrc, BYTE * pBuf, LONG lKe
       l2 = lKeys - l1;
       pPtr1 = &pSrc[ 0 ];
       pPtr2 = &pSrc[ l1 * iLen ];
+
       hb_cdxQSort( pSort, pPtr1, &pBuf[ 0 ], l1 );
       hb_cdxQSort( pSort, pPtr2, &pBuf[ l1 * iLen ], l2 );
       pDst = pBuf;
@@ -7068,6 +7130,7 @@ static void hb_cdxQSort( LPCDXSORTINFO pSort, BYTE * pSrc, BYTE * pBuf, LONG lKe
       memcpy( pSrc, pBuf, iLen * lKeys );
    }
 }
+#endif
 
 #if 0
 static LONG hb_cdxQuickSortSegment( LPCDXSORTINFO pSort, LONG lFrom, LONG lTo )
@@ -7185,7 +7248,14 @@ static void hb_cdxSortSortPage( LPCDXSORTINFO pSort )
    cdxTimeIdxBld -= hb_cdxGetTime();
 #endif
    //hb_cdxQuickSort( pSort, 0, pSort->ulKeys - 1 );
+#ifdef HB_CDX_SORT_OPT
+   if ( !hb_cdxQSort( pSort, pSort->pKeyPool, &pSort->pKeyPool[ pSort->ulKeys * ( pSort->keyLen + 4 ) ], pSort->ulKeys ) )
+   {
+      memcpy( pSort->pKeyPool, &pSort->pKeyPool[ pSort->ulKeys * ( pSort->keyLen + 4 ) ], pSort->ulKeys * ( pSort->keyLen + 4 ) );
+   }
+#else
    hb_cdxQSort( pSort, pSort->pKeyPool, &pSort->pKeyPool[ pSort->ulKeys * ( pSort->keyLen + 4 ) ], pSort->ulKeys );
+#endif
 #ifdef HB_CDX_DBGTIME
    cdxTimeIdxBld += hb_cdxGetTime();
 #endif
@@ -7486,7 +7556,7 @@ static void hb_cdxSortOut( LPCDXSORTINFO pSort )
       }
       if ( fUnique )
       {
-         if ( ulKey != 0 && memcmp( pSort->pLastKey, pKeyVal, iLen ) == 0 )
+         if ( ulKey != 0 && hb_cdxValCompare( pSort->pTag, pSort->pLastKey, iLen, pKeyVal, iLen, TRUE ) == 0 )
          {
             continue;
          }
