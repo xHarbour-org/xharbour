@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.40 2004/01/27 03:40:28 fsgiudice Exp $
+# $Id: hrbdll.bc,v 1.41 2004/02/11 22:43:46 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -107,12 +107,14 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\filesys.obj \
   $(OBJ_DIR)\fkmax.obj \
   $(OBJ_DIR)\fnsplit.obj \
+  $(OBJ_DIR)\fparse.obj \
   $(OBJ_DIR)\fssize.obj \
   $(OBJ_DIR)\fstemp.obj \
   $(OBJ_DIR)\gete.obj \
   $(OBJ_DIR)\gt.obj \
   $(OBJ_DIR)\gtapi.obj \
   $(OBJ_DIR)\gtapiu.obj \
+  $(OBJ_DIR)\gtgraph.obj \
   $(OBJ_DIR)\gx.obj \
   $(OBJ_DIR)\hardcr.obj \
   $(OBJ_DIR)\hbbitf.obj \
@@ -523,12 +525,14 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\filesys.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\fkmax.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\fnsplit.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\fparse.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\fssize.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\fstemp.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\gete.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\gt.obj                + >> hdll.tmp
   echo. $(OBJ_DIR)\gtapi.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\gtapiu.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\gtgraph.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\gx.obj                + >> hdll.tmp
   echo. $(OBJ_DIR)\hardcr.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hbbitf.obj            + >> hdll.tmp
@@ -1281,6 +1285,9 @@ $(OBJ_DIR)\fkmax.obj : $(RTL_DIR)\fkmax.c
 $(OBJ_DIR)\fnsplit.obj : $(RTL_DIR)\fnsplit.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\fparse.obj : $(RTL_DIR)\fparse.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\fssize.obj : $(RTL_DIR)\fssize.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -1297,6 +1304,9 @@ $(OBJ_DIR)\gtapi.obj : $(RTL_DIR)\gtapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\gtapiu.obj : $(RTL_DIR)\gtapiu.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\gtgraph.obj : $(RTL_DIR)\gtgraph.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
