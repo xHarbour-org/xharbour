@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2003 Giancarlo Niccolai
-* $Id: tipencoderbase64.prg,v 1.1 2003/11/30 14:41:50 jonnymind Exp $
+* $Id: tipmail.prg,v 1.1 2003/12/02 04:08:07 jonnymind Exp $
 ************************************************/
 
 #include "hbclass.ch"
@@ -231,6 +231,10 @@ METHOD ToString() CLASS TipMail
    LOCAL cRet := ""
 
    // this is a multipart message; we need a boundary
+	 IF Len( ::aAttachments ) > 0
+	   ::hHeaders["Mime-Version"] :="1.0"
+	 endif	
+
    IF Len( ::aAttachments ) > 0
       //Reset failing content type
       IF At( "multipart/", Lower( ::GetFieldPart("Content-Type")) ) == 0
@@ -243,7 +247,7 @@ METHOD ToString() CLASS TipMail
          cBoundary := ::MakeBoundary()
          IF .not. ::SetFieldOption( "Content-Type", "Boundary", cBoundary )
             ::hHeaders[ "Content-Type" ] := ;
-               'multipart/mixed; Boundary="' + cBoundary + '"'
+               'multipart/mixed; boundary="' + cBoundary + '"'
          ENDIF
       ENDIF
    ENDIF
@@ -271,12 +275,15 @@ METHOD ToString() CLASS TipMail
    IF "Subject" IN ::hHeaders
       cRet+= "Subject: "+ ::hHeaders[ "Subject"] + e"\r\n"
    ENDIF
+	 IF Len( ::aAttachments ) > 0
+	   cRet+= "Mime-Version:" + ::hHeaders["Mime-Version"] + e"\r\n"
+	 endif	
 
    FOR i := 1 TO Len( ::hHeaders )
       cElem := Lower(HGetKeyAt( ::hHeaders, i ))
       IF cElem != "return-path" .and. cElem != "delivered-to" .and.;
             cElem != "date" .and. cElem != "from" .and.;
-            cElem != "to" .and. cElem != "subject"
+            cElem != "to" .and. cElem != "subject" .and. cElem !="mime-version"
          cRet += HGetKeyAt( ::hHeaders, i ) + ": " +;
                 HGetValueAt( ::hHeaders, i ) + e"\r\n"
       ENDIF
@@ -287,7 +294,7 @@ METHOD ToString() CLASS TipMail
 
    //Body
    IF .not. Empty( ::cBody )
-      cRet += ::cBody
+      cRet += ::cBody + e"\r\n"
    ENDIF
 
    IF .not. Empty( ::aAttachments )
