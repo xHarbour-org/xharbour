@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2050 2004/01/13 16:28:57 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2051 2004/01/13 17:28:45 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-13 2:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * contrib/tip/tipclient.prg
+    ! Fixed few tIPClientSMTP to tIPClient
+  * contrib/tip/base64x.c
+    ! Added missing type cast.
 
 2004-01-13 23:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
    * xharbour/tests/wvtgui.prg
@@ -23,11 +29,11 @@
        pen set with Wvt_SetPen().
 
    * xharbour/tests/wvtgui.prg
-     Enhanced . Press F5 repeatedly to bring GUI TBrowse in focus. It 
+     Enhanced . Press F5 repeatedly to bring GUI TBrowse in focus. It
      exploits above two functions to draw hotizontal and vertical grid.
 
    * xharbour/source/rtl/tbrowse.prg
-     + DATA aColumnsSep, an array to hold the nColumn where seperator is 
+     + DATA aColumnsSep, an array to hold the nColumn where seperator is
        displayed. This array is used to draw vertical grid of GUI Tbrowse above.
 
 2004-01-12 22:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
