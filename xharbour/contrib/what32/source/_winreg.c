@@ -82,7 +82,7 @@ HB_FUNC( REGCLOSEKEY )
 HB_FUNC( REGOPENKEYEX )
 {
 
-   HKEY hwKey = ( ( HKEY ) hb_parnl( 1 ) ); 
+   HKEY hwKey = ( ( HKEY ) hb_parnl( 1 ) );
    LPCTSTR lpValue=hb_parc( 2 );
    LONG lError;
    HKEY phwHandle;
@@ -127,10 +127,10 @@ HB_FUNC( REGQUERYVALUEEX )
 
       free( ( BYTE* ) lpData );
    }
- 
+
 }
 
-                     
+
 HB_FUNC( REGENUMKEYEX )
 {
 
@@ -145,7 +145,7 @@ HB_FUNC( REGENUMKEYEX )
 
     if ( bErr != ERROR_SUCCESS )
       {
-         hb_retnl(-1);
+         hb_retnl( bErr );
       }
     else
       {
@@ -154,14 +154,14 @@ HB_FUNC( REGENUMKEYEX )
          hb_storc( Class , 6 );
          hb_stornl( ( long ) dwClass , 7 );
 
-         hb_retnl( 1 );
+         hb_retnl( ERROR_SUCCESS );
       }
 }
 
 
 HB_FUNC( REGSETVALUEEX )
 {
-       
+
    hb_retnl( RegSetValueExA( ( HKEY ) hb_parnl( 1 ), hb_parc( 2 ), 0, hb_parnl( 4 ), ( BYTE * const ) hb_parc( 5 ), ( strlen( hb_parc( 5 ) ) + 1 ) ) ) ;
 
 }
@@ -169,7 +169,7 @@ HB_FUNC( REGSETVALUEEX )
 HB_FUNC( REGCREATEKEY )
 {
    HKEY hKey;
-   LONG nErr; 
+   LONG nErr;
 
    nErr = RegCreateKey( ( HKEY ) hb_parnl( 1 ) , hb_parc( 2 ) , &hKey );
    if ( nErr == ERROR_SUCCESS )
@@ -177,7 +177,7 @@ HB_FUNC( REGCREATEKEY )
       hb_stornl( PtrToLong( hKey ) , 3 );
    }
    hb_retnl( nErr );
-   
+
 }
 
 //-------------------------------------------------------
@@ -194,7 +194,7 @@ LONG RegCreateKeyEx(
   PHKEY phkResult,          // address of buffer for opened handle
   LPDWORD lpdwDisposition   // address of disposition value buffer
 );
- 
+
 */
 
 HB_FUNC( REGCREATEKEYEX )
