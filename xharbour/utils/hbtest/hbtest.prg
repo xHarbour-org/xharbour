@@ -1,5 +1,5 @@
 /*
- * $Id: hbtest.prg,v 1.21 2001/11/05 02:59:25 vszakats Exp $
+ * $Id: hbtest.prg,v 1.1.1.1 2001/12/21 10:44:58 ronpinkas Exp $
  */
 
 /*
@@ -127,6 +127,7 @@ FUNCTION Main( cPar1, cPar2 )
    ENDIF
 
    /* Initialize test */
+   HB_SETCODEPAGE("EN")
 
    TEST_BEGIN( cPar1 + " " + cPar2 )
 
