@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.129 2004/03/21 02:44:36 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.130 2004/03/29 18:04:00 ronpinkas Exp $
  */
 
 /*
@@ -113,10 +113,17 @@ HB_EXTERN_BEGIN
 #define HB_IS_POINTER( p ) HB_IS_OF_TYPE( p, HB_IT_POINTER )
 #define HB_IS_HASH( p )    HB_IS_OF_TYPE( p, HB_IT_HASH )
 #define HB_IS_ORDERABLE( p )    ( ( p )->type & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) )
-#define HB_IS_COMPLEX( p )  ( ( p )->type  && ( HB_IS_STRING( p ) || HB_IS_BLOCK( p ) || HB_IS_ARRAY( p ) || HB_IS_MEMVAR( p ) || HB_IS_HASH( p )) )
+/* Slower version */
+/* #define HB_IS_COMPLEX( p )  ( ( p )->type  && ( HB_IS_STRING( p ) || HB_IS_BLOCK( p ) || HB_IS_ARRAY( p ) || HB_IS_MEMVAR( p ) || HB_IS_HASH( p )) ) */
 /* Optimized version */
-/* #define HB_IS_COMPLEX( p ) ( ( p )->type & HB_IT_COMPLEX ) */
+#define HB_IS_COMPLEX( p ) ( ( p )->type & HB_IT_COMPLEX )
 #define HB_IS_SIMPLE( p )  ( ! HB_IS_COMPLEX( p ) )
+
+#if defined(__GNUC__)
+#  define HB_ITEM_NIL      { HB_IT_NIL, {} }
+#else
+#  define HB_ITEM_NIL      { HB_IT_NIL, NULL }
+#endif
 
 #define ISNIL( n )         ( hb_param( n, HB_IT_ANY ) == NULL || HB_IS_NIL( hb_param( n, HB_IT_ANY ) ) ) /* NOTE: Intentionally using a different method */
 #define ISCHAR( n )        ( hb_param( n, HB_IT_STRING ) != NULL )

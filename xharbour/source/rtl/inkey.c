@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.27 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: inkey.c,v 1.28 2004/03/30 05:27:40 guerra000 Exp $
  */
 
 /*
@@ -100,8 +100,8 @@ static int    s_inkeyForce;      /* Variable to hold keyboard input when TYPEAHE
 static PHB_inkeyKB s_inkeyKB = NULL;
 static HB_inkey_enum s_eventmask;
 
-static HB_ITEM s_inKeyBlockBefore = { HB_IT_NIL, NULL };
-static HB_ITEM s_inKeyBlockAfter  = { HB_IT_NIL, NULL };
+static HB_ITEM s_inKeyBlockBefore = HB_ITEM_NIL;
+static HB_ITEM s_inKeyBlockAfter  = HB_ITEM_NIL;
 
 static void hb_inkeyKBfree( void )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.35 2004/03/24 08:02:06 brianhays Exp $
+ * $Id: ads1.c,v 1.36 2004/03/26 08:47:52 brianhays Exp $
  */
 
 /*
@@ -199,6 +199,11 @@ static void commonError( ADSAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, cha
    return;
 }
 
+/*
+ * it's not used - temporary disabled to avoid warnings,
+ * enable it if necessary
+ */
+#if 0
 static void DumpArea( ADSAREAP pArea )  /* For debugging: call this to dump ads server settings to HB_TRACE. Currently in a quick-and-dirty state... */
 {
    UNSIGNED8  pucTemp[1025];
@@ -247,6 +252,7 @@ static void DumpArea( ADSAREAP pArea )  /* For debugging: call this to dump ads 
       }
    }
 }
+#endif
 
 /*
 static BOOL hb_nltoa( LONG lValue, char * szBuffer, USHORT uiLen )

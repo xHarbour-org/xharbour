@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.31 2004/03/26 21:57:01 ronpinkas Exp $
+ * $Id: adsfunc.c,v 1.32 2004/03/28 09:05:52 andijahja Exp $
  */
 
 /*
@@ -77,7 +77,9 @@ ADSHANDLE adsConnectHandle = 0;
 BOOL bDictionary = FALSE;               /* Use Data Dictionary? */
 BOOL bTestRecLocks = FALSE;             /* Debug Implicit locks */
 
-static HB_ITEM s_itmCobCallBack = { HB_IT_NIL, NULL };
+#if !defined( ADS_LINUX )
+static HB_ITEM s_itmCobCallBack = HB_ITEM_NIL;
+#endif
 
 HB_FUNC( ADSTESTRECLOCKS )              /* Debug Implicit locks Set/Get call */
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.33 2004/02/09 18:00:37 druzus Exp $
+ * $Id: gtcrs.c,v 1.34 2004/02/18 21:35:56 druzus Exp $
  */
 
 /*
@@ -3013,6 +3013,7 @@ int HB_GT_FUNC(gt_ExtendedKeySupport( void ))
 int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
+    HB_SYMBOL_UNUSED( eventmask );
 
     return wait_key( s_ioBase, -1 );
 }

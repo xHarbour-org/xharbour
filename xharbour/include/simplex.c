@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.6 2003/11/30 10:02:46 druzus Exp $
+ * $Id: simplex.c,v 1.7 2004/03/23 02:14:57 andijahja Exp $
  */
 
 /*
@@ -284,8 +284,8 @@ static int rulecmp( const void * pLeft, const void * pRight );
          } \
          else \
          { \
-            register unsigned int i = aPairNodes[(int)chr].iMin, iMax = aPairNodes[(int)chr].iMax + 1, iStartLen; \
-            register unsigned char chrStart; \
+            register unsigned int i = aPairNodes[(int)chr].iMin, iMax = aPairNodes[(int)chr].iMax + 1, iStartLen = 0; \
+            register unsigned char chrStart = 0; \
             unsigned int iLastPair = 0, iLastLen = 0; \
             \
             DEBUG_INFO( printf( "Checking %i Streams for %c At: >%s<\n", iPairs, chr, szBuffer - 1 ) ); \
