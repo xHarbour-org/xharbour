@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.392 2004/05/09 21:13:49 druzus Exp $
+ * $Id: hvm.c,v 1.393 2004/05/10 21:19:10 andijahja Exp $
  */
 
 /*
@@ -71,14 +71,6 @@
 
 /*JC1: say we are going to optimze MT stack */
 #define HB_THREAD_OPTIMIZE_STACK
-
-#ifndef __MPW__
-   #ifdef HB_OS_BSD
-      #include <stdlib.h>     /* There is no malloc.h in Darwin, and BSD complaints, too */
-   #else
-      #include <malloc.h>
-   #endif
-#endif
 
 #include <math.h>
 #include <time.h>

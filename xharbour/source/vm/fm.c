@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.61 2004/04/14 10:32:14 druzus Exp $
+ * $Id: fm.c,v 1.62 2004/05/10 10:38:07 mauriliolongo Exp $
  */
 
 /*
@@ -81,14 +81,6 @@
 
 #define HB_OS_WIN_32_USED
 #define HB_THREAD_OPTIMIZE_STACK
-
-#ifndef __MPW__
-   #ifdef HB_OS_BSD
-      #include <stdlib.h>     /* There is no malloc.h in Darwin, and BSD complaints, too */
-   #else
-      #include <malloc.h>
-   #endif
-#endif
 
 #include "hbapi.h"
 #include "hbver.h"

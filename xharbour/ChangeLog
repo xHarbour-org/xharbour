@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2917 2004/05/10 20:38:05 peterrees Exp $
+ * $Id: ChangeLog,v 1.2918 2004/05/10 21:19:05 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-11 03:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/bsd/gcc.cf
+    - removed copy of config/rules.cf - I don't know why it was there
+      (if I committed it then sorry - it was done by mistake)
+
+  * xharbour/config/darwin/gcc.cf
+    * some minor cleanups
+
+  * xharbour/source/compiler/harbour.c
+  * xharbour/source/compiler/harbour.sly
+  * xharbour/source/vm/fm.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/utils/hbpp/hbpp.c
+    * do not use malloc.h as far as is not strictly necessary by some
+      old compilers - malloc.h has been obsoleted by stdlib.h - in such
+      case add malloc.h to hbdefs.h only or this compiler
+      Some contrib files should be cleaned too.
+
 2004-05-11 04:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/hvm.c
     ! minor correction on function __TRACEPRGCALLS for MT compilation.

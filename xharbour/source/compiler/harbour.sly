@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.64 2004/05/08 04:25:13 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.65 2004/05/08 17:40:43 ronpinkas Exp $
  */
 
 /*
@@ -32,12 +32,6 @@
  *    The major problem to solve is how to support QSELF() inside a codeblock.
  * 2) Support this syntax: nPtr := @Hello()
  */
-
-#ifdef HB_OS_BSD
-   #include <stdlib.h>     /* There is no malloc.h in Darwin, and BSD complaints, too */
-#else
-   #include <malloc.h>
-#endif
 
 #include "hbcomp.h"
 

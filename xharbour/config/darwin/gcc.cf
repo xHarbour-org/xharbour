@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.8 2004/01/18 06:34:16 likewolf Exp $
+# $Id: gcc.cf,v 1.9 2004/03/18 21:46:52 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -13,10 +13,9 @@ CC = $(CCACHE) gcc
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -fsigned-char -no-cpp-precomp -I. -I$(TOP)include -I$(HB_INC_COMPILE)
+CFLAGS = -Wall -W -g
 ifeq ($(HB_LEX),SIMPLEX)
-CFLAGS = -Wall -g -DSIMPLEX
-else
-CFLAGS = -Wall -g
+CFLAGS += -DSIMPLEX
 endif
 CFLAGS += -DHB_OS_BSD -DHB_OS_DARWIN
 CFLAGS += -DHB_BIG_ENDIAN
