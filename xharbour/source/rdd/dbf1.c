@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.86 2004/07/29 21:16:24 druzus Exp $
+ * $Id: dbf1.c,v 1.87 2004/08/02 12:37:14 druzus Exp $
  */
 
 /*
@@ -2064,10 +2064,10 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    BOOL bRetry, bError, bLock;
    PHB_ITEM pError, pFileExt;
    PHB_FNAME pFileName;
-   char * szFileName;
    BYTE * pBuffer;
    LPDBFFIELD pField;
    DBFIELDINFO pFieldInfo;
+   BYTE szPath[ _POSIX_PATH_MAX + 1 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfOpen(%p, %p)", pArea, pOpenInfo));
 
@@ -2114,7 +2114,11 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    do
    {
       bLock = FALSE;
-      pArea->hDataFile = hb_spOpen( pOpenInfo->abName, uiFlags );
+      if ( ! hb_spFile( pOpenInfo->abName, szPath ) )
+      {
+         hb_strncpy( ( char * ) szPath, ( const char * ) pOpenInfo->abName, _POSIX_PATH_MAX );
+      }
+      pArea->hDataFile = hb_spOpen( szPath, uiFlags );
 #ifdef DBF_EXLUSIVE_LOCKPOS
       if( pArea->hDataFile != FS_ERROR )
       {
@@ -2176,8 +2180,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
 
    /* Allocate only after succesfully open file */
-   pArea->szDataFileName = (char *) hb_xgrab( strlen( (char * ) pOpenInfo->abName)+1 );
-   strcpy( pArea->szDataFileName, ( char * ) pOpenInfo->abName );
+   pArea->szDataFileName = ( BYTE * ) hb_strdup( ( char * ) szPath );
 
    /* Read file header and exit if error */
    if( SELF_READDBHEADER( ( AREAP ) pArea ) == FAILURE )
@@ -2364,21 +2367,20 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    if( pArea->fHasMemo )
    {
       BYTE *tmp;
-      pFileName = hb_fsFNameSplit( ( char * ) pOpenInfo->abName );
+      pFileName = hb_fsFNameSplit( ( char * ) szPath );
       pFileExt = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) pArea, DBI_MEMOEXT, pFileExt );
-      szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-      szFileName[ 0 ] = 0;
+
+      szPath[ 0 ] = 0;
       if( pFileName->szPath )
-         strcat( szFileName, pFileName->szPath );
-      strcat( szFileName, pFileName->szName );
-      strncat( szFileName, pFileExt->item.asString.value, _POSIX_PATH_MAX -
-               strlen( szFileName ) );
+         strcat( ( char * ) szPath, pFileName->szPath );
+      strncat( ( char * ) szPath, pFileName->szName, _POSIX_PATH_MAX - strlen( ( char * ) szPath ) );
+      strncat( ( char * ) szPath, pFileExt->item.asString.value, _POSIX_PATH_MAX - strlen( ( char * ) szPath ) );
       hb_itemRelease( pFileExt );
       hb_xfree( pFileName );
       tmp = pOpenInfo->abName;
-      pOpenInfo->abName = ( BYTE * ) szFileName;
-      pArea->szMemoFileName = szFileName;
+      pOpenInfo->abName = szPath;
+      pArea->szMemoFileName = ( BYTE * ) hb_strdup( ( char * ) szPath );
 
       /* Open memo file and exit if error */
       if( SELF_OPENMEMFILE( ( AREAP ) pArea, pOpenInfo ) == FAILURE )
