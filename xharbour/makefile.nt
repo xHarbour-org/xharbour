@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.103 2004/10/23 23:18:38 oh1 Exp $
+# $Id: makefile.nt,v 1.104 2004/10/25 01:58:18 kaddath Exp $
 #
 
 #
@@ -1265,7 +1265,8 @@ CLEAN:
    -@if exist vc70.idb $(DEL) vc70.idb > nul
 
 $(HBPP_EXE) : \
-   $(HBPP_DIR)\hbpp.c
+   $(HBPP_DIR)\hbpp.c \
+   $(COMPILER_DIR)\calconst.c
    $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
 
 #
