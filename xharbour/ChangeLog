@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.705 2003/02/12 03:31:01 paultucker Exp $
+ * $Id: ChangeLog,v 1.706 2003/02/12 06:38:14 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-02-12 02:10 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+  * source/rtl/hbcompress.c
+    ! Strings created on the fly are now returned with 
+      retcAdoptRaw, and thus they don't issue any warning on
+      on probram closing anymore.
+    ! hb_xfree() of the preallocated buffer, in case of error,
+      was freed in the wrong branch of "if". Fixed.
+    ! pDestLen is not used in hb_uncompress(). Removed.
+    
+  * tests/compress.prg
+    + Added comments to explain something
+    * Minor stylistic fixes.
+
 
 2003-02-11 22:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.vc
