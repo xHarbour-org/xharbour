@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.1.1.1 2001/12/21 10:41:54 ronpinkas Exp $
+ * $Id: seconds.c,v 1.2 2003/02/11 03:08:40 druzus Exp $
  */
 
 /*
@@ -113,43 +113,42 @@ double hb_dateSeconds( void )
 */
 double hb_secondsCPU(int n)
 {
-	double d = 0;
+   double d = 0;
 
 #if defined( OS_UNIX_COMPATIBLE )
-	struct tms tm;
+   struct tms tm;
 
-	times(&tm);
+   times(&tm);
 
-	if ((n < 1 || n > 3) && (n < 11 || n > 13))
-		n = 3;
-	
-	if (n > 10)
-	{
-		n -= 10;
-		if (n & 1)
-			d += tm.tms_cutime;
-		if (n & 2)
-			d += tm.tms_cstime;
-	}
-	if (n & 1)
-		d += tm.tms_utime;
-	if (n & 2)
-		d += tm.tms_stime;
+   if ((n < 1 || n > 3) && (n < 11 || n > 13))
+      n = 3;
+   
+   if (n > 10)
+   {
+      n -= 10;
+      if (n & 1)
+         d += tm.tms_cutime;
+      if (n & 2)
+         d += tm.tms_cstime;
+   }
+   if (n & 1)
+      d += tm.tms_utime;
+   if (n & 2)
+      d += tm.tms_stime;
 
-	d /= CLK_TCK;
+   d /= CLK_TCK;
 #else
-	/* TODO: this code is only for DOS and other platforms which cannot
-	         calculate process time */
+   /* TODO: this code is only for DOS and other platforms which cannot
+            calculate process time */
 
-	if ((n < 1 || n > 3) && (n < 11 || n > 13))
-		n = 3;
-	else if (n > 10)
-		n -= 10;
-
-	if (n & 1)
-		d = hb_dateSeconds( void );
+   if ((n < 1 || n > 3) && (n < 11 || n > 13))
+      n = 3;
+   else if (n > 10)
+      n -= 10;
+   if (n & 1)
+      d = hb_dateSeconds(  );
 #endif
-	return d;
+   return d;
 }
 
 #endif
