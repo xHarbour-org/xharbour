@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.7 2004/02/23 10:01:41 andijahja Exp $
+ * $Id: dbfdbt1.c,v 1.8 2004/03/25 12:13:14 druzus Exp $
  */
 
 /*
@@ -245,8 +245,8 @@ HB_FUNC( DBFDBT_GETFUNCTABLE )
 
 
 HB_INIT_SYMBOLS_BEGIN( dbfdbt1__InitSymbols )
-{ "_DBFDBT",             HB_FS_PUBLIC, HB_FUNCNAME( _DBFDBT ), NULL },
-{ "DBFDBT_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( DBFDBT_GETFUNCTABLE ), NULL }
+{ "_DBFDBT",             HB_FS_PUBLIC, {HB_FUNCNAME( _DBFDBT )}, NULL },
+{ "DBFDBT_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFDBT_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( dbfdbt1__InitSymbols )
 
 #if defined(HB_STATIC_STARTUP)

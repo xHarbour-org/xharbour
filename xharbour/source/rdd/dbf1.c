@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.74 2004/03/30 16:43:37 druzus Exp $
+ * $Id: dbf1.c,v 1.75 2004/04/02 18:47:06 srobert Exp $
  */
 
 /*
@@ -80,8 +80,8 @@ HB_FUNC( DBF_GETFUNCTABLE );
 
 
 HB_INIT_SYMBOLS_BEGIN( dbf1__InitSymbols )
-{ "_DBFC",            HB_FS_PUBLIC, HB_FUNCNAME( _DBFC ), NULL },
-{ "DBF_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( DBF_GETFUNCTABLE ), NULL }
+{ "_DBFC",            HB_FS_PUBLIC, {HB_FUNCNAME( _DBFC )}, NULL },
+{ "DBF_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBF_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( dbf1__InitSymbols )
 
 #if defined(HB_PRAGMA_STARTUP)
@@ -635,7 +635,7 @@ BOOL HB_EXPORT hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, UL
    BOOL fRet = FALSE, fWait;
 
    if ( !hb_dbfLockIdxGetData( bScheme, &ulPos, &ulPool ) )
-      return fRet;
+      return FALSE;
 
    do
    {
@@ -652,6 +652,10 @@ BOOL HB_EXPORT hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, UL
                   ulSize = ulPool + 1;
                }
             }
+            else
+            {
+               *pPoolPos = 0;
+            }
             break;
 
          case FL_UNLOCK:
@@ -659,6 +663,10 @@ BOOL HB_EXPORT hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, UL
             {
                if ( ! *pPoolPos )
                   ulSize = ulPool + 1;
+            }
+            else
+            {
+               *pPoolPos = 0;
             }
             break;
 
@@ -1814,7 +1822,8 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       if( pArea->hDataFile != FS_ERROR )
       {
          if ( !hb_fsLock( pArea->hDataFile, DBF_EXLUSIVE_LOCKPOS, DBF_EXLUSIVE_LOCKSIZE,
-                          FL_LOCK | ( pArea->fShared ? FLX_SHARED : FLX_EXCLUSIVE ) ) )
+                          FL_LOCK | ( ( pArea->fShared || pArea->fReadonly ) ? 
+                                       FLX_SHARED : FLX_EXCLUSIVE ) ) )
          {
             hb_fsClose( pArea->hDataFile );
             pArea->hDataFile = FS_ERROR;

@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.13 2004/02/29 00:42:07 paultucker Exp $
+ * $Id: dbffpt1.c,v 1.14 2004/03/25 12:13:14 druzus Exp $
  */
 
 /*
@@ -247,8 +247,8 @@ HB_FUNC( DBFFPT_GETFUNCTABLE )
 
 
 HB_INIT_SYMBOLS_BEGIN( dbffpt1__InitSymbols )
-{ "_DBFFPT",             HB_FS_PUBLIC, HB_FUNCNAME( _DBFFPT ), NULL },
-{ "DBFFPT_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( DBFFPT_GETFUNCTABLE ), NULL }
+{ "_DBFFPT",             HB_FS_PUBLIC, {HB_FUNCNAME( _DBFFPT )}, NULL },
+{ "DBFFPT_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFFPT_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( dbffpt1__InitSymbols )
 
 #if defined(HB_STATIC_STARTUP)

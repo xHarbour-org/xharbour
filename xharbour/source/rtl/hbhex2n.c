@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.8 2004/04/04 12:35:14 mlombardo Exp $
+ * $Id: hbhex2n.c,v 1.9 2004/04/04 12:45:02 mlombardo Exp $
  */
 
 /*
@@ -61,12 +61,21 @@
 
 HB_FUNC( HB_NUMTOHEX )
 {
-   ULONG ulNum;
    int iCipher;
-   char ret[32];
-   char tmp[32];
-   int len = 0, len1 = 0;
-
+   char ret[33];
+   int len = 33;
+#ifndef HB_LONG_LONG_OFF
+   ULONGLONG ulNum;
+   if( ISNUM(1) )
+   {
+      ulNum = (ULONGLONG) hb_parnll( 1 );
+   }
+   else if ( ISPOINTER( 1 ) )
+   {
+      ulNum = (HB_PTRDIFF) hb_parptr( 1 );
+   }
+#else
+   ULONG ulNum;
    if( ISNUM(1) )
    {
       ulNum = (ULONG) hb_parnl( 1 );
@@ -75,41 +84,37 @@ HB_FUNC( HB_NUMTOHEX )
    {
       ulNum = (ULONG) hb_parptr( 1 );
    }
+#endif
    else
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_NUMTOHEX", 1, hb_param(1,HB_IT_ANY) );
       return;
    }
-
-
+   ret[--len] = '\0';
    while ( ulNum > 0 )
    {
-      iCipher = ulNum % 16;
+      iCipher = ulNum & 0x0f;
       if ( iCipher < 10 )
       {
-         tmp[ len++ ] = '0' + iCipher;
+         ret[ --len ] = '0' + iCipher;
       }
       else
       {
-         tmp[ len++ ] = 'A' + (iCipher - 10 );
+         ret[ --len ] = 'A' + ( iCipher - 10 );
       }
-      ulNum >>=4;
-
+      ulNum >>= 4;
    }
-
-   while ( len > 0 )
-   {
-      ret[len1++] = tmp[ --len ];
-   }
-   ret[len1] = '\0';
-
-   hb_retc( ret );
+   hb_retc( &ret[ len ] );
 }
 
 
 HB_FUNC( HB_HEXTONUM )
 {
+#ifndef HB_LONG_LONG_OFF
+   ULONGLONG ulNum = 0;
+#else
    ULONG ulNum = 0;
+#endif
    char *cHex, c;
    ULONG ulCipher;
 
@@ -130,11 +135,11 @@ HB_FUNC( HB_HEXTONUM )
       }
       else if ( c >= 'A' && c <= 'F' )
       {
-         ulCipher = (ULONG) ( c - 'A' )+10;
+         ulCipher = (ULONG) ( c - 'A' ) + 10;
       }
       else if ( c >= 'a' && c <= 'f' )
       {
-         ulCipher = (ULONG) ( c - 'a' )+10;
+         ulCipher = (ULONG) ( c - 'a' ) + 10;
       }
       else
       {
@@ -144,8 +149,7 @@ HB_FUNC( HB_HEXTONUM )
       ulNum += ulCipher;
       cHex++;
    }
-
-   hb_retnl( (LONG) ulNum  );
+   hb_retnint( ulNum );
 }
 
 HB_FUNC( HB_STRTOHEX )

@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.41 2004/03/08 22:15:36 andijahja Exp $
+ * $Id: extend.c,v 1.42 2004/03/18 04:05:27 ronpinkas Exp $
  */
 
 /*
@@ -633,24 +633,6 @@ void *hb_parptr( int iParam, ... )
       {
          return pItem->item.asPointer.value;
       }
-      else if( HB_IS_LONG( pItem ) )
-      {
-         return ( void * )pItem->item.asLong.value;
-      }
-      else if( HB_IS_INTEGER( pItem ) )
-      {
-         return ( void * )pItem->item.asInteger.value;
-      }
-      else if( HB_IS_LOGICAL( pItem ) )
-      {
-         return ( void * )pItem->item.asLogical.value;
-      }
-#ifndef HB_LONG_LONG_OFF
-      else if( HB_IS_LONGLONG( pItem ) )
-      {
-         return ( void * ) ((LONG)pItem->item.asLongLong.value);
-      }
-#endif
       else if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
@@ -660,7 +642,7 @@ void *hb_parptr( int iParam, ... )
          ulArrayIndex = va_arg( va, ULONG );
          va_end( va );
 
-         return ( void * )hb_arrayGetNL( pItem, ulArrayIndex );
+         return hb_arrayGetPtr( pItem, ulArrayIndex );
       }
    }
 
@@ -896,6 +878,12 @@ void HB_EXPORT hb_retnllen( LONG lNumber, int iWidth )
 #undef hb_retptr
 void hb_retptr( void *voidPtr )
 {
+   hb_itemPutPtr( &(HB_VM_STACK.Return), voidPtr );
+}
+
+#undef hb_retptrGC
+void hb_retptrGC( void *voidPtr )
+{
    hb_itemPutPtrGC( &(HB_VM_STACK.Return), voidPtr );
 }
 
@@ -1117,6 +1105,34 @@ void HB_EXPORT hb_stornd( double dNumber, int iParam, ... )
       else if( bByRef || iParam == -1 )
       {
          hb_itemPutND( pItem, dNumber );
+      }
+   }
+}
+
+void HB_EXPORT hb_storptr( void * pointer, int iParam, ... )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_storptr(%p, %d, ...)", pointer, iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? &hb_stack.Return : hb_stackItemFromBase( iParam );
+      BOOL bByRef = HB_IS_BYREF( pItem );
+
+      if( bByRef  )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         va_start( va, iParam );
+         hb_itemPutPtr( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), pointer );
+         va_end( va );
+      }
+      else if( bByRef || iParam == -1 )
+      {
+         hb_itemPutPtr( pItem, pointer );
       }
    }
 }

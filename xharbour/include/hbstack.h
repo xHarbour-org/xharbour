@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.21 2003/12/19 07:30:00 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.22 2004/04/20 14:33:08 jacekp Exp $
  */
 
 /*
@@ -115,14 +115,14 @@ typedef struct
 } HB_STACK_STATE;    /* used to save/restore stack state in hb_vmDo)_ */
 
 #ifdef HB_STACK_MACROS
-    #define hb_stackItemFromTop( n )    ( * ( HB_VM_STACK.pPos + (n) ) )
-    #define hb_stackItemFromBase( n )   ( ( *HB_VM_STACK.pBase )->item.asSymbol.paramcnt < 255 ? *( HB_VM_STACK.pBase + (n) + 1 ) : *( HB_VM_STACK.pBase + (n) + 1 + ( *HB_VM_STACK.pBase )->item.asSymbol.paramcnt - 256 ) )
+    #define hb_stackItemFromTop( n )    ( * ( HB_VM_STACK.pPos + (int)(n) ) )
+    #define hb_stackItemFromBase( n )   ( ( *HB_VM_STACK.pBase )->item.asSymbol.paramcnt < 255 ? *( HB_VM_STACK.pBase + (int)(n) + 1 ) : *( HB_VM_STACK.pBase + (int)(n) + 1 + ( *HB_VM_STACK.pBase )->item.asSymbol.paramcnt - 256 ) )
     #define hb_stackTopOffset( )        ( HB_VM_STACK.pPos - HB_VM_STACK.pItems )
     #define hb_stackBaseOffset( )       ( HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1)
     #define hb_stackTopItem( )          ( * HB_VM_STACK.pPos )
     #define hb_stackBaseItem( )         ( * HB_VM_STACK.pBase )
     #define hb_stackSelfItem( )         ( * ( HB_VM_STACK.pBase + 1 ) )
-    #define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + iItemPos ) )
+    #define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + (LONG) iItemPos ) )
 #else
     extern HB_ITEM_PTR HB_EXPORT hb_stackItemFromTop( int nFromTop );
     extern HB_ITEM_PTR HB_EXPORT hb_stackItemFromBase( int nFromBase );

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.24 2004/03/18 21:46:53 druzus Exp $
+# $Id: gcc.cf,v 1.25 2004/03/21 15:55:04 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -12,10 +12,13 @@ LIB_EXT = .a
 CC = $(CCACHE) gcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -fsigned-char -I. -I$(TOP)include -I$(HB_INC_COMPILE)
+CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 # We are under linux
 #CFLAGS = -DHB_OS_LINUX -Wall -std=gnu99
-CFLAGS = -DHB_OS_LINUX -Wall -W
+CFLAGS = -DHB_OS_LINUX -Wall -W -fsigned-char
+# uncomment this if you want to farce relocateable code for .so libs
+# it's necessary on some platforms but can reduce performance
+#CFLAGS += -fPIC
 
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.137 2004/04/15 16:04:25 likewolf Exp $
+ * $Id: hbapi.h,v 1.138 2004/04/20 14:33:08 jacekp Exp $
  */
 
 /*
@@ -234,7 +234,7 @@ extern int      HB_EXPORT hb_parl( int iParam, ... ); /* retrieve a logical para
 extern double   HB_EXPORT hb_parnd( int iParam, ... ); /* retrieve a numeric parameter as a double */
 extern int      HB_EXPORT hb_parni( int iParam, ... ); /* retrieve a numeric parameter as a integer */
 extern LONG     HB_EXPORT hb_parnl( int iParam, ... ); /* retrieve a numeric parameter as a LONG */
-extern void     HB_EXPORT * hb_parptr( int iParam, ... ); /* retrieve a pointer to a memory collected by GC */
+extern void     HB_EXPORT * hb_parptr( int iParam, ... ); /* retrieve a parameter as a pointer */
 extern void     HB_EXPORT * hb_parpointer( int iParam ); /* retrieve ONLY a pointer from ONLY HB_IT_POINTER, or retunrs NULL */
 extern PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask ); /* retrieve a generic parameter */
 extern PHB_ITEM HB_EXPORT hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
@@ -290,8 +290,8 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
     #define hb_retndlen( dNumber, iWidth, iDec ) hb_itemPutNDLen( &HB_VM_STACK.Return, (dNumber), (iWidth), (iDec) )
     #define hb_retnilen( iNumber, iWidth )       hb_itemPutNILen( &HB_VM_STACK.Return, (iNumber), (iWidth) )
     #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &HB_VM_STACK.Return, (lNumber), (iWidth) )
-    #define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &HB_VM_STACK.Return, (voidPtr) )
-    #define hb_retptrfin( voidPtr, fFin )        hb_itemPutPtrFinalizer( &HB_VM_STACK.Return, (voidPtr), (fFin) )
+    #define hb_retptr( voidPtr )                 hb_itemPutPtr( &HB_VM_STACK.Return, (voidPtr) )
+    #define hb_retptrGC( voidPtr )               hb_itemPutPtrGC( &HB_VM_STACK.Return, (voidPtr) )
    #ifndef HB_LONG_LONG_OFF
     #define hb_retnll( llNumber )                 hb_itemPutNLL( &HB_VM_STACK.Return, (llNumber) )
     #define hb_retnlllen( llNumber, iWidth )      hb_itemPutNLLLen( &HB_VM_STACK.Return, (llNumber), (iWidth) )
@@ -334,7 +334,8 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
     extern void  HB_EXPORT  hb_retnilen( int iNumber, int iWidth ); /* returns a integer number, with specific width */
     extern void  HB_EXPORT  hb_retnllen( LONG lNumber, int iWidth ); /* returns a LONG number, with specific width */
     extern void  HB_EXPORT  hb_reta( ULONG ulLen );  /* returns an array with a specific length */
-    extern void  HB_EXPORT  hb_retptr( void *voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
+    extern void  HB_EXPORT  hb_retptr( void * voidPtr );  /* returns a pointer */
+    extern void  HB_EXPORT  hb_retptrGC( void * voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
    #ifndef HB_LONG_LONG_OFF
     extern void  HB_EXPORT  hb_retnll( LONGLONG llNumber ); /* returns a LONGLONG int */
     extern void  HB_EXPORT  hb_retnlllen( LONGLONG llNumber, int iWidth ); /* returns a LONGLONG int, with specific width */
@@ -356,6 +357,7 @@ extern void  HB_EXPORT  hb_storl( int iLogical, int iParam, ... ); /* stores a l
 extern void  HB_EXPORT  hb_storni( int iValue, int iParam, ... ); /* stores an integer on a variable by reference */
 extern void  HB_EXPORT  hb_stornl( LONG lValue, int iParam, ... ); /* stores a LONG on a variable by reference */
 extern void  HB_EXPORT  hb_stornd( double dValue, int iParam, ... ); /* stores a double on a variable by reference */
+extern void  HB_EXPORT  hb_storptr( void * pointer, int iParam, ... ); /* stores a pointer on a variable by reference */
 #ifndef HB_LONG_LONG_OFF
 extern void  HB_EXPORT  hb_stornll( LONGLONG llValue, int iParam, ... ); /* stores a LONGLONG int on a variable by reference */
 #endif
@@ -400,6 +402,7 @@ extern ULONG    HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * 
 extern char     HB_EXPORT * hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string contained on an array element */
 extern char     HB_EXPORT * hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string pointer on an array element */
 extern ULONG    HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string length contained on an array element */
+extern void *   HB_EXPORT hb_arrayGetPtr( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the pointer contained on an array element */
 extern BOOL     HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the logical value contained on an array element */
 extern int      HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the int value contained on an array element */
 extern LONG     HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the LONG numeric value contained on an array element */
@@ -467,7 +470,7 @@ extern HB_EXPORT char *   hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an 
 extern HB_EXPORT char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szString  ); /* retrieves an object class name for a specific message */
 extern HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
 extern HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend );
-extern HB_EXPORT ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
+extern HB_EXPORT PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
 extern HB_EXPORT PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
 /*#define hb_objGetPropValue( pObj, szProp, pDestNullable ) \
    if ( pDestNullable == NULL ) \
@@ -627,8 +630,8 @@ extern void     hb_idleReset( void ); /* reset idle state routine count*/
 extern void     hb_idleSleep( double dSeconds ); /* sleep for a given time serving idle task */
 
 extern void     hb_idleShutDown( void ); /* closes all idle state tasks */
-extern ULONG    hb_idleAddFunc( PHB_ITEM pBlock ); /* Adds a codeblock or an executable array */
-extern PHB_ITEM hb_idleDelFunc( ULONG ulID ); /* Deletes a prevuiously added codeblock */
+extern void *   hb_idleAddFunc( PHB_ITEM pBlock ); /* Adds a codeblock or an executable array */
+extern PHB_ITEM hb_idleDelFunc( void * pID ); /* Deletes a prevuiously added codeblock */
 
 /* Background functions */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.29 2004/03/18 04:28:30 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.30 2004/03/25 12:13:13 druzus Exp $
  */
 
 /*
@@ -330,6 +330,41 @@ typedef struct _CDXINDEX
    BOOL     fFlush;           /* changes written to index, need upadte ulVersion */
 } CDXINDEX;
 typedef CDXINDEX * LPCDXINDEX;
+
+/* for index creation */
+typedef struct
+{
+   ULONG    nOffset;    /* offset in temporary file */
+   ULONG    ulKeys;     /* number of keys in page */
+   ULONG    ulKeyBuf;   /* number of keys in memory buffer */
+   ULONG    ulCurKey;   /* current key in memory buffer */
+   BYTE *   pKeyPool;   /* memory buffer */
+} CDXSWAPPAGE;
+typedef CDXSWAPPAGE * LPCDXSWAPPAGE;
+
+typedef struct
+{
+   LPCDXTAG pTag;             /* current Tag */
+   FHANDLE  hTempFile;        /* handle to temporary file */
+   char *   szTempFileName;   /* temporary file name */
+   int      keyLen;           /* key length */
+   BYTE     bTrl;             /* filler char for shorter keys */
+   BOOL     fUnique;          /* TRUE if index is unique */
+   ULONG    ulMaxRec;         /* the highest record number */
+   ULONG    ulTotKeys;        /* total number of keys indexed */
+   ULONG    ulKeys;           /* keys in curently created page */
+   ULONG    ulPages;          /* number of pages */
+   ULONG    ulCurPage;        /* current page */
+   ULONG    ulPgKeys;         /* maximum number of key in page memory buffer */
+   ULONG    ulMaxKey;         /* maximum number of keys in single page */
+   BYTE *   pKeyPool;         /* memory buffer for current page then for pages */
+   LPCDXSWAPPAGE pSwapPage;   /* list of pages */
+   LPCDXPAGE NodeList[ CDX_STACKSIZE ];   /* Stack of pages */
+   BYTE     pLastKey[ CDX_MAXKEY ]; /* last key val */
+   ULONG    ulLastRec;
+} CDXSORTINFO;
+typedef CDXSORTINFO * LPCDXSORTINFO;
+
 
 
 /*

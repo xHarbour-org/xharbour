@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.115 2004/04/08 13:26:54 druzus Exp $
+ * $Id: classes.c,v 1.116 2004/04/09 18:52:08 ronpinkas Exp $
  */
 
 /*
@@ -179,7 +179,7 @@ static BOOL     s_bClsScope    = TRUE;
 static BOOL     s_bClsAutoInit = TRUE;
 /* static PHB_DYNS s_msgClass     = NULL; */
 
-HB_SYMB  hb_symDestructor = { "__Destructor", HB_FS_PUBLIC, NULL, NULL };
+HB_SYMB  hb_symDestructor = { "__Destructor", HB_FS_PUBLIC, {NULL}, NULL };
 
 /* All functions contained in classes.c */
 
@@ -1236,7 +1236,7 @@ HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
  *
  * <uPtr> should be read as a boolean
  */
-HB_EXPORT ULONG hb_objHasMsg( PHB_ITEM pObject, char *szString )
+HB_EXPORT PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char *szString )
 {
    PHB_DYNS pDynSym;
    PHB_SYMB pSymbol;
@@ -1252,7 +1252,7 @@ HB_EXPORT ULONG hb_objHasMsg( PHB_ITEM pObject, char *szString )
       pSymbol = pDynSym->pSymbol;
       hb_dynsymUnlock();
 
-      return ( ULONG ) hb_objGetMthd( pObject, pSymbol, FALSE, NULL, FALSE );
+      return hb_objGetMthd( pObject, pSymbol, FALSE, NULL, FALSE );
    }
    else
    {
@@ -1262,7 +1262,7 @@ HB_EXPORT ULONG hb_objHasMsg( PHB_ITEM pObject, char *szString )
 }
 
 // Worker function for HB_FUNC( __CLSADDMSG ).
-void hb_clsAddMsg( USHORT uiClass, char *szMessage, LONG lID_or_FuncPointer_or_BlockPointer, USHORT wType, USHORT uiSprClass, USHORT uiScope, BOOL bPersistent, PHB_ITEM pInit, BOOL bCheckPrefix, BOOL bCase )
+void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * lID_or_FuncPointer_or_BlockPointer, USHORT wType, USHORT uiSprClass, USHORT uiScope, BOOL bPersistent, PHB_ITEM pInit, BOOL bCheckPrefix, BOOL bCase )
 {
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -1383,7 +1383,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, LONG lID_or_FuncPointer_or_B
          }
       }
 
-      if( wType == (USHORT) HB_OO_MSG_INLINE && lID_or_FuncPointer_or_BlockPointer == 0l )
+      if( wType == (USHORT) HB_OO_MSG_INLINE && lID_or_FuncPointer_or_BlockPointer == NULL )
       {
          hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSADDMSG", 0 );
       }
@@ -1615,7 +1615,7 @@ HB_FUNC( __CLSADDMSG )
 {
    USHORT   uiClass, uiScope, wType, uiSprClass = 0;
    char     *szMessage, szAssign[ HB_SYMBOL_NAME_LEN ];
-   LONG     lID_or_FuncPointer_or_BlockPointer;
+   void *   lID_or_FuncPointer_or_BlockPointer;
    PHB_ITEM pInit = NULL;
    BOOL     bPersistent, bCase;
 
@@ -1635,10 +1635,14 @@ HB_FUNC( __CLSADDMSG )
    szMessage = hb_parcx( 2 );
 
    // 3
-   lID_or_FuncPointer_or_BlockPointer = (LONG) hb_param( 3, HB_IT_BLOCK );
-   if( lID_or_FuncPointer_or_BlockPointer == 0l )
+   lID_or_FuncPointer_or_BlockPointer = (void *) hb_param( 3, HB_IT_BLOCK );
+   if( lID_or_FuncPointer_or_BlockPointer == NULL )
    {
-      lID_or_FuncPointer_or_BlockPointer = hb_parnl( 3 );
+      lID_or_FuncPointer_or_BlockPointer = hb_parptr( 3 );
+      if( lID_or_FuncPointer_or_BlockPointer == NULL )
+      {
+         lID_or_FuncPointer_or_BlockPointer = (void *) hb_parnl( 3 );
+      }
    }
 
    // 4
@@ -2409,7 +2413,7 @@ HB_FUNC( __OBJHASMSG )
 
    if( pObject && pString )
    {
-      hb_retl( hb_objHasMsg( pObject, pString->item.asString.value ) );
+      hb_retl( hb_objHasMsg( pObject, pString->item.asString.value ) != NULL );
    }
    else
    {
@@ -3490,7 +3494,7 @@ void hb_clsFinalize( PHB_ITEM pObject )
          SavedReturn.type = HB_IT_NIL;
          hb_itemForwardValue( &SavedReturn, &( HB_VM_STACK.Return ) );
 
-         hb_symDestructor.pFunPtr = pDestructor;
+         hb_symDestructor.value.pFunPtr = pDestructor;
 
          hb_vmPushSymbol( &hb_symDestructor );
          hb_vmPush( pObject ); // Do NOT Forward!!!
@@ -3681,7 +3685,7 @@ HB_FUNC( HB_OBJMSGPTR )
 
    if( pObject && pString )
    {
-      hb_retnl( hb_objHasMsg( pObject, pString->item.asString.value ) );
+      hb_retptr( hb_objHasMsg( pObject, pString->item.asString.value ) );
    }
    else
    {

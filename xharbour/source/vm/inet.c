@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.44 2004/03/18 04:05:28 ronpinkas Exp $
+* $Id: inet.c,v 1.45 2004/03/30 22:47:23 druzus Exp $
 */
 
 /*
@@ -402,7 +402,7 @@ HB_FUNC( INETCREATE )
       Socket->timeout = hb_parni(1);
    }
 
-   hb_retptr( Socket );
+   hb_retptrGC( Socket );
 }
 
 HB_FUNC( INETCLOSE )
@@ -1533,7 +1533,7 @@ HB_FUNC( INETSERVER )
    {
       HB_SOCKET_SET_ERROR( Socket );
       Socket->com = 0;
-      hb_retptr( Socket );
+      hb_retptrGC( Socket );
       return;
    }
 
@@ -1575,7 +1575,7 @@ HB_FUNC( INETSERVER )
       HB_INET_CLOSE( Socket->com );
    }
 
-   hb_retptr( Socket );
+   hb_retptrGC( Socket );
 }
 
 
@@ -1665,7 +1665,7 @@ HB_FUNC( INETACCEPT )
       memcpy( &NewSocket->remote, &si_remote, Len );
       NewSocket->com = incoming;
       hb_socketSetNonBlocking( NewSocket );
-      hb_retptr( NewSocket );
+      hb_retptrGC( NewSocket );
    }
 
 }
@@ -1743,7 +1743,7 @@ HB_FUNC( INETCONNECT )
    HB_STACK_LOCK;
 
 ret:
-   hb_retptr( Socket );
+   hb_retptrGC( Socket );
 }
 
 
@@ -1798,7 +1798,7 @@ HB_FUNC( INETCONNECTIP )
    HB_STACK_LOCK;
 
 ret:
-   hb_retptr( Socket );
+   hb_retptrGC( Socket );
 }
 
 /***********************************************************
@@ -1832,7 +1832,7 @@ HB_FUNC( INETDGRAMBIND )
    {
       HB_SOCKET_SET_ERROR( Socket );
       Socket->com = 0;
-      hb_retptr( Socket );
+      hb_retptrGC( Socket );
       return;
    }
 
@@ -1868,7 +1868,7 @@ HB_FUNC( INETDGRAMBIND )
       HB_INET_CLOSE( Socket->com );
    }
 
-   hb_retptr( Socket );
+   hb_retptrGC( Socket );
 }
 
 HB_FUNC( INETDGRAM )
@@ -1889,7 +1889,7 @@ HB_FUNC( INETDGRAM )
    {
       HB_SOCKET_SET_ERROR( Socket );
       Socket->com = 0;
-      hb_retptr( Socket );
+      hb_retptrGC( Socket );
       return;
    }
 
@@ -1901,7 +1901,7 @@ HB_FUNC( INETDGRAM )
    /* we'll be using non blocking sockets in all functions */
    hb_socketSetNonBlocking( Socket );
 
-   hb_retptr( Socket );
+   hb_retptrGC( Socket );
 }
 
 

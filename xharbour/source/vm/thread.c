@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.164 2004/04/03 11:47:11 jonnymind Exp $
+* $Id: thread.c,v 1.165 2004/04/04 23:38:01 fsgiudice Exp $
 */
 
 /*
@@ -1381,9 +1381,9 @@ HB_FUNC( STARTTHREAD )
       {
          pFunc = (PHB_FUNC) hb_objHasMsg( pPointer, pString->item.asString.value );
       }
-      else if( pString->type == HB_IT_LONG )
+      else if( pString->type == HB_IT_POINTER )
       {
-         pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+         pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
       }
       else
       {
@@ -1481,13 +1481,13 @@ HB_FUNC( STARTTHREAD )
       pThread->threadId = th_id;
       pThread->bReady = TRUE;
       pThread->pStack = pStack;
-      hb_retptr( pThread );
+      hb_retptrGC( pThread );
    }
    else
    {
       hb_threadDestroyStack( pStack );
       pThread->bReady = FALSE;
-      hb_retptr( pThread );
+      hb_retptrGC( pThread );
    }
    //notice that the child thread won't be able to proceed until we
    // release this mutex.
@@ -1660,7 +1660,7 @@ HB_FUNC( GETCURRENTTHREAD )
    pThread->pStack = &HB_VM_STACK;
    pThread->bReady = TRUE;
 
-   hb_retptr( pThread );
+   hb_retptrGC( pThread );
 }
 
 /*
@@ -2029,7 +2029,7 @@ HB_FUNC( HB_MUTEXCREATE )
 
    hb_threadLinkMutex( mt );
 
-   hb_retptr( mt );
+   hb_retptrGC( mt );
 }
 
 /*

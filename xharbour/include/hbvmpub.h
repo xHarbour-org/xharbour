@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.29 2004/04/09 01:04:44 druzus Exp $
+ * $Id: hbvmpub.h,v 1.30 2004/04/14 10:32:01 druzus Exp $
  */
 
 /*
@@ -59,27 +59,30 @@
 
 #include "hbdefs.h"
 
-    HB_EXTERN_BEGIN
+   HB_EXTERN_BEGIN
 
-    struct _HB_DYNS;
-    struct _SYMBOLS;
+   struct _HB_DYNS;
+   struct _SYMBOLS;
 
-    #if defined(_MSC_VER) && _MSC_VER < 1000
-       #pragma pack(8)
-    #endif
+   #if defined(_MSC_VER) && _MSC_VER < 1000
+      #pragma pack(8)
+   #endif
 
-    /* symbol support structure */
-    typedef struct
-    {
-       char *            szName;         /* the name of the symbol */
-       HB_SYMBOLSCOPE    cScope;         /* the scope of the symbol */
-       PHB_FUNC          pFunPtr;        /* function address for function symbol table entries */
-       struct _HB_DYNS * pDynSym;        /* pointer to its dynamic symbol if defined */
-    } HB_SYMB, * PHB_SYMB;
+   /* symbol support structure */
+   typedef struct
+   {
+      char *            szName;         /* the name of the symbol */
+      HB_SYMBOLSCOPE    cScope;         /* the scope of the symbol */
+      union {
+        PHB_FUNC        pFunPtr;        /* function address for function symbol table entries */
+        int             iStaticsBase;
+      } value;
+      struct _HB_DYNS * pDynSym;        /* pointer to its dynamic symbol if defined */
+   } HB_SYMB, * PHB_SYMB;
 
-    #if defined(_MSC_VER) && _MSC_VER < 1000
-       #pragma pack()
-    #endif
+   #if defined(_MSC_VER) && _MSC_VER < 1000
+      #pragma pack()
+   #endif
 
    typedef struct _SYMBOLS
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.108 2004/04/23 15:00:34 lf_sfnet Exp $
+ * $Id: dbcmd.c,v 1.109 2004/04/24 11:52:22 lf_sfnet Exp $
  */
 
 /*
@@ -89,7 +89,7 @@ HB_FUNC_EXTERN( FPARSEEX );
 #undef HB_PRG_PCODE_VER
 #define HB_PRG_PCODE_VER HB_PCODE_VER
 HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_DBCMD )
-{ "FPARSEEX", HB_FS_PUBLIC, HB_FUNCNAME( FPARSEEX ), NULL }
+{ "FPARSEEX", HB_FS_PUBLIC, {HB_FUNCNAME( FPARSEEX )}, NULL }
 HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_DBCMD )
 
 #if defined(HB_PRAGMA_STARTUP)
@@ -979,8 +979,7 @@ ERRCODE HB_EXPORT hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
       {
          if( ( PHB_DYNS ) pField->sym == pFieldSymbol->pDynSym )
          {
-            SELF_GETVALUE( pArea, uiField, pItem );
-            return SUCCESS;
+            return SELF_GETVALUE( pArea, uiField, pItem );
          }
          pField = pField->lpfNext;
          uiField++;
@@ -1009,8 +1008,7 @@ ERRCODE HB_EXPORT hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
       {
          if( ( PHB_DYNS ) pField->sym == pFieldSymbol->pDynSym )
          {
-            SELF_PUTVALUE( pArea, uiField, pItem );
-            return SUCCESS;
+            return SELF_PUTVALUE( pArea, uiField, pItem );
          }
          pField = pField->lpfNext;
          uiField++;

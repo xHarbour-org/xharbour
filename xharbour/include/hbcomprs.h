@@ -1,5 +1,5 @@
 /*
- * $Id: hbcompress.h,v 1.9 2003/10/01 04:39:39 ronpinkas Exp $
+ * $Id: hbcomprs.h,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
  */
 
 /*
@@ -198,10 +198,10 @@
 #endif
 
 #if !defined(MACOS) && !defined(TARGET_OS_MAC)
-typedef unsigned char  Byte;  /* 8 bits */
+typedef BYTE   Byte;  /* 8 bits */
 #endif
-typedef unsigned int   uInt;  /* 16 bits or more */
-typedef unsigned long  uLong; /* 32 bits or more */
+typedef UINT   uInt;  /* 16 bits or more */
+typedef ULONG  uLong; /* 32 bits or more */
 
 #ifdef SMALL_MEDIUM
 /* Borland C/C++ and some old MSC versions ignore FAR inside typedef */

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.383 2004/04/23 22:52:07 ronpinkas Exp $
+ * $Id: hvm.c,v 1.384 2004/04/28 09:59:38 brianhays Exp $
  */
 
 /*
@@ -272,7 +272,7 @@ extern void hb_clsSetModule( USHORT uiClass );
 
 /* virtual machine state */
 
-HB_SYMB  hb_symEval = { "__EVAL", HB_FS_PUBLIC, hb_vmDoBlock, NULL }; /* symbol to evaluate codeblocks */
+HB_SYMB  hb_symEval = { "__EVAL", HB_FS_PUBLIC, {hb_vmDoBlock}, NULL }; /* symbol to evaluate codeblocks */
 
 static HB_ITEM  s_aStatics;         /* Harbour array to hold all application statics variables */
 static USHORT   s_uiStatics;        /* Number of statics added after processing hb_vmStatics() */
@@ -377,7 +377,7 @@ void hb_vmDoInitClip( void )
 {
    PHB_DYNS pDynSym = hb_dynsymFind( "CLIPINIT" );
 
-   if( pDynSym && pDynSym->pSymbol->pFunPtr )
+   if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
    {
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();
@@ -400,7 +400,7 @@ void hb_vmDoInitRdd( void )
    for ( i = 0; rddName[i]; i++ )
    {
       pDynSym = hb_dynsymFind( rddName[i] );
-      if( pDynSym && pDynSym->pSymbol->pFunPtr )
+      if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
       {
          hb_vmPushSymbol( pDynSym->pSymbol );
          hb_vmPushNil();
@@ -560,7 +560,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    {
       PHB_DYNS pDynSym = hb_dynsymFind( "_APPMAIN" );
 
-      if( pDynSym && pDynSym->pSymbol->pFunPtr )
+      if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
       {
          s_pSymStart = pDynSym->pSymbol;
       }
@@ -580,13 +580,13 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
          {
             pDynSym = hb_dynsymFind( HARBOUR_START_PROCEDURE );
 
-            if( ! ( pDynSym && pDynSym->pSymbol->pFunPtr ) && s_pszLinkedMain )
+            if( ! ( pDynSym && pDynSym->pSymbol->value.pFunPtr ) && s_pszLinkedMain )
             {
                pDynSym = hb_dynsymFind( s_pszLinkedMain );
             }
          }
 
-         if( pDynSym && pDynSym->pSymbol->pFunPtr )
+         if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
          {
             s_pSymStart = pDynSym->pSymbol;
          }
@@ -4001,8 +4001,8 @@ static void hb_vmFuncPtr( void )  /* pushes a function address pointer. Removes 
 
    if( HB_IS_SYMBOL( pItem ) )
    {
-      pItem->item.asLong.value = (LONG) pItem->item.asSymbol.value->pFunPtr;
-      pItem->type = HB_IT_LONG;
+      pItem->item.asPointer.value = (void *) pItem->item.asSymbol.value->value.pFunPtr;
+      pItem->type = HB_IT_POINTER;
    }
    else
    {
@@ -5553,7 +5553,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 
    if( HB_IS_NIL( pSelf ) ) /* are we sending a message ? */
    {
-      pFunc = pSym->pFunPtr;
+      pFunc = pSym->value.pFunPtr;
 
       if( pFunc )
       {
@@ -5606,7 +5606,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
    }
    else
    {
-      HB_TRACE( HB_TR_ERROR, ( "hb_vmDo() internal logic error, Symbol: '%s' Fun: %p, Self Type: %i", pSym->szName, pSym->pFunPtr, pSelf->type ) );
+      HB_TRACE( HB_TR_ERROR, ( "hb_vmDo() internal logic error, Symbol: '%s' Fun: %p, Self Type: %i", pSym->szName, pSym->value.pFunPtr, pSelf->type ) );
       hb_errInternal( HB_EI_ERRUNRECOV, "Error! hb_vmDo() internal logic failure, Symbol: '%s'.", pSym->szName, NULL );
    }
 
@@ -5744,12 +5744,12 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    {
       if( pSym == &( hb_symEval ) )
       {
-         pFunc = pSym->pFunPtr;                 /* __EVAL method = function */
+         pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
       }
       else if( strncmp( pSym->szName, "EVAL", 4 ) == 0 )
       {
          pSym = &hb_symEval;
-         pFunc = pSym->pFunPtr;                 /* __EVAL method = function */
+         pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
       }
    }
    else if( HB_IS_OBJECT( pSelf ) )               /* Object passed            */
@@ -5758,7 +5758,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
       if( pSym == &hb_symDestructor )
       {
-         pFunc = pSym->pFunPtr;
+         pFunc = pSym->value.pFunPtr;
       }
       else
       {
@@ -7503,7 +7503,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols i
 
             for( ui = 0; ui < uiModuleSymbols; ui++ )
             {
-               if( pSymbols[ui].pFunPtr )
+               if( pSymbols[ui].value.pFunPtr )
                {
                   sprintf( sModule, "Program with 1st fun: %s", pSymbols[ui].szName );
                   break;
@@ -7525,7 +7525,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols i
 
          for( ui = 0; ui < uiModuleSymbols; ui++ )
          {
-            if( pSymbols[ui].pFunPtr )
+            if( pSymbols[ui].value.pFunPtr )
             {
                sprintf( sModule, "Program with 1st fun: %s", pSymbols[ui].szName );
                break;
@@ -8219,9 +8219,9 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
          pDynSym= hb_dynsymFind( pSymbol->szName );
          hb_dynsymUnlock();
 
-         if( pDynSym && pDynSym->pFunPtr && pSymbol->pFunPtr )
+         if( pDynSym && pDynSym->pFunPtr && pSymbol->value.pFunPtr )
          {
-            pSymbol->pFunPtr = pDynSym->pFunPtr;
+            pSymbol->value.pFunPtr = pDynSym->pFunPtr;
          }
          else
          {
@@ -8280,7 +8280,7 @@ HB_FUNC( HB_FUNCPTR )
       if( pDynSym )
       {
          ( &(HB_VM_STACK.Return) )->type = HB_IT_LONG;
-         ( &(HB_VM_STACK.Return) )->item.asLong.value = (ULONG) pDynSym->pSymbol->pFunPtr;
+         ( &(HB_VM_STACK.Return) )->item.asLong.value = (ULONG) pDynSym->pSymbol->value.pFunPtr;
          ( &(HB_VM_STACK.Return) )->item.asLong.length = 10;
       }
       else

@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.16 2004/04/04 09:24:47 andijahja Exp $
+* $Id: hbserv.c,v 1.17 2004/04/14 20:59:10 andijahja Exp $
 */
 
 /*
@@ -195,7 +195,7 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
          #ifndef HARBOUR_GCC_OS2
          hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSSUBSIG), info->si_code );
          hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSERROR), info->si_errno );
-         hb_itemPutNL( hb_arrayGetItemPtr( &Ret, HB_SERVICE_ADDRESS), (LONG) info->si_addr );
+         hb_itemPutPtr( hb_arrayGetItemPtr( &Ret, HB_SERVICE_ADDRESS), (void *) info->si_addr );
          hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_PROCESS), info->si_pid );
          hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_UID), info->si_uid );
          #endif
@@ -438,12 +438,12 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
 
          if (type == 0 ) //exception
          {
-            hb_itemPutNL( hb_arrayGetItemPtr( &Ret,
-                  HB_SERVICE_ADDRESS), (LONG)exc->ExceptionAddress );
+            hb_itemPutPtr( hb_arrayGetItemPtr( &Ret,
+                  HB_SERVICE_ADDRESS), ( void * ) exc->ExceptionAddress );
          }
          else
          {
-            hb_itemPutNL( hb_arrayGetItemPtr( &Ret, HB_SERVICE_ADDRESS ), 0 );
+            hb_itemPutPtr( hb_arrayGetItemPtr( &Ret, HB_SERVICE_ADDRESS ), NULL );
          }
          //TODO:
          hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_PROCESS), GetCurrentThreadId() );

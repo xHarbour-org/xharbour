@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.95 2004/04/16 04:41:38 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.96 2004/04/17 22:42:30 andijahja Exp $
  */
 
 /*
@@ -1474,10 +1474,6 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
                break;
          }
 
-         if ( fNeg && iPos-- > 0 )
-         {
-            szResult[ iPos ] = '-';
-         }
          if ( iPos > 0 )
          {
             memset( szResult, ' ', iPos );
@@ -1493,7 +1489,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
                {
                   if ( szResult[ iPos ] != '0' )
                   {
-                     iFirst = iPos-1;
+                     iFirst = iPos - 1;
                   }
                }
                else if ( iPos - iFirst >= iPrec )
@@ -1511,14 +1507,15 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
 
             if ( iFirst < 0 )
             {
-               iZer = iLast = 0;
+               iZer = 0;
             }
             else
             {
                iZer = iSize - iFirst - iPrec - ( iDec > 0 ? 1 : 0 );
-               dFract = modf( dFract * doBase, &dDig );
-               iLast = ( int ) ( dDig + 0.01 );
             }
+            dFract = modf( dFract * doBase, &dDig );
+            iLast = ( int ) ( dDig + 0.01 );
+
             /* hack for x.xxxx4999999999, f.e. 8.995 ~FL 8.994999999999999218.. */
             if ( iLast == 4 && iZer < 0 )
             {
@@ -1558,14 +1555,15 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
                         if ( szResult[ iPos ] < '0' ) /* '-' or ' ' */
                         {
                            szResult[ iPos ] = '1';
-                           if ( fNeg && iPos-- > 0 )
-                           {
-                              szResult[ iPos ] = '-';
-                           }
+                           iFirst = iPos;
                         }
                         else
                         {
                            szResult[ iPos ]++;
+                           if ( iFirst < 0 )
+                           {
+                              iFirst = iPos;
+                           }
                         }
                         break;
                      }
@@ -1574,6 +1572,14 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
                   {
                      break;
                   }
+               }
+            }
+            if ( fNeg && iFirst >= 0 && iPos >= 0 )
+            {
+               iPos = ( iDot > 0 && iFirst >= iDot ) ? iDot - 2 : iFirst - 1;
+               if ( iPos >= 0 )
+               {
+                  szResult[ iPos ] = '-';
                }
             }
          }
@@ -1808,6 +1814,35 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
          buffer = ( hb_itemGetL( pItem ) ? "T" : "F" );
          * ulLen = 1;
          * bFreeReq = FALSE;
+         break;
+
+      case HB_IT_POINTER:
+         {
+            int size = ( sizeof( void * ) << 1 ) + 3; /* n bytes for address + 0x + \0 */
+            int n;
+            BOOL bFail = TRUE; 
+
+            buffer = ( char * ) hb_xgrab( size );
+            do
+            {
+               n = snprintf( buffer, size, "%p", hb_itemGetPtr( pItem ) );
+               if( (n > -1) && (n < size) )
+               {
+                  bFail = FALSE;
+               }
+               else
+               {
+                  if( n > -1 )
+                     size = n + 1;
+                  else
+                     size *= 2;
+                  buffer = ( char * ) hb_xrealloc( buffer, size );
+               }
+            }
+            while( bFail );
+            * ulLen = strlen( buffer );
+            * bFreeReq = TRUE;
+         }
          break;
 
       default:

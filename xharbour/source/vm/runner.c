@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.24 2004/04/09 18:52:08 ronpinkas Exp $
+ * $Id: runner.c,v 1.25 2004/04/09 23:10:55 ronpinkas Exp $
  */
 
 /*
@@ -401,7 +401,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
       {
          pSymRead[ ul ].szName  = hb_hrbFileReadId( file, szFileName );
          pSymRead[ ul ].cScope  = hb_hrbFileReadByte( file, szFileName );
-         pSymRead[ ul ].pFunPtr = ( PHB_FUNC ) ( ULONG ) hb_hrbFileReadByte( file, szFileName );
+         pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) ( ULONG ) hb_hrbFileReadByte( file, szFileName );
          pSymRead[ ul ].pDynSym = NULL;
 
          if ( pHrbBody->ulSymStart == -1 && pSymRead[ ul ].cScope & HB_FS_FIRST && ! ( pSymRead[ ul ].cScope & HB_FS_INITEXIT ) )
@@ -438,7 +438,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
       {
          //printf( "#%i/%i Sym: >%s<\n", ul, pHrbBody->ulSymbols, pSymRead[ ul ].szName );
 
-         if( ( ( ULONG ) pSymRead[ ul ].pFunPtr ) == SYM_FUNC )
+         if( ( ( ULONG ) pSymRead[ ul ].value.pFunPtr ) == SYM_FUNC )
          {
             ulPos = hb_hrbFindSymbol( pSymRead[ ul ].szName, pDynFunc, pHrbBody->ulFuncs );
 
@@ -446,7 +446,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
             if( ulPos == SYM_NOT_FOUND )
             {
-               pSymRead[ ul ].pFunPtr = ( PHB_FUNC ) SYM_EXTERN;
+               pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) SYM_EXTERN;
             }
             else
             {
@@ -459,12 +459,12 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
                   break;
                }
                */
-               pSymRead[ ul ].pFunPtr = pDynFunc[ ulPos ].pAsmCall->pFunPtr;
+               pSymRead[ ul ].value.pFunPtr = pDynFunc[ ulPos ].pAsmCall->pFunPtr;
             }
          }
 
          /* External function        */
-         if( ( ( ULONG ) pSymRead[ ul ].pFunPtr ) == SYM_EXTERN )
+         if( ( ( ULONG ) pSymRead[ ul ].value.pFunPtr ) == SYM_EXTERN )
          {
             //printf( "External\n" );
 
@@ -475,7 +475,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
             if( pDynSym )
             {
-               pSymRead[ ul ].pFunPtr = pDynSym->pFunPtr;
+               pSymRead[ ul ].value.pFunPtr = pDynSym->pFunPtr;
                hb_dynsymUnlock();
             }
             else
@@ -527,7 +527,7 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
           * to pass any parameters to this function because they
           * cannot be used to initialize static variable.
           */
-         pHrbBody->pSymRead[ ul ].pFunPtr();
+         pHrbBody->pSymRead[ ul ].value.pFunPtr();
       }
    }
 
@@ -605,7 +605,7 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
          //printf( "Reset >%s<\n", pHrbBody->pDynFunc[ ul ].szName );
 
          pDyn->pFunPtr = NULL;
-         pDyn->pSymbol->pFunPtr = NULL;
+         pDyn->pSymbol->value.pFunPtr = NULL;
       }
       hb_dynsymUnlock();
 

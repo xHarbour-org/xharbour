@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2843 2004/04/28 14:26:02 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2844 2004/04/28 15:04:02 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,134 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-28 20:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/linux/gcc.cf
+    + fPIC added for some platforms - disabled by default
+
+  * xharbour/include/hbdefs.h
+    + some modification for 64bit platforms
+
+  * xharbour/include/hbstack.h
+    + proper casting for stack macros on 64bit platform
+
+  * xharbour/include/hbvmpub.h
+    * added 
+       union {
+          PHB_FUNC pFunPtr;
+          int iStaticsBase;
+       } value
+      to HB_SYMB structure to remove pointer/int conversion
+      the modification synchronized with Harbour and Ryszard Glab's
+      changes.
+
+  * xharbour/include/hbcomprs.h
+  * xharbour/include/hbnxs.h
+    * changed to use xHarbour types
+
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/source/compiler/genc.c
+  * xharbour/source/rdd/delim1.c
+  * xharbour/source/rdd/sdf1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * changed to use new HB_SYMB structure
+
+  * xharbour/source/rdd/dbcmd.c
+    * changed to use new HB_SYMB structure
+    * hb_rddFieldGet()/hb_rddFieldPut() returns error code from low level RDD
+      The side effect of this could be double error reporting in some RDD
+      but it seems better then silent error ignoring
+
+  - xharbour/source/rdd/dbfcdx/dbfcdx1.h
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed Clipper compatibility bug when skipping from EOF
+      position but EOF flag is not set (we cannot use fEOF flag for
+      checking if record is at EOF because it could be cleared by
+      skip())
+    ! fixed Clipper compatibility bug when creating index for READONLY WA
+      the index is open now in READWRITE mode
+    * changed AUTOPEN action and production index flag setting if macro
+      HB_CDX_CLIP_AUTOPEN is set (default) then it's working like in Clipper:
+      doesn't check production index flag before opening and set it only
+      when AUTOPEN is ON
+    * changed to use new HB_SYMB structure
+    * removed all pointer/long castings
+    * rewritten indexing procedure - now it's more then 3 times faster and
+      portable to other systems with non 32bit pointer
+      From my simple test (old version):
+        records: 1000000
+        creating databse...        31.40 sec.
+        creating index (D)...      13.39 sec.   74682 records per sec.
+        creating index (C)...      13.40 sec.   74638 records per sec.
+        Total execution time...    58.65 sec.
+      With new code:
+        records: 1000000
+        creating databse...        31.46 sec.
+        creating index (D)...       2.96 sec.  337952 records per sec.
+        creating index (C)...       3.45 sec.  289435 records per sec.
+        Total execution time...    40.19 sec.
+
+  * xharbour/source/rdd/dbf1.c
+    ! fixed problem with opening DBF in EXCLUSIVE READONLY mode in POSIX
+      systems - EXCLUSIVE/SHARED mode is emulated on by fcntl locks and
+      such mode doesn't exist so the database is opened in SHREAD/READONLY
+      mode
+    * changed to use new HB_SYMB structure
+
+  * xharbour/source/rtl/filesys.c
+    ! fixed bug in hb_fsLock for MSC and MINGW - it changed the file offset
+      possition into lock offset
+
+  * xharbour/source/rtl/hbhex2n.c
+    * some modification to work with different pointer size
+
+  * xharbour/source/rtl/hbserv.c
+  * xharbour/source/rtl/idle.c
+  * xharbour/source/rtl/trace.c
+  * xharbour/source/vm/arrays.c
+  * xharbour/source/vm/arrayshb.c
+  * xharbour/source/vm/classes.c
+  * xharbour/source/vm/dynsym.c
+  * xharbour/source/vm/estack.c
+  * xharbour/source/vm/eval.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/initsymb.c
+  * xharbour/source/vm/itemapi.c
+  * xharbour/source/vm/macro.c
+    * changed to use new HB_SYMB structure
+    * removed all pointer/long castings
+    * use HB_IT_POINTER instead of HB_IT_LONG
+
+  * xharbour/include/hbapi.h
+  * xharbour/source/vm/extend.c
+    + hb_parptr()/hb_storptr()/hb_retptr() to operate on HB_IT_POINTER
+    + hb_retptrGC() to work with pointer allocated by hb_gcAlloc()
+
+  * xharbour/source/vm/runner.c
+
+  * xharbour/tests/onidle.prg
+    * use HB_IT_POINTER item not HB_IT_LONG
+
+  * xharbour/source/vm/thread.c
+  * xharbour/source/vm/inet.c
+  * xharbour/contrib/xwt/src/xwt_api.c
+    * use hb_retptrGC() instead of hb_retptr()
+
+  * xharbour/doc/howtoext.txt
+    * updated documentation for hb_retptr()/hb_retptrGC()
+      please someone good in English to extend it.
+      hb_retptrGC() return pointer which will be scanned by GC and has
+      to be allocated by hb_gcAlloc()
+      hb_parptr()/hb_storptr()/hb_retptr() can operate on any type of
+      pointers - please us it instead of pointer to LONG conversion
+
+For full 64bit port we have to clean yet:
+hbxml.c, arryshb.c (HB_ARRAYTOSTRUCTURE/HB_STRUCTURETOARRAY), runner.c
+(this will be the most difficult if we want to keep multiplatform
+compatibility)
 
 2004-04-28 08:01 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * source/rdd/dbfntx/dbfntx1.c

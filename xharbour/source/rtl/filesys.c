@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.99 2004/04/14 20:59:10 andijahja Exp $
+ * $Id: filesys.c,v 1.100 2004/04/21 15:28:41 lculik Exp $
  */
 
 /*
@@ -2277,7 +2277,6 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
    HB_DISABLE_ASYN_CANC
 
 #elif defined(HB_OS_OS2)
-
    {
       struct _FILELOCK fl, ful;
 
@@ -2310,14 +2309,14 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
       }
       hb_fsSetIOError( bResult, 0 );
    }
-
 #elif defined(_MSC_VER)
-
    {
-      ULONG ulOldPos = hb_fsSeek( hFileHandle, ulStart, FS_SET );
+      ULONG ulOldPos = hb_fsSeek( hFileHandle, 0, FS_RELATIVE );
 
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
+
+      hb_fsSeek( hFileHandle, ulStart, FS_SET );
       switch( uiMode & FL_MASK )
       {
          case FL_LOCK:
@@ -2335,14 +2334,14 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
       hb_fsSeek( hFileHandle, ulOldPos, FS_SET );
       HB_DISABLE_ASYN_CANC
    }
-
 #elif defined(__MINGW32__)
-
    {
-      ULONG ulOldPos = hb_fsSeek( hFileHandle, ulStart, FS_SET );
+      ULONG ulOldPos = hb_fsSeek( hFileHandle, 0, FS_RELATIVE );
 
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
+
+      hb_fsSeek( hFileHandle, ulStart, FS_SET );
       switch( uiMode & FL_MASK )
       {
          case FL_LOCK:
@@ -2360,9 +2359,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
       hb_fsSeek( hFileHandle, ulOldPos, FS_SET );
       HB_DISABLE_ASYN_CANC
    }
-
 #elif defined(__GNUC__) && defined(HB_OS_UNIX)
-
    {
       /* TODO: check for append locks (SEEK_END)
        */
@@ -2399,7 +2396,6 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
       }
       hb_fsSetIOError( bResult, 0 );
    }
-
 #elif defined(HAVE_POSIX_IO) && !defined(__IBMCPP__) && ( !defined(__GNUC__) || defined(__DJGPP__) )
 
    // allowing async cancelation here

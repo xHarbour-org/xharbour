@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.16 2004/02/23 08:31:57 andijahja Exp $
+ * $Id: eval.c,v 1.17 2004/04/20 14:33:23 jacekp Exp $
  */
 
 /*
@@ -473,9 +473,9 @@ HB_FUNC( HB_EXECFROMARRAY )
       {
          pFunc = (PHB_FUNC) hb_objHasMsg( pSelf, pString->item.asString.value );
       }
-      else if( pString->type == HB_IT_LONG )
+      else if( pString->type == HB_IT_POINTER )
       {
-         pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+         pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
       }
 
       hb_dynsymLock();
@@ -495,9 +495,9 @@ HB_FUNC( HB_EXECFROMARRAY )
       {
          pFunc = (PHB_FUNC) hb_objHasMsg( pSelf, pString->item.asString.value );
       }
-      else if( pString->type == HB_IT_LONG )
+      else if( pString->type == HB_IT_POINTER )
       {
-         pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+         pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
       }
       hb_dynsymLock();
       pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
@@ -529,9 +529,9 @@ HB_FUNC( HB_EXECFROMARRAY )
       hb_dynsymUnlock();
       pArgs = hb_param( 2, HB_IT_ARRAY );
    }
-   else if( pFirst->type == HB_IT_LONG && uiPcount == 1)   /* hb_ExecFromArray( pFunc )  */
+   else if( pFirst->type == HB_IT_POINTER && uiPcount == 1)   /* hb_ExecFromArray( pFunc )  */
    {
-      pFunc = (PHB_FUNC) hb_itemGetNL( pFirst );
+      pFunc = (PHB_FUNC) hb_itemGetPtr( pFirst );
       hb_dynsymLock();
       pExecSym = hb_dynsymFindFromFunction( pFunc );
       if ( pExecSym )
@@ -540,9 +540,9 @@ HB_FUNC( HB_EXECFROMARRAY )
       }
       hb_dynsymUnlock();
    }
-   else if( pFirst->type == HB_IT_LONG && uiPcount == 2)   /* hb_ExecFromArray( pFunc, { params,... } )  */
+   else if( pFirst->type == HB_IT_POINTER && uiPcount == 2)   /* hb_ExecFromArray( pFunc, { params,... } )  */
    {
-      pFunc = (PHB_FUNC) hb_itemGetNL( pFirst );
+      pFunc = (PHB_FUNC) hb_itemGetPtr( pFirst );
       hb_dynsymLock();
       pExecSym = hb_dynsymFindFromFunction( pFunc );
       if ( pExecSym )
@@ -587,9 +587,9 @@ HB_FUNC( HB_EXECFROMARRAY )
          {
             pFunc = (PHB_FUNC) hb_objHasMsg( pSelf, pString->item.asString.value );
          }
-         else if( pString->type == HB_IT_LONG )
+         else if( pString->type == HB_IT_POINTER )
          {
-            pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+            pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
          }
          hb_dynsymLock();
          pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
@@ -611,9 +611,9 @@ HB_FUNC( HB_EXECFROMARRAY )
          hb_dynsymUnlock();
          ulStart = 2;
       }
-      else if( pString->type == HB_IT_LONG )
+      else if( pString->type == HB_IT_POINTER )
       {
-         pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+         pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
          hb_dynsymLock();
          pExecSym = hb_dynsymFindFromFunction( pFunc );
          if ( pExecSym )
@@ -714,9 +714,9 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
       {
          pFunc = (PHB_FUNC) hb_objHasMsg( pSelf, pString->item.asString.value );
       }
-      else if( pString->type == HB_IT_LONG )
+      else if( pString->type == HB_IT_POINTER )
       {
-         pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+         pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
       }
 
       hb_dynsymLock();
@@ -740,9 +740,9 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
       hb_dynsymUnlock();
       ulStart = 2;
    }
-   else if( pString->type == HB_IT_LONG )
+   else if( pString->type == HB_IT_POINTER )
    {
-      pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+      pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
       hb_dynsymLock();
       pExecSym = hb_dynsymFindFromFunction( pFunc );
       if ( pExecSym )
@@ -816,9 +816,9 @@ HB_FUNC( HB_EXEC )
 
    PHB_ITEM pPointer = *( HB_VM_STACK.pBase + 1 + 1 );
 
-   if ( pPointer->type == HB_IT_LONG )
+   if ( pPointer->type == HB_IT_POINTER )
    {
-      PHB_FUNC pFunc = (PHB_FUNC) hb_itemGetNL( pPointer );
+      PHB_FUNC pFunc = (PHB_FUNC) hb_itemGetPtr( pPointer );
       PHB_ITEM pSelf;
       PHB_DYNS pExecSym = NULL;
       int iParams;

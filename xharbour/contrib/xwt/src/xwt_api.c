@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.19 2004/01/30 18:34:12 lculik Exp $
+   $Id: xwt_api.c,v 1.20 2004/03/18 04:12:31 ronpinkas Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -186,7 +186,7 @@ HB_FUNC( XWT_CREATE )
 
    if ( xwt_drv_create( xwtData ) )
    {
-      hb_retptr( xwtData );
+      hb_retptrGC( xwtData );
    }
    else
    {

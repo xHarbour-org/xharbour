@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.16 2004/03/25 23:49:27 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.17 2004/04/26 19:32:10 ronpinkas Exp $
  */
 
 /*
@@ -109,7 +109,7 @@ PHB_SYMB HB_EXPORT hb_symbolNew( char * szName )      /* Create a new symbol */
    pSymbol->szName = ( char * ) hb_xgrab( strlen( szName ) + 1 );
    pSymbol->cScope = SYM_ALLOCATED; /* to know what symbols to release when exiting the app */
    strcpy( pSymbol->szName, szName );
-   pSymbol->pFunPtr = NULL;
+   pSymbol->value.pFunPtr = NULL;
    pSymbol->pDynSym = NULL;
 
    return pSymbol;
@@ -130,9 +130,9 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
    {
       if( pSymbol->cScope & HB_FS_PUBLIC ) /* only for HB_FS_PUBLIC */
       {
-         if( ( ! pDynSym->pFunPtr ) && pSymbol->pFunPtr ) /* The DynSym existed */
+         if( ( ! pDynSym->pFunPtr ) && pSymbol->value.pFunPtr ) /* The DynSym existed */
          {
-            pDynSym->pFunPtr = pSymbol->pFunPtr;  /* but had no function ptr assigned */
+            pDynSym->pFunPtr = pSymbol->value.pFunPtr;  /* but had no function ptr assigned */
             pDynSym->pSymbol = pSymbol;
             pDynSym->ulCalls = 0; /* profiler support */
             pDynSym->ulTime  = 0; /* profiler support */
@@ -188,9 +188,9 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
    if( pSymbol->cScope & HB_FS_PUBLIC ) /* only for HB_FS_PUBLIC */
    {
-      if( pDynSym->pFunPtr != pSymbol->pFunPtr ) /* it contains a function pointer */
+      if( pDynSym->pFunPtr != pSymbol->value.pFunPtr ) /* it contains a function pointer */
       {
-         pDynSym->pFunPtr = pSymbol->pFunPtr;    /* place the function at DynSym */
+         pDynSym->pFunPtr = pSymbol->value.pFunPtr;    /* place the function at DynSym */
       }
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.14 2004/02/21 04:45:19 ronpinkas Exp $
+ * $Id: idle.c,v 1.15 2004/02/23 00:53:50 peterrees Exp $
  */
 
 /*
@@ -262,8 +262,13 @@ HB_FUNC( HB_IDLESLEEP )
 }
 
 
-ULONG hb_idleAddFunc( PHB_ITEM pBlock )
+void * hb_idleAddFunc( PHB_ITEM pBlock )
 {
+   if( !HB_IS_BLOCK( pBlock ) && !HB_IS_ARRAY( pBlock ) )
+   {
+      return NULL;
+   }
+
    ++s_uiIdleMaxTask;
    if( !s_pIdleTasks )
    {
@@ -281,11 +286,11 @@ ULONG hb_idleAddFunc( PHB_ITEM pBlock )
    */
    if ( HB_IS_ARRAY( pBlock ) )
    {
-      return ( ULONG ) pBlock->item.asArray.value;    /* TODO: access to pointers from harbour code */
+      return ( void * ) pBlock->item.asArray.value;    /* TODO: access to pointers from harbour code */
    }
    else
    {
-      return ( ULONG ) pBlock->item.asBlock.value;    /* TODO: access to pointers from harbour code */
+      return ( void * ) pBlock->item.asBlock.value;    /* TODO: access to pointers from harbour code */
    }
 }
 
@@ -296,13 +301,13 @@ HB_FUNC( HB_IDLEADD )
 
    if( HB_IS_BLOCK( pBlock ) || HB_IS_ARRAY( pBlock ) )
    {
-      hb_retnl( hb_idleAddFunc( pBlock ) );
+      hb_retptr( hb_idleAddFunc( pBlock ) );
    }
    else
-      hb_retnl( -1 );    /* error - a codeblock is required */
+      hb_retptr( NULL );    /* error - a codeblock is required */
 }
 
-PHB_ITEM hb_idleDelFunc( ULONG ulID )
+PHB_ITEM hb_idleDelFunc( void * pID )
 {
    SHORT iTask;
    PHB_ITEM pItem = NULL;
@@ -313,9 +318,9 @@ PHB_ITEM hb_idleDelFunc( ULONG ulID )
       pItem = s_pIdleTasks[ iTask ];
 
       if( ( pItem->type == HB_IT_BLOCK &&
-            ulID == ( ULONG ) pItem->item.asBlock.value ) ||
+            pID == ( void * ) pItem->item.asBlock.value ) ||
           ( pItem->type == HB_IT_ARRAY &&
-            ulID == ( ULONG ) pItem->item.asArray.value ) )
+            pID == ( void * ) pItem->item.asArray.value ) )
 
       {
          --s_uiIdleMaxTask;
@@ -345,17 +350,19 @@ PHB_ITEM hb_idleDelFunc( ULONG ulID )
    return pItem;
 }
 
-
 /* Delete a task with given handle and return a codeblock with this task */
 HB_FUNC( HB_IDLEDEL )
 {
    PHB_ITEM pItem = NULL;
 
-   if( s_pIdleTasks && ( hb_parinfo( 1 ) & HB_IT_NUMERIC ) )
+   if( s_pIdleTasks && ( hb_parinfo( 1 ) & HB_IT_POINTER ) )
    {
-      ULONG ulID = hb_parnl( 1 );   /* TODO: access to pointers from harbour code */
+      void * pID = hb_parptr( 1 );   /* TODO: access to pointers from harbour code */
 
-      pItem = hb_idleDelFunc( ulID );
+      if ( pID )
+      {
+         pItem = hb_idleDelFunc( pID );
+      }
    }
 
    if( pItem == NULL )

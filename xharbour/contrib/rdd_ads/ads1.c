@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.41 2004/04/17 19:52:34 brianhays Exp $
+ * $Id: ads1.c,v 1.42 2004/04/28 09:59:37 brianhays Exp $
  */
 
 /*
@@ -93,8 +93,8 @@ extern ADSHANDLE adsConnectHandle;
 #endif
 
 HB_INIT_SYMBOLS_BEGIN( ads1__InitSymbols )
-{ "_ADS",             HB_FS_PUBLIC, HB_FUNCNAME( _ADS ), NULL },
-{ "ADS_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( ADS_GETFUNCTABLE ), NULL }
+{ "_ADS",             HB_FS_PUBLIC, {HB_FUNCNAME( _ADS )}, NULL },
+{ "ADS_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( ADS_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( ads1__InitSymbols )
 
 #if defined(HB_STATIC_STARTUP)

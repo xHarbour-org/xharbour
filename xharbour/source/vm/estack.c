@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.62 2004/04/03 01:51:02 ronpinkas Exp $
+ * $Id: estack.c,v 1.63 2004/04/20 14:33:23 jacekp Exp $
  */
 
 /*
@@ -476,6 +476,10 @@ void hb_stackDispLocal( void )
 
          case HB_IT_SYMBOL:
             printf( HB_I_("SYMBOL = %s "), ( *pBase )->item.asSymbol.value->szName );
+            break;
+
+         case HB_IT_POINTER:
+            printf( HB_I_("POINTER = %p "), ( *pBase )->item.asPointer.value );
             break;
 
          default:

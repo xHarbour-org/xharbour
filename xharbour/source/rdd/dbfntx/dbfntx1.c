@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.79 2004/04/01 01:01:12 druzus Exp $
+ * $Id: dbfntx1.c,v 1.80 2004/04/28 15:04:26 kaddath Exp $
  */
 
 /*
@@ -148,8 +148,8 @@ HB_FUNC( DBFNTX_GETFUNCTABLE );
 #endif
 
 HB_INIT_SYMBOLS_BEGIN( dbfntx1__InitSymbols )
-{ "_DBFNTX",             HB_FS_PUBLIC, HB_FUNCNAME( _DBFNTX ),             0 },
-{ "DBFNTX_GETFUNCTABLE", HB_FS_PUBLIC, HB_FUNCNAME( DBFNTX_GETFUNCTABLE) , 0 }
+{ "_DBFNTX",             HB_FS_PUBLIC, {HB_FUNCNAME( _DBFNTX )},             0 },
+{ "DBFNTX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFNTX_GETFUNCTABLE)} , 0 }
 HB_INIT_SYMBOLS_END( dbfntx1__InitSymbols )
 
 #if defined(HB_PRAGMA_STARTUP)

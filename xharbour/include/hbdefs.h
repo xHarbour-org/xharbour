@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.37 2004/04/09 01:04:43 druzus Exp $
+ * $Id: hbdefs.h,v 1.38 2004/04/14 10:32:01 druzus Exp $
  */
 
 /*
@@ -169,7 +169,7 @@
    typedef unsigned int ULONG;
 
    #undef ULONG_MAX
-   #define ULONG_MAX    (~(ULONG) 0)
+   #define ULONG_MAX    (0xFFFFFFFF)
    #undef LONG_MAX
    #define LONG_MAX     ((LONG)( ULONG_MAX >> 1 ))
    #undef LONG_MIN
@@ -242,10 +242,10 @@
 #endif
 
 /* type of reference counter */
-typedef ULONG HB_COUNTER;
+typedef unsigned long HB_COUNTER;
 
 /* type for memory pointer diff */
-typedef ULONG HB_PTRDIFF;
+typedef unsigned long HB_PTRDIFF;
 
 /* maximum length of double number in decimal representation:
    log10(2^1024) ~ 308.25 */

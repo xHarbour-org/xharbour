@@ -10,7 +10,7 @@
                                  gc@niccolai.ws
 
 
-$Id: howtoext.txt,v 1.5 2004/03/07 14:42:22 likewolf Exp $
+$Id: howtoext.txt,v 1.6 2004/04/28 09:59:38 brianhays Exp $
 
 
 STATUS OF THIS DOCUMENT
@@ -690,7 +690,7 @@ is discarded. It's supposed that the calling program wishes this specific memory
 location to remain valid for all the program lifetime, or anyhow for a longer
 timethan the returned value lifespan.
 
-The function hb_retptr() is provided to create user-defined atomic objects;
+The function hb_retptrGC() is provided to create user-defined atomic objects;
 objects that are stored inside an xharbour variable (in this case, objects that
 are returned as a variable) and that the XHarbour program can't manipulate
 directly. We'll see this function in a separate section.
@@ -1119,7 +1119,7 @@ programmer to explicitly call close or shutdown function. Just use your extensio
 to create new object types; when they are not needed anymore, the GC will call
 your function, to take care of cleanups.
 
-hb_retptr() function allows to return a value created with hb_gcAlloc(), so that
+hb_retptrGC() function allows to return a value created with hb_gcAlloc(), so that
 the calling xharbour program receives a HB_IT_POINTER object with custom data
 inside it. hb_parpointer( N ) returns a the pointer object that is associated
 with the given Nth parameter.
@@ -1134,7 +1134,7 @@ the object is detected as collectable. Then, if the item inside the structure
 is allocated using collectable memory, we must lock the item against Garbage
 Collecting, as the Virtual Machine doesn't know about the item being held
 inside a user-defined structure. Finally, by passing the created value back
-in the VM with hb_retptr() the Xharbour program can use that value as
+in the VM with hb_retptrGC() the Xharbour program can use that value as
 parameter for other functions that could access the user-defined structure.
 
 That is an example:
@@ -1176,7 +1176,7 @@ HB_FUNC( CREATEMYTYPE )
       being inside another one. */
    hb_gcLock( my->pItem );
 
-   hb_retptr( my );
+   hb_retptrGC( my );
 }
 
 HB_FUNC( MYTYPESETSTR )
@@ -1238,7 +1238,7 @@ HB_FUNC( CREATEMYTYPE )
    my->sign = MYSTRUCT_SIGN;
    //.. the rest as before ..
 
-   hb_retptr( my );
+   hb_retptrGC( my );
 }
 
 
