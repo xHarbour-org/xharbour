@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.128 2004/08/29 16:36:05 modalsist Exp $
+ * $Id: hbmake.prg,v 1.130 2004/09/16 00:00:00 modalsist Exp $
  */
 /*
  * Harbour Project source code:
@@ -69,7 +69,7 @@
       Default Values for core variables are set here
       New Core vars should only be added on this section
       */
-STATIC s_cHbMakeVersion := "1.128"
+STATIC s_cHbMakeVersion := "1.130"
 STATIC s_lPrint        := .F.
 STATIC s_nHandle
 STATIC s_aDefines      := {}
@@ -944,6 +944,7 @@ FUNCTION CompileFiles()
 
                   IF ! s_lIgnoreErrors .AND. lEnd
                      IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit " +(s_cLog) ), __run( "Notepad " + (s_cLog) ) )
+                     set cursor on
                      QUIT
                   ELSE
                      // Ferase( (s_cLog) )
@@ -1075,6 +1076,7 @@ FUNCTION CompileFiles()
                      lEnd     := 'Error E' $   cErrText
                      IF ! s_lIgnoreErrors .AND. lEnd
                         IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog)) )
+                        set cursor on
                         QUIT
                      ELSE
                         //                                Ferase( (s_cLog) )
@@ -1145,6 +1147,7 @@ FUNCTION CompileFiles()
 
                   IF ! s_lIgnoreErrors .AND. lEnd
                      IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog)) )
+                     set cursor on
                      QUIT
                   ELSE
                      //                            Ferase( (s_cLog) )
@@ -1425,6 +1428,7 @@ FUNC CreateMakeFile( cFile )
       ELSE
          SetColor("W/N,N/W")
          CLS
+         set cursor on
          QUIT
       ENDIF
 
@@ -2550,6 +2554,7 @@ FUNCTION CompileUpdatedFiles()
 
                      IF ! s_lIgnoreErrors .AND. lEnd
                         IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog) ) )
+                        set cursor on
                         QUIT
                      ELSE
                         // Ferase( (s_cLog) )
@@ -2664,6 +2669,7 @@ FUNCTION CompileUpdatedFiles()
 
                      IF ! s_lIgnoreErrors .AND. lEnd
                         IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit "  + (s_cLog)), __run( "Notepad " + (s_cLog) ) )
+                        set cursor on
                         QUIT
                      ELSE
                         //                                Ferase( (s_cLog) )
@@ -2734,6 +2740,7 @@ FUNCTION CompileUpdatedFiles()
 
                      IF ! s_lIgnoreErrors .AND. lEnd
                         IIF( "LINUX" IN Upper( Os() ) , __run( "mcedit " + (s_cLog) ), __run( "Notepad "  + (s_cLog) ) )
+                        set cursor on
                         QUIT
                      ELSE
                         //                                Ferase( (s_cLog) )
