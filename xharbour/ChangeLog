@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.403 2002/09/26 15:59:16 lculik Exp $
+ * $Id: ChangeLog,v 1.404 2002/09/27 02:43:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-27 08:57 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * source/rdd/dbfcdx/dbfcdx1.h
+   * source/rdd/dbfcdx/dbfcdx1.c
+        ! changed key in-memory management.
+          this fixes trimmed key problems, reported by Lorenzo Fiorini.
+
+2002-09-27 08:56 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * include/hbrddntx.h
+   * source/rdd/dbfntx/dbfntx1.c
+        ! synched with Harbour,
+        several fixes from Alexander Kresin.
 
 2002-09-26 19:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
