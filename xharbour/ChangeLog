@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2909 2004/05/10 00:58:46 lculik Exp $
+ * $Id: ChangeLog,v 1.2910 2004/05/10 01:47:48 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-10 01:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+    + Added logic to disallow Destructor calls on faked super objects, as well as temp super objects created with __clsInstSuper()
 
 2004-05-10 05:50 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/dbgmenu.prg

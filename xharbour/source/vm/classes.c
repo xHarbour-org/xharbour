@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.119 2004/04/29 23:23:30 ronpinkas Exp $
+ * $Id: classes.c,v 1.120 2004/05/09 21:13:49 druzus Exp $
  */
 
 /*
@@ -3498,7 +3498,8 @@ void hb_clsFinalize( PHB_ITEM pObject )
    {
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
 
-      if( pClass->pDestructor )
+      if( pClass->pDestructor && ( *( HB_VM_STACK.pBase ) )->item.asSymbol.uiSuperClass == 0 &&
+          strcmp( ( *( HB_VM_STACK.pBase ) )->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
       {
          HB_ITEM SavedReturn;
          PHB_FUNC pDestructor = pClass->pDestructor;
