@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.13 2004/04/05 02:29:31 druzus Exp $
+ * $Id: bkgtsks.c,v 1.14 2004/04/05 19:40:32 fsgiudice Exp $
  */
 
 /*
@@ -63,7 +63,7 @@
 #define INCL_NOPMAPI
 #define HB_OS_WIN_32_USED
 
-#define HB_THRAED_OPTIMIZE_STACK
+#define HB_THREAD_OPTIMIZE_STACK
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -387,6 +387,7 @@ int hb_backgroundTime( ULONG ulID, int nMillisec )
 /* forces to run Background functions */
 HB_FUNC( HB_BACKGROUNDRUN )
 {
+   HB_THREAD_STUB
    if ( s_pBackgroundTasks )
    {
       if ( hb_parinfo( 1 ) & HB_IT_NUMERIC )
