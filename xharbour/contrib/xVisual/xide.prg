@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.115 2002/11/07 20:27:46 what32 Exp $
+ * $Id: xide.prg,v 1.116 2002/11/07 23:01:39 what32 Exp $
  */
 
 /*
@@ -102,7 +102,7 @@ METHOD MainMenu() CLASS MainFrame
    WITH OBJECT ::WindowMenu
       :AddPopup('&Test')
       WITH OBJECT :Popup
-         :AddItem( 'Editor', 101, {||  FormEdit := TFormEdit():Create( MainFrame ):GetHandle() } )
+         :AddItem( 'Editor', 101, {||  FormEdit := TFormEdit():Create( MainFrame ) } )
          :AddItem( 'Open', 102, {|| OpenProject():Create() } )
          :AddSeparator()
          :AddItem( 'Exit'  , 200, {||MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )

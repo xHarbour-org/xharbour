@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.53 2002/11/05 21:39:58 what32 Exp $
+ * $Id: TForm.prg,v 1.54 2002/11/07 20:05:56 what32 Exp $
  */
 
 /*
@@ -128,7 +128,7 @@ METHOD Create( oParent ) CLASS TForm
    ::lRegister := IFNIL( ::lRegister,.T.,::lRegister)
    ::lControl  := .F.
    ::ExStyle   := IFNIL( ::ExStyle,0,::ExStyle)
-
+   ::Name      := IFNIL( ::Name, ::ClassName(), ::Name )
 RETURN( super:Create( oParent ) )
 
 *-----------------------------------------------------------------------------*

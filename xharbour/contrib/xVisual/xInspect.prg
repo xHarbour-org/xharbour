@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.58 2002/11/07 20:05:57 what32 Exp $
+ * $Id: xInspect.prg,v 1.59 2002/11/07 23:01:37 what32 Exp $
  */
 
 /*
@@ -38,6 +38,7 @@
 
 GLOBAL EXTERNAL oApp
 GLOBAL EXTERNAL FormEdit
+GLOBAL InspTabs
 
 CLASS ObjInspect FROM TForm
 
@@ -52,13 +53,19 @@ CLASS ObjInspect FROM TForm
    METHOD OnCloseQuery() INLINE 0
 
 /*
-   METHOD OnSize(n,x,y)  INLINE  ::ComboBox1:Width := x,
-                                 ::InspTabs:Move( , 25, x, y-25, .T. ),;
-                                 ::browser:FWidth := ::InspTabs:Properties:ClientRect()[3],;
-                                 ::browser:FHeight:= ::InspTabs:Properties:ClientRect()[4],;
+   METHOD OnSize(n,x,y)  INLINE  ::ComboBox1:Width := x,;
+                                 InspTabs:Move( , 25, x, y-25, .T. ),;
+                                 ::browser:FWidth := InspTabs:Properties:ClientRect()[3],;
+                                 ::browser:FHeight:= InspTabs:Properties:ClientRect()[4],;
                                  ::browser:Move( , , , , .T. ),;
                                  NIL
 */
+   METHOD OnSize(n,x,y)  INLINE  IIF( ! ::Combo == NIL, ( ::ComboBox1:Width := x,;
+                                                          InspTabs:Move( , 25, x, y-25, .T. ),;
+                                                          ::browser:FWidth := InspTabs:Properties:ClientRect()[3],;
+                                                          ::browser:FHeight:= InspTabs:Properties:ClientRect()[4],;
+                                                          ::browser:Move( , , , , .T. ) ), ),;
+                                                          NIL
    METHOD SetBrowserData()
    METHOD SaveVar()
 ENDCLASS
@@ -101,8 +108,7 @@ RETURN Self
 
 METHOD Create( oParent ) CLASS ObjInspect
 
-   LOCAL oTabs
-
+   // Object Inspector Window
    ::FCaption := "Object Inspector"
    ::Name     := "ObjInspect"
    ::FLeft    := 0
@@ -110,35 +116,29 @@ METHOD Create( oParent ) CLASS ObjInspect
    ::FWidth   := 200
    ::FHeight  := 297
    ::ExStyle  := WS_EX_TOOLWINDOW
+   super:Create( oParent )
 
-   super:Create( oParent ):GetHandle()
-
+   // ComboBox   
    ::Combo        := ComboInsp():Create( self )
-   ::Add( ::Combo )
 
    ::Combo:FWidth := ::FWidth
    ::Combo:Style  := WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
    ::Combo:SetItemHeight( -1, 15 )
+   ::Combo:GetHandle() // needs handle
 
-   ::Combo:GetHandle()
+   // TabControls
+   InspTabs := TTabControl():Create( self )
 
+   InspTabs:FTop   := 25
+   InspTabs:FWidth := ::FWidth
+   InspTabs:FHeight:= ::FHeight - 25
+   InspTabs:AddTab( "Properties", TabPage():Create( InspTabs ) )
+   InspTabs:AddTab( "Events", TabPage():Create( InspTabs ) )
 
-   oTabs := TTabControl():Create( self )
-   oTabs:FTop   := 25
-   oTabs:FWidth := ::FWidth
-   oTabs:FHeight:= ::FHeight - 25
-   oTabs:Name   := "InspTabs"
-
-   ::Add( oTabs )
-
-   oTabs:GetHandle()
-
-
-   ::InspTabs:AddTab( "Properties", TabPage():Create( ::InspTabs ) )
-   ::InspTabs:AddTab( "Events", TabPage():Create( ::InspTabs ) )
-   oTabs:Configure()
+   InspTabs:Configure()
    
-   ::Browser:=InspectBrowser():Create( ::InspTabs:Properties )
+   // Browser
+   ::Browser:=InspectBrowser():Create( InspTabs:Properties )
 
 return( Self )
 
@@ -410,7 +410,6 @@ METHOD SetColControl(x,y) CLASS InspectBrowser
 
          CASE cType == "O"
               aRect:=::GetItemRect()
-              view aRect
               ::oCtrl:=TButton():New( self, "...", 333, aRect[3]-(aRect[4]-aRect[2]+1), aRect[2]-1, (aRect[4]-aRect[2]+1), aRect[4]-aRect[2]+1)
               ::oCtrl:Create()
               ::oCtrl:SetFocus()
@@ -512,7 +511,6 @@ METHOD OnCommand( nwParam ) CLASS StringList
                cText := StrTran( cText, Chr(0) , '' )
                cText := StrTran( cText, Chr(10), '' )
                cText := StrTran( cText, Chr(13), '' )
-               view cText
                oApp:MainFrame:ObjInspect:CurObject:Items:Add( AllTrim( cText ) )
            NEXT
 

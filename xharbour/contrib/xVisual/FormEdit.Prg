@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.80 2002/10/31 04:08:59 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.81 2002/11/05 21:40:09 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -76,18 +76,21 @@ GLOBAL EXTERNAL FormEdit
    DATA CtrlName     PROTECTED
    DATA aXFM         PROTECTED INIT Array( XFM_Size )
 
-   METHOD New( oParent )       INLINE ::Caption := 'TForm' + LTrim( Str( ++::nForms ) ), ;
-                                      ::Editing := .F.        ,;
-                                      ::aCtrl   := {}         ,;
-                                      ::left    := 200        ,;
-                                      ::top     := 125        ,;
-                                      ::width   := 600        ,;
-                                      ::height  := 400        ,;
-                                      ::xGrid   := 8          ,;
-                                      ::yGrid   := 8          ,;
-                                      ::GridColor:=RGB(0,0,0) ,;
-                                      super:New( oParent )    ,;
-                                      ::XFMTop()
+   METHOD Create( oParent )  INLINE ::FCaption := 'TForm' + LTrim( Str( ++::nForms ) ), ;
+                                    ::Editing  := .F.        ,;
+                                    ::aCtrl    := {}         ,;
+                                    ::FLeft    := 200        ,;
+                                    ::FTop     := 125        ,;
+                                    ::FWidth   := 600        ,;
+                                    ::FHeight  := 400        ,;
+                                    ::xGrid    := 8          ,;
+                                    ::yGrid    := 8          ,;
+                                    ::GridColor:=RGB(0,0,0) ,;
+                                    super:Create( oParent ) ,;
+                                    ::GetHandle(),;
+                                    ::XFMTop(),;
+                                    Self
+
 
    METHOD AddControl()
    METHOD OnCreate()         INLINE ::CreateSub()
@@ -140,7 +143,7 @@ METHOD OnSize( nFlag, Width, Height)
    LOCAL aRect
 
    IF ::oMask <> NIL
-      aRect := GetClientRect(::Handle)
+      aRect := GetClientRect(::FHandle)
       ::oMask:Move( aRect[1], aRect[2], aRect[3], aRect[4], .T. )
       ::oMask:Refresh()
    ENDIF
@@ -263,7 +266,7 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
          oObj:=::Add( TToolBar():New( self, 511, 2, HINST_COMMCTRL, IDB_STD_SMALL_COLOR, 16, 16, 16, 16, 14 ) )
          oObj:AddButton("New", ToolButton():New( 0 , ,"New",  100 ) )
          oObj:AddButton("Open",ToolButton():New( 1 , ,"Open", 100 ) )
-         UpdateWindow( ::handle )
+         UpdateWindow( ::Fhandle )
 
       CASE ::CtrlName=="ProgressBar"
          oObj:=::Add( TProgressBar():New( self, aRect[1], aRect[2], aRect[3], aRect[4] ) )
@@ -287,8 +290,6 @@ METHOD SetControl( oObj ) CLASS TFormEdit
 
    LOCAL oTree, o, n
 
-   //TraceLog( oObj, oObj:Caption, oObj:Top, oObj:Left, oObj:Height, oObj:Width, oObj:FCaption, oObj:FTop, oObj:FLeft, oObj:FHeight, oObj:FWidth )
-
    aAdd( ::aCtrl, oObj )
    ::oMask:GetSiblings()
    ::oMask:SetFocus()
@@ -301,13 +302,13 @@ METHOD SetControl( oObj ) CLASS TFormEdit
                               HB_QSELF():DelControl(), oObj:Parent:XFMControl( NIL, oObj, .T. ) } )
 
    MainFrame:ObjInspect:ComboBox1:AddString( oObj:name + chr(9) + oObj:ClassName(), oObj )
-   oTree := MainFrame:ObjTree:TreeView1:Add( oObj:Name, 1, oObj:handle )
+   oTree := MainFrame:ObjTree:TreeView1:Add( oObj:Name, 1, oObj:Fhandle )
    oTree:Select()
 
    IF !EMPTY( oObj:Controls )
       FOR n := 1 TO LEN( oObj:Controls )
           o := oObj:Controls[ n ]
-          oTree:Add( o:name,1, o:handle )
+          oTree:Add( o:name,1, o:Fhandle )
           oTree:Expand()
       NEXT
    ENDIF
@@ -362,14 +363,14 @@ METHOD CreateSub()
 
    ::Parent:ObjInspect:ComboBox1:AddString( ::Name + chr(9) + "TFORM", self)
 //   ::Parent:ObjInspect:ComboBox1:SetCurSel(::Parent:ObjInspect:ComboBox1:GetCount()-1)
-   oTree := ::Parent:ObjTree:TreeView1:Add( ::Name,, ::handle )
+   oTree := ::Parent:ObjTree:TreeView1:Add( ::Name,, ::Fhandle )
    oTree:Select()
 
 
    xRet := super:OnCreate()
 
-   ::oMask:=oCtrlMask():New( self )
-   ::oMask:Create()
+   ::oMask:=oCtrlMask():Create( self )
+   ::oMask:GetHandle()
    ::oMask:GetSiblings()
    ::oMask:BringToTop()
    ::oMask:SetFocus()
@@ -388,9 +389,9 @@ METHOD TileGrid(hDC)
    LOCAL hOldBmp := SelectObject(hMemDC,::hBmpGrid)
 
    SetTextColor(hDC,::GridColor)
-   DO WHILE j < ::Height
+   DO WHILE j < ::FHeight
       i:=0
-      DO WHILE i < ::Width
+      DO WHILE i < ::FWidth
          BitBlt( hDC, i, j, ::xBmpSize,::yBmpSize, hMemDC, 0, 0, SRCAND )
          i+=::xBmpSize
       ENDDO

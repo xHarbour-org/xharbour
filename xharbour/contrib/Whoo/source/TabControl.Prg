@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.26 2002/11/07 20:05:56 what32 Exp $
+ * $Id: TabControl.Prg,v 1.27 2002/11/07 23:01:33 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -225,7 +225,6 @@ METHOD Configure() CLASS TTabControl
  
          ::Controls[i]:Move( , , , , .T. )
          
-         view LEN( ::Controls[i]:Controls )
       endif
    next
 

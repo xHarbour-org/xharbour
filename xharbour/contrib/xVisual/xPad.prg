@@ -1,5 +1,5 @@
 /*
- * $Id: xPad.prg,v 1.7 2002/11/05 21:40:09 what32 Exp $
+ * $Id: xPad.prg,v 1.8 2002/11/07 20:05:57 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -509,7 +509,6 @@ METHOD configure(x,y)
   Local arect
   local cBin
   local tm
-  //view procname(1)+'('+AllTrim(str(procline(1)))+')'
 
   // window coordinates
 
@@ -628,7 +627,6 @@ METHOD ChooseFont()
 
   If !Empty(aFont:=GetObject(::hFont))
     aFont:=Bin2A(aFont,LF_Bin2A)
-    // view afont
   Else
     aFont:=aClone(::aFont)
   EndIf
@@ -885,8 +883,6 @@ METHOD OnBlockKey(nKey)
     EndIf
 
   EndCase
-
-  //view nkey
 
   If isBlockKey
     ::blockon(::Col,::Line)
@@ -1669,8 +1665,6 @@ METHOD FindMatch()
   Local lFound:=.F.
   Local cTemp
 
-  //VIEW 'IN FIND MATCH',curchar
-
   If !Empty(curchar)
     If (n:=aScan(amatch,{|x| curchar $ x})) > 0
       l:=::Line
@@ -2085,8 +2079,6 @@ METHOD deltext
 
   Local i
 
-  //view 'in deltext'
-
   If !::ReadOnly
 
     If ::isBlockOn
@@ -2106,7 +2098,6 @@ METHOD deltext
       ::getcomments(::BlockTop)
       ::BlockBottom:=::BlockTop
       ::BlockRight :=::BlockLeft
-      //view ::BlockTop,::lines
       ::gotoline(::BlockTop)
       ::gotocol(::BlockLeft)
       ::Changed:=.T.
@@ -2175,7 +2166,6 @@ METHOD cut()
       If ::blockgetlen() < 65534
         If OpenClipboard(::hWnd)
           ctext:=::gettext()
-          // view ctext
           if EmptyClipboard()
           if SetClipboardData(CF_TEXT,ctext+chr(0)) # 0
             ::DelText()
@@ -2193,8 +2183,6 @@ METHOD cut()
     MessageBeep(MB_ICONASTERISK)
   EndIf
 
-  // view retval
-
   Return(retval)
 
 *-----------------------------------------------------------------------------*
@@ -2207,7 +2195,6 @@ METHOD copy()
     If ::blockgetlen() < 65534
       If OpenClipboard(::hWnd)
         ctext:=::gettext()
-     //   view ctext
         if EmptyClipboard()
         if SetClipboardData(CF_TEXT,ctext+chr(0)) # 0
           retval:=.t.
@@ -2219,8 +2206,7 @@ METHOD copy()
 
   EndIf
 
-  //view retval
-
+  
   Return(retval)
 
 *-----------------------------------------------------------------------------*
@@ -2235,7 +2221,6 @@ METHOD paste()
 
     If OpenClipboard(::hWnd)
       cText:=GetClipboardData(CF_TEXT)
-    //  view cText
       CloseClipboard()
       If cText # NIL
         nlines:=(Len(cText)-Len(StrTran(cText,CRLF,'')))/CRLFlen +1
@@ -2251,7 +2236,6 @@ METHOD paste()
     MessageBeep(MB_ICONASTERISK)
   EndIf
 
-  //view retval
 
   Return(retval)
 
@@ -2567,7 +2551,6 @@ METHOD refreshall(hDC,nFrom)
   Local lInComment:=.F.
   Local n
 
-  // view procname(1)
 
   If hDC==NIL
     noDC:=.T.
@@ -3004,7 +2987,6 @@ METHOD collapse()
   Local n
   Local lInComment:=.F.
 
-  //view procname(1),procline(1)
 
   ::aPrgState:=array(PRG_STATELEN)
   ::aPrgState[PRG_LEFTCOL    ] := ::LeftCol
@@ -3133,16 +3115,13 @@ METHOD EditorProc( nMsg, nwParam, nlParam)
     ::ShiftPressed:=.F.    // this too.
 
   Case nMsg == WM_KEYDOWN
-    //   view 'down',nwparam,nlparam
     ::Onkey(nwParam)
     Return 0
 
   Case nMsg == WM_KEYUP
-    //view 'up',nwparam,nlparam
     ::OnKeyUp(nwParam)
 
   Case nMsg == WM_CHAR
-    //view 'char',nwparam,nlparam
     For i := 1 To LoWord( nlParam) // That is Repeat Count
       ::Onchar(nwParam)
     Next
@@ -3494,7 +3473,6 @@ Function readafile(cFileName,aText,nTabSpace) // atext must be by reference
       Do While .T.
 
         If (CRLFpos:=atn(CRLF,cBuff,nStart)) > 0
-          //    view CRLFpos
           nlines++
           aText[nlines]:=StrTran(SubStr(cBuff,nStart,CRLFpos-nStart),chr(9),nTabSpace)
           nStart:=CRLFpos+CRLFlen
@@ -3562,7 +3540,6 @@ Function parsexpr(c,lHonorSpacing,lInRemark,lUpperKeyWord)
 
   NextWord:=GetWord(@c,lHonorSpacing)
 
-  //view c,GetWord(@c,lHonorSpacing),c
 
 
   Do While Len(NextWord) > 0

@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.36 2002/10/30 16:37:46 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.37 2002/10/30 21:39:29 ronpinkas Exp $
  */
 
 /*
@@ -107,7 +107,7 @@ CLASS oCtrlMask FROM TWinControl
    DATA lHintActive INIT .T.
    DATA lChanged    INIT .F.
 
-   METHOD New() CONSTRUCTOR
+   METHOD Create() CONSTRUCTOR
    METHOD OnGetDlgCode() INLINE DLGC_WANTARROWS + DLGC_WANTTAB
    METHOD OnRButtonDown()
    METHOD OnLButtonDown()
@@ -125,7 +125,7 @@ ENDCLASS
 
 *-----------------------------------------------------------------------------*
 
-METHOD New( oParent ) CLASS oCtrlMask
+METHOD Create( oParent ) CLASS oCtrlMask
 
    ::left      := 0
    ::top       := 0
@@ -155,7 +155,7 @@ METHOD New( oParent ) CLASS oCtrlMask
    ::aSelected := {}
    ::aClickPt  := {}
 
-   RETURN( super:new( oParent ) )
+RETURN( super:Create( oParent ) )
 
 
 *-----------------------------------------------------------------------------*
