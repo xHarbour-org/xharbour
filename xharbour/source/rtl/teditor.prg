@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.36 2004/05/12 23:00:00 modalsist Exp $
+ * $Id: teditor.prg,v 1.36 2004/05/13 02:15:02 modalsist Exp $
  *
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
@@ -117,7 +117,7 @@
  *
  * Minor Fix:
  * Down(), Up(), End(), Home(), Right(), Left(), WordRight(), WordLeft(), SplitLine().
- * Setpos(), Gotocol(), GotoPos(),etc. 
+ * Setpos(), Gotocol(), GotoPos(),etc.
  *
  * Added methods:
  * ==============
@@ -134,21 +134,21 @@
  * _ShowPos()                      Show screen and array cursor position. To test only.
  *
  * <insert> message at line 0 column 67 when we press <Ins> key as Clipper.
- * In insert mode the cursor size is 2 and in overstrike mode is original size. 
+ * In insert mode the cursor size is 2 and in overstrike mode is original size.
  *
  * Behaviour changes:
  * ==================
- * In Clipper to exit with save we press CTRL-W. In xHarbour CTRL-END is same as CTRL-W, 
+ * In Clipper to exit with save we press CTRL-W. In xHarbour CTRL-END is same as CTRL-W,
  * so, I added a new parameter in MemoEdit() to choice betwen save with CTRL-W or CTRL-Q.
- * If the choice is CTRL-Q the CTRL-W/CTRL_END move the cursor to end of current window, 
- * otherwise CTRL-END/CTRL-W exit with save. The default is CTRL-W as Clipper. 
+ * If the choice is CTRL-Q the CTRL-W/CTRL_END move the cursor to end of current window,
+ * otherwise CTRL-END/CTRL-W exit with save. The default is CTRL-W as Clipper.
  *
  * Virtual TAB management
  * ======================
  * To control tab in/out of text, I used the chr(255) to swapp betwen real tab and
- * virtual tab. To do it, the HBTextLine class was changed. 
+ * virtual tab. To do it, the HBTextLine class was changed.
  *
- * See memoedit.prg and ttextlin.prg to more details. 
+ * See memoedit.prg and ttextlin.prg to more details.
  *
  * v.1.36
  * Better cursor and text scroll management.
@@ -213,16 +213,16 @@ CLASS HBEditor
 
    DATA  cSoftCR        INIT chr(141)+chr(10) // Soft CR character as Clipper.
    DATA  cHardCR        INIT HB_OSNewLine()   // Hard CR character. This characters are operational system dependent.
-   DATA  lToggleCTRL_WQ INIT .F.              // this change CTRL-W by CTRL-Q to finish edit with save. 
+   DATA  lToggleCTRL_WQ INIT .F.              // this change CTRL-W by CTRL-Q to finish edit with save.
                                               // Default is CTRL-W as Clipper.
-   DATA  lIsLeftScrolled INIT NIL             // To save if the screen was left scrolled. 
+   DATA  lIsLeftScrolled INIT NIL             // To save if the screen was left scrolled.
                                               // 3 state: NIL = never scrolled.
-                                              //          .T. = left scrolled 
+                                              //          .T. = left scrolled
                                               //          .F. = unscrolled
    DATA  nLeftScrollVal  INIT 8               // Amount of columns to left scroll.
    DATA  nWordWrapColLeftScroll INIT 0        // Column to word wrap in left scroll mode.
 
-   
+
    METHOD  New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabSize,;
                 nTextRow, nTextCol, nWndRow, nWndCol, lToggleKeySave )
 
@@ -236,7 +236,7 @@ CLASS HBEditor
    METHOD  GetLine( nRow )                                  // Return line n of text
    METHOD  LineLen( nRow ) INLINE if( nRow <= ::naTextLen, Len( ::aText[ nRow ]:cText ), 0 )  // Return text length of line n
    METHOD  SplitLine( nRow )                                // If a line of text is longer than nWordWrapCol divides it into multiple lines
-   
+
    METHOD  GotoLine( nRow )                                 // Put line nRow at cursor position
    METHOD  GotoCol( nCol )                                  // Put line nCol at cursor position
    METHOD  GotoPos( nRow, nCol, lForceRefresh )
@@ -281,11 +281,11 @@ CLASS HBEditor
 
    METHOD  Left()                    // move cursor one position to left.
    METHOD  WordLeft()                // move cursor to previous left word.
-   METHOD  Home()                    // move cursor to begin of current line. 
+   METHOD  Home()                    // move cursor to begin of current line.
 
    METHOD  K_Ascii()                 // process asc-II chars in line text.
    METHOD  K_Return()                // move cursor do next line.
-   METHOD  K_Del()                   // delete current character 
+   METHOD  K_Del()                   // delete current character
    METHOD  K_Bs()                    // delete previous character.
    METHOD  K_Tab()                   // move cursor to tab spaces
    METHOD  K_Mouse()
@@ -304,10 +304,11 @@ CLASS HBEditor
    METHOD  IsSoftCR( nRow )                 // return true/false if the current line end with soft CR.
    METHOD  ScrollLeft()                     // Scroll text to left if greater than nWordWrapCol.
    METHOD  _ShowPos()                       // Show screen and array cursor position. Should be used only in test mode.
-   
+
 ENDCLASS
 
 //-------------------------------------------------------------------//
+
 METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabSize,;
             nTextRow, nTextCol, nWndRow, nWndCol, lToggleKeySave ) CLASS HBEditor
 
@@ -364,7 +365,7 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    if nLineLength != NIL
       ::nWordWrapCol := nLineLength
    else
-      ::nWordWrapCol := ::nNumCols 
+      ::nWordWrapCol := ::nNumCols
    endif
 
 
@@ -374,15 +375,15 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    else
       ::nWordWrapColLeftScroll := ::nRight - ::nLeftScrollVal + 1
    endif
-   
+
    // how many spaces for each tab?
    // declare this before load string into text-array
    if nTabSize != NIL
       ::nTabWidth := nTabSize
    endif
-   ::cTabSpace := Replicate( chr(255) , ::nTabWidth )
+   ::cTabSpace := Replicate( chr( 255 ) , ::nTabWidth )
 
-   // Load string into text-array. Converts a string to an array of strings 
+   // Load string into text-array. Converts a string to an array of strings
    // splitting input string at EOL boundaries
    ::aText := Text2Array( cString, self )
    ::naTextLen := Len( ::aText )
@@ -401,7 +402,6 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    ::nFirstCol := max( 1, nTextCol - nWndCol )
    ::nRow      := max( 1, min( nTextRow, ::naTextLen ) )
    ::nCol      := max( 1, min( Len( ::aText[ ::nRow ]:cText ) , nTextCol + 1 ) )
-
 
    // extra sanitization over max bounds
    IF ::nFirstRow >  ::naTextLen
@@ -450,7 +450,7 @@ METHOD Resize( nTop, nLeft, nBottom, nRight ) CLASS HBEditor
    //
    ::nRow      := 1
    ::nCol      := 1
-   
+
    // Set cursor upper left corner
    ::SetPos( ::nTop, ::nLeft )
 
@@ -490,7 +490,7 @@ METHOD RefreshWindow() CLASS HBEditor
    //
    //ScrollFixed( ::nTop, ::nLeft, ::nBottom, ::nRight )
 
-   
+
    for i := 0 to Min( ::nNumRows - 1, ::naTextLen - 1 )
       DispOutAt( ::nTop + i, ::nLeft, ;
                  PadR( SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol, ::nNumCols ), ::nNumCols ), ;
@@ -504,7 +504,7 @@ METHOD RefreshWindow() CLASS HBEditor
    SetCursor( ::nCurrentCursor )
 
    ::SetPos( nCurRow, nCurCol )
-   
+
 return Self
 
 //-------------------------------------------------------------------//
@@ -517,24 +517,24 @@ METHOD RefreshLine() CLASS HBEditor
    LOCAL nCurRow
    LOCAL nStart
 
-   
+
    nCurRow := ::Row()
    nCurCol := ::Col()
 
    SetCursor( SC_NONE )
 
    if ::lIsLeftScrolled == .T.
-      nStart := ::nFirstCol + ::nLeftScrollVal 
+      nStart := ::nFirstCol + ::nLeftScrollVal
    else
       nStart := ::nFirstCol
    endif
 
-   DispOutAt( ::Row(), ::nLeft, PadR( SubStr(::GetLine( ::nRow ), nStart, ::nNumCols ), ::nNumCols, " " ), ::LineColor( ::nRow ) )
+   DispOutAt( ::Row(), ::nLeft, PadR( SubStr( ::GetLine( ::nRow ), nStart, ::nNumCols ), ::nNumCols, " " ), ::LineColor( ::nRow ) )
 
    SetCursor( ::nCurrentCursor )
-   
+
    SetPos( nCurRow, nCurCol )
-   
+
 return Self
 
 //-------------------------------------------------------------------//
@@ -654,7 +654,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
    LOCAL lDelAppend
    LOCAL bKeyBlock
    LOCAL lSingleKeyProcess := .F.   // .T. if I have to process passed key and then exit
-   
+
    //  [ ::lDirty := .T. ] marks memoedit() return as "file change made."
 
    if ! ::lEditAllow
@@ -701,7 +701,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                 ::DelWordRight()
                 exit
 
-            case K_CTRL_Q 
+            case K_CTRL_Q
                  if (::lToggleCTRL_WQ)  // Finish edit with save. xHarbour option.
                     ::lSaved    := .T.
                     ::lExitEdit := .T.
@@ -710,7 +710,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                  endif
                  exit
 
-            case K_CTRL_W 
+            case K_CTRL_W
                  if !(::lToggleCTRL_WQ)  // Finish edit with save. In xHarbour CTRL-W behaves as CTRL-END.
                     ::lSaved    := .T.
                     ::lExitEdit := .T.
@@ -720,7 +720,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                     ::Bottom() // same CRTL-END behaviour
                  endif
                  exit
-                
+
             case K_CTRL_Y
                ::lDirty := .T.
 
@@ -820,13 +820,8 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                ::Bottom()
                exit
 
-            /*
-            case K_SPACE
-               ::K_Ascii( nKey )
-               exit
-            */
             default
-               if nKey >= K_SPACE .AND. nKey < 255 // char(255) is used to simulate virtual tab spaces and 
+               if nKey >= K_SPACE .AND. nKey < 255 // char(255) is used to simulate virtual tab spaces and
                   ::K_Ascii( nKey )                // can not be used in edit.
                else
                   // NOTE: if you call ::Edit() with a key that is passed to ::KeyboardHook() and then
@@ -874,7 +869,7 @@ METHOD Bottom() CLASS HBEditor
 
    LOCAL nRowTo := min( ::nFirstRow + ::nNumRows-1, ::naTextLen )
 
-   ::GotoLine( nRowTo ) 
+   ::GotoLine( nRowTo )
    ::End()
 
 RETURN Self
@@ -938,52 +933,41 @@ RETURN Self
 
 METHOD Right() CLASS HBEditor
 
-
    if ::lWordWrap
+      IF ::nCol >= Max( ::LineLen( ::nRow ), ::nWordWrapCol ) .and. ::nRow < ::naTextLen
+         if ( ::lIsLeftScrolled == NIL .or. ::lIsLeftScrolled == .F. )
+            ::ScrollLeft()
 
-      IF ::nCol >= Max( ::LineLen( ::nRow ), ::nWordWrapCol ) .and.;
-         ::nRow < ::naTextLen 
-
-            if ( ::lIsLeftScrolled == NIL .or. ::lIsLeftScrolled == .F. )
-               ::ScrollLeft()
-            else
-
-               if ::nCol+1 <= ::nWordWrapCol
-                  ::GotoCol( ::nCol + 1 )
-               elseif ::nCol+1 > ::nWordWrapCol + 1
-                  ::GotoPos( ::nRow + 1, 1, .T. )
-               elseif ::nCol+1 <= ::nWordWrapCol + 1
-                  ::GotoCol( ::nCol + 1 )   
-               endif   
-
+         else
+            if ::nCol+1 <= ::nWordWrapCol
+               ::GotoCol( ::nCol + 1 )
+            elseif ::nCol+1 > ::nWordWrapCol + 1
+               ::GotoPos( ::nRow + 1, 1, .T. )
+            elseif ::nCol+1 <= ::nWordWrapCol + 1
+               ::GotoCol( ::nCol + 1 )
             endif
 
-      ELSE
+         endif
 
+      ELSE
          if ::nCol+1 <= ::nWordWrapCol
             ::GotoCol( ::nCol + 1 )
+
          else
-
             if ( ::lIsLeftScrolled == NIL .or. ::lIsLeftScrolled == .F. )
-
                ::ScrollLeft()
 
             else
-
                if ::nCol+1 <= ::nWordWrapCol
                   ::GotoCol( ::nCol + 1 )
                elseif ::nCol+1 <= ::nWordWrapCol + 1
-                  ::GotoCol( ::nCol + 1 )   
-               endif   
+                  ::GotoCol( ::nCol + 1 )
+               endif
 
-            endif   
-
-         endif   
-         
+            endif
+         endif
       ENDIF
-
    else
-
       if ::nCol < ::nWordWrapCol
          ::GotoCol( ::nCol + 1 )
       endif
@@ -995,71 +979,69 @@ RETURN Self
 //-------------------------------------------------------------------//
 
 METHOD WordRight() CLASS HBEditor
+   LOCAL nColLimit
 
-Local nColLimit
+   if ::LineLen( ::nRow ) > ::nWordWrapCol .and. AT(" ",::GetLine( ::nRow )) == 0
+      return self
+   endif
 
-if ::LineLen( ::nRow ) > ::nWordWrapCol .and. AT(" ",::GetLine( ::nRow )) == 0 
-   return self
-endif
-   
    nColLimit := iif( ::lWordWrap, Min( ::nWordWrapCol, ::LineLen( ::nRow ) ), ::LineLen( ::nRow ) )
 
-if ::IsTabCol( ::nCol )
-   ::GotoCol( ::TabColPos( ::nCol ) + ::nTabWidth )
-else
+   if ::IsTabCol( ::nCol )
+      ::GotoCol( ::TabColPos( ::nCol ) + ::nTabWidth )
 
-   while ::nCol <= nColLimit .and. SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) != " "
+   else
+      while ::nCol <= nColLimit .and. SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) != " "
          ::Right()
-         if ::lIsLeftScrolled == .T. 
+         if ::lIsLeftScrolled == .T.
             exit
          endif
-   enddo
+      enddo
 
-   while ::nCol <= nColLimit .and. SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) == " "
+      while ::nCol <= nColLimit .and. SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) == " "
          ::Right()
-   enddo
+      enddo
 
-   if ::nRow == ::naTextLen
-      if ::nCol > ::LineLen( ::nRow )
-        while ::nCol >= 1 .and. SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) != " "
-            ::Left()
-            if ::nCol <= nColLimit .and. SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) == " "
-               ::Right()
-               exit
-            endif   
-        enddo
+      if ::nRow == ::naTextLen
+         if ::nCol > ::LineLen( ::nRow )
+            while ::nCol >= 1 .and. SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) != " "
+               ::Left()
+               if ::nCol <= nColLimit .and. SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) == " "
+                  ::Right()
+                  exit
+               endif
+            enddo
+         endif
       endif
-   endif
 
-   // move to next line
-   if ( ::lWordWrap )
-
-      if (::nCol >= nColLimit .or. SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) == " ") .and. ::nRow < ::naTextLen
-         ::Down()
-         while ::LineLen( ::nRow ) == 0 .and. ::nRow < ::naTextLen
+      // move to next line
+      if ( ::lWordWrap )
+         if ( ::nCol >= nColLimit .or. SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) == " ") .and. ::nRow < ::naTextLen
             ::Down()
-         enddo   
-         ::Home()
-         while ::nCol <= nColLimit .and.;
-             ( SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) == " " .or.;
-             ::IsTabCol( ::nCol ) )
-            ::Right()
-         enddo
-        
-      endif
 
+            while ::LineLen( ::nRow ) == 0 .and. ::nRow < ::naTextLen
+               ::Down()
+            enddo
+            ::Home()
+
+            while ::nCol <= nColLimit .and.;
+                      ( SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) == " " .or.;
+                                   ::IsTabCol( ::nCol ) )
+               ::Right()
+            enddo
+
+         endif
+      endif
    endif
-endif
 
 RETURN Self
 
 //-------------------------------------------------------------------//
 
 METHOD End() CLASS HBEditor
+   LOCAL i,cText
 
-Local i,cText
-
-   cText := ::aText[ ::nRow ]:cText 
+   cText := ::aText[ ::nRow ]:cText
 
    if ::LineLen( ::nRow ) < ::nWordWrapCol
 
@@ -1067,36 +1049,33 @@ Local i,cText
 
       if RAt( " ", cText ) >= Len( RTrim(cText) ) + 1
           ::GotoCol( ::LineLen( ::nRow ) )
-      endif 
+      endif
 
    else
-
       if ::nWordWrapCol <= ::nNumCols
-      
-         if SubStr( cText, ::nWordWrapCol, 1 ) != " " 
+
+         if SubStr( cText, ::nWordWrapCol, 1 ) != " "
 
             if ( ::lIsLeftScrolled == NIL .or. ::lIsLeftScrolled == .F. )
                 if ::nWordWrapCol >= ::nNumCols
                    ::ScrollLeft()
                 else
                    ::GotoCol( Min( ::nWordWrapCol+1 , ::LineLen(::nRow)+1) )
-                endif   
-            else   
+                endif
+            else
                ::GotoCol( ::nWordWrapCol )
-            endif   
+            endif
 
          else
             ::GotoCol( ::nWordWrapCol )
          endif
 
       else
-
          for i := ::nCol to Min(::nWordWrapCol, ::LineLen( ::nRow ) )
              ::Right()
          next
 
       endif
-
    endif
 
 Return Self
@@ -1106,34 +1085,30 @@ Return Self
 METHOD Left() CLASS HBEditor
 
    IF ::nCol <= 1
-
       if ::lWordWrap
-
          IF ::nRow > 1
 
-			while ::nRow>1 .and. ::LineLen(::nRow-1)=0
-			   ::Up()
-			   ::End()
-			end
+         while ::nRow>1 .and. ::LineLen(::nRow-1)=0
+            ::Up()
+            ::End()
+         end
 
             ::GotoPos( ::nRow - 1, ::LineLen( ::nRow - 1 ) , .T. )
-            ::End()    
+            ::End()
 
          ENDIF
-
       endif
 
    ELSE
-
-      if ::lIsLeftScrolled == .T. 
-
+      if ::lIsLeftScrolled == .T.
          if ::nCol > 1 .and. ::nCol <= ::nLeftScrollVal+1
-	        ::RefreshWindow()
+            ::RefreshWindow()
             ::GotoCol( ::nCol - 1 )
-         else   
+
+         else
             ::nPhysCol := ::Col() - 1
             SetPos( ::Row() , ::nPhysCol )
-            if ::nPhysCol <= ::nRight - ::nLeftScrollVal 
+            if ::nPhysCol <= ::nRight - ::nLeftScrollVal
                if ::nWordWrapCol > ::nNumCols
                   ::nCol -= 1
                   if ::nCol <= ::nFirstCol
@@ -1141,23 +1116,23 @@ METHOD Left() CLASS HBEditor
                   endif
                else
                   ::nCol := ::nPhysCol - ::nLeft + ::nLeftScrollVal + 1
-               endif    
-            endif    
+
+               endif
+            endif
          endif
-           
-	  else   
+
+      else
          ::GotoCol( ::nCol - 1 )
+
       endif
-      
    ENDIF
-   
+
 RETURN Self
 
 //-------------------------------------------------------------------//
 
 METHOD WordLeft() CLASS HBEditor
-
-Local cChar
+   LOCAL cChar
 
    // splitline() does not use this function
    // modifed to wrap lines and position at first letter of word, not word end
@@ -1166,13 +1141,13 @@ Local cChar
       ::Up()
       while ::LineLen( ::nRow ) = 0 .and. ::nRow > 1
         ::Up()
-      enddo  
+      enddo
       ::GotoPos( ::nRow , ::LineLen( ::nRow ) , .T. )
    endif
 
 cChar := ""
 
-if ::nCol > 1 
+if ::nCol > 1
 
    ::Left()
 
@@ -1181,15 +1156,15 @@ if ::nCol > 1
          ::Up()
          while ::LineLen( ::nRow ) = 0 .and. ::nRow > 1
            ::Up()
-         enddo  
+         enddo
          ::GotoPos( ::nRow , ::LineLen( ::nRow ) , .T. )
       else
          ::Right()
       endif
-   endif   
+   endif
 
    cChar := SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 )
-   
+
    while ::nCol > 1 .and. cChar == " "
       ::Left()
       cChar := SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 )
@@ -1220,7 +1195,7 @@ METHOD Home() CLASS HBEditor
   endif
 
   ::GotoCol( 1 )
-  
+
 RETURN Self
 
 //-------------------------------------------------------------------//
@@ -1258,8 +1233,7 @@ RETURN Self
 //-------------------------------------------------------------------//
 
 METHOD K_Ascii( nKey ) CLASS HBEditor
-
-Local nTabCol,nLastChar
+   LOCAL nTabCol,nLastChar
 
    // nKey := ASC( HB_ANSITOOEM( CHR( nKey ) ) )    // convert from windows
 
@@ -1269,7 +1243,7 @@ Local nTabCol,nLastChar
 
    if ::IsTabCol( ::nCol )
       Return Self
-   endif   
+   endif
 
    ::lDirty   := .T.
    ::nMarkPos := 0
@@ -1282,10 +1256,9 @@ Local nTabCol,nLastChar
       ::aText[ ::nRow ]:cText += Space( ::nCol - ::LineLen( ::nRow ) )
    endif
 
- 
    // insert char if in insert mode or at end of current line
    //
-   if ::lInsert .or. ( ::nCol > Min( ::LineLen( ::nRow ), ::nWordWrapCol ) ) 
+   if ::lInsert .or. ( ::nCol > Min( ::LineLen( ::nRow ), ::nWordWrapCol ) )
 
       if ::lIsLeftScrolled == NIL .or. ::lIsLeftScrolled == .F.
          ::aText[ ::nRow ]:cText := Stuff( ::aText[ ::nRow ]:cText, ::nCol, 0, Chr( nKey ) )
@@ -1293,16 +1266,15 @@ Local nTabCol,nLastChar
          ::nCol += 1
          ::aText[ ::nRow ]:cText := Stuff( ::aText[ ::nRow ]:cText, ::nCol, 0, Chr( nKey ) )
          ::nCol -= 1
-      endif   
+      endif
 
    else
-
       if ::lIsLeftScrolled = NIL .or. ::lIsLeftScrolled = .F.
          ::aText[ ::nRow ]:cText := Stuff( ::aText[ ::nRow ]:cText, ::nCol, 1, Chr( nKey ) )
       else
          if ::LineLen( ::nRow ) <= ::nWordWrapCol
             ::aText[ ::nRow ]:cText += Chr( nKey )
-         endif   
+         endif
       endif
 
    endif
@@ -1311,7 +1283,7 @@ Local nTabCol,nLastChar
    //
    IF ::lWordWrap .and. ::LineLen( ::nRow ) >= ::nWordWrapCol
 
-      if ::LineLen( ::nRow ) == ::nWordWrapCol 
+      if ::LineLen( ::nRow ) == ::nWordWrapCol
          ::ScrollLeft()
       else
          ::RefreshLine()
@@ -1319,7 +1291,7 @@ Local nTabCol,nLastChar
 
       if ::LineLen( ::nRow ) > ::nWordWrapCol
 
-         if ::lIsLeftScrolled == .T. 
+         if ::lIsLeftScrolled == .T.
             ::nCol += 1
          endif
 
@@ -1328,8 +1300,8 @@ Local nTabCol,nLastChar
          else
             nLastChar := nKey
          endif
-            
-         if nKey > K_SPACE .or. ::nRow == ::naTextLen 
+
+         if nKey > K_SPACE .or. ::nRow == ::naTextLen
             ::SplitLine( ::nRow )
          endif
 
@@ -1342,22 +1314,21 @@ Local nTabCol,nLastChar
          endif
 
       endif
-      
+
    ELSE
       ::RefreshLine()
       ::Right()
    ENDIF
-  
+
 RETURN Self
 
 //-------------------------------------------------------------------//
 
 METHOD K_Bs() CLASS HBEditor
 
-Local nNewCol
+LOCAL nNewCol
 
    if !::lEditAllow
-
       if ::nCol > 1
          ::GotoCol( ::nCol - 1 )
       endif
@@ -1372,15 +1343,15 @@ Local nNewCol
 
       if ::nRow == ::naTextLen
          ::RemoveLine( ::nRow )
-      endif   
-
-	  ::Up()
- 	  ::End()
-
- 	  if ::nCol == ::nWordWrapCol+1 
- 	     ::K_Del()
       endif
-      
+
+      ::Up()
+      ::End()
+
+      if ::nCol == ::nWordWrapCol+1
+         ::K_Del()
+      endif
+
    else
       // delete previous character
       if ::nCol > 1
@@ -1391,9 +1362,9 @@ Local nNewCol
 
          if nNewCol != nil
             ::DelVirtualTab( ::nCol-1 , nNewCol  )
-         else
 
-           if ::lIsLeftScrolled == .T. 
+         else
+            if ::lIsLeftScrolled == .T.
 
                ::aText[ ::nRow ]:cText := Stuff( ::aText[ ::nRow ]:cText, ::nCol, 1, "" )
 
@@ -1404,20 +1375,17 @@ Local nNewCol
                endif
 
                ::RefreshWindow()
-               
-           else
 
-             ::aText[ ::nRow ]:cText := Stuff( ::aText[ ::nRow ]:cText, ::nCol-1, 1, "" )
-             ::GotoCol( ::nCol - 1 )
-            
-           endif
+            else
+               ::aText[ ::nRow ]:cText := Stuff( ::aText[ ::nRow ]:cText, ::nCol-1, 1, "" )
+               ::GotoCol( ::nCol - 1 )
 
-           ::RefreshLine()
-           
-        endif
+            endif
 
+            ::RefreshLine()
+
+         endif
       endif
-
    endif
 
 Return Self
@@ -1426,10 +1394,10 @@ Return Self
 
 METHOD K_Del() CLASS HBEditor
 
-   Local nCurRow,nCurCol
-   Local lMerge,nNewCol
-   Local cText
-   
+   LOCAL nCurRow,nCurCol
+   LOCAL lMerge,nNewCol
+   LOCAL cText
+
    lMerge   := .F.
    ::lDirty := .T.
 
@@ -1456,7 +1424,7 @@ METHOD K_Del() CLASS HBEditor
          if ::lIsLeftScrolled == .T.
             ::RefreshWindow()
          endif
-         
+
       ENDIF
 
    endif
@@ -1480,13 +1448,13 @@ METHOD K_Del() CLASS HBEditor
             cText := ::aText[ ::nRow ]:cText
             ::aText[ ::nRow ]:cText := Left( cText, ::nWordWrapCol+1 )
             cText := SubStr( cText , Len( ::aText[ ::nRow ]:cText )+1 )
-            if Len( cText ) > 0 
+            if Len( cText ) > 0
                ::InsertLine( cText , NIL , ::nRow+1 )
-            endif 
-             
+            endif
+
          endif
-  
-	  endif
+
+      endif
 
       ::GotoPos( nCurRow, nCurCol, .T. )
       ::RefreshWindow()
@@ -1499,10 +1467,10 @@ RETURN Self
 
 METHOD K_Tab() CLASS HBEditor
 
-   Local lHardCR := .F.
-   Local i := 0
-   Local nTabLimit
-   Local lAddTabMark
+   LOCAL lHardCR := .F.
+   LOCAL i := 0
+   LOCAL nTabLimit
+   LOCAL lAddTabMark
 
    nTabLimit := Max( ::nWordWrapCol , ::LineLen(::nRow) ) - ::nTabWidth
 
@@ -1511,7 +1479,7 @@ METHOD K_Tab() CLASS HBEditor
         ::lDirty := .T.
 
         lAddTabMark := ::lInsert .or. ::nCol >= ::LineLen(::nRow) .or. ( ::nCol <= ::LineLen(::nRow) - ::nTabWidth .and.;
-	                     SubStr(::aText[::nRow]:cText,::nCol,::nTabWidth) != ::cTabSpace  )
+                        SubStr(::aText[::nRow]:cText,::nCol,::nTabWidth) != ::cTabSpace  )
 
 
         ::AddTabCol( ::nCol , lAddTabMark  )
@@ -1534,18 +1502,18 @@ METHOD K_Tab() CLASS HBEditor
                     endif
                 endif
 
-       	        if !empty( ::aText[ ::nRow+1 ]:cText )
+                  if !empty( ::aText[ ::nRow+1 ]:cText )
                    ::aText[ ::nRow ]:cText += ::GetLine( ::nRow+1 )
                    ::RemoveLine( ::nRow+1 )
-   	            else
- 		           if !::IsSoftCR( ::nRow+1 )
-			          ::InsertLine("",.F.,::nRow+1)
-			       endif
+                  else
+                  if !::IsSoftCR( ::nRow+1 )
+                   ::InsertLine("",.F.,::nRow+1)
+                endif
                 endif
 
                 ::aText[ ::nRow ]:lSoftCR := !lHardCR  // .T. if lHardCR = .F.
 
-		   endif
+         endif
 
            ::SplitLine( ::nRow )
            ::RefreshWindow()
@@ -1560,8 +1528,8 @@ Return Self
 
 METHOD K_Return() CLASS HBEditor
 
-   IF ::lEditAllow 
-   
+   IF ::lEditAllow
+
      IF ::lInsert
 
         ::lDirty := .T.
@@ -1569,7 +1537,7 @@ METHOD K_Return() CLASS HBEditor
       // if last row
       IF ::nRow == ::naTextLen
 
-   	     ::aText[ ::nRow ]:lSoftCR := .F. // HardCR
+           ::aText[ ::nRow ]:lSoftCR := .F. // HardCR
 
          if ::nCol > ::LineLen( ::nRow )
             ::AddLine( "", .F. )
@@ -1583,10 +1551,10 @@ METHOD K_Return() CLASS HBEditor
          ::aText[ ::nRow + 1 ]:cText
 
          ::aText[ ::nRow ]:lSoftCR := .F.
-         
+
          if ::LineLen( ::nRow + 1 ) >= ::nWordWrapCol
             ::SplitLine( ::nRow + 1 )
-         endif   
+         endif
 
        ELSE
          ::InsertLine( Substr( ::aText[ ::nRow ]:cText, ::nCol ), .F., ::nRow + 1 )
@@ -1601,9 +1569,9 @@ METHOD K_Return() CLASS HBEditor
            ::lDirty := .T.
            ::AddLine( "", .F. )
         ENDIF
-        
+
      ENDIF
-     
+
    ENDIF
 
    // will also refresh
@@ -1683,7 +1651,7 @@ METHOD RemoveLine( nRow ) CLASS HBEditor
 
    if nRow <= ::naTextLen
       ADel( ::aText, nRow, .T. ) //  the 3rd parameter (.T.) resize array automatically.
-   	  ::naTextLen := Len( ::aText )
+      ::naTextLen := Len( ::aText )
    endif
 
 return Self
@@ -1693,10 +1661,10 @@ return Self
 // Return line of text
 //
 METHOD GetLine( nRow ) CLASS HBEditor
-Local cText,i,cChar
+LOCAL cText,i,cChar
 
    cText := ""
-//   cText := ::aText[ nRow ]:cText
+   // cText := ::aText[ nRow ]:cText
 
    if nRow > 0 .and. nRow <= ::naTextLen
       cText := StrTran(::aText[ nRow ]:cText,::cSoftCR,"")
@@ -1706,12 +1674,13 @@ Local cText,i,cChar
    // Clean all control characters.
    if !empty( cText )
       for i := 0 to 31
-          cChar := chr( i )
-          cText := StrTran(cText,cChar,"")
+         cChar := chr( i )
+         cText := StrTran( cText,cChar,"" )
       next
+
    endif
 
-Return cText
+RETURN cText
 
 //-------------------------------------------------------------------//
 
@@ -1752,10 +1721,10 @@ METHOD GotoLine( nRow ) CLASS HBEditor
          lRefresh := .t.
       endif
 
-      if lRefresh 
+      if lRefresh
          if ::lIsLeftScrolled == NIL .or. ::lIsLeftScrolled==.F.
            ::RefreshWindow()
-         endif  
+         endif
       endif
 
       if ::lIsLeftScrolled == NIL .or. ::lIsLeftScrolled==.F.
@@ -1763,7 +1732,7 @@ METHOD GotoLine( nRow ) CLASS HBEditor
       else
          ::SetPos( ::nTop + nRow - ::nFirstRow, ::nLeft + ::nCol - ::nFirstCol + ::nLeftScrollVal )
       endif
-      
+
    ENDIF
 
 RETURN Self
@@ -1783,7 +1752,7 @@ METHOD GotoCol( nCol ) CLASS HBEditor
       endif
 
       ::nCol := Min( ::nWordWrapCol+1, nCol )
-      
+
       // I need to move cursor if is past requested line number and if requested line is
       // inside first screen of text otherwise ::nFirstRow would be wrong
       //
@@ -1791,7 +1760,7 @@ METHOD GotoCol( nCol ) CLASS HBEditor
          ::nFirstCol := nCol
          ::RefreshWindow()
 
-      elseif (nCol - ::nFirstCol) >= ::nNumCols
+      elseif ( nCol - ::nFirstCol ) >= ::nNumCols
          ::nFirstCol := Max( 1, nCol - ::nNumCols + 1 )
          ::RefreshWindow()
 
@@ -1802,7 +1771,7 @@ METHOD GotoCol( nCol ) CLASS HBEditor
       else
          ::SetPos( ::Row(), ::nLeft + nCol - ::nFirstCol + ::nLeftScrollVal )
       endif
-      
+
    ENDIF
 
 RETURN Self
@@ -1820,8 +1789,8 @@ METHOD GotoPos( nRow, nCol, lRefresh ) CLASS HBEditor
       IF nRow < ::nFirstRow
          ::nFirstRow := nRow
          lRefresh := .T.
-      ELSEIF (nRow - ::nFirstRow) >= ::nNumRows
-         ::nFirstRow := Max(1, nRow - ::nNumRows + 1 )
+      ELSEIF ( nRow - ::nFirstRow ) >= ::nNumRows
+         ::nFirstRow := Max( 1, nRow - ::nNumRows + 1 )
          lRefresh := .T.
       ENDIF
       ::nRow := nRow
@@ -1841,7 +1810,7 @@ METHOD GotoPos( nRow, nCol, lRefresh ) CLASS HBEditor
          ::nFirstCol := Max( 1, nCol - ::nNumCols + 1 )
          lRefresh := .T.
       ENDIF
-      ::nCol := Min(::nWordWrapCol,nCol)
+      ::nCol := Min( ::nWordWrapCol,nCol )
    ENDIF
 
    IF lRefresh
@@ -1863,7 +1832,7 @@ METHOD SplitLine( nRow ) CLASS HBEditor
    LOCAL nFirstSpace,nCurSpace
    LOCAL cSplittedLine,cLine
    LOCAL nPosInWord,nStartRow
-   
+
    // Split something only if Word Wrapping is on
    if !::lWordWrap // .OR. ( ::LineLen( nRow ) <= ::nWordWrapCol )
       Return Self
@@ -1890,40 +1859,39 @@ METHOD SplitLine( nRow ) CLASS HBEditor
    nStartRow := nRow
    cLine := GetParagraph( Self, nRow )
 
-
-   while Len( cLine ) > ::nWordWrapCol 
+   while Len( cLine ) > ::nWordWrapCol
 
       // Added + 1 because it is possible that line ends when there is a space
       // next to nWordWrapCol
       // Split line at first space before current position
 
-      nFirstSpace := ::nWordWrapCol + 1 
+      nFirstSpace := ::nWordWrapCol + 1
 
       while nFirstSpace > 0 .and. SubStr( cLine, nFirstSpace, 1 ) != " "
-            nFirstSpace -= 1
+         nFirstSpace -= 1
       enddo
 
       // If there is a space before beginning of line split there
       if nFirstSpace > 0
          cSplittedLine := Left( cLine, nFirstSpace )
-      else
 
+      else
          if Len( cLine ) > ::nWordWrapCol
             cSplittedLine := Left( cLine, ::nWordWrapCol+1 )
          else
             cSplittedLine := Left( cLine, ::nWordWrapCol )
-         endif   
+         endif
 
       endif
-      
+
       // We must not trim the line as split occurs next to a space
       // Insert splitted line in next row.
       ::InsertLine( cSplittedLine, .T., nStartRow++ )  // insert line with SoftCR
-      
+
       cLine := SubStr( cLine, Len( cSplittedLine ) + 1 )
-      
+
    enddo
-  
+
    ::InsertLine( cLine, NIL, nStartRow++ )  // insert line without SoftCR/HardCR
 
    // re-count words and see where current word has gone.
@@ -1953,7 +1921,7 @@ METHOD SplitLine( nRow ) CLASS HBEditor
       ::RefreshWindow()
    ENDIF
 
-RETURN Self     
+RETURN Self
 
 //-------------------------------------------------------------------//
 //
@@ -1968,7 +1936,7 @@ RETURN Self
 
 METHOD KeyboardHook( nKey )  CLASS HBEditor
 
-return Self
+RETURN Self
 
 //-------------------------------------------------------------------//
 //
@@ -1982,7 +1950,7 @@ return Self
 
 METHOD SetColor( cColorString ) CLASS HBEditor
 
-    local cOldColor := ::cColorSpec
+    LOCAL cOldColor := ::cColorSpec
 
     if cColorString <> nil
        ::cColorSpec := cColorString
@@ -1994,7 +1962,7 @@ return cOldColor
 
 METHOD Hilite() CLASS HBEditor
 
-   local cEnhanced := ""
+   LOCAL cEnhanced := ""
 
    // Swap CLR_STANDARD and CLR_ENHANCED
    cEnhanced += __StrToken( ::cColorSpec, 2, "," ) +  ","
@@ -2008,7 +1976,7 @@ return Self
 
 METHOD DeHilite() CLASS HBEditor
 
-   local cStandard := ""
+   LOCAL cStandard := ""
 
    // Swap CLR_STANDARD and CLR_ENHANCED back to their original position inside cColorSpec
    cStandard += __StrToken( ::cColorSpec, 2, "," ) +  ","
@@ -2028,7 +1996,7 @@ METHOD SetPos( nRow, nCol ) CLASS HBEditor
    ::nPhysRow := nRow
 
    if ::lIsLeftScrolled == NIL .or. ::lIsLeftScrolled == .F.
-      ::nPhysCol := nCol 
+      ::nPhysCol := nCol
    else
       ::nPhysCol := nCol - ::nLeftScrollVal
    endif
@@ -2040,10 +2008,9 @@ METHOD SetPos( nRow, nCol ) CLASS HBEditor
    if ::nPhysCol > ::nRight
       ::nPhyscol := ::nRight
    endif
-   
+
    SetPos( ::nPhysRow, ::nPhysCol )
 
-   
 Return ::nPhysRow
 
 //-------------------------------------------------------------------//
@@ -2051,33 +2018,35 @@ Return ::nPhysRow
 // Changes lInsert value and insertion / overstrike mode of editor
 //
 METHOD InsertState( lInsState ) CLASS HBEditor
-
-Local nCurCol,nCurRow
+   LOCAL nCurCol,nCurRow
 
    IF ISLOGICAL( lInsState )
       ::lInsert := lInsState
-      SET( _SET_INSERT, lInsState )
-      nCurCol := ::Col()
-      nCurRow := ::Row()
-      if ::lInsert
-         if SET(_SET_SCOREBOARD)
-          	::cScreenArea := SaveScreen(0,60,0,67)
-	      	@0,60 say '<insert>'
-	      endif
-          ::nCurrentCursor := SC_INSERT
-          SetCursor( ::nCurrentCursor ) 
-      else
-	      if SET(_SET_SCOREBOARD)
-	      	if !empty(::cScreenArea)
-          		RestScreen(0,60,0,67,::cScreenArea)
-            	::cScreenArea := ""
-            endif
-         endif
-         ::nCurrentCursor := ::nOrigCursor
-         SetCursor( ::nCurrentCursor ) // in overstrike mode, restore original cursor.
-	  endif
 
-     SetPos(nCurRow,nCurCol)
+      SET( _SET_INSERT, lInsState )
+
+      ::nCurrentCursor := if( ::lInsert, 1, 2 ) // SC_INSERT, SC_OVERSTRIKE )
+
+      if SET( _SET_SCOREBOARD )
+         nCurCol := ::Col()
+         nCurRow := ::Row()
+         SetCursor( SC_NONE )
+
+         if ::lInsert
+            ::cScreenArea := SaveScreen( 0,60,0,67 )
+            @ 0,60 say '<insert>'
+
+         else
+            if !empty( ::cScreenArea )
+               RestScreen( 0,60,0,67,::cScreenArea )
+               ::cScreenArea := ""
+            endif
+
+         endif
+         SetPos( nCurRow,nCurCol )
+      endif
+
+      SetCursor( ::nCurrentCursor )
 
    ENDIF
 
@@ -2087,31 +2056,29 @@ return Self
 //
 // Converts an array of text lines to a String
 //
-METHOD GetText() CLASS HBEditor
-
 // Return String to Memoedit function if exit by pressing CTRL-Q
 // This string can be saved in the memo file.
-
+//
+METHOD GetText() CLASS HBEditor
    LOCAL cString,cLine
    LOCAL k,m
 
    cString := cLine := ""
-   k := m := 0
 
-    if ::naTextLen > 1
+   if ::naTextLen > 1
+      if ::lWordWrap
+         for k := 1 to ::naTextLen-1
+            cLine := ::aText[ k ]:cText + iif( Len(::aText[ k ]:cText) >= ::nWordWrapCol .or. ::IsSoftCR( k ) ,iif(::IsSoftCR( k ),::cSoftCR,::cHardCR),::cHardCR)
+            cString += cLine
+         next
 
-        if ::lWordWrap
-	       for k := 1 to ::naTextLen-1
-		      cLine := ::aText[ k ]:cText + iif( Len(::aText[ k ]:cText) >= ::nWordWrapCol .or. ::IsSoftCR( k ) ,iif(::IsSoftCR( k ),::cSoftCR,::cHardCR),::cHardCR)
-   		      cString += cLine
-	       next
-   	    else
-	       for k := 1 to ::naTextLen-1
-		      cLine := ::aText[ k ]:cText + ::cHardCR
-              cString += cLine
-	       next
-   	    endif
+      else
+         for k := 1 to ::naTextLen-1
+            cLine := ::aText[ k ]:cText + ::cHardCR
+            cString += cLine
+         next
 
+      endif
    endif
 
    // Last line or unique line does not need a EOL delimiter
@@ -2121,13 +2088,14 @@ METHOD GetText() CLASS HBEditor
    // swapping virtual tab-char by real tab-char
    m := RAt( ::cTabSpace , cString )
    While m > 0
-	   cString := Stuff( cString , m , ::nTabWidth , ::cTabChar )
-       m := RAt( ::cTabSpace , cString )
+      cString := Stuff( cString , m , ::nTabWidth , ::cTabChar )
+      m := RAt( ::cTabSpace , cString )
    enddo
 
 Return cString
 
 //-------------------------------------------------------------------//
+
 METHOD GetTextIndex() CLASS HBEditor
    LOCAL nPos := 0
    LOCAL oItem, nCount
@@ -2150,6 +2118,7 @@ METHOD GetTextIndex() CLASS HBEditor
 RETURN nPos
 
 //-------------------------------------------------------------------//
+
 METHOD LoadText( cString ) CLASS HBEditor
 
    ::aText := Text2Array( cString, self)
@@ -2166,9 +2135,10 @@ METHOD LoadText( cString ) CLASS HBEditor
 return Self
 
 //-------------------------------------------------------------------//
+
 METHOD LoadFile( cFileName ) CLASS HBEditor
 
-   local cString := ""
+   LOCAL cString := ""
 
    if File( cFileName )
       ::cFile := cFileName
@@ -2187,13 +2157,14 @@ METHOD LoadFile( cFileName ) CLASS HBEditor
    ::GoTop()
 
 return Self
+
 //-------------------------------------------------------------------//
 //
 // Saves file being edited, if there is no file name does nothing, returns .T. if OK
 //
 METHOD SaveFile() CLASS HBEditor
 
-   Local cString
+   LOCAL cString
 
    if !Empty( ::cFile )
       cString := ::GetText()
@@ -2204,10 +2175,12 @@ METHOD SaveFile() CLASS HBEditor
 return .F.
 
 //-------------------------------------------------------------------//
-METHOD DelWordRight() CLASS HBEditor
+//
 // Delete next word to right at cursor position. Called by pressing CTRL-T as Clipper.
- 
-   while ::nCol <= Min( ::nWordWrapCol, ::LineLen( ::nRow ) ) 
+//
+METHOD DelWordRight() CLASS HBEditor
+
+   while ::nCol <= Min( ::nWordWrapCol, ::LineLen( ::nRow ) )
 
       ::K_Del()
 
@@ -2215,54 +2188,56 @@ METHOD DelWordRight() CLASS HBEditor
 
       if SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) == " "
          exit
-      endif   
+      endif
 
    end
 
 RETURN Self
 
 //--------------------------------------------------------------------//
-METHOD AddTabCol( nCol , lAddTab ) CLASS HBEditor
 
-Local aTab
+METHOD AddTabCol( nCol , lAddTab ) CLASS HBEditor
+LOCAL aTab
 
     default lAddTab to .F.
 
-	aTab := ::aText[ ::nRow ]:aTabCol
+   aTab := ::aText[ ::nRow ]:aTabCol
 
-	if Len( aTab ) == 0 .or. AScan( aTab , nCol ) == 0 .or. ::lInsert
+   if Len( aTab ) == 0 .or. AScan( aTab , nCol ) == 0 .or. ::lInsert
 
-	   while ::lInsert .and. AScan( aTab, nCol ) > 0
- 	      nCol +=1
-	   end
+      while ::lInsert .and. AScan( aTab, nCol ) > 0
+          nCol +=1
+      end
 
-	   aadd( ::aText[ ::nRow ]:aTabCol , nCol )
+      aadd( ::aText[ ::nRow ]:aTabCol , nCol )
 
-	   if lAddTab
-	      ::AddVirtualTab( nCol )
-	   endif
+      if lAddTab
+         ::AddVirtualTab( nCol )
+      endif
 
-	endif
+   endif
 
 Return self
 //-------------------------------------------------------------------//
 
 METHOD DelTabCol( nCol ) CLASS HBEditor
 // Delete tab-mark from array-text.
-Local aTab
+LOCAL aTab
 
-	aTab := ::aText[ ::nRow ]:aTabCol
+   aTab := ::aText[ ::nRow ]:aTabCol
 
-	if Len(aTab) > 0 .and. AScan( aTab , nCol ) > 0
+   if Len(aTab) > 0 .and. AScan( aTab , nCol ) > 0
        ADel( ::aText[ ::nRow ]:aTabCol , nCol , .T. )
-	endif
+   endif
 
 Return self
 
 //-------------------------------------------------------------------//
-METHOD AddVirtualTab( nCol ) CLASS HBEditor
+//
 // Insert virtual tab spaces in tab mark column.
-Local aTab,i,nTabCol,cText
+//
+METHOD AddVirtualTab( nCol ) CLASS HBEditor
+LOCAL aTab,i,nTabCol,cText
 
    aTab  := ::aText[ ::nRow ]:aTabCol
    cText := ::aText[ ::nRow ]:cText
@@ -2270,8 +2245,8 @@ Local aTab,i,nTabCol,cText
    if Len( aTab ) > 0
       for i := Len( aTab ) to 1 step -1 // Tab mark
           nTabCol := aTab[i]
-		  if nTabCol == nCol
-          	 if SubStr( cText , nTabCol, Len(::cTabSpace) ) != ::cTabSpace .or. ::lInsert
+        if nTabCol == nCol
+              if SubStr( cText , nTabCol, Len(::cTabSpace) ) != ::cTabSpace .or. ::lInsert
                 cText := Stuff( cText , nTabCol , 0 , ::cTabSpace )
                 ::aText[ ::nRow ]:cText := cText
                 exit
@@ -2283,10 +2258,12 @@ Local aTab,i,nTabCol,cText
 Return self
 
 //-------------------------------------------------------------------//
-METHOD DelVirtualTab( nCol, nTabCol ) CLASS HBEditor
+//
 // Delete tab column from text-array. Delete virtual tab-spaces from text line and
 // Set the new position of cursor.
-Local cText
+//
+METHOD DelVirtualTab( nCol, nTabCol ) CLASS HBEditor
+LOCAL cText
 
    cText := ::aText[ ::nRow ]:cText
 
@@ -2301,75 +2278,75 @@ Local cText
 Return self
 
 //------------------------------------------------------------------//
-METHOD IsSoftCR( nRow ) CLASS HBEditor
+//
 // Return .t. or .f. is end of line is SoftCR
-Local lReturn := .F.
+//
+METHOD IsSoftCR( nRow ) CLASS HBEditor
+LOCAL lRet := .F.
 
-	if ::aText[ nRow ]:lSoftCR != NIL
-	   lReturn := ::aText[ nRow ]:lSoftCR
-	endif
+   if ::aText[ nRow ]:lSoftCR != NIL
+      lRet := ::aText[ nRow ]:lSoftCR
+   endif
 
-Return lReturn
+Return lRet
+
 //------------------------------------------------------------------//
-METHOD TabColPos( nCol ) CLASS HBEditor
+//
 // Return the real tab column if <nCol> is inside of tab area, otherwise return nil
-Local aTab,i,nTabCol,nRet
+//
+METHOD TabColPos( nCol ) CLASS HBEditor
+LOCAL aTab,i,nTabCol,nRet
 
     aTab := ::aText[ ::nRow ]:aTabCol
-    i := 0
-    nTabCol := 0
-    nRet := nil
 
-    if Len(aTab) > 0
+    if Len( aTab ) > 0
 
-        for i := Len( aTab ) to 1 step -1
-            nTabCol := aTab[i]
-            if nCol >= nTabCol .and. nCol <= ( nTabCol + ::nTabWidth - 1 )
-               nRet := nTabCol
-               exit
-          	endif
+       for i := Len( aTab ) to 1 step -1
+          nTabCol := aTab[ i ]
+          if nCol >= nTabCol .and. nCol <= ( nTabCol + ::nTabWidth - 1 )
+             nRet := nTabCol
+             exit
+          endif
        next
 
    endif
 
 Return nRet
 //-------------------------------------------------------------------//
-
-METHOD IsTabCol( nCol ) CLASS HBEditor
+//
 // Return true/false if <nCol> is within tab area.
-Local aTab,i,nTabCol,nRet
+//
+METHOD IsTabCol( nCol ) CLASS HBEditor
+LOCAL aTab,i,nTabCol,lRet
 
     aTab := ::aText[ ::nRow ]:aTabCol
-    i := nTabCol := 0
-    nRet := .F.
+    lRet := .F.
 
-    if Len(aTab) > 0
-
-        for i := Len( aTab ) to 1 step -1
-            nTabCol := aTab[i]
-            if nCol >= nTabCol .and. nCol <= ( nTabCol + ::nTabWidth - 1 )
-               nRet := .T.
-               exit
-          	endif
+    if Len( aTab ) > 0
+       for i := Len( aTab ) to 1 step -1
+          nTabCol := aTab[ i ]
+          if nCol >= nTabCol .and. nCol <= ( nTabCol + ::nTabWidth - 1 )
+             lRet := .T.
+             exit
+          endif
        next
+    endif
 
-   endif
+Return lRet
 
-Return nRet
 //-------------------------------------------------------------------//
 
 METHOD RefreshTabCol( ) CLASS HBEditor
-
-Local aTab,i,cLine,cChar
+LOCAL aTab,i,cLine,cChar
 
    aTab := {}
    cLine := ::aText[ ::nRow ]:cText
 
    i := RAt( ::cTabSpace , cLine )
    While i > 0
-       aadd( aTab , i )
-	   cLine := Stuff( cLine , i , ::nTabWidth , "")
-       i := RAt( ::cTabSpace , cLine )
+      aadd( aTab , i )
+      cLine := Stuff( cLine , i , ::nTabWidth , "" )
+      i := RAt( ::cTabSpace , cLine )
    enddo
 
    ::aText[ ::nRow ]:aTabCol := aTab
@@ -2379,68 +2356,66 @@ Return self
 //-------------------------------------------------------------------//
 
 METHOD ScrollLeft() Class HBEditor
+LOCAL i,nStart
 
-Local i,nStart
+   if ::nWordWrapCol >= ::nNumCols
 
-if ::nWordWrapCol >= ::nNumCols 
+      nStart := ::nFirstCol + ::nLeftScrollVal
 
- nStart := ::nFirstCol + ::nLeftScrollVal 
+      if ::lIsLeftScrolled == NIL .or. ::lIsLeftScrolled == .F.
 
- if ::lIsLeftScrolled == NIL .or. ::lIsLeftScrolled == .F. 
+         ::lIsLeftScrolled := .T.
 
-    ::lIsLeftScrolled := .T.
- 
-    Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight, , ::nLeftScrollVal )
+         Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight, , ::nLeftScrollVal )
 
-    if ::naTextLen > 1
+         if ::naTextLen > 1
 
-       for i := 0 to Min( ::nNumRows - 1, ::naTextLen - 1 )
-           DispOutAt( ::nTop + i, ::nLeft, PadR( SubStr( ::GetLine( ::nFirstRow + i ), nStart, ::nNumCols ), ::nNumCols ), ::LineColor( ::nFirstRow + i ) )
-       next
+            for i := 0 to Min( ::nNumRows - 1, ::naTextLen - 1 )
+               DispOutAt( ::nTop + i, ::nLeft, PadR( SubStr( ::GetLine( ::nFirstRow + i ), nStart, ::nNumCols ), ::nNumCols ), ::LineColor( ::nFirstRow + i ) )
+            next
 
-    endif
+         endif
 
-    ::RefreshLine()
+         ::RefreshLine()
 
-    ::nFirstCol += ::nLeftScrollVal 
-    ::nCol := Max( ::LineLen( ::nRow ), ::nWordWrapCol ) + 1
+         ::nFirstCol += ::nLeftScrollVal
+         ::nCol := Max( ::LineLen( ::nRow ), ::nWordWrapCol ) + 1
 
-    if ::nCol > ::nWordWrapCol + 1
-       ::nCol := ::nWordWrapCol + 1
-    endif
+         if ::nCol > ::nWordWrapCol + 1
+            ::nCol := ::nWordWrapCol + 1
+         endif
 
-    ::SetPos( ::Row(), ::nLeft + ::nCol - ::nFirstCol + ::nLeftScrollVal )
+         ::SetPos( ::Row(), ::nLeft + ::nCol - ::nFirstCol + ::nLeftScrollVal )
 
- endif
+      endif
 
+   else
 
-else
+      ::lIsLeftScrolled := .F.
 
-    ::lIsLeftScrolled := .F.
+      if ::nCol+1 == ::nWordWrapCol+1
+         ::GotoCol( ::nCol + 1 )
+         ::RefreshLine()
+      elseif ::nCol == ::nWordWrapCol+1
+         ::K_Return()
+         ::GotoPos( ::nRow, ::nCol+1, .T. )
+      endif
 
-    if ::nCol+1 == ::nWordWrapCol+1
-       ::GotoCol( ::nCol + 1 )
-       ::RefreshLine()
-    elseif ::nCol == ::nWordWrapCol+1
-       ::K_Return() 
-       ::GotoPos( ::nRow, ::nCol+1, .T. )
-    endif
+   endif
 
-endif
- 
 Return self
 
 //--------------------------------------------------------------------//
-Method _ShowPos() Class HBEditor 
-
+//
 // Show cursor position in screen and text arrray.
 // Called by Edit method. It should be used only in test mode.
-
-Local nRow,nCol
+//
+Method _ShowPos() Class HBEditor
+LOCAL nRow,nCol
 
    nRow := ::Row()
    nCol := ::Col()
-   
+
    // Test mode only.
    if ::nBottom < maxrow()-2
       @ maxrow()-2,0 say space( maxcol() )
@@ -2483,9 +2458,10 @@ Return self
 // Rebuild a long line from multiple short ones ( wrapped at soft CR )
 //
 //-------------------------------------------------------------------//
-
-STATIC function GetParagraph( oSelf, nRow )
+//
 // Called by SplitLine method.
+//
+STATIC function GetParagraph( oSelf, nRow )
 
    LOCAL cLine := ""
 
@@ -2496,9 +2472,9 @@ STATIC function GetParagraph( oSelf, nRow )
       // a different line each time I add it to cLine
       oSelf:RemoveLine( nRow )
 
-	  if nRow > oSelf:naTextLen
-	     exit
-	  endif
+     if nRow > oSelf:naTextLen
+        exit
+     endif
 
    enddo
 
@@ -2516,9 +2492,10 @@ return cLine
 // Returns EOL char ( be it either CR or LF ,both or SoftCR )
 //
 //-------------------------------------------------------------------//
+
 STATIC function WhichEOL( cString, oSelf )
 
-Local nCRPos,nLFPos,nSoftCRPos,nHardCRPos,cEOL
+   LOCAL nCRPos,nLFPos,nSoftCRPos,nHardCRPos,cEOL
 
    nSoftCRPos := At( oSelf:cSoftCR , cString )
    nHardCRPos := At( oSelf:cHardCR , cString )
@@ -2547,19 +2524,20 @@ Return cEOL
 // Converts a string to an array of strings splitting input string at EOL boundaries
 //
 //-------------------------------------------------------------------//
+
 STATIC function Text2Array( cString, oSelf )
 
-   Local nFirstSpace
-   Local i,j,k
-   Local cSplittedLine,cLine,cLine2,cChar,cTab
-   Local lHardCR,lSoftCR,lEOL
-   Local aArray,aTab,aHardCR,aSoftCR
+   LOCAL nFirstSpace
+   LOCAL i,j,k
+   LOCAL cSplittedLine,cLine,cLine2,cChar,cTab
+   LOCAL lHardCR,lSoftCR,lEOL
+   LOCAL aArray,aTab,aHardCR,aSoftCR
 
-   cChar := cLine := cLine2 := cSplittedLine := ""
-   lSoftCR := lHardCR := lEOL := .F.
-   aArray := aTab := aHardCR := {}
+   cChar   := cLine   := cLine2  := cSplittedLine := ""
+   lSoftCR := lHardCR := lEOL    := .F.
+   aArray  := aTab    := aHardCR := {}
+
    i := j:= k := nFirstSpace := 0
-  
 
    if IsNil( cString ) //.or. Len( cString ) == 0
       return aArray
@@ -2567,129 +2545,121 @@ STATIC function Text2Array( cString, oSelf )
 
    For i := 1 to Len( cString )
 
-	   lEOL := .F.
-	   lHardCR := lSoftCR := .F.
+      lEOL := .F.
+      lHardCR := lSoftCR := .F.
 
-       cLine := ""
-	   cLine2 += SubStr( cString, i, 1 )
+      cLine := ""
+      cLine2 += SubStr( cString, i, 1 )
 
-	   lHardCR := iif( RAt( oSelf:cHardCR, cLine2 ) > 0 , .T., .F. )
-	   lSoftCR := iif( RAt( oSelf:cSoftCR, cLine2 ) > 0 , .T., .F. )
+      lHardCR := iif( RAt( oSelf:cHardCR, cLine2 ) > 0 , .T., .F. )
+      lSoftCR := iif( RAt( oSelf:cSoftCR, cLine2 ) > 0 , .T., .F. )
 
-	   // if end of line
-	   if (lHardCR .or. lSoftCR)
-		  cLine := cLine2
-          lEOL  := .T.
-	   elseif i == Len( cString ) // Last line or first and unique line or end of file.
-		  cLine := cLine2
-          lEOL  := .T.
-	   endif
+      // if end of line
+      if (lHardCR .or. lSoftCR)
+         cLine := cLine2
+         lEOL  := .T.
+      elseif i == Len( cString ) // Last line or first and unique line or end of file.
+         cLine := cLine2
+         lEOL  := .T.
+      endif
 
-	   if lEOL .and. Len(cLine) > 0
+      if lEOL .and. Len(cLine) > 0
 
-	      cLine2 := ""
+         cLine2 := ""
 
-		  // save tab position.
-	      aTab := {}
-		  for j := 1 to Len( cLine )
-          	  cChar := SubStr( cLine, j, Len( oSelf:cTabChar ) )
-		      if  cChar == oSelf:cTabChar
-		          aadd(aTab,j)
-			  endif
-		  next
+        // save tab position.
+         aTab := {}
+         for j := 1 to Len( cLine )
+            cChar := SubStr( cLine, j, Len( oSelf:cTabChar ) )
+            if cChar == oSelf:cTabChar
+               aadd(aTab,j)
+            endif
+         next
 
-		  // replace tab-char by virtual tab-space
-		  for k := Len(aTab) to 1 step -1
-		      cLine := Stuff( cLine, aTab[k], 1, oSelf:cTabSpace )
-		  next
+         // replace tab-char by virtual tab-space
+         for k := Len(aTab) to 1 step -1
+            cLine := Stuff( cLine, aTab[k], 1, oSelf:cTabSpace )
+         next
 
-		  // save only HardCR position in line. SoftCR always in in last position of the line.
-	      aHardCR := {}
-		  for j := 1 to Len( cLine )
-          	  cChar := SubStr( cLine, j, Len( oSelf:cHardCR ) )
-		      if  cChar == oSelf:cHardCR
-		          aadd(aHardCR,j)
-			  endif
-		  next
+         // save only HardCR position in line. SoftCR always in in last position of the line.
+         aHardCR := {}
+         for j := 1 to Len( cLine )
+            cChar := SubStr( cLine, j, Len( oSelf:cHardCR ) )
+            if cChar == oSelf:cHardCR
+               aadd( aHardCR,j )
+            endif
+         next
 
-		  // if any Tab position is greater than HardCR, this can occur when
-		  // nTabWidt was increased.
-	      for j := 1 to Len( aHardCR )
-			  for k := 1 to Len( aTab )
-			      if aTab[ k ] > aHardCR[ j ]
-				     aTab[ k ] -= Len(oSelf:cHardCR)
-				  endif
-			  next
-		  next
+         // if any Tab position is greater than HardCR, this can occur when
+         // nTabWidt was increased.
+         for j := 1 to Len( aHardCR )
+            for k := 1 to Len( aTab )
+               if aTab[ k ] > aHardCR[ j ]
+                  aTab[ k ] -= Len(oSelf:cHardCR)
+               endif
+            next
+         next
 
-   	      lHardCR := (At( oSelf:cHardCR, cLine ) > 0)
+         lHardCR := (At( oSelf:cHardCR, cLine ) > 0)
 
-		  // extracting HardCR and SoftCR.
-	      cLine := StrTran( cLine, oSelf:cHardCR, "")
-	      cLine := StrTran( cLine, oSelf:cSoftCR, "")
+         // extracting HardCR and SoftCR.
+         cLine := StrTran( cLine, oSelf:cHardCR, "")
+         cLine := StrTran( cLine, oSelf:cSoftCR, "")
 
-		  // Split line.
-		  if Len( cLine ) > oSelf:nWordWrapCol
+         // Split line.
+         if Len( cLine ) > oSelf:nWordWrapCol
 
-         		while !Empty( cLine )
+            while !Empty( cLine )
 
-            		// Split line at nWordWrapCol boundary
-            		if Len( cLine ) > oSelf:nWordWrapCol
+               // Split line at nWordWrapCol boundary
+               if Len( cLine ) > oSelf:nWordWrapCol
+                  nFirstSpace := oSelf:nWordWrapCol+1
 
-               			nFirstSpace := oSelf:nWordWrapCol+1
+                  while nFirstSpace > 0 .and. SubStr( cLine, nFirstSpace ,1 ) != " "
+                     nFirstSpace -= 1
+                  enddo
 
-               			while nFirstSpace > 0 .and. SubStr( cLine, nFirstSpace ,1 ) != " "
-                 			nFirstSpace -= 1
-               			enddo
+                  if nFirstSpace > 0
+                     cSplittedLine := Left( cLine, nFirstSpace )
 
-               			if nFirstSpace > 0 
+                  else
+                     if Len( cLine ) > oSelf:nWordWrapCol
+                        cSplittedLine := Left( cLine, oSelf:nWordWrapCol+1 )
+                     else
+                        cSplittedLine := Left( cLine, oSelf:nWordWrapCol )
+                     endif
 
-                           cSplittedLine := Left( cLine, nFirstSpace )
+                  endif
 
-               			else
+                  aadd( aArray, HBTextLine():New( cSplittedLine, .T. , aTab ) )  // SoftCR
 
-               			   if Len( cLine ) > oSelf:nWordWrapCol
-                  		      cSplittedLine := Left( cLine, oSelf:nWordWrapCol+1 )
-               			   else
-                  		      cSplittedLine := Left( cLine, oSelf:nWordWrapCol )
-                  		   endif
+                  cLine := LTrim( SubStr( cLine, Len( cSplittedLine )+1 ) )
 
-               			endif
-      
-            			aadd( aArray, HBTextLine():New( cSplittedLine, .T. , aTab ) )  // SoftCR
+               else
+                  if lHardCR
+                     // remainder of line is shorter than split point
+                     aadd( aArray, HBTextLine():New( cLine, .F. ) ) // HardCR
+                     // Done.
+                     exit
+                  else
+                     cLine2 += cLine
+                     cLine := ""
+                  endif
+               endif
+            enddo
 
-           			    cLine := LTrim( SubStr( cLine, Len( cSplittedLine )+1 ) )
-       
-            		else
-            		
-            		    if lHardCR
-               			  // remainder of line is shorter than split point
-             			  aadd( aArray, HBTextLine():New( cLine, .F. ) ) // HardCR
-               			  // Done.
-         			      exit
-            		    else
-        		          cLine2 += cLine
-                          cLine := "" 
-                        endif
-            		endif
+         // cLine is shorter than...
+         else
 
-        		enddo
-
-			// cLine is shorter than...
-      		else
-
-				if lHardCR
-           		   aadd( aArray, HBTextLine():New( cLine, .F. , aTab ) )
-				elseif lSoftCR
-           		   aadd( aArray, HBTextLine():New( cLine, .T. , aTab ) )
-				else
-           		   aadd( aArray, HBTextLine():New( cLine, NIL , aTab ) )
-				endif
-
-      		endif
-
-	   	endif
-
+            if lHardCR
+               aadd( aArray, HBTextLine():New( cLine, .F. , aTab ) )
+            elseif lSoftCR
+               aadd( aArray, HBTextLine():New( cLine, .T. , aTab ) )
+            else
+               aadd( aArray, HBTextLine():New( cLine, NIL , aTab ) )
+            endif
+         endif
+      endif
    Next
 
 Return aArray
@@ -2704,10 +2674,8 @@ STATIC procedure BrowseText( oSelf, nPassedKey )
    LOCAL nKey,bKeyBlock
 
    while ! oSelf:lExitEdit
-
       // If I haven't been called with a key already preset, evaluate this key and then exit
       if nPassedKey == NIL
-
          if NextKey() == 0
             oSelf:IdleHook()
          endif
@@ -2715,6 +2683,7 @@ STATIC procedure BrowseText( oSelf, nPassedKey )
          nKey := InKey( 0 )
       else
          nKey = nPassedKey
+
       endif
 
       if ( bKeyBlock := Setkey( nKey ) ) <> NIL
@@ -2725,13 +2694,13 @@ STATIC procedure BrowseText( oSelf, nPassedKey )
       // ******* modified to add exit with K_LEFT when in non-edit mode
       if nKey == K_ESC .or. nkey == iif( oSelf:lToggleCTRL_WQ, K_CTRL_Q, K_CTRL_W )
          oSelf:lExitEdit := .T.
+
       else
          if !oSelf:MoveCursor( nKey )
             oSelf:KeyboardHook( nKey )
+
          endif
-
       endif
-
    enddo
 
 return
