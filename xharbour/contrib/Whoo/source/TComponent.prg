@@ -1,5 +1,5 @@
 /*
- * $Id: TComponent.prg,v 1.3 2002/10/16 21:17:00 fsgiudice Exp $
+ * $Id: TComponent.prg,v 1.4 2002/11/05 21:39:58 what32 Exp $
  */
 
 /*
@@ -106,10 +106,35 @@ ENDCLASS
 METHOD Create( oOwner ) CLASS TComponent
 
    oOwner:InsertComponent( Self )
-   
+
 RETURN( Self )
 
 
-METHOD InsertComponent( oOwner ) CLASS TComponent
-   
-RETURN( Self )
+METHOD InsertComponent( oComponent ) CLASS TComponent
+
+  //oComponent.ValidateContainer(Self)
+
+  //ValidateRename( oComponent, '', oComponent:FName )
+
+  ::Insert(oComponent)
+
+  oComponent.SetReference(True)
+  //IF And( csDesigning, ComponentState )
+  //   oComponent:SetDesigning(True)
+  //ENDIF
+
+  //Notification( oComponent, opInsert )
+
+Return NIL
+
+METHOD Insert( oComponent ) CLASS TComponent
+
+  IF ::FComponents == NIL
+     ::FComponents := {}
+  ENDIF
+
+  aAdd( ::FComponents, oComponent )
+
+  oComponent:FOwner := Self
+
+Return NIL
