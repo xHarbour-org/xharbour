@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2002/12/23 20:08:25 lculik Exp $
+# $Id: Makefile,v 1.5 2002/12/24 00:46:05 lculik Exp $
 #
 
 ROOT = ../
@@ -60,6 +60,7 @@ PRG_HEADERS=\
 	getexit.ch   \
 	hbclass.ch   \
 	hbcommon.ch  \
+	hbcompress.ch\
 	hbextern.ch  \
 	hbgetcmt.ch  \
 	hbinkey.ch   \

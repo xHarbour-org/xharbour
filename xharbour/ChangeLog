@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.699 2003/02/11 10:19:21 druzus Exp $
+ * $Id: ChangeLog,v 1.700 2003/02/11 11:23:18 what32 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,44 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-12-11 02:10 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+  * source/rtl/Makefile
+  + source/rtl/hbcompress.c
+    + Added compression routines based on a xharbour rearrangement
+      of original (and free) zlib compression code.
+      HB_COMPRESS( cSource [, nSourceLen ] ) --> cDest
+      HB_COMPRESS( nComprFactor, cSource [,nSourceLen ] ) --> cDest
+      HB_COMPRESS( cSource, nSourceLen, @cDest, @nDestLen ) --> nError
+      HB_COMPRESS( nComprFactor, cSource, nSourceLen, @cDest, @nDestLen ) 
+            --> nError
+            
+      HB_UNCOMPRESS( nDestLen, cSource [, nSourceLen ] ) --> cDest
+      HB_UNCOMPRESS( nDestLen, cSource, nSourceLen, @cDest ) --> nError
+      
+      HB_COMPRESSERROR() --> nError
+      HB_COMPRESSERRORDESC() -->cDesc
+      HB_COMPRESSBUFLEN( nUncompressedLen )--> nDefaultBufLen
+
+      There are some latest/minor fixes in memory allocation to
+      be made, but the thing is working, and can only get better.
+      Stream oriented incremental compression can also be achieved
+      in the future (just wrapping the zlib a little more.
+
+  * include/Makefile
+  + include/hbcompress.h
+    + RTL specific compilation headers
+
+  + include/hbcompress.ch
+    * PRG level definitions for usage with zlib. Not required, but
+      useful (e.g. errror level meanings).
+  
+  + tests/compress.prg
+    + A test for basic string compression functions
+
 2003-02-11 03:20 UTC-0800 Augusto Infante <august213@sbcglobal.net>
    * source/rtl/seconds.c
      * Removed (void) parameter in line 150   " d = hb_dateSeconds(  ); "
- 
+
 
 2003-02-11 02:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * source/rtl/diskspac.c
@@ -34,7 +68,7 @@
   * source/pp/ppcore.c
     * allow to compile file with <CR><LF> on *nix platforms.
       It's dirty hack but works good for me and resolves one of the
-      most important problem with common CLIPPER and Harbour 
+      most important problem with common CLIPPER and Harbour
       (and other XBASE compatible compilers like FlagShip and CLIP)
       sources - only [x]Harbour cannot compile files with <CR>.
 

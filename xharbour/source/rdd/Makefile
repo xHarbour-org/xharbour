@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2003/01/10 16:13:05 jonnymind Exp $
+# $Id: Makefile,v 1.4 2003/01/12 22:50:20 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -27,7 +27,7 @@ PRG_SOURCES=\
 	rddsys.prg \
  
 ifeq ($(HB_MT),MT)
-   MT_LIBNAME=rddmt
+   LIBNAME=rddmt
 endif
 
 LIBNAME=rdd
