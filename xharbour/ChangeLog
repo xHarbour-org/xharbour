@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1377 2003/08/23 10:48:20 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1378 2003/08/24 23:55:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-25 18:10 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/lib.cf
+    * small modification for building only MT library
+  
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx2.h
+    ! fixed bug which could appear when user add new order to old
+      index file with free pages
+    + Codepage support extended - now you can use different codepages
+      in all work area
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * small indent modification
 
 2003-08-24 16:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * include/hbapi.h

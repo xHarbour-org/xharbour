@@ -1,5 +1,5 @@
 #
-# $Id: lib.cf,v 1.3 2003/04/22 08:12:55 mauriliolongo Exp $
+# $Id: lib.cf,v 1.4 2003/06/17 00:54:33 druzus Exp $
 #
 
 ifneq ($(HB_ARCHITECTURE),)
@@ -9,7 +9,9 @@ include $(TOP)$(ROOT)config/global.cf
 include $(TOP)$(ROOT)config/c.cf
 include $(TOP)$(ROOT)config/prg.cf
 
+ifneq ($(LIBNAME),)
 LIB_NAME := $(LIB_PREF)$(LIBNAME)$(LIB_EXT)
+endif
 ifneq ($(MT_LIBNAME),)
 ifeq ($(HB_MT),MT)
 MT_LIB_NAME := $(LIB_PREF)$(MT_LIBNAME)$(LIB_EXT)
@@ -35,7 +37,11 @@ ALL_OBJS = $(ALL_C_OBJS) $(ALL_PRG_OBJS)
 ifeq ($(MT_LIB_NAME),)
 first:: dirbase descend
 else
+ifeq ($(LIB_NAME),)
+first:: dirbase_mt descend_mt
+else
 first:: dirbase dirbase_mt descend descend_mt
+endif
 endif
 
 descend :

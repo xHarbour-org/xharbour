@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.57 2003/08/01 15:32:35 mlombardo Exp $
+ * $Id: dbfntx1.c,v 1.58 2003/08/07 20:23:34 druzus Exp $
  */
 
 /*
@@ -128,8 +128,8 @@
 #include "hbapilng.h"
 #include "hbrddntx.h"
 #ifndef HB_CDP_SUPPORT_OFF
-#  include "hbapicdp.h"
-extern PHB_CODEPAGE s_cdpage;
+   #include "hbapicdp.h"
+   extern PHB_CODEPAGE s_cdpage;
 #endif
 #define __PRG_SOURCE__ __FILE__
 
@@ -2446,7 +2446,7 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
    USHORT uiCurLen;
    char szBuffer[ HB_MAX_DOUBLE_LENGTH + 1 ];
    char * pszTempName = NULL;
-   NTXAREAP pArea;
+   NTXAREAP pArea = pIndex->Owner;
    LPTAGINFO pTag;
    HB_MACRO_PTR pMacro;
    PHB_ITEM pItem;
@@ -2458,15 +2458,10 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
    BOOL fValidBuffer;
 #ifndef HB_CDP_SUPPORT_OFF
    PHB_CODEPAGE cdpTmp = s_cdpage;
-#endif
-
-   ulRecCount = pIndex->Owner->ulRecCount;
-   pArea = pIndex->Owner;
-
-#ifndef HB_CDP_SUPPORT_OFF
    s_cdpage = pArea->cdPage;
 #endif
 
+   ulRecCount = pArea->ulRecCount;
    pTag = pIndex->CompoundTag;
    pItem = hb_itemNew( NULL );
 

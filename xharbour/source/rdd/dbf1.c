@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.34 2003/07/05 22:11:09 lculik Exp $
+ * $Id: dbf1.c,v 1.35 2003/08/07 17:29:54 lculik Exp $
  */
 
 /*
@@ -582,9 +582,9 @@ static void hb_dbfGetMemo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       *pBuffer = '\0';
 
    hb_itemPutCPtr( pItem, ( char * ) pBuffer, ulSize );
-   #ifndef HB_CDP_SUPPORT_OFF
-   hb_cdpTranslate( pItem->item.asString.value, pArea->cdPage,s_cdpage );
-   #endif
+#ifndef HB_CDP_SUPPORT_OFF
+   hb_cdpTranslate( pItem->item.asString.value, pArea->cdPage, s_cdpage );
+#endif
    hb_itemSetCMemo( pItem );
 }
 
