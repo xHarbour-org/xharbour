@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.26 2004/07/28 20:56:18 druzus Exp $
+ * $Id: workarea.c,v 1.27 2004/08/19 00:51:46 druzus Exp $
  */
 
 /*
@@ -283,7 +283,11 @@ ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
       {
          case 'C':
             pFieldInfo.uiType = HB_IT_STRING;
+#ifdef HB_C52_STRICT
+            pFieldInfo.uiLen = uiLen;
+#else
             pFieldInfo.uiLen = uiLen + uiDec * 256;
+#endif
             break;
 
          case 'L':

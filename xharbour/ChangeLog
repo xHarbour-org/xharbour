@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3329 2004/08/23 15:39:49 druzus Exp $
+ * $Id: ChangeLog,v 1.3330 2004/08/23 22:41:28 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-24 02:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/workarea.c
+    * do not use DBS_DEC part in character fields when HB_C52_STRICT set
+
+2004-08-24 02:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbstrux.prg
+    ! fixed bug in __dbCreate() which cause multiple interpretation
+      of DBS_DEC in character fields by __dbCreate() and later by RDD
 
 2004-08-24 00:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/tests/i18ntest.prg

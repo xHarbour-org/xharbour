@@ -1,5 +1,5 @@
 /*
- * $Id: dbstrux.prg,v 1.2 2002/05/21 16:43:05 horacioroldan Exp $
+ * $Id: dbstrux.prg,v 1.3 2003/03/08 01:30:46 horacioroldan Exp $
  */
 
 /*
@@ -143,7 +143,8 @@ FUNCTION __dbCreate( cFileName, cFileFrom, cRDDName, lNew, cAlias )
          ENDIF
 
          AEval( aStruct, {| aField | iif( aField[ DBS_TYPE ] == "C" .AND. aField[ DBS_DEC ] != 0, ;
-            aField[ DBS_LEN ] := aField[ DBS_LEN ] + aField[ DBS_DEC ] * 256, NIL ) } )
+            ( aField[ DBS_LEN ] += aField[ DBS_DEC ] * 256, ;
+              aField[ DBS_DEC ] := 0 ), NIL ) } )
 
          dbCreate( cFileName, aStruct, cRDDName )
          dbUseArea( lNew, cRDDName, cFileName, cAlias )
