@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: grid.prg,v 1.1 2003/04/07 18:20:28 jonnymind Exp $
+   $Id: grid.prg,v 1.2 2003/04/07 22:06:39 jonnymind Exp $
 
    Grid Pane class.
    The child objects are arranged in a fixed size grid,
@@ -16,12 +16,10 @@
 #include "xwt.ch"
 
 CLASS XWTGrid FROM XWTLayContainer
-   DATA nRows
-   DATA nCols
-
    METHOD New( iRows, iCols )
    METHOD Attach( oChild, nFromRow, nFromCol, nRowWidth, nColWidth )
    METHOD Add( oChild )
+   METHOD SetPadding( nRowPad, nColPad )
 ENDCLASS
 
 METHOD New(iRows, iCols ) CLASS XWTGrid
@@ -36,15 +34,17 @@ METHOD New(iRows, iCols ) CLASS XWTGrid
       iCols := 1
    ENDIF
 
-   ::nRows := iRows
-   ::nCols := iCols
-   XWT_SetProperty( ::oRawWidget, XWT_PROP_COLROWS, iCols, iRows )
+  XWT_SetProperty( ::oRawWidget, XWT_PROP_COLROWS, iCols, iRows )
 RETURN Self
 
-METHOD Attach( oChild, nFromRow, nFromCol, nWidth, nHeight ) CLASS XWTGrid
+METHOD Attach( oChild, nFromRow, nFromCol, nHeight, nWidth ) CLASS XWTGrid
    LOCAL bRes
 
-   bRes := XWT_FastRiseEvent( XWT_E_ADDCHILD, Self, oChild )
+   IF ValType( oChild ) != "O"
+      ? "ERROR"
+   ENDIF
+
+   bRes := .not. XWT_FastRiseEvent( XWT_E_ADDCHILD, Self, oChild )
 
    IF bRes
       IF ValType( nWidth ) != 'N'
@@ -56,9 +56,9 @@ METHOD Attach( oChild, nFromRow, nFromCol, nWidth, nHeight ) CLASS XWTGrid
       ENDIF
 
       bRes := XWT_SetProperty( ::oRawWidget, XWT_PROP_ATTACH, ;
-         { oChild, nFromRow, nFromCol, nWidth, nHeight } )
+               { oChild:oRawWidget, nFromRow, nFromCol, nHeight, nWidth} )
       IF bRes
-         AAdd( oChildren, oChild )
+         AAdd( ::aChildren, oChild )
          oChild:oOwner := Self
       ENDIF
    ENDIF
@@ -68,3 +68,6 @@ RETURN bRes
 
 METHOD Add( oChild ) CLASS XWTGrid
 RETURN ::Attach( oChild, 1, 1, ::nRows, ::nCols )
+
+METHOD SetPadding( nRowPad, nColPad ) CLASS XWTGrid
+RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_PADDING, nRowPad, nColPad )

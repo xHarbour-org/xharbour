@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_layout.c,v 1.2 2003/04/07 15:41:08 jonnymind Exp $
+   $Id: xwt_gtk_layout.c,v 1.3 2003/04/07 18:20:33 jonnymind Exp $
 
    Layout - Horizontal or vertical layout manager
 */
@@ -21,7 +21,10 @@ PXWT_WIDGET xwt_gtk_createLayout( PHB_ITEM pSelf )
    gtkLayout = ( PXWT_GTK_LAYOUT ) hb_xgrab( sizeof( XWT_GTK_LAYOUT ) );
    gtkLayout->iMode = -1; // still undefined
    gtkLayout->frame = NULL; // no frame for now
-   gtkLayout->container = NULL; // still not available
+   gtkLayout->align = NULL; // no frame for now
+   gtkLayout->iHAlign = XWT_ALIGN_CENTER; // no frame for now
+   gtkLayout->iVAlign = XWT_ALIGN_TOP; // no frame for now
+   gtkLayout->main_widget = NULL; // still not available
    gtkLayout->owner = pSelf->item.asArray.value;
 
    gtkLayout->iPadding = 0;
@@ -34,7 +37,7 @@ PXWT_WIDGET xwt_gtk_createLayout( PHB_ITEM pSelf )
    // no widget for now.
    xwtData->widget_data = (void *) gtkLayout;
    xwtData->destructor = hb_xfree;
-   xwtData->get_main_widget = container_get_mainwidget;
+   xwtData->get_main_widget = xwt_gtk_get_mainwidget_base;
    xwtData->get_top_widget = container_get_topwidget;
 
    return xwtData;
@@ -53,14 +56,14 @@ BOOL xwt_gtk_layout_create_with_mode( PXWT_WIDGET wWidget, int mode  )
    lay->iMode = mode;
    if ( mode == XWT_LM_HORIZ )
    {
-      lay->container = gtk_hbox_new( FALSE, 0 );
+      lay->main_widget = gtk_hbox_new( FALSE, 0 );
    }
    else
    {
-      lay->container = gtk_vbox_new( FALSE, 0 );
+      lay->main_widget = gtk_vbox_new( FALSE, 0 );
    }
 
-   gtk_widget_show( lay->container );
+   gtk_widget_show( lay->main_widget );
 
    return TRUE;
  }

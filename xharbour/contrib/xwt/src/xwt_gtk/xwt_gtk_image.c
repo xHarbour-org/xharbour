@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_image.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: xwt_gtk_image.c,v 1.1 2003/04/07 10:27:45 jonnymind Exp $
 
    GTK interface - Clickable image widget
 */
@@ -48,22 +48,6 @@ static gboolean
 }
 */
 
-static void *image_mainwidget( void *data )
-{
-   PXWT_GTK_IMAGE img = (PXWT_GTK_IMAGE) data;
-   return img->image;
-}
-
-static void *image_topwidget( void *data )
-{
-   PXWT_GTK_IMAGE img = (PXWT_GTK_IMAGE) data;
-   if ( img->evt_window != NULL )
-   {
-      return img->evt_window;
-   }
-
-   return img->image;
-}
 
 static void image_destroy( void *data )
 {
@@ -80,19 +64,23 @@ PXWT_WIDGET xwt_gtk_createImage( PHB_ITEM pSelf )
    PXWT_WIDGET xwtData;
    PXWT_GTK_IMAGE imgdata = (PXWT_GTK_IMAGE) hb_xgrab( sizeof( XWT_GTK_IMAGE ) );
 
-   imgdata->image = GTK_IMAGE( gtk_image_new () );
-   imgdata->evt_window = NULL;
+   imgdata->main_widget = gtk_image_new();
+   imgdata->align = imgdata->evt_window = NULL;
+   imgdata->iVAlign = XWT_ALIGN_CENTER;
+   imgdata->iHAlign = XWT_ALIGN_CENTER;
+   xwt_gtk_set_alignment( (PXWT_GTK_ALIGN) imgdata );
+
    imgdata->pixmap = NULL;
    imgdata->owner = pSelf->item.asArray.value;
    imgdata->filename = NULL;
-   gtk_widget_show( GTK_WIDGET( imgdata->image ) );
+   gtk_widget_show( GTK_WIDGET( imgdata->main_widget ) );
 
    XWT_CREATE_WIDGET( xwtData );
    xwtData->type = XWT_TYPE_IMAGE;
    xwtData->widget_data = imgdata;
    xwtData->destructor = image_destroy;
-   xwtData->get_main_widget = image_mainwidget;
-   xwtData->get_top_widget = image_topwidget;
+   xwtData->get_main_widget = xwt_gtk_get_mainwidget_base;
+   xwtData->get_top_widget = xwt_gtk_get_topwidget_sensible;
 
    return xwtData;
 }
@@ -107,10 +95,10 @@ BOOL xwt_gtk_imageLoad( PXWT_WIDGET wSelf, const char *filename )
       imgdata->filename = NULL;
    }
 
-   gtk_image_set_from_file( imgdata->image , filename );
+   gtk_image_set_from_file( GTK_IMAGE( imgdata->main_widget ) , filename );
 
    /* An invalid load will default to the stock icon "broken image" */
-   if ( gtk_image_get_storage_type( imgdata->image ) != GTK_IMAGE_STOCK )
+   if ( gtk_image_get_storage_type( GTK_IMAGE( imgdata->main_widget) ) != GTK_IMAGE_STOCK )
    {
       imgdata->filename = (char *) hb_xgrab( strlen( filename ) + 1 );
       strcpy( imgdata->filename, filename );
@@ -122,18 +110,19 @@ BOOL xwt_gtk_imageLoad( PXWT_WIDGET wSelf, const char *filename )
 BOOL xwt_gtk_image_setSensible( PXWT_WIDGET wSelf )
 {
    PXWT_GTK_IMAGE imgSelf = ( PXWT_GTK_IMAGE ) wSelf->widget_data;
+   GtkWidget *evt;
 
    if ( imgSelf->evt_window != NULL )
    {
       return FALSE;
    }
 
-   imgSelf->evt_window = gtk_event_box_new ();
-   gtk_container_add (GTK_CONTAINER (imgSelf->evt_window), GTK_WIDGET( imgSelf->image ));
+   evt = gtk_event_box_new();
+   gtk_container_add (GTK_CONTAINER (evt),GTK_WIDGET( wSelf->get_top_widget( wSelf->widget_data ) ));
 
-   g_signal_connect (G_OBJECT (imgSelf->evt_window),"button_press_event",
+   g_signal_connect (G_OBJECT (evt),"button_press_event",
                       G_CALLBACK (button_press_callback), imgSelf->owner);
-
-   gtk_widget_show( imgSelf->evt_window );
+   gtk_widget_show( evt );
+   imgSelf->evt_window = evt;
    return TRUE;
 }

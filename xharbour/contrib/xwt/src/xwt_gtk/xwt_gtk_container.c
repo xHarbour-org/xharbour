@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_pane.c,v 1.2 2003/04/07 15:41:08 jonnymind Exp $
+   $Id: xwt_gtk_container.c,v 1.1 2003/04/07 18:20:32 jonnymind Exp $
 
    Abstract container management.
 */
@@ -11,20 +11,18 @@
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 
-void *container_get_mainwidget( void *data )
-{
-   PXWT_GTK_CONTAINER lay = (PXWT_GTK_CONTAINER ) data;
-   return lay->container;
-}
-
 void *container_get_topwidget( void *data )
 {
-   PXWT_GTK_CONTAINER lay = (PXWT_GTK_CONTAINER ) data;
-   if ( lay->frame != NULL)
+   PXWT_GTK_CONTAINER widget = (PXWT_GTK_CONTAINER ) data;
+   if ( widget->frame != NULL)
    {
-      return lay->frame;
+      return widget->frame;
    }
-   return lay->container;
+   if ( widget->align != NULL )
+   {
+      return widget->align;
+   }
+   return widget->main_widget;
 }
 
 BOOL xwt_gtk_container_set_box( PXWT_WIDGET wWidget )
@@ -37,7 +35,7 @@ BOOL xwt_gtk_container_set_box( PXWT_WIDGET wWidget )
       return FALSE;
    }
 
-   lay->frame = xwt_gtk_enframe( lay->container );
+   lay->frame = xwt_gtk_enframe( wWidget->get_top_widget( wWidget->widget_data ) );
    return TRUE;
 }
 
@@ -45,6 +43,7 @@ BOOL xwt_gtk_container_set_box( PXWT_WIDGET wWidget )
 BOOL xwt_gtk_container_reset_box( PXWT_WIDGET wWidget )
 {
    PXWT_GTK_CONTAINER lay = (PXWT_GTK_CONTAINER ) wWidget->widget_data;
+   GtkWidget *oldFrame;
 
    //if we haven't a box...
    if ( lay->frame == NULL )
@@ -52,8 +51,11 @@ BOOL xwt_gtk_container_reset_box( PXWT_WIDGET wWidget )
       return FALSE;
    }
 
-   xwt_gtk_deframe( lay->frame, lay->container );
+   oldFrame = lay->frame;
    lay->frame = NULL;
+
+   xwt_gtk_deframe( oldFrame, wWidget->get_top_widget( wWidget->widget_data ) );
+
    return TRUE;
 }
 

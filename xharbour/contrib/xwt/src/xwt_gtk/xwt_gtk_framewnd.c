@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_framewnd.c,v 1.2 2003/03/28 14:44:40 gian Exp $
+   $Id: xwt_gtk_framewnd.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    GTK interface - Frame window
 */
@@ -49,9 +49,14 @@ PXWT_WIDGET xwt_gtk_createFrameWindow(PHB_ITEM pSelf )
    gtk_container_add (GTK_CONTAINER (frame->window), frame->vbox);
 
    /* Now we create the menu bar */
+   frame->menu_box = gtk_handle_box_new();
+   gtk_box_pack_start(GTK_BOX(frame->vbox), frame->menu_box, FALSE, FALSE, 0 );
+   gtk_widget_show (frame->menu_box);
+
    frame->menu_bar = gtk_menu_bar_new ();
-   gtk_box_pack_start(GTK_BOX(frame->vbox), frame->menu_bar, FALSE, FALSE, 0 );
-   gtk_widget_show (frame->menu_bar);
+   gtk_container_add( GTK_CONTAINER( frame->menu_box ), frame->menu_bar );
+   gtk_widget_show( frame->menu_box );
+   gtk_widget_show( frame->menu_bar );
 
    /* Create a void grid of 1,1 as the central widget, for now.
       Inside this central area, many widgets can then find place.*/
@@ -105,7 +110,7 @@ void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
    for ( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
    {
       PHB_ITEM pMenuItem = pBaseArray->pItems + ulPos;
-      
+
       printf("Setting menu item\r\n");
       hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
       xwtData = (PXWT_WIDGET) HB_VM_STACK.Return.item.asPointer.value;

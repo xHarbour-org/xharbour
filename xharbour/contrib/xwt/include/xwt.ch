@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.3 2003/04/07 18:20:26 jonnymind Exp $
+   $Id: xwt.ch,v 1.4 2003/04/07 22:06:21 jonnymind Exp $
 
    Definitions
 */
@@ -53,7 +53,7 @@
 #define XWT_PROP_RESOURCE  21 // Char * or number depending driver
 
 #define XWT_PROP_LAYMODE   30 // numeric, 0 or 1 (horiz/vert)
-#define XWT_PROP_PADDING   31 // numeric
+#define XWT_PROP_PADDING   31 // numeric ( RowPad, ColPad (size) for GRID )
 #define XWT_PROP_EXPAND    32 // BOOL
 #define XWT_PROP_FILL      33 // BOOL
 #define XWT_PROP_HOMOGENEOUS  34 // BOOL
@@ -61,7 +61,10 @@
 #define XWT_PROP_BORDER    36    // Numeric
 
 #define XWT_PROP_ATTACH    40 // Pseudo prop: {child, row, col, width, height}
-#define XWT_PROP_COLROWS   41 // width, height 
+#define XWT_PROP_COLROWS   41 // width, height
+#define XWT_PROP_SHRINK    42 // BOOL
+
+#define XWT_PROP_IMAGE     50 // text
 
 #define XWT_PROP_FIXED      100 // bool
 #define XWT_PROP_MODAL      101 // bool

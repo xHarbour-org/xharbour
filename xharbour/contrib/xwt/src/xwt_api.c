@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.3 2003/04/07 15:41:07 jonnymind Exp $
+   $Id: xwt_api.c,v 1.4 2003/04/07 22:06:39 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -192,6 +192,7 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_HOMOGENEOUS:
       case XWT_PROP_EXPAND:
       case XWT_PROP_FILL:
+      case XWT_PROP_SHRINK:
       case XWT_PROP_BOX:
          prop.value.setting = hb_parl( 3 );
       break;
@@ -205,27 +206,42 @@ HB_FUNC( XWT_SETPROPERTY )
 
       //Size parameter
       case XWT_PROP_SIZE:
+      case XWT_PROP_COLROWS:
          prop.value.size.width = hb_parni( 3 );
          prop.value.size.height = hb_parni( 4 );
       break;
 
       //Text parameters
       case XWT_PROP_TEXT:
+      case XWT_PROP_IMAGE:
       case XWT_PROP_NAME:
          prop.value.text = hb_parc( 3 );
       break;
 
       //Numeric parameters
       case XWT_PROP_VISIBILITY:
-      case XWT_PROP_PADDING:
       case XWT_PROP_LAYMODE:
       case XWT_PROP_BORDER:
          prop.value.number = hb_parni( 3 );
       break;
 
+      // Numeric or size
+      case XWT_PROP_PADDING:
+         if ( wSelf->type == XWT_TYPE_GRID )
+         {
+            prop.value.size.width = hb_parni( 4 );
+            prop.value.size.height = hb_parni( 3 );
+         }
+         else
+         {
+            prop.value.number = hb_parni( 3 );
+         }
+      break;
+
       //Array
       case XWT_PROP_SETMENUBAR:
       case XWT_PROP_RSTMENUBAR:
+      case XWT_PROP_ATTACH:
          prop.value.data = hb_param( 3, HB_IT_ARRAY );
          if ( prop.value.data == NULL )
          {
@@ -267,6 +283,7 @@ HB_FUNC( XWT_GETPROPERTY )
       case XWT_PROP_MODAL:
       case XWT_PROP_HOMOGENEOUS:
       case XWT_PROP_EXPAND:
+      case XWT_PROP_SHRINK:
       case XWT_PROP_FILL:
       case XWT_PROP_BOX:
          if( pParam1 != NULL )
@@ -299,6 +316,7 @@ HB_FUNC( XWT_GETPROPERTY )
 
       //Text parameters
       case XWT_PROP_TEXT:
+      case XWT_PROP_IMAGE:
       case XWT_PROP_NAME:
          if( pParam1 != NULL )
          {
@@ -309,7 +327,6 @@ HB_FUNC( XWT_GETPROPERTY )
 
       //Numeric parameters
       case XWT_PROP_VISIBILITY:
-      case XWT_PROP_PADDING:
       case XWT_PROP_LAYMODE:
       case XWT_PROP_BORDER:
          if( pParam1 != NULL )
@@ -318,9 +335,24 @@ HB_FUNC( XWT_GETPROPERTY )
             bRet = TRUE;
          }
       break;
+
+
+      case XWT_PROP_PADDING:
+         if ( wSelf->type == XWT_TYPE_GRID  && pParam1 != NULL && pParam2 != NULL )
+         {
+            hb_itemPutNI( pParam1, prop.value.size.height );
+            hb_itemPutNI( pParam2, prop.value.size.width );
+            bRet = TRUE;
+         }
+         else if( pParam1 != NULL )
+         {
+            hb_itemPutNI( pParam1, prop.value.size.height );
+            bRet = TRUE;
+         }
+      break;
    }
 
-   hb_retl( TRUE );
+   hb_retl( bRet );
 }
 
 

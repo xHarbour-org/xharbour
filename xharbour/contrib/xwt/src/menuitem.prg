@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: menuitem.prg,v 1.2 2003/03/28 14:44:40 gian Exp $
+   $Id: menuitem.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Menuitem class.
 */
@@ -15,7 +15,8 @@ CLASS XWTMenuItem FROM XWTWidget
    DATA nId
    
    METHOD New( cStr, nId, oCalled, oMethod )
-   
+   METHOD SetIcon( cFileName )
+
 ENDCLASS
 
 METHOD New( cStr, nId, oCalled, oMethod ) CLASS XWTMenuItem
@@ -32,3 +33,7 @@ METHOD New( cStr, nId, oCalled, oMethod ) CLASS XWTMenuItem
    ENDIF
 
 RETURN Self
+
+METHOD SetIcon( cFileName ) CLASS XWTMenuItem
+RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_IMAGE, cFilename )
+

@@ -6,6 +6,7 @@ PROCEDURE MAIN()
    LOCAL oWindow, oButton, oMenuItem, oMenu, oMenuHelp
    LOCAL oMenuSec, oPane, oTextbox, oLabel
    LOCAL oImg, oHlay, oVLay
+   LOCAL oGrid
 
    XwtInit()
    altd()
@@ -48,20 +49,35 @@ PROCEDURE MAIN()
 
    oVLay:Add( oPane )
 
+
+   /* A beautiful GRID */
+   oGrid := XwtGrid():New(2,3)
+   oLabel := XwtLabel():New("Field label")
+
+   oGrid:setPadding( 2, 10 )
+   oGrid:SetFill( .T. )
+
+   oGrid:Attach( oLabel, 1, 2 )
+   oGrid:Attach( XwtLabel():New("Field 2"), 2, 2 )
+
+   oGrid:SetExpand( .T. )
+   oGrid:Attach( XwtTextBox():New("Data 1"), 1, 3 )
+   oGrid:Attach( XwtTextBox():New("Data 2"), 2, 3 )
+
+   oGrid:SetBox( .T.,"A Grid " )
+
+   oVLay:Add( oGrid )
+
    /*** IMAGE ***/
    oImg := XwtImage():New( "icon.png" )
    oImg:SetSensible()
    oVLay:add( oImg )
 
-   /*** Showing window ***/
-   oWindow:Resize( 200, 200 )
-   oWindow:Show()
-   oWindow:AddListener( @WindowReceive() )
-
    /***** MENU design *****/
    oMenu := XwtMenu():New( "File" )
 
    oMenuItem := XwtMenuItem():New( "Op_en", 1 , @FileEvent())
+   oMenuItem:SetIcon( "valley.png" )
 
    oMenu:Add( oMenuItem )
    oMenu:Add( XwtMenuItem():New( "Close", 2 , @FileEvent()))
@@ -77,6 +93,10 @@ PROCEDURE MAIN()
    oMenuHelp:Add( XwtMenuItem():New( "Help", 6 , @FileEvent()) )
 
    oWindow:SetMenuBar( { oMenu, oMenuHelp } )
+   /*** Showing window ***/
+   oWindow:Resize( 200, 200 )
+   oWindow:Show()
+   oWindow:AddListener( @WindowReceive() )
 
    /*** Main LOOP ***/
    XwtMainLoop()

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_menuitem.c,v 1.2 2003/03/28 14:44:40 gian Exp $
+   $Id: xwt_gtk_menuitem.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Menu item managemetn
 */
@@ -26,23 +26,42 @@ static void *mi_get_topwidget( void *data )
 
 PXWT_WIDGET xwt_gtk_createMenuItem( PHB_ITEM pSelf )
 {
-   GtkWidget *menuitem;
    PXWT_WIDGET xwtData;
-      
-   menuitem = gtk_menu_item_new ();
-   // add a container to the window
+   PXWT_GTK_MENUITEM menuitem;
 
-   g_signal_connect (G_OBJECT (menuitem), "activate", G_CALLBACK (mi_activate),
-      pSelf->item.asArray.value );
-   
-   gtk_widget_show( menuitem );
+   menuitem = (PXWT_GTK_MENUITEM) hb_xgrab( sizeof( XWT_GTK_MENUITEM ) );
+
+   menuitem->main_widget = gtk_menu_item_new ();
+   menuitem->hbox = gtk_hbox_new( FALSE, 2 );
+   menuitem->image = gtk_image_new();
+   menuitem->label = gtk_label_new("");
+   menuitem->align = gtk_alignment_new( 0.0, 0.5, 0.0, 0.0 );
+   gtk_container_add( GTK_CONTAINER( menuitem->hbox), menuitem->image );
+   gtk_container_add( GTK_CONTAINER( menuitem->hbox ), menuitem->label );
+   gtk_container_add( GTK_CONTAINER( menuitem->align), menuitem->hbox );
+
+   gtk_container_add( GTK_CONTAINER( menuitem->main_widget), menuitem->align );
+
+   gtk_widget_show( menuitem->hbox );
+   gtk_widget_show( menuitem->label );
+   gtk_widget_show( menuitem->image );
+   gtk_widget_show( menuitem->align );
+
+
+   // add a container to the window
+   menuitem->owner = pSelf->item.asArray.value;
+   g_signal_connect (G_OBJECT (menuitem->main_widget), "activate", G_CALLBACK (mi_activate),
+      menuitem->owner );
+
+   gtk_widget_show( menuitem->main_widget );
 
    // no need for destructor, the data is just our widget for now
    XWT_CREATE_WIDGET( xwtData );
    xwtData->type = XWT_TYPE_MENUITEM;
    xwtData->widget_data = menuitem;
-   xwtData->destructor = NULL;
-   xwtData->get_main_widget = xwtData->get_top_widget = xwt_gtk_get_topwidget_neuter;
+   xwtData->destructor = hb_xfree;
+   xwtData->get_main_widget = xwt_gtk_get_topwidget_base;
+   xwtData->get_top_widget = xwt_gtk_get_topwidget_base;
 
    return xwtData;
 }

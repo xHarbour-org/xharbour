@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: image.prg,v 1.1 2003/04/01 22:36:27 gian Exp $
+   $Id: image.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Pane class. A basic void container.
    (Container is an abstract class, and have not a DRV method)
@@ -32,7 +32,7 @@ METHOD New( cFilename ) CLASS XWTImage
 RETURN Self
 
 METHOD Load( cFilename ) CLASS XWTImage
-   LOCAL bRet := XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cFilename )
+   LOCAL bRet := XWT_SetProperty( ::oRawWidget, XWT_PROP_IMAGE, cFilename )
    IF bRet
       ::iStatus := XWT_IMG_READY
    ENDIF
