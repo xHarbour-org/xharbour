@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.16 2004/11/21 21:44:19 druzus Exp $
+ * $Id: math.c,v 1.17 2005/02/15 21:06:27 andijahja Exp $
  */
 
 /*
@@ -229,6 +229,8 @@ int hb_mathErrSet( double dResult, double arg1, double arg2, char * szFunc, int 
          }
 #if defined(HB_OS_SUNOS)
          else if ( !finite( dResult ) )
+#elif defined(HB_OS_OS2)
+         else if ( !isfinite( dResult ) )
 #else
          else if ( isinf( dResult ) )
 #endif
@@ -668,7 +670,7 @@ HB_FUNC (EXP)
       if ( hb_mathIsMathErr() )
 #endif
       {
-         /* the C-RTL provides a kind of matherr() mechanism */ 
+         /* the C-RTL provides a kind of matherr() mechanism */
          int iLastError = hb_mathGetLastError( &hb_exc );
          if( iLastError != HB_MATH_ERR_NONE )
          {
@@ -716,7 +718,7 @@ HB_FUNC (LOG)
       if ( hb_mathIsMathErr() )
 #endif
       {
-         /* the C-RTL provides a kind of matherr() mechanism */ 
+         /* the C-RTL provides a kind of matherr() mechanism */
          int iLastError = hb_mathGetLastError( &hb_exc );
          if( iLastError != HB_MATH_ERR_NONE )
          {
@@ -768,7 +770,7 @@ HB_FUNC( SQRT )
       if ( hb_mathIsMathErr() )
 #endif
       {
-         /* the C-RTL provides a kind of matherr() mechanism */ 
+         /* the C-RTL provides a kind of matherr() mechanism */
          int iLastError = hb_mathGetLastError( &hb_exc );
          if( iLastError != HB_MATH_ERR_NONE )
          {
