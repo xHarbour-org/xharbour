@@ -32,6 +32,19 @@
 
 CLASS TButton FROM TControl
 
+   DATA Caption INIT  "Button"
+   DATA Left    INIT   0
+   DATA Top     INIT   0
+   DATA Width   INIT  80
+   DATA Height  INIT  24
+   DATA Style   INIT  WS_CHILD+WS_VISIBLE+WS_TABSTOP+BS_PUSHBUTTON
+
+   DATA lRegister PROTECTED INIT .F.
+   DATA lControl  PROTECTED INIT .T.
+   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
+   DATA WndProc   PROTECTED INIT 'ControlProc'
+   DATA Name      PROTECTED INIT "button"
+
    METHOD New() CONSTRUCTOR
 
 ENDCLASS
@@ -40,18 +53,12 @@ ENDCLASS
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TButton
       
-   ::Name      := 'button'
-   ::id        := nId
-   ::lRegister := .F.
-   ::lControl  := .T.
-   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_SIZE,WM_MOVE}, ::Msgs )
-   ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
    ::Caption   := cCaption
+   ::id        := nId
    ::Left      := nLeft
    ::Top       := nTop
-   ::Width     := IFNIL( nWidth , IFNIL( ::Width , 80, ::Width ), nWidth )
-   ::Height    := IFNIL( nHeight, IFNIL( ::height, 24, ::height), nHeight)
-   ::Style     := WS_CHILD + WS_VISIBLE + WS_TABSTOP + BS_PUSHBUTTON
+   ::Width     := IFNIL( nWidth , ::Width , nWidth )
+   ::Height    := IFNIL( nHeight, ::height, nHeight)
  
    RETURN( super:new( oParent ) )
 
