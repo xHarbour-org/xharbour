@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.24 2003/12/23 22:52:47 druzus Exp $
+# $Id: make_tgz.sh,v 1.25 2004/01/02 17:22:44 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -76,22 +76,13 @@ VERBOSE=YES
 DELTMP=YES
 EOF
 
-# Create PP
-pushd tests
-$HB_BIN_INSTALL/${hb_pref}mk pp -n -w -D_DEFAULT_INC_DIR=\"${_DEFAULT_INC_DIR}\"
-install -m755 -s pp $HB_BIN_INSTALL/pp
-ln -s pp $HB_BIN_INSTALL/pprun
-install -m644 rp_dot.src $HB_INC_INSTALL/
-install -m644 rp_run.src $HB_INC_INSTALL/
-rm -f pp
-popd
-
 # check if we should rebuild tools with shared libs
 if [ "${hb_lnkso}" = yes ]
 then
     export L_USR="-L${HB_LIB_INSTALL} -l${name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11"
+    export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
 
-    for utl in hbmake hbrun hbpp hbdoc hbtest hbdict
+    for utl in hbmake hbrun hbpp hbdoc hbtest hbdict xbscript
     do
         pushd utils/${utl}
         rm -fR "./${HB_ARCHITECTURE}"
@@ -100,6 +91,8 @@ then
         popd
     done
 fi
+ln -s xbscript ${HB_BIN_INSTALL}/pprun
+ln -s xbscript ${HB_BIN_INSTALL}/xprompt
 
 tar -czvf "${hb_archfile}" --owner=root --group=root -C "${HB_INST_PREF}" .
 rm -fR "${HB_INST_PREF}"

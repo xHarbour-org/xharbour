@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.53 2004/03/09 01:00:57 likewolf Exp $
+# $Id: xharbour.spec,v 1.54 2004/04/30 19:42:22 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -355,22 +355,14 @@ fi
 [ "%{?_with_odbc:1}" ]    || rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libhbodbc.a
 [ "%{?_with_allegro:1}" ] || rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libgtalleg.a
 
-# Create PP
-pushd tests
-$HB_BIN_INSTALL/%{hb_pref}mk pp -n -w -D_DEFAULT_INC_DIR=\"${_DEFAULT_INC_DIR}\"
-install -m755 -s pp $HB_BIN_INSTALL/pp
-ln -s pp $HB_BIN_INSTALL/pprun
-install -m644 rp_dot.src $HB_INC_INSTALL/
-install -m644 rp_run.src $HB_INC_INSTALL/
-popd
-
 # check if we should rebuild tools with shared libs
 if [ "%{hb_lnkso}" = yes ]
 then
     unset HB_GTALLEG
     export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11"
     #export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11 %{?_with_allegro: %(allegro-config --static)}"
-    for utl in hbmake hbrun hbpp hbdoc
+    export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
+    for utl in hbmake hbrun hbpp hbdoc xbscript
     do
         pushd utils/${utl}
         rm -fR "./${HB_ARCHITECTURE}"
@@ -379,6 +371,8 @@ then
         popd
     done
 fi
+ln -s xbscript ${HB_BIN_INSTALL}/pprun
+ln -s xbscript ${HB_BIN_INSTALL}/xprompt
 
 # remove unused files
 rm -f ${HB_BIN_INSTALL}/hbdoc ${HB_BIN_INSTALL}/hbtest
@@ -579,9 +573,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %files pp
 %defattr(-,root,root,755)
-%doc tests/pp.txt
-%{prefix}/bin/pp
+%doc utils/xbscript/xbscript.txt
+%{prefix}/bin/xbscript
 %{prefix}/bin/pprun
+%{prefix}/bin/xprompt
 
 ######################################################################
 ## Spec file Changelog.
