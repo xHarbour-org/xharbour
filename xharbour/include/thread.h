@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.77 2003/12/19 16:14:01 jonnymind Exp $
+* $Id: thread.h,v 1.78 2003/12/19 16:36:41 jonnymind Exp $
 */
 
 /*
@@ -337,11 +337,8 @@ typedef struct tag_HB_STACK
    USHORT uiCurrArea;        /* Selectd area */
    LPAREANODE pCurrArea;  /* Pointer to a selected and valid area */
 
-   struct tag_HB_STACK *next;
-
-
    /* Background per-thread jobs */
-   PHB_ITEM *pBackgroundTasks;
+   struct HB_BACKGROUNDTASK_ **pBackgroundTasks;
    BOOL bIamBackground;
    USHORT uiBackgroundTask;
    USHORT uiBackgroundMaxTask;
@@ -355,6 +352,8 @@ typedef struct tag_HB_STACK
    void **pCleanUpParam;
    int iCleanCount;
 #endif
+
+   struct tag_HB_STACK *next;
 
 } HB_STACK;
 

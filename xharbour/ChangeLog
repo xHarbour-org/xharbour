@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1946 2003/12/26 15:56:03 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.1947 2003/12/26 17:20:52 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-27 03:40 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/bkgtsks.c
+    * Completed background tasks.
+      Added a structure contains all informations about tasks.
+      Now we have time in milliseconds after the task will be executed
+      and Active flag that defines if the task has to be executed or not.
+    on C level
+    * ULONG hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive )
+      Add a new task:
+      - pBlock     = can be a codeblock or an array as defined in hb_ExecFromArray()
+      - nMillisec  = number of milliseconds the task have to run, default 0 = always run
+      - bActive    = .T. the task is active
+    + BOOL hb_backgroundActive( ULONG ulID, BOOL bActive )
+    + int hb_backgroundTime( ULONG ulID, int nMillisec )
+    + PHB_BACKGROUNDTASK hb_backgroundFind( ULONG ulID )
+      internal function that returns the task
+    on PRG level
+    * hb_BackgroundAdd( bBlock|aArray, nMillisec, lActive ) --> nID
+    + hb_backgroundActive( nID, lActive ) --> lOldActive
+    + hb_backgroundTime( nID, nMillisec ) --> nOldTime
+
+  * source/vm/hvm.c
+    * Changed background counter to 1000 vm exec.
+  * include/hbapi.h
+    + added support for new background functions and HB_BACKGROUNDTASK structure
+  * include/thread.h
+    * changed support for background defines
+  * tests/bkgtest.prg
+    * Updated with new and complete tests
 
 2003-12-26 22:46 utc+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * source/rtl/gtwvt/gtwvt.c
