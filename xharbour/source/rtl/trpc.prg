@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.1 2003/04/03 04:15:16 ronpinkas Exp $
+ * $Id: trpc.prg,v 1.12 2003/04/13 11:16:27 jonnymind Exp $
  */
 
 /*
@@ -1158,10 +1158,11 @@ METHOD Accept() CLASS tRPCService
       skIn := InetAccept( ::skServer )
       // todo: better sync
       IF InetStatus( ::skServer ) < 0
-         InetDestroy( skIn )
          EXIT
       ENDIF
-      ::StartService( skIn )
+      IF skIn != NIL
+         ::StartService( skIn )
+      ENDIF
    ENDDO
 RETURN .T.
 

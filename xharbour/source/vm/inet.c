@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.21 2003/03/16 15:03:37 jonnymind Exp $
+* $Id: inet.c,v 1.22 2003/03/18 00:39:02 jonnymind Exp $
 */
 
 /*
@@ -80,7 +80,6 @@ int hb_selectReadSocket( HB_SOCKET_STRUCT *Socket )
 
    FD_ZERO( &set );
    FD_SET(Socket->com, &set);
-
 
    if ( Socket->timeout == -1 )
    {
@@ -1209,6 +1208,7 @@ HB_FUNC( INETSENDALL )
    HB_STACK_UNLOCK;
    HB_TEST_CANCEL_ENABLE_ASYN;
 
+   iLen = 0;
    while( iSent < iSend )
    {
       iBufferLen = HB_SENDRECV_BUFFER_SIZE > iSend - iSent ? iSend - iSent : HB_SENDRECV_BUFFER_SIZE;
@@ -1462,7 +1462,8 @@ HB_FUNC( INETACCEPT )
 {
    PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
    HB_SOCKET_STRUCT *Socket, *NewSocket;
-   HB_SOCKET_T incoming;
+   HB_SOCKET_T incoming = 0;
+   int iError = EAGAIN;
    struct sockaddr_in si_remote;
 
    #if defined(HB_OS_WIN_32)
@@ -1494,43 +1495,61 @@ HB_FUNC( INETACCEPT )
    HB_SOCKET_ZERO_ERROR( Socket );
 
    HB_STACK_UNLOCK;
-   HB_TEST_CANCEL_ENABLE_ASYN;
    /* Connection incoming */
-   if( hb_selectReadSocket( Socket ) )
+
+   while ( iError == EAGAIN )
    {
-      /* On error (e.g. async connection closed) , com will be -1 and
-         errno == 22 (invalid argument ) */
-      incoming = accept( Socket->com, (struct sockaddr *) &si_remote, &Len );
-      HB_DISABLE_ASYN_CANC;
-      /* this prevents unreleased memory to be generated in accept */
-      HB_SOCKET_INIT( NewSocket );
-      if( incoming > 0 )
+      HB_TEST_CANCEL_ENABLE_ASYN;
+      if( hb_selectReadSocket( Socket ) )
       {
-         memcpy( &NewSocket->remote, &si_remote, Len );
+         /* On error (e.g. async connection closed) , com will be -1 and
+            errno == 22 (invalid argument ) */
+         incoming = accept( Socket->com, (struct sockaddr *) &si_remote, &Len );
+
+         HB_DISABLE_ASYN_CANC;
+
+         if (incoming == -1 )
+         {
+            #if defined(HB_OS_WIN_32)
+            iError = WSAGetLastError();
+            #else
+            iError = errno;
+            #endif
+         }
+         else
+         {
+            iError = 0;
+         }
       }
-      NewSocket->com = incoming;
-   }
-   /* Timeout expired */
-   else
-   {
-      HB_DISABLE_ASYN_CANC;
-      HB_SOCKET_INIT( NewSocket );
-      NewSocket->com = 0;
-      HB_SOCKET_SET_ERROR2( NewSocket, -1, "Timeout" );
+      /* Timeout expired */
+      else
+      {
+         iError = -1;
+         HB_DISABLE_ASYN_CANC;
+      }
    }
    HB_STACK_LOCK;
-      
-   if( NewSocket->com == -1 )
+
+   if( iError == -1 )
    {
-      HB_SOCKET_SET_ERROR( NewSocket );
-      NewSocket->com = 0;
+      HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );
+      hb_ret();
    }
-   else {
+   else if ( iError > 0 )
+   {
+      HB_SOCKET_SET_ERROR1( Socket, iError );
+      hb_ret();
+   }
+   else
+   {
       /* we'll be using only nonblocking sockets */
+      HB_SOCKET_INIT( NewSocket );
+      memcpy( &NewSocket->remote, &si_remote, Len );
+      NewSocket->com = incoming;
       hb_socketSetNonBlocking( NewSocket );
+      hb_retclenAdoptRaw( (char *) NewSocket, sizeof( HB_SOCKET_STRUCT ) );
    }
 
-   hb_retclenAdoptRaw( (char *) NewSocket, sizeof( HB_SOCKET_STRUCT ) );
 }
 
 
@@ -1899,7 +1918,7 @@ HB_FUNC( INETDGRAMRECV )
 
    HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
-   
+
    if( iLen == -2 )
    {
       HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );

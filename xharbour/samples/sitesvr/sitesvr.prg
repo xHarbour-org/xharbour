@@ -1,5 +1,5 @@
 /*
- * $Id: sitesvr.prg,v 1.5 2003/02/19 10:16:31 jonnymind Exp $
+ * $Id: sitesvr.prg,v 1.6 2003/02/19 20:20:29 jonnymind Exp $
  */
 
 ***********************************************************
@@ -69,10 +69,10 @@ PROCEDURE Main( cPort)
 
    DO WHILE .T.
       cCommand := Space( 50 )
-      HBConsoleLock()
+      //HBConsoleLock()
 
       @ 5, 5 SAY "Enter Command      : " GET cCommand
-      HBConsoleUnlock()
+      //HBConsoleUnlock()
       READ
 
       cCommand := Trim( cCommand )
@@ -112,7 +112,7 @@ PROCEDURE ViewUpdate( Socket )
    DO WHILE .T.
       * Saving cursor status before screen update
 
-      HBConsoleLock()
+      //HBConsoleLock()
 
       nRow := Row()
       nCol := Col()
@@ -128,7 +128,7 @@ PROCEDURE ViewUpdate( Socket )
       MutexUnlock( MutexCount )
 
       @ nRow, nCol
-      HBConsoleUnlock()
+      //HBConsoleUnlock()
 
       ThreadSleep( 100 )
    ENDDO
@@ -148,7 +148,7 @@ PROCEDURE AcceptIncoming( Socket )
    DO WHILE .T.
       Com := InetAccept( Socket )
 
-      IF InetErrorCode( Com ) == 0
+      IF Com != NIL
          MutexLock( MutexCount )
          g_nUserCount++
          g_nTotalCount++
@@ -157,8 +157,9 @@ PROCEDURE AcceptIncoming( Socket )
          StartThread( @ServeClient(), com )
          HB_GcAll( .T. )
       ELSE
-         InetDestroy( Com )
-         EXIT
+         //InetDestroy( Com )
+         ? "Catched error ", InetErrorCode( Socket ), InetErrorDesc( Socket )
+         //EXIT
       ENDIF
    ENDDO
 
@@ -185,6 +186,9 @@ PROCEDURE ServeClient( Socket )
    cRequest := InetRecvLine( Socket, @nLength )
    IF nLength < 0
       InetDestroy( Socket )
+      MutexLock( MutexCount )
+      g_nUserCount--
+      MutexUnlock( MutexCount )
       RETURN
    ENDIF
 
@@ -207,6 +211,9 @@ PROCEDURE ServeClient( Socket )
       ELSE
          *** invalid
          InetDestroy( Socket )
+         MutexLock( MutexCount )
+         g_nUserCount--
+         MutexUnlock( MutexCount )
          RETURN
       ENDIF
    ENDDO
@@ -217,6 +224,9 @@ PROCEDURE ServeClient( Socket )
       cPostData := Space( nContLen )
       IF InetRecvAll( Socket, @cPostData, nContLen ) <= 0
          InetDestroy( Socket )
+         MutexLock( MutexCount )
+         g_nUserCount--
+         MutexUnlock( MutexCount )
          RETURN
       ENDIF
    ENDIF
@@ -243,7 +253,7 @@ PROCEDURE ProcessRequest( Socket, cRequest, aFields, cPostData )
    LOCAL nRow, nCol
 
    *** For now, just display some data from the request
-   HBConsoleLock()
+   //HBConsoleLock()
 
    nRow := Row()
    nCol := Col()
@@ -264,7 +274,7 @@ PROCEDURE ProcessRequest( Socket, cRequest, aFields, cPostData )
 */
 
    @nRow, nCol
-   HBConsoleUnlock()
+   //HBConsoleUnlock()
 
    IF At( "/admin", cRequest ) > 0
       cReply := CreateReply( 200, "OK", ProcessAdminRequest( cRequest, cPostData ) )

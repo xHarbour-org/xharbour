@@ -1,6 +1,6 @@
 ***************************************************
 * X harbour Inet demo server program
-* $Id$
+* $Id: server.prg,v 1.7 2003/01/14 02:40:40 jonnymind Exp $
 *
 * Giancarlo Niccolai
 *
@@ -42,10 +42,9 @@ Procedure Main( cPort )
       DO WHILE bCont
          Progress( @nTurn, 5, 39 )
          s := InetAccept( Socket )
-         IF InetErrorCode( s ) == 0
+         IF InetErrorCode( Socket ) == 0
             EXIT
          ENDIF
-         InetDestroy( s )
          IF Inkey() != 0
             bCont := .f.
          ENDIF
