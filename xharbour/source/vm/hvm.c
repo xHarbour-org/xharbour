@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.233 2003/07/14 19:18:47 jonnymind Exp $
+ * $Id: hvm.c,v 1.234 2003/07/14 23:27:56 jonnymind Exp $
  */
 
 /*
@@ -2041,7 +2041,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             #ifndef HB_LONG_LONG_OFF
             else if( pLocal->type & HB_IT_LONGLONG )
             {
-               dNewVal = pLocal->item.asLongLong.value + iAdd;
+               dNewVal = (double) pLocal->item.asLongLong.value + iAdd;
             }
             #endif
             else if( HB_IS_DATE( pLocal ) )
@@ -2170,7 +2170,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             #ifndef HB_LONG_LONG_OFF
             else if( pTop->type & HB_IT_LONGLONG )
             {
-               dNewVal = pTop->item.asLongLong.value + iAdd;
+               dNewVal = (double) pTop->item.asLongLong.value + iAdd;
             }
             #endif
             else if( HB_IS_DATE( pTop ) )

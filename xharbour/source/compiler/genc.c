@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.46 2003/06/27 05:05:36 ronpinkas Exp $
+ * $Id: genc.c,v 1.47 2003/06/29 04:42:33 andijahja Exp $
  */
 
 /*
@@ -650,16 +650,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
    }
 
    #ifndef HB_BACK_END
-      #define HB_BACK_END 0
-   #endif
-
-   if( HB_BACK_END == 0 )
-   {
       if( ! hb_comp_bQuiet )
       {
          printf( "Done.\n" );
       }
-   }
+   #endif
 
    /*
     Close .p file

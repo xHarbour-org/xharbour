@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.8 2003/03/19 08:50:10 ronpinkas Exp $
+ * $Id: hbset.h,v 1.9 2003/06/23 18:14:53 druzus Exp $
  */
 
 /*
@@ -54,7 +54,9 @@
 #ifndef HB_SET_H_
 #define HB_SET_H_
 #if defined(HB_OS_WIN_32) || defined(__WIN32__)
+#if !defined(HB_OS_WIN_32_USED)
 #define HB_OS_WIN_32_USED
+#endif
 #endif
 #include "hbapi.h"
 #include "hbapifs.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.6 2003/06/30 23:06:27 jonnymind Exp $
+ * $Id: hbxml.c,v 1.7 2003/07/15 00:57:04 jonnymind Exp $
  */
 
 /*
@@ -130,6 +130,8 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
    char buf_attrib[ MXML_MAX_NAME_LEN *2 + 1];
    int iPosn = 0, iPosa = 0;
    int iStatus = 0;
+
+   HB_SYMBOL_UNUSED( style );
 
    while ( iStatus < 5 && iPosn <= MXML_MAX_NAME_LEN && iPosa <= MXML_MAX_ATTRIB_LEN ) {
       chr = mxml_refil_getc( ref );

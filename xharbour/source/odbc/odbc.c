@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.5 2003/06/20 19:14:45 mlombardo Exp $
+ * $Id: odbc.c,v 1.6 2003/06/21 03:17:56 ronpinkas Exp $
  */
 
 /*
@@ -189,10 +189,9 @@ HB_FUNC( SQLFETCH )   /* HB_SQLFETCH( hStmt ) --> nRetCode */
 HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) --> nRetCode */
 {
    SDWORD lLen, lInitBuff;
-   PTR  bBuffer, bOut, pPos;
+   PTR  bBuffer, bOut;
    WORD wType, wResult;
    int iReallocs = 0;
-   int i;
 
    lLen       = ( SDWORD )( hb_parnl( 4 ) ? hb_parnl( 4 ) : 64 );
    bBuffer    = hb_xgrab( lLen );

@@ -6567,7 +6567,6 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
          }
 
-         return TRUE;
       }
    }
 

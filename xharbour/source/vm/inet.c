@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.30 2003/07/14 07:44:27 jonnymind Exp $
+* $Id: inet.c,v 1.31 2003/07/14 19:18:47 jonnymind Exp $
 */
 
 /*
@@ -863,7 +863,7 @@ HB_FUNC( INETRECVALL )
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_BYREF ); // hb_param() calls hb_itemUnref()!
    int iTimeElapsed;
    char *Buffer;
-   int iLen = 0, iMax, iReceived, iBufferLen;
+   int iLen, iMax, iReceived, iBufferLen;
    HB_SOCKET_STRUCT *Socket;
 
    if( pSocket == NULL || pBuffer == NULL )

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.34 2003/06/17 14:22:22 ronpinkas Exp $
+ * $Id: filesys.c,v 1.35 2003/06/30 21:42:23 andijahja Exp $
  */
 
 /*
@@ -90,7 +90,9 @@
    This has been corrected by ptucker
  */
 
-#define HB_OS_WIN_32_USED
+#ifndef HB_OS_WIN_32_USED
+   #define HB_OS_WIN_32_USED
+#endif
 
 #include <ctype.h>
 
@@ -512,7 +514,7 @@ BYTE HB_EXPORT * hb_filecase(char *str) {
 
 FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 {
-   FHANDLE hFileHandle;
+   FHANDLE hFileHandle ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsPOpen(%p, %s)", pFilename, pMode));
 
@@ -570,7 +572,7 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
    HB_SYMBOL_UNUSED( pFilename );
    HB_SYMBOL_UNUSED( pMode );
 
-   hFileHandle = FS_ERROR;
+   // hFileHandle = FS_ERROR;
    s_uiErrorLast = FS_ERROR;
 
 #endif
