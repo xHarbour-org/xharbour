@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.15 2004/03/21 15:55:05 druzus Exp $
+ * $Id: cdpapi.c,v 1.16 2004/05/12 02:25:29 druzus Exp $
  */
 
 /*
@@ -133,11 +133,55 @@ static int u16toutf8( BYTE *szUTF8, USHORT uc )
    return n;
 }
 
+static BOOL utf8tou16nextchar( BYTE byChar, int * n, USHORT * uc )
+{
+   if ( *n > 0 )
+   {
+      if ( ( byChar & 0xc0 ) != 0x80 )
+         return FALSE;
+      *uc = ( *uc << 6 ) | ( byChar & 0x3f );
+      (*n)--;
+      return TRUE;
+   }
+
+   *n = 0;
+   *uc = byChar;
+   if ( byChar >= 0xc0 )
+   {
+      if ( byChar < 0xe0 )
+      {
+         *uc &= 0x1f;
+         *n = 1;
+      }
+      else if ( byChar < 0xf0 )
+      {
+         *uc &= 0x0f;
+         *n = 2;
+      }
+      else if ( byChar < 0xf8 )
+      {
+         *uc &= 0x07;
+         *n = 3;
+      }
+      else if ( byChar < 0xfc )
+      {
+         *uc &= 0x03;
+         *n = 4;
+      }
+      else if ( byChar < 0xfe )
+      {
+         *uc &= 0x01;
+         *n = 5;
+      }
+   }
+   return TRUE;
+}
+
 #if 0  /* currently unused, it will in the future */
 static int utf8tou16( BYTE *szUTF8, USHORT *uc )
 {
    int n = 1, m = 1;
-   ULONG u32;
+   UINT32 u32;
 
    u32 = *szUTF8;
    if ( u32 >= 0xc0 )
@@ -170,7 +214,6 @@ static int utf8tou16( BYTE *szUTF8, USHORT *uc )
       while ( n < m && ( szUTF8[n] & 0xc0 ) == 0x80 )
       {
          u32 = ( u32 << 6 ) | ( szUTF8[n++] & 0x3f );
-         n++;
       }
       if ( n < m )
       {
@@ -441,6 +484,28 @@ USHORT HB_EXPORT hb_cdpGetU16( PHB_CODEPAGE cdp, BYTE ch )
    }
    return u;
 }
+
+BOOL HB_EXPORT hb_cdpGetFromUTF8( PHB_CODEPAGE cdp, BYTE ch, int * n, USHORT * uc )
+{
+   if ( utf8tou16nextchar( ch, n, uc ) )
+   {
+      if ( *n == 0 && cdp && cdp->uniTable && cdp->uniTable->uniCodes && *uc >= 0x100 )
+      {
+         int i;
+         for ( i = 0; i < cdp->uniTable->nChars; i++ )
+         {
+            if ( cdp->uniTable->uniCodes[ i ] == *uc )
+            {
+               *uc = i;
+               break;
+            }
+         }
+      }
+      return TRUE;
+   }
+   return FALSE;
+}
+
 
 ULONG HB_EXPORT hb_cdpStrnToUTF( PHB_CODEPAGE cdp, BYTE* pSrc, ULONG ulLen, BYTE* pDst )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.10 2004/03/31 09:19:53 andijahja Exp $
+ * $Id: hbapicdp.h,v 1.11 2004/04/02 22:01:57 andijahja Exp $
  */
 
 /*
@@ -116,6 +116,7 @@ extern int HB_EXPORT hb_cdpchrcmp( char, char, PHB_CODEPAGE );
 extern void HB_EXPORT hb_cdpReleaseAll( void );
 
 extern USHORT HB_EXPORT hb_cdpGetU16( PHB_CODEPAGE, BYTE );
+extern BOOL HB_EXPORT hb_cdpGetFromUTF8( PHB_CODEPAGE cdp, BYTE ch, int * n, USHORT * uc );
 extern ULONG HB_EXPORT hb_cdpStrnToUTF( PHB_CODEPAGE, BYTE*, ULONG, BYTE* );
 extern ULONG HB_EXPORT hb_cdpStrnToU16( PHB_CODEPAGE, BYTE*, ULONG, BYTE* );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.12 2004/03/21 15:55:06 druzus Exp $
+ * $Id: kbsln.c,v 1.13 2004/05/25 20:27:23 druzus Exp $
  */
 
 /*
@@ -401,23 +401,51 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
             }
         }
 
-        if( ( eventmask & INKEY_RAW ) == 0 )
-        {
-            tmp = HB_GT_FUNC(gt_FindKeyTranslation( tmp ));
+        if( ( eventmask & INKEY_RAW ) != 0 )
+            return tmp;
 
-            /* TOFIX: this code is broken - needs a diffrent aproach */
-            if( tmp == 0 )
-            {
-                tmp = HB_GT_FUNC(gt_FindKeyTranslation( ch ));
-                if( tmp == 0 && ch < 256 ) tmp = ch;
-            }
-        }
+        tmp = HB_GT_FUNC(gt_FindKeyTranslation( tmp ));
+        if( tmp != 0 )
+            return tmp;
 
-        return( tmp );
+        /* TOFIX: this code is broken - needs a diffrent aproach */
+        tmp = HB_GT_FUNC(gt_FindKeyTranslation( ch ));
+        if( tmp != 0 || ch > 256 )
+            return tmp;
     }
 
+#if !defined( HB_CDP_SUPPORT_OFF ) && defined( HB_SLN_UTF8 )
+    if ( SLsmg_Is_Unicode && ch < 256 )
+    {
+        int n = 0;
+        USHORT uc = 0;
+
+        if ( hb_cdpGetFromUTF8( s_gtSln_cdpIN, (BYTE) ch, &n, &uc ) )
+        {
+            unsigned int buf[ 10 ], i = 0;
+
+            while ( n > 0 )
+            {
+                if( SLang_input_pending( s_gtSLN_escDelay == 0 ? 10 : 
+                                         - HB_MAX( s_gtSLN_escDelay, 0 ) ) == 0 )
+                    break;
+                buf[ i++ ] = SLang_getkey();
+                if ( !hb_cdpGetFromUTF8( s_gtSln_cdpIN, (BYTE) buf[ i - 1 ], &n, &uc ) )
+                    break;
+            }
+            if ( n > 0 )
+            {
+                while ( i > 0 )
+                    SLang_ungetkey( buf[ --i ] );
+            }
+            else
+                ch = uc;
+        }
+    }
+#endif
+
     /* standard ASCII key */
-    return( ch );
+    return ch < 256 ? s_inputTab[ ch ] : ch;
 }
 
 /* *********************************************************************** */

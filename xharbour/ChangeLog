@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3013 2004/06/01 23:59:13 kaddath Exp $
+ * $Id: ChangeLog,v 1.3014 2004/06/03 02:38:17 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-04 02:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/xhbgtmk.sh
+    * xharbour CVS repsotiry address changed to:
+      cvs.sourceforge.net:/cvsroot/xharbour
+
+  * xharbour/include/hbapicdp.h
+  * xharbour/source/rtl/cdpapi.c
+    * new function to decode UTF-8 stream characters
+      BOOL hb_cdpGetFromUTF8( PHB_CODEPAGE cdp, BYTE ch, int* n, USHORT* uc )
+
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtsln/gtsln.h
+  * xharbour/source/rtl/gtsln/kbsln.c
+    + UTF8 support added. Now GTSLN can be compilled with RH patched
+      version of slang
+    + i18n support added, now GTSLN works with HB_SET{TERM|KEY|DISP}CP()
+      functions. Remember those function makes two things:
+      They allow to autotranslate input/output between codepages and
+      _INFORM_ GTSLN (GTCRS, too) which characters are letters and
+      which one should be displayed as box drawing ones. So it's
+      good to always call at program sturtp:
+          HB_SETCODEPAGE( <cCDP> )
+          HB_SETTERMCP( <cCDP> )
+      if you use different then "EN" cp. It doesn't matter what GT you
+      are using. If I'll find a while I'll add real i18n to GTWVT too.
+      In my local copy of GTXVT it's already done - I'll try synchronize
+      it with CVS after Beta-1
+
+  * xharbour/source/rtl/gtcrs/hb-charmap.def
+    * small modification in default ACSC mapping to make it similar
+      to the one hardcoded inside GTSLN
 
 2004-06-02 19:35 UTC-0800 Luis Krause Mantilla
   * contrib/rdd_ads/ads1.c

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: xhbgtmk.sh,v 1.6 2003/09/11 17:59:01 druzus Exp $
+# $Id: xhbgtmk.sh,v 1.7 2003/12/07 19:36:17 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -14,7 +14,7 @@
 
 # ssh is not necessary for anonymous access on SourceForge
 # export CVS_RSH=ssh
-export CVSROOT=":pserver:anonymous@cvs.xharbour.sourceforge.net:/cvsroot/xharbour"
+export CVSROOT=":pserver:anonymous@cvs.sourceforge.net:/cvsroot/xharbour"
 export PROJECT=xharbour
 
 test_reqrpm()

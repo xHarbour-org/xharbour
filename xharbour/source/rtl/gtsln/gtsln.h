@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.h,v 1.5 2003/05/16 19:52:11 druzus Exp $
+ * $Id: gtsln.h,v 1.6 2003/05/21 09:35:37 druzus Exp $
  */
 
 /*
@@ -62,11 +62,67 @@
 #include "hbapifs.h"
 #include "inkey.ch"
 #include <unistd.h>
+#include <signal.h>
+
+#ifndef HB_OS_DARWIN
+#include <time.h>
+#endif
+
+#ifndef HB_CDP_SUPPORT_OFF
+#include "hbapicdp.h"
+extern PHB_CODEPAGE s_cdpage;
+#endif
+
+#if UTF8 && SLANG_VERSION >= 10409
+    #define HB_SLN_UTF8
+#endif
+
+/* missing defines in previous versions of Slang - this may not work ok ! */
+#if SLANG_VERSION < 10400
+    typedef unsigned short SLsmg_Char_Type;
+    #define SLSMG_EXTRACT_CHAR( x ) ( ( x ) & 0xFF )
+    #define SLSMG_EXTRACT_COLOR( x ) ( ( ( x ) >> 8 ) & 0xFF )
+    #define SLSMG_BUILD_CHAR( ch, color ) ( ( ( SLsmg_Char_Type ) ( unsigned char )( ch ) ) | ( ( color ) << 8 ) )
+
+#if SLANG_VERSION < 10308
+    #define SLSMG_DIAMOND_CHAR    0x04
+    #define SLSMG_DEGREE_CHAR     0xF8
+    #define SLSMG_PLMINUS_CHAR    0xF1
+    #define SLSMG_BULLET_CHAR     0xF9
+    #define SLSMG_LARROW_CHAR     0x1B
+    #define SLSMG_RARROW_CHAR     0x1A
+    #define SLSMG_DARROW_CHAR     0x19
+    #define SLSMG_UARROW_CHAR     0x18
+    #define SLSMG_BOARD_CHAR      0xB2
+    #define SLSMG_BLOCK_CHAR      0xDB
+    /*
+    #define SLSMG_BOARD_CHAR      'h'
+    #define SLSMG_BLOCK_CHAR      '0'
+    */
+#endif
+#endif
+
+#define HB_SLN_ACSC_ATTR        SLSMG_BUILD_CHAR( 0, 0x80 )
+#define HB_SLN_BUILD_CHAR( ch, attr )   ( s_currOutTab[ (BYTE) ch ] | s_colorTab[ (BYTE) attr ] )
+
+#ifndef HB_SLN_UTF8
+extern int SLsmg_Is_Unicode;
+#endif
+
+/* *********************************************************************** */
+
+/* if we can not manipulate cursor state */
+#define SC_UNAVAIL -1
+
 
 /* *********************************************************************** */
 
 extern BOOL hb_gt_UnderLinuxConsole;
 extern BOOL hb_gt_UnderXterm;
+extern unsigned char s_inputTab[ 256 ];
+#ifndef HB_CDP_SUPPORT_OFF
+extern PHB_CODEPAGE s_gtSln_cdpIN;
+#endif
 
 /* *********************************************************************** */
 
