@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.45 2003/08/15 00:50:59 jonnymind Exp $
+ * $Id: dbcmd.c,v 1.46 2003/08/20 20:06:06 ronpinkas Exp $
  */
 
 /*
@@ -2081,12 +2081,19 @@ HB_FUNC( DBSELECTAREA )
    {
       szAlias = hb_parc( 1 );
       ulLen = strlen( szAlias );
+
       if( ulLen >= 1 && szAlias[ 0 ] >= '0' && szAlias[ 0 ] <= '9' )
+      {
          uiNewArea = atoi( szAlias );
+      }
       else if( ulLen == 1 && toupper( szAlias[ 0 ] ) >= 'A' && toupper( szAlias[ 0 ] ) <= 'K' )
+      {
          uiNewArea = toupper( szAlias[ 0 ] ) - 'A' + 1;
+      }
       else if( ulLen == 1 && toupper( szAlias[ 0 ] ) == 'M' )
+      {
          uiNewArea = 0;
+      }
       else
       {
          if( ( uiNewArea = hb_rddSelect( szAlias ) ) == 0 )
@@ -2103,7 +2110,7 @@ HB_FUNC( DBSELECTAREA )
 
                if( uiAction == E_RETRY )
                {
-                  if( ( uiNewArea = hb_rddSelect( szAlias ) ) == 0 )
+                  if( ( uiNewArea = hb_rddSelect( szAlias ) ) != 0 )
                   {
                      uiNewArea = hb_rddSelect( szAlias );
                      uiAction = E_DEFAULT;
@@ -2118,18 +2125,25 @@ HB_FUNC( DBSELECTAREA )
       }
    }
    else
+   {
       uiNewArea = hb_parni( 1 );
+   }
 
    /* JC1: Locking here as hb_rddSelectFirstAvailable could not
       be valid anymore if we unlock the area in the meanwhile */
    LOCK_AREA
 
    if( uiNewArea == 0 )
+   {
       hb_rddSelectFirstAvailable();
+   }
    else
+   {
       s_uiCurrArea = uiNewArea;
+   }
 
    pAreaNode = s_pWorkAreas;
+
    while( pAreaNode )
    {
       if( ( ( AREAP ) pAreaNode->pArea )->uiArea == s_uiCurrArea )
@@ -2140,7 +2154,9 @@ HB_FUNC( DBSELECTAREA )
       }
       pAreaNode = pAreaNode->pNext;
    }
+
    UNLOCK_AREA
+
    s_pCurrArea = NULL; /* Selected WorkArea is closed */
 }
 

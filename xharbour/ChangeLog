@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1368 2003/08/20 20:06:04 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1369 2003/08/20 20:48:50 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-08-20 15:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbcmd.c
+    ! Fixed DBSELECTAREA() to correctly support recovery from Error.
+
 2003-08-20 14:45 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/hbzlib/*
     ! updated all files (with bug fixes )
-
 
 2003-08-20 13:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/errorapi.c
