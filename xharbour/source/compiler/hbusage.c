@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.4 2002/01/27 22:30:07 ronpinkas Exp $
+ * $Id: hbusage.c,v 1.5 2002/05/20 21:24:26 mafact Exp $
  */
 
 /*
@@ -153,6 +153,7 @@ void hb_compPrintCredits( void )
            "Eddie Runia <eddie@runia.com>\n"
            "Felipe G. Coury <fcoury@creation.com.br>\n"
            "Gonzalo A. Diethelm <gonzalo.diethelm@iname.com>\n"
+           "Horacio D. Roldan Kasimatis <harbour_ar@yahoo.com.ar>\n"
            "Ignacio Ortiz de Zuniga <ignacio@fivetech.com>\n"
            "Janica Lubos <janica@fornax.elf.stuba.sk>\n"
            "Jean-Francois Lefebvre (mafact) <jfl@mafact.com>\n"
