@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.675 2003/02/02 22:31:14 jonnymind Exp $
+ * $Id: ChangeLog,v 1.676 2003/02/03 00:48:12 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-03 02:25 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/ttable.prg
+    % Optimizations with FOR-EACH and ADEL/ASIZE suggested by Andi Jahja.
+
+2003-02-03 02:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * contrib/make_b32.bat
+  * contrib/Makefile
+  * contrib/makefile.bc
+  * contrib/mysql.c
+  * contrib/mysql.ch
+  * contrib/tmysql.prg
+  * contrib/dbf2mysql.prg
+  * contrib/tsqlbrw.prg
+  * contrib/test.prg          // test with comments in english
+  * contrib/testes.prg        // test with comments in spanish
+  * contrib/animal.dbf
+  * contrib/readme.txt
+    * Classes for access to MySQL server from xHarbour.
+      Original from Harbour contributions with several
+      optimizations, code depuration and improvements.
+
 2003-02-02 22:50 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/rdd_ads/adsfunc.c
     + Added functions for Transactions
