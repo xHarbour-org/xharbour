@@ -390,6 +390,7 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
                       'gtsln' + cSuffix, ;
                       'gtstd' + cSuffix, ;
                       'ziparchive' + cSuffix, ;
+                      'hbzip' + cSuffix, ;
                       'rddads' + cSuffix, ;
                       'ace32' + cSuffix, ;
                       'libnf' + cSuffix, ;
@@ -447,8 +448,8 @@ FUNCTION Getlibs( lGcc, cDir )
                         { "Harbour Misc library - Libmisc", IIF( lGcc, 'misc.a', 'libmisc.lib' ) }, ;
                         { "Harbour html library - Htmllib", 'html' + IIF( lGcc, '.a', '.lib' ) }, ;
                         { "Harbour Nanfor library - Libnf", 'nf' + IIF( lGcc, '.a', '.lib' ) }, ;
-                        { "Harbour Gt library - Libgt", 'nf' + IIF( lGcc, '.a', '.lib' ) }, ;
-                        { "Harbour Zip library ", 'ziparchive' + IIF( lGcc, '.a', '.lib' ) + IIF( lLinux, ' stdc++.a z.a', ' ' ) }, ;
+                        { "Harbour Gt library - Libgt", 'gt' + IIF( lGcc, '.a', '.lib' ) }, ;
+                        { "Harbour Zip library ", IIF( ISWIN(),'hbzip','ziparchive') + IIF( lGcc, '.a', '.lib' ) + IIF( lLinux, ' stdc++.a z.a', ' ' ) }, ;
                         { "Harbour Hbole library Hbole", 'hbole' + IIF( lGcc, '.a', '.lib' ) + ' ole2' + IIF( lGcc, '.a', '.lib' ) }, ;
                         { "Harbour Mysql library - MySql", 'mysql' + IIF( lGcc, '.a', '.lib' )}, ;
                         { "Harbour Postgres library - hbpg", 'libhbpg' + IIF( lGcc, '.a', '.lib' )}, ;
@@ -516,5 +517,8 @@ FUNCTION CreateLink()
     FClose( nHandle )
     
 
-RETURN NIL    
+RETURN NIL
+
+STATIC FUNCTION ISWIN()
+RETURN "WINDOWS" IN Upper( OS() )
 *+ EOF: HBMUTILS.PRG

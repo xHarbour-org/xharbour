@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.117 2004/04/15 01:58:26 lculik Exp $
+ * $Id: hbmake.prg,v 1.118 2004/04/20 23:47:38 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1407,7 +1407,7 @@ FUNC CreateMakeFile( cFile )
    @ 11, 01 SAY "Resource file Name" GET cResName
    @ 12, 01 SAY s_aLangMessages[ 43 ] GET s_nFilestoAdd PICT "99" VALID s_nFilestoAdd > 0
    @ 13, 01 GET s_lMt checkbox caption s_aLangMessages[ 44 ] style "[o ]"
-   @ 13, 40 SAY s_aLangMessages[ 46 ] GET s_nWarningLevel Pict "9" VALID s_nWarningLevel <= 4
+   @ 13, 40 SAY s_aLangMessages[ 46 ] GET s_nWarningLevel Pict "9" VALID s_nWarningLevel>=0 .AND. s_nWarningLevel <= 4
   // READ
    READ msg at maxrow()-1,1,maxcol()-1
 
@@ -1501,17 +1501,23 @@ FUNC CreateMakeFile( cFile )
       cDefHarOpts += " -m "
    ENDIF
 
-   IF s_nWarningLevel > 0
+/*   IF s_nWarningLevel >= 0
       IF At("-w",cDefHarOpts)>0
-         StrTran( cDefHarOpts, "-w", SubStr( cDefHarOpts, At( "-w", cDefHarOpts), 3 ), "-w" + Str(s_nWarningLevel,2) )
+         StrTran( cDefHarOpts, "-w", SubStr( cDefHarOpts, At( "-w", cDefHarOpts), 3 ), "-w" + Str(s_nWarningLevel,1) )
       ELSE
-         cDefHarOpts += " -w" + s_nWarningLevel
+         cDefHarOpts += " -w" + str(s_nWarningLevel,1)
       ENDIF
    ELSE
       IF At( "-w", cDefHarOpts ) > 0
          StrTran( cDefHarOpts, "-w", SubStr( cDefHarOpts, At( "-w", cDefHarOpts), 3 ), "" )
       ENDIF
    ENDIF
+*/
+
+   IF s_nWarningLevel >= 0
+      cDefHarOpts += " -w" + Str(s_nWarningLevel,1)
+   ENDIF
+
 
    IF s_lBcc
       aAdd( s_aCommands, { ".cpp.obj:", "$(BCB)\BIN\bcc32 $(CFLAG1) $(CFLAG2) -o$* $**" } )
@@ -1574,9 +1580,9 @@ FUNC CreateMakeFile( cFile )
    aOut := aClone( aIn )
 
    IF nO != 1
-      pickarry( 11, 15, 20, 64, aIn, aOut ,ArrayAJoin( { oMake:aPrgs, oMake:aCs } ))
+      pickarry( 11, 15, 20, 64, aIn, aOut ,ArrayAJoin( { oMake:aPrgs, oMake:aCs } ), .T. )
    ELSE
-      pickarry( 11, 15, 20, 64, aIn, aOut ,{})
+      pickarry( 11, 15, 20, 64, aIn, aOut, {}, .T. )
    ENDIF
 
    nLenaOut := Len( aOut )
@@ -1629,7 +1635,7 @@ FUNC CreateMakeFile( cFile )
 
       aEval( aLibs, { | x | aAdd( aLibsIn, x[ 1 ] ) } )
       aEval( aLibs, { | x | aAdd( aLibsOut, x[ 2 ] ) } )
-      pickarry( 11, 15, 20, 64, aLibsIn, aLibsOut ,{})
+      pickarry( 11, 15, 20, 64, aLibsIn, aLibsOut ,{} )
    ENDIF
 
    aEval( aout, { | xItem | IIF(  '.c'IN xItem  .OR.  '.C' IN xItem , aAdd( aoutc, xitem ), ) } )
@@ -2656,7 +2662,7 @@ FUNC CreateLibMakeFile( cFile )
    ENDIF
 
    aOut := aClone( aIn )
-   pickarry( 10, 15, 19, 64, aIn, aOut ,{})
+   pickarry( 10, 15, 19, 64, aIn, aOut ,{}, .T.)
    nLenaOut := Len( aOut )
 
    aEval( aout, { | x, y | aout[ y ] := Trim( Substr( aOut[ y ], 1, At( ' ', aout[ y ] ) ) ) } )
@@ -3589,7 +3595,7 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "User Defines " )
       aAdd( aLang, "User include Path" )
       aAdd( aLang, "Use External Libs" )
-      aAdd( aLang, "Spacebar to select, Enter to continue process" )
+      aAdd( aLang, "Spacebar to select, Enter to continue process F5 sel/unsel All" )
       aAdd( aLang, "Warning level /w" )
       aAdd( aLang, "Numbers of source files per line on makefile" )
       aAdd( aLang, "Use Multi Thread Library" )
@@ -3648,7 +3654,7 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "Define de usu rios:" )
       aAdd( aLang, "Path p/ includes de usu rio:" )
       aAdd( aLang, "Usar Libs Externas" )
-      aAdd( aLang, "<Espa‡o> para selecionar, <Enter> p/ continuar processo" )
+      aAdd( aLang, "<Espa‡o> para selecionar, <Enter> p/ continuar processo,F5 sel/desel todos" )
       aAdd( aLang, "N¡vel de aviso do compilador /w" )
       aAdd( aLang, "Qtd de PRGs por linea, no makefile:" )
 
@@ -3709,7 +3715,7 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "User Defines " )
       aAdd( aLang, "User include Path" )
       aAdd( aLang, "Usa Libs Externas" )
-      aAdd( aLang, "Espa‡o para selecionar, Enter p/ continuar processo" )
+      aAdd( aLang, "Espa‡o para selecionar, Enter p/ continuar processo F5 sel/desel todos" )
       aAdd( aLang, "N¡vel de Aviso do compilador /w" )
       aAdd( aLang, "Qtd de PRGs por linha, no makefile: " )
       aAdd( aLang, "Use a Biblioteca Multi Thread" )
