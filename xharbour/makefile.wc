@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.39 2005/01/14 20:00:00 ptsarenko Exp $
+# $Id: makefile.wc,v 1.40 2005/01/23 14:00:00 ptsarenko Exp $
 #
 
 #
@@ -487,6 +487,7 @@ RTL_LIB_OBJS = \
 #
 
 LANG_LIB_OBJS = \
+   $(OBJ_DIR)\msgbgwin.obj \
    $(OBJ_DIR)\msgby866.obj \
    $(OBJ_DIR)\msgbywin.obj \
    $(OBJ_DIR)\msgca.obj \
@@ -743,11 +744,7 @@ GTWIN_LIB_OBJS = \
 #
 
 GTWVT_LIB_OBJS = \
-   $(OBJ_DIR)\gtwvt.obj \
-   $(OBJ_DIR)\wvtcore.obj \
-   $(OBJ_DIR)\wvtutils.obj \
-   $(OBJ_DIR)\wvtclass.obj \
-   $(OBJ_DIR)\wvtpaint.obj
+   $(OBJ_DIR)\gtwvt.obj
 
 #
 # GTALLEG.LIB rules
@@ -896,6 +893,8 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cphr1250.obj \
    $(OBJ_DIR)\cphr437.obj \
    $(OBJ_DIR)\cphr852.obj \
+   $(OBJ_DIR)\cphu852.obj \
+   $(OBJ_DIR)\cphuwin.obj \
    $(OBJ_DIR)\cpit437.obj \
    $(OBJ_DIR)\cpit850.obj \
    $(OBJ_DIR)\cpitisb.obj \
@@ -2385,6 +2384,9 @@ $(RTL_OBJ_DIR)\trpccli.obj : $(RTL_OBJ_DIR)\trpccli.c
 # LANG.LIB dependencies
 #
 
+$(OBJ_DIR)\msgbgwin.obj : $(LANG_DIR)\msgbgwin.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
 $(OBJ_DIR)\msgby866.obj : $(LANG_DIR)\msgby866.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
@@ -2753,24 +2755,6 @@ $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
 $(OBJ_DIR)\gtwvt.obj : $(RTL_DIR)\gtwvt\gtwvt.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
-$(OBJ_DIR)\wvtcore.obj : $(RTL_DIR)\gtwvt\wvtcore.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
-
-$(OBJ_DIR)\wvtutils.obj : $(RTL_DIR)\gtwvt\wvtutils.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
-
-$(OBJ_DIR)\wvtclass.c : $(RTL_DIR)\gtwvt\wvtclass.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\wvtclass.obj : $(OBJ_DIR)\wvtclass.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
-
-$(OBJ_DIR)\wvtpaint.c : $(RTL_DIR)\gtwvt\wvtpaint.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\wvtpaint.obj : $(OBJ_DIR)\wvtpaint.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
-
 #
 # GTALLEG.LIB dependencies
 #
@@ -2822,6 +2806,12 @@ $(OBJ_DIR)\cphr437.obj : $(CODEPAGE_DIR)\cphr437.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\cphr852.obj : $(CODEPAGE_DIR)\cphr852.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\cphu852.obj : $(CODEPAGE_DIR)\cphu852.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\cphuwin.obj : $(CODEPAGE_DIR)\cphuwin.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\cpit437.obj : $(CODEPAGE_DIR)\cpit437.c

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.82 2005/01/14 19:22:09 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.84 2005/01/23 14:00:00 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -338,6 +338,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbffpt1.obj \
   $(OBJ_DIR)\dbfntx0.obj \
   $(OBJ_DIR)\dbfntx1.obj \
+  $(OBJ_DIR)\msgbgwin.obj \
   $(OBJ_DIR)\msgby866.obj \
   $(OBJ_DIR)\msgbywin.obj \
   $(OBJ_DIR)\msgca.obj \
@@ -430,6 +431,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cphr1250.obj \
   $(OBJ_DIR)\cphr437.obj \
   $(OBJ_DIR)\cphr852.obj \
+  $(OBJ_DIR)\cphu852.obj \
+  $(OBJ_DIR)\cphuwin.obj \
   $(OBJ_DIR)\cpit437.obj \
   $(OBJ_DIR)\cpit850.obj \
   $(OBJ_DIR)\cpitisb.obj \
@@ -641,6 +644,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\cphr1250.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cphr437.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cphr852.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cphu852.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cphuwin.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpit437.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpit850.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpitisb.obj           + >> hdll.tmp
@@ -938,6 +943,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\dbffpt1.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbfntx0.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbfntx1.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgbgwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgby866.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgbywin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgca.obj             + >> hdll.tmp
@@ -2128,6 +2134,9 @@ $(OBJ_DIR)\xhelp.obj : $(RTL_DIR)\xhelp.c
 $(OBJ_DIR)\xsavescr.obj : $(RTL_DIR)\xsavescr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\msgbgwin.obj : $(LANG_DIR)\msgbgwin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\msgby866.obj : $(LANG_DIR)\msgby866.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -2498,6 +2507,12 @@ $(OBJ_DIR)\cphr437.obj : $(CODEPAGE_DIR)\cphr437.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cphr852.obj : $(CODEPAGE_DIR)\cphr852.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cphu852.obj : $(CODEPAGE_DIR)\cphu852.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cphuwin.obj : $(CODEPAGE_DIR)\cphuwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cpit437.obj : $(CODEPAGE_DIR)\cpit437.c

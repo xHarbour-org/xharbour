@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.33 2005/01/14 20:00:00 ptsarenko Exp $
+# $Id: hrbdll.wc,v 1.34 2005/01/23 14:00:00 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -340,6 +340,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbffpt1.obj \
   $(OBJ_DIR)\dbfntx0.obj \
   $(OBJ_DIR)\dbfntx1.obj \
+  $(OBJ_DIR)\msgbgwin.obj \
   $(OBJ_DIR)\msgby866.obj \
   $(OBJ_DIR)\msgbywin.obj \
   $(OBJ_DIR)\msgca.obj \
@@ -428,6 +429,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cphr1250.obj \
   $(OBJ_DIR)\cphr437.obj \
   $(OBJ_DIR)\cphr852.obj \
+  $(OBJ_DIR)\cphu852.obj \
+  $(OBJ_DIR)\cphuwin.obj \
   $(OBJ_DIR)\cpit437.obj \
   $(OBJ_DIR)\cpit850.obj \
   $(OBJ_DIR)\cpitisb.obj \
@@ -1630,6 +1633,9 @@ $(OBJ_DIR)\xhelp.obj : $(RTL_DIR)\xhelp.c
 $(OBJ_DIR)\xsavescr.obj : $(RTL_DIR)\xsavescr.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
+$(OBJ_DIR)\msgbgwin.obj : $(LANG_DIR)\msgbgwin.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
 $(OBJ_DIR)\msgby866.obj : $(LANG_DIR)\msgby866.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
@@ -1979,6 +1985,12 @@ $(OBJ_DIR)\cphr437.obj : $(CODEPAGE_DIR)\cphr437.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\cphr852.obj : $(CODEPAGE_DIR)\cphr852.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\cphu852.obj : $(CODEPAGE_DIR)\cphu852.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\cphuwin.obj : $(CODEPAGE_DIR)\cphuwin.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\cpit437.obj : $(CODEPAGE_DIR)\cpit437.c

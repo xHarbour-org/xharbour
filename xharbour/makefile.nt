@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.119 2005/01/14 19:22:10 ptsarenko Exp $
+# $Id: makefile.nt,v 1.121 2005/01/23 14:00:00 ptsarenko Exp $
 #
 
 #
@@ -573,6 +573,7 @@ RTL_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 LANG_LIB_OBJS = \
+   $(OBJ_DIR)\msgbgwin.obj \
    $(OBJ_DIR)\msgby866.obj \
    $(OBJ_DIR)\msgbywin.obj \
    $(OBJ_DIR)\msgca.obj \
@@ -642,6 +643,8 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cphr1250.obj \
    $(OBJ_DIR)\cphr437.obj \
    $(OBJ_DIR)\cphr852.obj \
+   $(OBJ_DIR)\cphu852.obj \
+   $(OBJ_DIR)\cphuwin.obj \
    $(OBJ_DIR)\cpit437.obj \
    $(OBJ_DIR)\cpit850.obj \
    $(OBJ_DIR)\cpitisb.obj \
