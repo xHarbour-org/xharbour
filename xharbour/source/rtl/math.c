@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.15 2004/05/24 10:31:44 jonnymind Exp $
+ * $Id: math.c,v 1.16 2004/11/21 21:44:19 druzus Exp $
  */
 
 /*
@@ -88,7 +88,6 @@
    #define s_hb_exc   s_hb_exc
    static HB_MATH_EXCEPTION s_hb_exc = {HB_MATH_ERR_NONE, "", "", 0.0, 0.0, 0.0, 1, 0, 0};
 #endif
-
 
 /* reset math error information */
 void hb_mathResetError (void)
@@ -219,9 +218,10 @@ int hb_mathErrSet( double dResult, double arg1, double arg2, char * szFunc, int 
    {
       case EDOM:
       case ERANGE:
+#if defined(EOVERFLOW)
       case EOVERFLOW:
          break;
-
+#endif
       default:
          if ( isnan( dResult ) )
          {
@@ -256,12 +256,12 @@ int hb_mathErrSet( double dResult, double arg1, double arg2, char * szFunc, int 
          s_hb_exc.type = HB_MATH_ERR_SING;
          s_hb_exc.error = "Calculation results in singularity";
          break;
-
+#if defined(EOVERFLOW)
       case EOVERFLOW:
          s_hb_exc.type = HB_MATH_ERR_OVERFLOW;
          s_hb_exc.error = "Calculation result too large to represent";
          break;
-
+#endif
       default:
          s_hb_exc.type = HB_MATH_ERR_UNKNOWN;
          s_hb_exc.error = "Unknown math error";

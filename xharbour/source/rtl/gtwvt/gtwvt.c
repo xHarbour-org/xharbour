@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.144 2005/01/22 18:38:42 fsgiudice Exp $
+ * $Id: gtwvt.c,v 1.145 2005/02/11 18:59:11 druzus Exp $
  */
 
 /*
@@ -90,6 +90,10 @@
 #endif
 
 #include "gtwvt.h"
+
+#if defined(__WATCOMC__)
+  #include <conio.h>
+#endif
 
 #ifndef WM_MOUSEWHEEL
    #define WM_MOUSEWHEEL 0x020A
@@ -1185,7 +1189,7 @@ int HB_GT_FUNC( gt_ReadKey( HB_inkey_enum eventmask ) )
 //
 //   Copied from gtwin
 //
-#if defined(__BORLANDC__) || defined(_MSC_VER)
+#if defined(__BORLANDC__) || defined(_MSC_VER) || defined(__WATCOMC__) || defined(__MINGW32__)
 static int hb_Inp9x( USHORT usPort )
 {
    USHORT usVal;
@@ -1206,6 +1210,14 @@ static int hb_Inp9x( USHORT usPort )
                in    al, dx
                mov   usVal, ax
             }
+
+   #elif defined( __MINGW32__ )
+      __asm__ __volatile__ ("inb %w1,%b0":"=a" (usVal):"Nd" (usPort));
+
+   #elif defined( __WATCOMC__ )
+
+      usVal = inp( usPort );
+
    #else
 
       usVal = _inp( usPort );
@@ -1235,6 +1247,15 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
                mov   ax, usVal
                out   dx, al
             }
+
+   #elif defined( __MINGW32__ )
+
+      __asm__ __volatile__ ("outb %b0,%w1": :"a" (usVal), "Nd" (usPort));
+
+   #elif defined( __WATCOMC__ )
+
+       outp( usPort, usVal );
+
    #else
 
       _outp( usPort, usVal );
@@ -1361,7 +1382,7 @@ void HB_GT_FUNC( gt_Tone( double dFrequency, double dDuration ) )
     /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
     if ( osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
     {
-       #if defined( __BORLANDC__ ) || defined( _MSC_VER )
+       #if defined( __BORLANDC__ ) || defined( _MSC_VER ) || defined( __WATCOMC__ )  || defined(__MINGW32__)
           HB_GT_FUNC( gt_w9xTone( dFrequency, dDuration ) );
        #else
           HB_GT_FUNC( gt_wNtTone( dFrequency, dDuration ) );

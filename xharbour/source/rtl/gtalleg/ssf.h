@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.h,v 1.9 2004/07/31 00:34:53 maurifull Exp $
+ * $Id: ssf.h,v 1.10 2004/08/02 01:46:13 maurifull Exp $
  */
 
 /*
@@ -187,6 +187,9 @@
 #define al_draw_triangle triangle
 #define al_blit blit
 #define al_clear_to_color clear_to_color
+#ifndef al_set_clip
+#define al_set_clip set_clip
+#endif
 #endif
 
 typedef enum {

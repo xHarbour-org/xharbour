@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.7 2005/01/13 10:30:40 bdj Exp $
+ * $Id: gtwvw.c,v 1.8 2005/01/14 04:42:57 bdj Exp $
  */
 
 /*
@@ -5420,7 +5420,7 @@ static VOID CALLBACK hb_wvw_gtFlashWindow(HWND hwnd, UINT uMsg, UINT_PTR idEvent
 
 static void hb_wvw_gtInputNotAllowed( USHORT usWinNum, UINT message, WPARAM wParam, LPARAM lParam )
 {
-  FLASHWINFO fwi;
+  // FLASHWINFO fwi;
 
   /* user may handle this event and returns .t. from .PRG level
      using function WVW_INPUTFOCUS()

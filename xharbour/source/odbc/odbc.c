@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.23 2004/12/25 12:09:40 ptsarenko Exp $
+ * $Id: odbc.c,v 1.24 2004/12/28 06:39:20 druzus Exp $
  */
 
 /*
@@ -99,6 +99,14 @@
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
+
+#ifndef SQLLEN
+   #ifdef _WIN64
+      typedef INT64           SQLLEN;
+   #else
+      #define SQLLEN          SQLINTEGER
+   #endif
+#endif
 
 HB_FUNC( SQLALLOCEN ) /* HB_SQLALLOCENV( @hEnv ) --> nRetCode */
 {

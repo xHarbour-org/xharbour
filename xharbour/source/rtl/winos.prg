@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg,v 1.1 2004/12/08 01:01:08 peterrees Exp $
+ * $Id: winos.prg,v 1.2 2004/12/10 21:56:56 peterrees Exp $
  */
 
 /*
@@ -260,7 +260,12 @@ HB_FUNC( OS_ISWTSCLIENT )
   if ( osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion >= 4 )
   {
     // Only supported on NT Ver 4.0 SP3 & higher
+#if(WINVER >= 0x0500)
+    #ifndef SM_REMOTESESSION
+       #define SM_REMOTESESSION        0x1000
+    #endif
     iResult = GetSystemMetrics(SM_REMOTESESSION) ;
+#endif
   }
   hb_retl( iResult );
 }

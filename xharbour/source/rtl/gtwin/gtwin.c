@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.82 2005/02/12 19:54:03 druzus Exp $
+ * $Id: gtwin.c,v 1.83 2005/02/13 17:42:04 paultucker Exp $
  */
 
 /*
@@ -96,7 +96,7 @@
 #include <time.h>
 //#include <io.h>
 
-#if defined( _MSC_VER )
+#if defined( _MSC_VER ) || defined(__WATCOMC__)
   #include <conio.h>
 #endif
 
@@ -1952,7 +1952,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
 /* *********************************************************************** */
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
+#if defined(__BORLANDC__) || defined(_MSC_VER) || defined(__WATCOMC__) || defined(__MINGW32__)
 static int hb_Inp9x( USHORT usPort )
 {
    USHORT usVal;
@@ -1967,12 +1967,21 @@ static int hb_Inp9x( USHORT usPort )
       usVal = _AX;
 
    #elif defined( __XCC__ )
+
       __asm {
                mov   dx, usPort
                xor   ax, ax
                in    al, dx
                mov   usVal, ax
             }
+
+   #elif defined( __MINGW32__ )
+      __asm__ __volatile__ ("inb %w1,%b0":"=a" (usVal):"Nd" (usPort));
+
+   #elif defined( __WATCOMC__ )
+
+      usVal = inp( usPort );
+
    #else
 
       usVal = _inp( usPort );
@@ -1995,11 +2004,21 @@ static int hb_Outp9x( USHORT usPort, USHORT usVal )
       __emit__(0xEE);        /* ASM OUT DX, AL */
 
    #elif defined( __XCC__ )
+
       __asm {
                mov   dx, usPort
                mov   ax, usVal
                out   dx, al
             }
+
+   #elif defined( __MINGW32__ )
+
+      __asm__ __volatile__ ("outb %b0,%w1": :"a" (usVal), "Nd" (usPort));
+
+   #elif defined( __WATCOMC__ )
+
+       outp( usPort, usVal );
+
    #else
 
       _outp( usPort, usVal );
@@ -2113,7 +2132,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
     /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
     if( s_osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
     {
-       #if defined( __BORLANDC__ ) || defined( _MSC_VER )
+       #if defined( __BORLANDC__ ) || defined( _MSC_VER ) || defined( __WATCOMC__ )  || defined(__MINGW32__)
           HB_GT_FUNC(gt_w9xTone( dFrequency, dDuration ));
        #else
           HB_GT_FUNC(gt_wNtTone( dFrequency, dDuration ));

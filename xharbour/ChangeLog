@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3822 2005/02/15 12:51:52 snaiperis Exp $
+ * $Id: ChangeLog,v 1.3823 2005/02/15 19:52:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-16 03:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/odbc/odbc.c
+    ! define SQLLEN if not defined to enable compilation under standard MSVC 6.0 (Win98)
+  * source/rtl/winos.prg
+    ! function OS_ISWTSCLIENT() is now guarded with #if(WINVER >= 0x0500)
+      to enable compilation under standard MSVC 6.0 (Win98)
+  * source/rtl/gtalleg/ssf.h
+    ! define al_set_clip if not defined
+  * source/rtl/filesys.c
+    ! minor change to enable compilation under PellesC
+  * contrib/gtwvw/gtwvw.c
+    ! comment unused FLASHWINFO variable
+
+  Codes for the following changes are by Przemek and tested by me:
+
+  * include/hbmath.h
+    ! do not define HB_MATH_HANDLER if HB_MATH_ERRNO is defined (for MinGW32)
+  * source/rtl/math.c
+    ! use EOVERFLOW only if defined (for MinGW32)
+  * source/rtl/gtwin/gtwin.c
+    ! enable TONE() for OpenWatcom and MinGW32 under Win98
+  * source/rtl/gtwvt/gtwvt.c
+    ! enable TONE() for OpenWatcom and MinGW32 under Win98
 
 2005-02-15 11:48 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbclass.ch
