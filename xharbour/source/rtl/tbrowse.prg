@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.58 2004/03/16 08:32:49 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.59 2004/03/18 23:07:32 fsgiudice Exp $
  */
 
 /*
@@ -1970,6 +1970,8 @@ METHOD DrawRows() CLASS TBrowse
                   endif
                next
             else
+               DevPos( nRow + ::nRowData, ::nwLeft )
+
                for n := nColFrom to ::rightVisible
                   if n == ::nFrozenCols + 1
                      n := ::leftVisible
