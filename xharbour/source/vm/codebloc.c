@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.5 2002/02/01 01:05:58 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.6 2002/09/17 05:51:42 ronpinkas Exp $
  */
 
 /*
@@ -318,8 +318,22 @@ void hb_codeblockEvaluate( HB_ITEM_PTR pItem )
    int iStatics = hb_stack.iStatics;
    PHB_ITEM **Saved_pGlobals = hb_vm_pGlobals;
    short      Saved_iGlobals = hb_vm_iGlobals;
+   short iGlobal;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockEvaluate(%p)", pItem));
+
+   // Lock Module Globals, so that GC from callee will not release higher level Globals.
+   for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
+   {
+      if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_ARRAY )
+      {
+         hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asArray.value );
+      }
+      else if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_BLOCK )
+      {
+         hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
+      }
+   }
 
    hb_vm_pGlobals = pItem->item.asBlock.value->pGlobals;
    hb_vm_iGlobals = pItem->item.asBlock.value->iGlobals;
@@ -330,6 +344,19 @@ void hb_codeblockEvaluate( HB_ITEM_PTR pItem )
 
    hb_vm_pGlobals = Saved_pGlobals;
    hb_vm_iGlobals = Saved_iGlobals;
+
+   // Un-Lock Module Globals, so that GC can release current level Globals.
+   for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
+   {
+      if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_ARRAY )
+      {
+         hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asArray.value );
+      }
+      else if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_BLOCK )
+      {
+         hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
+      }
+   }
 }
 
 /* Get local variable referenced in a codeblock

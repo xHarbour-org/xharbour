@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.97 2002/09/16 05:34:02 ronpinkas Exp $
+ * $Id: hvm.c,v 1.98 2002/09/17 05:51:42 ronpinkas Exp $
  */
 
 /*
@@ -4092,6 +4092,8 @@ void hb_vmDo( USHORT uiParams )
 
       if( pFunc )
       {
+         short iGlobal;
+
          if( bProfiler && pSym->pDynSym )
          {
             pSym->pDynSym->ulRecurse++;
@@ -4102,9 +4104,35 @@ void hb_vmDo( USHORT uiParams )
             HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
          }
 
+         // Lock Module Globals, so that GC from callee will not release higher level Globals.
+         for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
+         {
+            if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_ARRAY )
+            {
+               hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asArray.value );
+            }
+            else if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_BLOCK )
+            {
+               hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
+            }
+         }
+
          HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
          pFunc();
          HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
+
+         // Un-Lock Module Globals, so that GC can release current level Globals.
+         for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
+         {
+            if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_ARRAY )
+            {
+               hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asArray.value );
+            }
+            else if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_BLOCK )
+            {
+               hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
+            }
+         }
 
          if( bProfiler && pSym->pDynSym )
          {
@@ -4264,6 +4292,8 @@ void hb_vmSend( USHORT uiParams )
 
    if( pFunc )
    {
+      short iGlobal;
+
       if( bProfiler )
       {
          pMethod = hb_mthRequested();
@@ -4274,7 +4304,33 @@ void hb_vmSend( USHORT uiParams )
          HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
       }
 
+      // Lock Module Globals, so that GC from callee will not release higher level Globals.
+      for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
+      {
+         if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_ARRAY )
+         {
+            hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asArray.value );
+         }
+         else if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_BLOCK )
+         {
+            hb_gcLock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
+         }
+      }
+
       pFunc();
+
+      // Un-Lock Module Globals, so that GC can release current level Globals.
+      for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
+      {
+         if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_ARRAY )
+         {
+            hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asArray.value );
+         }
+         else if( (*hb_vm_pGlobals)[ iGlobal ]->type == HB_IT_BLOCK )
+         {
+            hb_gcUnlock( (*hb_vm_pGlobals)[ iGlobal ]->item.asBlock.value );
+         }
+      }
 
       if ( ( pSym != &hb_symEval ) && lPopSuper && pSelfBase->puiClsTree )
       {
