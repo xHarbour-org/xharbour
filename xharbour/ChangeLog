@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.586 2003/01/05 20:19:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.587 2003/01/05 23:36:11 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-06 09:40 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+  * include/hbapirdd.h
+    ! changed LPDBORDERCONDINFO, borrowed from Harbour.
+    ! removed duplicated #defines (used from dbinfo.ch and dbstruct.ch)
+  * source/rdd/dbcmd.c
+  * source/rdd/dbf1.c
+  * source/rdd/workarea.c
+    ! several fixes borrowed from Harbour:
+      - some strings operations optimized,
+      - prevents some buffers overflow, unreleased memory
+      - changed LPDBORDERCONDINFO to support WHILE clause for ADS RDD
+      - COPY TO ... FIELDS ... is fixed - fields in the result dbf
+        are in the same secuence as in the FIELDS clause.
+  * include/hbrddntx.h
+  * source/rdd/dbfntx/dbfntx1.c
+    ! borrowed from Harbour:
+      ! some fixes and index optimizations (single field key)
+      + support for DBOI_ORDERCOUNT
 
 2003-01-05 20:35 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
   * source/rdd/dbfcdx/dbfcdx1.c
