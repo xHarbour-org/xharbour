@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.122 2004/09/16 17:32:08 druzus Exp $
+ * $Id: filesys.c,v 1.123 2004/10/18 10:22:25 likewolf Exp $
  */
 
 /*
@@ -1787,7 +1787,7 @@ void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
 
    /* TODO: HB_WIN32_IO support */
 
-#if defined(__BORLANDC__) || defined(__IBMCPP__) || defined(__DJGPP__) || defined(__CYGWIN__) || defined(__WATCOMC__)
+#if defined(__BORLANDC__) || defined(__IBMCPP__) || defined(__DJGPP__) || defined(__CYGWIN__) || defined(__WATCOMC__) || defined(HB_OS_OS2)
 {
    int iRet = 0;
 
@@ -2452,7 +2452,7 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
 
 #if defined(HB_FS_FILE_IO) && defined(HB_OS_LINUX) && \
     defined(__USE_LARGEFILE64)
-   /* 
+   /*
     * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
     * define and efectively enables lseek64/flock64 functions on 32bit
     * machines.
@@ -2610,7 +2610,7 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
 
 #if defined(HB_FS_FILE_IO) && defined(HB_OS_LINUX) && \
     defined(__USE_LARGEFILE64)
-   /* 
+   /*
     * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
     * define and efectively enables lseek64/flock64 functions on 32bit
     * machines.

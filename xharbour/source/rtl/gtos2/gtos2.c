@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.19 2004/10/22 11:26:45 paultucker Exp $
+ * $Id: gtos2.c,v 1.20 2004/10/24 09:36:14 oh1 Exp $
  */
 
 /*
@@ -1287,7 +1287,7 @@ void HB_GT_FUNC(gt_OutStd( BYTE * pbyStr, ULONG ulLen ))
 
 void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
 {
-    hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
+    hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
 }
 
 /* ************************** Clipboard support ********************************** */

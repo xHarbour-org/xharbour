@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3572 2004/11/01 22:40:56 likewolf Exp $
+ * $Id: ChangeLog,v 1.3573 2004/11/02 08:38:59 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-11-02 15:22 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/filesys.c
+    ! on OS/2 stdin and stdout were not set to binary because of missing #ifdef...
+  * source/rtl/gtos2/gtos2.c
+    ! gt_OutStd and gt_OutErr were both writing to stdout
 
 2004-11-02 15:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * source/rtl/tbrowse.prg
