@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.9 2003/11/10 01:48:29 jonnymind Exp $
+ * $Id: hbserial.prg,v 1.10 2004/01/31 20:18:26 tommir Exp $
  */
 
 /*
@@ -80,20 +80,20 @@ FUNCTION HB_Serialize( xValue )
 
       CASE "O"  
       	 if __objDerivedFrom(xValue,"HBPersistent")
-      	 	cSerial:= HB_SerializeSimple( xValue:ClassName )
-      	 	cSerial+= xValue:SaveToText()
-      	 	cSerial:= "Q" + HB_CreateLen8( Len( cSerial ) )+ cSerial
+            cSerial:= HB_SerializeSimple( xValue:ClassName )
+            cSerial+= xValue:SaveToText()
+            cSerial:= "Q" + HB_CreateLen8( Len( cSerial ) )+ cSerial
       	 
       	 else
-         	aPropertiesAndValues := __ClsGetPropertiesAndValues( xValue )
-         	cSerial := "O" + HB_CreateLen8( Len( aPropertiesAndValues ) )
-         	cSerial += HB_SerializeSimple( xValue:ClassName )
+            aPropertiesAndValues := __ClsGetPropertiesAndValues( xValue )
+            cSerial := "O" + HB_CreateLen8( Len( aPropertiesAndValues ) )
+            cSerial += HB_SerializeSimple( xValue:ClassName )
 
-         	FOR EACH aPropertyAndValue in aPropertiesAndValues
-         	   // saves name and content
-        	    cSerial += HB_Serialize( aPropertyAndValue[1] )
-        	    cSerial += HB_Serialize( aPropertyAndValue[2] )
-        	 NEXT
+            FOR EACH aPropertyAndValue in aPropertiesAndValues
+               // saves name and content
+               cSerial += HB_Serialize( aPropertyAndValue[1] )
+               cSerial += HB_Serialize( aPropertyAndValue[2] )
+            NEXT
          end if
          EXIT
 
@@ -109,16 +109,15 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
    LOCAL nLen, nClassID  
    LOCAL nLenBytes,nClassNameLen,oErr
 
-   IF Len( cSerial ) < 8
+   IF Len( cSerial ) < 2 // note
       RETURN NIL
    ENDIF
 
    SWITCH cSerial[1]
       CASE "A"
-         oObject := {}
-         cSerial := Substr( cSerial, 2 )
-         nLen := HB_GetLen8( cSerial )
-         cSerial := Substr( cSerial, 9 )
+         oObject := Array(0)
+         nLen := HB_GetLen8( Substr( cSerial, 2 ) )
+         cSerial := Substr( cSerial, 10 )
          DO WHILE nLen > 0
             oElem := HB_Deserialize( cSerial, nMaxLen )
             Aadd( oObject, oElem )
@@ -129,9 +128,8 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
 
       CASE "H"
          oObject := Hash()
-         cSerial := Substr( cSerial, 2 )
-         nLen := HB_GetLen8( cSerial )
-         cSerial := Substr( cSerial, 9 )
+         nLen := HB_GetLen8( Substr( cSerial, 2 ) )
+         cSerial := Substr( cSerial, 10 )
          HAllocate( oObject, nLen )
 
          DO WHILE nLen > 0
@@ -145,9 +143,8 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
       EXIT
 
       CASE "O"
-         cSerial := Substr( cSerial, 2 )
-         nLen := HB_GetLen8( cSerial )
-         cSerial := Substr( cSerial, 9 )
+         nLen := HB_GetLen8( Substr( cSerial, 2 ) )
+         cSerial := Substr( cSerial, 10 )
          cClassName := HB_DeserializeSimple( cSerial, 128 )
          IF cClassName == NIL
             RETURN NIL
@@ -156,17 +153,17 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
          // Let's create a new instance of this class, if possible
          nClassID := __ClsGetHandleFromName( cClassName )
          IF nClassID == 0
-			oErr := ErrorNew()
-			oErr:Args          := { cSerial, nMaxLen }
-			oErr:CanDefault    := .F.
-			oErr:CanRetry      := .F.
-			oErr:CanSubstitute := .F.
-			oErr:Description   := "Cannot find class implementation: '" + cClassName + "'"
-			oErr:Operation     := "HB_Deserialize()"
-			oErr:Severity      := ES_ERROR
-			oErr:SubCode       := 3
-			oErr:SubSystem     := "Serialization"
-			RETURN Eval( ErrorBlock(), oErr )
+            oErr := ErrorNew()
+            oErr:Args          := { cSerial, nMaxLen }
+            oErr:CanDefault    := .F.
+            oErr:CanRetry      := .F.
+            oErr:CanSubstitute := .F.
+            oErr:Description   := "Cannot find class implementation: '" + cClassName + "'"
+            oErr:Operation     := "HB_Deserialize()"
+            oErr:Severity      := ES_ERROR
+            oErr:SubCode       := 3
+            oErr:SubSystem     := "Serialization"
+            RETURN Eval( ErrorBlock(), oErr )
          ENDIF
          oObject := __ClsInst( nClassId )
 
@@ -185,9 +182,8 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
       EXIT
       
       CASE "Q"                               // Object inherited from HBPersistent
-         cSerial := Substr( cSerial, 2 )
-         nLenBytes := HB_GetLen8( cSerial )
-         cSerial := Substr( cSerial, 9 )
+         nLenBytes := HB_GetLen8( Substr( cSerial, 2 ) )
+         cSerial := Substr( cSerial, 10 )
                   
          cClassName := HB_DeserializeSimple( cSerial, 128 )
          IF cClassName == NIL
@@ -199,36 +195,36 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
          // Let's create a new instance of this class, if possible
          nClassID := __ClsGetHandleFromName( cClassName )
          IF nClassID == 0
-			oErr := ErrorNew()
-			oErr:Args          := { cSerial, nMaxLen }
-			oErr:CanDefault    := .F.
-			oErr:CanRetry      := .F.
-			oErr:CanSubstitute := .F.
-			oErr:Description   := "Cannot find class implementation: '" + cClassName + "'"
-			oErr:Operation     := "HB_Deserialize()"
-			oErr:Severity      := ES_ERROR
-			oErr:SubCode       := 1
-			oErr:SubSystem     := "Serialization"
-			RETURN Eval( ErrorBlock(), oErr )
+            oErr := ErrorNew()
+            oErr:Args          := { cSerial, nMaxLen }
+            oErr:CanDefault    := .F.
+            oErr:CanRetry      := .F.
+            oErr:CanSubstitute := .F.
+            oErr:Description   := "Cannot find class implementation: '" + cClassName + "'"
+            oErr:Operation     := "HB_Deserialize()"
+            oErr:Severity      := ES_ERROR
+            oErr:SubCode       := 1
+            oErr:SubSystem     := "Serialization"
+            RETURN Eval( ErrorBlock(), oErr )
          ENDIF           
          
          oObject := __ClsInst( nClassId )  
          if ! __objDerivedFrom(oObject,"HBPersistent")
             oErr := ErrorNew()
-			oErr:Args          := { cSerial, nMaxLen }
-			oErr:CanDefault    := .F.
-			oErr:CanRetry      := .F.
-			oErr:CanSubstitute := .F.
-			oErr:Description   := "Class is not derived from HBPersistent: '" + cClassName + "'"
-			oErr:Operation     := "HB_Deserialize()"
-			oErr:Severity      := ES_ERROR
-			oErr:SubCode       := 2
-			oErr:SubSystem     := "Serialization"
-			RETURN Eval( ErrorBlock(), oErr )
+            oErr:Args          := { cSerial, nMaxLen }
+            oErr:CanDefault    := .F.
+            oErr:CanRetry      := .F.
+            oErr:CanSubstitute := .F.
+            oErr:Description   := "Class is not derived from HBPersistent: '" + cClassName + "'"
+            oErr:Operation     := "HB_Deserialize()"
+            oErr:Severity      := ES_ERROR
+            oErr:SubCode       := 2
+            oErr:SubSystem     := "Serialization"
+            RETURN Eval( ErrorBlock(), oErr )
          end if
  
-		 oObject:LoadFromText(substr(cSerial,1,nLenBytes))
-		 cSerial :=  Substr( cSerial,nLenBytes+1 )
+       oObject:LoadFromText(substr(cSerial,1,nLenBytes))
+       cSerial :=  Substr( cSerial,nLenBytes+1 )
          
       EXIT
       
