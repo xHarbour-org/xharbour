@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.155 2004/06/16 00:07:28 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.156 2004/06/17 17:47:27 ronpinkas Exp $
  */
 
 /*
@@ -4926,7 +4926,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
           {
              /* Ron Pinkas added 2000-01-21 */
              if( *expreal == '&' && ( expreal[1] == '(' || ( ( ( ( pTemp = strchr( expreal + 1, '.' ) ) == NULL || pTemp >= expreal + lenitem - 1 ) &&
-                 strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) ) ) )
+                 strpbrkSkipStrings( expreal, "+-*/^$=!#<>|\\" ) == NULL ) ) ) )
              {
                 i = 0;
                 if( ! ifou )
@@ -4962,7 +4962,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
     {
        /* Ron Pinkas added 2000-01-21 */
        if( *expreal == '&' && ( expreal[1] == '(' || ( ( ( ( pTemp = strchr( expreal + 1, '.' ) ) == NULL || pTemp >= expreal + lenreal - 1 ) &&
-           strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) ) ) )
+           strpbrkSkipStrings( expreal, "+-*/^$=!#<>|\\" ) == NULL ) ) ) )
        {
           rmlen--;
 
@@ -5001,7 +5001,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
            if( *expreal != '\0' )
            {
                if( expreal[0] == '&' && ( expreal[1] != '(' && ( pTemp = strchr( expreal + 1, '.' ) ) != NULL &&
-                  pTemp < expreal + lenitem - 1 ) && ( ( pTemp = strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) ) == NULL || pTemp >= expreal + lenitem ) )
+                  pTemp < expreal + lenitem - 1 ) && ( ( pTemp = strpbrkSkipStrings( expreal, "+-*/^$=!#<>|\\" ) ) == NULL || pTemp >= expreal + lenitem ) )
                {
                    i = ifou ? 3 : 2;
                    pp_rQuotes( expreal, sQuotes );
@@ -5010,7 +5010,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
                    ptro += i;
                    rmlen += i;
                }
-               else if( !lenitem || *expreal == '(' || ( *expreal == '&' && lenreal > 1 && ( expreal[1] == '(' || strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) ) ||
+               else if( !lenitem || *expreal == '(' || ( *expreal == '&' && lenreal > 1 && ( expreal[1] == '(' || strpbrkSkipStrings( expreal, "+-*/^$=!#<>|\\" ) == NULL ) ) ||
                     ( *expreal =='\"' && *(expreal + lenitem - 1 ) == '\"' && strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) ||
                     ( *expreal == '\'' && *(expreal + lenitem - 1 ) == '\'' && strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) )
                {
@@ -5050,14 +5050,14 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
         while( ifou > 0 );
     }
     else if( *expreal == '&' && ( expreal[1] != '(' && ( pTemp = strchr( expreal + 1, '.' ) ) != NULL && pTemp < expreal + lenreal - 1 ) &&
-             strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL )
+             strpbrkSkipStrings( expreal, "+-*/^$=!#<>|\\" ) == NULL )
     {
         pp_rQuotes( expreal, sQuotes );
         hb_pp_Stuff( sQuotes, ptro, 2, 4, lenres );
         hb_pp_Stuff( expreal, ptro + 1, lenreal, 0, lenres );
         rmlen = lenreal + 2;
     }
-    else if( !lenreal || *expreal == '(' || ( *expreal == '&' && lenreal > 1 && ( expreal[1] == '(' || strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) ) ||
+    else if( !lenreal || *expreal == '(' || ( *expreal == '&' && lenreal > 1 && ( expreal[1] == '(' || strpbrkSkipStrings( expreal, "+-*/^$=!#<>|\\" ) == NULL ) ) ||
              ( *expreal == '\"' && *( expreal + lenreal - 1 ) == '\"' && strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) ||
              ( *expreal == '\'' && *( expreal + lenreal - 1 ) == '\'' && strpbrkSkipStrings( expreal, "+-*/^$=!#<>|" ) == NULL ) )
     {

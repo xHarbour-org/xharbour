@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3090 2004/06/18 16:48:02 paultucker Exp $
+ * $Id: ChangeLog,v 1.3091 2004/06/18 21:13:00 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-18 18:01 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/pp/ppcore.c
+    ! Added '\' to complex macro detection in getExpReal() support for Extended Markers.
 
 2004-06-19 01:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * contrib/libct/files.c
