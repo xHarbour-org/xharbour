@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1157 2003/06/20 21:29:15 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1158 2003/06/21 02:03:06 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-21 08:58 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * include/hberrors.h
+  * source/compiler/cmdcheck.c
+  * source/compiler/harbour.c
+  * source/compiler/hbgenerr.c
+    % Emproved support for -j switch, both in reporting and checking.
+    ! -jfilename is now working (HILoutput is sent to filename)
+    % Using now HIT format to produce HIL files, so it is posible to
+      have the same API to manage both.
+    ! If an HIL file already exists, the data is appended. This causes
+      proliferation of the list on multiple make, unless the file is
+      intentionally removed.
+
+  * include/hbi18n.h
+  * source/vm/hbi18n.c
+    % Api rationalization.
+
+  * source/vm/hvm.c
+    ! Added support for initialization of i18n at startup and shutdown
+
+  + tests/i18n/fr_FR.hit
+  + tests/i18n/it_IT.hit
+    ! Test of international dictionaries for i18ntest. Set environment
+      variable LANG="it_IT" or LANG="fr_FR" and see the international
+      result! (french dictionary is intentionally left "partial", to
+      demonstrate the possibility to do also mixed/partial dicts).
+
+  + utils/hbdict/Makefile
+  + utils/hbdict/hbdict.prg
+  + utils/hbdict/i18n/it_IT.hit
+    + Hbdict is a very basic (currently TEST) application to build
+      and maintain HIT dictionaries.
+      TODO (urgent): merge of HIL duplicated strings (but can be after
+      build 81;
 
 2003-06-20 22:55 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   * source/rdd/dbfntx1.c

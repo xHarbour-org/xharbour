@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.40 2003/06/18 08:57:01 ronpinkas Exp $
+ * $Id: harbour.c,v 1.41 2003/06/20 17:32:41 jonnymind Exp $
  */
 
 /*
@@ -106,6 +106,7 @@
 
 #include "hbcomp.h"
 #include "hbhash.h"
+#include "hbi18n.h"
 
 #if defined(HB_OS_DOS) && defined(__BORLANDC__)
    #include <limits.h>
@@ -4392,6 +4393,8 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
    {
       char szFileName[ _POSIX_PATH_MAX ], szFileLiteral[ _POSIX_PATH_MAX + 2 ];
       char szPpoName[ _POSIX_PATH_MAX ];
+      char szHILName[ _POSIX_PATH_MAX ];
+
       char *szSourceExtension, *szSourcePath;
 
       if( !hb_comp_pFileName->szExtension )
@@ -4419,6 +4422,55 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
          }
       }
 
+      /* Giancarlo Niccolai: opening/creating i18n file */
+      if ( hb_comp_bI18n )
+      {
+         char *szExt;
+
+         /* Get correct filename */
+         if ( hb_comp_szHILout == NULL )
+         {
+            szExt = hb_comp_pFileName->szExtension;
+            hb_comp_pFileName->szExtension = ".hil";
+            hb_fsFNameMerge( szHILName, hb_comp_pFileName );
+            hb_comp_pFileName->szExtension = szExt;
+         }
+         else
+         {
+            strcpy( szHILName, hb_comp_szHILout );
+         }
+
+         // if the file already exists...
+         hb_comp_HILfile = fopen( szHILName, "r+b" );
+         if( hb_comp_HILfile != NULL )
+         {
+            //... just go to the end
+            fseek(hb_comp_HILfile, 0, SEEK_END);
+         }
+         else
+         {
+            HB_I18N_TAB_HEADER head;
+
+            // try to create it...
+            hb_comp_HILfile = fopen( szHILName, "wb" );
+            if( hb_comp_HILfile == NULL )
+            {
+               hb_compGenError( hb_comp_szErrors,
+                  'E', HB_COMP_ERR_CREATE_HIL,
+                  szHILName, NULL );
+               iStatus = EXIT_FAILURE;
+            }
+            // and write header
+            sprintf( head.signature, "\3HIL" );
+            sprintf( head.author, "The xharbour group" );
+            sprintf( head.language, "International" );
+            sprintf( head.language_int, "International" );
+            sprintf( head.language_code, HB_INTERNATIONAL_NAME );
+            head.entries = -1; // unknown
+            fwrite( &head, sizeof( head ), 1, hb_comp_HILfile );
+         }
+      }
+
       if( iStatus == EXIT_SUCCESS )
       {
          /* Add /D command line or envvar defines */
@@ -4439,6 +4491,11 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                   printf( "Compiling '%s' and generating preprocessed output to '%s'...\n", szFileName, szPpoName );
                else
                   printf( "Compiling '%s'...\n", szFileName );
+
+               if( hb_comp_bI18n )
+               {
+                  printf( "Generating intenrational list to '%s'...\n", szHILName );
+               }
             }
 
             /* Generate the starting procedure frame */
@@ -4860,52 +4917,27 @@ void hb_compEnumMemberAdd( char *szName )
    hb_comp_pEnum->pMembers[ hb_comp_pEnum->lMembers - 1 ] = szName;
 }
 
-/* Giasncarlo Niccolai: internatonalization functions */
+/* Giancarlo Niccolai: internatonalization functions */
 void hb_compAddI18nString( char *szString )
 {
-   char szFileName[ _POSIX_PATH_MAX ];
-   char *szExt, *szPath;
    int nLen;
-
-   /* open destination file if necessary */
-   if ( hb_comp_HILfile == NULL )
-   {
-      /* Get correct filename */
-      if ( hb_comp_szHILout == NULL )
-      {
-         szExt = hb_comp_pFileName->szExtension;
-         hb_comp_pFileName->szExtension = ".hil";
-         hb_fsFNameMerge( szFileName, hb_comp_pFileName );
-         hb_comp_pFileName->szExtension = szExt;
-         szPath = szFileName;
-      }
-      else
-      {
-         szPath = hb_comp_szHILout;
-      }
-
-      hb_comp_HILfile = fopen( szPath, "wb" );
-
-      if( hb_comp_HILfile == NULL )
-      {
-         hb_compGenError( hb_comp_szErrors,
-            'E', HB_COMP_ERR_CREATE_OUTPUT,
-            szFileName, NULL );
-         /* avoidsbeing called again */
-         hb_comp_bI18n = FALSE;
-         return;
-      }
-   }
 
    nLen = strlen( szString );
 
    // include trailing 0
-   fwrite( &nLen, 1, sizeof( nLen + 1 ), hb_comp_HILfile );
-   fwrite( szString, 1,  nLen + 1, hb_comp_HILfile );
+   /* writing 8 characters in ASCII numeric format,
+      so it can be read from xharbour without conversions, and is
+      portable across architectures */
+   fprintf( hb_comp_HILfile, "%8d", nLen + 1 );
+   fprintf( hb_comp_HILfile, szString );
+   // I want the trailing 0 to be in the file as a validity marker
+   fputc( 0, hb_comp_HILfile );
+   // hil file is an hit file without translations
+   fprintf( hb_comp_HILfile, "       0" );
 
    if ( ferror( hb_comp_HILfile ) )
    {
-      //TODO: signal error
+      /* TODO:Signal error */
       hb_comp_bI18n = FALSE;
    }
 }

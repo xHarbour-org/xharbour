@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.8 2002/10/09 20:42:58 ronpinkas Exp $
+ * $Id: hberrors.h,v 1.9 2003/01/24 09:52:42 ronpinkas Exp $
  */
 
 /*
@@ -121,6 +121,7 @@ extern "C" {
 #define HB_COMP_ERR_EXTERNGLOBAL_ASSIGN         57
 #define HB_COMP_ERR_TOOMANY_PARAMS              58
 #define HB_COMP_ERR_INVALID_CONSTANT            59
+#define HB_COMP_ERR_CREATE_HIL                  33
 
 #define HB_COMP_WARN_AMBIGUOUS_VAR              1
 #define HB_COMP_WARN_MEMVAR_ASSUMED             2

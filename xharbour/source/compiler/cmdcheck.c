@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.5 2003/02/15 22:20:11 paultucker Exp $
+ * $Id: cmdcheck.c,v 1.6 2003/06/20 17:32:41 jonnymind Exp $
  */
 
 /*
@@ -274,6 +274,24 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                        /* Accept rest as part of #define and continue with next Args[]. */
                        j = strlen( Args[i] );
                        continue;
+
+                     case 'j':
+                     case 'J':
+                        hb_comp_bI18n = TRUE;
+                        if ( Args[i][2] )
+                        {
+                           hb_comp_szHILout = (char *) hb_xgrab( strlen( Args[i] + 2 ) );
+                           strcpy( hb_comp_szHILout, Args[i] + 2);
+                           j += strlen( hb_comp_szHILout )+2;
+                        }
+                        else
+                        {
+                           hb_comp_szHILout = NULL;
+                           j+=2;
+                        }
+
+                        /* The file will be eventually created when we find an i18n() */
+                        break;
 
                      case 'n' :
                      case 'N' :
@@ -611,22 +629,6 @@ void hb_compChkEnvironVar( char * szSwitch )
              case 'i':
              case 'I':
                 hb_fsAddSearchPath( s + 1, &hb_comp_pIncludePath );
-                break;
-
-             case 'j':
-             case 'J':
-                hb_comp_bI18n = TRUE;
-                if ( s[1] )
-                {
-                   hb_comp_szHILout = (char *) hb_xgrab( strlen( s + 1 ) );
-                   strcpy( hb_comp_szHILout, s + 1);
-                }
-                else
-                {
-                   hb_comp_szHILout = NULL;
-                }
-
-                /* The file will be eventually created when we find an i18n() */
                 break;
 
              case 'k':

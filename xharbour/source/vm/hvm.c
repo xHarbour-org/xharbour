@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.213 2003/06/19 20:50:33 andijahja Exp $
+ * $Id: hvm.c,v 1.214 2003/06/20 18:25:39 ronpinkas Exp $
  */
 
 /*
@@ -95,6 +95,7 @@
 #include "hbinkey.ch"
 #include "inkey.ch"
 #include "classes.h"
+#include "hbi18n.h"
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
@@ -410,6 +411,9 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    #define HB_LANG_SELECT_DEFAULT_( id ) hb_langSelectID( #id )
    HB_LANG_SELECT_DEFAULT( HB_LANG_DEFAULT );
 
+   /* a good point to put i18n initialization */
+   hb_i18nInit( NULL, NULL );
+
    /* Check for some internal switches */
    hb_cmdargProcessVM();
 
@@ -534,6 +538,8 @@ void HB_EXPORT hb_vmQuit( void )
 
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
    //printf( "After ExitFunctions\n" );
+
+   hb_i18nExit();
 
    /* release all known items stored in subsystems */
    hb_rddShutDown();

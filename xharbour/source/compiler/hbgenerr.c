@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.9 2003/01/24 09:52:43 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.10 2003/06/18 21:09:50 andijahja Exp $
  */
 
 /*
@@ -91,7 +91,8 @@ char * hb_comp_szErrors[] =
    "Too many Global declarations \'%s\'.",
    "External Global declaration can not include initializer \'%s\'.",
    "Too many Parameter declarations \'%s\'.",
-   "Invalid SWITCH Constant \'%s\'."
+   "Invalid SWITCH Constant \'%s\'.",
+   "Cannot write HIL table to \'%s\'."
 };
 
 /* Table with parse warnings */

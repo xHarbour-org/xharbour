@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbi18n.h,v 1.1 2003/06/20 18:00:57 jonnymind Exp $
  */
 
 /*
@@ -8,7 +8,6 @@
  *
  * Copyright 2003 Giancarlo Niccolai <giancarlo@niccolai.ws>
  * www - http://www.xharbour.org
- * SEE ALSO COPYRIGHT NOTICE FOR NXS BELOW.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,29 +56,29 @@
 #define HB_DEFAULT_I18N_PATH     "i18n"
 #define HB_I18N_LIST_EXT         "hil"
 #define HB_I18N_TAB_EXT          "hit"
-
-#include <stdio.h>
+#define HB_INTERNATIONAL_NAME    "en_US"
 
 typedef struct tag_hb_i18n_tab_header
 {
-   char signature[4];
+   char signature[5];
    char author[50];
    char language[50];
    char language_int[50];
+   char language_code[10];
    int entries;
 } HB_I18N_TAB_HEADER;
+
 
 /** VM Interface **/
 BOOL hb_i18nInit( char *i18n_dir, char *language );
 void hb_i18nExit( void );
 
 /** Internal routines **/
-BOOL hb_i18n_read_table( FILE *fp );
-
-/** Programs willing to have an internationlized strings must call this */
-char *hb_i18n( char *cInt );
-
-/** Never use this directly, unless you know what you are doing */
-char *hb_i18n_scan_table( char *cInt );
+char * hb_i18n_build_table_filename( char *i18n_dir, char *language );
+PHB_ITEM hb_i18n_read_table_header( int handle );
+BOOL hb_i18n_write_table_header( int handle, PHB_ITEM pHeader );
+PHB_ITEM hb_i18n_read_table( int handle, int count );
+BOOL hb_i18n_write_table( int handle, PHB_ITEM pTable );
+BOOL hb_i18n_load_language( char *language );
 
 #endif
