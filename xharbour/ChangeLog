@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2145 2004/01/26 16:58:16 druzus Exp $
+ * $Id: ChangeLog,v 1.2146 2004/01/26 18:43:42 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-26 16:30 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/dbedit.prg
+    ! Better approach for the bug causing DbEdit() to quit inmediatly if
+      LastKey() is K_ESC or K_ENTER
 
 2004-01-26 19:40 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfntx/dbfntx1.c
