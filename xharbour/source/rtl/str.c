@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.11 2004/02/09 12:11:30 andijahja Exp $
+ * $Id: str.c,v 1.12 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 #include "hbfast.h"
+#include "hbset.h"
 
 HB_FUNC( STR )
 {
@@ -84,6 +85,7 @@ HB_FUNC( STR )
          if( hb_pcount() >= 2 )
          {
             pWidth = hb_param( 2, HB_IT_NUMERIC );
+
             if ( ! pWidth )
             {
                bValid = FALSE;
@@ -108,7 +110,10 @@ HB_FUNC( STR )
 
    if( bValid )
    {
+      BOOL bLogical = hb_set.HB_SET_FIXED;
+      hb_set.HB_SET_FIXED = FALSE ;
       char * szResult = hb_itemStr( pNumber, pWidth, pDec );
+      hb_set.HB_SET_FIXED = bLogical ;
 
       if( szResult )
       {
@@ -124,9 +129,18 @@ HB_FUNC( STR )
             hb_xfree( szResult );
          }
       }
+      else if ( ( pWidth ) && ( pDec ) && ( hb_itemGetNI( pWidth ) - ( hb_itemGetNI( pDec ) + 1) == 0 ) )
+      {
+        int iLen = hb_itemGetNI( pWidth ) ;
+        char *szTemp = (char *) hb_xgrab( iLen + 1  ) ;
+        hb_xmemset( szTemp, 0 , iLen + 1 );
+        hb_xmemset( szTemp, '*', iLen );
+        hb_retc( szTemp ) ;
+        hb_xfree( szTemp ) ;
+      }
       else
       {
-         hb_retc( NULL );
+         hb_retc( szResult );
       }
    }
    else
