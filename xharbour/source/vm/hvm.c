@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.265 2003/10/05 04:48:26 ronpinkas Exp $
+ * $Id: hvm.c,v 1.266 2003/10/05 05:25:07 paultucker Exp $
  */
 
 /*
@@ -2178,7 +2178,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                pLocal->type = HB_IT_LONG;
                pLocal->item.asLong.value = ( long ) dNewVal;
-               pLocal->item.asLong.length = 10;
+
+               if( dNewVal >= 1000000000 )
+               {
+                  pLocal->item.asLong.length = 11;
+               }
+               else if( dNewVal <= -1000000000 )
+               {
+                  pLocal->item.asLong.length = 20;
+               }
+               else
+               {
+                  pLocal->item.asLong.length = 10;
+               }
             }
             else
             {
@@ -2317,7 +2329,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                pTop->type = HB_IT_LONG;
                pTop->item.asLong.value = ( long ) dNewVal;
-               pTop->item.asLong.length = 10;
+
+               if( dNewVal >= 1000000000 )
+               {
+                  pTop->item.asLong.length = 11;
+               }
+               else if( dNewVal <= -1000000000 )
+               {
+                  pTop->item.asLong.length = 20;
+               }
+               else
+               {
+                  pTop->item.asLong.length = 10;
+               }
             }
             else
             {
@@ -5860,7 +5884,20 @@ void hb_vmPushLong( long lNumber )
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_LONG;
    ( * HB_VM_STACK.pPos )->item.asLong.value = lNumber;
-   ( * HB_VM_STACK.pPos )->item.asLong.length = 10;
+
+   if( lNumber >= 1000000000 )
+   {
+      ( * HB_VM_STACK.pPos )->item.asLong.length = 11;
+   }
+   else if( lNumber <= -1000000000 )
+   {
+      ( * HB_VM_STACK.pPos )->item.asLong.length = 20;
+   }
+   else
+   {
+      ( * HB_VM_STACK.pPos )->item.asLong.length = 10;
+   }
+
    hb_stackPush();
 }
 
@@ -5874,11 +5911,17 @@ static void hb_vmPushLongConst( long lNumber )
    ( * HB_VM_STACK.pPos )->item.asLong.value = lNumber;
 
    if( lNumber >= 1000000000 )
+   {
       ( * HB_VM_STACK.pPos )->item.asLong.length = 11;
+   }
    else if( lNumber <= -1000000000 )
+   {
       ( * HB_VM_STACK.pPos )->item.asLong.length = 20;
+   }
    else
+   {
       ( * HB_VM_STACK.pPos )->item.asLong.length = 10;
+   }
 
    hb_stackPush();
 }
@@ -5941,9 +5984,13 @@ static void hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec )
          ( * HB_VM_STACK.pPos )->item.asDouble.length = iWidth;
    }
    else if( dNumber <= -1000000000.0 )
+   {
       ( * HB_VM_STACK.pPos )->item.asDouble.length = 20;
+   }
    else
+   {
       ( * HB_VM_STACK.pPos )->item.asDouble.length = 10;
+   }
 
    hb_stackPush();
 }

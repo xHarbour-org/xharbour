@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1553 2003/10/05 18:55:33 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1554 2003/10/06 03:28:58 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-05 20:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+    ! Fixed long outstanding issue of item.asLong.length.
+      Length now set to 11 if item.asLong.value is >= 1,000,000,000
+                     to 20 if <= -1,000,000,000
+                     to 10 otherwise.
+      /* Clipper compatibility - this fixes problem where sometimes numbers
+        (like Windows Handles) are shown as "**********". */
 
 2003-10-06 00:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/gtwin/gtwin.c
