@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.c,v 1.3 2004/01/22 02:58:01 maurifull Exp $
+ * $Id: ssf.c,v 1.4 2004/01/28 04:14:34 maurifull Exp $
  */
 
 /*
@@ -65,12 +65,6 @@
 ssfFont *ssfDefaultFont = &ssfFixedThinFont;
 
 #define fSize sfont->fsize
-
-void ssfSetFontSize(ssfFont *sfont, unsigned short fsize)
-{
-    fSize = fsize;
-}
-
 #define fLeft points[0]
 #define fTop points[1]
 #define fRight points[2]
@@ -80,125 +74,136 @@ void ssfSetFontSize(ssfFont *sfont, unsigned short fsize)
 #define fRight2 points[6]
 #define fBottom2 points[7]
 
+void ssfSetFontSize(ssfFont *sfont, unsigned short fsize)
+{
+   fSize = fsize;
+}
+
 unsigned short ssfDrawChar(AL_BITMAP *dst, ssfFont *sfont, char c, int x, int y, int color)
 {
-unsigned char p;
-int i, j, thick;
-ssfGlyph charGlyph;
-ssfFrame charFrame;
-int points[8];
-float fScale;
+   unsigned char p;
+   int i, j, thick;
+   ssfGlyph charGlyph;
+   ssfFrame charFrame;
+   int points[8];
+   float fScale;
 
-    p = (unsigned char) c;
-    charGlyph = *sfont->chars[p];
-    fScale = (float) ((float) sfont->fsize / (float) 65535);
+   p = (unsigned char) c;
+   charGlyph = *sfont->chars[p];
+   fScale = (float) ((float) sfont->fsize / (float) 65535);
 
-    for (i = 0; i < charGlyph.num; i++)
-    {
-	charFrame = charGlyph.frames[i];
-	if (charFrame.ftype == SSF_SPLINE2)
-	{
-	    fLeft2 = x + (int) (fScale * charFrame.left);
-	    fTop2 = y + (int) (fScale * charFrame.top);
-	    fRight2 = x + (int) (fScale * charFrame.right);
-	    fBottom2 = y + (int) (fScale * charFrame.bottom);
-	}
-	else
-	{
-	    fLeft = x + (int) (fScale * charFrame.left);
-	    fTop = y + (int) (fScale * charFrame.top);
-	    fRight = x + (int) (fScale * charFrame.right);
-	    fBottom = y + (int) (fScale * charFrame.bottom);
-	}
+   for (i = 0; i < charGlyph.num; i++)
+   {
+      charFrame = charGlyph.frames[i];
+      if (charFrame.ftype == SSF_SPLINE2)
+      {
+         fLeft2 = x + (int) (fScale * charFrame.left);
+         fTop2 = y + (int) (fScale * charFrame.top);
+         fRight2 = x + (int) (fScale * charFrame.right);
+         fBottom2 = y + (int) (fScale * charFrame.bottom);
+      }
+      else
+      {
+         fLeft = x + (int) (fScale * charFrame.left);
+         fTop = y + (int) (fScale * charFrame.top);
+         fRight = x + (int) (fScale * charFrame.right);
+         fBottom = y + (int) (fScale * charFrame.bottom);
+      }
 
-	switch (charFrame.ftype)
-	{
-	    case SSF_SPLINE2:
-		thick = (int) (fScale * charFrame.thick);
-		if (thick == 0)
-		    thick++;
-		for (j = 0; j < thick; j++) 
-		{
-		    al_draw_spline(dst, points, color);
-		    switch (charFrame.thickdir)
-		    {
-			case THICK_LEFT:
-			    fLeft--;
-			    fRight--;
-			    fLeft2--;
-			    fRight2--;
-			    break;
-			case THICK_UP:
-			    fTop--;
-			    fBottom--;
-			    fTop2--;
-			    fBottom2--;
-			    break;
-			case THICK_RIGHT:
-			    fLeft++;
-			    fRight++;
-			    fLeft2++;
-			    fRight2++;
-			    break;
-			case THICK_DOWN:
-			    fTop++;
-			    fBottom++;
-			    fTop2++;
-			    fBottom2++;
-			    break;
-		    }
-		}
-		break;
-	    case SSF_LINE:
-		thick = (int) (fScale * charFrame.thick);
-		if (thick == 0)
-		    thick++;
-		for (j = 0; j < thick; j++) 
-		{
-		    al_draw_line(dst, fLeft, fTop, fRight, fBottom, color);
-		    switch (charFrame.thickdir)
-		    {
-			case THICK_LEFT:
-			    fLeft--;
-			    fRight--;
-			    break;
-			case THICK_UP:
-			    fTop--;
-			    fBottom--;
-			    break;
-			case THICK_RIGHT:
-			    fLeft++;
-			    fRight++;
-			    break;
-			case THICK_DOWN:
-			    fTop++;
-			    fBottom++;
-			    break;
-		    }
-		}
-		break;
-	    case SSF_BOX:
-		al_draw_rect_fill(dst, fLeft, fTop, fRight, fBottom, color);
-		break;
-	    case SSF_TRIANGLE:
-		thick = x + (int) (fScale * charFrame.thick);
-		al_draw_triangle(dst, fLeft, fTop, fRight, fBottom, thick, y + (int) (fScale * charFrame.thickdir), color);
-		break;
-	}
-    }
+      switch (charFrame.ftype)
+      {
+      case SSF_SPLINE2:
+         thick = (int) (fScale * charFrame.thick);
 
-    return (sfont->fsize / 2);
+         if (thick == 0)
+            thick++;
+
+         for (j = 0; j < thick; j++)
+         {
+            al_draw_spline(dst, points, color);
+            switch (charFrame.thickdir)
+            {
+               case THICK_LEFT:
+                  fLeft--;
+                  fRight--;
+                  fLeft2--;
+                  fRight2--;
+                  break;
+               case THICK_UP:
+                  fTop--;
+                  fBottom--;
+                  fTop2--;
+                  fBottom2--;
+                  break;
+               case THICK_RIGHT:
+                  fLeft++;
+                  fRight++;
+                  fLeft2++;
+                  fRight2++;
+                  break;
+               case THICK_DOWN:
+                  fTop++;
+                  fBottom++;
+                  fTop2++;
+                  fBottom2++;
+                  break;
+            }
+         }
+         break;
+
+      case SSF_LINE:
+         thick = (int) (fScale * charFrame.thick);
+
+         if (thick == 0)
+            thick++;
+
+         for (j = 0; j < thick; j++)
+         {
+            al_draw_line(dst, fLeft, fTop, fRight, fBottom, color);
+            switch (charFrame.thickdir) {
+               case THICK_LEFT:
+                  fLeft--;
+                  fRight--;
+                  break;
+               case THICK_UP:
+                  fTop--;
+                  fBottom--;
+                  break;
+               case THICK_RIGHT:
+                  fLeft++;
+                  fRight++;
+                  break;
+               case THICK_DOWN:
+                  fTop++;
+                  fBottom++;
+                  break;
+            }
+         }
+         break;
+
+      case SSF_BOX:
+         al_draw_rect_fill(dst, fLeft, fTop, fRight, fBottom, color);
+         break;
+
+      case SSF_TRIANGLE:
+         thick = x + (int) (fScale * charFrame.thick);
+         al_draw_triangle(dst, fLeft, fTop, fRight, fBottom, thick, y + (int) (fScale * charFrame.thickdir), color);
+         break;
+      }
+   }
+
+   return (sfont->fsize / 2);
 }
 
 int ssfDrawText(AL_BITMAP *dst, ssfFont *sfont, char *s, int x, int y, int color)
 {
-int i = 0;
+   int i = 0;
 
-    while ( s[i] )
-    {
-	x += ssfDrawChar(dst, sfont, s[i], x, y, color);
-	i++;
-    }
+   while ( s[i] )
+   {
+      x += ssfDrawChar(dst, sfont, s[i], x, y, color);
+      i++;
+   }
 
-    return x;
+   return x;
 }

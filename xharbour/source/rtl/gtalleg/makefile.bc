@@ -1,0 +1,31 @@
+#
+# $Id$
+#
+
+# makefile for Borland C/C++ 32 bits
+# Building of gtalleg.lib - Harbour GT Allegro Support
+
+# Important: Allegro include files must exist
+# and adjust ALLEGRO_DIR as per environment
+
+ALLEGRO_DIR = D:\allegro
+
+INCLUDE_DIR = ..\..\..\include;$(ALLEGRO_DIR)\include
+
+BIN_DIR = ..\..\..\bin\b32
+OBJ_DIR = ..\..\..\obj\b32
+LIB_DIR = ..\..\..\lib\b32
+
+$(LIB_DIR)\gtalleg.lib : \
+   $(OBJ_DIR)\gtalleg.obj \
+   $(OBJ_DIR)\ssf.obj
+
+$(OBJ_DIR)\gtalleg.obj : gtalleg.c
+$(OBJ_DIR)\ssf.obj     : ssf.c
+
+.c.obj:
+  bcc32 $(CLIBFLAGS) $(C_USR) -c -O2 -DWIN32 -I$(INCLUDE_DIR) -o$@ $<
+  tlib $(LIB_DIR)\gtalleg.lib -+$@,,
+
+.prg.c:
+  $(BIN_DIR)\harbour.exe $< -q0 -w -es2 -gc0 -n -i$(INCLUDE_DIR) -o$@

@@ -1,0 +1,70 @@
+#
+# $Id$
+#
+
+#
+# Directory macros. These should never have to change.
+#
+
+# Important: Allegro include files must exist
+# and adjust ALLEGRO_DIR as per environment
+
+ALLEGRO_DIR = D:\allegro
+
+INCLUDE_DIR = ..\..\..\include;$(ALLEGRO_DIR)\include
+BIN_DIR     = ..\..\..\bin
+LIB_DIR     = ..\..\..\lib\vc
+OBJ_DIR     = ..\..\..\obj\vc
+
+#
+# C compiler definition and C flags. These should never have to change.
+#
+
+CC = cl
+C_FLAGS = -G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -nologo $(HB_MT) -I$(INCLUDE_DIR) -DWIN32 $(C_USR) $(CFLAGS)
+CLIBFLAGS = $(C_FLAGS) -c
+CLIBFLAGSDEBUG = $(CLIBFLAGS) -Zi
+
+#
+# Macros to access our library names
+#
+
+GTALLEG_LIB = $(LIB_DIR)\gtalleg.lib
+HARBOUR_EXE = $(BIN_DIR)\harbour.exe
+HARBOURFLAGS = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0
+
+#
+# OBJ list for gtalleg.lib
+#
+
+GTALLEG_LIB_OBJS = \
+   $(OBJ_DIR)\gtalleg.obj \
+   $(OBJ_DIR)\ssf.obj
+
+#
+# Our default target
+#
+
+all: $(GTALLEG_LIB)
+
+CLEAN:
+   -@if exist $(OBJ_DIR)\gtalleg.obj  del $(OBJ_DIR)\gtalleg.obj
+   -@if exist $(OBJ_DIR)\ssf.obj      del $(OBJ_DIR)\ssf.obj
+   -@if exist $(GTALLEG_LIB) del $(GTALLEG_LIB)
+
+#
+# Library dependencies and build rules
+#
+
+$(GTALLEG_LIB) : $(GTALLEG_LIB_OBJS)
+    lib /OUT:$(GTALLEG_LIB) $(GTALLEG_LIB_OBJS)
+
+#
+# GTALLEG dependencies
+#
+
+$(OBJ_DIR)\gtalleg.obj : gtalleg.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $**
+
+$(OBJ_DIR)\ssf.obj : ssf.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $**
