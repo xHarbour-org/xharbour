@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.126 2004/03/17 02:29:00 druzus Exp $
+ * $Id: hbapi.h,v 1.127 2004/03/18 04:14:38 ronpinkas Exp $
  */
 
 /*
@@ -671,6 +671,18 @@ BOOL hb_execFromArray( PHB_ITEM pFirst );
 #endif
  /* LONGLONG support */
 
+#if ( defined(__XCC__) || defined(__LCC__) )
+   #ifndef _I64_MIN
+      #define _I64_MIN    (-9223372036854775807 - 1)
+   #endif
+
+   #ifndef _I64_MAX
+      #define _I64_MAX      9223372036854775807
+   #endif
+
+   extern int _inp(unsigned short);
+   extern int _outp(unsigned short, int);
+#endif
 
 HB_EXTERN_END
 

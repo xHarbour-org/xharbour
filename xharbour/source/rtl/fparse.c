@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.9 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: fparse.c,v 1.10 2004/03/19 17:42:23 likewolf Exp $
  */
 
 /*
@@ -90,6 +90,7 @@ void hb_ParseLine( PHB_ITEM pReturn, char * szText, int iDelimiter, int * iWord 
           /* booked enough memory */
           char *szResult = (char*) hb_xgrab( iLen + 1 );
 
+#if 0
           while( iLen )
           {
              if ( szText[ iLen - 1 ] && ! HB_ISSPACE( szText[ iLen - 1 ] ) )
@@ -103,6 +104,7 @@ void hb_ParseLine( PHB_ITEM pReturn, char * szText, int iDelimiter, int * iWord 
           szText[ iLen ] = 0;
 
           iLen = strlen( szText );
+#endif
 
           Temp.type = HB_IT_NIL;
 
