@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.25 2003/11/08 06:17:29 brianhays Exp $
+ * $Id: ads1.c,v 1.26 2004/01/11 14:03:39 andijahja Exp $
  */
 
 /*
@@ -1278,7 +1278,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       case HB_IT_DATE:
          {
-            UNSIGNED16 pusLen = 11;
+            // UNSIGNED16 pusLen = 11;
             pulLength = pArea->maxFieldLen + 1;
             // AdsGetString  returns dates in YYYYMMDD format!
             if(AdsGetString( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD  )

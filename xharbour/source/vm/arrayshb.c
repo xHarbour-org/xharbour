@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.34 2003/10/10 06:40:57 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.35 2004/01/10 10:21:48 ronpinkas Exp $
  */
 
 /*
@@ -1535,10 +1535,10 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
          {
             PHB_ITEM pID = hb_itemPutNI( NULL, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
             PHB_ITEM pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, pID );
-            unsigned int uiNestedSize, uiNestedAlign;
+            unsigned int uiNestedSize /*, uiNestedAlign */ ;
 
             hb_objSendMsg( pStructure, "NALIGN", 0 );
-            uiNestedAlign = ( &(HB_VM_STACK.Return) )->item.asInteger.value;
+            // uiNestedAlign = ( &(HB_VM_STACK.Return) )->item.asInteger.value;
 
             hb_objSendMsg( pStructure, "SizeOf", 0 );
             uiNestedSize = (unsigned int) hb_itemGetNL( &HB_VM_STACK.Return );

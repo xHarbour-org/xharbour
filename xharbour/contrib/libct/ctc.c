@@ -1,5 +1,5 @@
 /*
- * $Id: ctc.c,v 1.1 2001/09/09 19:05:12 mbirdyg Exp $
+ * $Id: ctc.c,v 1.1 2003/03/04 21:04:23 lculik Exp $
  */
 
 /*
@@ -82,8 +82,9 @@ USHORT ct_error (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
 
   for (uiArgPos = 1; uiArgPos <= uiArgCount; uiArgPos++)
   {
-    PHB_ITEM pTemp;
-    hb_itemArrayPut (pArray, uiArgPos, pTemp = va_arg (va, PHB_ITEM));
+    PHB_ITEM pTemp = va_arg (va, PHB_ITEM);
+    hb_itemArrayPut (pArray, uiArgPos, pTemp );
+//  hb_itemArrayPut (pArray, uiArgPos, pTemp = va_arg (va, PHB_ITEM));
     HB_TRACE(HB_TR_DEBUG, ("\t%p,",pTemp));
   }
   va_end (va);
@@ -137,8 +138,8 @@ PHB_ITEM ct_error_subst (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
   va_start (va, uiArgCount);
   for (uiArgPos = 1; uiArgPos <= uiArgCount; uiArgPos++)
   {
-    PHB_ITEM pTemp;
-    hb_itemArrayPut (pArray, uiArgPos, pTemp = va_arg (va, PHB_ITEM));
+    PHB_ITEM pTemp = va_arg (va, PHB_ITEM);
+    hb_itemArrayPut (pArray, uiArgPos, pTemp );
     HB_TRACE(HB_TR_DEBUG, ("\t%p,",pTemp));
   }
   va_end (va);

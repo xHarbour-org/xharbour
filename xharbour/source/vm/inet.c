@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.37 2003/12/03 13:01:26 mauriliolongo Exp $
+* $Id: inet.c,v 1.38 2003/12/07 13:35:02 jonnymind Exp $
 */
 
 /*
@@ -733,7 +733,7 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_BYREF );
    char *Buffer;
    int iLen, iMaxLen, iReceived, iBufferLen;
-   int iTimeElapsed = 0;
+   int iTimeElapsed;
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || pBuffer == NULL )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: n2color.c,v 1.1 2000/04/22 11:10:53 lculik Exp $
+ * $Id: n2color.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /*
@@ -83,7 +83,7 @@ HB_FUNC(FT_N2COLOR )
 
 void _ftI2Color( int iColor, char * cColor )
 {
-   unsigned int iBack = 0, iFore = 0, i = 0;
+   unsigned int iBack, iFore, i = 0;
 
    // check for blink attribute
 

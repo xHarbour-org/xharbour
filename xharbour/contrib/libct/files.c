@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.8 2003/12/28 22:25:33 druzus Exp $
+ * $Id: files.c,v 1.9 2004/01/17 17:54:02 lculik Exp $
  */
 
 /*
@@ -351,13 +351,14 @@ HB_FUNC( FILESEEK )
    #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
    {
       LPCTSTR szFile;
-      DWORD dwFlags=FILE_ATTRIBUTE_ARCHIVE;
-      int iAttr;
+
+//    DWORD dwFlags=FILE_ATTRIBUTE_ARCHIVE;
+//    int iAttr;
 
       if ( hb_pcount() >= 1 )
       {
          szFile=hb_parc( 1 );
-
+/*
          if ( ISNUM( 2 ) )
          {
             iAttr=hb_parnl( 2 );
@@ -378,7 +379,7 @@ HB_FUNC( FILESEEK )
 
          if(  iAttr & FA_NORMAL  )
             dwFlags |=    FILE_ATTRIBUTE_NORMAL;
-
+*/
          hLastFind = FindFirstFile( szFile,&Lastff32 );
 
          if ( hLastFind != INVALID_HANDLE_VALUE )
@@ -457,7 +458,7 @@ HB_FUNC( FILESIZE )
 
    #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
    {
-      DWORD dwFileSize=0;
+      DWORD dwFileSize;
       LPCTSTR szFile;
       DWORD dwFlags=FILE_ATTRIBUTE_ARCHIVE;
       HANDLE hFind;

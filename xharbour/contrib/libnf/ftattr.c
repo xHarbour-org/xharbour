@@ -1,5 +1,5 @@
 /*
- * $Id: ftattr.c,v 1.2 2002/11/05 17:51:51 walito Exp $
+ * $Id: ftattr.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 
@@ -191,7 +191,7 @@ HB_FUNC( FT_SAVEATT )
 
    hb_gtSave( uiTop, uiLeft, uiBottom, uiRight, pBuffer );
 
-   for( uiFor = 1; uiFor < uiSize; uiFor += 2 )
+   for( uiFor = 1; uiFor < (USHORT) uiSize; uiFor += 2 )
       *(pAttrib + ((uiFor - 1) / 2)) = *(pBuffer + uiFor);
 
    hb_xfree( pBuffer );
@@ -390,7 +390,7 @@ HB_FUNC( FT_RESTATT )
 
       pAttrib = hb_parc( 5 );
 
-      for( uiFor = 1; uiFor < uiSize; uiFor += 2 )
+      for( uiFor = 1; uiFor < (USHORT) uiSize; uiFor += 2 )
          *(pBuffer + uiFor) = *(pAttrib + ((uiFor - 1) / 2));
 
       hb_gtRest( uiTop, uiLeft, uiBottom, uiRight, pBuffer );
