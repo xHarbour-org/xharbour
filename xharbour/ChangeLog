@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1266 2003/07/18 21:42:33 andijahja Exp $
+ * $Id: ChangeLog,v 1.1267 2003/07/19 02:26:40 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-19 09:19 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
+  * utils/hbdict/hbdict.prg
+    + Updated hbdict:
+      ! Moved Class Definition to end of file to make MAIN() procedure first proc.
 
 2003-07-19 04:20 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * utils/hbdict/hbdict.prg
@@ -192,8 +197,8 @@
 2003-07-15 09:06 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
    * source/rdd/dbfntx/dbfntx1.c
 	  source/rdd/dbfcdx/dbfcdx1.c
-	  ! Fixed an bug when processing filenames of index file under linux (related to the filecase of paramaters) 
-	   
+	  ! Fixed an bug when processing filenames of index file under linux (related to the filecase of paramaters)
+
 2003-07-15 10:20 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * include/hbset.h
      * only define HB_OS_WIN_32_USED when not defined yet.
@@ -246,7 +251,7 @@
       to get another thread's stack to clear a Memvar. This requires
       cooperation of thread.c and memvars.c (that have now some MT specific
       functions).
-      
+
   * source/vm/estack.c
     ! exit sequence uses hb_threadDestroyStack() (easier developement)
 
@@ -438,7 +443,7 @@
 
 2003-07-10 14:34 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * include/hbapi.h
-    ! fixed LONG LONG api name ( hb_itemGetNDL and similar names was from the 
+    ! fixed LONG LONG api name ( hb_itemGetNDL and similar names was from the
       old "long double" soupport)
     ! HB_IT_LONGLONG is now 0x0040; 0x0015 (as it was before)
       would have fooled  many bit-oriented ifs.

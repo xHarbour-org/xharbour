@@ -1,7 +1,7 @@
 *****************************************************
 * HB I18N dictionary editor
 *
-* $Id: hbdict.prg,v 1.3 2003/06/24 02:17:21 fsgiudice Exp $
+* $Id: hbdict.prg,v 1.4 2003/07/19 02:26:18 jonnymind Exp $
 *
 * Usage: hbdict <infile> <outfile>
 *
@@ -18,46 +18,6 @@
 *
 #include "inkey.ch"
 #include "hbclass.ch"
-
-***************************************************
-* redefining the keyboard hook of xharbour teditor
-*
-
-CLASS THBdictEdit FROM HBEditor
-   DATA cOrigin
-
-   METHOD New( cString, nTop, nLeft, nBottom, nRight, cOrigin )
-
-   METHOD KeyboardHook( nKey )
-   METHOD IdleHook()
-ENDCLASS
-
-METHOD New( cString, nTop, nLeft, nBottom, nRight, cOrigin ) CLASS THBdictEdit
-   ::cOrigin := cOrigin
-   ::Super:New( cString, nTop, nLeft, nBottom, nRight )
-RETURN Self
-
-METHOD KeyboardHook( nKey ) CLASS THBdictEdit
-   // Control enter has become a common way to exit multiline
-   // editors
-   IF nKey == K_CTRL_ENTER
-      ::lSaved := .T.
-      ::lExitEdit := .T.
-   ENDIF
-
-   IF nKey == K_F2
-      IF ::naTextLen < Len( ::cOrigin )
-         ::LoadText( padr( ::GetText(), Len( ::cOrigin) ) )
-      ENDIF
-      ::lSaved := .T.
-      ::lExitEdit := .T.
-   ENDIF
-RETURN nKey
-
-METHOD IdleHook() CLASS THBDictEdit
-   ThreadSleep( 10 ) // release CPU
-RETURN Self
-
 
 
 ******************************************************
@@ -390,5 +350,45 @@ PROCEDURE MergeTables( aInTable, aOutTable )
    NEXT
 
 RETURN
+
+
+***************************************************
+* redefining the keyboard hook of xharbour teditor
+*
+
+CLASS THBdictEdit FROM HBEditor
+   DATA cOrigin
+
+   METHOD New( cString, nTop, nLeft, nBottom, nRight, cOrigin )
+
+   METHOD KeyboardHook( nKey )
+   METHOD IdleHook()
+ENDCLASS
+
+METHOD New( cString, nTop, nLeft, nBottom, nRight, cOrigin ) CLASS THBdictEdit
+   ::cOrigin := cOrigin
+   ::Super:New( cString, nTop, nLeft, nBottom, nRight )
+RETURN Self
+
+METHOD KeyboardHook( nKey ) CLASS THBdictEdit
+   // Control enter has become a common way to exit multiline
+   // editors
+   IF nKey == K_CTRL_ENTER
+      ::lSaved := .T.
+      ::lExitEdit := .T.
+   ENDIF
+
+   IF nKey == K_F2
+      IF ::naTextLen < Len( ::cOrigin )
+         ::LoadText( padr( ::GetText(), Len( ::cOrigin) ) )
+      ENDIF
+      ::lSaved := .T.
+      ::lExitEdit := .T.
+   ENDIF
+RETURN nKey
+
+METHOD IdleHook() CLASS THBDictEdit
+   ThreadSleep( 10 ) // release CPU
+RETURN Self
 
 
