@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.42 2004/02/23 08:31:57 andijahja Exp $
+ * $Id: set.c,v 1.43 2004/03/03 03:31:18 mlombardo Exp $
  */
 
 /*
@@ -1404,17 +1404,17 @@ HB_FUNC( SET )
          }
          break;
 
-      case HB_SET_BGTASKPCODES:
-         hb_retnl( hb_set.HB_SET_BGTASKPCODES );
+      case HB_SET_BACKGROUNDTICK:
+         hb_retnl( hb_set.HB_SET_BACKGROUNDTICK );
          if( args > 1 )
          {
-            if( set_numberul( pArg2, hb_set.HB_SET_BGTASKPCODES ) < 0 )
+            if( set_numberul( pArg2, hb_set.HB_SET_BACKGROUNDTICK ) < 0 )
             {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
             }
             else
             {
-               hb_set.HB_SET_BGTASKPCODES = set_numberul( pArg2, hb_set.HB_SET_BGTASKPCODES );
+               hb_set.HB_SET_BACKGROUNDTICK = set_numberul( pArg2, hb_set.HB_SET_BACKGROUNDTICK );
             }
          }
          break;

@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.37 2004/01/28 16:42:18 jonnymind Exp $
+ * $Id: pptable.c,v 1.38 2004/03/03 03:31:17 mlombardo Exp $
  */
 
 /*
@@ -133,7 +133,7 @@ void hb_pp_Table( void )
    static DEFINES sD___62 = {"_SET_BACKGROUNDTASKS",NULL,-1,"111", &sD___61 };
    static DEFINES sD___63 = {"_SET_TRIMFILENAME",NULL,-1,"112", &sD___62 };
    static DEFINES sD___64 = {"_SET_GTMODE",NULL,-1,"113", &sD___63 };
-   static DEFINES sD___65 = {"_SET_BGTASKPCODES",NULL,-1,"114", &sD___64 };
+   static DEFINES sD___65 = {"_SET_BACKGROUNDTICK",NULL,-1,"114", &sD___64 };
 
    static COMMANDS sC___1 = {0,"NOTE","\1A30",NULL,NULL };
    static COMMANDS sC___2 = {0,"DO","WHILE \1A00","while \1A00",&sC___1 };
@@ -489,7 +489,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___273 = {0,"SET","OUTPUT SAFETY \1A20 ON,OFF,&>","Set(_SET_OUTPUTSAFETY,\1A30 )",&sC___272 };
    static COMMANDS sC___274 = {0,"SET","BACKGROUND TASKS \1A20 ON,OFF,&>","Set(_SET_BACKGROUNDTASKS,\1A30 )",&sC___273 };
    static COMMANDS sC___275 = {0,"SET","GTMODE TO \1A30","Set( _SET_GTMODE,\1A30 )",&sC___274 };
-   static COMMANDS sC___276 = {0,"SET","BGTASKPCODES TO \1A00","Set( _SET_BGTASKPCODES, \1A00 )",&sC___275 };
+   static COMMANDS sC___276 = {0,"SET","BACKGROUNDTICK \1A00","Set( _SET_BACKGROUNDTICK, \1A00 )",&sC___275 };
 #endif
 
    static COMMANDS sT___01 = {0,"{","\16\1A00\17 => \16\1B00\17 \16,\1C00 => \1D00 \17 }", "Hash(\16\1A00,\1B00\17 \16,\1C00,\1D00 \17 )",NULL };

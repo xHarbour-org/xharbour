@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.344 2004/03/03 03:31:18 mlombardo Exp $
+ * $Id: hvm.c,v 1.345 2004/03/03 11:41:23 ronpinkas Exp $
  */
 
 /*
@@ -928,7 +928,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       if ( hb_set.HB_SET_BACKGROUNDTASKS )
       {
       #ifndef HB_THREAD_SUPPORT
-         ulBGMaxExecutions = ( hb_set.HB_SET_BGTASKPCODES ? hb_set.HB_SET_BGTASKPCODES : 1000 );
+         ulBGMaxExecutions = ( hb_set.HB_SET_BACKGROUNDTICK ? hb_set.HB_SET_BACKGROUNDTICK : 1000 );
          if( ulBGMaxExecutions < (++s_ulBackground) )
          {
             hb_backgroundRun();

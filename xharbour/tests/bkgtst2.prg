@@ -22,7 +22,7 @@ PROCEDURE Main()
       before checking Tasks. Default is 1000. When you raise this number,
       system saves time checking Tasks, but lowering it you can
       have a more realist multitasking */
-   SET BGTASKPCODES TO 10000
+   SET BACKGROUNDTICK 10000
 
    ? "Background Tasks defined and running."
 

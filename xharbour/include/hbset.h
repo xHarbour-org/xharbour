@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.20 2004/01/28 16:42:18 jonnymind Exp $
+ * $Id: hbset.h,v 1.21 2004/03/03 03:31:17 mlombardo Exp $
  */
 
 /*
@@ -135,7 +135,7 @@ typedef enum
    HB_SET_BACKGROUNDTASKS = 111,
    HB_SET_TRIMFILENAME    = 112,
    HB_SET_GTMODE          = 113,
-   HB_SET_BGTASKPCODES    = 114
+   HB_SET_BACKGROUNDTICK  = 114
 } HB_set_enum;
 
 typedef struct
@@ -214,7 +214,7 @@ typedef struct
    FHANDLE hb_set_winhan;
    char *  hb_set_printerjob;
    int     HB_SET_GTMODE;
-   ULONG    HB_SET_BGTASKPCODES;
+   ULONG    HB_SET_BACKGROUNDTICK;
 
 } HB_SET_STRUCT;
 
