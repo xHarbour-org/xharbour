@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.33 2005/02/02 13:47:19 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.34 2005/02/02 15:54:59 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -888,7 +888,7 @@ METHOD Update(oRow) CLASS TPQquery
             cWhere += ::aKeys[i] + '=' + DataToSql(xField)
                 
             if i <> len(::aKeys)
-                cWhere += ', '
+                cWhere += ' and '
             end
         Next                        
                 
