@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3839 2005/02/18 21:19:57 druzus Exp $
+ * $Id: ChangeLog,v 1.3840 2005/02/19 05:03:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-19 17:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/clipdefs.h
+    * undefine WORD, WORDP, PWORD for MinGW32/PellesC under MT
+      (I don't know if this is right. Modified just to enable compilation)
+
+  * contrib/libnf/dispc.c
+    * fileseek directions already defined in hbdefs.h
+
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbcy.c
+    ! fix warnings on uninitialized variables
+
+  * contrib/unicode/hbc7.c
+    * rename isdigit() -> hbcc_isdigit() to avoid name conflict
 
 2005-02-18 21:02 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbapierr.h

@@ -1,5 +1,5 @@
 /*
- * $Id: hbc7.c,v 1.4 2004/02/24 14:15:39 andijahja Exp $
+ * $Id: hbc7.c,v 1.5 2004/04/05 10:03:19 andijahja Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ static ULONG str2ue7(BYTE *,ULONG,BYTE *);
 static ULONG str2qp7(BYTE *,ULONG,BYTE *);
 static ULONG ue72str(BYTE *,ULONG,BYTE *);
 static ULONG qp72str(BYTE *,ULONG,BYTE *);
-static BOOL isdigit(BYTE,ULONG);
+static BOOL hbcc_isdigit(BYTE,ULONG);
 
 HB_FUNC(HB_URLENCODE)
 {
@@ -197,7 +197,7 @@ HB_FUNC(HB_QPDECODE)
 }
 
 //internal
-static BOOL isdigit(BYTE c,ULONG r)
+static BOOL hbcc_isdigit(BYTE c,ULONG r)
 {
    switch (r)
    {
@@ -342,7 +342,7 @@ static ULONG ue72str(BYTE *srcstr,ULONG srclen,BYTE *dststr)
    {
       if (srcstr[i]==CHR_ENC_UE)
       {
-         if (isdigit(srcstr[i+1],16)&&isdigit(srcstr[i+2],16))
+         if (hbcc_isdigit(srcstr[i+1],16)&&hbcc_isdigit(srcstr[i+2],16))
          {
             if (dststr)
             {
@@ -416,7 +416,7 @@ static ULONG qp72str(BYTE *srcstr,ULONG srclen,BYTE *dststr)
             i+=2;
             continue;
          }
-         else if (isdigit(srcstr[i+1],16)&&isdigit(srcstr[i+2],16))
+         else if (hbcc_isdigit(srcstr[i+1],16)&&hbcc_isdigit(srcstr[i+2],16))
          {
             if (dststr)
             {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcy.c,v 1.7 2004/02/24 14:15:39 andijahja Exp $
+ * $Id: hbcy.c,v 1.8 2004/03/02 12:58:14 andijahja Exp $
  */
 
 /*
@@ -86,7 +86,7 @@ HB_FUNC( YYDECODE_FILE )
 {
    PHB_ITEM pinFile = hb_param( 1, HB_IT_ANY );
    PHB_ITEM poutFile = hb_param( 2, HB_IT_STRING );
-   FILE *inFile, *outFile;
+   FILE *inFile=NULL, *outFile=NULL;
    char *string, *szFileName;
    ULONG srclen, dstlen, nBytesWritten = 0;
    BYTE *dststr;

@@ -1,5 +1,5 @@
 /*
- * $Id: dispc.c,v 1.3 2004/03/18 03:46:55 ronpinkas Exp $
+ * $Id: dispc.c,v 1.4 2004/12/01 00:53:02 peterrees Exp $
  */
 
 /*
@@ -66,9 +66,9 @@
 #define LF   ((char) 10)
 #define FEOF ((char) 26)
 
-#define SEEK_END 2              /* file seek directions */
-#define SEEK_CUR 1
-#define SEEK_SET 0
+// #define SEEK_END 2              /* file seek directions */
+// #define SEEK_CUR 1
+// #define SEEK_SET 0
 
 #define READONLY  0             /* open file modes */
 #define WRITEONLY 1

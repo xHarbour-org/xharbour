@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.9 2004/02/24 14:15:39 andijahja Exp $
+ * $Id: hbcc.prg,v 1.10 2004/03/02 12:58:14 andijahja Exp $
  */
 
 /*
@@ -616,8 +616,8 @@ HB_FUNC( HB_CSLIST )
 
 HB_FUNC( HB_CSTOCS )
 {
-   ULONG h1,h2,srclen,dstlen,intlen,x=0;
-   BYTE *srcstr, *dststr, *intstr;
+   ULONG h1,h2,srclen,dstlen=0,intlen=0,x=0;
+   BYTE *srcstr=0, *dststr=0, *intstr=0;
    PHB_ITEM pstr = hb_param( 1, HB_IT_STRING );
 
    if (hb_pcount()<3)
@@ -1226,7 +1226,7 @@ static ULONG uni2ut8(BYTE *unistr,ULONG unilen,BYTE *utfstr)
 static ULONG ut72uni(BYTE *utfstr,ULONG utflen,BYTE *unistr)
 {
    ULONG i,j,unilen=0,state=0;
-   BYTE *dummy,c;
+   BYTE *dummy=0,c;
 
    for (i=0;i<utflen;i++)
    {
@@ -1305,7 +1305,7 @@ static ULONG ut72uni(BYTE *utfstr,ULONG utflen,BYTE *unistr)
 static ULONG uni2ut7(BYTE *unistr,ULONG unilen,BYTE *utfstr)
 {
    ULONG i,j,utflen=0,state=0;
-   BYTE *dummy;
+   BYTE *dummy=0;
 
    for (i=0;i<unilen-1;i+=2)
    {
@@ -1460,7 +1460,7 @@ HB_FUNC( B64DECODE_FILE )
 {
    PHB_ITEM pinFile = hb_param( 1, HB_IT_ANY );
    PHB_ITEM poutFile = hb_param( 2, HB_IT_STRING );
-   FILE *inFile, *outFile;
+   FILE *inFile = NULL, *outFile = NULL;
    char *string, *szFileName;
    ULONG nBytesWritten = 0;
    HB_ITEM Struct, Item;
@@ -1470,7 +1470,7 @@ HB_FUNC( B64DECODE_FILE )
    ULONG srclen,dstlen,tmplen,i;
    BYTE *dststr,*tmpstr;
 
-   char *szFile ;
+   char *szFile = NULL;
 
    if( pinFile )
    {
