@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.12 2003/01/31 09:08:20 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.13 2003/03/25 02:36:12 ronpinkas Exp $
  */
 
 /*
@@ -184,7 +184,10 @@ FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
    aReturn := {}
 
    FOR EACH aVar IN aObjectVars
-      IF HB_EnumIndex() > Len( aBaseVars ) .OR. ! ( aVar[2] == aBaseVars[ HB_EnumIndex() ][ 2 ] )
+      IF HB_EnumIndex() > Len( aBaseVars ) .OR. ;
+            ValType( aVar[2] ) != ValType( aBaseVars[ HB_EnumIndex() ][ 2 ] ) .OR. ;
+            ValType( aVar[2] ) == 'B' .OR. ;
+         ! ( aVar[2] == aBaseVars[ HB_EnumIndex() ][ 2 ] )
          AAdd( aReturn, aVar )
       ENDIF
    NEXT

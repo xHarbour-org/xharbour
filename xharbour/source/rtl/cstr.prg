@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.8 2003/01/28 23:12:35 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.9 2003/03/26 02:20:02 ronpinkas Exp $
  */
 
 /*
@@ -104,7 +104,7 @@ RETURN ""
 FUNCTION CStrToVal( cExp, cType )
 
    IF ValType( cExp ) != 'C'
-      __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+      Throw( ErrorNew( "CSTR", 3101, ProcName(), "Argument error", { cExp, cType } ) )
    ENDIF
 
    SWITCH cType
@@ -129,17 +129,17 @@ FUNCTION CStrToVal( cExp, cType )
 
       /*
       CASE 'A'
-         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+         Throw( ErrorNew( "CSTR", 3101, ProcName(), "Argument error", { cExp, cType } ) )
 
       CASE 'B'
-         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+         Throw( ErrorNew( "CSTR", 3101, ProcName(), "Argument error", { cExp, cType } ) )
 
       CASE 'O'
-         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+         Throw( ErrorNew( "CSTR", 3101, ProcName(), "Argument error", { cExp, cType } ) )
       */
 
       DEFAULT
-         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+         Throw( ErrorNew( "CSTR", 3101, ProcName(), "Argument error", { cExp, cType } ) )
    END
 
 RETURN NIL
@@ -150,6 +150,8 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
    LOCAL cType := ValType( xVal )
    LOCAL aVars, aVar, cRet, cPad, nObj
 
+   //TraceLog( xVal, cName, nPad, aObjs )
+
    SWITCH cType
       CASE 'C'
          IF ! '"' IN xVal
@@ -159,7 +161,8 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          ELSEIF ( ! "[" IN xVal ) .AND. ( ! "]" IN xVal )
             RETURN "[" + xVal + "]"
          ELSE
-            __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
+            Throw( ErrorNew( "CSTR", 3102, ProcName(), "Can't stringify", { xVal } ) )
+            EXIT
          ENDIF
 
       CASE 'D'
@@ -188,23 +191,21 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
          RETURN cRet
 
-      /*
-      CASE 'B'
-         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
-      */
+      //CASE 'B'
+      //   RETURN "{|| }"
 
       CASE 'O'
          IF nPad == NIL
             nPad := 3
          ENDIF
 
+         IF cName == NIL
+            cName := "Unnamed: " + xVal:ClassName
+         ENDIF
+
          cPad  := sPace( nPad + 3 )
          aVars := __objGetValueDiff( xVal )
-         IF cName == NIL
-            cRet  := Space( nPad ) + "OBJECT OF: " + xVal:ClassName + CRLF
-         ELSE
-            cRet  := Space( nPad ) + "OBJECT " + cName + " IS " + xVal:ClassName + CRLF
-         ENDIF
+         cRet  := Space( nPad ) + "OBJECT " + cName + " IS " + xVal:ClassName + CRLF
 
          IF aObjs == NIL
             aObjs := { { xVal, cName } }
@@ -220,6 +221,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
                   cRet += ValToPrg( aVar[2], aVar[1], nPad + 3, aObjs ) + CRLF
                ENDIF
             ELSE
+               //TraceLog( aVar[1], aVar[2] )
                cRet += cPad + ":" + aVar[1] + " := " + ValToPrg( aVar[2] ) + CRLF
             ENDIF
          NEXT
@@ -227,7 +229,8 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          RETURN cRet + sPace( nPad ) + "END OBJECT"
 
       DEFAULT
-         __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName(), 1, { xVal, cName, nPad } )
+         //TraceLog( xVal, cName, nPad )
+         Throw( ErrorNew( "CSTR", 3103, ProcName(), "Unsupported type", { xVal } ) )
    END
 
    //TraceLog( cRet )

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.191 2003/04/21 03:05:18 jonnymind Exp $
+ * $Id: hvm.c,v 1.192 2003/04/27 00:46:04 ronpinkas Exp $
  */
 
 /*
@@ -7010,7 +7010,7 @@ HB_FUNC( HB_EXECFROMARRAY )
 
 BOOL hb_execFromArray( PHB_ITEM pFirst )
 {
-   PHB_ITEM pArgs = NULL, pSelf = NULL, pString;
+   PHB_ITEM pArgs, pSelf = NULL, pString;
    PHB_DYNS pExecSym = NULL;
    PHB_FUNC pFunc = NULL;
    ULONG i;
@@ -7023,6 +7023,7 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
 
    pString = hb_arrayGetItemPtr( pFirst, 1 );
    pArgs = pFirst;
+
    if( HB_IS_OBJECT( pString ) &&  hb_arrayLen( pFirst ) >= 2 )
    {
       pSelf = pString;

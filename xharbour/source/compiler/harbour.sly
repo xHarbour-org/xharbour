@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.40 2003/03/27 07:44:56 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.41 2003/03/28 05:52:05 ronpinkas Exp $
  */
 
 /*
@@ -223,7 +223,7 @@ static void hb_compDebugStart( void ) { };
 %type <iNumber> IfBegin VarList ExtVarList
 %type <iNumber> FieldList
 %type <lNumber> WhileBegin
-%type <pVoid>   IfElseIf Cases SwitchCases
+%type <pVoid>   IfElseIf Cases
 %type <asExpr>  Argument ArgList BlockExpList BlockVarList BlockNoVar
 %type <asExpr>  DoName DoProc DoArgument DoArgList
 %type <asExpr>  PareExpList1 PareExpList2 PareExpList3 PareExpListN
@@ -258,7 +258,7 @@ static void hb_compDebugStart( void ) { };
 %type <asExpr>  PostOp
 %type <asExpr>  Get GetVar GetA GetVarArray GetArgList
 %type <asExpr>  Constant
-
+%type <iNumber> SwitchCases
 %%
 
 Main       : { hb_compLinePush(); } Source       { }
@@ -1936,7 +1936,7 @@ Switch    : SwitchBegin
 
           | SwitchBegin
                SwitchCases
-                Default
+               Default
             EndSwitch
                {
                   hb_compLoopEnd();
@@ -1948,22 +1948,56 @@ Switch    : SwitchBegin
 EndSwitch  : END
                {
                   --hb_comp_wCaseCounter;
-                  --hb_comp_wCaseCounter;
 
+                  // NO EXIT statement precedes this END statement (must be the case where NO DEFAULT section exists).
                   if( hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter ] )
                   {
-                     hb_comp_functions.pLast->lPCodePos -= 5;
+                     LONG lOffset;
+
+                     /*
+                        We must REMOVE the unconditional JUMP instruction at the end of the preceding
+                        CASE statement [aiming to SKIP over the expected trailing CASE if no EXIT specified].
+                      */
+                     hb_comp_functions.pLast->lPCodePos -= 4;
+                     hb_comp_functions.pLast->iJumps--;
                      hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter ] = 0;
+
+                     /*
+                        We must RE-correct the prior CASE Jump, since we removed 4 bytes.
+                        $0 points to the previous rule (SwitchCases) which holds the offset to that last Jump.
+                      */
+                     switch( hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 - 1 ) ] )
+                     {
+                        case HB_P_JUMPFALSENEAR :
+                          hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ] -= 4;
+                          break;
+
+                        case HB_P_JUMPFALSE :
+                          lOffset = HB_PCODE_MKUSHORT( &( hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ] ) ) - 4;
+                          hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ]     = HB_LOBYTE( lOffset );
+                          hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 + 1 ) ] = HB_HIBYTE( lOffset );
+                          break;
+
+                        case HB_P_JUMPFALSEFAR :
+                          lOffset = HB_PCODE_MK24BIT( &( hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ] ) ) - 4;
+                          hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ]     = HB_LOBYTE( lOffset );
+                          hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) + 1 ] = HB_HIBYTE( lOffset );
+                          hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) + 2 ] = HB_LOBYTE( HB_HIWORD( lOffset ) );
+                          break;
+
+                        default :
+                          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_JUMP_NOT_FOUND, NULL, NULL );
+                     }
                   }
 
                   hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
                }
            ;
 
-SwitchBegin : SWITCH Expression { ++hb_comp_wCaseCounter; hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter++ ] = 0; hb_compExprGenPush( $2 ); hb_compLoopStart(); } Crlf
+SwitchBegin : SWITCH Expression { hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter++ ] = 0; hb_compExprGenPush( $2 ); hb_compLoopStart(); } Crlf
             ;
 
-SwitchCases : CASE { hb_compLinePush(); } Constant Crlf
+SwitchCases : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Constant Crlf
                {
                   hb_compGenPCode1( HB_P_SWITCHCASE );
                   hb_compGenPCode4( HB_LOBYTE( $3->value.asNum.lVal ), HB_HIBYTE( $3->value.asNum.lVal ), HB_LOBYTE( HB_HIWORD( $3->value.asNum.lVal ) ), HB_HIBYTE( HB_HIWORD( $3->value.asNum.lVal ) ), FALSE );
@@ -1986,9 +2020,12 @@ SwitchCases : CASE { hb_compLinePush(); } Constant Crlf
                   }
 
                   hb_compGenJumpHere( $<iNumber>5 );
+
+                  // Will be used as $0 in Default.
+                  $$ = $<iNumber>5;
                }
 
-           | SwitchCases CASE { hb_compLinePush(); } Constant Crlf
+           | SwitchCases CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Constant Crlf
                {
                   hb_compGenPCode1( HB_P_SWITCHCASE );
                   hb_compGenPCode4( HB_LOBYTE( $4->value.asNum.lVal ), HB_HIBYTE( $4->value.asNum.lVal ), HB_LOBYTE( HB_HIWORD( $4->value.asNum.lVal ) ), HB_HIBYTE( HB_HIWORD( $4->value.asNum.lVal ) ), FALSE );
@@ -2016,6 +2053,9 @@ SwitchCases : CASE { hb_compLinePush(); } Constant Crlf
                   }
 
                   hb_compGenJumpHere( $<iNumber>6 );
+
+                  // Will be used as $0 in Default.
+                  $$ = $<iNumber>6;
                }
            ;
 
@@ -2038,13 +2078,49 @@ Constant   : NUM_INTEGER         { $$ = hb_compExprNewLong( $1.iNumber ); }
 
 Default    : DEFAULT
                {
+                  // NO EXIT statement precedes this DEFAULT statement.
                   if( hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] )
                   {
+                     LONG lOffset;
+
+                     /*
+                        We must REMOVE the unconditional JUMP instruction at the end of the preceding
+                        CASE statement [aiming to SKIP over the expected trailing CASE if no EXIT specified].
+                      */
                      hb_comp_functions.pLast->lPCodePos -= 4;
                      hb_comp_functions.pLast->iJumps--;
                      hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] = 0;
-                     //hb_compGenJumpHere( hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] );
+
+                     /*
+                        We must RE-correct the prior CASE Jump, since we removed 4 bytes.
+                        $0 points to the previous rule (SwitchCases) which holds the offset to that last Jump.
+                      */
+                     switch( hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 - 1 ) ] )
+                     {
+                        case HB_P_JUMPFALSENEAR :
+                          hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ] -= 4;
+                          break;
+
+                        case HB_P_JUMPFALSE :
+                          lOffset = HB_PCODE_MKUSHORT( &( hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ] ) ) - 4;
+                          hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ]     = HB_LOBYTE( lOffset );
+                          hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 + 1 ) ] = HB_HIBYTE( lOffset );
+                          break;
+
+                        case HB_P_JUMPFALSEFAR :
+                          lOffset = HB_PCODE_MK24BIT( &( hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ] ) ) - 4;
+                          hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ]     = HB_LOBYTE( lOffset );
+                          hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) + 1 ] = HB_HIBYTE( lOffset );
+                          hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) + 2 ] = HB_LOBYTE( HB_HIWORD( lOffset ) );
+                          break;
+
+                        default :
+                          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_JUMP_NOT_FOUND, NULL, NULL );
+                     }
                   }
+
+                  hb_comp_bDontGenLineNum = FALSE;
+                  hb_compLinePush();
                }
 
                EmptyStats
@@ -2612,7 +2688,9 @@ static void hb_compLoopExit( void )
 
       pLast = hb_comp_pLoops;
       while( pLast->pNext )
+      {
          pLast = pLast->pNext;
+      }
 
       if( pLast->wSeqCounter != hb_comp_wSeqCounter )
       {
@@ -2625,7 +2703,9 @@ static void hb_compLoopExit( void )
       else
       {
          while( pLast->pExitList )
+         {
             pLast = pLast->pExitList;
+         }
 
          pLast->pExitList = pLoop;
 
@@ -2644,7 +2724,9 @@ static void hb_compLoopHere( void )
    if( pLoop )
    {
       while( pLoop->pNext )
+      {
          pLoop = pLoop->pNext;
+      }
 
       pLoop = pLoop->pLoopList;
       while( pLoop )
@@ -2682,8 +2764,12 @@ static void hb_compLoopEnd( void )
       }
 
       pLast->pNext = NULL;
+
       if( pLoop == hb_comp_pLoops )
+      {
          hb_comp_pLoops = NULL;
+      }
+
       hb_xfree( ( void * ) pLoop );
    }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.991 2003/04/27 15:58:46 paultucker Exp $
+ * $Id: ChangeLog,v 1.992 2003/04/27 16:01:22 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-29 16:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.c
+    % Minor optimizations to hb_compGenJumpThere()
+
+  * source/compiler/harbour.sly
+    ! Fixed generation of Default and EndSwitch when NO EXIT statement precedes DEFAULT/END statements.
+
+  * source/rtl/cstr.prg
+    ! Few minor fixes to ValToPrg().
+    * Replaced all __ErrRT_BASE() with Throw( ErrorNew( ... ) )
+
+  * source/rtl/objfunc.prg
+    ! Fixed __ObjGetValueDiff() support of CodeBlock properties.
+
+  * source/vm/classes.c
+    ! Fixed scope validation to allow derived classes access to PROTECTED properties.
+
+  * source/vm/hvm.c
+    * Corrected compiler warning.
 
 2003-04-27 12:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rdd/dbfntx/dbfntx1.c

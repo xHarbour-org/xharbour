@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.53 2003/04/01 00:42:08 ronpinkas Exp $
+ * $Id: classes.c,v 1.54 2003/04/13 20:40:45 jonnymind Exp $
  */
 
 /*
@@ -437,7 +437,8 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
 {
    USHORT uiScope = pMethod->uiScope;
 
-   //printf( "Method: '%s' Scope: %i\n\r", pMethod->pMessage->pSymbol->szName,uiScope );
+
+   //#define DEBUG_SCOPE
 
    if( uiScope & HB_OO_CLSTP_READONLY && hb_vm_iOptimizedSend != 2 )
    {
@@ -454,6 +455,10 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
 
       PHB_ITEM * pBase = HB_VM_STACK.pBase;
       PHB_ITEM pCaller;
+
+      #ifdef DEBUG_SCOPE
+         printf( "Method: '%s' Scope: %i\n\r", pMethod->pMessage->pSymbol->szName, uiScope );
+      #endif
 
       if( hb_vm_iOptimizedSend == 0 )
       {
@@ -550,7 +555,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
                goto ScopeError;
             }
 
-            // PROTECTED + READONLY Method can't be written from subclass.
+            // PROTECTED + READONLY can NOT be written from subclass.
             if( ( uiScope & HB_OO_CLSTP_PROTECTED ) && ( uiScope & HB_OO_CLSTP_READONLY ) )
             {
                goto ScopeError;
@@ -581,7 +586,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
                         if( strcmp( pCallerClass->pMethods[ uiAt ].pMessage->pSymbol->szName, szClassOfMessage ) == 0 )
                         {
                            // Derived class - allow access to PROTECTED.
-                           return TRUE;;
+                           return TRUE;
                         }
                      }
                   }
@@ -593,9 +598,41 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
             // NON Inherited Message, and Caller is same class as the object, so all scopes allowed.
             if( pCaller->item.asArray.value->uiClass == pObject->item.asArray.value->uiClass )
             {
-               return TRUE;;
+               return TRUE;
             }
+            else
+            {
+               PCLASS pCallerClass = s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 );
+               USHORT uiAt, uiLimit = ( USHORT ) ( pCallerClass->uiHashKey * BUCKET );
+               char *szObjectClass = ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName;
 
+               // Is the Caller derived from the Object?
+               for( uiAt = 0; uiAt < uiLimit; uiAt++ )
+               {
+                  if( ( pCallerClass->pMethods[ uiAt ].uiScope & HB_OO_CLSTP_CLASS ) == HB_OO_CLSTP_CLASS )
+                  {
+                     if( strcmp( pCallerClass->pMethods[ uiAt ].pMessage->pSymbol->szName, szObjectClass ) == 0 )
+                     {
+                        if( uiScope & HB_OO_CLSTP_PROTECTED )
+                        {
+                           if( uiScope & HB_OO_CLSTP_READONLY )
+                           {
+                              // PROTECTED + READONLY can NOT be written from subclass.
+                              goto ScopeError;
+                           }
+                           else
+                           {
+                              // PROTECTED (NON READONLY) can be written from subclass.
+                              return TRUE;
+                           }
+                        }
+
+                        // All other scopes are NOT allowed even in derived class.
+                        return TRUE;
+                     }
+                  }
+               }
+            }
             // This is NOT an Inherted Method, and Caller is Different Class - No restricted scope could be valid (excpet READONLY addressed above)!
          }
       }
@@ -3112,7 +3149,7 @@ HB_FUNC( HB_OBJMSGPTR )
 UINT hb_clsGetHandleFromName( char *szClassName )
 {
    PCLASS start = s_pClasses;
-   UINT uPos = 0;
+   USHORT uPos = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_clsGetHandleFromName(%s)", szClassName));
 
@@ -3126,6 +3163,7 @@ UINT hb_clsGetHandleFromName( char *szClassName )
    {
       return 0;
    }
+
    return uPos + 1;
 }
 
