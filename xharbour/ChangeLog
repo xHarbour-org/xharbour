@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2002 2004/01/06 19:36:08 andijahja Exp $
+ * $Id: ChangeLog,v 1.2003 2004/01/06 21:17:22 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-07 10:15 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/persist.prg
+   + ReplaceBracketsInString() to handle strings where all 3 delimiters are present
+   * Optimised code for previous changes made
+  * source/vm/memvars.c
+   + HB_FUNC( __MVSYMBOLINFO ) returns array of array of {"SymbolName", xValue}
+  * source/rtl/tget.prg
+   + METHOD Undo() CLASS Get - Fix to work correctly
+
 2004-01-06 16:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * bin/bld.bat
     * msvc support for gtwvt
-    
+
 
 2004-01-07 02:34 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/hbusage.c
@@ -32,20 +41,20 @@
       + Wvt_DrawLabel( nRow, nCol, cLabel, nAlign, nAngle, cTextColor, cBackColor, ;
                        cFontFace, nFontHeight, nFontWidth, nFontWeight, nFontQuality, ;
                        nCharSet, lItalic, lUnderline, lStrikeout )
-   + xharbour/tests/wvtgui.prg   
-   + xharbour/tests/bldwvt.bat   
+   + xharbour/tests/wvtgui.prg
+   + xharbour/tests/bldwvt.bat
      * bldwvt wvtgui
 
      /*
         These area few GUI primitive functions and hope a lot more will come up.
-        I have handelled the focus change and restore through WVT_PAINT function 
+        I have handelled the focus change and restore through WVT_PAINT function
         to be written in the application code which executes a series of code blocks
         whenever a WM_PAINT message is received by the window.
 
         I propose that WVT_PAINT, or something lik that, function be part of standard GT
-        which should in turn executes all code blocks put on a stack by the user. The 
+        which should in turn executes all code blocks put on a stack by the user. The
         primary job of those code blocks will be to call GUI functions with appropriate
-        parameter. 
+        parameter.
 
         This concept has been shown in tests/wvtgui.prg. This window console offers
         immense possibilities to be explored and incorporated and hope that
@@ -62,7 +71,7 @@
   ! contrib/pgsql/postgres.c
     ! fixed compilation error
     ITEM -> PHB_ITEM
-    
+
 2004-01-05 13:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbver.h
   * bin/!pack_bin.bat
