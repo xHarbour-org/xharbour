@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.31 2004/11/21 21:43:54 druzus Exp $
+ * $Id: dbffpt1.c,v 1.32 2004/11/26 17:36:49 druzus Exp $
  */
 
 /*
@@ -2391,7 +2391,7 @@ static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    pArea->uiMemoBlockSize = 0;
    memset( &fptHeader, 0, sizeof( FPTHEADER ) );
-   if( hb_fptFileLockEx( pArea, TRUE ) )
+   if( hb_fptFileLockSh( pArea, TRUE ) )
    {
       hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
       if ( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &fptHeader, sizeof( FPTHEADER ) ) >= 512 )

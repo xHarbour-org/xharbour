@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.148 2004/11/26 17:46:25 druzus Exp $
+ * $Id: hbapi.h,v 1.149 2004/12/01 00:50:58 peterrees Exp $
  */
 
 /*
@@ -142,6 +142,26 @@ HB_EXTERN_BEGIN
 
 #define HB_ITEM_UNLOCK( pItem ) ( (pItem)->type == HB_IT_ARRAY ? hb_gcUnlock( (pItem)->item.asArray.value ) : \
                                   (pItem)->type == HB_IT_BLOCK ? hb_gcUnlock( (pItem)->item.asBlock.value ) : NULL )
+
+#define HB_ITEM_GET_NUMINTRAW( p )  ( HB_IS_INTEGER( p ) ? \
+                                      ( HB_LONG ) p->item.asInteger.value : \
+                                      ( HB_LONG ) p->item.asLong.value )
+
+#define HB_ITEM_PUT_NUMINTRAW( p, v )  \
+               do { \
+                  if( HB_LIM_INT( v ) ) \
+                  { \
+                     (p)->type = HB_IT_INTEGER; \
+                     (p)->item.asInteger.length = HB_INT_LENGTH( v ); \
+                     (p)->item.asInteger.value = ( int ) (v); \
+                  } \
+                  else \
+                  { \
+                     (p)->type = HB_IT_LONG; \
+                     (p)->item.asLong.value = (v); \
+                     (p)->item.asLong.length = HB_LONG_LENGTH( v ); \
+                  } \
+               } while ( 0 )
 
 typedef struct _HB_VALUE
 {

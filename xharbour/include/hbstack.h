@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.23 2004/04/28 18:22:08 druzus Exp $
+ * $Id: hbstack.h,v 1.24 2004/12/02 03:26:19 druzus Exp $
  */
 
 /*
@@ -124,23 +124,28 @@ typedef struct
    #define hb_stackSelfItem( )         ( * ( HB_VM_STACK.pBase + 1 ) )
    #define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + (LONG) iItemPos ) )
 
-
-   #define hb_stackDec( )              {  HB_THREAD_STUB \
+   #define hb_stackDec( )              do { \
+                                          HB_THREAD_STUB \
                                           if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
-                                             hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); }
+                                             hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
+                                       } while ( 0 )
 
-   #define hb_stackPop( )              {  HB_THREAD_STUB \
+   #define hb_stackPop( )              do { \
+                                          HB_THREAD_STUB \
                                           if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
                                              hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
                                           if( HB_IS_COMPLEX( * HB_VM_STACK.pPos ) ) \
-                                             hb_itemClear( * HB_VM_STACK.pPos ); }
+                                             hb_itemClear( * HB_VM_STACK.pPos ); \
+                                       } while ( 0 )
 
-   #define hb_stackPush( )             {  HB_THREAD_STUB \
+   #define hb_stackPush( )             do { \
+                                          HB_THREAD_STUB \
                                           if( HB_VM_STACK.wItems - 1 <= HB_VM_STACK.pPos - HB_VM_STACK.pItems ) \
                                           { \
                                              hb_stackIncrease(); \
                                           } \
-                                          ( * (++HB_VM_STACK.pPos) )->type = HB_IT_NIL; }
+                                          ( * (++HB_VM_STACK.pPos) )->type = HB_IT_NIL; \
+                                       } while ( 0 )
 
 #else
    extern HB_ITEM_PTR HB_EXPORT hb_stackItemFromTop( int nFromTop );
@@ -151,7 +156,6 @@ typedef struct
    extern HB_ITEM_PTR HB_EXPORT hb_stackBaseItem( void );
    extern HB_ITEM_PTR HB_EXPORT hb_stackSelfItem( void );
    extern HB_ITEM_PTR HB_EXPORT hb_stackItem( LONG iItemPos );
-
 
    extern void        HB_EXPORT hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
    extern void        HB_EXPORT hb_stackPop( void );        /* pops an item from the stack */

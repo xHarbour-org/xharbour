@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.98 2004/12/01 10:55:13 lf_sfnet Exp $
+ * $Id: dbf1.c,v 1.99 2004/12/02 03:26:20 druzus Exp $
  */
 
 /*
@@ -1364,7 +1364,7 @@ static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
       /* Copy data to buffer */
       memcpy( pArea->pRecord, pBuffer, pArea->uiRecordLen );
    }
-   else if( pArea->fRecordChanged )
+   else /* if( pArea->fRecordChanged ) */
    {
       /* Write data to file */
       hb_fsSeek( pArea->hDataFile, pArea->uiHeaderLen + ( pArea->ulRecNo - 1 ) *
@@ -1662,6 +1662,7 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
    /* Update record and unlock records */
    if( pArea->hDataFile != FS_ERROR )
    {
+      /* update buffers */
       SELF_GOCOLD( ( AREAP ) pArea );
 
       /* Unlock all records */
@@ -1672,15 +1673,12 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
       {
          SELF_WRITEDBHEADER( ( AREAP ) pArea );
       }
-   }
 
-   /* Close the data file */
-   if( pArea->hDataFile != FS_ERROR )
-   {
-      if ( pArea->fDataFlush && hb_set.HB_SET_HARDCOMMIT )
+      /* It's not Clipper compatible but it reduces the problem with
+         byggy Windows network setting */
+      if ( hb_set.HB_SET_HARDCOMMIT )
       {
-         hb_fsCommit( pArea->hDataFile );
-         pArea->fDataFlush = FALSE;
+         SELF_FLUSH( ( AREAP ) pArea );
       }
       hb_fsClose( pArea->hDataFile );
       pArea->hDataFile = FS_ERROR;
@@ -1689,11 +1687,6 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
    /* Close the memo file */
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
    {
-      if ( pArea->fMemoFlush && hb_set.HB_SET_HARDCOMMIT )
-      {
-         hb_fsCommit( pArea->hMemoFile );
-         pArea->fMemoFlush = FALSE;
-      }
       hb_fsClose( pArea->hMemoFile );
       pArea->hMemoFile = FS_ERROR;
    }
@@ -2614,8 +2607,7 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
       /* Execute the Code Block */
       if( pBlock )
       {
-         ulEvery ++;
-         if( ulEvery >= ulUserEvery )
+         if( ++ulEvery >= ulUserEvery )
          {
             ulEvery = 0;
             hb_vmPushSymbol( &hb_symEval );
@@ -2631,6 +2623,7 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
          if( ulRecIn != ulRecOut )
          {
             pArea->ulRecNo = ulRecOut;
+            pArea->fRecordChanged = TRUE;
             hb_dbfWriteRecord( pArea );
          }
       }

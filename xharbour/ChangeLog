@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3667 2004/12/10 00:00:00 peterrees Exp $
+ * $Id: ChangeLog,v 1.3667 2004/12/10 23:42:35 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-11 01:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapi.h
+  * xharbour/include/hbdefs.h
+  * xharbour/include/hbstack.h
+   * changed the multi command macro definitions to use do {...} while(0)
+     for safe use in any C statement
+
+  * xharbour/source/vm/hvm.c
+    * some other optimisations and some of them suggested by Paul - thanks.
+
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+    * formatting
+
+  * xharbour/source/rdd/dbf1.c
+   ! fixed the bug in pack I introduced in previous commit
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+   ! fixed opening FPT files in READONLY mode on POSIX systems
 
 2004-12-10 21:25 UTC-300 Eduardo Fernandes <modalsist@yahoo.com.br>
 

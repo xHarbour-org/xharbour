@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.13 2004/11/21 21:44:21 druzus Exp $
+ * $Id: gtcrs.h,v 1.14 2004/12/10 03:43:34 mlombardo Exp $
  */
 
 /*
@@ -83,7 +83,7 @@ extern PHB_CODEPAGE s_cdpage;
 #  include <curses.h>
 #  if defined( HB_OS_SUNOS )
 #     include <term.h>
-#   endif
+#  endif
 #endif
 #ifdef HAVE_GPM_H
 # include <gpm.h>
