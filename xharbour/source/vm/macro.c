@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.12 2002/10/15 17:02:42 mlombardo Exp $
+ * $Id: macro.c,v 1.13 2002/10/17 00:48:07 ronpinkas Exp $
  */
 
 /*
@@ -353,6 +353,8 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
             // Save overriden char, and terminate.
             cSave = pName[ ulNameLen ];
             pName[ ulNameLen ] = '\0';
+
+            ulValLen = ulNameLen;
 
             /* Get a pointer to the string value stored in this variable
              * or NULL if variable doesn't exist or doesn't contain a string
