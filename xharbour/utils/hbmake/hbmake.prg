@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.77 2003/07/06 19:15:20 lculik Exp $
+ * $Id: hbmake.prg,v 1.78 2003/07/06 19:18:18 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -904,12 +904,13 @@ FUNCTION CompileFiles()
 
                      cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
 
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
+                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " "," >>"+ (s_cLog))
 
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                      nFile ++
                      //                            Outstd( cComm )
+		     tracelog (ccomm)
                      __RUN( (cComm) )
                      cErrText := Memoread( (s_cLog) )
                      lEnd     := 'Error E' $ cErrText
@@ -2037,7 +2038,7 @@ FUNCTION CompileUpdatedFiles()
       ELSE /**************Extended mode ******/             ////
 
          IF cOrder == "$(CFILES)"
-            nPos := aScan( s_aCommands, { | x | x[ 1 ] == ".c.obj:" .OR. x[ 1 ] == ".cpp.obj:" } )
+            nPos := aScan( s_aCommands, { | x | x[ 1 ] == ".c.obj:" .OR. x[ 1 ] == ".cpp.obj:" .or. x[ 1 ] == ".cpp.o:" .or. x[ 1 ] == ".c.o:"  } )
 
             IF nPos > 0
                cComm := s_aCommands[ nPos, 2 ]
