@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.38 2002/01/22 00:23:27 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.39 2002/01/22 22:07:42 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-22 18:30 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/gtapi.c
+    #defed out redundant hb_gtReadKey()
+
+  * source/rtl/inkey.c
+    ! Changed hb_gtReadKey() call to hb_gt_ReadKey()
+
+  * source/vm/hvm.c
+    - Removed call to hb_inkeyPoll() from hb_vmDo().
+    + Added logic to detect Alt-C in hb_vmExecute() every 65535 pCodes.
+
+  /* Now xHarbour support Alt-C in long loops, like Clipper does */
+
+  /* Now xHarbour Function/Procedure/Properties/Methods are 5 times faster,
+     and are even faster than Clipper!!!
+
+    Here are the latest results for 1,000,000 iterrations:
+
+              Proc    Func
+              -----   -----
+    xHarbour:  1.97    2.66
+    Clipper :  2.58    3.41
+    Harbour : 11.92   14.31
+  */
+
 2002-01-22 20:10 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
   * source/common/hbffind.c
     * Fixes for linux

@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.153 2001/12/17 09:33:58 vszakats Exp $
+ * $Id: gtapi.c,v 1.1.1.1 2001/12/21 10:42:15 ronpinkas Exp $
  */
 
 /*
@@ -147,12 +147,15 @@ int hb_gtExtendedKeySupport()
     return hb_gt_ExtendedKeySupport();
 }
 
+/* Why this redundancy ??? */
+#if 0
 int hb_gtReadKey( HB_inkey_enum eventmask )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtReadKey(%d)", (int) eventmask));
 
    return hb_gt_ReadKey( eventmask );
 }
+#endif
 
 void hb_gtAdjustPos( int iHandle, char * pStr, ULONG ulLen )
 {

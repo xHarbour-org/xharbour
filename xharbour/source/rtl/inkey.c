@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.119 2001/06/21 18:49:58 dholm Exp $
+ * $Id: inkey.c,v 1.1.1.1 2001/12/21 10:41:46 ronpinkas Exp $
  */
 
 /*
@@ -203,7 +203,7 @@ void hb_inkeyPoll( void )     /* Poll the console keyboard to stuff the Harbour 
 
    if( hb_set.HB_SET_TYPEAHEAD || s_inkeyPoll )
    {
-      int ch = hb_gtReadKey( s_eventmask );
+      int ch = hb_gt_ReadKey( s_eventmask );
 
       switch( ch )
       {

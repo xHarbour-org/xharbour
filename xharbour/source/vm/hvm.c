@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.18 2002/01/21 23:42:31 ronpinkas Exp $
+ * $Id: hvm.c,v 1.19 2002/01/22 00:23:28 ronpinkas Exp $
  */
 
 /*
@@ -84,6 +84,8 @@
 #include "hbvm.h"
 #include "hbpcode.h"
 #include "hbset.h"
+#include "hbinkey.ch"
+#include "inkey.ch"
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
@@ -429,6 +431,23 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
    while( pCode[ w ] != HB_P_ENDPROC )
    {
+      if( hb_set.HB_SET_CANCEL )
+      {
+         static unsigned short s_iCancel = 0;
+
+         if( ++s_iCancel == 65535 )
+         {
+            int ch = hb_gt_ReadKey( hb_set.HB_SET_EVENTMASK );
+
+            switch( ch )
+            {
+               case HB_K_ALT_C:           /* Check for extended Alt+C */
+               case K_ALT_C:              /* Check for normal Alt+C */
+                  hb_vmRequestCancel();/* Request cancellation */
+            }
+         }
+      }
+
       switch( pCode[ w ] )
       {
          /* Operators ( mathematical / character / misc ) */
@@ -3297,7 +3316,7 @@ void hb_vmDo( USHORT uiParams )
       ulClock = ( ULONG ) clock();
    }
 
-   hb_inkeyPoll();           /* Poll the console keyboard */
+   //hb_inkeyPoll();           /* Poll the console keyboard */
 
    HB_TRACE( HB_TR_INFO, ( "StackNewFrame %hu", uiParams ) );
 
