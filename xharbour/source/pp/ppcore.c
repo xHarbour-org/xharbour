@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.33 2002/09/30 21:26:46 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.34 2002/10/09 20:42:59 ronpinkas Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
  * Copyright 2000 Ron Pinkas <Ron@Profit-Master.com>
  *
  * hb_pp_SetRules() and related code for supportting
- * replaceable rules with -w switch
+ * replaceable rules with -u switch
  *
  * See doc/license.txt for licensing terms.
  *
@@ -4341,7 +4341,7 @@ static int NextWord( char ** sSource, char * sDest, BOOL lLower )
 static int NextName( char ** sSource, char * sDest )
 {
   /* Ron Pinkas added 2000-11-08 */
-  char cLastChar = '\0', *pString = NULL, *pTmp;
+  char cLastChar = '\32', *pString = NULL, *pTmp;
   /* END - Ron Pinkas added 2000-11-08 */
 
   int lenName = 0, State = STATE_NORMAL;
@@ -4453,11 +4453,14 @@ static int NextName( char ** sSource, char * sDest )
         State = STATE_QUOTE2;
      }
      /* Ron Pinkas added 2000-11-08 */
-     else if( **sSource == '[' && s_bArray == FALSE && strchr( ")]}.", cLastChar ) == NULL && ! ISNAME( cLastChar ) )
+     else if( **sSource == '[' )
      {
-        /* Ron Pinkas added 2000-11-08 */
-        pString = *sSource;
-        State = STATE_QUOTE3;
+        if( s_bArray == FALSE && strchr( ")]}.", cLastChar ) == NULL && ! ISNAME( cLastChar ) )
+        {
+           /* Ron Pinkas added 2000-11-08 */
+           pString = *sSource;
+           State = STATE_QUOTE3;
+        }
      }
      /* END - Ron Pinkas added 2000-11-08 */
 
@@ -4476,8 +4479,33 @@ static int NextName( char ** sSource, char * sDest )
      *sDest++ = *(*sSource)++;
      lenName++;
   }
-
   *sDest = '\0';
+
+  if( lenName > 3 && lenName < 7 )
+  {
+     if( toupper( (sDest - lenName)[0] ) == 'R' && toupper( (sDest - lenName)[1] ) == 'E' &&
+         toupper( (sDest - lenName)[2] ) == 'T' && toupper( (sDest - lenName)[3] ) == 'U'  )
+     {
+        if( (sDest - lenName)[4] == '\0' )
+        {
+           s_bArray = FALSE;
+           goto Done;
+        }
+        else if( toupper( (sDest - lenName)[4] ) == 'R' )
+        {
+           if( (sDest - lenName)[5] == '\0' )
+           {
+              s_bArray = FALSE;
+              goto Done;
+           }
+           else if( toupper( (sDest - lenName)[5] ) == 'N' )
+           {
+              s_bArray = FALSE;
+              goto Done;
+           }
+        }
+     }
+  }
 
   /* Ron Pinkas added 2000-11-08 - Prepare for next run. */
   pTmp = *sSource;
@@ -4493,6 +4521,8 @@ static int NextName( char ** sSource, char * sDest )
      printf( "NextName: >%s<\n", sDest - lenName );
      printf( "Rest: >%s<\n", *sSource );
   #endif
+
+ Done:
 
   return lenName;
 }
