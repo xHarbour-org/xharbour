@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.264 2002/06/09 19:15:35 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.265 2002/06/10 20:07:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-12 04:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/fm.c
+    * Minor refinment of error messages in hb_xfree()
+
+  * source/vm/arrays.c
+    ! Minor optimization to hb_arrayFill()
+
+  * source/vm/arrayshb.c
+    + Added new ArrayToStructure()
+    + Added new StructureToArray()
+
+  + include/cstruct.ch
+  + source/rtl/cstruct.prg
+    + New C STRUCTURE support.
+
+  + tests/tstcstru.prg
+    + Sample test to demonstrate new C STRUCTURE support.
+
+  * makefile.bc
+  * makefile.vc
+  * source/rtl/Makefile
+    + Added new cstruct.prg to make files.
 
 2002-06-10 13:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c

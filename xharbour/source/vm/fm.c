@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.6 2002/02/16 02:29:32 ronpinkas Exp $
+ * $Id: fm.c,v 1.7 2002/03/08 23:22:33 ronpinkas Exp $
  */
 
 /*
@@ -415,13 +415,13 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 
       if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
       {
-         hb_errInternal( HB_EI_XFREEINV, NULL, NULL, NULL );
+         hb_errInternal( HB_EI_XFREEINV, "hb_xfree() Invalid Pointer", NULL, NULL );
       }
 
       pSig  = (ULONG *)( ( ( unsigned char * ) pMem ) + pMemBlock->ulSize );
       if( *pSig != HB_MEMINFO_SIGNATURE )
       {
-         hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xfree()", NULL, NULL );
+         hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xfree() Pointer Overflow", NULL, NULL );
       }
 
       s_lMemoryConsumed -= pMemBlock->ulSize;
@@ -450,7 +450,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
    else
    {
       HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xfree(NULL)!"));
-      hb_errInternal( HB_EI_XFREENULL, NULL, NULL, NULL );
+      hb_errInternal( HB_EI_XFREENULL, "hb_xfree(NULL)", NULL, NULL );
    }
 #else
 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.15 2002/03/07 22:16:11 ronpinkas Exp $
+ * $Id: arrays.c,v 1.16 2002/05/12 17:58:56 ronpinkas Exp $
  */
 
 /*
@@ -522,9 +522,11 @@ void hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCoun
          ulCount = ulLen - ulStart + 1;
       }
 
+      ulStart--;
+
       for( ; ulCount > 0; ulCount--, ulStart++ )
       {
-         hb_itemCopy( pBaseArray->pItems + ( ulStart - 1 ), pValue );
+         hb_itemCopy( pBaseArray->pItems + ulStart, pValue );
       }
    }
 }

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2002/01/31 05:08:31 ronpinkas Exp $
+# $Id: Makefile,v 1.4 2002/01/31 05:57:24 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -125,6 +125,7 @@ PRG_SOURCES=\
 	browse.prg   \
 	checkbox.prg \
         cstr.prg \
+        cstruct.prg \
 	dbdelim.prg  \
 	dbedit.prg   \
 	dbsdf.prg    \
