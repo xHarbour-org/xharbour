@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.136 2002/03/26 15:29:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.137 2002/03/27 05:58:06 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-29 22:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.sly
+    ! Corrected typo in GetVar (included item belonging to GetVarArray
 
 2002-03-27 02:26 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * include/hbset.h
