@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.75 2005/03/21 02:23:43 andijahja Exp $
+ * $Id: win32ole.prg,v 1.76 2005/03/21 08:52:41 brianhays Exp $
  */
 
 /*
@@ -1350,24 +1350,24 @@ RETURN xRet
                                           &RetVal,
                                           &excep,
                                           &uArgErr );
+  }
 
-     if( s_nOleError == S_OK )
-     {
-        return;
-     }
+  //---------------------------------------------------------------------------//
 
-     //if( pDispParams->cArgs == 0 )
-     {
-        s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
-                                             DispID,
-                                             (REFIID) &IID_NULL,
-                                             0,
-                                             DISPATCH_PROPERTYGET,
-                                             pDispParams,
-                                             &RetVal,
-                                             &excep,
-                                             &uArgErr );
-     }
+  static void OleGetProperty( IDispatch *pDisp, DISPID DispID, DISPPARAMS *pDispParams )
+  {
+     memset( (LPBYTE) &excep, 0, sizeof( excep ) );
+
+     s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
+                                          DispID,
+                                          (REFIID) &IID_NULL,
+                                          0,
+                                          DISPATCH_PROPERTYGET,
+                                          pDispParams,
+                                          &RetVal,
+                                          &excep,
+                                          &uArgErr );
+
   }
 
   //---------------------------------------------------------------------------//
@@ -1376,6 +1376,7 @@ RETURN xRet
      IDispatch *pDisp;
      DISPID DispID;
      DISPPARAMS DispParams;
+     BOOL bSetFirst = FALSE;
 
      //TraceLog( NULL, "Class: '%s' Message: '%s', Params: %i Arg1: %i\n", hb_objGetClsName( hb_stackSelfItem() ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, hb_pcount(), hb_parinfo(1) );
 
@@ -1391,6 +1392,11 @@ RETURN xRet
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_USER_DEFAULT, &DispID );
         SysFreeString( bstrMessage );
         //TraceLog( NULL, "1. ID of: '%s' -> %i Result: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1, DispID, s_nOleError );
+
+        if( s_nOleError == S_OK )
+        {
+           bSetFirst = TRUE;
+        }
      }
      else
      {
@@ -1412,14 +1418,49 @@ RETURN xRet
 
         VariantInit( &RetVal );
 
-        OleInvoke( pDisp, DispID, &DispParams );
-        //TraceLog( NULL, "OleInvoke %i\n", s_nOleError );
-
-        if( s_nOleError == S_OK )
+        if( bSetFirst )
         {
-           RetValue();
+           DispParams.rgdispidNamedArgs = &lPropPut;
+           DispParams.cNamedArgs = 1;
+
+           OleSetProperty( pDisp, DispID, &DispParams );
+           //TraceLog( NULL, "OleSetProperty %i\n", s_nOleError );
+
+           if( s_nOleError == S_OK )
+           {
+              hb_itemReturn( hb_stackItemFromBase( 1 ) );
+           }
+           else
+           {
+              DispParams.rgdispidNamedArgs = NULL;
+              DispParams.cNamedArgs = 0;
+           }
         }
-        else if( hb_pcount() >= 1 )
+
+        if( bSetFirst == FALSE || s_nOleError != S_OK )
+        {
+           OleInvoke( pDisp, DispID, &DispParams );
+           //TraceLog( NULL, "OleInvoke %i\n", s_nOleError );
+
+           if( s_nOleError == S_OK )
+           {
+              RetValue();
+           }
+        }
+
+        // Collections are properties that do require arguments!
+        if( s_nOleError != S_OK /* && hb_pcount() == 0 */ )
+        {
+           OleGetProperty( pDisp, DispID, &DispParams );
+           //TraceLog( NULL, "OleGetProperty %i\n", s_nOleError );
+
+           if( s_nOleError == S_OK )
+           {
+              RetValue();
+           }
+        }
+
+        if( s_nOleError != S_OK && hb_pcount() >= 1 )
         {
            DispParams.rgdispidNamedArgs = &lPropPut;
            DispParams.cNamedArgs = 1;
