@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.1.1.1 2001/12/21 10:40:35 ronpinkas Exp $
+ * $Id: estack.c,v 1.2 2001/12/30 03:30:04 ronpinkas Exp $
  */
 
 /*
@@ -103,7 +103,9 @@ void hb_stackFree( void )
 
    i = hb_stack.wItems - 1;
    while( i >= 0 )
+   {
       hb_xfree( hb_stack.pItems[ i-- ] );
+   }
    hb_xfree( hb_stack.pItems );
 }
 
@@ -157,7 +159,12 @@ void hb_stackInit( void )
    hb_stack.wItems = STACK_INITHB_ITEMS;
 
    for( i=0; i < hb_stack.wItems; ++i )
-     hb_stack.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
+   {
+      hb_stack.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
+   }
+
+   ( * hb_stack.pPos )->type = HB_IT_NIL;
+   ( * hb_stack.pPos )->bShadow = FALSE;
 }
 
 void hb_stackRemove( LONG lUntilPos )

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.3 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: hvm.c,v 1.4 2001/12/30 03:30:04 ronpinkas Exp $
  */
 
 /*
@@ -269,13 +269,21 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_stack.pItems = NULL; /* keep this here as it is used by fm.c */
    hb_stack.Return.type = HB_IT_NIL;
 
+   HB_TRACE( HB_TR_INFO, ("xinit" ) );
    hb_xinit();
+   HB_TRACE( HB_TR_INFO, ("errInit" ) );
    hb_errInit();
+   HB_TRACE( HB_TR_INFO, ("stackInit" ) );
    hb_stackInit();
+   HB_TRACE( HB_TR_INFO, ("dynsymNew" ) );
    hb_dynsymNew( &hb_symEval );  /* initialize dynamic symbol for evaluating codeblocks */
+   HB_TRACE( HB_TR_INFO, ("setInitialize" ) );
    hb_setInitialize();        /* initialize Sets */
+   HB_TRACE( HB_TR_INFO, ("conInit" ) );
    hb_conInit();    /* initialize Console */
+   HB_TRACE( HB_TR_INFO, ("memvarsInit" ) );
    hb_memvarsInit();
+   HB_TRACE( HB_TR_INFO, ("SymbolInit_RT" ) );
    hb_vmSymbolInit_RT();      /* initialize symbol table with runtime support functions */
 
    /* Set the language to the default */
@@ -1528,8 +1536,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
       }
    }
 
+   HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmExecute(%p, %p)", pCode, pSymbols));
+
    if( pSymbols )
       hb_memvarSetPrivatesBase( ulPrivateBase );
+
+   HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
 }
 
 /* ------------------------------- */
@@ -1598,21 +1610,32 @@ static void hb_vmPlus( void )
    {
       if( ( double ) ( ( double ) pItem1->item.asString.length + ( double ) pItem2->item.asString.length ) < ( double ) ULONG_MAX )
       {
-         pItem1->item.asString.value = ( char * ) hb_xrealloc( pItem1->item.asString.value, pItem1->item.asString.length + pItem2->item.asString.length + 1 );
-         hb_xmemcpy( pItem1->item.asString.value + pItem1->item.asString.length,
-                     pItem2->item.asString.value, pItem2->item.asString.length );
+         if( pItem1->bShadow )
+         {
+            pItem1->item.asString.value = ( char * ) hb_xgrab( pItem1->item.asString.length + pItem2->item.asString.length + 1 );
+            pItem1->bShadow = FALSE;
+         }
+         else
+         {
+            pItem1->item.asString.value = ( char * ) hb_xrealloc( pItem1->item.asString.value, pItem1->item.asString.length + pItem2->item.asString.length + 1 );
+         }
+
+         hb_xmemcpy( pItem1->item.asString.value + pItem1->item.asString.length, pItem2->item.asString.value, pItem2->item.asString.length );
          pItem1->item.asString.length += pItem2->item.asString.length;
          pItem1->item.asString.value[ pItem1->item.asString.length ] = '\0';
 
-         if( pItem2->item.asString.value )
+         if( pItem2->item.asString.value && ! ( pItem2->bShadow ) )
          {
             hb_xfree( pItem2->item.asString.value );
             pItem2->item.asString.value = NULL;
          }
+
          hb_stackPop();
       }
       else
+      {
          hb_errRT_BASE( EG_STROVERFLOW, 1209, NULL, "+", 2, pItem1, pItem2 );
+      }
    }
    else if( HB_IS_DATE( pItem1 ) && HB_IS_DATE( pItem2 ) )
    {
@@ -1639,7 +1662,7 @@ static void hb_vmPlus( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_itemPushForward( pResult );
+         hb_vmPush( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -1683,29 +1706,45 @@ static void hb_vmMinus( void )
       {
          ULONG ulLen = pItem1->item.asString.length;
 
-         pItem1->item.asString.value = ( char * ) hb_xrealloc( pItem1->item.asString.value, pItem1->item.asString.length + pItem2->item.asString.length + 1 );
+         if( pItem1->bShadow )
+         {
+            pItem1->item.asString.value = ( char * ) hb_xgrab( pItem1->item.asString.length + pItem2->item.asString.length + 1 );
+            pItem1->bShadow = FALSE;
+         }
+         else
+         {
+            pItem1->item.asString.value = ( char * ) hb_xrealloc( pItem1->item.asString.value, pItem1->item.asString.length + pItem2->item.asString.length + 1 );
+         }
+
          pItem1->item.asString.length += pItem2->item.asString.length;
 
          while( ulLen && pItem1->item.asString.value[ ulLen - 1 ] == ' ' )
+         {
             ulLen--;
+         }
 
          hb_xmemcpy( pItem1->item.asString.value + ulLen, pItem2->item.asString.value, pItem2->item.asString.length );
          ulLen += pItem2->item.asString.length;
          hb_xmemset( pItem1->item.asString.value + ulLen, ' ', pItem1->item.asString.length - ulLen );
          pItem1->item.asString.value[ pItem1->item.asString.length ] = '\0';
 
-         if( pItem2->item.asString.value )
+         if( pItem2->item.asString.value && ! ( pItem2->bShadow ) )
          {
             hb_xfree( pItem2->item.asString.value );
             pItem2->item.asString.value = NULL;
          }
+
          hb_stackPop();
       }
       else
+      {
          hb_errRT_BASE( EG_STROVERFLOW, 1210, NULL, "-", 2, pItem1, pItem2 );
+      }
    }
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMinus" ) )
+   {
       hb_vmOperatorCall( pItem1, pItem2, "__OPMINUS" );
+   }
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pItem1, pItem2 );
@@ -1714,7 +1753,7 @@ static void hb_vmMinus( void )
       {
          hb_stackPop();
          hb_stackPop();
-         hb_itemPushForward( pResult );
+         hb_vmPush( pResult );
          hb_itemRelease( pResult );
       }
    }
@@ -2908,6 +2947,7 @@ void hb_vmDo( USHORT uiParams )
 
    hb_inkeyPoll();           /* Poll the console keyboard */
 
+   HB_TRACE( HB_TR_INFO, ( "StackNewFrame %hu", uiParams ) );
    pItem = hb_stackNewFrame( &sStackState, uiParams );
    pSym = pItem->item.asSymbol.value;
    pSelf = hb_stackSelfItem();   /* NIL, OBJECT or BLOCK */
@@ -3050,7 +3090,12 @@ void hb_vmDo( USHORT uiParams )
       }
    }
 
+   HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmDo(%hu)", uiParams));
+
    hb_stackOldFrame( &sStackState );
+
+   HB_TRACE(HB_TR_DEBUG, ("Restored OldFrame hb_vmDo(%hu)", uiParams));
+
    if( s_bDebugging )
       hb_vmDebuggerEndProc();
 

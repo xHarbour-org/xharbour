@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.1.1.1 2001/12/21 10:40:34 ronpinkas Exp $
+ * $Id: garbage.c,v 1.2 2001/12/22 06:36:17 ronpinkas Exp $
  */
 
 /*
@@ -413,9 +413,13 @@ void hb_gcCollectAll( void )
            }
          }
 
-         s_pCurrBlock = s_pCurrBlock->pNext;
+         /* The cleanup function might have resulted in the release of the current block. */
+         if( s_pCurrBlock )
+         {
+            s_pCurrBlock = s_pCurrBlock->pNext;
+         }
 
-      } while ( s_pCurrBlock && (pAlloc != s_pCurrBlock) );
+      } while ( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
 
       pAlloc = s_pCurrBlock;
       do
@@ -487,9 +491,13 @@ void hb_gcReleaseAll( void )
             ( s_pLockedBlock->pFunc )( ( void *)( s_pLockedBlock + 1 ) );
          }
 
-         s_pLockedBlock = s_pLockedBlock->pNext;
+         /* The cleanup function might have resulted in the release of the current block. */
+         if( s_pLockedBlock )
+         {
+            s_pLockedBlock = s_pLockedBlock->pNext;
+         }
 
-      } while ( s_pLockedBlock && pAlloc != s_pLockedBlock );
+      } while ( s_pLockedBlock && ( s_pLockedBlock != pAlloc ) );
 
       do
       {
@@ -510,22 +518,30 @@ void hb_gcReleaseAll( void )
          {
             HB_TRACE( HB_TR_INFO, ( "Cleanup, %p", s_pCurrBlock ) );
             ( s_pCurrBlock->pFunc )( ( void *)( s_pCurrBlock + 1 ) );
+            HB_TRACE( HB_TR_INFO, ( "DONE Cleanup, %p", s_pCurrBlock ) );
          }
 
-         s_pCurrBlock = s_pCurrBlock->pNext;
+         /* The cleanup function might have resulted in the release of the current block. */
+         if( s_pCurrBlock )
+         {
+            s_pCurrBlock = s_pCurrBlock->pNext;
+         }
 
-      } while ( s_pCurrBlock && pAlloc != s_pCurrBlock );
+      } while( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
 
-      do
+      while( s_pCurrBlock )
       {
          HB_TRACE( HB_TR_INFO, ( "Release %p", s_pCurrBlock ) );
          pDelete = s_pCurrBlock;
          hb_gcUnlink( &s_pCurrBlock, s_pCurrBlock );
          HB_GARBAGE_FREE( pDelete );
-      } while ( s_pCurrBlock );
+      }
    }
 
    s_bCollecting = FALSE;
+
+   HB_TRACE( HB_TR_INFO, ( "DONE Release All" ) );
+
 }
 
 /* service a single garbage collector step

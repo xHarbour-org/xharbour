@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.7 2001/12/30 03:28:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.8 2001/12/31 10:29:40 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-01 20:29 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
+  * xharbour/source/vm/fastitem.c
+  * xharbour/source/vm/itemapi.c
+    + Tracing info.
+
+  * xharbour/source/vm/arrays.c
+  * xharbour/source/vm/garbage.c
+    ! Fixed few more GPFs to do with hb_arrayReleaseGarabage().
+
+  * xharbour/source/vm/estack.c
+  * xharbour/source/vm/hvm.c
+    ! Fixed initialization of top item in hb_stackInit()
+
+  * xharbour/tests/inline_c.prg
+    ! Fixed aTokens() parsing of last token with just one character.
+
 2001-12-31 08:25 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
    * utils/hbmake/hbmake.prg
      * Sinc with harbour.Also command line are free now. ie hbmake -ex ola.bc

@@ -1,12 +1,12 @@
 /*
- * $Id: inline_c.prg,v 1.1.1.1 2001/12/21 10:45:53 ronpinkas Exp $
+ * $Id: inline_c.prg,v 1.2 2001/12/21 22:00:49 ronpinkas Exp $
  */
 PROCEDURE MAIN( cLine, cDelim )
 
    LOCAL a, i
 
    IF EMPTY( cLine )
-      cLine := "This is a test"
+      cLine := "This is a test a"
    END IF
 
    a := aTokens( cLine, cDelim )
@@ -51,7 +51,7 @@ FUNCTION aTokens( cLine, cDelimiter )
                iIndex++;
             }
          }
-         if( iOffset < pLine->item.asString.length - 1 )
+         if( iOffset < pLine->item.asString.length )
          {
             hb_arraySize( pArray, iIndex );
             hb_storclen( pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset, 1, iIndex );

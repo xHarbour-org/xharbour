@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.1.1.1 2001/12/21 10:40:45 ronpinkas Exp $
+ * $Id: arrays.c,v 1.2 2001/12/22 06:36:17 ronpinkas Exp $
  */
 
 /*
@@ -102,7 +102,10 @@ BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
    pBaseArray->puiClsTree = NULL;
 
    for( ulPos = 0; ulPos < ulLen; ulPos++ )
+   {
       ( pBaseArray->pItems + ulPos )->type = HB_IT_NIL;
+      ( pBaseArray->pItems + ulPos )->bShadow = FALSE;
+   }
 
    pItem->item.asArray.value = pBaseArray;
 
@@ -538,6 +541,8 @@ ULONG hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * 
             {
                PHB_ITEM pItem = pBaseArray->pItems + ulStart;
 
+                HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
+
                if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
                   return ulStart + 1;
             }
@@ -626,13 +631,14 @@ BOOL hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * p
 
 BOOL hb_arrayRelease( PHB_ITEM pArray )
 {
-   HB_TRACE( HB_TR_DEBUG, ("hb_arrayRelease(%p)", pArray ) );
+   HB_TRACE( HB_TR_DEBUG, ("hb_arrayRelease(%p) %p", pArray ) );
 
    if( HB_IS_ARRAY( pArray ) )
    {
       PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
-      ULONG ulLen = pBaseArray->ulLen;
       ULONG ulPos;
+
+      HB_TRACE( HB_TR_DEBUG, ( "pBaseArray %p", pBaseArray ) );
 
       /* Release object tree as needed */
       if( pBaseArray->puiClsTree )
@@ -661,9 +667,12 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
             ++pItem;
          }
 
+         HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pBaseArray->pItems ) );
          hb_xfree( pBaseArray->pItems );
+         pBaseArray->pItems = NULL;
       }
 
+      HB_TRACE( HB_TR_INFO, ( "Release pBaseArray %p", pBaseArray ) );
       hb_gcFree( ( void * ) pBaseArray );
 
       pArray->type = HB_IT_NIL;
@@ -996,6 +1005,11 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
          ++pItem;
       }
 
-      hb_xfree( pBaseArray->pItems );
+      if( pBaseArray->pItems )
+      {
+         HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pBaseArray->pItems ) );
+         hb_xfree( pBaseArray->pItems );
+         pBaseArray->pItems = NULL;
+      }
    }
 }

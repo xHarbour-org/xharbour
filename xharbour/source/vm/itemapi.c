@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.3 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.4 2001/12/30 03:30:04 ronpinkas Exp $
  */
 
 /*
@@ -817,7 +817,7 @@ void hb_itemClear( PHB_ITEM pItem )
    }
    else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
-      if( --( pItem->item.asArray.value )->uiHolders == 0 )
+      if( ( pItem->item.asArray.value )->uiHolders && --( pItem->item.asArray.value )->uiHolders == 0 )
       {
          hb_arrayRelease( pItem );
       }
@@ -833,6 +833,8 @@ void hb_itemClear( PHB_ITEM pItem )
 
    pItem->type = HB_IT_NIL;
    pItem->bShadow = FALSE;
+
+   HB_TRACE(HB_TR_DEBUG, ("DONE hb_itemClear(%p)", pItem));
 }
 
 /* Internal API, not standard Clipper */
@@ -881,17 +883,18 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_itemSwap(%p, %p)", pItem1, pItem2));
 
+   /*
    temp.type = HB_IT_NIL;
    hb_itemCopy( &temp, pItem2 );
    hb_itemCopy( pItem2, pItem1 );
    hb_itemCopy( pItem1, &temp );
    hb_itemClear( &temp );
+   */
 
-/* Faster, but less safe way
+/* Faster, but less safe way, [Ron Pinkas 12/30/2001 - I don't think so!] */
    memcpy( &temp, pItem2, sizeof( HB_ITEM ) );
    memcpy( pItem2, pItem1, sizeof( HB_ITEM ) );
    memcpy( pItem1, &temp, sizeof( HB_ITEM ) );
-*/
 }
 
 /* Internal API, not standard Clipper */

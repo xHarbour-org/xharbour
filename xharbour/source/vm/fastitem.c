@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.1 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.2 2001/12/30 03:30:04 ronpinkas Exp $
  */
 
 /*
@@ -60,7 +60,7 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
 
 void hb_itemPushForward( PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPush(%p)", pItem));
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemPushForward(%p)", pItem));
 
    hb_itemForwardValue( hb_stackTopItem(), pItem );
    hb_stackPush();
@@ -82,7 +82,25 @@ void hb_itemShareValue( PHB_ITEM pDest, PHB_ITEM pSource )
 
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
-   pDest->bShadow = TRUE;
+   if( HB_IS_ARRAY( pSource ) )
+   {
+      ( pSource->item.asArray.value )->uiHolders++;
+      pDest->bShadow = FALSE;
+   }
+   else if( HB_IS_BLOCK( pSource ) )
+   {
+      ( pSource->item.asBlock.value )->ulCounter++;
+      pDest->bShadow = FALSE;
+   }
+   else if( HB_IS_MEMVAR( pSource ) )
+   {
+      hb_memvarValueIncRef( pSource->item.asMemvar.value );
+      pDest->bShadow = FALSE;
+   }
+   else
+   {
+      pDest->bShadow = TRUE;
+   }
 }
 
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
