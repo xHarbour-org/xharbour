@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.21 2004/05/15 17:15:00 modalsist Exp $
+ * $Id: memoedit.prg,v 1.21 2004/05/15 22:35:32 modalsist Exp $
  */
 
 /*
@@ -68,6 +68,10 @@
  * if nLineLength < 0 then word-wrap = false like Clipper.
  * if nLineLength = 0 or null, then word-wrap = true and wordwrapcol = nRight - nLeft + 1.
  * if nLineLength > 0 then word-wrap = true and wordwrapcol = nLineLength
+ *
+ *
+ * v.1.22 - 2004/06/04     Vicente Guerra <vicente@guerra.com.mx>
+ * Send ProcName() and ProcLine() in SETKEY() procedure calls.
  *
  */
 
@@ -151,7 +155,8 @@ METHOD Edit() CLASS TMemoEditor
          nKey := Inkey( 0 )
 
          if ( bKeyBlock := Setkey( nKey ) ) <> NIL
-            Eval( bKeyBlock, Self )                // 7/01/2004 12:47p.m. Pass Self as parameter
+            // Pass Self as 4th. parameter
+            Eval( bKeyBlock, ::ProcName, ::ProcLine, "", Self )
             Loop
          endif
 
@@ -397,6 +402,9 @@ FUNCTION MemoEdit(cString,;         // same as Clipper
                              nWindowRow,;
                              nWindowColumn,;
                              lToggleExitSave )
+
+   oEd:ProcName := ProcName( 1 )
+   oEd:ProcLine := ProcLine( 1 )
 
    oEd:MemoInit( cUserFunction )
    oEd:RefreshWindow()

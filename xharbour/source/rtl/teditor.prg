@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.39 2004/05/17 21:31:41 lf_sfnet Exp $
+ * $Id: teditor.prg,v 1.40 2004/05/23 09:38:42 guerra000 Exp $
  *
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
@@ -184,6 +184,10 @@
  * - Fixed last row deletion when pressing BACKSPACE at the beginning of it.
  * - ::lInsert translated from DATA to METHOD for set/get READINSERT().
  *
+ * v.1.41 - 2004/06/04     Vicente Guerra <vicente@guerra.com.mx>
+ *
+ * Send ProcName() and ProcLine() in SETKEY() procedure calls.
+ *
  */
 
 #include "common.ch"
@@ -250,6 +254,9 @@ CLASS HBEditor
                                               //          .F. = unscrolled
    DATA  nLeftScrollVal  INIT 8               // Amount of columns to left scroll.
    DATA  nWordWrapColLeftScroll INIT 0        // Column to word wrap in left scroll mode.
+
+   DATA  ProcName        INIT ""
+   DATA  ProcLine        INIT 0
 
    // Class DATA can be faster, but since the user can change directly
    // READINSERT(), ::lInsert must check in it.
@@ -449,6 +456,10 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    IF ::nFirstCol >  ::LLen() + 1
       ::nFirstCol := ::LLen() + 1
    ENDIF
+
+   // Caller procedure's name and line
+   ::ProcName := ProcName( 1 )
+   ::ProcLine := ProcLine( 1 )
 
    // Set cursor position; also initializes phisical to virtual mapping
    ::SetPos( ::nTop + nWndRow, ::nLeft + nWndCol )
@@ -723,7 +734,8 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
          endif
 
          if ( bKeyBlock := Setkey( nKey ) ) <> NIL
-            Eval( bKeyBlock, Self )    // 7/01/2004 - Passed Self as parameter
+            // Passed Self as 4th. parameter
+            Eval( bKeyBlock, ::ProcName, ::ProcLine, "", Self )
             Loop
          endif
 
@@ -2833,7 +2845,8 @@ STATIC procedure BrowseText( oSelf, nPassedKey )
       endif
 
       if ( bKeyBlock := Setkey( nKey ) ) <> NIL
-         Eval( bKeyBlock, oSelf )  // 7/01/2004 12:47p.m. Pass oSelf as parameter
+         // Passed Self as 4th. parameter
+         Eval( bKeyBlock, ::ProcName, ::ProcLine, "", oSelf )
          Loop
       endif
 
