@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: net.c,v 1.4 2003/11/10 14:33:07 lculik Exp $
  */
 
 /*
@@ -93,7 +93,7 @@
 
 HB_FUNC( NETNAME )
 {
-#if defined(HB_OS_OS2) || defined(__GNUC__)
+#if defined(HB_OS_OS2) || defined(HB_OS_UNIX_COMPATIBLE)
 
    {
       char * pszValue = ( char * ) hb_xgrab( MAXGETHOSTNAME + 1 );
