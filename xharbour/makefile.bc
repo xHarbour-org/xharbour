@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.23 2003/01/10 22:54:51 ronpinkas Exp $
+# $Id: makefile.bc,v 1.24 2003/01/11 01:53:43 ronpinkas Exp $
 #
 
 #
@@ -101,7 +101,10 @@ LIB_DIR = lib\b32
 
 # This is needed, otherwise the libs may overflow when
 # debug info is requested with -v -y
-ARFLAGS = /P32
+# if debug info is requested, set ARFLAGS to /P64 in your environment
+!if !$d(ARFLAGS)
+   ARFLAGS = /P32
+!endif
 
 !endif
 

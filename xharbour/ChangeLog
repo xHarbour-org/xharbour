@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.611 2003/01/11 01:59:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.612 2003/01/11 02:18:09 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-11 12:53 UTC+0100 Patrick Mast <patrick@winfakt.com>
+  * makefile.bc
+    ! Added support for a user defined ARFLAGS
+      * if you use -v -y in your CFLAGS, you HAVE to set ARFLAGS to /P64
+        to be able to make the MT lib files.
 
 2003-01-11 03:15 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * samples/sitesrv/bldsrv.bat
