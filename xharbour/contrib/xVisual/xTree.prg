@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ * $Id: xTree.prg,v 1.5 2002/10/14 04:19:24 what32 Exp $
  */
 
 /*
@@ -57,7 +57,7 @@ METHOD OnCreate() CLASS ObjTree
    DeleteObject(hBmp)
 
    ::Add('tree', TreeObj():New( self, 100,  0,  0, 100, 100) )
-   
+   ::Tree:Hint := "OOPS"
    TVSetImageList(::Tree:handle, hImg, 0 )
 RETURN(nil)
 
