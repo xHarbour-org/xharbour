@@ -1,5 +1,5 @@
 /*
- * $Id: radiogrp.prg,v 1.5 2003/01/27 03:40:53 walito Exp $
+ * $Id: radiogrp.prg,v 1.6 2003/04/26 16:26:24 lculik Exp $
  */
 
 /*
@@ -196,7 +196,7 @@ METHOD  _SetColor( cColor ) CLASS HBRadioGroup
 
 METHOD  _Select( xValue ) CLASS HBRadioGroup
 
-   Local nPos //,nLen := ::ItemCount
+   Local nPos := -1
    Local cType := ValType( xValue )
    Local oItems
 
