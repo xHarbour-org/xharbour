@@ -5,13 +5,13 @@
 * \author Tadeusz Dracz
 */
 // Part of the ZipArchive library
-// 
+//
 // Copyright (C) 2000 - 2001 Tadeusz Dracz.
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // For the licensing details see the file License.txt
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -25,14 +25,14 @@
 #include "zconf.h"
 
 #ifndef _HBCOMPRESS_H
-#include "hbcompress.h"
+#include "hbcomprs.h"
 #endif
 
 /**
 	The purpose of this structure is to hold the data that allow communication
 	with the zlib library
 */
-ZEXPORT struct CZipInternalInfo  
+ZEXPORT struct CZipInternalInfo
 {
 	CZipInternalInfo();
 	virtual ~CZipInternalInfo();

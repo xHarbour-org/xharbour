@@ -5,7 +5,7 @@
 * handlers and what to do to start services.
 * Compile defining DEBUG constant; at timeout (0) an hard
 * error will be issiued.
-* On windows, use CTRL+BREAK to see an INTERRUPT SIGNAL 
+* On windows, use CTRL+BREAK to see an INTERRUPT SIGNAL
 * handling.
 *
 * Best viewed with gtcgi. On unix, you can change
@@ -16,10 +16,10 @@
 *
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id: service.prg,v 1.2 2003/09/26 08:22:44 jonnymind Exp $
+* $Id: service.prg,v 1.3 2003/10/20 02:39:29 jonnymind Exp $
 *
 
-#include "hbservice.ch"
+#include "hbserv.ch"
 #include "hblog.ch"
 GLOBAL bWait
 
@@ -50,8 +50,8 @@ PROCEDURE Main()
    ENDDO
 
    LOG "Main thread terminated"
-   CLOSE LOG   
-   
+   CLOSE LOG
+
 RETURN
 
 

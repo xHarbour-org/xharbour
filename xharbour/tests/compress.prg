@@ -3,10 +3,10 @@
 *
 * Giancarlo Niccolai
 *
-* $Id: compress.prg,v 1.1 2003/02/12 01:13:05 jonnymind Exp $
+* $Id: compress.prg,v 1.2 2003/02/12 10:35:19 jonnymind Exp $
 *
 
-#include "hbcompress.ch"
+#include "hbcomprs.ch"
 
 PROCEDURE MAIN()
    LOCAL cText := "A  text  to  be  compressed             "

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.24 2003/11/16 01:56:15 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.25 2003/11/16 02:13:02 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -119,16 +119,16 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\gtapiu.obj \
   $(OBJ_DIR)\gx.obj \
   $(OBJ_DIR)\hardcr.obj \
-  $(OBJ_DIR)\hbbitfield.obj \
-  $(OBJ_DIR)\hbchecksum.obj \
-  $(OBJ_DIR)\hbcompress.obj \
+  $(OBJ_DIR)\hbbitf.obj \
+  $(OBJ_DIR)\hbchksum.obj \
+  $(OBJ_DIR)\hbcomprs.obj \
   $(OBJ_DIR)\hbcrc32.obj \
   $(OBJ_DIR)\hbcrypt.obj \
   $(OBJ_DIR)\hbffind.obj \
-  $(OBJ_DIR)\hbhextonum.obj \
-  $(OBJ_DIR)\hboutdebug.obj \
+  $(OBJ_DIR)\hbhex2n.obj \
+  $(OBJ_DIR)\hboutdbg.obj \
   $(OBJ_DIR)\hbrandom.obj \
-  $(OBJ_DIR)\hbservice.obj \
+  $(OBJ_DIR)\hbserv.obj \
   $(OBJ_DIR)\hbsrlraw.obj \
   $(OBJ_DIR)\hbsyslog.obj \
   $(OBJ_DIR)\hbxml.obj \
@@ -233,8 +233,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\getlist.obj \
   $(OBJ_DIR)\getsys.obj \
   $(OBJ_DIR)\hblog.obj \
-  $(OBJ_DIR)\hbloginet.obj \
-  $(OBJ_DIR)\hbreadini.obj \
+  $(OBJ_DIR)\hblognet.obj \
+  $(OBJ_DIR)\hbini.obj \
   $(OBJ_DIR)\hbserial.obj \
   $(OBJ_DIR)\input.obj \
   $(OBJ_DIR)\listbox.obj \
@@ -512,10 +512,10 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 $(OBJ_DIR)\hbfsapi.obj : $(COMMON_DIR)\hbfsapi.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
-$(OBJ_DIR)\hbchecksum.obj : $(RTL_DIR)\hbchecksum.c
+$(OBJ_DIR)\hbchksum.obj : $(RTL_DIR)\hbchksum.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
-$(OBJ_DIR)\hbcompress.obj : $(RTL_DIR)\hbcompress.c
+$(OBJ_DIR)\hbcomprs.obj : $(RTL_DIR)\hbcomprs.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hbcrc32.obj : $(RTL_DIR)\hbcrc32.c
@@ -527,13 +527,13 @@ $(OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
 $(OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
-$(OBJ_DIR)\hbhextonum.obj : $(RTL_DIR)\hbhextonum.c
+$(OBJ_DIR)\hbhex2n.obj : $(RTL_DIR)\hbhex2n.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
-$(OBJ_DIR)\hbservice.obj : $(RTL_DIR)\hbservice.c
+$(OBJ_DIR)\hbserv.obj : $(RTL_DIR)\hbserv.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hbsrlraw.obj : $(RTL_DIR)\hbsrlraw.c
@@ -1007,13 +1007,13 @@ $(OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
 $(OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
-$(OBJ_DIR)\hbbitfield.obj : $(RTL_DIR)\hbbitfield.c
+$(OBJ_DIR)\hbbitf.obj : $(RTL_DIR)\hbbitf.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
-$(OBJ_DIR)\hbreadini.c : $(RTL_DIR)\hbreadini.prg
+$(OBJ_DIR)\hbini.c : $(RTL_DIR)\hbini.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\hbreadini.obj : $(OBJ_DIR)\hbreadini.c
+$(OBJ_DIR)\hbini.obj : $(OBJ_DIR)\hbini.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hbserial.c : $(RTL_DIR)\hbserial.prg
@@ -1759,16 +1759,16 @@ $(OBJ_DIR)\hblog.obj : $(OBJ_DIR)\hblog.c
 $(OBJ_DIR)\hblog.c : $(RTL_DIR)\hblog.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\hbloginet.obj : $(OBJ_DIR)\hbloginet.c
+$(OBJ_DIR)\hblognet.obj : $(OBJ_DIR)\hblognet.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
-$(OBJ_DIR)\hbloginet.c : $(RTL_DIR)\hbloginet.prg
+$(OBJ_DIR)\hblognet.c : $(RTL_DIR)\hblognet.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\hbsyslog.obj : $(RTL_DIR)\hbsyslog.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
-$(OBJ_DIR)\hboutdebug.obj : $(RTL_DIR)\hboutdebug.c
+$(OBJ_DIR)\hboutdbg.obj : $(RTL_DIR)\hboutdbg.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\ppcomp.obj : $(PP_DIR)\ppcomp.c

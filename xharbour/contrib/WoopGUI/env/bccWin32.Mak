@@ -2,7 +2,7 @@
 OUTDIR=build
 OBJDIR=obj\b32
 SRCDIR=source
-LIBDIR=lib\b32
+LIBDIR=..\..\lib\b32
 
 
 #-- HARBOUR COMPILER ----

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.cpp $
 // $Archive: /ZipArchive/ZipArchive.cpp $
-// $Date: 2003/09/12 20:10:13 $ $Author: paultucker $
+// $Date: 2003/09/15 02:38:37 $ $Author: paultucker $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-#include "hbcompress.h"
+#include "hbcomprs.h"
 #include "stdafx.h"
 #include "ziparchive.h"
 // #include "ZipPathComponent.h"
@@ -54,7 +54,7 @@ CZipArchive::CZipArchive()
 {
 
 	m_bRemoveDriveLetter = true;
-	m_bIgnoreCRC = 
+	m_bIgnoreCRC =
 	m_bAutoFlush = false;
 	m_centralDir.m_pStorage= &m_storage;
 //	m_info.m_stream.zalloc = (alloc_func)_zliballoc;
