@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.178 2004/11/01 05:38:12 likewolf Exp $
+* $Id: thread.c,v 1.179 2004/12/01 00:52:21 peterrees Exp $
 */
 
 /*
@@ -2307,6 +2307,61 @@ HB_FUNC( HB_MUTEXLOCK )
       HB_CRITICAL_UNLOCK( Mutex->mutex );
 
       HB_STACK_LOCK;
+   }
+}
+
+
+/*
+   Locks a mutex; locking is done by waiting for the mutex resource
+   to become available with timeout. This wait is cancelable.
+*/
+
+HB_FUNC( HB_MUTEXTIMEOUTLOCK )
+{
+#if defined(HB_API_MACROS)
+   HB_THREAD_STUB
+#endif
+
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
+   DWORD dwTimeOut = (DWORD) hb_parnl(2);
+
+   if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE || dwTimeOut < 0 )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXTIMEOUTLOCK", 2, hb_paramError(1), hb_paramError(2) );
+      return;
+   }
+
+   if( HB_SAME_THREAD( Mutex->locker, HB_CURRENT_THREAD() ) )
+   {
+      Mutex->lock_count ++;
+      hb_retl( TRUE );
+   }
+   else
+   {
+      BOOL bLock;
+      HB_STACK_UNLOCK;
+
+      HB_CRITICAL_LOCK( Mutex->mutex );
+      HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, Mutex->mutex );
+
+      HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, dwTimeOut );
+      
+      if ( Mutex->locker != 0 )
+      {
+         bLock = FALSE;
+      }
+      else
+      {
+         Mutex->locker = HB_CURRENT_THREAD();
+         Mutex->lock_count = 1;
+         bLock = TRUE;
+      }
+
+      HB_CLEANUP_POP;
+      HB_CRITICAL_UNLOCK( Mutex->mutex );
+
+      HB_STACK_LOCK;
+      hb_retl(bLock);
    }
 }
 
