@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3573 2004/11/02 08:38:59 bdj Exp $
+ * $Id: ChangeLog,v 1.3574 2004/11/02 14:39:54 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-11-02 13:16 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/achoice.prg
+    ! Fixed AC_GOTO return from user's function. Reported by Bruce Rowe.
 
 2004-11-02 15:22 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/filesys.c

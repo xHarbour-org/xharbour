@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.21 2004/06/08 23:52:19 what32 Exp $
+ * $Id: achoice.prg,v 1.22 2004/06/08 23:59:58 what32 Exp $
  */
 
 /*
@@ -50,7 +50,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
 
    ColorSelect( CLR_STANDARD )
 
-   lUserFunc := !Empty( xUserFunc ) .AND. ValType( xUserFunc ) IN "CB"
+   lUserFunc := !Empty( xUserFunc ) .AND. ValType( xUserFunc ) IN "CBM"
 
 
    DEFAULT nTop       TO 0                 // The topmost row of the window
@@ -88,7 +88,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
 
    IF !lFinished
 
-      nMode := Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems )
+      nMode := Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems, AC_IDLE )
       IF nMode == AC_NOITEM
          nPos := 0
       ENDIF
@@ -120,6 +120,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
          nKey  := Inkey( 0 )
          EXIT
       CASE AC_GOTO
+         EXIT
       CASE AC_NOITEM
          nKey := 0
          EXIT
@@ -140,7 +141,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
          ENDIF
 
          nRowsClr := Min( nNumRows, nItems )
-         nMode := Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems )
+         nMode := Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems, AC_IDLE )
 
          IF nMode == AC_NOITEM
             nPos := 0
@@ -517,7 +518,7 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
 
          DO CASE
          CASE nUserFunc == AC_ABORT .OR. (nMode == AC_NOITEM .AND. ;
-              Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems ) == AC_NOITEM )
+              Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems, AC_IDLE ) == AC_NOITEM )
             lFinished := .T.
             IF nPos > 0
                DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
@@ -540,7 +541,11 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
          IF nPos > 0
 
             nRowsClr := Min( nNumRows, nItems )
-            nMode := Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems )
+            IF nMode == AC_GOTO
+               nMode := Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems, AC_GOTO )
+            ELSE
+               nMode := Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems, AC_IDLE )
+            ENDIF
 
             IF nMode == AC_NOITEM
                nPos := 0
@@ -626,7 +631,7 @@ STATIC PROCEDURE DispLine( cLine, nRow, nCol, lSelect, lHiLite, nNumCols )
    RETURN
 
 
-STATIC FUNCTION Ach_Limits( nFrstItem, nLastItem, nItems, bSelect, alSelect, acItems )
+STATIC FUNCTION Ach_Limits( nFrstItem, nLastItem, nItems, bSelect, alSelect, acItems, nValidMode )
 
    LOCAL nMode, cItems
 
@@ -651,7 +656,7 @@ STATIC FUNCTION Ach_Limits( nFrstItem, nLastItem, nItems, bSelect, alSelect, acI
    IF nFrstItem == 0
       nLastItem := 0
    ELSE
-      nMode     := AC_IDLE
+      nMode     := nValidMode
       nLastItem := nItems               // Last valid item
       DO WHILE nLastItem>0 .and. !Eval( bSelect, alSelect[ nLastItem ] )
          nLastItem--
