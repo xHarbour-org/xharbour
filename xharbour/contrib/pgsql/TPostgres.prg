@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.32 2004/12/15 13:15:24 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.33 2005/02/02 13:47:19 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -63,7 +63,7 @@ CLASS TPQServer
     DATA     cError    INIT ''
    
     METHOD   New( cHost, cDatabase, cUser, cPass, nPort, Schema )
-    METHOD   Destroy()            INLINE PQClose(::pDb)
+    METHOD   Destroy()            
     METHOD   Close()              INLINE ::Destroy()
 
     METHOD   StartTransaction()
@@ -84,7 +84,7 @@ CLASS TPQServer
     METHOD   CreateTable( cTable, aStruct )
     METHOD   DeleteTable( cTable  )
 
-    DESTRUCTOR Destroy
+    //DESTRUCTOR Destroy
 ENDCLASS
 
 
@@ -111,6 +111,12 @@ METHOD New( cHost, cDatabase, cUser, cPass, nPort, Schema ) CLASS TPQserver
     endif
     
 RETURN self
+
+
+METHOD Destroy() CLASS TPQserver
+    PQClose(::pDb)    
+RETURN nil
+
 
 METHOD SetSchema( cSchema ) CLASS TPQserver
     Local res
@@ -486,7 +492,7 @@ CLASS TPQQuery
     METHOD   GetRow( nRow )   
     METHOD   GetBlankRow()  
     
-    DESTRUCTOR Destroy
+    //DESTRUCTOR Destroy
 ENDCLASS
 
 
