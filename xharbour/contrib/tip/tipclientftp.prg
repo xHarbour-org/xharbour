@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclientftp.prg,v 1.3 2003/11/05 11:06:41 jonnymind Exp $
+* $Id: tipclientftp.prg,v 1.4 2003/11/14 12:01:41 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -303,6 +303,7 @@ METHOD Read( nLen ) CLASS tIPClientFTP
    IF .not. ::bInitialized
       IF .not. Empty( ::oUrl:cPath )
          IF .not. ::CWD( ::oUrl:cPath )
+            ::bEof = .T.  // no data for this transaction
             RETURN .F.
          ENDIF
       ENDIF
@@ -311,6 +312,7 @@ METHOD Read( nLen ) CLASS tIPClientFTP
       ENDIF
 
       IF .not. ::Retr( ::oUrl:cFile )
+         ::bEof = .T.  // no data for this transaction
          RETURN .F.
       ENDIF
       // now channel is open
@@ -321,8 +323,6 @@ METHOD Read( nLen ) CLASS tIPClientFTP
    IF cRet == NIL
       ::Commit()
       ::bEof := .T.
-   ELSE
-      ? "CRET " + STR(Len( cret ))
    ENDIF
 RETURN cRet
 
