@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3535 2004/10/25 03:07:23 kaddath Exp $
+ * $Id: ChangeLog,v 1.3536 2004/10/25 07:35:54 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-25 15:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/gtapi.c
+    * changed default clear character from chr(255) to ' '
+      Clipper uses 255 but we cannot. Not all platform/character sets
+      uses 255 as blank char
 
 2004-10-25 14:35 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   + contrib/gtwvw

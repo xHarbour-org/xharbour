@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.35 2004/10/23 23:31:31 oh1 Exp $
+ * $Id: gtapi.c,v 1.36 2004/10/24 17:59:27 druzus Exp $
  */
 
 /*
@@ -196,7 +196,7 @@ static SHORT        ct_MRStep = 2;     // Move Rows Step
 static SHORT        ct_MCStep = 5;     // Move Columns Step
 
 static SHORT        ct_ClearA  = 7;    // Windows Clear Attribute
-static SHORT        ct_ClearB  = 255;  // Windows Clear Char
+static SHORT        ct_ClearB  = ' ';  // Windows Clear Char - Clipper uses 255 but we cannot not all platform/character set uses 255 as blank char
 static SHORT        ct_ShadowA = -1;   // Windows Shadow Attribute
 static UINT         ct_CSize   = 2;    // Windows Buffer One Char Size
 
@@ -2073,7 +2073,7 @@ static void hb_ctInit( void )
       ct_MCStep = 5;     // Move Columns Step
 
       ct_ClearA  = 7;    // Windows Clear Attribute
-      ct_ClearB  = 255;  // Windows Clear Char
+      ct_ClearB  = ' ';  // Windows Clear Char - Clipper uses 255 but we cannot not all platform/character set uses 255 as blank char
       ct_ShadowA = -1;   // Windows Shadow Attribute
 
       ct_NCur = -1;
