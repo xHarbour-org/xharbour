@@ -353,9 +353,9 @@ Function asString( x )
       Return AllTrim( str( x ) )
    Case v == "L"
       If x
-         Return "TRUE"
+         Return ".T."
       Else
-         Return "FALSE"
+         Return ".F."
       EndIf
    Case v == "D"
       Return dtoc( x )
