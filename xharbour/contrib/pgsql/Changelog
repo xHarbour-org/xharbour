@@ -1,0 +1,12 @@
+/*
+ * Chr(36) + "Id" + Chr(36)
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2004-01-02 15:05 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  * INITIAL RELEASE
