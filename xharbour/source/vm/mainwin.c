@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.15 2004/04/04 08:56:20 lf_sfnet Exp $
+ * $Id: mainwin.c,v 1.16 2004/04/07 03:10:15 andijahja Exp $
  */
 
 /*
@@ -64,9 +64,7 @@ HB_EXTERN_BEGIN
 int argc = 0;
 char * argv[ MAX_ARGS ];  //23/12/2003 3:40p.m. change from 20 to 64
 
-HANDLE hb_hInstance = 0;
-HANDLE hb_hPrevInstance = 0;
-int    hb_iCmdShow;
+void HB_EXPORT hb_SetWinMainParameters( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow ) ;
 
 int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
                     HINSTANCE hPrevInstance,  /* handle to previous instance */
@@ -86,9 +84,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
    HB_SYMBOL_UNUSED( iCmdShow );
 
-   hb_hInstance = hInstance;
-   hb_hPrevInstance = hPrevInstance;
-   hb_iCmdShow = iCmdShow;
+   hb_SetWinMainParameters( hInstance, hPrevInstance, iCmdShow ) ;
 
    GetModuleFileName( hInstance, szAppName, 249 );
    argv[ argc++ ] = szAppName;

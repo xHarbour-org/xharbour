@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.11 2004/05/04 16:24:13 mauriliolongo Exp $
+ * $Id: cmdarg.c,v 1.12 2004/05/04 18:39:31 kaddath Exp $
  */
 
 /*
@@ -49,6 +49,9 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+  #define HB_OS_WIN_32_USED
+#endif
 
 #include "hbapi.h"
 #include "hbmemory.ch"
@@ -57,13 +60,28 @@
    This variable will be set to FALSE upon
    initialization of gt -> hb_gt_Init()
 */
-#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
-   BOOL b_MouseEnable = TRUE;
-#endif
 
 /* Command line argument management */
 static int     s_argc = 0;
 static char ** s_argv = NULL;
+
+#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+
+
+  BOOL b_MouseEnable = TRUE;
+  HANDLE hb_hInstance = 0;
+  HANDLE hb_hPrevInstance = 0;
+  int    hb_iCmdShow;
+
+void HB_EXPORT hb_SetWinMainParameters( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow )
+{
+   hb_hInstance = hInstance;
+   hb_hPrevInstance = hPrevInstance;
+   hb_iCmdShow = iCmdShow;
+   return ;
+}
+
+#endif
 
 void HB_EXPORT hb_cmdargInit( int argc, char * argv[] )
 {

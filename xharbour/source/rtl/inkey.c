@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.34 2004/04/21 07:54:31 bdj Exp $
+ * $Id: inkey.c,v 1.35 2004/04/30 19:42:23 druzus Exp $
  */
 
 /*
@@ -365,7 +365,7 @@ void hb_inkeyReset( BOOL allocate )     /* Reset the keyboard buffer */
 
 HB_FUNC( INKEY )
 {
-  BOOL bContinue = TRUE ;
+  BOOL bContinue ;
   USHORT uiPCount = hb_pcount();
   int iKey;
 
