@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.46 2003/05/01 14:12:17 patrickmast Exp $
+ * $Id: tget.prg,v 1.47 2003/05/06 17:02:59 walito Exp $
  */
 
 /*
@@ -481,8 +481,8 @@ METHOD SetFocus() CLASS Get
 
    ::Original   := ::VarGet()
    ::type       := ValType( ::Original )
-   ::buffer     := ::PutMask( ::VarGet(), .f. )
    ::Picture    := ::cPicture
+   ::buffer     := ::PutMask( ::VarGet(), .f. )
    ::changed    := .f.
    ::clear      := ( "K" IN ::cPicFunc .or. ::type == "N")
 //   ::nMaxLen    := IIF( ::buffer == NIL, 0, Len( ::buffer ) )

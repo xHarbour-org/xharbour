@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.8 2002/11/13 20:41:50 walito Exp $
+ * $Id: teditor.prg,v 1.9 2003/01/27 03:40:53 walito Exp $
  */
 
 /*
@@ -951,7 +951,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
 
                else
 
-               ::lDirty := .T.
+                  ::lDirty := .T.
                // If I'm on last char of a line and there are more lines, append next line to current one
                   lDelAppend := ::nCol > ::LineLen(::nRow)
                   ::aText[::nRow]:cText := Stuff(::aText[::nRow]:cText, ::nCol, 1, "")
@@ -964,6 +964,8 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                      else
                         ::RefreshLine()
                      endif
+                  else
+                     ::RefreshLine()
                   endif
                endif
                exit

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.38 2003/04/25 12:35:50 anoncvs_ivtv Exp $
+ * $Id: tbrowse.prg,v 1.39 2003/05/05 23:03:53 lculik Exp $
  */
 
 /*
@@ -863,19 +863,18 @@ METHOD SetColumnWidth( oCol ) CLASS TBrowse
       if ISBLOCK( oCol:block )
 
          cType    := Valtype( xRes := Eval( oCol:block ) )
-//       nLen     := LenVal( xRes, cType )
          nLen     := LenVal( xRes, cType, oCol:Picture )
 
          cHeading := oCol:Heading + ";"
          while ( nL := Len( __StrTkPtr( @cHeading, @nTokenPos, ";" ) ) ) > 0
-            nHeadWidth += nL
+            nHeadWidth := Max( nHeadWidth, nL )
          enddo
 
          nTokenPos := 0
 
          cFooting  := oCol:Footing + ";"
          while ( nL := Len( __StrTkPtr( @cFooting, @nTokenPos, ";" ) ) ) > 0
-            nFootWidth += nL
+            nFootWidth := Max( nFootWidth, nL )
          enddo
       endif
 
