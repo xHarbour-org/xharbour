@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.18 2002/04/29 18:20:25 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.19 2002/05/06 02:52:07 ronpinkas Exp $
  */
 
 /*
@@ -949,18 +949,27 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                   LONG lIndex;
 
                   pExpr = pExpr->value.asList.pExprList; /* the first element in the array */
+
                   if( pIdx->value.asNum.NumType == HB_ET_LONG )
+                  {
                      lIndex = pIdx->value.asNum.lVal;
+                  }
                   else
+                  {
                      lIndex = ( LONG ) pIdx->value.asNum.dVal;
+                  }
 
                   if( lIndex > 0 )
                   {
                      while( --lIndex && pExpr )
+                     {
                         pExpr = pExpr->pNext;
+                     }
                   }
                   else
+                  {
                      pExpr = NULL;  /* index is <= 0 - generate bound error */
+                  }
 
                   if( pExpr ) /* found ? */
                   {
@@ -985,7 +994,9 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                }
                else
                {
-                  /* We DO want to allow R/T support for negative Index.
+
+                #ifdef HB_C52_STRICT
+                  // We DO want to allow R/T support for negative Index.
                   LONG lIndex;
 
                   if( pIdx->value.asNum.NumType == HB_ET_LONG )
@@ -998,14 +1009,18 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                   }
 
                   if( lIndex > 0 )
-                  { */
-                     HB_EXPR_USE( pExpr, HB_EA_ARRAY_AT ); /*
+                  {
+                #endif
+
+                     HB_EXPR_USE( pExpr, HB_EA_ARRAY_AT );
+
+                #ifdef HB_C52_STRICT
                   }
                   else
                   {
                      hb_compErrorBound( pIdx );
                   }
-                  */
+                #endif
                }
             }
          }
@@ -1018,6 +1033,34 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
       case HB_EA_PUSH_PCODE:
          {
             HB_EXPR_USE( pSelf->value.asList.pExprList, HB_EA_PUSH_PCODE );
+
+         #ifndef HB_C52_STRICT
+            if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE )
+            {
+               if( pSelf->value.asList.pIndex->ExprType == HB_ET_FUNCALL &&
+                   pSelf->value.asList.pIndex->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME &&
+                   strncmp( pSelf->value.asList.pIndex->value.asFunCall.pFunName->value.asSymbol, "LEN", 3 ) == 0 )
+
+               {
+                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asList.pIndex->value.asFunCall.pParms );
+
+                  if( usCount == 1 )
+                  {
+                     if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARIABLE ||
+                         pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARREF )
+                     {
+                        // No need to use strncmp() because all identifiers share their values.
+                        if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->value.asSymbol ==
+                            pSelf->value.asList.pExprList->value.asSymbol )
+                        {
+                            HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asList.pIndex );
+                            pSelf->value.asList.pIndex = hb_compExprNewLong( -1 );
+                        }
+                     }
+                  }
+               }
+            }
+          #endif
 
             if( HB_SUPPORT_XBASE )
             {
@@ -1041,6 +1084,34 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             }
 
             HB_EXPR_USE( pSelf->value.asList.pExprList, HB_EA_PUSH_PCODE );
+
+         #ifndef HB_C52_STRICT
+            if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARREF )
+            {
+               if( pSelf->value.asList.pIndex->ExprType == HB_ET_FUNCALL &&
+                   pSelf->value.asList.pIndex->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME &&
+                   strncmp( pSelf->value.asList.pIndex->value.asFunCall.pFunName->value.asSymbol, "LEN", 3 ) == 0 )
+
+               {
+                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asList.pIndex->value.asFunCall.pParms );
+
+                  if( usCount == 1 )
+                  {
+                     if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARIABLE ||
+                         pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARREF )
+                     {
+                        // No need to use strncmp() because all identifiers share their values.
+                        if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->value.asSymbol ==
+                            pSelf->value.asList.pExprList->value.asSymbol )
+                        {
+                            HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asList.pIndex );
+                            pSelf->value.asList.pIndex = hb_compExprNewLong( -1 );
+                        }
+                     }
+                  }
+               }
+            }
+          #endif
             HB_EXPR_USE( pSelf->value.asList.pIndex, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ARRAYPOP );
          }
@@ -1267,29 +1338,63 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                pSelf->value.asFunCall.pParms = HB_EXPR_USE( pSelf->value.asFunCall.pParms, HB_EA_REDUCE );
             }
 
-            if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBS", 4 ) == 0 )
+         #ifndef HB_C52_STRICT
+            // SubStr( Str, n, 1 ) => Str[n]
+            if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
             {
-               USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
-
-               if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+               if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR", 6 ) == 0 )
                {
-                  --usCount;
-               }
+                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
 
-               if( usCount == 3 )
-               {
-                  HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
-                  HB_EXPR_PTR pStart  = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
-                  HB_EXPR_PTR pLen    = pStart->pNext;
-
-                  if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
+                  if( usCount == 3 )
                   {
+                     HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+                     HB_EXPR_PTR pStart  = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
+                     HB_EXPR_PTR pLen    = pStart->pNext;
+
+                     if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
+                     {
+                        pSelf->ExprType = HB_ET_ARRAYAT;
+                        pSelf->value.asList.pExprList = pString;
+                        pSelf->value.asList.pIndex    = pStart;
+                     }
+                  }
+               }
+               // Right( Str, 1 ) => Str[-1]
+               else if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT", 5 ) == 0 )
+               {
+                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
+
+                  if( usCount == 2 )
+                  {
+                     HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+                     HB_EXPR_PTR pStart  = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
+
+                     if( pStart->ExprType == HB_ET_NUMERIC && pStart->value.asNum.NumType == HB_ET_LONG && pStart->value.asNum.lVal == 1 )
+                     {
+                        pSelf->ExprType = HB_ET_ARRAYAT;
+                        pSelf->value.asList.pExprList = pString;
+                        pStart->value.asNum.lVal      = -1;
+                        pSelf->value.asList.pIndex    = pStart;
+                     }
+                  }
+               }
+               // aTail( Array ) => Array[-1]
+               else if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "ATAIL", 5 ) == 0 )
+               {
+                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
+
+                  if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType != HB_ET_NONE )
+                  {
+                     HB_EXPR_PTR pArray = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+
                      pSelf->ExprType = HB_ET_ARRAYAT;
-                     pSelf->value.asList.pExprList = pString;
-                     pSelf->value.asList.pIndex    = pStart;
+                     pSelf->value.asList.pExprList = pArray;
+                     pSelf->value.asList.pIndex    = hb_compExprNewLong( -1 );
                   }
                }
             }
+          #endif
          }
          break;
 

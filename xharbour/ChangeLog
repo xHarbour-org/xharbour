@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.208 2002/05/08 23:44:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.209 2002/05/09 05:46:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-08 23:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/vm/hvm.c
+     ! Corrected HB_P_PUSHBYTE, HB_P_PUSHINT to support signed values.
+     + Added support for negative indexes into arrays.
+       Note: -1 == Last Element
+           : -1 on an empty array, will return NIL.
+
+   * include/hbexprb.c
+     ! Optimized Right( x, 1 ) => x[-1]
+     ! Optimized aTail( x ) => x[-1]
+     ! Optimized ArrayVar[ Len( ArrayVar ) ] => ArrayVar[-1]
+     Note: These optimizations result in much faster execution for code that uses the above.
+
+   * source/compiler/genc.c
+   * source/compiler/harbour.c
+     ! Corrected code generation to use HB_P_PUSHBYTE and HB_P_PUSHINT for signed values within their respective ranges.
+       Note: This change FORCES a RECOMPILE of ALL modules.
+           : xHarbour is not compatible with Harbour compiled modules, until if/when
+             this fix will be implemented in Harbour.
+           : Generated files will now be smaller for modules including negative numbers.
 
 2002-05-08 22:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.68 2002/05/02 18:36:41 ronpinkas Exp $
+ * $Id: hvm.c,v 1.69 2002/05/06 02:52:07 ronpinkas Exp $
  */
 
 /*
@@ -1288,7 +1288,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_PUSHBYTE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHBYTE") );
             ( * hb_stack.pPos )->type = HB_IT_INTEGER;
-            ( * hb_stack.pPos )->item.asInteger.value = ( int ) pCode[ w + 1 ];
+            ( * hb_stack.pPos )->item.asInteger.value = ( char ) pCode[ w + 1 ];
             ( * hb_stack.pPos )->item.asInteger.length = 10;
             hb_stackPush();
             w += 2;
@@ -1297,7 +1297,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_PUSHINT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHINT") );
             ( * hb_stack.pPos )->type = HB_IT_INTEGER;
-            ( * hb_stack.pPos )->item.asInteger.value = pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 );
+            ( * hb_stack.pPos )->item.asInteger.value = ( short ) ( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
             ( * hb_stack.pPos )->item.asInteger.length = 10;
             hb_stackPush();
             w += 3;
@@ -3409,7 +3409,11 @@ static void hb_vmArrayPush( void )
 {
    PHB_ITEM pIndex;
    PHB_ITEM pArray;
-   ULONG ulIndex;
+   long     lIndex;
+
+ #ifndef HB_C52_STRICT
+   BOOL bStrIndex = FALSE;
+ #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayAt()"));
 
@@ -3418,20 +3422,23 @@ static void hb_vmArrayPush( void )
 
    if( HB_IS_INTEGER( pIndex ) )
    {
-      ulIndex = ( ULONG ) pIndex->item.asInteger.value;
+      lIndex = ( long ) pIndex->item.asInteger.value;
    }
    else if( HB_IS_LONG( pIndex ) )
    {
-      ulIndex = ( ULONG ) pIndex->item.asLong.value;
+      lIndex = ( long ) pIndex->item.asLong.value;
    }
    else if( HB_IS_DOUBLE( pIndex ) )
    {
-      ulIndex = ( ULONG ) pIndex->item.asDouble.value;
+      lIndex = ( long ) pIndex->item.asDouble.value;
    }
+ #ifndef HB_C52_STRICT
    else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
    {
-      ulIndex = ( ULONG ) pIndex->item.asString.value[0];
+      lIndex = ( long ) pIndex->item.asString.value[0];
+      bStrIndex = TRUE;
    }
+ #endif
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
@@ -3449,14 +3456,31 @@ static void hb_vmArrayPush( void )
 
    if( HB_IS_ARRAY( pArray ) )
    {
-      if( ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+      #ifndef HB_C52_STRICT
+         if( lIndex < 0 )
+         {
+            if( pArray->item.asArray.value->ulLen )
+            {
+               lIndex += ( pArray->item.asArray.value->ulLen + 1 );
+            }
+            // Empty array and -1 Index -> return NIL.
+            else if( lIndex == -1 )
+            {
+               hb_stackPop();
+               hb_itemClear( hb_stackItemFromTop( -1 ) );
+               return;
+            }
+         }
+      #endif
+
+      if( lIndex > 0 && (ULONG) lIndex <= pArray->item.asArray.value->ulLen )
       {
          if( pArray->item.asArray.value->uiHolders > 1 )
          {
             /* this is a temporary copy of an array - we can overwrite
              * it with no problem
             */
-            hb_arrayGet( pArray, ulIndex, pArray );
+            hb_arrayGet( pArray, (ULONG) lIndex, pArray );
             hb_stackPop();
          }
          else
@@ -3468,7 +3492,7 @@ static void hb_vmArrayPush( void )
 
             ( &item )->type = HB_IT_NIL;
 
-            hb_arrayGet( pArray, ulIndex, &item );
+            hb_arrayGet( pArray, lIndex, &item );
 
             hb_stackPop();
 
@@ -3480,17 +3504,26 @@ static void hb_vmArrayPush( void )
          hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
       }
    }
+ #ifndef HB_C52_STRICT
    else if( HB_IS_STRING( pArray ) )
    {
-	  long lIndex = (long) ulIndex;
-
       if( lIndex > 0 )
       {
          lIndex--;
       }
       else if( lIndex < 0 )
       {
-         lIndex += pArray->item.asString.length;
+         if( pArray->item.asString.length )
+         {
+            lIndex += pArray->item.asString.length;
+         }
+         // Empty string and -1 Index -> return NIL.
+         else if( lIndex == -1 )
+         {
+            hb_stackPop();
+            hb_itemClear( hb_stackItemFromTop( -1 ) );
+            return;
+         }
 
          if( lIndex < 0 )
          {
@@ -3519,6 +3552,10 @@ static void hb_vmArrayPush( void )
          pArray->item.asString.length  = 1;
          //pArray->item.asString.bChar   = TRUE;
       }
+      else if( bStrIndex )
+      {
+         hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+      }
       else
       {
          if( ! pArray->item.asString.bStatic )
@@ -3530,6 +3567,7 @@ static void hb_vmArrayPush( void )
          pArray->item.asString.length = 0;
       }
    }
+ #endif
    else
    {
       hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
@@ -3541,7 +3579,7 @@ static void hb_vmArrayPop( void )
    PHB_ITEM pValue;
    PHB_ITEM pIndex;
    PHB_ITEM pArray;
-   ULONG ulIndex;
+   long     lIndex;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayPop()"));
 
@@ -3556,19 +3594,19 @@ static void hb_vmArrayPop( void )
 
    if( HB_IS_INTEGER( pIndex ) )
    {
-      ulIndex = ( ULONG ) pIndex->item.asInteger.value;
+      lIndex = ( long ) pIndex->item.asInteger.value;
    }
    else if( HB_IS_LONG( pIndex ) )
    {
-      ulIndex = ( ULONG ) pIndex->item.asLong.value;
+      lIndex = ( long ) pIndex->item.asLong.value;
    }
    else if( HB_IS_DOUBLE( pIndex ) )
    {
-      ulIndex = ( ULONG ) pIndex->item.asDouble.value;
+      lIndex = ( long ) pIndex->item.asDouble.value;
    }
    else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
    {
-      ulIndex = ( ULONG ) pIndex->item.asString.value[0];
+      lIndex = ( long ) pIndex->item.asString.value[0];
    }
    else
    {
@@ -3578,22 +3616,19 @@ static void hb_vmArrayPop( void )
 
    if( HB_IS_ARRAY( pArray ) )
    {
-      if( ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+      #ifndef HB_C52_STRICT
+         if( lIndex < 0 )
+         {
+            lIndex += ( pArray->item.asArray.value->ulLen + 1 );
+         }
+      #endif
+
+      if( lIndex > 0 && (ULONG) lIndex <= pArray->item.asArray.value->ulLen )
       {
          /* Remove MEMOFLAG if exists (assignment from field). */
          pValue->type &= ~HB_IT_MEMOFLAG;
 
-         #if 0
-         if( HB_IS_ARRAY( pValue ) )
-         {
-            if( hb_arrayScan( &s_aStatics, pArray, NULL, NULL ) )
-            {
-               ++pValue->item.asArray.value->uiExtRef;
-            }
-         }
-         #endif
-
-         hb_arraySet( pArray, ulIndex, pValue );
+         hb_arraySet( pArray, (ULONG) lIndex, pValue );
          hb_stackPop();
          hb_stackPop();
          hb_stackPop();    /* remove the value from the stack just like other POP operations */
@@ -3603,10 +3638,10 @@ static void hb_vmArrayPop( void )
          hb_errRT_BASE( EG_BOUND, 1133, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 1, pIndex );
       }
    }
+ #ifndef HB_C52_STRICT
+   // Only allowing assignment of strings (char) and numerics into String as Array.
    else if( HB_IS_STRING( pArray ) && ( HB_IS_STRING( pValue ) || HB_IS_NUMERIC( pValue ) ) )
    {
-      long lIndex = (long) ulIndex;
-
       if( lIndex > 0 )
       {
          lIndex--;
@@ -3668,6 +3703,7 @@ static void hb_vmArrayPop( void )
          hb_errRT_BASE( EG_BOUND, 1133, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 3, pArray, pIndex, pValue );
       }
    }
+ #endif
    else
    {
       hb_errRT_BASE( EG_ARG, 1069, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 3, pArray, pIndex, pValue );
@@ -4541,17 +4577,6 @@ static void hb_vmRetValue( void )
 
    hb_stackDec();                               /* make the last item visible */
 
-   #if 0
-   pVal = ( * hb_stack.pPos );
-
-   if( HB_IS_ARRAY( pVal ) )
-   {
-      ++pVal->item.asArray.value->uiExtRef;
-   }
-
-   hb_itemForwardValue( &hb_stack.Return, pVal );
-   #endif
-
    hb_itemForwardValue( &hb_stack.Return, ( * hb_stack.pPos ) ); /* Forward it */
 }
 
@@ -5337,37 +5362,10 @@ static void hb_vmPopLocal( SHORT iLocal )
       /* Assigned to a parameter by refrence. */
       if( HB_IS_BYREF( pLocal ) )
       {
-         #if 0
-         if( HB_IS_ARRAY( pLocal ) && pLocal->item.asArray.value->uiExtRef )
-         {
-            --pLocal->item.asArray.value->uiExtRef;
-         }
-
-         if( HB_IS_ARRAY( pVal ) )
-         {
-            ++pVal->item.asArray.value->uiExtRef;
-         }
-         #endif
-
          hb_itemForwardValue( hb_itemUnRef( pLocal ), pVal );
       }
       else
       {
-         if( hb_itemParamId( pLocal ) )
-         {
-            #if 0
-            if( HB_IS_ARRAY( pLocal ) && pLocal->item.asArray.value->uiExtRef )
-            {
-               --pLocal->item.asArray.value->uiExtRef;
-            }
-
-            if( HB_IS_ARRAY( pVal ) )
-            {
-               ++pVal->item.asArray.value->uiExtRef;
-            }
-            #endif
-         }
-
          hb_itemForwardValue( pLocal, pVal );
       }
    }
@@ -5377,18 +5375,6 @@ static void hb_vmPopLocal( SHORT iLocal )
        * hb_stackSelfItem() points to a codeblock that is currently evaluated
        */
       pLocal = hb_codeblockGetVar( hb_stackSelfItem(), iLocal ) ;
-
-      #if 0
-      if( HB_IS_ARRAY( pLocal ) && pLocal->item.asArray.value->uiExtRef )
-      {
-         --pLocal->item.asArray.value->uiExtRef;
-      }
-
-      if( HB_IS_ARRAY( pVal ) )
-      {
-         ++pVal->item.asArray.value->uiExtRef;
-      }
-      #endif
 
       hb_itemForwardValue( pLocal, pVal );
    }
@@ -5408,18 +5394,6 @@ static void hb_vmPopStatic( USHORT uiStatic )
    pVal->type &= ~HB_IT_MEMOFLAG;
 
    pStatic = s_aStatics.item.asArray.value->pItems + hb_stack.iStatics + uiStatic - 1;
-
-   #if 0
-   if( HB_IS_ARRAY( pStatic ) && pStatic->item.asArray.value->uiExtRef )
-   {
-      --pStatic->item.asArray.value->uiExtRef;
-   }
-
-   if( HB_IS_ARRAY( pVal ) )
-   {
-      ++pVal->item.asArray.value->uiExtRef;
-   }
-   #endif
 
    if( HB_IS_BYREF( pStatic ) )
    {

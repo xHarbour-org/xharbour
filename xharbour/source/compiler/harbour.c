@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.11 2002/05/08 20:18:52 ronpinkas Exp $
+ * $Id: harbour.c,v 1.12 2002/05/08 20:28:13 ronpinkas Exp $
  */
 
 /*
@@ -3111,15 +3111,20 @@ void hb_compGenPushFunCall( char * szFunName )
 void hb_compGenPushLong( long lNumber )
 {
    if( lNumber == 0 )
-      hb_compGenPCode1( HB_P_ZERO );
-   else if( lNumber == 1 )
-      hb_compGenPCode1( HB_P_ONE );
-   else if( ( ( char * ) &lNumber )[ 2 ] == 0 && ( ( char * ) &lNumber )[ 3 ] == 0 )
    {
-      if( ( ( char * ) &lNumber )[ 1 ] == 0 )
-         hb_compGenPCode2( HB_P_PUSHBYTE, ( ( char * ) &lNumber )[ 0 ], ( BOOL ) 1 );
-      else
-         hb_compGenPCode3( HB_P_PUSHINT, ( ( char * ) &lNumber )[ 0 ], ( ( char * ) &lNumber )[ 1 ], ( BOOL ) 1 );
+      hb_compGenPCode1( HB_P_ZERO );
+   }
+   else if( lNumber == 1 )
+   {
+      hb_compGenPCode1( HB_P_ONE );
+   }
+   else if( lNumber >= -128 && lNumber <= 127 )
+   {
+      hb_compGenPCode2( HB_P_PUSHBYTE, (BYTE) lNumber, ( BOOL ) 1 );
+   }
+   else if( lNumber >= -32768 && lNumber <= 32767 )
+   {
+      hb_compGenPCode3( HB_P_PUSHINT, ( ( unsigned char * ) &lNumber )[ 0 ], ( ( unsigned char * ) &lNumber )[ 1 ], ( BOOL ) 1 );
    }
    else
    {

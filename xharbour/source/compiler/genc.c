@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.10 2002/04/21 01:39:17 ronpinkas Exp $
+ * $Id: genc.c,v 1.11 2002/04/22 23:09:58 ronpinkas Exp $
  */
 
 /*
@@ -1300,7 +1300,7 @@ static HB_GENC_FUNC( hb_p_pushbyte )
    fprintf( cargo->yyc, "\tHB_P_PUSHBYTE, %i,",
             pFunc->pCode[ lPCodePos + 1 ] );
    if( cargo->bVerbose ) fprintf( cargo->yyc, "\t/* %i */",
-            pFunc->pCode[ lPCodePos + 1 ] );
+            (int)(char) pFunc->pCode[ lPCodePos + 1 ] );
    fprintf( cargo->yyc, "\n" );
    return 2;
 }
@@ -1311,8 +1311,7 @@ static HB_GENC_FUNC( hb_p_pushint )
             pFunc->pCode[ lPCodePos + 1 ],
             pFunc->pCode[ lPCodePos + 2 ] );
    if( cargo->bVerbose ) fprintf( cargo->yyc, "\t/* %i */",
-            pFunc->pCode[ lPCodePos + 1 ] +
-            pFunc->pCode[ lPCodePos + 2 ] * 256 );
+            (int)(short) ( pFunc->pCode[ lPCodePos + 1 ] + pFunc->pCode[ lPCodePos + 2 ] * 256 ) );
    fprintf( cargo->yyc, "\n" );
    return 3;
 }
