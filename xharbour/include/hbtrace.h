@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.h,v 1.9 2003/01/29 21:30:26 andijahja Exp $
+ * $Id: hbtrace.h,v 1.10 2003/05/29 22:55:01 paultucker Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
 
 #include "hbdefs.h"
 #include "hbsetup.h"
-#include "hbapifs.h"
 
 #if defined(HB_EXTERN_C)
 extern "C" {
