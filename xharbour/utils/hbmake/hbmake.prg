@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbmake.prg,v 1.43 2003/01/28 12:15:48 lculik Exp $
+ * $Id: hbmake.prg,v 1.44 2003/02/02 14:53:48 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -714,7 +714,6 @@ FUNCTION setBuild()
     cRead     := Alltrim( readln( @leof ) )
     szProject := cRead
     amacro    := Listasarray2( cRead, ":" )
-   tracelog(cRead)
     IF Len( amacro ) > 1
 
         aTemp := Listasarray2( amacro[ 2 ], " " )
@@ -744,7 +743,6 @@ FUNCTION setBuild()
         cRead        := Alltrim( readln( @leof ) )
         cCurrentRead := cRead
         amacro       := Listasarray2( cRead, " " )
-        tracelog( cRead )
 
         FOR ncount := 1 TO Len( amacro )
 
@@ -1312,7 +1310,7 @@ FUNC crtmakfile( cFile )
         @  5,  1 SAY "C4H path" GET ccwpath  Pict "@s20"
 
     ELSEIF lMiniGui
-
+            
         @  5,  1 SAY "MinuGui path" GET  cMiniPath Pict "@s20"
 
 
@@ -1335,7 +1333,6 @@ FUNC crtmakfile( cFile )
     @ 13, 1 say aLangMessages[ 43 ] get nFilestoAdd pict "99" valid nFilestoAdd > 0
     @ 14, 1 GET lMt checkbox caption aLangMessages [44] style "[o ]"
     READ
-   tracelog(lmt)
     IF !Empty( cUserDef )
 
         cDefHarOpts += " -D" + Alltrim( cUserDef ) + " "
@@ -1416,6 +1413,11 @@ FUNC crtmakfile( cFile )
         cDefGccLibs    += " -ldebug "
         cgcclibsos2    += " -ldebug "
         cDeflibGccLibs += " -ldebug "
+        cDefBccLibsmt    += " debug.lib "
+        cDefGccLibsmt    += " -ldebug "
+        cgcclibsos2mt    += " -ldebug "
+        cDeflibGccLibsmt += " -ldebug "
+
 
     ENDIF
 
@@ -1510,12 +1512,10 @@ FUNC crtmakfile( cFile )
     attention( aLangMessages[ 41 ] , 22 )
 
     IF !lRecurse
-	TRACELOG(LGCC,COS)
         ain      := GetSourceFiles( .f., lGcc, cOs )
         nLenaSrc := Len( ain )
 
     ELSE
-	TRACELOG(LGCC,COS)
         ain      := GetSourceFiles(, lGcc, cOs )
         nLenaSrc := Len( asrc )
 
@@ -1820,13 +1820,18 @@ FUNC crtmakfile( cFile )
 
         cDefBccLibs += " rddads.lib ace32.lib"
         cDeflibGccLibs += " -lrddads -ladsloc "
+        cDefBccLibsmt += " rddads.lib ace32.lib"
+        cDeflibGccLibsmt += " -lrddads -ladsloc "
     ENDIF
 
     IF Len( alibsout ) > 0 .and. lExternalLib
 
         IF lvcc .or. lbcc
-
+	  IF !lMt	
             cOldLib := cDefBccLibs
+	  ELSE
+	    cOldLib := cDefBccLibsMt
+	  endif          
             nPos    := Ascan( aLibsout, { | z | At( "html", Lower( z ) ) > 0 } )
 
             IF npos > 0
@@ -1838,9 +1843,11 @@ FUNC crtmakfile( cFile )
             ENDIF
 
             Aeval( alibsout, { | cLib | cLibs += " " + cLib } )
-
-            cDefBccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
-
+            if !lMt
+    	        cDefBccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
+	    else
+	       cDefBccLibsmt := cHtmlLib + " " + cOldLib + " " + cLibs
+	    endif
         ENDIF
 
         IF lGcc
@@ -1858,20 +1865,29 @@ FUNC crtmakfile( cFile )
             Aeval( alibsout, { | cLib | cLibs += " -l" + Strtran( cLib, '.a', "" ) } )
 
             IF cOs == "Linux"
-
-                cOldLib        := " " + cDeflibGccLibs
-                cDeflibGccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
+		if !lMt
+            	    cOldLib        := " " + cDeflibGccLibs
+            	    cDeflibGccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
+		else
+		     cOldLib        := " " + cDeflibGccLibsmt
+            	    cDeflibGccLibsmt := cHtmlLib + " " + cOldLib + " " + cLibs
+		endif
 
             ELSEIF cOs == "OS/2"
-
-                cOldLib     := " " + cgcclibsos2
-                cgcclibsos2 := cHtmlLib + " " + cOldLib + " " + cLibs
-
+		if !lMt
+            	    cOldLib     := " " + cgcclibsos2
+            	    cgcclibsos2 := cHtmlLib + " " + cOldLib + " " + cLibs
+		else
+		    cOldLib     := " " + cgcclibsos2mt
+            	    cgcclibsos2mt := cHtmlLib + " " + cOldLib + " " + cLibs
+		endif
             ELSE
-
-                cOldLib     := " " + cDefGccLibs
-                cDefGccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
-
+		if !lmt
+            
+		else
+		    cOldLib     := " " + cDefGccLibsmt
+            	    cDefGccLibsmt := cHtmlLib + " " + cOldLib + " " + cLibs
+		endif
             ENDIF
 
         ENDIF
@@ -1879,7 +1895,6 @@ FUNC crtmakfile( cFile )
     ENDIF
 
     IF lBcc .or. lVcc
-   tracelog(if(!lMt,cDefBccLibs,cDefBccLibsmt))
         IF lFwh
 
             if lXfwh
@@ -2269,7 +2284,6 @@ nFile:=1
                   FOR EACH cPrg IN aprgs 
                   @ 4,16 Say space(50)
                     xItem := Substr( cPrg, Rat( If( lgcc, '/', '\' ), cPrg ) + 1 )
-                    tracelog(xitem)
                     nPos  := Ascan( aobjs, { | x | x := Substr( x, Rat( If( lgcc, '/', '\' ), x ) + 1 ), Left( x, At( ".", x ) ) == Left( xItem, At( ".", xitem ) ) } )
 
                     IF fileisnewer( cPrg, aobjs[ npos ] )
