@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.3 2003/06/16 20:13:34 jonnymind Exp $
+ * $Id: hbxml.c,v 1.4 2003/06/23 20:31:39 jonnymind Exp $
  */
 
 /*
@@ -1477,7 +1477,7 @@ MXML_STATUS mxml_refil_setup( MXML_REFIL *ref, MXML_REFIL_FUNC func,
       return MXML_STATUS_ERROR;
 
    ref->refil_func = func;
-   ref->buffer = buf;
+   ref->buffer = (BYTE*) buf;
 
    ref->status = MXML_STATUS_OK;
    ref->error = MXML_ERROR_NONE;
@@ -1669,7 +1669,8 @@ static char *edesc[] =
 
 char *mxml_error_desc( MXML_ERROR_CODE code )
 {
-   code --;
+   // code --;
+   code = (MXML_ERROR_CODE) ( code - 1 );
    if ( code < 0 || code > sizeof( edesc ) / sizeof( char * ) )
       return NULL;
 
@@ -1753,7 +1754,7 @@ HB_FUNC( HB_XMLERRORDESC )
    }
 
 
-   hb_retc( mxml_error_desc( hb_itemGetNI( pNum ) ) );
+   hb_retc( mxml_error_desc( (MXML_ERROR_CODE) hb_itemGetNI( pNum ) ) );
 }
 
 
