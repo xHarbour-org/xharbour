@@ -1,10 +1,13 @@
 #
+# $Id: makefile.nt,v 1.4 2002/11/05 06:25:34 paultucker Exp $
+#
+
 # File:     makefile.nt
 # Author:   Paul Tucker <ptucker@sympatico.ca>
 # Created:  2002
 # Updated:
 #
-# Makefile : Builds woopgui library (Harbour & MSVC)
+# Makefile : Builds woopgui library (Harbour & MSVC) in batch mode
 
 # Global paths
 #
