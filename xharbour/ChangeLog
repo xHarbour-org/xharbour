@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.632 2003/01/16 23:38:18 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.633 2003/01/17 12:28:33 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-17 16:58 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+  * include/hbapirdd.h
+  * include/hbrddcdx.h
+  * source/rdd/dbfcdx/dbfcdx2.h
+  * source/rdd/dbfcdx/dbfcdx1.c
+    * INDEX command:
+      ! added support for relations in the index key (or conditions).
+        Note that if the dbf has relations the indexing is a bit slower,
+        but it works.
+      ! fixed support for deleted() in index expresion or conditions
+      * some speed optimizations
+      + added support for "INDEX ... WHILE cond"
+      + added support for "INDEX ... REST"
+      + added support for "INDEX ... NEXT n"
+      + added support for "INDEX ... RECORD n"
+      + added support for "INDEX ... USECURRENT"
+      ! fixed GPF in dbOrderInfo
 
 2003-01-17 15:10 UTC+0300 Phil Krylov <phil@mail.ru>
   * make_drw.sh
