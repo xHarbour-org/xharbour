@@ -1,7 +1,7 @@
 //345678901234567890123456789012345678901234567890
 /* Don't touch these initial lines! */
 Function Main()
-   local buff, nH
+   local buff, nH, i
 // lin1234
 // ##1234567890123456789012345678901234567890qwertyuiop
    nH := fOpen( "tstline.prg" )
@@ -20,5 +20,11 @@ Function Main()
    HB_FREADLINE( nH, @buff )
    ? rtrim(buff), len( buff )
 
-return
+   fClose( nH )
+   nH := fOpen( "tstline.prg" )
 
+   for i = 1 to 40
+      ? HB_FREADLINE( nH, @buff ), buff	
+   next
+
+return

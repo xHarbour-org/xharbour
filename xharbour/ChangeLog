@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2251 2004/02/09 18:00:21 druzus Exp $
+ * $Id: ChangeLog,v 1.2252 2004/02/09 18:38:25 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-09 16:12 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/rtl/readline.c
+     ! HB_FREADLINE() now returns -1 if EOF is found
+     ! fixed hb_fsReadLine() buffer overrun
+     ! hb_fsReadLine() now returns a bEOF param
 
 2004-02-09 10:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/itemapi.c

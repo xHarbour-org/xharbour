@@ -18,7 +18,7 @@
 *
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id: service.prg,v 1.5 2003/11/29 00:55:20 jonnymind Exp $
+* $Id: service.prg,v 1.6 2003/12/29 23:38:58 jonnymind Exp $
 *
 
 #include "hbserv.ch"
@@ -42,7 +42,7 @@ PROCEDURE Main( cMode )
    bWait := .T.
    HB_PushSignalHandler( HB_SIGNAL_ALL, "Handle" )
    // a newer push will override previous ones
-   HB_PushSignalHandler( HB_SIGNAL_FAULT + HB_SIGNAL_MATHERR, @SignalFault())
+//   HB_PushSignalHandler( HB_SIGNAL_FAULT + HB_SIGNAL_MATHERR, @SignalFault())
 
    //Service can be started before or after pushing handler.
    HB_StartService( .F. )
@@ -82,7 +82,7 @@ Function Handle( nSignal, aParams )
 RETURN HB_SERVICE_HANDLED
 
 PROCEDURE Waiter()
-   LOCAL nCount := 15
+   LOCAL nCount := 3
 
    WHILE bWait
       ThreadSleep( 1000 )
@@ -99,6 +99,7 @@ PROCEDURE Waiter()
          ENDIF
       ENDIF
       nCount--
+//quit
    ENDDO
 
 RETURN
