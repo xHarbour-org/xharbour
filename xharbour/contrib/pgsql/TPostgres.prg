@@ -771,7 +771,7 @@ METHOD Update(oRow) CLASS TPQquery
     Local nParams := 0
 
     ::SetKey()
-
+    
     if ! Empty(::Tablename) .and. ! Empty(::aKeys)
         cWhere := ''
         For i := 1 to len(::aKeys)
@@ -799,6 +799,7 @@ METHOD Update(oRow) CLASS TPQquery
         if ! (cWhere == '') .and. lChanged
 
             cQuery := Left( cQuery, len(cQuery) - 1 ) + ' WHERE ' + cWhere                        
+            
             res := PQexecParams( ::pDB, cQuery, aParams)    
             if PQresultstatus(res) != PGRES_COMMAND_OK            
                 result := PQresultErrorMessage(res)
@@ -943,7 +944,6 @@ METHOD SetKey() CLASS TPQquery
     Local nCount := 0
     Local cTable
     Local aKeys := {}
-    Local cField := ''
     Local res
     Local nPos
 
@@ -992,23 +992,19 @@ METHOD SetKey() CLASS TPQquery
         endif
         
         if ISNIL(::aKeys) .and. ! empty(::Tablename)
-            /* Set the table primary keys */
-            for i := 1 to len(::aStruct)
-                /* store the ordinal columns numbers */
-                cField += str(::aStruct[ i, 6 ])                    
-                
-                if i <> len(::aStruct)
-                    cField += ','
-                endif
-            next
-                                        
-            cQuery := "select column_name "
-            cQuery += "  from information_schema.key_column_usage "
-            cQuery += " where table_schema = " + DataToSql(::Schema)
-            cQuery += "   and ordinal_position in (" + cField + ") and table_name = '" + ::Tablename + "'"
-
+            /* Set the table primary keys */        
+            cQuery := "SELECT c.attname "
+            cQuery += "  FROM pg_class a, pg_class b, pg_attribute c, pg_index d, pg_namespace e "
+            cQuery += " WHERE a.oid = d.indrelid "
+            cQuery += "   AND a.relname = '" + ::Tablename + "'"
+            cQuery += "   AND b.oid = d.indexrelid "
+            cQuery += "   AND c.attrelid = b.oid "
+            cQuery += "   AND d.indisprimary "
+            cQuery += "   AND e.oid = a.relnamespace "
+            cQuery += "   AND e.nspname = " + DataToSql(::Schema)
+        
             res := PQexec(::pDB, cQuery)
-            
+
             if PQresultstatus(res) == PGRES_TUPLES_OK .and. PQlastrec(res) != 0
                 For x := 1 To PQlastrec(res)
                     aadd( aKeys, PQgetvalue( res, x, 1 ) )
@@ -1018,7 +1014,6 @@ METHOD SetKey() CLASS TPQquery
             PQclear(res)
         endif
         ::aKeys := aKeys            
-
     endif    
     
 RETURN nil
