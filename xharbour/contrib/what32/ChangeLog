@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.33 2002/10/09 13:00:19 vouchcac Exp $
+ * $Id: ChangeLog,v 1.34 2002/10/10 00:50:06 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-10-14 03:41 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
+   + _ToolTip.c
+     + Support for tooltips
+       SETTOOLTIP()
+
+
 2002-10-09 22:00 UTC -0300 Luiz Rafael Culik <culikr@uol.com.br>
    * _winmous.c
      _winscrlb.c
      _winmenu.c
      * Conditional compilation added to
        ENDMENU(),GETCURSORINFO(),GETSCROLLBARINFO()
-      
+
 2002-10-09 18:30 UCT+0530 Pritpal Bedi <vouch32@vouchcac.com>
    * _WinSys.c
      + FileTimeToSystemTime( ( FILETIME ) fileTime, @cSysTime )
@@ -27,14 +33,14 @@
    * _WinDate.c
      * DateTime_SetSystemTime
        Fixed error when SYSTEMTIME structure passed as array
-       
+
 2002-10-08 15:00 UCT+0530 Pritpal Bedi <vouch32@vouchcac.com>
    * _WinINet.c
      * FtpFindFirstFile()
      * InternetFindNextFile()
        Returns a WIN32_FIND_FILE structure instead of array ( thanks Andrew ).
-       Example how to call the functions is included. 
-       
+       Example how to call the functions is included.
+
 2002-10-06 18:00 UCT+0530 Pritpal Bedi <vouch32@vouchcac.com>
    * _WinINet.c
      * FtpFindFirstFile()
@@ -45,7 +51,7 @@
 2002-10-06 15:02 UCT+1000 AJ Wos <andrwos@aust1.net>
    * _WinIni.c
     * corrected insufficient buffer size in GetPrivateProfileString()
-      and GetProfileString() 
+      and GetProfileString()
 
 2002-10-03 23:42 UCT -0300 Augusto Infante <systems@quesoro.com>
    + _WinTree.c
@@ -58,7 +64,7 @@
    * _WinINet.c
      + Added prototypes for every function
      * Some bug fixes
-     
+
 2002-09-28 16:45 UCT+0530 Pritpal Bedi <vouch32@vouchcac.com>
    + _WinINet.c
      * Internet functions related with FTP functionality.
@@ -66,11 +72,11 @@
      * Manifest constants for _WinINet.c
    * Makefile.bc
      * Updated to include _WinINet.c
-       
+
        Please do forgive me if there are mistakes. It is my first endeavour
-       at this type of work. Most of the functions are tested and are 
+       at this type of work. Most of the functions are tested and are
        working barring a few ones, which I hope you experts will set right.
-       
+
 2002-09-28 18:51 UCT+1000 AJ Wos <andrwos@aust1.net>
    * Windows.ch
      + completed CB*_* definitions for combo boxes
@@ -87,39 +93,39 @@
 
 2002-09-25 16:50 UCT+1000 AJ Wos <andrwos@aust1.net>
    * _WinShell.c
-     * conditional compilation added to 
+     * conditional compilation added to
        SHEmptyRecycleBin(), SHInvokePrinterCommand()
    * _WinWnd.c
-     * conditional compilation added to 
+     * conditional compilation added to
        AllowSetForegroundWindow(), AnimateWindow()
        LockSetForegroundWindow()
    * _WinMsg.c
      * conditional compilation added to
-       UnregisterDeviceNotification(),InSendMessageEx()   
+       UnregisterDeviceNotification(),InSendMessageEx()
    * _WinClpb.c
-     * conditional compilation added to 
+     * conditional compilation added to
        GetClipboardSequencNumber()
    * _WinGdi
-     * conditional compilation added to 
+     * conditional compilation added to
        GetGuiResources()
-   
+
    All above #if(WINVER >= 0x0500)
-   
-   Use /DWINVER=xxx compiler option to control compilation of 
-   the above functions    
-   
+
+   Use /DWINVER=xxx compiler option to control compilation of
+   the above functions
+
 2002-09-25 16:50 UCT+1000 AJ Wos <andrwos@aust1.net>
-   * _WinMisc.c 
+   * _WinMisc.c
      * CreateMutex() bug fixed
 
 2002-09-24 13:59 UCT+1000 AJ Wos <andrwos@aust1.net>
-   * _WinShell.c 
+   * _WinShell.c
      + Added SHFileOperation() API
 
 2002-09-23 18:48 UCT+1000 AJ Wos <andrwos@aust1.net>
    * WinCore.Prg
      * Corrected subclassed dialog callback default processing
-       to go to DefDlgProc() function  
+       to go to DefDlgProc() function
 
 2002-09-22 20:17 UCT -0300 Augusto Infante <systems@quesoro.com>
    * _WinWnd.c
@@ -135,34 +141,34 @@
 2002-09-20 07:53 UCT+1000 AJ Wos <andrwos@aust1.net>
    * ErrorSys.Prg
      * Corrected error logging
-     * Improved feedback in debug window  
+     * Improved feedback in debug window
 
 2002-09-19 16:47 UCT -0300 Augusto Infante <systems@quesoro.com>
    * _WinSys.c
-     + GetMessageFont() to retrieve messagebox font to be used 
+     + GetMessageFont() to retrieve messagebox font to be used
        in controls instead of system font
 
 2002-09-19 22:18 UCT+1000 AJ Wos <andrwos@aust1.net>
    * WinTabs.Prg
      * changed _TempPageProc() to STATIC FUNCTION
-     * Passed the code through the PRG formatter 
+     * Passed the code through the PRG formatter
 
 2002-09-19 22:10 UCT+1000 AJ Wos <andrwos@aust1.net>
-   * ErrorSys.Prg  
+   * ErrorSys.Prg
      * Removed obsolete PP directives
      - Removed unnecessary WinSetCursor() calls
      * Passed the code through the PRG formatter
        ( please do not create confusion by modifying files
-         without adding value to the source )          
+         without adding value to the source )
 
 2002-09-19 16:15 UCT +0530 Pritpal Bedi <info@vouchcac.com>
    * ErrorSys.prg
      + Reformatted ( and all other files will be reformatted in the same manner )
      * Changed calls to SetCursor() function with WinSetCursor().
-     
+
    * WinTabs.prg
      + Reformatted
-   
+
 2002-09-18 05:54 UCT -0300 Augusto Infante <systems@quesoro.com>
    * _WinWnd.c
      + AllowSetForegroundWindow()
@@ -174,19 +180,19 @@
      + GetCurrentThreadId()
 
 2002-09-18 07:34 UCT+1000 AJ Wos <andrwos@aust1.net>
-   * WinCore.Prg 
+   * WinCore.Prg
      + GLOBAL variable lPrevInstance, which indicates if there is
        an instance of the application already running
-       Usage eample: 
-       FUNCTION Main()       
+       Usage eample:
+       FUNCTION Main()
        IF lPrevInstance()
           MessageBox(, "Application already running","Attention")
           QUIT
-       ENDIF  
-     + GLOBAL variable hThisInstance, to hold the handle of the     
+       ENDIF
+     + GLOBAL variable hThisInstance, to hold the handle of the
        current instance (for quick access)
-   * WinSys.c        
-     * corrected GetModuleHandle()   
+   * WinSys.c
+     * corrected GetModuleHandle()
 
 2002-09-17 18:50 UTC -0300 Luiz Rafael Culik <culikr@uol.com.br>
    * env/bccwin32.mak
@@ -197,18 +203,18 @@
     * RegisterClass(), DialogBox(), CreateDialog(), SetProcedure()
       now support xHarbour function pointers as window procedures.
       2 extra parameters added to each function [<oObj>] and [<xCargo>].
-      <oObj> should only be passed if the Window Procedure is a method, 
+      <oObj> should only be passed if the Window Procedure is a method,
              oObj is then the object to which that method belongs.
       <xCargo> is an optional user defined parameter to the callback
-      function. 
+      function.
       The window procedure will receive the following parameters:
       WndProc( <hWnd>,<nMsg>,<nwParam>,<nlParam>,<xCargo> )
-      Codeblocks are still supported as before.        
+      Codeblocks are still supported as before.
       Callback function pointer should be obtained using HB_FuncPtr(),
-      HB_ObjMsgPtr(), or @MyFunc(). 
-        
+      HB_ObjMsgPtr(), or @MyFunc().
+
 2002-09-17 AJ Wos
-  * _WinMisc.c      
+  * _WinMisc.c
     + CreateMutex()
     + OpenMutex()
     + ReleaseMutex()
@@ -321,10 +327,10 @@
       Added FreeEnvironmentStrings() to _WinMisc.c
       Corrected CreateDirectory() in _WinDir.c
 
-    
 
 
 
 
 
-  
+
+
