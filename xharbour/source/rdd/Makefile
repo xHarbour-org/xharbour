@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.18 2001/08/19 13:30:56 lculik Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:42:46 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -16,6 +16,7 @@ C_SOURCES=\
 PRG_SOURCES=\
 	dbf0.prg \
    dbfuncs.prg \
+   dbtotal.prg \
 	dblist.prg \
 	dbsort.prg \
 	dbstrux.prg \
