@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.39 2004/02/06 18:13:00 jonnymind Exp $
+ * $Id: gtwin.c,v 1.40 2004/02/07 20:06:35 andijahja Exp $
  */
 
 /*
@@ -1966,7 +1966,11 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-      return (int) FALSE;
+         return (int) FALSE;
+      case GTI_INPUTFD:
+         return s_iStdIn;
+      case GTI_OUTPUTFD:
+         return s_iStdOut;
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;

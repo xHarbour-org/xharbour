@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.31 2004/02/06 17:07:29 jonnymind Exp $
+ * $Id: gtcrs.c,v 1.32 2004/02/07 11:41:01 druzus Exp $
  */
 
 /*
@@ -928,6 +928,9 @@ static int getMouseKey(mouseEvent *mEvt)
 		mEvt->mbup_row = mEvt->row;
 		mEvt->mbup_col = mEvt->col;
 	    }
+	    nKey = (mEvt->buttonstate & M_BUTTON_MIDDLE) ?
+			((mEvt->buttonstate & M_BUTTON_MDBLCK) ? K_MDBLCLK :
+			    K_MBUTTONDOWN) : K_MBUTTONUP;
 	    mEvt->lbuttons ^= M_BUTTON_MIDDLE;
 	    mEvt->buttonstate &= ~M_BUTTON_MIDDLE;
 	} else
@@ -1163,9 +1166,9 @@ static void gt_refresh(InOutBase *ioBase)
     {
 /*
 	if (ioBase->cursor == SC_NONE)
-	    leaveok( ioBase->stdscr, FALSE );
-	else
 	    leaveok( ioBase->stdscr, TRUE );
+	else
+	    leaveok( ioBase->stdscr, FALSE );
 */
 /*	if (ioBase->cursor != SC_NONE) */
 	wmove( ioBase->stdscr, ioBase->row, ioBase->col );
@@ -1867,7 +1870,6 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
     idcok( ioBase->stdscr, FALSE );
     leaveok( ioBase->stdscr, FALSE );
 */
-
     /*
      * curses keyboard initialization
      * we have our own keyboard routine so it's unnecessary now
@@ -1875,6 +1877,10 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
      * there is no OPOST translation
      */
     raw();
+
+    leaveok( ioBase->stdscr, FALSE );
+    curs_set( 0 );
+
 /*
     nonl();
     nodelay( ioBase->stdscr, TRUE);
@@ -3292,7 +3298,11 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-      return (int) FALSE;
+         return (int) FALSE;
+      case GTI_INPUTFD:
+         return s_ioBase->base_infd;
+      case GTI_OUTPUTFD:
+         return s_ioBase->base_outfd;
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;

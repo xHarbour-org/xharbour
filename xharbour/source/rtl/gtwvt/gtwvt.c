@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.66 2004/02/07 19:31:02 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.67 2004/02/07 20:06:35 andijahja Exp $
  */
 
 /*
@@ -3418,7 +3418,7 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-      return (int) FALSE;
+         return (int) FALSE;
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;

@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.9 2004/02/01 23:40:50 jonnymind Exp $
+ * $Id: gtcgi.c,v 1.10 2004/02/06 17:07:28 jonnymind Exp $
  */
 
 /*
@@ -665,7 +665,11 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-      return (int) FALSE;
+         return (int) FALSE;
+      case GTI_INPUTFD:
+         return s_iStdIn;
+      case GTI_OUTPUTFD:
+         return s_iStdOut;
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;

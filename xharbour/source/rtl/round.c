@@ -67,6 +67,36 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
+static double hb_numPow10( int nPrecision )
+{
+   static const double doBase = 10.0f;
+   static double s_dPow10[17];
+   static int s_fPowInit = 0;
+
+   if ( ! s_fPowInit )
+   {
+      int i;
+      for ( i = 0; i <= 16; i++ )
+      {
+         s_dPow10[ i ] = pow( doBase, (double) i );
+      }
+      s_fPowInit = 1;
+   }
+
+   if ( nPrecision < 16 )
+   {
+      if ( nPrecision >= 0 )
+      {
+         return s_dPow10[ nPrecision ];
+      }
+      else if ( nPrecision > -16 )
+      {
+         return 1 / s_dPow10[ -nPrecision ];
+      }
+   }
+   return pow(doBase, (double) nPrecision);
+}
+
 
 HB_FUNC( INT )
 {
@@ -82,34 +112,27 @@ HB_FUNC( INT )
       {
          int iWidth;
          double dNumber = hb_itemGetND( pNumber );
-#ifndef HB_LONG_LONG_OFF
-         LONGLONG lNumber;
-#else
-         long lNumber;
-#endif
 
          hb_itemGetNLen( pNumber, &iWidth, NULL );
+         modf( dNumber, &dNumber );
 
-         dNumber = (dNumber >= 0 ? floor( dNumber ) : ceil( dNumber ));
-
-#ifndef HB_LONG_LONG_OFF
-         lNumber = (LONGLONG) dNumber;
-         if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )
-#else
-         lNumber = (long) dNumber;
-         if( LONG_MIN <= lNumber && lNumber <= LONG_MAX )
-#endif
+         if( (double) LONG_MIN <= dNumber && dNumber <= (double) LONG_MAX )
          {
-             HB_ITEM Number;
-             Number.type = HB_IT_NIL;
-
-             hb_itemPutNIntLen( &Number, lNumber, iWidth );
-
-             hb_itemReturn( &Number );
+            PHB_ITEM pNumber = hb_itemNew( NULL );
+            hb_itemPutNIntLen( pNumber, (LONG) dNumber, iWidth );
+            hb_itemRelease( hb_itemReturn( pNumber ) );
          }
+#ifndef HB_LONG_LONG_OFF
+         else if( (double) LONGLONG_MIN <= dNumber && dNumber <= (double) LONGLONG_MAX )
+         {
+            PHB_ITEM pNumber = hb_itemNew( NULL );
+            hb_itemPutNIntLen( pNumber, (LONGLONG) dNumber, iWidth );
+            hb_itemRelease( hb_itemReturn( pNumber ) );
+         }
+#endif
          else
          {
-             hb_retndlen( dNumber, iWidth, 0 );
+            hb_retndlen( dNumber, iWidth, 0 );
          }
       }
    }
@@ -119,39 +142,36 @@ HB_FUNC( INT )
    }
 }
 
-double hb_numRound( double dNum, int iDec, int iDecR )
+double hb_numRound( double dNum, int iDec )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_numRound(%lf, %d, %d)", dNum, iDec, iDecR));
+   static const double doBase = 10.0f;
+   double doComplete5, doComplete5i, dPow;
 
-   if( dNum != 0.0 )
-   {
-      double dAdjust, dFine;
+   HB_TRACE(HB_TR_DEBUG, ("hb_numRound(%lf, %d)", dNum, iDec));
 
-#ifdef _MSC_VER
-      dAdjust = pow( 10, iDec );
-      dFine   = pow( 10, -( iDecR - iDec + 5 ) );
+   dPow = hb_numPow10( iDec );
+   doComplete5 = dNum * dPow * doBase;
+
+#if 0
+   /*
+    * this is a hack for people who cannot live without hacked FL values
+    * in rounding
+    */
+   if( dNum < 0.0f )
+      doComplete5 -= 5.0f - hb_numPow10( (int) log10( -doComplete5 ) - 15 );
+   else
+      doComplete5 += 5.0f + hb_numPow10( (int) log10( doComplete5 ) - 15 );
 #else
-      dAdjust = pow10( iDec );
-      dFine   = pow10( -( iDecR - iDec + 5 ) );
+   if( dNum < 0.0f )
+      doComplete5 -= 5.0f;
+   else
+      doComplete5 += 5.0f;
 #endif
 
-      if( dNum < 0.0 )
-      {
-         dNum = ceil( (( dNum * dAdjust ) - ( 0.5 + dFine ) ) ) / dAdjust;
-      }
-      else
-      {
-         dNum = floor( (( dNum * dAdjust ) + ( 0.5 + dFine ) ) ) / dAdjust;
-      }
+   doComplete5 /= doBase;
+   modf( doComplete5, &doComplete5i );
 
-      // Maybe -0.00
-      if( dNum == -0.00 )
-      {
-         dNum = 0.0;
-      }
-   }
-
-   return dNum;
+   return doComplete5i / dPow;
 }
 
 HB_FUNC( ROUND )
@@ -168,34 +188,32 @@ HB_FUNC( ROUND )
       }
       else
       {
-         int iLen, iDecR;
-         double dNumber = hb_numRound( hb_itemGetND( pNumber ), iDec, iDecR );;
-
-         hb_itemGetNLen( pNumber, &iLen, &iDecR );
-
          if( iDec > 0 )
          {
-             hb_retndlen( dNumber, 0, HB_MAX( iDec, 0 ));
+            hb_retndlen( hb_numRound( hb_parnd( 1 ), iDec ), 0, iDec );
          }
          else
          {
-#ifndef HB_LONG_LONG_OFF
-            LONGLONG lNumber = (LONGLONG) dNumber;
-
-            if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )
-#else
-            long lNumber = (long) dNumber;
+            double dNumber = hb_numRound( hb_parnd( 1 ), iDec );
 
             if( (double) LONG_MIN <= dNumber && dNumber <= (double) LONG_MAX )
-#endif
             {
-               HB_ITEM Number;
-               Number.type = HB_IT_NIL;
+               PHB_ITEM pNumber = hb_itemNew( NULL );
 
-               hb_itemPutNInt( &Number, lNumber );
+               hb_itemPutNInt( pNumber, (LONG) dNumber );
 
-               hb_itemReturn( &Number );
+               hb_itemReturn( pNumber );
             }
+#ifndef HB_LONG_LONG_OFF
+            else if( (double) LONGLONG_MIN <= dNumber && dNumber <= (double) LONGLONG_MAX )
+            {
+               PHB_ITEM pNumber = hb_itemNew( NULL );
+
+               hb_itemPutNInt( pNumber, (LONGLONG) dNumber );
+
+               hb_itemReturn( pNumber );
+            }
+#endif
             else
             {
                hb_retndlen( dNumber, 0, HB_MAX( iDec, 0 ) );
@@ -204,8 +222,5 @@ HB_FUNC( ROUND )
       }
    }
    else
-   {
       hb_errRT_BASE_SubstR( EG_ARG, 1094, NULL, "ROUND", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
 }
-

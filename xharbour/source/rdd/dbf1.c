@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.56 2004/02/07 06:18:08 guerra000 Exp $
+ * $Id: dbf1.c,v 1.57 2004/02/08 04:31:39 walito Exp $
  */
 
 /*
@@ -1298,53 +1298,22 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       {
          if( pField->uiType == HB_IT_LONG )
          {
-            if( HB_IS_DOUBLE( pItem ) )
+            if ( hb_itemStrBuf( szBuffer, pItem, pField->uiLen, pField->uiDec ) )
             {
-               int iLen, iDec;
-               hb_itemGetNLen( pItem, &iLen, &iDec );
-
-               if( pField->uiDec == 0 )
-               {
-                  if( pField->uiLen > 9 )
-                     uiSize = sprintf( szBuffer, "%*.0f", pField->uiLen,
-                                    hb_numRound( hb_itemGetND( pItem ), 0, iDec ) );
-                  else
-                     uiSize = sprintf( szBuffer, "%*li", pField->uiLen,
-                                    ( LONG ) hb_numRound( hb_itemGetND( pItem ), 0, iDec ) );
-               }
-               else
-                  /*
-                  uiSize = sprintf( szBuffer, "%*.*f", pField->uiLen - pField->uiDec - 1,
-                                    pField->uiDec, hb_numRound( hb_itemGetND( pItem ),
-                                    pField->uiDec ) );
-                  */
-                  uiSize = sprintf( szBuffer, "%*.*f", pField->uiLen, pField->uiDec,
-                                    hb_numRound( hb_itemGetND( pItem ),
-                                    pField->uiDec, iDec ) );
+               memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
+                       szBuffer, pField->uiLen );
             }
             else
-            {
-               if( pField->uiDec == 0 )
-               {
-                  uiSize = sprintf( szBuffer, "%*li", pField->uiLen, hb_itemGetNL( pItem ) );
-               }
-               else
-                  uiSize = sprintf( szBuffer, "%*.*f", pField->uiLen,
-                                    pField->uiDec, hb_itemGetND( pItem ) );
-            }
-            /* Overflow? */
-            if( uiSize > pField->uiLen )
             {
                uiError = EDBF_DATAWIDTH;
                memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                        '*', pField->uiLen );
             }
-            else
-               memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
-                       szBuffer, pField->uiLen );
          }
          else
+         {
             uiError = EDBF_DATATYPE;
+         }
       }
       else if( HB_IS_LOGICAL( pItem ) )
       {

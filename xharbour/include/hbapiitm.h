@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.27 2003/12/05 02:15:51 jonnymind Exp $
+ * $Id: hbapiitm.h,v 1.28 2004/01/21 13:37:59 walito Exp $
  */
 
 /*
@@ -140,6 +140,7 @@ extern PHB_ITEM HB_EXPORT hb_itemUnRef    ( PHB_ITEM pItem ); /* de-references p
 extern PHB_ITEM HB_EXPORT hb_itemUnRefOnce( PHB_ITEM pItem ); /* de-references passed variable, one step*/
 extern char     HB_EXPORT * hb_itemStr      ( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec ); /* convert a number to a string */
 extern char     HB_EXPORT * hb_itemString   ( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq );  /* Convert any scalar to a string */
+extern BOOL     HB_EXPORT hb_itemStrBuf   ( char *szResult, PHB_ITEM pNumber, int iSize, int iDec ); /* convert a number to a string */
 extern PHB_ITEM HB_EXPORT hb_itemValToStr ( PHB_ITEM pItem ); /* Convert any scalar to a string */
 extern char     HB_EXPORT * hb_itemPadConv  ( PHB_ITEM pItem, char * buffer, ULONG * pulSize );
 extern void     HB_EXPORT hb_itemSwap     ( PHB_ITEM pItem1, PHB_ITEM pItem2 );

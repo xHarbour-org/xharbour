@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.114 2004/02/08 04:31:32 walito Exp $
+ * $Id: hbapi.h,v 1.115 2004/02/09 06:30:17 walito Exp $
  */
 
 /*
@@ -435,7 +435,7 @@ extern double   HB_EXPORT hb_strVal( const char * szText, ... ); /* return the n
 extern char     HB_EXPORT * hb_strLTrim( const char * szText, ULONG * ulLen ); /* return a pointer to the first non-white space character */
 extern ULONG    HB_EXPORT hb_strRTrimLen( const char * szText, ULONG ulLen, BOOL bAnySpace ); /* return length of a string, ignoring trailing white space (or true spaces) */
 
-extern double   HB_EXPORT hb_numRound( double dResult, int iDec, int iDecR ); /* round a number to a specific number of digits */
+extern double   HB_EXPORT hb_numRound( double dResult, int iDec ); /* round a number to a specific number of digits */
 
 
 /* class management */

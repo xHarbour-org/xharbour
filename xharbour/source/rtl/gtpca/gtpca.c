@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.10 2004/02/01 23:40:50 jonnymind Exp $
+ * $Id: gtpca.c,v 1.11 2004/02/06 17:07:30 jonnymind Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ static void HB_GT_FUNC(gt_AnsiGetCurPos( USHORT * row, USHORT * col ));
 
 static USHORT s_uiDispCount;
 static char *s_clipboard = NULL;
-static int s_clipsize = 0;
+static ULONG s_clipsize = 0;
 
 void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
@@ -746,7 +746,11 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-      return (int) FALSE;
+         return (int) FALSE;
+      case GTI_INPUTFD:
+         return s_iFilenoStdin;
+      case GTI_OUTPUTFD:
+         return s_iFilenoStdout;
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: gtinfo.ch,v 1.1 2004/02/01 00:35:42 maurifull Exp $
  */
 
 /*
@@ -63,5 +63,7 @@
 #define GTI_DESKTOPWIDTH   6
 #define GTI_DESKTOPHEIGHT  7
 #define GTI_DESKTOPDEPTH   8
+#define GTI_INPUTFD        9
+#define GTI_OUTPUTFD      10
 
 #endif /* HB_GTINFO_CH_ */

@@ -1,5 +1,5 @@
  /*
- * $Id: gtstd.c,v 1.11 2004/02/07 20:40:30 andijahja Exp $
+ * $Id: gtstd.c,v 1.12 2004/02/08 12:07:39 jonnymind Exp $
  */
 
 /*
@@ -88,6 +88,7 @@ static USHORT s_uiMaxRow;
 static USHORT s_uiMaxCol;
 static USHORT s_uiCursorStyle;
 static BOOL   s_bBlink;
+static int    s_iFilenoStdin;
 static int    s_iFilenoStdout;
 static int    s_iFilenoStderr;
 static USHORT s_uiDispCount;
@@ -109,8 +110,6 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
-   HB_SYMBOL_UNUSED( iFilenoStdin );
-   //HB_SYMBOL_UNUSED( iFilenoStderr );
 #if ! defined( HB_UNIX_GT_DAEMON )
 #if defined( OS_UNIX_COMPATIBLE )
    {
@@ -149,6 +148,7 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
    s_uiCursorStyle = SC_NORMAL;
    s_bBlink = FALSE;
+   s_iFilenoStdin  = iFilenoStdin;
    s_iFilenoStdout = iFilenoStdout;
    s_iFilenoStderr = iFilenoStderr;
    hb_fsSetDevMode( s_iFilenoStdout, FD_BINARY );
@@ -816,7 +816,11 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-      return (int) FALSE;
+         return (int) FALSE;
+      case GTI_INPUTFD:
+         return s_iFilenoStdin;
+      case GTI_OUTPUTFD:
+         return s_iFilenoStdout;
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;

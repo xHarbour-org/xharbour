@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.67 2004/01/26 18:43:46 druzus Exp $
+ * $Id: dbfntx1.c,v 1.68 2004/02/08 04:31:39 walito Exp $
  */
 
 /*
@@ -306,39 +306,12 @@ static void hb_IncString( NTXAREAP pArea, char* s, int slen )
 
 static char * numToStr( PHB_ITEM pItem, char* szBuffer, USHORT length, USHORT dec )
 {
-   if( HB_IS_DOUBLE( pItem ) )
-   {
-      int iLen, iDec;
-      hb_itemGetNLen( pItem, &iLen, &iDec );
-
-      if( dec == 0 )
-      {
-         if( length > 9 )
-            sprintf( szBuffer, "%0*.0f", length,
-                hb_numRound( hb_itemGetND( pItem ), 0, iDec ) );
-         else
-            sprintf( szBuffer, "%0*li", length,
-                ( LONG ) hb_numRound( hb_itemGetND( pItem ), 0, iDec ) );
-      }
-      else
-         sprintf( szBuffer, "%0*.*f", length,
-                dec, hb_numRound( hb_itemGetND( pItem ),
-                dec, iDec ) );
-   }
-   else
-   {
-      if( dec == 0 )
-         sprintf( szBuffer, "%0*li", length, hb_itemGetNL( pItem ) );
-      else
-         sprintf( szBuffer, "%0*.*f", length,
-                dec, hb_itemGetND( pItem ) );
-   }
-   szBuffer[ length ] = 0;
+   hb_itemStrBuf( szBuffer, pItem, length, dec );
    if( hb_itemGetND( pItem ) < 0 )
    {
       char *ptr = szBuffer;
       *ptr++ = ',';
-      for( ;*ptr;ptr++ )
+      for( ; *ptr; ptr++ )
          if( *ptr >= '0' && *ptr <= '9' )
             *ptr = (char) ( 92 - (int)*ptr );
    }

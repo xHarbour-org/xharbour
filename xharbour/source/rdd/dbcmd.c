@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.69 2004/02/04 00:51:45 andijahja Exp $
+ * $Id: dbcmd.c,v 1.70 2004/02/04 01:12:01 andijahja Exp $
  */
 
 /*
@@ -1398,11 +1398,11 @@ HB_FUNC( __DBCONTINUE )
 HB_FUNC( DBCREATE )
 {
    HB_THREAD_STUB
-   char * szDriver, * szFileName;
+   char * szDriver;
    char cDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH ];
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
    char szAliasTmp[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
-   char szSavedFileName[ _POSIX_PATH_MAX + 1 ];
+   char szFileName[ _POSIX_PATH_MAX + 1 ], szSavedFileName[ _POSIX_PATH_MAX + 1 ];
    USHORT uiSize, uiLen, uiPrevArea;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
@@ -1412,7 +1412,11 @@ HB_FUNC( DBCREATE )
 
    hb_ret();
 
-   szFileName = hb_parc( 1 );
+   szFileName[0] = '\0';
+   if ( ISCHAR( 1 ) )
+   {
+      strncpy( szFileName, hb_parc( 1 ), _POSIX_PATH_MAX );
+   }
    pStruct = hb_param( 2 , HB_IT_ARRAY );
 
    if( pStruct )
@@ -1532,15 +1536,6 @@ HB_FUNC( DBCREATE )
       return;
    }
 
-   szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-   // strncpy( szFileName, hb_parc( 1 ), _POSIX_PATH_MAX );
-   szFileName[0] = '\0';
-
-   if( ISCHAR(1) )
-   {
-      strncat( szFileName, hb_parc( 1 ), _POSIX_PATH_MAX );
-   }
-
    if( !pFileName->szExtension )
    {
       pFileExt = hb_itemPutC( NULL, "" );
@@ -1569,7 +1564,6 @@ HB_FUNC( DBCREATE )
 
    if( SELF_CREATEFIELDS( ( AREAP ) s_pCurrArea->pArea, pStruct ) == FAILURE )
    {
-      hb_xfree( szFileName );
       hb_rddReleaseCurrentArea();
       hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
       return;
@@ -1577,13 +1571,10 @@ HB_FUNC( DBCREATE )
 
    if( SELF_CREATE( ( AREAP ) s_pCurrArea->pArea, &pInfo ) == FAILURE )
    {
-      hb_xfree( szFileName );
       hb_rddReleaseCurrentArea();
       hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
       return;
    }
-
-   hb_xfree( szFileName );
 
    if( !bOpen )
    {
@@ -1609,8 +1600,6 @@ HB_FUNC( DBCREATE )
       ( ( AREAP ) s_pCurrArea->pArea )->rddID = uiRddID;
       SELF_NEW( ( AREAP ) s_pCurrArea->pArea );
 
-      //pInfo.abName = ( BYTE * )  hb_xgrab( _POSIX_PATH_MAX + 1 );
-      szFileName = ( char * )  hb_xgrab( _POSIX_PATH_MAX + 1 );
       pInfo.abName = ( BYTE * ) szFileName;
       pInfo.atomAlias = ( BYTE * ) szAlias;
       strcpy( ( char * ) pInfo.abName, szSavedFileName );
@@ -1628,11 +1617,7 @@ HB_FUNC( DBCREATE )
       {
          hb_retl( TRUE );
       }
-
-      //hb_xfree( pInfo.abName );
-      hb_xfree( szFileName );
    }
-   //hb_xfree( szFileName );
 }
 
 HB_FUNC( DBDELETE )
@@ -2367,8 +2352,8 @@ HB_FUNC( DBUNLOCKALL )
 HB_FUNC( DBUSEAREA )
 {
    HB_THREAD_STUB
-   char * szDriver, * szTempFile;
-   char szFileName[_POSIX_PATH_MAX];
+   char * szDriver;
+   char szFileName[ _POSIX_PATH_MAX + 1 ];
    USHORT uiLen;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
@@ -2410,20 +2395,17 @@ HB_FUNC( DBUSEAREA )
       szDriver = s_szDefDriver;
    }
 
-   strcpy( szFileName, hb_parc( 3 ) );
-
-   if( ! ISCHAR(3) || ( strlen( szFileName ) == 0 ) )
+   if( ! ISCHAR(3) || ( strlen( hb_parc( 3 ) ) == 0 ) )
    {
       hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
       return;
    }
 
- /* Convert FileName accoring to Sets (_SET_DIRCASE,_SET_FILECASE,_SET_DIRSEPARATOR) */
-   szTempFile = (char *) hb_fileNameConv( hb_strdup( szFileName ) );
+   strncpy( szFileName, hb_parc( 3 ), _POSIX_PATH_MAX );
+   /* Convert FileName accoring to Sets (_SET_DIRCASE,_SET_FILECASE,_SET_DIRSEPARATOR) */
+   hb_fileNameConv( szFileName );
 
-   pFileName = hb_fsFNameSplit( szTempFile );
-
-   hb_xfree( szTempFile );
+   pFileName = hb_fsFNameSplit( szFileName );
 
    szAlias[0] = '\0';
 
@@ -2492,13 +2474,9 @@ HB_FUNC( DBUSEAREA )
    if( SELF_OPEN( ( AREAP ) s_pCurrArea->pArea, &pInfo ) == FAILURE )
    {
       s_bNetError = TRUE;           /* Temp fix! What about other types of errors? */
-      *szFileName = NULL ;
-      pInfo.abName = NULL ;
       hb_rddReleaseCurrentArea();
       return;
    }
-
-   // hb_xfree( szFileName );
 }
 
 HB_FUNC( __DBZAP )

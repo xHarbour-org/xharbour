@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.17 2004/02/01 23:40:51 jonnymind Exp $
+ * $Id: gtsln.c,v 1.18 2004/02/06 17:07:30 jonnymind Exp $
  */
 
 /*
@@ -1392,7 +1392,11 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-      return (int) FALSE;
+         return (int) FALSE;
+      case GTI_INPUTFD:
+         return SLang_TT_Read_FD;
+      case GTI_OUTPUTFD:
+         return SLang_TT_Write_FD;
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;

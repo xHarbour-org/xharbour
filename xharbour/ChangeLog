@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2249 2004/02/09 16:31:22 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2250 2004/02/09 16:46:57 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,50 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-09 18:52 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/gtinfo.ch
+  * xharbour/source/rtl/gtcgi/gtcgi.c
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtdos/gtdos.c
+  * xharbour/source/rtl/gtpca/gtpca.c
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtstd/gtstd.c
+  * xharbour/source/rtl/gtwin/gtwin.c
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/rtl/gtxvt/gtxvt.c
+  * xharbour/source/rtl/gtxvt/gtxvt.h
+   + new GT_INFO params GTI_INPUTFD and GTI_OUTPUTFD
+
+  * xharbour/include/hbapi.h
+   * removed third parameters in hb_numRound
+
+  * xharbour/source/rtl/round.c
+   ! fixed some bugs introduced recently
+   * hb_numRound rewritten - it's based on Harbour version with small
+     hack to speed it up - it's about 4 times faster now.
+
+  * xharbour/include/hbapiitm.h
+  * xharbour/source/vm/itemapi.c
+   + new function hb_itemStrBuf, is similar to hb_itemStr but buffer has
+     to be allocated by caller. hb_itemStr internally call hb_itemStrBuf
+     !!! Important: I used snprintf() function to avoid allocating very
+     big buffer for number. snprintf should be supported by all compilers
+     we are using (it's ISO/IEC 9899:1999 standard) but if not then please
+     not change hb_itemStrBuf but simply write own version of snprintf
+
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+   * hb_itemStrBuf used instead of sprintf conversion. It's very important
+     to have the same conversion everywhere. It allows to remove all hacks
+     for -0.0 double and leave it only in hb_itemStrBuf and resolves some
+     other problems with different conversions for very big number when
+     str returns differ value then we store in database
+
+I would like to talk about numerical conversion on xHarbour devel when it
+will work, now it's like /dev/null for me. So if it's possible please
+only correct the bugs I might introduce but not add new extensions.
 
 2004-02-09 17:48 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/gx.c
