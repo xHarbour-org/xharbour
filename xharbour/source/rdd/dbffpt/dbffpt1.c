@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.7 2003/11/30 12:32:30 druzus Exp $
+ * $Id: dbffpt1.c,v 1.8 2003/12/12 10:16:06 druzus Exp $
  */
 
 /*
@@ -459,8 +459,11 @@ static ERRCODE hb_fptWriteGCitems( FPTAREAP pArea, LPMEMOGCTABLE pGCtable, USHOR
 {
    FPTBLOCK fptBlock;
    ERRCODE errCode = SUCCESS;
-   int i, iStart, iStop;
+   int i /* ,iStart, iStop */ ;
 
+   HB_SYMBOL_UNUSED( usItem ) ;
+
+/*
    if ( usItem == 0 )
    {
       iStart = 0;
@@ -471,6 +474,8 @@ static ERRCODE hb_fptWriteGCitems( FPTAREAP pArea, LPMEMOGCTABLE pGCtable, USHOR
       iStart = usItem;
       iStop = usItem + 1;
    }
+*/
+
    for( i = 0; i < pGCtable->usItems; i++ )
    {
       if ( pGCtable->pGCitems[i].fChanged )
@@ -721,7 +726,7 @@ static ERRCODE hb_fptReadGCdata( FPTAREAP pArea, LPMEMOGCTABLE pGCtable )
             pGCtable->ulSize = HB_GET_BE_ULONG( fptBlock.size );
             bPageBuf = ( BYTE * ) hb_xgrab( pGCtable->ulSize );
             if ( hb_fsRead( pArea->hMemoFile, bPageBuf, ( USHORT ) pGCtable->ulSize ) !=
-                                                            pGCtable->ulSize )
+                                                            ( USHORT ) pGCtable->ulSize )
             {
                hb_xfree( bPageBuf );
                return EDBF_CORRUPT;
@@ -840,7 +845,7 @@ static ERRCODE hb_fptWriteGCdata( FPTAREAP pArea, LPMEMOGCTABLE pGCtable )
             if ( hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &fptBlock,
                              sizeof( FPTBLOCK ) ) != sizeof( FPTBLOCK ) ||
                  hb_fsWrite( pArea->hMemoFile, bPageBuf,
-                             ( USHORT ) pGCtable->ulSize ) != pGCtable->ulSize )
+                             ( USHORT ) pGCtable->ulSize ) != ( USHORT ) pGCtable->ulSize )
             {
                errCode = EDBF_WRITE;
             }
@@ -857,7 +862,7 @@ static ERRCODE hb_fptWriteGCdata( FPTAREAP pArea, LPMEMOGCTABLE pGCtable )
                if ( hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &fptBlock,
                                 sizeof( FPTBLOCK ) ) != sizeof( FPTBLOCK ) ||
                     hb_fsWrite( pArea->hMemoFile, bPageBuf,
-                                ( USHORT )pGCtable->ulSize ) != pGCtable->ulSize )
+                                ( USHORT )pGCtable->ulSize ) != ( USHORT ) pGCtable->ulSize )
                {
                   errCode = EDBF_WRITE;
                }
@@ -877,7 +882,7 @@ static ERRCODE hb_fptWriteGCdata( FPTAREAP pArea, LPMEMOGCTABLE pGCtable )
       {
          HB_PUT_BE_ULONG( pGCtable->fptHeader.nextBlock, pGCtable->ulNextBlock );
          hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
-         if ( hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &pGCtable->fptHeader, ( USHORT )ulHdrSize ) != ulHdrSize )
+         if ( hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &pGCtable->fptHeader, ( USHORT )ulHdrSize ) != ( USHORT ) ulHdrSize )
          {
             errCode = EDBF_WRITE;
          }
@@ -1272,7 +1277,7 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
  */
 static ULONG hb_fptCountSixItemLength( FPTAREAP pArea, PHB_ITEM pItem )
 {
-   ULONG ulLen, i, ulSize = 0;
+   ULONG ulLen, i, ulSize;
    USHORT usType;
 
    usType = hb_itemType( pItem );
@@ -1823,7 +1828,7 @@ static ERRCODE hb_fptSysName( FPTAREAP pArea, BYTE * pBuffer )
 static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
    BOOL bDeleted;
-   ERRCODE uiError = SUCCESS;
+   ERRCODE uiError;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fptGetValue(%p, %hu, %p)", pArea, uiIndex, pItem));
 
@@ -1868,7 +1873,7 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 static ERRCODE hb_fptPutValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
    BOOL bDeleted;
-   ERRCODE uiError = SUCCESS;
+   ERRCODE uiError;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fptPutValue(%p, %hu, %p)", pArea, uiIndex, pItem));
 
@@ -1987,7 +1992,7 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
       strcpy( ( char *) fptHeader.signature2, "FlexFile3\003" );
       ulSize = sizeof( FPTHEADER );
    }
-   if( hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &fptHeader, ( USHORT) ulSize ) != ulSize )
+   if( hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &fptHeader, ( USHORT) ulSize ) != ( USHORT ) ulSize )
       return FAILURE;
 
    memset( &fptHeader, 0, sizeof( FPTHEADER ) );
@@ -1995,7 +2000,7 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
    while ( ulLen > 0 )
    {
       ulSize = HB_MIN( ulLen, sizeof( FPTHEADER ) );
-      if( hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &fptHeader, ( USHORT ) ulSize ) != ulSize )
+      if( hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &fptHeader, ( USHORT ) ulSize ) != ( USHORT ) ulSize )
          return FAILURE;
       ulLen -= ulSize;
    }
