@@ -1,5 +1,5 @@
 /*
- * $Id: TCStatic.prg,v 1.18 2002/11/05 21:39:58 what32 Exp $
+ * $Id: TCStatic.prg,v 1.19 2002/11/07 20:05:56 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -51,21 +51,5 @@ CLASS TStatic FROM TCustomControl
    DATA WinClass    PROTECTED INIT "static"
    DATA ControlName PROTECTED INIT "Label"
 
-   METHOD New() CONSTRUCTOR
-
 ENDCLASS
 
-*------------------------------------------------------------------------------*
-
-METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TStatic
-
-   ::FCaption   := cCaption
-   ::id         := nId
-   ::FLeft      := nLeft
-   ::FTop       := nTop
-   ::FWidth     := IFNIL( nWidth,  ::FWidth , nWidth )
-   ::FHeight    := IFNIL( nHeight, ::FHeight, nHeight)
-
-   RETURN( super:new( oParent ) )
-
-*------------------------------------------------------------------------------*

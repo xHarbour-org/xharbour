@@ -1,5 +1,5 @@
 /*
- * $Id: TCButton.prg,v 1.21 2002/11/05 21:39:58 what32 Exp $
+ * $Id: TCButton.prg,v 1.22 2002/11/07 20:05:55 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -50,21 +50,4 @@ CLASS TButton FROM TCustomControl
    DATA WinClass    PROTECTED INIT "button"
    DATA ControlName PROTECTED INIT "Button"
    
-   METHOD New() CONSTRUCTOR
-
 ENDCLASS
-
-*------------------------------------------------------------------------------*
-
-METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TButton
-
-   ::id         := nId
-   ::FCaption   := IFNIL( cCaption, ::FCaption, cCaption )
-   ::FLeft      := IFNIL( nLeft,    ::FLeft,    nLeft    )
-   ::FTop       := IFNIL( nTop,     ::FTop,     nTop     )
-   ::FWidth     := IFNIL( nWidth ,  ::FWidth,   nWidth   )
-   ::FHeight    := IFNIL( nHeight,  ::FHeight,  nHeight  )
-
-   RETURN( super:new( oParent ) )
-
-*------------------------------------------------------------------------------*

@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.92 2002/11/17 09:03:45 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.93 2002/11/18 06:24:20 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -248,63 +248,50 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
 
       DO CASE
       CASE ::CtrlName == "Button"
-         oObj := TButton():Create( self )
-         oObj:FCaption := oObj:Name
-         oObj:SetParent( Self )
+         oObj := TButton()
          
       CASE ::CtrlName == "Edit"
-         oObj := TEdit():Create( self )
-         oObj:FCaption := oObj:Name
-         oObj:SetParent( Self )
+         oObj := TEdit()
 
       CASE ::CtrlName=="Label"
-         oObj := TStatic():Create( self )
+         oObj := TStatic()
 
       CASE ::CtrlName=="CheckBox"
-         oObj := TCheck():New(    self, , 503,  aRect[1], aRect[2], aRect[3], aRect[4] )
+         oObj := TCheck()
 
       CASE ::CtrlName=="RadioButton"
-         oObj := TRadio():New(    self, , 504,  aRect[1], aRect[2], aRect[3], aRect[4] )
+         oObj := TRadio()
 
       CASE ::CtrlName=="ComboBox"
-         oObj:=::Add( TComboBox():New( self,   505,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj := TComboBox()
 
       CASE ::CtrlName=="ListBox"
-         oObj:=::Add( TListBox():New(  self,   506,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj := TListBox()
 
       CASE ::CtrlName=="StatusBar"
          IF !("2" $ cName) // only one status bar
-           oObj:=::Add( TStatusBar():New( self, , 507 ) )
+           oObj := TStatusBar()
          ENDIF
 
       CASE ::CtrlName=="TabControl"
-         oObj:=::Add( TTabControl():New( self, 508, aRect[1], aRect[2], aRect[3], aRect[4] ) )
-         oObj:AddTab( "Tab1" )
-         oObj:AddTab( "Tab2" )
-         oObj:configure()
-
-      CASE ::CtrlName=="TabPage"
-         // What ???
+         oObj := TTabControl()
 
       CASE ::CtrlName=="GroupBox"
-         oObj:=::Add( TGroupBox():New(   self, , 509, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj := TGroupBox()
 
       CASE ::CtrlName=="TreeView"
-         oObj:=::Add( TTreeView():New(   self,   510, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj := TTreeView()
 
       CASE ::CtrlName=="CoolBar"
          IF !("2" $ cName) // only one CoolBar
-            oObj:=::Add( TCoolBar():New( self ) )
+            oObj := TCoolBar()
          ENDIF
 
       CASE ::CtrlName=="ToolBar"
-         oObj:=::Add( TToolBar():New( self, 511, 2, HINST_COMMCTRL, IDB_STD_SMALL_COLOR, 16, 16, 16, 16, 14 ) )
-         oObj:AddButton("New", ToolButton():New( 0 , ,"New",  100 ) )
-         oObj:AddButton("Open",ToolButton():New( 1 , ,"Open", 100 ) )
-         UpdateWindow( ::Fhandle )
+         oObj := TToolBar()
 
       CASE ::CtrlName=="ProgressBar"
-         oObj:=::Add( TProgressBar():New( self, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj := TProgressBar()
 
       OTHERWISE // unknown name
          ::CtrlName    :=NIL
@@ -312,6 +299,13 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
       ENDCASE
 
       IF oObj != NIL
+      
+         oObj:Create( self )
+         oObj:FCaption := oObj:Name
+         oObj:FLeft    := aRect[1]
+         oObj:FTop     := aRect[2]
+         oObj:SetParent( Self )
+
          ::SetControl( oObj )
       ENDIF
    ENDIF

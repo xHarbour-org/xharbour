@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.9 2002/11/18 06:24:19 what32 Exp $
+ * $Id: TCustomForm.prg,v 1.10 2002/11/18 06:38:05 what32 Exp $
  */
 
 /*
@@ -35,50 +35,30 @@
 
 
 CLASS TCustomForm FROM TScrollingWinControl
-/*
+
   PROTECTED:
 
     DATA     FActionLists              //: TList;
     DATA     FFormState                //: TFormState;
-    METHOD   Activate                virtual  //; dynamic;
-    METHOD   ActiveChanged           virtual  //; dynamic;
-    METHOD   AlignControls           virtual  //; override;
-    METHOD   BeginAutoDrag           virtual  //; override;
-    METHOD   ChangeScale             virtual  //; override;
-    METHOD   CreateParams            virtual  //; override;
-    METHOD   CreateWindowHandle      virtual  //; override;
-    METHOD   CreateWnd               virtual  //; override;
-    METHOD   Deactivate              virtual  //; dynamic;
-    METHOD   DefineProperties        virtual  //; override;
-    METHOD   DestroyWindowHandle     virtual  //; override;
-    METHOD   DoClose                 virtual  //; dynamic;
+
+
+    METHOD   Activate                VIRTUAL  //; dynamic;
+    METHOD   ActiveChanged           VIRTUAL  //; dynamic;
+
+    METHOD   Deactivate              VIRTUAL  //; dynamic;
+
+    METHOD   DoClose                 VIRTUAL  //; dynamic;
     METHOD   DoCreate                VIRTUAL
     METHOD   DoDestroy               VIRTUAL
-    METHOD   DoHide                  virtual  //; dynamic;
-    METHOD   DoShow                  virtual  //; dynamic;
-    METHOD   GetClientRect           virtual   //; override;
-    METHOD   GetChildren             virtual  //; override;
-    METHOD   GetFloating             virtual   //: Boolean; override;
-    METHOD   HandleCreateException   virtual   //: Boolean; dynamic;
-    METHOD   Loaded                  virtual  //; override;
-    METHOD   Notification            virtual  //; override;
-    METHOD   Paint                   virtual  //; dynamic;
-    METHOD   PaintWindow             virtual  //; override;
-    METHOD   PaletteChanged          virtual   //(Foreground: Boolean): Boolean; override;
-    METHOD   QueryInterface          virtual   //(const IID: TGUID; out Obj): HResult; override;
-    METHOD   ReadState               virtual  //(Reader: TReader); override;
-    METHOD   RequestAlign            virtual  //; override;
-    METHOD   SetChildOrder           virtual  //(Child: TComponent; Order: Integer); override;
-    METHOD   SetParentBiDiMode       virtual  //(Value: Boolean); override;
-    METHOD   DoDock                  virtual  //(NewDockSite: TWinControl; var ARect: TRect); override;
-    METHOD   SetParent               virtual  //(AParent: TWinControl); override;
+    METHOD   DoHide                  VIRTUAL  //; dynamic;
+    METHOD   DoShow                  VIRTUAL  //; dynamic;
+
+
+    METHOD   HandleCreateException   VIRTUAL   //: Boolean; dynamic;
+    METHOD   Paint                   VIRTUAL  //; dynamic;
     METHOD   UpdateActions           VIRTUAL
-    METHOD   UpdateWindowState       virtual
-    METHOD   ValidateRename          virtual  //(AComponent: TComponent; const CurName, NewName: string); override;
-    METHOD   VisibleChanging         virtual  //; override;
-    METHOD   WndProc                 virtual  //(var Message: TMessage); override;
-    METHOD   Resizing                virtual  //(State: TWindowState); override;
-*/
+    METHOD   UpdateWindowState       VIRTUAL
+
 
 
     PROPERTY ActiveMDIChild             //: TForm;
@@ -116,33 +96,26 @@ CLASS TCustomForm FROM TScrollingWinControl
 
 
 
-/*
-  PUBLIC:
-    METHOD   Create                     CONSTRUCTOR //(AOwner: TComponent); override;
-    METHOD   CreateNew                  CONSTRUCTOR //VIRTUAL     //(AOwner: TComponent; Dummy: Integer = 0); virtual;
-    METHOD   Destroy                    virtual //destructor ; override;
-    METHOD   AfterConstruction          virtual //; override;
-    METHOD   BeforeDestruction          virtual //; override;
-    METHOD   Close
-    METHOD   CloseQuery                 VIRTUAL //: Boolean; virtual;
-    METHOD   DefaultHandler             virtual //(var Message); override;
-    METHOD   DefocusControl             virtual //(Control: TWinControl; Removing: Boolean);
-    METHOD   Dock                       virtual //(NewDockSite: TWinControl; ARect: TRect); override;
-    METHOD   FocusControl               virtual //(Control: TWinControl);
-    METHOD   GetFormImage               virtual //: TBitmap;
-    METHOD   Hide                       virtual
-    METHOD   IsShortCut                 virtual //(var Message: TWMKey): Boolean; dynamic;
-    METHOD   MakeFullyVisible           virtual //(AMonitor: TMonitor = nil);
-    METHOD   MouseWheelHandler          virtual //(var Message: TMessage); override;
-    METHOD   Print                      virtual
-    METHOD   Release                    virtual
-    METHOD   SendCancelMode             virtual //(Sender: TControl);
-    METHOD   SetFocus                   virtual //; override;
-    METHOD   SetFocusedControl          VIRTUAL //(Control: TWinControl): Boolean; virtual;
-    METHOD   Show                       virtual
-    METHOD   ShowModal                  VIRTUAL //: Integer; virtual;
-    METHOD   WantChildKey               virtual //(Child: TControl; var Message: TMessage): Boolean; virtual;
 
+  PUBLIC:
+//    METHOD   Create                     VIRTUAL //(AOwner: TComponent); override;
+//    METHOD   CloseQuery                 VIRTUAL //: Boolean; virtual;
+//    METHOD   Close                      VIRTUAL
+//    METHOD   Show                       VIRTUAL
+    METHOD   CreateNew                  VIRTUAL //VIRTUAL     //(AOwner: TComponent; Dummy: Integer = 0); virtual;
+    METHOD   DefocusControl             VIRTUAL //(Control: TWinControl; Removing: Boolean);
+    METHOD   FocusControl               VIRTUAL //(Control: TWinControl);
+    METHOD   GetFormImage               VIRTUAL //: TBitmap;
+    METHOD   Hide                       VIRTUAL
+    METHOD   IsShortCut                 VIRTUAL //(var Message: TWMKey): Boolean; dynamic;
+    METHOD   MakeFullyVisible           VIRTUAL //(AMonitor: TMonitor = nil);
+    METHOD   Print                      VIRTUAL
+    METHOD   Release                    VIRTUAL
+    METHOD   SendCancelMode             VIRTUAL //(Sender: TControl);
+    METHOD   SetFocusedControl          VIRTUAL //(Control: TWinControl): Boolean; virtual;
+    METHOD   ShowModal                  VIRTUAL //: Integer; virtual;
+    METHOD   WantChildKey               VIRTUAL //(Child: TControl; var Message: TMessage): Boolean; virtual;
+/*
     PROPERTY Active                     AS LOGICAL  //: Boolean;
     PROPERTY ActiveControl                      //: TWinControl;
     PROPERTY Action

@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.21 2002/11/07 02:48:47 fsgiudice Exp $
+ * $Id: TCListBox.prg,v 1.22 2002/11/08 04:46:51 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -71,8 +71,6 @@ CLASS TCustomListBox FROM TCustomControl
    DATA WinClass    PROTECTED INIT "listbox"
    DATA ControlName PROTECTED INIT "ListBox"
 
-   METHOD New() CONSTRUCTOR
-
    METHOD GetString()
    METHOD GetItemRect()
    METHOD GetSelItems()
@@ -90,18 +88,6 @@ CLASS TCustomListBox FROM TCustomControl
    METHOD Create()
    METHOD SetItems()
 ENDCLASS
-
-*------------------------------------------------------------------------------*
-
-METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TCustomListBox
-
-   ::id        := nId
-   ::Left      := IFNIL( nLeft,    ::Left,    nLeft    )
-   ::Top       := IFNIL( nTop,     ::Top,     nTop     )
-   ::Width     := IFNIL( nWidth ,  ::Width,   nWidth   )
-   ::Height    := IFNIL( nHeight,  ::height,  nHeight  )
-
-   RETURN( super:new( oParent ) )
 
 *------------------------------------------------------------------------------*
 
