@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3447 2004/09/19 03:58:54 kaddath Exp $
+ * $Id: ChangeLog,v 1.3449 2004/09/19 00:00:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-19 20:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * xharbour/utils/hbmake/hbmake.prg
+  * xharbour/utils/hbmake/tmake.prg
+  * xharbour/utils/hbmake/hbmutils.prg
+  * xharbour/utils/hbmake/pickarry.prg
+    * Fix to "remember" the graphic lib that was chosen by user.
+    * Still miss fix to "remember" the external libs.
+    * Any improvements to better view and show the user messages and help.
+    * Clean the code. Any "//" comments are removed.
 
 2004-09-19 11:05 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/source/ct/ctnet.c

@@ -1,5 +1,5 @@
 /*
- * $Id: tmake.prg,v 1.1 2001/08/29 22:41:00 modalsist Exp $
+ * $Id: tmake.prg,v 1. 2004/09/18 00:00:00 modalsist Exp $
  */
 
 /*
@@ -92,10 +92,12 @@ Data  cDefLang
 Data  lFwh           init .F.
 Data  lxFwh          init .F.
 Data  lCw            init .F.
-Data  lmini          init .F.
+Data  lMini          init .F.
 Data  lHwgui         init .F.
 Data  lGtwvt         init .F.
+Data  lXWT           init .F.
 Data  lWhoo          init .F.
+Data  lWhat32        init .F.
 Data  lRddAds        init .F.
 Data  lMediator      init .F.
 Data  cMakefile      init ""
@@ -171,23 +173,19 @@ Method WriteMakeFileHeader() Class THbmake
     Fwrite( ::nLinkHandle, "RECURSE ="+if(::lRecurse," YES "," NO ") + CRLF )
     Fwrite( ::nLinkHandle, "LIBRARY ="+if(::lLibrary," YES "," NO ") + CRLF )    
     Fwrite( ::nLinkHandle, " " + CRLF )
+
     IF ::lFwh
-
         Fwrite( ::nLinkHandle, "FWH = " + ::cFMC + CRLF )
-
     ELSEIF ::lCw
-
         Fwrite( ::nLinkHandle, "C4W =" + ::cFMC + CRLF )
-
     ELSEIF ::lMini
-
         Fwrite( ::nLinkHandle, "MINIGUI =" + ::cFMC + CRLF )
-
     ELSEIF ::lHwgui
         Fwrite( ::nLinkHandle, "HWGUI =" + ::cFMC + CRLF )
     ELSEIF ::lWhoo
         Fwrite( ::nLinkHandle, "WHOO =" + ::cFMC + CRLF )
-
+    ELSEIF ::lWhat32
+        Fwrite( ::nLinkHandle, "WHAT32 =" + ::cFMC + CRLF )
     ENDIF
 
 
@@ -1131,11 +1129,20 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
                    ::lGtwvt :=.t.
                 endif
 
+                IF aTemp[ 1 ] == "XWT"
+                   ::cFMC:= ""
+                   ::lXWT :=.t.
+                endif
+
                 IF aTemp[ 1 ] == "WHOO"
                    ::cFMC:= aTemp[2]
                    ::lWhoo  :=.t.
                 endif
 
+                IF aTemp[ 1 ] == "WHAT32"
+                   ::cFMC:= aTemp[2]
+                   ::lWhat32  :=.t.
+                endif
 
                 IF aTemp[ 1 ] == "MEDIATOR"
                    ::cMedpath:= aTemp[2]

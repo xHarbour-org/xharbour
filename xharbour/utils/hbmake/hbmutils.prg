@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.1 2004/08/29 22:40:00 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.34 2004/09/18 00:00:00 modalsist Exp $
  */
 /*
  * Harbour Project source code:
@@ -86,7 +86,9 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
    LOCAL xItem
    LOCAL nLen
    LOCAL cFile
+
    DEFAULT lSubDir TO .t.
+
    WHILE ++ nCounter <= LEN( aStru )
 
       IF ! EMPTY( aDirs := GetDirs( aStru[ nCounter ], lGcc ) )                  // There are elements!
@@ -103,23 +105,26 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
    FOR nCounter := 1 TO nArrayLen
 
       IF LEN( aData := DIR_MULTI( aStru[ nCounter ] + "*.prg |" + aStru[ nCounter ] + "*.c |" + aStru[ nCounter ] + "*.cpp" ) ) != 0
+
          nDataLen := LEN( aData )
 
          FOR y := 1 TO nDataLen
+
             IF AT( '.PRG', UPPER( aData[ y, 1 ] ) ) > 0 .OR. AT( '.C', UPPER( aData[ y, 1 ] ) ) > 0 .OR. AT( '.CPP', UPPER( aData[ y, 1 ] ) ) > 0
 
                IF lSubDir
 
                   nLen := AT( " ", aData[ y, 1 ] ) + 1
 
-                  AADD( aRet, STRTRAN( aStru[ nCounter ], cDir, '' ) + aData[ y, 1 ] + ;
+                  AADD( aRet, STRTRAN( aStru[ nCounter ], cDir, '' ) +;
+                        PadR(aData[ y, 1 ],12) + ;
                         STR( aData[ y, 2 ], 8 ) + '  ' + ;
                         DTOC( aData[ y, 3 ] ) + '  ' + ;
                         aData[ y, 4 ] )
 
                ELSEIF ! lSubDir .AND. AT( IIF( lLinux, "/", "\" ), STRTRAN( aStru[ nCounter ], cDir, '' ) ) == 0
 
-                  AADD( aRet, aData[ y, 1 ] + ;
+                  AADD( aRet, PadR(aData[ y, 1 ],12) + ;
                         STR( aData[ y, 2 ], 8 ) + '  ' + ;
                         DTOC( aData[ y, 3 ] ) + '  ' + ;
                         aData[ y, 4 ] )
@@ -516,7 +521,7 @@ FUNCTION GetLibs( lGcc, cDir )
    LOCAL lLinux        := AT( 'linux', LOWER( OS() ) ) > 0
    LOCAL cEnv          := GETENV( "HB_LIB_INSTALL" )
    LOCAL aInstaledLibs := GetInstaledLibs( IIF( ! lLinux, IIF( ! lGcc, cDir + "\*.lib", cDir + "\*.a" ),  '/usr/lib/xharbour/*.a' ), lGcc )
-   LOCAL aLibsDesc   := { { "Harbour CT3        library - Hbct"   ,  IIF( lGcc, 'ct.a', 'hbct.lib' ) }, ;
+   LOCAL aLibsDesc   := { { "Harbour CT3        library - Hbct"   , IIF( lGcc, 'ct.a', 'hbct.lib' ) }, ;
                           { "Harbour Misc       library - Libmisc", IIF( lGcc, 'misc.a', 'libmisc.lib' ) }, ;
                           { "Harbour Html       library - Htmllib", 'html' + IIF( lGcc, '.a', '.lib' ) }, ;
                           { "Harbour NanFor     library - Libnf"  , IIF( lGcc, 'nf.a', 'libnf.lib' ) }, ;
@@ -528,7 +533,7 @@ FUNCTION GetLibs( lGcc, cDir )
                           { "Harbour Samples    library - Samples", 'samples' + IIF( lGcc, '.a', '.lib' ) },;
                           { "Harbour TIP        library - Hbtip"  , 'hbtip' + IIF( lGcc, '.a', '.lib' ) } }
 
-   AEVAL( aInstaledLibs, { | x | AADD( aLibsDesc, { "User - " + x + " Library", x } ) } )
+   AEVAL( aInstaledLibs, { | x | AADD( aLibsDesc, { "User - " + padr(x,12) + " Library", x } ) } )
 
 RETURN aLibsDesc
 

@@ -1,5 +1,5 @@
 /*
- * $Id: pickarry.prg,v 1.6 2004/05/03 13:06:02 lculik Exp $
+ * $Id: pickarry.prg,v 1.8 2004/09/19 00:00:00 modalsist Exp $
  */
 
 STATIC someitems
@@ -7,7 +7,7 @@ STATIC lAdd := .F.
 
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
 #include "common.ch"
-FUNCTION PICKARRY( T, L, b, r, IN_ARRAY, OUT_ARRAY, aDefault, lAllowAll )
+FUNCTION PICKARRY( T, L, b, r, IN_ARRAY, OUT_ARRAY, aDefault, lAllowAll, cTitle )
 
 LOCAL nChoice    := 1
 LOCAL x
@@ -21,12 +21,17 @@ LOCAL cItem
 LOCAL cItem1
 LOCAL cTemp
 LOCAL cOldColor  := Setcolor()
-   DEFAULT lAllowAll TO .F.
+
+DEFAULT lAllowAll TO .F.
+DEFAULT cTitle to ""
+
    someitems := 0
 
    putscreen()
    Setcolor( 'gr+/rb,b+/w,w+/b,w/b+,w/b,w+/b' )
-   @ T - 1, L - 1 CLEAR TO b + 1, r + 1
+   @ T - 2, L - 1 CLEAR TO b + 1, r + 1
+   @ T - 2, L say cTitle
+// @ T - 1, L - 1 CLEAR TO b + 1, r + 1
    @ T - 1, L - 1 TO b + 1, r + 1 double
 
    FOR x := 1 TO NUM_ELEMS
