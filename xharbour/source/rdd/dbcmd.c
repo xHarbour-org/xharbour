@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.192 2002/03/19 06:26:11 alkresin Exp $
+ * $Id: dbcmd.c,v 1.197 2002/05/04 20:48:26 horacioroldan Exp $
  */
 
 /*
@@ -47,6 +47,15 @@
  * If you write modifications of your own for Harbour, it is your choice
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
+ *
+ */
+/*
+ * The following functions are added by
+ *       Horacio Roldan <harbour_ar@yahoo.com.ar>
+ *
+ * ordKeyVal()
+ * ordKeyAdd()
+ * ordKeyDel()
  *
  */
 
@@ -597,10 +606,6 @@ static USHORT hb_rddFieldIndex( AREAP pArea, char * szName )
  * -- FUNCTIONS ACCESSED FROM VIRTUAL MACHINE --
  */
 
-/*
- * Return the current WorkArea number.
- */
-
 USHORT hb_rddGetCurrentFieldPos( char * szName )
 {
    USHORT uiCount;
@@ -634,7 +639,9 @@ USHORT hb_rddGetCurrentFieldPos( char * szName )
    return 0;
 }
 
-
+/*
+ * Return the current WorkArea number.
+ */
 int  hb_rddGetCurrentWorkAreaNumber( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetCurrentWorkAreaNumber()"));
@@ -1432,6 +1439,7 @@ HB_FUNC( DBGOTO )
       hb_errRT_DBCMD( EG_ARG, EDBCMD_NOVAR, NULL, "DBGOTO" );
    else
       SELF_GOTOID( ( AREAP ) s_pCurrArea->pArea, pItem );
+   hb_ret();
 }
 
 HB_FUNC( DBGOTOP )
@@ -2357,7 +2365,8 @@ HB_FUNC( ORDCONDSET )
 
       if( lpdbOrdCondInfo->itmCobWhile )
          lpdbOrdCondInfo->fRest = TRUE;
-      if( lpdbOrdCondInfo->lNextCount || lpdbOrdCondInfo->lRecno || lpdbOrdCondInfo->fRest )
+      if( lpdbOrdCondInfo->lNextCount || lpdbOrdCondInfo->lRecno ||
+               lpdbOrdCondInfo->fRest || lpdbOrdCondInfo->fUseCurrent )
          lpdbOrdCondInfo->fAll = FALSE;
 
       hb_retl( SELF_ORDSETCOND( ( AREAP ) s_pCurrArea->pArea, lpdbOrdCondInfo ) == SUCCESS );
@@ -2515,7 +2524,6 @@ HB_FUNC( ORDKEYNO )
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYNO" );
-
 }
 
 HB_FUNC( ORDKEYVAL )
@@ -2533,6 +2541,48 @@ HB_FUNC( ORDKEYVAL )
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYVAL" );
 }
+
+HB_FUNC( ORDKEYADD )
+{
+   DBORDERINFO pOrderInfo;
+
+   if( s_pCurrArea )
+   {
+      pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
+      if( !pOrderInfo.itmOrder )
+         pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
+      pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
+      /* Either or both may be NIL */
+      pOrderInfo.itmNewVal = hb_param( 3 , HB_IT_ANY );
+      pOrderInfo.itmResult = hb_itemPutNL( NULL, 0 );
+      SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, DBOI_KEYADD, &pOrderInfo );
+      hb_itemReturn(  pOrderInfo.itmResult );
+      hb_itemRelease( pOrderInfo.itmResult );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYADD" );
+}
+HB_FUNC( ORDKEYDEL )
+{
+   DBORDERINFO pOrderInfo;
+
+   if( s_pCurrArea )
+   {
+      pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
+      if( !pOrderInfo.itmOrder )
+         pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
+      pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
+      /* Either or both may be NIL */
+      pOrderInfo.itmNewVal = hb_param( 3 , HB_IT_ANY );
+      pOrderInfo.itmResult = hb_itemPutNL( NULL, 0 );
+      SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, DBOI_KEYDELETE, &pOrderInfo );
+      hb_itemReturn(  pOrderInfo.itmResult );
+      hb_itemRelease( pOrderInfo.itmResult );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYDEL" );
+}
+
 #endif
 
 HB_FUNC( ORDLISTADD )
@@ -2547,6 +2597,7 @@ HB_FUNC( ORDLISTADD )
       */
       pOrderInfo.atomBagName = NULL;
       pOrderInfo.itmResult = hb_itemPutNI( NULL, 0 );
+      pOrderInfo.itmOrder = NULL;
       SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, DBOI_ORDERCOUNT, &pOrderInfo );
       bFirst = ( pOrderInfo.itmResult->type & HB_IT_NUMERIC ) &&
                   hb_itemGetNI( pOrderInfo.itmResult ) == 0;
@@ -2556,7 +2607,10 @@ HB_FUNC( ORDLISTADD )
       pOrderInfo.itmOrder  = hb_param( 2, HB_IT_STRING );
       if( !pOrderInfo.atomBagName )
       {
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_REL_BADPARAMETER, NULL, "ORDLISTADD" );
+         if ( hb_parinfo(1) != HB_IT_NIL )
+            hb_errRT_DBCMD( EG_ARG, EDBCMD_REL_BADPARAMETER, NULL, "ORDLISTADD" );
+         else
+            hb_itemRelease( pOrderInfo.itmResult );
          return;
       }
       SELF_ORDLSTADD( ( AREAP ) s_pCurrArea->pArea, &pOrderInfo );
@@ -3188,7 +3242,7 @@ HB_FUNC( DBINFO )
 
 HB_FUNC( DBORDERINFO )
 {
-   PHB_ITEM pType, pInfo;
+   PHB_ITEM pType;
    BOOL bDeleteItem;
    DBORDERINFO pOrderInfo;
 
@@ -3204,23 +3258,21 @@ HB_FUNC( DBORDERINFO )
          if( !pOrderInfo.itmOrder )
             pOrderInfo.itmOrder = hb_param( 3, HB_IT_NUMERIC );
 
-         /*  TODO: 4TH parameter is not supported in current ads code or the structure */
-         pInfo = hb_param( 4 , HB_IT_ANY );  /* Set new value */
-         if( !pInfo )
+         pOrderInfo.itmNewVal = hb_param( 4 , HB_IT_ANY );
+         if( !pOrderInfo.itmNewVal )
          {
-            pInfo = hb_itemNew( NULL );
+            pOrderInfo.itmNewVal = hb_itemNew( NULL );
             bDeleteItem = TRUE;
          }
          else
             bDeleteItem = FALSE;
-
          pOrderInfo.itmResult = hb_itemNew( NULL );
          SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, hb_itemGetNI( pType ), &pOrderInfo );
          hb_itemReturn(  pOrderInfo.itmResult );
          hb_itemRelease( pOrderInfo.itmResult );
 
          if( bDeleteItem )
-            hb_itemRelease( pInfo );
+            hb_itemRelease( pOrderInfo.itmNewVal );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBORDERINFO" );
@@ -3455,7 +3507,7 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
   pInfo.abName = ( BYTE * )  hb_xgrab( _POSIX_PATH_MAX + 1 );
   strcpy( ( char * ) pInfo.abName, szFileName );
   pInfo.atomAlias = ( BYTE * ) "__TMPAREA";
-  pInfo.fShared = !hb_set.HB_SET_EXCLUSIVE;
+  pInfo.fShared = FALSE;
   pInfo.fReadonly = FALSE;
 
 /* get the new area node */

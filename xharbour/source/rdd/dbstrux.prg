@@ -1,5 +1,5 @@
 /*
- * $Id: dbstrux.prg,v 1.9 2001/06/15 17:59:21 dholm Exp $
+ * $Id: dbstrux.prg,v 1.10 2002/04/26 11:10:29 alkresin Exp $
  */
 
 /*
@@ -126,8 +126,8 @@ FUNCTION __dbCreate( cFileName, cFileFrom, cRDDName, lNew, cAlias )
 
          dbUseArea( lNew,, cFileFrom ) 
 
-         dbEval( {|| AAdd( aStruct, { FIELD->FIELD_NAME ,;
-                                      FIELD->FIELD_TYPE ,;
+         dbEval( {|| AAdd( aStruct, { Rtrim(FIELD->FIELD_NAME) ,;
+                                      Rtrim(FIELD->FIELD_TYPE) ,;
                                       FIELD->FIELD_LEN ,;
                                       FIELD->FIELD_DEC } ) } )
          dbCloseArea()

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.9 2002/03/11 23:54:57 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.109 2002/05/08 05:25:02 mafact Exp $
  */
 
 /*
@@ -551,13 +551,15 @@ static void hb_dbfGetMemo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 /*
  * Write memo data.
  */
-static void hb_dbfWriteMemo( DBFAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULONG ulLen, ULONG * ulStoredBlock )
+static void hb_dbfWriteMemo( DBFAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULONG ulLen,
+                             ULONG * ulStoredBlock )
 {
    BYTE pBlock[ DBT_BLOCKSIZE ];
    BOOL bNewBlock;
    ULONG ulNewBlock, ulNextBlock;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbfWriteMemo(%p, %lu, %p, %lu, %p)", pArea, ulBlock, pItem, ulLen, ulStoredBlock));
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfWriteMemo(%p, %lu, %p, %lu, %p)", pArea, ulBlock, pItem,
+                           ulLen, ulNewBlock));
 
    memset( pBlock, 0x1A, DBT_BLOCKSIZE );
    bNewBlock = !( ulBlock && ulLen < DBT_BLOCKSIZE - 1 );
@@ -1589,6 +1591,8 @@ ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    /* Create memo file */
    if( bHasMemo )
    {
+      unsigned char *tmp;
+      ERRCODE result;
       pArea->szMemoFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
       pFileName = hb_fsFNameSplit( ( char * ) pCreateInfo->abName );
       pArea->szMemoFileName[ 0 ] = 0;
@@ -1601,8 +1605,11 @@ ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       strncat( pArea->szMemoFileName, hb_itemGetCPtr( pFileExt ),
                _POSIX_PATH_MAX - strlen( pArea->szMemoFileName ) );
       hb_itemRelease( pFileExt );
+      tmp = pCreateInfo->abName;
       pCreateInfo->abName = ( BYTE * ) pArea->szMemoFileName;
-      return SELF_CREATEMEMFILE( ( AREAP ) pArea, pCreateInfo );
+      result = SELF_CREATEMEMFILE( ( AREAP ) pArea, pCreateInfo );
+      pCreateInfo->abName = tmp;
+      return result;
    }
    else
       return SUCCESS;
@@ -1690,6 +1697,7 @@ ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    pArea->szDataFileName = (char *) hb_xgrab( strlen( (char * ) pOpenInfo->abName)+1 );
    strcpy( pArea->szDataFileName, ( char * ) pOpenInfo->abName );
    pArea->atomAlias = hb_dynsymGet( ( char * ) pOpenInfo->atomAlias );
+
    if( ( ( PHB_DYNS ) pArea->atomAlias )->hArea )
    {
       hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, ( char * ) pOpenInfo->atomAlias );
@@ -2500,13 +2508,18 @@ ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
 
    /* Update record count */
    if( pArea->fShared )
+   {
+      hb_fsLock( pArea->hDataFile, DBF_LOCKPOS, 1, FL_LOCK );
       pArea->ulRecCount = hb_dbfCalcRecCount( pArea );
+   }
 
    dbfHeader.ulRecCount = pArea->ulRecCount;
    dbfHeader.uiHeaderLen = pArea->uiHeaderLen;
    dbfHeader.uiRecordLen = pArea->uiRecordLen;
    hb_fsSeek( pArea->hDataFile, 0, FS_SET );
    hb_fsWrite( pArea->hDataFile, ( BYTE * ) &dbfHeader, sizeof( DBFHEADER ) );
+   if( pArea->fShared )
+      hb_fsLock( pArea->hDataFile, DBF_LOCKPOS, 1, FL_UNLOCK );
    pArea->fUpdateHeader = FALSE;
    return SUCCESS;
 }

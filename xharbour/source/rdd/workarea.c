@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.25 2002/02/10 15:50:00 alkresin Exp $
+ * $Id: workarea.c,v 1.27 2002/05/01 14:13:32 horacioroldan Exp $
  */
 
 /*
@@ -204,9 +204,9 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
          uiError = SELF_GOTO( pArea, 0 );
       else if( lUpDown < 0 )
       {
+         pArea->fEof = FALSE;
          uiError = SELF_GOTOP( pArea );
          pArea->fBof = TRUE;
-         pArea->fEof = FALSE;
       }
       else
       {
