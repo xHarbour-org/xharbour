@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.20 2004/05/25 18:56:47 guerra000 Exp $
+ * $Id: achoice.prg,v 1.21 2004/06/08 23:52:19 what32 Exp $
  */
 
 /*
@@ -617,7 +617,10 @@ STATIC PROCEDURE DispLine( cLine, nRow, nCol, lSelect, lHiLite, nNumCols )
    ELSE
       DispOutAt( nRow, nCol, Space( nNumCols ) )
    ENDIF
+
+   // Restore cursor position
    SetPos( nRow, nCol )
+
    ColorSelect( CLR_STANDARD )
 
    RETURN

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3043 2004/06/08 20:09:03 lculik Exp $
+ * $Id: ChangeLog,v 1.3044 2004/06/08 20:31:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-08 17:00 UTC-0800 Augusto Infante <august@winbuilt.com>
+  * source/rtl/Achoice.prg
+    + Added SetPos( nRow, nPos ) in line 620 after call to DispOutAt() to restore cursor position
 
 2004-06-08 13:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/filesys.c
