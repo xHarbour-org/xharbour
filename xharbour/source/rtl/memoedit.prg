@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.19 2004/05/11 22:47:40 modalsist Exp $
+ * $Id: memoedit.prg,v 1.20 2004/05/13 10:31:00 modalsist Exp $
  */
 
 /*
@@ -53,10 +53,14 @@
 
 /*
  * Eduardo Fernandes <eduardo@modalsistemas.com.br>
- * 11-May-2004
  *
+ * v.1.20
+ * Fixed bug in read only mode when run an user function. 
+ *
+ * v.1.19
  * Revision to proper working with tab columns, CTRL_T behaviour and other things.
  * See teditor.prg and ttextlin.prg to more details.
+ *
  */
 
 #include "common.ch"
@@ -175,7 +179,7 @@ METHOD KeyboardHook( nKey ) CLASS TMemoEditor
 
    local nUserKey
 
-   if ISCHARACTER( ::xUserFunction )
+   if ISCHARACTER( ::xUserFunction ) .and. ::lEditAllow
 
       nUserKey := ::xDo( iif( ::lDirty, ME_UNKEYX, ME_UNKEY ) )
       ::HandleUserKey( nKey, nUserKey )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2932 2004/05/13 02:14:57 modalsist Exp $
+ * $Id: ChangeLog,v 1.2934 2004/05/13 10:40:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-13 10:40 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
+  * source/rtl/memoedit.prg
+    ! Fixed bug in read-only mode when run an user function. Thanks to Stephan
+      Hennekens.
 
 2004-05-13 15:25 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/teditor.prg
