@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.10 2003/06/21 06:59:22 jonnymind Exp $
+ * $Id: hberrors.h,v 1.11 2003/10/26 03:34:10 ronpinkas Exp $
  */
 
 /*
@@ -178,6 +178,7 @@ extern "C" {
 #define HB_PP_ERR_TOO_MANY_MARKERS              20
 #define HB_PP_ERR_UNCLOSED_OPTIONAL             21
 #define HB_PP_ERR_UNCLOSED_REPEATABLE           22
+#define HB_PP_ERR_UNKNOWN_RESULTMARKER          23
 
 #define HB_PP_WARN_DEFINE_REDEF                 1
 #define HB_PP_WARN_NO_DIRECTIVES                2
