@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclienthttp.prg,v 1.11 2004/04/23 16:30:21 jonnymind Exp $
+* $Id: tipclienthttp.prg,v 1.12 2004/05/07 12:24:59 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -76,7 +76,7 @@ METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
          cTmp := CStr( cTmp )
          cTmp := AllTrim( cTmp )
          cTmp := TipEncoderUrl_Encode( cTmp )
-         cData += cTmp
+         cData += cTmp + "&"
       NEXT
       cData[-1] = ""
    ELSEIF HB_IsString( cPostData )

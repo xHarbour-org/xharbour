@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.31 2004/05/04 14:45:06 mauriliolongo Exp $
+ * $Id: Changelog,v 1.32 2004/05/07 12:24:58 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,7 +9,11 @@
 */
 
 2004-05-07 14:22 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
-  * contrib/tip/tipclienthttp.prg
+  * tipclienthttp.prg
+    ! In post form, the "&" field separator was missing :-/
+
+2004-05-07 14:22 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * tipclienthttp.prg
     + Added automatic authorization basic scheme if new field
       cAuthMode is set to "Basic". The cUserID and cPassword fields
       inside the oUrl object.
