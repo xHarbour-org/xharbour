@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.125 2003/11/27 20:18:04 jonnymind Exp $
+* $Id: thread.c,v 1.126 2003/11/27 20:34:55 jonnymind Exp $
 */
 
 /*
@@ -1313,7 +1313,7 @@ static void s_subscribeInternal( int mode )
    HB_THREAD_STUB
    int iWaitRes;
    ULONG ulWaitTime;
-   PHB_ITEM pNotifyVal;
+ 
 
    HB_MUTEX_STRUCT *Mutex = hb_parptr(1);
    PHB_ITEM pStatus = hb_param( 3, HB_IT_BYREF );
@@ -1337,24 +1337,25 @@ static void s_subscribeInternal( int mode )
    /* warining; does not checks if the current thread is holding the mutex */
    Mutex->waiting ++;
 
-   while( hb_arrayLen( Mutex->aEventObjects ) == 0 )
+   if ( hb_pcount() == 1 )
    {
-      if ( hb_pcount() == 1 )
+      while( hb_arrayLen( Mutex->aEventObjects ) == 0 )
       {
          HB_COND_WAIT( Mutex->cond, Mutex->mutex );
-         iWaitRes = 0;  /* means success of wait */
+      }
+      iWaitRes = 0;  /* means success of wait */
+   }
+   else
+   {
+      ulWaitTime = hb_parnl(2);
+      if ( ulWaitTime > 0 )
+      {
+         iWaitRes = HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, ulWaitTime);
       }
       else
       {
-         ulWaitTime = hb_parnl(2);
-         if ( ulWaitTime > 0 )
-         {
-            iWaitRes = HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, ulWaitTime);
-         }
-         else
-         {
-            iWaitRes = 0; /* Success! */
-         }
+         /* Remember that 0 means success */
+         iWaitRes = hb_arrayLen( Mutex->aEventObjects ) == 0;
       }
    }
 
@@ -1368,8 +1369,7 @@ static void s_subscribeInternal( int mode )
          pStatus->type = HB_IT_LOGICAL;
          pStatus->item.asLogical.value = 1;
       }
-      pNotifyVal = hb_arrayGetItemPtr( Mutex->aEventObjects, 1 );
-      hb_itemReturn( pNotifyVal );
+      hb_itemReturn( hb_arrayGetItemPtr( Mutex->aEventObjects, 1 ) );
       hb_arrayDel( Mutex->aEventObjects, 1 );
       hb_arraySize( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) - 1);
    }
@@ -1384,6 +1384,7 @@ static void s_subscribeInternal( int mode )
    }
 
    HB_CRITICAL_UNLOCK( Mutex->mutex );
+   
    HB_STACK_LOCK;
 }
 
@@ -1404,7 +1405,7 @@ HB_FUNC( NOTIFY )
 {
    HB_MUTEX_STRUCT *Mutex = hb_parptr(1);
    PHB_ITEM pVal = hb_param( 2, HB_IT_ANY );
-
+      
    /* Parameter error checking */
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
@@ -1413,13 +1414,17 @@ HB_FUNC( NOTIFY )
       return;
    }
 
+   HB_CRITICAL_LOCK( Mutex->mutex );
    if ( pVal == NULL )
    {
-      pVal = hb_itemNew( NULL );
+      /* add a NIL at bottom */
+      hb_arraySize( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects ) + 1 );
    }
-
-   HB_CRITICAL_LOCK( Mutex->mutex );
-   hb_arrayAddForward( Mutex->aEventObjects, pVal );
+   else
+   {
+      hb_arrayAdd( Mutex->aEventObjects, pVal );
+   }
+   
    HB_COND_SIGNAL( Mutex->cond );
    HB_CRITICAL_UNLOCK( Mutex->mutex );
 }

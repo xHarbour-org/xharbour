@@ -2,7 +2,7 @@
 * Complex example of Multi thread usage
 *
 * Giancarlo Niccolai
-* $Id: mtcomplex.prg,v 1.13 2003/11/26 19:43:27 jonnymind Exp $
+* $Id: mtcomplex.prg,v 1.14 2003/11/26 21:58:35 jonnymind Exp $
 *
 * Here we have a main thread counting, and some secondary
 * threads counting too (in different fashons).
@@ -27,11 +27,11 @@ PROCEDURE Main()
    @3,17 SAY "Press any key to terminate in every moment"
 
    StartThread ( @ThreadFunc(), 10, "1st. Thread", 100, Mutex )
-   StartThread ( @ThreadFunc(), 11, "2nd. Thread", 400, Mutex )
+   StartThread ( @ThreadFunc(), 11, "2nd. Thread", 250, Mutex )
 
    /* Test of the { codeblock } grammar */
    StartThread ( { | nRow, cName, nLoops, Mtx| ThreadFunc(nRow, cName, nLoops, Mtx) } ;
-         , 12, "3rd. Thread", 600, Mutex )
+         , 12, "3rd. Thread", 300, Mutex )
 
    Thread4Handle := StartThread( @ThreadFunc(), 13, "4th. Thread", 700, Mutex )
 
@@ -88,7 +88,7 @@ RETURN
 
 PROCEDURE WaitForThis( nRow )
 
-   ThreadSleep( 30 - nRow * 2 )
+   ThreadSleep( 30  )
 
 RETURN
 
@@ -100,12 +100,12 @@ PROCEDURE MonitorFunc( Mutex )
    @ 6, 5 SAY "->> Thread finished:"
 
    DO WHILE .T.
-      cName = Subscribe( Mutex )
+      cName := Subscribe( Mutex )
 
       IF cName != NIL
          @ 6, 26 SAY cName
       ELSE
-         @ 6, 26 SAY "waiting ...           " 
+         @ 6, 26 SAY "Unknown ..             " 
       ENDIF
 
       ThreadSleep( 1500 )
