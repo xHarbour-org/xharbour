@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: fparse.c,v 1.1 2004/02/15 03:12:49 andijahja Exp $
  */
 
 /*
@@ -72,14 +72,14 @@ FPARSE( cFile, cDelimiter ) -> array
 #define MAX_READ 4096
 
 //----------------------------------------------------------------------------//
-static char ** hb_tokensplit ( char *string, BYTE delimiter )
+static char ** hb_tokensplit ( char *string, BYTE delimiter, int iCharCount )
 {
    char *buffer, *bufptr;
    char **token_list;
    char last_char = '\0';
    int word_count = 0, word_nbr;
 
-   buffer = (char *) hb_xgrab ( strlen (string) + 1 );
+   buffer = (char *) hb_xgrab ( iCharCount + 1 );
 
    bufptr = buffer;
 
@@ -129,7 +129,7 @@ static char ** hb_tokensplit ( char *string, BYTE delimiter )
 }
 
 //----------------------------------------------------------------------------//
-static BOOL file_read ( FILE *stream, char *string )
+static BOOL file_read ( FILE *stream, char *string, int *iCharCount )
 {
    int ch, cnbr = 0;
 
@@ -141,6 +141,7 @@ static BOOL file_read ( FILE *stream, char *string )
 
       if ( (ch == '\n') ||  (ch == EOF) ||  (ch == 26) )
       {
+         *iCharCount = cnbr;
          string [cnbr] = '\0';
          return (ch == '\n' || cnbr);
       }
@@ -154,6 +155,7 @@ static BOOL file_read ( FILE *stream, char *string )
 
       if (cnbr >= MAX_READ)
       {
+         *iCharCount = cnbr;
          string [MAX_READ] = '\0';
          return (TRUE);
       }
@@ -169,7 +171,7 @@ HB_FUNC( FPARSE )
    PHB_ITEM pArray , pItem;
    char *string ;
    char **tokens;
-   int iToken;
+   int iToken, iCharCount = 0;
    BYTE nByte;
 
    /* file parameter correctly passed */
@@ -196,44 +198,40 @@ HB_FUNC( FPARSE )
    }
 
    /* default delimiter to comma, chr(44) */
-   nByte = pDelim ? (BYTE) pDelim->item.asString.value[0] : 44;
+   nByte = pDelim ? (BYTE) pDelim->item.asString.value[0] : (BYTE) 44;
 
    /* the main array */
    pArray = hb_itemNew( NULL );
+   hb_arrayNew( pArray, 0 );
 
    /* book memory for line to read */
    string = (char*) hb_xgrab( MAX_READ + 1 );
 
-   /* array for parsed line */
-   hb_arrayNew( pArray, 0 );
+   /* container for parsed line */
    pItem = hb_itemNew( NULL );
 
    /* read the file until EOF */
-   while ( file_read ( inFile, string ) )
+   while ( file_read ( inFile, string, &iCharCount ) )
    {
-     /* parse the read line */
-     tokens = hb_tokensplit ( string, nByte ) ;
+      /* parse the read line */
+      tokens = hb_tokensplit ( string, nByte, iCharCount ) ;
 
-     if ( tokens )
-     {
-        /* prepare empty array */
-        hb_arrayNew( pItem, 0 );
+      /* prepare empty array */
+      hb_arrayNew( pItem, 0 );
 
-        /* add parsed text to array */
-        for (iToken = 0; tokens [iToken]; iToken++)
-        {
-           hb_arrayAddForward( pItem, hb_itemPutC( NULL, tokens [iToken] ) );
-        }
+      /* add parsed text to array */
+      for (iToken = 0; tokens [iToken]; iToken++)
+      {
+         hb_arrayAddForward( pItem, hb_itemPutC( NULL, tokens [iToken] ) );
+      }
 
-        /* add array containing parsed text to main array */
-        hb_arrayAddForward( pArray, pItem );
+      /* add array containing parsed text to main array */
+      hb_arrayAddForward( pArray, pItem );
 
-     }
-
-     /* clean up */
-     tokens--;
-     hb_xfree( tokens [0] );
-     hb_xfree( tokens );
+      /* clean up */
+      tokens--;
+      hb_xfree( tokens [0] );
+      hb_xfree( tokens );
    }
 
    /* return main array */

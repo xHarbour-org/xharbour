@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.40 2003/12/06 15:33:39 jonnymind Exp $
+ * $Id: console.c,v 1.41 2003/12/17 23:55:14 ronpinkas Exp $
  */
 /*
  * Harbour Project source code:
@@ -215,7 +215,7 @@ void hb_conRelease( void )
    }
 }
 
-char * hb_conNewLine( void )
+char HB_EXPORT * hb_conNewLine( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conNewLine()"));
 
@@ -281,7 +281,7 @@ void hb_conOutStd( char * pStr, ULONG ulLen )
 }
 
 /* Output an item to STDERR */
-void hb_conOutErr( char * pStr, ULONG ulLen )
+void HB_EXPORT hb_conOutErr( char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutErr(%s, %lu)", pStr, ulLen));
 

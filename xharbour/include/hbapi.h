@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.117 2004/02/14 22:11:50 andijahja Exp $
+ * $Id: hbapi.h,v 1.118 2004/02/16 12:28:45 andijahja Exp $
  */
 
 /*
@@ -537,10 +537,10 @@ HB_EXPORT       PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar );
 /* console I/O subsystem */
 extern void     hb_conInit( void ); /* initialize the console API system */
 extern void     hb_conRelease( void ); /* release the console API system */
-extern char *   hb_conNewLine( void ); /* retrieve a pointer to a static buffer containing new-line characters */
+extern char     HB_EXPORT *hb_conNewLine( void ); /* retrieve a pointer to a static buffer containing new-line characters */
 extern void     hb_conOutAlt( char * pStr, ULONG ulLen ); /* output an string to console and/or printer/alternative device/file */
 extern void     hb_conOutStd( char * pStr, ULONG ulLen ); /* output an string to STDOUT */
-extern void     hb_conOutErr( char * pStr, ULONG ulLen ); /* output an string to STDERR */
+extern void     HB_EXPORT hb_conOutErr( char * pStr, ULONG ulLen ); /* output an string to STDERR */
 extern USHORT   hb_conSetCursor( BOOL bSetCursor, USHORT usNewCursor ); /* retrieve and optionally set cursor shape */
 extern char *   hb_conSetColor( char * szColor ); /* retrieve and optionally set console color */
 extern void     hb_conXSaveRestRelease( void ); /* release the save/restore API */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2314 2004/02/17 18:44:11 andijahja Exp $
+ * $Id: ChangeLog,v 1.2315 2004/02/18 08:55:34 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-18 17:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/hberrors.h
+    ! minor correction on error code definition
+      HB_COMP_ERR_CREATE_HIL : 33 -> 60
+    + new error code HB_COMP_ERR_ILLEGAL_CHARACTER
+      This is to generate compiling error when variable name contains
+      non-alpha-numeric ( except underscore ).
+
+  * source/compiler/hbgenerr.c
+  * source/compiler/harbour.c
+    + add error handler for illegal character in variable names.
+      This is however is guarded by HB_COMMON_VARNAME_OFF define. Those
+      who wish to have xHarbour accepts non-alphanum characters as parts of
+      variable name can turn off this checking routine by defining
+      HB_COMMON_VARNAME_OFF when building harbour.exe.
+
+  + tests/tstlegal.prg
+    ! test program for legal/illegal characters in variable names in
+      accordance with the feature described above. This file demonstrates
+      why the above changes are taken up.
+
+  * source/rtl/fparse.c
+    ! optimization
+
+  * include/hbapi.h
+  * source/rtl/console.c
+    ! exporting: hb_conNewLine() and hb_conOutErr()
 
 2004-02-18 01:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/tgetint.prg

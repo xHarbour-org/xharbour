@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.13 2003/09/27 17:25:51 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.14 2003/10/05 18:55:36 ronpinkas Exp $
  */
 
 /*
@@ -33,7 +33,7 @@ extern char *yytext;
 /* Table with parse errors */
 char * hb_comp_szErrors[] =
 {
-   "Statement not allowed outside of procedure or function",
+/* 1 */   "Statement not allowed outside of procedure or function",
    "Redefinition of procedure or function: \'%s\'",
    "Duplicate variable declaration: \'%s\'",
    "%s declaration follows executable statement",
@@ -42,7 +42,7 @@ char * hb_comp_szErrors[] =
    "Unterminated string: \'%s\'",
    "Redefinition of predefined function %s: \'%s\'",
    "Illegal variable \'%s\' initializer: \'%s\'",
-   "ENDIF does not match IF",
+/* 10 */   "ENDIF does not match IF",
    "ENDDO does not match WHILE",
    "ENDCASE does not match DO CASE",
    "NEXT does not match FOR",
@@ -52,7 +52,7 @@ char * hb_comp_szErrors[] =
    "Unclosed control structure %s",
    "%s statement with no loop in sight",
    "Syntax error: \'%s\' in: \'%s\'",
-   "Incomplete statement or unbalanced delimiters",
+/* 20 */   "Incomplete statement or unbalanced delimiters",
    "Incorrect number of arguments: %s %s",
    "Invalid lvalue: \'%s\'",
    "Invalid use of \'@\' (pass by reference): \'%s\'",
@@ -62,7 +62,7 @@ char * hb_comp_szErrors[] =
    "Could not allocate %s byte(s)",
    "Could not reallocate %s byte(s)",
    "Freeing a NULL memory pointer",
-   "Syntax error: \"%s at \'%s\'\"",
+/* 30 */   "Syntax error: \"%s at \'%s\'\"",
    "Jump offset too long",
    "Can't create output file: \'%s\'",
    "Can't create preprocessed output file: \'%s\'",
@@ -72,7 +72,7 @@ char * hb_comp_szErrors[] =
    "Mayhem in CASE handler",
    "Operation not supported for this data type: \'%s\'",
    "Invalid alias expression: \'%s\'",
-   "Invalid array index expression: \'%s\'",
+/* 40 */   "Invalid array index expression: \'%s\'",
    "Bound error: \'%s\'",
    "Macro of declared symbol: \'%s\'",
    "Invalid selector in send: \'%s\'",
@@ -82,7 +82,7 @@ char * hb_comp_szErrors[] =
    "Code block contains both macro and declared symbol references",
    "GET contains complex macro",
    "Unterminated inline block in function: \'%s\'",
-   "Too many inline blocks %s",
+/* 50 */   "Too many inline blocks %s",
    "Inline C requires C output generation, use -gc[n]",
    "Missing ENDTEXT",
    "Optimized Local [%s] out of range, after offsetting %s PARAMETERS.",
@@ -92,7 +92,8 @@ char * hb_comp_szErrors[] =
    "External Global declaration can not include initializer \'%s\'.",
    "Too many Parameter declarations \'%s\'.",
    "Invalid SWITCH Constant \'%s\'.",
-   "Cannot write HIL table to \'%s\'."
+/* 60 */   "Cannot write HIL table to \'%s\'.",
+   "Illegal character \'%s\'."
 };
 
 /* Table with parse warnings */
