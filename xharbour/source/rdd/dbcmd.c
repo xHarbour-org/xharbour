@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.143 2005/02/24 10:44:04 andijahja Exp $
+ * $Id: dbcmd.c,v 1.144 2005/02/27 14:14:15 andijahja Exp $
  */
 
 /*
@@ -2400,27 +2400,15 @@ HB_FUNC( DBUSEAREA )
       return;
    }
 
-   szFileName[ _POSIX_PATH_MAX ] = '\0';
-   strncpy( szFileName, hb_parcx( 3 ), _POSIX_PATH_MAX );
-   /* Convert FileName accoring to Sets (_SET_DIRCASE,_SET_FILECASE,_SET_DIRSEPARATOR) */
-   hb_fileNameConv( szFileName );
-
+   hb_strncpy( szFileName, hb_parc( 3 ), _POSIX_PATH_MAX );
    pFileName = hb_fsFNameSplit( szFileName );
-
-   szAlias[ 0 ] = szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH ] = '\0';
-
-   if( ISCHAR(4) )
+   hb_strncpy( szAlias, hb_parcx( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+   if( ! *szAlias )
    {
-      strncat( szAlias, hb_parc( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
-   }
-
-   if( strlen( szAlias ) == 0 )
-   {
-      strncat( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      hb_strncpy( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
    }
 
    uiLen = strlen( szAlias );
-
    if( szAlias[ 0 ] >= '0' && szAlias[ 0 ] <= '9' )
    {
       hb_xfree( pFileName );
@@ -2439,7 +2427,7 @@ HB_FUNC( DBUSEAREA )
       }
    }
 
-   // Verify if the alias is already in use
+   /* Verify if the alias is already in use */
    if( hb_rddSelect( szAlias ) )
    {
       hb_xfree( pFileName );
@@ -2466,9 +2454,6 @@ HB_FUNC( DBUSEAREA )
    }
    pArea = HB_CURRENT_WA;
 
-   szFileName[ _POSIX_PATH_MAX ] = '\0';
-   strncpy( szFileName, hb_parcx( 3 ), _POSIX_PATH_MAX );
-
    if( ! pFileName->szExtension )
    {
       HB_ITEM extItm;
@@ -2476,7 +2461,7 @@ HB_FUNC( DBUSEAREA )
       SELF_INFO( pArea, DBI_TABLEEXT, &extItm );
       if( HB_IS_STRING( &extItm ) )
       {
-         strncat( szFileName, extItm.item.asString.value, _POSIX_PATH_MAX - strlen( szFileName ) );
+         hb_strncat( szFileName, extItm.item.asString.value, _POSIX_PATH_MAX );
       }
       hb_itemClear( &extItm );
    }
@@ -2912,7 +2897,24 @@ HB_FUNC( ORDCONDSET )
          lpdbOrdCondInfo->abFor = NULL;
       }
 
-      if( ISCHAR( 17 ) && ( ulLen = hb_parclen( 17 ) ) > 0 )
+      pItem = hb_param( 2, HB_IT_BLOCK );
+      if( pItem )
+      {
+         lpdbOrdCondInfo->itmCobFor = hb_itemNew( NULL );
+         hb_itemCopy( lpdbOrdCondInfo->itmCobFor, pItem );
+      }
+      else
+      {
+         lpdbOrdCondInfo->itmCobFor = NULL;
+      }
+
+      if( ISLOG( 3 ) )
+         lpdbOrdCondInfo->fAll = hb_parl( 3 );
+      else
+         lpdbOrdCondInfo->fAll = TRUE;
+
+      ulLen = hb_parclen( 17 );
+      if( ulLen > 0 )
       {
          lpdbOrdCondInfo->abWhile = ( BYTE * ) hb_xgrab( ulLen + 1 );
          strcpy( ( char * ) lpdbOrdCondInfo->abWhile, hb_parc( 17 ) );
@@ -2921,19 +2923,6 @@ HB_FUNC( ORDCONDSET )
       {
          lpdbOrdCondInfo->abWhile = NULL;
       }
-
-      pItem = hb_param( 2, HB_IT_BLOCK );
-      if( pItem )
-      {
-         lpdbOrdCondInfo->itmCobFor = hb_itemNew( NULL );
-         hb_itemCopy( lpdbOrdCondInfo->itmCobFor, pItem );
-      }
-      else
-         lpdbOrdCondInfo->itmCobFor = NULL;
-      if( ISLOG( 3 ) )
-         lpdbOrdCondInfo->fAll = hb_parl( 3 );
-      else
-         lpdbOrdCondInfo->fAll = TRUE;
 
       pItem = hb_param( 4, HB_IT_BLOCK );
       if( pItem )
@@ -2965,11 +2954,22 @@ HB_FUNC( ORDCONDSET )
       lpdbOrdCondInfo->fCustom     = hb_parl( 15 );
       lpdbOrdCondInfo->fNoOptimize = hb_parl( 16 );
 
+      /* lpdbOrdCondInfo->fTemporary  = hb_parl( 18 ); */
+      /* lpdbOrdCondInfo->fUseFilter  = hb_parl( 19 ); */
+
       if( lpdbOrdCondInfo->itmCobWhile )
          lpdbOrdCondInfo->fRest = TRUE;
       if( lpdbOrdCondInfo->lNextCount || lpdbOrdCondInfo->lRecno ||
                lpdbOrdCondInfo->fRest || lpdbOrdCondInfo->fUseCurrent )
          lpdbOrdCondInfo->fAll = FALSE;
+
+      lpdbOrdCondInfo->fActive = !lpdbOrdCondInfo->fAll ||
+               lpdbOrdCondInfo->abFor || lpdbOrdCondInfo->itmCobFor ||
+               lpdbOrdCondInfo->abWhile || lpdbOrdCondInfo->itmCobWhile ||
+               lpdbOrdCondInfo->fNoOptimize || lpdbOrdCondInfo->itmCobEval;
+
+      /* lpdbOrdCondInfo->fScoped  = !lpdbOrdCondInfo->fAll; */
+      lpdbOrdCondInfo->lpvCargo = NULL;
 
       hb_retl( SELF_ORDSETCOND( pArea, lpdbOrdCondInfo ) == SUCCESS );
    }
@@ -4711,6 +4711,8 @@ HB_FUNC( DBUSEAREAD )
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
    AREAP pArea;
 
+   hb_rddCheck();
+
    s_bNetError = FALSE;
 
    /* New area? */
@@ -4723,9 +4725,7 @@ HB_FUNC( DBUSEAREAD )
       hb_rddReleaseCurrentArea();
    }
 
-   hb_rddCheck();
    uiLen = ( USHORT ) hb_parclen( 2 );
-
    if( uiLen > 0 )
    {
       if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
@@ -4739,7 +4739,7 @@ HB_FUNC( DBUSEAREAD )
 
    if( hb_parclen(3) == 0 )
    {
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREAD" );
       return;
    }
 
@@ -4783,7 +4783,7 @@ HB_FUNC( DBUSEAREAD )
    /* Create a new WorkArea node */
    if( !hb_rddInsertAreaNode( szDriver ) )
    {
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBUSEAREA" );
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBUSEAREAD" );
       return;
    }
    pArea = HB_CURRENT_WA;

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.111 2005/02/26 15:16:49 andijahja Exp $
+ * $Id: dbf1.c,v 1.112 2005/02/27 11:56:02 andijahja Exp $
  */
 
 /*
@@ -285,7 +285,10 @@ static BOOL hb_dbfReadRecord( DBFAREAP pArea )
 
    /* Set flags */
    pArea->fValidBuffer = pArea->fPositioned = TRUE;
-   pArea->fDeleted = ( pArea->pRecord[ 0 ] == '*' );
+   pArea->fEncrypted = ( pArea->pRecord[ 0 ] == 'D' ||
+                         pArea->pRecord[ 0 ] == 'E' );
+   pArea->fDeleted = pArea->fEncrypted ? pArea->pRecord[ 0 ] == 'D' :
+                                         pArea->pRecord[ 0 ] == '*';
    return TRUE;
 }
 
@@ -831,7 +834,7 @@ static ERRCODE hb_dbfGoTo( DBFAREAP pArea, ULONG ulRecNo )
    {
       pArea->ulRecNo = pArea->ulRecCount + 1;
       pArea->fBof = pArea->fEof = pArea->fValidBuffer = TRUE;
-      pArea->fPositioned = pArea->fDeleted = FALSE;
+      pArea->fPositioned = pArea->fDeleted = pArea->fEncrypted = FALSE;
 
       /* Clear record buffer */
       hb_dbfSetBlankRecord( pArea ) ;
@@ -1031,7 +1034,8 @@ static ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
    pArea->fAppend = pArea->fPositioned = TRUE;
    pArea->ulRecCount ++;
    pArea->ulRecNo = pArea->ulRecCount;
-   pArea->fDeleted = pArea->fBof = pArea->fEof = pArea->fFound = FALSE;
+   pArea->fDeleted = pArea->fEncrypted = pArea->fBof = pArea->fEof =
+   pArea->fFound = FALSE;
 
    if( pArea->fShared )
    {
@@ -1063,7 +1067,7 @@ static ERRCODE hb_dbfDeleteRec( DBFAREAP pArea )
    if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   pArea->pRecord[ 0 ] = '*';
+   pArea->pRecord[ 0 ] = pArea->fEncrypted ? 'D' : '*';
    pArea->fDeleted = TRUE;
    return SUCCESS;
 }
@@ -1623,7 +1627,7 @@ static ERRCODE hb_dbfRecall( DBFAREAP pArea )
    if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   pArea->pRecord[ 0 ] = ' ';
+   pArea->pRecord[ 0 ] = pArea->fEncrypted ? 'E' : ' ';
    pArea->fDeleted = FALSE;
    return SUCCESS;
 }
@@ -1755,14 +1759,30 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    DBFFIELD * pBuffer, *pThisField;
    PHB_FNAME pFileName;
    PHB_ITEM pFileExt, pError;
+   BYTE szFileName[ _POSIX_PATH_MAX + 1 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfCreate(%p, %p)", pArea, pCreateInfo));
+
+   pFileName = hb_fsFNameSplit( ( char * ) pCreateInfo->abName );
+   if( ! pFileName->szExtension )
+   {
+      pFileExt = hb_itemPutC( NULL, "" );
+      SELF_INFO( ( AREAP ) pArea, DBI_TABLEEXT, pFileExt );
+      pFileName->szExtension = hb_itemGetCPtr( pFileExt );
+      hb_fsFNameMerge( ( char * ) szFileName, pFileName );
+      hb_itemRelease( pFileExt );
+   }
+   else
+   {
+      hb_strncpy( ( char * ) szFileName, ( char * ) pCreateInfo->abName, _POSIX_PATH_MAX );
+   }
+   hb_xfree( pFileName );
 
    pError = NULL;
    /* Try create */
    do
    {
-      pArea->hDataFile = hb_spCreate( pCreateInfo->abName, FC_NORMAL );
+      pArea->hDataFile = hb_spCreate( szFileName, FC_NORMAL );
       if( pArea->hDataFile == FS_ERROR )
       {
          if( !pError )
@@ -1772,7 +1792,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             hb_errPutSubCode( pError, EDBF_CREATE_DBF );
             hb_errPutOsCode( pError, hb_fsError() );
             hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
-            hb_errPutFileName( pError, ( char * ) pCreateInfo->abName );
+            hb_errPutFileName( pError, ( char * ) szFileName );
             hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
          }
          bRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
@@ -1791,8 +1811,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       return FAILURE;
    }
 
-   pArea->szDataFileName = (char *) hb_xgrab( strlen( (char * ) pCreateInfo->abName)+1 );
-   strcpy( pArea->szDataFileName, ( char * ) pCreateInfo->abName );
+   pArea->szDataFileName = hb_strdup( ( char * ) szFileName );
    uiSize = pArea->uiFieldCount * sizeof( DBFFIELD );
 
    pBuffer = ( DBFFIELD * ) hb_xgrab( uiSize );
@@ -1907,22 +1926,16 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    {
       BYTE *tmp;
       ERRCODE result;
-      pArea->szMemoFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-      pFileName = hb_fsFNameSplit( ( char * ) pCreateInfo->abName );
-      pArea->szMemoFileName[ 0 ] = 0;
 
-      if ( pFileName->szPath )
-      {
-         strcat( pArea->szMemoFileName, pFileName->szPath );
-      }
-
-      strcat( pArea->szMemoFileName, pFileName->szName );
-      hb_xfree( pFileName );
+      pFileName = hb_fsFNameSplit( ( char * ) szFileName );
       pFileExt = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) pArea, DBI_MEMOEXT, pFileExt );
-      strncat( pArea->szMemoFileName, pFileExt->item.asString.value,
-               _POSIX_PATH_MAX - strlen( pArea->szMemoFileName ) );
+      pFileName->szExtension = hb_itemGetCPtr( pFileExt );
+      hb_fsFNameMerge( ( char * ) szFileName, pFileName );
       hb_itemRelease( pFileExt );
+      hb_xfree( pFileName );
+      pArea->szMemoFileName = hb_strdup( ( char * ) szFileName );
+
       tmp = pCreateInfo->abName;
       pCreateInfo->abName = ( BYTE * ) pArea->szMemoFileName;
       result = SELF_CREATEMEMFILE( ( AREAP ) pArea, pCreateInfo );
@@ -2041,8 +2054,8 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             if ( pArea->fAppend )
             {
-               hb_dbfSetBlankRecord( pArea ) ;
-               pArea->fDeleted = FALSE;
+               hb_dbfSetBlankRecord( pArea );
+               pArea->fDeleted = pArea->fEncrypted = FALSE;
             }
             else
             {
@@ -2051,8 +2064,28 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          }
          break;
 
+      case DBI_DB_VERSION:
+      case DBI_RDD_VERSION:
+      {
+         char szBuf[ 64 ];
+         int iSub = hb_itemGetNI( pItem );
+
+         if ( iSub == 1 )
+            snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s)", 0, 1, "DBF" );
+         else if ( iSub == 2 )
+            snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s:%d)", 0, 1, "DBF", pArea->rddID );
+/*
+            snprintf( szBuf, sizeof( szBuf ), "%d.%d (%s:%d)", 0, 1, pArea->pRddNode->szName, pArea->rddID );
+*/
+         else
+            snprintf( szBuf, sizeof( szBuf ), "%d.%d", 0, 1 );
+         hb_itemPutC( pItem, szBuf );
+         break;
+      }
+
       default:
          return SUPER_INFO( ( AREAP ) pArea, uiIndex, pItem );
+
    }
 
    return SUCCESS;
@@ -2063,44 +2096,47 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
  */
 static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType, PHB_ITEM pInfo )
 {
-   ULONG ulRecNo = hb_itemGetNL( pRecID );
+   ULONG ulRecNo = hb_itemGetNL( pRecID ), ulPrevRec = 0;
+   ERRCODE errResult = SUCCESS;
+   BOOL bDeleted;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfRecInfo(%p, %p, %hu, %p)", pArea, pRecID, uiInfoType, pInfo));
 
+   if( pArea->lpdbPendingRel )
+      SELF_FORCEREL( ( AREAP ) pArea );
 
    if( ulRecNo == 0 )
    {
-      if( pArea->lpdbPendingRel )
-         SELF_FORCEREL( ( AREAP ) pArea );
       ulRecNo = pArea->ulRecNo;
+   }
+   else if ( ulRecNo != pArea->ulRecNo )
+   {
+      switch( uiInfoType )
+      {
+         case DBRI_DELETED:
+         case DBRI_ENCRYPTED:
+         case DBRI_RAWRECORD:
+         case DBRI_RAWMEMOS:
+         case DBRI_RAWDATA:
+            ulPrevRec = pArea->ulRecNo;
+            SELF_GOTO( ( AREAP ) pArea, ulRecNo );
+            break;
+      }
    }
 
    switch( uiInfoType )
    {
       case DBRI_DELETED:
-      {
-         BOOL bDeleted;
-         ULONG ulPrevRec = 0;
-
-         if( pArea->lpdbPendingRel )
-            SELF_FORCEREL( ( AREAP ) pArea );
-
-         if( pArea->ulRecNo != ulRecNo )
-         {
-            ulPrevRec = pArea->ulRecNo;
-            SELF_GOTO( ( AREAP ) pArea, ulRecNo );
-         }
-         SELF_DELETED( ( AREAP ) pArea, &bDeleted );
-         if( ulPrevRec != 0 )
-         {
-            SELF_GOTO( ( AREAP ) pArea, ulPrevRec );
-         }
-         hb_itemPutL( pInfo, bDeleted );
+         if ( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) != SUCCESS )
+            errResult = FAILURE;
+         else
+            hb_itemPutL( pInfo, bDeleted );
          break;
-      }
 
       case DBRI_LOCKED:
-         hb_itemPutL( pInfo, hb_dbfIsLocked( pArea, ulRecNo ) );
+         /* Clipper also checks only fShared and RLOCK and ignore FLOCK */
+         hb_itemPutL( pInfo, !pArea->fShared || /* pArea->fFLocked || */
+                              hb_dbfIsLocked( pArea, ulRecNo ) );
          break;
 
       case DBRI_RECSIZE:
@@ -2115,74 +2151,75 @@ static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType
          hb_itemPutL( pInfo, ulRecNo == pArea->ulRecNo && pArea->fRecordChanged );
          break;
 
+      case DBRI_ENCRYPTED:
+         if( !pArea->fValidBuffer && !hb_dbfReadRecord( pArea ) )
+            errResult = FAILURE;
+         else
+            hb_itemPutL( pInfo, pArea->fEncrypted );
+         break;
+
       case DBRI_RAWRECORD:
       case DBRI_RAWMEMOS:
       case DBRI_RAWDATA:
+      {
+         USHORT uiFields;
+         BYTE *pResult ;
+         ULONG ulLength;
+
+         if( !pArea->fValidBuffer && !hb_dbfReadRecord( pArea ) )
          {
-            USHORT uiFields;
-            BYTE *pResult ;
-            HB_ITEM itItem = HB_ITEM_NIL ;
-            ULONG ulLength;
-            ULONG ulPrevRec = 0;
-            BOOL bDeleted;
-            if( pArea->ulRecNo != ulRecNo )
-            {
-               ulPrevRec = pArea->ulRecNo;
-               SELF_GOTO( ( AREAP ) pArea, ulRecNo );
-            }
-            SELF_DELETED( ( AREAP ) pArea, &bDeleted );  /* No need to allow for == FAILURE here */
+            errResult = FAILURE;
+            break;
+         }
+         if ( uiInfoType == DBRI_RAWRECORD || uiInfoType == DBRI_RAWDATA )
+         {
+            ulLength = pArea->uiRecordLen;
+            pResult = (BYTE *) hb_xgrab( ulLength + 1 ) ;  /* Allow final '\0' placed by hb_itemPutCPtr */
+                                                           /* Assume xgrab ok - no memory checking */
+            memcpy( pResult, pArea->pRecord, ulLength ) ;
+         }
+         else
+         {
+            pResult = NULL;
+            ulLength = 0;
+         }
 
-            if ( uiInfoType == DBRI_RAWRECORD || uiInfoType == DBRI_RAWDATA )
+         if ( uiInfoType == DBRI_RAWMEMOS || uiInfoType == DBRI_RAWDATA )
+         {
+            for ( uiFields = 0; uiFields < pArea->uiFieldCount ; uiFields++ )
             {
-               ulLength = pArea->uiRecordLen;
-               pResult = (BYTE *) hb_xgrab( ulLength + 1 ) ;  /* Allow final '\0' placed by hb_itemPutCPtr */
-                                                              /* Assume xgrab ok - no memory checking */
-               memcpy( pResult, pArea->pRecord, ulLength ) ;
-            }
-            else
-            {
-               pResult = NULL;
-               ulLength = 0;
-            }
-
-            if ( uiInfoType == DBRI_RAWMEMOS || uiInfoType == DBRI_RAWDATA )
-            {
-               for ( uiFields = 0; uiFields < pArea->uiFieldCount ; uiFields++ )
+               if ( pArea->lpFields[ uiFields ].uiType == HB_IT_MEMO )
                {
-                  if ( pArea->lpFields[ uiFields ].uiType == HB_IT_MEMO )
+                  /* uiFields in SELF_GETVALUE() 1 based */
+                  if ( SELF_GETVALUE( ( AREAP ) pArea, uiFields + 1, pInfo ) == SUCCESS &&
+                       HB_IS_STRING( pInfo ) && pInfo->item.asString.length > 0 )
                   {
-                     /* uiFields in SELF_GETVALUE() 1 based */
-                     if ( SELF_GETVALUE( ( AREAP ) pArea, uiFields + 1, &itItem ) == SUCCESS &&
-                          HB_IS_STRING( &itItem ) && itItem.item.asString.length > 0 )
+                     if ( pResult )
                      {
-                        if ( pResult )
-                        {
-                           pResult = (BYTE *) hb_xrealloc( pResult, ulLength + 1 + itItem.item.asString.length ); /* Assume xgrab ok - no memory checking */
-                        }
-                        else
-                        {
-                           pResult = (BYTE *) hb_xgrab( itItem.item.asString.length + 1 );  /* Assume xgrab ok - no memory checking */
-                        }
-                        memcpy( pResult + ulLength, itItem.item.asString.value, itItem.item.asString.length );
-                        ulLength += itItem.item.asString.length;
+                        pResult = (BYTE *) hb_xrealloc( pResult, ulLength + 1 + pInfo->item.asString.length ); /* Assume xgrab ok - no memory checking */
                      }
+                     else
+                     {
+                        pResult = (BYTE *) hb_xgrab( pInfo->item.asString.length + 1 );  /* Assume xgrab ok - no memory checking */
+                     }
+                     memcpy( pResult + ulLength, pInfo->item.asString.value, pInfo->item.asString.length );
+                     ulLength += pInfo->item.asString.length;
                   }
                }
             }
-            hb_itemClear( &itItem );
-            hb_itemPutCPtr( pInfo, (char *) pResult, ulLength );
-
-            if( ulPrevRec != 0 )
-            {
-               SELF_GOTO( ( AREAP ) pArea, ulPrevRec );
-            }
-            break;
          }
+         hb_itemPutCPtr( pInfo, (char *) pResult, ulLength );
+         break;
+      }
 
       default:
-         return SUPER_RECINFO( ( AREAP ) pArea, pRecID, uiInfoType, pInfo );
+         errResult = SUPER_RECINFO( ( AREAP ) pArea, pRecID, uiInfoType, pInfo );
    }
-   return SUCCESS;
+   if( ulPrevRec != 0 )
+   {
+      SELF_GOTO( ( AREAP ) pArea, ulPrevRec );
+   }
+   return errResult;
 }
 
 /*
@@ -2215,7 +2252,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    BYTE * pBuffer;
    LPDBFFIELD pField;
    DBFIELDINFO pFieldInfo;
-   BYTE szPath[ _POSIX_PATH_MAX + 1 ];
+   BYTE szPath[ _POSIX_PATH_MAX + 1 ], szFileName[ _POSIX_PATH_MAX + 1 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfOpen(%p, %p)", pArea, pOpenInfo));
 
@@ -2226,6 +2263,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, ( char * ) pOpenInfo->atomAlias );
       return FAILURE;
    }
+   ( ( PHB_DYNS ) pArea->atomAlias )->hArea = pOpenInfo->uiArea;
 
    if ( !pArea->bLockType )
    {
@@ -2234,7 +2272,6 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       else
          pArea->bLockType = HB_SET_DBFLOCK_CLIP;
    }
-   ( ( PHB_DYNS ) pArea->atomAlias )->hArea = pOpenInfo->uiArea;
 #ifndef HB_CDP_SUPPORT_OFF
    if( pOpenInfo->cdpId )
    {
@@ -2258,13 +2295,28 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
              (pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE);
    pError = NULL;
 
+   pFileName = hb_fsFNameSplit( ( char * ) pOpenInfo->abName );
+   if( ! pFileName->szExtension )
+   {
+      pFileExt = hb_itemPutC( NULL, "" );
+      SELF_INFO( ( AREAP ) pArea, DBI_TABLEEXT, pFileExt );
+      pFileName->szExtension = hb_itemGetCPtr( pFileExt );
+      hb_fsFNameMerge( ( char * ) szFileName, pFileName );
+      hb_itemRelease( pFileExt );
+   }
+   else
+   {
+      hb_strncpy( ( char * ) szFileName, ( char * ) pOpenInfo->abName, _POSIX_PATH_MAX );
+   }
+   hb_xfree( pFileName );
+
    /* Try open */
    do
    {
       bLock = FALSE;
-      if ( ! hb_spFile( pOpenInfo->abName, szPath ) )
+      if ( ! hb_spFile( szFileName, szPath ) )
       {
-         hb_strncpy( ( char * ) szPath, ( const char * ) pOpenInfo->abName, _POSIX_PATH_MAX );
+         hb_strncpy( ( char * ) szPath, ( const char * ) szFileName, _POSIX_PATH_MAX );
       }
       pArea->hDataFile = hb_spOpen( szPath, uiFlags );
 #ifdef DBF_EXLUSIVE_LOCKPOS
@@ -2288,7 +2340,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             hb_errPutGenCode( pError, EG_OPEN );
             hb_errPutSubCode( pError, EDBF_OPEN_DBF );
             hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
-            hb_errPutFileName( pError, ( char * ) pOpenInfo->abName );
+            hb_errPutFileName( pError, ( char * ) szFileName );
             hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
          }
          /*
@@ -2516,20 +2568,18 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    if( pArea->fHasMemo )
    {
       BYTE *tmp;
+
       pFileName = hb_fsFNameSplit( ( char * ) szPath );
       pFileExt = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) pArea, DBI_MEMOEXT, pFileExt );
-
-      szPath[ 0 ] = 0;
-      if( pFileName->szPath )
-         strcat( ( char * ) szPath, pFileName->szPath );
-      strncat( ( char * ) szPath, pFileName->szName, _POSIX_PATH_MAX - strlen( ( char * ) szPath ) );
-      strncat( ( char * ) szPath, pFileExt->item.asString.value, _POSIX_PATH_MAX - strlen( ( char * ) szPath ) );
+      pFileName->szExtension = hb_itemGetCPtr( pFileExt );
+      hb_fsFNameMerge( ( char * ) szFileName, pFileName );
       hb_itemRelease( pFileExt );
       hb_xfree( pFileName );
+      pArea->szMemoFileName = hb_strdup( ( char * ) szFileName );
+
       tmp = pOpenInfo->abName;
-      pOpenInfo->abName = szPath;
-      pArea->szMemoFileName = hb_strdup( ( char * ) szPath );
+      pOpenInfo->abName = ( BYTE * ) pArea->szMemoFileName;
 
       /* Open memo file and exit if error */
       if( SELF_OPENMEMFILE( ( AREAP ) pArea, pOpenInfo ) == FAILURE )
@@ -2572,7 +2622,7 @@ static ERRCODE hb_dbfSysName( DBFAREAP pArea, BYTE * pBuffer )
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfSysName(%p, %p)", pArea, pBuffer));
    HB_SYMBOL_UNUSED( pArea );
 
-   strncpy( ( char * ) pBuffer, "DBF", 4 );
+   strcpy( ( char * ) pBuffer, "DBF" );
    return SUCCESS;
 }
 

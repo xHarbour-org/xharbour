@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.34 2005/01/30 21:19:24 druzus Exp $
+ * $Id: workarea.c,v 1.35 2005/02/12 19:54:03 druzus Exp $
  */
 
 /*
@@ -603,7 +603,7 @@ ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_FCOUNT:
-         hb_itemPutL( pItem, pArea->uiFieldCount );
+         hb_itemPutNI( pItem, pArea->uiFieldCount );
          break;
 
       case DBI_ALIAS:
@@ -616,6 +616,14 @@ ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutC( pItem, szAlias );
          break;
       }
+
+      case DBI_DB_VERSION:
+         hb_itemPutC( pItem, "" );
+         break;
+
+      case DBI_RDD_VERSION:
+         hb_itemPutC( pItem, "" );
+         break;
 
       default:
          return FAILURE;
@@ -1249,7 +1257,7 @@ ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
    else
       iCurrArea = 0;
 
-   hb_itemCopy( pArea->valResult, hb_vmEvalBlock( pBlock ) );
+   hb_itemCopy( pArea->valResult, hb_vmEvalBlockOrMacro( pBlock ) );
 
    if ( iCurrArea )
       hb_rddSelectWorkAreaNumber( iCurrArea );
