@@ -22,15 +22,29 @@
 #Include "windows.ch"
 #Include "hboo.ch"
 
-//#xCommand ? ? < x > = > OutputDebugString( asString( < x > ) )
-//#xCommand ? < x > = > OutputDebugString( asString( < x > ) + chr( 13 ) )
-
 Static hWndActive := 0
 Static aClass:={}  //cClass,nType,{{anWM,bAction,nProc,0}}
 Static aWindow:={} //hWnd, nType, {{anWM,bAction,nProc,nOldProc}}
 Static aDialog:={} //hDlg, {{anWM.bAction}} // maybe rather add them to aWindow as type 0 - dialog ?
 Static aProc       // array of possible windows procedures (10)
                    // for subclassing ???
+
+
+/*
+GLOBAL lPrevInstance
+GLOBAL hThisInstance
+
+*-----------------------------------------------------------------------------*
+
+INIT PROCEDURE _CheckMultiInst
+
+   lPrevInstance:=(empty(CreateMutex( , .T., GetModuleFileName())) ;
+                   .or. (GetLastError() > 0) )
+
+   hThisInstance:=GetModuleHandle()
+
+   RETURN
+*/
 
 
 *-----------------------------------------------------------------------------*
@@ -47,7 +61,7 @@ FUNCTION WhatVersion(dDate)
 //     bAction: event procedure codeblock
 //        anWM: selective messages to send to codeblock ( -1 == All )
 
-Function RegisterClass( wndclass, nType, bAction, anWM )
+Function RegisterClass( wndclass, nType, bAction, anWM, oObj, xCargo)
 
    Local aAction
 
@@ -77,11 +91,11 @@ Function RegisterClass( wndclass, nType, bAction, anWM )
       anWM := { anWM }
    EndIf
 
-   If ValType( bAction ) # "B"
+   If !(ValType( bAction ) $ "BN")
       bAction := NIL
    EndIf
 
-   aAction := { anWM, bAction, GetWndProc( 1 ) , 0 }
+   aAction := { anWM, bAction, GetWndProc( 1 ) , 0, oObj, xCargo }
    aAdd( aClass, { WNDCLASS:lpszClassName, nType, aAction } )
 
    Return( .T. )
@@ -220,6 +234,8 @@ Function _ProcessMsg( hWnd, nMsg, nwParam, nlParam, nIndex )
    Local cId
    Local bMenuBlock
    Local nOldProc
+   Local oObj
+   Local xCargo
 
    // setup list of possible procedures (max 10 per window )
 
@@ -272,9 +288,11 @@ Function _ProcessMsg( hWnd, nMsg, nwParam, nlParam, nIndex )
    If n > 0
       nType := aWindow[ n, 2 ]
       Do While ( i := aScan( aWindow[ n, 3 ] , { | x, y | nProc == x[ 3 ] } ) ) > 0 // does custom procedure exist ?
-         anWM := aWindow[ n, 3, i, 1 ]
+         anWM  := aWindow[ n, 3, i, 1 ]
          bProc := aWindow[ n, 3, i, 2 ]
-         If ! ( ValType( bProc ) == "B" .AND.  ( nMsg >= WM_USER .OR. anWM[ 1 ] == - 1 .OR. aScan( anWM, nMsg ) > 0 ) )
+         oObj  := aWindow[ n, 3, i, 5 ]
+         xCargo:= aWindow[ n, 3, i, 6 ]
+         If ! ( ValType( bProc ) $ "BN" .AND.  ( nMsg >= WM_USER .OR. anWM[ 1 ] == - 1 .OR. aScan( anWM, nMsg ) > 0 ) )
             If ( nProc := aWindow[ n, 3, i, 4 ] ) <> 0 // old procedure exists
                If aScan( aProc, nProc ) == 0  // not our procedure
                   Return CallWindowProc( nProc, hWnd, nMsg, nwParam, nlParam ) // external
@@ -300,7 +318,11 @@ Function _ProcessMsg( hWnd, nMsg, nwParam, nlParam, nIndex )
          nRet := DefWindowProc( hWnd, nMsg, nwParam, nlParam )
       EndIf
    Else
-      nRet := Eval( bProc, hWnd, nMsg, nwParam, nlParam )
+      If Valtype(bProc)=="N"
+         nRet := HB_Exec( bProc, oObj, hWnd, nMsg, nwParam, nlParam, xCargo )
+      Else
+         nRet := Eval( bProc, hWnd, nMsg, nwParam, nlParam )
+      Endif
    EndIf
 
    // remove the window from our internal list
@@ -356,11 +378,13 @@ Function _ProcessDlgMsg( hDlg, nMsg, nwParam, nlParam )
 
    nResult := if( ValType(aDialog[ nIndex, 2 ]) == "B", ;
                   eval( aDialog[ nIndex, 2 ] , hDlg, nMsg, nwParam, nlParam ),;
-                  0 ;
+                  if(Valtype(aDialog[ nIndex, 2 ])=="N", ;
+                     HB_Exec( aDialog[ nIndex,2 ], aDialog[ nIndex, 4], hDlg, nMsg, nwParam, nlParam, aDialog[ nIndex, 5 ]  ),;
+                     0 );
                 )
 
    If nMsg == WM_NCDESTROY
-      aDialog[ nIndex ] := { NIL , NIL , NIL }
+      aDialog[ nIndex ] := { NIL , NIL , NIL, NIL, NIL }
       If ( n := aScan( aWindow, { | x | hDlg == x[ 1 ] .AND. RCF_DIALOG == x[ 2 ] .AND. Empty( x[ 3 ] ) } ) ) > 0
          __KillWindow( hDlg )
       EndIf
@@ -371,24 +395,24 @@ Function _ProcessDlgMsg( hDlg, nMsg, nwParam, nlParam )
 
 *-----------------------------------------------------------------------------*
 
-Function DialogBox( hInst, acnDlg, hWnd, bAction )
+Function DialogBox( hInst, acnDlg, hWnd, bAction, oObj, xCargo )
 
    Local nResult := 0
    Local nIndex
    Local cTemplate
 
-   If ValType( bAction ) <> "B"
+   If !(ValType( bAction ) $ "BN")
       Return( - 1 )
    EndIf
 
    // register the dialog
 
    If  ( nIndex := aScan( aDialog, { | x | x[ 1 ] == NIL } ) ) == 0
-      aAdd( aDialog, { 0, bAction, 1 } )
+      aAdd( aDialog, { 0, bAction, 1, oObj, xCargo } )
       nIndex := Len( aDialog )
    Else
-      aDialog[ nIndex ] := { 0, bAction, 1 }  // 0 means waiting...
-   EndIf                                      // 1 means modal
+      aDialog[ nIndex ] := { 0, bAction, 1, oObj, xCargo }  // 0 means waiting...
+   EndIf                                                    // 1 means modal
 
    // create the template from the array
 
@@ -403,11 +427,11 @@ Function DialogBox( hInst, acnDlg, hWnd, bAction )
       nResult := _DialogBox( hInst, acnDlg, hWnd, _GetDlgProc( ) )
    EndIf
 
-   aDialog[ nIndex ] := { NIL , NIL , NIL }    // unused
+   aDialog[ nIndex ] := { NIL , NIL , NIL, NIL, NIL }    // unused
 
    Return( nResult )
 
-
+   
 
 *-----------------------------------------------------------------------------*
 // internal to access setting dialog procedures as codeblocks
@@ -477,7 +501,7 @@ FUNCTION MakeDlgTemplate( cTitle, nStyle , x, y, nWidth, nHeight, nPointSize, ;
 
 *-----------------------------------------------------------------------------*
 
-Function CreateDialog( hInst, acnDlg , hWnd, bAction )
+Function CreateDialog( hInst, acnDlg , hWnd, bAction, oObj, xCargo )
 
    Local nIndex
    Local hDlg
@@ -485,18 +509,18 @@ Function CreateDialog( hInst, acnDlg , hWnd, bAction )
    Local aDlg
    Local n
 
-      If ValType( bAction ) <> "B"
+      If !(ValType( bAction ) $ "BN")
          Return( 0 )
       EndIf
 
       // prepare aDialog entry
 
       If ( nIndex := aScan( aDialog, { | x | x[ 1 ] == NIL } ) ) == 0
-         aAdd( aDialog, { 0 , bAction, 0 } )    // must add before CreateDialog
+         aAdd( aDialog, { 0 , bAction, 0, oObj, xCargo } )    // must add before CreateDialog
          nIndex := Len( aDialog )
       Else
-         aDialog[ nIndex ] := { 0, bAction, 0 }  // window 0 means waiting ...
-      EndIf                                       // type 0 means modeless
+         aDialog[ nIndex ] := { 0, bAction, 0, oObj, xCargo }  // window 0 means waiting ...
+      EndIf                                                    // type 0 means modeless
 
       // we need to add it here too, to QUIT on the last window !!!
       // note type 0
@@ -523,7 +547,7 @@ Function CreateDialog( hInst, acnDlg , hWnd, bAction )
 
       // if failed to create
       If hDlg == 0
-         aDialog[ nIndex ] := { NIL , NIL, NIL }
+         aDialog[ nIndex ] := { NIL , NIL, NIL, NIL, NIL }
          aWindow[ n ] := { NIL , NIL , { } }
          __KillWindow( )
       EndIf
@@ -555,7 +579,7 @@ Function AddDlgItem( aDlg, cnId, cnDlgClass, nStyle, nX, nY, ;
 
 *-----------------------------------------------------------------------------*
 
-Function SetProcedure( hWnd, bAction, anWM )
+Function SetProcedure( hWnd, bAction, anWM, oObj, xCargo )
 
    Local nProc := 0
    Local i, n
@@ -609,10 +633,10 @@ Function SetProcedure( hWnd, bAction, anWM )
             anWM := { anWM }
          EndIf
 
-         If ValType( bAction ) # "B"
+         If !(ValType( bAction ) $ "BN")
             bAction := NIL
          EndIf
-         aAdd( aWindow[ n, 3 ] , { anWM, bAction, nProc, nOldProc } )
+         aAdd( aWindow[ n, 3 ] , { anWM, bAction, nProc, nOldProc, oObj, xCargo } )
       EndIf
 
    EndIf

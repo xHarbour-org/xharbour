@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6 2002/09/08 22:05:48 andy_wos Exp $
+ * $Id: ChangeLog,v 1.7 2002/09/17 06:27:59 andy_wos Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-09-17 23:34 UCT+1000 AJ Wos <andrwos@aust1.net>
+  * WinCore.Prg
+    * RegisterClass(), DialogBox(), CreateDialog(), SetProcedure()
+      now support xHarbour function pointers as window procedures.
+      2 extra parameters added to each function [<oObj>] and [<xCargo>].
+      <oObj> should only be passed if the Window Procedure is a method, 
+             oObj is then the object to which that method belongs.
+      <xCargo> is an optional user defined parameter to the callback
+      function. 
+      The window procedure will receive the following parameters:
+      WndProc( <hWnd>,<nMsg>,<nwParam>,<nlParam>,<xCargo> )
+      Codeblocks are still supported as before.        
+      Callback function pointer should be obtained using HB_FuncPtr(),
+      HB_ObjMsgPtr(), or @MyFunc(). 
+        
 2002-09-17 AJ Wos
   * _WinMisc.c      
     + CreateMutex()
