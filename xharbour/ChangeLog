@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1322 2003/08/02 18:08:37 lculik Exp $
+ * $Id: ChangeLog,v 1.1323 2003/08/02 20:40:04 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-03 04:47 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/thread.c
+    ! uiCurrentArea was initialized to 0 (while it must be initialized to 1).
+
 2003-02-02 17:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
  * doc/en/files.txt
   * Added doc for HB_OsPathSeparator(),HB_OsPathListSeparator(),HB_OsPathDelimiters()

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.95 2003/08/01 11:36:05 jonnymind Exp $
+* $Id: thread.c,v 1.96 2003/08/01 16:56:52 jonnymind Exp $
 */
 
 /*
@@ -250,7 +250,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->iExtraIndex = 0;
 
    /* Initialization of dbcmd related variables */
-   tc->uiCurrArea = 0;
+   tc->uiCurrArea = 1;
    tc->pCurrArea = 0;
 
    /* Initialization of private and public memvars */
