@@ -1,5 +1,5 @@
 /*
- * $Id: radiogrp.prg,v 1.4 2002/11/13 20:40:30 walito Exp $
+ * $Id: radiogrp.prg,v 1.5 2003/01/27 03:40:53 walito Exp $
  */
 
 /*
@@ -9,7 +9,7 @@
  * Copyright 2000 Luiz Rafael Culik <culik@sl.conex.net>
  * www - http://www.harbour-project.org
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modIFy
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
@@ -20,14 +20,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
+ * along with this software; see the file COPYING.  IF not, write to
  * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
  *
- * The exception is that, if you link the Harbour libraries with other
+ * The exception is that, IF you link the Harbour libraries with other
  * files to produce an executable, this does not by itself cause the
  * resulting executable to be covered by the GNU General Public License.
  * Your use of that executable is in no way restricted on account of
@@ -37,16 +37,16 @@
  * the executable file might be covered by the GNU General Public License.
  *
  * This exception applies only to the code released by the Harbour
- * Project under the name Harbour.  If you copy code from other
+ * Project under the name Harbour.  IF you copy code from other
  * Harbour Project or Free Software Foundation releases into a copy of
  * Harbour, as the General Public License permits, the exception does
  * not apply to the code that you add in this way.  To avoid misleading
- * anyone as to the status of such modified files, you must delete
+ * anyone as to the status of such modIFied files, you must delete
  * this exception notice from them.
  *
- * If you write modifications of your own for Harbour, it is your choice
- * whether to permit this exception to apply to your modifications.
- * If you do not wish that, delete this exception notice.
+ * IF you write modIFications of your own for Harbour, it is your choice
+ * whether to permit this exception to apply to your modIFications.
+ * IF you do not wish that, delete this exception notice.
  *
  */
 
@@ -54,30 +54,30 @@
 #include "hbclass.ch"
 #include "hbsetup.ch"
 
-#ifdef HB_COMPAT_C53
+#IFdef HB_COMPAT_C53
 CLASS HBRadioGroup
 
    export:
 
-   METHOD AddItem(xItem)
-   METHOD DelItem(xItem)
+   METHOD AddItem( xItem )
+   METHOD DelItem( xItem )
    METHOD Display()
-   METHOD GetAccel(xItem)
-   METHOD GetItem(Xitem)
-   METHOD HitTest(nRow,nCol)
-   METHOD InsItem(nPos, oButtom )
-   METHOD KillFocus()
-   METHOD NextItem()
-   METHOD PrevItem()
-   MESSAGE Select(xItem) METHOD _Select(xItem)
-   MESSAGE SetColor(xItem) METHOD _SetColor(xItem)
-   METHOD SetFocus()
-   METHOD SetStyle(xItem)
-   METHOD New(nTop, nLeft, nBottom, nRight )
-//   METHOD GetColor(xColor)
+   METHOD GetAccel( xItem )
+   METHOD GetItem( Xitem )
+   METHOD HitTest( nRow, nCol )
+   METHOD InsItem( nPos, oButtom )
+   METHOD KillFocus( )
+   METHOD NextItem( )
+   METHOD PrevItem( )
+   MESSAGE Select( xItem ) METHOD _Select( xItem )
+   MESSAGE SetColor( xItem ) METHOD _SetColor( xItem )
+   METHOD SetFocus( )
+   METHOD SetStyle( xItem )
+   METHOD New( nTop, nLeft, nBottom, nRight )
+//   METHOD GetColor( xColor )
    DATA Bottom
 
-   DATA Buffer init  NIL
+   DATA Buffer INIT  NIL
 
    DATA CapCol
 
@@ -85,66 +85,68 @@ CLASS HBRadioGroup
 
    DATA Caption 
 
-   DATA Cargo  init  Nil
+   DATA Cargo  INIT  NIL
 
-   DATA ColdBox  init  "ÚÄ¿³ÙÄÀ³"
+   DATA ColdBox  INIT  "ÚÄ¿³ÙÄÀ³"
 
-   DATA fBlock  init  NIL
+   DATA fBlock  INIT  NIL
 
-   DATA HasFocus  init  .f.
+   DATA HasFocus  INIT  .F.
 
-   DATA HotBox init  "ÉÍ»º¼ÍÈº"
+   DATA HotBox INIT  "ÉÍ»º¼ÍÈº"
 
-   DATA ItemCount init 0
+   DATA ItemCount INIT 0
 
    DATA Left 
 
-   DATA Message init ""
+   DATA Message INIT ""
 
    DATA Right
-   DATA aItems init {}
-   DATA lCursor init 0
+   DATA aItems INIT {}
+   DATA lCursor INIT 0
 
-   DATA TextValue init ""
+   DATA TextValue INIT ""
 
    DATA Top
-   DATA CLASSName init "RADIOGROUP"
-   DATA TypeOut init .f.
+   DATA CLASSName INIT "RADIOGROUP"
+   DATA TypeOut INIT .F.
 
-   DATA Value init 0
+   DATA Value INIT 0
    DATA Color
-   Data colorspec init ""
-//   ASSIGN Colorspec(xColor) inline if(xColor!=Nil,::GetColor(xColor),)
+   Data colorspec INIT ""
+//   ASSIGN Colorspec( xColor ) inline IIF( xColor != NIL, ::GetColor( xColor ), )
 
 ENDCLASS
 
-METHOD New(nTop, nLeft, nBottom, nRight ) CLASS HBRadioGroup
+METHOD New( nTop, nLeft, nBottom, nRight ) CLASS HBRadioGroup
 
 Local cColor
-      if ( isdefcolor() )
-          ::ColorSpec:= "W/N,W/N,W+/N"
-      else
+
+      IF ( isdefcolor() )
+          ::ColorSpec := "W/N,W/N,W+/N"
+      ELSE
          cColor := SetColor()
-         ::ColorSpec:=  __guicolor(cColor, 3) + "," + ;
-            __guicolor(cColor, 1) + "," + __guicolor(cColor, 4)
-      endif
-      ::Bottom:=nBottom
-      ::CapCol:= nLeft+2
-      ::CapRow:= nTop
-      ::Left:=nLeft
-      ::right:=nRight
-      ::top:=nTop
-return Self
+         ::ColorSpec :=  __guicolor( cColor, 3 ) + "," + ;
+            __guicolor( cColor, 1 ) + "," + __guicolor( cColor, 4 )
+      ENDIF
+
+      ::Bottom := nBottom
+      ::CapCol := nLeft+2
+      ::CapRow := nTop
+      ::Left := nLeft
+      ::right := nRight
+      ::top := nTop
+RETURN Self
 
 METHOD  ADDITEM( xItem ) CLASS HBRadioGroup
 
 
-   if ( !( ISOBJECT( xItem ) ) )
-   elseif ( xItem:classname() == "RADIOBUTTO" )
-      AAdd(::aItems, xItem)
+   IF ( !( ISOBJECT( xItem ) ) )
+   ELSEIF ( xItem:classname() == "RADIOBUTTO" )
+      Aadd( ::aItems, xItem )
       ::ItemCount++
-   endif
-   return Self
+   ENDIF
+   RETURN Self
 
 METHOD  SetStyle( xStyle ) CLASS HBRadioGroup
    
@@ -154,14 +156,14 @@ METHOD  SetStyle( xStyle ) CLASS HBRadioGroup
       oItems:style( xStyle )
    NEXT
 
-   return Self
+   RETURN Self
 
 METHOD  SetFocus() CLASS HBRadioGroup
 
    Local oItems
 
-   If  !::HasFocus
-      ::lCursor  := setcursor(0)
+   IF  !::HasFocus
+      ::lCursor  := setcursor( 0 )
       ::HasFocus := .T.
 
       dispbegin()
@@ -174,13 +176,13 @@ METHOD  SetFocus() CLASS HBRadioGroup
 
       dispend()
 
-      if ISBLOCK( ::fBlock )
-         eval(::fBlock)
-      endif
+      IF ISBLOCK( ::fBlock )
+         Eval( ::fBlock )
+      ENDIF
 
-   endif
+   ENDIF
 
-   return self
+   RETURN self
 
 METHOD  _SetColor( cColor ) CLASS HBRadioGroup
 
@@ -190,93 +192,94 @@ METHOD  _SetColor( cColor ) CLASS HBRadioGroup
       oItems:ColorSpec := cColor
    NEXT
 
-   return Self
+   RETURN Self
 
 METHOD  _Select( xValue ) CLASS HBRadioGroup
 
-   Local nPos //, nLen := ::ItemCount
-   Local cType := ValType(xValue)
+   Local nPos //,nLen := ::ItemCount
+   Local cType := ValType( xValue )
    Local oItems
 
-   if cType == "C"
-      nPos := -1
+   IF cType == "C"
+
       FOR EACH oItems IN ::aItems
 
-         if oItems:data == xValue
+         IF oItems:data == xValue
             Default ::Buffer TO ""
-            changebutt( Self, ::Value, nPos )
             nPos := HB_EnumIndex()
+            changebutt( Self, ::Value, nPos )
+
             exit
-         endif
-//         nPos++
+         ENDIF
+
       NEXT
 
-      if nPos < 0
+      IF nPos < 0
          ::Buffer := xValue
-      endif
+      ENDIF
 
-   else
-      if !(cType != "U" .AND. xValue < 1) .AND.;
+   ELSE
+      IF !( cType != "U" .AND. xValue < 1 ) .AND.;
            ( cType != "U" .AND. xValue <= ::ItemCount )
          default ::Buffer to 0
-         changebutt(self, ::Value, xValue)
-      endif
-   endif
+         changebutt( self, ::Value, xValue )
+      ENDIF
+   ENDIF
 
-   return Self
+   RETURN Self
 
 METHOD  PrevItem()        CLASS HBRadioGroup
 
    local xValue := ::Value, nPos
 
-   if ::HasFocus .AND. ::ItemCount > 0
+   IF ::HasFocus .AND. ::ItemCount > 0
 
       Switch xValue
-      Case 0
+      CASE 0
          nPos := 1
          exit
-      Case 1
+      CASE 1
          nPos := ::ItemCount
          exit
       Default
          nPos := xValue - 1
       End
 
-      changebutt(self, xValue, nPos)
+      changebutt( self, xValue, nPos )
 
-   endif
+   ENDIF
 
-   return self
+   RETURN self
 
 METHOD  NextItem()        CLASS HBRadioGroup
 
 
    local xValue, nPos
 
-   if ::HasFocus .AND. ::ItemCount > 0
+   IF ::HasFocus .AND. ::ItemCount > 0
 
-      If ( xValue := ::Value ) == ::ItemCount
+      IF ( ( xValue := ::Value ) == ::ItemCount )
          nPos := 1
-      Else
+      ELSE
          nPos := xValue + 1
-      Endif
+      ENDIF
 
-      changebutt(self, xValue, nPos)
+      changebutt( self, xValue, nPos )
 
-   endif
-   return Self
+   ENDIF
+   RETURN Self
 
 METHOD  KillFocus()       CLASS HBRadioGroup
 
    local nPos, nCount, aItems
    Local oItems
 
-   if ::HasFocus
+   IF ::HasFocus
 
       ::HasFocus := .F.
-      if ( ISBLOCK( ::fBlock ) )
-         eval(::fBlock)
-      endif
+      IF ( ISBLOCK( ::fBlock ) )
+         Eval( ::fBlock )
+      ENDIF
 
       dispbegin()
 
@@ -288,174 +291,174 @@ METHOD  KillFocus()       CLASS HBRadioGroup
 
       dispend()
 
-      setcursor(::lCursor)
+      setcursor(::lCursor )
 
-   endif
+   ENDIF
 
-   return self
+   RETURN self
 
 METHOD  InsItem( nPos, oButtom ) CLASS HBRadioGroup
 
 
-   if ( !( ISOBJECT( oButtom ) ) )
-   elseif ( !( oButtom:classname() == "RADIOBUTTN" ) )
-   elseif ( nPos < ::ItemCount )
-//      asize(::aItems, ++::ItemCount)
+   IF ( !( ISOBJECT( oButtom ) ) )
+   ELSEIF ( !( oButtom:classname() == "RADIOBUTTN" ) )
+   ELSEIF ( nPos < ::ItemCount )
+//      asize(::aItems, ++::ItemCount )
       ains(::aItems, nPos, oButtom, .T. )
 //      ::aItems[ nPos ] := oButtom
-   endif
-   return ::aItems[ nPos ]
+   ENDIF
+   RETURN ::aItems[ nPos ]
 
 METHOD  HitTest( nRow, nCol )    CLASS HBRadioGroup
 
    Local nLen, nPosition
    Local oItems
 
-   do case
-   case Empty(::Coldbox + ::HotBox)
-   case nRow == ::Top
-      if ( nCol == ::Left )
-         return -1
-      elseif ( nCol == ::Right )
-         return -3
-      elseif ( nCol >= ::Left .AND. nCol <= ::Right )
-         return -2
-      endif
-   case nRow == ::Bottom
-      if ( nCol == ::Left )
-         return -7
-      elseif ( nCol == ::Right )
-         return -5
-      elseif ( nCol >= ::Left .AND. nCol <= ::Right )
-         return -6
-      endif
-   case nCol == ::Left
-      if ( nRow >= ::Top .AND. nRow <= ::Bottom )
-         return -8
-      else
-         return 0
-      endif
-   case nCol == ::Right
-      if ( nRow >= ::Top .AND. nRow <= ::Bottom )
-         return -4
-      else
-         return 0
-      endif
-   endcase
+   do CASE
+   CASE Empty( ::Coldbox + ::HotBox )
+   CASE nRow == ::Top
+      IF ( nCol == ::Left )
+         RETURN -1
+      ELSEIF ( nCol == ::Right )
+         RETURN -3
+      ELSEIF ( nCol >= ::Left .AND. nCol <= ::Right )
+         RETURN -2
+      ENDIF
+   CASE nRow == ::Bottom
+      IF ( nCol == ::Left )
+         RETURN -7
+      ELSEIF ( nCol == ::Right )
+         RETURN -5
+      ELSEIF ( nCol >= ::Left .AND. nCol <= ::Right )
+         RETURN -6
+      ENDIF
+   CASE nCol == ::Left
+      IF ( nRow >= ::Top .AND. nRow <= ::Bottom )
+         RETURN -8
+      ELSE
+         RETURN 0
+      ENDIF
+   CASE nCol == ::Right
+      IF ( nRow >= ::Top .AND. nRow <= ::Bottom )
+         RETURN -4
+      ELSE
+         RETURN 0
+      ENDIF
+   ENDCASE
 
-   nLen := Len(::Caption)
+   nLen := Len( ::Caption )
 
-   if ( ( nPosition := At("&", ::Caption) ) == 0 )
-   elseif ( nPosition < nLen )
+   IF ( ( nPosition := At( "&", ::Caption ) ) == 0 )
+   ELSEIF ( nPosition < nLen )
       nLen--
-   endif
+   ENDIF
 
-   do case
-   case Empty(::Caption)
-   case nRow != ::CapRow
-   case nCol < ::CapCol
-   case nCol < ::CapCol + nLen
-      return -1025
-   endcase
+   do CASE
+   CASE Empty( ::Caption )
+   CASE nRow != ::CapRow
+   CASE nCol < ::CapCol
+   CASE nCol < ::CapCol + nLen
+      RETURN -1025
+   ENDCASE
 
-   do case
-   case nRow < ::Top
-   case nRow > ::Bottom
-   case nCol < ::Left
-   case nCol <= ::Right
+   do CASE
+   CASE nRow < ::Top
+   CASE nRow > ::Bottom
+   CASE nCol < ::Left
+   CASE nCol <= ::Right
 //      nPos := 1
       FOR EACH oItems IN ::aItems
-         if oItems:HitTest( nRow, nCol ) != 0
-            return HB_EnumIndex()
-         endif
+         IF oItems:HitTest( nRow, nCol ) != 0
+            RETURN HB_EnumIndex()
+         ENDIF
 //         nPos++
       NEXT
-      return -2049
-   endcase
+      RETURN -2049
+   ENDCASE
 
-   return 0
+   RETURN 0
 
 METHOD  GetItem( xValue )        CLASS HBRadioGroup
-   local xReturn := Nil
+   local xReturn := NIL
 
-   if xValue >= 1 .AND. xValue <= ::ItemCount
+   IF xValue >= 1 .AND. xValue <= ::ItemCount
       xReturn := ::aItems[ xValue ]
-   endif
+   ENDIF
 
-   return xReturn
+   RETURN xReturn
 
 METHOD  GetAccel( xValue )       CLASS HBRadioGroup
 
 //   Local nPos
    Local oItems
 
-   Do Case
-   Case ISNUMBER( xValue )
-      xValue := Chr(xValue)
-   Case !ISCHARACTER( xValue )
-      return 0
-   EndCase
+   Do CASE
+   CASE ISNUMBER( xValue )
+      xValue := Chr( xValue )
+   CASE !ISCHARACTER( xValue )
+      RETURN 0
+   ENDCASE
 
-   xValue := Lower(xValue)
+   xValue := Lower( xValue )
 
 //   nPos := 1
    FOR EACH oItems IN ::aItems
-      if oItems:IsAccel( xValue )
-         return HB_EnumIndex()
-      endif
+      IF oItems:IsAccel( xValue )
+         RETURN HB_EnumIndex()
+      ENDIF
 //      nPos++
    NEXT
 
-   return 0
+   RETURN 0
 
 METHOD  Display() CLASS HBRadioGroup
 
-   Local cColor := SetColor(),;
-         nCurRow:= Row(), nCurCol := Col(), cSelBox,;
+   Local cColor := SetColor(), ;
+         nCurRow := Row(), nCurCol := Col(), cSelBox, ;
          cUnSelBox, cCaption, nPosition
    Local oItems
 
    dispbegin()
 
-   if ::HasFocus
+   IF ::HasFocus
       cSelBox := ::HotBox
       cUnSelBox := ::Coldbox
-   else
+   ELSE
       cSelBox := ::Coldbox
       cUnSelBox := ::HotBox
-   endif
+   ENDIF
 
-   set color to (__guicolor(::ColorSpec, 1))
+   set color to ( __guicolor( ::ColorSpec, 1 ) )
 
-   if !Empty(cSelBox)
+   IF !Empty( cSelBox )
       @ ::Top, ::Left, ::Bottom, ::Right ;
          box cSelBox
-   elseif ( !Empty(cUnSelBox) )
+   ELSEIF ( !Empty( cUnSelBox ) )
       @ ::Top, ::Left, ::Bottom, ::Right ;
          box cUnSelBox
-   endif
+   ENDIF
 
-   if !Empty(cCaption := ::Caption)
+   IF !Empty( cCaption := ::Caption )
 
-      if !(( nPosition := At("&", cCaption) ) == 0)
-         if nPosition == Len(cCaption)
+      IF !( ( nPosition := At( "&", cCaption ) ) == 0 )
+         IF nPosition == Len( cCaption )
             nPosition := 0
-         else
-            cCaption := stuff(cCaption, nPosition, 1, "")
-         endif
-      endif
+         ELSE
+            cCaption := stuff( cCaption, nPosition, 1, "" )
+         ENDIF
+      ENDIF
 
-      set color to (__guicolor(::ColorSpec, 2))
-      SetPos(::CapRow, ::CapCol)
+      set color to ( __guicolor( ::ColorSpec, 2 ) )
+      SetPos( ::CapRow, ::CapCol )
       ?? cCaption
 
-      if nPosition != 0
-         set color to (__guicolor(::ColorSpec, 3))
-         SetPos(::CapRow, ::CapCol + nPosition - 1)
-         ?? SubStr(cCaption, nPosition, 1)
-      endif
+      IF nPosition != 0
+         set color to ( __guicolor( ::ColorSpec, 3 ) )
+         SetPos( ::CapRow, ::CapCol + nPosition - 1 )
+         ?? SubStr( cCaption, nPosition, 1 )
+      ENDIF
 
-   endif
+   ENDIF
 
    FOR EACH oItems IN ::aItems
       oItems:Display()
@@ -463,84 +466,84 @@ METHOD  Display() CLASS HBRadioGroup
 
    dispend()
 
-   set color to (cColor)
-   SetPos(nCurRow, nCurCol)
+   set color to ( cColor )
+   SetPos( nCurRow, nCurCol )
 
-   return self
+   RETURN self
 
 METHOD  DelItem( xItem ) CLASS HBRadioGroup
 
-   if xItem >= 1 .AND. xItem <= ::ItemCount
-      adel(::aItems[ xItem ], .T.)
-//      asize(::aItems, --::ItemCount)
+   IF xItem >= 1 .AND. xItem <= ::ItemCount
+      Adel( ::aItems[ xItem ], .T. )
+//      asize(::aItems, --::ItemCount )
       ::ItemCount--
-   endif
+   ENDIF
 
-   if ::HasFocus .AND. ::ItemCount < ::Value
+   IF ::HasFocus .AND. ::ItemCount < ::Value
 
       ::Value := ::ItemCount
       ::TextValue := ::aItems[ ::Value ]:data
 
-      if ISNUMBER( ::Buffer )
+      IF ISNUMBER( ::Buffer )
          ::Buffer := ::Value
-      else
+      ELSE
          ::Buffer := ::TextValue
-      endif
+      ENDIF
 
-   endif
+   ENDIF
 
-   return self
+   RETURN self
 
-/*METHOD GetColor(xColor)  CLASS HBRadioGroup
-   if ( !( ISNIL( xColor ) ) )
-      ::Color := iif( Valtype(xColor)=="C" .and. !Empty(__guicolor(xColor, 3)) .AND. ;
-      Empty(__guicolor(xColor, 4)),xColor,)
+/*METHOD GetColor(xColor )  CLASS HBRadioGroup
+   IF ( !( ISNIL( xColor ) ) )
+      ::Color := IIF( Valtype(xColor )=="C" .and. !Empty( __guicolor( xColor, 3 ) ) .AND. ;
+      Empty( __guicolor( xColor, 4 ) ), xColor, )
 
-   endif
-   return ::Color
+   ENDIF
+   RETURN ::Color
 */
 
 static function  ChangeButt( oItems, xVal, nPos )
 
-   if xVal != nPos
+   IF xVal != nPos
 
       dispbegin()
 
-      if xVal > 0
-         oItems:aItems[ xVal ]:select(.F.)
+      IF xVal > 0
+         oItems:aItems[ xVal ]:select( .F. )
          oItems:aItems[ xVal ]:display()
-      endif
+      ENDIF
 
-      if nPos > 0
-         oItems:aItems[ nPos ]:select(.T.)
+      IF nPos > 0
+         oItems:aItems[ nPos ]:select( .T. )
          oItems:aItems[ nPos ]:display()
-      endif
+      ENDIF
 
       dispend()
 
       oItems:Value := nPos
       oItems:TextValue := oItems:aItems[ nPos ]:data
 
-      if ISNUMBER( oItems:Buffer )
+      IF ISNUMBER( oItems:Buffer )
          oItems:Buffer := nPos
-      else
+      ELSE
          oItems:Buffer := oItems:TextValue
-      endif
+      ENDIF
 
-   endif
+   ENDIF
 
-   return .T.
+   RETURN .T.
 
 // Radio Group Class Constructor Function
 
 function RadioGroup( nTop, nLeft, nBottom, nRight )
 
-   if ISNUMBER( nTop ) .and. ISNUMBER( nLeft ) .and.;
+   IF ISNUMBER( nTop ) .and. ISNUMBER( nLeft ) .and.;
         ISNUMBER( nBottom ) .and. ISNUMBER( nright )
-      Return HBRadioGroup():New(nTop, nLeft, nBottom, nRight )
-   endif
+      RETURN HBRadioGroup():New( nTop, nLeft, nBottom, nRight )
+   ENDIF
 
-   Return Nil
+   RETURN NIL
 
 
 function _RADIOGRP_( nTop, nLeft, nBottom, nRight, xValue, aItems, cCaption, cMessage, ;
@@ -551,23 +554,23 @@ function _RADIOGRP_( nTop, nLeft, nBottom, nRight, xValue, aItems, cCaption, cMe
 
    default ccaption to ""
 
-   oRadioGroup := RadioGroup(nTop, nLeft, nBottom, nRight)
+   oRadioGroup := RadioGroup( nTop, nLeft, nBottom, nRight )
 
-   if ! ISNIL( oRadioGroup )
+   IF ! ISNIL( oRadioGroup )
 
-      oRadioGroup:caption:= if(cCaption!=NIL,cCaption,)
-      oRadioGroup:colorspec:=if(cColor!=Nil,cColor,)
-      oRadioGroup:message:=if(cMessage!=nil,cMessage,)
-      oRadioGroup:fblock:=if(bFblock!=nil,bFblock,)
+      oRadioGroup:caption :=  IIF( cCaption != NIL, cCaption, )
+      oRadioGroup:colorspec := IIF( cColor != NIL, cColor, )
+      oRadioGroup:message := IIF( cMessage != NIL, cMessage, )
+      oRadioGroup:fblock := IIF( bFblock != NIL, bFblock, )
 
       FOR EACH xItems IN aItems
          oRadioGroup:AddItem( xItems )
       NEXT
 
-      oRadioGroup:select(xValue)
+      oRadioGroup:select( xValue )
 
-   endif
+   ENDIF
 
-   return oRadioGroup
+   RETURN oRadioGroup
 
-#endif
+#ENDIF
