@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.22 2002/03/22 15:36:55 map Exp $
+ * $Id: fastitem.c,v 1.23 2002/04/17 00:35:43 ronpinkas Exp $
  */
 
 /*
@@ -63,7 +63,7 @@
 
 static const char *s_sNull = "";
 
-extern char hb_vm_acAscii[256][2];
+extern unsigned char hb_vm_acAscii[256][2];
 
 /* Forward decalarations. */
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
