@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.36 2002/10/29 06:11:59 ronpinkas Exp $
+ * $Id: TApplication.prg,v 1.37 2002/10/29 06:21:37 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -130,6 +130,7 @@ METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
    FOR EACH aVar IN aVars
       IF ValType( aVar[2] ) == 'O'
          aAdd( oForm:Controls, aVar[2] )
+
          WITH OBJECT aVar[2]
             :Parent    := oForm
             :Instance  := _GetInstance()

@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.104 2002/10/28 13:32:55 what32 Exp $
+ * $Id: xide.prg,v 1.105 2002/10/29 15:39:24 what32 Exp $
  */
 
 /*
@@ -142,7 +142,7 @@ METHOD MainToolBar() CLASS MainFrame
    ::Rebar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolBar1:handle, 200, 52, 200, "", NIL )
 
    // add the TabControl on the Rebarband
-   
+
    With Object ::Add( ToolTabs():New( MainFrame, 445,  0,  0,  0,  0) )
       :AddTab( "StdTab", TabPage():New( MainFrame:ToolTabs, "Standard" ) )
       :AddTab( "Additional" )
@@ -256,9 +256,7 @@ CLASS OpenProject FROM TOpenDialog
                           XFMOpen( ::FileName )
 ENDCLASS
 
-//----------------------------------------------------------------------------------------------
-
-
+//--------------------------------------------------------------------------//
 #pragma BEGINDUMP
 
 #include <stdio.h>
@@ -287,8 +285,6 @@ HB_FUNC( XFMOPEN )
    long lSize ;
    char *sXFM;
    int  iErr;
-
-   //printf( "File: %s Handle: %p\n", argv[1], fh );
 
    if( pXFM )
    {
@@ -322,6 +318,7 @@ HB_FUNC( XFMOPEN )
             OutputDebugString( "I/O Error\n" );
             hb_retl( 0 );
             fclose( fh );
+            free( sXFM );
             return;
          }
 
@@ -331,25 +328,39 @@ HB_FUNC( XFMOPEN )
             OutputDebugString( "I/O Error\n" );
             hb_retl( 0 );
             fclose( fh );
+            free( sXFM );
             return;
          }
 
-         //printf( "%s", sXFM );
-         hb_retl( ! XFMParse( sXFM ) );
+         //OutputDebugString( "Parse:\n" );
+         //OutputDebugString( sXFM );
+         iErr = XFMParse( sXFM );
+         //OutputDebugString( "Parsed\n" );
+
+         hb_retl( iErr );
+         //OutputDebugString( "Set Return\n" );
+
          fclose( fh );
+         //OutputDebugString( "Closed.\n" );
+         free( sXFM );
+         //OutputDebugString( "Freed.\n" );
+         return;
       }
    }
 
-   hb_retl( 1 );
+   hb_retl( 0 );
 }
 
 int XFMParse( char *sText )
 {
    char sClass[64], sFromClass[64], sVar[64], sExp[64], *pTemp, *pEnd[16], sAssign[64], sTemp[256];
-   int i, iEnd = 0;
+   int i, iEnd = 0, iLen;
    static PHB_DYNS pCreateForm = NULL;
    static PHB_DYNS pTFormEdit = NULL;
-   HB_ITEM Exp;
+   PHB_DYNS pClassSym;
+   HB_ITEM Exp, Control;
+   PHB_ITEM pForm;
+   MSG msg ;
 
    if( pCreateForm == NULL )
    {
@@ -415,6 +426,11 @@ int XFMParse( char *sText )
    hb_vmPushNil();
    hb_vmDo( 0 );
 
+   OutputDebugString( "Done, FormEdit()\n" );
+
+   // Save result into pForm - we will use it multiple times below.
+   hb_itemForwardValue( pForm, &hb_stack.Return );
+
    //oApp:CreateForm( @FormEdit, TFormEdit(), MainFrame )
    hb_vmPushSymbol( pCreateForm->pSymbol );
    hb_vmPush( &OAPP );
@@ -422,13 +438,21 @@ int XFMParse( char *sText )
    //memcpy( ( * hb_stack.pPos ), &FORMEDIT, sizeof( HB_ITEM ) );
    //hb_stackPush();
    hb_vmPushNil();
-   hb_vmPush( &hb_stack.Return );
-   hb_itemClear( &hb_stack.Return );
+   hb_vmPush( pForm );
    hb_vmPush( &MAINFRAME );
    hb_vmSend( 3 );
 
    // Instead of pushing @FormEdit
    hb_itemForwardValue( &FORMEDIT, &hb_stack.Return );
+
+   OutputDebugString( "Done CreateForm()\n" );
+
+   // Do events.
+   while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+   {
+      TranslateMessage(&msg);
+      DispatchMessage(&msg);
+   }
 
    pEnd[ iEnd ] = strstr( sText, "END CLASS" );
    if( pEnd[ iEnd ] == NULL )
@@ -489,10 +513,6 @@ int XFMParse( char *sText )
    OutputDebugString( (char *) sExp );
    OutputDebugString( "\n" );
 
-   sAssign[0] = '_';
-   sAssign[1] = '\0';
-   strcat( (char *) sAssign, (char *) sVar );
-
    switch( sExp[0] )
    {
       case '.' :
@@ -501,10 +521,12 @@ int XFMParse( char *sText )
         break;
 
       case '"' :
-        Exp.type = HB_IT_STRING;
         sExp[ strlen( sExp ) - 1 ] = '\0';
-        Exp.item.asString.value = (char *) sExp + 1;
-        Exp.item.asString.bStatic = TRUE;
+        hb_itemPutC( &Exp, (char *) sExp + 1 );
+        break;
+
+      case '{' :
+        hb_arrayNew( &Exp, 0 );
         break;
 
       default :
@@ -512,6 +534,25 @@ int XFMParse( char *sText )
         Exp.item.asLong.value = atol( sExp );
         break;
    }
+
+   sAssign[0] = '_';
+   sAssign[1] = '\0';
+
+   iLen = strlen( sVar );
+   sVar[ iLen ] = ';';
+   sVar[ iLen + 1 ] = '\0';
+
+   if( strstr( "CAPTION;TOP;LEFT;HEIGHT;WIDTH;", sVar ) )
+   {
+      sVar[ iLen ] = '\0';
+      strcat( (char *) sAssign, (char *) "XX" );
+   }
+   else
+   {
+      sVar[ iLen ] = '\0';
+   }
+
+   strcat( (char *) sAssign, (char *) sVar );
 
    OutputDebugString( "Assign: " );
    OutputDebugString( sAssign );
@@ -521,7 +562,7 @@ int XFMParse( char *sText )
    OutputDebugString( sTemp );
 
    hb_objSendMsg( &FORMEDIT, sAssign, 1, &Exp );
-   hb_itemClear( &hb_stack.Return );
+   hb_stack.Return.type = HB_IT_NIL;
 
    SKIP_EOL();
 
@@ -533,7 +574,7 @@ int XFMParse( char *sText )
 
    if( strncmp( sText, "CONTROL", 6 ) )
    {
-      return 1;
+      return 0;
    }
    sText += 7;
 
@@ -570,6 +611,20 @@ int XFMParse( char *sText )
    OutputDebugString( (char *) sFromClass );
    OutputDebugString( "\n" );
 
+   pClassSym = hb_dynsymFind( sFromClass );
+   if( pClassSym )
+   {
+      hb_vmPushSymbol( pClassSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmDo( 0 );
+
+      hb_itemForwardValue( &Control, &hb_stack.Return );
+   }
+   else
+   {
+      return 0;
+   }
+
    pEnd[ iEnd ] = strstr( sText, "END CONTROL" );
    if( pEnd[ iEnd ] == NULL )
    {
@@ -593,7 +648,32 @@ int XFMParse( char *sText )
          {
             OutputDebugString( "END\n" );
 
-            sText = pEnd[ --iEnd ] + 10;
+            hb_objSendMsg( &FORMEDIT, "ADD", 1, &Control );
+            hb_stack.Return.type = HB_IT_NIL;
+
+            OutputDebugString( "Done Add()" );
+
+            while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+            {
+               TranslateMessage(&msg);
+               DispatchMessage(&msg);
+            }
+
+            hb_objSendMsg( &FORMEDIT, "SETCONTROL", 1, &Control );
+            hb_stack.Return.type = HB_IT_NIL;
+
+            OutputDebugString( "Done SetControl()" );
+
+            while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+            {
+               TranslateMessage(&msg);
+               DispatchMessage(&msg);
+            }
+
+            sText = pEnd[ --iEnd ] + 11;
+
+            OutputDebugString( "Continue with: " );
+            OutputDebugString( sText );
 
             sText = strchr( sText, '\n' );
             if( sText == NULL )
@@ -611,7 +691,15 @@ int XFMParse( char *sText )
             goto Properties;
          }
 
-         goto Vars;
+         if( *sText )
+         {
+            goto Vars;
+         }
+         else
+         {
+            OutputDebugString( "Done.\n" );
+            return 1;
+         }
       }
 
       sText += 6;
@@ -645,7 +733,7 @@ int XFMParse( char *sText )
       }
       sFromClass[i] = '\0';
 
-      OutputDebugString( "IS: " );
+      OutputDebugString( " IS: " );
       OutputDebugString( (char *) sFromClass );
       OutputDebugString( "\n" );
 
@@ -654,7 +742,6 @@ int XFMParse( char *sText )
       {
          return 0;
       }
-
 
       pEnd[ iEnd++ ][0] = '\0';
 
@@ -677,6 +764,11 @@ int XFMParse( char *sText )
      sVar[i++] = *sText++;
    }
    sVar[i] = '\0';
+
+   if( i == 0 )
+   {
+      return 1;
+   }
 
    SKIP_SPACE();
 
@@ -771,6 +863,57 @@ int XFMParse( char *sText )
    OutputDebugString( " = " );
    OutputDebugString( (char *) sExp );
    OutputDebugString( "\n" );
+
+   switch( sExp[0] )
+   {
+      case '.' :
+        Exp.type = HB_IT_LOGICAL;
+        Exp.item.asLogical.value = sExp[1] == 'T' ? TRUE : FALSE;
+        break;
+
+      case '"' :
+        sExp[ strlen( sExp ) - 1 ] = '\0';
+        hb_itemPutC( &Exp, (char *) sExp + 1 );
+        break;
+
+      case '{' :
+        hb_arrayNew( &Exp, 0 );
+        break;
+
+      default :
+        Exp.type = HB_IT_LONG;
+        Exp.item.asLong.value = atol( sExp );
+        break;
+   }
+
+   sAssign[0] = '_';
+   sAssign[1] = '\0';
+
+   iLen = strlen( sVar );
+   sVar[ iLen ] = ';';
+   sVar[ iLen + 1 ] = '\0';
+
+   if( strstr( "CAPTION;TOP;LEFT;HEIGHT;WIDTH;", sVar ) )
+   {
+      sVar[ iLen ] = '\0';
+      strcat( (char *) sAssign, (char *) "XX" );
+   }
+   else
+   {
+      sVar[ iLen ] = '\0';
+   }
+
+   strcat( (char *) sAssign, (char *) sVar );
+
+   OutputDebugString( "Assign: " );
+   OutputDebugString( sAssign );
+   OutputDebugString( " Type: " );
+
+   sprintf( (char *) sTemp, "%i\n", Exp.type );
+   OutputDebugString( sTemp );
+
+   hb_objSendMsg( &Control, sAssign, 1, &Exp );
+   hb_stack.Return.type = HB_IT_NIL;
 
    SKIP_EOL();
 

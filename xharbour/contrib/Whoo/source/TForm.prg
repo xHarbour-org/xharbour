@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.47 2002/10/28 12:03:51 what32 Exp $
+ * $Id: TForm.prg,v 1.48 2002/10/29 02:12:38 what32 Exp $
  */
 
 /*
@@ -82,7 +82,7 @@ CLASS TForm FROM TWinControl
    ACCESS BorderStyle    INLINE iif( ::xhBorder != NIL, ::xhBorder, "bsSizeable" )
    ASSIGN BorderStyle(c) INLINE ::xhBorder := c,;
                                 ::SetBorders(c)
-                                
+
 
 //-------------------------------------------------------------------------------------------
    DATA WinClass    PROTECTED INIT "Form"
@@ -96,7 +96,7 @@ CLASS TForm FROM TWinControl
    METHOD GetObj()
    METHOD SetLink()
    METHOD SetBorders()
-   
+
 ENDCLASS
 
 METHOD SetBorders(c) CLASS TForm
@@ -136,11 +136,11 @@ METHOD Add( oObj, lCreate ) CLASS TForm
    LOCAL nSeq, hClass, nInst := 1, oCtrl
 
    DEFAULT lCreate TO .T.
-   
+
    IF oObj:ControlName == "Form" .and. oObj:Name == NIL
       oObj:Name := oObj:ClassName()
    ENDIF
-   
+
    IF oObj:Name == NIL
       FOR EACH oCtrl IN ::Controls
           IF oCtrl:ControlName == oObj:ControlName
@@ -153,17 +153,21 @@ METHOD Add( oObj, lCreate ) CLASS TForm
    IF oObj:Caption == NIL
       oObj:Caption := oObj:Name
    ENDIF
-   
+
    oObj:Name := IFNIL( oObj:Name, oObj:ControlName, oObj:Name )
 
    __objAddData( self, oObj:Name, HB_OO_CLSTP_PROTECTED )
    __ObjSetValueList( self, { { oObj:Name, oObj } } )
 
+   oObj:Parent := Self
+
    IF lCreate
       oObj:Create()
    endif
-   AADD( ::Controls, oObj )
-   RETURN( oObj )
+
+   aAdd( ::Controls, oObj )
+
+RETURN oObj
 
 *-----------------------------------------------------------------------------*
 

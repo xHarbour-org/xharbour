@@ -64,7 +64,7 @@ STATIC FUNCTION DefError( e )
    //OutputDebugString( cProcStack + CRLF )
 
    cErr := LogError( e, cProcStack )
-   OutputDebugString( cErr ) 
+   OutputDebugString( cErr )
    cMessage := ErrorMessage( e )
 
    aOptions := { "Quit" }
@@ -193,10 +193,9 @@ STATIC FUNCTION LogError( e, cProcStack )
 
    cErr += cProcStack
 
-   SET PRINTER TO  GetModuleFileName()+"\Error.Log" ADDITIVE
+   SET PRINTER TO  "Error.Log" ADDITIVE
    SET CONSOLE OFF
    SET PRINTER ON
-
 
    QOut( "        Please mail or fax this error report to:" )
    /*
