@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.104 2005/01/25 10:47:50 druzus Exp $
+ * $Id: dbf1.c,v 1.105 2005/01/30 06:45:45 druzus Exp $
  */
 
 /*
@@ -715,7 +715,7 @@ BOOL HB_EXPORT hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, UL
       }
       fRet = hb_fsLock( hFile, ulPos + *pPoolPos, ulSize, usMode );
       fWait = ( !fRet && ( usMode & FLX_WAIT ) != 0 && ( usMode & FL_MASK ) == FL_LOCK );
-      /* TODO: call special error handler (LOCKHANDLER) hiere if fWait */
+      /* TODO: call special error handler (LOCKHANDLER) here if fWait */
 
    } while ( fWait );
 
@@ -2099,6 +2099,7 @@ static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType
       case DBRI_UPDATED:
          hb_itemPutL( pInfo, ulRecNo == pArea->ulRecNo && pArea->fRecordChanged );
          break;
+
       case DBRI_RAWRECORD:
       case DBRI_RAWMEMOS:
       case DBRI_RAWDATA:

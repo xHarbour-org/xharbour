@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.32 2004/12/31 11:56:06 druzus Exp $
+ * $Id: workarea.c,v 1.33 2005/01/30 06:45:45 druzus Exp $
  */
 
 /*
@@ -1232,11 +1232,23 @@ ERRCODE hb_waError( AREAP pArea, PHB_ITEM pError )
  */
 ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
 {
+   int iCurrArea;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_waEvalBlock(%p, %p)", pArea, pBlock));
 
    if( ! pArea->valResult )
       pArea->valResult = hb_itemNew( NULL );
 
+   iCurrArea = hb_rddGetCurrentWorkAreaNumber();
+   if ( iCurrArea != pArea->uiArea )
+      hb_rddSelectWorkAreaNumber( pArea->uiArea );
+   else
+      iCurrArea = 0;
+
    hb_itemCopy( pArea->valResult, hb_vmEvalBlock( pBlock ) );
+
+   if ( iCurrArea )
+      hb_rddSelectWorkAreaNumber( iCurrArea );
+
    return SUCCESS;
 }

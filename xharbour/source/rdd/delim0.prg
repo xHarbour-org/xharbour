@@ -1,5 +1,5 @@
 /*
- * $Id: delim0.prg,v 1.8 2001/06/18 18:04:05 dholm Exp $
+ * $Id: delim0.prg,v 1.1.1.1 2001/12/21 10:42:46 ronpinkas Exp $
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: rddsys.prg,v 1.2 2003/09/02 05:41:14 ronpinkas Exp $
+ * $Id: rddsys.prg,v 1.3 2003/09/10 21:35:46 druzus Exp $
  */
 
 /*
@@ -66,4 +66,3 @@ PROCEDURE RddInit
    __rddSetDefault( "DBFNTX" )
 
 return
-
