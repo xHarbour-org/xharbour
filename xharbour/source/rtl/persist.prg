@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.18 2004/01/06 21:11:40 peterrees Exp $
+ * $Id: persist.prg,v 1.19 2004/01/11 20:35:29 peterrees Exp $
  */
 
 /*
@@ -92,7 +92,6 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
    LOCAL cVersion2:= "// HBPersistent Ver 2.0"
    MEMVAR oObject
    PRIVATE oObject := QSelf()
-
    IF lIgnoreBadIVars == nil
       lIgnoreBadIVars := .f.
    ENDIF
@@ -312,6 +311,9 @@ STATIC FUNCTION ValToText( xValue )
       CASE "B"
          cText := ValToPrgExp( xValue  )
 
+         EXIT
+      CASE "L"
+         cText := IIF(  xValue, ".T.", ".F."  )
          EXIT
 
       DEFAULT
