@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.199 2003/05/24 00:33:49 ronpinkas Exp $
+ * $Id: hvm.c,v 1.200 2003/05/26 00:19:16 ronpinkas Exp $
  */
 
 /*
@@ -7384,7 +7384,7 @@ HB_FUNC( HB_RESTOREBLOCK )
                Block.item.asBlock.value->pSelfBase = NULL;
             }
 
-            TraceLog( NULL, "Proc: %s Line %i Self: %p\n", Block.item.asBlock.value->procname, Block.item.asBlock.value->lineno, Block.item.asBlock.value->pSelfBase );
+            //TraceLog( NULL, "Proc: %s Line %i Self: %p\n", Block.item.asBlock.value->procname, Block.item.asBlock.value->lineno, Block.item.asBlock.value->pSelfBase );
 
             hb_itemForwardValue( &( HB_VM_STACK.Return ), &Block );
          }
