@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1761 2003/11/24 15:15:21 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.1762 2003/11/24 16:57:22 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-24 18:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  ! xharbour.spec
+    ! minor fix
 
 2003-11-24 17:51 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini@tin.it>
   * source/rtl/hboutdbg.c replaced check for __DJGPP__ with check for HB_OS_WIN32

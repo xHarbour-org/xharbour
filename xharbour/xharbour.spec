@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.40 2003/11/20 23:47:34 druzus Exp $
+# $Id: xharbour.spec,v 1.41 2003/11/24 10:25:10 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -49,7 +49,7 @@
 %define hb_mt    MT
 %define hb_mgt   yes
 %define hb_lnkso yes
-%define hb_libs  vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca hbodbc ct debug profiler
+%define hb_libs  vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca ct debug profiler
 %define hb_libsc nf rddads
 %define hb_cc    export HB_COMPILER=gcc
 %define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3"
