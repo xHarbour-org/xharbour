@@ -242,8 +242,14 @@ HB_FUNC(GETPRINTERS) {
   PRINTER_INFO_5 *buffer, *pPrinterEnum;
   PRINTER_INFO_2 *pPrinterInfo2 ;
   ULONG needed = 0 , returned=0, a;
-  PHB_ITEM pSubItems, pFile, pPort ;
-  PHB_ITEM pArrayPrinter = hb_itemArrayNew( 0 );
+  HB_ITEM SubItems, File, Port, ArrayPrinter;
+
+  ArrayPrinter.type = HB_IT_NIL;
+  SubItems.type = HB_IT_NIL;
+  File.type = HB_IT_NIL;
+  Port.type = HB_IT_NIL;
+
+  hb_arrayNew( &ArrayPrinter, 0 );
 
   buffer = NULL ;
   HB_TRACE(HB_TR_DEBUG, ("GETPRINTERS()"));
@@ -259,9 +265,8 @@ HB_FUNC(GETPRINTERS) {
         if (EnumPrinters(Flags,NULL,4,(LPBYTE)  pPrinterEnum4,needed,&needed,&returned)) {
           if (bPrinterNamesOnly ) {
             for ( a = 0 ; a < returned ; a++, pPrinterEnum4++) {
-              pFile = hb_itemPutC( NULL, pPrinterEnum4->pPrinterName );
-              hb_arrayAdd( pArrayPrinter , pFile );
-              hb_itemRelease( pFile ) ;
+              hb_itemPutC( &File, pPrinterEnum4->pPrinterName );
+              hb_arrayAddForward( &ArrayPrinter , &File );
             }
           }
           else {
@@ -271,18 +276,15 @@ HB_FUNC(GETPRINTERS) {
                 if (needed>0) {
                   pPrinterInfo2 = ( PRINTER_INFO_2 * ) hb_xgrab( needed ) ;
                   if (pPrinterInfo2 ) {
-                    pFile = hb_itemPutC( NULL, pPrinterEnum4->pPrinterName );
-                    pSubItems = hb_itemArrayNew( 2 );
+                    hb_itemPutC( &File, pPrinterEnum4->pPrinterName );
+                    hb_arrayNew( &SubItems, 0 );
                     if (GetPrinter(hPrinter,2,(LPBYTE) pPrinterInfo2, needed,&needed))
-                      pPort = hb_itemPutC( NULL,pPrinterInfo2->pPortName );
+                      hb_itemPutC( &Port,pPrinterInfo2->pPortName );
                     else
-                      pPort = hb_itemPutC( NULL,"Error" );
-                    hb_arraySet( pSubItems , 1 , pFile ) ;
-                    hb_arraySet( pSubItems , 2 , pPort ) ;
-                    hb_arrayAdd( pArrayPrinter , pSubItems );
-                    hb_itemRelease( pFile ) ;
-                    hb_itemRelease( pPort ) ;
-                    hb_itemRelease( pSubItems );
+                      hb_itemPutC( &Port,"Error" );
+                    hb_arrayAddForward( &SubItems, &File ) ;
+                    hb_arrayAddForward( &SubItems, &Port ) ;
+                    hb_arrayAddForward( &ArrayPrinter, &SubItems );
                     hb_xfree(pPrinterInfo2) ;
                   }
                 }
@@ -303,20 +305,16 @@ HB_FUNC(GETPRINTERS) {
         if ( EnumPrinters(Flags, NULL , 5 , (LPBYTE) buffer , needed , &needed , &returned ) ) {
           for ( a = 0 ; a < returned ; a++, pPrinterEnum++) {
             if (bPrinterNamesOnly ) {
-              pFile = hb_itemPutC( NULL, pPrinterEnum->pPrinterName );
-              hb_arrayAdd( pArrayPrinter , pFile );
-              hb_itemRelease( pFile ) ;
+              hb_itemPutC( &File, pPrinterEnum->pPrinterName );
+              hb_arrayAddForward( &ArrayPrinter , &File );
             }
             else {
-              pSubItems = hb_itemArrayNew( 2 );
-              pFile = hb_itemPutC( NULL, pPrinterEnum->pPrinterName );
-              pPort = hb_itemPutC( NULL,pPrinterEnum->pPortName );
-              hb_arraySet( pSubItems , 1 , pFile ) ;
-              hb_arraySet( pSubItems , 2 , pPort ) ;
-              hb_arrayAdd( pArrayPrinter , pSubItems );
-              hb_itemRelease( pFile ) ;
-              hb_itemRelease( pPort ) ;
-              hb_itemRelease( pSubItems );
+              hb_arrayNew( &SubItems, 0 );
+              hb_itemPutC( &File, pPrinterEnum->pPrinterName );
+              hb_itemPutC( &Port, pPrinterEnum->pPortName );
+              hb_arrayAddForward( &SubItems , &File ) ;
+              hb_arrayAddForward( &SubItems , &Port ) ;
+              hb_arrayAddForward( &ArrayPrinter , &SubItems );
             }
           }
         }
@@ -324,7 +322,7 @@ HB_FUNC(GETPRINTERS) {
       }
     }
   }
-  hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
+  hb_itemReturn( &ArrayPrinter );
 }
 
 

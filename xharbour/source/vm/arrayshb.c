@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.39 2004/02/20 19:05:39 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.40 2004/02/20 19:45:51 ronpinkas Exp $
  */
 
 /*
@@ -503,7 +503,6 @@ HB_FUNC( HB_APARAMS )
 
 HB_FUNC( HB_AEXPRESSIONS )
 {
-   PHB_ITEM pArray = &(HB_VM_STACK.Return);
    PHB_ITEM pLine  = hb_param( 1, HB_IT_STRING );
    size_t i, iOffset = 0;
    int iParans = 0, iArrays = 0, iIndexs = 0;
@@ -515,7 +514,8 @@ HB_FUNC( HB_AEXPRESSIONS )
       return;
    }
 
-   hb_arrayNew( pArray, 0 );
+   HB_VM_STACK.Return.type = HB_IT_NIL;
+   hb_arrayNew( &(HB_VM_STACK.Return), 0 );
 
    for( i = 0; i < pLine->item.asString.length; i++ )
    {
@@ -571,12 +571,13 @@ HB_FUNC( HB_AEXPRESSIONS )
          case ',' :
             if( iParans == 0 && iArrays == 0 && iIndexs == 0 )
             {
-               PHB_ITEM pExp = hb_itemNew( NULL );
+               HB_ITEM Exp;
 
-               hb_arrayAdd( pArray, hb_itemPutCL( pExp, pLine->item.asString.value + iOffset, i - iOffset ) );
+               Exp.type = HB_IT_NIL;
+
+               hb_arrayAddForward( &(HB_VM_STACK).Return, hb_itemPutCL( &Exp, pLine->item.asString.value + iOffset, i - iOffset ) );
                iOffset = i + 1;
 
-               hb_itemRelease( pExp );
             }
             bArray = FALSE;
             break;
@@ -589,12 +590,12 @@ HB_FUNC( HB_AEXPRESSIONS )
 
    if( iOffset < pLine->item.asString.length - 1 )
    {
-      PHB_ITEM pExp = hb_itemNew( NULL );
+      HB_ITEM Exp;
 
+      Exp.type = HB_IT_NIL;
 
-      hb_arrayAdd( pArray, hb_itemPutCL( pExp, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
+      hb_arrayAddForward( &(HB_VM_STACK).Return, hb_itemPutCL( &Exp, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
 
-      hb_itemRelease( pExp );
    }
 }
 
@@ -605,18 +606,19 @@ HB_FUNC( HB_ATOKENS )
 
    if( pLine )
    {
-      PHB_ITEM pArray = &(HB_VM_STACK.Return);
-      PHB_ITEM pToken = hb_itemNew( NULL );
+      HB_ITEM Token;
       char cDelimiter = pDelim ? pDelim->item.asString.value[0] : 32;
       size_t i, iOffset = 0;
 
-      hb_arrayNew( pArray, 0 );
+      Token.type = HB_IT_NIL;
+      HB_VM_STACK.Return.type = HB_IT_NIL;
+      hb_arrayNew( &(HB_VM_STACK.Return), 0 );
 
       for( i = 0; i < pLine->item.asString.length; i++ )
       {
          if( pLine->item.asString.value[i] == cDelimiter )
          {
-            hb_arrayAddForward( pArray, hb_itemPutCL( pToken, pLine->item.asString.value + iOffset, i - iOffset ) );
+            hb_arrayAddForward( &(HB_VM_STACK.Return), hb_itemPutCL( &Token, pLine->item.asString.value + iOffset, i - iOffset ) );
 
             iOffset = i + 1;
          }
@@ -624,10 +626,9 @@ HB_FUNC( HB_ATOKENS )
 
       if( iOffset < pLine->item.asString.length )
       {
-         hb_arrayAddForward( pArray, hb_itemPutCL( pToken, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
+         hb_arrayAddForward( &(HB_VM_STACK.Return), hb_itemPutCL( &Token, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
       }
 
-      hb_itemRelease( pToken );
    }
    else
    {
