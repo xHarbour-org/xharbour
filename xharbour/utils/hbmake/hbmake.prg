@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.107 2004/01/05 02:57:37 lculik Exp $
+ * $Id: hbmake.prg,v 1.108 2004/01/09 18:51:31 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -2036,7 +2036,7 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) comdlg32.lib shell32.lib user32.lib gdi32.lib" + CRLF )
    ELSEIF s_lGcc
       fWrite( s_nLinkHandle, "CFLAG1 = " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude ),"")        + IIF(  "Linux" IN cOs, "-I/usr/include/xharbour", " -I$(BHC)/include" ) + " -c -Wall" + IIF( s_lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
-      fWrite( s_nLinkHandle, "CFLAG2 = " + IIF(  "Linux" IN cOs, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib" ) + iif(lXwt,,"") + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG2 = " + IIF(  "Linux" IN cOs, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib" )  + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LFLAGS =" + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + CRLF )
@@ -3769,4 +3769,4 @@ RETURN .T.
 
 function CheckCompiler(cOs)
 
-RETURN ("Win32" IN cOs)
+RETURN ( ("Win32" IN cOs) .or. ("Linux" In cOs) )
