@@ -93,6 +93,9 @@ METHOD Compile()
 RETURN nProcId > 0
 
 //----------------------------------------------------------------------------//
+
+#ifdef USE_C_BOOST
+
 #pragma BEGINDUMP
 
 #include <ctype.h>
@@ -706,6 +709,8 @@ HB_FUNC( DROPEXTRATRAILINGWS )
 }
 
 #pragma ENDDUMP
+
+#endif
 
 //----------------------------------------------------------------------------//
 #ifdef WIN

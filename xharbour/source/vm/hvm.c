@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.9 2002/01/04 07:15:23 ronpinkas Exp $
+ * $Id: hvm.c,v 1.10 2002/01/04 22:24:32 andijahja Exp $
  */
 
 /*
@@ -976,13 +976,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_PUSHSTR:
          {
             USHORT uiSize = pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 );
-            hb_vmPushString( ( char * ) pCode + w + 3, ( ULONG )( uiSize ) - 1 );
+            hb_itemPushEnvelopeString( ( char * ) pCode + w + 3, ( ULONG )( uiSize ) - 1 );
             w += ( 3 + uiSize );
             break;
          }
 
          case HB_P_PUSHSTRSHORT:
-            hb_vmPushString( ( char * ) pCode + w + 2, ( ULONG )( pCode[ w + 1 ] ) - 1 );
+            hb_itemPushEnvelopeString( ( char * ) pCode + w + 2, ( ULONG )( pCode[ w + 1 ] ) - 1 );
             w += ( 2 + pCode[ w + 1 ] );
             break;
 
@@ -1618,7 +1618,7 @@ static void hb_vmPlus( void )
             pItem1->item.asString.value = ( char * ) hb_xgrab( pItem1->item.asString.length + pItem2->item.asString.length + 1 );
             pItem1->bShadow = FALSE;
             hb_xmemcpy( pItem1->item.asString.value, pTmp, pItem1->item.asString.length );
-            HB_TRACE( HB_TR_DEBUG, ( "SHADOW hb_vmPlus() \"%s\"", pItem1->item.asString.value ) );
+            HB_TRACE( HB_TR_DEBUG, ( "De-SHADOW hb_vmPlus() %p \"%s\"", pItem1, pItem1->item.asString.value ) );
          }
          else
          {
@@ -1636,10 +1636,9 @@ static void hb_vmPlus( void )
 
          if( pItem2->item.asString.value && ( ! pItem2->bShadow ) )
          {
-            hb_xfree( pItem2->item.asString.value );
-            pItem2->item.asString.value = NULL;
+            hb_itemReleaseString( pItem2 );
             pItem2->type = HB_IT_NIL;
-            HB_TRACE( HB_TR_DEBUG, ( "RELEASED SHADOW hb_vmPlus() \"%p\"", pItem2 ) );
+            HB_TRACE( HB_TR_DEBUG, ( "RELEASED NON SHADOW hb_vmPlus() \"%p\"", pItem2 ) );
          }
 
          hb_stackPop();
@@ -1747,8 +1746,7 @@ static void hb_vmMinus( void )
 
          if( pItem2->item.asString.value && ! ( pItem2->bShadow ) )
          {
-            hb_xfree( pItem2->item.asString.value );
-            pItem2->item.asString.value = NULL;
+            hb_itemReleaseString( pItem2 );
          }
 
          hb_stackPop();
@@ -3143,7 +3141,9 @@ void hb_vmSend( USHORT uiParams )
    }
 
    if( bProfiler )
+   {
       ulClock = ( ULONG ) clock();
+   }
 
    pItem = hb_stackNewFrame( &sStackState, uiParams );   /* procedure name */
    pSym = pItem->item.asSymbol.value;

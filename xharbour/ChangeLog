@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.18 2002/01/04 21:27:26 andijahja Exp $
+ * $Id: ChangeLog,v 1.19 2002/01/04 22:27:14 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-04 19:14 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/codebloc.c
+  * source/vm/garbage.c
+    ! Minor corrections.
+
+  * source/vm/fastitem.c
+    + Added void hb_itemReleaseString( PHB_ITEM pItem )
+
+  * source/vm/itemapi.c
+    ! Changed hb_itemClear() to call new hb_itemReleaseString() for HB_IT_STRING.
+
+  * source/vm/hvm.c
+    ! Now using hb_itemPushEnevleopString()
+
+  * tests/logtime.prg
+    * Changed to use fwrite() instead of QOut() to allow output redirection.
+
+  * tests/pp.prg
+  * tests/pp_harb.ch
+    + Added support for -dDONT_BOOST to avoid using C versions if desiring pure PRG even with Harbour.
+
+/* Current statistcs for hbtest //info > hbtest.log are:
+
+             xHarbour           Harbour     % Difference
+            ---------          ---------    ------------
+Time:            0.77               1.02             32%
+Aloccated:  4,138,118          6,570,947             58%
+
+This will get further boost upon completion of the string sharing optimization.
+
+2002-01-04 18:28 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.sly
+    + Added missing type casts.
+
 2002-01-05 05:30:00 UTC+0700 Andi Jahja <andijahja@cbn.net.id>
    * sourc/vm/dynlibhb.c
      - remove function hb_StartApp()

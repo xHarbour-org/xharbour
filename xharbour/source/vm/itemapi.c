@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.5 2002/01/02 04:40:08 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.6 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -789,13 +789,7 @@ void hb_itemClear( PHB_ITEM pItem )
    }
    else if( HB_IS_STRING( pItem ) )
    {
-      if( pItem->item.asString.value )
-      {
-         hb_xfree( pItem->item.asString.value );
-         pItem->item.asString.value = NULL;
-      }
-
-      pItem->item.asString.length = 0;
+      hb_itemReleaseString( pItem );
    }
    else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {

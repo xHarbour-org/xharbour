@@ -1,3 +1,3 @@
 Procedure Main()
-   ? Time()
+   FWrite( 1, Chr(10) + Time() )
 RETURN

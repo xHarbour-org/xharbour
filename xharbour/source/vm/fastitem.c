@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.6 2002/01/04 07:15:23 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.7 2002/01/04 17:56:12 ronpinkas Exp $
  */
 
 /*
@@ -72,19 +72,23 @@ void hb_itemShareValue( PHB_ITEM pDest, PHB_ITEM pSource )
 
    //return hb_itemCopy( pDest, pSource );
 
-   if( pDest->type )
-   {
-      hb_itemClear( pDest );
-   }
-
    if( pDest == pSource )
    {
       hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemShareValue()", NULL );
    }
 
+   if( pDest->type )
+   {
+      hb_itemClear( pDest );
+   }
+
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
-   if( HB_IS_ARRAY( pSource ) )
+   if( HB_IS_STRING( pSource ) )
+   {
+      pDest->bShadow = TRUE;
+   }
+   else if( HB_IS_ARRAY( pSource ) )
    {
       ( pSource->item.asArray.value )->uiHolders++;
       pDest->bShadow = FALSE;
@@ -99,36 +103,50 @@ void hb_itemShareValue( PHB_ITEM pDest, PHB_ITEM pSource )
       hb_memvarValueIncRef( pSource->item.asMemvar.value );
       pDest->bShadow = FALSE;
    }
-   else
-   {
-      pDest->bShadow = TRUE;
-   }
 }
 
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
 {
    HB_TRACE( HB_TR_DEBUG, ("hb_itemForwardValue(%p, %p)", pDest, pSource ) );
 
+   if( pDest == pSource )
+   {
+      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemShareValue()", NULL );
+   }
+
    /* Source is already a shadow. */
+
+   #if 1
    if( pSource->bShadow )
    {
       hb_itemCopy( pDest, pSource );
       return;
    }
+   #endif
 
    if( pDest->type )
    {
       hb_itemClear( pDest );
    }
 
-   if( pDest == pSource )
-   {
-      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemShareValue()", NULL );
-   }
-
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
-   pSource->bShadow = TRUE;
+   if( HB_IS_STRING( pSource ) )
+   {
+      pSource->bShadow = TRUE;
+   }
+   else if( HB_IS_ARRAY( pSource ) )
+   {
+      ( pSource->item.asArray.value )->uiHolders++;
+   }
+   else if( HB_IS_BLOCK( pSource ) )
+   {
+      ( pSource->item.asBlock.value )->ulCounter++;
+   }
+   else if( HB_IS_MEMVAR( pSource ) )
+   {
+      hb_memvarValueIncRef( pSource->item.asMemvar.value );
+   }
 }
 
 void hb_itemVarAssign( PHB_ITEM pVar )
@@ -137,23 +155,33 @@ void hb_itemVarAssign( PHB_ITEM pVar )
 
    HB_TRACE( HB_TR_DEBUG, ("hb_itemAssign(%p, %p)", pVar ) );
 
-   if( pVar->type == HB_IT_STRING )
+   if( HB_IS_STRING( pVar ) )
    {
-      if( pValue->type == HB_IT_STRING && pVar->item.asString.value == pValue->item.asString.value )
+      if( pVar->bShadow )
       {
+         /* Recepient Var is a shadow, value will not be released, do nothing. */
+      }
+      else if( HB_IS_STRING( pValue ) && pVar->item.asString.value == pValue->item.asString.value )
+      {
+         /* Assign self ( cVar := cVar ), value would have been lost on hb_itemClear(), which is also the new value! */
          pValue->type = HB_IT_NIL;
          return;
+      }
+      else if( pVar->item.asString.value == NULL )
+      {
+         /* Nothing will be released, do nothing. */
       }
       else
       {
          long i;
 
-         for( i = 2; i < hb_stack.wItems; ++i )
+         long lItems = hb_stack.pPos - hb_stack.pItems - 1;
+
+         for( i = 2; i < lItems; ++i )
          {
-            if( hb_stack.pItems[ i ]->bShadow && hb_stack.pItems[ i ]->type == HB_IT_STRING &&
-                hb_stack.pItems[ i ]->item.asString.value == pVar->item.asString.value )
+            if( hb_stack.pItems[ i ]->bShadow && HB_IS_STRING( hb_stack.pItems[ i ] ) && hb_stack.pItems[ i ]->item.asString.value == pVar->item.asString.value )
             {
-               /* Shadow caster about to change, must get a true copy before value is lost. */
+               /* Shadow caster is about to change, the shadow must now get a true copy before value is lost. */
                hb_stack.pItems[ i ]->item.asString.value = hb_itemGetC( pVar );
                hb_stack.pItems[ i ]->bShadow = FALSE;
             }
@@ -161,8 +189,39 @@ void hb_itemVarAssign( PHB_ITEM pVar )
       }
    }
 
+   if( HB_IS_STRING( pValue ) )
+   {
+      hb_itemForwardValue( pVar, pValue );
+      hb_itemClear( pValue );
+      return;
+   }
+
    hb_itemCopy( pVar, pValue );
    hb_itemClear( pValue );
+}
+
+void hb_itemReleaseString( PHB_ITEM pItem )
+{
+   if( pItem->item.asString.value )
+   {
+      long i;
+
+      long lItems = hb_stack.pPos - hb_stack.pItems - 1;
+
+      for( i = 2; i < lItems; ++i )
+      {
+         if( hb_stack.pItems[ i ]->bShadow && HB_IS_STRING( hb_stack.pItems[ i ] ) && hb_stack.pItems[ i ]->item.asString.value == pItem->item.asString.value )
+         {
+            /* Shadow caster is about to be released, the shadow must now obtain a true copy before value is lost. */
+            hb_stack.pItems[ i ]->item.asString.value = hb_itemGetC( pItem );
+            hb_stack.pItems[ i ]->bShadow = FALSE;
+         }
+      }
+
+      hb_xfree( pItem->item.asString.value );
+      pItem->item.asString.value = NULL;
+      pItem->item.asString.length = 0;
+   }
 }
 
 void hb_itemPushEnvelopeString( char * szText, ULONG length )

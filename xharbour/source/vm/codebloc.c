@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.1.1.1 2001/12/21 10:40:47 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.2 2001/12/22 06:36:17 ronpinkas Exp $
  */
 
 /*
@@ -121,6 +121,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
             hMemvar = hb_memvarValueNew( pLocal, FALSE );
 
             pLocal->type = HB_IT_BYREF | HB_IT_MEMVAR;
+            pLocal->bShadow = FALSE;
             pLocal->item.asMemvar.itemsbase = hb_memvarValueBaseAddress();
             pLocal->item.asMemvar.offset    = 0;
             pLocal->item.asMemvar.value     = hMemvar;

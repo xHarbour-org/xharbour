@@ -21,10 +21,18 @@
  * their web site at http://www.gnu.org/).
  */
 
+#ifdef PP_QUIET
+   #COMMAND @ Row(), 0 SAY <nLine> =>
+#endif
+
 #DEFINE MAX_CICLES 64
 #DEFINE PP_BUFFER_SIZE 8192 //16384
 
 #ifdef __HARBOUR__
+   #ifndef DONT_BOOST
+      #define USE_C_BOOST
+   #endif
+
    #INCLUDE "hbextern.ch"
    #DEFINE  CRLF HB_OsNewLine()
    #ifdef FW
@@ -3825,7 +3833,7 @@ RETURN 0
 
 //--------------------------------------------------------------//
 
-#ifndef __HARBOUR__
+#ifndef USE_C_BOOST
 
 STATIC FUNCTION NextToken( sLine, lDontRecord )
 
@@ -4286,7 +4294,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                  sExp           += sNextToken
                  sLastToken     := sJustNext
                  sLine          := sNextLine
-                 #ifdef __HARBOUR__
+                 #ifdef USE_C_BOOST
                     SetArrayPrefix( .T. )
                  #else
                     s_bArrayPrefix := .T.
@@ -4297,7 +4305,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                     sExp           += sNextToken
                     sLastToken     := "."
                     sLine          := sNextLine
-                    #ifdef __HARBOUR__
+                    #ifdef USE_C_BOOST
                        SetArrayPrefix( .T. )
                     #else
                        s_bArrayPrefix := .T.
@@ -4311,7 +4319,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                              sExp           += sNextToken
                              sLastToken     := RTrim( sNextToken )
                              sLine          := sNextLine
-                             #ifdef __HARBOUR__
+                             #ifdef USE_C_BOOST
                                 SetArrayPrefix( .T. )
                              #else
                                 s_bArrayPrefix := .T.
@@ -4333,7 +4341,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            IF Left( sNext1, 1 ) == ')'
               sExp           += sNextToken
               sLine          := sNextLine
-              #ifdef __HARBOUR__
+              #ifdef USE_C_BOOST
                  SetArrayPrefix( .T. )
               #else
                  s_bArrayPrefix := .T.
@@ -4376,7 +4384,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               /* Literal block */
               sExp           += sNextToken
               sLine          := sNextLine
-              #ifdef __HARBOUR__
+              #ifdef USE_C_BOOST
                  SetArrayPrefix( .F. )
               #else
                  s_bArrayPrefix := .F.
@@ -4385,7 +4393,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               IF sNextToken != NIL .AND. Left( sNextToken, 1 ) == '|'
                  sExp           += sNextToken
                  sLine          := sNextLine
-                 #ifdef __HARBOUR__
+                 #ifdef USE_C_BOOST
                     SetArrayPrefix( .F. )
                  #else
                     s_bArrayPrefix := .F.
@@ -4406,7 +4414,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                  IF sNextToken != NIL .AND. Left( sNextToken, 1 ) == '|'
                     sExp           += sNextToken
                     sLine          := sNextLine
-                    #ifdef __HARBOUR__
+                    #ifdef USE_C_BOOST
                        SetArrayPrefix( .F. )
                     #else
                        s_bArrayPrefix := .F.
@@ -4448,7 +4456,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               IF sNext1 == '}'
                  sExp           += sNextToken
                  sLine          := sNextLine
-                 #ifdef __HARBOUR__
+                 #ifdef USE_C_BOOST
                     SetArrayPrefix( .T. )
                  #else
                     s_bArrayPrefix := .T.
@@ -4635,7 +4643,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         ELSEIF sNext1 $ "+-*/:=^!><!$%#|" // *** Very ODD Clipper consider '|' a continuation token !!!
            sExp           += sNextToken
            sLine          := sNextLine
-           #ifdef __HARBOUR__
+           #ifdef USE_C_BOOST
               SetArrayPrefix( .F. )
            #else
               s_bArrayPrefix := .F.
@@ -4649,7 +4657,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            IF IsAlpha( cLastChar  ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "_.]"
               sExp           += sNextToken
               sLine          := sNextLine
-              #ifdef __HARBOUR__
+              #ifdef USE_C_BOOST
                  SetArrayPrefix( .F. )
               #else
                  s_bArrayPrefix := .F.
@@ -4658,7 +4666,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         ELSEIF sNext2 $ "->\:=\==\!=\<>\>=\<=\+=\-=\*=\/=\^=\**\%="
            sExp           += sNextToken
            sLine          := sNextLine
-           #ifdef __HARBOUR__
+           #ifdef USE_C_BOOST
               SetArrayPrefix( .T. )
            #else
               s_bArrayPrefix := .T.
@@ -4671,7 +4679,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         IF sNext4 == ".OR."
            sExp           += sNextToken
            sLine          := sNextLine
-           #ifdef __HARBOUR__
+           #ifdef USE_C_BOOST
               SetArrayPrefix( .F. )
            #else
               s_bArrayPrefix := .F.
@@ -4685,7 +4693,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            sExp           += sNextToken
            sLine          := sNextLine
            s_bArrayPrefix := .F.
-           #ifdef __HARBOUR__
+           #ifdef USE_C_BOOST
               SetArrayPrefix( .F. )
            #else
               s_bArrayPrefix := .F.
@@ -4696,7 +4704,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            sExp           += sNextToken
            sLine          := sNextLine
            s_bArrayPrefix := .F.
-           #ifdef __HARBOUR__
+           #ifdef USE_C_BOOST
               SetArrayPrefix( .F. )
            #else
               s_bArrayPrefix := .F.
@@ -4713,7 +4721,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         IF cType == ","
            sList          += ( sExp + sNextToken )
            sLine          := sNextLine
-           #ifdef __HARBOUR__
+           #ifdef USE_C_BOOST
               SetArrayPrefix( .F. )
            #else
               s_bArrayPrefix := .F.
@@ -4722,7 +4730,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         ELSEIF cType == "A"
            aAdd( aExp, sExp )
            sLine          := sNextLine
-           #ifdef __HARBOUR__
+           #ifdef USE_C_BOOST
               SetArrayPrefix( .F. )
            #else
               s_bArrayPrefix := .F.
@@ -6356,7 +6364,7 @@ RETURN Len( aDefRules )
 
 //--------------------------------------------------------------//
 
-#ifndef __HARBOUR__
+#ifndef USE_C_BOOST
 
 FUNCTION ExtractLeadingWS( sLine, sWS )
 
@@ -6386,7 +6394,7 @@ RETURN sWS
 
 //--------------------------------------------------------------//
 
-#ifndef __HARBOUR__
+#ifndef USE_C_BOOST
 
 FUNCTION DropTrailingWS( sLine, sWS )
 
@@ -6413,7 +6421,7 @@ RETURN sLine
 
 //--------------------------------------------------------------//
 
-#ifndef __HARBOUR__
+#ifndef USE_C_BOOST
 
 FUNCTION DropExtraTrailingWS( sLine )
 
@@ -7636,7 +7644,7 @@ RETURN s_oSelf
 
 //--------------------------------------------------------------//
 
-#ifndef __HARBOUR__
+#ifndef USE_C_BOOST
 
 STATIC FUNCTION NextIdentifier( sLine, sSkipped )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.3 2002/01/02 04:40:08 ronpinkas Exp $
+ * $Id: garbage.c,v 1.4 2002/01/03 06:28:34 ronpinkas Exp $
  */
 
 /*
@@ -198,7 +198,7 @@ static HB_GARBAGE_FUNC( hb_gcGripRelease )
    /* Only needed when collecting garbage. */
    if( s_bCollecting )
    {
-      if( HB_IS_STRING( (HB_ITEM_PTR) Cargo ) && ( (HB_ITEM_PTR) Cargo )->item.asString.value )
+      if( HB_IS_STRING( (HB_ITEM_PTR) Cargo ) && ( ! ( ( (HB_ITEM_PTR) Cargo )->bShadow ) ) && ( (HB_ITEM_PTR) Cargo )->item.asString.value )
       {
          HB_TRACE( HB_TR_INFO, ( "Garbage Release String %p", ( (HB_ITEM_PTR) Cargo )->item.asString.value ) );
 
