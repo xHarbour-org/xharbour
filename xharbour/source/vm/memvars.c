@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.79 2004/04/27 22:04:12 ronpinkas Exp $
+ * $Id: memvars.c,v 1.80 2004/04/28 22:24:52 ronpinkas Exp $
  */
 
 /*
@@ -91,6 +91,8 @@
 #include "hbset.h"
 #include "hbvm.h"
 
+#include "regex.h"
+
 //JC1: under threads, we need this to be in thread stack
 #ifndef HB_THREAD_SUPPORT
 static PHB_DYNS * s_privateStack  = NULL;
@@ -147,8 +149,6 @@ static void hb_memvarCreateFromDynSymbol( PHB_DYNS, BYTE, PHB_ITEM );
 static void hb_memvarAddPrivate( PHB_DYNS );
 static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR );
 void hb_memvarReleasePublic( PHB_ITEM pMemVar );
-
-// extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
 
 extern void hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM ); /* call an overloaded operator */
 
@@ -814,10 +814,10 @@ ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarGet(%p, %p)", pItem, pMemvarSymb));
 
    #ifdef HB_THREAD_SUPPORT
-   // we must find the thread specific name
-   pDyn = s_memvarThGetName( pMemvarSymb->szName, &HB_VM_STACK );
+      // we must find the thread specific name
+      pDyn = s_memvarThGetName( pMemvarSymb->szName, &HB_VM_STACK );
    #else
-   pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
+      pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
    #endif
 
    if( pDyn )
@@ -888,10 +888,10 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarGetRefer(%p, %p)", pItem, pMemvarSymb));
    #ifdef HB_THREAD_SUPPORT
-   // we must find the thread specific name
-   pDyn = s_memvarThGetName( pMemvarSymb->szName, &HB_VM_STACK);
+      // we must find the thread specific name
+      pDyn = s_memvarThGetName( pMemvarSymb->szName, &HB_VM_STACK);
    #else
-   pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
+      pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
    #endif
 
    if( pDyn )
@@ -1203,7 +1203,15 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
    ULONG ulBase = s_privateStackCnt;
    PHB_DYNS pDynVar;
 
+   regex_t re;
+   regmatch_t aMatches[1];
+
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarReleaseWithMask(%s, %d)", sRegEx, (int) bInclude));
+
+   if( regcomp( &re, sRegEx, REG_EXTENDED ) )
+   {
+      hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s'\n", sRegEx, NULL );
+   }
 
    while( ulBase > s_privateStackBase )
    {
@@ -1221,7 +1229,7 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
 
          if( bInclude )
          {
-            if( hb_strMatchRegExp( pDynVar->pSymbol->szName, sRegEx ) )
+            if( regexec( &re, pDynVar->pSymbol->szName, 1, aMatches, 0 ) == 0 )
             {
                if( HB_IS_COMPLEX( pRef ) )
                {
@@ -1233,7 +1241,7 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
                }
             }
          }
-         else if( ! hb_strMatchRegExp( pDynVar->pSymbol->szName, sRegEx ) )
+         else if( regexec( &re, pDynVar->pSymbol->szName, 1, aMatches, 0 ) )
          {
             if( HB_IS_COMPLEX( pRef ) )
             {
@@ -1484,6 +1492,7 @@ static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR pName )
          #ifdef HB_THREAD_SUPPORT
             char szNewName[270];
             HB_THREAD_STUB;
+
             sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, pName->item.asString.value );
             pDynSym = hb_dynsymFindName( szNewName );
          #else
@@ -1637,7 +1646,7 @@ HB_FUNC( __MVRELEASE )
    HB_THREAD_STUB
 
    // Arbitary value which should be big enough.
-   char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
+   char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
 
    int iCount = hb_pcount();
 
@@ -1924,8 +1933,7 @@ typedef struct
    BOOL bIncludeMask;
    BYTE * buffer;
    FHANDLE fhnd;
-   // Arbitary value which should be big enough.
-   char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
+   regex_t re;
 } MEMVARSAVE_CARGO;
 
 /* saves a variable to a mem file already open */
@@ -1937,7 +1945,8 @@ static HB_DYNS_FUNC( hb_memvarSave )
    BOOL bIncludeMask = ( ( MEMVARSAVE_CARGO * ) Cargo )->bIncludeMask;
    BYTE * buffer     = ( ( MEMVARSAVE_CARGO * ) Cargo )->buffer;
    FHANDLE fhnd      = ( ( MEMVARSAVE_CARGO * ) Cargo )->fhnd;
-   char * sRegEx     = ( ( MEMVARSAVE_CARGO * ) Cargo )->sRegEx;
+
+   regmatch_t aMatches[1];
 
    /* NOTE: Harbour name lengths are not limited, but the .MEM file
             structure is not flexible enough to allow for it.
@@ -1945,7 +1954,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
    if( pDynSymbol->hMemvar )
    {
-      BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( pDynSymbol->pSymbol->szName, sRegEx ) );
+      BOOL bMatch = ( pszMask[ 0 ] == '*' || regexec( &( ( ( MEMVARSAVE_CARGO * ) Cargo )->re ), pDynSymbol->pSymbol->szName, 1, aMatches, 0 ) == 0 );
 
       PHB_ITEM pItem;
 
@@ -1994,6 +2003,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
             hb_itemGetNLen( pItem, &iWidth, &iDec );
 
             buffer[ 11 ] = 'N' + 128;
+
 #ifdef HB_C52_STRICT
 /* NOTE: This is the buggy, but fully CA-Cl*pper compatible method. [vszakats] */
             buffer[ 16 ] = ( BYTE ) iWidth + ( HB_IS_DOUBLE( pItem ) ? iDec + 1 : 0 );
@@ -2001,6 +2011,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
 /* NOTE: This would be the correct method, but Clipper is buggy here. [vszakats] */
             buffer[ 16 ] = ( BYTE ) iWidth + ( iDec == 0 ? 0 : iDec + 1 );
 #endif
+
             buffer[ 17 ] = ( BYTE ) iDec;
 
             hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
@@ -2059,15 +2070,22 @@ HB_FUNC( __MVSAVE )
       {
          BYTE buffer[ HB_MEM_REC_LEN ];
          MEMVARSAVE_CARGO msc;
+         // Arbitary value, *SHOULD* be long enough.
+         char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
 
          msc.pszMask      = hb_parcx( 2 );
          msc.bIncludeMask = hb_parl( 3 );
          msc.buffer       = buffer;
          msc.fhnd         = fhnd;
-         Wild2RegEx( (char *) (msc.pszMask), (char *) (msc.sRegEx), FALSE );
+
+         Wild2RegEx( (char *) (msc.pszMask), sRegEx, FALSE );
+
+         if( regcomp( &msc.re, sRegEx, REG_EXTENDED ) )
+         {
+            hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s' -> '%s'\n", (char *) (msc.pszMask), sRegEx );
+         }
 
          /* Walk through all visible memory variables and save each one */
-
          hb_dynsymEval( hb_memvarSave, ( void * ) &msc );
 
          buffer[ 0 ] = '\x1A';
@@ -2144,9 +2162,17 @@ HB_FUNC( __MVRESTORE )
          BYTE buffer[ HB_MEM_REC_LEN ];
 
          // Arbitary value which should be big enough.
-         char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
+         char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
+
+         regex_t re;
+         regmatch_t aMatches[1];
 
          Wild2RegEx( (char *) pszMask, (char *) sRegEx, FALSE );
+
+         if( regcomp( &re, sRegEx, REG_EXTENDED ) )
+         {
+            hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s' -> '%s'\n", (char *) pszMask, sRegEx );
+         }
 
          while( hb_fsRead( fhnd, buffer, HB_MEM_REC_LEN ) == HB_MEM_REC_LEN )
          {
@@ -2218,7 +2244,7 @@ HB_FUNC( __MVRESTORE )
 
             if( &Item )
             {
-               BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( (&Name)->item.asString.value, sRegEx ) );
+               BOOL bMatch = ( pszMask[ 0 ] == '*' || regexec( &re, (&Name)->item.asString.value, 1, aMatches, 0 ) == 0 );
 
                /* Process it if it matches the passed mask */
                if( bIncludeMask ? bMatch : ! bMatch )
@@ -2242,12 +2268,14 @@ HB_FUNC( __MVRESTORE )
                      PHB_DYNS pDyn;
 
                      hb_dynsymUnlock();
+
                      /* attempt to assign a value to undeclared variable create the PRIVATE one */
                      #ifdef HB_THREAD_SUPPORT
                         pDyn = s_memvarThGetName( (&Name)->item.asString.value, &HB_VM_STACK );
                      #else
                         pDyn = hb_dynsymGet( (&Name)->item.asString.value );
                      #endif
+
                      hb_memvarCreateFromDynSymbol( pDyn, VS_PRIVATE, &Item );
                   }
 
@@ -2337,6 +2365,7 @@ HB_HANDLE hb_memvarGetVarHandle( char *szName )
 
    #ifdef HB_THREAD_SUPPORT
       char szNewName[270];
+
       sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, szName );
    #endif
 
