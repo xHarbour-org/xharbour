@@ -1,3 +1,7 @@
+#
+# $Id: makefile.vc,v 1.68 2003/09/09 02:07:54 paultucker Exp $
+#
+
 !IF "$(OS)" == "Windows_NT"
 NULL=
 !ELSE
