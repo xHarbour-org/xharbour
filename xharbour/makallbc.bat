@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallbc.bat,v 1.5 2003/10/01 17:44:49 paultucker Exp $
+rem $Id: makallbc.bat,v 1.6 2003/10/09 05:31:53 paultucker Exp $
 rem 
 
 echo create system files
@@ -10,7 +10,15 @@ echo harbour.dll
 call dll_b32 %1
 if errorlevel 1 goto end
 
-:start
+:firebird
+echo firebird
+echo Uncomment this section if you have Firebird installed
+rem cd contrib\firebird
+rem if exist make_b32.bat call make_b32.bat %1
+rem cd ..\..
+rem if errorlevel 1 goto end
+
+:hbzlib
 echo hbzip
 cd contrib\hbzlib
 call make_b32.bat %1
@@ -53,12 +61,21 @@ cd ..\..
 if errorlevel 1 goto end
 
 :mysql
-rem echo mysql
+echo mysql
+echo Uncomment this section if you have mysql installed
 rem requires mysql.h to be installed
 rem cd contrib\mysql
 rem call make_b32.bat %1
 rem cd ..\..
 if errorlevel 1 goto end
+
+:pgsql
+echo pgsql
+echo Uncomment this section if you have pgsql installed
+rem cd contrib\pgsql
+rem if exist make_b32.bat call make_b32.bat %1
+rem cd ..\..
+rem if errorlevel 1 goto end
 
 :rdd_ads
 echo rdd_ads

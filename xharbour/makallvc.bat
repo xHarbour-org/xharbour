@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallvc.bat,v 1.6 2003/09/23 21:38:40 paultucker Exp $
+rem $Id: makallvc.bat,v 1.7 2003/10/09 05:31:53 paultucker Exp $
 rem 
 
 echo creating system files
@@ -9,6 +9,14 @@ call make_vc %1
 echo harbour.dll
 call dll_vc %1
 if errorlevel 1 goto end
+
+:firebird
+echo firebird
+echo Uncomment this section if you have firebird installed
+rem cd contrib\firebird
+rem if exist make_vc.bat call make_vc.bat %1
+rem cd ..\..
+rem if errorlevel 1 goto end
 
 :hbzlib
 echo hbzip
@@ -53,12 +61,20 @@ cd ..\..
 if errorlevel 1 goto end
 
 :mysql
-rem echo mysql
-rem requires mysql.h to be installed
+echo mysql
+echo Uncomment this section if you have mysql installed
 rem cd contrib\mysql
-rem call make_vc.bat %1
+rem if exist make_vc.bat call make_vc.bat %1
 rem cd ..\..
-if errorlevel 1 goto end
+rem if errorlevel 1 goto end
+
+:pgsql
+echo pgsql
+echo Uncomment this section if you have pgsql installed
+rem cd contrib\pgsql
+rem if exist make_vc.bat call make_vc.bat %1
+rem cd ..\..
+rem if errorlevel 1 goto end
 
 :rdd_ads
 echo rdd_ads
