@@ -1,5 +1,5 @@
 ;/*
- * $Id: gtcrs.c,v 1.10 2003/05/27 14:02:08 druzus Exp $
+ * $Id: gtcrs.c,v 1.11 2003/05/29 20:44:29 druzus Exp $
  */
 
 /*
@@ -1188,6 +1188,18 @@ static void gt_refresh(InOutBase *ioBase)
     }
 }
 
+static void gt_ttyset(InOutBase *ioBase)
+{
+    if (isatty(ioBase->base_infd))
+	tcsetattr( ioBase->base_infd, TCSANOW, &ioBase->curr_TIO );
+}
+
+static void gt_ttyrestore(InOutBase *ioBase)
+{
+    if (ioBase->lTIOsaved)
+	tcsetattr( ioBase->base_infd, TCSANOW, &ioBase->saved_TIO );
+}
+
 static void gt_outstd(InOutBase *ioBase, const char *str, int len)
 {
     write(ioBase->stdoutfd, str, len);
@@ -1469,7 +1481,7 @@ static void set_sig_keys(InOutBase *ioBase, int key_int, int key_brk, int key_st
             ioBase->curr_TIO.c_lflag |= ISIG;
 
 	/* ioctl( ioBase->base_infd, TIOCSCTTY, 0 ); */
-	tcsetattr( ioBase->base_infd, TCSANOW, &ioBase->curr_TIO );
+	gt_ttyset( ioBase );
     }
 }
 
@@ -1548,18 +1560,6 @@ static int gt_setsize(InOutBase *ioBase, int rows, int cols)
     }
 
     return ret;
-}
-
-static void gt_ttyset(InOutBase *ioBase)
-{
-    if (isatty(ioBase->base_infd))
-	tcsetattr( ioBase->base_infd, TCSANOW, &ioBase->curr_TIO );
-}
-
-static void gt_ttyrestore(InOutBase *ioBase)
-{
-    if (ioBase->lTIOsaved)
-	tcsetattr( ioBase->base_infd, TCSANOW, &ioBase->saved_TIO );
 }
 
 static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_t termpid)
@@ -1773,9 +1773,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
     noecho();
 */
 
-    if (isatty(ioBase->base_infd))
-	tcsetattr( ioBase->base_infd, TCSANOW, &ioBase->curr_TIO );
-
+    gt_ttyset( ioBase );
     add_efds(ioBase, ioBase->base_infd, O_RDONLY, NULL, NULL);
 
     init_keys(ioBase);
@@ -1824,8 +1822,7 @@ static void destroy_ioBase(InOutBase *ioBase)
 	removeAllKeyMap(&ioBase->pKeyTab);
 
     /* restore terminal settings */
-    if (ioBase->lTIOsaved)
-	tcsetattr(ioBase->base_infd, TCSANOW, &ioBase->saved_TIO);
+    gt_ttyrestore(ioBase);
 
     /* kill terminal proces if any */
     if (ioBase->termpid > 0) {

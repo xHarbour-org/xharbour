@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.6 2003/05/30 02:02:50 lculik Exp $
+# $Id: xharbour.spec,v 1.7 2003/06/03 04:08:49 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -24,6 +24,7 @@
 %define hb_gt    crs
 %define hb_mt    MT
 %define hb_mgt   yes
+%define hb_lnkso yes
 %define hb_libs  vm pp rtl rdd dbfcdx dbfntx odbc macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca debug
 
 %define hb_cc    export HB_COMPILER="gcc"
@@ -183,7 +184,7 @@ mkdir -p $HB_LIB_INSTALL
 make -i install
 
 # Keep the size of the binaries to a minimim.
-strip --strip-debug $HB_BIN_INSTALL/*
+strip $HB_BIN_INSTALL/*
 # Keep the size of the libraries to a minimim.
 strip --strip-debug $HB_LIB_INSTALL/*
 
@@ -217,7 +218,7 @@ for l in lib%{name}.so lib%{name}mt.so
 do
     [ -f %{name}/$l ] && ln -s %{name}/$l $l
 done
-LD_LIBRARY_PATH="$HB_LIB_INSTALL:$LD_LIBRARY_PATH"
+#export LD_LIBRARY_PATH="$HB_LIB_INSTALL:$LD_LIBRARY_PATH"
 popd
 
 # Add a harbour compiler wrapper.
@@ -420,12 +421,26 @@ EOF
 
 # Create PP
 pushd tests
-$HB_BIN_INSTALL/xhbmk pp -n -w -es2 -D_DEFAULT_INC_DIR=\"$_DEFAULT_INC_DIR\"
-install pp $HB_BIN_INSTALL/pp
+$HB_BIN_INSTALL/xhbmk pp -n -w -D_DEFAULT_INC_DIR=\"$_DEFAULT_INC_DIR\"
+install -s pp $HB_BIN_INSTALL/pp
 ln -s pp $HB_BIN_INSTALL/pprun
 install rp_dot.ch $HB_INC_INSTALL/
 popd
 
+# check if we should rebuild tools with shared libs
+if [ "%{hb_lnkso}" = yes ]
+then
+    export L_USR="-L${HB_LIB_INSTALL} -lxharbour -lncurses -lslang -lgpm"
+
+    for utl in hbmake hbrun hbpp
+    do
+	pushd utils/${utl}
+	rm -fR "./${HB_ARCHITECTURE}"
+	make install
+	strip ${HB_BIN_INSTALL}/${utl}
+	popd
+    done
+fi
 
 # Create a README file for people using this RPM.
 cat > doc/%{readme} <<EOF

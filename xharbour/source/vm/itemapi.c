@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.37 2003/05/26 00:19:16 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.38 2003/05/28 11:59:07 druzus Exp $
  */
 
 /*
@@ -1461,7 +1461,7 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                   break;
 
                case HB_IT_STRING:
-                  iBytes = sprintf( szResult, "%*li", iWidth, pNumber->item.asString.value[0] );
+                  iBytes = sprintf( szResult, "%*i", iWidth, pNumber->item.asString.value[0] );
                   break;
 
                default:

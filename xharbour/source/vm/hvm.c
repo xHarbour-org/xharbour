@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.205 2003/05/28 04:10:17 ronpinkas Exp $
+ * $Id: hvm.c,v 1.206 2003/05/28 11:59:07 druzus Exp $
  */
 
 /*
@@ -1234,7 +1234,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_CLASSSETMODULE:
          {
             PHB_ITEM pClassHandle = hb_stackItemFromTop( -1 );
-            USHORT uiClass;
 
             if( HB_IS_INTEGER( pClassHandle ) )
             {
@@ -6700,7 +6699,7 @@ void hb_vmRequestCancel( void )
          }
 
          i2 = strlen( (char *) buffer );
-         sprintf( buffer + i2, " (%lu)", uLine );
+         sprintf( buffer + i2, " (%u)", uLine );
 
          hb_conOutErr( buffer, 0 );
          hb_conOutErr( hb_conNewLine(), 0 );

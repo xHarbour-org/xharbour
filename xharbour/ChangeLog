@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1099 2003/06/05 04:55:25 brianhays Exp $
+ * $Id: ChangeLog,v 1.1100 2003/06/05 17:19:01 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-06 08:15 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/bin/!pack_src.sh
+  * xharbour/bin/!pack_src.bat
+    * added xharbour/source/codepage.*c files
+
+  * xharbour/xharbour.spec
+    * full striping (not only debug information) of executable files
+    * new macro 'hb_lnkso' to relink xHarbour tools (hbmake, hbrun, hbpp)
+      with shared libs - it reduce the size of executable files from
+      1509656 to 193792
+
+  * xharbour/include/hbexprc.c
+  * xharbour/source/vm/classes.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/itemapi.c
+  * xharbour/utils/Makefile
+    * minor cleanups to remove compiler warnings like no new line
+      at the end of file, etc. rather meaningless, Only one thing
+      can be important: in hb_itemStr for HB_IT_STRING translation
+      changed: "%*li" to "%*i"
+
+  There are still many warnings like: "`xVar' might be used uninitialized"
+  most of them are false alarm only but I found some places (like in 
+  console.c, which I corrected some days ago) where they were real bugs
+  which can caused GPFs so in my opinion developers should check it.
+
 2003-06-05 14:20 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   ! source/rdd/dbfntx/dbfntx1.c
     ! Fix on ntxOrderListFocus() which was not refreshing the Current record number
