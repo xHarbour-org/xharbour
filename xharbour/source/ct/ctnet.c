@@ -1,5 +1,5 @@
 /*
- * $Id: ctnet.c,v 1.1 2004/08/27 05:46:07 paultucker Exp $
+ * $Id: ctnet.c,v 1.2 2004/08/31 15:40:42 paultucker Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.
@@ -86,6 +86,7 @@
 
 #include "hbapi.h"
 #include "hbset.h"
+#include "hbapierr.h"
 
 #if defined(HB_OS_WIN_32)
 
@@ -94,11 +95,46 @@
 
 #define HB_OS_WIN_32_USED
 
+BOOL WINAPI WNetErrorHandler(DWORD dwErrorCode, LPSTR lpszFunction) 
+{ 
+    DWORD dwWNetResult, dwLastError; 
+    CHAR szDescription[256]; 
+    CHAR szProvider[256];
+
+    HB_ITEM_PTR pError; 
+ 
+    if (dwErrorCode != ERROR_EXTENDED_ERROR) 
+    { 
+        pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999, "Windows Network operation failed", lpszFunction, dwErrorCode, EF_NONE ); 
+        hb_errLaunch( pError );
+        hb_itemRelease( pError );
+        return TRUE; 
+    } 
+ 
+    else 
+    { 
+        dwWNetResult = WNetGetLastError(&dwLastError, (LPSTR) szDescription, sizeof(szDescription), 
+                           (LPSTR) szProvider,   
+                           sizeof(szProvider)); 
+ 
+        if(dwWNetResult != NO_ERROR) { 
+            pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999, "WNetGetLastError failed", "see OS error", dwWNetResult, EF_NONE ); 
+            hb_errLaunch( pError );
+            hb_itemRelease( pError );
+            return FALSE; 
+        } 
+ 
+        pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999, szDescription, szProvider, dwLastError, EF_NONE ); 
+        hb_errLaunch( pError );
+        hb_itemRelease( pError );
+        return TRUE; 
+    } 
+}
 
 static BOOL hb_IsNetShared(LPSTR szLocalDevice )
 {
    char szRemoteDevice[80] ;
-   DWORD dwResult ;
+   DWORD dwResult;
    DWORD cchBuff = sizeof(szRemoteDevice) ;
 
    dwResult = WNetGetConnection( (LPSTR) szLocalDevice , (LPSTR) szRemoteDevice , &cchBuff) ;
@@ -113,14 +149,14 @@ static BOOL hb_IsNetShared(LPSTR szLocalDevice )
    }
 }
 
-
 HB_FUNC ( NETCANCEL )
 {
    DWORD dwResult;
    char *cDevice = (char *)hb_parc (1);
 
    dwResult = WNetCancelConnection( cDevice , TRUE ) ; // FALSE = fail if exist open files or print jobs.
-                                                                                                       // TRUE = force cancel connection even if exist														//        open files or print jobs.
+                                                       // TRUE = force cancel connection even if exist														
+                                                       //         open files or print jobs.
    hb_retl( dwResult == NO_ERROR ? TRUE : FALSE );
 }
 
@@ -147,15 +183,11 @@ HB_FUNC ( NETDISK )
 
 HB_FUNC ( NETREDIR )
 {
-
    DWORD dwResult;
    char *cSharedRes = hb_parcx( 2 );
    char *cPassword  = hb_parcx( 3 );
-   char cLocalDev[3];
-
-   strncpy( cLocalDev, hb_parcx( 1 ), 1 );
-   cLocalDev[1] = ':';
-   cLocalDev[2] = '\0';
+   char *cLocalDev  = hb_parcx( 1 );
+   char szCommand[80];
 
    if ( hb_pcount() == 3 && ISCHAR( 3 ) )
    {
@@ -166,10 +198,18 @@ HB_FUNC ( NETREDIR )
       dwResult = WNetAddConnection( cSharedRes, NULL, cLocalDev ) ;
    }
 
-   hb_retl( dwResult == NO_ERROR ? TRUE : FALSE );
+   if( dwResult == NO_ERROR )
+   {
+      hb_retl( TRUE );
+   }
+   else
+   {
+      snprintf( szCommand, 80, "NETREDIR( \"%s\", \"%s\", \"%s\" )", cLocalDev, cSharedRes, cPassword ); 
+      WNetErrorHandler( dwResult, szCommand ); 
+      hb_retl( FALSE );
+   }
 
 }
-
 
 HB_FUNC ( NETRMTNAME )
 {
@@ -218,4 +258,3 @@ HB_FUNC ( NNETWORK )
 }
 
 #endif
-
