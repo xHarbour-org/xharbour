@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.140 2005/02/20 11:18:06 ptsarenko Exp $
+# $Id: makefile.bc,v 1.141 2005/03/02 02:11:58 andijahja Exp $
 #
 
 #
@@ -114,7 +114,7 @@ OPT_GUI_OBJ_DIR = $(OBJ_DIR)\opt\gui
 !endif
 
 # uncomment this line if you want to build harbour with multi-gt capabilities
-#HB_MULTI_GT = yes
+# HB_MULTI_GT = yes
 
 #
 # Directory macros. These should never have to change.
@@ -1071,14 +1071,14 @@ DLL_MAIN_LIB_OBJS = \
 # Our default target
 #
 
-PROJECT = \
-   $(COMMON_LIB) \
-   $(PP_LIB)
-
 !if !$d(HB_THREAD_SUPPORT)
    PROJECT = \
-      $(PROJECT) \
+      $(COMMON_LIB) \
+      $(PP_LIB) \
       $(HARBOUR_EXE)
+!else
+   PROJECT = \
+      $(PP_LIB)
 !endif
 
 PROJECT = \
@@ -1094,14 +1094,14 @@ PROJECT = \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
-   $(HB_GT_LIBS) \
    $(SAMPLES_LIB) \
-   $(ODBC_LIB) \
-   $(CT_LIB)
+   $(CT_LIB) \
+   $(ODBC_LIB)
 
 !if !$d(HB_THREAD_SUPPORT)
    PROJECT = \
       $(PROJECT) \
+      $(HB_GT_LIBS) \
       $(DEBUG_LIB) \
       $(LANG_LIB) \
       $(NULSYS_LIB) \
@@ -2576,157 +2576,7 @@ $(RTL_OBJ_DIR)\trpccli.obj : $(RTL_OBJ_DIR)\trpccli.c
 # LANG.LIB dependencies
 #
 
-$(OBJ_DIR)\msgbgwin.obj : $(LANG_DIR)\msgbgwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgby866.obj : $(LANG_DIR)\msgby866.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgbywin.obj : $(LANG_DIR)\msgbywin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgca.obj : $(LANG_DIR)\msgca.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgcs852.obj : $(LANG_DIR)\msgcs852.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgcsiso.obj : $(LANG_DIR)\msgcsiso.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgcskam.obj : $(LANG_DIR)\msgcskam.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgcswin.obj : $(LANG_DIR)\msgcswin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgde.obj : $(LANG_DIR)\msgde.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgdewin.obj : $(LANG_DIR)\msgdewin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgen.obj : $(LANG_DIR)\msgen.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgeo.obj : $(LANG_DIR)\msgeo.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msges.obj : $(LANG_DIR)\msges.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgeswin.obj : $(LANG_DIR)\msgeswin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgeu.obj : $(LANG_DIR)\msgeu.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgfr.obj : $(LANG_DIR)\msgfr.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msggl.obj : $(LANG_DIR)\msggl.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msghe862.obj : $(LANG_DIR)\msghe862.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msghewin.obj : $(LANG_DIR)\msghewin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msghr1250.obj : $(LANG_DIR)\msghr1250.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msghr437.obj : $(LANG_DIR)\msghr437.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msghr852.obj : $(LANG_DIR)\msghr852.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msghriso.obj : $(LANG_DIR)\msghriso.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msghu852.obj : $(LANG_DIR)\msghu852.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msghucwi.obj : $(LANG_DIR)\msghucwi.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msghuwin.obj : $(LANG_DIR)\msghuwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgid.obj : $(LANG_DIR)\msgid.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgis850.obj : $(LANG_DIR)\msgis850.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgit.obj : $(LANG_DIR)\msgit.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgko.obj : $(LANG_DIR)\msgko.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgltwin.obj : $(LANG_DIR)\msgltwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgpl852.obj : $(LANG_DIR)\msgpl852.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgpliso.obj : $(LANG_DIR)\msgpliso.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgplmaz.obj : $(LANG_DIR)\msgplmaz.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgplwin.obj : $(LANG_DIR)\msgplwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgpt.obj : $(LANG_DIR)\msgpt.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgro.obj : $(LANG_DIR)\msgro.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgru866.obj : $(LANG_DIR)\msgru866.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgrukoi.obj : $(LANG_DIR)\msgrukoi.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgruwin.obj : $(LANG_DIR)\msgruwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgsl852.obj : $(LANG_DIR)\msgsl852.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgsliso.obj : $(LANG_DIR)\msgsliso.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgslwin.obj : $(LANG_DIR)\msgslwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgsr852.obj : $(LANG_DIR)\msgsr852.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgsriso.obj : $(LANG_DIR)\msgsriso.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgsrwin.obj : $(LANG_DIR)\msgsrwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgua866.obj : $(LANG_DIR)\msgua866.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msguakoi.obj : $(LANG_DIR)\msguakoi.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msguawin.obj : $(LANG_DIR)\msguawin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgzhb5.obj : $(LANG_DIR)\msgzhb5.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgzhgb.obj : $(LANG_DIR)\msgzhgb.c
+{$(LANG_DIR)}.c{$(OBJ_DIR)}.obj:
    $(CC_CMD)
 
 #
@@ -2975,145 +2825,7 @@ $(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtnul\gtsys.c
 # CODEPAGE.LIB dependencies
 #
 
-$(OBJ_DIR)\cpeldos.obj : $(CODEPAGE_DIR)\cpeldos.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpelwin.obj : $(CODEPAGE_DIR)\cpelwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpesdos.obj : $(CODEPAGE_DIR)\cpesdos.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpesmwin.obj : $(CODEPAGE_DIR)\cpesmwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpeswin.obj : $(CODEPAGE_DIR)\cpeswin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpgedos.obj : $(CODEPAGE_DIR)\cpgedos.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpgewin.obj : $(CODEPAGE_DIR)\cpgewin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cphr1250.obj : $(CODEPAGE_DIR)\cphr1250.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cphr437.obj : $(CODEPAGE_DIR)\cphr437.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cphr852.obj : $(CODEPAGE_DIR)\cphr852.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cphu852.obj : $(CODEPAGE_DIR)\cphu852.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cphuwin.obj : $(CODEPAGE_DIR)\cphuwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpit437.obj : $(CODEPAGE_DIR)\cpit437.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpit850.obj : $(CODEPAGE_DIR)\cpit850.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpitisb.obj : $(CODEPAGE_DIR)\cpitisb.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpitiso.obj : $(CODEPAGE_DIR)\cpitiso.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpltwin.obj : $(CODEPAGE_DIR)\cpltwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cppl852.obj : $(CODEPAGE_DIR)\cppl852.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cppliso.obj : $(CODEPAGE_DIR)\cppliso.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpplmaz.obj : $(CODEPAGE_DIR)\cpplmaz.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpplwin.obj : $(CODEPAGE_DIR)\cpplwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cppt850.obj : $(CODEPAGE_DIR)\cppt850.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpptiso.obj : $(CODEPAGE_DIR)\cpptiso.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpru866.obj : $(CODEPAGE_DIR)\cpru866.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cprukoi.obj : $(CODEPAGE_DIR)\cprukoi.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpruwin.obj : $(CODEPAGE_DIR)\cpruwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpsl852.obj : $(CODEPAGE_DIR)\cpsl852.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpsliso.obj : $(CODEPAGE_DIR)\cpsliso.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpslwin.obj : $(CODEPAGE_DIR)\cpslwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpsrwin.obj : $(CODEPAGE_DIR)\cpsrwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpua866.obj : $(CODEPAGE_DIR)\cpua866.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpuakoi.obj : $(CODEPAGE_DIR)\cpuakoi.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpuawin.obj : $(CODEPAGE_DIR)\cpuawin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uc1250.obj : $(CODEPAGE_DIR)\uc1250.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uc1251.obj : $(CODEPAGE_DIR)\uc1251.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uc1253.obj : $(CODEPAGE_DIR)\uc1253.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uc1257.obj : $(CODEPAGE_DIR)\uc1257.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uc737.obj : $(CODEPAGE_DIR)\uc737.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uc850.obj : $(CODEPAGE_DIR)\uc850.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uc852.obj : $(CODEPAGE_DIR)\uc852.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uc866.obj : $(CODEPAGE_DIR)\uc866.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uc8859_1.obj : $(CODEPAGE_DIR)\uc8859_1.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uc8859_2.obj : $(CODEPAGE_DIR)\uc8859_2.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uc88591b.obj : $(CODEPAGE_DIR)\uc88591b.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uckoi8.obj : $(CODEPAGE_DIR)\uckoi8.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\uckoi8u.obj : $(CODEPAGE_DIR)\uckoi8u.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\ucmaz.obj : $(CODEPAGE_DIR)\ucmaz.c
+{$(CODEPAGE_DIR)}.c{$(OBJ_DIR)}.obj:
    $(CC_CMD)
 
 #

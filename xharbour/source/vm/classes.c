@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.133 2004/11/26 17:46:32 druzus Exp $
+ * $Id: classes.c,v 1.134 2005/03/02 05:54:33 ronpinkas Exp $
  */
 
 /*
@@ -206,7 +206,9 @@ static HARBOUR  hb___msgClsSel( void );
 static HARBOUR  hb___msgSuper( void );
 static HARBOUR  hb___msgEvalInline( void );
 static HARBOUR  hb___msgClsParent( void );
+#if 0
 static HARBOUR  hb___msgEval( void );
+#endif
 static HARBOUR  hb___msgVirtual( void );
 
 HARBOUR  hb___msgGetClsData( void );

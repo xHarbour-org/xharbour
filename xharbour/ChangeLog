@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3896 2005/03/02 05:01:29 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3897 2005/03/02 05:54:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-03-02 21:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * makefile.bc
+    ! fixing my fault in placing project entries :-(
+
+  * source/vm/classes.c
+    * comment unused hb___msgEval but declared
 
 2005-03-01 21:53 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
   * source\vm\classes.c
