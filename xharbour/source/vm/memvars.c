@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.53 2004/02/14 21:01:19 andijahja Exp $
+ * $Id: memvars.c,v 1.54 2004/02/20 00:22:41 ronpinkas Exp $
  */
 
 /*
@@ -200,8 +200,7 @@ void hb_memvarsRelease( void )
                /*
                 * We do NOT need to worry about Arrays & Blcoks as these values have been released
                 * by hb_gcReleaseAll() unconditionally!
-                *
-               */
+                */
                #ifdef DEBUG_MEMORY_LEAKS
                   // hb_gcAll() is used instead of hb_gcReleaseAll() - so we need to clean afterall.
                   hb_itemClear( &s_globalTable[ ulCnt ].item );
@@ -266,9 +265,12 @@ void hb_memvarsRelease( HB_STACK *pStack )
                /*
                 * We do NOT need to worry about Arrays & Blcoks as these values have been released
                 * by hb_gcReleaseAll() unconditionally!
-                *
-                hb_itemClearMT( &pStack->globalTable[ ulCnt ].item, pStack );
                 */
+               #ifdef DEBUG_MEMORY_LEAKS
+                  // hb_gcAll() is used instead of hb_gcReleaseAll() - so we need to clean afterall.
+                  hb_itemClearMT( &pStack->globalTable[ ulCnt ].item, pStack );
+               #endif
+
             }
          }
 
@@ -680,6 +682,12 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueDecRef(%lu)", hValue));
 
+   // Might be called from hb_gcAll() after hb_memvarsRelease() if DEBUG_MEMORY_LEAKS defined.
+   if( s_globalTable == NULL )
+   {
+      return;
+   }
+
    pValue = s_globalTable + hValue;
 
    HB_TRACE(HB_TR_INFO, ("Memvar item (%i) decrement refCounter=%li", hValue, pValue->counter-1));
@@ -691,6 +699,7 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
    * the codeblock will be released later then it will try to release
    * again this detached variable.
    */
+
    if( --pValue->counter <= 0 )
    {
       if( HB_IS_STRING( &pValue->item ) )
@@ -711,9 +720,8 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
          /*
           * We do NOT need to worry about Arrays & Blcoks as these values have been released
           * by hb_gcReleaseAll() unconditionally!
-          *
-         hb_itemClear( &pValue->item );
          */
+         //hb_itemClear( &pValue->item );
       }
 
       pValue->item.type = HB_IT_NIL;

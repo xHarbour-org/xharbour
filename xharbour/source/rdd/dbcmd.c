@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.71 2004/02/09 18:00:36 druzus Exp $
+ * $Id: dbcmd.c,v 1.72 2004/02/12 21:37:30 andijahja Exp $
  */
 
 /*
@@ -77,6 +77,8 @@
 #ifndef HB_CDP_SUPPORT_OFF
 #  include "hbapicdp.h"
 #endif
+
+HB_ITEM s_DefaultExtension;
 
 #ifndef HB_THREAD_SUPPORT
 /* TODO: Put it in a separate .h file */
@@ -1194,8 +1196,7 @@ HB_FUNC( ALIAS )
             szAlias = ( char * ) hb_xgrab( HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 );
             SELF_ALIAS( ( AREAP ) pAreaNode->pArea, ( BYTE * ) szAlias );
             UNLOCK_AREA
-            hb_retc( szAlias );
-            hb_xfree( szAlias );
+            hb_retcAdopt( szAlias );
             return;
          }
          break;
@@ -1280,8 +1281,7 @@ HB_FUNC( DBF )
             szAlias = ( char * ) hb_xgrab( HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 );
             SELF_ALIAS( ( AREAP ) pAreaNode->pArea, ( BYTE * ) szAlias );
             UNLOCK_AREA
-            hb_retc( szAlias );
-            hb_xfree( szAlias );
+            hb_retcAdopt( szAlias );
             return;
          }
          break;
@@ -1406,7 +1406,7 @@ HB_FUNC( DBCREATE )
    USHORT uiSize, uiLen, uiPrevArea;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
-   PHB_ITEM pStruct, pFieldDesc, pFileExt;
+   PHB_ITEM pStruct, pFieldDesc;
    BOOL bOpen;
    BYTE * codePageId = (BYTE*) hb_parc(6);
 
@@ -1538,10 +1538,10 @@ HB_FUNC( DBCREATE )
 
    if( !pFileName->szExtension )
    {
-      pFileExt = hb_itemPutC( NULL, "" );
-      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, pFileExt );
-      strncat( szFileName, hb_itemGetCPtr( pFileExt ), _POSIX_PATH_MAX - strlen( szFileName ) );
-      hb_itemRelease( pFileExt );
+      s_DefaultExtension.type = HB_IT_NIL;
+      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, &s_DefaultExtension );
+      strncat( szFileName, s_DefaultExtension.item.asString.value, _POSIX_PATH_MAX - strlen( szFileName ) );
+      hb_itemClear( &s_DefaultExtension );
    }
 
    hb_xfree( pFileName );
@@ -2357,7 +2357,6 @@ HB_FUNC( DBUSEAREA )
    USHORT uiLen;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
-   PHB_ITEM pFileExt;
    BYTE * codePageId = (BYTE*) hb_parc(7);
    char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
@@ -2452,10 +2451,10 @@ HB_FUNC( DBUSEAREA )
 
    if( ! pFileName->szExtension )
    {
-      pFileExt = hb_itemPutC( NULL, "" );
-      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, pFileExt );
-      strncat( szFileName, hb_itemGetCPtr( pFileExt ), _POSIX_PATH_MAX - strlen( szFileName ) );
-      hb_itemRelease( pFileExt );
+      s_DefaultExtension.type = HB_IT_NIL;
+      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, &s_DefaultExtension );
+      strncat( szFileName, s_DefaultExtension.item.asString.value, _POSIX_PATH_MAX - strlen( szFileName ) );
+      hb_itemClear( &s_DefaultExtension );
    }
 
    hb_xfree( pFileName );
@@ -2599,8 +2598,7 @@ HB_FUNC( FIELDNAME )
       {
          szName = ( char * ) hb_xgrab( ( ( AREAP ) s_pCurrArea->pArea)->uiMaxFieldNameLength + 1 );
          SELF_FIELDNAME( ( AREAP ) s_pCurrArea->pArea, hb_parni( 1 ), szName );
-         hb_retc( szName );
-         hb_xfree( szName );
+         hb_retcAdopt( szName );
          return;
       }
       /* This is not Clipper compatible! - David G. Holm <dholm@jsd-llc.com>
@@ -2902,7 +2900,9 @@ HB_FUNC( ORDCONDSET )
          strcpy( ( char * ) lpdbOrdCondInfo->abFor, szFor );
       }
       else
+      {
          lpdbOrdCondInfo->abFor = NULL;
+      }
 
       if( ISCHAR( 17 ) && ( ulLen = hb_parclen( 17 ) ) > 0 )
       {
@@ -2910,7 +2910,9 @@ HB_FUNC( ORDCONDSET )
          strcpy( ( char * ) lpdbOrdCondInfo->abWhile, hb_parc( 17 ) );
       }
       else
+      {
          lpdbOrdCondInfo->abWhile = NULL;
+      }
 
       pItem = hb_param( 2, HB_IT_BLOCK );
       if( pItem )
@@ -4312,7 +4314,7 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
   HB_THREAD_STUB
   LPAREANODE pAreaNode;
   LPRDDNODE  pRDDNode;
-  PHB_ITEM   tableItem, pFileExt;
+  PHB_ITEM   tableItem;
   USHORT     uiRddID;
   PHB_FNAME  pFileName;
   DBOPENINFO pInfo;
@@ -4342,13 +4344,10 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
 
   if( ! pFileName->szExtension )
   {
-      pFileExt = hb_itemPutC( NULL, "" );
-
-      SELF_INFO( ( AREAP ) pAreaNode->pArea, DBI_TABLEEXT, pFileExt );
-
-      strncat( (char *) ( pInfo.abName ), hb_itemGetCPtr( pFileExt ), _POSIX_PATH_MAX - strlen( (char *) ( pInfo.abName ) ) );
-
-      hb_itemRelease( pFileExt );
+      s_DefaultExtension.type = HB_IT_NIL;
+      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, &s_DefaultExtension );
+      strncat( szFileName, s_DefaultExtension.item.asString.value, _POSIX_PATH_MAX - strlen( szFileName ) );
+      hb_itemClear( &s_DefaultExtension );
   }
 
   hb_xfree( pFileName );

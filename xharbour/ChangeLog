@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2331 2004/02/20 00:42:23 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2333 2004/02/20 02:29:13 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-19 18:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/memvars.c
+    + Added DEBUG_MEMORY_LEAK support to hb_memvarValueDecGarbageRef()
+
+  * source/rdd/dbcmd.c
+    % Various optimizations.
 
 2004-02-20 05:35 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * Merged in some Harbour debugger updates by Ryszard Glab:
