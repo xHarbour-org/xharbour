@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.95 2002/10/26 09:19:15 ronpinkas Exp $
+ * $Id: xide.prg,v 1.96 2002/10/26 09:27:04 ronpinkas Exp $
  */
 
 /*
@@ -573,7 +573,7 @@ int XFMParse( char *sText )
       }
       sFromClass[i] = '\0';
 
-      OutputDebugString( "IS: " );
+      OutputDebugString( " IS: " );
       OutputDebugString( (char *) sFromClass );
       OutputDebugString( "\n" );
 
