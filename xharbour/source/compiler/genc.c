@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.12 2002/05/09 07:25:33 ronpinkas Exp $
+ * $Id: genc.c,v 1.13 2002/05/16 02:28:38 ronpinkas Exp $
  */
 
 /*
@@ -79,7 +79,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       fflush( stdout );
    }
 
-   fprintf( yyc, "/*\n * Harbour Compiler, Apha build %d.%d (%s)\n",
+   fprintf( yyc, "/*\n * xHarbour Compiler, build %d.%d (%s)\n",
       HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
    fprintf( yyc, " * Generated C source code\n */\n\n" );
 
