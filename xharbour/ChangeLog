@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.749 2003/02/20 17:26:31 lculik Exp $
+ * $Id: ChangeLog,v 1.750 2003/02/20 23:39:03 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-21 13:20 UTC+0100 Ian Anderson <ianderson@procon-online.de>
+  * source/rtl/gtapi.c
+    % optimize out repeated calls to lower level to get screen size
+  
 2003-02-20 20:36 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/vm/fm.c
    ! Added missing ; to return pMem
