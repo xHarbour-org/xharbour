@@ -1,5 +1,5 @@
 /*
- * $Id: round.c,v 1.5 2003/07/18 21:42:35 andijahja Exp $
+ * $Id: round.c,v 1.7 2004/02/08 04:31:39 walito Exp $
  */
 
 /*
@@ -154,9 +154,13 @@ double hb_numRound( double dNum, int iDec, int iDecR )
       else
 */
       {
+#ifdef _MSC_VER
+         dAdjust = pow( 10, iDec + 1 );
+         dFine   = pow( 10, -( iDecR - iDec + 4 ) );
+#else
          dAdjust = pow10( iDec + 1 );
          dFine   = pow10( -( iDecR - iDec + 4 ) );
-
+#endif
 
          if( dResult < 0.0 )
             dResult = ceil( (( dResult * dAdjust ) - ( 5.0 + dFine ) ) / 10.0 );
@@ -217,4 +221,4 @@ HB_FUNC( ROUND )
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1094, NULL, "ROUND", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
 }
- 
+
