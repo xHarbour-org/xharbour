@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.70 2004/02/19 13:32:47 andijahja Exp $
+ * $Id: harbour.c,v 1.71 2004/02/19 18:15:57 andijahja Exp $
  */
 
 /*
@@ -2971,11 +2971,17 @@ static void hb_compGenVariablePCode( BYTE bPCode, char * szVarName )
          hb_comp_AmbiguousVar = TRUE;
 
       if( bPCode == HB_P_POPVARIABLE )
+      {
          bPCode = HB_P_POPMEMVAR;
+      }
       else if( bPCode == HB_P_PUSHVARIABLE )
+      {
          bPCode = HB_P_PUSHMEMVAR;
+      }
       else
+      {
          bPCode = HB_P_PUSHMEMVARREF;
+      }
    }
    else
    {
@@ -3528,7 +3534,16 @@ void hb_compGenPushAliasedVar( char * szVarName,
                iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
             if( iCmp == 0 )
             {  /* MEMVAR-> or MEMVA-> or MEMV-> */
-               hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
+               // AJ
+               if( hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast ) > 0 )
+               {
+                  hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
+               }
+               else
+               {
+                  hb_comp_AmbiguousVar = TRUE;
+                  hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_AMBIGUOUS_VAR, szVarName, NULL );
+               }
             }
             else
             {  /* field variable */
