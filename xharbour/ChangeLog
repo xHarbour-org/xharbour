@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2803 2004/04/19 02:07:36 lculik Exp $
+ * $Id: ChangeLog,v 1.2804 2004/04/19 09:53:14 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-04-20 12:20 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/tbcolumn.prg
+  * source/rtl/tbrowse.prg
+    ! Fixed headsep/colsep display, including handling of different tbcolumn's
+      headsep/colsep.
+    ! Fixed wrong display when ::colPos assigned beyond ::leftVisible or
+      ::rightVisible.
+
+    /*
+      Notes:
+      ::right() and ::left() should skip empty columns (Clipper compatible).
+      I guess it is not difficult to fix this, but I don't personally see it
+      as a problem. Does anybody?
+    */
+
 2004-04-19 13:50 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/debugger.prg
     ! Fixed numerous problems (breakpoints, STATIC monitoring etc.) with .prg
-      modules located in different directories. 
+      modules located in different directories.
 
 2004-04-18 23:05 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * source/rtl/memoedit.prg
@@ -27,7 +42,7 @@
     ! Correct sanitization on New() parameters; prevents function looping into memoedit after
       changing the text to crash.
     % More compact and readable (by far) code.
-    
+
 2004-04-18 23:35 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * source/rtl/teditor.prg
     ! More fixes to TEditor.
@@ -41,19 +56,19 @@
 2004-04-18 12:17 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
   * source/rtl/teditor.prg
     ! More fixes to TEditor.
-    
+
 
 2004-04-18 01:26 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
   * source/rtl/at.c
     ! AT xharbour extra parameters were too much sanitized; Now AT is returning 0
       if start parameter is bigger than string size.
-        
+
   * source/rtl/memoedit.prg
     ! Changed
          DEFAULT nLineLength     TO nRight - nLeft
       INTO
          DEFAULT nLineLength     TO nRight - nLeft + 1
-         
+
       The previous setting (seemingly just a typo) was always neglecting the
       ability to use the very last character in the window when wordwrapping was on.
 
@@ -65,19 +80,19 @@
     + Added GotoCol() and GotoPos() that are doing a similar job as GotoRow(): they go
       to a Logical location that is then translated into screen coordinates (and scrolled)
       as needed.
-    ! GotoRow(), K_enter(), K_Bs(), K_del(), K_Ascii() have been highly optimized and 
+    ! GotoRow(), K_enter(), K_Bs(), K_del(), K_Ascii() have been highly optimized and
       simplified. They are now relying on the fixed SplitLine() that works on a fixed
       GetParagraph(). The short story: they all rely on SplitLine to fix word wrapping
       and cursor position when needed.
     - K_Space(): with the new SplitLine() that works for that, K_Space is absorbed into
       K_Ascii().
-      
+
     /* NOTE: For optimization reasons, I now use AT() with the third extra parameter in many
        points. Compiling this program with xharbour in strict compatibility mode will make
        memoedit to silently do wrong in many points. If someone is interested, it should provide
        a different version of AT with the third parameter when strict compatibility is on */
-       
-      
+
+
 
 2004-04-18 05:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/philes.c
@@ -332,8 +347,8 @@
       both are ULONG now. This resolves GPF problem when array
       was shared more then 2^16 times, f.e.:
         a:=array(100000)
-	b:={"default"}
-	afill(a,b)
+   b:={"default"}
+   afill(a,b)
 
   * xharbour/source/vm/hvm.c
     ! fixed the bug I reported a week ago in hb_vmArrayPush()/hb_vmArrayPop()

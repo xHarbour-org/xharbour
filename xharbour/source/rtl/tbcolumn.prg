@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.6 2002/11/29 20:21:06 walito Exp $
+ * $Id: tbcolumn.prg,v 1.7 2003/08/08 22:31:50 walito Exp $
  */
 
 /*
@@ -103,7 +103,7 @@ METHOD New( cHeading, bBlock ) CLASS TBColumn
    DEFAULT cHeading TO ""
 
    ::DefColor := { 1, 2, 1, 1 }
-   ::FootSep  := ""
+   //x ::FootSep  := ""      //x let it be NIL
    ::ColPos   := 1
    ::ColSep   := nil
 

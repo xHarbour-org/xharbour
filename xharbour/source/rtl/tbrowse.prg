@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.66 2004/04/07 09:27:53 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.67 2004/04/11 20:00:10 vouchcac Exp $
  */
 
 /*
@@ -414,7 +414,6 @@ METHOD Configure( nMode ) CLASS TBrowse
    endif
 
    if nMode < 2 .or. ::lNeverDisplayed
-
       ::lHeaders     := .F.
       ::lFooters     := .F.
       ::lRedrawFrame := .T.
@@ -1245,10 +1244,9 @@ METHOD LeftDetermine() CLASS TBrowse
 METHOD HowManyCol() CLASS TBrowse
    Local aColsInfo    := ::aColsInfo
    Local colPos       := ::ncolPos
-   Local rightVisible := ::rightVisible
-   Local leftVisible  := ::leftVisible
    Local nToAdd       := 0
    Local nColsVisible, nColsWidth, n, nColumns
+   Local nLeftCol, tryLeftVisible, saveColsWidth, oErr
 
    ::aColumns := ::aColsInfo
    nColumns   := ::nColumns
@@ -1293,24 +1291,82 @@ METHOD HowManyCol() CLASS TBrowse
 
    endif
 
-   nColsVisible := ::leftVisible - 1
+   // BDj notes:
+   // Cannot assume that ::leftVisible is correct
+   // (eg. if ::colPos was assigned ::rightVisible+1)
+   // Must do the following in a loop repeatedly until:
+   // (0) ::colPos <= ::nFrozenCols (assume ::colPos > 0)
+   // or
+   // (1) ::leftVisible <= ::colPos <= ::rightVisible
+   // or
+   // (2) the above conditions are impossible (runtime error)
 
-   while nColsVisible < ::nColumns
-      nToAdd := ::aColsInfo[ nColsVisible + 1, o_Width ]
+   saveColsWidth  := nColsWidth
+   tryLeftVisible := ::leftVisible
+   if ::nFrozenCols==0 .and. tryLeftVisible > ::nColPos
+      //nColPos is to the left of leftVisible
+      tryLeftVisible := ::nColPos
+   endif
 
-      if ( nColsVisible >= ::leftVisible .or. ::nFrozenCols > 0 ) .and.;
-                                          ::aColsInfo[ nColsVisible,o_Width ] > 0
-         nToAdd += ::aColsInfo[ nColsVisible + 1, o_SepWidth ]
-      endif
+   do while .t.
+      nColsVisible := tryLeftVisible-1
 
-      if nColsWidth + nToAdd > ::nVisWidth
+      while nColsVisible < ::nColumns
+         // which column is displayed to the left of next col?
+         if ::nFrozenCols > 0 .and. nColsVisible+1==tryLeftVisible
+            nLeftCol := ::nFrozenCols
+         else
+            nLeftCol := nColsVisible
+         endif
+
+         nToAdd := ::aColsInfo[ nColsVisible + 1, o_Width ]
+
+         // next, we must check against [nLeftCol], not [nColsVisible]:
+         if ( nColsVisible >= tryLeftVisible .or. ::nFrozenCols > 0 ) .and.;
+                                             (nLeftCol > 0) .and.;
+                                             ::aColsInfo[ nLeftCol,o_Width ] > 0
+
+            nToAdd += ::aColsInfo[ nColsVisible + 1, o_SepWidth ]
+         endif
+
+         if nColsWidth + nToAdd > ::nVisWidth
+            exit
+         endif
+
+         nColsWidth += nToAdd
+         nColsVisible++
+      enddo
+
+      // check: is ::nColPos fit within these calculated cols?
+      if ::nColPos <= ::nFrozenCols .or.;
+         (tryLeftVisible <= ::nColPos .and. ::nColPos <= nColsVisible)
          exit
       endif
 
-      nColsWidth += nToAdd
-      nColsVisible++
-   enddo
+      // not ok. can retry?
+      if tryLeftVisible==::nColumns
+         // cannot fit ::nColPos into display
+         // Generate Error TBROWSE
+         //
+         oErr := ErrorNew()
+         oErr:severity    := ES_ERROR
+         oErr:genCode     := EG_LIMIT
+         oErr:subSystem   := "TBROWSE"
+         oErr:subCode     := 0
+         oErr:description := "Width limit exceeded"
+         oErr:canRetry    := .F.
+         oErr:canDefault  := .F.
+         oErr:fileName    := ""
+         oErr:osCode      := 0
+         Eval( ErrorBlock(), oErr )
+      endif
 
+      // retry
+      tryLeftVisible++
+      nColsWidth := saveColsWidth
+   enddo //retry until ::nColPos fit into display
+
+   ::leftVisible  := tryLeftVisible //x
    ::rightVisible := nColsVisible
    ::nColsVisible := nColsVisible
    ::nColsWidth   := nColsWidth
@@ -1330,9 +1386,14 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
    Local nLCS
    Local aCol, nCol
    Local nColFrom
+   local chSep, cfSep, nSpacePre, nSpaceLast, nLeftCol
+   local ccSep, ncSepWidth
+
+   nSpacePre := INT( ( nWidth - ::nColsWidth ) / 2 )
+   nSpaceLast := nWidth - nSpacePre - ::nColsWidth
 
    aCol     := ARRAY( ::rightVisible )
-   nCol     := ::nwLeft + iif( ::nFrozenCols > 0, 0, INT( ( nWidth - ::nColsWidth ) / 2 ) )
+   nCol     := ::nwLeft + iif( ::nFrozenCols > 0, 0, nSpacePre )
 
    nColFrom := iif( ::nFrozenCols > 0, 1, ::leftVisible )
 
@@ -1353,7 +1414,7 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
 
       if ::nFrozenCols > 0 .and. n == ::nFrozenCols
          n    := ::leftVisible - 1
-         nCol += INT( ( nWidth - ::nColsWidth ) / 2 )
+         nCol += nSpacePre
       endif
    next
 
@@ -1375,51 +1436,136 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
    endif
 
    if ::lHeadSep                      //Draw horizontal heading separator line
+
+      nScreenRowT := ::nRowData
+      /** this is not necessary:
       DispOutAt( ( nScreenRowT := ::nRowData ), ::nwLeft,;
            Replicate( Right( ::HeadSep, 1 ), nWidth ), ::cColorSpec )
+      **/
 
    endif
 
    if ::lFootSep                      //Draw horizontal footing separator line
+
+      nScreenRowB := ::nwBottom - iif( ::lFooters, ::nFooterHeight, 0 )
+      /** this is not necessary:
       DispOutAt( ( nScreenRowB := ::nwBottom - iif( ::lFooters, ::nFooterHeight, 0 ) ), ::nwLeft,;
                                         Replicate( Right( ::FootSep, 1 ), nWidth ), ::cColorSpec )
+      **/
 
    endif
 
-   nTPos := nBPos := aCol[ iif( ::nFrozenCols > 0, 1, ::leftVisible ) ]
+   nTPos := nBPos := ::nwLeft
+
+   chSep := ::HeadSep  // default HeadSep
+   cfSep := ::FootSep  // default FootSep
 
    // Draw headin/footing column separator
    for n := iif( ::nFrozenCols > 0, 1, ::leftVisible ) to ::rightVisible
-      if ::nFrozenCols > 0 .and. n == ::nFrozenCols + 1
-         n     := ::leftVisible
-         nTPos += INT( ( nWidth - ::nColsWidth ) / 2 )
-         nBPos += INT( ( nWidth - ::nColsWidth ) / 2 )
+      // colsep's width will be needed later
+      ccSep := if( ::aColsInfo[ n,o_Obj ]:ColSep == nil, ::ColSep, ;
+                              ::aColsInfo[ n,o_Obj ]:ColSep )
+      ncSepWidth := if( ccSep == nil, 0, len(ccSep) )
+
+      // which column is displayed to the left of current col?
+      if ::nFrozenCols > 0 .and. n==::leftVisible
+         nLeftCol := ::nFrozenCols
+      else
+         nLeftCol := n-1
       endif
 
-      if n < ::rightVisible
-         if ::aColsInfo[ n,o_Width ] > 0
+      if (::nFrozenCols > 0 .and. n == ::nFrozenCols + 1) .or.;
+         (::nFrozenCols ==0 .and. n == ::leftVisible )
+         n     := ::leftVisible
+
+         if nSpacePre > 0
+
+            // we need to draw headSep for the nSpacePre gap
+            if ::lHeadSep
+               chSep := if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
+                                       ::aColsInfo[ n,o_Obj ]:HeadSep )
+               if nLeftCol>0 .and. ::aColsInfo[ nLeftCol,o_Width ] > 0 .and.;
+                  ::nFrozenCols > 0
+                  DispOutAT( nScreenRowT, nTPos-min(len(chSep), ncSepWidth), chSep, ::cColorSpec )
+               endif
+               DispOutAT( nScreenRowT, nTPos, repl(right(chSep,1),nSpacePre), ::cColorSpec )
+            endif
+
+            // we need to draw footSep for the nSpacePre gap
+            if ::lFootSep
+               cfSep := if( ::aColsInfo[ n,o_Obj ]:FootSep == nil, ::FootSep, ;
+                                       ::aColsInfo[ n,o_Obj ]:FootSep )
+               if nLeftCol>0 .and. ::aColsInfo[ nLeftCol,o_Width ] > 0 .and.;
+                  ::nFrozenCols > 0
+                  DispOutAT( nScreenRowB, nBPos-min(len(cfSep),ncSepWidth), cfSep, ::cColorSpec )
+               endif
+               DispOutAT( nScreenRowB, nBPos, repl(right(cfSep,1),nSpacePre), ::cColorSpec )
+            endif
+
+            nTPos += nSpacePre
+            nBPos += nSpacePre
+
+         endif
+      endif
+
+      // we need to handle even n==::rightVisible in the following block
+
+      //if n < ::rightVisible  //x commented out
+         if ::aColsInfo[ n,o_Width ] > 0 .and.;
+            n < ::rightVisible
             nLCS := ::aColsInfo[ n + 1, o_SepWidth ]
          else
             nLCS := 0
          endif
 
          if ::lHeadSep
-            // DispOutAT( nScreenRowT, ( nTPos += ::aColsInfo[ n, o_Width ] ), ::HeadSep, ::cColorSpec )
-            DispOutAT( nScreenRowT, ( nTPos += ::aColsInfo[ n,o_Width ] ), ;
-                            if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
-                                      ::aColsInfo[ n,o_Obj ]:HeadSep ), ::cColorSpec )
+            //DispOutAT( nScreenRowT, ( nTPos += ::aColsInfo[ n,o_Width ] ), ;
+            //                if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
+            //                          ::aColsInfo[ n,o_Obj ]:HeadSep ), ::cColorSpec )
+
+            chSep := if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
+                                    ::aColsInfo[ n,o_Obj ]:HeadSep )
+            if nLeftCol>0 .and. n <> ::leftVisible .and. ::aColsInfo[ nLeftCol,o_Width ] > 0
+               DispOutAT( nScreenRowT, nTPos-min(len(chSep),ncSepWidth), chSep, ::cColorSpec )
+            endif
+            DispOutAT( nScreenRowT, nTPos, repl(right(chSep,1),::aColsInfo[ n, o_Width ]), ::cColorSpec )
+            nTPos += ::aColsInfo[ n,o_Width ]
+
             nTPos += nLCS
          endif
 
          if ::lFootSep
-            // DispOutAT( nScreenRowB, ( nBPos += ::aColsInfo[ n, o_Width ] ), ::FootSep, ::cColorSpec )
-            DispOutAT( nScreenRowB, ( nBPos += ::aColsInfo[ n, o_Width ] ), ;
-                          if(::aColsInfo[ n,o_Obj ]:FootSep = nil, ::FootSep, ;
-                                      ::aColsInfo[ n,o_Obj ]:FootSep ), ::cColorSpec )
+            //DispOutAT( nScreenRowB, ( nBPos += ::aColsInfo[ n, o_Width ] ), ;
+            //              if(::aColsInfo[ n,o_Obj ]:FootSep = nil, ::FootSep, ;
+            //                          ::aColsInfo[ n,o_Obj ]:FootSep ), ::cColorSpec )
+
+            cfSep := if( ::aColsInfo[ n,o_Obj ]:FootSep == nil, ::FootSep, ;
+                                    ::aColsInfo[ n,o_Obj ]:FootSep )
+            if ::lHeadSep .and. len(chSep) > len(cfSep)
+               cfSep += repl(right(cfSep,1), len(chSep) - len(cfSep))
+            endif
+
+            if nLeftCol>0 .and. n <> ::leftVisible .and. ::aColsInfo[ nLeftCol,o_Width ] > 0
+               DispOutAT( nScreenRowB, nBPos-min(len(cfSep),ncSepWidth), cfSep, ::cColorSpec )
+            endif
+            DispOutAT( nScreenRowB, nBPos, repl(right(cfSep,1),::aColsInfo[ n, o_Width ]), ::cColorSpec )
+            nBPos += ::aColsInfo[ n,o_Width ]
+
             nBPos += nLCS
          endif
-      endif
+      //endif    //x commented out
    next
+
+   if nSpaceLast > 0
+      // right gap of spaces (nSpaceLast) on Header
+      if ::lHeadSep
+         DispOutAT( nScreenRowT, nTPos, repl(right(chSep,1),nSpaceLast), ::cColorSpec )
+      endif
+      // right gap of spaces (nSpaceLast) on Footer
+      if ::lFootSep
+         DispOutAT( nScreenRowB, nBPos, repl(right(cfSep,1),nSpaceLast), ::cColorSpec )
+      endif
+   endif
 
    if ::lFooters                // Drawing footers
       // Clear area of screen occupied by footers
