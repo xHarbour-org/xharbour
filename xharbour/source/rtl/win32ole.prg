@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.6 2002/05/03 08:01:57 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.7 2002/05/08 23:22:47 ronpinkas Exp $
  */
 
 /*
@@ -143,7 +143,7 @@ RETURN NIL
 
 //--------------------------------------------------------------------
 
-METHOD Invoke( cMethod, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOleAuto
+METHOD Invoke( cMethod, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 ) CLASS TOleAuto
 
    LOCAL uObj, nParams := PCount(), Counter
    LOCAL OleRefFlags := Space( nParams - 1 )
@@ -151,6 +151,25 @@ METHOD Invoke( cMethod, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) C
    //TraceLog( cMethod, nParams )
 
    IF ProcName( 1 ) != "TOLEAUTO:" + cMethod
+
+      IF nParams >= 10
+         IF HB_ISBYREF( @uParam9 )
+            OleRefFlags[9] = 'Y'
+         ENDIF
+      ENDIF
+
+      IF nParams >= 9
+         IF HB_ISBYREF( @uParam8 )
+            OleRefFlags[8] = 'Y'
+         ENDIF
+      ENDIF
+
+      IF nParams >= 8
+         IF HB_ISBYREF( @uParam7 )
+            OleRefFlags[7] = 'Y'
+         ENDIF
+      ENDIF
+
       IF nParams >= 7
          IF HB_ISBYREF( @uParam6 )
             OleRefFlags[6] = 'Y'
@@ -190,7 +209,13 @@ METHOD Invoke( cMethod, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) C
       ENDIF
    ENDIF
 
-   IF nParams == 7
+   IF nParams == 10
+      uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
+   ELSEIF nParams == 9
+      uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
+   ELSEIF nParams == 8
+      uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
+   ELSEIF nParams == 7
       uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
    ELSEIF nParams == 6
       uObj := OLEInvoke( ::hObj, cMethod, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
@@ -224,13 +249,19 @@ RETURN uObj
 
 //--------------------------------------------------------------------
 
-METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOleAuto
+METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 ) CLASS TOleAuto
 
    LOCAL uObj, nParams := PCount()
 
    //TraceLog( cProperty, nParams )
 
-   IF nParams == 7
+   IF nParams == 10
+      OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
+   ELSEIF nParams == 9
+      OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
+   ELSEIF nParams == 8
+      OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
+   ELSEIF nParams == 7
       OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
    ELSEIF nParams == 6
       OLESetProperty( ::hObj, cProperty, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
@@ -294,7 +325,7 @@ RETURN uObj
 
 //--------------------------------------------------------------------
 
-METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOleAuto
+METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 ) CLASS TOleAuto
 
    LOCAL cMsg := __GetMessage()
    LOCAL bPresetShowException := ::bShowException
@@ -303,6 +334,24 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOl
    LOCAL nParams := PCount(), OleRefFlags := Space( nParams )
 
    //TraceLog( cMsg, nParams )
+
+   IF nParams >= 9
+      IF HB_ISBYREF( @uParam9 )
+         OleRefFlags[9] = 'Y'
+      ENDIF
+   ENDIF
+
+   IF nParams >= 8
+      IF HB_ISBYREF( @uParam8 )
+         OleRefFlags[8] = 'Y'
+      ENDIF
+   ENDIF
+
+   IF nParams >= 7
+      IF HB_ISBYREF( @uParam7 )
+         OleRefFlags[7] = 'Y'
+      ENDIF
+   ENDIF
 
    IF nParams >= 6
       IF HB_ISBYREF( @uParam6 )
@@ -347,7 +396,13 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOl
    IF LEFT( cMsg, 1 ) == '_'
       cMsg := SubStr( cMsg, 2 )
 
-      IF nParams == 6
+      IF nParams == 9
+         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
+      ELSEIF nParams == 8
+         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
+      ELSEIF nParams == 7
+         uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
+      ELSEIF nParams == 6
          uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
       ELSEIF nParams == 5
          uObj := ::Set( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
@@ -366,7 +421,13 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOl
       // Reset in ::Set()
       //SetOleRefFlags()
    ELSE
-      IF nParams == 6
+      IF nParams == 9
+         uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
+      ELSEIF nParams == 8
+         uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
+      ELSEIF nParams == 7
+         uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
+      ELSEIF nParams == 6
          uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
       ELSEIF nParams == 5
          uObj := ::Invoke( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )
@@ -388,7 +449,13 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOl
       IF Ole2TxtError() != "S_OK"
          //TraceLog( cMsg )
 
-         IF nParams == 6
+         IF nParams == 9
+            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8, @uParam9 )
+         ELSEIF nParams == 8
+            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7, @uParam8 )
+         ELSEIF nParams == 7
+            uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6, @uParam7 )
+         ELSEIF nParams == 6
             uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5, @uParam6 )
          ELSEIF nParams == 5
             uObj := ::Get( cMsg, @uParam1, @uParam2, @uParam3, @uParam4, @uParam5 )

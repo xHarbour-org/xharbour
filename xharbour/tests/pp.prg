@@ -2002,6 +2002,10 @@ FUNCTION RP_Run_Err( oErr, aProcedures, nLine )
 
    LOCAL Counter, xArg, sArgs := "", nProc, sProc
 
+   IF nLine == NIL
+      nLine := 0
+   ENDIF
+
    IF ValType( oErr:Args ) == 'A'
       sArgs := "Arguments: "
 
