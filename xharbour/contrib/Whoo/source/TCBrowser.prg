@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.9 2002/10/25 01:25:47 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.10 2002/10/25 05:33:52 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -631,8 +631,6 @@ METHOD RefreshAll(lNoDraw) CLASS TWBrowse
       RETURN(self)
    ENDIF
    hi IS HDITEM
-   ZeroInit(hi)
-
    BEGIN SEQUENCE
       ShowScrollBar(::handle,SB_HORZ, ::ColCount > 1 .AND. ::wantHScroll )
       ShowScrollBar(::handle,SB_VERT,::wantVScroll)
@@ -1082,34 +1080,38 @@ RETURN(nil)
 
 METHOD UpdateHScrollBar(lRedraw) CLASS TWBrowse
    STATIC si
-   IF ISNIL(si)
-      si IS SCROLLINFO
-      si:cbSize := si:sizeof()
-      si:fMask  := SIF_ALL
-      si:nMin   := 0
+   IF ::wantHscroll
+      IF ISNIL(si)
+         si IS SCROLLINFO
+         si:cbSize := si:sizeof()
+         si:fMask  := SIF_ALL
+         si:nMin   := 0
+      ENDIF
+      si:nMax   := ::ColWidths[::ColCount+1]
+      si:nPage  := IF(::wantHiliteAll,::nDataWidth,(::ColWidths[::ColPos+1]-::ColWidths[::ColPos])) //::nDataWidth
+      si:nPos   := IF(::wantHiliteAll,::ColWidths[::LeftVisible],::ColWidths[::ColPos]) //::ColWidths[::leftVisible]
+      si:nTrackPos := 0
+      SetScrollInfo( ::handle, SB_HORZ, si:value, TRUE )
    ENDIF
-   si:nMax   := ::ColWidths[::ColCount+1]
-   si:nPage  := IF(::wantHiliteAll,::nDataWidth,(::ColWidths[::ColPos+1]-::ColWidths[::ColPos])) //::nDataWidth
-   si:nPos   := IF(::wantHiliteAll,::ColWidths[::LeftVisible],::ColWidths[::ColPos]) //::ColWidths[::leftVisible]
-   si:nTrackPos := 0
-   SetScrollInfo( ::handle, SB_HORZ, si:value, TRUE )
 RETURN(self)
 
 //---------------------------------------------------------------------------------------------
 
 METHOD UpdateVScrollBar(lRedraw) CLASS TWBrowse
    STATIC si
-   IF ISNIL(si)
-      si IS SCROLLINFO
-      si:cbSize := si:sizeof()
-      si:nMin   := 1
-      si:fMask  := SIF_ALL
+   IF ::wantVscroll
+      IF ISNIL(si)
+         si IS SCROLLINFO
+         si:cbSize := si:sizeof()
+         si:nMin   := 1
+         si:fMask  := SIF_ALL
+      ENDIF
+      si:nMax   := ::RecCount
+      si:nPage  := ::RowCountUsable
+      si:nPos   := ::RecPos - ::RowPos + 1
+      si:nTrackPos := 0
+      SetScrollInfo( ::handle, SB_VERT, si:value,TRUE )
    ENDIF
-   si:nMax   := ::RecCount
-   si:nPage  := ::RowCountUsable
-   si:nPos   := ::RecPos - ::RowPos + 1
-   si:nTrackPos := 0
-   SetScrollInfo( ::handle, SB_VERT, si:value,TRUE )
 RETURN(self)
 
 //---------------------------------------------------------------------------------------------
@@ -2390,10 +2392,4 @@ RETURN(CallWindowProc(nproc,hWnd,nMsg,nwParam,nlParam))
 
 STATIC FUNCTION GetAColumn(a,i)
  RETURN whColumn():INIT( a[i][1],{|oCol,oB,n| asString(oB:source[n,i]) } ,DT_LEFT, a[i][2] )
-
-
-FUNCTION ZeroInit(ostr)
-  ostr:buffer(replicate(chr( 0 ),ostr : sizeof()))
-  RETURN(NIL)
-
 

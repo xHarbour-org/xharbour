@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.23 2002/10/22 17:23:46 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.24 2002/10/25 05:33:57 what32 Exp $
  */
 
 /*
@@ -436,7 +436,7 @@ METHOD OnPaint(hDC)
       ENDIF
    ENDIF
 
-   RETURN(NIL)
+   RETURN(nil)
 
 *-----------------------------------------------------------------------------*
 
@@ -570,6 +570,13 @@ METHOD OnMouseMove( aParam,x,y)
    static oLastObj
    
    IF ::mousedown
+
+      if ::moving.or.::sizing
+
+//         ::HintWindow:SetTitle(0,"")
+//         ::HintWindow:SetText(alltrim(str(::aEditRect[1]))+","+alltrim(str(::aEditRect[2]))+"  "+;
+//                              alltrim(str(::aEditRect[3]-::aEditRect[1]))+","+alltrim(str(::aEditRect[4]-::aEditRect[2])))
+      endif
       hDC:=GetDC(::Handle)
       SetTextColor(hDC,RGB(255,255,128))
       SetBkColor(hDC,RGB(0,0,128))
@@ -593,13 +600,7 @@ METHOD OnMouseMove( aParam,x,y)
       ENDIF
 
       ReleaseDc(::Handle,hDC)
-
-      if ::moving.or.::sizing
-         ::HintWindow:SetTitle(0,"")
-         ::HintWindow:SetText(alltrim(str(::aEditRect[1]))+","+alltrim(str(::aEditRect[2]))+"  "+;
-                              alltrim(str(::aEditRect[3]-::aEditRect[1]))+","+alltrim(str(::aEditRect[4]-::aEditRect[2])))
-      endif
-
+      
    ELSE
       IF Empty(::Cursor)
          ClientToScreen(::Handle,aPt)
@@ -619,10 +620,10 @@ METHOD OnMouseMove( aParam,x,y)
                lFound:=.T.
                oObj:=::Parent:ChildFromHandle(hChild)
                IF oLastObj==NIL.OR.hChild!=oLastObj:handle.OR.::lHintActive
-                  ::HintWindow:Activate(1)
                   ::HintWindow:SetTitle(2,"Class: "+oObj:Classname())
                   ::HintWindow:SetText("Object: "+oObj:propname)
                   ::lHintActive := .F.
+                  ::HintWindow:Activate(1)
                   oLastObj:=oObj
                endif
                
