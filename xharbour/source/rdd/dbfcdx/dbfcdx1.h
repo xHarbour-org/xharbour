@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.h,v 1.7 2003/06/09 17:49:05 ronpinkas Exp $
+ * $Id: dbfcdx1.h,v 1.8 2003/08/29 02:43:13 ronpinkas Exp $
  */
 
 /*
@@ -158,6 +158,8 @@ typedef SORTSWAPITEM * LPSORTSWAPITEM;
 #elif defined(__WATCOMC__)
    #pragma pack(pop);
 #elif defined(__cplusplus)
+   #pragma pack()
+#elif defined(_MSC_VER)
    #pragma pack()
 #endif
 

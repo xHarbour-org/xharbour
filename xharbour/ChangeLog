@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1399 2003/09/02 05:41:12 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1400 2003/09/02 22:59:36 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-02 17:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbrddcdx.h
+  * source/rdd/dbfcdx/dbfcdx1.h
+    + Added missing reset of #pragma pack() for MSVC.
+
+  * source/rdd/dbcmd.c
+  * source/rdd/dbf1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+    - Removed unneeded BOOL bMathName from rddMoveFields() and replaced with if( pFields ).
+    ! Fixed GPF in GetTheOtherArea() resulting from attemting to convert case of static buffer (field name).
+    * Many Formating fixes.
+
+  * source/vm/errorapi.c
+    ! Fixed GPF trap in hb_errPutFileName() when file name is NULL.
+
 2003-09-03 05:45 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * source/rtl/inkey.c
    * source/rtl/gtwin/gtwin.c

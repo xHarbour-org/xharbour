@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.17 2003/07/30 20:45:40 andijahja Exp $
+ * $Id: errorapi.c,v 1.18 2003/08/20 20:06:06 ronpinkas Exp $
  */
 
 /*
@@ -528,7 +528,16 @@ PHB_ITEM HB_EXPORT hb_errPutFileName( PHB_ITEM pError, char * szFileName )
 
    hb_vmPushSymbol( hb_dynsymGet( "_FILENAME" )->pSymbol );
    hb_vmPush( pError );
-   hb_vmPushString( szFileName, strlen( szFileName ) );
+
+   if( szFileName )
+   {
+      hb_vmPushString( szFileName, strlen( szFileName ) );
+   }
+   else
+   {
+      hb_itemPushStaticString( "", 0 );
+   }
+
    hb_vmSend( 1 );
 
    return pError;

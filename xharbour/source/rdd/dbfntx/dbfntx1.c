@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.58 2003/08/07 20:23:34 druzus Exp $
+ * $Id: dbfntx1.c,v 1.59 2003/08/25 16:24:52 druzus Exp $
  */
 
 /*
@@ -1231,7 +1231,10 @@ static LPPAGEINFO hb_ntxPageLoad( LPTAGINFO pTag, ULONG ulOffset )
    if( !ulOffset )
    {
       if( pTag->Owner->Owner->fShared && !pTag->Memory )
+      {
          hb_ntxHeaderRead( pTag->Owner );
+      }
+
       ulOffset = pTag->RootBlock;
    }
    if( pTag->Memory )
@@ -1299,10 +1302,17 @@ static void hb_ntxPageRelease( LPTAGINFO pTag, LPPAGEINFO pPage )
 {
 
    if( pTag->Memory )
+   {
       return;
+   }
+
    pPage->lBusy = FALSE;
+
    if( pPage->Changed )
+   {
       hb_ntxPageSave( pTag,pPage );
+   }
+
    if( pTag->NewRoot )
    {
       pTag->RootBlock = pPage->Page;
@@ -1328,13 +1338,17 @@ static void hb_ntxPageFree( LPTAGINFO pTag, BOOL lFull )
    for( ; ul < ulMax; ul++,pPage++ )
    {
       if( pPage->Changed && !pTag->Memory )
+      {
          hb_ntxPageSave( pTag, pPage );
+      }
+
       if( pTag->NewRoot  && !pTag->Memory )
       {
          pTag->RootBlock = pPage->Page;
          hb_ntxHeaderSave( pTag->Owner, FALSE );
          pTag->NewRoot = FALSE;
       }
+
       if( lFull )
       {
          if( pPage->buffer )
@@ -1343,6 +1357,7 @@ static void hb_ntxPageFree( LPTAGINFO pTag, BOOL lFull )
             pPage->buffer = NULL;
          }
       }
+
       pPage->Page = -1;
    }
    pTag->ulPages = 0;
@@ -2260,17 +2275,27 @@ static void hb_ntxBufferSave( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo )
          pTag->pages[ul].buffer = pTag->pages[0].buffer + ul*NTXBLOCKSIZE;
    }
    else
+   {
       hb_fsSeek( pTag->Owner->DiskFile, 1024, FS_SET );
+   }
+
    pSortInfo->Tag = 0;
    pSortInfo->pageBuffers = (char**) hb_xgrab( sizeof( char* ) * lpArray[0] );
+
    for( i = 0; i < (USHORT)lpArray[0]; i++ )
+   {
       pSortInfo->pageBuffers[i] = NULL;
+   }
+
    pSortInfo->pageBuffers[0] = (char*) hb_xgrab( NTXBLOCKSIZE );
    memset( pSortInfo->pageBuffers[0], 0, NTXBLOCKSIZE );
    itemlist = ( LPNTXBUFFER ) pSortInfo->pageBuffers[0];
+
    for( i = 0; i < pTag->MaxKeys+1; i++ )
-      itemlist->item_offset[i] = 2 + 2 * ( pTag->MaxKeys + 1 ) +
-            i * ( pTag->KeyLength + 8 );
+   {
+      itemlist->item_offset[i] = 2 + 2 * ( pTag->MaxKeys + 1 ) + i * ( pTag->KeyLength + 8 );
+   }
+
    buffer = pSortInfo->pageBuffers[0];
 
    if( !pKey )
@@ -2515,7 +2540,10 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
       hb_fsSeek( pArea->hDataFile, pArea->uiHeaderLen, FS_SET );
    }
    else if( pArea->lpdbRelations || pArea->lpdbOrdCondInfo->fUseCurrent )
+   {
       SELF_GOTOP( ( AREAP ) pArea );
+   }
+
    for( ulRecNo = 1; ulRecNo <= ulRecCount; ulRecNo++)
    {
       if( !hb_ntxReadBuf( pArea, readBuffer, &numRecinBuf, pArea->lpdbOrdCondInfo ) )
@@ -2672,7 +2700,10 @@ static void hb_ntxHeaderSave( LPNTXINDEX pIndex, BOOL bFull )
    NTXHEADER Header;
 
    if( pIndex->CompoundTag->Memory )
+   {
       return;
+   }
+
    hb_fsSeek( pIndex->DiskFile , 0 , 0 );
    memset( (void*) &Header, 0, sizeof( NTXHEADER ) );
    Header.type = 15;
@@ -2682,6 +2713,7 @@ static void hb_ntxHeaderSave( LPNTXINDEX pIndex, BOOL bFull )
    Header.item_size = pIndex->CompoundTag->KeyLength+8;
    Header.key_size = pIndex->CompoundTag->KeyLength;
    Header.key_dec = pIndex->CompoundTag->KeyDec;
+
    if( bFull )
    {
       Header.max_item = pIndex->CompoundTag->MaxKeys;
@@ -2807,8 +2839,11 @@ static ERRCODE hb_ntxHeaderRead( LPNTXINDEX pIndex )
 
    ulPos = hb_fsSeek( pIndex->DiskFile, 0, SEEK_END );
    hb_fsSeek( pIndex->DiskFile , 0 , 0 );
+
    if( hb_fsRead( pIndex->DiskFile,(BYTE*)&Header,16 ) != 16 )
+   {
       return FAILURE;
+   }
 
    pIndex->NextAvail = Header.next_page;
    pIndex->CompoundTag->TagBlock = ulPos - 1024;
@@ -2826,11 +2861,17 @@ static ERRCODE hb_ntxHeaderLoad( LPNTXINDEX pIndex , char *ITN)
    ulPos = hb_fsSeek( pIndex->DiskFile, 0, SEEK_END );
 
    hb_fsSeek( pIndex->DiskFile , 0 , 0 );
+
    if( hb_fsRead( pIndex->DiskFile,(BYTE*)&Header,sizeof(NTXHEADER)) != sizeof(NTXHEADER) )
+   {
       return FAILURE;
+   }
 
    if( SELF_COMPILE( ( AREAP ) pIndex->Owner, (BYTE*)Header.key_expr ) == FAILURE )
+   {
       return FAILURE;
+   }
+
    pKeyExp = hb_itemNew( NULL );
    hb_itemCopy( pKeyExp, pIndex->Owner->valResult );
 
@@ -3469,12 +3510,15 @@ static ERRCODE ntxZap( NTXAREAP pArea )
 
          pTag = pTag->pNext;
       }
+
       pArea->lpCurTag = pTagTmp;
       hb_xfree( buffer );
       return SELF_GOTOP( ( AREAP ) pArea );
    }
    else
+   {
      return FAILURE;
+   }
 }
 
 static ERRCODE ntxOrderCondition( NTXAREAP area, LPDBORDERCONDINFO pOrdCondInfo )
@@ -3744,9 +3788,14 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       pArea->lpNtxTag = pTag;
    pArea->lpCurTag = pTag;
    hb_ntxHeaderSave( pIndex, TRUE );
+
    if( !pTag->Memory )
+   {
       pTag->TagBlock = hb_fsSeek( pIndex->DiskFile, 0, SEEK_END ) - 1024;
+   }
+
    SELF_ORDSETCOND( ( AREAP ) pArea, NULL );
+
    return SELF_GOTOP( ( AREAP ) pArea );
 }
 
@@ -4119,6 +4168,7 @@ static ERRCODE ntxOrderListRebuild( NTXAREAP pArea )
    while( pTag )
    {
       hb_ntxPageFree( pTag,TRUE );
+
       if( pTag->Memory )
       {
          pTag->ulPagesDepth = 0;
@@ -4129,6 +4179,7 @@ static ERRCODE ntxOrderListRebuild( NTXAREAP pArea )
          hb_fsSeek( pTag->Owner->DiskFile, NTXBLOCKSIZE, FS_SET );
          hb_fsWrite( pTag->Owner->DiskFile, NULL, 0 );
       }
+
       pTag->RootBlock = 0;
       pTag->keyCount = 0;
       hb_ntxIndexCreate( pTag->Owner );
@@ -4137,8 +4188,7 @@ static ERRCODE ntxOrderListRebuild( NTXAREAP pArea )
       {
          hb_ntxHeaderSave( pTag->Owner, TRUE );
          hb_fsSeek( pTag->Owner->DiskFile , 0 , 0 );
-         pTag->TagBlock =
-              hb_fsSeek( pTag->Owner->DiskFile, 0, SEEK_END ) - 1024;
+         pTag->TagBlock = hb_fsSeek( pTag->Owner->DiskFile, 0, SEEK_END ) - 1024;
       }
 
       pTag = pTag->pNext;

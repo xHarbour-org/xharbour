@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.13 2003/08/21 16:49:37 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.14 2003/08/29 02:43:13 ronpinkas Exp $
  */
 
 /*
@@ -285,6 +285,7 @@ typedef struct _CDXLEAFHEADER
    BYTE bData[ CDX_LEAFFREESPACE ];
 } CDXLEAFHEADER;
 typedef CDXLEAFHEADER * LPCDXLEAFHEADER;
+
 #if (__BORLANDC__ > 1040) /* Use this only above Borland C++ 3.1 */
    #pragma option -a /* default alignment */
 #elif defined(__GNUC__)
@@ -293,8 +294,9 @@ typedef CDXLEAFHEADER * LPCDXLEAFHEADER;
    #pragma pack(pop);
 #elif defined(__cplusplus)
    #pragma pack()
+#elif defined(_MSC_VER)
+   #pragma pack()
 #endif
-
 
 /*
  *  DBF WORKAREA
