@@ -14,7 +14,7 @@ static oApp
 //-------------------------------------------------------------------------------------------
 
 FUNCTION Main
-   local oTool, oRebar, n, oSplash
+   local oTool, oRebar, n, oSplash, oTab
    LOCAL hImg1,hImg2,hBmp,aStdTab
    
    oApp := Application():Initialize()
@@ -31,6 +31,8 @@ FUNCTION Main
 
             WITH OBJECT :Popup
                :AddItem( 'Editor'     , 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )
+
+/*
                :AddSeparator()
                :AddItem( 'Button'     , 102, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'Edit'       , 103, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
@@ -41,10 +43,11 @@ FUNCTION Main
                :AddItem( 'ListBox'    , 108, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'StatusBar'  , 109, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'TabControl' , 110, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-               
+*/               
             END
          END
          :SetWindowMenu()
+/*
          :WindowMenu:Gray( 102 )
          :WindowMenu:Gray( 103 )
          :WindowMenu:Gray( 104 )
@@ -54,23 +57,24 @@ FUNCTION Main
          :WindowMenu:Gray( 108 )
          :WindowMenu:Gray( 109 )
          :WindowMenu:Gray( 110 )
-
+*/
          WITH OBJECT :Add('Rebar', TRebar():New( oApp:MainFrame ) )
-            WITH OBJECT :Add( 'Tools', TToolBar():New( oApp:MainFrame:Rebar, 444, 15, , , 26, 26, 20, 20 ) )
-               :AddButton( 0, 10,,,,  ,,'New Project' )
-               :AddButton( 1, 11,,,,  ,,'Open Project' )
-               :AddButton( 2, 12,,,,  ,,'Properties' )
-               :AddButton( 3, 13,,,,  ,,'Build Application' )
-               :AddButton( 4, 14,,,,  ,,'Build and Launch Application' )
-               :AddButton( 5, 15,,,,  ,,'Re-Build Application' )
-               :AddButton( 6, 16,,,,  ,,'Re-Build and Launch Application' )
-               :AddButton( 7, 17,,,,  ,,'Launch Application' )
-               :AddButton( 8, 18,,,,  ,,'Compile Single Source' )
-               :AddButton( 9, 19,,,,  ,,'Compile All Sources' )
-               :AddButton(10, 20,,,,  ,,'Link Only' )
-               :AddButton(11, 21,,,,  ,,'Compile to PPO' )
-               :AddButton(12, 22,,,,  ,,'View' )
-               :AddButton(14, 23,,,,  ,,'Files')
+            WITH OBJECT :Add( 'Tools', TToolBar():New( oApp:MainFrame:Rebar, 444, 15, , , 26, 26, 20, 20 ))
+               
+               :AddButton( "NewProj",      ToolButton():New( 0,,"New Project",10, {|o|MessageBox(,o:hint)} ) )
+               :AddButton( "OpenProj",     ToolButton():New( 1,,"Open Project",11 ) )
+               :AddButton( "Properties",   ToolButton():New( 2,,"Properties",12 ) )
+               :AddButton( "Build",        ToolButton():New( 3,,"Build Application",13 ) )
+               :AddButton( "BldLunch",     ToolButton():New( 4,,"Build and Launch Application",14 ) )
+               :AddButton( "ReBldLunch",   ToolButton():New( 5,,'Re-Build Application',15 ) )
+               :AddButton( "ReBldLunchApp",ToolButton():New( 6,,'Re-Build and Launch Application',16 ) )
+               :AddButton( "LunchApp",     ToolButton():New( 7,,'Launch Application',17 ) )
+               :AddButton( "SingSource",   ToolButton():New( 8,,'Compile Single Source',18 ) )
+               :AddButton( "AllSources",   ToolButton():New( 9,,'Compile All Sources',19 ) )
+               :AddButton( "LinkOnly",     ToolButton():New(10,,'Link Only',20 ) )
+               :AddButton( "CompPPO",      ToolButton():New(11,,'Compile to PPO',21 ) )
+               :AddButton( "View",         ToolButton():New(12,,'View',22 ) )
+               :AddButton( "Files",        ToolButton():New(13,,'Files',23) )
 
                // ----------------------------------------------------   set imagelist
                hImg1:= ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
@@ -99,13 +103,16 @@ FUNCTION Main
             WITH OBJECT :Tabs:Tabs[1]
                WITH OBJECT :Add( 'TabBand', TRebar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1] ) )
                   :SetStyle( WS_BORDER, .F. )
-                  WITH OBJECT :Add( 'TabTools', TToolBar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1]:TabBand, 444, 14, , , 26, 26, 20, 20 ) )
-
+                  WITH OBJECT :Add( 'StdTools', TToolBar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1]:TabBand, 444, 14, , , 26, 26, 20, 20 ) )
+                     :SetStyle( TBSTYLE_CHECKGROUP )
                      aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
-                                  'CheckBox', 'RadioButton', 'Listbox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
+                                  'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
                                   'RadioGroup', 'Panel', 'ActionList' }
                      for n:=0 to 16
-                         :AddButton(n,100+n,,TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP,,,,aStdTab[n+1] )
+                        oTool := ToolButton():New( n,,aStdTab[n+1], n+100 )
+                        oTool:Action := {|oItem| oApp:SubForm:OnMenuCommand(oItem) }
+                        oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
+                        :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
                      next
                      
                      // ----------------------------------------------------   set imagelist
@@ -116,8 +123,8 @@ FUNCTION Main
                      SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
                      //---------------------------------------------------------------------
                   END
-                  :AddBand( NIL, RBBS_NOVERT, :TabTools:handle, 100, 34,  , "", NIL )
-                  :TabTools:DisableAll()
+                  :AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 34,  , "", NIL )
+                  :StdTools:DisableAll()
                END
             END
          END
@@ -128,6 +135,8 @@ FUNCTION Main
             :SetPanelText( 2, "Enjoy" )
          END
       END
+      
+      oSplash:OnTimer(1)
       :Run()
   END
 RETURN( nil)
@@ -179,3 +188,9 @@ METHOD New( oParent, cFile, nTimeOut ) CLASS Splash
    UpdateWindow( ::handle)
    SetTimer( ::handle, 1, nTimeOut )
 return( self )
+
+
+FUNCTION TestMsg(o)
+MessageBox(,o:name)
+return(nil)
+

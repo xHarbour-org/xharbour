@@ -8,6 +8,7 @@
 #Include "wintypes.ch"
 #Include "cstruct.ch"
 #Include "winGdi.ch"
+#Include "what32.ch"
 
 // move that structure to WinStruc.ch
 
@@ -22,8 +23,6 @@ typedef struct {;
 CLASS TTabControl FROM TControl
 
    DATA Tabs AS  ARRAY HIDDEN
-   DATA Dlgs AS  ARRAY HIDDEN
-   DATA Procs AS ARRAY HIDDEN
    DATA nCurSel
    DATA Cargo
    DATA ntProc
@@ -61,8 +60,8 @@ CLASS TTabControl FROM TControl
    METHOD SetToolTips()
    METHOD SetUnicodeFormat()
    METHOD TabNotify()
-   METHOD OnCreate() INLINE ::CreateTabs()
-   METHOD CreateTabs()
+   METHOD OnCreate()
+   METHOD OnSize()
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -78,25 +77,22 @@ METHOD New( oParent, nId, nL, nT, nW, nH, nSel ) CLASS TTabControl
    
    ::Left    := nL
    ::Top     := nT
-   ::width   := nW
-   ::height  := nH
+   ::width   := IFNIL(nW,289,nW)
+   ::height  := IFNIL(nH,193,nH)
    
    ::lRegister := .F.
    ::lControl  := .F.
    ::WndProc   := 'FormProc'
    
    ::Tabs    := {}
-   ::Dlgs    := {}
-   ::Procs   := {}
    ::nCurSel := IF(nSel==NIL,1,nSel)
 
-   ::Msgs    := {WM_NOTIFY,WM_CTLCOLORDLG}
-   ::SendTo  := oParent
+   ::Msgs    := {WM_NOTIFY,WM_CTLCOLORDLG,WM_SIZE}
 RETURN( super:new( oParent ))
 
 *-----------------------------------------------------------------------------*
 
-METHOD CreateTabs() CLASS TTabControl
+METHOD OnCreate() CLASS TTabControl
    ::ntProc := SetProcedure( ::Parent:handle,;
                {|hWnd,nMsg,nwParam,nlParam|::TabNotify( nMsg,nwParam, nlParam )},{WM_NOTIFY} )
 return( super:OnCreate() )
@@ -115,12 +111,12 @@ METHOD TabNotify( nMsg,nwParam, nlParam ) CLASS TTabControl
 
 *-----------------------------------------------------------------------------*
 
-METHOD AddTab(cText,cRes,bProc,nImgPos) CLASS TTabControl
+METHOD AddTab(cText,cRes,oPage,nImgPos) CLASS TTabControl
    LOCAL hTab
    if (hTab:=TabCtrl_AddItem(::handle,cText,nImgPos)) > -1
-      AADD(::Dlgs,cRes)
-      AADD(::Tabs,NIL )
-      AADD(::Procs,bProc)
+      DEFAULT oPage TO TabPage():New( self )
+      oPage:resname := cRes
+      AADD(::Tabs,oPage )
    ENDIF
 
    RETURN(hTab)
@@ -130,9 +126,7 @@ METHOD AddTab(cText,cRes,bProc,nImgPos) CLASS TTabControl
 METHOD InsertTab(nPos,cText,cRes,bProc) CLASS TTabControl
 
    if TabCtrl_InsertItem(::handle,cText,nPos) > -1
-      AINS(::Dlgs,nPos,cRes,.T.)
       aIns(::Tabs,nPos,NIL,.T.)
-      AINS(::Procs,nPos,bProc,.T.)
       RETURN(.T.)
    ENDIF
 
@@ -148,12 +142,10 @@ METHOD DeleteTab(nPos) CLASS TTabControl
         ::nCurSel--
       ENDIF
       TabCtrl_DeleteItem(nPos-1)
-      ADel(::Dlgs,nPos,.t.)
       if isWindow(::Tabs[nPos]:handle)
          DestroyWindow(::Tabs[nPos]:handle)
       endif
       ADel(::Tabs,nPos,.t.)
-      ADEL(::Procs,nPos,.T.)
       return(.T.)
    Endif
 
@@ -161,7 +153,7 @@ METHOD DeleteTab(nPos) CLASS TTabControl
 
 *-----------------------------------------------------------------------------*
 
-METHOD Configure() CLASS TTabControl
+METHOD Configure(lCreate) CLASS TTabControl
 
    LOCAL aTab :=GetClientRect(::handle)
    local acRect:={0,0,0,0}
@@ -171,7 +163,7 @@ METHOD Configure() CLASS TTabControl
    LOCAL i
    LOCAL aPt
    LOCAL bBlock
-   view aTab
+   DEFAULT lCreate TO .T.
    IF LEN(::Tabs) > 0
       acRect:=TabCtrl_GetItemRect(::handle,0)
       FOR i:=1 TO LEN(::Tabs)-1
@@ -187,14 +179,20 @@ METHOD Configure() CLASS TTabControl
    acRect[1]:=aPt[1]
    acRect[2]:=aPt[2]
 
-   FOR i:=1 TO LEN(::Dlgs)
-      IF /*::Dlgs[i] != NIL .AND.*/ EMPTY(::Tabs[i])
-
-         ::Tabs[i]:=TabPage():New( self )
-         MoveWindow(::Tabs[i]:handle,acRect[1],acRect[2]+acRect[4],aTab[3]-6,aTab[4]-acRect[2]-acRect[4]-4,.T.)
-
-         IF i<>::nCurSel
-            ShowWindow(::Tabs[i]:handle,SW_HIDE)
+   FOR i:=1 TO LEN(::Tabs)
+      IF ::Tabs[i]!=NIL
+         IF lCreate
+            ::Tabs[i]:Create()
+         endif
+         ::Tabs[i]:Move( acRect[1],;
+                         acRect[2]+acRect[4],;
+                         aTab[3]-6,;
+                         aTab[4]-acRect[2]-acRect[4]-4,;
+                         .T.)
+         if lCreate
+            IF i<>::nCurSel
+               ShowWindow(::Tabs[i]:handle,SW_HIDE)
+            endif
          endif
       endif
    next
@@ -216,7 +214,6 @@ METHOD DeleteAllTabs() CLASS TTabControl
   AEVAL(::Tabs,{|hWnd| IF(isWindow(hWnd),DestroyWindow(hWnd),)})
   ::Tabs:={}
   ::aDlg:={}
-  ::Procs:={}
   ::nCurSel:=0
 
   RETURN(lRet)
@@ -356,11 +353,20 @@ METHOD SetUnicodeFormat( lUnicode ) CLASS TTabControl
 
 *-----------------------------------------------------------------------------*
 
+METHOD OnSize( nwParam,x , y ) CLASS TTabControl
+   local n, aRect
+   for n:=1 to LEN( ::Tabs )
+       if ::Tabs[n]!=nil
+          ::Configure(.F.)
+       endif
+   next
+return( super:OnSize() )
+
+*-----------------------------------------------------------------------------*
 
 CLASS TabPage FROM TPanel
    METHOD New() CONSTRUCTOR
-   METHOD OnCommand(nwParam,nlParam) INLINE ::SendCommand(nwParam,nlParam)
-   METHOD SendCommand()
+   METHOD OnCommand()
 ENDCLASS
 
 METHOD New( oParent ) CLASS TabPage
@@ -369,11 +375,10 @@ METHOD New( oParent ) CLASS TabPage
    ::height:= 10
    ::style := WS_CHILD + WS_VISIBLE
    ::modal := .F.
-   ::Create()
 return( self )
 
-METHOD SendCommand(nwParam,nlParam) CLASS TabPage
+METHOD OnCommand(nwParam,nlParam) CLASS TabPage
    IF ::Parent:SendTo != NIL
-      ::Parent:SendTo:PostMessage( WM_COMMAND, nwParam, nlParam )
+      RETURN(::Parent:SendTo:SendMessage( WM_COMMAND, nwParam, nlParam ))
    endif
 return(0)

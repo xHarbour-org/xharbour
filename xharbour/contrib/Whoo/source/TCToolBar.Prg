@@ -60,17 +60,14 @@ typedef struct {;
     UINT      uflags;     // flag indicating how to interpret the idFrom member of the NMHDR structure that is included in the structure
 } TOOLTIPTEXT, FAR *LPTOOLTIPTEXT
 
-
 CLASS TToolbar FROM TControl
 
    DATA abuttons
    DATA aBitmaps
    DATA hParent
    DATA Created
-   DATA aText
    DATA hBmp
    DATA ntProc
-   DATA aTips
    DATA nBtn HIDDEN
    DATA aMenus
    VAR nImg,hBMInst,nBMId,xBtn,yBtn,xBmp,yBmp
@@ -79,7 +76,6 @@ CLASS TToolbar FROM TControl
 
    METHOD AddButton()
    METHOD AddBitmap()
-   METHOD AddString()
    METHOD Create()
    METHOD tbProc()
 
@@ -92,7 +88,8 @@ CLASS TToolbar FROM TControl
                                          ::SendMessage(TB_CHECKBUTTON,nBtn,If(lFlag,1,0))
    METHOD IsButtonChecked(nBtn)   INLINE IF(::SendMessage(TB_ISBUTTONCHECKED,nBtn,0)==0,.F.,.T.)
    METHOD AddMenu()
-
+   
+   METHOD SetListStyle()          INLINE ::Style := OR(::Style,TBSTYLE_LIST)
 ENDCLASS
 
 
@@ -109,12 +106,10 @@ METHOD New( oParent, nId, nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp ) CLASS T
    ::yBmp    := yBmp
   
    ::aButtons:={}
-   ::aTips   :={}
    ::Style   :=TBSTYLE_FLAT + TBSTYLE_TOOLTIPS + WS_CLIPCHILDREN + ;
               WS_CLIPSIBLINGS + CCS_ADJUSTABLE + CCS_NODIVIDER + CCS_NORESIZE + WS_CHILD
    ::Id      := nId
    ::Created := .F.
-   ::aText   :={}
    ::aBitmaps:={}
    ::aMenus  :={}
 
@@ -151,23 +146,27 @@ METHOD AddBitmap(hInst, nhIdBmp, nButtons) CLASS TToolBar
 
 *-----------------------------------------------------------------------------*
 
-METHOD AddButton(nIndex, nId, nState, nStyle, ncargo, nString, cText, cToolTip ) CLASS TToolBar
+METHOD AddButton( cName, oBtn ) CLASS TToolBar
 
    LOCAL tbb IS TBBUTTON
+   DEFAULT oBtn TO ToolButton():New()
+   
+   oBtn:name     := cName
+   oBtn:Parent   := self
+   
+   tbb:ibitmap   := oBtn:ImageIndex
+   tbb:idCommand := oBtn:Id
+   tbb:fsState   := oBtn:State
+   tbb:fsStyle   := oBtn:Style
+   tbb:dwData    := oBtn:cargo
+   tbb:iString   := LEN(::aButtons)
+   AADD(::aButtons,oBtn)
 
-   tbb:ibitmap   :=IFNIL(nIndex,-1,nIndex)
-   tbb:idCommand :=nId // must be supplied
-   tbb:fsState   :=IFNIL(nState,TBSTATE_ENABLED,nState)
-   tbb:fsStyle   :=IFNIL(nStyle,TBSTYLE_BUTTON,nStyle)
-   tbb:dwData    :=IFNIL(ncargo,0,nCargo)
-   tbb:iString   :=IFNIL(nString,0,nString)
+   __objAddData( self, oBtn:name )
+   __ObjSetValueList( self, { { oBtn:name, oBtn } } )
 
-   AADD(::aButtons,tbb)
-   AADD(::aTips,cToolTip)
-   IF ::Created
-     SendMessage(::handle,TB_ADDBUTTONS,1,tbb:value)
-     
-   ENDIF
+   SendMessage(::handle,TB_ADDBUTTONS,1,tbb:value)
+   SendMessage(::handle,TB_ADDSTRING, 0,oBtn:Caption)
 
 RETURN(self)
 
@@ -181,42 +180,21 @@ METHOD AddMenu(nId,aMenuItems)
 
 *-----------------------------------------------------------------------------*
 
-METHOD addstring(cText) CLASS TToolBar
-
-   IF ::created
-      SendMessage(::handle,TB_ADDSTRING,0,cText)
-   Else
-      AADD(::aText,cText)
-   Endif
-
-   RETURN(self)
-
-*-----------------------------------------------------------------------------*
-
 METHOD Create() CLASS TToolBar
-
    LOCAL cButtons:=""
    LOCAL cStrings:=""
    LOCAL tbb IS TBBUTTON
    LOCAL i
-
    IF ISNIL(::hBMInst) .AND. ISNIL(::nBMId)
       ::hBMInst:=HINST_COMMCTRL
       ::nBMId  :=IDB_STD_LARGE_COLOR
    ENDIF
-   FOR i:=1 TO LEN(::aButtons)
-       cButtons+=::aButtons[i]:Value
-   NEXT
    ::handle := CreateToolBarEx( ::Parent:handle, ::Style, ::Id, ::nImg,::hBMInst,::nBMId,cButtons,LEN(::aButtons),;
                                 ::xbtn,::yBtn,::xBmp,::yBmp, tbb:sizeof())
-   ::ntProc:=SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(nMsg,nwParam,nlParam)},{WM_NOTIFY})
+   ::ntProc:=SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam| ::tbProc(nMsg,nwParam,nlParam)},{WM_NOTIFY,WM_COMMAND})
    ::SendMessage(TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_DRAWDDARROWS )
-   FOR i:=1 to LEN(::aText)
-      ::SendMessage(TB_ADDSTRING,0,::aText[i])
-   NEXT
    ::Created:=.T.
-
-   RETURN( self )
+return( self )
 
 
 *-----------------------------------------------------------------------------*
@@ -232,15 +210,25 @@ METHOD tbProc(nMsg,nwParam,nlParam) CLASS TToolBar
    LOCAL hic
 
    DO CASE
+   CASE nMsg==WM_COMMAND
+       IF (n:=ASCAN(::aButtons,{|btn| btn:id==nwParam})) > 0
+          if ::aButtons[n]:Action != NIL
+             if valtype(::aButtons[n]:Action) == "B"
+                EVAL( ::aButtons[n]:Action,::aButtons[n] )
+               else
+                HB_Exec( ::aButtons[n]:Action,,::aButtons[n])
+             endif
+          endif
+       endif
    CASE nMsg==WM_NOTIFY
      Hdr IS NMHDR
      Hdr:Buffer(peek(nlParam,Hdr:sizeof))
      DO CASE
      CASE Hdr:code==TTN_NEEDTEXT
-       IF (n:=ASCAN(::aButtons,{|btn| btn:idCommand==Hdr:idFrom})) > 0
+       IF (n:=ASCAN(::aButtons,{|btn| btn:id==Hdr:idFrom})) > 0
          Ttt IS TOOLTIPTEXT
          Ttt:Buffer(peek(nlParam,Ttt:sizeof))
-         Ttt:lpszText:=::aTips[n]
+         Ttt:lpszText:=::aButtons[n]:hint
          poke(nlParam,Ttt:value,Ttt:sizeof)
        ENDIF
 
@@ -264,7 +252,7 @@ METHOD tbProc(nMsg,nwParam,nlParam) CLASS TToolBar
 
 METHOD disableall() CLASS TToolBar
 
-   AEVAL(::aButtons,{|btn| ::disable(btn:idCommand)})
+   AEVAL(::aButtons,{|btn| ::disable(btn:id)})
 
    RETURN(self)
 
@@ -272,8 +260,37 @@ METHOD disableall() CLASS TToolBar
 
 METHOD enableall() CLASS TToolBar
 
-   AEVAL(::aButtons,{|btn| ::enable(btn:idCommand)})
+   AEVAL(::aButtons,{|btn| ::enable(btn:id)})
 
    RETURN(self)
 
 *-----------------------------------------------------------------------------*
+
+
+CLASS ToolButton
+   DATA ImageIndex INIT -1
+   DATA Name       INIT "ToolButton"
+   DATA Style      INIT TBSTYLE_BUTTON
+   DATA PopupMenu
+   DATA Hint
+   DATA Height
+   DATA Width
+   DATA Enabled
+   DATA Caption
+   DATA Action
+   DATA Id
+   DATA State      INIT TBSTATE_ENABLED
+   DATA Cargo
+   DATA TextIndex  INIT 0
+   DATA Parent     HIDDEN
+   METHOD New() CONSTRUCTOR
+ENDCLASS
+
+METHOD New(nImgIndex,cCaption,cHint,nId,bAction) CLASS ToolButton
+   ::ImageIndex := IFNIL(nImgIndex,::ImageIndex,nImgIndex)
+   ::Caption    := IFNIL(cCaption, ::Caption,   cCaption)
+   ::Hint       := IFNIL(cHint,    ::Hint,      cHint)
+   ::Action     := IFNIL(bAction,  ::Action,    bAction)
+   ::Id         := nId
+return(self)
+

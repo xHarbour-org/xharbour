@@ -26,6 +26,8 @@ GLOBAL EXTERNAL hThisInstance
    DATA hBmpGrid
    DATA xBmpSize
    DATA yBmpSize
+   DATA CtrlName
+
 
    METHOD New( oParent )     INLINE ::Caption := 'SubForm1 from TForm', ;
                                     ::Editing := .F.        ,;
@@ -45,11 +47,18 @@ GLOBAL EXTERNAL hThisInstance
    METHOD OnPaint( hDC ) INLINE ::TileGrid(hDC)
    METHOD TileGrid(hDC)
    METHOD OnMenuCommand(oItem)
+   METHOD CreateControl(aRect)
    METHOD CreateSub()
    METHOD GetUniquePropName()
    METHOD OnDestroy()
    METHOD SetGridSize(x,y)
    METHOD OnCloseQuery()  INLINE    ::Parent:WindowMenu:Enable( 101 ),;
+                                    ::Parent:Rebar:Tabs:Tabs[1]:TabBand:StdTools:DisableAll(),;
+                                    nil
+
+   
+ END CLASS
+ /*
                                     ::Parent:WindowMenu:Gray( 102 ),;
                                     ::Parent:WindowMenu:Gray( 103 ),;
                                     ::Parent:WindowMenu:Gray( 104 ),;
@@ -59,12 +68,7 @@ GLOBAL EXTERNAL hThisInstance
                                     ::Parent:WindowMenu:Gray( 108 ),;
                                     ::Parent:WindowMenu:Gray( 109 ),;
                                     ::Parent:WindowMenu:Gray( 110 ),;
-                                    ::Parent:Rebar:Tabs:Tabs[1]:TabBand:TabTools:DisableAll(),;
-                                    nil
-
-   
- END CLASS
-
+*/
 //----------------------------------------------------------------------------//
 
 METHOD Add( cName, oObj )
@@ -74,6 +78,8 @@ METHOD Add( cName, oObj )
    aAdd( ::aCtrl, oCtrl)
    ::oMask:GetSiblings()
    ::oMask:SetFocus()
+   ::oMask:Cursor := NIL
+   ::CtrlName := NIL
 
    RETURN(oCtrl)
 
@@ -105,36 +111,92 @@ METHOD OnDestroy()
 
 METHOD OnMenuCommand(oItem)
 
+   // check for the range of commands which create controls
+   // otherwise process the command as usual
+
+   IF .T. //command if range of control creation commands
+
+      // store the control type in memory
+      ::CtrlName := oItem:Name // control type to be created
+
+      // this cursor shape must be correct for the type of the control
+      ::oMask:Cursor :=LoadCursor(hThisInstance,"FRAMES") //<= correct cursor for the control
+
+   ELSE
+
+      ::CtrlName := NIL
+      ::oMaskCursor:=NIL
+
+      // process command
+      DO CASE
+
+
+      ENDCASE
+
+
+   ENDIF
+
+
+
+   RETURN(NIL)
+
+
+//----------------------------------------------------------------------------//
+
+// note !
+// all controls must have default sizes !!!!!
+// please check Tab control
+
+    
+METHOD CreateControl(aRect)
+
    LOCAL oObj
    LOCAL nInd:=0
-   LOCAL cName:=::GetUniquePropName(oItem:Text)
+   LOCAL cName
 
-   DO CASE
-   CASE oItem:Text=="Button"
-      ::Add(cName, TButton():New(   self, cName, 500,  50, 10 ) )
-   CASE oItem:Text=="Edit"
-      ::Add(cName, TEdit():New(     self, cName, 501,  50, 40 ) )
-   CASE oItem:Text=="Label"
-      ::Add(cName, TStatic():New(   self, cName, 502,  50, 80 ) )
-   CASE oItem:Text=="CheckBox"
-      ::Add(cName, TCheck():New(    self, cName, 503,  50,120 ) )
-   CASE oItem:Text=="RadioButton"
-      ::Add(cName, TRadio():New(    self, cName, 504,  50,160 ) )
-   CASE oItem:Text=="ComboBox"
-      ::Add(cName, TComboBox():New( self,        505, 200, 10 ) )
-   CASE oItem:Text=="ListBox"
-      ::Add(cName, TListBox():New(  self,        506, 200, 40 ) )
-   CASE oItem:Text=="StatusBar"
-      IF !("2" $ cName) // only one status bar
-        ::Add(cName, TStatusBar():New( self, cName, 507 ) )
+   IF ! Empty( ::CtrlName )
+
+      IF Empty(aRect)
+         aRect:={10,10,NIL,NIL}
       ENDIF
-   CASE oItem:Text=="TabControl"
-      oObj := ::Add(cName, TTabControl():New( self,     508, 50, 50, 200, 200 ) )
-      oObj:AddTab( "Tab1")
-      oObj:configure()
-   ENDCASE
 
-  RETURN(NIL)
+      cName:=::GetUniquePropName(::CtrlName)
+
+      DO CASE
+      CASE ::CtrlName=="Button"
+         oObj:=::Add(cName, TButton():New(   self, cName, 500,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+      CASE ::CtrlName=="Edit"
+         oObj:=::Add(cName, TEdit():New(     self, cName, 501,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+      CASE ::CtrlName=="Label"
+         oObj:=::Add(cName, TStatic():New(   self, cName, 502,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+      CASE ::CtrlName=="CheckBox"
+         oObj:=::Add(cName, TCheck():New(    self, cName, 503,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+      CASE ::CtrlName=="RadioButton"
+         oObj:=::Add(cName, TRadio():New(    self, cName, 504,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+      CASE ::CtrlName=="ComboBox"
+         oObj:=::Add(cName, TComboBox():New( self,        505,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+      CASE ::CtrlName=="ListBox"
+         oObj:=::Add(cName, TListBox():New(  self,        506,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         view ::CtrlName
+      CASE ::CtrlName=="StatusBar"
+         IF !("2" $ cName) // only one status bar
+           oObj:=::Add(cName, TStatusBar():New( self, cName, 507 ) )
+         ENDIF
+      CASE ::CtrlName=="TabControl"
+         oObj := ::Add(cName, TTabControl():New( self,     508, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:AddTab( "Tab1",  'TEST' )
+         oObj:configure()
+
+      OTHERWISE // unknown name
+
+         ::CtrlName:=NIL
+         ::oMask:Cursor:=NIL
+
+      ENDCASE
+
+   ENDIF
+
+   RETURN(oObj)
 
 //----------------------------------------------------------------------------//
 
@@ -179,7 +241,7 @@ METHOD CreateSub()
    LOCAL xRet
 
    ::SetGridSize()
-
+/*
    ::Parent:WindowMenu:Gray( 101 )
    ::Parent:WindowMenu:Enable( 102 )
    ::Parent:WindowMenu:Enable( 103 )
@@ -190,8 +252,8 @@ METHOD CreateSub()
    ::Parent:WindowMenu:Enable( 108 )
    ::Parent:WindowMenu:Enable( 109 )
    ::Parent:WindowMenu:Enable( 110 )
-
-   ::Parent:Rebar:Tabs:Tabs[1]:TabBand:TabTools:EnableAll()
+*/
+   ::Parent:Rebar:Tabs:Tabs[1]:TabBand:StdTools:EnableAll()
 
    xRet := super:OnCreate()
 

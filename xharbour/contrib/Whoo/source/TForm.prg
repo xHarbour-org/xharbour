@@ -4,6 +4,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 #include "debug.ch"
+#include "what32.ch"
 
 #Define RCF_DIALOG     0
 #Define RCF_WINDOW     1
@@ -39,13 +40,14 @@ METHOD New( oParent ) CLASS TForm
 
 *-----------------------------------------------------------------------------*
 
-METHOD Add( cName, oObj ) CLASS TForm
-   
+METHOD Add( cName, oObj, lCreate ) CLASS TForm
+   DEFAULT lCreate TO .T.
    oObj:propname := cName
    __objAddData( self, cName )
    __ObjSetValueList( self, { { cName, oObj } } )
-   oObj:Create()
-
+   IF lCreate
+      oObj:Create()
+   endif
    RETURN( oObj )
 
 *-----------------------------------------------------------------------------*

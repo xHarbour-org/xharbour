@@ -74,10 +74,12 @@ CLASS oCtrlMask FROM TWindow
    DATA moving
    DATA sizing
    DATA selecting
+   DATA creating
    DATA nClick
    DATA MouseDown
    DATA aEditRect
    DATA aClickPt
+   DATA Cursor
 
    METHOD New() CONSTRUCTOR
    METHOD OnGetDlgCode()
@@ -91,6 +93,8 @@ CLASS oCtrlMask FROM TWindow
    METHOD OnMouseMove()
    METHOD MoveCtrl()
    METHOD Refresh()
+   METHOD SelectCtrl()
+   METHOD DeSelectCtrl()
 
 ENDCLASS
 
@@ -107,22 +111,23 @@ METHOD New( oParent ) CLASS oCtrlMask
    ::color     := GetStockObject(NULL_BRUSH)
    ::ExStyle   := WS_EX_TRANSPARENT
    ::Cursor    := 0 //LoadCursor(,IDC_WAIT)
-   ::Caption   :=""
-   ::lRegister :=.T.
+   ::Caption   := ""
+   ::lRegister := .T.
    ::WndProc   := 'FormProc'
    ::Msgs      := -1
-   ::FrameWnd  :=.F.
+   ::FrameWnd  := .F.
    ::FormType  := 1
-   ::aHot      :={}
-   ::aSiblings :={}
-   ::moving:=.F.
-   ::sizing:=.F.
-   ::selecting:=.F.
-   ::mousedown:=.F.
-   ::nClick:=HTCLIENT
-   ::aEditRect:=NIL
-   ::aSelected:={}
-   ::aClickPt:={}
+   ::aHot      := {}
+   ::aSiblings := {}
+   ::moving    := .F.
+   ::sizing    := .F.
+   ::selecting := .F.
+   ::creating  := .F.
+   ::mousedown := .F.
+   ::nClick    := HTCLIENT
+   ::aEditRect := NIL
+   ::aSelected := {}
+   ::aClickPt  := {}
 
 
 
@@ -156,6 +161,21 @@ METHOD OnRButtonDown()
 
    RETURN(NIL)
 
+
+*-----------------------------------------------------------------------------*
+
+METHOD SelectCtrl( oCtrl, lAdditive, lRefresh  )
+
+
+   RETURN(NIL)
+
+*-----------------------------------------------------------------------------*
+
+METHOD DeSelectCtrl( oCtrl, lAll, lRefresh )
+
+
+
+   RETURN(NIL)
 
 *-----------------------------------------------------------------------------*
 
@@ -391,32 +411,37 @@ METHOD OnLButtonDown( wParam, x, y )
    LOCAL aOldSelected:=aClone(::aSelected)
    ClientToScreen(::Handle,aPt)
 
-   FOR EACH hChild IN ::aSiblings
-      aWRect:=GetWindowRect(hChild)
-      IF PtInRect(aWRect,aPt)
-         lFound:=.T.
-         IF aScan(::aSelected,{|a| a[SEL_HANDLE]==hChild })==0
-            aRect:=aClone(aWRect)
-            RectScreenToClient(::Handle,aRect)
-            ::aSelected:={{hChild,aclone(aRect),x-aRect[1],y-aRect[2],{},{}}}   // handle,rect,anchorX,anchorY,aHot
+   IF Empty(::Cursor)
+      FOR EACH hChild IN ::aSiblings
+         aWRect:=GetWindowRect(hChild)
+         IF PtInRect(aWRect,aPt)
+            lFound:=.T.
+            IF aScan(::aSelected,{|a| a[SEL_HANDLE]==hChild })==0
+               aRect:=aClone(aWRect)
+               RectScreenToClient(::Handle,aRect)
+               ::aSelected:={{hChild,aclone(aRect),x-aRect[1],y-aRect[2],{},{}}}   // handle,rect,anchorX,anchorY,aHot
+            ENDIF
+            IF Len(::aSelected)==1 .and. (nPos:=aScan(::aSelected[1,SEL_HOTAREAS],{|a| ptInRect(a[1],{x,y})})) > 0 // <= aHot
+               ::nClick:=::aSelected[1,SEL_HOTAREAS,nPos,2]
+               WinSetCursor(LoadCursor(,::aSelected[1,SEL_HOTAREAS,nPos,3]))
+               ::sizing:=.T.
+            ELSE
+               ::nClick:=HTCAPTION
+               WinSetCursor(LoadCursor(hThisInstance,"FIST"))
+               FOR EACH a IN ::aSelected
+                   a[SEL_ANCHORX]:=x-a[SEL_OLDRECT,1] // anchor X
+                   a[SEL_ANCHORY]:=y-a[SEL_OLDRECT,2] // anchor Y
+               NEXT
+               ::moving:=.T.
+            ENDIF
+            ::aEditRect:=::MoveCtrl(::Handle,{x,y})
+            EXIT
          ENDIF
-         IF Len(::aSelected)==1 .and. (nPos:=aScan(::aSelected[1,SEL_HOTAREAS],{|a| ptInRect(a[1],{x,y})})) > 0 // <= aHot
-            ::nClick:=::aSelected[1,SEL_HOTAREAS,nPos,2]
-            WinSetCursor(LoadCursor(,::aSelected[1,SEL_HOTAREAS,nPos,3]))
-            ::sizing:=.T.
-         ELSE
-            ::nClick:=HTCAPTION
-            WinSetCursor(LoadCursor(hThisInstance,"FIST"))
-            FOR EACH a IN ::aSelected
-                a[SEL_ANCHORX]:=x-a[SEL_OLDRECT,1] // anchor X
-                a[SEL_ANCHORY]:=y-a[SEL_OLDRECT,2] // anchor Y
-            NEXT
-            ::moving:=.T.
-         ENDIF
-         ::aEditRect:=::MoveCtrl(::Handle,{x,y})
-         EXIT
-      ENDIF
-   NEXT
+      NEXT
+   ELSE
+      ::creating:=.T.
+      ::cursor:=NIL
+   ENDIF
 
    IF !lFound
       ::aSelected:={}
@@ -486,26 +511,30 @@ METHOD OnMouseMove( aParam,x,y)
       ReleaseDc(::Handle,hDC)
 
    ELSE
-      ClientToScreen(::Handle,aPt)
-      FOR EACH hChild IN ::aSiblings
-         IF PtInRect(GetWindowRect(hChild),aPt)
-            IF Len(::aSelected) == 1 .and. ::aSelected[1,SEL_HANDLE]==hChild
-               IF (nPos:=aScan(::aSelected[1,SEL_HOTAREAS],{|a| ptInRect(a[1],{x,y})})) > 0
-                  WinSetCursor(LoadCursor(,::aSelected[1,5,nPos,3]))
-               ELSE
+      IF Empty(::Cursor)
+         ClientToScreen(::Handle,aPt)
+         FOR EACH hChild IN ::aSiblings
+            IF PtInRect(GetWindowRect(hChild),aPt)
+               IF Len(::aSelected) == 1 .and. ::aSelected[1,SEL_HANDLE]==hChild
+                  IF (nPos:=aScan(::aSelected[1,SEL_HOTAREAS],{|a| ptInRect(a[1],{x,y})})) > 0
+                     WinSetCursor(LoadCursor(,::aSelected[1,5,nPos,3]))
+                  ELSE
+                     WinSetCursor(LoadCursor(hThisInstance,"HAND"))
+                  ENDIF
+               ELSEIF len(::aSelected) > 1
                   WinSetCursor(LoadCursor(hThisInstance,"HAND"))
+               ELSE
+                  WinSetCursor(LoadCursor(hThisInstance,"FINGER"))
                ENDIF
-            ELSEIF len(::aSelected) > 1
-               WinSetCursor(LoadCursor(hThisInstance,"HAND"))
-            ELSE
-               WinSetCursor(LoadCursor(hThisInstance,"FINGER"))
+               lFound:=.T.
+               EXIT
             ENDIF
-            lFound:=.T.
-            EXIT
+         NEXT
+         IF !lFound
+            WinSetCursor(LoadCursor(,IDC_ARROW))
          ENDIF
-      NEXT
-      IF !lFound
-         WinSetCursor(LoadCursor(,IDC_ARROW))
+      ELSE
+         WinSetCursor(::Cursor)
       ENDIF
    ENDIF
 
@@ -525,10 +554,15 @@ METHOD OnLButtonUp( wParam, x, y )
    LOCAL aRect
    LOCAL hDC
    LOCAL a
+   LOCAL oObj
 
    if !::mousedown // if dragged pressed from different window
       RETURN(NIL)
    endif
+
+   IF ::creating
+      ::cursor:=NIL
+   ENDIF
 
    ::mousedown:=.F.
 
@@ -555,14 +589,33 @@ METHOD OnLButtonUp( wParam, x, y )
       DrawFocusRect(hDC,::aEditRect)
       ReleaseDc(::Handle,hDC)
 
-      FOR EACH hChild IN ::aSiblings
-         aWRect:=GetWindowRect(hChild)
-         aRect:=aClone(aWRect)
-         RectScreenToClient(::Handle,aRect)
-         IF !empty(IntersectRect( aRect, ::aEditRect ))
-            aAdd(::aSelected,{hChild, aclone(aRect),0,0,{},{}}) // handle,rect,anchorX,anchorY,aHot
+      IF ::creating
+         ::creating:=.F.
+
+         oObj := ::Parent:CreateControl( { ::aEditRect[1],;
+                                           ::aEditRect[2],;
+                                           IF( ::aEditRect[3] - ::aEditRect[1] < MINX, NIL,;
+                                               ::aEditRect[3] - ::aEditRect[1]),;
+                                           IF( ::aEditRect[4] - ::aEditRect[2] < MINX, NIL,;
+                                               ::aEditRect[4] - ::aEditRect[2]) } )
+
+         IF ! Empty(oObj)
+            aWRect:=GetWindowRect(oObj:Handle)
+            aRect:=aClone(aWRect)
+            RectScreenToClient(::Handle,aRect)
+            ::aSelected:={{oObj:Handle, aclone(aRect),0,0,{},{}}} // handle,rect,anchorX,anchorY,aHot
          ENDIF
-      NEXT
+
+      ELSE
+         FOR EACH hChild IN ::aSiblings
+            aWRect:=GetWindowRect(hChild)
+            aRect:=aClone(aWRect)
+            RectScreenToClient(::Handle,aRect)
+            IF !empty(IntersectRect( aRect, ::aEditRect ))
+               aAdd(::aSelected,{hChild, aclone(aRect),0,0,{},{}}) // handle,rect,anchorX,anchorY,aHot
+            ENDIF
+         NEXT
+      ENDIF
    ENDIF
 
    InvalidateRect(::Handle,,.F.)
