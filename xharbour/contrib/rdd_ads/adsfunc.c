@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.5 2003/01/06 16:57:05 horacioroldan Exp $
+ * $Id: adsfunc.c,v 1.6 2003/02/03 00:48:17 lculik Exp $
  */
 
 /*
@@ -250,7 +250,7 @@ HB_FUNC( ADSSETDEFAULT )
 
    AdsGetDefault( pucDefault, &pusLen);
 
-   hb_retclen( pucDefault, pusLen );
+   hb_retclen( ( char * ) pucDefault, pusLen );
 
    if( ISCHAR(1) )
       AdsSetDefault( (UNSIGNED8*) hb_parc( 1 ) );
@@ -265,7 +265,7 @@ HB_FUNC( ADSSETSEARCHPATH )
 
    AdsGetSearchPath( pucPath, &pusLen);
 
-   hb_retclen( pucPath, pusLen );
+   hb_retclen( ( char *) pucPath, pusLen );
 
    if( ISCHAR(1) )
       AdsSetSearchPath( (UNSIGNED8*) hb_parc( 1 ) );
@@ -1363,7 +1363,7 @@ HB_FUNC(ADSCOMMITTRANSACTION)
 HB_FUNC(ADSFAILEDTRANSACTIONRECOVERY)
 {
 
-    UNSIGNED8 *pucServer = ISCHAR(1) ? hb_parc(1) : NULL;
+    UNSIGNED8 *pucServer =  ( UNSIGNED8 *) ( ISCHAR(1) ? hb_parc(1) : NULL);
 
     if ( AdsFailedTransactionRecovery( pucServer )  == AE_SUCCESS )
         hb_retl(TRUE);

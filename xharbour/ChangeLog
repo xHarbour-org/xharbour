@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.696 2003/02/10 12:58:08 lculik Exp $
+ * $Id: ChangeLog,v 1.697 2003/02/11 03:43:02 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -14,6 +14,8 @@
    * make_vc.bat
      * make_vc /? for help
      ! re-supply missing changes, and re-synch files.
+   * contrib/rdd_ads/adsfunc.c
+     ! added some needed typecasts.
 
 2003-02-10 10:50 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/filesys.c
