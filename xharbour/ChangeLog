@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.626 2003/01/15 03:08:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.627 2003/01/15 04:42:49 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-15 17:11 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+  * source/rdd/dbfcdx/dbfcdx2.h
+  * source/rdd/dbfcdx/dbfcdx1.c
+    * In INDEX command:
+      ! fixed index creation error, when the preexistent tag has
+        an invalid key
+      ! structural index is kept always open
+      + added support for INDEX ... ADDITIVE
+      ! fixed when recreating an existing tag of an open index
+      * work in progress: support for temporary indexes
+
 2003-01-15 12:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/compiler/hbusage.c
     ! fix serious bug on header file: 2002 -> 2003 :-)
