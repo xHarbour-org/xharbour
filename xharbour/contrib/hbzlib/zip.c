@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.35 2004/04/12 03:35:52 lculik Exp $
+ * $Id: zip.c,v 1.36 2004/05/18 13:52:41 lculik Exp $
  */
 
 /*
@@ -390,7 +390,7 @@ HB_FUNC( HB_ZIPFILE )
          ZipCreateArray( pParam, pCurDir );
 
          hb_fsChDir( pCurDir ) ;
-         hb_xfree( pCurDir ) ;
+
 
          if( pProgress )
          {
@@ -403,6 +403,7 @@ HB_FUNC( HB_ZIPFILE )
             strcpy( szFile, (char *) pCurDir );
             strcat( szFile, OS_PATH_DELIMITER_STRING) ;
             strcat( szFile, hb_parc( 1 ) ) ;
+            hb_xfree( pCurDir ) ;
          }
          else
          {
