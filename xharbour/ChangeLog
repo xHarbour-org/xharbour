@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1245 2003/07/14 08:00:16 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1246 2003/07/14 12:33:48 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-14 21:15 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/thread.h
+  * source/vm/codebloc.c
+  * source/vm/memvars.c
+  * source/vm/thread.c
+  * source/vm/itemapi.c
+  * include/thread.h
+    ! thread safed private and memvars
+    + Added hb_itemClearMT() function for some that is able
+      to get another thread's stack to clear a Memvar. This requires
+      cooperation of thread.c and memvars.c (that have now some MT specific
+      functions).
+      
+  * source/vm/estack.c
+    ! exit sequence uses hb_threadDestroyStack() (easier developement)
+
+  * source/vm/extend.c
+    ! Fixed a warning on longlong
+
+  * source/vm/dynsym.c
+    ! Put dynsym threadsafe (at least scanning for existing dynsym)
+    % Optimized HB_VM_STACK access. (it FLIES :-)
+
+  * source/vm/inet.c
+    ! re-added the signal handler for linux, but using a signal
+      that won't be used later on by the service signal handlers
+
+  * source/pp/ppcore.c
+    ! Fixed warning in preprocessor
+
+  + tests/mtstress.prg
+    ! Stress tests for new MT features.
 
 2003-07-14 19:20 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * makefile.vc

@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.22 2003/03/16 06:00:33 jonnymind Exp $
+ * $Id: codebloc.c,v 1.23 2003/06/20 18:25:39 ronpinkas Exp $
  */
 
 /*
@@ -57,8 +57,14 @@
 #include "hbvm.h"
 #include "hbstack.h"
 
+/*
+JC1: they are not needed anymore, it seems: all their reference are
+commented out. I commet this out here, to state that access must be
+thread-guarded, if someone ever wants to have them back
+
 extern PHB_ITEM **hb_vm_pGlobals;
 extern short hb_vm_iGlobals;
+*/
 
 /* Creates the codeblock structure
  *

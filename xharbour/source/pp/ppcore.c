@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.75 2003/06/20 17:32:41 jonnymind Exp $
+ * $Id: ppcore.c,v 1.76 2003/06/26 01:29:14 ronpinkas Exp $
  */
 
 /*
@@ -4894,7 +4894,7 @@ static int strincpy( char * ptro, char * ptri )
 
 static int strotrim( char * stroka, BOOL bRule )
 {
-  char *ptr = stroka, *pString, lastc = '0', curc;
+  char *ptr = stroka, *pString = 0, lastc = '0', curc;
   int lens = 0, State = STATE_NORMAL;
 
   char cLastChar = ' ';

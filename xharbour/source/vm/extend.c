@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.23 2003/07/07 03:30:49 lculik Exp $
+ * $Id: extend.c,v 1.24 2003/07/13 18:15:40 walito Exp $
  */
 
 /*
@@ -595,7 +595,7 @@ void *hb_parptr( int iParam, ... )
 #ifndef HB_LONG_LONG_OFF
       else if( HB_IS_LONGLONG( pItem ) )
       {
-         return ( void * ) pItem->item.asLongLong.value;
+         return ( void * ) ((long)pItem->item.asLongLong.value);
       }
 #endif
       else if( HB_IS_ARRAY( pItem ) )

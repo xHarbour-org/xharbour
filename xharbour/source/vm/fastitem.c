@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.45 2003/03/08 02:06:47 jonnymind Exp $
+ * $Id: fastitem.c,v 1.46 2003/07/01 05:16:24 walito Exp $
  */
 
 /*
@@ -157,7 +157,7 @@ void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
    //pItem->item.asString.bStatic = FALSE;
    pItem->item.asString.value = NULL;
    //pItem->item.asString.length = 0;
-   
+
 }
 
 void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
@@ -188,8 +188,42 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
    }
 
    pItem->type = HB_IT_NIL;
-   
+
 }
+
+#ifdef HB_THREAD_SUPPORT
+
+void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
+{
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemClear(%p) type: %i", pItem, pItem->type ) );
+
+   if( HB_IS_STRING( pItem ) )
+   {
+      if( pItem->item.asString.value )
+      {
+         hb_itemReleaseString( pItem );
+      }
+   }
+   else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
+   {
+      if( --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
+      {
+         hb_arrayRelease( pItem );
+      }
+   }
+   else if( HB_IS_BLOCK( pItem ) )
+   {
+      hb_codeblockDelete( pItem );
+   }
+   else if( HB_IS_MEMVAR( pItem ) )
+   {
+      hb_memvarValueDecRefMT( pItem->item.asMemvar.value, pStack );
+   }
+
+   pItem->type = HB_IT_NIL;
+}
+
+#endif
 
 void HB_EXPORT hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 {

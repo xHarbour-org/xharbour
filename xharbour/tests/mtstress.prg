@@ -1,0 +1,127 @@
+************************************************************
+* threadstress.prg
+* $Id: logtest.prg,v 1.4 2003/07/14 08:00:23 jonnymind Exp $
+*
+* Stresstest for thread programs
+* Stress all those feature that are thread-critical:
+* For each, With object, macro operations, codeblocks, Memvars GC
+*
+* (C) Giancarlo Niccolai
+*
+
+#include "hbclass.ch"
+#include "hbmemory.ch"
+
+
+PROCEDURE Main()
+   REQUEST HB_Random
+   LOCAL nStart;
+
+   SET COLOR to w+/b
+
+   CLEAR SCREEN
+   @2,15 SAY "X H A R B O U R - Multithreading / Stress tests"
+
+   nStart := Seconds()
+
+   StartThread( @Collector(), 15 )
+   StartThread( @Stress(), 1, 5 )
+   StartThread( @Stress(), 2, 5 )
+   StartThread( @Stress(), 3, 5 )
+   StartThread( @Stress(), 4, 5 )
+   StartThread( @Stress(), 5, 5 )
+   StartThread( @Stress(), 6, 5 )
+   StartThread( @Stress(), 7, 5 )
+   StartThread( @Stress(), 8, 5 )
+   WaitForThreads()
+
+   @20, 10 SAY "Duration: " + Alltrim( Str( Seconds() - nStart ))
+   @21, 10 SAY "Done - Press any key to stop"
+   Inkey( 0 )
+   @24,0
+
+RETURN
+
+
+PROCEDURE Stress( nId, nRow )
+   LOCAL cData, aData
+   LOCAL nCount
+   LOCAL cRndVal
+   PRIVATE cRnd
+   //PRIVATE cMemVal
+
+   nRow += nId - 1
+   m->cRnd := "ABCDEFGHILMNOPQRSTUVZ"
+   cRndVal := "ABCDEFGHILMNOPQRSTUVZ"
+   //Step 1: foreach test
+
+   aData := Array( 1000 )
+   FOR nCount := 1 TO 1000
+      aData[ nCount ] := cRndVal[ Int( HB_Random(1, 21) ) ]
+      @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Foreach pre-test " +;
+          Alltrim( Str( nCount ) )
+   NEXT
+
+   @nRow,5 SAY Space( 80 )
+   nCount := 1
+   FOR EACH cData IN aData
+      @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Foreach test " +;
+          Alltrim( Str( nCount ) ) + ": " + cData
+      nCount ++
+   NEXT
+
+   // Step 1: private test
+
+   @nRow,5 SAY Space( 80 )
+
+   m->cMemVal := "XXX"
+   FOR nCount := 1 TO 1000
+      m->cMemVal := m->cRnd[ Int( HB_Random(1, 21) ) ]
+      m->cMemVal += m->cRnd[ Int( HB_Random(1, 21) ) ]
+      m->cMemVal += m->cRnd[ Int( HB_Random(1, 21) ) ]
+      m->cMemVal += m->cRnd[ Int( HB_Random(1, 21) ) ]
+      @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Private test " +;
+       Alltrim( Str( nCount ) ) + ": "+m->cMemVal
+   NEXT
+
+
+   // Step 2: Public Memvar test
+
+   @nRow,5 SAY Space( 80 )
+   FOR nCount := 1 TO 1000
+      m->var1 := m->cRnd[ Int( HB_Random(1, 21) ) ]
+      m->var1 += m->cRnd[ Int( HB_Random(1, 21) ) ]
+      m->var1 += m->cRnd[ Int( HB_Random(1, 21) ) ]
+      m->var1 += m->cRnd[ Int( HB_Random(1, 21) ) ]
+      @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Memvar test " +;
+       Alltrim( Str( nCount ) ) + ": "+m->var1
+   NEXT
+
+   // Step 3: macro test
+   @nRow,5 SAY Space( 80 )
+   FOR nCount := 1 TO 1000
+      cData := "cRndMem := cRnd[ Int( HB_Random(1, 21) ) ] + cRnd[ Int( HB_Random(1, 21) ) ] + cRnd[ Int( HB_Random(1, 21) ) ]"
+      &cData
+      @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Macro test " +;
+       Alltrim( Str( nCount ) ) + ": "+ m->cRndMem
+   NEXT
+
+RETURN
+
+PROCEDURE Collector( nRow )
+   LOCAL nCount
+   // Exit when only main thread and this thread are left
+   ThreadSleep( 250 )
+   nCount := 1
+
+   DO WHILE HB_ThreadCountStacks() > 2
+      @nRow, 5 SAY "Collector loop :" + AllTrim( Str( nCount ) )
+      HB_GCALL( .T. )
+      ThreadSleep( 250 )
+      nCount ++
+   ENDDO
+
+   @nRow, 5 SAY "Collector loop : DONE         "
+
+RETURN
+

@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.7 2003/03/25 02:36:12 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.8 2003/06/18 08:57:02 ronpinkas Exp $
  */
 
 /*
@@ -50,9 +50,15 @@
  *
  */
 
+/*JC1: say we are going to optimze MT stack */
+#define HB_THREAD_OPTIMIZE_STACK
+
 #include "hbapi.h"
 
 #define SYM_ALLOCATED ( ( HB_SYMBOLSCOPE ) -1 )
+
+//JC1: the search of an intem could depend on the current thread stack
+#ifndef HB_THREAD_SUPPORT
 
 typedef struct
 {
@@ -65,10 +71,26 @@ static USHORT      s_uiDynSymbols = 0;    /* Number of symbols present */
 /* Closest symbol for match. hb_dynsymFind() will search for the name. */
 /* If it cannot find the name, it positions itself to the */
 /* closest symbol.  */
-static USHORT      s_uiClosestDynSym = 0; /* TOFIX: This solution is not thread safe. */
+static USHORT      s_uiClosestDynSym = 0;
+
+#else
+
+#define s_uiClosestDynSym  HB_VM_STACK.uiClosestDynSym
+
+/* JC1: temporarily turned off, relaying on the old system now
+#define s_pDynItems        HB_VM_STACK.pDynItems
+#define s_uiDynSymbols     HB_VM_STACK.uiDynSymbols*/
+
+static PDYNHB_ITEM s_pDynItems = NULL;    /* Pointer to dynamic items */
+static USHORT      s_uiDynSymbols = 0;    /* Number of symbols present */
+
+#endif
+
 
 void HB_EXPORT hb_dynsymLog( void )
 {
+   HB_THREAD_STUB
+
    USHORT uiPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymLog()"));
@@ -97,6 +119,7 @@ PHB_SYMB HB_EXPORT hb_symbolNew( char * szName )      /* Create a new symbol */
 
 PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    /* creates a new dynamic symbol */
 {
+   HB_THREAD_STUB
    PHB_DYNS pDynSym;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymNew(%p)", pSymbol));
@@ -183,6 +206,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
 PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName )  /* finds and creates a symbol if not found */
 {
+   HB_THREAD_STUB
    PHB_DYNS pDynSym;
    char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
 
@@ -237,6 +261,7 @@ PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName )  /* finds and creates a symbol 
 
 PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName )  /* finds and creates a symbol if not found CASE SENSITIVE! */
 {
+   HB_THREAD_STUB
    PHB_DYNS pDynSym;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymGetCase(%s)", szName));
@@ -306,6 +331,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFindName( char * szName )  /* finds a symbol */
 
 PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
 {
+   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymFind(%s)", szName));
 
    if( s_pDynItems == NULL )
@@ -550,6 +576,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
 
 USHORT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 {
+   HB_THREAD_STUB
    BOOL bCont = TRUE;
    USHORT uiPos;
 
@@ -565,6 +592,7 @@ USHORT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 
 void HB_EXPORT hb_dynsymRelease( void )
 {
+   HB_THREAD_STUB
    USHORT uiPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymRelease()"));
@@ -586,6 +614,8 @@ void HB_EXPORT hb_dynsymRelease( void )
 
 PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction( PHB_FUNC pFunc )
 {
+   HB_THREAD_STUB
+
    USHORT uiPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmFindSymbolFromFunction(%p)", pFunc ));
@@ -604,6 +634,8 @@ PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction( PHB_FUNC pFunc )
 // NOT TESTED YET!!!
 PHB_DYNS HB_EXPORT hb_dynsymPos( USHORT uiPos )
 {
+   HB_THREAD_STUB
+
    if( uiPos < s_uiDynSymbols )
    {
       return s_pDynItems[ uiPos ].pDynSym;
@@ -616,11 +648,14 @@ PHB_DYNS HB_EXPORT hb_dynsymPos( USHORT uiPos )
 
 HB_FUNC( __DYNSCOUNT ) /* How much symbols do we have: dsCount = __dynsymCount() */
 {
+   HB_THREAD_STUB
    hb_retnl( ( long ) s_uiDynSymbols );
 }
 
 HB_FUNC( __DYNSGETNAME ) /* Get name of symbol: cSymbol = __dynsymGetName( dsIndex ) */
 {
+   HB_THREAD_STUB
+
    long lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
 
    if( lIndex >= 1 && lIndex <= s_uiDynSymbols )
@@ -631,6 +666,7 @@ HB_FUNC( __DYNSGETNAME ) /* Get name of symbol: cSymbol = __dynsymGetName( dsInd
 
 HB_FUNC( __DYNSGETINDEX ) /* Gimme index number of symbol: dsIndex = __dynsymGetIndex( cSymbol ) */
 {
+   HB_THREAD_STUB
    PHB_DYNS pDynSym = hb_dynsymFindName( hb_parc( 1 ) );
 
    if( pDynSym )
@@ -646,6 +682,7 @@ HB_FUNC( __DYNSGETINDEX ) /* Gimme index number of symbol: dsIndex = __dynsymGet
 HB_FUNC( __DYNSISFUN ) /* returns .t. if a symbol has a function/procedure pointer,
                           given its symbol index */
 {
+   HB_THREAD_STUB
    long lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
 
    if( lIndex >= 1 && lIndex <= s_uiDynSymbols )
@@ -662,6 +699,7 @@ HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or proc
                                      called and consumed times { nTimes, nTime }
                                      , given the dynamic symbol index */
 {
+   HB_THREAD_STUB
    long lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
 
    hb_reta( 2 );

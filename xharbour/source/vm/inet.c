@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.29 2003/06/16 22:10:51 lculik Exp $
+* $Id: inet.c,v 1.30 2003/07/14 07:44:27 jonnymind Exp $
 */
 
 /*
@@ -88,18 +88,14 @@
 #endif
 
 
-/*
-JC1: now we'll handle this things in a more proper way
-     With the hb_service system.
-
 #ifdef HB_OS_LINUX
-   #include <signal.h>
+#include <signal.h>
+#define HB_INET_LINUX_INTERRUPT     SIGUSR1+90
 void hb_inetLinuxSigusrHandle( int sig )
 {
    // nothing to do
 }
 #endif
-*/
 
 #ifndef HB_NO_DEFAULT_INET
 //JC1: we need it volatile to be minimally thread safe.
@@ -340,7 +336,9 @@ HB_FUNC( INETINIT )
       #if defined(HB_OS_WIN_32)
          WSADATA wsadata;
          WSAStartup( MAKEWORD(1,1), &wsadata );
-      #endif      
+      #elif defined( HB_OS_LINUX )
+         signal( HB_INET_LINUX_INTERRUPT, hb_inetLinuxSigusrHandle );
+      #endif
       s_iSessions = 1;
    }
 }
@@ -401,7 +399,7 @@ HB_FUNC( INETCLOSE )
 
       Socket->com = 0;
       #ifdef HB_OS_LINUX
-         kill( 0, SIGUSR1);
+         kill( 0, HB_INET_LINUX_INTERRUPT );
       #endif
       hb_retni( 0 );
    }

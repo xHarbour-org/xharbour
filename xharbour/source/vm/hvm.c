@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.231 2003/07/13 18:15:40 walito Exp $
+ * $Id: hvm.c,v 1.232 2003/07/13 19:34:34 jonnymind Exp $
  */
 
 /*
@@ -61,6 +61,9 @@
  * Copyright 1999 Eddie Runia <eddie@runia.com>
  *    __VMVARSGET()
  *    __VMVARSLIST()
+ *
+ * Copyright 2003 Giancarlo Niccolai <gian@niccolai.ws>
+ *      Threadsafing and MT stack operations. MT Optimization.
  *
  * See doc/license.txt for licensing terms.
  *
@@ -420,8 +423,12 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_setInitialize();        /* initialize Sets */
    HB_TRACE( HB_TR_INFO, ("conInit" ) );
    hb_conInit();    /* initialize Console */
+
+   #ifndef HB_THREAD_SUPPORT
+   // in threads, it is called from thread stack constructor
    HB_TRACE( HB_TR_INFO, ("memvarsInit" ) );
    hb_memvarsInit();
+   #endif
 
    HB_TRACE( HB_TR_INFO, ("memvarsInit" ) );
    hb_i18nInit( NULL, NULL);  // try to open default language.
@@ -617,7 +624,11 @@ void HB_EXPORT hb_vmQuit( void )
    }
    //printf( "\nAfter Globals\n" );
 
+   #ifndef HB_THREAD_SUPPORT
+   // in threads, it is called by the th stack destructor
    hb_memvarsRelease();    /* clear all PUBLIC variables */
+   #endif
+
    //printf( "After Memvar\n" );
 
    /* release all known garbage */
@@ -1940,6 +1951,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_PUSHGLOBAL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHGLOBAL") );
+            //JC1: Should be threadsafe: pCodes are done at compile time, and
+            // a clash with another thread here should just bring to a race,
+            // not a crash; a race that must be resolved at PRG level.
             hb_vmPush( (*pGlobals)[ pCode[ w + 1 ] ] );
             w += 2;
             break;

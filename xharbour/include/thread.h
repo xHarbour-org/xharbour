@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.48 2003/06/18 08:57:01 ronpinkas Exp $
+* $Id: thread.h,v 1.49 2003/07/13 19:34:33 jonnymind Exp $
 */
 
 /*
@@ -57,11 +57,14 @@
 #ifdef HB_THREAD_SUPPORT
 
 /* Check if malloc/free is thread safe */
+/*
+JC1: tests demonstrates that this does not work
 #ifndef HB_SAFE_ALLOC
 #  if defined( HB_OS_LINUX ) && (defined(_THREAD_SAFE) || defined(_REENTRANT))
 #    define HB_SAFE_ALLOC
 #  endif
 #endif
+*/
 
 /* We should assert that cleanup functions must be in limited number */
 typedef void (*HB_CLEANUP_FUNC)(void *);
@@ -277,6 +280,11 @@ extern "C" {
 * Enanched stack for multithreading
 */
 
+typedef struct
+{
+   PHB_DYNS pDynSym;             /* Pointer to dynamic symbol */
+} DYNHB_ITEM, * PDYNHB_ITEM, * DYNHB_ITEM_PTR;
+
 /* Forward declarations for stack */
 struct HB_ERROR_INFO_;
 
@@ -333,6 +341,25 @@ typedef struct tag_HB_STACK
    int iExtraElementsIndex;
    int iExtraElements;
    int iExtraIndex;
+
+   /* Dynsym thread-specific table */
+   UINT uiClosestDynSym;
+   PDYNHB_ITEM pDynItems;
+   USHORT uiDynSymbols;
+
+   /* Management of PRIVATE variables (and macro memvars) */
+   PHB_DYNS * privateStack;
+   ULONG privateStackSize;
+   ULONG privateStackCnt;
+   ULONG privateStackBase;
+
+   /* Management of globals memvars */
+   ULONG globalTableSize;
+   ULONG globalFirstFree;
+   ULONG globalLastFree;
+   ULONG globalFreeCnt;
+   HB_VALUE_PTR globalTable;
+
 
    struct tag_HB_STACK *next;
 
@@ -568,6 +595,12 @@ extern void hb_rawMutexForceUnlock( void *);
 extern HB_MUTEX_STRUCT *hb_threadLinkMutex( HB_MUTEX_STRUCT *mx );
 extern HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *mx );
 extern void hb_threadTerminator( void *pData );
+
+/* External functions used by thread as helper */
+extern void hb_memvarsInit( HB_STACK * );
+extern void hb_memvarsRelease( HB_STACK * );
+extern void hb_memvarValueDecRefMT( HB_HANDLE hValue, HB_STACK *pStack );
+extern void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack );
 
 /* Win 32 specific functions */
 #ifdef HB_OS_WIN_32

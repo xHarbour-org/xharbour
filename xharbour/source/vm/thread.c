@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.84 2003/07/13 19:34:34 jonnymind Exp $
+* $Id: thread.c,v 1.85 2003/07/13 22:26:17 jonnymind Exp $
 */
 
 /*
@@ -92,6 +92,11 @@
 #endif
 
 #ifdef HB_THREAD_SUPPORT
+
+// FROM MEMVARS.C:
+//TODO:Move this in an appropriate file
+#define TABLE_INITHB_VALUE   100
+#define TABLE_EXPANDHB_VALUE  50
 
 /* Creating a trylock for systems that have to use LWR */
 #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
@@ -235,15 +240,48 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    }
    tc->wEnumCollectionCounter = 0;
 
+   /* Dynsym Thread Specific table. */
+   tc->uiClosestDynSym = 0;
+   tc->pDynItems = NULL;
+   tc->uiDynSymbols = 0;
+
    /* initialization of macro & codeblock parameter passing */
    tc->iExtraParamsIndex = 0;
    tc->iExtraElementsIndex = 0;
    tc->iExtraElements = 0;
    tc->iExtraIndex = 0;
 
+   /* Initialization of private and public memvars */
+   hb_memvarsInit( tc );
 }
 
+/*
+void hb_threadCopyDynSym( HB_STACK *target, HB_STACK *source )
+{
+   UINT uiCount;
+   PHB_DYNS tg, sr;
 
+   target->uiDynSymbols = source->uiDynSymbols;
+   target->pDynItems = ( PDYNHB_ITEM ) hb_xgrab(  ( target->uiDynSymbols ) * sizeof( DYNHB_ITEM ) );
+
+   for ( uiCount = 0; uiCount < target->uiDynSymbols; uiCount ++ )
+   {
+      target->pDynItems[ uiCount ].pDynSym =
+               (PHB_DYNS) hb_xgrab( sizeof( HB_DYNS ) );
+
+      tg = target->pDynItems[ uiCount ].pDynSym;
+      sr = source->pDynItems[ uiCount ].pDynSym;
+      tg->hArea = sr->hArea;
+      tg->hMemvar = sr->hMemvar;
+      tg->ulCalls = sr->ulCalls;
+      tg->ulTime = sr->ulTime;
+      tg->ulRecurse = sr->ulRecurse;
+      tg->pFunPtr = sr->pFunPtr;
+      tg->pModuleSymbols = sr->pModuleSymbols;
+      tg->pSymbol = sr->pSymbol;
+   }
+}
+*/
 
 HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
 {
@@ -370,13 +408,6 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    int i;
    PHB_ITEM *pPos;
 
-   /* Refuse to destroy the main thread stack: it will be
-      deleted by the VM at program termination. */
-   if ( pStack == &hb_stack )
-   {
-      return;
-   }
-
    /* Free each element of the stack */
    for( pPos = pStack->pItems; pPos < pStack->pPos; pPos++)
    {
@@ -396,9 +427,10 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    hb_itemClear( pStack->aTryCatchHandlerStack );
 
    /* Free each element of the stack */
-#ifndef HB_SAFE_ALLOC
-   HB_CRITICAL_LOCK( hb_allocMutex );
-#endif
+   #ifndef HB_SAFE_ALLOC
+      HB_CRITICAL_LOCK( hb_allocMutex );
+   #endif
+
    for( i = 0; i < pStack->wItems; i++ )
    {
       free( pStack->pItems[ i ] );
@@ -406,21 +438,27 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    /* Free the stack */
 
    free( pStack->pItems );
-   #ifdef HB_OS_WIN_32
-   //free( pStack->pCleanUp );
-   //free( pStack->pCleanUpParam );
-   #endif
-   free( pStack );
-#ifndef HB_SAFE_ALLOC
-   HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
 
-   // Call destructor
+   // releases this thread's memvars
+   hb_memvarsRelease( pStack );
+   hb_xfree( pStack->privateStack );
+   hb_xfree( pStack->globalTable );
+
    /*
-   if( pStack->pDestructor )
+   #ifdef HB_OS_WIN_32
+   free( pStack->pCleanUp );
+   free( pStack->pCleanUpParam );
+   #endif
+   */
+
+   // Free only if we are not destroing the main stack
+   if ( pStack != &hb_stack )
    {
-      pStack->pDestructor( (void *) p );
-   }*/
+      free( pStack );
+   }
+   #ifndef HB_SAFE_ALLOC
+      HB_CRITICAL_UNLOCK( hb_allocMutex );
+   #endif
 
 }
 
@@ -1046,6 +1084,9 @@ HB_FUNC( STARTTHREAD )
 
    // Create the stack here to avoid cross locking of alloc mutex
    pStack = hb_threadCreateStack( 0 );
+   // TODO: Commented while searching for a solution
+   //hb_threadCopyDynSym( pStack, hb_threadGetCurrentStack() );
+
    pStack->uiParams = hb_pcount();
    pStack->bIsMethod = bIsMethod;
 
