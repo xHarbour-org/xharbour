@@ -1,5 +1,5 @@
 /*
- * $Id: getsys.prg,v 1.1.1.1 2001/12/21 10:42:16 ronpinkas Exp $
+ * $Id: getsys.prg,v 1.2 2002/03/17 23:27:28 lculik Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ FUNCTION ReadModal( GetList, nPos, nMsgRow, nMsgLeft, nMsgRight, cMsgColor )
 FUNCTION ReadModal( GetList, nPos )
 #endif
 
-   LOCAL oGetList
+   LOCAL oGetList, oSaveGetList
 
 #ifdef HB_COMPAT_C53
    LOCAL lMsgFlag
@@ -89,6 +89,7 @@ FUNCTION ReadModal( GetList, nPos )
    oGetList:cReadProcName := ProcName( 1 )
    oGetList:nReadProcLine := ProcLine( 1 )
 
+   oSaveGetList := __GetListActive( )
    __GetListSetActive( oGetList )
 
    IF ! ( ISNUMBER( nPos ) .AND. nPos > 0 )
@@ -158,6 +159,8 @@ FUNCTION ReadModal( GetList, nPos )
       RestScreen( nMsgRow, nMsgLeft, nMsgRow, nMsgRight, cOldMsg )
    endif
 #endif
+
+   __GetListSetActive( oSaveGetList )
 
    SetPos( MaxRow() - 1, 0 )
 
