@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.5 2003/03/06 20:54:52 walito Exp $
+ * $Id: debugger.prg,v 1.6 2003/04/01 22:30:37 iananderson Exp $
  */
 
 /*
@@ -1164,10 +1164,9 @@ METHOD ShowVars() CLASS TDebugger
       AAdd( ::aWindows, ::oWndVars )
       ::oWndVars:bLButtonDown := { | nMRow, nMCol | ::WndVarsLButtonDown( nMRow, nMCol ) }
       ::oWndVars:bLDblClick   := { | nMRow, nMCol | ::EditVar( n ) }
-      ::oWndVars:bPainted     := { || if(Len( ::aVars ) > 0, ( ::obrwVars:ForceStable(),RefreshVarsS(::oBrwVars) ),) }
-
       ::oBrwVars := TBrowseNew( 2, 1, ::oWndVars:nBottom - 1, MaxCol() - iif( ::oWndStack != nil,;
                                ::oWndStack:nWidth(), 0 ) - 1 )
+
       ::oBrwVars:Cargo :={ 1,{}} // Actual highligthed row
       ::oBrwVars:ColorSpec := ::aColors[ 2 ] + "," + ::aColors[ 5 ] + "," + ::aColors[ 3 ]
       ::oBrwVars:GOTOPBLOCK := { || ::oBrwVars:cargo[ 1 ] := Min( 1, Len( ::aVars ) ) }
@@ -1178,6 +1177,8 @@ METHOD ShowVars() CLASS TDebugger
                                                              Len( ::aVars ) ),;
                                If( Len( ::aVars ) > 0, ::oBrwVars:Cargo[ 1 ] - nOld, 0 ) }
 
+
+      ::oWndVars:bPainted     := { || if(Len( ::aVars ) > 0, ( ::obrwVars:ForceStable(),RefreshVarsS(::oBrwVars) ),) }
 
       ::oWndVars:bKeyPressed := { | nKey | ( iif( nKey == K_DOWN ;
       , ::oBrwVars:Down(), nil ), iif( nKey == K_UP, ::oBrwVars:Up(), nil ) ;
