@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.34 2003/10/22 21:42:50 lculik Exp $
+# $Id: xharbour.spec,v 1.35 2003/11/10 11:49:47 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -61,7 +61,9 @@
 %define hb_bdir  export HB_BIN_INSTALL=%{prefix}/bin
 %define hb_idir  export HB_INC_INSTALL=%{prefix}/include/%{name}
 %define hb_ldir  export HB_LIB_INSTALL=%{prefix}/lib/%{name}
-%define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_cmt} ; %{hb_cgt} ; %{hb_cgpm} ; %{hb_cmgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}
+%define hb_plat  export HB_PLAT=%{platform}
+%define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_cmt} ; %{hb_cgt} ; %{hb_cgpm} ; %{hb_cmgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}; %{hb_plat}
+
 %define hb_host  www.xharbour.org
 %define readme   README.RPM
 ######################################################################
@@ -82,7 +84,11 @@ URL:            http://%{hb_host}/
 Source:         %{name}-%{version}.src.tar.gz
 Packager:       Przemys³aw Czerpak <druzus@polbox.com> Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
 BuildPrereq:    gcc binutils bash bison ncurses ncurses-devel gpm-devel
+%if "%{platform}" == "cl90"  ||  "%{platform}" == "cl8"  
+%{?_with_odbc:BuildRequires: unixodbc-devel}
+%else
 %{?_with_odbc:BuildRequires: unixODBC-devel}
+#endif
 Requires:       gcc binutils bash sh-utils %{name}-lib = %{version}
 Provides:       %{name} harbour
 BuildRoot:      /tmp/%{name}-%{version}-root
@@ -164,7 +170,12 @@ Summary(pl):    Bilioteki z drzewa contrib dla kompilatora %{dname}
 Summary(pt_BR): Libs contrib para %{dname}
 Group:          Development/Languages
 Requires:       %{name} = %{version}
+
+%if "%{platform}" == "cl90"  ||  "%{platform}" == "cl8"  
+%{?_with_mysql:BuildRequires: MySQL-devel}
+%else
 %{?_with_mysql:BuildRequires: mysql-devel}
+%endif
 
 %description contrib
 %{dname} is a Clipper compatible compiler.
