@@ -10,17 +10,16 @@
 
 CLASS TProgressBar FROM TControl
 
-   DATA Caption  INIT  "%"
-   DATA Left     INIT   0
-   DATA Top      INIT   0
-   DATA Width    INIT  80
-   DATA Height   INIT  24
-   DATA Style    INIT  WS_CHILD+WS_VISIBLE
-   DATA ExStyle  INIT  0
+   DATA Caption  INIT   ""
+   DATA Left     INIT    0
+   DATA Top      INIT    0
+   DATA Width    INIT  160
+   DATA Height   INIT   16
 
-   DATA range    INIT  100
-   DATA percent  INIT  0
-
+   DATA Max      INIT  100
+   DATA Position INIT  0
+   DATA Step     INIT  1
+   
    DATA bkColor  INIT GetSysColor(COLOR_BTNFACE)
    DATA BarColor INIT GetSysColor(COLOR_HIGHLIGHT)
    
@@ -30,34 +29,41 @@ CLASS TProgressBar FROM TControl
    DATA WndProc   PROTECTED INIT "ControlProc"
    DATA Name      PROTECTED INIT PROGRESS_CLASS
 
+   DATA Id        PROTECTED
+   DATA Icon      PROTECTED
+   DATA Style     PROTECTED INIT  WS_CHILD+WS_VISIBLE
+   DATA ExStyle   PROTECTED INIT  0
+   DATA Color     PROTECTED
+   
    METHOD New() CONSTRUCTOR
-   METHOD Update()
+   METHOD SetPosition()
    METHOD DrawText()
    METHOD SetBkColor()
    METHOD SetBarColor()
-   METHOD OnCreate() INLINE ::SendMessage( PBM_SETRANGE, 0, ::range ),;
-                            ::SendMessage( PBM_SETSTEP, 1, 0),;
-                            ::Update(),nil
+   METHOD OnCreate() INLINE ::SendMessage( PBM_SETRANGE, 0, ::Max ),;
+                            ::SendMessage( PBM_SETSTEP, ::Step, 0),;
+                            ::SetPosition(50),nil
 
 ENDCLASS
 
-METHOD New( oParent, nLeft, nTop, nWidth, nHeight, nRange )
+METHOD New( oParent, nLeft, nTop, nWidth, nHeight ) CLASS TProgressBar
    ::Left    := IFNIL( nLeft,   ::Left,   nLeft   )
    ::Top     := IFNIL( nTop,    ::Top,    nTop    )
    ::Width   := IFNIL( nWidth , ::Width,  nWidth  )
    ::Height  := IFNIL( nHeight, ::height, nHeight )
-   ::range   := IFNIL( nRange,  ::range,  nRange  )
-   ::percent := 50
 return(super:new(oParent))
 
-METHOD Update()
-   SetProgressBar(::handle,::percent)
+METHOD SetPosition(n) CLASS TProgressBar
+   DEFAULT n TO 0
+   ::position := n
+   ::SendMessage( PBM_SETPOS, 20, 0 )
    IF ::Caption!="".and.AND(GetWindowLong(::handle,GWL_STYLE),PBS_SMOOTH)>0
       ::DrawText()
    END
+   UpdateWindow( ::handle )
 RETURN(self)
 
-METHOD DrawText()
+METHOD DrawText() CLASS TProgressBar
    local hDC,aMetrics,nTMWidth,nTMHeight,nX,nY,aClip,nWidth,aRect,hBrush
    aRect:=GetClientRect(::handle)
    hDC:=GetDC(::handle)
@@ -67,7 +73,7 @@ METHOD DrawText()
    nTMHeight:=aMetrics[2]
    nX = (aRect[3] - nTMWidth )/ 2
    nY =((aRect[4] - nTMHeight)/ 2)+(aRect[2]/2)
-   nWidth:=aRect[1]+(((aRect[3]-aRect[1])* ::percent )/100)
+   nWidth:=aRect[1]+(((aRect[3]-aRect[1])* ::position )/100)
    aClip:={nX,aRect[2],nX+nTMWidth,aRect[4]}
    SetTextColor(hDC, ::barColor)
    SetBkColor(hDC, ::bkColor)
@@ -81,12 +87,12 @@ METHOD DrawText()
    ReleaseDC(::handle,hDC)
 return(self)
 
-METHOD SetBkColor(nColor)
-::bkColor:=nColor
-SendMessage(::handle,PBM_SETBKCOLOR,0,nColor)
+METHOD SetBkColor(nColor) CLASS TProgressBar
+   ::bkColor:=nColor
+   SendMessage(::handle,PBM_SETBKCOLOR,0,nColor)
 return(self)
 
-METHOD SetBarColor(nColor)
-::BarColor:=nColor
-SendMessage(::handle,PBM_SETBARCOLOR,0,nColor)
+METHOD SetBarColor(nColor) CLASS TProgressBar
+   ::BarColor:=nColor
+   SendMessage(::handle,PBM_SETBARCOLOR,0,nColor)
 return(self)

@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.23 2002/10/07 01:54:24 ronpinkas Exp $
+ * $Id: xInspect.prg,v 1.24 2002/10/09 08:49:17 what32 Exp $
  */
 
 /*
@@ -119,7 +119,7 @@ METHOD OnCreate() CLASS ObjInspect
   aHeads:= { { "Property", 85,},;
              { "Value",    81, {|cText,o,nwParam|::SaveVar(cText,nwParam)} }   }
 
-  aProp := { {'',''} }  // initial data
+  aProp := { {"",""} }  // initial data
 
   ::Browser:= TCBrowser():New( ::InspTabs:Properties, 0, 0, 100, 100, aHeads, aProp )
   ::Browser:wantHScroll  :=.F.

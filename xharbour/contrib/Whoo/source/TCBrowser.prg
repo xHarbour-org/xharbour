@@ -49,20 +49,21 @@ METHOD New( oParent, nL, nT, nW, nH, aHeader, aInfo ) CLASS TCBrowser
    ::Top        := IFNIL( nT, ::Top,    nT )
    ::Width      := IFNIL( nW, ::Width,  nW )
    ::Height     := IFNIL( nH, ::Height, nH )
-   ::Header     := ACLONE( aHeader )
-   ::Info       := ACLONE( aInfo )
+
+   ::Header     := aHeader
+   ::Info       := aInfo
    
 return( super:New( if( valtype( ::Info[1] )=="A", ::Info, ALIAS() ) ) )
 
 
 METHOD Create() CLASS TCBrowser
-   local n, oCol, aCols
+   local oCol, aCols, c,i, a
    super:Create( ::Parent:handle,  ::Left, ::Top, ::Width, ::Height, WS_CHILD+WS_VISIBLE+WS_VSCROLL, WS_EX_CLIENTEDGE )
 
-   for n:=1 to len( ::Header )
-       oCol:=whColumn():Init( ::Header[n][1], {|oCol,oB,x,i,j| asString(oB:source[x,j])} ,DT_LEFT, ::Header[n][2] )
+   for i:=1 to len( ::Header )
+       oCol:=GetAColumn(::header,i)
        oCol:VertAlign :=TA_CENTER
-       oCol:bSaveBlock:= ::Header[n][3]
+       oCol:bSaveBlock:= ::Header[i][3]
        ::addColumn(oCol)
    next
    
@@ -76,4 +77,7 @@ METHOD Create() CLASS TCBrowser
 
 
 *-----------------------------------------------------------------------------*
+
+FUNCTION GetAColumn(a,i)
+ RETURN whColumn():INIT(a[i][1],{|oCol,oB,n| asString(oB:source[n,i]) } ,DT_LEFT, a[i][2] )
 
