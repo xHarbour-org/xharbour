@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.115 2004/05/21 13:33:00 druzus Exp $
+ * $Id: dbcmd.c,v 1.116 2004/05/23 09:10:02 lf_sfnet Exp $
  */
 
 /*
@@ -4913,7 +4913,7 @@ static void hb_AppendToDb( PHB_ITEM pDelimitedFile, PHB_ITEM pDelimiter )
 }
 
 // Escaping delimited strings. Need to be cleaned/optimized/improved
-static char *hb_strescape( char *szInput, int lLen, char *cDelim, char *cEsc )
+static char *hb_strescape( char *szInput, int lLen, char *cDelim )
 {
    int     lCnt     = 0;
    char  * szChr;
@@ -4931,9 +4931,9 @@ static char *hb_strescape( char *szInput, int lLen, char *cDelim, char *cEsc )
 
    while ( *szChr && lCnt++ < lLen )
    {
-      if( *szChr == *cDelim || *szChr == *cEsc )
+      if( *szChr == *cDelim )
       {
-         *szEscape++ = *cEsc;
+         *szEscape++ = '\\';
       }
       *szEscape++ = *szChr++;
    }
@@ -4943,7 +4943,7 @@ static char *hb_strescape( char *szInput, int lLen, char *cDelim, char *cEsc )
 }
 
 // Export field values to text file
-static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim, char *cEsc )
+static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
 {
    switch( pValue->type )
    {
@@ -4953,9 +4953,9 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim, char *cEsc 
          char *szStrEsc;
          char *szString;
 
-         szStrEsc = hb_strescape( pValue->item.asString.value, pValue->item.asString.length, cDelim, cEsc );
+         szStrEsc = hb_strescape( pValue->item.asString.value, pValue->item.asString.length, cDelim );
          szString = hb_xstrcpy( NULL,cDelim,szStrEsc,cDelim,NULL);
-
+         
          // FWrite( handle, szString )
          hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
 
@@ -5025,7 +5025,7 @@ static BOOL hb___Eval( PHB_ITEM pItem )
 
 // Export DBF content to text file
 static void hb_Dbf2Text( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
-                        char *cDelim, FHANDLE handle, BYTE *cSep, BYTE *cEsc, int nCount )
+                        char *cDelim, FHANDLE handle, BYTE *cSep, int nCount )
 {
    HB_THREAD_STUB
    AREAP pArea = HB_CURRENT_WA;
@@ -5092,7 +5092,7 @@ static void hb_Dbf2Text( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
                }
 
                SELF_GETVALUE( pArea, ui, &Tmp );
-               bWriteSep = hb_ExportVar( handle, &Tmp, cDelim, cEsc );
+               bWriteSep = hb_ExportVar( handle, &Tmp, cDelim );
                hb_itemClear( &Tmp );
             }
          }
@@ -5122,7 +5122,7 @@ static void hb_Dbf2Text( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
                   hb_xfree( szName );
 
                   SELF_GETVALUE( pArea, iPos, &Tmp );
-                  bWriteSep = hb_ExportVar( handle, &Tmp, cDelim, cEsc );
+                  bWriteSep = hb_ExportVar( handle, &Tmp, cDelim );
                   hb_itemClear( &Tmp );
                }
 
@@ -5173,7 +5173,6 @@ HB_FUNC( __DBDELIM )
       LONG lStart, lCount;
       char cSeparator[] = ",";
       char cDelim[] = "\"";
-      char cEsc[] = "\\";
       char szFileName[ _POSIX_PATH_MAX + 1 ];
 
       BOOL bRetry;
@@ -5294,7 +5293,7 @@ HB_FUNC( __DBDELIM )
          }
 
          // Doing things now
-         hb_Dbf2Text( pWhile, pFor, pFields, cDelim, handle, ( BYTE *)cSeparator, ( BYTE *)cEsc, lCount );
+         hb_Dbf2Text( pWhile, pFor, pFields, cDelim, handle, ( BYTE *)cSeparator, lCount );
 
          hb_fsClose( handle );
       }
@@ -5370,44 +5369,136 @@ HB_FUNC( __DBDELIM )
    }
 }
 
-// Export field values to SQL script file
-static BOOL hb_ExportSqlVar( char *cBuffer, PHB_ITEM pValue, char *cDelim, char *cEsc )
+typedef struct _HB_FILEBUF
 {
+   FHANDLE  hFile;
+   BYTE *   pBuf;
+   ULONG    ulSize;
+   ULONG    ulPos;
+} HB_FILEBUF;
+typedef HB_FILEBUF * PHB_FILEBUF;
 
+static void hb_flushFBuffer( PHB_FILEBUF pFileBuf )
+{
+   if ( pFileBuf->ulPos > 0 )
+   {
+      hb_fsWriteLarge( pFileBuf->hFile, pFileBuf->pBuf, pFileBuf->ulPos );
+      pFileBuf->ulPos = 0;
+   }
+}
+
+static void hb_addToFBuffer( PHB_FILEBUF pFileBuf, char ch )
+{
+   if ( pFileBuf->ulPos == pFileBuf->ulSize )
+   {
+      hb_flushFBuffer( pFileBuf );
+   }
+   pFileBuf->pBuf[ pFileBuf->ulPos++ ] = ( BYTE ) ch;
+}
+
+static void hb_addStrnToFBuffer( PHB_FILEBUF pFileBuf, char * str, ULONG ulSize )
+{
+   ULONG ulPos = 0;
+   while ( ulPos < ulSize )
+   {
+      if ( pFileBuf->ulPos == pFileBuf->ulSize )
+      {
+         hb_flushFBuffer( pFileBuf );
+      }
+      pFileBuf->pBuf[ pFileBuf->ulPos++ ] = ( BYTE ) str[ ulPos++ ];
+   }
+}
+
+static void hb_addStrToFBuffer( PHB_FILEBUF pFileBuf, char * szStr )
+{
+   while ( *szStr )
+   {
+      if ( pFileBuf->ulPos == pFileBuf->ulSize )
+      {
+         hb_flushFBuffer( pFileBuf );
+      }
+      pFileBuf->pBuf[ pFileBuf->ulPos++ ] = ( BYTE ) *szStr++;
+   }
+}
+
+static void hb_destroyFBuffer( PHB_FILEBUF pFileBuf )
+{
+   hb_flushFBuffer( pFileBuf );
+   if ( pFileBuf->pBuf )
+   {
+      hb_xfree( pFileBuf->pBuf );
+   }
+   hb_xfree( pFileBuf );
+}
+
+static PHB_FILEBUF hb_createFBuffer( FHANDLE hFile, ULONG ulSize )
+{
+   PHB_FILEBUF pFileBuf = hb_xgrab( sizeof( HB_FILEBUF ) );
+
+   pFileBuf->hFile = hFile;
+   pFileBuf->pBuf = hb_xgrab( ulSize );
+   pFileBuf->ulSize = ulSize;
+   pFileBuf->ulPos = 0;
+   return pFileBuf;
+}
+
+/* Export field value into the buffer in SQL format */
+static BOOL hb_ExportBufSqlVar( PHB_FILEBUF pFileBuf, PHB_ITEM pValue, char *cDelim, char *cEsc )
+{
    switch( pValue->type )
    {
-      // a "C" field
       case HB_IT_STRING:
       {
-         strcat( cBuffer, hb_strescape( pValue->item.asString.value, pValue->item.asString.length, cDelim, cEsc ) );
+         ULONG ulLen = pValue->item.asString.length, ulCnt = 0;
+         char *szVal = pValue->item.asString.value;
+
+         hb_addStrToFBuffer( pFileBuf, cDelim );
+         while ( ulLen && HB_ISSPACE( szVal[ ulLen - 1 ] ) )
+         {
+            ulLen--;
+         }
+         while ( *szVal && ulCnt++ < ulLen )
+         {
+            if( *szVal == *cDelim || *szVal == *cEsc )
+            {
+               hb_addToFBuffer( pFileBuf, *cEsc );
+            }
+            hb_addToFBuffer( pFileBuf, *szVal++ );
+         }
+         hb_addStrToFBuffer( pFileBuf, cDelim );
          break;
       }
-      // a "D" field
+
       case HB_IT_DATE:
       {
          char szDate[9];
-         char szSqlDate[11];
 
+         hb_addStrToFBuffer( pFileBuf, cDelim );
          hb_itemGetDS( pValue, szDate );
          if( szDate[0] == ' ' )
          {
-            strcpy( szSqlDate, "0100-01-01" );
+            hb_addStrToFBuffer( pFileBuf, "0100-01-01" );
          }
          else
          {
-            sprintf( szSqlDate, "%c%c%c%c-%c%c-%c%c", szDate[0],szDate[1],szDate[2],szDate[3],szDate[4],szDate[5],szDate[6],szDate[7] );
+            hb_addStrnToFBuffer( pFileBuf, &szDate[0], 4 );
+            hb_addToFBuffer( pFileBuf, '-' );
+            hb_addStrnToFBuffer( pFileBuf, &szDate[4], 2 );
+            hb_addToFBuffer( pFileBuf, '-' );
+            hb_addStrnToFBuffer( pFileBuf, &szDate[6], 2 );
          }
-         szSqlDate[ 10 ] = '\0';
-         strcat( cBuffer, szSqlDate );
+         hb_addStrToFBuffer( pFileBuf, cDelim );
          break;
       }
-      // an "L" field
+
       case HB_IT_LOGICAL:
       {
-         strcat( cBuffer, (BYTE*) ( pValue->item.asLogical.value ? "Y" : "N" ) );
+         hb_addStrToFBuffer( pFileBuf, cDelim );
+         hb_addToFBuffer( pFileBuf, pValue->item.asLogical.value ? 'Y' : 'N' );
+         hb_addStrToFBuffer( pFileBuf, cDelim );
          break;
       }
-      // an "N" field
+
       case HB_IT_INTEGER:
       case HB_IT_LONG:
 #ifndef HB_LONG_LONG_OFF
@@ -5415,34 +5506,43 @@ static BOOL hb_ExportSqlVar( char *cBuffer, PHB_ITEM pValue, char *cDelim, char 
 #endif
       case HB_IT_DOUBLE:
       {
-         char *szResult = hb_itemStr( pValue, NULL, NULL );
+         char szResult[ HB_MAX_DOUBLE_LENGTH ];
+         int iSize, iDec;
 
-         if ( szResult )
+         hb_itemGetNLen( pValue, &iSize, &iDec );
+         if ( hb_itemStrBuf( szResult, pValue, iSize, iDec ) )
          {
-            ULONG ulLen = strlen( szResult );
-            char * szTrimmed = hb_strLTrim( szResult, &ulLen );
-
-            strcat( cBuffer, (BYTE*) szTrimmed );
-            hb_xfree( szResult );
+            int iPos = 0;
+            while ( iSize && HB_ISSPACE( szResult[ iPos ] ) )
+            {
+               iPos++;
+               iSize--;
+            }
+            hb_addStrnToFBuffer( pFileBuf, &szResult[ iPos ], iSize );
+         }
+         else
+         {
+            hb_addToFBuffer( pFileBuf, '0' );
          }
          break;
       }
       // an "M" field or the other, might be a "V" in SixDriver
       default:
-      // We do not want MEMO contents
+         // We do not want MEMO contents
          return FALSE;
    }
    return TRUE;
 }
+
 
 // Export DBF content to a SQL script file
 static LONG hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
                         char *cDelim, char *cSep, BYTE *cEsc, int nCount, char *cTable, FHANDLE handle,
                         BOOL bAppend, BOOL bInsert, BOOL bRecno )
 {
-
    HB_THREAD_STUB
    AREAP pArea = HB_CURRENT_WA;
+   PHB_FILEBUF pFileBuf;
 
    USHORT uiFields = 0;
    USHORT ui;
@@ -5469,6 +5569,8 @@ static LONG hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
       sprintf( szInsert, "INSERT INTO %s VALUES ( ", cTable );
    }
 
+   pFileBuf = hb_createFBuffer( handle, 0xFFFF );
+
    SELF_FIELDCOUNT( pArea, &uiFields );
 
    Tmp.type = HB_IT_NIL;
@@ -5488,21 +5590,16 @@ static LONG hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
       // if For is NULL, hb__Eval returns TRUE
       if ( hb___Eval ( pFor ) )
       {
-         
-         char cBuffer[4096];
-
-         cBuffer[0] = '\0';
-
          if( bInsert )
          {
-            strcat( cBuffer, szInsert );
+            hb_addStrToFBuffer( pFileBuf, szInsert );
          }
 
          if( bRecno )
          {
             sprintf( szRecno, "%ld", ++lRecno );
-            strcat( cBuffer, szRecno );
-            strcat( cBuffer, cSep );
+            hb_addStrToFBuffer( pFileBuf, szRecno );
+            hb_addStrToFBuffer( pFileBuf, cSep );
          }
 
          for ( ui = 1; ui <= uiFields; ui ++ )
@@ -5510,22 +5607,17 @@ static LONG hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
             SELF_GETVALUE( pArea, ui, &Tmp );
             if ( bWriteSep )
             {
-               strcat( cBuffer, cSep );
+               hb_addStrToFBuffer( pFileBuf, cSep );
             }
-            strcat( cBuffer, cDelim );
-            bWriteSep = hb_ExportSqlVar( cBuffer, &Tmp, cDelim, cEsc );
-            strcat( cBuffer, cDelim );
-            hb_itemClear( &Tmp );
+            bWriteSep = hb_ExportBufSqlVar( pFileBuf, &Tmp, cDelim, cEsc );
          }
 
          if( bInsert )
          {
-            strcat( cBuffer, " );" );
+            hb_addStrToFBuffer( pFileBuf, " );" );
          }
          
-         strcat( cBuffer, hb_conNewLine() );
-         
-         hb_fsWriteLarge( handle, cBuffer, strlen( cBuffer ) );
+         hb_addStrToFBuffer( pFileBuf, hb_conNewLine() );
          bWriteSep = FALSE;
       }
 
@@ -5534,15 +5626,17 @@ static LONG hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
          nCount-- ;
       }
 
-      // DBSKIP()
       SELF_SKIP( pArea, 1 );
    }
+
+   hb_itemClear( &Tmp );
 
    // Writing EOF
    // hb_fsWriteLarge( handle, (BYTE*) "\x1A", 1 );
 
    hb_xfree( szInsert );
-   hb_xfree( szRecno );
+
+   hb_destroyFBuffer( pFileBuf );
 
    return lRecno;
 
@@ -5699,7 +5793,3 @@ HB_FUNC( __DBSQL )
    }
 
 }
-
-
-#if 0
-#endif
