@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.39 2003/03/07 03:04:46 ronpinkas Exp $
+ * $Id: classes.c,v 1.40 2003/03/07 05:32:42 ronpinkas Exp $
  */
 
 /*
@@ -612,7 +612,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
       // All else is not allowed.
       ScopeError:
       {
-         char szScope[ 32 ];
+         char szScope[ 64 ];
 
          szScope[0] = '\0';
 
@@ -635,7 +635,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
 
          szScope[ strlen( szScope ) - 1 ] = '>';
 
-         hb_errRT_BASE( EG_NOMETHOD, 1004, szScope, pMethod->pMessage->pSymbol->szName + ( pMethod->pMessage->pSymbol->szName[0] == '_' ? 1 : 0 ), 1, pObject );
+         hb_errRT_BASE( EG_NOMETHOD, 1004, szScope, pMethod->pMessage->pSymbol->szName, 1, pObject );
 
          return FALSE;
       }
