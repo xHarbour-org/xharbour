@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.12 2002/01/21 09:11:57 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.13 2002/01/27 05:23:33 ronpinkas Exp $
  */
 
 /*
@@ -1066,9 +1066,11 @@ char * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
       if( hb_set.HB_SET_FIXED )
          /* If fixed mode is enabled, always use the default. */
          iDec = hb_set.HB_SET_DECIMALS;
-      else if( iDec > 9 )
          /* Otherwise, the maximum is 9. */
+/*
+      else if( iDec > 9 )
          iDec = 9;
+*/
 
       if( pWidth )
       {
@@ -1137,13 +1139,42 @@ char * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                iBytes = iSize + 1;
             else
             {
+               int iDecR;
+
                if( HB_IS_DOUBLE( pNumber ) && iDec < pNumber->item.asDouble.decimal )
                   dNumber = hb_numRound( dNumber, iDec );
 
-               if( iDec == 0 )
-                  iBytes = sprintf( szResult, "%*.0f", iSize, dNumber );
+               if( dNumber != 0.0 )
+               {
+                  iDecR = 15 - ( int ) log10( fabs( dNumber ) );
+                  if(( dNumber < 1 ) && ( dNumber > -1 )) iDecR++;
+               }
                else
-                  iBytes = sprintf( szResult, "%*.*f", iSize, iDec, dNumber );
+                  iDecR = iDec;
+
+               if( iDecR >= 0 )
+               {
+
+                  if( iDec == 0 )
+                     iBytes = sprintf( szResult, "%*.0f", iSize, dNumber );
+                  else
+                  {
+                     if( iDec <=  iDecR )
+                        iBytes = sprintf( szResult, "%*.*f", iSize, iDec, dNumber );
+                     else
+                     {
+                        if( iDecR == 0 ) iDecR++;
+                        iBytes = sprintf( szResult, "%*.*f%0*u", iSize-iDec+iDecR, iDecR, dNumber, iDec-iDecR, 0 );
+                     }
+                  }
+
+               }
+               else
+
+                  if( iDec == 0 )
+                     iBytes = sprintf( szResult, "%*.0f%0*u", iSize + iDecR , dNumber / pow( 10.0, ( double ) ( -iDecR ) ), -iDecR, 0 );
+                  else
+                     iBytes = sprintf( szResult, "%*.0f%0*u.%0*u", iSize + iDecR - iDec - 1 , dNumber / pow( 10.0, ( double ) ( -iDecR ) ), -iDecR, 0, iDec, 0 );
             }
          }
          else
