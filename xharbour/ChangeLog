@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.145 2002/04/01 10:58:59 map Exp $
+ * $Id: ChangeLog,v 1.146 2002/04/01 21:09:11 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-02 04:55 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * source/rtl/menuto.prg
+     ! Fix recursive executions and exit without pressing key.
+       Now use local pointer and save static pointer.
 
 2002-04-01 13:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/filesys.c
