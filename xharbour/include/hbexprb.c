@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.8 2002/01/27 22:30:07 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.9 2002/01/29 08:27:32 ronpinkas Exp $
  */
 
 /*
@@ -1083,7 +1083,7 @@ static HB_EXPR_FUNC( hb_compExprUseMacro )
                    * all components should be placed as a string that will
                    * be compiled after text susbstitution
                    */
-                  HB_EXPR_PCODE2( hb_compGenPushString, pSelf->value.asMacro.szMacro, strlen(pSelf->value.asMacro.szMacro) );
+                  HB_EXPR_PCODE2( hb_compGenPushString, pSelf->value.asMacro.szMacro, strlen( pSelf->value.asMacro.szMacro ) + 1 );
                }
             }
             /* compile & run - leave a result on the eval stack
@@ -1189,7 +1189,7 @@ static HB_EXPR_FUNC( hb_compExprUseMacro )
                    * all components should be placed as a string that will
                    * be compiled after text susbstitution
                    */
-                  HB_EXPR_PCODE2( hb_compGenPushString, pSelf->value.asMacro.szMacro, strlen(pSelf->value.asMacro.szMacro) );
+                  HB_EXPR_PCODE2( hb_compGenPushString, pSelf->value.asMacro.szMacro, strlen( pSelf->value.asMacro.szMacro ) + 1 );
                }
             }
             /* compile & run - macro compiler will generate pcode to pop a value
