@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.603 2003/01/10 05:40:00 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.604 2003/01/10 06:00:19 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-10 10:40 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * samples/sitesvr/sitesrv.prg
+    ! Using FOUND() instead of EOF() when scanning for a seek
+    * Now that dbfntx is working in recursive searches, I removed
+      the SEEK hack and put back the GOTO nRecno / SKIP sequence.
+      Thanks, Horacio ;-)
 
 2003-01-09 21:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * make_b32.bat
