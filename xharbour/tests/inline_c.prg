@@ -1,5 +1,5 @@
 /*
- * $Id: inline_c.prg,v 1.5 2001/01/13 10:28:32 ronpinkas Exp $
+ * $Id: inline_c.prg,v 1.1.1.1 2001/12/21 10:45:53 ronpinkas Exp $
  */
 PROCEDURE MAIN( cLine, cDelim )
 
@@ -85,7 +85,7 @@ HB_FUNC( C_FUNC )
 {
    hb_retc( "returned from C_FUN\n" );
 }
-#pragma STOPDUMP
+#pragma ENDDUMP
 
 Function PostDumpTest()
 RETURN "Post Dump Test"

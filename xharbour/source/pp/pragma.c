@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.c,v 1.7 2001/06/14 21:20:43 dholm Exp $
+ * $Id: pragma.c,v 1.8 2001/12/21 11:41:17 antoniolinares Exp $
  */
 
 /*
@@ -239,8 +239,8 @@ void hb_pp_ParsePragma( char * szLine )
             {
                pBuffer++;
             }
-            hb_strupr( strncpy( sDirective, pBuffer, 8 ) );
-            if( memcmp( sDirective, "STOPDUMP", 8 ) == 0 )
+            hb_strupr( strncpy( sDirective, pBuffer, 7 ) );
+            if( memcmp( sDirective, "ENDDUMP", 7 ) == 0 )
             {
                hb_pp_bInline = FALSE;
                return;
@@ -389,4 +389,3 @@ static void DebugPragma( char * pszStr, int iValue, BOOL bValue )
          printf( "#pragma set to %s \'%s\'\n", bValue ? "ON" : "OFF", pszStr );
    }
 }
-

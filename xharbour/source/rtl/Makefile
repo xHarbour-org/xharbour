@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.105 2001/12/18 00:03:25 vszakats Exp $
+# $Id: Makefile,v 1.108 2001/12/21 15:31:33 vszakats Exp $
 #
 
 ROOT = ../../
@@ -22,13 +22,15 @@ C_SOURCES=\
 	datesx.c     \
 	defpath.c    \
 	descend.c    \
-	dir.c        \
 	dirdrive.c   \
+	direct.c     \
 	diskspac.c   \
 	disksphb.c   \
 	do.c         \
 	empty.c      \
 	errorapi.c   \
+	file.c       \
+	filehb.c     \
 	filesys.c    \
 	fkmax.c      \
 	fnsplit.c    \

@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.13 2001/11/29 19:29:11 antoniolinares Exp $
+ * $Id: philes.c,v 1.15 2001/12/21 17:00:03 vszakats Exp $
  */
 
 /*
@@ -146,20 +146,16 @@ HB_FUNC( FERASE )
 {
    hb_fsSetError( 3 );
 
-   if( ISCHAR( 1 ) )
-      hb_retni( hb_fsDelete( ( BYTE * ) hb_parc( 1 ) ) );
-   else
-      hb_retni( -1 );
+   hb_retni( ( ISCHAR( 1 ) && 
+               hb_fsDelete( ( BYTE * ) hb_parc( 1 ) ) ) ? 0 : -1 );
 }
 
 HB_FUNC( FRENAME )
 {
    hb_fsSetError( 2 );
 
-   if( ISCHAR( 1 ) && ISCHAR( 2 ) )
-      hb_retni( hb_fsRename( ( BYTE * ) hb_parc( 1 ), ( BYTE * ) hb_parc( 2 ) ) );
-   else
-      hb_retni( -1 );
+   hb_retni( ( ISCHAR( 1 ) && ISCHAR( 2 ) && 
+               hb_fsRename( ( BYTE * ) hb_parc( 1 ), ( BYTE * ) hb_parc( 2 ) ) ) ? 0 : -1 );
 }
 
 HB_FUNC( FSEEK )
@@ -170,14 +166,6 @@ HB_FUNC( FSEEK )
                            ISNUM( 3 ) ? hb_parni( 3 ) : FS_SET ) );
    else
       hb_retnl( 0 );
-}
-
-/* TODO: Xbase++ has an extension where the second parameter can specify
-         the required attribute. */
-
-HB_FUNC( FILE )
-{
-   hb_retl( ISCHAR( 1 ) ? hb_spFile( ( unsigned char * ) hb_parc( 1 ) ) : FALSE );
 }
 
 HB_FUNC( FREADSTR )

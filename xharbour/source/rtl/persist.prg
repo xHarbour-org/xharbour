@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.14 2001/12/15 11:22:29 vszakats Exp $
+ * $Id: persist.prg,v 1.15 2001/12/21 08:41:52 brianhays Exp $
  */
 
 /*
@@ -115,7 +115,7 @@ return .T.
 METHOD SaveToText( cObjectName ) CLASS HBPersistent
 
    local oNew := &( ::ClassName() + "()" ):CreateNew()
-   local aProperties, n, uValue, cObject, cType
+   local aProperties, n, uValue, uNewValue, cObject, cType
 
    static nIndent := -3
 
@@ -130,10 +130,10 @@ METHOD SaveToText( cObjectName ) CLASS HBPersistent
 
    for n := 1 to Len( aProperties )
       uValue := __objSendMsg( Self, aProperties[ n ] )
+      uNewValue := __objSendMsg( oNew, aProperties[ n ] )
+      cType  := ValType( uValue )
 
-      if ! uValue == __objSendMsg( oNew, aProperties[ n ] )
-
-         cType  := ValType( uValue )
+      if cType == ValType( uNewValue ) .AND. ! uValue == uNewValue
 
          do case
             case cType == "A"

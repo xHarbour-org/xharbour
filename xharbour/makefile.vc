@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.225 2001/12/17 12:05:11 vszakats Exp $
+# $Id: makefile.vc,v 1.1.1.1 2001/12/21 10:39:09 ronpinkas Exp $
 #
 
 #
@@ -280,6 +280,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\do.obj \
    $(OBJ_DIR)\empty.obj \
    $(OBJ_DIR)\errorapi.obj \
+   $(OBJ_DIR)\file.obj \
+   $(OBJ_DIR)\filehb.obj \
    $(OBJ_DIR)\filesys.obj \
    $(OBJ_DIR)\fkmax.obj \
    $(OBJ_DIR)\fnsplit.obj \
