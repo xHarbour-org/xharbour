@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.8 2004/02/21 14:39:01 andijahja Exp $
+ * $Id: hbcc.prg,v 1.9 2004/02/24 14:15:39 andijahja Exp $
  */
 
 /*
@@ -1463,7 +1463,7 @@ HB_FUNC( B64DECODE_FILE )
    FILE *inFile, *outFile;
    char *string, *szFileName;
    ULONG nBytesWritten = 0;
-   HB_ITEM pStruct, pItem;
+   HB_ITEM Struct, Item;
    USHORT uiLen = 1, uiCount;
    BOOL bOutFile = FALSE;
 
@@ -1483,25 +1483,29 @@ HB_FUNC( B64DECODE_FILE )
          }
          else
          {
-            pStruct.type = HB_IT_NIL;
-            pItem.type = HB_IT_NIL;
-            hb_arrayNew( &pStruct, 1 );
-            hb_arraySet( &pStruct, 1, hb_itemPutC( &pItem, pinFile->item.asString.value ) );
+            Struct.type = HB_IT_NIL;
+            Item.type = HB_IT_NIL;
+            hb_arrayNew( &Struct, 1 );
+            hb_arraySet( &Struct, 1, hb_itemPutC( &Item, pinFile->item.asString.value ) );
+            hb_itemClear( &Item );
          }
       }
       else if ( ISARRAY( 1 ) )
       {
-         pStruct = (*hb_param( 1, HB_IT_ARRAY ));
-         uiLen = (USHORT) pStruct.item.asArray.value->ulLen;
+         Struct.type = HB_IT_NIL;
+         hb_itemCopy( &Struct, hb_param( 1, HB_IT_ARRAY ));
+         uiLen = (USHORT) Struct.item.asArray.value->ulLen;
 
          if ( uiLen <= 0 )
          {
+            hb_itemClear( &Struct );
             hb_retni( 0 );
             return;
          }
       }
       else
       {
+         hb_itemClear( &Struct );
          hb_retni( 0 );
          return;
       }
@@ -1516,6 +1520,7 @@ HB_FUNC( B64DECODE_FILE )
    {
       if ( strlen(poutFile->item.asString.value) == 0 )
       {
+         hb_itemClear( &Struct );
          hb_retni(0);
          return;
       }
@@ -1525,10 +1530,11 @@ HB_FUNC( B64DECODE_FILE )
 
    for ( uiCount = 0; uiCount < uiLen; uiCount++ )
    {
-      szFileName = hb_arrayGetC( &pStruct, uiCount + 1 );
+      szFileName = hb_arrayGetC( &Struct, uiCount + 1 );
 
       if ( !szFileName )
       {
+         hb_itemClear( &Struct );
          hb_xfree( string );
          hb_retni( 0 );
          return;
@@ -1536,6 +1542,7 @@ HB_FUNC( B64DECODE_FILE )
 
       if ( strlen( szFileName ) == 0 )
       {
+         hb_itemClear( &Struct );
          hb_xfree( szFileName );
          hb_xfree( string );
          hb_retni( 0 );
@@ -1546,6 +1553,7 @@ HB_FUNC( B64DECODE_FILE )
 
       if ( !inFile )
       {
+         hb_itemClear( &Struct );
          hb_xfree( szFileName );
          hb_xfree( string );
          hb_retni( 0 );
@@ -1604,6 +1612,7 @@ HB_FUNC( B64DECODE_FILE )
 
       if ( !bOutFile )
       {
+         hb_itemClear( &Struct );
          fclose( inFile );
          hb_xfree( string );
          if ( szFileName )
@@ -1667,6 +1676,9 @@ HB_FUNC( B64DECODE_FILE )
    {
       fclose( outFile );
    }
+
+   hb_itemClear( &Struct );
+
 }
 #pragma ENDDUMP
 

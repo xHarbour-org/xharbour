@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.22 2004/03/02 00:23:54 andijahja Exp $
+ * $Id: zip.c,v 1.23 2004/03/02 00:31:04 andijahja Exp $
  */
 
 /*
@@ -121,6 +121,8 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
 
       hb_xfree( szEntry );
    }
+
+   hb_itemClear( &Temp );
 }
 
 static BOOL ZipTestExclude ( char *szEntry )
@@ -186,8 +188,11 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
             {
                hb_arrayAddForward( &ExcludeFile, hb_itemPutC( &ExTmp, hb_strupr( szEntry ) ) );
                hb_xfree( szEntry );
+               hb_itemClear( &ExTmp );
             }
          }
+
+         hb_itemClear( &WildFile );
       }
       else
       {
@@ -228,17 +233,21 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
                   pDirEntry = hb_arrayGetItemPtr( &WildFile, uiW + 1 );
                   szEntry = hb_arrayGetC( pDirEntry, 1 );
                   hb_arrayAddForward( &ExcludeFile, hb_itemPutC( &ExTmp, szEntry ));
+                  hb_itemClear( &ExTmp );
                   hb_xfree( szEntry );
                }
             }
             else
             {
                hb_arrayAddForward( &ExcludeFile, hb_itemPutC( &ExTmp, szExclude ));
+               hb_itemClear( &ExTmp );
             }
 
             hb_xfree( szExclude );
          }
       }
+
+      hb_itemClear( &WildFile );
    }
 }
 
@@ -260,6 +269,7 @@ static void ZipCreateArray( PHB_ITEM pParam )
    if( pParam->type == HB_IT_STRING )
    {
       hb_arrayAddForward( &TempArray, hb_itemPutC( &Temp, pParam->item.asString.value ) );
+      hb_itemClear( &Temp );
    }
    else
    {
@@ -293,16 +303,20 @@ static void ZipCreateArray( PHB_ITEM pParam )
                {
                   hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szEntry ) );
                   hb_arrayAddForward( &FileAttribs, hb_itemPutNI( &Temp, GetFileAttributes( szEntry ) ) );
+                  hb_itemClear( &Temp );
                   SetFileAttributes( szEntry, FA_ARCH );
                }
 
                hb_xfree( szEntry );
             }
+
+            hb_itemClear( &WildFile );
          }
          else
          {
             hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szArrEntry ) );
             hb_arrayAddForward( &FileAttribs, hb_itemPutNI( &Temp, GetFileAttributes( szArrEntry ) ) );
+            hb_itemClear( &Temp );
             SetFileAttributes( szArrEntry, FA_ARCH );
          }
 
@@ -358,6 +372,7 @@ HB_FUNC( HB_ZIPFILE )
             ResetAttribs();
          }
 
+         hb_itemClear( &iProgress );
          hb_xfree( szZipFileName );
       }
    }
@@ -454,6 +469,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
             ResetAttribs();
          }
 
+         hb_itemClear( &iProgress );
          hb_xfree( szZipFileName );
       }
    }
@@ -505,6 +521,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
             ResetAttribs();
          }
 
+         hb_itemClear( &iProgress );
          hb_xfree( szZipFileName );
       }
    }
@@ -590,6 +607,7 @@ HB_FUNC( HB_UNZIPFILE )
       }
 
       hb_xfree( szZipFileName );
+      hb_itemClear( &iProgress );
       hb_itemClear( &UnzipFiles );
    }
 
@@ -761,6 +779,7 @@ HB_FUNC( HB_UNZIPFILEINDEX )
             if ( iIndex > 0 && iIndex <= ulLen )
             {
                hb_arrayAddForward( &DelZip, hb_itemPutNI( &Temp, iIndex ) );
+               hb_itemClear( &Temp );
             }
          }
          else
@@ -773,6 +792,7 @@ HB_FUNC( HB_UNZIPFILEINDEX )
                if ( iIndex && iIndex > 0 && iIndex <= ulLen )
                {
                   hb_arrayAddForward( &DelZip, hb_itemPutNI( &Temp, iIndex ) );
+                  hb_itemClear( &Temp );
                }
             }
 
@@ -789,6 +809,8 @@ HB_FUNC( HB_UNZIPFILEINDEX )
                                      &iProgress );
          }
 
+         hb_itemClear( &DelZip );
+         hb_itemClear( &iProgress );
          hb_xfree( szZipFileName );
 
       }

@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.14 2004/02/28 03:45:09 andijahja Exp $
+ * $Id: zipnew.cpp,v 1.15 2004/02/28 23:05:11 andijahja Exp $
  */
 
 /*
@@ -81,6 +81,8 @@ class SpanCallback : public CZipSpanCallback
       Disk.type = HB_IT_NIL;
 
       hb_vmEvalBlockV( &ChangeDiskBlock, 1, hb_itemPutNL( &Disk, m_uDiskNeeded ) );
+
+      hb_itemClear( &Disk );
 
       return true;
    }
@@ -262,9 +264,9 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
       for( ulCount = 0 ; ulCount < ( ULONG )iNumberOfFiles ; ulCount++ )
       {
          CZipFileHeader fh;
-         HB_ITEM pItem;
+         HB_ITEM Item;
 
-         pItem.type = HB_IT_NIL;
+         Item.type = HB_IT_NIL;
          szZip.GetFileInfo( fh, ( WORD )ulCount );
 
          if ( iMode )
@@ -287,7 +289,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 
             szTempString  = ( LPCTSTR )fh.GetFileName( );
             szFileNameInZip = ( const char * )szTempString;
-            hb_arraySetForward( &TempArray, filePos, hb_itemPutC( &pItem, ( char * )szFileNameInZip ) );
+            hb_arraySetForward( &TempArray, filePos, hb_itemPutC( &Item, ( char * )szFileNameInZip ) );
 
             #if defined( __WIN32__ )
                szAttr[ 0 ] = uAttr & FILE_ATTRIBUTE_READONLY ? ( char ) _T( 'r' ) : ( char ) _T( '-' );
@@ -300,8 +302,8 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 
             if ( fh.m_uUncomprSize>0 )
             {
-               hb_arraySetForward( &TempArray, Lenght, hb_itemPutNL( &pItem, fh.m_uUncomprSize ) );
-               hb_arraySetForward( &TempArray, Size, hb_itemPutNL( &pItem, fh.m_uComprSize ));
+               hb_arraySetForward( &TempArray, Lenght, hb_itemPutNL( &Item, fh.m_uUncomprSize ) );
+               hb_arraySetForward( &TempArray, Size, hb_itemPutNL( &Item, fh.m_uComprSize ));
                iRatio = 100-( ( fh.m_uComprSize*100 ) / fh.m_uUncomprSize );
 
                if ( iRatio <0 )
@@ -309,14 +311,14 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
                   iRatio = 0;
                }
 
-               hb_arraySetForward( &TempArray, Ratio, hb_itemPutNL( &pItem, iRatio ));
+               hb_arraySetForward( &TempArray, Ratio, hb_itemPutNL( &Item, iRatio ));
             }
             else
             {
-               hb_arraySetForward( &TempArray, Lenght, hb_itemPutNL( &pItem, fh.m_uUncomprSize ));
-               hb_arraySetForward( &TempArray, Size, hb_itemPutNL( &pItem, fh.m_uComprSize ) );
+               hb_arraySetForward( &TempArray, Lenght, hb_itemPutNL( &Item, fh.m_uUncomprSize ));
+               hb_arraySetForward( &TempArray, Size, hb_itemPutNL( &Item, fh.m_uComprSize ) );
                iRatio = 0;
-               hb_arraySetForward( &TempArray, Ratio, hb_itemPutNL( &pItem, iRatio ));
+               hb_arraySetForward( &TempArray, Ratio, hb_itemPutNL( &Item, iRatio ));
             }
 
             #if defined( __WIN32__ )
@@ -350,12 +352,12 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
                }
             }
 
-            hb_arraySetForward( &TempArray, Method, hb_itemPutC( &pItem, szMethod ));
+            hb_arraySetForward( &TempArray, Method, hb_itemPutC( &Item, szMethod ));
 
             sprintf( szCRC, "%8.8lx\n", ( ULONG )fh.m_uCrc32 );
 
-            hb_arraySetForward( &TempArray, Crc32, hb_itemPutCL( &pItem, szCRC, 8 ) );
-            hb_arraySetForward( &TempArray, Date, hb_itemPutD( &pItem, ( LONG ) ( fh.m_uModDate >> 9 ) +1980,( LONG )( ( fh.m_uModDate & ~0xFE00 ) >> 5 ), ( LONG )fh.m_uModDate & ~0xFFE0 ) );
+            hb_arraySetForward( &TempArray, Crc32, hb_itemPutCL( &Item, szCRC, 8 ) );
+            hb_arraySetForward( &TempArray, Date, hb_itemPutD( &Item, ( LONG ) ( fh.m_uModDate >> 9 ) +1980,( LONG )( ( fh.m_uModDate & ~0xFE00 ) >> 5 ), ( LONG )fh.m_uModDate & ~0xFFE0 ) );
 
             theTime = fh.GetTime( );
             SzTime =  localtime( &theTime );
@@ -370,8 +372,8 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
                }
             }
 
-            hb_arraySetForward( &TempArray, Time, hb_itemPutCL( &pItem, szTime, 5 ) );
-            hb_arraySetForward( &TempArray, Attr, hb_itemPutCL( &pItem, szAttr, 5 ));
+            hb_arraySetForward( &TempArray, Time, hb_itemPutCL( &Item, szTime, 5 ) );
+            hb_arraySetForward( &TempArray, Attr, hb_itemPutCL( &Item, szAttr, 5 ));
             hb_arraySetForward( &ZipArray, ulCount+1, &TempArray );
 
          }
@@ -380,8 +382,10 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
             const char *  szFileNameInZip;
             CZipString szTempString = ( LPCTSTR )fh.GetFileName( );
             szFileNameInZip = ( const char * )szTempString;
-            hb_arraySetForward( &ZipArray, ulCount+1, hb_itemPutC( &pItem, ( char * ) szFileNameInZip ));
+            hb_arraySetForward( &ZipArray, ulCount+1, hb_itemPutC( &Item, ( char * ) szFileNameInZip ));
          }
+
+         hb_itemClear( &Item );
       }
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.2 2004/02/18 10:50:45 andijahja Exp $
+ * $Id: fparse.c,v 1.3 2004/02/20 19:10:00 andijahja Exp $
  */
 
 /*
@@ -168,7 +168,7 @@ HB_FUNC( FPARSE )
    FILE *inFile ;
    PHB_ITEM pSrc = hb_param(1, HB_IT_STRING);
    PHB_ITEM pDelim = hb_param(2, HB_IT_STRING);
-   HB_ITEM pTemp, pArray, pItem;
+   HB_ITEM Temp, Array, Item;
    char *string ;
    char **tokens;
    int iToken, iCharCount = 0;
@@ -201,17 +201,17 @@ HB_FUNC( FPARSE )
    nByte = pDelim ? (BYTE) pDelim->item.asString.value[0] : (BYTE) 44;
 
    /* the main array */
-   pArray.type = HB_IT_NIL;
-   hb_arrayNew( &pArray, 0 );
+   Array.type = HB_IT_NIL;
+   hb_arrayNew( &Array, 0 );
 
    /* book memory for line to read */
    string = (char*) hb_xgrab( MAX_READ + 1 );
 
    /* container for parsed line */
-   pItem.type = HB_IT_NIL;
+   Item.type = HB_IT_NIL;
 
    /* holder for parsed text */
-   pTemp.type = HB_IT_NIL;
+   Temp.type = HB_IT_NIL;
 
    /* read the file until EOF */
    while ( file_read ( inFile, string, &iCharCount ) )
@@ -220,16 +220,16 @@ HB_FUNC( FPARSE )
       tokens = hb_tokensplit ( string, nByte, iCharCount ) ;
 
       /* prepare empty array */
-      hb_arrayNew( &pItem, 0 );
+      hb_arrayNew( &Item, 0 );
 
       /* add parsed text to array */
       for (iToken = 0; tokens [iToken]; iToken++)
       {
-         hb_arrayAddForward( &pItem, hb_itemPutC( &pTemp, tokens [iToken] ) );
+         hb_arrayAddForward( &Item, hb_itemPutC( &Temp, tokens [iToken] ) );
       }
 
       /* add array containing parsed text to main array */
-      hb_arrayAddForward( &pArray, &pItem );
+      hb_arrayAddForward( &Array, &Item );
 
       /* clean up */
       tokens--;
@@ -238,9 +238,13 @@ HB_FUNC( FPARSE )
    }
 
    /* return main array */
-   hb_itemForwardValue( &(HB_VM_STACK).Return, &pArray );
+   hb_itemForwardValue( &(HB_VM_STACK).Return, &Array );
 
    /* clean up */
    hb_xfree( string );
    fclose( inFile );
+
+   hb_itemClear( &Temp  );
+   hb_itemClear( &Array );
+   hb_itemClear( &Item  );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2444 2004/03/02 05:17:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2445 2004/03/02 08:21:52 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-02 20:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/winprn/tprint.prg
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcy.c
+  * contrib/unicode/hbcx.c
+  * contrib/hbzlib/zip.c
+  * contrib/hbzlib/zipnew.cpp
+  * source/rtl/fparse.c
+  * source/rdd/dbcmd.c
+    % fix GPF traps because HB_ITEMs are not cleared after usage
+
 2004-03-02 15:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/hbapifs.h
   * source/rtl/direct.c
