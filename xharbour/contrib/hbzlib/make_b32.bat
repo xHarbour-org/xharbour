@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.2 2003/09/12 20:10:13 paultucker Exp $
+rem $Id: make_b32.bat,v 1.3 2003/09/12 20:17:25 paultucker Exp $
 rem
 
 if "%1" == "clean" goto CLEAN
@@ -16,7 +16,7 @@ if not exist lib\b32 md lib\b32
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
-   copy lib\b32\ziparchive.lib ..\..\lib > nul
+   copy lib\b32\hbzip.lib ..\..\lib > nul
    goto EXIT
 
 :BUILD_ERR
