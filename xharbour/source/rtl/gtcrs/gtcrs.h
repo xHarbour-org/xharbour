@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.6 2003/06/19 00:07:59 druzus Exp $
+ * $Id: gtcrs.h,v 1.7 2003/06/26 12:37:09 druzus Exp $
  */
 
 /*
@@ -76,6 +76,8 @@ extern PHB_CODEPAGE s_cdpage;
 #endif
 
 /* #define HB_GT_CRS_TTYHACK */
+
+#define MAX_SIGNO	64
 
 extern int HB_GT_FUNC(gt_chrmapinit( int *piTransTbl, char *pszTerm ));
 

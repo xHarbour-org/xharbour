@@ -1,5 +1,5 @@
 /*
- * $Id: gtext.c,v 1.1 2003/06/19 00:07:59 druzus Exp $
+ * $Id: gtext.c,v 1.2 2003/06/19 22:39:02 druzus Exp $
  */
 
 /*
@@ -84,7 +84,10 @@ HB_FUNC( HB_SETTERMCP )
    if ( ISCHAR(1) )
    {
       if ( hb_pcount() == 2 && ISLOG(2) )
+      {
          hb_gt_SetDispCP( hb_parc( 1 ), NULL, hb_parl( 2 ) );
+         hb_gt_SetKeyCP( hb_parc( 1 ), NULL );
+      }
       else
       {
          hb_gt_SetDispCP( hb_parc( 1 ), hb_parc( 2 ), hb_parl( 3 ) );

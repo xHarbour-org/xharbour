@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.9 2003/03/25 02:36:11 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.10 2003/05/24 00:29:09 ronpinkas Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 
 #define HB_PCODE_VER 5
 
-// Don't change - this is the default for older compiled prgs.!!!
+/* Don't change - this is the default for older compiled prgs.!!! */
 #define HB_PRG_PCODE_VER 0
 
 #include <limits.h>

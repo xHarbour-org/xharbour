@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.14 2003/07/10 16:10:18 andijahja Exp $
+ * $Id: hbdefs.h,v 1.15 2003/07/19 22:08:05 jonnymind Exp $
  */
 
 /*
@@ -66,7 +66,7 @@
 #if defined(HB_OS_WIN_32_USED) && defined(HB_OS_WIN_32)
 
    #define WIN32_LEAN_AND_MEAN
-   #define _WINSOCKAPI_  // Prevents inclusion of Winsock.h in Windows.h
+   #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
    #include <windows.h>
    #if defined(__GNUC__)
       #define HB_DONT_DEFINE_BASIC_TYPES
@@ -326,6 +326,7 @@ typedef BYTE HB_ATTR;
 #define HB_CHAR_SOFT1           ( ( char ) 141 )
 #define HB_CHAR_SOFT2           ( ( char ) HB_CHAR_LF )
 
+#ifndef HB_LONG_LONG_OFF
 #if !defined(LONGLONG) && !defined(_WINNT_H)
 #if defined(__GNUC__)
   typedef long long LONGLONG;
@@ -341,5 +342,6 @@ typedef BYTE HB_ATTR;
   typedef unsigned __int64 ULONGLONG;
 #endif
 #endif
+#endif /* HB_LONG_LONG_OFF */
 
 #endif /* HB_DEFS_H_ */

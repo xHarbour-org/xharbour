@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.17 2003/03/27 07:44:55 ronpinkas Exp $
+ * $Id: hbpcode.h,v 1.18 2003/05/28 04:10:17 ronpinkas Exp $
  */
 
 /*
@@ -126,7 +126,7 @@ typedef enum
    HB_P_MPUSHMEMVAR,           /*  61 */
    HB_P_MPUSHMEMVARREF,        /*  62 */
    HB_P_MPUSHSYM,              /*  63 */
-   HB_P_MPUSHVARIABLE,         /*  64 */  // Note also 132 HB_P_MPUSHSTR
+   HB_P_MPUSHVARIABLE,         /*  64 Note also 132 HB_P_MPUSHSTR */
 /* end: */
    HB_P_MULT,                  /*  65 multiplies the latest two values on the stack, removing them and leaving there the result */
    HB_P_NEGATE,                /*  66 numerically negates the latest value on the stack */

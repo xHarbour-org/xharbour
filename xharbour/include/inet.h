@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.18 2003/04/04 17:21:21 paultucker Exp $
+* $Id: inet.h,v 1.19 2003/04/21 01:40:30 jonnymind Exp $
 */
 
 /*
@@ -60,7 +60,7 @@
        #define HB_NO_DEFAULT_INET
    #else
       #if defined( HB_OS_WIN_32 )
-         #define _WINSOCKAPI_  // Prevents inclusion of Winsock.h in Windows.h
+         #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
          #define HB_SOCKET_T SOCKET
          #include <winsock2.h>
          #include <windows.h>

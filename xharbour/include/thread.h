@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.52 2003/07/19 22:08:05 jonnymind Exp $
+* $Id: thread.h,v 1.53 2003/07/20 19:43:08 jonnymind Exp $
 */
 
 /*
@@ -78,7 +78,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #ifndef _WIN32_WINNT
       #define _WIN32_WINNT 0x0400
    #endif
-   #define _WINSOCKAPI_  // Prevents inclusion of Winsock.h in Windows.h
+   #define _WINSOCKAPI_  /* Prevents inclusion of Winsock.h in Windows.h */
    #include <windows.h>
 
    #define HB_THREAD_T                 DWORD
@@ -143,7 +143,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    }*/
 
    #define HB_CLEANUP_POP
-   // HB_VM_STACK.iCleanCount--;
+   /* HB_VM_STACK.iCleanCount--; */
 
    #define HB_CLEANUP_POP_EXEC
    /*{\
@@ -310,7 +310,7 @@ typedef struct tag_HB_STACK
    /* data to initialize the stack */
    UINT uiParams;
    /* Flag to signal that the context is in use */
-   BOOL bInUse; // this must be used with the guard of a global resource
+   BOOL bInUse; /* this must be used with the guard of a global resource */
 
    /* MT error handler, one for thread! */
    struct HB_ERROR_INFO_ *errorHandler;
@@ -368,7 +368,7 @@ typedef struct tag_HB_STACK
 
 #ifdef HB_OS_WIN_32
    HANDLE th_h;
-   BOOL bCanceled; // set when there is a cancel request and bInUse is true
+   BOOL bCanceled; /* set when there is a cancel request and bInUse is true */
    BOOL bCanCancel;
    /* Windows cleanup functions are working, but currently uneeded;
    So the are left here in [LEFTOVER] status
@@ -395,13 +395,13 @@ typedef struct tag_HB_MUTEX_STRUCT {
 
 typedef struct tag_HB_SHARED_RESOURCE
 {
-   HB_CRITICAL_T Mutex;  // mutex is used to read or write safely
-   union {              // data that can be read or written
+   HB_CRITICAL_T Mutex;  /* mutex is used to read or write safely */
+   union {              /* data that can be read or written */
       volatile long asLong;
       volatile void *asPointer;
    } content;
    volatile unsigned int aux;
-   HB_COND_T Cond; //condition that may change
+   HB_COND_T Cond; /* condition that may change */
 } HB_SHARED_RESOURCE;
 
 #define HB_SHARED_INIT( pshr, data ) \
@@ -427,7 +427,7 @@ typedef struct tag_HB_SHARED_RESOURCE
 
 #include <hbtrace.h>
 /* Lightweight macro for condition check */
-//   TraceLog( "mtgc.log", "FILE %s(%d): BEGINWAIT: %d   THID: %d\r\n", __FILE__, __LINE__, pshr.content.asLong, HB_CURRENT_THREAD() );
+/*   TraceLog( "mtgc.log", "FILE %s(%d): BEGINWAIT: %d   THID: %d\r\n", __FILE__, __LINE__, pshr.content.asLong, HB_CURRENT_THREAD() ); */
 #define HB_SET_SHARED( pshr, pMode, pValue ) \
 {\
    HB_CRITICAL_LOCK( pshr.Mutex );\

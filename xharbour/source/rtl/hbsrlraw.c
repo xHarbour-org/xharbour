@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.13 2003/07/13 18:11:57 walito Exp $
+ * $Id: hbsrlraw.c,v 1.14 2003/07/15 09:15:34 andijahja Exp $
  */
 
 /*
@@ -60,6 +60,7 @@
 * HB_CreateLen8( nLen ) --> returns the bytes containing the code
 */
 
+#ifndef HB_LONG_LONG_OFF
 void hb_createlen8( BYTE *ret, ULONGLONG uRet )
 {
    int i;
@@ -69,6 +70,17 @@ void hb_createlen8( BYTE *ret, ULONGLONG uRet )
       uRet /= 256l;
    }
 }
+#else
+void hb_createlen8( BYTE *ret, ULONG uRet )
+{
+   int i;
+   for( i = 7; i >= 0; i -- )
+   {
+      ret[i] = (BYTE) (uRet % 256 );
+      uRet /= 256l;
+   }
+}
+#endif
 
 HB_FUNC( HB_CREATELEN8 )
 {
@@ -102,11 +114,19 @@ ULONG hb_getlen8( BYTE *cStr )
    long lFact = 1;
    ULONG ulRet = 0;
 
-   for (i = 7; i >=0; i-- )
+#ifndef HB_LONG_LONG_OFF
+   for (i = 7; i >= 0; i-- )
    {
-      ulRet += (( ULONGLONG) cStr[i]) * lFact;
+      ulRet += (( ULONGLONG ) cStr[i]) * lFact;
       lFact *= 256l;
    }
+#else
+   for (i = 7; i >= 4; i-- )
+   {
+      ulRet += (( ULONG ) cStr[i]) * lFact;
+      lFact *= 256l;
+   }
+#endif
    return ulRet;
 }
 

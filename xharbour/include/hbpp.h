@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.3 2003/04/03 17:49:21 ronpinkas Exp $
+ * $Id: hbpp.h,v 1.4 2003/06/20 17:32:41 jonnymind Exp $
  */
 
 /*
@@ -141,7 +141,7 @@ extern void hb_pp_ParsePragma( char * szline );
 #define STATE_EXPRES_ID 9
 #define STATE_BRACKET   10
 /* Added by Giancarlo Niccolai 2003-05-20*/
-#define STATE_QUOTE4    11  // escaped quote
+#define STATE_QUOTE4    11  /* escaped quote */
 /* END */
 
 #if defined(HB_EXTERN_C)

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.2 2003/06/26 12:37:07 druzus Exp $
+# $Id: make_tgz.sh,v 1.4 2003/06/27 20:57:58 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -12,7 +12,7 @@
 
 Rel="$Release$"
 name="xharbour"
-hb_ver="0.81.0"
+hb_ver="0.82.0"
 hb_lnkso="yes"
 hb_pref="xhb"
 hb_libs="vm pp rtl rdd dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca odbc ct debug profiler"

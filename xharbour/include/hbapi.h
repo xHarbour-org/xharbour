@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.75 2003/07/14 19:18:46 jonnymind Exp $
+ * $Id: hbapi.h,v 1.76 2003/07/19 22:08:05 jonnymind Exp $
  */
 
 /*
@@ -269,7 +269,7 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
    #endif
 
 #else
-   //JC1: including thread anyways, because it defines some void macros when not in MT
+   /* JC1: including thread anyways, because it defines some void macros when not in MT */
    #include "thread.h"
     extern int   HB_EXPORT  hb_pcount( void );          /* returns the number of suplied parameters */
 
@@ -311,7 +311,6 @@ extern void  HB_EXPORT  hb_storl( int iLogical, int iParam, ... ); /* stores a l
 extern void  HB_EXPORT  hb_storni( int iValue, int iParam, ... ); /* stores an integer on a variable by reference */
 extern void  HB_EXPORT  hb_stornl( long lValue, int iParam, ... ); /* stores a long on a variable by reference */
 extern void  HB_EXPORT  hb_stornd( double dValue, int iParam, ... ); /* stores a double on a variable by reference */
-extern void  HB_EXPORT  hb_stornll(LONGLONG dValue, int iParam, ... ); /* stores a double on a variable by reference */
 
 #ifndef HB_LONG_LONG_OFF
 extern void  HB_EXPORT  hb_stornll( LONGLONG llValue, int iParam, ... ); /* stores a long long int on a variable by reference */
@@ -453,7 +452,7 @@ extern void     hb_codeblockEvaluate( HB_ITEM_PTR pItem ); /* evaluate a codeblo
 extern HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar ); /* create a new global value */
 extern HB_VALUE_PTR * hb_memvarValueBaseAddress( void ); /* retrieve the base address of the values table */
 
-//JC1: thread version is a little different
+/* JC1: thread version is a little different */
 #ifndef HB_THREAD_SUPPORT
 extern void     hb_memvarsInit( void ); /* initialize the memvar API system */
 extern void     hb_memvarsRelease( void ); /* clear all PUBLIC and PRIVATE variables */

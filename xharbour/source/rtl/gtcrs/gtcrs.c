@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.19 2003/06/27 20:58:02 druzus Exp $
+ * $Id: gtcrs.c,v 1.20 2003/06/30 17:08:57 ronpinkas Exp $
  */
 
 /*
@@ -86,8 +86,10 @@
 /* this variable should be global and checked in main VM loop */
 static volatile BOOL s_BreakFlag = FALSE;
 static volatile BOOL s_InetrruptFlag = FALSE;
-
 static volatile BOOL s_WinSizeChangeFlag = FALSE;
+
+static volatile BOOL s_SignalFlag = FALSE;
+static volatile BOOL s_SignalTable[MAX_SIGNO];
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 
@@ -191,6 +193,7 @@ static int s_iActive_ioBase = -1;
 static void set_tmevt(char *cMBuf, mouseEvent *);
 static int getMouseKey(mouseEvent *);
 static void destroy_ioBase(InOutBase *ioBase);
+static void sig_handler(int signo);
 
 typedef struct ClipKeyCode {
     int key;
@@ -377,11 +380,26 @@ static int getClipKey(int nKey)
     return nRet;
 }
 
+static void set_sig_handler( int iSig )
+{
+    struct sigaction act;
+
+    sigaction( iSig, 0, &act );
+    act.sa_handler = sig_handler;
+    act.sa_flags = SA_RESTART | (iSig == SIGCHLD ? SA_NOCLDSTOP : 0);
+    sigaction( iSig, &act, 0 );
+}
+
 #if 1
 static void sig_handler(int signo)
 {
     int e = errno, stat;
     pid_t pid;
+
+    if( signo < MAX_SIGNO ) {
+	s_SignalTable[signo] = TRUE;
+	s_SignalFlag = TRUE;
+    }
 
     switch( signo ) {
       case SIGCHLD:
@@ -408,17 +426,18 @@ static void sig_handler(int signo)
 
 static void set_signals()
 {
-    struct sigaction act;
     int i, sigs[] = { SIGINT, SIGQUIT, SIGTSTP, SIGWINCH, SIGCHLD, 0 };
+
+    s_SignalFlag = FALSE;
+    for (i=1; i<MAX_SIGNO; ++i) {
+	s_SignalTable[i] = FALSE;
+    }
 
     /* Ignore SIGPIPEs so they don't kill us. */
     signal( SIGPIPE, SIG_IGN );
 
     for ( i = 0; sigs[i]; ++i ) {
-	sigaction( sigs[i], 0, &act );
-	act.sa_handler = sig_handler;
-	act.sa_flags = SA_RESTART | (sigs[i] == SIGCHLD ? SA_NOCLDSTOP : 0);
-	sigaction( sigs[i], &act, 0 );
+	set_sig_handler( sigs[i] );
     }
 }
 
@@ -472,14 +491,12 @@ static void sig_handler(int signo)
 
 static void set_signals()
 {
-    struct sigaction act;
     int i;
 
-    for (i=1; i<32; ++i) {
-	sigaction( i, 0, &act );
-	act.sa_handler = sig_handler;
-	act.sa_flags = SA_NOCLDSTOP | SA_RESTART;
-	sigaction( i, &act, 0);
+    s_SignalFlag = FALSE;
+    for (i=1; i<MAX_SIGNO; ++i) {
+	s_SignalTable[i] = FALSE;
+	set_sig_handler( i );
     }
 }
 #endif
@@ -3032,6 +3049,28 @@ void HB_GT_FUNC(gt_SetDebugKey( int iDebug ))
 
 /* *********************************************************************** */
 
+BOOL HB_GT_FUNC(gt_GetSignalFlag( int iSig ))
+{
+    BOOL bRetVal = FALSE;
+
+    if ( iSig > 0 && iSig < MAX_SIGNO && s_SignalTable[iSig] )
+    {
+	bRetVal = TRUE;
+	s_SignalTable[iSig] = FALSE;
+    }
+
+    return bRetVal;
+}
+
+/* *********************************************************************** */
+
+void HB_GT_FUNC(gt_CatchSignal( int iSig ))
+{
+    set_sig_handler( iSig );
+}
+
+/* *********************************************************************** */
+
 int HB_GT_FUNC(gt_Shft_Pressed())
 {
     return ( s_ioBase->key_flag & KEY_CTRLMASK ) != 0 &&
@@ -3110,8 +3149,6 @@ void HB_GT_FUNC(gt_SetKeyCP( char * pszTermCDP, char * pszHostCDP ))
     if ( !pszHostCDP || !*pszHostCDP )
     {
         pszHostCDP = s_cdpage->id;
-        if ( !pszHostCDP )
-            pszHostCDP = pszTermCDP;
     }
 
     if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )

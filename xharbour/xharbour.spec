@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.13 2003/06/27 20:57:58 druzus Exp $
+# $Id: xharbour.spec,v 1.14 2003/07/16 17:03:02 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -16,7 +16,7 @@
 
 %define name     xharbour
 %define dname    xHarbour
-%define version  0.81.0
+%define version  0.82.0
 %define releasen 0
 %define platform rh73
 %define prefix   /usr
@@ -58,7 +58,7 @@ Source:         %{name}-%{version}.src.tar.gz
 Packager:       Przemys³aw Czerpak <druzus@polbox.com> Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
 BuildPrereq:    gcc binutils bash bison ncurses ncurses-devel slang-devel gpm-devel
 Requires:       gcc binutils bash sh-utils %{name}-lib = %{version}
-Provides:       %{name}
+Provides:       %{name} harbour
 BuildRoot:      /tmp/%{name}-%{version}-root
 
 %description
@@ -668,17 +668,19 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/include/%{name}/*
 
 %files static
+%defattr(-,root,root,755)
 %dir %{prefix}/lib/%{name}
 %{prefix}/lib/%{name}/*.a
 
 %files lib
+%defattr(-,root,root,755)
 %dir %{prefix}/lib/%{name}
 %{prefix}/lib/%{name}/*.so
 %{prefix}/lib/*.so
 
 %files pp
+%defattr(-,root,root,755)
 %doc tests/pp.txt
-%doc tests/*.txt
 %{prefix}/bin/pp
 %{prefix}/bin/pprun
 
@@ -687,6 +689,10 @@ rm -rf $RPM_BUILD_ROOT
 ######################################################################
 
 %changelog
+* Wed Jul 23 2003 Przemyslaw Czerpak <druzus@polbox.com>
+- fixed file (user and group) owner for RPMs builded from non root account
+- 0.82 version set
+
 * Wed Apr 30 2003 Przemyslaw Czerpak <druzus@polbox.com>
 - new tool "%{hb_pref}-build" (%{hb_pref}cmp, %{hb_pref}lnk, %{hb_pref}mk) added -
   compiler/linker wrapper.

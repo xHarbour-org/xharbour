@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.10 2003/04/18 01:51:26 lculik Exp $
+ * $Id: hbrddntx.h,v 1.11 2003/05/31 22:26:54 lculik Exp $
  */
 
 /*
@@ -103,7 +103,7 @@ struct _NTXINDEX;
 
 typedef struct _KEYINFO
 {
-   // PHB_ITEM pItem;
+   /* PHB_ITEM pItem; */
    LONG     Tag;
    LONG     Xtra;
    char     key[ 1 ]; /* value of key */
@@ -342,7 +342,7 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
 #define ntxSkipFilter            NULL
 static ERRCODE ntxSkipRaw( NTXAREAP pArea, LONG lToSkip );
 #define ntxAddField              NULL
-// static ERRCODE ntxAppend( NTXAREAP pArea, BOOL bUnLockAll );
+/* static ERRCODE ntxAppend( NTXAREAP pArea, BOOL bUnLockAll ); */
 #define ntxAppend                NULL
 #define ntxCreateFields          NULL
 #define ntxDeleteRec             NULL

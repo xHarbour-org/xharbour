@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1281 2003/07/23 00:23:06 mlombardo Exp $
+ * $Id: ChangeLog,v 1.1282 2003/07/23 09:43:31 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,47 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-23 14:10 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/xharbour.spec
+    ! fixed file (user and group) owner for RPMs builded from non root
+      account
+    * version set to 0.82
+
+  * xharbour/make_tgz.sh
+  * xharbour/xharbour.spec
+  * xharbour/bin/!pack_src.sh
+    * version set to 0.82
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+  * xharbour/source/rtl/gtnul/gtext.c
+    ! small fix in HB_SETTERMCP
+
+  * xharbour/include/hbapi.h
+    * remove redundant and not guarded with HB_LONG_LONG_OFF
+      declaration of hb_stornll(...)
+    * replaced ISO C99 comments (//) with /* */
+
+  * xharbour/include/hbdefs.h
+    * guard [U]LONGLONG declaration with HB_LONG_LONG_OFF
+    * replaced ISO C99 comments (//) with /* */
+
+  * xharbour/include/hbpcode.h
+  * xharbour/include/hbpp.h
+  * xharbour/include/hbrddntx.h
+  * xharbour/include/hbrddwrk.h
+  * xharbour/include/hbsetup.h
+  * xharbour/include/inet.h
+  * xharbour/include/thread.h
+    * replaced ISO C99 comments (//) with /* */
+
+  * xharbour/source/rtl/abs.c
+    * guard hb_itemGetNLL(...) with HB_LONG_LONG_OFF
+
+  * xharbour/source/rtl/hbsrlraw.c
+    * modified hb_createlen8(...) and hb_getlen8(...) to work with
+      HB_LONG_LONG_OFF - Giancarlo, can you look at it?
 
 2003-07-23 02:37 UTC-0800 Brian Hays <bhays@abacuslaw.com>
   * tests/pp.txt
