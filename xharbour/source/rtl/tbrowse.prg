@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.88 2002/09/02 15:32:50 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.10 2002/08/25 19:20:38 map Exp $
  */
 
 /*
@@ -268,7 +268,7 @@ METHOD New(nTop, nLeft, nBottom, nRight) CLASS TBrowse
    ::nRow            := 0
    ::nCol            := 0
    ::aSetStyle       := ARRAY( 4096 )
-
+   
    ::aSetStyle[ TBR_APPEND ]    := .f.
    ::aSetStyle[ TBR_APPENDING ] := .f.
    ::aSetStyle[ TBR_MODIFY ]    := .f.
@@ -301,6 +301,7 @@ METHOD Configure(nMode) CLASS TBrowse
 
    local n, nHeight
    local nLeft,nRight
+   Local oCol
 
    ::lHeaders := .F.
    ::lFooters := .F.
@@ -490,12 +491,12 @@ METHOD SetColumnWidth( oCol ) CLASS TBrowse
 
    LOCAL xRes, cType, nTokenPos := 0, nL, cHeading
    LOCAL nWidthMax := ::nRight - ::nLeft +1    // Visible width of TBrowse
-   LOCAL nWidth := 0, nColWidth := 0, nLen := 0
+   LOCAL nWidth := 0,nColWidth:=0,nLen:=0
 
-
+   
    // if oCol has :Width property set I use it
-   if oCol:Width <> nil
-      nWidth := Min(oCol:Width, nWidthMax - 2)
+   if oCol:Width <> nil //.AND. oCol:Width < (nWidthMax - 4)
+      nWidth := oCol:Width
 
    else
       if ISBLOCK( oCol:block )
@@ -507,18 +508,18 @@ METHOD SetColumnWidth( oCol ) CLASS TBrowse
                nLen := Len( Str( xRes ) )
 
             case cType == "L"
-               nLen := 1
+               nLen:=1
 
             case cType == "C"
                nLen := Len( xRes )
 
             case cType == "D"
-                nLen := Len(DToC( xRes ) )
+                nLen=  len(DToC( xRes ) )
 
             otherwise
                nLen := 0
-
          endcase
+         
 
          cHeading := oCol:Heading + ";"
          while (nL := Len(__StrTkPtr(@cHeading, @nTokenPos, ";"))) > 0
@@ -526,10 +527,14 @@ METHOD SetColumnWidth( oCol ) CLASS TBrowse
          enddo
       endif
 
-      nWidth:= Min(iif(nColwidth > nLen, nColwidth, nLen), nWidthMax - 2)
-
+    if nColWidth>nWidthMax
+        nColWidth:=nWidthMax
+    endif
+    if nlen>nWidthMax
+        nLen:=nWidthMax
+    endif
+    nWidth:= if(nColwidth>nLen,nColwidth,nLen)
    endif
-
 return nWidth
 
 
@@ -802,7 +807,7 @@ METHOD Hilite() CLASS TBrowse
 
    // Put cursor back on first char of cell value
    SetPos(nRow, nCol)
-
+   
  #ifdef HB_COMPAT_C53
    ::nRow := nRow
    ::nCol := nCol
@@ -814,7 +819,7 @@ return Self
 METHOD PosCursor() CLASS TBrowse
 
    local nRow := ::nTop + ::RowPos + iif(::lHeaders, ::nHeaderHeight, 0) + iif(Empty(::HeadSep), 0, 1) - 1
-   local nCol
+   local nCol 
    local cType := ValType( Eval( ::aColumns[ ::ColPos ]:block ) )
 
    nCol := ::aColumns[ ::ColPos ]:ColPos + iif(cType == "L", ::aColsWidth[::ColPos] / 2, 0 )
@@ -1306,10 +1311,10 @@ METHOD DispCell( nColumn, nColor ) CLASS TBrowse
 
    do case
    case cType $ "CM"
-      DispOut( PadL(Transform(ftmp, cPict), nWidth ), cColor )
+      DispOut( PadR(Transform(ftmp, cPict), nWidth ), cColor )
 
    case cType == "N"
-      DispOut( PadR(Transform(ftmp, cPict), nWidth ), cColor )
+      DispOut( PadL(Transform(ftmp, cPict), nWidth ), cColor )
 
    case cType == "D"
       cPict := iif(cPict == "", "@D", cPict)
@@ -1520,7 +1525,6 @@ function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
 
       Local1 := oBrowse:mrowpos - oBrowse:rowpos
 
-
       do while ( Local1 < 0 )
          Local1++
          oBrowse:up()
@@ -1550,9 +1554,9 @@ function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
 
 Method hitTest(mrow,mcol) CLASS TBROWSE
   local i
+  Local nCol
   ::mRowPos := ::rowPos
   ::mColPos := ::colPos
-
 
   if mRow< ::rect[1] .or. mRow > ::rect[3]
      return HTNOWHERE
@@ -1585,6 +1589,6 @@ METHOD SetStyle( nMode, lSetting ) CLASS TBROWSE
   IF ISLOGICAL( lSetting )
      ::aSetStyle[ nMode ] := lSetting
   ENDIF
-
+ 
 RETURN lRet
 #endif
