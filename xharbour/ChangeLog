@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1649 2003/11/03 05:28:44 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1650 2003/11/03 06:07:02 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,48 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-03 12:10 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+
+  * include\common.ch
+    * changed #translate to #xtrans... to avoid compile errors with
+      shorter instances of the tokens, such as TSBrowse's func IsChar
+
+  * contrib/rdd_ads/ads1.c
+    + added bTestRecLocks handling in adsPutValue
+
+  * contrib/rdd_ads/adsfunc.c
+    + added AdsTestRecLocks( lOnOff )
+    + added AdsVersion([<nType>]), copied from Harbour.
+    SEE DISCUSSION BELOW
+
+  * source\rtl\persist.prg
+      * removed tracelog
+      + added lIgnoreBadIVars to LoadFromFile and LoadFromText
+         Once you distribute an app that stores any properties in memos
+         or text files, if you modify the class and remove an ivar the Load
+         would throw a "No message" error trying to read the obsolete
+         ivar. Now just pass a second parameter of .t. and errors in
+         macro expanding each line are ignored.
+
+
+   ADS has Implicit Record locking that can mask programming errors.
+   Implicit locking can occur the first time a value is written to a
+   field with no lock in effect. The lock can potentially remain in
+   effect indefinitely if the record pointer is not moved, causing
+   bugs later in program execution that are hard to find.
+
+   The bTestRecLocks flag can be set using
+         AdsTestRecLocks( lOnOff )        in adsfunc.c.
+   If ON, we see if the file is open exclusively or locked, and whether
+   the record has been explicitly locked already. If not, we throw
+   an error so the developer can catch the missing lock condition.
+   For performance reasons, Release code should leave this OFF.
+      Although the call to AdsIsRecordLocked is documented as a client
+      call, not a server request, and should be fast, it will be
+      called for EACH FIELD as it is assigned a value.
+   Thanks to Randy Portnoff for the idea!
+
 
 2003-11-03 07:10 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * sitesvr/Makefile

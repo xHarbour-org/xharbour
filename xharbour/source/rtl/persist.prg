@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.12 2003/05/26 00:19:15 ronpinkas Exp $
+ * $Id: persist.prg,v 1.13 2003/06/19 04:55:54 ronpinkas Exp $
  */
 
 /*
@@ -70,24 +70,28 @@ extern HB_STOD
 CLASS HBPersistent
 
    METHOD CreateNew() INLINE Self
-   METHOD LoadFromFile( cFileName ) INLINE ::LoadFromText( MemoRead( cFileName ) )
-   METHOD LoadFromText( cObjectText )
+   METHOD LoadFromFile( cFileName, lIgnoreBadIVars ) INLINE ::LoadFromText( MemoRead( cFileName ), lIgnoreBadIVars )
+   METHOD LoadFromText( cObjectText, lIgnoreBadIVars )
    METHOD SaveToText( cObjectName )
    METHOD SaveToFile( cFileName ) INLINE MemoWrit( cFileName, ::SaveToText() )
 
 ENDCLASS
 
-METHOD LoadFromText( cObjectText ) CLASS HBPersistent
+METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
 
    EXTERN HB_RestoreBlock
 
    LOCAL nLines := MLCount( cObjectText, 254 )
    LOCAL nLine  := 1, cLine, cToken
    LOCAL lStart := .T., aObjects := {}, nObjectLevel := 0
-   LOCAL cTextCopy, nAt
+   LOCAL cTextCopy, nAt, e
 
    MEMVAR oObject
    PRIVATE oObject := QSelf()
+
+   IF lIgnoreBadIVars == nil
+      lIgnoreBadIVars := .f.
+   ENDIF
 
    cLine := RTrim( MemoLine( cObjectText, 254, 1 ) )
 
@@ -130,7 +134,13 @@ METHOD LoadFromText( cObjectText ) CLASS HBPersistent
             cLine := "oObject" + SubStr( cLine, 2 )
 
             //TraceLog( cLine )
-            &( cLine )
+            IF lIgnoreBadIVars
+               TRY
+                  &( cLine )
+               END
+            ELSE
+               &( cLine )
+            ENDIF
 
          CASE Left( cLine, 6 ) == "ARRAY "
             cLine = SubStr( cLine, 8 )
@@ -163,7 +173,7 @@ METHOD LoadFromText( cObjectText ) CLASS HBPersistent
             ENDIF
 
          OTHERWISE
-            TraceLog( cLine )
+            // TraceLog( cLine )
       ENDCASE
 
       nLine++

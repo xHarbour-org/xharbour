@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.21 2003/10/13 00:03:46 druzus Exp $
+ * $Id: ads1.c,v 1.22 2003/11/02 02:57:47 toninhofwi Exp $
  */
 
 /*
@@ -61,6 +61,7 @@
 #include "hbinit.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
+#include "hbdbferr.h"
 #include "hbapilng.h"
 #include "hbdate.h"
 #include "rddads.h"
@@ -82,6 +83,7 @@ extern int adsFileType;                 /* current global setting */
 extern int adsLockType;
 extern int adsRights;
 extern int adsCharType;
+extern BOOL bTestRecLocks;
 extern BOOL bDictionary;
 extern ADSHANDLE adsConnectHandle;
 
@@ -140,7 +142,7 @@ void adsSetListener_callback( HB_set_enum setting, HB_set_listener_enum when )
 
 /* Possible TODO?
          case HB_SET_MFILEEXT   :
-            if( hb_set.HB_SET_MFILEEXT ) 
+            if( hb_set.HB_SET_MFILEEXT )
             {
                hb_retc( hb_set.HB_SET_MFILEEXT );
             }
@@ -258,7 +260,7 @@ static BOOL hb_nltoa( LONG lValue, char * szBuffer, USHORT uiLen )
          break;
       }
    }
-   
+
    if( lValue < 0 )
    {
       if( szBuffer[ 0 ] != ' ' )
@@ -373,7 +375,7 @@ static BOOL hb_adsUnLockAllRecords( ADSAREAP pArea )
             }
          }
       }
-      while( AdsGetAllLocks( pArea->hTable, 
+      while( AdsGetAllLocks( pArea->hTable,
               aulLocks, &pusArrayLen ) == AE_INSUFFICIENT_BUFFER );
    }
    return 1;
@@ -1367,14 +1369,50 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    LPFIELD pField;
    USHORT uiCount;
    BYTE * szText;
-   BOOL bError = TRUE;
+   BOOL bTypeError = TRUE;
    long lDay, lMonth, lYear;
 
    UNSIGNED8 pucFormat[ 11 ];
    UNSIGNED16 pusLen = 10;
-   UNSIGNED32 ulRetVal;
+   UNSIGNED32 ulRetVal = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("adsPutValue(%p, %hu, %p)", pArea, uiIndex, pItem));
+
+   /* -----------------10/30/2003 3:54PM----------------
+
+      ADS has Implicit Record locking that can mask programming errors.
+      Implicit locking can occur the first time a value is written to a
+      field with no lock in effect. The lock can potentially remain in
+      effect indefinitely if the record pointer is not moved.
+
+      The bTestRecLocks flag can be set using
+          AdsTestRecLocks( lOnOff )        in adsfunc.c.
+      If ON, we see if the file is open exclusively or locked, and whether
+      the record has been explicitly locked already. If not, we throw
+      an error so the developer can catch the missing lock condition.
+      For performance reasons, Release code should leave this OFF.
+         Although the call to AdsIsRecordLocked is documented as a client
+         call, not a server request, and should be fast, it will be
+         called for EACH FIELD as it is assigned a value.
+
+    --------------------------------------------------*/
+   if( bTestRecLocks && pArea->fShared && !pArea->fFLocked )
+   {
+      UNSIGNED16 pbLocked = FALSE;
+
+      ulRetVal = AdsIsRecordLocked( pArea->hTable, 0, &pbLocked ) ;
+      if( ulRetVal != AE_SUCCESS )
+      {
+         hb_errRT_DBCMD( EG_LOCK, 0, "in adsPutValue", "ADSISRECORDLOCKED" );
+      }
+
+      if( !pbLocked  )
+      {
+         commonError( pArea, EG_UNLOCKED, EDBF_UNLOCKED, NULL );
+         //hb_errRT_DBCMD( EG_LOCK, EDBF_UNLOCKED, "Record not locked", "adsPutValue" );
+      }
+   }
+
 
    if( pArea->uiParents )
    {
@@ -1397,66 +1435,101 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_IT_STRING:
          if( HB_IS_STRING( pItem ) )
          {
+            bTypeError = FALSE;
             uiCount = ( USHORT ) hb_itemGetCLen( pItem );
             if( uiCount > pField->uiLen )
             {
                uiCount = pField->uiLen;
             }
-            AdsSetString( pArea->hTable, ADSFIELD( uiIndex ), (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
-            bError = FALSE;
+
+            ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ), (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
+
          }
          break;
 
       case HB_IT_LONG:
          if( HB_IS_NUMERIC( pItem ) )
          {
+            bTypeError = FALSE;
             ulRetVal = AdsSetDouble( pArea->hTable, ADSFIELD( uiIndex ), hb_itemGetND( pItem ) );
-            if( ulRetVal != AE_DATA_TOO_LONG )
-            {
-               bError = FALSE;
-            }
          }
          break;
 
       case HB_IT_DATE:
          if( HB_IS_DATE( pItem ) )
          {
+            bTypeError = FALSE;
             AdsGetDateFormat  ( pucFormat, &pusLen );
             AdsSetDateFormat  ( (UNSIGNED8*)"YYYYMMDD" );
             hb_dateDecode( hb_itemGetDL( pItem ), &lYear, &lMonth, &lDay );
             hb_dateStrPut( ( char * ) szText, lYear, lMonth, lDay );
-            AdsSetDate( pArea->hTable, ADSFIELD( uiIndex ), szText, 8 );
+            ulRetVal = AdsSetDate( pArea->hTable, ADSFIELD( uiIndex ), szText, 8 );
             AdsSetDateFormat  ( pucFormat );
-            bError = FALSE;
          }
          break;
 
       case HB_IT_LOGICAL:
          if( HB_IS_LOGICAL( pItem ) )
          {
+            bTypeError = FALSE;
             *szText = hb_itemGetL( pItem ) ? 'T' : 'F';
-            bError = FALSE;
-            AdsSetLogical( pArea->hTable, ADSFIELD( uiIndex ), hb_itemGetL( pItem ) );
+            ulRetVal = AdsSetLogical( pArea->hTable, ADSFIELD( uiIndex ), hb_itemGetL( pItem ) );
          }
          break;
 
       case HB_IT_MEMO:
          if( HB_IS_STRING( pItem ) )
          {
+            bTypeError = FALSE;
             uiCount = ( USHORT ) hb_itemGetCLen( pItem );
-            AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
+            ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
                (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
-            bError = FALSE;
          }
          break;
    }
 
-   if( bError )
+   if( bTypeError )
    {
       commonError( pArea, EG_DATATYPE, 1020, NULL );
       pArea->fRecordChanged = FALSE;
+      /* bh:
+         It seems wrong for this to be reset if OTHER fields have been
+         written successfully already. But
+         this flag is apparently not used by RDDADS. It has been there
+         since the beginning and may be implmented later. In the
+         internal RDDs it is apparently just used as a short-circuit flag for
+         avoiding repeated calls to GoHot, a method rddads never used.
+         If in fact GoHot does get implemented, it may be better if
+         fRecordChanged *is* set to False in case error handling is
+         retrying and another call to GoHot may be desirable.
+         If this happens, this needs to be integrated to the other error
+         conditions handled below.
+      */
       return FAILURE;
    }
+
+   if( ulRetVal != AE_SUCCESS )
+   {
+      if( ulRetVal == AE_LOCK_FAILED || ulRetVal == AE_RECORD_NOT_LOCKED )
+      {
+         commonError( pArea, EG_UNLOCKED, EDBF_UNLOCKED, NULL );
+      }
+      else if( ulRetVal == AE_TABLE_READONLY )
+      {
+         commonError( pArea, EG_READONLY, EDBF_READONLY, NULL );
+      }
+      else if( ulRetVal == AE_DATA_TOO_LONG )
+      {
+         commonError( pArea, EG_WRITE, (USHORT) ulRetVal, NULL );
+      }
+      else
+      {
+         commonError( pArea, EG_WRITE, EDBF_WRITE, NULL );
+      }
+
+      return FAILURE;
+   }
+
    pArea->fRecordChanged = TRUE;
    return SUCCESS;
 }
@@ -1892,7 +1965,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 	  // If the Advantage Data Dictionary open fails with an error indicating that this table is not
 	  // in the dictionary, OR if we are not using a ditionary at all, try the open with standard settings.
 	  // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
-      if( !bDictionary || ulLastErr==5132L )
+      if( !bDictionary || ulLastErr == 5132L )
       {
          ulRetVal = AdsOpenTable  ( 0, pOpenInfo->abName, pOpenInfo->atomAlias,
                   pArea->iFileType, adsCharType, adsLockType, adsRights,
@@ -2289,7 +2362,7 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 
    if( !pArea->lpdbOrdCondInfo || ( pArea->lpdbOrdCondInfo->fAll &&
                                     !pArea->lpdbOrdCondInfo->fAdditive ) )
-   {                                 
+   {
       SELF_ORDLSTCLEAR( ( AREAP ) pArea );
    }
 

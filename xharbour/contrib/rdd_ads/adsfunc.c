@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.20 2003/11/01 16:09:58 toninhofwi Exp $
+ * $Id: adsfunc.c,v 1.21 2003/11/02 02:57:47 toninhofwi Exp $
  */
 
 /*
@@ -75,8 +75,20 @@ int adsRights = 1;
 int adsCharType = ADS_ANSI;
 ADSHANDLE adsConnectHandle = 0;
 BOOL bDictionary = FALSE;               /* Use Data Dictionary? */
+BOOL bTestRecLocks = FALSE;             /* Debug Implicit locks */
 
 PHB_ITEM itmCobCallBack = 0;
+
+HB_FUNC( ADSTESTRECLOCKS )              /* Debug Implicit locks Set/Get call */
+{
+   BOOL oldSetting = bTestRecLocks;
+
+   if( ISLOG(1) )
+      bTestRecLocks = hb_parl( 1 );
+
+   hb_retl( oldSetting );
+}
+
 
 HB_FUNC( ADSSETFILETYPE )
 {
@@ -1651,6 +1663,34 @@ HB_FUNC( ADSREINDEX )
       hb_retl( 0 );
    }
 }
+
+HB_FUNC( ADSVERSION )
+{
+   int iVersionType = ISNUM(1) ? hb_parni(1) : 0;
+   UNSIGNED32 ulMajor;
+   UNSIGNED32 ulMinor;
+   UNSIGNED8  ucLetter;
+   UNSIGNED8  ucDesc[128];
+   UNSIGNED16 usDescLen = sizeof(ucDesc) - 1;
+   char ucVersion[256];
+
+   AdsGetVersion( &ulMajor, &ulMinor, &ucLetter, ucDesc, &usDescLen);
+
+   switch(iVersionType)
+   {
+   case 0:
+      sprintf(ucVersion, "%ld.%ld%c", ulMajor, ulMinor, ucLetter);
+      break;
+   case 3:
+      sprintf(ucVersion, "%s, v%ld.%ld%c", (char *)ucDesc, ulMajor, ulMinor, ucLetter);
+      break;
+   default:
+      ucVersion[0] = 0;
+   }
+
+   hb_retc(ucVersion);
+}
+
 
 #ifdef ADS_REQUIRE_VERSION6
 
