@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.27 2003/08/12 23:34:06 ronpinkas Exp $
+ * $Id: set.c,v 1.28 2003/08/25 17:00:42 lculik Exp $
  */
 
 /*
@@ -865,7 +865,7 @@ HB_FUNC( SET )
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
             /* Check is the Passed String is a file or an Windows Printer Name or Windows Printer Job Name*/
-           if (hb_stricmp(szResult,"JOB:") == 0)  /* Check for an Printer Name */
+           if (hb_stricmp(szResult,"WIN:") == 0)  /* Check for an Printer Name */
                bOpen=FALSE;
 
            if (hb_stricmp(szResult,"JOB:") == 0)  /* Check for an Jobname*/
