@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.55 2003/03/27 02:07:41 lculik Exp $
+ * $Id: hbmake.prg,v 1.56 2003/03/27 07:44:56 ronpinkas Exp $
  */
 /*
  * Harbour Project source code:
@@ -1136,7 +1136,7 @@ FUNC CreateMakeFile( cFile )
       aUserDefs := ListasArray2(Alltrim( cUserDef ), ";")
 
       FOR EACH cCurrentDef in aUserDefs
-         cDefHarOpts += " -D" + Alltrim( aUserDefs ) + " "
+         cDefHarOpts += " -D" + Alltrim( cCurrentDef ) + " "
       NEXT
 
    ENDIF
@@ -2098,7 +2098,7 @@ FUNC CreateLibMakeFile( cFile )
       aUserDefs := ListasArray2(Alltrim( cUserDef ), ";")
 
       FOR EACH cCurrentDef in aUserDefs
-         cDefHarOpts += " -D" + Alltrim( aUserDefs ) + " "
+         cDefHarOpts += " -D" + Alltrim( cCurrentDef ) + " "
       NEXT
    ENDIF
 
