@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallvc.bat,v 1.9 2004/01/16 16:54:37 paultucker Exp $
+rem $Id: makallvc.bat,v 1.10 2004/02/20 09:07:08 paultucker Exp $
 rem 
 
 echo creating system files
@@ -8,6 +8,13 @@ call make_vc %1
 
 echo harbour.dll
 call dll_vc %1
+if errorlevel 1 goto end
+
+:design
+echo design
+cd contrib\design
+call make_vc.bat %1
+cd ..\..
 if errorlevel 1 goto end
 
 :firebird
@@ -119,9 +126,10 @@ cd ..\..
 if errorlevel 1 goto end
 
 :xhwgui
+if not exist contrib\xhwgui\make_vc.bat goto xVisual
 echo xhwgui
 cd contrib\xhwgui
-if exist make_vc.bat call make_vc.bat %1
+call make_vc.bat %1
 cd ..\..
 if errorlevel 1 goto end
 

@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallbc.bat,v 1.8 2004/01/16 16:54:37 paultucker Exp $
+rem $Id: makallbc.bat,v 1.9 2004/02/20 09:07:08 paultucker Exp $
 rem 
 
 echo create system files
@@ -8,6 +8,13 @@ call make_b32 %1
 
 echo harbour.dll
 call dll_b32 %1
+if errorlevel 1 goto end
+
+:design
+echo design
+cd contrib\design
+call make_b32.bat %1
+cd ..\..
 if errorlevel 1 goto end
 
 :firebird
@@ -120,9 +127,10 @@ cd ..\..
 if errorlevel 1 goto end
 
 :xhwgui
+if not exist contrib\xhwgui\make_b32.bat goto xVisual
 echo xhwgui
 cd contrib\xhwgui
-if exist make_b32.bat call make_b32.bat %1
+call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end
 
