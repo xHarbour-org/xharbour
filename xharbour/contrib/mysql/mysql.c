@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.8 2004/03/17 01:24:04 lculik Exp $
+ * $Id: mysql.c,v 1.9 2004/03/18 03:53:14 ronpinkas Exp $
  */
 
 /*
@@ -330,14 +330,14 @@ HB_FUNC(SQLSRVINFO)
    hb_retc((char *) mysql_get_server_info( (MYSQL *)_parnl(1) ) );
 }
 
-#ifdef __GNUC__
+//#ifdef __GNUC__
 long filelength( int handle )
 {
     long nEnd = hb_fsSeek( handle, 0 , 2 );
     long nStart = hb_fsSeek( handle , 0 , 0 );
     return nEnd - nStart;
 }
-#endif
+//#endif
 
 
 HB_FUNC(DATATOSQL)
@@ -387,28 +387,31 @@ HB_FUNC(FILETOSQLBINARY)
      if ( fHandle > 0 )
      {
        iSize      = filelength( fHandle );
-       FromBuffer = ( char *) hb_xgrab( iSize );
-       if ( FromBuffer )
+       if ( iSize > 0 )
        {
-         iSize      = hb_fsReadLarge( fHandle , ( BYTE * ) FromBuffer , iSize );
-         if ( iSize )
+         FromBuffer = ( char *) hb_xgrab( iSize );
+         if ( FromBuffer )
          {
-           ToBuffer   = ( char *) hb_xgrab( ( iSize*2 ) + 1 );
-           if ( ToBuffer )
+           iSize      = hb_fsReadLarge( fHandle , ( BYTE * ) FromBuffer , iSize );
+           if ( iSize > 0 )
            {
-             if ISNUM(2)
+             ToBuffer   = ( char *) hb_xgrab( ( iSize*2 ) + 1 );
+             if ( ToBuffer )
              {
-               iSize = mysql_real_escape_string( (MYSQL *) hb_parnl(2), ToBuffer, FromBuffer, iSize);
+               if ISNUM(2)
+               {
+                 iSize = mysql_real_escape_string( (MYSQL *) hb_parnl(2), ToBuffer, FromBuffer, iSize);
+               }
+               else
+               {
+                 iSize = mysql_escape_string( ToBuffer, FromBuffer, iSize);
+               }
+               hb_retclenAdopt( ( char *) ToBuffer, iSize);
+               bResult = TRUE ;
              }
-             else
-             {
-               iSize = mysql_escape_string( ToBuffer, FromBuffer, iSize);
-             }
-             hb_retclenAdopt( ( char *) ToBuffer, iSize);
-             bResult = TRUE ;
            }
+           hb_xfree( FromBuffer );
          }
-         hb_xfree( FromBuffer );
        }
        hb_fsClose( fHandle );
      }
