@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2297 2004/02/15 20:21:38 andijahja Exp $
+ * $Id: ChangeLog,v 1.2298 2004/02/15 21:58:41 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-15 19:04 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * contrib/libct/files.c
+    ! minor fix to filedelete
+  * Changelog
+    ! corrected entry
 
 2004-02-15 14:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/eval.c
@@ -60,7 +66,7 @@
       mouse events (or other kind of events), and also unicode characters
       in future.
 
-2004-02-15 09:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+2004-02-15 09:00 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   * contrib/libct/files.c
     ! fixed to FILEDELETE function provided by Eduardo(eduardo@modalsistems.com.br
   * source/rtl/treport.prg
