@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.21 2003/09/14 09:27:23 paultucker Exp $
+ * $Id: gtwin.c,v 1.22 2003/10/06 03:29:00 lculik Exp $
  */
 
 /*
@@ -1229,6 +1229,7 @@ static int IgnoreKeyCodes( int wKey )
 int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
     int ch = 0, extended = 0;
+    int i_mouseLast = 0;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
 
