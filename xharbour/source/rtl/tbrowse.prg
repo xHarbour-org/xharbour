@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.31 2003/04/01 22:18:05 iananderson Exp $
+ * $Id: tbrowse.prg,v 1.32 2003/04/04 19:04:33 walito Exp $
  */
 
 /*
@@ -382,6 +382,10 @@ METHOD Configure( nMode ) CLASS TBrowse
    local n, nHeight, aCol, xVal, nFreeze, oErr
 
    default nMode to 0
+
+   if ::nColPos > ::nColumns
+      ::nColPos := ::nColumns
+   endif
 
    if nMode < 2 .or. ::lNeverDisplayed
 
