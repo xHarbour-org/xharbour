@@ -457,7 +457,8 @@ METHOD OnLButtonDown( wParam, x, y )
 
    hDC:=GetDC(::Handle)
    SetTextColor(hDC,RGB(255,255,128))
-   SetBkColor(hDC,RGB(0,0,128))
+
+   SetBkColor(hDC,RGB(0,0,125))
 
    IF len(::aSelected) > 1
       FOR EACH a In ::aSelected

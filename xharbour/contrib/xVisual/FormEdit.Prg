@@ -33,7 +33,7 @@ GLOBAL EXTERNAL hThisInstance
                                     ::Editing := .F.        ,;
                                     ::aCtrl   := {}         ,;
                                     ::left    := 200        ,;
-                                    ::top     := 160        ,;
+                                    ::top     := 130        ,;
                                     ::width   := 600        ,;
                                     ::height  := 350        ,;
                                     ::xGrid   := 8          ,;

@@ -53,6 +53,7 @@ FUNCTION Main
                :AddButton( "View",         ToolButton():New(12,,'View',22 ) )
                :AddButton( "Files",        ToolButton():New(13,,'Files',23) )
 
+               SendMessage( :handle, TB_SETROWS, 2 )
                // ----------------------------------------------------   set imagelist
                hImg1:= ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
                hBmp := LoadImage( hInstance(), "XMAKE", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
@@ -61,7 +62,7 @@ FUNCTION Main
                SendMessage( :handle, TB_SETIMAGELIST, 0, hImg1 )
                //---------------------------------------------------------------------
             END
-            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK , :Tools:handle, 110, 26, 150 , "", NIL )
+            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :Tools:handle, 200, 52, 200, "", NIL )
 
             WITH OBJECT :Add( 'Tabs', TTabControl():New( oApp:MainFrame:Rebar, 445,  0,  0,  0,  0) )
                :AddTab( "Standard" )
@@ -74,13 +75,13 @@ FUNCTION Main
                :AddTab( "Samples" )
                :AddTab( "Activex" )
             END
-            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK, :Tabs:handle, 650, 60, , "", NIL )
+            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :Tabs:handle, 550, 56, , "", NIL )
             :Tabs:Configure()
             
             WITH OBJECT :Tabs:Tabs[1]
                WITH OBJECT :Add( 'TabBand', TRebar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1] ) )
                   :SetStyle( WS_BORDER, .F. )
-                  WITH OBJECT :Add( 'StdTools', TToolBar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1]:TabBand, 444, 14, , , 26, 26, 20, 20 ) )
+                  WITH OBJECT :Add( 'StdTools', TToolBar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1]:TabBand, 444, 14, , , 28, 28, 20, 20 ) )
                      :SetStyle( TBSTYLE_CHECKGROUP )
                      aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
                                   'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
@@ -93,14 +94,15 @@ FUNCTION Main
                      next
                      
                      // ----------------------------------------------------   set imagelist
-                     hImg2:= ImageList_Create( 28, 28, ILC_COLORDDB+ILC_MASK )
+                     hImg2:= ImageList_Create( 24, 24, ILC_COLORDDB+ILC_MASK )
                      hBmp := LoadImage( hInstance(), "STDTAB", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
                      ImageList_AddMasked( hImg2, hBmp, RGB( 0, 255, 255 ) )
                      DeleteObject(hBmp)
                      SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
                      //---------------------------------------------------------------------
                   END
-                  :AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 34,  , "", NIL )
+
+                  :AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
                   :StdTools:DisableAll()
                   
                   //--------- sets a QUICK access to the control
@@ -129,7 +131,7 @@ CLASS MainFrame FROM TFrame
                                 ::left    := 0,;
                                 ::top     := 0,;
                                 ::width   := GetWindowRect(GetDesktopWindow())[3],;
-                                ::height  := 160,;
+                                ::height  := 125,;
                                 super:new( oParent )
 
    METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting xIDE ?', 'OnCloseQuery', MB_YESNO ) == IDYES,;
