@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1925 2003/12/22 16:46:12 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1926 2003/12/22 18:56:15 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-22 12:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/rdd/dbcmd.c
+     * Removed redundant logic by calling hb_rddSelectWorkAreaAlias() instead of hb_rddSelect().
+     * Some formating.
+
+   /*
+      Przmek, can you please review, I belive it makes the code and error handling more consistent.
+      but I'd like you to confirm it's ok.
+    */
 
 2003-12-22 10:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcomp.c
