@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.9 2002/12/20 23:19:41 jonnymind Exp $
+* $Id: thread.c,v 1.10 2002/12/21 04:00:05 jonnymind Exp $
 */
 
 /*
@@ -171,7 +171,11 @@ void hb_destroyContext( void )
     }
     else
     {
+        char errdat[60];
         HB_CRITICAL_UNLOCK( context_monitor );
+        // TODO Error.
+        sprintf( errdat, "Thread %ld has not a context",  (long) id );
+        hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_destroyContext", 0 );
     }
 }
 
@@ -232,8 +236,11 @@ void hb_destroyContextFromHandle( HB_THREAD_HANDLE th_h )
     }
     else
     {
+        char errdat[70];
         HB_CRITICAL_UNLOCK( context_monitor );
         // TODO Error.
+        sprintf( errdat, "Thread %ld has not a context", (long) th_h );
+        hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_destroyContextFromHandle", 0 );
     }
 }
 
@@ -243,7 +250,6 @@ HB_THREAD_CONTEXT *hb_getCurrentContext( void )
     HB_THREAD_T id;
 
     id = HB_CURRENT_THREAD();
-
     if( last_context && last_context->th_id == id )
     {
         return last_context;
@@ -263,8 +269,16 @@ HB_THREAD_CONTEXT *hb_getCurrentContext( void )
     }
 
     HB_CRITICAL_UNLOCK( context_monitor );
-
-    return p;
+    
+    if ( !p ) {
+        char errdat[70];
+        // TODO Error.
+        sprintf( errdat, "Thread %ld has not a context", (long) id );
+        hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_getCurrentContext", 0 );
+        return NULL;
+    }
+    else
+        return p;
 }
 
 void hb_threadInit( void )
@@ -904,7 +918,7 @@ void hb_SignalObjectAndWait( HB_COND_T hToSignal, HB_MUTEX_T hToWaitFor, DWORD d
     ReleaseMutex( hToSignal );
     WaitForSingleObject( hToWaitFor, dwMillisec );
 }
-#endif 
+#endif
 
 #endif
 
