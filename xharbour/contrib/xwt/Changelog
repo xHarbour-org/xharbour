@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.29 2003/08/29 02:09:24 lculik Exp $
+ * $Id: Changelog,v 1.30 2003/08/29 18:28:30 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-30 11:59 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/xwtcmd.ch
+    + Added mapping Quit => XWTQuit()
+
+  * xwt_test.prg
+    ! added a QUIT sequence
 
 2003-08-29 15:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   *include/xwtcmd.ch
@@ -34,6 +41,7 @@
     ! buttons now can has color , as also other font and font size    
    Please note this is an work in progress
 
+>>>>>>> 1.30
 2003-08-27 17:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   *include/xwt.ch
   *include/xwtcmd.ch
@@ -131,7 +139,7 @@
       +DEFINE SPLITTER <...>
       +MENU <oMenu> PROMPT <cPrompt> OF <oMenu>
       +MENUITEM <oMenuItem> ... OF <oMenu>
-      
+
 2003-07-21 20:12 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
   * src/button.prg
   * src/togglebutton.prg

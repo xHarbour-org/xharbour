@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwtcmd.ch,v 1.4 2003/08/29 02:07:07 lculik Exp $
+   $Id: xwtcmd.ch,v 1.5 2003/08/29 18:28:30 lculik Exp $
 
    Definitions
 */
@@ -76,5 +76,8 @@
 #xcommand MENUITEM [<oMenuItem>] [ PROMPT <cPrompt> ] [ ID <nId>] [ICON <cIcon>];
                                [ ACTION <pAction> ] [ METHOD <oMethod> ][ OF <oMenu> ] [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>];
           => [<oMenuItem> := ] XWTMenuItem():New( <cPrompt>, <nId>, <pAction>, <oMethod>, <cIcon>, <oMenu> ,<(cFont)>,<nSize>,<(clr)>)
-	  
+
+// Tope level commands --------------------------------------------------------------------------
+#xcommand QUIT => XWTQUIT()
+
 #endif

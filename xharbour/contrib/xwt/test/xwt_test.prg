@@ -123,11 +123,12 @@ PROCEDURE MAIN()
    MENU oMenu PROMPT "File"
         MENUITEM oMenuItem PROMPT "Op_en" ICON "valley.png" ACTION @FileEvent() OF oMenu FONT "Clean" Size 20 Color "#44DE5F"
         MENUITEM PROMPT "Close" ACTION @FileEvent() OF oMenu SIZE 5
-        MENUITEM PROMPT "QUIT"  ACTION @FileEvent() OF oMenu SIZE 40
 
         MENU oMenuSec PROMPT "SubMenu" OF oMenu
              MENUITEM PROMPT "Opt1" ID 10 ACTION @FileEvent() OF oMenuSec FONT "Sans" SIZE 60
              MENUITEM PROMPT "Opt2" ID 11 ACTION @FileEvent() OF oMenuSec FONT "Clean" SIZE 14
+
+        MENUITEM PROMPT "QUIT"  ID 99 ACTION @FileEvent() OF oMenu SIZE 40
 
    MENU oMenuHelp PROMPT "Help"
         MENUITEM PROMPT "About" ACTION @FileEvent() OF oMenuHelp  FONT "Helvetica" SIZE 8
@@ -189,7 +190,10 @@ FUNCTION FileEvent( oEvent )
       ELSE
 ?  "FILENAME: ", cFileName
       ENDIF
+   ELSEIF oEvent:oSender:nId == 99
+      Quit
    ENDIF
+   
 RETURN .F.
 
 FUNCTION BoxModified( oEvent )
