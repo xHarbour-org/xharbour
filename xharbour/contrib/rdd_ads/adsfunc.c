@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.8 2003/02/14 21:17:37 lculik Exp $
+ * $Id: adsfunc.c,v 1.9 2003/02/22 02:56:46 lculik Exp $
  */
 
 /*
@@ -1441,6 +1441,51 @@ HB_FUNC( ADSDDGETDBPROPERTY )
 }
 
 
+HB_FUNC( ADSSETDBPROPERTY )
+{
+
+   char * szProperty;
+   UNSIGNED16 ulLength;
+   UNSIGNED32 ulRetVal;
+   UNSIGNED16 ulBuffer;
+   UNSIGNED16 ulPropety = ( UNSIGNED16 ) hb_parni( 1 );
+   PHB_ITEM pParam = hb_param( 2, HB_IT_ANY ) ;
+
+   switch( ulPropety )
+   {
+      case ADS_DD_COMMENT:
+      case ADS_DD_DEFAULT_TABLE_PATH:
+      case ADS_DD_USER_DEFINED_PROP:
+      case ADS_DD_TEMP_TABLE_PATH:
+      case ADS_DD_ADMIN_PASSWORD:
+      case ADS_DD_ENCRYPT_TABLE_PASSWORD:
+      {
+         ulRetVal = AdsDDSetDatabaseProperty(adsConnectHandle, ulPropety, hb_itemGetCPtr( pParam ), hb_itemGetCLen( pParam ) );
+         break;
+      }
+      case ADS_DD_MAX_FAILED_ATTEMPTS:
+      case ADS_DD_INTERNET_SECURITY_LEVEL:
+      case ADS_DD_VERSION_MAJOR:
+      case ADS_DD_VERSION_MINOR:
+      {
+         ulBuffer =  hb_itemGetNI( pParam );
+         ulRetVal = AdsDDSetDatabaseProperty(adsConnectHandle, ulPropety, &ulBuffer, 2 );
+         break;
+      }
+      case  ADS_DD_LOG_IN_REQUIRED:
+      case  ADS_DD_VERIFY_ACCESS_RIGHTS:
+      case  ADS_DD_ENCRYPT_NEW_TABLE:
+      case  ADS_DD_ENABLE_INTERNET:
+      {
+         ulBuffer =  hb_itemGetL( pParam );
+         ulRetVal = AdsDDSetDatabaseProperty(adsConnectHandle, ulPropety, &ulBuffer, 2 );
+         break;
+      }
+   }
+   hb_retl( ulRetVal == AE_SUCCESS);
+}
+
+
 #endif
 
 HB_FUNC( ADSBEGINTRANSACTION )
@@ -1522,6 +1567,4 @@ HB_FUNC( ADSROLLBACK )
       hb_retl( FALSE );
    }
 }
-
-
 
