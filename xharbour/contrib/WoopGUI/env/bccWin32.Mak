@@ -1,8 +1,8 @@
 #-- path vari -----------
 OUTDIR=build
-OBJDIR=obj
+OBJDIR=obj\b32
 SRCDIR=source
-LIBDIR=lib
+LIBDIR=lib\b32
 
 
 #-- HARBOUR COMPILER ----

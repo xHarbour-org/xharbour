@@ -10,7 +10,7 @@
 # Global paths
 #
 HBR_DIR=..\..
-BCC_DIR=c:\bcc55
+BCC_DIR=e:\bcc55
 WG_DIR=.
 #WH_DIR=..\what32
 WH_DIR=.
@@ -20,10 +20,10 @@ WH_DIR=.
 
 # library
 #
-WOOPGUILIB = lib\woopgui.lib
-WAPILIB    = lib\wapilib.lib
-#UTILSLIB   = lib\utils.lib
-WOOPGUIRES = lib\woopgui.res
+WOOPGUILIB = $(LIBDIR)\woopgui.lib
+WAPILIB    = $(LIBDIR)\wapilib.lib
+#UTILSLIB   = $(LIBDIR)\utils.lib
+WOOPGUIRES = $(LIBDIR)\woopgui.res
 
 WOOPGUIOBJ = tobject.obj twindowdef.obj \
              tapplication.obj \
