@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.30 2004/03/11 13:54:23 andijahja Exp $
+ * $Id: transfrm.c,v 1.31 2004/03/16 00:36:29 andijahja Exp $
  */
 
 /*
@@ -225,7 +225,7 @@ HB_FUNC( TRANSFORM )
          /* HACKS !                                                           */
          /* To solve Transform ( "1234567890", "@9" )                         */
          /* ================================================================= */
-         if ( szPic[0] == '9' )
+         if ( *pPic->item.asString.value == '@' && *szPic == '9' )
          {
             ULONG ii;
 
@@ -543,7 +543,7 @@ HB_FUNC( TRANSFORM )
          /* HACKS !                                                           */
          /* To solve Transform ( 1234567890, "@9" )                           */
          /* ================================================================= */
-         if ( pPic->item.asString.value[0] == '@' && pPic->item.asString.value[1] == '9' &&
+         if ( *pPic->item.asString.value == '@' && pPic->item.asString.value[1] == '9' &&
               (int) (pPic->item.asString.length - 1) < iOrigWidth )
          {
             int ii, ulExpLen = pPic->item.asString.length;

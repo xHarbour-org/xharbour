@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2581 2004/03/16 14:39:22 druzus Exp $
+ * $Id: ChangeLog,v 1.2582 2004/03/16 14:43:45 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-16 20:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/transform.c
+    ! the length of get field expanded to the length of variable eventhough
+      the picture clause the numeric picture clause is shorter that that.
+      Example:
+      .--
+      |  local sget := space(10)
+      |  @ 10,10 say "get" sget pict "999" // sget expanded to length of 10
+      |                                    // it should be of 3 length
+      `--
+      This problem is fixed now.
 
 2004-03-16 20:20 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c
