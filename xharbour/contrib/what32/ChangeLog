@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.10 2002/09/18 00:35:22 andy_wos Exp $
+ * $Id: ChangeLog,v 1.11 2002/09/18 08:58:34 what32 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-09-19 16:15 UCT +0530 Pritpal Bedi <info@vouchcac.com>
+   * ErrorSys.prg
+     + Reformatted ( and all other files will be reformatted in the same manner )
+     * Changed calls to SetCursor() function with WinSetCursor().
+     
+   * WinTabs.prg
+     + Reformatted
+   
 2002-09-18 05:54 UCT -0300 Augusto Infante <systems@quesoro.com>
    * _WinWnd.c
      + AllowSetForegroundWindow()

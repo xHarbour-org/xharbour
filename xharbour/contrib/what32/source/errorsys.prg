@@ -1,22 +1,37 @@
+//----------------------------------------------------------\\
+//----------------------------------------------------------\\
+//----------------------------------------------------------\\
+//
+//                     WHAT32 ErrorSys
+//
+//                   A.J. Wos 08/06/2002 
+//
+//      Scaled down and adapted for Harbour + What32.Lib
+//
+//----------------------------------------------------------\\
+//----------------------------------------------------------\\
+//----------------------------------------------------------\\
 
-// WHAT32 ErrorSys
-// A.J. Wos 08/06/2002 ( scaled down and adapted for Harbour + What32.Lib )
+#Define TRUE    .T.
+#Define FALSE   .F.
 
-
-#Define TRUE .T.
-#Define FALSE .F.
+//----------------------------------------------------------\\
 
 #Define WIN_WANT_ALL
-#Include "windows.ch"
-#Include "error.ch"
-//#define ES_READONLY            2048
+
 #xTranslate NTRIM( < n > ) = > lTrim( Str( < n > ) )
-#Define CRLF chr( 13 ) + chr( 10 )
-#Define CR chr( 13 )
+
+#Define CRLF    chr( 13 ) + chr( 10 )
+#Define CR      chr( 13 )
 
 #Define LOGFILE error.log // don't use quotes
 
-*-----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
+
+#Include        "windows.ch"
+#Include        "error.ch"
+
+//----------------------------------------------------------\\
 
 Procedure ErrorSys( )
 
@@ -25,7 +40,7 @@ Procedure ErrorSys( )
 
    Return
 
-*-----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 Static Function DefError( e )
 
@@ -81,8 +96,8 @@ Static Function DefError( e )
    nChoice := 0
 
    hCursor := LoadCursor( , IDC_WAIT )
-   hOldcursor := SetCursor( hCursor )
-   SetCursor( hOldcursor )
+   hOldcursor := WinSetCursor( hCursor )
+   WinSetCursor( hOldcursor )
 
    If ( Empty( e:osCode ) )
       nChoice := eAlert( cMessage, aOptions, cErr )
@@ -116,8 +131,7 @@ Static Function DefError( e )
 
    Return ( .F. )
 
-
-*-----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 Static Function ErrorMessage( e )
 
@@ -155,8 +169,7 @@ Static Function ErrorMessage( e )
 
    Return ( cMessage )
 
-
-*-----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 Static Function LogError( e, cProcStack )
 
@@ -225,8 +238,7 @@ Static Function LogError( e, cProcStack )
 
    Return cErr
 
-
-*-----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 Static Function IfEmpty( msg )
 
@@ -238,8 +250,7 @@ Static Function IfEmpty( msg )
 
    Return ret_val
 
-
-*-----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 Static Function PrintError
 
@@ -247,8 +258,7 @@ Static Function PrintError
 
    Return ( .F. )
 
-
-*-----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 Static Function convertargs( a )
 
@@ -284,8 +294,7 @@ Static Function convertargs( a )
 
    Return ifempty( ret_val )
 
-
-*------------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 Static Function GetAliasCount( )
 
@@ -300,8 +309,7 @@ Static Function GetAliasCount( )
 
    Return( nCounter )
 
-
-*----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 Static Function getprocstack( )
 
@@ -313,8 +321,7 @@ Static Function getprocstack( )
 
    Return( i - 3 )
 
-
-*-----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 Static Function DosErrCode( e )
 
@@ -328,8 +335,7 @@ Static Function DosErrCode( e )
 
    Return msg
 
-
-*-----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 /*
  Function: DosErrText( )
@@ -338,79 +344,82 @@ Static Function DosErrCode( e )
  in the Clipper 5.0 "Programming & Utilities Guide" )
  Returns: character string
 */
+
 Static Function DosErrText( n )
-   Local desc_ := { "Invalid function number", ; // 1
-   "File not found", ; // 2
-   "Path not found", ; // 3
-   "Too many files open (no handles left)", ; // 4
-   "Access denied", ; // 5
-   "Invalid handle", ; // 6
-   "Memory control blocks destroyed (oh, my)", ; // 7
-   "Insufficient memory", ; // 8
-   "Invalid memory block address", ; // 9
-   "Invalid environment", ; // 10
-   "Invalid format", ; // 11
-   "Invalid access code", ; // 12
-   "Invalid data", ; // 13
-   , ; // 14
-   "Invalid drive was specified", ; // 15
-   "Attempt to remove the current directory", ; // 16
-   "Not same device", ; // 17
-   "No more files", ; // 18
+   Local desc_ := { ;
+   "Invalid function number", ;                      // 1
+   "File not found", ;                               // 2
+   "Path not found", ;                               // 3
+   "Too many files open (no handles left)", ;        // 4
+   "Access denied", ;                                // 5
+   "Invalid handle", ;                               // 6
+   "Memory control blocks destroyed (oh, my)", ;     // 7
+   "Insufficient memory", ;                          // 8
+   "Invalid memory block address", ;                 // 9
+   "Invalid environment", ;                          // 10
+   "Invalid format", ;                               // 11
+   "Invalid access code", ;                          // 12
+   "Invalid data", ;                                 // 13
+   , ;                                               // 14
+   "Invalid drive was specified", ;                  // 15
+   "Attempt to remove the current directory", ;      // 16
+   "Not same device", ;                              // 17
+   "No more files", ;                                // 18
    "Attempt to write on write-protected diskette", ; // 19
-   "Unknown unit", ; // 20
-   "Drive not ready", ; // 21
-   "Unknown command", ; // 22
-   "Data error (CRC)", ; // 23
-   "Bad request structure length", ; // 24
-   "Seek error", ; // 25
-   "Unknown media type", ; // 26
-   "Sector not found", ; // 27
-   "Printer out of paper", ; // 28
-   "Write fault", ; // 29
-   "Read fault", ; // 30
-   "General failure", ; // 31
-   "Sharing violation", ; // 32
-   "Lock violation", ; // 33
-   "Invalid disk change", ; // 34
-   "FCB unavailable", ; // 35
-   "Sharing buffer overflow", ; // 36
-   , , , , , , , , , , , , , ; // 37-49
-   "Network request not supported", ; // 50
-   "Remote computer not listening", ; // 51
-   "Duplicate name on network", ; // 52
-   "Network name not found", ; // 53
-   "Network busy", ; // 54
-   "Network device no longer exists", ; // 55
-   "Network BIOS command limit exceeded", ; // 56
-   "Network adapter hardware error", ; // 57
-   "Incorrect response from network", ; // 58
-   "Unexpected network error", ; // 59
-   "Incompatible remote adapter", ; // 60
-   "Print queue full", ; // 61
-   "Not enough space for print file", ; // 62
-   "Print file deleted (not enough space)", ; // 63
-   "Network name deleted", ; // 64
-   "Access denied", ; // 65
-   "Network device type incorrect", ; // 66
-   "Network name not found", ; // 67
-   "Network name limit exceeded", ; // 68
-   "Network BIOS session limit exceeded", ; // 69
-   "Temporarily paused", ; // 70
-   "Network request not accepted", ; // 71
-   "Print or disk redirection paused", ; // 72
-   , , , , , , , ; // 73-79
-   "File already exists", ; // 80
-   , ; // 81
-   "Cannot make directory entry", ; // 82
-   "Fail on INT 24h", ; // 83
-   "Too many redirections", ; // 84
-   "Duplicate redirection", ; // 85
-   "Invalid password", ; // 86
-   "Invalid parameter", ; // 87
-   "Network device fault", ; // 88
+   "Unknown unit", ;                                 // 20
+   "Drive not ready", ;                              // 21
+   "Unknown command", ;                              // 22
+   "Data error (CRC)", ;                             // 23
+   "Bad request structure length", ;                 // 24
+   "Seek error", ;                                   // 25
+   "Unknown media type", ;                           // 26
+   "Sector not found", ;                             // 27
+   "Printer out of paper", ;                         // 28
+   "Write fault", ;                                  // 29
+   "Read fault", ;                                   // 30
+   "General failure", ;                              // 31
+   "Sharing violation", ;                            // 32
+   "Lock violation", ;                               // 33
+   "Invalid disk change", ;                          // 34
+   "FCB unavailable", ;                              // 35
+   "Sharing buffer overflow", ;                      // 36
+   , , , , , , , , , , , , , ;                       // 37-49
+   "Network request not supported", ;                // 50
+   "Remote computer not listening", ;                // 51
+   "Duplicate name on network", ;                    // 52
+   "Network name not found", ;                       // 53
+   "Network busy", ;                                 // 54
+   "Network device no longer exists", ;              // 55
+   "Network BIOS command limit exceeded", ;          // 56
+   "Network adapter hardware error", ;               // 57
+   "Incorrect response from network", ;              // 58
+   "Unexpected network error", ;                     // 59
+   "Incompatible remote adapter", ;                  // 60
+   "Print queue full", ;                             // 61
+   "Not enough space for print file", ;              // 62
+   "Print file deleted (not enough space)", ;        // 63
+   "Network name deleted", ;                         // 64
+   "Access denied", ;                                // 65
+   "Network device type incorrect", ;                // 66
+   "Network name not found", ;                       // 67
+   "Network name limit exceeded", ;                  // 68
+   "Network BIOS session limit exceeded", ;          // 69
+   "Temporarily paused", ;                           // 70
+   "Network request not accepted", ;                 // 71
+   "Print or disk redirection paused", ;             // 72
+   , , , , , , , ;                                   // 73-79
+   "File already exists", ;                          // 80
+   , ;                                               // 81
+   "Cannot make directory entry", ;                  // 82
+   "Fail on INT 24h", ;                              // 83
+   "Too many redirections", ;                        // 84
+   "Duplicate redirection", ;                        // 85
+   "Invalid password", ;                             // 86
+   "Invalid parameter", ;                            // 87
+   "Network device fault", ;                         // 88
    ;
-   "Undefined or reserved error code!" } // +1
+   "Undefined or reserved error code!" }             // +1
+
 /*
  Check that code number is within known upper limit,
  AND that a description is available For it.
@@ -421,49 +430,50 @@ Static Function DosErrText( n )
 
    Return desc_[ n ]
 
-
-*-----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 Static Function GenCodeText( n )
 
-   Local desc_ := { "EG_ARG", ; // 1
-   "EG_BOUND", ; // 2
-   "EG_STROVERFLOW", ; // 3
-   "EG_NUMOVERFLOW", ; // 4
-   "EG_ZERODIV", ; // 5
-   "EG_NUMERR", ; // 6
-   "EG_SYNTAX", ; // 7
-   "EG_COMPLEXITY", ; // 8
-   , , ; // 9-10
-   "EG_MEM", ; // 11
-   "EG_NOFUNC", ; // 12
-   "EG_NOMETHOD", ; // 13
-   "EG_NOVAR", ; // 14
-   "EG_NOALIAS", ; // 15
-   "EG_NOVARMETHOD", ; // 16
-   "EG_BADALIAS", ; // 17 (new w/ 5.01a)
-   "EG_DUPALIAS", ; // 18 (new w/ 5.01a)
-   , ; // 19
-   "EG_CREATE", ; // 20
-   "EG_OPEN", ; // 21
-   "EG_CLOSE", ; // 22
-   "EG_READ", ; // 23
-   "EG_WRITE", ; // 24
-   "EG_PRINT", ; // 25
-   , , , , ; // 26-29
-   "EG_UNSUPPORTED", ; // 30
-   "EG_LIMIT", ; // 31
-   "EG_CORRUPTION", ; // 32
-   "EG_DATATYPE", ; // 33
-   "EG_DATAWIDTH", ; // 34
-   "EG_NOTABLE", ; // 35
-   "EG_NOORDER", ; // 36
-   "EG_SHARED", ; // 37
-   "EG_UNLOCKED", ; // 38
-   "EG_READONLY", ; // 39
-   "EG_APPENDLOCK", ; // 40
+   Local desc_ := { ;
+   "EG_ARG", ;           // 1
+   "EG_BOUND", ;         // 2
+   "EG_STROVERFLOW", ;   // 3
+   "EG_NUMOVERFLOW", ;   // 4
+   "EG_ZERODIV", ;       // 5
+   "EG_NUMERR", ;        // 6
+   "EG_SYNTAX", ;        // 7
+   "EG_COMPLEXITY", ;    // 8
+   , , ;                 // 9-10
+   "EG_MEM", ;           // 11
+   "EG_NOFUNC", ;        // 12
+   "EG_NOMETHOD", ;      // 13
+   "EG_NOVAR", ;         // 14
+   "EG_NOALIAS", ;       // 15
+   "EG_NOVARMETHOD", ;   // 16
+   "EG_BADALIAS", ;      // 17 (new w/ 5.01a)
+   "EG_DUPALIAS", ;      // 18 (new w/ 5.01a)
+   , ;                   // 19
+   "EG_CREATE", ;        // 20
+   "EG_OPEN", ;          // 21
+   "EG_CLOSE", ;         // 22
+   "EG_READ", ;          // 23
+   "EG_WRITE", ;         // 24
+   "EG_PRINT", ;         // 25
+   , , , , ;             // 26-29
+   "EG_UNSUPPORTED", ;   // 30
+   "EG_LIMIT", ;         // 31
+   "EG_CORRUPTION", ;    // 32
+   "EG_DATATYPE", ;      // 33
+   "EG_DATAWIDTH", ;     // 34
+   "EG_NOTABLE", ;       // 35
+   "EG_NOORDER", ;       // 36
+   "EG_SHARED", ;        // 37
+   "EG_UNLOCKED", ;      // 38
+   "EG_READONLY", ;      // 39
+   "EG_APPENDLOCK", ;    // 40
    ;
    "Unknown or reserved" } // +1
+
 /*
  Check that code number is within known upper limit,
  AND that a description is available For it.
@@ -474,8 +484,7 @@ Static Function GenCodeText( n )
 
    Return NTRIM( n ) + ": " + desc_[ n ]
 
-
-*-----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 Static Function eAlert( cMsg, aChoices, cDetail )
 
@@ -571,8 +580,7 @@ Static Function eAlert( cMsg, aChoices, cDetail )
 
    Return i
 
-
-*----------------------------------------------------------------------------*
+//----------------------------------------------------------\\
 
 Static Function eAlertProc( hDlg, nMsg, nwParam, nlParam, isDetail, hWnd, n )
 
@@ -606,6 +614,5 @@ Static Function eAlertProc( hDlg, nMsg, nwParam, nlParam, isDetail, hWnd, n )
 
    Return( 0 )
 
+//----------------------------------------------------------\\
 
-
-// eof.
