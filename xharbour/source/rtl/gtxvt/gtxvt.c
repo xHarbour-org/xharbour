@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.11 2004/01/14 23:02:05 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.12 2004/01/15 01:30:57 jonnymind Exp $
  */
 
 /*
@@ -296,7 +296,7 @@ static void xvt_windowSetCursor( PXWND_DEF wnd );
 static void xvt_windowSetHints( PXWND_DEF wnd );
 static XFontStruct *xvt_fontNew( Display *dpy, char *fontFace, char *weight, int size,  char *encoding );
 static void xvt_windowSetFont( PXWND_DEF wnd, XFontStruct * xfs );
-void xvt_windowUpdate( PXWND_DEF wnd );
+void xvt_windowUpdate( PXWND_DEF wnd, XSegment *rUpdate );
 static void xvt_windowRepaintColRow( PXWND_DEF wnd,
    int colStart, int rowStart, int colStop, int rowStop );
 static BOOL xvt_windowDrawText( PXWND_DEF wnd,  USHORT col, USHORT row, char * str, USHORT cbString );
@@ -407,7 +407,7 @@ static void xvt_InitStatics( Display *dpy )
 /*** Prepare the default window ***/
 static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
 {
-   int icol, irow, icount, istart=1, i;
+   int icol, irow, icount, istart=1;
    Display *dpy;
    PXWND_DEF wnd;
 
@@ -601,7 +601,6 @@ static void xvt_bufferInvalidate( PXVT_BUFFER buf,
       if ( buf->rInvalid.y1 > top ) buf->rInvalid.y1 = top;
       if ( buf->rInvalid.x2 < right ) buf->rInvalid.x2 = right;
       if ( buf->rInvalid.y2 < bottom ) buf->rInvalid.y2 = bottom;
-
    }
 
    if ( s_uiDispCount == 0 )
@@ -611,6 +610,8 @@ static void xvt_bufferInvalidate( PXVT_BUFFER buf,
       COMMIT_BUFFER( buf );
       appMsg = XVT_ICM_UPDATE;
       write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+      write( streamUpdate[1], &buf->rInvalid, sizeof( XSegment ) );
+      buf->bInvalid = FALSE;
    }
 }
 
@@ -945,20 +946,17 @@ static void xvt_windowSetFont( PXWND_DEF wnd, XFontStruct * xfs )
 
 
 /******************** Repaint the window if necessary **********************/
-void xvt_windowUpdate( PXWND_DEF wnd )
+void xvt_windowUpdate( PXWND_DEF wnd, XSegment *rUpdate )
 {
-   PXVT_BUFFER buf = wnd->buffer;
    USHORT appMsg;
 
-   if ( buf->bInvalid )
-   {
-      xvt_windowRepaintColRow( wnd,
-         buf->rInvalid.x1, buf->rInvalid.y1,
-         buf->rInvalid.x2, buf->rInvalid.y2);
-      /* Signal the buffer filler that we have done with it */
-      appMsg = XVT_ICM_UPDATE;
-      write( streamFeedback[1], &appMsg, sizeof( appMsg ) );
-   }
+   xvt_windowRepaintColRow( wnd,
+      rUpdate->x1, rUpdate->y1,
+      rUpdate->x2, rUpdate->y2);
+
+   /* Signal the buffer filler that we have done with it */
+   appMsg = XVT_ICM_UPDATE;
+   write( streamFeedback[1], &appMsg, sizeof( appMsg ) );
 }
 
 
@@ -2376,68 +2374,79 @@ static void xvt_processMessages( PXWND_DEF wnd )
    XEvent evt;
    fd_set updateSet;
    struct timeval timeout;
+   //struct timespec ts;
    BOOL bLoop = TRUE, bUpdate;
+   XSegment rUpdate = {32000,32000,-1,-1};
 
    FD_ZERO(&updateSet);
-   FD_SET(streamUpdate[0], &updateSet );
 
    while ( bLoop )
    {
       bUpdate = FALSE;
 
+      //ts.tv_sec = 0;
+      //ts.tv_nsec = 25000000;
+      //nanosleep( &ts, NULL );
       // wait for app input
+      //usleep( 25000 );
       timeout.tv_sec = 0;
       timeout.tv_usec = 25000;
+
       FD_SET(streamUpdate[0], &updateSet );
-      select( streamUpdate[0] + 1, &updateSet, NULL, NULL, &timeout );
-
-      if ( FD_ISSET( streamUpdate[0], &updateSet ) )
+      bLoop = TRUE;
+      while( bLoop &&
+         select( streamUpdate[0] + 1, &updateSet, NULL, NULL, &timeout ) )
       {
-         do {
+         if ( read( streamUpdate[0], &appMsg, sizeof( appMsg ) ) <= 0 )
+         {
+         return;
+         }
 
-            if ( read( streamUpdate[0], &appMsg, sizeof( appMsg ) ) <= 0 )
+         switch( appMsg )
+         {
+            // when the app requires a resize, resize value is inside the buffer.
+            case XVT_ICM_RESIZE:
+               xvt_windowResize( wnd );
+            break;
+
+            case XVT_ICM_MOUSEMOVE:
             {
-               printf( "Comm closed\n" );
-               bLoop = FALSE;
-               break;
+               ICM_DATA_RESIZE data;
+               read( streamUpdate[0], &data, sizeof( data ) );
+
+               XWarpPointer( wnd->dpy, None, wnd->window, 0,0,0,0,
+                  data.cols * wnd->fontWidth + wnd->fontWidth/2,
+                  data.rows * wnd->fontHeight + wnd->fontHeight/2 );
             }
+            break;
 
-            switch( appMsg )
+            case XVT_ICM_UPDATE:
             {
-               // when the app requires a resize, resize value is inside the buffer.
-               case XVT_ICM_RESIZE:
-                  xvt_windowResize( wnd );
-               break;
-
-               case XVT_ICM_MOUSEMOVE:
+               XSegment added;
+               bUpdate = TRUE;
+               //read update data
+               if ( read (streamUpdate[0], &added, sizeof( added ) ) <= 0 )
                {
-                  ICM_DATA_RESIZE data;
-                  read( streamUpdate[0], &data, sizeof( data ) );
-
-                  XWarpPointer( wnd->dpy, None, wnd->window, 0,0,0,0,
-                     data.cols * wnd->fontWidth + wnd->fontWidth/2,
-                     data.rows * wnd->fontHeight + wnd->fontHeight/2 );
+                  return;
                }
-               break;
-
-               case XVT_ICM_UPDATE:
-                  bUpdate = TRUE;
-               break;
-
-               case XVT_ICM_SETCURSOR:
-                  xvt_windowSetCursor( wnd );
-               break;
-
-               case XVT_ICM_QUIT:
-                  exit(0);
-                  break;
+               if ( added.x1 < rUpdate.x1 ) rUpdate.x1 = added.x1;
+               if ( added.y1 < rUpdate.y1 ) rUpdate.y1 = added.y1;
+               if ( added.x2 > rUpdate.x2 ) rUpdate.x2 = added.x2;
+               if ( added.y2 > rUpdate.y2 ) rUpdate.y2 = added.y2;
             }
+            break;
 
-            timeout.tv_sec = 0;
-            timeout.tv_usec = 0;
-            FD_SET(streamUpdate[0], &updateSet );
-            select( streamUpdate[0] + 1, &updateSet, NULL, NULL, &timeout );
-         } while ( bLoop && FD_ISSET( streamUpdate[0], &updateSet ) );
+            case XVT_ICM_SETCURSOR:
+               xvt_windowSetCursor( wnd );
+            break;
+
+            case XVT_ICM_QUIT:
+               return;
+         }
+
+         timeout.tv_sec = 0;
+         timeout.tv_usec = 0;
+         FD_SET(streamUpdate[0], &updateSet );
       }
 
       // now manage periodic changes
@@ -2458,7 +2467,7 @@ static void xvt_processMessages( PXWND_DEF wnd )
 
       if ( bUpdate )
       {
-         xvt_windowUpdate( wnd );
+         xvt_windowUpdate( wnd, &rUpdate );
       }
 
       while ( XEventsQueued( wnd->dpy, QueuedAfterFlush) )
@@ -2475,26 +2484,43 @@ static void xvt_processMessages( PXWND_DEF wnd )
 */
 static void xvt_appProcess()
 {
+   static int period = 100;
    USHORT appMsg;
    fd_set keySet;
    struct timeval timeout = {0,0};
 
-   FD_ZERO(&keySet);
-   FD_SET(streamFeedback[0], &keySet );
+   period --;
 
-   if ( select( streamFeedback[0] + 1, &keySet, NULL , NULL, &timeout) )
+   // quit immediately if child is died
+   if ( period == 0 )
    {
-      read( streamFeedback[0], &appMsg, sizeof( appMsg ) );
-      switch( appMsg )
+      if( s_childPid != 0 && waitpid( s_childPid, NULL, WNOHANG ) == s_childPid )
       {
-         case XVT_ICM_UPDATE:
-            s_buffer->bInvalid = FALSE;
-            break;
-
-         case XVT_ICM_QUIT:
-            hb_gtHandleClose();
-            break;
+         hb_vmRequestQuit();
+         return;
       }
+
+      FD_ZERO(&keySet);
+      FD_SET(streamFeedback[0], &keySet );
+
+      while ( select( streamFeedback[0] + 1, &keySet, NULL , NULL, &timeout) )
+      {
+         read( streamFeedback[0], &appMsg, sizeof( appMsg ) );
+         switch( appMsg )
+         {
+            case XVT_ICM_UPDATE:
+               s_buffer->bInvalid = FALSE;
+               break;
+
+            case XVT_ICM_QUIT:
+               hb_gtHandleClose();
+               break;
+         }
+         timeout.tv_sec = 0;
+         timeout.tv_usec = 0;
+         FD_SET(streamFeedback[0], &keySet );
+      }
+      period = 100;
    }
 }
 
