@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.77 2004/05/28 21:00:04 lculik Exp $
+ * $Id: tget.prg,v 1.78 2004/05/31 02:35:11 lculik Exp $
  */
 
 /*
@@ -1774,7 +1774,7 @@ STATIC FUNCTION BuildGetColor(cColorSpec)
 
    elseif   len( aTokens ) == 4
       cCur := cColorSpec
-      cColorSpec := cCur + "," aTokens[ 1 ]
+      cColorSpec := cCur + "," +aTokens[ 1 ]
 
    ENDIF
 
