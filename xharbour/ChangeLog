@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2815 2004/04/21 07:48:28 bdj Exp $
+ * $Id: ChangeLog,v 1.2816 2004/04/21 11:01:33 jacekp Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-21 12:15 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
+  * source/rtl/filesys.c
+    ! hb_fsmkdir/hb_fschdir/hb_fsrmdir, not respecting _SET_FILECASE and _SET_DIRCASE,
+    fixed bug reported by Marcelo Lombardo
+  * source/rtl/memoline.c
+    ! fix to me more clipper compatible,(file provided by Pritpal Bedi
 
 2004-04-21 14:50 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * source/rtl/inkey.c
