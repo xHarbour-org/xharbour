@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.50 2003/01/31 09:08:20 ronpinkas Exp $
+ * $Id: TApplication.prg,v 1.51 2003/02/02 16:48:09 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -134,6 +134,13 @@ METHOD CreateForm( oForm, oTarget ) CLASS Application
    //aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
    aVars := __ObjGetDerivedDiff( oForm, oBase, HB_OO_CLSTP_EXPORTED )
 
+   ::Showing := .T.
+
+   IF ::FMainForm == NIL
+      ::FMainForm := oForm
+      ::FMainForm:HandleNeeded()
+   ENDIF
+
    FOR EACH aVar IN aVars
       IF ValType( aVar[2] ) == 'O'
          //TraceLog( aVar[1] )
@@ -145,13 +152,6 @@ METHOD CreateForm( oForm, oTarget ) CLASS Application
          ENDIF
       ENDIF
    NEXT
-
-   ::Showing := .T.
-
-   IF ::FMainForm == NIL
-      ::FMainForm := oForm
-      ::FMainForm:HandleNeeded()
-   ENDIF
 
    oTarget := oForm
 

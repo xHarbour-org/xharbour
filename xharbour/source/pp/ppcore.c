@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.40 2003/01/28 16:13:00 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.41 2003/01/28 20:36:37 ronpinkas Exp $
  */
 
 /*
@@ -4245,7 +4245,7 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
            {
               kolFig--;
            }
-           else if( szText[lPos] == '.' && ( szSub[0] != '.' || lSubLen == 1 ) )
+           else if( szText[lPos] == '.' && ( szSub[lSubPos] != '.' || lSubLen == 1 ) )
            {
               if( toupper( szText[lPos + 1] ) == 'T' && szText[lPos + 2] == '.' )
               {
@@ -4822,7 +4822,7 @@ static int NextName( char ** sSource, char * sDest )
   /* END - Ron Pinkas added 2000-11-08 */
 
   #if 0
-     printf( "NextName: >%s<\n", sDest - lenName );
+     printf( "Len: %i NextName: >%s<\n", lenName, sDest - lenName );
      printf( "Rest: >%s<\n", *sSource );
   #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.679 2003/02/03 11:15:16 mlombardo Exp $
+ * $Id: ChangeLog,v 1.680 2003/02/03 14:21:49 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-03 10:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Additional fix to '.' support in md_strAt()
+
 2003-02-03 11:05 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tbrowse.prg
     ! Fix display with border active.
       Reported by Larry Sevilla.
-
 
 2003-02-03 09:10 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/rtl/dbdelim.prg
@@ -95,14 +98,14 @@
     ! Fixed an error introduced by my on last optimization tests.
       Now it seems that MT is pretty stable also under GC. There
       are still minor problems, but now it goes great.
-      
+
   % source/vm/estack.c
     % Optimized MT programs, so that estack calls hb_threadGetCurrentStack()
       only once per function.
-  
+
   * tests/mtgc.prg
     * cleaned up the code and added an header.
-    
+
   + doc/thread.txt
     + Thread api reference: functions in thread.c and their description.
 
@@ -131,7 +134,7 @@
 2003-01-31 20:15 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
   * source/rtl/gtsln/mousesln.c
     * Some cleanup related to last mousesln.c fixes
-    
+
 2003-01-31 19:40 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/inet.c
     ! fixed a potential problem in InetRecv().

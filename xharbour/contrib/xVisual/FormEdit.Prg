@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.100 2003/01/09 08:22:37 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.101 2003/01/29 10:27:14 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -112,13 +112,13 @@ ENDCLASS
 
 //----------------------------------------------------------------------------//
 
-METHOD Create( oParent ) CLASS TFormEdit 
+METHOD Create( oParent ) CLASS TFormEdit
    LOCAL oBtn
    LOCAL xRet
    Local oTree
 
    ::Super:Create( oParent )
-   
+
    ::FCaption := 'TForm' + LTrim( Str( ++::nForms ) )
    ::Editing  := .F.
    ::aCtrl    := {}
@@ -132,7 +132,7 @@ METHOD Create( oParent ) CLASS TFormEdit
    ::OnCloseQuery := {|| MainForm:StdBar:Disable(), InspCombo:DelObject( HB_QSELF() ), NIL }
 
    FormEdit := Self
-   
+
    ::XFMTop()
    ::SetParent( MainForm )
 
@@ -144,7 +144,7 @@ METHOD WMMoving( x, y ) CLASS TFormEdit
 
 RETURN Self
 //----------------------------------------------------------------------------//
-METHOD WMCreate() CLASS TFormEdit 
+METHOD WMCreate() CLASS TFormEdit
 
    LOCAL oBtn
    LOCAL xRet
@@ -163,7 +163,7 @@ METHOD WMCreate() CLASS TFormEdit
    ::oMask:SetFocus()
 
    InspCombo:AddString( ::Name + chr(9) + "TFORM", self)
-  
+
    oTree := InspTree:Add( ::Name,, ::Fhandle )
    oTree:Select()
 
@@ -175,19 +175,19 @@ RETURN NIL
 
 //--------------------------------------------------------------------------------------------
 
-METHOD WMSize( nFlag, Width, Height) CLASS TFormEdit 
+METHOD WMSize( nFlag, Width, Height) CLASS TFormEdit
 
    LOCAL aRect
 
    IF ::oMask != NIL
       aRect := GetClientRect(::FHandle)
-      
+
       ::oMask:FLeft   := aRect[1]
       ::oMask:FTop    := aRect[2]
       ::oMask:FWidth  := aRect[3]
       ::oMask:FHeight := aRect[4]
       ::oMask:Move( , , , , .T. )
-      
+
       ::oMask:Refresh()
       ObjInspect:SetBrowserData( Self, .T. )
    ENDIF
@@ -196,7 +196,7 @@ RETURN NIL
 
 //----------------------------------------------------------------------------//
 
-METHOD WMDestroy() CLASS TFormEdit 
+METHOD WMDestroy() CLASS TFormEdit
 
    IF !Empty(::hBmpGrid)
       DeleteObject(::hBmpGrid)
@@ -206,7 +206,7 @@ METHOD WMDestroy() CLASS TFormEdit
 
 //----------------------------------------------------------------------------//
 
-METHOD OnMenuCommand(oItem) CLASS TFormEdit 
+METHOD OnMenuCommand(oItem) CLASS TFormEdit
 
    // check for the range of commands which create controls
    // otherwise process the command as usual
@@ -258,12 +258,12 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
          aRect:={10,10,NIL,NIL}
       ENDIF
 
-      cName:=::GetUniquePropName(::CtrlName)
+      cName := ::GetUniquePropName(::CtrlName)
 
       cClass := "T" + AllTrim( ::CtrlName )
       n := HB_FuncPtr( cClass )
       oObj := HB_Exec( n )
-      
+
       DO CASE
          CASE ::CtrlName == "StatusBar"
             IF ("2" $ cName) // only one status bar
@@ -291,9 +291,9 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
             oBand := TCoolBand():Create( oObj )
             oBand:MinHeight := 28
          ENDIF
-         
+
          ::SetControl( oObj )
-         
+
       ENDIF
    ENDIF
 
@@ -331,7 +331,7 @@ METHOD SetControl( oObj ) CLASS TFormEdit
 
 RETURN oObj
 //----------------------------------------------------------------------------//
-METHOD GetUniquePropName(cName) CLASS TFormEdit 
+METHOD GetUniquePropName(cName) CLASS TFormEdit
 
    LOCAL nInd:=1
 
@@ -344,7 +344,7 @@ RETURN(cName+AllTrim(Str(nInd)))
 
 //----------------------------------------------------------------------------//
 
-METHOD SetGridSize(x,y) CLASS TFormEdit 
+METHOD SetGridSize(x,y) CLASS TFormEdit
 
    LOCAL xSize
    LOCAL ySize
@@ -367,7 +367,7 @@ RETURN(NIL)
 
 *------------------------------------------------------------------------------
 
-METHOD WMPaint( hDC ) CLASS TFormEdit 
+METHOD WMPaint( hDC ) CLASS TFormEdit
 
    LOCAL hMemDC  := CreateCompatibleDC(hDC)
    LOCAL i       := 0
@@ -448,7 +448,7 @@ RETURN Self
 METHOD XFMControl( cName, oControl, lDelete ) CLASS TFormEdit
 
    LOCAL nControl, nBase, aVar, XFMControl
-   
+
    IF cName == NIL
       nControl := aScan( ::aXFM[ XFM_Controls ], { |XFM| XFM[2] == oControl } )
 
@@ -549,7 +549,7 @@ METHOD XFMReflect() CLASS TFormEdit
    ObjEdit:SourceEdit:Line  := 1
    ObjEdit:SourceEdit:Col   := 1
    ObjEdit:SourceEdit:Lines := 1
-   
+
    ObjEdit:SourceEdit:SetText( cText )
 
 RETURN Self
