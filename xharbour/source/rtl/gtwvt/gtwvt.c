@@ -1,6 +1,6 @@
 
 /*
- * $Id: gtwvt.c,v 1.19 2004/01/03 20:51:47 fsgiudice Exp $
+ * $Id: gtwvt.c,v 1.20 2004/01/04 04:26:24 ronpinkas Exp $
  */
 
 /*
@@ -2425,21 +2425,16 @@ static BOOL hb_wvt_gtTextOut( HDC hdc,  USHORT col, USHORT row, LPCTSTR lpString
 */
 static BOOL hb_wvt_gtSetColors( HDC hdc, BYTE attr )
 {
-  BOOL bResult= FALSE;
+  int fore = attr & 0x000F;
+  int back = ( attr & 0x00F0 )>>4;
 
-  if ( attr != ' ' )
-  {
-    int fore = attr & 0x000F;
-    int back = ( attr & 0x00F0 )>>4;
+  _s.foreground = _COLORS[ fore ];
+  _s.background = _COLORS[ back ];
 
-    _s.foreground = _COLORS[ fore ];
-    _s.background = _COLORS[ back ];
+  SetTextColor( hdc, _s.foreground );
+  SetBkColor( hdc, _s.background );
 
-    SetTextColor( hdc, _s.foreground );
-    SetBkColor( hdc, _s.background );
-    bResult= TRUE;
-  }
-  return( bResult );
+  return( TRUE );
 }
 
 //-------------------------------------------------------------------//
