@@ -117,7 +117,6 @@ FUNCTION Main
          
       END
       
-      oSplash:OnTimer(1)
       :Run()
   END
 RETURN( nil)
