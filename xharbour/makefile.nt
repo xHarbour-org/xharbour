@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.1 2002/10/30 02:32:48 paultucker Exp $
+# $Id: makefile.nt,v 1.2 2002/10/30 04:08:41 paultucker Exp $
 #
 
 #
@@ -56,7 +56,7 @@
 #     a specific target as a parameter immediatley after compiling a given
 #     set of prg files.
 #      ie: Harbour $<
-#          nmake /fmakefile.vc obj\vc\rtl.lib2
+#          nmake /fmakefile.nt obj\vc\rtl.lib2
 #     which will simply get make to re-evaluate the dependancy list for the
 #     lib, and as a result, it will execute the C compiler using the .c.obj
 #     rule below to create the obj's for the prg's that were created just
@@ -133,9 +133,8 @@ CFLAGS = $(CFLAGS) -DSIMPLEX
 #
 
 AS             = ML
-CFLAGS         = -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)
+CFLAGS         = -G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF $(C_USR) $(CFLAGS)
 CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
-CLIBFLAGSDEBUG = -Zi $(CLIBFLAGS)
 HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LDFLAGS        = $(LDFLAGS)
 
@@ -171,6 +170,7 @@ HBRUN_EXE    = $(BIN_DIR)\hbrun.exe
 HBTEST_EXE   = $(BIN_DIR)\hbtest.exe
 HBDOC_EXE    = $(BIN_DIR)\hbdoc.exe
 HBMAKE_EXE   = $(BIN_DIR)\hbmake.exe
+
 #
 # GT driver list
 #
@@ -267,7 +267,7 @@ LIBS2 = \
 
 {$(RTL_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
-   $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(RTL_LIB)2
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RTL_LIB)2
 
 RTL_LIB_OBJS = \
    $(OBJ_DIR)\abs.obj \
@@ -446,7 +446,7 @@ RTL_LIB_OBJS = \
 #
 
 {$(LANG_DIR)}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgca.obj \
@@ -489,7 +489,7 @@ LANG_LIB_OBJS = \
 #
 
 {$(MACRO_DIR)}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 MACRO_LIB_OBJS = \
    $(OBJ_DIR)\macroy.obj \
@@ -512,11 +512,11 @@ MACRO_LIB_OBJS = \
 #
 
 {$(RDD_DIR)}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(RDD_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
-   $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(RDD_LIB)2
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RDD_LIB)2
 
 RDD_LIB_OBJS = \
    $(OBJ_DIR)\dbcmd.obj \
@@ -544,11 +544,11 @@ RDD_LIB_OBJS = \
 #
 
 {$(RDD_DIR)\nulsys}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(RDD_DIR)\nulsys}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
-   $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(NULSYS_LIB)2
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(NULSYS_LIB)2
 
 NULSYS_LIB_OBJS = \
    $(OBJ_DIR)\nulsys.obj
@@ -558,11 +558,11 @@ NULSYS_LIB_OBJS = \
 #
 
 {$(RDD_DIR)\dbfntx}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
-   $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(DBFNTX_LIB)2
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFNTX_LIB)2
 
 DBFNTX_LIB_OBJS = \
    $(OBJ_DIR)\dbfntx1.obj \
@@ -574,11 +574,11 @@ DBFNTX_LIB_OBJS = \
 #
 
 {$(RDD_DIR)\dbfcdx}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
-   $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(DBFCDX_LIB)2
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFCDX_LIB)2
 
 DBFCDX_LIB_OBJS = \
    $(OBJ_DIR)\dbfcdx1.obj \
@@ -590,7 +590,7 @@ DBFCDX_LIB_OBJS = \
 #
 
 {$(PP_DIR)}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 PP_LIB_OBJS = \
    $(OBJ_DIR)\ppcore.obj \
@@ -604,11 +604,11 @@ PP_LIB_OBJS = \
 #
 
 {$(DEBUG_DIR)}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
-   $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(DEBUG_LIB)2
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DEBUG_LIB)2
 
 DEBUG_LIB_OBJS = \
    $(OBJ_DIR)\dbgmenu.obj \
@@ -626,7 +626,7 @@ DEBUG_LIB_OBJS = \
 #
 
 {$(COMMON_DIR)}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 COMMON_LIB_OBJS = \
    $(OBJ_DIR)\hbffind.obj \
@@ -646,11 +646,11 @@ COMMON_LIB_OBJS = \
 #
 
 {$(VM_DIR)}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(VM_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
-   $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(VM_LIB)2
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(VM_LIB)2
 
 VM_LIB_OBJS = \
    $(OBJ_DIR)\arrays.obj \
@@ -691,7 +691,7 @@ VM_LIB_OBJS = \
 #
 
 {$(RTL_DIR)\gtcgi}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTCGI_LIB_OBJS = \
    $(OBJ_DIR)\gtcgi.obj \
@@ -702,7 +702,7 @@ GTCGI_LIB_OBJS = \
 #
 
 {$(RTL_DIR)\gtdos}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTDOS_LIB_OBJS = \
    $(OBJ_DIR)\gtdos.obj \
@@ -713,7 +713,7 @@ GTDOS_LIB_OBJS = \
 #
 
 {$(RTL_DIR)\gtpca}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTPCA_LIB_OBJS = \
    $(OBJ_DIR)\gtpca.obj \
@@ -724,7 +724,7 @@ GTPCA_LIB_OBJS = \
 #
 
 {$(RTL_DIR)\gtstd}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTSTD_LIB_OBJS = \
    $(OBJ_DIR)\gtstd.obj \
@@ -735,7 +735,7 @@ GTSTD_LIB_OBJS = \
 #
 
 {$(RTL_DIR)\gtwin}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\  $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTWIN_LIB_OBJS = \
    $(OBJ_DIR)\gtwin.obj \

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.475 2002/11/04 12:29:34 mlombardo Exp $
+ * $Id: ChangeLog,v 1.476 2002/11/04 21:28:11 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,19 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-11-04 18:19 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.vc
+    * no more recursive nmake calls
+  * makefile.nt
+    * corrected one batch mode call
+  * make_vc.bat
+    * if building Harbour under NT, will use the alternate makefile.nt
+    * for faster builds.
+    * if you would prefer not to use batch mode, 
+    *  run make_vc /y (just like nmake)
+
 2002-11-04 19:30 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/vm/dynsym.c
-    ! Fixed workaround for Symbol Table lenght limited to 10 chars and
+    ! Fixed workaround for Symbol Table length limited to 10 chars and
     ! Source code comments improved
 
 2002-11-04 09:20 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/macro/macro.y
-    + added support for If() function in macro execution with optional 3th 
-      parameter, as Cl*pper does : if(<lCondition>,<uResult1> [,<uResult2>])
-
-2002-11-04 09:20 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
-  * source/macro/macro.y
-    + added support for If() function in macro execution with optional 3th 
+    + added support for If() function in macro execution with optional 3rd
       parameter, as Cl*pper does : if(<lCondition>,<uResult1> [,<uResult2>])
 
 2002-10-31 17:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
@@ -48,7 +54,7 @@
 2002-10-29 23:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/memoedit.prg
     source/rtl/teditor.prg
-    % CRTL_W key is now an Valid Save key for memoedit Function 
+    % CRTL_W key is now an Valid Save key for memoedit Function
 
 2002-10-26 17:30 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/vm/dymsym.c
