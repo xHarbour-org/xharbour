@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.6 2004/01/02 11:38:14 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.7 2004/01/02 14:02:55 druzus Exp $
  */
 
 /*
@@ -284,18 +284,7 @@ static const ClipKeyCode stdKeyTab[CLIP_KEY_COUNT] = {
     {K_ENTER,    K_ALT_ENTER,  K_CTRL_ENTER,         0}  /*  25 */
 };
 
-typedef struct tag_UnixBox {
-    USHORT c1;
-    USHORT c2;
-} UnixBoxChar;
-
-#define XVT_BOX_CHARS 52
-
 static const UnixBoxChar boxTranslate[ XVT_BOX_CHARS ] ={
-   { 16, '+' },
-   { 17, ',' },
-   { 30, '-' },
-   { 31, '.' },
    { 176, HB_GTXVG_FILLER1},
    { 177, HB_GTXVG_FILLER2},
    { 178, HB_GTXVG_FILLER3},

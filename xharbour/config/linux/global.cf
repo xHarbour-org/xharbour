@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.5 2003/05/16 19:52:04 druzus Exp $
+# $Id: global.cf,v 1.6 2003/12/29 23:38:56 jonnymind Exp $
 #
 
 all : first
@@ -13,11 +13,6 @@ HB_GT_LIBS=\
         gtxvt \
         gtnul \
         
-#jonnymind - EXPERIMENTAL Adding QT lib only if explicitly requested
-ifeq ($(HB_GT_LIB),gtQTc)
-   HB_GT_LIBS+=gtQTc
-endif
-
 ifeq ($(HB_GT_LIB),)
    HB_GT_LIB = gtstd
 endif

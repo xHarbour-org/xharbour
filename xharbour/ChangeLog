@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1980 2004/01/03 09:37:52 vouchcac Exp $
+ * $Id: ChangeLog,v 1.1981 2004/01/03 13:03:03 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-03 15:04 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.h
+  * source/rtl/gtxvt/gtxvt.h
+    ! Minor fixups
+
+  * config/bsd/gcc.cf
+  * config/linux/gcc.cf
+    + Added support for gtxvt in utils
+
+  * config/linux/global.cf
+    - removed support for gtQTc
 
 2004-01-03 16:30 utc+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c
@@ -30,7 +42,7 @@
 	  These functions need be implemented at GT level but is only possible
         when someone implements them in proper way. Till then only for WVT.
    
-        When changing the fonts I could not control the box characters. 
+        When changing the fonts I could not control the box characters.
         Hopefully Peter may get it done.
 
   * xharbour/include/hbgtwvt.h
@@ -65,7 +77,7 @@
   * source/rtl/gtxvt/gtxvt.c
     ! Fixed a wrong box character
 
-2004-02-01 12:06 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+2004-01-02 12:06 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/gtxvt/gtxvt.c
   * source/rtl/gtxvt/gtxvt.h
     ! Fixed visualization of box characters (they were missing some

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.1 2003/12/31 06:59:59 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.2 2004/01/02 11:11:28 jonnymind Exp $
  */
 
 /*
@@ -164,8 +164,6 @@ typedef USHORT HB_GT_CELLTYPE;
 #define HB_GTXVT_DBL_SNG_CRS 0xE038 /* Double cross (single horiz) */
 
 
-
-
 #define HB_GTXVG_FULL      0xE090 /* Full character filler */
 #define HB_GTXVG_FULL_T    0xE091
 #define HB_GTXVG_FULL_B    0xE092
@@ -176,4 +174,12 @@ typedef USHORT HB_GT_CELLTYPE;
 #define HB_GTXVG_FILLER2   0xE0A1
 #define HB_GTXVG_FILLER3   0xE0A2
 
+/********************** Unix to graphic box translation ******************/
+
+typedef struct tag_UnixBox {
+    USHORT c1;
+    USHORT c2;
+} UnixBoxChar;
+
+#define XVT_BOX_CHARS 49
 #endif

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.16 2003/12/18 10:55:31 druzus Exp $
+# $Id: gcc.cf,v 1.17 2003/12/18 11:11:25 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -100,6 +100,10 @@ endif
 endif
 ifneq ($(HB_SCREEN_LIB),)
 LINKLIBS += -l$(HB_SCREEN_LIB)
+endif
+ifeq ($(HB_GT_LIB),gtxvt)
+LINKLIBS += -lX11
+LINKPATHS +=-L/usr/X11R6/lib
 endif
 # HB_GPM_MOUSE: use gpm mouse driver
 ifeq ($(HB_GPM_MOUSE),yes)
