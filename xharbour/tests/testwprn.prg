@@ -11,7 +11,8 @@ local aPrinter
    ? '----- No Printers installed'
   ELSE
     set printer to (GetDefaultPrinter())
-    ? SET(_SET_DEVICE)
+    ? SET(_SET_PRINTER)
+    ? SET(_SET_PRINTFILE)
     set console off
     set printer on
     ? 'Default Printer'
@@ -23,7 +24,6 @@ local aPrinter
     FOR x:= 1 TO LEN(aPrinter)
       ? aPrinter[x]
     NEXT x
-    EJECT
     aPrinter:= GetPrinters(.T.)
     ? 'Printers and Ports'
     ?'-------------------'
@@ -35,6 +35,7 @@ local aPrinter
     set console on
     set printer to
   ENDIF
+  ? SET(_SET_PRINTER)
   ? SET(_SET_DEVICE)
   WAIT
 return nil
