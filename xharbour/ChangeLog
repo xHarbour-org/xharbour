@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3192 2004/07/22 15:54:34 vouchcac Exp $
+ * $Id: ChangeLog,v 1.3193 2004/07/22 16:58:21 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-22 10:02 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/compiler/harbour.sly
+    ! Corrected 2 typos that caused reduce/shift conflicts
 
 2004-07-22 20:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * contrib/libct/addascii.c
@@ -37,8 +41,8 @@
     + s_.hDlgModeless slot to hold one modeless dialog window handle.
 
   * xharbour/source/rtl/gtwvt/gtwvt.c
-    Optimization as to correct rectangle in terms fo rows/cols to be 
-    painted in WM_PAINT message. Earlier it was painting 2 rows and two 
+    Optimization as to correct rectangle in terms fo rows/cols to be
+    painted in WM_PAINT message. Earlier it was painting 2 rows and two
     cols more than required, i.e., { 4,4,10,20 } -> { 3,3,11,21 }
     Due care has been taken if the painting is not initiated by any
     GtWvt function, then entire region is painted.
@@ -52,11 +56,11 @@
 
   * xharbour/source/vm/hvm.c
     + HB_FUNC( HB_NOSTARTUPWINDOW )
-      Earlier, if no startup window was required, GtWvt.lib needed 
+      Earlier, if no startup window was required, GtWvt.lib needed
       to be compiled with -D__WVT_NOSHOW_STARTUP__ cflag.
-      This behavior is now changed. Now you need to 
+      This behavior is now changed. Now you need to
       REQUEST Hb_NoStartupWindow
-      which will force the startup window to be HIDDEN which can be 
+      which will force the startup window to be HIDDEN which can be
       brought in view with Wvt_ShowWindow( S_RESTORE ).
 
 2004-07-22 18:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>

@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.70 2004/07/21 20:59:48 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.71 2004/07/22 08:40:52 ronpinkas Exp $
  */
 
 /*
@@ -2175,10 +2175,10 @@ SwitchCases : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Const
                }
            ;
 
-Constant   : NUM_INTEGER           { $$ = hb_compExprNewLong( $1.iNumber ); }
-           | '-' NUM_INTEGER       { $$ = hb_compExprNewLong( - $2.iNumber ); }
-           | NUM_LONG              { $$ = hb_compExprNewLong( $1.lNumber ); }
-           | '-' NUM_LONG          { $$ = hb_compExprNewLong( - $2.lNumber ); }
+Constant   : NUM_INTEGER               { $$ = hb_compExprNewLong( $1.iNumber ); }
+           | '-' NUM_INTEGER %prec PRE { $$ = hb_compExprNewLong( - $2.iNumber ); }
+           | NUM_LONG                  { $$ = hb_compExprNewLong( $1.lNumber ); }
+           | '-' NUM_LONG    %prec PRE { $$ = hb_compExprNewLong( - $2.lNumber ); }
            | Constant '+' Constant {
                                      $<asExpr>1->value.asNum.lVal += $<asExpr>3->value.asNum.lVal;
                                      hb_compExprDelete( $<asExpr>3 );
@@ -2189,12 +2189,12 @@ Constant   : NUM_INTEGER           { $$ = hb_compExprNewLong( $1.iNumber ); }
                                      hb_compExprDelete( $<asExpr>3 );
                                      $$ = $1;
                                    }
-           | Constant '|' Constant {
+           | Constant BITOR Constant {
                                      $<asExpr>1->value.asNum.lVal |= $<asExpr>3->value.asNum.lVal;
                                      hb_compExprDelete( $<asExpr>3 );
                                      $$ = $1;
                                    }
-           | Constant '&' Constant {
+           | Constant BITAND Constant {
                                      $<asExpr>1->value.asNum.lVal &= $<asExpr>3->value.asNum.lVal;
                                      hb_compExprDelete( $<asExpr>3 );
                                      $$ = $1;
