@@ -1,5 +1,5 @@
 /*
- * $Id: formedit.prg,v 1.0 2002/10/05 06:27:24 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.46 2002/10/06 02:50:59 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -93,7 +93,6 @@ GLOBAL EXTERNAL oApp
    METHOD SetGridSize(x,y)
    METHOD OnCloseQuery()     INLINE ::Parent:WindowMenu:Enable( 101 ),;
                                     ::Parent:StdBar:DisableAll(),;
-                                    ::XFMTrace(),;
                                     ::Parent:ObjInsp:InspCombo:DelObject( self ),;
                                     super:OnCloseQuery()
 
@@ -450,6 +449,7 @@ METHOD XFMReflect() CLASS TFormEdit
    FOR EACH aVar IN ::aXFM[ XFM_Datas ]
       cText += ( "   VAR " + aVar[1] + " INIT " + CStr( aVar[2] ) + CRLF )
    NEXT
+   cText += CRLF
 
    FOR EACH XFMControl IN ::aXFM[ XFM_Controls ]
       FOR EACH cLine IN XFMControl[ 4 ]
