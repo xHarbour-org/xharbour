@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.103 2004/03/31 21:02:05 druzus Exp $
+ * $Id: dbcmd.c,v 1.104 2004/04/01 09:35:36 andijahja Exp $
  */
 
 /*
@@ -4485,8 +4485,6 @@ static ERRCODE rddMoveRecords( char *cAreaFrom, char *cAreaTo, PHB_ITEM pFields,
 {
    HB_THREAD_STUB
    char     * szDriver;
-   LONG       toGo = lNext;
-   BOOL       bFor, bWhile, keepGoing = TRUE;
    AREAP      pAreaFrom, pAreaTo, pAreaRelease = NULL;
    USHORT     uiCurrAreaSaved = hb_rddGetCurrentWorkAreaNumber();
    AREAP      pCurrArea = HB_CURRENT_WA;
@@ -4544,58 +4542,37 @@ static ERRCODE rddMoveRecords( char *cAreaFrom, char *cAreaTo, PHB_ITEM pFields,
    {                                      /* only one record */
       SELF_GOTO( pAreaFrom, lRec );       /* go there */
    }
-   else
+   else if( ! pWhile && ! bRest && ! lNext )  /* these two stay current */
    {
-      if( ( ! pWhile ) && ( ! bRest ) && ( ! lNext ) )  /* these two stay current */
-      {
-         SELF_GOTOP( pAreaFrom );        /* else start from the top */
-      }
+      SELF_GOTOP( pAreaFrom );        /* else start from the top */
    }
 
    /*move those records assuming we are positioned on one.*/
-   while( keepGoing )
+   while ( ! pAreaFrom->fEof )
    {
-      keepGoing = FALSE;
-
-      if( ! pAreaFrom->fEof )  /*until eof or an evaluation failed*/
+      if ( pWhile && ! hb_itemGetL( hb_vmEvalBlock( pWhile ) ) )
       {
-         if( pWhile )
-         {
-            bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
-         }
-         else
-         {
-            bWhile = TRUE;
-         }
-         if( pFor )
-         {
-            bFor = hb_itemGetL( hb_vmEvalBlock( pFor ) );
-         }
-         else
-         {
-            bFor = TRUE;
-         }
-         if( bWhile && ( ! lNext || toGo > 0 ) )                /*candidate?*/
-         {
-            if( bFor )
-            {
-               hb_rddSelectWorkAreaNumber( pAreaTo->uiArea );
-               SELF_APPEND( pAreaTo, FALSE );      /*put a new one on TO Area*/
-               rddMoveFields( pAreaFrom, pAreaTo, pFields ); /*move the data*/
-               hb_rddSelectWorkAreaNumber( pAreaFrom->uiArea );
-            }
-            if( lRec == 0 || pFor )  /*not only one record? Or there's a For clause?*/
-            {
-               keepGoing = TRUE;
-            }
-            else
-            {
-               continue;
-            }
-         }
-         toGo--;                      /*one less to go*/
-         SELF_SKIP( pAreaFrom, 1L );  /*get the next one*/
+         break;
       }
+      if ( !pFor || hb_itemGetL( hb_vmEvalBlock( pFor ) ) )
+      {
+         hb_rddSelectWorkAreaNumber( pAreaTo->uiArea );
+         SELF_APPEND( pAreaTo, FALSE );      /*put a new one on TO Area*/
+         rddMoveFields( pAreaFrom, pAreaTo, pFields ); /*move the data*/
+         hb_rddSelectWorkAreaNumber( pAreaFrom->uiArea );
+      }
+      if ( lNext > 0 )
+      {
+         if ( --lNext == 0 )
+         {
+            break;
+         }
+      }
+      else if ( lRec != 0 ) /* only the one record? */
+      {
+         break;
+      }
+      SELF_SKIP( pAreaFrom, 1L );  /*get the next one*/
    }
 
    /*Close the File*/

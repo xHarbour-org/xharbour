@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2774 2004/04/08 21:48:41 andijahja Exp $
+ * $Id: ChangeLog,v 1.2775 2004/04/09 01:05:26 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-09 04:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbcmd.c
+    * fixed COPY TO/APPEND FROM to not make one unnecessary loop
+      if WHILE block fails what cause unnecessary execution of
+      FOR block and skipping
 
 2004-04-09 03:18 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbdefs.h
