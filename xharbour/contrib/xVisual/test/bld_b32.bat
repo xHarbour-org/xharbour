@@ -14,7 +14,7 @@ IF ERRORLEVEL 1 type comp.log
 IF ERRORLEVEL 1 PAUSE
 if errorlevel 1 goto exit
 
-%HB_INSTALL%\bin\harbour %2 -es2 -p -n -w -i%HB_INSTALL%\include;%WHAT32%\include > comp.log
+IF NOT '%2'=='' %HB_INSTALL%\bin\harbour %2 -es2 -p -n -w -i%HB_INSTALL%\include;%WHAT32%\include > comp.log
 IF ERRORLEVEL 1 type comp.log
 IF ERRORLEVEL 1 PAUSE
 if errorlevel 1 goto exit
@@ -40,7 +40,7 @@ if errorlevel 1 goto exit
 echo -O2 -tW -M -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF > b32.bc
 echo -I%HB_INSTALL%\include;%BCC_DIR%\include >> b32.bc
 echo -c %1.c >> b32.bc
-echo -c %2.c >> b32.bc
+IF NOT '%2'=='' echo -c %2.c >> b32.bc
 IF NOT '%3'=='' echo -c %3.c >> b32.bc
 IF NOT '%4'=='' echo -c %4.c >> b32.bc
 IF NOT '%5'=='' echo -c %5.c >> b32.bc
@@ -49,7 +49,7 @@ if errorlevel 1 goto exit
 
 echo %BCC_DIR%\lib\c0w32.obj + > b32.bc
 echo %1.obj + >> b32.bc
-echo %2.obj + >> b32.bc
+IF NOT '%2'=='' echo %2.obj + >> b32.bc
 IF NOT '%3'=='' echo %3.obj + >> b32.bc
 IF NOT '%4'=='' echo %4.obj + >> b32.bc
 IF NOT '%5'=='' echo %5.obj + >> b32.bc
