@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.3 2002/10/22 02:08:33 paultucker Exp $
+ * $Id: trace.c,v 1.4 2002/12/24 06:42:21 ronpinkas Exp $
  */
 
 /*
@@ -55,12 +55,14 @@
 
 #ifdef HB_EXTENSION
 
-void TraceLog( const char * sFile, const char * sTraceMsg )
+void TraceLog( const char * sFile, const char * sTraceMsg, ... )
 {
    FILE *hFile;
 
    if( !sTraceMsg )
+   {
       return;
+   }
 
    if( sFile == NULL )
    {
@@ -73,53 +75,12 @@ void TraceLog( const char * sFile, const char * sTraceMsg )
 
    if ( hFile )
    {
-      fprintf( hFile, sTraceMsg );
-      fclose( hFile );
-   }
-}
+      va_list ap;
 
-void TraceLogValue( const char * sFile, const char * sTraceMsg, long Value )
-{
-   FILE *hFile;
+      va_start( ap, sTraceMsg );
+      vfprintf( hFile, sTraceMsg, ap );
+      va_end( ap );
 
-   if( !sTraceMsg )
-      return;
-
-   if( sFile == NULL )
-   {
-      hFile = fopen( "trace.log", "a" );
-   }
-   else
-   {
-      hFile = fopen( sFile, "a" );
-   }
-
-   if ( hFile )
-   {
-      fprintf( hFile, sTraceMsg, Value );
-      fclose( hFile );
-   }
-}
-
-void TraceLogPointer( const char * sFile, const char * sTraceMsg, void *Pointer )
-{
-   FILE *hFile;
-
-   if( !sTraceMsg )
-      return;
-
-   if( sFile == NULL )
-   {
-      hFile = fopen( "trace.log", "a" );
-   }
-   else
-   {
-      hFile = fopen( sFile, "a" );
-   }
-
-   if ( hFile )
-   {
-      fprintf( hFile, sTraceMsg, Pointer );
       fclose( hFile );
    }
 }
