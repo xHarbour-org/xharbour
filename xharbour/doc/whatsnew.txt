@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.3 2004/03/12 14:06:06 patrickmast Exp $
+ * $Id: whatsnew.txt,v 1.4 2004/03/12 14:12:39 patrickmast Exp $
  */
 
 ----------------------------------------------------------------------
@@ -15,7 +15,9 @@ xHarbour 0.93 (Bug Freeze at 2004-03-10 )
 - Many Debugger fixes and improvements.
 - Fixed all reported RDD, PP and TRL issues.
 - More enhanced and fixed PRG level debugger
-
+- ADS RDD : Several speed enhancements, especially for WAN or other slow connection.
+- ADS RDD : Added support for Time and Timestamp Fields in ADT tables
+- ADS RDD : Added several new functions. See ADS documentation for details.
 
 Version 0.37 Build 37 (2001-06-26)
 
