@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2224 2004/02/04 23:04:23 walito Exp $
+ * $Id: ChangeLog,v 1.2225 2004/02/05 06:06:17 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-02-04 13:28 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtwin/gtwin.c
+    ! Commented out the following lines in IgnoreKeyCodes:
+      case 40: /* Circle Accent */
+      case 41: /* Tick Accent */
+      In Italian keyboards the correspond to # and ù; other international
+      keyboards may have other meaningful characters there as well.
+
+      /* I don't know why you wished to ingore those chars, but anything
+         you wanted to do MUST be done in a different way.
+      */
+      
 2004-02-05 00:03 UTC-0600 Vicente Guerra <vic@guerra.com.mx>
   * makefile.bc
     ! $(CFLAGS) was overwritten when hbrunmt.exe is created.

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.35 2004/01/20 03:41:35 walito Exp $
+ * $Id: gtwin.c,v 1.36 2004/02/01 23:40:51 jonnymind Exp $
  */
 
 /*
@@ -1238,8 +1238,8 @@ static int IgnoreKeyCodes( int wKey )
    {
       /* Virtual scan codes to ignore */
       case 29: /* Ctrl */
-      case 40: /* Circle Accent */
-      case 41: /* Tick Accent */
+      /* case 40: */ /* Circle Accent */
+      /* case 41: */ /* Tick Accent */
       case 42: /* Left Shift */
       case 43: /* Reverse Tick Accent */
       case 54: /* Right Shift */
