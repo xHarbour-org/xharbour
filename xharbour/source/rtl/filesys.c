@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.111 2004/06/23 21:59:31 likewolf Exp $
+ * $Id: filesys.c,v 1.112 2004/07/19 20:57:54 peterrees Exp $
  */
 
 /*
@@ -2213,7 +2213,6 @@ ULONG   HB_EXPORT hb_fsTell( FHANDLE hFileHandle )
    return ulPos;
 }
 
-
 BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
 {
    HB_THREAD_STUB
@@ -2221,7 +2220,10 @@ BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsDelete(%s)", (char*) pFilename));
 
+   pFilename = ( BYTE *) hb_fileNameConv( hb_strdup( ( char * ) pFilename) );
+
    HB_STACK_UNLOCK
+
 
 #if defined(HB_OS_WIN_32)
 
@@ -2251,6 +2253,8 @@ BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
 #endif
 
    HB_STACK_LOCK
+
+   hb_xfree( pFilename ) ;
 
    return bResult;
 }
