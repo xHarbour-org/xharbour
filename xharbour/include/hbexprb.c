@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.22 2002/05/16 20:06:27 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.23 2002/05/18 08:55:49 ronpinkas Exp $
  */
 
 /*
@@ -2958,6 +2958,8 @@ static HB_EXPR_FUNC( hb_compExprUseEqual )
                    {
                       hb_compExprFree( pSelf->value.asOperator.pLeft, HB_MACRO_PARAM );
                       pSelf = pRight;
+                      HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+                      break;
                    }
                    else
                    {
@@ -2965,6 +2967,8 @@ static HB_EXPR_FUNC( hb_compExprUseEqual )
                       pSelf->ExprType = HB_EO_NOT;
                       pSelf->value.asOperator.pLeft = pSelf->value.asOperator.pRight;
                       pSelf->value.asOperator.pRight = NULL;
+                      HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+                      break;
                    }
                 }
                 else if( pRight->ExprType == HB_ET_LOGICAL )
@@ -2973,6 +2977,8 @@ static HB_EXPR_FUNC( hb_compExprUseEqual )
                    {
                       hb_compExprFree( pSelf->value.asOperator.pRight, HB_MACRO_PARAM );
                       pSelf = pLeft;
+                      HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+                      break;
                    }
                    else
                    {
@@ -2980,6 +2986,8 @@ static HB_EXPR_FUNC( hb_compExprUseEqual )
                       pSelf->ExprType = HB_EO_NOT;
                       //pSelf->value.asOperator.pLeft = pSelf->value.asOperator.pLeft;
                       pSelf->value.asOperator.pRight = NULL;
+                      HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+                      break;
                    }
                 }
 
