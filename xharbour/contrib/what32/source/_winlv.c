@@ -36,6 +36,11 @@ HB_FUNC ( LISTVIEW_SETITEMCOUNT )
    ListView_SetItemCount( (HWND) hb_parnl(1), hb_parnl(2) );
 }
 
+HB_FUNC ( LISTVIEW_GETNEXTITEM )
+{
+   hb_retnl(ListView_GetNextItem( (HWND) hb_parnl(1), hb_parni(2), hb_parnl(3) ));
+}
+
 HB_FUNC ( LISTVIEWNOTIFY )
 {
    LPARAM lParam = (LPARAM) hb_parnl(2);
