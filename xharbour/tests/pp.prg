@@ -411,9 +411,9 @@ STATIC s_lReturnRequested
 
 #ifdef REVISION
 	 #xtranslate Stringify( <x> ) => #<x>
-   STATIC s_cVer := "1.0.RC8" + Stringify( REVISION )
+   STATIC s_cVer := "1.0.RC9" + Stringify( REVISION )
 #else
-   STATIC s_cVer := "1.0.RC8"
+   STATIC s_cVer := "1.0.RC9"
 #endif
 
 //--------------------------------------------------------------//
@@ -6075,7 +6075,7 @@ RETURN sResult
 STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
    LOCAL nNext, sKey, sAnchor, nOptional := 0, cType, nId := 0, aRule, aMatch, aWords
-   LOCAL nOptionalAt, nMarkerAt, aMarkers := {}, Counter, nType, aResult := {}, sTemp, aModifiers, aValues
+   LOCAL nOptionalAt, nMarkerAt, aMarkers := {}, Counter, nType, aResult := {}, sTemp, aModifiers
    LOCAL aRP, nAt, sResult, nCloseAt, sMarker, nCloseOptionalAt, sPad, nResults, nMarker, nMP, nMatches, nOffset
    LOCAL nWord, nWords, cChar
    LOCAL nLen, s1, s2, s3
@@ -6637,7 +6637,6 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
    nOptional     := 0
    aModifiers    := {}
-   aValues       := Array( nId )
    nId           := 0
    sPad          := ''
 
@@ -7273,7 +7272,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    NEXT
    //WAIT
 
-   aAdd( aResults, { aResult, aModifiers, aValues } )
+   aAdd( aResults, { aResult, aModifiers, Array( Len( aMarkers ) ) } )
 
    //TraceLog( "Finished" )
 
