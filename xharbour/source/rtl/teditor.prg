@@ -1,12 +1,12 @@
 /*
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
-*  
+*
 * Minimal revision for proper working (expecially with word warping).
 * Fixed many funtions
 * Added GotoCol() and GotoPos() to goto a logical column or position; they translate this
 * movement in a adequate ::SetPos call.
-* 
+*
 * Modifications are based upon the following source file:
 */
 
@@ -28,7 +28,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.26 2004/04/17 23:27:21 jonnymind Exp $
+/* $Id: teditor.prg,v 1.27 2004/04/18 10:18:18 jonnymind Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -126,7 +126,7 @@ CLASS HBEditor
    DATA  nTabWidth      INIT 5      // Size of Tab chars
    DATA  lEditAllow     INIT .T.    // Are changes to text allowed?
    DATA  lSaved         INIT .F.    // True if user exited editor with K_CTRL_W
-   DATA  lWordWrap      INIT .F.    // True if word wrapping is active
+   DATA  lWordWrap      INIT .T.    // .f. earlier, True if word wrapping is active
    DATA  nWordWrapCol   INIT 0      // At which column word wrapping occurs
    DATA  lDirty                     // .T. if there are changes not saved
    DATA  lExitEdit      INIT .F.    // .T. if user requested to end Edit() method
@@ -278,8 +278,12 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
 
    // is word wrap required?
    if nLineLength != NIL
-      ::lWordWrap := .T.
+      if nLineLength <= ::nRight - ::nLeft
+//         ::lWordWrap := .T.
+      endif
       ::nWordWrapCol := nLineLength
+   else
+      ::nWordWrapCol := ( ::nRight - ::nLeft )
    endif
 
    // how many spaces for each tab?
@@ -287,10 +291,15 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
       ::nTabWidth := nTabSize
    endif
 
+   nTextRow    := max( 1, nTextRow )
+   nTextCol    := max( 0, nTextCol )
+   nWndRow     := max( 0, nWndRow  )
+   nWndCol     := max( 0, nWndCol  )
+
    ::nFirstRow := max( 1, nTextRow - nWndRow )
    ::nFirstCol := max( 1, nTextCol - nWndCol )
-   ::nRow      := max( nTextRow, 1 )
-   ::nCol      := max( nTextCol, 1 )
+   ::nRow      := max( 1, nTextRow     )
+   ::nCol      := max( 1, nTextCol + 1 )
 
    // Empty area of screen which will hold editor window
    Scroll( nTop, nLeft, nBottom, nRight )
@@ -318,15 +327,19 @@ METHOD Resize( nTop, nLeft, nBottom, nRight ) CLASS HBEditor
    ::nRight    := nRight
 
    // How many cols and rows are available
+   //
    ::nNumCols  := ::nRight - ::nLeft + 1
    ::nNumRows  := ::nBottom - ::nTop + 1
 
    // FirstCol/Row of current text visible inside editor window
+   //
    ::nFirstCol := 1
    ::nFirstRow := 1
+
    // Cursor position inside aText ( nRow ) and inside current line of text ( nCol )
-   ::nRow := 1
-   ::nCol := 1
+   //
+   ::nRow      := 1
+   ::nCol      := 1
 
    // Set cursor upper left corner
    ::SetPos( ::nTop, ::nLeft )
@@ -613,11 +626,17 @@ METHOD GoTop() CLASS HBEditor
 METHOD Right() CLASS HBEditor
 
    if ::Col() == ::nRight
-      if ::nCol <= iif( ::lWordWrap, ::nWordWrapCol, ::LineLen( ::nRow ) )
+//      if ::nCol <= iif( ::lWordWrap, ::nWordWrapCol, ::LineLen( ::nRow ) )
+      if ::nCol <= ::nWordWrapCol
          Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight,, 1 )
          ::nFirstCol++
          ::nCol++
          ::RefreshColumn()
+      else
+         if ( ::lWordWrap )
+            ::Down()
+            ::Home()
+         endif
       endif
    else
       ::nCol++
@@ -627,9 +646,11 @@ METHOD Right() CLASS HBEditor
    //mod = move to next line
    //
    If ::lRightScroll
-      if ::nCol > ::LineLen( ::nRow ) .and. ::nRow < ::naTextLen
-         ::Down()
-         ::Home()
+      if ( ::lWordWrap )
+         if ::nCol > ::LineLen( ::nRow ) .and. ::nRow < ::naTextLen
+            ::Down()
+            ::Home()
+         endif
       endif
    endif
 
@@ -640,6 +661,7 @@ METHOD Right() CLASS HBEditor
 METHOD WordRight() CLASS HBEditor
 
    // NOTE: should be faster without call to ::GetLine()
+   //
    while ::nCol <= iif( ::lWordWrap, Min( ::nWordWrapCol, ::LineLen( ::nRow ) ), ::LineLen( ::nRow ) ) .AND. SubStr( ::aText[ ::nRow ]:cText, ::nCol, 1 ) <> " "
       ::Right()
    enddo
@@ -648,10 +670,13 @@ METHOD WordRight() CLASS HBEditor
    enddo
 
    // mod = move to next line
+   //
    If ::lRightScroll
-      if ::nCol > ::LineLen( ::nRow ) .and. ::nRow < ::naTextLen
-         ::Down()
-         ::Home()
+      if ( ::lWordWrap )
+         if ::nCol > ::LineLen( ::nRow ) .and. ::nRow < ::naTextLen
+            ::Down()
+            ::Home()
+         endif
       endif
    endif
 
@@ -661,6 +686,7 @@ METHOD WordRight() CLASS HBEditor
 
 METHOD End() CLASS HBEditor
    ::GotoCol( ::LineLen( ::nRow ) + 1 )
+
 Return Self
 
 //-------------------------------------------------------------------//
@@ -675,10 +701,13 @@ METHOD Left() CLASS HBEditor
          ::RefreshColumn()
 
       // Modified = keep at max of end of line
+      //
       else
-         if ::nRow>1
-            ::Up()
-            ::End()
+         if ::lWordWrap
+            if ::nRow > 1
+               ::Up()
+               ::End()
+            endif
          endif
       endif
    else
@@ -695,7 +724,7 @@ METHOD WordLeft() CLASS HBEditor
    // splitline() does not use this function
    // modifed to wrap lines and position at first letter of word, not word end
    //
-   if ::nCol == 1  .and. ::nrow>1
+   if ::nCol == 1  .and. ::nrow > 1 .and. ::lWordWrap
       ::Up()
       ::End()
    endif
@@ -838,15 +867,16 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
          endif
 
          if ( bKeyBlock := Setkey( nKey ) ) <> NIL
-            Eval( bKeyBlock, Self )  // 7/01/2004 12:47p.m. Pass Self as parameter
-            Loop
+            Eval( bKeyBlock, Self )    // 7/01/2004 12:47p.m. Pass Self as parameter
+            Loop                     // Commented out - 18 Apr 2004 - Pritpal Bedi
          endif
 
          Switch nKey
             case K_ALT_W
             case K_CTRL_W
                // TOFIX: Not clipper compatible
-               ::lSaved := .T.
+               //
+               ::lSaved    := .T.
                ::lExitEdit := .T.
                SetCursor( ::nOrigCursor )   // restore original cursor saved at startup
                exit
@@ -973,37 +1003,41 @@ return Self
 //-------------------------------------------------------------------//
 
 METHOD K_Ascii( nKey ) CLASS HBEditor
-   LOCAL lHardCR := .f., nLastLine
 
    // nKey := ASC( HB_ANSITOOEM( CHR( nKey ) ) )    // convert from windows
 
-   ::lDirty := .T.
+   ::lDirty   := .T.
    ::nMarkPos := 0
 
    // If I'm past EOL I need to add as much spaces as I need to reach ::nCol
-   if ::nCol > ::LineLen( ::nRow )         // At end of line, add room
+   // Always remeber the cursor position is always 1 ahead of buffer
+   // So adding 1 below - Pritpal Bedi
+   //
+   if ::nCol > ::LineLen( ::nRow ) + 1        // At end of line, add room
       ::aText[ ::nRow ]:cText += Space( ::nCol - ::LineLen( ::nRow ) )
    endif
 
    // insert char if in insert mode or at end of current line
+   //
    if ::lInsert .OR. ( ::nCol > ::LineLen( ::nRow ) )
       ::aText[ ::nRow ]:cText := Stuff( ::aText[ ::nRow ]:cText, ::nCol, 0, Chr( nKey ) )
    else
       ::aText[ ::nRow ]:cText := Stuff( ::aText[ ::nRow ]:cText, ::nCol, 1, Chr( nKey ) )
    endif
+
    // eventually wordwrap
-   IF ::lWordWrap .and. ::LineLen( ::nRow ) > ::nWordWrapCol 
+   //
+   IF ::lWordWrap .and. ::LineLen( ::nRow ) > ::nWordWrapCol
       ::SplitLine( ::nRow )
       IF nKey != K_SPACE
          ::Right()
-      ENDIF      
-   ELSE      
-      ::RefreshLine()  
+      ENDIF
+   ELSE
+      ::RefreshLine()
       ::Right()
    ENDIF
-RETURN Self
 
-//-------------------------------------------------------------------//
+RETURN Self
 
 //-------------------------------------------------------------------//
 
@@ -1015,25 +1049,28 @@ METHOD K_Bs() CLASS HBEditor
    // Handling this destructive key properly is quite complex, especially at line end
 
    if ::nCol == 1
-      if ::nRow > 1
-         ::lDirty := .T.
-         ::nRow --
-         // inherit sibling line's soft CR setting.
-         ::aText[ ::nRow ]:lSoftCR := ::aText[ ::nRow + 1 ]:lSoftCR
-         // remove a SINGLE trailing space, if it exists
-         IF ::aText[ ::nRow ]:cText[-1] == " "
-            ::aText[ ::nRow ]:cText := Substr( ::aText[ ::nRow ]:cText, 1, ::LineLen( ::nRow ) - 1 )
-         ENDIF
-         ::nCol := ::LineLen( ::nRow ) +1
-         ::aText[ ::nRow ]:cText += ::aText[ ::nRow + 1 ]:cText
-         ::RemoveLine( ::nRow + 1 )
-         // resplit the line.
-         IF ::lWordWrap .and. ::LineLen( ::nRow ) >= ::nWordWrapCol 
-            // will also refresh
-            ::SplitLine( ::nRow )
-         ENDIF
-         ::GotoPos( ::nRow, ::nCol, .T. ) // also refresh
+      if ( ::lWordWrap )
+         if ::nRow > 1
+            ::lDirty := .T.
+            ::nRow --
+            // inherit sibling line's soft CR setting.
+            ::aText[ ::nRow ]:lSoftCR := ::aText[ ::nRow + 1 ]:lSoftCR
+            // remove a SINGLE trailing space, if it exists
+            IF ::aText[ ::nRow ]:cText[-1] == " "
+               ::aText[ ::nRow ]:cText := Substr( ::aText[ ::nRow ]:cText, 1, ::LineLen( ::nRow ) - 1 )
+            ENDIF
+            ::nCol := ::LineLen( ::nRow ) +1
+            ::aText[ ::nRow ]:cText += ::aText[ ::nRow + 1 ]:cText
+            ::RemoveLine( ::nRow + 1 )
+            // resplit the line.
+            IF ::lWordWrap .and. ::LineLen( ::nRow ) >= ::nWordWrapCol
+               // will also refresh
+               ::SplitLine( ::nRow )
+            ENDIF
+            ::GotoPos( ::nRow, ::nCol, .T. ) // also refresh
+         endif
       endif
+
    else
       // delete previous character
       ::lDirty := .T.
@@ -1104,15 +1141,19 @@ METHOD K_Del() CLASS HBEditor
 
    IF ::nCol > ::LineLen( ::nRow ) .and. ::nRow < ::naTextLen
       // eventually pad.
+      //
       IF ::nCol > ::LineLen( ::nRow ) + 1
          ::aText[ ::nRow ]:cText := Padr( ::aText[ ::nRow ]:cText, ::nCol - 1)
       ENDIF
       lMerge := .T.
-   
+
    ELSEIF ::nCol <= ::LineLen( ::nRow )
       // stuff the character
+      //
       ::aText[ ::nRow ]:cText := Stuff( ::aText[ ::nRow ]:cText, ::nCol, 1, "" )
+
       // in case of softcr, reparse the paragraph.
+      //
       IF ::aText[ ::nRow ]:lSoftCR
          IF ::aText[ ::nRow ]:cText[ -1 ] != " "
             ::aText[ ::nRow ]:cText += " "
@@ -1123,9 +1164,9 @@ METHOD K_Del() CLASS HBEditor
       ENDIF
    ENDIF
 
-   // have we to merge with the next line?   
+   // have we to merge with the next line?
    IF lMerge
-      // copy the other line 
+      // copy the other line
       ::aText[ ::nRow ]:cText += ::aText[ ::nRow + 1 ]:cText
       // copy its softcr setting
       ::aText[ ::nRow ]:lSoftCr := ::aText[ ::nRow + 1 ]:lSoftCr
@@ -1150,17 +1191,23 @@ METHOD K_Return() CLASS HBEditor
          ::aText[ ::nRow + 1 ]:cText := Substr( ::aText[ ::nRow ]:cText, ::nCol ) +" "+ ::aText[ ::nRow + 1 ]:cText
          ::SplitLine( ::nRow )
       ELSE
-         ::InsertLine( Substr( ::aText[ ::nRow ]:cText, ::nCol ), .F., ::nRow + 1 )         
+         ::InsertLine( Substr( ::aText[ ::nRow ]:cText, ::nCol ), .F., ::nRow + 1 )
       ENDIF
       ::aText[ ::nRow ]:cText := Left( ::aText[ ::nRow ]:cText, ::nCol - 1 )
+
    ELSEIF ::nRow == ::naTextLen
       ::AddLine( "", .F. )
+
    ENDIF
+
    // the current line should not have softcr anymore
+   //
    ::aText[ ::nRow ]:lSoftCR := .F.
+
    // will also refresh
+   //
    ::GotoPos( ::nRow + 1, 1, .T. )
-         
+
 RETURN Self
 
 //-------------------------------------------------------------------//
@@ -1223,69 +1270,85 @@ return Self
 METHOD GotoLine( nRow ) CLASS HBEditor
 
    if nRow <= ::naTextLen .AND. nRow > 0
-      IF nRow < ::nFirstRow 
+      // I need to move cursor if is past requested line number and if requested line is
+      // inside first screen of text otherwise ::nFirstRow would be wrong
+      //
+      IF nRow < ::nFirstRow
          ::nFirstRow := nRow
          ::RefreshWindow()
+
       ELSEIF nRow - ::nFirstRow > ::nBottom - ::nTop
          ::nFirstRow := Max( 1, nRow - (::nBottom - ::nTop) )
          ::RefreshWindow()
+
       ENDIF
+
       ::nRow := nRow
       ::SetPos( ::nTop + nRow - ::nFirstRow, ::Col() )
    ENDIF
 
 return Self
 
+//-------------------------------------------------------------------//
+
 METHOD GotoCol( nCol ) CLASS HBEditor
 
-   IF nCol <= ::LineLen( ::nRow ) +1 .AND. nCol >= 1 
-      // I need to move cursor if is past requested line number and if requested line is
-      // inside first screen of text otherwise ::nFirstRow would be wrong
+   IF nCol <= ::LineLen( ::nRow ) + 1 .AND. nCol > 0
+      // I need to move cursor if is past requested column and if requested column is
+      // inside first screen of text otherwise ::nFirstCol would be wrong
+      //
       IF nCol < ::nFirstCol
          ::nFirstCol :=  nCol
          ::RefreshWindow()
+
       ELSEIF nCol - ::nFirstCol > ::nRight - ::nLeft
-         ::nFirstCol := Max( 1, nCol - (::nRight - ::nLeft) )
+         ::nFirstCol := Max( 1, nCol - ( ::nRight - ::nLeft ) )
          ::RefreshWindow()
+
       ENDIF
+
       ::nCol := nCol
       ::SetPos( ::Row(), ::nLeft + nCol - ::nFirstCol )
    ENDIF
+
 RETURN Self
 
+//-------------------------------------------------------------------//
+
 METHOD GotoPos( nRow, nCol, lRefresh ) CLASS HBEditor
-   
+
    DEFAULT lRefresh TO .F.
-   
+
    if nRow <= ::naTextLen .AND. nRow > 0
-      IF nRow < ::nFirstRow 
+      // I need to move cursor if is past requested line number and if requested line is
+      // inside first screen of text otherwise ::nFirstRow would be wrong
+      //
+      IF nRow < ::nFirstRow
          ::nFirstRow := nRow
          lRefresh := .T.
       ELSEIF nRow - ::nFirstRow > ::nBottom - ::nTop
-         ::nFirstRow := Max( 1, nRow - (::nBottom - ::nTop) )
+         ::nFirstRow := Max( 1, nRow - ( ::nBottom - ::nTop ) )
          lRefresh := .T.
       ENDIF
       ::nRow := nRow
    endif
-   
-   if nCol <= ::LineLen( nRow ) .AND. nCol >= 1 
-      // I need to move cursor if is past requested line number and if requested line is
-      // inside first screen of text otherwise ::nFirstRow would be wrong
-      if nCol < ::nFirstCol 
+
+   if nCol <= ::LineLen( nRow ) + 1 .AND. nCol > 0
+      if nCol < ::nFirstCol
          ::nFirstCol := nCol
          lRefresh := .T.
       ELSEIF nCol - ::nFirstCol > ::nRight - ::nLeft
-         ::nFirstCol := Max( 1, nCol - (::nRight - ::nLeft) )
+         ::nFirstCol := Max( 1, nCol - ( ::nRight - ::nLeft ) )
          lRefresh := .T.
       ENDIF
       ::nCol := nCol
    endif
-   
-   
-   IF lRefresh
+
+   if lRefresh
       ::SetPos( ::nTop + nRow - ::nFirstRow, ::nLeft + nCol - ::nFirstCol )
       ::RefreshWindow()
-   ENDIF
+   endif
+
 RETURN Self
 
 //-------------------------------------------------------------------//
@@ -1301,14 +1364,15 @@ STATIC function GetParagraph( oSelf, nRow )
       // I don't need to increment nRow since I'm removing lines, ie line n is
       // a different line each time I add it to cLine
       oSelf:RemoveLine( nRow )
-      IF Len(cLine) > 0 .and. cLine[-1] != " "
+      IF Len( cLine ) > 0 .and. cLine[ -1 ] != " "
          cLine += " "
       ENDIF
    enddo
 
    // Last line, or only one line
-      cLine += oSelf:aText[ nRow ]:cText
-      oSelf:RemoveLine( nRow )   // this is where array error occurs IF final line of text is allowed to have :lSoftCR
+   //
+   cLine += oSelf:aText[ nRow ]:cText
+   oSelf:RemoveLine( nRow )   // this is where array error occurs IF final line of text is allowed to have :lSoftCR
 
 return cLine
 
@@ -1332,7 +1396,7 @@ METHOD SplitLine( nRow ) CLASS HBEditor
    IF .NOT. ::lWordWrap .OR. ( ::LineLen( nRow ) <= ::nWordWrapCol )
       RETURN Self
    ENDIF
-   
+
    ::lRightScroll := .F.                       // must be .F. within this Method
 
    // Move cursor to next line if you will move the word which I'm over to next line
@@ -1340,43 +1404,50 @@ METHOD SplitLine( nRow ) CLASS HBEditor
 
    // special case; if the character(s) at the end of the line are spaces, we must just
    // create a blank line.
-   cLine := ::GetLine( nRow ) 
+   //
+   cLine := ::GetLine( nRow )
+
    // count words up to the word containing the cursor.
+   //
    nFirstSpace := 0
-   nCurSpace := At( " ", cLine )
+   nCurSpace   := At( " ", cLine )
    DO WHILE nCurSpace <= ::nCol .and. nCurSpace > 0
       nFirstSpace := nCurSpace
-      nCurSpace := At( " ", cLine, nCurSpace + 1 )
+      nCurSpace   := At( " ", cLine, nCurSpace + 1 )
    ENDDO
+
    // and see at what point in that line the cursor is.
    // remember that nFirstSpace is zero based, and pointing to one space
    // before the current word.
+   //
    nPosInWord := IIF( ::nCol > nFirstSpace, ::nCol - nFirstSpace, 1 )
 
-   nStartRow := nRow
-   cLine := GetParagraph( Self, nRow )
+   nStartRow  := nRow
+   cLine      := GetParagraph( Self, nRow )
 
    while Len( cLine ) >= ::nWordWrapCol
 
       nFirstSpace := ::nWordWrapCol
 
       // Split line at fist space before current position
+      //
       while nFirstSpace > 1 .and. cLine[nFirstSpace] <> " "
          nFirstSpace --
       enddo
 
       // If there is a space before beginning of line split there
+      //
       if nFirstSpace > 1
          cSplittedLine := Left( cLine, nFirstSpace )
       else
          // Changed -- now splits line at the nWordWrapCol when no space!  The cursor position is not reliable!
          // This avoids error if the line has NO SPACES! Without this modif. code enters infinite loop on wrap
          // Note that cursor postioning when wrapping lines that have NO space is funky due to MovetoNextLine() problems
-
+         //
          cSplittedLine := Left( cLine, ::nWordWrapCol )
 
-            // Old method was: else split at current cursor position
-            // cSplittedLine := Left( cLine, ::nCol - 1 )
+         // Old method was: else split at current cursor position
+         // cSplittedLine := Left( cLine, ::nCol - 1 )
       endif
 
       cSplittedLine := cSplittedLine
@@ -1384,29 +1455,31 @@ METHOD SplitLine( nRow ) CLASS HBEditor
       cLine := Substr( cLine, Len( cSplittedLine ) + 1 )
    enddo
 
-   // insert EVEN an empty row (it will be added at bottom)  
+   // insert EVEN an empty row (it will be added at bottom)
    ::InsertLine( Trim(cLine), .F., nStartRow++ )
 
    // re-count words and see where current word has gone.
-   cLine := ::GetLine( nRow ) 
+   cLine := ::GetLine( nRow )
 
-   IF Len( cLine ) < ::nCol 
+   IF Len( cLine ) < ::nCol
       nCurSpace := At( " ", cLine )
       // stop when word count has matched OR when nCol is passed (all stay in current line).
-      DO WHILE nCurSpace > 0 .and. nCurSpace <= ::nCol 
+      DO WHILE nCurSpace > 0 .and. nCurSpace <= ::nCol
          nCurSpace := At( " ", cLine, nCurSpace + 1 )
       ENDDO
-      
+
       // next line?
-      IF nCurSpace == 0 
-         nRow ++
+      IF nCurSpace == 0
+         nRow++
          ::GotoPos( nRow, nPosInWord )
-      ELSEIF nCurSpace == ::nCol 
+
+      ELSEIF nCurSpace == ::nCol
          nRow ++
          ::GotoPos( nRow, 1 )
+
       ENDIF
    ENDIF
-   
+
    ::RefreshWindow()
    ::lRightScroll := .T.          // set at beginning of if/endif -- must be .F. in SplitScreen()
 
@@ -1497,7 +1570,7 @@ METHOD InsertState( lInsState ) CLASS HBEditor
       ::lInsert := lInsState
       SET( _SET_INSERT, lInsState )
       if ::lInsert
-           Setcursor( 2 )
+         Setcursor( 2 )
       else
       Setcursor( 3 )
       endif
@@ -1515,9 +1588,9 @@ METHOD GetText() CLASS HBEditor
    LOCAL cEOL := HB_OSNewLine()
 
    if ::lWordWrap
-      AEval( ::aText, {|cItem| cString += cItem:cText + iif( cItem:lSoftCR, "", cEOL )},, ::naTextLen - 1 )
+      AEval( ::aText, {| cItem | cString += cItem:cText + iif( cItem:lSoftCR, "", cEOL )},, ::naTextLen - 1 )
    else
-      AEval( ::aText, {|cItem| cString += cItem:cText + cEOL},, ::naTextLen - 1 )
+      AEval( ::aText, {| cItem | cString += cItem:cText + cEOL},, ::naTextLen - 1 )
    endif
 
    // Last line does not need a cEOL delimiter
@@ -1627,9 +1700,9 @@ STATIC function Text2Array( cString, nWordWrapCol )
    LOCAL nTokPos := 0
 
    nTokNum := 1
-   aArray := {}
+   aArray  := {}
 
-   cEOL := WhichEOL( cString )
+   cEOL    := WhichEOL( cString )
    nEOLLen := Len( cEOL )
 
    // __StrTkPtr() needs that string to be tokenized be terminated with a token delimiter
@@ -1638,7 +1711,7 @@ STATIC function Text2Array( cString, nWordWrapCol )
    endif
 
    nRetLen := 0
-   ncSLen := Len( cString )
+   ncSLen  := Len( cString )
 
    // If cString starts with an EOL delimiter I have to add an empty line since __StrTkPtr
    // gives back _next_ token and would skip this first EOL delimiter
@@ -1651,6 +1724,7 @@ STATIC function Text2Array( cString, nWordWrapCol )
    while nRetLen < ncSLen
       /* TOFIX: Note that __StrToken is not able to cope with delimiters longer than one char */
       // Dos - OS/2 - Windows have CRLF as EOL
+      //
       if nEOLLen > 1
          cLine := StrTran( __StrTkPtr( @cString, @nTokPos, cEOL ), SubStr( cEOL, 2 ), "" )
       else
@@ -1735,3 +1809,4 @@ STATIC procedure BrowseText( oSelf, nPassedKey )
 return
 
 //-------------------------------------------------------------------//
+
