@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.87 2003/10/18 01:15:18 jonnymind Exp $
+ * $Id: hbapi.h,v 1.88 2003/11/07 10:03:11 jonnymind Exp $
  */
 
 /*
@@ -269,7 +269,7 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
    #endif
 
    /* JC1: this helps to insolate thread independant libraries */
-   #define hb_stackReturn()                       (&(HB_WM_STACK.Return))
+   #define hb_stackReturn()                       (&(HB_VM_STACK.Return))
 
 #else
    /* JC1: including thread anyways, because it defines some void macros when not in MT */
