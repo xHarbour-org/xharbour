@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.53 2004/01/28 14:45:40 druzus Exp $
+ * $Id: dbf1.c,v 1.54 2004/01/30 09:38:28 andijahja Exp $
  */
 
 /*
@@ -69,9 +69,6 @@
 #  include "hbapicdp.h"
 extern PHB_CODEPAGE s_cdpage;
 #endif
-
-// AJ: 2004-01-30
-extern BYTE *hb_szDBFNotExist;
 
 #define __PRG_SOURCE__ __FILE__
 
@@ -1787,23 +1784,12 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfOpen(%p, %p)", pArea, pOpenInfo));
 
-   /* AJ: 2004-01-30
-      Added to release memory when opening a DBF which does not exist
-   */
-   hb_szDBFNotExist = pOpenInfo->abName ;
-
    pArea->szDataFileName = (char *) hb_xgrab( strlen( (char * ) pOpenInfo->abName)+1 );
    strcpy( pArea->szDataFileName, ( char * ) pOpenInfo->abName );
    pArea->atomAlias = hb_dynsymGet( ( char * ) pOpenInfo->atomAlias );
 
    if( ( ( PHB_DYNS ) pArea->atomAlias )->hArea )
    {
-      /* AJ: 2004-01-30
-         Added to release memory when opening a DBF with same alias
-      */
-      hb_xfree( pOpenInfo->abName );
-      hb_szDBFNotExist = NULL;
-
       hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, ( char * ) pOpenInfo->atomAlias );
       hb_xfree( pArea->szDataFileName );
       return FAILURE;
@@ -1895,7 +1881,6 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       if( pArea->szDataFileName )
          hb_xfree( pArea->szDataFileName );
       pArea->szDataFileName = NULL;
-      hb_szDBFNotExist = NULL;
       return FAILURE;
    }
 
@@ -1903,7 +1888,6 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    if( SELF_READDBHEADER( ( AREAP ) pArea ) == FAILURE )
    {
       SELF_CLOSE( ( AREAP ) pArea );
-      hb_szDBFNotExist = NULL;
       return FAILURE;
    }
 
@@ -1932,7 +1916,6 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       {
          pOpenInfo->abName = tmp;
          SELF_CLOSE( ( AREAP ) pArea );
-         hb_szDBFNotExist = NULL;
          return FAILURE;
       }
       pOpenInfo->abName = tmp;
@@ -2061,7 +2044,6 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    pArea->ulRecCount = hb_dbfCalcRecCount( pArea );
 
    /* Position cursor at the first record */
-   hb_szDBFNotExist = NULL;
    return SELF_GOTOP( ( AREAP ) pArea );
 }
 

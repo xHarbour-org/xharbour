@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.67 2004/01/17 17:51:42 lculik Exp $
+ * $Id: dbcmd.c,v 1.68 2004/01/30 09:38:28 andijahja Exp $
  */
 
 /*
@@ -95,9 +95,6 @@ extern HB_FUNC( _DBF );
 extern HB_FUNC( _SDF );
 extern HB_FUNC( _DELIM );
 extern HB_FUNC( RDDSYS );
-
-// AJ: 2004-01-30
-BYTE * hb_szDBFNotExist = NULL;
 
 static char * s_szDefDriver = NULL;    /* Default RDD name */
 static LPRDDNODE s_pRddList = NULL;    /* Registered RDD's */
@@ -1081,16 +1078,6 @@ void  HB_EXPORT hb_rddShutDown( void )
    }
 
    s_szDefDriver = NULL;
-
-   /* AJ: 2004-01-30
-      Added to release memory when opening a DBF which does not exist
-   */
-   if( hb_szDBFNotExist )
-   {
-      hb_xfree( hb_szDBFNotExist );
-   }
-
-   hb_szDBFNotExist = NULL;
 
    while( s_pRddList )
    {
@@ -2380,7 +2367,8 @@ HB_FUNC( DBUNLOCKALL )
 HB_FUNC( DBUSEAREA )
 {
    HB_THREAD_STUB
-   char * szDriver, * szFileName, * szTempFile;
+   char * szDriver, * szTempFile;
+   char szFileName[_POSIX_PATH_MAX];
    USHORT uiLen;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
@@ -2422,7 +2410,7 @@ HB_FUNC( DBUSEAREA )
       szDriver = s_szDefDriver;
    }
 
-   szFileName = hb_parc( 3 );
+   strcpy( szFileName, hb_parc( 3 ) );
 
    if( ! ISCHAR(3) || ( strlen( szFileName ) == 0 ) )
    {
@@ -2477,8 +2465,7 @@ HB_FUNC( DBUSEAREA )
       return;
    }
 
-   szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-   szFileName[0] = '\0';
+   *szFileName = '\0';
    strncat( szFileName, hb_parc( 3 ), _POSIX_PATH_MAX );
 
    if( ! pFileName->szExtension )
@@ -2505,7 +2492,8 @@ HB_FUNC( DBUSEAREA )
    if( SELF_OPEN( ( AREAP ) s_pCurrArea->pArea, &pInfo ) == FAILURE )
    {
       s_bNetError = TRUE;           /* Temp fix! What about other types of errors? */
-      hb_xfree( pInfo.abName );
+      *szFileName = NULL ;
+      pInfo.abName = NULL ;
       hb_rddReleaseCurrentArea();
       return;
    }
@@ -2631,7 +2619,6 @@ HB_FUNC( FIELDNAME )
       if( SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields ) == SUCCESS &&
           uiIndex > 0 && uiIndex <= uiFields )
       {
-         /* szName = ( char * ) hb_xgrab( HARBOUR_MAX_RDD_FIELDNAME_LENGTH + 1 ); */
          szName = ( char * ) hb_xgrab( ( ( AREAP ) s_pCurrArea->pArea)->uiMaxFieldNameLength + 1 );
          SELF_FIELDNAME( ( AREAP ) s_pCurrArea->pArea, hb_parni( 1 ), szName );
          hb_retc( szName );
