@@ -2,7 +2,7 @@
 * Complex example of Multi thread usage
 *
 * Giancarlo Niccolai
-* $Id: mtcomplex.prg,v 1.10 2003/10/18 01:15:19 jonnymind Exp $
+* $Id: mtcomplex.prg,v 1.11 2003/10/18 16:20:03 jonnymind Exp $
 *
 * Here we have a main thread counting, and some secondary
 * threads counting too (in different fashons).
@@ -17,7 +17,7 @@ PROCEDURE Main()
    LOCAL Thread4Handle, MonitorHandle
    LOCAL bKill := .F.
 
-   SET OUTPUT SAFETY OFF
+   SET OUTPUT SAFETY ON
 
    set color to w+/b
    CLEAR SCREEN

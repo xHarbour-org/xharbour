@@ -2,7 +2,7 @@
 * Demonstration of error conditions and cancelations in MT
 *
 * Giancarlo Niccolai
-* $Id: mtcomplex.prg,v 1.11 2003/10/18 16:20:03 jonnymind Exp $
+* $Id: mterror.prg,v 1.1 2003/10/19 00:17:36 jonnymind Exp $
 *
 * There are several threads endlessy counting. Pressing F2 cause
 * an error randomly in a thread. This test works if error is
@@ -24,7 +24,7 @@ PROCEDURE Main()
 
    set color to w+/b
    CLEAR SCREEN
-   @1,30 SAY "X H A R B O U R - Multithreading error test. "
+   @1,15 SAY "X H A R B O U R - Multithreading error test. "
    @3,10 SAY "Press any key to terminate in every moment."
    @4,10 SAY "Press ALT-C to perform graceful cancelation."
    @5,10 SAY "Press F2 to rise an error."
@@ -68,7 +68,7 @@ PROCEDURE ThreadFunc( nRow, cName )
    DO WHILE .T.
 
       @nRow, 10 SAY cName + Str( i, 4 )
-      ThreadSleep( Int(HB_Random(1000)) )
+      ThreadSleep( Int(HB_Random(750)) )
       i++
       IF bGenerateError
          RiseAnError()

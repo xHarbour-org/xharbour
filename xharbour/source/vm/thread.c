@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.111 2003/10/18 16:20:03 jonnymind Exp $
+* $Id: thread.c,v 1.112 2003/10/19 00:17:36 jonnymind Exp $
 */
 
 /*
@@ -693,7 +693,9 @@ void hb_threadCancelInternal( )
 */
 void hb_threadCancel( HB_STACK *pStack )
 {
-
+   #ifdef HB_OS_WIN_32
+   HB_THREAD_STUB
+   #endif
    /*
    previous section using kind cancellation
    CONTEXT context;
