@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1175 2003/06/23 21:51:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1176 2003/06/23 22:41:37 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-24 00:40 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+    * minor modyfication
 
 2003-06-24 00:40 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   * source/vm/hbi18n.c
@@ -33,6 +37,14 @@
   * include/hbinit.h
   * source/compiler/genc.c
     * Minor optimization by means of generic HB_STATIC_STARTUP
+
+2003-06-23 20:02 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbset.h
+    * move #define HB_OS_WIN_32_USED
+      inside
+      #if defined(HB_OS_WIN_32) || defined(__WIN32__); #endif
+      This macro was set for all platforms so last Andi changes
+      break compilation for all platforms which doesn't use GTWIN
 
 2003-06-23 18:00 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/make_gnu.sh

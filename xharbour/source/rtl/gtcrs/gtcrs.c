@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.15 2003/06/19 22:39:02 druzus Exp $
+ * $Id: gtcrs.c,v 1.16 2003/06/23 17:41:17 druzus Exp $
  */
 
 /*
@@ -1187,19 +1187,24 @@ static void gt_ttyrestore(InOutBase *ioBase)
 
 static void gt_outstr(InOutBase *ioBase, int fd, const unsigned char *str, int len)
 {
-    unsigned char *buf = (unsigned char *) hb_xgrab(len), c;
+    unsigned char *buf, c;
     int i;
-    
-    for ( i = 0; i < len; ++i )
+
+    if (ioBase->out_transtbl != NULL)
     {
-	c = str[i];
-	if ( ioBase->out_transtbl[c] )
-	    buf[i] = ioBase->out_transtbl[c];
-	else
-	    buf[i] = c ? c : ' ';
-    }
-    write(fd, buf, len);
-    hb_xfree(buf);
+	buf = (unsigned char *) hb_xgrab(len);
+	for ( i = 0; i < len; ++i )
+	{
+	    c = str[i];
+	    if ( c != 9 && c != 10 && c != 13 && ioBase->out_transtbl[c] )
+		buf[i] = ioBase->out_transtbl[c];
+	    else
+		buf[i] = c;
+	}
+	write(fd, buf, len);
+	hb_xfree(buf);
+    } else
+	write(fd, str, len);
 }
 
 static void gt_outstd(InOutBase *ioBase, unsigned const char *str, int len)
