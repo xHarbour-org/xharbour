@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.62 2004/03/18 02:12:04 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.63 2004/03/31 13:52:23 likewolf Exp $
  */
 
 /*
@@ -190,31 +190,49 @@ static void hb_compDebugStart( void ) { };
 %token TRY CATCH
 %token SWITCH DEFAULT
 %token CRITICAL CRITICAL_STATIC
+%token CBMARKER
+%token BITAND BITOR BITXOR BITSHIFTR BITSHIFTL
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
+
 %left  POST
+
 /*assigment - from right to left*/
 %right INASSIGN
 %right  PLUSEQ MINUSEQ
 %right  MULTEQ DIVEQ MODEQ
 %right  EXPEQ
+
 /*logical operators*/
 %right  OR
 %right  AND
 %right  NOT
+
+/* Bitwise */
+%right BITOR
+%right BITXOR
+%right  BITAND
+
 /*relational operators*/
 %right  '=' '<' '>' EQ NE1 NE2 LE GE '$' LIKE MATCH
+
+/* Bitwise */
+%right BITSHIFTR BITSHIFTL
+
 /*mathematical operators*/
 %right  '+' '-'
 %right  '*' '/' '%'
 %right  POWER
 %right UNARY
+
 /*preincrement and predecrement*/
 %right  PRE
+
 /*special operators*/
 %right  ALIASOP '&' '@'
 %right '\n' ';' ','
+
 /*the highest precedence*/
 
 %type <string>  IdentName IDENTIFIER LITERAL MACROVAR MACROTEXT CompTimeStr
@@ -1262,12 +1280,17 @@ ExprOperEq  : ExprPlusEq        { $$ = $1; }
             | ExprExpEq         { $$ = $1; }
             ;
 
-ExprMath    : Expression '+' Expression     { $$ = hb_compExprSetOperand( hb_compExprNewPlus( $1 ), $3 ); }
-            | Expression '-' Expression     { $$ = hb_compExprSetOperand( hb_compExprNewMinus( $1 ), $3 ); }
-            | Expression '*' Expression     { $$ = hb_compExprSetOperand( hb_compExprNewMult( $1 ), $3 ); }
-            | Expression '/' Expression     { $$ = hb_compExprSetOperand( hb_compExprNewDiv( $1 ), $3 ); }
-            | Expression '%' Expression     { $$ = hb_compExprSetOperand( hb_compExprNewMod( $1 ), $3 ); }
-            | Expression POWER Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPower( $1 ), $3 ); }
+ExprMath    : Expression '+' Expression       { $$ = hb_compExprSetOperand( hb_compExprNewPlus( $1 ), $3 ); }
+            | Expression '-' Expression       { $$ = hb_compExprSetOperand( hb_compExprNewMinus( $1 ), $3 ); }
+            | Expression '*' Expression       { $$ = hb_compExprSetOperand( hb_compExprNewMult( $1 ), $3 ); }
+            | Expression '/' Expression       { $$ = hb_compExprSetOperand( hb_compExprNewDiv( $1 ), $3 ); }
+            | Expression '%' Expression       { $$ = hb_compExprSetOperand( hb_compExprNewMod( $1 ), $3 ); }
+            | Expression POWER Expression     { $$ = hb_compExprSetOperand( hb_compExprNewPower( $1 ), $3 ); }
+            | Expression BITAND Expression    { $$ = hb_compExprSetOperand( hb_compExprNewBitAnd( $1 ), $3 ); }
+            | Expression BITOR Expression     { $$ = hb_compExprSetOperand( hb_compExprNewBitOr( $1 ), $3 ); }
+            | Expression BITXOR Expression    { $$ = hb_compExprSetOperand( hb_compExprNewBitXOr( $1 ), $3 ); }
+            | Expression BITSHIFTR Expression { $$ = hb_compExprSetOperand( hb_compExprNewBitShiftR( $1 ), $3 ); }
+            | Expression BITSHIFTL Expression { $$ = hb_compExprSetOperand( hb_compExprNewBitShiftL( $1 ), $3 ); }
             ;
 
 ExprBool    : Expression AND  Expression   { $$ = hb_compExprSetOperand( hb_compExprNewAnd( $1 ), $3 ); }
@@ -1450,7 +1473,7 @@ GetAExt   : { /* Nothing*/ }
 	  | ',' GetArgList
 	  ;
 
-CodeBlock  : '{' '|' { s_bBlock = TRUE; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockNoVar '|' BlockExpList '}'
+CodeBlock  : '{' CBMARKER { s_bBlock = TRUE; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockNoVar CBMARKER BlockExpList '}'
                      {
                        if( s_bBlockMacro )
 		       {
@@ -1482,7 +1505,7 @@ CodeBlock  : '{' '|' { s_bBlock = TRUE; $<asExpr>$ = hb_compExprNewCodeBlock(); 
 		       s_bBlock = FALSE; s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
 		     }
 
-           | '{' '|' { s_bBlock = TRUE; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockVarList '|' BlockExpList '}'
+           | '{' CBMARKER { s_bBlock = TRUE; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockVarList CBMARKER BlockExpList '}'
                      {
                        if( s_bBlockMacro )
 		       {
@@ -1956,7 +1979,7 @@ DoCaseStart : DOCASE {
                         {
                            s_iLastControlLine = hb_comp_iLine;
                         }
-                        
+
                         hb_compLinePushIfDebugger();
                      }
               Crlf

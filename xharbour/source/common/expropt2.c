@@ -1,5 +1,5 @@
 /*
- * $Id: expropt2.c,v 1.3 2002/12/06 17:37:39 ronpinkas Exp $
+ * $Id: expropt2.c,v 1.4 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -1102,6 +1102,62 @@ HB_EXPR_PTR hb_compExprReduceOr( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
          pSelf = pLeft;
       }
    }
+   return pSelf;
+}
+
+HB_EXPR_PTR hb_compExprReduceBitOp( HB_EXPR_PTR pSelf, char cOp, HB_MACRO_DECL )
+{
+   HB_EXPR_PTR pLeft, pRight;
+
+   pLeft  = pSelf->value.asOperator.pLeft;
+   pRight = pSelf->value.asOperator.pRight;
+
+   if( pLeft->ExprType == HB_ET_NUMERIC && pRight->ExprType == HB_ET_NUMERIC )
+   {
+      if( pLeft->value.asNum.NumType == HB_ET_LONG && pRight->value.asNum.NumType == HB_ET_LONG )
+      {
+         switch( cOp )
+         {
+            case '&' :
+               pSelf->ExprType = HB_ET_LOGICAL;
+               pSelf->ValType  = HB_EV_LOGICAL;
+               pSelf->value.asLogical = pLeft->value.asNum.lVal & pRight->value.asNum.lVal;
+               break;
+
+            case '|' :
+               pSelf->ExprType = HB_ET_LOGICAL;
+               pSelf->ValType  = HB_EV_LOGICAL;
+               pSelf->value.asLogical = pLeft->value.asNum.lVal | pRight->value.asNum.lVal;
+               break;
+
+            case '^' :
+               pSelf->ExprType = HB_ET_LOGICAL;
+               pSelf->ValType  = HB_EV_LOGICAL;
+               pSelf->value.asLogical = pLeft->value.asNum.lVal ^ pRight->value.asNum.lVal;
+               break;
+
+            case '>' :
+               pSelf->ExprType = HB_ET_NUMERIC;
+               pSelf->ValType  = HB_EV_NUMERIC;
+               pSelf->value.asNum.NumType = HB_ET_LONG;
+               pSelf->value.asNum.lVal = pLeft->value.asNum.lVal >> pRight->value.asNum.lVal;
+               pSelf->value.asNum.bDec = 0;
+               break;
+
+            case '<' :
+               pSelf->ExprType = HB_ET_NUMERIC;
+               pSelf->ValType  = HB_EV_NUMERIC;
+               pSelf->value.asNum.NumType = HB_ET_LONG;
+               pSelf->value.asNum.lVal = pLeft->value.asNum.lVal << pRight->value.asNum.lVal;
+               pSelf->value.asNum.bDec = 0;
+               break;
+         }
+
+         hb_compExprFree( pLeft, HB_MACRO_PARAM );
+         hb_compExprFree( pRight, HB_MACRO_PARAM );
+      }
+   }
+
    return pSelf;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.18 2003/05/28 04:10:17 ronpinkas Exp $
+ * $Id: hbpcode.h,v 1.19 2003/07/23 12:35:57 druzus Exp $
  */
 
 /*
@@ -215,9 +215,14 @@ typedef enum
    HB_P_PUSHMACROREF,          /* 149 */
    HB_P_IVARREF,               /* 150 */
    HB_P_CLASSSETMODULE,        /* 151 */
+   HB_P_BITAND,                /* 152 */
+   HB_P_BITOR,                 /* 153 */
+   HB_P_BITXOR,                /* 154 */
+   HB_P_BITSHIFTR,             /* 155 */
+   HB_P_BITSHIFTL,             /* 156 */
 
 /* NOTE: This have to be the last definition */
-   HB_P_LAST_PCODE            /* 152 this defines the number of defined pcodes */
+   HB_P_LAST_PCODE             /* 157 this defines the number of defined pcodes */
 } HB_PCODE;
 
 #endif /* HB_PCODE_H_ */

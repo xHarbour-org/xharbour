@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.13 2002/12/04 06:24:06 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.14 2003/02/28 10:37:19 ronpinkas Exp $
  */
 
 /*
@@ -127,6 +127,11 @@ static BYTE s_PrecedTable[] = {
    HB_EO_MULT,                /*   HB_EO_DIV,         */
    HB_EO_MULT,                /*   HB_EO_MOD,         */
    HB_EO_POWER,               /*   HB_EO_POWER,       */
+   HB_EO_BITAND,              /*   HB_EO_BITAND       */
+   HB_EO_BITOR,               /*   HB_EO_BITOR        */
+   HB_EO_BITXOR,              /*   HB_EO_BITXOR       */
+   HB_EO_BITSHIFTR,           /*   HB_EO_BITSHIFTR    */
+   HB_EO_BITSHIFTL,           /*   HB_EO_BITSHIFTL    */
    HB_ET_NIL,                 /*   HB_EO_NEGATE,      sign operator */
    HB_ET_NIL,                 /*   HB_EO_PREINC,      */
    HB_ET_NIL                  /*   HB_EO_PREDEC,      pre-operators */
@@ -450,6 +455,7 @@ HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR pExpr, HB_EXPR_PTR pItem )
       {
          hb_compErrorSyntax( pItem );
       }
+
       pExpr->value.asOperator.pRight = pItem; /* set it anyway */
    }
    else
@@ -460,6 +466,7 @@ HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR pExpr, HB_EXPR_PTR pItem )
        * precedence rules
        */
       BYTE ucLeft = s_PrecedTable[ pExpr->ExprType ];
+
       if( ucLeft >= ucRight )
       {
          /* Left operator has the same or lower precedence then the right one

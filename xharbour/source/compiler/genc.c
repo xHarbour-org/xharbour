@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.73 2004/04/21 01:29:29 andijahja Exp $
+ * $Id: genc.c,v 1.74 2004/04/28 18:23:41 druzus Exp $
  */
 
 /*
@@ -2950,6 +2950,51 @@ static HB_GENC_FUNC( hb_p_classsetmodule )
    return 1;
 }
 
+static HB_GENC_FUNC( hb_p_bitand )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_BITAND,\n" );
+   return 1;
+}
+
+static HB_GENC_FUNC( hb_p_bitor )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_BITOR,\n" );
+   return 1;
+}
+
+static HB_GENC_FUNC( hb_p_bitxor )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_BITXOR,\n" );
+   return 1;
+}
+
+static HB_GENC_FUNC( hb_p_bitshiftr )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_BITSHIFTR,\n" );
+   return 1;
+}
+
+static HB_GENC_FUNC( hb_p_bitshiftl )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_BITSHIFTL,\n" );
+   return 1;
+}
+
 /* NOTE: The order of functions has to match the order of opcodes
  *       mnemonics
  */
@@ -3107,7 +3152,12 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_match,
    hb_p_pushmacroref,
    hb_p_ivarref,
-   hb_p_classsetmodule
+   hb_p_classsetmodule,
+   hb_p_bitand,
+   hb_p_bitor,
+   hb_p_bitxor,
+   hb_p_bitshiftr,
+   hb_p_bitshiftl
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

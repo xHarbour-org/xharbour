@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2889 2004/05/07 21:38:33 likewolf Exp $
+ * $Id: ChangeLog,v 1.2890 2004/05/07 23:05:56 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-07 21:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprop.h
+  * include/hbpcode.h
+  * source/common/expropt1.c
+  * source/common/expropt2.c
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+    + Added support (including compile time optimization) for BIT operations:
+     AND, OR, XOR, SHIFT RIGHT, SHIFT LEFT. Except for 'XOR' C syntax is used:
+         &  == and
+         |  == or
+         ^^ == xor
+         >> == shift right
+         << == shift left
+
+    Please NOTE that 'AND' (&) *requires* trailing white space, or else MACRO Context will
+    be assumed, to maintain Clipper compatability.
+
+  + tests/tstbitop.prg
+    + New test for BIT operations.
+
+  * tests/pp_harb.ch
+     ! Fixed to reflect latest changes in PP.prg
+
+  * tests/ppclass.prg
+    * Minor formatting.
+
 2004-05-08 11:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/persist.prg
     - valToStr() - added explicit test for ValType("L")

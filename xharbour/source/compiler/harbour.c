@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.76 2004/04/03 21:14:21 andijahja Exp $
+ * $Id: harbour.c,v 1.77 2004/04/05 00:21:39 andijahja Exp $
  */
 
 /*
@@ -5450,7 +5450,7 @@ static int hb_compProcessRSPFile( char* szRspName, int argc, char * argv[] )
 {
    FILE *inFile;
    int ch;
-   int i = 0;
+   int i;
    int iProcess = 1;
    int iStatus = EXIT_SUCCESS;
    BOOL bFirstChar = FALSE;

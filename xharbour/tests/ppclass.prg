@@ -11,7 +11,7 @@ PROCEDURE Main()
 
     o:Increment()
     Alert( o:nVar )
-Return NIL
+RETURN
 
 CLASS TTest
    VAR nVar
@@ -21,7 +21,7 @@ ENDCLASS
 
 METHOD New //CLASS TTest /* CLASS clause now optional */
    ::nVar := 0
-return Self
+RETURN Self
 
 METHOD Increment() CLASS TTest // () No longer required
-Return (++::nVar)
+RETURN (++::nVar)

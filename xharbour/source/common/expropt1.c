@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.10 2003/12/04 09:26:54 druzus Exp $
+ * $Id: expropt1.c,v 1.11 2004/02/29 22:10:30 likewolf Exp $
  */
 
 /*
@@ -122,6 +122,11 @@ static char * s_OperTable[] = {
    "/",
    "%",
    "^",
+   "&",
+   "|",
+   "^^",
+   ">>",
+   "<<",
    "-",    /* sign operator */
    "++",
    "--"
@@ -704,6 +709,46 @@ HB_EXPR_PTR hb_compExprNewMod( HB_EXPR_PTR pLeftExpr )
 HB_EXPR_PTR hb_compExprNewPower( HB_EXPR_PTR pLeftExpr )
 {
    HB_EXPR_PTR pExpr = hb_compExprNew( HB_EO_POWER );
+   pExpr->value.asOperator.pLeft = pLeftExpr;
+   pExpr->value.asOperator.pRight = NULL;
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewBitAnd( HB_EXPR_PTR pLeftExpr )
+{
+   HB_EXPR_PTR pExpr = hb_compExprNew( HB_EO_BITAND );
+   pExpr->value.asOperator.pLeft = pLeftExpr;
+   pExpr->value.asOperator.pRight = NULL;
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewBitOr( HB_EXPR_PTR pLeftExpr )
+{
+   HB_EXPR_PTR pExpr = hb_compExprNew( HB_EO_BITOR );
+   pExpr->value.asOperator.pLeft = pLeftExpr;
+   pExpr->value.asOperator.pRight = NULL;
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewBitXOr( HB_EXPR_PTR pLeftExpr )
+{
+   HB_EXPR_PTR pExpr = hb_compExprNew( HB_EO_BITXOR );
+   pExpr->value.asOperator.pLeft = pLeftExpr;
+   pExpr->value.asOperator.pRight = NULL;
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewBitShiftR( HB_EXPR_PTR pLeftExpr )
+{
+   HB_EXPR_PTR pExpr = hb_compExprNew( HB_EO_BITSHIFTR );
+   pExpr->value.asOperator.pLeft = pLeftExpr;
+   pExpr->value.asOperator.pRight = NULL;
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewBitShiftL( HB_EXPR_PTR pLeftExpr )
+{
+   HB_EXPR_PTR pExpr = hb_compExprNew( HB_EO_BITSHIFTL );
    pExpr->value.asOperator.pLeft = pLeftExpr;
    pExpr->value.asOperator.pRight = NULL;
    return pExpr;

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.387 2004/05/02 10:47:48 druzus Exp $
+ * $Id: hvm.c,v 1.388 2004/05/03 17:29:21 druzus Exp $
  */
 
 /*
@@ -1009,6 +1009,226 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_vmPower();
             w++;
             break;
+
+         case HB_P_BITAND :
+         {
+            PHB_ITEM pItem1;
+            PHB_ITEM pItem2;
+
+            HB_TRACE(HB_TR_DEBUG, ("HB_P_BITAND"));
+
+            pItem1 = hb_stackItemFromTop( -2 );
+            pItem2 = hb_stackItemFromTop( -1 );
+
+            if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
+            {
+               long l1 = hb_itemGetNL( pItem1 );
+               long l2 = hb_itemGetNL( pItem2 );
+
+               /* NOTE: Clipper always returns the result of power
+                        with the SET number of decimal places. */
+               if( HB_IS_STRING( pItem2 ) )
+               {
+                  hb_itemReleaseString( pItem1 );
+               }
+
+               pItem1->type = HB_IT_LOGICAL;
+               pItem1->item.asLogical.value = l1 & l2;
+
+               hb_stackPop();
+            }
+            else
+            {
+               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1088, NULL, "&", 2, pItem1, pItem2 );
+
+               if( pResult )
+               {
+                  hb_stackPop();
+                  hb_stackPop();
+                  hb_itemPushForward( pResult );
+                  hb_itemRelease( pResult );
+               }
+            }
+         }
+
+         w++;
+         break;
+
+         case HB_P_BITOR :
+         {
+            PHB_ITEM pItem1;
+            PHB_ITEM pItem2;
+
+            HB_TRACE(HB_TR_DEBUG, ("HB_P_BITOR"));
+
+            pItem1 = hb_stackItemFromTop( -2 );
+            pItem2 = hb_stackItemFromTop( -1 );
+
+            if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
+            {
+               long l1 = hb_itemGetNL( pItem1 );
+               long l2 = hb_itemGetNL( pItem2 );
+
+               /* NOTE: Clipper always returns the result of power
+                        with the SET number of decimal places. */
+               if( HB_IS_STRING( pItem2 ) )
+               {
+                  hb_itemReleaseString( pItem1 );
+               }
+
+               pItem1->type = HB_IT_LOGICAL;
+               pItem1->item.asLogical.value = l1 | l2;
+
+               hb_stackPop();
+            }
+            else
+            {
+               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1088, NULL, "|", 2, pItem1, pItem2 );
+
+               if( pResult )
+               {
+                  hb_stackPop();
+                  hb_stackPop();
+                  hb_itemPushForward( pResult );
+                  hb_itemRelease( pResult );
+               }
+            }
+         }
+
+         w++;
+         break;
+
+         case HB_P_BITXOR :
+         {
+            PHB_ITEM pItem1;
+            PHB_ITEM pItem2;
+
+            HB_TRACE(HB_TR_DEBUG, ("HB_P_BITXOR"));
+
+            pItem1 = hb_stackItemFromTop( -2 );
+            pItem2 = hb_stackItemFromTop( -1 );
+
+            if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
+            {
+               long l1 = hb_itemGetNL( pItem1 );
+               long l2 = hb_itemGetNL( pItem2 );
+
+               /* NOTE: Clipper always returns the result of power
+                        with the SET number of decimal places. */
+               if( HB_IS_STRING( pItem2 ) )
+               {
+                  hb_itemReleaseString( pItem1 );
+               }
+
+               pItem1->type = HB_IT_LOGICAL;
+               pItem1->item.asLogical.value = l1 ^ l2;
+
+               hb_stackPop();
+            }
+            else
+            {
+               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1088, NULL, "^^", 2, pItem1, pItem2 );
+
+               if( pResult )
+               {
+                  hb_stackPop();
+                  hb_stackPop();
+                  hb_itemPushForward( pResult );
+                  hb_itemRelease( pResult );
+               }
+            }
+         }
+
+         w++;
+         break;
+
+         case HB_P_BITSHIFTR :
+         {
+            PHB_ITEM pItem1;
+            PHB_ITEM pItem2;
+
+            HB_TRACE(HB_TR_DEBUG, ("HB_P_BITSHIFTR"));
+
+            pItem1 = hb_stackItemFromTop( -2 );
+            pItem2 = hb_stackItemFromTop( -1 );
+
+            if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
+            {
+               long l1 = hb_itemGetNL( pItem1 );
+               long l2 = hb_itemGetNL( pItem2 );
+
+               /* NOTE: Clipper always returns the result of power
+                        with the SET number of decimal places. */
+               if( HB_IS_STRING( pItem2 ) )
+               {
+                  hb_itemReleaseString( pItem1 );
+               }
+
+               pItem1->type = HB_IT_LONG;
+               pItem1->item.asLong.value = l1 >> l2;
+
+               hb_stackPop();
+            }
+            else
+            {
+               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1088, NULL, ">>", 2, pItem1, pItem2 );
+
+               if( pResult )
+               {
+                  hb_stackPop();
+                  hb_stackPop();
+                  hb_itemPushForward( pResult );
+                  hb_itemRelease( pResult );
+               }
+            }
+         }
+
+         w++;
+         break;
+
+         case HB_P_BITSHIFTL :
+         {
+            PHB_ITEM pItem1;
+            PHB_ITEM pItem2;
+
+            HB_TRACE(HB_TR_DEBUG, ("HB_P_BITSHIFTL"));
+
+            pItem1 = hb_stackItemFromTop( -2 );
+            pItem2 = hb_stackItemFromTop( -1 );
+
+            if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
+            {
+               long l1 = hb_itemGetNL( pItem1 );
+               long l2 = hb_itemGetNL( pItem2 );
+
+               /* NOTE: Clipper always returns the result of power
+                        with the SET number of decimal places. */
+               if( HB_IS_STRING( pItem2 ) )
+               {
+                  hb_itemReleaseString( pItem1 );
+               }
+
+               pItem1->type = HB_IT_LONG;
+               pItem1->item.asLong.value = l1 << l2;
+
+               hb_stackPop();
+            }
+            else
+            {
+               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1088, NULL, "<<", 2, pItem1, pItem2 );
+
+               if( pResult )
+               {
+                  hb_stackPop();
+                  hb_stackPop();
+                  hb_itemPushForward( pResult );
+                  hb_itemRelease( pResult );
+               }
+            }
+         }
+
+         w++;
+         break;
 
          case HB_P_INC:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_INC") );
@@ -7210,6 +7430,7 @@ static double hb_vmPopNumber( void )
 
       case HB_IT_STRING:
          dNumber = (double) ( pItem->item.asString.value[0] );
+         hb_itemReleaseString( pItem );
          break;
 
       default:
@@ -7269,6 +7490,7 @@ static double hb_vmPopDouble( int * piDec )
 
       case HB_IT_STRING:
          dNumber = (double) pItem->item.asString.value[0];
+         hb_itemReleaseString( pItem );
          *piDec = 0;
          break;
 

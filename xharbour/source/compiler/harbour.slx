@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.48 2004/03/28 15:12:02 likewolf Exp $
+ * $Id: harbour.slx,v 1.49 2004/04/03 00:27:02 druzus Exp $
  */
 
 /*
@@ -104,28 +104,29 @@ ACCEPT_TOKEN_AND_DROP_DELIMITER_IF_ONE_OF_THESE( " \t" );
 #define HB_CHK_BLOCK    LEX_CUSTOM_ACTION - 1
 
 ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
-                                     LEX_DELIMITER( ',' ) AS_TOKEN( ',' ),
-                                     LEX_DELIMITER( '(' ) AS_TOKEN( '(' ),
-                                     LEX_DELIMITER( ')' ) AS_TOKEN( ')' ),
-                                     LEX_DELIMITER( '[' ) AS_TOKEN( '[' ),
-                                     LEX_DELIMITER( ']' ) AS_TOKEN( ']'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '}' ) AS_TOKEN( '}'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( ':' ) AS_TOKEN( ':' ),
-                                     LEX_DELIMITER( '=' ) AS_TOKEN( '=' ),
-                                     LEX_DELIMITER( '#' ) AS_TOKEN( NE1 ),
-                                     LEX_DELIMITER( '@' ) AS_TOKEN( '@' ),
-                                     LEX_DELIMITER( '<' ) AS_TOKEN( '<'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '>' ) AS_TOKEN( '>'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '!' ) AS_TOKEN( NOT   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '{' ) AS_TOKEN( HB_CHK_BLOCK        ),
-                                     LEX_DELIMITER( '|' ) AS_TOKEN( '|'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '^' ) AS_TOKEN( POWER + DONT_REDUCE ),
-                                     LEX_DELIMITER( '%' ) AS_TOKEN( '%'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '*' ) AS_TOKEN( '*'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '/' ) AS_TOKEN( '/'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '+' ) AS_TOKEN( '+'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '-' ) AS_TOKEN( '-'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '$' ) AS_TOKEN( '$'   + DONT_REDUCE )
+                                     LEX_DELIMITER( ','  ) AS_TOKEN( ',' ),
+                                     LEX_DELIMITER( '('  ) AS_TOKEN( '(' ),
+                                     LEX_DELIMITER( ')'  ) AS_TOKEN( ')' ),
+                                     LEX_DELIMITER( '['  ) AS_TOKEN( '[' ),
+                                     LEX_DELIMITER( ']'  ) AS_TOKEN( ']'      + DONT_REDUCE ),
+                                     LEX_DELIMITER( '}'  ) AS_TOKEN( '}'      + DONT_REDUCE ),
+                                     LEX_DELIMITER( ':'  ) AS_TOKEN( ':' ),
+                                     LEX_DELIMITER( '='  ) AS_TOKEN( '=' ),
+                                     LEX_DELIMITER( '#'  ) AS_TOKEN( NE1 ),
+                                     LEX_DELIMITER( '@'  ) AS_TOKEN( '@' ),
+                                     LEX_DELIMITER( '<'  ) AS_TOKEN( '<'      + DONT_REDUCE ),
+                                     LEX_DELIMITER( '>'  ) AS_TOKEN( '>'      + DONT_REDUCE ),
+                                     LEX_DELIMITER( '!'  ) AS_TOKEN( NOT      + DONT_REDUCE ),
+                                     LEX_DELIMITER( '{'  ) AS_TOKEN( HB_CHK_BLOCK        ),
+                                     LEX_DELIMITER( '\\' ) AS_TOKEN( CBMARKER + DONT_REDUCE ), /* CodeBlock Marker '|' converted to '\' */
+                                     LEX_DELIMITER( '|'  ) AS_TOKEN( BITOR    + DONT_REDUCE ),
+                                     LEX_DELIMITER( '^'  ) AS_TOKEN( POWER    + DONT_REDUCE ),
+                                     LEX_DELIMITER( '%'  ) AS_TOKEN( '%'      + DONT_REDUCE ),
+                                     LEX_DELIMITER( '*'  ) AS_TOKEN( '*'      + DONT_REDUCE ),
+                                     LEX_DELIMITER( '/'  ) AS_TOKEN( '/'      + DONT_REDUCE ),
+                                     LEX_DELIMITER( '+'  ) AS_TOKEN( '+'      + DONT_REDUCE ),
+                                     LEX_DELIMITER( '-'  ) AS_TOKEN( '-'      + DONT_REDUCE ),
+                                     LEX_DELIMITER( '$'  ) AS_TOKEN( '$'      + DONT_REDUCE )
                                    };
 
 /* Custom Intermediate Token needed to be expanded. */
@@ -158,9 +159,11 @@ SELF_CONTAINED_WORDS_ARE {
                            LEX_WORD( ":="    ) AS_TOKEN( INASSIGN   ),
                            LEX_WORD( "::"    ) AS_TOKEN( HB_SELF    ),
                            LEX_WORD( "=="    ) AS_TOKEN( EQ         + DONT_REDUCE ),
-                           LEX_WORD( "<>"    ) AS_TOKEN( NE2        + DONT_REDUCE ),
+                           LEX_WORD( "<<"    ) AS_TOKEN( BITSHIFTL  + DONT_REDUCE ),
                            LEX_WORD( "<="    ) AS_TOKEN( LE         + DONT_REDUCE ),
+                           LEX_WORD( "<>"    ) AS_TOKEN( NE2        + DONT_REDUCE ),
                            LEX_WORD( ">="    ) AS_TOKEN( GE         + DONT_REDUCE ),
+                           LEX_WORD( ">>"    ) AS_TOKEN( BITSHIFTR  + DONT_REDUCE ),
                            LEX_WORD( "!="    ) AS_TOKEN( NE2        + DONT_REDUCE ),
                            LEX_WORD( "++"    ) AS_TOKEN( INC        ),
                            LEX_WORD( "+="    ) AS_TOKEN( PLUSEQ     ),
@@ -171,6 +174,7 @@ SELF_CONTAINED_WORDS_ARE {
                            LEX_WORD( "**"    ) AS_TOKEN( POWER      + DONT_REDUCE ),
                            LEX_WORD( "/="    ) AS_TOKEN( DIVEQ      ),
                            LEX_WORD( "^="    ) AS_TOKEN( EXPEQ      ),
+                           LEX_WORD( "^^"    ) AS_TOKEN( BITXOR     + DONT_REDUCE ),
                            LEX_WORD( "%="    ) AS_TOKEN( MODEQ      )
                          };
 
@@ -715,7 +719,16 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             /* Maybe just the Macro Operator. */
             if( yyleng == 1 )
             {
-               iRet = '&';
+               if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == LITERAL ||
+                   iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
+                   iLastToken == ')' || iLastToken == ']' || iLastToken == '}' )
+               {
+                  iRet = BITAND + DONT_REDUCE;
+               }
+               else
+               {
+                  iRet = '&';
+               }
             }
             /* No '.' so Simple Macro. */
             else if( ( tmpPtr = strchr( yytext, '.' ) ) == NULL ) /* Left Search. */
@@ -913,8 +926,9 @@ static int hb_comp_SLX_CustomAction( int x )
    {
       bIgnoreWords = FALSE;
 
-      if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == IDENTIFIER ||
-                          iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || iLastToken == ']' || iLastToken == LITERAL )
+      if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == LITERAL ||
+          iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
+          iLastToken == ')' || iLastToken == ']' || iLastToken == '}' )
       {
          return ( (-x) + (HB_AFTER_EXP) ) + DONT_REDUCE;
       }
@@ -980,7 +994,22 @@ static int hb_comp_SLX_CustomAction( int x )
                char cTmp;
                BOOL bMacro = FALSE;
 
+               *pTmp = '\\';
+
                pTmp++;
+
+               while( *pTmp  )
+               {
+                  if( *pTmp == '|' )
+                  {
+                     *pTmp = '\\';
+                     pTmp++;
+                     break;
+                  }
+
+                  pTmp++;
+               }
+
                while( *pTmp )
                {
                   if( *pTmp == '}' )
@@ -1115,7 +1144,7 @@ static int hb_comp_SLX_CustomAction( int x )
          NOT_FOREACH :
 
            if( iLastToken == 0 || iLastToken == '\n' || iLastToken == ';' ||
-               iLastToken == '(' || iLastToken == '[' || iLastToken == '{' || iLastToken == '|' || iLastToken == ',' ||
+               iLastToken == '(' || iLastToken == '[' || iLastToken == '{' || iLastToken == CBMARKER || iLastToken == ',' ||
                iLastToken == WANTS_ID ||
                iLastToken == WITH ||
                iLastToken == REJECT_OP ||

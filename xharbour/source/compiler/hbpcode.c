@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.28 2004/04/05 10:03:19 andijahja Exp $
+ * $Id: hbpcode.c,v 1.29 2004/04/05 22:25:42 andijahja Exp $
  */
 
 /*
@@ -203,7 +203,12 @@ static char *pCodeList[] =
     "HB_P_PUSHMACROREF",          /* 149 */
     "HB_P_IVARREF",               /* 150 */
     "HB_P_CLASSSETMODULE",        /* 151 */
-    "HB_P_LAST_PCODE"             /* 152 this defines the number of defined pcodes */
+    "HB_P_BITAND",                /* 152 */
+    "HB_P_BITOR",                 /* 153 */
+    "HB_P_BITXOR",                /* 154 */
+    "HB_P_BITSHIFTR",             /* 155 */
+    "HB_P_BITSHIFTL",             /* 156 */
+    "HB_P_LAST_PCODE"             /* 157 this defines the number of defined pcodes */
 };
 
 static BYTE s_pcode_len[] = {
@@ -360,7 +365,12 @@ static BYTE s_pcode_len[] = {
    1,        /* HB_P_MATCH                 */
    1,        /* HB_P_PUSHMACROREF          */
    1,        /* HB_P_IVARREF               */
-   1         /* HB_P_CLASSSETMODULE        */
+   1,        /* HB_P_CLASSSETMODULE        */
+   1,        /* HB_P_BITAND                */
+   1,        /* HB_P_BITOR                 */
+   1,        /* HB_P_BITXOR                */
+   1,        /* HB_P_BITSHIFTR             */
+   1         /* HB_P_BITSHIFTL             */
 };
 
 extern BOOL hb_comp_iGenVarList;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.9 2004/02/16 06:07:12 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.10 2004/03/17 02:29:00 druzus Exp $
  */
 
 /*
@@ -164,6 +164,11 @@ typedef enum
    HB_EO_DIV,
    HB_EO_MOD,
    HB_EO_POWER,
+   HB_EO_BITAND,
+   HB_EO_BITOR,
+   HB_EO_BITXOR,
+   HB_EO_BITSHIFTR,
+   HB_EO_BITSHIFTL,
    HB_EO_NEGATE,     /* sign operator */
    HB_EO_PREINC,
    HB_EO_PREDEC      /* pre-operators -> the highest precedence */
@@ -345,6 +350,11 @@ HB_EXPR_PTR hb_compExprNewPreDec( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewAnd( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewOr( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewNot( HB_EXPR_PTR );
+HB_EXPR_PTR hb_compExprNewBitAnd( HB_EXPR_PTR );
+HB_EXPR_PTR hb_compExprNewBitOr( HB_EXPR_PTR );
+HB_EXPR_PTR hb_compExprNewBitXOr( HB_EXPR_PTR );
+HB_EXPR_PTR hb_compExprNewBitShiftR( HB_EXPR_PTR );
+HB_EXPR_PTR hb_compExprNewBitShiftL( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewNegate( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewVarRef( char * );
 HB_EXPR_PTR hb_compExprNewMemVarRef( char * );

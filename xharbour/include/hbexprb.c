@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.74 2004/03/17 02:29:00 druzus Exp $
+ * $Id: hbexprb.c,v 1.75 2004/03/20 23:24:46 druzus Exp $
  */
 
 /*
@@ -118,6 +118,7 @@ HB_EXPR_PTR hb_compExprReduceEQ( HB_EXPR_PTR pSelf, HB_MACRO_DECL );
 HB_EXPR_PTR hb_compExprReduceAnd( HB_EXPR_PTR pSelf, HB_MACRO_DECL );
 HB_EXPR_PTR hb_compExprReduceOr( HB_EXPR_PTR pSelf, HB_MACRO_DECL );
 HB_EXPR_PTR hb_compExprReduceIIF( HB_EXPR_PTR, HB_MACRO_DECL );
+HB_EXPR_PTR hb_compExprReduceBitOp( HB_EXPR_PTR pSelf, char cOp, HB_MACRO_DECL );
 
 
 /* forward declaration of callback functions
@@ -155,6 +156,11 @@ static HB_EXPR_FUNC( hb_compExprUseMult );
 static HB_EXPR_FUNC( hb_compExprUseDiv );
 static HB_EXPR_FUNC( hb_compExprUseMod );
 static HB_EXPR_FUNC( hb_compExprUsePower );
+static HB_EXPR_FUNC( hb_compExprUseBitAnd );
+static HB_EXPR_FUNC( hb_compExprUseBitOr );
+static HB_EXPR_FUNC( hb_compExprUseBitXOr );
+static HB_EXPR_FUNC( hb_compExprUseBitShiftR );
+static HB_EXPR_FUNC( hb_compExprUseBitShiftL );
 static HB_EXPR_FUNC( hb_compExprUsePostInc );
 static HB_EXPR_FUNC( hb_compExprUsePostDec );
 static HB_EXPR_FUNC( hb_compExprUsePreInc );
@@ -233,6 +239,11 @@ HB_EXPR_FUNC_PTR hb_comp_ExprTable[] = {
    hb_compExprUseDiv,
    hb_compExprUseMod,
    hb_compExprUsePower,
+   hb_compExprUseBitAnd,
+   hb_compExprUseBitOr,
+   hb_compExprUseBitXOr,
+   hb_compExprUseBitShiftR,
+   hb_compExprUseBitShiftL,
    hb_compExprUseNegate,    /* sign operator */
    hb_compExprUsePreInc,
    hb_compExprUsePreDec     /* highest precedence */
@@ -4265,7 +4276,7 @@ static HB_EXPR_FUNC( hb_compExprUseMinus )
 
           #else
 
-            HB_EXPR_PTR pValue = NULL;
+            HB_EXPR_PTR pValue;
             short iIncrement;
 
             if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
@@ -4552,6 +4563,241 @@ static HB_EXPR_FUNC( hb_compExprUsePower )
          HB_EXPR_PCODE1( hb_compExprDelOperator, pSelf );
          break;
    }
+   return pSelf;
+}
+
+static HB_EXPR_FUNC( hb_compExprUseBitAnd )
+{
+   switch( iMessage )
+   {
+      case HB_EA_REDUCE:
+         pSelf->value.asOperator.pLeft  = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+         pSelf->value.asOperator.pRight = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pRight,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+         pSelf = hb_compExprReduceBitOp( pSelf, '&', HB_MACRO_PARAM );
+         break;
+
+      case HB_EA_ARRAY_AT:
+         hb_compErrorType( pSelf );
+         break;
+
+      case HB_EA_ARRAY_INDEX:
+         break;
+
+      case HB_EA_LVALUE:
+         hb_compErrorLValue( pSelf );
+         break;
+
+      case HB_EA_PUSH_PCODE:
+         HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_PUSH_PCODE );
+         HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_BITAND );
+         break;
+
+      case HB_EA_POP_PCODE:
+         break;
+
+      case HB_EA_PUSH_POP:
+         HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
+         break;
+
+      case HB_EA_STATEMENT:
+         hb_compErrorSyntax( pSelf );
+         break;
+
+      case HB_EA_DELETE:
+         HB_EXPR_PCODE1( hb_compExprDelOperator, pSelf );
+         break;
+   }
+
+   return pSelf;
+}
+
+static HB_EXPR_FUNC( hb_compExprUseBitOr )
+{
+   switch( iMessage )
+   {
+      case HB_EA_REDUCE:
+         pSelf->value.asOperator.pLeft  = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+         pSelf->value.asOperator.pRight = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pRight,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+         pSelf = hb_compExprReduceBitOp( pSelf, '|', HB_MACRO_PARAM );
+         break;
+
+      case HB_EA_ARRAY_AT:
+         hb_compErrorType( pSelf );
+         break;
+
+      case HB_EA_ARRAY_INDEX:
+         break;
+
+      case HB_EA_LVALUE:
+         hb_compErrorLValue( pSelf );
+         break;
+
+      case HB_EA_PUSH_PCODE:
+         HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_PUSH_PCODE );
+         HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_BITOR );
+         break;
+
+      case HB_EA_POP_PCODE:
+         break;
+
+      case HB_EA_PUSH_POP:
+         HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
+         break;
+
+      case HB_EA_STATEMENT:
+         hb_compErrorSyntax( pSelf );
+         break;
+
+      case HB_EA_DELETE:
+         HB_EXPR_PCODE1( hb_compExprDelOperator, pSelf );
+         break;
+   }
+
+   return pSelf;
+}
+
+static HB_EXPR_FUNC( hb_compExprUseBitXOr )
+{
+   switch( iMessage )
+   {
+      case HB_EA_REDUCE:
+         pSelf->value.asOperator.pLeft  = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+         pSelf->value.asOperator.pRight = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pRight,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+         pSelf = hb_compExprReduceBitOp( pSelf, '^', HB_MACRO_PARAM );
+         break;
+
+      case HB_EA_ARRAY_AT:
+         hb_compErrorType( pSelf );
+         break;
+
+      case HB_EA_ARRAY_INDEX:
+         break;
+
+      case HB_EA_LVALUE:
+         hb_compErrorLValue( pSelf );
+         break;
+
+      case HB_EA_PUSH_PCODE:
+         HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_PUSH_PCODE );
+         HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_BITXOR );
+         break;
+
+      case HB_EA_POP_PCODE:
+         break;
+
+      case HB_EA_PUSH_POP:
+         HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
+         break;
+
+      case HB_EA_STATEMENT:
+         hb_compErrorSyntax( pSelf );
+         break;
+
+      case HB_EA_DELETE:
+         HB_EXPR_PCODE1( hb_compExprDelOperator, pSelf );
+         break;
+   }
+
+   return pSelf;
+}
+
+static HB_EXPR_FUNC( hb_compExprUseBitShiftR )
+{
+   switch( iMessage )
+   {
+      case HB_EA_REDUCE:
+         pSelf->value.asOperator.pLeft  = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+         pSelf->value.asOperator.pRight = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pRight,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+         pSelf = hb_compExprReduceBitOp( pSelf, '>', HB_MACRO_PARAM );
+         break;
+
+      case HB_EA_ARRAY_AT:
+         hb_compErrorType( pSelf );
+         break;
+
+      case HB_EA_ARRAY_INDEX:
+         break;
+
+      case HB_EA_LVALUE:
+         hb_compErrorLValue( pSelf );
+         break;
+
+      case HB_EA_PUSH_PCODE:
+         HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_PUSH_PCODE );
+         HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_BITSHIFTR );
+         break;
+
+      case HB_EA_POP_PCODE:
+         break;
+
+      case HB_EA_PUSH_POP:
+         HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
+         break;
+
+      case HB_EA_STATEMENT:
+         hb_compErrorSyntax( pSelf );
+         break;
+
+      case HB_EA_DELETE:
+         HB_EXPR_PCODE1( hb_compExprDelOperator, pSelf );
+         break;
+   }
+
+   return pSelf;
+}
+
+static HB_EXPR_FUNC( hb_compExprUseBitShiftL )
+{
+   switch( iMessage )
+   {
+      case HB_EA_REDUCE:
+         pSelf->value.asOperator.pLeft  = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+         pSelf->value.asOperator.pRight = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pRight,  HB_EA_REDUCE ), HB_MACRO_PARAM );
+         pSelf = hb_compExprReduceBitOp( pSelf, '<', HB_MACRO_PARAM );
+         break;
+
+      case HB_EA_ARRAY_AT:
+         hb_compErrorType( pSelf );
+         break;
+
+      case HB_EA_ARRAY_INDEX:
+         break;
+
+      case HB_EA_LVALUE:
+         hb_compErrorLValue( pSelf );
+         break;
+
+      case HB_EA_PUSH_PCODE:
+         HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_PUSH_PCODE );
+         HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_BITSHIFTL );
+         break;
+
+      case HB_EA_POP_PCODE:
+         break;
+
+      case HB_EA_PUSH_POP:
+         HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
+         break;
+
+      case HB_EA_STATEMENT:
+         hb_compErrorSyntax( pSelf );
+         break;
+
+      case HB_EA_DELETE:
+         HB_EXPR_PCODE1( hb_compExprDelOperator, pSelf );
+         break;
+   }
+
    return pSelf;
 }
 
