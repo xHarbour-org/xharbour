@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.24 2004/10/20 03:14:41 ronpinkas Exp $
+ * $Id: hbusage.c,v 1.25 2005/01/09 06:08:25 likewolf Exp $
  */
 
 /*
@@ -173,6 +173,7 @@ void hb_compPrintCredits( void )
            "Jose Lalin <dezac@corevia.com>\n"
            "Leslee Griffith <les.griffith@vantagesystems.ca>\n"
            "Lorenzo Fiorini <lorenzo_fiorini@teamwork.it>\n"
+           "Luis Krause Mantilla <lkrausem@shaw.ca>\n"
            "Luiz Rafael Culik <culik@sl.conex.net>\n"
            "Manuel Ruiz <mrt@joca.es>\n"
            "Marcelo Lombardo <lombardo@uol.com.br>\n"

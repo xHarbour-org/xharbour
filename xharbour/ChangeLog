@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3867 2005/02/25 10:43:39 andijahja Exp $
+ * $Id: ChangeLog,v 1.3868 2005/02/25 13:37:10 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-25 14:00 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * source/compiler/hbusage.c
+    * Added Luis Krause Mantilla to contributors list.
+
 2005-02-25 08:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/fm.c
     ! define HB_FM_WIN32_ALLOC when building DLL. This ensures consistent
