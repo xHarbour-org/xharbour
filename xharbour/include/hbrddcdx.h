@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.14 2002/05/04 20:47:55 horacioroldan Exp $
+ * $Id: hbrddcdx.h,v 1.15 2002/06/08 19:15:36 horacioroldan Exp $
  */
 
 /*
@@ -170,13 +170,13 @@ typedef struct _CDXTAG
    LONG       RootBlock;       /* a page offset with the root of keys tree */
    //USHORT     KeyLength;
    USHORT     MaxKeys;
-   LPKEYINFO  CurKeyInfo;    /* current value of key expression */
+   LPCDXKEYINFO  CurKeyInfo;    /* current value of key expression */
    LPPAGEINFO RootPage;
-   LPKEYINFO  HotKey;        /* value of hot key expression */
+   LPCDXKEYINFO  HotKey;        /* value of hot key expression */
    PHB_ITEM   topScope;
-   LPKEYINFO  topScopeKey;
+   LPCDXKEYINFO  topScopeKey;
    PHB_ITEM   bottomScope;
-   LPKEYINFO  bottomScopeKey;
+   LPCDXKEYINFO  bottomScopeKey;
 } CDXTAG;
 typedef CDXTAG * LPCDXTAG;
 
