@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.52 2004/12/05 23:28:24 oh1 Exp $
+ * $Id: gtapi.c,v 1.54 2005/01/04 17:00:00 ptsarenko Exp $
  */
 
 /*
@@ -1310,7 +1310,6 @@ USHORT HB_EXPORT hb_gtWrite( BYTE * pStr, ULONG ulLength )
       {
          hb_ctWMove( p_WFRow, p_WFCol );
       }
-      hb_gtDispEnd();
 
       /* Finally, save the new cursor position, even if off-screen */
       hb_gtSetPosContext( s_iRow - ct_UFRow,
@@ -1326,6 +1325,7 @@ USHORT HB_EXPORT hb_gtWrite( BYTE * pStr, ULONG ulLength )
             hb_gtSetPosContext( s_iRow - ct_UFRow , ct_ULCol - ct_UFCol,
                                 HB_GT_SET_POS_AFTER );
       }
+      hb_gtDispEnd();
    }
 
    return 0;
@@ -1371,7 +1371,6 @@ USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr,
          uiRow -= ct_BFRow - p_WFRow;
          uiCol -= ct_BFCol - p_WFCol;
       }
-      hb_gtDispEnd();
 
       /* Finally, save the new cursor position, even if off-screen */
       hb_gtSetPosContext( uiRow - ct_UFRow,
@@ -1387,6 +1386,7 @@ USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr,
             hb_gtSetPosContext( s_iRow - ct_UFRow , ct_ULCol - ct_UFCol,
                                 HB_GT_SET_POS_AFTER );
       }
+      hb_gtDispEnd();
    }
 
    return 0;
