@@ -1,5 +1,5 @@
 /*
- * $Id: accept.c,v 1.1.1.1 2001/12/21 10:41:09 ronpinkas Exp $
+ * $Id: accept.c,v 1.2 2002/10/09 03:43:21 druzus Exp $
  */
 
 /*
@@ -96,7 +96,7 @@ HB_FUNC( __ACCEPT )
 
    szAcceptResult[ 0 ] = '\0';
 
-   while( input != K_ENTER )
+   while( input != K_ENTER && input != 3 )  // 3 == ALT_C cancelled
    {
       /* Wait forever, for keyboard events only */
       input = hb_inkey( TRUE, 0.0, ( HB_inkey_enum ) INKEY_KEYBOARD );
@@ -112,7 +112,7 @@ HB_FUNC( __ACCEPT )
             break;
 
          default:
-            if( ulLen < ( ACCEPT_BUFFER_LEN - 1 ) && input >= 32 )
+            if( ulLen < ( ACCEPT_BUFFER_LEN - 1 ) && input >= 32 && input <= 255 )
             {
                szAcceptResult[ ulLen ] = input; /* Accept the input */
                hb_conOutAlt( &szAcceptResult[ ulLen ], sizeof( char ) ); /* Then display it */
