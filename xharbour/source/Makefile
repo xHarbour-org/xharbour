@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.17 2001/02/26 18:11:58 dholm Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:40:33 ronpinkas Exp $
 #
 
 ROOT = ../
@@ -32,6 +32,8 @@ DIRS=\
 	lang \
 	rdd \
 	debug \
+   clipsamp \
+   odbc \
 
 endif
 
