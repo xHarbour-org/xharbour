@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.40 2002/11/07 20:05:55 what32 Exp $
+ * $Id: TApplication.prg,v 1.41 2002/11/07 20:15:58 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -124,7 +124,7 @@ METHOD Run() CLASS Application
 
 *------------------------------------------------------------------------------*
 
-METHOD CreateForm( oTarget, oForm ) CLASS Application
+METHOD CreateForm( oForm, oTarget ) CLASS Application
 
    LOCAL aVars, aVar
 
