@@ -313,7 +313,9 @@ Function _ProcessMsg( hWnd, nMsg, nwParam, nlParam, nIndex )
          nRet := DefMDIChildProc( hWnd, nMsg, nwParam, nlParam )
       ElseIf nType == RCF_MDIFRAME
          nRet := DefFrameProc( hWnd, nMsg, nwParam, nlParam )
-      Else //RCF_WINDOW or RCF_DIALOG
+      ElseIf nType == RCF_DIALOG
+         nRet := DefDlgProc( hWnd, nMsg, nwParam, nlParam ) 
+      Else  //RCF_WINDOW 
          nRet := DefWindowProc( hWnd, nMsg, nwParam, nlParam )
       EndIf
    Else
