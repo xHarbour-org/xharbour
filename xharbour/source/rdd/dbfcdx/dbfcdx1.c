@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.85 2003/11/20 23:47:36 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.86 2003/11/23 19:34:55 druzus Exp $
  */
 
 /*
@@ -1687,6 +1687,13 @@ static void hb_cdxPageLeafDecode( LPCDXPAGE pPage, BYTE * pKeyBuf )
          memcpy( pDst, pSrc, iTmp );
          pDst += iTmp;
       }
+#ifndef HB_CDX_DBGCODE_OFF
+      else if ( iTmp < 0 )
+      {
+          printf("\r\npPage->Page=%lx, iLen=%d, bDup=%d, bTrl=%d", pPage->Page, iLen, bDup, bTrl); fflush(stdout);
+	  hb_cdxErrInternal( "hb_cdxPageLeafDecode: page is not a leaf." );
+      }
+#endif
       if ( bTrl != 0 )
       {
          memset( pDst, bTrail, bTrl );
@@ -1818,10 +1825,10 @@ static int hb_cdxPageLeafDelKey( LPCDXPAGE pPage )
          SHORT iPrev = ( iKey - 1 ) * iLen, iNext = ( iKey + 1 ) * iLen,
                iNum = pPage->TagParent->uiLen;
          iNum -= /* pPage->pKeyBuf[ iNext + iNum + 5 ]; */
-                 HB_MAX( pPage->pKeyBuf[ iNext + iNum + 5 ],
-                         pPage->pKeyBuf[ iPrev + iNum + 5 ] );
-         iDup = HB_MIN( pPage->pKeyBuf[ iNext + iNum + 5 ],
-                        pPage->pKeyBuf[ iNext + iNum + 5 - iLen ] );
+                 HB_MAX( pPage->pKeyBuf[ iNext + iLen - 1 ],
+                         pPage->pKeyBuf[ iPrev + iLen - 1 ] );
+         iDup = HB_MIN( pPage->pKeyBuf[ iPos ],
+                        pPage->pKeyBuf[ iNext - 2] );
          while ( iDup < iNum && pPage->pKeyBuf[ iPrev + iDup ] ==
                                 pPage->pKeyBuf[ iNext + iDup ] )
             ++iDup;
