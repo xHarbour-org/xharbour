@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.1.1.1 2001/12/21 10:44:30 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.2 2002/04/21 01:39:17 ronpinkas Exp $
  */
 
 /*
@@ -316,6 +316,7 @@ HB_EXPR_PTR hb_compExprNewArray( HB_EXPR_PTR pArrList )
     */
    if( pExpr->ExprType == HB_ET_NONE && pExpr->pNext == NULL )
    {
+      HB_XFREE( pExpr );
       pArrList->value.asList.pExprList = NULL;
    }
    else

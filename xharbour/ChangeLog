@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.322 2002/07/24 14:48:39 walito Exp $
+ * $Id: ChangeLog,v 1.323 2002/07/24 18:41:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2002-07-25 11:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/common/expropt1.c
+    ! Fixed memory leak in optimization of empty array.
+
 2002-07-24 11:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * doc/cstruct.txt
   * include/cstruct.ch
-    * Added: IMPORT C STRCTURE <strucName>. This allows usage of structures from a seperatly compiled modules.
+    * Added: IMPORT C STRUCTURE <strucName>. This allows usage of structures from a separately compiled modules.
 
 2002-07-25 11:45 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/transfrm.c
