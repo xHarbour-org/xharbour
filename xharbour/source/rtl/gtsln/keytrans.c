@@ -1,5 +1,5 @@
 /*
- * $Id: keytrans.c,v 1.5 2004/06/06 11:33:21 lf_sfnet Exp $
+ * $Id: keytrans.c,v 1.6 2004/06/07 04:37:54 bdj Exp $
  */
 
 /*
@@ -88,7 +88,6 @@ static int KeyTranslationTable[][ 2 ] =
    { SL_KEY_PPAGE      | ( ALTL_PRESSED << 16 ),     K_ALT_PGUP   },
    { SL_KEY_NPAGE      | ( ALTL_PRESSED << 16 ),     K_ALT_PGDN   },
 
- #ifdef HB_EXT_SHIFT_KEYS_CODES
    { SL_KEY_UP         | ( SHIFT_PRESSED << 16 ),     K_SH_UP     },
    { SL_KEY_DOWN       | ( SHIFT_PRESSED << 16 ),     K_SH_DOWN   },
    { SL_KEY_LEFT       | ( SHIFT_PRESSED << 16 ),     K_SH_LEFT   },
@@ -97,7 +96,6 @@ static int KeyTranslationTable[][ 2 ] =
    { SL_KEY_END        | ( SHIFT_PRESSED << 16 ),     K_SH_END    },
    { SL_KEY_PPAGE      | ( SHIFT_PRESSED << 16 ),     K_SH_PGUP   },
    { SL_KEY_NPAGE      | ( SHIFT_PRESSED << 16 ),     K_SH_PGDN   },
- #endif
 
 #endif
 
@@ -143,11 +141,9 @@ static int KeyTranslationTable[][ 2 ] =
 
    { K_TAB             | ( SHIFT_PRESSED << 16 ),    K_SH_TAB     },
 
- #ifdef HB_EXT_SHIFT_KEYS_CODES
    { SL_KEY_IC         | ( SHIFT_PRESSED << 16 ),    K_SH_INS     },
    { SL_KEY_DELETE     | ( SHIFT_PRESSED << 16 ),    K_SH_DEL     },
    { K_ENTER           | ( SHIFT_PRESSED << 16 ),    K_SH_ENTER   },
- #endif
 
 #endif
 

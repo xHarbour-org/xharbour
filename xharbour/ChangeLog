@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3045 2004/06/08 23:58:39 what32 Exp $
+ * $Id: ChangeLog,v 1.3046 2004/06/09 05:26:46 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-09 13:25 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * include/inkey.ch
+    These inkey codes:
+       K_SH_LEFT    K_SH_UP      K_SH_RIGHT   K_SH_DOWN
+       K_SH_INS     K_SH_DEL     K_SH_HOME    K_SH_END
+       K_SH_PGUP    K_SH_PGDN    K_SH_RETURN  K_SH_ENTER
+    are now mapped to K_LEFT, K_UP, etc ifndef HB_EXT_SHIFT_KEYS_CODES.
+
+  * source/rtl/gtsln/keytrans.c
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtwin/gtwin.c
+    Use K_SH_LEFT, K_SH_UP, etc regardless of HB_EXT_SHIFT_KEYS_CODES.
 
 2004-06-09 00:10 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/tget.prg
