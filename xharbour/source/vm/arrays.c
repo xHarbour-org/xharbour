@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.10 2002/01/27 10:57:09 ronpinkas Exp $
+ * $Id: arrays.c,v 1.11 2002/02/01 01:05:58 ronpinkas Exp $
  */
 
 /*
@@ -1042,7 +1042,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
            * allocated by the GC, its just a portion of the
            * pItems chunk, which will be released as one piece.
            * --------------------------------------------------*/
-         if( HB_IS_STRING( pItem ) && ! pItem->bStatic )
+         if( HB_IS_STRING( pItem ) && ! pItem->item.asString.bStatic )
          {
             hb_itemReleaseString( pItem );
          }
