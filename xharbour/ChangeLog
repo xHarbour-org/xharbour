@@ -1,5 +1,5 @@
-/*
- * $Id: ChangeLog,v 1.3373 2004/08/30 08:40:57 jonnymind Exp $
+﻿/*
+ * $Id: ChangeLog,v 1.3374 2004/08/30 11:49:58 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,84 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-30 19:45 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/include/hbgtwvt.h
+  * xharbour/include/wvtwin.ch
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/rtl/gtwvt/wvtcore.c
+  * xharbour/source/rtl/gtwvt/wvtutils.c
+  * xharbour/source/rtl/gtwvt/wvtclass.prg 
+  * xHarbour/tests/wvtgui.prg
+
+    New functions, formatting, code cleanup, core rearrangement.
+
+    Added the functionality to control the GUI elements when overlapped
+    UI components are layered over the existing GUI components, and where
+    array of GUI draw blocks has been forced for only that overlapped 
+    window, and when under this situation user clicks on some other
+    window on the desktop and returns back to appln window. Earlier,
+    under such scenario, the GUI elements drawn prior to the current paint
+    block were erased. Now a special kind of buffering the current 
+    application screen is employed which is flushed back on the appln
+    window when a WM_SETFOCUS or WM_KILLFOCUS is received by the 
+    appln followed by WM_PAINT. This is ultra fast and non-flickering
+    protocol. 
+
+    The above behavior can be invoked with Wvt_SetGui( TRUE ). By default
+    earlier behavior is retained just because many of you will be 
+    using pure console protocol thus eliminating the overhead.
+
+    With this feature GTWVT is now capable of producing worry-free 
+    applications where no screen will be blurred when overlapped 
+    UI ( Alert(), AChoice(), Tbrowse() ) is invoked over existing 
+    GUI elements.
+
+    +----------------------------------------------+
+    :  +-----+                                     : 
+    :  : BMP :                                     : 
+    :  +-----+    +------------------------------+ : 
+    :             :                              : :
+    :             :                              : :
+    :             :                              : : 
+    :             :            BMP               : :
+    :             :                              : :
+    :             :                              : :
+    :             :                              : :
+    :             :                              : :
+    :             +------------------------------+ :
+    :                                              :
+    +----------------------------------------------+
+
+    The above is achieved with a set of WvtSetPaint() blocks.
+
+    +----------------------------------------------+
+    :  +-----+                                     : 
+    :  : BMP :                                     : 
+    :  +-----+    +------------------------------+ : 
+    :             :                              : :
+    :             :                              : :
+    :        +-----------------------------+     : :
+    :        :         Alert Msg           :     : :
+    :        +-----------------------------+     : :
+    :             :                              : :
+    :             :                              : :
+    :             :                              : :
+    :             +------------------------------+ :
+    :                                              :
+    +----------------------------------------------+
+
+    Now an alert box is opened over it. That will be 
+    controlled by another set of paint blocks. 
+
+    Suppose user opens Outlook which partial covers the 
+    appln window. User closes Outlook and returns to appln.
+    What will happen? The bitmaps drawn
+    through first set of paint blocks are erased from the 
+    area covered by Outlook, though alert box will be displayed 
+    properly. You can well imagine how the blurred window will
+    look-alike. With the current implementation, GTWVT takes 
+    care of it.
 
 2004-08-30 07:51 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtwin/gtwin.c
