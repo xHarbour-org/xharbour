@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.14 2002/04/17 21:19:56 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.15 2002/04/21 01:39:17 ronpinkas Exp $
  */
 
 /*
@@ -941,6 +941,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             pSelf->value.asList.pExprList = HB_EXPR_USE( pSelf->value.asList.pExprList, HB_EA_REDUCE );
             pSelf->value.asList.pIndex = HB_EXPR_USE( pSelf->value.asList.pIndex, HB_EA_REDUCE );
             pIdx = pSelf->value.asList.pIndex;
+
             if( pIdx->ExprType == HB_ET_NUMERIC )
             {
                HB_EXPR_PTR pExpr = pSelf->value.asList.pExprList; /* the expression that holds an array */
@@ -986,17 +987,27 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                }
                else
                {
+                  /* We DO want to allow R/T support for negative Index.
                   LONG lIndex;
 
                   if( pIdx->value.asNum.NumType == HB_ET_LONG )
+                  {
                      lIndex = pIdx->value.asNum.lVal;
+                  }
                   else
+                  {
                      lIndex = ( LONG ) pIdx->value.asNum.dVal;
+                  }
 
-                  //if( lIndex > 0 )
-                     HB_EXPR_USE( pExpr, HB_EA_ARRAY_AT );
-                  //else
-                  //   hb_compErrorBound( pIdx ); /* index <= 0 - bound error */
+                  if( lIndex > 0 )
+                  { */
+                     HB_EXPR_USE( pExpr, HB_EA_ARRAY_AT ); /*
+                  }
+                  else
+                  {
+                     hb_compErrorBound( pIdx );
+                  }
+                  */
                }
             }
          }
