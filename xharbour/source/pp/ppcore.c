@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.58 2003/04/07 06:08:42 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.59 2003/04/07 06:48:49 paultucker Exp $
  */
 
 /*
@@ -2089,16 +2089,20 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
            strtopti = ptrmp;
         }
 
-        if( !s_numBrackets && strtopti && strtptri != ptri && ISNAME( *ptri ) )
+        if( !s_numBrackets && strtopti && strtptri != ptri )
         {
            strtptri = ptri;
            ptrmp    = strtopti;
+
+           //printf( "Restored: %s\n", ptrmp );
+
            ptr      = ptri;
            ipos     = NextStopper( &ptr, tmpname );
            ipos     = md_strAt( tmpname, ipos, strtopti, TRUE, TRUE, TRUE, TRUE );
 
            #ifdef DEBUG_OPTIONAL
               printf( "At: %i Name: >%s< in >%s<\n", ipos, tmpname, strtopti );
+
               if( ipos )
               {
                  printf( "TestOptional( >%s<, >%s< )\n", strtopti, strtopti+ipos-2 );
@@ -2108,10 +2112,12 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
            if( ipos && TestOptional( strtopti, strtopti+ipos-2 ) )
            {
               ptr = strtopti+ipos-2;
+
               ptr = PrevSquare( ptr, strtopti, NULL );
 
               if( ptr )
               {
+                 //printf( "Rewinded: %s\n", ptr );
                  ptrmp = ptr;
               }
            }
@@ -2131,6 +2137,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
           ptrmp++;
 
           //printf( "CHECK >%s< in >%s<\n", ptrmp, ptri );
+
           if( !CheckOptional( ptrmp, ptri, ptro, lenres, com_or_tra, com_or_xcom ) )
           {
              //printf( "SKIP %s\n", ptrmp );
@@ -2152,10 +2159,13 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
                    ipos = NextStopper( &ptr, tmpname );
                    ipos = md_strAt( tmpname, ipos, ptrmp, TRUE, TRUE, TRUE, TRUE );
 
-  HB_TRACE(HB_TR_DEBUG, ("2"));
+                   //printf( "TestOptional, %s, %i\n", tmpname, ipos );
+
                    if( ipos && TestOptional( ptrmp+1, ptrmp+ipos-2 ) )
                    {
                       ptr = PrevSquare( ptrmp+ipos-2, ptrmp+1, NULL );
+
+                      //printf( "Rewinded: %s\n", ptr );
 
                       if( !ptr || CheckOptional( ptrmp+1, ptri, ptro, lenres, com_or_tra, com_or_xcom ) )
                       {
@@ -2245,10 +2255,12 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
              isWordInside = 1; /*  restricted match marker  */
           }
 
-          //printf( "\nCommandStuff->WorkMarkers\n" );
+          //printf( "\nCommandStuff->WorkMarkers: >%s< MP: >%s<\n", ptri, ptrmp );
 
           if( ! WorkMarkers( &ptrmp, &ptri, ptro, lenres, com_or_xcom ) )
           {
+             //printf( "Failed!\n" );
+
              if( s_numBrackets )
              {
                 SkipOptional( &ptrmp );
@@ -2652,6 +2664,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
      if( !lenreal )
      {
         lenreal = getExpReal( expreal, ptri, TRUE, maxlenreal, FALSE );
+
         #if 0
            printf( "List Len: %i Exp: %s\n", lenreal, expreal );
         #endif
@@ -2708,11 +2721,11 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
 
    HB_TRACE(HB_TR_DEBUG, ("getExpReal(%s, %s, %d, %d, %d)", expreal, *ptri, prlist, maxrez, bStrict));
 
-   //printf( "getExpReal( '%s', '%s', %d, %d, %d )\n", expreal, *ptri, prlist, maxrez, bStrict );
+   //printf( "\ngetExpReal( %p, '%s', %d, %d, %d )\n", expreal, *ptri, prlist, maxrez, bStrict );
 
    HB_SKIPTABSPACES( *ptri );
 
-   if( strchr( "}]),=*/^%", **ptri ) || ( strchr( ":-+", **ptri ) && *( ( *ptri) + 1 ) == '=' ) )
+   if( strchr( "}]),|=*/^%", **ptri ) || ( strchr( ":-+", **ptri ) && *( ( *ptri) + 1 ) == '=' ) )
    {
       return 0;
    }
@@ -3105,7 +3118,9 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
          /* Ron Pinkas end 2000-06-17 */
 
          if( expreal != NULL )
+         {
             *expreal++ = **ptri;
+         }
 
          (*ptri)++;
          lens++;
@@ -3116,6 +3131,7 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
    {
       if( *(expreal-1) == ' ' )
       {
+         (*ptri)--;
          expreal--;
          lens--;
       }
@@ -3137,9 +3153,20 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
    }
    /* Ron Pinkas end 2000-06-21 */
 
+   if( expreal )
+   {
+      *expreal = '\0';
+   }
+
    #if 0
-      if( expreal && lens )
-         printf( "\nLen=%i >%s<\n", lens, expreal-lens );
+      if( lens )
+      {
+         printf( "Len=%i >%.*s<\n", lens, lens, *ptri - lens );
+      }
+      else
+      {
+         printf( "State %i, Inavlid Expression %s\n", State, *ptri );
+      }
    #endif
 
    return lens;
@@ -3769,6 +3796,13 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
 
   HB_TRACE(HB_TR_DEBUG, ("ReplacePattern(%c, %s, %i, %s, %i)", patttype, expreal, lenreal, ptro, lenres));
 
+  lenreal--;
+  while( expreal[ lenreal ] == ' ' )
+  {
+     lenreal--;
+  }
+  lenreal++;
+
   #ifdef DEBUG_MARKERS
      printf( "   %c, '%s', %i, '%s', %i\n", patttype, expreal, lenreal, ptro, lenres );
   #endif
@@ -3983,34 +4017,40 @@ static void pp_rQuotes( char * expreal, char * sQuotes )
 
   HB_TRACE_STEALTH(HB_TR_DEBUG, ("pp_rQuotes(%s, %s)", expreal, sQuotes));
 
-  /*
-  printf( "String: >%s< Delim: %s\n", expreal, sQuotes );
-  */
+  //printf( "String: >%s< Delim: %s\n", expreal, sQuotes );
 
   while( *expreal != '\0' )
-    {
-      if( *expreal == '\"' ) lQuote2 = TRUE;
-      else if( *expreal == '\'' ) lQuote1 = TRUE;
-      expreal++;
-    }
+  {
+     if( *expreal == '\"' )
+     {
+        lQuote2 = TRUE;
+     }
+     else if( *expreal == '\'' )
+     {
+        lQuote1 = TRUE;
+     }
+
+     expreal++;
+  }
+
   if( lQuote2 )
-    {
-      if( lQuote1 )
-        {
-          *sQuotes = '[';
-          *(sQuotes+1) = ']';
-        }
-      else
-        {
-          *sQuotes = '\'';
-          *(sQuotes+1) = '\'';
-        }
-    }
+  {
+     if( lQuote1 )
+     {
+        *sQuotes = '[';
+        *(sQuotes+1) = ']';
+     }
+     else
+     {
+        *sQuotes = '\'';
+        *(sQuotes+1) = '\'';
+     }
+  }
   else
-    {
-      *sQuotes = '\"';
-      *(sQuotes+1) = '\"';
-    }
+  {
+     *sQuotes = '\"';
+     *(sQuotes+1) = '\"';
+  }
 }
 
 int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, char * sBuffer, int * lenBuffer, int * iBuffer, int State )
@@ -4468,12 +4508,18 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
 
   #if 0
      if( bRule )
+     {
         printf( "Finished (Rule: %i) Find: >%s< In: >%s<\n", bRule, szSub, szText );
+     }
      else
+     {
         printf( "Finished - Find: >%s< In: >%s<\n", szSub, szText );
+     }
 
      if( lSubPos == lSubLen )
+     {
         printf( "Found at Pos: %i >%s<\n", lPos - lSubLen, ( szText + lPos- lSubLen ) );
+     }
   #endif
 
   return ( lSubPos < lSubLen ? 0 : lPos - lSubLen + 1 );
@@ -5153,9 +5199,13 @@ static int NextParm( char ** sSource, char * sDest )
 
   #if 0
      if( sDest )
+     {
         printf( "NextParm: >%s<\n", sDest - lenName );
+     }
      else
+     {
         printf( "NextParm Len: %i\n", lenName );
+     }
   #endif
 
   return lenName;
