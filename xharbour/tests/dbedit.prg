@@ -25,10 +25,11 @@ Local aCols := {{"PadR(AllTrim(FIRST)+' '+AllTrim(LAST),30)", {|x| IIf(SALARY<10
                 "SALARY"}
 
   Use test
-  DBEdit(,,,, aCols, "TstFnc",,{"Name","City","Salary"})
+  DBEdit(,,,, aCols, "TstFnc",,{"Name", "City", "Salary"})
   Close
   Cls
   ? "Have a nice day ;)"
+  ?
 Return Nil
 
 Function TstFnc(nMode, nCol, oTBR)

@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.9 2003/11/12 20:34:52 maurifull Exp $
+ * $Id: dbedit.prg,v 1.10 2003/11/15 18:46:37 paultucker Exp $
  */
 
 /*
@@ -105,18 +105,18 @@ Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
   // NOTE: Heading/footing separator is SINGLE line instead of DOUBLE line
   //       this is because most codepages (unicode too) don't have DOUBLE line chars
   //       so the output is ugly with them
-  IIf(ValType(xHSep) == 'U', xHSep := Chr(194) + Chr(196), .T.)
-  IIf(ValType(xCSep) == 'U', xCSep := Chr(179), .T.)
-  IIf(ValType(xFSep) == 'U' .And. !Empty(xFoot), xFSep := Chr(193) + Chr(196), .T.)
+  IIf(HB_ISNIL(xHSep), xHSep := Chr(196) + Chr(194) + Chr(196), .T.)
+  IIf(HB_ISNIL(xCSep), xCSep := ' ' + Chr(179) + ' ', .T.)
+  IIf(HB_ISNIL(xFSep) .And. !Empty(xFoot), xFSep := Chr(196) + Chr(193) + Chr(196), .T.)
 
   oTBR := TBrowseDB(nTop, nLeft, nBottom, nRight)
-  If ValType(xHSep) == 'C'
+  If HB_ISSTRING(xHSep)
     oTBR:headSep := xHSep
   End
-  If ValType(xFSep) == 'C'
+  If HB_ISSTRING(xFSep)
     oTBR:footSep := xFSep
   End
-  If ValType(xCSep) == 'C'
+  If HB_ISSTRING(xCSep)
     oTBR:colSep := xCSep
   End
 
@@ -128,42 +128,58 @@ Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
 #endif
 
   For i := 1 To Len(aCols)
-    bFun := IIf(ValType(aCols[i]) == 'C', &("{||" + aCols[i] + '}'),  &("{||" + aCols[i,1] + '}'))
-    If ValType(Eval(bFun)) == 'M'
+    If HB_ISARRAY(aCols[i])
+      bFun := IIf(HB_ISBLOCK(aCols[i,1]), aCols[i,1], &("{||" + aCols[i,1] + '}'))
+    Else
+      bFun := IIf(HB_ISBLOCK(aCols[i]), aCols[i], &("{||" + aCols[i] + '}'))
+    End
+    If ValType(Eval(bFun)) == 'M'  // HB_ISMEMO() returns .T. for strings :(
       bFun := {|| "  <Memo>  "}
     End
 
-    oTBC := TBColumnNew(IIf(ValType(xHdr) == 'C', xHdr, xHdr[i]), bFun)
+    If HB_ISARRAY(xHdr) .And. Empty(xHdr[i])  // handle empty column headers
+      IIf(HB_ISSTRING(aCols[i]), xHdr[i] := aCols[i], "<block>")
+    End
 
-    If ValType(aCols[i])=='A'
+    oTBC := TBColumnNew(IIf(HB_ISSTRING(xHdr), xHdr, xHdr[i]), bFun)
+
+    If HB_ISARRAY(aCols[i])
       oTBC:colorBlock := aCols[i,2]
     End
-    If ValType(xCSep) == 'A'
+    If HB_ISARRAY(xCSep)
       oTBC:colSep := xCSep[i]
     End
-    If ValType(xHSep) == 'A'
+    If HB_ISARRAY(xHSep)
       oTBC:headSep := xHSep[i]
     End
-    If ValType(xFSep) == 'A'
+    If HB_ISARRAY(xFSep)
       oTBC:footSep := xFSep[i]
     End
-    If ValType(xFoot) == 'A'
+    If HB_ISARRAY(xFoot)
       oTBC:footing := xFoot[i]
-    ElseIf ValType(xFoot) == 'C'
+    ElseIf HB_ISSTRING(xFoot)
       oTBC:footing := xFoot
+    End
+    If HB_ISARRAY(xPict)
+      oTBC:picture := xPict[i]
+    ElseIf HB_ISSTRING(xPict)
+      oTBC:picture := xPict
     End
 
     oTBR:addColumn(oTBC)
   Next
 
-  IIf(Empty(xFunc), bFun := {|| IIf(Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER), DE_ABORT, DE_CONT)}, bFun := IIf(ValType(xFunc) == 'B', xFunc, &("{|x, y, z|" + xFunc + "(x,y,z)}")))
+  IIf(Empty(xFunc), bFun := {|| IIf(Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER), DE_ABORT, DE_CONT)}, bFun := IIf(HB_ISBLOCK(xFunc), xFunc, &("{|x, y, z|" + xFunc + "(x,y,z)}")))
 
   // EXTENSION: Initialization call
-  nRet := Eval(bFun, -1, oTBR:colPos, oTBR)
+  nRet := _DoUserFunc(bFun, -1, oTBR:colPos, oTBR)
 
-  If LastRec() == 0
-    nRet := Eval(bFun, DE_EMPTY, oTBR:colPos, oTBR)
+  i := RecNo()
+  Go Top
+  If (Eof() .Or. RecNo() == LastRec() + 1) .And. Bof()
+    nRet := _DoUserFunc(bFun, DE_EMPTY, oTBR:colPos, oTBR)
   End
+  Go (i)
 
   While nRet != 0
     If nRet == 2
@@ -171,12 +187,12 @@ Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
       oTBR:invalidate()
     End
     If oTBR:hitTop
-      nRet := Eval(bFun, DE_HITTOP, oTBR:colPos, oTBR)
+      nRet := _DoUserFunc(bFun, DE_HITTOP, oTBR:colPos, oTBR)
     ElseIf oTBR:hitBottom
-      nRet := Eval(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
+      nRet := _DoUserFunc(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
     End
     oTBR:forceStable()
-    nRet := Eval(bFun, DE_IDLE, oTBR:colPos, oTBR)
+    nRet := _DoUserFunc(bFun, DE_IDLE, oTBR:colPos, oTBR)
     nKey := Inkey(0)
 
 #ifdef HB_COMPAT_C53
@@ -194,7 +210,7 @@ Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
 
 #ifdef HB_COMPAT_C53
     // got a key exception
-    nRet := Eval(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
+    nRet := _DoUserFunc(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
 #else
     // xHarbour without 5.3 extensions code
     Switch nKey
@@ -247,14 +263,17 @@ Local oTBR, oTBC, i, nRet := 2, nKey, bFun, nCrs
         Exit
       Default
        // got a key exception
-       nRet := Eval(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
+       nRet := _DoUserFunc(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
     End
 #endif
 
     // userfunc could delete recs...
-    If LastRec() == 0
-      nRet := Eval(bFun, DE_EMPTY, oTBR:colPos, oTBR)
+    i := RecNo()
+    Go Top
+    If (Eof() .Or. RecNo() == LastRec() + 1) .And. Bof()
+      nRet := _DoUserFunc(bFun, DE_EMPTY, oTBR:colPos, oTBR)
     End
+    Go (i)
   End
 
   SetCursor(nCrs)
@@ -263,19 +282,27 @@ Return .T.
 Static Function _MoveCol(oTBR, nKey)
 Local oTB1, oTB2
 
-  If nKey == K_CTRL_DOWN .And. oTBR:colPos<oTBR:colCount
+  If nKey == K_CTRL_DOWN .And. oTBR:colPos < oTBR:colCount
     oTB1 := oTBR:getColumn(oTBR:colPos)
-    oTB2 := oTBR:getColumn(oTBR:colPos+1)
+    oTB2 := oTBR:getColumn(oTBR:colPos + 1)
     oTBR:setColumn(oTBR:colPos, oTB2)
-    oTBR:SetColumn(oTBR:colPos+1, oTB1)
+    oTBR:SetColumn(oTBR:colPos + 1, oTB1)
     oTBR:colPos++
     oTBR:invalidate()
-  ElseIf nKey == K_CTRL_UP .And. oTBR:colPos>1
+  ElseIf nKey == K_CTRL_UP .And. oTBR:colPos > 1
     oTB1 := oTBR:getColumn(oTBR:colPos)
-    oTB2 := oTBR:getColumn(oTBR:colPos-1)
+    oTB2 := oTBR:getColumn(oTBR:colPos - 1)
     oTBR:setColumn(oTBR:colPos, oTB2)
-    oTBR:SetColumn(oTBR:colPos-1, oTB1)
+    oTBR:SetColumn(oTBR:colPos - 1, oTB1)
     oTBR:colPos--
     oTBR:invalidate()
   End
 Return Nil
+
+Static Function _DoUserFunc(bFun, nMode, nColPos, oTBR)
+Local nRet
+
+  nRet := Eval(bFun, nMode, nColPos, oTBR)
+ 
+  IIf(!HB_ISNUMERIC(nRet), nRet := 1, .T.)
+Return nRet
