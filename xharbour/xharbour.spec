@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.59 2004/06/15 11:55:53 druzus Exp $
+# $Id: xharbour.spec,v 1.60 2004/08/29 00:26:20 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -549,7 +549,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/lib/%{name}/libgt*.a
 %{prefix}/lib/%{name}/libhbtip*.a
 %{?_with_odbc: %{prefix}/lib/%{name}/libhbodbc.a}
-%{prefix}/lib/%{name}/libct*.a
+%{prefix}/lib/%{name}/libhbct*.a
 %{prefix}/lib/%{name}/liblang.a
 %{prefix}/lib/%{name}/libmacro*.a
 %{prefix}/lib/%{name}/libnulsys*.a
