@@ -203,17 +203,17 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
    /* Get the file list */
    if( ( ffind = hb_fsFindFirst( (const char *) szDirSpec, uiMask ) ) != NULL )
    {
-      HB_ITEM pFilename;
-      HB_ITEM pSize;
-      HB_ITEM pDate;
-      HB_ITEM pTime;
-      HB_ITEM pAttr;
+      HB_ITEM Filename;
+      HB_ITEM Size;
+      HB_ITEM Date;
+      HB_ITEM Time;
+      HB_ITEM Attr;
 
-      pFilename.type = HB_IT_NIL ;
-      pSize.type = HB_IT_NIL ;
-      pDate.type = HB_IT_NIL ;
-      pTime.type = HB_IT_NIL ;
-      pAttr.type = HB_IT_NIL ;
+      Filename.type = HB_IT_NIL ;
+      Size.type = HB_IT_NIL ;
+      Date.type = HB_IT_NIL ;
+      Time.type = HB_IT_NIL ;
+      Attr.type = HB_IT_NIL ;
 
       do
       {
@@ -231,21 +231,21 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
             if ( bFullPath )
             {
                char *szFullName = hb_xstrcpy(NULL,fDirSpec->szPath?fDirSpec->szPath:"",ffind->szName,NULL);
-               hb_arrayAddForward( &pSubarray, hb_itemPutC( &pFilename, szFullName ) );
+               hb_arrayAddForward( &pSubarray, hb_itemPutC( &Filename, szFullName ) );
                hb_xfree( szFullName );
             }
             else
             {
-               hb_arrayAddForward( &pSubarray, hb_itemPutC( &pFilename, ffind->szName ) );
+               hb_arrayAddForward( &pSubarray, hb_itemPutC( &Filename, ffind->szName ) );
             }
          #ifndef HB_LONG_LONG_OFF
-            hb_arrayAddForward( &pSubarray, hb_itemPutNLL( &pSize, ffind->size ) );
+            hb_arrayAddForward( &pSubarray, hb_itemPutNLL( &Size, ffind->size ) );
          #else
-            hb_arrayAddForward( &pSubarray, hb_itemPutNL( &pSize, ffind->size ) );
+            hb_arrayAddForward( &pSubarray, hb_itemPutNL( &Size, ffind->size ) );
          #endif
-            hb_arrayAddForward( &pSubarray, hb_itemPutDL( &pDate, ffind->lDate ) );
-            hb_arrayAddForward( &pSubarray, hb_itemPutC( &pTime, ffind->szTime ) );
-            hb_arrayAddForward( &pSubarray, hb_itemPutC( &pAttr, hb_fsAttrDecode( ffind->attr, buffer ) ) );
+            hb_arrayAddForward( &pSubarray, hb_itemPutDL( &Date, ffind->lDate ) );
+            hb_arrayAddForward( &pSubarray, hb_itemPutC( &Time, ffind->szTime ) );
+            hb_arrayAddForward( &pSubarray, hb_itemPutC( &Attr, hb_fsAttrDecode( ffind->attr, buffer ) ) );
 
             /* Don't exit when array limit is reached */
             bAddEntry = bDirOnly ? hb_fsIsDirectory( ( BYTE * ) ffind->szName ) : TRUE;
@@ -266,6 +266,12 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
       while( hb_fsFindNext( ffind ) );
 
       hb_fsFindClose( ffind );
+
+      hb_itemClear( &Filename );
+      hb_itemClear( &Size );
+      hb_itemClear( &Date );
+      hb_itemClear( &Time );
+      hb_itemClear( &Attr );
 
    }
 
