@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.45 2003/10/04 14:20:58 walito Exp $
+ * $Id: tbrowse.prg,v 1.46 2003/10/19 04:05:26 walito Exp $
  */
 
 /*
@@ -381,9 +381,14 @@ return Self
 
 METHOD Configure( nMode ) CLASS TBrowse
 
-   local n, nHeight, aCol, xVal, nFreeze, oErr
+   local n, nHeight, aCol, xVal, nFreeze, oErr, lInitializing := .f.
 
    default nMode to 0
+
+   if nMode == 3
+      nMode := 0
+      lInitializing := .t.
+   endif
 
    if ::nColPos > ::nColumns
       ::nColPos := ::nColumns
@@ -421,7 +426,7 @@ METHOD Configure( nMode ) CLASS TBrowse
    // Find out highest header and footer
    FOR EACH aCol IN ::aColsInfo
 
-      if nMode <= 1 .or. ::lNeverDisplayed
+      if (nMode <= 1 .and. !::lNeverDisplayed) .or. lInitializing
          xVal := Eval( aCol[ o_Obj ]:block )
 
          aCol[ o_Type      ] := valtype( xVal )
@@ -430,12 +435,12 @@ METHOD Configure( nMode ) CLASS TBrowse
          aCol[ o_Pict      ] := iif( Empty( aCol[ o_Obj ]:Picture ), "", aCol[ o_Obj ]:Picture )
       endif
 
-      if nMode = 0 .or. nMode = 2
+      if nMode = 0 .or. nMode = 2 .or. lInitializing
          aCol[ o_ColSep    ] := iif( aCol[ o_Obj ]:ColSep != NIL,;
                                           aCol[ o_Obj ]:ColSep, ::ColSep )
       endif
 
-      if nMode <= 1 .or. ::lNeverDisplayed
+      if (nMode <= 1 .and. !::lNeverDisplayed) .or. lInitializing
          xVal := Eval( aCol[ o_Obj ]:block )
 
          if !aCol[ o_SetWidth ]
@@ -1543,7 +1548,7 @@ METHOD Stabilize() CLASS TBrowse
    //
    if !::lConfigured .or. ::lNeverDisplayed
       if ::lNeverDisplayed
-         ::configure()
+         ::configure( 3 )
       endif
       ::configure( 2 )
    endif
@@ -1920,7 +1925,7 @@ METHOD ForceStabilize() CLASS TBrowse
    //
    if !::lConfigured .or. ::lNeverDisplayed
       if ::lNeverDisplayed
-         ::configure()
+         ::configure( 3 )
       endif
       ::configure( 2 )
    endif
