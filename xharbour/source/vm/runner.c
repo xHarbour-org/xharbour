@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.13 2003/06/18 08:57:02 ronpinkas Exp $
+ * $Id: runner.c,v 1.14 2003/10/02 22:39:52 mlombardo Exp $
  */
 
 /*
@@ -762,7 +762,7 @@ static void hb_hrbFileRead( FHANDLE file, char * szFileName, char * cBuffer, int
 
 //   if( iCount != ( int ) fread( cBuffer, iSize, iCount, file ) )
 
-   if( iCount != ( int ) ( hb_fsRead( file, cBuffer, (USHORT) iCount * iSize ) / iSize ) )
+   if( iCount != ( int ) ( hb_fsRead( file, ( BYTE *) cBuffer, (USHORT) iCount * iSize ) / iSize ) )
    {
       hb_errRT_BASE_Ext1( EG_READ, 9999, NULL, szFileName, 0, EF_NONE, 0 );
    }
@@ -775,7 +775,7 @@ static FHANDLE hb_hrbFileOpen( char * szFileName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileOpen(%s)", szFileName));
 //   return fopen( szFileName, "rb" );
-   return hb_fsOpen( szFileName, FO_READ );
+   return hb_fsOpen( ( BYTE *)szFileName, FO_READ );
 }
 
 
