@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2993 2004/05/27 00:34:26 lculik Exp $
+ * $Id: ChangeLog,v 1.2994 2004/05/27 02:30:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-27 11:10 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
+  * source/rtl/tget.prg
+    ! Reenable colorspec method and change buildgetcolor function to me more clipper compatible
+     ie if user pass color r/r, clipper get object color spec member has r/r,r/r,r/r,r/r
+
 
 2004-05-26 19:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * utils\xbscript\xbs_harb.ch

@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.73 2004/04/21 16:38:56 kaddath Exp $
+ * $Id: tget.prg,v 1.74 2004/05/27 00:29:34 lculik Exp $
  */
 
 /*
@@ -99,7 +99,7 @@ CLASS Get
    DATA SubScript
    DATA Type
    DATA TypeOut
-   DATA ColorSpec
+
    #ifdef HB_COMPAT_C53
    DATA Control
    DATA Message
@@ -109,7 +109,7 @@ CLASS Get
    DATA CapCol
    #endif
 
-//   DATA cColorSpec   PROTECTED    Used only for METHOD ColorSpec
+   DATA cColorSpec   PROTECTED   // Used only for METHOD ColorSpec
    DATA cPicture     PROTECTED   // Used only for METHOD Picture
    DATA Block
 
@@ -120,7 +120,7 @@ CLASS Get
    MESSAGE _Assign METHOD Assign()
 #endif
    METHOD HitTest(mrow,mcol)
-//   METHOD ColorSpec( cColorSpec ) SETGET  // Replace to DATA ColorSpec
+   METHOD ColorSpec( cColorSpec ) SETGET  // Replace to DATA ColorSpec
    METHOD Picture( cPicture )     SETGET  // Replace to DATA Picture
    METHOD Display( lForced )
    METHOD ColorDisp( cColorSpec ) INLINE ::ColorSpec := cColorSpec, ::Display(), Self
@@ -1586,27 +1586,28 @@ return Self
  *
   // QUESTIONS, is realy necessary this method? the ::colorspec generated was
   not clipper 5.x compatible, and also was not respecting SET INTENSITY
-    
+*/    
 METHOD ColorSpec( cColorSpec ) CLASS Get
 
    local cClrUnSel, cClrEnh
 
    if cColorSpec != NIL
    
-      cClrUnSel := iif( !Empty( hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ) ),;
+/*      cClrUnSel := iif( !Empty( hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ) ),;
                                 hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ),;
                                 hb_ColorIndex( SetColor(), GET_CLR_UNSELECTED ) )
 
       cClrEnh   := iif( !Empty( hb_ColorIndex( cColorSpec, GET_CLR_ENHANCED ) ),;
                                 hb_ColorIndex( cColorSpec, GET_CLR_ENHANCED ),;
                                 cClrUnSel )
+*/
 
-      ::cColorSpec := buildGetColor()
+      ::cColorSpec := buildGetColor(cColorSpec)
 
    endif
 
 return ::cColorSpec
-*/
+
 //---------------------------------------------------------------------------//
 
 /* The METHOD Picture and DATA cPicture allow to replace the
@@ -1748,14 +1749,24 @@ static procedure AnalyzePicture( cPicture )
 Return
 */
 
-STATIC FUNCTION BuildGetColor()
-
+STATIC FUNCTION BuildGetColor(cColorSpec)
+     
    LOCAL lIntensity := SET( _SET_INTENSITY )
-   LOCAL cEndColor := "," + __guiColor( SetColor(), CLR_STANDARD + 1 ) + "," + __guiColor( SetColor(), CLR_BACKGROUND + 1 )
+   LOCAL cEndColor
    LOCAL cCur
    LOCAL cRet := ""
+   DEFAULT cColorSpec to SetColor()
 
-   cCur := hb_ColorIndex( SetColor(), CLR_UNSELECTED )
+   /* ONLY ONE PAIR COLOR PASSED */
+   IF ( len( cColorSpec ) == 3 .or. Len( cColorSpec ) == 4 ) .AND. AT(',', cColorSpec ) == 0 
+   // replicate to 4 colors pairs as clipper do
+      cCur := cColorSpec
+      cColorSpec := cCur + "," + cCur + "," + cCur + "," + cCur   
+   ENDIF
+   // now process color acording to set intensity setting
+
+   cEndColor := "," + __guiColor( cColorSpec, CLR_STANDARD + 1 ) + "," + __guiColor( cColorSpec, CLR_BACKGROUND + 1 )
+   cCur := hb_ColorIndex( cColorSpec, CLR_UNSELECTED )
    IF ( lIntensity)
       cRet += cCur +","
    ELSE
@@ -1766,7 +1777,7 @@ STATIC FUNCTION BuildGetColor()
       ENDIF
    ENDIF
 
-   cCur := hb_ColorIndex( SetColor(), CLR_ENHANCED )
+   cCur := hb_ColorIndex( cColorSpec, CLR_ENHANCED )
    IF ( lIntensity)
       cRet += cCur + cEndColor
    ELSE
