@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.18 2002/06/21 19:18:27 ronpinkas Exp $
+ * $Id: arrays.c,v 1.19 2002/08/08 19:36:08 ronpinkas Exp $
  */
 
 /*
@@ -707,6 +707,8 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
 {
    HB_TRACE( HB_TR_DEBUG, ("hb_arrayRelease(%p) %p", pArray, pArray->item.asArray.value ) );
 
+   //printf( "hb_arrayRelease(%p) %p\n", pArray, pArray->item.asArray.value );
+
    if( HB_IS_ARRAY( pArray ) )
    {
       PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
@@ -743,7 +745,9 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
             }
             else if( HB_IS_COMPLEX( pItem ) )
             {
+               //printf( "Before %p type: %i\n", pItem, pItem->type );
                hb_itemClear( pItem );
+               //printf( "After %p\n", pItem );
             }
 
             ++pItem;

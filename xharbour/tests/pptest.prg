@@ -41,15 +41,13 @@ PROCEDURE Main
 
    ? FIELD->First
 
-   //DO t6.prg
-
    cLocal := "in main"
    ? Test( cName, 1, .T. )
    ? cLocal
    ? cName
 
    ? cFromTest
-   ? TestPrv
+   ? Type( "TestPrv" )
 
 RETURN
 
@@ -61,7 +59,7 @@ static FUNCTION Test( P1, P2 )
     ? P1, P2
 
     ? cName
-    ? cLocal
+    ? Type( "cLocal" ) // U
 
     M->TestPrv := "Private of Test"
     Test2()

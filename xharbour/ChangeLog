@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.353 2002/08/21 19:15:42 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.354 2002/08/23 23:25:29 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-08-23 18:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrays.c
+  * source/vm/hvm.c
+    + Added some trace info.
+
+  * source/vm/fastitem.c
+    ! Fixed possible GPF resulting from double release of same array value.
+
+  * source/vm/garbage.c
+    ! Fixed possible GPF when attempting to refernce items of empty array.
+
+  * tests/pp.prg
+    ! Fixed reporting of line no of a script R/T error.
+
+  * tests/pptest.prg
+    * Commented out lines intended to generate R/T error, and replaced with display of Out-ofScope Var type.
+
+  * tests/rp_run.ch
+    * Moved new DO <proc> [WITH...] rules above DO CASE rule.
 
 2002-08-23 16:24 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/rp_run.ch

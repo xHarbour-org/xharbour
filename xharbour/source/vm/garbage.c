@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.15 2002/03/19 19:44:16 ronpinkas Exp $
+ * $Id: garbage.c,v 1.16 2002/03/22 15:38:42 map Exp $
  */
 
 /*
@@ -385,6 +385,9 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
    else if( HB_IS_ARRAY( pItem ) )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asArray.value;
+
+      //printf( "Array %p\n", pItem->item.asArray.value );
+
       --pAlloc;
 
       /* Check this array only if it was not checked yet */
@@ -397,11 +400,17 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
          pAlloc->used ^= HB_GC_USED_FLAG;
 
          /* mark also all array elements */
-         pItem = pItem->item.asArray.value->pItems;
-         while( ulSize )
+         if( pItem->item.asArray.value->pItems )
          {
-            hb_gcItemRef( pItem++ );
-            --ulSize;
+            pItem = pItem->item.asArray.value->pItems;
+            //printf( "Items %p\n", pItem );
+
+            while( ulSize )
+            {
+               //printf( "Item %p\n", pItem );
+               hb_gcItemRef( pItem++ );
+               --ulSize;
+            }
          }
       }
    }
@@ -457,10 +466,19 @@ void hb_gcCollectAll( void )
       /* Step 2 - sweep */
       /* check all known places for blocks they are referring */
       hb_vmIsLocalRef();
+      //printf( "After LocalRef\n" );
+
       hb_vmIsStaticRef();
+      //printf( "After StaticRef\n" );
+
       hb_memvarsIsMemvarRef();
+      //printf( "After MemvarRef\n" );
+
       hb_gcItemRef( &hb_stack.Return );
+      //printf( "After ReturnRef\n" );
+
       hb_clsIsClassRef();
+      //printf( "After ClassRef\n" );
 
       HB_TRACE( HB_TR_INFO, ( "Locked Scan" ) );
 

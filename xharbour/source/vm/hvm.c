@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.91 2002/08/14 01:15:08 ronpinkas Exp $
+ * $Id: hvm.c,v 1.92 2002/08/15 04:47:06 ronpinkas Exp $
  */
 
 /*
@@ -479,46 +479,72 @@ void HB_EXPORT hb_vmQuit( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmQuit()"));
 
+   //printf( "\nvmQuit()\n" );
+
    #ifdef HB_MACRO_STATEMENTS
      hb_pp_Free();
    #endif
 
    s_uiActionRequest = 0;         /* EXIT procedures should be processed */
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
+   //printf( "After Functions\n" );
 
    /* release all known items stored in subsystems */
    hb_rddShutDown();
+   //printf( "After RDD\n" );
+
    hb_idleShutDown();
+   //printf( "After Idle\n" );
+
    hb_errExit();
+   //printf( "After Err\n" );
+
    hb_clsReleaseAll();
+   //printf( "After Class\n" );
+
    hb_vmReleaseLocalSymbols();  /* releases the local modules linked list */
+   //printf( "After Symbols\n" );
+
    hb_dynsymRelease();          /* releases the dynamic symbol table */
+   //printf( "After Dyn\n" );
+
    hb_conRelease();             /* releases Console */
+   //printf( "After Con\n" );
+
    hb_setRelease();             /* releases Sets */
+   //printf( "After Set\n" );
 
    /* release all remaining items */
    hb_stackRemove( 0 );
-
-   HB_TRACE( HB_TR_DEBUG, ( "Clean hb_stack.Return Type: %i", ( &hb_stack.Return )->type ) );
+   //printf( "After Stack\n" );
 
    if( HB_IS_COMPLEX( &hb_stack.Return ) )
    {
       hb_itemClear( &hb_stack.Return );
    }
-
-   HB_TRACE(HB_TR_DEBUG, ("\nClean Statics"));
+   //printf( "After Return\n" );
 
    hb_arrayRelease( &s_aStatics );
+   //printf( "After Statics\n" );
+
    hb_memvarsRelease();    /* clear all PUBLIC variables */
+   //printf( "After Memvar\n" );
 
    /* release all known garbage */
    //hb_gcCollectAll();
    hb_gcReleaseAll();
+   //printf( "After GC\n" );
 
    hb_memvarsFree();    /* free memory allocated for memvars table */
+   //printf( "After memvarsFree\n" );
+
    hb_stackFree();
+   //printf( "After stackFree\n" );
+
 /* hb_dynsymLog(); */
+
    hb_xexit();
+   //printf( "After xexit\n" );
 
    exit( s_byErrorLevel );
 }
