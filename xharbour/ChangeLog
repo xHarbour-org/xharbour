@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2794 2004/04/17 09:22:45 andijahja Exp $
+ * $Id: ChangeLog,v 1.2795 2004/04/17 10:10:29 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-15 12:55 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+
+  * contrib/rdd_ads/ads1.c
+    + fixed adsOrderListFocus and adsOrderInfo so ordsetfocus and ordkey
+      return "" when no index is active
+
 2004-04-17 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/hbusage.c
     ! revertion of UNDEF switch has been ommited in my last commit.

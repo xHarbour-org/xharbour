@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.39 2004/04/01 22:00:41 druzus Exp $
+ * $Id: ads1.c,v 1.40 2004/04/10 13:42:13 snaiperis Exp $
  */
 
 /*
@@ -2372,6 +2372,7 @@ static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
    if( !pArea->hOrdCurrent )
    {
      *pucName = '\0';
+     pusLen = 0;
    }
    else
    {
@@ -2666,9 +2667,9 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          if( phIndex )
          {
             AdsGetIndexExpr( phIndex, aucBuffer, &pusLen);
+            hb_itemPutCL( pOrderInfo->itmResult, (char*)aucBuffer, pusLen );
          }
 
-         hb_itemPutCL( pOrderInfo->itmResult, (char*)aucBuffer, pusLen );
          break;
 
       case DBOI_ISCOND:
