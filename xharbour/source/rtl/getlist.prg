@@ -1,5 +1,5 @@
 /*
- * $Id: getlist.prg,v 1.1.1.1 2001/12/21 10:42:23 ronpinkas Exp $
+ * $Id: getlist.prg,v 1.2 2002/04/30 04:37:03 walito Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 /* NOTE: Harbour internal function to set and get the active GetList */
 
 STATIC s_oGetListActive
+STATIC s_oGetListLast
 
 PROCEDURE __GetListSetActive( oGetList )
 
@@ -72,4 +73,11 @@ PROCEDURE __GetListSetActive( oGetList )
 
 FUNCTION __GetListActive()
    RETURN s_oGetListActive
+
+FUNCTION __GetListLast( oGetListLast )
+
+   if oGetListLast != NIL
+      s_oGetListLast := oGetListLast
+   endif
+   RETURN s_oGetListLast
 
