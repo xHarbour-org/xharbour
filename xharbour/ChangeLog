@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1412 2003/09/04 04:27:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1413 2003/09/04 05:31:31 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-04 18:50 UTC+0100 Ian Anderson <i.anderson@procon-online.de>
+   * contrib/rdd_ads/ads1.c
+     ! Fix to allow opening of free tables and tables in an 
+       Advantage data dictionary at the same time
+   * contrib/rdd_ads/ads1.c
+     + Additional wrappers for Advantage Data Dictionary functions    
+
 2003-09-04 11:50 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * source/rtl/inkey.c
    * source/rtl/gtwin/gtwin.c
