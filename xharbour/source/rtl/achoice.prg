@@ -1,684 +1,493 @@
 /*
- * $Id: achoice.prg,v 1.22 2004/06/08 23:59:58 what32 Exp $
+ * $Id: achoice.prg,v 1.23 2004/11/02 19:21:58 guerra000 Exp $
  */
 
 /*
- * Harbour Project source code:
+ * xHarbour Project source code:
  * ACHOICE() function
  *
- * Released to Public Domain by Peter Townsend <cephas@tpgi.com.au>
- * www - http://www.harbour-project.org
+ * Copyright 2004  Vicente Guerra <vicente@guerra.com.mx>
+ * www - http://www.xharbour.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ *
+ * As a special exception, the xHarbour Project gives permission for
+ * additional uses of the text contained in its release of xHarbour.
+ *
+ * The exception is that, if you link the xHarbour libraries with other
+ * files to produce an executable, this does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * Your use of that executable is in no way restricted on account of
+ * linking the xHarbour library code into it.
+ *
+ * This exception does not however invalidate any other reasons why
+ * the executable file might be covered by the GNU General Public License.
+ *
+ * This exception applies only to the code released by the xHarbour
+ * Project under the name xHarbour.  If you copy code from other
+ * xHarbour Project or Free Software Foundation releases into a copy of
+ * xHarbour, as the General Public License permits, the exception does
+ * not apply to the code that you add in this way.  To avoid misleading
+ * anyone as to the status of such modified files, you must delete
+ * this exception notice from them.
+ *
+ * If you write modifications of your own for xHarbour, it is your choice
+ * whether to permit this exception to apply to your modifications.
+ * If you do not wish that, delete this exception notice.
  *
  */
 
 #include "achoice.ch"
-#include "color.ch"
-#include "common.ch"
 #include "inkey.ch"
 #include "setcurs.ch"
+#include "color.ch"
+#include "hbclass.ch"
 
-#define INRANGE( xLo, xVal, xHi )       ( xVal >= xLo .AND. xVal <= xHi )
-#define BETWEEN( xLo, xVal, xHi )       Min( Max( xLo, xVal ), xHi )
+FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, nFirstRow )
+LOCAL oAChoice
+   oAChoice := TAChoice():New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, nFirstRow )
+   oAChoice:cProcName := ProcName( 1 )
+   oAChoice:nProcLine := ProcLine( 1 )
+RETURN IF( oAChoice:nItems == 0, 0, oAChoice:Loop( AC_CONT ) )
 
-FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPos, nHiLiteRow )
+// I had made AChoice() as a class for avoid pass all memvars to each
+// static function. Anyway, it can be easyly converted to a "GET subclass".
 
-   LOCAL nNumCols                          // Number of columns in the window
-   LOCAL nNumRows                          // Number of rows in the window
-   LOCAL nRowsClr                          // Number of rows to clear
-   LOCAL acCopy    := {}                   // A padded copy of the items
-   LOCAL alSelect                          // Select permission
-   LOCAL nNewPos   := 0                    // The next item to be selected
-   LOCAL lFinished := .F.                  // Is processing finished?
-   LOCAL nKey      := 0                    // The keystroke to be processed
-   LOCAL nMode     := AC_IDLE              // The current operating mode
-   LOCAL nAtTop    := 1                    // The number of the item at the top
-   LOCAL nAtBtm    := 1                    // The number of the item at the bottom
-   LOCAL nItems    := 0                    // The number of items
-   LOCAL nGap      := 0                    // The number of lines between top and current lines
-                                           // Block used to search for items
-   LOCAL lUserFunc                         // Is a user function to be used?
-   LOCAL nUserFunc := 0                    // Return value from user function
-   LOCAL nSaveCsr  := SetCursor( SC_NONE )
-   LOCAL nFrstItem := 0
-   LOCAL nLastItem := 0
+#define AC_NO_USER_FUNCTION -1         // Don't process user's function
+#define AC_MAXVALUE         AC_REDRAW  // Highest user's return value
 
-   LOCAL nCntr
-   LOCAL bAction
-   LOCAL cKey
+CLASS TAChoice
+   VAR    nTop, nLeft, nBottom, nRight   // Screen coords.
+   VAR    acItems                        // Array of items
+   VAR    uSelect                        // Determines if any item is selectable
+   VAR    nItems                         // Count of valid items in array
+   VAR    nOption                        // Selected item
+   VAR    nFirstRow                      // Item in first screen's row
+   VAR    lUserFunc                      // If there's an user's function
+   VAR    uUserFunc                      // User's function
+   VAR    nArraySize                     // Last array's size
 
-   LOCAL bSelect   := {|x,y| if(ISLOGICAL(x), x, if(!Empty( x ), (y := &( x ),if(ISLOGICAL(y), y, .T.)), .T.)) }
+   // NOTE: Clipper does in this way (it doesn't validates each time).
+   //       It's for a simple way to add "this compatibility".
+   VAR    alSelect                       // Pre-verified items' selectable flags
 
-   ColorSelect( CLR_STANDARD )
+   VAR    cProcName                      // Calling procedure name
+   VAR    nProcLine                      // Calling procedure line
 
-   lUserFunc := !Empty( xUserFunc ) .AND. ValType( xUserFunc ) IN "CBM"
+   METHOD New    CONSTRUCTOR             // Initializes TAChoice
+   METHOD Loop                           // Main loop
 
+   METHOD ValidateArray                  // Verifies if the array have selectable elements, and if the array has changed
+   METHOD MoveCursor                     // Changes selected option, and validates if it's selectable
+   METHOD DrawRows                       // "Paints" items on screen
+   METHOD HitTest                        // Checks if the mouse is over the screen's area
+ENDCLASS
 
-   DEFAULT nTop       TO 0                 // The topmost row of the window
-   DEFAULT nLeft      TO 0                 // The leftmost column of the window
-   DEFAULT nBottom    TO MaxRow()          // The bottommost row of the window
-   DEFAULT nRight     TO MaxCol()          // The rightmost column of the window
+// #define IsAvailableItem( nItem )     ( ::alSelect[ ( nItem ) ] )
+#define IsAvailableItem( nItem )     ( IsItemSelectable( ( nItem ), ::nItems, ::uSelect, ::acItems ) )
 
-   DEFAULT acItems    TO {}                // The items from which to choose
-   DEFAULT xSelect    TO .T.               // Array or logical, what is selectable
-   DEFAULT nPos       TO 1                 // The number of the selected item
-   DEFAULT nHiLiteRow TO 0                 // The row to be highlighted
+METHOD New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, nFirstRow ) CLASS TAChoice
+   ::nTop    := IF( HB_ISNUMERIC( nTop ),    nTop,    0 )
+   ::nLeft   := IF( HB_ISNUMERIC( nLeft ),   nLeft,   0 )
+   ::nBottom := IF( HB_ISNUMERIC( nBottom ), nBottom, MaxRow() )
+   ::nRight  := IF( HB_ISNUMERIC( nRight ),  nRight,  MaxCol() )
+   ::nTop    := Max( Min( ::nTop,    MaxRow() ) , 0 )
+   ::nLeft   := Max( Min( ::nLeft,   MaxCol() ) , 0 )
+   ::nBottom := Max( Min( ::nBottom, MaxRow() ) , ::nTop )
+   ::nRight  := Max( Min( ::nRight,  MaxCol() ) , ::nLeft )
 
-   IF nRight > MaxCol()
-      nRight := MaxCol()
+   ::acItems := acItems
+   ::uSelect := uSelect
+   ::nItems := 0
+   IF HB_ISARRAY( acItems )
+      DO WHILE ::nItems < LEN( acItems ) .AND. HB_ISSTRING( acItems[ ::nItems + 1 ] ) .AND. ! acItems[ ::nItems + 1 ] == ""
+         ::nItems++
+      ENDDO
    ENDIF
 
-   IF nBottom > MaxRow()
-      nBottom := MaxRow()
+   ::nOption := IF( HB_ISNUMERIC( nOption ), nOption, 1 )
+   ::nOption := Min( Max( ::nOption, 1 ), ::nItems )
+   ::nFirstRow := IF( HB_ISNUMERIC( nFirstRow ), nFirstRow, 0 )
+   ::nFirstRow := Max( Min( ::nFirstRow, ::nBottom - ::nTop ), 0 )   // Inside range
+   ::nFirstRow := Max( ::nOption - ::nFirstRow, 1 )                  // Initial row
+
+   ::uUserFunc := uUserFunc
+   ::lUserFunc := ( VALTYPE( ::uUserFunc ) IN "CBM" .AND. ! EMPTY( ::uUserFunc ) )
+
+   IF ::nItems != 0
+      ::nArraySize := 0
+      ::ValidateArray()
+      ::DrawRows( 0, ::nBottom - ::nTop, .T. )
    ENDIF
+RETURN Self
 
-   nNumCols := nRight - nLeft + 1
-   nNumRows := nBottom - nTop + 1
+METHOD Loop( nMode ) CLASS TAChoice
+LOCAL nRet, nUserMode, lNoItems
+LOCAL nKey, bAction, nSize, nAux
+LOCAL nSaveCsr := SetCursor( SC_NONE )
 
+   nSize := ::nBottom - ::nTop
 
-   IF VALTYPE( xSelect ) == "A"
-      alSelect := xSelect
-   ELSE
-      alSelect := ARRAY( LEN( acItems ) )
-      AFill( alSelect, xSelect )
-   ENDIF
+   lNoItems := ! ::ValidateArray()
 
-   IF Len( acItems ) <> Len( alSelect )
-      aSize( alSelect, Len( acItems ) )
-   ENDIF
+   nRet := 0
+   nUserMode := AC_NOITEM     // Something different to AC_IDLE
 
-   IF !lFinished
+   // Main loop
+   DO WHILE nMode > AC_SELECT
 
-      nMode := Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems, AC_IDLE )
-      IF nMode == AC_NOITEM
-         nPos := 0
+      // Refresh?
+      IF nMode == AC_REDRAW
+         ::DrawRows( 0, nSize, .T. )
       ENDIF
 
-      // Ensure hilighted item can be selected
-      nPos := BETWEEN( nFrstItem, nPos, nLastItem )
-
-      // Force hilighted row to be valid
-      nHiLiteRow := BETWEEN( 0, nHiLiteRow, nNumRows - 1 )
-
-      // Force the topmost item to be a valid index of the array
-      nAtTop := BETWEEN( 1, Max( 1, nPos - nHiLiteRow ), nItems )
-
-      // Ensure as much of the selection area as possible is covered
-      IF ( nAtTop + nNumRows - 1 ) > nItems
-         nAtTop := Max( 1, nItems - nNumrows + 1 )
+      // What will do?
+      nKey := 0
+      IF lNoItems
+         // There aren't selectable items
+         nUserMode := AC_NOITEM
+         nMode := AC_ABORT
+      ELSEIF NextKey() != 0
+         // There are pending keys
+         nKey := INKEY()
+         nUserMode := AC_EXCEPT
+         nMode := AC_GOTO
+      ELSEIF nUserMode == AC_IDLE
+         // AC_IDLE state was processed by user's function. Wait for a key
+         nKey := INKEY( 0 )
+         nUserMode := AC_EXCEPT
+         nMode := AC_GOTO
+      ELSE
+         // Send AC_IDLE to user's function
+         nUserMode := AC_IDLE
+         nMode := AC_CONT
       ENDIF
 
-      DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect, nItems )
-
-   ENDIF
-
-   DO WHILE !lFinished
-
-      SetPos( nTop + ( nPos - nAtTop ), nLeft )
-
-      SWITCH nMode
-      CASE AC_IDLE
-         nKey  := Inkey( 0 )
-         EXIT
-      CASE AC_GOTO
-         EXIT
-      CASE AC_NOITEM
+      IF ( bAction := SetKey( nKey ) ) != NIL
+         Eval( bAction, ::cProcName, ::nProcLine, "" )
+         // Key was processed
+         nUserMode := AC_NO_USER_FUNCTION
+         nMode := AC_GOTO
          nKey := 0
-         EXIT
-      DEFAULT
-         nKey  := 0
-         nMode := AC_IDLE
-      END
-
-
-      DO CASE
-      CASE ( bAction := SetKey( nKey ) ) != NIL
-
-         Eval( bAction, ProcName( 1 ), ProcLine( 1 ), "" )
-         IF Empty( NextKey() )
-            KEYBOARD Chr( 255 )
-            Inkey()
-            nKey := 0
+         IF ! ::ValidateArray()
+            nUserMode := AC_NOITEM
+            nMode := AC_ABORT
          ENDIF
+      ENDIF
 
-         nRowsClr := Min( nNumRows, nItems )
-         nMode := Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems, AC_IDLE )
+      SWITCH nKey
+         CASE K_UP             // Moves up
+            nAux := ::nOption
+            ::MoveCursor( -1, -1, 0 )
+            nUserMode := IF( nAux > ::nOption, AC_NO_USER_FUNCTION, AC_HITTOP )
+            EXIT
 
-         IF nMode == AC_NOITEM
-            nPos := 0
-            nAtTop := Max( 1, nPos - nNumRows + 1 )
-         ELSE
-            DO WHILE nPos < nLastItem .and. !Eval( bSelect, alSelect[ nPos ] )
-               nPos++
-            ENDDO
+         CASE K_DOWN           // Moves down
+            nAux := ::nOption
+            ::MoveCursor( 1, 1, 0 )
+            nUserMode := IF( nAux < ::nOption, AC_NO_USER_FUNCTION, AC_HITBOTTOM )
+            EXIT
 
-            IF nPos > nLastItem
-               nPos := BETWEEN( nFrstItem, nPos, nLastItem )
-            ENDIF
+         CASE K_CTRL_HOME      // Top of the window
+            ::MoveCursor( - ( ::nOption - ::nFirstRow ), 1, 0 )
+            nUserMode := AC_NO_USER_FUNCTION
+            EXIT
 
-            nAtTop := MIN( nAtTop, nPos )
+         CASE K_CTRL_END       // Bottom of the window
+            ::MoveCursor( nSize - ( ::nOption - ::nFirstRow ), -1, 0 )
+            nUserMode := AC_NO_USER_FUNCTION
+            EXIT
 
-            IF nAtTop + nNumRows - 1 > nItems
-               nAtTop := BETWEEN( 1, nPos - nNumRows + 1, nItems - nNumRows + 1 )
-            ENDIF
+         CASE K_MWFORWARD
+         CASE K_PGUP           // Previous screen
+            nAux := ::nOption
+            ::MoveCursor( - MAX( nSize, 1 ), -1, - MAX( nSize, 1 ) )
+            nUserMode := IF( nAux > ::nOption, AC_NO_USER_FUNCTION, AC_HITTOP )
+            EXIT
 
-            IF nAtTop < 1
-               nAtTop := 1
-            ENDIF
+         CASE K_MWBACKWARD
+         CASE K_PGDN           // Next screen
+            nAux := ::nOption
+            ::MoveCursor( MAX( nSize, 1 ), 1, MAX( nSize, 1 ) )
+            nUserMode := IF( nAux < ::nOption, AC_NO_USER_FUNCTION, AC_HITBOTTOM )
+            EXIT
 
-         ENDIF
-
-         DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect, nRowsClr )
-
-      CASE ( nKey == K_ESC .OR. nMode == AC_NOITEM ) .AND. !lUserFunc
-         IF nPos > 0
-            DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-         ENDIF
-         nMode     := AC_ABORT
-         nPos      := 0
-         lFinished := .T.
-
-      CASE nKey == K_UP
-
-         IF nPos == nFrstItem
-            nMode := AC_HITTOP
-            IF nAtTop > Max( 1, nPos - nNumRows + 1 )
-               nAtTop := Max( 1, nPos - nNumRows + 1 )
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ENDIF
-         ELSE
-            nNewPos := nPos - 1
-            DO WHILE !Eval( bSelect, alSelect[ nNewPos ] )
-               nNewPos --
-            ENDDO
-            IF INRANGE( nAtTop, nNewPos, nAtTop + nNumRows - 1 )
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-               nPos := nNewPos
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-            ELSE
-               DispBegin()
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-               Scroll( nTop, nLeft, nBottom, nRight, ( nNewPos - ( nAtTop + nNumRows - 1 ) ) )
-               nAtTop := nNewPos
-               if nNumRows > 1
-                  nPos   := Max( nPos, nAtTop + nNumRows - 1 )
-                  DO WHILE nPos > nNewPos
-                     DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-                     nPos --
-                  ENDDO
-               else
-                  nPos--
-               endif
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-               DispEnd()
-            ENDIF
-         ENDIF
-
-      CASE nKey == K_DOWN
-
-         // Find the next selectable item to display
-         IF nPos == nLastItem
-            nMode := AC_HITBOTTOM
-            IF nAtTop < Min( nPos, nItems - nNumRows + 1 )
-               nAtTop := Min( nPos, nItems - nNumRows + 1 )
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ENDIF
-         ELSE
-
-            nNewPos := nPos + 1
-
-            DO WHILE !Eval( bSelect, alSelect[ nNewPos ] )
-               nNewPos ++
-            ENDDO
-
-            IF INRANGE( nAtTop, nNewPos, nAtTop + nNumRows - 1 )
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-               nPos := nNewPos
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-            ELSE
-               DispBegin()
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-               Scroll( nTop, nLeft, nBottom, nRight, ( nNewPos - ( nAtTop + nNumRows - 1 ) ) )
-               nAtTop := nNewPos - nNumRows + 1
-               nPos   := Max( nPos, nAtTop )
-               DO WHILE nPos < nNewPos
-                  DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-                  nPos ++
-               ENDDO
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-               DispEnd()
-            ENDIF
-
-         ENDIF
-
-      CASE nKey == K_CTRL_PGUP .OR. ( nKey == K_HOME .AND. !lUserFunc )
-
-         IF nPos == nFrstItem
-            IF nAtTop == Max( 1, nPos - nNumRows + 1 )
-//               nMode := AC_HITTOP
-            ELSE
-               nAtTop := Max( 1, nPos - nNumRows + 1 )
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ENDIF
-         ELSE
-            IF INRANGE( nAtTop, nFrstItem, nAtTop + nNumRows - 1 )
-               // On same page as nFrstItem
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-               nPos   := nFrstItem
-               nAtTop := nPos
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-            ELSE
-               nPos   := nFrstItem
-               nAtTop := nPos
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ENDIF
-         ENDIF
-
-      CASE nKey == K_CTRL_PGDN .OR. ( nKey == K_END .AND. !lUserFunc )
-
-         IF nPos == nLastItem
-            IF nAtTop == Min( nLastItem, Max( 1, nItems - nNumRows + 1 ) )
-//               nMode := AC_HITBOTTOM
-            ELSE
-               nAtTop := Min( nLastItem, Max( 1, nItems - nNumRows + 1 ) )
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ENDIF
-         ELSE
-            IF INRANGE( nAtTop, nLastItem, nAtTop + nNumRows - 1 )
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-               nPos := nLastItem
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-            ELSE
-               nPos   := nLastItem
-               nAtTop := Max( 1, nPos - nNumRows + 1 )
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ENDIF
-         ENDIF
-
-      CASE nKey == K_CTRL_HOME
-
-         IF nPos == nFrstItem
-            IF nAtTop == Max( 1, nPos - nNumRows + 1 )
-//               nMode := AC_HITTOP
-            ELSE
-               nAtTop := Max( 1, nPos - nNumRows + 1 )
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ENDIF
-         ELSE
-            nNewPos := nAtTop
-            DO WHILE !Eval( bSelect, alSelect[ nNewPos ] )
-               nNewPos++
-            ENDDO
-            IF nNewPos != nPos
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-               nPos := nNewPos
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-            ENDIF
-         ENDIF
-
-      CASE nKey == K_CTRL_END
-
-         IF nPos == nLastItem
-            IF nAtTop == Min( nPos, Max( 1, nItems - nNumRows + 1 ) )
-//               nMode := AC_HITBOTTOM
-            ELSE
-               nAtTop := Min( nPos, Max( 1, nItems - nNumRows + 1 ) )
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ENDIF
-         ELSE
-            nNewPos := Min( nAtTop + nNumRows - 1, nItems )
-            DO WHILE !Eval( bSelect, alSelect[ nNewPos ] )
-               nNewPos--
-            ENDDO
-            IF nNewPos != nPos
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-               nPos := nNewPos
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-            ENDIF
-         ENDIF
-
-      CASE nKey == K_PGUP .OR. nKey == K_MWFORWARD
-
-         IF nPos == nFrstItem
-            nMode := AC_HITTOP
-            IF nPos > 0
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-            ENDIF
-            IF nAtTop > Max( 1, nPos - nNumRows + 1 )
-               nAtTop := Max( 1, nPos - nNumRows + 1 )
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ELSE
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-            ENDIF
-         ELSE
-            IF INRANGE( nAtTop, nFrstItem, nAtTop + nNumRows - 1 )
-               // On same page as nFrstItem
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-               nPos   := nFrstItem
-               nAtTop := Max( nPos - nNumRows + 1, 1 )
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-            ELSE
-               IF ( nPos - nNumRows + 1 ) < nFrstItem
-                  nPos   := nFrstItem
-                  nAtTop := nFrstItem
-               ELSE
-                  nPos   := Max( nFrstItem, nPos - nNumRows + 1 )
-                  nAtTop := Max( 1, nAtTop - nNumRows + 1 )
-                  DO WHILE nPos > nFrstItem .AND. !Eval( bSelect, alSelect[ nPos ] )
-                     nPos--
-                     nAtTop--
-                  ENDDO
-                  nAtTop := Max( 1, nAtTop )
-               ENDIF
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ENDIF
-         ENDIF
-
-      CASE nKey == K_PGDN .OR. nKey == K_MWBACKWARD
-
-         IF nPos == nLastItem
-            nMode := AC_HITBOTTOM
-            IF nPos > 0
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-            ENDIF
-            IF nAtTop < Min( nPos, Max( 1, nItems - nNumRows + 1 ) )
-               nAtTop := Min( nPos, Max( 1, nItems - nNumRows + 1 ) )
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ELSE
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-            ENDIF
-         ELSE
-            IF INRANGE( nAtTop, nLastItem, nAtTop + nNumRows - 1 )
-               // On the same page as nLastItem
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-               nPos := nLastItem
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-            ELSE
-               nGap := nPos - nAtTop
-               nPos := Min( nLastItem, nPos + nNumRows - 1 )
-               IF ( nPos + nNumRows - 1 ) > nLastItem
-                  // On the last page
-                  nAtTop := nLastItem - nNumRows + 1
-                  nPos   := Min( nLastItem, nAtTop + nGap )
-               ELSE
-                  // Not on the last page
-                  nAtTop := nPos - nGap
-               ENDIF
-               // Make sure that the item is selectable
-               DO WHILE nPos < nLastItem .AND. !Eval( bSelect, alSelect[ nPos ] )
-                  nPos++
-                  nAtTop++
-               ENDDO
-               // Don't leave blank space on the page
-               DO WHILE ( nAtTop + nNumRows - 1 ) > nItems
-                  nAtTop--
-               ENDDO
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ENDIF
-         ENDIF
-
-      CASE nKey == K_ENTER .AND. !lUserFunc
-         nMode     := AC_SELECT
-         lFinished := .T.
-
-      CASE nKey == K_LBUTTONDOWN .or. (nKey == K_LDBLCLK .AND. !lUserFunc )
-         nNewPos := Hittest( nTop, nLeft, nBottom, nRight )
-
-         IF nNewPos >= 0 .AND. (nNewPos+nAtTop) <= LEN(alSelect)
-              nNewPos += nAtTop
-              IF Eval( bSelect, alSelect[ nNewPos ] )
-                 nPos := nNewPos
-              ENDIF
-
-           IF nKey == K_LDBLCLK
-              nMode     := AC_SELECT
-              lFinished := .T.
-           ENDIF
-         ENDIF
-
-      CASE nKey == K_RIGHT .AND. !lUserFunc
-         IF nPos > 0
-            DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-         ENDIF
-         nPos      := 0
-         lFinished := .T.
-
-      CASE nKey == K_LEFT .AND. !lUserFunc
-         IF nPos > 0
-            DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-         ENDIF
-         nPos      := 0
-         lFinished := .T.
-
-      CASE INRANGE( 32, nKey, 255 ) .AND. ( !lUserFunc .OR. nMode == AC_GOTO )
-
-         cKey := Upper( Chr( nKey ) )
-
-         // Find next selectable item
-         FOR nNewPos := nPos + 1 TO nItems
-            IF Eval( bSelect, alSelect[ nNewPos ] ) .AND. Upper( Left( acItems[ nNewPos ], 1 ) ) == cKey
+         CASE K_HOME
+            IF ::lUserFunc
                EXIT
             ENDIF
-         NEXT
-         IF nNewPos == nItems + 1
-            FOR nNewPos := 1 TO nPos - 1
-               IF Eval( bSelect, alSelect[ nNewPos ] ) .AND. Upper( Left( acItems[ nNewPos ], 1 ) ) == cKey
+         CASE K_CTRL_PGUP      // First item
+            ::MoveCursor( - ( ::nOption - 1 ), -1, ::nFirstRow - 1 )
+            nUserMode := AC_NO_USER_FUNCTION
+            EXIT
+
+         CASE K_END
+            IF ::lUserFunc
+               EXIT
+            ENDIF
+         CASE K_CTRL_PGDN      // Last item
+            ::MoveCursor( ::nItems - ::nOption, 1, Max( ::nItems - nSize - ::nFirstRow, 0 ) )
+            nUserMode := AC_NO_USER_FUNCTION
+            EXIT
+
+         CASE K_ENTER          // Select item
+            IF ! ::lUserFunc
+               nUserMode := AC_NO_USER_FUNCTION
+               nMode := AC_SELECT
+            ENDIF
+            EXIT
+
+         CASE K_LEFT
+         CASE K_RIGHT
+         CASE K_ESC            // Exits ACHOICE
+            IF ! ::lUserFunc
+               nUserMode := AC_NO_USER_FUNCTION
+               nMode := AC_ABORT
+            ENDIF
+            EXIT
+
+         CASE K_LDBLCLK        // Double click mouse button
+         CASE K_LBUTTONDOWN    // Click mouse button
+            nAux := ::HitTest( MRow(), MCol() )
+            IF nAux != 0 .AND. IsAvailableItem( ::nFirstRow + nAux - 1 )
+               ::MoveCursor( ::nFirstRow + nAux - 1 - ::nOption, 1, 0 )
+               IF nKey == K_LDBLCLK
+                  IF ::lUserFunc
+                     // EMULATE ENTER
+                     SetLastKey( K_ENTER )
+                  ELSE
+                     nUserMode := AC_NO_USER_FUNCTION
+                     nMode := AC_SELECT
+                  ENDIF
+               ELSE
+                  nUserMode := AC_NO_USER_FUNCTION
+               ENDIF
+            ENDIF
+            EXIT
+
+      END
+
+      IF ::lUserFunc .AND. nUserMode != AC_NO_USER_FUNCTION
+         nMode := Do( ::uUserFunc, nUserMode, ::nOption, ::nOption - ::nFirstRow )
+         IF nMode < 0 .OR. nMode > AC_MAXVALUE
+            nMode := AC_CONT
+         ENDIF
+         IF ! ::ValidateArray()
+            nMode := AC_ABORT
+         ENDIF
+      ENDIF
+
+      IF nMode == AC_SELECT
+         nRet := ::nOption
+      ELSEIF nMode == AC_GOTO
+         IF nKey >= 32 .AND. nKey <= 255
+            nAux := ::nOption
+            DO WHILE .T.
+               nAux++
+               IF nAux > ::nItems
+                  nAux := 1
+               ENDIF
+               IF ::nOption == nAux
                   EXIT
                ENDIF
-            NEXT
-         ENDIF
-
-         IF nNewPos != nPos
-            IF INRANGE( nAtTop, nNewPos, nAtTop + nNumRows - 1 )
-               // On same page
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-               nPos := nNewPos
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
-            ELSE
-               // On different page
-               nPos   := nNewPos
-               nAtTop := BETWEEN( 1, nPos - nNumRows + 1, nItems )
-               DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
-            ENDIF
-         ENDIF
-
-         nMode := AC_IDLE
-
-      CASE nMode == AC_GOTO
-
-         // Garbage collect gotos which aren't valid ASCII characters
-         nMode := AC_IDLE
-
-      OTHERWISE
-
-         IF nMode != AC_NOITEM
-            IF nKey == 0 // No keystroke
-               nMode := AC_IDLE
-            ELSE
-               nMode := AC_EXCEPT
-            ENDIF
-         ENDIF
-
-      ENDCASE
-
-      IF lUserFunc
-
-         IF nKey == K_LDBLCLK
-            nNewPos := Hittest( nTop, nLeft, nBottom, nRight )
-            IF nNewPos >= 0
-               nNewPos += nAtTop
-               IF Eval( bSelect, alSelect[ nNewPos ] )
-                  nPos := nNewPos
-                  /* EMULATE ENTER */
-                  SetLastKey( K_ENTER )
+               IF UPPER( LEFT( ::acItems[ nAux ], 1 ) ) == UPPER( CHR( nKey ) ) .AND. IsAvailableItem( nAux )
+                  ::MoveCursor( nAux - ::nOption, 1, 0 )
+                  EXIT
                ENDIF
-            ENDIF
-         ENDIF
-
-         nUserFunc := Do( xUserFunc, nMode, nPos, nPos - nAtTop )
-
-         DO CASE
-         CASE nUserFunc == AC_ABORT .OR. (nMode == AC_NOITEM .AND. ;
-              Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems, AC_IDLE ) == AC_NOITEM )
-            lFinished := .T.
-            IF nPos > 0
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-            ENDIF
-            nPos := 0
-
-         CASE nUserFunc == AC_SELECT
-            lFinished := .T.
-
-         CASE nUserFunc == AC_CONT .OR. nUserFunc == AC_REDRAW
-            // Do nothing
-            nMode := AC_CONT
-
-         CASE nUserFunc == AC_GOTO
-            // Do nothing.  The next keystroke won't be read and
-            // this keystroke will be processed as a goto.
-            nMode := AC_GOTO
-         ENDCASE
-
-         IF nPos > 0
-
-            nRowsClr := Min( nNumRows, nItems )
-            IF nMode == AC_GOTO
-               nMode := Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems, AC_GOTO )
-            ELSE
-               nMode := Ach_Limits( @nFrstItem, @nLastItem, @nItems, bSelect, alSelect, acItems, AC_IDLE )
-            ENDIF
-
-            IF nMode == AC_NOITEM
-               nPos := 0
-               nAtTop := Max( 1, nPos - nNumRows + 1 )
-            ELSE
-               DO WHILE nPos < nLastItem .and. !Eval( bSelect, alSelect[ nPos ] )
-                  nPos++
-               ENDDO
-
-               IF nPos > nLastItem
-                  nPos := BETWEEN( nFrstItem, nPos, nLastItem )
-               ENDIF
-
-               nAtTop := MIN( nAtTop, nPos )
-
-               IF nAtTop + nNumRows - 1 > nItems
-                  nAtTop := BETWEEN( 1, nPos - nNumRows + 1, nItems - nNumRows + 1 )
-               ENDIF
-
-               IF nAtTop < 1
-                  nAtTop := 1
-               ENDIF
-
-            ENDIF
-
-            DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect, nRowsClr )
+            ENDDO
          ENDIF
       ENDIF
 
    ENDDO
 
+   ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F. )
+
    SetCursor( nSaveCsr )
 
-   RETURN nPos
+RETURN nRet
 
-STATIC PROCEDURE DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nArrLen, bSelect, nRowsClr )
-
-   LOCAL nCntr
-   LOCAL nRow                              // Screen row
-   LOCAL nIndex                            // Array index
-   LOCAL nSaveRow := Row()                 // Position at start of routine
-   LOCAL nSaveCol := Col()                 // Position at start of routine
-
-   Default nRowsClr to nNumRows
-
-   DispBegin()
-
-   FOR nCntr := 1 TO Min( nNumRows, nRowsClr )
-
-      nRow   := nTop + nCntr - 1
-      nIndex := nCntr + nAtTop - 1
-
-      IF INRANGE( 1, nIndex, nArrLen )
-         DispLine( acItems[ nIndex ], nRow, nLeft, Eval( bSelect, alSelect[ nIndex ] ), nIndex == nPos, nRight - nLeft + 1 )
-      ELSE
-         ColorSelect( CLR_STANDARD )
-         DispOutAt( nRow, nLeft, Space( nRight - nLeft + 1 ) )
-      ENDIF
-   NEXT
-
-   DispEnd()
-
-   SetPos( nSaveRow, nSaveCol )
-
-   RETURN
-
-STATIC PROCEDURE DispLine( cLine, nRow, nCol, lSelect, lHiLite, nNumCols )
-
-   ColorSelect( iif( lSelect .AND. ISCHARACTER( cLine ), ;
-                iif( lHiLite, CLR_ENHANCED, CLR_STANDARD ), CLR_UNSELECTED ) )
-   
-   IF ISCHARACTER( cLine )
-      DispOutAt( nRow, nCol, PadR( cLine, nNumCols ) )
-   ELSE
-      DispOutAt( nRow, nCol, Space( nNumCols ) )
-   ENDIF
-
-   // Restore cursor position
-   SetPos( nRow, nCol )
-
-   ColorSelect( CLR_STANDARD )
-
-   RETURN
-
-
-STATIC FUNCTION Ach_Limits( nFrstItem, nLastItem, nItems, bSelect, alSelect, acItems, nValidMode )
-
-   LOCAL nMode, cItems
-
-   nItems := Len( acItems )
-
-   FOR EACH cItems IN acItems
-/*
-      IF ISCHARACTER( cItems )
-         nItems++
-      ELSE
-         EXIT
-      ENDIF
-*/
-      IF !ISCHARACTER( cItems ) .OR. cItems == ""
-         nItems := HB_EnumIndex() - 1
-         EXIT
-      ENDIF
-   NEXT
-
-   nFrstItem := AScan( alSelect, bSelect )  // First valid item
-
-   IF nFrstItem == 0
-      nLastItem := 0
-   ELSE
-      nMode     := nValidMode
-      nLastItem := nItems               // Last valid item
-      DO WHILE nLastItem>0 .and. !Eval( bSelect, alSelect[ nLastItem ] )
-         nLastItem--
+METHOD ValidateArray() CLASS TAChoice
+LOCAL lValid
+   lValid := .T.
+   IF ::nArraySize != LEN( ::acItems ) .OR. ! IsAvailableItem( ::nOption )
+      ::nItems := 0
+      DO WHILE ::nItems < LEN( ::acItems ) .AND. HB_ISSTRING( ::acItems[ ::nItems + 1 ] ) .AND. ! ::acItems[ ::nItems + 1 ] == ""
+         ::nItems++
       ENDDO
+
+      ::alSelect := ARRAY( ::nItems )
+      AEVAL( ::alSelect, { |x,i| ::alSelect[ i ] := IsItemSelectable( i, ::nItems, ::uSelect, ::acItems ) } )
+
+      lValid := ::MoveCursor( 0, 1, 0 )
    ENDIF
+RETURN lValid
 
-   IF nLastItem <= 0
-      nMode     := AC_NOITEM
-      nLastItem := nItems
+METHOD MoveCursor( nMove, nDirection, nMoveScreen ) CLASS TAChoice
+LOCAL nBounce := 0
+LOCAL nLastFirstRow := ::nFirstRow
+LOCAL nSize := ::nBottom - ::nTop
+
+   IF ::nItems == 0
+      RETURN .F.
    ENDIF
+   ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F. )
+   ::nFirstRow := Max( Min( ::nFirstRow + nMoveScreen, ::nItems - nSize ), 1 )
+   DO WHILE nBounce < 2
+      ::nOption += nMove
+      IF ::nOption < 1
+         ::nOption := 1
+         nDirection := 1
+         nMove := 0
+         nBounce++
+         ::nFirstRow := 1
+      ELSEIF ::nOption > ::nItems
+         ::nOption := ::nItems
+         nDirection := -1
+         nMove := 0
+         nBounce++
+         ::nFirstRow := ::nItems - nSize
+      ELSE
+         nMove := nDirection
+         IF IsAvailableItem( ::nOption )
+            EXIT
+         ENDIF
+      ENDIF
+   ENDDO
+   ::nFirstRow := Max( Min( Max( Min( ::nFirstRow, ::nOption ), ::nOption - nSize ), ::nItems - nSize ), 1 )
+   IF nBounce != 2
+      IF ::nFirstRow != nLastFirstRow
+         IF ABS( ::nFirstRow - nLastFirstRow ) > nSize
+            ::DrawRows( 0, nSize, .T. )
+         ELSEIF ::nFirstRow < nLastFirstRow
+            Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight, ::nFirstRow - nLastFirstRow )
+            ::DrawRows( 0, nLastFirstRow - ::nFirstRow - 1, .T. )
+         ELSE
+            Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight, ::nFirstRow - nLastFirstRow )
+            ::DrawRows( nSize - ( ::nFirstRow - nLastFirstRow ) + 1, nSize, .T. )
+         ENDIF
+      ENDIF
+      ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .T. )
+   ENDIF
+RETURN ( nBounce != 2 )
 
+METHOD DrawRows( nFrom, nTo, lHilite ) CLASS TAChoice
+LOCAL nCurOption
+   DO WHILE nFrom <= nTo
+      nCurOption := ::nFirstRow + nFrom
+      IF nCurOption > ::nItems
+         EXIT
+      ELSEIF nCurOption == ::nOption .AND. lHilite
+         ColorSelect( CLR_ENHANCED )
+      ELSEIF IsAvailableItem( nCurOption )
+         ColorSelect( CLR_STANDARD )
+      ELSE
+         ColorSelect( CLR_UNSELECTED )
+      ENDIF
+      DispOutAt( ::nTop + nFrom, ::nLeft, PadR( ::acItems[ ::nFirstRow + nFrom ], ::nRight - ::nLeft + 1 ) )
+      nFrom++
+   ENDDO
+   SetPos( ::nTop + ::nOption - ::nFirstRow, ::nLeft )
+   ColorSelect( CLR_STANDARD )
+RETURN nil
 
-   RETURN nMode
+METHOD HitTest( nRow, nCol ) CLASS TAChoice
+LOCAL nRet
+   IF nCol >= ::nLeft .AND. nCol <= ::nRight .AND. ;
+      nRow >= ::nTop  .AND. nRow <= ::nBottom
+      nRet := nRow - ::nTop + 1
+   ELSE
+      nRet := 0
+   ENDIF
+RETURN nRet
 
+#pragma BEGINDUMP
+#include "hbapi.h"
+#include "hbvm.h"
+#include "hbapierr.h"
 
-STATIC FUNCTION Hittest( nTop, nLeft, nBottom, nRight )
-   LOCAL nPos
-   LOCAL nMouseRow := MRow()
-   LOCAL nMouseCol := MCol()
+// Determines if any element is selectable
+HB_FUNC_STATIC( ISITEMSELECTABLE )
+{
+   UINT     uiItem  = hb_parni( 1 );               // Item to verify
+   UINT     uiCount = hb_parni( 2 );               // Count of items
+   PHB_ITEM pSelect = hb_param( 3, HB_IT_ANY );    // xSelectable
+   PHB_ITEM pData   = hb_param( 4, HB_IT_ANY );    // Array of items
+   BOOL     bResult = TRUE;
+   PHB_ITEM pSelectItem = NULL;
 
-   nPos := iif( ;
-         nMouseRow >= nTop   .and. nMouseRow <= nBottom .and.;
-         nMouseCol >= nLeft  .and. nMouseCol <= nRight,  ;
-         nMouseRow - nTop, -1 )
-RETURN nPos
+   if( uiItem > uiCount )
+   {
+      bResult = FALSE;
+   }
+   else if( pSelect )
+   {
+      if( HB_IS_ARRAY( pSelect ) )
+      {
+         if( uiItem >= 1 && uiItem <= pSelect->item.asArray.value->ulLen )
+         {
+            pSelectItem = hb_itemArrayGet( pSelect, uiItem );
+            pSelect = pSelectItem;
+         }
+      }
+
+      if( HB_IS_LOGICAL( pSelect ) )
+      {
+         bResult = pSelect->item.asLogical.value;
+      }
+      else if( HB_IS_STRING( pSelect ) )
+      {
+         HB_MACRO_PTR pMacro;
+
+         pMacro = hb_macroCompile( pSelect->item.asString.value );
+         if( pMacro )
+         {
+            hb_macroRun( pMacro );
+            hb_macroDelete( pMacro );
+            pSelect = hb_stackItemFromTop( -1 );
+            if( pSelect && HB_IS_LOGICAL( pSelect ) )
+            {
+               bResult = pSelect->item.asLogical.value;
+            }
+            hb_stackPop();
+         }
+      }
+      else if( HB_IS_BLOCK( pSelect ) )
+      {
+         PHB_ITEM pDataItem;
+
+         hb_vmPushSymbol( &hb_symEval );
+         hb_vmPush( pSelect );
+         pDataItem = hb_itemArrayGet( pData, uiItem );
+         hb_vmPush( pDataItem );
+         hb_itemRelease( pDataItem );
+         hb_vmPushInteger( uiItem );
+         hb_vmDo( 2 );
+         pSelect = hb_param( -1, HB_IT_ANY );
+         if( pSelect && HB_IS_LOGICAL( pSelect ) )
+         {
+            bResult = pSelect->item.asLogical.value;
+         }
+      }
+
+      if( pSelectItem )
+      {
+         hb_itemRelease( pSelectItem );
+      }
+   }
+
+   hb_retl( bResult );
+}
+#pragma ENDDUMP
