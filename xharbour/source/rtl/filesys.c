@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.132 2005/01/12 16:36:22 druzus Exp $
+ * $Id: filesys.c,v 1.133 2005/01/13 08:24:57 druzus Exp $
  */
 
 /*
@@ -2433,7 +2433,6 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
 BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
                                HB_FOFFSET ulLength, USHORT uiMode )
 {
-   HB_THREAD_STUB
    BOOL bResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsLockLarge(%p, %" PFHL "u, %" PFHL "u, %hu)", hFileHandle, ulStart, ulLength, uiMode));
@@ -2445,6 +2444,7 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
     * define and efectively enables lseek64/flock64 functions on 32bit
     * machines.
     */
+   HB_THREAD_STUB
    HB_STACK_UNLOCK
    HB_TEST_CANCEL_ENABLE_ASYN
    {
@@ -2591,7 +2591,6 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
 
 HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT uiFlags )
 {
-   HB_THREAD_STUB
    HB_FOFFSET llPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSeekLarge(%p, %" PFHL "u, %hu)", hFileHandle, llOffset, uiFlags));
@@ -2603,6 +2602,7 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
     * define and efectively enables lseek64/flock64 functions on 32bit
     * machines.
     */
+   HB_THREAD_STUB
    HB_STACK_UNLOCK
    HB_TEST_CANCEL_ENABLE_ASYN
    {

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.38 2005/01/11 08:44:01 druzus Exp $
+# $Id: make_tgz.sh,v 1.39 2005/01/12 16:36:00 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -35,9 +35,9 @@ if [ -z "$HB_ARCHITECTURE" ]; then
     else
         hb_arch=`uname -s | tr -d "[-]" | tr '[A-Z]' '[a-z]' 2>/dev/null`
         case "$hb_arch" in
-            *windows*) hb_arch="w32" ;;
-            *dos)      hb_arch="dos" ;;
-            *bsd)      hb_arch="bsd" ;;
+            *windows*|*mingw32*)    hb_arch="w32" ;;
+            *dos)   hb_arch="dos" ;;
+            *bsd)   hb_arch="bsd" ;;
         esac
         export HB_ARCHITECTURE="$hb_arch"
     fi
@@ -83,9 +83,18 @@ case "$HB_ARCHITECTURE" in
         [ -d "$HB_INSTALL_PREFIX/lib64" ] && HB_LIBDIRNAME="lib64"
         HB_INSTALL_GROUP=root
         ;;
+    w32)
+        [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr/local"
+        HB_INSTALL_GROUP=0
+        hb_lnkso="no"
+        hb_sysdir="no"
+        hb_exesuf=".exe"
+        hb_instfile=""
+        ;;
     dos)
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/${name}"
         HB_INSTALL_GROUP=root
+        hb_lnkso="no"
         hb_sysdir="no"
         hb_exesuf=".exe"
         hb_instfile=""
@@ -127,9 +136,6 @@ fi
 
 case "$HB_ARCHITECTURE" in
     linux)
-        ;;
-    dos)
-        hb_lnkso="no"
         ;;
     darwin)
         # Autodetect old Darwin versions and set appropriate build options
@@ -231,9 +237,11 @@ then
          strip "${HB_BIN_INSTALL}/${utl}")
     done
 fi
-ln -s xbscript${hb_exesuf} ${HB_BIN_INSTALL}/pprun${hb_exesuf}
-ln -s xbscript${hb_exesuf} ${HB_BIN_INSTALL}/xprompt${hb_exesuf}
 
+(cd ${HB_BIN_INSTALL}
+    ln -s xbscript${hb_exesuf} pprun${hb_exesuf}
+    ln -s xbscript${hb_exesuf} xprompt${hb_exesuf}
+)
 
 CURDIR=$(pwd)
 (cd "${HB_INST_PREF}"; $TAR -czvf "${CURDIR}/${hb_archfile}" --owner=${HB_INSTALL_OWNER} --group=${HB_INSTALL_GROUP} .)

@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_gnu.sh,v 1.16 2005/01/11 23:53:19 likewolf Exp $
+# $Id: make_gnu.sh,v 1.17 2005/01/12 16:36:00 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -21,9 +21,9 @@ if [ -z "$HB_ARCHITECTURE" ]; then
     else
         hb_arch=`uname -s | tr -d "[-]" | tr '[A-Z]' '[a-z]' 2>/dev/null`
         case "$hb_arch" in
-            *windows*) hb_arch="w32" ;;
-            *dos)      hb_arch="dos" ;;
-            *bsd)      hb_arch="bsd" ;;
+            *windows*|*mingw32*)    hb_arch="w32" ;;
+            *dos)   hb_arch="dos" ;;
+            *bsd)   hb_arch="bsd" ;;
         esac
     fi
     export HB_ARCHITECTURE="$hb_arch"

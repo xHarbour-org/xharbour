@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.41 2005/01/09 20:39:52 likewolf Exp $
+# $Id: hb-func.sh,v 1.42 2005/01/10 18:45:19 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -16,17 +16,25 @@ get_hbplatform()
 {
     local id
 
-    # please add your distro suffix if it not belong to the one recognized below
-    # and remember that order checking can be important
+    if [ "$OSTYPE" = "msdosdjgpp" ]; then
+        id="djgpp"
+    else
+        # please add your distro suffix if it not belong to the one recognized below
+        # and remember that order checking can be important
 
-    [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$rel"|tr -d "."`
-    [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$rel"|tr -d "."`
-    [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' fedora-release 2>/dev/null) && echo "fc$rel"|tr -d "."`
-    [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' suse-release 2>/dev/null) && echo "fc$rel"|tr -d "."`
-    [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
-    [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' aurox-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
-    [ "${id}" = "" ] && id=`[ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/'`
-    [ "${id}" = "" ] && id=`uname -sr | tr '[A-Z]' '[a-z]' | tr -d " "`
+        [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$rel"|tr -d "."`
+        [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$rel"|tr -d "."`
+        [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' fedora-release 2>/dev/null) && echo "fc$rel"|tr -d "."`
+        [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' suse-release 2>/dev/null) && echo "fc$rel"|tr -d "."`
+        [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
+        [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' aurox-release 2>/dev/null) && echo "cl$rel"|tr -d "."`
+        [ "${id}" = "" ] && id=`[ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/'`
+        [ "${id}" = "" ] && id=`uname -sr | tr '[A-Z]' '[a-z]'`
+        case "${id}" in
+            mingw*) id="mingw" ;;
+            *) ;;
+        esac
+    fi
     echo -n "${id}"
 }
 
@@ -84,11 +92,19 @@ mk_hbtools()
         hb_path_separator=";"
         hb_static="yes"
         hb_static_default=" (default)"
+        hb_exesuf=".exe"
+    elif [ "${HB_ARCHITECTURE}" = "w32" ]; then
+        hb_tool="$1/${hb_pref}-build"
+        hb_path_separator=":"
+        hb_static="yes"
+        hb_static_default=" (default)"
+        hb_exesuf=".exe"
     else
         hb_tool="$1/${hb_pref}-build"
         hb_path_separator=":"
         hb_static="no"
         hb_shared_default=" (default)"
+        hb_exesuf=""
     fi
     hb_libs=`mk_hbgetlibs "$2"`
     hb_libsc=`mk_hbgetlibsctb "$3"`
@@ -353,14 +369,10 @@ elif [ "\${HB_ARCHITECTURE}" = "sunos" ]; then
     HB_STRIP="no"
 fi
 
-FOUTC1="\${FILEOUT%.*}.c"
-FOUTO1="\${FILEOUT%.*}.o"
-FOUTE1="\${FILEOUT%.[Pp][Rr][Gg]}"
-FOUTE1="\${FOUTE1%.[oc]}"
 FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
 FOUTO="\${DIROUT}/\${FILEOUT%.*}.o"
 FOUTE="\${DIROUT}/\${FILEOUT%.[Pp][Rr][Gg]}"
-FOUTE="\${FOUTE%.[oc]}"
+FOUTE="\${FOUTE%.[oc]}${hb_exesuf}"
 
 hb_cc()
 {
