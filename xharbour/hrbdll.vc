@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.9 2003/05/27 20:41:29 paultucker Exp $
+# $Id: hrbdll.vc,v 1.10 2003/06/09 20:41:15 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -183,6 +183,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\strcase.obj \
   $(OBJ_DIR)\strings.obj \
   $(OBJ_DIR)\strmatch.obj \
+  $(OBJ_DIR)\strpeek.obj \
   $(OBJ_DIR)\strtran.obj \
   $(OBJ_DIR)\strzero.obj \
   $(OBJ_DIR)\stuff.obj \
@@ -420,7 +421,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cdpeswin.obj \
   $(OBJ_DIR)\cdpgedos.obj \
   $(OBJ_DIR)\cdpgewin.obj \
-  $(OBJ_DIR)\cdpla850.obj \
+  $(OBJ_DIR)\cdppt850.obj \
+  $(OBJ_DIR)\cdpptiso.obj \
   $(OBJ_DIR)\cdppl852.obj \
   $(OBJ_DIR)\cdppliso.obj \
   $(OBJ_DIR)\cdpplmaz.obj \
@@ -1212,6 +1214,9 @@ $(OBJ_DIR)\strings.obj : $(RTL_DIR)\strings.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\strmatch.obj : $(RTL_DIR)\strmatch.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\strpeek.obj : $(RTL_DIR)\strpeek.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\strtran.obj : $(RTL_DIR)\strtran.c

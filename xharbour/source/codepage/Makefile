@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2003/05/26 13:32:49 druzus Exp $
+# $Id: Makefile,v 1.4 2003/06/19 22:39:02 druzus Exp $
 #
 
 ROOT = ../../
@@ -9,7 +9,6 @@ C_SOURCES=\
 	cdpeswin.c    \
 	cdpgedos.c    \
 	cdpgewin.c    \
-	cdpla850.c    \
 	cdpru866.c    \
 	cdprukoi.c    \
 	cdpruwin.c    \
@@ -17,6 +16,8 @@ C_SOURCES=\
 	cdppliso.c    \
 	cdpplmaz.c    \
 	cdpplwin.c    \
+	cdppt850.c    \
+	cdpptiso.c    \
 	cdpsl852.c    \
 	cdpsliso.c    \
 	cdpslwin.c    \

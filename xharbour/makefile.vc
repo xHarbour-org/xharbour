@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.55 2003/06/09 20:41:15 lculik Exp $
+# $Id: makefile.vc,v 1.56 2003/06/19 02:44:47 druzus Exp $
 #
 
 #
@@ -521,7 +521,8 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cdpeswin.obj \
    $(OBJ_DIR)\cdpgedos.obj \
    $(OBJ_DIR)\cdpgewin.obj \
-   $(OBJ_DIR)\cdpla850.obj \
+   $(OBJ_DIR)\cdppt850.obj \
+   $(OBJ_DIR)\cdpptiso.obj \
    $(OBJ_DIR)\cdppl852.obj \
    $(OBJ_DIR)\cdppliso.obj \
    $(OBJ_DIR)\cdpplmaz.obj \

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.15 2003/06/01 22:31:44 lculik Exp $
+# $Id: hrbdll.bc,v 1.16 2003/06/09 20:41:14 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -178,6 +178,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\strcase.obj \
   $(OBJ_DIR)\strings.obj \
   $(OBJ_DIR)\strmatch.obj \
+  $(OBJ_DIR)\strpeek.obj \
   $(OBJ_DIR)\strtran.obj \
   $(OBJ_DIR)\strzero.obj \
   $(OBJ_DIR)\stuff.obj \
@@ -367,7 +368,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cdpeswin.obj \
   $(OBJ_DIR)\cdpgedos.obj \
    $(OBJ_DIR)\cdpgewin.obj \
-   $(OBJ_DIR)\cdpla850.obj \
+   $(OBJ_DIR)\cdppt850.obj \
+   $(OBJ_DIR)\cdpptiso.obj \
    $(OBJ_DIR)\cdppl852.obj \
    $(OBJ_DIR)\cdppliso.obj \
    $(OBJ_DIR)\cdpplmaz.obj \
@@ -523,6 +525,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\strcase.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\strings.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\strmatch.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\strpeek.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\strtran.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\strzero.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\stuff.obj             + >> hdll.tmp
@@ -1459,6 +1462,9 @@ $(OBJ_DIR)\strings.obj : $(RTL_DIR)\strings.c
 $(OBJ_DIR)\strmatch.obj : $(RTL_DIR)\strmatch.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\strpeek.obj : $(RTL_DIR)\strpeek.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\strtran.obj : $(RTL_DIR)\strtran.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -1864,7 +1870,10 @@ $(OBJ_DIR)\cdpgedos.obj : $(CODEPAGE_DIR)\cdpgedos.c
 $(OBJ_DIR)\cdpgewin.obj : $(CODEPAGE_DIR)\cdpgewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\cdpla850.obj : $(CODEPAGE_DIR)\cdpla850.c
+$(OBJ_DIR)\cdppt850.obj : $(CODEPAGE_DIR)\cdppt850.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cdpptiso.obj : $(CODEPAGE_DIR)\cdpptiso.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdppl852.obj : $(CODEPAGE_DIR)\cdppl852.c
