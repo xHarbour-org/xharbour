@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.33 2003/10/19 18:38:02 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.34 2003/10/19 18:39:12 ronpinkas Exp $
  */
 
 /*
@@ -152,9 +152,9 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
             memcpy( pCBlock->pLocals + ui, pValue, sizeof( HB_ITEM ) );
 
             // Need to refelct in the local as well.
-            if( pLocal != pValue )
+            if( pLocal != pValue && HB_VM_STACK.pBase > HB_VM_STACK.pItems )
             {
-               PHB_ITEM *pItem = hb_stack.pBase - 1;
+               PHB_ITEM *pItem = HB_VM_STACK.pBase - 1;
 
                pLocal->type = HB_IT_BYREF | HB_IT_MEMVAR;
                pLocal->item.asMemvar.itemsbase = hb_memvarValueBaseAddress();
