@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.4 2003/02/15 02:00:17 lculik Exp $
+ * $Id: tmysql.prg,v 1.5 2003/02/15 02:05:02 lculik Exp $
  */
 
 /*
@@ -231,9 +231,9 @@ METHOD MakePrimaryKeyWhere() CLASS TMySQLRow
 
          // if a part of a primary key has been changed, use original value
          if ::aDirty[ HB_EnumIndex() ]
-            cWhere += ClipValue2SQL( ::aOldValue[ HB_EnumIndex() ], aField[ MYSQL_FS_TYPE ] )
+            cWhere += ClipValue2SQL( ::aOldValue[ HB_EnumIndex() ] )
          else
-            cWhere += ClipValue2SQL( ::aRow[ HB_EnumIndex() ], aField[ MYSQL_FS_TYPE ] )
+            cWhere += ClipValue2SQL( ::aRow[ HB_EnumIndex() ] )
          endif
 
          cWhere += " AND "
@@ -286,7 +286,7 @@ CLASS TMySQLQuery
    METHOD   GoTop()      INLINE iif( ::nNumRows > 0, ( ::lEof := .f. , ::lBof := .f.), ),;
                                 ::getRow( 1 )
    METHOD   GoBottom()   INLINE iif( ::nNumRows > 0, ( ::lEof := .f. , ::lBof := .f.), ),;
-                                ::getRow( ::nNumRows )
+                                ::getRow( ::nNumRows - 1 )
    METHOD   GoTo( nRow ) INLINE ::lEof := ( ::nCurRow + nRow > ::nNumRows ),;
                                 ::lBof := ( ::nCurRow + nRow < 1 ),;
                                 ::GetRow( nRow )
@@ -490,6 +490,11 @@ METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
             ::lBof    := .f.
             ::lEof    := .f.
             ::nCurRow := nRow
+         endif
+         if nRow = ::nNumRows
+            ::lBof    := .f.
+            ::lEof    := .t.
+            ::nCurRow := ::nNumRows - 1
          endif
          if nRow > ::nNumRows
             ::lBof    := .f.
@@ -1070,7 +1075,7 @@ METHOD MakePrimaryKeyWhere() CLASS TMySQLTable
 
          // if a part of a primary key has been changed, use original value
 
-            cWhere += ClipValue2SQL( ::aOldValue[ HB_EnumIndex() ], ::FieldType(HB_EnumIndex()) )
+            cWhere += ClipValue2SQL( ::aOldValue[ HB_EnumIndex() ]  )
 
          cWhere += " AND "
       endif
@@ -1511,7 +1516,8 @@ static function ClipValue2SQL(Value, cType)
             if cDateFormat == 'mm-dd-yyyy' // USA
                cValue := "'"+PadL(Month(Value), 2, "0") + '-'+ PadL(Day(Value), 2, "0") + "-" + Str(Year(Value), 4) + "'"
             elseif  cDateFormat == 'dd/mm/yyyy' // BRITISH ou FRENCH
-               cValue := "'"+PadL(Day(Value), 2, "0") + "/" + PadL(Month(Value), 2, "0") + "/" + Str(Year(Value), 4) + "'"
+               //cValue := "'"+PadL(Day(Value), 2, "0") + "/" + PadL(Month(Value), 2, "0") + "/" + Str(Year(Value), 4) + "'"
+               cValue := "'"+Str(Year(Value), 4) + "-" + PadL(Month(Value), 2, "0") + "-" + PadL(Day(Value), 2, "0") + "'"
             elseif cDateFormat == 'yyyy.mm.dd' // ANSI
                cValue := "'"+Str(Year(Value), 4)  + "." + PadL(Month(Value), 2, "0") + "." + PadL(Day(Value), 2, "0") + "'"
             elseif cDateFormat == 'dd.mm.yyyy' //GERMAN
