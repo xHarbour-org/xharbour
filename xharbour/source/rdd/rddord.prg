@@ -1,5 +1,5 @@
 /*
- * $Id: rddord.prg,v 1.1.1.1 2001/12/21 10:42:46 ronpinkas Exp $
+ * $Id: rddord.prg,v 1.2 2003/11/04 08:31:03 druzus Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include "common.ch"
+#include "dbinfo.ch"
 
 /* NOTE: The fifth parameters (cOrderName) is undocumented. */
 
@@ -106,3 +107,28 @@ FUNCTION ORDSETFOCU( xOrder, cFile )
 
 FUNCTION ORDSETRELA( xArea, bRelation, cRelation )
    RETURN ORDSETRELATION( xArea, bRelation, cRelation )
+
+FUNCTION ORDWILDSEEK( cPattern, lCont, lBack )
+   LOCAL lFound := .F.
+
+   IF VALTYPE( lCont ) != "L"
+      lCont := .F.
+   ENDIF
+   IF VALTYPE( lBack ) != "L"
+      lBack := .F.
+   ENDIF
+
+   IF lCont
+      IF lBack
+         DBGOBOTTOM()
+      ELSE
+         DBGOTOP()
+      ENDIF
+      lFound := WildMatch( cPattern, ORDKEYVAL() )
+   ENDIF
+
+   IF ! lFound
+      lFound := DBORDERINFO( IIF( lBack, DBOI_SKIPWILDBACK, DBOI_SKIPWILD ),,, cPattern )
+   ENDIF
+
+   RETURN lFound

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.9 2004/04/28 18:28:40 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.10 2004/05/03 23:52:25 peterrees Exp $
  */
 
 /*
@@ -271,13 +271,13 @@ static BOOL hb_dbtFileLockEx( DBTAREAP pArea )
 {
    BOOL fRet;
 
-	 do
-	 {
-			fRet = hb_fsLock( pArea->hMemoFile, DBT_LOCKPOS, DBT_LOCKSIZE,
+   do
+   {
+      fRet = hb_fsLock( pArea->hMemoFile, DBT_LOCKPOS, DBT_LOCKSIZE,
                         FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT );
-	 } while ( !fRet );
+   } while ( !fRet );
 
-	 return fRet;
+   return fRet;
 }
 
 /*
@@ -287,11 +287,11 @@ static BOOL hb_dbtFileLockSh( DBTAREAP pArea )
 {
    BOOL fRet;
 
-	 do
-	 {
-			fRet = hb_fsLock( pArea->hMemoFile, DBT_LOCKPOS, DBT_LOCKSIZE,
+   do
+   {
+      fRet = hb_fsLock( pArea->hMemoFile, DBT_LOCKPOS, DBT_LOCKSIZE,
                         FL_LOCK | FLX_SHARED | FLX_WAIT );
-	 } while ( !fRet );
+   } while ( !fRet );
 
    return fRet;
 }
@@ -752,7 +752,7 @@ static ERRCODE hb_dbtWriteDBHeader( DBTAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbtWriteDBHeader(%p)", pArea));
 
-   if ( pArea->fHasMemo && pArea->bVersion != 0x30 )
+   if ( pArea->fHasMemo && pArea->bVersion != 0x30 && pArea->bVersion != 0x31 )
    {
       pArea->bVersion = 0x83;
    }

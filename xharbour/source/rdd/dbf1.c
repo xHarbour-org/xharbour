@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.76 2004/04/28 18:24:26 druzus Exp $
+ * $Id: dbf1.c,v 1.77 2004/05/03 23:51:37 peterrees Exp $
  */
 
 /*
@@ -195,7 +195,7 @@ static RDDFUNCS dbfTable = { ( DBENTRYP_BP ) hb_dbfBof,
                              ( DBENTRYP_SVP ) hb_dbfWhoCares
                            };
 
-static BYTE s_dbfVersion = 0x03 ;  // Stores the current default DBF type for DBCREATE()
+static BYTE s_dbfVersion = 0x03 ;  /* Stores the current default DBF type for DBCREATE() */
 
 /*
  * Common functions.
@@ -203,23 +203,40 @@ static BYTE s_dbfVersion = 0x03 ;  // Stores the current default DBF type for DB
 
 static void hb_dbfSetBlankRecord( DBFAREAP pArea )
 {
-  // Peter Rees added 3/05/2004 4:02p.m.
-  USHORT uiCount;
+   BYTE *pPtr = pArea->pRecord, bFill = ' ', bNext;
+   ULONG ulSize = 1; /* 1 byte ' ' for DELETE flag */
+   USHORT uiCount;
+   LPFIELD pField;
 
-  memset( pArea->pRecord, ' ', pArea->uiRecordLen );  // Set the whole record to spaces
+   for( uiCount = 0, pField = pArea->lpFields; uiCount < pArea->uiFieldCount; uiCount++, pField++ )
+   {
+      USHORT uiLen = pField->uiLen;
 
-  if ( pArea->fHasMemo )
-  {
-    for( uiCount = 0; uiCount < pArea->uiFieldCount ; uiCount++ )
-    {
-      // If any fields are Memo of DBF version 0x30 set to ZERO's
-      if ( pArea->lpFields[ uiCount ].uiType == HB_IT_MEMO && pArea->lpFields[ uiCount ].uiLen == 4 )
+      if ( ( pField->uiType == HB_IT_MEMO && uiLen == 4 ) ||
+           ( pField->uiType == HB_IT_DATE && uiLen == 3 ) ||
+           pField->uiType == HB_IT_INTEGER ||
+           pField->uiType == HB_IT_DOUBLE )
       {
-        memset( &pArea->pRecord[ pArea->pFieldOffset[ uiCount ] ], 0, 4 ) ;
+         bNext = '\0';
       }
-    }
-  }
-  return ;
+      else
+      {
+         bNext = ' ';
+      }
+
+      if ( bNext == bFill )
+      {
+         ulSize += uiLen;
+      }
+      else
+      {
+         memset( pPtr, bFill, ulSize );
+         pPtr += ulSize;
+         ulSize = uiLen;
+         bFill = bNext;
+      }
+   }
+   memset( pPtr, bFill, ulSize );
 }
 
 /*
@@ -578,30 +595,31 @@ ERRCODE HB_EXPORT hb_dbfGetEGcode( ERRCODE errCode )
  */
 ULONG HB_EXPORT hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex )
 {
-  ULONG ulBlock= 0 ;
+   ULONG ulBlock= 0 ;
 
-  HB_TRACE(HB_TR_DEBUG, ("hb_dbfGetMemoBlock(%p, %hu)", pArea, uiIndex));
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfGetMemoBlock(%p, %hu)", pArea, uiIndex));
 
-  // 3/05/2004 Support 0x30 format DBF memo
-  if ( pArea->lpFields[ uiIndex ].uiLen == 4 )
-  {
-    ulBlock =  HB_GET_LE_ULONG( &pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ] );
-  }
-  else
-  {
-    USHORT uiCount;
-    BYTE bByte;
+   /* 3/05/2004 Support 0x30 format DBF memo */
+   if ( pArea->lpFields[ uiIndex ].uiLen == 4 )
+   {
+      ulBlock =  HB_GET_LE_ULONG( &pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ] );
+   }
+   else
+   {
+      USHORT uiCount;
+      BYTE bByte;
 
-    for( uiCount = 0; uiCount < 10; uiCount++ )
-    {
-      bByte = pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] + uiCount ];
-      if( bByte >= '0' && bByte <= '9' )
+      for( uiCount = 0; uiCount < 10; uiCount++ )
       {
-        ulBlock = ulBlock * 10 + ( bByte - '0' );
+         bByte = pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] + uiCount ];
+         if( bByte >= '0' && bByte <= '9' )
+         {
+            ulBlock = ulBlock * 10 + ( bByte - '0' );
+         }
       }
-    }
-  }
-  return ulBlock;
+   }
+
+   return ulBlock;
 }
 
 /*
@@ -611,29 +629,29 @@ ULONG HB_EXPORT hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex )
  */
 void HB_EXPORT hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock )
 {
-   SHORT iCount;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfPutMemoBlock(%p, %hu, %lu)", pArea, uiIndex, ulBlock));
 
-  // 3/05/2004 Support 0x30 format DBF memo
+   /* 3/05/2004 Support 0x30 format DBF memo */
    if ( pArea->lpFields[ uiIndex ].uiLen == 4 )
    {
      HB_PUT_LE_ULONG( &pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ], ulBlock );
    }
    else
    {
-     for( iCount = 9; iCount >= 0; iCount-- )
-     {
-       if( ulBlock > 0 )
-       {
-         pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] + iCount ] = ( BYTE )( ulBlock % 10 ) + '0';
-         ulBlock /= 10;
-       }
-       else
-       {
-         pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] + iCount ] = ' ';
-       }
-     }
+      SHORT iCount;
+
+      for( iCount = 9; iCount >= 0; iCount-- )
+      {
+         if( ulBlock > 0 )
+         {
+            pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] + iCount ] = ( BYTE )( ulBlock % 10 ) + '0';
+            ulBlock /= 10;
+         }
+         else
+         {
+            pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] + iCount ] = ' ';
+         }
+      }
    }
 }
 
@@ -681,6 +699,7 @@ BOOL HB_EXPORT hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, UL
    {
       return fRet ;
    }
+
    do
    {
       switch ( usMode & FL_MASK )
@@ -722,6 +741,7 @@ BOOL HB_EXPORT hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, UL
       /* TODO: call special error handler (LOCKHANDLER) hiere if fWait */
 
    } while ( fWait );
+
    return fRet;
 }
 
@@ -821,9 +841,8 @@ static ERRCODE hb_dbfGoTo( DBFAREAP pArea, ULONG ulRecNo )
       pArea->fBof = pArea->fEof = pArea->fValidBuffer = TRUE;
       pArea->fPositioned = pArea->fDeleted = FALSE;
 
-      /* Clear buffer */
+      /* Clear record buffer */
       hb_dbfSetBlankRecord( pArea ) ;
-//      memset( pArea->pRecord, ' ', pArea->uiRecordLen );
    }
    pArea->fFound = FALSE;
 
@@ -1004,7 +1023,7 @@ static ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
       }
    }
 
-   /* Clear buffer and update pArea */
+   /* Clear record buffer and update pArea */
    hb_dbfSetBlankRecord( pArea ) ;
 
    pArea->fValidBuffer = pArea->fUpdateHeader = pArea->fRecordChanged =
@@ -1134,9 +1153,42 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case HB_IT_DATE:
-         memcpy( szBuffer, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], 8 );
-         szBuffer[ 8 ] = 0;
-         hb_itemPutDS( pItem, szBuffer );
+         if ( pField->uiLen == 3 )
+         {
+            hb_itemPutDL( pItem, HB_GET_LE_UINT24( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ) );
+         }
+         else
+         {
+            memcpy( szBuffer, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], 8 );
+            szBuffer[ 8 ] = 0;
+            hb_itemPutDS( pItem, szBuffer );
+         }
+         break;
+
+      case HB_IT_INTEGER:
+         switch ( pField->uiLen )
+         {
+            case 2:
+               hb_itemPutNILen( pItem, ( SHORT ) HB_GET_LE_USHORT( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 10 );
+               break;
+            case 4:
+               hb_itemPutNLLen( pItem, ( LONG ) HB_GET_LE_ULONG( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 10 );
+               break;
+#ifndef HB_LONG_LONG_OFF
+            case 8:
+               hb_itemPutNLLLen( pItem, ( LONGLONG ) HB_GET_LE_UINT64( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 20 );
+               break;
+#endif
+            default:
+               bError = TRUE;
+               break;
+         }
+         break;
+
+      case HB_IT_DOUBLE:
+         hb_itemPutNDLen( pItem, HB_GET_LE_DOUBLE( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ),
+                          20 - ( pField->uiDec > 0 ? ( pField->uiDec + 1 ) : 0 ),
+                          ( int ) pField->uiDec );
          break;
 
       case HB_IT_LONG:
@@ -1339,13 +1391,21 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          else
             uiError = EDBF_DATATYPE;
       }
-      // Must precede HB_IS_NUMERIC() because a DATE is also a NUMERIC. (xHarbour)
+      /* Must precede HB_IS_NUMERIC() because a DATE is also a NUMERIC. (xHarbour) */
       else if( HB_IS_DATE( pItem ) )
       {
          if( pField->uiType == HB_IT_DATE )
          {
-            hb_itemGetDS( pItem, szBuffer );
-            memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], szBuffer, 8 );
+            if ( pField->uiLen == 3 )
+            {
+               HB_PUT_LE_UINT24( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
+                                 hb_itemGetDL( pItem ) );
+            }
+            else
+            {
+               hb_itemGetDS( pItem, szBuffer );
+               memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], szBuffer, 8 );
+            }
          }
          else
             uiError = EDBF_DATATYPE;
@@ -1365,6 +1425,64 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                        '*', pField->uiLen );
             }
+         }
+         else if ( pField->uiType == HB_IT_INTEGER )
+         {
+#ifndef HB_LONG_LONG_OFF
+            LONGLONG lVal = hb_itemGetNLL( pItem );
+            int iSize = ( SHRT_MIN <= lVal && lVal <= SHRT_MAX ) ? 2 :
+                        ( LONG_MIN <= lVal && lVal <= LONG_MAX ) ? 4 : 8;
+
+            if ( HB_IS_DOUBLE( pItem ) )
+            {
+               double d = hb_itemGetND( pItem );
+               if ( d < (double) LONGLONG_MIN || d > (double) LONGLONG_MAX ||
+                   ( d == (double) LONGLONG_MAX && (LONGLONG) d < 0 ) )
+               {
+                  iSize = 99;
+               }
+            }
+#else
+            LONG lVal = hb_itemGetNL( pItem );
+            int iSize = ( SHRT_MIN <= lVal && lVal <= SHRT_MAX ) ? 2 : 4;
+
+            if ( HB_IS_DOUBLE( pItem ) )
+            {
+               double d = hb_itemGetND( pItem );
+               if ( d < (double) LONG_MIN || d > (double) LONG_MAX )
+               {
+                  iSize = 99;
+               }
+            }
+#endif
+            if ( iSize > pField->uiLen )
+            {
+               uiError = EDBF_DATAWIDTH;
+            }
+            else
+            {
+               switch ( pField->uiLen )
+               {
+                  case 2:
+                     HB_PUT_LE_USHORT( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], ( SHORT ) lVal );
+                     break;
+                  case 4:
+                     HB_PUT_LE_ULONG( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], ( LONG ) lVal  );
+                     break;
+#ifndef HB_LONG_LONG_OFF
+                  case 8:
+                     HB_PUT_LE_UINT64( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], ( LONGLONG ) lVal );
+                     break;
+#endif
+                  default:
+                     uiError = EDBF_DATATYPE;
+                     break;
+               }
+            }
+         }
+         else if( pField->uiType == HB_IT_DOUBLE )
+         {
+            HB_PUT_LE_DOUBLE( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], hb_itemGetND( pItem ) );
          }
          else
          {
@@ -1392,7 +1510,8 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       hb_errPutFlags( pError, EF_CANDEFAULT );
       SELF_ERROR( ( AREAP ) pArea, pError );
       hb_itemRelease( pError );
-      return FAILURE;
+      return SUCCESS;
+   //   return FAILURE;
    }
 
    /* Update deleted flag */
@@ -1459,15 +1578,15 @@ static ERRCODE hb_dbfRecNo( DBFAREAP pArea, PHB_ITEM pRecNo )
  */
 static ERRCODE hb_dbfSetFieldExtent( DBFAREAP pArea, USHORT uiFieldExtent )
 {
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfSetFieldExtent(%p, %hu)", pArea, uiFieldExtent));
 
    if( SUPER_SETFIELDEXTENT( ( AREAP ) pArea, uiFieldExtent ) == FAILURE )
       return FAILURE;
 
    /* Alloc field offsets array */
-
    pArea->pFieldOffset = ( USHORT * ) hb_xgrab( uiFieldExtent * sizeof( USHORT * ) );
-
    memset( pArea->pFieldOffset, 0, uiFieldExtent * sizeof( USHORT * ) );
+
    return SUCCESS;
 }
 
@@ -1556,7 +1675,7 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
 static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 {
    USHORT uiSize, uiCount;
-   BOOL bHasMemo, bRetry;
+   BOOL fHasMemo, bRetry;
    DBFFIELD * pBuffer, *pThisField;
    PHB_FNAME pFileName;
    PHB_ITEM pFileExt, pError;
@@ -1607,8 +1726,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    pArea->uiRecordLen = 1;
    pArea->bVersion = s_dbfVersion ;
 
-   bHasMemo = FALSE;
-
+   fHasMemo = FALSE;
 
    for( uiCount = 0; uiCount < pArea->uiFieldCount; uiCount++ )
    {
@@ -1632,17 +1750,21 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
          case HB_IT_MEMO:
             pThisField->bType = 'M';
-            pThisField->bLen = pArea->bVersion == 0x30 ? 4 : 10 ;
+            pThisField->bLen = pArea->lpFields[ uiCount ].uiLen;
+            if ( pThisField->bLen != 4 )
+               pThisField->bLen = 10;
             pThisField->bDec = 0;
-            pArea->uiRecordLen += pThisField->bLen ;
-            bHasMemo = TRUE;
+            pArea->uiRecordLen += pThisField->bLen;
+            fHasMemo = TRUE;
             break;
 
          case HB_IT_DATE:
             pThisField->bType = 'D';
-            pThisField->bLen = 8;
+            pThisField->bLen = pArea->lpFields[ uiCount ].uiLen;
+            if ( pThisField->bLen != 3 )
+               pThisField->bLen = 8;
             pThisField->bDec = 0;
-            pArea->uiRecordLen += 8;
+            pArea->uiRecordLen += pThisField->bLen;
             break;
 
          case HB_IT_LONG:
@@ -1652,23 +1774,33 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             pArea->uiRecordLen += pArea->lpFields[ uiCount ].uiLen;
             break;
 
+         case HB_IT_DOUBLE:
+            pThisField->bType = 'B';
+            pThisField->bLen = 8;
+            pThisField->bDec = ( BYTE ) pArea->lpFields[ uiCount ].uiDec;
+            pArea->uiRecordLen += pArea->lpFields[ uiCount ].uiLen;
+            break;
+
+         case HB_IT_INTEGER:
+            pThisField->bType = 'I';
+            pThisField->bLen = ( pArea->lpFields[ uiCount ].uiLen == 2 ||
+                                 pArea->lpFields[ uiCount ].uiLen == 8 ) ?
+                                 pArea->lpFields[ uiCount ].uiLen : 4;
+            pThisField->bDec = 0;
+            pArea->uiRecordLen += pArea->lpFields[ uiCount ].uiLen;
+            break;
+
          default:
             hb_xfree( pBuffer );
             return FAILURE;
       }
       pThisField++ ;
-//      pBuffer[ uiCount ] = dbField;
    }
    pArea->fShared = pCreateInfo->fShared;
    pArea->ulRecCount = 0;
-   pArea->uiHeaderLen = sizeof( DBFHEADER ) + uiSize + 2;
-   pArea->fHasMemo = bHasMemo;
+   pArea->uiHeaderLen = sizeof( DBFHEADER ) + uiSize + ( pArea->bVersion == 0x30 ? 1 : 2 );
+   pArea->fHasMemo = fHasMemo;
    pArea->uiMemoBlockSize = 0;
-
-   if ( bHasMemo && pArea->bVersion == 0x30 )
-   {
-     pArea->fHasTags = 0x02 ;  // Visual Fox sets bit to indicate memofile
-   }
 
    /* Write header */
    if ( SELF_WRITEDBHEADER( ( AREAP ) pArea ) == FAILURE )
@@ -1681,7 +1813,9 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    /* Write fields and eof mark */
    if ( hb_fsWrite( pArea->hDataFile, ( BYTE * ) pBuffer, uiSize ) != uiSize ||
-       hb_fsWrite( pArea->hDataFile, ( BYTE * ) "\r\0\032", 3 ) != 3 )
+        ( pArea->bVersion == 0x30 ? 
+            hb_fsWrite( pArea->hDataFile, ( BYTE * ) "\r\032", 2 ) != 2 :
+            hb_fsWrite( pArea->hDataFile, ( BYTE * ) "\r\0\032", 3 ) != 3 ) )
    {
       hb_fsClose( pArea->hDataFile );
       pArea->hDataFile = FS_ERROR;
@@ -1692,7 +1826,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    hb_xfree( pBuffer );
 
    /* Create memo file */
-   if ( bHasMemo )
+   if ( fHasMemo )
    {
       BYTE *tmp;
       ERRCODE result;
@@ -2026,10 +2160,24 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 
          case 'D':
             pFieldInfo.uiType = HB_IT_DATE;
-            pFieldInfo.uiLen = 8;
+            if ( pFieldInfo.uiLen != 3 )
+               pFieldInfo.uiLen = 8;
+            break;
+
+         case 'I':
+            pFieldInfo.uiType = HB_IT_INTEGER;
+            if ( pFieldInfo.uiLen != 2 && pFieldInfo.uiLen != 8 )
+               pFieldInfo.uiLen = 4;
+            break;
+
+         case '2':
+         case '4':
+            pFieldInfo.uiType = HB_IT_INTEGER;
+            pFieldInfo.uiLen = pField->bType - '0';
             break;
 
          case 'N':
+         case 'F':
             pFieldInfo.uiType = HB_IT_LONG;
          /* DBASE documentation defines maximum numeric field size as 20
           * but Clipper alows to create longer fileds so I remove this
@@ -2040,7 +2188,14 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
                bError = TRUE;
             else
           */
-               pFieldInfo.uiDec = pField->bDec;
+            pFieldInfo.uiDec = pField->bDec;
+            break;
+
+         case '8':
+         case 'B':
+            pFieldInfo.uiType = HB_IT_DOUBLE;
+            pFieldInfo.uiLen = 8;
+            pFieldInfo.uiDec = pField->bDec;
             break;
 
          default:
@@ -2775,12 +2930,12 @@ static ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
    do
    {
       hb_fsSeek( pArea->hDataFile, 0, FS_SET );
-      if( hb_fsRead( pArea->hDataFile, ( BYTE * ) &dbHeader, sizeof( DBFHEADER ) ) != sizeof( DBFHEADER ) ||
-          ( dbHeader.bVersion != 0x03 &&    // dBase III
-            dbHeader.bVersion != 0x30 &&    // VisualFoxPro 6.0
-            dbHeader.bVersion != 0x83 &&    // dBase III w/memo
-            dbHeader.bVersion != 0xF5       // FoxPro??? w/memo
-        ) )
+      if ( hb_fsRead( pArea->hDataFile, ( BYTE * ) &dbHeader, sizeof( DBFHEADER ) ) != sizeof( DBFHEADER ) ||
+           ( dbHeader.bVersion != 0x03 &&    /* dBase III */
+             dbHeader.bVersion != 0x30 &&    /* VisualFoxPro 6.0 */
+             dbHeader.bVersion != 0x83 &&    /* dBase III w/memo */
+             dbHeader.bVersion != 0xF5       /* FoxPro??? w/memo */
+           ) )
       {
          bError = TRUE;
          if( !pError )
@@ -2808,15 +2963,16 @@ static ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
    pArea->bDay = dbHeader.bDay;
    pArea->bMonth = dbHeader.bMonth;
    pArea->bYear = dbHeader.bYear;
-   pArea->fHasTags = dbHeader.bHasTags;
+   pArea->fHasTags = ( dbHeader.bHasTags & 0x01 ) != 0;
    pArea->bVersion = dbHeader.bVersion;
    pArea->bCodePage = dbHeader.bCodePage;
    pArea->uiHeaderLen = HB_GET_LE_USHORT( dbHeader.uiHeaderLen );
    pArea->ulRecCount = HB_GET_LE_ULONG( dbHeader.ulRecCount );
 
-   pArea->fHasMemo = ( pArea->bVersion == 0xF5 // FoxPro 2.x or earlier with Memo
-       || ( pArea->bVersion == 0x30 && ( pArea->fHasTags & 0x02 ) ) // VisualFox with Memo
-       ||  pArea->bVersion == 0x83 ) ; // dBase III with Memo
+   pArea->fHasMemo = ( pArea->bVersion == 0xF5 || /* FoxPro 2.x or earlier with Memo */
+                       pArea->bVersion == 0x83 || /* dBase III with Memo */
+                     ( pArea->bVersion == 0x30 && 
+                       ( dbHeader.bHasTags & 0x02 ) ) ); /* VisualFox with Memo */
 
    return SUCCESS;
 }
@@ -2838,7 +2994,8 @@ static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
    dbfHeader.bYear = ( BYTE ) ( lYear - 1900 );
    dbfHeader.bMonth = ( BYTE ) lMonth;
    dbfHeader.bDay = ( BYTE ) lDay;
-   dbfHeader.bHasTags = ( BYTE ) pArea->fHasTags;
+   dbfHeader.bHasTags = ( BYTE ) ( pArea->fHasTags ? 0x01 : 0x00 ) |
+             ( ( pArea->fHasMemo && pArea->bVersion == 0x30 ) ? 0x02 : 0x00 );
    dbfHeader.bCodePage = pArea->bCodePage;
 
    /* Update record count */

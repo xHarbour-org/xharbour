@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.23 2004/03/21 15:55:05 druzus Exp $
+ * $Id: workarea.c,v 1.24 2004/03/31 03:18:32 druzus Exp $
  */
 
 /*
@@ -293,15 +293,34 @@ ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
 
          case 'M':
             pFieldInfo.uiType = HB_IT_MEMO;
-            pFieldInfo.uiLen = 10;
+            pFieldInfo.uiLen = (uiLen == 4) ? 4 : 10;
             break;
 
          case 'D':
             pFieldInfo.uiType = HB_IT_DATE;
+            pFieldInfo.uiLen = ( uiLen == 3 ) ? 3 : 8;
+            break;
+
+         case 'I':
+            pFieldInfo.uiType = HB_IT_INTEGER;
+            pFieldInfo.uiLen = ( uiLen == 2 || uiLen == 8 ) ? uiLen : 4;
+            break;
+
+         case '2':
+         case '4':
+            pFieldInfo.uiType = HB_IT_INTEGER;
+            pFieldInfo.uiLen = iData - '0';
+            break;
+
+         case 'B':
+         case '8':
+            pFieldInfo.uiType = HB_IT_DOUBLE;
             pFieldInfo.uiLen = 8;
+            pFieldInfo.uiDec = uiDec;
             break;
 
          case 'N':
+         case 'F':
             pFieldInfo.uiType = HB_IT_LONG;
             /* DBASE documentation defines maximum numeric field size as 20
              * but Clipper alows to create longer fileds so I remove this
@@ -377,6 +396,14 @@ ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_ITEM pIt
 
             case HB_IT_LONG:
                hb_itemPutC( pItem, "N" );
+               break;
+
+            case HB_IT_INTEGER:
+               hb_itemPutC( pItem, "I" );
+               break;
+
+            case HB_IT_DOUBLE:
+               hb_itemPutC( pItem, "B" );
                break;
 
             default:

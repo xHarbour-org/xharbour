@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.33 2004/05/07 15:33:33 lf_sfnet Exp $
+ * $Id: gtxvt.c,v 1.34 2004/05/08 18:10:53 fsgiudice Exp $
  */
 
 /*
@@ -4103,7 +4103,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
    xvt_appProcess( 0 );
 
-   if ( eventmask & ( INKEY_KEYBOARD | HB_INKEY_RAW /* | HB_INKEY_EXTENDED */ ) )
+   if ( eventmask & ( INKEY_KEYBOARD /* | HB_INKEY_RAW | HB_INKEY_EXTENDED */ ) )
    {
       bKey = xvt_bufferDeqeueKey( s_buffer, &c );
    }

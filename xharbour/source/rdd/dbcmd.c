@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.110 2004/04/28 18:24:23 druzus Exp $
+ * $Id: dbcmd.c,v 1.111 2004/05/07 15:33:31 lf_sfnet Exp $
  */
 
 /*
@@ -4983,7 +4983,11 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
          break;
       }
       // an "N" field
+      case HB_IT_INTEGER:
       case HB_IT_LONG:
+#ifndef HB_LONG_LONG_OFF
+      case HB_IT_LONGLONG:
+#endif
       case HB_IT_DOUBLE:
       {
          char *szResult = hb_itemStr( pValue, NULL, NULL );
@@ -5405,7 +5409,7 @@ static BOOL hb_ExportSqlVar( int handle, PHB_ITEM pValue, char *cDelim )
          else
          { 
             sprintf( szSqlDate, "%c%c%c%c-%c%c-%c%c", szDate[0],szDate[1],szDate[2],szDate[3],szDate[4],szDate[5],szDate[6],szDate[7] );
-         }   
+         }
          szSqlDate[ 10 ] = '\0';
          szString = hb_xstrcpy( NULL,cDelim,szSqlDate,cDelim,NULL);
          hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
@@ -5424,7 +5428,11 @@ static BOOL hb_ExportSqlVar( int handle, PHB_ITEM pValue, char *cDelim )
          break;
       }
       // an "N" field
+      case HB_IT_INTEGER:
       case HB_IT_LONG:
+#ifndef HB_LONG_LONG_OFF
+      case HB_IT_LONGLONG:
+#endif
       case HB_IT_DOUBLE:
       {
          char *szResult = hb_itemStr( pValue, NULL, NULL );
@@ -5460,7 +5468,7 @@ static void hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
    HB_ITEM Tmp;
    ULONG lRecNo = 0;
    BOOL bWriteSep = FALSE;
-   char *szRecNo = ( char * ) hb_xgrab( 9 );
+   char *szRecNo = ( char * ) hb_xgrab( 11 );
    char *szInsert = ( char * ) hb_xgrab( 13 + strlen( cTable ) + 12 );
 
    BOOL bEof = TRUE;
@@ -5569,8 +5577,13 @@ static void hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
                hb_xfree( szFieldName );
             }
          }
-         hb_fsWriteLarge( handle, (BYTE*) " );", 3 );
-         hb_fsWriteLarge( handle, (BYTE*) hb_conNewLine(), OS_EOL_LEN );
+         /*
+          * use szRecNo buffer (it's big enough) to avoid double call to
+          * hb_fsWriteLarge
+          */
+         strcpy( szRecNo, " );" );
+         strcat( szRecNo, hb_conNewLine() );
+         hb_fsWriteLarge( handle, (BYTE *) szRecNo, strlen( szRecNo ) );
          bWriteSep = FALSE;
       }
 

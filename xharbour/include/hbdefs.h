@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.38 2004/04/14 10:32:01 druzus Exp $
+ * $Id: hbdefs.h,v 1.39 2004/04/28 18:22:07 druzus Exp $
  */
 
 /*
@@ -190,17 +190,24 @@
 #endif /* HB_DONT_DEFINE_BASIC_TYPES */
 
 #ifndef HB_LONG_LONG_OFF
-   #ifndef __GNUC__
-      #if !defined(LONGLONG_MIN)
-         #define LONGLONG_MIN       _I64_MIN
+   #if !defined(_WINNT_H)
+      #if !defined(LONGLONG)
+         #if defined(__GNUC__)
+            typedef long long LONGLONG;
+         #else
+           typedef __int64 LONGLONG;
+         #endif
       #endif
-      #if !defined(LONGLONG_MAX)
-         #define LONGLONG_MAX       _I64_MAX
+      #if !defined(ULONGLONG)
+         #if defined(__GNUC__)
+            typedef unsigned long long ULONGLONG;
+         #else
+            typedef unsigned __int64 ULONGLONG;
+         #endif
       #endif
-      #if !defined(ULONGLONG_MAX)
-         #define ULONGLONG_MAX      _UI64_MAX
-      #endif
-   #else
+   #endif
+
+   #ifdef __GNUC__
       #if defined(ULLONG_MAX)
          #define ULONGLONG_MAX      ULLONG_MAX
       #elif defined(ULONG_LONG_MAX)
@@ -222,8 +229,18 @@
       #else
          #define LONGLONG_MIN       (-LONGLONG_MAX - 1LL)
       #endif
+   #else
+      #if !defined(LONGLONG_MIN)
+         #define LONGLONG_MIN       _I64_MIN
+      #endif
+      #if !defined(LONGLONG_MAX)
+         #define LONGLONG_MAX       _I64_MAX
+      #endif
+      #if !defined(ULONGLONG_MAX)
+         #define ULONGLONG_MAX      _UI64_MAX
+      #endif
    #endif
-#endif
+#endif /* HB_LONG_LONG_OFF */
 
 /* try to detect byte order if not explicitly set */
 #if !defined( HB_PDP_ENDIAN ) && !defined( HB_BIG_ENDIAN ) && \
@@ -276,89 +293,35 @@ typedef unsigned long HB_PTRDIFF;
                                               ( ( ( ULONG ) ( w ) & 0x00FF0000L ) >>  8 ) | \
                                               ( ( ( ULONG ) ( w ) & 0xFF000000L ) >> 24 ) ) )
 
+#ifndef HB_LONG_LONG_OFF
+#define HB_SWAP_UINT64( w )      ( ( ULONGLONG ) ( ( ( ( ULONGLONG ) ( w ) & 0x00000000000000FFLL ) << 56 ) | \
+                                                   ( ( ( ULONGLONG ) ( w ) & 0x000000000000FF00LL ) << 40 ) | \
+                                                   ( ( ( ULONGLONG ) ( w ) & 0x0000000000FF0000LL ) >> 24 ) | \
+                                                   ( ( ( ULONGLONG ) ( w ) & 0x00000000FF000000LL ) >>  8 ) | \
+                                                   ( ( ( ULONGLONG ) ( w ) & 0x000000FF00000000LL ) >>  8 ) | \
+                                                   ( ( ( ULONGLONG ) ( w ) & 0x0000FF0000000000LL ) >> 24 ) | \
+                                                   ( ( ( ULONGLONG ) ( w ) & 0x00FF000000000000LL ) >> 40 ) | \
+                                                   ( ( ( ULONGLONG ) ( w ) & 0xFF00000000000000LL ) >> 56 ) ) )
+#endif
+
 #if defined( HB_PDP_ENDIAN )
    #error PDP-Endian support unimplemented. If you have such machine do it yourself.
-#elif !defined( HB_BIG_ENDIAN )
-   /* We use Little-Endian here */
-
-   #define HB_GET_LE_USHORT( p )    ( *( USHORT * )( p ) )
-   #define HB_PUT_LE_USHORT( p, w ) ( *( USHORT * )( p ) = ( USHORT ) ( w ) )
-   #define HB_GET_LE_ULONG( p )     ( *( ULONG * )( p ) )
-   #define HB_PUT_LE_ULONG( p, l )  ( *( ULONG * )( p ) = ( ULONG ) ( l ) )
-
-   #define HB_GET_BE_USHORT( p )    HB_SWAP_USHORT( *( USHORT * )( p ) )
-   #define HB_PUT_BE_USHORT( p, w ) ( *( USHORT * )( p ) = HB_SWAP_USHORT( w ) )
-   #define HB_GET_BE_ULONG( p )     HB_SWAP_ULONG( *( ULONG * )( p ) )
-   #define HB_PUT_BE_ULONG( p, l )  ( *( ULONG * )( p ) = HB_SWAP_ULONG( l ) )
-
-   #define HB_GET_LE_DOUBLE( p )    ( *( double * )( p ) )
-   #define HB_PUT_LE_DOUBLE( p, d ) ( *( double * )( p ) = ( double ) ( d ) )
-
-   #define HB_USHORT_FROM_LE( w )   ( ( USHORT )( w ) )
-   #define HB_ULONG_FROM_LE( l )    ( ( ULONG )( l ) )
-   #define HB_USHORT_TO_LE( w )     ( ( USHORT )( w ) )
-   #define HB_ULONG_TO_LE( l )      ( ( ULONG )( l ) )
-   #define HB_DOUBLE_TO_LE( d )     ( ( double )( d ) )
-
-   #define HB_PCODE_MKSHORT( p )    ( *( SHORT * )( p ) )
-   #define HB_PCODE_MKUSHORT( p )   ( *( USHORT * )( p ) )
-   #define HB_PCODE_MKLONG( p )     ( *( LONG * )( p ) )
-   #define HB_PCODE_MKULONG( p )    ( *( ULONG * )( p ) )
-   #define HB_PCODE_MKDOUBLE( p )   ( *( double * )( p ) )
-
-   #define HB_ORD2DBL( o, d ) { \
-      if ( ( ( BYTE * ) ( o ) )[ 0 ] & 0x80 ) { \
-         ( ( BYTE * ) ( d ) )[ 0 ] = ( ( BYTE * ) ( o ) )[ 7 ]; \
-         ( ( BYTE * ) ( d ) )[ 1 ] = ( ( BYTE * ) ( o ) )[ 6 ]; \
-         ( ( BYTE * ) ( d ) )[ 2 ] = ( ( BYTE * ) ( o ) )[ 5 ]; \
-         ( ( BYTE * ) ( d ) )[ 3 ] = ( ( BYTE * ) ( o ) )[ 4 ]; \
-         ( ( BYTE * ) ( d ) )[ 4 ] = ( ( BYTE * ) ( o ) )[ 3 ]; \
-         ( ( BYTE * ) ( d ) )[ 5 ] = ( ( BYTE * ) ( o ) )[ 2 ]; \
-         ( ( BYTE * ) ( d ) )[ 6 ] = ( ( BYTE * ) ( o ) )[ 1 ]; \
-         ( ( BYTE * ) ( d ) )[ 7 ] = ( ( BYTE * ) ( o ) )[ 0 ] ^ ( BYTE ) 0x80; \
-      } else { \
-         ( ( BYTE * ) ( d ) )[ 0 ] = ( ( BYTE * ) ( o ) )[ 7 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( d ) )[ 1 ] = ( ( BYTE * ) ( o ) )[ 6 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( d ) )[ 2 ] = ( ( BYTE * ) ( o ) )[ 5 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( d ) )[ 3 ] = ( ( BYTE * ) ( o ) )[ 4 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( d ) )[ 4 ] = ( ( BYTE * ) ( o ) )[ 3 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( d ) )[ 5 ] = ( ( BYTE * ) ( o ) )[ 2 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( d ) )[ 6 ] = ( ( BYTE * ) ( o ) )[ 1 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( d ) )[ 7 ] = ( ( BYTE * ) ( o ) )[ 0 ] ^ ( BYTE ) 0xFF; \
-      } }
-
-   #define HB_DBL2ORD( d, o ) { \
-      if ( *( double * )( d ) >= 0.0 ) { \
-      ( ( BYTE * ) ( o ) )[ 0 ] = ( ( BYTE * ) ( d ) )[ 7 ] ^ ( BYTE ) 0x80; \
-         ( ( BYTE * ) ( o ) )[ 1 ] = ( ( BYTE * ) ( d ) )[ 6 ]; \
-         ( ( BYTE * ) ( o ) )[ 2 ] = ( ( BYTE * ) ( d ) )[ 5 ]; \
-         ( ( BYTE * ) ( o ) )[ 3 ] = ( ( BYTE * ) ( d ) )[ 4 ]; \
-         ( ( BYTE * ) ( o ) )[ 4 ] = ( ( BYTE * ) ( d ) )[ 3 ]; \
-         ( ( BYTE * ) ( o ) )[ 5 ] = ( ( BYTE * ) ( d ) )[ 2 ]; \
-         ( ( BYTE * ) ( o ) )[ 6 ] = ( ( BYTE * ) ( d ) )[ 1 ]; \
-         ( ( BYTE * ) ( o ) )[ 7 ] = ( ( BYTE * ) ( d ) )[ 0 ]; \
-      } else { \
-         ( ( BYTE * ) ( o ) )[ 0 ] = ( ( BYTE * ) ( d ) )[ 7 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( o ) )[ 1 ] = ( ( BYTE * ) ( d ) )[ 6 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( o ) )[ 2 ] = ( ( BYTE * ) ( d ) )[ 5 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( o ) )[ 3 ] = ( ( BYTE * ) ( d ) )[ 4 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( o ) )[ 4 ] = ( ( BYTE * ) ( d ) )[ 3 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( o ) )[ 5 ] = ( ( BYTE * ) ( d ) )[ 2 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( o ) )[ 6 ] = ( ( BYTE * ) ( d ) )[ 1 ] ^ ( BYTE ) 0xFF; \
-         ( ( BYTE * ) ( o ) )[ 7 ] = ( ( BYTE * ) ( d ) )[ 0 ] ^ ( BYTE ) 0xFF; \
-      } }
-
-#else
+#elif defined( HB_BIG_ENDIAN )
    /* We use Big-Endian here */
 
    #define HB_GET_LE_USHORT( p )    HB_SWAP_USHORT( *( USHORT * )( p ) )
    #define HB_PUT_LE_USHORT( p, w ) ( *( USHORT * )( p ) = HB_SWAP_USHORT( w ) )
    #define HB_GET_LE_ULONG( p )     HB_SWAP_ULONG( *( ULONG * )( p ) )
    #define HB_PUT_LE_ULONG( p, l )  ( *( ULONG * )( p ) = HB_SWAP_ULONG( l ) )
+   #define HB_GET_LE_UINT64( p )    HB_SWAP_UINT64( *( ULONGLONG * )( p ) )
+   #define HB_PUT_LE_UINT64( p, l ) ( *( ULONGLONG * )( p ) = HB_SWAP_UINT64( l ) )
+
    #define HB_GET_BE_USHORT( p )    ( *( USHORT * )( p ) )
    #define HB_PUT_BE_USHORT( p, w ) ( *( USHORT * )( p ) = ( USHORT ) ( w ) )
    #define HB_GET_BE_ULONG( p )     ( *( ULONG * )( p ) )
    #define HB_PUT_BE_ULONG( p, l )  ( *( ULONG * )( p ) = ( ULONG ) ( l ) )
+   #define HB_GET_BE_UINT64( p )    ( *( ULONGLONG * )( p ) )
+   #define HB_PUT_BE_UINT64( p, l ) ( *( ULONGLONG * )( p ) = ( ULONGLONG ) ( l ) )
 
    #define HB_USHORT_FROM_LE( w )   HB_MKUSHORT( HB_HIBYTE( w ), HB_LOBYTE( w ) )
    #define HB_ULONG_FROM_LE( l )    HB_MKULONG( HB_HIBYTE( HB_HIWORD( l ) ), HB_LOBYTE( HB_HIWORD( l ) ), HB_HIBYTE( l ), HB_LOBYTE( l ) )
@@ -422,9 +385,88 @@ typedef unsigned long HB_PTRDIFF;
    #error Little-Endian IEEE 754 double type conversion unimplemented with a non-GCC compiler
 #endif
 
+#else
+   /* We use Little-Endian here */
+
+   #define HB_GET_LE_USHORT( p )    ( *( USHORT * )( p ) )
+   #define HB_PUT_LE_USHORT( p, w ) ( *( USHORT * )( p ) = ( USHORT ) ( w ) )
+   #define HB_GET_LE_ULONG( p )     ( *( ULONG * )( p ) )
+   #define HB_PUT_LE_ULONG( p, l )  ( *( ULONG * )( p ) = ( ULONG ) ( l ) )
+   #define HB_GET_LE_UINT64( p )    ( *( ULONGLONG * )( p ) )
+   #define HB_PUT_LE_UINT64( p, l ) ( *( ULONGLONG * )( p ) = ( ULONGLONG ) ( l ) )
+
+   #define HB_GET_BE_USHORT( p )    HB_SWAP_USHORT( *( USHORT * )( p ) )
+   #define HB_PUT_BE_USHORT( p, w ) ( *( USHORT * )( p ) = HB_SWAP_USHORT( w ) )
+   #define HB_GET_BE_ULONG( p )     HB_SWAP_ULONG( *( ULONG * )( p ) )
+   #define HB_PUT_BE_ULONG( p, l )  ( *( ULONG * )( p ) = HB_SWAP_ULONG( l ) )
+   #define HB_GET_BE_UINT64( p )    HB_SWAP_UINT64( *( ULONGLONG * )( p ) )
+   #define HB_PUT_BE_UINT64( p, l ) ( *( ULONGLONG * )( p ) = HB_SWAP_UINT64( l ) )
+
+   #define HB_GET_LE_DOUBLE( p )    ( *( double * )( p ) )
+   #define HB_PUT_LE_DOUBLE( p, d ) ( *( double * )( p ) = ( double ) ( d ) )
+
+   #define HB_USHORT_FROM_LE( w )   ( ( USHORT )( w ) )
+   #define HB_ULONG_FROM_LE( l )    ( ( ULONG )( l ) )
+   #define HB_USHORT_TO_LE( w )     ( ( USHORT )( w ) )
+   #define HB_ULONG_TO_LE( l )      ( ( ULONG )( l ) )
+   #define HB_DOUBLE_TO_LE( d )     ( ( double )( d ) )
+
+   #define HB_PCODE_MKSHORT( p )    ( *( SHORT * )( p ) )
+   #define HB_PCODE_MKUSHORT( p )   ( *( USHORT * )( p ) )
+   #define HB_PCODE_MKLONG( p )     ( *( LONG * )( p ) )
+   #define HB_PCODE_MKULONG( p )    ( *( ULONG * )( p ) )
+   #define HB_PCODE_MKDOUBLE( p )   ( *( double * )( p ) )
+
+   #define HB_ORD2DBL( o, d ) { \
+      if ( ( ( BYTE * ) ( o ) )[ 0 ] & 0x80 ) { \
+         ( ( BYTE * ) ( d ) )[ 0 ] = ( ( BYTE * ) ( o ) )[ 7 ]; \
+         ( ( BYTE * ) ( d ) )[ 1 ] = ( ( BYTE * ) ( o ) )[ 6 ]; \
+         ( ( BYTE * ) ( d ) )[ 2 ] = ( ( BYTE * ) ( o ) )[ 5 ]; \
+         ( ( BYTE * ) ( d ) )[ 3 ] = ( ( BYTE * ) ( o ) )[ 4 ]; \
+         ( ( BYTE * ) ( d ) )[ 4 ] = ( ( BYTE * ) ( o ) )[ 3 ]; \
+         ( ( BYTE * ) ( d ) )[ 5 ] = ( ( BYTE * ) ( o ) )[ 2 ]; \
+         ( ( BYTE * ) ( d ) )[ 6 ] = ( ( BYTE * ) ( o ) )[ 1 ]; \
+         ( ( BYTE * ) ( d ) )[ 7 ] = ( ( BYTE * ) ( o ) )[ 0 ] ^ ( BYTE ) 0x80; \
+      } else { \
+         ( ( BYTE * ) ( d ) )[ 0 ] = ( ( BYTE * ) ( o ) )[ 7 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( d ) )[ 1 ] = ( ( BYTE * ) ( o ) )[ 6 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( d ) )[ 2 ] = ( ( BYTE * ) ( o ) )[ 5 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( d ) )[ 3 ] = ( ( BYTE * ) ( o ) )[ 4 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( d ) )[ 4 ] = ( ( BYTE * ) ( o ) )[ 3 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( d ) )[ 5 ] = ( ( BYTE * ) ( o ) )[ 2 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( d ) )[ 6 ] = ( ( BYTE * ) ( o ) )[ 1 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( d ) )[ 7 ] = ( ( BYTE * ) ( o ) )[ 0 ] ^ ( BYTE ) 0xFF; \
+      } }
+
+   #define HB_DBL2ORD( d, o ) { \
+      if ( *( double * )( d ) >= 0.0 ) { \
+      ( ( BYTE * ) ( o ) )[ 0 ] = ( ( BYTE * ) ( d ) )[ 7 ] ^ ( BYTE ) 0x80; \
+         ( ( BYTE * ) ( o ) )[ 1 ] = ( ( BYTE * ) ( d ) )[ 6 ]; \
+         ( ( BYTE * ) ( o ) )[ 2 ] = ( ( BYTE * ) ( d ) )[ 5 ]; \
+         ( ( BYTE * ) ( o ) )[ 3 ] = ( ( BYTE * ) ( d ) )[ 4 ]; \
+         ( ( BYTE * ) ( o ) )[ 4 ] = ( ( BYTE * ) ( d ) )[ 3 ]; \
+         ( ( BYTE * ) ( o ) )[ 5 ] = ( ( BYTE * ) ( d ) )[ 2 ]; \
+         ( ( BYTE * ) ( o ) )[ 6 ] = ( ( BYTE * ) ( d ) )[ 1 ]; \
+         ( ( BYTE * ) ( o ) )[ 7 ] = ( ( BYTE * ) ( d ) )[ 0 ]; \
+      } else { \
+         ( ( BYTE * ) ( o ) )[ 0 ] = ( ( BYTE * ) ( d ) )[ 7 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( o ) )[ 1 ] = ( ( BYTE * ) ( d ) )[ 6 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( o ) )[ 2 ] = ( ( BYTE * ) ( d ) )[ 5 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( o ) )[ 3 ] = ( ( BYTE * ) ( d ) )[ 4 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( o ) )[ 4 ] = ( ( BYTE * ) ( d ) )[ 3 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( o ) )[ 5 ] = ( ( BYTE * ) ( d ) )[ 2 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( o ) )[ 6 ] = ( ( BYTE * ) ( d ) )[ 1 ] ^ ( BYTE ) 0xFF; \
+         ( ( BYTE * ) ( o ) )[ 7 ] = ( ( BYTE * ) ( d ) )[ 0 ] ^ ( BYTE ) 0xFF; \
+      } }
 #endif
 
 #define HB_PCODE_MK24BIT( p )       HB_MKLONG( *( BYTE * )( p ), ( ( BYTE * )( p ) )[ 1 ], ( ( BYTE * )( p ) )[ 2 ], 0 )
+#define HB_GET_LE_UINT24( p )       HB_PCODE_MK24BIT( p )
+#define HB_PUT_LE_UINT24( p, l )    { \
+                                       (( BYTE * )( p ))[0] = ( BYTE )( ( ( l ) & 0xFF ) ); \
+                                       (( BYTE * )( p ))[1] = ( BYTE )( ( ( l ) >>  8 ) & 0xFF ); \
+                                       (( BYTE * )( p ))[2] = ( BYTE )( ( ( l ) >> 16 ) & 0xFF ); \
+                                    }
 
 #define HB_SYMBOL_UNUSED( symbol )  ( void ) symbol
 
@@ -539,22 +581,5 @@ typedef BYTE HB_ATTR;
 #define HB_CHAR_SOFT1           ( ( char ) 141 )
 #define HB_CHAR_SOFT2           ( ( char ) HB_CHAR_LF )
 
-#ifndef HB_LONG_LONG_OFF
-#if !defined(LONGLONG) && !defined(_WINNT_H)
-#if defined(__GNUC__)
-  typedef long long LONGLONG;
-#else
-  typedef __int64 LONGLONG;
-#endif
-#endif
-
-#if !defined(ULONGLONG) && !defined(_WINNT_H)
-#if defined(__GNUC__)
-  typedef unsigned long long ULONGLONG;
-#else
-  typedef unsigned __int64 ULONGLONG;
-#endif
-#endif
-#endif /* HB_LONG_LONG_OFF */
 
 #endif /* HB_DEFS_H_ */

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.129 2004/05/02 13:44:05 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.130 2004/05/03 17:29:20 druzus Exp $
  */
 
 /*
@@ -624,7 +624,7 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
    {
       case HB_IT_STRING:
       case HB_IT_STRING | HB_IT_MEMO:
-         len = ( BYTE ) HB_MIN( pItem->item.asString.length, pTag->uiLen );
+         len = (BYTE) HB_MIN( pItem->item.asString.length, (ULONG) pTag->uiLen );
          if ( fSize && len < pTag->uiLen )
          {
             memcpy( ptr, pItem->item.asString.value, len );
