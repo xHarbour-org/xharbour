@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.14 2004/03/21 15:55:05 druzus Exp $
+ * $Id: gtcgi.c,v 1.15 2004/03/23 12:43:00 andijahja Exp $
  */
 
 /*
@@ -676,6 +676,22 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
 }
 /* *********************************************************************** */
 
+/* ********** Graphics API ********** */
+
+int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
+{
+  HB_SYMBOL_UNUSED( iType );
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( iBottom );
+  HB_SYMBOL_UNUSED( iRight );
+  HB_SYMBOL_UNUSED( iColor );
+
+  return 0;
+}
+
+/* ******** Graphics API end ******** */
+
 #ifdef HB_MULTI_GT
 
 static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
@@ -725,6 +741,9 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+    
+    /* Graphics API */
+    gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
 }
 
 /* ********************************************************************** */

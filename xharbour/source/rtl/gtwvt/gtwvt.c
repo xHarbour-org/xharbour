@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.121 2004/07/29 14:33:10 lf_sfnet Exp $
+ * $Id: gtwvt.c,v 1.122 2004/07/29 15:14:39 vouchcac Exp $
  */
 
 /*
@@ -68,13 +68,19 @@
  */
 
 //-------------------------------------------------------------------//
+
 /*
 * Individual authors:
 * (C) 2003-2004 Giancarlo Niccolai <gc at niccolai dot ws>
 *         Standard xplatform GT Info system,
 *         Graphical object system and event system.
 *         GTINFO() And GTO_* implementation.
+*
+* (C) 2004 Mauricio Abre <maurifull@datafull.com>
+*         Cross-GT, multiplatform Graphics API
+*
 */
+
 //-------------------------------------------------------------------//
 
 #define HB_OS_WIN_32_USED
@@ -4043,6 +4049,133 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
    return -1;
 }
 
+/* ********** Graphics API ********** */
+
+/*
+ * NOTE:
+ *      gfxPrimitive() parameters may have different meanings
+ *      ie: - Desired color is 'iBottom' for PUTPIXEL and 'iRight' for CIRCLE
+ *          - Red is iTop, Green iLeft and Blue is iBottom for MAKECOLOR
+ *
+ */
+
+#define SetGFXContext() hPen=CreatePen(PS_SOLID,1,color); hOldPen=(HPEN) SelectObject(hdc,hPen); hBrush=(HBRUSH) CreateSolidBrush(color); hOldBrush=(HBRUSH) SelectObject(hdc,hBrush); bOut=TRUE
+
+int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
+{
+COLORREF      color;
+HPEN          hPen, hOldPen;
+HBRUSH        hBrush, hOldBrush;
+HDC           hdc;
+BOOL          bOut = FALSE;
+int           iRet = 0;
+
+   hdc = GetDC( _s.hWnd );
+
+   switch ( iType )
+   {
+      case GFX_ACQUIRESCREEN:
+      case GFX_RELEASESCREEN:
+         return 1;
+      case GFX_MAKECOLOR:
+         return (int) ( iTop << 16 | iLeft << 8 | iBottom );
+      case GFX_PUTPIXEL:
+         color = RGB( iBottom >> 16, ( iBottom & 0xFF00 ) >> 8, iBottom & 0xFF );
+         SetGFXContext();
+
+         MoveToEx( hdc, iLeft, iTop, NULL );
+         LineTo( hdc, iLeft, iTop );
+
+         iRet = 1;
+         break;
+      case GFX_LINE:
+         color = RGB( iColor >> 16, ( iColor & 0xFF00 ) >> 8, iColor & 0xFF );
+         SetGFXContext();
+
+         MoveToEx( hdc, iLeft, iTop, NULL );
+         LineTo( hdc, iRight, iBottom );
+
+         iRet = 1;
+         break;
+      case GFX_RECT:
+      {
+         RECT r;
+         r.left = iLeft;
+         r.top = iTop;
+         r.right = iRight;
+         r.bottom = iBottom;
+
+         color = RGB( iColor >> 16, ( iColor & 0xFF00 ) >> 8, iColor & 0xFF );
+         SetGFXContext();
+
+         FrameRect( hdc, &r, hBrush );
+
+         iRet = 1;
+      }
+      break;
+      case GFX_FILLEDRECT:
+         color = RGB( iColor >> 16, ( iColor & 0xFF00 ) >> 8, iColor & 0xFF );
+         SetGFXContext();
+
+         Rectangle( hdc, iLeft, iTop, iRight, iBottom );
+
+         iRet = 1;
+         break;
+      case GFX_CIRCLE:
+         color = RGB( iRight >> 16, ( iRight & 0xFF00 ) >> 8, iRight & 0xFF );
+         SetGFXContext();
+
+         Arc( hdc, iLeft - iBottom / 2, iTop - iBottom / 2, iLeft + iBottom / 2, iTop + iBottom / 2, 0, 0, 0, 0 );
+
+         iRet = 1;
+         break;
+      case GFX_FILLEDCIRCLE:
+         color = RGB( iRight >> 16, ( iRight & 0xFF00 ) >> 8, iRight & 0xFF );
+         SetGFXContext();
+
+         Ellipse( hdc, iLeft - iBottom / 2, iTop - iBottom / 2, iLeft + iBottom / 2, iTop + iBottom / 2 );
+
+         iRet = 1;
+         break;
+      case GFX_ELLIPSE:
+         color = RGB( iColor >> 16, ( iColor & 0xFF00 ) >> 8, iColor & 0xFF );
+         SetGFXContext();
+
+         Arc( hdc, iLeft - iRight / 2, iTop - iBottom / 2, iLeft + iRight / 2, iTop + iBottom / 2, 0, 0, 0, 0 );
+
+         iRet = 1;
+         break;
+      case GFX_FILLEDELLIPSE:
+         color = RGB( iColor >> 16, ( iColor & 0xFF00 ) >> 8, iColor & 0xFF );
+         SetGFXContext();
+
+         Ellipse( hdc, iLeft - iRight / 2, iTop - iBottom / 2, iLeft + iRight / 2, iTop + iBottom / 2 );
+
+         iRet = 1;
+         break;
+      case GFX_FLOODFILL:
+         color = RGB( iBottom >> 16, ( iBottom & 0xFF00 ) >> 8, iBottom & 0xFF );
+         SetGFXContext();
+
+         FloodFill( hdc, iLeft, iTop, iColor );
+
+         iRet = 1;
+         break;
+  }
+
+  if ( bOut )
+  {
+     SelectObject( hdc, hOldPen );
+     SelectObject( hdc, hOldBrush );
+     DeleteObject( hBrush );
+     DeleteObject( hPen );
+  }
+
+  return iRet;
+}
+
+/* ******** Graphics API end ******** */
+
 //-------------------------------------------------------------------//
 
 #ifdef HB_MULTI_GT
@@ -4094,6 +4227,9 @@ static void HB_GT_FUNC( gtFnInit( PHB_GT_FUNCS gt_funcs ) )
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard       );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard       );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize   );
+
+    /* Graphics API */
+    gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
 }
 
 //-------------------------------------------------------------------//

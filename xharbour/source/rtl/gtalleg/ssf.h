@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.h,v 1.8 2004/02/06 03:36:50 maurifull Exp $
+ * $Id: ssf.h,v 1.9 2004/07/31 00:34:53 maurifull Exp $
  */
 
 /*
@@ -95,6 +95,7 @@
 #define AL_KEY_DOWN KEY_DOWN
 #define AL_KEY_LEFT KEY_LEFT
 #define AL_KEY_RIGHT KEY_RIGHT
+#define AL_KEY_QUOTE KEY_QUOTE
 #define AL_KEY_A KEY_A
 #define AL_KEY_B KEY_B
 #define AL_KEY_C KEY_C
@@ -170,13 +171,19 @@
 #define al_acquire_bitmap acquire_bitmap
 #define al_release_bitmap release_bitmap
 #define al_drawing_mode drawing_mode
+#define al_get_pixel getpixel
 #define al_put_pixel putpixel
 #define al_draw_line line
+#define al_draw_vline vline
+#define al_draw_hline hline
 #define al_draw_rect rect
 #define al_draw_rect_fill rectfill
 #define al_draw_spline spline
 #define al_draw_circle circle
 #define al_draw_circle_fill circlefill
+#define al_draw_ellipse ellipse
+#define al_draw_ellipse_fill ellipsefill
+#define al_floodfill floodfill
 #define al_draw_triangle triangle
 #define al_blit blit
 #define al_clear_to_color clear_to_color

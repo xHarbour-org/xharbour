@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.21 2004/02/17 18:44:14 andijahja Exp $
+ * $Id: gtnul.c,v 1.22 2004/04/01 22:00:42 druzus Exp $
  */
 
 /*
@@ -669,6 +669,22 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    return -1;
 }
 
+/* ********** Graphics API ********** */
+
+int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
+{
+  HB_SYMBOL_UNUSED( iType );
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( iBottom );
+  HB_SYMBOL_UNUSED( iRight );
+  HB_SYMBOL_UNUSED( iColor );
+
+  return 0;
+}
+
+/* ******** Graphics API end ******** */
+
 /* ********************************************************************** */
 
 void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
@@ -919,6 +935,13 @@ int hb_gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
 
 /* ********************************************************************** */
 
+int hb_gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor )
+{
+   return GT_FUNCS.gfxPrimitive( iType, iTop, iLeft, iBottom, iRight, iColor );
+}
+
+/* ********************************************************************** */
+
 void hb_mouse_Init( void )
 {
     GT_FUNCS.mouse_Init();
@@ -1111,6 +1134,9 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+
+    /* Graphics API */
+    gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
 }
 
 /* ********************************************************************** */

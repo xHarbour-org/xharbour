@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.16 2004/05/02 19:29:32 druzus Exp $
+ * $Id: gtdos.c,v 1.17 2004/06/23 14:09:45 likewolf Exp $
  */
 
 /*
@@ -1777,3 +1777,18 @@ int hb_gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
    return -1;
 }
 
+/* ********** Graphics API ********** */
+
+int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
+{
+  HB_SYMBOL_UNUSED( iType );
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( iBottom );
+  HB_SYMBOL_UNUSED( iRight );
+  HB_SYMBOL_UNUSED( iColor );
+
+  return 0;
+}
+
+/* ******** Graphics API end ******** */

@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.8 2004/02/06 17:07:29 jonnymind Exp $
+ * $Id: gtos2.c,v 1.9 2004/03/30 09:29:55 mauriliolongo Exp $
  */
 
 /*
@@ -1249,4 +1249,20 @@ int hb_gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
    // DEFAULT: there's something wrong if we are here.
    return -1;
 }
+
+/* ********** Graphics API ********** */
+
+int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
+{
+  HB_SYMBOL_UNUSED( iType );
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( iBottom );
+  HB_SYMBOL_UNUSED( iRight );
+  HB_SYMBOL_UNUSED( iColor );
+
+  return 0;
+}
+
+/* ******** Graphics API end ******** */
 

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.41 2004/06/06 19:23:46 lf_sfnet Exp $
+rem $Id: bld.bat,v 1.42 2004/07/02 13:12:34 paultucker Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -111,6 +111,8 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
 :COMPILE
 
+   echo Compilando
+   echo %HB_BIN_INSTALL%\harbour %1.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
    %HB_BIN_INSTALL%\harbour %1.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
    IF NOT '%2'=='' %HB_BIN_INSTALL%\harbour %2.prg -n -q0 -gc -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
    IF NOT '%2'=='' SET HB_2nd_prg=%2.c
@@ -214,10 +216,12 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    if "%HB_COMPILER%" == "msvc"    goto C_MSVC
    if "%HB_COMPILER%" == "watcom"  goto C_WATCOM
 
-   if "%HB_DLL%" == "" set HB_LIBLIST=common.lib debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbfdbt%HB_MT%.lib dbffpt%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib samples.lib hbzip.lib %ADS_LIBS% %HB_USER_LIBS%
-   if not "%HB_DLL%" == "" set HB_LIBLIST=harbour.lib %_HB_GT_LIB%.lib samples.lib hbzip.lib vm.lib %ADS_LIBS% %HB_USER_LIBS%
+   if "%HB_GTALLEG%" == "yes" set HB_ALGLIB=alleg.lib
+
+   if "%HB_DLL%" == "" set HB_LIBLIST=common.lib debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbfdbt%HB_MT%.lib dbffpt%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib samples.lib hbzip.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
+   if not "%HB_DLL%" == "" set HB_LIBLIST=harbour.lib %_HB_GT_LIB%.lib samples.lib hbzip.lib vm.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
    
-   if not "%HB_MT%" == "" SET BC_MT_FLAG=-tWM   
+   if not "%HB_MT%" == "" SET BC_MT_FLAG=-tWM
    if "%HB_MT%" == "" SET BC_MT_FLAG=
 
    if "%HB_COMPILER%" == "bcc32"   if     exist ..\lib\bcc640%HB_MT%.lib bcc32 %BC_MT_FLAG% -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% bcc640%HB_MT%.lib %HB_LIBLIST%

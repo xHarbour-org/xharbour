@@ -1,5 +1,5 @@
  /*
- * $Id: gtstd.c,v 1.14 2004/02/16 12:28:45 andijahja Exp $
+ * $Id: gtstd.c,v 1.15 2004/02/17 18:44:14 andijahja Exp $
  */
 
 /*
@@ -826,6 +826,22 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    return -1;
 }
 
+/* ********** Graphics API ********** */
+
+int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
+{
+  HB_SYMBOL_UNUSED( iType );
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( iBottom );
+  HB_SYMBOL_UNUSED( iRight );
+  HB_SYMBOL_UNUSED( iColor );
+
+  return 0;
+}
+
+/* ******** Graphics API end ******** */
+
 void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
 {
    if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
@@ -906,6 +922,9 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
     gt_funcs->info                  = HB_GT_FUNC( gt_info );
+
+    /* Graphics API */
+    gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
 }
 
 /* ********************************************************************** */

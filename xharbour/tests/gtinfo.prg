@@ -2,7 +2,7 @@
  * Test to query/set properties for graphics gts
  * Under textual gts it should only properly quit
  *
- * $Id: gtinfo.prg,v 1.4 2004/07/28 19:48:50 maurifull Exp $
+ * $Id: gtinfo.prg,v 1.5 2004/07/30 22:14:14 maurifull Exp $
  */
 #include "gtinfo.ch"
 
@@ -22,7 +22,7 @@ Local nOp
 
    While .T.
       CLEAR SCREEN
-      gtInfo(GTI_WINTITLE, "gtInfo() api demonstration program")
+//      gtInfo(GTI_WINTITLE, "gtInfo() api demonstration program")
       updKeys(.T.)
       @ 3, 5 Say "Desktop Resolution: " + ;
                AllTrim(Str(GTInfo(GTI_DESKTOPWIDTH))) + "x" + ;
@@ -99,14 +99,20 @@ Local nOp
    End
 Return Nil
 
+#define WINTIT "gtInfo() API demonstration program"
+
 Function updKeys(lPar)
 Static aKeys := Nil, lInit := .F.
+Static cStr := "", lDir := .T., nSec := Nil
 Local i, aNewKeys, nY := Row(), nX := Col()
 
   If !lInit .Or. !Empty(lPar)
     @ MaxRow(), MaxCol() - 36 Say "SHF   CTR   ALT   NUM   CAP   SCR   " Color "w+/b"
     aKeys := {0, 0, 0, 0, 0, 0}
     lInit := .T.
+    cStr := ""
+    lDir := .T.
+    nSec := Seconds()
   End
 
   i := gtInfo(GTI_KBDSHIFTS)
@@ -125,4 +131,23 @@ Local i, aNewKeys, nY := Row(), nX := Col()
   Next
 
   SetPos(nY, nX)
+
+  If Seconds() - nSec > .1
+    nSec := Seconds()
+    If lDir
+      cStr += SubStr(WINTIT, Len(cStr) + 1, 1)
+      If Len(cStr) == Len(WINTIT)
+        lDir := .F.
+        nSec += 2
+      End
+    Else
+      cStr := Left(cStr, Len(cStr) - 1)
+      If Empty(cStr)
+        lDir := .T.
+        nSec += 2
+      End
+    End
+
+    gtInfo(GTI_WINTITLE, cStr)
+  End
 Return Nil
