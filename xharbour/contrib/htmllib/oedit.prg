@@ -1,5 +1,5 @@
 /*
- * $Id: oedit.prg,v 1.1 2003/02/23 23:15:17 lculik Exp $
+ * $Id: oedit.prg,v 1.2 2003/02/24 16:09:44 lculik Exp $
  */
 
 /*
@@ -353,9 +353,9 @@ METHOD Put( lPut ) CLASS HControl
       FOR i := 1 TO Len( ::aOptions )
          cStr := "<OPTION"
          cStr += IIF( ::aOptions[ i, _OPTION_VALUE ] != NIL, ;
-                     " value=" + ::Options[ i, _OPTION_VALUE ], "" )
+                     " value=" + ::aOptions[ i, _OPTION_VALUE ], "" )
          cStr += IIF( ::aOptions[ i, _OPTION_LABEL ] != NIL, ;
-                     " label=" + ::Options[ i, _OPTION_LABEL ], "" )
+                     " label=" + ::aOptions[ i, _OPTION_LABEL ], "" )
          cStr += IIF( ::aOptions[ i, _OPTION_SELECTED ] == .T., ;
                      " SELECTED ", "" )
          cStr += IIF( ::aOptions[ i, _OPTION_DISABLED ] == .T., ;
