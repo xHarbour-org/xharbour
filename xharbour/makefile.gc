@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.gc,v 1.3 2005/02/17 12:22:26 andijahja Exp $
+# $Id: makefile.gc,v 1.4 2005/02/19 11:22:29 andijahja Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -2977,7 +2977,7 @@ $(RTL_OBJ_DIR)/listbox.o : $(RTL_OBJ_DIR)/listbox.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/math.o : $(RTL_DIR)/math.c
-	$(CC) $(CFLAGS) -DHB_MATH_ERRNO -c -I$(INC_DIR) -o $@ $^
+	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/maxrow.o : $(RTL_DIR)/maxrow.c
 	$(CC_CMD)

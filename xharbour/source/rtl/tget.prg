@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.93 2004/12/30 07:23:59 kaddath Exp $
+ * $Id: tget.prg,v 1.94 2005/01/15 17:39:54 bdj Exp $
  */
 
 /*
@@ -695,9 +695,9 @@ RETURN xVarGet
 
 METHOD Untransform( cBuffer ) CLASS Get
 
-   local xValue
+   local xValue, lUntransform := .T.
    local cChar
-   local nFor
+   local nFor, nPad := 0
    local cMaskDel := ""
 
    DEFAULT cBuffer TO ::buffer
@@ -777,15 +777,26 @@ METHOD Untransform( cBuffer ) CLASS Get
                        SubStr( cBuffer, ::LastEditable() + 1 )
 
          else
-            cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + ;
-                       StrTran( SubStr( cBuffer, ::FirstEditable( ), ;
+	    if "R" IN ::cPicFunc
+	       lUntransform := Empty( ::buffer )
+	    endif
+	    if lUntransform
+               cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + ;
+                          StrTran( SubStr( cBuffer, ::FirstEditable( ), ;
                                                  ::LastEditable( ) - ::FirstEditable( ) + 1 ), ;
                                         ",", " " ) + ;
-                       SubStr( cBuffer, ::LastEditable() + 1 )
+                          SubStr( cBuffer, ::LastEditable() + 1 )
+            endif
          endif
 
          for nFor := ::FirstEditable( ) to ::LastEditable( )
-            cMaskDel += iif( ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == ".", " ", "X" )
+            // cMaskDel += iif( ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == ".", " ", "X" )
+            if lUntransform
+               cMaskDel += iif( ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == ".", " ", "X" )
+	    endif
+            if ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == "."
+	       nPad ++
+	    endif
          next
       endif
 
@@ -797,8 +808,9 @@ METHOD Untransform( cBuffer ) CLASS Get
       cBuffer := StrTran( cBuffer, "(", " " )
       cBuffer := StrTran( cBuffer, ")", " " )
 
+      cBuffer := PadL( StrTran( cBuffer, " ", "" ), nPad )
 
-      cBuffer := PadL( StrTran( cBuffer, " ", "" ), Len( cBuffer ) )
+      // cBuffer := PadL( StrTran( cBuffer, " ", "" ), Len( cBuffer ) )
                  // It replace left, right and medium spaces.
                  // Don't replace for Alltrim()
 
@@ -1876,3 +1888,4 @@ FUNCTION Isdefcolor()
 RETURN Upper( SetColor() ) == "W/N,N/W,N/N,N/N,N/W"
 
 #endif
+
