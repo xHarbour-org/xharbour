@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.106 2004/05/09 23:40:05 druzus Exp $
+ * $Id: filesys.c,v 1.107 2004/06/08 18:05:58 lculik Exp $
  */
 
 /*
@@ -2723,10 +2723,14 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
          pbyStart += 2;
 #endif
       if( strchr( OS_PATH_DELIMITER_LIST, pbyStart[ 0 ] ) )
+      {
          pbyStart++;
+      }
 
       if( pbyBuffer != pbyStart )
+      {
          memmove( pbyBuffer, pbyStart, ulLen );
+      }
    }
 
    /* Strip the trailing (back)slash if there's one */
@@ -2735,7 +2739,9 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
       ULONG ulLen = strlen( ( char * ) pbyBuffer );
 
       if( strchr( OS_PATH_DELIMITER_LIST, pbyBuffer[ ulLen - 1 ] ) )
+      {
          pbyBuffer[ ulLen - 1 ] = '\0';
+      } 
    }
 
    return 0; // correct if it arrives here
@@ -3092,19 +3098,28 @@ USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulL
 
 #if defined(OS_HAS_DRIVE_LETTER)
       if( pbyStart[ 1 ] == OS_DRIVE_DELIMITER )
+      {
          pbyStart += 2;
+      }
 #endif
 
       if( pbyBuffer != pbyStart )
+      {
          memmove( pbyBuffer, pbyStart, ulLen );
+      }
 
       /* Strip the trailing (back)slash if there's one */
       ulPthLen = strlen( ( char * ) pbyBuffer );
+
       if( strchr( OS_PATH_DELIMITER_LIST, pbyBuffer[ ulPthLen - 1 ] ) )
+      {
          pbyBuffer[ ulPthLen  ] = '\0';
+      }
       else
+      {
          strcat( pbyBuffer,OS_PATH_DELIMITER_LIST);
-      
+      }
+
       return 0; // if it reaches here, it is right.
    }
 }
