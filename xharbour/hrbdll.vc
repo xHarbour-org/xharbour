@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.14 2003/09/04 22:05:02 andijahja Exp $
+# $Id: hrbdll.vc,v 1.15 2003/09/09 02:07:54 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -359,17 +359,29 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\expropt2.obj \
   $(OBJ_DIR)\reserved.obj \
 #
-# dbfntx
-#
-  $(OBJ_DIR)\dbfntx1.obj \
-#
-  $(OBJ_DIR)\dbfntx0.obj \
-#
 # dbfcdx
 #
   $(OBJ_DIR)\dbfcdx1.obj \
 #
   $(OBJ_DIR)\dbfcdx0.obj \
+#
+# dbfdbt
+#
+  $(OBJ_DIR)\dbfdbt1.obj \
+#
+  $(OBJ_DIR)\dbfdbt0.obj \
+#
+# dbffpt
+#
+  $(OBJ_DIR)\dbffpt1.obj \
+#
+  $(OBJ_DIR)\dbffpt0.obj \
+#
+# dbfntx
+#
+  $(OBJ_DIR)\dbfntx1.obj \
+#
+  $(OBJ_DIR)\dbfntx0.obj \
 #
 # Lang
 #
@@ -1575,15 +1587,6 @@ $(OBJ_DIR)\nulsys.c : $(RDD_DIR)\nulsys\nulsys.prg
 $(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
-$(OBJ_DIR)\dbfntx0.c : $(RDD_DIR)\dbfntx\dbfntx0.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\dbfntx0.obj : $(OBJ_DIR)\dbfntx0.c
-   $(CC) $(CLIBFLAGS) /Fo$@ $**
-
-$(OBJ_DIR)\dbfntx1.obj : $(RDD_DIR)\dbfntx\dbfntx1.c
-  $(CC) $(CLIBFLAGS) /Fo$@ $**
-
 $(OBJ_DIR)\dbfcdx0.c : $(RDD_DIR)\dbfcdx\dbfcdx0.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
@@ -1592,6 +1595,33 @@ $(OBJ_DIR)\dbfcdx0.obj : $(OBJ_DIR)\dbfcdx0.c
 
 $(OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\dbfdbt0.c : $(RDD_DIR)\dbfdbt\dbfdbt0.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dbfdbt0.obj : $(OBJ_DIR)\dbfdbt0.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\dbfdbt1.obj : $(RDD_DIR)\dbfdbt\dbfdbt1.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\dbffpt0.c : $(RDD_DIR)\dbffpt\dbffpt0.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dbffpt0.obj : $(OBJ_DIR)\dbffpt0.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\dbffpt1.obj : $(RDD_DIR)\dbffpt\dbffpt1.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\dbfntx0.c : $(RDD_DIR)\dbfntx\dbfntx0.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dbfntx0.obj : $(OBJ_DIR)\dbfntx0.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\dbfntx1.obj : $(RDD_DIR)\dbfntx\dbfntx1.c
+  $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\dbghelp.c : $(DEBUG_DIR)\dbghelp.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
