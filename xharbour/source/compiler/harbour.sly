@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.8 2002/03/30 06:46:59 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.9 2002/04/21 01:39:17 ronpinkas Exp $
  */
 
 /*
@@ -177,7 +177,7 @@ static void hb_compDebugStart( void ) { };
 %token AS_ARRAY AS_BLOCK AS_CHARACTER AS_CLASS AS_DATE AS_LOGICAL AS_NUMERIC AS_OBJECT AS_VARIANT DECLARE OPTIONAL DECLARE_CLASS DECLARE_MEMBER
 %token AS_ARRAY_ARRAY AS_BLOCK_ARRAY AS_CHARACTER_ARRAY AS_CLASS_ARRAY AS_DATE_ARRAY AS_LOGICAL_ARRAY AS_NUMERIC_ARRAY AS_OBJECT_ARRAY
 %token PROCREQ GET
-%token WITHOBJ
+%token WITHOBJ FOREACH
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
@@ -1693,6 +1693,7 @@ ExecFlow   : IfEndif
            | DoCase
            | DoWhile
            | ForNext
+           | ForEach
            | BeginSeq
            ;
 
@@ -1938,6 +1939,38 @@ ForStatements : EmptyStats NEXT                     { hb_compLinePush(); --hb_co
            | EmptyStats NEXT IdentName              { hb_compLinePush(); --hb_comp_wForCounter; }
            | EmptyStats END                         { hb_compLinePush(); --hb_comp_wForCounter; }
            | EmptyStats END IdentName               { hb_compLinePush(); --hb_comp_wForCounter; }
+           ;
+
+ForEach    : FOREACH LValue  /* 1  2 */
+               {  /* 3 */
+                  hb_compLinePush();
+                  hb_compDebugStart();
+                  ++hb_comp_wForCounter;
+                  hb_compExprGenPush( $2 );
+               }
+             IN Expression /* 4 5 */
+               { /* 6 */
+                  hb_compExprGenPush( $5 );
+                  hb_compGenPCode1( HB_P_FOREACH );
+                  $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;  /* 6 */
+                  hb_compGenPCode1( HB_P_ENUMERATE );
+                  hb_compLoopStart();
+               }
+             Crlf                                     /* 7 */
+               { /* 8 */
+                  $<lNumber>$ = hb_compGenJumpFalse( 0 );   /* 8 */
+               }
+             ForStatements                            /* 9 */
+               {
+                  hb_compLoopHere();
+                  hb_compGenJump( $<lNumber>6 - hb_comp_functions.pLast->lPCodePos );
+                  hb_compGenJumpHere( $<lNumber>8 );
+                  hb_compLoopEnd();
+                  hb_compGenPCode1( HB_P_ENDENUMERATE );
+                  hb_compExprDelete( $5 );
+                  hb_compExprDelete( $2 );
+                  hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
+               }
            ;
 
 WithObject   : WITHOBJ Expression { hb_compGenWithObject($2); } Crlf

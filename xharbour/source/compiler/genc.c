@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.9 2002/03/17 00:10:12 ronpinkas Exp $
+ * $Id: genc.c,v 1.10 2002/04/21 01:39:17 ronpinkas Exp $
  */
 
 /*
@@ -2043,6 +2043,33 @@ static HB_GENC_FUNC( hb_p_endwithobject )
    return 1;
 }
 
+static HB_GENC_FUNC( hb_p_foreach )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_FOREACH,\n" );
+   return 1;
+}
+
+static HB_GENC_FUNC( hb_p_enumerate )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_ENUMERATE,\n" );
+   return 1;
+}
+
+static HB_GENC_FUNC( hb_p_endenumerate )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_ENDENUMERATE,\n" );
+   return 1;
+}
+
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
@@ -2187,7 +2214,10 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_withobject,
    hb_p_sendwith,
    hb_p_sendwithshort,
-   hb_p_endwithobject
+   hb_p_endwithobject,
+   hb_p_foreach,
+   hb_p_enumerate,
+   hb_p_endenumerate
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

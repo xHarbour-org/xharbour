@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.162 2002/04/18 17:10:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.163 2002/04/21 01:39:15 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-22 18:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + #define HB_MAX_ENUMERATIONS 16
+
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+    + Added support for new HB_P_FOREACH, HB_P_ENUMERATE, HB_P_ENDENUMERATE
+
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+  * source/vm/hvm.c
+    + Added support for new syntax:
+      FOR EACH <id> IN <Arrayr>|<Object>
+         [...]
+      NEXT
+
+      Note: FOR EACH may be nested up-to HB_MAX_ENUMERATIONS levels deep.
+
+  /*
+     This allows for automatic enumeration of all elements in an Array, and/or all Properties of an Object.
+  */
 
 2002-04-20 18:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h

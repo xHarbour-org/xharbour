@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.58 2002/04/18 17:10:38 ronpinkas Exp $
+ * $Id: hvm.c,v 1.59 2002/04/21 01:39:17 ronpinkas Exp $
  */
 
 /*
@@ -263,6 +263,11 @@ HB_ITEM hb_vm_aWithObject[ HB_MAX_WITH_OBJECTS ];
 USHORT  hb_vm_wWithObjectCounter; // Initilaized in hb_vmInit()
 BOOL    hb_vm_bWithObject = FALSE;
 
+HB_ITEM  hb_vm_aEnumCollection[ HB_MAX_ENUMERATIONS ];
+PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
+USHORT   hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
+USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
+
 /* 21/10/00 - maurilio.longo@libero.it
    This Exception Handler gets called in case of an abnormal termination of an harbour program and
    displays a full stack trace at the harbour language level */
@@ -303,6 +308,13 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       hb_vm_aWithObject[ hb_vm_wWithObjectCounter ].type = HB_IT_NIL;
    }
    hb_vm_wWithObjectCounter = 0;
+
+   for ( hb_vm_wEnumCollectionCounter = 0; hb_vm_wEnumCollectionCounter++; hb_vm_wEnumCollectionCounter < HB_MAX_ENUMERATIONS )
+   {
+      hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type = HB_IT_NIL;
+      hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
+   }
+   hb_vm_wEnumCollectionCounter = 0;
 
    HB_TRACE( HB_TR_INFO, ("xinit" ) );
    hb_xinit();
@@ -756,6 +768,36 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          case HB_P_ENDWITHOBJECT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENDWITHOBJECT") );
             hb_itemClear( &( hb_vm_aWithObject[ --hb_vm_wWithObjectCounter ] ) );
+            w++;
+            break;
+
+         case HB_P_FOREACH:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_FOREACH") );
+            hb_itemForwardValue( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_stackItemFromTop( -1 ) );
+            hb_stackPop();
+            if( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_ARRAY )
+            {
+               hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_itemPutNI( * hb_stack.pPos, 1 ) );
+            }
+            hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] = hb_stackItemFromTop( -1 )->pOrigin;
+            hb_stackPop();
+            hb_vm_wEnumCollectionCounter++;
+            w++;
+            break;
+
+         case HB_P_ENUMERATE:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_ENUMERATE") );
+            hb_vmPushLogical( hb_arrayGet( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter - 1 ] ),
+                                          ++hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ],
+                                          hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter - 1 ] ) );
+
+            w++;
+            break;
+
+         case HB_P_ENDENUMERATE:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_ENDENUMERATE") );
+            hb_itemClear( &( hb_vm_aEnumCollection[ --hb_vm_wEnumCollectionCounter ] ) );
+            hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
             w++;
             break;
 

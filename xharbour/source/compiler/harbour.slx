@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.3 2002/03/14 19:14:16 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.4 2002/04/21 01:39:17 ronpinkas Exp $
  */
 
 /*
@@ -234,6 +234,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "EXTERNAL"            ) AS_TOKEN( HB_WANTS_ID  - EXTERN           ),
                          LEX_WORD( "FIELD"               ) AS_TOKEN( HB_WANTS_ID  - FIELD            ),
                          LEX_WORD( "FOR"                 ) AS_TOKEN( HB_WANTS_VAR - FOR              ),
+                         LEX_WORD( "FOR{WS}EACH"         ) AS_TOKEN( FOREACH                         ),
                          LEX_WORD( "FUNCTION"            ) AS_TOKEN( HB_WANTS_ID  - FUNCTION         ),
                          LEX_WORD( "IF"                  ) AS_TOKEN( HB_WANTS_EXP - IF               ),
                          LEX_WORD( "INIT{WS}FUNCTION"    ) AS_TOKEN( HB_INIT_FUNC     ),
@@ -331,6 +332,9 @@ LANGUAGE_RULES_ARE {
                     IF_SEQUENCE_IS( WANTS_VAR      , MACROTEXT   , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( WANTS_VAR      , '&'         , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( WANTS_VAR      , 0           , 0      , 0          ) REDUCE_TO( HB_IDENTIFIER     , 0             ),
+
+                    IF_SEQUENCE_IS( FOREACH        , IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( FOREACH        , 0           , 0      , 0          ) REDUCE_TO( FOR, HB_IDENTIFIER ),
 
                     /* Wants Identifier. */
                     IF_SEQUENCE_IS( WANTS_ID       , IDENTIFIER  , 0      , 0          ) PASS_THROUGH(),

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.6 2002/03/10 18:41:54 ronpinkas Exp $
+ * $Id: hbpcode.h,v 1.7 2002/04/21 01:39:17 ronpinkas Exp $
  */
 
 /*
@@ -202,8 +202,11 @@ typedef enum
    HB_P_SENDWITH,              /* 136 */
    HB_P_SENDWITHSHORT,         /* 137 */
    HB_P_ENDWITHOBJECT,         /* 138 */
+   HB_P_FOREACH,               /* 139 */
+   HB_P_ENUMERATE,             /* 140 */
+   HB_P_ENDENUMERATE,          /* 141 */
 /* NOTE: This have to be the last definition */
-   HB_P_LAST_PCODE             /* 139 this defines the number of defined pcodes */
+   HB_P_LAST_PCODE             /* 142 this defines the number of defined pcodes */
 } HB_PCODE;
 
 #endif /* HB_PCODE_H_ */
