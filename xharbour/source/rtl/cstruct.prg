@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.16 2002/10/06 08:15:59 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.17 2002/11/29 20:09:17 walito Exp $
  */
 
 /*
@@ -231,6 +231,10 @@ Function HB_CStructure( cStructure, nAlign )
    acMembers := s_aClasses[nID][3]
    aCTypes   := s_aClasses[nID][4]
 
+   IF VAlType( nAlign ) != 'N'
+      nAlign := s_aClasses[nID][5]
+   ENDIF
+
    IF s_aClasses[nID][2] == NIL
 
       //TraceLog( "Created: " + Str( nId ) )
@@ -259,13 +263,13 @@ Function HB_CStructure( cStructure, nAlign )
 
       Counter++
 
-      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
-      __clsAddMsg( hClass, "_nAlign"        , Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
+      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_DATA, nAlign, /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass, "_nAlign"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
 
       Counter++
 
-      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
-      __clsAddMsg( hClass, "_SizeOf"        , Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
+      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_DATA, HB_SizeOfCStructure( acTypes, nAlign ), /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass, "_SizeOf"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
 
       Counter++
 
@@ -293,9 +297,9 @@ Function HB_CStructure( cStructure, nAlign )
    // All instances will share the same definitions array.
    oStructure:aCTypes := aCTypes // same as: s_aClasses[nID][4]
 
-   oStructure:nAlign := IIF( ValType( nAlign ) == "N", nAlign, s_aClasses[nID][5] )
+   //oStructure:nAlign := IIF( ValType( nAlign ) == "N", nAlign, s_aClasses[nID][5] )
 
-   oStructure:SizeOf := HB_SizeOfCStructure( acTypes, oStructure:nAlign )
+   //oStructure:SizeOf := HB_SizeOfCStructure( acTypes, oStructure:nAlign )
 
    oStructure:nId := nID + CTYPE_STRUCTURE
 
@@ -416,13 +420,13 @@ Function HB_CTypeArrayID( CType, nLen )
 
       Counter++
 
-      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
-      __clsAddMsg( hClass, "_nAlign"        , Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
+      __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass, "_nAlign"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
 
       Counter++
 
-      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
-      __clsAddMsg( hClass, "_SizeOf"        , Counter, HB_OO_MSG_DATA, , HB_OO_CLSTP_READONLY )
+      __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
+      __clsAddMsg( hClass, "_SizeOf"        , Counter, HB_OO_MSG_DATA, , /*HB_OO_CLSTP_READONLY*/ )
 
       Counter++
 
