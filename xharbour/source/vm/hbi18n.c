@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.6 2003/06/23 22:41:38 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.7 2003/06/24 00:41:05 jonnymind Exp $
  */
 
 /*
@@ -578,7 +578,7 @@ HB_FUNC( HB_I18NSAVETABLE )
    if ( HB_IS_STRING( pParam ) )
    {
 
-      handle = hb_fsCreate( (BYTE *) hb_itemGetCPtr( pParam ), FO_WRITE );
+      handle = hb_fsCreate( (BYTE *) hb_itemGetCPtr( pParam ), FC_NORMAL );
 
       // an opening failure will cause following operations to fail
       if ( handle < 0 ) {
