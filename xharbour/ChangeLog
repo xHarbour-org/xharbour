@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1802 2003/12/01 03:41:02 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1803 2003/12/01 03:45:09 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,10 +11,6 @@
 2003-11-30 19:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * contrib/tip/makefile.bc
     - Removed tiputil.prg
-
-  * contrib/tip/tiputils.c
-  * source/rdd/dbcmd.c
-    * MSVC compilaton
 
   * contrib/tip/tiputils.c
   * source/rdd/dbcmd.c
