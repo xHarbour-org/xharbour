@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.5 2003/09/23 21:23:56 paultucker Exp $
+ * $Id: files.c,v 1.6 2003/09/24 01:20:34 druzus Exp $
  */
 
 /*
@@ -907,7 +907,7 @@ HB_FUNC( FILEDELETE )
          uiAttr = hb_parni( 2 );
       }
 
-      if( ( ffind = hb_fsFindFirst( pDirSpec, uiAttr ) ) != NULL )
+      if( ( ffind = hb_fsFindFirst( ( const char *)pDirSpec, uiAttr ) ) != NULL )
       {
          do
          {
