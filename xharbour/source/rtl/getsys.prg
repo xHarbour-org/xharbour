@@ -1,5 +1,5 @@
 /*
- * $Id: getsys.prg,v 1.11 2003/06/22 05:34:29 ronpinkas Exp $
+ * $Id: getsys.prg,v 1.12 2005/01/15 17:39:54 bdj Exp $
  */
 
 /*
@@ -81,11 +81,14 @@ FUNCTION ReadModal( GetList, nPos )
       RETURN .F.
    ENDIF
 
+   nPos := IF( ISNUMBER( nPos ), nPos, 0 )
+
    oGetList := HBGetList():New( GetList )
    oGetList:cReadProcName := ProcName( 1 )
    oGetList:nReadProcLine := ProcLine( 1 )
    #ifdef HB_COMPAT_C53
-   oGetList:nSaveCursor   := SetCursor(SC_NONE)
+   oGetList:nSaveCursor   := SetCursor( SC_NONE )
+   oGetList:nNextGet      := nPos
    #endif
 
    oSaveGetList := __GetListActive( )
@@ -94,11 +97,7 @@ FUNCTION ReadModal( GetList, nPos )
 
 #ifdef HB_COMPAT_C53
 
-   IF ISNUMBER( nPos )
-      oGetList:nPos := oGetList:Settle( nPos, TRUE )
-   ELSE
-      oGetList:nPos := oGetList:Settle(    0, TRUE )
-   ENDIF
+   oGetList:nPos := oGetList:Settle( nPos, TRUE )
 
    oGetMsg := GetMssgLine():new( nMsgRow, nMsgLeft, nMsgRight, cMsgColor )
 
@@ -109,13 +108,12 @@ FUNCTION ReadModal( GetList, nPos )
       oGetMsg:saveScreen()
    endif
 
-   oGetList:nNextGet := 0
    oGetList:nHitCode := 0
    oGetList:nMenuID  := 0
 
 #else
 
-   IF ! ( ISNUMBER( nPos ) .AND. nPos > 0 )
+   IF ! nPos > 0
       oGetList:nPos := oGetList:Settle( 0 )
    ENDIF
 
@@ -249,12 +247,6 @@ FUNCTION GetPostValidate( oGet )
    ENDIF
 
    RETURN .F.
-
-FUNCTION ReadExit( lExit )
-   RETURN IF( ISLOGICAL( lExit ), Set( _SET_EXIT, lExit ), Set( _SET_EXIT ) )
-
-FUNCTION ReadInsert( lInsert )
-   RETURN IF( ISLOGICAL( lInsert ), Set( _SET_INSERT, lInsert ), Set( _SET_INSERT ) )
 
 FUNCTION ReadUpdated( lUpdated )
 /*   LOCAL oGetList := __GetListActive() */

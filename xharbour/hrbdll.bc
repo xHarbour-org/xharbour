@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.84 2005/01/23 14:00:00 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.84 2005/01/23 12:14:30 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -236,6 +236,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dircmd.obj \
   $(OBJ_DIR)\dummy.obj \
   $(OBJ_DIR)\dumpvar.obj \
+  $(OBJ_DIR)\error.obj \
   $(OBJ_DIR)\errorsys.obj \
   $(OBJ_DIR)\fieldbl.obj \
   $(OBJ_DIR)\getlist.obj \
@@ -840,6 +841,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\dircmd.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\dummy.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\dumpvar.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\error.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\errorsys.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\fieldbl.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\getlist.obj           + >> hdll.tmp
@@ -1544,6 +1546,9 @@ $(OBJ_DIR)\dumpvar.obj : $(OBJ_DIR)\dumpvar.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\empty.obj : $(RTL_DIR)\empty.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\error.obj : $(RTL_DIR)\error.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\errorsys.c : $(RTL_DIR)\errorsys.prg

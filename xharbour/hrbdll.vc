@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.64 2005/01/23 14:00:00 ptsarenko Exp $
+# $Id: hrbdll.vc,v 1.64 2005/01/23 12:14:30 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -233,6 +233,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dircmd.obj \
   $(OBJ_DIR)\dummy.obj \
   $(OBJ_DIR)\dumpvar.obj \
+  $(OBJ_DIR)\error.obj \
   $(OBJ_DIR)\errorsys.obj \
   $(OBJ_DIR)\fieldbl.obj \
   $(OBJ_DIR)\getlist.obj \
@@ -1100,6 +1101,9 @@ $(OBJ_DIR)\dumpvar.obj : $(OBJ_DIR)\dumpvar.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\empty.obj : $(RTL_DIR)\empty.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\error.obj : $(RTL_DIR)\error.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\errorapi.obj : $(VM_DIR)\errorapi.c

@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.13 2004/07/03 03:34:54 ronpinkas Exp $
+ * $Id: terror.prg,v 1.14 2004/10/26 00:38:46 ronpinkas Exp $
  */
 
 /*
@@ -142,9 +142,6 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName 
    lInErr := .F.
 
 RETURN oErr
-
-FUNCTION Error()
-RETURN ErrorNew()
 
 #ifndef HB_THREAD_SUPPORT
 

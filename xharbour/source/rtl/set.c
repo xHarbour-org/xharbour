@@ -1,9 +1,9 @@
 /*
- * $Id: set.c,v 1.58 2004/11/07 21:12:54 guerra000 Exp $
+ * $Id: set.c,v 1.59 2005/01/25 10:47:53 druzus Exp $
  */
 
 /*
- * Harbour Project source code:
+ * xHarbour Project source code:
  * Set functions
  *
  * Copyright 1999-2001 David G. Holm <dholm@jsd-llc.com>
@@ -479,7 +479,9 @@ HB_FUNC( SETCANCEL )
    hb_retl( hb_set.HB_SET_CANCEL );
 
    if( ISLOG( 1 ) )
+   {
       hb_set.HB_SET_CANCEL = hb_parl( 1 );
+   }
 }
 
 HB_FUNC( __SETCENTURY )
@@ -566,6 +568,26 @@ HB_FUNC( __SETCENTURY )
 
    /* Return the previous setting */
    hb_retl( old_century_setting );
+}
+
+HB_FUNC( READEXIT )
+{
+   hb_retl( hb_set.HB_SET_EXIT );
+
+   if( ISLOG( 1 ) )
+   {
+      hb_set.HB_SET_EXIT = hb_parl( 1 );
+   }
+}
+
+HB_FUNC( READINSERT )
+{
+   hb_retl( hb_set.HB_SET_INSERT );
+
+   if( ISLOG( 1 ) )
+   {
+      hb_set.HB_SET_INSERT = hb_parl( 1 );
+   }
 }
 
 HB_FUNC( SET )

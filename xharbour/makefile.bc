@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.138 2005/01/23 14:00:00 ptsarenko Exp $
+# $Id: makefile.bc,v 1.138 2005/01/23 12:14:30 ptsarenko Exp $
 #
 
 #
@@ -497,6 +497,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\dircmd.obj \
    $(RTL_OBJ_DIR)\dummy.obj \
    $(RTL_OBJ_DIR)\dumpvar.obj \
+   $(RTL_OBJ_DIR)\error.obj \
    $(RTL_OBJ_DIR)\errorsys.obj \
    $(RTL_OBJ_DIR)\fieldbl.obj \
    $(RTL_OBJ_DIR)\getlist.obj \
@@ -1948,6 +1949,9 @@ $(RTL_OBJ_DIR)\dumpvar.obj : $(RTL_OBJ_DIR)\dumpvar.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\empty.obj : $(RTL_DIR)\empty.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\error.obj : $(RTL_DIR)\error.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\errorsys.c : $(RTL_DIR)\errorsys.prg

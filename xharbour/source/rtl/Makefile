@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.58 2004/11/10 14:36:34 lf_sfnet Exp $
+# $Id: Makefile,v 1.59 2004/12/08 01:25:47 peterrees Exp $
 #
 
 ROOT = ../../
@@ -32,6 +32,7 @@ C_SOURCES=\
         diskspac.c   \
         disksphb.c   \
         empty.c      \
+        error.c      \
         file.c       \
         filehb.c     \
         filestat.c   \
