@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1964 2003/12/30 10:24:44 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.1965 2003/12/30 11:52:45 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-30 10:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  + lib/bcc640mt.lib
+    + Added mt version of bcc640.lib
+  ! bin/bld.bat
+    ! on MT compilation with bcc32 compiler use bcc640mt.lib
+  ! utils/hbmake/hbmake.prg
+    ! if use MT libs options is selected, use bcc640mt.lib
 
 2003-12-30 12:45 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * bin/bld.bat
