@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.668 2003/01/31 21:07:42 walito Exp $
+ * $Id: ChangeLog,v 1.669 2003/02/01 12:45:30 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-01 12:10 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rdd/dbcmd.c
+    ! Last change fix linux problem with RLOCK() but break windows.
+      Fix now to work properly on both system
 
 2003-02-01 13:46 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   ! source/vm/thread.c
