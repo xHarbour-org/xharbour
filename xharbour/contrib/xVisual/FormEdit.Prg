@@ -189,6 +189,8 @@ METHOD CreateControl(aRect)
       if oObj!=NIL
          oApp:MainFrame:ObjInsp:InspCombo:AddString(oObj:propname+chr(9)+oObj:ClassName(),oObj)
          oApp:MainFrame:ObjInsp:InspCombo:SetCurSel(oApp:MainFrame:ObjInsp:InspCombo:GetCount()-1)
+         ::Parent:ObjTree:Tree:Add( oObj:PropName,1 )
+         ::Parent:ObjTree:Tree:Expand()
       endif
    ENDIF
    ::Parent:StdBar:CheckButton( 100, .T. )
@@ -243,7 +245,9 @@ METHOD CreateSub()
    
    ::Parent:ObjInsp:InspCombo:AddString(::PropName+chr(9)+::ClassName(),self)
    ::Parent:ObjInsp:InspCombo:SetCurSel(::Parent:ObjInsp:InspCombo:GetCount()-1)
-
+   
+   ::Parent:ObjTree:Tree:Add( ::PropName )
+   
    xRet := super:OnCreate()
 
    ::oMask:=oCtrlMask():New( self )

@@ -5,11 +5,9 @@
 
 //-------------------------------------------------------------------------//
 
-HB_FUNC( TVINSERTITEM ) // ( hWnd, cItemText, hItem, nImage )
+HB_FUNC( TVINSERTITEM )
 {
    TV_INSERTSTRUCT is;
-
-//   _bset( ( LPBYTE ) &is, 0, sizeof( TV_INSERTSTRUCT ) );
 
    is.hParent      = ( HTREEITEM ) hb_parnl( 3 );
    is.hInsertAfter = TVI_LAST;
@@ -67,3 +65,4 @@ HB_FUNC( TVGETSELECTED ) // ( hWnd ) --> hItem
 }
 
 //-------------------------------------------------------------------------//
+
