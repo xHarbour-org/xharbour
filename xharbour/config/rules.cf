@@ -1,5 +1,5 @@
 #
-# $Id: rules.cf,v 1.7 2003/12/20 10:57:27 lf_sfnet Exp $
+# $Id: rules.cf,v 1.8 2003/12/28 22:25:33 druzus Exp $
 #
 
 # How to run yacc.
@@ -18,9 +18,14 @@ ifneq ($(HB),)
 # there is no slash at the end
 HB := $(HB_BIN_COMPILE)/
 endif
-HB := $(HB)harbour$(EXE_EXT)
 
+ifeq ($(HB_COMPILER),clipper)
+HB := $(HB)clipper$(EXE_EXT)
+HB_FLAGS = -n -q -w -es2 $(HB_USER_FLAGS)
+else
+HB := $(HB)harbour$(EXE_EXT)
 HB_FLAGS = -n -q0 -w -es2 -gc0 $(HB_USER_FLAGS) -I$(TOP) -I$(TOP)include -I$(HB_INC_COMPILE) $(HB_MT_FLAGS)
+endif
 
 # The rule to link an executable.
 ifeq ($(LD_RULE),)
@@ -73,14 +78,20 @@ endif
 %$(EXE_EXT) : %$(OBJ_EXT)
 	$(LD_RULE)
 
+ifeq ($(HB_COMPILER),clipper)
+# Rule to generate a OBJ file from a PRG file.
+%$(OBJ_EXT) : $(GRANDP)%.prg
+	$(HB) $(subst /,\,$?)) $(PRG_USR) $(HB_FLAGS)
+else
 # Rule to generate a C file from a PRG file.
 %.c : $(GRANDP)%.prg
 	$(HB) $? $(PRG_USR) $(HB_FLAGS)
+endif
 
 ifeq ($(SHLVL),) # COMMAND.COM
 # Do nothing. the $(hb_architecture)/global.cf will handle clean up.
 else
 # Generic rule to clean up.
 clean::
-	-$(RM) *.bak *.obj core *.core *~ *.o
+	-$(RM) *.bak *.obj core *.core *~ *.o *.ppo
 endif

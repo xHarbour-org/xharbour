@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.17 2003/12/18 11:11:25 druzus Exp $
+# $Id: gcc.cf,v 1.18 2004/01/03 14:06:20 jonnymind Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -35,6 +35,10 @@ endif
 
 LD = gcc
 LD_OUT = -o
+
+# Add all libraries specified in HB_USER_LIBS.
+LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)

@@ -1,5 +1,5 @@
 #
-# $Id: djgpp.cf,v 1.5 2003/09/25 02:24:02 paultucker Exp $
+# $Id: djgpp.cf,v 1.6 2003/12/28 22:25:33 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -25,6 +25,10 @@ endif
 LD = gcc
 LD_OUT = -o
 LDLIBS = -lm
+
+# Add all libraries specified in HB_USER_LIBS.
+LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)

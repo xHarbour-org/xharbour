@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.58 2003/12/29 11:16:51 druzus Exp $
+ * $Id: filesys.c,v 1.59 2003/12/29 12:41:04 lculik Exp $
  */
 
 /*
@@ -3410,7 +3410,7 @@ void  HB_EXPORT hb_fsSetError( USHORT uiError )
    #if defined(X__WIN32__)
       s_uiErrorLast=WintoDosError(uiError);
    #else
-      #if !defined( HB_OS_WIN_32 )
+      #if !defined( HB_OS_WIN_32 ) || defined(__WATCOMC__)
          s_uiErrorLast = GnuErrtoDosErr( uiError );
       #else
          s_uiErrorLast = uiError;
