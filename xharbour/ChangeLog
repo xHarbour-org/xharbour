@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1276 2003/07/22 11:35:09 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1277 2003/07/22 12:31:06 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-07-22 13:15 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/odbc/odbc.c
+    + Added New PRG level function:
+        SQLCOLATTRIBUTE()
 
 2003-07-22 13:35 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/hblog.prg

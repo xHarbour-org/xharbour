@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.6 2003/06/21 03:17:56 ronpinkas Exp $
+ * $Id: odbc.c,v 1.7 2003/07/15 09:15:33 andijahja Exp $
  */
 
 /*
@@ -75,6 +75,7 @@
  *    SQLGETSTMTOPTION()
  *    SQLCOMMIT()
  *    SQLROLLBACK()
+ *    SQLCOLATTRIBUTE()
  *
  * See doc/license.txt for licensing terms.
  */
@@ -280,6 +281,29 @@ HB_FUNC( SQLDESCRIB )
        hb_stornl( ( LONG ) wColSize, 7 );
        hb_stornl( ( LONG ) wDecimals, 8 );
        hb_stornl( ( LONG ) wNullable, 9 );
+    }
+
+    hb_xfree( ( PTR ) bBuffer );
+    hb_retni( wResult );
+}
+
+/* SQLCOLATTRIBUTE( hStmt, nCol, nField, @cName, nLen, @nBufferLen, @nAttribute ) --> nRetCode */
+HB_FUNC( SQLCOLATTRIBUTE )
+{
+    SDWORD      lLen      = ( SDWORD ) hb_parnl( 5 );
+    PTR         bBuffer   = hb_xgrab( lLen );
+    SQLSMALLINT wBufLen   = hb_parni( 6 );
+    SQLSMALLINT wNumPtr   = hb_parni( 7 );
+    WORD        wResult   = SQLColAttribute( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ), hb_parni( 3 ),
+                                            (unsigned char*) bBuffer, hb_parni( 5 ), &wBufLen,
+                                            &wNumPtr );
+
+    if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
+    {
+       hb_storclen( ( LPSTR ) bBuffer,
+                    ( WORD ) wBufLen, 4 );
+       hb_stornl( ( LONG ) wBufLen, 6 );
+       hb_stornl( ( LONG ) wNumPtr, 7 );
     }
 
     hb_xfree( ( PTR ) bBuffer );
