@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.420 2002/10/05 06:05:29 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.421 2002/10/05 08:16:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-05 01:57 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    + Added new PRG function HB_QSelf() to retuen the correct SELF object, even if called from a Codeblock.
 
 2002-10-05 01:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.108 2002/09/24 04:23:54 ronpinkas Exp $
+ * $Id: hvm.c,v 1.109 2002/10/05 06:05:31 ronpinkas Exp $
  */
 
 /*
@@ -6102,6 +6102,24 @@ HB_FUNC( HB_EXEC )
 HB_FUNC( HB_QWITH )
 {
    hb_itemCopy( &hb_stack.Return, &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ) );
+}
+
+HB_FUNC( HB_QSELF )
+{
+   PHB_ITEM * pBase = hb_stack.pBase;
+
+   // Outer function level.
+   pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+
+   // Outer while in Block.
+   while( ( strcmp( ( *pBase )->item.asSymbol.value->szName, "EVAL" ) == 0 ||
+            strcmp( ( *pBase )->item.asSymbol.value->szName, "__EVAL" ) == 0 ) &&
+           pBase != hb_stack.pItems )
+   {
+      pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+   }
+
+   hb_itemCopy( &hb_stack.Return, *( pBase + 1 ) );
 }
 
 HB_FUNC( __OPCOUNT ) /* it returns the total amount of opcodes */
