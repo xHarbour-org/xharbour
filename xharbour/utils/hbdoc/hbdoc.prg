@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbdoc.prg,v 1.3 2003/10/13 03:40:12 lculik Exp $
+ * $Id: hbdoc.prg,v 1.4 2003/12/29 18:25:56 lculik Exp $
  */
 
 /*
@@ -54,8 +54,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2003/10/13 03:40:12 $
- * Revision..: $Revision: 1.3 $
+ * Date......: $Date: 2003/12/29 18:25:56 $
+ * Revision..: $Revision: 1.4 $
  * Log file..: $Logfile:     $
  *
  *
@@ -249,7 +249,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
 
    IF cLinkName = NIL
       ?? "XHarbour Doc Extractor"
-      ? "Copyright 1999-2001, http://www.xharbour.org"
+      ? "Copyright 1999-2004, http://www.xharbour.org"
       ? ""
       ? "Syntax:  hbdoc [options] <linkname> [<ifile>]"
       ? ""
@@ -618,8 +618,8 @@ set console off
       oHtm1 := THTML():New( "htm\xharbour.htm" ,aMetaContents)
 //          oHtm:WriteMetaTag('Keywords',"Harbour project, Clipper, xBase, database, Free Software, GNU, compiler, cross platform, 32-bit, FiveWin,Harbour Documentation")
       oHtm1:WriteTitle( "XHarbour Reference Guide" )
-      oHtm1:WriteText( "<H1>Harbour Reference Guide</H1>" )
-      oHtm1:WriteText( "<H2>HARBOUR</H2>" + hb_osnEwline() + '<UL>' )
+      oHtm1:WriteText( "<H1>XHarbour Reference Guide</H1>" )
+      oHtm1:WriteText( "<H2>XHARBOUR</H2>" + hb_osnEwline() + '<UL>' )
       oHtm1:WriteLink( "overview", UpperLower( "XHarbour Read me" ) )
       oHtm1:WriteLink( "license", UpperLower( "XHarbour License" ) )
       oHtm1:WriteLink( "http://www.gnu.org/copyleft/gpl.html", "GNU License" )

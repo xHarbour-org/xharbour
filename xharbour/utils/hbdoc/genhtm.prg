@@ -1,5 +1,5 @@
 /*
- * $Id: genhtm.prg,v 1.1.1.1 2001/12/21 10:45:20 ronpinkas Exp $
+ * $Id: genhtm.prg,v 1.2 2003/12/29 18:25:56 lculik Exp $
  */
 
 /*
@@ -1386,16 +1386,16 @@ FUNCTION GenhtmTable( oHtm )
    LOCAL x
 /*   oHtm:WriteText( "<br>" )
    oHtm:WriteText( "<br>" )*/
-   oHtm:WriteText( '<table border=1>' )                     //-4
+   oHtm:WriteText( '<table border=1 aling=center>' )                     //-4
 
    FOR x := 1 TO LEN( asitable )
       IF !EMPTY( asitable[ x ] )
          IF nNumTableItems == 2
-            oHtm:WriteText( '<tr><td>' + afitable[ x ] + '</td><td>' + asitable[ x ] + '</td></tr> ' )
+            oHtm:WriteText( '<tr aling=center ><td>' + afitable[ x ] + '</td><td>' + asitable[ x ] + '</td></tr> ' )
          ELSEIF nNumTableItems == 3
-            oHtm:WriteText( '<tr><td>' + afitable[ x ] + '</td><td>' + asitable[ x ] + '</td><td>' + atitable[ x ] + '</td></tr> ' )
+            oHtm:WriteText( '<tr aling=center><td>' + afitable[ x ] + '</td><td>' + asitable[ x ] + '</td><td>' + atitable[ x ] + '</td></tr> ' )
          ELSEIF nNumTableItems == 4
-            oHtm:WriteText( '<tr><td>' + afitable[ x ] + '</td><td>' + asitable[ x ] + '</td><td>' + atitable[ x ] + '</td><td>' + afoitable[ x ] + '</td></tr> ' )
+            oHtm:WriteText( '<tr aling=center><td>' + afitable[ x ] + '</td><td>' + asitable[ x ] + '</td><td>' + atitable[ x ] + '</td><td>' + afoitable[ x ] + '</td></tr> ' )
          ENDIF
       ELSE
          oHtm:WriteText( '<tr><td></td></tr> ' )
