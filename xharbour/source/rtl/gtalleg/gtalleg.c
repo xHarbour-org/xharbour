@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.17 2004/02/03 14:01:13 druzus Exp $
+ * $Id: gtalleg.c,v 1.18 2004/02/03 16:37:43 maurifull Exp $
  */
 
 /*
@@ -886,15 +886,20 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
 
       if ( iRows < 0 )
       {
-         usT = usB;
-         usB = usT - iRows;
-         usTop = MAX(usTop-iRows,0);
+         usT = MIN(usTop,usBottom);
+         usB = usT + (-iRows);
+         usBottom = MIN(usBottom - iRows,s_usScrHeight-1);
+      }
+      else if ( iRows == 0 )
+      {
+         usT = MIN(usTop,usBottom);
+	 usB = MAX(usTop,usBottom) + 1;
       }
       else
       {
-         usB = usT;
+         usB = MAX(usTop,usBottom) + 1;
          usT = usB - iRows;
-         usBottom = MIN(usBottom - iRows,s_usScrHeight-1);
+         usTop = MAX(usTop-iRows,0);
       }
 
       if ( iCols < 0 )
@@ -902,6 +907,11 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
          usL = usR;
          usR = usL - iCols;
          usLeft = MAX(usLeft-iCols,0);
+      }
+      else if ( iCols == 0 )
+      {
+         usL = MIN(usLeft,usRight);
+	 usR = MAX(usLeft,usRight);
       }
       else
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.h,v 1.6 2004/01/30 17:05:07 maurifull Exp $
+ * $Id: ssf.h,v 1.7 2004/02/01 00:35:42 maurifull Exp $
  */
 
 /*
@@ -200,7 +200,7 @@ typedef enum {
 typedef struct _ssfFrame {
     char ftype;
     unsigned short left, top, right, bottom, thick;
-    unsigned char thickdir;
+    unsigned short thickdir;
 } ssfFrame;
 
 typedef struct _ssfGlyph {

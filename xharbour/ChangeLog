@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2226 2004/02/05 12:33:51 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2227 2004/02/05 12:44:11 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-06 00:25 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/gtalleg.c
+    ! Fixed gt_Scroll() bug not properly clearing disp rows/cols
+
 2004-02-05 19:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    * contrib/winprn/tprint.prg
      ! change 'static HB_FUNC' construct to 'HB_FUNC_STATIC'
@@ -55,7 +60,7 @@
     ! Commented out the following lines in IgnoreKeyCodes:
       case 40: /* Circle Accent */
       case 41: /* Tick Accent */
-      In Italian keyboards the correspond to # and ù; other international
+      In Italian keyboards the correspond to # and Ã¹; other international
       keyboards may have other meaningful characters there as well.
 
       /* I don't know why you wished to ingore those chars, but anything
