@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.990 2003/04/27 00:46:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.991 2003/04/27 15:58:46 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -17,7 +17,7 @@
      * cast @ 242 and 256
   * source/rtl/gtwin/gtwin.c
      * Min tone duration is 1, not 0
-     ! corrected Tick caclulation to always be 1000/18.2 even if not _MSC
+     ! corrected Tick caclulation to always be 1000/18.2 even if _MSC
 
 2003-04-26 17:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
