@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.92 2004/07/31 23:07:31 lculik Exp $
+* $Id: thread.h,v 1.93 2004/07/31 23:28:07 lculik Exp $
 */
 
 /*
@@ -296,7 +296,7 @@ extern PPVOID hb_dwCurrentStack;
       HB_THREAD_T owner; \
       ULONG count; \
    } HB_RECURSIVE_MUTEX_T;
-   
+
    #define HB_CRITICAL_T               HB_RECURSIVE_MUTEX_T
    #define HB_CRITICAL_INIT( x ) \
       { \
@@ -785,7 +785,6 @@ void hb_threadCancelInternal( void );
 
    #ifndef HB_VM_STACK
       #define HB_VM_STACK hb_stack
-      // note this shouw be       #define HB_VM_STACK hb_getStack()
    #endif
 
 
