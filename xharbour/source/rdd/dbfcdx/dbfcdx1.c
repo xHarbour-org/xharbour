@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.107 2004/03/04 02:15:32 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.108 2004/03/06 20:13:05 druzus Exp $
  */
 
 /*
@@ -3277,7 +3277,7 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
    pTag->KeyExpr = ( char * ) hb_xgrab( CDX_MAXKEY + 1 );
    /* QUESTION: Is UPPER a valid operation here?
     * This will break expressions like:
-    * somefield+'smallcaps'+otherfield
+    * somefield+'lowerletter'+otherfield
     * TODO:
    */
    hb_strncpyUpper( pTag->KeyExpr, ( char * ) pHeader.keyExpPool, CDX_MAXKEY );
@@ -3722,16 +3722,12 @@ static BOOL hb_cdxPageReadNextKey( LPCDXPAGE pPage )
 static BOOL hb_cdxPageReadPrevUniqKey( LPCDXPAGE pPage )
 {
    LPCDXPAGE pOwnerPage = NULL;
-//   BYTE pbVal[CDX_MAXKEY];
 
    while ( pPage->Child )
    {
       pOwnerPage = pPage;
       pPage = pPage->Child;
    }
-//   memcpy( pbVal, hb_cdxPageGetKeyVal( pPage, pPage->iCurKey ), pPage->TagParent->uiLen );
-//   pPage->iCurKey--;
-//   while ( pPage->iCurKey < 0 || memcmp( pbVal, hb_cdxPageGetKeyVal( pPage, pPage->iCurKey ), pPage->TagParent->uiLen ) == 0 )
    while ( pPage->iCurKey < 0 || memcmp( pPage->TagParent->CurKey->val, hb_cdxPageGetKeyVal( pPage, pPage->iCurKey ), pPage->TagParent->uiLen ) == 0 )
    {
       if ( pPage->iCurKey > 0 )
@@ -6136,7 +6132,6 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
       case DBOI_POSITION:
          if ( pOrderInfo->itmNewVal && HB_IS_NUMERIC( pOrderInfo->itmNewVal ) )
          {
-            /* TODO: DBOI_KEYGOTO goto specific logical record in the index file */
              pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
                   hb_cdxDBOIKeyGoto( pArea, pTag,
                               hb_itemGetNL( pOrderInfo->itmNewVal ), TRUE ) == SUCCESS );
@@ -7867,9 +7862,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
             if ( lStep == 0 )
             {
                if ( !hb_cdxEvalCond ( pArea, pEvalItem, FALSE ) )
-               hb_vmPushSymbol( &hb_symEval );
-               hb_vmPush( pEvalItem );
-               hb_vmSend( 0 );
+                  break;
             }
          }
          if ( !bDirectRead )
