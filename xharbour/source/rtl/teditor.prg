@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.55 2004/12/01 10:55:13 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.56 2005/01/26 21:29:44 lculik Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.55 2004/12/01 10:55:13 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.56 2005/01/26 21:29:44 lculik Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -594,16 +594,16 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
             case K_CTRL_C
                GTSETCLIPBOARD( ::GetText() )
-               exit 
+               exit
 
             case K_CTRL_X
                GTSETCLIPBOARD( ::GetText() )
                ::DelText()
-               exit 
+               exit
 
             case K_CTRL_V
                ::AddText( GTGETCLIPBOARD() )
-               exit 
+               exit
 
          #endif
 
@@ -1235,7 +1235,7 @@ RETURN Self
 
 //-------------------------------------------------------------------//
 
-METHOD K_Esc() CLASS HBEditor()
+METHOD K_Esc() CLASS HBEditor
    LOCAL cScreenMsg, nCurRow, nCurCol
 
    // Added message "Abort Edit? Y/N" like Clipper.

@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.18 2003/12/29 23:38:56 jonnymind Exp $
+* $Id: hblog.prg,v 1.19 2004/06/08 15:40:11 jonnymind Exp $
 */
 
 /*
@@ -428,7 +428,7 @@ PROTECTED:
 
 ENDCLASS
 
-METHOD New( nLevel ) CLASS HB_LogChannel
+METHOD New( nLevel ) CLASS HB_LogConsole
    ::Super:New( nLevel )
 RETURN Self
 
@@ -648,14 +648,14 @@ PROTECTED:
 
 ENDCLASS
 
-METHOD New( nLevel, nMaxLevel ) CLASS HB_LogChannel
+METHOD New( nLevel, nMaxLevel ) CLASS HB_LogDebug
 
    ::Super:New( nLevel )
    ::nMaxLevel := nMaxLevel
 
 RETURN Self
 
-PROCEDURE Send( nStyle, cMessage, cName, nPriority ) CLASS HB_LogConsole
+PROCEDURE Send( nStyle, cMessage, cName, nPriority ) CLASS HB_LogDebug
 
    IF .not. Empty( ::nMaxLevel )
       IF nPriority < ::nMaxLevel

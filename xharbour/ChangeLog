@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3799 2005/02/08 14:04:47 druzus Exp $
+ * $Id: ChangeLog,v 1.3800 2005/02/08 16:52:47 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-08 10:28 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbclass.ch
+    ! Fixed bug which forced context of last defined class for all methods definition, even when explict class is specified.
+
+  * source/rtl/hblog.prg
+  * source/rtl/teditor.prg
+    ! Fixed typos discovered by above fix.
 
 2005-02-08 17:50 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/make_rpm.sh
