@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1071 2003/05/27 15:19:07 paultucker Exp $
+ * $Id: ChangeLog,v 1.1072 2003/05/27 20:05:12 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-27 22:07 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/regex.c
+    + Added HB_RegexAtx() function. It has the same grammar as
+      HB_Regex, but it merges the functionality of Regex and Atx:
+      the returned array is itself made of arrays containing the
+      matched string, the start position of the match in the
+      source string, and the end position. An entry is for the
+      whole match, and the following are for the subgroups matches.
+
+      The returned array has the form:
+      { {WholeMatch, nStartWhole, nEndWhole },
+        {Group1, nStartGroup1, nEndGroup1 },
+        ...
+        {GroupN, nStartGroupn, nEndGroupN }
+      }
+      ( for who does not remember, a "group" is an expression
+        between parenthesis in a regex search pattern)
+      RFC: the end position may be obtained with Len() + nStart
+      but it seems to me it would be less efficient.
+
+  * tests/regex.prg
+    + Added a test for HB_RegexAtx()
 
 2003-05-27 16:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tbrowse.prg
