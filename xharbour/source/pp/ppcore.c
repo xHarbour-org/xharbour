@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.107 2003/12/29 22:29:53 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.108 2004/01/07 20:06:57 ronpinkas Exp $
  */
 
 /*
@@ -248,7 +248,8 @@ char * hb_pp_szErrors[] =
    "Too many match markers in #directive",
    "Unclosed optional group '[%s'",
    "Unclosed repeatable group '[%s'",
-   "Unknown result marker <%s> in #directive"
+   "Unknown result marker <%s> in #directive",
+   "Too many instanced of marker or group"
 };
 
 /* Table with warnings */
@@ -4152,7 +4153,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
             {
                if( s_Repeate )
                {
-                  char cMarkerCount = '0', cGroupCount = '0';
+                  unsigned char cMarkerCount = '0', cGroupCount = '0';
 
                   lennew = ptr2 - ptr - 1;
 
@@ -4189,6 +4190,15 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                         }
                      }
                   }
+
+                  if( cMarkerCount >= 255 || cGroupCount >= 255 )
+                  {
+                     hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_INSTANCES, NULL, NULL );
+                  }
+
+                  #ifdef DEBUG_MARKERS
+                     printf( "cMarkerCount: %i, cGroupCount: %i\n", cMarkerCount, cGroupCount );
+                  #endif
 
                   // (ptrOut + ifou)[2] - '0' signify a NON repeatable forced early instanciation so no need to instanciate again for this marker.
                   if( cMarkerCount <= cGroupCount || bDontInstanciate )

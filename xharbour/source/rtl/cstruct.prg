@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.21 2003/03/26 03:33:51 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.22 2003/06/24 03:35:04 ronpinkas Exp $
  */
 
 /*
@@ -50,8 +50,8 @@
  *
  */
 
-#include "hboo.ch"
 #include "cstruct.ch"
+#include "hboo.ch"
 #include "error.ch"
 
 #define CLASS_PROPERTIES 5
@@ -59,13 +59,21 @@
 static s_aActiveStructure
 static s_aClasses := {}
 static s_aArrayClasses := {}
+static s_aSynonyms := {}
+
+typedef struct {;
+   ULONG ulong[2];
+} ULONGLONG;
+
+typedef struct {;
+   LONG long[2];
+} LONGLONG;
 
 //---------------------------------------------------------------------------//
 Function __ActiveStructure( cStructure, nAlign )
 
    LOCAL oErr
    LOCAL acMembers, aCTypes, hClass, Counter, cMember
-
 
    IF PCount() == 2
       cStructure := Upper( cStructure )
@@ -164,9 +172,40 @@ Return
 //---------------------------------------------------------------------------//
 Function HB_CStructureID( cStructure, lInplace )
 
+   LOCAL nID
+   LOCAL oErr
+
    cStructure := Upper( cStructure )
 
-RETURN aScan( s_aClasses, { | aClassInfo | aClassInfo[1] == cStructure } ) + IIF( lInplace, CTYPE_STRUCTURE, CTYPE_STRUCTURE_PTR )
+   nID := aScan( s_aClasses, { | aClassInfo | aClassInfo[1] == cStructure } )
+
+   IF nID == 0
+      nID := aScan( s_aSynonyms, {|aSynonym| aSynonym[1] == cStructure } )
+      IF nID == 0
+         oErr := ErrorNew()
+         oErr:Args          := { cStructure, lInplace }
+         oErr:CanDefault    := .F.
+         oErr:CanRetry      := .F.
+         oErr:CanSubstitute := .T.
+         oErr:Description   := "Structure not found: '" + cStructure + "'"
+         oErr:Operation     := "HB_CStructureID()"
+         oErr:Severity      := ES_ERROR
+         oErr:SubCode       := 3
+         oErr:SubSystem     := "C Structure"
+
+         RETURN Eval( ErrorBlock(), oErr )
+      ELSE
+         nID := s_aSynonyms[nID][2]
+      ENDIF
+
+      nID += IIF( lInplace, 0, CTYPE_STRUCTURE_PTR - CTYPE_STRUCTURE )
+   ELSE
+      nID += IIF( lInplace, CTYPE_STRUCTURE, CTYPE_STRUCTURE_PTR )
+   ENDIF
+
+   //TraceLog( cStructure, nID )
+
+RETURN nID
 
 //---------------------------------------------------------------------------//
 Procedure HB_CStructureCSyntax( cStructure, aDefinitions, cTag, cSynonList, nAlign )
@@ -174,6 +213,7 @@ Procedure HB_CStructureCSyntax( cStructure, aDefinitions, cTag, cSynonList, nAli
    LOCAL cElem, nAt, nIndex := 1
    LOCAL nLen, Counter, CType
    LOCAL oErr
+   LOCAL nID, cSynon
 
    FOR EACH cElem IN aDefinitions
        // *** PP bug - remove when possible! ***
@@ -204,10 +244,30 @@ Procedure HB_CStructureCSyntax( cStructure, aDefinitions, cTag, cSynonList, nAli
    NEXT
 
    __ActiveStructure( cStructure, nAlign )
+   nID := Len( s_aClasses )
+
+   IF ! Empty( cTag )
+      aAdd( s_aSynonyms, { Upper( cTag ), nID + CTYPE_STRUCTURE } )
+      //Tracelog( s_aSynonyms[-1][1], s_aSynonyms[-1][2] )
+   ENDIF
+
+   IF ! Empty( cSynonList )
+      FOR EACH cSynon IN HB_aTokens( cSynonList )
+         IF cSynon[1] == '*'
+            aAdd( s_aSynonyms, { Upper( SubStr( cSynon, 2 ) ), nID + CTYPE_STRUCTURE_PTR } )
+         ELSE
+            aAdd( s_aSynonyms, { Upper( cSynon ), nID + CTYPE_STRUCTURE } )
+         ENDIF
+
+         //Tracelog( s_aSynonyms[-1][1], s_aSynonyms[-1][2] )
+      NEXT
+   ENDIF
+
    nLen := Len( aDefinitions )
 
    FOR Counter := 1 TO nLen STEP 2
       //TraceLog( "Member: " + aDefinitions[Counter + 1], "Type: " + aDefinitions[Counter] )
+
       CType := aDefinitions[Counter]
       IF Val( CType ) != 0
          HB_Member( aDefinitions[Counter + 1], Val( aDefinitions[Counter] ) )

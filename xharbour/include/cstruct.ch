@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.10 2003/06/24 03:35:04 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.11 2003/10/23 10:04:06 ronpinkas Exp $
  */
 
 /*
@@ -124,7 +124,7 @@
 
       #define __PACK 8
 
-      #xcommand typedef struct [<!tag!>] { [<elem>] } <!stru!> [, <*synon*>] => ;
+      #xcommand typedef struct [<!tag!>] { [[struct] <elem>] } <!stru!> [, <*synon*>] => ;
                 INIT PROCEDURE __INIT_<stru>; ;
                    HB_CStructureCSyntax( #<stru>, {[#<elem>,]}, <(tag)>, <"synon">, __PACK ); ;
                    __ClsSetModule( __ActiveStructure() ); ;
@@ -135,4 +135,5 @@
       #xcommand pragma pack() => #undef __PACK; #define __PACK 8
 
    #endif
+
 #endif

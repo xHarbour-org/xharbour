@@ -50,15 +50,13 @@ error will be occur.
 #define DOUBLE         6 //CTYPE_DOUBLE
 #define LPTSTR        10 //CTYPE_CHAR_PTR
 #define LPSTR         10 //CTYPE_CHAR_PTR
-#define ULONG         -4 //CTYPE_UNSIGNED LONG
+#define ULONG         -4 //CTYPE_UNSIGNED_LONG
 #define UCHAR         -1 //CTYPE_UNSIGNED_CHAR
 #define SHORT          2
 #define USHORT        -2 
+#define PVOID          7 //CTYPE_VOID_PTR
+#define ULONG_PTR    -40 //CTYPE_UNSIGNED_LONG_PTR
        
-
-
-
-
 
 #define LPOFNHOOKPROC   -4 // CTYPE_UNSIGNED_LONG
 #define LPCFHOOKPROC    -4
@@ -69,10 +67,6 @@ error will be occur.
 #define LPSETUPHOOKPROC -4  
      
 #define BFFCALLBACK     -4 
-
-
-
-
 
 #define HDC           -4  
 #define HIMAGELIST    -4
