@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2845 2004/04/28 18:16:51 druzus Exp $
+ * $Id: ChangeLog,v 1.2846 2004/04/28 22:24:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-28 15:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/itemapi.c
+    * MSVC uses _snprintf() instead of snprintf()
 
 2004-04-28 15:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h
