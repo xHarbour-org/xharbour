@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.45 2004/03/10 02:32:16 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.46 2004/03/10 19:16:53 ronpinkas Exp $
  */
 
 /*
@@ -1023,7 +1023,6 @@ RETURN uObj
 
               case HB_IT_INTEGER:
               case HB_IT_LONG:
-              case HB_IT_NUMERIC:
                 if( bByRef )
                 {
                    pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I4;
@@ -1036,6 +1035,21 @@ RETURN uObj
                    pArgs[ n ].n1.n2.n3.lVal = hb_parnl( nArg );
                 }
                 break;
+
+           #ifndef HB_LONG_LONG_OFF
+              case HB_IT_LONGLONG:
+                if( bByRef )
+                {
+                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I8;
+                   pArgs[ n ].n1.n2.n3.pllVal = &( uParam->item.asLongLong.value ) ;
+                }
+                else
+                {
+                   pArgs[ n ].n1.n2.vt = VT_I8;
+                   pArgs[ n ].n1.n2.n3.llVal = hb_parnll( nArg );
+                }
+                break;
+            #endif
 
               case HB_IT_DOUBLE:
                 if( bByRef )
@@ -1302,6 +1316,13 @@ RETURN uObj
         case VT_UINT:
           hb_retnl( ( LONG ) RetVal.n1.n2.n3.lVal );
           break;
+
+     #ifndef HB_LONG_LONG_OFF
+        case VT_I8:     // Long (4 bytes)
+        case VT_UI8:
+          hb_retnll( ( LONG ) RetVal.n1.n2.n3.llVal );
+          break;
+     #endif
 
         case VT_R4:     // Single
           hb_retnd( RetVal.n1.n2.n3.fltVal );
