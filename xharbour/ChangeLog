@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1758 2003/11/23 20:23:51 maurifull Exp $
+ * $Id: ChangeLog,v 1.1759 2003/11/23 22:33:32 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-11-23 21:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * contrib/hbzlib/include/hbzip2.h
+    ! added missed prototype to make MSVC happy
+  * source/rtl/listbox.prg
+    ! Fixed problem that listbox was not show on screen, reported by Ron Pinkas
+
+
 2003-11-24 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/valtype.c
     * Minor modification on HB_ISMEMO() and HB_ISSTRING() to conform

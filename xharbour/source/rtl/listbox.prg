@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.13 2003/09/19 16:47:59 lculik Exp $
+ * $Id: listbox.prg,v 1.14 2003/09/19 17:05:49 ronpinkas Exp $
  */
 
 /*
@@ -170,6 +170,7 @@ Method New( nTop, nLeft, nBottom, nRigth, lDrop )
                                    3 ) + "," + __guicolor( cColor, 1 ) + "," + ;
                                    __guicolor( cColor, 4 )
      ENDIF
+     ::isopen    := !lDrop
      ::aItems    := {}
      ::dropdown  := lDrop
      ::ldropdown := lDrop
@@ -183,7 +184,8 @@ Method New( nTop, nLeft, nBottom, nRigth, lDrop )
 
      ::ascreen := Str( nTop + 1, 2 ) + Str( nleft, 2 ) + Str( nBottom, ;
                        2 ) + Str( nRigth, 2 ) + Savescreen( nTop + 1, nleft, nBottom, nRigth )
-     ::isopen := !lDrop
+
+
 
      ::sBlock    := Nil
      ::nCursor   := Nil
@@ -195,7 +197,7 @@ Method New( nTop, nLeft, nBottom, nRigth, lDrop )
      ::vScroll  := Nil
      ::Value    := 0
 
-RETURN SELF
+     RETURN SELF
 /**** Get/Set Datas ****/
 
 Method SetScroll( xData ) Class HBListBox
@@ -234,7 +236,7 @@ Method SetDropDown( xData ) Class HBListBox
         ELSEIF ( !::isOpen )
            ::isOpen := .T.
         ENDIF
-
+       ::display()
      ENDIF
 
 RETURN ::xDropDown
@@ -265,7 +267,7 @@ RETURN ::xBottom
 Method ADDITEM( cText, xValue ) Class HBListBox
 
      IF ( !( ISCHARACTER( cText ) ) )
-     ELSEIF ( Valtype( xValue ) IN "CUN" )
+     ELSEIF ( Valtype( xValue ) IN "CU" )
         Aadd( ::aItems, { cText, xValue } )
         ::iTemCount ++
 
@@ -826,6 +828,7 @@ Method Display() Class HBListBox
 
      SET COLOR TO (cCurrentColor)
      Setpos( nCurRow, nCurCol )
+
 RETURN SELF
 
 Method GETITEM( xItem ) Class HBListBox
@@ -1020,7 +1023,6 @@ Method SETFOCUS() Class HBListBox
      IF ( !::hasfocus )
         ::nCursor  := Setcursor( 0 )
         ::hasfocus := .T.
-
         Dispbegin()
            ::display()
         Dispend()
@@ -1156,7 +1158,7 @@ Function _LISTBOX_( Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ;
         oScroll:message := Arg8
         oScroll:fblock  := Arg10
         oScroll:sblock  := Arg11
-        oScroll:isopen  := arg13
+
         nLen            := Len( Arg6 )
 
         FOR nPos := 1 TO nLen
