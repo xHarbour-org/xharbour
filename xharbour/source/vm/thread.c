@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.138 2003/12/06 17:48:30 jonnymind Exp $
+* $Id: thread.c,v 1.139 2003/12/07 00:10:07 jonnymind Exp $
 */
 
 /*
@@ -1390,7 +1390,7 @@ HB_FUNC( STARTTHREAD )
 HB_FUNC( STOPTHREAD )
 {
    HB_THREAD_STUB
-   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
+   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parpointer( 1 );
 
    if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN )
    {
@@ -1437,7 +1437,7 @@ HB_FUNC( KILLTHREAD )
    HB_THREAD_STUB
 #endif
 
-   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
+   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parpointer( 1 );
 
    if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN )
    {
@@ -1480,7 +1480,7 @@ HB_FUNC( KILLTHREAD )
 HB_FUNC( JOINTHREAD )
 {
    HB_THREAD_STUB
-   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
+   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parpointer( 1 );
 
    if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN )
    {
@@ -1559,7 +1559,7 @@ HB_FUNC( GETCURRENTTHREAD )
 HB_FUNC( GETTHREADID )
 {
    HB_THREAD_STUB
-   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
+   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parpointer( 1 );
 
    if( pThread != NULL )
    {
@@ -1591,7 +1591,7 @@ HB_FUNC( GETTHREADID )
 HB_FUNC( GETSYSTEMTHREADID )
 {
    HB_THREAD_STUB
-   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
+   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parpointer( 1 );
 
    if( pThread != NULL )
    {
@@ -1628,8 +1628,8 @@ HB_FUNC( ISSAMETHREAD )
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
 #endif
-   PHB_THREAD_ID pThread1 = (PHB_THREAD_ID) hb_parptr( 1 );
-   PHB_THREAD_ID pThread2 = (PHB_THREAD_ID) hb_parptr( 2 );
+   PHB_THREAD_ID pThread1 = (PHB_THREAD_ID) hb_parpointer( 1 );
+   PHB_THREAD_ID pThread2 = (PHB_THREAD_ID) hb_parpointer( 2 );
 
    if( pThread1 == NULL || pThread1->sign != HB_THREAD_ID_SIGN ||
        ( pThread2 != NULL && pThread2->sign != HB_THREAD_ID_SIGN ) )
@@ -1668,16 +1668,16 @@ HB_FUNC( ISVALIDTHREAD )
 #if defined( HB_API_MACROS)
    HB_THREAD_STUB
 #endif
-   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
+   PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parpointer( 1 );
 
    if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "ISVALIDTHREAD", 1,
-         hb_paramError(1) );
-      return;
+      hb_retl( FALSE );
    }
-
-   hb_retl( pThread->bReady );
+   else
+   {
+      hb_retl( pThread->bReady );
+   }
 }
 
 /*
@@ -1942,7 +1942,7 @@ HB_FUNC( MUTEXLOCK )
    HB_THREAD_STUB
 #endif
 
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
@@ -1985,7 +1985,7 @@ HB_FUNC( MUTEXTRYLOCK )
    HB_THREAD_STUB
 #endif
 
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
@@ -2021,7 +2021,7 @@ HB_FUNC( MUTEXTRYLOCK )
 */
 HB_FUNC( MUTEXUNLOCK )
 {
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
@@ -2053,7 +2053,7 @@ static void s_subscribeInternal( int mode )
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
 #endif
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
    PHB_ITEM pStatus = hb_param( 3, HB_IT_BYREF );
    int iWaitRes;
    ULONG ulWaitTime;
@@ -2149,7 +2149,7 @@ HB_FUNC( SUBSCRIBENOW )
 */
 HB_FUNC( NOTIFY )
 {
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
    PHB_ITEM pVal = hb_param( 2, HB_IT_ANY );
 
    /* Parameter error checking */
@@ -2183,7 +2183,7 @@ HB_FUNC( NOTIFY )
 */
 HB_FUNC( NOTIFYALL )
 {
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
    PHB_ITEM pVal = hb_param( 2, HB_IT_ANY );
    BOOL bClear;
    int iWt;

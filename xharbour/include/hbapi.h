@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.102 2003/12/06 15:33:39 jonnymind Exp $
+ * $Id: hbapi.h,v 1.103 2003/12/07 00:10:07 jonnymind Exp $
  */
 
 /*
@@ -211,6 +211,7 @@ extern double   HB_EXPORT hb_parnd( int iParam, ... ); /* retrieve a numeric par
 extern int      HB_EXPORT hb_parni( int iParam, ... ); /* retrieve a numeric parameter as a integer */
 extern long     HB_EXPORT hb_parnl( int iParam, ... ); /* retrieve a numeric parameter as a long */
 extern void     HB_EXPORT * hb_parptr( int iParam, ... ); /* retrieve a pointer to a memory collected by GC */
+extern void     HB_EXPORT * hb_parpointer( int iParam ); /* retrieve ONLY a pointer from ONLY HB_IT_POINTER, or retunrs NULL */
 extern PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask ); /* retrieve a generic parameter */
 extern PHB_ITEM HB_EXPORT hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
 extern BOOL     HB_EXPORT hb_extIsArray( int iParam );

@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.22 2003/11/27 17:57:50 jonnymind Exp $
+ * $Id: trpc.prg,v 1.23 2003/11/28 16:10:50 jonnymind Exp $
  */
 
 /*
@@ -373,7 +373,7 @@ CLASS tRPCServeCon
    /* Socket, mutex and thread */
    DATA skRemote
    DATA mtxBusy
-   DATA thSelf INIT -1
+   DATA thSelf INIT NIL
 
    /* Assigned authorization level */
    DATA nAuthLevel
@@ -409,7 +409,7 @@ HIDDEN:
    DATA cCryptKey
 
    /* Function execution data */
-   DATA thFunction   INIT -1
+   DATA thFunction   INIT NIL
    DATA lCanceled    INIT  .F.
 
    METHOD RecvAuth( lEncrypt )
@@ -442,7 +442,7 @@ RETURN Self
 METHOD Destroy() CLASS tRPCServeCon
    MutexLock( ::mtxBusy )
    // Eventually wait for the function to terminate
-   IF ::thFunction != -1
+   IF ::thFunction != NIL
       ::lCanceled := .T.
       MutexUnlock( ::mtxBusy )
       JoinThread( ::thFunction )
@@ -458,7 +458,7 @@ METHOD Start() CLASS tRPCServeCon
    LOCAL lRet := .F.
 
    MutexLock( ::mtxBusy )
-   IF ::thSelf < 0
+   IF ::thSelf == NIL
       ::thSelf := StartThread( Self, "RUN" )
       lRet := .T.
    ENDIF
@@ -471,12 +471,12 @@ METHOD Stop() CLASS tRPCServeCon
    LOCAL lRet := .F.
 
    MutexLock( ::mtxBusy )
-   IF ::thSelf > 0
+   IF IsValidThread( ::thSelf )
       KillThread( ::thSelf )
       lRet := .T.
       MutexUnlock( ::mtxBusy )
       JoinThread( ::thSelf )
-      ::thSelf := -1
+      ::thSelf := NIL
    ELSE
       MutexUnlock( ::mtxBusy )
    ENDIF
@@ -1352,7 +1352,7 @@ METHOD Start( lStartUdp ) CLASS tRPCService
    IF lStartUdp != NIL .and. lStartUdp
       ::thUdp := StartThread( Self, "UdpListen" )
    ELSE
-      ::thUdp := -1
+      ::thUdp := NIL
    ENDIF
 
 RETURN .T.
@@ -1362,7 +1362,7 @@ METHOD Stop() CLASS tRPCService
    LOCAL oElem
 
    MutexLock( ::mtxBusy )
-   IF ::thAccept == 0
+   IF .not. IsValidThread( ::thAccept )
       MutexUnlock( ::mtxBusy )
       RETURN .F.
    ENDIF
@@ -1371,15 +1371,17 @@ METHOD Stop() CLASS tRPCService
    // closing the socket will make their infinite loops to terminate.
    StopThread( ::thAccept)
    JoinThread( ::thAccept )
-   IF ::thUDP > 0
+   IF IsValidThread( ::thUDP )
       InetClose( ::skUdp )
       StopThread( ::thUdp)
       JoinThread( ::thUdp )
    ENDIF
 
    FOR EACH oElem IN ::aServing
-      KillThread( oElem:thSelf )
-      JoinThread( oElem:thSelf )
+      IF IsValidThread( oElem:thSelf )
+         KillThread( oElem:thSelf )
+         JoinThread( oElem:thSelf )
+      ENDIF
    NEXT
    ASize( ::aServing, 0 )
 

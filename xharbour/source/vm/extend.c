@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.30 2003/11/26 21:58:35 jonnymind Exp $
+ * $Id: extend.c,v 1.31 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -67,6 +67,9 @@
  * Copyright 2002 Marek Paliwoda <paliwoda@inetia.pl>
  *    hb_parptr()
  *    hb_retptr()
+ *
+ * Copyright 2003 Giancarlo Niccolai <antispam (at) niccolai [dot] ws>
+ *    hb_parpointer()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -615,6 +618,32 @@ void *hb_parptr( int iParam, ... )
    }
 
    return ( void * )0;
+}
+
+void *hb_parpointer( int iParam )
+{
+#ifdef HB_API_MACROS
+   HB_THREAD_STUB
+#endif
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_parptr(%d, ...)", iParam));
+
+   if( iParam >= 1 && iParam <= hb_pcount()  )
+   {
+      PHB_ITEM pItem = hb_stackItemFromBase( iParam );
+
+      if( HB_IS_BYREF( pItem ) )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_POINTER( pItem ) )
+      {
+         return pItem->item.asPointer.value;
+      }
+   }
+
+   return NULL;
 }
 
 ULONG  HB_EXPORT hb_parinfa( int iParamNum, ULONG uiArrayIndex )
