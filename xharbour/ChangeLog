@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1545 2003/10/03 05:50:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1546 2003/10/04 02:49:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-04 11:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tbrowse.prg
+    ! Fix Add, Del, Insert and Set of columns, don't evaluate block of
+      column in this step if tbrowse is not displayed yet.
+      Fix Configure() for initilize all of internal settings of columns
+      in the first stabilize.
+      Reported by Lars Hedman
 
 2003-10-03 19:48 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * contrib/WoopGUI/env/bccWin32.Mak
@@ -148,6 +156,11 @@
 2003-09-30 10:05 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * contrib/hbzlib/zip.c
     * corrected parameter checking in UnzipFile
+
+2003-09-30 00:05 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * contrib\rdd_ads\ads1.c
+    * adsInfo() return a correct value for DBI_LASTUPDATE using
+      AdsGetLastTableUpdate() function.
 
 2003-09-29 23:55 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/tget.prg
