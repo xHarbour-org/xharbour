@@ -1,6 +1,6 @@
 ************************************************************
 * i18ntest.prg
-* $Id: i18ntest.prg,v 1.2 2003/06/24 00:41:05 jonnymind Exp $
+* $Id: i18ntest.prg,v 1.3 2003/06/24 02:17:21 fsgiudice Exp $
 *
 * Test for internationalization system
 *
@@ -10,18 +10,21 @@
 #include "inkey.ch"
 
 Procedure MAIN()
-   LOCAL nChoice
+   LOCAL nChoice, nLangs
    LOCAL aLanguages
-   LOCAL aLangCodes := { "en_US", "it_IT", "fr_FR" }
+   LOCAL aLangCodes := { "en_US", "it_IT", "fr_FR", "es_MX" }
 
    SET COLOR TO W+/B
+   SetMode( 25, 80 )
 
    nChoice := 1
-   DO WHILE nChoice < 4 .and. nChoice > 0
+   nLangs := Len( aLangCodes ) + 1
+   DO WHILE nChoice < nLangs .and. nChoice > 0
       aLanguages := { ;
          i18n( "International" ), ;
          i18n( "Italian" ), ;
          i18n( "French" ), ;
+         i18n( "Spanish" ), ;
          i18n( "Quit" ) }
 
       CLEAR SCREEN
@@ -38,7 +41,7 @@ Procedure MAIN()
       nChoice := Achoice(13, 41, 19, 54, aLanguages,,, ;
          Ascan( aLangCodes, { |x| x == HB_I18NGetLanguage() } ) )
 
-      IF nChoice > 0 .and. nChoice < 4
+      IF nChoice > 0 .and. nChoice < nLangs
          HB_I18NSetLanguage( aLangCodes[ nChoice ] )
       ENDIF
    ENDDO
