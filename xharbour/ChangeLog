@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3235 2004/07/29 21:16:22 druzus Exp $
+ * $Id: ChangeLog,v 1.3236 2004/07/29 23:55:55 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-30 11:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * contrib/libct/token1.c
+    ! Fixed TOKEN() to correctly return the last token before the trailing
+      separators when non-extended syntax is used.
+  * contrib/libct/token.prg
+    + Added another testcase.
 
 2004-07-29 16:53 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbclass.ch

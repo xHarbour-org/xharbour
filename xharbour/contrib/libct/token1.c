@@ -1,5 +1,5 @@
 /*
- * $Id: token1.c,v 1.1 2003/03/04 21:04:53 lculik Exp $
+ * $Id: token1.c,v 1.2 2004/07/22 16:58:26 likewolf Exp $
  */
 
 /*
@@ -181,7 +181,7 @@ static void do_token1 (int iSwitch)
     
       size_t sMatchedPos = sSeparatorStrLen;
 
-      /* ulSkip */
+      /* Skip the left ulSkip successive separators */
       ulSkipCnt = 0;
       do
       {
@@ -284,12 +284,32 @@ static void do_token1 (int iSwitch)
       ulToken++;
 
       /* should we find the last token, but string ends with tokenizer, i.e.
-         pc points to a the last character at the moment ?
+         pc points to the last character at the moment ?
          -> break here ! */
-      if ((ulTokenCounter == HB_MKULONG (255,255,255,255)) &&
-          (pc+1==pcString+sStrLen))
+      if ( ulTokenCounter == HB_MKULONG( 255, 255, 255, 255 ) )
       {
-        break;
+         if ( ulSkip == HB_MKULONG( 255, 255, 255, 255 ) )
+	 {
+	    char *t;
+	    BOOL bLast = TRUE;
+	    
+	    for ( t = pc + 1; t + 1 < pcString + sStrLen; t++ )
+	    {
+	       if ( !memchr( pcSeparatorStr, *t, sSeparatorStrLen ) )
+	       {
+	          bLast = FALSE;
+		  break;
+	       }
+	    }
+	    if ( bLast )
+	    {
+	       break;
+	    }
+	 }
+	 else if ( pc + 1 == pcString + sStrLen )
+         {
+            break;
+         }
       }
 
       if (pc == NULL)

@@ -1,5 +1,5 @@
 /*
- * $Id: token.prg,v 1.2 2001/07/17 20:27:13 mbirdyg Exp $
+ * $Id: token.prg,v 1.1 2003/03/04 21:06:15 lculik Exp $
  */
 
 /*
@@ -53,9 +53,6 @@
  */
 
 
-#include "../ct.ch"
-
-
 procedure main
 
 local cStr := ".,.This.,.is.,.a.,.test!"
@@ -93,6 +90,9 @@ local cPost := " "
          [") @ pos ]+str(npos:=attoken (cStr, ".,!", ni, 3),3)+[, tokenized by "]+cPre+[" and "]+cPost+[" is ]+iif(substr(cStr,npos,1)$".,!","","not ")+"empty.")
  next ni
 
+ ?
+ ? 'Token("a b c  ", " ") == "c": "' + Token("a b c  ", " ") + '"'
+ 
  qout ("")
  qout ("End test of TOKEN()")
  qout ()
