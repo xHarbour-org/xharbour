@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.15 2004/04/14 20:59:10 andijahja Exp $
+ * $Id: tprint.prg,v 1.16 2004/04/25 11:26:13 andijahja Exp $
  */
 
 /*
@@ -905,11 +905,13 @@ HB_FUNC_STATIC( DRAWBITMAP ) {
 static int CALLBACK FontEnumCallBack(LOGFONT *lplf, TEXTMETRIC *lpntm, DWORD FontType, LPVOID pArray )
 {
 
-#if defined( __POCC__ ) || defined( __XCC__ )
-    fprintf( pArray,"%s," , lplf->lfFaceName );
-    fprintf( pArray,"%s," , lplf->lfPitchAndFamily && FIXED_PITCH?"1":"0" );
-    fprintf( pArray,"%s," , FontType && TRUETYPE_FONTTYPE?"1":"0" );
-    fprintf( pArray,"%u\n", lpntm->tmCharSet );
+#if defined( __WRITE_FONT_INFO_TO_FILE__ )
+    fprintf( pArray,"%s,%s,%s,%u\n",
+       lplf->lfFaceName,
+       lplf->lfPitchAndFamily && FIXED_PITCH?"1":"0",
+       FontType && TRUETYPE_FONTTYPE?"1":"0",
+       lpntm->tmCharSet );
+
 #else
     HB_ITEM SubItems;
 
@@ -929,7 +931,7 @@ HB_FUNC_STATIC( ENUMFONTS )
 {
   BOOL Result = FALSE ;
   HDC hDC = (HDC) hb_parnl(1) ;
-#if defined( __POCC__ ) || defined( __XCC__ )
+#if defined( __WRITE_FONT_INFO_TO_FILE__ )
   FILE *hFontList = fopen("font.lst","wb");
   PHB_ITEM pFonts;
   HB_ITEM FontListFile ;
@@ -941,7 +943,7 @@ HB_FUNC_STATIC( ENUMFONTS )
     HB_ITEM Array;
     Array.type = HB_IT_NIL;
     hb_arrayNew( &Array, 0 );
-#if defined( __POCC__ ) || defined( __XCC__ )
+#if defined( __WRITE_FONT_INFO_TO_FILE__ )
     EnumFonts(hDC, (LPCTSTR) NULL, (FONTENUMPROC) FontEnumCallBack, (LPARAM) hFontList );
     fclose( hFontList );
     FontListFile.type = HB_IT_NIL;

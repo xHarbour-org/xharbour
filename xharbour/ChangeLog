@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2831 2004/04/25 11:26:00 andijahja Exp $
+ * $Id: ChangeLog,v 1.2832 2004/04/25 23:50:11 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-26 16:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! remove __XCC__ defines
+
 2004-04-26 07:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/gtwvt/gtwvt.c
     ! add definition of IDC_HAND to allow compilation when WINVER < 0x0500
