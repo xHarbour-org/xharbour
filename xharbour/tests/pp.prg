@@ -603,6 +603,8 @@ STATIC s_aSwitchDefs := {}
    ENDIF
 
    IF bLoadRules
+      bLoadRules := .F.
+
       InitRules()
       InitResults()
 
@@ -901,6 +903,13 @@ PROCEDURE RP_Dot()
        Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + [;;Please try Interpreter mode, using the -R switch...] )
        RETURN
    #endif
+
+   IF bLoadRules
+      bLoadRules := .F.
+
+      InitRules()
+      InitResults()
+   ENDIF
 
    bCount := .F.
 

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.104 2003/09/14 18:07:24 jonnymind Exp $
+* $Id: thread.c,v 1.105 2003/09/18 14:40:09 jonnymind Exp $
 */
 
 /*
@@ -138,25 +138,25 @@ static HB_CRITICAL_T s_thread_unique_id_mutex;
 static UINT s_thread_unique_id;
 
 #ifdef HB_OS_WIN_32
-   DWORD hb_dwCurrentStack;
+   HB_EXPORT DWORD hb_dwCurrentStack;
 #else
    pthread_key_t hb_pkCurrentStack;
 #endif
 
 /* Declarations of shell mutexes */
-HB_CRITICAL_T hb_threadStackMutex;
-HB_CRITICAL_T hb_globalsMutex;
-HB_CRITICAL_T hb_staticsMutex;
-HB_CRITICAL_T hb_memvarsMutex;
-HB_CRITICAL_T hb_macroMutex;
-HB_CRITICAL_T hb_allocMutex;
-HB_CRITICAL_T hb_garbageAllocMutex;
-HB_CRITICAL_T hb_outputMutex;
-HB_CRITICAL_T hb_mutexMutex;
-HB_CRITICAL_T hb_cancelMutex;
-HB_CRITICAL_T hb_fenceMutex;
+HB_EXPORT HB_CRITICAL_T hb_threadStackMutex;
+HB_EXPORT HB_CRITICAL_T hb_globalsMutex;
+HB_EXPORT HB_CRITICAL_T hb_staticsMutex;
+HB_EXPORT HB_CRITICAL_T hb_memvarsMutex;
+HB_EXPORT HB_CRITICAL_T hb_macroMutex;
+HB_EXPORT HB_CRITICAL_T hb_allocMutex;
+HB_EXPORT HB_CRITICAL_T hb_garbageAllocMutex;
+HB_EXPORT HB_CRITICAL_T hb_outputMutex;
+HB_EXPORT HB_CRITICAL_T hb_mutexMutex;
+HB_EXPORT HB_CRITICAL_T hb_cancelMutex;
+HB_EXPORT HB_CRITICAL_T hb_fenceMutex;
 
-HB_SHARED_RESOURCE hb_runningStacks;
+HB_EXPORT HB_SHARED_RESOURCE hb_runningStacks;
 #ifdef HB_OS_WIN_32
    HB_SHARED_RESOURCE hb_idleQueueRes;
 #endif
@@ -688,7 +688,7 @@ void hb_threadResumeAll()
    }
 }
 
-void hb_threadCallIdle()
+HB_EXPORT void hb_threadCallIdle()
 {
    HB_IDLE_FUNC_LIST *pIdle;
    HB_CRITICAL_LOCK( hb_idleQueueRes.Mutex );
@@ -1666,7 +1666,7 @@ HB_FUNC( THREADGETCURRENTINTERNAL )
    hb_retnl( (long) HB_VM_STACK.th_vm_id );
 }
 
-void hb_threadWaitAll()
+HB_EXPORT void hb_threadWaitAll()
 {
    HB_THREAD_STUB
 
@@ -1698,7 +1698,7 @@ void hb_threadWaitAll()
    HB_CRITICAL_UNLOCK( hb_threadStackMutex );
 }
 
-void hb_threadKillAll()
+HB_EXPORT void hb_threadKillAll()
 {
    HB_STACK *pStack;
 
