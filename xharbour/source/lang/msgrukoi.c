@@ -1,5 +1,5 @@
 /*
- * $Id: msgrukoi.c,v 1.4 2004/12/19 14:00:00 ptsarenko Exp $
+ * $Id: msgrukoi.c,v 1.4 2004/12/19 11:34:10 ptsarenko Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Русский",                   /* Name (in native language) */
       "RU",                        /* RFC ID */
       "KOI8",                       /* Codepage */
-      "$Revision: 1.4 $ $Date: 2004/12/19 14:00:00 $",         /* Version */
+      "$Revision: 1.4 $ $Date: 2004/12/19 11:34:10 $",         /* Version */
 
       /* Month names */
 
@@ -205,7 +205,7 @@ HB_LANG_ANNOUNCE( RUKOI8 );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_RUKOI8 )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_RUKOI8 )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_RUKOI8
 #endif
 

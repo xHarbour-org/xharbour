@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.37 2005/02/24 10:44:06 andijahja Exp $
+ * $Id: dbffpt1.c,v 1.38 2005/02/27 11:56:04 andijahja Exp $
  */
 
 /*
@@ -254,7 +254,7 @@ HB_INIT_SYMBOLS_BEGIN( dbffpt1__InitSymbols )
 { "DBFFPT_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFFPT_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( dbffpt1__InitSymbols )
 
-#if defined(HB_STATIC_STARTUP)
+#if defined(HB_PRAGMA_STARTUP)
 #  pragma startup dbffpt1__InitSymbols
 #elif defined(HB_MSC_STARTUP)
 #  if _MSC_VER >= 1010
@@ -265,10 +265,7 @@ HB_INIT_SYMBOLS_END( dbffpt1__InitSymbols )
 #  endif
    static HB_$INITSYM hb_vm_auto_dbffpt1__InitSymbols = dbffpt1__InitSymbols;
 #  pragma data_seg()
-#elif !defined(__GNUC__) && !defined(HB_CPP_STARTUP)
-#  pragma startup dbffpt1__InitSymbols
 #endif
-
 
 static ERRCODE hb_fptIsDbLocked( FPTAREAP pArea, BOOL *bLocked )
 {

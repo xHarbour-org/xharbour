@@ -1,5 +1,5 @@
 /*
- * $Id: cpru866.c,v 1.3 2005/02/27 09:30:00 ptsarenko Exp $
+ * $Id: cpru866.c,v 1.3 2005/02/27 07:44:25 ptsarenko Exp $
  */
 
 /*
@@ -69,7 +69,7 @@ HB_CODEPAGE_ANNOUNCE( RU866 );
 HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_RU866 )
    hb_cdpRegister( &s_codepage );
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_RU866 )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_RU866
 #endif
 

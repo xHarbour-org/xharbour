@@ -1,5 +1,5 @@
 /*
- * $Id: msgpliso.c,v 1.4 2003/06/17 22:10:23 druzus Exp $
+ * $Id: msgpliso.c,v 1.5 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Polski",                    /* Name (in native language) */
       "PL",                        /* RFC ID */
       "ISO-8859-2",                /* Codepage */
-      "$Revision: 1.4 $ $Date: 2003/06/17 22:10:23 $",         /* Version */
+      "$Revision: 1.5 $ $Date: 2003/06/30 17:07:29 $",         /* Version */
 
       /* Month names */
 
@@ -205,7 +205,7 @@ HB_LANG_ANNOUNCE( PLISO );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_PLISO )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_PLISO )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_PLISO
 #endif
 

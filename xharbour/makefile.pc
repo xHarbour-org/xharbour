@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gp,v 1.3 2005/02/17 12:22:26 andijahja Exp $
+# $Id: makefile.pc,v 1.3 2005/02/20 22:14:03 andijahja Exp $
 # makefile for PellesC compiler
 #
 
@@ -22,7 +22,7 @@ POLIB_DIR    = $(POCCMAIN)\LIB
 INCLUDE_DIR  = $(XHARBOUR_ROOT)\INCLUDE
 HARBOURFLAGS = -i$(INCLUDE_DIR) -n1 -q0 -w -es2 -gc0 -d_NO_GFX_TRANSLATES_
 MAINFLAGS    = -i$(INCLUDE_DIR) -n  -q0 -w -es2 -gc0
-CFLAGS       = /Ze /I"$(INCLUDE_DIR)" /I"$(POCCMAIN)\INCLUDE" /I"$(POCCMAIN)\INCLUDE\WIN" /I"$(POCCMAIN)\INCLUDE\MSVC" /D"HB_STATIC_STARTUP" /c
+CFLAGS       = /Ze /I"$(INCLUDE_DIR)" /I"$(POCCMAIN)\INCLUDE" /I"$(POCCMAIN)\INCLUDE\WIN" /I"$(POCCMAIN)\INCLUDE\MSVC" /c
 CFLAGS       = /Op /Go $(CFLAGS) /D"HB_OS_WIN_32" /D"__WIN32__" /D"WIN32" /D"_NO_GFX_TRANSLATES_"
 LINKFLAGS    = /LIBPATH:$(POLIB_DIR) /LIBPATH:$(POLIB_DIR)\WIN /MACHINE:IX86 /OPT:WIN98 /SUBSYSTEM:CONSOLE
 

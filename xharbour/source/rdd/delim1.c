@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.7 2005/02/24 10:44:04 andijahja Exp $
+ * $Id: delim1.c,v 1.8 2005/02/27 11:56:02 andijahja Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ HB_INIT_SYMBOLS_BEGIN( delim1__InitSymbols )
 { "DELIM_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DELIM_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( delim1__InitSymbols )
 
-#if defined(HB_STATIC_STARTUP)
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup delim1__InitSymbols
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
@@ -81,8 +81,6 @@ HB_INIT_SYMBOLS_END( delim1__InitSymbols )
    #endif
    static HB_$INITSYM hb_vm_auto_delim1__InitSymbols = delim1__InitSymbols;
    #pragma data_seg()
-#elif !defined(__GNUC__) && !defined(HB_CPP_STARTUP)
-   #pragma startup delim1__InitSymbols
 #endif
 
 static RDDFUNCS delimSuper;

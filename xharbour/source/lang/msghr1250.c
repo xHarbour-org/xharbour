@@ -1,5 +1,5 @@
 /*
- * $Id: msghr1250.c,v 1.4 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: msghr1250.c,v 1.1 2003/12/18 19:33:33 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ static HB_LANG s_lang =
       "Hrvatski",                  /* Name (in native language) */
       "HR",                        /* RFC ID */
       "1250",                      /* Codepage */
-      "$Revision: 1.4 $ $Date: 2003/06/30 17:07:29 $",         /* Version */
+      "$Revision: 1.1 $ $Date: 2003/12/18 19:33:33 $",         /* Version */
 
       /* Month names */
 
@@ -207,7 +207,7 @@ HB_LANG_ANNOUNCE( HR1250 );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_HR1250 )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_HR1250 )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_HR1250
 #endif
 

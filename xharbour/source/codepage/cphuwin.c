@@ -1,5 +1,5 @@
 /*
- * $Id: cphuwin.c,v 1.1 2005/01/23 14:00:00 ptsarenko Exp $
+ * $Id: cphuwin.c,v 1.1 2005/01/23 12:14:43 ptsarenko Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ HB_CODEPAGE_ANNOUNCE( HUWIN );
 HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_HUWIN )
    hb_cdpRegister( &s_codepage );
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_HUWIN )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_HUWIN
 #endif
 

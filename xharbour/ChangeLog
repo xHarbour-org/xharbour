@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3887 2005/02/27 21:27:39 andijahja Exp $
+ * $Id: ChangeLog,v 1.3888 2005/02/28 02:12:26 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,116 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-28 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rdd/delim1.c
+  * source/rdd/sdf1.c
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * contrib/rdd_ads/ads1.c
+  * source/lang/msgbgwin.c
+  * source/lang/msgby866.c
+  * source/lang/msgbywin.c
+  * source/lang/msgca.c
+  * source/lang/msgcs852.c
+  * source/lang/msgcsiso.c
+  * source/lang/msgcskam.c
+  * source/lang/msgcswin.c
+  * source/lang/msgde.c
+  * source/lang/msgdewin.c
+  * source/lang/msgen.c
+  * source/lang/msgeo.c
+  * source/lang/msges.c
+  * source/lang/msgeswin.c
+  * source/lang/msgeu.c
+  * source/lang/msgfr.c
+  * source/lang/msggl.c
+  * source/lang/msghe862.c
+  * source/lang/msghewin.c
+  * source/lang/msghr1250.c
+  * source/lang/msghr437.c
+  * source/lang/msghr852.c
+  * source/lang/msghriso.c
+  * source/lang/msghu852.c
+  * source/lang/msghucwi.c
+  * source/lang/msghuwin.c
+  * source/lang/msgid.c
+  * source/lang/msgis850.c
+  * source/lang/msgit.c
+  * source/lang/msgko.c
+  * source/lang/msgltwin.c
+  * source/lang/msgnl.c
+  * source/lang/msgpl852.c
+  * source/lang/msgpliso.c
+  * source/lang/msgplmaz.c
+  * source/lang/msgplwin.c
+  * source/lang/msgpt.c
+  * source/lang/msgro.c
+  * source/lang/msgru866.c
+  * source/lang/msgrukoi.c
+  * source/lang/msgruwin.c
+  * source/lang/msgsl852.c
+  * source/lang/msgsliso.c
+  * source/lang/msgslwin.c
+  * source/lang/msgsr852.c
+  * source/lang/msgsriso.c
+  * source/lang/msgsrwin.c
+  * source/lang/msgua866.c
+  * source/lang/msguakoi.c
+  * source/lang/msguawin.c
+  * source/lang/msgzhb5.c
+  * source/lang/msgzhgb.c
+  * source/lang/msg_tpl.c
+  * source/codepage/cpeldos.c
+  * source/codepage/cpelwin.c
+  * source/codepage/cpesdos.c
+  * source/codepage/cpesmwin.c
+  * source/codepage/cpeswin.c
+  * source/codepage/cpgedos.c
+  * source/codepage/cpgewin.c
+  * source/codepage/cphr1250.c
+  * source/codepage/cphr437.c
+  * source/codepage/cphr852.c
+  * source/codepage/cphu852.c
+  * source/codepage/cphuwin.c
+  * source/codepage/cpit437.c
+  * source/codepage/cpit850.c
+  * source/codepage/cpitisb.c
+  * source/codepage/cpitiso.c
+  * source/codepage/cpltwin.c
+  * source/codepage/cppl852.c
+  * source/codepage/cppliso.c
+  * source/codepage/cpplmaz.c
+  * source/codepage/cpplwin.c
+  * source/codepage/cppt850.c
+  * source/codepage/cpptiso.c
+  * source/codepage/cpru866.c
+  * source/codepage/cprukoi.c
+  * source/codepage/cpruwin.c
+  * source/codepage/cpsl852.c
+  * source/codepage/cpsliso.c
+  * source/codepage/cpslwin.c
+  * source/codepage/cpsrwin.c
+  * source/codepage/cpua866.c
+  * source/codepage/cpuakoi.c
+  * source/codepage/cpuawin.c
+  * source/codepage/cp_tpl.c
+  * source/codepage/uc1250.c
+  * source/codepage/uc1251.c
+  * source/codepage/uc1253.c
+  * source/codepage/uc1257.c
+  * source/codepage/uc737.c
+  * source/codepage/uc850.c
+  * source/codepage/uc852.c
+  * source/codepage/uc866.c
+  * source/codepage/uc88591b.c
+  * source/codepage/uc8859_1.c
+  * source/codepage/uc8859_2.c
+  * source/codepage/uckoi8.c
+  * source/codepage/uckoi8u.c
+  * source/codepage/ucmaz.c
+  * makefile.pc
+  * hrbdll.pc
+    * clean up due to recent changes in initialization procedure
 
 2005-02-28 03:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbinit.h

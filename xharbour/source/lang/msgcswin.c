@@ -1,5 +1,5 @@
 /*
- * $Id: msgcswin.c,v 1.3 2003/06/17 22:10:22 druzus Exp $
+ * $Id: msgcswin.c,v 1.4 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ static HB_LANG s_lang =
       "Èesky",             /* Name (in native language) */
       "CS",                        /* RFC ID */
       "1250",                      /* Codepage */
-      "$Revision: 1.3 $ $Date: 2003/06/17 22:10:22 $",         /* Version */
+      "$Revision: 1.4 $ $Date: 2003/06/30 17:07:29 $",         /* Version */
 
       /* Month names */
 
@@ -207,7 +207,7 @@ HB_LANG_ANNOUNCE( CSWIN );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_CSWIN )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_CSWIN )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_CSWIN
 #endif
 

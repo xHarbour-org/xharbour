@@ -1,5 +1,5 @@
 /*
- * $Id: msgeo.c,v 1.4 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: msgeo.c,v 1.5 2004/01/25 21:48:48 andijahja Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ static HB_LANG s_lang =
       "Esperanto",                 /* Name (in native language) */
       "EO",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.4 $ $Date: 2003/06/30 17:07:29 $",         /* Version */
+      "$Revision: 1.5 $ $Date: 2004/01/25 21:48:48 $",         /* Version */
 
       /* Month names */
 
@@ -207,6 +207,6 @@ HB_LANG_ANNOUNCE( EO );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_EO )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_EO )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_EO
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.17 2005/02/24 10:44:06 andijahja Exp $
+ * $Id: dbfdbt1.c,v 1.18 2005/02/27 11:56:04 andijahja Exp $
  */
 
 /*
@@ -245,7 +245,7 @@ HB_INIT_SYMBOLS_BEGIN( dbfdbt1__InitSymbols )
 { "DBFDBT_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFDBT_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( dbfdbt1__InitSymbols )
 
-#if defined(HB_STATIC_STARTUP)
+#if defined(HB_PRAGMA_STARTUP)
 #  pragma startup dbfdbt1__InitSymbols
 #elif defined(HB_MSC_STARTUP)
 #  if _MSC_VER >= 1010
@@ -256,8 +256,6 @@ HB_INIT_SYMBOLS_END( dbfdbt1__InitSymbols )
 #  endif
    static HB_$INITSYM hb_vm_auto_dbfdbt1__InitSymbols = dbfdbt1__InitSymbols;
 #  pragma data_seg()
-#elif !defined(__GNUC__) && !defined(HB_CPP_STARTUP)
-#  pragma startup dbfdbt1__InitSymbols
 #endif
 
 /*

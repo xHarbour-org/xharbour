@@ -1,5 +1,5 @@
 /*
- * $Id: msgcskam.c,v 1.3 2003/06/17 22:10:22 druzus Exp $
+ * $Id: msgcskam.c,v 1.4 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "?esky",                     /* Name (in native language) */
       "CS",                        /* RFC ID */
       "KAM",                       /* Codepage */
-      "$Revision: 1.3 $ $Date: 2003/06/17 22:10:22 $",         /* Version */
+      "$Revision: 1.4 $ $Date: 2003/06/30 17:07:29 $",         /* Version */
 
       /* Month names */
 
@@ -206,7 +206,7 @@ HB_LANG_ANNOUNCE( CSKAM );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_CSKAM )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_CSKAM )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_CSKAM
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: msgbgwin.c,v 1.1 2005/01/23 14:00:00 ptsarenko Exp $
+ * $Id: msgbgwin.c,v 1.1 2005/01/23 12:14:44 ptsarenko Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Български",                 /* Name (in native language) */
       "BG",                        /* RFC ID */
       "1251",                      /* Codepage */
-      "$Revision: 1.1 $ $Date: 2005/01/17 17:07:29 $",         /* Version */
+      "$Revision: 1.1 $ $Date: 2005/01/23 12:14:44 $",         /* Version */
 
       /* Month names */
 
@@ -205,7 +205,7 @@ HB_LANG_ANNOUNCE( BGWIN );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_BGWIN )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_BGWIN )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_BGWIN
 #endif
 

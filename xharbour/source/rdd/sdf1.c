@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.7 2005/02/24 10:44:05 andijahja Exp $
+ * $Id: sdf1.c,v 1.8 2005/02/27 11:56:02 andijahja Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ HB_INIT_SYMBOLS_BEGIN( sdf1__InitSymbols )
 { "SDF_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( SDF_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( sdf1__InitSymbols )
 
-#if defined(HB_STATIC_STARTUP)
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup sdf1__InitSymbols
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
@@ -81,8 +81,6 @@ HB_INIT_SYMBOLS_END( sdf1__InitSymbols )
    #endif
    static HB_$INITSYM hb_vm_auto_sdf1__InitSymbols = sdf1__InitSymbols;
    #pragma data_seg()
-#elif !defined(__GNUC__) && !defined(HB_CPP_STARTUP)
-   #pragma startup sdf1__InitSymbols
 #endif
 
 static RDDFUNCS sdfSuper;

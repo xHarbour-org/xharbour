@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: hrbdll.pc,v 1.2 2005/02/22 04:35:32 paultucker Exp $
+# $Id: hrbdll.pc,v 1.3 2005/02/25 10:43:42 andijahja Exp $
 # makefile for creating Harbour.dll with PellesC compiler
 #
 
@@ -22,7 +22,7 @@ POLIB        = $(POCCMAIN)\BIN\POLIB.EXE
 POLIB_DIR    = $(POCCMAIN)\LIB
 INCLUDE_DIR  = $(XHARBOUR_ROOT)\INCLUDE
 HARBOURFLAGS = -i$(INCLUDE_DIR) -n1 -q0 -w -es2 -gc0 -d_NO_GFX_TRANSLATES_
-CFLAGS       = /Ze /I"$(INCLUDE_DIR)" /I"$(POCCMAIN)\INCLUDE" /I"$(POCCMAIN)\INCLUDE\WIN" /I"$(POCCMAIN)\INCLUDE\MSVC" /D"HB_STATIC_STARTUP" /c
+CFLAGS       = /Ze /I"$(INCLUDE_DIR)" /I"$(POCCMAIN)\INCLUDE" /I"$(POCCMAIN)\INCLUDE\WIN" /I"$(POCCMAIN)\INCLUDE\MSVC" /c
 CFLAGS       = /Op /Go $(CFLAGS) /D"HB_OS_WIN_32" /D"__WIN32__" /D"WIN32" /D"_NO_GFX_TRANSLATES_" /D"__EXPORT__"
 LINKFLAGS    = /DLL /LIBPATH:$(POLIB_DIR) /LIBPATH:$(POLIB_DIR)\WIN /MACHINE:IX86 /OPT:WIN98 /SUBSYSTEM:CONSOLE
 

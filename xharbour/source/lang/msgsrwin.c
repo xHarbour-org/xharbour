@@ -1,5 +1,5 @@
 /*
- * $Id: msgsrwin.c,v 1.3 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: msgsrwin.c,v 1.4 2004/01/25 21:48:51 andijahja Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Ñðïñêè",                   /* Name (in native language) */
       "SR",                        /* RFC ID */
       "1251",                      /* Codepage */
-      "$Revision: 1.3 $ $Date: 2003/06/30 17:07:29 $",         /* Version */
+      "$Revision: 1.4 $ $Date: 2004/01/25 21:48:51 $",         /* Version */
 
       /* Month names */
 
@@ -206,6 +206,6 @@ HB_LANG_ANNOUNCE( SRWIN );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_SRWIN )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_SRWIN )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_SRWIN
 #endif

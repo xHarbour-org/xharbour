@@ -1,5 +1,5 @@
 /*
- * $Id: msguakoi.c,v 1.1 2004/12/19 14:00:00 ptsarenko Exp $
+ * $Id: msguakoi.c,v 1.1 2004/12/19 11:34:10 ptsarenko Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Укра╓нський",               /* Name (in native language) */
       "UA",                        /* RFC ID */
       "KOI8U",                     /* Codepage */
-      "$Revision: 1.1 $ $Date: 2004/12/19 14:00:00 $",         /* Version */
+      "$Revision: 1.1 $ $Date: 2004/12/19 11:34:10 $",         /* Version */
 
       /* Month names */
 
@@ -206,7 +206,7 @@ HB_LANG_ANNOUNCE( UAKOI8 );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_UAKOI8 )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_UAKOI8 )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_UAKOI8
 #endif
 

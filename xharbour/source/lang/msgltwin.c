@@ -1,5 +1,5 @@
 /*
- * $Id: msgltwin.c,v 1.1 2003/11/06 23:42:47 ronpinkas Exp $
+ * $Id: msgltwin.c,v 1.2 2003/11/11 20:20:53 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Lietuviø",                  /* Name (in native language) */
       "LT",                        /* RFC ID */
       "Windows-1257",              /* Codepage */
-      "$Revision: 1.1 $ $Date: 2003/11/06 23:42:47 $",         /* Version */
+      "$Revision: 1.2 $ $Date: 2003/11/11 20:20:53 $",         /* Version */
 
       /* Month names */
 
@@ -205,6 +205,6 @@ HB_LANG_ANNOUNCE( LT );
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_LT )
    hb_langRegister( &s_lang );
 HB_CALL_ON_STARTUP_END( hb_lang_Init_LT )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_lang_Init_LT
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: cp_tpl.c,v 1.1 2004/11/21 21:43:41 druzus Exp $
+ * $Id: cp_tpl.c,v 1.2 2004/12/31 11:55:49 druzus Exp $
  */
 
 /*
@@ -94,6 +94,6 @@ HB_CODEPAGE_ANNOUNCE( EN );
 HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_EN )
    hb_cdpRegister( &s_codepage );
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_EN )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_EN
 #endif
