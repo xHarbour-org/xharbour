@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.744 2003/02/20 01:48:49 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.745 2003/02/20 02:32:51 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-20 13:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/garbage.c
+    ! Now the hb_allocMutex must be defined also if statistic
+      are off.
+      
 
 2003-02-19 23:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/checkbox.prg
@@ -22,7 +28,7 @@
      this (with a dicotomic search for example)? Any example of a search in a
      sorted table would be appreciated. Thanks
      bof() eof() gobottom() gotop() skip() working properly now
-  
+
 2003-02-19 17:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c
     ! Fixed compile time optimization of Right() to only be performed on LITRAL strings.

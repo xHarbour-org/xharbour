@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.20 2002/12/31 15:03:28 lculik Exp $
+ * $Id: fm.c,v 1.21 2003/02/19 20:20:31 jonnymind Exp $
  */
 
 /*
@@ -116,12 +116,12 @@ static LONG s_lFreed = 0;
 static PHB_MEMINFO s_pFirstBlock = NULL;
 static PHB_MEMINFO s_pLastBlock = NULL;
 
+#endif
 
 #ifdef HB_THREAD_SUPPORT
-HB_CRITICAL_T hb_allocMutex;
+   HB_CRITICAL_T hb_allocMutex;
 #endif
 
-#endif
 
 /* allocates fixed memory, do *not* exits on failure */
 void HB_EXPORT * hb_xalloc( ULONG ulSize )
