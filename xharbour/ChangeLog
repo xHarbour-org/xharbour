@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.876 2003/03/26 20:50:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.877 2003/03/27 02:20:53 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-27 04:01 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/hbcompress.h
+  * source/rtl/hbcompress.c
+    ! fixed a potential error in inflate(); a code from original zlib was
+      left in, and a variable check when not initialized could have bought
+      to uncorrect error report while decompressing.
+    
 2003-03-26 23:16 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
     ! changed logic of generation if -D swicht for HARBOURFLAGS section of makefile
