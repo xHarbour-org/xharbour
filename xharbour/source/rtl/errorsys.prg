@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.1.1.1 2001/12/21 10:41:33 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.2 2002/01/26 20:16:18 ronpinkas Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
  *
  * Copyright 2001 Ron Pinkas <ron@profit-master.com>
  *    TraceLog()
- *    xToStr()
+ *    CStr()
  */
 
 #include "common.ch"
@@ -226,7 +226,7 @@ FUNCTION TraceLog(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p
    ENDDO
 
    FOR Counter := 1 to PCount()
-      FWrite( FileHandle, '>>>' + xToStr( aEntries[Counter] ) + '<<<' + CRLF )
+      FWrite( FileHandle, '>>>' + CStr( aEntries[Counter] ) + '<<<' + CRLF )
    NEXT
 
    FWrite( FileHandle, CRLF )
@@ -236,7 +236,7 @@ FUNCTION TraceLog(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p
 RETURN .T.
 
 //--------------------------------------------------------------//
-FUNCTION xToStr( xExp )
+FUNCTION CStr( xExp )
 
    LOCAL cType
 
