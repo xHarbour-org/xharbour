@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.59 2003/08/25 16:24:52 druzus Exp $
+ * $Id: dbfntx1.c,v 1.60 2003/09/03 00:34:01 ronpinkas Exp $
  */
 
 /*
@@ -163,7 +163,7 @@ HB_INIT_SYMBOLS_END( dbfntx1__InitSymbols )
    #pragma startup dbfntx1__InitSymbols
 #endif
 
-static RDDFUNCS ntxSuper = { 0 };
+static RDDFUNCS ntxSuper;
 
 /* Internal functions */
 static LPKEYINFO hb_ntxKeyNew( LPKEYINFO pKeyFrom, int keylen );
@@ -4351,12 +4351,13 @@ static RDDFUNCS ntxTable = { ntxBof,
                              ntxPutValueFile,
                              ntxReadDBHeader,
                              ntxWriteDBHeader,
+                             ntxExit,
+                             ntxDrop,
+                             ntxExists,
                              ntxWhoCares
                            };
 
-HB_FUNC(_DBFNTX )
-{
-}
+HB_FUNC(_DBFNTX ) {;}
 
 HB_FUNC( DBFNTX_GETFUNCTABLE )
 {
@@ -4367,8 +4368,17 @@ HB_FUNC( DBFNTX_GETFUNCTABLE )
    * uiCount = RDDFUNCSCOUNT;
    pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
    if( pTable )
-      hb_retni( hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBF" ) );
+   {
+      SHORT iRet;
+      iRet = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBFDBT" );
+      if ( iRet == FAILURE )
+         iRet = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBFFPT" );
+      if ( iRet == FAILURE )
+         iRet = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBF" );
+      hb_retni( iRet );
+   }
    else
+   {
       hb_retni( FAILURE );
+   }
 }
-

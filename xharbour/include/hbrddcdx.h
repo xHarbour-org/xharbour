@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.14 2003/08/29 02:43:13 ronpinkas Exp $
+ * $Id: hbrddcdx.h,v 1.15 2003/09/03 00:34:01 ronpinkas Exp $
  */
 
 /*
@@ -54,28 +54,14 @@
 #define HB_RDDCDX_H_
 
 #include "hbapirdd.h"
+#include "hbdbferr.h"
+#ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
+#endif
 
 #if defined(HB_EXTERN_C)
 extern "C" {
 #endif
-
-
-/* DBFCDX errors */
-
-#define EDBF_OPEN_DBF                              1001
-#define EDBF_CREATE_DBF                            1004
-#define EDBF_READ                                  1010
-#define EDBF_WRITE                                 1011
-#define EDBF_CORRUPT                               1012
-#define EDBF_DATATYPE                              1020
-#define EDBF_DATAWIDTH                             1021
-#define EDBF_UNLOCKED                              1022
-#define EDBF_SHARED                                1023
-#define EDBF_APPENDLOCK                            1024
-#define EDBF_READONLY                              1025
-#define EDBF_INVALIDKEY                            1026
-
 
 
 /* DBFCDX default extensions */
@@ -345,9 +331,12 @@ typedef struct _CDXAREA
    ULONG ulRecCount;             /* Total records */
    char * szDataFileName;        /* Name of data file */
    char * szMemoFileName;        /* Name of memo file */
+   USHORT uiMemoBlockSize;       /* Size of memo block */
+   BYTE bMemoType;               /* MEMO type used in DBF memo fields */
    BOOL fHasMemo;                /* WorkArea with Memo fields */
    BOOL fHasTags;                /* WorkArea with MDX or CDX index */
-   BYTE bCodePage;
+   BYTE bVersion;                /* DBF version ID byte */
+   BYTE bCodePage;               /* DBF codepage ID */
    BOOL fShared;                 /* Shared file */
    BOOL fReadonly;               /* Read only file */
    USHORT * pFieldOffset;        /* Pointer to field offset array */
@@ -366,21 +355,20 @@ typedef struct _CDXAREA
    BYTE bDay;
    ULONG * pLocksPos;            /* List of records locked */
    ULONG ulNumLocksPos;          /* Number of records locked */
+#ifndef HB_CDP_SUPPORT_OFF
    PHB_CODEPAGE cdPage;          /* Area's codepage pointer  */
+#endif
 
    /*
    *  CDX's additions to the workarea structure
    *
-   *  Warning: The above section MUST match WORKAREA exactly!  Any
+   *  Warning: The above section MUST match DBFAREA exactly! Any
    *  additions to the structure MUST be added below, as in this
    *  example.
    */
 
-   USHORT uiMemoBlockSize;       /* Size of memo block */
-   LPMEMOROOT pMemoRoot;         /* Array of free memo blocks */
-   //LPCDXTAG * lpIndexes;         /* Pointer to indexes array */
-   LPCDXINDEX lpIndexes;         /* Pointer to indexes array */
-   USHORT    uiTag;              /* current tag focus          */
+   LPCDXINDEX lpIndexes;         /* Pointer to indexes array  */
+   USHORT     uiTag;             /* current tag focus */
 
 } CDXAREA;
 
@@ -420,14 +408,12 @@ extern ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip );
 #define hb_cdxFieldName                            NULL
 #define hb_cdxFlush                                NULL
 #define hb_cdxGetRec                               NULL
-extern ERRCODE hb_cdxGetValue( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
-extern ERRCODE hb_cdxGetVarLen( CDXAREAP pArea, USHORT uiIndex, ULONG * pLength );
-//#define hb_cdxGoCold                               NULL
+#define hb_cdxGetValue                             NULL
+#define hb_cdxGetVarLen                            NULL
 extern ERRCODE hb_cdxGoCold( CDXAREAP pArea );
-//#define hb_cdxGoHot                                NULL
 extern ERRCODE hb_cdxGoHot( CDXAREAP pArea );
 #define hb_cdxPutRec                               NULL
-extern ERRCODE hb_cdxPutValue( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
+#define hb_cdxPutValue                             NULL
 #define hb_cdxRecall                               NULL
 #define hb_cdxRecCount                             NULL
 #define hb_cdxRecInfo                              NULL
@@ -436,7 +422,7 @@ extern ERRCODE hb_cdxPutValue( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
 #define hb_cdxAlias                                NULL
 extern ERRCODE hb_cdxClose( CDXAREAP pArea );
 #define hb_cdxCreate                               NULL
-extern ERRCODE hb_cdxInfo( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
+#define hb_cdxInfo                                 NULL
 #define hb_cdxNewArea                              NULL
 extern ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo );
 #define hb_cdxRelease                              NULL
@@ -448,7 +434,6 @@ extern ERRCODE hb_cdxPack ( CDXAREAP pArea );
 #define hb_cdxSort                                 NULL
 #define hb_cdxTrans                                NULL
 #define hb_cdxTransRec                             NULL
-/* #define hb_cdxZap                                  NULL */
 extern ERRCODE hb_cdxZap ( CDXAREAP pArea );
 #define hb_cdxChildEnd                             NULL
 #define hb_cdxChildStart                           NULL
@@ -489,12 +474,12 @@ static ERRCODE hb_cdxSetScope( CDXAREAP pArea, LPDBORDSCOPEINFO sInfo );
 #define hb_cdxLock                                 NULL
 #define hb_cdxUnLock                               NULL
 #define hb_cdxCloseMemFile                         NULL
-extern ERRCODE hb_cdxCreateMemFile( CDXAREAP pArea, LPDBOPENINFO pCreateInfo );
+#define hb_cdxCreateMemFile                        NULL
 #define hb_cdxGetValueFile                         NULL
-extern ERRCODE hb_cdxOpenMemFile( CDXAREAP pArea, LPDBOPENINFO pOpenInfo );
+#define hb_cdxOpenMemFile                          NULL
 #define hb_cdxPutValueFile                         NULL
-extern ERRCODE hb_cdxReadDBHeader( CDXAREAP pArea );
-extern ERRCODE hb_cdxWriteDBHeader( CDXAREAP pArea );
+#define hb_cdxReadDBHeader                         NULL
+#define hb_cdxWriteDBHeader                        NULL
 #define hb_cdxWhoCares                             NULL
 
 #if defined(HB_EXTERN_C)

@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.3 2003/05/24 00:29:09 ronpinkas Exp $
+ * $Id: sdf1.c,v 1.4 2003/06/26 01:29:15 ronpinkas Exp $
  */
 
 /*
@@ -85,8 +85,7 @@ HB_INIT_SYMBOLS_END( sdf1__InitSymbols )
    #pragma startup sdf1__InitSymbols
 #endif
 
-static RDDFUNCS sdfSuper = { NULL };
-
+static RDDFUNCS sdfSuper;
 static RDDFUNCS sdfTable = { hb_sdfBof,
                              hb_sdfEof,
                              hb_sdfFound,
@@ -178,6 +177,9 @@ static RDDFUNCS sdfTable = { hb_sdfBof,
                              hb_sdfPutValueFile,
                              hb_sdfReadDBHeader,
                              hb_sdfWriteDBHeader,
+                             hb_sdfExit,
+                             hb_sdfDrop,
+                             hb_sdfExists,
                              hb_sdfWhoCares
                            };
 

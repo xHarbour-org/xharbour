@@ -1,5 +1,5 @@
 /*
- * $Id: bit1.c,v 1.2 2002/04/14 05:06:43 walito Exp $
+ * $Id: bit1.c,v 1.1 2003/03/04 21:04:03 lculik Exp $
  */
 
 /*
@@ -59,13 +59,13 @@
 #include "ct.h"
 #include "clipdefs.h"
 
-WORD static __hex2int( char *cNum1, int iLenHex );
-WORD static __getparam( int iParam );
-WORD static __numand( WORD wNum1, WORD wNum2 );
-WORD static __numor ( WORD wNum1, WORD wNum2 );
-WORD static __numxor( WORD wNum1, WORD wNum2 );
-WORD static __numnot( WORD wNum1, WORD wNum2 );
-long static __numfun( int iPCount, WORD (*operation)(WORD wNum1, WORD wNum2));
+static WORD __hex2int( char *cNum1, int iLenHex );
+static WORD __getparam( int iParam );
+static WORD __numand( WORD wNum1, WORD wNum2 );
+static WORD __numor ( WORD wNum1, WORD wNum2 );
+static WORD __numxor( WORD wNum1, WORD wNum2 );
+static WORD __numnot( WORD wNum1, WORD wNum2 );
+static long __numfun( int iPCount, WORD (*operation)(WORD wNum1, WORD wNum2));
 
 
 /*  $DOC$
@@ -381,7 +381,7 @@ HB_FUNC ( HEX2NUM )
 }
 */
 
-WORD static __hex2int( char *cNum1, int iLenHex )
+static WORD __hex2int( char *cNum1, int iLenHex )
 {
   int  i;
   int  iNum;
@@ -406,7 +406,7 @@ WORD static __hex2int( char *cNum1, int iLenHex )
 }
 
 
-WORD static __getparam( int iParam )
+static WORD __getparam( int iParam )
 {
 
   if ( ISCHAR( iParam ) )
@@ -417,32 +417,32 @@ WORD static __getparam( int iParam )
 }
 
 
-WORD static __numand( WORD uiNum1, WORD uiNum2 )
+static WORD __numand( WORD uiNum1, WORD uiNum2 )
 {
     return uiNum1 & uiNum2;
 }
 
 
-WORD static __numor( WORD uiNum1, WORD uiNum2 )
+static WORD __numor( WORD uiNum1, WORD uiNum2 )
 {
     return uiNum1 | uiNum2;
 }
 
 
-WORD static __numxor( WORD uiNum1, WORD uiNum2 )
+static WORD __numxor( WORD uiNum1, WORD uiNum2 )
 {
     return uiNum1 ^ uiNum2;
 }
 
 
-WORD static __numnot( WORD uiNum1, WORD uiNum2 )
+static WORD __numnot( WORD uiNum1, WORD uiNum2 )
 {
     HB_SYMBOL_UNUSED (uiNum2);
     return ~uiNum1;
 }
 
 
-long static __numfun( int iPCount, WORD (*operation)(WORD wNum1, WORD wNum2))
+static long __numfun( int iPCount, WORD (*operation)(WORD wNum1, WORD wNum2))
 {
   WORD uiNumOp = 0;
   WORD uiNum1, uiNum2;

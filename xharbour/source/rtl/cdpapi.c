@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.6 2003/06/30 17:08:57 ronpinkas Exp $
+ * $Id: cdpapi.c,v 1.7 2003/08/18 12:13:47 druzus Exp $
  */
 
 /*
@@ -273,8 +273,8 @@ void HB_EXPORT hb_cdpTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpO
       for( ; *psz; psz++ )
       {
          if( ( ( n = (int)cdpIn->s_chars[ ((int)*psz)&255 ] ) != 0 ) &&
-             ( n <= cdpIn->nChars || ( n > (cdpOut->nChars+nAddLower) ) &&
-             ( n <= (cdpOut->nChars*2+nAddLower) ) ) )
+             ( n <= cdpOut->nChars || ( n > (cdpOut->nChars+nAddLower) &&
+               n <= (cdpOut->nChars*2+nAddLower) ) ) )
          {
             n--;
             *psz = ( n >= (cdpOut->nChars+nAddLower) )?
@@ -295,8 +295,8 @@ void HB_EXPORT hb_cdpnTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdp
       for( i=0; i<nChars; i++,psz++ )
       {
          if( ( ( n = (int)cdpIn->s_chars[ ((int)*psz)&255 ] ) != 0 ) &&
-             ( n <= cdpIn->nChars || ( n > (cdpOut->nChars+nAddLower) ) &&
-             ( n <= (cdpOut->nChars*2+nAddLower) ) ) )
+             ( n <= cdpOut->nChars || ( n > (cdpOut->nChars+nAddLower) &&
+               n <= (cdpOut->nChars*2+nAddLower) ) ) )
          {
             n--;
             *psz = ( n >= (cdpOut->nChars+nAddLower) )?

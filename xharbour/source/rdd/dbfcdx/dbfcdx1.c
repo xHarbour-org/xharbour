@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.62 2003/09/03 00:34:01 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.63 2003/09/03 12:51:36 paultucker Exp $
  */
 
 /*
@@ -141,10 +141,6 @@ hb_cdxEvalCond
 
 #define __PRG_SOURCE__ __FILE__
 
-//#include "xfpt2.h"
-
-
-
 extern HB_FUNC( _DBFCDX );
 extern HB_FUNC( DBFCDX_GETFUNCTABLE );
 
@@ -175,8 +171,6 @@ HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
 #elif ! defined(__GNUC__)
    #pragma startup dbfcdx1__InitSymbols
 #endif
-
-static USHORT s_uiMemoBlockSize = 64;        /* Default block memo size */
 
 static RDDFUNCS cdxSuper ;//= { NULL };
 
@@ -279,11 +273,6 @@ static RDDFUNCS cdxTable = { ( DBENTRYP_BP )    hb_cdxBof,
 static long hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, int iFilters );
 static long hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, int iFilters );
 
-static ULONG hb_xfptWriteItemSx( FHANDLE hMemoFile, PHB_ITEM pItem );
-static ULONG hb_xfptWriteItemSxLength( PHB_ITEM pItem );
-static void hb_xfptReadItemSx( FHANDLE hMemoFile, PHB_ITEM pItem );
-
-
 /*
  * Common functions.
  */
@@ -380,791 +369,6 @@ ULONG hb_cdxSwapBytes( ULONG ulLong )
 
    return ulLong;
 }
-
-/* hb_cdx memo */
-/* #include "cdxmemo.c" */
-
-/*
- * Converts memo block offset into ASCII.
- */
-static ULONG hb_cdxGetMemoBlock( CDXAREAP pArea, USHORT uiIndex )
-{
-   USHORT uiCount;
-   BYTE bByte;
-   ULONG ulBlock;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxGetMemoBlock(%p, %hu)", pArea, uiIndex));
-
-   ulBlock = 0;
-
-   for( uiCount = 0; uiCount < 10; uiCount++ )
-   {
-      bByte = pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] + uiCount ];
-
-      if( bByte >= '0' && bByte <= '9' )
-         ulBlock = ulBlock * 10 + ( bByte - '0' );
-   }
-
-   return ulBlock;
-}
-
-/*
- * Converts ASCII data into memo block offset.
- */
-static void hb_cdxPutMemoBlock( CDXAREAP pArea, USHORT uiIndex, ULONG ulBlock )
-{
-   SHORT iCount;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxPutMemoBlock(%p, %hu, %lu)", pArea, uiIndex, ulBlock));
-
-   for( iCount = 9; iCount >= 0; iCount-- )
-   {
-      if( ulBlock > 0 )
-      {
-         pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] + iCount ] = ( BYTE ) (( ulBlock % 10 ) + '0');
-         ulBlock /= 10;
-      }
-      else
-         pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] + iCount ] = ' ';
-   }
-}
-
-/*
- * Return the size of memo.
- */
-static ULONG hb_cdxGetMemoLen( CDXAREAP pArea, USHORT uiIndex )
-{
-   ULONG ulBlock;
-   MEMOBLOCK mbBlock;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxGetMemoLen(%p, %hu)", pArea, uiIndex));
-
-   ulBlock = hb_cdxGetMemoBlock( pArea, uiIndex );
-
-   if( ulBlock == 0 )
-      return 0;
-
-   hb_fsSeek( pArea->hMemoFile, ulBlock * pArea->uiMemoBlockSize, FS_SET );
-
-   if( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &mbBlock, sizeof( MEMOBLOCK ) ) !=
-       sizeof( MEMOBLOCK ) )
-      return 0;
-
-   return hb_cdxSwapBytes( mbBlock.ulSize );
-}
-
-#if 0
-/*
- * Read memo data.
- */
-static void hb_cdxGetMemo( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
-{
-   ULONG ulBlock, ulSize;
-   BYTE * pBuffer;
-   MEMOBLOCK mbBlock;
-   long lSize;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxGetMemo(%p, %hu, %p)", pArea, uiIndex, pItem));
-
-   ulBlock = hb_cdxGetMemoBlock( pArea, uiIndex );
-
-   if( ulBlock > 0 )
-   {
-      hb_fsSeek( pArea->hMemoFile, ulBlock * pArea->uiMemoBlockSize, FS_SET );
-
-      if( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &mbBlock, sizeof( MEMOBLOCK ) ) !=
-          sizeof( MEMOBLOCK ) )
-         ulSize = 0;
-      else
-         ulSize = hb_cdxSwapBytes( mbBlock.ulSize );
-      lSize = (long) ulSize;
-      /* if( ulSize > 0 && ulSize < 0xFFFFFF ) */
-      if ( lSize > 0 )
-      {
-         pBuffer = ( BYTE * ) hb_xgrab( ulSize + 1 );
-         hb_fsReadLarge( pArea->hMemoFile, pBuffer, ulSize );
-         hb_itemPutCPtr( pItem, ( char * ) pBuffer, ulSize );
-         hb_itemSetCMemo( pItem );
-      }
-   }
-   else
-   {
-      hb_itemPutC( pItem, "" );
-      hb_itemSetCMemo( pItem );
-   }
-}
-#endif
-
-/*
- * Append blocks to free memo blocks list.
- */
-static void hb_cdxAddFreeBlocks( CDXAREAP pArea, ULONG ulBlock, ULONG ulBlocks )
-{
-   /*
-   SHORT iCount;
-   BOOL bFound;
-   LPMEMOFREEBLOCK pFreeBlock;
-   */
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxAddFreeBlocks(%p, %lu, %hu)", pArea, ulBlock, ulBlocks));
-   HB_SYMBOL_UNUSED( pArea );
-   HB_SYMBOL_UNUSED( ulBlock );
-   HB_SYMBOL_UNUSED( ulBlocks );
-   return;
-   /*
-    * Def'ed out temporarily this version doesn't seem correct for shared access or compatible with VFP.
-    * Do the dumb thing, no free block list (as VFP)
-    */
-#if 0
-   bFound = FALSE;
-   for( iCount = pArea->pMemoRoot->uiListLen - 1; iCount >= 0; iCount-- )
-   {
-      pFreeBlock = ( LPMEMOFREEBLOCK ) ( pArea->pMemoRoot->pFreeList + iCount * SIZEOFMEMOFREEBLOCK );
-      if( pFreeBlock->ulBlock < ulBlock )
-      {
-         /* Can grow current free block? */
-         if( (pFreeBlock->ulBlock + pFreeBlock->uiBlocks) == ulBlock )
-         {
-            /* The new blocks are directly after the current free block */
-            pFreeBlock->uiBlocks += uiBlocks;
-            ulBlock = pFreeBlock->ulBlock;
-            uiBlocks = pFreeBlock->uiBlocks;
-         }
-         /* Can append to next free block? */
-         else if( iCount < pArea->pMemoRoot->uiListLen - 1 &&
-                  (ulBlock + uiBlocks) == ( pFreeBlock + 1 )->ulBlock )
-         {
-            /* The new blocks are directly before the next free block */
-            pFreeBlock++;
-            iCount++;
-            pFreeBlock->ulBlock = ulBlock;
-            pFreeBlock->uiBlocks += uiBlocks;
-            uiBlocks = pFreeBlock->uiBlocks;
-         }
-         /* Append to next free block */
-         else
-         {
-            pFreeBlock++;
-            iCount++;
-            memmove( pFreeBlock + 1, pFreeBlock,
-                     ( HB_MIN( MAXFREEBLOCKS, pArea->pMemoRoot->uiListLen ) - iCount ) *
-                     sizeof( SIZEOFMEMOFREEBLOCK ) );
-            pFreeBlock->ulBlock = ulBlock;
-            pFreeBlock->uiBlocks = uiBlocks;
-            pArea->pMemoRoot->uiListLen = HB_MIN( MAXFREEBLOCKS, pArea->pMemoRoot->uiListLen + 1 );
-         }
-         pArea->pMemoRoot->fChanged = TRUE;
-         bFound = TRUE;
-         break;
-      }
-   }
-
-   /* If it is the last block in memo file truncate it */
-   if( (ulBlock + uiBlocks) == pArea->pMemoRoot->ulNextBlock )
-   {
-      pArea->pMemoRoot->ulNextBlock = ulBlock;
-      pArea->pMemoRoot->fChanged = TRUE;
-      if( bFound )
-      {
-         memmove( pFreeBlock, pFreeBlock + 1,
-                  ( HB_MIN( MAXFREEBLOCKS, pArea->pMemoRoot->uiListLen ) - iCount ) *
-                  sizeof( SIZEOFMEMOFREEBLOCK ) );
-         pArea->pMemoRoot->uiListLen--;
-      }
-      hb_fsSeek( pArea->hMemoFile, ulBlock * pArea->uiMemoBlockSize, FS_SET );
-      hb_fsWrite( pArea->hMemoFile, NULL, 0 );
-      return;
-   }
-
-   /* Insert free block */
-   if( !bFound && pArea->pMemoRoot->uiListLen < MAXFREEBLOCKS )
-   {
-      pFreeBlock = ( LPMEMOFREEBLOCK ) pArea->pMemoRoot->pFreeList;
-      memmove( pFreeBlock + 1, pFreeBlock,
-               HB_MIN( MAXFREEBLOCKS, pArea->pMemoRoot->uiListLen ) * sizeof( SIZEOFMEMOFREEBLOCK ) );
-      pFreeBlock->ulBlock = ulBlock;
-      pFreeBlock->uiBlocks = uiBlocks;
-      pArea->pMemoRoot->uiListLen = HB_MIN( MAXFREEBLOCKS, pArea->pMemoRoot->uiListLen + 1 );
-      pArea->pMemoRoot->fChanged = TRUE;
-   }
-#endif
-}
-
-/*
- * Try get free memo blocks from list.
- */
-static BOOL hb_cdxCompleteFromFreeBlocks( CDXAREAP pArea, ULONG ulBlock, ULONG ulBlocks )
-{
-   /*
-   USHORT uiCount;
-   LPMEMOFREEBLOCK pFreeBlock;
-   MEMOBLOCK mbBlock;
-   */
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxCompleteFromFreeBlocks(%p, %lu, %hu)", pArea, ulBlock, ulBlocks));
-   HB_SYMBOL_UNUSED( pArea );
-   HB_SYMBOL_UNUSED( ulBlock );
-   HB_SYMBOL_UNUSED( ulBlocks );
-   return FALSE;
-   /*
-    * Def'ed out temporarily this version doesn't seem correct for shared access or compatible with VFP.
-    * Do the dumb thing, no free block list (as VFP)
-    */
-#if 0
-   for( uiCount = 0; uiCount < pArea->pMemoRoot->uiListLen; uiCount++ )
-   {
-      pFreeBlock = ( LPMEMOFREEBLOCK ) ( pArea->pMemoRoot->pFreeList + uiCount * SIZEOFMEMOFREEBLOCK );
-      if( pFreeBlock->ulBlock == ulBlock )
-      {
-         if( pFreeBlock->uiBlocks >= uiBlocks )
-         {
-            /* Same size, remove it */
-            if( pFreeBlock->uiBlocks == uiBlocks )
-            {
-               memmove( pFreeBlock, pFreeBlock + SIZEOFMEMOFREEBLOCK,
-                        ( pArea->pMemoRoot->uiListLen - uiCount ) * SIZEOFMEMOFREEBLOCK );
-               memset( pArea->pMemoRoot->pFreeList + ( pArea->pMemoRoot->uiListLen - 1 ) *
-                       SIZEOFMEMOFREEBLOCK, 0, SIZEOFMEMOFREEBLOCK );
-               pArea->pMemoRoot->uiListLen--;
-            }
-            else /* Adjust new free size */
-            {
-               pFreeBlock->ulBlock += uiBlocks;
-               pFreeBlock->uiBlocks -= uiBlocks;
-               mbBlock.ulType = mbBlock.ulSize = 0;
-               hb_fsSeek( pArea->hMemoFile, pFreeBlock->ulBlock * pArea->uiMemoBlockSize, FS_SET );
-               hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &mbBlock, sizeof( MEMOBLOCK ) );
-            }
-            pArea->pMemoRoot->fChanged = TRUE;
-            return TRUE;
-         }
-         else
-            break;
-      }
-   }
-   return FALSE;
-#endif
-}
-
-/*
- * Get free memo blocks from list or return a new block.
- */
-/* static void hb_cdxGetFreeBlocks( CDXAREAP pArea, USHORT uiBlocks, ULONG * ulBlock ) */
-static void hb_cdxGetFreeBlocks( CDXAREAP pArea, ULONG ulBlocks, ULONG * ulBlock )
-{
-   /*
-   USHORT uiCount;
-   LPMEMOFREEBLOCK pFreeBlock;
-   MEMOBLOCK mbBlock;
-    */
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxGetFreeBlocks(%p, %hu, %p)", pArea, ulBlocks, ulBlock));
-
-   /*
-    * Def'ed out temporarily this version doesn't seem correct for shared access or compatible with VFP.
-    * Do the dumb thing, no free block list (as VFP)
-    */
-#if 0
-   for( uiCount = 0; uiCount < pArea->pMemoRoot->uiListLen; uiCount++ )
-   {
-      pFreeBlock = ( LPMEMOFREEBLOCK ) ( pArea->pMemoRoot->pFreeList + uiCount * SIZEOFMEMOFREEBLOCK );
-      if( ulBlocks <= pFreeBlock->uiBlocks )
-      {
-         * ulBlock = pFreeBlock->ulBlock;
-
-         /* Same size, remove it */
-         if( pFreeBlock->uiBlocks == uiBlocks )
-         {
-            memmove( pFreeBlock, pFreeBlock + SIZEOFMEMOFREEBLOCK,
-                     ( pArea->pMemoRoot->uiListLen - uiCount ) * SIZEOFMEMOFREEBLOCK );
-            memset( pArea->pMemoRoot->pFreeList + ( pArea->pMemoRoot->uiListLen - 1 ) *
-                    SIZEOFMEMOFREEBLOCK, 0, SIZEOFMEMOFREEBLOCK );
-            pArea->pMemoRoot->uiListLen--;
-         }
-         else /* Adjust new free size */
-         {
-            pFreeBlock->ulBlock += uiBlocks;
-            pFreeBlock->uiBlocks -= uiBlocks;
-            mbBlock.ulType = mbBlock.ulSize = 0;
-            hb_fsSeek( pArea->hMemoFile, pFreeBlock->ulBlock * pArea->uiMemoBlockSize, FS_SET );
-            hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &mbBlock, sizeof( MEMOBLOCK ) );
-         }
-         pArea->pMemoRoot->fChanged = TRUE;
-         return;
-      }
-   }
-#endif
-   /* Not found a free block */
-   * ulBlock = pArea->pMemoRoot->ulNextBlock;
-   pArea->pMemoRoot->ulNextBlock += ulBlocks;
-   pArea->pMemoRoot->fChanged = TRUE;
-}
-
-/*
- * Write memo data.
- */
-static void hb_cdxWriteMemo( CDXAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULONG ulLen,
-                             ULONG * ulStoredBlock, ULONG ulType )
-{
-   /* USHORT uiBloksRequired, uiBlocksUsed; */
-   ULONG ulBlocksRequired, ulBlocksUsed = 0;
-   MEMOBLOCK mbBlock;
-   BOOL bWriteBlocks;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxWriteMemo(%p, %lu, %p, %lu, %p, %hu)", pArea, ulBlock,
-                           pItem, ulLen, ulStoredBlock, ulType));
-   /*
-   uiBloksRequired = ( USHORT ) (( ulLen + sizeof( MEMOBLOCK ) + pArea->uiMemoBlockSize - 1 ) /
-                                  pArea->uiMemoBlockSize);
-   */
-   ulBlocksRequired = (( ulLen + sizeof( MEMOBLOCK ) + pArea->uiMemoBlockSize - 1 ) /
-                      pArea->uiMemoBlockSize);
-   if( ulBlock > 0 )
-   {
-      hb_fsSeek( pArea->hMemoFile, ulBlock * pArea->uiMemoBlockSize, FS_SET );
-      hb_fsRead( pArea->hMemoFile, ( BYTE * ) &mbBlock, sizeof( MEMOBLOCK ) );
-      /*
-      uiBlocksUsed = ( USHORT ) (( hb_cdxSwapBytes( mbBlock.ulSize ) + sizeof( MEMOBLOCK ) +
-                                  pArea->uiMemoBlockSize - 1 ) / pArea->uiMemoBlockSize);
-      */
-      ulBlocksUsed = (( hb_cdxSwapBytes( mbBlock.ulSize ) + sizeof( MEMOBLOCK ) +
-                        pArea->uiMemoBlockSize - 1 ) / pArea->uiMemoBlockSize);
-   }
-
-   bWriteBlocks = FALSE;
-   /* Use same space */
-   if( ulBlock > 0 && ulBlocksUsed >= ulBlocksRequired )
-   {
-      * ulStoredBlock = ulBlock;
-      bWriteBlocks = TRUE;
-
-      /* Free space */
-      if( ulBlocksUsed > ulBlocksRequired )
-         hb_cdxAddFreeBlocks( pArea, ulBlock + ulBlocksRequired, ulBlocksUsed - ulBlocksRequired );
-   }
-   else /* Need more space */
-   {
-      if( ulBlock > 0 )
-      {
-         if( hb_cdxCompleteFromFreeBlocks( pArea, ulBlock + ulBlocksUsed,
-                                           ulBlocksRequired - ulBlocksUsed ) )
-            bWriteBlocks = TRUE;
-         else /* Free all blocks */
-            hb_cdxAddFreeBlocks( pArea, ulBlock, ulBlocksUsed );
-      }
-
-      if( !bWriteBlocks )
-      {
-         hb_cdxGetFreeBlocks( pArea, ulBlocksRequired, ulStoredBlock );
-         bWriteBlocks = TRUE;
-      }
-   }
-
-   /* Write memo header and data */
-   if( bWriteBlocks )
-   {
-#ifdef XDBFCDX
-      if ( HB_IS_STRING( pItem ) )
-      {
-         mbBlock.ulType = hb_cdxSwapBytes( ulType );
-         mbBlock.ulSize = hb_cdxSwapBytes( ulLen );
-         hb_fsSeek( pArea->hMemoFile, * ulStoredBlock * pArea->uiMemoBlockSize, FS_SET );
-         hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &mbBlock, sizeof( MEMOBLOCK ) );
-         hb_fsWriteLarge( pArea->hMemoFile, ( BYTE * ) hb_itemGetCPtr( pItem ), ulLen );
-      }
-      else
-      {
-         mbBlock.ulType = hb_cdxSwapBytes( ulType );
-         mbBlock.ulSize = hb_cdxSwapBytes( ulLen );
-         hb_fsSeek( pArea->hMemoFile, * ulStoredBlock * pArea->uiMemoBlockSize, FS_SET );
-         hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &mbBlock, sizeof( MEMOBLOCK ) );
-         hb_xfptWriteItemSx( pArea->hMemoFile, pItem );
-         // hb_fsWriteLarge( pArea->hMemoFile, ( BYTE * ) hb_itemGetCPtr( pItem ), ulLen );
-      }
-#else
-      mbBlock.ulType = hb_cdxSwapBytes( ulType );
-      mbBlock.ulSize = hb_cdxSwapBytes( ulLen );
-      hb_fsSeek( pArea->hMemoFile, * ulStoredBlock * pArea->uiMemoBlockSize, FS_SET );
-      hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &mbBlock, sizeof( MEMOBLOCK ) );
-      hb_fsWriteLarge( pArea->hMemoFile, ( BYTE * ) hb_itemGetCPtr( pItem ), ulLen );
-#endif
-   }
-}
-
-/*
- * Assign a value to the specified memo field.
- */
-static BOOL hb_cdxPutMemo( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
-{
-   /* USHORT uiBlocksUsed; */
-   ULONG ulBlocksUsed;
-   ULONG ulLen, ulBlock, ulType;
-   MEMOBLOCK mbBlock;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxPutMemo(%p, %hu, %p)", pArea, uiIndex, pItem));
-
-#ifdef XDBFCDX
-   if ( HB_IS_STRING( pItem ) )
-   {
-      ulLen = hb_itemGetCLen( pItem );
-      ulType = 1;
-   }
-   else
-   {
-      ulType = hb_itemType( pItem );
-      ulLen = hb_xfptWriteItemSxLength( pItem );
-      switch ( ulType )
-      {
-         case HB_IT_INTEGER :   // ( ( USHORT ) 0x0002 )
-         case HB_IT_LONG   :     // ( ( USHORT ) 0x0008 )
-            ulType = 0x0002; /* CLIP_IT_LNUM */
-            break;
-         case HB_IT_DOUBLE :     // ( ( USHORT ) 0x0010 )
-            ulType = 0x0008; /* CLIP_IT_DNUM */
-            break;
-         case HB_IT_DATE   :     //     ( ( USHORT ) 0x0020 )
-            ulType = 0x0020; /* CLIP_IT_LDATE */
-            break;
-         case HB_IT_LOGICAL :    // ( ( USHORT ) 0x0080 )
-            ulType = 0x0080; /* CLIP_IT_LOG */
-            break;
-         case HB_IT_ARRAY : // HB_IT_OBJECT = HB_IT_ARRAY
-            ulType = 0x8000; /* CLIP_IT_ARRAY */
-            break;
-         default :
-            ulType = 0x0000;
-            ulLen = 0;
-            break;
-      }
-   }
-#else
-   ulType = 1;
-   ulLen = hb_itemGetCLen( pItem );
-#endif
-   ulBlock = hb_cdxGetMemoBlock( pArea, uiIndex );
-   if( ulLen > 0 )
-      hb_cdxWriteMemo( pArea, ulBlock, pItem, ulLen, &ulBlock, ulType );
-   else
-   {
-      /* Free blocks */
-      if( ulBlock > 0 )
-      {
-         hb_fsSeek( pArea->hMemoFile, ulBlock * pArea->uiMemoBlockSize, FS_SET );
-         hb_fsRead( pArea->hMemoFile, ( BYTE * ) &mbBlock, sizeof( MEMOBLOCK ) );
-         /*
-         uiBlocksUsed = ( USHORT ) (( hb_cdxSwapBytes( mbBlock.ulSize ) +
-                                     pArea->uiMemoBlockSize - 1 ) / pArea->uiMemoBlockSize);
-         hb_cdxAddFreeBlocks( pArea, ulBlock, uiBlocksUsed );
-         */
-         ulBlocksUsed = (( hb_cdxSwapBytes( mbBlock.ulSize ) +
-                           pArea->uiMemoBlockSize - 1 ) / pArea->uiMemoBlockSize);
-         hb_cdxAddFreeBlocks( pArea, ulBlock, ulBlocksUsed );
-      }
-      ulBlock = 0;
-   }
-   if( pArea->fShared && pArea->pMemoRoot->fChanged )
-   {
-      pArea->pMemoRoot->fChanged = FALSE;
-      hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
-      pArea->pMemoRoot->ulNextBlock = hb_cdxSwapBytes( pArea->pMemoRoot->ulNextBlock );
-      pArea->pMemoRoot->ulBlockSize = hb_cdxSwapBytes( pArea->pMemoRoot->ulBlockSize );
-      hb_fsWrite( pArea->hMemoFile, ( BYTE * ) pArea->pMemoRoot, sizeof( MEMOROOT ) );
-      pArea->pMemoRoot->ulNextBlock = hb_cdxSwapBytes( pArea->pMemoRoot->ulNextBlock );
-      pArea->pMemoRoot->ulBlockSize = hb_cdxSwapBytes( pArea->pMemoRoot->ulBlockSize );
-   }
-   hb_cdxPutMemoBlock( pArea, uiIndex, ulBlock );
-   return TRUE;
-}
-/* end hb_cdx memo*/
-
-/* hb_xfpt */
-/* #include "xfptmemo.c" */
-/*
- * XDBFCDX
- * xfptmemo.c
- * */
-
-
-/*
- * Read fpt vartype memos.
- */
-static void hb_xfptGetMemo( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
-{
-   ULONG ulBlock, ulSize, ulType;
-   BYTE * pBuffer;
-   MEMOBLOCK mbBlock;
-   long lSize;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxGetMemo(%p, %hu, %p)", pArea, uiIndex, pItem));
-
-   ulBlock = hb_cdxGetMemoBlock( pArea, uiIndex );
-
-   if( ulBlock > 0 )
-   {
-      hb_fsSeek( pArea->hMemoFile, ulBlock * pArea->uiMemoBlockSize, FS_SET );
-
-      if( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &mbBlock, sizeof( MEMOBLOCK ) ) !=
-          sizeof( MEMOBLOCK ) )
-         ulSize = 0;
-      else
-         ulSize = hb_cdxSwapBytes( mbBlock.ulSize );
-      lSize = (long) ulSize;
-      ulType = hb_cdxSwapBytes( mbBlock.ulType );
-
-      /* if( ulSize > 0 && ulSize < 0xFFFFFF ) */
-      if ( lSize > 0 )
-      {
-         switch ( ulType )
-         {
-            case 0x0000 :  /* Picture */
-            case 0x0001 :  /* Text    */
-               pBuffer = ( BYTE * ) hb_xgrab( ulSize + 1 );
-               hb_fsReadLarge( pArea->hMemoFile, pBuffer, ulSize );
-               hb_itemPutCPtr( pItem, ( char * ) pBuffer, ulSize );
-               hb_itemSetCMemo( pItem );
-               break;
-
-            case 0x0002 : /* CLIP_IT_LNUM */
-            case 0x0008 : /* CLIP_IT_DNUM */
-            case 0x0020 : /* CLIP_IT_LDATE */
-            case 0x0080 : /* CLIP_IT_LOG */
-            case 0x8000 : /* CLIP_IT_ARRAY */
-               hb_xfptReadItemSx( pArea->hMemoFile, pItem );
-               break;
-
-            default:
-               hb_itemClear( pItem );
-               break;
-         }
-      }
-   }
-   else
-   {
-      hb_itemPutC( pItem, "" );
-      hb_itemSetCMemo( pItem );
-   }
-}
-
-static void hb_xfptReadItemSx( FHANDLE hMemoFile, PHB_ITEM pItem )
-{
-   BYTE itmBuffer[14];
-   char * pStr;
-   USHORT usType;
-   ULONG ulLen, i;
-   PHB_ITEM pArray, pNewItem;
-
-   hb_fsRead( hMemoFile, itmBuffer, 14 );
-   usType = *(short *)(&itmBuffer[0]);
-   switch ( usType )
-   {
-      case 0x0002 : /* CLIP_IT_LNUM */
-         hb_itemPutNL( pItem, *(long *)(&itmBuffer[6]) );
-         break;
-
-      case 0x0008 : /* CLIP_IT_DNUM */
-         hb_itemPutNDLen( pItem, *(double *)(&itmBuffer[6]),
-            *(short *)(&itmBuffer[2]), *(short *)(&itmBuffer[4]) );
-         break;
-
-      case 0x0020 : /* CLIP_IT_LDATE */
-         hb_itemPutDL( pItem, *(long *)(&itmBuffer[6]) );
-         break;
-
-      case 0x0080 : /* CLIP_IT_LOG */
-         hb_itemPutL( pItem, *(BOOL *)(&itmBuffer[6]) );
-         break;
-
-      case 0x0400 : /* CLIP_IT_CHAR */
-         ulLen = *(short *)(&itmBuffer[2]);  /* only 2 bytes for SIX compatibility */
-         pStr = (char *) hb_xgrab( ulLen + 1 );
-         hb_fsRead( hMemoFile, (BYTE *) pStr, ( USHORT ) ulLen );
-         hb_itemPutCPtr( pItem, pStr, ulLen );
-         break;
-
-            //#define CLIP_IT_BLOCK             0x1000
-            //#define CLIP_IT_VREF              0x2000
-            //#define CLIP_IT_MREF              0x4000
-            //#define CLIP_IT_ARRAY             0x8000
-
-      case 0x8000 : /* CLIP_IT_ARRAY */
-         ulLen = *(short *)(&itmBuffer[2]);  /* only 2 bytes for SIX compatibility */
-         pArray = hb_itemArrayNew( ulLen );
-         pNewItem = hb_itemNew( NULL );
-         for ( i = 1 ; i <= ulLen ; i++ )
-         {
-            hb_xfptReadItemSx( hMemoFile, pNewItem );
-            pArray = hb_itemArrayPut( pArray, i, pNewItem );
-            hb_itemClear( pNewItem );
-         }
-         hb_itemCopy( pItem, pArray );
-         break;
-      default:
-         hb_itemClear( pItem );
-         break;
-   }
-}
-
-
-/*
- * Write fpt vartype memos.
- * */
-
-#if 1
-
-static ULONG hb_xfptWriteItemSx( FHANDLE hMemoFile, PHB_ITEM pItem )
-{
-   BYTE itmBuffer[14];
-   USHORT usType;
-   ULONG ulLen, i, ulSize;
-   PHB_ITEM pTmpItem;
-
-
-   usType = hb_itemType( pItem );
-   memset(itmBuffer, '\0', 14);
-   ulSize = 14;
-   switch ( usType )
-   {
-      case HB_IT_ARRAY : // HB_IT_OBJECT = HB_IT_ARRAY
-         ulLen = hb_arrayLen( pItem );
-         if ( ulLen > 65535 )
-         {
-            ulLen = 65535;
-         }
-         *(short *)(&itmBuffer[0]) = (USHORT) 0x8000; /* CLIP_IT_ARRAY */
-         *(short *)(&itmBuffer[2]) = (USHORT) ulLen;  /* only 2 bytes for SIX compatibility */
-         hb_fsWrite( hMemoFile, itmBuffer, 14 );
-         for ( i = 1 ; i <= ulLen ; i++ )
-         {
-            pTmpItem = hb_arrayGetItemPtr( pItem, i );
-            ulSize += hb_xfptWriteItemSx( hMemoFile, pTmpItem );
-         }
-         break;
-
-      case HB_IT_INTEGER :   // ( ( USHORT ) 0x0002 )
-         *(USHORT *)(&itmBuffer[0]) = 0x0002; /* CLIP_IT_LNUM */
-         *(USHORT *)(&itmBuffer[2]) = pItem->item.asInteger.length;
-         *(long   *)(&itmBuffer[6]) = pItem->item.asInteger.value;
-         hb_fsWrite( hMemoFile, itmBuffer, 14 );
-         break;
-
-      case HB_IT_LONG   :     // ( ( USHORT ) 0x0008 )
-         *(USHORT *)(&itmBuffer[0]) = 0x0002; /* CLIP_IT_LNUM */
-         *(USHORT *)(&itmBuffer[2]) = pItem->item.asLong.length;
-         *(long   *)(&itmBuffer[6]) = pItem->item.asLong.value;
-         hb_fsWrite( hMemoFile, itmBuffer, 14 );
-         break;
-
-      case HB_IT_DOUBLE :     // ( ( USHORT ) 0x0010 )
-         *(USHORT *)(&itmBuffer[0]) = 0x0008; /* CLIP_IT_DNUM */
-         *(USHORT *)(&itmBuffer[2]) = pItem->item.asDouble.length;
-         *(USHORT *)(&itmBuffer[4]) = pItem->item.asDouble.decimal;
-         *(double *)(&itmBuffer[6]) = pItem->item.asDouble.value;
-         hb_fsWrite( hMemoFile, itmBuffer, 14 );
-         break;
-
-      case HB_IT_DATE   :     //     ( ( USHORT ) 0x0020 )
-         *(USHORT *)(&itmBuffer[0]) = 0x0020; /* CLIP_IT_LDATE */
-         *(long   *)(&itmBuffer[6]) = pItem->item.asDate.value;
-         hb_fsWrite( hMemoFile, itmBuffer, 14 );
-         break;
-
-      case HB_IT_LOGICAL :    // ( ( USHORT ) 0x0080 )
-         *(USHORT *)(&itmBuffer[0]) = 0x0080; /* CLIP_IT_LOG */
-         *(BOOL   *)(&itmBuffer[6]) = pItem->item.asLogical.value;
-         hb_fsWrite( hMemoFile, itmBuffer, 14 );
-         break;
-
-      case HB_IT_STRING :
-      case HB_IT_MEMO   :
-         /* only 2 bytes for SIX compatibility,
-          * TODO: decide how to extend its capabilities.
-          * */
-         ulLen = pItem->item.asString.length;
-         if ( ulLen > 65535 )
-         {
-            ulLen = 65535;
-         }
-         *(USHORT *)(&itmBuffer[0]) = 0x0400; /* CLIP_IT_CHAR */
-         *(USHORT *)(&itmBuffer[2]) = ( USHORT ) ulLen;
-         // *(USHORT *)(&itmBuffer[4]) = pItem->item.asDouble.decimal;
-         hb_fsWrite( hMemoFile, itmBuffer, 14 );
-         ulSize += ulLen;
-         if ( ulLen > 0 )
-         {
-            hb_fsWrite( hMemoFile, (BYTE *) (pItem->item.asString.value), ( USHORT ) ulLen );
-         }
-         break;
-
-/*
-#define HB_IT_NIL       ( ( USHORT ) 0x0000 )
-#define HB_IT_POINTER   ( ( USHORT ) 0x0001 )
-#define HB_IT_SYMBOL    ( ( USHORT ) 0x0100 )
-#define HB_IT_ALIAS     ( ( USHORT ) 0x0200 )
-#define HB_IT_BLOCK     ( ( USHORT ) 0x1000 )
-#define HB_IT_BYREF     ( ( USHORT ) 0x2000 )
-#define HB_IT_MEMVAR    ( ( USHORT ) 0x4000 )
-#define HB_IT_NUMERIC   ( ( USHORT ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
-#define HB_IT_ANY       ( ( USHORT ) 0xFFFF )
-*/
-      default :
-         hb_fsWrite( hMemoFile, itmBuffer, 14 );
-         break;
-   }
-   return ulSize;
-}
-
-static ULONG hb_xfptWriteItemSxLength( PHB_ITEM pItem )
-{
-   ULONG ulLen, i, ulSize;
-   PHB_ITEM pTmpItem;
-   USHORT usType;
-
-   usType = hb_itemType( pItem );
-   switch ( usType )
-   {
-      case HB_IT_ARRAY : // HB_IT_OBJECT = HB_IT_ARRAY
-         ulSize = 14;
-         ulLen = hb_arrayLen( pItem );
-         for ( i = 1 ; i <= ulLen ; i++ )
-         {
-            pTmpItem = hb_arrayGetItemPtr( pItem, i );
-            ulSize += hb_xfptWriteItemSxLength( pTmpItem );
-         }
-         break;
-      case HB_IT_STRING :
-      case HB_IT_MEMO   :
-         ulSize = 14;
-         ulSize += pItem->item.asString.length;
-         break;
-      default :
-         ulSize = 14;
-   }
-   return ulSize;
-}
-/*
-#define HB_IT_NIL       ( ( USHORT ) 0x0000 )
-#define HB_IT_POINTER   ( ( USHORT ) 0x0001 )
-#define HB_IT_INTEGER   ( ( USHORT ) 0x0002 )
-#define HB_IT_LONG      ( ( USHORT ) 0x0008 )
-#define HB_IT_DOUBLE    ( ( USHORT ) 0x0010 )
-#define HB_IT_DATE      ( ( USHORT ) 0x0020 )
-#define HB_IT_LONGLONG  ( ( USHORT ) 0x0040 )
-#define HB_IT_LOGICAL   ( ( USHORT ) 0x0080 )
-#define HB_IT_SYMBOL    ( ( USHORT ) 0x0100 )
-#define HB_IT_ALIAS     ( ( USHORT ) 0x0200 )
-#define HB_IT_STRING    ( ( USHORT ) 0x0400 )
-#define HB_IT_MEMOFLAG  ( ( USHORT ) 0x0800 )
-#define HB_IT_MEMO      ( HB_IT_MEMOFLAG | HB_IT_STRING )
-#define HB_IT_BLOCK     ( ( USHORT ) 0x1000 )
-#define HB_IT_BYREF     ( ( USHORT ) 0x2000 )
-#define HB_IT_MEMVAR    ( ( USHORT ) 0x4000 )
-#define HB_IT_ARRAY     ( ( USHORT ) 0x8000 )
-#define HB_IT_NUMERIC   ( ( USHORT ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
-#define HB_IT_ANY       ( ( USHORT ) 0xFFFF )
-*/
-
-#endif
-/* end hb_xfpt */
 
 /* hb_cdxkeyxxx */
 /* #include "cdxkey.c" */
@@ -3516,15 +2720,14 @@ static LPCDXKEYINFO hb_cdxPageGetKey( LPCDXPAGEINFO pPage, USHORT uiKey )
 
    if ( !pPage )
       hb_cdxErrInternal( "hb_cdxPageGetKey: pPage is NULL" );
-   if ( !pPage->pKeys )
-   {
-      //if ( uiKey == 0xffff ) return NULL;
-      //hb_cdxErrInternal( "hb_cdxPageGetKey: pPage->pKeys is NULL" );
-      pKey = pPage->pKeys;
-   }
+
    pKey = pPage->pKeys;
-   while( uiKey > 0 && pKey->pNext != NULL )
+   while ( uiKey-- ) //&& pKey->pNext != NULL )
    {
+#ifndef HB_CDX_DBGCODE_OFF
+      if ( pKey == NULL )
+         hb_cdxErrInternal( "hb_cdxPageGetKey: wrong uiKey index." );
+#endif
       pKey = pKey->pNext;
       uiKey--;
    }
@@ -3842,7 +3045,7 @@ static BYTE hb_cdxPageKeyLeafBalance( LPCDXPAGEINFO pPage )
    LPCDXPAGEINFO childs[4], lpTmpPage;
    LPCDXKEYINFO pKeyList, pKey, pKeyTmp;
    BYTE bRet = 0;
-   USHORT uiCount, usKeys, usTotalKeys, i, j;
+   USHORT usKeys, usTotalKeys, i, j;
 
    nFirstChild = pPage->CurKey - 1;
    if ( nFirstChild >= pPage->uiKeys - 2 )
@@ -3909,7 +3112,7 @@ static BYTE hb_cdxPageKeyLeafBalance( LPCDXPAGEINFO pPage )
       for ( i = 0 ; i < nChilds && pKeyList ; i++ )
       {
          childs[i]->pKeys = pKeyList;
-         childs[i]->uiKeys = uiCount = 1;
+         childs[i]->uiKeys = 1;
          hb_cdxPageCalcLeafSpace( childs[i] );
          iSpace = childs[i]->FreeSpace;
          pKeyTmp = pKeyList;
@@ -6704,9 +5907,7 @@ static long hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, int iFilters )
  * -- DBFCDX METHODS --
  */
 
-HB_FUNC( _DBFCDX )
-{
-}
+HB_FUNC( _DBFCDX ) {;}
 
 HB_FUNC( DBFCDX_GETFUNCTABLE )
 {
@@ -6725,9 +5926,20 @@ HB_FUNC( DBFCDX_GETFUNCTABLE )
    }
 
    if( pTable )
-      hb_retni( hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" ) );
+   {
+      SHORT iRet;
+
+      iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
+      if ( iRet == FAILURE )
+         iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );
+      if ( iRet == FAILURE )
+         iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" );
+      hb_retni( iRet );
+   }
    else
+   {
       hb_retni( FAILURE );
+   }
 }
 
 /* #include "cdxrdd.c" */
@@ -7159,54 +6371,8 @@ ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
 // ( DBENTRYP_SVP )   hb_cdxFieldName       : NULL
 // ( DBENTRYP_V )     hb_cdxFlush           : NULL
 // ( DBENTRYP_PP )    hb_cdxGetRec          : NULL
-
 // ( DBENTRYP_SI )    hb_cdxGetValue
-/*
- * Obtain the current value of a field.
- */
-ERRCODE hb_cdxGetValue( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
-{
-   BOOL bDeleted;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxGetValue(%p, %hu, %p)", pArea, uiIndex, pItem));
-
-   if( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
-   {
-      /* Force read record */
-      if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
-         return FAILURE;
-#ifdef XDBFCDX
-      hb_xfptGetMemo( pArea, uiIndex - 1, pItem );
-#else
-      hb_cdxGetMemo( pArea, uiIndex - 1, pItem );
-#endif
-      return SUCCESS;
-   }
-   else
-      return SUPER_GETVALUE( ( AREAP ) pArea, uiIndex, pItem );
-}
-
 // ( DBENTRYP_SVL )   hb_cdxGetVarLen
-/*
- * Obtain the length of a field value.
- */
-ERRCODE hb_cdxGetVarLen( CDXAREAP pArea, USHORT uiIndex, ULONG * pLength )
-{
-   BOOL bDeleted;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxGetVarLen(%p, %hu, %p)", pArea, uiIndex, pLength));
-
-   /* Force read record */
-   if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
-      return FAILURE;
-
-   if( pArea->fHasMemo )
-      * pLength = hb_cdxGetMemoLen( pArea, uiIndex - 1 );
-   else
-      * pLength = 0;
-
-   return SUCCESS;
-}
 
 // ( DBENTRYP_V )     hb_cdxGoCold
 /*
@@ -7382,57 +6548,7 @@ ERRCODE hb_cdxGoHot( CDXAREAP pArea )
 }
 
 // ( DBENTRYP_P )     hb_cdxPutRec          : NULL
-
 // ( DBENTRYP_SI )    hb_cdxPutValue
-/*
- * Assign a value to a field.
- */
-ERRCODE hb_cdxPutValue( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
-{
-   BOOL bDeleted;
-   PHB_ITEM pError;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxPutValue(%p, %hu, %p)", pArea, uiIndex, pItem));
-
-   if( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
-   {
-#ifndef XDBFCDX
-      if( HB_IS_MEMO( pItem ) || HB_IS_STRING( pItem ) )
-      {
-#endif
-         /* Force read record */
-         if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
-            return FAILURE;
-
-         if( !pArea->fPositioned )
-            return SUCCESS;
-
-         /* Buffer is hot? */
-         if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
-            return FAILURE;
-
-         if( !hb_cdxPutMemo( pArea, uiIndex - 1, pItem ) )
-         {
-            pError = hb_errNew();
-            hb_errPutGenCode( pError, EG_DATAWIDTH );
-            hb_errPutDescription( pError, hb_langDGetErrorDesc( EDBF_DATAWIDTH ) );
-            hb_errPutSubCode( pError, EDBF_DATAWIDTH );
-            SELF_ERROR( ( AREAP ) pArea, pError );
-            hb_errRelease( pError );
-            return FAILURE;
-         }
-
-         /* Update deleted flag */
-         pArea->pRecord[ 0 ] = (BYTE) (pArea->fDeleted ? '*' : ' ');
-         return SUCCESS;
-#ifndef XDBFCDX
-      }
-#endif
-   }
-   return SUPER_PUTVALUE( ( AREAP ) pArea, uiIndex, pItem);
-}
-
-
 // ( DBENTRYP_V )     hb_cdxRecall          : NULL
 // ( DBENTRYP_ULP )   hb_cdxRecCount        : NULL
 // ( DBENTRYP_ISI )   hb_cdxRecInfo         : NULL
@@ -7457,56 +6573,13 @@ ERRCODE hb_cdxClose( CDXAREAP pArea )
    /* SELF_ORDLSTCLEAR( ( AREAP ) pArea ); */
    hb_cdxOrdListClear( pArea, 1, NULL );
 
-   /* uiError = SUPER_CLOSE( ( AREAP ) pArea ); */
-
-   /* Free root memo block */
-   if( pArea->fHasMemo && pArea->pMemoRoot )
-   {
-      if( pArea->pMemoRoot->fChanged )
-      {
-         pArea->pMemoRoot->fChanged = FALSE;
-         hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
-         pArea->pMemoRoot->ulNextBlock = hb_cdxSwapBytes( pArea->pMemoRoot->ulNextBlock );
-         pArea->pMemoRoot->ulBlockSize = hb_cdxSwapBytes( pArea->pMemoRoot->ulBlockSize );
-         hb_fsWrite( pArea->hMemoFile, ( BYTE * ) pArea->pMemoRoot, sizeof( MEMOROOT ) );
-      }
-      hb_xfree( pArea->pMemoRoot );
-      pArea->pMemoRoot = NULL;
-   }
    uiError = SUPER_CLOSE( ( AREAP ) pArea );
    return uiError;
 }
 
 
 // ( DBENTRYP_VP )    hb_cdxCreate          : NULL
-
 // ( DBENTRYP_SI )    hb_cdxInfo
-/*
- * Retrieve information about the current driver.
- */
-ERRCODE hb_cdxInfo( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxInfo(%p, %hu, %p)", pArea, uiIndex, pItem));
-
-   switch( uiIndex )
-   {
-      case DBI_MEMOEXT:
-         hb_itemPutC( pItem, CDX_MEMOEXT );
-         break;
-
-      case DBI_MEMOBLOCKSIZE:
-         hb_itemPutNI( pItem, pArea->uiMemoBlockSize );
-         break;
-
-      /* case DBI_RDD_VERSION */
-
-      default:
-         return SUPER_INFO( ( AREAP ) pArea, uiIndex, pItem );
-   }
-
-   return SUCCESS;
-}
-
 // ( DBENTRYP_V )     hb_cdxNewArea         : NULL
 
 // ( DBENTRYP_VP )    hb_cdxOpen
@@ -7545,30 +6618,6 @@ ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo )
    if( SUPER_OPEN( ( AREAP ) pArea, pOpenInfo ) == FAILURE )
    {
       return FAILURE;
-   }
-
-   /* Alloc root memo block and read data */
-   if( pArea->fHasMemo )
-   {
-      pArea->pMemoRoot = ( LPMEMOROOT ) hb_xgrab( sizeof( MEMOROOT ) );
-      memset( pArea->pMemoRoot, 0, sizeof( MEMOROOT ) );
-
-      hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
-
-      if( hb_fsRead( pArea->hMemoFile, ( BYTE * ) pArea->pMemoRoot, sizeof( MEMOROOT ) ) != sizeof( MEMOROOT ) )
-      {
-         return FAILURE;
-      }
-
-      if( pArea->pMemoRoot->szSignature[ 0 ] == 0 )
-      {
-         strcpy( ( char * ) pArea->pMemoRoot->szSignature, "Harbour" );
-         hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
-         hb_fsWrite( pArea->hMemoFile, ( BYTE * ) pArea->pMemoRoot, sizeof( MEMOROOT ) );
-      }
-
-      pArea->pMemoRoot->ulNextBlock = hb_cdxSwapBytes( pArea->pMemoRoot->ulNextBlock );
-      pArea->pMemoRoot->ulBlockSize = hb_cdxSwapBytes( pArea->pMemoRoot->ulBlockSize );
    }
 
    /* If SET_AUTOPEN open index */
@@ -9077,251 +8126,13 @@ static ERRCODE hb_cdxSetScope( CDXAREAP pArea, LPDBORDSCOPEINFO sInfo )
 // ( DBENTRYP_UL )    hb_cdxUnLock          : NULL
 
 // ( DBENTRYP_V )     hb_cdxCloseMemFile    : NULL
-
 // ( DBENTRYP_VP )    hb_cdxCreateMemFile
-/*
- * Create a memo file in the WorkArea.
- */
-ERRCODE hb_cdxCreateMemFile( CDXAREAP pArea, LPDBOPENINFO pCreateInfo )
-{
-   MEMOHEADER fptHeader;
-   BYTE pBlock[ 512 ];
-   BOOL bRetry;
-   PHB_ITEM pError;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxCreateMemFile(%p, %p)", pArea, pCreateInfo));
-
-   if( pCreateInfo )
-   {
-      pError = NULL;
-      /* Try create */
-      do
-      {
-         pArea->hMemoFile = hb_spCreate( pCreateInfo->abName, FC_NORMAL );
-         if( pArea->hMemoFile == FS_ERROR )
-         {
-            if( !pError )
-            {
-               pError = hb_errNew();
-               hb_errPutGenCode( pError, EG_CREATE );
-               hb_errPutSubCode( pError, EDBF_CREATE_DBF );
-               hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
-               hb_errPutFileName( pError, ( char * ) pCreateInfo->abName );
-               hb_errPutFlags( pError, EF_CANRETRY );
-            }
-            bRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
-         }
-         else
-            bRetry = FALSE;
-      } while( bRetry );
-      if( pError )
-         hb_errRelease( pError );
-
-      if( pArea->hMemoFile == FS_ERROR )
-         return FAILURE;
-   }
-   else /* For zap file */
-      hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
-
-   pArea->uiMemoBlockSize = s_uiMemoBlockSize;
-   fptHeader.ulNextBlock = hb_cdxSwapBytes( s_uiMemoBlockSize > 512 ? 1 :
-                                            512 / s_uiMemoBlockSize  );
-   fptHeader.ulBlockSize = hb_cdxSwapBytes( s_uiMemoBlockSize );
-   if( hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &fptHeader, sizeof( MEMOHEADER ) ) !=
-       sizeof( MEMOHEADER ) )
-      return FAILURE;
-   memset( pBlock, 0, 512 );
-   if( hb_fsWrite( pArea->hMemoFile, pBlock, 512 - sizeof( MEMOHEADER ) ) !=
-       512 - sizeof( MEMOHEADER ) )
-      return FAILURE;
-   hb_fsWrite( pArea->hMemoFile, NULL, 0 );
-   return SUCCESS;
-}
-
-
 // ( DBENTRYP_SVPB )  hb_cdxGetValueFile    : NULL
-
 // ( DBENTRYP_VP )    hb_cdxOpenMemFile
-/*
- * Open a memo file in the specified WorkArea.
- */
-ERRCODE hb_cdxOpenMemFile( CDXAREAP pArea, LPDBOPENINFO pOpenInfo )
-{
-   USHORT uiFlags;
-   BOOL bRetry;
-   MEMOHEADER fptHeader;
-   PHB_ITEM pError;
-   BYTE buffer[0x20];
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxOpenMemFile(%p, %p)", pArea, pOpenInfo));
-
-   uiFlags = (USHORT) (pOpenInfo->fReadonly ? FO_READ : FO_READWRITE);
-   uiFlags |= (USHORT) (pOpenInfo->fShared ? FO_DENYNONE : FO_EXCLUSIVE);
-   pError = NULL;
-
-   /* Try open */
-   do
-   {
-      pArea->hMemoFile = hb_spOpen( pOpenInfo->abName, uiFlags );
-      if( pArea->hMemoFile == FS_ERROR )
-      {
-         if( !pError )
-         {
-            pError = hb_errNew();
-            hb_errPutGenCode( pError, EG_OPEN );
-            hb_errPutSubCode( pError, EDBF_OPEN_DBF );
-            hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
-            hb_errPutFileName( pError, ( char * ) pOpenInfo->abName );
-            hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
-         }
-         bRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
-      }
-      else
-         bRetry = FALSE;
-   } while( bRetry );
-   if( pError )
-      hb_errRelease( pError );
-   if( pArea->hMemoFile == FS_ERROR )
-      return FAILURE;
-
-   hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
-   if( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &fptHeader, sizeof( MEMOHEADER ) ) !=
-       sizeof( MEMOHEADER ) )
-      return FAILURE;
-   pArea->uiMemoBlockSize = ( USHORT ) hb_cdxSwapBytes( fptHeader.ulBlockSize );
-   if ( pArea->uiMemoBlockSize == 0)
-   {
-      /* Check for compatibility with Clipper 5.3/FlexFile3 malformed memo headers*/
-      hb_fsSeek( pArea->hMemoFile, 0x200, FS_SET );
-      if( hb_fsRead( pArea->hMemoFile, buffer, sizeof( buffer ) ) != sizeof( buffer ) )
-         return FAILURE;
-      if ( memcmp( (char *) buffer, "FlexFile3\x03", 10) == 0 )
-      {
-         pArea->uiMemoBlockSize = ( USHORT ) buffer[0x1C];
-      }
-   }
-   if ( pArea->uiMemoBlockSize == 0)
-   {
-      if( !pError )
-      {
-         pError = hb_errNew();
-         hb_errPutGenCode( pError, EG_CORRUPTION );
-         hb_errPutSubCode( pError, EDBF_CORRUPT );
-         hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CORRUPTION ) );
-         hb_errPutFileName( pError, (char *) pOpenInfo->abName );
-      }
-      /* bRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY ); */
-      SELF_ERROR( ( AREAP ) pArea, pError );
-      if( pError )
-         hb_errRelease( pError );
-      return FAILURE;
-   }
-
-
-   return SUCCESS;
-}
-
 // ( DBENTRYP_SVP )   hb_cdxPutValueFile    : NULL
 
 // ( DBENTRYP_V )     hb_cdxReadDBHeader
-/*
- * Read the database file header record in the WorkArea.
- */
-ERRCODE hb_cdxReadDBHeader( CDXAREAP pArea )
-{
-   DBFHEADER dbHeader;
-   BOOL bRetry, bError;
-   PHB_ITEM pError;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxReadHeader(%p)", pArea));
-
-   pError = NULL;
-
-   /* Try read */
-   do
-   {
-      hb_fsSeek( pArea->hDataFile, 0, FS_SET );
-
-      if( hb_fsRead( pArea->hDataFile, ( BYTE * ) &dbHeader, sizeof( DBFHEADER ) ) !=
-          sizeof( DBFHEADER ) || ( dbHeader.bVersion != 0x03 && dbHeader.bVersion != 0xF5 ) )
-      {
-         bError = TRUE;
-
-         if( ! pError )
-         {
-            pError = hb_errNew();
-            hb_errPutGenCode( pError, EG_CORRUPTION );
-            hb_errPutSubCode( pError, EDBF_CORRUPT );
-            hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CORRUPTION ) );
-            hb_errPutFileName( pError, pArea->szDataFileName );
-            hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
-         }
-
-         bRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
-      }
-      else
-      {
-         bRetry = bError = FALSE;
-      }
-   }
-   while( bRetry );
-
-   if( pError )
-   {
-      hb_errRelease( pError );
-   }
-
-   /* Read error? */
-   if( bError )
-   {
-      return FAILURE;
-   }
-
-   pArea->bDay = dbHeader.bDay;
-   pArea->bMonth = dbHeader.bMonth;
-   pArea->bYear = dbHeader.bYear;
-   pArea->uiHeaderLen = dbHeader.uiHeaderLen;
-   pArea->ulRecCount = dbHeader.ulRecCount;
-   pArea->fHasMemo = ( dbHeader.bVersion == 0xF5 );
-   pArea->fHasTags = dbHeader.bHasTags;
-   pArea->bCodePage = dbHeader.bCodePage;
-
-   return SUCCESS;
-}
-
 // ( DBENTRYP_V )     hb_cdxWriteDBHeader
-/*
- * Write the database file header record in the WorkArea.
- */
-ERRCODE hb_cdxWriteDBHeader( CDXAREAP pArea )
-{
-   DBFHEADER dbfHeader;
-   ULONG ulRecCount;
-   long lYear, lMonth, lDay;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxWriteDBHeader(%p)", pArea));
-
-   memset( &dbfHeader, 0, sizeof( DBFHEADER ) );
-   dbfHeader.bVersion = (BYTE) (pArea->fHasMemo ? 0xF5 : 0x03);
-   hb_dateToday( &lYear, &lMonth, &lDay );
-   dbfHeader.bYear = ( BYTE ) ( lYear - 1900 );
-   dbfHeader.bMonth = ( BYTE ) lMonth;
-   dbfHeader.bDay = ( BYTE ) lDay;
-   dbfHeader.bHasTags = ( BYTE ) pArea->fHasTags;
-   dbfHeader.bCodePage = pArea->bCodePage;
-
-   /* Update record count */
-   SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount );
-
-   dbfHeader.ulRecCount = ulRecCount;
-   dbfHeader.uiHeaderLen = pArea->uiHeaderLen;
-   dbfHeader.uiRecordLen = pArea->uiRecordLen;
-   hb_fsSeek( pArea->hDataFile, 0, FS_SET );
-   hb_fsWrite( pArea->hDataFile, ( BYTE * ) &dbfHeader, sizeof( DBFHEADER ) );
-   pArea->fUpdateHeader = FALSE;
-   return SUCCESS;
-}
-
 // ( DBENTRYP_SVP )   hb_cdxWhoCares        : NULL
 
 /* end of cdxrdd.c */

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx0.prg,v 1.1.1.1 2001/12/21 10:43:06 ronpinkas Exp $
+ * $Id: dbfcdx0.prg,v 1.2 2002/04/24 00:28:49 ronpinkas Exp $
  */
 
 /*
@@ -60,6 +60,7 @@ procedure DBFCDXInit
    REQUEST _DBFCDX
 
    rddRegister( "DBF", RDT_FULL )
+   rddRegister( "DBFFPT", RDT_FULL )
    rddRegister( "DBFCDX", RDT_FULL )
 
 return

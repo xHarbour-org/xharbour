@@ -1,5 +1,5 @@
 /*
- * $Id: bit2.c,v 1.1 2001/11/19 16:16:00 mbirdyg Exp $
+ * $Id: bit2.c,v 1.1 2003/03/04 21:04:03 lculik Exp $
  */
 
 /*
@@ -56,8 +56,8 @@
 #include "ct.h"
 
 
-long int static __hex2long( char *cNum1, int iLenHex );
-long int static __getparam( int iParam );
+static long int __hex2long( char *cNum1, int iLenHex );
+static long int __getparam( int iParam );
 
 
 /*  $DOC$
@@ -245,7 +245,7 @@ HB_FUNC ( ISBIT )
 }
 
 
-long int static __hex2long( char *cNum1, int iLenHex )
+static long int __hex2long( char *cNum1, int iLenHex )
 {
   register int i;
   register int iNum;
@@ -270,7 +270,7 @@ long int static __hex2long( char *cNum1, int iLenHex )
 }
 
 
-long int static __getparam( int iParam )
+static long int __getparam( int iParam )
 {
 
   if ( ISCHAR( iParam ) )

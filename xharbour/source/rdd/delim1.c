@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.3 2003/05/24 00:29:09 ronpinkas Exp $
+ * $Id: delim1.c,v 1.4 2003/06/26 01:29:15 ronpinkas Exp $
  */
 
 /*
@@ -85,8 +85,7 @@ HB_INIT_SYMBOLS_END( delim1__InitSymbols )
    #pragma startup delim1__InitSymbols
 #endif
 
-static RDDFUNCS delimSuper = { NULL };
-
+static RDDFUNCS delimSuper;
 static RDDFUNCS delimTable = { hb_delimBof,
                                hb_delimEof,
                                hb_delimFound,
@@ -178,6 +177,9 @@ static RDDFUNCS delimTable = { hb_delimBof,
                                hb_delimPutValueFile,
                                hb_delimReadDBHeader,
                                hb_delimWriteDBHeader,
+                               hb_delimExit,
+                               hb_delimDrop,
+                               hb_delimExists,
                                hb_delimWhoCares
                              };
 

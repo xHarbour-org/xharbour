@@ -1,13 +1,13 @@
 /*
- * $Id: dbfntx0.prg,v 1.3 2003/09/02 05:41:14 ronpinkas Exp $
+ * $Id$
  */
 
 /*
  * Harbour Project source code:
- * DBFNTX RDD
+ * DBFDBT RDD
  *
- * Copyright 1999 Bruno Cantero <bruno@issnet.net>
- * www - http://www.harbour-project.org
+ * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,39 +50,15 @@
  *
  */
 
-#include "error.ch"
 #include "rddsys.ch"
 
-ANNOUNCE DBFNTX
+ANNOUNCE DBFDBT
 
-PROCEDURE DBFNTXInit
+procedure DBFDBTInit
 
-   REQUEST _DBFNTX
+   REQUEST _DBFDBT
 
    rddRegister( "DBF", RDT_FULL )
    rddRegister( "DBFDBT", RDT_FULL )
-   rddRegister( "DBFNTX", RDT_FULL )
 
 return
-
-/* NOTE: Commented out, because in Harbour the INIT order is not guaranteed,
-         so it can happen that this error handler will be installed *before*
-         the default error, but it this case it will not work. [vszakats] */
-
-/*
-
-init procedure InitHandler
-
-   local bOldError := ErrorBlock( { | oError | LockErrHandler( oError, bOldError ) } )
-
-return
-
-static function LockErrHandler( oError, bOldError )
-
-   if oError:GenCode == EG_LOCK
-      return .T.
-   endif
-
-return Eval( bOldError, oError )
-
-*/

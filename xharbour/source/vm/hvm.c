@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.257 2003/09/06 20:42:58 ronpinkas Exp $
+ * $Id: hvm.c,v 1.258 2003/09/07 23:12:15 ronpinkas Exp $
  */
 
 /*
@@ -341,35 +341,23 @@ void hb_vmDoInitClip( void )
 void hb_vmDoInitRdd( void )
 {
    PHB_DYNS pDynSym;
+   int i;
+   char * rddName[] = { "DBFDBTINIT",
+                        "DBFFPTINIT",
+                        "DBFNTXINIT",
+                        "DBFCDXINIT",
+                        "RDDINIT",
+                        NULL };
 
-   // Registers DBF and DBFNTX if linked.
-   pDynSym = hb_dynsymFind( "DBFNTXINIT" );
-   if( pDynSym && pDynSym->pSymbol->pFunPtr )
+   for ( i = 0; rddName[i]; i++ )
    {
-      //TraceLog( NULL, "NTX: %p %p\n", pDynSym, pDynSym->pSymbol->pFunPtr );
-      hb_vmPushSymbol( pDynSym->pSymbol );
-      hb_vmPushNil();
-      hb_vmDo(0);
-   }
-
-   // Registers DBF and DBFCDX if linked.
-   pDynSym = hb_dynsymFind( "DBFCDXINIT" );
-   if( pDynSym && pDynSym->pSymbol->pFunPtr )
-   {
-      //TraceLog( NULL, "CDX: %p %p\n", pDynSym, pDynSym->pSymbol->pFunPtr );
-      hb_vmPushSymbol( pDynSym->pSymbol );
-      hb_vmPushNil();
-      hb_vmDo(0);
-   }
-
-   // Sets default RDD to DBFNTX if linked.
-   pDynSym = hb_dynsymFind( "RDDINIT" );
-   if( pDynSym && pDynSym->pSymbol->pFunPtr )
-   {
-      //TraceLog( NULL, "RDD: %p %p\n", pDynSym, pDynSym->pSymbol->pFunPtr );
-      hb_vmPushSymbol( pDynSym->pSymbol );
-      hb_vmPushNil();
-      hb_vmDo(0);
+      pDynSym = hb_dynsymFind( rddName[i] );
+      if( pDynSym && pDynSym->pSymbol->pFunPtr )
+      {
+         hb_vmPushSymbol( pDynSym->pSymbol );
+         hb_vmPushNil();
+         hb_vmDo(0);
+      }
    }
 }
 

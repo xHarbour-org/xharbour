@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.7 2003/07/13 22:21:25 andijahja Exp $
+ * $Id: math.c,v 1.8 2003/07/18 21:42:35 andijahja Exp $
  */
 
 /*
@@ -75,7 +75,7 @@ _LIB_VERSION_TYPE _LIB_VERSION = _XOPEN_;
  * ************************************************************
  */
 
-static HB_MATH_EXCEPTION s_hb_exc = {HB_MATH_ERR_NONE, "", "", 0.0, 0.0, 0.0, 1};
+static HB_MATH_EXCEPTION s_hb_exc = {HB_MATH_ERR_NONE, "", "", 0.0, 0.0, 0.0, 1, 0, 0};
 
 /* reset math error information */
 void hb_mathResetError (void)

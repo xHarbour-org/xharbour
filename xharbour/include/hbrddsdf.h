@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddsdf.h,v 1.3 2001/06/18 18:04:05 dholm Exp $
+ * $Id: hbrddsdf.h,v 1.1.1.1 2001/12/21 10:47:24 ronpinkas Exp $
  */
 
 /*
@@ -154,6 +154,9 @@ extern "C" {
 #define hb_sdfPutValueFile                         NULL
 #define hb_sdfReadDBHeader                         NULL
 #define hb_sdfWriteDBHeader                        NULL
+#define hb_sdfExit                                 NULL
+#define hb_sdfDrop                                 NULL
+#define hb_sdfExists                               NULL
 #define hb_sdfWhoCares                             NULL
 
 #if defined(HB_EXTERN_C)

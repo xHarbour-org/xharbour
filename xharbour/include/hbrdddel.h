@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddel.h,v 1.3 2001/06/18 18:41:11 dholm Exp $
+ * $Id: hbrdddel.h,v 1.1.1.1 2001/12/21 10:47:23 ronpinkas Exp $
  */
 
 /*
@@ -154,6 +154,9 @@ extern "C" {
 #define hb_delimPutValueFile                         NULL
 #define hb_delimReadDBHeader                         NULL
 #define hb_delimWriteDBHeader                        NULL
+#define hb_delimExit                                 NULL
+#define hb_delimDrop                                 NULL
+#define hb_delimExists                               NULL
 #define hb_delimWhoCares                             NULL
 
 #if defined(HB_EXTERN_C)

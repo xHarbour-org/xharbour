@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.49 2003/09/03 00:34:01 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.50 2003/09/06 20:42:58 ronpinkas Exp $
  */
 
 /*
@@ -4144,12 +4144,9 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
 
   /* Fill pInfo structure */
   memset( &pInfo, 0, sizeof(DBOPENINFO) );
-
   pInfo.uiArea = hb_rddFindFirstFreeAreaNum();
   pInfo.abName = ( BYTE * )  hb_xgrab( _POSIX_PATH_MAX + 1 );
-
   strcpy( ( char * ) ( pInfo.abName ), szFileName );
-
   pInfo.atomAlias = ( BYTE * ) "__TMPAREA";
   pInfo.fShared = FALSE;
   pInfo.fReadonly = FALSE;

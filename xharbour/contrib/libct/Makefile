@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2003/08/10 21:52:01 druzus Exp $
+# $Id: Makefile,v 1.7 2003/08/18 12:13:46 druzus Exp $
 #
 
 ROOT = ../../
@@ -57,6 +57,7 @@ C_SOURCES = \
 	remove.c \
 	replace.c \
 	screen1.c \
+	setlast.c \
 	strdiff.c \
 	strswap.c \
 	tab.c \
@@ -77,7 +78,6 @@ PRG_SOURCES= \
 	invertwin.prg \
 	numconv.prg \
 	screen2.prg \
-	setlast.prg \
 	time.prg \
 
 LIBNAME=ct

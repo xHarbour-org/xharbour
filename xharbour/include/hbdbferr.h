@@ -1,13 +1,13 @@
 /*
- * $Id: dbfntx0.prg,v 1.3 2003/09/02 05:41:14 ronpinkas Exp $
+ * $Id$
  */
 
 /*
- * Harbour Project source code:
- * DBFNTX RDD
+ * xHarbour Project source code:
+ * DBF error codes
  *
- * Copyright 1999 Bruno Cantero <bruno@issnet.net>
- * www - http://www.harbour-project.org
+ * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,39 +50,32 @@
  *
  */
 
-#include "error.ch"
-#include "rddsys.ch"
+#ifndef HB_DBFERR_H_
+#define HB_DBFERR_H_
 
-ANNOUNCE DBFNTX
+#if defined(HB_EXTERN_C)
+extern "C" {
+#endif
 
-PROCEDURE DBFNTXInit
+/* DBF errors */
+#define EDBF_OPEN_DBF                              1001
+#define EDBF_CREATE_DBF                            1004
+#define EDBF_READ                                  1010
+#define EDBF_WRITE                                 1011
+#define EDBF_CORRUPT                               1012
+#define EDBF_DATATYPE                              1020
+#define EDBF_DATAWIDTH                             1021
+#define EDBF_UNLOCKED                              1022
+#define EDBF_SHARED                                1023
+#define EDBF_APPENDLOCK                            1024
+#define EDBF_READONLY                              1025
+#define EDBF_LOCK                                  1038
+/* ORDER errors */
+#define EDBF_INVALIDKEY                            1026
 
-   REQUEST _DBFNTX
 
-   rddRegister( "DBF", RDT_FULL )
-   rddRegister( "DBFDBT", RDT_FULL )
-   rddRegister( "DBFNTX", RDT_FULL )
+#if defined(HB_EXTERN_C)
+}
+#endif
 
-return
-
-/* NOTE: Commented out, because in Harbour the INIT order is not guaranteed,
-         so it can happen that this error handler will be installed *before*
-         the default error, but it this case it will not work. [vszakats] */
-
-/*
-
-init procedure InitHandler
-
-   local bOldError := ErrorBlock( { | oError | LockErrHandler( oError, bOldError ) } )
-
-return
-
-static function LockErrHandler( oError, bOldError )
-
-   if oError:GenCode == EG_LOCK
-      return .T.
-   endif
-
-return Eval( bOldError, oError )
-
-*/
+#endif /* HB_DBFERR_H_ */

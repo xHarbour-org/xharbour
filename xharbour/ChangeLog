@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1423 2003/09/08 02:17:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1424 2003/09/08 02:42:25 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,95 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-08 14:46 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/contrib/libct/Makefile
+  * xharbour/contrib/libct/bit1.c
+  * xharbour/contrib/libct/bit2.c
+  * xharbour/contrib/libct/bit3.c
+  * xharbour/contrib/libct/ftoc.c
+    * casting and some nonstandard C statements corrected
+
+  * xharbour/contrib/libct/makefile.bc
+  * xharbour/contrib/libct/makefile.vc
+  + xharbour/contrib/libct/setlast.c
+  - xharbour/contrib/libct/setlast.prg
+    + SETLASTKEY added (previous version put key into key buffer :-) )
+
+  * xharbour/source/rtl/math.c
+    * casting
+
+  * xharbour/source/rtl/cdpapi.c
+    * small modification in logical expresion
+
+  * xharbour/config/global.cf
+    * new RDDs added
+
+  * xharbour/include/hbdefs.h
+    + endian conversion macros
+
+  + xharbour/include/hbdbferr.h
+    + standard DBF errors definition moved to separate file
+
+  * xharbour/include/hbdbsort.h
+    ! corrected including hbrdddbf.h
+      New macro HB_EXTRANAL_RDDDBF_USE for sources which want to include
+      hbrdddbf.h
+
+  * xharbour/include/hbapirdd.h
+  * xharbour/include/hbrddcdx.h
+  * xharbour/include/hbrdddbf.h
+  * xharbour/include/hbrdddel.h
+  * xharbour/include/hbrddntx.h
+  * xharbour/include/hbrddsdf.h
+    * modified to new API
+
+  + xharbour/include/hbrdddbt.h
+  + xharbour/include/hbrddfpt.h
+    * new RDD headers
+
+  * xharbour/source/rdd/Makefile
+    * new RDDs added
+
+  * xharbour/source/rdd/delim1.c
+  * xharbour/source/rdd/sdf1.c
+  * xharbour/source/rdd/dbfntx/dbfntx0.prg
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * modified to new API
+    * DBFNTX by default try to inherits from DBFDBT and if it not exists
+      from DBFFPT then from DBF
+    * DBFCDX by default try to inherits from DBFFPT and if it not exists
+      from DBFDBT then from DBF
+    - removed old FPT code
+
+  * xharbour/source/rdd/dbf1.c
+    * modified to new API
+    * small fixes
+    * methods lock and unLock now calls rawLock so if you want to
+      change locking scheme you only have to overwrite rawLock method
+
+  * xharbour/source/rdd/dbcmd.c
+    * modified to new API
+    * small fixes
+
+  + xharbour/source/rdd/dbfdbt/Makefile
+  + xharbour/source/rdd/dbfdbt/dbfdbt0.prg
+  + xharbour/source/rdd/dbfdbt/dbfdbt1.c
+    + new DBFDBT RDD. Nearly all code was taking frm dbf1.c which
+      I modified a little bit and added DBT file locking (there was
+      no one so far)
+
+  + xharbour/source/rdd/dbffpt/Makefile
+  + xharbour/source/rdd/dbffpt/dbffpt0.prg
+  + xharbour/source/rdd/dbffpt/dbffpt1.c
+    + new DBFFPT RDD. It can read and write from/to SIX and FLEX memos
+    any type of items. Type of FPT file is recognized automatically at
+    open. New files use FLEX format. It's about 15 times faster then
+    Clipper 5.3 on writing and about 50 times on reading
+
+  * xharbour/source/vm/hvm.c
+    + new RDDs initiatlization
 
 2003-09-07 19:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/estack.c

@@ -1,13 +1,13 @@
 /*
- * $Id: dbfntx0.prg,v 1.3 2003/09/02 05:41:14 ronpinkas Exp $
+ * $Id$
  */
 
 /*
  * Harbour Project source code:
- * DBFNTX RDD
+ *   CT3 Set Status functions: - SETLASTKEY()
  *
- * Copyright 1999 Bruno Cantero <bruno@issnet.net>
- * www - http://www.harbour-project.org
+ * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,39 +50,38 @@
  *
  */
 
-#include "error.ch"
-#include "rddsys.ch"
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETLASTKEY()
+ *  $CATEGORY$
+ *      CT3 Set Status functions
+ *  $ONELINER$
+ *  $SYNTAX$
+ *      SETLASTKEY( <nKeyValue> ) -> <cNull>
+ *  $ARGUMENTS$
+ *      <nKeyValue> Designates the character code passed to LASTKEY().
+ *  $RETURNS$
+ *      SETLASTKEY() always returns a null string.
+ *  $DESCRIPTION$
+ *      TODO: add documentation
+ *  $EXAMPLES$
+ *  $TESTS$
+ *  $STATUS$
+ *      Started
+ *  $COMPLIANCE$
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Source is setlast.prg, library is libct.
+ *  $SEEALSO$
+ *      LASTKEY()
+ *  $END$
+ */
 
-ANNOUNCE DBFNTX
+#include "hbapigt.h"
 
-PROCEDURE DBFNTXInit
-
-   REQUEST _DBFNTX
-
-   rddRegister( "DBF", RDT_FULL )
-   rddRegister( "DBFDBT", RDT_FULL )
-   rddRegister( "DBFNTX", RDT_FULL )
-
-return
-
-/* NOTE: Commented out, because in Harbour the INIT order is not guaranteed,
-         so it can happen that this error handler will be installed *before*
-         the default error, but it this case it will not work. [vszakats] */
-
-/*
-
-init procedure InitHandler
-
-   local bOldError := ErrorBlock( { | oError | LockErrHandler( oError, bOldError ) } )
-
-return
-
-static function LockErrHandler( oError, bOldError )
-
-   if oError:GenCode == EG_LOCK
-      return .T.
-   endif
-
-return Eval( bOldError, oError )
-
-*/
+HB_FUNC( SETLASTKEY )
+{
+    hb_setInkeyLast( hb_parni( 1 ) );
+    hb_retc( "" );
+}
