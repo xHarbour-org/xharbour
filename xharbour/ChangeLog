@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3992 2005/04/01 06:09:04 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3993 2005/04/01 16:19:21 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-01 19:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/make_rpm.sh
+    + added automatic version update in xharbour.spec file before
+      RPM is created - it will work though it will be nice if Linux
+      developers will remember to commit updated xharbour.spec file
+      in next release
 
 2005-04-01 18:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/make_rpm.sh

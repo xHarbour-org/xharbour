@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.25 2005/02/08 16:52:59 druzus Exp $
+# $Id: make_rpm.sh,v 1.26 2005/04/01 16:19:47 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -51,8 +51,22 @@ get_rpmmacro()
     echo -n "${R}"
 }
 
-NEED_RPM="make gcc binutils bison bash ncurses ncurses-devel"
+check_version()
+{
+    local hb_ver spec_ver
 
+    . bin/hb-func.sh
+    hb_ver=`get_hbver`
+    spec_ver=`sed -e '/%define version/ !d' -e 's/[^0-9.]//g' ${SPEC_FILE}`
+    if [ -n "${spec_ver}" ] && [ "${spec_ver}" != "${hb_ver}" ]
+    then
+        sed -e "/%define version/ s/${spec_ver}/${hb_ver}/g" ${SPEC_FILE} > ${SPEC_FILE}.new
+        mv -f ${SPEC_FILE}.new ${SPEC_FILE}
+    fi
+}
+
+NEED_RPM="make gcc binutils bison bash ncurses ncurses-devel"
+SPEC_FILE="xharbour.spec"
 FORCE=""
 BUGGY_RPM=""
 if [ -f /etc/conectiva-release ]
@@ -128,6 +142,7 @@ done
 
 if [ -z "${TOINST_LST}" ] || [ "${FORCE}" = "yes" ]
 then
+    check_version
     . ./bin/pack_src.sh
     stat="$?"
     if [ -z "${hb_filename}" ]
