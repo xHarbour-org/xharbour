@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.19 2003/08/27 02:47:48 lculik Exp $
+   $Id: xwt.ch,v 1.20 2003/08/27 20:53:44 lculik Exp $
 
    Definitions
 */
@@ -100,6 +100,8 @@
 #define XWT_PROP_BASECOLOR      132
 #define XWT_PROP_TEXTCOLOR      133
 
+#define XWT_PROP_FONTNAME        140
+
 /* Fake properties */
 #define XWT_PROP_SETMENUBAR 1000 // PHB_ITEM (HB_IT_ARRAY) in data
 #define XWT_PROP_RSTMENUBAR 1001 // idem
@@ -171,7 +173,7 @@
 #define XWT_TYPE_SPLITTER 70
 #define XWT_TYPE_TREEITEM 80
 #define XWT_TYPE_TREELIST 81
-
+#define XWT_TYPE_FONTSEL  90
 
 // Container of Widgets ---------------------------
 
