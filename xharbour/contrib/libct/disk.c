@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.5 2004/03/03 19:27:13 likewolf Exp $
+ * $Id: disk.c,v 1.6 2004/03/18 03:43:08 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -10,7 +10,7 @@
  * DirMake()     - Ready. Already exist a MakeDir() function in xHarbour RT Library, but
  *                 this funtion return a more compatible error codes.
  * DirName()     - Ready.
- * DriveType()   - Ready.
+ * DriveType()   - Ready.  corrected <ptucker@sympatico.ca>
  * FileMove()    - Ready.
  *
  * Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>
@@ -342,7 +342,8 @@ HB_FUNC ( DRIVETYPE )
 {
    #if defined(HB_OS_WIN_32)
       unsigned int uiType;
-      char * pDrive = hb_parcx( 1 );
+      char * pDrive = (char *) xgrab( hb_parclen( 1 )+2 );
+      strcpy( pDrive, (char *) hb_parcx(1) );
 
       if ( strstr( pDrive, ":" ) == NULL )
       {
@@ -380,9 +381,11 @@ HB_FUNC ( DRIVETYPE )
       {
          hb_retni( 9 );  // Unknow Drive - xHarbour extension
       }
+      hb_xfree( pDrive );
    #else
       hb_retni(9);
    #endif
+
 }
 
 /*  $DOC$
