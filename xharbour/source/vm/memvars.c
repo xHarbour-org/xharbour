@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.31 2003/09/04 02:14:39 ronpinkas Exp $
+ * $Id: memvars.c,v 1.32 2003/09/07 23:12:15 ronpinkas Exp $
  */
 
 /*
@@ -778,8 +778,6 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
    if( pDyn )
    {
       HB_TRACE(HB_TR_INFO, ("Memvar item (%i)(%s) referenced", hb_threadGetHMemvar( pDyn ), pMemvarSymb->szName));
-
-      TraceLog( NULL, "***\n" );
 
       if( hb_threadGetHMemvar( pDyn ) )
       {
