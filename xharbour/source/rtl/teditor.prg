@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.38 2004/05/15 18:24:00 modalsist Exp $
+ * $Id: teditor.prg,v 1.38 2004/05/15 22:35:32 modalsist Exp $
  *
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
@@ -378,7 +378,7 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
 
    // set correct insert state
    if ::lEditAllow
-      ::InsertState( ReadInsert() )
+      ::InsertState( SET( _SET_INSERT ) )
    endif
 
    // No need to save
