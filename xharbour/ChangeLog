@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2143 2004/01/26 09:41:37 paultucker Exp $
+ * $Id: ChangeLog,v 1.2144 2004/01/26 14:59:25 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-26 17:10 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbdefs.h
+   * fixed my typo and redefining [U]LONGLONG_* if they allready exist
+     (OpenWatcom)
 
 2004-01-26 15:56 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/hbdefs.h
