@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.86 2004/01/26 22:03:24 fsgiudice Exp $
+# $Id: makefile.vc,v 1.87 2004/01/30 08:49:18 paultucker Exp $
 #
 
 #
@@ -1309,6 +1309,11 @@ $(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
 
 $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
    lib /out:$@ $**
+
+!ifdef HB_GTALLEG
+$(GTALLEG_LIB) : $(GTALLEG_LIB_OBJS)
+   lib /out:$@ $**
+!endif
 
 $(GTWVT_LIB) : $(GTWVT_LIB_OBJS)
    lib /out:$@ $**
