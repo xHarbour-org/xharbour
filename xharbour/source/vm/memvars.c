@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.91 2004/12/31 11:56:11 druzus Exp $
+ * $Id: memvars.c,v 1.92 2005/01/04 05:15:06 walito Exp $
  */
 
 /*
@@ -251,7 +251,7 @@ void hb_memvarsRelease( HB_STACK *pStack )
    {
       while( --ulCnt )
       {
-         if( --( pStack->globalTable[ ulCnt ].counter ) == 0 )
+         /*if( --( pStack->globalTable[ ulCnt ].counter ) == 0 )*/
          {
             if( pStack->globalTable[ ulCnt ].hPrevMemvar == ( HB_HANDLE ) -1 )
             {
@@ -423,7 +423,7 @@ PHB_ITEM hb_memvarDetachLocal( HB_ITEM_PTR pLocal )
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarDetachLocal(%p, %d)", pLocal, pLocal->type ));
 
    /* This code is only for Harbour memvar management */
-#if 0   
+#if 0
    if( HB_IS_BYREF( pLocal ) && ! HB_IS_MEMVAR( pLocal ) )
    {
       HB_ITEM_PTR pItem = pLocal;
@@ -555,7 +555,7 @@ static void hb_memvarRecycle( HB_HANDLE hValue )
       /* first free value in the list */
       s_globalFirstFree = hValue;
       s_globalTable[ hValue ].hPrevMemvar = 0;
-   }      
+   }
 }
 
 #else
@@ -573,7 +573,7 @@ static void hb_memvarRecycleMT( HB_HANDLE hValue, HB_STACK *pStack )
       /* first free value in the list */
       pStack->globalFirstFree = hValue;
       pStack->globalTable[ hValue ].hPrevMemvar = 0;
-   }      
+   }
 }
 #endif
 
