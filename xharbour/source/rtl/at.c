@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.3 2002/05/08 20:07:07 ronpinkas Exp $
+ * $Id: at.c,v 1.4 2003/05/17 17:30:28 jonnymind Exp $
  */
 
 /*
@@ -84,7 +84,7 @@
        {
           ULONG ulLength = pText->item.asString.length;
           ULONG ulStart = ISNUM( 3 ) ? hb_parnl( 3 ) : 1;
-          ULONG ulEnd = ISNUM( 4 ) ? hb_parnl( 4 ) : ulLength;
+          ULONG ulEnd = ISNUM( 4 ) ? (ULONG) hb_parnl( 4 ) : ulLength;
           ULONG ulPos;
 
           // SANITIZATION

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.16 2003/11/20 23:47:36 druzus Exp $
+ * $Id: hbrddntx.h,v 1.17 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -342,7 +342,7 @@ static ERRCODE ntxSkipRaw( NTXAREAP pArea, LONG lToSkip );
 #define ntxFieldDisplay          NULL
 #define ntxFieldInfo             NULL
 #define ntxFieldName             NULL
-#define ntxFlush                 NULL
+static ERRCODE ntxFlush( NTXAREAP pArea );
 #define ntxGetRec                NULL
 #define ntxGetValue              NULL
 #define ntxGetVarLen             NULL

@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.11 2004/01/16 22:57:14 paultucker Exp $
+ * $Id: hbver.c,v 1.12 2004/01/18 03:51:35 paultucker Exp $
  */
 
 /*
@@ -99,10 +99,6 @@
 char * hb_verPlatform( void )
 {
 
-   char szName[128];
-
-   /* NOTE: Must be larger than 128, which is the maximum size of
-            osVer.szCSDVersion (Win32). [vszakats] */
    char *szPlatform = ( char * ) hb_xgrab( 256 );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_verPlatform()"));
@@ -110,6 +106,9 @@ char * hb_verPlatform( void )
 #if defined(HB_OS_DOS)
 
    {
+      /* NOTE: Must be larger than 128, which is the maximum size of
+               osVer.szCSDVersion (Win32). [vszakats] */
+      char szName[128];
       union REGS regs;
 
       regs.h.ah = 0x30;
@@ -204,6 +203,9 @@ char * hb_verPlatform( void )
 #elif defined(HB_OS_WIN_32)
 
    {
+      /* NOTE: Must be larger than 128, which is the maximum size of
+               osVer.szCSDVersion (Win32). [vszakats] */
+      char szName[128];
       OSVERSIONINFO osVer;
 
       osVer.dwOSVersionInfoSize = sizeof( osVer );

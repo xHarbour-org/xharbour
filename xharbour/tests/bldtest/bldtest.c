@@ -26,7 +26,6 @@ int main()
 
    if ( sizeof(BYTE    )!=1 ||
         sizeof(SHORT   )!=2 ||
-        sizeof(UINT    )!=4 ||
         sizeof(LONG    )!=4 ||
         sizeof(LONGLONG)!=8 ||
         sizeof(double  )!=8 )
@@ -45,7 +44,7 @@ int main()
 #else
    l = 4321;
 #endif
-   printf( "\nn=0x%x -> %s (%s endian) %s\n", n, buf,
+   printf( "\nn=0x%x -> \"%s\" (%s endian) %s\n", n, buf,
             i == 1234 ? "big" : 
             i == 2143 ? "pdp" : 
             i == 4321 ? "little" : "unknown",
@@ -54,6 +53,18 @@ int main()
    {
       iRet = 1;
    }
+
+   buf[0] = 0x12;
+   buf[1] = 0x34;
+   buf[2] = 0x56;
+   buf[3] = 0x78;
+   i = ( HB_GET_BE_ULONG( buf ) == 0x12345678L &&
+         HB_GET_LE_ULONG( buf ) == 0x78563412L );
+   if ( ! i )
+   {
+      iRet = 1;
+   }
+   printf( "byte order translation: %s\n", i ? "OK" : "BAD" );
 
    n = (char)255;
    printf( "n=%d -> (char) type is %ssinged %s\n", n, n < 0 ? "" : "un",
@@ -66,6 +77,10 @@ int main()
    if ( iRet )
    {
       printf("\nxHarbour cannot be compiled !!!\n");
+   }
+   else
+   {
+      printf("\nBasic test is correct, try to compile xHarbour.\n");
    }
 
    return iRet;

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.20 2004/03/02 00:28:18 druzus Exp $
+ * $Id: workarea.c,v 1.21 2004/03/15 12:45:25 druzus Exp $
  */
 
 /*
@@ -228,13 +228,20 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
 #else
    /*
     * The only one situation when we should repos is backward skipping
-    * if we are not on BOTTOM position (it's not SKIPFILTER called
-    * from GOBOTTOM).
+    * if we are at BOTTOM position (it's SKIPFILTER called from GOBOTTOM)
+    * then GOEOF() if not then GOTOP()
     */
-   if( pArea->fBof && lUpDown < 0 && !fBottom )
+   if( pArea->fBof && lUpDown < 0 )
    {
-      uiError = SELF_GOTOP( pArea );
-      pArea->fBof = TRUE;
+      if ( fBottom )
+      {
+         uiError = SELF_GOTO( pArea, 0 );
+      }
+      else
+      {
+         uiError = SELF_GOTOP( pArea );
+         pArea->fBof = TRUE;
+      }
    }
 #endif
    else

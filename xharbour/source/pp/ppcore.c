@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.140 2004/03/19 07:37:04 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.141 2004/03/19 16:39:17 ronpinkas Exp $
  */
 
 /*
@@ -411,10 +411,6 @@ void hb_pp_Free( void )
 
 char * hb_ppPlatform( void )
 {
-   char szName[128];
-
-   /* NOTE: Must be larger than 128, which is the maximum size of
-            osVer.szCSDVersion (Win32). [vszakats] */
    char *szPlatform = ( char * ) hb_xgrab( 256 );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_ppPlatform()"));
@@ -422,6 +418,9 @@ char * hb_ppPlatform( void )
 #if defined(HB_OS_DOS)
 
    {
+      /* NOTE: Must be larger than 128, which is the maximum size of
+               osVer.szCSDVersion (Win32). [vszakats] */
+      char szName[128];
       union REGS regs;
 
       regs.h.ah = 0x30;
@@ -516,6 +515,9 @@ char * hb_ppPlatform( void )
 #elif defined(HB_OS_WIN_32)
 
    {
+      /* NOTE: Must be larger than 128, which is the maximum size of
+               osVer.szCSDVersion (Win32). [vszakats] */
+      char szName[128];
       OSVERSIONINFO osVer;
 
       osVer.dwOSVersionInfoSize = sizeof( osVer );

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.115 2004/03/18 04:28:30 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.116 2004/03/18 14:24:28 druzus Exp $
  */
 
 /*
@@ -856,7 +856,7 @@ static BOOL hb_cdxTopScope( LPCDXTAG pTag )
  */
 static BOOL hb_cdxBottomScope( LPCDXTAG pTag )
 {
-   return !pTag->bottomScopeKey || !pTag->topScopeKey->len ||
+   return !pTag->bottomScopeKey || !pTag->bottomScopeKey->len ||
           hb_cdxValCompare( pTag, pTag->bottomScopeKey->val,
                                   pTag->bottomScopeKey->len,
                                   pTag->CurKey->val,
@@ -3705,7 +3705,12 @@ static BOOL hb_cdxPageReadPrevKey( LPCDXPAGE pPage )
    while ( pPage->iCurKey < 0 )
    {
       if ( pPage->Left == CDX_DUMMYNODE || !pOwnerPage )
+      {
+         pPage->iCurKey = 0;
+         if ( pPage->iKeys > 0 )
+            hb_cdxSetCurKey( pPage );
          return FALSE;
+      }
       pOwnerPage->Child = hb_cdxPageNew( pPage->TagParent, pPage->Owner, pPage->Left );
       hb_cdxPageFree( pPage, !pPage->fChanged );
       pPage = pOwnerPage->Child;
@@ -3732,7 +3737,10 @@ static BOOL hb_cdxPageReadNextKey( LPCDXPAGE pPage )
    while ( pPage->iCurKey >= pPage->iKeys )
    {
       if ( pPage->Right == CDX_DUMMYNODE || !pOwnerPage )
+      {
+         pPage->iCurKey = pPage->iKeys;
          return FALSE;
+      }
       pOwnerPage->Child = hb_cdxPageNew( pPage->TagParent, pPage->Owner, pPage->Right );
       hb_cdxPageFree( pPage, !pPage->fChanged );
       pPage = pOwnerPage->Child;
@@ -3763,6 +3771,7 @@ static BOOL hb_cdxPageReadPrevUniqKey( LPCDXPAGE pPage )
       {
          if ( pPage->Left == CDX_DUMMYNODE || !pOwnerPage )
          {
+            pPage->iCurKey = 0;
             if ( pPage->iKeys > 0 )
                hb_cdxSetCurKey( pPage );
             return FALSE;
@@ -3802,6 +3811,7 @@ static BOOL hb_cdxPageReadNextUniqKey( LPCDXPAGE pPage )
       {
          if ( pPage->Right == CDX_DUMMYNODE || !pOwnerPage )
          {
+            pPage->iCurKey = pPage->iKeys - 1;
             if ( pPage->iKeys > 0 )
                hb_cdxSetCurKey( pPage );
             return FALSE;
@@ -3821,7 +3831,7 @@ static BOOL hb_cdxPageReadNextUniqKey( LPCDXPAGE pPage )
  */
 static void hb_cdxTagKeyRead( LPCDXTAG pTag, BYTE bTypRead )
 {
-   BOOL fAfter = FALSE;
+   BOOL fAfter = FALSE, fBof, fEof;
 
    pTag->CurKey->rec = 0;
    pTag->fRePos = FALSE;
@@ -3842,8 +3852,15 @@ static void hb_cdxTagKeyRead( LPCDXTAG pTag, BYTE bTypRead )
             break;
       }
    }
-   if ( !pTag->UsrAscend )
+   if ( pTag->UsrAscend )
    {
+      fBof = pTag->TagBOF;
+      fEof = pTag->TagEOF;
+   }
+   else
+   {
+      fBof = pTag->TagEOF;
+      fEof = pTag->TagBOF;
       switch( bTypRead )
       {
          case TOP_RECORD:
@@ -3871,45 +3888,41 @@ static void hb_cdxTagKeyRead( LPCDXTAG pTag, BYTE bTypRead )
             break;
       }
    }
-   pTag->TagBOF = pTag->TagEOF = FALSE;
+   //fBof = fEof = FALSE;
    switch( bTypRead )
    {
       case TOP_RECORD:
-         pTag->TagBOF = pTag->TagEOF = !hb_cdxPageReadTopKey( pTag->RootPage );
+         fBof = fEof = !hb_cdxPageReadTopKey( pTag->RootPage );
          break;
 
       case BTTM_RECORD:
-         pTag->TagBOF = pTag->TagEOF = !hb_cdxPageReadBottomKey( pTag->RootPage );
+         fBof = fEof = !hb_cdxPageReadBottomKey( pTag->RootPage );
          break;
 
       case PREV_RECORD:
-         pTag->TagBOF = !hb_cdxPageReadPrevKey( pTag->RootPage );
+         if ( !fBof )
+            fBof = !hb_cdxPageReadPrevKey( pTag->RootPage );
          break;
 
       case NEXT_RECORD:
-         pTag->TagEOF = !hb_cdxPageReadNextKey( pTag->RootPage );
+         if ( !fEof )
+            fEof = !hb_cdxPageReadNextKey( pTag->RootPage );
          break;
 
       case PRVU_RECORD:
-         pTag->TagBOF = !hb_cdxPageReadPrevUniqKey( pTag->RootPage );
+         if ( !fBof )
+            fBof = !hb_cdxPageReadPrevUniqKey( pTag->RootPage );
          break;
 
       case NXTU_RECORD:
-         pTag->TagEOF = !hb_cdxPageReadNextUniqKey( pTag->RootPage );
+         if ( !fEof )
+            fEof = !hb_cdxPageReadNextUniqKey( pTag->RootPage );
          break;
    }
-   if ( pTag->TagBOF || pTag->TagEOF )
-   {
-      if ( !pTag->UsrAscend )
-      {
-         BOOL fTmp;
-         fTmp = pTag->TagEOF;
-         pTag->TagEOF = pTag->TagBOF;
-         pTag->TagBOF = fTmp;
-      }
+
+   if ( fEof )
       pTag->CurKey->rec = 0;
-   }
-   else if ( fAfter )
+   else if ( fAfter && !fBof )
    {
       if ( pTag->UsrAscend )
       {
@@ -3921,6 +3934,17 @@ static void hb_cdxTagKeyRead( LPCDXTAG pTag, BYTE bTypRead )
          if ( hb_cdxPageReadNextUniqKey( pTag->RootPage ) )
             hb_cdxPageReadPrevKey( pTag->RootPage );
       }
+   }
+
+   if ( pTag->UsrAscend )
+   {
+      pTag->TagBOF = fBof;
+      pTag->TagEOF = fEof;
+   }
+   else
+   {
+      pTag->TagBOF = fEof;
+      pTag->TagEOF = fBof;
    }
 }
 
@@ -4465,7 +4489,7 @@ static LPCDXTAG hb_cdxGetActiveTag( CDXAREAP pArea )
  */
 static BOOL hb_cdxCurKeyRefresh( CDXAREAP pArea, LPCDXTAG pTag, BOOL fUniq )
 {
-   if ( pArea->ulRecNo == 0 )
+   if ( pArea->fEof || pArea->ulRecNo == 0 )
    {
       pTag->TagEOF = TRUE;
       pTag->fRePos = FALSE;
@@ -4480,9 +4504,10 @@ static BOOL hb_cdxCurKeyRefresh( CDXAREAP pArea, LPCDXTAG pTag, BOOL fUniq )
       {
          LPCDXKEY pKey = hb_cdxKeyEval( NULL, pTag, TRUE );
          hb_cdxTagKeyFind( pTag, pKey );
-         if ( fUniq )
+         if ( fUniq && !pTag->TagEOF && pTag->CurKey->rec != pArea->ulRecNo )
          {
             memcpy( pTag->CurKey->val, pKey->val, pKey->len );
+            pTag->CurKey->rec = 0;
          }
          hb_cdxKeyFree( pKey );
       }
@@ -4492,11 +4517,12 @@ static BOOL hb_cdxCurKeyRefresh( CDXAREAP pArea, LPCDXTAG pTag, BOOL fUniq )
 }
 
 /*
- * skit to next unique key
+ * skip to next unique key
  */
 static ERRCODE hb_cdxSkipUnique( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward )
 {
    ERRCODE retval;
+   BOOL fOut = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxSkipUnique(%p, %p, %i)", pArea, pTag, fForward));
 
@@ -4511,58 +4537,53 @@ static ERRCODE hb_cdxSkipUnique( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward )
    {
       if ( ! hb_cdxCurKeyRefresh( pArea, pTag, fForward ) )
       {
-         if ( fForward )
-         {
-            if ( pTag->TagEOF )
-               pArea->fEof = TRUE;
-         }
-         else if ( pTag->TagEOF )
-            pTag->TagBOF = TRUE;
+         if ( !fForward && pTag->TagEOF && !pArea->fEof )
+            fOut = TRUE;
       }
    }
    if ( fForward )
    {
-      if ( !pArea->fEof )
+      if ( !pArea->fEof && !pTag->TagEOF )
       {
          hb_cdxTagKeyRead( pTag, NXTU_RECORD );
          if ( !pTag->TagEOF )
          {
             if ( !hb_cdxTopScope( pTag ) )
                hb_cdxTagKeyFind( pTag, pTag->topScopeKey );
-            else if ( !hb_cdxBottomScope( pTag ) )
-               pTag->TagEOF = TRUE;
+            if ( !hb_cdxBottomScope( pTag ) )
+               fOut = TRUE;
          }
       }
-      retval = SELF_GOTO( ( AREAP ) pArea, ( pArea->fEof || pTag->TagEOF )
+      retval = SELF_GOTO( ( AREAP ) pArea, ( fOut || pArea->fEof || pTag->TagEOF )
                                            ? 0 : pTag->CurKey->rec );
    }
    else
    {
       if ( pArea->fEof )
       {
-         SELF_GOBOTTOM( ( AREAP ) pArea );
+         retval = SELF_GOBOTTOM( ( AREAP ) pArea );
       }
       else
       {
-         if ( !pTag->TagBOF )
+         if ( !fOut && !pTag->TagBOF )
          {
             hb_cdxTagKeyRead( pTag, PRVU_RECORD );
             if ( !pTag->TagBOF )
             {
                if ( !hb_cdxTopScope( pTag ) ||
                     !hb_cdxBottomScope( pTag ) )
-                  pTag->TagBOF = TRUE;
+                  fOut = TRUE;
             }
          }
-      }
-      if ( pTag->TagBOF )
-      {
-         retval = SELF_GOTOP( ( AREAP ) pArea );
-         pArea->fBof = TRUE;
-      }
-      else
-      {
-         retval = SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
+         if ( fOut || pTag->TagBOF )
+         {
+            retval = SELF_GOTOP( ( AREAP ) pArea );
+            pArea->fBof = TRUE;
+         }
+         else
+         {
+            retval = SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
+         }
       }
    }
    hb_cdxIndexUnLockRead( pTag->pIndex );
@@ -4599,39 +4620,25 @@ static BOOL hb_cdxDBOISkipEval( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    hb_cdxIndexLockRead( pTag->pIndex );
    if ( !pArea->fEof )
    {
-      if ( ! hb_cdxCurKeyRefresh( pArea, pTag, fForward ) )
-      {
-         if ( fForward )
-         {
-            if ( pTag->TagEOF )
-               pArea->fEof = TRUE;
-         }
-         else if ( pTag->TagEOF )
-            pTag->TagBOF = TRUE;
-      }
+      hb_cdxCurKeyRefresh( pArea, pTag, FALSE );
    }
    if ( fForward )
    {
-      if ( !pArea->fEof )
+      if ( !pTag->TagEOF && !pArea->fEof )
       {
          if ( !hb_cdxTopScope( pTag ) )
             hb_cdxTagKeyFind( pTag, pTag->topScopeKey );
          else
             hb_cdxTagKeyRead( pTag, NEXT_RECORD );
 
-         while ( !pTag->TagEOF )
+         while ( !pTag->TagEOF && hb_cdxBottomScope( pTag ) )
          {
-            if ( !hb_cdxBottomScope( pTag ) )
-               pTag->TagEOF = TRUE;
-            else
-            {
-               if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
-                  break;
-               fFound = hb_cdxEvalSeekCond( pTag, pEval );
-               if ( fFound )
-                  break;
-               hb_cdxTagKeyRead( pTag, NEXT_RECORD );
-            }
+            if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
+               break;
+            fFound = hb_cdxEvalSeekCond( pTag, pEval );
+            if ( fFound )
+               break;
+            hb_cdxTagKeyRead( pTag, NEXT_RECORD );
          }
       }
       if ( !fFound )
@@ -4644,19 +4651,14 @@ static BOOL hb_cdxDBOISkipEval( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
       else if ( !pTag->TagBOF )
          hb_cdxTagKeyRead( pTag, PREV_RECORD );
 
-      while ( !pTag->TagBOF )
+      while ( !pTag->TagBOF && hb_cdxTopScope( pTag ) && hb_cdxBottomScope( pTag ) )
       {
-         if ( !hb_cdxTopScope( pTag ) || !hb_cdxBottomScope( pTag ) )
-            pTag->TagBOF = TRUE;
-         else
-         {
-            if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
-               break;
-            fFound = hb_cdxEvalSeekCond( pTag, pEval );
-            if ( fFound )
-               break;
-            hb_cdxTagKeyRead( pTag, PREV_RECORD );
-         }
+         if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
+            break;
+         fFound = hb_cdxEvalSeekCond( pTag, pEval );
+         if ( fFound )
+            break;
+         hb_cdxTagKeyRead( pTag, PREV_RECORD );
       }
       if ( !fFound )
       {
@@ -4699,43 +4701,26 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    hb_cdxIndexLockRead( pTag->pIndex );
    if ( !pArea->fEof )
    {
-      if ( ! hb_cdxCurKeyRefresh( pArea, pTag, fForward ) )
-      {
-         if ( fForward )
-         {
-            if ( pTag->TagEOF )
-               pArea->fEof = TRUE;
-         }
-         else if ( pTag->TagEOF )
-            pTag->TagBOF = TRUE;
-      }
+      hb_cdxCurKeyRefresh( pArea, pTag, FALSE );
    }
    if ( fForward )
    {
-      if ( !pArea->fEof )
+      if ( !pTag->TagEOF && !pArea->fEof )
       {
          if ( !hb_cdxTopScope( pTag ) )
             hb_cdxTagKeyFind( pTag, pTag->topScopeKey );
          else
             hb_cdxTagKeyRead( pTag, NEXT_RECORD );
 
-         while ( !pTag->TagEOF )
+         while ( !pTag->TagEOF && hb_cdxBottomScope( pTag ) )
          {
-            if ( !hb_cdxBottomScope( pTag ) )
-               pTag->TagEOF = TRUE;
-            else
-            {
-               if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
-                  break;
-               fFound = hb_strMatchWild( (const char *) pTag->CurKey->val, szPattern );
-               if ( fFound )
-                  break;
-               hb_cdxTagKeyRead( pTag, NEXT_RECORD );
-            }
+            fFound = hb_strMatchWild( (const char *) pTag->CurKey->val, szPattern );
+            if ( fFound )
+               break;
+            hb_cdxTagKeyRead( pTag, NEXT_RECORD );
          }
       }
-      if ( !fFound )
-         SELF_GOTO( ( AREAP ) pArea, 0 );
+      SELF_GOTO( ( AREAP ) pArea, fFound ? pTag->CurKey->rec : 0 );
    }
    else
    {
@@ -4744,21 +4729,16 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
       else if ( !pTag->TagBOF )
          hb_cdxTagKeyRead( pTag, PREV_RECORD );
 
-      while ( !pTag->TagBOF )
+      while ( !pTag->TagBOF && hb_cdxTopScope( pTag ) && hb_cdxBottomScope( pTag ) )
       {
-         if ( !hb_cdxTopScope( pTag ) || !hb_cdxBottomScope( pTag ) )
-            pTag->TagBOF = TRUE;
-         else
-         {
-            if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
-               break;
-            fFound = hb_strMatchWild( (const char *) pTag->CurKey->val, szPattern );
-            if ( fFound )
-               break;
-            hb_cdxTagKeyRead( pTag, PREV_RECORD );
-         }
+         fFound = hb_strMatchWild( (const char *) pTag->CurKey->val, szPattern );
+         if ( fFound )
+            break;
+         hb_cdxTagKeyRead( pTag, PREV_RECORD );
       }
-      if ( !fFound )
+      if ( fFound )
+         SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
+      else
       {
          SELF_GOTOP( ( AREAP ) pArea );
          pArea->fBof = TRUE;
@@ -4816,47 +4796,30 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    hb_cdxIndexLockRead( pTag->pIndex );
    if ( !pArea->fEof )
    {
-      if ( ! hb_cdxCurKeyRefresh( pArea, pTag, fForward ) )
-      {
-         if ( fForward )
-         {
-            if ( pTag->TagEOF )
-               pArea->fEof = TRUE;
-         }
-         else if ( pTag->TagEOF )
-            pTag->TagBOF = TRUE;
-      }
+      hb_cdxCurKeyRefresh( pArea, pTag, FALSE );
    }
    if ( fForward )
    {
-      if ( !pArea->fEof )
+      if ( !pTag->TagEOF && !pArea->fEof )
       {
          if ( !hb_cdxTopScope( pTag ) )
             hb_cdxTagKeyFind( pTag, pTag->topScopeKey );
          else
             hb_cdxTagKeyRead( pTag, NEXT_RECORD );
 
-         while ( !pTag->TagEOF )
+         while ( !pTag->TagEOF && hb_cdxBottomScope( pTag ) )
          {
-            if ( !hb_cdxBottomScope( pTag ) )
-               pTag->TagEOF = TRUE;
-            else
+            if( regexec( pReg, (const char *) pTag->CurKey->val, 1, aMatches, EFlags ) == 0 )
             {
-               if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
+               //fFound = aMatches[0].rm_so == 0 && (ULONG) aMatches[0].rm_eo == strlen( pTag->CurKey->val );
+               fFound = TRUE;
+               if ( fFound )
                   break;
-               if( regexec( pReg, (const char *) pTag->CurKey->val, 1, aMatches, EFlags ) == 0 )
-               {
-                  //fFound = aMatches[0].rm_so == 0 && (ULONG) aMatches[0].rm_eo == strlen( pTag->CurKey->val );
-                  fFound = TRUE;
-                  if ( fFound )
-                     break;
-               }
-               hb_cdxTagKeyRead( pTag, NEXT_RECORD );
             }
+            hb_cdxTagKeyRead( pTag, NEXT_RECORD );
          }
       }
-      if ( !fFound )
-         SELF_GOTO( ( AREAP ) pArea, 0 );
+      SELF_GOTO( ( AREAP ) pArea, fFound ? pTag->CurKey->rec : 0 );
    }
    else
    {
@@ -4865,25 +4828,20 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
       else if ( !pTag->TagBOF )
          hb_cdxTagKeyRead( pTag, PREV_RECORD );
 
-      while ( !pTag->TagBOF )
+      while ( !pTag->TagBOF && hb_cdxTopScope( pTag ) && hb_cdxBottomScope( pTag ) )
       {
-         if ( !hb_cdxTopScope( pTag ) || !hb_cdxBottomScope( pTag ) )
-            pTag->TagBOF = TRUE;
-         else
+         if( regexec( pReg, (const char *) pTag->CurKey->val, 1, aMatches, EFlags ) == 0 )
          {
-            if ( SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec ) == FAILURE )
+            //fFound = aMatches[0].rm_so == 0 && (ULONG) aMatches[0].rm_eo == strlen( (const char *) pTag->CurKey->val );
+            fFound = TRUE;
+            if ( fFound )
                break;
-            if( regexec( pReg, (const char *) pTag->CurKey->val, 1, aMatches, EFlags ) == 0 )
-            {
-               fFound = aMatches[0].rm_so == 0 && (ULONG) aMatches[0].rm_eo == strlen( (const char *) pTag->CurKey->val );
-               //fFound = TRUE;
-               if ( fFound )
-                  break;
-            }
-            hb_cdxTagKeyRead( pTag, PREV_RECORD );
          }
+         hb_cdxTagKeyRead( pTag, PREV_RECORD );
       }
-      if ( !fFound )
+      if ( fFound )
+         SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
+      else
       {
          SELF_GOTOP( ( AREAP ) pArea );
          pArea->fBof = TRUE;
@@ -5353,6 +5311,7 @@ static ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
 {
    LPCDXTAG pTag;
    ERRCODE retval;
+   BOOL fOut = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("cdxSkipRaw(%p, %ld)", pArea, lToSkip));
 
@@ -5372,17 +5331,17 @@ static ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
          if ( lToSkip > 0 )
          {
             if ( pTag->TagEOF )
-               pArea->fEof = TRUE;
+               fOut = TRUE;
             else
                lToSkip--;
          }
-         else if ( pTag->TagEOF )
-            pTag->TagBOF = TRUE;
+         else if ( pTag->TagEOF && !pArea->fEof )
+            fOut = TRUE;
       }
    }
    if ( lToSkip >= 0 )
    {
-      if ( !pArea->fEof )
+      if ( !pArea->fEof && !fOut )
       {
          while ( !pTag->TagEOF && lToSkip-- > 0 )
          {
@@ -5392,42 +5351,49 @@ static ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
                if ( !hb_cdxTopScope( pTag ) )
                   hb_cdxTagKeyFind( pTag, pTag->topScopeKey );
                else if ( !hb_cdxBottomScope( pTag ) )
-                  pTag->TagEOF = TRUE;
+               {
+                  fOut = TRUE;
+                  break;
+               }
             }
          }
       }
-      retval = SELF_GOTO( ( AREAP ) pArea, ( pArea->fEof || pTag->TagEOF )
+      retval = SELF_GOTO( ( AREAP ) pArea, ( pArea->fEof || pTag->TagEOF || fOut )
                                            ? 0 : pTag->CurKey->rec );
    }
    else /* if ( lToSkip < 0 ) */
    {
       if ( pArea->fEof )
       {
-         SELF_GOBOTTOM( ( AREAP ) pArea );
+         if ( pTag->bottomScope )
+            hb_cdxTagKeyFind( pTag, pTag->bottomScopeKey );
+         else
+            hb_cdxTagKeyRead( pTag, BTTM_RECORD );
+         if ( pTag->CurKey->rec == 0 || ! hb_cdxTopScope( pTag ) )
+            fOut = TRUE;
          lToSkip++;
       }
-      while ( !pTag->TagBOF && lToSkip++ < 0 )
+      while ( !fOut && !pTag->TagBOF && lToSkip++ < 0 )
       {
          hb_cdxTagKeyRead( pTag, PREV_RECORD );
-         if ( !pTag->TagBOF )
+         if ( pTag->TagBOF || !hb_cdxTopScope( pTag ) || !hb_cdxBottomScope( pTag ) )
          {
-            if ( !hb_cdxTopScope( pTag ) ||
-                 !hb_cdxBottomScope( pTag ) )
-            {
-               pTag->TagBOF = TRUE;
-            }
+            fOut = TRUE;
+            break;
          }
       }
-
-      if ( pTag->TagBOF )
+      if ( fOut || pTag->TagBOF )
       {
-         retval = SELF_GOTOP( ( AREAP ) pArea );
-         pArea->fBof = TRUE;
+         if ( pTag->topScope )
+            hb_cdxTagKeyFind( pTag, pTag->topScopeKey );
+         else
+            hb_cdxTagKeyRead( pTag, TOP_RECORD );
+         if ( pTag->CurKey->rec != 0 && ! hb_cdxBottomScope( pTag ) )
+            pTag->CurKey->rec = 0;
+         fOut = TRUE;
       }
-      else
-      {
-         retval = SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
-      }
+      retval = SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
+      pArea->fBof = fOut;
    }
    hb_cdxIndexUnLockRead( pTag->pIndex );
    return retval;
@@ -5507,8 +5473,8 @@ static ERRCODE hb_cdxGoCold( CDXAREAP pArea )
       /* TODO:
        * There is possible race condition here but not very dangerous.
        * To avoid it we should Lock all index file before SUPER_GOCOLD
-       * but it make other problem if two station open the database index
-       * file in a differ order then they can block each other.
+       * but it makes other problem if two stations open the database index
+       * files in a differ order then they can block each other.
        * Without changes in locking scheme we can do only one thing which
        * is enough if there is only one index file: lock first index only
        * before SUPER_GOCOLD
@@ -5612,7 +5578,7 @@ static ERRCODE hb_cdxGoHot( CDXAREAP pArea )
          if ( !pTag->Custom )
          {
             pTag->HotKey = hb_cdxKeyEval( pTag->HotKey, pTag, TRUE );
-            pTag->HotFor = pTag->pForItem == NULL || hb_cdxEvalCond ( pArea, pTag->pForItem, TRUE );
+            pTag->HotFor = pTag->pForItem == NULL || hb_cdxEvalCond( pArea, pTag->pForItem, TRUE );
          }
 
          if ( pTag->pNext )

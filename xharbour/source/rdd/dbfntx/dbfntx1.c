@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.75 2004/03/08 00:38:39 druzus Exp $
+ * $Id: dbfntx1.c,v 1.76 2004/03/15 12:45:26 druzus Exp $
  */
 
 /*
@@ -3495,6 +3495,33 @@ static ERRCODE ntxGoHot( NTXAREAP pArea )
 }
 
 /*
+ * Flush _system_ buffers to disk
+ */
+static ERRCODE ntxFlush( NTXAREAP pArea )
+{
+   LPTAGINFO pTag;
+   ERRCODE uiError;
+
+   HB_TRACE(HB_TR_DEBUG, ("ntxFlush(%p)", pArea));
+
+   if( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
+      return FAILURE;
+
+   uiError = SUPER_FLUSH( ( AREAP ) pArea );
+
+   pTag = pArea->lpNtxTag;
+   while( pTag )
+   {
+      if( !pTag->Memory )
+      {
+         hb_fsCommit( pTag->Owner->DiskFile );
+      }
+      pTag = pTag->pNext;
+   }
+   return uiError;
+}
+
+/*
  * Retrieve the size of the WorkArea structure.
  */
 static ERRCODE ntxStructSize( NTXAREAP pArea, USHORT * uiSize )
@@ -4338,7 +4365,7 @@ static RDDFUNCS ntxTable = { ntxBof,
                              ntxFieldDisplay,
                              ntxFieldInfo,
                              ntxFieldName,
-                             ntxFlush,
+                             ( DBENTRYP_V ) ntxFlush,
                              ntxGetRec,
                              ntxGetValue,
                              ntxGetVarLen,

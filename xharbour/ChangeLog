@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2613 2004/03/20 18:07:49 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2614 2004/03/20 22:12:06 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-21 00:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed smal typo but with very bad side effect - when only bottom
+      scope was set it cause GPF when skipping
+    * reorganized TagBOF/TagEOF flags for better performance and fixing
+      some possible bad BOF/EOF setting
+    * cdxSkipRaw() is now real SKIPRAW() without any filtering other
+      then the one set on CDX level.
+
+  * xharbour/source/rdd/workarea.c
+    * fixed my last modification, now skipFilter() do only minimum
+      necessary operations
+    
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    + flushing buffers added (patch from "Oscar Hernandez Suarez"
+      <oscar@oscarweb.com>, thanks)
+
+  - xharbour/tests/bldtest/endian.c
+  + xharbour/tests/bldtest/bldtest.c
+    * endian.c renamed to bldtest.c and a little bit extend
+
+  * xharbour/include/hbexprb.c
+  * xharbour/source/common/hbver.c
+  * xharbour/source/pp/ppcore.c
+  * xharbour/source/rtl/at.c
+  * xharbour/source/rtl/filesys.c
+    * warning fixes
 
 2004-03-20 17:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rdd/dbcmd.c
@@ -373,7 +401,7 @@
 
 2004-03-17 03:40 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
-    ! fixed RTerror code in seek 1201 not 1020 (Thanks to Luiz)
+    ! fixed RTerror code in seek 1201 not 1020 (Thanks to Luis)
 
   * xharbour/source/rdd/dbcmd.c
     * casting, strcmp() returns integer not pointer

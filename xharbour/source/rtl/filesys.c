@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.71 2004/03/11 22:03:23 ronpinkas Exp $
+ * $Id: filesys.c,v 1.72 2004/03/16 21:31:37 lf_sfnet Exp $
  */
 
 /*
@@ -1796,6 +1796,12 @@ void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
    }
    hb_fsSetError( errno );
 
+#elif defined( HB_OS_UNIX )
+
+   HB_SYMBOL_UNUSED( hFileHandle );
+   HB_SYMBOL_UNUSED( uiDevMode );
+   hb_fsSetError( FS_ERROR );
+
 #else
 
    hb_fsSetError( FS_ERROR );
@@ -2995,6 +3001,7 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 
 #else
 
+   HB_SYMBOL_UNUSED( nDrive );
    uiResult = FS_ERROR;
    hb_fsSetError( FS_ERROR );
 
@@ -3070,6 +3077,7 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
 
 #else
 
+   HB_SYMBOL_UNUSED( nDrive );
    uiResult = FS_ERROR;
    hb_fsSetError( FS_ERROR );
 
