@@ -11,10 +11,10 @@
 #
 HBR_DIR =..\..
 WH_DIR  =.
-OBJ_DIR =obj
+OBJ_DIR =obj\vc
 OUTDIR  =build
 SRCDIR  =source
-LIBDIR  =lib
+LIBDIR  =lib\vc
 
 
 MK_FILE  = makefile.nt
@@ -50,7 +50,7 @@ LIBLIST  = $(WHAT32LIB)
 
 # library
 #
-#
+
 {$(OBJ_DIR)}.c{$(OBJ_DIR)}.obj:
    $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
 
@@ -60,18 +60,6 @@ LIBLIST  = $(WHAT32LIB)
 {$(SRCDIR)}.prg{$(OBJ_DIR)}.obj::
    $(hbc) $(hbcflags) -o$(OBJ_DIR)\ $<
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(WHAT32LIB)2
-
-#WHAT32C  = \
-#    $(OBJ_DIR)\Debug.c \
-#    $(OBJ_DIR)\ErrorSys.c \
-#    $(OBJ_DIR)\WhatUtil.c \
-#    $(OBJ_DIR)\WinCDlg.c \
-#    $(OBJ_DIR)\WinComm.c \
-#    $(OBJ_DIR)\WinCore.c \
-#    $(OBJ_DIR)\WinIni.c \
-#    $(OBJ_DIR)\WinRBar.c \
-#    $(OBJ_DIR)\WinTBar.c \
-#    $(OBJ_DIR)\WinTabs.c
 
 WHAT32OBJ = \
     $(OBJ_DIR)\Debug.obj \

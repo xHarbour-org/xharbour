@@ -2,7 +2,7 @@
 if not exist .\lib md .\lib
 if not exist .\obj md .\obj
 if not exist .\lib\b32 md .\lib\b32
-if not exist .\obj\vc md .\obj\vc
+if not exist .\obj\b32 md .\obj\b32
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN

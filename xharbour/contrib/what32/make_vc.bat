@@ -1,7 +1,9 @@
 @echo off
 rem $Id: make_vc.bat,v 1.3 2002/10/30 02:32:48 paultucker Exp $
 if not exist .\lib md .\lib
+if not exist .\lib\vc md .\lib\vc
 if not exist .\obj md .\obj
+if not exist .\obj\vc md .\obj\vc
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
@@ -16,9 +18,9 @@ goto copy_files
 
 :clean
 
-   if exist lib\*.lib del .\lib\*.lib
-   if exist obj\*.obj del .\obj\*.obj
-   if exist obj\*.c   del .\obj\*.c
+   if exist lib\vc\*.lib del .\lib\vc\*.lib
+   if exist obj\vc\*.obj del .\obj\vc\*.obj
+   if exist obj\vc\*.c   del .\obj\vc\*.c
    goto End
 
 :error
@@ -26,6 +28,7 @@ echo there is an error on make files
 goto end
 
 :copy_files
+copy lib\vc\*.lib lib
 copy lib\*.lib ..\..\lib
 
 :end
