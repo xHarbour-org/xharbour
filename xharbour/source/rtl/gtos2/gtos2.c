@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.15 2004/08/31 07:05:25 mauriliolongo Exp $
+ * $Id: gtos2.c,v 1.16 2004/09/08 00:17:14 druzus Exp $
  */
 
 /*
@@ -1409,8 +1409,10 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
     /* extended GT functions */
     gt_funcs->info                  = HB_GT_FUNC( gt_info );
+/*
     gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
     gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
+*/
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3414 2004/09/08 02:50:13 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3415 2004/09/08 02:52:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-08 12:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/gtos2/gtos2.c
+    * commented out setDispCP() and setKeyCP() until they will not be
+      defined in GTOS2
 
 2004-09-07 19:49 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/hbini.prg
