@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2394 2004/02/24 17:41:13 paultucker Exp $
+ * $Id: ChangeLog,v 1.2395 2004/02/24 18:20:35 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,7 +9,7 @@
 */
 
 2004-02-24 19:25 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
-  * source/vm/classes.c
+  * source/rdd/dbcmd.c
     ! in COPY TO and APPEND FROM, if target file were missing
       extension, a SEFGAULT may arise: strcat function was used to
       add some data to a string obtained from hb_parc(), which is
