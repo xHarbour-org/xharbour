@@ -1305,7 +1305,7 @@ if( h ){
 BOOL LockSetForegroundWindow( UINT uLockCode
 );
 */
-
+/*
 #if (WINVER >= 0X0500)
 
 HB_FUNC ( LOCKSETFOREGROUNDWINDOW )
@@ -1314,7 +1314,7 @@ HB_FUNC ( LOCKSETFOREGROUNDWINDOW )
 }
 
 #endif
-
+*/
 HB_FUNC ( LOCKWINDOWUPDATE )
 {
    hb_retl( LockWindowUpdate( (HWND) hb_parnl( 1 ) ) );

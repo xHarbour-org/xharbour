@@ -784,18 +784,19 @@ HB_FUNC( GETUSERNAME )
 //-----------------------------------------------------------------------------
 // WINBASEAPI BOOL WINAPI GetVersionExA( IN OUT LPOSVERSIONINFOA lpVersionInformation );
 
-/*
+
 
 HB_FUNC( GETVERSIONEX )
 {
-   LPOSVERSIONINFOA lpVersionInformation ;
-
-   // Your code goes here
-
-   hb_retl( GetVersionExA( lpVersionInformation ) ) ;
+   BOOL bGetVer;
+   OSVERSIONINFOEX osvi;
+   osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+   bGetVer = GetVersionEx( (OSVERSIONINFOEX*) &osvi );
+   hb_storclen( (char*) &osvi, sizeof(OSVERSIONINFOEX), 1 );
+   hb_retl( bGetVer );
 }
 
-*/
+
 
 //-----------------------------------------------------------------------------
 // WINBASEAPI BOOL WINAPI VerifyVersionInfoA( IN LPOSVERSIONINFOEXA lpVersionInformation, IN DWORD dwTypeMask, IN DWORDLONG dwlConditionMask );
