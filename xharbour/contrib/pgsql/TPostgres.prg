@@ -929,6 +929,13 @@ METHOD FieldGet( nRow, nField ) CLASS TPQquery
                 result := PadR(result, nSize)                
             end
                         
+        elseif cType == "M"
+            if ISNIL(result)
+                result := ""
+            else
+                result := result
+            end
+                        
         end
     end                    
 RETURN result
