@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.72 2004/07/22 17:04:14 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.73 2004/10/27 05:27:37 ronpinkas Exp $
  */
 
 /*
@@ -1540,7 +1540,7 @@ CodeBlock  : '{' CBMARKER { s_iBlock++; $<asExpr>$ = hb_compExprNewCodeBlock(); 
 		     }
            ;
 
-CodeBlock2 : '<' BITOR { hb_compCodeBlockStart(); } ParamList BITOR Crlf
+CodeBlock2 : '<' BITOR { hb_compCodeBlockStart(); hb_comp_iVarScope = VS_PARAMETER; } ParamList BITOR Crlf
                  Source
              '>'
              {
@@ -1609,15 +1609,20 @@ ExpList    : ExpList3 ',' Argument { $$ = hb_compExprAddListExpr( $1, $3 ); }
 IIFInline  : IIF PareExpList3          { $$ = hb_compExprNewIIF( $2 ); }
            ;
 
-VarDefs    : LOCAL { hb_comp_iVarScope = VS_LOCAL; hb_compLinePush(); } VarList Crlf { hb_comp_cVarType = ' '; }
+VarDefs    : LOCAL { hb_comp_iVarScope = ( hb_comp_functions.pLast->szName ? VS_LOCAL : VS_PARAMETER ); hb_compLinePush(); } VarList Crlf { hb_comp_cVarType = ' '; }
            | STATIC { hb_comp_iVarScope = VS_STATIC; hb_compLinePush(); } VarList Crlf { hb_comp_cVarType = ' '; }
            | GLOBAL { hb_comp_iVarScope = VS_GLOBAL; hb_compLinePush(); } VarList Crlf { hb_comp_cVarType = ' '; }
            | EXTERNGLOBAL { hb_comp_iVarScope = VS_EXTERNGLOBAL; hb_compLinePush(); } VarList Crlf { hb_comp_cVarType = ' '; }
            | PARAMETERS { if( hb_comp_functions.pLast->bFlags & FUN_USES_LOCAL_PARAMS )
+                          {
                              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_PARAMETERS_NOT_ALLOWED, NULL, NULL );
+                          }
                           else
-                             hb_comp_functions.pLast->wParamNum=0; hb_comp_iVarScope = ( VS_PRIVATE | VS_PARAMETER ); }
-                             MemvarList Crlf { hb_comp_iVarScope = VS_NONE; }
+                          {
+                             hb_comp_functions.pLast->wParamNum = 0; hb_comp_iVarScope = ( VS_PRIVATE | VS_PARAMETER );
+                          }
+                        }
+                        MemvarList Crlf { hb_comp_iVarScope = VS_NONE; }
            ;
 
 VarList    : VarDef                                  { $$ = 1; }
