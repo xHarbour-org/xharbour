@@ -720,7 +720,7 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
          //     endif
          //     ::Axit()
          CASE nMsg == WM_NCMOUSEMOVE
-              nRet := ::OnNCMouseMove( wParam, lParam )
+              nRet := ::OnNCMouseMove(LoWord(lParam), HiWord(lParam), wParam)
          CASE nMsg == WM_MOVE   // x, y
               WG_DebugTrace( "TWindow:WindowProc() - WM_MOVE - ::OnMove", "Self", Self )
               nRet := ::OnMove(LoWord(lParam), HiWord(lParam))
