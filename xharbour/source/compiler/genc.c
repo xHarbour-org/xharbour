@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.58 2004/01/21 06:34:12 andijahja Exp $
+ * $Id: genc.c,v 1.59 2004/01/21 10:53:34 andijahja Exp $
  */
 
 /*
@@ -457,11 +457,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       if( bCritical )
       {
          fprintf( yyc, "#if defined(HB_STATIC_STARTUP)\n" );
-         fprintf( yyc, "   #pragma startup hb_InitCritical%s\n", pFileName->szName );
+         fprintf( yyc, "   #pragma startup hb_InitCritical%s\n", hb_comp_FileAsSymbol );
          fprintf( yyc, "#elif defined(_MSC_VER)\n" );
-         fprintf( yyc, "   static HB_$INITSYM hb_auto_InitCritical = hb_InitCritical%s;\n", pFileName->szName );
+         fprintf( yyc, "   static HB_$INITSYM hb_auto_InitCritical = hb_InitCritical%s;\n", hb_comp_FileAsSymbol );
          fprintf( yyc, "#elif ! defined(__GNUC__)\n" );
-         fprintf( yyc, "   #pragma startup hb_InitCritical%s\n", pFileName->szName );
+         fprintf( yyc, "   #pragma startup hb_InitCritical%s\n", hb_comp_FileAsSymbol );
          fprintf( yyc, "#endif\n\n" );
       }
 
