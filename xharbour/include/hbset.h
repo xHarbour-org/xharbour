@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.16 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbset.h,v 1.17 2003/12/09 00:50:26 ronpinkas Exp $
  */
 
 /*
@@ -121,17 +121,18 @@ typedef enum
    HB_SET_AUTOSHARE     = 47,
 
    /* Harbour SET extensions start at 100 */
-   HB_SET_LANGUAGE      = 100,
-   HB_SET_IDLEREPEAT    = 101,
-   HB_SET_TRACE         = 102,
-   HB_SET_TRACEFILE     = 103,
-   HB_SET_TRACESTACK    = 104,
-   HB_SET_FILECASE      = 105,
-   HB_SET_DIRCASE       = 106,
-   HB_SET_DIRSEPARATOR  = 107,
-   HB_SET_ERRORLOOP     = 108,
-   HB_SET_OUTPUTSAFETY  = 109,
-   HB_SET_DBFLOCKSCHEME = 110
+   HB_SET_LANGUAGE        = 100,
+   HB_SET_IDLEREPEAT      = 101,
+   HB_SET_TRACE           = 102,
+   HB_SET_TRACEFILE       = 103,
+   HB_SET_TRACESTACK      = 104,
+   HB_SET_FILECASE        = 105,
+   HB_SET_DIRCASE         = 106,
+   HB_SET_DIRSEPARATOR    = 107,
+   HB_SET_ERRORLOOP       = 108,
+   HB_SET_OUTPUTSAFETY    = 109,
+   HB_SET_DBFLOCKSCHEME   = 110,
+   HB_SET_BACKGROUNDTASKS = 111
 
 } HB_set_enum;
 
@@ -204,6 +205,7 @@ typedef struct
 
    int     HB_SET_ERRORLOOP;
    BOOL    HB_SET_OUTPUTSAFETY;
+   BOOL    HB_SET_BACKGROUNDTASKS;
 
    BOOL    hb_set_winprinter;
    FHANDLE hb_set_winhan;

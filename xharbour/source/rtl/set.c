@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.35 2003/10/23 01:32:20 peterrees Exp $
+ * $Id: set.c,v 1.36 2003/11/20 23:47:36 druzus Exp $
  */
 
 /*
@@ -1356,6 +1356,14 @@ HB_FUNC( SET )
          }
          break;
 
+      case HB_SET_BACKGROUNDTASKS:
+         hb_retl( hb_set.HB_SET_BACKGROUNDTASKS );
+         if( args > 1 )
+         {
+            hb_set.HB_SET_BACKGROUNDTASKS = set_logical( pArg2, hb_set.HB_SET_BACKGROUNDTASKS );
+         }
+         break;
+
       default:
          /* Return NIL if called with invalid SET specifier */
          break;
@@ -1464,6 +1472,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_OUTPUTSAFETY = TRUE;
 
    hb_set.HB_SET_DBFLOCKSCHEME = 0;
+   hb_set.HB_SET_BACKGROUNDTASKS = FALSE;
 
    hb_set.HB_SET_WRAP = FALSE;
    hb_set.hb_set_winprinter=FALSE;

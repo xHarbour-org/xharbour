@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.79 2003/11/24 15:15:22 lf_sfnet Exp $
+# $Id: makefile.vc,v 1.80 2003/12/13 17:45:07 paultucker Exp $
 #
 
 #
@@ -303,6 +303,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\accept.obj \
    $(OBJ_DIR)$(MT)\ampm.obj \
    $(OBJ_DIR)$(MT)\at.obj \
+   $(OBJ_DIR)$(MT)\bkgtsks.obj \
    $(OBJ_DIR)$(MT)\binnum.obj \
    $(OBJ_DIR)$(MT)\binnumx.obj \
    $(OBJ_DIR)$(MT)\box.obj \

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.35 2003/12/13 20:09:02 fsgiudice Exp $
+# $Id: hrbdll.bc,v 1.36 2003/12/15 22:41:56 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -76,6 +76,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\accept.obj \
   $(OBJ_DIR)\ampm.obj \
   $(OBJ_DIR)\at.obj \
+  $(OBJ_DIR)\bkgtsks.obj \
   $(OBJ_DIR)\binnum.obj \
   $(OBJ_DIR)\binnumx.obj \
   $(OBJ_DIR)\box.obj \
@@ -416,7 +417,7 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\ppcore.obj \
    $(OBJ_DIR)\pplib.obj \
    $(OBJ_DIR)\pptable.obj \
-   $(OBJ_DIR)\pragma.obj 
+   $(OBJ_DIR)\pragma.obj
 
 # ÚÄÄÄÄÄÄÄÄÄ¿
 # ³ project ³Û
@@ -450,6 +451,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\accept.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\ampm.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\at.obj                + >> hdll.tmp
+  echo. $(OBJ_DIR)\bkgtsks.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\binnum.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\binnumx.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\box.obj               + >> hdll.tmp
@@ -1065,6 +1067,9 @@ $(OBJ_DIR)\ampm.obj : $(RTL_DIR)\ampm.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\at.obj : $(RTL_DIR)\at.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\bkgtsks.obj : $(RTL_DIR)\bkgtsks.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\binnum.obj : $(RTL_DIR)\binnum.c

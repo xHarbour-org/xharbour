@@ -1,5 +1,5 @@
 /*
- * $Id: set.ch,v 1.6 2003/10/18 01:15:18 jonnymind Exp $
+ * $Id: set.ch,v 1.7 2003/11/20 23:47:36 druzus Exp $
  */
 
 /*
@@ -114,19 +114,20 @@
 
 #define _SET_COUNT        47
 
-#define _SET_LANGUAGE      100 /* Harbour extension */
-#define _SET_IDLEREPEAT    101 /* Harbour extension */
-#define _SET_TRACE         102 /* Harbour extension */
-#define _SET_TRACEFILE     103 /* Harbour extension */
-#define _SET_TRACESTACK    104 /* Harbour extension */
-#define _SET_FILECASE      105 /* Harbour extension */
-#define _SET_DIRCASE       106 /* Harbour extension */
-#define _SET_DIRSEPARATOR  107 /* Harbour extension */
-#define _SET_ERRORLOOP     108 /* Harbour extension */
-#define _SET_OUTPUTSAFETY  109 /* Harbour extension */
-#define _SET_DBFLOCKSCHEME 110 /* Harbour extension */
+#define _SET_LANGUAGE        100 /* Harbour extension */
+#define _SET_IDLEREPEAT      101 /* Harbour extension */
+#define _SET_TRACE           102 /* Harbour extension */
+#define _SET_TRACEFILE       103 /* Harbour extension */
+#define _SET_TRACESTACK      104 /* Harbour extension */
+#define _SET_FILECASE        105 /* Harbour extension */
+#define _SET_DIRCASE         106 /* Harbour extension */
+#define _SET_DIRSEPARATOR    107 /* Harbour extension */
+#define _SET_ERRORLOOP       108 /* Harbour extension */
+#define _SET_OUTPUTSAFETY    109 /* Harbour extension */
+#define _SET_DBFLOCKSCHEME   110 /* Harbour extension */
+#define _SET_BACKGROUNDTASKS 111 /* Harbour extension */
 
 #define HB_SET_BASE        100
-#define HB_SET_COUNT       11
+#define HB_SET_COUNT       12
 
 #endif /* _SET_CH */

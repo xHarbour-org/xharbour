@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1896 2003/12/18 21:12:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1897 2003/12/19 01:12:06 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,48 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-19 02:31 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  + source/rtl/bkgtsks.c
+    ! Added:
+      At C Level
+      void hb_backgroundRun( void )
+      void hb_backgroundReset( void )
+      void hb_backgroundShutDown( void )
+      ULONG hb_backgroundAddFunc( PHB_ITEM pBlock )
+      PHB_ITEM hb_backgroundDelFunc( ULONG ulID )
+
+      At PRG Level
+      HB_BackgroundAdd()
+      HB_BackgroundDel()
+      HB_BackgroundRun()
+      HB_BackgroundReset()
+
+    Now we can have multitasking on ST !
+    This is done as an extension of idle state.
+    Background functions works on every vmExecute() call,
+    so PAY ATTENTION in use of them! A wrong use will make your prg very SLOW.
+    Background functions are operative throught a SET BACKGROUND TASKS ON|OFF
+    or Set( _SET_BACKGROUNDTASKS, .T.|.F. )
+    Default is set to FALSE.
+    Even it is set to FALSE, you can call it explicitly using HB_BackgroundRun()
+    i.e. inside HB_Idle*() functions.
+
+  * include/hbset.h
+  * include/set.ch
+  * source/pp/pptable.c
+  * source/rtl/set.c
+  * source/rtl/Makefile
+  * makefile.bc
+  * makefile.vc
+  * makefile.nt
+  * hrbdll.bc
+  * hrbdll.vc
+    * touched for background functions
+
+
+  + tests/bkgtest.prg
+    + Added tests to show use of Background functions
 
 2003-12-18 12:10 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/compiler/harbour.c

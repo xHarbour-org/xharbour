@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.77 2003/12/08 01:36:07 mlombardo Exp $
+# $Id: makefile.bc,v 1.78 2003/12/15 22:41:56 ronpinkas Exp $
 #
 
 #
@@ -314,6 +314,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\accept.obj \
    $(RTL_OBJ_DIR)\ampm.obj \
    $(RTL_OBJ_DIR)\at.obj \
+   $(RTL_OBJ_DIR)\bkgtsks.obj \
    $(RTL_OBJ_DIR)\binnum.obj \
    $(RTL_OBJ_DIR)\binnumx.obj \
    $(RTL_OBJ_DIR)\box.obj \
@@ -1526,6 +1527,9 @@ $(RTL_OBJ_DIR)\arrayblk.obj : $(RTL_OBJ_DIR)\arrayblk.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\at.obj : $(RTL_DIR)\at.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\bkgtsks.obj : $(RTL_DIR)\bkgtsks.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\binnum.obj : $(RTL_DIR)\binnum.c

@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.34 2003/11/14 01:18:01 ronpinkas Exp $
+ * $Id: pptable.c,v 1.35 2003/11/20 23:47:36 druzus Exp $
  */
 
 /*
@@ -130,6 +130,7 @@ void hb_pp_Table( void )
    static DEFINES sD___59 = {"_SET_ERRORLOOP",NULL,-1,"108", &sD___58 };
    static DEFINES sD___60 = {"_SET_OUTPUTSAFETY",NULL,-1,"109", &sD___59 };
    static DEFINES sD___61 = {"_SET_DBFLOCKSCHEME",NULL,-1,"110", &sD___60 };
+   static DEFINES sD___62 = {"_SET_BACKGROUNDTASKS",NULL,-1,"111", &sD___61 };
 
    static COMMANDS sC___1 = {0,"NOTE","\1A30",NULL,NULL };
    static COMMANDS sC___2 = {0,"DO","WHILE \1A00","while \1A00",&sC___1 };
@@ -483,6 +484,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___271 = {0,"SET","STRICTREAD \1A20 ON,OFF,&>","Set(_SET_STRICTREAD,\1A30 )",&sC___270 };
    static COMMANDS sC___272 = {0,"SET","STRICTREAD (\1A00)","Set(_SET_STRICTREAD,\1A00 )",&sC___271 };
    static COMMANDS sC___273 = {0,"SET","OUTPUT SAFETY \1A20 ON,OFF,&>","Set(_SET_OUTPUTSAFETY,\1A30 )",&sC___272 };
+   static COMMANDS sC___274 = {0,"SET","BACKGROUND TASKS \1A20 ON,OFF,&>","Set(_SET_BACKGROUNDTASKS,\1A30 )",&sC___273 };
 #endif
 
    static COMMANDS sT___01 = {0,"{","\16\1A00\17 => \16\1B00\17 \16,\1C00 => \1D00 \17 }", "Hash(\16\1A00,\1B00\17 \16,\1C00,\1D00 \17 )",NULL };
@@ -491,11 +493,11 @@ void hb_pp_Table( void )
    static COMMANDS sT___04 = {0,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___03 };
 
 #if defined( HB_COMPAT_C53 )
-   hb_pp_topCommand = &sC___273;
+   hb_pp_topCommand = &sC___274;
 #else
    hb_pp_topCommand = &sC___254;
 #endif
 
-   hb_pp_topDefine = &sD___61;
+   hb_pp_topDefine = &sD___62;
    hb_pp_topTranslate = &sT___04;
 }

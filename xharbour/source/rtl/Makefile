@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.42 2003/11/24 15:15:25 lf_sfnet Exp $
+# $Id: Makefile,v 1.43 2003/12/08 01:36:12 mlombardo Exp $
 #
 
 ROOT = ../../
@@ -13,6 +13,7 @@ C_SOURCES=\
         accept.c     \
         ampm.c       \
         at.c         \
+        bkgtsks.c    \
         binnum.c     \
         binnumx.c    \
         box.c        \

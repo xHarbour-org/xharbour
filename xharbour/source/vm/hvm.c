@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.296 2003/12/13 07:16:25 andijahja Exp $
+ * $Id: hvm.c,v 1.297 2003/12/18 21:12:44 ronpinkas Exp $
  */
 
 /*
@@ -676,6 +676,8 @@ int HB_EXPORT hb_vmQuit( void )
    hb_idleShutDown();
    //printf("After Idle\n" );
 
+   hb_backgroundShutDown();
+
    hb_i18nExit();
 
    hb_errExit();
@@ -847,6 +849,18 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          }
       }
 #endif
+
+      if ( hb_set.HB_SET_BACKGROUNDTASKS )
+      {
+         static unsigned short s_iCancel = 0;
+
+         if( ++s_iCancel == 65535 )
+         {
+            //hb_idleRun();
+            hb_backgroundRun();
+         }
+      }
+
       switch( pCode[ w ] )
       {
          /* Operators ( mathematical / character / misc ) */
