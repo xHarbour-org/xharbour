@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.32 2004/03/30 22:47:23 druzus Exp $
+ * $Id: hash.c,v 1.33 2004/05/08 20:32:41 ronpinkas Exp $
  */
 
 /*
@@ -1899,7 +1899,7 @@ HB_FUNC( HHASKEY )
    }
    else
    {
-      hb_retnl( TRUE );
+      hb_retl( TRUE );
    }
 }
 

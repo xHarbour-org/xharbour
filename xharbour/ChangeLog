@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3470 2004/09/26 16:37:00 jonnymind Exp $
+ * $Id: ChangeLog,v 1.3471 2004/09/28 03:40:49 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-28 13:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/vm/hash.c
+    ! Fixed HHASKEY() to return .T. instead of 1. Fix provided by Valery
+      Belorustcev.
 
 2004-09-28 09:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c
