@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.36 2003/07/19 22:08:05 jonnymind Exp $
+ * $Id: fm.c,v 1.37 2003/07/20 17:50:03 jonnymind Exp $
  */
 
 /*
@@ -620,6 +620,55 @@ void HB_EXPORT hb_xinit( void ) /* Initialize fixed memory subsystem */
    #endif
 }
 
+
+/* Returns pointer to string containing printable version 
+   of pMem memory block */
+
+char * hb_mem2str( void * pMem, UINT uiSize )
+{
+#define HB_MAX_MEM2STR_BLOCK 256
+
+   static unsigned char cBuffer[2*HB_MAX_MEM2STR_BLOCK+1]; /* multiplied by 2 to allow hex format */
+   unsigned char *cMem = (unsigned char*)pMem;
+   UINT uiIndex, uiPrintable;
+
+   if( uiSize > HB_MAX_MEM2STR_BLOCK )
+      uiSize = HB_MAX_MEM2STR_BLOCK;
+
+   uiPrintable = 0;
+   for( uiIndex=0; uiIndex < uiSize; uiIndex++ )
+      if( cMem[uiIndex] >= ' ' )
+         uiPrintable++;
+
+   if( (uiPrintable*100)/uiSize > 70 ) /* more then 70% printable chars */
+   {
+      /* format as string of original chars */
+      for( uiIndex=0; uiIndex < uiSize; uiIndex++ )
+         if( cMem[uiIndex] >= ' ' )
+            cBuffer[uiIndex] = cMem[uiIndex];
+         else
+            cBuffer[uiIndex] = '.';
+      cBuffer[uiIndex] = '\0';
+   }
+   else
+   {
+     /* format as hex */
+      for( uiIndex=0; uiIndex < uiSize; uiIndex++ )
+      {  
+         int lownibble, hinibble;
+         lownibble = (cMem[uiIndex])>>4;
+         hinibble = (cMem[uiIndex]) & 0x0F;
+         cBuffer[uiIndex*2] = (hinibble <= 9) ?  ('0'+hinibble) : ('A'+hinibble-10);
+         cBuffer[uiIndex*2+1] = (lownibble <= 9) ? ('0'+lownibble) : ('A'+lownibble-10);
+      }
+      cBuffer[uiIndex*2] = '\0';
+   }
+
+   return (char *)cBuffer;
+}
+
+
+
 void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xexit()"));
@@ -667,7 +716,7 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
             pMemBlock->ulSize,
             pMemBlock->szProcName,
             pMemBlock->uiProcLine,
-            (char *) ( pMemBlock + 1 ) ) );
+            hb_mem2str( pMemBlock + 1, pMemBlock->ulSize ) ) );
       }
    }
 
