@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.10 2002/03/08 03:57:18 ronpinkas Exp $
+ * $Id: garbage.c,v 1.11 2002/03/08 23:22:33 ronpinkas Exp $
  */
 
 /*
@@ -85,7 +85,7 @@ static HB_GARBAGE_PTR s_pCurrBlock = NULL;
 static HB_GARBAGE_PTR s_pLockedBlock = NULL;
 
 /* pointer to Cached Items memory blocks */
-static HB_GARBAGE_PTR s_pAvailableItems = NULL, s_pReuseItem = NULL;
+static HB_GARBAGE_PTR s_pAvailableItems = NULL;
 
 /* pointer to Cached BaseArrays memory blocks */
 static HB_GARBAGE_PTR s_pAvailableBaseArrays = NULL;
@@ -103,6 +103,8 @@ static USHORT s_uUsedFlag = HB_GC_USED_FLAG;
 
 /* we may use a cache later */
 #if 0
+static HB_GARBAGE_PTR s_pReuseItem = NULL;
+
 #define HB_GARBAGE_NEW( ulSize )   ( s_pAvailableItems && ulSize == sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) ? \
                                      ( hb_gcUnlink( &s_pAvailableItems, ( s_pReuseItem = s_pAvailableItems ) ), s_pReuseItem ) \
                                      : \

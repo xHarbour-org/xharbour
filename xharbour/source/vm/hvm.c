@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.43 2002/03/10 00:13:09 ronpinkas Exp $
+ * $Id: hvm.c,v 1.44 2002/03/10 18:41:54 ronpinkas Exp $
  */
 
 /*
@@ -3968,11 +3968,13 @@ void hb_vmFunction( USHORT uiParams )
       hb_vmDo( uiParams );
    }
 
-   /* *** */
-   /* TODO: This should be changed to hb_itemForwardValue()
+   /*
+    ***
+    * TODO: This should be changed to hb_itemForwardValue()
     * This is here to protect against ill behaved FWH code, which uses hb_stack.Return
     * after calling vmFunction().
-   /* *** */
+    ***
+    */
    hb_itemCopy( ( * hb_stack.pPos ), &hb_stack.Return );
    hb_stackPush();
 }
@@ -4105,7 +4107,9 @@ static void hb_vmEndBlock( void )
 
 static void hb_vmRetValue( void )
 {
+   #if 0
    PHB_ITEM pVal;
+   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRetValue()"));
 
