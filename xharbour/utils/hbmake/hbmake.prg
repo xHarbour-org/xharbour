@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.116 2004/04/06 19:16:34 lculik Exp $
+ * $Id: hbmake.prg,v 1.117 2004/04/15 01:58:26 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -2045,7 +2045,7 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, "ALLOBJ = " + IIF( ( lWhoo .OR. lFwh .OR. lMinigui .OR. lHwgui .or. lgtWvt ), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + ;
                + CRLF )
       fWrite( s_nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
-      fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) import32.lib " + IIF( s_lMt,"cw32.lib", "cw32.lib" )+ CRLF )
+      fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) import32.lib " + IIF( s_lMt,"cw32mt.lib", "cw32.lib" )+ CRLF )
       fWrite( s_nLinkHandle, ".autodepend" + CRLF )
    ELSEIF s_lVcc
       fWrite( s_nLinkHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" +IIF( s_lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
