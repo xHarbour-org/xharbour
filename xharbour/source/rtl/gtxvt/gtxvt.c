@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.18 2004/01/24 16:29:46 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.19 2004/01/25 13:18:55 jonnymind Exp $
  */
 
 /*
@@ -269,7 +269,8 @@ static const UnixBoxChar boxTranslate[ XVT_BOX_CHARS ] ={
    { 220, HB_GTXVT_FULL_B},
    { 221, HB_GTXVT_FULL_R},
    { 222, HB_GTXVT_FULL_L},
-   { 223, HB_GTXVT_FULL_T}
+   { 223, HB_GTXVT_FULL_T},
+   { 251, HB_GTXVT_CHECK }
 };
 
 
@@ -1008,15 +1009,25 @@ void xvt_windowUpdate( PXWND_DEF wnd, XSegment *rUpdate )
 static void xvt_windowRepaintGraphical( PXWND_DEF wnd, int x1, int y1, int x2, int y2 )
 {
    HB_GT_GOBJECT *pObj;
+   XRectangle cliprect;
    XColor color;
 
    pObj = hb_gt_gobjects;
+
+   /* Set clipping region for X */
+   cliprect.x = x1;
+   cliprect.y = y1;
+   cliprect.width = x2 - x1+1;
+   cliprect.height = y2 - y1+1;
+
+   XSetClipRectangles( wnd->dpy, wnd->gc, 0, 0, &cliprect, 1, YXBanded );
 
    while ( pObj )
    {
       /* Check if pObj boundaries are inside the area to be updated */
       if ( hb_gtGobjectInside( pObj, x1, y1, x2, y2 ) )
       {
+         printf( "INSIDE %p\n", pObj );
          color.red = pObj->color.usRed;
          color.green = pObj->color.usGreen;
          color.blue = pObj->color.usBlue;
@@ -1075,9 +1086,10 @@ static void xvt_windowRepaintGraphical( PXWND_DEF wnd, int x1, int y1, int x2, i
             break;
          }
       }
-
       pObj = pObj->next;
    }
+
+   XSetClipMask(wnd->dpy, wnd->gc, None);
 }
 
 /******** Draw a part (or all) of the window based on buffer content **********/
@@ -1179,7 +1191,7 @@ static void xvt_windowRepaintColRow( PXWND_DEF wnd,
    {
       xvt_windowRepaintGraphical( wnd,
          colStart * wnd->fontWidth, rowStart * wnd->fontHeight,
-         colStop * wnd->fontWidth, rowStop * wnd->fontHeight );
+         (colStop+1) * wnd->fontWidth, (rowStop+1) * wnd->fontHeight );
    }
 
 }
@@ -2096,6 +2108,25 @@ static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar )
          segs[2].y1 = basey + celly/2;
          segs[2].x2 = basex + cellx;
          segs[2].y2 = segs[2].y1;
+
+         nsegs = 3;
+      break;
+
+      case HB_GTXVT_CHECK:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey+ celly/2;
+         segs[0].x2 = basex+2;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = segs[0].x2;
+         segs[1].y1 = segs[0].y2;
+         segs[1].x2 = basex + cellx/2;
+         segs[1].y2 = basey+ celly;
+
+         segs[2].x1 = segs[1].x2;
+         segs[2].y1 = segs[1].y2;
+         segs[2].x2 = basex + cellx;
+         segs[2].y2 = basey;
 
          nsegs = 3;
       break;

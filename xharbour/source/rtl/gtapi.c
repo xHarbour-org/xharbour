@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.17 2004/01/24 16:29:40 jonnymind Exp $
+ * $Id: gtapi.c,v 1.18 2004/01/25 13:18:52 jonnymind Exp $
  */
 
 /*
@@ -1098,7 +1098,13 @@ USHORT HB_EXPORT hb_gtScroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHO
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtScroll(%hu, %hu, %hu, %hu, %hd, %hd)", uiTop, uiLeft, uiBottom, uiRight, iRows, iCols));
 
-   hb_gtClearGobjects();
+   /* Complete scroll? */
+   if ( uiTop == 0 && uiLeft == 0 && uiBottom >= s_Height -1 && uiRight >= s_Width -1 &&
+         iRows == 0 )
+   {
+      /* Destroy objects */
+      hb_gtClearGobjects();
+   }
 
    hb_gt_Scroll( uiTop, uiLeft, uiBottom, uiRight, ( BYTE ) s_pColor[ s_uiColorIndex ], iRows, iCols );
 
@@ -1384,7 +1390,7 @@ void HB_EXPORT hb_gtClearGobjects( void )
 
 HB_GT_COLDEF* HB_EXPORT hb_gt_gcolorFromString( char *color_name )
 {
-   int i, len;
+   int i;
 
 
    for ( i = 0; i < HB_GT_COLDEF_COUNT; i ++ )
@@ -1402,6 +1408,8 @@ BOOL HB_EXPORT hb_gtGobjectInside( HB_GT_GOBJECT *gobject,
    int x1, int y1, int x2, int y2 )
 {
    int xx2, yy2;
+   int xmin, ymin;
+   int xmax,ymax;
 
    if( gobject->x >= x1 && gobject->x <= x2 &&
       gobject->y >= y1 && gobject->y <= y2 )
@@ -1410,23 +1418,29 @@ BOOL HB_EXPORT hb_gtGobjectInside( HB_GT_GOBJECT *gobject,
    }
 
    /* using width/height? */
-   if ( gobject->type == GTO_LINE && // line has width == x2
-      (gobject->width >= x1 && gobject->width <= x2 &&
-      gobject->height >= y1 && gobject->height <= y2 )
-      )
+   if ( gobject->type == GTO_LINE ) // line has width == x2
    {
-      return TRUE;
+      xx2 = gobject->width;
+      yy2 = gobject->height;
    }
-
-   /* using width/height? */
-   if ( gobject->type != GTO_POINT && gobject->type != GTO_TEXT )
+   else if ( gobject->type != GTO_POINT && gobject->type != GTO_TEXT )
    {
       xx2 = gobject->x + gobject->width;
       yy2 = gobject->y + gobject->height;
-      if ( xx2 >= x1 && xx2 <= x2 && yy2 >= y1 && yy2 <= y2 )
-      {
-         return TRUE;
-      }
+   }
+   else
+   {
+      return FALSE;
+   }
+
+   xmin = x1 > gobject->x ? x1 : gobject->x;
+   xmax = x2 < xx2 ? x2 : xx2;
+   ymin = y1 > gobject->y ? y1 : gobject->y;
+   ymax = y2 < yy2 ? y2 : yy2;
+
+   if ( xmin < xmax && ymin < ymax && xmin >= x1 && xmax <= x2 && ymin >= y1 && ymax <= y2 )
+   {
+      return TRUE;
    }
 
    return FALSE;

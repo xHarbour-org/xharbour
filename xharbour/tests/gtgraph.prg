@@ -1,6 +1,6 @@
 **************************************************
 * gtgraph.prg
-* $Id: gtgraph.prg,v 1.1 2004/01/24 16:30:41 jonnymind Exp $
+* $Id: gtgraph.prg,v 1.2 2004/01/25 13:18:59 jonnymind Exp $
 * Test for GT based graphical functions.
 *
 * Giancarlo Niccolai
@@ -42,7 +42,11 @@ PROCEDURE Main()
 
    CLEAR SCREEN
    TestSquares()
+   @10,10 SAY "Press any key to continue"
+   Inkey(0)
+   TestScroll()
 
+   @9,0 clear to 11,70
    @10,2 SAY "Press any key to terminate"
    Inkey(0)
 RETURN
@@ -55,6 +59,14 @@ PROCEDURE TestSquares()
    FOR nCount := 255 TO 1 STEP -1
       GtRectangle( 300 + (255-nCount),50 + (255-nCount), nCount, nCount,;
          GtRGB( (255 - nCount) *256, ( 255 - nCount) * 128, ( 255 - nCount) * 64 ) )
+   NEXT
+RETURN
+
+PROCEDURE TestScroll()
+   LOCAL nCount
+   
+   FOR nCount := 1 TO 100
+      ? Replicate("-Pad-",5),"Scrolling test", nCount
    NEXT
 
 RETURN

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.6 2004/01/14 23:02:05 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.7 2004/01/24 16:30:17 jonnymind Exp $
  */
 
 /*
@@ -118,7 +118,7 @@ typedef USHORT HB_GT_CELLTYPE;
 #define XVT_DEFAULT_COLS      80
 #define XVT_MAX_BUTTONS        8
 #define CLIP_KEY_COUNT       122
-#define XVT_BOX_CHARS         49
+#define XVT_BOX_CHARS         50
 
 /************************************************************************/
 /* XVT intercommunication protocol XVT_ICM                              */
@@ -214,6 +214,7 @@ typedef struct tag_ICM_UPDATE
 #define HB_GTXVT_DBL_V_SNG_R 0xE037 /* Double vertical single right junction */
 #define HB_GTXVT_DBL_SNG_CRS 0xE038 /* Double cross (single horiz) */
 
+#define HB_GTXVT_CHECK     0xE040 /* List characters, very used */
 
 #define HB_GTXVT_FULL      0xE090 /* Full character filler */
 #define HB_GTXVT_FULL_T    0xE091
