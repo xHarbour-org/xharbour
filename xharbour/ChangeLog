@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.546 2002/12/23 19:17:10 jonnymind Exp $
+ * $Id: ChangeLog,v 1.547 2002/12/23 20:04:11 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-12-23 22:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  + include/ttable.ch
+    + Commands for Table/Record and Field classes
+  + source/rtl/ttable.prg
+    + Source code for Table,Record and Field Classes
+  * include/Makefile
+   + Added ttable.ch to PRG_HEADERS    
+  *  source/rtl/Makefile
+     makefile.bc
+     makefile.vc
+   * Added ttable.prg to dependencie list
+  + tests/TstTable.prg
+    * Test For table Class  
 
 2002-12-23 18:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + include/dbinfo.ch

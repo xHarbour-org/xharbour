@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.18 2002/12/18 13:43:53 ronpinkas Exp $
+# $Id: makefile.bc,v 1.19 2002/12/20 19:41:41 ronpinkas Exp $
 #
 
 #
@@ -381,6 +381,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\tpopup.obj \
    $(OBJ_DIR)\traceprg.obj \
    $(OBJ_DIR)\treport.obj \
+   $(OBJ_DIR)\ttable.obj \
    $(OBJ_DIR)\ttextlin.obj \
    $(OBJ_DIR)\ttopbar.obj \
    $(OBJ_DIR)\typefile.obj \
@@ -1976,6 +1977,13 @@ $(OBJ_DIR)\treport.c : $(RTL_DIR)\treport.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\treport.obj : $(OBJ_DIR)\treport.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\ttable.c : $(RTL_DIR)\ttable.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\ttable.obj : $(OBJ_DIR)\ttable.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
