@@ -16,6 +16,12 @@
 *-----------------------------------------------------------------------------*
 
 CLASS TForm FROM TWindow
+   DATA WindowMenu   EXPORTED
+   DATA Modal        EXPORTED INIT .F.
+   DATA resname      EXPORTED
+   DATA biSystemMenu EXPORTED INIT .T.
+   DATA biMinimize   EXPORTED INIT .T.
+   DATA biMaximize   EXPORTED INIT .T.
    METHOD New()
    METHOD Add()
    METHOD Del()
@@ -39,21 +45,6 @@ METHOD New( oParent ) CLASS TForm
    ::ExStyle   := IFNIL(::ExStyle,0,::ExStyle)
    ::PropName  := IFNIL(::PropName,"TForm",::PropName)
    
-   ::PropList  := { { 'Name',       },;
-                    { 'Caption',    },;
-                    { 'ResName',    },;
-                    { 'Contraints', },;
-                    { 'ExStyle',    },;
-                    { 'Font',       },;
-                    { 'Color',      },;
-                    { 'Cursor',     },;
-                    { 'Icon',       },;
-                    { 'Left',       },;
-                    { 'Top',        },;
-                    { 'Width',      },;
-                    { 'Height',     },;
-                    { 'Style',      } }
-
    RETURN( super:New( oParent ) )
 
 *-----------------------------------------------------------------------------*

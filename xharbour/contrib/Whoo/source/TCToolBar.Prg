@@ -14,18 +14,8 @@
 
 pragma pack(4)
 
-typedef struct _RECT { ;
-    LONG left; 
-    LONG top; 
-    LONG right; 
-    LONG bottom; 
-} RECT 
-
-typedef struct tagNMHDR {;
-    HWND hwndFrom; 
-    UINT idFrom; 
-    UINT code; 
-} NMHDR
+IMPORT C STRUCTURE RECT
+IMPORT C STRUCTURE NMHDR
 
 typedef struct _TBBUTTON {;
     int iBitmap; 

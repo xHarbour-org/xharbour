@@ -13,11 +13,7 @@
 
 // move that structure to WinStruc.ch
 
-typedef struct {;
-    HWND hwndFrom; 
-    UINT idFrom; 
-    UINT code; 
-} NMHDR
+IMPORT C STRUCTURE NMHDR
 
 *-----------------------------------------------------------------------------*
 

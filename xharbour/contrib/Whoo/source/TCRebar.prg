@@ -63,7 +63,6 @@ METHOD New( oParent ) CLASS TRebar
    InitCommonControlsEx(ICC_COOL_CLASSES)
 
    ::Name      := REBARCLASSNAME
-   ::id        := 1
    ::lRegister := .F.
    ::lControl  := .T.
    ::WndProc   := ""

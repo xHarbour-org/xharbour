@@ -12,12 +12,7 @@
 #define LB_ERR              (-1)
 #define LB_ERRSPACE         (-2)
 
-typedef struct _RECT { ;
-    LONG left; 
-    LONG top; 
-    LONG right; 
-    LONG bottom; 
-} RECT 
+IMPORT C STRUCTURE RECT
 
 *------------------------------------------------------------------------------*
 

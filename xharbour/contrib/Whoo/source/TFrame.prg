@@ -14,6 +14,11 @@
 *-----------------------------------------------------------------------------*
 
 CLASS TFrame FROM TWindow
+   DATA WindowMenu   EXPORTED
+   DATA Modal        EXPORTED INIT .F.
+   DATA biSystemMenu EXPORTED INIT .T.
+   DATA biMinimize   EXPORTED INIT .T.
+   DATA biMaximize   EXPORTED INIT .T.
    METHOD New()
    METHOD Add()
    METHOD SetLink()

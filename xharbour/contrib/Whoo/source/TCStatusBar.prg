@@ -9,13 +9,6 @@
 #Include "cstruct.ch"
 #Include "debug.ch"
 
-typedef struct _RECT { ;
-    LONG left; 
-    LONG top; 
-    LONG right; 
-    LONG bottom; 
-} RECT 
-
 *------------------------------------------------------------------------------*
 
 CLASS TStatusBar FROM TControl
