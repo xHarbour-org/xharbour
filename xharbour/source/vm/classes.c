@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.117 2004/04/28 18:31:15 druzus Exp $
+ * $Id: classes.c,v 1.118 2004/04/29 17:57:23 ronpinkas Exp $
  */
 
 /*
@@ -1746,6 +1746,8 @@ HB_FUNC( __CLSNEW )
    pNewCls->uiDatasShared = 0;
    pNewCls->pModuleSymbols = NULL;
 
+   //TraceLog( NULL, "-------------------- Class %s (%i)\n", pNewCls->szName, s_uiClasses + 1 );
+
    if( uiSuper )
    {
       for( i = 1; i <= uiSuper; i++ )
@@ -1768,6 +1770,8 @@ HB_FUNC( __CLSNEW )
 
          pNewCls->uiDataFirst += pSprCls->uiDatas;
          pNewCls->uiDatas      = ( USHORT ) ( pNewCls->uiDataFirst + hb_parni( 2 ) );
+
+         //TraceLog( NULL, "-------- Class: %s Super: %s Known: %i + Super %i\n", pNewCls->szName, pSprCls->szName, uiKnownMethods, pSprCls->uiMethods );
 
          if( i == 1 ) /* This is the first superclass */
          {
@@ -1891,7 +1895,18 @@ HB_FUNC( __CLSNEW )
                             pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgSuper
                           )
                         {
-                           pNewCls->pMethods[ uiAt+uiBucket ].uiData     += nLenDatas;
+                           pNewCls->pMethods[ uiAt+uiBucket ].uiData += pNewCls->uiDataFirst - pSprCls->uiDatas;
+
+                           #if 0
+                           if( pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgSetData )
+                           {
+                              TraceLog( NULL, "Class: %s Super: %s Slot %i SuperSlot: %i First: %i\n", pNewCls->szName, pSprCls->szName, pNewCls->pMethods[ uiAt+uiBucket ].uiData, pSprCls->pMethods[ ui ].uiData, pNewCls->uiDataFirst );
+                           }
+                           else if( pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgSuper )
+                           {
+                              TraceLog( NULL, "*** Class: %s Super: %s Slot %i SuperSlot: %i First: %i\n", pNewCls->szName, pSprCls->szName, pNewCls->pMethods[ uiAt+uiBucket ].uiData, pSprCls->pMethods[ ui ].uiData, pNewCls->uiDataFirst );
+                           }
+                           #endif
                         }
 
                         if( pNewCls->pMethods[ uiAt+uiBucket ].pFunction ==  hb___msgEvalInline )
@@ -1920,10 +1935,8 @@ HB_FUNC( __CLSNEW )
                            }
                            else
                            {
-                              PHB_ITEM pInitValue = hb_itemNew( NULL );
-
-                              hb_itemCopy( pInitValue, pSprCls->pMethods[ ui ].pInitValue );
-                              pNewCls->pMethods[ uiAt + uiBucket ].pInitValue = pInitValue;
+                              pNewCls->pMethods[ uiAt + uiBucket ].pInitValue = hb_itemNew( NULL );
+                              hb_itemCopy( pNewCls->pMethods[ uiAt + uiBucket ].pInitValue, pSprCls->pMethods[ ui ].pInitValue );
                            }
                         }
 
@@ -2001,14 +2014,16 @@ HB_FUNC( __CLSDELMSG )
          USHORT uiAt    = ( USHORT ) ( MsgToNum( pMsg->pSymbol->szName, pClass->uiHashKey ) * BUCKET );
          USHORT uiLimit = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
 
-         while( ( uiAt != uiLimit ) &&
-                ( pClass->pMethods[ uiAt ].pMessage &&
-                ( pClass->pMethods[ uiAt ].pMessage != pMsg ) ) )
+         while( ( uiAt != uiLimit ) && ( pClass->pMethods[ uiAt ].pMessage && ( pClass->pMethods[ uiAt ].pMessage != pMsg ) ) )
          {
             uiAt++;
+
             if( uiAt == uiMask )
+            {
                uiAt = 0;
+            }
          }
+
          if( uiAt != uiLimit )
          {                                         /* Requested method found   */
             PHB_FUNC pFunc = pClass->pMethods[ uiAt ].pFunction;
@@ -2030,6 +2045,7 @@ HB_FUNC( __CLSDELMSG )
                   uiAt = 0;
                }
             }
+
             memset( pClass->pMethods + uiAt, 0, sizeof( METHOD ) );
             pClass->uiMethods--;                    /* Decrease number messages */
          }
@@ -2045,12 +2061,9 @@ HB_FUNC( __CLSDELMSG )
  */
 HB_FUNC( __CLSINST )
 {
-   HB_ITEM itmSelf ;
+   HB_THREAD_STUB
 
-   itmSelf.type = HB_IT_NIL;
-
-   hb_clsInst( ( USHORT ) hb_parni( 1 ), &itmSelf );
-   hb_itemReturn( &itmSelf );
+   hb_clsInst( ( USHORT ) hb_parni( 1 ), &HB_VM_STACK.Return );
 }
 
 /*
