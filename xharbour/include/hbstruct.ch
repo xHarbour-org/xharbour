@@ -1,10 +1,10 @@
 /*
- * $Id: hbstruct.ch,v 1.2 2003/11/17 10:58:50 toninhofwi Exp $
+ * $Id: hbstruct.ch,v 1.3 2003/12/18 16:19:16 jonnymind Exp $
  */
 
 /*
 * xHarbour Project source code:
-* Support for TAssociativeArray()
+* Support for fixed data structures using Hashes.
 *
 * Copyright 2003 Antonio Carlos Pantaglione [toninho@fwi.com.br]
 * www - http://www.xharbour.org
@@ -62,8 +62,8 @@
           => ;
           HashAddMember( {<(cName)>}, <(type)>, <uValue>, _TSTRUCT_ )
 
-#xcommand ENDSTRUCTURE =>
-#xcommand ENDSTRUC =>
+#xcommand ENDSTRUCTURE => HSetAutoAdd( _TSTRUCT_, .f. )
+#xcommand ENDSTRUC => HSetAutoAdd( _TSTRUCT_, .f. )
 
 #translate DESTROY STRUCTURE <hStruct> => <hStruct> := nil
 
