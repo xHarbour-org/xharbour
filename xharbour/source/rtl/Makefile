@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2002/01/31 05:57:24 ronpinkas Exp $
+# $Id: Makefile,v 1.5 2002/06/12 11:53:06 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -76,6 +76,7 @@ C_SOURCES=\
 	philes53.c   \
 	philesx.c    \
 	rat.c        \
+        regex.c      \
 	replic.c     \
 	right.c      \
 	round.c      \

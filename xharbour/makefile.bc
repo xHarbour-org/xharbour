@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.14 2002/06/12 11:53:06 ronpinkas Exp $
+# $Id: makefile.bc,v 1.15 2002/08/28 00:36:45 lculik Exp $
 #
 
 #
@@ -286,6 +286,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\philes53.obj \
    $(OBJ_DIR)\philesx.obj \
    $(OBJ_DIR)\rat.obj \
+   $(OBJ_DIR)\regex.obj \
    $(OBJ_DIR)\replic.obj \
    $(OBJ_DIR)\right.obj \
    $(OBJ_DIR)\round.obj \
@@ -1707,6 +1708,10 @@ $(OBJ_DIR)\readvar.c : $(RTL_DIR)\readvar.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\readvar.obj : $(OBJ_DIR)\readvar.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\regex.obj : $(RTL_DIR)\regex.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
