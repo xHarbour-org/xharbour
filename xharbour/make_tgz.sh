@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.19 2003/11/20 23:47:34 druzus Exp $
+# $Id: make_tgz.sh,v 1.20 2003/11/24 10:25:10 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -10,32 +10,19 @@
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
 
-# please add your distro suffix if it not belong to the one recognized below
-# and remember that order checking can be important
-hb_platform=""
-
-[ "${hb_platform}" = "" ] && hb_platform=`rel=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$rel"|tr -d "."`
-[ "${hb_platform}" = "" ] && hb_platform=`rel=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$rel"|tr -d "."`
-[ "${hb_platform}" = "" ] && hb_platform=`rel=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "rh$rel"|tr -d "."`
-[ "${hb_platform}" = "" ] && hb_platform=`[ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/`
-
-[ "${hb_platform}" = "" ] || hb_platform="-${hb_platform}"
-
-get_hbver()
-{
-    FVER="include/hbver.h"
-    MAJOR=`sed -e '/HB_VER_MAJOR/    s/[^0-9]*\([^ ]*\).*/\1/g p' -e 'd' "${FVER}"`
-    MINOR=`sed -e '/HB_VER_MINOR/    s/[^0-9]*\([^ ]*\).*/\1/g p' -e 'd' "${FVER}"`
-    REVIS=`sed -e '/HB_VER_REVISION/ s/[^0-9]*\([^ ]*\).*/\1/g p' -e 'd' "${FVER}"`
-    echo -n "${MAJOR}.${MINOR}.${REVIS}"
-}
+cd `dirname $0`
+. bin/hb-func.sh
 
 name="xharbour"
 hb_ver=`get_hbver`
+hb_platform=`get_hbplatform`
+[ "${hb_platform}" = "" ] || hb_platform="-${hb_platform}"
+hb_archfile="${name}-${hb_ver}${hb_platform}.bin.tar.gz"
+hb_instfile="${name}-${hb_ver}${hb_platform}.inst.sh"
 hb_lnkso="yes"
 hb_pref="xhb"
-hb_libs="vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca hbodbc ct debug profiler"
-hb_libsc="nf rddads"
+hb_libs="vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca debug profiler"
+hb_libsc="ct nf rddads"
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 if [ -z "$HB_ARCHITECTURE" ]; then export HB_ARCHITECTURE=linux; fi
 if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=gcc; fi
@@ -62,9 +49,9 @@ if [ -z "$TMPDIR" ]; then TMPDIR="/tmp"; fi
 HB_INST_PREF="$TMPDIR/$name.bin.$USER.$$"
 rm -fR "${HB_INST_PREF}"
 
-_DEFAULT_BIN_DIR=$HB_BIN_INSTALL
-_DEFAULT_INC_DIR=$HB_INC_INSTALL
-_DEFAULT_LIB_DIR=$HB_LIB_INSTALL
+export _DEFAULT_BIN_DIR=$HB_BIN_INSTALL
+export _DEFAULT_INC_DIR=$HB_INC_INSTALL
+export _DEFAULT_LIB_DIR=$HB_LIB_INSTALL
 export HB_BIN_INSTALL="$HB_INST_PREF/$HB_BIN_INSTALL"
 export HB_INC_INSTALL="$HB_INST_PREF/$HB_INC_INSTALL"
 export HB_LIB_INSTALL="$HB_INST_PREF/$HB_LIB_INSTALL"
@@ -94,309 +81,15 @@ pushd source/vm
 popd
 
 # Keep the size of the binaries to a minimim.
-strip $HB_BIN_INSTALL/*
+strip $HB_BIN_INSTALL/harbour
 # Keep the size of the libraries to a minimim.
 strip --strip-debug $HB_LIB_INSTALL/*
-
-install -m755 bin/hb-mkslib.sh $HB_BIN_INSTALL/hb-mkslib
-
-pushd $HB_LIB_INSTALL
-LIBS=""
-LIBSMT=""
-for l in ${hb_libs}
-do
-    case $l in
-        debug|profiler) ;;
-        *)
-            ls="lib${l}.a"
-            if [ -f lib${l}mt.a ]
-            then
-                lm="lib${l}mt.a"
-            else
-                lm="${ls}"
-            fi
-            if [ "${HB_MULTI_GT}" = "yes" ] || \
-               [ "${l#gt}" = "${l}" ] || \
-               [ "${l}" == "${HB_GT_LIB}" ]
-            then
-                if [ -f $ls ]
-                then
-                    LIBS="$LIBS $ls"
-                fi
-                if [ -f $lm ]
-                then
-                    LIBSMT="$LIBSMT $lm"
-                fi
-            fi
-            ;;
-    esac
-done
-$HB_BIN_INSTALL/hb-mkslib lib${name}-${hb_ver}.so $LIBS
-[ $HB_MT != "MT" ] || $HB_BIN_INSTALL/hb-mkslib lib${name}mt-${hb_ver}.so $LIBSMT
-for l in lib${name}-${hb_ver}.so lib${name}mt-${hb_ver}.so
-do
-    if [ -f $l ]
-    then
-        ll=${l%-${hb_ver}.so}.so
-        ln -s $l $ll && ln -s ${name}/$l $HB_INST_PREF/usr/lib/$ll
-    fi
-done
-#export LD_LIBRARY_PATH="$HB_LIB_INSTALL:$LD_LIBRARY_PATH"
-popd
-
-# Add a harbour compiler wrapper.
-cat > $HB_BIN_INSTALL/${hb_pref}-build <<EOF
-#!/bin/bash
-
-if [ \$# == 0 ]; then
-    echo "syntax: \$0 [<options,...>] <file>[.prg|.o]
-
-\"${hb_pref}cc\", \"${hb_pref}cmp\", \"${hb_pref}lnk\" and \"${hb_pref}mk\" parameters:
-    -o<outputfilename>      # output file name
-\"${hb_pref}lnk\" and \"${hb_pref}mk\" parameters:
-    -static             # link with static ${name} libs
-    -fullstatic         # link with all static libs
-    -shared             # link with shared libs (default)
-    -mt                 # link with multi-thread libs
-    -gt<hbgt>           # link with <hbgt> GT driver, can be repeated to
-                        # link with more GTs. The first one will be
-                        #      the default at runtime
-    -fmstat             # link with the memory statistics lib
-    -nofmstat           # do not link with the memory statistics lib (default)
-    -main=<main_func>   # set the name of main program function/procedure.
-                        # if not set then 'MAIN' is used or if it doesn't
-                        # exist the name of first public function/procedure
-                        # in first linked object module (link)
-"
-    exit 1
-elif [ "\$*" == "mk-links" ]; then
-    DIR="\${0%/*}"
-    NAME="\${0##*/}"
-    if [ "\${DIR}" != "\${NAME}" ]; then
-	for n in ${hb_pref}cc ${hb_pref}cmp ${hb_pref}mk ${hb_pref}lnk gharbour harbour-link; do
-	    ln -sf "\${NAME}" "\${DIR}/\${n}"
-	done
-    fi
-    exit
-fi
-
-## default parameters
-HB_STATIC="no"
-HB_MT=""
-HB_GT="${HB_GT_LIB#gt}"
-HB_MG="${HB_MULTI_GT}"
-
-HB_GT_REQ=""
-HB_FM_REQ=""
-HB_MAIN_FUNC=""
-_TMP_FILE_="/tmp/hb-build-\$USER-\$\$.c"
-
-## parse params
-P=( "\$@" ); n=0; DIROUT="."; FILEOUT=""
-while [ \$n -lt \${#P[@]} ]; do
-    v=\${P[\$n]}; p=""
-    case "\$v" in
-        -o*)
-            d="\${v#-o}"; p="\${v}"
-            if [ -d "\${d}" ]; then
-                DIROUT="\${d%/}"
-            elif [ -d "\${d%/*}" ]; then
-                DIROUT="\${d%/*}"; FILEOUT="\${d##*/}"; p="-o\${d%.*}"
-            elif [ -n "\${d}" ]; then
-                FILEOUT="\${d}"; p="-o\${d%.*}"
-            fi ;;
-        -static)     HB_STATIC="yes" ;;
-        -fullstatic) HB_STATIC="full" ;;
-        -shared)     HB_STATIC="no" ;;
-        -mt)         HB_MT="MT" ;;
-        -gt*)        HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
-        -fmstat)     HB_FM_REQ="STAT" ;;
-        -nofmstat)   HB_FM_REQ="NOSTAT" ;;
-        -main=*)     HB_MAIN_FUNC="\${v#*=}" ;;
-        -*)          p="\${v}" ;;
-        *)           [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
-    esac
-    [ -n "\$p" ] && PP[\$n]="\$p"
-    n=\$[\$n + 1]
-done
-P=( "\${PP[@]}" )
-
-case "\${HB_MT}" in
-    [Mm][Tt]|[Yy][Ee][Ss]|1)  HB_MT="MT";;
-    *)  HB_MT="";;
-esac
-
-SYSTEM_LIBS="-lm -lncurses -lslang -lgpm"
-# use pthread system library for MT programs
-if [ "\${HB_MT}" = "MT" ]; then
-    SYSTEM_LIBS="-lpthread \${SYSTEM_LIBS}"
-fi
-
-HB_GT_STAT=""
-[ -z "\${HB_GT_REQ}" ] && HB_GT_REQ="\${HB_GT}"
-if [ "\${HB_MG}" != "yes" ]; then
-    [ "\${HB_STATIC}" = "yes" ] && HB_GT_STAT=\`echo \${HB_GT_REQ}|tr A-Z a-z\`
-    HB_GT_REQ=""
-else
-    HB_GT_REQ=\`echo \${HB_GT_REQ}|tr a-z A-Z\`
-fi
-HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr a-z A-Z\`
-
-# set environment variables
-export HB_ARCHITECTURE="${HB_ARCHITECTURE}"
-export HB_COMPILER="${HB_COMPILER}"
-[ -z "\${HB_BIN_INSTALL}" ] && export HB_BIN_INSTALL="${_DEFAULT_BIN_DIR}"
-[ -z "\${HB_INC_INSTALL}" ] && export HB_INC_INSTALL="${_DEFAULT_INC_DIR}"
-[ -z "\${HB_LIB_INSTALL}" ] && export HB_LIB_INSTALL="${_DEFAULT_LIB_DIR}"
-
-# be sure that ${name} binaries are in your path
-export PATH="\${HB_BIN_INSTALL}:\${PATH}"
-
-HB_PATHS="-I\${HB_INC_INSTALL}"
-GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
-LINK_OPT=""
-if [ "\${HB_STATIC}" = "full" ]; then
-    LINK_OPT="\${LINK_OPT} -static"
-    HB_STATIC="yes"
-fi
-
-HARBOUR_LIBS=""
-if [ "\${HB_STATIC}" = "yes" ]; then
-    libs="${hb_libs} ${hb_libsc}"
-else
-    l="${name}"
-    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.so" ] && l="\${l}mt"
-    [ -f "\${HB_LIB_INSTALL}/lib\${l}.so" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
-    libs="debug profiler ${hb_libsc}"
-fi
-for l in \${libs}
-do
-    if [ "\${HB_MG}" = "yes" ] || [ "\${l#gt}" = "\${l}" ] || [ "\${l}" == "gt\${HB_GT_STAT}" ]; then
-        [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-        [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
-    fi
-done
-HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
-l="fm"
-[ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
-    if [ "\${HB_STATIC}" = "yes" ] && [ "\${HB_FM_REQ}" = "STAT" ]; then
-        HARBOUR_LIBS="-l\${l} \${HARBOUR_LIBS}"
-    else
-        HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
-    fi
-fi
-
-FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
-FOUTO="\${DIROUT}/\${FILEOUT%.*}.o"
-FOUTE="\${DIROUT}/\${FILEOUT%.[Pp][Rr][Gg]}"
-FOUTE="\${FOUTE%.[oc]}"
-
-hb_cc()
-{
-    harbour "\$@" \${HB_PATHS} && [ -f "\${FOUTC}" ] 
-}
-
-hb_link()
-{
-    if [ -n "\${HB_MAIN_FUNC}" ]; then
-        HB_MAIN_FUNC="@\${HB_MAIN_FUNC}"
-    elif [ -f "\${FOUTO}" ]; then
-        HB_MAIN_FUNC=\`hb_lnk_main "\${FOUTO}"\`
-    fi
-    if [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_FM_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
-        hb_lnk_request > \${_TMP_FILE_} && \\
-        gcc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
-    else
-        gcc "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
-    fi
-}
-
-hb_cmp()
-{
-    hb_cc "\$@" && \\
-    gcc -g -c "\${FOUTC}" -o "\${FOUTO}" \${GCC_PATHS} && \\
-    rm -f "\${FOUTC}"
-}
-
-hb_lnk_request()
-{
-    echo "#include \\"hbapi.h\\""
-    if [ "\${HB_STATIC}" = "yes" ] || [ -n "\${HB_FM_REQ}" ]; then
-        for gt in \${HB_GT_REQ}; do
-            echo "extern HB_FUNC( HB_GT_\${gt} );"
-        done
-        if [ -n "\${HB_FM_REQ}" ]; then
-            echo "extern HB_FUNC( HB_FM_\${HB_FM_REQ} );"
-        fi
-        echo "void hb_lnk_ForceLink_build( void )"
-        echo "{"
-        for gt in \${HB_GT_REQ}; do
-            echo "   HB_FUNCNAME( HB_GT_\${gt} )();"
-        done
-        if [ -n "\${HB_FM_REQ}" ]; then
-            echo "   HB_FUNCNAME( HB_FM_\${HB_FM_REQ} )();"
-        fi
-        echo "}"
-    fi
-    gt="\${HB_GT_REQ%% *}"
-    if [ -n "\$gt" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
-        echo "#include \\"hbinit.h\\""
-        echo "extern char * s_defaultGT;"
-        echo "extern char * s_pszLinkedMain;"
-        echo "HB_CALL_ON_STARTUP_BEGIN( hb_lnk_SetDefault_build )"
-        if [ -n "\$gt" ]; then
-            echo "   s_defaultGT = \\"\$gt\\";"
-        fi
-        if [ -n "\${HB_MAIN_FUNC}" ]; then
-            echo "   s_pszLinkedMain = \\"\${HB_MAIN_FUNC}\\";"
-        fi
-        echo "HB_CALL_ON_STARTUP_END( hb_lnk_SetDefault_build )"
-    fi
-}
-
-hb_lnk_main()
-{
-    (nm \$1 -g -n --defined-only|sed -e '/HB_FUN_/ ! d' -e 's/^[0-9a-fA-F]* T HB_FUN_//'|head -1|grep -v '^MAIN\$')2>/dev/null
-#    (nm \$1 -n --defined-only|sed -e '/HB_FUN_/ ! d' -e 's/^[0-9a-fA-F]* [Tt] HB_FUN_//'|head -1|grep -v '^MAIN\$')2>/dev/null
-}
-
-hb_cleanup()
-{
-    rm -f "\${_TMP_FILE_}"
-}
-
-trap hb_cleanup EXIT &>/dev/null
-
-## get basename
-HB="\${0##*/}"
-
-case "\${HB}" in
-    *cc)
-        hb_cc "\${P[@]}"
-        ;;
-    *cmp|gharbour)
-        hb_cmp "\${P[@]}"
-        ;;
-    *lnk|harbour-link)
-        hb_link "\${P[@]}"
-        ;;
-    *mk)
-        hb_cmp "\${P[@]}" && \\
-        hb_link "\${FOUTO}" && \\
-        strip "\${FOUTE}" && \\
-        rm -f "\${FOUTO}"
-        ;;
-esac
-EOF
-chmod 755 $HB_BIN_INSTALL/${hb_pref}-build
-$HB_BIN_INSTALL/${hb_pref}-build mk-links
 
 mkdir -p $HB_INST_PREF/etc/harbour
 install -m644 source/rtl/gtcrs/hb-charmap.def $HB_INST_PREF/etc/harbour/hb-charmap.def
 cat > $HB_INST_PREF/etc/harbour.cfg <<EOF
 CC=gcc
-CFLAGS=-c -I$_DEFAULT_INC_DIR -O2
+CFLAGS=-c -I$_DEFAULT_INC_DIR -O3
 VERBOSE=YES
 DELTMP=YES
 EOF
@@ -426,5 +119,25 @@ then
     done
 fi
 
-tar -czvf ${name}-${hb_ver}${hb_platform}.bin.tar.gz --owner=root --group=root -C "${HB_INST_PREF}" .
+tar -czvf "${hb_archfile}" --owner=root --group=root -C "${HB_INST_PREF}" .
 rm -fR "${HB_INST_PREF}"
+
+cat > ${hb_instfile} <<EOF
+#!/bin/sh
+if [ \`id -u\` != 0 ]; then
+    echo "This package has to be installed from root account."
+    exit 1
+fi
+echo "Do you want to install ${name} (y/n)"
+read ASK
+if [ "\${ASK}" != "y" ] && [ "\${ASK}" != "Y" ]; then
+    exit 1
+fi
+(sed -e '1,/^HB_INST_EOF\$/ d' \$0 | gzip -cd | tar xvf - -C /) && \
+ldconfig
+exit \$?
+HB_INST_EOF
+EOF
+cat "${hb_archfile}" >> ${hb_instfile}
+chmod +x ${hb_instfile}
+rm -f "${hb_archfile}"

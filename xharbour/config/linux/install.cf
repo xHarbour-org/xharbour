@@ -1,5 +1,5 @@
 #
-# $Id: install.cf,v 1.1 1999/06/18 07:13:14 rglab Exp $
+# $Id: install.cf,v 1.1.1.1 2001/12/21 10:47:58 ronpinkas Exp $
 #
 
 INSTALL_RULE =\
@@ -19,3 +19,4 @@ INSTALL_RULE =\
 	  done \
 	fi
 
+POSTINST_RULE = $(HB_POSTINST)

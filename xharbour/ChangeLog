@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1832 2003/12/07 03:06:02 maurifull Exp $
+ * $Id: ChangeLog,v 1.1833 2003/12/07 13:34:59 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,42 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-12-07 20:15 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/contrib/mysql/Makefile
+    ! fixed include dirs to allow compilation on different distros
+
+  - xharbour/bin/!pack_src.sh
+  + xharbour/bin/pack_src.sh
+    * renamed !pack_src.sh to pack_src.sh
+
+  * xharbour/xhbgtmk.sh
+    ! small fix: --whatprovides used package checking
+
+  * xharbour/make_rpm.sh
+    + new switch --without ct
+
+  * xharbour/Makefile
+  * xharbour/config/install.cf
+  * xharbour/config/dos/install.cf
+  * xharbour/config/linux/install.cf
+  + xharbour/bin/hb-func.sh
+  + xharbour/bin/postinst.bat
+  + xharbour/bin/postinst.sh
+    * build process changed. Now GNU make system can run post install macro
+      Currently this macro is used for creating additional tools after
+      installation for Linux GCC. In the nearest feature I plan to add
+      similar extensions for DOS with and OpenWatcom
+
+  * xharbour/xharbour.spec
+    - removed CT lib from xharbour.so lib
+    - removed post install operations, now they are part of GNU make
+
+  * xharbour/make_tgz.sh
+    - removed CT lib from xharbour.so lib
+    - removed post install operations, now they are part of GNU make
+    * now as result the executable installation file:
+        xharbour-${hb_ver}${hb_platform}.inst.sh
+      is created
 
 2003-12-07 14:36 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbapi.h

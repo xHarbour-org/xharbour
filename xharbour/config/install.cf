@@ -1,8 +1,9 @@
 #
-# $Id: install.cf,v 1.4 1999/06/12 00:13:31 gdiet Exp $
+# $Id: install.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/install.cf
 
 install:: first
 	$(INSTALL_RULE)
+	$(POSTINST_RULE)

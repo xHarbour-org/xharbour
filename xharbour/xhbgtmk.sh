@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: xhbgtmk.sh,v 1.5 2003/06/15 13:36:36 druzus Exp $
+# $Id: xhbgtmk.sh,v 1.6 2003/09/11 17:59:01 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -19,7 +19,7 @@ export PROJECT=xharbour
 
 test_reqrpm()
 {
-    rpm -q "$1" &> /dev/null
+    rpm -q --whatprovides "$1" &> /dev/null
 }
 
 TOINST_LST=""
