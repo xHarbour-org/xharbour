@@ -1,5 +1,5 @@
 /*
- * $Id: thread.c,v 1.1 2002/12/18 13:43:57 ronpinkas Exp $
+ * $Id: thread.c,v 1.2 2002/12/18 14:35:50 ronpinkas Exp $
  */
 
 /*
@@ -295,7 +295,6 @@ HB_FUNC( STARTTHREAD )
       PHB_FUNC pFunc = (PHB_FUNC) hb_itemGetNL( pPointer );
       PHB_ITEM pSelf = NULL;
       PHB_DYNS pExecSym;
-      int iParams;
 
       if( hb_pcount() >= 2 )
       {
@@ -383,7 +382,7 @@ HB_FUNC( DESTROYMUTEX )
 
    if( pMutex )
    {
-      mutex = pMutex->item.asPointer.value;
+      mutex = (HB_MUTEX_T *) pMutex->item.asPointer.value;
       HB_MUTEX_DESTROY( mutex );
       hb_gcFree( mutex );
    }
@@ -396,7 +395,7 @@ HB_FUNC( MUTEXLOCK )
 
    if( pMutex )
    {
-      mutex = pMutex->item.asPointer.value;
+      mutex = (HB_MUTEX_T *) pMutex->item.asPointer.value;
       HB_MUTEX_LOCK( mutex );
    }
 }
@@ -408,7 +407,7 @@ HB_FUNC( MUTEXUNLOCK )
 
    if( pMutex )
    {
-      mutex = pMutex->item.asPointer.value;
+      mutex = (HB_MUTEX_T *) pMutex->item.asPointer.value;
 
       HB_MUTEX_UNLOCK( mutex );
    }

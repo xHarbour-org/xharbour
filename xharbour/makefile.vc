@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.23 2002/12/11 11:06:53 ronpinkas Exp $
+# $Id: makefile.vc,v 1.24 2002/12/11 19:02:47 ronpinkas Exp $
 #
 
 #
@@ -648,6 +648,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)\proc.obj \
    $(OBJ_DIR)\pvalue.obj \
    $(OBJ_DIR)\runner.obj \
+   $(OBJ_DIR)\thread.obj \
    \
    $(OBJ_DIR)\harbinit.obj
 
