@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.34 2004/03/04 00:02:22 andijahja Exp $
+ * $Id: direct.c,v 1.35 2004/03/04 01:13:16 andijahja Exp $
  */
 
 /*
@@ -134,6 +134,7 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
             char buffer[ 32 ];
             BOOL bAddEntry = TRUE;
 
+            Subarray.type = HB_IT_NIL;
             hb_arrayNew( &Subarray, 0 );
 
             if ( bFullPath )
@@ -385,20 +386,18 @@ HB_FUNC( DIRECTORYRECURSE )
 
    if( pDirSpec && pDirSpec->item.asString.length <= _POSIX_PATH_MAX )
    {
-      szAttributes = (char*) hb_xgrab( 4 + 1 ); // HSDV
-      hb_xmemset( szAttributes, 0, 5 );
+      szAttributes = (char*) hb_xgrab( 3 + 1 ); // DHS
+      hb_xmemset( szAttributes, 0, 4 );
       szAttributes[0] = 'D';                    // Compulsory
 
       if ( pAttribute )
       {
-         hb_strupr( pAttribute->item.asString.value );
-
-         if ( strchr( pAttribute->item.asString.value, 'H' ) != NULL )
+         if ( strpbrk( pAttribute->item.asString.value, "hH" ) != NULL )
          {
             strcat( szAttributes, "H" );
          }
 
-         if ( strchr( pAttribute->item.asString.value, 'S' ) != NULL )
+         if ( strpbrk( pAttribute->item.asString.value, 'sS' ) != NULL )
          {
             strcat( szAttributes, "S" );
          }
