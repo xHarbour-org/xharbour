@@ -30,6 +30,13 @@
 
   * src/xwt_gtk/xwt_gtk_treelist.c
 
+  * test/Makefile
+  + test/t_browse
+    + added a test for xwtbrowse. Makefiles have been changed so that it
+      works as xharbour/tests makefile; use the name of the program
+      you want to compile as a target, i.e. 'make t_browse';
+
+
 2003-10-15 01:10 UTC+0200 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * contrib/xwt/makefile.bc
   * contrib/xwt/src/xwt_win/xwt_win.c
