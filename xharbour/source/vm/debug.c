@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.8 2004/01/29 14:26:00 likewolf Exp $
+ * $Id: debug.c,v 1.9 2004/01/30 00:37:24 andijahja Exp $
  */
 
 /*
@@ -301,4 +301,14 @@ HB_FUNC( __VMVARLGET )
 HB_FUNC( __VMVARLSET )
 {
    HB_FUNCNAME(HB_DBG_VMVARLSET)();
+}
+
+HB_FUNC( __VMSTKGLIST)
+{
+   HB_FUNCNAME(HB_DBG_VMSTKGLIST)();
+}
+
+HB_FUNC( __VMSTKGCOUNT )
+{
+   HB_FUNCNAME(HB_DBG_VMSTKGCOUNT)();
 }
