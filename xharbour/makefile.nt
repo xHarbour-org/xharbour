@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.9 2003/02/08 05:43:07 ronpinkas Exp $
+# $Id: makefile.nt,v 1.10 2003/02/08 05:51:25 ronpinkas Exp $
 #
 
 #
@@ -387,6 +387,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\achoice.obj \
    $(OBJ_DIR)\adir.obj \
    $(OBJ_DIR)\alert.obj \
+   $(OBJ_DIR)\arrayblk.obj \
    $(OBJ_DIR)\browdb.obj \
    $(OBJ_DIR)\browdbx.obj \
    $(OBJ_DIR)\browse.obj \
@@ -437,6 +438,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\tpopup.obj \
    $(OBJ_DIR)\traceprg.obj \
    $(OBJ_DIR)\treport.obj \
+   $(OBJ_DIR)\ttable.obj \
    $(OBJ_DIR)\ttextlin.obj \
    $(OBJ_DIR)\ttopbar.obj \
    $(OBJ_DIR)\typefile.obj \
@@ -662,8 +664,8 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)\classes.obj \
    $(OBJ_DIR)\cmdarg.obj \
    $(OBJ_DIR)\codebloc.obj \
-   $(OBJ_DIR)\do.obj \
    $(OBJ_DIR)\debug.obj \
+   $(OBJ_DIR)\do.obj \
    $(OBJ_DIR)\dynsym.obj \
    $(OBJ_DIR)\errorapi.obj \
    $(OBJ_DIR)\estack.obj \
@@ -752,9 +754,10 @@ GTWIN_LIB_OBJS = \
 #
 
 
-!if ( "$(MK_FLAGS)"=="A" )
+!if ( "$(MK_FLAGS:Y=)"=="A" )
 
-all: zot \
+all: \
+   CLEAN \
    $(COMMON_LIB) \
    $(PP_LIB) \
    $(HARBOUR_EXE) \
@@ -775,13 +778,6 @@ all: zot \
    $(HBMAKE_EXE)
 
 MK_FLAGS = $(MK_FLAGS:A=)
-
-zot:
-   -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
-   -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
-   -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
-   -@if exist $(BIN_DIR)\*.exe $(DEL) $(BIN_DIR)\*.exe > nul
-   -@if exist $(BIN_DIR)\*.map $(DEL) $(BIN_DIR)\*.map > nul
 
 !else
 
@@ -806,6 +802,17 @@ all: \
    $(HBMAKE_EXE)
 
 !endif
+
+CLEAN:
+   -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
+   -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
+   -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
+   -@if exist $(OBJ_DIR)\*.pch $(DEL) $(OBJ_DIR)\*.pch > nul
+   -@if exist $(LIB_DIR)\*.lib $(DEL) $(LIB_DIR)\*.lib > nul
+   -@if exist $(BIN_DIR)\*.exe $(DEL) $(BIN_DIR)\*.exe > nul
+   -@if exist $(BIN_DIR)\*.map $(DEL) $(BIN_DIR)\*.map > nul
+   -@if exist $(BIN_DIR)\*.pdb $(DEL) $(BIN_DIR)\*.pdb > nul
+   -@if exist $(BIN_DIR)\*.ilk $(DEL) $(BIN_DIR)\*.ilk > nul
 
 $(HBPP_EXE) : \
    $(HBPP_DIR)\hbpp.c

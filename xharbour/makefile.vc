@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.29 2003/01/27 04:46:00 walito Exp $
+# $Id: makefile.vc,v 1.30 2003/01/30 00:46:22 jonnymind Exp $
 #
 
 #
@@ -717,10 +717,10 @@ GTWIN_LIB_OBJS = \
 # Our default target
 #
 
+!if ( "$(MK_FLAGS:Y=)"=="A" )
 
-!if ( "$(MK_FLAGS)"=="A" )
-
-all: zot \
+all: \
+   CLEAN \
    $(COMMON_LIB) \
    $(PP_LIB) \
    $(HARBOUR_EXE) \
@@ -741,13 +741,6 @@ all: zot \
    $(HBMAKE_EXE)
 
 MK_FLAGS = $(MK_FLAGS:A=)
-
-zot:
-   -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
-   -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
-   -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
-   -@if exist $(BIN_DIR)\*.exe $(DEL) $(BIN_DIR)\*.exe > nul
-   -@if exist $(BIN_DIR)\*.map $(DEL) $(BIN_DIR)\*.map > nul
 
 !else
 
@@ -772,6 +765,17 @@ all: \
    $(HBMAKE_EXE)
 
 !endif
+
+CLEAN:
+   -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
+   -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
+   -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
+   -@if exist $(OBJ_DIR)\*.pch $(DEL) $(OBJ_DIR)\*.pch > nul
+   -@if exist $(LIB_DIR)\*.lib $(DEL) $(LIB_DIR)\*.lib > nul
+   -@if exist $(BIN_DIR)\*.exe $(DEL) $(BIN_DIR)\*.exe > nul
+   -@if exist $(BIN_DIR)\*.map $(DEL) $(BIN_DIR)\*.map > nul
+   -@if exist $(BIN_DIR)\*.pdb $(DEL) $(BIN_DIR)\*.pdb > nul
+   -@if exist $(BIN_DIR)\*.ilk $(DEL) $(BIN_DIR)\*.ilk > nul
 
 $(HBPP_EXE) : \
    $(HBPP_DIR)\hbpp.c
