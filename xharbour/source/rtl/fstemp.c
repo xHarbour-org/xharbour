@@ -1,5 +1,5 @@
-/*
- * $Id: fstemp.c,v 1.14 2004/07/22 08:28:19 druzus Exp $
+ /*
+ * $Id: fstemp.c,v 1.15 2004/07/25 21:53:14 peterrees Exp $
  */
 
 /*
@@ -147,6 +147,34 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
 #include <ctype.h> /* isupper()/islower() */
 #include "hbset.h"
 
+static BOOL fsGetTempDirByCase( BYTE *pszName, const char *pszTempDir )
+{
+   BOOL bOk= FALSE;
+   if ( *pszTempDir )
+   {
+      bOk= TRUE;
+      strcpy( pszName, ( char *) pszTempDir );
+      if ( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER || hb_set.HB_SET_DIRCASE == HB_SET_CASE_UPPER )
+      {
+         // check to see if temp directory already upper or lower. If not use current directory ( "." )
+         char *psZ = pszName ;
+         int iChar ;
+         BOOL bLower =  hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER  ;
+         while ( *psZ )
+         {
+            iChar = ( int ) *psZ;
+            if ( isalpha( iChar ) && !( bLower ? islower( iChar ) : isupper( iChar ) ) )
+            {
+               bOk = FALSE;
+               break;
+            }
+            psZ++ ;
+         }
+      }
+   }
+   return( bOk ) ;
+}
+
 FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, USHORT uiAttr, BYTE * pszName )
 {
    /* less attemps */
@@ -163,25 +191,10 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
       {
          strcpy( pszName, pszDir );
       }
-      else
+      else if ( !fsGetTempDirByCase( pszName, getenv( "TMPDIR" ) ) &&
+                !fsGetTempDirByCase( pszName, P_tmpdir ) )
       {
-         strcpy( pszName, P_tmpdir );
-         if ( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER || hb_set.HB_SET_DIRCASE == HB_SET_CASE_UPPER )
-         {
-           // check to see if temp directory already upper or lower. If not use current directory ( "." )
-           int (*pt2Function)( int );
-           char *psZ = pszName ;
-           pt2Function = ( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER ) ? isupper : islower ;
-           while ( *psZ )
-           {
-              if ( ( *pt2Function )( ( int ) *psZ ) )
-             {
-               strcpy( pszName, "." ) ;
-               break ;
-             }
-             psZ++ ;
-           }
-         }
+         strcpy( pszName, "." );
       }
       if ( pszName[0] != '\0' )
       {
@@ -237,6 +250,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
 #endif
 
 #ifdef HB_EXTENSION
+
 
 HB_FUNC( HB_FTEMPCREATE )
 {

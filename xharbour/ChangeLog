@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3223 2004/07/27 21:05:01 druzus Exp $
+ * $Id: ChangeLog,v 1.3224 2004/07/27 22:35:24 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-07-28 14:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/fstemp.c
+    - altered Linux/BSD version of hb_fsCreateTemp() to search GETENV( "TMPDIR" )
 
 2004-07-27 15:33 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * source/rtl/tbrowse.prg
