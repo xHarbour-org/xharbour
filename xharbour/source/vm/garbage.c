@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.71 2003/12/20 01:15:57 ronpinkas Exp $
+ * $Id: garbage.c,v 1.72 2004/01/27 03:07:00 ronpinkas Exp $
  */
 
 /*
@@ -762,6 +762,7 @@ void hb_gcReleaseAll( void )
 
    if( s_pLockedBlock )
    {
+      #if 0
       pAlloc = s_pLockedBlock;
       do
       {
@@ -775,6 +776,7 @@ void hb_gcReleaseAll( void )
          s_pLockedBlock = s_pLockedBlock->pNext;
 
       } while ( s_pLockedBlock && ( s_pLockedBlock != pAlloc ) );
+      #endif
 
       do
       {
@@ -789,6 +791,7 @@ void hb_gcReleaseAll( void )
 
    if( s_pCurrBlock )
    {
+      #if 0
       pAlloc = s_pCurrBlock;
       do
       {
@@ -803,6 +806,7 @@ void hb_gcReleaseAll( void )
          s_pCurrBlock = s_pCurrBlock->pNext;
 
       } while( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
+      #endif
 
       do
       {

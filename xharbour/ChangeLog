@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2329 2004/02/20 00:22:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2330 2004/02/20 00:31:22 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,6 +10,10 @@
 2004-02-20 07:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/achoice.prg
     ! fixes on initialization of row/col when initial item is not 1.
+
+2004-02-19 16:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/garbage.c
+    % Disabled cleanup functions in hb_gcReleaseAll()
 
 2004-02-19 16:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c
