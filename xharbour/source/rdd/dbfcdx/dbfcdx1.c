@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.154 2004/08/23 15:40:04 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.155 2004/08/29 00:26:23 druzus Exp $
  */
 
 /*
@@ -3625,6 +3625,7 @@ static void hb_cdxTagClose( LPCDXTAG pTag )
    {
       hb_cdxTagHeaderStore( pTag );
    }
+   pTag->fRePos = TRUE;
 }
 
 /*
@@ -3768,8 +3769,11 @@ static int hb_cdxPageSeekKey( LPCDXPAGE pPage, LPCDXKEY pKey, ULONG ulKeyRec, BO
            hb_cdxPageGetKeyRec( pPage, pPage->iCurKey ) !=
            hb_cdxPageGetKeyRec( pPage->Child, pPage->Child->iKeys-1 ) )
       {
+         printf("\r\nkeyLen=%d", pPage->TagParent->uiLen);
          printf("\r\nparent=%lx, iKey=%d, rec=%ld", pPage->Page, pPage->iCurKey, hb_cdxPageGetKeyRec( pPage, pPage->iCurKey ));
          printf("\r\n child=%lx, iKey=%d, rec=%ld", pPage->Child->Page, pPage->Child->iKeys-1, hb_cdxPageGetKeyRec( pPage->Child, pPage->Child->iKeys-1 ));
+         printf("\r\nparent val=[%s]", hb_cdxPageGetKeyVal( pPage, pPage->iCurKey ));
+         printf("\r\n child val=[%s]", hb_cdxPageGetKeyVal( pPage->Child, pPage->Child->iKeys-1 ));
          fflush(stdout);
          hb_cdxErrInternal("hb_cdxPageSeekKey: wrong parent key.");
       }
@@ -5516,6 +5520,7 @@ static LONG hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
    else if ( pTag )
    {
       hb_cdxIndexLockRead( pTag->pIndex );
+      hb_cdxTagOpen( pTag );
       if ( hb_cdxCurKeyRefresh( pArea, pTag ) )
       {
          if ( CURKEY_RAWPOS( pTag ) )
@@ -7399,8 +7404,6 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                   pKey = hb_cdxKeyEval( NULL, pTag, TRUE );
                pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
                                               hb_cdxTagKeyAdd( pTag, pKey ) );
-               if ( uiTag != pArea->uiTag )
-                  hb_cdxTagClose( pTag );
                hb_cdxIndexUnLockWrite( pTag->pIndex );
                hb_cdxKeyFree( pKey );
             }
@@ -7430,8 +7433,6 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                   pKey = hb_cdxKeyEval( NULL, pTag, TRUE );
                pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
                                              hb_cdxTagKeyDel( pTag, pKey ) );
-               if ( uiTag != pArea->uiTag )
-                  hb_cdxTagClose( pTag );
                hb_cdxIndexUnLockWrite( pTag->pIndex );
                hb_cdxKeyFree( pKey );
             }
