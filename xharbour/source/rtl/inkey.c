@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.39 2004/12/01 00:51:58 peterrees Exp $
+ * $Id: inkey.c,v 1.40 2004/12/29 19:21:10 bdj Exp $
  */
 
 /*
@@ -207,7 +207,7 @@ int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
          /* There is no point in waiting forever for no input events! */
          if( ( event_mask & ( INKEY_ALL + INKEY_RAW ) ) != 0 )
          {
-            while( hb_inkeyNextNon0( event_mask ) == -99 ) /* bdj: was == 0 */
+            while( hb_inkeyNextNon0( event_mask ) == -99 )
             {
                // immediately break if a VM request is pending.
                if ( hb_vmRequestQuery() != 0 )
@@ -231,12 +231,10 @@ int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
 
          end_clock = times( &tm ) + ( clock_t ) ( dSeconds * sysconf(_SC_CLK_TCK) );
 
-         /* bdj: was == 0 */
          while( hb_inkeyNextNon0( event_mask ) == -99 && (times( &tm ) < end_clock) )
 #else
          clock_t end_clock = clock() + ( clock_t ) ( dSeconds * CLOCKS_PER_SEC );
 
-         /* bdj: was == 0 */
          while( hb_inkeyNextNon0( event_mask ) == -99 && clock() < end_clock )
 #endif
          {
@@ -287,7 +285,6 @@ int hb_setInkeyLast( int ch )      /* Force a value to s_inkeyLast and return pr
 */
 int hb_inkeyNext( HB_inkey_enum event_mask )      /* Return the next key without extracting it */
 {
-   /* bdj: was simply s_inkeyForce */
    int key = (s_inkeyForce == 0 ? -99 : s_inkeyForce);    /* Assume that typeahead support is disabled */
 
    HB_TRACE(HB_TR_DEBUG, ("hb_inkeyNext()"));
@@ -299,7 +296,7 @@ int hb_inkeyNext( HB_inkey_enum event_mask )      /* Return the next key without
       /* Proper typeahead support is enabled */
       if( s_inkeyHead == s_inkeyTail )
       {
-         key = -99;  /* bdj: was = 0 */
+         key = -99;
       }
       else
       {
@@ -621,13 +618,65 @@ HB_FUNC( HB_KEYPUT )
 
 #endif
 
+/* bdj:
+   As in Clipper, Nextkey() should return next available char in kbd buffer w/o extracting it,
+   EXCEPT when the char is chr(0).
+ */
 HB_FUNC( NEXTKEY )
 {
-   /* bdj: was simply:
-      hb_retni( hb_inkeyNext( ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK ) );
-   */
-
    int iRetval = hb_inkeyNext( ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK );
+
+   /* iRetval==0 means we have chr(0) as next char */
+   if (iRetval==0)
+   {
+      /* must trash this key==0, but cannot use hb_inkeyFetch()
+         because we must not change s_inkeyLast.
+         The following is copied and modified from hb_inkeyFetch() */
+
+      int iKey;
+
+      if( hb_set.HB_SET_TYPEAHEAD )
+      {
+         /* Proper typeahead support is set */
+
+         iKey = s_inkeyBuffer[ s_inkeyTail++ ];
+
+         if( iKey == -99 && s_inkeyKB )
+         {
+            iKey = s_inkeyKB->String[ s_inkeyKB->Pos-- ];
+
+            if( s_inkeyKB->Pos >= 0 )
+            {
+               s_inkeyTail--;
+            }
+            else
+            {
+               hb_inkeyKBfree( );
+            }
+         }
+
+         if( s_inkeyTail >= hb_set.HB_SET_TYPEAHEAD )
+         {
+            s_inkeyTail = 0;
+         }
+
+         s_inkeyForce = 0;
+      }
+      else
+      {
+         if( s_inkeyKB )
+         {
+            s_inkeyKB->Pos--;
+
+            if( s_inkeyKB->Pos < 0 )
+            {
+               hb_inkeyKBfree( );
+               s_inkeyForce = 0;
+            }
+         }
+      }
+   } /* end chr(0) handling */
+
    hb_retni( iRetval == -99 ? 0 : iRetval );
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3705 2004/12/30 03:08:52 kaddath Exp $
+ * $Id: ChangeLog,v 1.3706 2004/12/30 07:23:02 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-30 14:35 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/inkey.c
+    ! Another Clipper compatibility issue.
+      NEXTKEY() should discard the char from kbd buffer, if it is chr(0).
 
 2004-12-29 23:20 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * source/rtl/tget.prg
