@@ -1300,7 +1300,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
          ExtractLeadingWS( @sBlock )
          DropTrailingWS( @sBlock )
 
-         TraceLog( sBlock )
+         //TraceLog( sBlock )
 
          IF ! Empty( sBlock )
             IF sBlock = "#line"
