@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.15 2002/08/08 19:36:07 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.16 2002/08/31 22:25:47 ronpinkas Exp $
  */
 
 /*
@@ -412,6 +412,8 @@ static ERRCODE hb_dbfLockFile( DBFAREAP pArea, BOOL * pResult )
    {
       if( pArea->lpdbPendingRel )
          SELF_FORCEREL( ( AREAP ) pArea );
+
+      hb_dbfUnlockAllRecords( pArea );
 
       pArea->fFLocked = hb_fsLock( pArea->hDataFile, DBF_LOCKPOS + 1,
                                    DBF_LOCKPOS, FL_LOCK );
