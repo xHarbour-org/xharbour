@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.106 2004/04/14 10:32:13 druzus Exp $
+ * $Id: dbcmd.c,v 1.107 2004/04/23 10:26:26 lf_sfnet Exp $
  */
 
 /*
@@ -4909,6 +4909,36 @@ static void hb_AppendToDb( PHB_ITEM pDelimitedFile, PHB_ITEM pDelimiter )
    }
 }
 
+// Escaping delimited strings. Need to be cleaned/optimized/improved
+static char *hb_strescape( char *szInput, int lLen, char *cEsc )
+{
+   int     lCnt     = 0;
+   char  * szChr;
+   char  * szEscape = NULL;
+   char  * szReturn = NULL;
+
+   szReturn = szEscape = ( char * ) hb_xgrab( lLen * 2 + 4 );
+   
+   while( lLen && HB_ISSPACE( szInput[ lLen - 1 ] ) )
+   {   
+      lLen--;
+   }
+   
+   szChr = szInput;
+   
+   while ( *szChr && lCnt++ < lLen )
+   {
+      if( *szChr == *cEsc || *szChr < ' ' ) // *szChr == '\\' || *szChr == '"'  )
+      {
+         *szEscape++ = '\'';
+      }
+      *szEscape++ = *szChr++;
+   }
+   *szEscape = '\0';
+   
+   return szReturn;
+} 
+
 // Export field values to text file
 static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
 {
@@ -4917,24 +4947,17 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
       // a "C" field
       case HB_IT_STRING:
       {
+         char *szStrEsc;
          char *szString;
-         char *szText = pValue->item.asString.value;
-         USHORT iSzLen = ( USHORT ) pValue->item.asString.length;
 
-         // RTRIM( szText )
-         while( iSzLen && HB_ISSPACE( szText[ iSzLen - 1 ] ) )
-         {
-            iSzLen--;
-         }
-         szText[ iSzLen ] = '\0';
-
-         // szString := cDelim + szText + cDelim
-         szString = hb_xstrcpy( NULL,cDelim,szText,cDelim,NULL);
+         szStrEsc = hb_strescape( pValue->item.asString.value, pValue->item.asString.length, cDelim );
+         szString = hb_xstrcpy( NULL,cDelim,szStrEsc,cDelim,NULL);
 
          // FWrite( handle, szString )
          hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
 
          // Orphaned, get rif off it
+         hb_xfree( szStrEsc );
          hb_xfree( szString );
          break;
       }
@@ -4955,18 +4978,17 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
          break;
       }
       // an "N" field
-      case HB_IT_NUMERIC:
+      case HB_IT_LONG:
+      case HB_IT_DOUBLE:
       {
-         char * szResult = hb_itemStr( pValue, NULL, NULL );
-
+         char *szResult = hb_itemStr( pValue, NULL, NULL );
+   
          if ( szResult )
          {
-            szResult ++;
-            while( HB_ISSPACE( *szResult ) )
-            {
-               szResult++ ;
-            }
-            hb_fsWriteLarge( handle, (BYTE*) szResult, strlen( szResult ) );
+            ULONG ulLen = strlen( szResult );
+            char * szTrimmed = hb_strLTrim( szResult, &ulLen );
+      
+            hb_fsWriteLarge( handle, (BYTE*) szTrimmed, strlen( szTrimmed ) );
             hb_xfree( szResult );
          }
          break;
@@ -5340,85 +5362,27 @@ HB_FUNC( __DBDELIM )
    }
 }
 
-// Escaping SQL string very basic. Need to be optimized/improved
-static char *hb_sqlescape( char *szInput )
-{
-   int     lLength = 0;
-   BOOL    bHasOne = FALSE;
-   char  * szChr;
-   char  * szEscape = NULL;
-   char  * szReturn = NULL;
-   
-   szChr = szInput;
-   
-   while( *szChr )
-   {
-      if( *szChr == '\'' ) // || *szChr == '\\' || *szChr == '"' )
-      {
-         bHasOne = TRUE;
-      }   
-      szChr++;
-   }
-   
-   lLength = szChr - szInput;
-  
-   szReturn = szEscape = ( char * ) hb_xgrab( lLength * 2 + 4 ); 
-   
-	if( !bHasOne )
-   {
-      strcpy( szEscape, szInput );
-   }   
-	else
-	{
-      szChr = szInput;
-      while ( *szChr )
-      {
-         if( *szChr == '\'' || *szChr < ' ' ) // *szChr == '\\' || *szChr == '"'  )
-         {
-            *szEscape++ = '\'';
-         }
-         *szEscape++ = *szChr++;
-      }
-      *szEscape = '\0';
-	}
-   
-   return szReturn;
-} 
-
 // Export field values to SQL script file
 static BOOL hb_ExportSqlVar( int handle, PHB_ITEM pValue, char *cDelim )
 {
-   
-  char *szString;
- 
+
    switch( pValue->type )
    {
       // a "C" field
       case HB_IT_STRING:
       {
          char *szStrEsc;
-         char *szText = pValue->item.asString.value;
-         /* commented due a GPF in gcc
-         USHORT iSzLen = ( USHORT ) pValue->item.asString.length;
-        
-         // RTRIM( szText )
-         while( iSzLen && HB_ISSPACE( szText[ iSzLen - 1 ] ) )
-         {
-            iSzLen--;
-         }
-         szText[ iSzLen ] = '\0';
-         // szString := cDelim + szText + cDelim
-         */
+         char *szString;
 
-         szStrEsc = hb_sqlescape( szText );
+         szStrEsc = hb_strescape( pValue->item.asString.value, pValue->item.asString.length, cDelim );
          szString = hb_xstrcpy( NULL,cDelim,szStrEsc,cDelim,NULL);
 
          // FWrite( handle, szString )
          hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
 
          // Orphaned, get rif off it
-         hb_xfree( szString );
          hb_xfree( szStrEsc );
+         hb_xfree( szString );
          break;
       }
       // a "D" field
@@ -5426,6 +5390,7 @@ static BOOL hb_ExportSqlVar( int handle, PHB_ITEM pValue, char *cDelim )
       {
          char *szDate = (char*) hb_xgrab( 9 );
          char *szSqlDate = (char*) hb_xgrab( 11 );
+         char *szString;
 
          hb_itemGetDS( pValue, szDate );
          sprintf( szSqlDate, "%c%c%c%c-%c%c-%c%c", szDate[0],szDate[1],szDate[2],szDate[3],szDate[4],szDate[5],szDate[6],szDate[7] );
@@ -5440,24 +5405,24 @@ static BOOL hb_ExportSqlVar( int handle, PHB_ITEM pValue, char *cDelim )
       // an "L" field
       case HB_IT_LOGICAL:
       {
+         char *szString;
          szString = hb_xstrcpy( NULL,cDelim,( pValue->item.asLogical.value ? "Y" : "N" ),cDelim,NULL);
          hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
          hb_xfree( szString );
          break;
       }
       // an "N" field
-      case HB_IT_NUMERIC:
+      case HB_IT_LONG:
+      case HB_IT_DOUBLE:
       {
-         char * szResult = hb_itemStr( pValue, NULL, NULL );
-
+         char *szResult = hb_itemStr( pValue, NULL, NULL );
+   
          if ( szResult )
          {
-            szResult ++;
-            while( HB_ISSPACE( *szResult ) )
-            {
-               szResult++ ;
-            }
-            hb_fsWriteLarge( handle, (BYTE*) szResult, strlen( szResult ) );
+            ULONG ulLen = strlen( szResult );
+            char * szTrimmed = hb_strLTrim( szResult, &ulLen );
+      
+            hb_fsWriteLarge( handle, (BYTE*) szTrimmed, strlen( szTrimmed ) );
             hb_xfree( szResult );
          }
          break;
@@ -5481,7 +5446,7 @@ static void hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
    USHORT uiFields = 0;
    USHORT ui;
    HB_ITEM Tmp;
-   long lRecNo = 0;
+   ULONG lRecNo = 0;
    BOOL bWriteSep = FALSE;
 
    char *szInsert = ( char * ) hb_xgrab( 13 + strlen( cTable ) + 12 );
@@ -5540,7 +5505,7 @@ static void hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
       {
          hb_fsWriteLarge( handle, (BYTE*) szInsert, strlen( szInsert ) );
 
-         sprintf( szRecNo, "%d,", ++lRecNo );
+         sprintf( szRecNo, "%ld,", ++lRecNo );
          
          hb_fsWriteLarge( handle, (BYTE*) szRecNo, strlen( szRecNo ) );
          

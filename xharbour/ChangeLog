@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2824 2004/04/23 07:46:05 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2825 2004/04/23 10:26:16 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-23 17:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rdd/dbcmd.c
+    + hb_sqlescape renamed hb_strescape since added to __dbdelim also.
+      Fixed gcc's GPF and number export in __dbdelim and __dbsql.
 
 2004-04-23 12:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rdd/dbcmd.c
