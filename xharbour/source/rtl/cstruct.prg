@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.36 2004/11/21 21:44:17 druzus Exp $
+ * $Id: cstruct.prg,v 1.37 2005/01/09 01:41:06 ronpinkas Exp $
  */
 
 /*
@@ -504,7 +504,15 @@ RETURN QSelf()
 //---------------------------------------------------------------------------//
 STATIC Function Reset()
 
-   aFill( QSelf(), NIL, 1, Len( QSelf() ) - CLASS_PROPERTIES )
+   LOCAL xProperty
+
+   FOR EACH xProperty IN QSelf()
+      IF HB_IS_CStructure( xProperty )
+         xProperty:Reset()
+      ELSE
+         xProperty := NIL
+      END
+   NEXT
 
 RETURN QSelf()
 

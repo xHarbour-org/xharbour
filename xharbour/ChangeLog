@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3919 2005/03/07 10:16:48 andijahja Exp $
+ * $Id: ChangeLog,v 1.3920 2005/03/08 03:36:17 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-08 18:45 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/cstruct.prg
+     ! ::Reset() method did not preserve nested structures' structure;
+       just try to add an oStructure:Reset() before oStructure:SayMembers() in
+       tests/tstcstru.prg to see the difference.
 
 2005-03-07 22:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtwin/gtwin.c
