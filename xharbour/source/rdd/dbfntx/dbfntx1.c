@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.98 2005/03/31 03:58:16 druzus Exp $
+ * $Id: dbfntx1.c,v 1.99 2005/03/31 18:43:15 guerra000 Exp $
  */
 
 /*
@@ -2484,7 +2484,9 @@ static LPTAGINFO hb_ntxFindTag( NTXAREAP pArea, PHB_ITEM lpOrder )
 {
    LPTAGINFO pTag = pArea->lpNtxTag;
 
-   if( pTag && lpOrder )
+   if ( ! lpOrder )
+      pTag = pArea->lpCurTag;
+   else if( pTag && lpOrder )
    {
       if( hb_itemType( lpOrder ) == HB_IT_STRING )
       {
@@ -2495,13 +2497,11 @@ static LPTAGINFO hb_ntxFindTag( NTXAREAP pArea, PHB_ITEM lpOrder )
             pTag = pTag->pNext;
          } while( pTag );
       }
-      else
+      else 
       {
          int iNum = hb_itemGetNI( lpOrder ), iCount = 0;
          while ( pTag && ++iCount != iNum )
-         {
             pTag = pTag->pNext;
-         }
       }
    }
    return pTag;
@@ -3508,8 +3508,6 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
       return FAILURE;
 
    pTag = hb_ntxFindTag( pArea , pInfo->itmOrder );
-   if ( !pTag )
-      pTag = pArea->lpCurTag;
 
    if( pTag )
    {
@@ -3798,8 +3796,6 @@ static ERRCODE ntxOrderListClear( NTXAREAP pArea )
 
 static ERRCODE ntxOrderListFocus( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
-   LPTAGINFO pTag;
-
    HB_TRACE(HB_TR_DEBUG, ("ntxOrderListFocus(%p, %p)", pArea, pOrderInfo));
 
    pOrderInfo->itmResult = hb_itemPutC( pOrderInfo->itmResult,
@@ -3807,17 +3803,7 @@ static ERRCODE ntxOrderListFocus( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
 
    if( pOrderInfo->itmOrder )
    {
-      if( hb_itemType( pOrderInfo->itmOrder ) != HB_IT_STRING &&
-          hb_itemGetNI( pOrderInfo->itmOrder ) == 0 )
-      {
-         pArea->lpCurTag = NULL;
-      }
-      else
-      {
-         pTag = hb_ntxFindTag( pArea, pOrderInfo->itmOrder );
-         if( pTag )
-            pArea->lpCurTag = pTag;
-      }
+      pArea->lpCurTag = hb_ntxFindTag( pArea, pOrderInfo->itmOrder );
    }
 
    return SUCCESS;
