@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.6 2003/02/06 05:17:54 walito Exp $
+ * $Id: dbedit.prg,v 1.7 2003/05/15 01:52:30 andijahja Exp $
  */
 
 /*
@@ -85,7 +85,7 @@ FUNCTION dbEdit(;
    LOCAL oBrowse
    LOCAL nKey
    LOCAL bAction
-   LOCAL lException
+   LOCAL lNeedIdle
 
    LOCAL nOldCursor
 
@@ -254,7 +254,8 @@ FUNCTION dbEdit(;
    ENDIF
 
    nOldCursor := SetCursor( SC_NONE )
-   lException := .F.
+   lNeedIdle  := .T.
+   nKey       := 0
 
    lWhile := .T.
    DO WHILE lWhile
@@ -262,14 +263,20 @@ FUNCTION dbEdit(;
       DO WHILE !oBrowse:Stabilize() .AND. NextKey() == 0
       ENDDO
 
-      IF ( nKey := InKey() ) == 0
+      nKey := InKey()   // it should set nKey although lNeedIdle is true
 
-         IF !lException
-            IF !dbEditCallUser( oBrowse, xUserFunc, 0 )
+      IF lNeedIdle .OR. nKey == 0
+
+         IF lNeedIdle
+            IF !dbEditCallUser( oBrowse, xUserFunc, nKey, @lNeedIdle )
                oBrowse:forceStable()
                EXIT
             ENDIF
             oBrowse:forceStable()
+         ENDIF
+
+         IF lNeedIdle
+            LOOP
          ENDIF
 
          oBrowse:Hilite()
@@ -282,8 +289,6 @@ FUNCTION dbEdit(;
          ENDIF
 
       ENDIF
-
-      lException := .F.
 
       SWITCH nKey
          CASE K_DOWN       ; oBrowse:Down() ; exit
@@ -301,11 +306,10 @@ FUNCTION dbEdit(;
          CASE K_CTRL_HOME  ; oBrowse:PanHome() ; exit
          CASE K_CTRL_END   ; oBrowse:PanEnd() ; exit
          DEFAULT
-            IF !dbEditCallUser( oBrowse, xUserFunc, nKey )
+            IF !dbEditCallUser( oBrowse, xUserFunc, nKey, @lNeedIdle )
                lWhile := .F.
 //               EXIT
             ENDIF
-            lException := .T.
       END
    ENDDO
 
@@ -313,7 +317,7 @@ FUNCTION dbEdit(;
 
    RETURN .T.
 
-STATIC FUNCTION dbEditCallUser( oBrowse, xUserFunc, nKey )
+STATIC FUNCTION dbEditCallUser( oBrowse, xUserFunc, nKey, lNeedIdle )
    LOCAL nMode
    LOCAL nResult
    LOCAL nPrevRecNo
@@ -342,6 +346,8 @@ STATIC FUNCTION dbEditCallUser( oBrowse, xUserFunc, nKey )
 
    IF nResult == DE_REFRESH .OR. nPrevRecNo != RecNo()
 
+      lNeedIdle := .T.
+
       IF nResult != DE_ABORT
 
          IF Set( _SET_DELETED ) .AND. Deleted() .OR. !Empty( dbFilter() ) .AND. ! &( dbFilter() )
@@ -363,6 +369,7 @@ STATIC FUNCTION dbEditCallUser( oBrowse, xUserFunc, nKey )
 
    ELSE
       oBrowse:Refreshcurrent()
+      lNeedIdle := .F.
    ENDIF
 
    RETURN nResult != DE_ABORT
