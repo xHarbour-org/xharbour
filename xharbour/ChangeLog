@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.643 2003/01/24 09:52:22 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.644 2003/01/25 01:44:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -13,8 +13,10 @@
     + Added #define HB_MAX_SWITCHES 16
 
   * source/compiler/harbour.sly
-  * tests/switch.prg
     + Added support for upto HB_MAX_SWITCHES nested SWITCH control flows.
+
+  * tests/switch.prg
+    * Minor revisions.
 
   + xdiff.txt
     + Added document describing xHarbour Extensions.
