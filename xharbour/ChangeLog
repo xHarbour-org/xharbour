@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.206 2002/05/07 02:11:58 lculik Exp $
+ * $Id: ChangeLog,v 1.207 2002/05/08 23:22:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-08 16:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * TODO
+    * Updated status.
 
 2002-05-08 16:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/hbfunchk.c
@@ -18,7 +22,18 @@
 
   * tests/pp.prg
   * tests/pp_harb.ch
-    ! Fixed PP_PreProText()
+    ! Fixed PP_PreProText() handling of Chr(10), comments, and retaing line numbers.
+
+2002-05-08 14:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.c
+    - Removed prototype declaration of QOUT and QQOUT from hb_compDeclaredInit()
+    * Corrected prototype declaration of AT to 4 parameters in hb_compDeclaredInit()
+
+  * source/rtl/at.c
+    + Added support for optional nStart and nEnd 3rd. and 4th. parameters.
+
+  * source/rtl/errorsys.prg
+    * Formatting and typos.
 
 2002-05-06 23:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/tbrowse.prg

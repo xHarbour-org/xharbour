@@ -1,5 +1,5 @@
 /*
- * $Id: TODO,v 1.1.1.1 2001/12/21 10:38:57 ronpinkas Exp $
+ * $Id: TODO,v 1.2 2002/03/18 15:22:16 ronpinkas Exp $
  */
 
                   Harbour Project To-Do list
@@ -24,8 +24,6 @@ OO system                                    Jean-Francois Lefebvre (JFL)
 Add missing 5.3 ord* functions.              Brian Hays
 OrdKeyVal and others are still in
 dummy.prg. Move dbcmd.c
-
-'SAVE TO' needs to support PUBLICs           Ron
 
 Is memofile support complete?
 [more info ???]
