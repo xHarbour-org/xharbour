@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.74 2002/05/20 22:37:40 ronpinkas Exp $
+ * $Id: hvm.c,v 1.75 2002/05/21 00:16:23 ronpinkas Exp $
  */
 
 /*
@@ -5433,7 +5433,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
          }
          else
          {
-            sModule = hb_xgrab( 128 );
+            sModule = (char *) hb_xgrab( 128 );
             bFree = TRUE;
 
             for( ui = 0; ui < uiModuleSymbols; ui++ )
