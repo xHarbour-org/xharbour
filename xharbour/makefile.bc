@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.83 2004/01/26 22:03:24 fsgiudice Exp $
+# $Id: makefile.bc,v 1.84 2004/01/30 02:29:48 maurifull Exp $
 #
 
 #
@@ -2855,7 +2855,7 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
 
    $(ECHO) $(CFLAGS) > make.tmp
 !if $d(HB_THREAD_SUPPORT)
-   $(ECHO) -tWM > make.tmp
+   $(ECHO) -tWM >> make.tmp
 !endif
    $(ECHO) -e$(HBRUN_EXE) >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbrun.obj >> make.tmp
