@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.13 2003/07/26 08:01:36 brianhays Exp $
+rem $Id: make_b32.bat,v 1.1 2003/09/23 21:23:56 paultucker Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -14,9 +14,6 @@ rem ---------------------------------------------------------------
 if not exist obj md obj
 if not exist obj\b32 md obj\b32
 
-if "%1" == "clean" goto CLEAN
-if "%1" == "CLEAN" goto CLEAN
-
 :BUILD
 
    SET HB_MT=
@@ -24,6 +21,8 @@ if "%1" == "CLEAN" goto CLEAN
    echo NOTE: Witout GTK, this lib does not serve any purpose at this time!
    echo.
    make -l -fmakefile.bc %1 %2 %3 > make_b32.log
+   if "%1" == "clean" goto CLEAN
+   if "%1" == "CLEAN" goto CLEAN
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
@@ -38,14 +37,7 @@ if "%1" == "CLEAN" goto CLEAN
    goto EXIT
 
 :CLEAN
-
-   if exist ..\..\lib\xwt.lib     del ..\..\lib\xwt.lib >nul
-   if exist ..\..\lib\b32\xwt.lib     del ..\..\lib\b32\xwt.lib >nul
-   if exist obj\b32\*.obj del obj\b32\*.obj > nul
-   if exist obj\b32\*.c   del obj\b32\*.c > nul
-   if exist obj\b32\*.h   del obj\b32\*.h > nul
    if exist make_b32.log  del make_b32.log
-   goto EXIT
 
 :EXIT
 
