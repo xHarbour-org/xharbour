@@ -1,5 +1,5 @@
 /*                                
- * $Id: ChangeLog,v 1.911 2003/04/04 17:21:10 paultucker Exp $
+ * $Id: ChangeLog,v 1.912 2003/04/04 19:11:25 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-04 16:35 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source\rtl\tbrowse.prg
+    ! Fix set column bigger than max columns.
+      Reported by Gianluca Piemonte
 
 2003-04-04 16:03 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tbrowse.prg
