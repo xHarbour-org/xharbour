@@ -4,7 +4,7 @@
 *   write by Adam Lubszczyk    alubszcz@rsw.pl                     *
 ********************************************************************
 /*
- * $Id: $
+ * $Id: ctwin.prg,v 1.1 2003/03/22 17:22:43 lculik Exp $
  */
 
 /*
@@ -69,10 +69,12 @@ STATIC ctw_BOARDT  := 0
 STATIC ctw_BOARDL  := 0
 STATIC ctw_BOARDB  := 0
 STATIC ctw_BOARDR  := 0
-STATIC ctw_MODET  := .F.
-STATIC ctw_MODEL  := .F.
-STATIC ctw_MODEB  := .F.
-STATIC ctw_MODER  := .F.
+STATIC ctw_MODET   := .F.
+STATIC ctw_MODEL   := .F.
+STATIC ctw_MODEB   := .F.
+STATIC ctw_MODER   := .F.
+STATIC ctw_CANMOVE := .T.
+STATIC ctw_SHADOWATTR := -1
 STATIC ctw_WBOX_Type := {;
             "ÉÍ»º¼ÍÈº ",;   // 0      WB_DOUBLE_CLEAR
             "ÚÄ¿³ÙÄÀ³ ",;   // 1      WB_SINGLE_CLEAR
@@ -289,6 +291,21 @@ FUNCTION WMOVE(nT,nL)
     ctw_WINDOWS[ctw_CURRENT]:Move(nT,nL)
   ENDIF
 RETURN ctw_CURRENT
+*********************************
+FUNCTION WSETMOVE(lMode)
+ LOCAL lOldMode := ctw_CANMOVE
+  IF VALTYPE(lMode) == "L"
+    ctw_CANMOVE := lMode
+  ENDIF
+RETURN lOldMode
+*********************************
+FUNCTION WSETSHADOW(xAttr)
+ LOCAL lOldAttr := ctw_SHADOWATTR
+  IF !EMPTY(xAttr) .AND. ;
+     ( VALTYPE(xAttr) == "C" .OR. ( VALTYPE(xAttr) == "N" .AND. xAttr == -1 ) )
+    ctw_SHADOWATTR := xAttr
+  ENDIF
+RETURN lOldAttr
 *********************************
 FUNCTION WMODE(lT,lL,lB,lR)
   IF lT != NIL
@@ -898,6 +915,7 @@ METHOD New(nT,nL,nB,nR) CLASS TctWIN
  ::UsedL := nL
  ::UsedB := nB
  ::UsedR := nR
+ ::SaveBG()
  ::cBackground := SAVESCREEN(nT,nL,nB,nR)
  ::cSaveData := ::cBackground
  ::nRow := nT

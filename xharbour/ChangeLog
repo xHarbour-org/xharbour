@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1309 2003/07/30 14:07:39 druzus Exp $
+ * $Id: ChangeLog,v 1.1310 2003/07/30 20:45:39 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-31 14:43 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/debug/Makefile
+  + xharbour/source/debug/dbgaltd.prg
+  * xharbour/source/debug/debugger.prg
+    * ALTD() code moved from debugger.prg to dbgaltd.prg
+      Now if programmer adds ALTD(0) to he's code the whole libdebug
+      is not linked - only one function.
+    ! removed unnecessary call to HB_OSHASDRIVELETTER()
+
+  * xharbour/source/debug/dbgtobj.prg
+  * xharbour/source/debug/debugger.prg
+    * #pragma -es0 commented
+
 2003-07-31 03:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * include/set.ch
    * include/hbset.h

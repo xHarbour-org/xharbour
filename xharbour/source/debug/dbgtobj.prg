@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtobj.prg,v 1.3 2003/01/30 02:23:58 walito Exp $
+ * $Id: dbgtobj.prg,v 1.4 2003/06/09 20:38:49 lculik Exp $
  */
 
 /*
@@ -55,7 +55,9 @@
 #include "common.ch"
 #include "hbclass.ch"
 #include "inkey.ch"
-#pragma -es0
+
+//#pragma -es0
+
 Class TDBGobject
 //export:
 data aWindows

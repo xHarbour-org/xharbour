@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.12 2003/06/17 11:09:41 iananderson Exp $
+ * $Id: debugger.prg,v 1.13 2003/07/30 14:07:41 druzus Exp $
  */
 
 /*
@@ -62,7 +62,7 @@
 /* Information structure hold by DATA aCallStack
    aCallStack = { { cFunctionName, aLocalVariables, nStartLine , cPrgName }, ... } */
 
-#pragma -es0
+//#pragma -es0
 
 #include "hbclass.ch"
 #include "hbmemvar.ch"
@@ -71,33 +71,19 @@
 #include "common.ch"
 #include "setcurs.ch"
 
-#define ALTD_DISABLE   0
-#define ALTD_ENABLE    1
-
 static s_oDebugger
 static s_lExit := .F.
 Static nDump
 memvar __DbgStatics
 
-procedure AltD( nAction )
-   do case
-      case nAction == nil
-           if SET( _SET_DEBUG )
-              s_lExit := .f.
-              if !s_oDebugger==nil		// protects if altd() in code and debugger
-                                                // linked but not active
-                s_oDebugger:lGo := .F.
-                __dbgEntry( ProcLine( 1 ) )
-              endif
-           endif
 
-      case nAction == ALTD_DISABLE
-           SET( _SET_DEBUG, .F. )
-
-      case nAction == ALTD_ENABLE
-           SET( _SET_DEBUG, .T. )
-   endcase
-
+procedure __dbgAltDEntry()
+   s_lExit := .f.
+   if !s_oDebugger==nil		// protects if altd() in code and debugger
+                                // linked but not active
+      s_oDebugger:lGo := .F.
+      __dbgEntry( ProcLine( 2 ) )
+   endif
 return
 
 procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
@@ -353,8 +339,6 @@ METHOD New() CLASS TDebugger
    // that way if the source is in the same directory it will still be found even if the application
    // changes the current directory with the SET DEFAULT command
    /* ::cPathForFiles     := CURDRIVE() + ':\' + CURDIR() + '\' */
-   ::cPathForFiles     := iif( HB_OSHASDRIVELETTER(), CURDRIVE() + ':', '' ) + ;
-                          HB_OSPATHSEPARATOR() + CURDIR() + HB_OSPATHSEPARATOR()
    ::cPathForFiles     := CURDRIVE() + HB_OSDRIVESEPARATOR() + ;
                           HB_OSPATHSEPARATOR() + CURDIR() + HB_OSPATHSEPARATOR()
    ::nTabWidth         := 4

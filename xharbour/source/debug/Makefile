@@ -1,18 +1,19 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:43:42 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2003/06/09 20:38:49 lculik Exp $
 #
 
 ROOT = ../../
 
 PRG_SOURCES=\
-	dbgmenu.prg \
-   dbghelp.prg \
+	dbgmenu.prg  \
+	dbghelp.prg  \
 	dbgtmenu.prg \
 	dbgtmitm.prg \
-	dbgtwin.prg \
+	dbgtwin.prg  \
 	debugger.prg \
-   dbgtarr.prg \
-   dbgtobj.prg \
+	dbgaltd.prg  \
+	dbgtarr.prg  \
+	dbgtobj.prg  \
 	tbrwtext.prg \
 	dbgwa.prg
 
