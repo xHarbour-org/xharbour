@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.133 2002/12/18 13:43:57 ronpinkas Exp $
+ * $Id: hvm.c,v 1.134 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -340,7 +340,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
     /*JC1: initialization of thread aware stack */
     #ifdef HB_THREAD_SUPPORT
        HB_TRACE( HB_TR_INFO, ("contextInit" ) );
-       hb_contextInit();
+       hb_threadInit();
     #endif
 
    /* initialize internal data structures */
@@ -501,17 +501,7 @@ void HB_EXPORT hb_vmQuit( void )
    //printf( "\nvmQuit()\n" );
 
    #ifdef HB_THREAD_SUPPORT
-      while( hb_ht_context )
-      {
-         #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
-           {
-              static struct timespec nanosecs = { 0, 1000 };
-              nanosleep( &nanosecs, NULL );
-           }
-         #elif defined(HB_OS_WIN_32)
-            Sleep( 0 );
-         #endif
-      }
+       hb_threadExit();
    #endif
 
    #ifdef HB_MACRO_STATEMENTS

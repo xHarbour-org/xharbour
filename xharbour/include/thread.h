@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.4 2002/12/20 01:25:54 jonnymind Exp $
+* $Id: thread.h,v 1.5 2002/12/20 01:43:19 jonnymind Exp $
 */
 
 /*
@@ -62,21 +62,54 @@
 #include "hbapierr.h"
 
 #if defined( HB_OS_WIN_32 )
-#include <windows.h>
+   #include <windows.h>
 #endif
 
-#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+#if defined(HB_OS_WIN_32)
+   #define HB_THREAD_T                 DWORD
+   #define HB_THREAD_HANDLE            HANDLE
+
+   #define HB_CRITICAL_T               CRITICAL_SECTION
+   #define HB_CRITICAL_INIT( x )       InitializeCriticalSection( &(x) )
+   #define HB_CRITICAL_DESTROY( x )    DeleteCriticalSection( &(x) )
+   #define HB_CRITICAL_LOCK( x )       EnterCriticalSection( &(x) )
+   #define HB_CRITICAL_UNLOCK( x )     LeaveCriticalSection( &(x) )
+
+   #define HB_MUTEX_T                  HANDLE
+   #define HB_MUTEX_INIT( x )          x = CreateMutex( NULL, FALSE, NULL )
+   #define HB_MUTEX_DESTROY( x )       CloseHandle( x )
+   #define HB_MUTEX_LOCK( x )          WaitForSingleObject( x, INFINITE )
+   #define HB_MUTEX_UNLOCK( x )        ReleaseMutex( x )
+
+   #define HB_COND_T                   HANDLE
+   #define HB_COND_INIT( x )           x = CreateEvent( NULL, TRUE, FALSE, NULL )
+   #define HB_COND_WAIT( x, y )        SignalObjectAndWait( y, x, INFINITE, FALSE )
+   #define HB_COND_WAITTIME( x, y, t ) SignalObjectAndWait( y, x, t *1000, FALSE )
+   #define HB_COND_SIGNAL( x )         SetEvent( x )
+   #define HB_COND_DESTROY( x )        CloseHandle( x )
+
+   #define HB_CURRENT_THREAD           GetCurrentThreadId
+   #define HB_CURRENT_THREAD_HANDLE    GetCurrentThread
+#else
     #include <pthread.h>
     #define HB_THREAD_T                 pthread_t
+    #define HB_THREAD_HANDLE            pthread_t
+
+    #define HB_CRITICAL_T               pthread_mutex_t
+    #define HB_CRITICAL_INIT( x )       pthread_mutex_init( &(x), NULL )
+    #define HB_CRITICAL_DESTROY( x )    pthread_mutex_destroy( &(x) )
+    #define HB_CRITICAL_LOCK( x )       pthread_mutex_lock( &(x) )
+    #define HB_CRITICAL_UNLOCK( x )     pthread_mutex_unlock( &(x) )
+
     #define HB_MUTEX_T                  pthread_mutex_t
-    #define HB_MUTEX_INIT( x )          pthread_mutex_init( &x, NULL )
-    #define HB_MUTEX_DESTROY( x )       pthread_mutex_destroy( x )
-    #define HB_MUTEX_LOCK( x )          pthread_mutex_lock( x )
-    #define HB_MUTEX_UNLOCK( x )        pthread_mutex_unlock( x )
+    #define HB_MUTEX_INIT( x )          pthread_mutex_init( &(x), NULL )
+    #define HB_MUTEX_DESTROY( x )       pthread_mutex_destroy( &(x) )
+    #define HB_MUTEX_LOCK( x )          pthread_mutex_lock( &(x) )
+    #define HB_MUTEX_UNLOCK( x )        pthread_mutex_unlock( &(x) )
 
     #define HB_COND_T                   pthread_cond_t
-    #define HB_COND_INIT( x )           pthread_cond_init( x, NULL )
-    #define HB_COND_WAIT( x, y )        pthread_cond_wait( x, y )
+    #define HB_COND_INIT( x )           pthread_cond_init( &(x), NULL )
+    #define HB_COND_WAIT( x, y )        pthread_cond_wait( &(x), &(y) )
     #define HB_COND_WAITTIME( x, y, t )  \
         {\
             struct timeval now;\
@@ -84,36 +117,22 @@
             gettimeofday(&now, 0);\
             timeout.tv_sec = now.tv_sec + t /1000;\
             timeout.tv_nsec = now.tv_usec * 1000 + (t % 1000) * 1000000 ;\
-            pthread_cond_timedwait(x, y, &timeout);\
+            pthread_cond_timedwait( x, y, &timeout );\
         }
     #define HB_COND_SIGNAL( x )         pthread_cond_signal( x )
     #define HB_COND_DESTROY( x )        pthread_cond_destroy( x )
 
     #define HB_CURRENT_THREAD           pthread_self
+    #define HB_CURRENT_THREAD_HANDLE    pthread_self
 
 /* Thread support is only for linux and windows now */
-#elif defined(HB_OS_WIN_32)
-    #define HB_THREAD_T                 HANDLE
-    #define HB_MUTEX_T                  HANDLE
-    #define HB_MUTEX_INIT( x )          x = CreateMutex( NULL, FALSE, NULL)
-    #define HB_MUTEX_DESTROY( x )       CloseHandle( x )
-    #define HB_MUTEX_LOCK( x )          WaitForSingleObject( x, INFINITE )
-    #define HB_MUTEX_UNLOCK( x )        ReleaseMutex( x )
-    #define HB_COND_T                   HANDLE
-    #define HB_COND_INIT( x )           x = CreateEvent( NULL, TRUE, FALSE, NULL )
-    #define HB_COND_WAIT( x, y )        SignalObjectAndWait( y, x, INFINITE, FALSE )
-    #define HB_COND_WAITTIME( x, y, t ) SignalObjectAndWait( y, x, t *1000, FALSE )
-    #define HB_COND_SIGNAL( x )         SetEvent( x )
-    #define HB_COND_DESTROY( x )        CloseHandle( x )
-
-    #define HB_CURRENT_THREAD           GetCurrentThread
 #endif
 
 /* Complex Mutex Structure*/
 typedef struct {
-	HB_MUTEX_T *mutex;
-	HB_COND_T *cond;
-	HB_THREAD_T locker;
+    HB_MUTEX_T mutex;
+    HB_COND_T cond;
+    HB_THREAD_HANDLE locker;
 	USHORT lock_count;
 	int waiting;
 	PHB_ITEM event_object;
@@ -122,23 +141,29 @@ typedef struct {
 /* Context */
 typedef struct tag_HB_THREAD_CONTEXT {
     HB_THREAD_T th_id;
+#if defined(HB_OS_WIN_32)
+    HB_THREAD_HANDLE th_h;
+#endif
     HB_STACK *stack;
     struct tag_HB_THREAD_CONTEXT *next;
 } HB_THREAD_CONTEXT;
 
 /* Parameters passed for thread creation */
 typedef struct tag_HB_THREAD_PARAM {
+    HB_THREAD_T th_id;
     PHB_ITEM args;
     USHORT count;
 } HB_THREAD_PARAM;
 
 extern HB_STACK hb_stack_general;
 extern HB_THREAD_CONTEXT *hb_ht_context;
-extern HB_MUTEX_T context_monitor;
+extern HB_CRITICAL_T context_monitor;
 
 extern void hb_createContext( void );
 extern void hb_destroyContext( void );
-extern void hb_destroyContextId( HB_THREAD_T id );
-extern void hb_contextInit( void );
+extern void hb_destroyContextFromHandle( HB_THREAD_HANDLE th_h );
+extern void hb_threadInit( void );
+extern void hb_threadExit( void );
 extern HB_THREAD_CONTEXT *hb_getCurrentContext( void );
+
 #endif

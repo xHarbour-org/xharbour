@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.5 2002/12/19 22:25:25 jonnymind Exp $
+* $Id: thread.c,v 1.6 2002/12/20 01:26:08 jonnymind Exp $
 */
 
 /*
@@ -69,142 +69,169 @@
 #include "thread.h"
 
 HB_THREAD_CONTEXT *hb_ht_context;
-HB_MUTEX_T context_monitor;
+HB_CRITICAL_T context_monitor;
 HB_THREAD_CONTEXT *last_context;
 
 void hb_createContext( void )
 {
-HB_THREAD_CONTEXT *p;
-HB_THREAD_CONTEXT *tc;
-int i;
+    HB_THREAD_CONTEXT *p;
+    HB_THREAD_CONTEXT *tc;
+    int i;
 
-tc = (HB_THREAD_CONTEXT *) malloc( sizeof( HB_THREAD_CONTEXT));
-tc->th_id = HB_CURRENT_THREAD();
+    tc = (HB_THREAD_CONTEXT *) malloc( sizeof( HB_THREAD_CONTEXT));
+    tc->th_id = HB_CURRENT_THREAD();
 
-tc->stack = ( HB_STACK *) malloc( sizeof( HB_STACK ) );
-tc->next = NULL;
+    tc->stack = ( HB_STACK *) malloc( sizeof( HB_STACK ) );
+    tc->next = NULL;
 
-tc->stack->pItems = ( HB_ITEM_PTR * ) malloc( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
-tc->stack->pBase  = tc->stack->pItems;
-tc->stack->pPos   = tc->stack->pItems;     /* points to the first stack item */
-tc->stack->wItems = STACK_INITHB_ITEMS;
+    tc->stack->pItems = ( HB_ITEM_PTR * ) malloc( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
+    tc->stack->pBase  = tc->stack->pItems;
+    tc->stack->pPos   = tc->stack->pItems;     /* points to the first stack item */
+    tc->stack->wItems = STACK_INITHB_ITEMS;
 
-for( i=0; i < tc->stack->wItems; ++i )
-{
-    tc->stack->pItems[ i ] = (HB_ITEM *) malloc( sizeof( HB_ITEM ) );
-}
-
-( * (tc->stack->pPos) )->type = HB_IT_NIL;
-
-HB_MUTEX_LOCK( &context_monitor );
-
-if( hb_ht_context == NULL )
-{
-    hb_ht_context = tc;
-}
-else
-{
-    p = hb_ht_context;
-    while( p->next )
+    for( i=0; i < tc->stack->wItems; ++i )
     {
-        p = p->next;
+        tc->stack->pItems[ i ] = (HB_ITEM *) malloc( sizeof( HB_ITEM ) );
     }
-    p->next = tc;
-}
 
-HB_MUTEX_UNLOCK( &context_monitor );
+    ( * (tc->stack->pPos) )->type = HB_IT_NIL;
+
+    HB_CRITICAL_LOCK( context_monitor );
+
+    if( hb_ht_context == NULL )
+    {
+        hb_ht_context = tc;
+    }
+    else
+    {
+        p = hb_ht_context;
+
+        while( p->next )
+        {
+            p = p->next;
+        }
+
+        p->next = tc;
+    }
+
+    HB_CRITICAL_UNLOCK( context_monitor );
 }
 
 void hb_destroyContext( void )
 {
-HB_THREAD_CONTEXT *p, *prev;
-HB_THREAD_T id;
-int i;
+    HB_THREAD_CONTEXT *p, *prev;
+    HB_THREAD_T id;
+    int i;
 
-if( hb_ht_context == NULL )
-{
-    return;
-}
-
-id = HB_CURRENT_THREAD();
-
-HB_MUTEX_LOCK( &context_monitor );
-
-p = hb_ht_context;
-prev = NULL;
-while( p && p->th_id != id )
-{
-    prev = p;
-    p = p->next;
-}
-
-if( p )
-{
-    /*unlink the stack*/
-    if( prev )
+    if( hb_ht_context == NULL )
     {
-        prev->next = p->next;
-    }
-    else
-    {
-        hb_ht_context = p->next;
+        return;
     }
 
-    /* Free each element of the stack */
-    for( i = 0; i < p->stack->wItems; ++i )
+    id = HB_CURRENT_THREAD();
+
+    HB_CRITICAL_LOCK( context_monitor );
+
+    p = hb_ht_context;
+    prev = NULL;
+
+    while( p && p->th_id != id )
     {
-        free( p->stack->pItems[ i ] );
+        prev = p;
+        p = p->next;
     }
 
-    free( p->stack->pItems );
+    if( p )
+    {
+        /*unlink the stack*/
+        if( prev )
+        {
+            prev->next = p->next;
+        }
+        else
+        {
+            hb_ht_context = p->next;
+        }
 
-    /* Free the stack */
-    free( p->stack );
+        /* Free each element of the stack */
+        for( i = 0; i < p->stack->wItems; ++i )
+        {
+            free( p->stack->pItems[ i ] );
+        }
 
-    /* Free the context */
-    free( p );
+        free( p->stack->pItems );
+
+        /* Free the stack */
+        free( p->stack );
+
+        /* Free the context */
+        free( p );
+    }
+
+    HB_CRITICAL_UNLOCK( context_monitor );
 }
-HB_MUTEX_UNLOCK( &context_monitor );
-}
 
-void hb_destroyContextId( HB_THREAD_T id )
+void hb_destroyContextFromHandle( HB_THREAD_HANDLE th_h )
 {
     HB_THREAD_CONTEXT *p, *prev;
     int i;
 
     if ( hb_ht_context == NULL )
+    {
         return;
-    HB_MUTEX_LOCK( &context_monitor );
+    }
+
+    HB_CRITICAL_LOCK( context_monitor );
 
     p = hb_ht_context;
     prev = NULL;
-    while ( p != NULL && p->th_id != id ) {
-        prev = p;
-        p = p->next;
-    }
 
-    if ( p != NULL ) {
+    #ifdef HB_OS_WIN_32
+        while ( p && p->th_h != th_h )
+        {
+            prev = p;
+            p = p->next;
+        }
+    #else
+        while ( p && p->th_id != th_h )
+        {
+            prev = p;
+            p = p->next;
+        }
+    #endif
+
+    if( p )
+    {
         /*unlink the stack*/
-        if ( prev != NULL )
+        if ( prev )
+        {
             prev->next = p->next;
+        }
         else
+        {
             hb_ht_context = p->next;
+        }
+
+        HB_CRITICAL_UNLOCK( context_monitor );
 
         /* Free each element of the stack */
-        for( i=0; i < p->stack->wItems; ++i ) {
+        for( i=0; i < p->stack->wItems; ++i )
+        {
             free( p->stack->pItems[ i ] );
         }
+
         free( p->stack->pItems );
         /* Free the stack */
         free( p->stack );
         /* Free the context */
         free( p );
     }
-
-    HB_MUTEX_UNLOCK( &context_monitor );
-
-    /* if p == NULL, a thread without a context called this function;
-    nothing must be done! */
+    else
+    {
+        HB_CRITICAL_UNLOCK( context_monitor );
+        // TODO Error.
+        printf( "No context for %i\n" );
+    }
 }
 
 HB_THREAD_CONTEXT *hb_getCurrentContext( void )
@@ -214,13 +241,12 @@ HB_THREAD_CONTEXT *hb_getCurrentContext( void )
 
     id = HB_CURRENT_THREAD();
 
-    if ( last_context != NULL && last_context->th_id == id )
+    if( last_context && last_context->th_id == id )
     {
         return last_context;
     }
 
-
-    HB_MUTEX_LOCK( &context_monitor );
+    HB_CRITICAL_LOCK( context_monitor );
 
     p = hb_ht_context;
     while( p && p->th_id != id )
@@ -228,38 +254,55 @@ HB_THREAD_CONTEXT *hb_getCurrentContext( void )
         p = p->next;
     }
 
-    if ( p )
+    if( p )
     {
         last_context = p;
     }
-    HB_MUTEX_UNLOCK( &context_monitor );
+
+    HB_CRITICAL_UNLOCK( context_monitor );
+
     return p;
 }
 
-void hb_contextInit( void )
+void hb_threadInit( void )
 {
     hb_ht_context = NULL;
-    HB_MUTEX_INIT( context_monitor );
+    HB_CRITICAL_INIT( context_monitor );
     last_context = NULL;
 }
 
+void hb_threadExit( void )
+{
+    while( hb_ht_context )
+    {
+       #if defined(HB_OS_WIN_32)
+          Sleep( 0 );
+       #else
+          static struct timespec nanosecs = { 0, 1000 };
+          nanosleep( &nanosecs, NULL );
+       #endif
+    }
+
+    HB_CRITICAL_DESTROY( context_monitor );
+}
+
 #ifdef HB_OS_WIN_32
-DWORD WINAPI
+   DWORD WINAPI
 #else
-void *
+   void *
 #endif
 
 hb_create_a_thread(
 
 #ifdef HB_OS_WIN_32
-LPVOID sym
+   LPVOID Cargo
 #else
-void *sym
+   void *Cargo
 #endif
                 )
 {
     USHORT uiParam;
-    HB_THREAD_PARAM *pt = (HB_THREAD_PARAM *) sym;
+    HB_THREAD_PARAM *pt = (HB_THREAD_PARAM *) Cargo;
     PHB_ITEM pPointer = hb_arrayGetItemPtr( pt->args, 1 );
 
     hb_createContext();
@@ -304,28 +347,24 @@ void *sym
 
     hb_itemRelease( pt->args );
     free( pt );
-
     hb_destroyContext();
 
     return NULL;
 }
 
-
-
-
 HB_FUNC( STARTTHREAD )
 {
     PHB_ITEM pPointer;
-    PHB_ITEM pargs;
-    HB_THREAD_T thid;
+    PHB_ITEM pArgs;
+    HB_THREAD_T th_id;
     HB_THREAD_PARAM *pt;
 
-    #if defined(HB_OS_WIN_32)
-    ULONG ulthid;
+    #ifdef HB_OS_WIN_32
+       HB_THREAD_HANDLE th_h;
     #endif
 
-    pargs = hb_arrayFromParams( hb_stack.pBase );
-    pPointer  = hb_arrayGetItemPtr( pargs, 1 );
+    pArgs = hb_arrayFromParams( hb_stack.pBase );
+    pPointer  = hb_arrayGetItemPtr( pArgs, 1 );
 
     /* Error Checking */
     if ( pPointer->type == HB_IT_LONG )
@@ -364,60 +403,75 @@ HB_FUNC( STARTTHREAD )
 
         if( ! pDynSym )
         {
-            hb_errRT_BASE( EG_NOFUNC, 1001, NULL, hb_itemGetCPtr( pPointer ), 1, pargs );
-            hb_itemRelease( pargs );
+            hb_errRT_BASE( EG_NOFUNC, 1001, NULL, hb_itemGetCPtr( pPointer ), 1, pArgs );
+            hb_itemRelease( pArgs );
             return;
         }
     }
     else if( ( ! HB_IS_BLOCK( pPointer ) ) && ( ! HB_IS_SYMBOL( pPointer ) )  && ( ! HB_IS_LONG( pPointer ) ) )
     {
-        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STARTTHREAD", 1, pargs );
-        hb_itemRelease( pargs );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STARTTHREAD", 1, pArgs );
+        hb_itemRelease( pArgs );
         return;
     }
 
     pt = (HB_THREAD_PARAM *) malloc( sizeof( HB_THREAD_PARAM ) );
-    pt->args = pargs;
+    pt->args = pArgs;
     pt->count = hb_pcount();
 
-    /*phase 3: launch thread */
-    #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
-    if( pthread_create( &thid, NULL, hb_create_a_thread, (void * ) pt ) == 0 );
-    #elif defined(HB_OS_WIN_32)
-    thid = CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, 0, &ulthid );
-    if( ! thid )
-    #endif
+  #if defined(HB_OS_WIN_32)
+    if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, 0, &th_id ) ) != NULL )
+  #else
+    if( pthread_create( &th_id, NULL, hb_create_a_thread, (void * ) pt ) == 0 )
+  #endif
     {
-        // Wait for the actual creation.
-        while( hb_ht_context == NULL )
+        HB_THREAD_CONTEXT *p;
+
+        /*
+         * We must wait for the context to be created because we MUST record
+         * into it the Thread HANDLE in Windows. We can't use GetCurrentThread()
+         * because it return is a pseudo handle which will NOT match with the
+         * true th_h, we just created an returning to caller!!!
+         */
+        do
         {
-            #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
-            {
+            #if defined(HB_OS_WIN_32)
+                Sleep( 0 );
+            #else
                 static struct timespec nanosecs = { 0, 1000 };
                 nanosleep( &nanosecs, NULL );
-            }
-            #elif defined(HB_OS_WIN_32)
-                Sleep( 0 );
             #endif
-        }
+
+            HB_CRITICAL_LOCK( context_monitor );
+            p = hb_ht_context;
+            while( p && p->th_id != th_id )
+            {
+                p = p->next;
+            }
+            HB_CRITICAL_UNLOCK( context_monitor );
+
+        } while( p == NULL );
+
+        #if defined(HB_OS_WIN_32)
+            // Now, we can record the true Handle into the context.
+            p->th_h = th_h;
+            hb_retnl( (long) th_h );
+        #else
+            hb_retnl( (long) th_id );
+        #endif
     }
-
-    hb_retnl( (long) thid );
 }
-
-
-
 
 HB_FUNC( STOPTHREAD )
 {
-    HB_THREAD_T th = (HB_THREAD_T) hb_parnl( 1 );
-    PHB_ITEM pargs;
+    HB_THREAD_HANDLE th = (HB_THREAD_HANDLE) hb_parnl( 1 );
 
-    if( ! ISNUM( 1 ) || hb_pcount() != 1 )
+    if( ! ISNUM( 1 ) )
     {
-        pargs = hb_arrayFromParams( hb_stack.pBase );
-        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STOPTHREAD", 1, pargs );
-        hb_itemRelease( pargs );
+        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STOPTHREAD", 1, pArgs );
+        hb_itemRelease( pArgs );
+
         return;
     }
 
@@ -428,22 +482,21 @@ HB_FUNC( STOPTHREAD )
     TerminateThread( th, 0);
     WaitForSingleObject( th, INFINITE );
 #endif
-    hb_destroyContextId( th );
-
+    hb_destroyContextFromHandle( th );
 }
 
 HB_FUNC( KILLTHREAD )
 {
-    HB_THREAD_T th = (HB_THREAD_T) hb_parnl( 1 );
-    PHB_ITEM pargs;
+    HB_THREAD_HANDLE th = (HB_THREAD_HANDLE) hb_parnl( 1 );
 
-    if( ! ISNUM( 1 ) || hb_pcount() != 1 )
+    if( ! ISNUM( 1 ) )
     {
-        pargs = hb_arrayFromParams( hb_stack.pBase );
-        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "KILLTHREAD", 1, pargs );
-        hb_itemRelease( pargs );
+        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "KILLTHREAD", 1, pArgs );
+        hb_itemRelease( pArgs );
         return;
     }
+
 #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
     pthread_cancel( th );
 #else
@@ -453,100 +506,103 @@ HB_FUNC( KILLTHREAD )
 
 HB_FUNC( CLEARTHREAD )
 {
-    PHB_ITEM pargs;
-    HB_THREAD_T th;
+    HB_THREAD_HANDLE th;
 
-    if( ! ISNUM( 1 ) || hb_pcount() != 1 )
+    if( ! ISNUM( 1 ) )
     {
-        pargs = hb_arrayFromParams( hb_stack.pBase );
-        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "KILLTHREAD", 1, pargs );
-        hb_itemRelease( pargs );
+        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "CLEARTHREAD", 1, pArgs );
+        hb_itemRelease( pArgs );
         return;
     }
-    th = (HB_THREAD_T) hb_parnl( 1 );
 
-    hb_destroyContextId( th );
+    th = (HB_THREAD_HANDLE) hb_parnl( 1 );
+
+    hb_destroyContextFromHandle( th );
 }
 
 HB_FUNC( JOINTHREAD )
 {
-    PHB_ITEM pargs;
-    HB_THREAD_T  th;
+    HB_THREAD_HANDLE  th;
 
-    if( ! ISNUM( 1 ) || hb_pcount() != 1 )
+    if( ! ISNUM( 1 ) )
     {
-        pargs = hb_arrayFromParams( hb_stack.pBase );
-        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "KILLTHREAD", 1, pargs );
-        hb_itemRelease( pargs );
+        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "KILLTHREAD", 1, pArgs );
+        hb_itemRelease( pArgs );
         return;
     }
-    th = (HB_THREAD_T) hb_parnl( 1 );
 
+    th = (HB_THREAD_HANDLE) hb_parnl( 1 );
 
 #if ! defined( HB_OS_WIN_32 )
     pthread_join( th, 0 );
 #else
     WaitForSingleObject( th, INFINITE );
 #endif
-
 }
-
 
 HB_FUNC( CREATEMUTEX )
 {
-    HB_MUTEX_STRUCT *mt = (HB_MUTEX_STRUCT *) malloc( sizeof( HB_MUTEX_STRUCT ) );
+    HB_MUTEX_STRUCT *mt = (HB_MUTEX_STRUCT *) hb_gcAlloc( sizeof( HB_MUTEX_STRUCT ), NULL );
 
-#if ! defined( HB_OS_WIN_32 )
-    mt->mutex = (HB_MUTEX_T *) malloc( sizeof( HB_MUTEX_T ) );
-#endif
-
-    mt->cond = (HB_COND_T *) malloc( sizeof( HB_COND_T ) );
-    HB_MUTEX_INIT( *(mt->mutex) );
+    HB_MUTEX_INIT( mt->mutex );
     HB_COND_INIT( mt->cond );
+
     mt->lock_count = 0;
     mt->waiting = 0;
     mt->locker = 0;
+
     hb_retptr( mt );
 }
 
 HB_FUNC( DESTROYMUTEX )
 {
     HB_MUTEX_STRUCT *mutex;
-    PHB_ITEM pargs;
 
-    if( ! ISPOINTER( 1 ) || hb_pcount() != 1 )
+    if( ! ISPOINTER( 1 ) )
     {
-        pargs = hb_arrayFromParams( hb_stack.pBase );
-        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "DESTROYMUTEX", 1, pargs );
-        hb_itemRelease( pargs );
+        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "DESTROYMUTEX", 1, pArgs );
+        hb_itemRelease( pArgs );
         return;
     }
-    mutex = hb_parptr( 1 );
 
-    while ( mutex->lock_count ) {
+    mutex = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+
+    while( mutex->lock_count )
+    {
         HB_MUTEX_UNLOCK( mutex->mutex );
-        mutex->lock_count --;
+        mutex->lock_count--;
     }
-    mutex = hb_parptr( 1 );
+
     HB_MUTEX_DESTROY( mutex->mutex );
     HB_COND_DESTROY( mutex->cond );
-#if ! defined( HB_OS_WIN_32 )
-    free( mutex->mutex );
-#endif
-    free( mutex->cond );
-    free( mutex );
 }
 
 HB_FUNC( MUTEXLOCK )
 {
     HB_MUTEX_STRUCT *mt;
 
-    mt = hb_parptr( 1 );
-    if ( mt->locker == HB_CURRENT_THREAD() )
+    if( ! ISPOINTER( 1 ) )
+    {
+        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXLOCK", 1, pArgs );
+        hb_itemRelease( pArgs );
+        return;
+    }
+
+    mt = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+
+    if( mt->locker == HB_CURRENT_THREAD_HANDLE() )
+    {
         mt->lock_count ++;
-    else {
+    }
+    else
+    {
         HB_MUTEX_LOCK( mt->mutex );
-        mt->locker = HB_CURRENT_THREAD();
+
+        mt->locker = HB_CURRENT_THREAD_HANDLE();
         mt->lock_count = 1;
     }
 }
@@ -554,20 +610,23 @@ HB_FUNC( MUTEXLOCK )
 HB_FUNC( MUTEXUNLOCK )
 {
     HB_MUTEX_STRUCT *mt;
-    PHB_ITEM pargs;
 
-    if( ! ISPOINTER( 1 ) || hb_pcount() != 1 )
+    if( ! ISPOINTER( 1 ) )
     {
-        pargs = hb_arrayFromParams( hb_stack.pBase );
-        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "DESTROYMUTEX", 1, pargs );
-        hb_itemRelease( pargs );
+        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXUNLOCK", 1, pArgs );
+        hb_itemRelease( pArgs );
         return;
     }
-    mt = hb_parptr( 1 );
 
-    if ( mt->locker == HB_CURRENT_THREAD() ) {
+    mt = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+
+    if( mt->locker == HB_CURRENT_THREAD_HANDLE() )
+    {
         mt->lock_count --;
-        if ( mt->lock_count == 0 ) {
+
+        if( mt->lock_count == 0 )
+        {
             mt->locker = 0;
             HB_MUTEX_UNLOCK( mt->mutex );
         }
@@ -579,26 +638,27 @@ HB_FUNC( SUBSCRIBE )
     int lc;
     int islocked;
     HB_MUTEX_STRUCT *mt;
-    PHB_ITEM pargs;
 
     /* Parameter error checking */
-    /* TODO: SOCKET TYPE */
-    if( (hb_pcount() < 1 || hb_pcount() > 2 ) ||
-        ! ISPOINTER( 1 ) || ( hb_pcount() == 2 && ! ISNUM(2)) )
+    if( ( ! ISPOINTER( 1 ) ) || ( hb_pcount() == 2 && ! ISNUM(2)) )
     {
-        pargs = hb_arrayFromParams( hb_stack.pBase );
-        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SUBSCRIBE", 1, pargs );
-        hb_itemRelease( pargs );
+        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SUBSCRIBE", 1, pArgs );
+        hb_itemRelease( pArgs );
         return;
     }
-    mt = hb_parptr( 1 );
 
-    if ( mt->locker != HB_CURRENT_THREAD() ) {
+    mt = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+
+    if( mt->locker != HB_CURRENT_THREAD_HANDLE() )
+    {
         islocked = 0;
         HB_MUTEX_LOCK( mt->mutex );
     }
     else
+    {
         islocked = 1;
+    }
 
     mt->locker = 0;
     lc = mt->lock_count;
@@ -606,28 +666,45 @@ HB_FUNC( SUBSCRIBE )
 
     mt->waiting ++;
 
-    if ( mt->waiting > 0 ) {
+    if( mt->waiting > 0 )
+    {
         if ( hb_pcount() == 1 )
+        {
             HB_COND_WAIT( mt->cond, mt->mutex );
-        else {
+        }
+        else
+        {
             int wt = mt->waiting;
+
             HB_COND_WAITTIME( mt->cond, mt->mutex, hb_parnl( 2 ) );
-            if ( wt == mt->waiting ) mt->waiting --;
+
+            if ( wt == mt->waiting )
+            {
+                 mt->waiting --;
+            }
         }
     }
 
     // Prepare return value
     mt->lock_count = lc;
-    if ( ! islocked )
+
+    if( ! islocked )
+    {
         HB_MUTEX_UNLOCK( mt->mutex );
+    }
     else
-        mt->locker = HB_CURRENT_THREAD();
+    {
+        mt->locker = HB_CURRENT_THREAD_HANDLE();
+    }
 
-    if ( mt->event_object )
+    if( mt->event_object )
+    {
         hb_itemReturn( mt->event_object );
+    }
     else
+    {
         hb_ret();
-
+    }
 }
 
 HB_FUNC( SUBSCRIBENOW )
@@ -635,157 +712,178 @@ HB_FUNC( SUBSCRIBENOW )
     int lc;
     int islocked;
     HB_MUTEX_STRUCT *mt;
-    PHB_ITEM pargs;
 
     /* Parameter error checking */
-    /* TODO: SOCKET TYPE */
-    if( (hb_pcount() < 1 || hb_pcount() > 2 ) ||
-        ! ISPOINTER( 1 ) || ( hb_pcount() == 2 && ! ISNUM(2)) )
+    if( ( ! ISPOINTER( 1 ) ) || ( hb_pcount() == 2 && ! ISNUM(2)) )
     {
-        pargs = hb_arrayFromParams( hb_stack.pBase );
-        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SUBSCRIBENOW", 1, pargs );
-        hb_itemRelease( pargs );
+        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SUBSCRIBENOW", 1, pArgs );
+        hb_itemRelease( pArgs );
         return;
     }
-    mt = hb_parptr( 1 );
 
-    if ( mt->locker != HB_CURRENT_THREAD() ) {
+    mt = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+
+    if( mt->locker != HB_CURRENT_THREAD_HANDLE() )
+    {
         islocked = 0;
         HB_MUTEX_LOCK( mt->mutex );
     }
     else
+    {
         islocked = 1;
+    }
 
     mt->locker = 0;
     lc = mt->lock_count;
     mt->lock_count = 0;
 
     mt->event_object = NULL;
-    mt->waiting ++;
-    if ( mt->waiting <= 0 )
-        mt->waiting = 1;
-    else
-        mt->waiting++;
+    mt->waiting++;
 
-    if ( hb_pcount() == 1 )
+    if( mt->waiting <= 0 )
+    {
+        mt->waiting = 1;
+    }
+    else
+    {
+        mt->waiting++;
+    }
+
+    if( hb_pcount() == 1 )
+    {
         HB_COND_WAIT( mt->cond, mt->mutex );
-    else {
+    }
+    else
+    {
         int wt = mt->waiting;
+
         HB_COND_WAITTIME( mt->cond, mt->mutex, hb_parnl( 2 ) );
-        if ( wt == mt->waiting ) mt->waiting --;
+
+        if( wt == mt->waiting )
+        {
+            mt->waiting --;
+        }
     }
 
     // Prepare return value
     mt->lock_count = lc;
-    if ( ! islocked )
+
+    if( ! islocked )
+    {
         HB_MUTEX_UNLOCK( mt->mutex );
+    }
     else
-        mt->locker = HB_CURRENT_THREAD();
+    {
+        mt->locker = HB_CURRENT_THREAD_HANDLE();
+    }
 
-    if ( mt->event_object )
+    if( mt->event_object )
+    {
         hb_itemReturn( mt->event_object );
+    }
     else
+    {
         hb_ret();
-
+    }
 }
-
 
 HB_FUNC( NOTIFY )
 {
     HB_MUTEX_STRUCT *mt;
-    PHB_ITEM pargs;
 
     /* Parameter error checking */
-    /* TODO: SOCKET TYPE */
-    if( (hb_pcount() < 1 || hb_pcount() > 2 ) || ! ISPOINTER( 1 ) )
+    if( ! ISPOINTER( 1 ) )
     {
-        pargs = hb_arrayFromParams( hb_stack.pBase );
-        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NOTIFY", 1, pargs );
-        hb_itemRelease( pargs );
+        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NOTIFY", 1, pArgs );
+        hb_itemRelease( pArgs );
         return;
     }
 
-    mt = hb_parptr( 1 );
-    if ( hb_pcount() == 2 )
+    mt = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+
+    if( hb_pcount() == 2 )
     {
         mt->event_object = hb_itemNew( NULL );
         hb_itemCopy( mt->event_object, hb_param( 2, HB_IT_ANY ));
     }
     else
+    {
         mt->event_object = NULL;
+    }
 
-    if ( mt->waiting > 0 )
+    if( mt->waiting > 0 )
+    {
         HB_COND_SIGNAL( mt->cond );
-    mt->waiting --;
+    }
+
+    mt->waiting--;
 }
 
 HB_FUNC( NOTIFYALL )
 {
     HB_MUTEX_STRUCT *mt;
-    PHB_ITEM pargs;
 
     /* Parameter error checking */
-    /* TODO: SOCKET TYPE */
-    if( (hb_pcount() < 1 || hb_pcount() > 2 ) || ! ISPOINTER( 1 ) )
+    if( ! ISPOINTER( 1 ) )
     {
-        pargs = hb_arrayFromParams( hb_stack.pBase );
-        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NOTIFYALL", 1, pargs );
-        hb_itemRelease( pargs );
+        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NOTIFYALL", 1, pArgs );
+        hb_itemRelease( pArgs );
         return;
     }
 
-    mt = hb_parptr( 1 );
-    if ( hb_pcount() == 2 )
+    mt = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+
+    if( hb_pcount() == 2 )
     {
         mt->event_object = hb_itemNew( NULL );
         hb_itemCopy( mt->event_object, hb_param( 2, HB_IT_ANY ));
     }
     else
+    {
         mt->event_object = NULL;
+    }
 
-    while ( mt->waiting  > 0) {
+    while( mt->waiting  > 0)
+    {
         HB_COND_SIGNAL( mt->cond );
         mt->waiting--;
     }
-
 }
 
 HB_FUNC( THREADSLEEP )
 {
-    PHB_ITEM pargs;
-
-    if( ! ISNUM( 1 ) || hb_pcount() != 1 )
+    if( ! ISNUM( 1 ) )
     {
-        pargs = hb_arrayFromParams( hb_stack.pBase );
-        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "THREADSLEEP", 1, pargs );
-        hb_itemRelease( pargs );
+        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "THREADSLEEP", 1, pArgs );
+        hb_itemRelease( pArgs );
         return;
     }
 
-#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
-    struct timespec ts;
-    ts.tv_sec = hb_parni( 1 ) / 1000;
-    ts.tv_nsec = (hb_parni( 1 ) % 1000) * 1000000;
-    nanosleep( &ts, 0 );
-#else
-    Sleep( hb_parni( 1 ) );
-#endif
+    #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+        struct timespec ts;
+        ts.tv_sec = hb_parni( 1 ) / 1000;
+        ts.tv_nsec = (hb_parni( 1 ) % 1000) * 1000000;
+        nanosleep( &ts, 0 );
+    #else
+        Sleep( hb_parni( 1 ) );
+    #endif
 }
-
 
 HB_FUNC( WAITFORTHREADS )
 {
-while( hb_ht_context )
-{
-    #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
-        {
-        static struct timespec nanosecs = { 0, 1000 };
-        nanosleep( &nanosecs, NULL );
-        }
-    #elif defined(HB_OS_WIN_32)
-        Sleep( 1 );
-    #endif
-}
+    while( hb_ht_context )
+    {
+        #if defined(HB_OS_WIN_32)
+           Sleep( 1 );
+        #else
+           static struct timespec nanosecs = { 0, 1000 };
+           nanosleep( &nanosecs, NULL );
+        #endif
+    }
 }
 #endif
 

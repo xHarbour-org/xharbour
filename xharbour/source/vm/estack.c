@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.17 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: estack.c,v 1.18 2002/12/20 01:26:08 jonnymind Exp $
  */
 
 /*
@@ -90,7 +90,7 @@ HB_STACK hb_stack;
          }
          */
 
-         HB_MUTEX_LOCK( &context_monitor );
+         HB_CRITICAL_LOCK( context_monitor );
 
          p = hb_ht_context;
          while( p && p->th_id != id )
@@ -101,13 +101,13 @@ HB_STACK hb_stack;
          if( p )
          {
             //last_context = p;
-            HB_MUTEX_UNLOCK( &context_monitor );
+            HB_CRITICAL_UNLOCK( context_monitor );
             return p->stack;
          }
          else
          {
             // TODO: Add Error Message.
-            HB_MUTEX_UNLOCK( &context_monitor );
+            HB_CRITICAL_UNLOCK( context_monitor );
             return &hb_stack;
          }
       }
