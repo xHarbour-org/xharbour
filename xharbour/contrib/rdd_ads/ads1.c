@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.38 2004/04/01 01:01:12 druzus Exp $
+ * $Id: ads1.c,v 1.39 2004/04/01 22:00:41 druzus Exp $
  */
 
 /*
@@ -2801,7 +2801,16 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
                   break;
 
                case ADS_DATE:
-                  hb_itemPutDS( pOrderInfo->itmResult, (char*)aucBuffer );
+                  if ( pArea->iFileType == ADS_NTX )
+                  {
+                     hb_itemPutDS( pOrderInfo->itmResult, (char*) aucBuffer );
+                  }
+                  else
+                  {         /* ADS_CDX, ADS_ADT */
+                     double nValue;
+                     FoxToDbl( aucBuffer, &nValue );
+                     hb_itemPutDL( pOrderInfo->itmResult, (long)nValue );
+                  }
                   break;
 
                case ADS_LOGICAL:
