@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.20 2004/08/29 00:26:24 druzus Exp $
+ * $Id: dbffpt1.c,v 1.21 2004/08/30 23:43:23 druzus Exp $
  */
 
 /*
@@ -54,6 +54,8 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#define HB_FPT_SAFE
 
 #include "hbapi.h"
 #include "hbinit.h"
@@ -965,7 +967,11 @@ static char * hb_fptGetMemoType( FPTAREAP pArea, USHORT uiIndex )
 //      case FPTIT_SIX_MREF:
 
       case FPTIT_FLEX_ARRAY:
+      case FPTIT_FLEX_VOARR:
          return "A";
+      case FPTIT_FLEX_OBJECT:
+      case FPTIT_FLEX_VOOBJ:
+         return "O";
       case FPTIT_FLEX_NIL:
          return "U";
       case FPTIT_FLEX_TRUE:
@@ -973,14 +979,19 @@ static char * hb_fptGetMemoType( FPTAREAP pArea, USHORT uiIndex )
          return "L";
       case FPTIT_FLEX_LDATE:
          return "D";
-      case FPTIT_FLEX_BYTE:
+      case FPTIT_FLEX_CHAR:
+      case FPTIT_FLEX_UCHAR:
       case FPTIT_FLEX_SHORT:
+      case FPTIT_FLEX_USHORT:
       case FPTIT_FLEX_LONG:
+      case FPTIT_FLEX_ULONG:
       case FPTIT_FLEX_DOUBLE:
+      case FPTIT_FLEX_LDOUBLE:
          return "N";
       case FPTIT_TEXT:
          return "M";
       case FPTIT_PICT:
+      case FPTIT_FLEX_COMPCH:
          return "C";
    }
    return "U";
@@ -1325,8 +1336,11 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             case FPTIT_FLEX_LDATE:
                hb_itemPutDL( pItem, (LONG) HB_GET_LE_UINT32( pBuffer ) );
                break;
-            case FPTIT_FLEX_BYTE:
-               hb_itemPutNI( pItem, pBuffer[0] );
+            case FPTIT_FLEX_CHAR:
+               hb_itemPutNI( pItem, (signed char) pBuffer[0] );
+               break;
+            case FPTIT_FLEX_UCHAR:
+               hb_itemPutNI( pItem, (BYTE) pBuffer[0] );
                break;
             case FPTIT_FLEX_SHORT:
                hb_itemPutNI( pItem, (SHORT) HB_GET_LE_UINT16( pBuffer ) );
@@ -1886,26 +1900,44 @@ static ERRCODE hb_fptSysName( FPTAREAP pArea, BYTE * pBuffer )
  */
 static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
-   BOOL bDeleted;
-   ERRCODE uiError;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fptGetValue(%p, %hu, %p)", pArea, uiIndex, pItem));
 
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
-      /* Force read record */
-      if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
-         return FAILURE;
+      HB_ITEM recItm = HB_ITEM_NIL, resultItm = HB_ITEM_NIL;
+      BOOL bLocked;
+      ERRCODE uiError;
+
+      if( pArea->fShared && !pArea->fFLocked && !pArea->fRecordChanged )
+      {
+         if ( SELF_RECINFO( ( AREAP ) pArea, &recItm, DBRI_LOCKED, &resultItm ) == FAILURE )
+            return FAILURE;
+         bLocked = hb_itemGetL( &resultItm );
+      }
+      else
+         bLocked = TRUE;
+
       if( hb_fptFileLockSh( pArea, TRUE ) )
       {
-         uiError = hb_fptGetMemo( pArea, uiIndex - 1, pItem );
+#ifdef HB_FPT_SAFE
+         /* Force read record? */
+         if ( !bLocked )
+            pArea->fValidBuffer = FALSE;
+#endif
+         /* update any pending relations and reread record if necessary */
+         uiError = SELF_DELETED( ( AREAP ) pArea, &bLocked );
+
+         if ( uiError == SUCCESS )
+            uiError = hb_fptGetMemo( pArea, uiIndex - 1, pItem );
          hb_fptFileUnLock( pArea );
       }
       else
       {
          uiError = EDBF_LOCK;
       }
+
       if ( uiError != SUCCESS )
       {
          PHB_ITEM pError = hb_errNew();
@@ -1953,14 +1985,18 @@ static ERRCODE hb_fptPutValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       if( hb_fptFileLockEx( pArea, TRUE ) )
       {
          uiError = hb_fptPutMemo( pArea, uiIndex -1, pItem );
+#ifdef HB_FPT_SAFE
+         if( uiError == SUCCESS )
+            /* Force writer record to eliminate race condition */
+            if ( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
+               return FAILURE;
+#endif
          hb_fptFileUnLock( pArea );
       }
       else
       {
          uiError = EDBF_LOCK;
       }
-      /* Update deleted flag */
-      pArea->pRecord[ 0 ] = (BYTE) (pArea->fDeleted ? '*' : ' ');
 
       if( uiError != SUCCESS )
       {

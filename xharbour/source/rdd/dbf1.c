@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.88 2004/08/20 00:50:15 druzus Exp $
+ * $Id: dbf1.c,v 1.89 2004/08/21 15:23:03 paultucker Exp $
  */
 
 /*
@@ -420,7 +420,7 @@ static ERRCODE hb_dbfLockRecord( DBFAREAP pArea, ULONG ulRecNo, BOOL * pResult,
    if( pArea->ulNumLocksPos > 0 )
    {
       ULONG ul;
-      for( ul=0; ul< pArea->ulNumLocksPos; ul++ )
+      for( ul = 0; ul < pArea->ulNumLocksPos; ul++ )
          if( pArea->pLocksPos[ ul ] == ulRecNo )
          {
             * pResult = TRUE;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3382 2004/08/31 13:03:21 vouchcac Exp $
+ * $Id: ChangeLog,v 1.3383 2004/08/31 15:40:22 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-01 03:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrddfpt.h
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+   * added macro HB_FPT_SAFE (enabled by default) to force a little
+     bit differ then Clipper lock schemes in read/update process but
+     really safe in network environment
+
+  * xharbour/source/rdd/dbf1.c
+   * indenting
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+   * indenting also - I wrote this file using tabs (sorry) then someone
+     update it with differ tab size setting and many of the functions
+     where unreadable - it was to big for manual changes so I used:
+         indent -bad -bap -bl -bli0 -cli3 -cbi0 -cs -hnl -i3 -lps -l80 \
+                -nfca -npcs -npsl -nsob -nut -prs -ss -ts3 "$@"
+     for automatic reformatting the whole file
 
 2004-08-31 11:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/ct/ctnet.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.9 2004/02/29 00:42:07 paultucker Exp $
+ * $Id: hbrddfpt.h,v 1.10 2004/08/29 00:26:22 druzus Exp $
  */
 
 /*
@@ -100,18 +100,25 @@ HB_EXTERN_BEGIN
 //#define FPTIT_SIX_VREF     0x2000
 //#define FPTIT_SIX_MREF     0x4000
 
-#define FPTIT_FLEX_GC      0x03E8
-#define FPTIT_FLEX_UNUSED  0x03E9
-
-#define FPTIT_FLEX_ARRAY   0x03EA
-#define FPTIT_FLEX_NIL     0x03EE
-#define FPTIT_FLEX_TRUE    0x03EF
-#define FPTIT_FLEX_FALSE   0x03F0
-#define FPTIT_FLEX_LDATE   0x03F1
-#define FPTIT_FLEX_BYTE    0x03F2
-#define FPTIT_FLEX_SHORT   0x03F4
-#define FPTIT_FLEX_LONG    0x03F6
-#define FPTIT_FLEX_DOUBLE  0x03F8
+#define FPTIT_FLEX_GC      0x03E8   // 1000
+#define FPTIT_FLEX_UNUSED  0x03E9   // 1001
+#define FPTIT_FLEX_ARRAY   0x03EA   // 1002
+#define FPTIT_FLEX_OBJECT  0x03EB   // 1003 *
+#define FPTIT_FLEX_VOARR   0x03EC   // 1004 *
+#define FPTIT_FLEX_VOOBJ   0x03ED   // 1005 *
+#define FPTIT_FLEX_NIL     0x03EE   // 1006
+#define FPTIT_FLEX_TRUE    0x03EF   // 1007
+#define FPTIT_FLEX_FALSE   0x03F0   // 1008
+#define FPTIT_FLEX_LDATE   0x03F1   // 1009
+#define FPTIT_FLEX_CHAR    0x03F2   // 1010
+#define FPTIT_FLEX_UCHAR   0x03F3   // 1011 *
+#define FPTIT_FLEX_SHORT   0x03F4   // 1012
+#define FPTIT_FLEX_USHORT  0x03F5   // 1013 *
+#define FPTIT_FLEX_LONG    0x03F6   // 1014
+#define FPTIT_FLEX_ULONG   0x03F7   // 1015 *
+#define FPTIT_FLEX_DOUBLE  0x03F8   // 1016
+#define FPTIT_FLEX_LDOUBLE 0x03F9   // 1017 *
+#define FPTIT_FLEX_COMPCH  0x03FA   // 1018 *
 
 #define FPTIT_FLEXAR_ARAY   0x0C
 #define FPTIT_FLEXAR_NIL    0x00
