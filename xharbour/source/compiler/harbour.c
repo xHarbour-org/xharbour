@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.4 2002/03/09 19:09:43 ronpinkas Exp $
+ * $Id: harbour.c,v 1.5 2002/03/09 20:04:23 ronpinkas Exp $
  */
 
 /*
@@ -1509,9 +1509,6 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    hb_compGenPCode3( HB_P_FRAME, 0, 0, ( BOOL ) 0 );   /* frame for locals and parameters */
    hb_compGenPCode3( HB_P_SFRAME, 0, 0, ( BOOL ) 0 );     /* frame for statics variables */
-   hb_compGenPCode3( HB_P_LINE, HB_LOBYTE( iLine ), HB_HIBYTE( iLine ), ( BOOL ) 0 );
-
-   //printf( "Resetting\n" );
 
    hb_comp_iLastLine = hb_comp_iLine;
 
@@ -2441,7 +2438,8 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
 
       //printf( "Line: %i, Offset %i LastPos %i, Pos %i\n", hb_comp_iLine, iOffset, hb_comp_ulLastOffsetPos, hb_comp_functions.pLast->lPCodePos );
 
-      if( iOffset > -1 && iOffset < 256 )
+      // We want each function to start with actual line number not offset. hb_comp_ulLastLinePos is reset every top of function.
+      if( hb_comp_ulLastLinePos && iOffset > -1 && iOffset < 256 )
       {
          if( iOffset )
          {
@@ -3831,14 +3829,15 @@ static void hb_compInitVars( void )
    hb_comp_pInitFunc        = NULL;
    hb_comp_bAnyWarning      = FALSE;
 
-   hb_comp_iLine         = 1;
-   hb_comp_iLastLine     = 1;
-   hb_comp_iFunctionCnt  = 0;
-   hb_comp_iErrorCount   = 0;
-   hb_comp_cVarType      = ' ';
-   hb_comp_ulLastLinePos = 0;
-   hb_comp_iStaticCnt    = 0;
-   hb_comp_iVarScope     = VS_LOCAL;
+   hb_comp_iLine           = 1;
+   hb_comp_iLastLine       = 1;
+   hb_comp_iFunctionCnt    = 0;
+   hb_comp_iErrorCount     = 0;
+   hb_comp_cVarType        = ' ';
+   hb_comp_ulLastLinePos   = 0;
+   hb_comp_ulLastOffsetPos = 0;
+   hb_comp_iStaticCnt      = 0;
+   hb_comp_iVarScope       = VS_LOCAL;
 
    hb_comp_inlines.iCount = 0;
    hb_comp_inlines.pFirst = NULL;
