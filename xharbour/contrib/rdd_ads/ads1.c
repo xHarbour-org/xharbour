@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.45 2004/06/03 02:38:20 kaddath Exp $
+ * $Id: ads1.c,v 1.46 2004/06/04 19:15:47 kaddath Exp $
  */
 
 /*
@@ -2352,10 +2352,13 @@ static ERRCODE adsOrderListClear( ADSAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsOrderListClear(%p)", pArea));
 
-   if( !pArea->fReadonly )
-   {
-      AdsFlushFileBuffers( pArea->hTable );  /* meaningful with local server; ignored by remote server */
-   }
+   #if ADS_REQUIRE_VERSION >= 6
+      if( !pArea->fReadonly )
+      {
+         AdsFlushFileBuffers( pArea->hTable );  /* meaningful with local server; ignored by remote server */
+      }
+   #endif
+
    AdsCloseAllIndexes( pArea->hTable );
    pArea->hOrdCurrent = 0;
    return SUCCESS;

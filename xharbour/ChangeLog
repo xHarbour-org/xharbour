@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3241 2004/07/30 11:42:42 maurifull Exp $
+ * $Id: ChangeLog,v 1.3242 2004/07/30 13:45:20 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-30 09:35 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * contrib/rdd_ads/ads1.c
+    * Protected call to AdsFlushFileBuffers() within #if ADS_REQUIRE_VERSION >= 6
 
 2004-07-30 15:45 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/direct.c
