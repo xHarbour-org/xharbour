@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.22 2004/07/21 22:09:22 maurifull Exp $
+ * $Id: dbedit.prg,v 1.23 2004/08/27 15:47:34 mauriliolongo Exp $
  */
 
 /*
@@ -214,6 +214,7 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
     bFun := {|| IIf(HB_ISNUMERIC(nKey) .And. (Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER)), DE_ABORT, DE_CONT)}
   Else
     bFun := IIf(HB_ISBLOCK(xFunc), xFunc, &("{|x, y, z|" + xFunc + "(x,y,z)}"))
+    oTBR:setKey( K_ESC, nil )
   End
 
   // EXTENSION: Initialization call
