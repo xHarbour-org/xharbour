@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.171 2002/03/03 19:56:18 lculik Exp $
+ * $Id: filesys.c,v 1.12 2002/03/10 18:44:56 lculik Exp $
  */
 
 /*
@@ -414,6 +414,9 @@ FHANDLE hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
    }
 #else
 
+   HB_SYMBOL_UNUSED( pFilename );
+   HB_SYMBOL_UNUSED( pMode );
+
    hFileHandle = FS_ERROR;
    s_uiErrorLast = FS_ERROR;
 
@@ -582,9 +585,9 @@ FHANDLE hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
    return hFileHandle;
 }
 
-/* Derived from hb_fsCreate() 
+/* Derived from hb_fsCreate()
 
-   NOTE: The default opening mode differs from the one used in hb_fsCreate() 
+   NOTE: The default opening mode differs from the one used in hb_fsCreate()
          [vszakats]
  */
 
@@ -708,7 +711,7 @@ USHORT  hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
          if (!bError)
             errno = GetLastError();
          uiRead = ( USHORT ) dwRead;
-         
+
       }
    #else
       uiRead = read( hFileHandle, pBuff, uiCount );
@@ -1476,7 +1479,7 @@ USHORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
    errno = 0;
    getcwd( ( char * ) pbyBuffer, ulLen );
    s_uiErrorLast = errno;
-    
+
 #elif defined(__MINGW32__)
 
    errno = 0;

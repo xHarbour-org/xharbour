@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.15 2002/03/31 02:56:32 ronpinkas Exp $
+ * $Id: dbfntx1.c,v 1.16 2002/03/31 03:25:07 ronpinkas Exp $
  */
 
 /*
@@ -940,7 +940,6 @@ static void hb_ntxPageSave( LPPAGEINFO pPage )
 
 static LPPAGEINFO hb_ntxPageLoad( LPNTXINDEX pIndex, ULONG ulOffset )
 {
-   int i;
    LPPAGEINFO pPage;
    BOOL bReplace = FALSE;
 
@@ -1018,8 +1017,6 @@ static void hb_ntxPageRelease( LPPAGEINFO pPage )
 
 static void hb_ntxPageFree( LPPAGEINFO pPage, BOOL lFull )
 {
-   int i;
-
    if( pPage->pNext )
    {
       hb_ntxPageFree( pPage->pNext,lFull );
@@ -1532,7 +1529,7 @@ static BOOL hb_ntxSortKeyAdd( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo, char* szk
 
    LPSORTITEM pKeyNew, pKey, pKeyTmp, pKeyLast = NULL, pKeyPrev;
    int result;
-   BOOL fDescend = !pTag->AscendKey; 
+   BOOL fDescend = !pTag->AscendKey;
 
    /* printf( "\n\rhb_ntxSortKeyAdd - 0 ( %s )",szkey ); */
    pKeyNew = (LPSORTITEM) ( pSortInfo->sortBuffer +
@@ -1739,7 +1736,7 @@ static BOOL hb_ntxGetSortedKey( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo, LPSORTI
             nPage = iPage;
             key1 = key2;
          }
-      }         
+      }
    }
    if( pKey && key1 )
    {
@@ -1774,7 +1771,7 @@ static BOOL hb_ntxGetSortedKey( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo, LPSORTI
             hb_fsSeek( pSortInfo->tempHandle, pSwapPage->offset +
                  pageItemLength*pSwapPage->numReadkeys , SEEK_SET );
             nRead = hb_fsRead( pSortInfo->tempHandle, (BYTE*)pSwapPage->page,
-                 ( (pSwapPage->numAllkeys-pSwapPage->numReadkeys < maxKeys)? 
+                 ( (pSwapPage->numAllkeys-pSwapPage->numReadkeys < maxKeys)?
                     pSwapPage->numAllkeys-pSwapPage->numReadkeys:maxKeys ) * pageItemLength );
             pSwapPage->numkeys = nRead/pageItemLength;
             pSwapPage->numReadkeys += nRead/pageItemLength;
@@ -1832,7 +1829,7 @@ static void hb_ntxBufferSave( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo )
          pSwapPage = (LPSWAPPAGE) ( pSortInfo->swappages + sizeof(SWAPPAGE)*i );
          hb_fsSeek( pSortInfo->tempHandle, pSwapPage->offset, SEEK_SET );
          nRead = hb_fsRead( pSortInfo->tempHandle, (BYTE*)pSwapPage->page,
-            ( (pSwapPage->numAllkeys-pSwapPage->numReadkeys < maxKeysSwapPage)? 
+            ( (pSwapPage->numAllkeys-pSwapPage->numReadkeys < maxKeysSwapPage)?
                pSwapPage->numAllkeys-pSwapPage->numReadkeys:maxKeysSwapPage ) * pageItemLength );
          pSwapPage->numkeys = nRead/pageItemLength;
          pSwapPage->numReadkeys = nRead/pageItemLength;
@@ -1859,7 +1856,7 @@ static void hb_ntxBufferSave( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo )
          {
             pSortInfo->Tag += NTXBLOCKSIZE;
             hb_fsWrite( pTag->Owner->DiskFile, (BYTE *) buffer, NTXBLOCKSIZE );
-            
+
             lKeys = hb_ntxGetSortedKey( pTag, pSortInfo, &pKey, pKeyRoot );
             if( lKeys )
             {
@@ -2004,7 +2001,7 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
          do
          {
             nParts = (nParts)? nParts*2:2;
-            sortInfo.sortBuffer = (BYTE*) hb_xalloc( 
+            sortInfo.sortBuffer = (BYTE*) hb_xalloc(
                   (ulRecCount/nParts+1) * sortInfo.itemLength );
             if( sortInfo.sortBuffer )
                sortInfo.swappages = (BYTE*) hb_xalloc( nParts * sizeof( SWAPPAGE ) );
@@ -2314,13 +2311,13 @@ static ERRCODE hb_ntxHeaderLoad( LPNTXINDEX pIndex , char *ITN)
    hb_strncpyUpper( pTag->TagName, ITN, strlen( ITN ) );
    pTag->KeyExpr = (char *) hb_xgrab( NTX_MAX_KEY );
    strcpy( pTag->KeyExpr, Header.key_expr );
-   
+
    if( pForExp )
    {
       pTag->ForExpr = (char *) hb_xgrab( NTX_MAX_KEY );
       strcpy( pTag->ForExpr, Header.for_expr );
    }
-   
+
    pTag->pKeyItem = pKeyExp;
    pTag->pForItem = pForExp;
    pTag->UniqueKey = Header.unique;
@@ -2504,7 +2501,7 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
            strcpy( pKey2->key, szBuffer );
            break;
      }
-     if( ( pTag->topScope && 
+     if( ( pTag->topScope &&
         hb_ntxItemCompare( pTag->topScope->item.asString.value,
         pKey2->key,
         pTag->topScope->item.asString.length,
@@ -2603,7 +2600,7 @@ static ERRCODE ntxSkipRaw( NTXAREAP pArea, LONG lToSkip )
           while ( !pTag->TagEOF && lToSkip-- > 0 )
           {
             hb_ntxTagKeyRead( pTag, NEXT_RECORD, &lContinue );
-            if( pTag->topScope && 
+            if( pTag->topScope &&
                hb_ntxItemCompare( pTag->topScope->item.asString.value,
                    pTag->CurKeyInfo->key,
                    pTag->topScope->item.asString.length, pTag->KeyLength, 1 ) > 0 )
@@ -2635,7 +2632,7 @@ static ERRCODE ntxSkipRaw( NTXAREAP pArea, LONG lToSkip )
        while ( !pTag->TagBOF && lToSkip++ < 0 )
        {
          hb_ntxTagKeyRead( pTag, PREV_RECORD, &lContinue );
-         if( pTag->topScope && 
+         if( pTag->topScope &&
             hb_ntxItemCompare( pTag->topScope->item.asString.value,
                 pTag->CurKeyInfo->key,
                 pTag->topScope->item.asString.length, pTag->KeyLength, 1 ) > 0 )
@@ -2693,7 +2690,7 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
 
             if( fAppend || hb_ntxItemCompare( pKey->key,
                     pTag->CurKeyInfo->key,
-                    pTag->KeyLength, pTag->KeyLength, TRUE ) 
+                    pTag->KeyLength, pTag->KeyLength, TRUE )
                 || InIndex != pTag->InIndex )
             {
                pArea->lpCurIndex = lpIndex;
@@ -3081,7 +3078,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          return SUCCESS;
    }
 
-   if( pArea->lpNtxIndex && 
+   if( pArea->lpNtxIndex &&
        ( pIndex = ntxFindIndex( pArea , pInfo->itmOrder ) ) != NULL )
    {
       switch( uiIndex )
@@ -3177,7 +3174,7 @@ static ERRCODE ntxScopeInfo( NTXAREAP pArea, USHORT nScope, PHB_ITEM pItem )
 
    HB_TRACE(HB_TR_DEBUG, ("ntxScopeInfo(%p, %hu, %p)", pArea, nScope, pItem));
 
-   if( !pArea->lpCurIndex || ( nScope == 0 && !pArea->lpCurIndex->CompoundTag->topScope ) || 
+   if( !pArea->lpCurIndex || ( nScope == 0 && !pArea->lpCurIndex->CompoundTag->topScope ) ||
             ( nScope == 1 && !pArea->lpCurIndex->CompoundTag->bottomScope ) )
       hb_itemClear( pItem );
    else
@@ -3193,7 +3190,7 @@ static ERRCODE ntxScopeInfo( NTXAREAP pArea, USHORT nScope, PHB_ITEM pItem )
          case HB_IT_INTEGER:
          case HB_IT_LONG:
          case HB_IT_DOUBLE:
-            hb_itemPutND( pItem, hb_strVal( 
+            hb_itemPutND( pItem, hb_strVal(
               hb_itemGetCPtr( (nScope)? pTag->bottomScope:pTag->topScope ),
               hb_itemGetCLen( (nScope)? pTag->bottomScope:pTag->topScope ) ) );
             break;

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.10 2002/03/17 06:46:34 ronpinkas Exp $
+ * $Id: memvars.c,v 1.11 2002/03/31 02:56:32 ronpinkas Exp $
  */
 
 /*
@@ -940,7 +940,7 @@ static HB_DYNS_FUNC( hb_memvarReleasePublicWorker )
    return TRUE;
 }
 
-static void hb_memvarReleasePublic( PHB_ITEM pMemVar )
+void hb_memvarReleasePublic( PHB_ITEM pMemVar )
 {
    char *sPublic = pMemVar->item.asString.value;
 
