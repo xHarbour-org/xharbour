@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.32 2002/10/29 01:42:01 what32 Exp $
+ * $Id: TApplication.prg,v 1.33 2002/10/29 01:56:05 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -130,6 +130,7 @@ METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
             :Parent    := oForm
             :Instance  := oForm:Instance
             :Create()
+            //TraceLog( HB_QWith():Id )
          END WITH
       ENDIF
    NEXT
@@ -185,7 +186,7 @@ HB_FUNC( PROCESSMESSAGES )
 {
    MSG msg ;
 
-   while( PeekMessage( &msg,NULL, 1, 65000, PM_REMOVE ) )
+   while( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
    {
       TranslateMessage(&msg);
       DispatchMessage(&msg);

@@ -14,7 +14,7 @@ CLASS TForm1 FROM TForm
    DATA WIDTH INIT        600
 
    CONTROL Button1 FROM TBUTTON
-      :CAPTION := "Button1"
+      :CAPTION := "MyButton"
       :HEIGHT :=         24
       :ID :=        500
       :LEFT :=        163
