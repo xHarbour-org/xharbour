@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.1 2002/12/11 11:06:55 ronpinkas Exp $
+ * $Id: regex.c,v 1.2 2002/12/11 19:02:50 ronpinkas Exp $
  */
 
 /*
@@ -3033,7 +3033,7 @@ HB_FUNC( HB_ATX )
     #define REGEX_MAX_GROUPS 16
     regex_t re;
     regmatch_t aMatches[REGEX_MAX_GROUPS];
-    int CFlags = REG_EXTENDED, EFlags = 0;
+    int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
     unsigned long ulLen;
 
     PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
@@ -3058,7 +3058,7 @@ HB_FUNC( HB_ATX )
               aMatches[0].rm_eo = pString->item.asString.length;
            }
 
-           if( pStart && pStart->item.asInteger.value > 0 && pEnd->item.asInteger.value <= aMatches[0].rm_eo )
+           if( pStart && pStart->item.asInteger.value > 0 && pStart->item.asInteger.value <= aMatches[0].rm_eo )
            {
               aMatches[0].rm_so = pStart->item.asInteger.value - 1;
            }
@@ -3070,7 +3070,7 @@ HB_FUNC( HB_ATX )
 
            if( regexec( &re, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
            {
-              ulLen = aMatches[0].rm_eo - aMatches[0].rm_so + 1;
+              ulLen = aMatches[0].rm_eo - aMatches[0].rm_so;
 
               if( hb_pcount() > 3 )
               {

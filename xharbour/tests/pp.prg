@@ -2604,13 +2604,13 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
           DO CASE
              CASE ( cChar == '/' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '*' )
                 nPosition++
+
                 WHILE .T.
-                   nClose := At( "*/", SubStr( sBuffer, nPosition + 1 ) )
+                   nClose := At( "*/", sBuffer, nPosition + 1 )
 
                    IF nClose == 0
-                      nBase := nPosition + 2
-                      WHILE ( nNext := At( Chr(10), SubStr( sBuffer, nBase ) ) ) > 0
-
+                      nNext := nPosition + 2
+                      WHILE ( nNext := At( Chr(10), sBuffer, nNext ) ) > 0
                          nLine++
                          IF bCount
                             @ Row(), 0 SAY nLine
@@ -2619,7 +2619,8 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                          IF bBlanks
                             FWrite( hPP, CRLF )
                          ENDIF
-                         nBase += ( nNext + 1 )
+
+                         nNext++
                       ENDDO
 
                       //FSeek( hSource, -1, 1 )
@@ -2631,8 +2632,10 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                       nPosition := 0
                       LOOP
                    ELSE
-                      nBase := nPosition + 1
-                      WHILE ( nNext := At( Chr(10), SubStr( sBuffer, nBase ) ) ) > 0 .AND. ( nBase + nNext - nPosition ) <= nClose + 1
+                      nNext := nPosition + 1
+                      nClose -= nPosition
+
+                      WHILE ( nNext := At( Chr(10), sBuffer, nNext ) ) > 0 .AND. ( nNext - nPosition ) <= nClose + 1
                          nLine++
                          IF bCount
                             @ Row(), 0 SAY nLine
@@ -2640,7 +2643,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                          IF bBlanks
                             FWrite( hPP, CRLF )
                          ENDIF
-                         nBase += ( nNext + 1 )
+                         nNext++
                       ENDDO
 
                       nPosition += ( nClose + 1 )
@@ -2652,7 +2655,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
              CASE ( cChar == '/' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '/' )
                 nPosition++
                 WHILE .T.
-                   nClose := At( Chr(10), SubStr( sBuffer, nPosition + 1 ) )
+                   nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
                    IF nClose == 0
                       //FSeek( hSource, -1, 1 )
@@ -2664,7 +2667,9 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                       nPosition := 0
                       LOOP
                    ELSE
+                      nClose -= nPosition
                       nLine++
+
                       IF bCount
                          @ Row(), 0 SAY nLine
                       ENDIF
@@ -2714,7 +2719,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
              CASE ( cChar == '&' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '&' )
                 nPosition++
                 WHILE .T.
-                   nClose := At( Chr(10), SubStr( sBuffer, nPosition + 1 ) )
+                   nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
                    IF nClose == 0
                       //FSeek( hSource, -1, 1 )
@@ -2726,6 +2731,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                       nPosition := 0
                       LOOP
                    ELSE
+                      nClose -= nPosition
                       nLine++
                       IF bCount
                          @ Row(), 0 SAY nLine
@@ -2752,7 +2758,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
              CASE ( cChar == '*' )
                 IF LTrim( sLine ) == ''
                    WHILE .T.
-                      nClose := At( Chr(10), SubStr( sBuffer, nPosition + 1 ) )
+                      nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
                       IF nClose == 0
                          //FSeek( hSource, -1, 1 )
@@ -2764,6 +2770,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                          nPosition := 1
                          LOOP
                       ELSE
+                         nClose -= nPosition
                          nLine++
                          IF bCount
                             @ Row(), 0 SAY nLine
@@ -2781,8 +2788,8 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
 
              CASE ( cChar == '"' )
                 WHILE .T.
-                   nClose := At( '"', SubStr( sBuffer, nPosition + 1 ) )
-                   nNewLine := At( Chr(10), SubStr( sBuffer, nPosition + 1 ) )
+                   nClose := At( '"', sBuffer, nPosition + 1 )
+                   nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
 
                    IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
                       EXIT
@@ -2796,6 +2803,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                       nPosition := 1
                       LOOP
                    ELSE
+                      nClose    -= nPosition
                       sLine     += SubStr( sBuffer, nPosition, nClose )
                       nPosition += ( nClose )
                       EXIT
@@ -2804,8 +2812,8 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
 
              CASE ( cChar == "'" )
                 WHILE .T.
-                   nClose   := At( "'", SubStr( sBuffer, nPosition + 1 ) )
-                   nNewLine := At( Chr(10), SubStr( sBuffer, nPosition + 1 ) )
+                   nClose   := At( "'", sBuffer, nPosition + 1 )
+                   nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
 
                    IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
                       EXIT
@@ -2819,6 +2827,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                       nPosition := 1
                       LOOP
                    ELSE
+                      nClose    -= nPosition
                       sLine     += SubStr( sBuffer, nPosition, nClose )
                       nPosition += ( nClose )
                       EXIT
@@ -2833,8 +2842,8 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                 ENDIF
 
                 WHILE .T.
-                   nClose   := At( ']', SubStr( sBuffer, nPosition + 1 ) )
-                   nNewLine := At( Chr(10), SubStr( sBuffer, nPosition + 1 ) )
+                   nClose   := At( ']', sBuffer, nPosition + 1 )
+                   nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
 
                    IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
                       EXIT
@@ -2848,11 +2857,13 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly )
                       nPosition := 1
                       LOOP
                    ELSE
+                      nClose    -= nPosition
                       sLine     += SubStr( sBuffer, nPosition, nClose )
                       nPosition += ( nClose )
                       EXIT
                    ENDIF
                 ENDDO
+
                 IF nClose > 0 .AND. nClose < nNewLine
                    cChar := ']'
                 ENDIF
@@ -4593,24 +4604,24 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
 
       ELSEIF s1 == '"'
 
-         nClose := AT( '"', SubStr( sLine, 2 ) )
+         nClose := AT( '"', sLine, 2 )
          IF nClose == 0
             //Alert( 'ERROR! [NextToken()] Unterminated ["] at: ' + sLine )
             sReturn := '"'
          ELSE
-            sReturn := Left( sLine, nClose + 1 )
+            sReturn := Left( sLine, nClose )
          ENDIF
 
          BREAK
 
       ELSEIF s1 == "'"
 
-         nClose := AT( "'", SubStr( sLine, 2 ) )
+         nClose := AT( "'", sLine, 2 )
          IF nClose == 0
             //Alert( "ERROR! [NextToken()] Unterminated ['] at: " + sLine )
             sReturn := "'"
          ELSE
-            sReturn := SubStr( sLine, 2, nClose - 1 )
+            sReturn := SubStr( sLine, 2, nClose )
             IF ! ( '"' $ sReturn )
                sReturn := '"' + sReturn + '"'
             ELSE
@@ -5850,6 +5861,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    LOCAL sDots
    LOCAL nMarkerID
    LOCAL nTempMP
+   LOCAL nTokenLen
 
    /*
    nMarkerID
@@ -5881,12 +5893,18 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
    aRule := { sKey, {}, bX }
 
-   nNext := At( "=>", sRule )
+   #ifdef __XHARBOUR__
+      HB_AtX( "= *>", sRule, , @nNext, @nTokenLen )
+   #else
+      nNext := At( "=>", sRule )
+      nTokenLen := 2
+   #endif
+
    IF nNext == 0
       Alert( [ERROR! Invalid translation format: ] + sRule )
       RETURN .F.
    ELSE
-      sResult := SubStr( sRule, nNext + 2 )
+      sResult := SubStr( sRule, nNext + nTokenLen )
       ExtractLeadingWS( @sResult )
       sRule   := Left( sRule, nNext - 1 )
    ENDIF
@@ -6385,33 +6403,27 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          WHILE nMarkerAt > 0
             IF nMarkerAt > 1 .AND. SubStr( sResult, nOffset + nMarkerAt - 1, 1 ) == '\'
                nOffset   += nMarkerAt
-               nMarkerAt := At( '<', SubStr( sResult, nOffset + 1 ) )
+               nMarkerAt := At( '<', sResult, nOffset + 1 )
             ELSEIF nMarkerAt > 0 .AND. SubStr( sResult, nOffset + nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
                nOffset   += nMarkerAt + 1
-               nMarkerAt := At( '<', SubStr( sResult, nOffset + 1 ) )
+               nMarkerAt := At( '<', sResult, nOffset + 1 )
             ELSE
                EXIT
             ENDIF
          ENDDO
-         IF nMarkerAt > 0
-            nMarkerAt += nOffset
-         ENDIF
       ELSE
          nMarkerAt := At( '<', sResult )
          WHILE nMarkerAt > 0
             IF nMarkerAt > 1 .AND. nOffset + nMarkerAt < nOptionalAt .AND. SubStr( sResult, nOffset + nMarkerAt - 1, 1 ) == '\'
                nOffset   += nMarkerAt
-               nMarkerAt := At( '<', SubStr( sResult, nOffset + 1 ) )
+               nMarkerAt := At( '<', sResult, nOffset + 1 )
             ELSEIF nMarkerAt > 0 .AND. nOffset + nMarkerAt < nOptionalAt .AND. SubStr( sResult, nOffset + nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
                nOffset   += nMarkerAt + 1
-               nMarkerAt := At( '<', SubStr( sResult, nOffset + 1 ) )
+               nMarkerAt := At( '<', sResult, nOffset + 1 )
             ELSE
                EXIT
             ENDIF
          ENDDO
-         IF nMarkerAt > 0
-            nMarkerAt += nOffset
-         ENDIF
 
          IF nMarkerAt > 0
             IF nMarkerAt > nOptionalAt
@@ -6430,22 +6442,14 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          nOffset := 0
          IF nAt == 0
             nCloseOptionalAt := At( ']', sResult )
-            WHILE nCloseOptionalAt > 1 .AND. SubStr( sResult, nOffset + nCloseOptionalAt - 1, 1 ) == '\'
-               nOffset += nCloseOptionalAt
-               nCloseOptionalAt := At( ']', SubStr( sResult, nOffset + 1 ) )
+            WHILE nCloseOptionalAt > 1 .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
+               nCloseOptionalAt := At( ']', sResult, nCloseOptionalAt + 1 )
             ENDDO
-            IF nCloseOptionalAt > 0
-               nCloseOptionalAt += nOffset
-            ENDIF
          ELSE
             nCloseOptionalAt := At( ']', sResult )
-            WHILE nCloseOptionalAt > 1 .AND. nOffset + nCloseOptionalAt <= nAt .AND. SubStr( sResult, nOffset + nCloseOptionalAt - 1, 1 ) == '\'
-               nOffset += nCloseOptionalAt
-               nCloseOptionalAt := At( ']', SubStr( sResult, nOffset + 1 ) )
+            WHILE nCloseOptionalAt > 1 .AND. nCloseOptionalAt <= nAt .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
+               nCloseOptionalAt := At( ']', SubStr( sResult, nCloseOptionalAt + 1 ) )
             ENDDO
-            IF nCloseOptionalAt > 0
-               nCloseOptionalAt += nOffset
-            ENDIF
 
             IF nCloseOptionalAt > 0
                IF nCloseOptionalAt > nAt

@@ -1,15 +1,22 @@
 FUNCTION Main()
 
    LOCAL Start, Len
-   LOCAL cString := "This is the string to search into"
-   LOCAL cRegEx  := "s[^ ]*"
    LOCAL lCaseSensitive := .T.
 
-   ? HB_AtX( cRegEx, cString, lCaseSensitive, @Start, @Len ), Start, Len
+   LOCAL cString := "This is the string to search into"
 
-   // Now search only a portion.
-   Start := 8
-   Len := 10
-   ? HB_AtX( cRegEx, cString, lCaseSensitive, @Start, @Len ), Start, Len
+   // Find a sequence starting by a space followed by 's' followed by 4 to 8 NON space charcters, and terminated with a space.
+   LOCAL cRegEx  := " [^ ]{4,8} "
+
+   ? "Found:", HB_AtX( cRegEx, cString, lCaseSensitive, @Start, @Len ), Start, Len
+   ? "Should have found: ' string '"
+   ?
+
+   // Now search only from the 15th position.
+   Start := 15
+   Len := NIL
+   ? "Found:",HB_AtX( cRegEx, cString, lCaseSensitive, @Start, @Len ), Start, Len
+   ? "Should have found: ' search '"
+   ?
 
 RETURN 0
