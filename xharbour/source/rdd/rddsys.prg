@@ -1,5 +1,5 @@
 /*
- * $Id: rddsys.prg,v 1.13 2001/06/18 18:04:05 dholm Exp $
+ * $Id: rddsys.prg,v 1.1.1.1 2001/12/21 10:42:46 ronpinkas Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 
 ANNOUNCE RDDSYS
 
-init procedure RddInit
+PROCEDURE RddInit
 
    REQUEST DBFNTX
 

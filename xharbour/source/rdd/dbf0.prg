@@ -1,5 +1,5 @@
 /*
- * $Id: dbf0.prg,v 1.8 2001/06/18 18:04:05 dholm Exp $
+ * $Id: dbf0.prg,v 1.1.1.1 2001/12/21 10:42:44 ronpinkas Exp $
  */
 
 /*
@@ -54,10 +54,10 @@
 
 ANNOUNCE _DBF
 
-init procedure DBFInit
+INIT PROCEDURE DBFInit
 
    REQUEST _DBFC
 
    rddRegister( "DBF", RDT_FULL )
 
-return
+RETURN

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.46 2003/08/20 20:06:06 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.47 2003/08/20 22:07:46 ronpinkas Exp $
  */
 
 /*
@@ -1020,8 +1020,11 @@ void  HB_EXPORT hb_rddShutDown( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_rddShutDown()"));
 
    hb_rddCloseAll();
+
    if( s_szDefDriver )
+   {
       hb_xfree( s_szDefDriver );
+   }
 
    s_szDefDriver = NULL;
 
@@ -1029,8 +1032,12 @@ void  HB_EXPORT hb_rddShutDown( void )
    {
       pRddNode = s_pRddList;
       s_pRddList = s_pRddList->pNext;
+
       if ( pRddNode->pTable.exit != NULL )
+      {
         SELF_EXIT( pRddNode );
+      }
+
       hb_xfree( pRddNode );
    }
 }
@@ -2251,6 +2258,7 @@ HB_FUNC( DBTABLEEXT )
    {
       hb_rddCheck();
       pRddNode = hb_rddFindNode( s_szDefDriver, &uiRddID );
+
       if( !pRddNode )
       {
          hb_retc( NULL );
@@ -2352,9 +2360,12 @@ HB_FUNC( DBUSEAREA )
       szDriver = szDriverBuffer;
    }
    else
+   {
       szDriver = s_szDefDriver;
+   }
 
    szFileName = hb_parc( 3 );
+
    if( ! ISCHAR(3) || ( strlen( szFileName ) == 0 ) )
    {
       hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
@@ -2687,6 +2698,7 @@ HB_FUNC( ORDBAGEXT )
    {
       hb_rddCheck();
       pRddNode = hb_rddFindNode( s_szDefDriver, &uiRddID );
+
       if( !pRddNode )
       {
          hb_retc( NULL );
@@ -3365,12 +3377,23 @@ HB_FUNC( __RDDSETDEFAULT )
    hb_retc( s_szDefDriver );
 
    uiLen = ( USHORT ) hb_parclen( 1 );
+
    if( uiLen > 0 )
    {
       if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
+      {
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
+      }
 
-      s_szDefDriver = ( char * ) hb_xrealloc( s_szDefDriver, uiLen + 1 );
+      if( s_szDefDriver )
+      {
+         s_szDefDriver = ( char * ) hb_xrealloc( s_szDefDriver, uiLen + 1 );
+      }
+      else
+      {
+         s_szDefDriver = ( char * ) hb_xgrab( uiLen + 1 );
+      }
+
       hb_strncpyUpper( s_szDefDriver, hb_parc( 1 ), uiLen );
    }
 }
@@ -3386,21 +3409,33 @@ HB_FUNC( RDDSETDEFAULT )
    hb_retc( s_szDefDriver );
 
    uiLen = ( USHORT ) hb_parclen( 1 );
+
    if( uiLen > 0 )
    {
       if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
+      {
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
+      }
 
       hb_strncpyUpper( szNewDriver, hb_parc( 1 ), uiLen );
 
-      if( !hb_rddFindNode( szNewDriver, NULL ) )
+      if( ! hb_rddFindNode( szNewDriver, NULL ) )
       {
          hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "RDDSETDEFAULT" );
          return;
       }
 
-      s_szDefDriver = ( char * ) hb_xrealloc( s_szDefDriver, uiLen + 1 );
-      strcpy( s_szDefDriver, szNewDriver );
+      if( s_szDefDriver )
+      {
+         s_szDefDriver = ( char * ) hb_xrealloc( s_szDefDriver, uiLen + 1 );
+      }
+      else
+      {
+         s_szDefDriver = ( char * ) hb_xgrab( uiLen + 1 );
+      }
+
+      strncpy( s_szDefDriver, szNewDriver, uiLen );
+      s_szDefDriver[ uiLen ] = '\0';
    }
 }
 
@@ -3414,10 +3449,13 @@ HB_FUNC( DBSETDRIVER )
    hb_retc( s_szDefDriver );
 
    uiLen = ( USHORT ) hb_parclen( 1 );
+
    if( uiLen > 0 )
    {
       if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
+      {
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
+      }
 
       hb_strncpyUpper( szNewDriver, hb_parc( 1 ), uiLen );
 
@@ -3427,8 +3465,17 @@ HB_FUNC( DBSETDRIVER )
          return;
       }
 
-      s_szDefDriver = ( char * ) hb_xrealloc( s_szDefDriver, uiLen + 1 );
-      strcpy( s_szDefDriver, szNewDriver );
+      if( s_szDefDriver )
+      {
+         s_szDefDriver = ( char * ) hb_xrealloc( s_szDefDriver, uiLen + 1 );
+      }
+      else
+      {
+         s_szDefDriver = ( char * ) hb_xgrab( uiLen + 1 );
+      }
+
+      strncpy( s_szDefDriver, szNewDriver, uiLen );
+      s_szDefDriver[ uiLen ] = '\0';
    }
 }
 

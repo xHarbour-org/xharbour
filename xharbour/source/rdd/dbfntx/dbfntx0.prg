@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx0.prg,v 1.1.1.1 2001/12/21 10:43:00 ronpinkas Exp $
+ * $Id: dbfntx0.prg,v 1.2 2002/04/24 00:28:49 ronpinkas Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 
 ANNOUNCE DBFNTX
 
-Procedure DBFNTXInit
+PROCEDURE DBFNTXInit
 
    REQUEST _DBFNTX
 

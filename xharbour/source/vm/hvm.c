@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.254 2003/08/27 19:51:34 ronpinkas Exp $
+ * $Id: hvm.c,v 1.255 2003/08/27 20:02:14 ronpinkas Exp $
  */
 
 /*
@@ -340,19 +340,48 @@ void hb_vmDoInitClip( void )
 // Initialize DBFCDX and DBFNTX if linked.
 void hb_vmDoInitRdd( void )
 {
-   PHB_DYNS pDynSym = hb_dynsymFind( "DBFNTXINIT" );
+   PHB_DYNS pDynSym;
 
+   // Registers DBF and DBFNTX if linked.
+   pDynSym = hb_dynsymFind( "DBFNTXINIT" );
    if( pDynSym && pDynSym->pSymbol->pFunPtr )
    {
+      //TraceLog( NULL, "NTX: %p %p\n", pDynSym, pDynSym->pSymbol->pFunPtr );
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();
       hb_vmDo(0);
    }
 
+   // Registers DBF and DBFCDX if linked.
    pDynSym = hb_dynsymFind( "DBFCDXINIT" );
-
    if( pDynSym && pDynSym->pSymbol->pFunPtr )
    {
+      //TraceLog( NULL, "CDX: %p %p\n", pDynSym, pDynSym->pSymbol->pFunPtr );
+      hb_vmPushSymbol( pDynSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmDo(0);
+   }
+
+   // Sets default RDD to DBFNTX if linked.
+   pDynSym = hb_dynsymFind( "RDDINIT" );
+   if( pDynSym && pDynSym->pSymbol->pFunPtr )
+   {
+      //TraceLog( NULL, "RDD: %p %p\n", pDynSym, pDynSym->pSymbol->pFunPtr );
+      hb_vmPushSymbol( pDynSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmDo(0);
+   }
+}
+
+void hb_vmDoInitOle( void )
+{
+   PHB_DYNS pDynSym;
+
+   // Init Ole if Win32Ole is linked.
+   pDynSym = hb_dynsymFind( "INITIALIZE_OLE" );
+   if( pDynSym && pDynSym->pSymbol->pFunPtr )
+   {
+      //TraceLog( NULL, "OLE: %p %p\n", pDynSym, pDynSym->pSymbol->pFunPtr );
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();
       hb_vmDo(0);
@@ -485,6 +514,10 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    //printf( "Before InitRdd\n" );
    hb_vmDoInitRdd();  // Initialize DBFCDX and DBFNTX if linked.
 
+   #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
+      hb_vmDoInitOle();
+   #endif
+
    //printf( "Before InitFunctions\n" );
    hb_vmDoInitFunctions(); /* process defined INIT functions */
 
@@ -494,7 +527,9 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       PHB_DYNS pDynSym = hb_dynsymFind( "_APPMAIN" );
 
       if( pDynSym && pDynSym->pSymbol->pFunPtr )
+      {
          s_pSymStart = pDynSym->pSymbol;
+      }
 #ifdef HARBOUR_START_PROCEDURE
       else
       {
@@ -504,24 +539,34 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
             first linked moudule which is used if there is no
             HARBOUR_START_PROCEDURE in code */
          if( s_pszLinkedMain && *s_pszLinkedMain == '@' )
+         {
             pDynSym = hb_dynsymFind( s_pszLinkedMain + 1 );
+         }
          else
          {
             pDynSym = hb_dynsymFind( HARBOUR_START_PROCEDURE );
 
             if( ! ( pDynSym && pDynSym->pSymbol->pFunPtr ) && s_pszLinkedMain )
+            {
                pDynSym = hb_dynsymFind( s_pszLinkedMain );
+            }
          }
 
          if( pDynSym && pDynSym->pSymbol->pFunPtr )
+         {
             s_pSymStart = pDynSym->pSymbol;
+         }
          else
+         {
             hb_errInternal( HB_EI_VMBADSTARTUP, NULL, HARBOUR_START_PROCEDURE, NULL );
+         }
       }
 #else
 #ifndef HB_C52_STRICT
       else if( bStartMainProc && ! s_pSymStart )
+      {
          hb_errInternal( HB_EI_VMNOSTARTUP, NULL, NULL, NULL );
+      }
 #endif
 #endif
    }

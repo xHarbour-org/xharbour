@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.27 2003/06/21 03:17:57 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.28 2003/06/26 01:29:15 ronpinkas Exp $
  */
 
 /*
@@ -162,7 +162,7 @@ RETURN TOleAuto():GetActiveObject( cString )
 
 //----------------------------------------------------------------------------//
 
-INIT PROCEDURE Initialize_Ole
+PROCEDURE Initialize_Ole
    IF ! bOleInitialized
       bOleInitialized := .T.
       Ole_Initialize()

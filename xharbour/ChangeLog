@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1397 2003/08/31 12:26:05 patrickmast Exp $
+ * $Id: ChangeLog,v 1.1398 2003/09/02 03:55:50 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-01 22:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbcmd.c
+  * source/rdd/dbf0.prg
+  * source/rdd/rddsys.prg
+  * source/rdd/dbfntx/dbfntx0.prg
+  * source/rdd/nulsys/nulsys.prg
+  * source/rtl/win32ole.prg
+  * source/vm/hvm.c
+    ! Fixed initilaization of DBF, DBFNTX, DBFCDX and Initialize_Ole, to take place before INIT PORCEDUREs are called.
 
 2003-09-02 01:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   *source/rtl/set.c

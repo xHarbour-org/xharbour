@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.prg,v 1.5 2003/07/23 20:58:31 andijahja Exp $
+ * $Id: nulsys.prg,v 1.6 2003/07/27 01:23:11 ronpinkas Exp $
  */
 
 /*
@@ -54,9 +54,13 @@
 
 ANNOUNCE RDDSYS
 
-init procedure RDDInit
+PROCEDURE RDDInit
 
-return
+RETURN
+
+PROCEDURE DBFInit
+
+RETURN
 
 #pragma BEGINDUMP
 
