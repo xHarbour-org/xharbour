@@ -1,5 +1,5 @@
 /*
- * $Id: memofile.c,v 1.5 2003/01/05 06:50:36 ronpinkas Exp $
+ * $Id: memofile.c,v 1.6 2004/02/20 17:16:29 ronpinkas Exp $
  */
 
 /*
@@ -85,7 +85,9 @@ HB_FUNC( MEMOREAD )
                hb_fsRead( fhnd, &byEOF, sizeof( BYTE ) );
 
                if( byEOF == HB_CHAR_EOF )
+               {
                   ulSize--;
+               }
             }
             #endif
 
@@ -94,15 +96,14 @@ HB_FUNC( MEMOREAD )
             hb_fsSeek( fhnd, 0, FS_SET );
             hb_fsReadLarge( fhnd, pbyBuffer, ulSize );
 
-            hb_fsClose( fhnd );
-
             hb_retclenAdopt( ( char * ) pbyBuffer, ulSize );
          }
          else
          {
-            hb_fsClose( fhnd );
             hb_retc( "" );
          }
+
+         hb_fsClose( fhnd );
       }
       else
       {
