@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.5 2002/03/31 16:53:50 lculik Exp $
+ * $Id: tbrowse.prg,v 1.6 2002/04/26 11:06:46 lculik Exp $
  */
 
 /*
@@ -475,7 +475,7 @@ METHOD SetColumnWidth( oCol ) CLASS TBrowse
    LOCAL nWidthMax := ::nRight - ::nLeft +1    // Visible width of TBrowse
    LOCAL nWidth := 0,nColWidth:=0,nLen:=0
 
-   tracelog('nWidthMax : ',nWidthMax)
+
    // if oCol has :Width property set I use it
    if oCol:Width <> nil //.AND. oCol:Width < (nWidthMax - 4)
       nWidth := oCol:Width
@@ -508,7 +508,7 @@ METHOD SetColumnWidth( oCol ) CLASS TBrowse
                nColWidth += nL
          enddo
       endif
-   endif
+
     if nColWidth>nWidthMax
         nColWidth:=nWidthMax
     endif
@@ -516,10 +516,7 @@ METHOD SetColumnWidth( oCol ) CLASS TBrowse
         nLen:=nWidthMax
     endif
     nWidth:= if(nColwidth>nLen,nColwidth,nLen)
-    tracelog('nColwidth : ',nColwidth)
-    tracelog('nLen : ',nLen)
-    tracelog('nwidth : ',nWidth)
-
+   endif
 return nWidth
 
 
@@ -1492,11 +1489,8 @@ function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
 
    local Local1
    if ( oBrowse:hittest(nMouseRow, nMouseCol) == -5121 )
-      //tracelog('mouse row ',oBrowse:mrowpos)
-      //tracelog('mouse col ',oBrowse:mcolpos)
 
       Local1 := oBrowse:mrowpos - oBrowse:rowpos
-      //tracelog('local1 ',local1)
 
       do while ( Local1 < 0 )
          Local1++
@@ -1527,11 +1521,8 @@ function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
 
 Method hitTest(mrow,mcol) CLASS TBROWSE
 	local i
-        //tracelog('mrow',mrow)
-        //tracelog('mcol',mrow)
   ::mRowPos := ::rowPos
   ::mColPos := ::colPos
-  //tracelog(::mrowPos)
 
   if mRow< ::rect[1] .or. mRow > ::rect[3]
      return HTNOWHERE
