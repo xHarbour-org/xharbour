@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2423 2004/02/29 02:59:01 andijahja Exp $
+ * $Id: ChangeLog,v 1.2424 2004/02/29 07:28:24 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-29 18:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/hbzlib/zip.c
+    ! minor changes on recent extensions when members in skletons array
+      are not character type.
+      Ex: HB_ZIPFILE("my.zip",{"*.prg",NIL},,,,,,,,{NIL,"*.dll"}) caused GPF.
 
 2004-02-28 23:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c

@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.17 2004/02/28 23:05:11 andijahja Exp $
+ * $Id: zip.c,v 1.18 2004/02/29 02:59:04 andijahja Exp $
  */
 
 /*
@@ -142,30 +142,33 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
       {
          szExclude = hb_arrayGetC( pExclude, ux + 1 );
 
-         if ( strchr( szExclude, '*') != NULL )
+         if( szExclude )
          {
-            int uiW, uiWLen;
-            char *szEntry;
-
-            pWildFile = hb_fsDirectory(szExclude,NULL,NULL,TRUE);
-            uiWLen = pWildFile->item.asArray.value->ulLen;
-
-            for ( uiW = 0; uiW < uiWLen; uiW ++ )
+            if ( strchr( szExclude, '*') != NULL )
             {
-               pDirEntry = hb_arrayGetItemPtr( pWildFile, uiW + 1 );
-               szEntry = hb_arrayGetC( pDirEntry, 1 );
-               hb_arrayAddForward( &ExcludeFile, hb_itemPutC( &ExTmp, szEntry ));
-               hb_xfree( szEntry );
+               int uiW, uiWLen;
+               char *szEntry;
+
+               pWildFile = hb_fsDirectory(szExclude,NULL,NULL,TRUE);
+               uiWLen = pWildFile->item.asArray.value->ulLen;
+
+               for ( uiW = 0; uiW < uiWLen; uiW ++ )
+               {
+                  pDirEntry = hb_arrayGetItemPtr( pWildFile, uiW + 1 );
+                  szEntry = hb_arrayGetC( pDirEntry, 1 );
+                  hb_arrayAddForward( &ExcludeFile, hb_itemPutC( &ExTmp, szEntry ));
+                  hb_xfree( szEntry );
+               }
+
+               hb_itemRelease( pWildFile );
+            }
+            else
+            {
+               hb_arrayAddForward( &ExcludeFile, hb_itemPutC( &ExTmp, szExclude ));
             }
 
-            hb_itemRelease( pWildFile );
+            hb_xfree( szExclude );
          }
-         else
-         {
-            hb_arrayAddForward( &ExcludeFile, hb_itemPutC( &ExTmp, szExclude ));
-         }
-
-         hb_xfree( szExclude );
       }
    }
 }
@@ -201,33 +204,36 @@ static void ZipCreateArray( PHB_ITEM pParam )
    {
       char *szArrEntry = hb_arrayGetC( &TempArray, ulArr + 1 );
 
-      if ( strchr( szArrEntry, '*') != NULL )
+      if ( szArrEntry )
       {
-         pWildFile = hb_fsDirectory(szArrEntry,NULL,NULL,TRUE);
-         ulLen = pWildFile->item.asArray.value->ulLen;
-
-         for ( ul = 0; ul < ulLen ; ul ++ )
+         if ( strchr( szArrEntry, '*') != NULL )
          {
-            char * szEntry;
-            pDirEntry = hb_arrayGetItemPtr( pWildFile, ul + 1 );
-            szEntry = hb_arrayGetC( pDirEntry, 1 );
+            pWildFile = hb_fsDirectory(szArrEntry,NULL,NULL,TRUE);
+            ulLen = pWildFile->item.asArray.value->ulLen;
 
-            if ( ZipTestExclude ( szEntry ) )
+            for ( ul = 0; ul < ulLen ; ul ++ )
             {
-               hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szEntry ) );
+               char * szEntry;
+               pDirEntry = hb_arrayGetItemPtr( pWildFile, ul + 1 );
+               szEntry = hb_arrayGetC( pDirEntry, 1 );
+
+               if ( ZipTestExclude ( szEntry ) )
+               {
+                  hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szEntry ) );
+               }
+
+               hb_xfree( szEntry );
             }
 
-            hb_xfree( szEntry );
+            hb_itemRelease( pWildFile );
+         }
+         else
+         {
+            hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szArrEntry ) );
          }
 
-         hb_itemRelease( pWildFile );
+         hb_xfree( szArrEntry );
       }
-      else
-      {
-         hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szArrEntry ) );
-      }
-
-      hb_xfree( szArrEntry );
    }
 
    hb_itemClear( &TempArray );
