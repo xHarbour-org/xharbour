@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.43 2003/10/14 15:24:06 ronpinkas Exp $
+ * $Id: memvars.c,v 1.44 2003/10/14 15:30:49 ronpinkas Exp $
  */
 
 /*
@@ -225,8 +225,6 @@ void hb_memvarsRelease( void )
 
 void hb_memvarsInit( HB_STACK *pStack )
 {
-   // we MUST use malloc instead of hb_xgrab, as destruction sequence of main
-   // thread is different.
    pStack->globalTable = ( HB_VALUE_PTR ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
    pStack->privateStack = ( PHB_DYNS * ) hb_xgrab( sizeof( PHB_DYNS ) * TABLE_INITHB_VALUE );
    pStack->globalTableSize = TABLE_INITHB_VALUE;

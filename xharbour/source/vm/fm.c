@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.45 2003/10/20 02:39:29 jonnymind Exp $
+ * $Id: fm.c,v 1.46 2003/11/26 03:17:48 likewolf Exp $
  */
 
 /*
@@ -204,8 +204,13 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 #ifdef HB_FM_STATISTICS
 
    HB_CRITICAL_LOCK( hb_allocMutex );
+   
+   #ifndef HB_OS_WIN_32
    pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
-
+   #else
+   pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
+   #endif
+   
    if( ! pMem )
    {
       HB_CRITICAL_UNLOCK( hb_allocMutex );
@@ -299,8 +304,12 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
 
+   #ifndef HB_OS_WIN_32
    pMem = malloc( ulSize );
-
+   #else
+   pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize );
+   #endif
+   
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 #endif
@@ -326,7 +335,12 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 #ifdef HB_FM_STATISTICS
 
    HB_CRITICAL_LOCK( hb_allocMutex );
+   
+   #ifndef HB_OS_WIN_32
    pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
+   #else
+   pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
+   #endif
 
    if( ! pMem )
    {
@@ -422,7 +436,11 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
 
+   #ifndef HB_OS_WIN_32
    pMem = malloc( ulSize );
+   #else
+   pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize );
+   #endif
 
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
@@ -480,8 +498,13 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
       hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xrealloc()", NULL, NULL );
    }
 
+   #ifndef HB_OS_WIN_32
    pMem = realloc( pMemBlock, ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
-
+   #else
+   pMem = (void *) LocalReAlloc( (HLOCAL) pMemBlock, 
+         ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ), LMEM_MOVEABLE );
+   #endif
+   
    s_lMemoryConsumed += ( ulSize - ulMemSize );
 
    if( s_lMemoryMaxConsumed < s_lMemoryConsumed )
@@ -548,8 +571,12 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
 
+   #ifndef HB_OS_WIN_32
    pMem = realloc( pMem, ulSize );
-
+   #else
+   pMem = (void *) LocalReAlloc( (HLOCAL) pMem, ulSize, LMEM_MOVEABLE );
+   #endif
+   
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 #endif
@@ -621,8 +648,11 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 
       pMemBlock->ulSignature = *pSig = 0;
 
+      #ifndef HB_OS_WIN_32
       free( ( void * ) pMemBlock );
-
+      #else
+      LocalFree( (HLOCAL) pMemBlock );
+      #endif
       HB_CRITICAL_UNLOCK( hb_allocMutex );
    }
    else
@@ -644,7 +674,11 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
 
+   #ifndef HB_OS_WIN_32
       free( pMem );
+   #else
+      LocalFree( (HLOCAL) pMem );
+   #endif
 
 #ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );

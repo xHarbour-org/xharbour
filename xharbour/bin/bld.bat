@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.27 2003/12/02 11:46:58 lf_sfnet Exp $
+rem $Id: bld.bat,v 1.28 2003/12/04 13:39:08 jonnymind Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -216,6 +216,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    if not "%HB_DLL%" == "" set HB_LIBLIST=harbour.lib %_HB_GT_LIB%.lib samples.lib hbzip.lib vm.lib %ADS_LIBS%
    
    if not "%HB_MT%" == "" SET BC_MT_FLAG=-tWM   
+   if "%HB_MT%" == "" SET BC_MT_FLAG=
 
    if "%HB_COMPILER%" == "bcc32"   if exist ..\lib\bcc640.lib bcc32 %BC_MT_FLAG% -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% bcc640.lib %HB_LIBLIST%
    if "%HB_COMPILER%" == "bcc32"   if not exist ..\lib\bcc640.lib bcc32 %BC_MT_FLAG% -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% %HB_LIBLIST%

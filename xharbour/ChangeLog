@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1819 2003/12/04 13:39:05 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1820 2003/12/04 17:55:50 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-05 02:37 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/fm.c
+    * Under windows, LocalAlloc & c are used instead of malloc & c
+      Plz. test under non-windows-aware compilers. It should work also in
+      mingw and family, anyhow.
+
+  * source/vm/memvars.c
+    * removed a misleading comment
+  
+  * bin/bld.bat
+    ! after compiling under MT, was not resetting bcc flags to ST.
 
 2003-12-04 18:55 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rtl/direct.c
