@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: treelist.prg,v 1.2 2003/06/08 14:05:33 jonnymind Exp $
+   $Id: browse.prg,v 1.1 2003/11/08 00:45:56 jonnymind Exp $
 
    XWT Browse - A tbrowse like class for XWT.
 
@@ -34,7 +34,7 @@ METHOD New( nLenght ) CLASS XWTBrowse
    ::Super:New()
    ::nWidgetType := XWT_TYPE_BROWSE
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_BROWSE )
-   IF HB_IsNum( nLenght )
+   IF HB_IsNumeric( nLenght )
       ::nRows := nLenght
    ENDIF
 RETURN Self

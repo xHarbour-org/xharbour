@@ -3,12 +3,13 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_treelist.c,v 1.2 2003/06/08 14:05:36 jonnymind Exp $
+   $Id: xwt_gtk_browse.c,v 1.1 2003/11/08 00:45:56 jonnymind Exp $
 
    GTK interface - browse widget
 */
 
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbvm.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>
@@ -294,7 +295,7 @@ tbcol_list_get_value (GtkTreeModel *tree_model,
 
    pColumn = hb_arrayGetItemPtr( &(tbcol_list->hbColumns), column + 1 );
    hbCodeBlock.type = HB_IT_NIL;
-   hb_objGetPropValue( pColumn, "BGETITEM", &hbCodeBlock );
+   hb_itemForwardValue( &hbCodeBlock, hb_objSendMsg( pColumn, "BGETITEM", 0 ));
 
 
    /* Executes the codeblock */
@@ -477,13 +478,12 @@ TBColList * tbcol_list_new( PXWT_WIDGET xwtData )
    newlist->hbTBrowse.item.asArray.value = xwtData->owner;
 
    newlist->hbColumns.type = HB_IT_NIL;
-   hb_objGetPropValue( &(newlist->hbTBrowse),
-      "ACOLUMNS",
-      &newlist->hbColumns );
+      hb_itemForwardValue( &newlist->hbColumns ,
+         hb_objSendMsg( &(newlist->hbTBrowse), "ACOLUMNS", 0 ));
 
    newlist->n_columns = hb_arrayLen( &newlist->hbColumns );
    newlist->num_rows = hb_itemGetNI(
-      hb_objGetPropValue( &(newlist->hbTBrowse), "NROWS", NULL ) );
+      hb_objSendMsg( &(newlist->hbTBrowse), "NROWS", 0 ) );
 
    return newlist;
 }
@@ -558,7 +558,7 @@ static BOOL xwt_gtk_browse_create_columns( PXWT_WIDGET xwtData )
    tv = (GtkTreeView *) xwtData->widget_data;
 
    hbData.type = HB_IT_NIL;
-   hb_objGetPropValue( &Self, "ACOLUMNS", &hbData );
+   hb_itemForwardValue( &hbData, hb_objSendMsg( &Self, "ACOLUMNS", 0) );
    nCols = hb_arrayLen( &hbData );
 
    for ( i = 0; i < nCols; i ++ )
@@ -570,8 +570,7 @@ static BOOL xwt_gtk_browse_create_columns( PXWT_WIDGET xwtData )
          "column_num", GINT_TO_POINTER( i+1 ) );
 
       /* Return value is not needed anymore */
-      bEditable = hb_itemGetL(
-            hb_objGetPropValue( pCol, "BEDITABLE", NULL ));
+      bEditable = hb_itemGetL( hb_objSendMsg( pCol, "BEDITABLE", 0 ) );
 
       if ( bEditable )
       {
@@ -588,12 +587,9 @@ static BOOL xwt_gtk_browse_create_columns( PXWT_WIDGET xwtData )
       }
 
       /* All other parameters */
-      szColor = hb_itemGetCPtr(
-            hb_objGetPropValue( pCol, "CCOLOR", NULL ));
-      szBg = hb_itemGetCPtr(
-            hb_objGetPropValue( pCol, "CBACKGROUND", NULL ));
-      szCellBg = hb_itemGetCPtr(
-            hb_objGetPropValue( pCol, "CHIGHLIGHT", NULL ));
+      szColor = hb_itemGetCPtr( hb_objSendMsg( pCol, "CCOLOR", 0 ) );
+      szBg = hb_itemGetCPtr( hb_objSendMsg( pCol, "CBACKGROUND", 0 ));
+      szCellBg = hb_itemGetCPtr( hb_objSendMsg( pCol, "CHIGHLIGHT", 0 ));
 
       g_object_set(G_OBJECT (renderer),
             "foreground", szColor,
@@ -604,7 +600,7 @@ static BOOL xwt_gtk_browse_create_columns( PXWT_WIDGET xwtData )
       g_signal_connect (renderer, "edited", G_CALLBACK(cell_edited), xwtData);
 
       /* get the column name */
-      pName = hb_objGetPropValue( pCol, "CHEADING", NULL );
+      pName = hb_objSendMsg( pCol, "CHEADING", 0 );
       if ( pName->type == HB_IT_NIL )
       {
          szColTitle = "";

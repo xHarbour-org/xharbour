@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.46 2003/11/08 00:50:34 jonnymind Exp $
+ * $Id: Changelog,v 1.47 2003/11/15 17:05:26 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-27 00:00 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * src/browse.prg
+    ! hb_IsNum() is no longer supported; using hb_IsNumeric 
+  * src/xwt_gtk/xwt_gtk_browse.c
+    ! using hb_objSendMsg() to access object data
+      
 2003-11-15 18:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * makefile.bc
     ! Fixes from Gianluca Piemonte
