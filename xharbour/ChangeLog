@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.835 2003/03/14 11:21:23 jonnymind Exp $
+ * $Id: ChangeLog,v 1.836 2003/03/14 13:08:08 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-14 14:55 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/garbage.c
+    ! Compilation under linux fixed.
+
 2003-03-14 14:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/thread.h
   * source/vm/thread.c
   * source/vm/garbage.c
     ! Compilation with fence under windows is fixed (still have to implement
-      it though), and added some optimizations for linux. 
+      it though), and added some optimizations for linux.
 
 2003-03-14 12:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/thread.h

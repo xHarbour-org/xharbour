@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.51 2003/03/14 11:22:30 jonnymind Exp $
+ * $Id: garbage.c,v 1.52 2003/03/14 13:08:13 jonnymind Exp $
  */
 
 /*
@@ -512,7 +512,11 @@ void hb_gcCollect( void )
 void hb_gcCollectAll()
 {
    HB_GARBAGE_PTR pAlloc, pDelete;
+   #if defined(HB_THREAD_SUPPORT) && ! defined( HB_OS_WIN_32 )
+      HB_THREAD_STUB
+   #endif
    HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
+
 
    /* is anoter garbage in action? */
    #ifdef HB_THREAD_SUPPORT
@@ -522,7 +526,7 @@ void hb_gcCollectAll()
             return;
          }
       #else
-         HB_UNLOCK_STACK;
+         HB_STACK_UNLOCK;
          HB_CRITICAL_LOCK( hb_runningStacks.Mutex );
          if ( s_bCollecting == TRUE || s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
          {
