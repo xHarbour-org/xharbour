@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.133 2004/11/02 20:45:53 guerra000 Exp $
+ * $Id: dbcmd.c,v 1.134 2004/11/21 21:43:50 druzus Exp $
  */
 
 /*
@@ -2652,8 +2652,8 @@ HB_FUNC( FIELDPOS )
          }
          szName = ( char * ) hb_xgrab( iLen + 1 );
          hb_strncpyUpperTrim( szName, hb_parc( 1 ), iLen );
-         hb_xfree( szName );
          hb_retni( hb_rddFieldIndex( pArea, szName ) );
+         hb_xfree( szName );
          return;
       }
    }
