@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.125 2002/11/09 07:49:38 ronpinkas Exp $
+ * $Id: hvm.c,v 1.126 2002/11/12 17:24:14 ronpinkas Exp $
  */
 
 /*
@@ -914,6 +914,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_ENUMINDEX:
             ( *hb_stack.pPos )->type = HB_IT_LONG;
             ( *hb_stack.pPos )->item.asLong.value = hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ];
+            ( * hb_stack.pPos )->item.asLong.length = 10;
             hb_stackPush();
             w++;
             break;
