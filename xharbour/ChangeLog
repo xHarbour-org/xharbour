@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3123 2004/06/30 21:59:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3124 2004/06/30 22:50:40 marcosgambeta Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-30 21:07 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/pp/ppcore.c
+    * Renamed hb_strAtSkipStrings() to AtSkipStringsInRules() and made static.
+
+  * source/rtl/at.c
+    + Added low level ULONG HB_EXPORT hb_AtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
+    + Added prg wrapper AtSkipStrings( cFind, cHere, nStart ) -> nPosFromStart
+
+  * utils/xbscript/xbscript.prg
+    * Renamed nAtSkipStrings() to AtInRules()
+    + Added AtSkipStrings() guarded by #ifndef __XHARBOUR__
+    * Revised all calls of nAtSkipStrings() to AtInRules() within CompileRule() function.
+    * Revised all calls of nAtSkipStrings() to AtSkipStrings() elsewhere.
+    ! Fixed CompileRule to allow Literal Strings as tokens.
 
 2004-06-30 19:51 UTC-0300 Marcos Antonio Gambeta <marcosgambeta@uol.com.br>
   * source/rdd/dbcmd.c

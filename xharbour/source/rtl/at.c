@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.5 2004/03/20 23:24:47 druzus Exp $
+ * $Id: at.c,v 1.6 2004/04/17 23:27:21 jonnymind Exp $
  */
 
 /*
@@ -79,9 +79,9 @@
     {
        PHB_ITEM pSub = hb_param( 1, HB_IT_STRING );
        PHB_ITEM pText = hb_param( 2, HB_IT_STRING );
-       PHB_ITEM pStart = hb_param( 3, HB_IT_NUMERIC ); 
-       PHB_ITEM pEnd = hb_param( 4, HB_IT_NUMERIC ); 
-      
+       PHB_ITEM pStart = hb_param( 3, HB_IT_NUMERIC );
+       PHB_ITEM pEnd = hb_param( 4, HB_IT_NUMERIC );
+
        if( pText && pSub )
        {
           ULONG ulLength = pText->item.asString.length;
@@ -126,3 +126,113 @@
     }
 
 #endif
+
+ULONG HB_EXPORT hb_AtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
+{
+   char cLastChar = ' ';
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strAtSkipStrings(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen));
+
+   if( ulSubLen > 0 && ulLen >= ulSubLen )
+   {
+      ULONG ulPos = 0;
+      ULONG ulSubPos = 0;
+
+      while( ulPos < ulLen && ulSubPos < ulSubLen )
+      {
+         if( szText[ ulPos ] == '"' && szSub[0] != '"' )
+         {
+            while( ++ulPos < ulLen && szText[ ulPos ] != '"' )
+            {
+               // Skip.
+            }
+
+            ulPos++;
+            ulSubPos = 0;
+            continue;
+         }
+
+         if( szText[ ulPos ] == '\'' && szSub[0] != '\'' )
+         {
+            while( ++ulPos < ulLen && szText[ ulPos ] != '\'' )
+            {
+               // Skip.
+            }
+
+            ulPos++;
+            ulSubPos = 0;
+            continue;
+         }
+
+         if( szText[ ulPos ] == '[' && szSub[0] != '[' )
+         {
+            if( ! ( isalpha( cLastChar  ) || isdigit( cLastChar ) || strchr( "])}_.", cLastChar ) ) )
+            {
+               while( ++ulPos < ulLen && szText[ ulPos ] != ']' )
+               {
+                  // Skip.
+               }
+
+               ulPos++;
+               ulSubPos = 0;
+               continue;
+            }
+         }
+
+         if( szText[ ulPos ] == szSub[ ulSubPos ] )
+         {
+            ulSubPos++;
+            ulPos++;
+         }
+         else if( ulSubPos )
+         {
+            /* Go back to the first character after the first match,
+               or else tests like "22345" $ "012223456789" will fail. */
+            ulPos -= ( ulSubPos - 1 );
+            ulSubPos = 0;
+         }
+         else
+         {
+            cLastChar = szText[ ulPos ];
+            ulPos++;
+         }
+      }
+
+      return ( ulSubPos < ulSubLen ) ? 0 : ( ulPos - ulSubLen + 1 );
+   }
+   else
+   {
+      return 0;
+   }
+}
+
+HB_FUNC( ATSKIPSTRINGS ) // cFind, cWhere, nStart
+{
+   PHB_ITEM pFind = hb_param( 1, HB_IT_STRING ), pWhere = hb_param( 2, HB_IT_STRING );
+
+   if( pFind && pWhere )
+   {
+      unsigned long ulStart = (unsigned long) hb_parnl(3);
+
+      if( ulStart > 0 )
+      {
+         ulStart--;
+      }
+
+      if( ulStart < pWhere->item.asString.length )
+      {
+         unsigned long ulRet;
+
+         ulRet = hb_AtSkipStrings( pFind->item.asString.value, pFind->item.asString.length,
+                                      pWhere->item.asString.value + ulStart, pWhere->item.asString.length - ulStart );
+
+         if( ulRet )
+         {
+            hb_retnl( ulRet + ulStart );
+            return;
+         }
+      }
+   }
+
+   hb_retnl( 0 );
+}

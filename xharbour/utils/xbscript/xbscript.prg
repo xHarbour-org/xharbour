@@ -1272,7 +1272,7 @@ STATIC PROCEDURE ExecuteLine( sPPed )
 
    BEGIN SEQUENCE
 
-      WHILE ( nNext := nAtSkipStr( ';', sTemp ) ) > 0
+      WHILE ( nNext := AtSkipStrings( ';', sTemp ) ) > 0
          sBlock := Left( sTemp, nNext - 1 )
          ExtractLeadingWS( @sBlock )
          DropTrailingWS( @sBlock )
@@ -1440,7 +1440,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
       ENDIF
 
       sTemp := sPPed
-      WHILE ( nNext := nAtSkipStr( ';', sTemp ) ) > 0 .OR. ! Empty( sTemp )
+      WHILE ( nNext := AtSkipStrings( ';', sTemp ) ) > 0 .OR. ! Empty( sTemp )
          IF nNext > 0
             sBlock := Left( sTemp, nNext - 1 )
 
@@ -2467,7 +2467,7 @@ RETURN nIf
          asBlocks := {}
       ENDIF
 
-      WHILE ( nStart := nAtSkipStr( '{', sBlock, nStart ) ) > 0
+      WHILE ( nStart := AtSkipStrings( '{', sBlock, nStart ) ) > 0
          FOR nPosition := nStart + 1 TO nEnd
             IF SubStr( sBlock, nPosition, 1 ) != ' '
                EXIT
@@ -3163,7 +3163,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
       IF Left( LTrim( sLine ), 1 ) != '#'
           nPosition := 0
-          WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
+          WHILE ( nNewLineAt := AtSkipStrings( ';', sLine ) ) > 0
              nPendingLines++
              aSize( aPendingLines, nPendingLines )
 
@@ -3537,7 +3537,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                aAdd( aDefined, nRule )
 
                nPosition := 0
-               WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
+               WHILE ( nNewLineAt := AtSkipStrings( ';', sLine ) ) > 0
                   nPendingLines++
                   IF nPendingLines > Len( aPendingLines )
                      aSize( aPendingLines, nPendingLines )
@@ -3631,7 +3631,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                ENDIF
 
                nPosition := 0
-               WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
+               WHILE ( nNewLineAt := AtSkipStrings( ';', sLine ) ) > 0
                   nPendingLines++
                   IF nPendingLines > Len( aPendingLines )
                      aSize( aPendingLines, nPendingLines )
@@ -3713,7 +3713,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             ENDIF
 
             nPosition := 0
-            WHILE ( nNewLineAt := nAtSkipStr( ';', sLine ) ) > 0
+            WHILE ( nNewLineAt := AtSkipStrings( ';', sLine ) ) > 0
                nPendingLines++
                IF nPendingLines > Len( aPendingLines )
                   aSize( aPendingLines, nPendingLines )
@@ -6292,18 +6292,14 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
    aRule := { sKey, {}, bX }
 
-   #ifdef __XHARBOUR__
-      HB_AtX( "(^|[^\\])= *>", sRule, , @nNext, @nTokenLen )
-   #else
-      nNext := 0
-      DO WHILE ( nNext := nAtSkipStr( "=>", sRule, nNext + 1 ) ) > 0
-         IF ! SubStr( sRule, nNext - 1, 1 ) == '\'
-            EXIT
-         ENDIF
-      ENDDO
+   nNext := 0
+   DO WHILE ( nNext := AtInRules( "=>", sRule, nNext + 1 ) ) > 0
+      IF ! SubStr( sRule, nNext - 1, 1 ) == '\'
+         EXIT
+      ENDIF
+   ENDDO
 
-      nTokenLen := 2
-   #endif
+   nTokenLen := 2
 
    IF nNext == 0
       Eval( ErrorBlock(), ErrorNew( [PP], 2059, [Compile-Rule], [Missing => in #directive], { sRule } ) )
@@ -6379,6 +6375,9 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                BREAK
             ELSEIF s1 $ "+-*/:=^!&(){}@,|>#%?$"
                sTemp := s1
+               BREAK
+            ELSEIF s1 == '"' .OR. s1 == "'"
+               sTemp := RTrim( NextToken( sRule ) ) // Not by refernce because of SubStr() below!!!
                BREAK
             ENDIF
          ENDIF
@@ -6819,37 +6818,37 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
    DO WHILE ! ( sResult == '' )
       nOffset := 0
-      nOptionalAt := nAtSkipStr( '[', sResult )
+      nOptionalAt := AtSkipStrings( '[', sResult )
       WHILE nOPtionalAt > 1 .AND. SubStr( sResult, nOptionalAt - 1, 1 ) == '\'
          nOffset := nOptionalAt
-         nOptionalAt := nAtSkipStr( '[', sResult, nOffset + 1 )
+         nOptionalAt := AtSkipStrings( '[', sResult, nOffset + 1 )
       ENDDO
 
       nOffset := 0
       IF nOptionalAt == 0
-         nMarkerAt := nAtSkipStr( '<', sResult )
+         nMarkerAt := AtInRules( '<', sResult )
          WHILE nMarkerAt > 0
             IF nMarkerAt > 1 .AND. SubStr( sResult, nMarkerAt - 1, 1 ) == '\'
                nOffset   := nMarkerAt
-               nMarkerAt := nAtSkipStr( '<', sResult, nOffset + 1 )
+               nMarkerAt := AtInRules( '<', sResult, nOffset + 1 )
                //TraceLog( sResult, nOffset, nMarkerAt )
             ELSEIF nMarkerAt > 0 .AND. SubStr( sResult, nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
                nOffset   := nMarkerAt + 1
-               nMarkerAt := nAtSkipStr( '<', sResult, nOffset + 1 )
+               nMarkerAt := AtInRules( '<', sResult, nOffset + 1 )
             ELSE
                EXIT
             ENDIF
          ENDDO
       ELSE
-         nMarkerAt := nAtSkipStr( '<', sResult )
+         nMarkerAt := AtInRules( '<', sResult )
          WHILE nMarkerAt > 0
             IF nMarkerAt > 1 .AND. nMarkerAt < nOptionalAt .AND. SubStr( sResult, nMarkerAt - 1, 1 ) == '\'
                nOffset   := nMarkerAt
-               nMarkerAt := nAtSkipStr( '<', sResult, nOffset + 1 )
+               nMarkerAt := AtInRules( '<', sResult, nOffset + 1 )
                //TraceLog( sResult, nOffset, nMarkerAt )
             ELSEIF nMarkerAt > 0 .AND. nMarkerAt < nOptionalAt .AND. SubStr( sResult, nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
                nOffset   := nMarkerAt + 1
-               nMarkerAt := nAtSkipStr( '<', sResult, nOffset + 1 )
+               nMarkerAt := AtInRules( '<', sResult, nOffset + 1 )
             ELSE
                EXIT
             ENDIF
@@ -6864,9 +6863,9 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          ELSE
             TraceLog( "Warning, no markers in repeatable group: " + SubStr( sResult, nOptionalAt ) )
 
-            nCloseOptionalAt := nAtSkipStr( ']', sResult, nOptionalAt )
+            nCloseOptionalAt := AtInRules( ']', sResult, nOptionalAt )
             WHILE nCloseOptionalAt > 1 .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
-               nCloseOptionalAt := nAtSkipStr( ']', sResult, nCloseOptionalAt + 1 )
+               nCloseOptionalAt := AtInRules( ']', sResult, nCloseOptionalAt + 1 )
             ENDDO
 
             IF nCloseOptionalAt > 0
@@ -6887,9 +6886,9 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       ELSE
          nOffset := 0
          IF nAt == 0
-            nCloseOptionalAt := nAtSkipStr( ']', sResult )
+            nCloseOptionalAt := AtInRules( ']', sResult )
             WHILE nCloseOptionalAt > 1 .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
-               nCloseOptionalAt := nAtSkipStr( ']', sResult, nCloseOptionalAt + 1 )
+               nCloseOptionalAt := AtInRules( ']', sResult, nCloseOptionalAt + 1 )
             ENDDO
 
             IF nCloseOptionalAt == 0
@@ -6898,9 +6897,9 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                BREAK
             ENDIF
          ELSE
-            nCloseOptionalAt := nAtSkipStr( ']', sResult )
+            nCloseOptionalAt := AtInRules( ']', sResult )
             WHILE nCloseOptionalAt > 1 .AND. nCloseOptionalAt <= nAt .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
-               nCloseOptionalAt := nAtSkipStr( ']', sResult, nCloseOptionalAt + 1 )
+               nCloseOptionalAt := AtInRules( ']', sResult, nCloseOptionalAt + 1 )
             ENDDO
 
             IF nCloseOptionalAt > 0
@@ -9074,20 +9073,12 @@ RETURN sIdentifier
 #endif
 
 //--------------------------------------------------------------//
-
-FUNCTION nAtSkipStr( sFind, sLine, nStart )
+FUNCTION AtInRules( sFind, sLine, nStart )
 
    LOCAL nAt, nLen := Len( sLine ), cChar, cLastChar := ' ', nLenFind := Len( sFind )
-   LOCAL lRule
 
    IF nStart == NIL
       nStart := 1
-   ENDIF
-
-   IF ProcName( 1 ) == "COMPILERULE"
-      lRule := .T.
-   ELSE
-      lRule := .F.
    ENDIF
 
    FOR nAt := nStart TO nLen
@@ -9101,19 +9092,48 @@ FUNCTION nAtSkipStr( sFind, sLine, nStart )
           DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != cChar
           ENDDO
           LOOP // No need to record cLastChar
-       ELSEIF lRule == .F. .AND. cChar == '['
-          IF ! ( IsAlpha( cLastChar  ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "])}_." )
-             DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != ']'
-             ENDDO
-          ENDIF
-          cLastChar := ']'
-          LOOP // Recorded cLastChar
        ENDIF
 
        cLastChar := cChar
     NEXT
 
 RETURN 0
+
+//--------------------------------------------------------------//
+#ifndef __XHARBOUR__
+FUNCTION AtSkipStrings( sFind, sLine, nStart )
+
+   LOCAL nAt, nLen := Len( sLine ), cChar, cLastChar := ' ', nLenFind := Len( sFind )
+
+   IF nStart == NIL
+      nStart := 1
+   ENDIF
+
+   FOR nAt := nStart TO nLen
+       IF SubStr( sLine, nAt, nLenFind ) == sFind
+          RETURN nAt
+       ENDIF
+
+       cChar := SubStr( sLine, nAt, 1 )
+
+       IF cChar $ '"'+"'"
+          DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != cChar
+          ENDDO
+          LOOP // No need to record cLastChar
+       ELSEIF cChar == '['
+          IF ! ( IsAlpha( cLastChar  ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "])}_." )
+             DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != ']'
+             ENDDO
+             cLastChar := ']'
+             LOOP // Recorded cLastChar
+          ENDIF
+       ENDIF
+
+       cLastChar := cChar
+    NEXT
+
+RETURN 0
+#endif
 
 //--------------------------------------------------------------//
 FUNCTION nAtAnyCharSkipStr( sChars, sLine, nStart )
@@ -9450,10 +9470,10 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile, nStartLine, sSou
    sLines := StrTran( sLines, Chr(13), " " )
    sLines := StrTran( sLines, Chr(9), " " )
 
-   WHILE ( nOpen := nAtSkipStr( "/*", sLines ) ) > 0
+   WHILE ( nOpen := AtSkipStrings( "/*", sLines ) ) > 0
       sTemp += Left( sLines, nOpen - 1 )
-      nClose := nAtSkipStr( "*/", sLines, nOpen + 2 )
-      WHILE ( nOpen := nAtSkipStr( Chr(10), sLines, nOpen + 1 ) ) > 0 .AND. nOpen < nClose
+      nClose := AtSkipStrings( "*/", sLines, nOpen + 2 )
+      WHILE ( nOpen := AtSkipStrings( Chr(10), sLines, nOpen + 1 ) ) > 0 .AND. nOpen < nClose
          sTemp += Chr(10)
       ENDDO
       sLines := SubStr( sLines, nClose + 2 )
@@ -9508,7 +9528,7 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile, nStartLine, sSou
 
       //TraceLog( nLine, nLines, sTemp )
 
-      nOpen := nAtSkipStr( "&&", sTemp )
+      nOpen := AtSkipStrings( "&&", sTemp )
       IF nOpen > 0
          IF nOpen == 1
            IF bBlanks
@@ -9527,7 +9547,7 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile, nStartLine, sSou
          sTemp := asLines[nLine]
       ENDIF
 
-      nOpen := nAtSkipStr( "//", sTemp )
+      nOpen := AtSkipStrings( "//", sTemp )
       IF nOpen > 0
          IF nOpen == 1
             IF bBlanks
@@ -9651,7 +9671,7 @@ FUNCTION PP_RunText( sLines, bPP, aParams )
       sLines := StrTran( sLines, ';', Chr(10) )
       nOpen  := 0
       nClose := 0
-      WHILE ( nOpen := nAtSkipStr( Chr(10), sLines, nOpen + 1 ) ) > 0
+      WHILE ( nOpen := AtSkipStrings( Chr(10), sLines, nOpen + 1 ) ) > 0
          aAdd( asLines, SubStr( sLines, nClose + 1, nOpen - ( nClose + 1 ) ) )
          nClose := nOpen
       ENDDO

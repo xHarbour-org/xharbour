@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.157 2004/06/19 01:03:06 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.158 2004/06/30 21:37:12 ronpinkas Exp $
  */
 
 /*
@@ -1440,9 +1440,9 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
   }
 }
 
-ULONG HB_EXPORT hb_strAtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
+static ULONG AtSkipStringsInRules( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_strAtSkipStrings(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen));
+   HB_TRACE(HB_TR_DEBUG, ("AtSkipStringsInRules(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen));
 
    if( ulSubLen > 0 && ulLen >= ulSubLen )
    {
@@ -1757,7 +1757,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            //printf( "Find Marker: >%.*s< In: Len: %i %.*s\n", explen, exppatt, mlen - i, mlen - i, ptr );
 
            // Find if SAME Marker Name is used again in the remainder of the Match Rule.
-           while( ( ifou = hb_strAtSkipStrings( exppatt, explen, ptr, mlen - ( ptr - mpatt ) ) ) > 0 )
+           while( ( ifou = AtSkipStringsInRules( exppatt, explen, ptr, mlen - ( ptr - mpatt ) ) ) > 0 )
            {
               char *pTmp = ptr + ifou - 2, *pStart;
 
@@ -1865,7 +1865,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            /* Look for appropriate result markers */
            ptr = rpatt;
 
-           while( ( ifou = hb_strAtSkipStrings( exppatt, explen, ptr, rlen - ( ptr - rpatt ) ) ) > 0 )
+           while( ( ifou = AtSkipStringsInRules( exppatt, explen, ptr, rlen - ( ptr - rpatt ) ) ) > 0 )
            {
               /* Convert result marker into inner format */
               ifou --;
