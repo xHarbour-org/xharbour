@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.13 2002/08/05 18:04:23 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.14 2002/08/09 08:26:35 ronpinkas Exp $
  */
 
 /*
@@ -66,9 +66,9 @@ RETURN TOleAuto():New( cString )
 
 //----------------------------------------------------------------------------//
 
-FUNCTION GetObject( cString )
+FUNCTION GetActiveObject( cString )
 
-RETURN TOleAuto():GetObject( cString )
+RETURN TOleAuto():GetActiveObject( cString )
 
 //----------------------------------------------------------------------------//
 
@@ -159,7 +159,7 @@ CLASS TOleAuto
    DATA bShowException INIT .T.
 
    METHOD New( uObj, cClass ) CONSTRUCTOR
-   METHOD GetObject( cClass ) CONSTRUCTOR
+   METHOD GetActiveObject( cClass ) CONSTRUCTOR
 
    METHOD Invoke( cMember, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
    METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )
@@ -192,13 +192,13 @@ RETURN Self
 
 //--------------------------------------------------------------------
 
-METHOD GetObject( cClass ) CLASS TOleAuto
+METHOD GetActiveObject( cClass ) CLASS TOleAuto
 
    IF ValType( cClass ) = 'C'
       ::hObj := GetOleObject( cClass )
       ::cClassName := cClass
    ELSE
-      MessageBox( 0, "Invalid parameter type to constructor TOleAuto():GetObject()!", "OLE Interface", 0 )
+      MessageBox( 0, "Invalid parameter type to constructor TOleAuto():GetActiveObject()!", "OLE Interface", 0 )
       ::hObj := 0
    ENDIF
 

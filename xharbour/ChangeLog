@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.339 2002/08/08 19:36:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.340 2002/08/09 08:26:34 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-08-09 09:48 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + Added HB_IS_NUMBER() only matches numbers vs. HB_IS_NUMERIC() which also matches HB_IT_DATE and HB_IT_STRING[].
+
+  * source/vm/hvm.c
+    ! Fixed hb_vmPlus() to correctly return date when one of the operands is a DATE and the other is a NUMBER.
+    ! Fixed hb_vmPlus() to correctly return date when one of the operands is a DATE and the other is a DATE (like Clipper).
+    ! Fixed hb_vmMinus() to correctly return date when the left operand is a DATE and the right operand is a NUMBER.
+
+  * include/hbexprb.c
+    + Added HB_P_ADDINT optimization to HB_P_MINUS
+      /* Minus operations involving an integer will now be many times faster. */
+
+  * source/rtl/win32ole.prg
+  * tests/testole.prg
+    * Renamed GetObject() to GetActiveObject() to avoid conflict with WINAPI GetObject()
 
 2002-08-09 01:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/win32ole.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.86 2002/07/26 09:32:16 ronpinkas Exp $
+ * $Id: hvm.c,v 1.87 2002/08/08 19:36:08 ronpinkas Exp $
  */
 
 /*
@@ -1454,7 +1454,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             }
             else if( HB_IS_STRING( pLocal ) && pLocal->item.asString.length == 1 )
             {
-               pLocal->item.asString.value[0] += iAdd;
+               pLocal->item.asString.value = hb_vm_acAscii[ (unsigned char) ( pLocal->item.asString.value[0] + iAdd ) ];
                break;
             }
             else if( HB_IS_NUMERIC( pLocal ) )
@@ -1579,7 +1579,20 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
             w += 3;
 
-            if( HB_IS_NUMERIC( pTop ) )
+            if( HB_IS_DATE( pTop ) )
+            {
+               pTop->item.asDate.value += iAdd;
+               break;
+            }
+            else if( HB_IS_STRING( pTop ) && pTop->item.asString.length == 1 )
+            {
+               pTop->type = HB_IT_LONG;
+               pTop->item.asLong.value  = pTop->item.asString.value[0] + iAdd;
+               pTop->item.asLong.length = 10;
+               //printf( "Added: %i, Result: %i", iAdd, pTop->item.asLong.value );
+               break;
+            }
+            else if( HB_IS_NUMERIC( pTop ) )
             {
                if( pTop->type & HB_IT_INTEGER )
                {
@@ -1593,19 +1606,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                {
                   dNewVal = pTop->item.asDouble.value + iAdd;
                }
-            }
-            else if( HB_IS_STRING( pTop ) && pTop->item.asString.length == 1 )
-            {
-               pTop->type = HB_IT_LONG;
-               pTop->item.asLong.value  = pTop->item.asString.value[0] + iAdd;
-               pTop->item.asLong.length = 10;
-               //printf( "Added: %i, Result: %i", iAdd, pTop->item.asLong.value );
-               break;
-            }
-            else if( HB_IS_DATE( pTop ) )
-            {
-               pTop->item.asDate.value += iAdd;
-               break;
             }
             else
             {
@@ -2436,6 +2436,13 @@ static void hb_vmPlus( void )
          hb_errRT_BASE( EG_STROVERFLOW, 1209, NULL, "+", 2, pItem1, pItem2 );
       }
    }
+   /* Intentionally using HB_IS_NUMERIC() instead of HB_IS_NUMBER() on the right
+      Clipper consider DATE + NUMBER => DATE and DATE + DATE => DATE
+   */
+   else if( ( HB_IS_DATE( pItem1 ) || HB_IS_DATE( pItem2 ) ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
+   {
+      hb_vmPushDate( (long) hb_vmPopNumber() + (long) hb_vmPopNumber() );
+   }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
       int iDec2, iDec1, iType2 = pItem2->type, iType1 = pItem2->type;
@@ -2509,6 +2516,13 @@ static void hb_vmMinus( void )
       {
          hb_errRT_BASE( EG_STROVERFLOW, 1210, NULL, "-", 2, pItem1, pItem2 );
       }
+   }
+   else if( HB_IS_DATE( pItem1 ) && HB_IS_NUMBER( pItem2 ) )
+   {
+      double dNumber2 = hb_vmPopNumber();
+      double dNumber1 = hb_vmPopNumber();
+
+      hb_vmPushDate( (long) dNumber1 - (long) dNumber2 );
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.26 2002/07/24 03:08:01 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.27 2002/08/08 19:36:07 ronpinkas Exp $
  */
 
 /*
@@ -100,6 +100,7 @@ extern "C" {
 #define HB_IS_LOGICAL( p ) HB_IS_OF_TYPE( p, HB_IT_LOGICAL )
 #define HB_IS_LONG( p )    HB_IS_OF_TYPE( p, HB_IT_LONG )
 #define HB_IS_NUMERIC( p ) ( ( p )->type & HB_IT_NUMERIC  || HB_IS_DATE(p) || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
+#define HB_IS_NUMBER( p ) ( ( p )->type & HB_IT_NUMERIC )
 #define HB_IS_OBJECT( p )  ( HB_IS_OF_TYPE( p, HB_IT_OBJECT ) && ( p )->item.asArray.value->uiClass != 0 )
 #define HB_IS_STRING( p )  ( ( ( p )->type & ~( HB_IT_BYREF | HB_IT_MEMOFLAG ) ) == HB_IT_STRING )
 #define HB_IS_MEMO( p )    HB_IS_OF_TYPE( p, HB_IT_MEMO )

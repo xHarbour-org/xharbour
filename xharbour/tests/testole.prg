@@ -19,7 +19,7 @@ STATIC PROCEDURE Excel()
 
    LOCAL oExcel, oAS
 
-   oExcel := GetObject( "Excel.Application" )
+   oExcel := GetActiveObject( "Excel.Application" )
 
    IF Ole2TxtError() != "S_OK"
       oExcel := CreateObject( "Excel.Application" )
@@ -69,7 +69,7 @@ STATIC PROCEDURE MsWord()
 
    LOCAL oWord, oText
 
-   oWord := GetObject( "Word.Application" )
+   oWord := GetActiveObject( "Word.Application" )
 
    IF Ole2TxtError() != "S_OK"
       oWord := CreateObject( "Word.Application" )
@@ -100,7 +100,7 @@ STATIC PROCEDURE IEXPLORER()
 
    LOCAL oIE
 
-   oIE := GetObject( "InternetExplorer.Application" )
+   oIE := GetActiveObject( "InternetExplorer.Application" )
 
    IF Ole2TxtError() != "S_OK"
       oIE := CreateObject( "InternetExplorer.Application" )
@@ -123,7 +123,7 @@ STATIC PROCEDURE OUTLOOK()
 
    LOCAL oOL, oList, oMail, i
 
-   oOL := GetObject( "Outlook.Application" )
+   oOL := GetActiveObject( "Outlook.Application" )
 
    IF Ole2TxtError() != "S_OK"
       oOL := CreateObject( "Outlook.Application" )

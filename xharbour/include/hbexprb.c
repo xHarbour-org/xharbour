@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.27 2002/07/11 00:13:10 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.28 2002/07/23 18:58:26 ronpinkas Exp $
  */
 
 /*
@@ -3606,6 +3606,38 @@ static HB_EXPR_FUNC( hb_compExprUseMinus )
          break;
       case HB_EA_PUSH_PCODE:
          {
+          #if defined( HB_MACRO_SUPPORT )
+
+            /* This optimization is not applicable in Macro Compiler. */
+
+          #else
+
+            HB_EXPR_PTR pValue = NULL;
+            short iIncrement;
+
+            if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
+                pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
+            {
+               pValue = pSelf->value.asOperator.pLeft;
+               iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+            }
+
+            if( pValue )
+            {
+               HB_EXPR_USE( pValue, HB_EA_PUSH_PCODE );
+
+               /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
+               if( iIncrement )
+               {
+                  iIncrement = -iIncrement;
+                  hb_compGenPCode3( HB_P_ADDINT, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+               }
+
+               break;
+            }
+
+          #endif
+
             HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_PUSH_PCODE );
             HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_MINUS );
