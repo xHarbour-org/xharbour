@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.15 2002/07/24 02:58:43 ronpinkas Exp $
+ * $Id: classes.c,v 1.16 2002/07/24 03:22:20 ronpinkas Exp $
  */
 
 /*
@@ -247,7 +247,7 @@ static void hb_clsDictRealloc( PCLASS pClass )
    if( pClass )
    {
       PMETHOD pNewMethods;
-      USHORT  uiNewHashKey = pClass->uiHashKey;
+      USHORT  uiNewHashKey = pClass->uiHashKey * 2;
       USHORT  ui;
       USHORT  uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET );
 
