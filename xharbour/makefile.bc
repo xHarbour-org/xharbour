@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.32 2003/02/16 10:49:53 fsgiudice Exp $
+# $Id: makefile.bc,v 1.33 2003/02/23 21:02:43 jonnymind Exp $
 #
 
 #
@@ -105,7 +105,7 @@ LIB_DIR = lib\b32
 # debug info is requested with -v -y
 # if debug info is requested, set ARFLAGS to /P64 in your environment
 !if !$d(ARFLAGS)
-   ARFLAGS = /P32
+   ARFLAGS = /0
 !endif
 
 !endif
@@ -146,7 +146,7 @@ HBMAKE_DIR   = utils\hbmake
 # C compiler definition and C flags. These should never have to change.
 #
 
-CFLAGS               = -I$(INCLUDE_DIR) -d $(C_USR) $(CFLAGS)
+CFLAGS               = -I$(INCLUDE_DIR) -d $(C_USR) -5 -6 -OS -a8 -DHB_FM_STATISTICS_OFF $(CFLAGS)
 CLIBFLAGS            = -c $(CFLAGS) $(CLIBFLAGS)
 CLIBFLAGSDEBUG       = -v $(CLIBFLAGS)
 HARBOURFLAGS         = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
@@ -1580,7 +1580,7 @@ $(RTL_OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbcompress.obj : $(RTL_DIR)\hbcompress.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
+   $(CC) $(CLIBFLAGS) -DZLIB_DLL;WIN32 -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbchecksum.obj : $(RTL_DIR)\hbchecksum.c

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.793 2003/03/02 18:45:13 jonnymind Exp $
+ * $Id: ChangeLog,v 1.794 2003/03/03 02:11:39 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-03 10:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * makefile.bc
+    ! Standarize CFLAGS to -5 -6 -OS -a8 -DHB_FM_STATISTICS_OFF
+      and ARFLAGS to /0 (reduce lib size in about 10-20%)
 
 2003-03-02 18:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * doc/en/set.txt
