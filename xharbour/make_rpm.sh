@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.3 2003/05/17 15:55:13 druzus Exp $
+# $Id: make_rpm.sh,v 1.4 2003/05/30 02:02:50 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -33,7 +33,12 @@ then
 		     ${RPMDIR}/BUILD ${RPMDIR}/SPECS
 	    echo "%_topdir ${RPMDIR}" > ${HOME}/.rpmmacros
 	fi
-	rpm -ta ${hb_filename} --rmsource
+	if which rpmbuild &>/dev/null
+	then
+	    rpmbuild -ta ${hb_filename} --rmsource
+	else
+	    rpm -ta ${hb_filename} --rmsource
+	fi
     else
 	echo "Cannot find archive file: ${hb_filename}"
     fi

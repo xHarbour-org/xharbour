@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.5 2003/05/30 01:29:19 druzus Exp $
+# $Id: xharbour.spec,v 1.6 2003/05/30 02:02:50 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -142,7 +142,7 @@ Ten pakiet udostêpnia %{dname} PP, który daje trzy narzêdzia w jednym.
 2. ¦rodowisko DOT, w którym mo¿na u¿ywaæ wiêkszo¶ci sk³adni Clippera
 3. PP to tak¿e nieco ograniczony interpreter Clippera. Z uwzglêdnieniem
    wspomnianych kilku ograniczeñ potrafi on uruchomiæ wiêkszo¶æ sk³adni
-   Harbour. Mo¿esz napisaæ swój w³asny skrypt dodaj±c do pliku .prg
+   Harbour. Mo¿esz napisaæ swój w³asny skrypt xBase dodaj±c do pliku .prg
    #!/usr/bin/pprun
 
 

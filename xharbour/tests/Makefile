@@ -1,7 +1,7 @@
 # xHarbour project
 # Demo makefile for GNU MAKE in tests/ subdir
 #
-# $Id: Makefile,v 1.9 2003/04/25 23:02:49 jonnymind Exp $
+# $Id: Makefile,v 1.10 2003/05/26 15:46:30 jonnymind Exp $
 #
 # Copyright 2003 Giancarlo Niccolai
 #
@@ -17,6 +17,7 @@
 #
 # Remember to set HB_MT=MT if you want to compile
 # programs using Multithreading aware libs
+# and HB_MULTI_GT=yes if you use multi GT libs
 #
 
 ifeq ($(HB_MT),MT)
@@ -33,7 +34,7 @@ ifeq ($(HB_ARCHITECTURE),linux)
       GT_LIBS=-lgtQTc -lqt-mt -L/usr/lib/qt3/lib
    else
      ifeq ($(HB_GT_LIB),gtcrs)
-       GT_LIBS=-lgtcrs -lncurses
+       GT_LIBS=-lgtcrs -lncurses -lgpm
      else
        GT_LIBS=-lgtsln -lslang -lgpm
      endif
@@ -55,6 +56,9 @@ else
     EXE_EXT=.exe
   endif
 endif
+ifeq ($(HB_MULTI_GT),yes)
+GT_LIBS += -lgtnul
+endif
 
 %.c: %.prg
 	$(HB_BIN_INSTALL)/harbour -I$(HB_INC_INSTALL) $(PRG_USR) -n $<
@@ -64,6 +68,7 @@ endif
 
 %$(EXE_EXT): %.o
 	gcc -o $@ $< $(C_USR) -I$(HB_INC_INSTALL) -L$(HB_LIB_INSTALL) \
-		-ldebug $(MTLIBS) -lpp  -llang  -lcommon\
-		$(GT_LIBS) -lm\
-
+		-Wl,--start-group \
+			-ldebug $(MTLIBS) -lpp -llang -lcommon \
+			$(GT_LIBS) -lm \
+		-Wl,--end-group

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.57 2003/05/26 00:19:15 ronpinkas Exp $
+ * $Id: classes.c,v 1.58 2003/05/28 04:10:17 ronpinkas Exp $
  */
 
 /*
@@ -840,6 +840,11 @@ USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetRealCls(%p, %s)", pObject, szName));
 
+   if ( !pMsg )
+   {
+      return 0;
+   }
+
    uiClass = pObject->item.asArray.value->uiClass;
 
    /* default value to current class object */
@@ -1075,7 +1080,7 @@ BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_clsHasMsg(%i, %s)", uiClass, szMsg));
 
-   if( uiClass && uiClass <= s_uiClasses )
+   if( pMsg && uiClass && uiClass <= s_uiClasses )
    {
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
       USHORT uiAt    = ( USHORT ) ( MsgToNum( pMsg->pSymbol->szName, pClass->uiHashKey ) * BUCKET );
