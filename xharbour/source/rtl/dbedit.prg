@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.10 2003/11/15 18:46:37 paultucker Exp $
+ * $Id: dbedit.prg,v 1.11 2003/11/23 20:23:55 maurifull Exp $
  */
 
 /*
@@ -50,7 +50,8 @@
  *
  */
 
-/* NOTE: This is a total rewrite with all features previous dbedit() had
+/*
+ * NOTE: This is a total rewrite with all features previous dbedit() had
  *       plus a few more.
  *       It works with or w/o 5.3 extensions
  *       + Using 5.3 extensions gives mouse event handling :)
@@ -59,6 +60,7 @@
  *         - No coords = full screen
  *         - No columns = fill with db structure
  *       + New features in this version:
+ *         - Any column can be also a codeblock instead of a string
  *         - Heading/footing separator is single line instead of double line
  *           (see below in the code)
  *         - Columns are movable via K_CTRL_UP / K_CTRL_DOWN
