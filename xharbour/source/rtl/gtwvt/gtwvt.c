@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.79 2004/03/10 10:24:18 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.80 2004/03/10 19:16:52 ronpinkas Exp $
  */
 
 /*
@@ -1436,7 +1436,7 @@ static BOOL hb_wvt_gtInitWindow( HWND hWnd, USHORT col, USHORT row )
 
 static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int iWidth )
 {
-  HDC        hdc;
+//  HDC        hdc;
   HFONT      hOldFont ;
   USHORT     width, height, maxWidth, maxHeight;
   TEXTMETRIC tm;
@@ -1447,11 +1447,11 @@ static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int iWidt
   maxWidth  = (SHORT) ( rcWorkArea.right - rcWorkArea.left );
   maxHeight = (SHORT) ( rcWorkArea.bottom - rcWorkArea.top );
 
-  hdc       = GetDC( _s.hWnd );
-  hOldFont  = ( HFONT ) SelectObject( hdc, hFont );
-  GetTextMetrics( hdc, &tm );
-  SelectObject( hdc, hOldFont ); // Put old font back
-  ReleaseDC( _s.hWnd, hdc );
+//  hdc       = GetDC( _s.hWnd );
+  hOldFont  = ( HFONT ) SelectObject( _s.hdc, hFont );
+  GetTextMetrics( _s.hdc, &tm );
+  SelectObject( _s.hdc, hOldFont ); // Put old font back
+//  ReleaseDC( _s.hWnd, hdc );
 
   width     = iWidth < 0 ? -iWidth : tm.tmAveCharWidth * cols ;  // Total pixel width this setting would take
   height    = tm.tmHeight * rows;         // Total pixel height this setting would take
@@ -1463,7 +1463,7 @@ static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int iWidt
 
 static void hb_wvt_gtResetWindowSize( HWND hWnd )
 {
-  HDC        hdc;
+//  HDC        hdc;
   HFONT      hFont, hOldFont ;
   USHORT     diffWidth, diffHeight;
   USHORT     height, width;
@@ -1476,17 +1476,17 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
   // set the font and get it's size to determine the size of the client area
   // for the required number of rows and columns
   //
-  hdc      = GetDC( hWnd );
+//  hdc      = GetDC( hWnd );
   hFont    = hb_wvt_gtGetFont( _s.fontFace, _s.fontHeight, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage );
   _s.hFont = hFont ;
-  hOldFont = ( HFONT ) SelectObject( hdc, hFont );
+  hOldFont = ( HFONT ) SelectObject( _s.hdc, hFont );
   if ( hOldFont )
   {
     DeleteObject( hOldFont );
   }
-  GetTextMetrics( hdc, &tm );
-  SetTextCharacterExtra( hdc,0 ); // do not add extra char spacing even if bold
-  ReleaseDC( hWnd, hdc );
+  GetTextMetrics( _s.hdc, &tm );
+  SetTextCharacterExtra( _s.hdc,0 ); // do not add extra char spacing even if bold
+//  ReleaseDC( hWnd, hdc );
 
   // we will need to use the font size to handle the transformations from
   // row column space in the future, so we keep it around in a static!
@@ -1504,7 +1504,7 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
     _s.FixedFont = TRUE ;
   }
 
-  for( n=0 ; n< _s.COLS ; n++ ) // _s.FixedSize[] is used by ExtTextOut() to emulate
+  for( n = 0 ; n < _s.COLS ; n++ ) // _s.FixedSize[] is used by ExtTextOut() to emulate
   {                             //          fixed font when a proportional font is used
     _s.FixedSize[ n ] = _s.PTEXTSIZE.x;
   }
@@ -1538,9 +1538,9 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
 static void s_wvt_paintGraphicObjects( HDC hdc, RECT *updateRect )
 {
    HB_GT_GOBJECT *pObj;
-   COLORREF color;
-   HPEN hPen, hOldPen;
-   HBRUSH hBrush, hOldBrush;
+   COLORREF      color;
+   HPEN          hPen, hOldPen;
+   HBRUSH        hBrush, hOldBrush;
 
    pObj = hb_gt_gobjects;
 
@@ -1548,14 +1548,13 @@ static void s_wvt_paintGraphicObjects( HDC hdc, RECT *updateRect )
    {
       /* Check if pObj boundaries are inside the area to be updated */
       if ( hb_gtGobjectInside( pObj, updateRect->left, updateRect->top,
-         updateRect->right, updateRect->bottom ) )
+                              updateRect->right, updateRect->bottom ) )
       {
-         color = RGB( pObj->color.usRed >> 8, pObj->color.usGreen >> 8,
-               pObj->color.usBlue >> 8);
-         hPen = CreatePen( PS_SOLID, 1, color );
-         hOldPen = (HPEN) SelectObject( hdc, hPen );
-         hBrush = (HBRUSH) CreateSolidBrush( color );
-         hOldBrush = (HBRUSH) SelectObject( hdc, hBrush );
+         color     = RGB( pObj->color.usRed >> 8, pObj->color.usGreen >> 8, pObj->color.usBlue >> 8 );
+         hPen      = CreatePen( PS_SOLID, 1, color );
+         hOldPen   = ( HPEN   ) SelectObject( hdc, hPen );
+         hBrush    = ( HBRUSH ) CreateSolidBrush( color );
+         hOldBrush = ( HBRUSH ) SelectObject( hdc, hBrush );
 
          switch( pObj->type )
          {
@@ -1677,7 +1676,8 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         for ( irow = rowStart; irow < rowStop; irow++ )
         {
           USHORT icol, index, startIndex, startCol, len;
-          BYTE oldAttrib, attrib;
+          BYTE   oldAttrib, attrib;
+
           icol       = colStart;
           index      = hb_wvt_gtGetIndexForTextBuffer( icol, irow );
           startIndex = index;
@@ -2463,12 +2463,12 @@ static BOOL hb_wvt_gtTextOut( HDC hdc,  USHORT col, USHORT row, LPCTSTR lpString
   SetRect(&rClip, xy.x, xy.y, xy.x+cbString*nFontCX, xy.y+nFontCY);
   if ( _s.FixedFont )
   {
-    Result = ExtTextOut(hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString,cbString, NULL);
+    Result = ExtTextOut( hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString,cbString, NULL );
 //    Result = TextOut( hdc, xy.x, xy.y, lpString, cbString );
   }
   else
   {
-    Result = ExtTextOut(hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString,cbString, _s.FixedSize);
+    Result = ExtTextOut( hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString,cbString, _s.FixedSize );
 //    Result = ExtTextOut( hdc, xy.x, xy.y, 0, NULL, lpString, cbString, _s.FixedSize ) ;
   }
   return( Result ) ;
