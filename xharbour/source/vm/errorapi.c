@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.23 2003/11/04 08:31:04 druzus Exp $
+ * $Id: errorapi.c,v 1.24 2003/11/11 20:20:54 ronpinkas Exp $
  */
 
 /*
@@ -356,7 +356,8 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
             // this will also signal the changed situation.
             HB_STACK_LOCK
          #endif
-         hb_vmQuit();
+
+         exit( hb_vmQuit() );
       }
       else if( usRequest == HB_BREAK_REQUESTED || usRequest == HB_ENDPROC_REQUESTED )
       {
@@ -541,7 +542,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
             HB_STACK_LOCK
          #endif
 
-         hb_vmQuit();
+         exit( hb_vmQuit() );
       }
       else if( usRequest == HB_BREAK_REQUESTED || usRequest == HB_ENDPROC_REQUESTED )
       {

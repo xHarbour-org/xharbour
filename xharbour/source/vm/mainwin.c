@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.3 2003/03/14 22:23:29 ronpinkas Exp $
+ * $Id: mainwin.c,v 1.4 2003/07/05 07:51:55 ronpinkas Exp $
  */
 
 /*
@@ -86,7 +86,9 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    argv[ 0 ] = szAppName;
 
    if( * pArgs != 0 )
+   {
       argv[ ++argc ] = pArgs;
+   }
 
    while( *pArg != 0 )
    {
@@ -96,29 +98,34 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
          argc++;
 
          while( *pArg == ' ' )
+         {
             pArg++;
+         }
 
          if( *pArg != 0 )
+         {
             argv[ argc ] = pArg++;
+         }
          else
+         {
             argc--;
+         }
       }
       else
+      {
          pArg++;
+      }
    }
+
    argc++;
 
    hb_cmdargInit( argc, argv );
+
    hb_vmInit( TRUE );
-   hb_vmQuit();
 
-   LocalFree( pArgs );  /* QUESTION: It seems we never reach here,
-                                     so how may we free it ? */
+   LocalFree( pArgs );
 
-   /* NOTE: The exit value is set by exit() */
-   /* NOTE: This point is never reached */
-
-   return 0;
+   return hb_vmQuit();
 }
 
 #endif

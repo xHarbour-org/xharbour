@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.277 2003/11/14 16:36:04 jonnymind Exp $
+ * $Id: hvm.c,v 1.278 2003/11/15 16:55:17 jonnymind Exp $
  */
 
 /*
@@ -244,7 +244,8 @@ static HB_ITEM  s_aStatics;         /* Harbour array to hold all application sta
 static USHORT   s_uiStatics;        /* Number of statics added after processing hb_vmStatics() */
 static PHB_SYMB s_pSymStart = NULL; /* start symbol of the application. MAIN() is not required */
 static PSYMBOLS s_pSymbols = NULL;  /* to hold a linked list of all different modules symbol tables */
-static BYTE     s_byErrorLevel;     /* application exit errorlevel */
+
+static int      s_iErrorLevel;      /* application exit errorlevel */
 
 static BOOL     s_bDebugging;
 static BOOL     s_bDebugRequest;    /* debugger invoked via the VM */
@@ -403,7 +404,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    /* initialize internal data structures */
    s_aStatics.type = HB_IT_NIL;
-   s_byErrorLevel = 0;
+   s_iErrorLevel = 0;
    s_bDebugging = FALSE;
    s_bDebugShowLines = FALSE;
    s_bDebuggerIsWorking = FALSE;
@@ -603,7 +604,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 #endif
 }
 
-void HB_EXPORT hb_vmQuit( void )
+int HB_EXPORT hb_vmQuit( void )
 {
    static BOOL bQuitting = FALSE;
 
@@ -761,7 +762,7 @@ void HB_EXPORT hb_vmQuit( void )
    hb_threadCloseHandles();
 #endif
 
-   exit( s_byErrorLevel );
+   return s_iErrorLevel;
 }
 
 void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **pGlobals )
@@ -7478,7 +7479,7 @@ HB_FUNC( ERRORLEVEL )
 {
    HB_THREAD_STUB
 
-   hb_retni( s_byErrorLevel );
+   hb_retni( s_iErrorLevel );
 
    /* NOTE: This should be ISNUM( 1 ), but it's sort of a Clipper bug that it
             accepts other types also and considers them zero. [vszakats] */
@@ -7486,7 +7487,7 @@ HB_FUNC( ERRORLEVEL )
    if( hb_pcount() >= 1 )
    {
       /* Only replace the error level if a parameter was passed */
-      s_byErrorLevel = hb_parni( 1 );
+      s_iErrorLevel = hb_parni( 1 );
    }
 }
 

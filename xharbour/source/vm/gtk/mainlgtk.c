@@ -1,5 +1,5 @@
 /*
- * $Id: mainlgtk.c,v 1.3 2003/03/14 22:23:29 ronpinkas Exp $
+ * $Id: mainlgtk.c,v 1.1 2003/04/03 04:15:16 ronpinkas Exp $
  */
 
 /*
@@ -65,9 +65,7 @@ int main( int argc, char * argv[] )
    {
       hb_cmdargInit( argc, argv );
       hb_vmInit( TRUE );
-      hb_vmQuit();
-      /* uncoment the next line if hb_vmQuit() returns */
-      /* return 0; */
+      return hb_vmQuit();
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: mainpm.c,v 1.3 2003/03/14 22:23:29 ronpinkas Exp $
+ * $Id: mainpm.c,v 1.1 2003/04/03 04:15:16 ronpinkas Exp $
  */
 
 /*
@@ -73,9 +73,7 @@ int main( int argc, char * argv[] )
    WinDestroyMsgQueue( hmq );
    WinTerminate( hab );
 
-   hb_vmQuit();
-
-   return 0;
+   return hb_vmQuit();
 }
 
 

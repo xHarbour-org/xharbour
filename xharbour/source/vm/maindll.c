@@ -1,5 +1,5 @@
 /*
- * $Id: maindll.c,v 1.18 2001/12/28 22:00:47 andijahja Exp $
+ * $Id: maindll.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -78,7 +78,7 @@ BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
            break;
 
       case DLL_PROCESS_DETACH:
-           /* hb_vmQuit(); */
+           hb_vmQuit();
            break;
    }
 
