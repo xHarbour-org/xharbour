@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2066 2004/01/15 14:57:21 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2067 2004/01/15 16:52:13 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-15 10:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/transfrm.c
+    ! Fix for case when a picture function has no space before a '9'
+
 2004-01-15 17:50 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
    * source/include/hbgtwvt.h
-     * fix include for OpenWatcom 1.2 
+     * fix include for OpenWatcom 1.2
    * source/rtl/gtwvt/gtwvt.c
      * fix K_CTRL_A-Z management
 
@@ -27,7 +31,7 @@
 
   * xharbour/source/rtl/gtwvt/gtwvt.c
     ! Formatted.
-    * Changed the sequence of some functions to their respective groups.        
+    * Changed the sequence of some functions to their respective groups.
 
 2004-01-15 14:58 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/gtxvt/gtxvt.c
