@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.116 2002/10/13 18:06:30 ronpinkas Exp $
+ * $Id: hvm.c,v 1.117 2002/10/14 18:22:03 ronpinkas Exp $
  */
 
 /*
@@ -5217,7 +5217,7 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
 
 static void hb_vmPushVariable( PHB_SYMB pVarSymb )
 {
-   USHORT uiAction = E_DEFAULT;
+   USHORT uiAction;
 
    do
    {
