@@ -1,5 +1,5 @@
 /*
- * $Id: adsfuncs.txt,v 1.5 2003/11/08 06:17:29 brianhays Exp $
+ * $Id: adsfuncs.txt,v 1.6 2004/02/01 12:02:39 lculik Exp $
  */
 
 /*
@@ -1122,9 +1122,7 @@
 ADSGETCONNECTIONHANDLE
 
 v6:
-   AdsAddTable
    AdsAddUserToGroup
-   ADSUSEDICTIONARY
 
 AdsAddCustomKey
 AdsDeleteCustomKey
@@ -1149,6 +1147,124 @@ ADSIsRecordEncrypted
 ADSIsTableEncrypted
 
 */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ADSDDADDTABLE()
+ *  $CATEGORY$
+ *      Advantage Database RDD
+ *  $ONELINER$
+ *      Add na new table do an Data dictionary
+ *  $SYNTAX$
+ *      ADSDDADDTABLE( <cTableName>,<cFileName>,<cIndexFileName> ) --> lSuccess
+ *  $ARGUMENTS$
+ *      <cTableName> Name of the table inside the data dictionaty
+ *      <cFileName>  Name of the adt or dbf file name
+ *      <cIndexFileName> Optional name of the index file
+ *  $RETURNS$
+ *      <lSuccess> -> .T. if file was added, otherwise .F.
+ *  $DESCRIPTION$
+ *      See ACE.HLP for full details about the Advantage Database Server.
+ *      AdsDDAddTable() is function that add an new table to an Ads data dictionary
+ *      To add the table you must be conected as ADSSYS user using the AdsConnect60() function
+ *  $EXAMPLES$
+ *  IF adsConnect60("xharbour.add",7/* All types of conection*/,"ADSSYS","",)
+ *     // Add one user
+ *      AdsDDCreateUser(,"Luiz","papael","This is luiz User") 
+ *     // Add the tables
+ *      AdsDDaddTable("Table1","table1.adt","table1.adi")
+ *  $TESTS$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      Windows 32-bit, Linux
+ *  $FILES$
+ *      Library is RddAds
+ *      Header is ads.ch
+ *  $SEEALSO$
+ *      ADSCONNECT60(),ADSUSEDICTIONARY()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ADSUSEDICTIONARY()
+ *  $CATEGORY$
+ *      Advantage Database RDD
+ *  $ONELINER$
+ *      This function inform that you want to use an datadictionary conection
+ *  $SYNTAX$
+ *      ADSUSEDICTIONARY(<lUse>) --> lOldStatus
+ *  $ARGUMENTS$
+ *      <lUseDictionary> Toggle to say id you want to use an database inside an
+ *      data dictionary or not
+ *  $RETURNS$
+ *      <lOldStatus> -> The old status of this function
+ *  $DESCRIPTION$
+ *      This function toggle the usage or not of database(.adt or .dbf files)
+ *      that are stored on an Advantage Data Dictionary
+ *  $TESTS$
+ *      AdsUseDictionary(.t.)
+ *      DbUseAreaD(.t.,,"Custumer Data","custum",.t.,.f.)
+ *      Browse()
+ *      USE
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      Windows 32-bit, Linux
+ *  $FILES$
+ *      Library is RddAds
+ *      Header is ads.ch
+ *  $SEEALSO$
+ *      ADSCONNECT60()
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ADSCONNECT60()
+ *  $CATEGORY$
+ *      Advantage Database RDD
+ *  $ONELINER$
+ *      Connect to an localr/remote server
+ *  $SYNTAX$
+ *      ADSCONNECT60(<cFilePath>,<nServertype>,[<cUserName>],[<cUserPass>],[<nOptions>]) -> lSuccess
+ *  $ARGUMENTS$
+ *      <cFilePath>   Name od data dictionary to connect
+ *      <nServertype> Specify the server type to connect(LOCAL,REMOTE,AIS or all together)
+ *      <cUserName>   Optional Name of the user connecting to the serve
+ *      <cUserPass>   Optional password for the user Name
+ *      <nOptions>    The optional connection options
+ *
+ *  $RETURNS$
+ *      <lSuccess>   True is conected , otherwise False
+ *  $DESCRIPTION$
+ *      See ACE.HLP for full details about the Advantage Database Server.
+ *      Adsconnect60() does the connect to an advantage database sercer
+ *  $EXAMPLES$
+ *      IF adsConnect60("xharbour.add",7/* All types of conection*/,"ADSSYS","",)
+ *      // Add one user
+ *         AdsDDCreateUser(,"Luiz","papael","This is luiz User") 
+ *      ENDIF
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      Harbour extension
+ *  $PLATFORMS$
+ *      Windows 32-bit, Linux
+ *  $FILES$
+ *      Library is RddAds
+ *      Header is ads.ch
+ *  $SEEALSO$
+ *      ADSUSEDICTIONARY(),ADSDDADDTABLE()
+ *  $END$
+ */
+
 
 
 /*  $DOC$
