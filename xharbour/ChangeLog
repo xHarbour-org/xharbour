@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1337 2003/08/10 21:51:59 druzus Exp $
+ * $Id: ChangeLog,v 1.1338 2003/08/10 22:15:13 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-11 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tget.prg
+    ! Fix behavior in picture functions.
+      Ex: @5,5 Get nVar picture "@B9999"
+
 2003-08-10 19:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/set.c
    *(All changes on behave of _SET_PRINTFILE place)
@@ -54,6 +60,15 @@
   * source/vm/hvm.c
     + Added 2 commented TraceLog() debugging lines.
 
+2003-08-08 19:39 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tbcolumn.prg
+  * source/rtl/tbrowse.prg
+    ! Fix relese of HitTop and HitBottom correctly.
+      Reported by Guillermo Verona
+  * source/rdd/workarea.c
+    ! Fix dbEval. <nRest> should be stop and stay in last record evaluated.
+      Reported by Guillermo Verona
+ 
 2003-08-07 22:23 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfntx/dbfntx1.c
     ! support of binary keys (borrowed from Harbour, many thanks
