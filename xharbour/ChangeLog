@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2126 2004/01/22 20:56:56 lculik Exp $
+ * $Id: ChangeLog,v 1.2127 2004/01/22 22:23:20 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-22 20:10 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/inkey.c
+    + Copy SETLASTKEY() function from LIBCT.
 
 2004-01-22 18:35 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/dbedit.prg
@@ -36,7 +40,7 @@
   * source/rtl/gtalleg/ssf.h
   * source/rtl/gtalleg/ssf.c
   * source/rtl/gtalleg/fixedth.c
-    ! Fixed $Id: ChangeLog,v 1.2126 2004/01/22 20:56:56 lculik Exp $ header
+    ! Fixed $Id: ChangeLog,v 1.2127 2004/01/22 22:23:20 maurifull Exp $ header
 
 2004-01-22 13:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /contrib/winprn/tprint.prg
