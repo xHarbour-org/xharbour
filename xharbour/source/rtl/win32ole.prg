@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.9 2002/05/11 00:48:39 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.10 2002/05/16 02:28:38 ronpinkas Exp $
  */
 
 /*
@@ -115,7 +115,7 @@ RETURN TOleAuto():New( cString )
       }
    }
 
-   static HB_FUNC( OLE_INITIALIZE )
+   HB_FUNC_STATIC( OLE_INITIALIZE )
    {
       s_nOleError = OleInitialize( NULL );
 
@@ -123,7 +123,7 @@ RETURN TOleAuto():New( cString )
       s_pSym_New  = hb_dynsymFindName( "NEW" );
    }
 
-   static HB_FUNC( OLE_UNINITIALIZE )
+   HB_FUNC_STATIC( OLE_UNINITIALIZE )
    {
       OleUninitialize();
    }

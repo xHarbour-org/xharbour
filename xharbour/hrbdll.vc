@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.3 2002/05/25 18:39:15 lculik Exp $
+# $Id: hrbdll.vc,v 1.4 2002/05/25 18:42:19 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -353,8 +353,10 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\hvm.obj \
   $(OBJ_DIR)\fastitem.obj \
   $(OBJ_DIR)\tprint.obj \
-  $(OBJ_DIR)\tprinter.obj 
-
+  $(OBJ_DIR)\tprinter.obj \
+  $(OBJ_DIR)\cstruct.obj \
+  $(OBJ_DIR)\win32ole.obj \
+  $(OBJ_DIR)\traceprg.obj
 
 # ÚÄÄÄÄÄÄÄÄÄÄ¿
 # ³ project  ³Û
@@ -377,7 +379,7 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
         /DLL                       \
         /IMPLIB:LIB\vc\harbour.lib \
         /NOLOGO                    \
-        /DEFAULTLIB:user32.lib advapi32.lib gdi32.lib libcmt.lib winspool.lib \
+        /DEFAULTLIB:user32.lib advapi32.lib gdi32.lib libcmt.lib winspool.lib ole32.lib oleaut32.lib \
         /SUBSYSTEM:WINDOWS        \
         /OPT:WIN98                \
         $(HARBOUR_DLL_OBJS)
@@ -1458,4 +1460,22 @@ $(OBJ_DIR)\cstr.c : $(RTL_DIR)\cstr.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\cstr.obj : $(OBJ_DIR)\cstr.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\cstruct.c : $(RTL_DIR)\cstruct.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\cstruct.obj : $(OBJ_DIR)\cstruct.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\win32ole.c : $(RTL_DIR)\win32ole.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\win32ole.obj : $(OBJ_DIR)\win32ole.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\traceprg.obj : $(OBJ_DIR)\traceprg.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**

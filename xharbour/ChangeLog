@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.278 2002/06/17 20:42:53 andijahja Exp $
+ * $Id: ChangeLog,v 1.279 2002/06/17 21:35:44 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-18 05:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+   * source/rtl/win32.ole
+     ! Modify macros to enable win32ole.prg be included in DLL :
+       * static HB_FUNC( OLE_INITIALIZE ) => HB_FUNC_STATIC( OLE_INITIALIZE )
+       * static HB_FUNC( OLE_UNINITIALIZE ) => HB_FUNC_STATIC( OLE_UNINITIALIZE )
+
+   * hrbdll.bc
+     * force compilation in SimpLex flavor
+     + inclusion of cstruct.prg, win32ole.prg and traceprg.prg
+
+   * hrbdll.vc
+     + inclusion of cstruct.prg, win32ole.prg and traceprg.prg
+     + added ole32.lib abd oleaut32.lib to link script
 
 2002-06-18 04:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * source\compiler\genc.c

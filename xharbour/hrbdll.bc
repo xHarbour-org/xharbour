@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.4 2002/05/25 18:39:15 lculik Exp $
+# $Id: hrbdll.bc,v 1.5 2002/05/25 18:42:19 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -53,12 +53,8 @@ INCLUDE_DIR  = include
 #  ßßßßßßßßßßßßßßßßßß
 
 C_USR          = -tWM -DHB_FM_STATISTICS_OFF -D__WIN32__ -D__EXPORT__
-CLIBFLAGS      = $(C_USR) -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3
+CLIBFLAGS      = $(C_USR) -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3 -DSIMPLEX
 HARBOURFLAGS   = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /i$(INCLUDE_DIR) /q0 /w /es2 /n1 /gc0
-
-!if $(HB_LEX) == SIMPLEX
-   CLIBFLAGS = $(CLIBFLAGS) -DSIMPLEX
-!endif
 
 # ÚÄÄÄÄÄÄÄÄ¿
 # ³ output ³Û
@@ -348,17 +344,11 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\hvm.obj \
   $(OBJ_DIR)\tprint.obj \
   $(OBJ_DIR)\tprinter.obj \
-  $(OBJ_DIR)\fastitem.obj
-
-!if $(HB_LEX) == SIMPLEX
-    HARBOUR_DLL_OBJS = \
-       $(HARBOUR_DLL_OBJS) \
-       $(OBJ_DIR)\macroslx.obj
-!else
-    HARBOUR_DLL_OBJS = \
-       $(HARBOUR_DLL_OBJS) \
-       $(OBJ_DIR)\macrol.obj
-!endif
+  $(OBJ_DIR)\fastitem.obj \
+  $(OBJ_DIR)\macroslx.obj \
+  $(OBJ_DIR)\cstruct.obj \
+  $(OBJ_DIR)\win32ole.obj \
+  $(OBJ_DIR)\traceprg.obj
 
 # ÚÄÄÄÄÄÄÄÄÄ¿
 # ³ project ³Û
@@ -573,11 +563,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\runner.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\harbinit.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\macroy.obj            + >> hdll.tmp
-!if $(HB_LEX) == SIMPLEX
   echo. $(OBJ_DIR)\macroslx.obj          + >> hdll.tmp
-!else
-  echo. $(OBJ_DIR)\macrol.obj            + >> hdll.tmp
-!endif
   echo. $(OBJ_DIR)\macroa.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\macrob.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\macroc.obj            + >> hdll.tmp
@@ -1639,25 +1625,11 @@ $(OBJ_DIR)\msgzhgb.obj : $(LANG_DIR)\msgzhgb.c
 $(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
    bison --no-line -p hb_comp -d $** -o$@
 
-!if $(HB_LEX) == SIMPLEX
-   # Flex not needed in SimpLex build.
-!else
-$(OBJ_DIR)\macrol.c : $(MACRO_DIR)\macro.l
-   flex -Phb_comp -i -8 -o$@ $**
-!endif
-
 $(OBJ_DIR)\macroy.obj : $(OBJ_DIR)\macroy.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-!if $(HB_LEX) == SIMPLEX
 $(OBJ_DIR)\macroslx.obj : $(MACRO_DIR)\macroslx.c
    $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -o$@ $**
-!else
-$(OBJ_DIR)\macrol.obj : $(OBJ_DIR)\macrol.c
-   -echo. > $(OBJ_DIR)\unistd.h
-   $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -o$@ $**
-   -echo. $(OBJ_DIR)\unistd.h
-!endif
 
 $(OBJ_DIR)\macroa.obj : $(MACRO_DIR)\macroa.c
    $(CC) $(CLIBFLAGS) -o$@ $**
@@ -1758,3 +1730,20 @@ $(OBJ_DIR)\tprint.obj : $(RTL_DIR)\tprint.cpp
 $(OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.cpp
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\cstruct.c : $(RTL_DIR)\cstruct.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\cstruct.obj : $(OBJ_DIR)\cstruct.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\win32ole.c : $(RTL_DIR)\win32ole.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\win32ole.obj : $(OBJ_DIR)\win32ole.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\traceprg.obj : $(OBJ_DIR)\traceprg.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
