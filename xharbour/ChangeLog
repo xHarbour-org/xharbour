@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3272 2004/08/04 20:57:42 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3273 2004/08/04 23:25:09 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-04 16:50 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbclass.ch
+    * Corrected EXTEND ... WITH DATA to use regular match marker and smart stringify
 
 2004-08-05 01:20 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * config/rules.cf

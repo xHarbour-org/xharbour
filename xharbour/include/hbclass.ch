@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.20 2004/07/28 22:28:34 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.21 2004/07/29 23:55:59 ronpinkas Exp $
  */
 
 /*
@@ -173,8 +173,8 @@ DECLARE HBClass ;
 #xcommand OVERRIDE METHOD <!Message!> [IN] CLASS <!Class!> WITH [METHOD] <!Method!> [SCOPE <Scope>] => ;
   <Class>(); __clsModMsg( __ClsGetHandleFromName( #<Class> ), #<Message>, @<Method>(), IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ) )
 
-#xcommand EXTEND CLASS <!Class!> WITH <data: DATA, VAR> <!Data!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
-  <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), #<Data>, __cls_IncData( __ClsGetHandleFromName( #<Class> ) ), HB_OO_MSG_PROPERTY, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+#xcommand EXTEND CLASS <!Class!> WITH <data: DATA, VAR> <Data> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), <(Data)>, __cls_IncData( __ClsGetHandleFromName( #<Class> ) ), HB_OO_MSG_PROPERTY, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
 
 #xcommand EXTEND CLASS <!Class!> WITH METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
   <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), #<Method>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
@@ -192,8 +192,8 @@ DECLARE HBClass ;
 #xcommand OVERRIDE METHOD <Message> [IN] CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH [METHOD] <!Method!> [SCOPE <Scope>] => ;
   _<type>(); __clsModMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, @<Method>(), IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ) )
 
-#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH <data: DATA, VAR> <!Data!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
-  _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), #<Data>, __cls_IncData( __ClsGetHandleFromName( #<type> ) ), HB_OO_MSG_PROPERTY, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH <data: DATA, VAR> <Data> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), <(Data)>, __cls_IncData( __ClsGetHandleFromName( #<type> ) ), HB_OO_MSG_PROPERTY, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
 
 #xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
   _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), #<Method>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
