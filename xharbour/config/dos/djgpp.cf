@@ -1,5 +1,5 @@
 #
-# $Id: djgpp.cf,v 1.7 2004/01/05 18:59:27 lf_sfnet Exp $
+# $Id: djgpp.cf,v 1.8 2004/03/04 00:27:39 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -16,10 +16,9 @@ CPPFLAGS = -I. -I$(TOP)include -Iinclude
 ifeq ($(HB_LIB_COMPILE),)
     CPPFLAGS += -I$(HB_INC_COMPILE)
 endif
+CFLAGS = -Wall -W
 ifeq ($(HB_LEX),SIMPLEX)
-CFLAGS = -Wall -DSIMPLEX
-else
-CFLAGS = -Wall
+CFLAGS += -DSIMPLEX
 endif
 
 LD = gcc
