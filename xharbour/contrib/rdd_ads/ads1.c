@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.32 2004/03/02 00:28:18 druzus Exp $
+ * $Id: ads1.c,v 1.33 2004/03/21 15:55:04 druzus Exp $
  */
 
 /*
@@ -2398,8 +2398,15 @@ static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
       }
       if( ulRetVal != AE_SUCCESS )
       {
-         pArea->hOrdCurrent = 0;
-         return FAILURE;
+         if ( pArea->iFileType == ADS_NTX )
+         {
+           phIndex = pArea->hOrdCurrent;  /* ntx compatibilty: keep current order if failed */
+         }
+         else
+         {
+            pArea->hOrdCurrent = 0;
+            return FAILURE;
+         }
       }
       pArea->hOrdCurrent = phIndex;
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2623 2004/03/21 21:48:48 druzus Exp $
+ * $Id: ChangeLog,v 1.2624 2004/03/22 03:15:59 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-22 1:35 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+      Added fix from Luis Krause Mantilla for adsOrderListFocus().
+      NTX and CDX behave differently when an invalid index/tag is requested.
+      CDX sets the order to 0, but NTX leaves it to the current order, if any.
+      This change makes ADSNTX behave in compatibility mode with
+      Clipper's (And xHarbour's) NTX RDD
 
 2004-03-21 19:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.slx
