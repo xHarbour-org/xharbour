@@ -1,3 +1,11 @@
+******************************************************************
+* parseini.prg
+*
+* $Id$
+* Test for Ini file reading/writing
+*
+* Giancarlo Niccolai
+*
 
 PROCEDURE Main( cName )
    LOCAL aIni, aSect
@@ -34,6 +42,18 @@ PROCEDURE Main( cName )
             ? cKey + " = " + aSect[ cKey ]
          NEXT
       NEXT
+   ENDIF
+   
+   ?
+   ? "Adding section 'Added', with key NEW = new"
+   aIni[ "Added" ] := TAssociativeArray()
+   aIni[ "Added" ][ "NEW" ] := "new"
+   
+   ? "Writing output to parseini_out.ini"
+   IF HB_WriteIni( "parseini_out.ini", aIni, "#Generated file; don't touch", "#End of file")
+      ? "File written"
+   ELSE
+      ? "Can't write file"
    ENDIF
    ?
    ? "Press any key to end"

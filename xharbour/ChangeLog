@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.854 2003/03/18 22:12:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.855 2003/03/19 08:49:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-19 14:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/set.ch
+    ! Added _SET_TRACEFILE and _SET_TRACESTACK, and changed the
+      values of _SET_FILECASE & followings accordingly with 
+      hbset.h. Numbers were not matching anymore and _SET_TRACEFILE
+      and _SET_TRACESTACK were missing.
+      
+      A MAKE CLEAN IS IN ORDER
+      
+  * source/rtl/traceprg.prg
+    ! Now including set.ch (How did it compile before?)
+
+  * source/rtl/regex.c
+    ! Fixed a typo: used "|" instead of "||" in a test. Casually,
+      result was the same.
+  
+  * source/rtl/hbreadini.prg
+    + Added HB_WriteIni( cFile, aaIni [, cBeginComment [, cEndComment]]) 
+            --> lResult
+      If cFile is a string the file is created, while if it is a number 
+      (a file handler) an already open file is used. This is useful
+      for writing by-hand some part of the config file and then pass
+      the resto to HB_WriteIni()
+  
+  * tests/parseini.ini
+  * tests/parseini.prg
+    + Added test for HB_WriteIni()
 
 2003-03-19 00:48 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbset.h

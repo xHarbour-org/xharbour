@@ -6522,7 +6522,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                str += aMatches[ 0 ].rm_eo;
                iCount++;
             }
-            while ( *str && (iMax == 0 | iMax > iCount) &&
+            while ( *str && (iMax == 0 || iMax > iCount) &&
                   regexec( pReg, str, 1, aMatches, EFlags ) == 0 );
 
             /* last match must be done also in case that str is empty; this would

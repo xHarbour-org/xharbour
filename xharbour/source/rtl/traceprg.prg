@@ -1,5 +1,5 @@
 /*
- * $Id: traceprg.prg,v 1.5 2003/01/02 23:46:27 ronpinkas Exp $
+ * $Id: traceprg.prg,v 1.6 2003/03/19 08:50:12 ronpinkas Exp $
  */
 
 /*
@@ -48,6 +48,8 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#include "set.ch"
 
 #DEFINE  CRLF HB_OsNewLine()
 
