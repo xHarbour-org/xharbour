@@ -1,5 +1,5 @@
 /*
- * $Id: msgpt.c,v 1.13 2002/01/07 02:47:30 lculik Exp $
+ * $Id: msgpt.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -78,7 +78,7 @@ static HB_LANG s_lang =
       "Portugues",                 /* Name (in native language) */
       "PT",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.13 $ $Date: 2002/01/07 02:47:30 $",         /* Version */
+      "$Revision: 1.2 $ $Date: 2002/01/19 14:15:45 $",         /* Version */
 
       /* Month names */
 
@@ -202,7 +202,7 @@ static HB_LANG s_lang =
       "Memory buffer overflow",
       "hb_xgrab requisitou para alocar zero bytes",
       "hb_xrealloc requisitou para redimensiorar para zero byte",
-      "hb_xalloc requisitou para alocar zero bytes"
+      "hb_xalloc requisitou para alocar zero bytes",
 
       /* Texts */
 
