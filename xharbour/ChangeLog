@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1814 2003/12/03 13:01:05 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.1815 2003/12/03 14:00:36 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-12-02 14:25 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+   *doc/en/print.txt
+     ! minor fix on Syntax section
 
 2003-12-03 14:55 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * xharbour/source/rtl/hboutdbg.c
@@ -63,7 +66,7 @@
   * source/vm/classes.c
     ! Added hash to deep initialization types for INIT clauses.
 
-2003-01-02 10:25 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-12-02 10:25 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * include/hbapifs.ch
     ! some arragemente on HB_FA_XX defines
   * source/rtl/direct.c
