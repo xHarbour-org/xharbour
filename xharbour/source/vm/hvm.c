@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.294 2003/12/07 00:10:07 jonnymind Exp $
+ * $Id: hvm.c,v 1.295 2003/12/11 10:59:27 toninhofwi Exp $
  */
 
 /*
@@ -3510,7 +3510,10 @@ static void hb_vmMult( void )
       double d2 = hb_vmPopDouble( &iDec2 );
       double d1 = hb_vmPopDouble( &iDec1 );
 
-      hb_vmPushNumType( d1 * d2, iDec1 + iDec2, iType1, iType2 );
+      if ( ( d1 * d2 ) == -0 )
+         hb_vmPushNumType( 0, iDec1 + iDec2, iType1, iType2 );
+      else
+         hb_vmPushNumType( d1 * d2, iDec1 + iDec2, iType1, iType2 );
    }
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMult" ) )
    {
