@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.prg,v 1.3 2004/06/19 10:30:00 modalsist Exp $
+ * $Id: dattime3.prg,v 1.4 2004/06/20 22:00:00 modalsist Exp $
  */
 
 /*
@@ -253,7 +253,7 @@ RETURN NIL
 
 STATIC FUNCTION hb_ShowTimeEvent( cIDName, lActiv, bCode, nTime )
 // supplementary showtime FUNCTION
-   Local nHD,nHPos
+   Local nHPos
 
    IF ValType( cIDName ) == "U" .AND. ValType( lActiv ) == "U"
       RETURN lHandle
@@ -267,14 +267,18 @@ STATIC FUNCTION hb_ShowTimeEvent( cIDName, lActiv, bCode, nTime )
       lActiv := .T.
    ENDIF
 
+
    IF cIDName <> "*"
       nHPos  := ASCan( aH_Timers, {|nI| nI[ 1 ] == cIDName } )
-    ELSE
+   ELSE
+
+      nHPos := 0
 
       IF ! lActiv
          HB_IdleDel( nHandle )
          lHandle := .F.
-       ELSE
+         nHandle := NIL
+      ELSE
          nHandle := HB_IdleAdd( {|| hb_ShowTime_Eval_Event( ) } )
          lHandle := .T.
       ENDIF
@@ -284,7 +288,7 @@ STATIC FUNCTION hb_ShowTimeEvent( cIDName, lActiv, bCode, nTime )
 
    IF ( nHPos == 0 .AND. ValType( lActiv ) == "L" )
       AAdd( aH_Timers, { cIDName, .T., bCode, nTime, lActiv, hb_ShowTimeProxExc(1)} )
-    ELSE
+   ELSE
 
       IF lActiv == .F.
          aH_Timers[ nHPos ][ 5 ] := .F.

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3096 2004/06/19 12:27:41 modalsist Exp $
+ * $Id: ChangeLog,v 1.3097 2004/06/20 22:16:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-20 22:12 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
+  * contrib/libct/dattime3.prg
+    ! Fixed showtime() function to show time newly after be disabled by calling showTime() 
+      without parameters. Bug reported by JoteR.
 
 2004-06-19 12:30 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
   * source/rtl/teditor.prg
