@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.24 2002/07/17 15:08:13 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.25 2002/08/11 05:03:16 ronpinkas Exp $
  */
 
 /*
@@ -2803,7 +2803,7 @@ static BOOL TestOptional( char *ptr1, char *ptr2 )
 
   //printf( "nbr: %i ptr2: >%s<\n", nbr, ptr2 );
 
-  return ( ! flagname ); //&& ( nbr <= 1 );
+  return ( ! flagname ) && ( nbr <= 1 );
 }
 
 static BOOL CheckOptional( char * ptrmp, char * ptri, char * ptro, int * lenres, BOOL com_or_tra, BOOL com_or_xcom )
@@ -3077,21 +3077,38 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
             {
                if( s_Repeate )
                {
+                  char cMarkerCount = '0', cGroupCount = '0';
+
                   lennew = ptr2-ptr-1;
 
-                  // Flagging 1st Marker in Repeatable group as Instanciated.
+                  // Flagging all Markers in Repeatable group as Instanciated.
                   for( i=0; i < lennew; i++ )
                   {
                      if( ptr[i] == '\1' )
                      {
-                        ptr[ i + 3 ] = '1';
+                        if( ptr[i + 1] == exppatt[1] )
+                        {
+                            ptr[ i + 3 ]++;
 
-                        #ifdef DEBUG_MARKERS
-                           printf( "   Marked %s as instanciated\n", ptr + i );
-                        #endif
+                            #ifdef DEBUG_MARKERS
+                               printf( "   Marked %s as instanciated\n", ptr + i );
+                            #endif
 
-                        break;
+                            cMarkerCount = ptr[ i + 3 ];
+                        }
+                        else
+                        {
+                           cGroupCount = cGroupCount > ptr[ i + 3 ] ? cGroupCount : ptr[ i + 3 ];
+                        }
                      }
+                  }
+
+                  if( cMarkerCount <= cGroupCount )
+                  {
+                      #ifdef DEBUG_MARKERS
+                         printf( "   Already instanciated %i times with %i values\n", cGroupCount - '0', cMarkerCount - '0' );
+                      #endif
+                      goto Instanciated;
                   }
 
                   memcpy( expnew, ptr+1, lennew );
@@ -3109,7 +3126,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
                   if( kolmarkers )
                   {
-                     s_groupchar = (char) ( (unsigned int)s_groupchar + 1 );
+                     s_groupchar++;
 
                      #ifdef DEBUG_MARKERS
                         printf( "   Increased to %c;", s_groupchar );
@@ -3138,6 +3155,9 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                   #ifdef DEBUG_MARKERS
                      printf( "   Instanciated Repeatable Group: %s\n", expnew );
                   #endif
+
+                Instanciated :
+
                }
                else
                {
@@ -3164,12 +3184,12 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                   {
                      lennew = ptr2 - ptr - 1;
 
-                     // Scanning 1st Marker in Repeatable group to check if Instanciated.
+                     // Scanning all Markers in Repeatable group to check if Instanciated.
                      for( i = 0; i < lennew; i++ )
                      {
                         if( ptr[i] == '\1' )
                         {
-                           if( ptr[ i + 3 ] == '1' )
+                           if( ptr[ i + 3 ] > '0' )
                            {
                               #ifdef DEBUG_MARKERS
                                  printf( "   '%s' Already instanciated\n", ptr + i );
@@ -3178,11 +3198,10 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                               isdvig = ptr2 - ptro;
                               rezs = TRUE;
                            }
-                           break;
                         }
                      }
 
-                     // Maybe the group was instanciated already and sich this is Non Repeatable we don't need to instanciate again.
+                     // Maybe the group was instanciated already and since this is Non Repeatable we don't need to instanciate again.
                      if( ! rezs )
                      {
                         // Flagging all markers in Repeatable group as Instanciated.
@@ -3190,7 +3209,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                         {
                            if( ptr[i] == '\1' )
                            {
-                              ptr[ i + 3 ] = '1';
+                              ptr[ i + 3 ]++;// = '1';
 
                               #ifdef DEBUG_MARKERS
                                  printf( "   Marked %s as instanciated\n", ptr + i );
