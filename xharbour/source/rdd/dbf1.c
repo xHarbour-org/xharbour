@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.14 2002/08/08 03:44:27 horacioroldan Exp $
+ * $Id: dbf1.c,v 1.15 2002/08/08 19:36:07 ronpinkas Exp $
  */
 
 /*
@@ -348,6 +348,13 @@ static ERRCODE hb_dbfLockRecord( DBFAREAP pArea, ULONG ulRecNo, BOOL * pResult,
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfLockRecord(%p, %lu, %p, %i)", pArea, ulRecNo,
             pResult, (int) bExclusive));
+
+
+   if( pArea->fFLocked )
+   {
+      * pResult = TRUE;
+      return SUCCESS;
+   }
 
    if( pArea->lpdbPendingRel )
       SELF_FORCEREL( ( AREAP ) pArea );
