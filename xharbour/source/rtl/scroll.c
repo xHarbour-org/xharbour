@@ -1,5 +1,5 @@
 /*
- * $Id: scroll.c,v 1.3 2003/09/22 19:03:32 ronpinkas Exp $
+ * $Id: scroll.c,v 1.4 2003/09/22 19:15:40 ronpinkas Exp $
  */
 
 /*
@@ -109,7 +109,7 @@ HB_FUNC( SCROLL )
    if( pRight )
    {
       iRight = hb_parni( 4 );
-      if( iRight <= iLeft )
+      if( iRight < iLeft )
       {
          return;
       }
