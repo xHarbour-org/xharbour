@@ -1,5 +1,5 @@
 /*
- * $Id: memoline.c,v 1.11 2004/04/23 03:32:54 lculik Exp $
+ * $Id: memoline.c,v 1.12 2004/08/09 11:15:18 vouchcac Exp $
  */
 
 /*
@@ -160,7 +160,12 @@ HB_FUNC( MEMOLINE )
       ulLineEnd = ( ulPos == 0 ) ? 0 : ( ulPos - 1 );
    }
 
-   if( ulPos < ulLen || (ulLineNumber == ulLines && ulLineEnd >= ulLineBegin) )
+   // Clipper returns empty line if last line of memo is terminated by CRLF pair
+   // xHarbour was returning NULL as per line below.   ( Pritpal 12 Aug 2004 )
+   //
+   // if( ulPos < ulLen || (ulLineNumber == ulLines && ulLineEnd >= ulLineBegin) )
+   //
+   if( ulPos <= ulLen || ( ulLineNumber == ulLines && ulLineEnd >= ulLineBegin ) )
    {
       ULONG ulSpAdded = 0;
       char * pszLine = ( char * ) hb_xgrab( ulLineLength + 1 );

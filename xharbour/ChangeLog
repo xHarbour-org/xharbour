@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3302 2004/08/12 01:14:24 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3303 2004/08/12 14:13:39 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-12 21:40 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/memoline.c
+    Changed if( ulPos < ulLen || (ulLineNumber == ulLines && ulLineEnd >= ulLineBegin) )
+    to      if( ulPos <= ulLen || ( ulLineNumber == ulLines && ulLineEnd >= ulLineBegin ) )
+
+    Clipper returns empty line if last line of memo is terminated by CRLF pair
+    xHarbour was returning NULL.
 
 2004-08-12 19:45 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/tbrowse.prg
