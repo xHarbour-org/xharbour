@@ -128,7 +128,9 @@ PROCEDURE Main()
    LOCAL kf6     := SetKey( K_F6, {|| Wvt_Minimize() } )
    LOCAL kf7     := SetKey( K_F7, {|| WvtPartialScreen() } )
    LOCAL kf8     := SetKey( K_F8, {|| WvtLines() } )
-         
+   LOCAL kf9     := SetKey( K_F9, {|| Wvt_ChooseFont() } )
+   LOCAL kf10    := SetKey( K_F10,{|| Wvt_ChooseColor() } )
+            
    SET DATE BRITISH
 
    dDate := ctod( '04/01/04' )
@@ -136,6 +138,10 @@ PROCEDURE Main()
    Wvt_SetFont( 'Courier New', 18 )
    Wvt_SetMouseMove( .t. )
    
+   //  Force mouse pointer right below the xHarbour label
+   //
+	Wvt_SetMousePos( 2,40 )
+	   
    aAdd( aBlocks, {|| Wvt_SetIcon( 'vr_1.ico' ) } )
    aAdd( aBlocks, {|| Wvt_SetTitle( 'Vouch' ) } )
    aAdd( aBlocks, {|| Wvt_DrawLabel( 1,40, cLabel,6,, rgb(255,255,255), rgb(198,198,198), 'Arial', 26, , , , , .t., .t. ) } )
@@ -230,9 +236,10 @@ PROCEDURE Main()
    @ 12, nColGet SAY '<' + PadC( 'Address', 33 ) + '>'
    @ 16, 61      SAY '< Salary >'
 
-   @  7, nColGet GET dDate WHEN  {|| Wvt_DrawLabel( nMaxRows,60, 'Date must be Valid',6,, 0, rgb(198,198,198), 'Arial', 18, , 900 ), .t. } ;
-                           VALID {|| Wvt_DrawLabel( nMaxRows,60, space(37),6,, 0, rgb(198,198,198), 'Arial', 18, , 900 ), .t. }
-   @ 10, nColGet GET cName VALID ( VouChoice() < 7 )
+   @  7, nColGet GET dDate WHEN  DispStatusMsg( 'Date must be Valid' );
+                           VALID ClearStatusMsg()
+   @ 10, nColGet GET cName WHEN  DispStatusMsg( 'Must be one of the list!' );
+                           VALID ( VouChoice() < 7 .and. ClearStatusMsg() )
    @ 13, nColGet GET cAdd1
    @ 15, nColGet GET cAdd2
    @ 17, nColGet GET cAdd3
@@ -395,7 +402,8 @@ FUNCTION Wvt_Mouse( nKey, nRow, nCol )
    LOCAL nObj
    
    STATIC nLastObj := 0
-   
+   STATIC nLastKey := 0
+      
 	if ( nLen := len( aObjects ) ) == 0
 		return nil
 	endif
@@ -421,7 +429,7 @@ FUNCTION Wvt_Mouse( nKey, nRow, nCol )
    nObj := ascan( aObjects, {|e_| e_[ WVT_OBJ_ROW   ] <= nRow .and. ;
                                   e_[ WVT_OBJ_ROWTO ] >= nRow .and. ;
                                   e_[ WVT_OBJ_COL   ] <= nCol .and. ;
-                                  e_[ WVT_OBJ_COLTO ] >= nCol } )
+                                  e_[ WVT_OBJ_COLTO ] >= nCol     } )
 	if nObj == 0
 		if nLastObj > 0
 		   aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_DISP
@@ -431,9 +439,12 @@ FUNCTION Wvt_Mouse( nKey, nRow, nCol )
 	   return nil
 	endif
 
-   if nLastObj <> nObj
-      nLastObj := nObj
-	endif
+   if nLastObj == nObj .and. nLastKey == nKey
+   	return nil
+   endif
+   
+   nLastObj := nObj
+	nLastKey := nKey
 		   
 	DO CASE
 	CASE nKey == K_MOUSEMOVE
@@ -802,16 +813,6 @@ function WvtLines()
    @ 15,8 Say 'D'
    @ 16,9 Say 'E'
 
-/*
-   Wvt_DrawLine( 
-   Wvt_DrawLine( 
-   Wvt_DrawLine( 
-   Wvt_DrawLine( 
-   Wvt_DrawLine( 
-   Wvt_DrawLine( 
-   Wvt_DrawLine( 1,nCols,nRows,nCols, WVT_LINE_VERT ) 
-*/
-
 	do while ( inkey(0) <> 27 )
 	enddo
 
@@ -824,6 +825,26 @@ function WvtLines()
    WvtSetObjects( aObjects )
 
 RETURN nil
+
+//-------------------------------------------------------------------//
+
+FUNCTION DispStatusMsg( cMsg )
+
+Wvt_DrawLabel( MaxRow(), 60, cMsg, 6, , 0, rgb(198,198,198), 'Arial', 18, , 900 )
+
+RETURN .t.
+
+//-------------------------------------------------------------------//
+
+FUNCTION ClearStatusMsg()
+   LOCAL nRow := Row()
+   LOCAL nCol := Col()
+   
+   DispOutAt( MaxRow(), 42, space( 37 ), 'W/W' )
+   
+   SetPos( nRow, nCol )
+   
+RETURN .t.
 
 //-------------------------------------------------------------------//
 

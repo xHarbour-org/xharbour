@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.13 2004/01/15 16:52:22 lf_sfnet Exp $
+ * $Id: hbgtwvt.h,v 1.14 2004/01/19 20:50:22 vouchcac Exp $
  */
 
 /*
@@ -82,6 +82,7 @@
 
 #include <winuser.h>
 #include <commctrl.h>
+#include <commdlg.h>
 #if defined(__MINGW32__) || defined(__WATCOMC__) || defined(_MSC_VER)
    #include <ole2.h>
    #include <ocidl.h>
