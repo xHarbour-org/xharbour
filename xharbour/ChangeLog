@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.728 2003/02/17 04:18:03 andijahja Exp $
+ * $Id: ChangeLog,v 1.729 2003/02/18 01:32:56 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-18 14:00 UTC+0100 Ian Anderson <ianderson@procon-online.de>
+    * added code to configure() so that it handles headers and
+      footers the same way as clipper 5.2e when the separator char for
+      header and footer are set, but there is no header or footer
+      text in any of the columns. Previously in this case the header
+      or footer was not drawn. Now it is.
 
 2003-02-17 22:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/mysql/mysql.prg
