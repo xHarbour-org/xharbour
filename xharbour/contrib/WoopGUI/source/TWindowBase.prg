@@ -290,7 +290,7 @@ METHOD Create() CLASS TWindowBase
    soInCreation := Self
    WG_DebugTrace( "TWindowBase:Create() - Save this object", "Self", Self )
    ::nHandle := CreateWindowEx( ::nExStyle, ::cClassName, ::cName, ::nStyle, ;
-                                ::nTop, ::nLeft, ::nWidth, ::nHeight, ;
+                                ::nLeft,::nTop, ::nWidth, ::nHeight, ;
                                 ::nParent, ::nMenu, ::nApplication, ::pStruct )
    // Clean var
    soInCreation := NIL
