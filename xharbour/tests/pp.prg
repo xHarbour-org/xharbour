@@ -3347,7 +3347,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                aIns( aPendingLines, nPosition )
                aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
 
-               IF Left( sLine, 1 ) == '#'
+               IF Left( sLine, 1 ) == '#' .AND. ! bCompile
                   aAdd( asOutLines, aPendingLines[ nPosition ] )
                ENDIF
 
@@ -3356,7 +3356,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             ENDDO
 
             IF nPosition == 0
-               IF Left( sLine, 1 ) == '#'
+               IF Left( sLine, 1 ) == '#' .AND. ! bCompile
                   aAdd( asOutLines, sLine )
                ENDIF
 
@@ -3416,7 +3416,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                aIns( aPendingLines, nPosition )
                aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
 
-               IF Left( aPendingLines[ nPosition ], 1 ) == '#'
+               IF Left( aPendingLines[ nPosition ], 1 ) == '#' .AND. ! bCompile
                   aAdd( asOutLines, aPendingLines[ nPosition ] )
                ENDIF
 
@@ -3425,7 +3425,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             ENDDO
 
             IF nPosition == 0
-               IF Left( sLine, 1 ) == '#'
+               IF Left( sLine, 1 ) == '#' .AND. ! bCompile
                   aAdd( asOutLines, sLine )
                ENDIF
 
@@ -3482,7 +3482,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             aIns( aPendingLines, nPosition )
             aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
 
-            IF Left( aPendingLines[ nPosition ], 1 ) == '#'
+            IF Left( aPendingLines[ nPosition ], 1 ) == '#' .AND. ! bCompile
                aAdd( asOutLines, aPendingLines[ nPosition ] )
             ENDIF
 
@@ -3491,7 +3491,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
          ENDDO
 
          IF nPosition == 0
-            IF Left( sLine, 1 ) == '#'
+            IF Left( sLine, 1 ) == '#' .AND. ! bCompile
                aAdd( asOutLines, sLine )
             ENDIF
 
