@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3028 2004/06/04 19:23:42 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3029 2004/06/04 19:25:55 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-05 15:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/include/hbgtwvt.h
+  * xharbour/include/wvtwin.ch
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/rtl/gtwvt/wvtcore.c
+  * xharbour/source/rtl/gtwvt/wvtutils.c
+    + Added a lot of GUI primitives usable with upcoming Wvt*Classes. 
+    * This commit does not change the core functionality of GtWvt in any way.
 
 2004-06-04 12:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c
