@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.77 2002/05/22 19:24:18 horacioroldan Exp $
+ * $Id: hvm.c,v 1.78 2002/06/13 22:46:05 ronpinkas Exp $
  */
 
 /*
@@ -1551,7 +1551,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
          {
             PHB_ITEM pTop = hb_stackItemFromTop( -1 );
             short iAdd = ( short ) ( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
-            double dNewVal;
+            double dNewVal = 0.0;
 
             w += 3;
 
@@ -3303,7 +3303,7 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
 
    dCurrent = hb_vmPopNumber();
 
-   if( dStep > 0 )           /* Positive loop. Use LESS */
+   if( dStep >= 0 )          /* Positive loop. Use LESS */
       hb_vmPushLogical( dCurrent <= dEnd );
    else if( dStep < 0 )      /* Negative loop. Use GREATER */
       hb_vmPushLogical( dCurrent >= dEnd );
@@ -4146,10 +4146,10 @@ void hb_vmSend( USHORT uiParams )
    PHB_FUNC       pFunc = NULL;
    BOOL           bDebugPrevState;
    ULONG          ulClock = 0;
-   void           *pMethod;
+   void           *pMethod = NULL;
    BOOL           bProfiler = hb_bProfiler; /* because profiler state may change */
-   PHB_BASEARRAY  pSelfBase;
-   BOOL           lPopSuper;
+   PHB_BASEARRAY  pSelfBase = NULL;
+   BOOL           lPopSuper = FALSE;
    int            iPresetBase = s_iBaseLine;
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmSend(%hu)", uiParams ) );
