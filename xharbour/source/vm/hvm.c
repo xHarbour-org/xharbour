@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.72 2002/05/16 02:33:31 ronpinkas Exp $
+ * $Id: hvm.c,v 1.73 2002/05/18 08:55:49 ronpinkas Exp $
  */
 
 /*
@@ -5416,6 +5416,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
    USHORT uiModuleSymbols;
    int iPCodeVer = 0, iLen;
    char *sModule;
+   BOOL bFree = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pModuleSymbols));
 
@@ -5432,6 +5433,9 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
          }
          else
          {
+            sModule = hb_xgrab( 128 );
+            bFree = TRUE;
+
             for( ui = 0; ui < uiModuleSymbols; ui++ )
             {
                if( pModuleSymbols[ui].pFunPtr )
@@ -5456,7 +5460,13 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
       char sTemp[256];
 
       sprintf( sTemp, "HVM version %i is incompatible with '%s' PCODE version %i\n", HB_PCODE_VER, sModule, iPCodeVer );
+
       hb_errInternal( HB_EI_ERRUNRECOV, sTemp, NULL, NULL );
+   }
+
+   if( bFree )
+   {
+      hb_xfree( sModule );
    }
 
    pNewSymbols = ( PSYMBOLS ) hb_xgrab( sizeof( SYMBOLS ) );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.226 2002/05/20 20:41:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.227 2002/05/20 21:24:25 mafact Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2002-05-20 15:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Fixed minor bug in hb_vmProcessSymbols() where sModule was NOT allocated.
 
 2002-05-20 23:20 UTC+0100 J.lefebvre (Mafact) <jfl@mafact.com>
  * source/compiler/hbusage.c
