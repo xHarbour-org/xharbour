@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.237 2002/05/22 20:25:10 map Exp $
+ * $Id: ChangeLog,v 1.238 2002/05/22 21:44:41 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-22 17:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/alert.prg
+    ! Fixed to autowarp if message is longer than 58 characters long (like Clipper).
+      /* Long Error Messages can finally display correctly! */
+
+  * source/vm/arrayshb.c
+    + Added support for an optional 3rd paramater to aIns() representing the value to insert.
+      /* For the longest time I was frustrated with Clipper only inserting a NIL */
+
+  * include/hbver.h
+    * Updated ChangeLog entries
+      /* I seriously hope this is the last time for Build 73. */
 
 2002-05-22 18:39 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
   * tests/test.dbf

@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.4 2002/01/31 05:08:31 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.5 2002/03/06 06:21:14 ronpinkas Exp $
  */
 
 /*
@@ -182,7 +182,16 @@ HB_FUNC( AINS )
    if( pArray )
    {
       if( ISNUM( 2 ) )
+      {
          hb_arrayIns( pArray, hb_parnl( 2 ) );
+      }
+
+    #ifndef HB_C52_STRICT
+      if( hb_pcount() >= 3 )
+      {
+         hb_arraySet( pArray, hb_parnl( 2 ), hb_param( 3, HB_IT_ANY ) );
+      }
+    #endif
 
       hb_itemCopy( &hb_stack.Return, pArray ); /* AIns() returns the array itself */
    }
