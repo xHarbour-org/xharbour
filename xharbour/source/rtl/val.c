@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.9 2004/02/09 06:30:17 walito Exp $
+ * $Id: val.c,v 1.10 2004/02/10 02:02:12 druzus Exp $
  */
 
 /*
@@ -49,7 +49,6 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
 #include <math.h>
 #include <ctype.h>
 
@@ -186,6 +185,7 @@ HB_FUNC( VAL )
 {
    PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
 
+
    if( pText )
    {
       char * szText = hb_itemGetCPtr( pText );
@@ -213,11 +213,14 @@ HB_FUNC( VAL )
 
          lValue = hb_strValInt( szText, &iOverflow );
 
+#ifndef _MSC_VER
          if( !iOverflow )
          {
             hb_retnintlen( lValue, iLen );
             return;
          }
+#endif
+
       }
 
       {
@@ -234,7 +237,24 @@ HB_FUNC( VAL )
             iWidth++;
          }
 
-         hb_retnlen( dValue, iWidth, iDec );
+#ifdef _MSC_VER
+         if( iWidth == 1 && szText[ 0 ] == 0 )
+         {
+            iWidth = 10;
+         }
+
+         if ( iLen == 1 && szText[ 0 ] == '-' )
+         {
+            iWidth = 1;
+         }
+
+         if( bInteger )
+         {
+            hb_retnlen( dValue, iWidth, 0 );
+         }
+         else
+#endif
+            hb_retnlen( dValue, iWidth, iDec );
       }
    }
    else

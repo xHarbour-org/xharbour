@@ -1,5 +1,5 @@
 /*
- * $Id: rt_str.prg,v 1.3 2003/07/13 22:21:26 andijahja Exp $
+ * $Id: rt_str.prg,v 1.4 2003/12/18 21:12:44 ronpinkas Exp $
  */
 
 /*
@@ -62,7 +62,9 @@ FUNCTION Main_STR()
    TEST_LINE( Val( NIL )                      , "E BASE 1098 Argument error VAL A:1:U:NIL F:S" )
    TEST_LINE( Val( 10 )                       , "E BASE 1098 Argument error VAL A:1:N:10 F:S"  )
 
-   TEST_LINE( Str(Val(""))                    , "         0"                           )
+   // This line already exist in rt_math line 67.
+   // TEST_LINE( Str(Val(""))                    , "         0"                           )
+
    TEST_LINE( Str(Val(" "))                   , "0"                                    )
    TEST_LINE( Str(Val("-"))                   , "0"                                    )
    TEST_LINE( Str(Val("+"))                   , "0"                                    )
