@@ -1,6 +1,7 @@
 As it stands at this point, xHarbour offers many syntax extensions over Harbour
 and Clipper, including:
 
+TODO: Describe Portable Service, Logging, Exception Handling etc.
 
 OOP Macros:
 -----------

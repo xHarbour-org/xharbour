@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.72 2004/03/16 01:42:44 andijahja Exp $
+ * $Id: harbour.c,v 1.73 2004/03/16 02:40:26 andijahja Exp $
  */
 
 /*
@@ -983,7 +983,7 @@ void hb_compGenStaticName( char *szVarName )
       PFUNCTION pFunc;
       BYTE * pBuffer;
       int iVar;
-      
+
       if( ! hb_comp_bStartProc && hb_comp_functions.iCount <= 1 )
       {
          /* Variable declaration is outside of function/procedure body.
@@ -995,12 +995,12 @@ void hb_compGenStaticName( char *szVarName )
       pFunc = hb_comp_functions.pLast;
       pBuffer = ( BYTE * ) hb_xgrab( strlen( szVarName ) + 5 );
       iVar = hb_compStaticGetPos( szVarName, pFunc );
-      
+
       pBuffer[0] = HB_P_STATICNAME;
       pBuffer[1] = bGlobal;
       pBuffer[2] = HB_LOBYTE( iVar );
       pBuffer[3] = HB_HIBYTE( iVar );
-      
+
       memcpy( ( BYTE * ) ( & ( pBuffer[4] ) ), szVarName, strlen( szVarName ) + 1 );
 
       hb_compGenPCodeN( pBuffer, strlen( szVarName ) + 5 , 0 );
@@ -3530,39 +3530,25 @@ void hb_compGenPushAliasedVar( char * szVarName,
          else
          {
             int iCmp = strncmp( szAlias, "MEMVAR", 4 );
+
             if( iCmp == 0 )
+            {
                iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
+            }
+
             if( iCmp == 0 )
             {  /* MEMVAR-> or MEMVA-> or MEMV-> */
-               // AJ
-               if( hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast ) > 0 )
-               {
-                  hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
-               }
-               else
-               {
-                  // Look in Public symbol table
-                  USHORT wPos;
-                  PCOMSYMBOL pSym = hb_compSymbolFind( szVarName, &wPos );
-
-                  if( pSym )
-                  {
-                     hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
-                  }
-                  else
-                  {
-                     hb_comp_AmbiguousVar = TRUE;
-                     hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_AMBIGUOUS_VAR, szVarName, NULL );
-                  }
-               }
+               hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
             }
             else
             {  /* field variable */
                iCmp = strncmp( szAlias, "FIELD", 4 );
+
                if( iCmp == 0 )
                {
                   iCmp = strncmp( szAlias, "FIELD", strlen( szAlias ) );
                }
+
                if( iCmp == 0 )
                {  /* FIELD-> */
                   hb_compGenVarPCode( HB_P_PUSHFIELD, szVarName );

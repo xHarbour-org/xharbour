@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2585 2004/03/16 17:38:15 mlombardo Exp $
+ * $Id: ChangeLog,v 1.2586 2004/03/16 21:31:35 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-03-16 16:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * xdiff.txt
+    + Added TODO comment, about Portable Service, Logging, Exception Handling etc.
+      /* Giancarlo, can you please review? */
+
+  * source/compiler/harbour.c
+    - Reverted Andi'2 2 latest commits, which caused serious compilation bugs related to memvars
+      and undeclared variables.
+      /* I'll try add missing warning ASAP but possibly after 0.93 */
+
 2004-03-16 22:29 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rtl/Makefile
     ! removed dbdelim.prg not more nedded.
   * source/rtl/win32ole.prg
-    ! disabled LONG LONG support to build with mingw32 and openwatcom w32 
+    ! disabled LONG LONG support to build with mingw32 and openwatcom w32
   * source/rtl/filesys.c
     ! restored support for openwatcom w32
   * source/rdd/dbfcdx/dbfcdx1.c
