@@ -1,5 +1,5 @@
 /*
- * $Id: hbslex.c,v 1.1.1.1 2001/12/21 10:43:52 ronpinkas Exp $
+ * $Id: hbslex.c,v 1.2 2002/11/25 05:09:01 ronpinkas Exp $
  */
 
 #include "hbcomp.h"
@@ -13,7 +13,7 @@
 #define MAX_STREAM_TERMINATOR                       4 /* "])\n"   */
 #define MAX_STREAM_EXCLUSIONS                       2
 
-#define TOKEN_SIZE             HB_SYMBOL_NAME_LEN + 1
+#define TOKEN_SIZE             ( 65 > HB_SYMBOL_NAME_LEN + 1 ? 65 : HB_SYMBOL_NAME_LEN + 1 )
 
 #define YY_BUF_SIZE HB_PP_STR_SIZE
 

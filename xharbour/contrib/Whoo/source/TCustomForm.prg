@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.12 2002/12/24 17:26:08 what32 Exp $
+ * $Id: TCustomForm.prg,v 1.13 2003/01/09 08:21:41 what32 Exp $
  */
 
 /*
@@ -160,8 +160,8 @@ METHOD SetMenu( Value )
      NEXT
 
      IF ::FMenu != NIL
-        ::FMenu:WindowHandle := 0
         ::FMenu := Value
+        ::FMenu:WindowHandle := ::Handle
      ENDIF
 
      IF Value != NIL 
@@ -173,8 +173,8 @@ METHOD SetMenu( Value )
 //        IF ! ( ::Menu:AutoMerge .OR. ( ::FormStyle == fsMDIChild ))
 
            IF ::HandleAllocated
-              IF GetMenu( ::Handle ) != ::Menu:Handle
-                 SetMenu( ::Handle, ::Menu:Handle)
+              IF GetMenu( ::Handle ) != ::FMenu:Handle
+                 SetMenu( ::Handle, ::FMenu:Handle)
                  Value:WindowHandle := ::Handle
               ENDIF
            ENDIF

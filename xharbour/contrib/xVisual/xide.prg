@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.140 2003/01/27 09:34:30 what32 Exp $
+ * $Id: xide.prg,v 1.141 2003/01/27 11:54:22 what32 Exp $
  */
 
 /*
@@ -117,7 +117,6 @@ METHOD MainMenu() CLASS MainForm
    
          oSubItem := TMenuItem():Create( oItem )
          oSubItem:Caption := "Open"
-         oSubItem:FCommand:= 100
          oSubItem:AppendTo( oItem:Handle )
 
          oSubItem := TMenuItem():Create( oItem )
@@ -126,7 +125,7 @@ METHOD MainMenu() CLASS MainForm
 
          oSubItem := TMenuItem():Create( oItem )
          oSubItem:Caption := "Exit"
-         oSubItem:Action  := {|| MessageBox(,"MENU ACTION EXIT") }
+         oSubItem:Action  := {|| MainForm:Close() }
          oSubItem:AppendTo( oItem:Handle )
 
    ::SetMenu( oMenu )
