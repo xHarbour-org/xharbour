@@ -1,5 +1,5 @@
 /*
- * $Id: getsys.prg,v 1.10 2003/01/27 03:57:24 walito Exp $
+ * $Id: getsys.prg,v 1.11 2003/06/22 05:34:29 ronpinkas Exp $
  */
 
 /*
@@ -438,11 +438,14 @@ PROCEDURE TBApplyKey( oGet, oTB, GetList, nKey,  oGetMsg )
    ENDIF
    RETURN
 
+/* bdj notes: aGetList is not really used by this function.
+              should we remove it?
+ */
 FUNCTION HitTest( aGetList, MouseRow, MouseCol, aMsg ) // Removed STATIC
    LOCAL oGetList := __GetListActive()
 
    IF oGetList != NIL
-      RETURN oGetlist:Hittest( aGetList, MouseRow, MouseCol, aMsg ) // Removed STATIC
+      RETURN oGetlist:Hittest( MouseRow, MouseCol, aMsg ) // Removed STATIC
    ENDIF
    RETURN 0
 

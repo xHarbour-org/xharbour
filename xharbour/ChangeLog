@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3748 2005/01/15 17:09:58 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3748 2005/01/15 15:37:54 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-16 00:40 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/getsys.prg
+    ! HitTest() function passed wrong parameter to oGetList:HitTest().
+
+  * source/rtl/tget.prg
+    ! ::KillFocus() should assign ::TypeOut to .f.
+      (Clipper compatibility).
 
 2005-01-15 17:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/ct/dattime2.prg
@@ -56,10 +64,10 @@
   * makefile.wc
     * updated for datetime.c and commented !if $(HB_LEX) == SIMPLEX
       This operator doesn't recognised under OpenWatcom 1.3
-    
+
 2005-01-14 13:25 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   + contrib/gtwvw/samples/cbtest1.prg
-  + contrib/gtwvw/samples/cbtest2.prg
+  + contrib/gtwvw/samples/cbtest6.prg
     * Samples on how to use GTWVW combobox.
 
 2005-01-14 11:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>

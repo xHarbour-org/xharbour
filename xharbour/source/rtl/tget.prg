@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.92 2004/08/14 15:10:40 modalsist Exp $
+ * $Id: tget.prg,v 1.93 2004/12/30 07:23:59 kaddath Exp $
  */
 
 /*
@@ -623,6 +623,7 @@ METHOD KillFocus() CLASS Get
    ::Display()
    ::xVarGet  := NIL
 
+   ::typeout := .f.  /* Clipper compatible */
 
 return Self
 
