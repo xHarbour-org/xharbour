@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.14 2003/11/03 20:09:25 brianhays Exp $
+ * $Id: persist.prg,v 1.15 2003/12/23 00:44:11 peterrees Exp $
  */
 
 /*
@@ -99,10 +99,9 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
       nLine++
    ELSE
       cTextCopy := ""
-
+      nLines := MLCount( cObjectText, 254 )
       DO WHILE nLine <= nLines
-         cLine := LTrim( aLines[nLine] )
-
+         cLine := LTrim( MemoLine( cObjectText, 254, nLine ) )
          IF cLine[1] == ':'
             nAt := At( '=', cLine )
             IF nAt > 1
@@ -114,9 +113,9 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
 
          nLine++
       ENDDO
-
-      cObjectText := cTextCopy
-      nLine := 1
+      aLines := ArrayFromLFString(cTextCopy)
+      nLines := LEN(aLines)
+      nLine  := 1
    ENDIF
 
    DO WHILE nLine <= nLines
