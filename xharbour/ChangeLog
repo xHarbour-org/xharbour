@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1848 2003/12/11 10:51:07 lculik Exp $
+ * $Id: ChangeLog,v 1.1849 2003/12/11 10:59:26 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-11 16:40 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  + \contrib\what32\source\_winserial.c
+    Serial Communications WinApi Functions
+
+    HB_FUNC( BUILDCOMMDCB )
+    HB_FUNC( BUILDCOMMDCBANDTIMEOUTS )
+    HB_FUNC( CLEARCOMMBREAK )
+    HB_FUNC( CLEARCOMMERROR )
+    HB_FUNC( COMMCONFIGDIALOG )
+    HB_FUNC( ESCAPECOMMFUNCTION )
+    HB_FUNC( GETCOMMCONFIG )
+    HB_FUNC( GETCOMMMASK )
+    HB_FUNC( GETCOMMMODEMSTATUS )
+    HB_FUNC( GETCOMMPROPERTIES )
+    HB_FUNC( GETCOMMSTATE )
+    HB_FUNC( GETCOMMTIMEOUTS )
+    HB_FUNC( GETDEFAULTCOMMCONFIG )
+    HB_FUNC( PURGECOMM )
+    HB_FUNC( SETCOMMBREAK )
+    HB_FUNC( SETCOMMCONFIG )
+    HB_FUNC( SETCOMMMASK )
+    HB_FUNC( SETCOMMSTATE )
+    HB_FUNC( SETCOMMTIMEOUTS )
+    HB_FUNC( SETDEFAULTCOMMCONFIG )
+    HB_FUNC( SETUPCOMM )
+    HB_FUNC( TRANSMITCOMMCHAR )
+    HB_FUNC( WAITCOMMEVENT )
+
+    All functions are working perfectly except TransmitCommError(). I feel I am not handelling
+    the cast ( cChar ) properly or may be my tests are not upto the mark. 
+    Someone please correct it if I am wrong.
 
 2003-12-11 08:55 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/vm/hvm.c

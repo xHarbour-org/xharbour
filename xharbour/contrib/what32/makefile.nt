@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.9 2003/10/09 05:31:55 paultucker Exp $
+# $Id: makefile.nt,v 1.10 2003/10/10 13:33:52 paultucker Exp $
 #
 
 # File:     makefile.nt
@@ -117,6 +117,7 @@ WHAT32OBJ = \
     $(OBJ_DIR)\_winTree.obj \
     $(OBJ_DIR)\_winview.obj \
     $(OBJ_DIR)\_winwnd.obj \
+    $(OBJ_DIR)\_winserial.obj \
     \
     $(OBJ_DIR)\Debug.obj \
     $(OBJ_DIR)\ErrorSys.obj \

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.55 2003/12/02 14:40:14 patrickmast Exp $
+ * $Id: ChangeLog,v 1.56 2003/12/11 10:23:28 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,37 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-12-11 16:13 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  + _winserial.c
+    Serial Communications WinApi Functions
+
+    HB_FUNC( BUILDCOMMDCB )
+    HB_FUNC( BUILDCOMMDCBANDTIMEOUTS )
+    HB_FUNC( CLEARCOMMBREAK )
+    HB_FUNC( CLEARCOMMERROR )
+    HB_FUNC( COMMCONFIGDIALOG )
+    HB_FUNC( ESCAPECOMMFUNCTION )
+    HB_FUNC( GETCOMMCONFIG )
+    HB_FUNC( GETCOMMMASK )
+    HB_FUNC( GETCOMMMODEMSTATUS )
+    HB_FUNC( GETCOMMPROPERTIES )
+    HB_FUNC( GETCOMMSTATE )
+    HB_FUNC( GETCOMMTIMEOUTS )
+    HB_FUNC( GETDEFAULTCOMMCONFIG )
+    HB_FUNC( PURGECOMM )
+    HB_FUNC( SETCOMMBREAK )
+    HB_FUNC( SETCOMMCONFIG )
+    HB_FUNC( SETCOMMMASK )
+    HB_FUNC( SETCOMMSTATE )
+    HB_FUNC( SETCOMMTIMEOUTS )
+    HB_FUNC( SETDEFAULTCOMMCONFIG )
+    HB_FUNC( SETUPCOMM )
+    HB_FUNC( TRANSMITCOMMCHAR )
+    HB_FUNC( WAITCOMMEVENT )
+
+    All functions are working perfectly except TransmitCommError(). I feel i am not handelling
+    the cast ( cChar ) properly. Someone please correct it if I am wrong.
+  
 2003-12-11 14:02 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * source/_winsys.c
     * fixed HB_FUNC( READFILE )
