@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.ch,v 1.7 2004/05/07 15:33:31 lf_sfnet Exp $
+ * $Id: inkey.ch,v 1.8 2004/06/06 11:33:20 lf_sfnet Exp $
  */
 
 /*
@@ -177,6 +177,10 @@
 
 #define K_CTRL_SH_TAB           423   /* * Ctrl-Shift-Tab                */
 
+#ifdef HB_EXT_SHIFT_KEYS_CODES
+
+/* extended shift key codes, none in  Clipper */
+
 #define K_SH_LEFT               424   /* * Shift-Left                    */
 #define K_SH_UP                 425   /* * Shift-Up                      */
 #define K_SH_RIGHT              426   /* * Shift-Right                   */
@@ -191,6 +195,8 @@
 
 #define K_SH_RETURN             434   /* * Shift-Enter                   */
 #define K_SH_ENTER              434   /* * Shift-Enter                   */
+
+#endif
 
 #ifndef HB_CTRL_KEYS_CODES
 

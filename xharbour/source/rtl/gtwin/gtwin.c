@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.54 2004/05/07 17:36:58 lf_sfnet Exp $
+ * $Id: gtwin.c,v 1.55 2004/06/06 11:33:21 lf_sfnet Exp $
  */
 
 /*
@@ -72,7 +72,7 @@
 /* NOTE: User programs should never call this layer directly! */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_NAME	WIN
+#define HB_GT_NAME   WIN
 
 /* TODO: include any standard headers here */
 /* *********************************************************************** */
@@ -322,6 +322,8 @@ static const ClipKeyCode extKeyTab[CLIP_EXTKEY_COUNT] = {
     {K_F10,        K_ALT_F10,    K_CTRL_F10,  K_SH_F10}, /*  09 */
     {K_F11,        K_ALT_F11,    K_CTRL_F11,  K_SH_F11}, /*  10 */
     {K_F12,        K_ALT_F12,    K_CTRL_F12,  K_SH_F12}, /*  11 */
+
+  #ifdef HB_EXT_SHIFT_KEYS_CODES
     {K_UP,          K_ALT_UP,     K_CTRL_UP,   K_SH_UP}, /*  12 */
     {K_DOWN,      K_ALT_DOWN,   K_CTRL_DOWN, K_SH_DOWN}, /*  13 */
     {K_LEFT,      K_ALT_LEFT,   K_CTRL_LEFT, K_SH_LEFT}, /*  14 */
@@ -332,10 +334,29 @@ static const ClipKeyCode extKeyTab[CLIP_EXTKEY_COUNT] = {
     {K_END,        K_ALT_END,    K_CTRL_END,  K_SH_END}, /*  19 */
     {K_PGUP,      K_ALT_PGUP,   K_CTRL_PGUP, K_SH_PGUP}, /*  20 */
     {K_PGDN,      K_ALT_PGDN,   K_CTRL_PGDN, K_SH_PGDN}, /*  21 */
+  #else
+    {K_UP,          K_ALT_UP,     K_CTRL_UP,         0}, /*  12 */
+    {K_DOWN,      K_ALT_DOWN,   K_CTRL_DOWN,         0}, /*  13 */
+    {K_LEFT,      K_ALT_LEFT,   K_CTRL_LEFT,         0}, /*  14 */
+    {K_RIGHT,    K_ALT_RIGHT,  K_CTRL_RIGHT,         0}, /*  15 */
+    {K_INS,        K_ALT_INS,    K_CTRL_INS,         0}, /*  16 */
+    {K_DEL,        K_ALT_DEL,    K_CTRL_DEL,         0}, /*  17 */
+    {K_HOME,      K_ALT_HOME,   K_CTRL_HOME,         0}, /*  18 */
+    {K_END,        K_ALT_END,    K_CTRL_END,         0}, /*  19 */
+    {K_PGUP,      K_ALT_PGUP,   K_CTRL_PGUP,         0}, /*  20 */
+    {K_PGDN,      K_ALT_PGDN,   K_CTRL_PGDN,         0}, /*  21 */
+  #endif
+
     {K_BS,          K_ALT_BS,           127,         0}, /*  22 */
     {K_TAB,        K_ALT_TAB,    K_CTRL_TAB,  K_SH_TAB}, /*  23 */
     {K_ESC,        K_ALT_ESC,         K_ESC,         0}, /*  24 */
+
+  #ifdef HB_EXT_SHIFT_KEYS_CODES
     {K_ENTER,    K_ALT_ENTER,  K_CTRL_ENTER,K_SH_ENTER}, /*  25 */
+  #else
+    {K_ENTER,    K_ALT_ENTER,  K_CTRL_ENTER,         0}, /*  25 */
+  #endif
+
     {K_ENTER,   KP_ALT_ENTER,  K_CTRL_ENTER,         0}, /*  26 */
     {KP_CENTER,            0,     KP_CTRL_5,         0}, /*  27 */
     {0,                    0, K_CTRL_PRTSCR,         0}, /*  28 */
@@ -393,8 +414,8 @@ static void HB_GT_FUNC(gt_xSetCursorStyle( void ))
 #ifndef HB_GTWIN_NORMAL_CURSOR
         cci.dwSize = 25;  /* this was 12, but when used in full screen dos window
                              cursor state is erratic  - doesn't turn off, etc.
-			     09-10-2002 druzus: I hope now it's OK.
-			     09-14-2003 ptucker:Not really....
+              09-10-2002 druzus: I hope now it's OK.
+              09-14-2003 ptucker:Not really....
                                         Make your case before changing this */
 #else
         cci.dwSize = 12;
@@ -1425,7 +1446,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
           s_cNumIndex = 0;
        }
     }
-    
+
     /* Only process one keyboard event at a time. */
     if( s_wRepeated > 0 || s_cNumRead > s_cNumIndex )
     {
@@ -1440,17 +1461,17 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
              /* Could be used in the future */
              /* WORD wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode; */
              ch = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar;
-           
+
              if ( s_wRepeated == 0 )
-             { 
+             {
                 s_wRepeated = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wRepeatCount;
-             } 
+             }
              if ( s_wRepeated > 0 ) /* Might not be redundant */
              {
                 s_wRepeated--;
              }
 
-             // printf( "\n\nhb_gt_ReadKey(): dwState is %ld, wChar is %d, wKey is %d, ch is %d", dwState, wChar, wKey, ch ); 
+             // printf( "\n\nhb_gt_ReadKey(): dwState is %ld, wChar is %d, wKey is %d, ch is %d", dwState, wChar, wKey, ch );
 
              if ( wChar == 8 )
              {
@@ -1470,7 +1491,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
              }
              else if ( wChar >= 112 && wChar <= 123 ) // F1-F12
              {
-                extKey = wChar - 112; 
+                extKey = wChar - 112;
              }
              else if ( wChar == 33 )
              {
@@ -1529,10 +1550,10 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
              {
                 clipKey = &extKeyTab[ extKey ];
              }
-             
+
              if ( clipKey != NULL )
              {
-                if( ( dwState & SHIFT_PRESSED ) && ( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )               
+                if( ( dwState & SHIFT_PRESSED ) && ( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )
                 {
                    if( clipKey->key == K_TAB )
                    {
@@ -1550,12 +1571,12 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 else if( dwState & SHIFT_PRESSED )
                 {
                    ch = clipKey->shift_key;
-                }                
+                }
                 else
                 {
                    ch = clipKey->key;
                 }
-                if( ch == 0 ) // for keys that are only on shift or AltGr 
+                if( ch == 0 ) // for keys that are only on shift or AltGr
                 {
                    ch = clipKey->key;
                 }
