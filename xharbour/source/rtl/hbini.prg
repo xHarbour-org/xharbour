@@ -1,5 +1,5 @@
 /*
-* $Id: hbini.prg,v 1.2 2004/03/04 18:03:13 toninhofwi Exp $
+* $Id: hbini.prg,v 1.4 2004/03/05 23:30:08 jonnymind Exp $
 */
 
 /*
@@ -272,7 +272,7 @@ function HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd )
    hCurrentSection = hIni[ "MAIN" ]
 
    HEval( hCurrentSection, ;
-          { | cKey, xVal |  FWrite( nFileId, cKey + "=" + cKey + cNewLine ) };
+          { | cKey, xVal |  FWrite( nFileId, Cstr(cKey) + "=" + CStr(xVal) + cNewLine ) };
         )
 
    for each cSection in hIni:Keys
@@ -283,12 +283,12 @@ function HB_WriteIni( cFileName, hIni, cCommentBegin, cCommentEnd )
 
        hCurrentSection = hIni[ cSection ]
 
-       if FWrite( nFileId, cNewLine + "[" + cSection + "]" + cNewLine ) <= 0
+       if FWrite( nFileId, cNewLine + "[" + CStr(cSection) + "]" + cNewLine ) <= 0
           return .f.
        endif
 
        HEval( hCurrentSection, ;
-              { | cKey, xVal |  FWrite( nFileId, cKey + "=" + xVal + cNewLine ) };
+              { | cKey, xVal |  FWrite( nFileId, CStr(cKey) + "=" + CStr(xVal) + cNewLine ) };
             )
 
    next
