@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.114 2004/07/21 11:07:24 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.115 2004/07/22 15:36:51 vouchcac Exp $
  */
 
 /*
@@ -185,7 +185,6 @@ static BOOL    hb_wvt_gtTextOut( HDC hdc, USHORT col, USHORT row, LPCTSTR lpStri
 static void    hb_wvt_gtSetStringInTextBuffer( USHORT col, USHORT row, BYTE attr, BYTE *sBuffer, USHORT length );
 static USHORT  hb_wvt_gtGetIndexForTextBuffer( USHORT col, USHORT row );
 static RECT    hb_wvt_gtGetXYFromColRowRect( RECT colrow );
-static RECT    hb_wvt_gtGetColRowFromXYRect( RECT xy );
 static void    hb_wvt_gtCreateObjects( void );
 static void    hb_wvt_gtKillCaret( void );
 static void    hb_wvt_gtCreateCaret( void );
@@ -1730,7 +1729,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       return( bRet );
     }
 
-    case WM_COMMAND: // handle menu items
+    case WM_COMMAND:
     {
       hb_wvt_gtHandleMenuSelection( ( int ) LOWORD( wParam ) );
       return( 0 );
@@ -1742,8 +1741,6 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       HDC         hdc;
       USHORT      irow;
       RECT        updateRect, rcRect;
-      // BOOL        bSame;
-      int         iAdjust;
 
       GetUpdateRect( hWnd, &updateRect, FALSE );
       /* WARNING!!!
@@ -1753,31 +1750,16 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       hdc = BeginPaint( hWnd, &ps );
       SelectObject( hdc, _s.hFont );
 
-      /*
-       * using the update rect, determine which rows and columns of text
-       * to paint, and do so
-       */
       if ( _s.pBuffer != NULL && _s.pAttributes != NULL )
       {
-        // need to account for truncation in conversion
-        // i.e. redraw any 'cell' partially covered...
         rcRect = hb_wvt_gtGetColRowFromXYRect( updateRect );
 
-        // bSame = ( updateRect.bottom % _s.PTEXTSIZE.y == 0 && ( updateRect.bottom - updateRect.top ) % _s.PTEXTSIZE.y == 0 );
-        iAdjust = ( ( ( updateRect.bottom - updateRect.top ) % _s.PTEXTSIZE.y == 0 ) ? 0 : 1 );
+        _s.rowStart = rcRect.top    ;
+        _s.rowStop  = rcRect.bottom ;
+        _s.colStart = rcRect.left   ;
+        _s.colStop  = rcRect.right  ;
 
-        _s.rowStart = max( 0      , rcRect.top    - 0 );
-        _s.rowStop  = min( _s.ROWS, rcRect.bottom + iAdjust );
-        _s.colStart = max( 0      , rcRect.left   - 0 );
-        _s.colStop  = min( _s.COLS, rcRect.right  + iAdjust );
-/*
-        TraceLog( NULL, "updateRect:  %i %i %i %i  ViaWVT: %i  ROWCOL:  %i %i %i %i  StartEnd %i %i %i %i \n",
-           updateRect.top, updateRect.left, updateRect.bottom, updateRect.right,
-           iAdjust,
-           rcRect.top, rcRect.left, rcRect.bottom, rcRect.right,
-           _s.rowStart, _s.colStart, _s.rowStop, _s.colStop );
-*/
-        for ( irow = _s.rowStart; irow < _s.rowStop; irow++ )
+        for ( irow = _s.rowStart; irow <=  _s.rowStop; irow++ )
         {
           USHORT icol, index, startIndex, startCol, len;
           BYTE   oldAttrib, attrib;
@@ -1793,7 +1775,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           * so buffer up text with same attrib, and output it
           * then do next section with same attrib, etc
           */
-          while ( icol < _s.colStop )
+          while ( icol <= _s.colStop )
           {
             if ( index >= _s.BUFFERSIZE )
             {
@@ -2468,9 +2450,9 @@ static RECT hb_wvt_gtGetColRowFromXYRect( RECT xy )
   RECT colrow;
 
   colrow.left   = ( xy.left   / _s.PTEXTSIZE.x );
-  colrow.top    = ( xy.top    / _s.PTEXTSIZE.y );
-  colrow.right  = ( xy.right  / _s.PTEXTSIZE.x );
-  colrow.bottom = ( xy.bottom / _s.PTEXTSIZE.y );
+  colrow.top    = ( xy.top    / _s.PTEXTSIZE.y );                                           // 23/07/2004 9:02a.m.
+  colrow.right  = ( xy.right  / _s.PTEXTSIZE.x - ( xy.right  % _s.PTEXTSIZE.x ? 0 : 1 ) );  // Adjust for when rectangle
+  colrow.bottom = ( xy.bottom / _s.PTEXTSIZE.y - ( xy.bottom % _s.PTEXTSIZE.y ? 0 : 1 ) );  // EXACTLY overlaps characters
 
   return( colrow );
 }
@@ -2488,7 +2470,7 @@ static RECT hb_wvt_gtGetXYFromColRowRect( RECT colrow )
 
   xy.left   = ( colrow.left     ) * _s.PTEXTSIZE.x;
   xy.top    = ( colrow.top      ) * _s.PTEXTSIZE.y;
-  xy.right  = ( colrow.right+1  ) * _s.PTEXTSIZE.x;
+  xy.right  = ( colrow.right +1 ) * _s.PTEXTSIZE.x;
   xy.bottom = ( colrow.bottom+1 ) * _s.PTEXTSIZE.y;
 
   return( xy );
@@ -4145,6 +4127,7 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 static BOOL CALLBACK hb_wvt_gtDlgProcModeless( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
 {
+   HB_SYMBOL_UNUSED( lParam );
    switch( message )
    {
       case WM_COMMAND:
