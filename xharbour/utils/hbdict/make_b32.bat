@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.1 2003/06/24 02:17:21 fsgiudice Exp $
+rem $Id: make_b32.bat,v 1.2 2003/11/03 05:16:58 jonnymind Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -18,7 +18,11 @@ call %HB_BIN_INSTALL%\bld.bat hbdict
 
 if errorlevel 1 goto exit
 copy hbdict.exe %HB_BIN_INSTALL%
+
+REM
+REM If you add a translation file, add also a copy command here
+REM
 copy i18n\it_IT.hit %HB_BIN_INSTALL%\hbdict_it_IT.hit
 
-exit:
+:exit
 
