@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.4 2002/06/02 12:36:52 horacioroldan Exp $
+ * $Id: hbdefs.h,v 1.5 2002/10/22 02:11:47 paultucker Exp $
  */
 
 /*
@@ -153,6 +153,8 @@
 
 #define HB_LOBYTE( w )          ( ( BYTE ) ( w ) )
 #define HB_HIBYTE( w )          ( ( BYTE ) ( ( ( USHORT ) ( w ) >> 8 ) & 0xFF ) )
+#define HB_LOWORD( l )		( ( USHORT ) ( l ) )
+#define HB_HIWORD( l )		( ( USHORT ) ( ( ( l ) >> 16 ) & 0xFFFF ) )
 #define HB_MKSHORT( lo, hi )    ( ( SHORT ) ( ( ( SHORT ) ( hi ) ) << 8 ) | ( lo ) )
 #define HB_MKUSHORT( lo, hi )   ( ( USHORT ) ( ( ( USHORT ) ( hi ) ) << 8 ) | ( lo ) )
 #define HB_MKLONG( b1, b2, b3, b4 )  ( ( ( ( LONG ) ( b4 ) ) << 24 ) | \

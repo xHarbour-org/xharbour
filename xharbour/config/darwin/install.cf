@@ -1,5 +1,5 @@
 #
-# $Id: install.cf,v 1.1.1.1 2001/12/21 10:47:58 ronpinkas Exp $
+# $Id: install.cf,v 1.1 2002/12/04 23:06:46 likewolf Exp $
 #
 
 INSTALL_RULE =\
@@ -16,6 +16,10 @@ INSTALL_RULE =\
 	    else \
 	      echo "! Can't install $$i, not found"; \
 	    fi \
-	  done \
+	  done; \
+	  if [ $(INSTALL_DIR) = $(HB_LIB_INSTALL) ]; \
+	  then \
+	    $(RANLIB) $(foreach file,$(notdir $(INSTALL_OBJS)),$(INSTALL_DIR)/$(file)); \
+	  fi \
 	fi
 

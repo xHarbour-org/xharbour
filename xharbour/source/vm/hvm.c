@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.147 2003/01/02 20:14:09 ronpinkas Exp $
+ * $Id: hvm.c,v 1.148 2003/01/05 06:50:36 ronpinkas Exp $
  */
 
 /*
@@ -1405,7 +1405,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_PUSHLONG:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLONG") );
+#ifndef HB_BIG_ENDIAN
             hb_vmPushLongConst( * ( long * ) ( &pCode[ w + 1 ] ) );
+#else
+            hb_vmPushLongConst( HB_MKLONG( pCode[ w + 1 ], pCode[ w + 2 ], pCode[ w + 3 ], pCode[ w + 4 ] ) );
+#endif
             w += 5;
             break;
 

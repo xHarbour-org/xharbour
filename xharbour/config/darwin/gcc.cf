@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.4 2002/09/27 20:51:49 map Exp $
+# $Id: gcc.cf,v 1.1 2002/12/04 23:06:45 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -19,6 +19,7 @@ else
 CFLAGS = -Wall -g
 endif
 CFLAGS += -DHB_OS_BSD -DHB_OS_DARWIN
+CFLAGS += -DHB_BIG_ENDIAN
 
 LD = gcc
 LD_OUT = -o
@@ -76,4 +77,5 @@ LD_RULE = $(LD) $(CFLAGS) $(LD_OUT) $@ $^ $(LDFLAGS) $(L_USR) $(LINKLIBS)
 LIBTOOL = libtool
 LIBTOOLFLAGS = $(LIBTOOL_USR)
 AR_RULE = $(LIBTOOL) -static $(LIBTOOLFLAGS) -o $@ $^ || $(RM) $@
+RANLIB = ranlib
 include $(TOP)$(ROOT)config/rules.cf

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.20 2002/12/08 20:10:50 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.21 2002/12/13 20:06:36 ronpinkas Exp $
  */
 
 /*
@@ -569,7 +569,6 @@ int hb_comp_SLX_InterceptAction( int iRet )
      else                           { printf( "   TOKEN = %i\n", iRet  ); }
 
      fflush( stdout );
-     }
    #endif
 
    return iRet;

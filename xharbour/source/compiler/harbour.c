@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.28 2002/12/04 06:24:07 ronpinkas Exp $
+ * $Id: harbour.c,v 1.29 2002/12/04 23:06:52 likewolf Exp $
  */
 
 /*
@@ -2363,7 +2363,7 @@ ULONG hb_compGenJump( LONG lOffset )
    }
    else if( lOffset >= (-8388608L) && lOffset <= 8388607L )
    {
-      hb_compGenPCode4( HB_P_JUMPFAR, HB_LOBYTE( lOffset ), HB_HIBYTE( lOffset ), ( BYTE ) ( ( ( USHORT ) ( lOffset ) >> 16 ) & 0xFF ), ( BOOL ) 1 );
+      hb_compGenPCode4( HB_P_JUMPFAR, HB_LOBYTE( lOffset ), HB_HIBYTE( lOffset ), HB_LOBYTE( HB_HIWORD( lOffset ) ), ( BOOL ) 1 );
    }
    else
    {
@@ -2392,7 +2392,7 @@ ULONG hb_compGenJumpFalse( LONG lOffset )
    }
    else if( lOffset >= (-8388608L) && lOffset <= 8388607L )
    {
-      hb_compGenPCode4( HB_P_JUMPFALSEFAR, HB_LOBYTE( lOffset ), HB_HIBYTE( lOffset ), ( BYTE ) ( ( ( USHORT ) ( lOffset ) >> 16 ) & 0xFF ), ( BOOL ) 1 );
+      hb_compGenPCode4( HB_P_JUMPFALSEFAR, HB_LOBYTE( lOffset ), HB_HIBYTE( lOffset ), HB_LOBYTE( HB_HIWORD( lOffset ) ), ( BOOL ) 1 );
    }
    else
    {
@@ -2421,7 +2421,7 @@ ULONG hb_compGenJumpTrue( LONG lOffset )
    }
    else if( lOffset >= (-8388608L) && lOffset <= 8388607L )
    {
-      hb_compGenPCode4( HB_P_JUMPTRUEFAR, HB_LOBYTE( lOffset ), HB_HIBYTE( lOffset ), ( BYTE ) ( ( ( USHORT ) ( lOffset ) >> 16 ) & 0xFF ), ( BOOL ) 1 );
+      hb_compGenPCode4( HB_P_JUMPTRUEFAR, HB_LOBYTE( lOffset ), HB_HIBYTE( lOffset ), HB_LOBYTE( HB_HIWORD( lOffset ) ), ( BOOL ) 1 );
    }
    else
    {
@@ -2592,7 +2592,7 @@ void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo )
    {
       pCode[ ulFrom ] = HB_LOBYTE( lOffset );
       pCode[ ( ULONG ) ( ulFrom + 1 ) ] = HB_HIBYTE( lOffset );
-      pCode[ ( ULONG ) ( ulFrom + 2 ) ] = ( BYTE ) ( ( ( USHORT ) ( lOffset ) >> 16 ) & 0xFF );
+      pCode[ ( ULONG ) ( ulFrom + 2 ) ] = HB_LOBYTE( HB_HIWORD( lOffset ) );
    }
    else
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_JUMP_TOO_LONG, NULL, NULL );
@@ -3379,17 +3379,17 @@ void hb_compGenPushLong( long lNumber )
    }
    else if( lNumber >= -32768 && lNumber <= 32767 )
    {
-      hb_compGenPCode3( HB_P_PUSHINT, ( ( unsigned char * ) &lNumber )[ 0 ], ( ( unsigned char * ) &lNumber )[ 1 ], ( BOOL ) 1 );
+      hb_compGenPCode3( HB_P_PUSHINT, HB_LOBYTE( lNumber ), HB_HIBYTE( lNumber ), ( BOOL ) 1 );
    }
    else
    {
       BYTE pBuffer[5];
 
       pBuffer[0] = HB_P_PUSHLONG;
-      pBuffer[1] = ( ( BYTE * ) &lNumber )[0];
-      pBuffer[2] = ( ( BYTE * ) &lNumber )[1];
-      pBuffer[3] = ( ( BYTE * ) &lNumber )[2];
-      pBuffer[4] = ( ( BYTE * ) &lNumber )[3];
+      pBuffer[1] = HB_LOBYTE( lNumber );
+      pBuffer[2] = HB_HIBYTE( lNumber );
+      pBuffer[3] = HB_LOBYTE( HB_HIWORD( lNumber ) );
+      pBuffer[4] = HB_HIBYTE( HB_HIWORD( lNumber ) );
 
       hb_compGenPCodeN( pBuffer, 5, 1 );
    }
