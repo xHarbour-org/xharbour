@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.389 2004/05/08 04:25:14 ronpinkas Exp $
+ * $Id: hvm.c,v 1.390 2004/05/08 05:26:06 ronpinkas Exp $
  */
 
 /*
@@ -4619,6 +4619,8 @@ static void hb_vmInstringOrArray( void )
          {
             HB_ITEM hbV1;
             PHB_ITEM pV2 = hb_hashGetValueAt( pItem2, ulPos );
+
+            hbV1.type = HB_IT_NIL;
 
             hb_itemCopy( &hbV1, hb_hashGetValueAt( pItem1, 1) );
             hb_stackPop();

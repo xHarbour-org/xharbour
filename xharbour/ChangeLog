@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2901 2004/05/08 22:06:59 druzus Exp $
+ * $Id: ChangeLog,v 1.2902 2004/05/09 02:54:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-08 22:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Fixed GPF Trap related to uninitialized .type when seaching in Hashes.
 
 2004-05-08 19:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/simplex.c
