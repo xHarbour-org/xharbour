@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: !pack_src.bat,v 1.9 2003/09/08 19:18:45 druzus Exp $
+rem $Id: !pack_src.bat,v 1.10 2003/10/15 00:21:15 ronpinkas Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
@@ -170,11 +170,11 @@ rem SOURCE\VM
 %hb_archbin% %hb_archopt%  %hb_filename% source/vm/*.prg
 
 rem TESTS
-%hb_archbin% %hb_archopt%  %hb_filename% tests/*.bat
-%hb_archbin% %hb_archopt%  %hb_filename% tests/*.ch
-%hb_archbin% %hb_archopt%  %hb_filename% tests/*.dbf
-%hb_archbin% %hb_archopt%  %hb_filename% tests/*.fpt
-%hb_archbin% %hb_archopt%  %hb_filename% tests/*.prg
+REM %hb_archbin% %hb_archopt%  %hb_filename% tests/*.bat
+REM %hb_archbin% %hb_archopt%  %hb_filename% tests/*.ch
+REM %hb_archbin% %hb_archopt%  %hb_filename% tests/*.dbf
+REM %hb_archbin% %hb_archopt%  %hb_filename% tests/*.fpt
+REM %hb_archbin% %hb_archopt%  %hb_filename% tests/*.prg
 
 rem UTILS
 %hb_archbin% %hb_archopt%  %hb_filename% utils/Makefile
