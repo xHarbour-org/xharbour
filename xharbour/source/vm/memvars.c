@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.46 2003/12/07 00:10:07 jonnymind Exp $
+ * $Id: memvars.c,v 1.47 2003/12/07 01:25:51 jonnymind Exp $
  */
 
 /*
@@ -739,7 +739,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
 
    #ifdef HB_THREAD_SUPPORT
    // we must find the thread specific name
-   pDyn = s_memvarThGetName( pMemvarSymb->szName, _pStack_ );
+   pDyn = s_memvarThGetName( pMemvarSymb->szName, &HB_VM_STACK );
    #else
    pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
    #endif
@@ -790,7 +790,7 @@ ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
 
    #ifdef HB_THREAD_SUPPORT
    // we must find the thread specific name
-   pDyn = s_memvarThGetName( pMemvarSymb->szName, _pStack_ );
+   pDyn = s_memvarThGetName( pMemvarSymb->szName, &HB_VM_STACK );
    #else
    pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
    #endif
@@ -864,7 +864,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarGetRefer(%p, %p)", pItem, pMemvarSymb));
    #ifdef HB_THREAD_SUPPORT
    // we must find the thread specific name
-   pDyn = s_memvarThGetName( pMemvarSymb->szName, _pStack_);
+   pDyn = s_memvarThGetName( pMemvarSymb->szName, &HB_VM_STACK);
    #else
    pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
    #endif
@@ -1025,7 +1025,7 @@ void hb_memvarCreateFromItem( PHB_ITEM pMemvar, BYTE bScope, PHB_ITEM pValue )
    if( HB_IS_SYMBOL( pMemvar ) )
    {
       #ifdef HB_THREAD_SUPPORT
-         pDynVar = s_memvarThGetName( pMemvar->item.asSymbol.value->szName, _pStack_ );
+         pDynVar = s_memvarThGetName( pMemvar->item.asSymbol.value->szName, &HB_VM_STACK );
       #else
          pDynVar = hb_dynsymGet( pMemvar->item.asSymbol.value->szName );
       #endif
@@ -1033,7 +1033,7 @@ void hb_memvarCreateFromItem( PHB_ITEM pMemvar, BYTE bScope, PHB_ITEM pValue )
    else if( HB_IS_STRING( pMemvar ) )
    {
       #ifdef HB_THREAD_SUPPORT
-         pDynVar = s_memvarThGetName( pMemvar->item.asString.value, _pStack_ );
+         pDynVar = s_memvarThGetName( pMemvar->item.asString.value, &HB_VM_STACK );
       #else
          pDynVar = hb_dynsymGet( pMemvar->item.asString.value );
       #endif
@@ -1267,7 +1267,7 @@ int hb_memvarScope( char * szVarName )
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarScope(%s)", szVarName));
 
    #ifdef HB_THREAD_SUPPORT
-      pDynVar = s_memvarThFindName( szVarName, _pStack_ );
+      pDynVar = s_memvarThFindName( szVarName, &HB_VM_STACK );
    #else
       pDynVar = hb_dynsymFindName( szVarName );
    #endif
@@ -1452,7 +1452,7 @@ static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR pName )
          #ifdef HB_THREAD_SUPPORT
             char szNewName[270];
             HB_THREAD_STUB;
-            sprintf( szNewName, ":TH:%d:%s", _pStack_->th_vm_id, pName->item.asString.value );
+            sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, pName->item.asString.value );
             pDynSym = hb_dynsymFindName( szNewName );
          #else
             pDynSym = hb_dynsymFindName( pName->item.asString.value );
@@ -1848,7 +1848,7 @@ HB_FUNC( __MVPUT )
           * create the PRIVATE one
           */
          #ifdef HB_THREAD_SUPPORT
-            pDyn = s_memvarThGetName( pName->item.asString.value, _pStack_);
+            pDyn = s_memvarThGetName( pName->item.asString.value, &HB_VM_STACK );
          #else
             pDyn = hb_dynsymGet( pName->item.asString.value );
          #endif
@@ -2186,7 +2186,7 @@ HB_FUNC( __MVRESTORE )
                      hb_dynsymUnlock();
                      /* attempt to assign a value to undeclared variable create the PRIVATE one */
                      #ifdef HB_THREAD_SUPPORT
-                        pDyn = s_memvarThGetName( pName->item.asString.value, _pStack_ );
+                        pDyn = s_memvarThGetName( pName->item.asString.value, &HB_VM_STACK );
                      #else
                         pDyn = hb_dynsymGet( pName->item.asString.value );
                      #endif
@@ -2255,7 +2255,7 @@ HB_HANDLE hb_memvarGetVarHandle( char *szName )
 
    #ifdef HB_THREAD_SUPPORT
       char szNewName[270];
-      sprintf( szNewName, ":TH:%d:%s", _pStack_->th_vm_id, szName );
+      sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, szName );
    #endif
 
    hb_dynsymLock();

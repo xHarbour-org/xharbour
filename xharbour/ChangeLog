@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1878 2003/12/14 22:41:13 peterrees Exp $
+ * $Id: ChangeLog,v 1.1875 2003/12/14 11:28:15 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,24 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-2003-12-15 15:24 UTC+1200 Peter Rees <peter@rees.co.nz>
-  * source/vm/mainwin.c
-    *remove LocalFree( pArgs ) as causes problem with Win9X
 
-2003-12-15 11:41 UTC+1200 Peter Rees <peter@rees.co.nz>
-  * source/vm/mainwin.c
-    *fix last change for exception if only parameter is "
-       e.g. test "
+2003-12-15 03:30 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/arrays.c
+    ! removed an old useless comment
 
-2003-12-15 11:11 UTC+1200 Peter Rees <peter@rees.co.nz>
-  * source/vm/mainwin.c
-    *altered to handle command line quoted parameters correctly for Windows
-       e.g. test "Param 1" param2 "Param 3"
+  * source/vm/fm.c
+    * romoved a useless ceck in if
 
-2003-12-15 04:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-  * source/compiler/genc.c
-    * fix bug I introduced in recent changes so that multi inline C
-      (more than one loop in pragma's) were not processed properly.
+  * source/vm/memvars.c
+    * changed _pStack_ in HB_VM_STACK
+
+  * include/thread.h
+  * source/vm/thread.c
+    + Added __thread TLS variable to access stack instead of
+      hb_getCurrentStack();
+      This change is now available only with
+         -DHB_THREAD_TLS_KEYWORD
+      defined
+      
 
 2003-12-14 12:27 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/contrib/libct/Makefile

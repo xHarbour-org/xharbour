@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.48 2003/12/05 04:11:48 jonnymind Exp $
+ * $Id: fm.c,v 1.49 2003/12/11 14:28:54 jonnymind Exp $
  */
 
 /*
@@ -387,9 +387,10 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    else
    {
       HB_THREAD_STUB
+      
       if(
-         #ifdef HB_THREAD_SUPPORT  /*** Se JC1: notes at begin */
-            hb_ht_stack != 0 && _pStack_ != 0 &&
+         #if defined( HB_THREAD_SUPPORT )  /*** Se JC1: notes at begin */
+            hb_ht_stack != 0 &&
          #endif
          HB_VM_STACK.pItems && ( HB_VM_STACK.pBase != HB_VM_STACK.pItems ) )
       {

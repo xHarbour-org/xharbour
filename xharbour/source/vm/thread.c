@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.141 2003/12/09 02:53:49 ronpinkas Exp $
+* $Id: thread.c,v 1.142 2003/12/11 14:44:52 jonnymind Exp $
 */
 
 /*
@@ -97,6 +97,16 @@
 /* Part 1: Global objects declaration                         */
 /**************************************************************/
 
+#if defined( HB_THREAD_TLS_KEYWORD )
+   #if defined(__GNUC__) || defined( __BORLANDC__ )
+   __thread HB_STACK *hb_thread_stack;
+   #elif defined( _MSVC_VER )
+   __declspec(thread) HB_STACK *hb_thread_stack;
+   #else
+      #error "This platform does not support __thread keyword; undefine HB_THREAD_TLS_KEYWORD & recompile"
+   #endif
+#endif
+
 HB_STACK *hb_ht_stack = 0;
 HB_STACK *last_stack;
 HB_MUTEX_STRUCT *hb_ht_mutex;
@@ -161,13 +171,23 @@ void hb_threadInit( void )
 
    #ifdef HB_OS_WIN_32
       HB_CRITICAL_INIT( hb_cancelMutex );
-
-      hb_dwCurrentStack = TlsAlloc();
-      TlsSetValue( hb_dwCurrentStack, (void *)&hb_stack );
-   #else
-      pthread_key_create( &hb_pkCurrentStack, NULL );
-      pthread_setspecific( hb_pkCurrentStack, (void *)&hb_stack );
    #endif
+
+   #if ! defined( HB_THREAD_TLS_KEYWORD )
+      /* hb_thread_stack does not need initialization */
+      #ifdef HB_OS_WIN_32
+         hb_dwCurrentStack = TlsAlloc();
+         TlsSetValue( hb_dwCurrentStack, (void *)&hb_stack );
+      #else
+         pthread_key_create( &hb_pkCurrentStack, NULL );
+         pthread_setspecific( hb_pkCurrentStack, (void *)&hb_stack );
+      #endif
+   #else
+      #if !defined( __GNUC__ )
+         hb_thread_stack = &hb_stack;
+      #endif
+   #endif
+   
 }
 
 void hb_threadExit( void )
@@ -199,10 +219,15 @@ void hb_threadCloseHandles( void )
    HB_COND_DESTROY(hb_threadStackCond);
 
    #ifdef HB_OS_WIN_32
-      TlsFree( hb_dwCurrentStack );
       HB_CRITICAL_DESTROY( hb_cancelMutex );
-   #else
-      pthread_key_delete( hb_pkCurrentStack );
+   #endif
+
+   #if !defined( HB_THREAD_TLS_KEYWORD )
+      #ifdef HB_OS_WIN_32
+         TlsFree( hb_dwCurrentStack );
+      #else
+         pthread_key_delete( hb_pkCurrentStack );
+      #endif
    #endif
 
    #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
@@ -726,16 +751,23 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
 
    /* Sets the cancellation handler so small delays in
    cancellation do not cause segfault or memory leaks */
-#ifdef HB_OS_WIN_32
-   TlsSetValue( hb_dwCurrentStack, ( void * ) _pStack_ );
-#else
-   /* The fist that arrives among father and child will set up
-      the stack id. */
-   _pStack_->th_id = HB_CURRENT_THREAD();
-   pthread_setspecific( hb_pkCurrentStack, Cargo );
-   pthread_cleanup_push( hb_threadTerminator, NULL );
-#endif
-
+   #ifdef HB_OS_WIN_32
+      #ifdef HB_THREAD_TLS_KEYWORD
+         hb_thread_stack = _pStack_;
+      #else
+         TlsSetValue( hb_dwCurrentStack, ( void * ) _pStack_ );
+      #endif
+   #else
+      /* The fist that arrives among father and child will set up
+         the stack id. */
+      _pStack_->th_id = HB_CURRENT_THREAD();
+      #ifdef HB_THREAD_TLS_KEYWORD
+         hb_thread_stack = _pStack_;
+      #else
+         pthread_setspecific( hb_pkCurrentStack, Cargo );
+      #endif
+      pthread_cleanup_push( hb_threadTerminator, NULL );
+   #endif
 
    // call errorsys() to initialize errorblock
    hb_dynsymLock();

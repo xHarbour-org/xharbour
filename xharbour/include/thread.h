@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.72 2003/12/06 15:58:34 jonnymind Exp $
+* $Id: thread.h,v 1.73 2003/12/06 17:40:53 jonnymind Exp $
 */
 
 /*
@@ -465,15 +465,44 @@ typedef struct tag_HB_SHARED_RESOURCE
    this variable will be accessed instead of HB_VM_STACK.
 */
 
-#if defined( HB_THREAD_OPTIMIZE_STACK ) && ! defined( HB_NO_DEFAULT_STACK_MACROS )
-   #define HB_VM_STACK (*_pStack_)
-   #define HB_THREAD_STUB\
-      HB_STACK *_pStack_ = hb_threadGetCurrentStack();
-#else
-   #define HB_VM_STACK (* hb_threadGetCurrentStack() )
-   #define HB_THREAD_STUB
-#endif
+#if ! defined( HB_THREAD_TLS_KEYWORD )
+   /* Use standard hb_threadGetCurrentStack(), that can be macroed into a
+      TLS function, like TlsGetValue() or pthread_getspecific, i.e. */
 
+   #if defined( HB_THREAD_OPTIMIZE_STACK ) && ! defined( HB_NO_DEFAULT_STACK_MACROS )
+      #define HB_VM_STACK (*_pStack_)
+      #define HB_THREAD_STUB\
+         HB_STACK *_pStack_ = hb_threadGetCurrentStack();
+   #else
+      #define HB_VM_STACK (* hb_threadGetCurrentStack() )
+      #define HB_THREAD_STUB
+   #endif
+
+#else
+
+   /* Use __thread keyword where available */
+   #if defined( __GNUC__ )
+   #if defined( HB_THREAD_OPTIMIZE_STACK ) && ! defined( HB_NO_DEFAULT_STACK_MACROS )
+      #define HB_THREAD_STUB\
+         HB_STACK *_pStack_ = ( ((unsigned long)&hb_thread_stack) & 0xf0000000) == 0xf0000000 ? &hb_stack : hb_thread_stack;
+      #define HB_VM_STACK (*_pStack_)
+   #else
+      #define HB_VM_STACK (*( ( ((unsigned long)&hb_thread_stack) & 0xf0000000)==0xf0000000 ? &hb_stack : hb_thread_stack ))
+      #define HB_THREAD_STUB
+   #endif
+   #else
+      #define HB_VM_STACK ( *hb_thread_stack )
+      #define HB_THREAD_STUB
+   #endif
+
+   #if defined(__GNUC__) || defined( __BORLANDC__ )
+      extern HB_STACK __thread *hb_thread_stack;
+   #elif defined( _MSVC_VER )
+      extern HB_STACK __declspec(thread) *hb_thread_stack;
+   #else
+      #error "This platform does not support __thread keyword; undefine HB_THREAD_TLS_KEYWORD & recompile"
+   #endif
+#endif
 
 /*********************************************************************/
 /* More elegant guard of a small section of code                     */

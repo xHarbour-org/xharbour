@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.81 2003/11/23 03:13:54 jonnymind Exp $
+ * $Id: arrays.c,v 1.82 2003/12/01 23:02:27 ronpinkas Exp $
  */
 
 /*
@@ -890,11 +890,11 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
             hb_vmPush( pItems + ulStart );
             hb_vmPushNumber( ( double ) ( ulStart + 1 ), 0 );
             hb_vmSend( ulParams );
-
             if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) && HB_VM_STACK.Return.item.asLogical.value )
             {
                return ulStart + 1;                  /* arrays start from 1 */
             }
+
          }
       }
       else if( HB_IS_STRING( pValue ) ) // Must precede HB_IS_NUMERIC()
@@ -1530,8 +1530,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    }
 
    pArray->item.asArray.value = pBaseArray;
-
-   /*Notice: the thread could still be killed HERE, causing a memory leak */
 
    return pArray;
 }
