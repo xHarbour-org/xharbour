@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.138 2004/05/24 20:20:25 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.139 2004/05/27 23:58:18 druzus Exp $
  */
 
 /*
@@ -5677,9 +5677,9 @@ static ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
          else if ( pTag->UsrAscend )
             lToSkip--;
       }
-      else
+      else if ( pArea->fPositioned )
       {
-         if ( pTag->TagEOF && pArea->fPositioned )
+         if ( pTag->TagEOF )
             fOut = TRUE;
          else if ( !pTag->UsrAscend )
             lToSkip++;
