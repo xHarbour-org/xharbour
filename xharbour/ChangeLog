@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.709 2003/02/12 11:23:21 jonnymind Exp $
+ * $Id: ChangeLog,v 1.710 2003/02/12 13:33:19 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-12 20:15 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * source/vm/extend.c
+  * source/vm/itemapi.c
+    * Added possibility to get values from LOGICAL vars
+      when retrieving numeric values at a C level (you 
+      will get 0 or 1).
+
+  * source/vm/hvm.c
+    * Added support for C-like IF <numeric> conditions.
+      This is DISABLED by default. Enabled only when
+      compiled with HB_USE_NUMERIC_IF defined.
 
 2003-02-12 11:30 UTC-0200 Luiz Rafale Culik <culikr@uol.com.br>
   * source/common/hbffind.c

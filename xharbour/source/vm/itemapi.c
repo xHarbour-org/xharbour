@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.30 2002/12/19 18:15:36 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.31 2002/12/29 08:32:42 ronpinkas Exp $
  */
 
 /*
@@ -454,6 +454,9 @@ double HB_EXPORT hb_itemGetND( PHB_ITEM pItem )
          case HB_IT_DATE:
             return ( double ) pItem->item.asDate.value;
 
+         case HB_IT_LOGICAL:
+            return ( double ) pItem->item.asLogical.value;
+
          case HB_IT_STRING:
             return ( double ) pItem->item.asString.value[0];
       }
@@ -482,6 +485,9 @@ int HB_EXPORT hb_itemGetNI( PHB_ITEM pItem )
          case HB_IT_DATE:
             return ( int ) pItem->item.asDate.value;
 
+         case HB_IT_LOGICAL:
+            return ( int ) pItem->item.asLogical.value;
+
          case HB_IT_STRING:
             return ( int ) pItem->item.asString.value[0];
       }
@@ -509,6 +515,9 @@ long HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
 
          case HB_IT_DATE:
             return pItem->item.asDate.value;
+
+         case HB_IT_LOGICAL:
+            return ( long ) pItem->item.asLogical.value;
 
          case HB_IT_STRING:
             return ( long ) pItem->item.asString.value[0];

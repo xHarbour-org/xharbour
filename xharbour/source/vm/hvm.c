@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.157 2003/01/28 23:12:36 ronpinkas Exp $
+ * $Id: hvm.c,v 1.158 2003/02/10 01:22:34 ronpinkas Exp $
  */
 
 /*
@@ -3427,6 +3427,32 @@ static void hb_vmNot( void )
    {
       pItem->item.asLogical.value = ! pItem->item.asLogical.value;
    }
+#ifdef HB_USE_NUMERIC_IF
+   else if( HB_IS_NUMERIC( pItem ) )
+   {
+      if( HB_IS_INTEGER( hb_stackItemFromTop( -1 ) ) )
+      {
+         if( pItem->item.asInteger.value == 0 )
+            pItem->item.asInteger.value = 1;
+ 	 else
+            pItem->item.asInteger.value = 0;
+      }
+      else if( HB_IS_LONG( hb_stackItemFromTop( -1 ) ) )
+      {
+         if( pItem->item.asLong.value == 0 )
+            pItem->item.asLong.value = 1;
+ 	 else
+            pItem->item.asLong.value = 0;
+      }
+      else
+      {
+         if( pItem->item.asDouble.value == 0 )
+            pItem->item.asDouble.value = 1.0;
+	 else
+            pItem->item.asDouble.value = 0.0;
+      }
+   }
+#endif
    else if( HB_IS_OBJECT( pItem ) && hb_objHasMsg( pItem, "__OpNot" ) )
    {
       hb_vmOperatorCallUnary( pItem, "__OPNOT" );
@@ -5416,6 +5442,23 @@ static BOOL hb_vmPopLogical( void )
       ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
       return ( * HB_VM_STACK.pPos )->item.asLogical.value;
    }
+#ifdef HB_USE_NUMERIC_IF
+   else if( HB_IS_NUMERIC( hb_stackItemFromTop( -1 ) ) )
+   {
+      hb_stackDec();
+
+      ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
+
+      if( HB_IS_INTEGER( hb_stackItemFromTop( -1 ) ) )
+         return ( ( * HB_VM_STACK.pPos )->item.asInteger.value != 0 );
+
+      else if( HB_IS_LONG( hb_stackItemFromTop( -1 ) ) )
+         return ( ( * HB_VM_STACK.pPos )->item.asLong.value != 0 );
+
+      else 
+         return ( ( * HB_VM_STACK.pPos )->item.asDouble.value != 0.0 );
+   }
+#endif
    else
    {
       hb_errRT_BASE( EG_ARG, 1066, NULL, hb_langDGetErrorDesc( EG_CONDITION ), 1, hb_stackItemFromTop( -1 ) );

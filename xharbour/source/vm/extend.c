@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.11 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: extend.c,v 1.12 2002/12/23 00:14:22 ronpinkas Exp $
  */
 
 /*
@@ -391,6 +391,10 @@ double  HB_EXPORT hb_parnd( int iParam, ... )
       {
          return ( double ) pItem->item.asLong.value;
       }
+      else if( HB_IS_LOGICAL( pItem ) )
+      {
+         return ( double ) pItem->item.asLogical.value;
+      }
       else if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
@@ -431,6 +435,10 @@ int  HB_EXPORT hb_parni( int iParam, ... )
       else if( HB_IS_DOUBLE( pItem ) )
       {
          return ( int ) pItem->item.asDouble.value;
+      }
+      else if( HB_IS_LOGICAL( pItem ) )
+      {
+         return ( int ) pItem->item.asLogical.value;
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
@@ -476,6 +484,10 @@ long  HB_EXPORT hb_parnl( int iParam, ... )
       else if( HB_IS_DATE( pItem ) )
       {
          return pItem->item.asDate.value;
+      }
+      else if( HB_IS_LOGICAL( pItem ) )
+      {
+         return ( long ) pItem->item.asLogical.value;
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
