@@ -4,37 +4,35 @@
 #include "hbclass.ch"
 
 FUNCTION Main
-   LOCAL oApp, oMain, oPopup, oMenu, oItem
+   LOCAL oApp, oMain, oMenu
+
    oApp  := Application():New()
+
+   oApp:CreateForm( 'MainForm', mainForm() )
    
-   oMain := oApp:CreateForm( Form1() )
+   oApp:MainForm:WindowMenu := TMenu():New()
    
-//   oMain := Form1():New()
-//   oMain:Create()
-   
-   oMenu := TMenu():New( oMain )
-      oMenu:AddPopup('popup 1')
-         oMenu:Popup:AddItem('item 100',100)
-         oMenu:Popup:AddItem('item 101',101)
-         oMenu:Popup:AddItem('item 102',102)
-         oMenu:Popup:AddItem('item 103',103)
-      oMenu:AddPopup('popup 2')
-         oMenu:Popup:AddItem('item 200',200)
-         oMenu:Popup:AddItem('item 201',201)
-         oMenu:Popup:AddItem('item 202',202)
-         oMenu:Popup:AddItem('item 203',203)
-      oMenu:AddPopup('popup 3')
-         oMenu:Popup:AddItem('item 300',300)
-         oMenu:Popup:AddItem('item 301',301)
-         oMenu:Popup:AddItem('item 302',302)
-         oMenu:Popup:AddItem('item 303',303)
-   oMenu:Set()
+      oApp:MainForm:WindowMenu:AddPopup('popup 1')
+      
+         oApp:MainForm:WindowMenu:Popup:AddItem('item 100',100)
+         oApp:MainForm:WindowMenu:Popup:AddItem('item 101',101)
+         oApp:MainForm:WindowMenu:Popup:AddItem('item 102',102)
+         oApp:MainForm:WindowMenu:Popup:AddItem('item 103',103)
+         
+      oApp:MainForm:WindowMenu:AddPopup('popup 2')
+      
+         oApp:MainForm:WindowMenu:Popup:AddItem('item 200',200)
+         oApp:MainForm:WindowMenu:Popup:AddItem('item 201',201)
+         oApp:MainForm:WindowMenu:Popup:AddItem('item 202',202)
+         oApp:MainForm:WindowMenu:Popup:AddItem('item 203',203)
+         
+   oApp:MainForm:SetWindowMenu()   
 
    oApp:Run()
 RETURN( nil)
 
 
-CLASS Form1 FROM TForm
+CLASS mainForm FROM TForm
    METHOD OnPaint( hDC ) INLINE DrawGrid( ::handle, hDC, 3 ),0
    METHOD OnClose()      INLINE MessageBox( ::handle, 'OnClose','Whoo'),;
                                 PostQuitMessage(0)

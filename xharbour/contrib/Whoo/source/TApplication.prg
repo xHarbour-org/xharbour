@@ -10,6 +10,7 @@ CLASS Application
    
    METHOD New() CONSTRUCTOR
    METHOD Run()
+   METHOD AddData( cSymbol ) INLINE __objAddData( self, cSymbol )
    
    METHOD CreateForm()
    
@@ -40,11 +41,14 @@ METHOD Run() CLASS Application
 
 RETURN(0)
 
-METHOD CreateForm( oForm ) CLASS Application
+METHOD CreateForm( cForm, oForm ) CLASS Application
+
+   __objAddData( self, cForm )
    
-   oForm:New(self)
+   oForm := if( oForm != NIL, oForm:New( self ), TForm():New(self) )
+
+   __ObjSetValueList( self, { {cForm, oForm} } )
+
    oForm:Create()
-
+   
 return( oForm )
-
-function App() ; return( oAppl )
