@@ -411,7 +411,7 @@ FUNCTION Getlibs( lGcc, cDir )
    LOCAL cEnv          := GETENV( "HB_LIB_INSTALL" )
    LOCAL ainstaledlibs := Getinstaledlibs( IIF( ! lLinux, IIF( ! lGcc, cDir + "\*.lib", cDir + "\*.a" ), cEnv + '/*.a' ), lGcc )
    LOCAL aLibsDesc     := { { "Harbour Ct3 library - Libct",  IIF( lGcc, 'ct.a', 'libct.lib' ) }, ;
-                        { "Harbour Misc library - Libmisc", 'misc' + IIF( lGcc, '.a', '.lib' ) }, ;
+                        { "Harbour Misc library - Libmisc", IIF( lGcc, 'misc.a', 'libmisc.lib' ) }, ;
                         { "Harbour html library - Htmllib", 'html' + IIF( lGcc, '.a', '.lib' ) }, ;
                         { "Harbour Nanfor library - Libnf", 'nf' + IIF( lGcc, '.a', '.lib' ) }, ;
                         { "Harbour Gt library - Libgt", 'nf' + IIF( lGcc, '.a', '.lib' ) }, ;
