@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.183 2002/04/29 02:11:50 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.184 2002/04/29 02:13:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-29 11:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+  * include/hbexprc.c
+    ! Fixed GPF when left side of an optimized assignment is a macro.
+
+  * tests/pp.prg
+  * tests/rp_dot.ch
+  * tests/rp_run.ch
+    ! Corrected #translate of _GET_().
 
 2002-04-28 19:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/math.c
