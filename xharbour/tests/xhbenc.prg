@@ -1,6 +1,6 @@
 **************************************************
 * xhbenc.prg
-* $Id: xhbenc.prg,v 1.3 2004/02/06 12:55:17 andijahja Exp $
+* $Id: xhbenc.prg,v 1.4 2004/02/07 18:51:07 andijahja Exp $
 * Test program for file encoding and decoding
 * UUEncode, Base64, YYEncode and XXEncode
 *
@@ -27,6 +27,11 @@ PROCEDURE MAIN()
 
    SET CURSOR OFF
    CLEAR SCREEN
+
+   IF !File( "pp.prg" )
+      __CopyFile( "..\utils\xbscript\xbscript.prg", "pp.prg" )
+   ENDIF
+
    IF Alert( "xHarbour File Encoding Tests",{" Continue "," Quit "},"N/W*" ) == 2
       restscreen(0,0,maxrow(),maxcol(),cScr)
       BREAK
@@ -205,6 +210,7 @@ STATIC PROCEDURE View( aFile )
 
    o:lWordWrap := .F.
    o:Loadfile( aFile[F_NAME] )
+   o:MoveCursor(K_DOWN)
 
    WHILE ( ( nKey := inkey() ) != K_ESC )
       o:MoveCursor(nKey)
