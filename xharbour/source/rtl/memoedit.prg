@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.20 2004/05/13 10:31:00 modalsist Exp $
+ * $Id: memoedit.prg,v 1.21 2004/05/15 17:15:00 modalsist Exp $
  */
 
 /*
@@ -54,12 +54,20 @@
 /*
  * Eduardo Fernandes <eduardo@modalsistemas.com.br>
  *
- * v.1.20
- * Fixed bug in read only mode when run an user function. 
- *
  * v.1.19
  * Revision to proper working with tab columns, CTRL_T behaviour and other things.
  * See teditor.prg and ttextlin.prg to more details.
+ *
+ * v.1.20
+ * Fixed bug in read only mode when call an user function and press Tab key, reported by 
+ * Stephan Hennekens. 
+ * 
+ * v.1.21 - 2004/05/15
+ * Fixed word-wrap control in memoedit.prg through <nLineLength> parameter.
+ * 
+ * if nLineLength < 0 then word-wrap = false like Clipper.
+ * if nLineLength = 0 or null, then word-wrap = true and wordwrapcol = nRight - nLeft + 1.
+ * if nLineLength > 0 then word-wrap = true and wordwrapcol = nLineLength
  *
  */
 
@@ -354,18 +362,24 @@ FUNCTION MemoEdit(cString,;         // same as Clipper
    DEFAULT nBottom         TO MaxRow()
    DEFAULT nRight          TO MaxCol()
    DEFAULT lEditMode       TO .T.
-   DEFAULT nLineLength     TO nRight - nLeft + 1 // dont´t change.
+   DEFAULT nLineLength     TO 0 
    DEFAULT nTabSize        TO 4
    DEFAULT nTextBuffRow    TO 1
    DEFAULT nTextBuffColumn TO 0
    DEFAULT nWindowRow      TO 0
    DEFAULT nWindowColumn   TO nTextBuffColumn
    DEFAULT cString         TO ""
-   DEFAULT lToggleExitSave  TO .F.  // Toogle betewn CTRL-W/CTRL-Q. Default is CTRL-W
+   DEFAULT lToggleExitSave TO .F.  // Toogle betewn CTRL-W/CTRL-Q. Default is CTRL-W
    
    if !ISLOGICAL( cUserFunction ) .AND. Empty( cUserFunction )
       cUserFunction = nil
    endif
+
+   // if nLineLength < 0  Word Wrap will be seted to false in HBEditor, otherwise true.
+   IF nLineLength == 0
+      nLineLength := nRight - nLeft + 1 
+   ENDIF   
+
 
 // Original MemoEdit() converts Tabs into spaces;
 //   oEd := TMemoEditor():New( StrTran( cString, Chr( K_TAB ), Space( 1 ) ), nTop, nLeft, nBottom, nRight, ;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2937 2004/05/14 12:49:07 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2939 2004/05/15 19:18:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-15 18:35 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
+  * source/rtl/memoedit.prg
+    ! Fixed word-wrap control in memoedit.prg through <nLineLength> parameter.
+      if nLineLength < 0 then word-wrap = false like Clipper.
+      if nLineLength = 0 or null, then word-wrap = true and wordwrapcol = nRight - nLeft + 1.
+      if nLineLength > 0 then word-wrap = true and wordwrapcol = nLineLength
+
+  * source/rtl/teditor.prg
+    * Restored correct cursor style in overstrike/insert mode.
+
+    * Changed "LineLen" method name to "LLen" to turn more clean and easy
+      codification. Removed INLINE declaration.  
+
+    * Minor revision in cursor position management after text left scroll,
+      especially in insert mode. Better behaviour in insert mode, but still
+      have somethings to do.
+
+    ! Fixed word-wrap control in teditor.prg through <nLineLength> parameter
+      from memoedit.
+     
+    ! Fixed bug that was word wrap lines improperly in debugger. Reported by
+      Teo Fonrouge.
 
 2004-05-14 09:40 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/common/expropt2.c
