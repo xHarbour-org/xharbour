@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.3 2004/06/05 09:56:28 vouchcac Exp $
+ * $Id: wvtcore.c,v 1.4 2004/06/06 11:33:21 lf_sfnet Exp $
  */
 
 /*
@@ -1772,7 +1772,7 @@ HB_FUNC( WVT_DRAWSCROLLTHUMBHORZ )
    hb_wvt_gtDrawBoxRaised( iTop+1, iThumbLeft+1, iBottom-2, iThumbRight-2 );
 }
 
-#if WINVER > 0x500
+//#if WINVER > 0x500
 //-------------------------------------------------------------------//
 //
 //    Wvt_DrawShadedRect( nTop, nLeft, nBottom, nRight, aPxlOffSet, nHorVert, aRGBb, aRGBe  )
@@ -1814,7 +1814,7 @@ HB_FUNC( WVT_DRAWSHADEDRECT )
    }
    hb_retl( bGF );
 }
-#endif
+//#endif
 
 //-------------------------------------------------------------------//
 //

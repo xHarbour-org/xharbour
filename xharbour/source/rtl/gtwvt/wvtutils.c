@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.5 2004/06/10 21:43:19 peterrees Exp $
+ * $Id: wvtutils.c,v 1.6 2004/06/10 23:20:09 peterrees Exp $
  */
 
 /*
@@ -782,6 +782,8 @@ HB_FUNC( WVT_SETMENUKEYEVENT )
   hb_retni( hb_wvt_gtSetMenuKeyEvent( iEvent ) ) ;
 }
 
+//-------------------------------------------------------------------//
+
 HB_FUNC( WVT_DRAWMENUBAR )
 {
   DrawMenuBar( _s->hWnd ) ;
@@ -1029,4 +1031,26 @@ HB_FUNC( WVT_ISLBUTTONPRESSED )
 
 //-------------------------------------------------------------------//
 
+HB_FUNC( WVT_CLIENTTOSCREEN )
+{
+   HB_ITEM  aXY;
+   HB_ITEM  temp;
+   POINT    xy;
+
+   xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+
+   ClientToScreen( _s->hWnd, &xy );
+
+   aXY.type  = HB_IT_NIL;
+   temp.type = HB_IT_NIL;
+
+   hb_arrayNew( &aXY, 2 );
+
+   hb_arraySetForward( &aXY, 1, hb_itemPutNL( &temp, xy.x ) );
+   hb_arraySetForward( &aXY, 2, hb_itemPutNL( &temp, xy.y ) );
+
+   hb_itemReturn( &aXY );
+}
+
+//-------------------------------------------------------------------//
 
