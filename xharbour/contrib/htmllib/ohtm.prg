@@ -1,5 +1,5 @@
 /*
- * $Id: ohtm.prg,v 1.2 2002/04/17 16:08:00 lculik Exp $
+ * $Id: ohtm.prg,v 1.1 2003/02/23 23:15:17 lculik Exp $
  */
 
 /*
@@ -71,9 +71,9 @@ STATIC soPage  := 0
    // --- FONTS --- //
    // --- OUTPUT --- //
    // --- COSMETICS --- //
-                             nSize  := IIF( nSize == NIL, 3, nSize ),;
+/*                             nSize  := IIF( nSize == NIL, 3, nSize ),;
                              nWidth := IIF( nWidth == NIL, 90, nWidth ),;
-                             FWrite( ::nH, '<P>'+CRLF()+'<HR SIZE = '+NUMTRIM(nSize)+' WIDTH = '+NUMTRIM(nWidth)+'%>')
+                             FWrite( ::nH, '<P>'+CRLF()+'<HR SIZE = '+NUMTRIM(nSize)+' WIDTH = '+NUMTRIM(nWidth)+'%>')*/
 */
    // --- URLs --- //
    // --- TABLES --- //
@@ -123,61 +123,43 @@ CLASS Html
 
    METHOD SAY( str, font, size, type, color, style )
 
-   METHOD Qqout( c ) INLINE DEFAULT( c, "" )
+   METHOD Qqout( c ) INLINE DEFAULT( c, "" ),;
+   Fwrite( ::nH, c )
 
-   METHOD Fwrite( ::nH, c )
+   METHOD Qout( c ) INLINE DEFAULT( c, "" ),;
+    Fwrite( ::nH, CRLF() + c + '<BR>' + CRLF() )
 
-   METHOD Qout( c ) INLINE DEFAULT( c, "" )
+   METHOD Write( c ) INLINE DEFAULT( c, "" ),;
+      Fwrite( ::nH, c )
 
-   METHOD Fwrite( ::nH, CRLF() + c + '<BR>' + CRLF() )
+   METHOD WriteLN( c ) INLINE DEFAULT( c, "" ), ;
+          Fwrite( ::nH, CRLF() + c + '<BR>' + CRLF() )
 
-   METHOD Write( c ) INLINE DEFAULT( c, "" )
+   METHOD SayColor( t, c ) INLINE DEFAULT( t, "" ), DEFAULT( c, "black" ),;
+          Fwrite( ::nH, '<FONT COLOR="' + c + '">' + t + '</FONT>' )
 
-   METHOD Fwrite( ::nH, c )
-
-   METHOD WriteLN( c ) INLINE DEFAULT( c, "" )
-
-   METHOD Fwrite( ::nH, CRLF() + c + '<BR>' + CRLF() )
-
-   METHOD SayColor( t, c ) INLINE DEFAULT( t, "" )
-
-   METHOD DEFAULT( c, "black" )
-
-   METHOD Fwrite( ::nH, '<FONT COLOR="' + c + '">' + t + '</FONT>' )
-
-   METHOD Space( n ) INLINE DEFAULT( n, 1 )
-
-   METHOD Fwrite( ::nH, Replicate( "&nbsp;", n ) )
+   METHOD Space( n ) INLINE DEFAULT( n, 1 ), Fwrite( ::nH, Replicate( "&nbsp;", n ) )
 
    METHOD PutImage( cImage, nBorder, nHeight, ;
    cOnclick, cOnMsOver, cOnMsOut, ;
    cName, cAlt, cTarget, nWidth, lBreak, ID, MAP, ALING, HSPACE )
 
-   METHOD TEXT( cText, nCols, lWrap ) INLINE DEFAULT( lWrap, .T. )
+   METHOD TEXT( cText, nCols, lWrap ) INLINE DEFAULT( lWrap, .T. ),;
+   DEFAULT( nCols, 80 ),;
+   Fwrite( ::nH, "<PRE" + IIF( nCols != NIL, ' COLS="' + NUMTRIM( nCols ) + "'", "" ) + IIF( lWrap, " WRAP>", ">" ) + CRLF() + cText + CRLF() + "</PRE>" + CRLF() )
 
-   METHOD DEFAULT( nCols, 80 )
-
-   METHOD Fwrite( ::nH, "<PRE" + IIF( nCols != NIL, ' COLS="' + NUMTRIM( nCols ) + "'", "" ) + IIF( lWrap, " WRAP>", ">" ) + CRLF() + cText + CRLF() + "</PRE>" + CRLF() )
-
-   METHOD MultiCol( txt, cols, gutter, width ) INLINE DEFAULT( txt, "" )
-
-   METHOD DEFAULT( cols, 2 )
-
-   METHOD DEFAULT( gutter, 5 )
-
-   METHOD DEFAULT( width, 100 )
-
-   METHOD Fwrite( ::nH, '<MULTICOL COLS="' + NUMTRIM( cols ) + '" GUTTER="' + NUMTRIM( gutter ) + '" WIDTH="' + NUMTRIM( width ) + '">' )
-
-   METHOD Fwrite( ::nH, txt )
-
-   METHOD Fwrite( ::nH, "</MULTICOL>" )
+   METHOD MultiCol( txt, cols, gutter, width ) INLINE DEFAULT( txt, "" ),;
+   DEFAULT( cols, 2 ),;
+   DEFAULT( gutter, 5 ),;
+   DEFAULT( width, 100 ),;
+   Fwrite( ::nH, '<MULTICOL COLS="' + NUMTRIM( cols ) + '" GUTTER="' + NUMTRIM( gutter ) + '" WIDTH="' + NUMTRIM( width ) + '">' ),;
+   Fwrite( ::nH, txt ),;
+   Fwrite( ::nH, "</MULTICOL>" )
 
    METHOD PutHeading( cText, nWeight, lCentered )
 
    METHOD HLine( nSize, nWidth, lShade, cColor )
 
-   /*                         INLINE ;
    METHOD PutParagraph() INLINE Fwrite( ::nH, "<P> </P>" + CRLF() )
 
    METHOD Paragraph( l, c, style )
@@ -197,7 +179,7 @@ CLASS Html
    onMsOver, onMsOut, onClick, onStart, onFinish )
    METHOD EndMarquee()
 
-   METHOD PutTextUrl( cText, cUrl, cOnClick, cOmMsOver, cOnMsout, cTarget, /*new parameters*/ font, clr, size, style, bld, lbreak, cClass )
+   METHOD PutTextUrl( cText, cUrl, cOnClick, cOmMsOver, cOnMsout, cTarget,  font, clr, size, style, bld, lbreak, cClass )
 
    METHOD PutImageUrl( cImage, nBorder, nHeight, nWidth, cUrl, ;
    cOnclick, cOnMsOver, cOnMsOut, cName, cAlt, cTarget, nWidth, lbreak, cClass, ALING )

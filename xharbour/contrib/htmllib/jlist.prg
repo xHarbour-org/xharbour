@@ -199,7 +199,8 @@ METHOD SetFont( name, font, fntColor, fntSize ) CLASS NcList
       [ FACE = '] + font + [' ] + ;
       [ SIZE = ] + NTRIM( fntSize ) + ['] + ;
       [ COLOR = '] + fntColor + [' ] + ;
-      [ > "," < / FONT >
+      [ > ","</FONT>");]+CRLF()
+             
    Aadd( ::aScript, cStr )
 RETURN self
 

@@ -1,5 +1,5 @@
 /*
- * $Id: oedit.prg,v 1.2 2002/04/17 16:08:00 lculik Exp $
+ * $Id: oedit.prg,v 1.1 2003/02/23 23:15:17 lculik Exp $
  */
 
 /*
@@ -490,9 +490,8 @@ CLASS Form
 
    METHOD setwidth( c ) INLINE ::width := c
 
-   METHOD AddControl( o ) INLINE IIF( Valtype( o ) == "O", ( o:nH := ::nH, o:Form := Self ), )
-
-   METHOD Aadd( ::aControls, o )
+   METHOD AddControl( o ) INLINE IIF( Valtype( o ) == "O", ( o:nH := ::nH, o:Form := Self ), ),;
+          Aadd( ::aControls, o )
 
    METHOD PutControls() INLINE Aeval( ::aControls, { | e | e:Put() } )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: oini.prg,v 1.1 2001/12/25 16:51:58 lculik Exp $
+ * $Id: oini.prg,v 1.1 2003/02/23 23:15:17 lculik Exp $
  */
 
 /*
@@ -496,19 +496,19 @@ STATIC FUNCTION Str2Any( cVal, uType )
          CASE  "D" 
             uRet := Ctod( cVal )
             EXIT
-         CASE cType == "N" 
+         CASE  "N" 
             uRet := IIF( !Empty( cVal ), Val( cVal ), 0 )
             EXIT
-         CASE cType == "L"
+         CASE  "L"
             uRet := IIF( cVal == ".T.", .T., .F. )
             EXIT
-         CASE cType == "B" 
+         CASE  "B" 
             uRet := { || .T. }
             EXIT
-         CASE cType == "O" 
+         CASE  "O" 
             uRet := NIL
             EXIT
-         CASE cType == "U" 
+         CASE  "U" 
             uRet := NIL
             EXIT
          DEFAULT
