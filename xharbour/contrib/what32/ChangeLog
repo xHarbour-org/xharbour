@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.34 2002/10/10 00:50:06 lculik Exp $
+ * $Id: ChangeLog,v 1.35 2002/10/14 01:46:37 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-10-18 07:30 UCT+1000 AJ Wos <andrwos@aust1.net>
+   * _winwnd.c
+     * Corrected ignored parameter to AllowSetForgroundWindow()
+     * Fixed bug in closing the DLL before function call in 
+       AllowSetForegroundWindow().
+   * _windlg.c   
+     * converted GetListBoxInfo() to a dynamic DLL call. 
+
+   ( please make sure that the changelog is always updated - there
+     is no entry here that somebody has converted some API functions,
+     to dynamic DLL calls - which other functions have been changed ? )  
+
 2002-10-14 03:41 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
    + _ToolTip.c
      + Support for tooltips
        SETTOOLTIP()
-
 
 2002-10-09 22:00 UTC -0300 Luiz Rafael Culik <culikr@uol.com.br>
    * _winmous.c

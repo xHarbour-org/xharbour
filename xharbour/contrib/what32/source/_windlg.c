@@ -345,13 +345,31 @@ HB_FUNC( GETALTTABINFO )
 //-----------------------------------------------------------------------------
 // WINUSERAPI DWORD WINAPI GetListBoxInfo( IN HWND hwnd );
 
-
+/*
 HB_FUNC( GETLISTBOXINFO )
 {
    hb_retnl( (LONG) GetListBoxInfo( (HWND) hb_parnl( 1 ) ) ) ;
 }
+*/
 
+HB_FUNC ( GETLISTBOXINFO )
+{
+HINSTANCE h    = LoadLibraryEx( "user32.dll",NULL,NULL);
+DWORD dwGLIRet = 0 ;
+HWND  hWnd     = (HWND) hb_parnl( 1 );
 
+if( h ){
+    typedef DWORD (WINAPI *xdwGetListBoxInfo)( HWND hWnd );
+    xdwGetListBoxInfo pfnGLI = (xdwGetListBoxInfo)
+    GetProcAddress( h, "GetListBoxInfo") ;
+    if( pfnGLI ){
+        dwGLIRet = (DWORD) pfnGLI( hWnd ) ;
+    }
+    FreeLibrary( h );
+}
+ 
+   hb_retl( (ULONG) dwGLIRet );
+}
 
 
 //----------------------------------------------------------------------------//

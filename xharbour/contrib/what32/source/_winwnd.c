@@ -1267,17 +1267,16 @@ HB_FUNC ( ALLOWSETFOREGROUNDWINDOW )
 {
 HINSTANCE h = LoadLibraryEx( "user32.dll",NULL,NULL);
 BOOL bASFWRet = (BOOL) FALSE ;
-DWORD dwProcessId = ASFW_ANY ;  // you may have to look up this value if
-                                // your compiler does not have it defined
- 
+DWORD dwProcessId = ISNIL( 1 ) ? ASFW_ANY : (DWORD) hb_parnl( 1 );
+
 if( h ){
     typedef BOOL (WINAPI *xbAllowSetForegroundWindow)( DWORD dwProcessId );
     xbAllowSetForegroundWindow pfnASFW = (xbAllowSetForegroundWindow)
     GetProcAddress( h, "AllowSetForegroundWindow") ;
-    FreeLibrary( h );
     if( pfnASFW ){
         bASFWRet = (BOOL) pfnASFW( dwProcessId ) ;
     }
+    FreeLibrary( h );
 }
  
    hb_retl( bASFWRet );
