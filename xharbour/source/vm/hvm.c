@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.320 2004/02/14 00:22:08 ronpinkas Exp $
+ * $Id: hvm.c,v 1.321 2004/02/14 01:29:45 andijahja Exp $
  */
 
 /*
@@ -195,13 +195,13 @@ static void    hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec ); /* 
 static void    hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols ); /* creates a macro-compiled codeblock */
 static void    hb_vmPushLocal( SHORT iLocal );    /* pushes the containts of a local onto the stack */
 static void    hb_vmPushLocalByRef( SHORT iLocal );    /* pushes a local by refrence onto the stack */
-static void    hb_vmPushLongConst( long lNumber );  /* Pushes a long constant (pcode) */
+static void    hb_vmPushLongConst( LONG lNumber );  /* Pushes a long constant (pcode) */
 HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 ); /* pushes a number on to the stack and decides if it is integer, long or double */
 #ifndef HB_LONG_LONG_OFF
    HB_EXPORT void    hb_vmPushLongLong( LONGLONG lNumber );  /* Pushes a long long (pcode) */
    HB_EXPORT void    hb_vmPushNumInt( LONGLONG lNumber );
 #else
-   HB_EXPORT void    hb_vmPushNumInt( long lNumber );
+   HB_EXPORT void    hb_vmPushNumInt( LONG lNumber );
 #endif
 static void    hb_vmPushStatic( USHORT uiStatic );     /* pushes the containts of a static onto the stack */
 static void    hb_vmPushStaticByRef( USHORT uiStatic ); /* pushes a static by refrence onto the stack */
@@ -2200,7 +2200,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                #ifndef HB_LONG_LONG_OFF
                   LONGLONG lNewVal, lVal;
                #else
-                  long lNewVal, lVal;
+                  LONG lNewVal, lVal;
                #endif
 
                if( HB_IS_INTEGER( pLocal ) )
@@ -2340,7 +2340,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                #ifndef HB_LONG_LONG_OFF
                   LONGLONG lNewVal, lVal;
                #else
-                  long lNewVal, lVal;
+                  LONG lNewVal, lVal;
                #endif
 
                if( HB_IS_INTEGER( pTop ) )
@@ -2427,11 +2427,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SWITCHCASE") );
          {
             PHB_ITEM pTop = hb_stackItemFromTop( -1 );
-            long lCase = HB_PCODE_MKLONG( &( pCode[ w + 1 ] ) );
+            LONG lCase = HB_PCODE_MKLONG( &( pCode[ w + 1 ] ) );
 
             if( pTop->type & HB_IT_INTEGER )
             {
-               hb_vmPushLogical( (long) ( pTop->item.asInteger.value ) == lCase );
+               hb_vmPushLogical( (LONG) ( pTop->item.asInteger.value ) == lCase );
             }
             else if( pTop->type & HB_IT_LONG )
             {
@@ -2439,7 +2439,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if( pTop->type & HB_IT_STRING && pTop->item.asString.length == 1 )
             {
-               hb_vmPushLogical( (long) ( pTop->item.asString.value[0] ) == lCase );
+               hb_vmPushLogical( (LONG) ( pTop->item.asString.value[0] ) == lCase );
             }
             else
             {
@@ -3381,7 +3381,7 @@ static void hb_vmPlus( void )
    }
    else if( ( HB_IS_DATE( pItem1 ) || HB_IS_DATE( pItem2 ) ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
    {
-      hb_vmPushDate( (long) hb_vmPopNumber() + (long) hb_vmPopNumber() );
+      hb_vmPushDate( (LONG) hb_vmPopNumber() + (LONG) hb_vmPopNumber() );
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
@@ -3491,7 +3491,7 @@ static void hb_vmMinus( void )
       double dNumber2 = hb_vmPopNumber();
       double dNumber1 = hb_vmPopNumber();
 
-      hb_vmPushDate( (long) dNumber1 - (long) dNumber2 );
+      hb_vmPushDate( (LONG) dNumber1 - (LONG) dNumber2 );
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
@@ -3896,7 +3896,7 @@ static void hb_vmFuncPtr( void )  /* pushes a function address pointer. Removes 
 
    if( HB_IS_SYMBOL( pItem ) )
    {
-      pItem->item.asLong.value = (long) pItem->item.asSymbol.value->pFunPtr;
+      pItem->item.asLong.value = (LONG) pItem->item.asSymbol.value->pFunPtr;
       pItem->type = HB_IT_LONG;
    }
    else
@@ -4572,7 +4572,7 @@ static void hb_vmArrayPush( void )
 
    PHB_ITEM pIndex;
    PHB_ITEM pArray;
-   long     lIndex;
+   LONG     lIndex;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayAt()"));
 
@@ -4600,20 +4600,20 @@ static void hb_vmArrayPush( void )
 
    if( HB_IS_INTEGER( pIndex ) )
    {
-      lIndex = ( long ) pIndex->item.asInteger.value;
+      lIndex = ( LONG ) pIndex->item.asInteger.value;
    }
    else if( HB_IS_LONG( pIndex ) )
    {
-      lIndex = ( long ) pIndex->item.asLong.value;
+      lIndex = ( LONG ) pIndex->item.asLong.value;
    }
    else if( HB_IS_DOUBLE( pIndex ) )
    {
-      lIndex = ( long ) pIndex->item.asDouble.value;
+      lIndex = ( LONG ) pIndex->item.asDouble.value;
    }
 #ifndef HB_LONG_LONG_OFF
    else if( HB_IS_LONGLONG( pIndex ) )
    {
-      lIndex = ( long ) pIndex->item.asLongLong.value;
+      lIndex = ( LONG ) pIndex->item.asLongLong.value;
    }
 #endif
  #ifndef HB_C52_STRICT
@@ -4621,7 +4621,7 @@ static void hb_vmArrayPush( void )
    {
       if( pIndex->item.asString.length == 1 )
       {
-         lIndex = ( long ) pIndex->item.asString.value[0];
+         lIndex = ( LONG ) pIndex->item.asString.value[0];
       }
       else if( HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
       {
@@ -4805,7 +4805,7 @@ static void hb_vmArrayPop( void )
    PHB_ITEM pValue;
    PHB_ITEM pIndex;
    PHB_ITEM pArray;
-   long     lIndex;
+   LONG     lIndex;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayPop()"));
 
@@ -4829,20 +4829,20 @@ static void hb_vmArrayPop( void )
 
    if( HB_IS_INTEGER( pIndex ) )
    {
-      lIndex = ( long ) pIndex->item.asInteger.value;
+      lIndex = ( LONG ) pIndex->item.asInteger.value;
    }
    else if( HB_IS_LONG( pIndex ) )
    {
-      lIndex = ( long ) pIndex->item.asLong.value;
+      lIndex = ( LONG ) pIndex->item.asLong.value;
    }
    else if( HB_IS_DOUBLE( pIndex ) )
    {
-      lIndex = ( long ) pIndex->item.asDouble.value;
+      lIndex = ( LONG ) pIndex->item.asDouble.value;
    }
 #ifndef HB_LONG_LONG_OFF
    else if( HB_IS_LONGLONG( pIndex ) )
    {
-      lIndex = ( long ) pIndex->item.asLongLong.value;
+      lIndex = ( LONG ) pIndex->item.asLongLong.value;
    }
 #endif
  #ifndef HB_C52_STRICT
@@ -4850,7 +4850,7 @@ static void hb_vmArrayPop( void )
    {
       if( pIndex->item.asString.length == 1 )
       {
-         lIndex = ( long ) pIndex->item.asString.value[0];
+         lIndex = ( LONG ) pIndex->item.asString.value[0];
       }
       else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
       {
@@ -6173,7 +6173,7 @@ HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType
    }
    else if( LONG_MIN <= dNumber && dNumber <= LONG_MAX )
    {
-      hb_vmPushLong( ( long ) dNumber );
+      hb_vmPushLong( ( LONG ) dNumber );
    }
 #ifndef HB_LONG_LONG_OFF
    else if( LONGLONG_MIN <= dNumber && dNumber <= LONGLONG_MAX )
@@ -6190,7 +6190,7 @@ HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType
 #ifndef HB_LONG_LONG_OFF
 HB_EXPORT void hb_vmPushNumInt( LONGLONG lNumber )
 #else
-HB_EXPORT void hb_vmPushNumInt( long lNumber )
+HB_EXPORT void hb_vmPushNumInt( LONG lNumber )
 #endif
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumType(%Ld, %i, %i)", lNumber ));
@@ -6203,7 +6203,7 @@ HB_EXPORT void hb_vmPushNumInt( long lNumber )
    }
    else if( LONG_MIN <= lNumber && lNumber <= LONG_MAX )
    {
-      hb_vmPushLong( ( long ) lNumber );
+      hb_vmPushLong( ( LONG ) lNumber );
    }
 #ifndef HB_LONG_LONG_OFF
    else //if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )
@@ -6225,7 +6225,7 @@ HB_EXPORT void hb_vmPushInteger( int iNumber )
    hb_stackPush();
 }
 
-HB_EXPORT void hb_vmPushLong( long lNumber )
+HB_EXPORT void hb_vmPushLong( LONG lNumber )
 {
    HB_THREAD_STUB
 
@@ -6250,7 +6250,7 @@ HB_EXPORT void hb_vmPushLong( long lNumber )
    hb_stackPush();
 }
 
-static void hb_vmPushLongConst( long lNumber )
+static void hb_vmPushLongConst( LONG lNumber )
 {
    HB_THREAD_STUB
 
@@ -6362,7 +6362,7 @@ static void hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec )
    hb_stackPush();
 }
 
-HB_EXPORT void hb_vmPushDate( long lDate )
+HB_EXPORT void hb_vmPushDate( LONG lDate )
 {
    HB_THREAD_STUB
 
@@ -8054,7 +8054,7 @@ HB_FUNC( HB_QSELF )
    HB_THREAD_STUB
 
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
-   long lLevel = hb_parnl( 1 );
+   LONG lLevel = hb_parnl( 1 );
 
    // Outer function level.
    pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;

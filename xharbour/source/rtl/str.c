@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.10 2003/07/18 21:42:35 andijahja Exp $
+ * $Id: str.c,v 1.11 2004/02/09 12:11:30 andijahja Exp $
  */
 
 /*
@@ -163,7 +163,7 @@ HB_FUNC( HB_STRING2POINTER )
 
    if( pString )
    {
-      hb_retnl( (long) pString->item.asString.value );
+      hb_retnl( (LONG) pString->item.asString.value );
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.75 2004/02/11 21:18:46 andijahja Exp $
+ * $Id: itemapi.c,v 1.76 2004/02/12 22:00:26 andijahja Exp $
  */
 
 /*
@@ -423,7 +423,7 @@ char HB_EXPORT * hb_itemGetDS( PHB_ITEM pItem, char * szDate )
    }
 }
 
-long HB_EXPORT hb_itemGetDL( PHB_ITEM pItem )
+LONG HB_EXPORT hb_itemGetDL( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDL(%p)", pItem));
 
@@ -551,7 +551,7 @@ int HB_EXPORT hb_itemGetNI( PHB_ITEM pItem )
    return 0;
 }
 
-long HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
+LONG HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetNL(%p)", pItem));
 
@@ -563,26 +563,26 @@ long HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
             return pItem->item.asLong.value;
 
          case HB_IT_INTEGER:
-            return ( long ) pItem->item.asInteger.value;
+            return ( LONG ) pItem->item.asInteger.value;
 
          case HB_IT_DOUBLE:
-            return ( long ) pItem->item.asDouble.value;
+            return ( LONG ) pItem->item.asDouble.value;
 
          case HB_IT_DATE:
             return pItem->item.asDate.value;
 
          case HB_IT_LOGICAL:
-            return ( long ) pItem->item.asLogical.value;
+            return ( LONG ) pItem->item.asLogical.value;
 
          #ifndef HB_LONG_LONG_OFF
          case HB_IT_LONGLONG:
-            return ( long ) pItem->item.asLongLong.value;
+            return ( LONG ) pItem->item.asLongLong.value;
          #endif
 
          case  HB_IT_STRING:
             if( pItem->item.asString.length == 1 )
             {
-               return ( long ) pItem->item.asString.value[0];
+               return ( LONG ) pItem->item.asString.value[0];
             }
       }
    }
@@ -645,7 +645,7 @@ PHB_ITEM HB_EXPORT hb_itemPutDS( PHB_ITEM pItem, char * szDate )
    return pItem;
 }
 
-PHB_ITEM HB_EXPORT hb_itemPutD( PHB_ITEM pItem, long lYear, long lMonth, long lDay )
+PHB_ITEM HB_EXPORT hb_itemPutD( PHB_ITEM pItem, LONG lYear, LONG lMonth, LONG lDay )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutD(%p, %04i, %02i, %02i)", pItem, lYear, lMonth, lDay));
 
@@ -669,7 +669,7 @@ PHB_ITEM HB_EXPORT hb_itemPutD( PHB_ITEM pItem, long lYear, long lMonth, long lD
    return pItem;
 }
 
-PHB_ITEM HB_EXPORT hb_itemPutDL( PHB_ITEM pItem, long lJulian )
+PHB_ITEM HB_EXPORT hb_itemPutDL( PHB_ITEM pItem, LONG lJulian )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutDL(%p, %ld)", pItem, lJulian));
 
@@ -768,7 +768,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNI( PHB_ITEM pItem, int iNumber )
    return pItem;
 }
 
-PHB_ITEM HB_EXPORT hb_itemPutNL( PHB_ITEM pItem, long lNumber )
+PHB_ITEM HB_EXPORT hb_itemPutNL( PHB_ITEM pItem, LONG lNumber )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutNL(%p, %ld)", pItem, lNumber));
 
@@ -828,7 +828,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNLen( PHB_ITEM pItem, double dNumber, int iWidth, i
    }
    else if( LONG_MIN <= dNumber && dNumber <= LONG_MAX )
    {
-      return hb_itemPutNLLen( pItem, ( long ) dNumber, iWidth );
+      return hb_itemPutNLLen( pItem, ( LONG ) dNumber, iWidth );
    }
 #ifndef HB_LONG_LONG_OFF
    else if( LONGLONG_MIN <= dNumber && dNumber <= LONGLONG_MAX )
@@ -915,7 +915,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNILen( PHB_ITEM pItem, int iNumber, int iWidth )
    return pItem;
 }
 
-PHB_ITEM HB_EXPORT hb_itemPutNLLen( PHB_ITEM pItem, long lNumber, int iWidth )
+PHB_ITEM HB_EXPORT hb_itemPutNLLen( PHB_ITEM pItem, LONG lNumber, int iWidth )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutNLLen(%p, %ld, %d)", pItem, lNumber, iWidth));
 
@@ -1902,7 +1902,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNLLLen( PHB_ITEM pItem, LONGLONG llNumber, int iWid
 #ifndef HB_LONG_LONG_OFF
 PHB_ITEM HB_EXPORT hb_itemPutNInt( PHB_ITEM pItem, LONGLONG lNumber )
 #else
-PHB_ITEM HB_EXPORT hb_itemPutNInt( PHB_ITEM pItem, long lNumber )
+PHB_ITEM HB_EXPORT hb_itemPutNInt( PHB_ITEM pItem, LONG lNumber )
 #endif
 {
    if( SHRT_MIN <= lNumber && lNumber <= SHRT_MAX )
@@ -1911,7 +1911,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNInt( PHB_ITEM pItem, long lNumber )
    }
    else if( LONG_MIN <= lNumber && lNumber <= LONG_MAX )
    {
-      hb_itemPutNL( pItem, ( long ) lNumber );
+      hb_itemPutNL( pItem, ( LONG ) lNumber );
    }
 #ifndef HB_LONG_LONG_OFF
    else //if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )
@@ -1925,7 +1925,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNInt( PHB_ITEM pItem, long lNumber )
 #ifndef HB_LONG_LONG_OFF
 PHB_ITEM HB_EXPORT hb_itemPutNIntLen( PHB_ITEM pItem, LONGLONG lNumber, int iWidth )
 #else
-PHB_ITEM HB_EXPORT hb_itemPutNIntLen( PHB_ITEM pItem, long lNumber, int iWidth )
+PHB_ITEM HB_EXPORT hb_itemPutNIntLen( PHB_ITEM pItem, LONG lNumber, int iWidth )
 #endif
 {
    if( SHRT_MIN <= lNumber && lNumber <= SHRT_MAX )
@@ -1934,7 +1934,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNIntLen( PHB_ITEM pItem, long lNumber, int iWidth )
    }
    else if( LONG_MIN <= lNumber && lNumber <= LONG_MAX )
    {
-      hb_itemPutNLLen( pItem, ( long ) lNumber, iWidth );
+      hb_itemPutNLLen( pItem, ( LONG ) lNumber, iWidth );
    }
 #ifndef HB_LONG_LONG_OFF
    else //if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbhextonum.c,v 1.2 2003/11/07 18:20:54 jonnymind Exp $
+ * $Id: hbhex2n.c,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
  */
 
 /*
@@ -145,6 +145,6 @@ HB_FUNC( HB_HEXTONUM )
       cHex++;
    }
 
-   hb_retnl( (long) ulNum  );
+   hb_retnl( (LONG) ulNum  );
 }
 

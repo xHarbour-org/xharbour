@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.38 2004/02/03 00:43:25 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.39 2004/02/04 01:15:12 ronpinkas Exp $
  */
 
 /*
@@ -854,7 +854,7 @@ RETURN uObj
   {
      static char cDate[9] = "00000000";
 
-     hb_dateDecStr( cDate, (long) nDate + 0x0024d9abL );
+     hb_dateDecStr( cDate, (LONG) nDate + 0x0024d9abL );
 
      return ( cDate );
   }
@@ -1781,12 +1781,12 @@ RETURN uObj
                 break;
 
               case HB_IT_LOGICAL:
-                hb_storl( (long) ptros[ i ], i );
+                hb_storl( (LONG) ptros[ i ], i );
                 break;
 
               case HB_IT_INTEGER:
               case HB_IT_LONG:
-                hb_stornl( (long) ptros[ i ], i );
+                hb_stornl( (LONG) ptros[ i ], i );
                 break;
 
               case HB_IT_DOUBLE:

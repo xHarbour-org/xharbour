@@ -1,5 +1,5 @@
 /*
- * $Id: replic.c,v 1.4 2003/07/13 22:21:25 andijahja Exp $
+ * $Id: replic.c,v 1.5 2003/07/18 21:42:35 andijahja Exp $
  */
 
 /*
@@ -61,7 +61,7 @@ HB_FUNC( REPLICATE )
 {
    if( ISCHAR( 1 ) && hb_param( 2, HB_IT_NUMERIC ) )
    {
-      long lTimes = hb_parnl( 2 );
+      LONG lTimes = hb_parnl( 2 );
 
       if( lTimes > 0 )
       {
@@ -72,7 +72,7 @@ HB_FUNC( REPLICATE )
             char * szText = hb_parc( 1 );
             char * szResult = ( char * ) hb_xgrab( ( ulLen * lTimes ) + 1 );
             char * szPtr = szResult;
-            long i;
+            LONG i;
 
             for( i = 0; i < lTimes; i++ )
             {

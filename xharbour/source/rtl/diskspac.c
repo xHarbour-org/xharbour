@@ -1,5 +1,5 @@
 /*
- * $Id: diskspac.c,v 1.2 2003/02/11 03:08:40 druzus Exp $
+ * $Id: diskspac.c,v 1.3 2003/02/16 16:00:42 likewolf Exp $
  */
 
 /*
@@ -51,7 +51,7 @@
  */
 
 /* NOTE: DISKSPACE() supports larger disks than 2GB. CA-Cl*pper will always
-         return a (long) value, Harbour may return a (double) for large
+         return a (LONG) value, Harbour may return a (double) for large
          values, the decimal places are always set to zero, though. */
 
 /* NOTE: For OS/2. Must be ahead of any and all #include statements */

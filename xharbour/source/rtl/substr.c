@@ -1,5 +1,5 @@
 /*
- * $Id: substr.c,v 1.3 2003/07/13 22:21:25 andijahja Exp $
+ * $Id: substr.c,v 1.4 2003/07/18 21:42:35 andijahja Exp $
  */
 
 /*
@@ -62,11 +62,11 @@ HB_FUNC( SUBSTR )
 
    if( pText && hb_param( 2, HB_IT_NUMERIC ) )
    {
-      long lPos = hb_parnl( 2 );
+      LONG lPos = hb_parnl( 2 );
 
       if( lPos < 0 )
       {
-         lPos += ( long ) hb_itemGetCLen( pText );
+         lPos += ( LONG ) hb_itemGetCLen( pText );
          if( lPos < 0 )
             lPos = 0;
       }
@@ -75,9 +75,9 @@ HB_FUNC( SUBSTR )
          lPos--;
       }
 
-      if( lPos < ( long ) hb_itemGetCLen( pText ) )
+      if( lPos < ( LONG ) hb_itemGetCLen( pText ) )
       {
-         long lLen;
+         LONG lLen;
 
          if( hb_pcount() >= 3 )
          {
@@ -85,8 +85,8 @@ HB_FUNC( SUBSTR )
             {
                lLen = hb_parnl( 3 );
 
-               if( lLen > ( long ) hb_itemGetCLen( pText ) - lPos )
-                  lLen = ( long ) hb_itemGetCLen( pText ) - lPos;
+               if( lLen > ( LONG ) hb_itemGetCLen( pText ) - lPos )
+                  lLen = ( LONG ) hb_itemGetCLen( pText ) - lPos;
             }
             else
             {
@@ -96,7 +96,7 @@ HB_FUNC( SUBSTR )
             }
          }
          else
-            lLen = ( long ) hb_itemGetCLen( pText ) - lPos;
+            lLen = ( LONG ) hb_itemGetCLen( pText ) - lPos;
 
          if( lLen > 0 )
          {

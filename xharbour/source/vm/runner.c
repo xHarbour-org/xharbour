@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.19 2003/12/07 00:10:07 jonnymind Exp $
+ * $Id: runner.c,v 1.20 2004/02/14 01:29:45 andijahja Exp $
  */
 
 /*
@@ -140,7 +140,7 @@ static void      hb_hrbFileRead( FHANDLE file, char * szFileName, char * cBuffer
 static BYTE      hb_hrbFileReadByte( FHANDLE file, char * szFileName );
 static int       hb_hrbFileReadHead( FHANDLE file, char * szFileName );
 static char *    hb_hrbFileReadId( FHANDLE file, char * szFileName );
-static long      hb_hrbFileReadLong( FHANDLE file, char * szFileName );
+static LONG      hb_hrbFileReadLong( FHANDLE file, char * szFileName );
 static void      hb_hrbFileClose( FHANDLE file );
 
 static ULONG     s_ulSymEntry = 0;              /* Link enhancement         */
@@ -737,7 +737,7 @@ static BYTE hb_hrbFileReadByte( FHANDLE file, char * szFileName )
 }
 
 
-static long hb_hrbFileReadLong( FHANDLE file, char * szFileName )
+static LONG hb_hrbFileReadLong( FHANDLE file, char * szFileName )
 {
    char cLong[ 4 ];                               /* Temporary long           */
 

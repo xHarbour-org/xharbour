@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.15 2004/01/27 21:18:21 peterrees Exp $
+ * $Id: hbffind.c,v 1.16 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.15 2004/01/27 21:18:21 peterrees Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.16 2004/02/14 01:29:42 andijahja Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -93,7 +93,7 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.15 2004/01/27 21:18:21 peterrees Exp $" )
 
    #if defined(__WATCOMC__)
       struct _finddata_t  entry;
-      long hHandle;
+      LONG hHandle;
    #else
       struct ffblk    entry;
    #endif

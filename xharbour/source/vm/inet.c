@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.39 2004/01/23 10:10:37 andijahja Exp $
+* $Id: inet.c,v 1.40 2004/02/14 01:29:45 andijahja Exp $
 */
 
 /*
@@ -240,7 +240,7 @@ void hb_socketSetNonBlocking( HB_SOCKET_STRUCT *Socket )
 
    flags = fcntl( Socket->com, F_GETFL );
    flags |= O_NONBLOCK;
-   fcntl( Socket->com, F_SETFL, (long) flags );
+   fcntl( Socket->com, F_SETFL, (LONG) flags );
 
 #endif
 

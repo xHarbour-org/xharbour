@@ -1,5 +1,5 @@
 /*
- * $Id: hbchecksum.c,v 1.3 2003/09/15 02:38:37 paultucker Exp $
+ * $Id: hbchksum.c,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
  */
 
 /*
@@ -124,7 +124,7 @@ HB_FUNC( HB_CHECKSUM )
       ulSum = (ULONG) hb_parnl( 2 );
    }
 
-   hb_retnd( (long) 
+   hb_retnd( (LONG)
       adler32( ulSum, ( const BYTE *) pString->item.asString.value, pString->item.asString.length ) );
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.84 2004/01/11 14:03:39 andijahja Exp $
+ * $Id: arrays.c,v 1.85 2004/02/14 01:29:44 andijahja Exp $
  */
 
 /*
@@ -527,9 +527,9 @@ char HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
    return exData;
 }
 
-long HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
+LONG HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
 {
-   long lData;
+   LONG lData;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDL(%p, %lu)", pArray, ulIndex ));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
@@ -596,9 +596,9 @@ int HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex )
    return iRet;
 }
 
-long HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex )
+LONG HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex )
 {
-   long lRet;
+   LONG lRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNL(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
@@ -913,7 +913,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       }
       else if( HB_IS_DATE( pValue ) ) // Must precede HB_IS_NUMERIC()
       {
-         long lValue = hb_itemGetDL( pValue );
+         LONG lValue = hb_itemGetDL( pValue );
 
          for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {
@@ -943,7 +943,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       }
       else if( HB_IS_LOGICAL( pValue ) )
       {
-         BOOL bValue = hb_itemGetL( pValue ); /* NOTE: This is correct: Get the date as a long value. [vszakats] */
+         BOOL bValue = hb_itemGetL( pValue ); /* NOTE: This is correct: Get the date as a LONG value. [vszakats] */
 
          for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {

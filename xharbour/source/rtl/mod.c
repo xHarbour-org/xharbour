@@ -1,5 +1,5 @@
 /*
- * $Id: mod.c,v 1.2 2003/07/13 22:21:25 andijahja Exp $
+ * $Id: mod.c,v 1.3 2003/07/18 21:42:35 andijahja Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ HB_FUNC( MOD )
 
       if( dBase )
       {
-         double dResult = dNumber - ( ( long ) ( dNumber / dBase ) * dBase );
+         double dResult = dNumber - ( ( LONG ) ( dNumber / dBase ) * dBase );
 
          if( dResult * dBase < 0 )
             hb_retnd( dResult + dBase );

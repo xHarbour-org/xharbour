@@ -1,5 +1,5 @@
 /*
- * $Id: right.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: right.c,v 1.3 2003/02/20 01:49:04 ronpinkas Exp $
  */
 
 /*
@@ -62,8 +62,8 @@ HB_FUNC( RIGHT )
 
    if( pText && ISNUM( 2 ) )
    {
-      long lLen = hb_parnl( 2 );
-      long lTextLen = ( long ) hb_itemGetCLen( pText );
+      LONG lLen = hb_parnl( 2 );
+      LONG lTextLen = ( LONG ) hb_itemGetCLen( pText );
 
       if( lLen > lTextLen )
       {

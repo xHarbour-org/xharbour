@@ -1,5 +1,5 @@
 /*
- * $Id: padc.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: padc.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -64,22 +64,22 @@ HB_FUNC( PADC )
 
    if( szText && ISNUM( 2 ) )
    {
-      long lLen = hb_parnl( 2 );
+      LONG lLen = hb_parnl( 2 );
 
-      if( lLen > ( long ) ulSize )
+      if( lLen > ( LONG ) ulSize )
       {
          char * szResult = ( char * ) hb_xgrab( lLen + 1 );
          char cPad;
-         long w, lPos = ( lLen - ( long ) ulSize ) / 2;
+         LONG w, lPos = ( lLen - ( LONG ) ulSize ) / 2;
 
-         hb_xmemcpy( szResult + lPos, szText, ( long ) ulSize + 1 );
+         hb_xmemcpy( szResult + lPos, szText, ( LONG ) ulSize + 1 );
 
          cPad = ( ISCHAR( 3 ) ? *hb_parc( 3 ) : ' ' );
 
          for( w = 0; w < lPos; w++ )
             szResult[ w ] = cPad;
 
-         for( w = ( long ) ulSize + lPos; w < lLen; w++ )
+         for( w = ( LONG ) ulSize + lPos; w < lLen; w++ )
             szResult[ w ] = cPad;
 
          szResult[ lLen ] = '\0';

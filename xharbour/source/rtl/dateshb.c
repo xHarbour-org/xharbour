@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.4 2004/02/11 15:09:45 jonnymind Exp $
+ * $Id: dateshb.c,v 1.5 2004/02/11 16:07:56 jonnymind Exp $
  */
 
 /*
@@ -233,7 +233,7 @@ HB_FUNC( YEAR )
 
    if( pDate )
    {
-      long lYear, lMonth, lDay;
+      LONG lYear, lMonth, lDay;
 
       hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
 
@@ -251,7 +251,7 @@ HB_FUNC( MONTH )
 
    if( pDate )
    {
-      long lYear, lMonth, lDay;
+      LONG lYear, lMonth, lDay;
 
       hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
 
@@ -269,7 +269,7 @@ HB_FUNC( DAY )
 
    if( pDate )
    {
-      long lYear, lMonth, lDay;
+      LONG lYear, lMonth, lDay;
 
       hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
 
@@ -311,7 +311,7 @@ HB_FUNC( TIMEOFDAY )
 
 HB_FUNC( DATE )
 {
-   long lYear, lMonth, lDay;
+   LONG lYear, lMonth, lDay;
    hb_dateToday( &lYear, &lMonth, &lDay );
    hb_retd( lYear, lMonth, lDay );
 }
@@ -322,11 +322,11 @@ HB_FUNC( DOW )
 
    if( pDate )
    {
-      long lDate = hb_itemGetDL( pDate );
+      LONG lDate = hb_itemGetDL( pDate );
 
       if( lDate )
       {
-         long lYear, lMonth, lDay;
+         LONG lYear, lMonth, lDay;
 
          hb_dateDecode( lDate, &lYear, &lMonth, &lDay );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.51 2004/01/11 22:04:12 ronpinkas Exp $
+ * $Id: memvars.c,v 1.52 2004/01/21 19:58:17 peterrees Exp $
  */
 
 /*
@@ -2145,7 +2145,7 @@ HB_FUNC( __MVRESTORE )
                   BYTE pbyNumber[ HB_MEM_NUM_LEN ];
 
                   if( hb_fsRead( fhnd, pbyNumber, HB_MEM_NUM_LEN ) == HB_MEM_NUM_LEN )
-                     pItem = hb_itemPutDL( NULL, ( long ) ( * ( double * ) &pbyNumber ) );
+                     pItem = hb_itemPutDL( NULL, ( LONG ) ( * ( double * ) &pbyNumber ) );
 
                   break;
                }

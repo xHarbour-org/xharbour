@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.20 2003/12/13 19:27:00 ronpinkas Exp $
+ * $Id: hash.c,v 1.21 2004/02/10 13:16:18 andijahja Exp $
  */
 
 /*
@@ -126,8 +126,8 @@ static int s_hashOrderComplex( PHB_ITEM pFirst,
       }
       else if ( pSecond->type == HB_IT_DATE )
       {
-         long d1 = pFirst->item.asDate.value;
-         long d2 = pSecond->item.asDate.value;
+         LONG d1 = pFirst->item.asDate.value;
+         LONG d2 = pSecond->item.asDate.value;
          if ( d1 < d2 )
          {
             return -1;
@@ -2436,7 +2436,7 @@ HB_FUNC( HALLOCATE )
 
    if( pHash && pValue )
    {
-      long lMem = hb_itemGetNL( pValue );
+      LONG lMem = hb_itemGetNL( pValue );
 
       if( lMem > 0 )
       {

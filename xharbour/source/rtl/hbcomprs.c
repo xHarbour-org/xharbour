@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.c,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
+ * $Id: hbcomprs.c,v 1.2 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -518,7 +518,7 @@ int HB_EXPORT deflateSetDictionary ( z_streamp strm,  const Bytef * dictionary, 
     }
     memcpy(s->window, dictionary, length);
     s->strstart = length;
-    s->block_start = (long)length;
+    s->block_start = (LONG)length;
 
     /* Insert all strings in the hash table (except for the last two bytes).
      * s->lookahead stays null, so s->ins_h will be recomputed at the next
@@ -1142,7 +1142,7 @@ local void fill_window( deflate_state *s )
             memcpy(s->window, s->window+wsize, (unsigned)wsize);
             s->match_start -= wsize;
             s->strstart    -= wsize; /* we now have strstart >= MAX_DIST */
-            s->block_start -= (long) wsize;
+            s->block_start -= (LONG) wsize;
 
             /* Slide the hash table (could be avoided with 32 bit values
                at the expense of memory usage). We slide even when level == 0
@@ -1210,7 +1210,7 @@ local void fill_window( deflate_state *s )
    _tr_flush_block(s, (s->block_start >= 0L ? \
                    (charf *)&s->window[(unsigned)s->block_start] : \
                    (charf *)NULL), \
-		(ulg)((long)s->strstart - s->block_start), \
+		(ulg)((LONG)s->strstart - s->block_start), \
 		(eof)); \
    s->block_start = s->strstart; \
    flush_pending(s->strm); \
@@ -1761,8 +1761,8 @@ local void gen_bitlen(
             m = s->heap[--h];
             if (m > max_code) continue;
             if ((unsigned)tree[m].Len != (unsigned) bits) {
-                s->opt_len += ((long)bits - (long)tree[m].Len)
-                              *(long)tree[m].Freq;
+                s->opt_len += ((LONG)bits - (LONG)tree[m].Len)
+                              *(LONG)tree[m].Freq;
                 tree[m].Len = (ush)bits;
             }
             n--;
@@ -2194,7 +2194,7 @@ int _tr_tally (
     if ((s->last_lit & 0x1fff) == 0 && s->level > 2) {
         /* Compute an upper bound for the compressed length */
         ulg out_length = (ulg)s->last_lit*8L;
-        ulg in_length = (ulg)((long)s->strstart - s->block_start);
+        ulg in_length = (ulg)((LONG)s->strstart - s->block_start);
         int dcode;
         for (dcode = 0; dcode < D_CODES; dcode++) {
             out_length += (ulg)s->dyn_dtree[dcode].Freq *
@@ -4089,7 +4089,7 @@ HB_FUNC( HB_COMPRESS )
    {
       if (pDestLen != NULL )
       {
-         pDestLen->item.asLong.value = (long) ulDstlen;
+         pDestLen->item.asLong.value = (LONG) ulDstlen;
          hb_retni( Z_OK );
       }
       else
@@ -4208,6 +4208,6 @@ HB_FUNC( HB_COMPRESSERRORDESC )
 
 HB_FUNC( HB_COMPRESSBUFLEN )
 {
-   hb_retnl( (long) hb_destBuflen( hb_parni(1) ) );
+   hb_retnl( (LONG) hb_destBuflen( hb_parni(1) ) );
 }
 

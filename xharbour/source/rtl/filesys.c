@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.66 2004/02/03 01:05:52 lculik Exp $
+ * $Id: filesys.c,v 1.67 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -3169,9 +3169,9 @@ BOOL HB_EXPORT hb_fsEof( FHANDLE hFileHandle )
 {
 #if defined(__DJGPP__) || defined(__CYGWIN__) || defined(OS_UNIX_COMPATIBLE)
    HB_THREAD_STUB
-   long curPos;
-   long endPos;
-   long newPos;
+   LONG curPos;
+   LONG endPos;
+   LONG newPos;
 
    HB_STACK_UNLOCK
 

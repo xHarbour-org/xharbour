@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrypt.c,v 1.11 2003/11/24 15:15:25 lf_sfnet Exp $
+ * $Id: hbcrypt.c,v 1.12 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -86,8 +86,8 @@
 */
 
 void nxs_crypt(
-   const unsigned char *source, unsigned long srclen,
-   const unsigned char *key, unsigned long keylen,
+   const unsigned char *source, ULONG srclen,
+   const unsigned char *key, ULONG keylen,
    BYTE *cipher )
 {
 
@@ -114,8 +114,8 @@ void nxs_crypt(
 /*decrypting the buffer */
 
 void nxs_decrypt(
-   const unsigned char *cipher, unsigned long cipherlen,
-   const unsigned char *key, unsigned long keylen,
+   const unsigned char *cipher, ULONG cipherlen,
+   const unsigned char *key, ULONG keylen,
    BYTE *result )
 {
    if(keylen > NXS_MAX_KEYLEN )
@@ -139,8 +139,8 @@ void nxs_decrypt(
 /* This function scrambles the source using the letter ordering in the
 * key. */
 void nxs_scramble(
-      const unsigned char *source, unsigned long srclen,
-      const unsigned char *key, unsigned long keylen,
+      const unsigned char *source, ULONG srclen,
+      const unsigned char *key, ULONG keylen,
       BYTE *cipher )
 {
    int scramble[ NXS_MAX_KEYLEN ];

@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbcrc32.c,v 1.5 2003/09/15 02:38:37 paultucker Exp $
+ * $Id: hbcrc32.c,v 1.6 2003/11/24 15:15:25 lf_sfnet Exp $
  */
 
 /*
@@ -236,7 +236,7 @@ HB_FUNC( HB_CRC32)
       ulSum = (ULONG) hb_parnl( 2 );
    }
 
-   hb_retnd( (long) 
+   hb_retnd( (LONG)
       crc32( ulSum, ( const BYTE *) pString->item.asString.value, pString->item.asString.length ) );
 }
 

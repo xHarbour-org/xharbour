@@ -1,5 +1,5 @@
 /*
- * $Id: minmax.c,v 1.2 2002/08/08 19:36:08 ronpinkas Exp $
+ * $Id: minmax.c,v 1.3 2002/10/17 00:48:07 ronpinkas Exp $
  */
 
 /*
@@ -94,8 +94,8 @@ HB_FUNC( MAX )
       }
       else if( HB_IS_LONG( p1 ) || HB_IS_LONG( p2 ) )
       {
-         long l1 = hb_itemGetNL( p1 );
-         long l2 = hb_itemGetNL( p2 );
+         LONG l1 = hb_itemGetNL( p1 );
+         LONG l2 = hb_itemGetNL( p2 );
 
          hb_retnl( l1 >= l2 ? l1 : l2 );
       }
@@ -153,8 +153,8 @@ HB_FUNC( MIN )
       }
       else if( HB_IS_LONG( p1 ) || HB_IS_LONG( p2 ) )
       {
-         long l1 = hb_itemGetNL( p1 );
-         long l2 = hb_itemGetNL( p2 );
+         LONG l1 = hb_itemGetNL( p1 );
+         LONG l2 = hb_itemGetNL( p2 );
 
          hb_retnl( l1 <= l2 ? l1 : l2 );
       }

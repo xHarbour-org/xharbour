@@ -1,5 +1,5 @@
 /*
- * $Id: rat.c,v 1.3 2001/04/12 18:56:29 dholm Exp $
+ * $Id: rat.c,v 1.1.1.1 2001/12/21 10:42:00 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,7 @@ HB_FUNC( RAT )
 
    if( ulSubLen )
    {
-      long lPos = hb_parclen( 2 ) - ulSubLen;
+      LONG lPos = hb_parclen( 2 ) - ulSubLen;
 
       if( lPos >= 0 )
       {

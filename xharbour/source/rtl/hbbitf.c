@@ -1,5 +1,5 @@
 /*
- * $Id: hbbitfield.c,v 1.1 2003/07/08 06:05:40 jonnymind Exp $
+ * $Id: hbbitf.c,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 */
 
 static BOOL s_invalid_params( char *szFname, PHB_ITEM pParam1, PHB_ITEM pParam2,
-      long *ret1, long *ret2 )
+      LONG *ret1, LONG *ret2 )
 {
    if ( pParam1 == NULL || pParam2 == NULL ||
       (pParam1->type & ( HB_IT_INTEGER | HB_IT_LONG )) == 0 ||
@@ -73,12 +73,12 @@ static BOOL s_invalid_params( char *szFname, PHB_ITEM pParam1, PHB_ITEM pParam2,
    }
 
    *ret1 = pParam1->type == HB_IT_INTEGER ?
-         (long) hb_itemGetNI( pParam1 ) : hb_itemGetNL( pParam1 );
+         (LONG) hb_itemGetNI( pParam1 ) : hb_itemGetNL( pParam1 );
 
    if ( ret2 != NULL )
    {
       *ret2 = pParam2->type == HB_IT_INTEGER ?
-         (long) hb_itemGetNI( pParam2 ) : hb_itemGetNL( pParam2 );
+         (LONG) hb_itemGetNI( pParam2 ) : hb_itemGetNL( pParam2 );
    }
 
    return FALSE;
@@ -91,7 +91,7 @@ HB_FUNC( HB_BITAND )
 {
    PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
    PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   long ret1, ret2;
+   LONG ret1, ret2;
 
    if ( s_invalid_params( "HB_BITAND", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
@@ -116,7 +116,7 @@ HB_FUNC( HB_BITOR )
 {
    PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
    PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   long ret1, ret2;
+   LONG ret1, ret2;
 
    if ( s_invalid_params( "HB_BITOR", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
@@ -140,7 +140,7 @@ HB_FUNC( HB_BITXOR )
 {
    PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
    PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   long ret1, ret2;
+   LONG ret1, ret2;
 
    if ( s_invalid_params( "HB_BITXOR", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
@@ -163,7 +163,7 @@ HB_FUNC( HB_BITXOR )
 HB_FUNC( HB_BITNOT )
 {
    PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
-   long ret1;
+   LONG ret1;
 
    if ( s_invalid_params( "HB_BITNOT", pAnd1, pAnd1, &ret1, NULL ) )
    {
@@ -187,7 +187,7 @@ HB_FUNC( HB_BITISSET )
 {
    PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
    PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   long ret1, ret2;
+   LONG ret1, ret2;
 
    if ( s_invalid_params( "HB_BITISSET", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
@@ -204,7 +204,7 @@ HB_FUNC( HB_BITSET )
 {
    PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
    PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   long ret1, ret2;
+   LONG ret1, ret2;
 
    if ( s_invalid_params( "HB_BITSET", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
@@ -228,7 +228,7 @@ HB_FUNC( HB_BITRESET )
 {
    PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
    PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   long ret1, ret2;
+   LONG ret1, ret2;
 
    if ( s_invalid_params( "HB_BITRESET", pAnd1, pAnd2, &ret1, &ret2 ) )
    {
@@ -252,7 +252,7 @@ HB_FUNC( HB_BITSHIFT )
 {
    PHB_ITEM pAnd1 = hb_param(1, HB_IT_ANY );
    PHB_ITEM pAnd2 = hb_param(2, HB_IT_ANY );
-   long ret1, ret2;
+   LONG ret1, ret2;
 
    if ( s_invalid_params( "HB_BITRESET", pAnd1, pAnd2, &ret1, &ret2 ) )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.12 2003/12/06 15:33:39 jonnymind Exp $
+ * $Id: dynsym.c,v 1.13 2004/01/27 03:07:00 ronpinkas Exp $
  */
 
 /*
@@ -711,7 +711,7 @@ HB_FUNC( __DYNSCOUNT ) /* How much symbols do we have: dsCount = __dynsymCount()
 #ifdef HB_API_MACROS
    HB_THREAD_STUB
 #endif
-   hb_retnl( ( long ) s_uiDynSymbols );
+   hb_retnl( ( LONG ) s_uiDynSymbols );
 }
 
 HB_FUNC( __DYNSGETNAME ) /* Get name of symbol: cSymbol = __dynsymGetName( dsIndex ) */
@@ -720,7 +720,7 @@ HB_FUNC( __DYNSGETNAME ) /* Get name of symbol: cSymbol = __dynsymGetName( dsInd
    HB_THREAD_STUB
 #endif
 
-   long lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
+   LONG lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
 
    hb_dynsymLock();
 
@@ -749,7 +749,7 @@ HB_FUNC( __DYNSGETINDEX ) /* Gimme index number of symbol: dsIndex = __dynsymGet
    if( pDynSym )
    {
       /* ... because this is from HB_VM_STACK (see macros at top of file) */
-      hb_retnl( ( long ) ( s_uiClosestDynSym + 1 ) );
+      hb_retnl( ( LONG ) ( s_uiClosestDynSym + 1 ) );
    }
    else
    {
@@ -765,7 +765,7 @@ HB_FUNC( __DYNSISFUN ) /* returns .t. if a symbol has a function/procedure point
 #ifdef HB_API_MACROS
    HB_THREAD_STUB
 #endif
-   long lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
+   LONG lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
 
    hb_dynsymLock();
 
@@ -788,7 +788,7 @@ HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or proc
 #ifdef HB_API_MACROS
    HB_THREAD_STUB
 #endif
-   long lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
+   LONG lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
 
    hb_reta( 2 );
    hb_stornl( 0, -1, 1 );

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.94 2004/02/13 07:13:33 ronpinkas Exp $
+ * $Id: classes.c,v 1.95 2004/02/14 01:29:44 andijahja Exp $
  */
 
 /*
@@ -1278,7 +1278,7 @@ HB_EXPORT ULONG hb_objHasMsg( PHB_ITEM pObject, char *szString )
 }
 
 // Worker function for HB_FUNC( __CLSADDMSG ).
-void hb_clsAddMsg( USHORT uiClass, char *szMessage, long lID_or_FuncPointer_or_BlockPointer, USHORT wType, USHORT uiSprClass, USHORT uiScope, BOOL bPersistent, PHB_ITEM pInit, BOOL bCheckPrefix, BOOL bCase )
+void hb_clsAddMsg( USHORT uiClass, char *szMessage, LONG lID_or_FuncPointer_or_BlockPointer, USHORT wType, USHORT uiSprClass, USHORT uiScope, BOOL bPersistent, PHB_ITEM pInit, BOOL bCheckPrefix, BOOL bCase )
 {
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -1623,7 +1623,7 @@ HB_FUNC( __CLSADDMSG )
 {
    USHORT   uiClass, uiScope, wType, uiSprClass = 0;
    char     *szMessage, szAssign[ HB_SYMBOL_NAME_LEN ];
-   long     lID_or_FuncPointer_or_BlockPointer;
+   LONG     lID_or_FuncPointer_or_BlockPointer;
    PHB_ITEM pInit = NULL;
    BOOL     bPersistent, bCase;
 
@@ -1643,7 +1643,7 @@ HB_FUNC( __CLSADDMSG )
    szMessage = hb_parc( 2 );
 
    // 3
-   lID_or_FuncPointer_or_BlockPointer = (long) hb_param( 3, HB_IT_BLOCK );
+   lID_or_FuncPointer_or_BlockPointer = (LONG) hb_param( 3, HB_IT_BLOCK );
    if( lID_or_FuncPointer_or_BlockPointer == 0l )
    {
       lID_or_FuncPointer_or_BlockPointer = hb_parnl( 3 );

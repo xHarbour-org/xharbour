@@ -1,5 +1,5 @@
 /*
- * $Id: left.c,v 1.7 2003/07/13 22:21:25 andijahja Exp $
+ * $Id: left.c,v 1.8 2003/07/18 21:42:35 andijahja Exp $
  */
 
 /*
@@ -62,7 +62,7 @@ HB_FUNC( LEFT )
    if( pText && hb_param( 2, HB_IT_NUMERIC ) )
    {
       char *sLeft, *sString = pText->item.asString.value;
-      long lLeft = hb_parnl( 2 );
+      LONG lLeft = hb_parnl( 2 );
       ULONG ulLen = pText->item.asString.length;
 
       HB_TRACE( HB_TR_DEBUG, ("Left( '%s', %i ) %i", sString, lLeft, ulLen ) );

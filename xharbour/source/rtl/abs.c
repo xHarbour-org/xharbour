@@ -1,5 +1,5 @@
 /*
- * $Id: abs.c,v 1.5 2003/12/18 21:12:43 ronpinkas Exp $
+ * $Id: abs.c,v 1.6 2004/01/12 22:51:41 paultucker Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ HB_FUNC( ABS )
       }
       else if( HB_IS_LONG( pNumber ) )
       {
-         long lNumber = hb_itemGetNL( pNumber );
+         LONG lNumber = hb_itemGetNL( pNumber );
 
          if( lNumber >= 0 )
             hb_retnllen( lNumber, iWidth );

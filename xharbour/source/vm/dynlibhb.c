@@ -1,5 +1,5 @@
 /*
- * $Id: dynlibhb.c,v 1.6 2003/10/01 04:39:39 ronpinkas Exp $
+ * $Id: dynlibhb.c,v 1.7 2003/12/07 00:10:07 jonnymind Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ HB_FUNC( LIBLOAD )
 {
 #if defined(HB_OS_WIN_32)
    {
-      hb_retnl( ( long ) LoadLibrary( hb_parc( 1 ) ) );
+      hb_retnl( ( LONG ) LoadLibrary( hb_parc( 1 ) ) );
    }
 #else
    {

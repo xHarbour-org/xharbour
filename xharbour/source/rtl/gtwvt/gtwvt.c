@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.69 2004/02/13 09:22:47 andijahja Exp $
+ * $Id: gtwvt.c,v 1.70 2004/02/14 01:29:43 andijahja Exp $
  */
 
 /*
@@ -3099,7 +3099,7 @@ BOOL HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * image 
   HANDLE   hFile;
   DWORD    nFileSize;
   DWORD    nReadByte;
-  long     lWidth,lHeight;
+  LONG     lWidth,lHeight;
   int      x,y,xe,ye;
   int      c   = x1 ;
   int      r   = y1 ;
@@ -4981,7 +4981,7 @@ HB_FUNC( WVT_CHOOSEFONT )
 {
    CHOOSEFONT  cf;
    LOGFONT     lf;
-   long        PointSize = 0;
+   LONG        PointSize = 0;
 
    if ( ! ISNIL( 2 ) )
       PointSize = -MulDiv( ( LONG ) hb_parnl( 2 ), GetDeviceCaps( _s.hdc, LOGPIXELSY ), 72 ) ;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrandom.c,v 1.8 2004/01/11 14:03:39 andijahja Exp $
+ * $Id: hbrandom.c,v 1.9 2004/02/10 13:16:18 andijahja Exp $
  */
 
 /*
@@ -117,7 +117,7 @@ HB_FUNC( HB_RANDOMINT )
    #ifndef HB_LONG_LONG_OFF
    LONGLONG lX, lY;
    #else
-   long lX, lY;
+   LONG lX, lY;
    #endif
    
    dRnd = hb_random_num();
@@ -153,7 +153,7 @@ HB_FUNC( HB_RANDOMINT )
          #ifndef HB_LONG_LONG_OFF
          LONGLONG lZ = lY;
          #else
-         long lZ;
+         LONG lZ;
          #endif
          
          lY = lX;

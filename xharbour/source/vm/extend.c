@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.35 2004/01/11 14:03:39 andijahja Exp $
+ * $Id: extend.c,v 1.36 2004/02/09 06:30:16 walito Exp $
  */
 
 /*
@@ -517,7 +517,7 @@ int  HB_EXPORT hb_parni( int iParam, ... )
    return 0;
 }
 
-long  HB_EXPORT hb_parnl( int iParam, ... )
+LONG  HB_EXPORT hb_parnl( int iParam, ... )
 {
    HB_THREAD_STUB
 
@@ -538,11 +538,11 @@ long  HB_EXPORT hb_parnl( int iParam, ... )
       }
       else if( HB_IS_INTEGER( pItem ) )
       {
-         return ( long ) pItem->item.asInteger.value;
+         return ( LONG ) pItem->item.asInteger.value;
       }
       else if( HB_IS_DOUBLE( pItem ) )
       {
-         return ( long ) pItem->item.asDouble.value;
+         return ( LONG ) pItem->item.asDouble.value;
       }
       else if( HB_IS_DATE( pItem ) )
       {
@@ -550,17 +550,17 @@ long  HB_EXPORT hb_parnl( int iParam, ... )
       }
       else if( HB_IS_LOGICAL( pItem ) )
       {
-         return ( long ) pItem->item.asLogical.value;
+         return ( LONG ) pItem->item.asLogical.value;
       }
 #ifndef HB_LONG_LONG_OFF
       else if( HB_IS_LONGLONG( pItem ) )
       {
-         return ( long ) pItem->item.asLongLong.value;
+         return ( LONG ) pItem->item.asLongLong.value;
       }
 #endif
       else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
       {
-         return ( long ) pItem->item.asString.value[0];
+         return ( LONG ) pItem->item.asString.value[0];
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
@@ -613,7 +613,7 @@ void *hb_parptr( int iParam, ... )
 #ifndef HB_LONG_LONG_OFF
       else if( HB_IS_LONGLONG( pItem ) )
       {
-         return ( void * ) ((long)pItem->item.asLongLong.value);
+         return ( void * ) ((LONG)pItem->item.asLongLong.value);
       }
 #endif
       else if( HB_IS_ARRAY( pItem ) )
@@ -671,7 +671,7 @@ ULONG  HB_EXPORT hb_parinfa( int iParamNum, ULONG uiArrayIndex )
       if( uiArrayIndex == 0 )
          return hb_arrayLen( pArray );
       else
-         return ( long ) hb_arrayGetType( pArray, uiArrayIndex );
+         return ( LONG ) hb_arrayGetType( pArray, uiArrayIndex );
    }
    else
       return 0;
@@ -778,7 +778,7 @@ void HB_EXPORT hb_retds( char * szDate )
 }
 
 #undef hb_retd
-void HB_EXPORT hb_retd( long lYear, long lMonth, long lDay )
+void HB_EXPORT hb_retd( LONG lYear, LONG lMonth, LONG lDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retd(%04i, %02i, %02i)", lYear, lMonth, lDay));
 
@@ -786,7 +786,7 @@ void HB_EXPORT hb_retd( long lYear, long lMonth, long lDay )
 }
 
 #undef hb_retdl
-void HB_EXPORT hb_retdl( long lJulian )
+void HB_EXPORT hb_retdl( LONG lJulian )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retdl(%ld)", lJulian));
 
@@ -818,7 +818,7 @@ void HB_EXPORT hb_retni( int iNumber )
 }
 
 #undef hb_retnl
-void HB_EXPORT hb_retnl( long lNumber )
+void HB_EXPORT hb_retnl( LONG lNumber )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retnl(%ld)", lNumber));
 
@@ -850,7 +850,7 @@ void HB_EXPORT hb_retnilen( int iNumber, int iWidth )
 }
 
 #undef hb_retnllen
-void HB_EXPORT hb_retnllen( long lNumber, int iWidth )
+void HB_EXPORT hb_retnllen( LONG lNumber, int iWidth )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retnllen(%ld, %d)", lNumber, iWidth));
 
@@ -868,7 +868,7 @@ void hb_retptr( void *voidPtr )
 #ifndef HB_LONG_LONG_OFF
 void HB_EXPORT hb_retnint( LONGLONG lNumber )
 #else
-void HB_EXPORT hb_retnint( long lNumber )
+void HB_EXPORT hb_retnint( LONG lNumber )
 #endif
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retnint(%Ld)", lNumber));
@@ -880,7 +880,7 @@ void HB_EXPORT hb_retnint( long lNumber )
 #ifndef HB_LONG_LONG_OFF
 void HB_EXPORT hb_retnintlen( LONGLONG lNumber, int iWidth )
 #else
-void HB_EXPORT hb_retnintlen( long lNumber, int iWidth )
+void HB_EXPORT hb_retnintlen( LONG lNumber, int iWidth )
 #endif
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retnintlen(%Ld, %d)", lNumber, iWidth));
@@ -1040,7 +1040,7 @@ void HB_EXPORT hb_storni( int iValue, int iParam, ... )
    }
 }
 
-void HB_EXPORT hb_stornl( long lValue, int iParam, ... )
+void HB_EXPORT hb_stornl( LONG lValue, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stornl(%ld, %d, ...)", lValue, iParam));
 

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.151 2004/02/14 08:24:33 ronpinkas Exp $
+* $Id: thread.c,v 1.152 2004/02/14 19:48:52 andijahja Exp $
 */
 
 /*
@@ -462,7 +462,7 @@ HB_STACK *hb_threadLinkStack( HB_STACK *tc )
 */
 void hb_threadDestroyStack( HB_STACK *pStack )
 {
-   long i;
+   LONG i;
    PHB_ITEM *pPos;
    /* Free each element of the stack */
    if ( pStack != &hb_stack ) {
@@ -572,7 +572,7 @@ HB_STACK *hb_threadUnlinkStack( HB_STACK* pStack )
    {
       char errdat[64];
 
-      sprintf( errdat, "Stack not found for Thread %ld",  (long) pStack->th_id );
+      sprintf( errdat, "Stack not found for Thread %ld",  (LONG) pStack->th_id );
       hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadUnlinkStack", 0 );
    }
 
@@ -1559,7 +1559,7 @@ HB_FUNC( THREADGETCURRENT )
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
 #endif
-   hb_retnl( (long) HB_CURRENT_THREAD() );
+   hb_retnl( (LONG) HB_CURRENT_THREAD() );
 }
 
 /*
@@ -1569,7 +1569,7 @@ HB_FUNC( THREADGETCURRENT )
 HB_FUNC( THREADGETCURRENTINTERNAL )
 {
    HB_THREAD_STUB
-   hb_retnl( (long) HB_VM_STACK.th_vm_id );
+   hb_retnl( (LONG) HB_VM_STACK.th_vm_id );
 }
 
 /*
@@ -1611,7 +1611,7 @@ HB_FUNC( GETTHREADID )
             "GETTHREADID", 1, hb_paramError(1) );
          return;
       }
-      hb_retnl( (long) pThread->pStack->th_vm_id );
+      hb_retnl( (LONG) pThread->pStack->th_vm_id );
    }
    else
    {
@@ -1644,7 +1644,7 @@ HB_FUNC( GETSYSTEMTHREADID )
          return;
       }
       #if 1
-         hb_retnl( (long) pThread->threadId );
+         hb_retnl( (LONG) pThread->threadId );
       #endif
       /* Place here a warning or a special value for system without
         numeric or enumerable thread ids

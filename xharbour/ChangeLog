@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2285 2004/02/14 16:59:43 lculik Exp $
+ * $Id: ChangeLog,v 1.2286 2004/02/14 19:47:24 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,58 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-16 04:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/arrays.c
+  * source/vm/arrayshb.c
+  * source/vm/classes.c
+  * source/vm/dynlibhb.c
+  * source/vm/dynsym.c
+  * source/vm/extend.c
+  * source/vm/hash.c
+  * source/vm/hvm.c
+  * source/vm/inet.c
+  * source/vm/itemapi.c
+  * source/vm/macro.c
+  * source/vm/memvars.c
+  * source/vm/runner.c
+  * source/vm/thread.c
+  * source/rtl/abs.c
+  * source/rtl/binnum.c
+  * source/rtl/datec.c
+  * source/rtl/dates.c
+  * source/rtl/dateshb.c
+  * source/rtl/dir.c
+  * source/rtl/diskspac.c
+  * source/rtl/filesys.c
+  * source/rtl/hbbitf.c
+  * source/rtl/hbchksum.c
+  * source/rtl/hbcomprs.c
+  * source/rtl/hbcrc32.c
+  * source/rtl/hbcrypt.c
+  * source/rtl/hbffind.c
+  * source/rtl/hbhex2n.c
+  * source/rtl/hbrandom.c
+  * source/rtl/hbserv.c
+  * source/rtl/hbsrlraw.c
+  * source/rtl/left.c
+  * source/rtl/minmax.c
+  * source/rtl/mod.c
+  * source/rtl/padc.c
+  * source/rtl/padl.c
+  * source/rtl/padr.c
+  * source/rtl/rat.c
+  * source/rtl/readline.c
+  * source/rtl/replic.c
+  * source/rtl/right.c
+  * source/rtl/space.c
+  * source/rtl/str.c
+  * source/rtl/strtran.c
+  * source/rtl/substr.c
+  * source/rtl/win32ole.prg
+  * source/common/hbffind.c
+  * source/rtl/gtwvt/gtwvt.c
+    ! standardize long -> LONG
+
 2004-02-15 02:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/thread.c
     ! minor correction on define: _MSVC_VER => _MSC_VER

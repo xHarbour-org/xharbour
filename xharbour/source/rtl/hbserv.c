@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.6 2003/12/11 11:22:11 mlombardo Exp $
+* $Id: hbserv.c,v 1.7 2004/02/14 01:29:42 andijahja Exp $
 */
 
 /*
@@ -188,7 +188,7 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
          #ifndef HARBOUR_GCC_OS2
          hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSUBSIG), info->si_code );
          hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSERROR), info->si_errno );
-         hb_itemPutNL( hb_arrayGetItemPtr( pRet, HB_SERVICE_ADDRESS), (long) info->si_addr );
+         hb_itemPutNL( hb_arrayGetItemPtr( pRet, HB_SERVICE_ADDRESS), (LONG) info->si_addr );
          hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_PROCESS), info->si_pid );
          hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_UID), info->si_uid );
          #endif

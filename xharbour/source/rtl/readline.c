@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.6 2004/01/11 14:03:39 andijahja Exp $
+ * $Id: readline.c,v 1.7 2004/02/09 19:15:05 mlombardo Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT uiBuffLen, char ** Term, int *
 {
    USHORT uiPosTerm, iPos, uiPosition;
    USHORT nTries, uiSize;
-   long lRead, lOffset;
+   LONG lRead, lOffset;
    BYTE * pBuff;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %hu, %p, %p, %hu, %i, %i)", hFileHandle, uiBuffLen, Term, iTermSizes, iTerms, *bFound, *bEOF ));
@@ -134,7 +134,7 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT uiBuffLen, char ** Term, int *
          {
             pBuff[lOffset+iPos-iTermSizes[uiPosTerm]+1] = '\0';
             /* Set handle pointer in the end of the line */
-            hb_fsSeek( hFileHandle, (((lRead-((long)iPos)))*-1)+1, FS_RELATIVE );
+            hb_fsSeek( hFileHandle, (((lRead-((LONG)iPos)))*-1)+1, FS_RELATIVE );
             return( pBuff );
          }
       }
@@ -168,7 +168,7 @@ HB_FUNC( HB_FREADLINE )
    char ** Term;
    BYTE * pBuffer;
    int * iTermSizes;
-   long lSize = hb_parnl(4);
+   LONG lSize = hb_parnl(4);
    USHORT i, iTerms;
    BOOL bFound, bEOF;
 

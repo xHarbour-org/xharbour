@@ -1,5 +1,5 @@
 /*
- * $Id: binnum.c,v 1.4 2003/03/07 10:36:01 likewolf Exp $
+ * $Id: binnum.c,v 1.5 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ HB_FUNC( BIN2L )
        * I fixed them. -- PK. */
       if( pBin->item.asString.length > 2 ) // Ok to take advantage of Termination char 0 :-)
       {
-         hb_retnl( HB_ULONG_FROM_LE( *(long *) ( pBin->item.asString.value ) ) );
+         hb_retnl( HB_ULONG_FROM_LE( *(LONG *) ( pBin->item.asString.value ) ) );
 
          return;
       }
@@ -93,7 +93,7 @@ HB_FUNC( BIN2L )
 
          memcpy( (void *) Temp, (void *) pBin->item.asString.value, pBin->item.asString.length );
 
-         hb_retnl( HB_ULONG_FROM_LE( *(long *) ( Temp ) ) );
+         hb_retnl( HB_ULONG_FROM_LE( *(LONG *) ( Temp ) ) );
 
          return;
       }
@@ -136,7 +136,7 @@ HB_FUNC( L2BIN )
 
    if( ISNUM( 1 ) )
    {
-      long lValue = hb_parnl( 1 );
+      LONG lValue = hb_parnl( 1 );
 
       szString[ 0 ] = ( lValue & 0x000000FF );
       szString[ 1 ] = ( lValue & 0x0000FF00 ) >> 8;

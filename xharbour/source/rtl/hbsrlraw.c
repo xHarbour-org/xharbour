@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.21 2004/01/31 20:18:26 tommir Exp $
+ * $Id: hbsrlraw.c,v 1.22 2004/02/13 09:22:47 andijahja Exp $
  */
 
 /*
@@ -267,7 +267,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
 HB_FUNC( HB_DESERIALIZESIMPLE )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
-   long ulMaxlen;
+   LONG ulMaxlen;
    ULONG ulData;
    char *cBuf;
 
@@ -316,7 +316,7 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
          else if( cBuf[1] == 'L' )
          {
             ulData = (ULONG) hb_getlen8( ( BYTE * )cBuf + 2 );
-            hb_retnl( (long) ulData );
+            hb_retnl( (LONG) ulData );
          }
 #ifndef HB_LONG_LONG_OFF
          else if( cBuf[1] == 'X' )

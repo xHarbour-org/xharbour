@@ -1,5 +1,5 @@
 /*
- * $Id: dates.c,v 1.3 2002/10/27 14:41:38 lculik Exp $
+ * $Id: dates.c,v 1.4 2003/01/29 21:30:27 andijahja Exp $
  */
 
 /*
@@ -78,7 +78,7 @@
 #include "hbapi.h"
 #include "hbdate.h"
 
-long HB_EXPORT hb_dateEncode( long lYear, long lMonth, long lDay )
+LONG HB_EXPORT hb_dateEncode( LONG lYear, LONG lMonth, LONG lDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateEncode(%ld, %ld, %ld)", lYear, lMonth, lDay));
 
@@ -94,9 +94,9 @@ long HB_EXPORT hb_dateEncode( long lYear, long lMonth, long lDay )
       if( ( ( lYear % 4 == 0 && lYear % 100 != 0 ) || lYear % 400 == 0 ) )
          auiDayLimit[ 1 ] = 29;
 
-      if( lDay <= ( long ) auiDayLimit[ ( int ) lMonth - 1 ] )
+      if( lDay <= ( LONG ) auiDayLimit[ ( int ) lMonth - 1 ] )
       {
-         long lFactor = ( lMonth < 3 ) ? -1 : 0;
+         LONG lFactor = ( lMonth < 3 ) ? -1 : 0;
 
          return ( 1461 * ( lFactor + 4800 + lYear ) / 4 ) +
                 ( ( lMonth - 2 - ( lFactor * 12 ) ) * 367 ) / 12 -
@@ -108,13 +108,13 @@ long HB_EXPORT hb_dateEncode( long lYear, long lMonth, long lDay )
    return 0;
 }
 
-void HB_EXPORT hb_dateDecode( long lJulian, long * plYear, long * plMonth, long * plDay )
+void HB_EXPORT hb_dateDecode( LONG lJulian, LONG * plYear, LONG * plMonth, LONG * plDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateDecode(%ld, %p, %p, %p)", lJulian, plYear, plMonth, plDay));
 
    if( lJulian > 0 )
    {
-      long U, V, W, X;
+      LONG U, V, W, X;
 
       lJulian += 68569;
       W = ( lJulian * 4 ) / 146097;
@@ -136,7 +136,7 @@ void HB_EXPORT hb_dateDecode( long lJulian, long * plYear, long * plMonth, long 
    }
 }
 
-void HB_EXPORT hb_dateStrPut( char * szDate, long lYear, long lMonth, long lDay )
+void HB_EXPORT hb_dateStrPut( char * szDate, LONG lYear, LONG lMonth, LONG lDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateStrPut(%p, %ld, %ld, %ld)", szDate, lYear, lMonth, lDay));
 
@@ -157,7 +157,7 @@ void HB_EXPORT hb_dateStrPut( char * szDate, long lYear, long lMonth, long lDay 
       memset( szDate, ' ', 8 );
 }
 
-void HB_EXPORT hb_dateStrGet( const char * szDate, long * plYear, long * plMonth, long * plDay )
+void HB_EXPORT hb_dateStrGet( const char * szDate, LONG * plYear, LONG * plMonth, LONG * plDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateStrGet(%s, %p, %p, %p)", szDate, plYear, plMonth, plDay));
 
@@ -181,11 +181,11 @@ void HB_EXPORT hb_dateStrGet( const char * szDate, long * plYear, long * plMonth
 }
 
 /* This function always closes the date with a zero byte, so it needs a
-   9 character long buffer. */
+   9 character LONG buffer. */
 
-char HB_EXPORT * hb_dateDecStr( char * szDate, long lJulian )
+char HB_EXPORT * hb_dateDecStr( char * szDate, LONG lJulian )
 {
-   long lYear, lMonth, lDay;
+   LONG lYear, lMonth, lDay;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dateDecStr(%p, %ld)", szDate, lJulian));
 
@@ -196,9 +196,9 @@ char HB_EXPORT * hb_dateDecStr( char * szDate, long lJulian )
    return szDate;
 }
 
-long HB_EXPORT hb_dateEncStr( char * szDate )
+LONG HB_EXPORT hb_dateEncStr( char * szDate )
 {
-   long lYear, lMonth, lDay;
+   LONG lYear, lMonth, lDay;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dateEncStr(%s)", szDate));
 
@@ -381,7 +381,7 @@ char HB_EXPORT * hb_dateFormat( const char * szDate, char * szFormattedDate, con
    return szFormattedDate;
 }
 
-long HB_EXPORT hb_dateDOW( long lYear, long lMonth, long lDay )
+LONG HB_EXPORT hb_dateDOW( LONG lYear, LONG lMonth, LONG lDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateDOW(%ld, %ld, %ld)", lYear, lMonth, lDay));
 
@@ -397,7 +397,7 @@ long HB_EXPORT hb_dateDOW( long lYear, long lMonth, long lDay )
             lYear + lYear / 4 - lYear / 100 + lYear / 400 + 6 ) % 7 + 1;
 }
 
-void HB_EXPORT hb_dateToday( long * plYear, long * plMonth, long * plDay )
+void HB_EXPORT hb_dateToday( LONG * plYear, LONG * plMonth, LONG * plDay )
 {
 #if defined(HB_OS_WIN_32)
    {
@@ -423,7 +423,7 @@ void HB_EXPORT hb_dateToday( long * plYear, long * plMonth, long * plDay )
 #endif
 }
 
-/* NOTE: The passed buffer must be at least 9 chars long */
+/* NOTE: The passed buffer must be at least 9 chars LONG */
 
 void HB_EXPORT hb_dateTimeStr( char * pszTime )
 {

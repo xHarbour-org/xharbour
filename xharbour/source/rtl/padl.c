@@ -1,5 +1,5 @@
 /*
- * $Id: padl.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: padl.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -64,15 +64,15 @@ HB_FUNC( PADL )
 
    if( szText && ISNUM( 2 ) )
    {
-      long lLen = hb_parnl( 2 );
+      LONG lLen = hb_parnl( 2 );
 
-      if( lLen > ( long ) ulSize )
+      if( lLen > ( LONG ) ulSize )
       {
          char * szResult = ( char * ) hb_xgrab( lLen + 1 );
-         long lPos = lLen - ( long ) ulSize;
+         LONG lPos = lLen - ( LONG ) ulSize;
          char cPad;
 
-         hb_xmemcpy( szResult + lPos, szText, ( long ) ulSize );
+         hb_xmemcpy( szResult + lPos, szText, ( LONG ) ulSize );
 
          cPad = ( ISCHAR( 3 ) ? *( hb_parc( 3 ) ) : ' ' );
 

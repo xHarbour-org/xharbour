@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.35 2003/12/13 16:52:09 ronpinkas Exp $
+ * $Id: macro.c,v 1.36 2003/12/13 19:40:03 andijahja Exp $
  */
 
 /*
@@ -1302,7 +1302,7 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_
 }
 
 /* generates the pcode to push a long number on the virtual machine stack */
-void hb_compGenPushLong( long lNumber, HB_MACRO_DECL )
+void hb_compGenPushLong( LONG lNumber, HB_MACRO_DECL )
 {
    if( lNumber )
    {
@@ -1375,7 +1375,7 @@ void hb_compGenPopVar( char * szVarName, HB_MACRO_DECL )
 void hb_compGenPopAliasedVar( char * szVarName,
                               BOOL bPushAliasValue,
                               char * szAlias,
-                              long lWorkarea, HB_MACRO_DECL )
+                              LONG lWorkarea, HB_MACRO_DECL )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_compGenPopAliasedVar(%s->%s)",szAlias,szVarName));
 
@@ -1492,7 +1492,7 @@ void hb_compGenPushMemVarRef( char * szVarName, HB_MACRO_DECL )
 void hb_compGenPushAliasedVar( char * szVarName,
                                BOOL bPushAliasValue,
                                char * szAlias,
-                               long lWorkarea, HB_MACRO_DECL )
+                               LONG lWorkarea, HB_MACRO_DECL )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_compGenPushAliasedVar(%s->%s)",szAlias,szVarName));
 
