@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.53 2002/03/08 10:30:02 lculik Exp $
+ * $Id: hbmake.prg,v 1.11 2002/03/10 18:34:37 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -150,7 +150,7 @@ else
    cFile := ""
 endif
 
-If (empty(cFile) .and. !lEditMode) .or. !file(cfile) 
+If (empty(cFile) .and. !lEditMode) 
    ? "File not Found"
    Return Nil
 Endif
@@ -2007,7 +2007,7 @@ elseif lGcc
  if at("linux",Getenv("HB_ARCHITECTURE"))>0 .or.  cOs=="Linux" .or. at("linux",lower(os()))>0
     Fwrite( nLinkHandle, "LINKER = ar -M "+CRLF)
  else
-    Fwrite( nLinkHandle, "LINKER = $(BCB)\ar -M <"+CRLF)
+    Fwrite( nLinkHandle, "LINKER = $(BCB)\ar -M "+CRLF)
  endif
  Fwrite( nLinkHandle, " "+CRLF)
  Fwrite( nLinkHandle, "ALLOBJ = $(OBJFILES) $(OBJCFILES) "+CRLF)
