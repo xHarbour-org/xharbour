@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.72 2004/02/15 19:11:55 jonnymind Exp $
+ * $Id: gtwvt.c,v 1.73 2004/02/16 12:28:46 andijahja Exp $
  */
 
 /*
@@ -66,6 +66,15 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+/*
+* Individual authors:
+* (C) 2003-2004 Giancarlo Niccolai <gc at niccolai dot ws>
+*         Standard xplatform GT Info system, 
+*         Graphical object system and event system.
+*         GTINFO() And GTO_* implementation.
+*/
+
 #include "hbgtwvt.h"
 
 #ifndef WM_MOUSEWHEEL
@@ -674,27 +683,37 @@ void HB_GT_FUNC( gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
 //
 BOOL HB_GT_FUNC( gt_SetMode( USHORT row, USHORT col ) )
 {
-  BOOL bResult= FALSE;
-  HFONT hFont;
+   BOOL bResult= FALSE;
+   HFONT hFont;
 
-  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_SetMode( %hu, %hu )", row, col ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_SetMode( %hu, %hu )", row, col ) );
 
-  if ( row<= WVT_MAX_ROWS && col<= WVT_MAX_COLS )
-  {
-    hFont = hb_wvt_gtGetFont( _s.fontFace, _s.fontHeight, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage );
-    if ( hFont )
-    {
-      // make sure that the mode selected along with the current
-      // font settings will fit in the window
-      //
-      if ( hb_wvt_gtValidWindowSize( row,col, hFont, _s.fontWidth ) )
+   if ( row<= WVT_MAX_ROWS && col<= WVT_MAX_COLS )
+   {
+      // Is the window already open
+      if ( _s.hWnd )
       {
-        bResult = hb_wvt_gtInitWindow( _s.hWnd, col, row );
+         hFont = hb_wvt_gtGetFont( _s.fontFace, _s.fontHeight, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage );
+         if ( hFont )
+         {
+            // make sure that the mode selected along with the current
+            // font settings will fit in the window
+            //
+            // JC1: See my note
+            //
+            //if ( hb_wvt_gtValidWindowSize( row,col, hFont, _s.fontWidth ) )
+            //{
+              bResult = hb_wvt_gtInitWindow( _s.hWnd, col, row );
+            //}
+         DeleteObject( hFont );
+         }
       }
-      DeleteObject( hFont );
-    }
-  }
-  return( bResult );
+      else 
+      {
+         hb_wvt_gtAllocSpBuffer( row, col );
+      }
+   }
+   return( bResult );
 }
 
 //-------------------------------------------------------------------//
@@ -2593,8 +2612,6 @@ static void gt_hbInitStatics( void )
 {
   OSVERSIONINFO osvi ;
 
-  _s.PTEXTSIZE.x      = 0;
-  _s.PTEXTSIZE.y      = 0;
   _s.ROWS             = WVT_DEFAULT_ROWS;
   _s.COLS             = WVT_DEFAULT_COLS;
   _s.foreground       = WHITE;
@@ -2614,11 +2631,16 @@ static void gt_hbInitStatics( void )
   _s.keyPointerOut    = 0;
   _s.displayCaret     = TRUE;
   _s.RectInvalid.left = -1 ;
-  _s.fontHeight       = 0;
-  _s.fontWidth        = 0;
-  _s.fontWeight       = 0;
+
+  // THEESE are the default font parameters, if not changed by user
+  _s.PTEXTSIZE.x      = 8;
+  _s.PTEXTSIZE.y      = 12;
+  _s.fontHeight       = 12;
+  _s.fontWidth        = 8;
+  _s.fontWeight       = FW_NORMAL;
   _s.fontQuality      = DEFAULT_QUALITY;
   strcpy( _s.fontFace,"Terminal" );
+  
   _s.LastMenuEvent    = 0;
   _s.MenuKeyEvent     = 1024;
   _s.CentreWindow     = TRUE;       // Default is to always display window in centre of screen
@@ -2999,8 +3021,12 @@ BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold
     // make sure that the font  will fit inside the
     // window with the current _s.ROWS and _s.COLS setting
     //
-    if ( hb_wvt_gtValidWindowSize( _s.ROWS,_s.COLS, hFont, width ) )
-    {
+    //JC1: There's definitely something WRONG with this way of thinking.
+    // This makes effectively impossible to enlarge the window from it's
+    // initial size.
+    //
+    // if ( hb_wvt_gtValidWindowSize( _s.ROWS,_s.COLS, hFont, width ) )
+    // {
       _s.fontHeight  = height;
       _s.fontWidth   = width;
       _s.fontWeight  = Bold;
@@ -3023,7 +3049,7 @@ BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold
         hb_wvt_gtCreateCaret();
       }
       bResult= TRUE;
-    }
+    //}
     DeleteObject( hFont );
   }
   return( bResult );
@@ -3412,15 +3438,199 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
 {
-   HB_SYMBOL_UNUSED( bUpdate );
-   HB_SYMBOL_UNUSED( iParam );
+   int iOldValue;
+   
    HB_SYMBOL_UNUSED( vpParam );
-
+   
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-         return (int) FALSE;
+      return (int) TRUE;
+
+      case GTI_FONTSIZE:
+         iOldValue = (int) _s.PTEXTSIZE.y;
+         if ( bUpdate )
+         {
+            HFONT hFont = hb_wvt_gtGetFont( _s.fontFace, iParam, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage );
+            // make sure the font could actually be created
+            if ( hFont )
+            {
+               _s.fontHeight = iParam;
+               // is the window already opened?
+               if ( _s.hWnd )
+               {
+                 // resize the window based on new fonts
+                 //
+                 hb_wvt_gtResetWindowSize( _s.hWnd );
+         
+                 // force resize of caret
+                 //
+                 hb_wvt_gtKillCaret();
+                 hb_wvt_gtCreateCaret();
+               }
+               DeleteObject( hFont );
+            }
+         }
+      return iOldValue;         
+
+      
+      case GTI_FONTWIDTH:
+         iOldValue = (int) _s.PTEXTSIZE.x;
+         if ( bUpdate )
+         {
+            // store font status for next operation on fontsize
+            _s.fontWidth = iParam;
+         }
+      return iOldValue;  
+
+      
+      case GTI_FONTWEIGHT:
+         switch( _s.fontWeight )
+         {   
+            case FW_THIN:
+            case FW_EXTRALIGHT:
+            case FW_LIGHT:
+               iOldValue = GTI_FONTW_THIN;
+            break;
+               
+            case FW_DONTCARE:
+            case FW_NORMAL:
+            case FW_MEDIUM: 
+               iOldValue = GTI_FONTW_NORMAL;
+            break;
+            
+            case FW_SEMIBOLD: 
+            case FW_BOLD:
+            case FW_EXTRABOLD: 
+            case FW_HEAVY:
+               iOldValue = GTI_FONTW_BOLD;
+         }
+         
+         if ( bUpdate )
+         {
+            // store font status for next operation on fontsize
+            switch( iParam )
+            {
+               case GTI_FONTW_THIN:
+                  _s.fontWeight = FW_LIGHT;
+                  
+               case GTI_FONTW_NORMAL:
+                  _s.fontWeight = FW_NORMAL;
+               break;
+               
+               case GTI_FONTW_BOLD:
+                  _s.fontWeight = FW_BOLD;
+            }
+         }
+      return iOldValue;  
+
+      
+      case GTI_FONTQUALITY:
+         switch( _s.fontQuality )
+         {
+            case ANTIALIASED_QUALITY:
+               iOldValue = GTI_FONTQ_HIGH;
+            break;
+           
+            case DEFAULT_QUALITY:
+            case DRAFT_QUALITY:
+               iOldValue = GTI_FONTQ_NORMAL;
+            break;
+            
+            case NONANTIALIASED_QUALITY:
+            case PROOF_QUALITY:
+               iOldValue = GTI_FONTQ_DRAFT;
+         }
+               
+         if ( bUpdate )
+         {
+            switch( iParam )
+            {
+               case GTI_FONTQ_HIGH:
+                  _s.fontQuality = ANTIALIASED_QUALITY;
+               break;
+
+               case GTI_FONTQ_NORMAL:
+                  _s.fontQuality = DEFAULT_QUALITY;
+               break;
+               
+               case GTI_FONTQ_DRAFT:
+                  _s.fontQuality = DRAFT_QUALITY;
+            }
+         }
+      return iOldValue;
+            
+                   
+      case GTI_SCREENHEIGHT:
+         iOldValue = _s.PTEXTSIZE.y * _s.ROWS;
+         if ( bUpdate )
+         {
+            HB_GT_FUNC( gt_SetMode( iParam/_s.PTEXTSIZE.y , _s.COLS ) );
+         }
+      return iOldValue;
+      
+      
+      case GTI_SCREENWIDTH:
+         iOldValue = _s.PTEXTSIZE.x * _s.COLS;
+         if ( bUpdate )
+         {
+            HB_GT_FUNC( gt_SetMode( _s.ROWS, iParam/_s.PTEXTSIZE.x ) );
+         }      
+      return iOldValue;
+      
+      
+      case GTI_DESKTOPWIDTH:
+      {
+         RECT rDesk;
+         HWND hDesk;
+         
+         hDesk = GetDesktopWindow();
+         GetWindowRect( hDesk, &rDesk );
+         return rDesk.right - rDesk.left; 
+      }
+   
+      
+      case GTI_DESKTOPHEIGHT:
+      {
+         RECT rDesk;
+         HWND hDesk = GetDesktopWindow();
+         GetWindowRect( hDesk, &rDesk );
+         return rDesk.bottom - rDesk.top; 
+      }
+           
+      case GTI_DESKTOPCOLS:
+      {
+         RECT rDesk;
+         HWND hDesk;
+         
+         hDesk = GetDesktopWindow();
+         GetClientRect( hDesk, &rDesk );
+         
+         return (rDesk.right - rDesk.left) / _s.PTEXTSIZE.x; 
+      }
+      
+      
+      case GTI_DESKTOPROWS:
+      {
+         RECT rDesk;
+         HWND hDesk;
+         
+         hDesk = GetDesktopWindow();
+         GetClientRect( hDesk, &rDesk );
+         
+         return (rDesk.bottom - rDesk.top) / _s.PTEXTSIZE.y; 
+      }
+      
+      case GTI_INPUTFD:
+         return (int) GetStdHandle( STD_INPUT_HANDLE );
+      
+      case GTI_OUTPUTFD:
+         return (int) GetStdHandle( STD_INPUT_HANDLE );
+      
+      case GTI_ERRORFD:
+         return (int) GetStdHandle( STD_ERROR_HANDLE );
    }
+   
    // DEFAULT: there's something wrong if we are here.
    return -1;
 }

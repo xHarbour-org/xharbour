@@ -1,0 +1,175 @@
+                           
+                           
+                                 X H A R B O U R
+                                 
+                             Cross Platform GT system
+ 
+                                 GT Informations
+                                 
+                              
+                             Giancarlo Niccolai et al.
+                              
+                                 
+About this document
+-------------------
+   This document is finally meant to be included into a somewhat more
+   complete document about the new XHARBOUR crossplatform GT system,
+   that includes:
+   - Traditional clipper GT
+   - Clipper 5.3 text based GUI emulation (with enanchements)
+   - Extended graphical GT Informations
+   - Extended graphical GT objects (graphics objects in text/GT windows).
+   - Internal documentations of GT module building
+   
+   Currently, xharbour projects has a very partial documentationt of this
+   features; having somewhere to start is better than nothing...
+   
+Authors
+-------
+New GT+Graphical system is being developed at Xharbour projects, mainly
+by Giancarlo Niccolai, Przemislaw Czerpack, Pritpal Bedi, Mauricio Abre,
+Peter Rees and Francesco Saverio Giudice. Individual contributions are
+stated in the various xharbour files.
+
+   
+GTINFO System
+-------------
+
+   GTInfo() is a multiplatform compliant function, able to return or to
+   change many settings in the current GT.
+   
+   GTInfo( nSetting ) always returns a numeric value ( the old value for 
+   a certain setting) or -1 if the setting is not available or cannot
+   be determined.
+   
+   GTInfo( nSetting, nNewValue) will change the value and try to enact the
+   change as soon as possible. Some values are read-only, while others may
+   be altered by GTInfo. By convention, GT modules *MAY* delay the
+   enforcement of the new settings until a key setting is changed, like the
+   follownig table reports.
+  
+   Type of change            Key Setting
+   --------------------      ----------------
+   Font related              GTI_FONTSIZE
+   Screen (window) size      GTI_SCREENHEIGHT
+   
+   The GT *MAY* store values in temporary variables until the key setting
+   is changed; application not willing to change the key setting may
+   use GTInfo to retreive and re-set the current setting. I.e. to chante
+   only the font width from 8 to 12 pixels, the application should call:
+
+   GTInfo( GTI_FONTWIDTH, 12 )
+   GTInfo( GTI_FONTSIZE, GTInfo( GTI_FONTSIZE ) )
+   
+   This temporary storage behavior is singlethread oriented; but it makes
+   no sense to try to change application "face" apparence from more than
+   a thread (indeed, it makes little sense to change it after initialization,
+   or beside explicit user requests).
+
+   
+GTINFO Settings
+---------------
+   
+   Here follows the list of GTINFO settings and their meaning; they are marked
+   with a (RO) if they are read only, and (RW) if they can be changed.
+   
+   GTI_ISGRAPHIC (RO) 
+      Returns 1 if application supports (at least partially) graphic settings, 
+      -1 otherwise. TODO: More deeper explanation of supported features.
+       
+   GTI_SCREENWIDTH (RW) 
+      Get/set width of application window in pixels. Application MAY delay
+      enforcement of this setting until a GTI_SCREENHEIGHT is issued.
+      
+   GTI_SCREENHEIGHT (RW)
+      Get/set height of application window in pixels.
+      
+   GTI_SCREENDEPTH (RW)  
+      Amount of bits used for colors in the application: 1, 4, 8, 16, 24 or 32.
+      (or -1 if not supported).
+      
+   GTI_FONTSIZE (RW)
+      Get/set height of application font in pixels. The character height is 
+      often referred as main font size, and this is why this name is MORE
+      sensible than GTI_FONTHEIGHT would have been.
+      Initial status of GT defaults to 12 pixels, if possible/applicable.
+      
+   GTI_FONTWIDTH  (RW)
+      Get/set width of application font characters. Application MAY delay
+      enforcement of this setting until a GTI_FONTSIZE is issued.
+      Initial status of GT defaults to 8, unless system metrics for system
+      default fonts is heavily different; in this case GT modules should default
+      to adequate font width for a 12 pixel font size (height).
+
+   GTI_FONTWEIGHT (RW)
+      Get/set the weight of the font used in application; Value must be one
+      of the following cross platform values:
+         GTI_FONTW_THIN   - fairly thin font
+         GTI_FONTW_NORMAL - usually a normal font
+         GTI_FONTW_BOLD   - heavy bold characters
+      
+      Initial status of GT defaults to GTI_FONTW_NORMAL.
+      Application MAY delay enforcement of this setting until a GTI_FONTSIZE 
+      is issued.      
+
+   GTI_FONTQUALITY (RW)
+      Get/set quality of font rendering in the application. Results of this
+      setting are VERY depending on the underlying system. The value is one
+      of the following:
+         GTI_FONTQ_DRAFT    - Fast and dirty
+         GTI_FONTQ_NORMAL   - Normal font rendering
+         GTI_FONTQ_HIGH     - Better rendering usually slower
+         
+      Initial status of GT defaults to GTI_FONTQ_NORMAL.
+      Application MAY delay enforcement of this setting until a GTI_FONTSIZE 
+      is issued. 
+      
+     
+   GTI_DESKTOPWIDTH (RO)  
+      Get width of desktop in pixels, which is also maximum application width.
+      Notice that this does not consider possible character cell roundings and
+      windows borders, so the effective maximum size fo the GT area may be 
+      smaller.
+
+   GTI_DESKTOPHEIGHT (RO)  
+      Get height of desktop in pixels.
+      Notice that this does not consider possible character cell roundings and
+      windows borders, so the effective maximum size fo the GT area may be 
+      smaller.
+      
+   GTI_DESKTOPDEPTH  (RO)
+      Amount of bits used for colors in system.
+      
+   GTI_DESKTOPROWS   (RO)  
+      Get Size of desktop in character rows. This is the maximum area that the GT
+      may display on the screen, but it does NOT consider windows borders, titles,
+      and eventual extra window manager spaces, as the Windows taskbar, or the
+      KDE Kicker, or the Macintosh system menu. So, the effective amount of rows
+      to be used should be considered this number minus standard system desktop
+      occupation.
+      
+   GTI_DESKTOPCOLS (RO)
+      Get Size of desktop in character columns. This is the maximum area that the 
+      GT may display on the screen, but it does NOT consider windows borders, 
+      titles, and eventual extra window manager spaces, as the Windows taskbar, 
+      or the KDE Kicker, or the Macintosh system menu. So, the effective amount 
+      of rows to be used should be considered this number minus standard system 
+      desktop occupation.
+
+   GTI_INPUTFD (RO)
+      Returns standard file descriptor associated with application standard input.
+      In fact, as graphical GT are likely to be displayed in their own windows,
+      the FD may be well different from the place the GT displays its things;
+      an application may be interested to have access to the system console to
+      i.e. log it's status.
+      
+   GTI_OUTPUTFD (RO)      
+      Get Standard output steream of application/GT.
+      
+   GTI_ERRORFD  (RO)
+      Get Standard error steream of application/GT.
+   
+TODO
+----   
+   TODO: character based settings, like font names; activeable subGTs, i.e.
+   for multiple windowing.

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2307 2004/02/16 06:55:52 paultucker Exp $
+ * $Id: ChangeLog,v 1.2308 2004/02/16 12:28:44 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-15 21:12 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
+  + doc/gtinfo.txt
+    + Some embrional documentation about the GTINFO system; will be merged
+      with GTAPI to form a unique document about GT system.
+      
+  * include/gtinfo.ch
+    + Some defintions, comments. Capability to read desktop size in characters.
+    
+  * source/rtl/gtwvt/gtwvt.c
+    + GTINFO compliancy.
+    
+  * tests/gtinfo.prg
+    * Layout/indentation.
+
 2004-02-16 19:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/hbapi.h
   * source/common/hbgete.c

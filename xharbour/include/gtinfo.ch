@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.1 2004/02/01 00:35:42 maurifull Exp $
+ * $Id: gtinfo.ch,v 1.2 2004/02/09 18:00:35 druzus Exp $
  */
 
 /*
@@ -51,19 +51,41 @@
  *
  */
 
+/* 
+   Minimal informations:
+   
+   READ doc/gtinfo.txt
+*/
+    
 #ifndef HB_GTINFO_CH_
 #define HB_GTINFO_CH_
 
-#define GTI_ISGRAPHIC      0
-#define GTI_SCREENWIDTH    1
-#define GTI_SCREENHEIGHT   2
-#define GTI_SCREENDEPTH    3
-#define GTI_FONTSIZE       4
-#define GTI_FONTWIDTH      5
-#define GTI_DESKTOPWIDTH   6
-#define GTI_DESKTOPHEIGHT  7
-#define GTI_DESKTOPDEPTH   8
-#define GTI_INPUTFD        9
-#define GTI_OUTPUTFD      10
+#define GTI_ISGRAPHIC      0  /* 1 if GT has graphic support / pixel oriented */
+#define GTI_SCREENWIDTH    1  /* Get/set width of application window in pixels */
+#define GTI_SCREENHEIGHT   2  /* Get/set height of appl. window in pixels */
+#define GTI_SCREENDEPTH    3  /* Amount of bits used for colors in the application */
+#define GTI_FONTSIZE       4  /* Get/set height of application font in pixels */
+#define GTI_FONTWIDTH      5  /* Get/set width of application font characters */
+#define GTI_DESKTOPWIDTH   6  /* Get width of desktop in pixels */
+#define GTI_DESKTOPHEIGHT  7  /* Get height of desktop in pixels */
+#define GTI_DESKTOPDEPTH   8  /* Amount of bits used for colors in system */
+#define GTI_DESKTOPROWS   20  /* Get Size of desktop in character rows */
+#define GTI_DESKTOPCOLS   21  /* Get Size of desktop in character cols */
+#define GTI_FONTWEIGHT    22  /* Get/set the weight of the font used in application */
+#define GTI_FONTQUALITY   23  /* Get/set quality of font rendering in the appl. */
+
+#define GTI_INPUTFD       30  /* Get Standard input steream of application/GT */
+#define GTI_OUTPUTFD      31  /* Get Standard output steream of application/GT */
+#define GTI_ERRORFD       32  /* Get Standard error steream of application/GT */
+
+/* Font weights */
+#define GTI_FONTW_THIN     1
+#define GTI_FONTW_NORMAL   2
+#define GTI_FONTW_BOLD     3
+
+/* Font sizes */
+#define GTI_FONTQ_DRAFT    1
+#define GTI_FONTQ_NORMAL   2
+#define GTI_FONTQ_HIGH     3
 
 #endif /* HB_GTINFO_CH_ */

@@ -40,19 +40,19 @@ Local nOp
 	    Do Case
 	       Case nOp == 1
 	          GTInfo(GTI_SCREENWIDTH, 320)
-		  GTInfo(GTI_SCREENHEIGHT, 200)
+		       GTInfo(GTI_SCREENHEIGHT, 200)
 	       Case nOp == 2
 	          GTInfo(GTI_SCREENWIDTH, 640)
-		  GTInfo(GTI_SCREENHEIGHT, 400)
+		       GTInfo(GTI_SCREENHEIGHT, 400)
 	       Case nOp == 3
 	          GTInfo(GTI_SCREENWIDTH, 640)
-		  GTInfo(GTI_SCREENHEIGHT, 480)
+		       GTInfo(GTI_SCREENHEIGHT, 480)
 	       Case nOp == 4
 	          GTInfo(GTI_SCREENWIDTH, 800)
-		  GTInfo(GTI_SCREENHEIGHT, 600)
+		       GTInfo(GTI_SCREENHEIGHT, 600)
 	       Case nOp == 5
 	          GTInfo(GTI_SCREENWIDTH, 1024)
-		  GTInfo(GTI_SCREENHEIGHT, 768)
+		       GTInfo(GTI_SCREENHEIGHT, 768)
 	    End
          Case nOp == 2
 	    nOp := Alert("Select desired depth", {"  8 ", " 15 ", " 16 ", " 24 ", " 32 "})
