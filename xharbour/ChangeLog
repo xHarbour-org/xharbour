@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.243 2002/05/23 20:13:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.244 2002/05/24 01:26:51 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-23 19:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! more fix in handling of repeatable/non repeatables into a repeatable group.
 
 2002-05-23 22:25 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
   * source/vm/estack.c

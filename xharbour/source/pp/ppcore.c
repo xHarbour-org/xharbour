@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.15 2002/05/16 20:38:34 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.16 2002/05/20 20:41:49 ronpinkas Exp $
  */
 
 /*
@@ -2979,14 +2979,29 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                {
                   lennew = ptr2-ptr-1;
 
+                  // Flagging 1st Marker in Repeatable group as Instanciated.
+                  for( i=0; i < lennew; i++ )
+                  {
+                     if( ptr[i] == '\1' )
+                     {
+                        ptr[ i + 3 ] = '1';
+
+                        #ifdef DEBUG_MARKERS
+                           printf( "   Marked %s as instanciated\n", ptr + i );
+                        #endif
+
+                        break;
+                     }
+                  }
+
                   memcpy( expnew, ptr+1, lennew );
                   *(expnew + lennew++) = ' ';
                   *(expnew + lennew) = '\0';
 
-                  while( (i = hb_strAt( exppatt, 2, expnew, lennew )) > 0 )
+                  while( ( i = hb_strAt( exppatt, 2, expnew, lennew ) ) > 0 )
                   {
                      #ifdef DEBUG_MARKERS
-                        printf( "   1\n" );
+                        printf( "   Expand: '%s' at %i\n", exppatt, i );
                      #endif
 
                      lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew+i-1, lennew );
@@ -3000,7 +3015,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                         printf( "   Increased to %c;", s_groupchar );
                      #endif
 
-                     for( i=0; i<lennew; i++ )
+                     for( i = 0; i<lennew; i++ )
                      {
                         if( *(expnew+i) == '\1' )
                         {
@@ -3026,25 +3041,87 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                }
                else
                {
-                  // Don't change order must perform first.
                   // Only marker in this repeatable group, and it's not repeatable.
                   if( kolmarkers == 0 )
                   {
+                     // Don't change order, must perform before expansion.
                      ptr[0]  = ' ';
                      ptr2[0] = ' ';
 
                      #ifdef DEBUG_MARKERS
                         printf( "   Removed Repeatable Squares for Non Repeatable exclusive Marker: '%s'\n", ptr );
                      #endif
+
+                     // Replace sole NON repeatable into the residual repeatable container.
+                     *lenres += ReplacePattern( exppatt[2], expreal, lenreal, ptrOut + ifou - 1, *lenres - isdvig - ifou + 1 );
+                     isdvig += ifou - 1;
+
+                     #ifdef DEBUG_MARKERS
+                        printf( "   Replaced Non Repeatable into Residual Group '%s'\n", ptr );
+                     #endif
                   }
+                  else
+                  {
+                     lennew = ptr2 - ptr - 1;
 
-                  // Replace NON repeatable into the residual repeatable container.
-                  *lenres += ReplacePattern( exppatt[2], expreal, lenreal, ptrOut + ifou - 1, *lenres-isdvig-ifou+1 );
-                  isdvig += ifou - 1;
+                     // Scanning 1st Marker in Repeatable group to check if Instanciated.
+                     for( i = 0; i < lennew; i++ )
+                     {
+                        if( ptr[i] == '\1' )
+                        {
+                           if( ptr[ i + 3 ] == '1' )
+                           {
+                              #ifdef DEBUG_MARKERS
+                                 printf( "   '%s' Already instanciated\n", ptr + i );
+                              #endif
 
-                  #ifdef DEBUG_MARKERS
-                     printf( "   Replaced non repeatable into Residual Group '%s'\n", ptr );
-                  #endif
+                              isdvig = ptr2 - ptro;
+                              rezs = TRUE;
+                           }
+                           break;
+                        }
+                     }
+
+                     // Maybe the group was instanciated already and sich this is Non Repeatable we don't need to instanciate again.
+                     if( ! rezs )
+                     {
+                        // Flagging all markers in Repeatable group as Instanciated.
+                        for( i = 0; i < lennew; i++ )
+                        {
+                           if( ptr[i] == '\1' )
+                           {
+                              ptr[ i + 3 ] = '1';
+
+                              #ifdef DEBUG_MARKERS
+                                 printf( "   Marked %s as instanciated\n", ptr + i );
+                              #endif
+
+                              break;
+                           }
+                        }
+
+                        memcpy( expnew, ptr+1, lennew );
+                        *(expnew + lennew++) = ' ';
+                        *(expnew + lennew) = '\0';
+
+                        while( (i = hb_strAt( exppatt, 2, expnew, lennew )) > 0 )
+                        {
+                           #ifdef DEBUG_MARKERS
+                              printf( "   Expand: '%s' at %i\n", exppatt, i );
+                           #endif
+
+                           lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew+i-1, lennew );
+                        }
+
+                        hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres-(ptr-ptro)+1 );
+                        *lenres += lennew;
+                        isdvig = ptr - ptro + (ptr2-ptr-1) + lennew;
+
+                        #ifdef DEBUG_MARKERS
+                           printf( "   Instanciated Repeatable Group: %s with Non Repeatable %s\n", expnew, expreal );
+                        #endif
+                     }
+                  }
 
                   rezs = TRUE;
                }
