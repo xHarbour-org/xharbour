@@ -28,7 +28,7 @@ WHAT32OBJ  = _winbrsh.obj    _wincall.obj    _winclpb.obj    _wincret.obj    _wi
              _winrgn.obj     _winscrlb.obj   _wintab.obj     _wintext.obj    _winview.obj \
              _winbmp.obj     _wincdlg.obj    _wincomm.obj    _windir.obj     _windlg.obj  \
              _wingdi.obj     _winmain.obj    _winmisc.obj    _winshell.obj   _winsys.obj  \
-             _winwnd.obj     _wintbar.obj    _WinINet.obj                                 \
+             _winwnd.obj     _wintbar.obj    _WinINet.obj    _WinTree.obj                 \
              Debug.obj ErrorSys.obj WhatUtil.obj WinIni.obj WinCDlg.obj WinComm.obj       \
              WinCore.obj WinRBar.obj WinTBar.obj WinTabs.obj
              

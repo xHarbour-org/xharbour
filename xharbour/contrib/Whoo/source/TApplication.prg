@@ -80,6 +80,7 @@ METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
    __objAddData( self, cForm )
    oForm := if( oForm != NIL, oForm:New( oParent ), TForm():New( oParent ) )
    __ObjSetValueList( self, { { cForm, oForm } } )
+   oForm:propname:=cForm
    oForm:Create()
 
    RETURN( oForm )
@@ -98,6 +99,7 @@ METHOD CreateFrame( cName, oFrame ) CLASS Application
    __objAddData( self, cName )
    oFrame := if( oFrame != NIL, oFrame:New( self ), TFrame():New( self ) )
    __ObjSetValueList( self, { { cName, oFrame } } )
+   oFrame:propname:=cName
    oFrame:Create()
    
    RETURN( oFrame )

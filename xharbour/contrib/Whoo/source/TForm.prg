@@ -35,6 +35,7 @@ METHOD New( oParent ) CLASS TForm
    ::lRegister := IFNIL(::lRegister,.T.,::lRegister)
    ::lControl  := .F.
    ::ExStyle   := IFNIL(::ExStyle,0,::ExStyle)
+   ::PropName  := IFNIL(::PropName,"TForm",::PropName)
    
    ::PropList  := { { 'Name',       },;
                     { 'Caption',    },;
