@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.4 2003/10/10 13:33:52 paultucker Exp $
+# $Id: makefile.vc,v 1.5 2004/01/14 00:11:06 lculik Exp $
 #
 
 #
@@ -10,9 +10,9 @@
 # NOTE: You can use these envvars to configure the make process:
 #       (note that these are all optional)
 #
-#       CFLAGS       - Extra C compiler options for libraries and for 
+#       CFLAGS       - Extra C compiler options for libraries and for
 #                      executables
-#       C_USR        - Extra C compiler options for libraries and for 
+#       C_USR        - Extra C compiler options for libraries and for
 #                      executables (GNU make compatible envvar)
 #       CLIBFLAGS    - Extra C compiler options for the libraries
 #       HARBOURFLAGS - Extra Harbour compiler options
@@ -119,6 +119,10 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\tipclient.obj \
    $(OBJ_DIR)\tipclientsmtp.obj \
    $(OBJ_DIR)\tipcredentials.obj \
+   $(OBJ_DIR)\tipencoder.obj\
+   $(OBJ_DIR)\tipencoderbase64.obj\
+   $(OBJ_DIR)\tipencoderqp.obj\
+   $(OBJ_DIR)\tipencoderurl.obj\
    $(OBJ_DIR)\tipurl.obj \
    $(OBJ_DIR)\tiputils.obj \
    $(OBJ_DIR)\base64x.obj
