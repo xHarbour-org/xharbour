@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.9 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: val.c,v 1.1.1.1 2001/12/21 10:42:18 ronpinkas Exp $
  */
 
 /*
@@ -59,10 +59,11 @@
 /* returns the numeric value of a character string representation of a number */
 double hb_strVal( const char * szText, ULONG ulLen )
 {
-   double dValue = 0.0;
+   long double ldValue = 0.0;
    ULONG ulPos;
    ULONG ulDecPos = 0;
    BOOL bNegative = FALSE;
+   long double ldScale = 0.1L;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strVal(%s, %d)", szText, ulLen));
 
@@ -96,15 +97,18 @@ double hb_strVal( const char * szText, ULONG ulLen )
       else if( szText[ ulPos ] >= '0' && szText[ ulPos ] <= '9' )
       {
          if( ulDecPos )
-            dValue += ( ( double ) ( szText[ ulPos ] - '0' ) ) / pow( 10.0, ( double ) ulDecPos++ );
+         {
+            ldValue += ldScale * ( long double )( szText[ ulPos ] - '0' );
+            ldScale *= 0.1L;
+         }
          else
-            dValue = ( dValue * 10 ) + ( ( double ) ( szText[ ulPos ] - '0' ) );
+            ldValue = ( ldValue * 10.0L ) + ( long double )( szText[ ulPos ] - '0' );
       }
       else
          break;
    }
 
-   return bNegative && dValue != 0.0 ? -dValue : dValue;
+   return ( double )( bNegative && ldValue != 0.0 ? -ldValue : ldValue );
 }
 
 /* returns the numeric value of a character string representation of a number  */
