@@ -1,5 +1,5 @@
 /*
- * $Id: spread.prg,v 1.1 2004/11/29 22:11:31 ptsarenko Exp $
+ * $Id: spread.prg,v 1.3 2005/01/21 20:00:00 ptsarenko Exp $
  */
 
 /*
@@ -108,7 +108,7 @@ if ISCHARACTER(cStr) .and. ISNUMBER(nLength)
       cResult := Left(cStr, nAt - 1)
       for ser := 2 to nTokens
          nAt2 := if(ser==nTokens, len(cStr)+1, AtToken(cStr, cChar, ser+1))
-         cResult += Repl(cChar, if(ser==nTokens, nLength, nCount)) + ;
+         cResult += Replicate(cChar, if(ser==nTokens, nLength, nCount)) + ;
                     Substr(cStr, nAt, nAt2 - nAt)
          nLength -= nCount
          nAt := nAt2

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3759 2005/01/21 16:04:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3760 2005/01/21 20:00:00 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-21 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * source/ct/spread.prg
+    * use replicate() instead repl()
 
 2005-01-21 16:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils\hbmake\hbmake.prg
