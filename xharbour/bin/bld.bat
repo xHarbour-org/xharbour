@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.35 2004/01/05 18:59:27 lf_sfnet Exp $
+rem $Id: bld.bat,v 1.36 2004/01/06 21:17:32 paultucker Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -240,6 +240,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    if "%HB_GT_LIB%"=="gtwvt" set _cons=WINDOWS
    echo cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link ..\obj\vc\mainstd.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib> msvc.log
         cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link ..\obj\vc\mainstd.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib>>msvc.log
+   set _cons=
    @type msvc.log
    @echo Ignore LNK4033 warning
    set LDFLAGS=
