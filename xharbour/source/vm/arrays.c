@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.97 2004/03/18 14:39:55 jonnymind Exp $
+ * $Id: arrays.c,v 1.98 2004/03/29 17:04:19 ronpinkas Exp $
  */
 
 /*
@@ -114,7 +114,7 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
    }
 
    #ifdef HB_ARRAY_USE_COUNTER
-      pBaseArray->uiHolders = 1;
+      pBaseArray->uiHolders = HB_ARRAY_COUNTER_DEFAULT_HOLDERS;
    #else
       pBaseArray->pOwners = NULL;
       hb_arrayRegisterHolder( pBaseArray, (void *) pItem );
@@ -1444,44 +1444,22 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
 PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
 {
    PHB_ITEM pArray = hb_itemNew( NULL );
-   PHB_BASEARRAY pBaseArray;
    USHORT uiPos;
 
    //printf( "Got: %p\n", pBaseArray );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromStack(%iu)", uiLen));
 
-   /* JC1: prevent being interrupted/killed and prevents GC from taking pBaseArray*/
-   pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
-   pArray->item.asArray.value = pBaseArray;
-   pArray->type = HB_IT_ARRAY;
-
-   if( uiLen > 0 )
+   if( uiLen < 0 )
    {
-      pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( sizeof( HB_ITEM ) * uiLen );
-   }
-   else
-   {
-      pBaseArray->pItems = NULL;
+	  uiLen = 0;
    }
 
-   pBaseArray->ulLen      = uiLen;
+   hb_arrayNew( pArray, uiLen );
 
-   #ifdef HB_ARRAY_USE_COUNTER
-      pBaseArray->uiHolders  = 1;
-   #else
-      pBaseArray->pOwners = NULL;
-      hb_arrayRegisterHolder( pBaseArray, (void *) pArray );
-   #endif
-
-   pBaseArray->uiClass    = 0;
-   pBaseArray->uiPrevCls  = 0;
-   pBaseArray->puiClsTree = NULL;
-
-   for( uiPos = 0; uiPos < uiLen; uiPos++ )
+   for( uiPos = 1; uiPos <= uiLen; uiPos++ )
    {
-      ( pBaseArray->pItems + uiPos )->type = HB_IT_NIL;
-      hb_itemCopy( pBaseArray->pItems + uiPos, hb_stackItemFromTop( uiPos - uiLen ) );
+      hb_arraySet( pArray, uiPos, hb_stackItemFromTop( uiPos - uiLen - 1 ) );
    }
 
    return pArray;
@@ -1490,7 +1468,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
 PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 {
    PHB_ITEM pArray;
-   PHB_BASEARRAY pBaseArray;
    USHORT uiPos, uiPCount;
 
    pArray = hb_itemNew( NULL );
@@ -1498,108 +1475,24 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
 
-   pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
-
-   //printf( "Got: %p\n", pBaseArray );
-
-   pArray->type = HB_IT_ARRAY;
-
    // SomeFunc( ... ) Variable paramaters.
    if( uiPCount > 255 )
    {
       uiPCount -= 256;
    }
 
-   if( uiPCount > 0 )
+   if( uiPCount < 0 )
    {
-      pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( sizeof( HB_ITEM ) * uiPCount );
-   }
-   else
-   {
-      pBaseArray->pItems = NULL;
+	 uiPCount = 0;
    }
 
-   pBaseArray->ulLen      = uiPCount;
+   hb_arrayNew( pArray, uiPCount );
 
-   #ifdef HB_ARRAY_USE_COUNTER
-      pBaseArray->uiHolders  = 1;
-   #else
-      pBaseArray->pOwners = NULL;
-      hb_arrayRegisterHolder( pBaseArray, (void *) pArray );
-   #endif
-
-   pBaseArray->uiClass    = 0;
-   pBaseArray->uiPrevCls  = 0;
-   pBaseArray->puiClsTree = NULL;
-
-   for( uiPos = 0; uiPos < uiPCount; uiPos++ )
+   for( uiPos = 1; uiPos <= uiPCount; uiPos++ )
    {
-      ( pBaseArray->pItems + uiPos )->type = HB_IT_NIL;
-      hb_itemCopy( pBaseArray->pItems + uiPos, *( pBase + uiPos + 2 ) );
+      hb_arraySet( pArray, uiPos, *( pBase + uiPos + 1 ) );
    }
 
-   pArray->item.asArray.value = pBaseArray;
-
-   return pArray;
-}
-
-PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase )
-{
-   PHB_ITEM pArray;
-   PHB_BASEARRAY pBaseArray;
-   USHORT uiPos, uiPCount;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
-
-   pArray = hb_itemNew( NULL );
-   uiPCount = (*pBase)->item.asSymbol.paramcnt;
-
-
-   /* Thread safety: the array type is set AFTER the array locking */
-   pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
-   hb_gcLock( pBaseArray );
-
-   //printf( "Got: %p\n", pBaseArray );
-
-   pArray->type = HB_IT_ARRAY;
-
-   // SomeFunc( ... ) Variable paramaters.
-   if( uiPCount > 255 )
-   {
-      uiPCount -= 256;
-   }
-
-   if( uiPCount > 0 )
-   {
-      pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( sizeof( HB_ITEM ) * uiPCount );
-   }
-   else
-   {
-      pBaseArray->pItems = NULL;
-   }
-
-   pBaseArray->ulLen      = uiPCount;
-
-   #ifdef HB_ARRAY_USE_COUNTER
-      pBaseArray->uiHolders  = 1;
-   #else
-      pBaseArray->pOwners = NULL;
-      hb_arrayRegisterHolder( pBaseArray, (void *) pArray );
-   #endif
-
-   pBaseArray->uiClass    = 0;
-   pBaseArray->uiPrevCls  = 0;
-   pBaseArray->puiClsTree = NULL;
-
-   for( uiPos = 0; uiPos < uiPCount; uiPos++ )
-   {
-      ( pBaseArray->pItems + uiPos )->type = HB_IT_NIL;
-      hb_itemCopy( pBaseArray->pItems + uiPos, *( pBase + uiPos + 2 ) );
-   }
-
-   pArray->item.asArray.value = pBaseArray;
-
-   /*Notice: the thread could still be killed HERE, causing a memory leak */
    return pArray;
 }
 

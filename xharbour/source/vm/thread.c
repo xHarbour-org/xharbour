@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.159 2004/03/05 22:37:58 ronpinkas Exp $
+* $Id: thread.c,v 1.160 2004/03/06 12:56:59 jonnymind Exp $
 */
 
 /*
@@ -1335,7 +1335,7 @@ HB_FUNC( STARTTHREAD )
    HANDLE th_h;
 #endif
 
-   pArgs = hb_arrayFromParamsLocked( HB_VM_STACK.pBase );
+   pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
    pPointer  = hb_arrayGetItemPtr( pArgs, 1 );
 
    /* Error Checking */

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.59 2004/02/25 15:10:56 lculik Exp $
+ * $Id: fastitem.c,v 1.60 2004/02/25 15:32:49 lculik Exp $
  */
 
 /*
@@ -181,6 +181,11 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
    else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
       #ifdef HB_ARRAY_USE_COUNTER
+		 if( pItem->item.asArray.value->uiHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
+		 {
+            hb_errInternal( HB_EI_PREMATURE_RELEASE, NULL, "Premature Array/Object Release detected", NULL );
+		 }
+
          if( --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
          {
             hb_arrayRelease( pItem );

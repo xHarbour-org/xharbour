@@ -1,5 +1,5 @@
 /*
- * $Id: error.ch,v 1.3 2003/03/27 07:44:55 ronpinkas Exp $
+ * $Id: error.ch,v 1.4 2003/11/27 20:18:04 jonnymind Exp $
  */
 
 /*
@@ -136,5 +136,6 @@
 #define HB_EI_XREALLOCNULLSIZE  9024 /* "hb_xrealloc requested to resize to zero byte" */
 #define HB_EI_XALLOCNULLSIZE    9025 /* "hb_xalloc requested to allocate zero byte" */
 #define HB_EI_MEMCORRUPT        9026 /* "Memory corruption detected" */
+#define HB_EI_PREMATURE_RELEASE 9027 /* "Premature Array/Object Release detected" */
 
 #endif /* _ERROR_CH */

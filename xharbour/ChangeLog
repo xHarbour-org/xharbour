@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2675 2004/03/29 14:29:41 srobert Exp $
+ * $Id: ChangeLog,v 1.2676 2004/03/29 17:04:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-29 10:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/error.ch
+    + Added #define HB_EI_PREMATURE_RELEASE 9027 /* "Premature Array/Object Release detected" */
+
+  * include/hbapi.h
+  * source/vm/arrays.c
+    + Added support for new define HB_ARRAY_COUNTER_DEFAULT_HOLDERS (default 1)
+      /*
+        This allows to set an HIGHER number to experience memory impact of GC only arrays
+	and will also provide additional support for detecting Pre-Mature Release of Arrays/Objects.
+      */
+
+  * source/vm/fastitem.c
+    + Added logic to detect and generate an Internal Error opon premature release of Arrays/Objects
+
+  * source/vm/arrays.c
+    ! Fixed hb_arrayFrom*() to use hb_arrayNew() instead of duplicating array creation logic.
+    - Removed no longer needed hb_arrayFromParamsLocked()
+  * source/vm/thread.c
+    - Removed no longer needed hb_arrayFromParamsLocked()
 
 2004-03-29 09:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbinit.h

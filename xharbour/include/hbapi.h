@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.128 2004/03/20 10:44:34 andijahja Exp $
+ * $Id: hbapi.h,v 1.129 2004/03/21 02:44:36 ronpinkas Exp $
  */
 
 /*
@@ -243,6 +243,10 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
    #ifndef HB_API_MACROS
       #define HB_API_MACROS
    #endif
+#endif
+
+#ifndef HB_ARRAY_COUNTER_DEFAULT_HOLDERS
+   #define HB_ARRAY_COUNTER_DEFAULT_HOLDERS 1
 #endif
 
 #ifdef HB_API_MACROS
