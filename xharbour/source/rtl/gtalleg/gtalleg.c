@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.3 2004/01/22 02:58:01 maurifull Exp $
+ * $Id: gtalleg.c,v 1.4 2004/01/28 04:14:34 maurifull Exp $
  */
 
 /*
@@ -75,6 +75,8 @@ static BYTE * s_pbyScrBuffer = NULL;
 static int s_pClr[16];
 static BYTE s_byFontSize = 16, s_byFontWidth = 8;
 static AL_BITMAP *bmp;
+
+static void hb_gt_DoCursor( void );
 
 // I'm not sure of removing these (yet)
 // (they used to be static vars to center gt in hw screen, but now the
@@ -871,7 +873,7 @@ HB_GT_GOBJECT *gobject;
 		usL = usLeft + iCols;
 		usR = usRight;
 	    }
-	    pbyScr = hb_xgrab(HB_GT_FUNC(gt_RectSize(usB - usT + 1, usR - usL + 1)));
+	    pbyScr = (BYTE *) hb_xgrab(HB_GT_FUNC(gt_RectSize(usB - usT + 1, usR - usL + 1)));
 	    HB_GT_FUNC(gt_GetText(usT, usL, usB, usR, pbyScr));
 	    HB_GT_FUNC(gt_PutText(usT - iRows, usL - iCols, usB - iRows, usR - iCols, pbyScr));
 	    hb_xfree(pbyScr);
@@ -1110,7 +1112,7 @@ BOOL lMode = FALSE, lPrev = FALSE;
 	s_pClr[14] = al_make_color(0xFF, 0xFF, 0x55);  // yellow
 	s_pClr[15] = al_make_color(0xFF, 0xFF, 0xFF);  // bright white
 
-	s_pbyScrBuffer = hb_xgrab( s_usScrWidth * s_usScrHeight * 2 );
+	s_pbyScrBuffer = (BYTE *) hb_xgrab( s_usScrWidth * s_usScrHeight * 2 );
 	memset( s_pbyScrBuffer, 0, s_usScrWidth * s_usScrHeight * 2 );
 	bmp = al_create_system_bitmap(AL_SCREEN_W, AL_SCREEN_H);
 	if ( bmp == NULL )
