@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1385 2003/08/26 15:08:42 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1386 2003/08/26 16:43:02 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-27 10:57 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/pp/pptable.c
+    * reverted hack with @..SAY translation to DEVOUT{PICT} with
+      additional two parameters. This breaks compatibility with
+      Clipper. If some one needs it then please add such rule to
+      your own .ch files not to the internal PP table which has
+      to be Clipper compatible as most as possible.
+
+  * xharbour/contrib/libct/ctwin.prg
+    * small fixes to accept additional two parameters in DEVOUT
+      and DEVOUTPICT
 
 2003-08-26 18:35 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

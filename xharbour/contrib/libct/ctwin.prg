@@ -4,7 +4,7 @@
 *   write by Adam Lubszczyk    alubszcz@rsw.pl                     *
 ********************************************************************
 /*
- * $Id: ctwin.prg,v 1.2 2003/07/31 12:51:01 druzus Exp $
+ * $Id: ctwin.prg,v 1.3 2003/08/27 01:23:21 druzus Exp $
  */
 
 /*
@@ -169,11 +169,13 @@ FUNCTION ctw_DEVOUT(xVal,xColor,nT,nL)
  ENDIF
 RETURN NIL
 ********************************************
-
-FUNCTION ctw_DEVOUTPICT(xVal,cPict,xColor)
+FUNCTION ctw_DEVOUTPICT(xVal,cPict,xColor,nT,nL)
  IF ctw_CURRENT == 0
-   DEVOUTPICT(xVal,cPict,xColor)
+   DEVOUTPICT(xVal,cPict,xColor,nT,nL)
  ELSE
+   IF VALTYPE(nT)=="N" .AND. VALTYPE(nL)=="N"
+     ctw_WINDOWS[ctw_CURRENT]:DevPos(nT,nL)
+   ENDIF
    ctw_WINDOWS[ctw_CURRENT]:DevOutPict(xVal,cPict,xColor)
  ENDIF
 RETURN NIL
