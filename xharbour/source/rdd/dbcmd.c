@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.88 2004/03/10 12:15:37 andijahja Exp $
+ * $Id: dbcmd.c,v 1.89 2004/03/10 13:50:44 andijahja Exp $
  */
 
 /*
@@ -4972,15 +4972,15 @@ HB_FUNC( APPENDTODB )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pDelimitedFile = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pDelimiter = hb_param( 2, HB_IT_STRING );
-
-   if ( pDelimitedFile )
+   if( s_pCurrArea )
    {
-      PHB_ITEM pContent = hb_itemDoC( "FPARSEEX", 2, pDelimitedFile, pDelimiter );
+      PHB_ITEM pDelimitedFile = hb_param( 1, HB_IT_STRING );
+      PHB_ITEM pDelimiter = hb_param( 2, HB_IT_STRING );
 
-      if( s_pCurrArea )
+      if ( pDelimitedFile )
       {
+         PHB_ITEM pContent = hb_itemDoC( "FPARSEEX", 2, pDelimitedFile, pDelimiter );
+
          ULONG ulContent = pContent->item.asArray.value->ulLen;
          HB_ITEM Structure;
          USHORT uiStruct;
@@ -5060,10 +5060,10 @@ HB_FUNC( APPENDTODB )
          hb_itemClear( &Structure );
          hb_itemRelease( pContent );
       }
-      else
-      {
-         hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "APPENDTODB" );
-      }
+   }
+   else
+   {
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "APPENDTODB" );
    }
 }
 

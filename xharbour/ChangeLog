@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2546 2004/03/10 19:24:55 andijahja Exp $
+ * $Id: ChangeLog,v 1.2547 2004/03/10 20:19:35 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-11 05:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rdd/dbcmd.c
+    % error trapper when trying to append to non existet workarea
+
 2004-03-11 03:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/fparse.c
     ! empty string "" was translated as " ", chr(32), space. This is not
