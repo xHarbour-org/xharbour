@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: harbour.c,v 1.4 2002/03/09 19:09:43 ronpinkas Exp $
  */
 
 /*
@@ -145,8 +145,8 @@ INLINES        hb_comp_inlines;
 /* various compatibility flags (-k switch) */
 ULONG          hb_comp_Supported;
 
-int hb_comp_iLastLine = 0;
-int hb_comp_ulLastOffsetPos = 0;
+int hb_comp_iLastLine;
+int hb_comp_ulLastOffsetPos;
 
 /* EXTERNAL statement can be placed into any place in a function - this flag is
  * used to suppress error report generation
@@ -1457,6 +1457,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    PCOMSYMBOL   pSym;
    PFUNCTION pFunc;
    char * szFunction;
+   int iLine = hb_comp_iLine - 1;
 
    hb_compFinalizeFunction();    /* fix all previous function returns offsets */
 
@@ -1504,9 +1505,15 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    hb_comp_functions.iCount++;
 
    hb_comp_ulLastLinePos = 0;   /* optimization of line numbers opcode generation */
+   hb_comp_ulLastOffsetPos = 0;   /* optimization of line numbers opcode generation */
 
    hb_compGenPCode3( HB_P_FRAME, 0, 0, ( BOOL ) 0 );   /* frame for locals and parameters */
    hb_compGenPCode3( HB_P_SFRAME, 0, 0, ( BOOL ) 0 );     /* frame for statics variables */
+   hb_compGenPCode3( HB_P_LINE, HB_LOBYTE( iLine ), HB_HIBYTE( iLine ), ( BOOL ) 0 );
+
+   //printf( "Resetting\n" );
+
+   hb_comp_iLastLine = hb_comp_iLine;
 
    if( hb_comp_bDebugInfo )
    {
@@ -2430,21 +2437,18 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
    {
       int iOffset = hb_comp_iLine - hb_comp_iLastLine;
 
-      if( iOffset > -129 && iOffset < 128 )
-      {
-         if( hb_comp_iLastLine == 0 )
-         {
-            hb_comp_iLastLine = 1;
+      hb_comp_iLastLine = hb_comp_iLine;
 
-            // Skip Line Number - using goto to avoid complex conditions for resetting hb_comp_iLastLine!
-            goto AfterLineNo;
-         }
-         else if( iOffset )
+      //printf( "Line: %i, Offset %i LastPos %i, Pos %i\n", hb_comp_iLine, iOffset, hb_comp_ulLastOffsetPos, hb_comp_functions.pLast->lPCodePos );
+
+      if( iOffset > -1 && iOffset < 256 )
+      {
+         if( iOffset )
          {
             if( ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastOffsetPos ) > 2 ) || hb_comp_bDebugInfo )
             {
-               hb_compGenPCode2( HB_P_LINEOFFSET, (BYTE) iOffset, ( BOOL ) 0 );
                hb_comp_ulLastOffsetPos = hb_comp_functions.pLast->lPCodePos;
+               hb_compGenPCode2( HB_P_LINEOFFSET, (BYTE) iOffset, ( BOOL ) 0 );
             }
             else
             {
@@ -2467,10 +2471,6 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
          hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +2 ] = HB_HIBYTE( iLine );
       }
    }
-
-   hb_comp_iLastLine = hb_comp_iLine;
-
- AfterLineNo :
 
    if( hb_comp_functions.pLast->bFlags & FUN_BREAK_CODE )
    {
@@ -3832,6 +3832,7 @@ static void hb_compInitVars( void )
    hb_comp_bAnyWarning      = FALSE;
 
    hb_comp_iLine         = 1;
+   hb_comp_iLastLine     = 1;
    hb_comp_iFunctionCnt  = 0;
    hb_comp_iErrorCount   = 0;
    hb_comp_cVarType      = ' ';

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.40 2002/03/08 03:57:18 ronpinkas Exp $
+ * $Id: hvm.c,v 1.41 2002/03/09 19:09:44 ronpinkas Exp $
  */
 
 /*
@@ -783,7 +783,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             break;
 
          case HB_P_LINEOFFSET:
-            (hb_stackBaseItem())->item.asSymbol.lineno += (signed char) pCode[ w + 1 ];
+            (hb_stackBaseItem())->item.asSymbol.lineno += (unsigned char) pCode[ w + 1 ];
 
             if( s_bDebugging && s_bDebugShowLines )
             {
