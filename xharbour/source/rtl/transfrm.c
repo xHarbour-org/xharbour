@@ -234,7 +234,7 @@ HB_FUNC( TRANSFORM )
 
                if ( strchr( szTmp, 'D' ) == NULL )
                {
-                  if( strchr( szTmp, 'R' ) == NULL )
+                  if( strchr( "RKEBCSLXZ", szTmp[1] ) == NULL )
                   {
                      szPicNew = (char*) hb_xgrab( ulExpLen + 1 );
 
