@@ -35,6 +35,9 @@
       #define __FOR_EACH__
       #define __WITH_
       #define __STRING_INDEX__
+
+      EXTERN CreateObject
+      EXTERN GetActiveObject
    #endif
 
    #ifndef NO_BOOST
@@ -171,9 +174,7 @@
       #ifdef WIN
          #COMMAND Alert( <x> ) => MessageBox( 0, CStr( <x> ), "PP for Windows", 0 )
          EXTERN MessageBox
-         EXTERN CreateObject
       #endif
-
 
    #endif
 
