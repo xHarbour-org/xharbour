@@ -1,5 +1,5 @@
 /*
- * $Id: memvclip.c,v 1.3 2001/05/15 13:02:07 vszakats Exp $
+ * $Id: memvclip.c,v 1.1.1.1 2001/12/21 10:40:58 ronpinkas Exp $
  */
 
 /*
@@ -54,11 +54,11 @@
 #include "hbapiitm.h"
 #include "hbcomp.h" /* for VS_* macros */
 
-extern HB_FUNC( __MVCLEAR );
-extern HB_FUNC( __MVRELEASE );
-extern HB_FUNC( __MVXRELEASE );
-extern HB_FUNC( __MVSAVE );
-extern HB_FUNC( __MVRESTORE );
+HB_FUNC_EXTERN( __MVCLEAR );
+HB_FUNC_EXTERN( __MVRELEASE );
+HB_FUNC_EXTERN( __MVXRELEASE );
+HB_FUNC_EXTERN( __MVSAVE );
+HB_FUNC_EXTERN( __MVRESTORE );
 
 /* NOTE: Undocumented Clipper internal function */
 

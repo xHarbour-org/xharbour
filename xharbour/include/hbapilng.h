@@ -1,5 +1,5 @@
 /*
- * $Id: hbapilng.h,v 1.5 2003/06/17 22:10:22 druzus Exp $
+ * $Id: hbapilng.h,v 1.6 2003/11/30 12:32:29 druzus Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ HB_EXTERN_BEGIN
 
 /* This hack is needed to force preprocessing if id is also a macro */
 #define HB_LANG_REQUEST( id )           HB_LANG_REQUEST_( id )
-#define HB_LANG_REQUEST_( id )          extern HB_FUNC( HB_LANG_##id ); \
+#define HB_LANG_REQUEST_( id )          HB_FUNC_EXTERN( HB_LANG_##id ); \
                                         void hb_lang_ForceLink( void ) \
                                         { \
                                            HB_FUNCNAME( HB_LANG_##id )(); \

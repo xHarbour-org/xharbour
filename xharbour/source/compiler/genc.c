@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.68 2004/03/22 23:49:01 andijahja Exp $
+ * $Id: genc.c,v 1.69 2004/03/24 08:08:30 andijahja Exp $
  */
 
 /*
@@ -41,7 +41,7 @@ static void hb_compGenCInLine( FILE* ) ;
 // with #PRAGMA BEGINDUMP - ENDDUMP
 static void hb_compGenCInLineSymbol( void );
 static void hb_compGenCCheckInLineStatic( char * str );
-static BOOL hb_compCStaticSymbolFound( char* szSymbol );
+static BOOL hb_compCStaticSymbolFound( char* szSymbol, BOOL bSearchStatic );
 /* struct to hold symbol names of c-in-line static functions */
 typedef struct _SSYMLIST
 {
@@ -50,6 +50,7 @@ typedef struct _SSYMLIST
 } SSYMLIST, * PSSYMLIST;
 
 static PSSYMLIST pStatSymFirst = NULL;
+static PSSYMLIST pPubSymFirst = NULL;
 
 /* helper structure to pass information */
 typedef struct HB_stru_genc_info
@@ -287,13 +288,20 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
       {
          if( hb_compFunctionFind( pFunc->szName ) == NULL && hb_compInlineFind( pFunc->szName ) == NULL )
          {
-            if( hb_compCStaticSymbolFound( pFunc->szName ) )
+            if( hb_compCStaticSymbolFound( pFunc->szName, TRUE ) )
             {
                fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pFunc->szName );
             }
             else
             {
-               fprintf( yyc, "extern HB_FUNC( %s );\n", pFunc->szName );
+               if( hb_compCStaticSymbolFound( pFunc->szName, FALSE ) )
+               {
+                  fprintf( yyc, "HB_FUNC( %s );\n", pFunc->szName );
+               }
+               else
+               {
+                  fprintf( yyc, "HB_FUNC_EXTERN( %s );\n", pFunc->szName );
+               }
             }
          }
 
@@ -413,7 +421,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
             }
             else
             {
-               if ( hb_compCStaticSymbolFound( pSym->szName ) )
+               if ( hb_compCStaticSymbolFound( pSym->szName, TRUE ) )
                {
                   fprintf( yyc, "HB_FS_STATIC" );
 
@@ -782,18 +790,28 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
    pStatSymTemp = pStatSymFirst;
    while( pStatSymTemp )
    {
-      // printf( "%s\n", pStatSymTemp->szName );
+      // printf( "RELEASING STATIC: >>%s<<\n", pStatSymTemp->szName );
       hb_xfree( pStatSymTemp->szName );
       pStatSymTemp = pStatSymTemp->pNext;
       hb_xfree( ( void * ) pStatSymFirst );
       pStatSymFirst = pStatSymTemp;
    }
+
+   pStatSymTemp = pPubSymFirst;
+   while( pStatSymTemp )
+   {
+      // printf( "RELEASING PUBLIC: >>%s<<\n", pStatSymTemp->szName );
+      hb_xfree( pStatSymTemp->szName );
+      pStatSymTemp = pStatSymTemp->pNext;
+      hb_xfree( ( void * ) pPubSymFirst );
+      pPubSymFirst = pStatSymTemp;
+   }
 }
 
-static BOOL hb_compCStaticSymbolFound( char* szSymbol )
+static BOOL hb_compCStaticSymbolFound( char* szSymbol, BOOL bSearchStatic )
 {
    BOOL bStatSymFound = FALSE;
-   PSSYMLIST pStatSymTemp = pStatSymFirst;
+   PSSYMLIST pStatSymTemp = bSearchStatic ? pStatSymFirst : pPubSymFirst;
 
    while( pStatSymTemp )
    {
@@ -811,7 +829,7 @@ static BOOL hb_compCStaticSymbolFound( char* szSymbol )
    return bStatSymFound;
 }
 
-static PSSYMLIST hb_compCStatSymList( PSSYMLIST pStatSymCurrent, char* statSymName )
+static void hb_compCStatSymList( char* statSymName, BOOL bPublic )
 {
    PSSYMLIST pStatSymLast = (PSSYMLIST) hb_xgrab( sizeof( SSYMLIST ) );
    int ulLen = strlen( statSymName );
@@ -824,16 +842,33 @@ static PSSYMLIST hb_compCStatSymList( PSSYMLIST pStatSymCurrent, char* statSymNa
    statSymName[ ulLen ] = '\0';
    pStatSymLast->szName = (char*) hb_xgrab( strlen( statSymName ) + 1 );
    strcpy( pStatSymLast->szName, statSymName );
-   pStatSymLast->pNext = NULL;
 
-   if( pStatSymCurrent )
+   if( bPublic )
    {
-      pStatSymCurrent->pNext = pStatSymLast;
+      if( pPubSymFirst == NULL )
+      {
+         pStatSymLast->pNext = NULL;
+         pPubSymFirst = pStatSymLast;
+      }
+      else
+      {
+         pStatSymLast->pNext = pPubSymFirst;
+         pPubSymFirst = pStatSymLast;
+      }
    }
-
-   pStatSymCurrent = pStatSymLast;
-
-   return pStatSymCurrent;
+   else
+   {
+      if( pStatSymFirst == NULL )
+      {
+         pStatSymLast->pNext = NULL;
+         pStatSymFirst = pStatSymLast;
+      }
+      else
+      {
+         pStatSymLast->pNext = pStatSymFirst;
+         pStatSymFirst = pStatSymLast;
+      }
+   }
 }
 
 static void hb_compGenCCheckInLineStatic( char *str )
@@ -843,9 +878,12 @@ static void hb_compGenCCheckInLineStatic( char *str )
    LONG ulLen = strlen( str );
    LONG i ;
    PSSYMLIST pStatSymCurrent = NULL;
+   BOOL bPublic;
 
-   while( ( nAt = hb_strAt( "HB_FUNC_STATIC", 14, str, ulLen ) ) != 0 )
+   while( ( nAt = hb_strAt( "HB_FUNC", 7, str, ulLen ) ) != 0 )
    {
+      bPublic = ( str[ nAt + 6 ] != '_' );
+
       str += nAt;
       i = 0;
 
@@ -865,12 +903,7 @@ static void hb_compGenCCheckInLineStatic( char *str )
 
       *pCode = '\0';
 
-      pStatSymCurrent = hb_compCStatSymList( pStatSymCurrent, pTmp );
-
-      if( !pStatSymFirst )
-      {
-         pStatSymFirst = pStatSymCurrent;
-      }
+      hb_compCStatSymList( pTmp, bPublic );
 
    }
 }

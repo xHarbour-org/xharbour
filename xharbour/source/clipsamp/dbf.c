@@ -1,5 +1,5 @@
 /*
- * $Id: dbf.c,v 1.3 2001/06/14 21:20:43 dholm Exp $
+ * $Id: dbf.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 
-extern HB_FUNC( ALIAS );
+HB_FUNC_EXTERN( ALIAS );
 
 HB_FUNC( DBF )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: pad.c,v 1.6 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: pad.c,v 1.1.1.1 2001/12/21 10:41:55 ronpinkas Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 #include "hbapi.h"
 
-extern HB_FUNC( PADR );
+HB_FUNC_EXTERN( PADR );
 
 /* synonymn for PADR */
 HB_FUNC( PAD )

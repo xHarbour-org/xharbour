@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.367 2004/03/30 18:37:29 ronpinkas Exp $
+ * $Id: hvm.c,v 1.368 2004/03/31 09:19:54 andijahja Exp $
  */
 
 /*
@@ -143,7 +143,7 @@
 /* DEBUG only*/
 /*#include <windows.h>*/
 
-extern HB_FUNC( SYSINIT );
+HB_FUNC_EXTERN( SYSINIT );
 
 /* PCode functions */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: accept.c,v 1.2 2002/10/09 03:43:21 druzus Exp $
+ * $Id: accept.c,v 1.3 2004/03/28 22:26:40 peterrees Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
 #include "hbapigt.h"
 #include "inkey.ch"
 
-extern HB_FUNC( QOUT );
+HB_FUNC_EXTERN( QOUT );
 
 #define ACCEPT_BUFFER_LEN 256 /* length of input buffer for ACCEPT command */
 

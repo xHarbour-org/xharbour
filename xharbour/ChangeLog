@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2704 2004/03/31 21:02:04 druzus Exp $
+ * $Id: ChangeLog,v 1.2705 2004/04/01 01:01:09 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-01 16:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/libct/dbftools.c
+  * source/clipsamp/dbf.c
+  * source/clipsamp/time.c
+  * source/rtl/accept.c
+  * source/rtl/pad.c
+  * source/rdd/dbcmd.c
+  * source/rdd/dbnubs.c
+  * source/vm/hvm.c
+  * source/vm/initsymb.c
+  * source/vm/memvclip.c
+  * source/vm/errorapi.c
+  * include/hbapilng.h
+    ! changed: "extern HB_FUNC" => "HB_FUNC_EXTERN"
+
+  * source/compiler/genc.c
+    ! minor mofification on writing external function prototypes:
+      from "extern HB_FUNC" to "HB_FUNC_EXTERN"
+
+  * include/hbdefs.h
+    + definition of HB_FUNC_EXTERN
+    ! modification on HB_FUNC* macros to allow builders to create static
+      library (LIB) or dynamic library (DLL) with undecorated symbol names
+      under C++ environment (eg. MSVC). Macros are defined only for MSVC
+      for I can only make a test with this compiler. For other compilers,
+      defines should be modified accordingly.
+
+  /*
+    These changes allow building xHarbour with C++ flag with UNDECORATED
+    symbol names. Builder has to add HB_FUNC_NODECORATION define to C
+    compiler flags in order to achieve this feature. These changes should
+    end the ugly incompatibility among MSVC and BCC VM/RTL DLL under
+    Windoze. HB_FUNC_NO_DECORATION flag should also be used during building
+    application with static LIB created per above.
+  */
 
 2004-04-01 03:11 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/rdd_ads/ads1.c

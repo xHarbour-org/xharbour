@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.41 2004/03/30 18:37:29 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.42 2004/03/31 09:19:54 andijahja Exp $
  */
 
 /*
@@ -116,7 +116,7 @@ extern HB_SET_STRUCT hb_set;
 #include "hbserv.h"
 // extern BOOL hb_isService(void);
 #endif
-extern HB_FUNC( ERRORNEW );
+HB_FUNC_EXTERN( ERRORNEW );
 
 PHB_ITEM HB_EXPORT hb_errPutModuleName( PHB_ITEM pError, char * szModuleName );
 

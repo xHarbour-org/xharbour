@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.102 2004/03/31 15:38:59 walito Exp $
+ * $Id: dbcmd.c,v 1.103 2004/03/31 21:02:05 druzus Exp $
  */
 
 /*
@@ -79,13 +79,13 @@
 #  include "hbapicdp.h"
 #endif
 
-extern HB_FUNC( _DBF );
-extern HB_FUNC( _SDF );
-extern HB_FUNC( _DELIM );
-extern HB_FUNC( RDDSYS );
+HB_FUNC_EXTERN( _DBF );
+HB_FUNC_EXTERN( _SDF );
+HB_FUNC_EXTERN( _DELIM );
+HB_FUNC_EXTERN( RDDSYS );
 
 #define __PRG_SOURCE__ __FILE__
-extern HB_FUNC( FPARSEEX );
+HB_FUNC_EXTERN( FPARSEEX );
 #undef HB_PRG_PCODE_VER
 #define HB_PRG_PCODE_VER HB_PCODE_VER
 HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_DBCMD )

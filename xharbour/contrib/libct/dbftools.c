@@ -1,5 +1,5 @@
 /*
- * $Id: dbftools.c,v 1.2 2003/10/01 17:41:47 paultucker Exp $
+ * $Id: dbftools.c,v 1.3 2004/03/07 00:01:19 andijahja Exp $
  */
 
 /*
@@ -53,9 +53,9 @@
 #include "hbapi.h"
 #include "hbapirdd.h"
 
-extern HB_FUNC( FIELDPOS );
-extern HB_FUNC( FIELDLEN );
-extern HB_FUNC( FIELDDEC );
+HB_FUNC_EXTERN( FIELDPOS );
+HB_FUNC_EXTERN( FIELDLEN );
+HB_FUNC_EXTERN( FIELDDEC );
 
 HB_FUNC( FIELDSIZE )
 {
