@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.6 2004/06/10 23:20:09 peterrees Exp $
+ * $Id: wvtutils.c,v 1.7 2004/06/11 14:02:30 vouchcac Exp $
  */
 
 /*
@@ -1050,6 +1050,51 @@ HB_FUNC( WVT_CLIENTTOSCREEN )
    hb_arraySetForward( &aXY, 2, hb_itemPutNL( &temp, xy.y ) );
 
    hb_itemReturn( &aXY );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETCURSORPOS )
+ {
+    POINT    xy;
+    HB_ITEM  info;
+    HB_ITEM  temp;
+
+    GetCursorPos( &xy );
+
+    info.type = HB_IT_NIL;
+    temp.type = HB_IT_NIL;
+
+    hb_arrayNew( &info, 2 );
+
+    hb_arraySetForward( &info, 1, hb_itemPutNI( &temp, xy.x ) );
+    hb_arraySetForward( &info, 2, hb_itemPutNI( &temp, xy.y ) );
+
+    hb_itemReturn( &info );
+ }
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_TRACKPOPUPMENU )
+{
+   POINT xy;
+
+   GetCursorPos( &xy );
+
+   hb_retnl( TrackPopupMenu( ( HMENU ) hb_parnl( 1 ) ,
+                     TPM_CENTERALIGN | TPM_RETURNCMD ,
+                                                xy.x ,
+                                                xy.y ,
+                                                   0 ,
+                                            _s->hWnd ,
+                                                NULL ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETMENU )
+{
+   hb_retnl( ( ULONG ) GetMenu( _s->hWnd ) );
 }
 
 //-------------------------------------------------------------------//

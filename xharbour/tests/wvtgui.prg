@@ -1,4 +1,5 @@
-
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //
 //                   GTWVT Console GUI Interface
@@ -51,23 +52,45 @@
 //
 #define OBJ_STATE_HIDE             0
 #define OBJ_STATE_DISP             1
-#define OBJ_STATE_MOUSEOVER        2 
+#define OBJ_STATE_MOUSEOVER        2
 #define OBJ_STATE_BUTTONDOWN       3
 #define OBJ_STATE_BUTTONUP         4
 
 //-------------------------------------------------------------------//
 
-#define  SLOT_IMAGE_VOUCH          1
-#define  SLOT_IMAGE_BROWSE         2 
-#define  SLOT_IMAGE_VR             3
-#define  SLOT_IMAGE_NOTES          4
-#define  SLOT_IMAGE_TOOLS          5
-#define  SLOT_IMAGE_HELP           6
+#define  IMAGE_VOUCH          'vouch1.bmp'
+#define  IMAGE_BROWSE         'v_browse.ico'
+#define  IMAGE_VR             'vr_1.ico'
+#define  IMAGE_NOTES          'v_notes.ico'
+#define  IMAGE_TOOLS          'v_tools.ico'
+#define  IMAGE_HELP           'v_notes.ico'
+
+//-------------------------------------------------------------------//
+//
+//   Candidate for inkey.ch
+//
+#define K_SBLINEUP              1051
+#define K_SBLINEDOWN            1052
+#define K_SBPAGEUP              1053
+#define K_SBPAGEDOWN            1054
+
+#define K_SBLINELEFT            1055
+#define K_SBLINERIGHT           1056
+#define K_SBPAGELEFT            1057
+#define K_SBPAGERIGHT           1058
+
+#define K_SBTHUMBTRACKVERT      1059
+#define K_SBTHUMBTRACKHORZ      1060
+
+//-------------------------------------------------------------------//
+
+#define CRLF   chr( 13 )+chr( 10 )
 
 //-------------------------------------------------------------------//
 
 static wvtScreen := {}
 static pic_:= { , , , , , , , , , , , , , , , , , , , }
+static keys_:= { , , , , , , , , , , , , , , , , , , , }
 
 //-------------------------------------------------------------------//
 PROCEDURE Main()
@@ -91,39 +114,21 @@ PROCEDURE Main()
    LOCAL cLabel  := 'xHarbour simulated GUI.'
    LOCAL aObjects:= WvtSetObjects( {} )
    LOCAL aObj    := {}
-   LOCAL kf2     := SetKey( K_F2, {|| WvtGets()             } )
-   LOCAL kf3     := SetKey( K_F3, {|| WvtWindowExpand( 1 )  } )
-   LOCAL kf4     := SetKey( K_F4, {|| WvtWindowExpand( -1 ) } )
-   LOCAL kf5     := SetKey( K_F5, {|| WvtBrowse()           } )
-   LOCAL kf6     := SetKey( K_F6, {|| Wvt_Minimize()        } )
-   LOCAL kf7     := SetKey( K_F7, {|| WvtPartialScreen()    } )
-   LOCAL kf8     := SetKey( K_F8, {|| WvtLines()            } )
-   LOCAL kf9     := SetKey( K_F9, {|| Wvt_ChooseFont()      } )
-   LOCAL kf10    := SetKey( K_F10,{|| Wvt_ChooseColor()     } )
    LOCAL hPopup  := Wvt_SetPopupMenu()
-   
-   Popups( 1 )
-   
-   //  Load All Image Files
-   //
-   WvtPictures( SLOT_IMAGE_VOUCH  , 'Vouch1.bmp'   )
-   WvtPictures( SLOT_IMAGE_BROWSE , 'V_Browse.Ico' )
-   WvtPictures( SLOT_IMAGE_VR     , 'vr_1.ico'     )
-   WvtPictures( SLOT_IMAGE_NOTES  , 'v_notes.ico'  )
-   WvtPictures( SLOT_IMAGE_TOOLS  , 'v_tools.ico'  )
-   WvtPictures( SLOT_IMAGE_HELP   , 'v_help.ico'   )
-   
+   LOCAL oMenu   := CreateMainMenu()
+
    SET DATE BRITISH
 
-   dDate := ctod( '04/01/04' )
+   WvtSetKeys( .t. )
+   Popups( 1 )
 
    Wvt_SetFont( 'Courier New', 18, 0, 0 )
    Wvt_SetMouseMove( .t. )
-   
+
    //  Force mouse pointer right below the xHarbour label
    //
    Wvt_SetMousePos( 2,40 )
-	   
+
    aAdd( aBlocks, {|| Wvt_SetIcon( 'vr_1.ico' ) } )
    aAdd( aBlocks, {|| Wvt_SetTitle( 'Vouch' ) } )
    aAdd( aBlocks, {|| Wvt_DrawLabel( 1,40, cLabel,6,, rgb(255,255,255), rgb(198,198,198), 'Arial', 26, , , , , .t., .t. ) } )
@@ -131,76 +136,76 @@ PROCEDURE Main()
    aAdd( aBlocks, {|| Wvt_DrawBoxRecessed( 7, 61, 13, 70 ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxGroup( 15, 59, 18, 72 ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxGroup( 5, 6, 19, 44 ) } )
-   aAdd( aBlocks, {|| Wvt_DrawImage( 8,62,12,69, SLOT_IMAGE_VOUCH ) } )
+   aAdd( aBlocks, {|| Wvt_DrawImage( 8,62,12,69, IMAGE_VOUCH ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxRecessed( 7, 48, 13, 55 ) } )
    aAdd( aBlocks, {|| Wvt_DrawLine( maxrow()-2,0,maxrow()-2,maxcol(),WVT_LINE_HORZ,WVT_LINE_RECESSED,WVT_LINE_BOTTOM ) } )
 
-   aAdd( aBlocks, {|| Wvt_DrawLine( maxrow()-1, 4,maxrow(), 4,WVT_LINE_VERT,WVT_LINE_RECESSED,WVT_LINE_CENTER ) } )      
-   aAdd( aBlocks, {|| Wvt_DrawLine( maxrow()-1,41,maxrow(),41,WVT_LINE_VERT,WVT_LINE_RECESSED,WVT_LINE_CENTER ) } )   
+   aAdd( aBlocks, {|| Wvt_DrawLine( maxrow()-1, 4,maxrow(), 4,WVT_LINE_VERT,WVT_LINE_RECESSED,WVT_LINE_CENTER ) } )
+   aAdd( aBlocks, {|| Wvt_DrawLine( maxrow()-1,41,maxrow(),41,WVT_LINE_VERT,WVT_LINE_RECESSED,WVT_LINE_CENTER ) } )
 
    aAdd( aBlocks, {|| aEval( GetList, {|oGet| Wvt_DrawBoxGet( oGet:Row, oGet:Col, Len( Transform( oGet:VarGet(), oGet:Picture ) ) ) } ) } )
-  
-	#define btnFDisp   WVT_BTN_FORMAT_FLAT
-	#define btnFMOver  WVT_BTN_FORMAT_RAISED
-	#define btnFBDown  WVT_BTN_FORMAT_RECESSED
-	#define btnFBUp    WVT_BTN_FORMAT_FLAT
+
+   #define btnFDisp   WVT_BTN_FORMAT_FLAT
+   #define btnFMOver  WVT_BTN_FORMAT_RAISED
+   #define btnFBDown  WVT_BTN_FORMAT_RECESSED
+   #define btnFBUp    WVT_BTN_FORMAT_FLAT
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 1,  nBtnRow, 6,nBtnRow+1, 9, ;
-       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,SLOT_IMAGE_VOUCH,btnFDisp  ) },;
-       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,SLOT_IMAGE_VOUCH,btnFMOver ) },;
-       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,SLOT_IMAGE_VOUCH,btnFBDown ) },;
-       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,SLOT_IMAGE_VOUCH,btnFBUp   )  ,;
+       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,IMAGE_VOUCH,btnFDisp  ) },;
+       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,IMAGE_VOUCH,btnFMOver ) },;
+       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,IMAGE_VOUCH,btnFBDown ) },;
+       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,IMAGE_VOUCH,btnFBUp   )  ,;
               eval( SetKey( K_F2 ) ) } ;
                     } )
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 2,  nBtnRow,11,nBtnRow+1,14, ;
-       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,SLOT_IMAGE_BROWSE, btnFDisp  ) },;
-       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,SLOT_IMAGE_BROWSE, btnFMOver ) },;
-       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,SLOT_IMAGE_BROWSE, btnFBDown ) },;
-       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,SLOT_IMAGE_BROWSE, btnFBUp   )  ,;
+       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,IMAGE_BROWSE, btnFDisp  ) },;
+       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,IMAGE_BROWSE, btnFMOver ) },;
+       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,IMAGE_BROWSE, btnFBDown ) },;
+       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,IMAGE_BROWSE, btnFBUp   )  ,;
               eval( SetKey( K_F5 ) ) } ;
                     } )
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 3,  nBtnRow,16,nBtnRow+1,19, ;
-       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand',SLOT_IMAGE_NOTES,btnFDisp  ) },;
-       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand',SLOT_IMAGE_NOTES,btnFMOver ) },;
-       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand',SLOT_IMAGE_NOTES,btnFBDown ) },;
-       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand',SLOT_IMAGE_NOTES,btnFBUp   )  ,;
+       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand',IMAGE_NOTES,btnFDisp  ) },;
+       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand',IMAGE_NOTES,btnFMOver ) },;
+       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand',IMAGE_NOTES,btnFBDown ) },;
+       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand',IMAGE_NOTES,btnFBUp   )  ,;
               eval( SetKey( K_F3 ) ) } ;
                    } )
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 4,  nBtnRow,21,nBtnRow+1,24, ;
        {|| Wvt_DrawButton( nBtnRow,21,nBtnRow+1,24,'Shrink',  , btnFDisp , rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;
        {|| Wvt_DrawButton( nBtnRow,21,nBtnRow+1,24,'Shrink',  , btnFMOver, rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;
-       {|| Wvt_DrawButton( nBtnRow,21,nBtnRow+1,24,'Shrink',  , btnFBDown, rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;       
+       {|| Wvt_DrawButton( nBtnRow,21,nBtnRow+1,24,'Shrink',  , btnFBDown, rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;
        {|| Wvt_DrawButton( nBtnRow,21,nBtnRow+1,24,'Shrink',  , btnFBUp  , rgb( 100,22,241 ), rgb( 0,100,0 ) )  ,;
               eval( SetKey( K_F4 ) ) } ;
                    } )
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 5,  nBtnRow,26,nBtnRow+1,29, ;
-       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize',SLOT_IMAGE_TOOLS, btnFDisp  ) },;
-       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize',SLOT_IMAGE_TOOLS, btnFMOver ) },;       
-       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize',SLOT_IMAGE_TOOLS, btnFBDown ) },;       
-       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize',SLOT_IMAGE_TOOLS, btnFBUp   )  ,;       
+       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize',IMAGE_TOOLS, btnFDisp  ) },;
+       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize',IMAGE_TOOLS, btnFMOver ) },;
+       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize',IMAGE_TOOLS, btnFBDown ) },;
+       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize',IMAGE_TOOLS, btnFBUp   )  ,;
               eval( SetKey( K_F6 ) ) },;
                    } )
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 6, nBtnRow,31,nBtnRow+1,34, ;
-       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial',SLOT_IMAGE_HELP, btnFDisp  ) },;
-       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial',SLOT_IMAGE_HELP, btnFMOver ) },;
-       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial',SLOT_IMAGE_HELP, btnFBDown ) },;       
-       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial',SLOT_IMAGE_HELP, btnFBUp   )  ,;       
+       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial',IMAGE_HELP, btnFDisp  ) },;
+       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial',IMAGE_HELP, btnFMOver ) },;
+       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial',IMAGE_HELP, btnFBDown ) },;
+       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial',IMAGE_HELP, btnFBUp   )  ,;
               eval( SetKey( K_F7 ) ) },;
                    } )
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 7,  nBtnRow,36,nBtnRow+1,39, ;
-       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines',SLOT_IMAGE_VR, btnFDisp , rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;
-       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines',SLOT_IMAGE_VR, btnFMOver, rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;
-       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines',SLOT_IMAGE_VR, btnFBDown, rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;       
-       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines',SLOT_IMAGE_VR, btnFBUp  , rgb( 100,22,241 ), rgb( 0,100,0 ) )  ,;
+       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines',IMAGE_VR, btnFDisp , rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;
+       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines',IMAGE_VR, btnFMOver, rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;
+       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines',IMAGE_VR, btnFBDown, rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;
+       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines',IMAGE_VR, btnFBUp  , rgb( 100,22,241 ), rgb( 0,100,0 ) )  ,;
               eval( SetKey( K_F8 ) ) } ;
                    } )
-                              
+
    aAdd( aBlocks, {|| Wvt_Mouse( -1000001 ) } )
 
 
@@ -213,10 +218,16 @@ PROCEDURE Main()
 
    SetColor( 'N/W,N/GR*,,,N/W*' )
 
+   Wvt_SetMenu( oMenu:hMenu )
+   Wvt_DrawMenuBar()
+   SetKey( Wvt_SetMenuKeyEvent(), { || ActivateMenu( oMenu ) } )
+
    @  6, nColGet SAY '< Date >'
    @  9, nColGet SAY '<' + PadC( 'Name', 33 ) + '>'
    @ 12, nColGet SAY '<' + PadC( 'Address', 33 ) + '>'
    @ 16, 61      SAY '< Salary >'
+
+   dDate := ctod( '04/01/04' )
 
    @  7, nColGet GET dDate WHEN  DispStatusMsg( 'Date must be Valid' );
                            VALID ClearStatusMsg()
@@ -235,19 +246,13 @@ PROCEDURE Main()
    WvtSetObjects( aObjects )
    SetColor( clr )
    RestScreen( 0,0,maxrow(),maxcol(), scr )
-   SetKey( K_F2, kf2 )
-   SetKey( K_F3, kf3 )
-   SetKey( K_F4, kf4 )
-   SetKey( K_F5, kf5 )
-   SetKey( K_F6, kf6 )
-   SetKey( K_F7, kf7 )
-   SetKey( K_F8, kf8 )
+   WvtSetKeys( .f. )
    Wvt_SetPopupMenu( hPopup )
-         
+
 RETURN
 
 //-------------------------------------------------------------------//
-PROCEDURE WvtGets()
+PROCEDURE WvtNextGets()
 
    LOCAL aLastPaint, clr
    LOCAL dDate      := ctod( '' )
@@ -273,7 +278,7 @@ PROCEDURE WvtGets()
    LOCAL nRow       := Row()
    LOCAL nCol       := Col()
    LOCAL scr        := SaveScreen( 0,0,maxrow(),maxcol() )
-   LOCAL wvtScr     := Wvt_SaveScreen( 0,0,maxrow(),maxcol() )         
+   LOCAL wvtScr     := Wvt_SaveScreen( 0,0,maxrow(),maxcol() )
 
    // Change the values of pallatte arbitrarily though yu can fine tune
    // these values with realistic values.
@@ -290,14 +295,14 @@ PROCEDURE WvtGets()
    aAdd( aBlocks, {|| Wvt_DrawRectangle( 11, 50, 13, 58 ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxGroupRaised( 5, 6, 19, 72 ) } )
    aAdd( aBlocks, {|| aEval( GetList, {|oGet| Wvt_DrawBoxGet( oGet:Row, oGet:Col, Len( Transform( oGet:VarGet(), oGet:Picture ) ) ) } ) } )
-   
+
    aAdd( aBlocks, {|| Wvt_DrawButton( 21, 6,22, 9,'New'   ,'vouch1.bmp' ) } )
    aAdd( aBlocks, {|| Wvt_DrawButton( 21,11,22,14,'Browse','vouch1.bmp', 1, rgb( 255,255,255 ) ) } )
    aAdd( aBlocks, {|| Wvt_DrawButton( 21,16,22,19, ,'vouch1.bmp' ) } )
-   aAdd( aBlocks, {|| Wvt_DrawButton( 21,21,22,24,'Data',, 0, rgb( 100,22,241 ), rgb( 198,198,198 ) ) } )         
-   aAdd( aBlocks, {|| Wvt_DrawButton( 21,26,22,29,'Flat',SLOT_IMAGE_VR,2 ) } )
-   aAdd( aBlocks, {|| Wvt_DrawButton( 21,31,22,34,'Outline',SLOT_IMAGE_VR,3 ) } )   
-   aAdd( aBlocks, {|| Wvt_DrawButton( 22,36,22,41,'Data',, 0, rgb( 100,22,241 ), rgb( 198,198,198 ) ) } )         
+   aAdd( aBlocks, {|| Wvt_DrawButton( 21,21,22,24,'Data',, 0, rgb( 100,22,241 ), rgb( 198,198,198 ) ) } )
+   aAdd( aBlocks, {|| Wvt_DrawButton( 21,26,22,29,'Flat',IMAGE_VR,2 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawButton( 21,31,22,34,'Outline',IMAGE_VR,3 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawButton( 22,36,22,41,'Data',, 0, rgb( 100,22,241 ), rgb( 198,198,198 ) ) } )
 
    aLastPaint := WvtSetBlocks( aBlocks )
    clr        := SetColor( 'N/W,N/GR*,,,N/W*' )
@@ -322,7 +327,7 @@ PROCEDURE WvtGets()
 
    // Restore Environment
    //
-   Wvt_SetPalette( aPalette )   
+   Wvt_SetPalette( aPalette )
    WvtSetObjects( aObjects )
    WvtSetBlocks( aLastPaint )
    SetColor( clr )
@@ -332,15 +337,41 @@ PROCEDURE WvtGets()
 RETURN
 
 //-------------------------------------------------------------------//
+FUNCTION WvtSetKeys( lSet )
+
+   if lSet
+      keys_[ 2 ] := SetKey( K_F2, {|| WvtNextGets()         } )
+      keys_[ 3 ] := SetKey( K_F3, {|| WvtWindowExpand( 1 )  } )
+      keys_[ 4 ] := SetKey( K_F4, {|| WvtWindowExpand( -1 ) } )
+      keys_[ 5 ] := SetKey( K_F5, {|| WvtMyBrowse()         } )
+      keys_[ 6 ] := SetKey( K_F6, {|| Wvt_Minimize()        } )
+      keys_[ 7 ] := SetKey( K_F7, {|| WvtPartialScreen()    } )
+      keys_[ 8 ] := SetKey( K_F8, {|| WvtLines()            } )
+      keys_[ 9 ] := SetKey( K_F9, {|| Wvt_ChooseFont()      } )
+      keys_[ 10] := SetKey( K_F10,{|| Wvt_ChooseColor()     } )
+   else
+      SetKey( K_F2,  keys_[ 2 ] )
+      SetKey( K_F3,  keys_[ 3 ] )
+      SetKey( K_F4,  keys_[ 4 ] )
+      SetKey( K_F5,  keys_[ 5 ] )
+      SetKey( K_F6,  keys_[ 6 ] )
+      SetKey( K_F7,  keys_[ 7 ] )
+      SetKey( K_F8,  keys_[ 8 ] )
+      SetKey( K_F9,  keys_[ 9 ] )
+      SetKey( K_F10, keys_[ 10] )
+   endif
+
+RETURN Nil
+//-------------------------------------------------------------------//
 //      Wvt_Paint() must be a FUNCTION in your application
 //      as it is called when Window gets WM_PAINT message.
 //-------------------------------------------------------------------//
 FUNCTION Wvt_Paint()
-   LOCAL tlbr_:= Wvt_GetPaintRect()  // { ntop, nLeft, nBottom, nRight }
-
    LOCAL aBlocks := WvtSetBlocks()
 
    aEval( aBlocks, {|e| eval( e ) } )
+
+   WvtPaintObjects()
 
 RETURN 0
 
@@ -382,78 +413,81 @@ RETURN nil
 //
 //-------------------------------------------------------------------//
 FUNCTION Wvt_Mouse( nKey, nRow, nCol )
-
-	LOCAL i, nLen, aObjects := WvtSetObjects()
+   LOCAL i, nLen, aObjects := WvtSetObjects()
    LOCAL nObj
-   
+
    STATIC nLastObj := 0
    STATIC nLastKey := 0
-      
-	if ( nLen := len( aObjects ) ) == 0
-		return nil
-	endif
-	
-	if nKey == -1000001
-		for nObj :=	1 to nLen
-			DO CASE
-			CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_DISP
-				eval( aObjects[ nObj, WVT_OBJ_ONDISP ] )
-			CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_MOUSEOVER	
-				eval( aObjects[ nObj, WVT_OBJ_ONMOUSEOVER ] )
-			CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_BUTTONDOWN
-				eval( aObjects[ nObj, WVT_OBJ_ONBUTTONDOWN ] )
-			CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_BUTTONUP
-				eval( aObjects[ nObj, WVT_OBJ_ONDISP ] )
-			CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_HIDE
 
-			ENDCASE
-		next
-		return nil
-	endif
+   if ( nLen := len( aObjects ) ) == 0
+      return nil
+   endif
+
+   if !SetMouseCheck()
+      return nil
+   endif
+
+   if nKey == -1000001
+      for nObj :=   1 to nLen
+         DO CASE
+         CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_DISP
+            eval( aObjects[ nObj, WVT_OBJ_ONDISP ] )
+         CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_MOUSEOVER
+            eval( aObjects[ nObj, WVT_OBJ_ONMOUSEOVER ] )
+         CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_BUTTONDOWN
+            eval( aObjects[ nObj, WVT_OBJ_ONBUTTONDOWN ] )
+         CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_BUTTONUP
+            eval( aObjects[ nObj, WVT_OBJ_ONDISP ] )
+         CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_HIDE
+
+         ENDCASE
+      next
+      return nil
+   endif
 
    nObj := ascan( aObjects, {|e_| e_[ WVT_OBJ_ROW   ] <= nRow .and. ;
                                   e_[ WVT_OBJ_ROWTO ] >= nRow .and. ;
                                   e_[ WVT_OBJ_COL   ] <= nCol .and. ;
                                   e_[ WVT_OBJ_COLTO ] >= nCol     } )
-	if nObj == 0
-		if nLastObj > 0
-		   aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_DISP
-			eval( aObjects[ nLastObj, WVT_OBJ_ONDISP ] )
-			nLastObj := 0
-		endif
-	   return nil
-	endif
+   if nObj == 0
+      if nLastObj > 0
+         aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_DISP
+         eval( aObjects[ nLastObj, WVT_OBJ_ONDISP ] )
+         nLastObj := 0
+      endif
+      return nil
+   endif
 
    if nLastObj == nObj .and. nLastKey == nKey
-   	return nil
+      return nil
    endif
-   
+
    nLastObj := nObj
-	nLastKey := nKey
-		   
-	DO CASE
-	CASE nKey == K_MOUSEMOVE
-		if aObjects[ nLastObj, WVT_OBJ_STATE ] <> OBJ_STATE_MOUSEOVER
-  			aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_MOUSEOVER
-			if aObjects[ nObj, WVT_OBJ_ONMOUSEOVER ] <> nil
-				eval( aObjects[ nObj, WVT_OBJ_ONMOUSEOVER ] )
-			endif
-		endif
-			
-	CASE nKey == K_LBUTTONDOWN
-  		aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_BUTTONDOWN
-  		if aObjects[ nObj, WVT_OBJ_ONBUTTONDOWN ] <> nil
-  			eval( aObjects[ nObj, WVT_OBJ_ONBUTTONDOWN ] )
-   	endif
-			
-	CASE nKey == K_LBUTTONUP
-  		aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_DISP
-  		if aObjects[ nObj, WVT_OBJ_ONBUTTONUP ] <> nil
-  			eval( aObjects[ nObj, WVT_OBJ_ONBUTTONUP ] )
-   	endif
-	
-	ENDCASE
-   
+   nLastKey := nKey
+
+   DO CASE
+   CASE nKey == K_MOUSEMOVE
+      if aObjects[ nLastObj, WVT_OBJ_STATE ] <> OBJ_STATE_MOUSEOVER
+           aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_MOUSEOVER
+         if aObjects[ nObj, WVT_OBJ_ONMOUSEOVER ] <> nil
+            eval( aObjects[ nObj, WVT_OBJ_ONMOUSEOVER ] )
+         endif
+      endif
+
+   CASE nKey == K_LBUTTONDOWN
+        aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_BUTTONDOWN
+        if aObjects[ nObj, WVT_OBJ_ONBUTTONDOWN ] <> nil
+           eval( aObjects[ nObj, WVT_OBJ_ONBUTTONDOWN ] )
+      endif
+
+   CASE nKey == K_LBUTTONUP
+        aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_DISP
+        if aObjects[ nObj, WVT_OBJ_ONBUTTONUP ] <> nil
+           eval( aObjects[ nObj, WVT_OBJ_ONBUTTONUP ] )
+      endif
+
+   ENDCASE
+
 RETURN nil
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
@@ -472,7 +506,6 @@ FUNCTION WvtSetBlocks( a_ )
    ENDIF
 
 RETURN o
-
 //-------------------------------------------------------------------//
 //  WvtSetObjects() is a get/set FUNCTION to be used by Wvt_Mouse()
 //-------------------------------------------------------------------//
@@ -480,27 +513,40 @@ FUNCTION WvtSetObjects( aObject )
 
    LOCAL oObjects
    STATIC aObjects := {}
-   
+
    oObjects := aclone( aObjects )
-   
+
    if aObject <> nil
       if empty( aObject )
-      	aObjects := {}
+         aObjects := {}
       else
          if valtype( aObject[ 1 ] ) == 'A'
-				aeval( aObject, {|e_| aadd( aObjects, e_ ) } )
+            aeval( aObject, {|e_| aadd( aObjects, e_ ) } )
          else
-	         aSize( aObject, WVT_OBJ_VRBLS )
+            aSize( aObject, WVT_OBJ_VRBLS )
 
-	         DEFAULT aObject[ WVT_OBJ_STATE ] TO OBJ_STATE_DISP
+            DEFAULT aObject[ WVT_OBJ_STATE ] TO OBJ_STATE_DISP
 
-		   	aadd( aObjects, aObject )
-		   endif	
-	   endif	
+            aadd( aObjects, aObject )
+         endif
+      endif
    endif
 
 RETURN oObjects
 //-------------------------------------------------------------------//
+FUNCTION SetMouseCheck( lYes )
+   LOCAL lOYes
+   STATIC lSYes := .t.
+
+   lOYes := lSYes
+   if lYes <> nil
+      lSYes := lYes
+   endif
+
+RETURN lOYes
+
+//-------------------------------------------------------------------//
+
 FUNCTION WvtWindowExpand( nUnits )
 
    STATIC sUnits := 18
@@ -534,35 +580,35 @@ FUNCTION VouChoice( aChoices )
 RETURN nChoice
 
 //-------------------------------------------------------------------//
-FUNCTION WvtBrowse()
+FUNCTION WvtMyBrowse()
 
    LOCAL nKey, bBlock, oBrowse , aLastPaint, i
    LOCAL lEnd    := .f.
-	LOCAL aBlocks := {}
-	LOCAL info_   := {}
-	LOCAL nTop    :=  3
-	LOCAL nLeft   :=  3
-	LOCAL nBottom := maxrow() - 2
-	LOCAL nRight  := maxcol() - 3
-	LOCAL nCursor := setCursor( 0 )
-	LOCAL nRow    := row()
-	LOCAL nCol    := col()
-   LOCAL cColor  := SetColor( 'N/W*,N/GR*,,,N/W* ' )
-	LOCAL cScr    := SaveScreen( 0,0,maxrow(),maxcol() )
+   LOCAL aBlocks := {}
+   LOCAL info_   := {}
+   LOCAL nTop    :=  3
+   LOCAL nLeft   :=  3
+   LOCAL nBottom := maxrow() - 2
+   LOCAL nRight  := maxcol() - 3
+   LOCAL nCursor := setCursor( 0 )
+   LOCAL nRow    := row()
+   LOCAL nCol    := col()
+   LOCAL cColor  := SetColor( 'N/W*,N/GR*,,,N/W*' )
+   LOCAL cScr    := SaveScreen( 0,0,maxrow(),maxcol() )
    LOCAL aObjects:= WvtSetObjects( {} )
    LOCAL hPopup  := Wvt_SetPopupMenu()
-  
-	STATIC nStyle := 0
 
-	USE 'TEST' NEW
+   STATIC nStyle := 0
+
+   USE 'TEST' NEW
    if NetErr()
       return nil
    endif
    info_:= DbStruct()
 
    Popups( 2 )
-   
-	oBrowse := TBrowseNew( nTop + 3, nLeft + 2, nBottom - 1, nRight - 2 )
+
+   oBrowse := TBrowseNew( nTop + 3, nLeft + 2, nBottom - 1, nRight - 2 )
 
    oBrowse:ColSep        = '  '
    oBrowse:HeadSep       = '__'
@@ -570,12 +616,12 @@ FUNCTION WvtBrowse()
    oBrowse:GoBottomBlock = { || dbGoBottom() }
    oBrowse:SkipBlock     = { | nSkip | dbSkipBlock( nSkip,oBrowse ) }
 
-	for i := 1 to len( info_ )
-		bBlock := VouBlockField( i )
-	   oBrowse:AddColumn( TBColumnNew( info_[ i,1 ], bBlock ) )
-	next
+   for i := 1 to len( info_ )
+      bBlock := VouBlockField( i )
+      oBrowse:AddColumn( TBColumnNew( info_[ i,1 ], bBlock ) )
+   next
 
-	oBrowse:configure()
+   oBrowse:configure()
 
    if nStyle > 5
       nStyle := 0
@@ -594,78 +640,29 @@ FUNCTION WvtBrowse()
 
    aLastPaint := WvtSetBlocks( aBlocks )
 
-	DispBox( 0, 0, maxrow(), maxcol(), '         ', 'N/W' )
-	DispOutAt( nTop + 1, nleft, padc( CurDrive()+':\'+CurDir()+'\'+'Test.dbf', nRight - nLeft + 1 ), 'W+/W' )
+   DispBox( 0, 0, maxrow(), maxcol(), '         ', 'N/W' )
+   DispOutAt( nTop + 1, nleft, padc( CurDrive()+':\'+CurDir()+'\'+'Test.dbf', nRight - nLeft + 1 ), 'W+/W' )
 
-	While !lEnd
+   While !lEnd
       oBrowse:ForceStable()
 
       nKey = InKey( 0 )
 
-      do case
-      case nKey == K_ESC
-         lEnd = .t.
-
-		case nKey == K_ENTER
-			lEnd := .t.
-
-      case nKey == K_DOWN
-         oBrowse:Down()
-
-      case nKey == K_UP
-         oBrowse:Up()
-
-      case nKey == K_LEFT
-         oBrowse:Left()
-
-      case nKey == K_RIGHT
-         oBrowse:Right()
-
-      case nKey = K_PGDN
-         oBrowse:pageDown()
-
-      case nKey = K_PGUP
-         oBrowse:pageUp()
-
-      case nKey = K_CTRL_PGUP
-         oBrowse:goTop()
-
-      case nKey = K_CTRL_PGDN
-         oBrowse:goBottom()
-
-      case nKey = K_HOME
-         oBrowse:home()
-
-      case nKey = K_END
-         oBrowse:end()
-
-      case nKey = K_CTRL_LEFT
-         oBrowse:panLeft()
-
-      case nKey = K_CTRL_RIGHT
-         oBrowse:panRight()
-
-      case nKey = K_CTRL_HOME
-         oBrowse:panHome()
-
-      case nKey = K_CTRL_END
-         oBrowse:panEnd()
-
-      endcase
+      BrwHandleKey( oBrowse, nKey, @lEnd )
    end
 
-	Wvt_SetPen( 0 )
+   Wvt_SetPen( 0 )
    WvtSetBlocks( aLastPaint )
-	WvtSetObjects( aObjects )
-	
+   WvtSetObjects( aObjects )
+
    DevPos( nRow, nCol )
    SetColor( cColor )
    SetCursor( nCursor )
 
-	DBCloseArea()
+   DBCloseArea()
    RestScreen( 0,0, maxrow(),maxcol(), cScr )
-	Wvt_setPopupMenu( hPopup )
-	
+   Wvt_setPopupMenu( hPopup )
+
 RETURN nil
 //-------------------------------------------------------------------//
 STATIC FUNCTION DbSkipBlock( n, oTbr )
@@ -722,40 +719,263 @@ STATIC FUNCTION VouBlockField( i )
 
 RETURN  {|| fieldget( i ) }
 //-------------------------------------------------------------------//
+STATIC FUNCTION BrwHandleKey( oBrowse, nKey, lEnd )
+   LOCAL lRet := .t.
+
+   do case
+   case nKey == K_ESC
+      lEnd = .t.
+
+   case nKey == K_ENTER
+      lEnd := .t.
+
+   case nKey == K_DOWN
+      oBrowse:Down()
+
+   case nKey == K_UP
+      oBrowse:Up()
+
+   case nKey == K_LEFT
+      oBrowse:Left()
+
+   case nKey == K_RIGHT
+      oBrowse:Right()
+
+   case nKey = K_PGDN
+      oBrowse:pageDown()
+
+   case nKey = K_PGUP
+      oBrowse:pageUp()
+
+   case nKey = K_CTRL_PGUP
+      oBrowse:goTop()
+
+   case nKey = K_CTRL_PGDN
+      oBrowse:goBottom()
+
+   case nKey = K_HOME
+      oBrowse:home()
+
+   case nKey = K_END
+      oBrowse:end()
+
+   case nKey = K_CTRL_LEFT
+      oBrowse:panLeft()
+
+   case nKey = K_CTRL_RIGHT
+      oBrowse:panRight()
+
+   case nKey = K_CTRL_HOME
+      oBrowse:panHome()
+
+   case nKey = K_CTRL_END
+      oBrowse:panEnd()
+
+   case nKey == K_MWBACKWARD
+      oBrowse:down()
+
+   case nKey == K_MWFORWARD
+      oBrowse:up()
+
+   otherwise
+      lRet := .f.
+
+   endcase
+
+   RETURN lRet
+
+//-------------------------------------------------------------------//
+
+STATIC FUNCTION BrwOnEvent( oWvtBrw, cPaintID, oBrowse, nKey )
+   LOCAL lRet := .t., lRefAll := .f.
+
+   do case
+   case nKey == K_DOWN
+      oBrowse:Down()
+
+   case nKey == K_UP
+      oBrowse:Up()
+
+   case nKey == K_LEFT
+      oBrowse:Left()
+
+   case nKey == K_RIGHT
+      oBrowse:Right()
+
+   case nKey = K_PGDN
+      oBrowse:pageDown()
+      lRefAll := .t.
+
+   case nKey = K_PGUP
+      oBrowse:pageUp()
+      lRefAll := .t.
+
+   case nKey = K_CTRL_PGUP
+      oBrowse:goTop()
+      lRefAll := .t.
+
+   case nKey = K_CTRL_PGDN
+      oBrowse:goBottom()
+      lRefAll := .t.
+
+   case nKey = K_HOME
+      oBrowse:home()
+
+   case nKey = K_END
+      oBrowse:end()
+
+   case nKey = K_CTRL_LEFT
+      oBrowse:panLeft()
+
+   case nKey = K_CTRL_RIGHT
+      oBrowse:panRight()
+
+   case nKey = K_CTRL_HOME
+      oBrowse:panHome()
+
+   case nKey = K_CTRL_END
+      oBrowse:panEnd()
+
+   case nKey == K_MWBACKWARD
+      oBrowse:down()
+
+   case nKey == K_MWFORWARD
+      oBrowse:up()
+
+   case nKey == K_SBTHUMBTRACKVERT
+      OrdKeyGoTo( oWvtBrw:oVBar:GetPos() )
+      lRefAll := .t.
+
+   case nKey == K_SBTHUMBTRACKHORZ
+      oBrowse:ColPos := oWvtBrw:oHBar:GetPos()
+
+   case nKey == K_SBLINEUP
+      oBrowse:up()
+
+   case nKey == K_SBLINEDOWN
+      oBrowse:down()
+
+   case nKey == K_SBPAGEUP
+     oBrowse:PageUp()
+
+   case nKey == K_SBPAGEDOWN
+      oBrowse:PageDown()
+
+   case nKey == K_SBLINELEFT
+      oBrowse:Left()
+
+   case nKey == K_SBLINERIGHT
+      oBrowse:Right()
+
+   case nKey == K_SBPAGELEFT
+      oBrowse:Left()
+
+   case nKey == K_SBPAGERIGHT
+      oBrowse:right()
+
+   otherwise
+      lRet := .f.
+
+   endcase
+
+   if lRet
+      if lRefAll
+         oBrowse:RefreshAll()
+      endif
+      oBrowse:ForceStable()
+
+      oWvtBrw:oVBar:SetPos( OrdKeyCount(),OrdKeyNo() )
+      oWvtBrw:oHBar:SetPos( oBrowse:ColCount, oBrowse:ColPos )
+   endif
+
+   RETURN Nil
+
+//-------------------------------------------------------------------//
+
+STATIC FUNCTION CfgMyBrowse( aFields, cUseAlias, aTLBR, cDesc, oParent, cColorSpec, nID )
+   LOCAL info_, oWvtBrw, oBrowse, i, bBlock
+   LOCAL aPopup := {}
+
+   aadd( aPopup, { 'Down'     , {|| oBrowse:Down()    , oBrowse:ForceStable() } } )
+   aadd( aPopup, { 'Up'       , {|| oBrowse:Up()      , oBrowse:ForceStable() } } )
+   aadd( aPopup, { 'Page Down', {|| oBrowse:PageDown(), oBrowse:ForceStable() } } )
+   aadd( aPopup, { 'Page Up'  , {|| oBrowse:PageUp()  , oBrowse:ForceStable() } } )
+   aadd( aPopup, { 'Top'      , {|| oBrowse:GoTop()   , oBrowse:ForceStable() } } )
+   aadd( aPopup, { 'Bottom'   , {|| oBrowse:GoBottom(), oBrowse:ForceStable() } } )
+
+   Select( cUseAlias )
+   info_:= DbStruct()
+
+   oBrowse := TBrowseNew( aTLBR[ 1 ], aTLBR[ 2 ], aTLBR[ 3 ], aTLBR[ 4 ] )
+
+   oBrowse:ColSep        := '  '
+   oBrowse:HeadSep       := '__'
+   oBrowse:ColorSpec     := cColorSpec
+   oBrowse:GoTopBlock    := { || dbGoTop() }
+   oBrowse:GoBottomBlock := { || dbGoBottom() }
+   oBrowse:SkipBlock     := { | nSkip | dbSkipBlock( nSkip,oBrowse ) }
+
+   for i := 1 to len( aFields )
+      bBlock := VouBlockField( aFields[ i ] )
+      oBrowse:AddColumn( TBColumnNew( info_[ aFields[ i ],1 ], bBlock ) )
+   next
+
+   oBrowse:configure()
+
+   oWvtBrw := WvtBrowse():New( oParent,nID )
+
+   oWvtBrw:nTop         := aTLBR[ 1 ]
+   oWvtBrw:nLeft        := aTLBR[ 2 ]
+   oWvtBrw:nBottom      := aTLBR[ 3 ]
+   oWvtBrw:nRight       := aTLBR[ 4 ]
+   oWvtBrw:cAlias       := cUseAlias
+   oWvtBrw:oBrw         := oBrowse
+   oWvtBrw:cDesc        := cDesc
+   oWvtBrw:nPointer     := WVT_IDC_HAND
+   oWvtBrw:cColorHilite := 'W+/B*'
+   oWvtBrw:Tooltip      := cDesc
+   oWvtBrw:aPopup       := aPopup
+
+   oWvtBrw:bHandleEvent := {|oWvtBrw,cPaintID,oBrowse,nKey| BrwOnEvent( oWvtBrw,cPaintID,oBrowse,nKey ) }
+
+RETURN oWvtBrw
+
+//-------------------------------------------------------------------//
+
 FUNCTION WvtPartialScreen()
    LOCAL scr        := SaveScreen( 7,20,15,60 )
-   LOCAL wvtScr     := Wvt_SaveScreen( 0, 0, MaxRow(), MaxCol() )         
-   LOCAL wvtScr1 
-   LOCAL aLastPaint 
+   LOCAL wvtScr     := Wvt_SaveScreen( 0, 0, MaxRow(), MaxCol() )
+   LOCAL wvtScr1
+   LOCAL aLastPaint
    LOCAL hPopup     := Wvt_SetPopupMenu()
-   
+
    aLastPaint := WvtSetBlocks( {} )
-   
-   DispBox( 7, 20, 15, 60, '         ', 'W/GR*' )   
+
+   DispBox( 7, 20, 15, 60, '         ', 'W/GR*' )
    @ 10,25 SAY 'Wvt_SaveScreen()' COLOR 'N/GR*'
    @ 11,25 SAY 'Wvt_RestScreen()' COLOR 'N/GR*'
-   @ 13,25 SAY 'Press Esc '       COLOR 'N/GR*'   
-   Wvt_DrawBoxRecessed( 8,22,14,58 )   
+   @ 13,25 SAY 'Press Esc '       COLOR 'N/GR*'
+   Wvt_DrawBoxRecessed( 8,22,14,58 )
 
    wvtScr1 := Wvt_SaveScreen( 7,20,15,60 )
-   
+
    do while inkey( 0 ) <> K_ESC
    enddo
-   
-   DispBox( 7, 20, 15, 60, '         ', 'W/B*' )   
+
+   DispBox( 7, 20, 15, 60, '         ', 'W/B*' )
    @ 10,25 SAY 'Wvt_SaveScreen()' COLOR 'N/B*'
    @ 11,25 SAY 'Wvt_RestScreen()' COLOR 'N/B*'
-   @ 13,25 SAY 'Press Esc '       COLOR 'N/B*'   
-   Wvt_DrawBoxRecessed( 8,22,14,58 )   
+   @ 13,25 SAY 'Press Esc '       COLOR 'N/B*'
+   Wvt_DrawBoxRecessed( 8,22,14,58 )
 
    do while inkey( 0 ) <> K_ESC
    enddo
 
-   Wvt_RestScreen( 7,20,15,60, wvtScr1 )   
-	
+   Wvt_RestScreen( 7,20,15,60, wvtScr1 )
+
    do while inkey( 0 ) <> K_ESC
    enddo
-  
+
    RestScreen( 7,20,15,60,scr )
    Wvt_RestScreen( 0, 0, MaxRow(), MaxCol(), wvtScr )
    WvtSetBlocks( aLastPaint )
@@ -772,16 +992,16 @@ function WvtLines()
    LOCAL aLastPaint := WvtSetBlocks( {} )
    LOCAL aObjects   := WvtSetObjects( {} )
    LOCAL hPopup     := Wvt_SetPopupMenu()
-   
+
    CLS
-  
+
    Wvt_DrawLine( 0, 0, 0, nCols, WVT_LINE_HORZ, WVT_LINE_RAISED  , WVT_LINE_CENTER )
    Wvt_DrawLine( 1, 0, 1, nCols, WVT_LINE_HORZ, WVT_LINE_RECESSED, WVT_LINE_TOP )
    Wvt_DrawLine( 2, 0, 2, nCols, WVT_LINE_HORZ, WVT_LINE_PLAIN   , WVT_LINE_CENTER, WVT_LINE_SOLID, 4, Rgb( 255,255,255 ) )
    Wvt_DrawLine( 3, 0, 3, nCols, WVT_LINE_HORZ, WVT_LINE_RAISED  , WVT_LINE_CENTER, WVT_LINE_DASH , 0, Rgb( 255,0,0 ) )
    Wvt_DrawLine( 4, 0, 4, nCols, WVT_LINE_HORZ, WVT_LINE_RECESSED, WVT_LINE_BOTTOM )
 
-   @ 0, 1 SAY 'Center Raised' 
+   @ 0, 1 SAY 'Center Raised'
    @ 1,11 say 'Top Recessed'
    @ 2,21 say 'Center Plain White 3 Pixels'
    @ 3,31 say 'Center Raised Dotted'
@@ -805,10 +1025,10 @@ function WvtLines()
    @ 15,8 Say 'D'
    @ 16,9 Say 'E'
 
-	do while ( inkey(0) <> 27 )
-	enddo
+   do while ( inkey(0) <> 27 )
+   enddo
 
-	//  Restore Environments
+   //  Restore Environments
    //
    SetColor( clr )
 
@@ -823,7 +1043,7 @@ RETURN nil
 
 FUNCTION DispStatusMsg( cMsg )
 
-	Wvt_DrawLabel( MaxRow(), 60, cMsg, 6, , 0, rgb(198,198,198), 'Arial', 18, , 900 )
+   Wvt_DrawLabel( MaxRow(), 60, cMsg, 6, , 0, rgb(198,198,198), 'Arial', 18, , 900 )
 
 RETURN .t.
 
@@ -832,80 +1052,80 @@ RETURN .t.
 FUNCTION ClearStatusMsg()
    LOCAL nRow := Row()
    LOCAL nCol := Col()
-   
+
    DispOutAt( MaxRow(), 42, space( 37 ), 'W/W' )
-   
+
    SetPos( nRow, nCol )
-   
+
 RETURN .t.
 
 //-------------------------------------------------------------------//
 
 FUNCTION Popups( nID, lDestroy )
-	LOCAL hPop, hPop1
-	LOCAL nPrompt := MF_ENABLED+MF_STRING
+   LOCAL hPop, hPop1
+   LOCAL nPrompt := MF_ENABLED+MF_STRING
 
-	static hPop_:= { , , , , , , , , }
+   static hPop_:= { , , , , , , , , }
 
-	if nID == nil
-   	Wvt_SetPopupMenu()
-		return nil
-	endif
+   if nID == nil
+      Wvt_SetPopupMenu()
+      return nil
+   endif
 
-	if lDestroy <> nil
-		Wvt_DestroyMenu( hPop_[ nID ] )
-		return nil
-	endif
+   if lDestroy <> nil
+      Wvt_DestroyMenu( hPop_[ nID ] )
+      return nil
+   endif
 
-	hPop := hPop_[ nID ]
-   
-	do case
-	case nID == 1   //  Data Entry Module
-   
-   	if hPop == nil
-			hPop := Wvt_CreatePopupMenu()
-			Wvt_AppendMenu( hPop, nPrompt, K_F2, 'Second Get Screen' )
-			Wvt_AppendMenu( hPop, nPrompt, K_F3, 'Expand Window'     )
-			Wvt_AppendMenu( hPop, nPrompt, K_F4, 'Shrink Window'     )
-			Wvt_AppendMenu( hPop, nPrompt, K_F5, 'Browse'            )
-			Wvt_AppendMenu( hPop, nPrompt, K_F6, 'Minimize'          )
-			Wvt_AppendMenu( hPop, nPrompt, K_F7, 'Partial Screen'    )
-			Wvt_AppendMenu( hPop, nPrompt, K_F8, 'Lines'             )
-			Wvt_AppendMenu( hPop, nPrompt, K_F9, 'Choose Font'       )
-			Wvt_AppendMenu( hPop, nPrompt, K_F10,'Choose Color'      )   
-		
-			Wvt_AppendMenu( hPop, MF_SEPARATOR )
-	
-			Wvt_AppendMenu( hPop, nPrompt, K_F5, 'Browse'  )
-	   
-		endif
+   hPop := hPop_[ nID ]
 
-	case nID == 2   //  Browser
-		
-   	if hPop == nil
-			hPop := Wvt_CreatePopupMenu()	
-			Wvt_AppendMenu( hPop, nPrompt, K_DOWN     , 'Down'      )
-			Wvt_AppendMenu( hPop, nPrompt, K_UP       , 'Up'        )
-			Wvt_AppendMenu( hPop, nPrompt, K_PGDN     , 'Page Down' )
-			Wvt_AppendMenu( hPop, nPrompt, K_PGUP     , 'Page Up'   )
-			Wvt_AppendMenu( hPop, nPrompt, K_CTRL_PGUP, 'Top'       )
-			Wvt_AppendMenu( hPop, nPrompt, K_CTRL_PGDN, 'Bottom'    )
-		
-			Wvt_AppendMenu( hPop, MF_SEPARATOR )		
-		
-			hPop1 := Wvt_CreatePopupMenu()
-			Wvt_AppendMenu( hPop1, nPrompt, K_RIGHT   , 'Right'     )
-			Wvt_AppendMenu( hPop1, nPrompt, K_LEFT    , 'Left'      )
-			Wvt_AppendMenu( hPop1, nPrompt, K_END     , 'End'       )
-			Wvt_AppendMenu( hPop1, nPrompt, K_HOME    , 'Home'      )
+   do case
+   case nID == 1   //  Data Entry Module
 
-			Wvt_AppendMenu( hPop, MF_ENABLED+MF_POPUP, hPop1, 'Column Movement' )
-		
-		endif
-	
-	endcase
+      if hPop == nil
+         hPop := Wvt_CreatePopupMenu()
+         Wvt_AppendMenu( hPop, nPrompt, K_F2, 'Second Get Screen' )
+         Wvt_AppendMenu( hPop, nPrompt, K_F3, 'Expand Window'     )
+         Wvt_AppendMenu( hPop, nPrompt, K_F4, 'Shrink Window'     )
+         Wvt_AppendMenu( hPop, nPrompt, K_F5, 'Browse'            )
+         Wvt_AppendMenu( hPop, nPrompt, K_F6, 'Minimize'          )
+         Wvt_AppendMenu( hPop, nPrompt, K_F7, 'Partial Screen'    )
+         Wvt_AppendMenu( hPop, nPrompt, K_F8, 'Lines'             )
+         Wvt_AppendMenu( hPop, nPrompt, K_F9, 'Choose Font'       )
+         Wvt_AppendMenu( hPop, nPrompt, K_F10,'Choose Color'      )
 
-	hPop_[ nID ] := hPop
+         Wvt_AppendMenu( hPop, MF_SEPARATOR )
+
+         Wvt_AppendMenu( hPop, nPrompt, K_F5, 'Browse'  )
+
+      endif
+
+   case nID == 2   //  Browser
+
+      if hPop == nil
+         hPop := Wvt_CreatePopupMenu()
+         Wvt_AppendMenu( hPop, nPrompt, K_DOWN     , 'Down'      )
+         Wvt_AppendMenu( hPop, nPrompt, K_UP       , 'Up'        )
+         Wvt_AppendMenu( hPop, nPrompt, K_PGDN     , 'Page Down' )
+         Wvt_AppendMenu( hPop, nPrompt, K_PGUP     , 'Page Up'   )
+         Wvt_AppendMenu( hPop, nPrompt, K_CTRL_PGUP, 'Top'       )
+         Wvt_AppendMenu( hPop, nPrompt, K_CTRL_PGDN, 'Bottom'    )
+
+         Wvt_AppendMenu( hPop, MF_SEPARATOR )
+
+         hPop1 := Wvt_CreatePopupMenu()
+         Wvt_AppendMenu( hPop1, nPrompt, K_RIGHT   , 'Right'     )
+         Wvt_AppendMenu( hPop1, nPrompt, K_LEFT    , 'Left'      )
+         Wvt_AppendMenu( hPop1, nPrompt, K_END     , 'End'       )
+         Wvt_AppendMenu( hPop1, nPrompt, K_HOME    , 'Home'      )
+
+         Wvt_AppendMenu( hPop, MF_ENABLED+MF_POPUP, hPop1, 'Column Movement' )
+
+      endif
+
+   endcase
+
+   hPop_[ nID ] := hPop
 
 RETURN Wvt_SetPopupMenu( hPop_[ nID ] )
 
@@ -913,13 +1133,13 @@ RETURN Wvt_SetPopupMenu( hPop_[ nID ] )
 
 FUNCTION WvtPictures( nSlot,cFilePic )
 
-	if nSlot <> nil .and. nSlot <= 20 .and. file( cFilePic )
-		if pic_[ nSlot ] <> cFilePic
-			if Wvt_LoadPicture( cFilePic, nSlot )
-				pic_[ nSlot ] := cFilePic
-			endif				
-		endif
-	endif
+   if nSlot <> nil .and. nSlot <= 20 .and. file( cFilePic )
+      if pic_[ nSlot ] <> cFilePic
+         if Wvt_LoadPicture( cFilePic, nSlot )
+            pic_[ nSlot ] := cFilePic
+         endif
+      endif
+   endif
 
 RETURN nil
 
@@ -928,11 +1148,450 @@ RETURN nil
 FUNCTION WvtExePicture( nTop, nLeft, nBottom, nRight, nSlot, aOffset )
 
    if pic_[ nSlot ] <> nil
-	   Wvt_DrawPicture( nTop, nLeft, nBottom, nRight, nSlot, aOffSet )
+      Wvt_DrawPicture( nTop, nLeft, nBottom, nRight, nSlot, aOffSet )
    endif
 
 RETURN nil
 
 //-------------------------------------------------------------------//
 
+FUNCTION CreateMainMenu()
+   LOCAL oMenu
+   LOCAL g_oMenuBar := wvtMenu():new():create()
+
+   oMenu := wvtMenu():new():create()
+   oMenu:Caption:= "Wvt*Classes"
+   oMenu:AddItem( "Dialog One", {|| MyDialogOne() } )
+   oMenu:AddItem( "Dialog Two", {|| MyDialogTwo() } )
+   oMenu:AddItem( "-" )
+   oMenu:AddItem( "Exit"      , {|| __keyboard( K_ESC ) } )
+   g_oMenuBar:addItem( "",oMenu )
+
+   oMenu := wvtMenu():new():create()
+   oMenu:Caption := "Traditional"
+   oMenu:AddItem( "Next Gets"     , {|| WvtNextGets()      } )
+   oMenu:AddItem( "Browser"       , {|| WvtMyBrowse()      } )
+   oMenu:AddItem( "Partial Screen", {|| WvtPartialScreen() } )
+   oMenu:AddItem( "-")
+   oMenu:AddItem( "Wvt Lines"     , {|| WvtLines()         } )
+   g_oMenuBar:addItem( "",oMenu )
+
+   oMenu := wvtMenu():new():create()
+   oMenu:Caption:= "Common Dialogs"
+   oMenu:AddItem( "Fonts" ,{|| Wvt_ChooseFont() } )
+   oMenu:AddItem( "-")
+   oMenu:AddItem( "Colors",{|| Wvt_ChooseColor() } )
+   g_oMenuBar:addItem( "",oMenu)
+
+   oMenu := wvtMenu():new():create()
+   oMenu:Caption:= "Functionality"
+   oMenu:AddItem( "Expand" ,{|| WvtWindowExpand( 1 ) } )
+   oMenu:AddItem( "Shrink" ,{|| WvtWindowExpand( -1 ) } )
+   oMenu:AddItem( "-")
+   oMenu:AddItem( "Minimize",{|| Wvt_Minimize() } )
+   g_oMenuBar:addItem( "",oMenu)
+
+RETURN g_oMenuBar
+
+//-------------------------------------------------------------------//
+
+STATIC FUNCTION ActivateMenu( oMenu )
+   LOCAL nMenu := Wvt_GetLastMenuEvent()
+   LOCAL aMenuItem
+
+   IF !EMPTY( nMenu )
+
+     IF HB_ISOBJECT( oMenu )
+       IF !EMPTY( aMenuItem := oMenu:FindMenuItemById( nMenu ) )
+         IF HB_ISBLOCK( aMenuItem[ WVT_MENU_ACTION ] )
+           EVAL( aMenuItem[ WVT_MENU_ACTION ] )
+         ENDIF
+       ENDIF
+      ENDIF
+   ENDIF
+
+RETURN ( NIL )
+
+//-------------------------------------------------------------------//
+
+STATIC FUNCTION MyDialogOne()
+   LOCAL aObjects:= WvtSetBlocks( {} )
+   Local nWinRows, nWinCols, cWinTitle, cFont, nHeight, nWidth
+   Local oDlg, obj_, oBar, d_, nN, cUseAlias
+   Local oText, oTBar, aImg_, oImg, oLine, oBox, oBtn, oBtn2
+   Local oBBox, oCon, oGet, oGet2, nRowG, oBBox2, oBnr, oTBx
+   Local oBRsd, cTxt, oRct, nGetCol, nSayCol, bBlock, bBlock1
+   Local oMnu, oWvtBrw, oWvtBrw1, lOpen, lOpen1, cUseAlias1, oGetArea, oGet1
+   LOCAL hPopup, nGetRow, aGets_, lChkMouse
+   LOCAL g_oMenuBar, oMenu, oPBar2,oPBar3
+
+   WvtSetKeys( .f. )
+   lChkMouse := SetMouseCheck( .f. )
+
+   hPopup := Wvt_SetPopupMenu()
+   Popups()
+
+   cTxt := 'GtWvt is capable of designing virtually any preceivable control '
+   cTxt := cTxt + 'Windows offers.'
+   cTxt := cTxt + CRLF + CRLF
+   cTxt := cTxt + 'This text is placed in a WvtTextBox() control with '
+   cTxt := cTxt + 'font and alignment adjustments!'
+   cTxt := cTxt + CRLF + CRLF
+   cTxt := cTxt + 'Enjoy - Pritpal Bedi, INDIA'
+
+   aImg_:={}
+   aadd( aImg_, 'v_lock.bmp'   )
+   aadd( aImg_, 'v_new.bmp'    )
+   aadd( aImg_, 'v_clclt.bmp'  )
+   aadd( aImg_, 'v_calend.bmp' )
+   aadd( aImg_, 'v_index.bmp'  )
+   aadd( aImg_, 'v_notes1.bmp' )
+   aadd( aImg_, 'v_selct1.bmp' )
+
+   nWinRows  := 55
+   nWinCols  := 185
+   cWinTitle := 'WvtGui Dialog One'
+   cFont     := 'Courier New'
+   nHeight   := 13
+
+   oDlg := WvtDialog():New( nWinRows, nWinCols, cWinTitle, cFont, nHeight )
+   oDlg:nTooltipWidth     := 300
+   oDlg:nTooltipTextColor := RGB( 255,0,0 )
+
+   oBar := WvtStatusBar():New( oDlg,201 )
+   oBar:SetPanels( { 50,100 } )
+   oBar:SetText( 1, 'Tab.SH_Tab.Left_Click - Select a Browse' )
+   oBar:SetText( 2, 'GtWvt is Fantastic', 'w+/W' )
+   oBar:SetText( 3, 'WOW' )
+   oBar:nPointer := WVT_IDC_HAND
+   oBar:Tooltip  := 'GtWvt Statusbar with 3 panels'
+   oDlg:AddObject( oBar )
+
+   oBox := WvtStatic():New( oDlg,110,4,oDlg:MaxCol()-40,7,oDlg:MaxCol()-2 )
+   oBox:nStatic := WVT_STATIC_BOXRECESSED
+   oDlg:AddObject( oBox )
+
+   oText := WvtLabel():New( oDlg, 101, 4, oDlg:MaxCol()-40, 7,oDlg:MaxCol()-2 )
+   oText:Text              := 'xHarbour'
+   oText:nFontHeight       := 36
+   oText:nAlignHorz        := 2
+   oText:nAlignVert        := 2
+   oText:nFontWeight       := 700
+   oText:nTextColor        := RGB( 100, 255,  12 )
+   oText:nBackColor        := RGB(   0,   0, 255 )
+   oText:nTextColorHoverOn := RGB( 255, 255,   0 )
+   oText:nBackColorHoverOn := RGB( 255, 100,  12 )
+   oText:lItalic           := .t.
+   oText:ToolTip           := 'Software that GROWS with you'
+   oText:bOnSelect         := {|o,v| .t. }
+   oDlg:AddObject( oText )
+
+   oImg := WvtImage():New( oDlg,102,20,oDlg:MaxCol()-40,37,oDlg:MaxCol()-2 )
+   oImg:cImage  := aImg_[ 5 ]
+   oImg:Tooltip := 'WvtImage():New()'
+   oDlg:AddObject( oImg )
+
+   oTBar := WvtToolbar():New( oDlg,103, 0,0,2 )
+   oTBar:lFloating := .f.
+   oTBar:Tooltip   := 'Toolbar'
+   oTBar:AddButton( aImg_[ 1 ], {|| oImg:SetImage( aImg_[ 1 ] ) } , 'Lock' )
+   oTBar:AddButton( aImg_[ 2 ], {|| oImg:SetImage( aImg_[ 2 ] ), oText:SetText( 'xHarbour' ) } , 'New' )
+   oTBar:AddButton( aImg_[ 3 ], {|| oImg:SetImage( aImg_[ 3 ] ) } , 'Calculator' )
+   oTBar:AddButton()
+   oTBar:AddButton( aImg_[ 5 ], {|| oImg:SetImage( aImg_[ 5 ] ) } , 'Restore' )
+   oTBar:AddButton( aImg_[ 4 ], {|| oImg:SetImage( aImg_[ 4 ] ), oText:SetText( 'Vouch' )    } , 'Calendar' )
+   oTBar:AddButton( aImg_[ 6 ], {|| oImg:SetImage( aImg_[ 6 ] ) } , 'Notes' )
+   oTBar:AddButton( aImg_[ 7 ], {|| oImg:SetImage( aImg_[ 7 ] ) } , 'Press to Send Browse on Top' )
+   oTBar:AddButton()
+   oDlg:AddObject( oTBar )
+
+   oLine := WvtStatic():New( oDlg, 105, 39, 0, 39, oDlg:MaxCol() )
+   oLine:nStatic := WVT_STATIC_LINE
+   oDlg:AddObject( oLine )
+
+   oBBox := WvtStatic():New( oDlg,125,4,127,37,139 )
+   oBBox:nStatic := WVT_STATIC_BOXGROUP
+   oDlg:AddObject( oBBox )
+
+   oBtn := WvtPushButton():New(oDlg, 124, 6, 129, 7, 137 )
+   oBtn:cCaption  := 'Print'
+   oBtn:bOnLeftUp := {|| Wvt_Keyboard( 379 ) }
+   oBtn:Tooltip   := 'Open Printing Dialog for the Browser in Focus'
+   oDlg:AddObject( oBtn )
+
+   oBtn2 := WvtPushButton():New( oDlg, 124, 9, 129, 12, 137 )
+   oBtn2:cFileImage := aImg_[ 3 ]
+   oBtn2:block      := {|| ExeProgressBar( oPBar2, oPBar3 ) }
+   oBtn2:Tooltip    := 'Execute Progress Bar'
+   oDlg:AddObject( oBtn2 )
+
+   oPBar2 := WvtProgressBar():New( oDlg, , 14, 129, 25, 137 )
+   oPBar2:nBarColor  := RGB( 240,240,0 )
+   oPBar2:cBackColor := 'W/N*'
+   oPBar2:lVertical  := .t.
+   oPBar2:nDirection := 0
+   oPBar2:cImage     := 'vouch1.bmp'
+   oDlg:AddObject( oPBar2 )
+
+   oPBar3 := WvtProgressBar():New( oDlg, , 26, 129, 36, 137 )
+   oPBar3:nBarColor  := RGB( 240,240,0 )
+   oPBar3:cBackColor := 'W/N*'
+   oPBar3:lVertical  := .t.
+   oPBar3:nDirection := 1
+   oPBar3:cImage     := 'vouch1.bmp'
+   oDlg:AddObject( oPBar3 )
+
+   oBBox2 := WvtStatic():New( oDlg, , 9, oDlg:MaxCol()-40, 18, oDlg:Maxcol()-2 )
+   oBBox2:nStatic := WVT_STATIC_BOXGROUP
+   oDlg:AddObject( oBBox2 )
+
+   oCon := WvtConsole():New( oDlg )
+   oDlg:AddObject( oCon )
+
+   nGetCol := 158
+   bBlock  := {|| oCon:Say( 12, 148, 'Name'  ,'N/W' ),;
+                  oCon:Say( 14, 148, 'Date'  ,'N/W' ),;
+                  oCon:Say( 16, 148, 'Amount','N/W' ) }
+
+   oGet := WvtGets():New( oDlg, 210, 9, oDlg:Maxcol()-40, 18, oDlg:Maxcol()-2 )
+   oGet:AddGets( 12, nGetCol, 'GTWvt               ', '@! ','W+/B*,N/W*' )
+   oGet:AddGets( 14, nGetCol, date() )
+   oGet:AddGets( 16, nGetCol, 2122.57, '@Z 99999999.99','w+/R,GR+/B' )
+   oGet:Tooltip   := 'WvtGets():New() - ReadModal() like Clipper'
+   oGet:cDesc     := 'Normal Get Box'
+   oGet:bOnCreate := bBlock
+   oDlg:AddObject( oGet )
+
+   oBnr := WvtBanner():New( oDlg, 101, 0, 127, 1,oDlg:MaxCol()-2 )
+   oBnr:nTimeDelay        := 0.25
+   oBnr:cText             := 'the compiler that EXTENDS with you'
+   oBnr:nFontHeight       := 24
+   oBnr:nFontWeight       := 0
+   oBnr:nDirection        := 0
+   oBnr:nAlignVert        := 2
+   oBnr:nTextColor        := RGB( 253,251,170 )
+   oBnr:nBackColor        := RGB( 128,227,142 )
+   oBnr:nTextColorHoverOn := RGB( 255,255,  0 )
+   oBnr:nBackColorHoverOn := RGB( 255,100, 12 )
+   oBnr:Tooltip           := 'WvtBanner():New()'
+   oDlg:AddObject( oBnr )
+
+   oBRsd := WvtStatic():New( oDlg, , 41,127,52,oDlg:MaxCol()-2 )
+   oBRsd:nStatic := WVT_STATIC_BOXGROUPRAISED
+   oDlg:AddObject( oBRsd )
+
+   oRct := WvtStatic():New( oDlg, , 41,127,52,oDlg:MaxCol()-2 )
+   oRct:nStatic := WVT_STATIC_SHADEDRECT
+   oRct:aRGBb   := { 0xffff, 0x0000, 0x0000, 0x0000 }
+   oRct:aRGBe   := { 0x0000, 0xffff, 0xffff, 0x0000 }
+   oDlg:AddObject( oRct )
+
+   oTBx := WvtTextBox():New( oDlg, , 42,129,51,oDlg:MaxCol()-4 )
+   oTBx:cText       := cTxt
+   oTBx:Tooltip     := 'WvtTextBox():New()'
+   oTBx:nFontHeight := 16
+   oTBx:lItalic     := .t.
+   oTBx:lUnderline  := .t.
+   oTBx:nAlignHorz  := 2
+   oTBx:nTextColor  := RGB( 255,255,255 )
+   oTBx:nTextColorHoverOn := RGB( 0,0,255 )
+   oTBx:aPopup      := {}
+   aadd( oTBx:aPopup, { 'Getsome' , {|| .t. } } )
+   aadd( oTBx:aPopup, { 'Getsome2', {|| .t. } } )
+   oDlg:AddObject( oTBx )
+
+   oGetArea := WvtStatic():New( oDlg, , 4, 2, 37, 62 )
+   oGetArea:nStatic := WVT_STATIC_BOXRAISED
+   oDlg:AddObject( oGetArea )
+
+   nGetCol := 20
+   nSayCol := 7
+   nGetRow := 7
+   bBlock1 := {|| oCon:Say( nGetRow+00, nSayCol, 'First Name'  ,'N/W' ),;
+                  oCon:Say( nGetRow+02, nSayCol, 'Last Name '  ,'N/W' ),;
+                  oCon:Say( nGetRow+04, nSayCol, 'Street'      ,'N/W' ),;
+                  oCon:Say( nGetRow+06, nSayCol, 'City'        ,'W+/W'),;
+                  oCon:Say( nGetRow+08, nSayCol, 'State'       ,'N/W' ),;
+                  oCon:Say( nGetRow+10, nSayCol, 'Zip'         ,'B+/W'),;
+                  oCon:Say( nGetRow+12, nSayCol, 'Date Hired'  ,'B+/W'),;
+                  oCon:Say( nGetRow+14, nSayCol, 'Married'     ,'B+/W'),;
+                  oCon:Say( nGetRow+16, nSayCol, 'Age'         ,'B+/W'),;
+                  oCon:Say( nGetRow+18, nSayCol, 'Salary'      ,'B+/W'),;
+                  oCon:Say( nGetRow+20, nSayCol, 'Notes',      ,'B+/W') ;
+                  }
+
+   aGets_:= { pad('Pritpal',20 ), pad( 'Bedi',20 ), pad( '60, New Professor Colony',30 ), ;
+              pad( 'Ludhiana, INDIA',30 ),;
+              'PB', pad( '141004',10 ), ctod( '22/06/04' ), .t., 48, 17000, ;
+              pad( 'Wvtgui is a classical example of xHarbour capabilities...',65 ) }
+
+   oGet1 := WvtGets():New( oDlg, , 4, 2, 37, 62 )
+   oGet1:AddGets( nGetRow+00, nGetCol, aGets_[ 1 ], '@ '       , 'N/W*,N/GR*' )
+   oGet1:AddGets( nGetRow+02, nGetCol, aGets_[ 2 ], '@ '       , 'N/W*,N/GR*' )
+   oGet1:AddGets( nGetRow+04, nGetCol, aGets_[ 3 ], '@ '       , 'N/W*,N/GR*' )
+   oGet1:AddGets( nGetRow+06, nGetCol, aGets_[ 4 ], '@ '       , 'N/W*,N/GR*' )
+   oGet1:AddGets( nGetRow+08, nGetCol, aGets_[ 5 ], '@ '       , 'N/W*,N/GR*' )
+   oGet1:AddGets( nGetRow+10, nGetCol, aGets_[ 6 ], '@ '       , 'N/W*,N/GR*' )
+   oGet1:AddGets( nGetRow+12, nGetCol, aGets_[ 7 ], '@ '       , 'N/W*,N/GR*' )
+   oGet1:AddGets( nGetRow+14, nGetCol, aGets_[ 8 ], '@Y'       , 'N/W*,N/GR*' )
+   oGet1:AddGets( nGetRow+16, nGetCol, aGets_[ 9 ], '@Z 99'    , 'N/W*,N/GR*' )
+   oGet1:AddGets( nGetRow+18, nGetCol, aGets_[ 10], '@Z 999999', 'N/W*,N/GR*' )
+   oGet1:AddGets( nGetRow+20, nGetCol, aGets_[ 11], '@S35'     , 'N/W*,N/GR*' )
+   oGet1:cDesc     := 'Test.dbf Fields'
+   oGet1:Tooltip   := 'Double Click to Activate ReadModal()'
+   oGet1:bOnCreate := bBlock1
+   oDlg:AddObject( oGet1 )
+
+   g_oMenuBar := WvtMenu():new():create()
+   oMenu      := WvtMenu():new():create()
+   oMenu:Caption := 'Other Dialogs'
+   oMenu:AddItem( 'Dialog Two', {|| MyDialogTwo() } )
+   oMenu:AddItem( '-' )
+   oMenu:AddItem( 'Exit',       {|| Wvt_Keyboard( K_ESC ) } )
+   g_oMenuBar:addItem( "",oMenu )
+
+   oDlg:oMenu := g_oMenuBar
+
+   lOpen := .f.
+   cUseAlias := 'TEST'
+   USE 'TEST' NEW ALIAS ( cUseAlias ) SHARED
+   if !NetErr()
+      lOpen := .t.
+      oWvtBrw := CfgMyBrowse( { 1,7,9,10,8 }, cUseAlias, { 6,67,36,120 }, 'Test.dbf - 1,7,9,10,8', oDlg, 'N/W*,N/GR*',1001 )
+      oDlg:AddObject( oWvtBrw )
+   endif
+
+   lOpen1 := .f.
+   cUseAlias1 := 'TEST1'
+   USE 'TEST' NEW ALIAS ( cUseAlias1 ) SHARED
+   if !NetErr()
+      lOpen1 := .t.
+      oWvtBrw1 := CfgMyBrowse( { 1,2,3,4,5,6 }, cUseAlias1, { 43,4,51,120 }, 'Test.dbf - 1,2,3,4,5,6',oDlg, 'N/BG*,N/W*',1002 )
+      oDlg:AddObject( oWvtBrw1 )
+   endif
+
+   oDlg:Create()
+   oDlg:Execute()
+   oDlg:Destroy()
+
+   if lOpen
+      Select( cUseAlias )
+      USE
+   endif
+   if lOpen1
+      Select( cUseAlias1 )
+      USE
+   endif
+
+   WvtSetBlocks( aObjects )
+   WvtSetKeys( .t. )
+   Wvt_SetPopupMenu( hPopup )
+   SetMouseCheck( lChkMouse )
+
+RETURN Nil
+
+//-------------------------------------------------------------------//
+
+STATIC FUNCTION MyDialogTwo()
+   LOCAL aObjects := WvtSetBlocks( {} )
+   LOCAL oDlg     := WvtDialog():New( 30,90,'My Dialog Two' )
+   LOCAL g_oMenuBar, oMenu, oPBar
+   LOCAL oPBar1, oPBar2, oPBar3, oPBar4
+
+   g_oMenuBar    := WvtMenu():new():create()
+   oMenu         := wvtMenu():new():create()
+   oMenu:Caption := 'Miscellaneous'
+   oMenu:AddItem( 'Progressbar', {|| ExeProgBar( oPBar,oPBar1,oPBar2,oPBar3, oPBar4 ) } )
+   oMenu:AddItem( '-' )
+   oMenu:AddItem( 'Exit',        {|| Wvt_Keyboard( K_ESC ) } )
+   g_oMenuBar:addItem( "",oMenu )
+
+   oDlg:oMenu := g_oMenuBar
+
+   oPBar := WvtProgressBar():New( oDlg, , 3, 10, 5, 80 )
+   oPBar:nBarColor   := RGB( 0,240,240 )
+   oPBar:cBackColor  := 'W/N*'
+   oPBar:nDirection  := 1
+   oPBar:cImage      := 'vouch1.bmp'
+   oDlg:AddObject( oPBar )
+
+   oPBar1 := WvtProgressBar():New( oDlg, , 7, 10, 8, 80 )
+   oPBar1:nBarColor  := RGB( 11,255,196 )
+   oPBar1:cBackColor := 'W/N*'
+   oPBar1:nDirection := 0
+   oDlg:AddObject( oPBar1 )
+
+   oPBar2 := WvtProgressBar():New( oDlg, , 11, 10, 28, 19 )
+   oPBar2:nBarColor  := RGB( 240,240,0 )
+   oPBar2:cBackColor := 'W/N*'
+   oPBar2:lVertical  := .t.
+   oPBar2:nDirection := 0
+   oPBar2:cImage     := 'v_notes.ico'
+   oDlg:AddObject( oPBar2 )
+
+   oPBar3 := WvtProgressBar():New( oDlg, , 11, 77, 28, 80 )
+   oPBar3:nBarColor  := RGB( 0,0,255 )
+   oPBar3:cBackColor := 'W/N*'
+   oPBar3:lVertical  := .t.
+   oPBar3:nDirection := 1
+   oDlg:AddObject( oPBar3 )
+
+   oPBar4 := WvtProgressBar():New( oDlg, , 22, 22, 28, 74 )
+   oPBar4:nBarColor  := RGB( 255,255,0 )
+   oPBar4:cBackColor := 'W/N*'
+   oPBar4:lVertical  := .t.
+   oPBar4:nDirection := 0
+   oDlg:AddObject( oPBar4 )
+
+   oDlg:Create()
+   oDlg:Execute()
+   oDlg:Destroy()
+
+   WvtSetBlocks( aObjects )
+RETURN Nil
+
+//-------------------------------------------------------------------//
+
+STATIC FUNCTION ExeProgBar( oPBar,oPBar1,oPBar2,oPBar3,oPBar4 )
+   LOCAL i
+
+   oPBar:Activate()
+   oPBar1:Activate()
+   oPBar2:Activate()
+   oPBar3:Activate()
+   oPBar4:Activate()
+   for i := 1 to 100
+      oPBar:Display( i, 100 )
+      oPBar1:Display( i, 100 )
+      oPBar2:Display( i, 100 )
+      oPBar3:Display( i, 100 )
+      oPBar4:Display( i, 100 )
+      inkey( 0.3 )
+   next
+   inkey( 0 )
+   oPBar:DeActivate()
+   oPBar1:DeActivate()
+   oPBar2:DeActivate()
+   oPBar3:DeActivate()
+   oPBar4:DeActivate()
+
+RETURN nil
+
+//-------------------------------------------------------------------//
+
+STATIC FUNCTION ExeProgressBar( oPBar, oPBar3 )
+   LOCAL i
+
+   oPBar:Activate()
+   oPBar3:Activate()
+   for i := 1 to 100
+      oPBar:Display( i, 100 )
+      oPBar3:Display( i, 100 )
+      inkey( 0.3 )
+   next
+   oPBar:DeActivate()
+   oPBar3:DeActivate()
+RETURN NIL
+
+//-------------------------------------------------------------------//
 

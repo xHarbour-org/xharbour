@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.5 2004/06/11 14:02:30 vouchcac Exp $
+ * $Id: wvtcore.c,v 1.6 2004/06/22 03:01:54 vouchcac Exp $
  */
 
 /*
@@ -1728,6 +1728,7 @@ HB_FUNC( WVT_DRAWSCROLLTHUMBVERT )
    //  Background
    SetBkColor( _s->hdc, RGB( 230,230,230 ) );
    SelectObject( _s->hdc, _s->diagonalBrush );
+   //SelectObject( _s->hdc, GetSysColorBrush( COLOR_SCROLLBAR ) );
    SelectObject( _s->hdc, _s->penNull );
    Rectangle( _s->hdc, iLeft, iTop, iRight+1, iBottom+1 );
 
@@ -1830,7 +1831,6 @@ HB_FUNC( WVT_DRAWTEXTBOX )
    int iRight  = ( _s->PTEXTSIZE.x * ( hb_parni( 4 ) + 1 ) ) - 1 + hb_parni( 5,4 );
 
    int iAlignHorz   = ( ISNIL( 7 ) ? 0 : hb_parni( 7 ) );
-   int iAlignVert   = ( ISNIL( 8 ) ? 0 : hb_parni( 8 ) );
    int iAlignH ;
 
    COLORREF oldTextColor, oldBkColor;
@@ -1878,49 +1878,89 @@ HB_FUNC( WVT_DRAWTEXTBOX )
 }
 
 //-------------------------------------------------------------------//
-
-HB_FUNC( WVT_GETCURSORPOS )
- {
-    POINT    xy;
-    HB_ITEM  info;
-    HB_ITEM  temp;
-
-    GetCursorPos( &xy );
-
-    info.type = HB_IT_NIL;
-    temp.type = HB_IT_NIL;
-
-    hb_arrayNew( &info, 2 );
-
-    hb_arraySetForward( &info, 1, hb_itemPutNI( &temp, xy.x ) );
-    hb_arraySetForward( &info, 2, hb_itemPutNI( &temp, xy.y ) );
-
-    hb_itemReturn( &info );
- }
-
-//-------------------------------------------------------------------//
-
-HB_FUNC( WVT_TRACKPOPUPMENU )
+//
+// Wvt_DrawProgressBar( nTop, nLeft, nBottom, nRight, aPxlTLBR, nPercent,;
+//                      nBackColor, nBarColor, cImage, lVertical, nDirection )
+//
+HB_FUNC( WVT_DRAWPROGRESSBAR )
 {
-   POINT xy;
+   int      iTop     = ( _s->PTEXTSIZE.y * hb_parni( 1 ) ) + hb_parni( 5,1 );
+   int      iLeft    = ( _s->PTEXTSIZE.x * hb_parni( 2 ) ) + hb_parni( 5,2 );
+   int      iBottom  = ( _s->PTEXTSIZE.y * ( hb_parni( 3 ) + 1 ) ) - 1 + hb_parni( 5,3 );
+   int      iRight   = ( _s->PTEXTSIZE.x * ( hb_parni( 4 ) + 1 ) ) - 1 + hb_parni( 5,4 );
+   int      iPercent,  iBarUpto, iDirection;
+   BOOL     bVertical, bImage;
+   COLORREF crBkColor, crBarColor;
+   HBRUSH   hBrush;
+   LOGBRUSH lb;
+   RECT     rc;
 
-   GetCursorPos( &xy );
+   iPercent   = hb_parni( 6 );
+   bImage     = ISNIL(  9 ) ? FALSE : TRUE ;
+   bVertical  = ISNIL( 10 ) ? FALSE : hb_parl( 10 ) ;
+   iDirection = ISNIL( 11 ) ? 0 : hb_parni( 11 );
 
-   hb_retnl( TrackPopupMenu( ( HMENU ) hb_parnl( 1 ) ,
-                     TPM_CENTERALIGN | TPM_RETURNCMD ,
-                                                xy.x ,
-                                                xy.y ,
-                                                   0 ,
-                                            _s->hWnd ,
-                                                NULL ) );
+   if ( bVertical )
+   {
+      if ( iDirection == 0 )
+      {
+         iBarUpto  = iTop + ( ( iBottom - iTop ) * iPercent / 100 );
+         rc.top    = iTop;
+         rc.left   = iLeft;
+         rc.bottom = iBarUpto;
+         rc.right  = iRight;
+      }
+      else
+      {
+         iBarUpto  = iBottom - ( ( iBottom - iTop ) * iPercent / 100 );
+         rc.top    = iBarUpto;
+         rc.left   = iLeft;
+         rc.bottom = iBottom;
+         rc.right  = iRight;
+      }
+   }
+   else
+   {
+      if ( iDirection == 0 )
+      {
+         iBarUpto  = iLeft + ( ( iRight - iLeft ) * iPercent / 100 );
+         rc.top    = iTop;
+         rc.left   = iLeft;
+         rc.bottom = iBottom;
+         rc.right  = iBarUpto;
+      }
+      else
+      {
+         iBarUpto  = iRight - ( ( iRight - iLeft ) * iPercent / 100 );
+         rc.top    = iTop;
+         rc.left   = iBarUpto;
+         rc.bottom = iBottom;
+         rc.right  = iRight;
+      }
+   }
+
+   if ( bImage )
+   {
+      hb_wvt_gtDrawImage( rc.left, rc.top, rc.right-rc.left+1, rc.bottom-rc.top+1, hb_parc( 9 ) );
+   }
+   else
+   {
+      crBarColor  = ISNIL( 8 ) ? hb_wvt_gtGetColorData(  0 ) : hb_parnl( 8 );
+
+      lb.lbStyle  = BS_SOLID;
+      lb.lbColor  = crBarColor;
+      lb.lbHatch  = 0;
+
+      hBrush      = CreateBrushIndirect( &lb );
+
+      rc.bottom++;
+      rc.right++;
+      FillRect( _s->hdc, &rc, hBrush );
+
+      DeleteObject( hBrush );
+   }
 }
 
 //-------------------------------------------------------------------//
 
-HB_FUNC( WVT_GETMENU )
-{
-   hb_retnl( ( ULONG ) GetMenu( _s->hWnd ) );
-}
-
-//-------------------------------------------------------------------//
 
