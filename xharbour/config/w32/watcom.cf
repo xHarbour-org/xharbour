@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.2 2003/02/12 13:26:35 lculik Exp $
+# $Id: watcom.cf,v 1.5 2003/11/23 19:34:54 druzus Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -11,13 +11,13 @@ EXE_EXT = .exe
 LIB_PREF =
 LIB_EXT = .lib
 
-$(HB_ARCHITECTURE)_$(HB_COMPILER)_GRANDP = $(subst /,\\,$(GRANDP))
+$(HB_ARCHITECTURE)_$(HB_COMPILER)_GRANDP = $(subst /,\,$(GRANDP))
 
-CC = wcc386
+CC = wpp386
 CC_IN =
 CC_OUT = -fo=
-CPPFLAGS = -w4 -zq -od -d2 -5r -bt=nt -mf
-CFLAGS := -i$(subst \,\\,$(WATCOM))\\h -i$(subst /,\\,$(HB_INC_COMPILE)) -i.
+CPPFLAGS = -w0 -zq -od -d2 -5r -bt=nt -mf
+CFLAGS := -i$(subst /,\,$(HB_INC_COMPILE)) -i.
 
 # Note: The empty line directly before 'endef' HAVE TO exist!
 # It causes that the 'echo' command is separated by LF
@@ -42,7 +42,7 @@ $(foreach lib, $(GTLIBS), $(link_lib))
 endef
 
 LD = wlink
-LDFLAGS = debug all SYS nt op inc op m op maxe=25 op q op symf
+LDFLAGS = debug all OP osn=DOS4G OP stack=65536 OP CASEEXACT
 ifeq ($(HB_LIB_COMPILE),)
 LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst /,\,$(TOP)$(ROOT)contrib/$(lib)/$(ARCH)/$(subst lib,,$(lib))))
 LINKLIBS := $(foreach lib, $(LIBS), $(subst /,\,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
@@ -56,17 +56,8 @@ ifeq ($(findstring rdd,$(LIBS)),rdd)
 RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst /,\,$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)/$(drv)))
 endif
 
-#GTLIBS := $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)/$(HB_GT_LIB)
-#GTLIBS := $(subst /,\,$(GTLIBS))
-ifeq ($(findstring rtl,$(LIBS)),rtl)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
-LINKLIBS += -l$(HB_GT_LIB)
-ifeq ($(HB_MULTI_GT),yes)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
-LINKLIBS += -lgtnul
-endif
-endif
-
+GTLIBS := $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)/$(HB_GT_LIB)
+GTLIBS := $(subst /,\,$(GTLIBS))
 
 LD_RULE = $(link_exe_file)
 
@@ -83,9 +74,10 @@ $(AR) $(ARFLAGS) @__lib__.tmp
 endef
 
 AR = wlib
-ARFLAGS = -c $(A_USR)
+ARFLAGS = -p=32 -c $(A_USR)
 AR_RULE = $(create_library)
 
 include $(TOP)$(ROOT)config/rules.cf
 
-HB := $(subst /,\\,$(HB))
+HB := $(subst /,\,$(HB))
+HB_FLAGS := $(subst /,\,$(HB_FLAGS))

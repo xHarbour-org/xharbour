@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.4 2003/05/16 19:52:04 druzus Exp $
+# $Id: watcom.cf,v 1.5 2003/11/23 19:34:54 druzus Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -89,4 +89,5 @@ AR_RULE = $(create_library)
 include $(TOP)$(ROOT)config/rules.cf
 
 HB := $(subst /,\,$(HB))
+#HB_FLAGS = -n -q0 -w -es2 -gc0 
 HB_FLAGS := $(subst /,\,$(HB_FLAGS))

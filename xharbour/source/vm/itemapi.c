@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.54 2003/11/12 17:53:01 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.55 2003/11/24 15:15:26 lf_sfnet Exp $
  */
 
 /*
@@ -100,7 +100,7 @@
 extern PHB_CODEPAGE s_cdpage;
 #endif
 
-#if defined(__BORLANDC__)
+#if defined(__BORLANDC__) || defined(__WATCOMC__) 
 #include <float.h>  /* for _finite() and _isnan() */
 #endif
 
@@ -1395,10 +1395,7 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
          {
             double dNumber = hb_itemGetND( pNumber );
 
-            /* #if defined(__BORLANDC__) || defined(__WATCOMC__) */
             /* added infinity check for Borland C [martin vogel] */
-            #if defined(__WATCOMC__)
-            #else
 
             static double s_dInfinity = 0;
             static double s_bInfinityInit = FALSE;
@@ -1417,7 +1414,6 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                hb_mathSetHandler (fOldMathHandler);
                s_bInfinityInit = TRUE;
             }
-            #endif
 
             #if defined(__MINGW32__)
                sprintf( szResult, "%f", dNumber );
@@ -1427,8 +1423,7 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                below [martin vogel] */
             if( pNumber->item.asDouble.length == 99
             /* #if defined(__BORLANDC__) || defined(__WATCOMC__) */
-            #if defined(__WATCOMC__)
-            #elif defined(__BORLANDC__)
+            #if defined(__BORLANDC__) || defined(__WATCOMC__)
                /* No more checks for Borland C, which returns 0 for log( 0 ),
                   and is therefore unable to test for infinity */
                /* log(0) returning 0 seems to be a side effect of using a custom math error handler that

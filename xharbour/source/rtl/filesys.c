@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.54 2003/11/11 20:20:53 ronpinkas Exp $
+ * $Id: filesys.c,v 1.55 2003/11/12 13:49:13 jonnymind Exp $
  */
 
 /*
@@ -165,7 +165,7 @@
    #define ftruncate chsize
 #endif
 
-#if defined(__BORLANDC__) || defined(__IBMCPP__) || defined(_MSC_VER) || defined(__MINGW32__)
+#if defined(__BORLANDC__) || defined(__IBMCPP__) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__WATCOMC__)
    #include <sys\stat.h>
    #include <share.h>
    #include <fcntl.h>
@@ -853,12 +853,12 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       argv = s_argvize( command, size );
       argv[size] = 0;
 
-      #if !defined(__BORLANDC__)
-      iFlags = _P_NOWAIT;
-      pid = _spawnvp( iFlags, argv[0], argv );
-      #else
+      #if defined(__BORLANDC__) || defined(__WATCOMC__)
       iFlags = P_NOWAIT;
       pid = spawnvp( iFlags, argv[0], argv );
+      #else
+      iFlags = _P_NOWAIT;
+      pid = _spawnvp( iFlags, argv[0], argv );
       #endif
 
       hb_xfree( command );
