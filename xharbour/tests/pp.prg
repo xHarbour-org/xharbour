@@ -29,6 +29,14 @@
 #DEFINE PP_BUFFER_SIZE 8192 //16384
 
 #ifdef __HARBOUR__
+
+   // Enable extended syntax.
+   #ifdef __XHARBOUR__
+      #define __FOR_EACH__
+      #define __WITH_
+      #define __STRING_INDEX__
+   #endif
+
    #ifndef NO_BOOST
       #define USE_C_BOOST
    #endif
@@ -604,17 +612,21 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
 
          BEGIN SEQUENCE
 
+            //TraceLog( "Line: " + Str( aProc[2][nBlock][3], 3 ) )
+
             IF aProc[2][nBlock][1] == 0
                //? aProc[2][nBlock][3]
                Eval( aProc[2][nBlock][2] )
             ELSE
                IF ! Eval( aProc[2][nBlock][2] ) // Jump if FALSE.
                   nBlock := aProc[2][nBlock][1]
+                  //TraceLog( "Jump: " + Str( aProc[2][nBlock][3], 3 ) )
                ENDIF
             ENDIF
 
          RECOVER USING xErr
             IF ValType( xErr ) == 'L'
+               //TraceLog( "Return" )
                // Return from this procedure requested by PP_SetReturn()
                EXIT
             ENDIF
@@ -719,7 +731,7 @@ PROCEDURE RP_Dot()
       SET CURSOR ON
       READ
 
-      sLine := StrTran( sLine,  Chr(9), "  " )
+      sLine := StrTran( sLine,  Chr(9), " " )
 
       ExecuteLine( PP_PreProLine( RTrim( sLine ), 1, '' ) )
 
@@ -900,6 +912,8 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
    ExtractLeadingWS( @sPPed )
    DropTrailingWS( @sPPed )
+
+   //TraceLog( sPPed, nLine )
 
    BEGIN SEQUENCE
 
@@ -1570,7 +1584,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                aAdd( aProcedures[ nProcId ][2], { 0, NIL, nLine } )
             ELSE
                //? nLine, nProcId, sBlock
-               //TraceLog( sBlock )
+               //TraceLog( nLine, nProcId, sBlock )
                aAdd( aProcedures[ nProcId ][2], { 0, &( "{||" + sBlock + "}" ), nLine } )
             ENDIF
          ENDIF
@@ -1819,6 +1833,8 @@ PROCEDURE PP_SetReturn( xRet )
 
    s_xRet := xRet
 
+   //TraceLog( xRet )
+
    BREAK .T.
 
 RETURN
@@ -1931,6 +1947,8 @@ PROCEDURE RP_PPText_Err( oErr, sLine, nLine )
 PROCEDURE RP_Comp_Err( oErr, sLine, nLine )
 
    LOCAL Counter, xArg, sArgs := ""
+
+   ErrorBlock( {|e| TraceLog( e:Description, e:SubSystem, e:SubCode, e:Args ), __Quit() } )
 
    IF ValType( oErr:Args ) == 'A'
       sArgs := "Arguments: "
@@ -8271,18 +8289,24 @@ PROCEDURE PP_RunInit( aProcedures, aInitExit )
 RETURN
 
 //--------------------------------------------------------------//
-FUNCTION PP_PreProText( sLines, asLines )
+FUNCTION PP_PreProText( sLines, asLines, bBlanks )
 
    LOCAL nOpen, nClose, sTemp := "", nLine, nLines
 
    //ErrorBlock( {|oErr| RP_PPText_Err( oErr, sLines, 0 ) } )
 
+   //TraceLog( sLines )
+
+   IF bBlanks == NIL
+      bBlanks := .T.
+   ENDIF
+
    IF asLines == NIL
       asLines := {}
    ENDIF
 
-   sLines := StrTran( sLines, Chr(13), "" )
-   sLines := StrTran( sLines, Chr(9), "   " )
+   sLines := StrTran( sLines, Chr(13), " " )
+   sLines := StrTran( sLines, Chr(9), " " )
 
    WHILE ( nOpen := nAtSkipStr( "/*", sLines ) ) > 0
       sTemp += Left( sLines, nOpen - 1 )
@@ -8299,39 +8323,62 @@ FUNCTION PP_PreProText( sLines, asLines )
 
    //ErrorBlock( {|oErr| RP_PPText_Err( oErr, SubStr( sLines, nClose + 1, nOpen - ( nClose + 1 ) ), 0 ) } )
 
-   WHILE ( nOpen := nAtSkipStr( Chr(10), sLines, nOpen + 1 ) ) > 0
+   WHILE ( nOpen := At( Chr(10), sLines, nOpen + 1 ) ) > 0
+      //TraceLog( nClose, nOpen )
       aAdd( asLines, RTrim( LTrim( SubStr( sLines, nClose + 1, nOpen - ( nClose + 1 ) ) ) ) )
+      //TraceLog( Len( asLines ), aTail( asLines ) )
       nClose := nOpen
    ENDDO
    IF Len( sLines ) > nClose
       aAdd( asLines, RTrim( LTrim( SubStr( sLines, nClose + 1 ) ) ) )
+      TraceLog( Len( asLines) , aTail( asLines ) )
    ENDIF
 
    //ErrorBlock( {|oErr| RP_PPText_Err( oErr, asLines[nLine], nLine ) } )
 
    nLines := Len( asLines )
    FOR nLine := 1 TO nLines
-      DO WHILE Empty( asLines[nLine] ) .OR. Left( asLines[nLine], 1 ) == '*'
-         aDel( asLines, nLine )
-         nLines--
-         aSize( asLines, nLines )
-				 IF nLine > nLines
-						EXIT
-				 ENDIF
+      sTemp := asLines[nLine]
+      //TraceLog( sTemp )
+
+      DO WHILE Empty( sTemp ) .OR. Left( sTemp, 1 ) == '*'
+         //TraceLog( nLine, nLines, sTemp )
+         IF bBlanks
+            asLines[nLine] := NIL
+            nLine++
+            IF nLine > nLines
+               EXIT
+            ENDIF
+            sTemp := asLines[nLine]
+         ELSE
+            aDel( asLines, nLine )
+            nLines--
+            aSize( asLines, nLines )
+            IF nLine > nLines
+               EXIT
+            ENDIF
+         ENDIF
       ENDDO
 
 			IF nLine > nLines
 			 	EXIT
 			ENDIF
 
-      nOpen := nAtSkipStr( "&&", asLines[nLine] )
+      //TraceLog( nLine, nLines, sTemp )
+
+      nOpen := nAtSkipStr( "&&", sTemp )
       IF nOpen > 0
          IF nOpen == 1
-            aDel( asLines, nLine )
-            nLine--
-            nLines--
-            aSize( asLines, nLines )
-            LOOP
+           IF bBlanks
+              asLines[nLine] := NIL
+              LOOP
+           ELSE
+              aDel( asLines, nLine )
+              nLine--
+              nLines--
+              aSize( asLines, nLines )
+              LOOP
+            ENDIF
          ENDIF
          sTemp := Left( asLines[nLine], nOpen - 1 )
       ELSE
@@ -8341,11 +8388,17 @@ FUNCTION PP_PreProText( sLines, asLines )
       nOpen := nAtSkipStr( "//", sTemp )
       IF nOpen > 0
          IF nOpen == 1
-            aDel( asLines, nLine )
-            nLine--
-            nLines--
-            aSize( asLines, nLines )
-            LOOP
+            IF bBlanks
+               asLines[nLine] := NIL
+               //TraceLog( "LOOP" )
+               LOOP
+            ELSE
+               aDel( asLines, nLine )
+               nLine--
+               nLines--
+               aSize( asLines, nLines )
+               LOOP
+            ENDIF
          ENDIF
          sTemp := Left( sTemp, nOpen - 1 )
       ENDIF
@@ -8354,26 +8407,65 @@ FUNCTION PP_PreProText( sLines, asLines )
    NEXT
 
    sLines := ""
+
+   //TraceLog( nLines )
+
+   // Don't process the last line for [;].
+   nLines--
    FOR nLine := 1 TO nLines
       sTemp := asLines[nLine]
+      //TraceLog( sTemp )
+      IF sTemp == NIL
+         LOOP
+      ENDIF
 
       DO WHILE Right( sTemp, 1 ) == ';'
-         aDel( asLines, nLine )
-         nLines--
-         aSize( asLines, nLines )
-         // nLine now points to the next line.
-         sTemp := Left( sTemp, Len( sTemp ) - 1 ) + asLines[nLine]
+         IF bBlanks
+            #ifdef __STR_INDEX__
+               sTemp[-1] := ' '
+            #else
+               sTemp := Left( sTemp, Len( sTemp ) - 1 ) + ' '
+            #endif
+            asLines[nLine] := NIL
+            nLine++
+            asLines[nLine] := sTemp + asLines[nLine]
+            sTemp := asLines[nLine]
+         ELSE
+            aDel( asLines, nLine )
+            nLines--
+            aSize( asLines, nLines )
+            // nLine now points to the next line.
+            sTemp := Left( sTemp, Len( sTemp ) - 1 ) + ' ' + asLines[nLine]
+         ENDIF
       ENDDO
 
       sTemp := PP_PreProLine( sTemp )
 
       sLines += sTemp
-      IF nLine < nLines
-         sLines += ";"
-      ENDIF
+      sLines += ";"
 
-      asLines[nLine] := sTemp
+      IF sTemp == ""
+         asLines[nLine] := NIL
+      ELSE
+         asLines[nLine] := sTemp
+      ENDIF
+      //TraceLog( nLine, sTemp )
    NEXT
+
+   sTemp := asLines[nLine]
+
+   IF sTemp != NIL
+      sTemp := PP_PreProLine( sTemp )
+      sLines += sTemp
+   ENDIF
+
+   IF sTemp == ""
+      asLines[nLine] := NIL
+   ELSE
+      asLines[nLine] := sTemp
+   ENDIF
+
+   //TraceLog( nLine, sTemp, sLines )
 
 RETURN sLines
 
@@ -8381,7 +8473,7 @@ RETURN sLines
 FUNCTION PP_RunText( sLines, bPP, aParams )
 
    LOCAL aProcedures := {}, aInitExit := { {}, {} }, nProcId := 0, ;
-         nLine, nLines, xRet, asLines := {}, nOpen, nClose
+         nLine, nLines, xRet, asLines := {}, nOpen, nClose, sLine
 
    IF bPP == NIL
       bPP := .T.
@@ -8393,7 +8485,8 @@ FUNCTION PP_RunText( sLines, bPP, aParams )
       PP_PreProText( sLines, asLines )
    ELSE
       sLines := StrTran( sLines, Chr(13), "" )
-      sLines := StrTran( sLines, Chr(9), "   " )
+      sLines := StrTran( sLines, Chr(9), " " )
+      sLines := StrTran( sLines, ';', Chr(10) )
       nOpen  := 0
       nClose := 0
       WHILE ( nOpen := nAtSkipStr( Chr(10), sLines, nOpen + 1 ) ) > 0
@@ -8409,7 +8502,10 @@ FUNCTION PP_RunText( sLines, bPP, aParams )
 
    nLines := Len( asLines )
    FOR nLine := 1 TO nLines
-      PP_CompileLine( asLines[nLine], nLine, aProcedures, aInitExit, @nProcId )
+      sLine := asLines[nLine]
+      IF sLine != NIL
+         PP_CompileLine( sLine, nLine, aProcedures, aInitExit, @nProcId )
+      ENDIF
    NEXT
 
 RETURN PP_Exec( aProcedures, aInitExit, nProcId, aParams )
@@ -8426,7 +8522,9 @@ FUNCTION PP_RunArray( asLines, aParams )
 
    nLines := Len( asLines )
    FOR nLine := 1 TO nLines
-      PP_CompileLine( asLines[nLine], nLine, aProcedures, aInitExit, @nProcId )
+      IF asLines[nLine] != NIL
+         PP_CompileLine( asLines[nLine], nLine, aProcedures, aInitExit, @nProcId )
+      ENDIF
    NEXT
 
 RETURN PP_Exec( aProcedures, aInitExit, nProcId, aParams )
@@ -8466,6 +8564,8 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nProcId, aParams )
    FOR nProc := 1 TO nProcs
       PP_ExecProcedure( aProcedures[ aInitExit[2][nProc] ] )
    NEXT
+
+   //TraceLog( xRet )
 
 RETURN xRet
 

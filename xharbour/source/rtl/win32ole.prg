@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.5 2002/05/03 07:38:45 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.6 2002/05/03 08:01:57 ronpinkas Exp $
  */
 
 /*
@@ -125,7 +125,7 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
          ::cClassName := LTrim( Str( uObj ) )
       ENDIF
    ELSE
-      Alert( "Invalid parameter type to constructor TOleAuto():New()!" )
+      MessageBox( 0, "Invalid parameter type to constructor TOleAuto():New()!", "OLE Interface", 0 )
       ::hObj := 0
    ENDIF
 
@@ -205,7 +205,7 @@ METHOD Invoke( cMethod, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) C
    ELSEIF nParams == 1
       uObj := OLEInvoke( ::hObj, cMethod )
    ELSE
-      Alert( "TOleAuto:Invoke() - Unsupported number of parameter!" )
+      MessageBox( 0, "TOleAuto:Invoke() - Unsupported number of parameter!", "OLE Interface", 0 )
       RETURN NIL
    ENDIF
 
@@ -217,7 +217,7 @@ METHOD Invoke( cMethod, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) C
       OLEShowException()
       RETURN Self
    ELSEIF ::bShowException .AND. OleError() != 0
-      Alert( "Error! " + ::cClassName + ":" + cMethod + " " + Ole2TxtError() )
+      MessageBox( 0, "Error! " + ::cClassName + ":" + cMethod + " " + Ole2TxtError(), "OLE Interface", 0 )
    ENDIF
 
 RETURN uObj
@@ -243,7 +243,7 @@ METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CL
    ELSEIF nParams == 2
       OLESetProperty( ::hObj, cProperty, @uParam1 )
    ELSE
-      Alert( "TOleAuto:Set() - Unsupported number of parameter!" )
+      MessageBox( 0, "TOleAuto:Set() - Unsupported number of parameter!", "OLE Interface", 0 )
       RETURN NIL
    ENDIF
 
@@ -252,7 +252,7 @@ METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CL
    IF ::bShowException .AND. Ole2TxtError() == "DISP_E_EXCEPTION"
       OLEShowException()
    ELSEIF ::bShowException .AND. OleError() != 0
-      Alert( "Error! " + ::cClassName + ":" + cProperty + " " + Ole2TxtError() )
+      MessageBox( 0, "Error! " + ::cClassName + ":" + cProperty + " " + Ole2TxtError(), "OLE Interface", 0 )
    ENDIF
 
 RETURN nil
@@ -280,14 +280,14 @@ METHOD Get( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CL
    ELSEIF nParams == 1
       uObj := OLEGetProperty( ::hObj, cProperty )
    ELSE
-      Alert( "TOleAuto:Get() - Unsupported number of parameter!" )
+      MessageBox( 0, "TOleAuto:Get() - Unsupported number of parameter!", "OLE Interface", 0 )
       RETURN NIL
    ENDIF
 
    IF OleIsObject()
       RETURN TOleAuto():New( uObj )
    ELSEIF ::bShowException .AND. OleError() != 0
-      Alert( "Error! " + ::cClassName + ":" + cProperty + " " + Ole2TxtError() )
+      MessageBox( 0, "Error! " + ::cClassName + ":" + cProperty + " " + Ole2TxtError(), "OLE Interface", 0 )
    ENDIF
 
 RETURN uObj
@@ -412,7 +412,7 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CLASS TOl
    ::bShowException := bPresetShowException
 
    IF ::bShowException .AND. ( cError := Ole2TxtError() ) != "S_OK"
-      Alert( "Error! " + ::cClassName + ":" + cMsg + " " + cError )
+      MessageBox( 0, "Error! " + ::cClassName + ":" + cMsg + " " + cError, "OLE Interface", 0 )
    ENDIF
 
 RETURN uObj
@@ -435,9 +435,6 @@ RETURN uObj
   #include <OleAuto.h>
   #include <OleDB.h>
   #include <ShlObj.h>
-
-  #undef  WORD
-  #define WORD  unsigned short
 
   // -----------------------------------------------------------------------
 
@@ -480,23 +477,24 @@ RETURN uObj
      UINT uLen;
      BSTR wString;
 
-     uLen  = strlen( cString );
+     uLen  = strlen( cString ) + 1;
 
      if( uLen )
      {
-        wString = ( BSTR ) hb_xgrab( ( uLen + 1 ) * 2 );
+        wString = ( BSTR ) hb_xgrab( uLen * 2 );
+        MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, uLen, wString, uLen );
      }
      else
      {
-       return NULL;
+        // *** This is a speculation about L"" - need to be verified.
+        wString = (BSTR) hb_xgrab( 2 );
+        wString[0] = L'\0';
      }
-
-     MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, uLen + 1, wString, uLen + 1 );
 
      //printf( "\nAnsi: '%s'\n", cString );
      //wprintf( L"\nWide: '%s'\n", wString );
 
-     return ( wString );
+     return wString;
   }
 
   //---------------------------------------------------------------------------//
@@ -504,14 +502,19 @@ RETURN uObj
   static LPSTR WideToAnsi( BSTR wString )
   {
      UINT uLen;
-     LPSTR cString = NULL;
+     char *cString;
 
-     uLen = SysStringLen( wString );
+     uLen = SysStringLen( wString ) + 1;
 
      if( uLen )
      {
-        cString = (char *) hb_xgrab( uLen + 1 );
-        WideCharToMultiByte( CP_ACP, 0, wString, uLen + 1, cString, uLen + 1, NULL, NULL );
+        cString = (char *) hb_xgrab( uLen );
+        WideCharToMultiByte( CP_ACP, 0, wString, uLen, cString, uLen, NULL, NULL );
+     }
+     else
+     {
+        cString = (char *) hb_xgrab( 1 );
+        cString[0] = '\0';
      }
 
      //wprintf( L"\nWide: '%s'\n", wString );
@@ -697,6 +700,9 @@ RETURN uObj
 
                    // The item should NOT be cleared because we released the value above.
                    aPrgParams[ n ]->type = HB_IT_NIL;
+
+                   // The Arg should NOT be cleared because we released the value above.
+                   dParams->rgvarg[ n ].n1.n2.vt = VT_EMPTY;
 
                    hb_itemPutCPtr( aPrgParams[ n ], sString, strlen( sString ) );
                    break;
@@ -902,9 +908,13 @@ RETURN uObj
      VariantInit( &RetVal );
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
+     //printf( "1\n" );
+
      wMember = AnsiToWide( hb_parc( 2 ) );
      nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (unsigned short **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
      hb_xfree( wMember );
+
+     //printf( "2\n" );
 
      if( nOleError == S_OK )
      {
@@ -921,7 +931,12 @@ RETURN uObj
         FreeParams( &dParams );
      }
 
+     //printf( "3\n" );
+
      RetValue();
+
+     //printf( "4\n" );
+
   }
 
   //---------------------------------------------------------------------------//
@@ -1050,6 +1065,7 @@ RETURN uObj
 
   //---------------------------------------------------------------------------//
 
+  #if 0
   HB_FUNC( COMFUNCTION )  // ( hOleObject, nFunc, uParams... )
   {
      typedef HRESULT ( STDMETHODCALLTYPE * COMFunc ) ( IUnknown * pUnk );
@@ -1178,6 +1194,7 @@ RETURN uObj
 
      hb_ret();
   }
+  #endif
 
   //---------------------------------------------------------------------------//
 
@@ -1304,32 +1321,39 @@ RETURN uObj
 
   HB_FUNC( ANSITOWIDE )  // ( cAnsiStr ) -> cWideStr
   {
-     WORD wLen;
-     LPSTR cOut;
+     UINT uLen;
+     BSTR wString;
+     char *cString = hb_parc( 1 );
 
-     wLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, hb_parc( 1 ), -1, 0, 0 );
-     cOut = ( char * ) hb_xgrab( wLen * 2 );
-     MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, hb_parc( 1 ), -1, ( LPWSTR ) cOut, wLen );
+     if( cString == NULL )
+     {
+        hb_ret();
+        return;
+     }
 
-     hb_retclen( cOut, wLen * 2 - 1 );
-     hb_xfree( cOut );
+     uLen = strlen( cString ) + 1;
+
+     wString = ( BSTR ) hb_xgrab( uLen * 2 );
+     MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, uLen, wString, uLen );
+
+     hb_retclenAdopt( (char *) wString, uLen * 2 - 1 );
   }
 
   //---------------------------------------------------------------------------//
 
   HB_FUNC( WIDETOANSI )  // ( cWideStr, nLen ) -> cAnsiStr
   {
-     WORD wLen;
-     LPWSTR cWideStr;
-     LPSTR cOut = NULL;
+     UINT uLen;
+     BSTR wString = ( BSTR ) hb_parc( 1 );
+     char *cString = NULL;
 
-     cWideStr = ( LPWSTR ) hb_parc( 1 );
-     wLen = WideCharToMultiByte( CP_ACP, WC_COMPOSITECHECK, cWideStr, -1, cOut, 0, NULL, NULL );
-     cOut = ( char * ) hb_xgrab( wLen );
-     WideCharToMultiByte( CP_ACP, WC_COMPOSITECHECK, cWideStr, -1, cOut, wLen, NULL, NULL );
+     uLen = SysStringLen( wString ) + 1;
 
-     hb_retc( cOut );
-     hb_xfree( cOut );
+     cString = ( char * ) hb_xgrab( uLen );
+
+     WideCharToMultiByte( CP_ACP, WC_COMPOSITECHECK, wString, uLen, cString, uLen, NULL, NULL );
+
+     hb_retclenAdopt( cString, uLen - 1 );
   }
 
   //---------------------------------------------------------------------------//

@@ -1,5 +1,5 @@
 /*
- * $Id: hbfunchk.c,v 1.8 2001/09/17 00:23:06 vszakats Exp $
+ * $Id: hbfunchk.c,v 1.1.1.1 2001/12/21 10:43:58 ronpinkas Exp $
  */
 
 /*
@@ -44,7 +44,7 @@ static HB_FUNCINFO hb_StdFunc[] =
    { "AADD"      , 2,  2 },
    { "ABS"       , 1,  1 },
    { "ASC"       , 1,  1 },
-   { "AT"        , 2,  2 },
+   { "AT"        , 2,  4 },
    { "BOF"       , 0,  0 },
    { "BREAK"     , 0,  1 },
    { "CDOW"      , 1,  1 },

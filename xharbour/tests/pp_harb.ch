@@ -76,7 +76,7 @@
   //----------------------------------------------------------------------------//
   METHOD Compile() CLASS  TInterpreter
 
-     LOCAL nLine, nLines, nProcId := 0
+     LOCAL nLine, nLines, sLine, nProcId := 0
 
      IF Len( ::acPPed ) == 0
         PP_InitStd()
@@ -93,7 +93,10 @@
 
         nLines := Len( ::acPPed )
         FOR nLine := 1 TO nLines
-           PP_CompileLine( ::acPPed[nLine], nLine, ::aCompiledProcs, ::aInitExit, @nProcId )
+           sLine := ::acPPed[nLine]
+           IF sLine != NIL
+              PP_CompileLine( sLine, nLine, ::aCompiledProcs, ::aInitExit, @nProcId )
+           ENDIF
         NEXT
      ENDIF
 
@@ -784,7 +787,7 @@
 
     FUNCTION Alert( cMsg, aOptions )
 
-    RETURN MessageBox( 0, cMsg, "XBScript", 0 )
+    RETURN MessageBox( 0, CStr( cMsg ), "XBScript", 0 )
 
  #endif
 
