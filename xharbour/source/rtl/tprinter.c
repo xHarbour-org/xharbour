@@ -317,7 +317,7 @@ HB_FUNC( PRINTFILERAW )  {
   if (ISCHAR(1) && ISCHAR(2)) {
     cPrinterName= hb_parc(1) ;
     cFileName= hb_parc(2) ;
-    cDocName = ISCHAR(3) ? hb_parc(3) : cFileName ;
+    cDocName = ISCHAR(3) ? (UCHAR) hb_parc(3) : cFileName ;
     Result = hb_PrintFileRaw(cPrinterName, cFileName, cDocName) ;
   }
   hb_retnl(Result) ;
