@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.2 2005/01/20 08:28:07 brianhays Exp $
+ * $Id: ftpcln.prg,v 1.3 2005/02/12 10:56:00 jonnymind Exp $
  */
 
 /*
@@ -323,12 +323,7 @@ METHOD Stor( cFile ) CLASS tIPClientFTP
    ENDIF
 
    InetSendAll( ::SocketCon, "STOR " + cFile+ ::cCRLF )
-   IF ::GetReply()
-      InetSetTimeout( ::SocketCon, nTimeout )
-      ::TransferStart()
-      RETURN .T.
-   ENDIF
-RETURN .F.
+RETURN ::TransferStart()
 
 /*
 METHOD Port() CLASS tIPClientFTP

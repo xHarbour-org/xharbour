@@ -1,7 +1,7 @@
 *****************************************************
 * TEST of TIP libs (for higher level URI interface)
 *
-* $Id: tiptest.prg,v 1.1 2004/08/05 12:21:17 lf_sfnet Exp $
+* $Id: tiptest.prg,v 1.3 2005/02/12 16:11:53 jonnymind Exp $
 *
 * Usage: This file is similar to a wget command
 *
@@ -37,11 +37,11 @@
 *      the url with "", eg "smtp://...&at;...@server/dest"
 *
 * FTP Protocol
-*    ftp://user:passwd@<ftpserver>/[+][<path>]
+*    ftp://user:passwd@<ftpserver>/[<path>]
 *    - without path, get the list of files (use path/ to get the list of
 *      files in a dir.
-*    - with path, get a file
-*    + with +path, send a file (using the filename command line)
+*    - with path, get a file. If the target file (second param) starts with '+'
+*      it will be sent instead of being retreived.
 *
 
 #include "hbclass.ch"
@@ -112,6 +112,7 @@ PROCEDURE MAIN( cUrl, cFile )
          ELSE
             IF oClient:ReadToFile( cFile )
                @7,5 SAY "File "+ cFile + " written."
+               @8,5 SAY "Server replied " + oClient:cReply
             ELSE
                @7,5 SAY "Generic error in writing."  + cFile
             ENDIF
