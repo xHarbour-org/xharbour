@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.134 2004/03/07 01:07:53 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.135 2004/03/08 00:25:30 ronpinkas Exp $
  */
 
 /*
@@ -2579,10 +2579,59 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
           if( s_Repeate )
           {
              s_Repeate--;
-          }
 
-          s_numBrackets--;
-          ptrmp++;
+             if( s_aIsRepeate[ s_Repeate ] )
+             {
+                if( ISNAME( *ptri ) )
+                {
+                   ptr  = ptri;
+                   ipos = NextStopper( &ptr, tmpname );
+                   ipos = md_strAt( tmpname, ipos, ptrmp, TRUE, TRUE, TRUE, TRUE );
+
+                   //printf( "TestOptional, %s, %i\n", tmpname, ipos );
+
+                   if( ipos && TestOptional( ptrmp+1, ptrmp+ipos-2 ) )
+                   {
+                      ptr = PrevSquare( ptrmp+ipos-2, ptrmp+1, NULL );
+
+                      //printf( "2-Rewinded: %s\n", ptr );
+
+                      if( !ptr || CheckOptional( ptrmp+1, ptri, ptro, lenres, com_or_tra, com_or_xcom ) )
+                      {
+                         ptrmp = lastopti[s_Repeate];
+                         ptrmp++;
+                         s_Repeate++;
+                         SkipOptional( &ptrmp );
+                         s_numBrackets++;
+                         ptrmp++;
+                         strtptri = ptri;
+                      }
+                      else
+                      {
+                         ptrmp = lastopti[s_Repeate];
+                      }
+                   }
+                   else
+                   {
+                      ptrmp = lastopti[s_Repeate];
+                   }
+                }
+                else
+                {
+                   ptrmp = lastopti[s_Repeate];
+                }
+             }
+             else
+             {
+                ptrmp++;
+             }
+
+             s_numBrackets--;
+          }
+          else
+          {
+             s_numBrackets--; ptrmp++;
+          }
 
           break;
 
