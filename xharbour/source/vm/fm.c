@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.56 2004/02/14 19:47:33 andijahja Exp $
+ * $Id: fm.c,v 1.57 2004/02/20 19:10:01 andijahja Exp $
  */
 
 /*
@@ -155,7 +155,7 @@ void hb_paraniodMemInit( void *pMem, ULONG ulSize )
    if( !bParanoidMemInit )
    {
       itmMemStat.type = HB_IT_STRING;
-      itmMemStat.item.asString.puiHolders = (USHORT*) malloc( sizeof( USHORT ) );
+      itmMemStat.item.asString.piuHolders = (ULONG*) malloc( sizeof( ULONG ) );
       *( itmMemStat.item.asString.puiHolders ) = 1;
       itmMemStat.item.asString.bStatic = FALSE;
       itmMemStat.item.asString.length  = strlen(pszMemStat);

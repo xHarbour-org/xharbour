@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.57 2004/02/14 01:29:44 andijahja Exp $
+ * $Id: fastitem.c,v 1.58 2004/02/14 01:55:22 andijahja Exp $
  */
 
 /*
@@ -352,7 +352,7 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, char * szText )
    }
    else
    {
-      pItem->item.asString.puiHolders      = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+      pItem->item.asString.puiHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
       *( pItem->item.asString.puiHolders ) = 1;
       pItem->item.asString.bStatic         = FALSE;
       pItem->item.asString.length          = strlen( szText );
@@ -397,7 +397,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
    }
    else
    {
-      pItem->item.asString.puiHolders      = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+      pItem->item.asString.puiHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
       *( pItem->item.asString.puiHolders ) = 1;
       pItem->item.asString.bStatic         = FALSE;
       pItem->item.asString.length          = ulLen;
@@ -426,7 +426,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    }
 
    pItem->type = HB_IT_STRING;
-   pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+   pItem->item.asString.piuHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
    *( pItem->item.asString.puiHolders ) = 1;
    pItem->item.asString.bStatic = FALSE;
    pItem->item.asString.length  = ulLen;
@@ -455,7 +455,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
    }
 
    pItem->type = HB_IT_STRING;
-   pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+   pItem->item.asString.piuHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
    *( pItem->item.asString.puiHolders ) = 1;
    pItem->item.asString.bStatic = FALSE;
    pItem->item.asString.length  = ulLen;
@@ -660,7 +660,7 @@ void HB_EXPORT hb_retcAdopt( char * szText )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+   ( &(HB_VM_STACK.Return) )->item.asString.piuHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
    *( ( &(HB_VM_STACK.Return) )->item.asString.puiHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
@@ -691,7 +691,7 @@ void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+   ( &(HB_VM_STACK.Return) )->item.asString.piuHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
    *( ( &(HB_VM_STACK.Return) )->item.asString.puiHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
@@ -720,7 +720,7 @@ void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+   ( &(HB_VM_STACK.Return) )->item.asString.piuHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
    *( ( &(HB_VM_STACK.Return) )->item.asString.puiHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
@@ -748,7 +748,7 @@ void HB_EXPORT hb_retclenAdoptRawStatic( char * szText, ULONG ulLen )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+   ( &(HB_VM_STACK.Return) )->item.asString.piuHolders = (ULONG*) hb_xgrab( sizeof( ULONG ) );
    *( ( &(HB_VM_STACK.Return) )->item.asString.puiHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = TRUE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
