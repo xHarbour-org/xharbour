@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.326 2004/02/20 18:27:35 ronpinkas Exp $
+ * $Id: hvm.c,v 1.327 2004/02/20 22:34:00 ronpinkas Exp $
  */
 
 /*
@@ -6085,9 +6085,19 @@ static void hb_vmRetValue( void )
 {
    HB_THREAD_STUB
 
+#if 1
+   PHB_ITEM pItem = *( HB_VM_STACK.pPos - 1 );
+#endif
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRetValue()"));
 
+#if 0
    hb_itemForwardValue( &(HB_VM_STACK.Return), *( HB_VM_STACK.pPos - 1 ) );
+#else
+   /* for clipper compatibility */
+   pItem->type &= ~HB_IT_MEMOFLAG;
+   hb_itemForwardValue( &(HB_VM_STACK.Return), pItem ) ;
+#endif
 
    hb_stackDec();
 }
