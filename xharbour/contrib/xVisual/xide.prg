@@ -64,7 +64,7 @@ METHOD MainCommands( nwParam, nlParam ) CLASS MainFrame
    local oForm
    do case
       case nwParam == 101
-           oForm:=SubForm1():New( self )
+           oForm := SubForm1():New( self )
            oForm:Caption := 'SubForm1 from TForm'
            oForm:Create()
    endcase
