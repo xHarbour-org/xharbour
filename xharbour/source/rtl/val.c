@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.4 2003/05/30 06:49:32 ronpinkas Exp $
+ * $Id: val.c,v 1.5 2003/05/30 18:15:49 paultucker Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ double HB_EXPORT hb_strVal( const char * szText, ... )
       {
          if( ulLen > ulPad )
          {
-            pCopy = (char *) hb_xgrab( ulLen+1 );
+            pCopy = (char *) hb_xgrab( ulLen + 1 );
             strncpy( pCopy, szText, ulLen );
             pCopy[ulLen] = '\0';
             szText = pCopy;
