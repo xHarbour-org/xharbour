@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.17 2003/04/20 22:46:09 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.18 2003/04/21 01:40:30 jonnymind Exp $
  */
 
 /*
@@ -180,6 +180,7 @@ HIDDEN:
    METHOD UDPParse( cData, nLen )
    METHOD TCPAccept()
    METHOD TCPParse( cData )
+   METHOD clearTCPBuffer()
 
    /* internal network send call */
    METHOD SendCall(cFunction,aParams )
@@ -342,18 +343,9 @@ METHOD UDPAccept() CLASS tRPCClient
    DO WHILE .T.
       nDatalen := InetDGramRecv( ::skUDP, @cData, 1400 )
 
-      #ifdef HB_THREAD_SUPPORT
-         MutexLock( ::mtxBusy )
-         IF .not. ::UDPParse( cData, nDatalen )
-            MutexUnlock( ::mtxBusy )
-            EXIT
-         ENDIF
-         MutexUnlock( ::mtxBusy )
-      #else
-         IF .not. ::UDPParse( cData, nDatalen )
-            EXIT
-         ENDIF
-      #endif
+      IF ::UDPParse( cData, nDatalen )
+         EXIT
+      ENDIF
 
       IF ::nTimeout >= 0
          nTime := Int( Seconds() * 1000 )
@@ -587,6 +579,19 @@ METHOD SetLoopMode( nMethod, xData, nEnd, nStep ) CLASS tRPCClient
 
 RETURN .T.
 
+METHOD ClearTCPBuffer() CLASS tRPCClient
+   LOCAL cDummy := Space( 512 )
+
+   IF ::skTCP == NIL .or. ::nStatus < RPC_STATUS_LOGGED
+      RETURN .F.
+   ENDIF
+
+   DO WHILE InetDataReady( ::skTCP ) > 0
+      // InetRecv reads only the available data
+      InetRecv( ::skTCP, @cDummy )
+   ENDDO
+RETURN .T.
+
 
 METHOD Call( ... ) CLASS tRPCClient
    LOCAL oCalling, xParam
@@ -618,6 +623,9 @@ METHOD Call( ... ) CLASS tRPCClient
       NEXT
    ENDIF
 
+   // clear eventual pending data
+   //::ClearTcpBuffer()
+
    // The real call
    #ifdef HB_THREAD_SUPPORT
       MutexLock( ::mtxBusy )
@@ -626,6 +634,7 @@ METHOD Call( ... ) CLASS tRPCClient
          MutexUnlock( ::mtxBusy )
          RETURN NIL
       ENDIF
+      MutexUnlock( ::mtxBusy )
    #else
       IF ::skTCP == NIL .or. ::nStatus < RPC_STATUS_LOGGED
          RETURN NIL
@@ -835,6 +844,7 @@ METHOD TCPAccept() CLASS tRPCClient
    cCode := Space(6)
    ::nTCPTimeBegin := INT( Seconds() * 1000 )
    nTimeLimit = Max( ::nTimeout, ::nTimeLimit )
+
 
    DO WHILE .T.
       IF InetRecvAll( ::skTCP, @cCode, 6 ) <= 0

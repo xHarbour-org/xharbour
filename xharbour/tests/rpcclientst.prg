@@ -1,6 +1,6 @@
 ************************************************************
 * rpcclientst.prg
-* $Id: rpcclientst.prg,v 1.1 2003/04/13 13:20:06 jonnymind Exp $
+* $Id: rpcclientst.prg,v 1.2 2003/04/17 21:22:23 jonnymind Exp $
 * Test for tRpcClient class
 *
 * SINGLE THREAD MODE
@@ -21,6 +21,7 @@
 #include "hbrpc.ch"
 
 GLOBAL nRow
+GLOBAL lComplete
 
 PROCEDURE Main( cNetwork )
    LOCAL oRpc, aElem, cFname
@@ -149,14 +150,15 @@ PROCEDURE Main( cNetwork )
 
       // again, setting the timer to lower wait for interactive incremental calls
       oRpc:SetLoopMode( RPC_LOOP_NONE )
-      oRpc:SetTimeout( 250 )
+      oRpc:SetTimeout( 125 )
       @nRow, 20 SAY "Waiting"
       nPos := 28
       oResult := oRpc:Call( cFname, cBase )
-      DO WHILE oRpc:GetStatus() == RPC_STATUS_WAITING
+      lComplete := .F.
+      DO WHILE .not. lComplete
          @nRow, nPos SAY "."
          nPos++
-         IF nPos > 70
+         IF nPos > 50
             nRow++
             @nRow,10 say "Async test failed"
          ENDIF
@@ -198,6 +200,7 @@ FUNCTION FuncComplete( oResult  )
       nRow++
       @nRow, 10 SAY "Function complete, result: " + oResult
       nRow++
+      lComplete := .T.
 RETURN .T.
 
 /* Called when function is complete */
