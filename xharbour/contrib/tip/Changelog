@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.8 2003/11/05 11:06:41 jonnymind Exp $
+ * $Id: Changelog,v 1.9 2003/11/14 12:01:41 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-20 16:27 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * tipclient.prg
+    ! fixed a misplaced return on line 192
+    ! If the connection is not working, destination file is not created
+      in ReadToFile() method.
 
 2003-11-14 13:01 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * Rules.make

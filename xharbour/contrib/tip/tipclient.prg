@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclient.prg,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
+* $Id: tipclient.prg,v 1.2 2003/11/05 11:06:41 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "fileio.ch"
@@ -179,18 +179,20 @@ METHOD ReadToFile( cFile, nMode ) CLASS tIPClient
       nMode := FO_CREAT
    ENDIF
 
-   ::nStatus := 0
-   nFout := Fcreate( cFile, nMode )
-   IF nFout < 0
-      RETURN .F.
-   ENDIF
-
    ::nStatus := 1
    DO WHILE InetErrorCode( ::SocketCon ) == 0 .and. .not. ::bEof
+      IF nFout == NIL
+         nFout := Fcreate( cFile, nMode )
+         IF nFout < 0
+            ::nStatus := 0
+            RETURN .F.
+         ENDIF
+      ENDIF
+
       cData := ::Read( 1024 )
       IF cData == NIL
-         RETURN .F.
          Fclose( nFout )
+         RETURN .F.
       ENDIF
       IF Fwrite( nFout, cData ) < 0
          Fclose( nFout )
