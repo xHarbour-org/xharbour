@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.72 2003/09/10 19:02:29 ronpinkas Exp $
+ * $Id: arrays.c,v 1.73 2003/09/10 19:31:22 ronpinkas Exp $
  */
 
 /*
@@ -1527,7 +1527,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
                }
                else
                {
-                  hb_itemCear( pItem );
+                  hb_itemClear( pItem );
                }
             #else
                if( pItem->item.asArray.value )
