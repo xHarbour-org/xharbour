@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.126 2004/08/23 15:40:03 druzus Exp $
+ * $Id: dbcmd.c,v 1.127 2004/09/03 01:34:59 druzus Exp $
  */
 
 /*
@@ -372,6 +372,7 @@ static int hb_rddRegister( char * szDriver, USHORT uiType )
    hb_vmPushNil();
    hb_vmPushPointer( ( void * ) &uiFunctions );
    hb_vmPushPointer( ( void * ) &pRddNewNode->pTable );
+   hb_vmPushPointer( ( void * ) &pRddNewNode->pSuperTable );
    hb_vmDo( 2 );
    if ( hb_parni( -1 ) != SUCCESS )
    {
@@ -496,7 +497,7 @@ static AREAP hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
 {
    AREAP pArea;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddNewAreaNode(%p %d)", pRddNode,uiRddID));
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddNewAreaNode(%p %d)", pRddNode, uiRddID));
 
    if( pRddNode->uiAreaSize == 0 ) /* Calculate the size of WorkArea */
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3427 2004/09/13 07:38:43 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3428 2004/09/13 11:10:44 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-13 15:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapirdd.h
+  * xharbour/source/rdd/dbcmd.c
+    + added supertable to RDDNODE - RDDNODE is private dbcmd structure
+      so it should not break any 3-rd party code.
+    + added 3-rd parameter to *_GETFUNCTABLE() - it's a pointer to
+      supper table in RDDNODE
+    
+    The above changes are for future modification in AREAP - I'll add
+         struct _RDDFUNCS * lprfsSuper
+    to this structure to allow single RDD code to be used as base for
+    more then one new RDD - it will be enough to make more then one
+    *_GETFUNCTABLE() for static inheritance or create separate function
+    with _GETFUNCTABLE functionality, f.e. rddCreate()
+
+  * xharbour/source/rtl/tgetlist.prg
+    ! added missing #ENDIF for #ifdef HB_NEW_KCTRL
+      - Lorenzo please check me.
 
 2004-09-13 13:05 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/source/rtl/memoedit.prg
