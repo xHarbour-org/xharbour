@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: mtstress.prg,v 1.1 2003/07/14 19:18:47 jonnymind Exp $
+* $Id: mtstress.prg,v 1.2 2003/07/15 00:57:04 jonnymind Exp $
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:
@@ -54,8 +54,34 @@ PROCEDURE Stress( nId, nRow )
    nRow += nId - 1
    m->cRnd := "ABCDEFGHILMNOPQRSTUVZ"
    cRndVal := "ABCDEFGHILMNOPQRSTUVZ"
+
+   // Step 40: database test
+
+   @nRow,5 SAY Space( 80 )
+   IF File( "test.dbf" )
+      Select &nId
+      USE test Alias &( "Test" + Alltrim( Str(nId)) )
+      aData := Array(Fcount())
+      aFields(aData)
+      GOTO Int( HB_Random( 1, Reccount() ) )
+      FOR nCount := 1 TO 10000
+         // this is to test if separate threads are able not to
+         // change other areas or file pointers
+         Select &nId
+         @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" DBF test " +;
+         Alltrim( Str( nCount ) ) + ": Record "+Alltrim( Str( Recno( ) ))+;
+            ":" +& ("FIELD->"+aData[1])
+         SKIP // this will create a linear ramp that can be checked
+         IF Eof()
+            GOTO 1
+         ENDIF
+      NEXT
+      USE
+   ENDIF
+
    //Step 1: foreach test
 
+   @nRow,5 SAY Space( 80 )
    aData := Array( 10000 )
    FOR nCount := 1 TO 10000
       aData[ nCount ] := cRndVal[ Int( HB_Random(1, 21) ) ]
@@ -103,7 +129,6 @@ PROCEDURE Stress( nId, nRow )
       @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Private test " +;
        Alltrim( Str( nCount ) ) + ": "+m->cMemVal
    NEXT
-
 
    // Step 4: Public Memvar test
 

@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.8 2003/07/23 20:12:43 toninhofwi Exp $
+* $Id: hblog.prg,v 1.9 2003/07/24 01:55:58 jonnymind Exp $
 */
 
 /*
@@ -298,7 +298,7 @@ CLASS HB_LogChannel
    METHOD Open( cName )          VIRTUAL
    METHOD Close( cName )         VIRTUAL
 
-   METHOD Log( cMessage, nPriority )
+   METHOD Log( nStyle, cMessage, cName, nPriority )
    METHOD SetActive( lAct )      INLINE   ::lActive := lAct
 
    METHOD Format( nStyle, cMessage, cName, nPriority )

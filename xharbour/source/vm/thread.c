@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.93 2003/07/27 14:59:01 jonnymind Exp $
+* $Id: thread.c,v 1.94 2003/07/27 20:15:12 jonnymind Exp $
 */
 
 /*
@@ -55,8 +55,6 @@
 */
 
 /* JC1: Now including all this files to make threadsleep available in ST */
-
-
 #define HB_THREAD_OPTIMIZE_STACK
 
 #if defined( HB_OS_DARWIN )
@@ -131,7 +129,7 @@ BOOL hb_critical_trylock( HB_CRITICAL_T *lpMutex )
 
 #endif  //LWR mutexes for OS without them.
 
-HB_STACK *hb_ht_stack;
+HB_STACK *hb_ht_stack = 0;
 HB_STACK *last_stack;
 HB_MUTEX_STRUCT *hb_ht_mutex;
 HB_THREAD_T hb_main_thread_id;
@@ -250,6 +248,10 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->iExtraElementsIndex = 0;
    tc->iExtraElements = 0;
    tc->iExtraIndex = 0;
+
+   /* Initialization of dbcmd related variables */
+   tc->uiCurrArea = 0;
+   tc->pCurrArea = 0;
 
    /* Initialization of private and public memvars */
    hb_memvarsInit( tc );

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.39 2003/07/17 03:08:24 andijahja Exp $
+ * $Id: dbcmd.c,v 1.40 2003/07/23 00:23:08 mlombardo Exp $
  */
 
 /*
@@ -62,9 +62,12 @@
  *
  */
 
+/* JC1: optimizing stack access under MT */
+#define HB_THREAD_OPTIMIZE_STACK
+
 #include <ctype.h>
-#include "hbvm.h"
 #include "hbstack.h"
+#include "hbvm.h"
 #include "hbapifs.h"
 #include "hbset.h"
 #include "hbapierr.h"
@@ -75,6 +78,8 @@
 #  include "hbapicdp.h"
 #endif
 
+#ifndef HB_THREAD_SUPPORT
+/* TODO: Put it in a separate .h file */
 typedef struct _AREANODE
 {
    void * pArea;               /* WorkAreas with different sizes */
@@ -84,7 +89,7 @@ typedef struct _AREANODE
 
 typedef AREANODE * LPAREANODE;
 
-
+#endif
 
 extern HB_FUNC( _DBF );
 extern HB_FUNC( _SDF );
@@ -92,12 +97,22 @@ extern HB_FUNC( _DELIM );
 extern HB_FUNC( RDDSYS );
 
 static char * s_szDefDriver = NULL;    /* Default RDD name */
-static USHORT s_uiCurrArea = 1;        /* Selectd area */
 static LPRDDNODE s_pRddList = NULL;    /* Registered RDD's */
 static BOOL s_bNetError = FALSE;       /* Error on Networked environments */
-
 static LPAREANODE s_pWorkAreas = NULL; /* WorkAreas */
+
+#ifndef HB_THREAD_SUPPORT
+static USHORT s_uiCurrArea = 1;        /* Selectd area */
 static LPAREANODE s_pCurrArea = NULL;  /* Pointer to a selected and valid area */
+#define LOCK_AREA
+#define UNLOCK_AREA
+#else
+#define s_uiCurrArea    HB_VM_STACK.uiCurrArea
+#define s_pCurrArea     HB_VM_STACK.pCurrArea
+HB_CRITICAL_T  s_mtxWorkArea;
+#define LOCK_AREA HB_CRITICAL_LOCK( s_mtxWorkArea );
+#define UNLOCK_AREA HB_CRITICAL_UNLOCK( s_mtxWorkArea );
+#endif
 
 /*
  * -- DEFAULT METHODS --
@@ -266,12 +281,15 @@ static void hb_rddCheck( void )
  */
 static void hb_rddCloseAll( void )
 {
+   HB_THREAD_STUB
+
    BOOL isParents = TRUE, isFinish = FALSE;
    LPAREANODE pAreaNode,pCurrArea;
    HB_TRACE(HB_TR_DEBUG, ("hb_rddCloseAll()"));
 
    while( isParents )
    {
+      LOCK_AREA
       pAreaNode = s_pWorkAreas;
       isParents = FALSE;
       while( pAreaNode )
@@ -298,10 +316,14 @@ static void hb_rddCloseAll( void )
       }
       if( !isParents && !isFinish )
          isParents = isFinish = TRUE;
+      UNLOCK_AREA
    }
 
    s_uiCurrArea = 1;
    s_pCurrArea = NULL;
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_DESTROY( s_mtxWorkArea );
+   #endif
    s_pWorkAreas = NULL;
 }
 
@@ -409,11 +431,13 @@ static USHORT hb_rddSelect( char * szAlias )
  */
 static void hb_rddSelectFirstAvailable( void )
 {
+   HB_THREAD_STUB
    LPAREANODE pAreaNode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectFirstAvailable()"));
 
    s_uiCurrArea = 1;
+   LOCK_AREA
    pAreaNode = s_pWorkAreas;
    while( pAreaNode )
    {
@@ -423,6 +447,7 @@ static void hb_rddSelectFirstAvailable( void )
          s_uiCurrArea++;
       pAreaNode = pAreaNode->pNext;
    }
+   UNLOCK_AREA
    s_pCurrArea = NULL;   /* Selected WorkArea must be created */
 }
 
@@ -438,6 +463,7 @@ static USHORT hb_rddFindFirstFreeAreaNum( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_rddFirstFreeAreaNum()"));
 
    uiFreeAreaNum = 1;
+   LOCK_AREA
    pAreaNode = s_pWorkAreas;
    while( pAreaNode )
    {
@@ -447,6 +473,7 @@ static USHORT hb_rddFindFirstFreeAreaNum( void )
          uiFreeAreaNum++;
       pAreaNode = pAreaNode->pNext;
    }
+   UNLOCK_AREA
 	return uiFreeAreaNum;
 }
 
@@ -507,10 +534,13 @@ ERRCODE HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNC
  */
 void  HB_EXPORT hb_rddReleaseCurrentArea( void )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_rddReleaseCurrentArea()"));
    SELF_CLOSE( ( AREAP ) s_pCurrArea->pArea );
    SELF_RELEASE( ( AREAP ) s_pCurrArea->pArea );
 
+   LOCK_AREA
    if( s_pWorkAreas == s_pCurrArea )
    {
       s_pWorkAreas = s_pCurrArea->pNext;
@@ -524,6 +554,7 @@ void  HB_EXPORT hb_rddReleaseCurrentArea( void )
       if( s_pCurrArea->pNext )
          s_pCurrArea->pNext->pPrev = s_pCurrArea->pPrev;
    }
+   UNLOCK_AREA
 
    hb_xfree( s_pCurrArea );
    s_pCurrArea = NULL;
@@ -577,6 +608,8 @@ LPAREANODE  HB_EXPORT hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
  */
 USHORT  HB_EXPORT hb_rddInsertAreaNode( char *szDriver )
 {
+   HB_THREAD_STUB
+
    USHORT uiRddID;
    LPRDDNODE pRddNode;
    LPAREANODE pAreaNode;
@@ -588,9 +621,15 @@ USHORT  HB_EXPORT hb_rddInsertAreaNode( char *szDriver )
 
    s_pCurrArea = hb_rddNewAreaNode( pRddNode, uiRddID );
    if( !s_pWorkAreas )
+   {
       s_pWorkAreas = s_pCurrArea;  /* The new WorkArea node is the first */
+      #ifdef HB_THREAD_SUPPORT
+         HB_CRITICAL_INIT( s_mtxWorkArea );
+      #endif
+   }
    else
    {
+      LOCK_AREA
       pAreaNode = s_pWorkAreas;
       while( pAreaNode )
       {
@@ -617,6 +656,7 @@ USHORT  HB_EXPORT hb_rddInsertAreaNode( char *szDriver )
          }
       }
    }
+   UNLOCK_AREA
    return TRUE;
 }
 
@@ -649,6 +689,7 @@ ERRCODE  HB_EXPORT hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddIterateWorkAreas(%p)", pCallBack));
 
+   LOCK_AREA
    pAreaNode = s_pWorkAreas;
    while( pAreaNode )
    {
@@ -656,6 +697,7 @@ ERRCODE  HB_EXPORT hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data )
          break;
       pAreaNode = pAreaNode->pNext;
    }
+   UNLOCK_AREA
    return SUCCESS;
 }
 
@@ -669,6 +711,7 @@ ERRCODE  HB_EXPORT hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data )
  */
 int   HB_EXPORT hb_rddGetCurrentWorkAreaNumber( void )
 {
+   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetCurrentWorkAreaNumber()"));
 
    return s_uiCurrArea;
@@ -679,22 +722,26 @@ int   HB_EXPORT hb_rddGetCurrentWorkAreaNumber( void )
  */
 ERRCODE  HB_EXPORT hb_rddSelectWorkAreaNumber( int iArea )
 {
+   HB_THREAD_STUB
    LPAREANODE pAreaNode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectWorkAreaNumber(%d)", iArea));
 
    s_uiCurrArea = iArea;
 
+   LOCK_AREA
    pAreaNode = s_pWorkAreas;
    while( pAreaNode )
    {
       if( ( ( AREAP ) pAreaNode->pArea )->uiArea == s_uiCurrArea )
       {
          s_pCurrArea = pAreaNode; /* Select a valid WorkArea */
+         UNLOCK_AREA
          return SUCCESS;
       }
       pAreaNode = pAreaNode->pNext;
    }
+   UNLOCK_AREA
    s_pCurrArea = NULL;            /* Selected WorkArea is closed */
    return FAILURE;
 }
@@ -814,6 +861,7 @@ ERRCODE  HB_EXPORT hb_rddSelectWorkAreaAlias( char * szName )
  */
 void HB_EXPORT * hb_rddGetCurrentWorkAreaPointer( void )
 {
+   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetCurrentWorkAreaPointer()"));
 
    return ( s_pCurrArea )? s_pCurrArea->pArea:NULL;
@@ -898,6 +946,7 @@ ERRCODE  HB_EXPORT hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol
  */
 ERRCODE  HB_EXPORT hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
+   HB_THREAD_STUB
    LPFIELD pField;
    USHORT uiField;
 
@@ -926,6 +975,7 @@ ERRCODE  HB_EXPORT hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
  */
 ERRCODE  HB_EXPORT hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
+   HB_THREAD_STUB
    LPFIELD pField;
    USHORT uiField;
 
@@ -980,6 +1030,8 @@ void  HB_EXPORT hb_rddShutDown( void )
 
 HB_FUNC( AFIELDS )
 {
+   HB_THREAD_STUB
+
    PHB_ITEM pName, pType, pLen, pDec, pItem;
    USHORT uiFields, uiArrayLen, uiCount;
 
@@ -1053,11 +1105,14 @@ HB_FUNC( AFIELDS )
 
 HB_FUNC( ALIAS )
 {
+   HB_THREAD_STUB
+
    USHORT uiArea;
    LPAREANODE pAreaNode;
    char * szAlias;
 
    uiArea = hb_parni( 1 );
+   LOCK_AREA
    uiArea = uiArea ? uiArea : s_uiCurrArea;
    pAreaNode = s_pWorkAreas;
    while( pAreaNode )
@@ -1069,6 +1124,7 @@ HB_FUNC( ALIAS )
          {
             szAlias = ( char * ) hb_xgrab( HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 );
             SELF_ALIAS( ( AREAP ) pAreaNode->pArea, ( BYTE * ) szAlias );
+            UNLOCK_AREA
             hb_retc( szAlias );
             hb_xfree( szAlias );
             return;
@@ -1077,11 +1133,14 @@ HB_FUNC( ALIAS )
       }
       pAreaNode = pAreaNode->pNext;
    }
+   UNLOCK_AREA
    hb_retc( NULL );
 }
 
 HB_FUNC( DBEVAL )
 {
+   HB_THREAD_STUB
+
    DBEVALINFO pEvalInfo;
 
    if( s_pCurrArea )
@@ -1136,9 +1195,12 @@ HB_FUNC( DBEVAL )
 
 HB_FUNC( DBF )
 {
-   LPAREANODE pAreaNode = s_pWorkAreas;
+   HB_THREAD_STUB
+   LPAREANODE pAreaNode;
    char * szAlias;
 
+   LOCK_AREA
+   pAreaNode = s_pWorkAreas;
    while( pAreaNode )
    {
       if( ( ( AREAP ) pAreaNode->pArea )->uiArea == s_uiCurrArea )
@@ -1148,6 +1210,7 @@ HB_FUNC( DBF )
          {
             szAlias = ( char * ) hb_xgrab( HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 );
             SELF_ALIAS( ( AREAP ) pAreaNode->pArea, ( BYTE * ) szAlias );
+            UNLOCK_AREA
             hb_retc( szAlias );
             hb_xfree( szAlias );
             return;
@@ -1156,11 +1219,13 @@ HB_FUNC( DBF )
       }
       pAreaNode = pAreaNode->pNext;
    }
+   UNLOCK_AREA
    hb_retc( NULL );
 }
 
 HB_FUNC( BOF )
 {
+   HB_THREAD_STUB
    BOOL bBof = TRUE;
 
    if( s_pCurrArea )
@@ -1170,6 +1235,7 @@ HB_FUNC( BOF )
 
 HB_FUNC( DBAPPEND )
 {
+   HB_THREAD_STUB
    BOOL bUnLockAll;
 
    if( s_pCurrArea )
@@ -1187,6 +1253,7 @@ HB_FUNC( DBAPPEND )
 
 HB_FUNC( DBCLEARFILTER )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       SELF_CLEARFILTER( ( AREAP ) s_pCurrArea->pArea );
    else
@@ -1200,12 +1267,14 @@ HB_FUNC( DBCLOSEALL )
 
 HB_FUNC( DBCLOSEAREA )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       hb_rddReleaseCurrentArea();
 }
 
 HB_FUNC( DBCOMMIT )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       SELF_FLUSH( ( AREAP ) s_pCurrArea->pArea );
    else
@@ -1214,19 +1283,24 @@ HB_FUNC( DBCOMMIT )
 
 HB_FUNC( DBCOMMITALL )
 {
+   HB_THREAD_STUB
    LPAREANODE pAreaNode = s_pCurrArea;
 
+   LOCK_AREA
    s_pCurrArea = s_pWorkAreas;
    while( s_pCurrArea )
    {
       SELF_FLUSH( ( AREAP ) s_pCurrArea->pArea );
       s_pCurrArea = s_pCurrArea->pNext;
    }
+   UNLOCK_AREA
    s_pCurrArea = pAreaNode;
 }
 
 HB_FUNC( __DBCONTINUE )
 {
+   HB_THREAD_STUB
+
    if( !s_pCurrArea )
    {
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBCONTINUE" );
@@ -1251,6 +1325,7 @@ HB_FUNC( __DBCONTINUE )
 
 HB_FUNC( DBCREATE )
 {
+   HB_THREAD_STUB
    char * szDriver, * szFileName;
    char cDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH ];
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
@@ -1453,6 +1528,7 @@ HB_FUNC( DBCREATE )
 
 HB_FUNC( DBDELETE )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       SELF_DELETE( ( AREAP ) s_pCurrArea->pArea );
    else
@@ -1461,6 +1537,7 @@ HB_FUNC( DBDELETE )
 
 HB_FUNC( DBFILTER )
 {
+   HB_THREAD_STUB
    PHB_ITEM pFilter;
 
    if( s_pCurrArea )
@@ -1476,6 +1553,7 @@ HB_FUNC( DBFILTER )
 
 HB_FUNC( DBGOBOTTOM )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       SELF_GOBOTTOM( ( AREAP ) s_pCurrArea->pArea );
    else
@@ -1484,6 +1562,7 @@ HB_FUNC( DBGOBOTTOM )
 
 HB_FUNC( DBGOTO )
 {
+   HB_THREAD_STUB
    PHB_ITEM pItem;
 
    if( !s_pCurrArea )
@@ -1502,6 +1581,7 @@ HB_FUNC( DBGOTO )
 
 HB_FUNC( DBGOTOP )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       SELF_GOTOP( ( AREAP ) s_pCurrArea->pArea );
    else
@@ -1510,6 +1590,7 @@ HB_FUNC( DBGOTOP )
 
 HB_FUNC( __DBLOCATE )
 {
+   HB_THREAD_STUB
    PHB_ITEM pFor, pNewFor, pWhile, pNext, pRecord, pRest, pNewRest;
    DBSCOPEINFO pScopeInfo;
    ULONG lNext;
@@ -1808,6 +1889,7 @@ ExitLocate :
 
 HB_FUNC( __DBSETLOCATE )
 {
+   HB_THREAD_STUB
    PHB_ITEM pLocate;
    DBSCOPEINFO pScopeInfo;
 
@@ -1825,6 +1907,7 @@ HB_FUNC( __DBSETLOCATE )
 
 HB_FUNC( __DBPACK )
 {
+   HB_THREAD_STUB
    PHB_ITEM pBlock, pEvery;
 
    if( s_pCurrArea )
@@ -1860,6 +1943,7 @@ HB_FUNC( __DBPACK )
 
 HB_FUNC( DBRECALL )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       SELF_RECALL( ( AREAP ) s_pCurrArea->pArea );
    else
@@ -1868,6 +1952,7 @@ HB_FUNC( DBRECALL )
 
 HB_FUNC( DBRLOCK )
 {
+   HB_THREAD_STUB
    DBLOCKINFO dbLockInfo;
 
    dbLockInfo.fResult = FALSE;
@@ -1888,6 +1973,7 @@ HB_FUNC( DBRLOCK )
 
 HB_FUNC( DBRLOCKLIST )
 {
+   HB_THREAD_STUB
    PHB_ITEM pList;
 
    pList = hb_itemArrayNew( 0 );
@@ -1901,6 +1987,7 @@ HB_FUNC( DBRLOCKLIST )
 
 HB_FUNC( DBRUNLOCK )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       SELF_UNLOCK( ( AREAP ) s_pCurrArea->pArea, hb_parnl( 1 ) );
    else
@@ -1909,6 +1996,7 @@ HB_FUNC( DBRUNLOCK )
 
 HB_FUNC( DBSEEK )
 {
+   HB_THREAD_STUB
    PHB_ITEM pKey;
    BOOL bSoftSeek, bFindLast;
 
@@ -1936,6 +2024,7 @@ HB_FUNC( DBSEEK )
 
 HB_FUNC( DBSELECTAREA )
 {
+   HB_THREAD_STUB
    USHORT uiNewArea;
    char * szAlias;
    LPAREANODE pAreaNode;
@@ -1984,6 +2073,10 @@ HB_FUNC( DBSELECTAREA )
    else
       uiNewArea = hb_parni( 1 );
 
+   /* JC1: Locking here as hb_rddSelectFirstAvailable could not
+      be valid anymore if we unlock the area in the meanwhile */
+   LOCK_AREA
+
    if( uiNewArea == 0 )
       hb_rddSelectFirstAvailable();
    else
@@ -1995,15 +2088,18 @@ HB_FUNC( DBSELECTAREA )
       if( ( ( AREAP ) pAreaNode->pArea )->uiArea == s_uiCurrArea )
       {
          s_pCurrArea = pAreaNode; /* Select a valid WorkArea */
+         UNLOCK_AREA
          return;
       }
       pAreaNode = pAreaNode->pNext;
    }
+   UNLOCK_AREA
    s_pCurrArea = NULL; /* Selected WorkArea is closed */
 }
 
 HB_FUNC( __DBSETFOUND )
 {
+   HB_THREAD_STUB
    PHB_ITEM pFound;
 
    if( s_pCurrArea )
@@ -2016,6 +2112,7 @@ HB_FUNC( __DBSETFOUND )
 
 HB_FUNC( DBSKIP )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, ISNUM( 1 ) ? hb_parnl( 1 ) : 1 );
    else
@@ -2024,6 +2121,7 @@ HB_FUNC( DBSKIP )
 
 HB_FUNC( DBSETFILTER )
 {
+   HB_THREAD_STUB
    PHB_ITEM pBlock, pText;
    DBFILTERINFO pFilterInfo;
 
@@ -2049,6 +2147,7 @@ HB_FUNC( DBSETFILTER )
 
 HB_FUNC( DBSTRUCT )
 {
+   HB_THREAD_STUB
    PHB_ITEM pItem, pData;
    USHORT uiFields, uiCount;
 
@@ -2079,6 +2178,7 @@ HB_FUNC( DBSTRUCT )
 
 HB_FUNC( DBTABLEEXT )
 {
+   HB_THREAD_STUB
    LPRDDNODE pRddNode;
    AREAP pTempArea;
    USHORT uiSize, uiRddID;
@@ -2132,6 +2232,7 @@ HB_FUNC( DBTABLEEXT )
 
 HB_FUNC( DBUNLOCK )
 {
+   HB_THREAD_STUB
 
    if( s_pCurrArea )
       SELF_UNLOCK( ( AREAP ) s_pCurrArea->pArea, 0 );
@@ -2141,19 +2242,23 @@ HB_FUNC( DBUNLOCK )
 
 HB_FUNC( DBUNLOCKALL )
 {
+   HB_THREAD_STUB
    LPAREANODE pTempArea = s_pCurrArea;
 
+   LOCK_AREA
    s_pCurrArea = s_pWorkAreas;
    while( s_pCurrArea )
    {
       SELF_UNLOCK( ( AREAP ) s_pCurrArea->pArea, 0 );
       s_pCurrArea = s_pCurrArea->pNext;
    }
+   UNLOCK_AREA
    s_pCurrArea = pTempArea;
 }
 
 HB_FUNC( DBUSEAREA )
 {
+   HB_THREAD_STUB
    char * szDriver, * szFileName;
    USHORT uiLen;
    DBOPENINFO pInfo;
@@ -2264,6 +2369,7 @@ HB_FUNC( DBUSEAREA )
 
 HB_FUNC( __DBZAP )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       SELF_ZAP( ( AREAP ) s_pCurrArea->pArea );
    else
@@ -2272,6 +2378,7 @@ HB_FUNC( __DBZAP )
 
 HB_FUNC( DELETED )
 {
+   HB_THREAD_STUB
    BOOL bDeleted = FALSE;
 
    if( s_pCurrArea )
@@ -2281,6 +2388,7 @@ HB_FUNC( DELETED )
 
 HB_FUNC( EOF )
 {
+   HB_THREAD_STUB
    BOOL bEof = TRUE;
 
    if( s_pCurrArea )
@@ -2290,6 +2398,7 @@ HB_FUNC( EOF )
 
 HB_FUNC( FCOUNT )
 {
+   HB_THREAD_STUB
    USHORT uiFields = 0;
 
    if( s_pCurrArea )
@@ -2299,6 +2408,7 @@ HB_FUNC( FCOUNT )
 
 HB_FUNC( FIELDGET )
 {
+   HB_THREAD_STUB
    PHB_ITEM pItem;
    USHORT uiField, uiFields;
 
@@ -2317,6 +2427,7 @@ HB_FUNC( FIELDGET )
 
 HB_FUNC( FIELDNAME )
 {
+   HB_THREAD_STUB
    char * szName;
    USHORT uiFields, uiIndex;
 
@@ -2343,6 +2454,7 @@ HB_FUNC( FIELDNAME )
 
 HB_FUNC( FIELDPOS )
 {
+   HB_THREAD_STUB
    /* char szName[ HARBOUR_MAX_RDD_FIELDNAME_LENGTH ]; */
    char * szName;
 
@@ -2380,6 +2492,7 @@ HB_FUNC( FIELDPOS )
 
 HB_FUNC( FIELDPUT )
 {
+   HB_THREAD_STUB
    USHORT uiIndex;
    PHB_ITEM pItem;
 
@@ -2394,6 +2507,7 @@ HB_FUNC( FIELDPUT )
 
 HB_FUNC( FLOCK )
 {
+   HB_THREAD_STUB
    DBLOCKINFO dbLockInfo;
 
    dbLockInfo.fResult = FALSE;
@@ -2411,6 +2525,7 @@ HB_FUNC( FLOCK )
 
 HB_FUNC( FOUND )
 {
+   HB_THREAD_STUB
    BOOL bFound = FALSE;
 
    if( s_pCurrArea )
@@ -2420,6 +2535,7 @@ HB_FUNC( FOUND )
 
 HB_FUNC( HEADER )
 {
+   HB_THREAD_STUB
    PHB_ITEM pRecSize;
 
    if( !s_pCurrArea )
@@ -2434,6 +2550,7 @@ HB_FUNC( HEADER )
 
 HB_FUNC( INDEXORD )
 {
+   HB_THREAD_STUB
    DBORDERINFO pInfo;
 
    if( s_pCurrArea )
@@ -2451,6 +2568,7 @@ HB_FUNC( INDEXORD )
 /* Same as RECCOUNT() */
 HB_FUNC( LASTREC )
 {
+   HB_THREAD_STUB
    ULONG ulRecCount = 0;
 
    if( s_pCurrArea )
@@ -2460,6 +2578,7 @@ HB_FUNC( LASTREC )
 
 HB_FUNC( LOCK )
 {
+   HB_THREAD_STUB
    DBLOCKINFO dbLockInfo;
 
    dbLockInfo.fResult = FALSE;
@@ -2476,6 +2595,7 @@ HB_FUNC( LOCK )
 
 HB_FUNC( LUPDATE )
 {
+   HB_THREAD_STUB
    if( !s_pCurrArea )
       hb_itemPutDS( &(HB_VM_STACK.Return), "" );
    else
@@ -2484,6 +2604,7 @@ HB_FUNC( LUPDATE )
 
 HB_FUNC( NETERR )
 {
+   HB_THREAD_STUB
    if( ISLOG( 1 ) )
       s_bNetError = hb_parl( 1 );
 
@@ -2492,6 +2613,7 @@ HB_FUNC( NETERR )
 
 HB_FUNC( ORDBAGEXT )
 {
+   HB_THREAD_STUB
    DBORDERINFO pInfo;
    LPRDDNODE pRddNode;
    AREAP pTempArea;
@@ -2546,6 +2668,7 @@ HB_FUNC( ORDBAGEXT )
 
 HB_FUNC( ORDBAGNAME )
 {
+   HB_THREAD_STUB
    DBORDERINFO pOrderInfo;
 
    if( s_pCurrArea )
@@ -2577,6 +2700,7 @@ HB_FUNC( ORDBAGNAME )
 
 HB_FUNC( ORDCONDSET )
 {
+   HB_THREAD_STUB
    LPDBORDERCONDINFO lpdbOrdCondInfo;
    char * szFor;
    ULONG ulLen;
@@ -2660,6 +2784,7 @@ HB_FUNC( ORDCONDSET )
 
 HB_FUNC( ORDCREATE )
 {
+   HB_THREAD_STUB
    DBORDERCREATEINFO dbOrderInfo;
 
    if( s_pCurrArea )
@@ -2687,6 +2812,7 @@ HB_FUNC( ORDCREATE )
 
 HB_FUNC( ORDDESTROY )
 {
+   HB_THREAD_STUB
    DBORDERINFO pOrderInfo;
 
    if( s_pCurrArea )
@@ -2701,6 +2827,7 @@ HB_FUNC( ORDDESTROY )
 
 HB_FUNC( ORDFOR )
 {
+   HB_THREAD_STUB
    DBORDERINFO pOrderInfo;
 
    if( s_pCurrArea )
@@ -2734,6 +2861,7 @@ HB_FUNC( ORDFOR )
 
 HB_FUNC( ORDKEY )
 {
+   HB_THREAD_STUB
    DBORDERINFO pOrderInfo;
 
    if( s_pCurrArea )
@@ -2768,6 +2896,7 @@ HB_FUNC( ORDKEY )
 #ifdef HB_COMPAT_C53
 HB_FUNC( ORDKEYCOUNT )
 {
+   HB_THREAD_STUB
    DBORDERINFO pOrderInfo;
 
    if( s_pCurrArea )
@@ -2790,6 +2919,7 @@ HB_FUNC( ORDKEYCOUNT )
 
 HB_FUNC( ORDKEYNO )
 {
+   HB_THREAD_STUB
    DBORDERINFO pOrderInfo;
 
    if( s_pCurrArea )
@@ -2811,6 +2941,7 @@ HB_FUNC( ORDKEYNO )
 
 HB_FUNC( ORDKEYVAL )
 {
+   HB_THREAD_STUB
    DBORDERINFO pOrderInfo;
 
    if( s_pCurrArea )
@@ -2827,6 +2958,7 @@ HB_FUNC( ORDKEYVAL )
 
 HB_FUNC( ORDKEYADD )
 {
+   HB_THREAD_STUB
    DBORDERINFO pOrderInfo;
 
    if( s_pCurrArea )
@@ -2845,8 +2977,10 @@ HB_FUNC( ORDKEYADD )
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYADD" );
 }
+
 HB_FUNC( ORDKEYDEL )
 {
+   HB_THREAD_STUB
    DBORDERINFO pOrderInfo;
 
    if( s_pCurrArea )
@@ -2870,6 +3004,7 @@ HB_FUNC( ORDKEYDEL )
 
 HB_FUNC( ORDLISTADD )
 {
+   HB_THREAD_STUB
 
    DBORDERINFO pOrderInfo;
    BOOL bFirst;
@@ -2916,6 +3051,7 @@ HB_FUNC( ORDLISTADD )
 
 HB_FUNC( ORDLISTCLEAR )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       SELF_ORDLSTCLEAR( ( AREAP ) s_pCurrArea->pArea );
    else
@@ -2924,6 +3060,7 @@ HB_FUNC( ORDLISTCLEAR )
 
 HB_FUNC( ORDLISTREBUILD )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       SELF_ORDLSTREBUILD( ( AREAP ) s_pCurrArea->pArea );
    else
@@ -2932,6 +3069,7 @@ HB_FUNC( ORDLISTREBUILD )
 
 HB_FUNC( ORDNAME )
 {
+   HB_THREAD_STUB
    DBORDERINFO pOrderInfo;
 
    if( s_pCurrArea )
@@ -2961,6 +3099,7 @@ HB_FUNC( ORDNAME )
 
 HB_FUNC( ORDNUMBER )
 {
+   HB_THREAD_STUB
    DBORDERINFO pOrderInfo;
 
    if( s_pCurrArea )
@@ -2983,6 +3122,7 @@ HB_FUNC( ORDNUMBER )
 
 HB_FUNC( ORDSETFOCUS )
 {
+   HB_THREAD_STUB
    DBORDERINFO pInfo;
 
    if( s_pCurrArea )
@@ -3003,6 +3143,7 @@ HB_FUNC( ORDSETFOCUS )
 
 HB_FUNC( RDDLIST )
 {
+   HB_THREAD_STUB
    USHORT uiType;
    PHB_ITEM pName;
    LPRDDNODE pRddNode;
@@ -3023,6 +3164,7 @@ HB_FUNC( RDDLIST )
 
 HB_FUNC( RDDNAME )
 {
+   HB_THREAD_STUB
    char * pBuffer;
 
    if( s_pCurrArea )
@@ -3069,6 +3211,7 @@ HB_FUNC( RDDREGISTER )
 /* Same as LASTREC() */
 HB_FUNC( RECCOUNT )
 {
+   HB_THREAD_STUB
    ULONG ulRecCount = 0;
 
    if( s_pCurrArea )
@@ -3078,6 +3221,7 @@ HB_FUNC( RECCOUNT )
 
 HB_FUNC( RECNO )
 {
+   HB_THREAD_STUB
    PHB_ITEM pRecNo;
 
    pRecNo = hb_itemPutNL( NULL, 0 );
@@ -3088,6 +3232,7 @@ HB_FUNC( RECNO )
 
 HB_FUNC( RECSIZE )
 {
+   HB_THREAD_STUB
    PHB_ITEM pRecSize;
 
    if( s_pCurrArea )
@@ -3102,6 +3247,7 @@ HB_FUNC( RECSIZE )
 
 HB_FUNC( RLOCK )
 {
+   HB_THREAD_STUB
    DBLOCKINFO dbLockInfo;
 
    dbLockInfo.fResult = FALSE;
@@ -3119,6 +3265,7 @@ HB_FUNC( RLOCK )
 
 HB_FUNC( SELECT )
 {
+   HB_THREAD_STUB
    char * szAlias;
    ULONG ulLen;
 
@@ -3137,6 +3284,7 @@ HB_FUNC( SELECT )
 
 HB_FUNC( USED )
 {
+   HB_THREAD_STUB
    hb_retl( s_pCurrArea != NULL );
 }
 
@@ -3147,6 +3295,7 @@ HB_FUNC( USED )
 
 HB_FUNC( __RDDSETDEFAULT )
 {
+   HB_THREAD_STUB
    USHORT uiLen;
 
    hb_rddCheck();
@@ -3165,6 +3314,8 @@ HB_FUNC( __RDDSETDEFAULT )
 
 HB_FUNC( RDDSETDEFAULT )
 {
+   HB_THREAD_STUB
+
    USHORT uiLen;
    char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
 
@@ -3192,6 +3343,7 @@ HB_FUNC( RDDSETDEFAULT )
 
 HB_FUNC( DBSETDRIVER )
 {
+   HB_THREAD_STUB
    USHORT uiLen;
    char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1];
 
@@ -3219,6 +3371,7 @@ HB_FUNC( DBSETDRIVER )
 
 HB_FUNC( ORDSCOPE )
 {
+   HB_THREAD_STUB
    PHB_ITEM pScopeValue = hb_itemNew( NULL );
    DBORDSCOPEINFO sInfo;
 
@@ -3254,6 +3407,7 @@ HB_FUNC( ORDSCOPE )
 
 HB_FUNC( DBRELATION )  /* (<nRelation>) --> cLinkExp */
 {
+   HB_THREAD_STUB
    char cExprBuff[ 256 ];  /*TODO: Correct buffer size initialization ??*/
 
    cExprBuff[ 0 ] = 0;
@@ -3265,6 +3419,7 @@ HB_FUNC( DBRELATION )  /* (<nRelation>) --> cLinkExp */
 
 HB_FUNC( DBRSELECT )  /* (<nRelation>) --> nWorkArea */
 {
+   HB_THREAD_STUB
    USHORT uiWorkArea = 0;
    if( s_pCurrArea )
       SELF_RELAREA( ( AREAP ) s_pCurrArea->pArea, hb_parni(1), &uiWorkArea );
@@ -3274,12 +3429,14 @@ HB_FUNC( DBRSELECT )  /* (<nRelation>) --> nWorkArea */
 
 HB_FUNC( DBCLEARRELATION )
 {
+   HB_THREAD_STUB
    if( s_pCurrArea )
       SELF_CLEARREL( ( AREAP ) s_pCurrArea->pArea );
 }
 
 HB_FUNC( DBSETRELATION )
 {
+   HB_THREAD_STUB
    char * szAlias;
    DBRELINFO dbRelations;
    LPAREANODE s_pArea, pAreaNode;
@@ -3310,6 +3467,7 @@ HB_FUNC( DBSETRELATION )
          }
       }
 
+      LOCK_AREA
       pAreaNode = s_pWorkAreas;
       while( pAreaNode )
       {
@@ -3323,6 +3481,7 @@ HB_FUNC( DBSETRELATION )
       if( !s_pArea )
       {
          hb_errRT_BASE( EG_NOALIAS, EDBCMD_NOALIAS, NULL, szAlias, 0 );
+         UNLOCK_AREA
          return;
       }
 
@@ -3333,6 +3492,7 @@ HB_FUNC( DBSETRELATION )
       dbRelations.lpdbriNext = NULL;
 
       SELF_SETREL( ( AREAP ) s_pCurrArea->pArea, &dbRelations );
+      UNLOCK_AREA
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSETRELATION" );
@@ -3341,6 +3501,7 @@ HB_FUNC( DBSETRELATION )
 
 HB_FUNC( __DBARRANGE )
 {
+   HB_THREAD_STUB
    USHORT uiNewArea, uiCount;
    ULONG ulSize;
    char * szFieldLine, * szFieldName, * szPos;
@@ -3472,6 +3633,9 @@ HB_FUNC( __DBARRANGE )
       if( dbSortInfo.lpdbsItem == NULL )
          return;
 
+      /* Locing here to ensure that noone is doing too much
+         harm to our s_pCurrentArea->pArea in the meanwhile */
+      LOCK_AREA
       dbSortInfo.dbtri.lpaSource = ( AREAP ) s_pCurrArea->pArea;
       dbSortInfo.dbtri.lpaDest = NULL;
       pAreaNode = s_pWorkAreas;
@@ -3486,6 +3650,7 @@ HB_FUNC( __DBARRANGE )
       }
 
       SELF_SORT( ( AREAP ) s_pCurrArea->pArea, &dbSortInfo );
+      UNLOCK_AREA
 
       /* Free items */
       if( dbSortInfo.lpdbsItem )
@@ -3498,6 +3663,7 @@ HB_FUNC( __DBARRANGE )
 #ifdef HB_COMPAT_C53
 HB_FUNC( DBINFO )
 {
+   HB_THREAD_STUB
    PHB_ITEM pType, pInfo;
    BOOL bDeleteItem;
 
@@ -3528,6 +3694,7 @@ HB_FUNC( DBINFO )
 
 HB_FUNC( DBORDERINFO )
 {
+   HB_THREAD_STUB
    PHB_ITEM pType;
    BOOL bDeleteItem;
    DBORDERINFO pOrderInfo;
@@ -3569,6 +3736,7 @@ HB_FUNC( DBORDERINFO )
 
 HB_FUNC( DBFIELDINFO )
 {
+   HB_THREAD_STUB
    PHB_ITEM pType, pInfo;
    USHORT uiFields, uiIndex;
    BOOL bDeleteItem;
@@ -3603,6 +3771,7 @@ HB_FUNC( DBFIELDINFO )
 
 HB_FUNC( DBRECORDINFO )
 {
+   HB_THREAD_STUB
    PHB_ITEM pType, pRecNo, pInfo;
    BOOL bDeleteItem;
 
@@ -3634,6 +3803,7 @@ HB_FUNC( DBRECORDINFO )
 
 HB_FUNC( DBFILEGET )
 {
+   HB_THREAD_STUB
    PHB_ITEM pFileName, pMode;
    char szFileName[ _POSIX_PATH_MAX + 1 ];
    USHORT uiFields, uiIndex;
@@ -3664,6 +3834,7 @@ HB_FUNC( DBFILEGET )
 
 HB_FUNC( DBFILEPUT )
 {
+   HB_THREAD_STUB
    PHB_ITEM pFileName;
    char szFileName[ _POSIX_PATH_MAX + 1 ];
    USHORT uiFields, uiIndex;
@@ -3695,6 +3866,7 @@ HB_FUNC( DBFILEPUT )
 /* here we have the NEW Database level functions DBDROP & DBEXISTS */
 HB_FUNC( DBDROP )
 {
+   HB_THREAD_STUB
   LPRDDNODE  pRDDNode;
   USHORT     uiRddID;
   char      *szDriver;
@@ -3719,6 +3891,7 @@ HB_FUNC( DBDROP )
 
 HB_FUNC( DBEXISTS )
 {
+   HB_THREAD_STUB
   LPRDDNODE  pRDDNode;
   USHORT     uiRddID;
   char * szDriver;
@@ -3779,6 +3952,7 @@ static BOOL IsFieldIn( char * fieldName, PHB_ITEM pFields )
 
 static void AddField( PHB_ITEM pFieldArray, PHB_ITEM pItem, PHB_ITEM pData, USHORT uiCount )
 {
+    HB_THREAD_STUB
     hb_arrayNew( pItem, 4 );
     SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_NAME, pData );
     hb_arraySet( pItem, 1, pData );
@@ -3795,6 +3969,7 @@ static void AddField( PHB_ITEM pFieldArray, PHB_ITEM pItem, PHB_ITEM pData, USHO
 */
 static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, PHB_ITEM pFields )
 {
+  HB_THREAD_STUB
   LPAREANODE pAreaNode;
   LPRDDNODE  pRDDNode;
   PHB_ITEM   tableItem, pFileExt;
@@ -3933,6 +4108,7 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
 /* move the Field Data between areas by name */
 static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, BOOL bNameMatch, LPAREANODE s )
 {
+  HB_THREAD_STUB
   USHORT   i, f=1;
   PHB_ITEM fieldValue;
 
@@ -3963,6 +4139,7 @@ static ERRCODE rddMoveRecords( char *cAreaFrom, char *cAreaTo, PHB_ITEM pFields,
                                PHB_ITEM pFor, PHB_ITEM pWhile, LONG lNext,
                                ULONG lRec, BOOL bRest, char *cDriver )
 {
+  HB_THREAD_STUB
   char     * szDriver;
   LONG       toGo=lNext;
   BOOL       bFor, bWhile;
@@ -4111,6 +4288,7 @@ HB_FUNC( __DBCOPY )
 }
 HB_FUNC( DBUSEAREAD )
 {
+   HB_THREAD_STUB
    char * szDriver, * szFileName;
    USHORT uiLen;
    DBOPENINFO pInfo;
@@ -4230,6 +4408,7 @@ ERRCODE hb_rddGetTempAlias( char * szAliasTmp )
 
 HB_FUNC( __RDDGETTEMPALIAS )
 {
+   HB_THREAD_STUB
    char szAliasTmp[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
 
    hb_rddGetTempAlias( szAliasTmp );
@@ -4238,6 +4417,8 @@ HB_FUNC( __RDDGETTEMPALIAS )
 
 HB_FUNC( DBSKIPPER )
 {
+   HB_THREAD_STUB
+
    if( s_pCurrArea )
    {  long  nSkipped   = 0;
       long  nRecs      = 1;

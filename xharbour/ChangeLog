@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1312 2003/07/31 18:56:10 druzus Exp $
+ * $Id: ChangeLog,v 1.1313 2003/08/01 02:58:10 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-01 13:41 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hblog.prg
+    ! Fixed Missing some parameters from LOG() method declaration in
+      class HB_Logger
+
+  * include/thread.h
+  * source/rdd/dbcmd.c
+  * source/vm/thread.c
+    ! threadsafed RDD system (except for sensible error messages
+      on imporper operations under MT).
+
+  * tests/mtstress.prg
+    + Check for (minimal) coherency of database access under MT
 
 2003-07-31 19:57 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbsetup.h

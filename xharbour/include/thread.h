@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.54 2003/07/23 12:35:57 druzus Exp $
+* $Id: thread.h,v 1.55 2003/07/27 14:59:01 jonnymind Exp $
 */
 
 /*
@@ -288,6 +288,16 @@ typedef struct
 /* Forward declarations for stack */
 struct HB_ERROR_INFO_;
 
+/* Declaration from dbfcmd.c in rdd */
+typedef struct _AREANODE
+{
+   void * pArea;               /* WorkAreas with different sizes */
+   struct _AREANODE * pPrev;   /* Prev WorkArea in the list */
+   struct _AREANODE * pNext;   /* Next WorkArea in the list */
+} AREANODE;
+
+typedef AREANODE * LPAREANODE;
+
 typedef struct tag_HB_STACK
 {
    PHB_ITEM * pItems;       /* pointer to the stack items */
@@ -367,6 +377,10 @@ typedef struct tag_HB_STACK
    HB_HANDLE *hMemvars;
    ULONG hMemvarsAllocated;
    ULONG hMemvarsLastFree;
+
+   /* Data useful for dbcmd & friends */
+   USHORT uiCurrArea;        /* Selectd area */
+   LPAREANODE pCurrArea;  /* Pointer to a selected and valid area */
 
    struct tag_HB_STACK *next;
 
