@@ -43,6 +43,8 @@ GLOBAL EXTERNAL oApp
    METHOD Add()
    METHOD OnCreate()         INLINE ::CreateSub()
    METHOD OnSize()
+   METHOD OnMove()           INLINE ::Parent:ObjInsp:SetBrowserData( self ),NIL
+
    METHOD OnPaint( hDC )     INLINE ::TileGrid(hDC)
    METHOD TileGrid(hDC)
    METHOD OnMenuCommand(oItem)
