@@ -1,5 +1,5 @@
 /*
- * $Id: hbc7.c,v 1.5 2004/04/05 10:03:19 andijahja Exp $
+ * $Id: hbc7.c,v 1.6 2005/02/19 10:08:39 andijahja Exp $
  */
 
 /*
@@ -336,7 +336,8 @@ static ULONG str2qp7(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 
 static ULONG ue72str(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 {
-   ULONG i,j,dstlen=0;
+   ULONG i,dstlen=0;
+   UINT j;
 
    for (i=0;i<srclen;i++)
    {
@@ -405,7 +406,8 @@ static ULONG ue72str(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 
 static ULONG qp72str(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 {
-   ULONG i,j,dstlen=0;
+   ULONG i,dstlen=0;
+   UINT j;
 
    for (i=0;i<srclen;i++)
    {

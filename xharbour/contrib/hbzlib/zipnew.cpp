@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.21 2004/05/18 16:21:28 srobert Exp $
+ * $Id: zipnew.cpp,v 1.22 2004/07/27 02:29:08 lculik Exp $
  */
 
 /*
@@ -136,7 +136,7 @@ int hb_CmpPkSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
       }
    }
 
-   catch ( CZipException &e )
+   catch ( CZipException )
    {
       bReturn = FALSE;
    }
@@ -204,7 +204,7 @@ int hb_CmpPkSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
       szZip.Close( );
    }
 
-   catch ( CZipException&  e )
+   catch ( CZipException )
    {
       bReturn = FALSE;
    }
@@ -453,7 +453,7 @@ BOOL hb_IsPassWord( char *szFile )
             bReturn = FALSE;
       }
    }
-   catch ( CZipException& e )   {}
+   catch ( CZipException )   {}
 
    if ( bReturn )
    {
@@ -535,7 +535,7 @@ int hb_DeleteSel( char *szFile, PHB_ITEM pArray, BOOL bCase )
       }
    }
 
-   catch ( CZipException &e )    {}
+   catch ( CZipException )    {}
 
    if ( iReturn )
    {
@@ -597,7 +597,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       }
    }
 
-   catch ( CZipException&  e )    {}
+   catch ( CZipException )    {}
 
    if ( iReturn )
    {
@@ -677,7 +677,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
                }
             }
 
-            catch ( CZipException&  e )   {}
+            catch ( CZipException )   {}
 
             if ( bChange )
             {
@@ -759,7 +759,7 @@ const char * hb_GetZipComment( char *szFile )
       }
    }
 
-   catch ( CZipException&  e )  {}
+   catch ( CZipException )  {}
 
    if ( iReturn )
    {
@@ -816,7 +816,7 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
       }
    }
 
-   catch ( CZipException &e )  {}
+   catch ( CZipException )  {}
 
    if ( iReturn )
    {
@@ -861,7 +861,7 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
                }
             }
 
-            catch ( CZipException&  e )   {}
+            catch ( CZipException )   {}
          }
       }
    }
@@ -896,7 +896,7 @@ BOOL hb_TransferFilesFromzip( char *szSource, char *szDest, PHB_ITEM pArray )
       }
    }
 
-   catch ( CZipException &e ) { }
+   catch ( CZipException ) { }
 
    try
    {
@@ -913,7 +913,7 @@ BOOL hb_TransferFilesFromzip( char *szSource, char *szDest, PHB_ITEM pArray )
       }
    }
 
-   catch ( CZipException &e ) { }
+   catch ( CZipException ) { }
 
    if ( bReturn && bReturn1 )
    {
@@ -1029,7 +1029,7 @@ BOOL bChange=FALSE;
                   }
              }
     }
-    catch (CZipException& e)    {
+    catch (CZipException &e)    {
       iCause=e.m_iCause       ;
 	}
 
@@ -1050,7 +1050,7 @@ BOOL bChange=FALSE;
          szZip.SetRootPath(szPath);
       }
 
-    for (uiCount=0;uiCount<(int)szZip.GetCount();uiCount++){
+    for (uiCount=0;uiCount<(uLong)szZip.GetCount();uiCount++){
 		CZipFileHeader fh;
             const char *  szFileNameInZip;
             CZipString szTempString;
@@ -1086,7 +1086,7 @@ BOOL bChange=FALSE;
         try {
                      if (!HB_IS_BLOCK(pProgress))
                      {
-         
+
             szZip.SetPassword(szPassWord);
             szZip.ExtractFile( ( WORD )uiCount, ( LPCTSTR )szPath, bWithPath, NULL, 65536 );
             }
@@ -1098,7 +1098,7 @@ BOOL bChange=FALSE;
             }
             
         }
-    catch (CZipException& e)
+    catch (CZipException &e)
 	{
       iCause=e.m_iCause       ;
 	}

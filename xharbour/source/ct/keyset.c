@@ -1,5 +1,5 @@
 /*
- * $Id: keyset.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: keyset.c,v 1.2 2004/11/21 21:43:47 druzus Exp $
  */
 
 /*
@@ -71,50 +71,29 @@
 
 static void SetGet( char cKey );
 
-
-
 HB_FUNC (KSETINS)
 {
-
-char cKey = 0x80;
-
+   char cKey = 0x80;
    SetGet( cKey );
-
 }
-
-
 
 HB_FUNC (KSETCAPS)
 {
-
-char cKey = 0x40;
-
+   char cKey = 0x40;
    SetGet( cKey );
-
 }
-
-
 
 HB_FUNC (KSETNUM)
 {
-
-char cKey = 0x20;
-
+   char cKey = 0x20;
    SetGet( cKey );
-
 }
-
-
 
 HB_FUNC (KSETSCROLL)
 {
-
-char cKey = 0x10;
-
+   char cKey = 0x10;
    SetGet( cKey );
-
 }
-
 
 static void SetGet( char cKey )
 {
@@ -155,3 +134,62 @@ static void SetGet( char cKey )
 }
 
 #endif /* #if defined (HB_OS_DOS) */
+
+#if defined (HB_OS_WIN_32)
+/*
+ The following function ONLY works with GTWVT/GTWVW/GTALLEG.
+ They will NOT WORK on pure CONSOLE mode
+*/
+#include "hbapi.h"
+#include <windows.h>
+
+#define HB_VK_INSERT         0x2D
+#define HB_VK_CAPITAL        0x14
+#define HB_VK_NUMLOCK        0x90
+#define HB_VK_SCROLL         0x91
+
+static BOOL hb_SetKeyBoardState( USHORT uKey, BOOL bOn )
+{
+   BYTE kbBuffer[ 256 ];
+
+   GetKeyboardState( kbBuffer );
+
+   if( kbBuffer[ uKey ] & 0x01 )
+   {
+      if( !bOn)
+      {
+         kbBuffer[ uKey ] = 0;
+      }
+   }
+   else
+   {
+      if( bOn)
+      {
+         kbBuffer[ uKey ] = 1;
+      }
+   }
+
+   SetKeyboardState( kbBuffer );
+}
+
+HB_FUNC (KSETINS)
+{
+   hb_retl(hb_SetKeyBoardState( HB_VK_INSERT , hb_parl(1) ));
+}
+
+HB_FUNC (KSETCAPS)
+{
+   hb_retl(hb_SetKeyBoardState( HB_VK_CAPITAL, hb_parl(1) ));
+}
+
+HB_FUNC (KSETNUM)
+{
+   hb_retl(hb_SetKeyBoardState( HB_VK_NUMLOCK, hb_parl(1) ));
+}
+
+HB_FUNC (KSETSCROLL)
+{
+   hb_retl(hb_SetKeyBoardState( HB_VK_SCROLL , hb_parl(1) ));
+}
+
+#endif /* #if defined (HB_OS_WIN_32) */

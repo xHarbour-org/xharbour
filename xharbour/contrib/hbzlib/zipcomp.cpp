@@ -1,5 +1,5 @@
 /*
- * $Id: zipcomp.cpp,v 1.15 2004/03/29 14:36:20 srobert Exp $
+ * $Id: zipcomp.cpp,v 1.16 2004/03/30 20:00:55 srobert Exp $
  */
 
 /*
@@ -132,7 +132,7 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
       }
    }
 
-   catch ( CZipException &e )
+   catch ( CZipException )
    {
       bReturn = FALSE;
    }
@@ -214,7 +214,7 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
       szZip.Close(  );
    }
 
-   catch ( CZipException &e )
+   catch ( CZipException )
    {
       bReturn = FALSE;
    }
@@ -260,7 +260,7 @@ int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
       }
    }
 
-   catch ( CZipException &e )
+   catch ( CZipException )
    {
       bReturn = FALSE;
    }
@@ -333,7 +333,7 @@ int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
       szZip.Close();
    }
 
-   catch ( CZipException &e )
+   catch ( CZipException )
    {
       bReturn = FALSE;
    }
@@ -386,7 +386,7 @@ int hb_CompressFileStd( char *szFile, char *szFiletoCompress, int iCompLevel, PH
       }
    }
 
-   catch ( CZipException &e )
+   catch ( CZipException )
    {
       bReturn = FALSE;
    }
@@ -471,7 +471,7 @@ int hb_CompressFileStd( char *szFile, char *szFiletoCompress, int iCompLevel, PH
       szZip.Close(  );
    }
 
-   catch ( CZipException &e )
+   catch ( CZipException )
    {
       bReturn = FALSE;
    }
@@ -512,7 +512,7 @@ int hb_CmpTdSpanStd( char *szFile, char * szFiletoCompress, int iCompLevel, PHB_
       }
    }
 
-   catch ( CZipException &e )
+   catch ( CZipException )
    {
       bReturn = FALSE;
    }
@@ -599,7 +599,7 @@ int hb_CmpTdSpanStd( char *szFile, char * szFiletoCompress, int iCompLevel, PHB_
       szZip.Close(  );
    }
 
-   catch ( CZipException &e )
+   catch ( CZipException )
    {
       bReturn = FALSE;
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcx.c,v 1.7 2005/02/19 10:08:40 andijahja Exp $
+ * $Id: hbcx.c,v 1.8 2005/03/17 08:41:52 andijahja Exp $
  */
 
 /*
@@ -116,7 +116,7 @@ HB_FUNC( XXDECODE_FILE )
       {
          if ( strlen( pinFile->item.asString.value ) == 0 )
          {
-            hb_retni( 0 );
+            hb_retni( -1 );
             return;
          }
          else
@@ -137,19 +137,19 @@ HB_FUNC( XXDECODE_FILE )
          if ( uiLen <= 0 )
          {
             hb_itemClear( &Struct );
-            hb_retni( 0 );
+            hb_retni( -2 );
             return;
          }
       }
       else
       {
-         hb_retni( 0 );
+         hb_retni( -3 );
          return;
       }
    }
    else
    {
-      hb_retni( 0 );
+      hb_retni( -4 );
       return;
    }
 
@@ -158,7 +158,7 @@ HB_FUNC( XXDECODE_FILE )
       if ( strlen(poutFile->item.asString.value) == 0 )
       {
          hb_itemClear( &Struct );
-         hb_retni(0);
+         hb_retni( -5 );
          return;
       }
    }
@@ -173,7 +173,7 @@ HB_FUNC( XXDECODE_FILE )
       {
          hb_itemClear( &Struct );
          hb_xfree( string );
-         hb_retni( 0 );
+         hb_retni( -6 );
          return;
       }
 
@@ -182,7 +182,7 @@ HB_FUNC( XXDECODE_FILE )
          hb_itemClear( &Struct );
          hb_xfree( szFileName );
          hb_xfree( string );
-         hb_retni( 0 );
+         hb_retni( -7 );
          return;
       }
 
@@ -193,7 +193,7 @@ HB_FUNC( XXDECODE_FILE )
          hb_itemClear( &Struct );
          hb_xfree( szFileName );
          hb_xfree( string );
-         hb_retni( 0 );
+         hb_retni( -8 );
          return;
       }
 

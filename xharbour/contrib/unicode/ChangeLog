@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.13 2004/02/07 18:49:48 andijahja Exp $
+ * $Id: ChangeLog,v 1.14 2004/02/24 14:15:39 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,43 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-03-19 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcy.c
+  * contrib/unicode/hbcx.c
+    ! modify return value of decoding functions for easy debugging upon error
+
+  * contrib/unicode/hbc7.c
+  * contrib/unicode/hbencode.c
+    ! kill warnings under MinGW32
+
+  * tests/xhbenc.prg
+    ! minor enhancements
+
+2005-03-17 15:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/hbcomprs.c
+  * contrib/unicode/hbencode.c
+  * contrib/unicode/hbcx.c
+    ! code changes in retrieving numeric params
+
+2005-03-06 14:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * contrib\unicode\makefile.vc
+
+2005-02-19 17:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbcy.c
+    ! fix warnings on uninitialized variables
+
+  * contrib/unicode/hbc7.c
+    * rename isdigit() -> hbcc_isdigit() to avoid name conflict
+
+2004-04-05 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/unicode/hbc7.c
+    ! fix inconsistent linkage : str2ue7()
+
 2004-02-24 21:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * contrib/unicode/hbcc.prg
   * contrib/unicode/hbcrpt128.c

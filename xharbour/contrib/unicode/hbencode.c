@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.6 2004/02/07 18:49:48 andijahja Exp $
+ * $Id: hbencode.c,v 1.7 2005/03/17 08:41:52 andijahja Exp $
  */
 
 /*
@@ -226,7 +226,7 @@ static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int 
 
    if (part==0)  // SinglePart message
    {
-      fprintf(fDes,"=ybegin line=%ld size=%ld name=%s\r\n",linelength,filelen,postname);
+      fprintf(fDes,"=ybegin line=%ld size=%ld name=%s\r\n",(ULONG)linelength,filelen,postname);
    }
    else          // Multipart message
    {
@@ -241,7 +241,7 @@ static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int 
          pend=pend+filelen;
       }
 
-      fprintf(fDes,"=ybegin part=%d line=%ld size=%ld name=%s\r\n",part,linelength,fulllen,postname);
+      fprintf(fDes,"=ybegin part=%d line=%ld size=%ld name=%s\r\n",part,(ULONG)linelength,fulllen,postname);
       fprintf(fDes,"=ypart begin=%ld end=%ld\r\n",pbegin,pend);
    }
 
@@ -316,12 +316,12 @@ static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int 
 
    if (part==0)   // Single part message
    {
-      fprintf(fDes,"=yend size=%ld crc32=%08lx \r\n",filelen,crc_val ^ 0xFFFFFFFF);
+      fprintf(fDes,"=yend size=%ld crc32=%08lx \r\n",filelen,(ULONG)crc_val ^ 0xFFFFFFFF);
    }
    else           // Multipart message
    {
       // This does not yet support the full crc32 for the entire file
-      fprintf(fDes,"=yend size=%ld part=%d pcrc32=%08lx \r\n",filelen,part,crc_val ^ 0xFFFFFFFF);
+      fprintf(fDes,"=yend size=%ld part=%d pcrc32=%08lx \r\n",filelen,(USHORT)part,(ULONG)crc_val ^ 0xFFFFFFFF);
    }
 
    return(0);
@@ -1005,7 +1005,7 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
       if (( ulLineLength > 0 ) &&
           ( ulLineLength <= 255 ))
       {
-         YYELineLength = ulLineLength;
+         YYELineLength = (USHORT) ulLineLength;
       }
       else if ( ulLineLength > 255 )
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.10 2004/03/02 12:58:14 andijahja Exp $
+ * $Id: hbcc.prg,v 1.11 2005/02/19 10:08:40 andijahja Exp $
  */
 
 /*
@@ -1478,7 +1478,7 @@ HB_FUNC( B64DECODE_FILE )
       {
          if ( strlen( pinFile->item.asString.value ) == 0 )
          {
-            hb_retni( 0 );
+            hb_retni( -1 );
             return;
          }
          else
@@ -1499,20 +1499,20 @@ HB_FUNC( B64DECODE_FILE )
          if ( uiLen <= 0 )
          {
             hb_itemClear( &Struct );
-            hb_retni( 0 );
+            hb_retni( -2 );
             return;
          }
       }
       else
       {
          hb_itemClear( &Struct );
-         hb_retni( 0 );
+         hb_retni( -3 );
          return;
       }
    }
    else
    {
-      hb_retni( 0 );
+      hb_retni( -4 );
       return;
    }
 
@@ -1521,7 +1521,7 @@ HB_FUNC( B64DECODE_FILE )
       if ( strlen(poutFile->item.asString.value) == 0 )
       {
          hb_itemClear( &Struct );
-         hb_retni(0);
+         hb_retni( -5 );
          return;
       }
    }
@@ -1536,7 +1536,7 @@ HB_FUNC( B64DECODE_FILE )
       {
          hb_itemClear( &Struct );
          hb_xfree( string );
-         hb_retni( 0 );
+         hb_retni( -6 );
          return;
       }
 
@@ -1545,7 +1545,7 @@ HB_FUNC( B64DECODE_FILE )
          hb_itemClear( &Struct );
          hb_xfree( szFileName );
          hb_xfree( string );
-         hb_retni( 0 );
+         hb_retni( -7 );
          return;
       }
 
@@ -1556,7 +1556,7 @@ HB_FUNC( B64DECODE_FILE )
          hb_itemClear( &Struct );
          hb_xfree( szFileName );
          hb_xfree( string );
-         hb_retni( 0 );
+         hb_retni( -8 );
          return;
       }
 
@@ -1619,7 +1619,7 @@ HB_FUNC( B64DECODE_FILE )
          {
             hb_xfree( szFileName );
          }
-         hb_retni( 0 );
+         hb_retni( -9 );
          return;
       }
 

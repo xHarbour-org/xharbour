@@ -1,5 +1,5 @@
 /*
- * $Id: rt_hvm.prg,v 1.10 2001/05/15 13:02:07 vszakats Exp $
+ * $Id: rt_hvm.prg,v 1.1.1.1 2001/12/21 10:44:42 ronpinkas Exp $
  */
 
 /*
@@ -418,6 +418,7 @@ FUNCTION Main_HVM()
    TEST_LINE( ""               == "Hello"     , .F.                                               )
    TEST_LINE( "J"              == ""          , .F.                                               )
    TEST_LINE( ""               == ""          , .T.                                               )
+   TEST_LINE( 2                == 2.000       , .T.                                               )
 
    TEST_LINE( scString  = scString            , .T.                                               )
    TEST_LINE( scString  = scStringE           , .T.                                               )

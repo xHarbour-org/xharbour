@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3961 2005/03/18 16:38:45 maurifull Exp $
+ * $Id: ChangeLog,v 1.3962 2005/03/18 21:03:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,37 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-03-19 05:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * utils/hbtest/rt_hvm.prg
+    + added test for 2 == 2.000 to test Przemek's hack on XCC
+
+  * source/common/hbstr.c
+    ! POCC's math problem to follow XCC
+
+  * source/ct/keyset.c
+    + KSETINS( lToggle )
+    + KSETCAPS( lToggle )
+    + KSETNUM( lToggle )
+    + KSETSCROLL( lToggle )
+      These are Windows version, work __ONLY__ with GTWVT/GTWVW/GTALLEG.
+      Parameter: lToggle, logical, .T. to switch on, .F. to switch off.
+
+  * contrib/hbzlib/zipcomp.cpp
+  * contrib/hbzlib/zipnew.cpp
+    ! remove unused variables
+
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcy.c
+  * contrib/unicode/hbcx.c
+    ! modify return value of decoding functions for easy debugging upon error
+
+  * contrib/unicode/hbc7.c
+  * contrib/unicode/hbencode.c
+    ! kill warnings under MinGW32
+
+  * tests/xhbenc.prg
+    ! minor enhancements
 
 2005-03-18 13:03 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
   * source/pp/ppcore.c

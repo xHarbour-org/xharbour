@@ -1,6 +1,6 @@
 **************************************************
 * xhbenc.prg
-* $Id: xhbenc.prg,v 1.4 2004/02/07 18:51:07 andijahja Exp $
+* $Id: xhbenc.prg,v 1.5 2005/03/17 04:56:31 andijahja Exp $
 * Test program for file encoding and decoding
 * UUEncode, Base64, YYEncode and XXEncode
 *
@@ -14,14 +14,15 @@
 #include "inkey.ch"
 
 static aOkey := { " Continue " , " Quit " }
+static cScr
 
 PROCEDURE MAIN()
 
-   LOCAL cScr := savescreen(0,0,maxrow(),maxcol())
    LOCAL nError
    LOCAL nFault := 0
-   LOCAL aOkey := { " Okay " }
    LOCAL nStart
+
+   cScr := savescreen(0,0,maxrow(),maxcol())
 
    BEGIN SEQUENCE
 
@@ -32,13 +33,15 @@ PROCEDURE MAIN()
       __CopyFile( "..\utils\xbscript\xbscript.prg", "pp.prg" )
    ENDIF
 
-   IF Alert( "xHarbour File Encoding Tests",{" Continue "," Quit "},"N/W*" ) == 2
-      restscreen(0,0,maxrow(),maxcol(),cScr)
-      BREAK
+   IF Alert( "xHarbour File Encoding Tests", aOkey, "N/W*" ) == 2
+      _QuitMe()
    ENDIF
 
    CLEAR SCREEN
-   Alert( 'Will UUEncode pp.prg to ~pp.uue.;Syntax: UUENCODE_FILE( "pp.prg", "~pp.uue" )',aOkey,"N/GR*" )
+   IF Alert( 'Will UUEncode pp.prg to ~pp.uue.;Syntax: UUENCODE_FILE( "pp.prg", "~pp.uue" )',aOkey,"N/GR*" ) == 2
+      _QuitMe()
+   ENDIF
+
    nStart := seconds()
    IF ( nError := UUENCODE_FILE( "pp.prg", "~pp.uue" ) ) == 0 .AND. File( "~pp.uue" )
       ShowResult( "~pp.uue", "UUE", nStart )
@@ -47,7 +50,9 @@ PROCEDURE MAIN()
    ENDIF
 
    CLEAR SCREEN
-   Alert( 'Now will Base64_Encode pp.prg to ~pp.b64.;Syntax: B64ENCODE_FILE( "pp.prg", "~pp.b64" )',aOkey, "N/BG*" )
+   IF Alert( 'Now will Base64_Encode pp.prg to ~pp.b64.;Syntax: B64ENCODE_FILE( "pp.prg", "~pp.b64" )',aOkey, "N/BG*" ) == 2
+      _QuitMe()
+   ENDIF
 
    nStart := seconds()
    IF ( nError := B64ENCODE_FILE( "pp.prg", "~pp.b64" ) ) == 0 .AND. File( "~pp.b64" )
@@ -57,7 +62,9 @@ PROCEDURE MAIN()
    ENDIF
 
    CLEAR SCREEN
-   Alert( 'Will YYEncode pp.prg to ~pp.yye.;Syntax: YYENCODE_FILE( "pp.prg", "~pp.yye" )',aOkey,"N/GR*" )
+   IF Alert( 'Will YYEncode pp.prg to ~pp.yye.;Syntax: YYENCODE_FILE( "pp.prg", "~pp.yye" )',aOkey,"N/GR*" ) == 2
+      _QuitMe()
+   ENDIF
 
    nStart := seconds()
    IF ( nError := YYENCODE_FILE( "pp.prg", "~pp.yye" ) ) == 0 .AND. File( "~pp.yye" )
@@ -67,7 +74,9 @@ PROCEDURE MAIN()
    ENDIF
 
    CLEAR SCREEN
-   Alert( 'Will XXEncode pp.prg to ~pp.xxe.;Syntax: XXENCODE_FILE( "pp.prg", "~pp.xxe" )',aOkey,"W+/BG" )
+   IF Alert( 'Will XXEncode pp.prg to ~pp.xxe.;Syntax: XXENCODE_FILE( "pp.prg", "~pp.xxe" )',aOkey,"W+/BG" ) == 2
+      _QuitMe()
+   ENDIF
 
    nStart := seconds()
    IF ( nError := XXENCODE_FILE( "pp.prg", "~pp.xxe" ) ) == 0 .AND. File( "~pp.xxe" )
@@ -77,7 +86,9 @@ PROCEDURE MAIN()
    ENDIF
 
    CLEAR SCREEN
-   ALert( 'Now Will UUEncode pp.prg to ~pp*.uue;with 2000 lines per chunk.;Syntax: UUENCODE_FILE_BY_CHUNK( "pp.prg", 2000, "~pp" )',aOkey, "W+/B" )
+   IF ALert( 'Now Will UUEncode pp.prg to ~pp*.uue;with 2000 lines per chunk.;Syntax: UUENCODE_FILE_BY_CHUNK( "pp.prg", 2000, "~pp" )',aOkey, "W+/B" ) == 2
+      _QuitMe()
+   ENDIF
 
    nStart := seconds()
    IF ( nError := UUENCODE_FILE_BY_CHUNK( "pp.prg", 2000, "~pp" ) ) == 0
@@ -87,7 +98,9 @@ PROCEDURE MAIN()
    ENDIF
 
    CLEAR SCREEN
-   Alert( 'Now Will Base64_Encode pp.prg to ~pp*.b64;with 2000 lines per chunk.;Syntax: B64ENCODE_FILE_BY_CHUNK( "pp.prg", 2000, "~pp" )',aOkey,"W+/G")
+   IF Alert( 'Now Will Base64_Encode pp.prg to ~pp*.b64;with 2000 lines per chunk.;Syntax: B64ENCODE_FILE_BY_CHUNK( "pp.prg", 2000, "~pp" )',aOkey,"W+/G") == 2
+      _QuitMe()
+   ENDIF
 
    nStart := seconds()
    IF ( nError := B64ENCODE_FILE_BY_CHUNK( "pp.prg", 2000, "~pp" ) ) == 0
@@ -97,7 +110,9 @@ PROCEDURE MAIN()
    ENDIF
 
    CLEAR SCREEN
-   Alert( 'Now Will YYEncode pp.prg to ~pp*.yye;with 1000 lines per chunk.;Syntax: YYENCODE_FILE_BY_CHUNK( "pp.prg", 1000, "~pp" )',aOkey,"W+/N")
+   IF Alert( 'Now Will YYEncode pp.prg to ~pp*.yye;with 1000 lines per chunk.;Syntax: YYENCODE_FILE_BY_CHUNK( "pp.prg", 1000, "~pp" )',aOkey,"W+/N") == 2
+      _QuitMe()
+   ENDIF
 
    nStart := seconds()
    IF ( nError := YYENCODE_FILE_BY_CHUNK( "pp.prg", 1000, "~pp" ) ) == 0
@@ -107,7 +122,9 @@ PROCEDURE MAIN()
    ENDIF
 
    CLEAR SCREEN
-   Alert( 'Now Will XXEncode pp.prg to ~pp*.xxe;with 2000 lines per chunk.;Syntax: XXENCODE_FILE_BY_CHUNK( "pp.prg", 2000, "~pp" )',aOkey,"N/BG*")
+   IF Alert( 'Now Will XXEncode pp.prg to ~pp*.xxe;with 2000 lines per chunk.;Syntax: XXENCODE_FILE_BY_CHUNK( "pp.prg", 2000, "~pp" )',aOkey,"N/BG*") == 2
+      _QuitMe()
+   ENDIF
 
    nStart := seconds()
    IF ( nError := XXENCODE_FILE_BY_CHUNK( "pp.prg", 2000, "~pp" ) ) == 0
@@ -117,7 +134,7 @@ PROCEDURE MAIN()
    ENDIF
 
    CLEAR SCREEN
-   Alert( "File Encoding Tests Completed" + if(nFault>0,". Error encountered : " + ltrim(str(nFault)),". All tests succesfull!"),aOkey,"N/W*" )
+   Alert( "File Encoding Tests Completed" + if(nFault>0,". Error encountered : " + ltrim(str(nFault)),". All tests succesfull!"), { " Bye "},"N/W*" )
 
    END SEQUENCE
 
@@ -132,6 +149,7 @@ STATIC PROCEDURE ShowResult( cFileMask, cEncoding, nStart )
    LOCAL nDecoded := 0
    LOCAL cSyntax
    LOCAL aDecodedFiles := {}
+   LOCAL iChoice
 
    IF !Empty( aFiles := Directory( cFileMask ) )
       Alert( "Conversion succesful !;Done in " + ltrim(str(seconds()-nStart)) + " seconds", { " Okay " }, "N/W*" )
@@ -147,25 +165,33 @@ STATIC PROCEDURE ShowResult( cFileMask, cEncoding, nStart )
       DO CASE
       CASE cEncoding == "UUE"
          cSyntax  := 'UUDECODE_FILE( aDecodedFiles, "result.txt" )'
-         Alert( "Now will decode the encoded files to 'result.txt';Syntax : " + cSyntax , { " Okay " }, "gr+/b" )
+         IF Alert( "Now will decode the encoded files to 'result.txt';Syntax : " + cSyntax , aOkey, "gr+/b" ) == 2
+            _QuitMe()
+         ENDIF
          ? "Decoding in progress ......"
          nStart := seconds()
          nDecoded := UUDECODE_FILE( aDecodedFiles, "result.txt" )
       CASE cEncoding == "B64"
          cSyntax  := 'B64DECODE_FILE( aDecodedFiles, "result.txt" )'
-         Alert( "Now will decode the encoded files to 'result.txt';Syntax : " + cSyntax , { " Okay " }, "gr+/b" )
+         IF Alert( "Now will decode the encoded files to 'result.txt';Syntax : " + cSyntax , aOkey, "gr+/b" ) == 2
+            _QuitMe()
+         ENDIF
          ? "Decoding in progress ......"
          nStart := seconds()
          nDecoded := B64DECODE_FILE( aDecodedFiles, "result.txt" )
       CASE cEncoding == "YYE"
          cSyntax  := 'YYDECODE_FILE( aDecodedFiles, "result.txt" )'
-         Alert( "Now will decode the encoded files to 'result.txt';Syntax : " + cSyntax , { " Okay " }, "gr+/b" )
+         IF Alert( "Now will decode the encoded files to 'result.txt';Syntax : " + cSyntax , aOkey, "gr+/b" ) == 2
+            _QuitMe()
+         ENDIF
          ? "Decoding in progress ......"
          nStart := seconds()
          nDecoded := YYDECODE_FILE( aDecodedFiles, "result.txt" )
       CASE cEncoding == "XXE"
          cSyntax  := 'XXDECODE_FILE( aDecodedFiles, "result.txt" )'
-         Alert( "Now will decode the encoded files to 'result.txt';Syntax : " + cSyntax , { " Okay " }, "gr+/b" )
+         IF Alert( "Now will decode the encoded files to 'result.txt';Syntax : " + cSyntax , aOkey, "gr+/b" ) == 2
+            _QuitMe()
+         ENDIF
          ? "Decoding in progress ......"
          nStart := seconds()
          nDecoded := XXDECODE_FILE( aDecodedFiles, "result.txt" )
@@ -174,12 +200,16 @@ STATIC PROCEDURE ShowResult( cFileMask, cEncoding, nStart )
       CLEAR SCREEN
 
       IF nDecoded > 0
-         Alert( "Decoding successful;Bytes written = " + ltrim(str(nDecoded)+"; Done in " + ltrim(str(seconds()-nStart))+ " seconds"),{" View "},"N/W*" )
-         IF !Empty( aDecodedFiles := Directory( "result.txt" ) )
-            FOR EACH aItem IN aDecodedFiles
-               View( aItem )
-            NEXT
-         ENDIF
+         iChoice := Alert( "Decoding successful;Bytes written = " + ltrim(str(nDecoded)+"; Done in " + ltrim(str(seconds()-nStart))+ " seconds"),{" View ", " Skip "," Quit "},"N/W*" )
+	 IF iChoice == 1
+            IF !Empty( aDecodedFiles := Directory( "result.txt" ) )
+               FOR EACH aItem IN aDecodedFiles
+                  View( aItem )
+               NEXT
+	    ENDIF
+	 ELSEIF iChoice == 3
+	    _QuitMe()
+	 ENDIF
       ELSE
          Alert( "Error in file decoding ...", { " Booo ..."})
       ENDIF
@@ -217,3 +247,8 @@ STATIC PROCEDURE View( aFile )
    ENDDO
 
    RETURN
+
+//----------------------------------------------------------------------------//
+STATIC PROCEDURE _QuitMe()
+   restscreen(0,0,maxrow(),maxcol(),cScr)
+   BREAK

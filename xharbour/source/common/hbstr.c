@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.12 2004/12/28 06:39:19 druzus Exp $
+ * $Id: hbstr.c,v 1.13 2005/03/16 16:01:35 druzus Exp $
  */
 
 /*
@@ -379,7 +379,7 @@ double HB_EXPORT hb_numRound( double dNum, int iDec )
 
    modf( doComplete5, &doComplete5i );
 
-#if defined( __XCC__ )
+#if defined( __XCC__ ) || defined( __POCC__ )
    if ( iDec < 16 )
    {
       if ( iDec >= 0 )
@@ -528,7 +528,7 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
    }
    if ( iDec )
    {
-#if defined( __XCC__ )
+#if defined( __XCC__ ) || defined( __POCC__ )
       if ( iDec < 16 )
          *dVal /= ( LONGLONG ) hb_numPow10( iDec );
       else
