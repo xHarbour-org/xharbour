@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.9 2003/12/04 09:26:55 druzus Exp $
+ * $Id: gtdos.c,v 1.10 2003/12/28 22:25:34 druzus Exp $
  */
 
 /*
@@ -216,7 +216,7 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
    HB_SYMBOL_UNUSED( iFilenoStdout );
    HB_SYMBOL_UNUSED( iFilenoStderr );
    */
-   
+
    /* stdin && stdout && stderr */
    s_iStdIn  = iFilenoStdin;
    s_iStdOut = iFilenoStdout;
@@ -1087,7 +1087,7 @@ void hb_gt_DispBegin( void )
 
       scrnPtr = ( char * ) hb_xgrab( nSize );
       ScreenRetrieve( ( void * ) scrnPtr );
-     
+
       scrnVirtual = TRUE;
    }
 #endif
@@ -1162,6 +1162,8 @@ void hb_gt_Tone( double dFrequency, double dDuration )
 
    dFrequency = HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 );
 
+   /* sync with internal clock with very small time period */
+   hb_idleSleep( 0.01 );
 #if defined(__BORLANDC__) || defined(__WATCOMC__)
    sound( ( unsigned ) dFrequency );
 #elif defined(__DJGPP__)
@@ -1170,8 +1172,7 @@ void hb_gt_Tone( double dFrequency, double dDuration )
 
    /* The conversion from Clipper (DOS) timer tick units to
       milliseconds is * 1000.0 / 18.2. */
-   dDuration /= 18.2;
-   hb_idleSleep( dDuration );
+   hb_idleSleep( dDuration / 18.2 );
 
 #if defined(__BORLANDC__) || defined(__WATCOMC__)
    nosound();
@@ -1284,9 +1285,9 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
    SHORT Height;
    SHORT Width;
 
-   if( ( Left   >= 0 && Left   < hb_gt_GetScreenWidth()  )  || 
-       ( Right  >= 0 && Right  < hb_gt_GetScreenWidth()  )  || 
-       ( Top    >= 0 && Top    < hb_gt_GetScreenHeight() )  || 
+   if( ( Left   >= 0 && Left   < hb_gt_GetScreenWidth()  )  ||
+       ( Right  >= 0 && Right  < hb_gt_GetScreenWidth()  )  ||
+       ( Top    >= 0 && Top    < hb_gt_GetScreenHeight() )  ||
        ( Bottom >= 0 && Bottom < hb_gt_GetScreenHeight() ) )
    {
 
@@ -1402,7 +1403,7 @@ USHORT hb_gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE by
          Left = 0;
       else if( Left >= hb_gt_GetScreenWidth() )
          Left = hb_gt_GetScreenWidth() - 1;
-   
+
       if( Right < 0 )
          Right = 0;
       else if( Right >= hb_gt_GetScreenWidth() )
