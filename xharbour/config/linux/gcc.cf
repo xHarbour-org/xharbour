@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.13 2003/07/31 18:56:12 druzus Exp $
+# $Id: gcc.cf,v 1.14 2003/09/24 01:20:34 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -55,8 +55,26 @@ LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rddmt,$(LIBS)),rddmt)
-LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)_mt)
-LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv)mt)
+#DBFNTX and DBFCDX are MTzed
+ifeq ($(findstring dbfcdx,$(HB_DB_DRIVERS)),dbfcdx)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfcdx/$(ARCH)_mt
+LINKLIBS += -ldbfcdxmt
+endif
+ifeq ($(findstring dbfntx,$(HB_DB_DRIVERS)),dbfntx)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH)_mt
+LINKLIBS += -ldbfntxmt
+endif
+
+#DBFDBT and DBFFTP are not MTzed
+ifeq ($(findstring dbfdbt,$(HB_DB_DRIVERS)),dbfdbt)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH)
+LINKLIBS += -ldbfdbt
+endif
+ifeq ($(findstring dbfftp,$(HB_DB_DRIVERS)),dbfftp)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfftp/$(ARCH)
+LINKLIBS += -ldbfftp
+endif
+
 else
 ifeq ($(findstring rdd,$(LIBS)),rdd)
 LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))

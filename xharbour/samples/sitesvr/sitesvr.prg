@@ -1,5 +1,5 @@
 /*
- * $Id: sitesvr.prg,v 1.7 2003/04/13 23:55:26 jonnymind Exp $
+ * $Id: sitesvr.prg,v 1.8 2003/04/14 21:10:58 jonnymind Exp $
  */
 
 ***********************************************************
@@ -90,6 +90,7 @@ PROCEDURE Main( cPort)
    InetDestroy( Socket )
    InetCleanup()
    DestroyMutex( MutexDB )
+   DestroyMutex( MutexCount )
 
    CLOSE ALL
 
@@ -190,6 +191,9 @@ PROCEDURE ServeClient( Socket )
       MutexUnlock( MutexCount )
       RETURN
    ENDIF
+
+   /* Select workarea for this thread */
+   SELECT 1
 
    *** Then we must get all the HTTP fields sent by the navigator
    WHILE .T.

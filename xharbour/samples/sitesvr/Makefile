@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2003/02/13 01:22:35 jonnymind Exp $
+# $Id: Makefile,v 1.8 2003/02/19 10:16:31 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -16,6 +16,8 @@ LIBS=\
 	rtlmt \
 	lang \
 	rddmt \
+	dbfntxmt \
+	dbfdbt \
 	rtlmt \
 	vmmt \
 	macro \

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1648 2003/11/03 05:16:56 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1649 2003/11/03 05:28:44 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-03 07:10 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * sitesvr/Makefile
+    ! Added latest dbf libs
+
+  * sitesvr/sitesvr.prg
+    ! Each thread must now call SELECT to retreive the wanted area pointer.
+
+  * config/linux/gcc.cf
+    ! Updated for non-mt DBFNTX and DBFCDX libraries.
+
 2003-11-03 06:26 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   - utils/hbdict/bld_b32.bat
     - useless file removed
   * utils/hbdict/make_b32
     ! Ops... wrong dos label format fixed
+
+2003-11-03 05:50 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
 
 2003-11-03 05:50 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/hbi18n.c
