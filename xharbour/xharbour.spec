@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.19 2003/08/01 19:52:44 druzus Exp $
+# $Id: xharbour.spec,v 1.20 2003/08/02 10:22:10 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -290,7 +290,25 @@ cat > $HB_BIN_INSTALL/%{hb_pref}-build <<EOF
 #!/bin/bash
 
 if [ \$# == 0 ]; then
-    echo "syntax: \$0 [<options,...>] <file>[.prg|.o]"
+    echo "syntax: \$0 [<options,...>] <file>[.prg|.o]
+
+\"%{hb_pref}cc\", \"%{hb_pref}cmp\", \"%{hb_pref}lnk\" and \"%{hb_pref}mk\" parameters:
+    -o<outputfilename>      # output file name
+\"%{hb_pref}lnk\" and \"%{hb_pref}mk\" parameters:
+    -static             # link with static %{dname} libs
+    -fullstatic         # link with all static libs
+    -shared             # link with shared libs (default)
+    -mt                 # link with multi-thread libs
+    -gt<hbgt>           # link with <hbgt> GT driver, can be repeated to
+                        # link with more GTs. The first one will be
+                        #      the default at runtime
+    -fmstat             # link with the memory statistics lib
+    -nofmstat           # do not link with the memory statistics lib (default)
+    -main=<main_func>   # set the name of main program function/procedure.
+                        # if not set then 'MAIN' is used or if it doesn't
+                        # exist the name of first public function/procedure
+                        # in first linked object module
+"
     exit 1
 elif [ "\$*" == "mk-links" ]; then
     DIR="\${0%/*}"
@@ -576,7 +594,10 @@ All these scripts accept command line switches:
                         #      the default at runtime
 -fmstat                 # link with the memory statistics lib
 -nofmstat               # do not link with the memory statistics lib (default)
--main=<main_func>	# set the name of main program function/procedure
+-main=<main_func>	# set the name of main program function/procedure.
+                        # if not set then 'MAIN' is used or if it doesn't
+                        # exist the name of first public function/procedure
+                        # in first linked object module
 
 Link options work only with "%{hb_pref}lnk" and "%{hb_pref}mk" and have no effect
 in "%{hb_pref}cc" and "%{hb_pref}cmp".
