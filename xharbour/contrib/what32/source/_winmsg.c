@@ -110,7 +110,7 @@ HB_FUNC ( SENDMESSAGE )
   }
 
 
-   hb_retnl( (LONG) SendMessage( (HWND) hb_parnl( 1 ), (UINT) hb_parni( 2 ),
+   hb_retnl( (ULONG) SendMessage( (HWND) hb_parnl( 1 ), (UINT) hb_parni( 2 ),
                                 (ISNIL(3) ? 0 : (WPARAM) hb_parnl( 3 ))   ,
                                 (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parc(4) : (LPARAM) hb_parnl( 4 ))))
                                )

@@ -988,5 +988,26 @@ DWORD GetCurrentProcessId( VOID )
  
 HB_FUNC ( GETCURRENTPROCESSID )
 {
-   GetCurrentProcessId() ;
+   hb_retnl( (ULONG) GetCurrentProcessId() );
 }
+
+//-----------------------------------------------------------------------------
+/*
+DWORD GetCurrentProcess( VOID )
+*/
+ 
+HB_FUNC ( GETCURRENTPROCESS )
+{
+   hb_retnl( (LONG) GetCurrentProcess() );
+}
+
+//-----------------------------------------------------------------------------
+/*
+DWORD GetCurrentThreadId( VOID )
+*/
+ 
+HB_FUNC ( GETCURRENTTHREADID )
+{
+   hb_retnl( (DWORD) GetCurrentThreadId() );
+}
+

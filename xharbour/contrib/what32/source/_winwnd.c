@@ -1244,3 +1244,17 @@ HB_FUNC ( ALLOWSETFOREGROUNDWINDOW )
 {
    hb_retl( AllowSetForegroundWindow ( (DWORD) hb_parnl( 1 ) ) );
 }
+
+
+
+//-----------------------------------------------------------------------------
+/*
+BOOL LockSetForegroundWindow( UINT uLockCode
+);
+*/
+
+HB_FUNC ( LOCKSETFOREGROUNDWINDOW )
+{
+   hb_retl( LockSetForegroundWindow( (UINT) hb_parnl( 1 ) ) );
+}
+
