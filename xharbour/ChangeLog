@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2424 2004/02/29 07:28:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2425 2004/02/29 11:06:09 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-01 00:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/hbzlib/zip.c
+    + add feature to unzip files match wild cards.
+    + add feature to delete from existing zip, files match wild cards.
+
+    /*
+    Examples:
+
+    HB_UNZIPFILE("my.zip",,,,,"*.prg")
+    (only unzip files match *.prg skleton)
+
+    HB_UNZIPFILE("my.zip",,,,,{"a*.prg","a*.c"})
+    (only unzip files match a*.prg and a*.c skletons)
+
+    HB_ZIPDELETEFILES("my.zip","*.prg")
+    (delete from my.zip all files match *.prg skleton)
+
+    HB_ZIPDELETEFILES("my.zip",{"*.prg","*.c"})
+    (delete from my.zip all files match *.prg and *.c skletons)
+    */
+
 2004-02-29 18:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * contrib/hbzlib/zip.c
     ! minor changes on recent extensions when members in skletons array
