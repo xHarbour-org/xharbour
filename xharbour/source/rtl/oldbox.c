@@ -1,5 +1,5 @@
 /*
- * $Id: oldbox.c,v 1.1.1.1 2001/12/21 10:42:07 ronpinkas Exp $
+ * $Id: oldbox.c,v 1.2 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -63,12 +63,14 @@ HB_FUNC( __BOX )
    PHB_ITEM pBottom = hb_param( 3, HB_IT_NUMERIC );
    PHB_ITEM pRight  = hb_param( 4, HB_IT_NUMERIC );
 
-   if( pTop && pLeft && pBottom && pRight )
+   if( pTop && pLeft && pBottom && pRight && ISCHAR( 5 ) )
+   {
       hb_gtBox( hb_itemGetNI( pTop ),
                 hb_itemGetNI( pLeft),
                 hb_itemGetNI( pBottom ),
                 hb_itemGetNI( pRight ),
-                ( BYTE * ) ( ISCHAR( 5 ) ? hb_parcx( 5 ) : " " ) );
+                ( BYTE * )( hb_parclen( 5 ) == 0 ? "         " : hb_parcx( 5 ) ) );
+   }
 }
 
 HB_FUNC( __BOXD )

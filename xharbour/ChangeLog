@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3139 2004/07/09 11:52:04 likewolf Exp $
+ * $Id: ChangeLog,v 1.3140 2004/07/09 19:54:53 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-09 20:38 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/box.c
+    ! Fixed @...BOX "" to clear all box area (instead only frame).
+  * source/rtl/oldbox.c
+    ! Fixed __BOX("") to clear all box area (instead only frame).
+    ! __BOX() will draw only if the parameter is character.
+      (Clipper compatibility)
 
 2004-07-09 23:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/debug/debugger.prg

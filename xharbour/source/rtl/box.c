@@ -1,5 +1,5 @@
 /*
- * $Id: box.c,v 1.1.1.1 2001/12/21 10:41:12 ronpinkas Exp $
+ * $Id: box.c,v 1.2 2004/03/18 03:58:36 ronpinkas Exp $
  */
 
 /*
@@ -73,26 +73,31 @@ HB_FUNC( DISPBOX )
       }
 
       if( ISCHAR( 5 ) )
+      {
          hb_gtBox( hb_itemGetNI( pTop ),
                    hb_itemGetNI( pLeft),
                    hb_itemGetNI( pBottom ),
                    hb_itemGetNI( pRight ),
-                   ( BYTE * ) hb_parcx( 5 ) );
-
+                   ( BYTE * )( hb_parclen( 5 ) == 0 ? "         " : hb_parcx( 5 ) ) );
+      }
       else if( ISNUM( 5 ) && hb_parni( 5 ) == 2 )
+      {
          hb_gtBoxD( hb_itemGetNI( pTop ),
                     hb_itemGetNI( pLeft),
                     hb_itemGetNI( pBottom ),
                     hb_itemGetNI( pRight ) );
-
+      }
       else
+      {
          hb_gtBoxS( hb_itemGetNI( pTop ),
                     hb_itemGetNI( pLeft),
                     hb_itemGetNI( pBottom ),
                     hb_itemGetNI( pRight ) );
+      }
 
       if( pszColor )
+      {
          hb_gtSetColorStr( szOldColor );
+      }
    }
 }
-
