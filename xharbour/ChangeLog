@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2510 2004/03/06 13:20:29 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2511 2004/03/06 19:54:28 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-06 21:20 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * modified the interpretation of ordcreate flags, now they should
+      be CL53 DBFCDX compatible
 
 2004-03-06 11:59 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hberrors.h
