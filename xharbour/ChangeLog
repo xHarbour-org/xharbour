@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1139 2003/06/19 00:07:57 druzus Exp $
+ * $Id: ChangeLog,v 1.1140 2003/06/19 02:44:47 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-18 21:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    + Added missing initialization of Block.item.asBlock.value->uLen in HB_RestoreBlock()
+
+  * source/rtl/traceprg.prg
+    * Minor optimization.
+
+  * source/rtl/persist.prg
+    + Added generation of a Version Header (2.0).
+    + Added logic to be backward compatible with Harbour original persitence files.
 
 2003-06-19 04:16 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/makefile.bc

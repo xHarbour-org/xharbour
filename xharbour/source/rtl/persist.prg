@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.11 2003/05/23 03:27:08 ronpinkas Exp $
+ * $Id: persist.prg,v 1.12 2003/05/26 00:19:15 ronpinkas Exp $
  */
 
 /*
@@ -84,13 +84,39 @@ METHOD LoadFromText( cObjectText ) CLASS HBPersistent
    LOCAL nLines := MLCount( cObjectText, 254 )
    LOCAL nLine  := 1, cLine, cToken
    LOCAL lStart := .T., aObjects := {}, nObjectLevel := 0
+   LOCAL cTextCopy, nAt
 
    MEMVAR oObject
-
    PRIVATE oObject := QSelf()
 
+   cLine := RTrim( MemoLine( cObjectText, 254, 1 ) )
+
+   IF cLine == "// HBPersistent Ver 2.0"
+      nLine++
+   ELSE
+      cTextCopy := ""
+
+      DO WHILE nLine <= nLines
+         cLine := LTrim( MemoLine( cObjectText, 254, nLine ) )
+
+         IF cLine[1] == ':'
+            nAt := At( '=', cLine )
+            IF nAt > 1
+              cLine[ nAt - 1] := ':'
+            ENDIF
+         ENDIF
+
+         cTextCopy += cLine + HB_OsNewLine()
+
+         nLine++
+      ENDDO
+
+      cObjectText := cTextCopy
+      nLine := 1
+   ENDIF
+
    DO WHILE nLine <= nLines
-      cLine  := LTrim( MemoLine( cObjectText, 254, nLine ) )
+      cLine := RTrim( LTrim( MemoLine( cObjectText, 254, nLine ) ) )
 
       IF Empty( cLine )
          nLine++
@@ -157,14 +183,13 @@ METHOD SaveToText( cObjectName ) CLASS HBPersistent
    nIndent += 3
 
    IF nIndent == 0
-      cObject := ""
+      cObject := "// HBPersistent Ver 2.0" + HB_OsNewLine()
+      //cObject := HB_OsNewLine()
    ELSE
-      cObject := HB_OsNewLine()
+      cObject := HB_OsNewLine() + Space( nIndent )
    ENDIF
 
-   cObject += Space( nIndent )
-
-   cObject +=  "OBJECT "
+   cObject += "OBJECT "
 
    IF nIndent > 0
       cObject += "::"

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.210 2003/06/18 09:23:30 ronpinkas Exp $
+ * $Id: hvm.c,v 1.211 2003/06/18 13:29:12 andijahja Exp $
  */
 
 /*
@@ -7347,7 +7347,7 @@ HB_FUNC( HB_SAVEBLOCK )
 
    if ( pBlock )
    {
-      PSYMBOLS pModuleSymbols = hb_vmFindModule( ( pBlock->item.asBlock.value )->pSymbols );
+      PSYMBOLS pModuleSymbols = hb_vmFindModule( pBlock->item.asBlock.value->pSymbols );
 
       if( pModuleSymbols )
       {
@@ -7359,7 +7359,7 @@ HB_FUNC( HB_SAVEBLOCK )
          hb_itemPutC( &ModuleName, pModuleSymbols->szModuleName );
 
          PCode.type = HB_IT_NIL;
-         hb_itemPutCL( &PCode, (char *) ( ( pBlock->item.asBlock.value )->pCode ), ( pBlock->item.asBlock.value )->uLen );
+         hb_itemPutCL( &PCode, (char *) pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->uLen );
 
          ParamCount.type = HB_IT_NIL;
          hb_itemPutNI( &ParamCount, pBlock->item.asBlock.paramcnt );
@@ -7402,6 +7402,7 @@ HB_FUNC( HB_RESTOREBLOCK )
 
             Block.type = HB_IT_BLOCK;
             Block.item.asBlock.value = hb_codeblockMacroNew( (unsigned char *) ( PCode.item.asString.value ), ( USHORT )PCode.item.asString.length );
+            Block.item.asBlock.value->uLen = PCode.item.asString.length;
             Block.item.asBlock.value->pSymbols = pModuleSymbols->pModuleSymbols;
             Block.item.asBlock.paramcnt = ParamCount.item.asInteger.value;
 

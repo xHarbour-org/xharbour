@@ -1,5 +1,5 @@
 /*
- * $Id: traceprg.prg,v 1.7 2003/03/19 13:30:47 jonnymind Exp $
+ * $Id: traceprg.prg,v 1.8 2003/05/29 22:33:30 ronpinkas Exp $
  */
 
 /*
@@ -56,13 +56,11 @@
 //--------------------------------------------------------------//
 FUNCTION TraceLog( ... )
 
-   LOCAL cFile := SET( _SET_TRACEFILE ), FileHandle, nLevel := SET( _SET_TRACESTACK ), ProcName, aParams, xParam
+   LOCAL cFile := SET( _SET_TRACEFILE ), FileHandle, nLevel := SET( _SET_TRACESTACK ), ProcName, xParam
 
    IF ! SET( _SET_TRACE )
       RETURN .T.
    ENDIF
-
-   aParams := HB_aParams()
 
    IF File( cFile )
       FileHandle := FOpen( cFile, 1 )
@@ -86,7 +84,7 @@ FUNCTION TraceLog( ... )
       FWrite( FileHandle,  CRLF )
    ENDIF
 
-   FOR EACH xParam IN aParams
+   FOR EACH xParam IN HB_aParams()
       FWrite( FileHandle, '>>>' + CStr( xParam ) + '<<<' + CRLF )
    NEXT
 
