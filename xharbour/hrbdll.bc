@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.39 2004/01/26 22:03:24 fsgiudice Exp $
+# $Id: hrbdll.bc,v 1.40 2004/01/27 03:40:28 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -103,6 +103,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\errorapi.obj \
   $(OBJ_DIR)\file.obj \
   $(OBJ_DIR)\filehb.obj \
+  $(OBJ_DIR)\filestat.obj \
   $(OBJ_DIR)\filesys.obj \
   $(OBJ_DIR)\fkmax.obj \
   $(OBJ_DIR)\fnsplit.obj \
@@ -518,6 +519,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\errorapi.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\file.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\filehb.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\filestat.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\filesys.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\fkmax.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\fnsplit.obj           + >> hdll.tmp
@@ -1268,6 +1270,9 @@ $(OBJ_DIR)\file.obj : $(RTL_DIR)\file.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\filehb.obj : $(RTL_DIR)\filehb.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\filestat.obj : $(RTL_DIR)\filestat.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\fkmax.obj : $(RTL_DIR)\fkmax.c
