@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.55 2003/03/02 15:22:31 jonnymind Exp $
+* $Id: thread.c,v 1.56 2003/03/02 18:45:19 jonnymind Exp $
 */
 
 /*
@@ -88,22 +88,22 @@ static HB_CRITICAL_T s_mtxTryLock;
 BOOL hb_critical_mutex_trylock( HB_CRITICAL_T *lpMutex )
 {
    HB_CRITICAL_LOCK( s_mtxTryLock );
-   if ( lpMutex.Locker == HB_CURRENT_THREAD() )
+   if ( lpMutex->Locker == HB_CURRENT_THREAD() )
    {
-      lpMutex.nCount++;
+      lpMutex->nCount++;
       HB_CRITICAL_UNLOCK( s_mtxTryLock );
       return TRUE;
    }
    else
    {
-      if ( lpMutex.nCount > 0 )
+      if ( lpMutex->nCount > 0 )
       {
          HB_CRITICAL_UNLOCK( s_mtxTryLock );
          return FALSE;
       }
-      HB_MUTEX_LOCK( lpMutex.Critical );
-      lpMutex.nCount = 1;
-      lpMutex.Locker = HB_CURRENT_THREAD();
+      HB_MUTEX_LOCK( lpMutex->Critical );
+      lpMutex->nCount = 1;
+      lpMutex->Locker = HB_CURRENT_THREAD();
       HB_CRITICAL_UNLOCK( s_mtxTryLock );
    }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.807 2003/03/07 05:32:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.808 2003/03/07 06:06:32 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-07 13:30 UTC+0300 Phil Krylov <phil@mail.ru>
+  * source/rtl/binnum.c
+    ! Use little-endian values on all platforms in BIN2L()
+  * source/vm/thread.c
+    ! Made hb_critical_mutex_trylock() at least compile on non-Linux Unices.
+
 
 2003-03-06 22:07 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
