@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.24 2004/03/08 13:42:12 andijahja Exp $
+ * $Id: inkey.c,v 1.25 2004/03/11 02:30:57 ronpinkas Exp $
  */
 
 /*
@@ -99,8 +99,9 @@ static int    s_inkeyForce;      /* Variable to hold keyboard input when TYPEAHE
 
 static PHB_inkeyKB s_inkeyKB = NULL;
 static HB_inkey_enum s_eventmask;
-static HB_ITEM s_inKeyBlockBefore = { 0, 0 };
-static HB_ITEM s_inKeyBlockAfter = { 0, 0 };
+
+static HB_ITEM s_inKeyBlockBefore = { HB_IT_NIL, NULL };
+static HB_ITEM s_inKeyBlockAfter  = { HB_IT_NIL, NULL };
 
 static void hb_inkeyKBfree( void )
 {
@@ -371,7 +372,7 @@ HB_FUNC( INKEY )
   USHORT uiPCount = hb_pcount();
   int iKey;
 
-  if ( &s_inKeyBlockBefore && (&s_inKeyBlockBefore)->type == HB_IT_BLOCK )
+  if( s_inKeyBlockBefore.type == HB_IT_BLOCK )
   {
      hb_vmEvalBlock( &s_inKeyBlockBefore );
   }
@@ -381,7 +382,9 @@ HB_FUNC( INKEY )
     iKey = hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
                        hb_parnd( 1 ),
                        ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK );
-    bContinue = iKey && &s_inKeyBlockAfter && (&s_inKeyBlockAfter)->type == HB_IT_BLOCK;
+
+    bContinue = iKey && s_inKeyBlockAfter.type == HB_IT_BLOCK;
+
     if ( bContinue )
     {
       HB_ITEM Key;
@@ -399,63 +402,56 @@ HB_FUNC( INKEY )
       hb_itemClear( &Key );
     }
   }
+
   hb_retni(iKey);
 }
 
 HB_FUNC( SETINKEYBEFOREBLOCK )
 {
-  USHORT uiPCount = hb_pcount();
+   USHORT uiPCount = hb_pcount();
 
-  if ( &s_inKeyBlockBefore )
-  {
-    hb_itemReturnCopy( &s_inKeyBlockBefore );
-  }
-  else
-  {
-    hb_ret() ;
-  }
-  if ( uiPCount > 0 )
-  {
-    if ( &s_inKeyBlockBefore )
-    {
-      hb_itemClear(&s_inKeyBlockBefore) ;
-    }
-    if ( ISBLOCK(1) )
-    {
-      s_inKeyBlockBefore.type = HB_IT_NIL;
-      hb_itemCopy ( &s_inKeyBlockBefore , hb_param( 1, HB_IT_BLOCK ) );
-    }
-  }
+   hb_itemReturnCopy( &s_inKeyBlockBefore );
+
+   if( uiPCount > 0 )
+   {
+      if( s_inKeyBlockBefore.type == HB_IT_BLOCK )
+      {
+         HB_ITEM_UNLOCK( &s_inKeyBlockBefore );
+         hb_itemClear( &s_inKeyBlockBefore );
+      }
+
+      if( ISBLOCK(1) )
+      {
+         hb_itemCopy ( &s_inKeyBlockBefore , hb_param( 1, HB_IT_BLOCK ) );
+         HB_ITEM_LOCK( &s_inKeyBlockBefore );
+      }
+   }
 }
 
 HB_FUNC( SETINKEYAFTERBLOCK )
 {
-  USHORT uiPCount = hb_pcount();
-  if ( &s_inKeyBlockAfter )
-  {
-    hb_itemReturnCopy( &s_inKeyBlockAfter );
-  }
-  else
- {
-    hb_ret() ;
-  }
-  if ( uiPCount > 0 )
-  {
-    if ( &s_inKeyBlockAfter )
-    {
-      hb_itemClear(&s_inKeyBlockAfter) ;
-    }
-    if ( ISBLOCK(1) )
-    {
-      s_inKeyBlockAfter.type = HB_IT_NIL;
-      hb_itemCopy( &s_inKeyBlockAfter, hb_param( 1, HB_IT_BLOCK ));
-    }
-  }
+   USHORT uiPCount = hb_pcount();
+
+   hb_itemReturnCopy( &s_inKeyBlockAfter );
+
+   if ( uiPCount > 0 )
+   {
+      if ( s_inKeyBlockAfter.type == HB_IT_BLOCK )
+      {
+         HB_ITEM_UNLOCK( &s_inKeyBlockAfter );
+         hb_itemClear( &s_inKeyBlockAfter );
+      }
+
+      if ( ISBLOCK(1) )
+      {
+         hb_itemCopy( &s_inKeyBlockAfter, hb_param( 1, HB_IT_BLOCK ));
+         HB_ITEM_LOCK( &s_inKeyBlockAfter );
+      }
+   }
 }
 
 HB_FUNC( __KEYBOARD )
 {
-
    /* Clear the typeahead buffer without reallocating the keyboard buffer */
    hb_inkeyReset( FALSE );
 
@@ -1364,6 +1360,7 @@ int hb_inkeyTranslate( int key, HB_inkey_enum event_mask )
          break;
       }
    }
+
    if( key == -99 )
    {
       /* Ignore this key code by extracting it from the input buffer
@@ -1372,4 +1369,19 @@ int hb_inkeyTranslate( int key, HB_inkey_enum event_mask )
       key = 0;
    }
    return key;
+}
+
+void hb_inkeyExit( void )
+{
+   if( s_inKeyBlockBefore.type == HB_IT_BLOCK )
+   {
+      HB_ITEM_UNLOCK( &s_inKeyBlockBefore );
+      hb_itemClear( &s_inKeyBlockBefore );
+   }
+
+   if( s_inKeyBlockAfter.type == HB_IT_BLOCK )
+   {
+      HB_ITEM_UNLOCK( &s_inKeyBlockAfter );
+      hb_itemClear( &s_inKeyBlockAfter );
+   }
 }

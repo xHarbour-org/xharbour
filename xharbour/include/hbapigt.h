@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.27 2004/02/02 19:32:25 ronpinkas Exp $
+ * $Id: hbapigt.h,v 1.28 2004/02/06 17:07:27 jonnymind Exp $
  */
 
 /*
@@ -382,6 +382,7 @@ extern HB_EXPORT int  hb_inkeyNext( HB_inkey_enum event_mask );           /* Ret
 extern HB_EXPORT void hb_inkeyPoll( void );           /* Poll the console keyboard to stuff the Harbour buffer */
 extern HB_EXPORT void hb_inkeyReset( BOOL allocate ); /* Reset the Harbour keyboard buffer */
 extern HB_EXPORT int  hb_inkeyTranslate( int key, HB_inkey_enum event_make ); /* Translation extended codes to normal codes, if needed */
+extern void hb_inkeyExit( void );
 
 /* Mouse related declarations */
 

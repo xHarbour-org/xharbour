@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2552 2004/03/11 01:25:56 andijahja Exp $
+ * $Id: ChangeLog,v 1.2553 2004/03/11 02:30:56 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-10 20:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapigt.h
+    + Added extern void hb_inkeyExit( void )
+  * source/rtl/inkey.c
+    + Added logic to LOCK/UNLOCK static variables holding BLOCK values.
+    + Added void hb_inkeyExit( void ) to UNLOCL and release BLOCK values in static variables.
+    % Cleanup of redundant code.
+
+  * source/vm/hvm.c
+    + Added call to hb_inkeyExit() in hb_vmQuit()
 
 2004-03-10 18:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/inkey.c
