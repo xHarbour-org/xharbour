@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.34 2003/06/20 17:32:41 jonnymind Exp $
+ * $Id: harbour.slx,v 1.35 2003/06/20 20:57:56 ronpinkas Exp $
  */
 
 /*
@@ -124,7 +124,6 @@ DEFINE_STREAM_AS_ONE_OF_THESE {
                                 START_WITH("['")     END_WITH("\']" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_NESTED_LIT),
                                 START_WITH("[[")     END_WITH("]]" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_NESTED_LIT),
                                 START_WITH("E\"")    END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_ESCAPE_LIT),
-                                START_WITH("E'")    END_WITH("'" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_ESCAPE_LIT)
                               };
 
 START_NEW_LINE_IF_ONE_OF_THESE( "\n;" );
@@ -922,34 +921,42 @@ static int hb_comp_SLX_CustomAction( int x )
 
       case HB_ESCAPE_LIT :
          {
-            int pos, len = strlen( sPair );
-            char *str = sPair;
-            int doit=0;
+            int iPos, iLen = strlen( sPair );
+            char *pTmp = sPair;
+            BOOL bShift = FALSE;
 
-            while( len > 0) {
-               if ( *str == '\\' ) {
-                  switch( str[1] ) {
-                     case 'n': *str = '\n'; doit=1; break;
-                     case 't': *str = '\t'; doit=1; break;
-                     case 'b': *str = '\b'; doit=1; break;
-                     case 'r': *str = '\r'; doit=1; break;
+            while( iLen > 0 )
+            {
+               if ( *pTmp == '\\' )
+               {
+                  switch( pTmp[1] )
+                  {
+                     case 'n': *pTmp = '\n'; bShift = TRUE; break;
+                     case 't': *pTmp = '\t'; bShift = TRUE; break;
+                     case 'b': *pTmp = '\b'; bShift = TRUE; break;
+                     case 'r': *pTmp = '\r'; bShift = TRUE; break;
 
                      case '\\':
                      case '\'':
                      case '"':
-                        *str = str[1]; doit=1; break;
+                        *pTmp = pTmp[1]; bShift = TRUE; break;
                   }
-                  // shift the rest of the string
-                  if ( doit )
+
+                  // Shift the rest of the string
+                  if( bShift )
                   {
-                     for ( pos = 1; pos < len; pos++ )
-                        str[ pos ] = str[ pos +1 ];
+                     for ( iPos = 1; iPos < iLen; iPos++ )
+                     {
+                        pTmp[ iPos ] = pTmp[ iPos + 1 ];
+                     }
                   }
                }
-               str++;
-               len--;
+
+               pTmp++;
+               iLen--;
             }
          }
+
          yylval.string = hb_compIdentifierNew( sPair, TRUE );
          return LITERAL + DONT_REDUCE ;
 

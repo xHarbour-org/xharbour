@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1155 2003/06/20 19:22:11 mlombardo Exp $
+ * $Id: ChangeLog,v 1.1156 2003/06/20 21:00:47 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-20 14:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.slx
+    - Removed redundant support for E '...' (as per request by Giancarlo)
+    * Minor formatting.
 
 2003-06-20 17:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source\rtl\tget.prg
@@ -101,7 +106,6 @@
   * xharbour/source/codepage/cdpslwin.c
     * corrections in code page description.
 
->>>>>>> 1.1151
 2003-06-19 02:05 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   - xharbour/source/codepage/cdpla850.c
   + xharbour/source/codepage/cdppt850.c
