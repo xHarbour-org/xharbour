@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbxml.h,v 1.1 2003/06/15 20:27:01 jonnymind Exp $
  */
 
 /*
@@ -123,14 +123,6 @@ typedef enum
    MXML_ERROR_UNCLOSED
 } MXML_ERROR_CODE;
 
-/* Iterator modes */
-
-typedef enum
-{
-   MXML_ITERATOR_MODE_FORWARD=0,
-   MXML_ITERATOR_MODE_BACKWARD
-} MXML_ITERATOR_MODE;
-
 /* Node types */
 
 typedef enum
@@ -154,61 +146,6 @@ typedef void (*MXML_OUTPUT_FUNC)( struct tag_mxml_output *out, char *data, int l
    Structures holding the XML data
 **************************************************/
 
-/* Attribute */
-typedef struct tag_mxml_attribute
-{
-   char *name;
-   char *value;
-   struct tag_mxml_attribute *next;
-} MXML_ATTRIBUTE;
-
-/* Node */
-typedef struct tag_mxml_node
-{
-   char *name;
-   char *data;
-   int data_length;
-   MXML_NODE_TYPE type;
-   struct tag_mxml_attribute *attributes;
-   struct tag_mxml_node *next;
-   struct tag_mxml_node *prev;
-   struct tag_mxml_node *child;
-   struct tag_mxml_node *parent;
-} MXML_NODE;
-
-/* Index for faster node retrival */
-
-typedef struct tag_mxml_index
-{
-   int length;
-   int allocated;
-   MXML_NODE *data;
-} MXML_INDEX;
-
-/* XML document */
-
-typedef struct tag_mxml_document
-{
-   char *name;
-   MXML_NODE *root;
-   MXML_STATUS status;
-   MXML_INDEX *index;
-   MXML_ERROR_CODE error;
-   //this is mainly for stats & progress
-   int node_count;
-   int iLine;
-} MXML_DOCUMENT;
-
-/* Iterator */
-
-typedef struct tag_mxml_iterator
-{
-   MXML_DOCUMENT *document;
-   MXML_NODE *node;
-   MXML_NODE *root_node;
-   int level;
-   MXML_ITERATOR_MODE mode;
-} MXML_ITERATOR;
 
 /* Refiller */
 
@@ -267,89 +204,28 @@ typedef struct tag_mxml_self_growing_string
 } MXML_SGS;
 
 
-/* Document operations  */
-
-MXML_DOCUMENT *mxml_document_new();
-MXML_STATUS mxml_document_setup( MXML_DOCUMENT *doc );
-void mxml_document_destroy( MXML_DOCUMENT *doc );
-
-/* Index oriented operations */
-MXML_INDEX *mxml_index_new();
-MXML_STATUS mxml_index_setup( MXML_INDEX *doc );
-void mxml_index_destroy( MXML_INDEX *doc );
-
 /* Tag oriented operations */
-MXML_NODE *mxml_node_new();
-MXML_STATUS mxml_node_setup( MXML_NODE *tag );
-MXML_NODE *mxml_node_clone( MXML_NODE *tg );
-MXML_NODE *mxml_node_clone_tree( MXML_NODE *tg );
+PHB_ITEM mxml_node_new( void );
+PHB_ITEM mxml_node_clone( PHB_ITEM tg );
+PHB_ITEM mxml_node_clone_tree( PHB_ITEM tg );
 
-void mxml_node_destroy( MXML_NODE *tag );
-void mxml_node_unlink( MXML_NODE *tag );
+void mxml_node_unlink( PHB_ITEM tag );
 
-void mxml_node_insert_before( MXML_NODE *tg, MXML_NODE *node );
-void mxml_node_insert_after( MXML_NODE *tg, MXML_NODE *node );
-void mxml_node_insert_below( MXML_NODE *tg, MXML_NODE *node );
-void mxml_node_add_below( MXML_NODE *tg, MXML_NODE *node );
+void mxml_node_insert_before( PHB_ITEM tg, PHB_ITEM node );
+void mxml_node_insert_after( PHB_ITEM tg, PHB_ITEM node );
+void mxml_node_insert_below( PHB_ITEM tg, PHB_ITEM node );
+void mxml_node_add_below( PHB_ITEM tg, PHB_ITEM node );
 
-char *mxml_node_value_of_default( MXML_NODE *pNode, char *attrib, char *val_default );
-char *mxml_node_value_of( MXML_NODE *pNode, char *attrib );
+MXML_STATUS mxml_node_read( MXML_REFIL *data, PHB_ITEM node, PHB_ITEM doc );
 
-MXML_STATUS mxml_node_read( MXML_REFIL *data, MXML_NODE *node, MXML_DOCUMENT *doc );
-
-char *mxml_node_get_path_new( MXML_NODE* node );
-int mxml_node_get_path( MXML_NODE* node, char *path );
-int mxml_node_get_path_length( MXML_NODE* node );
-int mxml_node_get_path_depth( MXML_NODE* node );
-
-MXML_STATUS mxml_node_write( MXML_OUTPUT *out, MXML_NODE *pNode, int style );
+MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style );
 
 
 /* Attribute oriented operations */
-MXML_ATTRIBUTE *mxml_attribute_new();
-MXML_STATUS mxml_attribute_setup( MXML_ATTRIBUTE *attrib );
-void mxml_attribute_destroy( MXML_ATTRIBUTE *attrib );
-void mxml_attribute_unlink( MXML_ATTRIBUTE *attrib );
-MXML_ATTRIBUTE *mxml_attribute_clone( MXML_ATTRIBUTE *attrib );
+PHB_ITEM mxml_attribute_new( void );
 
-MXML_ATTRIBUTE *mxml_attribute_read( MXML_REFIL *data, MXML_DOCUMENT *doc );
-
-MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, MXML_ATTRIBUTE *attr );
-
-
-/* Operating on iterators */
-MXML_ITERATOR *mxml_iterator_new( MXML_DOCUMENT *doc );
-MXML_STATUS mxml_iterator_setup( MXML_ITERATOR *it, MXML_DOCUMENT *doc );
-
-void mxml_iterator_set_top( MXML_ITERATOR *it, MXML_NODE *node );
-MXML_NODE *mxml_iterator_top( MXML_ITERATOR *it );
-
-void mxml_iterator_destroy( MXML_ITERATOR *it );
-void mxml_iterator_copy( MXML_ITERATOR *dest, MXML_ITERATOR *src );
-MXML_ITERATOR *mxml_iterator_clone( MXML_ITERATOR *src );
-
-// Use this one to populate an empty tree
-void mxml_iterator_add_below( MXML_ITERATOR *it, MXML_NODE *tag );
-
-// don't use any of the followning on an empty tree
-MXML_NODE *mxml_iterator_next( MXML_ITERATOR *it );
-MXML_NODE *mxml_iterator_previous_brother( MXML_ITERATOR *it );
-MXML_NODE *mxml_iterator_next_brother( MXML_ITERATOR *it );
-MXML_NODE *mxml_iterator_ascend( MXML_ITERATOR *it );
-MXML_NODE *mxml_iterator_descend( MXML_ITERATOR *it );
-
-void mxml_iterator_insert_after( MXML_ITERATOR *it, MXML_NODE *tag  );
-void mxml_iterator_insert_before( MXML_ITERATOR *it, MXML_NODE *tag );
-void mxml_iterator_insert_below( MXML_ITERATOR *it, MXML_NODE *tag );
-
-/* X-path enabled search routines */
-MXML_NODE *mxml_iterator_find_first( MXML_ITERATOR *it, char *path );
-MXML_NODE *mxml_iterator_find_next( MXML_ITERATOR *it );
-
-/* Basic search routines */
-MXML_NODE *mxml_iterator_scan_node( MXML_ITERATOR *it, char *name );
-MXML_NODE *mxml_iterator_scan_attribute( MXML_ITERATOR *it, char *attrib );
-MXML_NODE *mxml_iterator_scan_attribute_value( MXML_ITERATOR *it, char *attrib, char *val );
+PHB_ITEM mxml_attribute_read( MXML_REFIL *data, PHB_ITEM doc );
+MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHB_ITEM attr );
 
 /* Refil routines */
 MXML_REFIL *mxml_refil_new( MXML_REFIL_FUNC func, char *buf, int buflen,
@@ -378,7 +254,7 @@ void mxml_output_func_to_sgs( MXML_OUTPUT *out, char *s, int len );
 
 
 /* Self growing string routines */
-MXML_SGS *mxml_sgs_new();
+MXML_SGS *mxml_sgs_new( void );
 void mxml_sgs_destroy( MXML_SGS *sgs );
 MXML_STATUS mxml_sgs_append_char( MXML_SGS *sgs, char c );
 MXML_STATUS mxml_sgs_append_string_len( MXML_SGS *sgs, char *s, int slen );

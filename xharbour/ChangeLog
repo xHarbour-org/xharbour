@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1121 2003/06/15 21:05:13 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1122 2003/06/16 00:08:46 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-06-16 17:10 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * makefile.bc
+  * source/rtl/hbxml.c
+  + source/rtl/hbxml.c
+    * Changed the XML api to use xharbour object oriented feature.
+
+  * tests/xmltest.prg
+    Updated to latest api.
+
+   This is work in progress ( and currently not working), so plz be
+   patient.
 
 2003-06-16 02:05 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   + include/hbxml.ch

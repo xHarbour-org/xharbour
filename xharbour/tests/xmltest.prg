@@ -1,6 +1,6 @@
 ************************************************************
 * xmltest.prg
-* $Id: random.prg,v 1.1 2003/01/29 23:39:10 jonnymind Exp $
+* $Id: xmltest.prg,v 1.1 2003/06/15 20:27:01 jonnymind Exp $
 *
 * Test for XML routines of Xharbour rtl (MXML/HBXML)
 *
@@ -12,7 +12,7 @@
 
 PROCEDURE Main( cFileName )
    LOCAL hFile, cData
-   LOCAL xmlDoc, xmlIter, aNode
+   LOCAL xmlDoc, xmlNode
 
    CLEAR SCREEN
    @1,15 SAY "X H A R B O U R - XML Test "
@@ -33,13 +33,12 @@ PROCEDURE Main( cFileName )
    @3,10 SAY "File " + cFileName + " Opened. Processing XML."
 
    xmlDoc := HB_XmlCreate( hFile )
-   IF HB_XmlStatus( xmlDoc ) != HBXML_STATUS_OK
+   IF xmlDoc:nStatus != HBXML_STATUS_OK
       @4,10 SAY "Error While Processing File: "
-      @5,10 SAY "On Line: " + AllTrim( Str( HB_XmlLine( xmlDoc ) ) )
-      @6,10 SAY "Error: " + HB_XmlErrorDesc( HB_XmlError( xmlDoc ) )
+      @5,10 SAY "On Line: " + AllTrim( Str( xmlDoc:nLine ) )
+      @6,10 SAY "Error: " + HB_XmlErrorDesc( xmlDoc:nError )
       @8,10 SAY "Program Terminating, press any key"
       Inkey( 0 )
-      HB_XmlDestroy( xmlDoc )
       RETURN
    ENDIF
 
@@ -47,7 +46,7 @@ PROCEDURE Main( cFileName )
    ? "-----------------------"
    ? ""
 
-   cData := HB_XmlToString( xmlDoc, HBXML_STYLE_INDENT + HBXML_STYLE_THREESPACES )
+   cData := xmlDoc:ToString( HBXML_STYLE_INDENT + HBXML_STYLE_THREESPACES )
    ? cData
    ? "--- Press any key for next test"
    Inkey(0)
@@ -56,19 +55,19 @@ PROCEDURE Main( cFileName )
    ? "Navigating all nodes"
    ? ""
 
-   xmlIter := HB_XmlGetIterator( xmlDoc )
+   xmlNode := xmlDoc:oRoot:oChild
 
-   DO WHILE HB_XmlNextInTree( xmlIter )
-      cData := HB_XmlGetPath( xmlIter )
+   DO WHILE xmlNode != NIL
+      cData := xmlNode:Path()
       IF cData == NIL
          cData :=  "(Node without path)"
       ENDIF
-      aNode := HB_XmlGetNode( xmlIter )
-      ? ValToPrg( aNode ) + " " + cData
+      
+      ? Alltrim( Str( xmlNode:nType ) ), ", ", xmlNode:cName, ", ", ;
+            ValToPrg( xmlNode:aAttributes ), ", ", xmlNode:cData, ": ", cData
    ENDDO
 
    ? ""
    ? "Terminated. Press any key to continue"
    Inkey( 0 )
-   HB_XmlDestroy( xmlDoc )
 RETURN

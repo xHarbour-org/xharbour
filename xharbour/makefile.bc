@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.49 2003/06/09 20:41:15 lculik Exp $
+# $Id: makefile.bc,v 1.50 2003/06/16 00:08:53 jonnymind Exp $
 #
 
 #
@@ -478,6 +478,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\ttable.obj \
    $(RTL_OBJ_DIR)\ttextlin.obj \
    $(RTL_OBJ_DIR)\ttopbar.obj \
+   $(RTL_OBJ_DIR)\txml.obj \
    $(RTL_OBJ_DIR)\typefile.obj \
    $(RTL_OBJ_DIR)\wait.obj \
    $(RTL_OBJ_DIR)\win32ole.obj
@@ -2223,6 +2224,13 @@ $(RTL_OBJ_DIR)\ttopbar.c : $(RTL_DIR)\ttopbar.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\ttopbar.obj : $(RTL_OBJ_DIR)\ttopbar.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(RTL_OBJ_DIR)\txml.c : $(RTL_DIR)\txml.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\txml.obj : $(RTL_OBJ_DIR)\txml.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
