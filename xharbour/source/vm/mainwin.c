@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.11 2003/12/15 04:20:16 peterrees Exp $
+ * $Id: mainwin.c,v 1.12 2003/12/15 23:11:57 peterrees Exp $
  */
 
 /*
@@ -54,11 +54,15 @@
 
 #include "hbapi.h"
 #include "hbvm.h"
+#include "hbsetup.h"
+
+#define MAX_ARGS 64
 
 #if defined(HB_OS_WIN_32)
 
+
 int argc = 0;
-char * argv[ 20 ];
+char * argv[ MAX_ARGS ];  //23/12/2003 3:40p.m. change from 20 to 64
 
 HANDLE hb_hInstance = 0;
 HANDLE hb_hPrevInstance = 0;
@@ -69,7 +73,12 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
                     LPSTR lpCmdLine,          /* pointer to command line */
                     int iCmdShow )            /* show state of window */
 {
-   LPSTR pStart, pArgs = ( LPSTR ) LocalAlloc( LMEM_FIXED, strlen( lpCmdLine ) + 1 ), pArg = pArgs;
+#ifdef HB_FM_WIN32_ALLOC
+     LPSTR pArgs = ( LPSTR ) LocalAlloc( LMEM_FIXED, strlen( lpCmdLine ) + 1 );
+#else
+     LPSTR pArgs = ( LPSTR ) malloc(strlen( lpCmdLine ) + 1 );
+#endif
+   LPSTR pStart, pArg = pArgs;
    char szAppName[ 250 ];
    BOOL bInQuotedParam;
    int iResult ;
@@ -84,7 +93,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    GetModuleFileName( hInstance, szAppName, 249 );
    argv[ argc++ ] = szAppName;
 
-   while (*lpCmdLine )
+   while (*lpCmdLine && argc < MAX_ARGS )
    {
      while (*lpCmdLine== ' ')  // Skip over any white space
      {
@@ -152,7 +161,11 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    hb_vmInit( TRUE );
 
    iResult = hb_vmQuit();
-   LocalFree( pArgs );
+#ifdef HB_FM_WIN32_ALLOC
+      LocalFree( pArgs );
+#else
+      free( pArgs );
+#endif
    return iResult;
 }
 
