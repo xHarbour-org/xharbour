@@ -1,0 +1,304 @@
+
+                        X H A R B O U R - XML DOM oriented model
+
+                          Technical Notes for xHB developers
+
+                                  Giancarlo Niccolai
+
+                                    gian@nccolai.ws
+
+
+$Id$
+
+
+STATUS OF THE LIBRARY
+=====================
+
+Most functions have still to be tested. They have been tested under
+other systems, and outside the xharbour compiler context, but the
+while library must be considered work in progress.
+
+TODO: Namespace management
+TODO: pre-defined entity management
+TODO: User-defined entity management
+TODO: x-Path oriented search
+
+
+API
+===
+
+===================
+HB_XmlCreate( [xData] ) --> xmlDocument
+
+xData can be a file handle from which an XML can be read,
+a string containing an XML tree or NIL, in which case the
+document is created empty.
+
+
+===================
+HB_XmlDestroy( xmlDocument ) --> NIL
+
+Destroys a document and all the associated XML data.
+TODO: I would like to do this automatically in garbage collector.
+
+
+===================
+HB_XmlStatus( xmlDocument[, nNewStatus] ) --> nStatus
+
+Returns one of the HBXML_STATUS variables telling what is the
+status of the document. IF nNewStatus is set, the status of the
+document will be updated.
+
+
+===================
+HB_XmlError( xmlDocument[, nNewStatus] ) --> nError
+
+Returns one of the HBXML_ERROR type telling what is the error
+encountered while processing the document. IF nNewStatus is set,
+the status of the document will be updated.
+
+
+===================
+HB_XmlLine( xmlDocument ) --> nLine
+
+Returns the lines that have been processed. If an error is encountered,
+it returns the position in the file where the error have been detected.
+
+
+===================
+HB_XmlErrorDesc( nErrorNumber ) --> cErrorDesc
+
+Returns a descriptive string telling what the error number is meaning.
+
+
+===================
+HB_XmlGetIterator( xmlDocument ) -->xmlIterator
+
+Creates an iterator starting positioned at the root node of the current
+document.
+Notice: since the iterator is a flat pointer, it is stored
+in an xharbour string, so that garbage collector can easily dispose of it
+when needed, and so that it can easily inspected from PRG programs.
+NOTICE: At creation, the iterator is positioned on the toplevel root item,
+so to get the real first node in the document (generally the <?xml> tag),
+you have to do a first HB_XmlNextOnTree(), or HB_XmlDescend()
+
+
+===================
+HB_XmlCloneIterator( xmlIterator ) -->xmlIterator
+
+Clones the iterator.
+
+
+===================
+HB_XmlDepth( xmlIterator ) --> nDepth
+
+Returns the depth of the node where the iterator is currently pointing.
+0 means document root, which is above every node in the document.
+Toplevel nodes have depth 1.
+Notice that if you build an iterator on a document that is built on
+a subtree of another document, it's depth will be relative to the
+new document tree, not to the original one.
+
+
+
+===================
+HB_XmlAscend( xmlIterator ) --> lCanGo
+
+Climbs up in the current hierarcy of the tree. Will return true if
+this operation is possible, else the iterator won't be moved, and
+the return value will be .F.
+
+
+
+===================
+HB_XmlDescend( xmlIterator ) --> lCanGo
+
+Enters the child of the current node, if it exists. Will return true if
+this operation is possible, else the iterator won't be moved, and
+the return value will be .F.
+
+
+
+===================
+HB_XmlNext( xmlIterator ) --> lCanGo
+
+Moves the iterator to the following brother of the current node, if it
+exists. Will return true if this operation is possible, else the
+iterator won't be moved, and the return value will be .F.
+
+
+===================
+HB_XmlPrevious( xmlIterator ) --> lCanGo
+
+Moves the iterator to the preceding brother of the current node, if it
+exists. Will return true if this operation is possible, else the
+iterator won't be moved, and the return value will be .F.
+
+
+===================
+HB_XmlNextInTree( xmlIterator ) --> lCanGo
+
+Moves the iterator to the next node in the tree, ascending when necessary.
+This function traverses all the nodes in the tree, if called interactively.
+Will return true if this operation is possible, else the
+iterator won't be moved, and the return value will be .F.
+
+
+===================
+HB_XmlSetTop( xmlIterator ) --> NIL
+
+Sets the current node of the iterator as the top node: depth of this
+node will be 0, and "next" calls will traverse only the children
+of this node. HB_XmlGoTop will position the iterator at this node.
+
+
+===================
+HB_XmlGoTop( xmlIterator ) --> NIL
+
+Positions the iterator to its topmost node, that is usually the document
+root node, unless another position has been specified with HB_XMLSetTop().
+
+
+===================
+HB_XmlAddBelow( xmlIterator, nNodeType, cNodeName, aNodeAttribs,
+cNodeData ) --> lCanDo
+HB_XmlAddBelow( xmlIterator, aNode ) --> lCanDo
+HB_XmlAddBelow( xmlIterator, xmlIterator ) --> lCanDo
+
+Inserts a node as the last child of current node. The node can be passed
+directly with all its components (first grammar), packed in an array
+(second grammar) or can be copied from an iterator, that can point to
+any node of the same tree of the first iterator, or even at another tree.
+The function returns false on failure, that is if the current node cannot
+have childs (like data or comment nodes), or if there isn't enough memory
+left.
+
+
+===================
+HB_XmlInsertBelow( xmlIterator, nNodeType, cNodeName, aNodeAttribs,
+cNodeData ) --> lCanDo
+HB_XmlInsertBelow( xmlIterator, aNode ) --> lCanDo
+HB_XmlInsertBelow( xmlIterator, xmlIterator ) --> lCanDo
+
+Inserts a node between the target node pointed by the iterator and
+the first of its children, if it has, thus effectively inserting a
+new level in the tree.
+The inserted node can already have following brothers, but NOT preceding
+brothers NOR children (in case it is pointed by an iterator, last grammar).
+The function returns false on failure, that is if the current node cannot
+have childs (like data or comment nodes), or if there isn't enough memory
+left.
+
+
+===================
+HB_XmlInsertBefore( xmlIterator, nNodeType, cNodeName, aNodeAttribs,
+cNodeData ) --> lCanDo
+HB_XmlInsertBefore( xmlIterator, aNode ) --> lCanDo
+HB_XmlInsertBefore( xmlIterator, xmlIterator ) --> lCanDo
+
+Inserts a node before currently pointed node. The node must NOT have
+brothers, but can have children (in the last grammar). If the target
+node is the first child of the parent of this node tree, the inserted
+node becomes the new first child.
+
+The function returns false on failure, that is if the current node cannot
+have broters (root document node), or if there isn't enough memory
+left.
+
+
+
+===================
+HB_XmlInsertAfter( xmlIterator, nNodeType, cNodeName, aNodeAttribs,
+cNodeData ) --> lCanDo
+HB_XmlInsertAfter( xmlIterator, aNode ) --> lCanDo
+HB_XmlInsertAfter( xmlIterator, xmlIterator ) --> lCanDo
+
+Inserts a node after currently pointed node. The node must NOT have
+brothers, but can have children (in the last grammar). If the target
+node is the last child of the parent of this node tree, the inserted
+node is appended at the end of the list.
+
+The function returns false on failure, that is if the current node cannot
+have broters (root document node), or if there isn't enough memory
+left.
+
+
+
+===================
+HB_XmlDeleteNode( xmlIterator ) --> lCanDo
+
+Deletes current node and all its children.
+The iterator is then set to the next brother of the destroyed node;
+if the destroyed node has not a next brother, the iterator is set to
+its parent.
+It is not possible to destroy the root node in this way.
+
+The function returns false on failure, that is if the current node
+is the topmost node. Use HB_XmlDestroy() on the document to do that.
+
+
+===================
+HB_XmlRemoveNode( xmlIterator ) --> xmlDocument | NIL
+
+Removes the current node from the tree, and creates a new tree where
+the removed node is the only child of the topmost (document) node.
+The iterator is then set to the next brother of the destroyed node;
+if the destroyed node has not a next brother, the iterator is set to
+its parent.
+It is not possible to remove the root node in this way.
+
+The function returns NIL on failure, that is if the current node
+is the topmost node.
+
+
+===================
+HB_XmlSetNode( xmlIterator, nNodeType, cNodeName, aNodeAttribs,
+cNodeData ) --> lCanDo
+HB_XmlSetNode( xmlIterator, aNode ) --> lCanDo
+
+Sets current node to the required values. Notice that, to ensure
+consistency of the resulting XML document, you have to correctly
+specify all the elements of the node; setting an element to NIL
+or not specifying it will have the effect of destroying it.
+So, if you want to modify an item, first read it with HB_XmlGetNode(),
+them modify it and then set it back.
+
+The function returns false if the current iterator cannot be set
+(the document root element cannot be changed!), or if the passed
+parameters are not consistent.
+
+
+
+===================
+HB_XmlGetNode( xmlIterator ) --> aNode
+
+Returns the current node in an array with format:
+{ nType, cName, aAttributes, cData }
+
+aAttribute member having the format:
+{ { cName1, cValue1} ... { cNameN, cValueN } }
+
+If the node has not a single data child, then the cData member
+is returned as NIL.
+
+
+===================
+HB_XmlGetPath( xmlIterator ) --> cPath | NIL
+
+Returns the path of the current node. Nodes that have not
+a "name" cannot have a path, thus this function return NIL
+if applied on data or comment nodes.
+
+
+
+===================
+HB_XmlToString( xmlDocument [, nStyle] ) --> cXml | NIL
+
+Writes an XML document to a string.
+
+
+===================
+HB_XmlWrite( xmlDocument, nFileHandle, nStyle ) --> nStatus
+
+Writes an XML document to a file; returns the HB_XML status.
