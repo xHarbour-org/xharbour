@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.58 2003/08/25 16:24:52 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.59 2003/08/25 21:22:00 druzus Exp $
  */
 
 /*
@@ -6688,6 +6688,11 @@ HB_FUNC( DBFCDX_GETFUNCTABLE )
    pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
 
    HB_TRACE(HB_TR_DEBUG, ("DBFCDX_GETFUNCTABLE(%i, %p)", uiCount, pTable));
+
+   if ( sizeof(CDXDATA) != CDX_PAGELEN )
+   {
+      hb_cdxErrInternal( "This code cannot be compiled without one byte alignment." );
+   }
 
    if( pTable )
       hb_retni( hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" ) );

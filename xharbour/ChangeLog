@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1384 2003/08/26 09:31:17 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.1385 2003/08/26 15:08:42 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-26 18:35 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! stop execution if DBFCDX was not compiled with one byte alignment
+
+    Sorry I have to do that as temporary solution to the moment I
+    remove all #pragma from this code. In fact I have to rewrite
+    most of them to do that. If you see message:
+    "This code cannot be compiled without one byte alignment."
+    as an internal error or in error.log file then it means that
+    you have to add proper #pragma to include/hbrddcdx.h and
+    source/rdd/dbfcdx/dbfcdx1.h or some of basic types in your
+    compiler/architecture has different size then original author
+    of DBFCDX thought - in such case you have to wait until someone
+    (probably I) correct the code removing all pragmas depended parts. 
 
 2003-08-26 17:07 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/filesys.c
