@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.756 2003/02/22 02:00:14 jonnymind Exp $
+ * $Id: ChangeLog,v 1.757 2003/02/22 02:56:41 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,40 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-22 06:53 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/arrays.c
+    ! Locked all arrays operations
+
+  * source/vm/fm.c
+    ! hb_allocMutex was not initialized if statistics were off.
+
+  * source/vm/garbage.c
+    * minor style fixes
+
+  * source/vm/thread.c
+    * Added function KillAllThreads() to terminate all waiting
+      threads from inside the .prg program (i.e. a error
+      detection routine).
+
+  * tests/mtcomplex.prg
+    + Added a KillAllThreads() test
+    * Visual upgrade
+
+  * include/hbsetup.h
+  * include/hbstack.h
+  * include/thread.h
+    % Now thread is ALWAYS included if stack is included. If thread support
+      is disabled, HB_MUTEX_LOCK() and HB_MUTEX_UNLOCK() are defined void,
+      so there is no need to guard all calls to them in other files with
+      #ifdef thread support.
+    % Under linux, using system specific implementations of reentrant mutex.
+      Other systems will still need the LightWeight Reentrant Mutexes,
+      unless we implement specific reentrant pthread implementation for them
+      (that is non-startard posix). I know both BSD and Darwin has reentrant
+      mutexes.
+
+
 2003-02-21 23:55 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/rdd_ads/adsfunc.c
      ! Minor formating

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.22 2003/01/16 15:42:47 walito Exp $
+* $Id: thread.h,v 1.23 2003/01/27 21:44:48 jonnymind Exp $
 */
 
 /*
@@ -96,6 +96,7 @@
 
    #define HB_CURRENT_THREAD           GetCurrentThreadId
 #else
+
     #include <pthread.h>
     #define HB_THREAD_T                 pthread_t
 
@@ -194,9 +195,10 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
 */
 
 /** AUTO reentrant mutex if using UNIX */
-/** JC1:
-    To reactivate flat unix mutex, Comment this section */
-#if !defined( HB_OS_WIN_32 )
+/** JC1: we'll be using it in POSIX implementation without reentrant mutexes */
+#if ( defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE ) ) && \
+   ! defined( HB_OS_LINUX )
+
     #define HB_CRITICAL_T               HB_LWR_MUTEX
     #define HB_CRITICAL_INIT( x )       \
             { \
@@ -212,6 +214,7 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
             if ( lpMutex.Locker == HB_CURRENT_THREAD() )\
             {\
                lpMutex.nCount++;\
+               HB_MUTEX_UNLOCK( hb_threadMutexLock );\
             }\
             else\
             {\
@@ -221,7 +224,6 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
             }\
          }
 
-//      TraceLog( NULL, "+UNLOCK Thread: %i Mutex: %s File: %s[%i]\n", pthread_self(), #lpMutex, __FILE__, __LINE__ );
     #define HB_CRITICAL_UNLOCK( lpMutex ) \
          {\
             if ( lpMutex.Locker == HB_CURRENT_THREAD() )\
@@ -234,7 +236,26 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
                }\
             }\
          }
+#else
+   #ifdef HB_OS_LINUX
+   /* ODD: this definition is missing on some linux headers;
+      we should remove it when this bug is fixed */
+   int pthread_mutexattr_setkind_np( pthread_mutexattr_t * attr, int kind );
+      #define HB_CRITICAL_T               HB_MUTEX_T
 
+      #define HB_CRITICAL_INIT( x )       \
+      {\
+         pthread_mutexattr_t attr;\
+         pthread_mutexattr_init( &attr );\
+         pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_RECURSIVE_NP);\
+         pthread_mutex_init( &(x), &attr );\
+         pthread_mutexattr_destroy( &attr );\
+      }
+
+      #define HB_CRITICAL_LOCK( x )       HB_MUTEX_LOCK( x )
+      #define HB_CRITICAL_UNLOCK( x )     HB_MUTEX_UNLOCK( x )
+      #define HB_CRITICAL_DESTROY( x )    HB_MUTEX_DESTROY( x )
+   #endif
 #endif
 
 /* Monitor for sync access to the context library */
@@ -253,5 +274,11 @@ void hb_threadForbidenDestroy( HB_FORBID_MUTEX *Forbid );
 extern void hb_threadForbid( HB_FORBID_MUTEX * );
 extern void hb_threadAllow( HB_FORBID_MUTEX * );
 
+#else
+
+   #define HB_CRITICAL_LOCK( x )
+   #define HB_CRITICAL_UNLOCK( x )
+
 #endif
+
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.22 2003/02/20 12:21:11 jonnymind Exp $
+ * $Id: fm.c,v 1.23 2003/02/20 23:39:42 lculik Exp $
  */
 
 /*
@@ -639,10 +639,8 @@ void HB_EXPORT hb_xinit( void ) /* Initialize fixed memory subsystem */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xinit()"));
 
-   #ifdef HB_FM_STATISTICS
-      #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_INIT( hb_allocMutex );
-      #endif
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_INIT( hb_allocMutex );
    #endif
 }
 

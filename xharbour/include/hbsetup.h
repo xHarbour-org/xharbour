@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.6 2002/10/14 18:22:01 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.7 2002/11/13 15:06:16 walito Exp $
  */
 
 /*
@@ -306,6 +306,10 @@
 #ifndef HB_OS_UNIX
    #ifdef OS_UNIX_COMPATIBLE
       #define HB_OS_UNIX
+   #else
+      #ifdef HB_OS_LINUX
+         #define HB_OS_UNIX
+      #endif
    #endif
 #endif
 

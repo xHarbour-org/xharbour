@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.48 2003/02/21 22:33:21 jonnymind Exp $
+* $Id: thread.c,v 1.49 2003/02/22 01:30:37 jonnymind Exp $
 */
 
 /*
@@ -271,7 +271,7 @@ void hb_threadExit( void )
    #ifdef HB_OS_WIN_32
       HANDLE th_h;
    #endif
-   
+
    HB_CRITICAL_LOCK( hb_threadContextMutex );
 
    while( s_threadStarted )
@@ -1094,6 +1094,29 @@ HB_FUNC( WAITFORTHREADS )
       #endif
    }
 }
+
+HB_FUNC( KILLALLTHREADS )
+{
+   #ifdef HB_OS_WIN_32
+      HANDLE th_h;
+   #endif
+
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
+
+   while( s_threadStarted )
+   {
+      #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+         pthread_cancel( hb_ht_context->th_id );
+         pthread_join( hb_ht_context->th_id, 0 );
+      #else
+         TerminateThread( hb_ht_context->th_h, 0);
+         WaitForSingleObject( hb_ht_context->th_h, INFINITE );
+         CloseHandle( hb_ht_context->th_h );
+      #endif
+      hb_threadDestroyContext( hb_ht_context->th_id );
+   }
+}
+
 
 /*
 JC: I am leaving this in the source code for now; you can never know, this could

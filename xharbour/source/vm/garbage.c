@@ -478,7 +478,6 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asArray.value;
 
       //printf( "Array %p\n", pItem->item.asArray.value );
-
       --pAlloc;
 
       /* Check this array only if it was not checked yet */
@@ -576,6 +575,8 @@ void hb_gcCollectAll( void )
          HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
          return;
       }
+      // prevent operations from being executed in GC context
+      HB_CRITICAL_LOCK( s_CriticalMutex );
 
    #else
       if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
@@ -784,6 +785,7 @@ void hb_gcCollectAll( void )
    }
 
    #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_UNLOCK( s_CriticalMutex );
       HB_CRITICAL_LOCK( s_GawMutex );
       s_bGarbageAtWork = FALSE;
       HB_CRITICAL_UNLOCK( s_GawMutex );
