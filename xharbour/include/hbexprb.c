@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.4 2002/01/21 09:11:56 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.5 2002/01/21 20:51:42 ronpinkas Exp $
  */
 
 /*
@@ -1285,6 +1285,10 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG &&
                       pLen->value.asNum.lVal >= 0 && pLen->value.asNum.lVal <= 65535 )
                   {
+                     if( pString->ExprType == HB_ET_VARREF )
+                     {
+                        pString->ExprType = HB_ET_VARIABLE ;
+                     }
                      HB_EXPR_USE( pString, HB_EA_PUSH_PCODE );
 
                      hb_compGenPCode3( HB_P_LEFT, HB_LOBYTE( pLen->value.asNum.lVal ), HB_HIBYTE( pLen->value.asNum.lVal ), (BOOL) 0 );

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.5 2002/01/21 23:42:31 ronpinkas Exp $
+ * $Id: dbfntx1.c,v 1.6 2002/01/22 00:23:28 ronpinkas Exp $
  */
 
 /*
@@ -2062,6 +2062,9 @@ static LPNTXINDEX ntxFindIndex( NTXAREAP pArea , PHB_ITEM lpOrder )
    LPNTXINDEX start, current;
 
    start = pArea->lpNtxIndex;
+   if( !start )
+         return NULL;
+
    current = start;
 
    if( !lpOrder )

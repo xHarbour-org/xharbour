@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.20 2002/01/23 02:32:08 ronpinkas Exp $
+ * $Id: hvm.c,v 1.21 2002/01/23 03:10:28 ronpinkas Exp $
  */
 
 /*
@@ -1276,11 +1276,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
             if( HB_IS_STRING( pString ) )
             {
-               if( HB_IS_BYREF( pString ) )
-               {
-                  pString = hb_itemUnRef( pString );
-               }
-
                if( ( ULONG ) iNewLen < pString->item.asString.length )
                {
                   if( pString->item.asString.bStatic )

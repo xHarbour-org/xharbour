@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.23 2001/12/26 09:09:57 davep Exp $
+# $Id: Makefile,v 1.3 2002/01/19 14:15:45 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -35,6 +35,7 @@ C_SOURCES=\
 	initexit.c   \
 	initsymb.c   \
 	itemapi.c    \
+        fastitem.c   \
 	macro.c      \
 	$(C_MAIN)    \
 	memvars.c    \

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.40 2002/01/23 02:32:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.41 2002/01/23 03:42:04 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-23 08:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/Makefile
+    + Added fastitem.c to list of sources.
+
+  * include/hbexprb.c
+  * source/vm/hvm.c
+    ! Minor optimization for Left( @cVarByRef, ... )
+
+  * source/common/hbffind.c
+  * /source/rdd/dbfntx/dbfntx1
+    * Synched with the following from Harbour:
+        2002-01-23 09:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+          * source\common\hbffind.c
+            * Since I had used an undocumented 0x04000 as an attribute check.
+            * it was causing trouble. Fixed.
+
+        2002-01-23 09:10 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+          * source\common\hbffind.c
+            * removed extra comment marker.
+
+        2002-01-22 22:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+          * source\common\hbffind.c
+            * It seems that at some point prior to the release of Win2k, MS
+            * changed the definition of FILE_ATTRIBUTE_ENCRYPTED from
+            * 0x00004000 to 0x00000040
+            * If you installed the Release Win2k over a beta or RC version of
+            * the O/S, then Harbour's directory() will show an attribute of
+            * 'I' for Encrypted files.  Otherwise, it will show 'E'.  It seems
+            * that the only way to corect this is to reinstall the OS fresh.
+            * (This text is subject to correction if anyone has a better description)
+
+2002-01-22 10:20 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+  * source/rdd/dbfntx/dbfntx1.c
+    * bug fixed, reported by Jorge A. Giraldo
 
 2002-01-22 19:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * bin/!pack_bin.bat
