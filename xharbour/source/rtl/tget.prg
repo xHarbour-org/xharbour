@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.63 2003/11/15 04:46:23 walito Exp $
+ * $Id: tget.prg,v 1.64 2004/01/06 21:12:23 peterrees Exp $
  */
 
 /*
@@ -108,9 +108,9 @@ CLASS Get
    DATA CapCol
    #endif
 
-   DATA cColorSpec   HIDDEN   // Used only for METHOD ColorSpec
-   DATA cPicture     HIDDEN   // Used only for METHOD Picture
-   DATA bBlock       HIDDEN   // Used only for METHOD Block
+   DATA cColorSpec   PROTECTED   // Used only for METHOD ColorSpec
+   DATA cPicture     PROTECTED   // Used only for METHOD Picture
+   DATA bBlock       PROTECTED   // Used only for METHOD Block
 
    METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec )
 
