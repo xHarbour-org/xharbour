@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.12 2004/01/15 00:02:28 peterrees Exp $
+ * $Id: hbgtwvt.h,v 1.13 2004/01/15 16:52:22 lf_sfnet Exp $
  */
 
 /*
@@ -177,6 +177,7 @@ typedef struct global_data
   PHB_DYNS  pSymWVT_PAINT;             // Stores pointer to WVT_PAINT function
   PHB_DYNS  pSymWVT_SETFOCUS;          // Stores pointer to WVT_SETFOCUS function
   PHB_DYNS  pSymWVT_KILLFOCUS;         // Stores pointer to WVT_KILLFOCUS function
+  PHB_DYNS  pSymWVT_MOUSE;             // Stores pointer to WVT_MOUSE function
 } GLOBAL_DATA;
 
 BOOL   HB_EXPORT hb_wvt_gtSetMenuKeyEvent( int iMenuKeyEvent );
@@ -199,6 +200,9 @@ void   HB_EXPORT hb_wvt_gtDoProcessMessages( void );
 BOOL   HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent );
 BOOL   HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable );
 BOOL   HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * image );
+BOOL   HB_EXPORT hb_wvt_gtDrawBoxRaised( int iTop, int iLeft, int iBottom, int iRight );
+BOOL   HB_EXPORT hb_wvt_gtDrawBoxRecessed( int iTop, int iLeft, int iBottom, int iRight );
+BOOL   HB_EXPORT hb_wvt_gtDrawOutline( int iTop, int iLeft, int iBottom, int iRight );
 HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void );
 
 #endif

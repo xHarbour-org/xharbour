@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.54 2004/01/17 22:42:57 fsgiudice Exp $
+ * $Id: gtwvt.c,v 1.55 2004/01/17 23:17:29 andijahja Exp $
  */
 
 /*
@@ -161,6 +161,7 @@ static RECT    hb_wvt_gtGetColRowFromXYRect( RECT xy );
 static void    hb_wvt_gtCreateObjects( void );
 static void    hb_wvt_gtKillCaret( void );
 static void    hb_wvt_gtCreateCaret( void );
+static void    hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
 //-------------------------------------------------------------------//
 //
@@ -2002,83 +2003,14 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
     case WM_RBUTTONDOWN:
     case WM_LBUTTONDOWN:
-    {
-      if ( !b_MouseEnable )
-      {
-        break;
-      }
-      else
-      {
-        POINT xy, colrow ;
-
-        xy.x   = LOWORD( lParam );
-        xy.y   = HIWORD( lParam );
-        colrow = hb_wvt_gtGetColRowFromXY( (SHORT) xy.x, (SHORT) xy.y );
-        hb_wvt_gtSetMouseX( (SHORT) colrow.x );
-        hb_wvt_gtSetMouseY( (SHORT) colrow.y );
-        hb_wvt_gtAddCharToInputQueue( message == WM_LBUTTONDOWN ? K_LBUTTONDOWN : K_RBUTTONDOWN );
-        return( 0 );
-      }
-    }
     case WM_RBUTTONUP:
     case WM_LBUTTONUP:
-    {
-      if ( !b_MouseEnable )
-      {
-        break;
-      }
-      else
-      {
-        POINT xy, colrow ;
-
-        xy.x   = LOWORD( lParam );
-        xy.y   = HIWORD( lParam );
-        colrow = hb_wvt_gtGetColRowFromXY( (SHORT) xy.x, (SHORT) xy.y );
-        hb_wvt_gtSetMouseX( (SHORT) colrow.x );
-        hb_wvt_gtSetMouseY( (SHORT) colrow.y );
-        hb_wvt_gtAddCharToInputQueue( message == WM_LBUTTONUP ? K_LBUTTONUP : K_RBUTTONUP );
-        return( 0 );
-      }
-    }
     case WM_RBUTTONDBLCLK:
     case WM_LBUTTONDBLCLK:
-    {
-      if ( !b_MouseEnable )
-      {
-        break;
-      }
-      else
-      {
-        POINT xy, colrow ;
-
-        xy.x   = LOWORD( lParam );
-        xy.y   = HIWORD( lParam );
-        colrow = hb_wvt_gtGetColRowFromXY( (SHORT) xy.x, (SHORT) xy.y );
-        hb_wvt_gtSetMouseX( (SHORT) colrow.x );
-        hb_wvt_gtSetMouseY( (SHORT) colrow.y );
-        hb_wvt_gtAddCharToInputQueue( message == WM_LBUTTONDBLCLK ? K_LDBLCLK : K_RDBLCLK );
-        return( 0 );
-      }
-    }
     case WM_MOUSEMOVE:
     {
-//      if ( !b_MouseEnable || !_s.MouseMove|| ( wParam == MK_LBUTTON ) || ( wParam == MK_RBUTTON ) )
-      if ( !b_MouseEnable || !_s.MouseMove )
-      {
-        break;
-      }
-      else
-      {
-        POINT xy, colrow ;
-
-        xy.x   = LOWORD( lParam );
-        xy.y   = HIWORD( lParam );
-        colrow = hb_wvt_gtGetColRowFromXY( (SHORT) xy.x, (SHORT) xy.y );
-        hb_wvt_gtSetMouseX( (SHORT) colrow.x );
-        hb_wvt_gtSetMouseY( (SHORT) colrow.y );
-        hb_wvt_gtAddCharToInputQueue( K_MOUSEMOVE );
-        return( 0 );
-      }
+       hb_wvt_gtMouseEvent( hWnd, message, wParam, lParam );
+       return( 0 );
     }
   }
   return( DefWindowProc( hWnd, message, wParam, lParam ) );
@@ -2580,6 +2512,7 @@ static void gt_hbInitStatics( void )
   _s.pSymWVT_PAINT    = hb_dynsymFind( "WVT_PAINT" ) ;
   _s.pSymWVT_SETFOCUS = hb_dynsymFind( "WVT_SETFOCUS" ) ;
   _s.pSymWVT_KILLFOCUS= hb_dynsymFind( "WVT_KILLFOCUS" ) ;
+  _s.pSymWVT_MOUSE    = hb_dynsymFind( "WVT_MOUSE" ) ;
 }
 
 //-------------------------------------------------------------------//
@@ -2699,6 +2632,80 @@ static void hb_wvt_gtHandleMenuSelection( int menuIndex )
   hb_wvt_gtAddCharToInputQueue( _s.MenuKeyEvent );
 }
 
+//-------------------------------------------------------------------//
+
+static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+{
+  POINT xy, colrow ;
+  SHORT keyCode;
+
+  if ( !b_MouseEnable )
+  {
+    return;
+  }
+  else
+  {
+    if ( message == WM_MOUSEMOVE )
+    {
+      if ( ! _s.MouseMove )
+      {
+        return;
+      }
+    }
+
+    xy.x   = LOWORD( lParam );
+    xy.y   = HIWORD( lParam );
+
+    colrow = hb_wvt_gtGetColRowFromXY( (SHORT) xy.x, (SHORT) xy.y );
+
+    hb_wvt_gtSetMouseX( (SHORT) colrow.x );
+    hb_wvt_gtSetMouseY( (SHORT) colrow.y );
+
+    switch( message )
+    {
+      case WM_LBUTTONDBLCLK:
+        keyCode = K_LDBLCLK;
+        break;
+
+      case WM_RBUTTONDBLCLK:
+        keyCode = K_RDBLCLK;
+        break;
+
+      case WM_LBUTTONDOWN:
+        keyCode = K_LBUTTONDOWN;
+        break;
+
+      case WM_RBUTTONDOWN:
+        keyCode = K_RBUTTONDOWN;
+        break;
+
+      case WM_LBUTTONUP:
+        keyCode = K_LBUTTONUP;
+        break;
+
+      case WM_RBUTTONUP:
+        keyCode = K_RBUTTONUP;
+        break;
+
+      case WM_MOUSEMOVE:
+        keyCode = K_MOUSEMOVE;
+        break;
+    }
+
+    if ( _s.pSymWVT_MOUSE )
+    {
+      hb_vmPushSymbol( _s.pSymWVT_MOUSE->pSymbol );
+      hb_vmPushNil();
+      hb_vmPushLong( ( SHORT ) keyCode );
+      hb_vmPushLong( ( SHORT ) colrow.y );
+      hb_vmPushLong( ( SHORT ) colrow.x );
+      hb_vmDo( 3 );
+      hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+    }
+
+    hb_wvt_gtAddCharToInputQueue( keyCode );
+  }
+}
 
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
@@ -3017,6 +3024,105 @@ HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void )
 }
 
 //-------------------------------------------------------------------//
+
+HB_EXPORT BOOL hb_wvt_gtDrawBoxRaised( int iTop, int iLeft, int iBottom, int iRight )
+{
+   SelectObject( _s.hdc, _s.penWhiteDim );
+
+   MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Top Inner
+   LineTo( _s.hdc, iRight, iTop );
+
+   MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Left Inner
+   LineTo( _s.hdc, iLeft, iBottom );
+
+   SelectObject( _s.hdc, _s.penWhite );
+
+   MoveToEx( _s.hdc, iLeft-1, iTop-1, NULL );    //  Top Outer
+   LineTo( _s.hdc, iRight+1, iTop-1 );
+
+   MoveToEx( _s.hdc, iLeft-1, iTop-1, NULL );    //  Left Outer
+   LineTo( _s.hdc, iLeft-1, iBottom+1 );
+
+   SelectObject( _s.hdc, _s.penDarkGray );
+
+   MoveToEx( _s.hdc, iLeft, iBottom, NULL );     //  Bottom Inner
+   LineTo( _s.hdc, iRight, iBottom );
+
+   MoveToEx( _s.hdc, iRight, iBottom, NULL );    //  Right Inner
+   LineTo( _s.hdc, iRight, iTop );
+
+   SelectObject( _s.hdc, _s.penBlack );
+
+   MoveToEx( _s.hdc, iLeft-1, iBottom+1, NULL ); //  Bottom Outer
+   LineTo( _s.hdc, iRight+1+1, iBottom+1 );
+
+   MoveToEx( _s.hdc, iRight+1, iTop-1, NULL );   //  Right Outer
+   LineTo( _s.hdc, iRight+1, iBottom+1 );
+
+   return ( TRUE );
+}
+
+//-------------------------------------------------------------------//
+
+HB_EXPORT BOOL hb_wvt_gtDrawBoxRecessed( int iTop, int iLeft, int iBottom, int iRight )
+{
+   SelectObject( _s.hdc, _s.penWhiteDim );
+
+   MoveToEx( _s.hdc, iRight, iTop, NULL );            // Right Inner
+   LineTo( _s.hdc, iRight, iBottom );
+
+   MoveToEx( _s.hdc, iLeft, iBottom, NULL );          // Bottom Inner
+   LineTo( _s.hdc, iRight, iBottom );
+
+   SelectObject( _s.hdc, _s.penWhite );
+
+   MoveToEx( _s.hdc, iRight+1, iTop-1, NULL );        // Right Outer
+   LineTo( _s.hdc, iRight + 1, iBottom + 1 );
+
+   MoveToEx( _s.hdc, iLeft - 1, iBottom + 1, NULL );  // Bottom Outer
+   LineTo( _s.hdc, iRight + 2, iBottom + 1 );
+
+   SelectObject( _s.hdc, _s.penBlack );
+
+   MoveToEx( _s.hdc, iLeft, iTop, NULL );             // Left Inner
+   LineTo( _s.hdc, iLeft, iBottom );
+
+   MoveToEx( _s.hdc, iLeft, iTop, NULL );             // Top Inner
+   LineTo( _s.hdc, iRight, iTop );
+
+   SelectObject( _s.hdc, _s.penDarkGray );
+
+   MoveToEx( _s.hdc, iLeft - 1, iTop - 1, NULL );     // Left Outer
+   LineTo( _s.hdc, iLeft - 1 , iBottom + 1 );
+
+   MoveToEx( _s.hdc, iLeft - 1, iTop - 1, NULL );     // Top Outer
+   LineTo( _s.hdc, iRight + 1, iTop - 1 );
+
+   return ( TRUE );
+}
+
+//-------------------------------------------------------------------//
+
+HB_EXPORT BOOL hb_wvt_gtDrawOutline( int iTop, int iLeft, int iBottom, int iRight )
+{
+   SelectObject( _s.hdc, _s.penBlack );
+
+   MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Top
+   LineTo( _s.hdc, iRight, iTop );
+
+   MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Left
+   LineTo( _s.hdc, iLeft, iBottom );
+
+   MoveToEx( _s.hdc, iLeft, iBottom, NULL );     //  Bottom
+   LineTo( _s.hdc, iRight, iBottom );
+
+   MoveToEx( _s.hdc, iRight, iTop, NULL );       //  Right
+   LineTo( _s.hdc, iRight, iBottom + 1);
+
+   return ( TRUE );
+}
+
+//-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
@@ -3173,8 +3279,8 @@ HB_FUNC( WVT_SETCODEPAGE )
 HB_FUNC( WVT_CENTERWINDOW )
 {
    hb_retl( hb_wvt_gtSetCentreWindow(
-	            ISNIL( 1 ) ? TRUE  : hb_parl( 1 ),
-	            ISNIL( 2 ) ? FALSE : hb_parl( 2 ) ) );
+               ISNIL( 1 ) ? TRUE  : hb_parl( 1 ),
+               ISNIL( 2 ) ? FALSE : hb_parl( 2 ) ) );
 }
 
 //-------------------------------------------------------------------//
@@ -3509,39 +3615,7 @@ HB_FUNC( WVT_DRAWBOXRAISED )
    iBottom = xy.y;
    iRight  = xy.x;
 
-   SelectObject( _s.hdc, _s.penWhiteDim );
-
-   MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Top Inner
-   LineTo( _s.hdc, iRight, iTop );
-
-   MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Left Inner
-   LineTo( _s.hdc, iLeft, iBottom );
-
-   SelectObject( _s.hdc, _s.penWhite );
-
-   MoveToEx( _s.hdc, iLeft-1, iTop-1, NULL );    //  Top Outer
-   LineTo( _s.hdc, iRight+1, iTop-1 );
-
-   MoveToEx( _s.hdc, iLeft-1, iTop-1, NULL );    //  Left Outer
-   LineTo( _s.hdc, iLeft-1, iBottom+1 );
-
-   SelectObject( _s.hdc, _s.penDarkGray );
-
-   MoveToEx( _s.hdc, iLeft, iBottom, NULL );     //  Bottom Inner
-   LineTo( _s.hdc, iRight, iBottom );
-
-   MoveToEx( _s.hdc, iRight, iBottom, NULL );    //  Right Inner
-   LineTo( _s.hdc, iRight, iTop );
-
-   SelectObject( _s.hdc, _s.penBlack );
-
-   MoveToEx( _s.hdc, iLeft-1, iBottom+1, NULL ); //  Bottom Outer
-   LineTo( _s.hdc, iRight+1+1, iBottom+1 );
-
-   MoveToEx( _s.hdc, iRight+1, iTop-1, NULL );   //  Right Outer
-   LineTo( _s.hdc, iRight+1, iBottom+1 );
-
-   hb_retl( TRUE );
+   hb_retl( hb_wvt_gtDrawBoxRaised( iTop, iLeft, iBottom, iRight ) );
 }
 
 //-------------------------------------------------------------------//
@@ -3559,39 +3633,7 @@ HB_FUNC( WVT_DRAWBOXRECESSED )
    iBottom = xy.y;
    iRight  = xy.x;
 
-   SelectObject( _s.hdc, _s.penWhiteDim );
-
-   MoveToEx( _s.hdc, iRight, iTop, NULL );            // Right Inner
-   LineTo( _s.hdc, iRight, iBottom );
-
-   MoveToEx( _s.hdc, iLeft, iBottom, NULL );          // Bottom Inner
-   LineTo( _s.hdc, iRight, iBottom );
-
-   SelectObject( _s.hdc, _s.penWhite );
-
-   MoveToEx( _s.hdc, iRight+1, iTop-1, NULL );        // Right Outer
-   LineTo( _s.hdc, iRight + 1, iBottom + 1 );
-
-   MoveToEx( _s.hdc, iLeft - 1, iBottom + 1, NULL );  // Bottom Outer
-   LineTo( _s.hdc, iRight + 2, iBottom + 1 );
-
-   SelectObject( _s.hdc, _s.penBlack );
-
-   MoveToEx( _s.hdc, iLeft, iTop, NULL );             // Left Inner
-   LineTo( _s.hdc, iLeft, iBottom );
-
-   MoveToEx( _s.hdc, iLeft, iTop, NULL );             // Top Inner
-   LineTo( _s.hdc, iRight, iTop );
-
-   SelectObject( _s.hdc, _s.penDarkGray );
-
-   MoveToEx( _s.hdc, iLeft - 1, iTop - 1, NULL );     // Left Outer
-   LineTo( _s.hdc, iLeft - 1 , iBottom + 1 );
-
-   MoveToEx( _s.hdc, iLeft - 1, iTop - 1, NULL );     // Top Outer
-   LineTo( _s.hdc, iRight + 1, iTop - 1 );
-
-   hb_retl( TRUE );
+   hb_retl( hb_wvt_gtDrawBoxRecessed( iTop, iLeft, iBottom, iRight ) );
 }
 
 //-------------------------------------------------------------------//
@@ -3779,7 +3821,7 @@ HB_FUNC( WVT_DRAWOUTLINE )
    xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 4 )+1, hb_parni( 3 )+1 );
    iBottom = xy.y;
    iRight  = xy.x;
-
+/*
    SelectObject( _s.hdc, _s.penBlack );
 
    MoveToEx( _s.hdc, iLeft, iTop, NULL );        //  Top
@@ -3793,8 +3835,8 @@ HB_FUNC( WVT_DRAWOUTLINE )
 
    MoveToEx( _s.hdc, iRight, iTop, NULL );       //  Right
    LineTo( _s.hdc, iRight, iBottom + 1);
-
-   hb_retl( TRUE );
+*/
+   hb_retl( hb_wvt_gtDrawOutline( iTop, iLeft, iBottom, iRight ) );
 }
 
 //-------------------------------------------------------------------//
@@ -3830,7 +3872,9 @@ HB_FUNC( WVT_DRAWLINE )
 }
 
 //-------------------------------------------------------------------//
-
+//
+//   Inside the area requested
+//
 HB_FUNC( WVT_DRAWELLIPSE )
 {
    POINT xy;
@@ -3939,7 +3983,7 @@ HB_FUNC( WVT_SETPEN )
 HB_FUNC( WVT_SETBRUSH )
 {
    HBRUSH   hBrush;
-	LOGBRUSH lb;
+   LOGBRUSH lb;
 
    if ( ISNIL( 1 ) )
    {
@@ -4088,6 +4132,8 @@ HB_FUNC( WVT_GETCLIPBOARD )
    CloseClipboard();
 }
 
+//-------------------------------------------------------------------//
+
 HB_FUNC( WVT_SETCLIPBOARD )
 {
    LPTSTR  lptstrCopy;
@@ -4095,20 +4141,21 @@ HB_FUNC( WVT_SETCLIPBOARD )
    char *  cText;
    int     nLen;
 
-   if ( !IsClipboardFormatAvailable(CF_TEXT) )
+   if ( !IsClipboardFormatAvailable( CF_TEXT ) )
    {
      hb_retl( FALSE );
      return;
    }
 
    // Check params
-   if ( !ISCHAR(1) )
+   //
+   if ( ! ISCHAR( 1 ) )
    {
      hb_retl( FALSE );
      return;
    }
 
-   if (!OpenClipboard( NULL ))
+   if ( ! OpenClipboard( NULL ) )
    {
      hb_retl( FALSE );
      return;
@@ -4116,13 +4163,14 @@ HB_FUNC( WVT_SETCLIPBOARD )
    EmptyClipboard();
 
    // Get text from PRG
-   cText = hb_parc(1);
-   nLen  = hb_parclen(1);
+   //
+   cText = hb_parc( 1 );
+   nLen  = hb_parclen( 1 );
 
    // Allocate a global memory object for the text.
-
-   hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (nLen+1) * sizeof(TCHAR));
-   if (hglbCopy == NULL)
+   //
+   hglbCopy = GlobalAlloc( GMEM_MOVEABLE, ( nLen+1 ) * sizeof( TCHAR ) );
+   if ( hglbCopy == NULL )
    {
        CloseClipboard();
        hb_retl( FALSE );
@@ -4130,19 +4178,21 @@ HB_FUNC( WVT_SETCLIPBOARD )
    }
 
    // Lock the handle and copy the text to the buffer.
-
-   lptstrCopy = (LPSTR) GlobalLock(hglbCopy);
-   memcpy(lptstrCopy, cText, (nLen+1) * sizeof(TCHAR));
-   lptstrCopy[nLen+1] = (TCHAR) 0;    // null character
-   GlobalUnlock(hglbCopy);
+   //
+   lptstrCopy = ( LPSTR ) GlobalLock( hglbCopy );
+   memcpy( lptstrCopy, cText, ( nLen+1 ) * sizeof( TCHAR ) );
+   lptstrCopy[ nLen+1 ] = ( TCHAR ) 0;    // null character
+   GlobalUnlock( hglbCopy );
 
    // Place the handle on the clipboard.
-
-   SetClipboardData(CF_TEXT, hglbCopy);
+   //
+   SetClipboardData( CF_TEXT, hglbCopy );
 
    CloseClipboard();
    hb_retl( TRUE );
 }
+
+//-------------------------------------------------------------------//
 
 HB_FUNC( WVT_PASTEFROMCLIPBOARD )
 {
@@ -4150,31 +4200,31 @@ HB_FUNC( WVT_PASTEFROMCLIPBOARD )
    LPTSTR    lptstr;
    ULONG     ul;
 
-   if ( !IsClipboardFormatAvailable(CF_TEXT) )
+   if ( !IsClipboardFormatAvailable( CF_TEXT ) )
    {
      hb_ret();
    }
 
-   if (!OpenClipboard( NULL ))
+   if ( !OpenClipboard( NULL ) )
    {
      hb_ret();
    }
 
-   hglb = GetClipboardData(CF_TEXT);
-   if (hglb != NULL)
+   hglb = GetClipboardData( CF_TEXT );
+   if ( hglb != NULL )
    {
-      lptstr = (LPSTR) GlobalLock(hglb);
-      if (lptstr != NULL)
+      lptstr = ( LPSTR ) GlobalLock( hglb );
+      if ( lptstr != NULL )
       {
          //TraceLog( NULL, "Clipboard %s\n", (LPSTR) lptstr );
          //TraceLog( NULL, "Clipboard size %u\n", GlobalSize(hglb) );
 
-         for ( ul=0; ul < GlobalSize(hglb); ul++ )
+         for ( ul=0; ul < GlobalSize( hglb ); ul++ )
          {
-            hb_wvt_gtAddCharToInputQueue( (int) lptstr[ ul ] );
-            //TraceLog( NULL, "Value %i\n", (int) lptstr[ ul ] );
+            hb_wvt_gtAddCharToInputQueue( ( int ) lptstr[ ul ] );
+            //TraceLog( NULL, "Value %i\n", ( int ) lptstr[ ul ] );
          }
-         GlobalUnlock(hglb);
+         GlobalUnlock( hglb ) ;
       }
    }
    CloseClipboard();
@@ -4184,6 +4234,117 @@ HB_FUNC( WVT_PASTEFROMCLIPBOARD )
 //
 //                    End of Clipboard Functions
 //
+//-------------------------------------------------------------------//
+//
+//    Wvt_DrawButton( nTop, nLeft, nBottom, nRight, cText, cImage, nFormat, ;
+//                    nTextColor, nBkColor, nImageAt )
+//
+HB_FUNC( WVT_DRAWBUTTON )
+{
+   SIZE     sz;
+   POINT    xy;
+   RECT     rc;
+   int      iTop, iLeft, iBottom, iRight;
+   int      iAlign, oldTextAlign, oldBkMode;
+   int      iTextHeight, iTextWidth;
+   int      iImageWidth, iImageHeight;
+   COLORREF oldBkColor, oldTextColor;
+   LOGBRUSH lb;
+   HBRUSH   hBrush;
+
+   BOOL     bText     = ISCHAR( 5 );
+   BOOL     bImage    = ISCHAR( 6 );
+   int      iFormat   = ISNIL(  7 ) ? 0 : hb_parni( 7 );
+   COLORREF textColor = ISNIL(  8 ) ? _COLORS[ 0 ] : ( COLORREF ) hb_parnl( 8 ) ;
+   COLORREF bkColor   = ISNIL(  9 ) ? _COLORS[ 7 ] : ( COLORREF ) hb_parnl( 9 ) ;
+   int      iImageAt  = ISNIL( 10 ) ? 0 : hb_parni( 10 );
+
+   xy         = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   iTop       = xy.y;
+   iLeft      = xy.x;
+
+   xy         = hb_wvt_gtGetXYFromColRow( hb_parni( 4 ) + 1, hb_parni( 3 ) + 1 );
+   iBottom    = xy.y-1;
+   iRight     = xy.x-1;
+
+   lb.lbStyle = BS_SOLID;
+   lb.lbColor = bkColor;
+   lb.lbHatch = NULL;
+
+   hBrush     = CreateBrushIndirect( &lb );
+
+   rc.left    = iLeft ;
+   rc.top     = iTop ;
+   rc.right   = iRight  + 1 ;
+   rc.bottom  = iBottom + 1 ;
+
+   FillRect( _s.hdc, &rc, hBrush );
+
+   DeleteObject( hBrush );
+
+   switch ( iFormat )
+   {
+      case 1:
+         hb_wvt_gtDrawBoxRecessed( iTop+2, iLeft+2, iBottom-2, iRight-2 );
+         break;
+      case 2:
+         break;
+      case 3:
+         hb_wvt_gtDrawOutline( iTop+1, iLeft+1, iBottom-1, iRight-1 );
+         break;
+      default:
+         hb_wvt_gtDrawBoxRaised( iTop+2, iLeft+2, iBottom-2, iRight-2 );
+         break;
+   }
+
+   if ( bText )
+   {
+      ( HFONT ) SelectObject( _s.hdc, GetStockObject( DEFAULT_GUI_FONT ) );
+
+      GetTextExtentPoint32( _s.hdc, hb_parc( 5 ), strlen( hb_parc( 5 ) ), &sz );
+      iTextWidth   = sz.cx;
+      iTextHeight  = sz.cy;
+
+      xy.x = iLeft + ( ( iRight - iLeft + 1 ) / 2 ) ;
+
+      if ( bImage )
+      {
+         xy.y = ( iBottom - 2 - iTextHeight );
+      }
+      else
+      {
+         xy.y = iTop + ( ( iBottom - iTop + 1 ) / 2 ) - ( iTextHeight / 2 );
+      }
+
+      iAlign = TA_CENTER + TA_TOP ;
+
+      oldTextAlign = SetTextAlign( _s.hdc, iAlign );
+      oldBkMode    = SetBkMode( _s.hdc, TRANSPARENT );
+      oldTextColor = SetTextColor( _s.hdc, textColor );
+
+      ExtTextOut( _s.hdc, xy.x, xy.y, 0, NULL, hb_parc( 5 ), strlen( hb_parc( 5 ) ), NULL );
+
+      SetTextColor( _s.hdc, oldTextColor );
+      SetBkMode( _s.hdc, oldBkMode );
+      SetTextAlign( _s.hdc, oldTextAlign );
+   }
+
+   if ( bImage )
+   {
+      iImageWidth = ( iRight - iLeft + 1 - 8 );
+
+      if ( bText )
+         iImageHeight = ( iBottom - iTop + 1 - 8 - iTextHeight );
+      else
+         iImageHeight = ( iBottom - iTop + 1 - 8 + 1 );
+
+      hb_wvt_gtDrawImage( iLeft+4, iTop+4, iImageWidth, iImageHeight, hb_parc( 6 ) );
+   }
+   
+
+   hb_retl( TRUE );
+}
+
 //-------------------------------------------------------------------//
 
 
