@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.30 2003/12/28 22:25:35 druzus Exp $
+ * $Id: gtwin.c,v 1.31 2003/12/29 19:25:52 ronpinkas Exp $
  */
 
 /*
@@ -1760,7 +1760,7 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat ))
 
       hb_Outp9x(97, uiValue);
 
-      hb_idleSleep( dDurat * 1000.0 );
+      hb_idleSleep( dDurat / 1000.0 );
 
       /* Read back current Port value for Reset */
 
