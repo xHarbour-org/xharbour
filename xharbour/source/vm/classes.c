@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.24 2002/10/05 16:19:44 ronpinkas Exp $
+ * $Id: classes.c,v 1.25 2002/10/06 21:24:04 ronpinkas Exp $
  */
 
 /*
@@ -1820,8 +1820,20 @@ HB_FUNC( __CLSMODMSG )
 
 HB_FUNC( __CLSMSGASSIGNED )
 {
-   USHORT uiClass = ( USHORT ) hb_parni( 1 );
+
+   PHB_ITEM pObject = hb_param( 1, HB_IT_OBJECT );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
+   USHORT uiClass;
+
+   if( pObject )
+   {
+      uiClass = pObject->item.asArray.value->uiClass;
+   }
+   else
+   {
+      uiClass = 0;
+   }
+
 
    hb_stack.Return.type = HB_IT_LOGICAL;
    hb_stack.Return.item.asLogical.value = FALSE;
