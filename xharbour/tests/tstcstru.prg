@@ -1,24 +1,44 @@
 #include "cstruct.ch"
+#include "wintypes.ch"
 
-// Explicit Alignment
-C STRUCTURE MyNestedStructure Align 1
-  Member c1[2] IS CTYPE_CHAR
-  Member l2    IS CTYPE_LONG
-END C STRUCTURE
+#ifdef C_SYNTAX
+   pragma pack(1)
+   typedef struct { ;
+      char c1[2] ;
+      LONG l2;
+   } MyNestedStructure, *PMyNestedStructure
 
-// Different Alignment
-C STRUCTURE MyStructure Align 4
-  Member sName    IS CTYPE_CHAR_PTR
-  Member cAge     IS CTYPE_CHAR
-  Member uiWeight IS CTYPE_UNSIGNED_INT
-  Member dHeight  IS CTYPE_DOUBLE
+   pragma pack(4)
+   typedef struct {;
+      LPCSTR sName;
+      char   cAge;
+      UINT   uiWeight;
+      DOUBLE dHeight;
+      MyNestedStructure Nested;
+      MyStructure *pNext;
+   } MyStructure
+   pragma pack()
+#else
+   // Explicit Alignment
+   C STRUCTURE MyNestedStructure Align 1
+     Member c1[2] IS CTYPE_CHAR
+     Member l2    IS CTYPE_LONG
+   END C STRUCTURE
 
-  // This is IN-PLACE - Note IS clause (may also use INPLACE clause).
-  Member Nested   IS MyNestedStructure
+   // Different Alignment
+   C STRUCTURE MyStructure Align 4
+     Member sName    IS CTYPE_CHAR_PTR
+     Member cAge     IS CTYPE_CHAR
+     Member uiWeight IS CTYPE_UNSIGNED_INT
+     Member dHeight  IS CTYPE_DOUBLE
 
-  // This is DETACHED - Note AS clause.
-  Member pNext    AS MyStructure
-END C STRUCTURE
+     // This is IN-PLACE - Note IS clause (may also use INPLACE clause).
+     Member Nested   IS MyNestedStructure
+
+     // This is DETACHED - Note AS clause.
+     Member pNext    AS MyStructure
+   END C STRUCTURE
+#endif
 
 Procedure Main()
 

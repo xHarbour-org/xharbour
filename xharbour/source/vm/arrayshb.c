@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.13 2002/06/14 18:32:52 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.14 2002/06/17 08:07:36 ronpinkas Exp $
  */
 
 /*
@@ -477,6 +477,44 @@ HB_FUNC( HB_AEXPRESSIONS )
       hb_arrayAdd( pArray, hb_itemPutCL( pExp, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
 
       hb_itemRelease( pExp );
+   }
+}
+
+HB_FUNC( HB_ATOKENS )
+{
+   PHB_ITEM pLine  = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pDelim = hb_param( 2, HB_IT_STRING );
+
+   if( pLine )
+   {
+      PHB_ITEM pArray = &hb_stack.Return;
+      PHB_ITEM pToken = hb_itemNew( NULL );
+      char cDelimiter = pDelim ? pDelim->item.asString.value[0] : 32;
+      size_t i, iOffset = 0, iIndex = 1;
+
+      hb_arrayNew( pArray, 0 );
+
+      for( i = 0; i < pLine->item.asString.length; i++ )
+      {
+         if( pLine->item.asString.value[i] == cDelimiter )
+         {
+            hb_arrayAddForward( pArray, hb_itemPutCL( pToken, pLine->item.asString.value + iOffset, i - iOffset ) );
+
+            iOffset = i + 1;
+            iIndex++;
+         }
+      }
+      if( iOffset < pLine->item.asString.length )
+      {
+         hb_arrayAddForward( pArray, hb_itemPutCL( pToken, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
+      }
+
+      hb_itemRelease( pToken );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HB_ATOKENS", 2, hb_paramError(1), hb_paramError(2) );
+      return;
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.21 2002/05/18 08:55:49 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.22 2002/06/13 22:44:17 ronpinkas Exp $
  */
 
 /*
@@ -391,6 +391,7 @@ extern BOOL     HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ); /* creates
 extern ULONG    HB_EXPORT hb_arrayLen( PHB_ITEM pArray ); /* retrives the array len */
 extern BOOL     HB_EXPORT hb_arrayIsObject( PHB_ITEM pArray ); /* retrives if the array is an object */
 extern BOOL     HB_EXPORT hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pItemValue ); /* add a new item to the end of an array item */
+extern BOOL     HB_EXPORT hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pItemValue ); /* add a new item to the end of an array item */
 extern BOOL     HB_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex ); /* insert a nil item into an array, without changing the length */
 extern BOOL     HB_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex ); /* delete an array item, without changing length */
 extern BOOL     HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen ); /* sets the array total length */

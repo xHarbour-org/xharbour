@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.5 2002/06/19 01:00:55 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.6 2002/06/19 01:30:17 ronpinkas Exp $
  */
 
 /*
@@ -49,61 +49,89 @@
  *
  */
 
-#define CTYPE_CHAR 1
-#define CTYPE_UNSIGNED_CHAR -1
-#define CTYPE_CHAR_PTR 10
-#define CTYPE_UNSIGNED_CHAR_PTR -10
+#ifndef CTYPE_CHAR
+   #define CTYPE_CHAR 1
+   #define CTYPE_UNSIGNED_CHAR -1
+   #define CTYPE_CHAR_PTR 10
+   #define CTYPE_UNSIGNED_CHAR_PTR -10
 
-#define CTYPE_SHORT 2
-#define CTYPE_UNSIGNED_SHORT -2
-#define CTYPE_SHORT_PTR 20
-#define CTYPE_UNSIGNED_SHORT_PTR -20
+   #define CTYPE_SHORT 2
+   #define CTYPE_UNSIGNED_SHORT -2
+   #define CTYPE_SHORT_PTR 20
+   #define CTYPE_UNSIGNED_SHORT_PTR -20
 
-#define CTYPE_INT 3
-#define CTYPE_UNSIGNED_INT -3
-#define CTYPE_INT_PTR 30
-#define CTYPE_UNSIGNED_INT_PTR -30
+   #define CTYPE_INT 3
+   #define CTYPE_UNSIGNED_INT -3
+   #define CTYPE_INT_PTR 30
+   #define CTYPE_UNSIGNED_INT_PTR -30
 
-#define CTYPE_LONG 4
-#define CTYPE_UNSIGNED_LONG -4
-#define CTYPE_LONG_PTR 40
-#define CTYPE_UNSIGNED_LONG_PTR -40
+   #define CTYPE_LONG 4
+   #define CTYPE_UNSIGNED_LONG -4
+   #define CTYPE_LONG_PTR 40
+   #define CTYPE_UNSIGNED_LONG_PTR -40
 
-#define CTYPE_FLOAT 5
-#define CTYPE_FLOAT_PTR 50
+   #define CTYPE_FLOAT 5
+   #define CTYPE_FLOAT_PTR 50
 
-#define CTYPE_DOUBLE 6
-#define CTYPE_DOUBLE_PTR 60
+   #define CTYPE_DOUBLE 6
+   #define CTYPE_DOUBLE_PTR 60
 
-#define CTYPE_VOID_PTR 7
+   #define CTYPE_VOID_PTR 7
 
-// ***Must*** be smaller than CTYPE_STRUCTURE_PTR
-#define CTYPE_STRUCTURE 1000
-#define CTYPE_STRUCTURE_PTR 10000
+   // ***Must*** be smaller than CTYPE_STRUCTURE_PTR
+   #define CTYPE_STRUCTURE 1000
+   #define CTYPE_STRUCTURE_PTR 10000
 
-// Exclude from C compilation
-#ifdef _SET_CH
-   #command C STRUCTURE <!stru!> [ALIGN <align> ] => ;
-            INIT PROCEDURE __INIT_<stru>; __ActiveStructure( #<stru>, <align> ) ; ;
-            #translate IS <stru> [ <x: :=, INIT, FROM> { <initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {<initlist>} ) ; ;
+   // Exclude from C compilation
+   #ifdef _SET_CH
+      #command C STRUCTURE <!stru!> [ALIGN <align> ] => ;
+               INIT PROCEDURE __INIT_<stru>; __ActiveStructure( #<stru>, <align> ) ; ;
+               #translate IS <stru> [ <x: :=, INIT, FROM> { <initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {<initlist>} ) ; ;
 
-   // <elem> instead of <!elem!> to allow ElemName[n] syntax.
-   #command MEMBER <elem> IS <type> => HB_Member( #<elem>, <type> )
+      // <elem> instead of <!elem!> to allow ElemName[n] syntax.
+      #command MEMBER <elem> IS <type> => HB_Member( #<elem>, <type> )
 
-   /*
-      Will match:
-         MEMBER <elem> IS <!stru!>
-      due to expansion of:
-         #translate IS <stru> [...] => := HB_CStructure( #<stru> ):Init( {} )
-      as established by C STRUCTURE <!stru!> #command for the given structure.
-   */
-   #command MEMBER <elem> := HB_CStructure( <literalstru> ):Init( {} ) => ;
-            HB_Member( #<elem>, HB_CStructureId( <literalstru>, .T. ) )
+      /*
+         Will match:
+            MEMBER <elem> IS <!stru!>
+         due to expansion of:
+            #translate IS <stru> [...] => := HB_CStructure( #<stru> ):Init( {} )
+         as established by C STRUCTURE <!stru!> #command for the given structure.
+      */
+      #command MEMBER <elem> := HB_CStructure( <literalstru> ):Init( {} ) => ;
+               HB_Member( #<elem>, HB_CStructureId( <literalstru>, .T. ) )
 
-   #command MEMBER <!elem!> IS <type> ( <nlen> ) => HB_Member( #<elem>, HB_CTypeArrayID( <type>, <nlen> ) )
+      #command MEMBER <!elem!> IS <type> ( <nlen> ) => HB_Member( #<elem>, HB_CTypeArrayID( <type>, <nlen> ) )
 
-   #command MEMBER <!elem!> AS <!stru!> => ;
-            HB_Member( #<elem>, HB_CStructureId( #<stru>, .F. ) )
+      #command MEMBER <!elem!> AS <!stru!> => ;
+               HB_Member( #<elem>, HB_CStructureId( #<stru>, .F. ) )
 
-   #command END C STRUCTURE [<!stru!>] => ; __ActiveStructure( NIL ); RETURN
+      #command END C STRUCTURE [<!stru!>] => ; __ActiveStructure( NIL ); RETURN
+
+      //----------------------------- C Syntax support ---------------------------------//
+      /* NOTES:
+
+        1. #pragma pack(<x>) needs to be translated to pragma pack(<X>) without the <#>.
+
+        2. First line must end with <;> so the whole definition is a single PRG line!
+      */
+
+      #define __PACK 8
+
+      #xcommand typedef struct <elemArr> <!stru!> [, <*synon*> ] => ;
+               #translate IS <stru> [ <x: :=, INIT, FROM> { <initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {<initlist>} ) ; ;
+                INIT PROCEDURE __INIT_<stru>; ;
+                   HB_CStructureCSyntax( #<stru>, #<elemArr>, , <"synon">, __PACK ); ;
+                RETURN
+
+      #xcommand typedef struct <!tag!> <elemArr> <!stru!> [, <*synon*>] => ;
+                #translate IS <stru> [ <x: :=, INIT, FROM> { <initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {<initlist>} ) ; ;
+                INIT PROCEDURE __INIT_<stru>; ;
+                   HB_CStructureCSyntax( #<stru>, #<elemArr>, #<tag>, <"synon">, __PACK ); ;
+                RETURN
+
+      #xcommand pragma pack( <pack> ) => #undef __PACK; #define __PACK <pack>
+      #xcommand pragma pack() => #undef __PACK; #define __PACK 8
+
+   #endif
 #endif

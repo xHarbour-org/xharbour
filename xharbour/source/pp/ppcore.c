@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.21 2002/06/11 20:17:04 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.22 2002/06/17 18:21:21 ronpinkas Exp $
  */
 
 /*
@@ -1209,7 +1209,10 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
                        *(sLine + isdvig + ipos - 1) = '\0';
                     }
 
-                    ptri += i - (ptri-ptrb);
+                    // Ron Pinkas 2002-06-21
+                    //ptri += i - (ptri-ptrb);
+                    // Because we need to check the expansion for nested #defines as well!
+                    ptri += - (ptri-ptrb);
                  }
               }
            }

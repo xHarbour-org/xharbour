@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.16 2002/05/12 17:58:56 ronpinkas Exp $
+ * $Id: arrays.c,v 1.17 2002/06/12 11:53:06 ronpinkas Exp $
  */
 
 /*
@@ -130,6 +130,27 @@ BOOL hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
          hb_arraySize( pArray, pBaseArray->ulLen + 1 );
          pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
          hb_itemCopy( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
+
+         return TRUE;
+      }
+   }
+
+   return FALSE;
+}
+
+BOOL hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pValue )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayAddForward(%p, %p)", pArray, pValue));
+
+   if( HB_IS_ARRAY( pArray ) )
+   {
+      PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
+
+      if( pBaseArray->ulLen < ULONG_MAX )
+      {
+         hb_arraySize( pArray, pBaseArray->ulLen + 1 );
+         pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
+         hb_itemForwardValue( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
 
          return TRUE;
       }

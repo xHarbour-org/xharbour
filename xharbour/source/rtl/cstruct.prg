@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.5 2002/06/18 05:48:40 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.6 2002/06/19 01:00:55 ronpinkas Exp $
  */
 
 /*
@@ -100,6 +100,69 @@ Function HB_CStructureID( cStructure, lInplace )
    cStructure := Upper( cStructure )
 
 Return aScan( s_aClasses, { | aClassInfo | IIF( aClassInfo[1] == cStructure, .T., .F. ) } ) + IIF( lInplace, CTYPE_STRUCTURE, CTYPE_STRUCTURE_PTR )
+
+//---------------------------------------------------------------------------//
+Procedure HB_CStructureCSyntax( cStructure, cDefinitions, cTag, cSynonList, nAlign )
+
+   LOCAL aDefinitions, nLen, Counter, CType
+
+   cDefinitions := LTrim( RTrim( SubStr( cDefinitions, 2, Len( cDefinitions ) - 2 ) ) )
+
+   cDefinitions := StrTran( cDefinitions, "*", "* " )
+
+   nLen := Len( cDefinitions )
+   FOR Counter := 1 TO nLen
+      IF cDefinitions[Counter] == ' '
+         Counter++
+         WHILE cDefinitions[Counter] == ' '
+            cDefinitions[Counter] := '|'
+            Counter++
+         END
+         Counter--
+      ELSEIF cDefinitions[Counter] == '['
+         IF cDefinitions[Counter - 1] == ' '
+            cDefinitions[Counter - 1] := '|'
+         ENDIF
+
+         Counter++
+         WHILE cDefinitions[Counter] != ']'
+            IF cDefinitions[Counter] == ' '
+               cDefinitions[Counter] := '|'
+            ENDIF
+            Counter++
+         END
+      ELSEIF cDefinitions[Counter] == '*'
+         IF cDefinitions[Counter - 1] == ' '
+            cDefinitions[Counter - 1] := '|'
+         ENDIF
+      ENDIF
+   NEXT
+
+   cDefinitions := StrTran( cDefinitions, "|", "" )
+   aDefinitions := HB_aTokens( cDefinitions )
+
+   __ActiveStructure( cStructure, nAlign )
+   nLen := Len( aDefinitions )
+
+   FOR Counter := 1 TO nLen STEP 2
+      //TraceLog( "Member: " + aDefinitions[Counter + 1], "Type: " + aDefinitions[Counter] )
+      CType := aDefinitions[Counter]
+      IF Val( CType ) != 0
+         HB_Member( aDefinitions[Counter + 1], Val( aDefinitions[Counter] ) )
+      ELSE
+         IF CType[-1] == '*'
+            CType := HB_CStructureID( Left( CType, Len( CType ) - 1 ), .F. )
+         ELSE
+            CType := HB_CStructureID( CType, .T. )
+         ENDIF
+
+         HB_Member( aDefinitions[Counter + 1], CType )
+      ENDIF
+   NEXT
+
+   __ActiveStructure()
+
+Return
 
 //---------------------------------------------------------------------------//
 Function HB_CStructure( cStructure, nAlign )
