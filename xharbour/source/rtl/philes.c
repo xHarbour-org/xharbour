@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.9 2003/07/30 14:07:41 druzus Exp $
+ * $Id: philes.c,v 1.10 2003/08/26 15:08:51 jonnymind Exp $
  */
 
 /*
@@ -350,8 +350,7 @@ HB_FUNC( HB_OPENPROCESS )
       pfhErr = NULL;
    }
 
-
-   fhProcess = hb_fsOpenProcess( szName, pfhIn, pfhOut, pfhErr );
+   fhProcess = hb_fsOpenProcess( (unsigned char*) szName, pfhIn, pfhOut, pfhErr );
 
    if ( fhProcess != FS_ERROR )
    {

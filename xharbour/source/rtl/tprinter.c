@@ -204,7 +204,7 @@ BOOL THarbourPrinter_NewPage()
 
 #define MAXBUFFERSIZE 250
 
-#define WINVER  0x0500 
+#define WINVER  0x0500
 BOOL THarbourPrinter_DPGetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
 {
    BOOL bFlag;
@@ -270,7 +270,10 @@ BOOL THarbourPrinter_DPGetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBuffer
    {
       /* If Windows NT, use the GetDefaultPrinter API for Windows 2000,
          or GetProfileString for version 4.0 and earlier... */
+#if 0 // Link error on GetDefaultPrinter() as missing external.
 #if( WINVER >= 0x0500 )
+      extern BOOL GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
+
       if ( osv.dwMajorVersion >= 5 )  /* Windows 2000 or later */
       {
          bFlag = GetDefaultPrinter( pPrinterName, pdwBufferSize ) ;
@@ -281,6 +284,7 @@ BOOL THarbourPrinter_DPGetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBuffer
          }
       }
       else /* NT4.0 or earlier */
+#endif
 #endif
       {
          /* Retrieve the default string from Win.ini (the registry ) .
@@ -326,7 +330,7 @@ BOOL THarbourPrinter_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBuffe
    PRINTER_INFO_5 buffer[ MAX_PRINTERS ];
 
    EnumPrinters( PRINTER_ENUM_SHARED | PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL |PRINTER_ENUM_CONNECTIONS ,NULL,5,( LPBYTE ) buffer, MAX_PRINTERS*sizeof( PRINTER_INFO_5 ), &needed,&returned ) ;
-                             
+
    for( a = 0 ; a < returned ; a++ )
    {
       if ( lstrcmp( buffer[a].pPortName , pPortName ) == 0 )
