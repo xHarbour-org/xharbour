@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2784 2004/04/14 15:06:04 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2785 2004/04/14 18:53:27 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-15 03:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/hbapi.h
+  + include/local.h (empty)
+    * this is to allow builders to use their local defines
 
 2004-04-14 02:48 UTC-0400 Sylvain Robert (s.robert/at/videotron.ca)
   * source/rtl/filesys.c

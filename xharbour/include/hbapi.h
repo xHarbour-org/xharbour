@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.134 2004/04/03 11:47:11 jonnymind Exp $
+ * $Id: hbapi.h,v 1.135 2004/04/04 19:50:29 fsgiudice Exp $
  */
 
 /*
@@ -697,6 +697,8 @@ LONG     HB_EXPORT hb_strValInt( const char * szText, int * iOverflow );
 #endif
 int HB_EXPORT Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
 BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
+
+#include "local.h"
 
 HB_EXTERN_END
 
