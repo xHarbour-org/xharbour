@@ -14,7 +14,7 @@ echo , demo.exe, + >> b32.bc
 echo demo.map, + >> b32.bc
 echo ..\lib\what32.lib +  >>  b32.bc
 rem echo ..\..\whoo\lib\whoo.lib +  >>  b32.bc
-echo ..\..\xVisual\whatplus.lib +  >>  b32.bc
+echo ..\whatplus.lib +  >>  b32.bc
 echo ..\..\..\lib\rtl.lib + >> b32.bc
 echo ..\..\..\lib\vm.lib + >> b32.bc
 echo ..\..\..\lib\gtwin.lib + >> b32.bc
