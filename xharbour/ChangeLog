@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.581 2003/01/04 04:33:09 jonnymind Exp $
+ * $Id: ChangeLog,v 1.582 2003/01/04 08:56:59 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-04 14:09 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * samples/sitesvr/Makefile
+  * samples/sitesvr/blddbf.prg
+  * samples/sitesvr/sitesrv.prg
+    ! using lowercase file name convention to allow correct execution in UNIX
+    * blddbf is now a separate linked module
+
+  ! source/rtl/inet.c
+    ! InetCRLF() was broken :-(. Now it is fixed and correct.
 
 2003-01-04 09:54 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
 

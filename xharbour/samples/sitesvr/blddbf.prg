@@ -1,5 +1,5 @@
 /*
- * $Id:  Exp $
+ * $Id: blddbf.prg,v 1.1 2003/01/04 08:51:18 fsgiudice Exp $
  */
 
 ***********************************************************
@@ -25,7 +25,7 @@ PROCEDURE BuildDBF()
    LOCAL aStruct
 
    // Check if exist database
-   IF !File( "SITE.DBF" )
+   IF !File( "site.dbf" )
 
       aStruct := {                                ;
                    { "ID"       , "N", 10, 0 },   ;
@@ -37,11 +37,11 @@ PROCEDURE BuildDBF()
 
       dbCreate( "site.dbf", aStruct )
 
-      USE site
-      INDEX ON field->ID TO site01
-      INDEX ON STR( field->PARENT ) + "-" + field->NAME TO site02
+      USE "site.dbf"
+      INDEX ON field->ID TO "site01"
+      INDEX ON STR( field->PARENT ) + "-" + field->NAME TO "site02"
 
-      SET INDEX TO SITE01, SITE02
+      SET INDEX TO "site01", "site02"
 
       APPEND BLANK
       field->id       := 1
@@ -50,9 +50,9 @@ PROCEDURE BuildDBF()
       field->mimetype := "text/html"
       field->content  := [<HTML>                                                        ] + CRLF + ;
                          [<HEAD>                                                        ] + CRLF + ;
-                         [<TITLE>Clipper Server demo site</TITLE>                       ] + CRLF + ;
+                         [<TITLE>xHarbour Server demo site</TITLE>                       ] + CRLF + ;
                          [<BODY>                                                        ] + CRLF + ;
-                         [    <H1>Clipper Server Demo Site</H1>                         ] + CRLF + ;
+                         [    <H1>xHarbour Server Demo Site</H1>                         ] + CRLF + ;
                          [    <H2>Index</H2>                                            ] + CRLF + ;
                          [    <UL>                                                      ] + CRLF + ;
                          [      <LI>An HTML text in this area: <a href="/test">CLICK</A>] + CRLF + ;
