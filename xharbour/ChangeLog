@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1719 2003/11/14 03:15:11 walito Exp $
+ * $Id: ChangeLog,v 1.1720 2003/11/14 16:35:50 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-14 20:44 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/empty.c
+    ! Added hashes; if they are not empty, now Empty() returns false.
+
+  * source/rtl/hbreadini.prg
+  * tests/parseini.prg
+    * Using hashes instead of TAssociative array
 
 2003-11-14 17:30 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbhashapi.h

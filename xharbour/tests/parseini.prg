@@ -1,7 +1,7 @@
 ******************************************************************
 * parseini.prg
 *
-* $Id$
+* $Id: parseini.prg,v 1.2 2003/03/19 13:30:47 jonnymind Exp $
 * Test for Ini file reading/writing
 *
 * Giancarlo Niccolai
@@ -46,9 +46,9 @@ PROCEDURE Main( cName )
    
    ?
    ? "Adding section 'Added', with key NEW = new"
-   aIni[ "Added" ] := TAssociativeArray()
+   aIni[ "Added" ] := Hash()
    aIni[ "Added" ][ "NEW" ] := "new"
-   
+
    ? "Writing output to parseini_out.ini"
    IF HB_WriteIni( "parseini_out.ini", aIni, "#Generated file; don't touch", "#End of file")
       ? "File written"

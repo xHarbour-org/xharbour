@@ -1,5 +1,5 @@
 /*
- * $Id: empty.c,v 1.2 2003/05/06 08:31:39 jonnymind Exp $
+ * $Id: empty.c,v 1.3 2003/07/10 15:20:00 jonnymind Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbhashapi.h"
 
 HB_FUNC( EMPTY )
 {
@@ -100,6 +101,10 @@ HB_FUNC( EMPTY )
 
       case HB_IT_BLOCK:
          hb_retl( FALSE );
+         break;
+
+      case HB_IT_HASH:
+         hb_retl( hb_hashLen( pItem )  == 0 );
          break;
 
       default:
