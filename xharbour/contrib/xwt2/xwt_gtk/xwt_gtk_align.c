@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_align.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
+   $Id: xwt_gtk_align.c,v 1.2 2004/05/20 15:41:38 jonnymind Exp $
 
   Align widget - block over unaligned widgets to provide them with alignment ability.
 */
@@ -146,7 +146,7 @@ BOOL xwt_gtk_align_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    }
    else
    {
-      ret = xwt_gtk_base_setprop( widget, prop, pValue );
+      ret = xwt_gtk_base_getprop( widget, prop, pValue );
    }
 
    return ret;

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: widget.prg,v 1.1 2004/05/11 14:57:50 jonnymind Exp $
+   $Id: widget.prg,v 1.2 2004/05/17 09:27:11 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -15,12 +15,9 @@ Extern XwtEvent
 CLASS XWTWidget
    /** Parses styles in format NAME: VALUE; */
    CLASSDATA cRegexStyle   INIT HB_RegexComp('\s*([^:]+):\s*(("?)(.*?)\3)\s*(;|$)')
-   
+
    /** Pointer to internal data used by current subsystem */
    DATA oRawWidget
-   
-   /** Deliver events to owner or stop them in this widget */
-   DATA bEventsToOwner
 
    /** Owner of this object */
    DATA oOwner
@@ -37,9 +34,9 @@ CLASS XWTWidget
 
    METHOD SetFocus()
    METHOD HasFocus()
-   
+
    METHOD SetText( cText )      INLINE   ::setProperty( "text", cText )
-   METHOD GetText()             INLINE   ::getProperty( "text" )  
+   METHOD GetText()             INLINE   ::getProperty( "text" )
 
    METHOD GetType()        INLINE   ::nWidgetType
 
@@ -49,20 +46,20 @@ CLASS XWTWidget
 
    METHOD RiseEvent( oEvent )
    METHOD RiseOneEvent( aListeners, oEvent )
-   
+
    // cProperty may be a hash with a set of properties to set.
    METHOD SetProperty( cProperty, xValue )    INLINE XWT_SetProperty( ::oRawWidget, cProperty, xValue )
    METHOD SetStyle( cStr )
    METHOD GetProperty( cProperty )            INLINE XWT_GetProperty( ::oRawWidget, cProperty )
    METHOD GetProperties()                     INLINE XWT_GetAllProperties( ::oRawWidget )
    METHOD GetStyle()
-   
+
    METHOD SetSensible( bSense )
    METHOD IsSensible()
-   
+
 PROTECTED:
    DATA nWidgetType
-   
+
    /** Objects that are listening for this object events */
    DATA hEventListeners
 
@@ -80,20 +77,19 @@ ENDCLASS
    height
    id
 */
-   
+
 
 METHOD New( xStyle ) CLASS XWTWidget
    /* IMPORTANT! oRawWidget MUST be initialized by subclasses */
    ::hEventListeners := { "all" => {} }
-   ::bEventsToOwner := .T.
    IF ::oRawWidget != NIL .and. ! Empty( xStyle )
       IF ValType( xStyle ) == "H"
          ::SetProperty( xStyle )
       ELSEIF ValType( xStyle ) == "C"
          ::SetStyle( xStyle )
       ENDIF
-   ENDIF 
-   
+   ENDIF
+
 RETURN Self
 
 
@@ -124,7 +120,7 @@ RETURN .T.
 
 METHOD RemoveListener( oListener, mthListener ) CLASS XWTWidget
    LOCAL aList, i := 1, j
-   
+
    DO WHILE i < Len( ::hEventListeners )
       aList := HGetValueAt( ::hEventListeners, i )
       j := 1
@@ -148,31 +144,34 @@ RETURN .T.
 
 METHOD RiseEvent( oEvent ) CLASS XWTWidget
    LOCAL nPos
-   
+
    nPos := HGetPos( ::hEventListeners, oEvent:cType )
    IF nPos != 0
       IF ::RiseOneEvent( HGetValueAt( ::hEventListeners, nPos ), oEvent )
          RETURN .T.
       ENDIF
    ENDIF
-   
+
    nPos := HGetPos( ::hEventListeners, "all" )
    IF nPos != 0
       IF ::RiseOneEvent( HGetValueAt( ::hEventListeners, nPos ) , oEvent )
          RETURN .T.
       ENDIF
    ENDIF
-   
+
    /* Back broadcasting */
-   IF ::bEventsToOwner .and. ::oOwner != NIL
+   IF ::oOwner != NIL .and. ::GetProperty( "broadcast" )
       RETURN ::oOwner:RiseEvent( oEvent )
    ENDIF
 
+   IF .not. ::GetProperty( "broadcast" )
+      ? "Not Broadcast:", ::getProperty("id"), ::getProperty("text")
+   ENDIF
 RETURN .F.
-   
+
 METHOD RiseOneEvent( aListeners, oEvent ) CLASS XWTWidget
    LOCAL aList, aCall, bRes
-   
+
    FOR EACH aList IN aListeners
       IF Empty( aList[2] )
          aCall := { aList[1], oEvent }
@@ -184,7 +183,7 @@ METHOD RiseOneEvent( aListeners, oEvent ) CLASS XWTWidget
          RETURN .T.
       ENDIF
    NEXT
-   
+
 RETURN .F.
 
 /*****************************************************/
@@ -192,9 +191,9 @@ RETURN .F.
 METHOD SetStyle( cRequest ) CLASS XWTWidget
    LOCAL aMatch, nValue
    LOCAL hProps := Hash()
-   
+
    cRequest := AllTrim( cRequest )
-   
+
    DO WHILE Len( cRequest ) > 0
       aMatch := HB_Regex( ::cRegexStyle, cRequest )
       IF aMatch == NIL
@@ -211,29 +210,29 @@ METHOD SetStyle( cRequest ) CLASS XWTWidget
          ELSE
             hProps[ aMatch[2] ] := aMatch[5]
          ENDIF
-         cRequest := Substr( cRequest, Len( aMatch[1] ) + 1) 
+         cRequest := Substr( cRequest, Len( aMatch[1] ) + 1)
       ENDIF
    ENDDO
-   
+
    IF Len( hProps ) > 0
       RETURN XWT_SetProperty( ::oRawWidget, hProps )
    ENDIF
 RETURN .F.
-      
+
 METHOD GetStyle() CLASS XWTWidget
    LOCAL hProps, cProps, nPos
    LOCAL cKey, xValue
-   
+
    cProps := ""
    hProps := ::GetProperties()
    IF Len( hProps ) == 0
       RETURN ""
    ENDIF
-   
+
    FOR nPos := 1 TO Len( hProps )
       cKey := HGetKeyAt( hProps, nPos )
       xValue := HGetValueAt( hProps, nPos )
-      IF ValType(xValue) == "C" 
+      IF ValType(xValue) == "C"
          xValue := StrTran( xValue, '"', '\"' )
          IF At( " ", xValue ) != 0 .or. At( ";", xValue ) != 0
             xValue := '"' + xValue + '"'
@@ -243,14 +242,14 @@ METHOD GetStyle() CLASS XWTWidget
       ENDIF
       cProps += cKey + ": " + xValue + "; "
    NEXT
-   
+
 RETURN Substr( cProps, 1, Len( cProps ) -2 )
 
 METHOD Show() CLASS XWTWidget
    LOCAL bRaw
 
    bRaw:= XWT_FastRiseEvent( "show", Self )
-   
+
    IF .not. bRaw
       bRaw := .not. XWT_SetProperty( ::oRawWidget, "visibility", "normal" )
    ENDIF
@@ -331,4 +330,3 @@ METHOD IsSensible() CLASS XWTWidget
 
 RETURN bSense
 
-         

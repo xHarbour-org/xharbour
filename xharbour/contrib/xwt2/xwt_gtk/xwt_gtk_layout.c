@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_layout.c,v 1.7 2003/08/27 20:09:24 xthefull Exp $
+   $Id: xwt_gtk_layout.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
 
    Layout - Horizontal or vertical layout manager
 */
@@ -14,16 +14,16 @@
 #include <xwt_gtk.h>
 
 /** Layout manager functions */
-           
+
 BOOL xwt_gtk_layout_add( PXWT_WIDGET wParent, PXWT_WIDGET wChild )
 {
    GtkWidget *gtkChild =  ((PXWT_GTK_BASE) wChild->widget_data)->top_widget( wChild );
    PXWT_GTK_LAYOUT lay = (PXWT_GTK_LAYOUT) wParent->widget_data;
    GtkWidget *gtkSelf = ((PXWT_GTK_BASE) wParent->widget_data)->main_widget;
-   
+
    gtk_box_pack_start( GTK_BOX( gtkSelf ), gtkChild, lay->bExpand, lay->bFill, lay->iPadding );
-   
-   return TRUE;   
+
+   return TRUE;
 }
 
 
@@ -31,7 +31,7 @@ BOOL xwt_gtk_layout_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
 {
    BOOL ret = TRUE;
    PXWT_GTK_LAYOUT lay = (PXWT_GTK_LAYOUT) widget->widget_data;
-         
+
    if ( strcmp( prop, "mode" ) == 0 )
    {
       if (HB_IS_STRING( pValue ) )
@@ -63,8 +63,8 @@ BOOL xwt_gtk_layout_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
       {
          ret = FALSE;
       }
-      
-      if ( ret ) 
+
+      if ( ret )
       {
          xwt_gtk_layout_create_with_mode( widget );
       }
@@ -118,22 +118,22 @@ BOOL xwt_gtk_layout_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    {
       ret = xwt_gtk_container_setprop( widget, prop, pValue );
    }
-   
+
    return ret;
 }
-                   
+
 
 BOOL xwt_gtk_layout_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
 {
    BOOL ret = TRUE;
    PXWT_GTK_LAYOUT lay = (PXWT_GTK_LAYOUT) widget->widget_data;
-         
+
    if ( strcmp( prop, "mode" ) == 0 )
    {
       switch( lay->iMode )
       {
-         case XWT_LM_HORIZ: hb_itemPutCRawStatic( pValue, "horizontal", 10 ); break; 
-         case XWT_LM_VERT: hb_itemPutCRawStatic( pValue, "vertical", 8 ); break; 
+         case XWT_LM_HORIZ: hb_itemPutCRawStatic( pValue, "horizontal", 10 ); break;
+         case XWT_LM_VERT: hb_itemPutCRawStatic( pValue, "vertical", 8 ); break;
          default: ret = FALSE;
       }
    }
@@ -151,9 +151,9 @@ BOOL xwt_gtk_layout_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    }
    else
    {
-      ret = xwt_gtk_container_setprop( widget, prop, pValue );
+      ret = xwt_gtk_container_getprop( widget, prop, pValue );
    }
-   
+
    return ret;
 }
 
@@ -161,22 +161,22 @@ BOOL xwt_gtk_layout_getall( PXWT_WIDGET widget, PHB_ITEM pProps )
 {
    PXWT_GTK_LAYOUT lay = (PXWT_GTK_LAYOUT) widget->widget_data;
    HB_ITEM hbValue;
-   
+
    hbValue.type = HB_IT_NIL;
-   
+
    xwt_gtk_container_getall( widget, pProps );
-   
+
    switch( lay->iMode )
    {
-      case XWT_LM_HORIZ: hb_itemPutCRawStatic(  &hbValue, "horizontal", 10 ); break; 
-      case XWT_LM_VERT: hb_itemPutCRawStatic(  &hbValue, "vertical", 8 ); break; 
+      case XWT_LM_HORIZ: hb_itemPutCRawStatic(  &hbValue, "horizontal", 10 ); break;
+      case XWT_LM_VERT: hb_itemPutCRawStatic(  &hbValue, "vertical", 8 ); break;
       default: hb_itemPutCRawStatic(  &hbValue, "undefined", 9 ); break;
    }
    hb_hashAddChar( pProps, "mode", &hbValue );
    hb_hashAddChar( pProps, "padding", hb_itemPutNI( &hbValue, lay->iPadding )  );
    hb_hashAddChar( pProps, "fill", hb_itemPutL( &hbValue, lay->bFill )  );
    hb_hashAddChar( pProps, "expand", hb_itemPutL( &hbValue, lay->bExpand )  );
-   
+
    return TRUE;
 }
 
@@ -194,9 +194,9 @@ BOOL xwt_gtk_createLayout( PXWT_WIDGET xwtData )
    wLayout->INH(remove) = xwt_gtk_container_remove; // generic container remover
    wLayout->INH(INH(align)) = NULL; // no alignment window for now
    wLayout->INH(INH(iHAlign)) = XWT_ALIGN_CENTER; // defaults to center/center
-   wLayout->INH(INH(iVAlign)) = XWT_ALIGN_CENTER; 
+   wLayout->INH(INH(iVAlign)) = XWT_ALIGN_CENTER;
 
-   wLayout->INH(INH(INH(main_widget))) = gtk_vbox_new( TRUE, 0 ); 
+   wLayout->INH(INH(INH(main_widget))) = gtk_vbox_new( TRUE, 0 );
    wLayout->INH(INH(INH(top_widget))) = xwt_gtk_container_topwidget; // wich is the enframer
    // create also the mandatory aligment widget
    xwt_gtk_set_alignment( (XWT_GTK_ALIGN *) wLayout );
@@ -212,13 +212,13 @@ BOOL xwt_gtk_createLayout( PXWT_WIDGET xwtData )
    xwtData->set_property = xwt_gtk_layout_setprop;
    xwtData->get_property = xwt_gtk_layout_getprop;
    xwtData->get_all_properties = xwt_gtk_layout_getall;
-   
+
    // nothing more than the base one
    xwtData->set_pgroup = xwt_gtk_setpgroup;
-   
+
    xwt_gtk_base_signal_connect( xwtData );
-   xwt_gtk_base_general_connect( xwtData ); 
-   
+   xwt_gtk_base_general_connect( xwtData );
+
    return TRUE;
 }
 
@@ -228,7 +228,7 @@ BOOL xwt_gtk_layout_create_with_mode( PXWT_WIDGET wWidget )
    PXWT_GTK_LAYOUT lay = (PXWT_GTK_LAYOUT) wWidget->widget_data;
    GtkWidget *parent;
    GList *copy;
-   
+
    // Recreation?
    if ( lay->INH(INH(INH(main_widget))) != NULL )
    {
@@ -248,7 +248,7 @@ BOOL xwt_gtk_layout_create_with_mode( PXWT_WIDGET wWidget )
       copy = NULL;
       parent = NULL;
    }
-      
+
    if ( lay->iMode == XWT_LM_HORIZ )
    {
       lay->INH(INH(INH(main_widget))) = gtk_hbox_new( FALSE, 0 );
@@ -260,20 +260,20 @@ BOOL xwt_gtk_layout_create_with_mode( PXWT_WIDGET wWidget )
    // reference the widget
    g_object_ref( lay->INH(INH(INH(main_widget))) );
    gtk_widget_show( lay->INH(INH(INH(main_widget))) );
-   
+
    // readd to parent (usually an align)
    if ( parent != NULL )
    {
       gtk_container_add( GTK_CONTAINER( parent ), lay->INH(INH(INH(main_widget))) );
    }
-   
+
    // have we to reset the widgets in?
    if ( copy != NULL )
    {
       GList *child = copy;
       while ( child != NULL )
       {
-         gtk_box_pack_start( GTK_BOX( lay->INH(INH(INH(main_widget))) ), GTK_WIDGET( child->data ), 
+         gtk_box_pack_start( GTK_BOX( lay->INH(INH(INH(main_widget))) ), GTK_WIDGET( child->data ),
             lay->bExpand, lay->bFill, lay->iPadding );
          child = child->next;
       }
@@ -290,19 +290,19 @@ BOOL xwt_gtk_layout_repack( PXWT_WIDGET wWidget )
    PXWT_GTK_LAYOUT lay = (PXWT_GTK_LAYOUT) wWidget->widget_data;
    GtkWidget *box = lay->INH(INH(INH(main_widget)));
    GList *child;
-   
+
    if ( box == NULL )
    {
       return FALSE;
    }
-       
+
    child = gtk_container_get_children( GTK_CONTAINER( box ));
    while ( child != NULL )
    {
-      gtk_box_pack_start( GTK_BOX( box ), GTK_WIDGET( child->data ), 
+      gtk_box_pack_start( GTK_BOX( box ), GTK_WIDGET( child->data ),
          lay->bExpand, lay->bFill, lay->iPadding );
       child = child->next;
    }
-   
+
    return TRUE;
 }

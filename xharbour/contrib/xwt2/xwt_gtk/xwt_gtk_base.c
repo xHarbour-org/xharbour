@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_base.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
+   $Id: xwt_gtk_base.c,v 1.2 2004/05/17 09:27:11 jonnymind Exp $
 
    GTK Base widget for XWT system.
 */
@@ -24,7 +24,7 @@ BOOL xwt_gtk_base_destroy( PXWT_WIDGET wWidget )
       gtk_widget_destroy( wBase->main_widget );
       wBase->main_widget = NULL;
    }
-   
+
    // managed.
    return TRUE;
 }
@@ -51,23 +51,23 @@ static gboolean xwt_gtk_base_btn_manage(GtkWidget *widget, GdkEventButton *event
    HB_ITEM hb_state_shift;
    HB_ITEM hb_state_ctrl;
    HB_ITEM hb_state_alt;
-   
+
    PHB_ITEM pSelf = ((PXWT_WIDGET) user_data)->pOwner;
 
    char *szEvent;
-   
+
    hb_xpos.type = HB_IT_NIL;
    hb_ypos.type = HB_IT_NIL;
    hb_state_shift.type = HB_IT_NIL;
    hb_state_ctrl.type = HB_IT_NIL;
    hb_state_alt.type = HB_IT_NIL;
-   
+
    hb_itemPutNI( &hb_xpos, (int) event->x );
    hb_itemPutNI( &hb_ypos, (int) event->y );
    hb_itemPutL(  &hb_state_shift, (( event->state & GDK_SHIFT_MASK) == GDK_SHIFT_MASK) );
    hb_itemPutL(  &hb_state_ctrl, (( event->state & GDK_CONTROL_MASK) == GDK_CONTROL_MASK) );
    hb_itemPutL(  &hb_state_alt, (( event->state & GDK_MOD1_MASK) == GDK_MOD1_MASK) );
-   
+
    //creates everything about the event
    switch( event->button )
    {
@@ -75,7 +75,7 @@ static gboolean xwt_gtk_base_btn_manage(GtkWidget *widget, GdkEventButton *event
          if ( event->type == GDK_3BUTTON_PRESS )
          {
             szEvent = "triple-click";
-         } 
+         }
          else if ( event->type == GDK_2BUTTON_PRESS )
          {
             szEvent = "double-click";
@@ -84,59 +84,59 @@ static gboolean xwt_gtk_base_btn_manage(GtkWidget *widget, GdkEventButton *event
          {
             szEvent = "release";
          }
-         else 
+         else
          {
             szEvent = "click";
          }
       break;
-         
+
       case 2:
          if ( event->type == GDK_BUTTON_RELEASE )
          {
             szEvent = "middle-release";
          }
-         else 
+         else
          {
             szEvent = "middle-click";
          }
       break;
-          
+
       case 3:
          if ( event->type == GDK_BUTTON_RELEASE )
          {
             szEvent = "right-release";
          }
-         else 
+         else
          {
             szEvent = "right-click";
          }
       break;
-       
+
       case 4:
          if ( event->type == GDK_BUTTON_RELEASE )
          {
             szEvent = "fuorth-release";
          }
-         else 
+         else
          {
             szEvent = "fuorth-click";
          }
       break;
-      
+
       case 5:
          if ( event->type == GDK_BUTTON_RELEASE )
          {
             szEvent = "fifth-release";
          }
-         else 
+         else
          {
             szEvent = "fifth-click";
          }
       break;
    }
-   
+
    return xwt_rise_event( pSelf, szEvent, 5, &hb_xpos, &hb_ypos, &hb_state_shift, &hb_state_ctrl, &hb_state_alt );
-   
+
 }
 
 
@@ -146,24 +146,24 @@ static gboolean xwt_gtk_base_cross(GtkWidget *widget, GdkEventCrossing *event, g
    PHB_ITEM pSelf = ((PXWT_WIDGET) user_data)->pOwner;
    HB_ITEM hb_xpos;
    HB_ITEM hb_ypos;
-   
+
    hb_xpos.type = HB_IT_NIL;
    hb_ypos.type = HB_IT_NIL;
-   
+
    hb_itemPutNI( &hb_xpos, (int) event->x );
    hb_itemPutNI( &hb_ypos, (int) event->y );
-   
+
    char *szEvent;
-   
+
    if ( event->type == GDK_ENTER_NOTIFY )
    {
       szEvent = "enter";
    }
-   else 
+   else
    {
       szEvent = "leave";
    }
-   
+
    return xwt_rise_event( pSelf, szEvent, 2, &hb_xpos, &hb_ypos );
 }
 
@@ -178,16 +178,16 @@ static gboolean xwt_gtk_base_focus(GtkWidget *widget, GdkEventFocus *event, gpoi
    {
       szEvent = "got-focus";
    }
-   else 
+   else
    {
       szEvent = "lost-focus";
    }
-   
+
    return xwt_rise_event( pSelf, szEvent, 0 );
 }
 
 
-               
+
 static gboolean xwt_gtk_base_key_manage(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
    PHB_ITEM pSelf = ((PXWT_WIDGET) user_data)->pOwner;
@@ -208,18 +208,18 @@ static gboolean xwt_gtk_base_key_manage(GtkWidget *widget, GdkEventKey *event, g
    hb_state_ctrl.type = HB_IT_NIL;
    hb_state_alt.type = HB_IT_NIL;
    hb_state_caps.type = HB_IT_NIL;
-   
+
    char *szEvent;
 
    if ( event->type == GDK_KEY_PRESS )
    {
       szEvent = "key-press";
    }
-   else 
+   else
    {
       szEvent = "key-release";
    }
-   
+
    // until xharbour doesn't support UTF16, it's quite useless to get it.
    // we do the conversion to ascii.
    if ( event->keyval > 26 && event->keyval < 0x128 )
@@ -227,7 +227,7 @@ static gboolean xwt_gtk_base_key_manage(GtkWidget *widget, GdkEventKey *event, g
       szVal[0] = event->keyval;
       szVal[1] = '\0';
       iHbKey = event->keyval;
-      
+
       hb_itemPutCRawStatic( &hb_string, szVal, 1 );
    }
    else
@@ -240,23 +240,23 @@ static gboolean xwt_gtk_base_key_manage(GtkWidget *widget, GdkEventKey *event, g
       {
          iHbKey = xwt_gtk_translate_key( event->keyval );
       }
-      
+
       guint32 unicode = gdk_keyval_to_unicode( event->keyval );
       // What about endianity?
       memcpy( szVal, &unicode, 4 );
       szVal[4] = '\0';
-      
+
       hb_itemPutCRawStatic( &hb_string, szVal, 4 );
    }
-   
+
    hb_itemPutNI( &hb_keyval, iHbKey );
    hb_itemPutNI( &hb_scancode, event->hardware_keycode );
    hb_itemPutL(  &hb_state_shift, (( event->state & GDK_SHIFT_MASK) == GDK_SHIFT_MASK) );
    hb_itemPutL(  &hb_state_ctrl, (( event->state & GDK_CONTROL_MASK) == GDK_CONTROL_MASK) );
    hb_itemPutL(  &hb_state_alt, (( event->state & GDK_MOD1_MASK) == GDK_MOD1_MASK) );
    hb_itemPutL(  &hb_state_caps, (( event->state & GDK_LOCK_MASK) == GDK_LOCK_MASK) );
-   
-   return xwt_rise_event( pSelf, szEvent, 7, &hb_string, &hb_keyval, &hb_scancode, &hb_state_shift, 
+
+   return xwt_rise_event( pSelf, szEvent, 7, &hb_string, &hb_keyval, &hb_scancode, &hb_state_shift,
                         &hb_state_ctrl, &hb_state_alt, &hb_state_caps );
 }
 
@@ -266,13 +266,14 @@ static gboolean xwt_gtk_base_motion_manage(GtkWidget *widget, GdkEventMotion *ev
    PHB_ITEM pSelf = ((PXWT_WIDGET) user_data)->pOwner;
    HB_ITEM hb_xpos;
    HB_ITEM hb_ypos;
-   
+
    hb_xpos.type = HB_IT_NIL;
    hb_ypos.type = HB_IT_NIL;
-   
+
    hb_itemPutNI( &hb_xpos, (int) event->x );
    hb_itemPutNI( &hb_ypos, (int) event->y );
-      
+
+
    return xwt_rise_event( pSelf, "motion", 2, &hb_xpos, &hb_ypos );
 }
 
@@ -282,21 +283,23 @@ void xwt_gtk_base_signal_connect( PXWT_WIDGET widget )
 {
    PXWT_GTK_BASE base = (PXWT_GTK_BASE) widget->widget_data;
    GObject *target = G_OBJECT(base->top_widget( widget ) );
-   
+
    base->x = 0;
    base->y = 0;
    base->width = -1;
    base->height = -1;
-   
+   base->nId = 0;
+   base->bBroadcast = TRUE;
+
    // records GTK size assignment
    g_signal_connect( target, "size-allocate", G_CALLBACK(xwt_gtk_base_recordsize), base );
 }
 
 void xwt_gtk_base_general_connect( PXWT_WIDGET widget )
-{ 
+{
    PXWT_GTK_BASE base = (PXWT_GTK_BASE) widget->widget_data;
    GObject *target = G_OBJECT(base->top_widget( widget ) );
-   
+
    // standard signal connections
    g_signal_connect( target, "button-press-event", G_CALLBACK(xwt_gtk_base_btn_manage), widget);
    g_signal_connect( target, "button-release-event", G_CALLBACK(xwt_gtk_base_btn_manage), widget );
@@ -312,7 +315,7 @@ void xwt_gtk_base_focus_connect( PXWT_WIDGET widget )
 {
    PXWT_GTK_BASE base = (PXWT_GTK_BASE) widget->widget_data;
    GObject *target = G_OBJECT(base->top_widget( widget ) );
-   
+
    g_signal_connect( target, "focus-in", G_CALLBACK(xwt_gtk_base_focus), widget );
    g_signal_connect( target, "focus-out", G_CALLBACK(xwt_gtk_base_focus), widget );
 }
@@ -357,6 +360,10 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    {
       wSelf->nId = hb_itemGetNI(pValue);
    }
+   else if ( strcmp( prop, "broadcast" ) == 0 )
+   {
+      wSelf->bBroadcast = hb_itemGetL(pValue);
+   }
    else if ( strcmp( prop, "visibility" ) == 0 )
    {
       szPropVal = hb_itemGetCPtr( pValue );
@@ -392,7 +399,7 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    {
       ret = FALSE;
    }
-   
+
    return ret;
 }
 
@@ -402,7 +409,7 @@ BOOL xwt_gtk_base_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    XWT_GTK_BASE *wSelf = (PXWT_GTK_BASE) widget->widget_data;
    GtkWidget *wTop = wSelf->top_widget( widget );
 
-   if ( strcmp( prop, "x" ) == 0 ) 
+   if ( strcmp( prop, "x" ) == 0 )
    {
       hb_itemPutNI( pValue, wSelf->x );
    }
@@ -412,36 +419,40 @@ BOOL xwt_gtk_base_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    }
    else if ( strcmp( prop, "width" ) == 0 )
    {
-      hb_itemPutNI( pValue, wSelf->width );      
+      hb_itemPutNI( pValue, wSelf->width );
    }
    else if ( strcmp( prop, "height" ) == 0 )
    {
-      hb_itemPutNI( pValue, wSelf->height ); 
+      hb_itemPutNI( pValue, wSelf->height );
    }
    else if ( strcmp( prop, "id" ) == 0 )
    {
       hb_itemPutNI(pValue, wSelf->nId );
    }
    else if ( strcmp( prop, "visibility" ) == 0 )
-   {  
-      if ( GTK_WIDGET_VISIBLE(wTop) ) 
+   {
+      if ( GTK_WIDGET_VISIBLE(wTop) )
       {
          hb_itemPutCRawStatic( pValue, "visible", 7 );
       }
       else
       {
          hb_itemPutCRawStatic( pValue, "hidden", 6 );
-      }   
+      }
    }
    else if ( strcmp( prop, "focus" ) == 0 )
    {
-      hb_itemPutL( pValue, (BOOL) gtk_widget_is_focus( wTop ) ); 
+      hb_itemPutL( pValue, (BOOL) gtk_widget_is_focus( wTop ) );
    }
-   else 
+   else if ( strcmp( prop, "broadcast" ) == 0 )
+   {
+      hb_itemPutL( pValue, wSelf->bBroadcast );
+   }
+   else
    {
       ret = FALSE;
    }
-   
+
    return ret;
 }
 
@@ -451,27 +462,28 @@ BOOL xwt_gtk_base_getall( PXWT_WIDGET widget, PHB_ITEM pRet )
    HB_ITEM hbValue;
    XWT_GTK_BASE *wSelf = (PXWT_GTK_BASE) widget->widget_data;
    GtkWidget *wTop = wSelf->top_widget( widget );
-        
+
    hbValue.type = HB_IT_NIL;
-   
+
    hb_hashAddChar( pRet, "x", hb_itemPutNI( &hbValue, wSelf->x ) );
    hb_hashAddChar( pRet, "y", hb_itemPutNI( &hbValue, wSelf->y ) );
    hb_hashAddChar( pRet, "width", hb_itemPutNI( &hbValue, wSelf->width ) );
    hb_hashAddChar( pRet, "height", hb_itemPutNI( &hbValue, wSelf->height ) );
-   hb_hashAddChar( pRet, "id", hb_itemPutL( &hbValue, wSelf->nId ) );
-   if ( GTK_WIDGET_VISIBLE(wTop) ) 
+   hb_hashAddChar( pRet, "id", hb_itemPutNI( &hbValue, wSelf->nId ) );
+   hb_hashAddChar( pRet, "broadcast", hb_itemPutL( &hbValue, wSelf->bBroadcast ) );
+   if ( GTK_WIDGET_VISIBLE(wTop) )
    {
       hb_itemPutCRawStatic( &hbValue, "visible", 7 );
    }
    else
    {
       hb_itemPutCRawStatic( &hbValue, "hidden", 6 );
-   }   
+   }
    hb_hashAddChar( pRet, "visibility", &hbValue );
    hb_hashAddChar( pRet, "focus", hb_itemPutL( &hbValue, gtk_widget_is_focus( wTop )) );
-   
+
    hb_itemClear( &hbValue );
-   
+
    return TRUE;
 }
 
@@ -481,7 +493,7 @@ BOOL xwt_gtk_setpgroup( PXWT_WIDGET widget, PHB_ITEM pValue )
 {
    ULONG ulPos = 1;
    BOOL ret = TRUE;
-   
+
    while ( ulPos <= hb_hashLen( pValue ) )
    {
       PHB_ITEM pProp = hb_hashGetKeyAt( pValue, ulPos );
@@ -492,6 +504,7 @@ BOOL xwt_gtk_setpgroup( PXWT_WIDGET widget, PHB_ITEM pValue )
       }
       ulPos ++;
    }
-   
+
    return ret;
 }
+

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.2 2004/05/17 09:27:11 jonnymind Exp $
+   $Id: xwt_gtk.h,v 1.3 2004/05/20 15:41:38 jonnymind Exp $
 
    GTK interface
 */
@@ -55,6 +55,7 @@ typedef struct tag_xwt_gtk_base
    int width;
    int height;
    int nId;
+   BOOL bBroadcast;
 } XWT_GTK_BASE, *PXWT_GTK_BASE;
 
 
@@ -210,6 +211,7 @@ BOOL xwt_gtk_createMenu( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createMenuItem( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createPane( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createTextbox( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createTextarea( PXWT_WIDGET xwtData );
 BOOL xwt_gtk_createWindow( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createImage( PXWT_WIDGET wSelf );
 

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_textbox.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
+   $Id: xwt_gtk_textarea.c,v 1.1 2004/05/20 15:41:38 jonnymind Exp $
 
    Text Area - Advanced editor
 */
@@ -77,6 +77,31 @@ static BOOL xwt_gtk_textarea_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM p
          ret = FALSE;
       }
    }
+   else if ( strcmp( prop, "text-slice" ) == 0)
+   {
+      GtkTextIter startIter, endIter;
+      int nStart, nEnd, nMax;
+
+      // retreive the required slice
+      hb_objSendMsg( widget->pOwner, "NSLICESTART", 0 );
+      nStart = hb_itemGetNI( &HB_VM_STACK.Return );
+      hb_objSendMsg( widget->pOwner, "NSLICEEND", 0 );
+      nEnd = hb_itemGetNI( &HB_VM_STACK.Return );
+      gtk_text_buffer_get_end_iter( wSelf->textbuf, &endIter );
+      nMax = gtk_text_iter_get_offset( &endIter );
+      if ( nStart > nEnd || nStart < 0 || nEnd > nMax )
+      {
+         ret = FALSE;
+      }
+      else
+      {
+         gtk_text_iter_set_offset( &endIter, nEnd);
+         gtk_text_buffer_get_end_iter( wSelf->textbuf, &startIter );
+         gtk_text_iter_set_offset( &startIter, nStart);
+         gtk_text_buffer_delete( wSelf->textbuf, &startIter, &endIter );
+         gtk_text_buffer_insert( wSelf->textbuf, &startIter, hb_itemGetCPtr( pValue ), -1 );
+      }
+   }
    else if ( strcmp( prop, "column" ) == 0)
    {
       int nCol = hb_itemGetNI( pValue ) -1;
@@ -129,9 +154,32 @@ static BOOL xwt_gtk_textarea_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM p
          ret = FALSE;
       }
    }
-   else if ( strcmp( prop, "modified" ) == 0)
+   else if ( strcmp( prop, "selection-end" ) == 0)
    {
-      gtk_text_buffer_set_modified( wSelf->textbuf, hb_itemGetL( pValue ) );
+      int nPos = hb_itemGetNI( pValue ) -1;
+      int maxPos;
+      GtkTextIter tiCursor;
+      GtkTextMark *selEnd;
+
+      if ( nPos >= 0 )
+      {
+         maxPos = gtk_text_buffer_get_char_count( wSelf->textbuf );
+         if ( nPos < maxPos )
+         {
+            gtk_text_buffer_get_start_iter(  wSelf->textbuf, &tiCursor );
+            selEnd = gtk_text_buffer_get_mark( wSelf->textbuf, "selection_bound" );
+            gtk_text_iter_set_offset( &tiCursor, nPos);
+            gtk_text_buffer_move_mark( wSelf->textbuf, selEnd, &tiCursor );
+         }
+         else
+         {
+            ret = FALSE;
+         }
+      }
+      else
+      {
+         ret = FALSE;
+      }
    }
    else if ( strcmp( prop, "editable" ) == 0)
    {
@@ -192,6 +240,44 @@ static BOOL xwt_gtk_textarea_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM p
       gtk_text_buffer_get_iter_at_mark( wSelf->textbuf, &tiCursor, cursor );
       hb_itemPutNI( pValue, gtk_text_iter_get_offset( &tiCursor ) +1 );
    }
+   else if ( strcmp( prop, "text-slice" ) == 0)
+   {
+      GtkTextIter startIter, endIter;
+      char *txt;
+      int nStart, nEnd, nMax;
+
+      // retreive the required slice
+      hb_objSendMsg( widget->pOwner, "NSLICESTART", 0 );
+      nStart = hb_itemGetNI( &HB_VM_STACK.Return );
+      hb_objSendMsg( widget->pOwner, "NSLICEEND", 0 );
+      nEnd = hb_itemGetNI( &HB_VM_STACK.Return );
+      gtk_text_buffer_get_end_iter( wSelf->textbuf, &endIter );
+      nMax = gtk_text_iter_get_offset( &endIter );
+
+      if ( nStart > nEnd || nStart < 0 || nEnd > nMax )
+      {
+         ret = FALSE;
+      }
+      else
+      {
+         gtk_text_iter_set_offset( &endIter, nEnd);
+         gtk_text_buffer_get_end_iter( wSelf->textbuf, &startIter );
+         gtk_text_iter_set_offset( &startIter, nStart);
+         txt = gtk_text_buffer_get_text( wSelf->textbuf, &startIter, &endIter, FALSE );
+         // we can't use this newly allocated memory, as it is not allocated with hb_xgrab
+         hb_itemPutC( pValue, txt );
+         free( txt );
+      }
+   }
+   else if ( strcmp( prop, "selection-end" ) == 0 )
+   {
+      GtkTextIter tiCursor;
+      GtkTextMark *cursor;
+
+      cursor = gtk_text_buffer_get_mark( wSelf->textbuf, "selection_bound" );
+      gtk_text_buffer_get_iter_at_mark( wSelf->textbuf, &tiCursor, cursor );
+      hb_itemPutNI( pValue, gtk_text_iter_get_offset( &tiCursor ) +1 );
+   }
    else if ( strcmp( prop, "modified" ) == 0)
    {
       hb_itemPutL( pValue, gtk_text_buffer_get_modified( wSelf->textbuf ) );
@@ -241,6 +327,12 @@ static BOOL xwt_gtk_textarea_getall( PXWT_WIDGET widget, PHB_ITEM pProps )
       hb_itemPutNI( &hbValue, gtk_text_iter_get_offset( &tiCursor ) + 1);
       hb_hashAddChar( pProps, "position", &hbValue );
       hb_itemPutL( &hbValue, gtk_text_buffer_get_modified( wSelf->textbuf ) );
+
+      cursor = gtk_text_buffer_get_mark( wSelf->textbuf, "selection_bound" );
+      gtk_text_buffer_get_iter_at_mark( wSelf->textbuf, &tiCursor, cursor );
+      hb_itemPutNI( &hbValue, gtk_text_iter_get_offset( &tiCursor ) +1 );
+      hb_hashAddChar( pProps, "selection-end", &hbValue );
+
       hb_hashAddChar( pProps, "modified", &hbValue );
       hb_itemPutL( &hbValue, gtk_text_view_get_editable( GTK_TEXT_VIEW(wSelf->INH( main_widget )) ));
       hb_hashAddChar( pProps, "editable", &hbValue );

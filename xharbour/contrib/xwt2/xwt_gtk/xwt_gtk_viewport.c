@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_viewport.c,v 1.4 2003/08/27 20:09:24 xthefull Exp $
+   $Id: xwt_gtk_viewport.c,v 1.1 2004/05/17 09:27:11 jonnymind Exp $
 
    Viewport - an infinite scroller container & drawing area
 */
@@ -26,7 +26,7 @@ static void viewport_scrolled(GtkScrolledWindow *scrolledwindow,
 
    hb_row.type = HB_IT_NIL;
    hb_col.type = HB_IT_NIL;
-   
+
    adjust = gtk_scrolled_window_get_vadjustment( GTK_SCROLLED_WINDOW( viewport->INH(main_widget) ) );
    hb_itemPutNI( &hb_row, gtk_adjustment_get_value( adjust ) );
    adjust = gtk_scrolled_window_get_hadjustment( GTK_SCROLLED_WINDOW( viewport->INH(main_widget) ) );
@@ -41,7 +41,7 @@ static BOOL xwt_gtk_viewport_connect( PXWT_WIDGET wWindow, PXWT_WIDGET wChild )
    PXWT_GTK_WND wnd = (PXWT_GTK_WND) wWindow->widget_data;
    PXWT_GTK_BASE base = (PXWT_GTK_BASE) wChild->widget_data;
    GtkWidget *gtkChild = base->top_widget( wChild );
-   
+
    // does the widget supports native scroll adjustment?
    /*if ( gtkChild->set_scroll_adjustments_signal != 0 )
    {
@@ -62,7 +62,7 @@ static BOOL xwt_gtk_viewport_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM p
    BOOL ret = TRUE;
    PXWT_GTK_WND viewport = (PXWT_GTK_WND) widget->widget_data;
    GtkAdjustment *adjust;
-      
+
    if ( strcmp( prop, "row-position" ) == 0 )
    {
       adjust = gtk_scrolled_window_get_vadjustment( GTK_SCROLLED_WINDOW( viewport->INH(main_widget) ) );
@@ -73,11 +73,11 @@ static BOOL xwt_gtk_viewport_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM p
       adjust = gtk_scrolled_window_get_hadjustment( GTK_SCROLLED_WINDOW( viewport->INH(main_widget) ) );
       gtk_adjustment_set_value( adjust, hb_itemGetNI( pValue ) );
    }
-   else 
+   else
    {
-      ret = xwt_gtk_base_setprop( widget, prop, pValue );   
+      ret = xwt_gtk_base_setprop( widget, prop, pValue );
    }
-   
+
    return ret;
 }
 
@@ -86,7 +86,7 @@ static BOOL xwt_gtk_viewport_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM p
    BOOL ret = TRUE;
    PXWT_GTK_WND viewport = (PXWT_GTK_WND) widget->widget_data;
    GtkAdjustment *adjust;
-      
+
    if ( strcmp( prop, "row-position" ) == 0 )
    {
       adjust = gtk_scrolled_window_get_vadjustment( GTK_SCROLLED_WINDOW( viewport->INH(main_widget) ) );
@@ -97,15 +97,15 @@ static BOOL xwt_gtk_viewport_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM p
       adjust = gtk_scrolled_window_get_hadjustment( GTK_SCROLLED_WINDOW( viewport->INH(main_widget) ) );
       hb_itemPutNI( pValue, gtk_adjustment_get_value( adjust ) );
    }
-   else 
+   else
    {
-      ret = xwt_gtk_base_setprop( widget, prop, pValue );   
+      ret = xwt_gtk_base_getprop( widget, prop, pValue );
    }
-   
+
    return ret;
 }
 
-   
+
 static BOOL xwt_gtk_viewport_getall( PXWT_WIDGET widget, PHB_ITEM pRet )
 {
    HB_ITEM hb_row, hb_col;
@@ -116,7 +116,7 @@ static BOOL xwt_gtk_viewport_getall( PXWT_WIDGET widget, PHB_ITEM pRet )
    {
       hb_row.type = HB_IT_NIL;
       hb_col.type = HB_IT_NIL;
-      
+
       adjust = gtk_scrolled_window_get_vadjustment( GTK_SCROLLED_WINDOW( viewport->INH(main_widget) ) );
       hb_itemPutNI( &hb_row, gtk_adjustment_get_value( adjust ) );
       hb_hashAddChar( pRet, "row-position", &hb_row );
@@ -125,7 +125,7 @@ static BOOL xwt_gtk_viewport_getall( PXWT_WIDGET widget, PHB_ITEM pRet )
       hb_hashAddChar( pRet, "col-position", &hb_col )
       return TRUE;
     }
-      
+
    return FALSE;
 }
 
@@ -139,11 +139,11 @@ BOOL xwt_gtk_createViewPort( PXWT_WIDGET xwtData )
    g_object_ref( G_OBJECT(viewport->INH(main_widget)) );
    viewport->INH(nId) = 0;
    viewport->INH(top_widget) = xwt_gtk_base_topwidget;
-   
+
    viewport->connect = xwt_gtk_viewport_connect;
    // disconnecting has nothing special: using the default window.
    viewport->disconnect = xwt_gtk_window_disconnect;
-   
+
 
    gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW( viewport->INH(main_widget) ),
       GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
@@ -162,6 +162,8 @@ BOOL xwt_gtk_createViewPort( PXWT_WIDGET xwtData )
    xwtData->set_pgroup = xwt_gtk_setpgroup;
    xwtData->get_property = xwt_gtk_viewport_getprop;
    xwtData->get_all_properties = xwt_gtk_viewport_getall;
-   
+
+   xwt_gtk_base_signal_connect( xwtData );
+
    return TRUE;
 }
