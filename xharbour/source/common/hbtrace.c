@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.c,v 1.5 2003/06/05 04:55:29 brianhays Exp $
+ * $Id: hbtrace.c,v 1.6 2003/06/13 06:58:50 brianhays Exp $
  */
 
 /*
@@ -194,7 +194,7 @@ void hb_tr_trace( char * fmt, ... )
        * Print file and line.
        */
       fprintf( s_fp, "%s:%d: %s ",
-               hb_tr_file_ + i, hb_tr_line_, s_slevel[ hb_tr_level_ ] );
+               hb_tr_file_ + i, hb_tr_line_, (hb_tr_level_ >= 0) ? s_slevel[ hb_tr_level_ ] : "HB_TR_LOST");
 
       /*
        * Print the name and arguments for the function.

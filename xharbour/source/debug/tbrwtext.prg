@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.5 2004/02/20 02:29:14 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.6 2004/03/01 09:37:29 vouchcac Exp $
  */
 
 /*
@@ -76,16 +76,7 @@ CLASS TBrwText FROM HBEditor
    ASSIGN colorSpec(cClr) INLINE ::cColorSpec:=cClr
 
    METHOD   New(nTop, nLeft, nBottom, nRight, cFileName, cColor)
-/*
-   METHOD   GoTop()           // Methods available on a standard TBrowse, needed to handle a HBEditor like a TBrowse
-   METHOD   GoBottom()
-   METHOD   Up()
-   METHOD   Down()
-   METHOD   Left()
-   METHOD   Right()
-   METHOD   PageUp()
-   METHOD   PageDown()
-*/
+
    METHOD   RefreshAll()
    METHOD   RefreshCurrent()
    METHOD   ForceStable() INLINE NIL
@@ -120,46 +111,6 @@ METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor) CLASS TBrwText
 
 return Self
 
-/*
-METHOD GoTop() CLASS TBrwText
-   ::MoveCursor(K_CTRL_PGUP)
-return Self
-
-
-METHOD GoBottom() CLASS TBrwText
-   ::MoveCursor(K_CTRL_PGDN)
-return Self
-
-
-METHOD Up() CLASS TBrwText
-   ::MoveCursor(K_UP)
-return Self
-
-
-METHOD Left() CLASS TBrwText
-   ::MoveCursor(K_LEFT)
-return Self
-
-
-METHOD Right() CLASS TBrwText
-   ::MoveCursor(K_RIGHT)
-return Self
-
-
-METHOD Down() CLASS TBrwText
-   ::MoveCursor(K_DOWN)
-return Self
-
-
-METHOD PageUp() CLASS TBrwText
-   ::MoveCursor(K_PGUP)
-return Self
-
-
-METHOD PageDown() CLASS TBrwText
-   ::MoveCursor(K_PGDN)
-return Self
-*/
 
 METHOD RefreshAll() CLASS TBrwText
    ::RefreshWindow()

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2439 2004/03/02 00:23:45 andijahja Exp $
+ * $Id: ChangeLog,v 1.2440 2004/03/02 00:28:17 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-02 04:00 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/common/hbtrace.c
+    ! Prevent GPF in hb_tr_trace when under certain conditions hb_tr_level_
+      becomes equal to -1.
+  * source/debug/tbrwtext.prg
+    * Removed unneeded methods commented out by Pritpal.
 
 2004-03-02 01:35 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/contrib/rdd_ads/ads1.c
