@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1563 2003/10/07 22:25:42 paultucker Exp $
+ * $Id: ChangeLog,v 1.1564 2003/10/07 23:48:21 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-08 20:00 GMT+1200 Peter Rees <peter@rees.co.nz>
+  * /rtl/tprint.c
+    rename THarbourPrinter_DPGetDefaultPrinter() hb_GetDefaultPrinter()
+
+  * set.c
+    rename THarbourPrinter_DPGetDefaultPrinter() hb_GetDefaultPrinter()
+
+  * /rtl/tprinter.c
+    + Added
+      PRINTFILERAW()
+      hb_PrintFileRaw()
+      Rewrite GETPRINTERS()
+        GETPRINTERS() returns 1D list of printer names GETPRINTERS(.T.) 2d printername,portname
+
+
+  * /rtl/isprint.c
+      Moved to tprinter.c
+        HB_FUNC(PRINTERPORTTONAME)
+        HB_FUNC(GETPRINTERS)
+      Rewrite all function and test on Win98,2000,2000 Server, XP Pro
+      Replace malloc()/free() with hb_x..(), fix memory leak
 
 2003-10-07 16:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/classes.h
