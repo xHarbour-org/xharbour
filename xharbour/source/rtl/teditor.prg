@@ -28,7 +28,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.46 2004/07/14 01:17:08 guerra000 Exp $
+/* $Id: teditor.prg,v 1.47 2004/07/22 12:57:44 likewolf Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -1417,7 +1417,7 @@ RETURN Self
 // Rebuild a long line from multiple short ones ( wrapped at soft CR )
 //
 //-------------------------------------------------------------------//
-
+/*
 STATIC function GetParagraph( oSelf, nRow )
 
    LOCAL cLine := ""
@@ -1438,7 +1438,31 @@ STATIC function GetParagraph( oSelf, nRow )
    oSelf:RemoveLine( nRow )   // this is where array error occurs IF final line of text is allowed to have :lSoftCR
 
 return cLine
+*/
 
+STATIC function GetParagraph( oSelf, nRow )
+
+   LOCAL cLine := ""
+   // V@
+   while ValType( oSelf:aText[ nRow ]:lSoftCR ) == 'L' .and. oSelf:aText[ nRow ]:lSoftCR
+      cLine += oSelf:aText[ nRow ]:cText
+      oSelf:RemoveLine( nRow )
+      if oSelf:naTextLen <= 0 // V@
+         exit
+      endif
+      IF Len( cLine ) > 0 .and. cLine[ -1 ] != " "
+         cLine += " "
+      ENDIF
+   enddo
+
+   // Last line, or only one line
+   //
+   if oSelf:naTextLen > 0 // V@
+      cLine += oSelf:aText[ nRow ]:cText
+      oSelf:RemoveLine( nRow )   // this is where array error occurs IF final line of text is allowed to have :lSoftCR
+   endif
+
+return cLine
 
 //-------------------------------------------------------------------//
 //

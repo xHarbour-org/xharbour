@@ -1,5 +1,5 @@
 /*
- * $Id: memoline.c,v 1.9 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: memoline.c,v 1.11 2004/04/23 03:32:54 lculik Exp $
  */
 
 /*
@@ -122,6 +122,10 @@ HB_FUNC( MEMOLINE )
          {
             if( ulLastSpace == 0 || ulLastSpace == ulCurLength )
             {
+               if ( ulLastSpace == ulCurLength )
+               {
+                  ulPos++;
+               }
                ulCurLength = 1;
                ulLineEnd   = ulPos - 1;
             }
@@ -165,15 +169,15 @@ HB_FUNC( MEMOLINE )
 
       if ( !bEmptyLine && ulLineEnd >= ulLineBegin && ulLen > 0 )
       {
-         for( ulPos = 0; ulPos <= ( ulLineEnd - ulLineBegin ); ulPos++ )
+         ULONG ulUpto = ( ulLineEnd - ulLineBegin );
+
+         for( ulPos = 0; ulPos <= ulUpto; ulPos++ )
          {
             if( pszString[ ulLineBegin + ulPos ] == HB_CHAR_HT )
                ulSpAdded += ( ( ULONG ) ( ulPos / ulTabLength ) * ulTabLength ) + ulTabLength - ulPos - 2;
             else
                * ( pszLine + ulPos + ulSpAdded ) = * ( pszString + ulLineBegin + ulPos );
-
          }
-
       }
 
       hb_retclenAdopt( pszLine, ulLineLength );
