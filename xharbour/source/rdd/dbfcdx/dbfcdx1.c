@@ -2877,11 +2877,21 @@ static USHORT hb_cdxIndexCheckVersion( LPCDXINDEX pIndex )
          while ( pTag ) {
             if( pTag->RootPage != NULL )
             {
+               /*
                if ( !pTag->HotKey) {
                   hb_errInternal( 9110, "hb_cdxIndexCheckVersion: ulVersion changed and !HotKey.", "", "" );
                }
                hb_cdxTagTagOpen( pTag, 0 );
                hb_cdxTagKeyFind( pTag, pTag->HotKey );
+               */
+               if ( pTag->HotKey ) {
+                  hb_cdxTagTagOpen( pTag, 0 );
+                  hb_cdxTagKeyFind( pTag, pTag->HotKey );
+               }
+               else
+               {
+                  SELF_GOTO( ( AREAP ) ( pIndex->pArea ), pIndex->pArea->ulRecNo );
+               }
             }
             pTag = pTag->pNext;
          }
