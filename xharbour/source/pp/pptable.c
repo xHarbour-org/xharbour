@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.23 2003/06/26 04:04:52 ronpinkas Exp $
+ * $Id: pptable.c,v 1.24 2003/06/26 04:42:51 ronpinkas Exp $
  */
 
 /*
@@ -310,8 +310,8 @@ void hb_pp_Table( void )
    static COMMANDS sC___163 = {0,"SELECT","\1A00","dbSelectArea( \1A30 )",&sC___162 };
    static COMMANDS sC___164 = {0,"SELECT","\1A00([\1B10])","dbSelectArea( \1A00(\1B00) )",&sC___163 };
    static COMMANDS sC___165 = {0,"USE","","dbCloseArea()",&sC___164 };
-   static COMMANDS sC___166 = {0,"USE","\1A40 [VIA \1B00] [ALIAS \1C00] [\1D20 NEW>] [\1E20 EXCLUSIVE>] [\1F20 SHARED>] [\1G20 READONLY>] [CODEPAGE \1H00] [INDEX \1H40 [, \1I40]]",
-       "dbUseArea( \1D50, \1B00, \1A30, \1C30, if(\1F50 .or. \1E50, !\1E50, NIL), \1G50, \1H30 ) [; dbSetIndex( \1H30 )] [; dbSetIndex( \1I30 )]",&sC___165 };
+   static COMMANDS sC___166 = {0,"USE","\1A40 [VIA \1B00] [ALIAS \1C00] [\1D20 NEW>] [\1E20 EXCLUSIVE>] [\1F20 SHARED>] [\1G20 READONLY>] [CODEPAGE \1H00] [INDEX \1I40 [, \1J40]]",
+       "dbUseArea( \1D50, \1B00, \1A30, \1C30, if(\1F50 .or. \1E50, !\1E50, NIL), \1G50, \1H30 ) [; dbSetIndex( \1I30 )] [; dbSetIndex( \1J30 )]",&sC___165 };
    static COMMANDS sC___167 = {0,"APPEND","BLANK","dbAppend()",&sC___166 };
    static COMMANDS sC___168 = {0,"PACK","","__dbPack()",&sC___167 };
    static COMMANDS sC___169 = {0,"ZAP","","__dbZap()",&sC___168 };
