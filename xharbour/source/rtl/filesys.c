@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.109 2004/06/08 20:31:29 ronpinkas Exp $
+ * $Id: filesys.c,v 1.110 2004/06/21 17:40:42 likewolf Exp $
  */
 
 /*
@@ -186,7 +186,7 @@
    #define HB_FS_SETDRIVE(n, total) ( total = setdisk( n ) )
 #elif defined( __WATCOMC__ )
    #define HB_FS_GETDRIVE(n) ( _dos_getdrive( &( n ) ), --( n ) )
-   #define HB_FS_SETDRIVE(n) ( _dos_setdrive( ( n ) + 1, &( total ) ) )
+   #define HB_FS_SETDRIVE(n, total) ( _dos_setdrive( ( n ) + 1, &( total ) ) )
 #else
    #define HB_FS_GETDRIVE(n) ( ( ( n = _getdrive() ) < 65 ) ? --( n ) : ( (n) -= 65 ) )
    #define HB_FS_SETDRIVE(n, total) ( _chdrive( ( n ) + 1 ) )
