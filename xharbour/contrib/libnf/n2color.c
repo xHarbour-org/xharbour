@@ -1,5 +1,5 @@
 /*
- * $Id: n2color.c,v 1.2 2004/01/23 09:55:11 andijahja Exp $
+ * $Id: n2color.c,v 1.3 2004/04/05 10:03:19 andijahja Exp $
  */
 
 /*
@@ -46,10 +46,10 @@
  */
 
 #include "hbapi.h"
-#if 0
+#if defined(HB_OS_DOS)
 static void _ftI2Color( int iColor, char * cColor );
-#endif
 static int _ftGetColorStr( int iColor, char * cColor );
+#endif
 
 HB_FUNC(FT_N2COLOR )
 {
@@ -81,7 +81,7 @@ HB_FUNC(FT_N2COLOR )
 //              *cColor -  pointer to the color string
 // Returns   :  void (string is modified directly)
 // 컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-#if 0
+#if defined(HB_OS_DOS)
 static void _ftI2Color( int iColor, char * cColor )
 {
    unsigned int iBack, iFore, i = 0;
@@ -131,7 +131,6 @@ static void _ftI2Color( int iColor, char * cColor )
 
    return ;
 }
-#endif
 
 
 // 컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -164,3 +163,4 @@ static int _ftGetColorStr( int iColor, char * cColor )
     return iLen;
 
 }
+#endif
