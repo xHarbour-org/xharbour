@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.11 2003/08/27 02:13:47 ronpinkas Exp $
+ * $Id: philes.c,v 1.12 2003/08/27 10:29:14 jonnymind Exp $
  */
 
 /*
@@ -318,7 +318,17 @@ HB_FUNC( HB_OPENPROCESS )
    {
       hb_errRT_BASE( EG_ARG, 4001,
          "All the given file handle parameters must be by reference",
-         "HB_OPENPROCESS", 4,
+         "HB_OPENPROCESS", 5,
+            hb_paramError( 1 ), hb_paramError( 2 ),  hb_paramError( 3 ),
+            hb_paramError( 4 ), hb_paramError( 5 ));
+      return;
+   }
+
+   if ( pIn != NULL && ( pIn == pOut || pIn == pErr ) )
+   {
+      hb_errRT_BASE( EG_ARG, 4001,
+         "Input stream must differ from output and error stream",
+         "HB_OPENPROCESS", 5,
             hb_paramError( 1 ), hb_paramError( 2 ),  hb_paramError( 3 ),
             hb_paramError( 4 ), hb_paramError( 5 ));
       return;
@@ -328,7 +338,7 @@ HB_FUNC( HB_OPENPROCESS )
    {
       bBackground = FALSE;
    }
-   else 
+   else
    {
       bBackground = hb_itemGetL( pBackground );
    }
@@ -353,7 +363,14 @@ HB_FUNC( HB_OPENPROCESS )
 
    if ( pErr != NULL )
    {
-      pfhErr = &fhErr;
+      if ( pErr != pOut )
+      {
+         pfhErr = &fhErr;
+      }
+      else
+      {
+         pfhErr = pfhOut;
+      }
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.45 2003/08/27 10:29:14 jonnymind Exp $
+ * $Id: filesys.c,v 1.46 2003/08/27 10:30:09 jonnymind Exp $
  */
 
 /*
@@ -132,8 +132,7 @@
    #include <sys/stat.h>
    #include <fcntl.h>
    #include <errno.h>
-   #include <process.h>
-   
+
    #if defined(__CYGWIN__)
       #include <io.h>
    #endif
@@ -713,7 +712,7 @@ char **s_argvize( char *params, int size )
 #endif
 
 /*
-JC1: Piping functions
+JC1: Process Control functions
 hb_fsOpenProcess creates a process and get the control of the 4 main
 standard handlers. The handlers are returned in FHANDLE pointers;
 each of them can be 0 if the owner process don't want to get
@@ -777,21 +776,21 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       }
       return (FHANDLE) -1;
    }
-   
-   
+
+
    if( fhStderr != 0 )
    {
       if( fhStderr != fhStdout )
       {
-         if ( pipe( hPipeErr ) != 0) 
+         if ( pipe( hPipeErr ) != 0)
          {
             hb_fsSetError( errno );
-            if ( fhStdin != 0 ) 
+            if ( fhStdin != 0 )
             {
                close( hPipeIn[0] );
                close( hPipeIn[1] );
             }
-            if ( fhStdout != 0 ) 
+            if ( fhStdout != 0 )
             {
                close( hPipeOut[0] );
                close( hPipeOut[1] );
@@ -799,19 +798,14 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
             return (FHANDLE) -1;
          }
       }
-      else
-      {
-         hPipeErr[0] = hPipeOut[0];
-         hPipeErr[1] = hPipeOut[1];
-      }
    }
 
-   
+
    #ifdef HB_OS_WIN_32
    {
       int oldstdin, oldstdout, oldstderr;
       int iFlags;
-      
+
       hNull = open("NUL:", O_RDWR);
 
       oldstdin = dup( 0 );
@@ -838,7 +832,14 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
 
       if ( fhStderr != 0 )
       {
-         dup2( hPipeErr[ 1 ], 2 );
+         if ( fhStderr != fhStdout )
+         {
+            dup2( hPipeErr[ 1 ], 2 );
+         }
+         else
+         {
+            dup2( hPipeOut[ 1 ], 2 );
+         }
       }
       else if ( bBackground )
       {
@@ -857,7 +858,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       iFlags = P_NOWAIT;
       pid = spawnvp( iFlags, argv[0], argv );
       #endif
-      
+
       hb_xfree( command );
       hb_xfree( argv );
 
@@ -865,8 +866,8 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       dup2( oldstdout, 1 );
       dup2( oldstderr, 2 );
    }
-   if ( pid < 0 )                     
-   
+   if ( pid < 0 )
+
    #else
    if( ( pid = fork() ) == -1 )
    #endif
@@ -874,18 +875,18 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       hb_fsSetError( errno );
       // closing unused handles should be nice
       // TODO: check fs_Popen to close handles.
-      if ( fhStdin != 0 ) 
+      if ( fhStdin != 0 )
       {
          close( hPipeIn[0] );
          close( hPipeIn[1] );
       }
-      
-      if ( fhStdout != 0 ) 
+
+      if ( fhStdout != 0 )
       {
          close( hPipeOut[0] );
          close( hPipeOut[1] );
       }
-      
+
       if ( fhStderr != 0 && fhStderr != fhStdout )
       {
          close( hPipeErr[0] );
@@ -896,19 +897,19 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
 
    if( pid != 0 ) {
       // I am the father
-      if ( fhStdin != 0 ) 
+      if ( fhStdin != NULL )
       {
          *fhStdin = hPipeIn[1];
          close( hPipeIn[0] );
       }
-      
-      if ( fhStdin != 0 ) 
+
+      if ( fhStdout != NULL )
       {
          *fhStdout = hPipeOut[0];
          close( hPipeOut[1] );
       }
-      
-      if ( fhStderr != 0 && fhStderr != fhStdout )
+
+      if ( fhStderr != NULL && fhStderr != fhStdout )
       {
          *fhStderr = hPipeErr[0];
          close( hPipeErr[1] );
@@ -926,8 +927,8 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       command = hb_xgrab( strlen(pFilename) + 2 );
       size = s_parametrize( command, pFilename );
       argv = s_argvize( command, size );
-      argv[size] = 0;
-      
+      argv[size] = NULL;
+
 /*
       // temporary solution
       char *argv[4];
@@ -940,23 +941,21 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       {
          hNull = open("/dev/null", O_RDWR);
       }
-      
-      close( hPipeIn[ 1 ] ); // we don't write to stdin
-      close( hPipeOut[0] );
-      close( hPipeErr[0] );
 
       // does father wants to control us?
-      if ( fhStdin != 0 )
+      if ( fhStdin != NULL )
       {
+         close( hPipeIn[ 1 ] ); // we don't write to stdin
          dup2( hPipeIn[ 0 ], 0 );
       }
-      else if ( bBackground ) 
+      else if ( bBackground )
       {
-            dup2( hNull, 0 );
+         dup2( hNull, 0 );
       }
 
-      if ( fhStdout != 0 )
+      if ( fhStdout != NULL )
       {
+         close( hPipeOut[0] );
          dup2( hPipeOut[ 1 ], 1 );
       }
       else if ( bBackground )
@@ -964,26 +963,37 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
          dup2( hNull, 1 );
       }
 
-      if ( fhStderr != 0 )
+      if ( fhStderr != NULL )
       {
-         dup2( hPipeErr[ 1 ], 2 );
+         if ( fhStdout != fhStderr )
+         {
+            close( hPipeErr[0] );
+            dup2( hPipeErr[ 1 ], 2 );
+         }
+         else
+         {
+            dup2( 1 , 2 );
+         }
       }
       else if ( bBackground )
       {
          dup2( hNull, 2 );
       }
 
-      close( hNull );
+      if ( bBackground )
+      {
+         close( hNull );
+      }
 
-      //??????
+      /*
       for( hNull = 3; hNull < MAXFD; ++hNull )
          close(hNull);
 
       // ????
       setuid(getuid());
-      setgid(getgid());
-      
-      execv(argv[0], argv );
+      setgid(getgid());*/
+
+      execvp(argv[0], argv );
    }
    #endif
 }
@@ -1086,7 +1096,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       // using show_hide AND using invalid handlers for unused streams
       si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
       si.wShowWindow = SW_HIDE;
-      
+
       si.hStdInput = hPipeInRd;
       si.hStdOutput = hPipeOutWr;
       si.hStdError = hPipeErrWr;
@@ -1235,18 +1245,29 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
 {
    int iStatus;
 
-   if ( ! bWait )
+   if ( fhProc > 0 )
    {
-      iRetStatus = waitpid( (pid_t) fhProc, &iStatus, WNOHANG );
+      if ( ! bWait )
+      {
+         iRetStatus = waitpid( (pid_t) fhProc, &iStatus, WNOHANG );
+      }
+      else
+      {
+         HB_STACK_UNLOCK;
+         iRetStatus = waitpid( (pid_t) fhProc, &iStatus, 0 );
+         HB_STACK_LOCK;
+      }
    }
    else
    {
-      HB_STACK_UNLOCK;
-      iRetStatus = waitpid( (pid_t) fhProc, &iStatus, 0 );
-      HB_STACK_LOCK;
+      iRetStatus = 0;
    }
 
+   #ifdef ERESTARTSYS
+   if ( iRetStatus < 0 && errno != ERESTARTSYS)
+   #else
    if ( iRetStatus < 0 )
+   #endif
    {
       hb_fsSetError( errno );
       iRetStatus = -2;
@@ -1270,7 +1291,7 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
 #elif defined( HB_OS_WIN_32 ) && ! defined( X__WIN32__ )
 {
    int iPid;
-   
+
    HB_SYMBOL_UNUSED( bWait );
 
    HB_STACK_UNLOCK
@@ -1282,18 +1303,18 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
    #endif
    HB_DISABLE_ASYN_CANC
    HB_STACK_LOCK;
-   
+
    if ( iPid != (int) fhProc )
    {
       iRetStatus = -1;
-   } 
-}   
+   }
+}
 #elif defined( X__WIN32__ )
 {
    DWORD dwTime;
    DWORD dwResult;
-   
-   if ( ! bWait ) 
+
+   if ( ! bWait )
    {
       dwTime = 0;
    }
@@ -1301,7 +1322,7 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
    {
       dwTime = INFINITE;
    }
-   
+
    HB_STACK_UNLOCK
    HB_TEST_CANCEL_ENABLE_ASYN
    dwResult = WaitForSingleObject( DostoWinHandle(fhProc), dwTime );
@@ -1352,30 +1373,30 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCloseProcess(%d, %d )", fhProc, bGentle));
 
    hb_fsSetError( 0 );
-   
+
 #if defined(OS_UNIX_COMPATIBLE)
-{
-   int iSignal = bGentle ? SIGTERM : SIGKILL;
-   bRet = (kill( (pid_t) fhProc, iSignal ) == 0);
-   if ( ! bRet )
-   {
-      hb_fsSetError( errno );
+   if ( fhProc > 0 ) {
+      int iSignal = bGentle ? SIGTERM : SIGKILL;
+      bRet = (kill( (pid_t) fhProc, iSignal ) == 0);
+      if ( ! bRet )
+      {
+         hb_fsSetError( errno );
+      }
    }
-}
 
 #elif defined( HB_OS_WIN_32 ) && !defined( X__WIN32__ )
 {
    HANDLE hProc;
    
    hProc = OpenProcess( PROCESS_TERMINATE, FALSE, fhProc );
-   
+
    if ( hProc != NULL )
    {
       bRet = (TerminateProcess( hProc, bGentle ? 0:1 ) != 0);
       if ( ! bRet )
       {
          hb_fsSetError( GetLastError() );
-      }   
+      }
    }
    else
    {

@@ -1,6 +1,6 @@
 ***********************************************************
 * process.prg
-* $Id: process.prg,v 1.1 2003/08/26 15:08:51 jonnymind Exp $
+* $Id: process.prg,v 1.2 2003/08/27 10:29:14 jonnymind Exp $
 * Test for process oriented functions
 * Read from streams and manage sub processes.
 *
@@ -26,7 +26,7 @@ PROCEDURE Main( cProc, cSend )
    ? " X H A R B O U R - Process management test "
 
    ? "Launching process", cProc
-   hProc := HB_OpenProcess( cProc , @hIn, @hOut, @hErr )
+   hProc := HB_OpenProcess( cProc , @hIn, @hOut, @hOut )
    ? "Process handler:", hProc
    ? "Error: ", FError()
 
@@ -34,8 +34,8 @@ PROCEDURE Main( cProc, cSend )
    FWrite( hIn, cSend )
 
    ? "To kill the application, press a key"
-   Inkey(0)
-   ? "Result of the kill", HB_CloseProcess( hProc )
+   //Inkey(0)
+   //? "Result of the kill", HB_CloseProcess( hProc )
 
    ? "Reading output"
    cData := Space( 1000 )
@@ -60,7 +60,6 @@ PROCEDURE Main( cProc, cSend )
    FClose( hIn )
    FClose( hOut )
    FClose( hErr )
-
    ? "Done. Press any key to terminate"
    Inkey(0)
 
