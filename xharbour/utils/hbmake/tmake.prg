@@ -1,5 +1,5 @@
 /*
- * $Id: tmake.prg,v 2.0 2004/12/24 00:00:00 modalsist Exp $
+ * $Id: tmake.prg,v 1.10 2005/01/17 20:47:00 modalsist Exp $
  */
 
 /*
@@ -81,6 +81,7 @@ Data  lForce         Init .F.
 Data  lLinux         Init .F.
 Data  szProject      Init ""
 Data  lLibrary       Init .F.
+Data  lInstallLib    Init .F.
 Data  lIgnoreErrors  Init .F.
 Data  lExtended      Init .T.
 Data  lOs2           Init .F.
@@ -174,6 +175,7 @@ Method WriteMakeFileHeader() Class THbmake
     Fwrite( ::nLinkHandle, " " + CRLF )
     Fwrite( ::nLinkHandle, "RECURSE ="+if(::lRecurse," YES "," NO ") + CRLF )
     Fwrite( ::nLinkHandle, "LIBRARY ="+if(::lLibrary," YES "," NO ") + CRLF )    
+    Fwrite( ::nLinkHandle, "INSTALLLIB ="+if(::lInstallLib," YES "," NO ") + CRLF )    
     Fwrite( ::nLinkHandle, " " + CRLF )
 
     IF ::lFwh
@@ -317,13 +319,13 @@ Method WriteMakeFile() CLASS THBMAKE
 
             ENDIF
 
-            nPos := Ascan( ::aCs, { | z | hb_FNAMESPLIT( z, @cPath, @cTest, @cExt, @cDrive ), cpath == citem } )
+            nPos := AScan( ::aCs, { | z | hb_FNAMESPLIT( z, @cPath, @cTest, @cExt, @cDrive ), cpath == citem } )
 
             IF nPos > 0
 
                 IF !::aMacros[ x, 3 ]
 
-                    Aeval( ::aCs, { | a, b | hb_FNAMESPLIT( a, @cPath, @cTest, @cExt, @cDrive ), If( cPath == citem, ::aCs[ b ] := Strtran( a, cpath, "$(" + ::aMacros[ x, 1 ] + If( ::lGcc, ")/", ')\' ) ), ) } )
+                    AEval( ::aCs, { | a, b | hb_FNAMESPLIT( a, @cPath, @cTest, @cExt, @cDrive ), If( cPath == citem, ::aCs[ b ] := Strtran( a, cpath, "$(" + ::aMacros[ x, 1 ] + If( ::lGcc, ")/", ')\' ) ), ) } )
                     Fwrite( ::nLinkHandle, ::aMacros[ x, 1 ] + ' = ' + Left( ::aMacros[ x, 2 ], Len( ::aMacros[ x, 2 ] ) - 1 ) + " " + CRLF )
                     ::aMacros[ x, 3 ] := .t.
 
@@ -1059,7 +1061,7 @@ Method ReadMakefile(cFile) //class thbmake
         RETURN self
     ENDIF
     cBuffer := Trim( Substr( ReadLN( @lEof ), 1 ) )
-   ::lLibrary :=.f.
+    ::lLibrary :=.f.
 
     WHILE !leof
 
@@ -1313,6 +1315,12 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
                 IF aTemp[ 1 ] == "LIBRARY"
 
                    ::lLibrary := AT( "YES", aTemp[ 2 ] ) > 0
+
+                ENDIF  
+
+                IF aTemp[ 1 ] == "INSTALLLIB"
+
+                   ::lInstallLib := AT( "YES", aTemp[ 2 ] ) > 0
 
                 ENDIF  
 

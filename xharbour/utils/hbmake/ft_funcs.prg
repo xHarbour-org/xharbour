@@ -1,5 +1,5 @@
 /*
- * $Id: ft_funcs.prg,v 1.5 2001/12/27 22:38:27 andijahja Exp $
+ * $Id: ft_funcs.prg,v 1.3 2005/01/17 20:54:00 modalsist Exp $
  */
 
 /*
@@ -109,11 +109,9 @@ FUNCTION FT_FUSE( cFile AS STRING, nMode  AS NUMERIC)
       theHandle:closefile()
    ENDIF
    IF cFile <> Nil
-      IF nMode <> 0
-         theHandle := HBMake_FileBase():new( cFile ):open()
-      ELSE
-         theHandle := HBMake_FileBase():new( cFile ):open()
-      ENDIF
+      theHandle := HBMake_FileBase():new( cFile )
+      theHandle:nOpenMode := nMode
+      theHandle:open()
    ENDIF
    nHandle:= theHandle:nHan
 RETURN nHandle

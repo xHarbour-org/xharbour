@@ -1,5 +1,5 @@
 /*
- * $Id: pickarry.prg,v 1.9 2004/12/25 23:52:18 modalsist Exp $
+ * $Id: pickarry.prg,v 1.10 2005/01/17 20:42:00 modalsist Exp $
  */
  * xHarbour Project source code:
  * hbmake.prg xHarbour make utility main file
@@ -77,7 +77,6 @@ DEFAULT cTitle to ""
 DEFAULT lLib to .F.
 
 
-
    someitems := 0
 
    putscreen()
@@ -131,6 +130,8 @@ DEFAULT lLib to .F.
       NEXT
    ENDIF
 
+
+   Clear TypeAhead
 
    WHILE nChoice != 0
 

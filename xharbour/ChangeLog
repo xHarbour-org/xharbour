@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3751 2005/01/17 04:35:25 aleytys Exp $
+ * $Id: ChangeLog,v 1.3753 2005/01/17 22:30:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-17 22:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/ct/diskutil.prg
+    + added fifth parameter <lSpaceInName> in filevalid funtion that allow
+      space in the file name string on non DOS mode.
+
+  * utils/hbmake/pickary.prg
+  * utils/hbmake/hbmutils.prg
+  * utils/hbmake/ft_funcs.prg
+  * utils/hbmake/tmake.prg
+  * utils/hbmake/hbmake.prg
+    ! Fixes and changes on edit and create mode. General review on the recursive
+      mode and lib build. Thanks to Sandro R.R. Freire and Alan Candido to
+      help with suggestions, code and report bugs. Open and build a makefile
+      that is in read-only mode need be resolved.
 
 2005-01-16 22:47 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/tbrowse.prg

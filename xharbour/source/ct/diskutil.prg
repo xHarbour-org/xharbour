@@ -1,5 +1,5 @@
 /*
- * $Id: diskutil.prg,v 1.4 2005/01/05 11:56:55 modalsist Exp $
+ * $Id: diskutil.prg,v 1.5 2005/01/17 20:31:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code.
@@ -12,8 +12,8 @@
  * DiskReady()   - Return true if disk is ready.
  * DiskReadyW()  - Partially ready. See function for more details.
  * DiskTotal()   - Return total disk size.
- * DiskUsed()    - Return ammount used into disk. New function is xHarbour extension.
- * FileValid()   - Return true if a file can be oppened.
+ * DiskUsed()    - Return ammount used into disk. This function is xHarbour extension.
+ * FileValid()   - Return true if a string file name is valid.
  * FloppyType()  - Return a floppy type.
  * RenameFile()  - Rename a file.
  *
@@ -61,6 +61,7 @@
 
 #include "fileio.ch"
 #include "common.ch"
+
 
 *----------------------------------------------------------------------------------------------------
 FUNCTION DiskFormat( cDrive, nCapacity, cUDF, cBootText, nRepetitions, cLabel , lBoot ,lQuickFormat )
@@ -323,13 +324,13 @@ Local nRet := 0
 RETURN ( nRet )
 
 
-*--------------------------------------------------------------
-FUNCTION FileValid( cFileName, nMaxName, nMaxExt, lWithoutExt )
-*--------------------------------------------------------------
+*----------------------------------------------------------------------------
+FUNCTION FileValid( cFileName, nMaxName, nMaxExt, lWithoutExt, lSpaceInName )
+*----------------------------------------------------------------------------
 /*
 This function return by default, the MS-DOS valid file name (8x3) or an other
 format defined by user in accordance with <nMaxName> and <nMaxExt> values. 
-nMaxName, nMaxExt and lWithoutExt are xHarbour extensions.
+nMaxName, nMaxExt, lWithoutExt and lSpaceInName are xHarbour extensions.
 */
 
  Local lRet  := .T.
@@ -341,10 +342,10 @@ nMaxName, nMaxExt and lWithoutExt are xHarbour extensions.
  Local nFileLen := 0
  
  default cFileName to ""
- default nMaxName  to 8     
- default nMaxExt   to 3     
- default lWithoutExt to .T.
-
+ default nMaxName  to 8      // max file name len.  
+ default nMaxExt   to 3      // max extension name len.
+ default lWithoutExt to .T.  // allow file name without extension.
+ default lSpaceInName to .F. // allow space char in file name. 
 
  if !IsCharacter(cFileName) .or. Empty(cFileName)
     Return .F.
@@ -360,6 +361,10 @@ nMaxName, nMaxExt and lWithoutExt are xHarbour extensions.
 
  if !IsLogical(lWithoutExt)
     lWithoutExt := .T.
+ endif
+
+ if !IsLogical(lSpaceInName)
+    lSpaceInName := .F.
  endif
 
  if nMaxName <= 0
@@ -381,10 +386,14 @@ nMaxName, nMaxExt and lWithoutExt are xHarbour extensions.
        (i>=91 .and. i<=93) .or.;
         i=124 .or. i=127
 
-       cInvalid += chr(i)
-
+        cInvalid += chr(i)
+       
     endif   
  next
+
+ if lSpaceInName
+    cInvalid := StrTran(cInvalid," ","")
+ endif
 
  cFileName := Rtrim(cFileName)
  
@@ -414,9 +423,9 @@ endif
 if lRet
 
  if !empty(cName)
-   if Len(cName) > nMaxName
-      lRet := .F.
-   endif   
+    if Len(cName) > nMaxName
+       lRet := .F.
+    endif   
  else
     lRet := .F.
  endif

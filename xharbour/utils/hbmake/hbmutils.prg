@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.39 2004/12/28 23:15:00 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.39 2005/01/17 20:42:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -128,9 +128,9 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
                   nLen := AT( " ", aData[ y, 1 ] ) + 1
 
                   AADD( aRet, STRTRAN( aStru[ nCounter ], cDir, '' ) +;
-                        PadR(aData[ y, 1 ],nPadr) + ;         // prg name
-                        STR( aData[ y, 2 ], 8 ) + '  ' + ;    // prg size
-                        DTOC( aData[ y, 3 ] ) + '  ' + ;      // prg date
+                        PadR(aData[ y,1 ] ,nPadr) + ;         // prg name
+                        STR(aData[ y, 2 ] , 8 ) + '  ' + ;    // prg size
+                        DTOC(aData[ y, 3 ] ) + '  ' + ;       // prg date
                         aData[ y, 4 ] )                       // prg time
 
                ELSEIF ! lSubDir .AND. AT( IIF( lLinux, "/", "\" ), STRTRAN( aStru[ nCounter ], cDir, '' ) ) == 0
