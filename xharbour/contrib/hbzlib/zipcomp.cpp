@@ -1,5 +1,5 @@
 /*
- * $Id: zipcomp.cpp,v 1.8 2003/11/22 21:15:04 lculik Exp $
+ * $Id: zipcomp.cpp,v 1.9 2004/02/14 16:37:52 lculik Exp $
  */
 
 /*
@@ -199,13 +199,8 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
 
    catch( ... ){}
 
-   if ( pProgressInfo )
-   {
-      hb_itemRelease( pProgressInfo    );
-   }
-
    return ( int ) bReturn;
-   
+
 
 }
 
@@ -320,11 +315,6 @@ int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
 
    catch( ... ){}
 
-
-   if ( pProgressInfo )
-   {
-      hb_itemRelease( pProgressInfo    );
-   }
 
    return ( int ) bReturn;
 }
@@ -457,11 +447,6 @@ int hb_CompressFileStd( char *szFile, char *szFiletoCompress, int iCompLevel, PH
 
    catch( ... ){}
 
-   if ( pProgressInfo )
-   {
-      hb_itemRelease( pProgressInfo    );
-   }
-
    return ( int ) bReturn;
 }
 
@@ -585,12 +570,6 @@ int hb_CmpTdSpanStd( char *szFile, char * szFiletoCompress, int iCompLevel, PHB_
    }
 
    catch( ... ){}
-
-
-   if ( pProgressInfo )
-   {
-      hb_itemRelease( pProgressInfo    );
-   }
 
    return ( int ) bReturn;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.7 2003/09/30 14:03:43 paultucker Exp $
+ * $Id: zip.c,v 1.8 2003/11/22 21:15:04 lculik Exp $
  */
 
 /*
@@ -65,6 +65,16 @@ HB_FUNC( HB_ZIPFILE )
 
       if( ISCHAR( 2 ) )
       {
+         PHB_ITEM pUpdate = hb_param( 9, HB_IT_ANY );
+         HB_ITEM pProgress;
+
+         pProgress.type = HB_IT_NIL ;
+
+         if( pUpdate )
+         {
+            hb_itemCopy( &pProgress, pUpdate );
+         }
+
          bRet = hb_CompressFileStd( hb___CheckFile( szFile ),
                                     hb_parc( 2 ),
                                     ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
@@ -73,10 +83,20 @@ HB_FUNC( HB_ZIPFILE )
                                     ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                                     ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                     ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                                    hb_itemParam( 9 ) );
+                                    &pProgress );
       }
       else if( ISARRAY( 2 ) )
       {
+         PHB_ITEM pUpdate = hb_param( 9, HB_IT_ANY );
+         HB_ITEM pProgress;
+
+         pProgress.type = HB_IT_NIL ;
+
+         if( pUpdate )
+         {
+            hb_itemCopy( &pProgress, pUpdate );
+         }
+
          bRet = hb_CompressFile( hb___CheckFile( szFile ),
                                  hb_param( 2, HB_IT_ARRAY ),
                                  ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
@@ -85,7 +105,8 @@ HB_FUNC( HB_ZIPFILE )
                                  ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                                  ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                                 hb_itemParam( 9 ) );
+                                 &pProgress );
+
       }
    }
 
