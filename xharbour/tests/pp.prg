@@ -8669,7 +8669,11 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks )
             #endif
             asLines[nLine] := NIL
             nLine++
-            asLines[nLine] := sTemp + asLines[nLine]
+            IF asLines[nLine] == NIL
+               asLines[nLine] := sTemp
+            ELSE
+               asLines[nLine] := sTemp + asLines[nLine]
+            ENDIF
             sTemp := asLines[nLine]
          ELSE
             aDel( asLines, nLine )
