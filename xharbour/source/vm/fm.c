@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.52 2004/01/27 03:07:00 ronpinkas Exp $
+ * $Id: fm.c,v 1.53 2004/01/27 09:56:11 likewolf Exp $
  */
 
 /*
@@ -715,19 +715,6 @@ ULONG HB_EXPORT hb_xsize( void * pMem ) /* returns the size of an allocated memo
 void HB_EXPORT hb_xinit( void ) /* Initialize fixed memory subsystem */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xinit()"));
-
-   #ifdef HB_FM_STATISTICS
-      s_lMemoryBlocks = 0;      /* memory blocks used */
-      s_lMemoryMaxBlocks = 0;   /* maximum number of used memory blocks */
-      s_lMemoryMaxConsumed = 0; /* memory size consumed */
-      s_lMemoryConsumed = 0;    /* memory max size consumed */
-      s_lAllocations = 0;
-      s_lReAllocations = 0;
-      s_lFreed = 0;
-
-      s_pFirstBlock = NULL;
-      s_pLastBlock = NULL;
-   #endif
 
    #ifdef HB_THREAD_SUPPORT
       hb_threadInit();

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2214 2004/02/03 16:37:41 maurifull Exp $
+ * $Id: ChangeLog,v 1.2215 2004/02/03 18:06:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-03 19:50 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   ! fix for duplicating trailing spaces in keys. It was possible to make
+     a situation where key was stored with trailing space in duplicate
+     part and even overwrite key buffer
+
+  * xharbour/source/vm/fm.c
+   * redundant initialization of static variables in hb_xinit() which
+      cause problem when memory was allocated in C init procedures removed
+
+  - xharbour/tests/ERRSYSW.prg
+  + xharbour/tests/errsysw.prg
+  - xharbour/tests/InitRun.prg
+  + xharbour/tests/initrun.prg
+  - xharbour/tests/wvtgui.PRG
+  + xharbour/tests/wvtgui.prg
+   * upper letters in filenames changed to lower
 
 2004-02-03 10:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/gtnul/gtnul.c

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.97 2004/01/28 14:45:40 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.98 2004/02/03 14:01:13 druzus Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
  */
 
 
-//#define HB_CDX_DBGCODE
+#define HB_CDX_DBGCODE
 //#define HB_CDX_DBGCODE_EXT
 
 //#define HB_CDX_DSPDBG_INFO
@@ -1650,7 +1650,8 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
 /* #ifdef HB_CDX_DBGCODE */
       else if ( iTmp < 0 )
       {
-         printf("\r\npPage->Page=%lx, iKey=%d, iNum=%d, iDup=%d, iTrl=%d", pPage->Page, iKey, iNum, iDup, iTrl); fflush(stdout);
+         printf("\r\n[%s][%s]", pSrc - iLen, pSrc);
+         printf("\r\npPage->Page=0x%lx, iKey=%d, iNum=%d, iDup=%d, iTrl=%d", pPage->Page, iKey, iNum, iDup, iTrl); fflush(stdout);
          hb_cdxErrInternal( "hb_cdxPageLeafEncode: index corrupted." );
       }
 /* #endif */
@@ -1862,9 +1863,16 @@ static int hb_cdxPageLeafDelKey( LPCDXPAGE pPage )
                          pPage->pKeyBuf[ iPrev + iLen - 1 ] );
          iDup = HB_MIN( pPage->pKeyBuf[ iPos ],
                         pPage->pKeyBuf[ iNext - 2] );
-         while ( iDup < iNum && pPage->pKeyBuf[ iPrev + iDup ] ==
-                                pPage->pKeyBuf[ iNext + iDup ] )
-            ++iDup;
+         if ( iDup > iNum )
+         {
+            iDup = iNum;
+         }
+         else
+         {
+            while ( iDup < iNum && pPage->pKeyBuf[ iPrev + iDup ] ==
+                                   pPage->pKeyBuf[ iNext + iDup ] )
+               ++iDup;
+         }
       }
       iSpc += ( pPage->pKeyBuf[ iPos ] = ( BYTE ) iDup );
    }
@@ -1949,9 +1957,16 @@ static int hb_cdxPageLeafAddKey( LPCDXPAGE pPage, LPCDXKEY pKey )
    if ( iKey > 0 )
    {
       iMax = iNum - HB_MAX( iTrl, pPage->pKeyBuf[ iPos - 1 ] );
-      while ( iDup < iMax && pPage->pKeyBuf[ iPos + iDup ] ==
-                             pPage->pKeyBuf[ iPos + iDup - iLen ] )
-         ++iDup;
+      if ( iDup > iMax )
+      {
+         iDup = iMax;
+      }
+      else
+      {
+         while ( iDup < iMax && pPage->pKeyBuf[ iPos + iDup ] ==
+                                pPage->pKeyBuf[ iPos + iDup - iLen ] )
+            ++iDup;
+      }
    }
    pPage->pKeyBuf[ iPos + iNum + 4 ] = (BYTE) iDup;
    pPage->pKeyBuf[ iPos + iNum + 5 ] = (BYTE) iTrl;
@@ -6649,7 +6664,9 @@ static SHORT hb_cdxSortKeyFindDup( LPCDXKEYINFO pKey1, LPCDXKEYINFO pKey2 )
       int iLimit = (pKey1->length > pKey2->length) ? pKey2->length : pKey1->length;
       while ( usDup < iLimit && ( (BYTE) pKey1->Value[ usDup ] ) ==
                                 ( (BYTE) pKey2->Value[ usDup ] ) )
+      {
          usDup++;
+      }
    }
    return usDup;
 }
