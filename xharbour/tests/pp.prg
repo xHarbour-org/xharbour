@@ -8948,6 +8948,7 @@ STATIC FUNCTION InitDotRules()
    aAdd( aCommRules, { 'OTHERWISE' ,  , .F. } )
    aAdd( aCommRules, { 'ENDCASE' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
    aAdd( aCommRules, { 'DO' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '.', NIL, NIL }, {    0,   0, 'PRG', NIL, NIL } } , .F. } )
+   aAdd( aCommRules, { 'CD' , { {    1,   0, NIL, '(', NIL } } , .F. } )
 
 RETURN .T.
 
@@ -8975,6 +8976,7 @@ STATIC FUNCTION InitDotResults()
    aAdd( aCommResults, { { {   0, '__SetOtherwise()' } }, { -1} ,  } )
    aAdd( aCommResults, { { {   0, '__SetEndCase()' } }, { -1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_Run( ' }, {   0,   1 }, {   0, ' + ".prg" )' } }, { -1,  2, -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, 'DirChange( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  4, -1} , { NIL }  } )
 
 RETURN .T.
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1342 2003/08/12 19:53:30 brianhays Exp $
+ * $Id: ChangeLog,v 1.1343 2003/08/12 23:34:04 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-12 17:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * contrib/rdd_ads/ace.h
+    ! Fixed definition of ENTRYPOINT - Brian we probably need to report this to Exetnded Systems (appears to be a typo!).
+
+  * contrib/rdd_ads/ads1.c
+    ! Fixed possible GPF, and added few commented debuging TraceLog().
+
+  * source/vm/arrays.c
+    - Removed redundant lines from hb_arrayDel()
+
+  * tests/ads.prg
+    ! Minor corrections.
+
+  * tests/pp.prg
+  * tests/rp_dot.ch
+    + Added support for:
+        CD <NewDir> in Dot Prompt mode.
 
 2003-08-12 16:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * bin/bld.bat

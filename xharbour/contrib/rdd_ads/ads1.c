@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.14 2003/07/22 09:40:44 toninhofwi Exp $
+ * $Id: ads1.c,v 1.15 2003/07/23 09:43:33 brianhays Exp $
  */
 
 /*
@@ -976,7 +976,8 @@ static ERRCODE adsFieldCount( ADSAREAP pArea, USHORT * uiFields )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsFieldCount(%p, %p)", pArea, uiFields));
 
-   AdsGetNumFields  ( pArea->hTable, uiFields );
+   AdsGetNumFields( pArea->hTable, uiFields );
+
    return SUCCESS;
 }
 
@@ -1653,47 +1654,61 @@ static ERRCODE adsNewArea( ADSAREAP pArea )
 
 static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
-   ADSHANDLE hTable;
+   ADSHANDLE hTable = 0;
    UNSIGNED32  ulRetVal, pulLength, ulRecCount;
-   USHORT uiFields, uiCount;
+   USHORT uiFields = 0, uiCount;
    UNSIGNED8 szName[ ADS_MAX_FIELD_NAME + 1 ];
       /* See adsGettValue() for why we don't use pArea->uiMaxFieldNameLength here */
    UNSIGNED16 pusBufLen, pusType;
    DBFIELDINFO dbFieldInfo;
 
+   //TraceLog( NULL, "Open '%s'\n", pOpenInfo->abName );
+
    HB_TRACE(HB_TR_DEBUG, ("adsOpen(%p)", pArea));
 
    if( pOpenInfo->atomAlias )
    {
-      pArea->szDataFileName = (char *) hb_xgrab( strlen( (char *) pOpenInfo->abName ) + 1 );
-      strcpy( pArea->szDataFileName, ( char * ) pOpenInfo->abName );
-      pArea->atomAlias = hb_dynsymGet( ( char * ) pOpenInfo->atomAlias );
+      pArea->szDataFileName = (char *) hb_xgrab( strlen( (char *) ( pOpenInfo->abName ) ) + 1 );
+      strcpy( pArea->szDataFileName, ( char * ) ( pOpenInfo->abName ) );
+
+      pArea->atomAlias = hb_dynsymGet( ( char * ) ( pOpenInfo->atomAlias ) );
+
+      //TraceLog( NULL, "Dyn: %p\n", pArea->atomAlias );
+
       if( ( ( PHB_DYNS ) pArea->atomAlias )->hArea )
       {
          hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, ( char * ) pOpenInfo->atomAlias );
          return FAILURE;
       }
+
       ( ( PHB_DYNS ) pArea->atomAlias )->hArea = pOpenInfo->uiArea;
       pArea->hStatement = 0;
       pArea->hOrdCurrent = 0;
 
-      if (bDictionary)
+      if( bDictionary )
+      {
          ulRetVal = AdsOpenTable  ( adsConnectHandle, pOpenInfo->abName, pOpenInfo->atomAlias,
                   ADS_DEFAULT, adsCharType, adsLockType, adsRights,
                   ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
                   ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
                    &hTable);
+      }
       else
+      {
          ulRetVal = AdsOpenTable  ( 0, pOpenInfo->abName, pOpenInfo->atomAlias,
                   pArea->iFileType, adsCharType, adsLockType, adsRights,
                   ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
                   ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
                    &hTable);
+      }
 
       if( ulRetVal != AE_SUCCESS )
       {
-         if ( ulRetVal != 1001 && ulRetVal != 7008)     /* 1001 and 7008 are standard ADS Open Errors that will usually be sharing issues */
+         if( ulRetVal != 1001 && ulRetVal != 7008 )     /* 1001 and 7008 are standard ADS Open Errors that will usually be sharing issues */
+         {
             commonError( pArea, EG_OPEN, ( USHORT ) ulRetVal, ( char * ) pOpenInfo->abName );
+         }
+
          return FAILURE;                /* just set neterr  */
       }
 
@@ -1702,7 +1717,10 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       pArea->fReadonly = pOpenInfo->fReadonly;
    }
 
+   //TraceLog( NULL, "Before count: %i \n", uiFields );
    SELF_FIELDCOUNT( ( AREAP ) pArea, &uiFields );
+
+   //TraceLog( NULL, "Before extent\n" );
    SELF_SETFIELDEXTENT( ( AREAP ) pArea, uiFields );
 
    /* Size for deleted flag */
@@ -1711,10 +1729,13 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    for( uiCount = 1; uiCount <= uiFields; uiCount++ )
    {
-      pusBufLen = pArea->uiMaxFieldNameLength + 1;
+      pusBufLen = ADS_MAX_FIELD_NAME;
       AdsGetFieldName( pArea->hTable, uiCount, szName, &pusBufLen );
       dbFieldInfo.atomName = szName;
-      * ( dbFieldInfo.atomName + pusBufLen ) = '\0';
+
+      //TraceLog( NULL, "Field: '%s'\n", szName );
+
+      * ( dbFieldInfo.atomName + pusBufLen - 1 ) = '\0';
       AdsGetFieldType  ( pArea->hTable, szName, &pusType );
       AdsGetFieldLength( pArea->hTable, szName, &pulLength );
       dbFieldInfo.uiLen = ( USHORT ) pulLength;
@@ -2505,7 +2526,6 @@ DBOI_AUTOSHARE
 
 static ERRCODE adsClearFilter( ADSAREAP pArea )
 {
-
    HB_TRACE(HB_TR_DEBUG, ("adsClearFilter(%p)", pArea));
    /*
     We don't know if an AOF was used.

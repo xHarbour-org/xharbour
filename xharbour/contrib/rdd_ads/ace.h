@@ -77,7 +77,7 @@
 #if defined( ASANLM ) || defined( ADS_LINUX ) || defined( ASANT ) || defined( NLM ) || defined( ADS_NT ) || defined( ADS_WIN9X ) || defined( STAND_ALONE_EXE )
    #define ENTRYPOINT
 #elif defined( WIN32 ) && !defined( __BORLANDC__ )
-   #define ENTRYPOINT _declspec( dllexport ) WINAPI
+   #define ENTRYPOINT __declspec( dllimport ) WINAPI
 #else
    #define ENTRYPOINT _export WINAPI
 #endif

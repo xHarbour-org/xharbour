@@ -1,4 +1,4 @@
-#include "ads.ch"
+#include "..\contrib\rdd_ads\ads.ch"
 
 PROCEDURE TestAds( cDBF )
 
@@ -48,7 +48,7 @@ RETURN
 
 #define WIN32
 
-#include "ace.h"
+#include "..\contrib\rdd_ads\ace.h"
 
 #include "hbapi.h"
 #include "hbvm.h"

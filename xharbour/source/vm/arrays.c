@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.57 2003/07/30 00:41:17 ronpinkas Exp $
+ * $Id: arrays.c,v 1.58 2003/07/30 12:48:54 druzus Exp $
  */
 
 /*
@@ -278,15 +278,6 @@ BOOL HB_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
          for( ulIndex--; ulIndex < ulLen - 1; ulIndex++ )       /* move items */
          {
             hb_itemForwardValue( pBaseArray->pItems + ulIndex, pBaseArray->pItems + ( ulIndex + 1 ) );
-         }
-
-         if( HB_IS_COMPLEX( pBaseArray->pItems + ( ulLen - 1 ) ) )
-         {
-            hb_itemClear( pBaseArray->pItems + ( ulLen - 1 ) );
-         }
-         else
-         {
-            ( pBaseArray->pItems + ( ulLen - 1 ) )->type = HB_IT_NIL;
          }
       }
       return TRUE;
