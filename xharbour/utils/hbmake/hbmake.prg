@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.88 2003/08/20 23:55:44 lculik Exp $
+ * $Id: hbmake.prg,v 1.89 2003/08/21 04:02:13 ronpinkas Exp $
  */
 /*
  * Harbour Project source code:
@@ -272,11 +272,12 @@ FUNCTION ParseMakeFile( cFile )
       RETURN NIL
    ENDIF
 
-   IF "linux" in Lower( Os () )
+   
+   #ifndef __PLATFORM__Windows
       IF !FILE("hbtemp.c")
-        &( "CreateLink()" )
+         CreateLink()
       ENDIF
-   ENDIF
+   #ENDIF
 
    cBuffer := Trim( Substr( ReadLN( @s_lEof ), 1 ) )
 
@@ -325,19 +326,19 @@ FUNCTION ParseMakeFile( cFile )
 
       ENDIF
 
-/*      IF "LINUX" IN Upper( Os() )
-        IF AT("OBJCFILES", cTemp) >0
-	   ct := SubStr(cTemp , 1 , Rat( "(", cTemp ) - 2 )
-    	   cTemp := ct +" hbtemp.o" +" $(OBC)"
-	ENDIF
-      ENDIF	   */
+   #ifndef __PLATFORM__Windows
+   IF AT("OBJCFILES", cTemp) >0
+      ct := SubStr(cTemp , 1 , Rat( "(", cTemp ) - 2 )
+      cTemp := ct +" hbtemp.o" +" $(OBC)"
+   ENDIF
+   #ENDIF    
 
-/*      IF "LINUX" IN Upper( Os() )
-        IF AT( "CFILES" , cTemp) >0
-	   ct := SubStr(cTemp , 1 , Rat( "(", cTemp ) - 2 )
-    	   cTemp := ct +" hbtemp.c" +" $(CF)"
-	ENDIF
-      ENDIF*/
+   #ifndef __PLATFORM__Windows
+      IF AT( "CFILES" , cTemp) >0
+         ct := SubStr(cTemp , 1 , Rat( "(", cTemp ) - 2 )
+         cTemp := ct +" hbtemp.c" +" $(CF)"
+      ENDIF
+   #ENDIF
 
       aTemp := ListAsArray2( Alltrim( cTemp ), "=" )
 
