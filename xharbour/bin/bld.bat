@@ -1,6 +1,6 @@
-@echo off
+rem @echo off
 rem
-rem $Id: bld.bat,v 1.24 2001/11/07 08:59:19 paultucker Exp $
+rem $Id: bld.bat,v 1.1 2001/12/22 06:36:17 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -155,9 +155,9 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include\
       echo -lvm >> build.tmp
       echo -lmacro >> build.tmp
       echo -lpp >> build.tmp
-      echo -ldbfnt >> build.tmp
-      echo -ldbfcd >> build.tmp
-      echo -lcommo >> build.tmp
+      echo -ldbfntx >> build.tmp
+      echo -ldbfcdx >> build.tmp
+      echo -lcommon >> build.tmp
       gcc @build.tmp
       del build.tmp
       goto END

@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.3 2002/01/05 03:29:39 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.4 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -251,6 +251,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
       {
          HB_TRACE( HB_TR_DEBUG, ( "Free pCode, %p", pCBlock->pCode ) );
          hb_xfree( pCBlock->pCode );
+         pCBlock->pCode = NULL;
       }
 
       /* free space allocated for a CODEBLOCK structure
