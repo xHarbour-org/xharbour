@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.17 2002/07/29 17:37:07 ronpinkas Exp $
+ * $Id: classes.c,v 1.18 2002/07/30 06:59:58 ronpinkas Exp $
  */
 
 /*
@@ -262,7 +262,7 @@ USHORT MsgToNum( const char *ptr, USHORT uiHashKey )
 
    //printf( "Val: %i Mult: %f Mod: %f Floor: %f Key: %i\n", val, val * 0.618, fmod( (double) ( val * 0.618 ), (double) 1 ), floor( fmod( (double) ( val * 0.618 ), (double) 1 ) * uiHashKey ), uiHashKey );
 
-   return (USHORT) floor( fmod( (double) ( val * 0.618 ), (double) 1 ) * uiHashKey ) ;
+   return val % uiHashKey; //(USHORT) floor( fmod( (double) ( val * 0.618 ), (double) 1 ) * uiHashKey ) ;
 }
 
 /* ================================================ */
@@ -1355,8 +1355,7 @@ HB_FUNC( __CLSNEW )
          {
             HB_TRACE( HB_TR_DEBUG, ( "Class: %s Super: %s Known: %i + Super %i\n", pNewCls->szName, pSprCls->szName, uiKnownMethods, pSprCls->uiMethods ) );
 
-            // TODO: findout why this break ???
-            pNewCls->uiHashKey = pSprCls->uiHashKey; //+ ( ( ( BASE_METHODS > uiKnownMethods ? BASE_METHODS : uiKnownMethods ) / BUCKET ) * 2 ) ;
+            pNewCls->uiHashKey = pSprCls->uiHashKey + ( ( ( BASE_METHODS > uiKnownMethods ? BASE_METHODS : uiKnownMethods ) / BUCKET ) * 2 ) ;
 
             ulSize = pNewCls->uiHashKey * BUCKET * sizeof( METHOD );
             pNewCls->pMethods = ( PMETHOD ) hb_xgrab( ulSize );
