@@ -1,5 +1,5 @@
 /*
- * $Id: wvtclass.prg,v 1.2 2004/07/15 03:22:01 vouchcac Exp $
+ * $Id: wvtclass.prg,v 1.3 2004/07/21 11:07:24 vouchcac Exp $
  */
 
 /*
@@ -895,7 +895,7 @@ RETURN Self
 METHOD Destroy() CLASS WvtObject
 
 if ::hFont <> nil
-   Wvt_DeleteObject( ::hFont )
+   Win_DeleteObject( ::hFont )
    ::hFont := nil
 endif
 
@@ -1521,7 +1521,7 @@ METHOD Configure() CLASS WvtLabel
 ::nBackColorHoverOff := ::nBackColor
 
 if ::hFont <> 0
-   Wvt_DeleteObject( ::hFont )
+   Win_DeleteObject( ::hFont )
 endif
 
 ::hFont := Wvt_CreateFont( ::cFont, ::nFontHeight, ::nFontWidth, ::nFontWeight, ::lItalic,;
@@ -2865,7 +2865,7 @@ RETURN Self
 
 METHOD Destroy() CLASS WvtBanner
 
-Wvt_DeleteObject( ::oLabel:hFont )
+Win_DeleteObject( ::oLabel:hFont )
 
 RETURN nil
 

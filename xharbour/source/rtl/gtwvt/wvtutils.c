@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.9 2004/07/21 11:07:24 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.10 2004/07/22 15:36:51 vouchcac Exp $
  */
 
 /*
@@ -75,12 +75,22 @@
 
 #include "hbgtwvt.h"
 
+//-------------------------------------------------------------------//
+
 static GLOBAL_DATA *_s = NULL;
 
+//-------------------------------------------------------------------//
+
+extern HANDLE  hb_hInstance;
+
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //
 //              Pritpal Bedi <pritpal@vouchcac.com>
 //
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
 void HB_EXPORT hb_wvt_wvtUtils( void )
@@ -198,12 +208,15 @@ HB_FUNC( WVT_CHOOSECOLOR )
 }
 
 //-------------------------------------------------------------------//
-
+//
+//  Wvt_MessageBox( cMessage, cTitle, nIcon, hWnd )
+//
 HB_FUNC( WVT_MESSAGEBOX )
 {
    hb_retni( MessageBox( _s->hWnd, hb_parcx( 1 ), hb_parcx( 2 ), ISNIL( 3 ) ? MB_OK : hb_parni( 3 ) ) ) ;
 }
 
+//-------------------------------------------------------------------//
 #if _WIN32_IE > 0x400
 //-------------------------------------------------------------------//
 //
@@ -371,8 +384,9 @@ HB_FUNC( WVT_GETTOOLTIPTEXTCOLOR )
 {
    hb_retnl( ( COLORREF ) SendMessage( _s->hWndTT, TTM_GETTIPTEXTCOLOR, 0, 0 ) );
 }
-#endif
 
+//-------------------------------------------------------------------//
+#endif
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
@@ -1050,6 +1064,8 @@ HB_FUNC( WVT_PASTEFROMCLIPBOARD )
 }
 
 //-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
 
 HB_FUNC( WVT_KEYBOARD )
 {
@@ -1163,18 +1179,603 @@ HB_FUNC( WVT_UPDATEWINDOW )
 }
 
 //-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//
+//                             Dialogs
+//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
 
-HB_FUNC( WVT_DELETEOBJECT )
+HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
+{
+   PHB_ITEM pFirst = hb_param( 3,HB_IT_ANY );
+   PHB_ITEM pFunc  = NULL ;
+   PHB_DYNS pExecSym;
+   HWND     hDlg ;
+   int      iIndex;
+   int      iType;
+   int      iResource = hb_parni( 4 );
+
+   if ( HB_IS_BLOCK( pFirst ) )
+   {
+      pFunc = ( PHB_ITEM ) pFirst ;
+      iType = 2;
+   }
+   else if( pFirst->type == HB_IT_STRING )
+   {
+      hb_dynsymLock();
+      pExecSym = hb_dynsymFindName( pFirst->item.asString.value );
+      hb_dynsymUnlock();
+      if ( pExecSym )
+      {
+         pFunc = ( PHB_ITEM ) pExecSym;
+      }
+      iType = 1;
+   }
+
+   for ( iIndex = 0; iIndex < WVT_DLGML_MAX; iIndex++ )
+   {
+      if ( _s->hDlgModeless[ iIndex ] == NULL )
+      {
+         break;
+      }
+   }
+
+   if ( iIndex < WVT_DLGML_MAX )
+   {
+      if ( ISNUM( 3 ) )
+      {
+         hDlg = CreateDialogIndirect( ( HINSTANCE     ) hb_hInstance,
+                                      ( LPDLGTEMPLATE ) hb_parc( 1 ),
+                                                        hb_parl( 2 ) ? _s->hWnd : NULL,
+                                      ( DLGPROC       ) hb_parnl( 3 ) );
+      }
+      else
+      {
+
+         switch ( iResource )
+         {
+            case 0:
+            {
+               hDlg = CreateDialog( ( HINSTANCE     ) hb_hInstance,
+                                                      hb_parc( 1 ),
+                                                      hb_parl( 2 ) ? _s->hWnd : NULL,
+                                                      hb_wvt_gtDlgProcMLess );
+            }
+            break;
+
+            case 1:
+            {
+               hDlg = CreateDialog( ( HINSTANCE     ) hb_hInstance,
+                                    MAKEINTRESOURCE( ( WORD ) hb_parni( 1 ) ),
+                                                      hb_parl( 2 ) ? _s->hWnd : NULL,
+                                                      hb_wvt_gtDlgProcMLess );
+            }
+            break;
+
+            case 2:
+            {
+               hDlg = CreateDialogIndirect( ( HINSTANCE     ) hb_hInstance,
+                                            ( LPDLGTEMPLATE ) hb_parc( 1 ),
+                                                              hb_parl( 2 ) ? _s->hWnd : NULL,
+                                                              hb_wvt_gtDlgProcMLess );
+            }
+            break;
+         }
+      }
+
+      if ( hDlg )
+      {
+         _s->hDlgModeless[ iIndex ] = hDlg;
+         if ( pFunc )
+         {
+            _s->pFunc[ iIndex ] = pFunc;
+            _s->iType[ iIndex ] = iType;
+         }
+         else
+         {
+            _s->pFunc[ iIndex ] = NULL;
+            _s->iType[ iIndex ] = NULL;
+         }
+         SendMessage( hDlg, WM_INITDIALOG, 0, 0 );
+      }
+      else
+      {
+         _s->hDlgModeless[ iIndex ] = NULL;
+      }
+   }
+
+   hb_retnl( ( ULONG ) hDlg );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC ( WVT__MAKEDLGTEMPLATE )
+{
+   WORD  *p, *pdlgtemplate ;
+   WORD  nItems = hb_parni( 1, 4 ) ;
+   int   i, nchar ;
+   DWORD lStyle ;
+
+   // Parameters: 12 arrays
+   // 1 for DLG template
+   // 11 for item properties
+
+   // 64k allow to build up to 255 items on the dialog
+   //
+   pdlgtemplate = p = ( PWORD ) LocalAlloc( LPTR, 65534 )  ;
+
+   //---------------
+
+    lStyle = hb_parnl(1,3) ;
+
+    // start to fill in the dlgtemplate information.  addressing by WORDs
+
+    *p++ = 1                        ; // version
+    *p++ = 0xFFFF                   ; // signature
+    *p++ = LOWORD ( hb_parnl(1,1) ) ; // Help Id
+    *p++ = HIWORD ( hb_parnl(1,1) ) ;
+
+    *p++ = LOWORD ( hb_parnl(1,2) ) ; // ext. style
+    *p++ = HIWORD ( hb_parnl(1,2) ) ;
+
+    *p++ = LOWORD (lStyle)          ;
+    *p++ = HIWORD (lStyle)          ;
+
+    *p++ = (WORD)   nItems          ;  // NumberOfItems
+    *p++ = (short)  hb_parni(1,5)   ;  // x
+    *p++ = (short)  hb_parni(1,6)   ;  // y
+    *p++ = (short)  hb_parni(1,7)   ;  // cx
+    *p++ = (short)  hb_parni(1,8)   ;  // cy
+    *p++ = (short)  0               ;  // Menu (ignored for now.)
+    *p++ = (short)  0x00            ;  // Class also ignored
+
+    if ( hb_parinfa( 1,11 ) == HB_IT_STRING )
+    {
+        nchar = nCopyAnsiToWideChar( p, TEXT( hb_parcx( 1,11 ) ) ) ;
+        p += nchar   ;
+    }
+    else
+    {
+      *p++ =0 ;
+    }
+    // add in the wPointSize and szFontName here iff the DS_SETFONT bit on
+
+    if ( ( lStyle & DS_SETFONT ) )
+    {
+      *p++ = (short) hb_parni(1,12) ;
+      *p++ = (short) hb_parni(1,13) ;
+      *p++ = (short) hb_parni(1,14) ;
+
+      nchar = nCopyAnsiToWideChar( p, TEXT( hb_parcx(1,15) ) ) ;
+      p += nchar ;
+    } ;
+
+    //---------------
+    // Now, for the items
+
+   for ( i = 1 ; i <= nItems ; i++ ) {
+      // make sure each item starts on a DWORD boundary
+      p = lpwAlign (p) ;
+
+      *p++ = LOWORD ( hb_parnl(2,i) ) ;    // help id
+      *p++ = HIWORD ( hb_parnl(2,i) ) ;
+
+      *p++ = LOWORD ( hb_parnl(3,i) ) ; // ext. style
+      *p++ = HIWORD ( hb_parnl(3,i) ) ;
+
+      *p++ = LOWORD ( hb_parnl(4,i) ) ; // style
+      *p++ = HIWORD ( hb_parnl(4,i) ) ;
+
+      *p++ = (short)  hb_parni(5,i)   ;  // x
+      *p++ = (short)  hb_parni(6,i)   ;  // y
+      *p++ = (short)  hb_parni(7,i)   ;  // cx
+      *p++ = (short)  hb_parni(8,i)   ;  // cy
+
+      *p++ = LOWORD ( hb_parnl(9,i) ) ;  // id
+      *p++ = HIWORD ( hb_parnl(9,i) ) ;  // id   // 0;
+
+      if ( hb_parinfa( 10,i ) == HB_IT_STRING )
+         {
+         nchar = nCopyAnsiToWideChar( p, TEXT ( hb_parcx( 10,i ) ) ) ; // class
+         p += nchar ;
+         }
+      else
+         {
+         *p++ = 0xFFFF ;
+         *p++ = (WORD) hb_parni(10,i) ;
+         }
+
+      if ( hb_parinfa( 11,i ) == HB_IT_STRING )
+         {
+         nchar = nCopyAnsiToWideChar( p, ( LPSTR ) hb_parcx( 11,i ) ) ;  // text
+         p += nchar ;
+         }
+      else
+         {
+         *p++ = 0xFFFF ;
+         *p++ = (WORD) hb_parni(11,i) ;
+         }
+
+      *p++ = 0x00 ;  // extras ( in array 12 )
+    } ;
+
+    p = lpwAlign( p )  ;
+
+    hb_retclen( ( LPSTR ) pdlgtemplate, ( ( ULONG ) p - ( ULONG ) pdlgtemplate ) ) ;
+
+    LocalFree( LocalHandle( pdlgtemplate ) ) ;
+}
+
+//-------------------------------------------------------------------//
+//
+//  Helper routine.  Take an input pointer, return closest
+//  pointer that is aligned on a DWORD (4 byte) boundary.
+//
+HB_EXPORT LPWORD lpwAlign( LPWORD lpIn )
+{
+   ULONG ul;
+   ul = ( ULONG ) lpIn;
+   ul += 3;
+   ul >>=2;
+   ul <<=2;
+  return ( LPWORD ) ul;
+}
+
+//-----------------------------------------------------------------------------
+
+HB_EXPORT int nCopyAnsiToWideChar( LPWORD lpWCStr, LPSTR lpAnsiIn )
+{
+   int nChar = 0;
+
+   do
+   {
+      *lpWCStr++ = ( WORD ) *lpAnsiIn;
+      nChar++;
+   }
+   while ( *lpAnsiIn++ );
+
+   return nChar;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_LBADDSTRING )
+{
+   SendMessage( GetDlgItem( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ), LB_ADDSTRING, 0, ( LPARAM )( LPSTR ) hb_parcx( 3 ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_LBSETCURSEL )
+{
+   SendMessage( GetDlgItem( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ), LB_SETCURSEL, hb_parni( 3 ), 0 );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_CBADDSTRING )
+{
+   SendMessage( GetDlgItem( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ), CB_ADDSTRING, 0, ( LPARAM )( LPSTR ) hb_parcx( 3 ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_CBSETCURSEL )
+{
+   SendMessage( GetDlgItem( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ), CB_SETCURSEL, hb_parni( 3 ), 0 );
+}
+
+//-------------------------------------------------------------------//
+//
+//   Wvt_DlgSetIcon( hDlg, ncIcon )
+//
+HB_FUNC( WVT_DLGSETICON )
+{
+   HICON hIcon = NULL;
+
+   if ( ISNUM( 2 ) )
+   {
+      hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( hb_parni( 2 ) ) );
+   }
+   else
+   {
+      hIcon = ( HICON ) LoadImage( ( HINSTANCE ) NULL, hb_parc( 2 ), IMAGE_ICON, 0, 0, LR_LOADFROMFILE );
+   }
+
+   if ( hIcon )
+   {
+      SendMessage( ( HWND ) hb_parnl( 1 ), WM_SETICON, ICON_SMALL, ( LPARAM ) hIcon ); // Set Title Bar ICON
+      SendMessage( ( HWND ) hb_parnl( 1 ), WM_SETICON, ICON_BIG,   ( LPARAM ) hIcon ); // Set Task List Icon
+   }
+
+   if ( hIcon )
+   {
+      hb_retnl( ( ULONG ) hIcon );
+   }
+}
+
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//
+//             Direct WinApi Functions - Prefixed WIN_*()
+//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+
+HB_FUNC ( WIN_SENDMESSAGE )
+{
+   char *cText ;
+
+   if( ISBYREF( 4 ) )
+   {
+      cText = ( char* ) hb_xgrab( hb_parcsiz( 4 ) );
+      hb_xmemcpy( cText, hb_parcx( 4 ), hb_parcsiz( 4 ) );
+   }
+
+   hb_retnl( ( ULONG ) SendMessage( ( HWND ) hb_parnl( 1 ),
+                                    ( UINT ) hb_parni( 2 ),
+                                    ( ISNIL( 3 ) ? 0 : ( WPARAM ) hb_parnl( 3 ) ),
+                                    ( ISNIL( 4 ) ? 0 : ( ISBYREF( 4 ) ? ( LPARAM ) ( LPSTR ) cText :
+                                       ( ISCHAR( 4 ) ? ( LPARAM )( LPSTR ) hb_parcx( 4 ) :
+                                           ( LPARAM ) hb_parnl( 4 ) ) ) ) )
+           );
+
+   if ( ISBYREF( 4 ) )
+   {
+      hb_storclen( cText, hb_parcsiz( 4 ), 4 );
+      hb_xfree( cText );
+   }
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC ( WIN_SENDDLGITEMMESSAGE )
+{
+   char     *cText;
+   PHB_ITEM pText = hb_param( 5, HB_IT_STRING );
+
+   if( pText )
+   {
+      cText = ( char* ) hb_xgrab( pText->item.asString.length + 1 );
+      hb_xmemcpy( cText, pText->item.asString.value, pText->item.asString.length + 1 );
+   }
+   else
+   {
+      cText = NULL;
+   }
+
+   hb_retnl( ( LONG ) SendDlgItemMessage( ( HWND ) hb_parnl( 1 ) ,
+                                          ( int  ) hb_parni( 2 ) ,
+                                          ( UINT ) hb_parni( 3 ) ,
+                                          ( ISNIL( 4 ) ? 0 : ( WPARAM ) hb_parnl( 4 ) ),
+                                          ( cText ? ( LPARAM ) cText : ( LPARAM ) hb_parnl( 5 ) )
+                                        )
+           );
+
+  if( pText )
+  {
+     hb_storclen( cText, pText->item.asString.length, 5 ) ;
+  }
+
+  if( cText )
+  {
+     hb_xfree( cText );
+  }
+}
+
+//-------------------------------------------------------------------//
+//
+//  WIN_SetTimer( hWnd, nIdentifier, nTimeOut )
+//
+HB_FUNC( WIN_SETTIMER )
+{
+   hb_retl( SetTimer( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ), hb_parni( 3 ), NULL ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_SETFOCUS )
+{
+   SetFocus( ( HWND ) hb_parnl( 1 ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_SETTEXTCOLOR )
+{
+   hb_retnl( ( ULONG ) SetTextColor( ( HDC ) hb_parnl( 1 ), ( COLORREF ) hb_parnl( 2 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_SETBKCOLOR )
+{
+   hb_retnl( ( ULONG ) SetBkColor( ( HDC ) hb_parnl( 1 ), ( COLORREF ) hb_parnl( 2 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_GETSTOCKOBJECT )
+{
+   hb_retnl( ( ULONG ) GetStockObject( hb_parnl( 1 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_DELETEOBJECT )
 {
    hb_retl( DeleteObject( ( HANDLE ) hb_parnl( 1 ) ) );
 }
 
 //-------------------------------------------------------------------//
 
-HB_FUNC( WVT_CREATEDIALOG )
+HB_FUNC( WIN_LOWORD )
 {
-   hb_retnl( ( ULONG ) hb_wvt_gtCreateDialog( hb_parc( 1 ), hb_parl( 2 ) ) );
+   hb_retnl( LOWORD( hb_parnl( 1 ) ) );
 }
 
 //-------------------------------------------------------------------//
+
+HB_FUNC( WIN_HIWORD )
+{
+   hb_retnl( HIWORD( hb_parnl( 1 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_MULDIV )
+{
+   hb_retni( MulDiv( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_GETDIALOGBASEUNITS )
+{
+   hb_retnl( ( LONG ) GetDialogBaseUnits() ) ;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_SETMENU )
+{
+   SetMenu( ( HWND ) hb_parnl( 1 ), ( HMENU ) hb_parni( 2 ) ) ;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_SETDLGITEMTEXT )
+{
+   SetDlgItemText( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ), hb_parc( 3 ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_GETDLGITEMTEXT )
+{
+   USHORT iLen = SendMessage( GetDlgItem( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ), WM_GETTEXTLENGTH, 0, 0 ) + 1 ;
+   char *cText = ( char* ) hb_xgrab( iLen );
+
+   GetDlgItemText( ( HWND ) hb_parnl( 1 ),   // handle of dialog box
+                   hb_parni( 2 ),            // identifier of control
+                   ( LPTSTR ) cText,         // address of buffer for text
+                   iLen                      // maximum size of string
+                 );
+
+   hb_retc( cText );
+   hb_xfree( cText );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_CHECKDLGBUTTON )
+{
+   hb_retl( CheckDlgButton( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ),
+                            ISNUM( 3 ) ? hb_parni( 3 ) : ( UINT ) hb_parl( 3 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_ISDLGBUTTONCHECKED )
+{
+   hb_retni( IsDlgButtonChecked( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ) ) ;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_CHECKRADIOBUTTON )
+{
+    hb_retl( CheckRadioButton( ( HWND ) hb_parnl( 1 ),   // handle of dialog box
+                                        hb_parni( 2 ),   // identifier of first radio button in group
+                                        hb_parni( 3 ),   // identifier of last radio button in group
+                                        hb_parni( 4 )    // identifier of radio button to select
+                              ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_GETDLGITEM )
+{
+   hb_retnl( ( ULONG ) GetDlgItem( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_MESSAGEBOX )
+{
+   hb_retni( MessageBox( ( HWND ) hb_parnl( 1 ), hb_parcx( 2 ), hb_parcx( 3 ), ISNIL( 4 ) ? MB_OK : hb_parni( 4 ) ) ) ;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_INVALIDATERECT )
+{
+   InvalidateRect( ( HWND ) hb_parnl( 1 ), NULL, TRUE );
+}
+
+//-------------------------------------------------------------------//
+//
+//  Win_LoadIcon( ncIcon )
+//
+HB_FUNC( WIN_LOADICON )
+{
+   HICON hIcon;
+
+   if ( ISNUM( 1 ) )
+   {
+      hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( hb_parni( 1 ) ) );
+   }
+   else
+   {
+      hIcon = ( HICON ) LoadImage( ( HINSTANCE ) NULL, hb_parc( 1 ), IMAGE_ICON, 0, 0, LR_LOADFROMFILE );
+   }
+
+   hb_retnl( ( ULONG ) hIcon ) ;
+}
+
+//-------------------------------------------------------------------//
+//
+//  Win_LoadImage( ncImage, nSource ) -> hImage
+//    nSource == 0 ResourceIdByNumber
+//    nSource == 0 ResourceIdByName
+//    nSource == 0 ImageFromDiskFile
+//
+HB_FUNC( WIN_LOADIMAGE )
+{
+   HBITMAP hImage;
+   int     iSource = hb_parni( 2 );
+
+   switch ( iSource )
+   {
+      case 0:
+      {
+         hImage = LoadBitmap( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( hb_parni( 1 ) ) );
+      }
+      break;
+
+      case 1:
+      {
+         hImage = LoadBitmap( ( HINSTANCE ) hb_hInstance, hb_parc( 1 ) );
+      }
+      break;
+
+      case 2:
+      {
+         hImage = ( HBITMAP ) LoadImage( ( HINSTANCE ) NULL, hb_parc( 1 ), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE );
+      }
+      break;
+   }
+
+   hb_retnl( ( ULONG ) hImage ) ;
+}
+
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+
 

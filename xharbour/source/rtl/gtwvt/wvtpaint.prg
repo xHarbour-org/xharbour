@@ -1,5 +1,5 @@
 /*
- * $Id: wvtpaint.prg,v 1.3 2004/07/21 11:07:24 vouchcac Exp $
+ * $Id: wvtpaint.prg,v 1.4 2004/07/22 15:36:51 vouchcac Exp $
  */
 
 /*
@@ -244,3 +244,186 @@ return nil
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
+//
+//               RunTime Dialog Generation Routines
+//
+//                      Courtesy What32.lib
+//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+
+FUNCTION Wvt_MakeDlgTemplate( nTop, nLeft, nRows, nCols, aOffSet, cTitle, nStyle, ;
+                              cFaceName, nPointSize, nWeight, lItalic, nHelpId, nExStyle )
+
+   LOCAL aDlg := { {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {} }
+   LOCAL aXY, nX, nY, nW, nH, nXM, nYM
+   LOCAL nBaseUnits, nBaseUnitsX, nBaseUnitsY
+   LOCAL aFont
+
+   aFont := Wvt_GetFontInfo()
+
+   DEFAULT aOffSet TO {}
+
+   aSize( aOffSet,4 )
+
+   DEFAULT aOffSet[ 1 ] TO 0
+   DEFAULT aOffSet[ 2 ] TO 0
+   DEFAULT aOffSet[ 3 ] TO 0
+   DEFAULT aOffSet[ 4 ] TO 0
+
+   nBaseUnits  := Win_GetDialogBaseUnits()
+   nBaseUnitsX := Win_LoWord( nBaseUnits )
+   nBaseUnitsY := Win_HiWord( nBaseUnits )
+
+   nW := aFont[ 7 ] * nCols + aOffSet[ 4 ]
+   nH := aFont[ 6 ] * nRows + aOffSet[ 3 ]
+
+   // Position it exactly where user has requested
+   //
+   aXY := Wvt_ClientToScreen( nTop,nLeft )
+   nX  := aXY[ 1 ] + aOffSet[ 2 ]
+   nY  := aXY[ 2 ] + aOffSet[ 1 ]
+
+   // MSDN says DlgBaseUnits and Screen Coordinates has multiplier of 4,8 for x & Y.
+   // But in my practice, the values below are 99% accurate.
+   // I have tested it on many fonts but on 1280/800 resolution.
+   // Please feel free to experiment if you find thses values inappropriate.
+   //
+   nXM :=  5.25
+   nYM := 10.25
+
+   nX  := ( nX * nXM / nBaseUnitsX )
+   nY  := ( nY * nYM / nBaseUnitsY )
+   nW  := ( nW * nXM / nBaseUnitsX )
+   nH  := ( nH * nYM / nBaseUnitsY )
+
+   If ValType( nStyle ) <> "N"
+      nStyle := + WS_CAPTION    + WS_SYSMENU              ;
+                + WS_GROUP      + WS_TABSTOP + DS_SETFONT ;
+                + WS_THICKFRAME + WS_VISIBLE + WS_POPUP   ;
+                + DS_3DLOOK
+   EndIf
+
+   aAdd( aDlg[ 1 ] , If( Empty( nHelpId  ), 0, nHelpId  ) )
+   aAdd( aDlg[ 1 ] , If( Empty( nExStyle ), 0, nExStyle ) )
+   aAdd( aDlg[ 1 ] , nStyle  )
+   aAdd( aDlg[ 1 ] , 0       )
+   aAdd( aDlg[ 1 ] , nX      )
+   aAdd( aDlg[ 1 ] , nY      )
+   aAdd( aDlg[ 1 ] , nW      )
+   aAdd( aDlg[ 1 ] , nH      )
+   aAdd( aDlg[ 1 ] , 0       )
+   aAdd( aDlg[ 1 ] , 0       )
+   aAdd( aDlg[ 1 ] , If( ValType( cTitle ) == "C", cTitle, "" ) )
+
+   if ( nStyle & DS_SETFONT ) == DS_SETFONT
+      aAdd( aDlg[ 1 ], If( ValType( nPointSize ) == "N", nPointSize, 8               ) )
+      aAdd( aDlg[ 1 ], If( ValType( nWeight    ) == "N", nWeight   , 400             ) )
+      aAdd( aDlg[ 1 ], If( ValType( lItalic    ) == "L", lItalic   , .F.             ) )
+      aAdd( aDlg[ 1 ], If( ValType( cFaceName  ) == "C", cFaceName , "MS Sans Serif" ) )
+   EndIf
+
+   Return( aDlg )
+
+//-------------------------------------------------------------------//
+
+Function Wvt_AddDlgItem( aDlg, nTop, nLeft, nRows, nCols, aOffSet,;
+                         cnId, cnDlgClass, nStyle, cText, nHelpId, nExStyle )
+   LOCAL aXY, nX, nY, nW, nH, nXM, nYM
+   LOCAL nBaseUnits, nBaseUnitsX, nBaseUnitsY
+   LOCAL nBottom, nRight
+
+   nBottom := nTop  + nRows - 1
+   nRight  := nLeft + nCols - 1
+
+   DEFAULT aOffSet TO {}
+
+   aSize( aOffSet,4 )
+
+   DEFAULT aOffSet[ 1 ] TO 0
+   DEFAULT aOffSet[ 2 ] TO 0
+   DEFAULT aOffSet[ 3 ] TO 0
+   DEFAULT aOffSet[ 4 ] TO 0
+
+   nBaseUnits  := Win_GetDialogBaseUnits()
+   nBaseUnitsX := Win_LoWord( nBaseUnits )
+   nBaseUnitsY := Win_HiWord( nBaseUnits )
+
+   aXY := Wvt_GetXYFromRowCol( nTop, nLeft )
+   nX  := aXY[ 1 ] + aOffSet[ 2 ]
+   nY  := aXY[ 2 ] + aOffSet[ 1 ]
+
+   aXY := Wvt_GetXYFromRowCol( nBottom+1, nRight+1 )
+   nW  := aXY[ 1 ] + aOffSet[ 4 ] - nX
+   nH  := aXY[ 2 ] + aOffSet[ 3 ] - nY
+
+   nXM :=  5.25
+   nYM := 10.25
+
+   nX  := ( nX * nXM / nBaseUnitsX )
+   nY  := ( nY * nYM / nBaseUnitsY )
+   nW  := ( nW * nXM / nBaseUnitsX )
+   nH  := ( nH * nYM / nBaseUnitsY )
+
+   aDlg[ 1,4 ]++      // item count
+
+   aAdd( aDlg[  2 ] , If( ValType( nHelpId  ) == "N", nHelpId , 0                     ) )
+   aAdd( aDlg[  3 ] , If( ValType( nExStyle ) == "N", nExStyle, 0                     ) )
+   aAdd( aDlg[  4 ] , If( ValType( nStyle   ) == "N", nStyle  , WS_CHILD + WS_VISIBLE ) )
+   aAdd( aDlg[  5 ] , nX         )
+   aAdd( aDlg[  6 ] , nY         )
+   aAdd( aDlg[  7 ] , nW         )
+   aAdd( aDlg[  8 ] , nH         )
+   aAdd( aDlg[  9 ] , cnId       )
+   aAdd( aDlg[ 10 ] , cnDlgClass )
+   aAdd( aDlg[ 11 ] , If( ValType( cText ) <> "C", If( ValType( cText ) == "N", cText, "" ) , cText ) )
+   aAdd( aDlg[ 12 ] , 0 )
+
+   Return aDlg
+
+//-------------------------------------------------------------------//
+
+Function Wvt_CreateDialog( acnDlg, lOnTop, cbDlgProc, ncIcon, nTimerTicks, hMenu )
+   LOCAL hDlg, cType, xTemplate, nDlgMode
+
+   if valtype( cbDlgProc ) == 'C'
+      cbDlgProc := upper( cbDlgProc )
+   endif
+
+   hDlg     := 0
+   cType    := Valtype( acnDlg )
+   nDlgMode := if( cType == 'C', 0, if( cType == 'N', 1, 2 ) )
+
+   if cType == 'A'
+      xTemplate := Wvt__MakeDlgTemplate( acnDlg[ 1 ] , acnDlg[  2 ] , acnDlg[  3 ] , acnDlg[  4 ] , ;
+                                         acnDlg[ 5 ] , acnDlg[  6 ] , acnDlg[  7 ] , acnDlg[  8 ] , ;
+                                         acnDlg[ 9 ] , acnDlg[ 10 ] , acnDlg[ 11 ] , acnDlg[ 12 ] )
+   else
+      xTemplate := acnDlg
+   endif
+
+   hDlg := Wvt_CreateDialogDynamic( xTemplate, lOnTop, cbDlgProc, nDlgMode )
+
+   if hDlg <> 0
+      if ncIcon <> nil
+         Wvt_DlgSetIcon( hDlg, ncIcon )
+
+      endif
+
+      if valtype( nTimerTicks ) == 'N'
+         Win_SetTimer( hDlg, 1001, nTimerTicks )
+
+      endif
+
+      if hMenu <> nil
+         Win_SetMenu( hDlg, hMenu )
+
+      endif
+
+   endif
+
+   Return hDlg
+
+//-------------------------------------------------------------------//
+

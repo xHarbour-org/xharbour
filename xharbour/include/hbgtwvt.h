@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.26 2004/07/22 15:36:43 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.27 2004/07/23 13:05:41 paultucker Exp $
  */
 
 /*
@@ -117,6 +117,7 @@
 #define WVT_PICTURES_MAX      20
 #define WVT_FONTS_MAX         20
 #define WVT_PENS_MAX          20
+#define WVT_DLGML_MAX         20
 
 //-------------------------------------------------------------------//
 
@@ -225,7 +226,10 @@ typedef struct global_data
   BOOL      bToolTipActive;            // Flag to set whether tooltip is active or not
   HINSTANCE hMSImg32;                  // Handle to the loaded library msimg32.dll
   wvtGradientFill pfnGF;               // Pointer to Address of the GradientFill function in MSImg32.dll
-  HWND      hDlgModeless;              // Handle to a modeless dialog
+  HWND      hDlgModeless[ WVT_DLGML_MAX ]; // Handle to a modeless dialog
+  PHB_DYNS  pSymDlgProcModeless[ WVT_DLGML_MAX ]; // Holds Modeless Dialog Procedure Address
+  PHB_ITEM  pFunc[ WVT_DLGML_MAX ];    // Function pointer for WndProc
+  int       iType[ WVT_DLGML_MAX ];    // Type of Function Pointers - Function 1, Block 2, Method 3
 } GLOBAL_DATA;
 
 typedef GLOBAL_DATA * LPGLOBAL_DATA;
@@ -263,9 +267,12 @@ BOOL   HB_EXPORT hb_wvt_gtDestroyPicture( IPicture * iPicture );
 COLORREF HB_EXPORT hb_wvt_gtGetColorData( int iIndex );
 BOOL   HB_EXPORT hb_wvt_gtSetColorData( int iIndex, COLORREF ulCr );
 
-HWND   HB_EXPORT hb_wvt_gtCreateDialog( char * pszDlgResource, BOOL bOnTop );
+LPWORD HB_EXPORT lpwAlign( LPWORD lpIn );
+int    HB_EXPORT nCopyAnsiToWideChar( LPWORD lpWCStr, LPSTR lpAnsiIn );
+BOOL   HB_EXPORT CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam );
 
 HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void );
+
 
 void   HB_EXPORT hb_wvt_wvtCore( void );
 void   HB_EXPORT hb_wvt_wvtUtils( void );

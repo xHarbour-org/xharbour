@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.120 2004/07/28 19:48:50 maurifull Exp $
+ * $Id: gtwvt.c,v 1.121 2004/07/29 14:33:10 lf_sfnet Exp $
  */
 
 /*
@@ -188,9 +188,11 @@ static void    hb_wvt_gtKillCaret( void );
 static void    hb_wvt_gtCreateCaret( void );
 static void    hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 static void    hb_wvt_gtCreateToolTipWindow( void );
-
+/*
 static BOOL CALLBACK hb_wvt_gtDlgProcModeless( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam );
-
+static int     hb_wvt_gtDialogMLIndex( void );
+static void    hb_wvt_gtDialogMLPlace( HWND hDlg, int iIndex, char * pszDlgProc );
+*/
 //-------------------------------------------------------------------//
 //
 // mouse initialization was made in cmdarg.c
@@ -765,7 +767,7 @@ BOOL HB_GT_FUNC( gt_SetMode( USHORT row, USHORT col ) )
             // font settings will fit in the window
             if ( hb_wvt_gtValidWindowSize( row,col, hFont, _s.fontWidth ) )
             {
-              bResult = hb_wvt_gtInitWindow( _s.hWnd, col, row );
+                bResult = hb_wvt_gtInitWindow( _s.hWnd, col, row );
             }
             DeleteObject( hFont );
          }
@@ -1793,9 +1795,6 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           hb_wvt_gtSetColors( hdc, oldAttrib );
           hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer + startIndex, len );
         }
-        //  Update for real values for Wvt_GetPaintRect()
-        _s.rowStop  -= 1 ;
-        _s.colStop  -= 1 ;
       }
 
       if ( hb_gt_gobjects != NULL )
@@ -2381,27 +2380,43 @@ static void hb_wvt_gtCreateToolTipWindow( void )
 
 static DWORD hb_wvt_gtProcessMessages( void )
 {
-  MSG msg;
+   MSG  msg;
+   int  iIndex;
+   BOOL bProcessed = FALSE;
 
-  /* See if we have some graphic object to draw */
-  if ( hb_gt_gobjects == NULL )
-  {
-    last_gobject = NULL;
-  }
-  else if( hb_gt_gobjects_end != last_gobject )
-  {
-    last_gobject = hb_gt_gobjects_end;
-    InvalidateRect( _s.hWnd, NULL, FALSE );
-  }
+   /* See if we have some graphic object to draw */
+   if ( hb_gt_gobjects == NULL )
+   {
+      last_gobject = NULL;
+   }
+   else if( hb_gt_gobjects_end != last_gobject )
+   {
+      last_gobject = hb_gt_gobjects_end;
+      InvalidateRect( _s.hWnd, NULL, FALSE );
+   }
 
-  while ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
-  {
-     if ( _s.hDlgModeless == 0 || ! IsDialogMessage( _s.hDlgModeless, &msg ) )
-     {
-        TranslateMessage( &msg );
-        DispatchMessage( &msg );
-     }
-  }
+   while ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+   {
+      bProcessed = FALSE;
+
+      for ( iIndex = 0; iIndex < WVT_DLGML_MAX; iIndex++ )
+      {
+         if ( _s.hDlgModeless[ iIndex ] != 0 )
+         {
+            if ( IsDialogMessage( _s.hDlgModeless[ iIndex ], &msg ) )
+            {
+               bProcessed = TRUE;
+               break;
+            }
+         }
+      }
+
+      if ( bProcessed == FALSE )
+      {
+         TranslateMessage( &msg );
+         DispatchMessage( &msg );
+      }
+   }
   return( msg.wParam );
 }
 
@@ -2800,7 +2815,8 @@ static HFONT hb_wvt_gtGetFont( char * pszFace, int iHeight, int iWidth, int iWei
 static void gt_hbInitStatics( void )
 {
   OSVERSIONINFO osvi ;
-  HINSTANCE h;
+  HINSTANCE     h;
+  int           iIndex;
 
   _s.ROWS             = WVT_DEFAULT_ROWS;
   _s.COLS             = WVT_DEFAULT_COLS;
@@ -2862,7 +2878,14 @@ static void gt_hbInitStatics( void )
       _s.hMSImg32 = h;
     }
   }
-  _s.hDlgModeless     = NULL;
+
+  for ( iIndex = 0; iIndex < WVT_DLGML_MAX; iIndex++ )
+  {
+     _s.hDlgModeless[ iIndex ]        = NULL;
+     _s.pSymDlgProcModeless[ iIndex ] = NULL;
+     _s.pFunc[ iIndex ]               = NULL;
+     _s.iType[ iIndex ]               = NULL;
+  }
 }
 
 //-------------------------------------------------------------------//
@@ -3245,7 +3268,7 @@ BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold
   {
     // make sure that the font  will fit inside the
     // window with the current _s.ROWS and _s.COLS setting
-    if ( hb_wvt_gtValidWindowSize( _s.ROWS,_s.COLS, hFont, width ) )
+//    if ( hb_wvt_gtValidWindowSize( _s.ROWS,_s.COLS, hFont, width ) )
     {
       _s.fontHeight  = height;
       _s.fontWidth   = width;
@@ -4002,8 +4025,8 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
       case GTI_WINTITLE:
          {
             hb_wvt_gtSetWindowTitle( (char *) vpParam );
-            return 1;
-         }   
+            return 1;   // 0 1.119
+         }
 
       case GTI_CODEPAGE:
          return (int) hb_wvt_gtSetCodePage( iParam );
@@ -4120,70 +4143,114 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 #endif  /* HB_MULTI_GT */
 
 //-------------------------------------------------------------------//
-//-------------------------------------------------------------------//
-//-------------------------------------------------------------------//
 //
-//       Modeless Dialog Implementation, Only ONE at any Time
+//                 Modeless Dialogs Implementation
 //
-//-------------------------------------------------------------------//
-//-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
-static BOOL CALLBACK hb_wvt_gtDlgProcModeless( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
+HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
 {
-   HB_SYMBOL_UNUSED( lParam );
+   int      iIndex, iType;
+   long int bReturn = FALSE ;
+   PHB_ITEM pFunc = NULL;
+   PHB_DYNS pDynSym;
+
+   iType = NULL;
+
+   for ( iIndex = 0; iIndex < WVT_DLGML_MAX; iIndex++ )
+   {
+      if ( ( _s.hDlgModeless[ iIndex ] != NULL ) && ( _s.hDlgModeless[ iIndex ] == hDlg ) )
+      {
+         if ( _s.pFunc[ iIndex ] != NULL )
+         {
+            pFunc = _s.pFunc[ iIndex ];
+            iType = _s.iType[ iIndex ];
+         }
+         break;
+      }
+   }
+
+   //TraceLog( NULL, "C----------Entered-   %i %i %i %i  \n \n", hDlg, message, pFunc, iType );
+
+   if ( pFunc )
+   {
+      switch ( iType )
+      {
+         case 1:  // Function Name
+         {
+            pDynSym = ( PHB_DYNS ) pFunc;
+            hb_vmPushSymbol( pDynSym->pSymbol );
+            hb_vmPushNil();
+            hb_vmPushLong( ( ULONG ) hDlg    );
+            hb_vmPushLong( ( UINT  ) message );
+            hb_vmPushLong( ( ULONG ) wParam  );
+            hb_vmPushLong( ( ULONG ) lParam  );
+            hb_vmDo( 4 );
+            bReturn = hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+            break;
+         }
+
+         case 2:  // Block
+         {
+            //TraceLog( NULL, "C----------Exec-PRG   %i %i \n \n", hDlg, message );
+
+            hb_vmPushSymbol( &hb_symEval );
+            hb_vmPush( pFunc );
+            hb_vmPushLong( ( ULONG ) hDlg    );
+            hb_vmPushLong( ( UINT  ) message );
+            hb_vmPushLong( ( ULONG ) wParam  );
+            hb_vmPushLong( ( ULONG ) lParam  );
+            hb_vmFunction( 4 );
+            bReturn = hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+
+            //TraceLog( NULL, "C----------Exit-PRG   %i %i \n \n", hDlg, message );
+            break;
+         }
+      }
+   }
+
    switch( message )
    {
       case WM_COMMAND:
+      {
          switch( LOWORD( wParam ) )
          {
             case IDOK:
             {
                DestroyWindow( hDlg );
-               _s.hDlgModeless = NULL;
+               bReturn = TRUE;
             }
-            return TRUE;
+            break;
 
             case IDCANCEL:
             {
                DestroyWindow( hDlg );
-               _s.hDlgModeless = NULL;
+               bReturn = FALSE;
             }
-            return FALSE;
+            break;
          }
-         break;
+      }
+      break;
 
-      case WM_CLOSE:
+      case WM_CLOSE:   // CLOSE:
       {
          DestroyWindow( hDlg );
-         _s.hDlgModeless = NULL;
-         break;
+         bReturn = FALSE;
       }
-   }
-   return FALSE;
-}
+      break;
 
-//-------------------------------------------------------------------//
-
-HB_EXPORT HWND hb_wvt_gtCreateDialog( char * pszDlgResource, BOOL bOnTop )
-{
-   HWND hDlg;
-   HWND hwnd = bOnTop ? _s.hWnd : NULL;
-
-   if ( _s.hDlgModeless )
-   {
-      DestroyWindow( _s.hDlgModeless );
-      _s.hDlgModeless = NULL;
+      case WM_NCDESTROY:   // CLOSE:
+      {
+         _s.hDlgModeless[ iIndex ] = NULL;
+         _s.pSymDlgProcModeless[ iIndex ] = NULL;
+         _s.pFunc[ iIndex ] = NULL;
+         _s.iType[ iIndex ] = NULL;
+         bReturn = FALSE;
+      }
+      break;
    }
 
-   hDlg = CreateDialog( ( HINSTANCE ) hb_hInstance, pszDlgResource, hwnd, hb_wvt_gtDlgProcModeless );
-
-   if ( hDlg )
-   {
-      _s.hDlgModeless = hDlg;
-   }
-
-   return hDlg;
+   return bReturn;
 }
 
 //-------------------------------------------------------------------//

@@ -101,13 +101,16 @@ REQUEST Hb_NoStartUpWindow
 
 //-------------------------------------------------------------------//
 
-MEMVAR cCdxExp
+MEMVAR cCdxExp, First, Last, City
 
 //-------------------------------------------------------------------//
 
 static wvtScreen := {}
 static pic_:= { , , , , , , , , , , , , , , , , , , , }
 static keys_:= { , , , , , , , , , , , , , , , , , , , }
+
+static ahFonts := {}
+static shIcon, shImage
 
 #ifdef __XCC__
 static paint_:= { { '', {} } }
@@ -633,7 +636,7 @@ FUNCTION WvtMyBrowse()
    LOCAL cScr    := SaveScreen( 0,0,maxrow(),maxcol() )
    LOCAL aObjects:= WvtSetObjects( {} )
    LOCAL hPopup  := Wvt_SetPopupMenu()
-   LOCAL stru_:={}, cDbfFile, cSqlFile, cFileIndex, cFileDbf
+   LOCAL stru_:={}, cDbfFile, cSqlFile, cFileIndex, cFileDbf, cRDD, nIndex
 
    STATIC nStyle := 0
 
@@ -1282,6 +1285,14 @@ FUNCTION CreateMainMenu()
    oMenu:AddItem( "Minimize",{|| Wvt_Minimize() } )
    g_oMenuBar:addItem( "",oMenu)
 
+   oMenu := wvtMenu():new():create()
+   oMenu:Caption:= "Modeless Dialogs"
+   oMenu:AddItem( "Dialog First" ,{|| DynDialog_2() } )
+   oMenu:AddItem( "-")
+   oMenu:AddItem( "Dialog Scond" ,{|| DynDialog_1() } )
+   g_oMenuBar:addItem( "",oMenu)
+
+
 RETURN g_oMenuBar
 
 //-------------------------------------------------------------------//
@@ -1843,5 +1854,365 @@ return nil
 
 //-------------------------------------------------------------------//
 #endif
+//-------------------------------------------------------------------//
+
+Function DynDialog_1()
+   Local hDlg, aDlg, nStyle
+
+   Static nInfo := 1
+
+   nStyle := + WS_CAPTION    + WS_SYSMENU               ;
+             + WS_GROUP      + WS_TABSTOP + DS_SETFONT  ;
+             + WS_THICKFRAME + WS_VISIBLE + WS_POPUP
+
+   aDlg := Wvt_MakeDlgTemplate( 1, 2, 15, 40, {0,0,0,0},  ;
+                     ltrim( str( nInfo++,10,0 ) ) + ' - Modeless Dialog', nStyle )
+
+   nStyle := WS_VISIBLE + WS_TABSTOP + ES_AUTOVSCROLL + ES_MULTILINE + ES_WANTRETURN + WS_BORDER + WS_VSCROLL
+   aDlg   := Wvt_AddDlgItem( aDlg,  1, 2, 9, 28, {}, 10, 'EDIT'  , nStyle, /* cText, nHelpId, nExStyle */ )
+
+   nStyle := WS_VISIBLE + SS_ETCHEDHORZ
+   aDlg   := Wvt_AddDlgItem( aDlg, 12, 2, 1, 36, {}, 12, 'STATIC', nStyle )
+
+   nStyle := WS_VISIBLE + WS_TABSTOP + BS_AUTOCHECKBOX
+   aDlg   := Wvt_AddDlgItem( aDlg, 13, 2, 1, 10, {}, 11, 'BUTTON', nStyle, 'Is It Checked?' )
+
+   hDlg := Wvt_CreateDialog( aDlg, .f., 'DynDlgProc_1' )
+
+Return hDlg
+
+//-------------------------------------------------------------------//
+
+Function DynDlgProc_1( hDlg, nMsg, wParam, lParam )
+   Local cText, lClicked
+
+   Switch ( nMsg )
+
+   case WM_INITDIALOG
+      Win_SetDlgItemText( hDlg, 10, 'This is multiline text which will be displayed in the edit window!' )
+      Win_CheckDlgButton( hDlg, 11, .t. )
+      exit
+
+   case WM_DESTROY
+      // Do whatevert you want to do with cText
+      // Each box will retrieve its own text.
+      //
+      cText := Win_GetDlgItemText( hDlg, 10 )
+      exit
+
+   case WM_TIMER
+      // Do some processing
+
+      exit
+
+   case WM_COMMAND
+      do case
+
+      case wParam == 11
+         lClicked := ( Win_IsDlgButtonChecked( hDlg,11 ) == 1 )
+         Win_MessageBox( hDlg, 'Button ' + if( lClicked, 'Clicked', 'Unclicked' ), 'CheckBoxStatus' )
+
+      endcase
+      exit
+
+   end
+
+   Return .f.
+
+//-------------------------------------------------------------------//
+
+#define ID_BTN_OK          1
+#define ID_MLE            10
+#define ID_CHK_SATIS      11
+#define ID_EDT_TIME       51
+#define ID_LST_LIST       13
+#define ID_CMB_COMBO      31
+#define ID_RDO_XH         21
+#define ID_RDO_CLIP       22
+#define ID_RDO_XBASE      23
+#define ID_EDT_TEXT       14
+#define ID_EDT_NUMB       15
+#define ID_STA_TEXT       71
+#define ID_STA_IMAGE      72
+#define ID_ICO_VOUCH      81
+
+#define ID_GRP_COMP      113
+
+#define ID_MNU_FILE      201
+#define ID_MNU_CONTROL   202
+
+//-------------------------------------------------------------------//
+
+Function DynDialog_2()
+   Local hDlg, aDlg, nStyle, nTimerTicks, cDlgIcon, cDlgProc, lOnTop, hMenu, nProc, bDlgProc
+
+   Static nInfo := 1
+
+   nStyle := DS_SETFONT + WS_VISIBLE + WS_POPUP + WS_CAPTION + WS_SYSMENU + WS_THICKFRAME + WS_MINIMIZEBOX
+
+   aDlg := Wvt_MakeDlgTemplate( 1, 4, 21, 60, {0,0,0,0},  ;
+              'Dialog First [ ' + ltrim( str( nInfo++,10,0 ) ) + ' ] Modeless Dialog', nStyle )
+
+   // Multi line edit control
+   //
+   nStyle := WS_CHILD + WS_VISIBLE + WS_TABSTOP + ES_AUTOVSCROLL + ES_MULTILINE + ;
+             ES_WANTRETURN + WS_BORDER  + WS_VSCROLL
+   aDlg   := Wvt_AddDlgItem( aDlg,  1, 2, 15, 35, {}, ID_MLE       , 'EDIT'   , nStyle, /* cText, nHelpId, nExStyle */ )
+
+   // Two Horz and Vert Lines
+   //
+   nStyle := WS_CHILD + WS_VISIBLE + SS_ETCHEDVERT
+   aDlg   := Wvt_AddDlgItem( aDlg, 1, 39,  16, 1, {}, 111          , 'STATIC' , nStyle )
+   nStyle := WS_CHILD + WS_VISIBLE + SS_ETCHEDHORZ
+   aDlg   := Wvt_AddDlgItem( aDlg, 17, 2,  1, 56, {}, 112          , 'STATIC' , nStyle )
+
+   // Icon
+   nStyle := WS_CHILD + WS_VISIBLE + SS_ICON //+ SS_CENTERIMAGE
+   aDlg   := Wvt_AddDlgItem( aDlg, 18, 2, 2, 6, {}, ID_ICO_VOUCH  , 'STATIC' , nStyle, '' )
+/*
+   // Bitmap
+   nStyle := WS_CHILD + WS_VISIBLE + SS_BITMAP + SS_REALSIZEIMAGE
+   aDlg   := Wvt_AddDlgItem( aDlg, 18, 41, 2,8, {-3,0,3}, ID_STA_IMAGE, 'STATIC' , nStyle, '' )
+*/
+   nStyle := WS_CHILD + WS_VISIBLE + WS_TABSTOP + BS_AUTOCHECKBOX
+   aDlg   := Wvt_AddDlgItem( aDlg, 18, 15,  1, 10, {}, ID_CHK_SATIS , 'BUTTON' , nStyle, 'Satisfied?' )
+
+   nStyle := WS_CHILD + WS_VISIBLE + WS_TABSTOP + ES_RIGHT + ES_READONLY
+   aDlg   := Wvt_AddDlgItem( aDlg, 18, 30, 1,  7, {3}, ID_EDT_TIME , 'EDIT' , nStyle, '' )
+
+   nStyle := WS_CHILD + WS_VISIBLE + WS_TABSTOP + LBS_NOTIFY + WS_VSCROLL + WS_BORDER
+   aDlg   := Wvt_AddDlgItem( aDlg, 1, 41,  4, 17, {}, ID_LST_LIST  , 'LISTBOX', nStyle, 'ListBox'  )
+
+   nStyle := WS_CHILD + WS_VISIBLE + SS_LEFT
+   aDlg   := Wvt_AddDlgItem( aDlg, 4, 41,  1, 17, {3,0,0,0}, -1    , 'STATIC' , nStyle, 'Degree'     )
+   nStyle := WS_VISIBLE + WS_TABSTOP + CBS_DROPDOWNLIST + WS_BORDER + WS_VSCROLL
+   aDlg   := Wvt_AddDlgItem( aDlg, 5, 41,  6, 17, {}, ID_CMB_COMBO , 'COMBOBOX' , nStyle, 'Combo' )
+
+   nStyle := WS_CHILD + WS_VISIBLE + WS_TABSTOP + BS_GROUPBOX
+   aDlg   := Wvt_AddDlgItem( aDlg, 7, 41,  4, 17, {0,0,4,0},ID_GRP_COMP, 'BUTTON' , nStyle, 'Compiler' )
+   nStyle := WS_CHILD + WS_VISIBLE + WS_TABSTOP + BS_AUTORADIOBUTTON
+   aDlg   := Wvt_AddDlgItem( aDlg, 8, 43,  1, 14, {}, ID_RDO_XH    , 'BUTTON' , nStyle, 'xHarbour' )
+   aDlg   := Wvt_AddDlgItem( aDlg, 9, 43,  1, 14, {}, ID_RDO_CLIP  , 'BUTTON' , nStyle, 'Clipper'  )
+   aDlg   := Wvt_AddDlgItem( aDlg,10, 43,  1, 14, {}, ID_RDO_XBASE , 'BUTTON' , nStyle, 'Xbase++'  )
+
+   nStyle := WS_CHILD + WS_VISIBLE + SS_LEFT
+   aDlg   := Wvt_AddDlgItem( aDlg, 12, 41, 1, 17, {3,0,0,0}, ID_STA_TEXT, 'STATIC' , nStyle, 'Scrollable Text'    )
+   nStyle := WS_CHILD + WS_VISIBLE + WS_TABSTOP + ES_AUTOHSCROLL + WS_BORDER
+   aDlg   := Wvt_AddDlgItem( aDlg, 13, 41, 1, 17, {}, ID_EDT_TEXT  , 'EDIT'   , nStyle, 'This is Text Field' )
+
+   nStyle := WS_CHILD + WS_VISIBLE + SS_LEFT
+   aDlg   := Wvt_AddDlgItem( aDlg, 14, 41, 1, 17, {3,0,0,0}, -1, 'STATIC' , nStyle, 'Right Justified Numerics' )
+   nStyle := WS_CHILD + WS_VISIBLE + WS_TABSTOP + ES_AUTOHSCROLL + ES_NUMBER + ES_RIGHT + WS_BORDER
+   aDlg   := Wvt_AddDlgItem( aDlg, 15, 41, 1, 17, {}, ID_EDT_NUMB  , 'EDIT'   , nStyle, '1234567' )
+
+   nStyle := WS_CHILD + WS_VISIBLE + WS_TABSTOP + BS_PUSHBUTTON
+   aDlg   := Wvt_AddDlgItem( aDlg, 18, 50, 1,  8, {-3,0,3,0}, ID_BTN_OK, 'BUTTON' , nStyle, 'OK' )
+
+   hMenu  := Wvt_CreateMenu()
+   Wvt_AppendMenu( hMenu, MF_STRING + MF_ENABLED, ID_MNU_FILE   , 'File'     )
+   Wvt_AppendMenu( hMenu, MF_STRING + MF_ENABLED, ID_MNU_CONTROL, 'Controls' )
+
+   lOnTop      := .f.
+   cDlgProc    := 'DynDlgProc_2'
+   bDlgProc    := {|a,b,c,d| DYNDLGPROC_2(a,b,c,d) }
+   cDlgIcon    := 'V_Notes.Ico'
+   nTimerTicks := 1000  // 1 second
+
+   //hDlg        := Wvt_CreateDialog( aDlg, lOnTop, bDlgProc, cDlgIcon, nTimerTicks, hMenu )
+   //nProc := AsCallBack( {|| 0 } ) // DynDialog_2() } )
+   //hDlg  := Wvt_CreateDialog( aDlg, lOnTop, nProc /*cDlgProc*/, cDlgIcon, nTimerTicks, hMenu )
+   hDlg  := Wvt_CreateDialog( aDlg, lOnTop, cDlgProc, cDlgIcon, nTimerTicks, hMenu )
+
+   Return hDlg
+
+//-------------------------------------------------------------------//
+
+Function DynDlgProc_2( hDlg, nMsg, wParam, lParam )
+   Local cText, lClicked, cPrompt, nIndex, hFont
+
+//TraceLog( '','P----------------Entry-----', hDlg, nMsg )
+
+   Switch ( nMsg )
+
+   case WM_TIMER
+      Win_SetDlgItemText( hDlg, ID_EDT_TIME, Time() )
+      exit
+
+   case WM_COMMAND
+      do case
+
+      case wParam == ID_CHK_SATIS
+         lClicked := ( Win_IsDlgButtonChecked( hDlg,ID_CHK_SATIS ) == 1 )
+         Win_MessageBox( hDlg, if( lClicked, 'Satisfied', 'UnSatisfied' ), 'CheckBoxStatus' )
+
+      case wParam == ID_RDO_XH
+         Win_MessageBox( hDlg, 'xHarbour', 'Compiler' )
+
+      case wParam == ID_RDO_CLIP
+         Win_MessageBox( hDlg, 'Clipper', 'Compiler' )
+
+      case wParam == ID_RDO_XBASE
+         Win_MessageBox( hDlg, 'Xbase++', 'Compiler' )
+
+      case wParam == ID_MNU_FILE
+         Win_MessageBox( hDlg, 'Execute Menu Action!', 'File' )
+
+      case wParam == ID_MNU_CONTROL
+         Win_MessageBox( hDlg, 'Controls are from Windows!', 'Controls' )
+
+      case Win_LoWord( wParam ) == ID_LST_LIST
+         if Win_HiWord( wParam ) == LBN_SELCHANGE
+            nIndex  := Win_SendMessage( Win_GetDlgItem( hDlg, ID_LST_LIST ), LB_GETCURSEL, 0, 0 )
+            cPrompt := space( 20 )
+            Win_SendMessage( Win_GetDlgItem( hDlg, ID_LST_LIST ), LB_GETTEXT, nIndex, @cPrompt )
+            Win_MessageBox( hDlg, cPrompt, 'ListBox' )
+         endif
+
+      case Win_LoWord( wParam ) == ID_CMB_COMBO
+         if Win_HiWord( wParam ) == CBN_SELCHANGE
+            nIndex  := Win_SendMessage( Win_GetDlgItem( hDlg, ID_CMB_COMBO ), CB_GETCURSEL, 0, 0 )
+            cPrompt := space( 20 )
+            Win_SendMessage( Win_GetDlgItem( hDlg, ID_CMB_COMBO ),CB_GETLBTEXT, nIndex, @cPrompt )
+            Win_MessageBox( hDlg, cPrompt, 'Combo Box' )
+         endif
+
+      endcase
+      exit
+
+   case WM_CTLCOLOREDIT
+      if ( Win_GetDlgItem( hDlg,ID_MLE ) == lParam )
+         Win_SetTextColor( wParam, RGB( 0,0,255 ) )
+         Win_SetBkColor( wParam, RGB( 255,255,200 ) )
+         return ( 1 )
+      elseif ( Win_GetDlgItem( hDlg,ID_EDT_TEXT ) == lParam )
+         Win_SetTextColor( wParam, RGB( 255,255,255 ) )
+         Win_SetBkColor( wParam, RGB( 10,200,45 ) )
+         Return ( 1 )
+      endif
+
+      exit
+
+   case WM_CTLCOLORSTATIC
+      if ( Win_GetDlgItem( hDlg,ID_STA_TEXT ) == lParam )
+         Win_SetTextColor( wParam, RGB( 255,255,255 ) )
+         Return ( 1 )
+      endif
+      exit
+
+   case WM_INITDIALOG
+//TraceLog( '','P----------------Enter WM_INITDIALOG', hDlg, nMsg )
+      if empty( ahFonts )
+         if ( hFont := Wvt_CreateFont( "Times New Roman", 18 ) ) <> 0
+            aadd( ahFonts, hFont )
+         endif
+      endif
+
+      if len( ahFonts ) > 0
+         Win_SendMessage( Win_GetDlgItem( hDlg, ID_MLE ), WM_SETFONT, ahFonts[ 1 ], 0 )
+      endif
+
+      if shIcon == nil
+         shIcon := Win_LoadIcon( 'Vr_1.ico' )
+      endif
+      if shIcon <> nil .or. shIcon <> 0
+         Win_SendMessage( Win_GetDlgItem( hDlg, ID_ICO_VOUCH ), STM_SETIMAGE, IMAGE_ICON, shIcon )
+      endif
+
+      /*
+      if shImage == nil
+         shImage := Win_LoadImage( 'Vouch1.bmp', 2 )
+      endif
+      if shImage <> nil .and. shImage <> 0
+         Win_SendMessage( Win_GetDlgItem( hDlg, ID_STA_IMAGE ), STM_SETIMAGE, IMAGE_BITMAP, shImage )
+      endif
+      */
+      Win_SetDlgItemText( hDlg, ID_MLE      , GetEditText() )
+      Win_CheckDlgButton( hDlg, ID_CHK_SATIS, .t.           )
+
+      Win_CheckRadioButton( hDlg, ID_RDO_XH, ID_RDO_XBASE, ID_RDO_XH )
+
+      Wvt_LBAddString( hDlg, ID_LST_LIST, 'xHarbour'  )
+      Wvt_LBAddString( hDlg, ID_LST_LIST, 'Gtwvt'     )
+      Wvt_LBAddString( hDlg, ID_LST_LIST, 'Wvtgui'    )
+      Wvt_LBAddString( hDlg, ID_LST_LIST, 'Modeless'  )
+      Wvt_LBAddString( hDlg, ID_LST_LIST, 'Dialogs'   )
+      Wvt_LBAddString( hDlg, ID_LST_LIST, 'WVT'       )
+
+      Wvt_LBSetCurSel( hDlg, ID_LST_LIST, 1 )
+
+      Wvt_CBAddString( hDlg, ID_CMB_COMBO, 'First'    )
+      Wvt_CBAddString( hDlg, ID_CMB_COMBO, 'Second'   )
+      Wvt_CBAddString( hDlg, ID_CMB_COMBO, 'Third'    )
+      Wvt_CBAddString( hDlg, ID_CMB_COMBO, 'Fourth'   )
+      Wvt_CBAddString( hDlg, ID_CMB_COMBO, 'Fifth'    )
+
+      Wvt_CBSetCurSel( hDlg, ID_CMB_COMBO, 1 )
+
+      Win_InvalidateRect( hDlg )
+//TraceLog( '','P----------------Exit WM_INITDIALOG', hDlg, nMsg )
+      exit
+
+   case WM_DESTROY
+      // Do whatevert you want to do with cText
+      // Each box will retrieve its own text.
+      //
+      cText := Win_GetDlgItemText( hDlg, ID_MLE )
+      exit
+
+   end
+
+   Return ( 0 )
+
+//-------------------------------------------------------------------//
+
+static function GetEditText()
+   Local cText := ''
+
+   cText += 'Welcome in the Wonderful World of xHarbour!'
+   cText += CRLF + CRLF
+   cText += 'When Peter Rees first published GTWVT, a Windows '
+   cText += 'Terminal Driver, on 22 Dec 2003, everybody took it '
+   cText += 'lightly, except for me, as I was aware that what '
+   cText += 'wonderful contribution to xHarbour he has made, '
+   cText += 'what immense possibilities he has opened for xHarbour '
+   cText += 'developers, what limitations he has cleared for Clipper '
+   cText += 'savvy user base.'
+   cText += CRLF + CRLF
+   cText += 'With a little effort I could extend GTWVT '
+   cText += 'to give it a GUI look. I also tried to give it '
+   cText += 'an event driven functionality, and up came Wvt*Classes.'
+   cText += CRLF + CRLF
+   cText += 'And yet another feather is added in the cap of GTWVT '
+   cText += 'as it is now capable of firing modeless dialogs like the one '
+   cText += 'you are viewing. These dialogs can be constructed dynamically ( Courtesy What32 ) '
+   cText += 'at run time or can be one of resources. At present 20 such dialogs '
+   cText += 'can be active at any given time. Also note that dialogs created '
+   cText += 'dynamically respect Top, Left, Rows, Cols coordinates, which is an '
+   cText += 'undisputed productivity boost!'
+   cText += CRLF + CRLF
+   cText += 'Enjoy!' + CRLF
+   cText += 'Pritpal Bedi, INDIA'
+
+   Return cText
+
+//-------------------------------------------------------------------//
+
+EXIT PROCEDURE CleanHandles()
+   LOCAL i
+
+   for i := 1 to len( ahFonts )
+      Win_DeleteObject( ahFonts[ i ] )
+   next
+
+   if shIcon <> nil
+      Win_DeleteObject( shIcon )
+   endif
+
+   if shImage <> nil
+      Win_DeleteObject( shImage )
+   endif
+
+   Return
+
 //-------------------------------------------------------------------//
 
