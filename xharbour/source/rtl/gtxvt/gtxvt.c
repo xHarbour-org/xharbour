@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.1 2003/12/29 23:38:57 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.2 2003/12/30 10:24:44 fsgiudice Exp $
  */
 
 /*
@@ -68,43 +68,7 @@
 
 /* This definition has to be placed before #include "hbapigt.h" */
 
-#define HB_GT_NAME	XVT
-
-#include "hbset.h"
-#include "hbvm.h"
-#include "hbapi.h"
-#include "hbapigt.h"
-#include "hbapierr.h"
-#include "inkey.ch"
-#include "error.ch"
-#include <signal.h>
-#include <sys/time.h>
-
-
-
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
-
-#ifndef max
-   #define max( a, b) ( a > b ? a : b )
-#endif
-
-#ifndef min
-   #define min( a, b ) ( a < b ? a : b )
-#endif
-
-#define XVT_CHAR_QUEUE_SIZE  128
-#define XVT_CHAR_BUFFER     1024
-#define XVT_MAX_ROWS         256
-#define XVT_MAX_COLS         256
-#define XVT_DEFAULT_ROWS      25
-#define XVT_DEFAULT_COLS      80
-#define XVT_MAX_BUTTONS       8
-#define CLIP_KEY_COUNT	122
-
-#define XVT_STD_MASK    (ExposureMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | StructureNotifyMask)
-
+#include "gtxvt.h"
 typedef struct tag_point
 {
    int x;
@@ -167,9 +131,9 @@ typedef struct tag_x_wnddef
    int fontWidth;
 
    // buffer informations
-   char *pBuffer;
-   char *pAttributes;
-   char background;
+   HB_GT_CELLTYPE *pBuffer;
+   HB_GT_CELLTYPE *pAttributes;
+   HB_GT_CELLTYPE background;
    ULONG bufsize;
 
    BOOL bInvalid;
@@ -319,8 +283,8 @@ static const ClipKeyCode stdKeyTab[CLIP_KEY_COUNT] = {
 };
 
 typedef struct tag_UnixBox {
-    unsigned char c1;
-    unsigned char c2;
+    USHORT c1;
+    USHORT c2;
 } UnixBoxChar;
 
 #define XVT_BOX_CHARS 52
@@ -330,54 +294,54 @@ static const UnixBoxChar boxTranslate[ XVT_BOX_CHARS ] ={
    { 17, ',' },
    { 30, '-' },
    { 31, '.' },
-   { 176, 104},
-   { 177, 97},
-   { 178, 48},
-   { 179, 120},
-   { 180, 117},
-   { 181, 117},
-   { 182, 117},
-   { 183, 107},
-   { 184, 107},
-   { 185, 117},
-   { 186, 120},
-   { 187, 107},
-   { 188, 106},
-   { 189, 106},
-   { 190, 106},
-   { 191, 107},
-   { 192, 109},
-   { 193, 118},
-   { 194, 119},
-   { 195, 116},
-   { 196, 113},
-   { 197, 110},
-   { 198, 116},
-   { 199, 116},
-   { 200, 109},
-   { 201, 108},
-   { 202, 118},
-   { 203, 119},
-   { 204, 116},
-   { 205, 113},
-   { 206, 110},
-   { 207, 118},
-   { 208, 118},
-   { 209, 119},
-   { 210, 119},
-   { 211, 109},
-   { 212, 109},
-   { 213, 108},
-   { 214, 108},
-   { 215, 110},
-   { 216, 110},
-   { 217, 106},
-   { 218, 108},
-   { 219, 96},
-   { 220, 96},
-   { 221, 96},
-   { 222, 96},
-   { 223, 96}
+   { 176, HB_GTXVG_FILLER1},
+   { 177, HB_GTXVG_FILLER2},
+   { 178, HB_GTXVG_FILLER3},
+   { 179, HB_GTXVT_SNG_VRT},
+   { 180, HB_GTXVT_SNG_VR},
+   { 181, HB_GTXVT_DBL_VR},
+   { 182, HB_GTXVT_DBL_VR},
+   { 183, HB_GTXVT_DBL_RT},
+   { 184, HB_GTXVT_DBL_RT},
+   { 185, HB_GTXVT_DBL_VR},
+   { 186, HB_GTXVT_DBL_VRT},
+   { 187, HB_GTXVT_DBL_RT},
+   { 188, HB_GTXVT_DBL_RB},
+   { 189, HB_GTXVT_DBL_RB},
+   { 190, HB_GTXVT_DBL_RB},
+   { 191, HB_GTXVT_SNG_RT},
+   { 192, HB_GTXVT_SNG_LB},
+   { 193, HB_GTXVT_SNG_BU},
+   { 194, HB_GTXVT_SNG_TD},
+   { 195, HB_GTXVT_SNG_VL},
+   { 196, HB_GTXVT_SNG_HOR},
+   { 197, HB_GTXVT_SNG_CRS},
+   { 198, HB_GTXVT_DBL_VL},
+   { 199, HB_GTXVT_DBL_VL},
+   { 200, HB_GTXVT_DBL_LB},
+   { 201, HB_GTXVT_DBL_LT},
+   { 202, HB_GTXVT_DBL_BU},
+   { 203, HB_GTXVT_DBL_TD},
+   { 204, HB_GTXVT_DBL_VL},
+   { 205, HB_GTXVT_DBL_HOR},
+   { 206, HB_GTXVT_DBL_CRS},
+   { 207, HB_GTXVT_DBL_BU},
+   { 208, HB_GTXVT_DBL_BU},
+   { 209, HB_GTXVT_DBL_TD},
+   { 210, HB_GTXVT_DBL_TD},
+   { 211, HB_GTXVT_DBL_LB},
+   { 212, HB_GTXVT_DBL_LB},
+   { 213, HB_GTXVT_DBL_LT},
+   { 214, HB_GTXVT_DBL_LT},
+   { 215, HB_GTXVT_DBL_CRS},
+   { 216, HB_GTXVT_DBL_CRS},
+   { 217, HB_GTXVT_SNG_RB},
+   { 218, HB_GTXVT_SNG_LT},
+   { 219, HB_GTXVG_FULL},
+   { 220, HB_GTXVG_FULL_B},
+   { 221, HB_GTXVG_FULL_R},
+   { 222, HB_GTXVG_FULL_L},
+   { 223, HB_GTXVG_FULL_T}
 };
 
 
@@ -400,7 +364,8 @@ static BOOL    hb_xvt_gtAllocSpBuffer( PXWND_DEF wnd, USHORT col, USHORT row);
 void HB_EXPORT    hb_xvt_gtProcessMessages(int);
 
 static void    hb_xvt_gtTranslateKey(int key );
-static unsigned char    hb_xvt_gtTranslateChar(unsigned char ch);
+static HB_GT_CELLTYPE hb_xvt_gtTranslateChar(unsigned char ch);
+static BYTE hb_xvt_gtUntranslateChar( HB_GT_CELLTYPE ch );
 static BOOL    hb_xvt_gtGetCharFromInputQueue (int * c);
 static void    hb_xvt_gtAddCharToInputQueue (int data);
 //static void    hb_xvt_gtTranslateKey(int key, int shiftkey, int altkey, int controlkey);
@@ -419,6 +384,8 @@ static USHORT  hb_xvt_gtGetIndexForTextBuffer(USHORT col, USHORT row);
 static void    hb_xvt_gtInvalidate( PXWND_DEF wnd, int left, int top, int right, int bottom );
 static void    hb_xvt_gtInvalidateChar( PXWND_DEF wnd, int left, int top, int right, int bottom );
 static void    hb_xvt_gtUpdate( PXWND_DEF wnd );
+
+static void    hb_xvt_gtDrawBoxChar( PXWND_DEF wnd, int col, int row, int boxchar );
 
 static USHORT  s_uiDispCount;
 static USHORT  s_usCursorStyle;
@@ -727,27 +694,26 @@ int HB_GT_FUNC(gt_RectSize( USHORT rows, USHORT cols ))
 
 void HB_GT_FUNC(gt_GetText( USHORT top, USHORT left, USHORT bottom, USHORT right, BYTE * sBuffer ))
 {
-  USHORT irow, icol, index, j;
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p)", top, left, bottom, right, sBuffer));
+   USHORT irow, icol, index, j;
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p)", top, left, bottom, right, sBuffer));
 
-  j = 0;
-  for (irow = top; irow <= bottom; irow++)
-  {
-    index = hb_xvt_gtGetIndexForTextBuffer(left, irow);
-    for (icol = left; icol <= right; icol++)
-    {
-      if (index >= s_wnd->bufsize)
+   j = 0;
+   for (irow = top; irow <= bottom; irow++)
+   {
+      index = HB_GT_INDEXOF(s_wnd, left, irow);
+      for (icol = left; icol <= right; icol++, index++)
       {
-        break;
+         if (index >= s_wnd->bufsize)
+         {
+         break;
+         }
+         else
+         {
+         sBuffer[j++] = hb_xvt_gtUntranslateChar( s_wnd->pBuffer[index] );
+         sBuffer[j++] = (BYTE) s_wnd->pAttributes[index];
+         }
       }
-      else
-      {
-        sBuffer[j++] = s_wnd->pBuffer[index];
-        sBuffer[j++] = s_wnd->pAttributes[index];
-        index++;
-      }
-    }
-  }
+   }
 }
 
 /* *********************************************************************** */
@@ -760,18 +726,17 @@ void HB_GT_FUNC(gt_PutText( USHORT top, USHORT left, USHORT bottom, USHORT right
    j = 0;
    for (irow = top; irow <= bottom; irow++)
    {
-      index = hb_xvt_gtGetIndexForTextBuffer(left, irow);
-      for (icol = left; icol <= right; icol++)
+      index = HB_GT_INDEXOF( s_wnd, left, irow );
+      for (icol = left; icol <= right; icol++, index++ )
       {
-         if (index >= s_wnd->bufsize)
+         if (index >= s_wnd->bufsize/HB_GT_CELLSIZE)
          {
             break;
          }
          else
          {
-            s_wnd->pBuffer[index] = sBuffer[j++];
+            s_wnd->pBuffer[index] = hb_xvt_gtTranslateChar( sBuffer[j++] );
             s_wnd->pAttributes[index] = sBuffer[j++];
-            index++;
          }
       }
    }
@@ -787,10 +752,10 @@ void HB_GT_FUNC(gt_SetAttribute( USHORT rowStart, USHORT colStart, USHORT rowSto
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d", usTop, usLeft, usBottom, usRight, (int) attr));
    for ( irow = rowStart; irow <=rowStop; irow++)
    {
-      index = hb_xvt_gtGetIndexForTextBuffer(colStart, irow);
+      index = HB_GT_INDEXOF(s_wnd, colStart, irow);
       for (icol = colStart; icol <= colStop; icol++)
       {
-         if (index >= s_wnd->bufsize )
+         if (index >= s_wnd->bufsize/HB_GT_CELLSIZE )
          {
             break;
          }
@@ -834,7 +799,7 @@ void hb_xvt_gtRepaintChar( PXWND_DEF wnd, int colStart, int rowStart, int colSto
          if (attrib != oldAttrib)
          {
             hb_xvt_gtSetColors(wnd, oldAttrib);
-            hb_xvt_gtTextOut( wnd, startCol, irow, (char *) wnd->pBuffer+startIndex, len );
+            hb_xvt_gtTextOut( wnd, startCol, irow, (char *) (wnd->pBuffer+startIndex), len );
             oldAttrib = attrib;
             startIndex = index;
             startCol = icol;
@@ -846,7 +811,7 @@ void hb_xvt_gtRepaintChar( PXWND_DEF wnd, int colStart, int rowStart, int colSto
          index++;
       }
       hb_xvt_gtSetColors(wnd, oldAttrib);
-      hb_xvt_gtTextOut(wnd, startCol, irow, (char *) wnd->pBuffer+startIndex, len );
+      hb_xvt_gtTextOut(wnd, startCol, irow, (char *) (wnd->pBuffer+startIndex), len );
    }
 
    // must the cursor be repainted?
@@ -867,13 +832,13 @@ void hb_xvt_gtRepaintChar( PXWND_DEF wnd, int colStart, int rowStart, int colSto
 
          hb_xvt_gtSetColors( wnd, attrib);
          hb_xvt_gtTextOut( wnd, wnd->col, wnd->row,
-               (char *) wnd->pBuffer+index, 1 );
+               (char *) (wnd->pBuffer+index), 1 );
       }
       else
       {
          hb_xvt_gtSetColors( wnd, wnd->pAttributes[ index ]);
          hb_xvt_gtTextOut( wnd, wnd->col, wnd->row,
-               (char *) wnd->pBuffer+index, 1 );
+               (char *) (wnd->pBuffer+index), 1 );
       }
    }
 
@@ -970,9 +935,6 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
       hb_xfree( fpBuff );
    }
 
-#ifdef XVT_DEBUG
-   nCountScroll++;
-#endif
 }
 
 /* *********************************************************************** */
@@ -1024,8 +986,8 @@ static void HB_GT_FUNC(gt_xPutch( USHORT iRow, USHORT iCol, BYTE bAttr, BYTE bCh
    index = hb_xvt_gtGetIndexForTextBuffer(iCol, iRow);
    if (index < s_wnd->bufsize )
    {
-      //s_wnd->pBuffer[index] = hb_xvt_gtTranslateChar( bChar );
-      s_wnd->pBuffer[index] = bChar;
+      s_wnd->pBuffer[index] = hb_xvt_gtTranslateChar( bChar );
+      //s_wnd->pBuffer[index] = bChar;
       s_wnd->pAttributes[index] = bAttr;
 
       //determine bounds of rect around character to refresh
@@ -1526,25 +1488,34 @@ void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int 
 
 static BOOL hb_xvt_gtAllocSpBuffer( PXWND_DEF wnd, USHORT col, USHORT row)
 {
+   int i;
+
    if ( row <= XVT_MAX_ROWS && col <= XVT_MAX_COLS )
    {
       wnd->cols = col;
       wnd->rows = row;
 
-      wnd->bufsize = col * row * sizeof(char);
+      wnd->bufsize = col * row * HB_GT_CELLSIZE;
       if ( wnd->pBuffer != 0 )
       {
-         wnd->pBuffer = ( char *) hb_xrealloc( wnd->pBuffer, wnd->bufsize );
-         wnd->pAttributes = ( char *) hb_xrealloc( wnd->pAttributes, wnd->bufsize );
+         wnd->pBuffer = ( HB_GT_CELLTYPE *) hb_xrealloc( wnd->pBuffer, wnd->bufsize );
+         wnd->pAttributes = ( HB_GT_CELLTYPE *) hb_xrealloc( wnd->pAttributes, wnd->bufsize );
       }
       else
       {
-         wnd->pBuffer = ( char *) hb_xgrab( wnd->bufsize );
-         wnd->pAttributes = ( char *) hb_xgrab( wnd->bufsize );
+         wnd->pBuffer = ( HB_GT_CELLTYPE *) hb_xgrab( wnd->bufsize );
+         wnd->pAttributes = ( HB_GT_CELLTYPE *) hb_xgrab( wnd->bufsize );
       }
 
-      memset( wnd->pBuffer, ' ', wnd->bufsize );
-      memset( wnd->pAttributes, wnd->background, wnd->bufsize );
+      for ( i = 0; i < wnd->bufsize/ HB_GT_CELLSIZE; i++ )
+      {
+         #ifdef HB_BIG_ENDIAN
+         wnd->pBuffer[i] = 0x0020;
+         #else
+         wnd->pBuffer[i] = 0x2000;
+         #endif
+         wnd->pAttributes[i] = wnd->background;
+      }
 
       return TRUE;
    }
@@ -1555,15 +1526,596 @@ static BOOL hb_xvt_gtAllocSpBuffer( PXWND_DEF wnd, USHORT col, USHORT row)
 }
 
 
+static void    hb_xvt_gtDrawBoxChar( PXWND_DEF wnd, int col, int row, int boxchar )
+{
+   XSegment segs[9];
+   int nsegs = 0;
+   char space = ' ';
+   int cellx = wnd->fontWidth;
+   int celly = wnd->fontHeight;
+   int basex = col * cellx;
+   int basey = row * celly;
+
+
+   /* Drawing a filler ? */
+   if ( boxchar >= HB_GTXVG_FILLER1 )
+   {
+      XColor color, dummy;
+      int attr = wnd->pAttributes[ HB_GT_INDEXOF( wnd, col, row )  ];
+      int fore = attr & 0x000F;
+      int back = (attr & 0x00F0)>>4;
+      XPoint pts[16*16];
+      int icol, irow, icount = 0, istart = 1;
+
+      for ( irow = 0; irow < celly;
+            irow += boxchar != HB_GTXVG_FILLER1 ? 2 : 3 )
+      {
+         for ( icol = istart ; icol < cellx;
+               icol += boxchar == HB_GTXVG_FILLER1 ? 2 : 3 )
+         {
+            pts[icount].x = basex + icol;
+            pts[icount].y = basey + irow;
+            icount++;
+         }
+         istart = istart != 1 ? 1 : 2;
+      }
+
+      if ( boxchar != HB_GTXVG_FILLER3 )
+      {
+
+         XAllocNamedColor( wnd->dpy, wnd->colors, color_refs[back], &color, &dummy );
+         XSetForeground( wnd->dpy, wnd->gc, color.pixel );
+
+         // erase background!
+         XFillRectangle( wnd->dpy, wnd->window, wnd->gc,
+            basex, basey, cellx, celly );
+
+         XAllocNamedColor( wnd->dpy, wnd->colors, color_refs[fore], &color, &dummy );
+         XSetForeground( wnd->dpy, wnd->gc, color.pixel );
+
+         // draw in foreground!
+         XDrawPoints( wnd->dpy, wnd->window, wnd->gc,
+               pts, icount, CoordModeOrigin );
+      }
+      else
+      {
+
+         // erase Foreground!
+         XFillRectangle( wnd->dpy, wnd->window, wnd->gc,
+            basex, basey, cellx, celly );
+
+         XAllocNamedColor( wnd->dpy, wnd->colors, color_refs[back], &color, &dummy );
+         XSetForeground( wnd->dpy, wnd->gc, color.pixel );
+
+         // draw in background!
+         XDrawPoints( wnd->dpy, wnd->window, wnd->gc,
+               pts, icount, CoordModeOrigin );
+
+         // reset foreground
+         XAllocNamedColor( wnd->dpy, wnd->colors, color_refs[fore], &color, &dummy );
+         XSetForeground( wnd->dpy, wnd->gc, color.pixel );
+      }
+
+      // done here
+      return;
+   }
+
+   /* Clears background */
+   XDrawImageString( wnd->dpy, wnd->window, wnd->gc,
+      basex, basey+wnd->xfs->ascent,
+      &space, 1 );
+
+   /* Drawing a full square? */
+   if ( boxchar >= HB_GTXVG_FULL )
+   {
+      switch( boxchar )
+      {
+         case HB_GTXVG_FULL:
+            XFillRectangle( wnd->dpy, wnd->window, wnd->gc,
+               basex, basey, cellx, celly );
+            return;
+
+         case HB_GTXVG_FULL_T:
+            XFillRectangle( wnd->dpy, wnd->window, wnd->gc,
+               basex, basey, cellx, celly/2 );
+            return;
+
+         case HB_GTXVG_FULL_B:
+            XFillRectangle( wnd->dpy, wnd->window, wnd->gc,
+               basex, basey + celly/2, cellx, celly/2 );
+            return;
+
+         case HB_GTXVG_FULL_L:
+            XFillRectangle( wnd->dpy, wnd->window, wnd->gc,
+               basex, basey, cellx/2, celly );
+            return;
+
+         case HB_GTXVG_FULL_R:
+            XFillRectangle( wnd->dpy, wnd->window, wnd->gc,
+               basex + cellx/2, basey, cellx/2, celly );
+            return;
+      }
+   }
+
+   switch( boxchar )
+   {
+      case HB_GTXVT_SNG_LT:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey + celly;
+         segs[0].x2 = basex + cellx/2;
+         segs[0].y2 = basey + celly/2;
+
+         segs[1].x1 = segs[0].x2;
+         segs[1].y1 = segs[0].y2;
+         segs[1].x2 = basex + cellx;
+         segs[1].y2 = basey + celly/2;
+
+         nsegs = 2;
+      break;
+
+      case HB_GTXVT_SNG_TD:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2;
+         segs[0].x2 = basex + cellx;
+         segs[0].y2 = basey + celly/2;
+
+         segs[1].x1 = basex + cellx/2;
+         segs[1].y1 = segs[0].y1;
+         segs[1].x2 = segs[1].x1;
+         segs[1].y2 = basey + celly;
+
+         nsegs = 2;
+      break;
+
+      case HB_GTXVT_SNG_RT:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey + celly;
+         segs[0].x2 = basex + cellx/2;
+         segs[0].y2 = basey + celly/2;
+
+         segs[1].x1 = segs[0].x2;
+         segs[1].y1 = segs[0].y2;
+         segs[1].x2 = basex;
+         segs[1].y2 = basey + celly/2;
+
+         nsegs = 2;
+      break;
+
+      case HB_GTXVT_SNG_LB:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey;
+         segs[0].x2 = basex + cellx/2;
+         segs[0].y2 = basey + celly/2;
+
+         segs[1].x1 = segs[0].x2;
+         segs[1].y1 = segs[0].y2;
+         segs[1].x2 = basex + cellx;
+         segs[1].y2 = basey + celly/2;
+
+         nsegs = 2;
+      break;
+
+      case HB_GTXVT_SNG_BU:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey;
+         segs[0].x2 = basex + cellx/2;
+         segs[0].y2 = basey + celly/2;
+
+         segs[1].x1 = basex;
+         segs[1].y1 = segs[0].y2;
+         segs[1].x2 = basex + cellx;
+         segs[1].y2 = basey + celly/2;
+
+         nsegs = 2;
+      break;
+
+      case HB_GTXVT_SNG_RB:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey;
+         segs[0].x2 = basex + cellx/2;
+         segs[0].y2 = basey + celly/2;
+
+         segs[1].x1 = segs[0].x2;
+         segs[1].y1 = segs[0].y2;
+         segs[1].x2 = basex;
+         segs[1].y2 = basey + celly/2;
+
+         nsegs = 2;
+      break;
+
+      case HB_GTXVT_SNG_VL:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly;
+
+         segs[1].x1 = segs[0].x1;
+         segs[1].y1 = basey+celly/2;
+         segs[1].x2 = basex+cellx;
+         segs[1].y2 = segs[1].y1;
+
+         nsegs = 2;
+      break;
+
+      case HB_GTXVT_SNG_VR:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly;
+
+         segs[1].x1 = segs[0].x1;
+         segs[1].y1 = basey + celly/2;
+         segs[1].x2 = basex;
+         segs[1].y2 = segs[1].y1;
+
+         nsegs = 2;
+      break;
+
+      case HB_GTXVT_SNG_CRS:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly;
+
+         segs[1].x1 = basex;
+         segs[1].y1 = basey+celly/2;
+         segs[1].x2 = basex+cellx;
+         segs[1].y2 = segs[1].y1;
+
+         nsegs = 2;
+      break;
+
+      case HB_GTXVT_SNG_HOR:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2;
+         segs[0].x2 = basex + cellx;
+         segs[0].y2 = segs[0].y1;
+
+         nsegs = 1;
+      break;
+
+      case HB_GTXVT_SNG_VRT:
+         segs[0].x1 = basex + cellx/2;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly;
+
+         nsegs = 1;
+      break;
+
+      case HB_GTXVT_DBL_LT:
+         segs[0].x1 = basex + cellx/2-1;
+         segs[0].y1 = basey + celly;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly/2-1;
+
+         segs[1].x1 = segs[0].x2;
+         segs[1].y1 = segs[0].y2;
+         segs[1].x2 = basex + cellx;
+         segs[1].y2 = segs[0].y2;
+
+         segs[2].x1 = basex + cellx/2+1;
+         segs[2].y1 = basey + celly;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly/2+1;
+
+         segs[3].x1 = segs[2].x2;
+         segs[3].y1 = segs[2].y2;
+         segs[3].x2 = basex + cellx;
+         segs[3].y2 = segs[2].y2;
+
+         nsegs = 4;
+      break;
+
+      case HB_GTXVT_DBL_TD:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2-1;
+         segs[0].x2 = basex + cellx;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = segs[0].x1;
+         segs[1].y1 = basey + celly/2+1;
+         segs[1].x2 = basex + cellx/2-1;
+         segs[1].y2 = segs[1].y1;
+
+         segs[2].x1 = basex + cellx/2+1;
+         segs[2].y1 = basey + celly/2+1;
+         segs[2].x2 = basex + cellx;
+         segs[2].y2 = segs[2].y1;
+
+         segs[3].x1 = segs[1].x2;
+         segs[3].y1 = segs[1].y1;
+         segs[3].x2 = segs[1].x2;
+         segs[3].y2 = basey + celly;
+
+         segs[4].x1 = segs[2].x1;
+         segs[4].y1 = segs[2].y1;
+         segs[4].x2 = segs[2].x1;
+         segs[4].y2 = basey + celly;
+
+         nsegs = 5;
+      break;
+
+      case HB_GTXVT_DBL_RT:
+         segs[0].x1 = basex + cellx/2-1;
+         segs[0].y1 = basey + celly;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly/2+1;
+
+         segs[1].x1 = segs[0].x2;
+         segs[1].y1 = segs[0].y2;
+         segs[1].x2 = basex;
+         segs[1].y2 = segs[0].y2;
+
+         segs[2].x1 = basex + cellx/2+1;
+         segs[2].y1 = basey + celly;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly/2-1;
+
+         segs[3].x1 = segs[2].x2;
+         segs[3].y1 = segs[2].y2;
+         segs[3].x2 = basex;
+         segs[3].y2 = segs[2].y2;
+
+         nsegs = 4;
+      break;
+
+      case HB_GTXVT_DBL_LB:
+         segs[0].x1 = basex + cellx/2-1;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly/2+1;
+
+         segs[1].x1 = segs[0].x2;
+         segs[1].y1 = segs[0].y2;
+         segs[1].x2 = basex + cellx;
+         segs[1].y2 = segs[0].y2;
+
+         segs[2].x1 = basex + cellx/2+1;
+         segs[2].y1 = basey;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly/2-1;
+
+         segs[3].x1 = segs[2].x2;
+         segs[3].y1 = segs[2].y2;
+         segs[3].x2 = basex + cellx;
+         segs[3].y2 = segs[2].y2;
+
+         nsegs = 4;
+      break;
+
+      case HB_GTXVT_DBL_BU:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2+1;
+         segs[0].x2 = basex + cellx;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = segs[0].x1;
+         segs[1].y1 = basey + celly/2-1;
+         segs[1].x2 = basex + cellx/2-1;
+         segs[1].y2 = segs[1].y1;
+
+         segs[2].x1 = basex + cellx/2+1;
+         segs[2].y1 = basey + celly/2-1;
+         segs[2].x2 = basex + cellx;
+         segs[2].y2 = segs[2].y1;
+
+         segs[3].x1 = segs[1].x2;
+         segs[3].y1 = segs[1].y1;
+         segs[3].x2 = segs[1].x2;
+         segs[3].y2 = basey;
+
+         segs[4].x1 = segs[2].x1;
+         segs[4].y1 = segs[2].y1;
+         segs[4].x2 = segs[2].x1;
+         segs[4].y2 = basey;
+
+         nsegs = 5;
+      break;
+
+      case HB_GTXVT_DBL_RB:
+         segs[0].x1 = basex + cellx/2-1;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly/2-1;
+
+         segs[1].x1 = segs[0].x2;
+         segs[1].y1 = segs[0].y2;
+         segs[1].x2 = basex;
+         segs[1].y2 = segs[0].y2;
+
+         segs[2].x1 = basex + cellx/2+1;
+         segs[2].y1 = basey;
+         segs[2].x2 = segs[2].x1;
+         segs[2].y2 = basey + celly/2+1;
+
+         segs[3].x1 = segs[2].x2;
+         segs[3].y1 = segs[2].y2;
+         segs[3].x2 = basex;
+         segs[3].y2 = segs[2].y2;
+
+         nsegs = 4;
+      break;
+
+      case HB_GTXVT_DBL_VL:
+         segs[0].x1 = basex + cellx/2-1;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey+ celly;
+
+         segs[1].x1 = basex + cellx/2+1;
+         segs[1].y1 = basey;
+         segs[1].x2 = segs[1].x1;
+         segs[1].y2 = basey + celly/2-1;
+
+         segs[2].x1 = segs[1].x1;
+         segs[2].y1 = basey + celly/2+1;
+         segs[2].x2 = segs[1].x1;
+         segs[2].y2 = basey + celly;
+
+         segs[3].x1 = segs[1].x1;
+         segs[3].y1 = segs[1].y2;
+         segs[3].x2 = basex + cellx;
+         segs[3].y2 = segs[3].y1;
+
+         segs[4].x1 = segs[2].x1;
+         segs[4].y1 = segs[2].y1;
+         segs[4].x2 = basex + cellx;
+         segs[4].y2 = segs[2].y1;
+
+         nsegs = 5;
+      break;
+
+
+      case HB_GTXVT_DBL_VR:
+         segs[0].x1 = basex + cellx/2+1;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey+ celly;
+
+         segs[1].x1 = basex + cellx/2-1;
+         segs[1].y1 = basey;
+         segs[1].x2 = segs[1].x1;
+         segs[1].y2 = basey + celly/2-1;
+
+         segs[2].x1 = segs[1].x1;
+         segs[2].y1 = basey + celly/2+1;
+         segs[2].x2 = segs[1].x1;
+         segs[2].y2 = basey + celly;
+
+         segs[3].x1 = segs[1].x1;
+         segs[3].y1 = segs[1].y2;
+         segs[3].x2 = basex;
+         segs[3].y2 = segs[3].y1;
+
+         segs[4].x1 = segs[2].x1;
+         segs[4].y1 = segs[2].y1;
+         segs[4].x2 = basex;
+         segs[4].y2 = segs[2].y1;
+
+         nsegs = 5;
+      break;
+
+      case HB_GTXVT_DBL_CRS:
+         segs[0].x1 = basex + cellx/2-1;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey + celly/2-1;
+
+         segs[1].x1 = segs[0].x1;
+         segs[1].y1 = basey + celly/2+1;
+         segs[1].x2 = segs[0].x1;
+         segs[1].y2 = basey + celly;
+
+         segs[2].x1 = segs[0].x1;
+         segs[2].y1 = segs[0].y2;
+         segs[2].x2 = basex;
+         segs[2].y2 = segs[2].y1;
+
+         segs[3].x1 = segs[1].x1;
+         segs[3].y1 = segs[1].y1;
+         segs[3].x2 = basex;
+         segs[3].y2 = segs[1].y1;
+
+         segs[4].x1 = basex + cellx/2+1;
+         segs[4].y1 = basey;
+         segs[4].x2 = segs[4].x1;
+         segs[4].y2 = basey + celly/2-1;
+
+         segs[5].x1 = segs[4].x1;
+         segs[5].y1 = basey + celly/2+1;
+         segs[5].x2 = segs[4].x1;
+         segs[5].y2 = basey + celly;
+
+         segs[6].x1 = segs[4].x1;
+         segs[6].y1 = segs[4].y2;
+         segs[6].x2 = basex + cellx;
+         segs[6].y2 = segs[6].y1;
+
+         segs[7].x1 = segs[5].x1;
+         segs[7].y1 = segs[5].y1;
+         segs[7].x2 = basex + cellx;
+         segs[7].y2 = segs[5].y1;
+
+         nsegs = 8;
+      break;
+
+      case HB_GTXVT_DBL_HOR:
+         segs[0].x1 = basex;
+         segs[0].y1 = basey + celly/2+1;
+         segs[0].x2 = basex + cellx;
+         segs[0].y2 = segs[0].y1;
+
+         segs[1].x1 = basex;
+         segs[1].y1 = basey + celly/2-1;
+         segs[1].x2 = basex + cellx;
+         segs[1].y2 = segs[1].y1;
+
+         nsegs = 2;
+      break;
+
+      case HB_GTXVT_DBL_VRT:
+         segs[0].x1 = basex + cellx/2-1;
+         segs[0].y1 = basey;
+         segs[0].x2 = segs[0].x1;
+         segs[0].y2 = basey+ celly;
+
+         segs[1].x1 = basex + cellx/2+1;
+         segs[1].y1 = basey;
+         segs[1].x2 = segs[1].x1;
+         segs[1].y2 = basey+ celly;
+
+         nsegs = 2;
+      break;
+
+   }
+
+
+   if ( nsegs == 0  ) {
+      XFillRectangle( wnd->dpy, wnd->window, wnd->gc,
+         basex+2, basey+2,
+         cellx-2, celly-2);
+   }
+   else
+   {
+      XDrawSegments( wnd->dpy, wnd->window, wnd->gc,
+         segs, nsegs);
+   }
+
+
+}
+
+
 static BOOL hb_xvt_gtTextOut( PXWND_DEF wnd,  USHORT col, USHORT row, char * str, USHORT cbString )
 {
+   int pos;
+   USHORT *usString;
+   HB_GT_CELLTYPE cell;
+
    if (cbString > wnd->cols) // make sure string is not too long
    {
       cbString = wnd->cols;
    }
 
-   XDrawImageString( wnd->dpy, wnd->window, wnd->gc,
-      col * wnd->fontWidth, row * wnd->fontHeight+wnd->xfs->ascent, str, cbString );
+   XDrawImageString16( wnd->dpy, wnd->window, wnd->gc,
+      col * wnd->fontWidth, row * wnd->fontHeight+wnd->xfs->ascent, (XChar2b *) str, cbString );
+
+   /* Draw eventual graphical chars */
+
+   usString = (USHORT *) str;
+   for ( pos = 0; pos < cbString; pos ++ )
+   {
+      #ifdef HB_BIG_ENDIAN
+      cell = usString[pos];
+      if ( cell > HB_GTXVT_DBL_LT )
+      #else
+      cell = 0xFFFF & ((usString[pos] << 8) | (usString[pos]>>8));
+      if ( cell >= HB_GTXVT_DBL_LT )
+      #endif
+      {
+         hb_xvt_gtDrawBoxChar( wnd, col + pos, row, cell );
+      }
+   }
    return TRUE;
 }
 
@@ -1590,7 +2142,7 @@ static BOOL hb_xvt_gtInitWindow( PXWND_DEF wnd, USHORT col, USHORT row)
 
 static void hb_xvt_processKey( XKeyEvent *evt)
 {
-   char buf[5];
+   unsigned char buf[5];
    KeySym out = XLookupKeysym( evt, 0 );
    int ikey = 0;
 
@@ -1748,12 +2300,8 @@ static void hb_xvt_processKey( XKeyEvent *evt)
       {
          if ( ! s_modifiers.bCtrl && ! s_modifiers.bAlt )
          {
-            int len = 0;
-            while( buf[len] ) // ready for UTF input!!!
-            {
-               hb_xvt_gtAddCharToInputQueue( buf[ len ] );
-               len++;
-            }
+            // ready for UTF input!!!
+            hb_xvt_gtAddCharToInputQueue( *buf + (buf[1] << 8) );
          }
          else {
             hb_xvt_gtTranslateKey( *buf );
@@ -1820,7 +2368,7 @@ static void hb_xvt_gtWndProc( XEvent *evt )
       case ButtonPress: case ButtonRelease:
       {
          unsigned char map[ XVT_MAX_BUTTONS ];
-         int button;
+         int button=0;
 
          XGetPointerMapping( s_wnd->dpy, map, s_wnd->mouseNumButtons );
 
@@ -1923,21 +2471,77 @@ static void hb_xvt_gtWndProc( XEvent *evt )
 
 }
 
-static unsigned char hb_xvt_gtTranslateChar(unsigned char ch )
+/* Translate ASCII char into unicode representation */
+static HB_GT_CELLTYPE hb_xvt_gtTranslateChar( unsigned char ch )
 {
    int i;
+
+   if ( ch <= 127 ) {
+      #ifdef HB_BIG_ENDIAN
+         return ch;
+      #else
+         return ch << 8;
+      #endif
+   }
 
    for( i = 0; i < XVT_BOX_CHARS; i++ )
    {
       if ( ch == boxTranslate[ i ].c1 )
       {
-         return  boxTranslate[ i ].c2;
+         #ifdef HB_BIG_ENDIAN
+            return boxTranslate[ i ].c2;
+         #else
+            return 0xFFFF & ((boxTranslate[ i ].c2 >> 8) | (boxTranslate[ i ].c2 << 8));
+         #endif
       }
    }
 
-   return ch;
+   #ifdef HB_BIG_ENDIAN
+      return ch;
+   #else
+      return ch << 8;
+   #endif
 }
 
+
+/* Translate Unicode representation char into ASCII char */
+static BYTE hb_xvt_gtUntranslateChar( HB_GT_CELLTYPE ch )
+{
+   int i;
+
+   #ifdef HB_BIG_ENDIAN
+   if ( ch <= 127 )
+   {
+      return ch;
+   }
+   #else
+   if ( (ch >> 8) <= 127 )
+   {
+      return ch >> 8;
+   }
+   #endif
+
+   for( i = 0; i < XVT_BOX_CHARS; i++ )
+   {
+      #ifdef HB_BIG_ENDIAN
+      if ( ch == boxTranslate[ i ].c2 )
+      #else
+      if ( (0xFFFF &
+               ((boxTranslate[ i ].c2 >> 8) | (boxTranslate[ i ].c2 << 8))
+           )
+         == ch )
+      #endif
+      {
+         return boxTranslate[ i ].c1;
+      }
+   }
+
+   #ifdef HB_BIG_ENDIAN
+      return ch;
+   #else
+      return ch >> 8;
+   #endif
+}
 
 static void hb_xvt_gtTranslateKey( int key )
 {
@@ -1983,7 +2587,7 @@ static PXWND_DEF hb_xvt_gtCreateWindow( Display *dpy )
    wnd->dpy = dpy;
    wnd->rows = XVT_DEFAULT_ROWS;
    wnd->cols = XVT_DEFAULT_COLS;
-   if (! hb_xvt_gtSetFont( wnd, "fixed", "medium", 14, NULL ) )
+   if (! hb_xvt_gtSetFont( wnd, "fixed", "medium", 18, NULL ) )
    {
       hb_xfree( wnd );
       hb_errRT_TERM( EG_CREATE, 10001, NULL, "Can't load 'fixed' font", 0, 0 );
@@ -2010,6 +2614,8 @@ static PXWND_DEF hb_xvt_gtCreateWindow( Display *dpy )
       0, whiteColor, whiteColor);
 
    wnd->gc = XCreateGC( dpy, wnd->window, 0, NULL );
+   // Line width 2
+   XSetLineAttributes( dpy, wnd->gc, 1, LineSolid, CapButt, JoinBevel );
    wnd->colors = DefaultColormap( dpy, DefaultScreen( dpy ));
 
    wnd->background = 0x07;
@@ -2144,6 +2750,7 @@ static void gt_hbInitStatics(void)
 static void hb_xvt_gtAddCharToInputQueue ( int data)
 {
   int iNextPos;
+
   iNextPos = (s_wnd->keyPointerIn >= XVT_CHAR_QUEUE_SIZE) ? 0 : s_wnd->keyPointerIn+1 ;
   if (iNextPos != s_wnd->keyPointerOut ) // Stop accepting characters once the buffer is full
   {
@@ -2178,20 +2785,24 @@ static void hb_xvt_gtSetStringInTextBuffer(USHORT col, USHORT row, BYTE attr, BY
    int pos;
 
    // determine the index and put the string into the TextBuffer
-   index = hb_xvt_gtGetIndexForTextBuffer(col, row);
+   index = HB_GT_INDEXOF(s_wnd, col, row);
    if (length + index <= s_wnd->bufsize)
    {
       if (attr != ' ') // if no attribute, don't overwrite
       {
          memset((s_wnd->pAttributes+index), attr, length);
+         for ( pos = 0; pos < length; pos ++ )
+         {
+            s_wnd->pAttributes[index + pos] = attr;
+         }
       }
 
       // translate characters
-      memcpy((s_wnd->pBuffer+index), sBuffer, length);
-      /*for ( pos = 0; pos < length; pos ++ )
+      //memcpy((s_wnd->pBuffer+index), sBuffer, length);
+      for ( pos = 0; pos < length; pos ++ )
       {
-         s_wnd->pBuffer[index + pos] = hb_xvt_gtTranslateChar( sBuffer[ pos ] );
-      }*/
+         s_wnd->pBuffer[index + pos] = hb_xvt_gtTranslateChar(sBuffer[ pos ]);
+      }
 
       //determine bounds of rect around character to refresh
       hb_xvt_gtInvalidateChar( s_wnd, col, row, col + length, row  );

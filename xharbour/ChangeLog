@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1970 2003/12/30 22:59:12 druzus Exp $
+ * $Id: ChangeLog,v 1.1971 2003/12/31 00:28:25 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,20 +8,32 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-12-31 08:00 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+  + source/rtl/gtxvt/gtxvt.h
+    + Now the virtual buffer of gtxvt is unicode. It's slower, as
+      many transformations are required, but is fast enough.
+    + Added support for DOS semigraphic characters. Fillers (full
+      and partial squares), single and double border boxes are
+      now drawn in the terminal INDEPENDENTLY from the underlying
+      font (they are drawn "manually" via draw functions).
+      (mixed style semigraphic characters are still missing though).
+
+
 2003-12-30 22:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
- + contrib\firebird\firebird.c
- + contrib\firebird\tfirebird.prg
- + contrib\firebird\README
- + contrib\firebird\make_b32.bat
- + contrib\firebird\Makefile
- + contrib\firebird\makefile.bc
- + contrib\firebird\tests\Makefile
- + contrib\firebird\tests\stress.prg
- + contrib\firebird\tests\simple.prg
- + contrib\firebird\tests\test.prg
- + contrib\firebird\tests\testapi.c
- + contrib\firebird\tests\README
-   + Xharbour  functions and classes for Firebird Acess Provided by Rodrigo Moreno
+  + contrib\firebird\firebird.c
+  + contrib\firebird\tfirebird.prg
+  + contrib\firebird\README
+  + contrib\firebird\make_b32.bat
+  + contrib\firebird\Makefile
+  + contrib\firebird\makefile.bc
+  + contrib\firebird\tests\Makefile
+  + contrib\firebird\tests\stress.prg
+  + contrib\firebird\tests\simple.prg
+  + contrib\firebird\tests\test.prg
+  + contrib\firebird\tests\testapi.c
+  + contrib\firebird\tests\README
+    + Xharbour  functions and classes for Firebird Acess Provided by Rodrigo Moreno
 
 
 2003-12-29 11:41 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
