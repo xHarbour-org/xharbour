@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.107 2002/10/30 15:22:42 what32 Exp $
+ * $Id: xide.prg,v 1.108 2002/10/30 21:39:31 ronpinkas Exp $
  */
 
 /*
@@ -54,8 +54,10 @@ FUNCTION Main
 
    WITH OBJECT oApp
       WITH OBJECT :CreateForm( @MainFrame, MainFrame() )
+
          :SetStyle( WS_THICKFRAME, .F. )
          :SetStyle( WS_MAXIMIZEBOX, .F. )
+
          :MainMenu()
          :MainToolBar()
          :MainStatusBar()
@@ -67,6 +69,7 @@ FUNCTION Main
 
          // focus to main Frame
          :SetFocus()
+
       END
       :Run()
   END
@@ -119,20 +122,20 @@ METHOD MainToolBar() CLASS MainFrame
 
     // add the xmake toolbar
    With Object ::Add( TToolBar():New( MainFrame, 444, 15, , , 26, 26, 20, 20, 14 ))
-      :AddButton( "NewProj",      ToolButton():New( 0,,"New Project",                    100 ) )
-      :AddButton( "OpenProj",     ToolButton():New( 1,,"Open Project",                   101 ) )
-      :AddButton( "Properties",   ToolButton():New( 2,,"Properties",                     102 ) )
-      :AddButton( "Build",        ToolButton():New( 3,,"Build Application",              103 ) )
-      :AddButton( "BldLunch",     ToolButton():New( 4,,"Build and Launch Application",   104 ) )
-      :AddButton( "ReBldLunch",   ToolButton():New( 5,,'Re-Build Application',           105 ) )
-      :AddButton( "ReBldLunchApp",ToolButton():New( 6,,'Re-Build and Launch Application',106 ) )
-      :AddButton( "LunchApp",     ToolButton():New( 7,,'Launch Application',             107 ) )
-      :AddButton( "SingSource",   ToolButton():New( 8,,'Compile Single Source',          108 ) )
-      :AddButton( "AllSources",   ToolButton():New( 9,,'Compile All Sources',            109 ) )
-      :AddButton( "LinkOnly",     ToolButton():New(10,,'Link Only',                      110 ) )
-      :AddButton( "CompPPO",      ToolButton():New(11,,'Compile to PPO',                 111 ) )
-      :AddButton( "View",         ToolButton():New(12,,'View',                           112 ) )
-      :AddButton( "Files",        ToolButton():New(13,,'Files',                          113 ) )
+      :AddButton( ToolButton():New( 0,,"New Project",                    100 ) )
+      :AddButton( ToolButton():New( 1,,"Open Project",                   101 ) )
+      :AddButton( ToolButton():New( 2,,"Properties",                     102 ) )
+      :AddButton( ToolButton():New( 3,,"Build Application",              103 ) )
+      :AddButton( ToolButton():New( 4,,"Build and Launch Application",   104 ) )
+      :AddButton( ToolButton():New( 5,,'Re-Build Application',           105 ) )
+      :AddButton( ToolButton():New( 6,,'Re-Build and Launch Application',106 ) )
+      :AddButton( ToolButton():New( 7,,'Launch Application',             107 ) )
+      :AddButton( ToolButton():New( 8,,'Compile Single Source',          108 ) )
+      :AddButton( ToolButton():New( 9,,'Compile All Sources',            109 ) )
+      :AddButton( ToolButton():New(10,,'Link Only',                      110 ) )
+      :AddButton( ToolButton():New(11,,'Compile to PPO',                 111 ) )
+      :AddButton( ToolButton():New(12,,'View',                           112 ) )
+      :AddButton( ToolButton():New(13,,'Files',                          113 ) )
 
       SendMessage( :handle, TB_SETROWS, 2 )
       // ----------------------------------------------------   set imagelist
@@ -174,7 +177,7 @@ METHOD MainToolBar() CLASS MainFrame
              oTool := ToolButton():New( n,,aStdTab[n+1], 150+n )
              oTool:Action := {|oItem| FormEdit:OnMenuCommand(oItem) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
-             :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
+             :AddButton( oTool )
          next
 
          // ----------------------------------------------------   set imagelist
@@ -186,7 +189,7 @@ METHOD MainToolBar() CLASS MainFrame
          //---------------------------------------------------------------------
       End
       :Rebar1:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
-      :StdTools:DisableAll()
+      :StdTools:Disable()
    End
 
 //----------------------------------------------------------------------------------------------
@@ -196,13 +199,12 @@ METHOD MainToolBar() CLASS MainFrame
       With Object :Add( WinTools():New( MainFrame:ToolTabs:Win32, 445, 14, , , 28, 28, 20, 20 ) )
          :SetStyle( TBSTYLE_CHECKGROUP )
          aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'Rebar', ;
-                      '', '', '', '', '', '', ;
-                      '', '', '' }
-         for n:=0 to 16
+                      '', '' }
+         for n:=0 to 9
              oTool := ToolButton():New( n,,aStdTab[n+1], 250+n )
              oTool:Action := {|oItem| FormEdit:OnMenuCommand(oItem) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
-             :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
+             :AddButton( oTool )
          next
 
          // ----------------------------------------------------   set imagelist
@@ -215,7 +217,7 @@ METHOD MainToolBar() CLASS MainFrame
 
       End
       :Rebar1:AddBand( NIL, RBBS_NOVERT, :WinTools:handle, 100, 30,  , "", NIL )
-      :WinTools:DisableAll()
+      :WinTools:Disable()
    End
 
    //--------- sets a QUICK access to the control

@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.21 2002/10/27 01:29:25 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.22 2002/10/29 02:12:37 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -110,17 +110,23 @@ CLASS TToolBar FROM TCustomControl
    METHOD Create()
    METHOD tbProc()
 
-   METHOD Disable(nBtn)           INLINE ::SendMessage(TB_ENABLEBUTTON,nBtn,0)
-   METHOD Enable(nBtn,lFlag)      INLINE lFlag := IFNIL(lFlag,.T.,lFlag),;
-                                         ::SendMessage(TB_ENABLEBUTTON,nBtn,If(lFlag,1,0))
+   METHOD DisableBtn( nBtn )      INLINE ::SendMessage( TB_ENABLEBUTTON, nBtn, 0)
+   METHOD EnableBtn( nBtn )       INLINE ::SendMessage( TB_ENABLEBUTTON, nBtn, 1)
+   
    METHOD Disableall()
    METHOD Enableall()
-   METHOD CheckButton(nBtn,lFlag) INLINE lFlag := IFNIL(lFlag,.T.,lFlag),;
+   
+   METHOD CLickButton(nBtn,lFlag) INLINE lFlag := IFNIL(lFlag,.T.,lFlag),;
                                          ::SendMessage(TB_CHECKBUTTON,nBtn,If(lFlag,1,0))
-   METHOD IsButtonChecked(nBtn)   INLINE IF(::SendMessage(TB_ISBUTTONCHECKED,nBtn,0)==0,.F.,.T.)
+                                         
+   METHOD IsButtonClicked(nBtn)   INLINE IF(::SendMessage(TB_ISBUTTONCHECKED,nBtn,0)==0,.F.,.T.)
    METHOD AddMenu()
 
    METHOD SetListStyle()          INLINE ::Style := OR(::Style,TBSTYLE_LIST)
+
+   METHOD Disable()               INLINE ::DisableAll(), EnableWindow( ::handle, .f. )
+   METHOD Enable()                INLINE ::EnableAll(), EnableWindow( ::handle, .t. )
+
 ENDCLASS
 
 
@@ -166,13 +172,13 @@ METHOD AddBitmap(hInst, nhIdBmp, nButtons) CLASS TToolBar
 
 *-----------------------------------------------------------------------------*
 
-METHOD AddButton( cName, oBtn ) CLASS TToolBar
+METHOD AddButton( oBtn ) CLASS TToolBar
 
    LOCAL tbb IS TBBUTTON
    DEFAULT oBtn TO ToolButton():New()
 
-   oBtn:name     := cName
    oBtn:Parent   := self
+   oBtn:Create()
 
    tbb:ibitmap   := oBtn:ImageIndex
    tbb:idCommand := oBtn:Id
@@ -272,7 +278,7 @@ METHOD tbProc(hWnd,nMsg,nwParam,nlParam) CLASS TToolBar
 
 METHOD disableall() CLASS TToolBar
 
-   AEVAL(::aButtons,{|btn| ::disable(btn:id)})
+   AEVAL(::aButtons,{|btn| ::disableBtn(btn:id)})
 
    RETURN(self)
 
@@ -280,7 +286,7 @@ METHOD disableall() CLASS TToolBar
 
 METHOD enableall() CLASS TToolBar
 
-   AEVAL(::aButtons,{|btn| ::enable(btn:id)})
+   AEVAL(::aButtons,{|btn| ::enableBtn(btn:id)})
 
    RETURN(self)
 
@@ -289,7 +295,8 @@ METHOD enableall() CLASS TToolBar
 
 CLASS ToolButton
    DATA ImageIndex INIT -1
-   DATA Name       INIT "ToolButton"
+   DATA Name
+   DATA ControlName INIT "ToolButton"
    DATA Style      PROTECTED INIT TBSTYLE_BUTTON
    DATA PopupMenu
    DATA Hint
@@ -302,10 +309,17 @@ CLASS ToolButton
    DATA State      INIT TBSTATE_ENABLED
    DATA Cargo
    DATA TextIndex  INIT 0
-   DATA Parent     HIDDEN
-   ASSIGN Enabled(l) INLINE IF( l,::Parent:enable( ::id),::Parent:disable( ::id))
+   DATA TabIndex   INIT 1
+   DATA Parent     PROTECTED
+
    METHOD New() CONSTRUCTOR
+   METHOD Create()
+   METHOD Disable() INLINE ::Parent:DisableBtn( ::Id )
+   METHOD Enable()  INLINE ::Parent:EnableBtn( ::Id )
+   METHOD Click()   INLINE ::Parent:ClickButton( ::Id, .T. )
+
 ENDCLASS
+
 
 METHOD New(nImgIndex,cCaption,cHint,nId,bAction) CLASS ToolButton
    ::ImageIndex := IFNIL(nImgIndex,::ImageIndex,nImgIndex)
@@ -315,3 +329,21 @@ METHOD New(nImgIndex,cCaption,cHint,nId,bAction) CLASS ToolButton
    ::Id         := nId
 return(self)
 
+
+METHOD Create() CLASS ToolButton
+   
+   LOCAL oCtrl, nInst := 1
+   
+   IF ::Name == NIL
+      FOR EACH oCtrl IN ::Parent:aButtons
+          IF oCtrl:ControlName == ::ControlName
+             nInst ++
+          ENDIF
+      NEXT
+      ::Name := ( ::ControlName + AllTrim( Str( nInst ) ) )
+   ENDIF
+
+   __objAddData( ::Parent, ::Name, HB_OO_CLSTP_PROTECTED )
+   __ObjSetValueList( ::Parent, { { ::Name, self } } )
+
+RETURN Self

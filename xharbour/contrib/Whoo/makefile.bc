@@ -20,7 +20,8 @@ WHOOOBJ    = TObject.obj TPersistent.obj TComponent.obj TControl.obj \
              TCRebar.obj TCToolBar.obj TabControl.obj TCGroupBox.obj TSplash.obj \
              TTreeView.obj TTVItem.obj TCBrowser.obj TCProgBar.obj \
              TWColumn.obj THintWindow.obj TStrings.obj TCommonDialog.obj \
-             TOpenDialog.obj
+             TOpenDialog.obj \
+             TCustomTab.obj TPageControl.obj TTabSheet.obj
 
 !include $(WHO_DIR)\env\makelib.b32
 

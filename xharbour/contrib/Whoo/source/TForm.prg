@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.49 2002/10/30 08:14:00 ronpinkas Exp $
+ * $Id: TForm.prg,v 1.50 2002/10/30 21:39:26 ronpinkas Exp $
  */
 
 /*
@@ -118,14 +118,14 @@ RETURN(c)
 
 METHOD New( oParent ) CLASS TForm
 
-   ::WndProc   := IFNIL(::WndProc,'FormProc',::WndProc)
-   ::Msgs      := IFNIL(::Msgs,-1,::Msgs)
-   ::FrameWnd  := .F.
-   ::Style     := IFNIL(::Style,WS_OVERLAPPEDWINDOW,::Style)
-   ::FormType  := IFNIL(::FormType,RCF_WINDOW,::FormType)
-   ::lRegister := IFNIL(::lRegister,.T.,::lRegister)
+   ::WndProc   := IFNIL( ::WndProc,'FormProc',::WndProc)
+   ::Msgs      := IFNIL( ::Msgs,-1,::Msgs)
+   ::FrameWnd  := IFNIL( ::FrameWnd,.F.,::FrameWnd)
+   ::Style     := IFNIL( ::Style,WS_OVERLAPPEDWINDOW,::Style)
+   ::FormType  := IFNIL( ::FormType,RCF_WINDOW,::FormType)
+   ::lRegister := IFNIL( ::lRegister,.T.,::lRegister)
    ::lControl  := .F.
-   ::ExStyle   := IFNIL(::ExStyle,0,::ExStyle)
+   ::ExStyle   := IFNIL( ::ExStyle,0,::ExStyle)
    InitCommonControls()
 
    RETURN( super:New( oParent ) )

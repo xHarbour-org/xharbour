@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.78 2002/10/30 15:22:41 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.79 2002/10/30 21:39:29 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -104,10 +104,9 @@ GLOBAL EXTERNAL FormEdit
    METHOD SetControl( oObj )
    METHOD SetGridSize(x,y)
    METHOD OnCloseQuery()     INLINE ::Parent:WindowMenu:Enable( 101 ),;
-                                    ::Parent:StdBar:DisableAll(),;
+                                    ::Parent:StdBar:Disable(),;
                                     ::Parent:ObjInspect:ComboBox1:DelObject( self ),;
                                     super:OnCloseQuery()
-
    METHOD XFMTop()
    METHOD XFMRoot()
    METHOD XFMControl( cName, oControl, lDelete )
@@ -170,7 +169,7 @@ METHOD OnMenuCommand(oItem)
    IF .T. //command if range of control creation commands
 
       // store the control type in memory
-      ::CtrlName := oItem:Name // control type to be created
+      ::CtrlName := oItem:Hint // control type to be created
 
       // this cursor shape must be correct for the type of the control
       ::oMask:Cursor :=LoadCursor(hThisInstance,"FRAMES") //<= correct cursor for the control
@@ -279,8 +278,8 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
       ENDIF
    ENDIF
 
-   ::Parent:StdBar:CheckButton( 150, .T. )
-   ::Parent:Win32Bar:CheckButton( 250, .T. )
+   ::Parent:StdBar:ToolButton1:Click()
+   ::Parent:Win32Bar:ToolButton1:Click()
 
 RETURN oObj
 
@@ -358,8 +357,8 @@ METHOD CreateSub()
 
    ::SetGridSize()
 
-   ::Parent:StdBar:EnableAll()
-   ::Parent:Win32Bar:EnableAll()
+   ::Parent:StdBar:Enable()
+   ::Parent:Win32Bar:Enable()
 
    ::Parent:ObjInspect:ComboBox1:AddString( ::Name + chr(9) + "TFORM", self)
 //   ::Parent:ObjInspect:ComboBox1:SetCurSel(::Parent:ObjInspect:ComboBox1:GetCount()-1)
