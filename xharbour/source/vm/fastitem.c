@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.44 2003/02/26 05:36:10 jonnymind Exp $
+ * $Id: fastitem.c,v 1.45 2003/03/08 02:06:47 jonnymind Exp $
  */
 
 /*
@@ -129,7 +129,7 @@ PHB_ITEM HB_EXPORT hb_itemReturnCopy( PHB_ITEM pItem )
 {
    HB_THREAD_STUB
    
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturn(%p)", pItem ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturnCopy(%p)", pItem ) );
 
    if( pItem )
    {
