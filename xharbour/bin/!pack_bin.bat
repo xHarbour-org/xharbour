@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: !pack_bin.bat,v 1.9 2003/04/02 02:10:40 ronpinkas Exp $
+rem $Id: !pack_bin.bat,v 1.10 2003/04/09 00:59:30 ronpinkas Exp $
 rem
 
 rem RDDADS separate from this, include headers and readme
@@ -10,7 +10,7 @@ rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
 rem set hb_architecture=w32
 rem set hb_compiler=bcc32
 
-set hb_ver=0.80.0
+set hb_ver=0.81.0
 
 if not "%hb_architecture%" == "linux"   set hb_archbin=zip
 if not "%hb_architecture%" == "linux"   set hb_archopt=-D -X

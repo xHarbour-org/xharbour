@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.8 2003/06/06 06:45:05 druzus Exp $
+# $Id: xharbour.spec,v 1.9 2003/06/23 17:41:15 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -16,9 +16,9 @@
 
 %define name     xharbour
 %define dname    xHarbour
-%define version  0.80.0
-%define releasen 1
-%define platform rh73
+%define version  0.81.0
+%define releasen 0
+%define platform cl80
 %define prefix   /usr
 %define hb_pref  xhb
 %define hb_gt    crs
@@ -45,6 +45,7 @@
 
 Summary:        Free software Clipper compatible compiler
 Summary(pl):    Darmowy kompilator kompatybilny z jêzykiem Clipper.
+Summary(pt_BR): Um compilador Clipper compativel Gratis 
 Name:           %{name}
 Version:        %{version}
 Release:        %{releasen}%{platform}
@@ -54,7 +55,7 @@ Group:          Development/Languages
 Vendor:         %{hb_host}
 URL:            http://%{hb_host}/
 Source:         %{name}-%{version}.src.tar.gz
-Packager:       Przemys³aw Czerpak <druzus@polbox.com>
+Packager:       Przemys³aw Czerpak <druzus@polbox.com> Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
 BuildPrereq:    gcc binutils bash bison ncurses ncurses-devel slang-devel gpm-devel
 Requires:       gcc binutils bash sh-utils %{name}-lib = %{version}
 Provides:       %{name}
@@ -72,6 +73,11 @@ this RPM distribution.
 %{dname} to kompatybilny z jêzykiem CA-Clipper kompilator rozwijany na
 wielu ró¿nych platformach. Ten pakiet zawiera kompilator, preprocesor,
 zbiory nag³ówkowe, wirtualn± maszynê oraz dokumentacjê.
+
+%description -l pt_BR
+%{dname} ‚ um compilador Clipper compativel para multiplas plataformas.
+Esse pacote contem um compilador ,um pr‚-processador, arquivos de cabe‡alho
+uma maquina virtual e documenta‡Æo
 
 
 ######################################################################
@@ -93,6 +99,11 @@ linked dynamically.
 Ten pakiet udostêpnia dzielone bilioteki kompilatora %{dname}
 dla programów konsolidowanych dynamicznie.
 
+%description -l pt_BR lib
+%{dname} ‚ um compilador compativel com o Clipper.
+Esse pacote %{dname} provem as bibliotecas compartilhadas para programas
+linkados dinamicamente
+
 
 ######################################################################
 ## static libs
@@ -113,6 +124,12 @@ program linking.
 %{dname} to kompatybilny z jêzykiem CA-Clipper kompilator.
 Ten pakiet udostêpnia statyczne bilioteki dla kompilatora %{dname}
 niezbêdne do statycznej konsolidacji programów.
+
+%description -l pt_BR static
+%{dname} ‚ um compilador compativel com o clippe.
+Esse pacote %{dname} provem as bibliotecas  de run time staticas para linkagem
+dos os programas
+
 
 ######################################################################
 ## PP
@@ -145,6 +162,18 @@ Ten pakiet udostêpnia %{dname} PP, który daje trzy narzêdzia w jednym.
    wspomnianych kilku ograniczeñ potrafi on uruchomiæ wiêkszo¶æ sk³adni
    Harbour. Mo¿esz napisaæ swój w³asny skrypt xBase dodaj±c do pliku .prg
    #!/usr/bin/pprun
+
+%description -l pt_BR pp
+%{dname} ‚ um compilador Clipper compativel.
+Esse pacote provem o %{dname} PP. Ele tem 3 caracteristicas dependentes
+uma da outra.
+1. Que e supostamente ser um Pre-Processor 100% compativel com o Clipper
+   (com algumas extenssäes).
+2. DOT prompt, que supostamente permite a maioria das syntaxes do Clipper.
+3. Finalmente, PP ‚ um limitado Interpretador Clipper/Harbour/xBase . Sujeito  
+   com algumas limita‡äes que pode executar a maioria da syntaxe do Harbour.
+   Voce pode escrever seus proprios scritps em .prg ao adicionar as seus arquivos 
+   .prg #!/usr/bin/pprun
 
 
 ######################################################################
