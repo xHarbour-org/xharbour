@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1588 2003/10/13 05:21:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1589 2003/10/13 20:40:59 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-13 19:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed getExpReal() to terminate on ']' if StBr2 == 0
+    ! Fixed getExpReal() to terminate on '}' if StBr3 == 0
+    /* This fixes literal initialization of TAssociativeArray with 1 pair,  reported by Francesco. */
 
 2003-10-13 22:40 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.79 2003/09/03 12:51:36 paultucker Exp $
+ * $Id: ppcore.c,v 1.80 2003/10/13 05:21:33 ronpinkas Exp $
  */
 
 /*
@@ -3067,6 +3067,16 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
             }
             /* Ron Pinkas added 2001-01-08 */
             else if( **ptri == ')' && StBr1 == 0 )
+            {
+               rez = TRUE;
+            }
+            /* Ron Pinkas added 2003-10-13 */
+            else if( **ptri == ']' && StBr2 == 0 )
+            {
+               rez = TRUE;
+            }
+            /* Ron Pinkas added 2003-10-13 */
+            else if( **ptri == '}' && StBr3 == 0 )
             {
                rez = TRUE;
             }
