@@ -375,7 +375,7 @@ extern void     hb_memvarSetPrivatesBase( ULONG ulBase ); /* release PRIVATE var
 extern void     hb_memvarNewParameter( PHB_SYMB pSymbol, PHB_ITEM pValue );
 extern char   * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen );
 extern void     hb_memvarCreateFromItem( PHB_ITEM pMemvar, BYTE bScope, PHB_ITEM pValue );
-extern int      hb_memvarScope( char * szVarName, ULONG ulLength ); /* retrieve scope of a dynamic variable symbol */
+extern int      hb_memvarScope( char * szVarName ); /* retrieve scope of a dynamic variable symbol */
 
 /* console I/O subsystem */
 extern void     hb_conInit( void ); /* initialize the console API system */
@@ -481,7 +481,6 @@ extern char * hb_verPlatform( void ); /* retrieves a newly allocated buffer cont
 extern char * hb_verCompiler( void ); /* retrieves a newly allocated buffer containing compiler version */
 extern char * hb_verHarbour( void ); /* retrieves a newly allocated buffer containing harbour version */
 extern void   hb_verBuildInfo( void ); /* display harbour, compiler, and platform versions to standard console */
-extern char * hb_verPCode( void ); /* retrieves a newly allocated buffer containing PCode version */
 
 /* environment variables access */
 /* WARNING: This returned pointer must be freed if not NULL using hb_xfree( ( void * ) ptr ); */

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.10 2002/09/19 01:57:43 ronpinkas Exp $
+ * $Id: macro.c,v 1.11 2002/10/13 18:06:30 ronpinkas Exp $
  */
 
 /*
@@ -1069,7 +1069,7 @@ static void hb_compMemvarCheck( char * szVarName, HB_MACRO_DECL )
          /* checking for variable is quite expensive than don't check it
           * if there are already some undefined symbols or variables
          */
-         if( hb_memvarScope( szVarName, strlen( szVarName ) + 1 ) <= HB_MV_ERROR )
+         if( hb_memvarScope( szVarName ) <= HB_MV_ERROR )
          {
             if( ! hb_dynsymFind( szVarName ) )
             {

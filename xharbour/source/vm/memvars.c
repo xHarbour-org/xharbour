@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.15 2002/09/20 19:48:20 ronpinkas Exp $
+ * $Id: memvars.c,v 1.16 2002/09/21 05:21:07 ronpinkas Exp $
  */
 
 /*
@@ -880,32 +880,18 @@ static int hb_memvarScopeGet( PHB_DYNS pDynVar )
 
 /* This function checks the scope of passed variable name
  */
-int hb_memvarScope( char * szVarName, ULONG ulLength )
+int hb_memvarScope( char * szVarName )
 {
    int iMemvar = HB_MV_ERROR;
-   char * szName;
+   PHB_DYNS pDynVar;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_memvarScope(%s, %lu)", szVarName, ulLength));
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarScope(%s)", szVarName));
 
-   szName = ( char * ) hb_xalloc( ulLength );
-   if( szName )
-   {
-      PHB_DYNS pDynVar;
-
-      memcpy( szName, szVarName, ulLength );
-      pDynVar = hb_dynsymFind( hb_strUpper( szName, ulLength - 1 ) );
-
-      if( pDynVar )
-	  {
-         iMemvar = hb_memvarScopeGet( pDynVar );
-	  }
-      else
-	  {
-         iMemvar = HB_MV_NOT_FOUND;
-	  }
-
-      hb_xfree( szName );
-   }
+   pDynVar = hb_dynsymFindName( szVarName );
+   if( pDynVar )
+      iMemvar = hb_memvarScopeGet( pDynVar );
+   else
+      iMemvar = HB_MV_NOT_FOUND;
 
    return iMemvar;
 }
@@ -1058,18 +1044,7 @@ static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR pName )
 
       if( ulLen )
       {
-         char * szName = ( char * ) hb_xgrab( ulLen + 1 );
-         char * szArg  = pName->item.asString.value;
-
-         szName[ ulLen ] = '\0';
-         do
-         {
-            --ulLen;
-            szName[ ulLen ] = toupper( szArg[ ulLen ] );
-         } while( ulLen );
-
-         pDynSym = hb_dynsymFind( szName );
-         hb_xfree( szName );
+         pDynSym = hb_dynsymFindName( pName->item.asString.value );
       }
    }
    return pDynSym;
@@ -1239,7 +1214,7 @@ HB_FUNC( __MVSCOPE )
       PHB_ITEM pVarName = hb_param( 1, HB_IT_STRING );
 
       if( pVarName )
-         iMemvar = hb_memvarScope( pVarName->item.asString.value, pVarName->item.asString.length + 1 );
+         iMemvar = hb_memvarScope( pVarName->item.asString.value );
    }
 
    hb_retni( iMemvar );
@@ -1761,7 +1736,7 @@ HB_HANDLE hb_memvarGetVarHandle( char *szName )
 {
    PHB_DYNS pDyn;
 
-   if( ( pDyn = hb_dynsymFind( szName ) ) != NULL )
+   if( ( pDyn = hb_dynsymFindName( szName ) ) != NULL )
       return  pDyn->hMemvar;
    else
       return 0; /* invalid handle */
