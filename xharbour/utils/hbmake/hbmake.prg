@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.18 2002/05/22 03:07:14 ronpinkas Exp $
+ * $Id: hbmake.prg,v 1.19 2002/05/24 03:40:56 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -836,7 +836,7 @@ FUNCTION Compfiles()
 
                         ELSE
 
-                            Ferase( 'test.out' )
+//                            Ferase( 'test.out' )
 
                         ENDIF
 
@@ -992,7 +992,7 @@ FUNCTION Compfiles()
 
                             ELSE
 
-                                Ferase( 'test.out' )
+//                                Ferase( 'test.out' )
 
                             ENDIF
 
@@ -1073,7 +1073,7 @@ FUNCTION Compfiles()
 
                         ELSE
 
-                            Ferase( 'test.out' )
+//                            Ferase( 'test.out' )
 
                         ENDIF
 
@@ -1191,9 +1191,9 @@ FUNC crtmakfile( cFile )
     LOCAL lRddAds      := .f.
     LOCAL cOs          := "Win32"
     LOCAL cCompiler    := "BCC"
-    LOCAL cfwhpath     := Space( 40 )
-    LOCAL ccwpath      := Space( 40 )
-    LOCAL cMiniPath    := Space( 40 )
+    LOCAL cfwhpath     := Space( 200 )
+    LOCAL ccwpath      := Space( 200 )
+    LOCAL cMiniPath    := Space( 200 )
     LOCAL cObjDir      := "obj" + Space( 20 )
     LOCAL lAutomemvar  := .f.
     LOCAL lvarismemvar := .f.
@@ -1630,11 +1630,12 @@ FUNC crtmakfile( cFile )
             hb_FNAMESPLIT( cTopfile, @cPath, @cTest, @cExt, @cDrive )
             cExt := Substr( cExt, 2 )
             Fwrite( nLinkHandle, "PROJECT = " + If( Isupper( cExt ), Strtran( cTopfile, ".PRG", "" ), Strtran( cTopfile, ".prg", "" ) ) + " $(PR) " + CRLF )
-
+            cExt := lower(cExt)
         ELSE
 
             hb_FNAMESPLIT( cTopfile, @cPath, @cTest, @cExt, @cDrive )
             cExt := Substr( cExt, 2 )
+            cExt := lower(cExt)
             Fwrite( nLinkHandle, "PROJECT = " + If( Isupper( cExt ), cTest + "." + Strtran( cExt, "PRG", "EXE" ), cTest + "." + Strtran( cExt, "prg", "exe" ) ) + " $(PR) " + CRLF )
 
         ENDIF
@@ -2011,7 +2012,7 @@ FUNCTION CompUpdatedfiles()
 
                             ELSE
 
-                                Ferase( 'test.out' )
+//                                Ferase( 'test.out' )
 
                             ENDIF
 
@@ -2130,7 +2131,7 @@ FUNCTION CompUpdatedfiles()
 
                             ELSE
 
-                                Ferase( 'test.out' )
+//                                Ferase( 'test.out' )
 
                             ENDIF
 
@@ -2200,7 +2201,7 @@ FUNCTION CompUpdatedfiles()
 
                             ELSE
 
-                                Ferase( 'test.out' )
+//                                Ferase( 'test.out' )
 
                             ENDIF
 

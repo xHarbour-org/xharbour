@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.2 2002/03/06 03:52:09 ronpinkas Exp $
+ * $Id: dbedit.prg,v 1.3 2002/04/27 20:37:59 lculik Exp $
  */
 
 /*
@@ -127,7 +127,7 @@ FUNCTION dbEdit(;
    oBrowse:ColSep    := iif( ISCHARACTER( xColumnSeparators ), xColumnSeparators, " " + Chr( 179 ) + " " )
    oBrowse:FootSep   := iif( ISCHARACTER( xFootingSeparators ), xFootingSeparators, "" )
    oBrowse:AutoLite  := .F. /* Set to .F. just like in CA-Cl*pper. [vszakats] */
-   tracelog(acColumns)
+
    // Calculate the number of columns
 
    IF ISARRAY( acColumns )
