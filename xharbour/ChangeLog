@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1673 2003/11/08 06:17:26 brianhays Exp $
+ * $Id: ChangeLog,v 1.1674 2003/11/09 16:03:41 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-09 12:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Minor fix to release of GLOBAL variables in hb_vmQuit()
+
+  * utils/hbmake/hbmake.prg
+    * Fixed compilation error (Luiz you apparantly commited this change by mistake!!! Please review.)
+
 2003-11-09 14:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
    * source/rtl/console.c
     ! fixed error on line 489 (should be \x0C insted of x0C )

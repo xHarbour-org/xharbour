@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.98 2003/10/22 21:40:54 lculik Exp $
+ * $Id: hbmake.prg,v 1.99 2003/11/09 19:55:20 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -272,7 +272,7 @@ FUNCTION ParseMakeFile( cFile )
       RETURN NIL
    ENDIF
 
-   
+
    #ifndef __PLATFORM__Windows
       IF !FILE("hbtemp.c")
          CreateLink()
@@ -927,7 +927,7 @@ FUNCTION CompileFiles()
                      __RUN( (cComm) )
                      cErrText := Memoread( (s_cLog) )
                      lEnd     := 'Error E' $   cErrText
-                     IF ! s_lIgnoreErrors .AND. lEnd 
+                     IF ! s_lIgnoreErrors .AND. lEnd
                         IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog)) )
                         QUIT
                      ELSE
@@ -1181,7 +1181,7 @@ FUNC CreateMakeFile( cFile )
    Local nO
    Local lNew := .F.
    LOCAL oMake
-   Local cAllRes := "" 
+   Local cAllRes := ""
    Local cTemp
    LOCAL cExtraLibs :=""
    #ifndef __PLATFORM__Windows
@@ -1839,7 +1839,7 @@ cResname += cAllRes
       ELSEIF lCw
          fWrite( s_nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib optgui.lib "  + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSE
-         fWrite( s_nLinkHandle, "LIBFILES = optcon"+ IIF( ! lMt, "", "mt" ) +".lib " + .lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = optcon" + IIF( ! lMt, "", "mt" ) + ".lib " + .lib + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ENDIF
 
    ELSEIF s_lGcc
@@ -2109,9 +2109,9 @@ FUNCTION CompileUpdatedFiles()
 
                      __RUN( (cComm) )
                      cErrText := Memoread( (s_cLog) )
-                     lEnd     := 'Error E' $ cErrText 
+                     lEnd     := 'Error E' $ cErrText
                                         tracelog(lEnd)
-                     IF ! s_lIgnoreErrors .AND. lEnd 
+                     IF ! s_lIgnoreErrors .AND. lEnd
                         IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit "  + (s_cLog)), __run( "Notepad " + (s_cLog) ) )
                         QUIT
                      ELSE

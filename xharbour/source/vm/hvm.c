@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.271 2003/10/16 20:27:49 ronpinkas Exp $
+ * $Id: hvm.c,v 1.272 2003/10/19 00:17:36 jonnymind Exp $
  */
 
 /*
@@ -711,7 +711,8 @@ void HB_EXPORT hb_vmQuit( void )
 
    if( s_aGlobals.type == HB_IT_ARRAY )
    {
-      //hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
+      // Because GLOBALS items are of type HB_IT_REF (see hb_vmRegisterGlobals())!
+      hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
       //TraceLog( NULL, "Releasing s_aGlobals: %p\n", &s_aGlobals );
       hb_arrayRelease( &s_aGlobals );
       //TraceLog( NULL, "   Released s_aGlobals: %p\n", &s_aGlobals );
