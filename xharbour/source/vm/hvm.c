@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.7 2002/01/03 06:28:34 ronpinkas Exp $
+ * $Id: hvm.c,v 1.8 2002/01/04 02:12:04 ronpinkas Exp $
  */
 
 /*
@@ -3551,15 +3551,7 @@ static void hb_vmRetValue( void )
 
    hb_stackDec();                               /* make the last item visible */
 
-   if( hb_stackTopItem()->bShadow )
-   {
-      /* Must create true copy because underlaying value might be released on function termination. */
-      hb_itemCopy( &hb_stack.Return, hb_stackTopItem() );
-   }
-   else
-   {
-      hb_itemForwardValue( &hb_stack.Return, hb_stackTopItem() );
-   }
+   hb_itemForwardValue( &hb_stack.Return, hb_stackTopItem() );
 
    hb_itemClear( hb_stackTopItem() );               /* now clear it */
 }
@@ -4098,7 +4090,7 @@ static void hb_vmDuplicate( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDuplicate()"));
 
-   hb_itemShareValue( ( hb_stackTopItem() ), hb_stackItemFromTop( -1 ) );
+   hb_itemCopy( ( hb_stackTopItem() ), hb_stackItemFromTop( -1 ) );
    hb_stackPush();
 }
 
@@ -4106,9 +4098,9 @@ static void hb_vmDuplTwo( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDuplTwo()"));
 
-   hb_itemShareValue( ( hb_stackTopItem() ), hb_stackItemFromTop( -2 ) );
+   hb_itemCopy( ( hb_stackTopItem() ), hb_stackItemFromTop( -2 ) );
    hb_stackPush();
-   hb_itemShareValue( ( hb_stackTopItem() ), hb_stackItemFromTop( -2 ) );
+   hb_itemCopy( ( hb_stackTopItem() ), hb_stackItemFromTop( -2 ) );
    hb_stackPush();
 }
 
@@ -4322,17 +4314,26 @@ static void hb_vmPopLocal( SHORT iLocal )
       PHB_ITEM pLocal = hb_stackItemFromBase( iLocal );
 
       if( HB_IS_BYREF( pLocal ) )
-         hb_itemCopy( hb_itemUnRef( pLocal ), hb_stackTopItem() );
+      {
+         hb_itemVarAssign( hb_itemUnRef( pLocal ) );
+      }
       else
-         hb_itemCopy( pLocal, hb_stackTopItem() );
+      {
+         hb_itemVarAssign( pLocal );
+      }
    }
    else
+   {
       /* local variable referenced in a codeblock
        * hb_stackSelfItem() points to a codeblock that is currently evaluated
        */
-      hb_itemCopy( hb_codeblockGetVar( hb_stackSelfItem(), iLocal ), hb_stackTopItem() );
+      hb_itemVarAssign( hb_codeblockGetVar( hb_stackSelfItem(), iLocal ) );
+   }
 
-   hb_itemClear( hb_stackTopItem() );
+   /*-----------------1/3/2002 10:47PM-----------------
+    * Cleard in hb_itemAssign()
+    * --------------------------------------------------*/
+   /*hb_itemClear( ( hb_stackTopItem() ) );*/
 }
 
 static void hb_vmPopStatic( USHORT uiStatic )
@@ -4342,14 +4343,22 @@ static void hb_vmPopStatic( USHORT uiStatic )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPopStatic(%hu)", uiStatic));
 
    hb_stackDec();
+
    pStatic = s_aStatics.item.asArray.value->pItems + hb_stack.iStatics + uiStatic - 1;
 
    if( HB_IS_BYREF( pStatic ) )
-      hb_itemCopy( hb_itemUnRef( pStatic ), ( hb_stackTopItem() ) );
+   {
+      hb_itemVarAssign( hb_itemUnRef( pStatic ) );
+   }
    else
-      hb_itemCopy( pStatic, ( hb_stackTopItem() ) );
+   {
+      hb_itemVarAssign( pStatic );
+   }
 
-   hb_itemClear( ( hb_stackTopItem() ) );
+   /*-----------------1/3/2002 10:47PM-----------------
+    * Cleard in hb_itemAssign()
+    * --------------------------------------------------*/
+   /*hb_itemClear( ( hb_stackTopItem() ) );*/
 }
 
 

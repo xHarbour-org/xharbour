@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.4 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.5 2002/01/04 02:12:03 ronpinkas Exp $
  */
 
 /*
@@ -70,6 +70,8 @@ void hb_itemShareValue( PHB_ITEM pDest, PHB_ITEM pSource )
 {
    HB_TRACE( HB_TR_INFO, ("*** hb_itemShareValue(%p, %p)", pDest, pSource ) );
 
+   //return hb_itemCopy( pDest, pSource );
+
    if( pDest->type )
    {
       hb_itemClear( pDest );
@@ -108,13 +110,11 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
    HB_TRACE( HB_TR_DEBUG, ("hb_itemForwardValue(%p, %p)", pDest, pSource ) );
 
    /* Source is already a shadow. */
-   /*
    if( pSource->bShadow )
    {
       hb_itemCopy( pDest, pSource );
       return;
    }
-   */
 
    if( pDest->type )
    {
@@ -129,6 +129,23 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
    pSource->bShadow = TRUE;
+}
+
+void hb_itemVarAssign( PHB_ITEM pVar )
+{
+   PHB_ITEM pValue = hb_stackTopItem();
+
+   HB_TRACE( HB_TR_DEBUG, ("hb_itemAssign(%p, %p)", pVar ) );
+
+   if( pVar->type == pValue->type && pVar->type == HB_IT_STRING && pVar->item.asString.value == pValue->item.asString.value )
+   {
+      pValue->type = HB_IT_NIL;
+   }
+   else
+   {
+      hb_itemCopy( pVar, pValue );
+      hb_itemClear( pValue );
+   }
 }
 
 void hb_itemPushEnvelopeString( char * szText, ULONG length )

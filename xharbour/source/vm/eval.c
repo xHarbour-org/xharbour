@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.17 2001/12/15 08:49:06 antoniolinares Exp $
+ * $Id: eval.c,v 1.1.1.1 2001/12/21 10:41:09 ronpinkas Exp $
  */
 
 /*
@@ -63,6 +63,7 @@
  */
 
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
 #include "hbvm.h"
@@ -129,7 +130,7 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
          hb_vmDo( pEvalInfo->paramCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemCopy( pResult, &hb_stack.Return );
+         hb_itemForwardValue( pResult, &hb_stack.Return );
       }
       else if( HB_IS_BLOCK( pEvalInfo->pItems[ 0 ] ) )
       {
@@ -140,7 +141,7 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
          hb_vmDo( pEvalInfo->paramCount );
 
          pResult = hb_itemNew( NULL );
-         hb_itemCopy( pResult, &hb_stack.Return );
+         hb_itemForwardValue( pResult, &hb_stack.Return );
       }
       else
          pResult = NULL;
@@ -213,10 +214,12 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
             va_end( va );
 
             pResult = hb_itemNew( NULL );
-            hb_itemCopy( pResult, &hb_stack.Return );
+            hb_itemForwardValue( pResult, &hb_stack.Return );
          }
          else
+         {
             pResult = NULL;
+         }
       }
       else if( HB_IS_BLOCK( pItem ) )
       {
@@ -232,7 +235,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
          va_end( va );
 
          pResult = hb_itemNew( NULL );
-         hb_itemCopy( pResult, &hb_stack.Return );
+         hb_itemForwardValue( pResult, &hb_stack.Return );
       }
       else if( HB_IS_SYMBOL( pItem ) )
       {
@@ -248,10 +251,12 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
          va_end( va );
 
          pResult = hb_itemNew( NULL );
-         hb_itemCopy( pResult, &hb_stack.Return );
+         hb_itemForwardValue( pResult, &hb_stack.Return );
       }
       else
+      {
          pResult = NULL;
+      }
    }
    else
       pResult = NULL;
@@ -285,18 +290,24 @@ PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
          hb_vmPushSymbol( pDynSym->pSymbol );
          hb_vmPushNil();
          for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
+         {
             hb_vmPush( va_arg( va, PHB_ITEM ) );
+         }
          hb_vmDo( ( unsigned short ) ulPCount );
          va_end( va );
 
          pResult = hb_itemNew( NULL );
-         hb_itemCopy( pResult, &hb_stack.Return );
+         hb_itemForwardValue( pResult, &hb_stack.Return );
       }
       else
+      {
          pResult = NULL;
+      }
    }
    else
+   {
       pResult = NULL;
+   }
 
    return pResult;
 }
