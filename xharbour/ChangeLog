@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1613 2003/10/21 14:40:29 paultucker Exp $
+ * $Id: ChangeLog,v 1.1614 2003/10/21 15:31:03 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-10-21 23:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * contrib/mysql/tmysql.prg
+    ! fixed bug on MakePrimaryKeyWhere() Thanks to report Rodrigo Moreno
+  * source/rtl/gtsln/kbsln.c
+    ! remove automatic define of HB_SLANG_ONE_ESC
 
 2003-10-21 11:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.vc
