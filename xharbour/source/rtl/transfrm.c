@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.13 2003/01/19 23:15:25 andijahja Exp $
+ * $Id: transfrm.c,v 1.14 2003/03/03 15:55:59 ignacioortiz Exp $
  */
 
 /*
@@ -809,7 +809,7 @@ HB_FUNC( TRANSFORM )
    {
       if( ISNIL( 1 ) )
       {
-        hb_retc("");
+         bError = TRUE;
       }
       else if( HB_IS_STRING( pValue ) )
       {
