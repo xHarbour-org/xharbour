@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.8 2002/11/17 09:03:42 what32 Exp $
+ * $Id: TCustomForm.prg,v 1.9 2002/11/18 06:24:19 what32 Exp $
  */
 
 /*
@@ -79,7 +79,8 @@ CLASS TCustomForm FROM TScrollingWinControl
     METHOD   WndProc                 virtual  //(var Message: TMessage); override;
     METHOD   Resizing                virtual  //(State: TWindowState); override;
 */
-/*
+
+
     PROPERTY ActiveMDIChild             //: TForm;
     PROPERTY AlphaBlend                 AS LOGICAL
     PROPERTY AlphaBlendValue            AS NUMERIC   //: Byte;
@@ -93,7 +94,7 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY Ctl3D                      DEFAULT TRUE
     PROPERTY DefaultMonitor             TYPE TDefaultMonitor DEFAULT dmActiveForm
     PROPERTY FormStyle                  TYPE TFormStyle      DEFAULT fsNormal
-    PROPERTY Height                     //stored IsFormSizeStored;
+//    PROPERTY Height                     //stored IsFormSizeStored;
     PROPERTY HorzScrollBar              //stored IsForm;
     PROPERTY Icon                       //: TIcon
     PROPERTY MDIChildCount              AS NUMERIC
@@ -109,10 +110,12 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY TileMode                   TYPE TTileMode       DEFAULT tbHorizontal
     PROPERTY VertScrollBar              //stored IsForm;
     PROPERTY Visible                    WRITE SetVisible     DEFAULT FALSE
-    PROPERTY Width                      //stored IsFormSizeStored;
+//    PROPERTY Width                      //stored IsFormSizeStored;
 
-    PROPERTY WindowMenu                 READ WindowMenu WRITE SetWindowMenu //: TMenuItem;
-*/
+    PROPERTY WindowMenu                 READ FWindowMenu WRITE SetWindowMenu //: TMenuItem;
+
+
+
 /*
   PUBLIC:
     METHOD   Create                     CONSTRUCTOR //(AOwner: TComponent); override;
