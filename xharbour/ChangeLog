@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2288 2004/02/14 22:11:49 andijahja Exp $
+ * $Id: ChangeLog,v 1.2289 2004/02/14 22:49:57 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,9 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-14 23:50 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * fixed bug when seek last was used in empty index.
+
 2004-02-14 20:53 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
-* contrib/hbzlib/zipnew.cpp
-  long -> LONG
+  * contrib/hbzlib/zipnew.cpp
+    * long -> LONG
 
 2004-02-16 05:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/hbapifs.h
@@ -84,19 +89,17 @@
     ! test program for fm.log
 
 2004-02-14 14:41 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
-* contrib/hbzlib/zipnew.cpp
-  contrib/hbzlib/zipcomp.cpp
-  ! Corrected some variable types (ie ULONG uiCount to ULONG ulCount) and some
-  code cleanup
-* contrib/hbzlib/include/hbzip2.h
-  ! minor update due change above
+  * contrib/hbzlib/zipnew.cpp
+  * contrib/hbzlib/zipcomp.cpp
+    ! Corrected some variable types (ie ULONG uiCount to ULONG ulCount) and some
+      code cleanup
+  * contrib/hbzlib/include/hbzip2.h
+    ! minor update due change above
 
 2004-02-14 11:27 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
-* ChangeLog
-  ! Renamed to ChangeLog.018 and started an new one
-* utils/hbtest/Makefile
-  ! added missing rt_ccall.prg    
-* contrib/hbzlib/Makefile
-  !Removed unneeded dependencies
-   
-
+  * ChangeLog
+    ! Renamed to ChangeLog.018 and started an new one
+  * utils/hbtest/Makefile
+    ! added missing rt_ccall.prg    
+  * contrib/hbzlib/Makefile
+    !Removed unneeded dependencies

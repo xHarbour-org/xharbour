@@ -1,6 +1,6 @@
 **************************************************
 * gtgraph.prg
-* $Id: gtgraph.prg,v 1.2 2004/01/25 13:18:59 jonnymind Exp $
+* $Id: gtgraph.prg,v 1.3 2004/01/25 19:15:53 jonnymind Exp $
 * Test for GT based graphical functions.
 *
 * Giancarlo Niccolai
@@ -8,6 +8,9 @@
 
 
 PROCEDURE Main()
+
+   //SET GTMODE TO INLINE
+
    SET COLOR TO w+/b
 
    CLEAR SCREEN

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.98 2004/02/03 14:01:13 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.99 2004/02/03 19:02:29 druzus Exp $
  */
 
 /*
@@ -3518,22 +3518,10 @@ static void hb_cdxSetCurKey( LPCDXPAGE pPage )
 /*
  * seek given Key in the Page or in its children
  */
-static int hb_cdxPageSeekKey( LPCDXPAGE pPage, LPCDXKEY pKey, BOOL fExact )
+static int hb_cdxPageSeekKey( LPCDXPAGE pPage, LPCDXKEY pKey, ULONG ulKeyRec, BOOL fExact )
 {
-   int l, r, n = -1, k = 1;
+   int l, r, n, k;
    BOOL fLeaf = ( pPage->PageType & CDX_NODE_LEAF ) != 0;
-   ULONG ulKeyRec = pKey->rec;
-
-   if ( pPage->TagParent->UsrUnique )
-   {
-      if ( pPage->TagParent->UsrAscend )
-      {
-         if ( ulKeyRec == CDX_MAX_REC_NUM )
-            ulKeyRec = CDX_IGNORE_REC_NUM;
-      }
-      else if ( ulKeyRec == CDX_IGNORE_REC_NUM )
-         ulKeyRec = CDX_MAX_REC_NUM;
-   }
 
    if ( fLeaf && !pPage->pKeyBuf && pPage->iKeys > 0 )
    {
@@ -3543,6 +3531,8 @@ static int hb_cdxPageSeekKey( LPCDXPAGE pPage, LPCDXKEY pKey, BOOL fExact )
       pPage->pKeyBuf = pKeyBuf;
    }
 
+   k = ( ulKeyRec == CDX_MAX_REC_NUM ) ? -1 : 1;
+   n = -1;
    l = 0;
    r = pPage->iKeys - 1;
    while ( l < r )
@@ -3589,7 +3579,7 @@ static int hb_cdxPageSeekKey( LPCDXPAGE pPage, LPCDXKEY pKey, BOOL fExact )
          hb_cdxErrInternal("hb_cdxPageSeekKey: wrong parent key.");
       }
 #endif
-      k = hb_cdxPageSeekKey( pPage->Child, pKey, fExact );
+      k = hb_cdxPageSeekKey( pPage->Child, pKey, ulKeyRec, fExact );
    }
    else if ( l != n || ulKeyRec == CDX_MAX_REC_NUM )
    {
@@ -3614,7 +3604,7 @@ static int hb_cdxPageSeekKey( LPCDXPAGE pPage, LPCDXKEY pKey, BOOL fExact )
          if ( !fLeaf )
          {
             hb_cdxPageGetChild( pPage );
-            k = hb_cdxPageSeekKey( pPage->Child, pKey, fExact );
+            k = hb_cdxPageSeekKey( pPage->Child, pKey, ulKeyRec, fExact );
          }
          else
             k = hb_cdxValCompare( pPage->TagParent, pKey->val, pKey->len,
@@ -3910,14 +3900,26 @@ static void hb_cdxTagKeyRead( LPCDXTAG pTag, BYTE bTypRead )
 static ULONG hb_cdxTagKeyFind( LPCDXTAG pTag, LPCDXKEY pKey )
 {
    int K;
+   ULONG ulKeyRec = pKey->rec;
+
+   if ( pTag->UsrUnique )
+   {
+      if ( pTag->UsrAscend )
+      {
+         if ( ulKeyRec == CDX_MAX_REC_NUM )
+            ulKeyRec = CDX_IGNORE_REC_NUM;
+      }
+      else if ( ulKeyRec == CDX_IGNORE_REC_NUM )
+         ulKeyRec = CDX_MAX_REC_NUM;
+   }
 
    pTag->CurKey->rec = 0;
    pTag->fRePos = FALSE;
    hb_cdxTagOpen( pTag );
 
    pTag->TagBOF = pTag->TagEOF = FALSE;
-   K = hb_cdxPageSeekKey( pTag->RootPage, pKey, FALSE );
-   if ( pKey->rec == CDX_MAX_REC_NUM && K != 0 )
+   K = hb_cdxPageSeekKey( pTag->RootPage, pKey, ulKeyRec, FALSE );
+   if ( ulKeyRec == CDX_MAX_REC_NUM )
       K = - K;
 
    if ( K > 0 )
@@ -3939,16 +3941,9 @@ static void hb_cdxTagKeyAdd( LPCDXTAG pTag, LPCDXKEY pKey )
    BOOL fFound;
 
    hb_cdxTagOpen( pTag );
-   if ( pTag->UniqueKey )
-   {
-      ULONG ulRec = pKey->rec;
-      pKey->rec = CDX_IGNORE_REC_NUM;
-      fFound = ( hb_cdxPageSeekKey( pTag->RootPage, pKey, TRUE ) == 0 );
-      pKey->rec = ulRec;
-   }
-   else
-      fFound = ( hb_cdxPageSeekKey( pTag->RootPage, pKey, TRUE ) == 0 );
-
+   fFound = ( hb_cdxPageSeekKey( pTag->RootPage, pKey,
+                                 pTag->UniqueKey ? CDX_IGNORE_REC_NUM : pKey->rec,
+                                 TRUE ) == 0 );
    if ( ! fFound )
    {
 #ifdef HB_CDX_DBGUPDT
