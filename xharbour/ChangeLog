@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2030 2004/01/10 11:13:14 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2031 2004/01/10 12:40:08 tommir Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-10 16:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + static void hb_wvt_gtCreateCaret()
+     + static void hb_wvt_gtKillCaret
+       The above functions are called in hb_wvt_gtSetFont() instead of 
+       SendMessage( _s.hWnd, WM_KILLFOCUS, 0, 0 ) and
+       SendMessage( _s.hWnd, WM_SETFOCUS, 0, 0 ) 
+       because these messages were generating the recursive calls.
+
+     + Callback functions for Window messages WM_SETFOCUS and WM_KILLFOCUS are 
+       activated as Wvt_SetFocus() and Wvt_KillFocus() at the PRG level.
+
+     ! Wvt_DrawBoxRaised(), Wvt_DrawBoxRecessed()
+       Fixed right-bottom corner values.
+   
+   * xharbour/include/hbgtwvt.h
+     + Added members to GLOBAL_DATA _s : pSymWVT_SETFOCUS and pSymWVT_KILLFOCUS
+       to hold handle to PRG functions Wvt_SetFocus() and Wvt_KillFocus().
+
+   * xharbour/tests/wvtgui.prg
+     Amended to reflect Wvt_SetFocus() and Wvt_LostFocus() functionality.
 
 2004-01-10 14:30 UTC+0200 Tommi Rouvali <tommi@rouvali.com>
    * xharbour/source/rtl/trpc.prg

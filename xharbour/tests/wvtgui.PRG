@@ -269,6 +269,31 @@ RestScreen( 7, 48, 13, 55, scr )
 return nChoice
 
 //-------------------------------------------------------------------//
+
+function Wvt_SetFocus( hWnd )
+local nRow := row()
+local nCol := col()
+
+DispOutAt( 1,3, 'Focus Gained!', 'r/w' )
+
+DevPos( nRow, nCol )
+
+return nil
+
+//-------------------------------------------------------------------//
+
+function Wvt_KillFocus( hWnd )
+local nRow := row()
+local nCol := col()
+
+DispOutAt( 1,3, 'Focus Lost...', 'B/w' )
+
+DevPos( nRow, nCol )
+
+return nil
+
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+
 

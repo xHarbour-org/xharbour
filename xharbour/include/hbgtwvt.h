@@ -127,6 +127,8 @@ typedef struct global_data
   HBRUSH    currentBrush;              // Handle to current brush settable by runtime
   HDC       hdc;                       // Handle to Windows Device Context
   PHB_DYNS  pSymWVT_PAINT;             // Stores pointer to WVT_PAINT function
+  PHB_DYNS  pSymWVT_SETFOCUS;          // Stores pointer to WVT_SETFOCUS function
+  PHB_DYNS  pSymWVT_KILLFOCUS;         // Stores pointer to WVT_KILLFOCUS function  
 } GLOBAL_DATA;
 
 BOOL   HB_EXPORT hb_wvt_gtSetMenuKeyEvent( int iMenuKeyEvent );

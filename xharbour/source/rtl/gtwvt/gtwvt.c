@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.35 2004/01/10 08:01:22 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.36 2004/01/10 11:16:07 vouchcac Exp $
  */
 
 /*
@@ -162,6 +162,8 @@ static USHORT  hb_wvt_gtGetIndexForTextBuffer( USHORT col, USHORT row );
 static RECT    hb_wvt_gtGetXYFromColRowRect( RECT colrow );
 static RECT    hb_wvt_gtGetColRowFromXYRect( RECT xy );
 static void    hb_wvt_gtCreateObjects( void );
+static void    hb_wvt_gtKillCaret( void );
+static void    hb_wvt_gtCreateCaret( void );
 
 //-------------------------------------------------------------------//
 //
@@ -1344,7 +1346,7 @@ static void hb_wvt_gtCreateObjects( void )
       
    _s.penWhite     = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 255,255,255 ) );
    _s.penBlack     = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );
-   _s.penWhiteDim  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 215,215,215 ) );
+   _s.penWhiteDim  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 205,205,205 ) );
    _s.penDarkGray  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 150,150,150 ) );
    
    _s.currentPen   = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );   
@@ -1503,10 +1505,10 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
 static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
   static BOOL bIgnoreWM_SYSCHAR = FALSE ;
-  static BOOL bPaint = FALSE;
-
+  static BOOL bPaint     = FALSE;
+  static BOOL bGetFocus  = FALSE;
+    
   BOOL        bRet;
-
 
   switch ( message )
   {
@@ -1554,7 +1556,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         colStart = max( 0, rcRect.left -1 );
         colStop  = min( _s.COLS, rcRect.right+1 );
 
-        for ( irow = rowStart; irow <rowStop; irow++ )
+        for ( irow = rowStart; irow < rowStop; irow++ )
         {
           USHORT icol, index, startIndex, startCol, len;
           BYTE oldAttrib, attrib;
@@ -1620,7 +1622,6 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       return( 0 );
     }
 
-
     case WM_MY_UPDATE_CARET:
     {
       hb_wvt_gtSetCaretPos();
@@ -1632,29 +1633,44 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 #ifdef WVT_DEBUG
   nSetFocus++;
 #endif
-      // create and show the caret
-      // create an underline caret of height - _s.CaretSize
-      //
-      _s.CaretExist = CreateCaret( hWnd, ( HBITMAP ) NULL, _s.PTEXTSIZE.x, _s.CaretSize );
-      if ( _s.CaretExist && _s.displayCaret )
+      hb_wvt_gtCreateCaret() ;
+      
+      if ( bGetFocus )
       {
-         hb_wvt_gtSetCaretPos();
-         ShowCaret( hWnd );
+        if ( _s.pSymWVT_SETFOCUS )
+        {
+          hb_vmPushSymbol( _s.pSymWVT_SETFOCUS->pSymbol );
+          hb_vmPushNil();
+          hb_vmPushLong( ( LONG ) hWnd    );
+          hb_vmDo( 1 );
+          hb_itemGetNL( ( PHB_ITEM ) &hb_stack.Return );
+        }
+      }
+      else
+      {
+        bGetFocus = TRUE;
       }
       return( 0 );
     }
 
     case WM_KILLFOCUS:
+    {
 #ifdef WVT_DEBUG
   nKillFocus++;
 #endif
-      if ( _s.CaretExist )
+      hb_wvt_gtKillCaret();
+      
+      if ( _s.pSymWVT_KILLFOCUS )
       {
-        DestroyCaret();
-        _s.CaretExist = FALSE ;
+        hb_vmPushSymbol( _s.pSymWVT_KILLFOCUS->pSymbol );
+        hb_vmPushNil();
+        hb_vmPushLong( ( LONG ) hWnd );
+        hb_vmDo( 1 );
+        hb_itemGetNL( ( PHB_ITEM ) &hb_stack.Return );
       }
       return( 0 );
-
+    }
+    
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
     {
@@ -2200,6 +2216,32 @@ static RECT hb_wvt_gtGetXYFromColRowRect( RECT colrow )
 }
 
 //-------------------------------------------------------------------//
+
+static void hb_wvt_gtCreateCaret()
+{
+   // create and show the caret
+   // create an underline caret of height - _s.CaretSize
+   //
+   _s.CaretExist = CreateCaret( _s.hWnd, ( HBITMAP ) NULL, _s.PTEXTSIZE.x, _s.CaretSize );
+   if ( _s.CaretExist && _s.displayCaret )
+   {
+      hb_wvt_gtSetCaretPos();
+      ShowCaret( _s.hWnd );
+   }
+}
+
+//-------------------------------------------------------------------//
+ 
+static void hb_wvt_gtKillCaret()
+{
+   if ( _s.CaretExist )
+   {
+      DestroyCaret();
+      _s.CaretExist = FALSE ;
+   }
+}
+
+//-------------------------------------------------------------------//
 /*
  * hb_wvt_gtSetCaretPos converts col and row to x and y ( pixels ) and calls
  * the Windows function SetCaretPos ( with the expected coordinates )
@@ -2534,7 +2576,8 @@ static void gt_hbInitStatics( void )
   _s.InvalidateWindow = TRUE;
   _s.EnableShortCuts  = FALSE;
   _s.pSymWVT_PAINT    = hb_dynsymFind( "WVT_PAINT" ) ;
-
+  _s.pSymWVT_SETFOCUS = hb_dynsymFind( "WVT_SETFOCUS" ) ;
+  _s.pSymWVT_KILLFOCUS= hb_dynsymFind( "WVT_KILLFOCUS" ) ;  
 }
 
 //-------------------------------------------------------------------//
@@ -2808,10 +2851,10 @@ BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold
         //
         hb_wvt_gtResetWindowSize( _s.hWnd );
 
-        // send message to force resize of caret
+        // force resize of caret
         //
-        SendMessage( _s.hWnd, WM_KILLFOCUS, 0, 0 );
-        SendMessage( _s.hWnd, WM_SETFOCUS , 0, 0 );
+        hb_wvt_gtKillCaret();
+        hb_wvt_gtCreateCaret();
       }
       bResult= TRUE;
     }
@@ -3247,6 +3290,7 @@ HB_FUNC( WVT_DRAWBOXGET )
    xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
    yz = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ) + hb_parni( 3 ), hb_parni( 1 ) + 1 );
 
+
    SelectObject( _s.hdc, _s.penBlack );
 
    MoveToEx( _s.hdc, xy.x-1, xy.y-1, NULL );        // Top Inner
@@ -3308,7 +3352,7 @@ HB_FUNC( WVT_DRAWBOXRAISED )
    SelectObject( _s.hdc, _s.penBlack );
 
    MoveToEx( _s.hdc, iLeft-1, iBottom+1, NULL ); //  Bottom Outer
-   LineTo( _s.hdc, iRight+1, iBottom+1 );
+   LineTo( _s.hdc, iRight+1+1, iBottom+1 );
 
    MoveToEx( _s.hdc, iRight+1, iTop-1, NULL );   //  Right Outer
    LineTo( _s.hdc, iRight+1, iBottom+1 );
@@ -3331,7 +3375,7 @@ HB_FUNC( WVT_DRAWBOXRECESSED )
    iBottom = xy.y;
    iRight  = xy.x;
 
-   SelectObject( _s.hdc, _s.penWhite );
+   SelectObject( _s.hdc, _s.penWhiteDim );
 
    MoveToEx( _s.hdc, iRight, iTop, NULL );            // Right Inner
    LineTo( _s.hdc, iRight, iBottom );
@@ -3339,13 +3383,13 @@ HB_FUNC( WVT_DRAWBOXRECESSED )
    MoveToEx( _s.hdc, iLeft, iBottom, NULL );          // Bottom Inner
    LineTo( _s.hdc, iRight, iBottom );
 
-   SelectObject( _s.hdc, _s.penWhiteDim );
-
+   SelectObject( _s.hdc, _s.penWhite );
+   
    MoveToEx( _s.hdc, iRight+1, iTop-1, NULL );        // Right Outer
    LineTo( _s.hdc, iRight + 1, iBottom + 1 );
 
    MoveToEx( _s.hdc, iLeft - 1, iBottom + 1, NULL );  // Bottom Outer
-   LineTo( _s.hdc, iRight + 1, iBottom + 1 );
+   LineTo( _s.hdc, iRight + 2, iBottom + 1 );
 
    SelectObject( _s.hdc, _s.penBlack );
 
