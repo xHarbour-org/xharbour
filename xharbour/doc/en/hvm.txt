@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.txt,v 1.10 2000/08/12 23:39:20 lculik Exp $
+ * $Id: hvm.txt,v 1.1.1.1 2001/12/21 10:48:51 ronpinkas Exp $
  */
 
 /*
@@ -383,13 +383,13 @@
 
 /*  $DOC$
  *  $FUNCNAME$
- *      __VMVARLGET()
+ *      HB_DBG_VMVARLGET()
  *  $CATEGORY$
  *      Variable Management
  *  $ONELINER$
  *      Retrive a local variable from a procedure level
  *  $SYNTAX$
- *      __VMVARLGET( <nProcLevel>, <nLocal> )
+ *      HB_DBG_VMVARLGET( <nProcLevel>, <nLocal> )
  *  $ARGUMENTS$
  *      <nProcLevel> Is the procedure level, same as used in ProcName()
  *      and ProcLine(), from which a local variable containts is going to

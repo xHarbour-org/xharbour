@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.20 2004/01/27 11:45:13 likewolf Exp $
+ * $Id: debugger.prg,v 1.21 2004/01/29 14:25:59 likewolf Exp $
  */
 
 /*
@@ -212,7 +212,7 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
       case nMode == HB_DBG_MODULENAME  // called from hvm.c hb_vmModuleName()
         // add a call to the stack but don't try to show the code yet
         cProcName := ProcName( 1 )
-        if cProcName == "__EVAL" .OR. cProcName == "EVAL"
+        if cProcName = "(b)" // cProcName == "__EVAL" .OR. cProcName == "EVAL"
           s_oDebugger:lCodeblock := .T.
         ELSE
           IF( s_oDebugger:lNextRoutine )
