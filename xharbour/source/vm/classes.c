@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.114 2004/04/08 00:14:15 ronpinkas Exp $
+ * $Id: classes.c,v 1.115 2004/04/08 13:26:54 druzus Exp $
  */
 
 /*
@@ -442,7 +442,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
 
       PHB_ITEM *pBase = HB_VM_STACK.pBase;
       PHB_ITEM pCaller;
-      PCLASS pClass = s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ), pRealClass;
+      PCLASS pClass = s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ), pRealClass = pClass;
 
       // ----------------- Get the Caller Symbol -----------------
       if( iOptimizedSend == 0 )
@@ -484,11 +484,6 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
             pRealClass = s_pClasses + ( uiSuperClass - 1 );
          }
       }
-      else
-      {
-         pRealClass = pClass;
-      }
-
 
       // ----------------- Compare Modules -----------------
 

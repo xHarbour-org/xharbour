@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2775 2004/04/09 01:05:26 druzus Exp $
+ * $Id: ChangeLog,v 1.2776 2004/04/09 01:47:53 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-09 12:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+    ! Fixed initialization of pRealClass in hb_clsValidScope() - thanks to Przemek
+  * source/vm/runner.c
+    * Removed unneeded static qualifier.
 
 2004-04-09 04:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbcmd.c
