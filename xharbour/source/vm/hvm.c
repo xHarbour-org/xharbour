@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.171 2003/03/07 03:04:46 ronpinkas Exp $
+ * $Id: hvm.c,v 1.172 2003/03/07 05:32:43 ronpinkas Exp $
  */
 
 /*
@@ -5172,7 +5172,7 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
 
     if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
     {
-       ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 1 );
+       ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = (char *) hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 1 );
        strcpy( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, hb_objGetRealClsName( *( HB_VM_STACK.pBase + 1 ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName ) );
        strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ":" );
        strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
@@ -5215,7 +5215,7 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
     */
    if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
    {
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 1 );
+      ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = (char *) hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 1 );
       strcpy( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, hb_objGetRealClsName( *( HB_VM_STACK.pBase + 1 ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName ) );
       strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ":" );
       strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
@@ -5257,7 +5257,7 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
     */
     if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
     {
-       ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 1 );
+       ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = (char *) hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 1 );
        strcpy( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, hb_objGetRealClsName( *( HB_VM_STACK.pBase + 1 ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName ) );
        strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ":" );
        strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
@@ -6668,11 +6668,11 @@ HB_FUNC( HB_EXECFROMARRAY )
 
    if( pSelf )
    {
-      hb_vmSend( ulLen - ulStart + 1 );
+      hb_vmSend( (USHORT) ( ulLen - ulStart + 1 ) );
    }
    else
    {
-      hb_vmDo( ulLen - ulStart + 1);
+      hb_vmDo( (USHORT) ( ulLen - ulStart + 1 ) );
    }
 }
 
