@@ -1,5 +1,5 @@
 /*
- * $Id: tpopup.prg,v 1.3 2002/11/13 20:43:13 walito Exp $
+ * $Id: tpopup.prg,v 1.4 2003/01/27 04:03:12 walito Exp $
  */
 
 /*
@@ -120,7 +120,7 @@ CLASS PopUpMenu
 
    /* NOTE: This method is new in Harbour */
 #ifdef HB_EXTENSION
-   METHOD SetCoors( nItem, nRow, nCol )
+   METHOD SetCoors( nRow, nCol, lTop )
 #endif
 
    METHOD IsShortCut( nKey, nID )
@@ -477,7 +477,8 @@ return Self
 
 #ifdef HB_EXTENSION
 //--------------------------------------------------------------------------//
-METHOD SetCoors( nItem, nRow, nCol ) CLASS PopUpMenu
+METHOD SetCoors( nRow, nCol, lTop ) CLASS PopUpMenu
+   Local oItem
 
    if ::top == -1 .or. ::left == -1
       ::top    := nRow
@@ -485,16 +486,39 @@ METHOD SetCoors( nItem, nRow, nCol ) CLASS PopUpMenu
       ::bottom := ::top + ::itemCount + 1
       ::right  := ::left + ::width - 1
 
-      /* Just to avoid the warning by now (compiling with -w2) */
-      nItem := nItem
-
-/* UNTESTED: I will wait until the bug in the classes.c module is fixed.
-             However it should work this way.
-             This updates the child popup coords of a given popup.
-      if nItem > 0 .and. ::aItems[ nItem ]:isPopup()
-         ::aItems[ nItem ]:data:SetCoors( 0, row, ::right + 1 )
+      if ::right > maxcol()
+         nDif    := ::right - maxcol()
+         ::right -= nDif
+         ::left  -= nDif
+         if !lTop
+            ::top++
+         endif
       endif
-*/
+
+      if ::left < 0
+         nDif    := ::left
+         ::right -= nDif
+         ::left  -= nDif
+      endif
+
+      if ::bottom > maxrow()
+         nDif     := ::bottom - maxrow()
+         ::bottom -= nDif
+         ::top    -= nDif
+      endif
+
+      if ::top < 0
+         nDif     := ::top
+         ::bottom -= nDif
+         ::top    -= nDif
+      endif
+
+      for each oItem in ::aItems
+         if oItem:isPopup()
+            oItem:data:SetCoors( nRow + HB_EnumIndex(), ::right + 1, .f. )
+         endif
+      next
+
 
    endif
 

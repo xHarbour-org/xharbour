@@ -1,5 +1,5 @@
 /*
- * $Id: ttopbar.prg,v 1.2 2002/11/13 20:45:41 walito Exp $
+ * $Id: ttopbar.prg,v 1.3 2003/01/27 04:03:12 walito Exp $
  */
 
 /*
@@ -417,7 +417,7 @@ METHOD Display() CLASS TopBarMenu
       endif
 
       if aItems:isPopup()
-         aItems:data:SetCoors( HB_EnumIndex(), ::row + 1, aItems:column )
+         aItems:data:SetCoors( ::row + 1, aItems:column, .t. )
       endif
 
    next
