@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.16 2004/02/27 16:45:38 andijahja Exp $
+ * $Id: direct.c,v 1.17 2004/02/27 22:04:47 andijahja Exp $
  */
 
 /*
@@ -95,7 +95,6 @@
  * TOFIX:- Volume label support
  *
  */
-
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbapiitm.h"
@@ -300,6 +299,89 @@ PHB_ITEM HB_EXPORT hb_fsDirectory( char* szSkleton, char* szAttributes, BOOL bDi
    }
 
    return ( pDir );
+}
+
+static int isdot( char *szIn )
+{
+   int iSzLen = strlen( szIn );
+   int iRet = 0;
+
+   while( iSzLen )
+   {
+      if ( szIn [ iSzLen ] == '.' )
+      {
+         if ( szIn [ iSzLen - 1 ] == '\\' )
+         {
+            iRet = iSzLen;
+            break;
+         }
+         else if ( szIn [ iSzLen - 1 ] == '.' )
+         {
+            iSzLen -- ;
+            if ( szIn [ iSzLen - 1 ] == '\\' )
+            {
+              iRet = iSzLen;
+              break;
+            }
+         }
+      }
+
+      iSzLen --;
+   }
+
+   return iRet;
+}
+
+static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult )
+{
+   ULONG ui, uiLen = pRecurse->item.asArray.value->ulLen;
+
+   for ( ui = 0; ui < uiLen; ui ++ )
+   {
+      PHB_ITEM pEntry = hb_arrayGetItemPtr( pRecurse, ui + 1 );
+      char *szEntry = hb_arrayGetC( pEntry, 1 );
+
+      if ( isdot( szEntry ) == 0 )
+      {
+         if ( hb_fsIsDirectory( ( BYTE * ) szEntry ) )
+         {
+            char *szSubdir = hb_xstrcpy(NULL,szEntry,"\\*.*",NULL);
+            PHB_ITEM pSubDir = hb_fsDirectory( szSubdir, "D", FALSE, TRUE );
+            hb_fsDirectoryCrawler( pSubDir, pResult );
+            hb_xfree( szSubdir );
+            hb_itemRelease( pSubDir );
+         }
+         else
+         {
+            hb_arrayAddForward( pResult, pEntry );
+         }
+      }
+
+      hb_xfree( szEntry );
+   }
+}
+
+PHB_ITEM HB_EXPORT hb_fsDirectoryRecursive( char* szSkleton )
+{
+   PHB_ITEM pDir = hb_fsDirectory( szSkleton, "D", FALSE, TRUE );
+   PHB_ITEM pResult = hb_itemNew(NULL);
+   hb_arrayNew( pResult, 0 );
+   hb_fsDirectoryCrawler( pDir, pResult );
+   hb_itemRelease( pDir );
+   return pResult;
+}
+
+HB_FUNC( DIRECTORYRECURSE )
+{
+   if ( ISCHAR(1) )
+   {
+      PHB_ITEM pDir = hb_fsDirectoryRecursive( hb_parc(1) );
+      hb_itemRelease( hb_itemReturn( pDir ) );
+   }
+   else
+   {
+      hb_reta( 0 );
+   }
 }
 
 HB_FUNC( DIRECTORY )

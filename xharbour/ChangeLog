@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2430 2004/02/29 23:10:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2431 2004/02/29 23:31:38 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-01 09:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * include/hbapifs.h
+     + PHB_ITEM HB_EXPORT hb_fsDirectoryRecursive( char* ) returns a multi
+       dimensional array each of which containing information of file names
+       of a given skleton.
+
+   * source/rtl/direct.c
+     + Function DIRECTORYRECURSE(), PRG Level directory function which
+       returns a multi dimensional array each of which containing information
+       of file names of a given skleton.
+
+   + tests/dirtest3.prg
+     + test program for DIRECTORYRECURSE()
+
+   /*
+      Example: DIRECTORYRECURSE( "C:\WINDOWS\*.*")
+      Returns array containing all files in C:\windows and its sub-folders.
+      Note: Must supply full path skleton!
+   */
 
 2004-03-01 00:33 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * doc/xharbour.rsp

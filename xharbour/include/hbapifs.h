@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.28 2004/02/14 22:11:50 andijahja Exp $
+ * $Id: hbapifs.h,v 1.29 2004/02/27 22:04:47 andijahja Exp $
  */
 
 /*
@@ -145,6 +145,8 @@ extern USHORT   HB_EXPORT hb_fsWrite      ( FHANDLE hFileHandle, BYTE * pBuff, U
 extern ULONG    HB_EXPORT hb_fsWriteLarge ( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount ); /* write to an open file from a buffer (>64K) */
 extern FHANDLE  HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode );
 extern PHB_ITEM HB_EXPORT hb_fsDirectory( char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
+extern PHB_ITEM HB_EXPORT hb_fsDirectoryRecursive( char* szSkleton );
+
 /* Open a child process */
 extern FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename, FHANDLE *fhStdin, FHANDLE *fhStdout, FHANDLE *fhStderr, BOOL bBackground );
 extern BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle );
