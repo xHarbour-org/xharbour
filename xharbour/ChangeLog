@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2837 2004/04/26 19:32:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2838 2004/04/27 15:25:46 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-26 20:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/include/hbgtwvt.h
+    + #define WVT_PICTURES_MAX  20
+    + IPicture _s.iPicture[ WVT_PICTURES_MAX ]
+      Array to hold image stream loaded by hb_wvt_gtLoadPicture().
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + hb_wvt_gtLoadPicture()
+    + hb_wvt_gtRenderPicture()
+    + Wvt_LoadPicture( cImageFile, nSlot )
+    + Wvt_DrawPicture( nTop, nLeft, nBottom, nRight, aAdjPixels )
+      hb_wvt_gtDrawImage() code is broken in two section, 1) to load image, 
+      and 2) render image. The image thus loaded is retained in _s.iPicture[ iSlot ]
+      array slot and rendered when required.
+
+    * Wvt_DrawImage()
+    * Wvt_DrawButton() 
+      Now both these functions accept <cImage/nImageSlot> as its respective parameter.
+  
+  * xharbour/tests/wvtgui.prg
+    Updated to demonstrate the mechanism achieved with above functions.
+
+  /*
+     It is a common practice with every application to have common buttons and images
+     for a variety of dialogs. So, to speedup the refresh time, AND, more importantly,
+     to prevent GDI resources to be exhausted ( Win9x systems ), this mechanism has
+     facilitated superbly. Hope you all will find it useful.
+  */
 
 2004-04-27 08:20 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * hrbdll.bc
