@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.377 2002/09/07 04:02:18 lculik Exp $
+ * $Id: ChangeLog,v 1.378 2002/09/16 05:34:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-16 11:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * makefile.vc
+    + Added /FORCE:MULTIPLE to switches used to build hbmake.exe to overcome link error.
+
+  * bin/bld.bat
+    + Added 2nd prg support to MSVC, and corrected typo.
+
+  * source/compiler/genc.c
+  * source/pp/ppcore.c
+    + Added missing ; required by MSVC.
+
+  * source/rdd/dbfcdx/dbfcdx1.c
+    + Added type casts required by MSVC.
 
 2002-09-15 22:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbcomp.h

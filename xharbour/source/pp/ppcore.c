@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.25 2002/08/11 05:03:16 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.26 2002/08/27 17:54:54 ronpinkas Exp $
  */
 
 /*
@@ -3157,7 +3157,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                   #endif
 
                 Instanciated :
-
+                  ;
                }
                else
                {

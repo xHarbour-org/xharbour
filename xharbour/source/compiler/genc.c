@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.14 2002/06/17 21:30:42 andijahja Exp $
+ * $Id: genc.c,v 1.15 2002/09/16 05:34:01 ronpinkas Exp $
  */
 
 /*
@@ -238,35 +238,35 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
 
       if( hb_comp_pGlobals )
       {
-         PVAR pLastVar = hb_comp_pGlobals, pDelete;
+         PVAR pGlobal = hb_comp_pGlobals;
 
          fprintf( yyc, "\n#include \"hbapi.h\"\n\n" );
 
          iGlobals       = 0;
 
-         while( pLastVar )
+         while( pGlobal )
          {
-            if( pLastVar->szAlias == NULL )
+            if( pGlobal->szAlias == NULL )
             {
-               fprintf( yyc, "HB_ITEM %s = { 0, 0 };\n", pLastVar->szName );
+               fprintf( yyc, "HB_ITEM %s = { 0, 0 };\n", pGlobal->szName );
             }
             else
             {
-               fprintf( yyc, "extern HB_ITEM %s;\n", pLastVar->szName );
+               fprintf( yyc, "extern HB_ITEM %s;\n", pGlobal->szName );
             }
-            pLastVar = pLastVar->pNext;
+            pGlobal = pGlobal->pNext;
             iGlobals++;
          }
 
          fprintf( yyc, "\nstatic PHB_ITEM pGlobals[] = {\n" );
 
-         pLastVar = hb_comp_pGlobals;
+         pGlobal = hb_comp_pGlobals;
 
-         while( pLastVar )
+         while( pGlobal )
          {
-            fprintf( yyc, "                                &%s%c\n", pLastVar->szName, pLastVar->pNext ? ',' : ' ' );
+            fprintf( yyc, "                                &%s%c\n", pGlobal->szName, pGlobal->pNext ? ',' : ' ' );
 
-            pLastVar = pLastVar->pNext;
+            pGlobal = pGlobal->pNext;
          }
 
          fprintf( yyc, "                             };\n\n" );

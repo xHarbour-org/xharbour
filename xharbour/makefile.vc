@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.14 2002/06/12 11:53:06 ronpinkas Exp $
+# $Id: makefile.vc,v 1.15 2002/08/28 00:36:45 lculik Exp $
 #
 
 #
@@ -907,7 +907,7 @@ $(HBMAKE_EXE) : \
                                    $(OBJ_DIR)\pickfile.c \
                                    $(OBJ_DIR)\prb_stak.c \
                                    $(HBMAKE_DIR)\hbmlang.c \
-                   -o $(HBMAKE_EXE) /link $(LDFLAGS) $(LIBS2)
+                   -o $(HBMAKE_EXE) /link $(LDFLAGS) /FORCE:MULTIPLE $(LIBS2)
 
 #
 # HARBOUR.EXE rules
