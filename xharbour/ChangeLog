@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3413 2004/09/08 00:17:04 druzus Exp $
+ * $Id: ChangeLog,v 1.3414 2004/09/08 02:50:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2004-09-07 19:49 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/hbini.prg
-    + Added support for 3rd optional param <cSpliters> to HB_ReadIni().
+    + Added support for 3rd optional param <cSplitters> to HB_ReadIni().
 
   /*
      Giancarlo, I did it that way to not break possible existing code,

@@ -1,5 +1,5 @@
 /*
-* $Id: hbini.prg,v 1.5 2004/03/06 11:35:26 jonnymind Exp $
+* $Id: hbini.prg,v 1.6 2004/09/08 02:50:16 ronpinkas Exp $
 */
 
 /*
@@ -90,14 +90,14 @@ PROCEDURE HB_SetIniComment( cLc, cHlc )
 RETURN
 
 
-FUNCTION HB_ReadIni( cFileSpec, bKeyCaseSens, cSpliters )
+FUNCTION HB_ReadIni( cFileSpec, bKeyCaseSens, cSplitters )
    LOCAL hIni := Hash()
 
    hIni[ "MAIN" ] := Hash()
 
-RETURN HB_ReadIni2( hIni, cFileSpec, bKeyCaseSens, cSpliters )
+RETURN HB_ReadIni2( hIni, cFileSpec, bKeyCaseSens, cSplitters )
 
-STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSpliters )
+STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSplitters )
    LOCAL aFiles
    LOCAL cFile, nLen
    LOCAL aKeyVal, hCurrentSection
@@ -128,8 +128,8 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSpliters )
       bKeyCaseSens := .T.
    ENDIF
 
-   IF cSpliters == NIL
-      cSpliters := "=|:"
+   IF cSplitters == NIL
+      cSplitters := "=|:"
    ENDIF
 
    /* we'll read the whole file, then we'll break it in lines. */
@@ -226,7 +226,7 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSpliters )
 
       //Is it a valid key?
 
-      aKeyVal := HB_RegexSplit( cSpliters, cLine,,,2 )
+      aKeyVal := HB_RegexSplit( cSplitters, cLine,,,2 )
       IF Len( aKeyVal ) == 1
          //TODO: Signal error
          cLine := ""
