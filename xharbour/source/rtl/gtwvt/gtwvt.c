@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.119 2004/07/27 16:56:15 lf_sfnet Exp $
+ * $Id: gtwvt.c,v 1.120 2004/07/28 19:48:50 maurifull Exp $
  */
 
 /*
@@ -4010,6 +4010,9 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
 
       case GTI_ICONFILE:
          return (long) hb_wvt_gtSetWindowIconFromFile( (char *) vpParam  );
+
+      case GTI_ICONRES:
+         return (long) hb_wvt_gtSetWindowIcon( iParam );
 
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.5 2004/06/28 14:16:33 jonnymind Exp $
+ * $Id: gtinfo.ch,v 1.6 2004/07/27 16:56:15 lf_sfnet Exp $
  */
 
 /*
@@ -77,6 +77,7 @@
 #define GTI_CODEPAGE      25  /* codepage */
 #define GTI_WINTITLE      26  /* title */
 #define GTI_ICONFILE      27  /* icon file */
+#define GTI_ICONRES       28  /* icon resource */
 
 #define GTI_INPUTFD       30  /* Get Standard input steream of application/GT */
 #define GTI_OUTPUTFD      31  /* Get Standard output steream of application/GT */

@@ -90,7 +90,7 @@
 #define K_NCMOUSEMOVE           1016   // Non-Client Area Mouse Movement
 
 #define K_MINMOUSE              1001
-#define K_MAXMOUSE              1016
+#define K_MAXMOUSE              1015
 
 /* Cursor movement keys */
 
@@ -219,7 +219,7 @@
 
 #endif
 
-#ifndef HB_CTRL_KEYS_CODES
+#ifndef HB_NEW_KCTRL
 
 /* Clipper compatible control keys */
 

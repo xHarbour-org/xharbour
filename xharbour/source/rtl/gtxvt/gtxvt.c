@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.39 2004/06/09 14:29:04 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.40 2004/06/28 14:16:34 jonnymind Exp $
  */
 
 /*
@@ -2244,6 +2244,7 @@ static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt)
 
    XLookupString( evt , buf, 5, &out, &compose );
    //printf( "BUF: %s\n", buf );
+   // printf( "OUT: %d\n", (int)out );
 
    switch( out )
    {
@@ -2306,6 +2307,16 @@ static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt)
          break;
       case XK_Tab:
          ikey = K_TAB;
+         break;
+      case XK_ISO_Left_Tab:
+         if ( s_modifiers.bCtrl ) 
+         {
+            ikey = K_CTRL_SH_TAB;
+         } 
+         else 
+         {
+            ikey = K_SH_TAB;
+         }
          break;
       case XK_Linefeed: case XK_Return:
          ikey = K_ENTER;
@@ -2403,6 +2414,10 @@ static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt)
          if ( (out >= XK_KP_0 && out <= XK_KP_9) || out == XK_KP_Decimal )
          {
             xvt_bufferQueueKey( buffer, *buf );
+         }
+         else if (out >= 'a' && out <= 'z')
+         {
+            xvt_bufferQueueKey( buffer, xvt_keyTranslate( out ) );
          }
          else
          {
