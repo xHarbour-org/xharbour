@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.68 2004/01/30 09:38:28 andijahja Exp $
+ * $Id: dbcmd.c,v 1.69 2004/02/04 00:51:45 andijahja Exp $
  */
 
 /*
@@ -2498,7 +2498,7 @@ HB_FUNC( DBUSEAREA )
       return;
    }
 
-   hb_xfree( szFileName );
+   // hb_xfree( szFileName );
 }
 
 HB_FUNC( __DBZAP )
