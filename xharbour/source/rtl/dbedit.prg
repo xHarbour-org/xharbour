@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.17 2004/01/22 22:23:58 maurifull Exp $
+ * $Id: dbedit.prg,v 1.18 2004/01/26 19:42:12 maurifull Exp $
  */
 
 /*
@@ -97,8 +97,10 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
 
   If Empty(aCols)
     // If no database in use, do nothing
+    // For clipper compatibility we must call Errorsys() with error 2001 !
     If !Used()
-      Return .F.
+//      Return .F.
+    Throw( ErrorNew( "DBCMD", 2001, ProcName(), "WorkArea not in use" ) )
     End
     aCols := Array(FCount())
     For Each i In aCols
@@ -113,7 +115,7 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
   //       so the output is ugly with them
   SetIfNil(xHSep, Chr(196) + Chr(194) + Chr(196))
   SetIfNil(xCSep, ' ' + Chr(179) + ' ')
-  
+
   IIf(HB_ISNIL(xFSep) .And. !Empty(xFoot), xFSep := Chr(196) + Chr(193) + Chr(196), .T.)
 
   oTBR := TBrowseDB(nTop, nLeft, nBottom, nRight)
@@ -193,7 +195,7 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
   oTBR:invalidate()
   oTBR:forceStable()
   oTBR:deHilite()
-  
+
   i := RecNo()
   Go Top
   If (Eof() .Or. RecNo() == LastRec() + 1) .And. Bof()
@@ -348,7 +350,7 @@ Static Function _DoUserFunc(bFun, nMode, nColPos, oTBR)
 Local nRet, nRec := RecNo()
 
   nRet := Eval(bFun, nMode, nColPos, oTBR)
- 
+
   If RecNo() != nRec .And. nRet != DE_ABORT
     nRet := DE_REFRESH
   End
