@@ -63,7 +63,11 @@ restrictions:
  *    HB_FUNC( HB_REGEX* )
  *
  */
+
+#include "hbdefs.h"
+#include "hbstack.h"
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbapierr.h"
 
 /* Begin of maketables.c */
@@ -6415,7 +6419,7 @@ HB_FUNC( HB_ATX )
  *  HVM when executing the HB_P_MATCH and HB_P_LIKE operator. In such case the operands
  *  are passed directly.
  */
-BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
+BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 {
    #ifndef REGEX_MAX_GROUPS
       #define REGEX_MAX_GROUPS 16

@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.8 2003/02/04 23:43:44 ronpinkas Exp $
+ * $Id: trace.c,v 1.9 2003/03/02 15:22:31 jonnymind Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ void hb_traceInit( void )
    FILE *fpTrace;
    PHB_DYNS pTraceLog = hb_dynsymFind( "TRACELOG" );
 
-   
+
 #ifdef HB_THREAD_SUPPORT
    HB_CRITICAL_INIT( s_CriticalMutex );
 #endif
@@ -103,7 +103,9 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
       return;
    }
 
-   HB_CRITICAL_LOCK( s_CriticalMutex );
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_LOCK( s_CriticalMutex );
+   #endif
 
    if( sFile == NULL )
    {
@@ -125,8 +127,9 @@ void TraceLog( const char * sFile, const char * sTraceMsg, ... )
       fclose( hFile );
    }
 
-   HB_CRITICAL_UNLOCK( s_CriticalMutex );
-
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_UNLOCK( s_CriticalMutex );
+   #endif
 }
 
 HB_FUNC( HB_TRACESTATE )

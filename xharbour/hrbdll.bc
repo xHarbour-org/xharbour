@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.9 2003/01/19 21:43:45 andijahja Exp $
+# $Id: hrbdll.bc,v 1.10 2003/01/27 04:51:26 walito Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -218,6 +218,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\objfunc.obj \
   $(OBJ_DIR)\readkey.obj \
   $(OBJ_DIR)\readvar.obj \
+  $(OBJ_DIR)\regex.obj \
   $(OBJ_DIR)\setfunc.obj \
   $(OBJ_DIR)\setta.obj \
   $(OBJ_DIR)\tbcolumn.obj \
@@ -333,11 +334,11 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msgsriso.obj \
   $(OBJ_DIR)\msgzhgb.obj \
   $(OBJ_DIR)\msgzhb5.obj \
-# $(OBJ_DIR)\ppcomp.obj \
-# $(OBJ_DIR)\ppcore.obj \
-# $(OBJ_DIR)\pplib.obj \
-# $(OBJ_DIR)\pptable.obj \
-# $(OBJ_DIR)\pragma.obj \
+  $(OBJ_DIR)\ppcomp.obj \
+  $(OBJ_DIR)\ppcore.obj \
+  $(OBJ_DIR)\pplib.obj \
+  $(OBJ_DIR)\pptable.obj \
+  $(OBJ_DIR)\pragma.obj \
   $(OBJ_DIR)\gtwin.obj \
   $(OBJ_DIR)\mousewin.obj \
   $(OBJ_DIR)\dbgmenu.obj \
@@ -468,6 +469,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\radiobtn.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\radiogrp.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\rat.obj               + >> hdll.tmp
+  echo. $(OBJ_DIR)\regex.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\replic.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\right.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\round.obj             + >> hdll.tmp
@@ -661,8 +663,9 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\tbrwtext.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgwa.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\maindllh.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\tprint.obj               + >> hdll.tmp
-  echo. $(OBJ_DIR)\tprinter.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\tprint.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\tprinter.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\win32ole.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\hvm.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\fastitem.obj          + >> hdll.tmp
   echo. $(BCC_DIR)\lib\c0d32w.obj,       + >> hdll.tmp
@@ -714,12 +717,6 @@ $(OBJ_DIR)\dbcmd.obj : $(RDD_DIR)\dbcmd.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\cstr.c : $(RTL_DIR)\cstr.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\cstr.obj : $(OBJ_DIR)\cstr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\dbf0.c : $(RDD_DIR)\dbf0.prg
@@ -821,10 +818,16 @@ $(OBJ_DIR)\codebloc.obj : $(VM_DIR)\codebloc.c
 $(OBJ_DIR)\debug.obj : $(VM_DIR)\debug.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\do.obj : $(VM_DIR)\do.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\dynlibhb.obj : $(VM_DIR)\dynlibhb.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\dynsym.obj : $(VM_DIR)\dynsym.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\errorapi.obj : $(VM_DIR)\errorapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\eval.obj : $(VM_DIR)\eval.c
@@ -1001,6 +1004,12 @@ $(OBJ_DIR)\console.obj : $(RTL_DIR)\console.c
 $(OBJ_DIR)\copyfile.obj : $(RTL_DIR)\copyfile.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\cstr.c : $(RTL_DIR)\cstr.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\cstr.obj : $(OBJ_DIR)\cstr.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\datec.obj : $(RTL_DIR)\datec.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -1064,9 +1073,6 @@ $(OBJ_DIR)\dircmd.c : $(RTL_DIR)\dircmd.prg
 $(OBJ_DIR)\dircmd.obj : $(OBJ_DIR)\dircmd.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\do.obj : $(RTL_DIR)\do.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
 $(OBJ_DIR)\dummy.c : $(RTL_DIR)\dummy.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
@@ -1074,9 +1080,6 @@ $(OBJ_DIR)\dummy.obj : $(OBJ_DIR)\dummy.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\empty.obj : $(RTL_DIR)\empty.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\errorapi.obj : $(RTL_DIR)\errorapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\errorsys.c : $(RTL_DIR)\errorsys.prg
@@ -1332,6 +1335,9 @@ $(OBJ_DIR)\readvar.c : $(RTL_DIR)\readvar.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\readvar.obj : $(OBJ_DIR)\readvar.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\regex.obj : $(RTL_DIR)\regex.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\replic.obj : $(RTL_DIR)\replic.c
