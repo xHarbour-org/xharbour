@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.32 2002/10/09 08:49:17 what32 Exp $
+ * $Id: ChangeLog,v 1.33 2002/10/09 13:00:19 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-10-09 22:00 UTC -0300 Luiz Rafael Culik <culikr@uol.com.br>
+   * _winmous.c
+     _winscrlb.c
+     _winmenu.c
+     * Conditional compilation added to
+       ENDMENU(),GETCURSORINFO(),GETSCROLLBARINFO()
+      
 2002-10-09 18:30 UCT+0530 Pritpal Bedi <vouch32@vouchcac.com>
    * _WinSys.c
      + FileTimeToSystemTime( ( FILETIME ) fileTime, @cSysTime )
