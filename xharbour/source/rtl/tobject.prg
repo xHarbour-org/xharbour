@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.11 2003/11/10 00:59:32 fsgiudice Exp $
+ * $Id: tobject.prg,v 1.12 2003/11/17 10:58:50 toninhofwi Exp $
  */
 
 /*
@@ -193,9 +193,12 @@ FUNCTION TAssociativeArray( aInit, lCase )
    IF ValType( aInit ) == 'A'
       hClass := __clsNew( "TASSOCIATIVEARRAY", Len( aInit ), 1 )
 
+      aKeys := Array(Len( aInit ))
+
       FOR EACH aMember IN aInit
          __clsAddMsg( hClass, aMember[1], nSeq++, HB_OO_MSG_PROPERTY, aMember[2], HB_OO_CLSTP_EXPORTED, .T., .T. )
-         aAdd( aKeys, aMember[1] )
+//         aAdd( aKeys, aMember[1] )
+         aKeys[HB_EnumIndex()] := aMember[1]
       NEXT
    ELSE
       hClass := __clsNew( "TASSOCIATIVEARRAY", 0, 1 )
@@ -257,14 +260,14 @@ RETURN NIL
 STATIC FUNCTION TAssociativeArray_SendKey( cKey, xParam )
     LOCAL Self := QSelf()
     LOCAL cMsg, cProperty
-    LOCAL hClass, nSeq, aKeys
+    LOCAL hClass, nSeq  //, aKeys
     LOCAL xRet
 
     //cKey := Upper( cKey )
-    aKeys := __ObjSendMsg( Self, "Keys" )
+    //aKeys := __ObjSendMsg( Self, "Keys" )
     //TraceLog( "PCOUNT(), cKey, xParam", PCOUNT(), cKey, xParam )
 
-    IF !( cKey IN aKeys )
+    IF !( cKey IN ::Keys )
        hClass    := ::ClassH
        nSeq      := __cls_IncData( hClass )
 
@@ -286,16 +289,7 @@ RETURN xRet
  *
 */
 STATIC FUNCTION TAssociativeArray_GetKeyPos( cKey )
-    LOCAL Self := QSelf()
-    LOCAL aKeys, nPos := 0
-
-    aKeys := __ObjSendMsg( Self, "Keys" )
-
-    IF !( cKey IN aKeys )
-       nPos := aScan( aKeys, {|e| e == cKey } )
-    ENDIF
-
-RETURN nPos
+RETURN aScan( QSelf():Keys, cKey, .T. )
 
 /*
  * (C) 2003 - Francesco Saverio Giudice
@@ -321,8 +315,7 @@ STATIC FUNCTION TAssociativeArray_GetKey( cKey, lCaseSensitive )
 
     IF !lCaseSensitive
        cMsg := Upper( cKey )
-       nPos := aScan( aKeys, {|e| Upper( e ) == cMsg } )
-       IF nPos > 0
+       IF (nPos := aScan( aKeys, {|e| Upper( e ) == cMsg } )) > 0
           xRet := __ObjSendMsgCase( Self, aKeys[ nPos ] )
        ENDIF
     ELSE
@@ -362,59 +355,56 @@ RETURN lOld
 */
 
 procedure HashAddMember( aName, cType, uInit, oObj )
-
-   local nLen := Len( aName ), n
+   local cName
 
    if !( cType == nil )
 
-      cType = Upper( Left( cType, 1 ) )
+      switch Upper( Left( cType, 1 ) )
 
-      switch cType
-
-         case "S"
+         case "S" // STRING
 
               if uInit == nil
-                 uInit  = ""
+                 uInit := ""
               endif
 
               exit
 
-         case "N"
+         case "N" // NUMERIC
 
               if uInit == nil
-                 uInit  = 0
+                 uInit := 0
               endif
 
               exit
 
-         case "L"
+         case "L" // LOGICAL
 
               if uInit == nil
-                 uInit  = .f.
+                 uInit := .f.
               endif
 
               exit
 
-         case "D"
+         case "D" // DATE
 
               if uInit == nil
-                 uInit  = CtoD( "" )
+                 uInit := CtoD( "" )
               endif
 
               exit
 
-         case "C"
+         case "C" // CODEBLOCK
 
               if uInit == nil
-                 uInit  = { || nil }
+                 uInit := { || nil }
               endif
 
               exit
 
-         case "A"
+         case "A" // ARRAY
 
               if uInit == nil
-                 uInit  = {}
+                 uInit := {}
               endif
 
               exit
@@ -423,8 +413,8 @@ procedure HashAddMember( aName, cType, uInit, oObj )
 
    endif
 
-   for n := 1 to nLen
-       oObj[ Upper( aName[ n ] ) ] = uInit
+   for each cName in aName
+       oObj[ cName ] := uInit
    next
 
 return
