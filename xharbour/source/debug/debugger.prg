@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.30 2004/03/30 09:29:55 mauriliolongo Exp $
+ * $Id: debugger.prg,v 1.31 2004/03/31 13:52:23 likewolf Exp $
  */
 
 /*
@@ -232,7 +232,7 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry poin
         IF( s_oDebugger == NIL )
           s_oDebugger := TDebugger():New()
         ENDIF
-        if cProcName = "(b)" // cProcName == "__EVAL" .OR. cProcName == "EVAL"
+        if Left( cProcName, 3 ) == "(b)" // cProcName == "__EVAL" .OR. cProcName == "EVAL"
           s_oDebugger:lCodeblock := .T.
         ELSE
           IF( s_oDebugger:lNextRoutine )
@@ -986,13 +986,14 @@ return nil
 METHOD VarGetValue( aVar ) CLASS TDebugger
   LOCAL nProcLevel, uValue
   LOCAL cProc
+  LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
 
-  IF( aVar[ VAR_TYPE ] = "L" )
+  IF( cType == "L" )
     nProcLevel := hb_dbg_procLevel() - aVar[ VAR_LEVEL ]
     cProc := aVar[ VAR_FUNCNAME ]
     uValue := hb_dbg_vmVarLGet( nProcLevel, aVar[ VAR_POS ] )
 
-  ELSEIF( aVar[ VAR_TYPE ] = "S" )
+  ELSEIF( cType == "S" )
     uValue := hb_dbg_vmVarSGet( aVar[ VAR_LEVEL ], aVar[ VAR_POS ] )
 
   ELSE
@@ -1006,13 +1007,14 @@ RETURN uValue
 METHOD VarSetValue( aVar, uValue ) CLASS TDebugger
   LOCAL nProcLevel
   LOCAL cProc
+  LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
 
-  IF( aVar[ VAR_TYPE ] = "L" )
+  IF( cType == "L" )
     nProcLevel := hb_dbg_procLevel() - aVar[VAR_LEVEL]   //skip debugger stack
     cProc := aVar[ VAR_FUNCNAME ]
     hb_dbg_vmVarLSet( nProcLevel, aVar[ VAR_POS ], uValue )
 
-  ELSEIF( aVar[ VAR_TYPE ] = "S" )
+  ELSEIF( cType == "S" )
     hb_dbg_vmVarSSet( aVar[ VAR_LEVEL ], aVar[ VAR_POS ], uValue )
 
   ELSE
@@ -1533,7 +1535,7 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
          for n := 1 to Len( aVars )
             cName := aVars[ n ][ VAR_NAME ]
             m := AScan( aBVars,; // Is there another var with this name ?
-                        { | aVar | aVar[ VAR_NAME ] == cName .AND. aVar[VAR_TYPE]=='S'} )
+                        { | aVar | aVar[ VAR_NAME ] == cName .AND. Left( aVar[ VAR_TYPE ], 1 ) == 'S' } )
             IF ( m > 0 )
                aBVars[ m ] := aVars[ n ]
             ELSE
@@ -1672,15 +1674,16 @@ return nil
 
 METHOD VarGetInfo( aVar ) CLASS TDebugger
   LOCAL uValue
+  LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
 
   uValue := ::VarGetValue( aVar )
   do case
-    case aVar[ VAR_TYPE ] = "L"
+    case cType == "L"
       return aVar[ VAR_NAME ] + " <Local, " + ;
        ValType( uValue ) + ;
        ">: " + ValToStr( uValue )
 
-    case aVar[ VAR_TYPE ] = "S"
+    case cType == "S"
       return aVar[ VAR_NAME ] + " <Static, " + ;
        ValType( uValue ) + ;
        ">: " + ValToStr( uValue )
@@ -2966,12 +2969,12 @@ STATIC FUNCTION CreateExpression( cExpr, aWatch )
             DO WHILE( SUBSTR(cExpr,i,1)==" ")
                i++
             ENDDO
-            IF( SUBSTR(cExpr,i,1) = '(' )
+            IF( SUBSTR(cExpr,i,1) == '(' )
                //function call
                j := i+1
                LOOP
             ENDIF
-            IF( SUBSTR(cExpr,i,2) = "->" )
+            IF( SUBSTR(cExpr,i,2) == "->" )
                //alias expressions are not expanded
                i += 2
                DO WHILE( i<=nLen .AND. IsIdentChar(SUBSTR(cExpr,i,1)," ()") )
@@ -2997,26 +3000,32 @@ STATIC FUNCTION CreateExpression( cExpr, aWatch )
          lSpace := .T.
          i++
 
-      ELSEIF( c = '&' )    //skip macro expression
+      ELSEIF( c == '&' )    //skip macro expression
          i++
          DO WHILE( i<=nLen .AND. IsIdentChar(SUBSTR(cExpr,i,1)," ()") )
             i++
          ENDDO
+          
+      ELSEIF( c == '.' )    //skip logical values
+         i++
+         IF( SUBSTR(cExpr,i,1) $ "TtFf" .AND. SUBSTR(cExpr,i+1,1) == '.' )
+            i += 2
+         ENDIF
 
-      ELSEIF( c = ':' )    //skip send operator
+      ELSEIF( c == ':' )    //skip send operator
          i++
          DO WHILE( i<=nLen .AND. IsIdentChar(SUBSTR(cExpr,i,1)) )
             i++
          ENDDO
 
-      ELSEIF( c = "'" .OR. c = '"' )   //STRING
+      ELSEIF( c == "'" .OR. c == '"' )   //STRING
          i++
          DO WHILE( i<=nLen .AND. SUBSTR(cExpr,i,1)!=c )
             i++
          ENDDO
          i++
 
-      ELSEIF( c = "[" )
+      ELSEIF( c == "[" )
          IF( lSpace )
             //STRING
             i++
@@ -3049,7 +3058,7 @@ RETURN cRet
 
 STATIC FUNCTION IsIdentChar( cChar, cSeeAlso )
 
-   IF( ISALPHA(cChar) .OR. ISDIGIT(cChar) .OR. cChar = '_' )
+   IF( ISALPHA(cChar) .OR. ISDIGIT(cChar) .OR. cChar == '_' )
       RETURN .T.
    ENDIF
 
@@ -3104,14 +3113,15 @@ STATIC FUNCTION IsValidStopLine( cLine )
     RETURN .F.
   ENDIF
 
-  IF ( cLine = 'FUNC' .OR.;
-       cLine = 'PROC' .OR.;
-       cLine = 'NEXT' .OR.;
-       cLine = 'END'  .OR.;
-       cLine = 'ELSE' .OR.;
-       cLine = 'LOCA' .OR.;
-       cLine = 'STAT' .OR.;
-       cLine = 'MEMV' )
+  c := Left( cLine, 4 )
+  IF ( Left( c, 3 ) == 'END' .OR.;
+       c == 'PROC' .OR.;
+       c == 'NEXT' .OR.;
+       c == 'ELSE' .OR.;
+       c == 'LOCA' .OR.;
+       c == 'STAT' .OR.;
+       c == 'MEMV' )
+    
     RETURN .F.
   ENDIF
 
@@ -3175,11 +3185,11 @@ static function DoCommand( o,cCommand )
 
    cCommand := ALLTRIM( cCommand )
    aCmnd := { NIL, NIL, NIL }
-   IF( cCommand = "??" )
+   IF( Left( cCommand, 2 ) == "??" )
       cCommand := SUBSTR( cCommand, 3 )
       aCmnd[WP_TYPE] := "??"
 
-   ELSEIF( cCommand = "?" )
+   ELSEIF( Left( cCommand, 1 ) == "?" )
       cCommand := SUBSTR( cCommand, 2 )
       aCmnd[WP_TYPE] := "?"
    ENDIF
