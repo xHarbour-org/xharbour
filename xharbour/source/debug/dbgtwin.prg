@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtwin.prg,v 1.6 2004/02/20 02:29:14 likewolf Exp $
+ * $Id: dbgtwin.prg,v 1.7 2004/03/12 12:37:25 likewolf Exp $
  */
 
 /*
@@ -97,7 +97,7 @@ ENDCLASS
 METHOD Clear() CLASS TDbWindow
   
   SetColor( ::cColor )
-  ::Scroll( ::nTop + 1, ::nLeft + 1, ::nBottom - 1, ::nRight - 1 )
+  Scroll( ::nTop + 1, ::nLeft + 1, ::nBottom - 1, ::nRight - 1 )
 
 RETURN nil
 
