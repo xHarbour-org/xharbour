@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.39 2003/07/23 22:09:30 druzus Exp $
+ * $Id: filesys.c,v 1.40 2003/07/24 18:55:10 druzus Exp $
  */
 
 /*
@@ -544,7 +544,7 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
       HB_STACK_UNLOCK;
 
       ulLen = strlen( pFilename );
-      if( *pMode == 'r' || *pMode == 'w' )
+      if( pMode && ( *pMode == 'r' || *pMode == 'w' ) )
          bRead = ( *pMode == 'r' );
       else
       {
