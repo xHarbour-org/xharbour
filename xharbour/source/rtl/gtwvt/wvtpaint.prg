@@ -1,5 +1,5 @@
 /*
- * $Id: wvtpaint.prg,v 1.4 2004/07/22 15:36:51 vouchcac Exp $
+ * $Id: wvtpaint.prg,v 1.5 2004/07/29 15:14:40 vouchcac Exp $
  */
 
 /*
@@ -424,6 +424,30 @@ Function Wvt_CreateDialog( acnDlg, lOnTop, cbDlgProc, ncIcon, nTimerTicks, hMenu
    endif
 
    Return hDlg
+
+//-------------------------------------------------------------------//
+
+Function Wvt_DialogBox( acnDlg, cbDlgProc, hWndParent )
+   LOCAL nResult, cType, xTemplate, nDlgMode
+
+   if valtype( cbDlgProc ) == 'C'
+      cbDlgProc := upper( cbDlgProc )
+   endif
+
+   cType    := Valtype( acnDlg )
+   nDlgMode := if( cType == 'C', 0, if( cType == 'N', 1, 2 ) )
+
+   if cType == 'A'
+      xTemplate := Wvt__MakeDlgTemplate( acnDlg[ 1 ] , acnDlg[  2 ] , acnDlg[  3 ] , acnDlg[  4 ] , ;
+                                         acnDlg[ 5 ] , acnDlg[  6 ] , acnDlg[  7 ] , acnDlg[  8 ] , ;
+                                         acnDlg[ 9 ] , acnDlg[ 10 ] , acnDlg[ 11 ] , acnDlg[ 12 ] )
+   else
+      xTemplate := acnDlg
+   endif
+
+   nResult := Wvt_CreateDialogModal( xTemplate, .f., cbDlgProc, nDlgMode, hWndParent )
+
+   Return nResult
 
 //-------------------------------------------------------------------//
 

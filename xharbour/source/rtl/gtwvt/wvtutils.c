@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.16 2004/09/13 17:20:55 lf_sfnet Exp $
+ * $Id: wvtutils.c,v 1.17 2004/09/15 03:52:49 bdj Exp $
  */
 
 /*
@@ -1250,7 +1250,6 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
       iType = 1;
    }
 
-   //if ( iIndex < WVT_DLGML_MAX )
    {
       if ( ISNUM( 3 ) )
       {
@@ -1261,7 +1260,6 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
       }
       else
       {
-
          switch ( iResource )
          {
             case 0:
@@ -1323,6 +1321,94 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
    }
 
    hb_retnl( ( ULONG ) hDlg );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_CREATEDIALOGMODAL )
+{
+   PHB_ITEM pFirst    = hb_param( 3,HB_IT_ANY );
+   PHB_ITEM pFunc     = NULL ;
+   PHB_DYNS pExecSym;
+   int      iIndex;
+   int      iResource = hb_parni( 4 );
+   int      iResult   = 0;
+   HWND     hParent   = ISNIL( 5 ) ? _s->hWnd : ( HWND ) hb_parnl( 5 );
+
+   /* check if we still have room for a new dialog */
+   for ( iIndex = 0; iIndex < WVT_DLGMD_MAX; iIndex++ )
+   {
+      if ( _s->hDlgModal[ iIndex ] == NULL )
+      {
+         break;
+      }
+   }
+
+   if ( iIndex >= WVT_DLGMD_MAX )
+   {
+      /* no more room */
+      hb_retni( ( int ) NULL );
+      return;
+   }
+
+   if ( HB_IS_BLOCK( pFirst ) )
+   {
+      /* pFunc is pointing to stored code block (later) */
+      pFunc = ( PHB_ITEM ) &( _s->cbFuncModal[ iIndex ] );
+
+      hb_itemCopy( &( _s->cbFuncModal[ iIndex ] ), ( PHB_ITEM ) pFirst );
+      HB_ITEM_LOCK( &( _s->cbFuncModal[ iIndex ] ) );
+
+      _s->pFuncModal[ iIndex ] = pFunc;
+      _s->iTypeModal[ iIndex ] = 2;
+   }
+   else if( pFirst->type == HB_IT_STRING )
+   {
+      hb_dynsymLock();
+      pExecSym = hb_dynsymFindName( pFirst->item.asString.value );
+      hb_dynsymUnlock();
+      if ( pExecSym )
+      {
+         pFunc = ( PHB_ITEM ) pExecSym;
+      }
+      _s->pFuncModal[ iIndex ] = pFunc;
+      _s->iTypeModal[ iIndex ] = 1;
+   }
+
+   switch ( iResource )
+   {
+      case 0:
+      {
+         iResult = DialogBoxParam( ( HINSTANCE     ) hb_hInstance,
+                                                     hb_parc( 1 ),
+                                                     hParent,
+                                                     hb_wvt_gtDlgProcModal,
+                                ( LPARAM ) ( DWORD ) iIndex+1 );
+      }
+      break;
+
+      case 1:
+      {
+         iResult = DialogBoxParam( ( HINSTANCE     ) hb_hInstance,
+                           MAKEINTRESOURCE( ( WORD ) hb_parni( 1 ) ),
+                                                     hParent,
+                                                     hb_wvt_gtDlgProcModal,
+                                ( LPARAM ) ( DWORD ) iIndex+1 );
+      }
+      break;
+
+      case 2:
+      {
+         iResult = DialogBoxIndirectParam( ( HINSTANCE     ) hb_hInstance,
+                                           ( LPDLGTEMPLATE ) hb_parc( 1 ),
+                                                             hParent,
+                                                             hb_wvt_gtDlgProcModal,
+                                        ( LPARAM ) ( DWORD ) iIndex+1 );
+      }
+      break;
+   }
+
+   hb_retni( iResult );
 }
 
 //-------------------------------------------------------------------//

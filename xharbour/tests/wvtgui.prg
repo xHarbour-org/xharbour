@@ -2025,19 +2025,25 @@ Function DynDialog_2()
    cDlgIcon    := 'V_Notes.Ico'
    nTimerTicks := 1000  // 1 second
 
-   //hDlg  := Wvt_CreateDialog( aDlg, lOnTop, bDlgProc, cDlgIcon, nTimerTicks, hMenu )
-   //nProc := AsCallBack( {|| DynDialog_2() } )
-   //hDlg  := Wvt_CreateDialog( aDlg, lOnTop, nProc /*cDlgProc*/, cDlgIcon, nTimerTicks, hMenu )
-   hDlg  := Wvt_CreateDialog( aDlg, lOnTop, cDlgProc, cDlgIcon, nTimerTicks, hMenu )
+   if nInfo % 2 == 1
+      // Modal Dialog
+      //
+      hDlg := Wvt_DialogBox( aDlg, bDlgProc, Wvt_GetWindowHandle() )
+   else
+      // Modeless Dialog
+      //
+      hDlg := Wvt_CreateDialog( aDlg, lOnTop, bDlgProc, cDlgIcon, nTimerTicks, hMenu )
+
+      // Using Function name.
+      //hDlg  := Wvt_CreateDialog( aDlg, lOnTop, cDlgProc, cDlgIcon, nTimerTicks, hMenu, lModal )
+   endif
 
    Return hDlg
 
 //-------------------------------------------------------------------//
 
-Function DynDlgProc_2( hDlg, nMsg, wParam, lParam )
+Static Function DynDlgProc_2( hDlg, nMsg, wParam, lParam )
    Local cText, lClicked, cPrompt, nIndex, hFont
-
-//TraceLog( '','P----------------Entry-----', hDlg, nMsg )
 
    Switch ( nMsg )
 
@@ -2107,7 +2113,6 @@ Function DynDlgProc_2( hDlg, nMsg, wParam, lParam )
       exit
 
    case WM_INITDIALOG
-//TraceLog( '','P----------------Enter WM_INITDIALOG', hDlg, nMsg )
       if empty( ahFonts )
          if ( hFont := Wvt_CreateFont( "Times New Roman", 18 ) ) <> 0
             aadd( ahFonts, hFont )
@@ -2156,7 +2161,7 @@ Function DynDlgProc_2( hDlg, nMsg, wParam, lParam )
       Wvt_CBSetCurSel( hDlg, ID_CMB_COMBO, 1 )
 
       Win_InvalidateRect( hDlg )
-//TraceLog( '','P----------------Exit WM_INITDIALOG', hDlg, nMsg )
+
       exit
 
    case WM_DESTROY

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.29 2004/08/30 14:10:10 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.30 2004/09/15 03:52:49 bdj Exp $
  */
 
 /*
@@ -118,6 +118,7 @@
 #define WVT_FONTS_MAX         20
 #define WVT_PENS_MAX          20
 #define WVT_DLGML_MAX         20
+#define WVT_DLGMD_MAX         20
 
 //-------------------------------------------------------------------//
 
@@ -227,10 +228,13 @@ typedef struct global_data
   HINSTANCE hMSImg32;                  // Handle to the loaded library msimg32.dll
   wvtGradientFill pfnGF;               // Pointer to Address of the GradientFill function in MSImg32.dll
   HWND      hDlgModeless[ WVT_DLGML_MAX ]; // Handle to a modeless dialog
-  PHB_DYNS  pSymDlgProcModeless[ WVT_DLGML_MAX ]; // Holds Modeless Dialog Procedure Address
   PHB_ITEM  pFunc[ WVT_DLGML_MAX ];    // Function pointer for WndProc
-  HB_ITEM   cbFunc[ WVT_DLGML_MAX ];    //codeblock for WndProc
+  HB_ITEM   cbFunc[ WVT_DLGML_MAX ];   //codeblock for WndProc
   int       iType[ WVT_DLGML_MAX ];    // Type of Function Pointers - Function 1, Block 2, Method 3
+  HWND      hDlgModal[ WVT_DLGMD_MAX ];// Handle to a modeless dialog
+  PHB_ITEM  pFuncModal[ WVT_DLGMD_MAX ];  // Function pointer for WndProc
+  HB_ITEM   cbFuncModal[ WVT_DLGMD_MAX ]; // codeblock for WndProc
+  int       iTypeModal[ WVT_DLGMD_MAX ];  // Type of Function Pointers - Function 1, Block 2, Method 3
   BOOL      bGui;
   HDC       hGuiDC;
   HBITMAP   hGuiBmp;
@@ -273,9 +277,9 @@ BOOL   HB_EXPORT hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, char
 LPWORD HB_EXPORT lpwAlign( LPWORD lpIn );
 int    HB_EXPORT nCopyAnsiToWideChar( LPWORD lpWCStr, LPSTR lpAnsiIn );
 BOOL   HB_EXPORT CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam );
+BOOL   HB_EXPORT CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam );
 
 HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void );
-
 
 void   HB_EXPORT hb_wvt_wvtCore( void );
 void   HB_EXPORT hb_wvt_wvtUtils( void );

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.131 2004/09/15 03:52:49 bdj Exp $
+ * $Id: gtwvt.c,v 1.132 2004/09/21 04:04:58 peterrees Exp $
  */
 
 /*
@@ -3013,10 +3013,17 @@ static void gt_hbInitStatics( void )
   for ( iIndex = 0; iIndex < WVT_DLGML_MAX; iIndex++ )
   {
      _s.hDlgModeless[ iIndex ]        = NULL;
-     _s.pSymDlgProcModeless[ iIndex ] = NULL;
+//     _s.pSymDlgProcModeless[ iIndex ] = NULL;
      _s.pFunc[ iIndex ]               = NULL;
-     _s.iType[ iIndex ]               = (int) NULL;
+     _s.iType[ iIndex ]               = ( int ) NULL;
   }
+  for ( iIndex = 0; iIndex < WVT_DLGMD_MAX; iIndex++ )
+  {
+     _s.hDlgModal[ iIndex ]           = NULL;
+     _s.pFuncModal[ iIndex ]          = NULL;
+     _s.iTypeModal[ iIndex ]          = ( int ) NULL;
+  }
+
   _s.bGui             = FALSE;
 }
 
@@ -4312,19 +4319,8 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
 
          case 2:  // Block
          {
-            /*
-            hb_vmPushSymbol( &hb_symEval );
-            hb_vmPush( pFunc );
-            hb_vmPushLong( ( ULONG ) hDlg    );
-            hb_vmPushLong( ( UINT  ) message );
-            hb_vmPushLong( ( ULONG ) wParam  );
-            hb_vmPushLong( ( ULONG ) lParam  );
-            hb_vmFunction( 4 );
-            bReturn = hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
-            */
-
             /* eval the codeblock */
-            if (_s.pFunc[ iIndex ]->type == HB_IT_BLOCK)
+            if ( _s.pFunc[ iIndex ]->type == HB_IT_BLOCK )
             {
               HB_ITEM hihDlg, himessage, hiwParam, hilParam;
               PHB_ITEM pReturn;
@@ -4393,7 +4389,6 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
             hb_itemClear( ( PHB_ITEM ) _s.pFunc[ iIndex ] );
          }
          _s.hDlgModeless[ iIndex ] = NULL;
-         _s.pSymDlgProcModeless[ iIndex ] = NULL;
          _s.pFunc[ iIndex ] = NULL;
          _s.iType[ iIndex ] = (int) NULL;
          bReturn = FALSE;
@@ -4405,4 +4400,136 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
 }
 
 //-------------------------------------------------------------------//
+
+HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam )
+{
+   int      iIndex, iType;
+   long int bReturn = FALSE ;
+   PHB_ITEM pFunc   = NULL;
+   PHB_DYNS pDynSym;
+   int      iFirst  = ( int ) lParam;
+
+   if ( iFirst > 0 && iFirst <= WVT_DLGMD_MAX )
+   {
+      _s.hDlgModal[ iFirst-1 ] = hDlg ;
+      SendMessage( hDlg, WM_INITDIALOG, 0, 0 );
+      return ( bReturn );
+   }
+
+   iType = ( int ) NULL;
+
+   for ( iIndex = 0; iIndex < WVT_DLGMD_MAX; iIndex++ )
+   {
+      if ( ( _s.hDlgModal[ iIndex ] != NULL ) && ( _s.hDlgModal[ iIndex ] == hDlg ) )
+      {
+         if ( _s.pFuncModal[ iIndex ] != NULL )
+         {
+            pFunc = _s.pFuncModal[ iIndex ];
+            iType = _s.iTypeModal[ iIndex ];
+         }
+         break;
+      }
+   }
+
+   if ( pFunc )
+   {
+      switch ( iType )
+      {
+         case 1:  // Function Name
+         {
+            pDynSym = ( PHB_DYNS ) pFunc;
+            hb_vmPushSymbol( pDynSym->pSymbol );
+            hb_vmPushNil();
+            hb_vmPushLong( ( ULONG ) hDlg    );
+            hb_vmPushLong( ( UINT  ) message );
+            hb_vmPushLong( ( ULONG ) wParam  );
+            hb_vmPushLong( ( ULONG ) lParam  );
+            hb_vmDo( 4 );
+            bReturn = hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+            break;
+         }
+
+         case 2:  // Block
+         {
+            /* eval the codeblock */
+            if (_s.pFuncModal[ iIndex ]->type == HB_IT_BLOCK )
+            {
+              HB_ITEM hihDlg, himessage, hiwParam, hilParam;
+              PHB_ITEM pReturn;
+
+              hihDlg.type = HB_IT_NIL;
+              hb_itemPutNL( &hihDlg, (ULONG) hDlg );
+
+              himessage.type = HB_IT_NIL;
+              hb_itemPutNL( &himessage, (ULONG) message );
+
+              hiwParam.type = HB_IT_NIL;
+              hb_itemPutNL( &hiwParam, (ULONG) wParam );
+
+              hilParam.type = HB_IT_NIL;
+              hb_itemPutNL( &hilParam, (ULONG) lParam );
+
+              pReturn = hb_vmEvalBlockV( (PHB_ITEM) _s.pFuncModal[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
+              bReturn = hb_itemGetNL( pReturn );
+            }
+            else
+            {
+              //internal error: missing codeblock
+            }
+
+            break;
+         }
+      }
+   }
+
+   switch( message )
+   {
+      case WM_COMMAND:
+      {
+         switch( LOWORD( wParam ) )
+         {
+            case IDOK:
+            {
+               EndDialog( hDlg, IDOK );
+               bReturn = TRUE;
+            }
+            break;
+
+            case IDCANCEL:
+            {
+               EndDialog( hDlg, IDCANCEL );
+               bReturn = FALSE;
+            }
+            break;
+         }
+      }
+      break;
+
+      case WM_CLOSE:
+      {
+         EndDialog( hDlg, IDCANCEL );
+         bReturn = FALSE;
+      }
+      break;
+
+      case WM_NCDESTROY:
+      {
+         if ( _s.pFuncModal[ iIndex ] != NULL && _s.iTypeModal[ iIndex ] == 2 )
+         {
+            HB_ITEM_UNLOCK( ( PHB_ITEM ) _s.pFuncModal[ iIndex ] );
+            hb_itemClear( ( PHB_ITEM ) _s.pFuncModal[ iIndex ] );
+         }
+         _s.hDlgModal[ iIndex ]   = NULL;
+         _s.pFuncModal[ iIndex ]  = NULL;
+         _s.iTypeModal[ iIndex ]  = ( int ) NULL;
+         bReturn = FALSE;
+      }
+      break;
+   }
+
+   return bReturn;
+}
+
+//-------------------------------------------------------------------//
+
 
