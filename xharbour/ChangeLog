@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1062 2003/05/26 20:44:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1063 2003/05/26 21:00:36 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-26 21:30 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/vm/errorapi.c
+  * source/vm/estack.c
+    + Created HB_RUN_AS_SERVICE option, so xHarbour programs working as
+      windows services does not hang up with message boxes
 
 2003-05-26 17:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.nt

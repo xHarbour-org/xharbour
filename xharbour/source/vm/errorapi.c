@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.7 2003/05/24 00:29:10 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.8 2003/05/25 17:03:18 jonnymind Exp $
  */
 
 /*
@@ -1296,8 +1296,10 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, char * szText, char * szPar1, ch
       printf( "%s\n", buffer );
    }
 
-   #ifdef HB_OS_WIN_32
-      MessageBox( NULL, buffer, title, MB_ICONSTOP );
+   #ifndef HB_RUN_AS_SERVICE
+      #ifdef HB_OS_WIN_32
+         MessageBox( NULL, buffer, title, MB_ICONSTOP );
+      #endif
    #endif
 
    exit( EXIT_FAILURE );

@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.31 2003/05/25 17:03:18 jonnymind Exp $
+ * $Id: estack.c,v 1.32 2003/05/26 00:19:15 ronpinkas Exp $
  */
 
 /*
@@ -226,7 +226,7 @@ void hb_stackFree( void )
 
    #ifdef HB_THREAD_SUPPORT
       // error block and related are freed by hb_errExit()
-     
+
       free( hb_stack.pItems );
    #else
       hb_xfree( hb_stack.pItems );
@@ -500,7 +500,9 @@ WINBASEAPI LONG WINAPI UnhandledExceptionFilter( struct _EXCEPTION_POINTERS * Ex
    }
    while( pBase != HB_VM_STACK.pItems );
 
-   MessageBox( NULL, msg, HB_I_("Harbour Exception"), MB_ICONSTOP );
+   #ifndef HB_RUN_AS_SERVICE
+      MessageBox( NULL, msg, HB_I_("Harbour Exception"), MB_ICONSTOP );
+   #endif
 
    return EXCEPTION_EXECUTE_HANDLER; /* EXCEPTION_CONTINUE_SEARCH; */
 }
