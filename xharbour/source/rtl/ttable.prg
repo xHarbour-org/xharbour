@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.prg,v 1.2 2003/01/27 03:44:13 walito Exp $
+ * $Id: ttable.prg,v 1.3 2003/02/03 05:27:20 walito Exp $
  */
 
 /*
@@ -78,10 +78,8 @@ STATIC snNetDelay    := 30
 STATIC slNetOk       := .F.
 STATIC scNetMsgColor := "GR+/R"
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 FUNCTION NetDbUse( cDataBase, cAlias, nSeconds, cDriver, ;
                       lNew, lOpenMode, lReadOnly )
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    LOCAL nKey       := 0
    LOCAL lForever
    LOCAL cOldScreen := SAVESCREEN( MAXROW(), 0, MAXROW(), MAXCOL() + 1 )
@@ -141,10 +139,9 @@ FUNCTION NetDbUse( cDataBase, cAlias, nSeconds, cDriver, ;
 
 RETURN ( slNetOk )
 
-// ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 FUNCTION NetLock( nType, lReleaseLocks, nSeconds )
 
-   // ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    LOCAL cSave       := SAVESCREEN( MAXROW(), 0, MAXROW(), MAXCOL() + 1 )
    LOCAL lContinue   := .T.
    LOCAL lSuccess    := .F.
@@ -185,12 +182,14 @@ FUNCTION NetLock( nType, lReleaseLocks, nSeconds )
    slNetOk := .F.
 
    WHILE lContinue == .T.
-      /*
+
+   /*
    IF (nKey := INKEY()) == K_ESC
       RestScreen( maxrow(),0,maxrow(),maxcol()+1, cSave)
       EXIT
    ENDIF
    */
+
       WHILE nSeconds > 0 .and. lContinue == .T.
          IF EVAL( bOperation, xIdentifier )
             nSeconds  := 0
@@ -250,10 +249,9 @@ FUNCTION NetLock( nType, lReleaseLocks, nSeconds )
 
 RETURN ( lSuccess )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 FUNCTION NetFunc( bBlock, nSeconds )
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    LOCAL lForever      // Retry forever?
 
    DEFAULT nSeconds := snNetDelay
@@ -272,16 +270,15 @@ FUNCTION NetFunc( bBlock, nSeconds )
 
 RETURN ( .F. )      // Not locked
 
+
 // { DBFName, Alias, { idx Names } }
 // Returns:   0   All Ok
 //           -1   DBF File not found
 //           -2   DBF File open Error
 //           -3   Index File open Error
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 FUNCTION NetOpenFiles( aFiles )
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    LOCAL nRet := 0
    LOCAL xFile, cIndex
 
@@ -311,16 +308,11 @@ FUNCTION NetOpenFiles( aFiles )
 
    RETURN nRet
 
-   /*
-ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-³  NETWORK METHODS                                                 ³
-ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-*/
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+/* NETWORK METHODS */
+
 FUNCTION NetDelete()
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    slNetOK := .F.
 
    IF NetLock( NET_RECLOCK ) == .T.
@@ -337,10 +329,9 @@ FUNCTION NetDelete()
    ENDIF
 RETURN ( slNetOk )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 FUNCTION NetReCall()
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    slNetOk := .F.
 
    IF NetLock( NET_RECLOCK ) == .T.
@@ -358,10 +349,9 @@ FUNCTION NetReCall()
 
 RETURN ( slNetOk )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 FUNCTION NetRecLock( nSeconds )
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    DEFAULT nSeconds := snNetDelay
 
    slNetOK := .F.
@@ -372,10 +362,9 @@ FUNCTION NetRecLock( nSeconds )
 
 RETURN ( slNetOK )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 FUNCTION NetFileLock( nSeconds )
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    slNetOK := .F.
    DEFAULT nSeconds := snNetDelay
 
@@ -385,10 +374,9 @@ FUNCTION NetFileLock( nSeconds )
 
 RETURN ( slNetOK )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 FUNCTION NetAppend( nSeconds, lReleaseLocks )
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    LOCAL nOrd := 0
    DEFAULT lReleaseLocks := .T.
    DEFAULT nSeconds := snNetDelay
@@ -404,16 +392,15 @@ FUNCTION NetAppend( nSeconds, lReleaseLocks )
 
 RETURN ( slNetOK )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 PROCEDURE NetFlush()
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    DBCOMMITALL()
    DBUNLOCKALL()
    DBSKIP( 0 )
 RETURN
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 FUNCTION NetCommitAll()
 
    //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
@@ -428,32 +415,26 @@ FUNCTION NetCommitAll()
 
 RETURN n
 
-// ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-FUNCTION IsLocked( nRecId )
 
-   // ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+FUNCTION IsLocked( nRecId )
 RETURN ( ASCAN( DBRLOCKLIST(), { | n | n == nRecID } ) > 0 )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-FUNCTION NetError()
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+FUNCTION NetError()
 RETURN !slNetOK
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 FUNCTION SetNetDelay( nSecs )
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    LOCAL nTemp := snNetDelay
    IF nSecs != NIL
       snNetDelay := nSecs
    ENDIF
 RETURN ( nTemp )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 FUNCTION SetNetMsgColor( cColor )
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    LOCAL cTemp := scNetMsgColor
    IF cColor != NIL
       scNetmsgColor := cColor
@@ -469,10 +450,8 @@ RETURN ( cTemp )
 *     getTable()
 */
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 FUNCTION TableNew( cDBF, cALIAS, cOrderBag, cDRIVER, ;
                       lNET, cPATH, lNEW, lREADONLY )
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    LOCAL nPos
    LOCAL lAuto
    LOCAL oDB
@@ -506,16 +485,16 @@ FUNCTION TableNew( cDBF, cALIAS, cOrderBag, cDRIVER, ;
 
 RETURN oDB
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 FUNCTION GetTable( cAlias )
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    LOCAL nPos
    LOCAL oDB
    IF ( nPos := ASCAN( saTables, { | e | e[ 1 ] == UPPER( cALIAS ) } ) ) > 0
       oDB := saTables[ nPos, 2 ]
    ENDIF
 RETURN oDB
+
 
 /****
 *
@@ -541,7 +520,7 @@ CLASS oField
 
 ENDCLASS
 
-   /****
+/****
 *
 *     CLASS Record()
 *
@@ -562,7 +541,7 @@ CLASS RECORD
 
 ENDCLASS
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 METHOD NEW( cAlias ) CLASS RECORD
 
    LOCAL i
@@ -592,8 +571,8 @@ METHOD NEW( cAlias ) CLASS RECORD
 
 RETURN Self
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-METHOD GET() CLASS RECORD
+
+PROCEDURE GET() CLASS RECORD
 
    LOCAL xField
 
@@ -602,10 +581,10 @@ METHOD GET() CLASS RECORD
       ::buffer[ HB_EnumIndex() ] := xField:value
    NEXT
 
-RETURN Self
+RETURN 
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-METHOD Put() CLASS RECORD
+
+PROCEDURE Put() CLASS RECORD
 
    LOCAL xField
 
@@ -616,7 +595,7 @@ METHOD Put() CLASS RECORD
       ENDIF
    NEXT
 
-RETURN Self
+RETURN 
 
 /****
 *
@@ -627,24 +606,22 @@ RETURN Self
 */
 
    //METHOD SetFocus()    INLINE (::Alias)->(Select( ::Area ))
-   // ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   // ³  Info...
-   // ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   //³ encapsulated methods
-   //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   // ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   // ³  Methods
-   // ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   // ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   // ³ table movement
-   // ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   // ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   // ³  RELATION
-   // ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   // ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-   // ³  ORDER Management
-   // ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+   // 
+   //
+   //encapsulated methods
+   //
+   //
+   //Methods
+   //
+   //
+   //table movement
+   //
+   //
+   //RELATION
+   //
+   //
+   //ORDER Management
+   //
 CLASS Table
 
    DATA Buffer INIT {}                  // 1
@@ -811,7 +788,6 @@ ENDCLASS
    //  Constructor...
    //---------------------
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 METHOD New( cDBF, cALIAS, cOrderBag, cDRIVER, ;
                lNET, cPATH, lNEW, lREADONLY ) CLASS Table
    DEFAULT lNET TO .F.
@@ -836,9 +812,9 @@ METHOD New( cDBF, cALIAS, cOrderBag, cDRIVER, ;
    ::Alias       := cALIAS
    ::nDataOffset := LEN( self )         //66
 
-RETURN self
+RETURN Self
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 METHOD OPEN() CLASS Table
 
    LOCAL lSuccess := .T.
@@ -869,8 +845,8 @@ METHOD OPEN() CLASS Table
 
 RETURN ( lSuccess )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-METHOD DBMove( nDirection ) CLASS Table
+
+PROCEDURE DBMove( nDirection ) CLASS Table
 
    LOCAL nRec := ( ::Alias )->( RECNO() )
    DEFAULT nDirection TO 0
@@ -892,7 +868,7 @@ METHOD DBMove( nDirection ) CLASS Table
       ( ::Alias )->( DBGOTO( nDirection ) )
    ENDCASE
 
-RETURN self
+RETURN 
 
 // -->
 // -->
@@ -900,7 +876,6 @@ RETURN self
 // -->
 // -->
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 METHOD FldInit() CLASS Table
 
    LOCAL i
@@ -970,8 +945,8 @@ METHOD FldInit() CLASS Table
 
 RETURN oNew
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-METHOD READ( lKeepBuffer ) CLASS Table
+
+PROCEDURE READ( lKeepBuffer ) CLASS Table
 
    LOCAL i
    LOCAL nSel   := SELECT( ::Alias )
@@ -998,10 +973,10 @@ METHOD READ( lKeepBuffer ) CLASS Table
 
    SELECT( nSel )
 
-RETURN ( Self )
+RETURN 
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-METHOD ReadBlank( lKeepBuffer ) CLASS Table
+
+PROCEDURE ReadBlank( lKeepBuffer ) CLASS Table
 
    LOCAL i
    LOCAL nSel   := SELECT( ::Alias )
@@ -1030,9 +1005,9 @@ METHOD ReadBlank( lKeepBuffer ) CLASS Table
    ( ::Alias )->( DBGOTO( nRec ) )
    SELECT( nSel )
 
-RETURN ( Self )
+RETURN 
 
-// ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 METHOD Write( lKeepBuffer ) CLASS Table
 
    LOCAL i
@@ -1078,7 +1053,7 @@ METHOD Write( lKeepBuffer ) CLASS Table
 
 RETURN ( .T. )
 
-// ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 METHOD BUFWrite( aBuffer ) CLASS Table
 
    LOCAL aOldBuffer := ARRAY( ( ::Alias )->( FCOUNT() ) )
@@ -1108,7 +1083,7 @@ METHOD BUFWrite( aBuffer ) CLASS Table
 
 RETURN ( .T. )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 METHOD __oTDelete( lKeepBuffer )        // ::Delete()
 
    LOCAL lRet
@@ -1137,7 +1112,7 @@ METHOD __oTDelete( lKeepBuffer )        // ::Delete()
 
 RETURN ( lRet )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 METHOD SetMonitor( lOnOff ) CLASS Table
 
    LOCAL lTemp := ::lMonitor
@@ -1148,7 +1123,6 @@ RETURN lTemp
 //   Transaction control subsystem...
 //
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 METHOD Undo( nBuffer, nLevel ) CLASS Table
 
    LOCAL i
@@ -1278,11 +1252,11 @@ METHOD Undo( nBuffer, nLevel ) CLASS Table
 
 RETURN ( lRet )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-//   ORDER MANAGEMENT
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//
+//   ORDER MANAGEMENT
+//
+
 METHOD AddOrder( cTag, cKey, cLabel, ;
                     cFor, cWhile, ;
                     lUnique, ;
@@ -1302,8 +1276,8 @@ METHOD AddOrder( cTag, cKey, cLabel, ;
 
 RETURN oOrd
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-METHOD REINDEX() CLASS Table
+
+METHOD Reindex() CLASS Table
 
    LOCAL i
    LOCAL lRet := .F.
@@ -1351,7 +1325,7 @@ METHOD REINDEX() CLASS Table
 
 RETURN ( lRet )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 METHOD FastReindex() CLASS Table
 
    LOCAL i
@@ -1397,7 +1371,7 @@ METHOD FastReindex() CLASS Table
 
 RETURN ( lRet )
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 METHOD GetOrder( xOrder ) CLASS Table
 
    LOCAL nPos  := 0
@@ -1417,7 +1391,7 @@ METHOD GetOrder( xOrder ) CLASS Table
 
 RETURN ::aOrders[ nPos ]                // returns oOrder
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 METHOD SetOrder( xTag ) CLASS Table
 
    LOCAL xType   := VALTYPE( xTag )
@@ -1442,7 +1416,7 @@ METHOD SetOrder( xTag ) CLASS Table
    END
 RETURN nOldOrd
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 METHOD GetOrderLabels() CLASS Table
 
    LOCAL aRet := {}
@@ -1451,31 +1425,29 @@ METHOD GetOrderLabels() CLASS Table
    ENDIF
 RETURN aRet
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//
 // Relation Methods
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+//
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-METHOD AddChild( oChild, cKey ) CLASS Table                 // ::addChild()
+PROCEDURE AddChild( oChild, cKey ) CLASS Table                 // ::addChild()
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    AADD( ::aChildren, { oChild, cKey } )
    oChild:oParent := Self
    ( ::Alias )->( ORDSETRELATION( oChild:Alias, COMPILE( cKey ), cKey ) )
-RETURN Self
+RETURN 
 
 /****
 *     FixExt( cFileName )
 *     extract .CDX filename from .DBF filename
 */
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
 STATIC FUNCTION FixExt( cFileName )
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    LOCAL nLeft := AT( ".", cFilename )
 RETURN ( LEFT( cFileName, IF( nLeft == 0, ;
          LEN( cFilename ), ;
          nLeft - 1 ) ) )
+
 
 METHOD CreateTable( cFile ) CLASS Table
 
@@ -1486,15 +1458,18 @@ METHOD CreateTable( cFile ) CLASS Table
    ENDIF
 RETURN Self
 
-METHOD AddField( f, t, l, d ) CLASS Table
+
+PROCEDURE AddField( f, t, l, d ) CLASS Table
 
    AADD( ::aStruc, { f, t, l, d } )
-RETURN Self
+RETURN 
 
-METHOD Gentable() CLASS Table
+
+PROCEDURE Gentable() CLASS Table
 
    DBCREATE( ::cDbf, ::aStruc, ::Driver )
-RETURN Self
+RETURN 
+
 
 CLASS oOrder
 
@@ -1526,10 +1501,8 @@ CLASS oOrder
 
 ENDCLASS
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
 METHOD New( cTag, cKey, cLabel, cFor, cWhile, lUnique, bEval, nInterval, cOrderBag ) CLASS oOrder
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
    DEFAULT cKey TO ".T."
    DEFAULT lUnique TO .F.
    DEFAULT cFor TO ".T."
@@ -1548,12 +1521,10 @@ METHOD New( cTag, cKey, cLabel, cFor, cWhile, lUnique, bEval, nInterval, cOrderB
    ::bEval     := bEval
    ::nInterval := nInterval
    ::Label     := cLabel
-RETURN self
+RETURN Self
 
-//ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
-METHOD Create() CLASS oOrder
 
-   //ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+PROCEDURE Create() CLASS oOrder
 
    DEFAULT ::cOrderBag TO ::oTable:cOrderBag
    //? "<<<",::alias, ::cOrderBag
@@ -1564,5 +1535,5 @@ METHOD Create() CLASS oOrder
 
    ( ::alias )->( ORDCREATE( ::cOrderBag, ::Tag, ::cKey, ;
      ::bKey, ::Unique ) )
-RETURN self
+RETURN 
 

@@ -1,5 +1,5 @@
 /*
- * $Id:  $
+ * $Id: ttable.ch,v 1.1 2002/12/24 00:42:47 lculik Exp $
  */
 
 /*
@@ -120,7 +120,7 @@
 
 // --> new order object
 #xCommand DEFINE ORDER [<oOrder>]   ;
-                 ON <key>           ;
+                 ON [KEY] <key>     ;
                  [TAG <cTag>]       ;
                  [LABEL <cLabel>]   ;
                  [FOR <for>]        ;

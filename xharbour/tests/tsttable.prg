@@ -1,50 +1,68 @@
 #include 'ttable.ch'
 
 request Dbfcdx
-FUNCTION main
+
+PROCEDURE main
 
    LOCAL x      := 1
-   LOCAL oTable
+   LOCAL oTable := nil
    
    RDDSETDEFAULT( 'dbfcdx')
 
    doData()
+
    /*Open An Table With Table Class */
-   DEFINE TABLE oTable file test new
+   DEFINE TABLE oTable FILE tsttable NEW
    
    /*Adding an Index to This Table */
-      Define order on key "nome" tag _1 in oTable
+   DEFINE ORDER ON KEY "nome" TAG _1 IN oTable
+
    /* Force the index Creating*/
-      oTable:reindex()
+   oTable:Reindex()
 
    WHILE x <= 100
 
-      oTable:readblank()
-      oTable:nome     := STR( x, 20 )
-      oTable:cidade   := STR( x + 1, 20 )
-      oTable:endereco := STR( x + 2, 20 )
-      oTable:codigo   := x
-      otable:Append()
-      oTable:write()
+      oTable:ReadBlank()
+
+      oTable:name   := Str( x, 20 )
+      oTable:street := Str( x + 1, 20 )
+      oTable:city   := Str( x + 2, 20 )
+      oTable:code   := x
+      oTable:today  := Date()
+      oTable:pay    := ( x % 2 ) == 0
+
+      oTable:Append()
+
+      oTable:Write()
 
       x ++
 
    ENDDO
 
    USE
-RETURN nil
 
-FUNCTION dodata()
+RETURN
+
+PROCEDURE dodata()
 
    LOCAL oTable
 
-   IF !FILE( 'test.dbf' )
-   /* Create An Table using Table Classe Syntax */
-      Create database otable FILE test.dbf
-      FIELD name nome type Character len 40 Dec 0 of oTable
-      FIELD name endereco type Character len 40 Dec 0 of oTable
-      FIELD name cidade type Character len 40 Dec 0 of oTable
-      FIELD name codigo type Numeric len 5 Dec 0 of oTable
-      build table o
+   IF !FILE( 'tsttable.dbf' )
+
+      /* Create An Table using Table Classe Syntax */
+
+      CREATE DATABASE oTable FILE tsttable.dbf
+
+      FIELD NAME name   TYPE CHARACTER LEN 40 DEC 0 OF oTable
+      FIELD NAME street TYPE CHARACTER LEN 40 DEC 0 OF oTable
+      FIELD NAME city   TYPE CHARACTER LEN 40 DEC 0 OF oTable
+      FIELD NAME code   TYPE NUMERIC   LEN  5 DEC 0 OF oTable
+      FIELD NAME today  TYPE DATE      LEN  8 DEC 0 OF oTable
+      FIELD NAME pay    TYPE LOGICAL   LEN  1 DEC 0 OF oTable
+
+      BUILD TABLE o
+
    ENDIF
-RETURN nil
+
+RETURN
+

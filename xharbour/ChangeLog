@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1291 2003/07/24 03:43:56 andijahja Exp $
+ * $Id: ChangeLog,v 1.1292 2003/07/24 04:11:44 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-24 08:00 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * source/rtl/ttable.prg
+    ! Replaced METHODs that return nil by PROCEDUREs.
+    - Removed some starnge chars in line comments
+
+  * include/ttable.ch
+    ! DEFINE ORDER to accept parameter [KEY]
+
+  * tests/tsttable.prg
+    ! Name of generated dbf file is now tsttable.dbf
+    ! All field names from portuguese to english
+    + Date and logical test fields
+    * Minor formating
+
 2003-07-24 11:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * makefile.vc
    * makefile.nt
@@ -86,7 +101,7 @@
 2003-07-23 17:10 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/hblog.prg
     ! Replaced METHODs that return nil by PROCEDUREs.
-      There are some functions retunring nil in some prgs that I'll fix.
+      There are some functions returning nil in some prgs that I'll fix.
 
 2003-07-23 18:32 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/xharbour.spec
@@ -1160,7 +1175,7 @@
     + Added "Internal error: invalid language selected.\n" in hb_langSelect() on invalid language.
 
   * source/vm/classes.c
-    + Added support for aSacn() in hb_clsValidScope()
+    + Added support for aScan() in hb_clsValidScope()
 
 2003-06-30 05:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/vm/hvm.c
