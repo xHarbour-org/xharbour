@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.139 2004/03/08 16:55:39 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.140 2004/03/19 07:37:04 ronpinkas Exp $
  */
 
 /*
@@ -1694,7 +1694,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            // Find if SAME Marker Name is used again in the remainder of the Match Rule.
            while( ( ifou = hb_strAtSkipStrings( exppatt, explen, ptr, mlen ) ) > 0 )
            {
-              char *pTmp = ptr + ifou - 1, *pStart;
+              char *pTmp = ptr + ifou - 2, *pStart;
 
               while( pTmp > ptr && *pTmp != '<' )
               {
@@ -1712,6 +1712,8 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
                        exptype = '5';  /* Minimal expression match marker */
                        break;
 
+
+                    case '<' :
                     case ' ' :
                     case '\t' :
                        break;
@@ -1732,8 +1734,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
               }
 
               pStart = pTmp;
-
-              pTmp = ptr + ifou + explen;
+              pTmp = ptr + ifou + explen - 1;
 
               while( *pTmp && *pTmp != '>' )
               {
@@ -1773,6 +1774,8 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
                  pTmp++;
               }
+
+              //printf( "End: %s\n", pTmp );
 
               if( *pTmp != '>' )
               {
