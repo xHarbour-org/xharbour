@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.97 2003/10/10 12:56:34 lculik Exp $
+ * $Id: hbmake.prg,v 1.98 2003/10/22 21:40:54 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -326,20 +326,6 @@ FUNCTION ParseMakeFile( cFile )
 
       ENDIF
 
-/*   #ifndef __PLATFORM__Windows
-   IF AT("OBJCFILES", cTemp) >0
-      ct := SubStr(cTemp , 1 , Rat( "(", cTemp ) - 2 )
-      cTemp := ct +" hbtemp.o" +" $(OBC)"
-   ENDIF
-   #ENDIF    
-
-   #ifndef __PLATFORM__Windows
-      IF AT( "CFILES" , cTemp) >0
-         ct := SubStr(cTemp , 1 , Rat( "(", cTemp ) - 2 )
-         cTemp := ct +" hbtemp.c" +" $(CF)"
-      ENDIF
-   #ENDIF
-*/
       aTemp := ListAsArray2( Alltrim( cTemp ), "=" )
 
       IF lmacrosec
@@ -1839,9 +1825,9 @@ cResname += cAllRes
       IF lFwh
 
          IF lXfwh
-            fWrite( s_nLinkHandle, "LIBFILES = $(FWH)\lib\fivehx.lib $(FWH)\lib\fivehc.lib optgui.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+            fWrite( s_nLinkHandle, "LIBFILES = $(FWH)\lib\fivehx.lib $(FWH)\lib\fivehc.lib optgui"+ IIF( ! lMt, "", "mt" ) +".lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
          ELSE
-            fWrite( s_nLinkHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib optgui.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+            fWrite( s_nLinkHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib optgui"+ IIF( ! lMt, "", "mt" ) +".lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
          ENDIF
 
       ELSEIF lMiniGui
@@ -1853,7 +1839,7 @@ cResname += cAllRes
       ELSEIF lCw
          fWrite( s_nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib optgui.lib "  + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSE
-         fWrite( s_nLinkHandle, "LIBFILES = optcon.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = optcon"+ IIF( ! lMt, "", "mt" ) +".lib " + .lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ENDIF
 
    ELSEIF s_lGcc
