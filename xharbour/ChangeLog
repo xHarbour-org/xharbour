@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3480 2004/09/30 14:15:33 mlombardo Exp $
+ * $Id: ChangeLog,v 1.3481 2004/09/30 15:31:30 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-09-30 16:23 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/pp/ppcore.c
+    * Copied recent fix from STATE_EXPRES_ID to STATE_ID
+
+  /*
+     We have very ugly and inefficent redundancy in getExpReal().
+     I'd really like to rewrite this function, but it should probably wait till after Beta-1.2.
+   */
 
 2004-09-30 17:30 UTC+0200 Giancarlo Niccolai <gc at niccolai dot ws>
   * source/tip/utils.c

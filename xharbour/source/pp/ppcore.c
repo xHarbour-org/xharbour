@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.168 2004/09/16 18:35:37 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.169 2004/09/29 20:50:38 ronpinkas Exp $
  */
 
 /*
@@ -3479,7 +3479,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       }
    }
 
-   State = ( **ptri == '\'' || **ptri == '\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
+   State = ( **ptri == '\'' || **ptri == '\"' || **ptri == '[' ) ? STATE_EXPRES : STATE_ID;
+   //State = STATE_EXPRES;
 
    while( **ptri != '\0' && !rez && lens < maxrez )
    {
@@ -3488,7 +3489,6 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       {
          if( **ptri == '"' || IS_ESC_STRING( **ptri ) )
          {
-
             if( expreal )
             {
                *expreal++ = **ptri;
@@ -3527,7 +3527,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             lens++;
 
             cLastChar = '"';
-            State = ( StBr1==0 && StBr2==0 && StBr3==0 )? STATE_ID_END: STATE_BRACKET;
+            State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
             continue;
          }
          else if( **ptri == '\'' )
@@ -3578,7 +3578,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             lens++;
 
             cLastChar = '\'';
-            State = ( StBr1==0 && StBr2==0 && StBr3==0 )? STATE_ID_END: STATE_BRACKET;
+            State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
             continue;
          }
          else if( **ptri == '[' /* ( see below 5-2-2001 && ( State == STATE_EXPRES || ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) )*/ )
@@ -3634,7 +3634,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             lens++;
 
             cLastChar = ']';
-            State = ( StBr1==0 && StBr2==0 && StBr3==0 )? STATE_ID_END: STATE_BRACKET;
+            State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
             continue;
          }
       /* Added by Ron Pinkas 2001-05-02 ( removed lots of related scattered logic below! */
@@ -3672,7 +3672,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             else if( **ptri == ')' )
             {
                StBr1--;
-               if( StBr1==0 && StBr2==0 && StBr3==0 )
+
+               if( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )
                {
                   State = STATE_ID_END;
                }
@@ -3680,7 +3681,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             else if( **ptri == ']' )
             {
                StBr2--;
-               if( StBr1==0 && StBr2==0 && StBr3==0 )
+
+               if( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )
                {
                   State = STATE_ID_END;
                }
@@ -3688,7 +3690,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             else if( **ptri == '}' )
             {
                StBr3--;
-               if( StBr1==0 && StBr2==0 && StBr3==0 )
+
+               if( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )
                {
                   State = STATE_ID_END;
                }
@@ -3818,15 +3821,58 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                   rez = TRUE;
                }
             }
+            else if( ( **ptri == '+' && *( *ptri + 1 ) == '+' ) || ( **ptri == '-' && *( *ptri + 1 ) == '-' ) )
+            {
+               cLastChar = **ptri;
+
+               if( expreal )
+               {
+                  *expreal++ = **ptri;
+               }
+
+               (*ptri)++;
+               lens++;
+
+               if( expreal )
+               {
+                  *expreal++ = **ptri;
+               }
+
+               (*ptri)++;
+               lens++;
+
+               if( State == STATE_ID )
+               {
+                  // Prefix ONLY when lens == 0 (2) oterwise MUST be a postfix.
+                  if( lens == 2 )
+                  {
+                     while( **ptri == ' ' )
+                     {
+                        if( expreal )
+                        {
+                           *expreal++ = **ptri;
+                        }
+
+                        (*ptri)++;
+                        lens++;
+                     }
+                  }
+                  else
+                  {
+                     State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
+                  }
+               }
+               continue;
+            }
             else if( strchr( sZnaki, **ptri ) || ( **ptri == '&' && isspace( (*ptri)[1] ) ) )
             {
                /* Ron Pinkas added 2000-06-02 */
                if( **ptri == '.' && bMacro )
                {
                   /* Macro terminator '.' */
-                  if( *(*ptri+1) == ' ' )
+                  if( *( *ptri + 1 ) == ' ' )
                   {
-                     State = STATE_ID_END;
+                     State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
                   }
 
                   /* Ron Pinkas added 2000-05-03 */
@@ -3852,6 +3898,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
                   (*ptri) +=2;
                   lens++;
+
                   cLastChar = '^';
                   State = STATE_EXPRES;
                   continue;
@@ -3864,7 +3911,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                   /* Ron Pinkas added 2003-10-25 */
                   if( **ptri == '.' )
                   {
-                     if( cMarkerType == '4' || *(*ptri + 1) == '\0' )
+                     if( cMarkerType == '4' || *( *ptri + 1 ) == '\0' )
                      {
                         // always accept as extended marker, or end of stream.
                         State = STATE_ID;
@@ -3924,8 +3971,9 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            }
                            else
                            {
-                              State = STATE_ID_END;
                               cLastChar = *(*ptri - 1);
+
+                              State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
                               continue;
                            }
                         }
@@ -3949,8 +3997,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            lens++;
                         }
 
-                        State = STATE_EXPRES;
                         cLastChar = '.';
+                        State = STATE_EXPRES;
                         continue;
                      }
                      else if( ( *(*ptri + 1) == 'N' || *(*ptri + 1) == 'n' ) && ( *(*ptri + 2) == 'O' || *(*ptri + 2) == 'o' ) && ( *(*ptri + 3) == 'T' || *(*ptri + 3) == 't' ) && *(*ptri + 4) == '.' )
@@ -3966,8 +4014,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            lens++;
                         }
 
-                        State = STATE_EXPRES;
                         cLastChar = '.';
+                        State = STATE_EXPRES;
                         continue;
                      }
                      else if( ( *(*ptri + 1) == 'O' || *(*ptri + 1) == 'o' ) && ( *(*ptri + 2) == 'R' || *(*ptri + 2) == 'r' ) && *(*ptri + 3) == '.' )
@@ -3983,8 +4031,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            lens++;
                         }
 
-                        State = STATE_EXPRES;
                         cLastChar = '.';
+                        State = STATE_EXPRES;
                         continue;
                      }
                      else if( ( *(*ptri + 1) == 'T' || *(*ptri + 1) == 't' ) && *(*ptri + 2) == '.' )
@@ -4000,8 +4048,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            lens++;
                         }
 
-                        State = STATE_ID_END;
                         cLastChar = '.';
+                        State = STATE_ID_END;
                         continue;
                      }
                      else if( ( *(*ptri + 1) == 'F' || *(*ptri + 1) == 'f' ) && *(*ptri + 2) == '.' )
@@ -4017,8 +4065,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            lens++;
                         }
 
-                        State = STATE_ID_END;
                         cLastChar = '.';
+                        State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
                         continue;
                      }
                      else if( ( *(*ptri + 1) == 'Y' || *(*ptri + 1) == 'y' ) && *(*ptri + 2) == '.' )
@@ -4034,8 +4082,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            lens++;
                         }
 
-                        State = STATE_ID_END;
                         cLastChar = '.';
+                        State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
                         continue;
                      }
                      else if( ( *(*ptri + 1) == 'N' || *(*ptri + 1) == 'n' ) && *(*ptri + 2) == '.' )
@@ -4051,8 +4099,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            lens++;
                         }
 
-                        State = STATE_ID_END;
                         cLastChar = '.';
+                        State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
                         continue;
                      }
                   }
@@ -4104,10 +4152,11 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             /* Ron Pinkas end 2000-06-02 */
             else if( **ptri == ' ' )
             {
-               State = STATE_ID_END;
                /* Ron Pinkas added 2000-06-02 */
                bMacro = FALSE;
                /* Ron Pinkas end 2000-06-02 */
+
+               State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
             }
 
             break;
@@ -4125,7 +4174,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             {
                State = STATE_EXPRES_ID;
             }
-            else if( ( **ptri == '+' && *( * ptri + 1 ) == '+' ) || ( **ptri == '-' && *( * ptri + 1 ) == '-' ) )
+            else if( ( **ptri == '+' && *( *ptri + 1 ) == '+' ) || ( **ptri == '-' && *( *ptri + 1 ) == '-' ) )
             {
                cLastChar = **ptri;
 
@@ -4145,14 +4194,27 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                (*ptri)++;
                lens++;
 
+               //printf( "(Digested) State: %i %c Rest >%s<\n", State, cLastChar, *ptri );
+
                if( State == STATE_EXPRES_ID )
                {
                   //printf( "ENDED\n" );
-                  State = STATE_ID_END;
+                  State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
                   continue;
                }
                else
                {
+                  while( **ptri == ' ' )
+                  {
+                     if( expreal )
+                     {
+                        *expreal++ = **ptri;
+                     }
+
+                     (*ptri)++;
+                     lens++;
+                  }
+
                   //printf( "BEGINED\n" );
                   State = STATE_EXPRES_ID;
                   continue;
@@ -4160,16 +4222,6 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             }
             else if( **ptri == ' ' )
             {
-               BOOL bPrefix = FALSE;
-
-               if( State == STATE_EXPRES_ID )
-               {
-                  if( lens > 2 && ( ( *( *ptri - 2 ) == '+' && *( *ptri - 1 ) == '+' ) || ( *( *ptri - 2 ) == '-' && *( *ptri - 1 ) == '-' ) ) )
-                  {
-                     bPrefix = TRUE;
-                  }
-               }
-
                do
                {
                   if( expreal )
@@ -4182,25 +4234,34 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                }
                while( **ptri == ' ' );
 
-               cLastChar = ' ';
-
                if( State == STATE_EXPRES_ID )
                {
                   if( ( **ptri == '+' && *( * ptri + 1 ) == '+' ) || ( **ptri == '-' && *( * ptri + 1 ) == '-' ) )
                   {
-                     // Continue in STATE_EXPRES_ID
+                     cLastChar = **ptri;
+
+                     if( expreal )
+                     {
+                        *expreal++ = **ptri;
+                     }
+
+                     (*ptri)++;
+                     lens++;
+
+                     if( expreal )
+                     {
+                        *expreal++ = **ptri;
+                     }
+
+                     (*ptri)++;
+                     lens++;
                   }
-                  else if( bPrefix )
-                  {
-                     // Continue in STATE_EXPRES_ID
-                  }
-                  else
-                  {
-                     // Terminate STATE_EXPRES_ID
-                     State = STATE_ID_END;
-                  }
+
+                  // Terminate STATE_EXPRES_ID
+                  State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
                }
 
+               cLastChar = ' ';
                continue;
             }
             /* Ron Pinkas added 2000-06-14 */
@@ -4223,7 +4284,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             {
                if( cMarkerType != '1' )
                {
-                  rez = TRUE; State = STATE_EXPRES;
+                  rez = TRUE;
+                  State = STATE_EXPRES;
                }
             }
             else if( **ptri == '.' )
@@ -4234,25 +4296,11 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                        *(*ptri-1) == 'Y' || *(*ptri-1) == 'N' ||
                        *(*ptri-1) == 'y' || *(*ptri-1) == 'n' ) )
                {
-                  State = STATE_ID_END;
+                  State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
                }
                else
                {
                   State = STATE_EXPRES;
-                  /*
-                  if( isdigit( *( *ptri + 1 ) ) )
-                  {
-                     State = STATE_EXPRES;
-                  }
-                  else if( strchr( "TFYN", toupper( *( *ptri + 1 ) ) ) && *( *ptri + 2 ) == '.' )
-                  {
-                     State = STATE_EXPRES;
-                  }
-                  else
-                  {
-                     rez = TRUE;
-                  }
-                  */
                }
             }
             else
