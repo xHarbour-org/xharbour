@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.17 2004/03/31 05:22:44 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.18 2004/04/25 07:17:34 vouchcac Exp $
  */
 
 /*
@@ -113,6 +113,8 @@
 #define WVT_DEFAULT_ROWS      25
 #define WVT_DEFAULT_COLS      80
 
+#define WVT_PICTURES_MAX      20
+
 //-------------------------------------------------------------------//
 
 #define BLACK          RGB( 0x0 ,0x0 ,0x0  )
@@ -197,6 +199,7 @@ typedef struct global_data
   int       colStart;                  // Holds nLeft   of last WM_PAINT rectangle
   int       colStop;                   // Holds nRight  of last WM_PAINT rectangle
   HMENU     hPopup;                    // Handle of context menu invokable with right click
+  IPicture  *iPicture[ WVT_PICTURES_MAX ]; // Array to hold the Picture Streams to avoid recurring loading and unloading
 
 } GLOBAL_DATA;
 

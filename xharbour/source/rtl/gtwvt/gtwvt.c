@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.95 2004/04/25 07:19:48 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.96 2004/04/25 23:50:14 andijahja Exp $
  */
 
 /*
@@ -94,6 +94,10 @@
 #ifndef IDC_HAND
    #define IDC_HAND MAKEINTRESOURCE(32649)
 #endif
+
+IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image );
+BOOL HB_EXPORT hb_wvt_gtRenderPicture( int x1, int y1, int wd, int ht, IPicture * iPicture );
+BOOL HB_EXPORT hb_wvt_gtDestroyPicture( IPicture * iPicture );
 
 //-------------------------------------------------------------------//
 
@@ -260,6 +264,8 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
 
 void HB_GT_FUNC( gt_Exit( void ) )
 {
+    int i;
+
     HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Exit()" ) );
 
     if ( _s.hWnd )
@@ -274,6 +280,14 @@ void HB_GT_FUNC( gt_Exit( void ) )
       if ( _s.hdc )
       {
          ReleaseDC( _s.hWnd, _s.hdc );
+      }
+
+      for ( i = 0; i < 10; i++ )
+      {
+         if ( _s.iPicture[ i ] )
+         {
+            hb_wvt_gtDestroyPicture( _s.iPicture[ i ] );
+         }
       }
 
       DestroyWindow( _s.hWnd );
@@ -3254,6 +3268,127 @@ BOOL HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * image 
 
 //-------------------------------------------------------------------//
 
+IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image )
+{
+  IStream  *iStream;
+  IPicture *iPicture;
+  HGLOBAL  hGlobal;
+  HANDLE   hFile;
+  DWORD    nFileSize;
+  DWORD    nReadByte;
+  IPicture *Result;
+
+  hFile = CreateFile( image, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+  if ( hFile != INVALID_HANDLE_VALUE )
+  {
+    nFileSize = GetFileSize( hFile, NULL );
+
+    if ( nFileSize != INVALID_FILE_SIZE )
+    {
+      hGlobal = GlobalAlloc( GPTR, nFileSize );
+
+      if ( hGlobal )
+      {
+        if ( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
+        {
+          CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
+          OleLoadPicture( iStream, nFileSize, TRUE, &IID_IPicture, ( LPVOID* )&iPicture );
+          if ( iPicture )
+          {
+            Result = iPicture;
+          }
+        }
+        GlobalFree( hGlobal );
+      }
+    }
+    CloseHandle( hFile );
+  }
+  return( Result );
+}
+
+//-------------------------------------------------------------------//
+
+BOOL HB_EXPORT hb_wvt_gtRenderPicture( int x1, int y1, int wd, int ht, IPicture * iPicture )
+{
+  LONG     lWidth,lHeight;
+  int      x,y,xe,ye;
+  int      c   = x1 ;
+  int      r   = y1 ;
+  int      dc  = wd ;
+  int      dr  = ht ;
+  int      tor =  0 ;
+  int      toc =  0 ;
+  HRGN     hrgn1;
+  POINT    lpp;
+  BOOL     bResult = FALSE;
+
+  if ( iPicture )
+  {
+    iPicture->lpVtbl->get_Width( iPicture,&lWidth );
+    iPicture->lpVtbl->get_Height( iPicture,&lHeight );
+
+    if ( dc  == 0 )
+    {
+      dc = ( int ) ( ( float ) dr * lWidth  / lHeight );
+    }
+    if ( dr  == 0 )
+    {
+      dr = ( int ) ( ( float ) dc * lHeight / lWidth  );
+    }
+    if ( tor == 0 )
+    {
+      tor = dr;
+    }
+    if ( toc == 0 )
+    {
+      toc = dc;
+    }
+    x  = c;
+    y  = r;
+    xe = c + toc - 1;
+    ye = r + tor - 1;
+
+    GetViewportOrgEx( _s.hdc, &lpp );
+
+    hrgn1 = CreateRectRgn( c+lpp.x, r+lpp.y, xe+lpp.x, ye+lpp.y );
+    SelectClipRgn( _s.hdc, hrgn1 );
+
+    while ( x < xe )
+    {
+      while ( y < ye )
+      {
+        iPicture->lpVtbl->  Render( iPicture, _s.hdc, x, y, dc, dr, 0,
+                                            lHeight, lWidth, -lHeight, NULL );
+        y += dr;
+      }
+      y =  r;
+      x += dc;
+    }
+
+    SelectClipRgn( _s.hdc, NULL );
+
+    bResult = TRUE ;
+  }
+
+  return( bResult );
+}
+
+//-------------------------------------------------------------------//
+
+BOOL HB_EXPORT hb_wvt_gtDestroyPicture( IPicture * iPicture )
+{
+   BOOL bResult = FALSE;
+
+   if ( iPicture )
+   {
+      iPicture->lpVtbl->Release( iPicture );
+      bResult = TRUE;
+   }
+   return bResult;
+}
+
+//-------------------------------------------------------------------//
+
 HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void )
 {
    return &_s;
@@ -3803,12 +3938,7 @@ HB_FUNC( WVT_SETMENU )
 HB_FUNC( WVT_SETPOPUPMENU )
 {
    HMENU hPopup = _s.hPopup ;
-/*
-   if ( _s.hPopup )
-   {
-      _s.hPopup = NULL ;  // DestroyMenu( _s.hPopup );
-   }
-*/
+
    _s.hPopup = ( HMENU ) hb_parnl( 1 );
    if ( hPopup )
    {
@@ -4703,7 +4833,7 @@ HB_FUNC( WVT_DRAWBOXGROUPRAISED )
 
 //-------------------------------------------------------------------//
 //
-//    Wvt_DrawImage( nTop, nLeft, nBottom, nRight, cImage )
+//    Wvt_DrawImage( nTop, nLeft, nBottom, nRight, cImage/nPictureSlot )
 //
 HB_FUNC( WVT_DRAWIMAGE )
 {
@@ -4718,7 +4848,14 @@ HB_FUNC( WVT_DRAWIMAGE )
    iBottom = xy.y - 1;
    iRight  = xy.x - 1;
 
-   hb_wvt_gtDrawImage( iLeft, iTop, ( iRight - iLeft ) + 1, ( iBottom - iTop ) + 1, hb_parcx( 5 ) ) ;
+   if ( ISNUM( 5 ) )
+   {
+      hb_wvt_gtRenderPicture( iLeft, iTop, ( iRight - iLeft ) + 1, ( iBottom - iTop ) + 1, _s.iPicture[ hb_parni( 5 )-1 ] ) ;
+   }
+   else
+   {
+      hb_wvt_gtDrawImage( iLeft, iTop, ( iRight - iLeft ) + 1, ( iBottom - iTop ) + 1, hb_parcx( 5 ) ) ;
+   }
 
    hb_retl( TRUE );
 }
@@ -5092,8 +5229,7 @@ HB_FUNC( WVT_DRAWGRIDHORZ )
 //
 HB_FUNC( WVT_DRAWGRIDVERT )
 {
-   int iTop, iBottom, x;
-   int i;
+   int iTop, iBottom, x, i, iCharHeight, iCharWidth;
    int iTabs = hb_parni( 4 );
 
    if ( ! iTabs )
@@ -5101,14 +5237,17 @@ HB_FUNC( WVT_DRAWGRIDVERT )
       hb_retl( FALSE );
    }
 
-   iTop    = ( hb_parni( 1 ) * _s.PTEXTSIZE.y );
-   iBottom = ( ( hb_parni( 2 ) + 1 ) * _s.PTEXTSIZE.y ) - 1;
+   iCharWidth  = _s.PTEXTSIZE.x;
+   iCharHeight = _s.PTEXTSIZE.y;
+
+   iTop    = ( hb_parni( 1 ) * iCharHeight );
+   iBottom = ( ( hb_parni( 2 ) + 1 ) * iCharHeight ) - 1;
 
    SelectObject( _s.hdc, _s.currentPen );
 
    for ( i = 1; i <= iTabs; i++ )
    {
-      x = ( hb_parni( 3,i ) * _s.PTEXTSIZE.x );
+      x = ( hb_parni( 3,i ) * iCharWidth );
 
       MoveToEx( _s.hdc, x, iTop, NULL );
       LineTo( _s.hdc, x, iBottom );
@@ -5119,7 +5258,7 @@ HB_FUNC( WVT_DRAWGRIDVERT )
 
 //-------------------------------------------------------------------//
 //
-//    Wvt_DrawButton( nTop, nLeft, nBottom, nRight, cText, cImage, ;
+//    Wvt_DrawButton( nTop, nLeft, nBottom, nRight, cText, cnImage, ;
 //                    nFormat, nTextColor, nBkColor, nImageAt ) ;
 //
 HB_FUNC( WVT_DRAWBUTTON )
@@ -5134,9 +5273,10 @@ HB_FUNC( WVT_DRAWBUTTON )
    COLORREF /* oldBkColor, */ oldTextColor;
    LOGBRUSH lb;
    HBRUSH   hBrush;
+   IPicture *iPicture;
 
    BOOL     bText     = ISCHAR( 5 );
-   BOOL     bImage    = ISCHAR( 6 );
+   BOOL     bImage    = !( ISNIL( 6 ) );
    int      iFormat   = ISNIL(  7 ) ? 0 : hb_parni( 7 );
    COLORREF textColor = ISNIL(  8 ) ? _COLORS[ 0 ] : ( COLORREF ) hb_parnl( 8 ) ;
    COLORREF bkColor   = ISNIL(  9 ) ? _COLORS[ 7 ] : ( COLORREF ) hb_parnl( 9 ) ;
@@ -5231,7 +5371,15 @@ HB_FUNC( WVT_DRAWBUTTON )
          iImageHeight = ( iBottom - iTop + 1 - 8 + 1 );
       }
 
-      hb_wvt_gtDrawImage( iLeft+4, iTop+4, iImageWidth, iImageHeight, hb_parcx( 6 ) );
+      if ( ISNUM( 6 ) )
+      {
+         iPicture = _s.iPicture[ hb_parni( 6 ) - 1 ];
+         hb_wvt_gtRenderPicture( iLeft+4, iTop+4, iImageWidth, iImageHeight, iPicture );
+      }
+      else
+      {
+         hb_wvt_gtDrawImage( iLeft+4, iTop+4, iImageWidth, iImageHeight, hb_parcx( 6 ) );
+      }
    }
 
    hb_retl( TRUE );
@@ -5295,14 +5443,14 @@ HB_FUNC( WVT_CHOOSEFONT )
 
       hb_reta( 8 );
 
-      hb_storc( lf.lfFaceName      , -1, 1 );
+      hb_storc(  lf.lfFaceName     , -1, 1 );
       hb_stornl( ( LONG ) PointSize, -1, 2 );
       hb_storni( lf.lfWidth        , -1, 3 );
       hb_storni( lf.lfWeight       , -1, 4 );
       hb_storni( lf.lfQuality      , -1, 5 );
-      hb_storl( lf.lfItalic        , -1, 6 );
-      hb_storl( lf.lfUnderline     , -1, 7 );
-      hb_storl( lf.lfStrikeOut     , -1, 8 );
+      hb_storl(  lf.lfItalic       , -1, 6 );
+      hb_storl(  lf.lfUnderline    , -1, 7 );
+      hb_storl(  lf.lfStrikeOut    , -1, 8 );
    }
    else
    {
@@ -5472,6 +5620,67 @@ HB_FUNC( WVT_SETPOINTER )
 }
 
 //-------------------------------------------------------------------//
+//
+//   Wvt_LoadPicture( cFilePic, nSlot )
+//
+HB_FUNC( WVT_LOADPICTURE )
+{
+   IPicture * iPicture = hb_wvt_gtLoadPicture( hb_parcx( 1 ) );
+   BOOL       bResult  = FALSE;
+   int        iSlot    = hb_parni( 2 ) - 1 ;
 
+   if ( iPicture )
+   {
+      if ( _s.iPicture[ iSlot ] )
+      {
+         hb_wvt_gtDestroyPicture( _s.iPicture[ iSlot ] );
+      }
 
+      _s.iPicture[ iSlot ] = iPicture;
+      bResult = TRUE;
+   }
+   hb_retl( bResult );
+}
+
+//-------------------------------------------------------------------//
+//
+//  Wvt_DrawPicture( nTop, nLeft, nBottom, nRight, nSlot, aAdj ) -> lOk
+//  nSlot <= 20  aAdj == { 0,0,-2,-2 } To Adjust the pixels for { Top,Left,Bottom,Right }
+//
+HB_FUNC( WVT_DRAWPICTURE )
+{
+   POINT    xy;
+   int      iTop, iLeft, iBottom, iRight;
+   BOOL     bResult = FALSE;
+   int      iSlot   = hb_parni( 5 ) - 1;
+
+   if ( iSlot < WVT_PICTURES_MAX )
+   {
+      if ( _s.iPicture[ iSlot ] )
+      {
+         xy       = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+         iTop     = xy.y + hb_parni( 6,1 );
+         iLeft    = xy.x + hb_parni( 6,2 );
+
+         xy       = hb_wvt_gtGetXYFromColRow( hb_parni( 4 ) + 1, hb_parni( 3 ) + 1 );
+         iBottom  = xy.y-1 + hb_parni( 6,3 );
+         iRight   = xy.x-1 + hb_parni( 6,4 );
+
+         hb_retl( hb_wvt_gtRenderPicture( iLeft, iTop, iRight - iLeft + 1, iBottom - iTop + 1, _s.iPicture[ iSlot ] ) );
+
+         bResult  = TRUE;
+      }
+   }
+
+   hb_retl( bResult );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_MESSAGEBOX )
+{
+   MessageBox( _s.hWnd, hb_parcx( 1 ), hb_parcx( 2 ), ISNIL( 3 ) ? MB_OK : hb_parni( 3 ) );
+}
+
+//-------------------------------------------------------------------//
 

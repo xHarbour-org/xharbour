@@ -57,7 +57,17 @@
 
 //-------------------------------------------------------------------//
 
+#define  SLOT_IMAGE_VOUCH          1
+#define  SLOT_IMAGE_BROWSE         2 
+#define  SLOT_IMAGE_VR             3
+#define  SLOT_IMAGE_NOTES          4
+#define  SLOT_IMAGE_TOOLS          5
+#define  SLOT_IMAGE_HELP           6
+
+//-------------------------------------------------------------------//
+
 static wvtScreen := {}
+static pic_:= { , , , , , , , , , , , , , , , , , , , }
 
 //-------------------------------------------------------------------//
 PROCEDURE Main()
@@ -81,19 +91,28 @@ PROCEDURE Main()
    LOCAL cLabel  := 'xHarbour simulated GUI.'
    LOCAL aObjects:= WvtSetObjects( {} )
    LOCAL aObj    := {}
-   LOCAL kf2     := SetKey( K_F2, {|| WvtGets() } )
-   LOCAL kf3     := SetKey( K_F3, {|| WvtWindowExpand( 1 ) } )
+   LOCAL kf2     := SetKey( K_F2, {|| WvtGets()             } )
+   LOCAL kf3     := SetKey( K_F3, {|| WvtWindowExpand( 1 )  } )
    LOCAL kf4     := SetKey( K_F4, {|| WvtWindowExpand( -1 ) } )
-   LOCAL kf5     := SetKey( K_F5, {|| WvtBrowse() } )
-   LOCAL kf6     := SetKey( K_F6, {|| Wvt_Minimize() } )
-   LOCAL kf7     := SetKey( K_F7, {|| WvtPartialScreen() } )
-   LOCAL kf8     := SetKey( K_F8, {|| WvtLines() } )
-   LOCAL kf9     := SetKey( K_F9, {|| Wvt_ChooseFont() } )
-   LOCAL kf10    := SetKey( K_F10,{|| Wvt_ChooseColor() } )
+   LOCAL kf5     := SetKey( K_F5, {|| WvtBrowse()           } )
+   LOCAL kf6     := SetKey( K_F6, {|| Wvt_Minimize()        } )
+   LOCAL kf7     := SetKey( K_F7, {|| WvtPartialScreen()    } )
+   LOCAL kf8     := SetKey( K_F8, {|| WvtLines()            } )
+   LOCAL kf9     := SetKey( K_F9, {|| Wvt_ChooseFont()      } )
+   LOCAL kf10    := SetKey( K_F10,{|| Wvt_ChooseColor()     } )
    LOCAL hPopup  := Wvt_SetPopupMenu()
    
    Popups( 1 )
-            
+   
+   //  Load All Image Files
+   //
+   WvtPictures( 'Vouch1.bmp'  , SLOT_IMAGE_VOUCH  )
+   WvtPictures( 'V_Browse.Ico', SLOT_IMAGE_BROWSE )
+   WvtPictures( 'vr_1.ico'    , SLOT_IMAGE_VR     )
+   WvtPictures( 'v_notes.ico' , SLOT_IMAGE_NOTES  )
+   WvtPictures( 'v_tools.ico' , SLOT_IMAGE_TOOLS  )
+   WvtPictures( 'v_help.ico'  , SLOT_IMAGE_HELP   )
+   
    SET DATE BRITISH
 
    dDate := ctod( '04/01/04' )
@@ -112,7 +131,7 @@ PROCEDURE Main()
    aAdd( aBlocks, {|| Wvt_DrawBoxRecessed( 7, 61, 13, 70 ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxGroup( 15, 59, 18, 72 ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxGroup( 5, 6, 19, 44 ) } )
-   aAdd( aBlocks, {|| Wvt_DrawImage( 8,62,12,69, 'vouch1.bmp' ) } )
+   aAdd( aBlocks, {|| Wvt_DrawImage( 8,62,12,69, SLOT_IMAGE_VOUCH ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxRecessed( 7, 48, 13, 55 ) } )
    aAdd( aBlocks, {|| Wvt_DrawLine( maxrow()-2,0,maxrow()-2,maxcol(),WVT_LINE_HORZ,WVT_LINE_RECESSED,WVT_LINE_BOTTOM ) } )
 
@@ -127,26 +146,26 @@ PROCEDURE Main()
 	#define btnFBUp    WVT_BTN_FORMAT_FLAT
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 1,  nBtnRow, 6,nBtnRow+1, 9, ;
-       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,'vouch1.bmp',btnFDisp  ) },;
-       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,'vouch1.bmp',btnFMOver ) },;
-       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,'vouch1.bmp',btnFBDown ) },;
-       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,'vouch1.bmp',btnFBUp   )  ,;
+       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,SLOT_IMAGE_VOUCH,btnFDisp  ) },;
+       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,SLOT_IMAGE_VOUCH,btnFMOver ) },;
+       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,SLOT_IMAGE_VOUCH,btnFBDown ) },;
+       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,SLOT_IMAGE_VOUCH,btnFBUp   )  ,;
               eval( SetKey( K_F2 ) ) } ;
                     } )
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 2,  nBtnRow,11,nBtnRow+1,14, ;
-       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,'v_browse.ico', btnFDisp  ) },;
-       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,'v_browse.ico', btnFMOver ) },;
-       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,'v_browse.ico', btnFBDown ) },;
-       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,'v_browse.ico', btnFBUp   )  ,;
+       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,SLOT_IMAGE_BROWSE, btnFDisp  ) },;
+       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,SLOT_IMAGE_BROWSE, btnFMOver ) },;
+       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,SLOT_IMAGE_BROWSE, btnFBDown ) },;
+       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,SLOT_IMAGE_BROWSE, btnFBUp   )  ,;
               eval( SetKey( K_F5 ) ) } ;
                     } )
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 3,  nBtnRow,16,nBtnRow+1,19, ;
-       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand','v_notes.ico',btnFDisp  ) },;
-       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand','v_notes.ico',btnFMOver ) },;
-       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand','v_notes.ico',btnFBDown ) },;
-       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand','v_notes.ico',btnFBUp   )  ,;
+       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand',SLOT_IMAGE_NOTES,btnFDisp  ) },;
+       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand',SLOT_IMAGE_NOTES,btnFMOver ) },;
+       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand',SLOT_IMAGE_NOTES,btnFBDown ) },;
+       {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand',SLOT_IMAGE_NOTES,btnFBUp   )  ,;
               eval( SetKey( K_F3 ) ) } ;
                    } )
 
@@ -159,26 +178,26 @@ PROCEDURE Main()
                    } )
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 5,  nBtnRow,26,nBtnRow+1,29, ;
-       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize','v_tools.ico' , btnFDisp  ) },;
-       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize','v_tools.ico' , btnFMOver ) },;       
-       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize','v_tools.ico' , btnFBDown ) },;       
-       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize','v_tools.ico' , btnFBUp   )  ,;       
+       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize',SLOT_IMAGE_TOOLS, btnFDisp  ) },;
+       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize',SLOT_IMAGE_TOOLS, btnFMOver ) },;       
+       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize',SLOT_IMAGE_TOOLS, btnFBDown ) },;       
+       {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Minimize',SLOT_IMAGE_TOOLS, btnFBUp   )  ,;       
               eval( SetKey( K_F6 ) ) },;
                    } )
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 6, nBtnRow,31,nBtnRow+1,34, ;
-       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial','v_help.ico', btnFDisp  ) },;
-       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial','v_help.ico', btnFMOver ) },;
-       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial','v_help.ico', btnFBDown ) },;       
-       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial','v_help.ico', btnFBUp   )  ,;       
+       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial',SLOT_IMAGE_HELP, btnFDisp  ) },;
+       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial',SLOT_IMAGE_HELP, btnFMOver ) },;
+       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial',SLOT_IMAGE_HELP, btnFBDown ) },;       
+       {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Partial',SLOT_IMAGE_HELP, btnFBUp   )  ,;       
               eval( SetKey( K_F7 ) ) },;
                    } )
 
    WvtSetObjects( { OBJ_TYPE_BUTTON, 7,  nBtnRow,36,nBtnRow+1,39, ;
-       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines','Vr_1.ico', btnFDisp , rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;
-       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines','Vr_1.ico', btnFMOver, rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;
-       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines','Vr_1.ico', btnFBDown, rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;       
-       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines','Vr_1.ico', btnFBUp  , rgb( 100,22,241 ), rgb( 0,100,0 ) )  ,;
+       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines',SLOT_IMAGE_VR, btnFDisp , rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;
+       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines',SLOT_IMAGE_VR, btnFMOver, rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;
+       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines',SLOT_IMAGE_VR, btnFBDown, rgb( 100,22,241 ), rgb( 0,100,0 ) ) },;       
+       {|| Wvt_DrawButton( nBtnRow,36,nBtnRow+1,39,'Lines',SLOT_IMAGE_VR, btnFBUp  , rgb( 100,22,241 ), rgb( 0,100,0 ) )  ,;
               eval( SetKey( K_F8 ) ) } ;
                    } )
                               
@@ -276,8 +295,8 @@ PROCEDURE WvtGets()
    aAdd( aBlocks, {|| Wvt_DrawButton( 21,11,22,14,'Browse','vouch1.bmp', 1, rgb( 255,255,255 ) ) } )
    aAdd( aBlocks, {|| Wvt_DrawButton( 21,16,22,19, ,'vouch1.bmp' ) } )
    aAdd( aBlocks, {|| Wvt_DrawButton( 21,21,22,24,'Data',, 0, rgb( 100,22,241 ), rgb( 198,198,198 ) ) } )         
-   aAdd( aBlocks, {|| Wvt_DrawButton( 21,26,22,29,'Flat','vr_1.ico',2 ) } )
-   aAdd( aBlocks, {|| Wvt_DrawButton( 21,31,22,34,'Outline','vr_1.ico',3 ) } )   
+   aAdd( aBlocks, {|| Wvt_DrawButton( 21,26,22,29,'Flat',SLOT_IMAGE_VR,2 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawButton( 21,31,22,34,'Outline',SLOT_IMAGE_VR,3 ) } )   
    aAdd( aBlocks, {|| Wvt_DrawButton( 22,36,22,41,'Data',, 0, rgb( 100,22,241 ), rgb( 198,198,198 ) ) } )         
 
    aLastPaint := WvtSetBlocks( aBlocks )
@@ -804,7 +823,7 @@ RETURN nil
 
 FUNCTION DispStatusMsg( cMsg )
 
-Wvt_DrawLabel( MaxRow(), 60, cMsg, 6, , 0, rgb(198,198,198), 'Arial', 18, , 900 )
+	Wvt_DrawLabel( MaxRow(), 60, cMsg, 6, , 0, rgb(198,198,198), 'Arial', 18, , 900 )
 
 RETURN .t.
 
@@ -823,73 +842,97 @@ RETURN .t.
 //-------------------------------------------------------------------//
 
 FUNCTION Popups( nID, lDestroy )
+	LOCAL hPop, hPop1
+	LOCAL nPrompt := MF_ENABLED+MF_STRING
 
-local hPop, hPop1
-local nPrompt := MF_ENABLED+MF_STRING
+	static hPop_:= { , , , , , , , , }
 
-static hPop_:= { , , , , , , , , }
+	if nID == nil
+   	Wvt_SetPopupMenu()
+		return nil
+	endif
 
-if nID == nil
-   Wvt_SetPopupMenu()
-	return nil
-endif
+	if lDestroy <> nil
+		Wvt_DestroyMenu( hPop_[ nID ] )
+		return nil
+	endif
 
-if lDestroy <> nil
-	Wvt_DestroyMenu( hPop_[ nID ] )
-	return nil
-endif
-
-hPop := hPop_[ nID ]
+	hPop := hPop_[ nID ]
    
-do case
-case nID == 1   //  Data Entry Module
+	do case
+	case nID == 1   //  Data Entry Module
    
-   if hPop == nil
-		hPop := Wvt_CreatePopupMenu()
-		Wvt_AppendMenu( hPop, nPrompt, K_F2, 'Second Get Screen' )
-		Wvt_AppendMenu( hPop, nPrompt, K_F3, 'Expand Window'     )
-		Wvt_AppendMenu( hPop, nPrompt, K_F4, 'Shrink Window'     )
-		Wvt_AppendMenu( hPop, nPrompt, K_F5, 'Browse'            )
-		Wvt_AppendMenu( hPop, nPrompt, K_F6, 'Minimize'          )
-		Wvt_AppendMenu( hPop, nPrompt, K_F7, 'Partial Screen'    )
-		Wvt_AppendMenu( hPop, nPrompt, K_F8, 'Lines'             )
-		Wvt_AppendMenu( hPop, nPrompt, K_F9, 'Choose Font'       )
-		Wvt_AppendMenu( hPop, nPrompt, K_F10,'Choose Color'      )   
+   	if hPop == nil
+			hPop := Wvt_CreatePopupMenu()
+			Wvt_AppendMenu( hPop, nPrompt, K_F2, 'Second Get Screen' )
+			Wvt_AppendMenu( hPop, nPrompt, K_F3, 'Expand Window'     )
+			Wvt_AppendMenu( hPop, nPrompt, K_F4, 'Shrink Window'     )
+			Wvt_AppendMenu( hPop, nPrompt, K_F5, 'Browse'            )
+			Wvt_AppendMenu( hPop, nPrompt, K_F6, 'Minimize'          )
+			Wvt_AppendMenu( hPop, nPrompt, K_F7, 'Partial Screen'    )
+			Wvt_AppendMenu( hPop, nPrompt, K_F8, 'Lines'             )
+			Wvt_AppendMenu( hPop, nPrompt, K_F9, 'Choose Font'       )
+			Wvt_AppendMenu( hPop, nPrompt, K_F10,'Choose Color'      )   
 		
-		Wvt_AppendMenu( hPop, MF_SEPARATOR )
+			Wvt_AppendMenu( hPop, MF_SEPARATOR )
 	
-		Wvt_AppendMenu( hPop, nPrompt, K_F5, 'Browse'  )
+			Wvt_AppendMenu( hPop, nPrompt, K_F5, 'Browse'  )
 	   
-	endif
+		endif
 
-case nID == 2   //  Browser
+	case nID == 2   //  Browser
 		
-   if hPop == nil
-		hPop := Wvt_CreatePopupMenu()	
-		Wvt_AppendMenu( hPop, nPrompt, K_DOWN     , 'Down'      )
-		Wvt_AppendMenu( hPop, nPrompt, K_UP       , 'Up'        )
-		Wvt_AppendMenu( hPop, nPrompt, K_PGDN     , 'Page Down' )
-		Wvt_AppendMenu( hPop, nPrompt, K_PGUP     , 'Page Up'   )
-		Wvt_AppendMenu( hPop, nPrompt, K_CTRL_PGUP, 'Top'       )
-		Wvt_AppendMenu( hPop, nPrompt, K_CTRL_PGDN, 'Bottom'    )
+   	if hPop == nil
+			hPop := Wvt_CreatePopupMenu()	
+			Wvt_AppendMenu( hPop, nPrompt, K_DOWN     , 'Down'      )
+			Wvt_AppendMenu( hPop, nPrompt, K_UP       , 'Up'        )
+			Wvt_AppendMenu( hPop, nPrompt, K_PGDN     , 'Page Down' )
+			Wvt_AppendMenu( hPop, nPrompt, K_PGUP     , 'Page Up'   )
+			Wvt_AppendMenu( hPop, nPrompt, K_CTRL_PGUP, 'Top'       )
+			Wvt_AppendMenu( hPop, nPrompt, K_CTRL_PGDN, 'Bottom'    )
 		
-		Wvt_AppendMenu( hPop, MF_SEPARATOR )		
+			Wvt_AppendMenu( hPop, MF_SEPARATOR )		
 		
-		hPop1 := Wvt_CreatePopupMenu()
-		Wvt_AppendMenu( hPop1, nPrompt, K_RIGHT   , 'Right'     )
-		Wvt_AppendMenu( hPop1, nPrompt, K_LEFT    , 'Left'      )
-		Wvt_AppendMenu( hPop1, nPrompt, K_END     , 'End'       )
-		Wvt_AppendMenu( hPop1, nPrompt, K_HOME    , 'Home'      )
+			hPop1 := Wvt_CreatePopupMenu()
+			Wvt_AppendMenu( hPop1, nPrompt, K_RIGHT   , 'Right'     )
+			Wvt_AppendMenu( hPop1, nPrompt, K_LEFT    , 'Left'      )
+			Wvt_AppendMenu( hPop1, nPrompt, K_END     , 'End'       )
+			Wvt_AppendMenu( hPop1, nPrompt, K_HOME    , 'Home'      )
 
-		Wvt_AppendMenu( hPop, MF_ENABLED+MF_POPUP, hPop1, 'Column Movement' )
+			Wvt_AppendMenu( hPop, MF_ENABLED+MF_POPUP, hPop1, 'Column Movement' )
 		
-	endif
+		endif
 	
-endcase
+	endcase
 
-hPop_[ nID ] := hPop
+	hPop_[ nID ] := hPop
 
-return Wvt_SetPopupMenu( hPop_[ nID ] )
+RETURN Wvt_SetPopupMenu( hPop_[ nID ] )
 
 //-------------------------------------------------------------------//
+
+FUNCTION WvtPictures( cFilePic, nSlot )
+
+	if nSlot <> nil .and. nSlot <= 20 .and. file( cFilePic )
+		if pic_[ nSlot ] <> cFilePic
+			if Wvt_LoadPicture( cFilePic, nSlot )
+				pic_[ nSlot ] := cFilePic
+			endif				
+		endif
+	endif
+
+RETURN nil
+
+//-------------------------------------------------------------------//
+
+FUNCTION WvtExePicture( nTop, nLeft, nBottom, nRight, nSlot, aOffset )
+
+   if pic_[ nSlot ] <> nil
+	   Wvt_DrawPicture( nTop, nLeft, nBottom, nRight, nSlot, aOffSet )
+   endif
+
+RETURN nil
+
+//-------------------------------------------------------------------//
+
 
