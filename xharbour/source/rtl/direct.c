@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.28 2004/03/03 06:35:18 andijahja Exp $
+ * $Id: direct.c,v 1.30 2004/03/03 07:06:38 ronpinkas Exp $
  */
 
 /*
@@ -274,7 +274,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
       PHB_ITEM pEntry = hb_arrayGetItemPtr( pRecurse, ui + 1 );
       char *szEntry = hb_arrayGetC( pEntry, 1 );
 
-      if ( szEntry[ strlen( szEntry ) - 1 ] != '.' )
+      if( szEntry[ strlen( szEntry ) - 1 ] != '.' )
       {
          if ( hb_fsIsDirectory( ( BYTE * ) szEntry ) )
          {
@@ -427,7 +427,7 @@ HB_FUNC( DIRECTORYRECURSE )
          szFName = hb_xstrcpy( NULL, fDirSpec->szName, fDirSpec->szExtension, NULL );
       }
 
-      hb_fsDirectoryRecursive( &Dir, szRecurse, szFName, hb_parc(2), bMatchCase );
+      hb_fsDirectoryRecursive( &Dir, szRecurse, szFName, szAttributes, bMatchCase );
 
       hb_itemForwardValue( &(HB_VM_STACK).Return, &Dir );
 
