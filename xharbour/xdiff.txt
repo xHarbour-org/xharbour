@@ -1,9 +1,9 @@
-xHarbour is a fork from Harbour created Demeber 2001. It aims to follow a more
-aggressive development path, and be more responsive to market trends, and
-users input.
+xHarbour is a fork from Harbour created December 2001. It aims to follow a more
+aggressive development path, and be more responsive to market trends, and users
+input.
 
-As it stands at this point, xHarbour offers many Syntax extensions over
-Harbour and Clipper, including:
+As it stands at this point, xHarbour offers many Syntax extensions over Harbour
+and Clipper, including:
 
 SWITCH syntax:
 -----------
@@ -29,7 +29,7 @@ NOTE: This syntax is modeled after the C 'switch' flow control. It offers
 WARNING: Those NOT familiar with the C switch flow control, should understand
          that unlike DO CASE, you MUST explicitly use the EXIT statement or
          else logic will FALL THROUGH to the NEXT CASE, until stopped at a
-         BREAK, or END statements.
+         EXIT, or END statements.
 
          At first this might seem VERY ODD, but it provides great flexibility
          exactly like the C model.
@@ -52,7 +52,7 @@ Syntax:
    StartThread ( @MyThreadFunc() [, xParam1 [,xParamN ] ] )
 
 NOTE: MT Application must link against the MT versions of the Libraries, i.e.
-      vmmt.lib, rtlmt.lib, ppmt.lib, rddmt.lib, dbfntxmt.lib and dbfcdxmt.lib.
+      vmmt.lib, rtlmt.lib, ppmt.lib, rddmt.lib, dbfntxmt.lib, and dbfcdxmt.lib.
 
 The full description of MT is beyond the scope of this document.
 
@@ -83,35 +83,35 @@ TRY syntax:
       ...
    END
 
-The above is very similiar to Clipper BEGIN SEQ, BREAK(), RECOVER USING, END,
+The above is very similar to Clipper BEGIN SEQ, BREAK(), RECOVER USING, END,
 but is more inline with more "modern" languages, and dismisses the need to
-worry about Error codeblock.
+worry about Error Codeblock.
 
 IN operator:
 ------------
 
    <Exp> IN <Array_or_StringExp> => .T./.F.
 
-The IN operator is very similiar to the @ operator, but is valid on *both*
-Strings and Arrays. IN is much faster than the eqivalent:
+The IN operator is very similar to the @ operator, but is valid on *both*
+Strings and Arrays. IN is much faster than the equivalent:
 
    aScan( <Array>, <Exp> ) > 0
 
-Variable Paramaters syntax:
+Variable Parameters syntax:
 ---------------------------
 
    Function <cFuncName>( ... )
 
-The above definition allows this Function to receive up-to 254 paramaters.
-You may retriev an ARRAY with all the paramaters using:
+The above definition allows this Function to receive up-to 254 parameters.
+You may retrieve an ARRAY with all the parameters using:
 
    HB_aParamas()
 
-The above is appropriate for such functions that may receive any
-number of generic paramaters, which normally will then be processed in
-a loop, or with hard coded IF statements based on PCount(). Instead
-the above is much easier to code, requires less memory, and is faster than
-declaring the paramaters.
+The above is appropriate for such functions that may receive any number of
+generic parameters, which normally will then be processed in a loop, or with
+hard coded IF statements based on PCount(). Instead the above is much easier to
+code, requires less memory, and is faster than
+declaring the parameters.
 
 GLOBAL variables:
 -----------------
@@ -119,12 +119,12 @@ GLOBAL variables:
    GLOBAL <Id1> [,<Id2> [,<IdN>]]
 
 GLOBAL Variables are a new kind of a declared variables. they have PUBLIC like
-visability, but are faster than even STATICs. GLOBLAS can be refernced from
+visibility, but are faster than even STATICs. GLOBLAS can be referenced from
 other modules using the syntax:
 
    GLOBAL EXTERNAL <Id1> [,<Id2> [,<IdN>]]
 
-GLOBAL Variables have the added benefit of being *directly* accessable from C
+GLOBAL Variables have the added benefit of being *directly* accessible from C
 code too.
 
 True C Type Structures:
@@ -161,21 +161,23 @@ equivalent conventional coding.
 FOR EACH Syntax:
 ----------------
 
-   FOR EACH <Element> IN <Array> // <Element> must be a declared variable.
-       <Element> // Enumarate value of each respective element in the <exp>.
-      HB_EnumIndex() returns
+   // <ElementOrProperty> must be a declared variable.
+   FOR EACH <ElementOrProperty> IN <ArrayOrObject>
+      // ElementOrProperty holds value of each respective element or property.
+      <ElementOrProperty>
+      HB_EnumIndex() // Returns current Position Index.
       [LOOP]
       [EXIT]
    NEXT
 
-is not only more elegant than:
+The FOR EACH syntax is not only more elegant than:
 
    FOR Counter := 1 TO Len(Array)
       Element := Array[Counter]
       ...
    NEXT
 
-but is also MUCH faster - and it also supports enumarating all properties in
+but is also MUCH faster - and it also supports enumerating all properties in
 an object.
 
 Full access to OLE Servers:
@@ -187,8 +189,8 @@ Full access to OLE Servers:
    GetActiveObject( "ServerName" ) => oOleObject
       Get existing instance of an Ole Server.
 
-All documeneted methods and properties of such Server should be directly
-accessable.
+All documented methods and properties of such Server should be directly
+accessible.
 
 Strings may be indexed like arrays:
 -----------------------------------
@@ -207,12 +209,12 @@ operations.
 
 Negative Array Index:
 ---------------------
-Both Arrays and Strings may be indexed with negative numbers (Reveresed),
+Both Arrays and Strings may be indexed with negative numbers (Reversed),
 where -1 indexes the LAST Element (or NIL if the Array is empty):
 
    cVar[-1] // => "o"
 
-assuming cVar is the value "Hello" as per above.
+   // assuming cVar is the value "Hello" as per above.
 
 #[x]uncommand and #[x]untranslate directives:
 ---------------------------------------------
@@ -228,7 +230,6 @@ Extended macro support:
 
 will compile correctly even if cMacro is a declared var.
 
-
 Optimizations:
 --------------
 
@@ -241,7 +242,7 @@ variables and numeric values.
 
 Optimized WHILE .T. loops.
 
-The underlaying ITEM API has been rewritten (source/vm/fastitem.c) and is far
+The underlying ITEM API has been rewritten (source/vm/fastitem.c) and is far
 faster and consumes much less memory.
 
 Much extended Expression Optimizer produces faster code for common functions,
@@ -252,8 +253,8 @@ and code notations. For example it will automatically convert:
 
 which will execute much faster than the above common code.
 
-Optimized generation of Line numbers and other similiar optimizations which
-endup producing smaller and faster executables.
+Optimized generation of Line numbers and other similar optimizations which
+end up producing smaller and faster executables.
 
 Built-in support for SET TRACE [On|Off] and TraceLog() function.
 
@@ -261,7 +262,7 @@ Optimized and extended Garbage Collector.
 
 Optimized OOP system.
 
-Full support for Clipper undocumented OOP internals (not avialable in Harbour).
+Full support for Clipper undocumented OOP internals (not available in Harbour).
 
 Built-in support for OLE in Win32.
 
@@ -271,12 +272,12 @@ New HB_FuncPtr(), HB_ObjMsgPtr() and HB_Exec().
 
 The xHarbour Run-Time library was re-written to take advantage of all above
 syntax extensions, and is taking full advantage of the resulting speed
-improvments.
+improvements.
 
 Fixed:
 ------
 
-   HB_Qself() returns correct QSelf() even from inide codeblocks (inline
+   HB_Qself() returns correct QSelf() even from inside Codeblocks (inline
    methods).
 
    @ x,y GET &xMacro.Suffix
@@ -289,8 +290,8 @@ Fixed:
    -> Clipper complains: Error C2047  GET contains complex macro.
 
 xHarbour is about twice as fast as Clipper, on most common operations
-[excluding console screen output, and DBF access], and about 10 times faster
-than Harbour.
+[excluding console screen output, and DBF access], and about 25% to 1000%
+faster than Harbour.
 
 xHarbour should compile and execute all valid Clipper and Harbour code,
 without any modifications - such code will be automatically optimized to take
