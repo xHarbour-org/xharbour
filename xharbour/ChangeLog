@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1212 2003/07/05 13:09:58 lculik Exp $
+ * $Id: ChangeLog,v 1.1213 2003/07/05 13:40:21 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-07-05 14:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+*source/rtl/direct.c
+*source/rtl/hbffind.c
+*source/rtl/transform.c
+   * Added support for long Doubles values
+*include/hbapi.h
+ include/hbapifs.h
+ include/hbvmpub.h
+ include/hbapiitm.h
+   + Prototypes for long doubles apis
+*source/vm/itemapi.c
+ source/vm/extend.c
+ source/vm/arrays.c
+   + Added Follow apis implementions
+    long double   HB_EXPORT hb_itemGetNLD        ( PHB_ITEM pItem );
+    PHB_ITEM      HB_EXPORT hb_itemPutNLD        ( PHB_ITEM pItem, long double dNumber );
+    PHB_ITEM      HB_EXPORT hb_itemPutNLDLen     ( PHB_ITEM pItem, long double dNumber, int iWidth, int iDec );
+    long double   HB_EXPORT hb_parnld( int iParam, ... ); /* retrieve a numeric parameter as a double */
+    void  HB_EXPORT  hb_retnld( long double dNumber ); /* returns a double */
+    void  HB_EXPORT  hb_retnldlen( long double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
+    void  HB_EXPORT  hb_stornld( long double dValue, int iParam, ... ); /* stores a double on a variable by reference */
+    long double   HB_EXPORT hb_arrayGetNLD( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the double value contained on an array element */
+    Ajusted the hb_itemStr() api to proper handle of Long Doubles numbers
+* source/vm/hvm.c
+   + Some functions was ajusted for Long doubles values
+
 
 2003-07-05 10:35 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
  * source/rdd/dbfntx/dbfntx1.c
