@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1237 2003/07/10 16:10:16 andijahja Exp $
+ * $Id: ChangeLog,v 1.1238 2003/07/10 22:04:06 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,37 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-13 15:25 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * include/hbexprb.c
+    ! Fix implementation of HB_EA_PUSH_POP in hb_compExprUseOr.
+      This fix resolve a PCODE generation error reported at 9/7/2003
+
+2003-07-13 15:20 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/val.c
+    ! Correction in HB_TRACE()
+
+2003-07-13 15:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/vm/thread.c
+    ! Fix declaration of function to avoid warning in BCC32
+      'function with no prototype'
+
+2003-07-13 15:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * include/hbapi.h
+  * include/hbapifs.h
+  * include/hbapiitm.h
+  * include/hbvmpub.h
+  * source/rtl/direct.c
+  * source/rtl/hbffind.c
+  * source/rtl/hbsrlaw.c
+  * source/vm/arrays.c
+  * source/vm/extend.c
+  * source/vm/hvm.c
+  * source/itemapi.c
+    ! Fix several bug in some new functions with LONGLONG support.
+    ! add LONGLONG support in more functions.
+    * change HB_LONG_DOUBLE_OFF to HB_LONG_LONG_OFF.
+    * change name of var to respect conventions in new LONGLONG functions.
 
 2003-07-11 00:00 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/hblog.prg
