@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2534 2004/03/09 20:51:34 peterrees Exp $
+ * $Id: ChangeLog,v 1.2535 2004/03/10 02:32:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-10 10:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/fparse.c
+    + FPARSEEX( cFile ) -> two dimension array of parsed text
+    + FPARSELINE()      -> single dimension array of parsed text
+      These are enhanced parsing utility for delimited text file which
+      contains values delimited with '"' ie. "Homer, Junior" which when
+      parsed with FPARSE(), breaks into: (1) "Homer (2) Junior"
+
+  + tests/fparsex.prg
+    ! test program for FPARSEEX() and FPARSELINE()
+
+  + tests/test1.csv
+    ! comma delimited text file for the purpose of testing the above functions
+
+  * source/rtl/dbdelim.prg
+    ! more enhancement using FPARSEEX()
+
+  + test/tstdelim.prg
+    ! previously : 0.80 seconds
+      now        : 0.22 seconds
 
 2004-03-09 18:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/win32ole.prg

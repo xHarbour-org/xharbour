@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.6 2003/10/01 18:01:06 paultucker Exp $
+ * $Id: dbdelim.prg,v 1.7 2004/03/09 11:17:29 mlombardo Exp $
  */
 
 /*
@@ -51,12 +51,11 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
 #include "hbcommon.ch"
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.6 2003/10/01 18:01:06 paultucker Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.7 2004/03/09 11:17:29 mlombardo Exp $" )
 
 #define AppendEOL( handle )       FWrite( handle, CHR( 13 ) + CHR( 10 ) )
 #define AppendEOF( handle )       FWrite( handle, CHR( 26 ) )
@@ -83,6 +82,11 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
    local aStruct
    local nOptmLen := 0
    local cLine
+
+#ifndef __USE_OLD__
+   // Arrays From Delimited Text File To Be Appended
+   local aTextContent
+#endif
 
    // Process the delimiter argument.
    IF !EMPTY( cDelimArg )
@@ -218,6 +222,8 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
          ENDIF
 
          aStruct  := DBStruct()
+
+#ifdef __USE_OLD__
          nFileLen := FSeek(handle,0,FS_END)
          nDimBuff := Min(nFileLen,nDimBuff)
          cByte    := Space(nDimBuff)
@@ -237,6 +243,17 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
 
          enddo
          FClose( handle )
+#else
+/*
+   AJ: Enhancement in speed
+   2003-03-10
+*/
+         FClose( handle )
+         IF !Empty( aTextContent := FParseEX( cFileName ) )
+            AppendToDb( aTextContent, aStruct )
+         ENDIF
+
+#endif
       endif
    endif
 RETURN
@@ -260,7 +277,7 @@ STATIC FUNCTION ExportVar( handle, xField, cDelim )
    END
 RETURN .T.
 
-
+#ifdef __USE_OLD__
 STATIC FUNCTION AppendToDb(cLine,cDelim,aStruct)
 
    local lenrow:=len(cLine)
@@ -310,7 +327,43 @@ STATIC FUNCTION AppendToDb(cLine,cDelim,aStruct)
 
       FIELDPUT(ii,vRes)
    next
+#else
+/*
+   AJ: Enhancement in speed
+   2003-03-10
+*/
+STATIC FUNCTION AppendToDb( aTextContent, aStruct )
 
+   local aContent
+   local nDBFfields
+   local nStructLen := Len( aStruct )
+   local ii
+   local vRes
+   local cBuffer
+
+   FOR EACH aContent IN aTextContent
+      nDBFfields := min( len( aContent ), nStructLen )
+      append blank
+      for ii := 1 to nDBFfields
+         cBuffer := aContent[ ii ]
+         SWITCH aStruct[ ii,2 ]
+            CASE "D"
+               vRes := HB_STOD( cBuffer )
+               EXIT
+            CASE "L"
+               vRes := Upper( cBuffer ) $ "T1Y"
+               EXIT
+            CASE "N"
+               vRes := VAL( cBuffer )
+               EXIT
+            DEFAULT
+               vRes := cBuffer
+         END
+         FIELDPUT(ii,vRes)
+      next
+   NEXT
+
+#endif
 return .T.
 
 Static Function AtToken( cToken, cLine, nStart )
