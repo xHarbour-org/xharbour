@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.29 2004/12/11 12:39:20 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.30 2004/12/15 12:51:17 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -533,6 +533,7 @@ METHOD Refresh(lQuery) CLASS TPQquery
     ::nFields  := 0
     ::nLastrec := 0    
     ::aStruct  := {}
+    ::Rows     := 0
 
     if lQuery
         res := PQexec( ::pDB, ::cQuery )
@@ -644,6 +645,7 @@ METHOD Refresh(lQuery) CLASS TPQquery
     elseif PQresultstatus(res) == PGRES_COMMAND_OK
         ::lError := .F.
         ::cError := ''    
+        ::rows   := val(PQcmdTuples(res))
         
     else
         ::lError := .T.
