@@ -119,13 +119,13 @@
    #define ENTRYPOINT
 #elif defined( WIN32 ) && !defined( __BORLANDC__ )
    #if defined( __WATCOMC__ )
-      #define ENTRYPOINT __declspec( dllimport ) WINAPI
+      #define ENTRYPOINT __declspec( dllexport ) WINAPI
    #else
-      #define ENTRYPOINT _declspec( dllimport ) WINAPI
+      #define ENTRYPOINT _declspec( dllexport ) WINAPI
    #endif
 #else
    #if defined( __BORLANDC__ )
-      #define ENTRYPOINT _declspec( dllimport ) WINAPI
+      #define ENTRYPOINT _declspec( dllexport ) WINAPI
    #else
       #define ENTRYPOINT _export WINAPI
    #endif
