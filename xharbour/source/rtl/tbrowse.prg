@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.29 2003/03/07 05:32:42 ronpinkas Exp $
+ * $Id: tbrowse.prg,v 1.30 2003/03/12 15:39:35 walito Exp $
  */
 
 /*
@@ -2273,6 +2273,12 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
    // it by one since CLR_STANDARD is 0
    //
    LOCAL cColor
+   
+   // if called when the column type is not defined, then do nothing
+   if EMPTY(cType)
+     RETURN nCol
+   ENDIF
+
 
    if aColors == NIL
       if oCol:ColorBlock == NIL
