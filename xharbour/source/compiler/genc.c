@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.70 2004/04/01 09:35:36 andijahja Exp $
+ * $Id: genc.c,v 1.71 2004/04/01 11:45:01 druzus Exp $
  */
 
 /*
@@ -808,6 +808,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
    }
 }
 
+/*
+  Searching for function names in in-line-c for writing prototypes
+*/
 static BOOL hb_compCStaticSymbolFound( char* szSymbol, BOOL bSearchStatic )
 {
    BOOL bStatSymFound = FALSE;
@@ -815,20 +818,21 @@ static BOOL hb_compCStaticSymbolFound( char* szSymbol, BOOL bSearchStatic )
 
    while( pStatSymTemp )
    {
-      if( strcmp( pStatSymTemp->szName, szSymbol ) )
-      {
-         pStatSymTemp = pStatSymTemp->pNext;
-      }
-      else
+      if( strcmp( pStatSymTemp->szName, szSymbol ) == 0 )
       {
          bStatSymFound = TRUE;
          break;
       }
+      pStatSymTemp = pStatSymTemp->pNext;
    }
 
    return bStatSymFound;
 }
 
+/*
+  Collecting function names from in-line-c. There are two categories, ie
+  statics (HB_FUNC_STATIC) and publics (HB_FUNC)
+*/
 static void hb_compCStatSymList( char* statSymName, BOOL bPublic )
 {
    PSSYMLIST pStatSymLast = (PSSYMLIST) hb_xgrab( sizeof( SSYMLIST ) );
@@ -845,32 +849,19 @@ static void hb_compCStatSymList( char* statSymName, BOOL bPublic )
 
    if( bPublic )
    {
-      if( pPubSymFirst == NULL )
-      {
-         pStatSymLast->pNext = NULL;
-         pPubSymFirst = pStatSymLast;
-      }
-      else
-      {
-         pStatSymLast->pNext = pPubSymFirst;
-         pPubSymFirst = pStatSymLast;
-      }
+      pStatSymLast->pNext = pPubSymFirst ? pPubSymFirst : NULL;
+      pPubSymFirst = pStatSymLast;
    }
    else
    {
-      if( pStatSymFirst == NULL )
-      {
-         pStatSymLast->pNext = NULL;
-         pStatSymFirst = pStatSymLast;
-      }
-      else
-      {
-         pStatSymLast->pNext = pStatSymFirst;
-         pStatSymFirst = pStatSymLast;
-      }
+      pStatSymLast->pNext = pStatSymFirst ? pStatSymFirst : NULL ;
+      pStatSymFirst = pStatSymLast;
    }
 }
 
+/*
+  Parsing in-line-c codes to extract function names
+*/
 static void hb_compGenCCheckInLineStatic( char *str )
 {
    LONG nAt;
@@ -907,6 +898,9 @@ static void hb_compGenCCheckInLineStatic( char *str )
    }
 }
 
+/*
+  Grab the content of in-line-c codes to be parse for function names
+*/
 static void hb_compGenCInLineSymbol()
 {
    PINLINE pInline = hb_comp_inlines.pFirst;
@@ -922,6 +916,9 @@ static void hb_compGenCInLineSymbol()
    }
 }
 
+/*
+  "Copy & Paste" the contents of in-line-c to C file output
+*/
 static void hb_compGenCInLine( FILE *yyc )
 {
    PINLINE pInline = hb_comp_inlines.pFirst;
@@ -936,7 +933,9 @@ static void hb_compGenCInLine( FILE *yyc )
       while( *pszFileName )
       {
          if( *pszFileName == '\\' )
+         {
             fprintf( yyc, "\\" );
+         }
          fprintf( yyc, "%c", *pszFileName++ );
       }
       fprintf( yyc, "\"\n" );

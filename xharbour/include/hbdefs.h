@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.30 2004/03/18 14:24:28 druzus Exp $
+ * $Id: hbdefs.h,v 1.31 2004/04/01 09:35:36 andijahja Exp $
  */
 
 /*
@@ -452,18 +452,16 @@ typedef PHB_FUNC HB_FUNC_PTR;
 #define HB_FUNCNAME( funcname )    HB_FUN_##funcname
 
 #if defined( _MSC_VER ) && defined( HB_FUNC_NO_DECORATION )
-   #define HB_FUNC( funcname )        extern "C" HARBOUR HB_EXPORT HB_FUN_##funcname ( void )
-   #define HB_FUNC_STATIC( funcname ) extern "C" static HARBOUR HB_FUN_##funcname ( void )
-   #define HB_FUNC_EXTERN( funcname ) extern "C" HARBOUR HB_FUN_##funcname ( void )
-   #define HB_FUNC_INIT( funcname )   extern "C" static HARBOUR HB_FUN_##funcname ( void )
-   #define HB_FUNC_EXIT( funcname )   extern "C" static HARBOUR HB_FUN_##funcname ( void )
+   #define HB_EXTERN_C_ extern "C"
 #else
-   #define HB_FUNC( funcname )        HARBOUR HB_EXPORT HB_FUN_##funcname ( void )
-   #define HB_FUNC_STATIC( funcname ) static HARBOUR HB_FUN_##funcname ( void )
-   #define HB_FUNC_EXTERN( funcname ) extern HARBOUR HB_FUN_##funcname ( void )
-   #define HB_FUNC_INIT( funcname )   static HARBOUR HB_FUN_##funcname ( void )
-   #define HB_FUNC_EXIT( funcname )   static HARBOUR HB_FUN_##funcname ( void )
+   #define HB_EXTERN_C_
 #endif
+
+#define HB_FUNC( funcname )        HB_EXTERN_C_ HARBOUR HB_EXPORT HB_FUN_##funcname ( void )
+#define HB_FUNC_STATIC( funcname ) HB_EXTERN_C_ static HARBOUR HB_FUN_##funcname ( void )
+#define HB_FUNC_EXTERN( funcname ) HB_EXTERN_C_ extern HARBOUR HB_FUN_##funcname ( void )
+#define HB_FUNC_INIT( funcname )   HB_EXTERN_C_ static HARBOUR HB_FUN_##funcname ( void )
+#define HB_FUNC_EXIT( funcname )   HB_EXTERN_C_ static HARBOUR HB_FUN_##funcname ( void )
 
 typedef ULONG HB_HANDLE;        /* handle to memvar value */
 typedef char  HB_SYMBOLSCOPE;   /* stores symbol's scope */
