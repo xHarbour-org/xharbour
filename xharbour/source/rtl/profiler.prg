@@ -1,5 +1,5 @@
 /*
- * $Id: profiler.prg,v 1.21 2002/01/24 10:30:07 davep Exp $
+ * $Id: profiler.prg,v 1.3 2002/01/29 04:38:12 ronpinkas Exp $
  */
 
 /*
@@ -397,9 +397,7 @@ Method gatherMethods Class HBProfile
 Local lProfile  := __setProfiler( .F. )
 Local n         := 1
 Local cClass
-Local nMembers
-Local aMembers
-Local nMember
+Local xMember
 
    // For each class in the environment...
    Do While !empty( cClass := __className( n ) )
@@ -408,17 +406,16 @@ Local nMember
       If !::ignoreSymbol( cClass )
 
          // Collect class members.
-         nMembers := len( aMembers := __classSel( n ) )
 
-         For nMember := 1 To nMembers
+         FOR EACH xMember IN __classSel( n )
 
             // If we've got a member name...
-            If !empty( aMembers[ nMember ] )
+            If !empty( xMember )
                // Add it to the profile.
-               aadd( ::aProfile, HBProfileMethod():new( cClass + ":" + aMembers[ nMember ], __GetMsgPrf( n, aMembers[ nMember ] ) ) )
+               aadd( ::aProfile, HBProfileMethod():new( cClass + ":" + xMember, __GetMsgPrf( n, xMember ) ) )
             EndIf
-
-         Next
+            
+         NEXT
 
       EndIf
 
