@@ -6444,7 +6444,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
    regex_t *pReg;
    regmatch_t aMatches[REGEX_MAX_GROUPS];
    int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
-   int i, iMatches;
+   int i, iMatches = 0;
    int iMaxMatch = REGEX_MAX_GROUPS;
 
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );

@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.13 2004/03/06 13:20:32 jonnymind Exp $
+* $Id: hbserv.c,v 1.14 2004/03/07 00:01:19 andijahja Exp $
 */
 
 /*
@@ -1056,15 +1056,17 @@ HB_FUNC( HB_SIGNALDESC )
 
 HB_FUNC( HB_SERVICEGENERATEFAULT )
 {
-   int *i = NULL;
-   *i = 100;
+   int *pGPF = NULL;
+
+   *pGPF = 0;
+   /* if it doesn't cause GPF (on some platforms it's possible) try this */
+   *(--pGPF) = 0;
 }
 
 HB_FUNC( HB_SERVICEGENERATEFPE )
 {
-   double a=100.0, b= 0.0;
-   a= a/b;
-   HB_SYMBOL_UNUSED( a );
+   static double a = 100.0, b = 0.0;
+   a = a / b;
 }
 
 #endif

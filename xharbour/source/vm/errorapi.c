@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.42 2004/03/31 09:19:54 andijahja Exp $
+ * $Id: errorapi.c,v 1.43 2004/04/01 09:35:37 andijahja Exp $
  */
 
 /*
@@ -290,6 +290,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
       hb_threadWaitForIdle();
 
       hb_bIdleFence = old_bIdleFence;
+      usRequest = 0;
    #endif
 
    if( pError )
@@ -460,6 +461,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
       hb_bIdleFence = TRUE;
       hb_threadWaitForIdle();
       hb_bIdleFence = old_bIdleFence;
+      usRequest = 0;
    #endif
 
    if( pError )

@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.37 2004/03/31 02:16:42 druzus Exp $
+ * $Id: ads1.c,v 1.38 2004/04/01 01:01:12 druzus Exp $
  */
 
 /*
@@ -2001,7 +2001,7 @@ static ERRCODE adsNewArea( ADSAREAP pArea )
 static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
    ADSHANDLE hTable = 0;
-   UNSIGNED32  ulRetVal, pulLength, ulRecCount, ulLastErr=0;
+   UNSIGNED32  ulRetVal = 0, pulLength, ulRecCount, ulLastErr=0;
    UNSIGNED16 usLength = ADS_MAX_ERROR_LEN + 1;
    UNSIGNED8  aucError[ ADS_MAX_ERROR_LEN + 1 ];
    USHORT uiFields = 0, uiCount;
@@ -2048,9 +2048,9 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
              }
       }
 
-	  // If the Advantage Data Dictionary open fails with an error indicating that this table is not
-     // in the dictionary, OR if we are not using a dictionary at all, try the open with standard settings.
-	  // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
+      // If the Advantage Data Dictionary open fails with an error indicating that this table is not
+      // in the dictionary, OR if we are not using a dictionary at all, try the open with standard settings.
+      // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
       if( !bDictionary || ulLastErr == 5132L )
       {
          ulRetVal = AdsOpenTable  ( 0, pOpenInfo->abName, pOpenInfo->atomAlias,
@@ -3725,7 +3725,7 @@ HB_FUNC( ADSCUSTOMIZEAOF )
 {
    ADSAREAP pArea;
    UNSIGNED32 ulNumRecs = 0;
-   UNSIGNED32 ulRecord;
+   UNSIGNED32 ulRecord = 0;
    UNSIGNED32 *pulRecords;
    UNSIGNED16 usOption = ADS_AOF_ADD_RECORD;
    UNSIGNED32 ulRetVal = AE_SUCCESS + 1;   /* initialize to something other than success */

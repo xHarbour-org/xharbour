@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.101 2004/03/30 18:40:55 ronpinkas Exp $
+ * $Id: arrays.c,v 1.102 2004/03/30 18:52:26 ronpinkas Exp $
  */
 
 /*
@@ -966,7 +966,7 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
 
    if(( HB_IS_ARRAY( pArray )|| HB_IS_HASH(pArray) ) && HB_IS_BLOCK( bBlock ))
    {
-      PHB_ITEM pItems, pKeys;
+      PHB_ITEM pItems, pKeys = NULL;
       ULONG ulLen;
       ULONG ulStart;
       ULONG ulCount;

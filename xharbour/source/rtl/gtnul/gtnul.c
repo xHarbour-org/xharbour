@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.20 2004/02/07 21:20:36 andijahja Exp $
+ * $Id: gtnul.c,v 1.21 2004/02/17 18:44:14 andijahja Exp $
  */
 
 /*
@@ -69,10 +69,8 @@ static int hb_gtFindNoNul( void );
 
 #if defined(HB_DEFAULT_GT)
    char * s_defaultGT = HB_GT_DRVNAME( HB_DEFAULT_GT );
-   HB_GT_REQUEST( HB_DEFAULT_GT );
 #elif defined(HB_GT_LIB)
    char * s_defaultGT = HB_GT_DRVNAME( HB_GT_LIB );
-   HB_GT_REQUEST( HB_GT_LIB );
 #elif defined(HB_OS_LINUX)
    char * s_defaultGT = "crs";
 #elif defined(HB_OS_WIN_32)
@@ -97,6 +95,15 @@ static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 static char *s_clipboard = NULL;
 static ULONG s_clipsize = 0;
+
+/* ********************************************************************** */
+
+HB_FUNC_EXTERN( GTSYS );
+
+void hb_NUL_gt_ForceLink( void )
+{
+   HB_FUNCNAME( GTSYS )();
+}
 
 /* ********************************************************************** */
 

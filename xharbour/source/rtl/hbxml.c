@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.19 2004/03/25 09:38:32 jonnymind Exp $
+ * $Id: hbxml.c,v 1.20 2004/03/30 15:46:19 jonnymind Exp $
  */
 
 /*
@@ -135,7 +135,7 @@ MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM pNode,
    MXML_SGS *buf_name;
    MXML_SGS *buf_attrib;
    int iStatus = 0;
-   int iPosAmper;
+   int iPosAmper = 0;
    int iLenName, iLenAttrib;
 
    buf_name = mxml_sgs_new();

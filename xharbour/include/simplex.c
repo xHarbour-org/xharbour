@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.7 2004/03/23 02:14:57 andijahja Exp $
+ * $Id: simplex.c,v 1.8 2004/03/31 02:16:43 druzus Exp $
  */
 
 /*
@@ -1111,7 +1111,7 @@ static int Reduce( int iToken )
 void SimpLex_CheckWords( void )
 {
    int iTentative = -1, iCompare;
-   unsigned int i, iMax, iLenMatched, iBaseSize, iKeyLen, iSavedLen;
+   unsigned int i, iMax, iLenMatched, iBaseSize = 0, iKeyLen, iSavedLen = 0;
    char *pNextSpacer, *sKeys2Match = NULL, *szBaseBuffer = s_szBuffer, cSpacer = chr;
    LEX_WORD *aCheck;
 

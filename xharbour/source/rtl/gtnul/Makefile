@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2003/06/19 00:07:59 druzus Exp $
+# $Id: Makefile,v 1.4 2003/07/31 18:56:12 druzus Exp $
 #
 
 ROOT = ../../../
@@ -7,6 +7,7 @@ ROOT = ../../../
 C_SOURCES=\
 	gtnul.c \
 	gtext.c \
+	gtsys.c \
 
 LIBNAME=gtnul
 

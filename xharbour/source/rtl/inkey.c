@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.28 2004/03/30 05:27:40 guerra000 Exp $
+ * $Id: inkey.c,v 1.29 2004/03/31 02:16:43 druzus Exp $
  */
 
 /*
@@ -377,7 +377,7 @@ HB_FUNC( INKEY )
      hb_vmEvalBlock( &s_inKeyBlockBefore );
   }
 
-  while ( bContinue )
+  do
   {
     iKey = hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
                        hb_parnd( 1 ),
@@ -402,6 +402,7 @@ HB_FUNC( INKEY )
       hb_itemClear( &Key );
     }
   }
+  while ( bContinue );
 
   hb_retni(iKey);
 }

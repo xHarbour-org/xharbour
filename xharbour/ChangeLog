@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2710 2004/04/01 20:46:53 andijahja Exp $
+ * $Id: ChangeLog,v 1.2711 2004/04/01 21:21:00 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-02 00:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/contrib/rdd_ads/adsfunc.c
+  * xharbour/include/simplex.c
+  * xharbour/source/rtl/hbserv.c
+  * xharbour/source/rtl/hbxml.c
+  * xharbour/source/rtl/inkey.c
+  * xharbour/source/rtl/readline.c
+  * xharbour/source/rtl/regex.c
+  * xharbour/source/vm/arrays.c
+  * xharbour/source/vm/errorapi.c
+  * xharbour/source/vm/thread.c
+    * warnings fixed, some of them were real bugs
+
+  * xharbour/source/rtl/gtnul/Makefile
+  * xharbour/source/rtl/gtnul/gtnul.c
+  + xharbour/source/rtl/gtnul/gtsys.c
+    + added GTSYS() which works in similar way as RDDSYS
+      when user will want to disable linking with default build GT
+      then simply should add into his code: ANNOUNCE GTSYS
+      Gian I hope you will find it useful for XWT and linking with
+      pure GTNUL only.
+
 2004-04-02 04:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/hbusage.c
     + add the following gentlemen into credit section:

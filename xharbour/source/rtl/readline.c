@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.8 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: readline.c,v 1.9 2004/03/05 21:46:35 andijahja Exp $
  */
 
 /*
@@ -63,9 +63,9 @@
 
 BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT uiBuffLen, char ** Term, int * iTermSizes, USHORT iTerms, BOOL * bFound, BOOL * bEOF  )
 {
-   USHORT uiPosTerm, iPos, uiPosition;
+   USHORT uiPosTerm = 0, iPos, uiPosition;
    USHORT nTries, uiSize;
-   LONG lRead, lOffset;
+   LONG lRead = 0, lOffset;
    BYTE * pBuff;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %hu, %p, %p, %hu, %i, %i)", hFileHandle, uiBuffLen, Term, iTermSizes, iTerms, *bFound, *bEOF ));

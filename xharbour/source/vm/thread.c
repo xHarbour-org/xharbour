@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.161 2004/03/29 18:04:02 ronpinkas Exp $
+* $Id: thread.c,v 1.162 2004/03/30 22:47:23 druzus Exp $
 */
 
 /*
@@ -2291,7 +2291,7 @@ HB_FUNC( NOTIFYALL )
 {
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
    PHB_ITEM pVal = hb_param( 2, HB_IT_ANY );
-   BOOL bClear;
+   BOOL bClear = FALSE;
    int iWt;
 
    /* Parameter error checking */

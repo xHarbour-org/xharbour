@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.32 2004/03/28 09:05:52 andijahja Exp $
+ * $Id: adsfunc.c,v 1.33 2004/03/31 02:16:42 druzus Exp $
  */
 
 /*
@@ -231,7 +231,7 @@ HB_FUNC( ADSGETSERVERTIME )
 
 HB_FUNC( ADSISTABLELOCKED )
 {
-   UNSIGNED32 ulRetVal ;
+   UNSIGNED32 ulRetVal = ~AE_SUCCESS;
    UNSIGNED16 pbLocked = FALSE;
    ADSAREAP pArea;
 
@@ -241,7 +241,7 @@ HB_FUNC( ADSISTABLELOCKED )
       ulRetVal = AdsIsTableLocked( pArea->hTable, &pbLocked );
    }
 
-   if( !pArea || ulRetVal != AE_SUCCESS )
+   if ( ulRetVal != AE_SUCCESS )
    {
       hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSISTABLELOCKED" );
    }
@@ -251,7 +251,7 @@ HB_FUNC( ADSISTABLELOCKED )
 
 HB_FUNC( ADSISRECORDLOCKED )
 {
-   UNSIGNED32 ulRetVal ;
+   UNSIGNED32 ulRetVal = ~AE_SUCCESS;
    UNSIGNED32 ulRec;
    UNSIGNED16 pbLocked = FALSE;
    ADSAREAP pArea;
@@ -269,7 +269,7 @@ HB_FUNC( ADSISRECORDLOCKED )
       }
       ulRetVal = AdsIsRecordLocked( pArea->hTable, ulRec, &pbLocked );
    }
-   if( !pArea || ulRetVal != AE_SUCCESS )
+   if( ulRetVal != AE_SUCCESS )
    {
       hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSISRECORDLOCKED" );
    }
@@ -1569,12 +1569,7 @@ HB_FUNC( ADSGETNUMOPENTABLES )
 
 HB_FUNC( ADSSHOWERROR )
 {
-   UNSIGNED8 * pucTitle;
-   if( ISCHAR( 1 ) )
-   {
-      pucTitle = (UNSIGNED8 *) hb_parcx( 1 );
-   }
-   AdsShowError( pucTitle );
+   AdsShowError( (UNSIGNED8 *) hb_parc( 1 ) );
 }
 
 
@@ -1960,6 +1955,11 @@ HB_FUNC( ADSDDSETDATABASEPROPERTY )
       {
          ulBuffer =  hb_itemGetL( pParam );
          ulRetVal = AdsDDSetDatabaseProperty(adsConnectHandle, ulProperty, &ulBuffer, 2 );
+         break;
+      }
+      default:
+      {
+         ulRetVal = ~AE_SUCCESS;
          break;
       }
    }
