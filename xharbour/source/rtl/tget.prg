@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.79 2004/05/31 02:58:11 lculik Exp $
+ * $Id: tget.prg,v 1.80 2004/05/31 03:08:05 lculik Exp $
  */
 
 /*
@@ -1187,7 +1187,12 @@ METHOD Input( cChar ) CLASS Get
    end
 
    if ! Empty( ::cPicFunc )
-      cChar := Left( Transform( cChar, ::cPicFunc ), 1 ) // Left needed for @D
+      // Dirty HACK for solve the the "@RE" TRANSFORMation... "N" -> "  /N  /  "
+      if "R" IN ::cPicFunc .AND. "E" IN ::cPicFunc
+         cChar := SubStr( Transform( cChar, ::cPicFunc ), 4, 1 ) // Needed for @RE
+      else
+         cChar := Left( Transform( cChar, ::cPicFunc ), 1 ) // Left needed for @D
+      endif
    endif
 
    if ! Empty( ::cPicMask )
