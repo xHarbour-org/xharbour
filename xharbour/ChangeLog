@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3303 2004/08/12 14:13:39 vouchcac Exp $
+ * $Id: ChangeLog,v 1.3304 2004/08/12 16:07:53 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-13 13:05 UTC+0200 Alex Strickland <sscc@mweb.co.za>
+  * source/rtl/gtgraph.c
+    * Changes on HB_LONG_LONG_OFF branch, the RGB values may not be what the
+      author intended? Castings for MSVC.
+  * source/rtl/hbhex2n.c
+  * source/rtl/hbmd5.c
+  * source/rtl/fserror.c
+  * source/rtl/hbrandom.c
+    * Castings for MSVC.
 
 2004-08-12 21:40 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/memoline.c
