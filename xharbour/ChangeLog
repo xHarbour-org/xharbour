@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3298 2004/08/10 15:47:03 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3299 2004/08/10 20:20:40 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-11 22:05 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tbrowse.prg
+    ! fixed an error inside ::LeftDetermine() when available space
+      doesn't contain even a single column.
 
 2004-08-10 22:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

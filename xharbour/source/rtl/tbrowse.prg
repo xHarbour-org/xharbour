@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.89 2004/08/09 17:10:06 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.90 2004/08/10 13:27:35 mauriliolongo Exp $
  */
 
 /*
@@ -1290,7 +1290,9 @@ METHOD LeftDetermine() CLASS TBrowse
       nCol--
    enddo
 
-Return nCol + 1
+       /* ::rightVisible could be larger then available space, for example because of
+          frozen columns, so nCol-- never gets executed  */
+Return Min(nCol + 1, ::rightVisible)
 
 //-------------------------------------------------------------------//
 //
