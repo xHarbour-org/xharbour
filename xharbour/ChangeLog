@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.822 2003/03/09 21:40:13 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.823 2003/03/09 22:54:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-19 02:50 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * include/thread.h
+  * source/vm/thread.c
+    % Simple Linux thread speed optimization using local thread data
+      - it makes Linux MT programs 40% faster.
+      Question to anyone familiar with Windows:
+        Is similar mechanism (local thread data) available for that platform?
 
 2003-03-09 14:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/tobject.prg
