@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.6 2002/04/17 17:31:40 lculik Exp $
+ * $Id: errorsys.prg,v 1.7 2002/04/17 20:01:15 lculik Exp $
  */
 
 /*
@@ -230,8 +230,11 @@ STATIC FUNCTION LogError( oerr )
      LOCAL nHandle
      LOCAL nBytes
      LOCAL nMemCount
-     Alert( 'An error occured, Information will be ;written on error.log' )
+
+     Alert( 'An error occured, Information will be ;written to error.log' )
+
      nHandle := Fcreate( cLogFile, FC_NORMAL )
+
      If nHandle < 3
      Else
         FWriteLine( nHandle, Padc( ' Error log file ', 79, '*' ) )
@@ -301,6 +304,7 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, "Default Status: " + strvalue( oerr:candefault() ) )
         FWriteLine( nHandle, "   Description: " + oErr:description() )
         FWriteLine( nHandle, "     Operation: " + Oerr:operation() )
+        FWriteLine( nHandle, "     Arguments:"  + Arguments( oErr ) )
         FWriteLine( nHandle, " Involved File: " + oErr:filename() )
         FWriteLine( nHandle, "Dos Error Code: " + strvalue( oErr:oscode() ) )
         FWriteLine( nHandle, "" )
@@ -330,6 +334,7 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, "" )
 
+        /*
         FWriteLine( nHandle, padc(" Avaliable Memory Variables ",maxcol(),'+') )
         FWriteLine( nHandle, "" )
         Save All Like * To errormem
@@ -364,6 +369,7 @@ STATIC FUNCTION LogError( oerr )
         Enddo
         Fclose( nMemHandle )
         Ferase( 'errormem.mem' )
+        */
         Fclose( nFhandle )
      Endif
      Errorlevel( 1 )
@@ -397,4 +403,16 @@ STATIC FUNCTION FWriteLine( nh, c )
      Fwrite( nh, Chr( 10 ) )
 Return nil
 
+STATIC FUNCTION Arguments( oErr )
+
+   LOCAL nIndex := 0, xArg, cArguments := ""
+
+   IF ValType( oErr:Args ) == "A"
+      FOR EACH xArg IN oErr:Args
+         nIndex++
+         cArguments += " [" + Str( nIndex, 2 ) + "] = Type: " + ValType( xArg ) + " Val: " + CStr( xArg )
+      NEXT
+   ENDIF
+
+RETURN cArguments
 *+ EOF: ERRORSYS.PRG

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.202 2002/05/04 04:02:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.203 2002/05/04 05:43:11 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-03 23:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/compiler/harbour.sly
+     ! Fixed minor bug in handling of pArrayIndexAsList
+
+   * source/rtl/errorsys.prg
+     - Commented out section that output MEMVARS to Log File, because it was causing nested error and
+       there are better ways to get list of MEMVARS.
+     + Added STATIC FUNCTION Arguments() and use it to log Argument Errors.
+
+   * source/rtl/tgetlist.prg
+     ! Corrected minor bug in using Len() on oGet:Buffer, where it might be NIL.
 
 2002-05-03 22:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * tests/pp.prg

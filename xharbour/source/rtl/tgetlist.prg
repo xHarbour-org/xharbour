@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.7 2002/03/19 05:45:31 ronpinkas Exp $
+ * $Id: tgetlist.prg,v 1.8 2002/03/22 19:45:49 walito Exp $
  */
 
 /*
@@ -406,7 +406,7 @@ METHOD GetPostValidate() CLASS HBGetList
    if oGet:PostBlock != NIL
 
       lUpdated := ::lUpdated
-      SetPos( oGet:Row, oGet:Col + Len( oGet:Buffer ) )
+      SetPos( oGet:Row, oGet:Col + IIF( oGet:Buffer == NIL, 0, Len( oGet:Buffer ) ) )
       lValid := Eval( oGet:PostBlock, oGet )
       SetPos( oGet:Row, oGet:Col )
       ::ShowScoreBoard()
@@ -470,7 +470,7 @@ METHOD Settle( nPos ) CLASS HBGetList
    else
       if ::nLastExitState != 0
          nExitState := ::nLastExitState
-      elseif ::nNextGet < ::nLastPos 
+      elseif ::nNextGet < ::nLastPos
          nExitState := GE_UP
       else
          nExitState := GE_DOWN
@@ -498,7 +498,7 @@ METHOD Settle( nPos ) CLASS HBGetList
       case nExitState == GE_ENTER
          nPos++
 
-      case nExitState == GE_SHORTCUT 
+      case nExitState == GE_SHORTCUT
          return ::nNextGet
 
       case nExitState == GE_MOUSEHIT
