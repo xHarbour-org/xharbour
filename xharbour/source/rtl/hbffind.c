@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.2 2003/07/05 17:40:42 lculik Exp $
+ * $Id: hbffind.c,v 1.3 2003/07/13 18:11:57 walito Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.2 2003/07/05 17:40:42 lculik Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.3 2003/07/13 18:11:57 walito Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -136,6 +136,9 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.2 2003/07/05 17:40:42 lculik Exp $" )
       HANDLE          hFindFile;
       WIN32_FIND_DATA pFindFileData;
       DWORD           dwAttr;
+      char            szVolInfo[MAX_PATH];
+      FILETIME        fFileTime;
+
    } HB_FFIND_INFO, * PHB_FFIND_INFO;
 
 #elif defined(HB_OS_UNIX)
@@ -190,6 +193,39 @@ int WintoDosError( unsigned long lError)
    return iReturn;
 }
 
+FILETIME GetOldesFile(char * szPath)
+{
+   WIN32_FIND_DATA  Lastff32;
+   HANDLE hLastFind;
+
+   FILETIME ftLastWriteTime ={0x99999999,0x9999999};
+   FILETIME ft,ft1;
+   SYSTEMTIME time,time1;
+   LARGE_INTEGER l1,l2;
+   char * szf = (char*)hb_xgrab(7);
+   strcpy(szf,szPath);
+   strcat(szf,"*.*");
+
+
+   hLastFind = FindFirstFile( szf,&Lastff32 );
+
+  if ( hLastFind != INVALID_HANDLE_VALUE )
+  {      
+     do 
+      {
+      if (Lastff32.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+             if(CompareFileTime(  &ftLastWriteTime,&Lastff32.ftLastWriteTime ) ==1 )
+                ftLastWriteTime = Lastff32.ftLastWriteTime;
+       }   while ( FindNextFile( hLastFind,&Lastff32 )) ;
+
+            FindClose( hLastFind );
+}
+   hb_xfree(szf);
+   return ftLastWriteTime;
+
+}
+
+
 #endif
 
 
@@ -227,6 +263,7 @@ USHORT HB_EXPORT hb_fsAttrFromRaw( ULONG raw_attr )
    if( raw_attr & FILE_ATTRIBUTE_READONLY )  uiAttr |= HB_FA_READONLY;
    if( raw_attr & FILE_ATTRIBUTE_SYSTEM )    uiAttr |= HB_FA_SYSTEM;
    if( raw_attr & FILE_ATTRIBUTE_NORMAL )    uiAttr |= HB_FA_NORMAL;
+   if( raw_attr & 0x00000008 )                   uiAttr |= HB_FA_LABEL;    
 
 #ifdef HB_EXTENSION
    /* Note that FILE_ATTRIBUTE_NORMAL is not needed
@@ -294,6 +331,7 @@ ULONG HB_EXPORT hb_fsAttrToRaw( USHORT uiAttr )
    if( uiAttr & HB_FA_ARCHIVE )   raw_attr |= FILE_ATTRIBUTE_ARCHIVE;
    if( uiAttr & HB_FA_DIRECTORY ) raw_attr |= FILE_ATTRIBUTE_DIRECTORY;
    if( uiAttr & HB_FA_HIDDEN )    raw_attr |= FILE_ATTRIBUTE_HIDDEN;
+   if( uiAttr & HB_FA_LABEL   )   raw_attr |= 0x00000008;
    if( uiAttr & HB_FA_READONLY )  raw_attr |= FILE_ATTRIBUTE_READONLY;
    if( uiAttr & HB_FA_SYSTEM )    raw_attr |= FILE_ATTRIBUTE_SYSTEM;
    if( uiAttr & HB_FA_NORMAL )    raw_attr |= FILE_ATTRIBUTE_NORMAL;
@@ -310,6 +348,7 @@ ULONG HB_EXPORT hb_fsAttrToRaw( USHORT uiAttr )
    if( uiAttr & HB_FA_OFFLINE )    raw_attr |= FILE_ATTRIBUTE_OFFLINE;
    if( uiAttr & HB_FA_NOTINDEXED ) raw_attr |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
    if( uiAttr & HB_FA_VOLCOMP )    raw_attr |= 0x00008000;
+
 #endif
 
 #elif defined(HB_OS_UNIX)
@@ -430,6 +469,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
    ffind->szName[ 0 ] = '\0';
 
    ffind->size = 0;
+   ffind->attr = 0;
 
    /* Convert platform specific find info structure into
       the Harbour spcific structure. */
@@ -510,27 +550,35 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       FILETIME ft;
       SYSTEMTIME time;
 
-      strncpy( ffind->szName, info->pFindFileData.cFileName, _POSIX_PATH_MAX );
+      strncpy( ffind->szName,( info->hFindFile == INVALID_HANDLE_VALUE ? info->szVolInfo :info->pFindFileData.cFileName ), _POSIX_PATH_MAX );
 
-      if( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+      if (info->hFindFile == INVALID_HANDLE_VALUE )
       {
          ffind->size = 0;
+         raw_attr = ( USHORT ) info->dwAttr;
       }
       else
       {
-      #ifndef HB_LONG_LONG_OFF
-         ffind->size = ( info->pFindFileData.nFileSizeHigh * MAXDWORD ) + info->pFindFileData.nFileSizeLow;
-      #else
-         ffind->size = info->pFindFileData.nFileSizeLow;
-      #endif
+         if( info->pFindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY   )
+         {
+            ffind->size = 0;
+         }
+         else
+         {
+         #ifndef HB_LONG_LONG_OFF
+            ffind->size = ( info->pFindFileData.nFileSizeHigh * MAXDWORD ) + info->pFindFileData.nFileSizeLow;
+         #else
+            ffind->size = info->pFindFileData.nFileSizeLow;
+         #endif
+         }
+      raw_attr = ( USHORT ) info->pFindFileData.dwFileAttributes;
       }
 
-      raw_attr = ( USHORT ) info->pFindFileData.dwFileAttributes;
 
       /* NOTE: One of these may fail when searching on an UNC path, I
                don't know yet what's the reason. [vszakats] */
-      
-      if( FileTimeToLocalFileTime( &info->pFindFileData.ftLastWriteTime, &ft ) &&
+
+      if( FileTimeToLocalFileTime( (info->hFindFile == INVALID_HANDLE_VALUE ? &info->fFileTime : &info->pFindFileData.ftLastWriteTime), &ft ) &&
              FileTimeToSystemTime( &ft, &time ) )
       {
          lYear  = time.wYear;
@@ -685,8 +733,29 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
       ffind->info = ( void * ) hb_xgrab( sizeof( HB_FFIND_INFO ) );
       info = ( PHB_FFIND_INFO ) ffind->info;
 
+      if ( uiAttr == HB_FA_LABEL )
+      {
+         FILETIME fOld;
+         DWORD dwSysFlags;
+         char szPath[ 4 ]  = {0};
+         strncpy( szPath, pszFileName, 3);
+         info->hFindFile = INVALID_HANDLE_VALUE;
+
+         if (GetVolumeInformation( szPath, info->szVolInfo, MAX_PATH, NULL, NULL, &dwSysFlags, NULL, 0 ) )
+         {
+            info->fFileTime = GetOldesFile( pszFileName );
+            bFound = TRUE;
+            info->dwAttr    = ( DWORD ) hb_fsAttrToRaw( uiAttr );
+         }
+         else
+            bFound = FALSE;
+      }
+
+      else
+      {
       info->hFindFile = FindFirstFile( pszFileName, &info->pFindFileData );
       info->dwAttr    = ( DWORD ) hb_fsAttrToRaw( uiAttr );
+
 
       if( info->hFindFile != INVALID_HANDLE_VALUE )
       {
@@ -725,6 +794,7 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
          bFound = FALSE;
          errno = WintoDosError( GetLastError() );
          hb_fsSetError( errno );
+      }
       }
    }
 

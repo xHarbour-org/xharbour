@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.1.1.1 2001/12/21 10:41:13 ronpinkas Exp $
+ * $Id: browse.prg,v 1.2 2003/01/27 03:37:23 walito Exp $
  */
 
 /*
@@ -51,6 +51,8 @@
  */
 
 #include "inkey.ch"
+static bBlock := { || setcursor(iif( readinsert(!readinsert()), 1, 2 ;
+   )) }
 
 function Browse( nTop, nLeft, nBottom, nRight )
 
@@ -60,7 +62,9 @@ function Browse( nTop, nLeft, nBottom, nRight )
    local nKey := 0
    local lExit := .f.
    local lGotKey := .f.
-   local bAction
+   Local lBottom,lRefresh
+   Local bAction
+   Local lKeyPressed
 
    if ! Used()
       return .f.
@@ -83,46 +87,102 @@ function Browse( nTop, nLeft, nBottom, nRight )
 
    oBrw := TBrowseDB( nTop + 2, nLeft + 1, nBottom - 1, nRight - 1 )
    oBrw:HeadSep := " " + Chr( 205 )
+   oBrw:skipblock({ |_1| skipped(_1, lBottom) })
 
    for n := 1 to FCount()
       oBrw:AddColumn( TBColumnNew( FieldName( n ), FieldBlock( FieldName( n ) ) ) )
    next
 
+   if ( EOF() )
+      goto top
+   endif
+
+   lBottom := lRefresh := .F.
+
    oBrw:ForceStable()
+
+   if ( LastRec() == 0 )
+      nKey := 24
+      lKeyPressed := .T.
+   else
+      lKeyPressed := .F.
+   endif
 
    while ! lExit
 
-      if nKey == 0
-         while !oBrw:stabilize() .and. NextKey() == 0
+      if ( !lKeyPressed)       
+         while !oBrw:stabilize() 
+            if ( ( nKey := InKey() ) != 0 )
+               lKeyPressed := .T.
+               exit
+            endif
          enddo
       endif
 
-      if NextKey() == 0
+      if (!lKeyPressed)
+           if ( oBrw:hitbottom() .AND. ( !lBottom .OR. RecNo() != ;
+               LastRec() + 1 ) )
+             if ( lBottom )
+               oBrw:refreshcurrent()
+               do while ( !oBrw:stabilize() )
+               enddo
+               goto bottom
+            else
+               lBottom := .T.
+               setcursor(iif( readinsert(), 2, 1 ))
+            endif
+            oBrw:down()
+            do while ( !oBrw:stabilize() )
+            enddo
+         endif
 
-         oBrw:forceStable()
          Statline( oBrw )
-
+         oBrw:forceStable()
          nKey := Inkey( 0 )
-
          if ( bAction := SetKey( nKey ) ) != nil
             Eval( bAction, ProcName( 1 ), ProcLine( 1 ), "" )
             loop
          endif
       else
-         nKey := Inkey()
-      endif
+         lKeyPressed := .f.
 
+      endif
       switch nKey
-         case K_ESC
-            lExit := .t.
+         case K_DOWN
+            if ( lBottom  )
+               oBrw:hitbottom := .T.
+            else
+               oBrw:Down()
+            endif
             exit
 
          case K_UP
-            oBrw:Up()
+            if ( lBottom )
+               lRefresh := .T.
+            else
+               oBrw:Up()
+            endif
             exit
 
-         case K_DOWN
-            oBrw:Down()
+         case K_PGUP
+            if ( lBottom )
+               lRefresh := .T.
+            else
+               oBrw:PageUp()
+            endif
+            exit
+
+
+         case K_PGDN
+            if ( lBottom )
+               oBrw:hitbottom := .T.
+            else
+               oBrw:PageDown()
+            endif
+            exit
+
+         case K_ESC
+            lExit := .t.
             exit
 
          case K_END
@@ -139,22 +199,22 @@ function Browse( nTop, nLeft, nBottom, nRight )
 
          case K_RIGHT
             oBrw:Right()
-            exit
-
-         case K_PGUP
-            oBrw:PageUp()
-            exit
-
-         case K_PGDN
-            oBrw:PageDown()
-            exit
+           exit
 
          case K_CTRL_PGUP
-            oBrw:GoTop()
+            if ( lBottom )
+               lRefresh := .T.
+            else
+               oBrw:GoTop()
+            endif
             exit
 
          case K_CTRL_PGDN
-            oBrw:GoBottom()
+            if ( lBottom )
+               lRefresh := .T.
+            else
+               oBrw:GoBottom()
+            endif
             exit
 
          case K_CTRL_LEFT
@@ -172,8 +232,41 @@ function Browse( nTop, nLeft, nBottom, nRight )
          case K_CTRL_END
             oBrw:panEnd()
             exit
+         case K_INS
+            if ( lBottom )
+               eval(bBlock)
+            endif
+            exit
+        case K_DEL
+            if ( RecNo() != LastRec() + 1 )
+               if ( Deleted() )
+                  recall
+               else
+                  delete
+               endif
+            endif
+            exit
 
-      end
+        case K_ENTER
+            if ( lBottom .OR. RecNo() != LastRec() + 1 )
+               nKey := doget(oBrw, lBottom)
+               lKeyPressed := nKey != 0
+            else
+               nKey := 24
+               lKeyPressed := .T.
+            endif
+            exit
+        default
+          keyboard Chr(13) + Chr(nKey)
+          exit
+        end
+      if ( lRefresh )
+         lRefresh := .F.
+         lBottom := .F.
+         freshorder(oBrw)
+         setcursor(0)
+      endif
+
    end
 
    RestScreen( nTop, nLeft, nBottom, nRight, cOldScreen )
@@ -181,7 +274,7 @@ function Browse( nTop, nLeft, nBottom, nRight )
 
 return .t.
 
-static procedure Statline( oBrw )
+static procedure Statline( oBrw ,lBottom)
 
    local nTop   := oBrw:nTop - 1
    local nRight := oBrw:nRight
@@ -202,3 +295,119 @@ static procedure Statline( oBrw )
 
 return
 
+
+static function DOGET( oBrowse, lValue )
+
+   local bIns, lScore, lExit, cData, oGet, nExitState, nIndexKey, ;
+      xKeyValue, lSuccess, nCursor, xData, cForExp
+   oBrowse:hittop(.F.)
+   statline(oBrowse, lValue)
+   do while ( !oBrowse:stabilize() )
+   enddo
+   lScore := Set(_SET_SCOREBOARD, .F.)
+   lExit := Set(_SET_EXIT, .T.)
+   bIns := SetKey(K_INS, bBlock)
+   nCursor := setcursor(iif( readinsert(), 2, 1 ))
+   nIndexKey := indexkey(0)
+   if ( !Empty(nIndexKey) )
+      xKeyValue := &nIndexKey
+   endif
+   cData := oBrowse:getcolumn(oBrowse:colpos())
+   xData := eval(cData:block())
+   oGet := getnew(Row(), Col(), { |_1| iif( PCount() == 0, xData, ;
+      xData := _1 ) }, "mGetVar", Nil, oBrowse:colorspec())
+   lSuccess := .F.
+   if ( ReadModal({oGet}) )
+      if ( lValue .AND. RecNo() == LastRec() + 1 )
+         append blank
+      endif
+      eval(cData:block(), xData)
+      if ( !lValue .AND. !Empty(cForExp := ordfor(indexord())) .AND. ;
+            !&cForExp )
+         goto top
+      endif
+      if ( !lValue .AND. !Empty(nIndexKey) .AND. xKeyValue != &nIndexKey )
+         lSuccess := .T.
+      endif
+   endif
+   if ( lSuccess )
+      freshorder(oBrowse)
+      nExitState := 0
+   else
+      oBrowse:refreshcurrent()
+      nExitState := exitkey(lValue)
+   endif
+   setcursor(nCursor)
+   set scoreboard (lScore)
+   Set(_SET_EXIT, lExit)
+   SetKey(K_INS, bIns)
+   return nExitState
+
+static function EXITKEY( lExit )
+
+   local nReturn := LastKey()
+   do case
+   case nReturn == 3
+      if ( lExit )
+         nReturn := 0
+      else
+         nReturn := 24
+      endif
+   case nReturn == 18
+      if ( lExit )
+         nReturn := 0
+      else
+         nReturn := 5
+      endif
+   case nReturn == 13 .OR. nReturn >= 32 .AND. nReturn <= 255
+      nReturn := 4
+   case nReturn != 5 .AND. nReturn != 24
+      nReturn := 0
+   endcase
+   return nReturn
+
+static function FRESHORDER( oBrowse )
+
+   local nRec := RecNo()
+   oBrowse:refreshall()
+   do while ( !oBrowse:stabilize() )
+   enddo
+   if ( nRec != LastRec() + 1 )
+      do while ( RecNo() != nRec .AND. !BOF() )
+         oBrowse:up()
+         do while ( !oBrowse:stabilize() )
+         enddo
+      enddo
+   endif
+   return Nil
+
+static function SKIPPED( nSkip, lSkip )
+
+   local nPos := 0
+   if ( LastRec() != 0 )
+      if ( nSkip == 0 )
+         skip 0
+      elseif ( nSkip > 0 .AND. RecNo() != LastRec() + 1 )
+         do while ( nPos < nSkip )
+            skip 
+            if ( EOF() )
+               if ( lSkip )
+                  nPos++
+               else
+                  skip -1
+               endif
+               exit
+            endif
+            nPos++
+         enddo
+      elseif ( nSkip < 0 )
+         do while ( nPos > nSkip )
+            skip -1
+            if ( BOF() )
+               exit
+            endif
+            nPos--
+         enddo
+      endif
+   endif
+   return nPos
