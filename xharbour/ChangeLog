@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2936 2004/05/14 10:47:50 srobert Exp $
+ * $Id: ChangeLog,v 1.2937 2004/05/14 12:49:07 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-14 09:40 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/common/expropt2.c
+    % Optimization and solution to the comparison of NIL with constants.
+      NIL == <constant>  =>  .F.      NIL != <constant>  =>  .T.
+      NIL == NIL         =>  .T.      NIL != NIL         =>  .F.
+
+      Due to LOGICAL optimization If(NIL == .T.,,)
+      was If(NIL,,) , now is optimized to IF(.F.,,)
 
 2004-05-14 18:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   + xharbour/sourc/rtl/gtwvt/wvtcore.c
