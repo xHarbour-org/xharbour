@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.54 2003/07/15 20:09:49 andijahja Exp $
+ * $Id: dbfntx1.c,v 1.55 2003/07/16 13:46:54 andijahja Exp $
  */
 
 /*
@@ -3959,7 +3959,7 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
    szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 3 );
    szFileName[ 0 ] = '\0';
    strcpy( szFileName, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
-	szFileName =  (char*) hb_filecase( hb_strdup( szFileName ) ) ;
+   szFileName =  (char*) hb_filecase( szFileName );
 		
    if( strlen( szFileName ) == 0 )
    {

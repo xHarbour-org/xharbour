@@ -1,5 +1,5 @@
 /*
- * $Id: cdpptiso.c,v 1.2 2003/06/20 13:44:57 druzus Exp $
+ * $Id: cdpptiso.c,v 1.3 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -52,8 +52,8 @@
  *
  */
 
-/* Language name: Portuguese
-/* ISO language code (2 chars): PT
+/* Language name: Portuguese */
+/* ISO language code (2 chars): PT */
 /* Codepage: ISO-8859-1 */
 
 #include <ctype.h>

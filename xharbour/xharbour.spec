@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.11 2003/06/26 12:37:07 druzus Exp $
+# $Id: xharbour.spec,v 1.13 2003/06/27 20:57:58 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -530,7 +530,7 @@ ensures that the harbour include directory is seen by the harbour compiler.
 "%{hb_pref}lnk" simply takes a list of object files and links them together
 with the harbour virtual machine and run-time library to produce an
 executable. The executable will be given basename of the first object
-file if not directly set bu "-o" command line switch
+file if not directly set by "-o" command line switch
 
 "%{hb_pref}mk" try to produce executable from your .prg file. It's a simple
 equivalent of cl.bat from CA-Clipper distribution.
@@ -654,6 +654,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bin/harbour
 %{prefix}/bin/hb-mkslib
 %{prefix}/bin/%{hb_pref}-build
+%{prefix}/bin/%{hb_pref}cc
 %{prefix}/bin/%{hb_pref}cmp
 %{prefix}/bin/%{hb_pref}lnk
 %{prefix}/bin/%{hb_pref}mk

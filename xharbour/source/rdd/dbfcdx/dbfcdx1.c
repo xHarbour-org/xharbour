@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.51 2003/07/15 12:47:00 lculik Exp $
+ * $Id: dbfcdx1.c,v 1.52 2003/07/15 20:09:48 andijahja Exp $
  */
 
 /*
@@ -7585,7 +7585,7 @@ ERRCODE hb_cdxOrderListAdd( CDXAREAP pAreaCdx, LPDBORDERINFO pOrderInfo )
    */
 	
    strcpy( szFileName, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
-	szFileName =  (char*) hb_filecase( hb_strdup( szFileName ) ) ;
+   szFileName =  (char*) hb_filecase( szFileName ) ;
 
    if( strlen( szFileName ) == 0 )
    {
