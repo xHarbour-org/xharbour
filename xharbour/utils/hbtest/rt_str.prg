@@ -1,5 +1,5 @@
 /*
- * $Id: rt_str.prg,v 1.10 2001/05/15 13:02:07 vszakats Exp $
+ * $Id: rt_str.prg,v 1.1.1.1 2001/12/21 10:44:52 ronpinkas Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ FUNCTION Main_STR()
    TEST_LINE( Str(Val("."))                   , "0"                                    )
    TEST_LINE( Str(Val(".."))                  , "0.0"                                  )
    TEST_LINE( Str(Val("-."))                  , " 0"                                   )
-   TEST_LINE( Str(Val("-.."))                 , "0.0"                                  )
+   TEST_LINE( Str(Val("-.."))                 , " 0.0"                                 )
    TEST_LINE( Str(Val("1."))                  , " 1"                                   )
    TEST_LINE( Str(Val("1.."))                 , "1.0"                                  )
    TEST_LINE( Str(Val("1..."))                , "1.00"                                 )
@@ -82,7 +82,7 @@ FUNCTION Main_STR()
    TEST_LINE( Str(Val("-1..."))               , "-1.00"                                )
    TEST_LINE( Str(Val(".1"))                  , "0.1"                                  )
    TEST_LINE( Str(Val("-.1"))                 , "-0.1"                                 )
-   TEST_LINE( Str(Val("-.0"))                 , "0.0"                                  )
+   TEST_LINE( Str(Val("-.0"))                 , " 0.0"                                 )
    TEST_LINE( Str(Val(" -.1"))                , "-0.1"                                 )
    TEST_LINE( Str(Val(" --.1"))               , "  0.0"                                )
    TEST_LINE( Str(Val("+.1"))                 , "0.1"                                  )

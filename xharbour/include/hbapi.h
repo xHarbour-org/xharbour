@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.62 2003/04/21 01:40:30 jonnymind Exp $
+ * $Id: hbapi.h,v 1.63 2003/05/23 03:27:08 ronpinkas Exp $
  */
 
 /*
@@ -374,7 +374,7 @@ extern char     HB_EXPORT * hb_strUpperCopy( char * szText, ULONG ulLen );
 extern char     HB_EXPORT * hb_strLower( char * szText, ULONG ulLen ); /* convert an existing string buffer to lower case */
 extern char     HB_EXPORT * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen ); /* copy an existing string buffer to another buffer, as upper case */
 extern char     HB_EXPORT * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen );
-extern double   HB_EXPORT hb_strVal( const char * szText, ULONG ulLen ); /* return the numeric value of a character string representation of a number */
+extern double   HB_EXPORT hb_strVal( const char * szText, ... ); /* return the numeric value of a character string representation of a number */
 extern char     HB_EXPORT * hb_strLTrim( const char * szText, ULONG * ulLen ); /* return a pointer to the first non-white space character */
 extern ULONG    HB_EXPORT hb_strRTrimLen( const char * szText, ULONG ulLen, BOOL bAnySpace ); /* return length of a string, ignoring trailing white space (or true spaces) */
 

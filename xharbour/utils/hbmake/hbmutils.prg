@@ -17,17 +17,17 @@
 
 FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
 
-   LOCAL aDirs 
+   LOCAL aDirs
    LOCAL aRet      := {}
    LOCAL lLinux    := AT( 'linux', LOWER( cOs ) ) > 0 .OR. lGcc
    LOCAL cDir      := IIF( ! lLinux, '\' + CURDIR() + '\', '/' + CURDIR() + '/' )
    LOCAL aStru     := { cDir }
    LOCAL aData
    LOCAL nCounter  := 0
-   LOCAL nArrayLen 
-   LOCAL nDatalen 
-   LOCAL y 
-   LOCAL cItem 
+   LOCAL nArrayLen
+   LOCAL nDatalen
+   LOCAL y
+   LOCAL cItem
    LOCAL cExt
    LOCAL cPath
    LOCAL cDrive
@@ -38,7 +38,7 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
    DEFAULT lSubDir TO .t.
    WHILE ++ nCounter <= LEN( aStru )
 
-      IF ! EMPTY( aDirs := GetDirs( aStru[ nCounter ], lGcc ) )                  // There are elements! 
+      IF ! EMPTY( aDirs := GetDirs( aStru[ nCounter ], lGcc ) )                  // There are elements!
          AEVAL( aDirs, { | xItem | AADD( aStru, xItem ) } )
       ENDIF
 
@@ -110,13 +110,13 @@ RETURN aRet
 FUNCTION ExtenPrg( cExt, nType )
 
    LOCAL aExt   := { "C", "c" }
-   LOCAL nPos 
+   LOCAL nPos
    LOCAL cTemp  := ""
 
    nPos := ASCAN( aExt, { | a | a == cExt } )
 
    IF nPos > 0
-      SWITCH nType 
+      SWITCH nType
       CASE 1
          cTemp := STRTRAN( cExt, aExt[ nPos ], 'prg' )
          EXIT
@@ -181,7 +181,7 @@ FUNCTION GetVccDir()
    LOCAL cPath   := ''
    LOCAL cEnv    := GETE( "PATH" )
    LOCAL aEnv    := HB_ATokens( cEnv, ";" )
-   LOCAL nPos 
+   LOCAL nPos
    LOCAL cCurEnv := ""
 
    FOR EACH cCurEnv IN aEnv
@@ -199,7 +199,7 @@ RETURN cPath
 FUNCTION Exten( cExt, nType )
 
    LOCAL aExt    := { 'C', 'c', "CPP", "cpp" }
-   LOCAL nPos 
+   LOCAL nPos
    LOCAL cTemp   := ""
 
    nPos := ASCAN( aExt, { | a | a == cExt } )
@@ -234,7 +234,7 @@ RETURN cPath
 
 FUNCTION GetSourceDirMacros()
 
-   LOCAL aDirs 
+   LOCAL aDirs
    LOCAL lLinux    := AT( 'linux', LOWER( OS() ) ) > 0
    LOCAL cDir      := IIF( lLinux, '/' + CURDIR() + '/', '\' + CURDIR() + '\' )
    LOCAL aStru     := { cDir }
@@ -244,7 +244,7 @@ FUNCTION GetSourceDirMacros()
 
    WHILE ++ nCounter <= LEN( aStru )
 
-      IF ! EMPTY( aDirs := GetDirs( aStru[ nCounter ], lLinux ) )                // There are elements! 
+      IF ! EMPTY( aDirs := GetDirs( aStru[ nCounter ], lLinux ) )                // There are elements!
          AEVAL( aDirs, { | xItem | AADD( aStru, xItem ) } )
       ENDIF
 
@@ -370,47 +370,48 @@ FUNCTION ReadLN( lEof )
 
 RETURN cBuffer
 
-FUNCTION GetinstaledLibs( clibs, lGcc )
+FUNCTION GetInstaledLibs( clibs, lGcc )
 
-   LOCAL aDefLib := {;
-    'lang'     + IIF( lGcc, '.a', '.lib' ),;
-    'vm'       + IIF( lGcc, '.a', '.lib' ),;
-    'rtl'      + IIF( lGcc, '.a', '.lib' ),;
-    'rdd'      + IIF( lGcc, '.a', '.lib' ),;
-    'macro'    + IIF( lGcc, '.a', '.lib' ),;
-    'pp'       + IIF( lGcc, '.a', '.lib' ),;
-    'dbfntx'   + IIF( lGcc, '.a', '.lib' ),;
-    'dbfcdx'   + IIF( lGcc, '.a', '.lib' ),;
-    'common'   + IIF( lGcc, '.a', '.lib' ),;
-    'gtwin'    + IIF( lGcc, '.a', '.lib' ),;
-    'debug'    + IIF( lGcc, '.a', '.lib' ),;
-    'gtpca'    + IIF( lGcc, '.a', '.lib' ),;
-    'gtdos'    + IIF( lGcc, '.a', '.lib' ),;
-    'gtsln'    + IIF( lGcc, '.a', '.lib' ),;
-    'gtstd'    + IIF( lGcc, '.a', '.lib' ),;
-    'ziparchive' + IIF( lGcc, '.a', '.lib' ),;
-    'rddads'   + IIF( lGcc, '.a', '.lib' ),;
-    'ace32'    + IIF( lGcc, '.a', '.lib' ),;
-    'libnf'    + IIF( lGcc, '.a', '.lib' ),;
-    'libct'    + IIF( lGcc, '.a', '.lib' ),;
-    'html'     + IIF( lGcc, '.a', '.lib' ),;
-    'libgt'    + IIF( lGcc, '.a', '.lib' ),;
-    'libmisc'  + IIF( lGcc, '.a', '.lib' ),;
-    'mysql'    + IIF( lGcc, '.a', '.lib' ),;
-    'libmysql' + IIF( lGcc, '.a', '.lib' ),;
-    'mysqlclient' + IIF( lGcc, '.a', '.lib' ),;
-    'samples'  + IIF( lGcc, '.a', '.lib' ),;
-    'pdflib'   + IIF( lGcc, '.a', '.lib' ),;
-    'nulsys'   + IIF( lGcc, '.a', '.lib' ),;
-    'gtcgi'    + IIF( lGcc, '.a', '.lib' ),;
-    'vmmt'     + IIF( lGcc, '.a', '.lib' ),;
-    'rtlmt'    + IIF( lGcc, '.a', '.lib' ),;
-    'rddmt'    + IIF( lGcc, '.a', '.lib' ),;
-    'ppmt'     + IIF( lGcc, '.a', '.lib' ),;
-    'dbfntxmt' + IIF( lGcc, '.a', '.lib' ),;
-    'dbfcdxmt' + IIF( lGcc, '.a', '.lib' ),;
-    'macromt'  + IIF( lGcc, '.a', '.lib' ),;
-    'gtnul'    + IIF( lGcc, '.a', '.lib' ) }
+   LOCAL cSuffix := IIF( lGCC, ".a", ".lib" )
+
+   LOCAL aDefLib := { 'lang' + cSuffix, ;
+                      'vm' + cSuffix, ;
+                      'rtl' + cSuffix, ;
+                      'rdd' + cSuffix, ;
+                      'macro' + cSuffix, ;
+                      'pp' + cSuffix, ;
+                      'dbfntx' + cSuffix, ;
+                      'dbfcdx' + cSuffix, ;
+                      'common' + cSuffix, ;
+                      'gtwin' + cSuffix, ;
+                      'debug' + cSuffix, ;
+                      'gtpca' + cSuffix, ;
+                      'gtdos' + cSuffix, ;
+                      'gtsln' + cSuffix, ;
+                      'gtstd' + cSuffix, ;
+                      'ziparchive' + cSuffix, ;
+                      'rddads' + cSuffix, ;
+                      'ace32' + cSuffix, ;
+                      'libnf' + cSuffix, ;
+                      'libct' + cSuffix, ;
+                      'html' + cSuffix, ;
+                      'libgt' + cSuffix, ;
+                      'libmisc' + cSuffix, ;
+                      'mysql' + cSuffix, ;
+                      'libmysql' + cSuffix, ;
+                      'mysqlclient' + cSuffix, ;
+                      'samples' + cSuffix, ;
+                      'pdflib' + cSuffix, ;
+                      'nulsys' + cSuffix, ;
+                      'gtcgi' + cSuffix, ;
+                      'vmmt' + cSuffix, ;
+                      'rtlmt' + cSuffix, ;
+                      'rddmt' + cSuffix, ;
+                      'ppmt' + cSuffix, ;
+                      'dbfntxmt' + cSuffix, ;
+                      'dbfcdxmt' + cSuffix, ;
+                      'macromt' + cSuffix, 'gtnul' + cSuffix }
+
    LOCAL aReturnLibs := {}
    LOCAL aLibs       := DIRECTORY( clibs )
    LOCAL nPos
@@ -483,7 +484,7 @@ RETURN aArray[ 1 ]
 
 FUNCTION ListAsArray2( cList, cDelimiter )
 
-   LOCAL nPos 
+   LOCAL nPos
    LOCAL aList  := {}              // Define an empty array
 
    IF cDelimiter = NIL

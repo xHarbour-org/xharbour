@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.2 2002/02/19 03:11:17 walito Exp $
+ * $Id: val.c,v 1.3 2002/10/27 14:41:38 lculik Exp $
  */
 
 /*
@@ -51,64 +51,73 @@
  */
 
 #include <math.h>
+#include <ctype.h>
 
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
 /* returns the numeric value of a character string representation of a number */
-double HB_EXPORT hb_strVal( const char * szText, ULONG ulLen )
+/*
+  ... to remain compatible with Harbour version which utilizes a 2nd paramater ulLen
+ */
+double HB_EXPORT hb_strVal( const char * szText, ... )
 {
-   long double ldValue = 0.0;
-   ULONG ulPos;
-   ULONG ulDecPos = 0;
-   BOOL bNegative = FALSE;
-   long double ldScale = 0.1L;
+   double dResult;
+   char *pCopy = NULL;
+   ULONG ulPad = 0, ulLen;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_strVal(%s, %d)", szText, ulLen));
+   HB_TRACE(HB_TR_DEBUG, ("hb_strVal(%s, %d)", szText));
 
-   /* Look for sign */
-
-   for( ulPos = 0; ulPos < ulLen; ulPos++ )
+   while( isspace( szText[ulPad] ) )
    {
-      if( szText[ ulPos ] == '-' )
-      {
-         bNegative = TRUE;
-         ulPos++;
-         break;
-      }
-      else if( szText[ ulPos ] == '+' )
-      {
-         ulPos++;
-         break;
-      }
-      else if( ! HB_ISSPACE( szText[ ulPos ] ) )
-         break;
+      ulPad++;
    }
 
-   /* Build the number */
-
-   for(; ulPos < ulLen; ulPos++ )
+   if( szText[ulPad] == '-' || szText[ulPad] == '+' )
    {
-      if( szText[ ulPos ] == '.' && ulDecPos == 0 )
+      ulPad++;
+   }
+
+   ulLen = ulPad;
+
+   while( szText[ulLen] )
+   {
+      if( ! ( isdigit( szText[ulLen] ) || szText[ulLen] == '.' ) )
       {
-         ulDecPos++;
-      }
-      else if( szText[ ulPos ] >= '0' && szText[ ulPos ] <= '9' )
-      {
-         if( ulDecPos )
+         if( ulLen > ulPad )
          {
-            ldValue += ldScale * ( long double )( szText[ ulPos ] - '0' );
-            ldScale *= 0.1L;
+            pCopy = (char *) hb_xgrab( ulLen );
+            strncpy( pCopy, szText, ulLen );
+            pCopy[ulLen] = '\0';
+            szText = pCopy;
+            break;
          }
          else
-            ldValue = ( ldValue * 10.0L ) + ( long double )( szText[ ulPos ] - '0' );
+         {
+            return 0.0;
+         }
       }
-      else
-         break;
+
+      ulLen++;
    }
 
-   return ( double )( bNegative && ldValue != 0.0 ? -ldValue : ldValue );
+   dResult = atof( szText );
+
+   // Maybe -0.00
+   if( dResult == -0.00 )
+   {
+      dResult = 0.0;
+   }
+
+   //printf( "String: >%s< Val:%f\n", szText, dResult );
+
+   if( pCopy )
+   {
+      hb_xfree( (void *) pCopy );
+   }
+
+   return dResult;
 }
 
 /* returns the numeric value of a character string representation of a number  */
@@ -119,29 +128,40 @@ HB_FUNC( VAL )
    if( pText )
    {
       char * szText = hb_itemGetCPtr( pText );
-      int iWidth = ( int ) hb_itemGetCLen( pText );
+      int iWidth, iLen = ( int ) hb_itemGetCLen( pText );
       int iDec;
       double dValue = hb_strVal( szText, hb_itemGetCLen( pText ) );
 
-      for( iDec = 0; iDec < iWidth && szText[ iDec ] != '.'; iDec++ );
+      for( iWidth = 0; iWidth < iLen; iWidth++ )
+      {
+         if( szText[ iWidth ] == '.' )
+         {
+            break;
+         }
+      }
 
-      if( iDec >= iWidth - 1 )
-         hb_retnlen( dValue, iWidth, 0 );
+      if( iWidth >= iLen - 1 )
+      {
+         hb_retnlen( dValue, iLen, 0 );
+      }
       else
       {
-         /* NOTE: Kludge Warning! This condition:
-                  "|| ( iDec == 1 && szText[ 0 ] == '-' && dValue != 0.0 )"
-                  may not be the generic way to handle the width of this "-.1"
-                  string. I could not find a matching case which
-                  fails for the same reason, nor a better way to handle it.
-                  The problem is that in this case only, the width is
-                  calculated upon conditions which can only be discovered by
-                  parsing the string, but the parsing is made by a lower level
-                  generic function. [vszakats] */
+         iDec = iLen - iWidth - 1;
 
-         hb_retnlen( dValue, iDec + ( iDec == 0 || ( iDec == 1 && szText[ 0 ] == '-' && dValue != 0.0 ) ? 1 : 0 ), iWidth - iDec - 1 );
+         if( iWidth == 0 )
+         {
+            iWidth++;
+         }
+         else if( iWidth == 1 && szText[ 0 ] == '-' /*&& dValue != 0.0*/ )
+         {
+            iWidth++;
+         }
+
+         hb_retnlen( dValue, iWidth, iDec );
       }
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1098, NULL, "VAL", 1, hb_paramError( 1 ) );
+   }
 }
