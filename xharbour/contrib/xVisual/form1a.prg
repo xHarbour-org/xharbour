@@ -20,7 +20,7 @@ CLASS TForm1 FROM TForm
       :ID :=        506
 
       OBJECT ITEMS IS TSTRINGS
-         :TEXT := {}
+         :TEXT := { "Option1", "Option2" }
       END OBJECT
 
       :LEFT :=        335
