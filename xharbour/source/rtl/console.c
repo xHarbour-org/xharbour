@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.47 2004/04/05 02:29:31 druzus Exp $
+ * $Id: console.c,v 1.48 2004/05/10 10:38:07 mauriliolongo Exp $
  */
 /*
  * Harbour Project source code:
@@ -442,14 +442,23 @@ HB_FUNC( QOUT )
    HB_THREAD_STUB
 #endif
 
-   hb_conOutAlt( s_szCrLf, CRLF_BUFFER_LEN - 1 );
+   if ( ! hb_set.HB_SET_PRINTER || hb_set.hb_set_printhan == FS_ERROR )
+   {
+      hb_conOutAlt( s_szCrLf, CRLF_BUFFER_LEN - 1 );
+   }
 
    HB_CONSOLE_SAFE_LOCK
 
-   if( (hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR )) {
+   if( (hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR )) 
+   {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       USHORT uiCount;
-
+      
+      //JC1: Even if unix requires only CR for line termination, printers ALWAYS
+      //use CRLF, so also prn files should.
+      // TODO: use FCNTL to expand CR into CRLF for printer files.
+      hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\r\n", 2 );
+      
       s_uiPRow++;
 
       uiCount = s_uiPCol = hb_set.HB_SET_MARGIN;
@@ -511,7 +520,8 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
          s_uiPRow = s_uiPCol = 0;
       }
       for ( ; s_uiPRow < iRow ; s_uiPRow++ ) {
-        hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
+        //hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
+        hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\r\n", 2 );
         s_uiPCol = 0 ;
       }
       if ( iCol < s_uiPCol) {
