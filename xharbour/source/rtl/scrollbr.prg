@@ -1,5 +1,5 @@
 /*
- * $Id: scrollbr.prg,v 1.2 2003/02/20 15:51:09 lculik Exp $
+ * $Id: scrollbr.prg,v 1.3 2004/02/04 23:00:36 walito Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include "hbclass.ch"
+#include "color.ch"
 #include "common.ch"
 
 #ifdef HB_COMPAT_C53
@@ -118,7 +119,8 @@ METHOD New( nStart, nEnd, nOffSet, bsBlock, nOrient ) CLASS HBScrollBar
    ::Current   := 1
    ::Cargo     := Nil
    cColor      := Setcolor()
-   ::ColorSpec := __guicolor( cColor, 5 ) + "," + __guicolor( cColor, 2 )
+   ::ColorSpec := __guicolor( cColor, CLR_UNSELECTED + 1) + "," + ;
+                  __guicolor( cColor, CLR_ENHANCED + 1 )
    ::End       := nEnd
    ::OffSet    := nOffSet
    ::Orient    := nOrient

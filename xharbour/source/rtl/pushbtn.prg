@@ -1,5 +1,5 @@
 /*
- * $Id: pushbtn.prg,v 1.5 2003/02/20 17:24:35 lculik Exp $
+ * $Id: pushbtn.prg,v 1.6 2003/02/20 20:04:56 lculik Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include 'hbsetup.ch'
 #include 'hbclass.ch'
+#include "color.ch"
 #include "common.ch"
 
 #ifdef HB_COMPAT_C53
@@ -95,7 +96,8 @@ ENDCLASS
 METHOD GetColor( xColor ) CLASS HBPushButton
 
    IF ( !( ISNIL( xColor ) ) )
-      ::Color := IIF( Valtype( xColor ) == "C" .and. !Empty( __GuiColor( xColor, 4 ) ) .and. ;
+      ::Color := IIF( Valtype( xColor ) == "C" .and. ;
+                     !Empty( __GuiColor( xColor, 4 ) ) .and. ;
                       Empty( __GuiColor( xColor, 6 ) ), xColor, )
 
    ENDIF
@@ -131,9 +133,10 @@ METHOD New( nRow, nCol, cCaption ) CLASS HBPushButton
       ::ColorSpec := "W/N,N/W,W+/N,W+/N"
    ELSE
       cColor      := Setcolor()
-      ::ColorSpec := __GuiColor( cColor, 5 ) + "," + ;
-                                 __GuiColor( cColor, 2 ) + "," + __GuiColor( cColor, 1 ) + ;
-                                 "," + __GuiColor( cColor, 4 )
+      ::ColorSpec := __GuiColor( cColor, CLR_UNSELECTED + 1 ) +","+;
+                     __GuiColor( cColor, CLR_ENHANCED   + 1 ) +","+;
+                     __GuiColor( cColor, CLR_STANDARD   + 1 ) +","+;
+                     __GuiColor( cColor, CLR_BACKGROUND + 1 )
    ENDIF
 
 RETURN Self

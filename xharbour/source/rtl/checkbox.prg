@@ -1,5 +1,5 @@
 /*
- * $Id: checkbox.prg,v 1.4 2003/11/21 13:22:35 lculik Exp $
+ * $Id: checkbox.prg,v 1.5 2004/02/15 19:11:54 jonnymind Exp $
  */
 
 /*
@@ -50,9 +50,11 @@
  *
  */
 
-#include "common.ch"
-#include "hbsetup.ch"
 #include "hbclass.ch"
+#include "hbsetup.ch"
+#include "color.ch"
+#include "common.ch"
+
 #ifdef HB_COMPAT_C53
 
 CLASS HBCHECKBOX
@@ -98,9 +100,10 @@ METHOD New( nRow, nCol, cCaption )
       ::ColorSpec := "W/N,W+/N,W/N,W+/N"
    ELSE
       cColor      := SetColor()
-      ::ColorSpec := __GuiColor( cColor, 5 ) + "," + ;
-                                 __GuiColor( cColor, 2 ) + "," + __GuiColor( cColor, 1 ) + ;
-                                 "," + __GuiColor( cColor, 4 )
+      ::ColorSpec := __guiColor( cColor, CLR_UNSELECTED + 1 ) +","+;
+                     __guiColor( cColor, CLR_ENHANCED   + 1 ) +","+;
+                     __guiColor( cColor, CLR_STANDARD   + 1 ) +","+;
+                     __guiColor( cColor, CLR_BACKGROUND + 1 )
    ENDIF
 
    ::HasFocus := .F.
@@ -164,7 +167,7 @@ METHOD HitTest( Arg1, Arg2 ) CLASS HBCHECKBOX
    ELSEIF ( Arg2 < ::Col + 3 )
       RETURN - 2049
    ENDIF
-   
+
    IF HB_IsString( ::Caption )
       Local2 :=  Len( ::Caption )
       IF ( Local1 := At( "&", ::Caption ) ) == 0
@@ -181,7 +184,6 @@ METHOD HitTest( Arg1, Arg2 ) CLASS HBCHECKBOX
 RETURN 0
 
 METHOD Display() CLASS HBCHECKBOX
-
    LOCAL cColor    := SetColor()
    LOCAL nCurRow   := Row()
    LOCAL nCurCol   := Col()
@@ -236,17 +238,7 @@ METHOD Display() CLASS HBCHECKBOX
 
 RETURN Self
 
-FUNCTION __GuiColor( cPair, nPos )
-
-   LOCAL cColor    := cPair
-   LOCAL nPosition := 0
-   LOCAL nCommaPos := 0
-   cColor := hb_colorindex( cpair, npos - 1 )
-
-RETURN cColor
-
 FUNCTION _CHECKBOX_( Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7 )
-
    LOCAL oCheck
 
    oCheck := hbcheckbox():new( Row(), Col(), Arg2 )
@@ -264,13 +256,8 @@ FUNCTION _CHECKBOX_( Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7 )
       oCheck:sblock := Arg6
 
    ENDIF
+
 RETURN oCheck
-
-FUNCTION Isdefcolor()
-
-   LOCAL cColor := SetColor()
-
-RETURN ( cColor == "W/N,N/W,N/N,N/N,N/W" )
 
 FUNCTION Checkbox( nr, ncol, cCaption )
 

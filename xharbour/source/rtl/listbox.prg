@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.14 2003/09/19 17:05:49 ronpinkas Exp $
+ * $Id: listbox.prg,v 1.15 2003/11/23 23:36:56 lculik Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include 'hbclass.ch'
+#include "color.ch"
 #include 'common.ch'
 #include "box.ch"
 #IFdef HB_COMPAT_C53
@@ -164,11 +165,13 @@ Method New( nTop, nLeft, nBottom, nRigth, lDrop )
         ::Colorspec := "W/N,W+/N,W+/N,N/W,W/N,W/N,W+/N,W/N"
      ELSE
         cColor      := Setcolor()
-        ::Colorspec := __guicolor( cColor, 5 ) + "," + ;
-                                   __guicolor( cColor, 5 ) + "," + __guicolor( cColor, 5 ) + ;
-                                   "," + __guicolor( cColor, 2 ) + "," + __guicolor( cColor, ;
-                                   3 ) + "," + __guicolor( cColor, 1 ) + "," + ;
-                                   __guicolor( cColor, 4 )
+        ::Colorspec := __guiColor( cColor, CLR_UNSELECTED + 1 ) +","+;
+                       __guiColor( cColor, CLR_UNSELECTED + 1 ) +","+;
+                       __guiColor( cColor, CLR_UNSELECTED + 1 ) +","+;
+                       __guiColor( cColor, CLR_ENHANCED   + 1 ) +","+;
+                       __guiColor( cColor, CLR_BORDER     + 1 ) +","+;
+                       __guiColor( cColor, CLR_STANDARD   + 1 ) +","+;
+                       __guiColor( cColor, CLR_BACKGROUND + 1 )
      ENDIF
      ::isopen    := !lDrop
      ::aItems    := {}
@@ -1110,8 +1113,8 @@ Static Function LBADJUSTCU( oList )
      nCount   := oList:itemCount
      nLength  := oList:vScroll:barlength
      nTopItem := oList:Topitem
-     nNewSize := ( ( nCount - nLength ) * nTopItem + nLength - nSize ) / ( ;
-                   nCount - nSize )
+     nNewSize := ( ( nCount - nLength ) * nTopItem + nLength - nSize ) / ;
+                   ( nCount - nSize )
 RETURN nNewSize
 
 Function Listbox( nTop, nLeft, nBottom, nRigth, lDrop )
@@ -1192,7 +1195,6 @@ Function _LISTBOX_( Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, ;
 RETURN oScroll
 
 Function __CAPLENGTH( Arg1 )
-
      Local Local1 := Len( Arg1 )
      Local Local2
 

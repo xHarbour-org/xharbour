@@ -1,5 +1,5 @@
 /*
- * $Id: radiogrp.prg,v 1.7 2003/06/04 14:40:54 walito Exp $
+ * $Id: radiogrp.prg,v 1.8 2003/11/21 13:22:35 lculik Exp $
  */
 
 /*
@@ -50,9 +50,10 @@
  *
  */
 
-#include "common.ch"
 #include "hbclass.ch"
 #include "hbsetup.ch"
+#include "color.ch"
+#include "common.ch"
 
 #IFdef HB_COMPAT_C53
 CLASS HBRadioGroup
@@ -125,8 +126,9 @@ Local cColor
           ::ColorSpec := "W/N,W/N,W+/N"
       ELSE
          cColor := SetColor()
-         ::ColorSpec :=  __guicolor( cColor, 3 ) + "," + ;
-            __guicolor( cColor, 1 ) + "," + __guicolor( cColor, 4 )
+         ::ColorSpec := __guicolor( cColor, CLR_BORDER + 1 ) + "," + ;
+                        __guicolor( cColor, CLR_STANDARD + 1 ) + "," + ;
+                        __guicolor( cColor, CLR_BACKGROUND + 1 )
       ENDIF
 
       ::Bottom := nBottom
@@ -495,8 +497,9 @@ METHOD  DelItem( xItem ) CLASS HBRadioGroup
 
 /*METHOD GetColor(xColor )  CLASS HBRadioGroup
    IF ( !( ISNIL( xColor ) ) )
-      ::Color := IIF( Valtype(xColor )=="C" .and. !Empty( __guicolor( xColor, 3 ) ) .AND. ;
-      Empty( __guicolor( xColor, 4 ) ), xColor, )
+      ::Color := IIF( Valtype(xColor )=="C" .and. ;
+                     !Empty( __guicolor( xColor, 3 ) ) .AND. ;
+                      Empty( __guicolor( xColor, 4 ) ), xColor, )
 
    ENDIF
    RETURN ::Color

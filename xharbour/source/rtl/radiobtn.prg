@@ -1,5 +1,5 @@
 /*
- * $Id: radiobtn.prg,v 1.2 2003/11/21 13:22:35 lculik Exp $
+ * $Id: radiobtn.prg,v 1.3 2004/02/15 20:09:31 jonnymind Exp $
  */
 
 /*
@@ -51,9 +51,10 @@
  */
 
 
-#include "common.ch"
 #include "hbclass.ch"
 #include "hbsetup.ch"
+#include "color.ch"
+#include "common.ch"
 
 #ifdef HB_COMPAT_C53
 CLASS HBRadioButton
@@ -99,12 +100,13 @@ METHOD New(nRow,nCol,cCaption,xData) CLASS HBRadioButton
       ::ColorSpec:="W/N,W+/N,W+/N,N/W,W/N,W/N,W+/N"
    else
       cColor := SetColor()
-      ::ColorSpec :=;
-      __guicolor(cColor, 5) + "," + ;
-      __guicolor(cColor, 5) + "," + __guicolor(cColor, 2) + ;
-      "," + __guicolor(cColor, 2) + "," + __guicolor(cColor, ;
-      1) + "," + __guicolor(cColor, 1) + "," + ;
-      __guicolor(cColor, 4)
+      ::ColorSpec := __guicolor(cColor, CLR_UNSELECTED + 1 ) + "," + ;
+                     __guicolor(cColor, CLR_UNSELECTED + 1 ) + "," + ;
+                     __guicolor(cColor, CLR_ENHANCED   + 1 ) + "," + ;
+                     __guicolor(cColor, CLR_ENHANCED   + 1 ) + "," + ;
+                     __guicolor(cColor, CLR_STANDARD   + 1 ) + "," + ;
+                     __guicolor(cColor, CLR_STANDARD   + 1 ) + "," + ;
+                     __guicolor(cColor, CLR_BACKGROUND + 1 )
    endif
    
    ::fBlock := NIL

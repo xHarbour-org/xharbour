@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3147 2004/07/13 18:55:09 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3148 2004/07/13 19:09:38 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-13 15:10 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+   * source/rtl/pushbtn.prg 
+   * source/rtl/radiogrp.prg 
+   * source/rtl/checkbox.prg 
+   * source/rtl/listbox.prg 
+   * source/rtl/scrollbr.prg 
+   * source/rtl/radiobtn.prg 
+   * source/rtl/tget.prg 
+     + include "color.ch"
+     * changed __GuiColor() Calls
+     * moved __GuiColor and IsDefColor() from Checkbox.prg to Tget.prg
+     * (for granularity issues)
 
 2004-07-13 14:05 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/teditor.prg

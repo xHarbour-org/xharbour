@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.82 2004/06/19 02:01:55 ronpinkas Exp $
+ * $Id: tget.prg,v 1.83 2004/07/13 17:25:27 paultucker Exp $
  */
 
 /*
@@ -186,41 +186,40 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    DEFAULT cPicture   TO ""
    DEFAULT cColorSpec TO BuildGetColor(cColorSpec) // SetColor()
 
-   ::HasFocus   := .f.
-   ::lEdit      := .f.
-   ::BadDate    := .f.
-   ::Block     := bVarBlock
-   ::Changed    := .f.
-   ::Clear      := .f.
-   ::Col        := nCol
-   ::ColorSpec  := cColorSpec
-   ::DecPos     := NIL
-   ::ExitState  := 0
-   ::nLastExitState := 0
-   ::Minus      := .f.
-   ::Name       := cVarName
-   //::Original   := ::VarGet()
-   ::Pos        := NIL
-   ::PostBlock  := NIL
-   ::PreBlock   := NIL
-   ::Reader     := NIL
-   ::Rejected   := .f.
-   ::Row        := nRow
-   ::SubScript  := NIL
-   //::Type       := ValType( ::Original )
-   ::TypeOut    := .f.
-   ::nDispPos   := 1
-   ::nOldPos    := 0
-   ::lCleanZero := .f.
-   ::cDelimit   := if( SET(_SET_DELIMITERS), SET(_SET_DELIMCHARS), NIL )
-   ::lMinusPrinted := .f.
+   ::HasFocus       := ;
+   ::lEdit          := ;
+   ::BadDate        := ;
+   ::Changed        := ;
+   ::Clear          := ;
+   ::lCleanZero     := ;
+   ::lMinusPrinted  := ;
+   ::Minus          := ;
+   ::Rejected       := ;
+   ::TypeOut        := .f.
+   ::DecPos         := ;
+   ::Pos            := ;
+   ::PostBlock      := ; 
+   ::PreBlock       := ; 
+   ::Reader         := ;
+   ::SubScript      := NIL
+   ::ExitState      := ;
+   ::nLastExitState := ;
+   ::nOldPos        := 0
+   ::nDispPos       := 1
+   ::Block          := bVarBlock
+   ::Col            := nCol
+   ::Row            := nRow
+   ::ColorSpec      := cColorSpec
+   ::Picture        := cPicture
+   ::Name           := cVarName
+   //::Original     := ::VarGet()
+   //::Type         := ValType( ::Original )
+   ::cDelimit       := if( SET(_SET_DELIMITERS), SET(_SET_DELIMCHARS), NIL )
 
-//   ::Picture    := cPicture
-   ::cPicture   := /*Upper(*/ cPicture /*)*/
    #ifdef HB_COMPAT_C53
-   ::Caption    := ""
-   ::CapRow     := 0
-   ::CapCol     := 0
+   ::CapCol         := ;
+   ::CapRow         := 0
+   ::Caption        := ""
    #endif
 return Self
 
@@ -1766,16 +1765,22 @@ STATIC FUNCTION BuildGetColor(cColorSpec)
    LOCAL cCur
    LOCAL aTokens
 
+   cCur := SetColor()
+
    IF SET( _SET_INTENSITY )
-      DEFAULT cColorSpec to __guiColor( SetColor(), CLR_UNSELECTED + 1 ) +","+;
-                            __guiColor( SetColor(), CLR_ENHANCED   + 1 ) +","+;
-                            __guiColor( SetColor(), CLR_STANDARD   + 1 ) +","+;
-                            __guiColor( SetColor(), CLR_BACKGROUND + 1 )
+
+      DEFAULT cColorSpec to __guiColor( cCur, CLR_UNSELECTED + 1 ) +","+;
+                            __guiColor( cCur, CLR_ENHANCED   + 1 ) +","+;
+                            __guiColor( cCur, CLR_STANDARD   + 1 ) +","+;
+                            __guiColor( cCur, CLR_BACKGROUND + 1 )
+
    ELSE
-      DEFAULT cColorSpec to __guiColor( SetColor(), CLR_STANDARD   + 1 )
+      DEFAULT cColorSpec to __guiColor( cCur, CLR_STANDARD   + 1 )
+
    ENDIF
 
-   aTokens := HB_ATOKENS( cCur := Upper( cColorSpec ),",")
+                          /* NOTE */
+   aTokens := HB_ATOKENS( cCur := Upper( cColorSpec ), "," )
 
    IF Len( aTokens ) == 1
       cColorSpec := cCur + "," + cCur + "," + cCur + "," + cCur
@@ -1787,7 +1792,20 @@ STATIC FUNCTION BuildGetColor(cColorSpec)
       cColorSpec := cCur + "," + aTokens[ 1 ]
 
    ELSE
-      cColorSpec := cCur
+      cColorSpec := aTokens[1] + "," + aTokens[2] + "," + ;
+                    aTokens[3] + "," + aTokens[4]
+
    ENDIF
 
 Return cColorSpec
+
+
+#ifdef HB_COMPAT_C53
+
+FUNCTION __GuiColor( cPair, nPos )
+RETURN hb_colorindex( cpair, npos - 1 )
+
+FUNCTION Isdefcolor()
+RETURN Upper( SetColor() ) == "W/N,N/W,N/N,N/N,N/W"
+
+#endif
