@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.672 2003/02/01 19:12:15 patrickmast Exp $
+ * $Id: ChangeLog,v 1.673 2003/02/02 02:08:08 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,6 +9,23 @@
 */
 
 2003-02-02 03:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/gtQTc/gtQTc.cpp
+  * source/rtl/gtQTc/qtconsole.cpp
+  * source/rtl/gtQTc/qtconsole.h
+  * source/rtl/gtQTc/qtconsoledoc.cpp
+  * source/rtl/gtQTc/qtconsoledoc.h
+  * source/rtl/gtQTc/qtconsoleview.cpp
+  * source/rtl/gtQTc/qtconsoleview.h
+    + Added input support (pretty compelte I think)
+    ! fixed box support
+    ! Background is cleanly deleted
+    + Scroll is now able to clean an area of the screen
+
+  * tests/mtgc.prg
+    * working tests.
+
+  * tests/qttest.prg
+    Added test of get/read (working :-)
 
 2003-02-01 20:01 UTC+0100 Patrick Mast <patrick@winfakt.com>
   * source/rtl/tpopup.prg
