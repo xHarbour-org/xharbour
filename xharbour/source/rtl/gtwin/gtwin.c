@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.40 2004/02/07 20:06:35 andijahja Exp $
+ * $Id: gtwin.c,v 1.41 2004/02/09 18:00:38 druzus Exp $
  */
 
 /*
@@ -221,7 +221,7 @@ static void HB_GT_FUNC(gt_xSetCursorStyle( void ))
     case SC_NORMAL:
     default:
         cci.bVisible = TRUE;
-        cci.dwSize = 25;  /* this was 12, but when used in full screen dos window
+        cci.dwSize = 12;  /* this was 12, but when used in full screen dos window
                              cursor state is erratic  - doesn't turn off, etc.
 			     09-10-2002 druzus: I hope now it's OK.
 			     09-14-2003 ptucker:Not really....
@@ -1861,8 +1861,9 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
       lptstr = (LPSTR) GlobalLock(hglb);
       if (lptstr != NULL)
       {
-         int iLen = strlen( lptstr );
-         if ( *pulMaxSize == 0 || *pulMaxSize > iLen ) 
+         // int iLen = strlen( lptstr );
+         ULONG iLen = strlen( lptstr );
+         if ( *pulMaxSize == 0 || *pulMaxSize > iLen )
          {
             *pulMaxSize = iLen;
          }

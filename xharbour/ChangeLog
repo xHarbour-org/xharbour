@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2273 2004/02/13 03:15:40 walito Exp $
+ * $Id: ChangeLog,v 1.2274 2004/02/13 07:13:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-13 16:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/proc.c
+    ! casting.
+
+  * source/rtl/gtgraph.c
+  * source/rtl/hbsrlraw.c
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtalleg/gtalleg.c
+    ! code clean-up ( mostly, consistent declaration of variable type to be
+      compared with passed parameter)
+
+    /*
+    I am sorry but the little thing is like the following sample.
+    It is known that every C compiler does automatically expand values upon
+    comparing but IMHO, an explicit type declaration is better (CMIIW).
+
+    void foo ( ULONG ulSize )
+    {
+       int ui; // int changed to ULONG
+       ......
+
+       if ( ulSize > ui )
+       .......
+    }
+    */
 
 2004-02-12 23:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbvmpub.h

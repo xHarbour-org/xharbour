@@ -1,5 +1,5 @@
 /*
- * $Id: gtgraph.c,v 1.3 2004/01/25 13:18:54 jonnymind Exp $
+ * $Id: gtgraph.c,v 1.4 2004/02/10 13:16:18 andijahja Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 
 static HB_GT_GCOLOR *s_paramToColor( PHB_ITEM pColor, char *funcname )
 {
-   HB_GT_COLDEF  *color = NULL;
+   HB_GT_COLDEF  *color; // = NULL;
    static HB_GT_GCOLOR lcolor;
 
    if ( HB_IS_STRING( pColor ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.67 2004/02/07 20:06:35 andijahja Exp $
+ * $Id: gtwvt.c,v 1.68 2004/02/09 18:00:38 druzus Exp $
  */
 
 /*
@@ -3313,8 +3313,9 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
       lptstr = (LPSTR) GlobalLock(hglb);
       if (lptstr != NULL)
       {
-         int iLen = strlen( lptstr );
-         if ( *pulMaxSize == 0 || *pulMaxSize > iLen ) 
+         // int iLen = strlen( lptstr );
+         ULONG iLen = strlen( lptstr );
+         if ( *pulMaxSize == 0 || *pulMaxSize > iLen )
          {
             *pulMaxSize = iLen;
          }

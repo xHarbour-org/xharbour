@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.17 2003/09/13 19:14:30 ronpinkas Exp $
+ * $Id: proc.c,v 1.18 2004/02/13 07:13:33 ronpinkas Exp $
  */
 
 /*
@@ -229,7 +229,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
                if( pSelf->item.asArray.value->puiClsTree && pSelf->item.asArray.value->puiClsTree[0] )
                {
                   // Save.
-                  UINT uiPos = pSelf->item.asArray.value;
+                  UINT uiPos = (UINT) pSelf->item.asArray.value;
 
                   // Hide.
                   pSelf->item.asArray.value->puiClsTree[0] = 0;

@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.19 2004/02/06 03:36:50 maurifull Exp $
+ * $Id: gtalleg.c,v 1.20 2004/02/06 17:07:28 jonnymind Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ BOOL lClearInit = TRUE;
 static void hb_gt_DoCursor( void );
 
 static char *s_clipboard = NULL;
-static int s_clipsize = 0;
+static ULONG s_clipsize = 0;
 
 // I'm not sure of removing these (yet)
 // (they used to be static vars to center gt in hw screen, but now the
