@@ -42,7 +42,8 @@ PROCEDURE Main()
    LOCAL kf3     := SetKey( K_F3, {|| Wvt_WindowExpand( 1 ) } )
    LOCAL kf4     := SetKey( K_F4, {|| Wvt_WindowExpand( -1 ) } )
    LOCAL kf5     := SetKey( K_F5, {|| VouBrowse() } )
-   
+	LOCAL nMaxRows:= MaxRow()
+	   
    LOCAL cLabel  := 'xHarbour simulated GUI.'
 
    SET DATE BRITISH
@@ -61,7 +62,11 @@ PROCEDURE Main()
    aAdd( aBlocks, {|| Wvt_DrawImage( 8,62,12,69, 'vouch1.bmp' ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxRecessed( 7, 48, 13, 55 ) } )
    aAdd( aBlocks, {|| aEval( GetList, {|oGet| Wvt_DrawBoxGet( oGet:Row, oGet:Col, Len( Transform( oGet:VarGet(), oGet:Picture ) ) ) } ) } )
-
+   aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2, 4, nMaxRows-2, 18 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2,20, nMaxRows-2, 30 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2,32, nMaxRows-2, 42 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2,44, nMaxRows-2, 54 ) } )         
+   
    aLastPaint := Wvt_SetBlocks( aBlocks )
 
    scr := SaveScreen( 0,0,maxrow(),maxcol() )
@@ -71,11 +76,11 @@ PROCEDURE Main()
 
    SetColor( 'N/W,N/GR*,,,N/W*' )
 
-   @ MaxRow(), 0 SAY PadC( 'xHarbour + WVT Console GUI Screen',80 ) COLOR 'R+/W'
-   @ MaxRow()-2, 8 say 'F2 New Screen' COLOR 'GR+/B'
-   @ MaxRow()-2,22 say 'F3 Expand'     COLOR 'GR+/BG'
-   @ MaxRow()-2,32 say 'F4 Shrink'     COLOR 'GR+/G'
-	@ MaxRow()-2,42 say 'F5 Browse'     COLOR 'GR+/B'
+   @ nMaxRows  , 0 SAY PadC( 'xHarbour + WVT Console GUI Screen',80 ) COLOR 'R+/W'
+   @ nMaxRows-2, 4 say ' F2 New Screen ' COLOR 'N/W'
+   @ nMaxRows-2,20 say ' F3 Expand '     COLOR 'N/W'
+   @ nMaxRows-2,32 say ' F4 Shrink '     COLOR 'N/W'
+	@ nMaxRows-2,44 say ' F5 Browse '     COLOR 'N/W'
 	
    @  6, nColGet SAY '< Date >'
    @  9, nColGet SAY '<' + PadC( 'Name', 33 ) + '>'
