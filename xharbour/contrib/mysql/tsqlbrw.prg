@@ -1,5 +1,5 @@
 /*
- * $Id: tsqlbrw.prg,v 1.0 2001/08/17 22:12:48 mauriliolongo Exp $
+ * $Id: tsqlbrw.prg,v 1.1 2003/02/03 05:21:06 walito Exp $
  */
 
 /*
@@ -103,28 +103,32 @@ METHOD Block() CLASS TBColumnSQL
    local xValue := ::oBrw:oCurRow:FieldGet(::nFieldNum)
    local xType := ::oBrw:oCurRow:FieldType(::nFieldNum)
 
-   do case
-      case xType == "N"
+   switch xType
+      case  "N"
          xValue := Str(xValue, ::oBrw:oCurRow:FieldLen(::nFieldNum), ::oBrw:oCurRow:FieldDec(::nFieldNum))
+         exit
 
-      case xType == "D"
+      case  "D"
          xValue :=  "'" + DToC(xValue) + "'"
+         exit
 
-      case xType == "L"
+      case  "L"
          xValue := iif(xValue, ".T.", ".F.")
+         exit
 
-      case xType == "C"
+      case  "C"
          // Chr(34) is a double quote
          // That is: if there is a double quote inside text substitute it with a string
          // which gets converted back to a double quote by macro operator. If not it would
          // give an error because of unbalanced double quotes.
          xValue := Chr(34) + StrTran(xValue, Chr(34), Chr(34) + "+Chr(34)+" + Chr(34)) + Chr(34)
+         exit
 
-      case xType == "M"
+      case  "M"
          xValue := "' <MEMO> '"
+         exit
 
-      otherwise
-   endcase
+   end
 
 return &("{||" + xValue + "}")
 
@@ -340,53 +344,70 @@ METHOD BrowseTable(lCanEdit, aExitKeys) CLASS TBrowseSQL
          LOOP
       endif
 
-      do case
-         case nKey == K_DOWN
+      switch nkey
+         case  K_DOWN
             ::down()
+            exit
 
-         case nKey == K_PGDN
+         case  K_PGDN
             ::pageDown()
+            exit
 
-         case nKey == K_CTRL_PGDN
+         case  K_CTRL_PGDN
             ::goBottom()
+            exit
 
-         case nKey == K_UP
+         case  K_UP
             ::up()
+            exit
 
-         case nKey == K_PGUP
+         case  K_PGUP
             ::pageUp()
+            exit
 
-         case nKey == K_CTRL_PGUP
+         case  K_CTRL_PGUP
             ::goTop()
+            exit
 
-         case nKey == K_RIGHT
+         case  K_RIGHT
             ::right()
+            exit
 
-         case nKey == K_LEFT
+         case  K_LEFT
             ::left()
+            exit
 
-         case nKey == K_HOME
+         case  K_HOME
             ::home()
+            exit
 
-         case nKey == K_END
+         case  K_END
             ::end()
+            exit
 
-         case nKey == K_CTRL_LEFT
+         case  K_CTRL_LEFT
             ::panLeft()
+            exit
 
-         case nKey == K_CTRL_RIGHT
+         case  K_CTRL_RIGHT
             ::panRight()
+            exit
 
-         case nKey == K_CTRL_HOME
+         case  K_CTRL_HOME
             ::panHome()
+            exit
 
-         case nKey == K_CTRL_END
+         case  K_CTRL_END
             ::panEnd()
+            exit
 
-         case nKey == K_RETURN .AND. lCanEdit
-            ::EditField()
+         case  K_RETURN
+            IF lCanEdit
+               ::EditField()
+            ENDIF
+            exit
 
-         /*case nKey == K_DEL
+         /*case  K_DEL
             if lCanEdit
                if ! ::oQuery:Delete(::oCurRow)
                   Alert("not deleted " + ::oQuery:Error())
@@ -399,10 +420,10 @@ METHOD BrowseTable(lCanEdit, aExitKeys) CLASS TBrowseSQL
                ::refreshAll():forceStable()
             endif*/
 
-         otherwise
+         default
             ::KeyboardHook(nKey)
 
-      endcase
+      end
    enddo
 
 return Self
