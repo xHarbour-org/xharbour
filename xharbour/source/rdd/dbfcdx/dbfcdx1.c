@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.77 2003/11/08 01:12:46 andijahja Exp $
+ * $Id: dbfcdx1.c,v 1.78 2003/11/10 11:49:48 druzus Exp $
  */
 
 /*
@@ -500,7 +500,7 @@ static LPCDXKEY hb_cdxKeyPut( LPCDXKEY pKey, BYTE * pbVal, USHORT uiLen, ULONG u
    }
    if ( pbVal && uiLen )
    {
-      pKey->len = uiLen;
+      pKey->len = (BYTE) uiLen;
       if ( !pKey->val )
          pKey->val = ( BYTE * ) hb_xgrab( uiLen + 1 );
       memcpy( pKey->val, pbVal, uiLen );
@@ -531,7 +531,7 @@ static LPCDXKEY hb_cdxKeyPutC( LPCDXKEY pKey, char * szText, USHORT uiRealLen, U
    uiLen = (USHORT) ( szText ? strlen( szText ) : 0 );
    if ( uiLen > uiRealLen )
       uiLen = uiRealLen;
-   pKey->len = uiRealLen;
+   pKey->len = ( BYTE ) uiRealLen;
    pKey->val = ( BYTE * ) hb_xgrab( uiRealLen + 1 );
    if ( uiLen )
       memcpy( pKey->val, szText, uiLen );
@@ -1757,7 +1757,7 @@ static int hb_cdxPageLeafDelKey( LPCDXPAGE pPage )
                                 pPage->pKeyBuf[ iNext + iDup ] )
             ++iDup;
       }
-      iSpc += pPage->pKeyBuf[ iPos ] = iDup;
+      iSpc += ( pPage->pKeyBuf[ iPos ] = ( BYTE ) iDup );
    }
    pPage->iFree += iSpc;
    if ( --pPage->iKeys > iKey )
@@ -1862,7 +1862,7 @@ static int hb_cdxPageLeafAddKey( LPCDXPAGE pPage, LPCDXKEY pKey )
       while ( iDup < iMax && pPage->pKeyBuf[ iPos + iDup ] ==
                              pPage->pKeyBuf[ iPos + iDup + iLen ] )
          ++iDup;
-      iSpc -= pPage->pKeyBuf[ iPos + iLen + iLen - 2 ] = iDup;
+      iSpc -= ( pPage->pKeyBuf[ iPos + iLen + iLen - 2 ] = ( BYTE ) iDup );
    }
    pPage->iKeys++;
    while ( pKey->rec > pPage->RNMask )
@@ -1982,7 +1982,7 @@ static void hb_cdxPageLoad( LPCDXPAGE pPage )
       pPage->fBufChanged = FALSE;
    }
    hb_cdxIndexPageRead( pPage->TagParent->pIndex, pPage->Page, (BYTE *) &pPage->node, sizeof( CDXNODE ) );
-   pPage->PageType = HB_GET_LE_USHORT( pPage->node.intNode.attr );
+   pPage->PageType = ( BYTE ) HB_GET_LE_USHORT( pPage->node.intNode.attr );
    pPage->Left = HB_GET_LE_ULONG( pPage->node.intNode.leftPtr );
    pPage->Right = HB_GET_LE_ULONG( pPage->node.intNode.rightPtr );
    pPage->iKeys = HB_GET_LE_USHORT( pPage->node.intNode.nKeys );
@@ -3328,7 +3328,7 @@ static int hb_cdxPageSeekKey( LPCDXPAGE pPage, LPCDXKEY pKey, BOOL fExact )
       n = (l + r ) >> 1;
       k = hb_cdxValCompare( pPage->TagParent, pKey->val, pKey->len,
                             hb_cdxPageGetKeyVal( pPage, n ),
-                            pPage->TagParent->uiLen, fExact );
+                            (BYTE) pPage->TagParent->uiLen, fExact );
       if ( k == 0 )
       {
          if ( ulKeyRec == CDX_MAX_REC_NUM )
@@ -3373,7 +3373,7 @@ static int hb_cdxPageSeekKey( LPCDXPAGE pPage, LPCDXKEY pKey, BOOL fExact )
    {
       k = hb_cdxValCompare( pPage->TagParent, pKey->val, pKey->len,
                             hb_cdxPageGetKeyVal( pPage, pPage->iCurKey ),
-                            pPage->TagParent->uiLen, fExact );
+                            (BYTE) pPage->TagParent->uiLen, fExact );
       if ( k == 0 && ulKeyRec != CDX_MAX_REC_NUM &&
                      ulKeyRec != CDX_IGNORE_REC_NUM )
       {
@@ -3397,7 +3397,7 @@ static int hb_cdxPageSeekKey( LPCDXPAGE pPage, LPCDXKEY pKey, BOOL fExact )
          else
             k = hb_cdxValCompare( pPage->TagParent, pKey->val, pKey->len,
                                   hb_cdxPageGetKeyVal( pPage, pPage->iCurKey ),
-                                  pPage->TagParent->uiLen, fExact );
+                                  (BYTE) pPage->TagParent->uiLen, fExact );
       }
    }
    else if ( k > 0 && fLeaf )
@@ -4569,7 +4569,7 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
          }
          if ( (USHORT) pPage->iKeys >= ulKeyNo )
          {
-            pPage->iCurKey = pTag->UsrAscend ? ulKeyNo - 1 : pPage->iKeys - ulKeyNo;
+            pPage->iCurKey = pTag->UsrAscend ? ( SHORT ) ulKeyNo - 1 : pPage->iKeys - ( SHORT ) ulKeyNo;
             hb_cdxSetCurKey( pPage );
          }
          else
