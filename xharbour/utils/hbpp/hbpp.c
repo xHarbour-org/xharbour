@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.10 2004/11/03 20:11:23 paultucker Exp $
+ * $Id: hbpp.c,v 1.11 2005/01/02 03:37:15 guerra000 Exp $
  */
 
 /*
@@ -655,7 +655,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
     hb_compGenError( hb_pp_szErrors, 'P', HB_PP_ERR_MEMFREE, NULL, NULL );
 }
 
-BOOL hb_pp_fopen( char * szFileName )
+static BOOL hb_pp_fopen( char * szFileName )
 {
    PFILE pFile;
    FILE * handl_i = fopen( szFileName, "r" );
