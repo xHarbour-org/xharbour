@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.33 2004/03/21 15:55:04 druzus Exp $
+ * $Id: ads1.c,v 1.34 2004/03/22 09:22:08 brianhays Exp $
  */
 
 /*
@@ -3011,6 +3011,16 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          }
          break;
 
+      case DBOI_KEYADD :
+         hb_itemPutL(pOrderInfo->itmResult,
+                     phIndex && AdsAddCustomKey(phIndex) == AE_SUCCESS);
+         break;
+
+      case DBOI_KEYDELETE :
+         hb_itemPutL(pOrderInfo->itmResult,
+                     phIndex && AdsDeleteCustomKey(phIndex) == AE_SUCCESS);
+         break;
+
 
 /* Unsupported TODO:
 
@@ -3019,8 +3029,6 @@ DBOI_SETCODEBLOCK
 DBOI_KEYDEC
 DBOI_HPLOCKING
 DBOI_LOCKOFFSET
-DBOI_KEYADD
-DBOI_KEYDELETE
 DBOI_KEYSINCLUDED
 DBOI_SKIPUNIQUE
  // these are really global settings:

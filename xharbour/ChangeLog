@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2639 2004/03/24 02:57:48 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2640 2004/03/24 03:19:51 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,10 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-24 00:15 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+    + Added support for ORDKEYADD(), ORDKEYDEL()
+      code supplied by Mindaugas Kavaliauskas  (Thanks!))
+      This fixes broken calls to adsOrderInfo()
+
+  * contrib/rdd_ads/adsfunc.c
+    * upgraded codeblock handling for ShowPercentage(), AdsRegCallback and
+          AdsClrCallback()
+      code supplied by Ron Pinkas ;-)
+
 2004-03-24 00:30 UTC-0300 Luiz Rafael Culik Guimaraes<culikr@brturbo.com>
   ! utils/hbmake/hbmake.prg
     ! minor fix
-
 
 2004-03-24 00:12 UTC-0300 Luiz Rafael Culik Guimaraes<culikr@brturbo.com>
   All changes bello by Sylvain Robert
@@ -41,10 +52,10 @@
 2004-03-23 23:39 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
   * source/rtl/filesys.c
     ! Missing thread stubs in fsPopen();
-    
+
   * source/rtl/hbxml.c
     ! Fixed typecasts and some minor bugs. (really)
-    
+
 2004-03-24 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    * source/rtl/hbxml.c
      ! type cast

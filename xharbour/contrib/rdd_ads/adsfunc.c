@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.28 2004/03/18 04:07:29 ronpinkas Exp $
+ * $Id: adsfunc.c,v 1.29 2004/03/21 15:55:04 druzus Exp $
  */
 
 /*
@@ -77,7 +77,7 @@ ADSHANDLE adsConnectHandle = 0;
 BOOL bDictionary = FALSE;               /* Use Data Dictionary? */
 BOOL bTestRecLocks = FALSE;             /* Debug Implicit locks */
 
-PHB_ITEM itmCobCallBack = 0;
+static HB_ITEM s_itmCobCallBack = { HB_IT_NIL, NULL };
 
 HB_FUNC( ADSTESTRECLOCKS )              /* Debug Implicit locks Set/Get call */
 {
@@ -1426,68 +1426,67 @@ HB_FUNC( ADSCONVERTTABLE )
 
 UNSIGNED32 WINAPI ShowPercentage( UNSIGNED16 usPercentDone )
 {
-   UNSIGNED32 bRet = 0;
-   PHB_ITEM pPercentDone = hb_itemPutNI(NULL, usPercentDone);
-   PHB_ITEM pReturn;
+   HB_ITEM PercentDone;
 
-   if( itmCobCallBack )
+   PercentDone.type = HB_IT_NIL;
+   hb_itemPutNI( &PercentDone, usPercentDone );
+
+   if( HB_IS_BLOCK( &s_itmCobCallBack ) )
    {
-      pReturn = hb_vmEvalBlockV( itmCobCallBack, 1, pPercentDone ) ;
-      bRet =  hb_itemGetL( pReturn ) ;
+      return hb_itemGetL( hb_vmEvalBlockV( &s_itmCobCallBack, 1, &PercentDone ) ) ;
    }
    else
    {
       HB_TRACE(HB_TR_DEBUG, ("ShowPercentage(%d) called with no codeblock set.\n", usPercentDone ));
-      /*bRet = 1;*/
    }
-   hb_itemRelease( pPercentDone );
-   return bRet;
+
+   return 0;
 
 }  /* ShowPercentage */
 
 
-HB_FUNC( ADSREGCALLBACK    )
+HB_FUNC( ADSREGCALLBACK )
 {
    UNSIGNED32 ulRetVal;
 
    /* Note: current implementation is not thread safe.
       ADS can register multiple callbacks, but one per thread/connection.
       To be thread safe, we need multiple connections.
-      The registered function (and its codeblock itmCobCallBack) should
+      The registered function (and its codeblock s_itmCobCallBack) should
       NOT make any Advantage Client Engine calls. If it does,
       it is possible to get error code 6619 "Communication Layer is busy".
 
    */
 
-   itmCobCallBack = hb_itemParam( 1 );
-   if( !itmCobCallBack || ( hb_itemType(itmCobCallBack) != HB_IT_BLOCK ) )
+   if( ISBLOCK( 1 ) )
    {
-      hb_retl( FALSE );
-      return;
+      HB_ITEM_UNLOCK( &s_itmCobCallBack );
+      hb_itemCopy( &s_itmCobCallBack, hb_param( 1, HB_IT_BLOCK ) );
+      HB_ITEM_LOCK( &s_itmCobCallBack );
+
+      ulRetVal = AdsRegisterProgressCallback( ShowPercentage );
+
+      if( ulRetVal == AE_SUCCESS )
+      {
+         hb_retl( TRUE );
+         return;
+      }
+      else
+      {
+         HB_ITEM_UNLOCK( &s_itmCobCallBack );
+         hb_itemClear( &s_itmCobCallBack );
+      }
    }
 
-   ulRetVal = AdsRegisterProgressCallback( ShowPercentage );
-   if( ulRetVal != AE_SUCCESS )
-   {
-      hb_itemRelease( itmCobCallBack );
-      itmCobCallBack = 0;
-      hb_retl( FALSE );
-      return;
-   }
-
+   hb_retl( FALSE );
 }
 
 
 HB_FUNC( ADSCLRCALLBACK  )
 {
-   if( itmCobCallBack )
-   {
-      hb_retni( AdsClearProgressCallback  () );
-
-      hb_itemRelease( itmCobCallBack );
-      itmCobCallBack = 0;
-
-   }
+   HB_ITEM_UNLOCK( &s_itmCobCallBack );
+   hb_itemClear( &s_itmCobCallBack );
+   hb_retni( AdsClearProgressCallback  () );
 }
 
 #endif
