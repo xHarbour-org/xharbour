@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.46 2003/10/01 06:13:22 ronpinkas Exp $
+ * $Id: estack.c,v 1.47 2003/10/01 17:41:48 paultucker Exp $
  */
 
 /*
@@ -265,11 +265,38 @@ HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
 
 void hb_stackOldFrame( HB_STACK_STATE * pStack )
 {
+   PHB_ITEM pDetached;
+
    HB_THREAD_STUB
 
    while( HB_VM_STACK.pPos > HB_VM_STACK.pBase )
    {
-      hb_stackPop();
+      --HB_VM_STACK.pPos;
+
+      if( HB_IS_BYREF( *HB_VM_STACK.pPos ) )
+      {
+         pDetached = hb_itemUnRefOnce( *HB_VM_STACK.pPos );
+
+         if( HB_IS_BYREF( pDetached ) )
+         {
+            hb_itemCopy( pDetached, hb_itemUnRef( pDetached ) );
+            //printf( "Severed Detached Local: %i Type: %i\n", HB_VM_STACK.pPos - HB_VM_STACK.pBase - 1, pDetached->type );
+         }
+         else
+         {
+            //hb_itemClear( pDetached );
+         }
+
+         hb_itemClear( *HB_VM_STACK.pPos );
+      }
+      else if( HB_IS_COMPLEX( *HB_VM_STACK.pPos ) )
+      {
+         hb_itemClear( *HB_VM_STACK.pPos );
+      }
+      else
+      {
+         ( *HB_VM_STACK.pPos )->type = HB_IT_NIL;
+      }
    }
 
    HB_VM_STACK.pBase = HB_VM_STACK.pItems + pStack->lBaseItem;

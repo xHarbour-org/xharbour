@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.36 2003/10/20 02:37:26 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.37 2003/10/20 18:44:41 ronpinkas Exp $
  */
 
 /*
@@ -88,7 +88,6 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
 {
    HB_CODEBLOCK_PTR pCBlock;
 
-
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockNew(%p, %hu, %p, %p, %p)", pBuffer, uiLocals, pLocalPosTable, pSymbols, pGlobals));
 
    pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
@@ -98,6 +97,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
    /* Store the number of referenced local variables
     */
    pCBlock->uiLocals = uiLocals;
+
    if( uiLocals )
    {
       /* NOTE: if a codeblock will be created by macro compiler then
@@ -105,7 +105,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
        * uiLocal will be also ZERO if it is a nested codeblock
        */
       USHORT ui = 1;
-      PHB_ITEM pLocal, pValue;
+      PHB_ITEM pLocal;
       HB_HANDLE hMemvar;
 
       /* Create a table that will store the values of local variables
@@ -133,65 +133,31 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
              * pool so it can be shared by codeblocks
              */
 
-            if( HB_IS_BYREF( pLocal ) )
-            {
-               pValue = hb_itemUnRef( pLocal );
-            }
-            else
-            {
-               pValue = pLocal;
-            }
+            hMemvar = hb_memvarValueNew( pLocal, FALSE );
+            hb_memvarValueIncRef( hMemvar );
 
-            hMemvar = hb_memvarValueNew( pValue, FALSE );
+            pLocal->type = HB_IT_BYREF | HB_IT_MEMVAR;
+            pLocal->item.asMemvar.itemsbase = hb_memvarValueBaseAddress();
+            pLocal->item.asMemvar.offset    = 0;
+            pLocal->item.asMemvar.value     = hMemvar;
 
-            pValue->type = HB_IT_BYREF | HB_IT_MEMVAR;
-            pValue->item.asMemvar.itemsbase = hb_memvarValueBaseAddress();
-            pValue->item.asMemvar.offset    = 0;
-            pValue->item.asMemvar.value     = hMemvar;
-
-            memcpy( pCBlock->pLocals + ui, pValue, sizeof( HB_ITEM ) );
-
-            // Need to refelct in the local as well.
-            if( pLocal != pValue )
-            {
-               PHB_ITEM *pItem = HB_VM_STACK.pPos - 1;
-
-               // Scan the stack for possible additional refrences to the now *detached* value!
-               while( pItem != HB_VM_STACK.pItems )
-               {
-                  if( ( *pItem ) == pLocal )
-                  {
-                     hb_memvarValueIncRef( hMemvar );
-                  }
-                  else if( ( *pItem ) == pValue )
-                  {
-                     // Done.
-                  }
-                  else if( ( *pItem )->type & HB_IT_BYREF )
-                  {
-                     if( hb_itemUnRef( *pItem ) == pValue )
-                     {
-                        hb_memvarValueIncRef( hMemvar );
-                     }
-                  }
-
-                  --pItem;
-               }
-            }
+            memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
+            hb_memvarValueIncRef( pLocal->item.asMemvar.value );
          }
          else
          {
             /* This variable is already detached (by another codeblock)
              * - copy the reference to a value
              */
+            memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
+
             /* Increment the reference counter so this value will not be
              * released if other codeblock will be deleted
              */
-            memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
+            hb_memvarValueIncRef( pLocal->item.asMemvar.value );
             //TraceLog( NULL, "Detach: %p to %p\n", pLocal, pCBlock->pLocals + ui );
          }
 
-         hb_memvarValueIncRef( pLocal->item.asMemvar.value );
          ++ui;
       }
    }
@@ -320,9 +286,14 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
          while( ui )
          {
-            //TraceLog( NULL, "blockDelete\n" );
-            hb_memvarValueDecRef( pCBlock->pLocals[ ui-- ].item.asMemvar.value );
-            //TraceLog( NULL, "DONE blockDelete\n" );
+            if( HB_IS_MEMVAR( &( pCBlock->pLocals[ ui ] ) ) )
+            {
+               //TraceLog( NULL, "Release Detached %i\n", ui );
+               hb_memvarValueDecRef( pCBlock->pLocals[ ui ].item.asMemvar.value );
+               //TraceLog( NULL, "DONE Release Detached %i\n", ui );
+            }
+
+			ui--;
          }
 
          /* decrement the table reference counter and release memory if

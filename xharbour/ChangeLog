@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1658 2003/11/05 09:55:36 lculik Exp $
+ * $Id: ChangeLog,v 1.1659 2003/11/05 13:41:39 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-05 22:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/codebloc.c
+  * source/vm/estack.c
+    ! Fixed detached locals implementation to be 100% Clipper compabtible with 1 exception which appears to be a bug in Clipper.
+
+  + tests/detach.prg
+    + New sample of Severed Detached Local, Clipper compatibility.
+
+  + tests/detach1.prg
+    + Sample of what appears to be a Clipper bug, in Detached Locals implementation [fixed in xHarbour].
 
 2003-11-05 14:37 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/hbdefs.h
