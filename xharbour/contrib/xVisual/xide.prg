@@ -113,7 +113,7 @@ FUNCTION Main
                   :GetObj("StdTools"):DisableAll()
                   
                   //--------- sets a QUICK access to the control
-                  //oApp:MainFrame:SetLink( 'StdBar', :GetObj("StdTools") )
+                  oApp:MainFrame:SetLink( 'StdBar', :GetObj("StdTools") )
                END
             END
 
