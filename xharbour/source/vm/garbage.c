@@ -1,6 +1,6 @@
 
 /*
- * $Id: garbage.c,v 1.65 2003/11/26 21:58:35 jonnymind Exp $
+ * $Id: garbage.c,v 1.66 2003/11/27 17:57:50 jonnymind Exp $
  */
 
 /*
@@ -301,11 +301,6 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
    }
 }
 
-/** JC1:
-* Warning: THREAD UNSAFE
-* If pItem is in a data set, hb_gcGripDrop must be provided in a thread safe way,
-* (generally locking the data set of pItem )
-****/
 
 void hb_gcGripDrop( HB_ITEM_PTR pItem )
 {
@@ -346,11 +341,6 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 
 /* Lock a memory pointer so it will not be released if stored
    outside of harbour variables
-* JC1: THREAD UNSAFE.
-* The caller must make sure to obtain the garbage mutex before to
-* call this function, and once obtained it must also be sure that
-* the object still exists, as the garbage could have removed it
-* in the meanwhile (unless it has been safely stored in a data set).
 */
 void * hb_gcLock( void * pBlock )
 {
@@ -411,10 +401,6 @@ void *hb_gcUnlock( void *pBlock )
 
 
 /* Mark a passed item as used so it will be not released by the GC
-*
-* JC1: hb_gcItemRef is thread unsafe, and MUST stay this way because
-* it can ONLY be called form within a GC process. The GC process is
-* made by one thread at a time by definition.
 */
 void hb_gcItemRef( HB_ITEM_PTR pItem )
 {

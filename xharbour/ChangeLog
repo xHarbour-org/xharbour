@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1789 2003/11/28 10:38:25 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1790 2003/11/28 16:10:46 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-28 21:42 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/thread.h
+  * source/vm/thread.c
+    + HB_THREAD_ID structure has been added; the thread id is now returned
+      in that structure via a garbagable pointer.
+    * Code heavily reorganized
+    + Added functions
+      * GetCurrentThread() --> THREAD, returning an instance of the thread
+        item representing the current thread.
+      * GetThreadId( [THREAD] ) --> nId, returning the Xharbour VM unique
+        thread id of the given thread object (or of the current thread).
+      * GetSystemThreadId( [THREAD] ) --> nId, returning, IF POSSIBLE
+        a numeric system representation of the given thread, or of the
+        current thread if called without parameter.
+      * IsSameThread( Th1, [TH2] ) --> lResult; If called with one
+        parameter, return true if the given thread object matches
+        current thread. If two parameters are passed, it checks if
+        the thread objects are referring the same system/vm thread.
+    - Removed function ThreadIsSame()
+    * "Deprecated" functions ThreadGetCurrent and
+      ThreadGetCurrentInternal(); they are candidate for total removal.
+
+  * source/vm/garbage.c
+    - removed outdated comments.
+
+  * source/vm/inet.c
+    ! added casts.
 
 2003-11-28 17:07 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/inet.c

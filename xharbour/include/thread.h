@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.66 2003/11/27 17:57:49 jonnymind Exp $
+* $Id: thread.h,v 1.67 2003/11/27 20:18:04 jonnymind Exp $
 */
 
 /*
@@ -364,7 +364,8 @@ typedef struct tag_HB_STACK
 /*********************************************************************/
 /* Complex PRG LEVEL Mutex Structure                                 */
 
-typedef struct tag_HB_MUTEX_STRUCT {
+typedef struct tag_HB_MUTEX_STRUCT
+{
    ULONG sign;
    HB_CRITICAL_T mutex;
    HB_COND_T cond;
@@ -373,7 +374,25 @@ typedef struct tag_HB_MUTEX_STRUCT {
    int waiting;
    PHB_ITEM aEventObjects;
    struct tag_HB_MUTEX_STRUCT *next;
-} HB_MUTEX_STRUCT;
+   struct tag_HB_MUTEX_STRUCT *prev;
+}
+HB_MUTEX_STRUCT;
+
+/*********************************************************************/
+/* Thread object structure                                           */
+#define HB_THREAD_ID_SIGN     0xF01B1A23
+
+typedef struct tag_HB_THREAD_ID
+{
+   ULONG sign;
+   /* System level thread id */
+   HB_THREAD_T threadId;
+   /* 0, NULL, -1 etc are not valid flags for unused ids. */
+   BOOL bReady;
+   /* Pointer to the thread stack. I can see a lot of uses for it */
+   HB_STACK *pStack;
+}
+HB_THREAD_ID, *PHB_THREAD_ID;
 
 
 /*********************************************************************/
@@ -494,8 +513,6 @@ extern HB_CRITICAL_T hb_outputMutex;
 extern HB_CRITICAL_T hb_garbageAllocMutex;
 /* Guard for thread unsafe macro compilation */
 extern HB_CRITICAL_T hb_macroMutex;
-/* Guard for PRG level mutex asyncrhonous operations */
-extern HB_CRITICAL_T hb_mutexMutex;
 
 /* count of running stacks */
 extern HB_SHARED_RESOURCE hb_runningStacks;
