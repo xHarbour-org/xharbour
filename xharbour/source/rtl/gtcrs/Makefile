@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:42:40 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2003/05/16 19:52:09 druzus Exp $
 #
 
 ROOT = ../../../
@@ -11,6 +11,10 @@ C_SOURCES=\
 LIBNAME=gtcrs
 
 include $(TOP)$(ROOT)config/lib.cf
+
+# a workaround of a problem with different include directories 
+# for slang curses files between different unix distributions
+CFLAGS += -I/usr/include/ncurses
 
 ifeq ($(HB_GPM_MOUSE),yes)
 CFLAGS := $(CFLAGS) -DHAVE_GPM_H

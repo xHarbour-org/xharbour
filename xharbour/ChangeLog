@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1028 2003/05/17 02:29:11 druzus Exp $
+ * $Id: ChangeLog,v 1.1029 2003/05/17 15:32:40 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,10 +9,14 @@
 */
 
 2003-05-17 17:30 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/bin/hb-mkslib.sh
   * xharbour/make_rpm.sh
   * xharbour/xharbour.spec
+  * xharbour/source/rtl/gtcrs/gtcrs.h
   * xharbour/source/rtl/gtcrs/Makefile
-    * some minor modifications, checking for gpm-devel added
+  * xharbour/source/rtl/gtcrs/hb-charmap.def
+    * headers added
+    * some minor modifications
 
 2003-05-17 04:22 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/bin/!pack_src.sh

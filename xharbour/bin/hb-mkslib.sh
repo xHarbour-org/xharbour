@@ -1,4 +1,16 @@
 #!/bin/sh
+#
+# $Id$
+#
+
+# ---------------------------------------------------------------
+# Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
+# simple script to build shared libraries from static ones and
+# object files
+#
+# See doc/license.txt for licensing terms.
+# ---------------------------------------------------------------
+
 if [ $# -lt 2 ]
 then
     echo "usage: `basename $0` <target[.so]> src1.a .. srcN.a [obj1.o .. objN.o]"

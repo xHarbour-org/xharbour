@@ -1,41 +1,69 @@
+/*
+ * $Id$
+ */
+
+/*
+ * Harbour Project source code:
+ * Video subsystem based on ncurses screen library.
+ *
+ * Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
+ * www - http://www.harbour-project.org
+ * Special thanks to Marek Paliwoda <paliwoda@inetia.pl>
+ * author of gtsln from which I borrowed a lot of code and ideas.
+ * and to Gonzalo Diethelm <gonzalo.diethelm@iname.com>
+ * author of previous version of gtcrs.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software; see the file COPYING.   If not, write to
+ * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ *
+ * As a special exception, the Harbour Project gives permission for
+ * additional uses of the text contained in its release of Harbour.
+ *
+ * The exception is that, if you link the Harbour libraries with other
+ * files to produce an executable, this does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * Your use of that executable is in no way restricted on account of
+ * linking the Harbour library code into it.
+ *
+ * This exception does not however invalidate any other reasons why
+ * the executable file might be covered by the GNU General Public License.
+ *
+ * This exception applies only to the code released by the Harbour
+ * Project under the name Harbour.  If you copy code from other
+ * Harbour Project or Free Software Foundation releases into a copy of
+ * Harbour, as the General Public License permits, the exception does
+ * not apply to the code that you add in this way.   To avoid misleading
+ * anyone as to the status of such modified files, you must delete
+ * this exception notice from them.
+ *
+ * If you write modifications of your own for Harbour, it is your choice
+ * whether to permit this exception to apply to your modifications.
+ * If you do not wish that, delete this exception notice.
+ *
+ */
+
+/* NOTE: User programs should never call this layer directly! */
+
+/* *********************************************************************** */
+
 /* This definition has to be placed before #include "hbapigt.h" */
 #define HB_GT_FNPREF(x) crs ## x
 
 #include "hbapigt.h"
 #include "inkey.ch"
 #include "setcurs.ch"
-
-#ifndef HB_OS_LINUX
-
-#define __LINUX__
-#define HAVE_GPM_H
-#define HB_OS_LINUX
-
-#define hb_xgrab	malloc
-#define hb_xfree	free
-#define hb_xrealloc	realloc
-
-#define hb_idleState()	
-#define hb_idleReset()	
-
-#define HB_MIN(x,y)	(x < y ? x : y)
-#define HB_MAX(x,y)	(x > y ? x : y)
-
-#define HB_TRACE(x,y)	
-#define HB_TR_DEBUG	0
-#define HB_SYMBOL_UNUSED(x)	{(x)=(x);}
-#define USHORT	unsigned short
-#define ULONG	unsigned long
-#define UINT	unsigned int
-#define SHORT	short
-#define BOOL	int
-#define BYTE	unsigned char
-
-#define HB_inkey_enum	int
-
-#define hb_gtRectSize( uiTop, uiLeft, uiBottom, uiRight, puiBuffSize ) (*puiBuffSize = 0)
-
-#endif
 
 #ifndef _POSIX_PATH_MAX
 #define _POSIX_PATH_MAX 256

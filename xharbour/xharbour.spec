@@ -1,3 +1,15 @@
+#
+# $Id$
+#
+
+# ---------------------------------------------------------------
+# Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>,
+# Dave Pearson <davep@davep.org>
+# xHarbour RPM spec file
+#
+# See doc/license.txt for licensing terms.
+# ---------------------------------------------------------------
+
 ######################################################################
 ## Definitions.
 ######################################################################
@@ -42,8 +54,8 @@ Vendor:         %{hb_host}
 URL:            http://%{hb_host}/
 Source:         %{name}-%{version}.src.tar.gz
 Packager:       Przemys³aw Czerpak <druzus@polbox.com>
-BuildPrereq:    gcc binutils bash flex bison ncurses ncurses-devel slang-devel
-Requires:       gcc binutils bash sh-utils %{name}-lib
+BuildPrereq:    gcc binutils bash flex bison ncurses ncurses-devel slang-devel gpm-devel
+Requires:       gcc binutils bash sh-utils %{name}-lib = %{version}
 Provides:       %{name}
 BuildRoot:      /tmp/%{name}-%{version}-root
 
@@ -372,8 +384,8 @@ all this scripts accept command line switches:
 -o<outputfilename>      # output file name
 -static                 # link with static libs
 -shared                 # link with shared libs
--mt			# link with multi-thread libs
--gt<hbgt>		# link with <hbgt> GT driver (only for -static)
+-mt                     # link with multi-thread libs
+-gt<hbgt>               # link with <hbgt> GT driver (only for -static)
 
 link options work only with "%{hb_pref}lnk" and "%{hb_pref}mk" and has no effect
 in "%{hb_pref}cmp"
@@ -425,6 +437,18 @@ I hope this RPM is useful. Have fun with %{dname}.
 Dave Pearson <davep@davep.org>
 Przemyslaw Czerpak <druzus@polbox.com>
 EOF
+
+######################################################################
+## Post install
+######################################################################
+#%post lib
+#/sbin/ldconfig
+
+######################################################################
+## Post uninstall
+######################################################################
+#%postun lib
+#/sbin/ldconfig
 
 ######################################################################
 ## Clean.

@@ -1,3 +1,10 @@
+#
+# $Id$
+#
+
+#=============================================================================
+# Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>,
+# See doc/license.txt for licensing terms.
 #=============================================================================
 # Table Syntax:
 # <:> terminal[|terminal|terminal...] <space> comment
@@ -35,25 +42,6 @@
 #-----------------------------------------------------------------------------
 :linux|fslinux|console|vt100|vt102|vt320 = Linux system console and VT terms
     0-31:       42      3
-# mazovia to ISO-8859-2 translation
-    143:        161     1
-    149:        198     1
-    144:        202     1
-    156:        163     1
-    165:        209     1
-    163:        211     1
-    152:        166     1
-    160:        172     1
-    161:        175     1
-    134:        177     1
-    141:        230     1
-    145:        234     1
-    146:        179     1
-    164:        241     1
-    162:        243     1
-    158:        182     1
-    166:        188     1
-    167:        191     1
 # display semigraphics chars as ACSC ones
     16:         '+'     5	# ACS_RARROW
     17:         ','     5	# ACS_LARROW
@@ -110,25 +98,6 @@
 
 :xterm|xterm-color|rxvt = Linux system console and VT terms
     0-31:       42      3
-# mazovia to ISO-8859-2 translation
-    143:        161     1
-    149:        198     1
-    144:        202     1
-    156:        163     1
-    165:        209     1
-    163:        211     1
-    152:        166     1
-    160:        172     1
-    161:        175     1
-    134:        177     1
-    141:        230     1
-    145:        234     1
-    146:        179     1
-    164:        241     1
-    162:        243     1
-    158:        182     1
-    166:        188     1
-    167:        191     1
 # display semigraphics chars as ACSC ones
     16:         '+'     5	# ACS_RARROW
     17:         ','     5	# ACS_LARROW
@@ -182,3 +151,24 @@
     221:         96     5	# ACS_DIAMOND
     222:         96     5	# ACS_DIAMOND
     223:         96     5	# ACS_DIAMOND
+
+:dump = example
+# mazovia to ISO-8859-2 translation
+    143:        161     1
+    149:        198     1
+    144:        202     1
+    156:        163     1
+    165:        209     1
+    163:        211     1
+    152:        166     1
+    160:        172     1
+    161:        175     1
+    134:        177     1
+    141:        230     1
+    145:        234     1
+    146:        179     1
+    164:        241     1
+    162:        243     1
+    158:        182     1
+    166:        188     1
+    167:        191     1

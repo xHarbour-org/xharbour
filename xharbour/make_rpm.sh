@@ -1,4 +1,14 @@
 #!/bin/sh
+#
+# $Id$
+#
+
+# ---------------------------------------------------------------
+# Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
+# simple script to build RPMs from xHarbour sources
+#
+# See doc/license.txt for licensing terms.
+# ---------------------------------------------------------------
 
 test_reqrpm()
 {
