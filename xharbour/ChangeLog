@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.520 2002/12/08 20:10:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.521 2002/12/11 11:06:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-12-11 10:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * makefile.nt
+  * makefile.vc
+    * Minor corrections.
+  * source/rtl/regex.c
+    * Minor modification to allow compilation under MSVC.
 
 2002-12-11 03:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   + include/regex.h

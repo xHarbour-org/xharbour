@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.22 2002/11/04 23:22:23 paultucker Exp $
+# $Id: makefile.vc,v 1.23 2002/12/11 11:06:53 ronpinkas Exp $
 #
 
 #
@@ -110,7 +110,7 @@ CFLAGS = $(CFLAGS) -DSIMPLEX
 #
 
 AS             = ML
-CFLAGS         = -G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF $(C_USR) $(CFLAGS)
+CFLAGS         = -G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 $(C_USR) $(CFLAGS)
 CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
 HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LDFLAGS        = $(LDFLAGS)

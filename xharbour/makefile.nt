@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.2 2002/10/30 04:08:41 paultucker Exp $
+# $Id: makefile.nt,v 1.3 2002/11/04 23:22:23 paultucker Exp $
 #
 
 #
@@ -133,7 +133,7 @@ CFLAGS = $(CFLAGS) -DSIMPLEX
 #
 
 AS             = ML
-CFLAGS         = -G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF $(C_USR) $(CFLAGS)
+CFLAGS         = -G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 $(C_USR) $(CFLAGS)
 CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
 HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LDFLAGS        = $(LDFLAGS)
@@ -341,6 +341,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\philes53.obj \
    $(OBJ_DIR)\philesx.obj \
    $(OBJ_DIR)\rat.obj \
+   $(OBJ_DIR)\regex.obj \
    $(OBJ_DIR)\replic.obj \
    $(OBJ_DIR)\right.obj \
    $(OBJ_DIR)\round.obj \
