@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: xhbgtmk.sh,v 1.3 2003/05/27 00:56:07 lculik Exp $
+# $Id: xhbgtmk.sh,v 1.4 2003/06/15 13:11:56 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -48,7 +48,7 @@ then
     cd CVS
     if cvs -z3 co "${PROJECT}"; then
 	cd "${PROJECT}"
-	./make_rpm.sh
+	./make_rpm.sh "$*"
     fi
 else
     echo "If you want to build xHarbour compilers"
