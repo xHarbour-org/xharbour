@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbdoc.prg,v 1.4 2003/12/29 18:25:56 lculik Exp $
+ * $Id: hbdoc.prg,v 1.5 2004/03/01 13:00:22 lculik Exp $
  */
 
 /*
@@ -54,8 +54,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2003/12/29 18:25:56 $
- * Revision..: $Revision: 1.4 $
+ * Date......: $Date: 2004/03/01 13:00:22 $
+ * Revision..: $Revision: 1.5 $
  * Log file..: $Logfile:     $
  *
  *
@@ -933,7 +933,7 @@ set console off
    @ MAXROW(), 0 SAY "Execute ASSEMBL.BAT to compile and link Guides"         
 
    //  Return to caller
-
+SET CURSOR ON
 RETURN NIL
 
 //  End of MAIN()
@@ -1445,7 +1445,7 @@ for nCount:=1 to Len(aWww)
         aadd(aTemp,{aTop[nCount,1],aTop[nCount,2],aTop[nCount,3]})
     endif
 Next
-asort(aTemp,,,{|x,y| x[1]<y[1]})
+asort(aTemp,,,{|x,y| x[2]<y[2]})
     fWrite( nFile, '2 '+cCat+CRLF)
 for nCount:=1 to Len(aTemp)
     fWrite( nFile, '3 '+aTemp[nCount,1]+"="+aTemp[nCount,2]+">Funca"+CRLF)
@@ -1469,7 +1469,7 @@ for nCount:=1 to Len(aWww)
         aadd(aTemp,{aTop[nCount,1],aTop[nCount,2],aTop[nCount,4]})
     endif
 Next
-asort(aTemp,,,{|x,y| x[1]<y[1]})
+asort(aTemp,,,{|x,y| x[2]<y[2]})
 
 for nCount:=1 to Len(aTemp)
           oHtm:ListItem()
