@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_layout.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
+   $Id: xwt_gtk_layout.c,v 1.2 2004/05/21 12:21:34 jonnymind Exp $
 
    Layout - Horizontal or vertical layout manager
 */
@@ -195,6 +195,10 @@ BOOL xwt_gtk_createLayout( PXWT_WIDGET xwtData )
    wLayout->INH(INH(align)) = NULL; // no alignment window for now
    wLayout->INH(INH(iHAlign)) = XWT_ALIGN_CENTER; // defaults to center/center
    wLayout->INH(INH(iVAlign)) = XWT_ALIGN_CENTER;
+   wLayout->INH(INH(INH(fgColor))) = NULL;
+   wLayout->INH(INH(INH(bgColor))) = NULL;
+   wLayout->INH(INH(INH(baseColor))) = NULL;
+   wLayout->INH(INH(INH(textColor))) = NULL;
 
    wLayout->INH(INH(INH(main_widget))) = gtk_vbox_new( TRUE, 0 );
    wLayout->INH(INH(INH(top_widget))) = xwt_gtk_container_topwidget; // wich is the enframer
@@ -258,6 +262,10 @@ BOOL xwt_gtk_layout_create_with_mode( PXWT_WIDGET wWidget )
       lay->INH(INH(INH(main_widget))) = gtk_vbox_new( FALSE, 0 );
    }
    // reference the widget
+   lay->INH(INH(INH(fgColor))) = NULL;
+   lay->INH(INH(INH(bgColor))) = NULL;
+   lay->INH(INH(INH(baseColor))) = NULL;
+   lay->INH(INH(INH(textColor))) = NULL;
    g_object_ref( lay->INH(INH(INH(main_widget))) );
    gtk_widget_show( lay->INH(INH(INH(main_widget))) );
 

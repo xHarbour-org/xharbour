@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_base.c,v 1.4 2004/05/24 22:53:00 lculik Exp $
+   $Id: xwt_gtk_base.c,v 1.5 2004/06/14 18:03:38 lculik Exp $
 
    GTK Base widget for XWT system.
 */
@@ -449,8 +449,10 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    {
    
      GdkColor color;
+     szPropVal  = hb_itemGetCPtr( pValue ) ;
+     if ( szPropVal )
+     {
      wSelf->fgColor = hb_itemGetCPtr( pValue ) ;
-     if (wSelf->fgColor) {
      gdk_color_parse (wSelf->fgColor, &color);
      switch( widget->type )
      {
@@ -477,9 +479,10 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    {
    
      GdkColor color;
-     wSelf->bgColor = hb_itemGetCPtr( pValue ) ;
-     if ( wSelf->bgColor )
+          szPropVal  = hb_itemGetCPtr( pValue ) ;
+     if ( szPropVal ) 
      {
+      wSelf->bgColor = hb_itemGetCPtr( pValue ) ;
      gdk_color_parse (wSelf->bgColor, &color);
 //     widget_set_color(GTK_LABEL(wMain), &color,2 );
      switch( widget->type )
@@ -505,9 +508,11 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    else if ( strcmp( prop, "textcolor" ) == 0 )
    {
       GdkColor color;
-      wSelf->textColor = hb_itemGetCPtr( pValue ) ;
-      if ( wSelf->textColor )
+       szPropVal  = hb_itemGetCPtr( pValue ) ;
+     if ( szPropVal ) 
+
       {
+            wSelf->textColor = hb_itemGetCPtr( pValue ) ;
       gdk_color_parse (wSelf->textColor, &color);
 
 //      widget_set_color(GTK_LABEL(wMain), &color,4 );
@@ -534,8 +539,10 @@ BOOL xwt_gtk_base_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
    else if ( strcmp( prop, "basecolor" ) == 0 )
    {
       GdkColor color;
-      wSelf->baseColor = hb_itemGetCPtr( pValue ) ;
-      if (wSelf->baseColor){
+           szPropVal  = hb_itemGetCPtr( pValue ) ;
+     if ( szPropVal ) {
+
+    wSelf->baseColor = hb_itemGetCPtr( pValue ) ;
       gdk_color_parse (wSelf->baseColor, &color);
 
 //      widget_set_color(GTK_LABEL(wMain), &color,3 );
@@ -610,34 +617,35 @@ BOOL xwt_gtk_base_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
       hb_itemPutL( pValue, (BOOL) gtk_widget_is_focus( wTop ) );
    }
    else if ( strcmp( prop, "broadcast" ) == 0 )
-   {
+   {  
       hb_itemPutL( pValue, wSelf->bBroadcast );
    }
    else if ( strcmp( prop, "fgcolor" ) == 0 )
    {
-      if ( wSelf->fgColor )
-         hb_itemPutCPtr( pValue, wSelf->fgColor, 8);
-      else
+
+      if ( !wSelf->fgColor  )
          hb_itemPutC( pValue,  ""  )	 ;
+      else
+         hb_itemPutCPtr( pValue, wSelf->fgColor, 7);
    }
    else if ( strcmp( prop, "bgcolor" ) == 0 )
    { 
-      if ( wSelf->bgColor )
-         hb_itemPutCPtr( pValue, wSelf->bgColor, 8 );
+      if ( wSelf->bgColor)
+         hb_itemPutCPtr( pValue, wSelf->bgColor, 7 );
       else	 
 	 hb_itemPutC( pValue,  ""  );
    }      
    else if ( strcmp( prop, "textcolor" ) == 0 )
    {
       if ( wSelf->textColor )
-         hb_itemPutCPtr( pValue, wSelf->textColor, 8 );
+         hb_itemPutCPtr( pValue, wSelf->textColor, 7 );
       else
          hb_itemPutC( pValue,  ""  );	 
    }   
    else if ( strcmp( prop, "basecolor" ) == 0 )
    {
       if ( wSelf->baseColor )
-         hb_itemPutCPtr( pValue, wSelf->baseColor, 8 );
+         hb_itemPutCPtr( pValue, wSelf->baseColor, 7 );
       else
          hb_itemPutC( pValue,  ""  );	 
    }   
@@ -670,11 +678,11 @@ BOOL xwt_gtk_base_getall( PXWT_WIDGET widget, PHB_ITEM pRet )
    }
    else
    {
-      hb_hashAddChar( pRet, "fgcolor", hb_itemPutCPtr( &hbValue, wSelf->fgColor, 8 ) );
+      hb_hashAddChar( pRet, "fgcolor", hb_itemPutCPtr( &hbValue, wSelf->fgColor, 7 ) );
    }
    if(wSelf->baseColor  != NULL )
    {
-      hb_hashAddChar( pRet, "basecolor", hb_itemPutCPtr( &hbValue, wSelf->baseColor, 8) );
+      hb_hashAddChar( pRet, "basecolor", hb_itemPutCPtr( &hbValue, wSelf->baseColor, 7) );
    }
    else
    {
@@ -682,15 +690,15 @@ BOOL xwt_gtk_base_getall( PXWT_WIDGET widget, PHB_ITEM pRet )
    }
    if( wSelf->textColor != NULL )
    {
-      hb_hashAddChar( pRet, "textcolor", hb_itemPutCPtr( &hbValue, wSelf->textColor, 8 ) );   
+      hb_hashAddChar( pRet, "textcolor", hb_itemPutCPtr( &hbValue, wSelf->textColor, 7 ) );   
    }
    else
    {
       hb_hashAddChar( pRet, "textcolor", hb_itemPutC( &hbValue, "" ) );      
    }
-   if(  wSelf->bgColor  != NULL )
+   if(  wSelf->bgColor  )
    {
-      hb_hashAddChar( pRet, "bgcolor", hb_itemPutCPtr( &hbValue, wSelf->bgColor, 8  ) );   
+      hb_hashAddChar( pRet, "bgcolor", hb_itemPutCPtr( &hbValue, wSelf->bgColor, 7 ) );   
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1 2004/05/24 22:57:11 lculik Exp $
+ * $Id: ChangeLog,v 1.2 2004/06/14 18:02:51 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-06-16 10:50 UTC-0300 Luiz Rafael Culik <culikr /at / brturbo.com>
+    * xwt_gtk_base.c
+      xwt_gtk_layout.c
+      xwt_gtk_sensible.c 
+      xwt_gtk_window.c 
+      ! minor fix to problem that generate core dumps(related to color support) 
+
 2004-06-14 15:10 UTC-0300 Luiz Rafael Culik <culikr /at / brturbo.com>
    * xwt_gtk_viewport.c
      xwt_gtk_window.c
