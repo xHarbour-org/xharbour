@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.92 2004/04/05 14:36:20 druzus Exp $
+ * $Id: filesys.c,v 1.93 2004/04/05 19:33:31 andijahja Exp $
  */
 
 /*
@@ -1483,11 +1483,6 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
 
-      #ifdef __XCC__
-         extern unsigned long _doserrno;
-         extern void __cdecl _dosmaperr( unsigned long oserrno );
-      #endif
-
       if( iShare )
       {
          hFileHandle = _sopen( ( char * ) pFilename, convert_open_flags( uiFlags ), iShare );
@@ -1829,7 +1824,7 @@ USHORT  HB_EXPORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount 
          else
          {
              dwWritten = 0;
-             fResult = SetFilePointer( DostoWinHandle(hFileHandle), 0L, NULL, FILE_CURRENT ) && 
+             fResult = SetFilePointer( DostoWinHandle(hFileHandle), 0L, NULL, FILE_CURRENT ) &&
                        SetEndOfFile( DostoWinHandle(hFileHandle) );
          }
          hb_fsSetIOError( fResult, 0 );
@@ -3211,7 +3206,7 @@ BYTE HB_EXPORT * hb_fileNameConv( char *str ) {
          p++;
       }
    }
-   
+
    if ( ( filename = strrchr( str, hb_set.HB_SET_DIRSEPARATOR ) ) != NULL )
    {
       filename++;
