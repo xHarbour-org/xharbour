@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2309 2004/02/16 16:11:17 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2310 2004/02/16 17:12:30 rodrigo_moreno Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-16 18:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/teditor.prg
+    ! Fixed infinite loop when line length argument is <= 0
 
 2004-02-16 14:00 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   * contrib/pgsql
@@ -16,13 +20,13 @@
   + doc/gtinfo.txt
     + Some embrional documentation about the GTINFO system; will be merged
       with GTAPI to form a unique document about GT system.
-      
+
   * include/gtinfo.ch
     + Some defintions, comments. Capability to read desktop size in characters.
-    
+
   * source/rtl/gtwvt/gtwvt.c
     + GTINFO compliancy.
-    
+
   * tests/gtinfo.prg
     * Layout/indentation.
 

@@ -16,7 +16,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.15 2004/01/20 03:20:06 lculik Exp $
+/* $Id: teditor.prg,v 1.17 2004/02/15 11:57:49 lculik Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -222,9 +222,7 @@ STATIC function Text2Array(cString, nWordWrapCol)
       nRetLen += Len(cLine) + nEOLLen
 
       if nWordWrapCol != NIL .AND. Len(cLine) > nWordWrapCol
-
          while !Empty(cLine)
-
             // Split line at nWordWrapCol boundary
             if Len(cLine) > nWordWrapCol
 
@@ -239,21 +237,18 @@ STATIC function Text2Array(cString, nWordWrapCol)
                endif
 
                AAdd(aArray, HBTextLine():New(cSplittedLine, .T.))
-
             else
-
                // remainder of line is shorter than split point
-               cSplittedLine := cLine
-               AAdd(aArray, HBTextLine():New(cSplittedLine, .F.))
+               AAdd(aArray, HBTextLine():New(cLine, .F.))
 
+               // Done.
+               EXIT
             endif
 
             cLine := Right(cLine, Len(cLine) - Len(cSplittedLine))
          enddo
-
       else
          AAdd(aArray, HBTextLine():New(cLine, .F.))
-
       endif
 
    enddo
@@ -290,6 +285,10 @@ METHOD New(cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabSi
    default  lEditMode   to .T.
    default  nLineLength to nil
    default  nTabSize    to nil
+
+   IF HB_IsNumeric( nLineLength ) .AND. nLineLength <= 0
+      nLineLength := NIL
+   ENDIF
 
    // fix setcolor() to value at New() call
    ::cColorSpec := setcolor()
