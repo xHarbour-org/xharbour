@@ -31,6 +31,7 @@ GLOBAL oAppl
 #include "windows.ch"
 #include "debug.ch"
 #include "wingdi.ch"
+#include "tabctrl.ch"
 
 GLOBAL EXTERNAL lPrevInstance
 
@@ -43,7 +44,7 @@ CLASS Application
    DATA nFormCount            INIT 0
    DATA FrameCreated AS LOGIC INIT .F.
    DATA MultiInstance         INIT .F.
-   DATA InstMsg               INIT NIL 
+   DATA InstMsg               INIT NIL
 
    METHOD Initialize() CONSTRUCTOR
    METHOD Run()
@@ -71,7 +72,7 @@ METHOD Initialize() CLASS Application
       ENDIF
    ENDIF
    ::Instance := hInstance()
-  
+
    oAppl := Self
 
    RETURN(self)
@@ -95,17 +96,34 @@ METHOD Run() CLASS Application
 
 METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
 
-   LOCAL n
+   LOCAL aVars, aVar
 
    DEFAULT oParent TO self
 
    __objAddData( self, cForm )
    oForm := if( oForm != NIL, oForm:New( oParent ), TForm():New( oParent ) )
    __ObjSetValueList( self, { { cForm, oForm } } )
-   oForm:propname:=cForm
+   oForm:propname := cForm
    oForm:Create()
 
-   RETURN( oForm )
+   aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
+   FOR EACH aVar IN aVars
+      IF ValType( aVar[2] ) == 'O'
+         aAdd( oForm:Controls, aVar[2] )
+
+         WITH OBJECT aVar[2]
+            :Name      := WinClass( :ClassName )
+            :WndProc   := "FormProc"
+            :lRegister := .F.
+            :lControl  := .T.
+            :Parent    := oForm
+            :Instance  := oForm:Instance
+            :Create()
+         END WITH
+      ENDIF
+   NEXT
+
+RETURN( oForm )
 
 *------------------------------------------------------------------------------*
 
@@ -123,8 +141,43 @@ METHOD CreateFrame( cName, oFrame ) CLASS Application
    __ObjSetValueList( self, { { cName, oFrame } } )
    oFrame:propname:=cName
    oFrame:Create()
-   
+
    RETURN( oFrame )
 
+FUNCTION WinClass( cClass )
+
+   DO CASE
+    CASE cClass == "TBUTTON"
+       RETURN "button"
+
+    CASE cClass == "TEDIT"
+       RETURN "edit"
+
+    CASE cClass == "TSTATIC"
+       RETURN "static"
+
+    CASE cClass == "TCHECK"
+       RETURN "edit"
+
+    CASE cClass == "TRADIO"
+       RETURN "button"
+
+    CASE cClass == "TCOMBOBOX"
+       RETURN "combobox"
+
+    CASE cClass == "TLISTBOX"
+       RETURN "listbox"
+
+    CASE cClass == "TSTATUSBAR"
+       RETURN "msctls_statusbar32"
+
+    CASE cClass == "TTABCONTROL"
+       RETURN WC_TABCONTROL
+
+    CASE cClass == "TGROUPBOX"
+       RETURN "button"
+   END CASE
+
+ RETURN NIL
 
 *------------------------------------------------------------------------------*

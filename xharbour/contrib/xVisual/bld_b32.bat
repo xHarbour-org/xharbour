@@ -19,17 +19,17 @@ IF ERRORLEVEL 1 type comp.log
 IF ERRORLEVEL 1 PAUSE
 if errorlevel 1 goto exit
 
-%HB_INSTALL%\bin\harbour %3 -es2 -p -n -w -i%HB_INSTALL%\include;%WHAT32%\include > comp.log
+IF NOT '%3'=='' %HB_INSTALL%\bin\harbour %3 -es2 -p -n -w -i%HB_INSTALL%\include;%WHAT32%\include > comp.log
 IF ERRORLEVEL 1 type comp.log
 IF ERRORLEVEL 1 PAUSE
 if errorlevel 1 goto exit
 
-%HB_INSTALL%\bin\harbour %4 -es2 -p -n -w -i%HB_INSTALL%\include;%WHAT32%\include > comp.log
+IF NOT '%4'=='' %HB_INSTALL%\bin\harbour %4 -es2 -p -n -w -i%HB_INSTALL%\include;%WHAT32%\include > comp.log
 IF ERRORLEVEL 1 type comp.log
 IF ERRORLEVEL 1 PAUSE
 if errorlevel 1 goto exit
 
-%HB_INSTALL%\bin\harbour %5 -es2 -p -n -w -i%HB_INSTALL%\include;%WHAT32%\include > comp.log
+IF NOT '%5'=='' %HB_INSTALL%\bin\harbour %5 -es2 -p -n -w -i%HB_INSTALL%\include;%WHAT32%\include > comp.log
 IF ERRORLEVEL 1 type comp.log
 IF ERRORLEVEL 1 PAUSE
 if errorlevel 1 goto exit
@@ -41,18 +41,19 @@ echo -O2 -tW -M -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATIST
 echo -I%HB_INSTALL%\include;%BCC_DIR%\include >> b32.bc
 echo -c %1.c >> b32.bc
 echo -c %2.c >> b32.bc
-echo -c %3.c >> b32.bc
-echo -c %4.c >> b32.bc
-echo -c %5.c >> b32.bc
+IF NOT '%3'=='' echo -c %3.c >> b32.bc
+IF NOT '%4'=='' echo -c %4.c >> b32.bc
+IF NOT '%5'=='' echo -c %5.c >> b32.bc
 %BCC_DIR%\BIN\bcc32 @b32.bc
 if errorlevel 1 goto exit
 
 echo %BCC_DIR%\lib\c0w32.obj + > b32.bc
 echo %1.obj + >> b32.bc
 echo %2.obj + >> b32.bc
-echo %3.obj + >> b32.bc
-echo %4.obj + >> b32.bc
-echo %5.obj, + >> b32.bc
+IF NOT '%3'=='' echo %3.obj + >> b32.bc
+IF NOT '%4'=='' echo %4.obj + >> b32.bc
+IF NOT '%5'=='' echo %5.obj + >> b32.bc
+echo , + >> b32.bc
 echo %1.exe, + >> b32.bc
 echo %1.map, + >> b32.bc
 echo %WHAT32%\lib\What32.lib + >> b32.bc

@@ -1,4 +1,16 @@
-/* 
+#include "windows.ch"
+#include "wingdi.ch"
+#include "common.ch"
+#include "hbclass.ch"
+#include "debug.ch"
+#include "what32.ch"
+#Include "toolbar.ch"
+#Include "winlview.ch"
+#include "wintypes.ch"
+#include "cstruct.ch"
+#Include "winstruc.ch"
+
+/*
    Support for syntax:
 
       CONTROL <...> FROM <...>

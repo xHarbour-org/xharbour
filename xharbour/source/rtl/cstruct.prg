@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.14 2002/07/30 18:10:31 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.15 2002/08/05 18:04:23 ronpinkas Exp $
  */
 
 /*
@@ -85,7 +85,7 @@ Function __ActiveStructure( cStructure, nAlign )
          */
 
          // In most cases we can simply ignore the redefinition, by returning a FAKED Structure Array!
-         TraceLog( "Redefinition of C Structure: " + cStructure )
+         //TraceLog( "Redefinition of C Structure: " + cStructure )
          Return ( s_aActiveStructure := { cStructure, NIL, {}, {}, IIF( ValType( nAlign ) == "N", nAlign, 8 ) } )
       END
 
@@ -219,7 +219,7 @@ Function HB_CStructure( cStructure, nAlign )
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Desscription  := "Structure not initialized with __ActiveStructure()"
+      oErr:Description   := "Structure not initialized with __ActiveStructure()"
       oErr:Operation     := "HB_CStructure()"
       oErr:Severity      := ES_ERROR
       oErr:SubCode       := 3

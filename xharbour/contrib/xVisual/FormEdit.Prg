@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.49 2002/10/06 03:25:11 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.50 2002/10/06 06:07:08 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -203,6 +203,7 @@ METHOD CreateControl(aRect)
       DO CASE
       CASE ::CtrlName=="Button"
          oObj:=::Add(cName, TButton():New(   self, cName, 500,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         TraceLog( oObj:Name )
       CASE ::CtrlName=="Edit"
          oObj:=::Add(cName, TEdit():New(     self, cName, 501,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="Label"

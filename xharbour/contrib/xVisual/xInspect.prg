@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.19 2002/10/06 02:50:59 ronpinkas Exp $
+ * $Id: xInspect.prg,v 1.20 2002/10/06 03:25:11 ronpinkas Exp $
  */
 
 /*
@@ -37,7 +37,6 @@
 #include "accel.ch"
 
 GLOBAL EXTERNAL oApp
-
 
 typedef struct {;
     UINT    mask;
