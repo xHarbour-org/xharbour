@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.81 2003/08/04 16:59:31 lculik Exp $
+ * $Id: hbmake.prg,v 1.82 2003/08/05 03:17:22 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -264,7 +264,7 @@ FUNCTION ParseMakeFile( cFile )
 //      s_lVcc    := .F.
 //   ENDIF 
 
-   tracelog( lDjgpp )
+   
    s_nHandle := FT_FUSE( cFile )
 
    IF s_nHandle < 0
@@ -330,7 +330,7 @@ FUNCTION ParseMakeFile( cFile )
 
                   IF s_lGcc .AND. aTemp[ 1 ] = "CFLAG1" .OR. s_lGcc .AND. aTemp[ 1 ] = "CFLAG2"
                       aAdd( s_aMacros, { aTemp[ 1 ], Strtran( Replacemacros( aTemp[ 2 ] ), "\", "/" ) } )
-                      tracelog( s_aMacros[x,1],s_aMacros[x,2])
+                      
                       x++
                    ELSE
                      IF aTemp[ 1 ] == "GUI" .AND. aTemp[ 2 ] == "YES"
@@ -353,7 +353,7 @@ FUNCTION ParseMakeFile( cFile )
                            IF At( 'fivehc.lib', Lower( aLibx ) ) > 0 .OR. At( 'minigui.lib', Lower( aLibx ) ) > 0
                               lGui := .T.
                            ENDIF
-                           tracelog(s_aDefines[2],alibx)
+
                            IF "-l" in Lower( aLibx ) 
                               s_lBcc    := .F.
                               s_lGcc    := .T.
@@ -378,7 +378,7 @@ FUNCTION ParseMakeFile( cFile )
 
                   IF s_lGcc .AND. aTemp[ 1 ] = "CFLAG1" .OR. s_lGcc .AND. aTemp[ 1 ] = "CFLAG2"
                      aAdd( s_aMacros, { aTemp[ 1 ], Strtran( aTemp[ 2 ], "\", "/" ) } )
-                      tracelog( s_aMacros[x,1],s_aMacros[x,2])
+                      
                       x++
 
                   ELSE
@@ -394,7 +394,7 @@ FUNCTION ParseMakeFile( cFile )
                            IF At( 'fivehc.lib', Lower( aLibx ) ) > 0 .OR. At( 'minigui.lib', Lower( aLibx ) ) > 0
                               lGui := .T.
                            ENDIF
-                           tracelog(s_aDefines[2],alibx)
+
                            IF "-l" in Lower( aLibx ) 
                               s_lBcc    := .F.
                               s_lGcc    := .T.
@@ -910,7 +910,7 @@ FUNCTION CompileFiles()
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                      nFile ++
                      //                            Outstd( cComm )
-		     tracelog (ccomm)
+
                      __RUN( (cComm) )
                      cErrText := Memoread( (s_cLog) )
                      lEnd     := 'Error E' $ cErrText
@@ -1254,7 +1254,7 @@ FUNC CreateMakeFile( cFile )
       cDefLibGccLibs   := cHARso
    ENDIF
 
-   tracelog(lfwh,lminigui,lRddAds,lMediator)
+   
    IF lFwh
       @  3, 40 SAY "FWH path" GET cfwhpath PICT "@s20"
    ELSEIF lCw
@@ -1314,9 +1314,9 @@ cResname += cAllRes
    IF "Linux" in cOs
           cCurrentDir:='/'+CurDirx()
    ELSE 
-       cCurrentDir:=CurDrive()+":"+CurDirx()
+       cCurrentDir:=CurDrive()+":\"+CurDirx()
    ENDIF              
-   tracelog( cCurrentDir )
+   
    IF ! Empty( cObjDir )
 
       IF DirChange( cObjDir ) != 0
@@ -1848,7 +1848,7 @@ cResname += cAllRes
       fWrite( s_nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) comdlg32.lib shell32.lib user32.lib gdi32.lib" + CRLF )
    ELSEIF s_lGcc
-      fWrite( s_nLinkHandle, "CFLAG1 = " + IIF(  "Linux" IN cOs, "-I$(HB_INC_INSTALL)", " -I$(BHC)/include" ) + " -c -Wall" + IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG1 = " +IIF( !EMPTY(cUserInclude ) ," -I" + Alltrim( cUserInclude ),"")        + IIF(  "Linux" IN cOs, "-I$(HB_INC_INSTALL)", " -I$(BHC)/include" ) + " -c -Wall" + IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
       fWrite( s_nLinkHandle, "CFLAG2 = " + IIF(  "Linux" IN cOs, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib" ) + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
@@ -2624,7 +2624,7 @@ FUNC CreateLibMakeFile( cFile )
       IF "linux" IN Lower( Getenv( "HB_ARCHITECTURE" ) )  .OR. cOs == "Linux" .OR.  "linux" IN Lower( Os() )
          fWrite( s_nLinkHandle, "LINKER = ar -M " + CRLF )
       ELSE
-         fWrite( s_nLinkHandle, "LINKER = $(BCB)\ar -M " + CRLF )
+         fWrite( s_nLinkHandle, "LINKER = ar -M " + CRLF )
       ENDIF
 
       fWrite( s_nLinkHandle, " " + CRLF )
@@ -2660,7 +2660,7 @@ FUNC CreateLibMakeFile( cFile )
       IF  "linux" IN Lower( Getenv( "HB_ARCHITECTURE" ) )  .OR. cOs == "Linux"
          fWrite( s_nLinkHandle, "    $(LINKER) @&&!" + CRLF )
       ELSE
-         fWrite( s_nLinkHandle, "    $(BCB)\$(LINKER) @&&!" + CRLF )
+         fWrite( s_nLinkHandle, "    $(BCB)\bin\$(LINKER) @&&!" + CRLF )
       ENDIF
 
       fWrite( s_nLinkHandle, "    $(PROJECT) " + CRLF )
@@ -3502,7 +3502,7 @@ FUNCTION GetSelFiles( aIn, aOut )
 
       IF nPos > 0
          aAdd( aRet, cItem )
-         tracelog(cItem)
+         
       ENDIF
 
    NEXT
