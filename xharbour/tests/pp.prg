@@ -46,7 +46,9 @@
 #else
    #DEFINE __CLIPPER__
 
-   #DEFINE  CRLF Chr(13) + Chr(10)
+   #ifndef CRLF
+      #DEFINE  CRLF Chr(13) + Chr(10)
+   #endif
 
    STATIC s_abBlocks := {}, nBlockId := 0
 
@@ -244,6 +246,22 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
       sSwitch += p9
    ENDIF
 
+   IF sSource != NIL .AND. ( "-H" $ Upper( sSource ) .OR. "--HELP"  $ Upper( sSource ) )
+      sSwitch := "   PP filename[.ext] [-CCH] [-D<id>] [-D:E] [-D:M] [-D:P] [-P] [-STRICT] [-U]" + CRLF + CRLF
+      sSwitch += [    -CCH    = Generate a .cch file (compiled command header).] + CRLF
+      sSwitch += [    -D<id>  = #define <id>.] + CRLF
+      sSwitch += [    -D:E    = Show tracing information into the Expression Scanner.] + CRLF
+      sSwitch += [    -D:M    = Show tracing information into the Match Engine.] + CRLF
+      sSwitch += [    -D:P    = Show tracing information into the Output Generator.] + CRLF
+      sSwitch += [    -P      = Generate .pp$ pre-processed output file.] + CRLF
+      sSwitch += [    -STRICT = Strict Clipper compatability (clone PP bugs).] + CRLF
+      sSwitch += [    -U      = Don't load standard rules.] + CRLF
+
+     	? sSwitch
+      ?
+      QUIT
+   endif
+
    sIncludePath := GetE( "INCLUDE" )
 
    WHILE ( nNext := At( ';', sIncludePath ) ) > 0
@@ -260,6 +278,29 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
       ENDIF
       aAdd( s_asPaths, sIncludePath )
    ENDIF
+
+#ifdef __CLIP__
+   sIncludePath := StartPath()
+   nAt := AtR( '/', sIncludePath )
+   IF nAt <= 0
+      nAt := AtR( "\", sIncludePath )
+   ENDIF
+   //? nAt,sIncludePath
+
+   IF nAt != 0
+      sIncludePath := Left( sIncludePath, nAt - 1 )
+      IF ! ( Right( sIncludePath, 1 ) $ "\/" )
+            sIncludePath += '\'
+      ENDIF
+      aAdd( s_asPaths, sIncludePath )
+   ENDIF
+
+   IF Empty(getenv("CLIPROOT"))
+      aAdd( s_asPaths, cliproot()+"\include\" )
+   else
+      aAdd( s_asPaths, getenv("CLIPROOT")+"\include\" )
+   endif
+#endif
 
    IF ! Empty( sSwitch )
       sSwitch := Upper( sSwitch )
@@ -328,20 +369,21 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
       ENDIF
    ENDIF
 
+
    IF bLoadRules
       InitRules()
       InitResults()
       IF Len( aDefRules ) != Len( aDefResults )
-         Alert( "#DEFINE Rules size mismatch" )
+         Alert( [#DEFINE Rules size mismatch] )
       ENDIF
       IF Len( aTransRules ) != Len( aTransResults )
-         Alert( "#TRANSLATE Rules size mismatch" )
+         Alert( [#TRANSLATE Rules size mismatch] )
       ENDIF
       IF Len( aCommRules ) != Len( aCommResults )
-         Alert( "#DEFINE Rules size mismatch" )
+         Alert( [#DEFINE Rules size mismatch] )
       ENDIF
    ELSE
-      Alert( "Not using standard rules." )
+      Alert( [Not using standard rules.] )
    ENDIF
 
    CompileDefine( "__PP__" )
@@ -387,84 +429,90 @@ RETURN
 
 FUNCTION PP_ExecMethod( sProcName, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
 
-    LOCAL sProc, nProc, nParams
+   LOCAL i, sProc, nProc, nParams
 
-      sProcName := Upper( sProcName )
+   sProcName := Upper( sProcName )
 
-      sProc := s_sModule + sProcName
+   sProc := s_sModule + sProcName
+   nProc := aScan( s_aProcedures, {|aProc| aProc[1] == sProc } )
+   IF nProc == 0
+      sProc := sProcName
       nProc := aScan( s_aProcedures, {|aProc| aProc[1] == sProc } )
-      IF nProc == 0
-         sProc := sProcName
-         nProc := aScan( s_aProcedures, {|aProc| aProc[1] == sProc } )
-      ENDIF
+   ENDIF
 
-      IF nProc > 0
-         s_xRet := NIL
+   IF nProc > 0
+      s_xRet := NIL
 
-         nParams := PCount()
-         s_aParams := {}
-         DO CASE
-            CASE nParams == 0
-            CASE nParams == 1
-               aAdd( s_aParams, p1 )
-            CASE nParams == 2
-               aAdd( s_aParams, p1 )
-               aAdd( s_aParams, p2 )
-            CASE nParams == 3
-               aAdd( s_aParams, p1 )
-               aAdd( s_aParams, p2 )
-               aAdd( s_aParams, p3 )
-            CASE nParams == 4
-               aAdd( s_aParams, p1 )
-               aAdd( s_aParams, p2 )
-               aAdd( s_aParams, p3 )
-               aAdd( s_aParams, p4 )
-            CASE nParams == 5
-               aAdd( s_aParams, p1 )
-               aAdd( s_aParams, p2 )
-               aAdd( s_aParams, p3 )
-               aAdd( s_aParams, p4 )
-               aAdd( s_aParams, p5 )
-            CASE nParams == 6
-               aAdd( s_aParams, p1 )
-               aAdd( s_aParams, p2 )
-               aAdd( s_aParams, p3 )
-               aAdd( s_aParams, p4 )
-               aAdd( s_aParams, p5 )
-               aAdd( s_aParams, p6 )
-            CASE nParams == 7
-               aAdd( s_aParams, p1 )
-               aAdd( s_aParams, p2 )
-               aAdd( s_aParams, p3 )
-               aAdd( s_aParams, p4 )
-               aAdd( s_aParams, p5 )
-               aAdd( s_aParams, p6 )
-               aAdd( s_aParams, p7 )
-            CASE nParams == 8
-               aAdd( s_aParams, p1 )
-               aAdd( s_aParams, p2 )
-               aAdd( s_aParams, p3 )
-               aAdd( s_aParams, p4 )
-               aAdd( s_aParams, p5 )
-               aAdd( s_aParams, p6 )
-               aAdd( s_aParams, p7 )
-               aAdd( s_aParams, p8 )
-            CASE nParams == 9
-               aAdd( s_aParams, p1 )
-               aAdd( s_aParams, p2 )
-               aAdd( s_aParams, p3 )
-               aAdd( s_aParams, p4 )
-               aAdd( s_aParams, p5 )
-               aAdd( s_aParams, p6 )
-               aAdd( s_aParams, p7 )
-               aAdd( s_aParams, p8 )
-               aAdd( s_aParams, p9 )
-         ENDCASE
+      nParams := PCount()
+      s_aParams := {}
+#ifdef __CLIP__
+   FOR i := 2 TO nParams
+      aAdd( s_aParams, Param( i ) )
+   NEXT
+#else
+      DO CASE
+         CASE nParams == 0
+         CASE nParams == 1
+            aAdd( s_aParams, p1 )
+         CASE nParams == 2
+            aAdd( s_aParams, p1 )
+            aAdd( s_aParams, p2 )
+         CASE nParams == 3
+            aAdd( s_aParams, p1 )
+            aAdd( s_aParams, p2 )
+            aAdd( s_aParams, p3 )
+         CASE nParams == 4
+            aAdd( s_aParams, p1 )
+            aAdd( s_aParams, p2 )
+            aAdd( s_aParams, p3 )
+            aAdd( s_aParams, p4 )
+         CASE nParams == 5
+            aAdd( s_aParams, p1 )
+            aAdd( s_aParams, p2 )
+            aAdd( s_aParams, p3 )
+            aAdd( s_aParams, p4 )
+            aAdd( s_aParams, p5 )
+         CASE nParams == 6
+            aAdd( s_aParams, p1 )
+            aAdd( s_aParams, p2 )
+            aAdd( s_aParams, p3 )
+            aAdd( s_aParams, p4 )
+            aAdd( s_aParams, p5 )
+            aAdd( s_aParams, p6 )
+         CASE nParams == 7
+            aAdd( s_aParams, p1 )
+            aAdd( s_aParams, p2 )
+            aAdd( s_aParams, p3 )
+            aAdd( s_aParams, p4 )
+            aAdd( s_aParams, p5 )
+            aAdd( s_aParams, p6 )
+            aAdd( s_aParams, p7 )
+         CASE nParams == 8
+            aAdd( s_aParams, p1 )
+            aAdd( s_aParams, p2 )
+            aAdd( s_aParams, p3 )
+            aAdd( s_aParams, p4 )
+            aAdd( s_aParams, p5 )
+            aAdd( s_aParams, p6 )
+            aAdd( s_aParams, p7 )
+            aAdd( s_aParams, p8 )
+         CASE nParams == 9
+            aAdd( s_aParams, p1 )
+            aAdd( s_aParams, p2 )
+            aAdd( s_aParams, p3 )
+            aAdd( s_aParams, p4 )
+            aAdd( s_aParams, p5 )
+            aAdd( s_aParams, p6 )
+            aAdd( s_aParams, p7 )
+            aAdd( s_aParams, p8 )
+            aAdd( s_aParams, p9 )
+      ENDCASE
+#endif
 
-         PP_ExecProcedure( s_aProcedures[nProc] )
-      ELSE
-         Alert( "Missing Method: " + sProcName )
-      ENDIF
+      PP_ExecProcedure( s_aProcedures[nProc] )
+   ELSE
+      Alert( [Missing Method: ] + sProcName )
+   ENDIF
 
 RETURN s_xRet
 
@@ -486,7 +534,7 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
          #else
             s_aProcStack[s_nProcStack][3][nVar][2] := &( s_asPrivates[nVar] )
          #endif
-         //Alert( "Saved upper Private: " + s_asPrivates[nVar] + " in " + s_aProcStack[s_nProcStack][1] )
+         //Alert( [Saved upper Private: ] + s_asPrivates[nVar] + [ in ] + s_aProcStack[s_nProcStack][1] )
       NEXT
       aSize( s_asPrivates, 0 )
 
@@ -502,7 +550,7 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
             s_aProcStack[s_nProcStack][4][nVar][2] := &( s_asLocals[nVar] )
             __MXRelease( s_asLocals[nVar] )
          #endif
-         //Alert( "Released upper local: " + s_asLocals[nVar] + " in " + s_aProcStack[s_nProcStack][1] )
+         //Alert( [Released upper local: ] + s_asLocals[nVar] + [ in ] + s_aProcStack[s_nProcStack][1] )
       NEXT
       aSize( s_asLocals, 0 )
    ENDIF
@@ -545,7 +593,7 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
       #else
          __MXRelease( s_asPrivates[nVar] )
       #endif
-      //Alert( "Released private: " + s_asPrivates[nVar] + " in " + s_aProcStack[s_nProcStack][1] )
+      //Alert( [Released private: ] + s_asPrivates[nVar] + [ in ] + s_aProcStack[s_nProcStack][1] )
    NEXT
    aSize( s_asPrivates, 0 )
 
@@ -557,7 +605,7 @@ FUNCTION PP_ExecProcedure( aProc, sProcName )
       #else
          __MXRelease( s_asLocals[nVar] )
       #endif
-      //Alert( "Released local: " + s_asLocals[nVar] + " in " + s_aProcStack[s_nProcStack][1] )
+      //Alert( [Released local: ] + s_asLocals[nVar] + [ in ] + s_aProcStack[s_nProcStack][1] )
    NEXT
    aSize( s_asLocals, 0 )
 
@@ -598,7 +646,7 @@ PROCEDURE RP_Dot()
    LOCAL GetList := {}, sLine := Space(256)
 
    #ifdef FW
-       Alert( "DOT mode (no filename parameter) is Not ready for GUI yet." + CRLF + CRLF + "Please try Interpreter mode, using the -R switch..." )
+       Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + CRLF + CRLF + [Please try Interpreter mode, using the -R switch...] )
        RETURN
    #endif
 
@@ -868,7 +916,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__NEXT"
 
                      IF s_nCompLoop == 0 .OR. s_aLoopJumps[ s_nCompLoop ][3] != "F"
-                        Alert( "NEXT does not match FOR" )
+                        Alert( [NEXT does not match FOR] )
                      ELSE
                         aAdd( aProcedures[ nProcId ][2], { 0, s_aLoopJumps[ s_nCompLoop ][4], nLine } ) // STEP
                         aAdd( aProcedures[ nProcId ][2], { s_aLoopJumps[ s_nCompLoop ][1] - 1, NIL, nLine } ) // Loop back
@@ -898,7 +946,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__LOOP"
 
                      IF s_nCompLoop == 0
-                        Alert( "LOOP with no loop in sight!" )
+                        Alert( [LOOP with no loop in sight!] )
                      ELSE
                         IF s_aLoopJumps[ s_nCompLoop ][3] == "F"
                            aAdd( aProcedures[ nProcId ][2], { 0, s_aLoopJumps[ s_nCompLoop ][4], nLine } ) // STEP
@@ -913,7 +961,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                      sBlock := ""
                      IF s_nCompLoop == 0
-                        Alert( "EXIT with no loop in sight!" )
+                        Alert( [EXIT with no loop in sight!] )
                      ELSE
                         aAdd( s_aLoopJumps[ s_nCompLoop ][2], Len( aProcedures[ nProcId ][2] ) + 1 ) // Address of line to later place unconditional Jump instruction into.
                      ENDIF
@@ -923,7 +971,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      //aSize( s_acFlowType, s_nFlowId )
 
                      IF s_nCompLoop == 0
-                        Alert( "ENDDO does not match WHILE" )
+                        Alert( [ENDDO does not match WHILE] )
                      ELSE
                         aAdd( aProcedures[ nProcId ][2], { s_aLoopJumps[ s_nCompLoop ][1] - 1, NIL, nLine } ) // Loop back
                         aProcedures[ nProcId ][2][ s_aLoopJumps[s_nCompLoop][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
@@ -953,7 +1001,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "C" .OR. s_aIfJumps[ s_nCompIf ][4]
                         sBlock := ""
-                        Alert( "CASE does not match DO CASE" )
+                        Alert( [CASE does not match DO CASE] )
                      ELSE
                         IF s_aIfJumps[ s_nCompIf ][1] > 0
                            aAdd( aProcedures[ nProcId ][2], { 0, NIL, nLine } ) // Place holder for unconditional Jump to END.
@@ -969,7 +1017,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                      sBlock := ""
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "C" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Alert( "OTHERWISE does not match DO CASE" )
+                        Alert( [OTHERWISE does not match DO CASE] )
                      ELSE
                         s_aIfJumps[ s_nCompIf ][4] := .T.
                         IF s_aIfJumps[ s_nCompIf ][1] > 0
@@ -983,7 +1031,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      //aSize( s_acFlowType, s_nFlowId )
 
                      IF s_nCompIf == 0
-                        Alert( "ENDCASE with no DO CASE in sight!" )
+                        Alert( [ENDCASE with no DO CASE in sight!] )
                      ELSE
                         IF s_aIfJumps[ s_nCompIf ][1] > 0
                            aProcedures[ nProcId ][2][ s_aIfJumps[s_nCompIf][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
@@ -1013,7 +1061,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__ELSEIF"
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Alert( "ELSEIF does not match IF" )
+                        Alert( [ELSEIF does not match IF] )
                         LOOP
                      ELSE
                         IF s_aIfJumps[ s_nCompIf ][1] > 0
@@ -1030,7 +1078,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                      sBlock := ""
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Alert( "ELSE does not match IF" )
+                        Alert( [ELSE does not match IF] )
                         LOOP
                      ELSE
                         s_aIfJumps[ s_nCompIf ][4] := .T.
@@ -1043,7 +1091,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      //aSize( s_acFlowType, s_nFlowId )
 
                      IF s_nCompIf == 0
-                        Alert( "ENDIF does not match IF" )
+                        Alert( [ENDIF does not match IF] )
                      ELSE
                         aProcedures[ nProcId ][2][ s_aIfJumps[s_nCompIf][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
 
@@ -1061,7 +1109,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__END"
 
                      IF s_nCompIf == 0 .AND. s_nCompLoop == 0
-                        Alert( "END with no Flow-Control structure in sight!" )
+                        Alert( [END with no Flow-Control structure in sight!] )
                      ELSE
                         IF s_acFlowType[ s_nFlowId ] $ "FW"
                            IF s_acFlowType[ s_nFlowId ] $ "F"
@@ -1200,7 +1248,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                ELSEIF sBlock = "PP__NEXT"
 
                   IF s_nCompLoop == 0 .OR. s_aLoopJumps[ s_nCompLoop ][3] != "F"
-                     Alert( "NEXT does not match FOR" )
+                     Alert( [NEXT does not match FOR] )
                   ELSE
                      aAdd( aProcedures[ nProcId ][2], { 0, s_aLoopJumps[ s_nCompLoop ][4], nLine } ) // STEP
                      aAdd( aProcedures[ nProcId ][2], { s_aLoopJumps[ s_nCompLoop ][1] - 1, NIL, nLine } ) // Loop back
@@ -1230,7 +1278,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                ELSEIF sBlock = "PP__LOOP"
 
                   IF s_nCompLoop == 0
-                     Alert( "LOOP with no loop in sight!" )
+                     Alert( [LOOP with no loop in sight!] )
                   ELSE
                      IF s_aLoopJumps[ s_nCompLoop ][3] == "F"
                         aAdd( aProcedures[ nProcId ][2], { 0, s_aLoopJumps[ s_nCompLoop ][4], nLine } ) // STEP
@@ -1245,7 +1293,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   sBlock := ""
                   IF s_nCompLoop == 0
-                     Alert( "EXIT with no loop in sight!" )
+                     Alert( [EXIT with no loop in sight!] )
                   ELSE
                      aAdd( s_aLoopJumps[ s_nCompLoop ][2], Len( aProcedures[ nProcId ][2] ) + 1 ) // Address of line to later place unconditional Jump instruction into.
                   ENDIF
@@ -1255,7 +1303,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   //aSize( s_acFlowType, s_nFlowId )
 
                   IF s_nCompLoop == 0
-                     Alert( "ENDDO does not match WHILE" )
+                     Alert( [ENDDO does not match WHILE] )
                   ELSE
                      aAdd( aProcedures[ nProcId ][2], { s_aLoopJumps[ s_nCompLoop ][1] - 1, NIL, nLine } ) // Loop back
                      aProcedures[ nProcId ][2][ s_aLoopJumps[s_nCompLoop][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
@@ -1285,7 +1333,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "C" .OR. s_aIfJumps[ s_nCompIf ][4]
                      sBlock := ""
-                     Alert( "CASE does not match DO CASE" )
+                     Alert( [CASE does not match DO CASE] )
                   ELSE
                      IF s_aIfJumps[ s_nCompIf ][1] > 0
                         aAdd( aProcedures[ nProcId ][2], { 0, NIL, nLine } ) // Place holder for unconditional Jump to END.
@@ -1301,7 +1349,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   sBlock := ""
                   IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "C" .OR. s_aIfJumps[ s_nCompIf ][4]
-                     Alert( "OTHERWISE does not match DO CASE" )
+                     Alert( [OTHERWISE does not match DO CASE] )
                   ELSE
                      s_aIfJumps[ s_nCompIf ][4] := .T.
                      IF s_aIfJumps[ s_nCompIf ][1] > 0
@@ -1315,7 +1363,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   //aSize( s_acFlowType, s_nFlowId )
 
                   IF s_nCompIf == 0
-                     Alert( "ENDCASE with no DO CASE in sight!" )
+                     Alert( [ENDCASE with no DO CASE in sight!] )
                   ELSE
                      IF s_aIfJumps[ s_nCompIf ][1] > 0
                         aProcedures[ nProcId ][2][ s_aIfJumps[s_nCompIf][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
@@ -1345,7 +1393,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                ELSEIF sBlock = "PP__ELSEIF"
 
                   IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I" .OR. s_aIfJumps[ s_nCompIf ][4]
-                     Alert( "ELSEIF does not match IF" )
+                     Alert( [ELSEIF does not match IF] )
                      BREAK
                   ELSE
                      IF s_aIfJumps[ s_nCompIf ][1] > 0
@@ -1362,7 +1410,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   sBlock := ""
                   IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I" .OR. s_aIfJumps[ s_nCompIf ][4]
-                     Alert( "ELSE does not match IF" )
+                     Alert( [ELSE does not match IF] )
                      BREAK
                   ELSE
                      s_aIfJumps[ s_nCompIf ][4] := .T.
@@ -1375,7 +1423,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   //aSize( s_acFlowType, s_nFlowId )
 
                   IF s_nCompIf == 0
-                     Alert( "ENDIF does not match IF" )
+                     Alert( [ENDIF does not match IF] )
                   ELSE
                      aProcedures[ nProcId ][2][ s_aIfJumps[s_nCompIf][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
 
@@ -1393,7 +1441,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                ELSEIF sBlock = "PP__END"
 
                   IF s_nCompIf == 0 .AND. s_nCompLoop == 0
-                     Alert( "END with no Flow-Control structure in sight!" )
+                     Alert( [END with no Flow-Control structure in sight!] )
                   ELSE
                      IF s_acFlowType[ s_nFlowId ] $ "FW"
                         IF s_acFlowType[ s_nFlowId ] $ "F"
@@ -1514,7 +1562,7 @@ PROCEDURE PP_LocalParams( aVars )
          &( aVars[nVar] ) := xInit
          aAdd( s_asLocals, aVars[nVar] )
       ELSE
-         Alert( PP_ProcName() + " (" + LTrim( Str( PP_ProcLine() ) ) +  ") Declared Parameter redeclaration: " + aVars[nVar] )
+         Alert( PP_ProcName() + " (" + LTrim( Str( PP_ProcLine() ) ) +  ")" + [ Declared Parameter redeclaration: ] + aVars[nVar] )
       ENDIF
    NEXT
 
@@ -1540,7 +1588,7 @@ PROCEDURE PP_Params( aVars )
          &( aVars[nVar] ) := xInit
          aAdd( s_asPrivates, aVars[nVar] )
       ELSE
-         Alert( PP_ProcName() + " (" + LTrim( Str( PP_ProcLine() ) ) +  ") Parameter redeclaration: " + aVars[nVar] )
+         Alert( PP_ProcName() + " (" + LTrim( Str( PP_ProcLine() ) ) +  ")" + [ Parameter redeclaration: ] + aVars[nVar] )
       ENDIF
    NEXT
 
@@ -1565,7 +1613,7 @@ PROCEDURE PP_Privates( aVars )
          &( aVars[nVar] ) := &( cInit )
          aAdd( s_asPrivates, aVars[nVar] )
       ELSE
-         Alert( PP_ProcName() + " (" + LTrim( Str( PP_ProcLine() ) ) +  ") Private redeclaration: " + aVars[nVar] )
+         Alert( PP_ProcName() + " (" + LTrim( Str( PP_ProcLine() ) ) +  ")" + [ Private redeclaration: ] + aVars[nVar] )
       ENDIF
    NEXT
 
@@ -1590,7 +1638,7 @@ PROCEDURE PP_Locals( aVars )
          &( aVars[nVar] ) := &( cInit )
          aAdd( s_asLocals, aVars[nVar] )
       ELSE
-         Alert( "Local redeclaration: " + aVars[nVar] )
+         Alert( [Local redeclaration: ] + aVars[nVar] )
       ENDIF
    NEXT
 
@@ -1614,7 +1662,7 @@ PROCEDURE PP_Publics( aVars )
          &( aVars[nVar] ) := &( cInit )
          aAdd( s_asPublics, aVars[nVar] )
       ELSE
-         Alert( "Public redeclaration: " + aVars[nVar] )
+         Alert( [Public redeclaration: ] + aVars[nVar] )
       ENDIF
    NEXT
 
@@ -1639,7 +1687,7 @@ PROCEDURE PP_Statics( aVars )
          &( aVars[nVar] ) := &( cInit )
          aAdd( s_asStatics, aVars[nVar] )
       ELSE
-         Alert( "Type: " + Type( aVars[nVar] ) + "Static redeclaration: '" + aVars[nVar] )
+         Alert( [Type: ] + Type( aVars[nVar] ) + [Static redeclaration: '] + aVars[nVar] )
       ENDIF
    NEXT
 
@@ -1661,13 +1709,13 @@ PROCEDURE PP_Run( cFile, aParams, sPPOExt, bBlanks )
       InitRunRules()
       InitRunResults()
       IF Len( aDefRules ) != Len( aDefResults )
-         Alert( "Run #DEFINE Rules size mismatch" )
+         Alert( [Run #DEFINE Rules size mismatch] )
       ENDIF
       IF Len( aTransRules ) != Len( aTransResults )
-         Alert( "Run #TRANSLATE Rules size mismatch" )
+         Alert( [Run #TRANSLATE Rules size mismatch] )
       ENDIF
       IF Len( aCommRules ) != Len( aCommResults )
-         Alert( "Run #DEFINE Rules size mismatch" )
+         Alert( [Run #DEFINE Rules size mismatch] )
       ENDIF
    ENDIF
 
@@ -1741,7 +1789,7 @@ PROCEDURE RP_Dot_Err( oErr )
       sArgs := Left( sArgs, Len( sArgs ) -2 )
    ENDIF
 
-   Alert( "Sorry, could not execute: " + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
+   Alert( [Sorry, could not execute: ] + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
 
    BREAK
 
@@ -1793,7 +1841,7 @@ PROCEDURE RP_Comp_Err( oErr, sLine, nLine )
    ENDIF
 
    TraceLog( "Line: " + Str( nLine, 4 ) + " could not compile: '" + sLine + "';" + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
-   Alert( "Line: " + Str( nLine, 4 ) + " could not compile: '" + sLine + "';" + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
+   Alert( [Line: ] + Str( nLine, 4 ) + [ could not compile: ]+"'" + sLine + "';" + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
 
    BREAK
 
@@ -1868,17 +1916,17 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
          IF oErr:CanSubstitute
             RETURN ( s_xRet )
          ELSEIF oErr:CanDefault
-            Alert( "Must Default: '" + oErr:Operation + "' " + oErr:Description + sArgs + " " + PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
+            Alert( [Must Default: ] + "'" + oErr:Operation + "' " + oErr:Description + sArgs + " " + PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
             RETURN  ( .F. )
          ELSE
-            Alert( "No Recovery for: '" + oErr:Operation + "' " + oErr:Description + sArgs + " " + PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
+            Alert( [No Recovery for: ] + "'" + oErr:Operation + "' " + oErr:Description + sArgs + " " + PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
             BREAK nProc
          ENDIF
       ENDIF
    ENDIF
 
    TraceLog( s_sModule, "Sorry, R/T Error: [" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) +  "] '" + oErr:Operation + "' " + oErr:Description + sArgs + " " + PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
-   Alert( "Sorry, R/T Error: [" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) + "] '" + oErr:Operation + "' " + oErr:Description + sArgs + " " + PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
+   Alert( [Sorry, R/T Error: ] + "[" + oErr:SubSystem + "/" + LTrim( Str( oErr:SubCode ) ) + "] '" + oErr:Operation + "' " + oErr:Description + sArgs + " " + PP_ProcName() + '(' + LTrim( Str( PP_ProcLine() ) ) + ") " + ProcName(2)  + "(" + LTrim( Str( ProcLine(2) ) ) + ")" )
 
    BREAK oErr
 
@@ -1933,7 +1981,7 @@ FUNCTION __SetEnd()
    IF nIf > 0
       nIf--
    ELSE
-      Alert( "END with no IF in sight!" )
+      Alert( [END with no IF in sight!] )
    ENDIF
 
 RETURN nIf
@@ -1983,7 +2031,7 @@ FUNCTION __SetEndCase()
    IF nIf > 0
       nIf--
    ELSE
-      Alert( "ENDCASE with no DO CASE in sight!" )
+      Alert( [ENDCASE with no DO CASE in sight!] )
    ENDIF
 
 RETURN nIf
@@ -2113,7 +2161,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks )
    ENDIF
 
    IF hSource == -1
-      Alert( "ERROR! opening: [" + sSource + "] O/S Error: " + Str( FError(), 2 ) )
+      Alert( [ERROR! opening: ]+ "[" + sSource + "]" + [ O/S Error: ] + Str( FError(), 2 ) )
       s_sFile := sPrevFile
       RETURN .F.
    ENDIF
@@ -2137,7 +2185,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks )
             hPP := FCreate( sSource + sPPOExt )
          ENDIF
          IF hPP == -1
-            Alert( "ERROR! creating '.pp$' file, O/S Error: " + Str( FError(), 2 ) )
+            Alert( [ERROR! creating '.pp$' file, O/S Error: ] + Str( FError(), 2 ) )
             s_sFile := sPrevFile
             RETURN .F.
          ENDIF
@@ -2191,7 +2239,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks )
                       //FSeek( hSource, -1, 1 )
                       nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                       IF nLen < 2
-                         Alert( "ERROR! Unterminated '/**/' [" + Str( ProcLine() ) + "]" )
+                         Alert( [ERROR! Unterminated '/**/' ] + "[" + Str( ProcLine() ) + "]" )
                       ENDIF
                       nMaxPos   := nLen - 1
                       nPosition := 0
@@ -2497,7 +2545,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks )
    RECOVER USING cError
       IF ValType( cError ) == 'C'
          TraceLog( "No EOL after: ", cError )
-         //Alert( "No EOL after: " + cError )
+         //Alert( [No EOL after: ] + cError )
       ENDIF
       nPosition := nMaxPos + 2
       sLine := ""
@@ -2614,7 +2662,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
       IF nCycles < MAX_CICLES
          nCycles++
       ELSE
-         Alert( "ERROR! Circularity detected [" + sSource + "(" + LTrim( Str( nLine ) ) + ")]" )
+         Alert( [ERROR! Circularity detected ]+"[" + sSource + "(" + LTrim( Str( nLine ) ) + ")]" )
          ? sLine
          BREAK
       ENDIF
@@ -2654,7 +2702,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
          sDirective := RTrim( Upper( NextToken( @sLine ) ) )
 
          IF ( nLen := Len( sDirective ) ) < 4
-            Alert( "ERROR! Unknown directive: '" + sDirective + "' " + sSource )
+            Alert( [ERROR! Unknown directive: ] + "'" + sDirective + "' " + sSource )
             sLine := ''
             LOOP
          ENDIF
@@ -2691,7 +2739,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             IF nIfDef > 0
                nIfDef--
             ELSE
-               Alert( "ERROR! #endif with no #ifdef in sight" )
+               Alert( [ERROR! #endif with no #ifdef in sight] )
             ENDIF
 
             sLine := ''
@@ -2752,13 +2800,13 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                   InitClsRules()
                   InitClsResults()
                   IF Len( aDefRules ) != Len( aDefResults )
-                     Alert( "Class #DEFINE Rules size mismatch" )
+                     Alert( [Class #DEFINE Rules size mismatch] )
                   ENDIF
                   IF Len( aTransRules ) != Len( aTransResults )
-                     Alert( "Class #TRANSLATE Rules size mismatch" )
+                     Alert( [Class #TRANSLATE Rules size mismatch] )
                   ENDIF
                   IF Len( aCommRules ) != Len( aCommResults )
-                     Alert( "Class #DEFINE Rules size mismatch" )
+                     Alert( [Class #DEFINE Rules size mismatch] )
                   ENDIF
                ENDIF
             ELSEIF Upper( sLine ) = "FIVEWIN"
@@ -2769,25 +2817,25 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                      InitClsRules()
                      InitClsResults()
                      IF Len( aDefRules ) != Len( aDefResults )
-                        Alert( "Class #DEFINE Rules size mismatch" )
+                        Alert( [Class #DEFINE Rules size mismatch] )
                      ENDIF
                      IF Len( aTransRules ) != Len( aTransResults )
-                        Alert( "Class #TRANSLATE Rules size mismatch" )
+                        Alert( [Class #TRANSLATE Rules size mismatch] )
                      ENDIF
                      IF Len( aCommRules ) != Len( aCommResults )
-                        Alert( "Class #DEFINE Rules size mismatch" )
+                        Alert( [Class #DEFINE Rules size mismatch] )
                      ENDIF
                   ENDIF
                   InitFWRules()
                   InitFWResults()
                   IF Len( aDefRules ) != Len( aDefResults )
-                     Alert( "FW #DEFINE Rules size mismatch" )
+                     Alert( [FW #DEFINE Rules size mismatch] )
                   ENDIF
                   IF Len( aTransRules ) != Len( aTransResults )
-                     Alert( "FW #TRANSLATE Rules size mismatch" )
+                     Alert( [FW #TRANSLATE Rules size mismatch] )
                   ENDIF
                   IF Len( aCommRules ) != Len( aCommResults )
-                     Alert( "FW #DEFINE Rules size mismatch" )
+                     Alert( [FW #DEFINE Rules size mismatch] )
                   ENDIF
                ENDIF
             ELSE
@@ -2824,7 +2872,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
             ELSE
 
-               Alert( "ERROR! Unknown directive: '" + sDirective + "' " + sSource )
+               Alert( [ERROR! Unknown directive: ] + "'" + sDirective + "' " + sSource )
                sLine := ''
                LOOP
 
@@ -2975,7 +3023,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
          /*
          IF aScan( aCommanded, nRule ) > 0
-            Alert( "Cyclic directive: #command " + sToken )
+            Alert( [Cyclic directive: #command ] + sToken )
             BREAK
          ELSE
             aAdd( aCommanded, nRule )
@@ -3368,7 +3416,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
          sNextAnchor := NIL
          nTemp       := 1
          WHILE nMatch + nTemp <= nMatches
-            IF aRules[Counter][2][nMatch + nTemp][2] == 0 // Non Optional ONLY!
+            IF aRules[Counter][2][nMatch + nTemp][2] <= 0 // Non NEW Optional ONLY!
                sNextAnchor := aRules[Counter][2][nMatch + nTemp][3]
                EXIT
             ENDIF
@@ -3474,7 +3522,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                ELSE
                   IF ValType( aMarkers ) != 'A' .OR. nMarkerId > Len( aMarkers )
                      TraceLog( "Oops", nRule, sKey, nMarkerId, ValType( aMarkers ), IIF( ValType( aMarkers ) == 'A', Len( aMarkers ) , "No array" ) )
-                     Alert( "Unexpected case [" + Str( Procline() ) + "]" )
+                     Alert( [Unexpected case ] + "[" + Str( Procline() ) + "]" )
                   ELSE
                      aMarkers[nMarkerId] := xMarker
                   ENDIF
@@ -3830,7 +3878,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
 
    ENDDO
 
-   Alert( "ERROR! Logic failure" )
+   Alert( [ERROR! Logic failure] )
 
 RETURN 0
 
@@ -3853,7 +3901,7 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
    // *** To be removed after final testing !!!
    IF Left( sLine, 1 ) == ' '
       TraceLog( "!!!Left Pad: " + sLine )
-      Alert( "!!!Left Pad: " + sLine )
+      Alert( [!!!Left Pad: ] + sLine )
       sLine := LTrim( sLine )
    ENDIF
 
@@ -4054,7 +4102,7 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
       ELSE
 
          TraceLog( "Unexpected case: " + sLine )
-         Alert( "Unexpected case: " + sLine )
+         Alert( [Unexpected case: ] + sLine )
          sReturn := sLine
 
       ENDIF
@@ -4114,7 +4162,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
      RETURN NIL
   ENDIF
 
-  //TraceLog( "*** Start", cType, sLine, sNextAnchor )
+  //TraceLog( "*** Start", cType, sLine, sNextAnchor, bX )
 
   DO CASE
      CASE cType == '<'
@@ -4332,7 +4380,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                     ENDIF
                  ENDIF
               ELSE
-                 Alert( "ERROR! Invalid '&' at: " + sExp + sNextToken )
+                 Alert( [ERROR! Invalid '&' at: ] + sExp + sNextToken )
                  EXIT
               ENDIF
            ENDIF
@@ -4354,7 +4402,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
               IF sTemp == NIL
                  TraceLog( "ERROR!(1) No content at: '" + sLine + "' After: " + sExp, sLine  )
-                 Alert( "ERROR!(1) No content at: '" + sLine + "' After: " + sExp  )
+                 Alert( [ERROR!(1) No content at: ] + "'" + sLine + "'"+[ After: ] + sExp  )
                  EXIT
               ELSE
                  sExp +=  sTemp
@@ -4364,14 +4412,14 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               sToken := NextToken( @sLine ) // Close
               IF sToken == NIL
                  TraceLog( "ERROR!(2) Unbalanced '(' at: " + sExp, sLine )
-                 Alert( "ERROR!(2) Unbalanced '(' at: " + sExp )
+                 Alert( [ERROR!(2) Unbalanced '(' at: ] + sExp )
                  EXIT
               ELSEIF Left( sToken, 1 ) == ')'
                  sExp += sToken
               ELSE
                  sLine := sToken + sLine
                  TraceLog( "ERROR!(3) Unbalanced '(' Found: '" +  sToken + "' at: " + sExp, sLine )
-                 Alert( "ERROR!(3) Unbalanced '(' Found: '" +  sToken + "' at: " + sExp )
+                 Alert( [ERROR!(3) Unbalanced '(' Found: ] + "'" +  sToken + "'"+[ at: ] + sExp )
                  EXIT
               ENDIF
            ENDIF
@@ -4405,7 +4453,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                  sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
                  IF sTemp == NIL
                     TraceLog( "ERROR! Unbalanced '{|...' at: " + sExp )
-                    Alert( "ERROR! Unbalanced '{|...' at: " + sExp )
+                    Alert( [ERROR! Unbalanced '{|...' at: ] + sExp )
                     EXIT
                  ELSE
                     sExp += sTemp
@@ -4424,7 +4472,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                     #endif
                  ELSE
                     TraceLog( "ERROR! Unbalanced '{|...|' at: " + sExp, sNextToken, sNextLine )
-                    Alert( "ERROR! Unbalanced '{|...|' at: " + sExp )
+                    Alert( [ERROR! Unbalanced '{|...|' at: ] + sExp )
                     EXIT
                  ENDIF
               ENDIF
@@ -4432,7 +4480,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
               IF sTemp == NIL
                  TraceLog( "ERROR! Empty '{||'" )
-                 Alert( "ERROR! Empty '{||'" )
+                 Alert( [ERROR! Empty '{||'] )
                  EXIT
               ELSE
                  sExp +=  sTemp
@@ -4441,14 +4489,14 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               sToken := NextToken( @sLine ) // Close
               IF sToken == NIL
                  TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                 Alert( "ERROR! Unbalanced '{' at: " + sExp )
+                 Alert( [ERROR! Unbalanced '{' at: ] + sExp )
                  EXIT
               ELSEIF Left( sToken, 1 ) == '}'
                  sExp += sToken
               ELSE
                  sLine := sToken + sLine
                  TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                 Alert( "ERROR! Unbalanced '{' at: " + sExp )
+                 Alert( [ERROR! Unbalanced '{' at: ] + sExp )
                  EXIT
               ENDIF
            ELSE
@@ -4468,7 +4516,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                  sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
                  IF sTemp == NIL
                     TraceLog( "ERROR! Unbalanced '{...'", sLine )
-                    Alert( "ERROR! Unbalanced '{...'" )
+                    Alert( [ERROR! Unbalanced '{...'] )
                     EXIT
                  ELSE
                     sExp +=  sTemp
@@ -4477,14 +4525,14 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                  sToken := NextToken( @sLine ) // Close
                  IF sToken == NIL
                     TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                    Alert( "ERROR! Unbalanced '{' at: " + sExp )
+                    Alert( [ERROR! Unbalanced '{' at: ] + sExp )
                     EXIT
                  ELSEIF Left( sToken, 1 ) == '}'
                     sExp += sToken
                  ELSE
                     sLine := sToken + sLine
                     TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                    Alert( "ERROR! Unbalanced '{' at: " + sExp )
+                    Alert( [ERROR! Unbalanced '{' at: ] + sExp )
                     EXIT
                  ENDIF
               ENDIF
@@ -4499,7 +4547,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            sExp  += sToken
            sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
            IF sTemp == NIL
-              Alert( "ERROR! Unbalanced '[' at: " + sExp )
+              Alert( [ERROR! Unbalanced ] + "'['" + [ at: ] + sExp )
               EXIT
            ELSE
               sExp += sTemp
@@ -4507,13 +4555,13 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
            sToken := NextToken( @sLine ) // Close
            IF sToken == NIL
-              Alert( "ERROR! Unbalanced '[' at: " + sExp )
+              Alert( [ERROR! Unbalanced ] + "'['" + [ at: ] + sExp )
               EXIT
            ELSEIF Left( sToken, 1 ) == ']'
               sExp += sToken
            ELSE
               sLine := sToken + sLine
-              Alert( "ERROR! Unbalanced '[' at: " + sExp )
+              Alert( [ERROR! Unbalanced ] + "'['" + [ at: ] + sExp )
               EXIT
            ENDIF
 
@@ -4986,10 +5034,10 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
               NEXT
               IF '"' $ sDumb .AND. "'" $ sDumb .AND. ']' $ sDumb .AND. Left( sDumb, 1 ) != '['
                  sResult += '[[' + sDumb + ']]'
-              ELSEIF '"' $ sDumb .AND. ['] $ sDumb
-                 sResult += '[' + sDumb + ']'
+              ELSEIF '"' $ sDumb .AND. "'" $ sDumb
+                 sResult += '[' + sDumb + "]"
               ELSEIF '"' $ sDumb
-                 sResult += ['] + sDumb + [']
+                 sResult += "'" + sDumb + "'"
               ELSE
                  sResult += '"' + sDumb + '"'
               ENDIF
@@ -4999,10 +5047,10 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
               ELSE
                  IF '"' $ xValue .AND. "'" $ xValue .AND. ']' $ xValue .AND. Left( xValue, 1 ) != '['
                     sResult += "[[" + xValue + "]]"
-                 ELSEIF '"' $ xValue .AND. ['] $ xValue
-                    sResult += '[' + xValue + ']'
+                 ELSEIF '"' $ xValue .AND. "'" $ xValue
+                    sResult += '[' + xValue + "]"
                  ELSEIF '"' $ xValue
-                    sResult += ['] + xValue + [']
+                    sResult += "'" + xValue + "'"
                  ELSE
                     sResult += '"' + xValue + '"'
                  ENDIF
@@ -5022,10 +5070,10 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
                     ENDIF
                  ELSEIF '"' $ xValue[nMatch] .AND. "'" $ xValue[nMatch] .AND. ']' $ xValue[nMatch] .AND. Left( xValue[nMatch], 1 ) != '['
                     sResult += "[[" + RTrim( xValue[nMatch] ) + "]]"
-                 ELSEIF '"' $ xValue[nMatch] .AND. ['] $ xValue[nMatch]
-                    sResult += '[' + RTrim( xValue[nMatch] ) + ']'
+                 ELSEIF '"' $ xValue[nMatch] .AND. "'" $ xValue[nMatch]
+                    sResult += '[' + RTrim( xValue[nMatch] ) + "]"
                  ELSEIF '"' $ xValue[nMatch]
-                    sResult += ['] + RTrim( xValue[nMatch] ) + [']
+                    sResult += "'" + RTrim( xValue[nMatch] ) + "'"
                  ELSE
                     sResult += '"' + RTrim( xValue[nMatch] ) + '"'
                  ENDIF
@@ -5044,10 +5092,10 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
                     ENDIF
                  ELSEIF '"' $ xValue .AND. "'" $ xValue .AND. ']' $ xValue .AND. Left( xValue, 1 ) != '['
                     sResult += "[[" + xValue + "]]"
-                 ELSEIF '"' $ xValue .AND. ['] $ xValue
+                 ELSEIF '"' $ xValue .AND. "'" $ xValue
                     sResult += '[' + xValue + ']'
                  ELSEIF '"' $ xValue
-                    sResult += ['] + xValue + [']
+                    sResult += "'" + xValue + "'"
                  ELSE
                     sResult += '"' + xValue + '"'
                  ENDIF
@@ -5221,7 +5269,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
    nNext := At( "=>", sRule )
    IF nNext == 0
-      Alert( "ERROR! Invalid translation format: " + sRule )
+      Alert( [ERROR! Invalid translation format: ] + sRule )
       RETURN .F.
    ELSE
       sResult := SubStr( sRule, nNext + 2 )
@@ -5347,7 +5395,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sAnchor := NIL
                   LOOP
                ELSE
-                  Alert( "ERROR! Unblanced MP: '<*' at: " + sRule )
+                  Alert( [ERROR! Unblanced MP: '<*' at: ] + sRule )
                   RETURN .F.
                ENDIF
 
@@ -5374,7 +5422,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sAnchor := NIL
                   LOOP
                ELSE
-                  Alert( "ERROR! Unbalanced MP: '<(' at: " + sRule )
+                  Alert( [ERROR! Unbalanced MP: '<(' at: ] + sRule )
                   RETURN .F.
                ENDIF
 
@@ -5401,7 +5449,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sAnchor := NIL
                   LOOP
                ELSE
-                  Alert( "ERROR! Unbalanced MP: '<!' at: " + sRule )
+                  Alert( [ERROR! Unbalanced MP: '<!' at: ] + sRule )
                   RETURN .F.
                ENDIF
 
@@ -5478,7 +5526,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                      aAdd( aWords, Upper( RTrim( Left( sRule, nCloseAt - 1 ) ) ) )
                      EXIT
                   ELSE
-                     Alert( "ERROR! Unblanced MP: ''<:' at: " + sRule )
+                     Alert( [ERROR! Unblanced MP: ''<:' at: ] + sRule )
                      RETURN .F.
                   ENDIF
                ENDIF
@@ -5510,7 +5558,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                nOptional := ( -nOptional )
             ENDIF
          ELSE
-            Alert( "ERROR! Unbalanced MP: '<' at: " + sRule )
+            Alert( [ERROR! Unbalanced MP: '<' at: ] + sRule )
             RETURN .F.
          ENDIF
 
@@ -5568,7 +5616,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
          // Some token sneaked in ...
          TraceLog( "UnExpected Case: " + sRule + "[" + Str( ProcLine() ) + "]" )
-         Alert( "UnExpected Case: " + sRule + "[" + Str( ProcLine() ) + "]" )
+         Alert( [UnExpected Case: ] + sRule + "[" + Str( ProcLine() ) + "]" )
 
          IF ! ( sAnchor == NIL )
             //TraceLog( "ORPHAN ANCHOR: " + sAnchor )
@@ -5597,7 +5645,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
    IF nOptional <> 0
       TraceLog( "ERROR Unclose Optional group, nOptional = " + Str( nOptional, 3 ), aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5] )
-      Alert( "ERROR! Unclosed Optional group, nOptional = " + Str( nOptional, 3 ) + " [" + Str( ProcLine(0), 4 ) + "]" )
+      Alert( [ERROR! Unclosed Optional group, nOptional = ] + Str( nOptional, 3 ) + " [" + Str( ProcLine(0), 4 ) + "]" )
       BREAK
    ENDIF
 
@@ -5752,7 +5800,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       IF nOptionalAt > 0
 
          IF nOptional <> 0
-            Alert( "ERROR! Nested repeatable RP.;" + sResult )
+            Alert( [ERROR! Nested repeatable RP.;] + sResult )
             BREAK
          ELSE
             nOptional := -1
@@ -5823,7 +5871,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( "->", sResult )
             IF nNext == 0
-               Alert( "ERROR! Unbalanced RP <-" )
+               Alert( [ERROR! Unbalanced RP <-] )
             ELSE
                nType := 0
                sTemp := Left( sResult, nNext - 1 )
@@ -5831,7 +5879,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                sResult := SubStr( sResult, nNext + 2 )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
-                  Alert( "ERROR! Unrecognized RP: '<-' : " + sTemp )
+                  Alert( [ERROR! Unrecognized RP: '<-' : ] + sTemp )
                ELSE
                   aRP := { nOptional, nId }
                   aAdd( aResult, aRP )
@@ -5847,7 +5895,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( '>', sResult )
             IF nNext == 0
-               Alert( "ERROR! Unbalanced RP: #<" )
+               Alert( [ERROR! Unbalanced RP: #<] )
             ELSE
                /*nType := 2*/
                sTemp := Left( sResult, nNext - 1 )
@@ -5855,7 +5903,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                sResult := SubStr( sResult, nNext + 1 )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
-                  Alert( "ERROR! Unrecognized RP: '#<' : " + sTemp )
+                  Alert( [ERROR! Unrecognized RP: '#<' : ] + sTemp )
                ELSE
                   aRP := { nOptional, nId }
                   aAdd( aResult, aRP )
@@ -5895,7 +5943,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ")>", sResult )
             IF nNext == 0
-               Alert( "ERROR! Unbalanced RP: <(" )
+               Alert( [ERROR! Unbalanced RP: <(] )
             ELSE
                nType := 4
                sTemp := Left( sResult, nNext - 1 )
@@ -5903,7 +5951,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                sResult := SubStr( sResult, nNext + 2 )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
-                  Alert( "ERROR! Unrecognized RP: '<(' : " + sTemp )
+                  Alert( [ERROR! Unrecognized RP: '<(' : ] + sTemp )
                ELSE
                   aRP := { nOptional, nId }
                   aAdd( aResult, aRP )
@@ -5919,7 +5967,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( "}>", sResult )
             IF nNext == 0
-               Alert( "ERROR! Unbalanced RP: <{" + sTemp )
+               Alert( [ERROR! Unbalanced RP: <{] + sTemp )
             ELSE
                nType := 5
                sTemp := Left( sResult, nNext - 1 )
@@ -5927,7 +5975,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                sResult := SubStr( sResult, nNext + 2 )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
-                  Alert( "ERROR! Unrecognized RP: '<{' : " + sTemp )
+                  Alert( [ERROR! Unrecognized RP: '<{' : ] + sTemp )
                ELSE
                   aRP := { nOptional, nId }
                   aAdd( aResult, aRP )
@@ -5943,7 +5991,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ".>", sResult )
             IF nNext == 0
-               Alert( "ERROR! Unbalanced RP: <." )
+               Alert( [ERROR! Unbalanced RP: <.] )
             ELSE
                nType := 6
                sTemp := Left( sResult, nNext - 1 )
@@ -5951,7 +5999,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                sResult := SubStr( sResult, nNext + 2 )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
-                  Alert( "ERROR! Unrecognized RP: '<.' : " + sTemp )
+                  Alert( [ERROR! Unrecognized RP: '<.' : ] + sTemp )
                ELSE
                   aRP := { nOptional, nId }
                   aAdd( aResult, aRP )
@@ -5966,7 +6014,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( '>', sResult )
             IF nNext == 0
-               Alert( "ERROR! Unbalanced RP: <" )
+               Alert( [ERROR! Unbalanced RP: <] )
             ELSE
                /* <x> Regular */
                nType := 1
@@ -5976,7 +6024,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
                   aEval( aMarkers, {|sMarker| TraceLog( sMarker ) } )
-                  Alert( "ERROR! Unrecognized RP: '<' : '" + sTemp + "'" )
+                  Alert( [ERROR! Unrecognized RP: '<']+" : '" + sTemp + "'" )
                ELSE
                   aRP := { nOptional, nId }
                   aAdd( aResult, aRP )
@@ -6006,7 +6054,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
    IF nOptional <> 0
       TraceLog( "ERROR! Internal logic failure, nOptional = " + Str( nOptional, 3 ) + " [" + Str( ProcLine(0), 4 ) + "]", aRP[1], aRP[2] )
-      Alert( "ERROR! Internal logic failure, nOptional = " + Str( nOptional, 3 ) + " [" + Str( ProcLine(0), 4 ) + "]" )
+      Alert( [ERROR! Internal logic failure, nOptional = ] + Str( nOptional, 3 ) + " [" + Str( ProcLine(0), 4 ) + "]" )
       BREAK
    ENDIF
 
@@ -6023,13 +6071,13 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          IF ValType( nMarker ) == 'N'
             nMP := aScan( aRule[2], {|aMP| aMP[1] == nMarker .OR. aMP[1] - 1000 == nMarker } )
             IF nMP == 0
-               Alert( "ERROR! Internal logic failed! Missing marker # " + str( nMarker, 2 ) + " [" + Str(ProcLine(),4 ) + ']' )
+               Alert( [ERROR! Internal logic failed! Missing marker # ] + str( nMarker, 2 ) + " [" + Str(ProcLine(),4 ) + ']' )
             ELSE
                WHILE aRule[2][nMP][2] < 0
                   IF aRule[2][nMP][1] >= 0
 
                      IF aRule[2][nMP][2] == 0
-                        TraceLog( "Result #" + Str( Counter ) + " marked REPEATABLE but root #" + Str( nMarker ) + " is not OPTIONAL!", sRuleCopy )
+                        TraceLog( [Result #] + Str( Counter ) + [ marked REPEATABLE but root #] + Str( nMarker ) + [ is not OPTIONAL!], sRuleCopy )
                         aRule[2][nMP][2] := 1
                      ENDIF
 
@@ -6241,7 +6289,7 @@ STATIC FUNCTION CompileDefine( sRule )
 //? "Rest: '" + sRule + "'"
 
    IF ( nId := aScan( aDefRules, {|aDefine| aDefine[1] == sKey } ) ) > 0
-      Alert( "Redefinition of '" + sKey + "' in file: " + s_sFile )
+      Alert( [Redefinition of ] + "'" + sKey + "'" + [ in file: ] + s_sFile )
       aRule      := aDefRules[nId]
       //aRule[1]   := sKey
       aRule[2]   := {}
@@ -7673,7 +7721,7 @@ STATIC FUNCTION NextIdentifier( sLine, sSkipped )
           IF nStart != NIL
              EXIT
           ENDIF
-       ELSEIF cChar $ ["']
+       ELSEIF cChar $ '"'+"'"
           DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != cChar
           ENDDO
           LOOP // No need to record cLastChar
@@ -7742,7 +7790,7 @@ FUNCTION nAtSkipStr( sFind, sLine, nStart )
 
        cChar := SubStr( sLine, nAt, 1 )
 
-       IF cChar $ ["']
+       IF cChar $ '"'+"'"
           DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != cChar
           ENDDO
           LOOP // No need to record cLastChar
@@ -7898,7 +7946,7 @@ RETURN .T.
 PROCEDURE PP_RunInit( aProcedures, aInitExit )
 
    IF ValType( aProcedures ) != 'A' .OR. ValType( aInitExit ) != 'A'
-      Alert( "Invalid parameters to: " + ProcName() + " must be Arrays!" )
+      Alert( [Invalid parameters to: ] + ProcName() + [ must be Arrays!] )
    ELSE
       aSize( aProcedures, 0 )
 
