@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.13 2002/03/15 04:24:21 ronpinkas Exp $
+ * $Id: garbage.c,v 1.14 2002/03/15 23:34:46 ronpinkas Exp $
  */
 
 /*
@@ -84,11 +84,15 @@ static HB_GARBAGE_PTR s_pCurrBlock = NULL;
 /* pointer to locked memory blocks */
 static HB_GARBAGE_PTR s_pLockedBlock = NULL;
 
-/* pointer to Cached Items memory blocks */
-static HB_GARBAGE_PTR s_pAvailableItems = NULL;
+//#define GC_RECYCLE
 
-/* pointer to Cached BaseArrays memory blocks */
-static HB_GARBAGE_PTR s_pAvailableBaseArrays = NULL;
+#ifdef GC_RECYCLE
+   /* pointer to Cached Items memory blocks */
+   static HB_GARBAGE_PTR s_pAvailableItems = NULL;
+
+   /* pointer to Cached BaseArrays memory blocks */
+   static HB_GARBAGE_PTR s_pAvailableBaseArrays = NULL;
+#endif
 
 /* marks if block releasing is requested during garbage collecting */
 static BOOL s_bCollecting = FALSE;
@@ -101,30 +105,20 @@ static BOOL s_bReleaseAll = FALSE;
  */
 static USHORT s_uUsedFlag = HB_GC_USED_FLAG;
 
-/* we may use a cache later */
-#if 0
-static HB_GARBAGE_PTR s_pReuseItem = NULL;
-
-#define HB_GARBAGE_NEW( ulSize )   ( s_pAvailableItems && ulSize == sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) ? \
-                                     ( hb_gcUnlink( &s_pAvailableItems, ( s_pReuseItem = s_pAvailableItems ) ), s_pReuseItem ) \
-                                     : \
-                                     ( s_pAvailableBaseArrays && ulSize == sizeof( HB_BASEARRAY ) + sizeof( HB_GARBAGE ) ? \
-                                       ( hb_gcUnlink( &s_pAvailableBaseArrays, ( s_pReuseItem = s_pAvailableBaseArrays ) ), s_pReuseItem ) \
-                                       : \
-                                       ( ( HB_GARBAGE_PTR ) hb_xgrab( ulSize ) ) \
-                                     ) \
-                                   )
+#ifdef GC_RECYCLE
+   #define HB_GARBAGE_FREE( pAlloc )  ( pAlloc->pFunc == hb_gcGripRelease ? \
+                                        ( hb_gcLink( &s_pAvailableItems, pAlloc ) ) \
+                                        : \
+                                        ( pAlloc->pFunc == hb_arrayReleaseGarbage ? \
+                                          ( hb_gcLink( &s_pAvailableBaseArrays, pAlloc ) ) \
+                                          : \
+                                          ( hb_xfree( (void *) ( pAlloc ) ) ) \
+                                        ) \
+                                      )
+#else
+   #define HB_GARBAGE_NEW( ulSize )   ( HB_GARBAGE_PTR )hb_xgrab( ulSize )
+   #define HB_GARBAGE_FREE( pAlloc )    hb_xfree( (void *)(pAlloc) )
 #endif
-
-#define HB_GARBAGE_FREE( pAlloc )  ( pAlloc->pFunc == hb_gcGripRelease ? \
-                                     ( hb_gcLink( &s_pAvailableItems, pAlloc ) ) \
-                                     : \
-                                     ( pAlloc->pFunc == hb_arrayReleaseGarbage ? \
-                                       ( hb_gcLink( &s_pAvailableBaseArrays, pAlloc ) ) \
-                                       : \
-                                       ( hb_xfree( (void *) ( pAlloc ) ) ) \
-                                     ) \
-                                   )
 
 /* Forward declaration.*/
 static HB_GARBAGE_FUNC( hb_gcGripRelease );
@@ -166,16 +160,19 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 {
    HB_GARBAGE_PTR pAlloc;
 
-   //pAlloc = HB_GARBAGE_NEW( ulSize + sizeof( HB_GARBAGE ) );
-   if( s_pAvailableBaseArrays && ulSize == sizeof( HB_BASEARRAY ) )
-   {
-      pAlloc = s_pAvailableBaseArrays;
-      hb_gcUnlink( &s_pAvailableBaseArrays, s_pAvailableBaseArrays );
-   }
-   else
-   {
-      pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( ulSize + sizeof( HB_GARBAGE ) );
-   }
+   #ifdef GC_RECYCLE
+      if( s_pAvailableBaseArrays && ulSize == sizeof( HB_BASEARRAY ) )
+      {
+         pAlloc = s_pAvailableBaseArrays;
+         hb_gcUnlink( &s_pAvailableBaseArrays, s_pAvailableBaseArrays );
+      }
+      else
+      {
+         pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( ulSize + sizeof( HB_GARBAGE ) );
+      }
+   #else
+      pAlloc = HB_GARBAGE_NEW( ulSize + sizeof( HB_GARBAGE ) );
+   #endif
 
    if( pAlloc )
    {
@@ -240,16 +237,19 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 {
    HB_GARBAGE_PTR pAlloc;
 
-   //pAlloc = HB_GARBAGE_NEW( sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) );
-   if( s_pAvailableItems )
-   {
-      pAlloc = s_pAvailableItems;
-      hb_gcUnlink( &s_pAvailableItems, s_pAvailableItems );
-   }
-   else
-   {
-      pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) );
-   }
+   #ifdef GC_RECYCLE
+      if( s_pAvailableItems )
+      {
+         pAlloc = s_pAvailableItems;
+         hb_gcUnlink( &s_pAvailableItems, s_pAvailableItems );
+      }
+      else
+      {
+         pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) );
+      }
+   #else
+      pAlloc = HB_GARBAGE_NEW( sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) );
+   #endif
 
    if( pAlloc )
    {
@@ -628,23 +628,25 @@ void hb_gcReleaseAll( void )
       } while( s_pCurrBlock );
    }
 
-   while( s_pAvailableItems )
-   {
-      HB_TRACE( HB_TR_INFO, ( "Release %p", s_pAvailableItems ) );
-      pDelete = s_pAvailableItems;
-      hb_gcUnlink( &s_pAvailableItems, s_pAvailableItems );
-      //HB_GARBAGE_FREE( pDelete );
-      hb_xfree( (void *) ( pDelete ) );
-   }
+   #ifdef GC_RECYCLE
+      while( s_pAvailableItems )
+      {
+         HB_TRACE( HB_TR_INFO, ( "Release %p", s_pAvailableItems ) );
+         pDelete = s_pAvailableItems;
+         hb_gcUnlink( &s_pAvailableItems, s_pAvailableItems );
+         //HB_GARBAGE_FREE( pDelete );
+         hb_xfree( (void *) ( pDelete ) );
+      }
 
-   while( s_pAvailableBaseArrays )
-   {
-      HB_TRACE( HB_TR_INFO, ( "Release %p", s_pAvailableBaseArrays ) );
-      pDelete = s_pAvailableBaseArrays;
-      hb_gcUnlink( &s_pAvailableBaseArrays, s_pAvailableBaseArrays );
-      //HB_GARBAGE_FREE( pDelete );
-      hb_xfree( (void *) ( pDelete ) );
-   }
+      while( s_pAvailableBaseArrays )
+      {
+         HB_TRACE( HB_TR_INFO, ( "Release %p", s_pAvailableBaseArrays ) );
+         pDelete = s_pAvailableBaseArrays;
+         hb_gcUnlink( &s_pAvailableBaseArrays, s_pAvailableBaseArrays );
+         //HB_GARBAGE_FREE( pDelete );
+         hb_xfree( (void *) ( pDelete ) );
+      }
+   #endif
 
    s_bCollecting = FALSE;
    s_bReleaseAll = FALSE;
