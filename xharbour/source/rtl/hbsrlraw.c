@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.4 2003/02/16 02:32:37 paultucker Exp $
+ * $Id: hbsrlraw.c,v 1.5 2003/02/16 02:40:51 paultucker Exp $
  */
 
 /*
@@ -219,8 +219,18 @@ HB_FUNC( HB_SERIALIZESIMPLE )
 HB_FUNC( HB_DESERIALIZESIMPLE )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
+   long ulMaxlen;
    ULONG ulData;
    char *cBuf;
+
+   if ( ISNUM( 2 ) )
+   {
+      ulMaxlen = hb_parnl( 2 );
+   }
+   else
+   {
+      ulMaxlen = -1;
+   }
 
    if( pItem == NULL )
    {
@@ -235,7 +245,14 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
    {
       case 'C':
          ulData = hb_getlen8( ( BYTE * )cBuf + 1 );
-         hb_retclen( cBuf + 9, ulData );
+         if ( ulMaxlen > 0 && ulData > ulMaxlen )
+         {
+            hb_ret();
+         }
+         else
+         {
+            hb_retclen( cBuf + 9, ulData );
+         }
       break;
 
       case 'L':

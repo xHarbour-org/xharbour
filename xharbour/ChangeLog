@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.946 2003/04/13 11:15:40 jonnymind Exp $
+ * $Id: ChangeLog,v 1.947 2003/04/13 11:35:44 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-13 14:34 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbcrypt.c
+    ! After last commit, if the string to be coded was shorter
+      than the key crypt was failing. Fixed
+
+  * source/rtl/hbserial.prg
+  * source/rtl/hbsrlraw.c
+    ! Added error checking (maximum length in decompression)
+    Changed:
+    HB_DeserialNext( cSerialData, [nMaxLen] )
+    HB_Deserialize( cSerialData, [nMaxLen] )
+
+  * source/rtl/trpccli.prg
+    ! More strict error checking in stream deserialization
 
 2003-04-13 13:27 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/Makefile

@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.1 2003/04/03 04:15:16 ronpinkas Exp $
+ * $Id: trpccli.prg,v 1.11 2003/04/13 11:16:28 jonnymind Exp $
  */
 
 /*
@@ -313,19 +313,29 @@ METHOD UDPParse( cData, nLen ) CLASS tRPCClient
       /* XHRB00 - server scan */
       CASE cCode == "XHBR10"
          cData := Substr( cData, 7 )
-         aLoc := { InetAddress( ::skUDP ),  HB_Deserialize( cData ) }
-         AAdd( ::aServers, aLoc )
-         RETURN ::OnScanServersProgress( aLoc )
+         cData := HB_Deserialize( cData, 512 )
+         // deserialization error checking
+         IF cData != NIL
+            aLoc := { InetAddress( ::skUDP ), cData }
+            AAdd( ::aServers, aLoc )
+            RETURN ::OnScanServersProgress( aLoc )
+         ELSE
+            RETURN .F.
+         ENDIF
 
 
       CASE cCode == "XHBR11"
          cData := Substr( cData, 7 )
          cSer := HB_DeserialBegin( cData )
-         cName := HB_DeserialNext( cSer )
-         cFunc := HB_DeserialNext( cSer )
-         aLoc := { InetAddress( ::skUDP ), cName, cFunc }
-         AAdd( ::aFunctions, aLoc )
-         RETURN ::OnScanFunctionsProgress( aLoc )
+         cName := HB_DeserialNext( cSer, 64 )
+         cFunc := HB_DeserialNext( cSer, 64 )
+         IF cName != NIL .and. cFunc != NIL
+            aLoc := { InetAddress( ::skUDP ), cName, cFunc }
+            AAdd( ::aFunctions, aLoc )
+            RETURN ::OnScanFunctionsProgress( aLoc )
+         ELSE
+            RETURN .F.
+         ENDIF
 
    ENDCASE
 
@@ -665,8 +675,11 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
             nDataLen := HB_GetLen8( cDataLen )
             cData := Space( nDataLen )
             IF InetRecvAll( ::skTCP, @cData, nDataLen ) == nDataLen
-               ::oResult := HB_Deserialize( ::Decrypt( cData ) )
-               ::OnFunctionReturn( ::oResult )
+               ::oResult := HB_Deserialize( ::Decrypt( cData ), nDataLen )
+               IF ::oResult != NIL
+                  ::OnFunctionReturn( ::oResult )
+               ENDIF
+               // todo: rise an error if ::oResult is nil
             ENDIF
          ENDIF
 
@@ -680,8 +693,10 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
                IF InetRecvAll( ::skTCP, @cData ) == nDataLen
                   cData := HB_Uncompress( nOrigLen, cData )
                   IF .not. Empty( cData )
-                     ::oResult := HB_Deserialize( ::Decrypt( cData ) )
-                     ::OnFunctionReturn( ::oResult )
+                     ::oResult := HB_Deserialize( ::Decrypt( cData ), nDataLen )
+                     IF ::oResult != NIL
+                        ::OnFunctionReturn( ::oResult )
+                     ENDIF
                   ENDIF
                ENDIF
             ENDIF
@@ -690,21 +705,26 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
       /* We have a progress */
       CASE cCode == "XHBR33"
          IF InetRecvAll( ::skTCP, @cProgress ) == Len( cProgress )
-            nProgress := HB_Deserialize( cProgress )
-            lContinue := .T.
-            ::OnFunctionProgress( nProgress )
+            nProgress := HB_Deserialize( cProgress, Len( cProgress ) )
+            IF nProgress != NIL
+               lContinue := .T.
+               ::OnFunctionProgress( nProgress )
+            ENDIF
          ENDIF
 
       /* We have a progress with data*/
       CASE cCode == "XHBR34"
          IF InetRecvAll( ::skTCP, @cProgress ) == Len( cProgress )
-            nProgress := HB_Deserialize( cProgress )
-            IF InetRecvAll( ::skTCP, @cDataLen ) == Len( cDataLen )
+            nProgress := HB_Deserialize( cProgress, Len( cProgress) )
+            IF nProgress != NIL .and. InetRecvAll( ::skTCP, @cDataLen ) == Len( cDataLen )
                nDataLen := HB_GetLen8( cDataLen )
                cData := Space( nDataLen )
                IF InetRecvAll( ::skTCP, @cData ) == nDataLen
-                  lContinue := .T.
-                  ::OnFunctionProgress( nProgress, HB_Deserialize(::Decrypt( cData) ) )
+                  ::oResult := HB_Deserialize(::Decrypt( cData), nDataLen )
+                  IF ::oResult != NIL
+                     lContinue := .T.
+                     ::OnFunctionProgress( nProgress, ::oResult  )
+                  ENDIF
                ENDIF
             ENDIF
          ENDIF
@@ -712,8 +732,8 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
       /* We have a progress with compressed data*/
       CASE cCode == "XHBR35"
          IF InetRecvAll( ::skTCP, @cProgress ) == Len( cProgress )
-            nProgress := HB_Deserialize( cProgress )
-            IF InetRecvAll( ::skTCP, @cOrigLen ) == Len( cOrigLen )
+            nProgress := HB_Deserialize( cProgress, Len( cProgress ) )
+            IF nProgress != NIL .and. InetRecvAll( ::skTCP, @cOrigLen ) == Len( cOrigLen )
                nOrigLen = HB_GetLen8( cOrigLen )
                IF InetRecvAll( ::skTCP, @cDataLen ) == Len( cDataLen )
                   nDataLen := HB_GetLen8( cDataLen )
@@ -721,8 +741,11 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
                   IF InetRecvAll( ::skTCP, @cData ) == nDataLen
                      cData := HB_Uncompress( nOrigLen, cData )
                      IF .not. Empty( cData )
-                        lContinue := .T.
-                        ::OnFunctionProgress( nProgress, HB_Deserialize( ::Decrypt( cData) ) )
+                        ::oResult := HB_Deserialize( ::Decrypt( cData), nDataLen )
+                        IF ::oResult != NIL
+                           lContinue := .T.
+                           ::OnFunctionProgress( nProgress, ::oResult )
+                        ENDIF
                      ENDIF
                   ENDIF
                ENDIF

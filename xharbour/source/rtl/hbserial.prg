@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.2 2003/02/16 00:00:13 jonnymind Exp $
+ * $Id: hbserial.prg,v 1.3 2003/03/10 23:22:00 jonnymind Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ FUNCTION HB_Serialize( oObject )
    ENDIF
 RETURN cSerial
 
-FUNCTION HB_Deserialize( cSerial )
+FUNCTION HB_Deserialize( cSerial, nMaxLen )
    LOCAL oObject
    LOCAL oElem
    LOCAL nLen
@@ -77,19 +77,20 @@ FUNCTION HB_Deserialize( cSerial )
       nLen := HB_GetLen8( cSerial )
       cSerial := Substr( cSerial, 9 )
       DO WHILE nLen > 0
-         oElem := HB_Deserialize( cSerial )
+         oElem := HB_Deserialize( cSerial, nMaxLen )
          Aadd( oObject, oElem )
          cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
          nLen --
       ENDDO
    ELSE
-      oObject := HB_DeserializeSimple( cSerial )
+      // can be NIL on deserialization error
+      oObject := HB_DeserializeSimple( cSerial, nMaxLen )
    ENDIF
 
 RETURN oObject
 
 
-FUNCTION HB_DeserialNext( cSerial )
+FUNCTION HB_DeserialNext( cSerial, nMaxLen )
    LOCAL oObject, cStr
    LOCAL nPos
 
@@ -99,7 +100,7 @@ FUNCTION HB_DeserialNext( cSerial )
    ENDIF
 
    cStr := Substr(cSerial, nPos)
-   oObject := HB_Deserialize( cStr )
+   oObject := HB_Deserialize( cStr, nMaxLen )
    IF oObject != NIL
       nPos += HB_SerialNext( cStr )
       HB_CreateLen8( cSerial, nPos )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrypt.c,v 1.4 2003/03/12 13:31:23 jonnymind Exp $
+ * $Id: hbcrypt.c,v 1.5 2003/04/07 20:16:08 jonnymind Exp $
  */
 
 /*
@@ -96,6 +96,10 @@ void nxs_crypt(
    {
       keylen = NXS_MAX_KEYLEN;
    }
+
+   // debug
+   //memcpy( cipher, source, srclen );
+   // end debug
 
    /* pass one: scramble the source using the key */
    nxs_scramble( source, srclen, key, keylen, cipher );
@@ -291,6 +295,11 @@ void nxs_xordecode(
    unsigned short keypos = 0;
    unsigned char c_bitrest, c_bitleft;
 
+   // A very short block?
+   if ( keylen > cipherlen - pos )
+   {
+      keylen = cipherlen - pos;
+   }
    c_bitleft = ( cipher[ keylen -1 ] ^ key[ keylen -1 ])<< 5;
 
    while ( pos < cipherlen )
