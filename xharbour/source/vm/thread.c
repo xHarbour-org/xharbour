@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.72 2003/04/21 18:22:52 jonnymind Exp $
+* $Id: thread.c,v 1.73 2003/04/25 23:02:48 jonnymind Exp $
 */
 
 /*
@@ -760,7 +760,7 @@ void hb_rawMutexForceUnlock( void * mtx )
    /* Sets the cancellation handler so small delays in
    cancellation do not cause segfault or memory leaks */
 #ifdef HB_OS_WIN_32
-   TlsSetValue( hb_dwCurrentStack, _pStack_ );
+   TlsSetValue( hb_dwCurrentStack, ( void * ) _pStack_ );
 #else
    _pStack_->th_id = HB_CURRENT_THREAD();
    pthread_setspecific( hb_pkCurrentStack, Cargo );

@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.2 2003/04/01 21:44:43 ronpinkas Exp $
+ * $Id: odbc.c,v 1.3 2003/04/22 08:12:55 mauriliolongo Exp $
  */
 
 /*
@@ -236,8 +236,8 @@ HB_FUNC( SQLEXTENDE )
     SQLUINTEGER  uiRowCountPtr = hb_parni( 4 );
     SQLUSMALLINT siRowStatus   = hb_parni( 5 );
     WORD         wResult       = SQLExtendedFetch( ( HSTMT ) hb_parnl( 1 ),
-                                                   hb_parnl( 2 ),
-                                                   hb_parnl( 3 ),
+                                                   ( USHORT )hb_parnl( 2 ),
+                                                   ( USHORT )hb_parnl( 3 ),
                                                    &uiRowCountPtr,
                                                    &siRowStatus );
 
@@ -253,7 +253,7 @@ HB_FUNC( SQLEXTENDE )
 HB_FUNC( SQLFETCHSC )
 {
     hb_retni( SQLFetchScroll( ( HSTMT ) hb_parnl( 1 ),
-                              hb_parnl( 2 ), hb_parnl( 3 ) ) );
+                              ( SHORT ) hb_parnl( 2 ), hb_parnl( 3 ) ) );
 }
 
 HB_FUNC( SQLERROR ) //  hEnv, hDbc, hStmt, @ cErrorClass, @ nType, @ cErrorMsg

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.35 2003/04/09 19:02:21 lculik Exp $
+ * $Id: dbfntx1.c,v 1.36 2003/04/18 01:51:25 lculik Exp $
  */
 
 /*
@@ -3633,11 +3633,11 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    }
    if( pOrderInfo->atomBagName )
    {
-      int iTagNameLen = strlen( pOrderInfo->atomBagName );
+      int iTagNameLen = strlen( ( const char *) pOrderInfo->atomBagName );
       if( iTagNameLen > 10 )
          iTagNameLen = 10;
       szTagName = ( char * ) hb_xgrab( iTagNameLen + 1 );
-      hb_strncpyUpper( szTagName, pOrderInfo->atomBagName, iTagNameLen );
+      hb_strncpyUpper( szTagName, ( const char *) pOrderInfo->atomBagName, iTagNameLen );
    }
    else
    {

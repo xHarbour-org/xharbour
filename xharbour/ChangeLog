@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.989 2003/04/26 16:26:07 lculik Exp $
+ * $Id: ChangeLog,v 1.990 2003/04/27 00:46:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-27 12:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rdd/dbfntx/dbfntx1.c
+     * casts at 3636 and 3640
+  * source/vm/thread.c
+     * cast at 763
+  * source/odbc/odbc.c
+     * cast @ 242 and 256
+  * source/rtl/gtwin/gtwin.c
+     * Min tone duration is 1, not 0
+     ! corrected Tick caclulation to always be 1000/18.2 even if not _MSC
 
 2003-04-26 17:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c

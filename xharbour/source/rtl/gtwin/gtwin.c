@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.11 2002/10/22 02:08:33 paultucker Exp $
+ * $Id: gtwin.c,v 1.13 2002/10/30 04:08:43 paultucker Exp $
  */
 
 /*
@@ -154,6 +154,7 @@ static CONSOLE_SCREEN_BUFFER_INFO s_csbi,     /* active screen mode */
 
 static DWORD        s_cNumRead;   /* Ok to use DWORD here, because this is specific... */
 static DWORD        s_cNumIndex;  /* ...to the Windows API, which defines DWORD, etc.  */
+static WORD         s_wRepeated = 0;  /* number of times the event (key) was repeated */
 static INPUT_RECORD s_irInBuf[ INPUT_BUFFER_LEN ];
 static int          s_mouseLast;  /* Last mouse button to be pressed                     */
 
@@ -1221,7 +1222,7 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
        ch = HB_BREAK_FLAG; /* Indicate that Ctrl+Break was pressed */
     }
     /* Check for events only when the event buffer is exhausted. */
-    else if( s_cNumRead <= s_cNumIndex )
+    else if( s_wRepeated == 0 && s_cNumRead <= s_cNumIndex )
     {
        /* Check for keyboard input */
        s_cNumRead = 0;
@@ -1239,7 +1240,7 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
        }
     }
     /* Only process one keyboard event at a time. */
-    if( s_cNumRead > s_cNumIndex )
+    if( s_wRepeated > 0 || s_cNumRead > s_cNumIndex )
     {
        if( s_irInBuf[ s_cNumIndex ].EventType == KEY_EVENT )
        {
@@ -1251,6 +1252,11 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
              WORD wChar = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualKeyCode;
              WORD wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode;
              ch = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar;
+             if ( s_wRepeated == 0 )
+                s_wRepeated = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wRepeatCount;
+             if ( s_wRepeated > 0 ) /* Might not be redundant */
+                s_wRepeated--;
+
              #ifdef HB_DEBUG_KEYBOARD
                 /* if( dwState & ENHANCED_KEY ) ch = -32; */
                 fprintf( stdout, "\n\nhb_gt_ReadKey(): dwState is %ld, wChar is %d, wKey is %d, ch is %d", dwState, wChar, wKey, ch );
@@ -1449,7 +1455,7 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
           }
        }
        else if( eventmask & ~( INKEY_KEYBOARD | INKEY_RAW )
-                            && s_irInBuf[ s_cNumIndex ].EventType == MOUSE_EVENT )
+                         && s_irInBuf[ s_cNumIndex ].EventType == MOUSE_EVENT )
        {
 
           hb_mouse_iCol = s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwMousePosition.X;
@@ -1488,7 +1494,8 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
           }
        }
        /* Set up to process the next input event (if any) */
-       s_cNumIndex++;
+       if ( s_wRepeated == 0 )
+          s_cNumIndex++;
     }
 
     return ch;
@@ -1659,15 +1666,11 @@ void hb_gt_Tone( double dFrequency, double dDuration )
     /* The conversion from Clipper timer tick units to
        milliseconds is * 1000.0 / 18.2. */
 
-    dDuration = HB_MIN( HB_MAX( 0, dDuration ), ULONG_MAX );
+    dDuration = HB_MIN( HB_MAX( 1, dDuration ), ULONG_MAX );
 
     if( dDuration > 0 ) 
     {
-      #if defined( _MSC_VER )
-         double dTick = (double) ( 1000.0 / CLOCKS_PER_SEC );
-      #else
-         double dTick = (double) ( CLOCKS_PER_SEC / 18.2 );
-      #endif
+      double dTick = (double) ( CLOCKS_PER_SEC / 18.2 );
 
       dMillisecs = dDuration * dTick;   /* milliseconds */
 
