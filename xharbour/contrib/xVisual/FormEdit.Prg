@@ -338,6 +338,7 @@ METHOD XFMRoot() CLASS TFormEdit
    aSize( ::aXFM[ XFM_Controls ], 0 )
 
    aDiff := __ObjGetValueDiff( TFormEdit():New( oApp:MainFrame, .F. ), Self )
+   ::nForms--
 
    FOR EACH aVar IN aDiff
       IF ValType( aVar[2] ) == 'O'
