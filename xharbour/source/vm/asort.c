@@ -1,5 +1,5 @@
 /*
- * $Id: asort.c,v 1.6 2002/01/27 09:01:57 ronpinkas Exp $
+ * $Id: asort.c,v 1.7 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -116,8 +116,25 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
    p = lb + ( ( ub - lb ) / 2 );
 
    memcpy( &pivot, pItems + p, sizeof( HB_ITEM ) );
+
+   #ifndef HB_ARRAY_USE_COUNTER
+      if( HB_IS_ARRAY( &pivot ) )
+      {
+         hb_arrayResetHolder( pivot.item.asArray.value, (void *) ( pItems + p ), (void *) &pivot );
+      }
+   #endif
+
    if( p != lb )
+   {
       memcpy( pItems + p, pItems + lb, sizeof( HB_ITEM ) );
+
+      #ifndef HB_ARRAY_USE_COUNTER
+         if( HB_IS_ARRAY( pItems + p ) )
+         {
+            hb_arrayResetHolder( ( pItems + p )->item.asArray.value, (void *) ( pItems + lb ), (void *) ( pItems + p ) );
+         }
+      #endif
+   }
 
    /* sort lb+1..ub based on pivot */
    i = lb + 1;
@@ -137,9 +154,13 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
             hb_vmSend( 2 );
 
             if( ( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) ? HB_VM_STACK.Return.item.asLogical.value : hb_itemIsLess( pItems + i, &pivot ) ) )
+            {
                i++;
+            }
             else
+            {
                break;
+            }
          }
 
          while( j >= i )
@@ -151,27 +172,49 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
             hb_vmSend( 2 );
 
             if( ( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) ? HB_VM_STACK.Return.item.asLogical.value : hb_itemIsLess( &pivot, pItems + j ) ) )
+            {
                j--;
+            }
             else
+            {
                break;
+            }
          }
       }
       else
       {
          /* Do native compare when no codeblock is supplied */
          while( i < j && hb_itemIsLess( pItems + i, &pivot ) )
+         {
             i++;
+         }
 
          while( j >= i && hb_itemIsLess( &pivot, pItems + j ) )
+         {
             j--;
+         }
       }
 
       if( i >= j )
+      {
          break;
+      }
 
       /* Swap the items */
       {
          HB_ITEM temp;
+
+         #ifndef HB_ARRAY_USE_COUNTER
+            if( HB_IS_ARRAY( pItems + j ) )
+            {
+               hb_arrayResetHolder( ( pItems + j )->item.asArray.value, (void *) ( pItems + j ), (void *) ( pItems + i ) );
+            }
+
+            if( HB_IS_ARRAY( pItems + i ) )
+            {
+               hb_arrayResetHolder( ( pItems + i )->item.asArray.value, (void *) ( pItems + i ), (void *) ( pItems + j ) );
+            }
+         #endif
 
          memcpy( &temp, pItems + j, sizeof( HB_ITEM ) );
          memcpy( pItems + j, pItems + i, sizeof( HB_ITEM ) );
@@ -186,8 +229,23 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
    if( lb != j )
    {
       memcpy( pItems + lb, pItems + j, sizeof( HB_ITEM ) );
+
+      #ifndef HB_ARRAY_USE_COUNTER
+         if( HB_IS_ARRAY( pItems + j ) )
+         {
+            hb_arrayResetHolder( ( pItems + j )->item.asArray.value, (void *) ( pItems + j ), (void *) ( pItems + lb ) );
+         }
+      #endif
    }
+
    memcpy( pItems + j, &pivot, sizeof( HB_ITEM ) );
+
+   #ifndef HB_ARRAY_USE_COUNTER
+      if( HB_IS_ARRAY( &pivot ) )
+      {
+         hb_arrayResetHolder( pivot.item.asArray.value, (void *) &pivot, (void *) ( pItems + j ) );
+      }
+   #endif
 
    return j;
 }
@@ -219,6 +277,8 @@ BOOL hb_arraySort( PHB_ITEM pArray, ULONG * pulStart, ULONG * pulCount, PHB_ITEM
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySort(%p, %p, %p, %p)", pArray, pulStart, pulCount, pBlock));
 
+   //TraceLog( NULL, "*** Sorting: %p ***\n", pArray );
+
    if( HB_IS_ARRAY( pArray ) )
    {
       PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
@@ -228,31 +288,45 @@ BOOL hb_arraySort( PHB_ITEM pArray, ULONG * pulStart, ULONG * pulCount, PHB_ITEM
       ULONG ulEnd;
 
       if( pulStart && ( *pulStart >= 1 ) )
+      {
          ulStart = *pulStart;
+      }
       else
+      {
          ulStart = 1;
+      }
 
       if( ulStart <= ulLen )
       {
          if( pulCount && *pulCount >= 1 && ( *pulCount <= ulLen - ulStart ) )
+         {
             ulCount = *pulCount;
+         }
          else
+         {
             ulCount = ulLen - ulStart + 1;
+         }
 
          if( ulStart + ulCount > ulLen )             /* check range */
+         {
             ulCount = ulLen - ulStart + 1;
+         }
 
          ulEnd = ulCount + ulStart - 2;
 
          /* Optimize when only one or no element is to be sorted */
          if( ulCount > 1 )
+         {
             hb_arraySortQuick( pBaseArray->pItems, ulStart - 1, ulEnd, pBlock );
+         }
       }
 
       return TRUE;
    }
    else
+   {
       return FALSE;
+   }
 }
 
 HB_FUNC( ASORT )

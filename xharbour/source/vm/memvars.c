@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.26 2003/07/27 20:15:12 jonnymind Exp $
+ * $Id: memvars.c,v 1.27 2003/08/14 23:49:47 jonnymind Exp $
  */
 
 /*
@@ -277,6 +277,8 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
    HB_HANDLE hValue;   /* handle 0 is reserved */
                        /* = 1 removed, since it's initialized in all branches. Caused a warning with Borland C++ */
 
+   //TraceLog( NULL, "*** Memvar ***\n" );
+
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueNew(%p, %d)", pSource, (int) bTrueMemvar));
 
    if( s_globalFreeCnt )
@@ -292,13 +294,18 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
       if( s_globalFreeCnt )
       {
          ++s_globalFirstFree;
+
          while( s_globalTable[ s_globalFirstFree ].counter )
+         {
             ++s_globalFirstFree;
+         }
       }
       else
+      {
          /* No more holes
             */
          s_globalFirstFree = s_globalLastFree;
+      }
    }
    else
    {
@@ -318,7 +325,6 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
          s_globalTableSize += TABLE_EXPANDHB_VALUE;
          s_globalTable = ( HB_VALUE_PTR ) hb_xrealloc( s_globalTable, sizeof( HB_VALUE ) * s_globalTableSize );
       }
-
    }
 
    pValue = s_globalTable + hValue;
@@ -335,6 +341,15 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
       else
       {
          memcpy( &pValue->item, pSource, sizeof(HB_ITEM) );
+
+         if( HB_IS_ARRAY( pSource ) )
+         {
+            #ifdef HB_ARRAY_USE_COUNTER
+               pSource->item.asArray.value->uiHolders++;
+            #else
+               hb_arrayRegisterHolder( pSource->item.asArray.value, &pValue->item );
+            #endif
+         }
       }
    }
 

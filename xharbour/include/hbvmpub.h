@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.15 2003/07/07 03:28:15 lculik Exp $
+ * $Id: hbvmpub.h,v 1.16 2003/07/13 18:10:00 walito Exp $
  */
 
 /*
@@ -219,6 +219,14 @@
        } item;
     } HB_ITEM, * PHB_ITEM, * HB_ITEM_PTR;
 
+    #ifndef HB_ARRAY_USE_COUNTER
+       typedef struct _HB_ARRAY_HOLDER
+       {
+          void *pOwner;
+          struct _HB_ARRAY_HOLDER *pNext;
+       } HB_ARRAY_HOLDER, *PHB_ARRAY_HOLDER;
+    #endif
+
     typedef struct _HB_BASEARRAY
     {
        PHB_ITEM pItems;       /* pointer to the array items */
@@ -227,6 +235,9 @@
        USHORT   uiClass;      /* offset to the classes base if it is an object */
        USHORT   uiPrevCls;    /* for fixing after access super */
        USHORT * puiClsTree;   /* remember array of super called ID Tree  */
+       #ifndef HB_ARRAY_USE_COUNTER
+          PHB_ARRAY_HOLDER pOwners;
+       #endif
     } HB_BASEARRAY, * PHB_BASEARRAY, * HB_BASEARRAY_PTR;
 
     /* internal structure for codeblocks */

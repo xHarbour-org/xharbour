@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.78 2003/08/14 23:49:46 jonnymind Exp $
+ * $Id: hbapi.h,v 1.79 2003/08/20 04:55:22 ronpinkas Exp $
  */
 
 /*
@@ -57,6 +57,8 @@
 
 #ifndef HB_APIEXT_H_
 #define HB_APIEXT_H_
+
+//#define HB_ARRAY_USE_COUNTER
 
 #include "hbvmpub.h"
 
@@ -372,8 +374,14 @@ extern PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen ); /* Creates and retu
 extern PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase ); /* Creates and returns an Array of Generic Parameters for specified base symbol. */
 extern PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase ); /* Creates and returns GC-LOCKED an Array of Generic Parameters for specified base symbol. */
 
+#ifndef HB_ARRAY_USE_COUNTER
+   extern void hb_arrayReleaseHolder( PHB_BASEARRAY pBaseArray, void *pOwner );
+   extern void hb_arrayRegisterHolder( PHB_BASEARRAY pBaseArray, void *pHolder );
+   extern void hb_arrayResetHolder( PHB_BASEARRAY pBaseArray, void *pOldHolder, void *pNewHolder );
+#endif
+
 #ifndef HB_LONG_LONG_OFF
-extern LONGLONG HB_EXPORT hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the long long int value contained on an array element */
+   extern LONGLONG HB_EXPORT hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the long long int value contained on an array element */
 #endif
 
 /* string management */

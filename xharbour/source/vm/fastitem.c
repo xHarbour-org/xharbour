@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.47 2003/07/14 19:18:47 jonnymind Exp $
+ * $Id: fastitem.c,v 1.48 2003/08/02 06:14:26 ronpinkas Exp $
  */
 
 /*
@@ -102,13 +102,18 @@ void HB_EXPORT hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
    }
 
    /* Forward. */
-
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
+
+   #ifndef HB_ARRAY_USE_COUNTER
+      if( HB_IS_ARRAY( pSource ) )
+      {
+         hb_arrayResetHolder( pSource->item.asArray.value, (void *) pSource, (void *) pDest );
+      }
+   #endif
 
    /* Now fake clear the transferer. */
    //pSource->item.asString.bStatic = FALSE;
    pSource->type = HB_IT_NIL;
-
 }
 
 PHB_ITEM HB_EXPORT hb_itemReturn( PHB_ITEM pItem )
@@ -173,10 +178,14 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
    }
    else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
-      if( --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
-      {
-         hb_arrayRelease( pItem );
-      }
+      #ifdef HB_ARRAY_USE_COUNTER
+         if( --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
+         {
+            hb_arrayRelease( pItem );
+         }
+      #else
+         hb_arrayReleaseHolder( pItem->item.asArray.value, (void *) pItem );
+      #endif
    }
    else if( HB_IS_BLOCK( pItem ) )
    {
@@ -206,10 +215,14 @@ void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
    }
    else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
-      if( --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
-      {
-         hb_arrayRelease( pItem );
-      }
+      #ifdef HB_ARRAY_USE_COUNTER
+         if( --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
+         {
+            hb_arrayRelease( pItem );
+         }
+      #else
+         hb_arrayReleaseHolder( pItem->item.asArray.value, (void *) pItem );
+      #endif
    }
    else if( HB_IS_BLOCK( pItem ) )
    {
@@ -238,11 +251,21 @@ void HB_EXPORT hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
    hb_itemForwardValue( pItem1, &temp );
    */
 
+   #ifndef HB_ARRAY_USE_COUNTER
+      if( HB_IS_ARRAY( pItem1 ) )
+      {
+         hb_arrayResetHolder( pItem1->item.asArray.value, (void *) pItem1, (void *) pItem2 );
+      }
+
+      if( HB_IS_ARRAY( pItem2 ) )
+      {
+         hb_arrayResetHolder( pItem2->item.asArray.value, (void *) pItem2, (void *) pItem1 );
+      }
+   #endif
 
    memcpy( &temp, pItem2, sizeof( HB_ITEM ) );
    memcpy( pItem2, pItem1, sizeof( HB_ITEM ) );
    memcpy( pItem1, &temp, sizeof( HB_ITEM ) );
-
 }
 
 void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
@@ -278,7 +301,11 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
    }
    else if( HB_IS_ARRAY( pSource ) )
    {
-      ( pSource->item.asArray.value )->uiHolders++;
+      #ifdef HB_ARRAY_USE_COUNTER
+         ( pSource->item.asArray.value )->uiHolders++;
+      #else
+          hb_arrayRegisterHolder( pDest->item.asArray.value, (void *) pDest );
+      #endif
    }
    else if( HB_IS_BLOCK( pSource ) )
    {
@@ -288,7 +315,6 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
    {
       hb_memvarValueIncRef( pSource->item.asMemvar.value );
    }
-
 }
 
 PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, char * szText )
@@ -331,7 +357,6 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, char * szText )
       pItem->item.asString.value           = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
       strcpy( pItem->item.asString.value, szText );
    }
-
 
    return pItem;
 }
@@ -379,14 +404,12 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
       pItem->item.asString.value[ ulLen ]  = '\0';
    }
 
-
    return pItem;
 }
 
 PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
-
 
    if( pItem )
    {
@@ -571,15 +594,18 @@ void HB_EXPORT hb_itemFastClear( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ( "hb_itemFastClear(%p) Type: %i", pItem, pItem->type ) );
 
-
    if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
       //printf( "\nFastClear Array %p uiHolders: %i Cyclic: %i", pItem, ( pItem->item.asArray.value )->uiHolders, hb_itemArrayCyclicCount( pItem ) );
 
-      if( ( pItem->item.asArray.value )->uiHolders == 0 || --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
-      {
-         hb_arrayRelease( pItem );
-      }
+      #ifdef HB_ARRAY_USE_COUNTER
+         if( ( pItem->item.asArray.value )->uiHolders == 0 || --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
+         {
+            hb_arrayRelease( pItem );
+         }
+      #else
+         hb_arrayReleaseHolder( pItem->item.asArray.value, (void *) pItem );
+      #endif
    }
    else if( HB_IS_BLOCK( pItem ) )
    {
@@ -782,156 +808,6 @@ void HB_EXPORT hb_retclenAdoptStatic( char * szText, ULONG ulLen )
 
 }
 
-HB_FUNC( ARRAYCYCLICCOUNT )
-{
-   HB_THREAD_STUB
-
-   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-
-   if( pArray )
-   {
-      hb_retnl( (long) hb_itemArrayCyclicCount( pArray ) );
-   }
-   else
-   {
-      hb_retni( 0 );
-   }
-}
-
-USHORT hb_itemArrayCyclicCount( PHB_ITEM pArray )
-{
-   HB_SCANNED_ARRAYS ScannedList;
-
-   ScannedList.pScannedBaseArray = NULL;
-   ScannedList.pNext             = NULL;
-
-   HB_TRACE( HB_TR_DEBUG, ( "hb_itemArrayCyclicCount(%p)", pArray ) );
-
-   return hb_itemArrayCyclicCountWorker( pArray->item.asArray.value, &ScannedList, pArray->item.asArray.value );
-}
-
-USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pScanBaseArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray )
-{
-   ULONG ulScanLen = pScanBaseArray->ulLen;
-   ULONG ulCount;
-   PHB_SCANNED_ARRAYS pScanned;
-   BOOL bTop;
-   USHORT uiCyclicCount = 0;
-   //static int i = 0;
-
-   HB_TRACE( HB_TR_DEBUG, ( "hb_itemArrayCyclicCountWorker(%p, %p %p)", pScanBaseArray, pScannedList, pTopBaseArray ) );
-
-   if( pScanBaseArray == pTopBaseArray )
-   {
-      //printf( "\nTop" );
-      bTop = TRUE;
-   }
-   else
-   {
-      //printf( "\n+++ %i", ++i );
-      bTop = FALSE;
-
-      if( pScannedList->pScannedBaseArray == NULL )
-      {
-         pScanned = pScannedList;
-      }
-      else
-      {
-         pScanned = pScannedList;
-
-         while( pScanned->pNext )
-         {
-            pScanned = pScanned->pNext;
-         }
-
-         pScanned->pNext = ( PHB_SCANNED_ARRAYS ) hb_xgrab( sizeof( HB_SCANNED_ARRAYS ) );
-         pScanned = pScanned->pNext;
-         //printf( "\nAllocated: %p", pScanned );
-      }
-
-      pScanned->pScannedBaseArray = pScanBaseArray;
-      pScanned->pNext = NULL;
-   }
-
-   for( ulCount = 0; ulCount < ulScanLen; ulCount++ )
-   {
-      PHB_ITEM pItem = pScanBaseArray->pItems + ulCount;
-
-      if( pItem->type == HB_IT_ARRAY )
-      {
-         if( pItem->item.asArray.value == pTopBaseArray )
-         {
-            uiCyclicCount++;
-            if( uiCyclicCount == pTopBaseArray->uiHolders )
-            {
-               return uiCyclicCount;
-            }
-
-            continue;
-         }
-
-         if( pScannedList->pScannedBaseArray )
-         {
-            pScanned = pScannedList;
-            do
-            {
-               if( pScanned->pScannedBaseArray == pItem->item.asArray.value )
-               {
-                  break;
-               }
-
-               pScanned = pScanned->pNext;
-
-            } while( pScanned );
-         }
-         else
-         {
-            pScanned = NULL;
-         }
-
-         /* Not scanned yet. */
-         if( pScanned == NULL )
-         {
-            uiCyclicCount += hb_itemArrayCyclicCountWorker( pItem->item.asArray.value, pScannedList, pTopBaseArray );
-
-            if( uiCyclicCount == pTopBaseArray->uiHolders )
-            {
-               break;
-            }
-            else if( uiCyclicCount > pTopBaseArray->uiHolders )
-            {
-               printf( "\nError! internal logic Error!\n" );
-               exit( 1 );
-            }
-         }
-      }
-   }
-
-   /* Top Level - Release the created list. */
-   if( bTop )
-   {
-      //printf( "\nDone %i", i );
-      if( pScannedList->pScannedBaseArray )
-      {
-         pScannedList = pScannedList->pNext;
-
-         while( pScannedList )
-         {
-            pScanned     = pScannedList;
-            pScannedList = pScannedList->pNext;
-            hb_xfree( pScanned );
-            //printf( "\nFreed: %p", pScanned );
-         }
-      }
-   }
-   else
-   {
-      //printf( "\n--- %i", --i );
-   }
-
-   return uiCyclicCount;
-}
-
 BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )
 {
    HB_THREAD_STUB
@@ -959,7 +835,6 @@ BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )
      }
      pBase++;iId++;
    }
-
 
    return 0;
 }

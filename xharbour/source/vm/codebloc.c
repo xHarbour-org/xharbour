@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.23 2003/06/20 18:25:39 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.24 2003/07/14 19:18:46 jonnymind Exp $
  */
 
 /*
@@ -252,7 +252,11 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
    {
       if( pCBlock->pSelfBase )
       {
-         pCBlock->pSelfBase->uiHolders--;
+         #ifdef HB_ARRAY_USE_COUNTER
+            pCBlock->pSelfBase->uiHolders--;
+         #else
+            hb_arrayReleaseHolder( pCBlock->pSelfBase, (void *) pCBlock );
+         #endif
          pCBlock->pSelfBase = NULL;
       }
 
@@ -299,7 +303,11 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
 
    if( pCBlock->pSelfBase )
    {
-      pCBlock->pSelfBase->uiHolders--;
+      #ifdef HB_ARRAY_USE_COUNTER
+         //pCBlock->pSelfBase->uiHolders--;
+      #else
+         //hb_arrayReleaseHolder( pCBlock->pSelfBase, (void *) pCBlock );
+      #endif
       pCBlock->pSelfBase = NULL;
    }
 

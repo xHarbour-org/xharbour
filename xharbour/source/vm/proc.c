@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.11 2003/08/15 22:17:26 ronpinkas Exp $
+ * $Id: proc.c,v 1.12 2003/08/18 18:24:59 ronpinkas Exp $
  */
 
 /*
@@ -199,6 +199,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
             }
             else
             {
+               TraceLog( "Error.log", "Corrupted object, points to invalid class id: %i of %i", pSelf->item.asArray.value->uiClass, hb_clsMaxClasses() );
                hb_errInternal( HB_EI_ERRUNRECOV, "Corrupted object, points to invalid class id!", NULL, NULL );
             }
          }

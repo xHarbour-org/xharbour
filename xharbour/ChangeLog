@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1376 2003/08/22 21:16:08 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1377 2003/08/23 10:48:20 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,46 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-24 16:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * include/hbapi.h
+   * include/hbvmpub.h
+   * source/vm/arrays.c
+   * source/vm/asort.c
+   * source/vm/fastitem.c
+   * source/vm/hvm.c
+   * source/vm/memvars.c
+   * source/vm/codebloc.c
+     + Added new optional Arrays (and Objects) lifetime management.
+     /*
+        This new system uses linked list to keep track of known refernces to the Array/Object.
+        this allows a far more reliable control than the previous reference counting.
+
+        This new system should be able to automatically circumvent pre-mature releaseproblems
+        as demonstrated by the recent HWGUI issue.
+
+        I've tested as much as I could but of course there might still be some minor issues to address.
+
+        The new system is ENABLED by default, but older system may be used by UN-commenting the
+        #define HB_ARRAY_USE_COUNTER in hbapi.h or adding such define when building xHarbour.
+
+        uiHolders members still maintained for binary compabtibility with Harbour librarries as well as
+        compiled xHarbour librarries.
+
+        Will greatly appreciate input to indicate what impact if any this has on any previously noted GPF[s].
+      */
+
+   * source/vm/garbage.c
+     + Added missing hb_gcItemRef() when codeblock item maintains a ->pSelfBase member.
+       /* This may resolve a potential GPF. */
+
+   * source/vm/codebloc.c
+     - Commented logic to release refernce of ->pSelfBase member in hb_codeblockDeleteGarbage(),
+       as the referenced object may have been released in preceding acions of the current Garbage removal.
+       /* This may resolve a potential GPF. */
+
+   * source/vm/proc.c
+     + Added TraceLog() debugging message when corupted object detected.
 
 2003-08-23 12:45 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/regex.c

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.54 2003/03/16 06:00:33 jonnymind Exp $
+ * $Id: garbage.c,v 1.55 2003/08/05 10:20:51 ronpinkas Exp $
  */
 
 /*
@@ -515,8 +515,8 @@ void hb_gcCollectAll()
    #if defined(HB_THREAD_SUPPORT) && ! defined( HB_OS_WIN_32 )
       HB_THREAD_STUB
    #endif
-   HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
 
+   HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
 
    /* is anoter garbage in action? */
    #ifdef HB_THREAD_SUPPORT
@@ -608,7 +608,7 @@ void hb_gcCollectAll()
    /* check list of locked blocks for blocks referenced from
    * locked block
    */
-    
+
    if( s_pLockedBlock )
    {
       pAlloc = s_pLockedBlock;
@@ -637,29 +637,32 @@ void hb_gcCollectAll()
             (&FakedItem)->item.asBlock.value = ( PHB_CODEBLOCK )( pAlloc + 1 );
 
             hb_gcItemRef( &FakedItem );
+
+            if( (&FakedItem)->item.asBlock.value->pSelfBase )
+            {
+               (&FakedItem)->type = HB_IT_ARRAY;
+               (&FakedItem)->item.asArray.value = (&FakedItem)->item.asBlock.value->pSelfBase;
+               hb_gcItemRef( &FakedItem );
+            }
          }
 
          pAlloc = pAlloc->pNext;
-
       }
       while ( s_pLockedBlock != pAlloc );
    }
 
    HB_TRACE( HB_TR_INFO, ( "Cleanup Scan" ) );
 
-   /* Step 3 - Call Cleanup Functions */
-   
+   /* Step 3 - Call Cleanup Functions  */
+
    pAlloc = s_pCurrBlock;
    do
    {
       if( s_pCurrBlock->used == s_uUsedFlag )
       {
-         /* Mark for deletion. */
          s_pCurrBlock->used |= HB_GC_DELETE;
 
-         //printf( "Marked, %p Item: %p\n", s_pCurrBlock, s_pCurrBlock + 1 );
-
-         /* call the cleanup function. */
+         /* call the cleanup function - now for NON Blosks. */
          if( s_pCurrBlock->pFunc )
          {
             HB_TRACE( HB_TR_INFO, ( "Cleanup, %p", s_pCurrBlock ) );
@@ -669,10 +672,9 @@ void hb_gcCollectAll()
       }
 
       s_pCurrBlock = s_pCurrBlock->pNext;
-
    }
    while ( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
-      
+
    HB_TRACE( HB_TR_INFO, ( "Release Scan" ) );
 
    /* Step 4 - Release all blocks that are still marked as unused */
@@ -717,7 +719,6 @@ void hb_gcCollectAll()
       {
          s_pCurrBlock = s_pCurrBlock->pNext;
       }
-
    }
    while ( s_pCurrBlock && ( pAlloc != s_pCurrBlock ) );
 
@@ -734,13 +735,13 @@ void hb_gcCollectAll()
 
    /* Unblocks all threads */
    HB_CRITICAL_UNLOCK( hb_threadStackMutex );
-   
+
    #if defined( HB_THREAD_SUPPORT ) && ! defined( HB_OS_WIN_32 )
       hb_runningStacks.aux = 0;
       // this will also signal the changed situation.
       HB_STACK_LOCK
    #endif
-   
+
    /* Step 6: garbage requests will be now allowed again. */
    s_bCollecting = FALSE;
 }
@@ -762,7 +763,7 @@ void hb_gcReleaseAll( void )
       pAlloc = s_pLockedBlock;
       do
       {
-         /* call the cleanup function */
+         /* call the cleanup function now for NON Blocks! */
          if( s_pLockedBlock->pFunc )
          {
             HB_TRACE( HB_TR_INFO, ( "Cleanup for Locked, %p", s_pLockedBlock ) );
@@ -789,7 +790,7 @@ void hb_gcReleaseAll( void )
       pAlloc = s_pCurrBlock;
       do
       {
-         /* call the cleanup function */
+         /* call the cleanup function now for NON Blocks! */
          if( s_pCurrBlock->pFunc )
          {
             HB_TRACE( HB_TR_INFO, ( "Cleanup, %p", s_pCurrBlock ) );
@@ -836,7 +837,6 @@ void hb_gcReleaseAll( void )
    s_bReleaseAll = FALSE;
 
    HB_TRACE( HB_TR_INFO, ( "DONE Release All" ) );
-
 }
 
 void hb_gcInit( void )
@@ -867,13 +867,13 @@ HB_FUNC( HB_GCSTEP )
 */
 HB_FUNC( HB_GCALL )
 {
-   
+
    if( hb_parl( 1 ) )
    {
       s_uAllocated = HB_GC_COLLECTION_JUSTIFIED;
    }
 
-   #if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT ) 
+   #if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT )
       hb_threadSubscribeIdle( hb_gcCollectAll );
    #else
       hb_gcCollectAll();

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.58 2003/07/30 12:48:54 druzus Exp $
+ * $Id: arrays.c,v 1.59 2003/08/13 00:18:00 ronpinkas Exp $
  */
 
 /*
@@ -82,6 +82,14 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
 {
    PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
    ULONG ulPos;
+   char szProc[64], szModule[64];
+   static int s_i = 0;
+
+   if( s_i++ > 0 )
+   {
+      hb_procinfo( 0, szProc, NULL, szModule  );
+      //TraceLog( NULL, "New array of %i items (%s->%s)\n", ulLen, szModule, szProc );
+   }
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayNew(%p, %lu)", pItem, ulLen));
 
@@ -99,8 +107,15 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
       pBaseArray->pItems = NULL;
    }
 
-   pBaseArray->ulLen      = ulLen;
-   pBaseArray->uiHolders  = 1;
+   pBaseArray->ulLen = ulLen;
+
+   #ifdef HB_ARRAY_USE_COUNTER
+      pBaseArray->uiHolders = 1;
+   #else
+      pBaseArray->pOwners = NULL;
+      hb_arrayRegisterHolder( pBaseArray, (void *) pItem );
+   #endif
+
    pBaseArray->uiClass    = 0;
    pBaseArray->uiPrevCls  = 0;
    pBaseArray->puiClsTree = NULL;
@@ -117,7 +132,6 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
 
    return TRUE;
 }
-
 
 BOOL HB_EXPORT hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
 {
@@ -140,7 +154,6 @@ BOOL HB_EXPORT hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
    return FALSE;
 }
 
-
 BOOL HB_EXPORT hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pValue )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayAddForward(%p, %p)", pArray, pValue));
@@ -162,7 +175,6 @@ BOOL HB_EXPORT hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pValue )
    return FALSE;
 }
 
-
 ULONG HB_EXPORT hb_arrayLen( PHB_ITEM pArray )
 {
    ULONG ulLen = 0;
@@ -176,7 +188,6 @@ ULONG HB_EXPORT hb_arrayLen( PHB_ITEM pArray )
    return ulLen;
 }
 
-
 BOOL HB_EXPORT hb_arrayIsObject( PHB_ITEM pArray )
 {
    BOOL bObj = FALSE;
@@ -189,7 +200,6 @@ BOOL HB_EXPORT hb_arrayIsObject( PHB_ITEM pArray )
 
    return bObj;
 }
-
 
 BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
 {
@@ -216,7 +226,21 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
          {
             if( pBaseArray->ulLen < ulLen )
             {
+               #ifndef HB_ARRAY_USE_COUNTER
+                  PHB_ITEM pOldItems = pBaseArray->pItems;
+               #endif
+
                pBaseArray->pItems = ( PHB_ITEM ) hb_xrealloc( pBaseArray->pItems, sizeof( HB_ITEM ) * ulLen );
+
+               #ifndef HB_ARRAY_USE_COUNTER
+                  for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
+                  {
+                     if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY )
+                     {
+                        hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, ( pOldItems + ulPos ), ( pBaseArray->pItems + ulPos ) );
+                     }
+                  }
+               #endif
 
                /* set value for new items */
                for( ulPos = pBaseArray->ulLen; ulPos < ulLen; ulPos++ )
@@ -246,7 +270,21 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                }
                else
                {
+                  #ifndef HB_ARRAY_USE_COUNTER
+                     PHB_ITEM pOldItems = pBaseArray->pItems;
+                  #endif
+
                   pBaseArray->pItems = ( PHB_ITEM ) hb_xrealloc( pBaseArray->pItems, sizeof( HB_ITEM ) * ulLen );
+
+                  #ifndef HB_ARRAY_USE_COUNTER
+                     for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
+                     {
+                        if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY )
+                        {
+                           hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, ( pOldItems + ulPos ), ( pBaseArray->pItems + ulPos ) );
+                        }
+                     }
+                  #endif
                }
             }
          }
@@ -261,7 +299,6 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
       return FALSE;
    }
 }
-
 
 BOOL HB_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
 {
@@ -287,7 +324,6 @@ BOOL HB_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
       return FALSE;
    }
 }
-
 
 BOOL HB_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
 {
@@ -323,7 +359,6 @@ BOOL HB_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
    }
 }
 
-
 BOOL HB_EXPORT hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
    PHB_ITEM pElement;
@@ -350,7 +385,6 @@ BOOL HB_EXPORT hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
    }
 }
 
-
 BOOL HB_EXPORT hb_arraySetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
    PHB_ITEM pElement;
@@ -376,7 +410,6 @@ BOOL HB_EXPORT hb_arraySetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pIte
       return FALSE;
    }
 }
-
 
 BOOL HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
@@ -410,7 +443,6 @@ BOOL HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 
    return FALSE;
 }
-
 
 BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
@@ -467,7 +499,6 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
    return FALSE;
 }
 
-
 char HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
 {
    char *exData;
@@ -485,7 +516,6 @@ char HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
    }
    return exData;
 }
-
 
 long HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
 {
@@ -524,7 +554,6 @@ PHB_ITEM HB_EXPORT hb_arrayGetItemPtr( PHB_ITEM pArray, ULONG ulIndex )
    return pItem;
 }
 
-
 BOOL HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex )
 {
    BOOL bRet;
@@ -540,7 +569,6 @@ BOOL HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex )
    }
    return bRet;
 }
-
 
 int HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex )
 {
@@ -558,7 +586,6 @@ int HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex )
    return iRet;
 }
 
-
 long HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex )
 {
    long lRet;
@@ -574,7 +601,6 @@ long HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex )
    }
    return lRet;
 }
-
 
 double HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex )
 {
@@ -593,7 +619,6 @@ double HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex )
    return dRet;
 }
 
-
 ULONG HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, ULONG ulLen )
 {
    ULONG ulRet;
@@ -609,7 +634,6 @@ ULONG HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, 
    }
    return ulRet;
 }
-
 
 char HB_EXPORT * hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex )
 {
@@ -643,7 +667,6 @@ char HB_EXPORT * hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex )
    return cRet;
 }
 
-
 ULONG HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex )
 {
    ULONG ulRet;
@@ -660,7 +683,6 @@ ULONG HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex )
    return ulRet;
 }
 
-
 USHORT HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
 {
    USHORT uType;
@@ -676,7 +698,6 @@ USHORT HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
    }
    return uType;
 }
-
 
 BOOL HB_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
 {
@@ -714,7 +735,6 @@ BOOL HB_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
    return FALSE;
 }
 
-
 void HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount )
 {
    PHB_BASEARRAY pBaseArray;
@@ -751,7 +771,6 @@ void HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, UL
    }
 }
 
-
 ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayScan(%p, %p, %p, %p)", pArray, pValue, pulStart, pulCount, bExact));
@@ -764,9 +783,13 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       ULONG ulCount;
 
       if( pulStart && ( *pulStart >= 1 ) )
+      {
          ulStart = *pulStart;
+      }
       else
+      {
          ulStart = 1;
+      }
 
       if( ulStart <= ulLen )
       {
@@ -877,7 +900,6 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
    return 0;
 }
 
-
 BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * pulCount )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayEval(%p, %p, %p, %p)", pArray, bBlock, pulStart, pulCount));
@@ -890,19 +912,29 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
       ULONG ulCount;
 
       if( pulStart && ( *pulStart >= 1 ) )
+      {
          ulStart = *pulStart;
+      }
       else
+      {
          ulStart = 1;
+      }
 
       if( ulStart <= ulLen )
       {
          if( pulCount && ( *pulCount <= ulLen - ulStart ) )
+         {
             ulCount = *pulCount;
+         }
          else
+         {
             ulCount = ulLen - ulStart + 1;
+         }
 
          if( ulStart + ulCount > ulLen )             /* check range */
+         {
             ulCount = ulLen - ulStart + 1;
+         }
 
          for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {
@@ -915,6 +947,7 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
             hb_vmSend( 2 );
          }
       }
+
       return TRUE;
    }
    else
@@ -923,6 +956,66 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
    }
 }
 
+void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "pBaseArray %p", pBaseArray ) );
+
+   /* Release object tree as needed */
+   if( pBaseArray->puiClsTree )
+   {
+      hb_xfree( pBaseArray->puiClsTree );
+      pBaseArray->puiClsTree = NULL;
+   }
+
+   if( pBaseArray->pItems )
+   {
+      HB_ITEM_PTR pItem = pBaseArray->pItems; //, pValue;
+      ULONG ulLen = pBaseArray->ulLen;
+
+      //TraceLog( NULL, "Releasing BaseArray %p\n", pBaseArray );
+
+      while( ulLen-- )
+      {
+         HB_TRACE( HB_TR_INFO, ( "Array Item %p type:%i", pItem, pItem->type ) );
+
+         //TraceLog( NULL, "Releasing Element: %i %p Class: %s\n", pBaseArray->ulLen - ulLen, pItem, hb_objGetClsName( pItem ) );
+
+         //printf( "Array Item %i %p type:%i\n", ulLen, pItem, pItem->type );
+
+         /* The Reference should NOT be cleared when an Array with element refering it is released!
+         pValue = pItem; // Subsequent pItem below were pValue, other then pItem++!!!
+         if( HB_IS_BYREF( pValue ) )
+         {
+            pValue = hb_itemUnRef( pValue );
+         }
+         */
+
+         /*-----------------12/21/2001 8:01PM----------------
+          * The item is not released because it was not
+          * allocated by the GC, its just a portion of the
+          * pItems chunk, which will be released as one piece.
+          * --------------------------------------------------*/
+         if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value == pBaseArray )
+         {
+            HB_TRACE( HB_TR_DEBUG, ("Warning! Nested Release (Cyclic) %p", pItem, pItem->item.asArray.value ) );
+         }
+         else if( HB_IS_COMPLEX( pItem ) )
+         {
+            //TraceLog( NULL, "Releasing Element: %i %p\n", pBaseArray->ulLen - ulLen, pItem );
+            hb_itemClear( pItem );
+         }
+
+         ++pItem;
+      }
+
+      HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pBaseArray->pItems ) );
+      hb_xfree( pBaseArray->pItems );
+      pBaseArray->pItems = NULL;
+   }
+
+   HB_TRACE( HB_TR_INFO, ( "Release pBaseArray %p", pBaseArray ) );
+   hb_gcFree( ( void * ) pBaseArray );
+}
 
 BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
 {
@@ -932,61 +1025,27 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
 
    if( HB_IS_ARRAY( pArray ) )
    {
-      PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
+      #ifdef HB_ARRAY_USE_COUNTER
+          hb_arrayReleaseBase( pArray->item.asArray.value );
+      #else
+          if( pArray->item.asArray.value->pOwners )
+          {
+             if( pArray->item.asArray.value->pOwners->pOwner == (void *) pArray )
+             {
+                if( pArray->item.asArray.value->pOwners->pNext )
+                {
+                   TraceLog( NULL, "Warning! (1) Residual owner %p of array %p\n", pArray->item.asArray.value->pOwners->pNext->pOwner, pArray->item.asArray.value );
+                }
+             }
+             else
+             {
+                TraceLog( NULL, "Warning! (2) Residual owner %p of array %p\n", pArray->item.asArray.value->pOwners->pOwner, pArray->item.asArray.value );
+             }
 
-      HB_TRACE( HB_TR_DEBUG, ( "pBaseArray %p", pBaseArray ) );
-
-      /* Release object tree as needed */
-      if( pBaseArray->puiClsTree )
-      {
-         HB_TRACE( HB_TR_INFO, ( "Release Tree, %p", pArray ) );
-         hb_xfree( pBaseArray->puiClsTree );
-         pBaseArray->puiClsTree = NULL;
-      }
-
-      if( pBaseArray->pItems )
-      {
-         HB_ITEM_PTR pItem = pBaseArray->pItems; //, pValue;
-         ULONG ulLen = pBaseArray->ulLen;
-
-         while( ulLen-- )
-         {
-            HB_TRACE( HB_TR_INFO, ( "Array Item %p type:%i", pItem, pItem->type ) );
-
-            //printf( "Array Item %i %p type:%i\n", ulLen, pItem, pItem->type );
-
-            /* The Reference should NOT be cleared when an Array with element refering it is released!
-            pValue = pItem; // Subsequent pItem below were pValue, other then pItem++!!!
-            if( HB_IS_BYREF( pValue ) )
-            {
-               pValue = hb_itemUnRef( pValue );
-            }
-            */
-
-            /*-----------------12/21/2001 8:01PM----------------
-             * The item is not released because it was not
-             * allocated by the GC, its just a portion of the
-             * pItems chunk, which will be released as one piece.
-             * --------------------------------------------------*/
-            if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value == pBaseArray )
-            {
-               HB_TRACE( HB_TR_DEBUG, ("Warning! Nested Release (Cyclic)", pArray, pArray->item.asArray.value ) );
-            }
-            else if( HB_IS_COMPLEX( pItem ) )
-            {
-               hb_itemClear( pItem );
-            }
-
-            ++pItem;
-         }
-
-         HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pBaseArray->pItems ) );
-         hb_xfree( pBaseArray->pItems );
-         pBaseArray->pItems = NULL;
-      }
-
-      HB_TRACE( HB_TR_INFO, ( "Release pBaseArray %p", pBaseArray ) );
-      hb_gcFree( ( void * ) pBaseArray );
+             //TraceLog( NULL, "Diverting to ReleaseHolder() - Class '%s'\n", hb_objGetClsName( pArray ) );
+             hb_arrayReleaseHolder( pArray->item.asArray.value, (void *) pArray );
+          }
+      #endif
 
       pArray->type = HB_IT_NIL;
       pArray->item.asArray.value = NULL;
@@ -996,13 +1055,13 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
    }
    else
    {
+      TraceLog( NULL, "Warning! not an array %p\n", pArray );
       return FALSE;
    }
 }
 
 /* NOTE: CA-Cl*pper 5.3a has a fix for the case when the starting position
          is greater than the length of the array. [vszakats] */
-
 BOOL HB_EXPORT hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart,
                    ULONG * pulCount, ULONG * pulTarget )
 {
@@ -1089,7 +1148,6 @@ BOOL HB_EXPORT hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pul
       return FALSE;
    }
 }
-
 
 PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedList )
 {
@@ -1208,6 +1266,7 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
             hb_xfree( pCloned );
          }
       }
+
       return pDstArray;
    }
    else
@@ -1216,13 +1275,11 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
    }
 }
 
-
 PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
 {
    PHB_ITEM pArray = hb_itemNew( NULL );
    PHB_BASEARRAY pBaseArray;
    USHORT uiPos;
-
 
    //printf( "Got: %p\n", pBaseArray );
 
@@ -1243,7 +1300,14 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
    }
 
    pBaseArray->ulLen      = uiLen;
-   pBaseArray->uiHolders  = 1;
+
+   #ifdef HB_ARRAY_USE_COUNTER
+      pBaseArray->uiHolders  = 1;
+   #else
+      pBaseArray->pOwners = NULL;
+      hb_arrayRegisterHolder( pBaseArray, (void *) pArray );
+   #endif
+
    pBaseArray->uiClass    = 0;
    pBaseArray->uiPrevCls  = 0;
    pBaseArray->puiClsTree = NULL;
@@ -1290,7 +1354,14 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    }
 
    pBaseArray->ulLen      = uiPCount;
-   pBaseArray->uiHolders  = 1;
+
+   #ifdef HB_ARRAY_USE_COUNTER
+      pBaseArray->uiHolders  = 1;
+   #else
+      pBaseArray->pOwners = NULL;
+      hb_arrayRegisterHolder( pBaseArray, (void *) pArray );
+   #endif
+
    pBaseArray->uiClass    = 0;
    pBaseArray->uiPrevCls  = 0;
    pBaseArray->puiClsTree = NULL;
@@ -1344,7 +1415,14 @@ PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase )
    }
 
    pBaseArray->ulLen      = uiPCount;
-   pBaseArray->uiHolders  = 1;
+
+   #ifdef HB_ARRAY_USE_COUNTER
+      pBaseArray->uiHolders  = 1;
+   #else
+      pBaseArray->pOwners = NULL;
+      hb_arrayRegisterHolder( pBaseArray, (void *) pArray );
+   #endif
+
    pBaseArray->uiClass    = 0;
    pBaseArray->uiPrevCls  = 0;
    pBaseArray->puiClsTree = NULL;
@@ -1366,7 +1444,26 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 {
    PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) Cargo;
 
+   #ifndef HB_ARRAY_USE_COUNTER
+      PHB_ARRAY_HOLDER pOwners = pBaseArray->pOwners, pFree;
+   #endif
+
    HB_TRACE( HB_TR_INFO, ( "hb_arrayReleaseGarbage( %p )", pBaseArray ) );
+
+   #ifndef HB_ARRAY_USE_COUNTER
+      while( pOwners )
+      {
+         //TraceLog( NULL, "Warning! (3) Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
+
+         pFree = pOwners;
+
+         pOwners = pOwners->pNext;
+
+         hb_xfree( pFree );
+      }
+
+      pBaseArray->pOwners = NULL;
+   #endif
 
    /* Release object tree as needed */
    if( pBaseArray->puiClsTree )
@@ -1412,23 +1509,100 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    }
 }
 
+#ifndef HB_ARRAY_USE_COUNTER
+   void hb_arrayRegisterHolder( PHB_BASEARRAY pBaseArray, void *pHolder )
+   {
+      PHB_ARRAY_HOLDER pOwner = (PHB_ARRAY_HOLDER) hb_xgrab( sizeof( HB_ARRAY_HOLDER ) );
+
+      //TraceLog( NULL, "Allocated %p Registring: %p of %p Next %p\n", pOwner, pBaseArray, pHolder, pBaseArray->pOwners );
+
+      pOwner->pOwner = pHolder;
+      pOwner->pNext = pBaseArray->pOwners;
+
+      pBaseArray->pOwners = pOwner;
+   }
+
+   void hb_arrayResetHolder( PHB_BASEARRAY pBaseArray, void *pOldHolder, void *pNewHolder )
+   {
+      PHB_ARRAY_HOLDER pOwners = pBaseArray->pOwners;
+
+      //TraceLog( NULL, "*Resetting: %p of %p to %p\n", pBaseArray, pOldHolder, pNewHolder );
+
+      while( pOwners )
+      {
+         if( pOwners->pOwner == pOldHolder )
+         {
+            pOwners->pOwner = pNewHolder;
+            return;
+         }
+
+         pOwners = pOwners->pNext;
+      }
+
+      TraceLog( NULL, "Warning! Could not locate old owner %p of array %p\n", pOldHolder, pBaseArray );
+
+      hb_arrayRegisterHolder( pBaseArray, pNewHolder );
+   }
+
+   void hb_arrayReleaseHolder( PHB_BASEARRAY pBaseArray, void *pHolder )
+   {
+      PHB_ARRAY_HOLDER pOwners = pBaseArray->pOwners, pPrevious = NULL;
+
+      //TraceLog( NULL, "-UNRegistering: %p of %p\n", pBaseArray, pHolder );
+
+      while( pOwners )
+      {
+         //TraceLog( NULL, "pOwners: %p\n", pOwners );
+
+         if( pOwners->pOwner == pHolder )
+         {
+            if( pPrevious )
+            {
+               pPrevious->pNext = pOwners->pNext;
+            }
+            else
+            {
+               pBaseArray->pOwners = pOwners->pNext;
+            }
+
+            hb_xfree( (void *) pOwners );
+            break;
+         }
+
+         pPrevious = pOwners;
+         pOwners = pOwners->pNext;
+      }
+
+      if( pOwners )
+      {
+         // Last Owner was released.
+         if( pBaseArray->pOwners == NULL )
+         {
+            hb_arrayReleaseBase( pBaseArray );
+         }
+      }
+      else
+      {
+         TraceLog( NULL, "Warning! Could not locate owner %p of array %p\n", pHolder, pBaseArray );
+      }
+   }
+#endif
+
 #ifndef HB_LONG_LONG_OFF
-
-LONGLONG HB_EXPORT hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex )
-{
-   LONGLONG llRet;
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNLL(%p, %lu)", pArray, ulIndex));
-
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   LONGLONG HB_EXPORT hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex )
    {
-      llRet = hb_itemGetNLL( pArray->item.asArray.value->pItems + ulIndex - 1 );
-   }
-   else
-   {
-      llRet = 0;
-   }
+      LONGLONG llRet;
+      HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNLL(%p, %lu)", pArray, ulIndex));
 
-   return llRet;
-}
+      if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+      {
+         llRet = hb_itemGetNLL( pArray->item.asArray.value->pItems + ulIndex - 1 );
+      }
+      else
+      {
+         llRet = 0;
+      }
 
+      return llRet;
+   }
 #endif

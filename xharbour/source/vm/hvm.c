@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.250 2003/08/15 00:51:00 jonnymind Exp $
+ * $Id: hvm.c,v 1.251 2003/08/20 20:06:06 ronpinkas Exp $
  */
 
 /*
@@ -406,6 +406,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    s_aGlobals.type = HB_IT_NIL;
    hb_arrayNew( &s_aGlobals, 0 );
+   //printf( "Allocated s_aGlobals: %p Owner: %p\n", &s_aGlobals, s_aGlobals.item.asArray.value->pOwners );
 
    /* Moved to hb_vmProcessSymbols() because hb_xgrab i sused from static initializers before we get here.
    HB_TRACE( HB_TR_INFO, ("xinit" ) );
@@ -633,14 +634,18 @@ void HB_EXPORT hb_vmQuit( void )
 
    if( s_aStatics.type == HB_IT_ARRAY )
    {
+      //TraceLog( NULL, "Releasing s_aStatics: %p\n", &s_aStatics );
       hb_arrayRelease( &s_aStatics );
+      //TraceLog( NULL, "   Released s_aStatics: %p\n", &s_aStatics );
    }
    //printf("\nAfter Statics\n" );
 
    if( s_aGlobals.type == HB_IT_ARRAY )
    {
-      hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
+      //hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
+      //TraceLog( NULL, "Releasing s_aGlobals: %p\n", &s_aGlobals );
       hb_arrayRelease( &s_aGlobals );
+      //TraceLog( NULL, "   Released s_aGlobals: %p\n", &s_aGlobals );
    }
    //printf("\nAfter Globals\n" );
 
@@ -1286,7 +1291,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                         if( HB_VM_STACK.Return.type == HB_IT_BLOCK && HB_VM_STACK.Return.item.asBlock.value->pSelfBase == NULL )
                         {
                            HB_VM_STACK.Return.item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
-                           HB_VM_STACK.Return.item.asBlock.value->pSelfBase->uiHolders++;
+
+                           #ifdef HB_ARRAY_USE_COUNTER
+                              HB_VM_STACK.Return.item.asBlock.value->pSelfBase->uiHolders++;
+                           #else
+                              hb_arrayRegisterHolder( HB_VM_STACK.Return.item.asBlock.value->pSelfBase, (void *) ( HB_VM_STACK.Return.item.asBlock.value ) );
+                           #endif
                         }
 
                         hb_stackPop(); //pSelf.
@@ -4347,7 +4357,11 @@ static void hb_vmArrayPush( void )
 
       if( lIndex > 0 && (ULONG) lIndex <= pArray->item.asArray.value->ulLen )
       {
+        #ifdef HB_ARRAY_USE_COUNTER
          if( pArray->item.asArray.value->uiHolders > 1 )
+        #else
+         if( 0 && pArray->item.asArray.value->pOwners->pNext )
+        #endif
          {
             /* this is a temporary copy of an array - we can overwrite
              * it with no problem
@@ -4716,14 +4730,12 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
       hb_itemForwardValue( ( * HB_VM_STACK.pPos ), &itArray );
       hb_stackPush();
    }
-
-
 }
 
 /* This function creates an array item using 'uiDimension' as an index
  * to retrieve the number of elements from the stack
  */
-static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
+static void hb_vmArrayNew( PHB_ITEM pArray, USHORT uiDimension )
 {
    HB_THREAD_STUB
 
@@ -4748,11 +4760,13 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
       case HB_IT_DOUBLE:
          ulElements = ( ULONG ) pDim->item.asDouble.value;
          break;
+
       #ifndef HB_LONG_LONG_OFF
       case HB_IT_LONGLONG:
          ulElements = ( ULONG ) pDim->item.asLongLong.value;
          break;
       #endif
+
       default:
          /* NOTE: Clipper creates empty array if non-numeric value is
           * specified as dimension and stops further processing.
@@ -4774,7 +4788,6 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
          hb_vmArrayNew( hb_arrayGetItemPtr( pArray, ulElements-- ), uiDimension );
       }
    }
-
 }
 
 /* ------------------------------- */
@@ -5267,7 +5280,7 @@ void hb_vmSend( USHORT uiParams )
             pSelf->item.asArray.value->puiClsTree[0]=0;
          }
 
-         nPos=pSelfBase->puiClsTree[0]+1;
+         nPos = pSelfBase->puiClsTree[0] + 1;
          pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
          pSelfBase->puiClsTree[0] = nPos ;
          pSelfBase->puiClsTree[ nPos ] = uiClass;
@@ -5634,11 +5647,13 @@ static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the g
    {
       pSym->pFunPtr = NULL;         /* statics frame for this PRG */
       hb_arrayNew( &s_aStatics, uiStatics );
+      //printf( "Allocated s_aStatics: %p %p\n", &s_aStatics, s_aStatics.item.asArray.value->pOwners );
    }
    else
    {
       pSym->pFunPtr = ( PHB_FUNC ) hb_arrayLen( &s_aStatics );
       hb_arraySize( &s_aStatics, hb_arrayLen( &s_aStatics ) + uiStatics );
+      //TraceLog( NULL, "Symbol: %s Statics: %i Size: %i\n", pSym->szName, uiStatics, hb_arrayLen( &s_aStatics ) );
    }
 
    s_uiStatics = uiStatics; /* We need s_uiStatics for processing hb_vmStaticName() */
@@ -5995,7 +6010,12 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
    {
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
+
+      #ifdef HB_ARRAY_USE_COUNTER
+         ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
+      #else
+         hb_arrayRegisterHolder( ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase, (void *) ( ( * HB_VM_STACK.pPos )->item.asBlock.value ) );
+      #endif
    }
    else
    {
@@ -6042,7 +6062,12 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
    {
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
+
+      #ifdef HB_ARRAY_USE_COUNTER
+         ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
+      #else
+         hb_arrayRegisterHolder( ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase, (void *) ( ( * HB_VM_STACK.pPos )->item.asBlock.value ) );
+      #endif
    }
    else
    {
@@ -6089,7 +6114,12 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
    if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
    {
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
+
+      #ifdef HB_ARRAY_USE_COUNTER
+         ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
+      #else
+         hb_arrayRegisterHolder( ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase, (void *) ( ( * HB_VM_STACK.pPos )->item.asBlock.value ) );
+      #endif
    }
    else
    {
@@ -6734,6 +6764,8 @@ static void hb_vmPopStatic( USHORT uiStatic )
 
    pStatic = s_aStatics.item.asArray.value->pItems + HB_VM_STACK.iStatics + uiStatic - 1;
 
+   //TraceLog( NULL, "Assign Static: %i, Class: %s\n", uiStatic, hb_objGetClsName( pVal ) );
+
    hb_itemForwardValue( pStatic, pVal );
 
    hb_stackDec();
@@ -6866,7 +6898,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols i
 
       pNewSymbols->hScope |= hSymScope;
 
-      //TraceLog( NULL, "Module: '%s' Sym: '%s'\n", sModule, pSymbol->szName );
+      //printf( "Module: '%s' Sym: '%s'\n", sModule, pSymbol->szName );
 
       if( ( ! s_pSymStart ) && ( hSymScope & HB_FS_FIRST && ! (  hSymScope & HB_FS_INITEXIT ) ) )
       {
@@ -7532,29 +7564,20 @@ HB_FUNC( HB_QSELF )
 
    while( ( HB_IS_BLOCK( *( pBase + 1 ) ) || lLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
    {
-      if( lLevel <= 0 && HB_IS_BLOCK( *( pBase + 1 ) ) )
+      if( lLevel <= 0 )
       {
-         PHB_ITEM pBlock = *( pBase + 1 );
-
-         if( pBlock->item.asBlock.value->pSelfBase )
+         if( (*( pBase + 1 ))->item.asBlock.value->pSelfBase )
          {
-            HB_ITEM Self;
-
-            Self.type = HB_IT_ARRAY;
-            Self.item.asArray.value = pBlock->item.asBlock.value->pSelfBase;
-            Self.item.asArray.value->uiHolders++;
-
-            hb_itemForwardValue( &(HB_VM_STACK.Return), &Self );
-            return;
+            break;
          }
       }
 
-      // TraceLog( NULL, "Skipped: %s\n", ( *pBase )->item.asSymbol.value->szName );
+      //TraceLog( NULL, "Skipped: %s\n", ( *pBase )->item.asSymbol.value->szName );
 
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
 
-   // TraceLog( NULL, "Found: %s\n", ( *pBase )->item.asSymbol.value->szName );
+   //TraceLog( NULL, "Found: %s\n", ( *pBase )->item.asSymbol.value->szName );
 
    hb_itemCopy( &(HB_VM_STACK.Return), *( pBase + 1 ) );
 }
@@ -7672,7 +7695,12 @@ HB_FUNC( HB_RESTOREBLOCK )
             if( pSelf && HB_IS_OBJECT( pSelf ) )
             {
                Block.item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
-               Block.item.asBlock.value->pSelfBase->uiHolders++;
+
+               #ifdef HB_ARRAY_USE_COUNTER
+                  Block.item.asBlock.value->pSelfBase->uiHolders++;
+               #else
+                  hb_arrayRegisterHolder( Block.item.asBlock.value->pSelfBase, (void *) ( Block.item.asBlock.value ) );
+               #endif
             }
             else
             {
