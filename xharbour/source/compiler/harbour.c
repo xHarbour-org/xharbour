@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.52 2003/10/06 21:31:35 ronpinkas Exp $
+ * $Id: harbour.c,v 1.53 2003/11/26 03:17:49 likewolf Exp $
  */
 
 /*
@@ -358,7 +358,7 @@ int main( int argc, char * argv[] )
    return iStatus;
 }
 
-#if defined(HB_OS_WIN_32)
+#if defined(HB_OS_WIN_32) && !defined(__WATCOMC__)
 #include <windows.h>
 
 int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */

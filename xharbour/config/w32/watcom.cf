@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.5 2003/11/30 10:02:46 druzus Exp $
+# $Id: watcom.cf,v 1.6 2003/11/30 12:32:29 druzus Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -40,6 +40,7 @@ endef
 
 define link_exe_file
 echo $(LDFLAGS) NAME $@ > __link__.tmp
+echo LIB kernel32.lib, user32.lib, winspool.lib, oleaut32.lib, uuid.lib >> __link__.tmp
 $(foreach file, $^, $(link_file))
 $(foreach lib, $(LINKLIBS), $(link_lib))
 $(foreach lib, $(RDDLIBS), $(link_lib))
@@ -49,6 +50,7 @@ endef
 
 LD = wlink
 LDFLAGS = debug all OP osn=NT OP stack=65536 OP CASEEXACT
+
 ifeq ($(HB_LIB_COMPILE),)
 LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst /,\,$(TOP)$(ROOT)contrib/$(lib)/$(ARCH)/$(subst lib,,$(lib))))
 LINKLIBS := $(foreach lib, $(LIBS), $(subst /,\,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
@@ -86,7 +88,7 @@ $(AR) $(ARFLAGS) @__lib__.tmp
 endef
 
 AR = wlib
-ARFLAGS = -p=32 -c $(A_USR)
+ARFLAGS = -p=64 -c $(A_USR)
 AR_RULE = $(create_library)
 
 include $(TOP)$(ROOT)config/rules.cf

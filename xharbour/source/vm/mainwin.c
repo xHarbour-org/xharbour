@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.5 2003/11/22 01:41:10 ronpinkas Exp $
+ * $Id: mainwin.c,v 1.6 2003/11/28 10:39:25 jonnymind Exp $
  */
 
 /*
@@ -127,5 +127,9 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
    return hb_vmQuit();
 }
+
+#if defined(__WATCOMC__)
+void HB_EXPORT hb_froceLinkMain() {}
+#endif
 
 #endif

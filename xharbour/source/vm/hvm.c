@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.288 2003/11/30 10:02:47 druzus Exp $
+ * $Id: hvm.c,v 1.289 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -313,7 +313,7 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
 
    #define s_uiActionRequest  (HB_VM_STACK.uiActionRequest)
    #define s_lRecoverBase     (HB_VM_STACK.lRecoverBase)
-   
+
    #define hb_vm_aEnumCollection (HB_VM_STACK.aEnumCollection)
    #define hb_vm_apEnumVar (HB_VM_STACK.apEnumVar)
    #define hb_vm_awEnumIndex (HB_VM_STACK.awEnumIndex)
@@ -8007,3 +8007,11 @@ HB_FUNC( HB_RESTOREBLOCK )
 }
 
 HB_FUNC( HB_NOMOUSE ){}
+
+#if defined(HB_OS_WIN_32) && defined(__WATCOMC__)
+extern void HB_EXPORT hb_froceLinkMain();
+void _hb_froceLinkMain()
+{
+   hb_froceLinkMain();
+}
+#endif

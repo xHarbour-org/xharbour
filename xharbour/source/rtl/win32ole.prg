@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.32 2003/11/11 20:20:54 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.33 2003/11/22 04:34:46 ronpinkas Exp $
  */
 
 /*
@@ -130,7 +130,7 @@ RETURN TOleAuto():GetActiveObject( cString )
 
    static char *s_OleRefFlags = NULL;
 
-   HB_FUNC_STATIC( OLE_INITIALIZE )
+   HB_FUNC( OLE_INITIALIZE )
    {
       s_nOleError = OleInitialize( NULL );
 
@@ -138,7 +138,7 @@ RETURN TOleAuto():GetActiveObject( cString )
       s_pSym_New  = hb_dynsymFindName( "NEW" );
    }
 
-   HB_FUNC_STATIC( OLE_UNINITIALIZE )
+   HB_FUNC( OLE_UNINITIALIZE )
    {
       OleUninitialize();
    }
@@ -1437,7 +1437,7 @@ RETURN uObj
      //printf( "1\n" );
 
      wMember = AnsiToWide( hb_parc( 2 ) );
-     s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (unsigned short **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
+     s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
      hb_xfree( wMember );
 
      //printf( "2\n" );
@@ -1482,7 +1482,7 @@ RETURN uObj
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
      wMember = AnsiToWide( hb_parc( 2 ) );
-     s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (unsigned short **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
+     s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
      hb_xfree( wMember );
 
      if( s_nOleError == S_OK )
@@ -1540,7 +1540,7 @@ RETURN uObj
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
      wMember = AnsiToWide( hb_parc( 2 ) );
-     s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (unsigned short **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
+     s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, &IID_NULL, (wchar_t **) &wMember, 1, LOCALE_USER_DEFAULT, &lDispID );
      hb_xfree( wMember );
 
      if( s_nOleError == S_OK )
