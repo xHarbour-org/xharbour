@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.26 2004/07/03 03:34:53 ronpinkas Exp $
+ * $Id: hbfix.c,v 1.27 2004/11/21 21:43:46 druzus Exp $
  */
 
 /*
@@ -342,6 +342,38 @@ static HB_FIX_FUNC( hb_p_localnearsetstr )
    return 4 + HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 2 ] ) );
 }
 
+static HB_FIX_FUNC( hb_p_pushstrhidden )
+{
+   HB_SYMBOL_UNUSED( cargo );
+   return 6 + HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 4 ] ) );
+}
+
+static HB_FIX_FUNC( hb_p_localnearsetstrhidden )
+{
+   BYTE cVarId = pFunc->pCode[ lPCodePos + 1 ];
+   USHORT wNewId;
+
+   HB_SYMBOL_UNUSED( cargo );
+
+   if( pFunc->wParamCount )
+   {
+      if( ( wNewId = cVarId + pFunc->wParamCount ) < 256 )
+      {
+         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) wNewId;
+      }
+      else
+      {
+        // After fixing this variable cannot be accessed using near code
+        char sTemp[16];
+
+        sprintf( (char *) sTemp, "%i", pFunc->wParamCount );
+        hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARADDINT", (const char *) sTemp );
+      }
+   }
+
+   return 7 + HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 5 ] ) );
+}
+
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
@@ -508,7 +540,9 @@ static HB_FIX_FUNC_PTR s_fixlocals_table[] =
    NULL,                       /* HB_P_SHIFTL,               */
    NULL,                       /* HB_P_LARGEFRAME,           */
    NULL,                       /* HB_P_PUSHWITH,             */
-   NULL                        /* HB_P_PUSHLONGLONG          */
+   NULL,                       /* HB_P_PUSHLONGLONG,         */
+   hb_p_pushstrhidden,         /* HB_P_PUSHSTRHIDDEN,        */
+   hb_p_localnearsetstrhidden  /* HB_P_LOCALNEARSETSTRHIDDEN */
 };
 
 void hb_compFixFuncPCode( PFUNCTION pFunc )

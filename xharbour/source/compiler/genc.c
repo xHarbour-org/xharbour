@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.80 2004/08/24 07:49:31 ronpinkas Exp $
+ * $Id: genc.c,v 1.81 2004/11/21 21:43:44 druzus Exp $
  */
 
 /*
@@ -3095,6 +3095,131 @@ static HB_GENC_FUNC( hb_p_pushwith )
    return 1;
 }
 
+static HB_GENC_FUNC( hb_p_pushstrhidden )
+{
+   ULONG ulStart = lPCodePos;
+   USHORT wLen = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) );
+   BYTE bType = pFunc->pCode[ lPCodePos + 3 ];
+   USHORT wLenBuffer = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 4 ] ) );
+
+   fprintf( cargo->yyc, "\tHB_P_PUSHSTRHIDDEN, %i, %i, %i, %i, %i,",
+            pFunc->pCode[ lPCodePos + 1 ],     // LO: String length
+            pFunc->pCode[ lPCodePos + 2 ],     // HI: String length
+            pFunc->pCode[ lPCodePos + 3 ],     // Hide type
+            pFunc->pCode[ lPCodePos + 4 ],     // LO: Buffer length
+            pFunc->pCode[ lPCodePos + 5 ] );   // HI: Buffer length
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %i, %i, %i */", wLen, bType, wLenBuffer );
+   }
+
+   lPCodePos += 6;
+   if( wLen > 0 )
+   {
+      fprintf( cargo->yyc, "\n\t" );
+      while( wLenBuffer-- )
+      {
+         BYTE uchr = ( BYTE ) pFunc->pCode[ lPCodePos++ ];
+         /*
+          * NOTE: After optimization some CHR(n) can be converted
+          *    into a string containing nonprintable characters.
+          *
+          * TODO: add switch to use hexadecimal format "%#04x"
+          */
+         if( ( uchr < ( BYTE ) ' ' ) || ( uchr >= 127 ) )
+         {
+            fprintf( cargo->yyc, "%i, ", uchr );
+         }
+         else if( strchr( "\'\\\"", uchr ) )
+         {
+            fprintf( cargo->yyc, "%i, ", uchr );
+         }
+         else
+         {
+            fprintf( cargo->yyc, "\'%c\', ", uchr );
+         }
+      }
+   }
+   fprintf( cargo->yyc, "\n" );
+
+   return (USHORT) (lPCodePos - ulStart);
+}
+
+static HB_GENC_FUNC( hb_p_localnearsetstrhidden )
+{
+   ULONG ulStart = lPCodePos;
+   USHORT uLen   = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 2 ] ) );
+   BYTE bType = pFunc->pCode[ lPCodePos + 4 ];
+   USHORT wLenBuffer = HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 5 ] ) );
+
+   fprintf( cargo->yyc, "\tHB_P_LOCALNEARSETSTRHIDDEN, %i, %i, %i, %i, %i, %i,",
+            pFunc->pCode[ lPCodePos + 1 ],
+            pFunc->pCode[ lPCodePos + 2 ],     // LO: String length
+            pFunc->pCode[ lPCodePos + 3 ],     // HI: String length
+            pFunc->pCode[ lPCodePos + 4 ],     // Hide type
+            pFunc->pCode[ lPCodePos + 5 ],     // LO: Buffer length
+            pFunc->pCode[ lPCodePos + 6 ] );   // HI: Buffer length
+
+   if( cargo->bVerbose )
+   {
+      int iVar = (int) (signed char) pFunc->pCode[ lPCodePos + 1 ];
+
+      if( cargo->iNestedCodeblock )
+      {
+         /* we are accesing variables within a codeblock */
+         /* the names of codeblock variable are lost     */
+         if( iVar < 0 )
+         {
+            fprintf( cargo->yyc, "\t/* localvar%i, %i, %i */", -iVar, bType, wLenBuffer );
+         }
+         else
+         {
+            fprintf( cargo->yyc, "\t/* codeblockvar%i, %i, %i */", iVar, bType, wLenBuffer );
+         }
+      }
+      else
+      {
+         fprintf( cargo->yyc, "\t/* %s %i, %i, %i*/", hb_compLocalVariableFind( pFunc, iVar )->szName, uLen, bType, wLenBuffer );
+      }
+   }
+
+   lPCodePos += 7;
+
+   if( uLen > 0 )
+   {
+      fprintf( cargo->yyc, "\n\t" );
+
+      while( wLenBuffer-- )
+      {
+         BYTE uchr = ( BYTE ) pFunc->pCode[ lPCodePos++ ];
+         /*
+          * NOTE: After optimization some CHR(n) can be converted
+          *    into a string containing nonprintable characters.
+          *
+          * TODO: add switch to use hexadecimal format "%#04x"
+          */
+         if( ( uchr < ( BYTE ) ' ' ) || ( uchr >= 127 ) )
+         {
+            fprintf( cargo->yyc, "%i, ", uchr );
+         }
+         else if( strchr( "\'\\\"", uchr ) )
+         {
+            fprintf( cargo->yyc, "%i, ", uchr );
+         }
+         else
+         {
+            fprintf( cargo->yyc, "\'%c\', ", uchr );
+         }
+      }
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return ( USHORT ) ( lPCodePos - ulStart );
+}
+
+
 /* NOTE: The order of functions has to match the order of opcodes
  *       mnemonics
  */
@@ -3260,7 +3385,9 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_bitshiftl,
    hb_p_largeframe,
    hb_p_pushwith,
-   hb_p_pushlonglong
+   hb_p_pushlonglong,
+   hb_p_pushstrhidden,
+   hb_p_localnearsetstrhidden
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

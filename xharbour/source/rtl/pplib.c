@@ -1,5 +1,5 @@
 /*
- * $Id: pplib.c,v 1.7 2004/10/23 12:02:09 druzus Exp $
+ * $Id: pplib.c,v 1.8 2004/10/26 01:30:54 ronpinkas Exp $
  */
 
 /*
@@ -96,6 +96,8 @@ BOOL           hb_comp_bTracePP = FALSE;
 FILE           *hb_comp_PPTrace = NULL;
 
 static jmp_buf s_env;
+
+int            hb_comp_iHidden = 0;
 
 /* TODO: Extend the function to allow directives
          and external include files              */

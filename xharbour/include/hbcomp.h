@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.31 2004/10/20 03:14:40 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.32 2004/11/21 21:43:37 druzus Exp $
  */
 
 /*
@@ -578,7 +578,10 @@ extern FILE           *hb_comp_PPTrace;
   #define HB_COMP_ISSUPPORTED(flag)    ( hb_comp_Supported & (flag) )
 #endif
 
+/* Hide Strings */
+extern int            hb_comp_iHidden;
+extern BYTE *         hb_compHideString( int iType, char * szText, ULONG ulStrLen, ULONG * ulBufferLen );
+
 HB_EXTERN_END
 
 #endif /* HB_COMP_H_ */
-

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.86 2004/11/21 21:43:37 druzus Exp $
+ * $Id: hbexprb.c,v 1.87 2004/11/26 17:36:48 druzus Exp $
  */
 
 /*
@@ -3018,9 +3018,21 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                         {
                            unsigned short iLen = ( unsigned short ) ( pSelf->value.asOperator.pRight->ulLength + 1 ) ;
 
-                           hb_compGenPCode4( HB_P_LOCALNEARSETSTR, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
+                           if( ! hb_comp_iHidden )
+                           {
+                              hb_compGenPCode4( HB_P_LOCALNEARSETSTR, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
+                              hb_compGenPCodeN( ( unsigned char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
+                           }
+                           else
+                           {
+                              ULONG ulBufferLen;
+                              BYTE * pBuffer = hb_compHideString( hb_comp_iHidden, ( BYTE * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, &ulBufferLen );
 
-                           hb_compGenPCodeN( ( unsigned char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
+                              hb_compGenPCode4( HB_P_LOCALNEARSETSTRHIDDEN, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
+                              hb_compGenPCode3( ( BYTE ) hb_comp_iHidden, HB_LOBYTE( ulBufferLen ), HB_HIBYTE( ulBufferLen ), FALSE );
+                              hb_compGenPCodeN( ( unsigned char * ) pBuffer, ulBufferLen, FALSE );
+                              hb_xfree( pBuffer );
+                           }
 
                            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
@@ -3089,9 +3101,21 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                         {
                            unsigned short iLen = ( unsigned short ) ( pSelf->value.asOperator.pRight->ulLength + 1 );
 
-                           hb_compGenPCode4( HB_P_LOCALNEARSETSTR, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
+                           if( ! hb_comp_iHidden )
+                           {
+                              hb_compGenPCode4( HB_P_LOCALNEARSETSTR, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
+                              hb_compGenPCodeN( ( unsigned char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
+                           }
+                           else
+                           {
+                              ULONG ulBufferLen;
+                              BYTE * pBuffer = hb_compHideString( hb_comp_iHidden, ( BYTE * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, &ulBufferLen );
 
-                           hb_compGenPCodeN( ( unsigned char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
+                              hb_compGenPCode4( HB_P_LOCALNEARSETSTRHIDDEN, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
+                              hb_compGenPCode3( ( BYTE ) hb_comp_iHidden, HB_LOBYTE( ulBufferLen ), HB_HIBYTE( ulBufferLen ), FALSE );
+                              hb_compGenPCodeN( ( unsigned char * ) pBuffer, ulBufferLen, FALSE );
+                              hb_xfree( pBuffer );
+                           }
 
                            return pSelf;
                         }

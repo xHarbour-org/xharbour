@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3708 2004/12/31 11:55:42 druzus Exp $
+ * $Id: ChangeLog,v 1.3709 2005/01/01 18:50:22 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-01 21:05 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * include/hbpcode.h
+    + Added HB_P_PUSHSTRHIDDEN and HB_P_LOCALNEARSETSTRHIDDEN PCODEs
+      for "hidden" strings.
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * include/hbexprb.c
+  * include/hbcomp.h
+  * source/rtl/pplib.c
+  * source/pp/pragma.c
+  * source/compiler/harbour.c
+  * utils/hbpp/hbpp.c
+    + Added new PCODEs generation.
+  * source/vm/hvm.c
+    + Implemented functionality for new PCODEs.
 
 2005-01-01 12:45 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/tbrowse.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.32 2004/07/03 03:34:53 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.33 2004/11/21 21:43:46 druzus Exp $
  */
 
 /*
@@ -211,7 +211,9 @@ static char *pCodeList[] =
     "HB_P_LARGEFRAME",            /* 157 */
     "HB_P_PUSHWITH",              /* 158 pushes QWith for the current procedure/method */
     "HB_P_PUSHLONGLONG",          /* 159 places 64bit integer number on the virtual machine stack */
-    "HB_P_LAST_PCODE"             /* 160 this defines the number of defined pcodes */
+    "HB_P_PUSHSTRHIDDEN",         /* 160 places a "hidden" string on the virtual machine stack */
+    "HB_P_LOCALNEARSETSTRHIDDEN", /* 161 Set specified "hidden" string into specified local without using the stack.*/
+    "HB_P_LAST_PCODE"             /* 162 this defines the number of defined pcodes */
 };
 
 static BYTE s_pcode_len[] = {
@@ -376,7 +378,9 @@ static BYTE s_pcode_len[] = {
    1,        /* HB_P_BITSHIFTL,            */
    4,        /* HB_P_LARGEFRAME,           */
    1,        /* HB_P_PUSHWITH,             */
-   9         /* HB_P_PUSHLONGLONG          */
+   9,        /* HB_P_PUSHLONGLONG          */
+   0,        /* HB_P_PUSHSTRHIDDEN,        */
+   0         /* HB_P_LOCALNEARSETSTRHIDDEN */
 };
 
 extern BOOL hb_comp_iGenVarList;
@@ -2141,6 +2145,7 @@ void hb_compStrongType( int iSize )
      /* Charcters */
      case HB_P_PUSHSTRSHORT :
      case HB_P_PUSHSTR :
+     case HB_P_PUSHSTRHIDDEN :
        pFunc->pStack[ pFunc->iStackIndex++ ] = 'C';
        break;
 
