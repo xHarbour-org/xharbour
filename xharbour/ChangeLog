@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.413 2002/09/30 21:26:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.414 2002/10/01 01:24:46 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-01 19:30 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * source/rtl/gtwin/gtwin.c
+    * Fixes suggested by Peter Rees <peter@rees.co.nz>. Thanks Peter !
+    * Added Copyright notes for hb_gt_CtrlHandler(), hb_gt_ReadKey()
+      and hb_gt_Tone(), previously omited by mistake
+
 2002-10-01 08:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * source/rtl/tget.prg
      ! Change behaviour of function UPDATED() to conform with Clipper which

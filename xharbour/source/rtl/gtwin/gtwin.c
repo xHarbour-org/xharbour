@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.6 2002/09/28 11:55:13 map Exp $
+ * $Id: gt_tpl.c,v 1.14 2001/08/21 03:37:25 dholm Exp $
  */
 
 /*
@@ -13,6 +13,18 @@
  *     Copyright 2002 Przemysˆaw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
+ *
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.harbour-project.org
+ *
+ * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
+ *    hb_gt_CtrlHandler()
+ *
+ * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
+ *    hb_gt_Tone()
+ *    hb_gt_ReadKey()
+ *
+ * See doc/license.txt for licensing terms.
  *
  * www - http://www.harbour-project.org
  *
@@ -817,8 +829,13 @@ BOOL hb_gt_SetMode( USHORT usRows, USHORT usCols )
         coBuf = GetLargestConsoleWindowSize( s_HOutput );
         if ( usRows > coBuf.Y )
             usRows = coBuf.Y;
-        if ( usCols > coBuf.Y )
+        else
+            coBuf.Y = usRows;  /* Thx to Peter Rees */
+
+        if ( usCols > coBuf.X )
             usCols = coBuf.X;
+        else
+            coBuf.X = usCols;
 
         /* new console window size and scroll position */
         srWin.Top    = srWin.Left = 0;
