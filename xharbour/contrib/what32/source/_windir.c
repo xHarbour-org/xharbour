@@ -176,19 +176,16 @@ HB_FUNC( SETVOLUMELABEL )
 //-----------------------------------------------------------------------------
 // WINBASEAPI BOOL WINAPI CreateDirectoryA( IN LPCSTR lpPathName, IN LPSECURITY_ATTRIBUTES lpSecurityAttributes );
 
-/*
-
 HB_FUNC( CREATEDIRECTORY )
 {
-   LPSECURITY_ATTRIBUTES lpSecurityAttributes ;
+   SECURITY_ATTRIBUTES *sa ;
 
-   // Your code goes here
+   if (ISCHAR(2)) 
+       sa = (SECURITY_ATTRIBUTES *) hb_param(1, HB_IT_STRING)->item.asString.value;
 
-   hb_retl( CreateDirectoryA( (LPCSTR) hb_parc( 1 ), lpSecurityAttributes ) ) ;
+   hb_retl( CreateDirectoryA( (LPCSTR) hb_parc( 1 ), sa ) ) ;
 }
 
-   Last change:  WN   30 May 2002    0:20 am
-*/
 
 //-----------------------------------------------------------------------------
 // WINBASEAPI BOOL WINAPI CreateDirectoryExA( IN LPCSTR lpTemplateDirectory, IN LPCSTR lpNewDirectory, IN LPSECURITY_ATTRIBUTES lpSecurityAttributes );

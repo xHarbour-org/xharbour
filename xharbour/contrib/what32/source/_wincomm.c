@@ -18,7 +18,9 @@
 #include "hbvm.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
+#include "item.api"
 
+extern PHB_ITEM Rect2Array( RECT *rc  );
 
 //-----------------------------------------------------------------------------
 
@@ -83,15 +85,28 @@ HB_FUNC ( WRITESTATUSWINDOW )
 }
 
 
+HB_FUNC ( STATUSBARGETRECT )
+{
+  RECT rc;
+  PHB_ITEM aRect ;
+  HWND hWnd = (HWND) hb_parnl(1);
+  SendMessage ( hWnd, SB_GETRECT, hb_parnl(2), (LPARAM) &rc); 
+  aRect = Rect2Array( &rc  );
+  _itemReturn( aRect );
+  _itemRelease( aRect );
+}
 
 
-
-
-
-
-
-
-
+HB_FUNC ( STATUSBARGETPARTS )
+{
+  RECT rc;
+  PHB_ITEM aParts;
+  HWND hWnd = (HWND) hb_parnl(1);
+  SendMessage ( hWnd, SB_GETPARTS, hb_parni(2), (LPARAM) &rc); 
+  aParts = Rect2Array( &rc  );
+  _itemReturn( aParts );
+  _itemRelease( aParts );
+}
 
 //----------------------------------------------------------------------------//
 
@@ -127,15 +142,18 @@ to load the appropriate Help string.
 //----------------------------------------------------------------------------//
 
 /*
-   CreateProgressBar( hParentWindow, nRange, x ,y, nWidth, )
+   CreateProgressBar( hParentWindow, nRange, x ,y, nWidth,nHeight,bBorder )
 */
 HB_FUNC ( CREATEPROGRESSBAR )
 {
    HWND hPBar, hParentWindow = (HWND) hb_parnl(1);
    RECT rcClient;
-   int cyVScroll = GetSystemMetrics( SM_CYVSCROLL );
+   LONG ProgressBarStyle;
+   BOOL bBorder = ISNIL(7) ? FALSE : hb_parl(7);
+   int cyVScroll = ISNIL(6) ? GetSystemMetrics( SM_CYVSCROLL ): hb_parni(6) ;
+   LONG nStyle = ISNIL(8) ? 0 : hb_parnl(8) ;
+   
    int x1, y1, nwidth, nheight;
-
    if( hb_pcount() > 2 )
    {
       x1 = hb_parni( 3 );
@@ -153,7 +171,7 @@ HB_FUNC ( CREATEPROGRESSBAR )
    }
 
    hPBar = CreateWindowEx( 0, PROGRESS_CLASS, (LPSTR) NULL,
-              WS_CHILD | WS_VISIBLE,    /* style  */
+              WS_CHILD | WS_VISIBLE | nStyle,    /* style  */
               x1,                       /* x */
               y1,                       /* y */
               nwidth, nheight,          /* nWidth, nHeight */
@@ -163,6 +181,14 @@ HB_FUNC ( CREATEPROGRESSBAR )
 
    SendMessage( hPBar, PBM_SETRANGE, 0, MAKELPARAM( 0, hb_parni( 2 ) ) );
    SendMessage(hPBar, PBM_SETSTEP, (WPARAM) 1, 0); 
+
+
+  if( bBorder )
+    {
+    ProgressBarStyle = GetWindowLong(hPBar, GWL_EXSTYLE);
+    ProgressBarStyle = ProgressBarStyle - WS_EX_STATICEDGE;
+    SetWindowLong(hPBar, GWL_EXSTYLE, ProgressBarStyle);
+    }
 
    hb_retnl( (LONG) hPBar );
 }

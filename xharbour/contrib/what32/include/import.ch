@@ -1,7 +1,9 @@
 /*
 
-What32.Lib - Modified from:
+What32.Lib
+AJ Wos: IMPORT syntax added
 
+Modified from:
 Copyright 2002 Vic McClung <vicmcclung@vicmcclung.com>
 www - http://www.vicmcclung.com
 
@@ -44,8 +46,11 @@ linking the VMGUI library code into it.
 // C syntax
 // very fast and efficient
 
+
+
+
 //----------------------------------------------------------------------------//
-// void params
+// void
 
 #xcommand IMPORT <hInstDLL> [<flags>] [<static:STATIC>] FUNCTION <return> ;
           <FuncName>( 0 );
@@ -58,20 +63,39 @@ linking the VMGUI library code into it.
              return CallDLL(<hInstDLL>,nProcAddr,[<flags>], <return>  )
 
 //----------------------------------------------------------------------------//
-// void params + alias
+// void + alias
 
 #xcommand IMPORT <hInstDLL> [<flags>] [<static:STATIC>] FUNCTION <return> ;
-          <FuncName>( 0 ) ALIAS <alias> ;
+          <FuncName>( 0 ) AS <alias> ;
        => ;
-          [<static>] function <FuncName>( ) ;;
+          [<static>] function <alias>( ) ;;
              STATIC nProcAddr;;
              IF nProcAddr==NIL;;
-                nProcAddr:=GetProcAddress(<hInstDLL>,<(alias)>);;
+                nProcAddr:=GetProcAddress(<hInstDLL>,<(FuncName)>);;
              ENDIF;;
              return CallDLL(<hInstDLL>,nProcAddr,[<flags>], <return> )
 
 //----------------------------------------------------------------------------//
 
+#xcommand IMPORT <hInstDLL> [<flags>] [<static:STATIC>] FUNCTION <return> <FuncName> => ;
+   __IMPORT <hInstDLL> [<flags>] [<static>] FUNCTION <return> <FuncName>;;
+   #translate * <!literal!> => * 10 <literal>
+
+
+#xcommand __IMPORT <hInstDLL> [<flags>] [<static:STATIC>] FUNCTION <return> ;
+          <!FuncName!>( [ <type1> <!uParam1!>] [, <typeN> <!uParamN!>]);
+       => ;
+          [<static>] function <FuncName>( [<uParam1>] [,<uParamN>] ) ;;
+             STATIC nProcAddr;;
+             IF nProcAddr==NIL;;
+                nProcAddr:=GetProcAddress(<hInstDLL>,<(FuncName)>);;
+             ENDIF;;
+             return CallDLL(<hInstDLL>,nProcAddr,[<flags>], <return>[,<type1>,<uParam1> ] [,<typeN>,<uParamN> ] );;
+             #untranslate * <!literal!> => * 10 <literal>
+
+
+// old
+/*
 #xcommand IMPORT <hInstDLL> [<flags>] [<static:STATIC>] FUNCTION <return> ;
           <FuncName>( [ <type1> <uParam1>] [, <typeN> <uParamN>] );
        => ;
@@ -82,11 +106,32 @@ linking the VMGUI library code into it.
              ENDIF;;
              return CallDLL(<hInstDLL>,nProcAddr,[<flags>], <return> [,<type1>,<uParam1> ] [,<typeN>,<uParamN> ] )
 
-//----------------------------------------------------------------------------//
-// alias
+*/
 
+//----------------------------------------------------------------------------//
+// aliased function name
+
+
+#xcommand IMPORT <hInstDLL> [<flags>] [<static:STATIC>] FUNCTION <return> <FuncName> AS <alias> => ;
+   __IMPORT <hInstDLL> [<flags>] [<static>] FUNCTION <return> <FuncName> AS <alias> ;;
+   #translate * <!literal!> => * 10 <literal>
+
+#xcommand __IMPORT <hInstDLL> [<flags>] [<static:STATIC>] FUNCTION <return> ;
+          <!FuncName!>( [ <type1> <!uParam1!>] [, <typeN> <!uParamN!>]) AS <alias> ;
+       => ;
+          [<static>] function <alias>( [<uParam1>] [,<uParamN>] ) ;;
+             STATIC nProcAddr;;
+             IF nProcAddr==NIL;;
+                nProcAddr:=GetProcAddress(<hInstDLL>,<(FuncName)>);;
+             ENDIF;;
+             return CallDLL(<hInstDLL>,nProcAddr,[<flags>], <return>[,<type1>,<uParam1> ] [,<typeN>,<uParamN> ] );;
+             #untranslate * <!literal!> => * 10 <literal>
+
+
+// old
+/*
 #xcommand IMPORT <hInstDLL> [<flags>] [<static:STATIC>] FUNCTION <return> ;
-          <FuncName>( [ <type1> <uParam1> ] [, <typeN> <uParamN> ] ) ALIAS <alias> ;
+          <FuncName>( [ <type1> <uParam1> ] [, <typeN> <uParamN> ] ) AS <alias> ;;
        => ;
           [<static>] function <FuncName>( [<uParam1>] [,<uParamN>] ) ;;
              STATIC nProcAddr;;
@@ -94,6 +139,7 @@ linking the VMGUI library code into it.
                 nProcAddr:=GetProcAddress(<hInstDLL>,<(alias)>);;
              ENDIF;;
              return CallDLL(<hInstDLL>, nProcAddr, [<flags>], <return> [,<type1>, <uParam1> ] [,<utypeN>, <uParamN> ] )
+*/
 
 //----------------------------------------------------------------------------//
 

@@ -45,18 +45,29 @@ error will be occur.
 #define HKEY          -4 //CTYPE_UNSIGNED_LONG
 #define char          -1 //CTYPE_CHAR
 #define LONG           4 //CTYPE_LONG
-#define BCHAR         -1 //CTYPE_CHAR
+#define BCHAR         -1 //CTYPE_UNSIGNED_CHAR
+#define WCHAR         -2 //CTYPE_UNSIGNED_SHORT
 #define DOUBLE         6 //CTYPE_DOUBLE
 #define LPTSTR        10 //CTYPE_CHAR_PTR
 #define LPSTR         10 //CTYPE_CHAR_PTR
 #define ULONG         -4 //CTYPE_UNSIGNED LONG
+#define UCHAR         -1 //CTYPE_UNSIGNED_CHAR
+#define SHORT          2
+#define USHORT        -2 
+       
+
+
+
+
 
 #define LPOFNHOOKPROC   -4 // CTYPE_UNSIGNED_LONG
 #define LPCFHOOKPROC    -4
 #define LPFRHOOKPROC    -4
 #define LPPAGESETUPHOOK -4
 #define LPPAGEPAINTHOOK -4
- 
+#define LPPRINTHOOKPROC -4  
+#define LPSETUPHOOKPROC -4  
+     
 #define BFFCALLBACK     -4 
 
 

@@ -41,6 +41,38 @@ HB_FUNC ( OUTPUTDEBUGSTRING )
 }
 
 //-----------------------------------------------------------------------------
+//DWORD GetTimeZoneInformation(LPTIME_ZONE_INFORMATION lpTimeZoneInformation)
+
+// SYNTAX:
+// cTZI:=tzi:value
+// GetTimeZoneInformation(@cTZI)
+// tzi:Buffer(cTZI)
+
+HB_FUNC( GETTIMEZONEINFORMATION )
+{
+ TIME_ZONE_INFORMATION tzi;
+
+ hb_retnl( GetTimeZoneInformation( &tzi ) ) ;
+
+ if ( ISBYREF(1) )
+    hb_storclen( (char*) &tzi, sizeof(tzi), 1);
+
+}
+
+//-----------------------------------------------------------------------------
+//BOOL SetTimeZoneInformation(TIME_ZONE_INFORMATION *TimeZoneInformation)
+
+// SYNTAX: SetTimeZoneInformation(tzi:value)
+
+HB_FUNC( SETTIMEZONEINFORMATION )
+{
+ TIME_ZONE_INFORMATION *tzi = ( TIME_ZONE_INFORMATION *) hb_param( 1, HB_IT_STRING )->item.asString.value ;
+
+ hb_retl( SetTimeZoneInformation( tzi ) ) ;
+
+}
+
+//-----------------------------------------------------------------------------
 
 // Win98 ++
 

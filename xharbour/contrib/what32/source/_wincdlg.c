@@ -36,38 +36,16 @@ HB_FUNC( COMMDLGEXTENDEDERROR )
 
 //---------------------------------------------------------------------
 
+//Syntax: ChooseFont( cf:value) -> structure buffer, or NIL 
+
 HB_FUNC(CHOOSEFONT)
 {
+  CHOOSEFONT *cf =  (CHOOSEFONT * ) hb_param( 1, HB_IT_STRING )->item.asString.value;
 
-/*
+  cf->lStructSize = sizeof(CHOOSEFONT);
 
-  CHOOSEFONT cf ;
-
-  typedef struct {    // cf
-    DWORD        lStructSize; 
-    HWND         hwndOwner; 
-    HDC          hDC; 
-    LPLOGFONT    lpLogFont; 
-    INT          iPointSize; 
-    DWORD        Flags; 
-    DWORD        rgbColors; 
-    LPARAM       lCustData; 
-    LPCFHOOKPROC lpfnHook; 
-    LPCTSTR      lpTemplateName; 
-    HINSTANCE    hInstance; 
-    LPTSTR       lpszStyle; 
-    WORD         nFontType; 
-    WORD         ___MISSING_ALIGNMENT__; 
-    INT          nSizeMin; 
-    INT          nSizeMax; 
-} CHOOSEFONT; 
- 
-
-
-hb_retl(ChooseFont( &cf ) ) ;
-
-*/
-
+  if (ChooseFont( cf ) ) 
+      hb_retclen( (char *) cf, sizeof( CHOOSEFONT )) ; 
 }
 
 //----------------------------------------------------------------------------
@@ -85,7 +63,7 @@ HB_FUNC(_FINDTEXT)
    fr.Flags            = (DWORD)  hb_parnl( 3 ) ;
    fr.lpstrFindWhat    = (LPTSTR) hb_parc( 4 ) ;
    fr.lpstrReplaceWith = NULL ;
-   fr.wFindWhatLen     = (WORD) hb_parclen( 4) ;
+   fr.wFindWhatLen     = (WORD) hb_parclen(4) ;
    fr.wReplaceWithLen  = NULL ;
    fr.lCustData        = NULL ;
 //   fr.lpfnHook         = ISNIL(5) ? NULL : __DlgProc ;
@@ -122,18 +100,60 @@ HB_FUNC(_REPLACETEXT)
 
 //----------------------------------------------------------------------------
 
-HB_FUNC(PRINTDLG)
+HB_FUNC( PRINTDLG )
 {
- MessageBox(GetActiveWindow(),"PrintDlg function is obsolete, use PageSetupDlg","Warning",MB_OK) ;
+
+   PRINTDLG *pd  = ( PRINTDLG * ) hb_param( 1, HB_IT_STRING )->item.asString.value;
+
+   pd->lStructSize = sizeof(PRINTDLG);
+
+   if ( PrintDlg( pd ) )
+   {
+      hb_storclen( (char*) pd, sizeof(PRINTDLG), 1 );
+      hb_retl(TRUE);
+   }
+   else
+     hb_retl(FALSE);
 }
+
+//----------------------------------------------------------------------------
+
+//NT
+
+/*
+HB_FUNC( PRINTDLGEX )
+{
+
+   PRINTDLGEX *pd  = ( PRINTDLGEX * ) hb_param( 1, HB_IT_STRING )->item.asString.value;
+
+   pd->lStructSize = sizeof(PRINTDLGEX);
+
+   if ( PrintDlgEx( pd ) )
+   {
+      hb_storclen( (char*) pd, sizeof(PRINTDLGEX), 1 );
+      hb_retl(TRUE);
+   }
+   else
+     hb_retl(FALSE);
+}
+*/
 
 //----------------------------------------------------------------------------
 
 HB_FUNC(PAGESETUPDLG)
 {
 
- PAGESETUPDLG *psd = (PAGESETUPDLG * ) hb_param( 1, HB_IT_STRING )->item.asString.value;
- hb_retl( PageSetupDlg( psd ) ) ;
+   PAGESETUPDLG *psd = (PAGESETUPDLG * ) hb_param( 1, HB_IT_STRING )->item.asString.value;
+
+   psd->lStructSize = sizeof(PAGESETUPDLG);
+
+   if ( PageSetupDlg( psd ) )
+   {
+      hb_storclen( (char*) psd, sizeof(PAGESETUPDLG), 1 );
+      hb_retl(TRUE);
+   }
+   else
+     hb_retl(FALSE);
 
 }
 
@@ -156,11 +176,9 @@ HB_FUNC ( CHOOSECOLOR )
    cc.rgbResult      = (COLORREF)ISNIL(2) ?  0 : hb_parnl(2) ;
    cc.lpCustColors   = crCustClr ;
    cc.Flags          = (WORD) (ISNIL(4) ? CC_ANYCOLOR | CC_FULLOPEN | CC_RGBINIT : hb_parnl(4) ) ;
+   if ( ChooseColorA( &cc ) )
+      hb_retnl( cc.rgbResult );
 
-   if ( ! ChooseColorA( &cc ) )
-      return;
-   else
-      hb_retnl( cc.rgbResult ) ;
 }
 
 
@@ -235,7 +253,7 @@ HB_FUNC ( _GETSAVEFILENAME )
 
 //----------------------------------------------------------------------------
 
-//SYNTAX: SHBrowseForFolder([<hWnd>],[<cTitle>],<nFlags>)
+//SYNTAX: SHBrowseForFolder([<hWnd>],[<cTitle>],<nFlags>,[<nFolderType>])
 
 HB_FUNC( SHBROWSEFORFOLDER )
 { 
@@ -243,7 +261,7 @@ HB_FUNC( SHBROWSEFORFOLDER )
    BROWSEINFO BrowseInfo; 
    char *lpBuffer = (char*) hb_xgrab( MAX_PATH+1);
    LPITEMIDLIST pidlBrowse;
-   SHGetSpecialFolderLocation(hwnd, CSIDL_DRIVES , &pidlBrowse) ;
+   SHGetSpecialFolderLocation(hwnd, ISNIL(4) ? CSIDL_DRIVES : hb_parni(4), &pidlBrowse) ;
    BrowseInfo.hwndOwner = hwnd; 
    BrowseInfo.pidlRoot = pidlBrowse; 
    BrowseInfo.pszDisplayName = lpBuffer; 

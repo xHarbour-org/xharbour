@@ -1,33 +1,7 @@
 
-//What32
-//AJ Wos
+#include "c:\what32\include\import.ch"
+#Include "c:\what32\include\WinTypes.ch"
 
-/*
-This is the example code of creating "import" functions from a DLL
-see import.ch for details of implementation, and also PPO of this file.
-Using this technique, you load a DLL library on the application startup
-and resolve the function address on the first call to each function.
-
-On subsequent calls of that function, the function addresses will have 
-been resolved, and will be very fast, just as if they were wrapped in 
-the C code. 
-
-The DLL library will be released on on application exit.
-
-You can create separate sources (like this one) for each included DLL library.
-
-The syntax have been puposefully arranged so, that you can grab the function
-definitions almost directly from the DLL header file, and use it with minimal 
-changes only.
-
-Make sure that all parameter and return value types are resolved before use.
-(see wintypes.ch)
-
-*/
-
-
-#Include "wintypes.ch"
-#include "import.ch"
 
 STATIC USER32
 STATIC GDI32
@@ -54,13 +28,27 @@ EXIT PROCEDURE FreeLibs
    FreeLibrary(WINMM)
 RETURN
 
-IMPORT WINMM    FUNCTION BOOL sndPlaySoundA(LPCSTR pszSound, UINT fuSound)
+// MCI
+
+#define MCIERROR    DWORD
+#define MCIDEVICEID UINT
+
+IMPORT WINMM FUNCTION BOOL        mciExecute(LPCSTR cCmd ) // obsolete
+IMPORT WINMM FUNCTION BOOL        mciSendStringA(LPCSTR lpstrCommand, LPSTR lpstrReturnString, UINT uReturnLength, HWND hwndCallback) AS mciSendString
+IMPORT WINMM FUNCTION BOOL        sndPlaySoundA(LPCSTR pszSound, UINT fuSound) AS sndPlaySound
+IMPORT WINMM FUNCTION MCIERROR    mciSendCommandA(MCIDEVICEID mciId, UINT uMsg, DWORD dwParam1, DWORD dwParam2) AS mciSendCommand
+IMPORT WINMM FUNCTION MCIDEVICEID mciGetDeviceIDA(LPCSTR pszDevice) AS mciGetDeviceID
+IMPORT WINMM FUNCTION MCIDEVICEID mciGetDeviceIDFromElementIDA(DWORD dwElementID, LPCSTR lpstrType ) AS mciGetDeviceIDFromElementID
+IMPORT WINMM FUNCTION BOOL        mciGetErrorStringA(MCIERROR mcierr, LPSTR pszText, UINT cchText) AS mciGetErrorString
+
+// SPOOLER
+
 IMPORT WINSPOOL FUNCTION BOOL ClosePrinter( HANDLE hPrinter )
 IMPORT WINSPOOL FUNCTION BOOL EndDocPrinter(HANDLE hPrinter)
 IMPORT WINSPOOL FUNCTION BOOL EndPagePrinter(HANDLE hPrinter)
-IMPORT KERNEL32 FUNCTION VOID ExitProcess( UINT uExitCode )
 
-DLL  FUNCTION BOOL sndPlaySoundA(LPCSTR pszSound, UINT fuSound) as BOOL  LIB  WINMM
+
+
+
 // etc.
-
 

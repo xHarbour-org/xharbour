@@ -393,11 +393,12 @@ HB_FUNC( SHINVOKEPRINTERCOMMAND )
 
 // verify the prototype
 
-
+/*
 HB_FUNC( SHLOADNONLOADEDICONOVERLAYIDENTIFIERS )
 {
 // (SHSTDAPI) SHLoadNonloadedIconOverlayIdentifiers(  ) ) ;
 }
+*/
 
 //-----------------------------------------------------------------------------
 // End.

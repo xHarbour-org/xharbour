@@ -394,7 +394,7 @@ typedef struct _SHELLEXECUTEINFO{;
 
 
 /* SHFILEINFO */
-
+/*
 typedef struct _SHFILEINFO{ ;
     HICON hIcon; 
     int   iIcon; 
@@ -402,7 +402,7 @@ typedef struct _SHFILEINFO{ ;
     char  szDisplayName[MAX_PATH]; 
     char  szTypeName[80]; 
 } SHFILEINFO
- 
+*/ 
 
 /* notifyicondata */
 

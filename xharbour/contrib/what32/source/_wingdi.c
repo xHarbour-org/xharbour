@@ -204,9 +204,9 @@ HB_FUNC( GETOBJECT )
    int nBytes = GetObject( (HGDIOBJ) hb_parnl( 1 ), 0, NULL );
    LPVOID  lpObj = (VOID *) hb_xgrab(nBytes) ;
 
-   nBytes = GetObjectA( (HGDIOBJ) hb_parnl( 1 ), nBytes, lpObj )  ;
+   nBytes = GetObject( (HGDIOBJ) hb_parnl( 1 ), nBytes, lpObj )  ;
 
-   hb_retclen( lpObj,nBytes) ;
+   hb_retclen( (char *) lpObj,nBytes) ;
    hb_xfree(lpObj);
 
 }
@@ -597,11 +597,12 @@ HB_FUNC( SETGRAPHICSMODE )
 //-----------------------------------------------------------------------------
 // WINGDIAPI DWORD WINAPI SetLayout(IN HDC, IN DWORD);
 
-
+/*
 HB_FUNC( SETLAYOUT )
 {
    hb_retnl( (LONG) SetLayout( (HDC) hb_parnl( 1 ), (DWORD) hb_parnl( 2 ) ) ) ;
 }
+*/
 
 //-----------------------------------------------------------------------------
 // WINGDIAPI BOOL WINAPI SwapBuffers(HDC);

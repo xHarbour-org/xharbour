@@ -36,9 +36,9 @@ Static aProc       // array of possible windows procedures (10)
 *-----------------------------------------------------------------------------*
 FUNCTION WhatVersion(dDate)
 
- dDate:=stod("20020721")
+ dDate:=stod("20020821")
 
- RETURN ("0.f")
+ RETURN ("0.g")
 
 *-----------------------------------------------------------------------------*
 
@@ -58,7 +58,7 @@ Function RegisterClass( wndclass, nType, bAction, anWM )
    wndclass:cbWndExtra    := if( wndclass:cbWndExtra==NIL, 0, wndclass:cbWndExtra )
    wndclass:hInstance     := if( wndclass:hInstance==NIL, GetModuleHandle(), wndclass:hInstance )
    wndclass:hIcon         := if( wndclass:hIcon==NIL, LoadIcon(GetModuleHandle(),""), wndclass:hIcon )
-   wndclass:hCursor       := if( wndclass:hCursor==NIL, LoadCursor(, IDC_ARROW), wndclass:hCursor )
+   wndclass:hCursor       := if( wndclass:hCursor==NIL, LoadCursor(, IDC_ARROW), wndclass:hCursor)
    wndclass:hbrBackground := if( wndclass:hbrBackground==NIL, COLOR_WINDOW  + 1, wndclass:hbrBackground )
    wndclass:lpszMenuName  := if( wndclass:lpszMenuName==NIL, "", wndclass:lpszMenuName ) ;
 
@@ -658,7 +658,7 @@ Function ResetProcedure( hWnd, nProc )
       EndIf
    EndIf
 
-   Return( NIL )
+   Return( lRet )
 
 
 *-----------------------------------------------------------------------------*

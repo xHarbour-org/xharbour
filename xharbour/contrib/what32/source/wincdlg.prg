@@ -4,6 +4,11 @@
 #Define RCF_DIALOG     0      // used internally (user custom dialog class - advanced option)
 #Include "commdlg.ch"
 #Include "windows.ch"
+/*
+pragma(4)
+#Include "ctruct.ch"
+#Include "WinStruc.ch"
+*/
 
 // Under development !!!
 
@@ -98,6 +103,7 @@ Function ReplaceText( hWnd, hInst, nFlags, cFindWhat, cReplaceWith, bAction)
    EndIf
 
    Return( hDlg )
+
 
 *-----------------------------------------------------------------------------*
 

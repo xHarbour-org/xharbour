@@ -14,14 +14,82 @@
       Corrected parameters in GetObject() -> cObjBytes:=GetObject(hObj) 
 25/07/2002 AJ Wos
       What32.ch updated, more pseudo-functions added 
+25/07/2002 August Infante
+      WhBrowse: Corrected parameters for vertical alignment now it accepts TA_TOP / TA_CENTER / TA_BOTTOM
+25/07/2002 August Infante
+      WinPie: Slices explode now via oPie:Explode(nSlice,nPorcentage)
 27/07/2002 AJ Wos
-     Updated Wintypes.ch IMAGELIST type added
-     Updated WinStru.ch cleaned up NMHDR added
-     toolbar.ch updated - REBAR defines added
-     tbstruct.ch created - REBAR structures
-     ErrorSys.Prg bug fixed
+      Updated Wintypes.ch IMAGELIST type added
+      Updated WinStru.ch cleaned up NMHDR added
+      toolbar.ch updated - REBAR defines added
+      tbstruct.ch created - REBAR structures
+      ErrorSys.Prg bug fixed
 28/07/2002 AJ Wos
-     Updated What32.ch MAKELPARAM definition added 
+      Updated What32.ch MAKELPARAM definition added 
+03/08/2002 AJ Wos
+      Windows.ch updated, more message definitions added
+03/08/2002 August Infante
+       Updated ChooseColor (_WinCDlg.c) to return NIL in case of cancel
+04/08/2002 August Infante
+      Modified CheckDlgButton (_WinDlg.c) to accept logical values.
+04/08/2002 AJ Wos
+      Completed PageSetupDlg(<psd:Value>) function (_WinCDlg.c).
+      Reinstated PrintDlg(<pd:value>) function (_WinCDlg.c)
+      Added PrintDlgEx(<pd:value>) function (_WinCDlg.c)// NT only
+      Added PrintDlg() and PageSetupDlg() related defines to CommDlg.ch
+      Updated WinTypes.ch
+05/08/2002 August Infante
+      Added GetBitmapSize(hBmp)->aSize function (_WinBmp.c)
+      Added BitmapToRegion(hBmp)->hRgn function       
 
-01/08/2002 AJ Wos
-     Corrected IFEMPTY() definition
+10/08/2002 August Infante
+      Added graphical calculator function to WinPlus.Lib
+
+11/08/2002 AJ Wos
+      Created SQL API raw function calls library
+      Added sqltypes.ch
+      Changed IMPORT syntax, replaced ALIAS clause with AS clause
+      to improve function calling. Suffix "A" no longer necessary   
+
+12/08/2002 AJ Wos
+      Added SnapShot() function WinUtil.Prg
+      Added GetTimeZoneInformations() and SetTimeZoneInformation()
+      to _WinSys.c
+      Corrected WCHAR definition in wintypes.ch
+
+13/08/2002 AJ Wos
+      Corrected whBrowse record pointer during :configure()
+      Cleaned up windows.ch and wingdi.ch
+      
+13/08/2002 August Infanfe
+      Added BubbleTip to WhatPlus PlusBubl.Prg
+
+18/08/2002 August Infanfe
+      Added CreateMDIclient _WinWnd.c ( couldn't do it in a .prg - structures problems ? )
+
+19/08/2002 August Infanfe
+      Modified TheView.prg it respects parent background ( whatermark allowed )
+
+19/08/2002 August Infanfe
+      Added PlusStat.prg Status Bar class because i needed a method height.
+
+19/08/2002 August Infanfe
+      Modified WinRBar.prg i needed a method height.
+
+20/08/2002 AJ Wos
+      Added ChooseFont() (_WinCDlg.c)
+
+20/08/2002 AJ Wos
+      Modified GetTextMetrics() (_WinText.c) added sizeof()
+
+02/09/2002 AJ Wos
+      Fixed GetEnvironmentStrings()
+      Added FreeEnvironmentStrings() to _WinMisc.c
+      Corrected CreateDirectory() in _WinDir.c
+
+ 
+
+
+
+
+  

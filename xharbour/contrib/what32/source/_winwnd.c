@@ -3,7 +3,7 @@
 /*
  * Some parts Copyright 2001 Alexander S.Kresin <alex@belacy.belgorod.su>
  * with author's permission granted on 27 MAy 2002
-	Last change:  WN   29 May 2002   10:59 pm
+   Last change:  WN   29 May 2002   10:59 pm
  */
 
 
@@ -11,6 +11,7 @@
 
 
 #include <windows.h>
+#include <winuser.h>
 #include "item.api"
 #include "hbapi.h"
 
@@ -205,9 +206,9 @@ HB_FUNC ( INVALIDATERECT )
    bRectOk = ( ISARRAY( 2 )  &&   Array2Rect( hb_param(2,HB_IT_ARRAY), &rc ) ) ;
 
    hb_retl( InvalidateRect(
-                           ISNIL(1) ? NULL : (HWND) hb_parnl( 1 )    , 	// handle of window with changed update region
+                           ISNIL(1) ? NULL : (HWND) hb_parnl( 1 )    ,  // handle of window with changed update region
                            bRectOk ? &rc : NULL ,  // address of rectangle coordinates
-                           ISLOG(3) ? hb_parl( 3 ) : TRUE       	// erase-background flag
+                           ISLOG(3) ? hb_parl( 3 ) : TRUE         // erase-background flag
                           ) );
 }
 
@@ -223,10 +224,10 @@ HB_FUNC ( REDRAWWINDOW )
    bRectOk = ( ISARRAY(2) && Array2Rect( hb_param(2,HB_IT_ARRAY), &rc ) ) ;
 
    RedrawWindow(
-    (HWND) hb_parnl( 1 ),          	          // handle of window
+    (HWND) hb_parnl( 1 ),                     // handle of window
      bRectOk ? &rc : NULL                     ,   // address of structure with update rectangle
      ISNIL( 3 ) ? NULL : (HRGN) hb_parnl( 3 ) ,   // handle of update region
-    hb_parni( 4 )                       	  // array of redraw flags
+    hb_parni( 4 )                           // array of redraw flags
    );
 
 }
@@ -259,7 +260,7 @@ HB_FUNC ( GETWINDOWRECT )
    RECT rc;
    PHB_ITEM aMetr ;
 
-   GetWindowRect( (HWND) hb_parnl( 1 ),	&rc );
+   GetWindowRect( (HWND) hb_parnl( 1 ),   &rc );
    aMetr = Rect2Array( &rc  );
 
    _itemReturn( aMetr );
@@ -1172,6 +1173,23 @@ HB_FUNC( SETWINDOWORGEX )
 
 
 //-----------------------------------------------------------------------------
+/* usage:
+  hwndClient:=CreateMdiClient(hWnd,; // frame window
+                                 0,; // window menu
+                               100,; // first child id
+                                 0,; // left
+                                 0,; // top
+                               150,; // width
+                               200)  // height
+*/
 
-
-
+HB_FUNC( CREATEMDICLIENT )
+{
+  HWND hwndClient;
+  HWND hFrame = (HWND) hb_parnl(1);
+  CLIENTCREATESTRUCT clientCreate ;
+  clientCreate.hWindowMenu  = (HMENU)hb_parnl(2);
+  clientCreate.idFirstChild = (INT)hb_parni(3);
+  hwndClient = CreateWindowEx(WS_EX_CLIENTEDGE,"MDICLIENT", NULL,WS_CHILD|WS_CLIPSIBLINGS|WS_VISIBLE,hb_parni(4), hb_parni(5), hb_parni(6), hb_parni(7), (HWND)hFrame,0,GetModuleHandle(NULL),&clientCreate);
+  hb_retnl((LONG)hwndClient);
+}

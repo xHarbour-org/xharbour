@@ -4,30 +4,33 @@
 
 #Include "windows.ch"
 #include 'statbar.ch'
+#include 'what32.ch'
+
+//#define CCM_FIRST                 8192      // Common control shared messages
+//#define CCM_SETBKCOLOR          (CCM_FIRST + 1) // lParam is bkColor
+#define SB_SETBKCOLOR           CCM_SETBKCOLOR      // lParam = bkColor
+//#define SB_SETICON              (WM_USER+15)
+//#define SB_SETTIPTEXT           (WM_USER+16)
+
 
 
 *------------------------------------------------------------------------------
 
 FUNCTION CreateStatusBar(nStyle, cText, hParent, nId  )
-
 LOCAL hSBWnd
 LOCAL nProc
-
    IF ( hSBWnd := CreateStatusWindow(nStyle, cText,hParent, nId )) <> 0
       nProc:=SetProcedure(hParent, {|hWnd, nMsg, nwParam, nlParam| ;
              _SBMove( nProc, hWnd, nMsg, nwParam, nlParam, hSBWnd ) }, WM_SIZE )
    ENDIF
-
-   RETURN(hSBWnd)
+RETURN(hSBWnd)
 
 *------------------------------------------------------------------------------
 
 // internal use
 
 Static FUNCTION  _SBMove(  nProc, hWnd, nMsg, nwParam, nlParam, hSBWnd )
-
    LOCAL aRect
-
    IF nMsg == WM_SIZE
       If IsWindow( hSBWnd )
          aRect := GetWindowRect( hSBWnd )
@@ -36,39 +39,38 @@ Static FUNCTION  _SBMove(  nProc, hWnd, nMsg, nwParam, nlParam, hSBWnd )
 
       Endif
    EndIf
-
-
    Return CallWindowProc( nProc, hWnd, nMsg, nwParam, nlParam )
 
 
 *------------------------------------------------------------------------------
 
 FUNCTION SetStatusBarParts( hSBWnd, aParts )
-
    LOCAL bSizes := ""
-
    AEVAL(aParts,{|x| bSizes+=L2BIN(x)})
-
    return SendMessage( hSBWnd, SB_SETPARTS, LEN( aParts ), bSizes )
 
 
 *------------------------------------------------------------------------------
 
-FUNCTION SetStatusBarText( hSBWnd, nPart, cText )
-
-   return SendMessage( hSBWnd, SB_SETTEXT, nPart, cText )
-
-
+FUNCTION SetStatusBarText( hSBWnd, nPart, cText, nBorder )
+   nBorder:=IFNIL(nBorder,0,nBorder)
+   return SendMessage( hSBWnd, SB_SETTEXT + nBorder, nPart, cText )
 
 
+*------------------------------------------------------------------------------
+
+FUNCTION SetStatusBkColor( hSBWnd, nPart, nColor )
+   return SendMessage( hSBWnd, SB_SETBKCOLOR, nPart, nColor )
 
 
+*------------------------------------------------------------------------------
 
+FUNCTION SetStatusIcon( hSBWnd, nPart, hIcon )
+   return SendMessage( hSBWnd, SB_SETICON, nPart, hIcon )
 
+*------------------------------------------------------------------------------
 
-
-
-
-
+FUNCTION SetStatusToolTip( hSBWnd, nPart, cTTip )
+   return SendMessage( hSBWnd, SB_SETTIPTEXT, nPart, cTTip )
 
 

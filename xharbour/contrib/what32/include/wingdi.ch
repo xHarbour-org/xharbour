@@ -11,17 +11,20 @@
 *                                                                         *
 **************************************************************************/
 
+
 #ifndef _WINGDI_
  //P_O_Push
 #define _WINGDI_
 
+
 #ifndef WINVER
-#define WINVER   1280   // version 5.0
+  #define WINVER   1280   // version 5.0
 #endif // WINVER
 
 #ifndef NOGDI
 
 #ifndef NORASTEROPS
+
 
 // Binary raster ops
 #define R2_BLACK            1   //  0
@@ -43,31 +46,31 @@
 #define R2_LAST             16
 
 // Ternary raster operations
-#define SRCCOPY             (DWORD)  13369376 // dest = source
-#define SRCPAINT            (DWORD)  15597702 // dest = source OR dest
-#define SRCAND              (DWORD)   8913094 // dest = source AND dest
-#define SRCINVERT           (DWORD)   6684742 // dest = source XOR dest
-#define SRCERASE            (DWORD)   4457256 // dest = source AND (NOT dest )
-#define NOTSRCCOPY          (DWORD)   3342344 // dest = (NOT source)
-#define NOTSRCERASE         (DWORD)   1114278 // dest = (NOT src) AND (NOT dest)
-#define MERGECOPY           (DWORD)  12583114 // dest = (source AND pattern)
-#define MERGEPAINT          (DWORD)  12255782 // dest = (NOT source) OR dest
-#define PATCOPY             (DWORD)  15728673 // dest = pattern
-#define PATPAINT            (DWORD)  16452105 // dest = DPSnoo
-#define PATINVERT           (DWORD)   5898313 // dest = pattern XOR dest
-#define DSTINVERT           (DWORD)   5570569 // dest = (NOT dest)
-#define BLACKNESS           (DWORD)        66 // dest = BLACK
-#define WHITENESS           (DWORD)  16711778 // dest = WHITE
-#define NOMIRRORBITMAP      (DWORD)2147483648 // Do not Mirror the bitmap in this call
-#define CAPTUREBLT          (DWORD)1073741824 // Include layered windows
+#define SRCCOPY               13369376 // dest = source
+#define SRCPAINT              15597702 // dest = source OR dest
+#define SRCAND                 8913094 // dest = source AND dest
+#define SRCINVERT              6684742 // dest = source XOR dest
+#define SRCERASE               4457256 // dest = source AND (NOT dest )
+#define NOTSRCCOPY             3342344 // dest = (NOT source)
+#define NOTSRCERASE            1114278 // dest = (NOT src) AND (NOT dest)
+#define MERGECOPY             12583114 // dest = (source AND pattern)
+#define MERGEPAINT            12255782 // dest = (NOT source) OR dest
+#define PATCOPY               15728673 // dest = pattern
+#define PATPAINT              16452105 // dest = DPSnoo
+#define PATINVERT              5898313 // dest = pattern XOR dest
+#define DSTINVERT              5570569 // dest = (NOT dest)
+#define BLACKNESS                   66 // dest = BLACK
+#define WHITENESS             16711778 // dest = WHITE
+#define NOMIRRORBITMAP       2147483648 // Do not Mirror the bitmap in this call
+#define CAPTUREBLT           1073741824 // Include layered windows
 
 // Quaternary raster codes
-#define MAKEROP4(fore,back) (DWORD)((((back) << 8) * 4278190080) + (fore))
+//#define MAKEROP4(fore,back) (DWORD)((((back) << 8) * 4278190080) + (fore))
 
 #endif // NORASTEROPS
 
-#define GDI_ERROR ( 4294967295)
-#define HGDI_ERROR ((HANDLE)( 4294967295))
+#define GDI_ERROR  ( 4294967295)
+#define HGDI_ERROR ( 4294967295)
 
 // Region Flags
 #define ERROR               0
@@ -437,10 +440,10 @@
 // Bitmap Header Definition
 
   
-#include "pshpack1.ch"
+//#include "pshpack1.ch"
 
         
-#include "poppack.ch"
+//#include "poppack.ch"
 
 // Image Color Matching color definitions
 
@@ -479,13 +482,14 @@
 #define ICM_UNREGISTERICMATCHER         6
 #define ICM_QUERYMATCH                  7
 
-// Macros to retrieve CMYK values from a COLORREF
-#define GetKValue(cmyk)      ((BYTE)(cmyk))
-#define GetYValue(cmyk)      ((BYTE)((cmyk)>> 8))
-#define GetMValue(cmyk)      ((BYTE)((cmyk)>>16))
-#define GetCValue(cmyk)      ((BYTE)((cmyk)>>24))
 
-#define CMYK(c,m,y,k)       ((COLORREF)((((BYTE)(k)|((WORD)((BYTE)(y))<<8))|(((DWORD)(BYTE)(m))<<16))|(((DWORD)(BYTE)(c))<<24)))
+// Macros to retrieve CMYK values from a COLORREF
+//#define GetKValue(cmyk)      ((BYTE)(cmyk))
+//#define GetYValue(cmyk)      ((BYTE)((cmyk)>> 8))
+//#define GetMValue(cmyk)      ((BYTE)((cmyk)>>16))
+//#define GetCValue(cmyk)      ((BYTE)((cmyk)>>24))
+
+//#define CMYK(c,m,y,k)       ((COLORREF)((((BYTE)(k)|((WORD)((BYTE)(y))<<8))|(((DWORD)(BYTE)(m))<<16))|(((DWORD)(BYTE)(c))<<24)))
 
         
 // Values for bV5CSType
@@ -500,7 +504,7 @@
 #define BI_JPEG       4L
 #define BI_PNG        5L
 
-#define MAKEPOINTS(l)       (*((POINTS FAR *)&(l)))
+//#define MAKEPOINTS(l)       (*((POINTS FAR *)&(l)))
 
 #ifndef NOFONTSIG
 
@@ -579,9 +583,9 @@
 #define CLIP_CHARACTER_PRECIS   1
 #define CLIP_STROKE_PRECIS      2
 #define CLIP_MASK                15
-#define CLIP_LH_ANGLES          (1<<4)
-#define CLIP_TT_ALWAYS          (2<<4)
-#define CLIP_EMBEDDED           (8<<4)
+//#define CLIP_LH_ANGLES          (1<<4)
+//#define CLIP_TT_ALWAYS          (2<<4)
+//#define CLIP_EMBEDDED           (8<<4)
 
 #define DEFAULT_QUALITY         0
 #define DRAFT_QUALITY           1
@@ -630,16 +634,17 @@
 #define FS_CHINESETRAD              1048576
 #define FS_JOHAB                    2097152
 #define FS_SYMBOL                2147483648
+
 // Font Families
-#define FF_DONTCARE         (0<<4)  // Don't care or don't know.
-#define FF_ROMAN            (1<<4)  // Variable stroke width, serifed.
-                                    // Times Roman, Century Schoolbook, etc.
-#define FF_SWISS            (2<<4)  // Variable stroke width, sans-serifed.
-                                    // Helvetica, Swiss, etc.
-#define FF_MODERN           (3<<4)  // Constant stroke width, serifed or sans-serifed.
-                                    // Pica, Elite, Courier, etc.
-#define FF_SCRIPT           (4<<4)  // Cursive, etc.
-#define FF_DECORATIVE       (5<<4)  // Old English, etc.
+#define FF_DONTCARE         0  // Don't care or don't know.
+#define FF_ROMAN           16  // Variable stroke width, serifed.
+                                 // Times Roman, Century Schoolbook, etc.
+#define FF_SWISS           32  // Variable stroke width, sans-serifed.
+                                 // Helvetica, Swiss, etc.
+#define FF_MODERN          48  // Constant stroke width, serifed or sans-serifed.
+                                 // Pica, Elite, Courier, etc.
+#define FF_SCRIPT          64  // Cursive, etc.
+#define FF_DECORATIVE      80  // Old English, etc.
 
 // Font Weights
 #define FW_DONTCARE         0
@@ -791,9 +796,9 @@
 #define DEVICE_FONTTYPE         2
 #define TRUETYPE_FONTTYPE       4
 
-#define RGB(r,g,b)          ((COLORREF)(((BYTE)(r)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(b))<<16)))
+//#define RGB(r,g,b)          ((COLORREF)(((BYTE)(r)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(b))<<16)))
 #define PALETTERGB(r,g,b)   (  33554432 + RGB(r,g,b))
-#define PALETTEINDEX(i)     ((COLORREF)(  16777216 + (DWORD)(WORD)(i)))
+//#define PALETTEINDEX(i)     ((COLORREF)(  16777216 + (DWORD)(WORD)(i)))
 
 // palette entry flags
 
@@ -801,9 +806,9 @@
 #define PC_EXPLICIT        2    // palette index is explicit to device
 #define PC_NOCOLLAPSE      4    // do not match color to system palette
 
-#define GetRValue(rgb)      ((BYTE)(rgb))
-#define GetGValue(rgb)      ((BYTE)(((WORD)(rgb)) >> 8))
-#define GetBValue(rgb)      ((BYTE)((rgb)>>16))
+//#define GetRValue(rgb)      ((BYTE)(rgb))
+//#define GetGValue(rgb)      ((BYTE)(((WORD)(rgb)) >> 8))
+//#define GetBValue(rgb)      ((BYTE)((rgb)>>16))
 
 // Background Modes
 #define TRANSPARENT         1
@@ -1065,8 +1070,6 @@
 #define RC_OP_DX_OUTPUT      16384
 #define RC_DEVBITS           32768
 
-#if(WINVER >=   1280)
-
 // Shading and blending caps
 #define SB_NONE                      0
 #define SB_CONST_ALPHA               1
@@ -1081,9 +1084,6 @@
 #define CM_DEVICE_ICM                1
 #define CM_GAMMA_RAMP                2
 #define CM_CMYK_COLOR                4
-
-#endif // WINVER >= 0x0500
-
 
 // DIB color table identifiers
 
@@ -1550,8 +1550,8 @@
 
 #define GGI_MARK_NONEXISTING_GLYPHS  0X0001
 
-#define STAMP_DESIGNVECTOR  (134217728 + 'd' + ('v' << 8))
-#define STAMP_AXESLIST      (134217728 + 'a' + ('l' << 8))
+//#define STAMP_DESIGNVECTOR  (134217728 + 'd' + ('v' << 8))
+//#define STAMP_AXESLIST      (134217728 + 'a' + ('l' << 8))
 #define MM_MAX_NUMAXES      16
 
 #define FR_PRIVATE       16
@@ -1611,18 +1611,18 @@
 #define ILLUMINANT_NTSC             ILLUMINANT_C
 
 // Min and max for RedGamma, GreenGamma, BlueGamma
-#define RGB_GAMMA_MIN               (WORD)02500
-#define RGB_GAMMA_MAX               (WORD)65000
+#define RGB_GAMMA_MIN               02500
+#define RGB_GAMMA_MAX               65000
 
 // Min and max for ReferenceBlack and ReferenceWhite
-#define REFERENCE_WHITE_MIN         (WORD)6000
-#define REFERENCE_WHITE_MAX         (WORD)10000
-#define REFERENCE_BLACK_MIN         (WORD)0
-#define REFERENCE_BLACK_MAX         (WORD)4000
+#define REFERENCE_WHITE_MIN         6000
+#define REFERENCE_WHITE_MAX         10000
+#define REFERENCE_BLACK_MIN         0
+#define REFERENCE_BLACK_MAX         4000
 
 // Min and max for Contrast, Brightness, Colorfulness, RedGreenTint
-#define COLOR_ADJ_MIN               (SHORT)-100
-#define COLOR_ADJ_MAX               (SHORT)100
+#define COLOR_ADJ_MIN               -100
+#define COLOR_ADJ_MAX               100
 
 #define DI_APPBANDING                        1
 #define DI_ROPS_READ_DESTINATION             2
@@ -1853,5 +1853,5 @@
 #define WGL_SWAP_UNDERLAY15     1073741824
 
 #endif // _WINGDI_
-
+#endif
 

@@ -20,6 +20,15 @@ Modified and non-API functions:
 #include "item.api"
 #include "hbapi.h"
 
+extern PHB_ITEM Rect2Array( RECT *rc  );
+extern BOOL Array2Rect(PHB_ITEM aRect, RECT *rc );
+extern PHB_ITEM Point2Array( POINT *pt  );
+extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
+extern BOOL Array2Size(PHB_ITEM aSize, SIZE *siz );
+extern PHB_ITEM Size2Array( SIZE *siz  );
+extern void Point2ArrayEx( POINT *pt  , PHB_ITEM aPoint);
+extern void Rect2ArrayEx( RECT *pt  , PHB_ITEM aRect);
+extern void Size2ArrayEx( SIZE *siz  ,  PHB_ITEM aSize);
 
 //-----------------------------------------------------------------------------
 // to be tested
@@ -62,6 +71,26 @@ HB_FUNC ( DRAWBITMAP )
    DeleteDC( hDCmem );
 }
 
+HB_FUNC( GETBITMAPSIZE )
+{
+   PHB_ITEM aArray = _itemArrayNew(2) ;
+   PHB_ITEM tmp ;
+   BITMAP bm;
+   HBITMAP hBmp = (HBITMAP) hb_parnl(1);
+
+   GetObject(hBmp, sizeof(bm), &bm);
+
+   tmp = _itemPutNL( NULL, bm.bmWidth );
+   hb_arraySet( aArray, 1, tmp );
+   _itemRelease( tmp );
+
+   tmp = _itemPutNL( NULL, bm.bmHeight );
+   hb_arraySet( aArray, 2, tmp );
+   _itemRelease( tmp );
+
+  _itemReturn( aArray );
+  _itemRelease( aArray );
+}
 
 //-----------------------------------------------------------------------------
 // WINGDIAPI BOOL WINAPI GetBitmapDimensionEx( IN HBITMAP, OUT LPSIZE);
@@ -69,27 +98,16 @@ HB_FUNC ( DRAWBITMAP )
 // Syntax
 // GetBitmapDimensionEx(hBmp) -> aSize or NIL
 
-
 HB_FUNC( GETBITMAPDIMENSIONEX )
 {
    SIZE  Size  ;
    PHB_ITEM aSize ;
-   PHB_ITEM temp  ;
 
    if  ( GetBitmapDimensionEx( (HBITMAP) hb_parnl( 1 ), &Size )  )
    {
-      aSize = _itemArrayNew( 2 );
-
-      temp = _itemPutNL( NULL, Size.cx );
-      hb_arraySet( aSize, 1, temp );
-      hb_itemRelease( temp );
-
-      temp = _itemPutNL( NULL, Size.cy );
-      hb_arraySet( aSize, 2, temp );
-      hb_itemRelease( temp );
-
-      hb_itemReturn( aSize );
-      hb_itemRelease( aSize );
+      aSize = Size2Array( &Size ) ;
+      _itemReturn( aSize );
+      _itemRelease( aSize );
    }
 
 }
@@ -279,6 +297,24 @@ HB_FUNC( MASKBLT )
                      hb_parni( 11 )         ,
                      (DWORD) hb_parnl( 12 ) 
                      ) ) ;
+}
+
+//-----------------------------------------------------------------------------
+// WINGDIAPI BOOL WINAPI BitBlt( IN HDC, IN int, IN int, IN int, IN int, IN HDC, IN int, IN int, IN DWORD);
+
+
+HB_FUNC( BITBLT )
+{
+   hb_retl( BitBlt( (HDC) hb_parnl( 1 )  ,
+                    hb_parni( 2 )        ,
+                    hb_parni( 3 )        ,
+                    hb_parni( 4 )        ,
+                    hb_parni( 5 )        ,
+                    (HDC) hb_parnl( 6 )  ,
+                    hb_parni( 7 )        ,
+                    hb_parni( 8 )        ,
+                    (DWORD) hb_parnl( 9 )
+                    ) ) ;
 }
 
 //-----------------------------------------------------------------------------

@@ -372,10 +372,21 @@ HB_FUNC ( CHECKBIT )
 //-----------------------------------------------------------------------------
 // WINBASEAPI LPSTR WINAPI GetEnvironmentStrings( VOID );
 
+// note: returns the actual pointer
 
 HB_FUNC( GETENVIRONMENTSTRINGS )
 {
-   hb_retc( (LPSTR) GetEnvironmentStrings(  ) ) ;
+   hb_retnl( (LONG) GetEnvironmentStrings(  ) ) ;
+}
+
+
+
+//-----------------------------------------------------------------------------
+// WINBASEAPI LPSTR WINAPI GetEnvironmentStrings( VOID );
+
+HB_FUNC( FREEENVIRONMENTSTRINGS )
+{
+   hb_retl( (LONG) FreeEnvironmentStrings( (LPTSTR) hb_parnl(1) ) ) ;
 }
 
 

@@ -6,7 +6,7 @@
 /*
  * Some parts Copyright 2001 Alexander S.Kresin <alex@belacy.belgorod.su>
  * with author's permission granted on 27 MAy 2002
-	Last change:  WN   27 May 2002   10:23 am
+   Last change:  WN   27 May 2002   10:23 am
  */
 
 
@@ -35,8 +35,8 @@ HB_FUNC ( ENDDIALOG )
 HB_FUNC ( GETDLGITEM )
 {
    HWND hWnd = GetDlgItem(
-                 (HWND) hb_parnl( 1 ),	// handle of dialog box
-                 hb_parni( 2 )	        // identifier of control
+                 (HWND) hb_parnl( 1 ), // handle of dialog box
+                 hb_parni( 2 )           // identifier of control
                );
    hb_retnl( (LONG) hWnd );
 }
@@ -104,9 +104,9 @@ HB_FUNC( SETDLGITEMINT )
 HB_FUNC ( SETDLGITEMTEXT )
 {
     SetDlgItemText(
-       (HWND) hb_parnl( 1 ),	// handle of dialog box
-       hb_parni( 2 ),	        // identifier of control
-       (LPCTSTR) hb_parc( 3 ) 	// text to set
+       (HWND) hb_parnl( 1 ),  // handle of dialog box
+       hb_parni( 2 ),           // identifier of control
+       (LPCTSTR) hb_parc( 3 )    // text to set
     );
 }
 
@@ -121,10 +121,10 @@ HB_FUNC ( GETDLGITEMTEXT )  // GETDLGITMTEXT
    char *cText = (char*) hb_xgrab( iLen );
 
    GetDlgItemText(
-                  (HWND) hb_parnl( 1 ), 	// handle of dialog box
-                  hb_parni( 2 ),          	// identifier of control
-                  (LPTSTR) cText,       	// address of buffer for text
-                  iLen                   	// maximum size of string
+                  (HWND) hb_parnl( 1 ),   // handle of dialog box
+                  hb_parni( 2 ),             // identifier of control
+                  (LPTSTR) cText,         // address of buffer for text
+                  iLen                    // maximum size of string
                  );
 
    hb_retc( cText );
@@ -158,10 +158,9 @@ HB_FUNC ( GETLBITEMTEXT )  // GETDLGITMTEXT
 HB_FUNC ( CHECKDLGBUTTON )
 {
     hb_retl( CheckDlgButton(
-                             (HWND) hb_parnl( 1 ),	// handle of dialog box
-                             hb_parni( 2 ),	        // identifier of control
-                             ( hb_parni( 3 ) )  	// value to set
-                           ) ) ;
+                             (HWND) hb_parnl( 1 ), // handle of dialog box
+                             hb_parni( 2 ),          // identifier of control
+                             ISNUM(3) ? hb_parni(3) : (UINT) hb_parl(3) ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -169,10 +168,10 @@ HB_FUNC ( CHECKDLGBUTTON )
 HB_FUNC ( CHECKRADIOBUTTON )
 {
     hb_retl( CheckRadioButton(
-                              (HWND) hb_parnl( 1 ),	// handle of dialog box
-                              hb_parni( 2 ),	        // identifier of first radio button in group
-                              hb_parni( 3 ),	        // identifier of last radio button in group
-                              hb_parni( 4 )	        // identifier of radio button to select
+                              (HWND) hb_parnl( 1 ),   // handle of dialog box
+                              hb_parni( 2 ),         // identifier of first radio button in group
+                              hb_parni( 3 ),         // identifier of last radio button in group
+                              hb_parni( 4 )          // identifier of radio button to select
                              ) ) ;
 }
 
