@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.5 2003/06/26 01:29:15 ronpinkas Exp $
+ * $Id: cdpapi.c,v 1.6 2003/06/30 17:08:57 ronpinkas Exp $
  */
 
 /*
@@ -304,6 +304,21 @@ void HB_EXPORT hb_cdpnTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdp
          }
       }
    }
+}
+
+int HB_EXPORT hb_cdpchrcmp( char cFirst, char cSecond, PHB_CODEPAGE cdpage )
+{
+   int n1, n2;
+
+   if( cFirst == cSecond )
+      return 0;
+
+   if( ( n1 = (int)cdpage->s_chars[ ((int)cFirst)&255 ] ) != 0 &&
+       ( n2 = (int)cdpage->s_chars[ ((int)cSecond)&255 ] ) != 0 )
+      return ( n1 < n2 )? -1 : 1;
+
+   return ( (((int)cFirst)&255) < (((int)cSecond)&255) ) ? -1 : 1;
+
 }
 
 int HB_EXPORT hb_cdpcmp( char* szFirst, char* szSecond, ULONG ulLen, PHB_CODEPAGE cdpage, ULONG* piCounter )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1351 2003/08/16 01:55:47 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1352 2003/08/16 03:39:30 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-18 13:56 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/xharbour.spec
+    * minor corecrections
+
+  * xharbour/contrib/libct/Makefile
+  * xharbour/contrib/libct/makefile.bc
+  * xharbour/contrib/libct/makefile.vc
+  + xharbour/contrib/libct/time.prg
+    + Added some missing CT functions: TIMETOSEC(), SECTOTIME(), MILLISEC()
+      Thanks to Piero Vincenzo Lupano <pierovincenzo1956@supereva.it>
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx2.h
+  * xharbour/include/hbapicdp.h
+  * xharbour/source/rtl/cdpapi.c
+    * many bug fixed, codepage support added but only character oriented
+      (it means that you cannot sort in correctly whit this languages which
+      use multibyte characters, not sorted chars, etc. but should be enough
+      for many people).
+      It should be quit stable now but it is still very slooow.
+      Only one fast think in it is index procedure which creates
+      character oriented structure to speed up this operation but in
+      fact it's very poor idea which doesn't allow me to add full
+      codepage support so it has to be remove and written again in the
+      future. I spend three days on this code and I have to say that
+      I cannot improve the speed without rewriting most of them.
+      Some thinks I can made acceptable fast but they will never been
+      the speed daemon.
+      Now I'm waiting for bug reports from users.
 
 2003-08-16 00:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * doc\genhtm.rsp

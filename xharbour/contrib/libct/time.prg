@@ -1,13 +1,14 @@
 /*
- * $Id: hbapicdp.h,v 1.4 2003/06/19 02:44:49 druzus Exp $
+ * $Id$
  */
 
 /*
- * Harbour Project source code:
- * Header file for the CodePages API
+ * xHarbour Project source code:
+ * TIMETOSEC(), SECTOTIME(), MILLISEC()
  *
- * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
- * www - http://www.harbour-project.org
+ * Copyright 2003 Piero Vincenzo Lupano <pierovincenzo1956@supereva.it>
+ * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,63 +51,49 @@
  *
  */
 
-#ifndef HB_CDP_SUPPORT_OFF
+function TIMETOSEC( cTime )
+local nSec := 0, nLen, i, aLim, aMod, nInd, n
+if cTime == NIL
+    nSec := seconds()
+elseif valtype( cTime ) == "C"
+    nLen := len( cTime )
+    if ( nLen + 1 ) % 3 == 0 .and. nLen <= 11
+        nInd := 1
+        aLim := { 24, 60, 60, 100 }
+        aMod := { 3600, 60, 1, 1/100 }
+        for i := 1 to nLen step 3
+            if isdigit( substr( cTime, i,     1 ) ) .and. ;
+               isdigit( substr( cTime, i + 1, 1 ) ) .and. ;
+               ( i == nLen - 1 .or. substr( cTime, i + 2, 1 ) == ":" ) .and. ;
+               ( n := val( substr( cTime, i, 2 ) ) ) < aLim[ nInd ]
+                nSec += n * aMod[ nInd ] 
+            else
+                nSec := 0
+                exit
+            endif
+            ++nInd
+        next
+    endif
+endif
+return round( nSec, 2) /* round FL val to be sure that you can compare it */
 
-#ifndef HB_APICDP_H_
-#define HB_APICDP_H_
 
-#include <ctype.h>
-#include "hbapi.h"
-#include "hbinit.h"
+function SECTOTIME( nSec, lHundr )
+local i, h, n
+n := iif( !valtype( nSec ) == "N", seconds(), nSec )
+if valtype( lHundr ) == "L" .and. lHundr
+   h := strzero( ( nSec * 100 ) % 100, 2 )
+else
+   h := ""
+endif
+n := int( n % 86400 )
+for i := 1 to 3
+  h := strzero( n % 60, 2 ) + iif( len( h ) == 0, "", ":") + h
+  n := int( n / 60 )
+next
+return h
 
-/* This hack is needed to force preprocessing if id is also a macro */
-#define HB_CODEPAGE_REQUEST( id )           HB_CODEPAGE_REQUEST_( id )
-#define HB_CODEPAGE_REQUEST_( id )          extern HB_FUNC( HB_CODEPAGE_##id ); \
-                                        void hb_codepage_ForceLink_##id( void ) \
-                                        { \
-                                           HB_FUNCNAME( HB_CODEPAGE_##id )(); \
-                                        }
 
-#define HB_CODEPAGE_ANNOUNCE( id )          HB_FUNC( HB_CODEPAGE_##id ) {}
-
-typedef struct _HB_MULTICHAR
-{
-   char  cLast[2];
-   char  cFirst[2];
-   int   nCode;
-} HB_MULTICHAR, * PHB_MULTICHAR;
-
-typedef struct _HB_CODEPAGE
-{
-   char *id;
-   int   nChars;
-   char *CharsUpper;
-   char *CharsLower;
-   BOOL  lLatin;
-   BOOL  lAccEqual;
-   BOOL  lAccInterleave;
-   BOOL  lSort;
-   BYTE *s_chars;
-   BYTE *s_upper;
-   BYTE *s_lower;
-   BYTE *s_accent;
-   int   nMulti;
-   PHB_MULTICHAR multi;
-} HB_CODEPAGE, * PHB_CODEPAGE;
-
-extern BOOL HB_EXPORT hb_cdpRegister( PHB_CODEPAGE );
-extern char HB_EXPORT * hb_cdpSelectID( char * );
-extern PHB_CODEPAGE HB_EXPORT hb_cdpSelect( PHB_CODEPAGE );
-extern PHB_CODEPAGE HB_EXPORT hb_cdpFind( char * );
-extern void HB_EXPORT hb_cdpTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE );
-extern void HB_EXPORT hb_cdpnTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE, unsigned int );
-extern int HB_EXPORT hb_cdpcmp( char*, char*, ULONG, PHB_CODEPAGE, ULONG* );
-extern int HB_EXPORT hb_cdpchrcmp( char, char, PHB_CODEPAGE );
-
-#endif /* HB_APICDP_H_ */
-
-#else
-
-#define PHB_CODEPAGE void*
-
-#endif /* HB_CDP_SUPPORT_OFF */
+function MILLISEC( nDelay )
+SECONDSSLEEP(nDelay / 1000)
+return ""

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2003/06/17 00:54:33 druzus Exp $
+# $Id: Makefile,v 1.6 2003/08/10 21:52:01 druzus Exp $
 #
 
 ROOT = ../../
@@ -78,6 +78,7 @@ PRG_SOURCES= \
 	numconv.prg \
 	screen2.prg \
 	setlast.prg \
+	time.prg \
 
 LIBNAME=ct
 ifeq ($(HB_MT),MT)

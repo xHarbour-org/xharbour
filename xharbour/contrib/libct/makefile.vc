@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.2 2003/03/22 17:22:44 lculik Exp $
+# $Id: makefile.vc,v 1.3 2003/03/29 19:16:40 paultucker Exp $
 #
 
 #
@@ -175,7 +175,8 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\invertwin.obj \
    $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\screen2.obj \
-   $(OBJ_DIR)\setlast.obj
+   $(OBJ_DIR)\setlast.obj \
+   $(OBJ_DIR)\time.obj \
 
 #
 # Our default target
@@ -247,6 +248,7 @@ CLEAN:
    -@if exist $(OBJ_DIR)\numconv.* del $(OBJ_DIR)\numconv.*
    -@if exist $(OBJ_DIR)\screen2.* del $(OBJ_DIR)\screen2.*
    -@if exist $(OBJ_DIR)\setlast.* del $(OBJ_DIR)\screen2.*
+   -@if exist $(OBJ_DIR)\time.* del $(OBJ_DIR)\time.*
    -@if exist $(TOOLS_LIB) del $(TOOLS_LIB)
 
 #
