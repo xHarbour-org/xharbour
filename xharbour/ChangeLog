@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.947 2003/04/13 11:35:44 jonnymind Exp $
+ * $Id: ChangeLog,v 1.948 2003/04/13 12:35:10 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-13 15:18 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/trpccli.prg
+    ! Now trpcclient class is also in rtl.lib, compiling without
+      threads if used in Sync mode. Async mode is currently not
+      available in non-mt environments.
+
+  + tests/rpcclientst.prg
+    ! Added a test for single thread mode RPC client.
+
+  - source/rtl/uses_mt/Makefile
+  - source/rtl/trpccli.prg
+  - source/rtl/trpc.prg
+    - No more needed.
 
 2003-04-13 14:34 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/hbcrypt.c

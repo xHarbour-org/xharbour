@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.11 2003/04/13 11:16:28 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.12 2003/04/13 12:35:17 jonnymind Exp $
  */
 
 /*
@@ -51,8 +51,6 @@
  *
  */
 
-#ifdef HB_THREAD_SUPPORT
-
 #include "hbclass.ch"
 
 CLASS tRPCClient
@@ -95,7 +93,10 @@ CLASS tRPCClient
    DATA nTcpTimeBegin INIT 0
    DATA thTcpAccept   INIT -1
 
+#ifdef HB_THREAD_SUPPORT
    DATA mtxBusy INIT CreateMutex()
+#endif
+
    DATA oResult
 
    /* Encryption data */
@@ -170,7 +171,9 @@ RETURN Self
 
 METHOD Destroy() CLASS tRPCClient
 
+#ifdef HB_THREAD_SUPPORT
    MutexLock( ::mtxBusy )
+#endif
       ::Disconnect()
       IF .not. Empty( ::skTcp )
          InetDestroy( ::skTcp )
@@ -179,15 +182,21 @@ METHOD Destroy() CLASS tRPCClient
          InetDestroy( ::skUdp )
       ENDIF
       IF ::thUdpAccept > 0
+         #ifdef HB_THREAD_SUPPORT
          KillThread( ::thUdpAccept )
+         #endif
          ::thUdpAccept := -1
       ENDIF
       IF ::thTcpAccept > 0
+         #ifdef HB_THREAD_SUPPORT
          KillThread( ::thTcpAccept )
+         #endif
          ::thTcpAccept := -1
       ENDIF
+#ifdef HB_THREAD_SUPPORT
    MutexUnlock( ::mtxBusy )
    DestroyMutex( ::mtxBusy )
+#endif
 RETURN .T.
 
 
@@ -202,9 +211,13 @@ METHOD ScanServers(cName, nTime ) CLASS tRPCClient
       RETURN .F.
    ENDIF
 
+   #ifdef HB_THREAD_SUPPORT
    MutexLock( ::mtxBusy )
    ::aServers = {}
    MutexUnlock( ::mtxBusy )
+   #else
+   ::aServers = {}
+   #endif
 
    InetDGramSend( ::skUDP, ::cNetwork , ::nUdpPort, "XHBR00" + HB_Serialize( cName ) )
    ::StartScan( nTime )
@@ -218,9 +231,13 @@ METHOD ScanFunctions(cFunc, cSerial, nTime ) CLASS tRPCClient
       RETURN .F.
    ENDIF
 
+#ifdef HB_THREAD_SUPPORT
    MutexLock( ::mtxBusy )
    ::aFunctions = {}
    MutexUnlock( ::mtxBusy )
+#else
+   ::aFunctions = {}
+#endif
 
    InetDGramSend( ::skUDP, ::cNetwork, ::nUdpPort,;
          "XHBR01" + HB_Serialize( cFunc ) + HB_Serialize( cSerial ))
@@ -248,9 +265,11 @@ METHOD StartScan( nTime )
 
    // in async mode, just launch the listener
    IF ::lAsyncMode
-      MutexLock( ::mtxBusy )
-         ::thUdpAccept := StartThread( Self, "UDPAccept" )
-      MutexUnlock( ::mtxBusy )
+      #ifdef HB_THREAD_SUPPORT
+         MutexLock( ::mtxBusy )
+            ::thUdpAccept := StartThread( Self, "UDPAccept" )
+         MutexUnlock( ::mtxBusy )
+      #endif
    ELSE
       ::UDPAccept()
    ENDIF
@@ -272,12 +291,18 @@ METHOD UDPAccept() CLASS tRPCClient
    DO WHILE .T.
       nDatalen := InetDGramRecv( ::skUDP, @cData, 1400 )
 
-      MutexLock( ::mtxBusy )
-      IF .not. ::UDPParse( cData, nDatalen )
+      #ifdef HB_THREAD_SUPPORT
+         MutexLock( ::mtxBusy )
+         IF .not. ::UDPParse( cData, nDatalen )
+            MutexUnlock( ::mtxBusy )
+            EXIT
+         ENDIF
          MutexUnlock( ::mtxBusy )
-         EXIT
-      ENDIF
-      MutexUnlock( ::mtxBusy )
+      #else
+         IF .not. ::UDPParse( cData, nDatalen )
+            EXIT
+         ENDIF
+      #endif
 
       IF ::nUDPTimeout >= 0
          nTime := Int( Seconds() * 1000 )
@@ -292,9 +317,13 @@ METHOD UDPAccept() CLASS tRPCClient
 
    ::OnScanComplete()
    // signal that this thread is no longer active
-   MutexLock( ::mtxBusy )
-   ::thUdpAccept := -1
-   MutexUnlock( ::mtxBusy )
+   #ifdef HB_THREAD_SUPPORT
+      MutexLock( ::mtxBusy )
+      ::thUdpAccept := -1
+      MutexUnlock( ::mtxBusy )
+   #else
+      ::thUdpAccept := -1
+   #endif
 
 RETURN .T.
 
@@ -343,6 +372,7 @@ RETURN .T.
 
 
 METHOD StopScan() CLASS tRPCClient
+#ifdef HB_THREAD_SUPPORT
    MutexLock( ::mtxBusy )
    IF ::thUDPAccept > 0
       KillThread( ::thUDPAccept )
@@ -352,6 +382,12 @@ METHOD StopScan() CLASS tRPCClient
    ELSE
       MutexUnlock( ::mtxBusy )
    ENDIF
+#else
+   IF ::thUDPAccept > 0
+      ::thUDPAccept := -1
+      ::OnScanComplete()
+   ENDIF
+#endif
 RETURN .T.
 
 
@@ -464,11 +500,15 @@ RETURN .T.
 METHOD Disconnect() CLASS tRPCClient
 
    IF ::nStatus >= 3
-      MutexLock( ::mtxBusy )
+      #ifdef HB_THREAD_SUPPORT
+         MutexLock( ::mtxBusy )
+      #endif
       ::nStatus :=  0
       InetSendAll( ::skTcp, "XHBR92" )
       InetDestroy( ::skTcp )
-      MutexUnlock( ::mtxBusy )
+      #ifdef HB_THREAD_SUPPORT
+         MutexUnlock( ::mtxBusy )
+      #endif
       RETURN .T.
    ENDIF
 
@@ -503,12 +543,18 @@ METHOD CallMode( cFunction, aParams, nTime, nMode, aElems ) CLASS tRPCClient
       RETURN NIL
    ENDIF
 
-   MutexLock( ::mtxBusy )
-   // already active or not already connected
-   IF ::thTcpAccept > 0 .or. ::skTCP == NIL .or. ::nStatus < 3
-      MutexUnlock( ::mtxBusy )
-      RETURN NIL
-   ENDIF
+   #ifdef HB_THREAD_SUPPORT
+      MutexLock( ::mtxBusy )
+      // already active or not already connected
+      IF ::thTcpAccept > 0 .or. ::skTCP == NIL .or. ::nStatus < 3
+         MutexUnlock( ::mtxBusy )
+         RETURN NIL
+      ENDIF
+   #else
+      IF ::thTcpAccept > 0 .or. ::skTCP == NIL .or. ::nStatus < 3
+         RETURN NIL
+      ENDIF
+   #endif
 
    ::oResult := NIL
    ::nStatus := 4 // waiting for a reply
@@ -526,20 +572,29 @@ METHOD CallMode( cFunction, aParams, nTime, nMode, aElems ) CLASS tRPCClient
    ENDIF
 
    // in async mode, just launch the listener
-   IF ::lAsyncMode
-      ::thTCPAccept := StartThread( Self, "TCPAccept" )
-      MutexUnlock( ::mtxBusy )
-   ELSE
-      MutexUnlock( ::mtxBusy )
+   #ifdef HB_THREAD_SUPPORT
+      IF ::lAsyncMode
+         ::thTCPAccept := StartThread( Self, "TCPAccept" )
+         MutexUnlock( ::mtxBusy )
+      ELSE
+         MutexUnlock( ::mtxBusy )
+         ::TCPAccept()
+         MutexLock( ::mtxBusy )
+         // Has something bad happened in the meanwhile?
+         IF ::nStatus > 3
+            oRet := ::oResult
+            ::nStatus := 3 // reply complete
+         ENDIF
+         MutexUnlock( ::mtxBusy )
+      ENDIF
+   #else
       ::TCPAccept()
-      MutexLock( ::mtxBusy )
       // Has something bad happened in the meanwhile?
       IF ::nStatus > 3
          oRet := ::oResult
          ::nStatus := 3 // reply complete
       ENDIF
-      MutexUnlock( ::mtxBusy )
-   ENDIF
+   #endif
 RETURN oRet
 
 
@@ -641,17 +696,20 @@ METHOD TCPAccept() CLASS tRPCClient
       ENDIF
    ENDDO
 
+   #ifdef HB_THREAD_SUPPORT
+   MutexLock( ::mtxBusy )
+   #endif
    IF InetErrorCode( ::skTCP ) != 0
       ::nStatus := 0
       InetDestroy( ::skTCP )
       ::skTCP := NIL
-      MutexUnlock( ::mtxBusy )
    ENDIF
 
    // signal that this thread is no longer active.
-   MutexLock( ::mtxBusy )
    ::thTcpAccept := -1
+   #ifdef HB_THREAD_SUPPORT
    MutexUnlock( ::mtxBusy )
+   #endif
 
 RETURN .T.
 
@@ -826,5 +884,3 @@ METHOD OnFunctionProgress( nProgress, oData ) CLASS tRPCClient
    ENDIF
 RETURN .T.
 
-
-#endif // HB_THREAD_SUPPORT
