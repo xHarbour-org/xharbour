@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.28 2004/07/30 09:54:16 likewolf Exp $
+ * $Id: files.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
@@ -257,9 +257,9 @@ HB_FUNC( SETFATTR )
          }
 
          if ( !( iFlags & ~( FA_ARCH | FA_HIDDEN | FA_RDONLY | FA_SYSTEM ) ) )
-	 {
-	    iReturn = _chmod( szFile, 1, iFlags );
-	 }
+    {
+       iReturn = _chmod( szFile, 1, iFlags );
+    }
 
          hb_retni( iReturn );
       }
@@ -326,7 +326,7 @@ HB_FUNC( SETFATTR )
 HB_FUNC( FILESEEK )
 {
    BOOL bFound = FALSE;
-   
+
    #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
    {
       LPCTSTR szFile;
@@ -363,17 +363,17 @@ HB_FUNC( FILESEEK )
 
          if ( hLastFind != INVALID_HANDLE_VALUE )
          {
-	    bFound = TRUE;
+       bFound = TRUE;
             hb_retc( Lastff32.cFileName );
          }
       }
       else
       {
          if ( FindNextFile( hLastFind, &Lastff32 ) )
-	 {
-	    bFound = TRUE;
+    {
+       bFound = TRUE;
             hb_retc( Lastff32.cFileName );
-	 }
+    }
          else
          {
             FindClose( hLastFind );
@@ -406,7 +406,7 @@ HB_FUNC( FILESEEK )
 
          if ( !iFind )
          {
-	    bFound = TRUE;
+       bFound = TRUE;
             hb_retc( fsOldFiles.ff_name );
          }
       }
@@ -415,7 +415,7 @@ HB_FUNC( FILESEEK )
          iFind = findnext( &fsOldFiles );
          if ( !iFind )
          {
-	    bFound = TRUE;
+       bFound = TRUE;
             hb_retc( fsOldFiles.ff_name );
          }
          #if !defined ( __DJGPP__ )
@@ -494,10 +494,10 @@ HB_FUNC( FILESIZE )
                hb_retnl( -1 );
             }
          }
-	 else
-	 {
-	    hb_retnl( -1 );
-	 }
+    else
+    {
+       hb_retnl( -1 );
+    }
       }
 
    else
@@ -668,7 +668,7 @@ HB_FUNC( FILEDATE )
       hb_retd( ( LONG ) ( fsOldFiles.ff_fdate >> 9 ) +1980, ( LONG ) ( ( fsOldFiles.ff_fdate & ~0xFE00 ) >> 5 ), ( LONG )fsOldFiles.ff_fdate & ~0xFFE0 );
     }
 
-#elif defined( OS_UNIX_COMPATIBLE )
+#elif defined( OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
 
    {
       if ( hb_pcount(  ) >0 )
@@ -681,23 +681,24 @@ HB_FUNC( FILEDATE )
          USHORT   ushbMask = FA_ARCH;
          USHORT   usFileAttr;
 
-      if ( ISNUM( 2 ) )
-         ushbMask=hb_parni( 2 );
+         if ( ISNUM( 2 ) )
+            ushbMask=hb_parni( 2 );
 
-        if ( stat( szFile,&sStat ) != -1 )
-        {
-         tm_t = sStat.st_mtime;
-         filedate = localtime( &tm_t );
-         sprintf( szDate,"%04d%02d%02d",filedate->tm_year+1900,filedate->tm_mon+1,filedate->tm_mday );
-         usFileAttr=osToHarbourMask( sStat.st_mode );
+         if ( stat( szFile,&sStat ) != -1 )
+         {
+            tm_t = sStat.st_mtime;
+            filedate = localtime( &tm_t );
+            sprintf( szDate,"%04d%02d%02d",filedate->tm_year+1900,filedate->tm_mon+1,filedate->tm_mday );
+            usFileAttr=osToHarbourMask( sStat.st_mode );
 
-         if ( ( ushbMask>0 ) & ( ushbMask&usFileAttr ) )
-            hb_retds( szDate );
-         else
-            hb_retds( szDate );
-      }
-      else
-         hb_retds( "        " );
+            if ( ( ushbMask>0 ) & ( ushbMask&usFileAttr ) )
+               hb_retds( szDate );
+            else
+               hb_retds( szDate );
+
+         } else {
+               hb_retds( "        " );
+         }
    }
 }
    #else
@@ -784,9 +785,9 @@ HB_FUNC( FILETIME )
       if ( !iFind )
       {
          sprintf( szTime, "%02d:%02d:%02d",
-	          ( fsFiles.ff_ftime >> 11 ) & 0x1f,
-	          ( fsFiles.ff_ftime >> 5 ) & 0x3f,
-		  ( fsFiles.ff_ftime & 0x1f ) << 1 );
+             ( fsFiles.ff_ftime >> 11 ) & 0x1f,
+             ( fsFiles.ff_ftime >> 5 ) & 0x3f,
+        ( fsFiles.ff_ftime & 0x1f ) << 1 );
          hb_retc( szTime );
       }
       else
@@ -798,13 +799,13 @@ HB_FUNC( FILETIME )
    {
       sprintf( szTime, "%02d:%02d:%02d",
                ( fsOldFiles.ff_ftime >> 11 ) & 0x1f,
-	       ( fsOldFiles.ff_ftime >> 5 ) & 0x3f,
-	       ( fsOldFiles.ff_ftime & 0x1f ) << 1 );
+          ( fsOldFiles.ff_ftime >> 5 ) & 0x3f,
+          ( fsOldFiles.ff_ftime & 0x1f ) << 1 );
       hb_retc( szTime );
    }
 }
 
-#elif defined( OS_UNIX_COMPATIBLE )
+#elif defined( OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
 
 {
    const char *szFile = hb_parcx( 1 );
@@ -812,7 +813,7 @@ HB_FUNC( FILETIME )
    time_t tm_t = 0;
    char szTime[9];
    struct tm *ft;
-   
+
    stat( szFile, &sStat );
    tm_t = sStat.st_mtime;
    ft = localtime( &tm_t );
