@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.157 2004/09/03 01:34:59 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.158 2004/09/06 13:30:00 druzus Exp $
  */
 
 /*
@@ -6974,7 +6974,9 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       {
          pArea->fHasTags = TRUE;
 #ifdef HB_CDX_CLIP_AUTOPEN
-         if ( hb_set.HB_SET_AUTOPEN )
+         if ( !pArea->fReadonly && hb_set.HB_SET_AUTOPEN )
+#else
+         if ( !pArea->fReadonly )
 #endif
             SELF_WRITEDBHEADER( ( AREAP ) pArea );
       }
@@ -7051,7 +7053,9 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
                   {
                      pArea->fHasTags = FALSE;
 #ifdef HB_CDX_CLIP_AUTOPEN
-                     if ( hb_set.HB_SET_AUTOPEN )
+                     if ( !pArea->fReadonly && hb_set.HB_SET_AUTOPEN )
+#else
+                     if ( !pArea->fReadonly )
 #endif
                         SELF_WRITEDBHEADER( ( AREAP ) pArea );
                   }

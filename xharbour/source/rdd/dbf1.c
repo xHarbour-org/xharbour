@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.90 2004/09/01 01:13:59 druzus Exp $
+ * $Id: dbf1.c,v 1.91 2004/09/03 01:34:59 druzus Exp $
  */
 
 /*
@@ -2438,6 +2438,16 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfPack(%p)", pArea));
 
+   if( pArea->fReadonly )
+   {
+      pError = hb_errNew();
+      hb_errPutGenCode( pError, EG_READONLY );
+      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READONLY ) );
+      hb_errPutSubCode( pError, EDBF_READONLY );
+      SELF_ERROR( ( AREAP ) pArea, pError );
+      hb_itemRelease( pError );
+      return FAILURE;
+   }
    if( pArea->fShared )
    {
       pError = hb_errNew();
@@ -2681,6 +2691,16 @@ static ERRCODE hb_dbfZap( DBFAREAP pArea )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfZap(%p)", pArea));
 
+   if( pArea->fReadonly )
+   {
+      pError = hb_errNew();
+      hb_errPutGenCode( pError, EG_READONLY );
+      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READONLY ) );
+      hb_errPutSubCode( pError, EDBF_READONLY );
+      SELF_ERROR( ( AREAP ) pArea, pError );
+      hb_itemRelease( pError );
+      return FAILURE;
+   }
    if( pArea->fShared )
    {
       pError = hb_errNew();

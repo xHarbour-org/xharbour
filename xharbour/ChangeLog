@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3415 2004/09/08 02:52:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3416 2004/09/08 10:39:35 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-08 18:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed the problem with updating header for readonly areas when
+      structural index is created
+
+  * xharbour/source/rdd/dbf1.c
+    ! generate RT error when ZAP or PACK is called for READONLY WA
 
 2004-09-08 12:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/gtos2/gtos2.c
