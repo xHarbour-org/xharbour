@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1699 2003/11/12 00:04:59 peterrees Exp $
+ * $Id: ChangeLog,v 1.1700 2003/11/12 02:01:04 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-11-12 15:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/rtl/tgetlist.prg
+    ! Minor modification to be more Clipper compatible when postblock
+      instance does not return true.
 
 2003-11-12 03:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
