@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1503 2003/09/23 15:16:01 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1504 2003/09/23 21:23:51 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-24 03:18 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/bin/!pack_src.sh
+  * xharbour/config/rules.cf
+  * xharbour/config/linux/gcc.cf
+    * fixed compilation for Linux
+
+  * xharbour/contrib/libct/files.c
+    ! fixed bug in FILEDELETE
+
+  * xharbour/include/hbapi.h
+  * xharbour/include/hbsetup.h
+    * #define HB_ARRAY_USE_COUNTER moved to hbsetup.h
+      I think it's easier to control when all such definition in one place
 
 2003-09-23 17:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   + contrib/htmllib/include

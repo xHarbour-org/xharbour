@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.12 2003/07/30 14:07:41 druzus Exp $
+ * $Id: hbsetup.h,v 1.13 2003/08/01 02:58:12 ronpinkas Exp $
  */
 
 /*
@@ -129,6 +129,14 @@
 #ifndef HB_FM_STATISTICS_OFF
    #define HB_FM_STATISTICS
 #endif
+
+/* ***********************************************************************
+ * 
+*/
+/* #ifndef HB_ARRAY_USE_COUNTER_OFF */
+#  define HB_ARRAY_USE_COUNTER
+/* #endif */
+
 
 /* ***********************************************************************
  * This symbol defines if we want an ability to create and link OBJ files

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.12 2003/05/16 19:52:04 druzus Exp $
+# $Id: gcc.cf,v 1.13 2003/07/31 18:56:12 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -12,7 +12,7 @@ LIB_EXT = .a
 CC = $(CCACHE) gcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -I. -I$(HB_INC_COMPILE)
+CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 # We are under linux
 CFLAGS = -DHB_OS_LINUX -Wall
 

@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.4 2003/09/13 18:30:28 ronpinkas Exp $
+ * $Id: files.c,v 1.5 2003/09/23 21:23:56 paultucker Exp $
  */
 
 /*
@@ -893,25 +893,31 @@ LPTSTR GetTime( FILETIME *rTime )
 
 HB_FUNC( FILEDELETE )
 {
+   BOOL bReturn = FALSE;
    PHB_FFIND ffind;
-   PHB_ITEM  pDirSpec = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM  pAttributes ;
-   BOOL bReturn = FALSE ;
+   USHORT uiAttr = HB_FA_ALL;
+   BYTE *pDirSpec;
 
-   if ( ISNUM( 2 ) )
+   if ( ISCHAR( 1 ) )
    {
-      pAttributes = hb_param( 2, HB_IT_NUMERIC );
-   }
+      pDirSpec = hb_filecase( hb_strdup( hb_parc( 1 ) ) );
 
-   if( ( ffind = hb_fsFindFirst( hb_itemGetCPtr( pDirSpec ), hb_itemGetNL( pAttributes ) ) ) != NULL )
-   {
-      do
+      if ( ISNUM( 2 ) )
       {
-         if ( hb_fsDelete( ( BYTE * ) ffind->szName ) )
-            bReturn = TRUE;
+         uiAttr = hb_parni( 2 );
       }
-      while( hb_fsFindNext( ffind ) );
-      hb_fsFindClose( ffind );
+
+      if( ( ffind = hb_fsFindFirst( pDirSpec, uiAttr ) ) != NULL )
+      {
+         do
+         {
+            if ( hb_fsDelete( ( BYTE * ) ffind->szName ) )
+               bReturn = TRUE;
+         }
+         while( hb_fsFindNext( ffind ) );
+         hb_fsFindClose( ffind );
+      }
+      hb_xfree( pDirSpec );
    }
    hb_retl( bReturn );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.82 2003/09/11 06:56:41 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.83 2003/09/19 20:16:38 ronpinkas Exp $
  */
 
 /*
@@ -57,8 +57,6 @@
 
 #ifndef HB_APIEXT_H_
 #define HB_APIEXT_H_
-
-#define HB_ARRAY_USE_COUNTER
 
 #include "hbvmpub.h"
 
