@@ -33,6 +33,7 @@ Function GetSourceFiles( lSubdir )
      Local xItem
      local ccc,ddd
      Local nLen
+     Local cFile
      Default lSubdir To .t.
 
 
@@ -73,10 +74,10 @@ Function GetSourceFiles( lSubdir )
         Endif
      Next
 
-     For nCounter := 1 To Len( aret )
-
-        xItem := Substr( aret[ nCounter ], Rat( If( llinux, "/", '\' ), aret[ nCounter ] ) + 1 )
-
+//     For nCounter := 1 To Len( aret )
+     For each cFile in aRet
+//        xItem := Substr( aret[ nCounter ], Rat( If( llinux, "/", '\' ), aret[ nCounter ] ) + 1 )
+        xItem := Substr( cFile, Rat( If( llinux, "/", '\' ), cFile ) + 1 )
         nPos := Ascan( astru, { | x | x := Substr( x, Rat( If( llinux, "/", '\' ), x ) + 1 ), Left( x, At( ".", x ) ) == Left( xitem, At( ".", xitem ) ) } )
         If nPos > 0
            Adel( astru, nPos )
@@ -84,10 +85,12 @@ Function GetSourceFiles( lSubdir )
         Endif
 
      Next
-     For nCounter := 1 To Len( aStru )
-        hb_FNAMESPLIT( Left( astru[ nCounter ], At( ' ', astru[ nCounter ] ) - 1 ), @cPath, @cItem, @cExt, @cDrive )
+//     For nCounter := 1 To Len( aStru )
+//        hb_FNAMESPLIT( Left( astru[ nCounter ], At( ' ', astru[ nCounter ] ) - 1 ), @cPath, @cItem, @cExt, @cDrive )
+      For each cFile in aStru
+          hb_FNAMESPLIT( Left( cFile , At( ' ', cFile ) - 1 ), @cPath, @cItem, @cExt, @cDrive )
         If ( cExt == '.C' ) .or. ( cExt == ".c" ) .or. ( cExt == '.CPP' ) .or. ( cExt == ".cpp" )
-           Aadd( aret, astru[ nCounter ] )
+           Aadd( aret, cFile )
         Endif
      Next
 
@@ -336,7 +339,7 @@ Function ReadLN( leof )
 Return cBuffer
 
 Function GetinstaledLibs( clibs, lGcc )
-
+      
      Local adeflib     := { 'lang' + If( lgcc, '.a', '.lib' ), 'vm' + If( lgcc, '.a', '.lib' ), 'rtl' + If( lgcc, '.a', '.lib' ), 'rdd' + If( lgcc, '.a', '.lib' ), 'macro' + If( lgcc, '.a', '.lib' ), 'pp' + If( lgcc, '.a', '.lib' ), 'dbfntx' + If( lgcc, '.a', '.lib' ), 'dbfcdx' + If( lgcc, '.a', '.lib' ), 'common' + If( lgcc, '.a', '.lib' ), 'gtwin' + If( lgcc, '.a', '.lib' ), 'debug' + If( lgcc, '.a', '.lib' ), 'gtpca' + If( lgcc, '.a', '.lib' ), 'gtdos' + If( lgcc, '.a', '.lib' ), 'gtsln' + If( lgcc, '.a', '.lib' ), 'gtstd' + If( lgcc, '.a', '.lib' ), 'zlib1' + If( lgcc, '.a', '.lib' ), 'ziparchive' + If( lgcc, '.a', '.lib' ), 'rddads' + If( lgcc, '.a', '.lib' ), 'ace32' + If( lgcc, '.a', '.lib' ), 'libnf' + If( lgcc, '.a', '.lib' ), 'libct' + If( lgcc, '.a', '.lib' ), 'htmllib' + If( lgcc, '.a', '.lib' ), 'libgt' + If( lgcc, '.a', '.lib' ), 'libmisc' + If( lgcc, '.a', '.lib' ), 'mysql' + If( lgcc, '.a', '.lib' ), 'libmysql' + If( lgcc, '.a', '.lib' ), 'mysqlclient' + If( lgcc, '.a', '.lib' ), 'samples' + If( lgcc, '.a', '.lib' ), 'pdflib' + If( lgcc, '.a', '.lib' ), 'nulsys' + If( lgcc, '.a', '.lib' ), 'gtcgi' + If( lgcc, '.a', '.lib' ) }
      Local aReturnLibs := {}
      Local aLibs       := Directory( clibs )
@@ -346,9 +349,11 @@ Function GetinstaledLibs( clibs, lGcc )
      if lgcc
         aeval(aLibs,{|x,y| citem:=x[1] ,if(left(citem,3)=="lib", alibs[y,1]:=substr(cItem,4),)})
     endif
-
+      
      For ncount := 1 To Len( alibs )
+
         citem := Lower( alibs[ ncount, 1 ] )
+
         npos  := Ascan( adeflib, { | a | Lower( a ) == citem } )
         If npos == 0
            Aadd( aReturnLibs, alibs[ ncount, 1 ] )
@@ -359,7 +364,8 @@ Return aReturnLibs
 
 Function Getlibs( lgcc ,cDir)
      Local lLinux:=at('linux',lower(os()))>0
-     Local ainstaledlibs := Getinstaledlibs( If( !llinux, if(!lgcc, cDir+"\*.lib",cDir+"\*.a") , '/usr/lib/harbour/*.a' ),lGcc )
+     Local cEnv:=Getenv("HB_LIB_INSTALL")
+     Local ainstaledlibs := Getinstaledlibs( If( !llinux, if(!lgcc, cDir+"\*.lib",cDir+"\*.a") , cEnv+'/*.a' ),lGcc )
      Local aLibsDesc     := { { "Harbour Ct3 library - Libct", 'ct' + If( lgcc, '.a', '.lib' ) }, ;
                           { "Harbour Misc library - Libmisc", 'misc' + If( lgcc, '.a', '.lib' ) }, ;
                           { "Harbour html library - Htmllib", 'html' + If( lgcc, '.a', '.lib' ) }, ;
