@@ -1,5 +1,5 @@
 /*
- * $Id: os2.c,v 1.2 2004/08/26 16:18:35 mauriliolongo Exp $
+ * $Id: os2.c,v 1.3 2004/08/31 14:53:34 mauriliolongo Exp $
  */
 
 /*
@@ -227,7 +227,6 @@ HB_FUNC( P_ISRI ) {
 
    BYTE instat;
 
-   /* if DosDevIOCtl() returns an error, return no DCD */
    if ( DosDevIOCtl( (HFILE) hb_parnl( 1 ), IOCTL_ASYNC, ASYNC_GETMODEMINPUT,
                      NULL, 0, NULL, &instat, sizeof(instat), NULL) == NO_ERROR ) {
       hb_retl( ( instat & RI_ON ) == RI_ON );
@@ -244,7 +243,6 @@ HB_FUNC( P_ISDSR ) {
 
    BYTE instat;
 
-   /* if DosDevIOCtl() returns an error, return no DCD */
    if ( DosDevIOCtl( (HFILE) hb_parnl( 1 ), IOCTL_ASYNC, ASYNC_GETMODEMINPUT,
                      NULL, 0, NULL, &instat, sizeof(instat), NULL) == NO_ERROR ) {
       hb_retl( ( instat & DSR_ON ) == DSR_ON );
@@ -261,7 +259,6 @@ HB_FUNC( P_ISCTS ) {
 
    BYTE instat;
 
-   /* if DosDevIOCtl() returns an error, return no DCD */
    if ( DosDevIOCtl( (HFILE) hb_parnl( 1 ), IOCTL_ASYNC, ASYNC_GETMODEMINPUT,
                      NULL, 0, NULL, &instat, sizeof(instat), NULL) == NO_ERROR ) {
       hb_retl( ( instat & CTS_ON ) == CTS_ON );
