@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.123 2004/02/22 22:16:21 andijahja Exp $
+ * $Id: hbapi.h,v 1.124 2004/03/15 12:45:25 druzus Exp $
  */
 
 /*
@@ -428,6 +428,7 @@ extern char     HB_EXPORT * hb_strdup( const char * pszText ); /* returns a poin
 extern char     HB_EXPORT * hb_xstrcat ( char *dest, const char *src, ... ); /* Concatenates multiple strings into a single result */
 extern char     HB_EXPORT * hb_xstrcpy ( char *szDest, const char *szSrc, ...); /* Concatenates multiple strings into a single result */
 extern BOOL     HB_EXPORT hb_strMatchRegExp( const char * szString, const char * szMask ); /* compare two strings using a regular expression pattern */
+extern BOOL     HB_EXPORT hb_strMatchWild(const char *szString, const char *szPattern ); /* compare two strings using pattern with wildcard (?*) */
 extern BOOL     HB_EXPORT hb_strEmpty( const char * szText, ULONG ulLen ); /* returns whether a string contains only white space */
 extern void     HB_EXPORT hb_strDescend( char * szStringTo, const char * szStringFrom, ULONG ulLen ); /* copy a string to a buffer, inverting each character */
 extern ULONG    HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen ); /* returns an index to a sub-string within another string */

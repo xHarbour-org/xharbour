@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2579 2004/03/16 08:33:39 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2580 2004/03/16 11:37:12 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-16 15:40 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/dbinfo.ch
+    + new DBORDERINFO() params: DBOI_SKIPWILD, DBOI_SKIPWILDBACK
+      for poor index skipping index key doesn't match given
+      pattern with wildcard characters (?*)
+        cPattern:="*101*A"
+        dbgotop()
+        while !eof()
+           if WildMatch(cPattern, ordkeyval())
+              qout( ordkeyval(), recno() )
+           endif
+           dborderinfo(DBOI_SKIPWILD,,,cRegex)
+        enddo
+        for more test and time comparison please try:
+        xharbour/tests/skipeval.prg
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    + new DBORDERINFO() params: DBOI_SKIPWILD, DBOI_SKIPWILDBACK
+    ! fixed updating indexes with FOR expresion
+    % reduced number of allocated memory in EVAL/REGEX/WILD SKIP
+
+  * xharbour/tests/skipeval.prg
+    + test for SKIPWILD added
+
+  * xharbour/include/hbapi.h
+    + hb_strMatchWild(const char *szString, const char *szPattern ) added
+
+  * xharbour/source/rtl/strmatch.c
+    + hb_strMatchWild(const char *szString, const char *szPattern ) added
+    + WILDMATCH( cPattern, cValue ) - new .prg function which works like
+      SIX sx_WildMatch()
+
 2004-03-16 18:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * hrbdll.bc
   * hrbdll.vc

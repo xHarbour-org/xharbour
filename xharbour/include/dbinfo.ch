@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.2 2003/11/20 23:47:36 druzus Exp $
+ * $Id: dbinfo.ch,v 1.3 2004/03/15 12:45:25 druzus Exp $
  */
 
 /*
@@ -115,6 +115,8 @@
 #define DBOI_SKIPEVALBACK        101  /* skip backward while code block doesn't return TRUE */
 #define DBOI_SKIPREGEX           102  /* skip while regular expression on index key doesn't return TRUE */
 #define DBOI_SKIPREGEXBACK       103  /* skip backward while regular expression on index key doesn't return TRUE */
+#define DBOI_SKIPWILD            104  /* skip while while comparison with given pattern with wildcards doesn't return TRUE */
+#define DBOI_SKIPWILDBACK        105  /* skip backward while comparison with given pattern with wildcards doesn't return TRUE */
 
 
 /* Return values for DBOI_OPTLEVEL */

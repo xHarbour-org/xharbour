@@ -2,7 +2,7 @@
 REQUEST DBFCDX
 function main(bld,rdd)
 FIELD F1
-local nSec, cBlock, cRegex
+local nSec, cBlock, cRegex, cPattern
 rddsetdefault(iif(empty(rdd),"DBFCDX",rdd))
 ? rddsetdefault()
 set delete on
@@ -70,5 +70,20 @@ while !eof()
 enddo
 nSec:=secondscpu()-nSec
 ? "SKIPREGEX:", nSec, "sec."
+
+cPattern:="*101*A"
+nSec:=secondscpu()
+dbgotop()
+if !eof() .and. ! WildMatch(cPattern, ordkeyval())
+   dborderinfo(DBOI_SKIPWILD,,,cPattern)
+endif
+while !eof()
+   if WildMatch(cPattern, ordkeyval())
+     qout( ordkeyval(), recno() )
+   endif
+   dborderinfo(DBOI_SKIPWILD,,,cPattern)
+enddo
+nSec:=secondscpu()-nSec
+? "SKIPWILD:", nSec, "sec."
 
 return nil
