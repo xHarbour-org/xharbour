@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_framewnd.c,v 1.3 2003/10/13 11:54:08 jonnymind Exp $
+   $Id: xwt_win_framewnd.c,v 1.4 2003/10/14 23:12:12 jonnymind Exp $
 
    MS-Windows interface - Frame window
 */
@@ -82,7 +82,7 @@ static HMENU xwt_win_createMenuFromArray( PHB_ITEM pMenuArray )
 
       hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
       widget = (PXWT_WIDGET) HB_VM_STACK.Return.item.asPointer.value;
-      menuData = widget->widget_data;
+      menuData = (PXWT_WIN_MENUDATA) widget->widget_data;
       
       miInfo.fMask = MIIM_DATA | MIIM_TYPE ;
       miInfo.fType = MFT_STRING;

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.131 2004/11/29 23:30:00 ptsarenko Exp $
+# $Id: makefile.vc,v 1.131 2004/11/29 22:10:01 ptsarenko Exp $
 #
 
 #
@@ -302,7 +302,8 @@ LIBS2 = \
    user32.lib \
    winspool.lib \
    ole32.lib \
-   oleaut32.lib
+   oleaut32.lib \
+   advapi32.lib
 
 #
 # RTL.LIB rules
@@ -1292,7 +1293,7 @@ $(HBTEST_EXE) : \
                                       $(OBJ_DIR)\rt_str.c \
                                       $(OBJ_DIR)\rt_stra.c \
                                       $(OBJ_DIR)\rt_trans.c \
-                       -o $(HBTEST_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(EXTRALIB) ole32.lib oleaut32.lib
+                       -o $(HBTEST_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(EXTRALIB)
 
 #
 # HBDOC.EXE rules
