@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.49 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.50 2004/03/22 03:16:00 ronpinkas Exp $
  */
 
 /*
@@ -1408,11 +1408,15 @@ RETURN uObj
         {
            long     i, nFrom, nTo;
            VARIANT  mElem;
-           PHB_ITEM pResult = hb_itemArrayNew( 0 );
-           PHB_ITEM pAdd;
+           HB_ITEM Result, Add;
 
            SafeArrayGetLBound( RetVal.n1.n2.n3.parray, 1, &nFrom );
            SafeArrayGetUBound( RetVal.n1.n2.n3.parray, 1, &nTo );
+
+           Result.type = HB_IT_NIL;
+           hb_arrayNew( &Result, 0 );
+
+           Add.type = HB_IT_NIL;
 
            for ( i = nFrom; i <= nTo; i++ )
            {
@@ -1421,36 +1425,32 @@ RETURN uObj
 
               if( mElem.n1.n2.vt == VT_DISPATCH && mElem.n1.n2.n3.pdispVal )
               {
-                 pAdd = hb_itemNew( NULL );
-                 pAdd->type = HB_IT_NIL;
-
                  if( s_pSym_OleAuto )
                  {
                     hb_vmPushSymbol( s_pSym_OleAuto->pSymbol );
                     hb_vmPushNil();
                     hb_vmDo( 0 );
 
-                    hb_itemForwardValue( pAdd, &hb_stack.Return );
+                    hb_itemForwardValue( &Add, &hb_stack.Return );
                  }
 
-                 if( s_pSym_New && pAdd->type )
+                 if( s_pSym_New && Add.type )
                  {
                     hb_vmPushSymbol( s_pSym_New->pSymbol );
-                    hb_vmPush( pAdd );
+                    hb_vmPush( &Add );
                     hb_vmPushLong( ( LONG ) mElem.n1.n2.n3.pdispVal );
                     hb_vmSend( 1 );
 
                     mElem.n1.n2.n3.pdispVal -> lpVtbl -> AddRef( mElem.n1.n2.n3.pdispVal );
                  }
 
-                 hb_arrayAdd( pResult, pAdd );
-                 hb_itemRelease( pAdd );
+                 hb_arrayAddForward( &Result, &Add );
               }
 
               VariantClear( &mElem );
            }
 
-           hb_itemRelease( hb_itemReturn( pResult ) );
+           hb_itemReturn( &Result );
         }
         break;
 /*- end ----------------------------->8-------------------------------------*/
