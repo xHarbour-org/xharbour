@@ -676,7 +676,7 @@ RETURN result
 
 
 METHOD Delete(oRow) CLASS TPQquery
-    Local result := .F.
+    Local result 
     Local res
     Local i
     Local nField
@@ -702,7 +702,9 @@ METHOD Delete(oRow) CLASS TPQquery
 
         if ! (cWhere == '')
             res := PQexecParams( ::pDB, 'DELETE FROM ' + ::Schema + '.' + ::Tablename + ' WHERE ' + cWhere, aParams)    
-            result := PQresultstatus(res) == PGRES_COMMAND_OK            
+            if PQresultstatus(res) != PGRES_COMMAND_OK            
+                result := PQresultErrorMessage(res)
+            endif                
             PQclear(res)
         end            
     end
@@ -710,7 +712,7 @@ RETURN result
 
 
 METHOD Append( oRow ) CLASS TPQquery
-    Local result := .F.
+    Local result
     Local cQuery
     Local i
     Local res
@@ -743,7 +745,10 @@ METHOD Append( oRow ) CLASS TPQquery
 
         if lChanged
             res := PQexecParams( ::pDB, cQuery, aParams)    
-            result := PQresultstatus(res) == PGRES_COMMAND_OK                
+            if PQresultstatus(res) != PGRES_COMMAND_OK            
+                result := PQresultErrorMessage(res)
+            endif                
+
             PQclear(res)
         end            
     end            
@@ -792,7 +797,9 @@ METHOD Update(oRow) CLASS TPQquery
 
             cQuery := Left( cQuery, len(cQuery) - 1 ) + ' WHERE ' + cWhere                        
             res := PQexecParams( ::pDB, cQuery, aParams)    
-            result := PQresultstatus(res) == PGRES_COMMAND_OK
+            if PQresultstatus(res) != PGRES_COMMAND_OK            
+                result := PQresultErrorMessage(res)
+            endif                
         end            
     end            
 RETURN result
