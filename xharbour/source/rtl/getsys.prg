@@ -1,5 +1,5 @@
 /*
- * $Id: getsys.prg,v 1.2 2002/03/17 23:27:28 lculik Exp $
+ * $Id: getsys.prg,v 1.3 2002/05/24 04:58:00 walito Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ FUNCTION ReadModal( GetList, nPos, nMsgRow, nMsgLeft, nMsgRight, cMsgColor )
 FUNCTION ReadModal( GetList, nPos )
 #endif
 
-   LOCAL oGetList, oSaveGetList
+   LOCAL oGetList //, oSaveGetList
 
 #ifdef HB_COMPAT_C53
    LOCAL lMsgFlag
@@ -89,7 +89,7 @@ FUNCTION ReadModal( GetList, nPos )
    oGetList:cReadProcName := ProcName( 1 )
    oGetList:nReadProcLine := ProcLine( 1 )
 
-   oSaveGetList := __GetListActive( )
+//   oSaveGetList := __GetListActive( )
    __GetListSetActive( oGetList )
 
    IF ! ( ISNUMBER( nPos ) .AND. nPos > 0 )
@@ -142,7 +142,7 @@ FUNCTION ReadModal( GetList, nPos )
 
       IF ISBLOCK( oGetList:oGet:Reader )
 #ifdef HB_COMPAT_C53
-         Eval( oGetList:oGet:Reader, oGetList:oGet ,Ogetlist)
+         Eval( oGetList:oGet:Reader, oGetList:oGet ,oGetlist)
 #else
          Eval( oGetList:oGet:Reader, oGetList:oGet )
 #endif
@@ -160,7 +160,7 @@ FUNCTION ReadModal( GetList, nPos )
    endif
 #endif
 
-   __GetListSetActive( oSaveGetList )
+//   __GetListSetActive( oSaveGetList )
 
    SetPos( MaxRow() - 1, 0 )
 
