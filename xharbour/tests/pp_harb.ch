@@ -47,11 +47,11 @@
      METHOD RunFile( cFile, aParams, cPPOExt, bBlanks ) INLINE PP_Run( cFile, aParams, cPPOExt, bBlanks )
 
      #ifdef __XHARBOUR__
-        METHOD IsProcedure( cName )
         METHOD EvalExpression()
 
         #ifdef AX
            METHOD RecoverSiteGlobals( oErr )
+           METHOD IsProcedure( cName )
         #endif
      #endif
 
@@ -124,13 +124,6 @@
 
   //----------------------------------------------------------------------------//
   #ifdef __XHARBOUR__
-  METHOD IsProcedure( cName ) CLASS  TInterpreter
-
-     cName := Upper( cName )
-
-  RETURN aScan( ::aCompiledProcs, {|aProc| aProc[1] == cName } ) > 0
-
-  //----------------------------------------------------------------------------//
 
   METHOD EvalExpression( cExp, aParams ) CLASS  TInterpreter
 
@@ -169,6 +162,13 @@
 
   //----------------------------------------------------------------------------//
   #ifdef AX
+     METHOD IsProcedure( cName ) CLASS  TInterpreter
+
+        cName := Upper( cName )
+
+     RETURN aScan( ::aCompiledProcs, {|aProc| aProc[1] == cName } ) > 0
+
+     //----------------------------------------------------------------------------//
      METHOD RecoverSiteGlobals( oErr )
 
          LOCAL Global, xRet
@@ -1787,6 +1787,12 @@
           #define HB_NO_DEFAULT_API_MACROS
           #define HB_NO_DEFAULT_STACK_MACROS
        #pragma ENDDUMP
+
+       #ifdef AX
+          #pragma BEGINDUMP
+             #define AX
+          #pragma ENDDUMP
+       #endif
     #endif
 
     #pragma BEGINDUMP
@@ -2505,7 +2511,9 @@
             }
             */
 
-            //OutputDebugValues( NULL, "Dyn: '%s'\n", sFunctionName );
+            #ifdef AX
+               OutputDebugValues( NULL, "Dyn: '%s'\n", sFunctionName );
+            #endif
 
             BYTE *pcode = (BYTE *) hb_xgrab( 31 );
 
@@ -2590,8 +2598,8 @@
 
             for( i = 0; i < s_iDyn; i++ )
             {
-               #if 0
-               OutputDebugValues( NULL, "Release #%i Dyn: '%s' %p, %p, %p\n", s_pDynList[i].iID, s_pDynList[i].pDyn->pSymbol->szName,
+               #ifdef AX
+                  OutputDebugValues( NULL, "Release #%i Dyn: '%s' %p, %p, %p\n", s_pDynList[i].iID, s_pDynList[i].pDyn->pSymbol->szName,
                                  s_pDynList[i].pAsm,
                                  s_pDynList[i].pcode,
                                  s_pDynList[i].pDyn->pSymbol->pFunPtr );

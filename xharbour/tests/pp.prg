@@ -9325,7 +9325,7 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
 
    #ifdef __XHARBOUR__
       FOR EACH aProcedure IN aProcedures
-         IF aScan( s_aDynProcedures, aProcedure ) == 0
+         IF aScan( s_aDynProcedures, aProcedure, , , .T. ) == 0
             PP_GenDynProcedure( aProcedure[1], Len( s_aDynProcedures ) + 1 )
             aAdd( s_aDynProcedures, aProcedure )
          ENDIF
@@ -9412,7 +9412,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nProcId, aParams )
 
    #ifdef __XHARBOUR__
       FOR EACH aProcedure IN s_aProcedures
-         IF aScan( s_aDynProcedures, aProcedure ) == 0
+         IF aScan( s_aDynProcedures, aProcedure, , , .T. ) == 0
             PP_GenDynProcedure( aProcedure[1], Len( s_aDynProcedures ) + 1 )
             aAdd( s_aDynProcedures, aProcedure )
          ENDIF
