@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.6 2002/12/20 08:39:42 ronpinkas Exp $
+* $Id: thread.h,v 1.7 2002/12/20 09:01:47 ronpinkas Exp $
 */
 
 /*
@@ -62,6 +62,9 @@
 #include "hbapierr.h"
 
 #if defined( HB_OS_WIN_32 )
+   #ifndef _WIN32_WINNT
+      #define _WIN32_WINNT 0x0400
+   #endif
    #include <windows.h>
 #endif
 
@@ -83,8 +86,9 @@
 
    #define HB_COND_T                   HANDLE
    #define HB_COND_INIT( x )           x = CreateEvent( NULL, TRUE, FALSE, NULL )
-   #define HB_COND_WAIT( x, y )        //SignalObjectAndWait( y, x, INFINITE, FALSE )
-   #define HB_COND_WAITTIME( x, y, t ) //SignalObjectAndWait( y, x, t *1000, FALSE )
+
+   #define HB_COND_WAIT( x, y )        SignalObjectAndWait( y, x, INFINITE, FALSE )
+   #define HB_COND_WAITTIME( x, y, t ) SignalObjectAndWait( y, x, t *1000, FALSE )
    #define HB_COND_SIGNAL( x )         SetEvent( x )
    #define HB_COND_DESTROY( x )        CloseHandle( x )
 

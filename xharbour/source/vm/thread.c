@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.6 2002/12/20 01:26:08 jonnymind Exp $
+* $Id: thread.c,v 1.7 2002/12/20 08:39:43 ronpinkas Exp $
 */
 
 /*
@@ -143,7 +143,7 @@ void hb_destroyContext( void )
 
     if( p )
     {
-        /*unlink the stack*/
+        /* unlink the stack */
         if( prev )
         {
             prev->next = p->next;
@@ -152,6 +152,8 @@ void hb_destroyContext( void )
         {
             hb_ht_context = p->next;
         }
+
+        HB_CRITICAL_UNLOCK( context_monitor );
 
         /* Free each element of the stack */
         for( i = 0; i < p->stack->wItems; ++i )
@@ -167,8 +169,10 @@ void hb_destroyContext( void )
         /* Free the context */
         free( p );
     }
-
-    HB_CRITICAL_UNLOCK( context_monitor );
+    else
+    {
+        HB_CRITICAL_UNLOCK( context_monitor );
+    }
 }
 
 void hb_destroyContextFromHandle( HB_THREAD_HANDLE th_h )
@@ -443,11 +447,13 @@ HB_FUNC( STARTTHREAD )
             #endif
 
             HB_CRITICAL_LOCK( context_monitor );
+
             p = hb_ht_context;
             while( p && p->th_id != th_id )
             {
                 p = p->next;
             }
+
             HB_CRITICAL_UNLOCK( context_monitor );
 
         } while( p == NULL );
