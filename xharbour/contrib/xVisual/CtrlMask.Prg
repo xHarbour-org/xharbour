@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.29 2002/10/27 01:29:26 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.30 2002/10/28 12:04:18 what32 Exp $
  */
 
 /*
@@ -105,7 +105,8 @@ CLASS oCtrlMask FROM TWinControl
    DATA aClickPt
    DATA Cursor
    DATA lHintActive INIT .T.
-
+   DATA lChanged    INIT .F.
+   
    METHOD New() CONSTRUCTOR
    METHOD OnGetDlgCode() INLINE DLGC_WANTARROWS + DLGC_WANTTAB
    METHOD OnRButtonDown()
@@ -464,6 +465,8 @@ METHOD OnLButtonDown( wParam, x, y )
 
    IF Empty( ::Cursor )
       
+      ::lChanged := .F.
+
       FOR EACH hChild IN ::aSiblings
          aWRect := GetWindowRect( hChild )
          IF PtInRect( aWRect, aPt )
@@ -499,6 +502,7 @@ METHOD OnLButtonDown( wParam, x, y )
     ELSE
       ::creating :=.T.
       ::cursor   :=NIL
+      ::lChanged := .T.
    ENDIF
 
    IF !lFound
@@ -633,14 +637,15 @@ METHOD OnMouseMove( aParam, x, y )
    IF ::mousedown
 
       aTipRect := ::aEditRect
-
-      ::MoveCtrl( ::Handle, aPt )
       
+      ::MoveCtrl( ::Handle, aPt )
       if !aTipRect[1] == ::aEditRect[1].or.;
          !aTipRect[2] == ::aEditRect[2].or.;
          !aTipRect[3] == ::aEditRect[3].or.;
          !aTipRect[4] == ::aEditRect[4]
-
+         
+         ::lChanged := .T.
+         
          hDC := GetDC( ::Handle )
          SetTextColor( hDC, RGB( 255, 255, 128 ) )
          SetBkColor( hDC, RGB( 0, 0, 128 ) )
@@ -743,6 +748,7 @@ METHOD OnLButtonUp( wParam, x, y )
    IF ::moving .OR. ::sizing
       UpdateWindow( ::Parent:handle )
    ENDIF
+    
    ::mousedown := .F.
    hDC := GetDC( ::Handle )
 
@@ -765,21 +771,22 @@ METHOD OnLButtonUp( wParam, x, y )
    ENDIF
    ::MoveCtrl( , aPt )
    FOR EACH a IN ::aSelected
-      ShowWindow( a[ SEL_HANDLE ], SW_HIDE )
 
-      MoveWindow( a[ SEL_HANDLE ], a[ SEL_NEWRECT, 1 ],a[ SEL_NEWRECT , 2 ],;
-                  a[ SEL_NEWRECT, 3 ]- a[ SEL_NEWRECT, 1 ], a[ SEL_NEWRECT, 4 ] - a[ SEL_NEWRECT, 2 ], .T. )
+       ShowWindow( a[ SEL_HANDLE ], SW_HIDE )
 
-      ShowWindow( a[ SEL_HANDLE ], SW_SHOW )
+       MoveWindow( a[ SEL_HANDLE ], a[ SEL_NEWRECT, 1 ],a[ SEL_NEWRECT , 2 ],;
+                   a[ SEL_NEWRECT, 3 ]- a[ SEL_NEWRECT, 1 ], a[ SEL_NEWRECT, 4 ] - a[ SEL_NEWRECT, 2 ], .F. )
 
-      aRect := GetWindowRect( a[1] )
-      RectScreenToClient( ::Handle, aRect )
-      a[ SEL_OLDRECT ] := aClone( aRect )
+       ShowWindow( a[ SEL_HANDLE ], SW_SHOW )
+       
+       aRect := GetWindowRect( a[1] )
+       RectScreenToClient( ::Handle, aRect )
+       a[ SEL_OLDRECT ] := aClone( aRect )
       
-      if a[ SEL_HANDLE ] == ::Parent:Parent:ObjInspect:CurObject:handle
-         oObj := ::Parent:ChildFromHandle( a[ SEL_HANDLE ] )
-         oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, 1 )
-      endif
+       if ::lChanged .AND. a[ SEL_HANDLE ] == ::Parent:Parent:ObjInspect:CurObject:handle
+          oObj := ::Parent:ChildFromHandle( a[ SEL_HANDLE ] )
+          oObj:Parent:Parent:ObjInspect:SetBrowserData( oObj, 1 )
+       endif
 
    NEXT
 

@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.73 2002/10/28 02:19:05 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.74 2002/10/28 12:04:18 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -249,18 +249,14 @@ METHOD CreateControl(aRect)
          IF !("2" $ cName) // only one Rebar
 
             oObj:=::Add( TRebar():New( self ) )
-            
-//            oObj:AddBand( , RBBS_GRIPPERALWAYS+RBBS_NOVERT+RBBS_BREAK, , 200, 20, 200, "", NIL )
-
-//            MainFrame:ObjTree:TreeView:GetItem( n ):Add( oObj:Name,1, oObj:handle )
-
+           
          ENDIF
 
       CASE ::CtrlName=="ToolBar"
          oObj:=::Add( TToolBar():New( self, 511, 2, HINST_COMMCTRL, IDB_STD_SMALL_COLOR, 16, 16, 16, 16, 14 ) )
          oObj:AddButton("New", ToolButton():New( 0 , ,"New",  100 ) )
          oObj:AddButton("Open",ToolButton():New( 1 , ,"Open", 100 ) )
-         UpdateWindow( oObj:handle )
+         UpdateWindow( ::handle )
 
       CASE ::CtrlName=="ProgressBar"
          oObj:=::Add( TProgressBar():New( self, aRect[1], aRect[2], aRect[3], aRect[4] ) )

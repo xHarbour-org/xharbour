@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.45 2002/10/28 02:19:05 what32 Exp $
+ * $Id: xInspect.prg,v 1.46 2002/10/28 12:04:18 what32 Exp $
  */
 
 /*
@@ -64,14 +64,22 @@ ENDCLASS
 //-------------------------------------------------------------------------------------------------
 
 METHOD SetBrowserData( oObj, nState ) CLASS ObjInspect
+   LOCAL aProp
+   
    DEFAULT nState TO 0
    IF nState == 0
       ::CurObject := oObj
    ENDIF
    IF oObj:handle == ::CurObject:handle .OR. nState == 0
-      ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
-      aSort( ::Browser:Source,,, {|x,y| x[1] < y[1] } )
-      aEval( ::Browser:Source, {|a|a[1] := Proper( a[1] )} )
+      IF nState == 0
+         ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
+         aSort( ::Browser:Source,,, {|x,y| x[1] < y[1] } )
+         aEval( ::Browser:Source, {|a|a[1] := Proper( a[1] )} )
+        ELSE
+         FOR EACH aProp IN ::Browser:source
+             aProp[2] := __objSendMsg( ::CurObject, aProp[1] )
+         NEXT
+      ENDIF
       ::Browser:RefreshAll()
    endif
 
