@@ -1,5 +1,5 @@
 /*
- * $Id: hbzip2.h,v 1.1 2003/09/12 20:12:35 paultucker Exp $
+ * $Id: hbzip2.h,v 1.2 2003/11/22 21:15:26 lculik Exp $
  */
 
 /*
@@ -134,7 +134,7 @@ extern BOOL     hb_IsPassWord(char *szName);
 extern BOOL     hb_SaveZipFileFromMemory(char *szFile);
 extern BOOL     hb_CreateZipInMemory(char *szFileToCompress,char *szFile);
 */
-
+extern void hb_SetZipReadOnly(BOOL bRead);
 #ifdef HB_EXTERN_C
 }
 #endif
