@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.50 2003/03/07 16:18:40 lculik Exp $
+ * $Id: hbmake.prg,v 1.51 2003/03/12 02:33:58 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -66,7 +66,7 @@
       New Core vars should only be added on this section
       */
 
-STATIC s_lPrint        := .f.
+STATIC s_lPrint        := .F.
 STATIC s_nHandle
 STATIC s_aDefines      := {}
 STATIC s_aBuildOrder   := {}
@@ -87,7 +87,7 @@ STATIC s_lVcc          := .F.
 STATIC s_lForce        := .F.
 STATIC s_lLinux        := .F.
 STATIC s_szProject     := ""
-STATIC s_lLibrary      := .f.
+STATIC s_lLibrary      := .F.
 STATIC s_lIgnoreErrors := .F.
 STATIC s_lExtended     := .T.
 STATIC s_lOs2          := .F.
@@ -718,7 +718,7 @@ FUNCTION CompileFiles()
                IF nPos > 0
                   cComm := Strtran( cComm, "o$*", "o" + s_aCs[ nPos ] )
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += " >> Test.out"
+                  cComm += IiF( "LINUX" IN Upper( Os() ),  "2> Test.out"," > Test.out")
                   Outstd( cComm )
                   Outstd( Hb_OsNewLine() )
                   __RUN( (cComm) )
@@ -726,7 +726,7 @@ FUNCTION CompileFiles()
                   lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
 
                   IF ! s_lIgnoreErrors .AND. lEnd
-                     IIF(  "LINUX" IN Upper( Os() ), __run( "vi Test.out" ), __run( "Notepad Test.out" ) )
+                     IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit Test.out" ), __run( "Notepad Test.out" ) )
                      QUIT
                   ELSE
                      //                            Ferase( 'Test.out' )
@@ -843,7 +843,8 @@ FUNCTION CompileFiles()
                      ENDIF
 
                      cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
-                     cComm += "  Test.out"
+
+                     cComm += IIF( "LINUX" IN Upper( Os() ),  "2> Test.out"," > Test.out")
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                      nFile ++
@@ -853,7 +854,7 @@ FUNCTION CompileFiles()
                      lEnd     := 'Error E' $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        IIF(  "LINUX" IN Upper( Os() ), __run( "vi Test.out" ), __run( "Notepad Test.out" ) )
+                        IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit Test.out" ), __run( "Notepad Test.out" ) )
                         QUIT
                      ELSE
                         //                                Ferase( 'Test.out' )
@@ -910,7 +911,7 @@ FUNCTION CompileFiles()
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += " >> Test.out"
+                  cComm += IIF( "LINUX" IN Upper( Os() ),  "2> Test.out"," > Test.out")
                   @  4, 16 SAY cPrg
                   GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                   //                        Outstd( Hb_OsNewLine() )
@@ -920,7 +921,7 @@ FUNCTION CompileFiles()
                   lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
 
                   IF ! s_lIgnoreErrors .AND. lEnd
-                     IIF(  "LINUX" IN Upper( Os() ), __run( "vi Test.out" ), __run( "Notepad Test.out" ) )
+                     IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit Test.out" ), __run( "Notepad Test.out" ) )
                      QUIT
                   ELSE
                      //                            Ferase( 'Test.out' )
@@ -1081,6 +1082,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL aSelFiles
    LOCAL nFilestoAdd  := 0
    LOCAL lGui         := .F.
+   LOCAL cBuild       := " "
 
    s_nLinkHandle := Fcreate( cFile )
    WriteMakeFileHeader()
@@ -1622,7 +1624,7 @@ FUNC CreateMakeFile( cFile )
    fWrite( s_nLinkHandle, "HARBOURFLAGS = " + cDefHarOpts + CRLF )
 
    IF s_lBcc
-      fWrite( s_nLinkHandle, "CFLAG1 =  -OS $(CFLAGS) -d -L$(BHC)\lib;$(FWH)\lib -c" + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG1 =  -OS $(CFLAGS) -d -L$(BHC)\lib;$(FWH)\lib -c" +" -I" + Alltrim( cUserInclude ) + " " +CRLF )
       fWrite( s_nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
@@ -1640,7 +1642,7 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, ".autodepend" + CRLF )
    ELSEIF s_lVcc
       fWrite( s_nLinkHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" +IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
-      fWrite( s_nLinkHandle, "CFLAG2 =  -c" + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG2 =  -c" +" -I" + Alltrim( cUserInclude ) + " " + CRLF )
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LFLAGS = /LIBPATH:$(BCB)\lib;$(BHC)\lib;$(C4W)\lib /SUBSYSTEM:CONSOLE" + CRLF )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
@@ -1712,6 +1714,15 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, "!" + CRLF )
    ENDIF
 
+   @ 20,5 Say "Build app" get cBuild PICT "!" Valid cBuild $"YNS"
+   READ
+   IF "YS" IN cBuild
+      ResetInternalVars()
+      cls
+      Main( cFile, " -F")
+   ENDIF
+
+
 RETURN NIL
 
 FUNCTION CompileUpdatedFiles()
@@ -1757,7 +1768,7 @@ FUNCTION CompileUpdatedFiles()
                      aAdd( aCtocompile, s_aCs[ nPos ] )
                      cComm := Strtran( cComm, "o$*", "o" + s_aCs[ nPos ] )
                      cComm := Strtran( cComm, "$**", s_aPrgs[ nFiles ] )
-
+                     cComm += IIF( "LINUX" IN Upper( Os() ),  "2> Test.out"," > Test.out")
                      //                   Outstd( cComm )
                      //                   Outstd( Hb_OsNewLine() )
                      __RUN( (cComm) )
@@ -1765,7 +1776,7 @@ FUNCTION CompileUpdatedFiles()
                      lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        IIF(  "LINUX" IN Upper( Os() ) , __run( "vi Test.out" ), __run( "Notepad Test.out" ) )
+                        IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit Test.out" ), __run( "Notepad Test.out" ) )
                         QUIT
                      ELSE
                         //                                Ferase( 'Test.out' )
@@ -1856,7 +1867,7 @@ FUNCTION CompileUpdatedFiles()
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjsc[ nPos ] )
                      cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
-                     cComm += " > Test.out"
+                     cComm += IIF( "LINUX" IN Upper( Os() ),  "2> Test.out"," > Test.out")
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                      nFile ++
@@ -1868,7 +1879,7 @@ FUNCTION CompileUpdatedFiles()
                      lEnd     := 'Error E' $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        IIF(  "LINUX" IN Upper( Os() ) , __run( "vi Test.out" ), __run( "Notepad Test.out" ) )
+                        IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit Test.out" ), __run( "Notepad Test.out" ) )
                         QUIT
                      ELSE
                         //                                Ferase( 'Test.out' )
@@ -1917,7 +1928,7 @@ FUNCTION CompileUpdatedFiles()
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                      cComm := Strtran( cComm, "$**", cPrg )
-                     cComm += " >> Test.out"
+                     cComm += IIF( "LINUX" IN Upper( Os() ),  "2> Test.out"," > Test.out")
                      @  4, 16 SAY cPrg
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
 
@@ -1926,7 +1937,7 @@ FUNCTION CompileUpdatedFiles()
                      lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        IIF( "LINUX" IN Upper( Os() ) , __run( "vi Test.out" ), __run( "Notepad Test.out" ) )
+                        IIF( "LINUX" IN Upper( Os() ) , __run( "mcedit Test.out" ), __run( "Notepad Test.out" ) )
                         QUIT
                      ELSE
                         //                                Ferase( 'test.out' )
@@ -3256,3 +3267,36 @@ FUNCTION GetSelFiles( aIn, aOut )
    NEXT
 
 RETURN aRet
+
+FUNCTION ResetInternalVars()
+
+   s_lPrint        := .f.
+   s_aDefines      := {}
+   s_aBuildOrder   := {}
+   s_aCommands     := {}
+   s_aMacros       := {}
+   s_aPrgs         := {}
+   s_aCs           := {}
+   s_aObjs         := {}
+   s_aObjsc        := {}
+   s_lEof          := .F.
+   s_aRes          := {}
+   s_cLinker       := "makefile.lnk"
+   s_cLinkComm     := ''
+   s_lBcc          := .T.
+   s_lGcc          := .F.
+   s_lVcc          := .F.
+   s_lForce        := .F.
+   s_lLinux        := .F.
+   s_szProject     := ""
+   s_lLibrary      := .F.
+   s_lIgnoreErrors := .F.
+   s_lExtended     := .T.
+   s_lOs2          := .F.
+   s_lRecurse      := .F.
+   s_lEditMode     := .F.
+   s_aDir
+   s_aLangMessages := {}
+
+
+RETURN NIL

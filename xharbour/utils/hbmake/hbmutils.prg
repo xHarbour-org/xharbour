@@ -70,7 +70,7 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
 
                ELSEIF ! lSubDir .AND. AT( IIF( lLinux, "/", "\" ), STRTRAN( aStru[ nCounter ], cDir, '' ) ) == 0
 
-                  AADD( aRet, PAD( aData[ y, 1 ], 18 ) + ;
+                  AADD( aRet, aData[ y, 1 ] + ;
                         STR( aData[ y, 2 ], 8 ) + '  ' + ;
                         DTOC( aData[ y, 3 ] ) + '  ' + ;
                         aData[ y, 4 ] )
