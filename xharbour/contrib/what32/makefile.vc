@@ -1,9 +1,11 @@
 #
-# File:     makefile.nt
+# $Id: makefile.vc,v 1.4 2002/11/05 06:25:34 paultucker Exp $
+#
+
+# File:     makefile.vc
 # Author:   Paul Tucker <ptucker@sympatico.ca>
 # Created:  2002
 # Updated:
-# Copyright: (C) Francesco Saverio Giudice - WoopGUI - A Win32 OOP GUI Library
 #
 # Makefile : Builds What32 for msvc in non batch mode
 

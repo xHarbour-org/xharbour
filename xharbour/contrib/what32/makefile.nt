@@ -1,9 +1,11 @@
 #
+# $Id: makefile.nt,v 1.4 2002/11/05 06:25:34 paultucker Exp $
+#
+
 # File:     makefile.nt
 # Author:   Paul Tucker <ptucker@sympatico.ca>
 # Created:  2002
 # Updated:
-# Copyright: (C) Francesco Saverio Giudice - WoopGUI - A Win32 OOP GUI Library
 #
 # Makefile : Builds What32 for msvc in batch mode
 
@@ -32,11 +34,10 @@ CFLAGS   =-TP -W3 -Ox -GA -nologo -c -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_W
 rc       =rc
 rcflags  =-r
 
-.SUFFIXES: .prg .lib .c .obj .asm
+.SUFFIXES: .prg .c
 
 .c.obj:
  $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
-
 
 WHAT32LIB= $(LIBDIR)\what32.lib
 
