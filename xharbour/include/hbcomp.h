@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.17 2003/06/20 17:32:41 jonnymind Exp $
+ * $Id: hbcomp.h,v 1.18 2003/06/29 04:42:33 andijahja Exp $
  */
 
 /*
@@ -481,6 +481,7 @@ extern PFUNCTION      hb_comp_pInitFunc;
 extern PFUNCTION      hb_comp_pGlobalsFunc;
 extern PHB_FNAME      hb_comp_pFileName;
 extern BOOL           hb_comp_bPPO;
+extern BOOL           hb_comp_bPPO_Only;
 extern FILE *         hb_comp_yyppo;
 extern BOOL           hb_comp_bStartProc;
 extern BOOL           hb_comp_bLineNumbers;

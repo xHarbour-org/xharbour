@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.9 2003/06/20 17:32:41 jonnymind Exp $
+ * $Id: hbusage.c,v 1.10 2003/06/23 14:04:15 andijahja Exp $
  */
 
 /*
@@ -83,6 +83,7 @@ void hb_compPrintUsage( char * szSelf )
            "\n                                   1=no starting procedure at all",
            "\n          %co<path>         object file drive and/or path",
            "\n          %cp               generate pre-processed output (.ppo) file",
+           "\n          %cp0              generate only pre-processed output (.ppo) file",
            "\n          %cq               quiet",
            "\n          %cq0              quiet and don't display program header",
 /* TODO:   "\n          %cr[<lib>]        request linker to search <lib> (or none)", */

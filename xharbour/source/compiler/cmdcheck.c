@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.7 2003/06/21 06:59:22 jonnymind Exp $
+ * $Id: cmdcheck.c,v 1.8 2003/06/23 14:04:15 andijahja Exp $
  */
 
 /*
@@ -738,10 +738,23 @@ void hb_compChkEnvironVar( char * szSwitch )
              /* Added for preprocessor needs */
              case 'p':
              case 'P':
-                if( *( s + 1 ) == '-' )
-                   hb_comp_bPPO = 0;
-                else
-                   hb_comp_bPPO = 1;
+                hb_comp_bPPO = 1;
+
+                switch( *( s + 1 ) )
+                {
+                   case '-':
+                   {
+                      hb_comp_bPPO = 0;
+                      break;
+                   }
+                   case '0':
+                   {
+                      hb_comp_bPPO = 1;
+                      hb_comp_bPPO_Only = TRUE;
+                      break;
+                   }
+                }
+
                 break;
 
              case 'q':
