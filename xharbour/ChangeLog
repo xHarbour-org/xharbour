@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2952 2004/05/18 14:08:27 lculik Exp $
+ * $Id: ChangeLog,v 1.2953 2004/05/18 15:05:28 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-18 12:11 UTC-0400 Sylvain Robert <s.robert/at/videotron.ca>
+  * contrib/hbzlib/zipnew.cpp
+      * hb_CheckSpanMode() was giving a GPF if the ZIP file was read only
+        and the program was called from a batch file (under windows)
+        User must use SETZIPREADONLY() before HB_UNZIPFILE() when the ZIP
+        file is RO or on a RO media
 
 2004-05-18 08:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/thread.c
