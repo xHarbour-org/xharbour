@@ -1,5 +1,5 @@
 /*
- * $Id: html.ch,v 1.2 2003/02/26 01:51:04 lculik Exp $
+ * $Id: html.ch,v 1.1 2003/09/23 21:23:56 paultucker Exp $
  */
 
 /*
@@ -141,6 +141,8 @@
           [BASEURL <baseurl>]        ;
           [BASETARGET <basetarget>]  ;
           [STYLESHEET <cStyleScr>]   ;
+          [REFRESH <nRefresh>]       ;
+          [REFRESHURL <cRefreshURL>]            ;
           [<lcache:NOCACHE>]           ;
           OF <oHtml>                 ;
           =>                         ;
@@ -151,7 +153,9 @@
                                  [<(onload)>], [<(onunload)>], ;
                                  [<(lcolor)>],[<(vlcolor)>],[<(alcolor)>],;
                                  [<(cStyle)>], [<aImages>],;
-                                 [<baseurl>], [<basetarget>] ,<cStyleScr>,<.lcache.>)
+                                 [<baseurl>], [<basetarget>] ,;
+                                 [<nRefresh>], [<cRefreshURL>],;
+                                 <cStyleScr>,<.lcache.>)
 
 #xCommand DEFINE CGI                 ;
           [TITLE <title>]            ;
@@ -194,6 +198,7 @@
                                    [<baseurl>], [<basetarget>], ;
                                    <nrefr>, <refrURL>, <cStyleScr>, <.lcache.>, <nof>,;
                                    <nMarginTop>, <nMarginHeight>, <nMarginWidth>, <nMarginLeft> )
+
           // [<auth:AUTHENTICATE>]      ;
           // [<.auth.>]
 
@@ -342,6 +347,11 @@
           =>                   ;
           <oHtm>:EndFont()
 
+#xCommand END FONT   ;
+          [OF <oHtm>]          ;
+          =>                   ;
+          <oHtm>:EndFont()
+
 
 #xcommand SAY <str>              ;
           [FONT <fnt> ]          ;
@@ -406,7 +416,7 @@
           [NAME <name>]             ;
           [TARGET <target>]         ;
           [ALT <alt>]               ;
-          [<break:BREAK>]           ;
+          [<break:BREAK>]             ;
           OF <oHtm>                 ;
           =>                        ;
           <oHtm>:putImageURL( <image>, <border>, <height>, <url>,;

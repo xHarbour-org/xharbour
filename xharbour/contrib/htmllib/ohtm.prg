@@ -1,5 +1,5 @@
 /*
- * $Id: ohtm.prg,v 1.1 2003/02/23 23:15:17 lculik Exp $
+ * $Id: ohtm.prg,v 1.2 2003/02/24 16:09:45 lculik Exp $
  */
 
 /*
@@ -101,11 +101,11 @@ CLASS Html
 
    /* METHOD Debug()         INLINE __clsDebug( self ) NOSELF */
 
-   METHOD SetPageColor( cColor, lBody ) INLINE Fwrite( ::nH, IIF( lBody, '<BODY BGCOLOR="' + cColor + '">', ' BGCOLOR="' + cColor + '" ' ) )
+   METHOD SetPageColor( cColor, lBody ) INLINE DEFAULT(lBody ,.T.),Fwrite( ::nH, IIF( lBody, '<BODY BGCOLOR="' + cColor + '">', ' BGCOLOR="' + cColor + '" ' ) )
 
-   METHOD SetTextColor( cColor, lBody ) INLINE Fwrite( ::nH, IIF( lBody, '<BODY TEXT="' + cColor + '">', ' TEXT="' + cColor + '" ' ) )
+   METHOD SetTextColor( cColor, lBody ) INLINE DEFAULT(lBody ,.T.),Fwrite( ::nH, IIF( lBody, '<BODY TEXT="' + cColor + '">', ' TEXT="' + cColor + '" ' ) )
 
-   METHOD SetBgImage( cImage, lBody ) INLINE Fwrite( ::nH, IIF( lBody, '<BODY BACKGROUND="' + cImage + '">', ' BACKGROUND="' + cImage + '" ' ) )
+   METHOD SetBgImage( cImage, lBody ) INLINE DEFAULT(lBody ,.T.),Fwrite( ::nH, IIF( lBody, '<BODY BACKGROUND="' + cImage + '">', ' BACKGROUND="' + cImage + '" ' ) )
 
    METHOD CLOSE()
 
@@ -119,7 +119,7 @@ CLASS Html
 
    METHOD DefineFont( cFont, cType, nSize, cColor, lSet )
 
-   METHOD ENDFONT()
+   METHOD ENDFONT()                    
 
    METHOD SAY( str, font, size, type, color, style )
 
@@ -1038,6 +1038,7 @@ METHOD PutTextUrl( cText, cUrl, cOnClick, cOnMsOver, cOnMsout, cTarget, font, cl
    LOCAL cStr := ""
    DEFAULT cUrl := ""
    DEFAULT bld := .F.
+   DEFAULT lBreak := .f.
 
    Fwrite( ::nH, ;
            '<A HREF="' + cUrl + '"' + crlf() )
@@ -1125,6 +1126,7 @@ METHOD PutImageUrl( cImage, nBorder, nHeight, cUrl, ;
                        cOnclick, cOnMsOver, cOnMsOut, cName, cAlt, cTarget, nWidth, lbreak, cClass, ;
                        Id, hSpace, Aling ) CLASS Html
    LOCAL cStr := ""
+   default lbreak := .F.
 
    IF cName != NIL
       cStr += ' NAME= "' + cName + '"' + CRLF()
@@ -1187,7 +1189,7 @@ RETURN Self
 METHOD PutTextImageUrl( cImage, nBorder, nHeight, cUrl, ;
                            cOnclick, cOnMsOver, cOnMsOut, cName, cAlt, cTarget, nWidth, lbreak, cClass, cText ) CLASS Html
    LOCAL cStr := ""
-
+   default lbreak := .F.
    IF cName != NIL
       cStr += ' NAME= "' + cName + '"'
    ENDIF
@@ -1242,8 +1244,10 @@ RETURN Self
 */
 
 METHOD PutImage( cImage, nBorder, nHeight, ;
-                    cOnclick, cOnMsOver, cOnMsOut, cName, cAlt, cTarget, nWidth, lbreak, Id, Map, Aling, hSpace ) CLASS Html
+                    cOnclick, cOnMsOver, cOnMsOut, cName, cAlt, cTarget,;
+                    nWidth, lbreak, Id, Map, Aling, hSpace ) CLASS Html
    LOCAL cStr := ""
+   default lbreak := .F.
 
    IF cName != NIL
       cStr += ' NAME= "' + cName + '"'
@@ -1305,7 +1309,7 @@ METHOD PutImage( cImage, nBorder, nHeight, ;
 
    Fwrite( ::nH, ;
            '<IMG SRC="' + cImage + '"' + ;
-           cStr + '>' + IIF( lBreak, '<br>' + CRLF(), "" ) )
+           cStr + '>' + IIF( lBreak, "<br>" + CRLF(), "" ) )
 
 RETURN Self
 

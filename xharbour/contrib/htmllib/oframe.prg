@@ -1,5 +1,5 @@
 /*
- * $Id: oframe.prg,v 1.1 2001/12/25 16:51:58 lculik Exp $
+ * $Id: oframe.prg,v 1.1 2003/02/23 23:15:17 lculik Exp $
  */
 
 /*
@@ -124,7 +124,7 @@ METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS Frameset
       cStr += ' cols="'
 
       FOR EACH cItem IN aCols
-
+        i:=hb_enumindex()
          IF i < Len( aCols )
             cStr += cItem + ","
          ELSE
