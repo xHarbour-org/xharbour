@@ -269,7 +269,7 @@ HB_FUNC( GETVOLUMEPATHNAME )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC(GETSHORTPATHNAME)
+HB_FUNC( GETSHORTPATHNAME )
 {
    char buffer[ MAX_PATH + 1 ] = {0};
    int iRet;
@@ -312,7 +312,7 @@ BOOL GetVolumeInformation(
 // Syntax:
 // GetVolumeInformation([cPath],[@cVolName],[@nSerNum],[@nMaxName],[@nFlags],[@cFATName] )
 
-HB_FUNC(GETVOLUMEINFORMATION)
+HB_FUNC( GETVOLUMEINFORMATION )
 {
   char *VolumeNameBuffer     = (char *) hb_xgrab( MAX_PATH ) ;
   DWORD VolumeSerialNumber                              ;

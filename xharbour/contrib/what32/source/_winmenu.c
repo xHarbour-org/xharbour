@@ -16,7 +16,7 @@
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( APPENDMENU )
+HB_FUNC( APPENDMENU )
 {
   hb_retl( AppendMenu( (HMENU) hb_parnl(1), hb_parni(2), hb_parni(3), hb_parcx(4)) ) ;
 }
@@ -24,35 +24,35 @@ HB_FUNC ( APPENDMENU )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( CHECKMENUITEM )
+HB_FUNC( CHECKMENUITEM )
 {
   hb_retnl( CheckMenuItem((HMENU) hb_parnl(1), hb_parni(2), hb_parni(3)) ) ;
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( CREATEMENU )
+HB_FUNC( CREATEMENU )
 {
   hb_retnl( (LONG) CreateMenu() ) ;
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( CREATEPOPUPMENU )
+HB_FUNC( CREATEPOPUPMENU )
 {
   hb_retnl( (LONG) CreatePopupMenu() ) ;
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( DELETEMENU )
+HB_FUNC( DELETEMENU )
 {
   hb_retl( DeleteMenu( (HMENU) hb_parnl(1), hb_parni(2), hb_parni(3) ) );
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( DESTROYMENU )
+HB_FUNC( DESTROYMENU )
 
 {
   hb_retl( DestroyMenu( (HMENU) hb_parnl(1) ) ) ;
@@ -60,7 +60,7 @@ HB_FUNC ( DESTROYMENU )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( GETMENU )
+HB_FUNC( GETMENU )
 
 {
   hb_retnl( (LONG) GetMenu( (HWND) hb_parnl(1) ) ) ;
@@ -68,7 +68,7 @@ HB_FUNC ( GETMENU )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( GETMENUITEMID )
+HB_FUNC( GETMENUITEMID )
 {
    hb_retni( GetMenuItemID(
                             (HMENU) hb_parnl( 1 ),  // handle to menu
@@ -78,14 +78,14 @@ HB_FUNC ( GETMENUITEMID )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( DRAWMENUBAR )
+HB_FUNC( DRAWMENUBAR )
 {
   hb_retl( DrawMenuBar( (HWND) hb_parnl(1))) ;
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( ENABLEMENUITEM )
+HB_FUNC( ENABLEMENUITEM )
 {
   hb_retl( EnableMenuItem( (HMENU) hb_parnl(1), hb_parni(2), hb_parni(3) ) ) ;
 }

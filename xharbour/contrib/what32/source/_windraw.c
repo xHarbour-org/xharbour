@@ -19,7 +19,7 @@ extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
 // Syntax:
 // MoveTo( x, y ) -> lSuccess
 
-HB_FUNC ( MOVETO )
+HB_FUNC( MOVETO )
 {
 
    hb_retl( MoveToEx(
@@ -36,7 +36,7 @@ HB_FUNC ( MOVETO )
 // MoveTo(hDC, x, y) -> aOldPoint or NIL
 
 
-HB_FUNC ( MOVETOEX )
+HB_FUNC( MOVETOEX )
 {
 
    POINT Point ;

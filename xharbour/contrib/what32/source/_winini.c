@@ -63,7 +63,7 @@
 
 
 //-----------------------------------------------------------------------------
-HB_FUNC (GETPROFILESTRING )
+HB_FUNC( GETPROFILESTRING )
 {
    DWORD nSize = 1024 ;
    LPTSTR bBuffer = (LPTSTR) hb_xgrab( nSize ) ;
@@ -96,7 +96,7 @@ HB_FUNC (GETPROFILESTRING )
 }
 
 //-----------------------------------------------------------------------------
-HB_FUNC (GETPRIVATEPROFILESTRING )
+HB_FUNC( GETPRIVATEPROFILESTRING )
 {
    DWORD nSize = 1024 ;
    LPTSTR bBuffer = (LPTSTR) hb_xgrab( nSize ) ;

@@ -25,7 +25,7 @@ extern void Size2ArrayEx( SIZE *siz  ,  PHB_ITEM aSize);
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( GETDC )
+HB_FUNC( GETDC )
 {
    hb_retnl( (ULONG) GetDC( (HWND) hb_parnl(1) ) ) ;
 }
@@ -61,7 +61,7 @@ HB_FUNC( GETDCEX )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( RELEASEDC )
+HB_FUNC( RELEASEDC )
 {
    hb_retni( ReleaseDC( (HWND) hb_parnl(1), (HDC) hb_parnl(2) ) ) ;
 }
@@ -93,7 +93,7 @@ HB_FUNC( CREATECOMPATIBLEDC )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( WINDOWFROMDC )
+HB_FUNC( WINDOWFROMDC )
 {
    hb_retnl( (LONG) WindowFromDC( (HDC) hb_parnl( 1 ) ) );
 }

@@ -21,7 +21,7 @@
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( _ISDIALOGMESSAGE )
+HB_FUNC( _ISDIALOGMESSAGE )
 {
   hb_retl(IsDialogMessage( (HWND) hb_parnl(1), (MSG*) hb_parcx(2) )) ;
 }
@@ -38,21 +38,21 @@ HB_FUNC( TRANSLATEMDISYSACCEL )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( TRANSLATEMESSAGE )
+HB_FUNC( TRANSLATEMESSAGE )
 {
   hb_retl(TranslateMessage( (MSG*) hb_parcx(1))) ;
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( DISPATCHMESSAGE )
+HB_FUNC( DISPATCHMESSAGE )
 {
   hb_retnl(DispatchMessage( (MSG*) hb_parcx(1))) ;
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( POSTQUITMESSAGE )
+HB_FUNC( POSTQUITMESSAGE )
 {
   PostQuitMessage(hb_parni(1));
 }
@@ -60,7 +60,7 @@ HB_FUNC ( POSTQUITMESSAGE )
 //-----------------------------------------------------------------------------
 
 
-HB_FUNC ( POSTMESSAGE )
+HB_FUNC( POSTMESSAGE )
 {
 
    char *cText ;
@@ -88,7 +88,7 @@ HB_FUNC ( POSTMESSAGE )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( SENDMESSAGE )
+HB_FUNC( SENDMESSAGE )
 {
 
    char *cText ;
@@ -117,7 +117,7 @@ HB_FUNC ( SENDMESSAGE )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( SENDDLGITEMMESSAGE )
+HB_FUNC( SENDDLGITEMMESSAGE )
 {
    char *cText;
    PHB_ITEM pText = hb_param( 5, HB_IT_STRING );
@@ -169,7 +169,7 @@ HB_FUNC ( SENDDLGITEMMESSAGE )
 
 // add error handling and recovery
 
-HB_FUNC ( GETMESSAGE )
+HB_FUNC( GETMESSAGE )
 {
   MSG Msg ;
 
@@ -187,7 +187,7 @@ HB_FUNC ( GETMESSAGE )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( PEEKMESSAGE )
+HB_FUNC( PEEKMESSAGE )
 {
   MSG Msg ;
 

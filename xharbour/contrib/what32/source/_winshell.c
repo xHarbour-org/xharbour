@@ -140,7 +140,7 @@ HB_FUNC( COMMANDLINETOARGVW )
 //-----------------------------------------------------------------------------
 // SHSTDAPI_(INT) ShellAboutA(HWND hWnd, LPCSTR szApp, LPCSTR szOtherStuff, HICON hIcon);
 
-HB_FUNC ( SHELLABOUT )
+HB_FUNC( SHELLABOUT )
 {
    hb_retni( ShellAbout( (HWND) hb_parnl(1),
                          (LPCSTR) hb_parcx(2),

@@ -31,7 +31,7 @@ extern void Size2ArrayEx( SIZE *siz  ,  PHB_ITEM aSize);
 // syntax
 // TextOut(hDC, x, y, cStr) -> lSuccess
 
-HB_FUNC ( TEXTOUT )
+HB_FUNC( TEXTOUT )
 {
 
    hb_retl( TextOut((HDC) hb_parnl( 1 )   ,	// handle of device context
@@ -108,7 +108,7 @@ HB_FUNC( EXTTEXTOUT )
 // syntax
 // DrawText( hDC, cStr, aRect, [uFormat]) -> nTextHeight, or 0
 
-HB_FUNC ( DRAWTEXT )
+HB_FUNC( DRAWTEXT )
 {
    char *cText = hb_parcx( 2 );
    RECT rc;
@@ -130,7 +130,7 @@ HB_FUNC ( DRAWTEXT )
 // syntax
 // DrawText( hDC, cStr, aRect, [uFormat],[DTParams]) -> nTextHeight, or 0
 
-HB_FUNC ( DRAWTEXTEX )
+HB_FUNC( DRAWTEXTEX )
 {
    char *cText = (char *) hb_parcx( 2 );
    RECT rc;
@@ -254,7 +254,7 @@ HB_FUNC( GETTABBEDTEXTEXTENT )
 // Syntax
 // GetTextMetrics(hDC) -> TEXTMETRIC_Structure_Buffer, or NIL
 
-HB_FUNC ( GETTEXTMETRICS )
+HB_FUNC( GETTEXTMETRICS )
 {
    TEXTMETRIC tm ;
 
@@ -285,7 +285,7 @@ HB_FUNC( GETOUTLINETEXTMETRICSA )
 // Syntax
 // GetTextExtentPoint32( hDC, cStr ) -> aSize, or NIL
 
-HB_FUNC ( GETTEXTEXTENTPOINT32 )
+HB_FUNC( GETTEXTEXTENTPOINT32 )
 {
    char * pstr = hb_parcx(2);
    SIZE sz;

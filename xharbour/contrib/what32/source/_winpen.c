@@ -17,7 +17,7 @@
 //-----------------------------------------------------------------------------
 // WINGDIAPI HPEN WINAPI CreatePen( IN int, IN int, IN COLORREF);
 
-HB_FUNC ( CREATEPEN )
+HB_FUNC( CREATEPEN )
 {
    hb_retnl( (LONG) CreatePen(
                hb_parni( 1 ),	// pen style 

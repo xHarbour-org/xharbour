@@ -747,7 +747,7 @@ LPWORD lpwAlign ( LPWORD lpIn);
 //       (the window background stays black)
 //       but not specifying it generates a WARNING, but it works OK.
 
-HB_FUNC ( _REGISTERCLASS )
+HB_FUNC( _REGISTERCLASS )
 {
    WNDCLASS *wndclass = ( WNDCLASS *) hb_param( 1, HB_IT_STRING )->item.asString.value ;
    wndclass->lpfnWndProc   = __WndProc ;
@@ -771,7 +771,7 @@ HB_FUNC ( _REGISTERCLASS )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( _UNREGISTERCLASS )
+HB_FUNC( _UNREGISTERCLASS )
 {
    HANDLE hInst = ( ISNIL(2) ? GetModuleHandle(NULL) : (HANDLE) hb_parnl(2) ) ;
 
@@ -783,7 +783,7 @@ HB_FUNC ( _UNREGISTERCLASS )
 // hMenu or Window ID are interchangable
 // casting Id to hMenu stops it from working correctly
 
-HB_FUNC ( _CREATEWINDOWEX )
+HB_FUNC( _CREATEWINDOWEX )
 {
    DWORD  dwExStyle  = (ISNIL(1)  ? 0 : hb_parnl(1)) ;
    LPCSTR cClass     = (LPCSTR) hb_parc(2);
@@ -809,7 +809,7 @@ HB_FUNC ( _CREATEWINDOWEX )
 
 //  Creates child MDI window
 
-HB_FUNC ( _CREATEMDIWINDOW )
+HB_FUNC( _CREATEMDIWINDOW )
 {
    LPCSTR cClass     = (LPCSTR) hb_parc(1);
    LPCSTR cTitle     = (LPCSTR) hb_parc(2);
@@ -1113,7 +1113,7 @@ LRESULT CALLBACK __WndProc10 (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 // called once, on start-up
 
-HB_FUNC (GETWNDPROC )
+HB_FUNC( GETWNDPROC )
 {
 
   switch ( hb_parni(1) )
@@ -1169,7 +1169,7 @@ HB_FUNC (GETWNDPROC )
 
 //----------------------------------------------------------------------------
 
-HB_FUNC ( _GETDLGPROC )
+HB_FUNC( _GETDLGPROC )
 {
     hb_retnl( (ULONG) __DlgProc ) ;
 }
@@ -1205,7 +1205,7 @@ BOOL CALLBACK __DlgProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 //----------------------------------------------------------------------------
 
-HB_FUNC ( _DIALOGBOX )
+HB_FUNC( _DIALOGBOX )
 {
 
 
@@ -1220,7 +1220,7 @@ HB_FUNC ( _DIALOGBOX )
 
 //----------------------------------------------------------------------------
 
-HB_FUNC ( _DIALOGBOXINDIRECT )
+HB_FUNC( _DIALOGBOXINDIRECT )
 {
 
    hb_retni( DialogBoxIndirect( (ISNIL(1)  ? GetModuleHandle(NULL) : (HINSTANCE) hb_parnl(1) )   ,
@@ -1233,7 +1233,7 @@ HB_FUNC ( _DIALOGBOXINDIRECT )
 
 //----------------------------------------------------------------------------
 
-HB_FUNC ( _CREATEDIALOG )
+HB_FUNC( _CREATEDIALOG )
 {
 
   hb_retnl( (ULONG) CreateDialog( (ISNIL(1)  ? GetModuleHandle(NULL) : (HINSTANCE) hb_parnl(1) )  ,
@@ -1246,7 +1246,7 @@ HB_FUNC ( _CREATEDIALOG )
 
 //----------------------------------------------------------------------------
 
-HB_FUNC ( _CREATEDIALOGINDIRECT )
+HB_FUNC( _CREATEDIALOGINDIRECT )
 {
   hb_retnl(
    (ULONG) CreateDialogIndirect(
@@ -1262,7 +1262,7 @@ HB_FUNC ( _CREATEDIALOGINDIRECT )
 
 // Create dynamic dialog from the Harbour array
 
-HB_FUNC ( _MAKEDLGTEMPLATE )
+HB_FUNC( _MAKEDLGTEMPLATE )
 
 {
    WORD *p, *pdlgtemplate ;

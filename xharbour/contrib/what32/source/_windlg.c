@@ -26,14 +26,14 @@
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( ENDDIALOG )
+HB_FUNC( ENDDIALOG )
 {
   EndDialog( (HWND) hb_parnl(1) , hb_parni(2) ) ;
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( GETDLGITEM )
+HB_FUNC( GETDLGITEM )
 {
    HWND hWnd = GetDlgItem(
                  (HWND) hb_parnl( 1 ), // handle of dialog box
@@ -102,7 +102,7 @@ HB_FUNC( SETDLGITEMINT )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( SETDLGITEMTEXT )
+HB_FUNC( SETDLGITEMTEXT )
 {
     SetDlgItemText(
        (HWND) hb_parnl( 1 ),  // handle of dialog box
@@ -115,7 +115,7 @@ HB_FUNC ( SETDLGITEMTEXT )
 
 // modified API
 
-HB_FUNC ( GETDLGITEMTEXT )  // GETDLGITMTEXT
+HB_FUNC( GETDLGITEMTEXT )  // GETDLGITMTEXT
 {
 
    USHORT iLen = SendMessage( GetDlgItem( (HWND) hb_parnl( 1 ), hb_parni( 2 ) ), WM_GETTEXTLENGTH, 0, 0 )+1 ;
@@ -137,7 +137,7 @@ HB_FUNC ( GETDLGITEMTEXT )  // GETDLGITMTEXT
 
 // NOT WIN API !!!
 
-HB_FUNC ( GETLBITEMTEXT )  // GETDLGITMTEXT
+HB_FUNC( GETLBITEMTEXT )  // GETDLGITMTEXT
 {
    USHORT iLen = ISNIL(3) ? 255 : hb_parni( 3 );
    char *cText = (char*) hb_xgrab( iLen+1 );
@@ -156,7 +156,7 @@ HB_FUNC ( GETLBITEMTEXT )  // GETDLGITMTEXT
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( CHECKDLGBUTTON )
+HB_FUNC( CHECKDLGBUTTON )
 {
     hb_retl( CheckDlgButton(
                              (HWND) hb_parnl( 1 ), // handle of dialog box
@@ -166,7 +166,7 @@ HB_FUNC ( CHECKDLGBUTTON )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( CHECKRADIOBUTTON )
+HB_FUNC( CHECKRADIOBUTTON )
 {
     hb_retl( CheckRadioButton(
                               (HWND) hb_parnl( 1 ),   // handle of dialog box
@@ -178,7 +178,7 @@ HB_FUNC ( CHECKRADIOBUTTON )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( ISDLGBUTTONCHECKED )
+HB_FUNC( ISDLGBUTTONCHECKED )
 {
   hb_retni( IsDlgButtonChecked(
                                (HWND) hb_parnl( 1 ),       // handle of dialog box
@@ -353,7 +353,7 @@ HB_FUNC( GETLISTBOXINFO )
 }
 */
 
-HB_FUNC ( GETLISTBOXINFO )
+HB_FUNC( GETLISTBOXINFO )
 {
 HINSTANCE h    = LoadLibraryEx( "user32.dll", NULL, 0);
 DWORD dwGLIRet = 0 ;

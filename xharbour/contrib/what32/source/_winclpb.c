@@ -166,7 +166,7 @@ HB_FUNC( GETCLIPBOARDDATA )
 */
 //----------------------------------------------------------------------------//
 
-HB_FUNC ( GETCLIPBOARDDATA )
+HB_FUNC( GETCLIPBOARDDATA )
 {
    WORD    wType = ( ISNIL( 1 ) ? CF_TEXT : hb_parni( 1 ) );
    HGLOBAL hMem ;

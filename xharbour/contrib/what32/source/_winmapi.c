@@ -30,7 +30,7 @@
 //
 //컴컴컴컴컴컴컴컴컴컴컴컴�\\
 
-HB_FUNC ( MAPISENDMAIL )
+HB_FUNC( MAPISENDMAIL )
 {
 	MapiRecipDesc orig ;
 	MapiRecipDesc rcpt ;

@@ -245,7 +245,7 @@ extern RESULT DynaCall(int Flags, DWORD lpFunction,
 
 // CallDll( hInstDLL, pFunctAddr, nFlags, nRetType, nParmType1, xParm1, nParmType2, xParm2, nParmTypeN, xParmN)
 
-HB_FUNC ( CALLDLL )
+HB_FUNC( CALLDLL )
 {
     int i;
     int iCnt = 0;

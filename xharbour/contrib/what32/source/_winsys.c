@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.20 2004/03/18 04:11:10 ronpinkas Exp $
+ * $Id: _winsys.c,v 1.21 2004/03/19 12:41:23 vouchcac Exp $
  */
 
 //-------------------------------------------------------------------//
@@ -57,7 +57,7 @@ HB_FUNC( GETFREESPACE )
 
 //-------------------------------------------------------------------//
 
-HB_FUNC ( OUTPUTDEBUGSTRING )
+HB_FUNC( OUTPUTDEBUGSTRING )
 {
    OutputDebugString( (LPCSTR) hb_parcx( 1 ) ) ;
 }
@@ -99,7 +99,7 @@ HB_FUNC( SETTIMEZONEINFORMATION )
 //
 // Win98 ++
 /*
-HB_FUNC ( ISDEBUGGERPRESENT )
+HB_FUNC( ISDEBUGGERPRESENT )
 {
    hb_retl( IsDebuggerPresent() ) ;
 }
@@ -241,7 +241,7 @@ HB_FUNC( SETLASTERROREX )
 HANDLE GetStdHandle(DWORD nStdHandle )  // input, output, or error device
 */
 
-HB_FUNC ( GETSTDHANDLE )
+HB_FUNC( GETSTDHANDLE )
 {
    hb_retnl( (LONG) GetStdHandle( (DWORD) hb_parnl(1) ) ) ;
 }
@@ -254,7 +254,7 @@ BOOL SetStdHandle(
 );
 */
 
-HB_FUNC ( SETSTDHANDLE )
+HB_FUNC( SETSTDHANDLE )
 {
    hb_retl( SetStdHandle( (DWORD) hb_parnl(1), (HANDLE) hb_parnl(2) ) ) ;
 }
@@ -264,7 +264,7 @@ HB_FUNC ( SETSTDHANDLE )
 BOOL SetConsoleTitle(LPCSTR szTitle )
 */
 
-HB_FUNC ( SETCONSOLETITLE )
+HB_FUNC( SETCONSOLETITLE )
 {
    hb_retnl( ( LONG ) SetConsoleTitle( ( LPCSTR ) hb_parcx( 1 ) ) ) ;
 }
@@ -279,7 +279,7 @@ Note: The real API is only supported on Windows 2000 and above, so we do a nasty
       3) use FindWindow to find the window handle of the window with our text
       4) restore the original text
 */
-HB_FUNC ( GETCONSOLEWINDOW )
+HB_FUNC( GETCONSOLEWINDOW )
 {
    char realtitle[ MAX_PATH ];
 
@@ -322,7 +322,7 @@ HB_FUNC( KILLTIMER )
 
 //-------------------------------------------------------------------//
 
-HB_FUNC ( GETSYSCOLOR )
+HB_FUNC( GETSYSCOLOR )
 {
   hb_retnl( GetSysColor( hb_parni(1) ) ) ;
 }
@@ -884,7 +884,7 @@ HB_FUNC( WINHELP )
 //  free HtmlHelp Workshop doanloadable from MSDN
 //
 /*
-HB_FUNC(HTMLHELP)
+HB_FUNC( HTMLHELP )
 {
 
  hb_retnl( (LONG) HtmlHelp( (HWND)   hb_parnl( 1 )  ,
@@ -1006,7 +1006,7 @@ HB_FUNC( WRITEFILE )
 /*
 DWORD GetCurrentProcessId( VOID )
 */
-HB_FUNC ( GETCURRENTPROCESSID )
+HB_FUNC( GETCURRENTPROCESSID )
 {
    hb_retnl( (ULONG) GetCurrentProcessId() );
 }
@@ -1015,7 +1015,7 @@ HB_FUNC ( GETCURRENTPROCESSID )
 /*
 DWORD GetCurrentProcess( VOID )
 */
-HB_FUNC ( GETCURRENTPROCESS )
+HB_FUNC( GETCURRENTPROCESS )
 {
    hb_retnl( (LONG) GetCurrentProcess() );
 }
@@ -1024,7 +1024,7 @@ HB_FUNC ( GETCURRENTPROCESS )
 /*
 DWORD GetCurrentThreadId( VOID )
 */
-HB_FUNC ( GETCURRENTTHREADID )
+HB_FUNC( GETCURRENTTHREADID )
 {
    hb_retnl( (DWORD) GetCurrentThreadId() );
 }
@@ -1035,7 +1035,7 @@ BOOL GetProcessWorkingSetSize( HANDLE hProcess, PSIZE_T lpMinimumWorkingSetSize,
                                PSIZE_T lpMaximumWorkingSetSize );
 NOTE: This function is not supported and returns .F. under Windows 9x
 */
-HB_FUNC ( GETPROCESSWORKINGSETSIZE )
+HB_FUNC( GETPROCESSWORKINGSETSIZE )
 {
    DWORD MinimumWorkingSetSize=0;
    DWORD MaximumWorkingSetSize=0;
@@ -1053,7 +1053,7 @@ BOOL SetProcessWorkingSetSize( HANDLE hProcess, PSIZE_T lpMinimumWorkingSetSize,
 NOTE: This function is not supported and returns .F. under Windows 9x
       It may also fail if the process does not have right SE_INC_BASE_PRIORITY_NAME on NT/2000
 */
-HB_FUNC ( SETPROCESSWORKINGSETSIZE )
+HB_FUNC( SETPROCESSWORKINGSETSIZE )
 {
    hb_retl(SetProcessWorkingSetSize(ISNIL(1) ? GetCurrentProcess() : (HANDLE) hb_parnl( 1 ),
                    hb_parnl( 2 ), hb_parnl( 3 ) ));
@@ -1064,7 +1064,7 @@ HB_FUNC ( SETPROCESSWORKINGSETSIZE )
 DWORD VirtualQuery( LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer,  SIZE_T dwLength);
 - may not be functional, always seems to return error
 */
-HB_FUNC ( VIRTUALQUERY )
+HB_FUNC( VIRTUALQUERY )
 {
    if (hb_parni(1) >= sizeof(MEMORY_BASIC_INFORMATION))
    {
@@ -1082,7 +1082,7 @@ HB_FUNC ( VIRTUALQUERY )
 BOOL VirtualLock(LPVOID lpAddress, SIZE_T dwSize );
 - may not be functional, always seems to return error
 */
-HB_FUNC ( VIRTUALLOCK )
+HB_FUNC( VIRTUALLOCK )
 {
    hb_retl( VirtualLock( ( void * ) hb_parnl( 1 ), hb_parni( 2 ) ) );
 }
@@ -1107,7 +1107,7 @@ HB_FUNC ( VIRTUALLOCK )
 //   } SYSTEMTIME
 //
 //
-HB_FUNC ( FILETIMETOSYSTEMTIME )
+HB_FUNC( FILETIMETOSYSTEMTIME )
 {
    FILETIME   *FileTime  = ( FILETIME *) hb_param( 1, HB_IT_STRING )->item.asString.value ;
    SYSTEMTIME SystemTime ;

@@ -279,7 +279,7 @@ HB_FUNC( SETMAPPERFLAGS )
 // Local cPS
 // BeginPaint( hWnd, @cPS) -> hDC
 
-HB_FUNC ( BEGINPAINT )
+HB_FUNC( BEGINPAINT )
 {
    PAINTSTRUCT pps ;
    hb_retnl( (LONG) BeginPaint( (HWND) hb_parnl( 1 ), &pps ) ) ;
@@ -292,7 +292,7 @@ HB_FUNC ( BEGINPAINT )
 // SYNTAX
 // EndPaint(hWnd,cPS)->lSuccess
 
-HB_FUNC ( ENDPAINT )
+HB_FUNC( ENDPAINT )
 {
    hb_retl( EndPaint( (HWND) hb_parnl( 1 ), (PAINTSTRUCT*) hb_parcx( 2 ) ) );
 }

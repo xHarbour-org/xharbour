@@ -244,7 +244,7 @@ HB_FUNC( REGDELETEKEY )
 //  For strange reasons this function is not working properly
 //  May be I am missing something. Pritpal Bedi.
 
-HB_FUNC ( REGDELETEVALUE )
+HB_FUNC( REGDELETEVALUE )
 {
    if ( RegDeleteValue( ( HKEY ) hb_parnl( 1 ), hb_parcx( 2 ) ) == ERROR_SUCCESS )
      {

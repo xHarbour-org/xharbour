@@ -12,38 +12,38 @@
 #include "hbapiitm.h"
 
 
-HB_FUNC ( LISTVIEW_DELETEALLITEMS )
+HB_FUNC( LISTVIEW_DELETEALLITEMS )
 {
    ListView_DeleteAllItems( (HWND) hb_parnl(1) );
 }
 
-HB_FUNC ( LISTVIEW_DELETECOLUMN )
+HB_FUNC( LISTVIEW_DELETECOLUMN )
 {
    ListView_DeleteColumn( (HWND) hb_parnl(1), (INT) hb_parni(2) );
 }
 
-HB_FUNC ( LISTVIEW_ENSUREVISIBLE )
+HB_FUNC( LISTVIEW_ENSUREVISIBLE )
 {
    hb_retl(ListView_EnsureVisible( (HWND) hb_parnl(1), hb_parni(2), hb_parl(3) ));
 }
 
-HB_FUNC ( LISTVIEW_INSERTCOLUMN )
+HB_FUNC( LISTVIEW_INSERTCOLUMN )
 {
    LV_COLUMN *lvColumn = ( LV_COLUMN *) hb_param( 3, HB_IT_STRING )->item.asString.value ;
    ListView_InsertColumn( (HWND)hb_parnl(1), hb_parni(2), lvColumn );
 }
 
-HB_FUNC ( LISTVIEW_SETITEMCOUNT )
+HB_FUNC( LISTVIEW_SETITEMCOUNT )
 {
    ListView_SetItemCount( (HWND) hb_parnl(1), hb_parnl(2) );
 }
 
-HB_FUNC ( LISTVIEW_GETNEXTITEM )
+HB_FUNC( LISTVIEW_GETNEXTITEM )
 {
    hb_retnl(ListView_GetNextItem( (HWND) hb_parnl(1), hb_parni(2), hb_parnl(3) ));
 }
 
-HB_FUNC ( LISTVIEWNOTIFY )
+HB_FUNC( LISTVIEWNOTIFY )
 {
    LPARAM lParam = (LPARAM) hb_parnl(2);
    LPNMHDR lpnmh = (LPNMHDR) lParam;

@@ -33,7 +33,7 @@ extern void Size2ArrayEx( SIZE *siz  ,  PHB_ITEM aSize);
 //-----------------------------------------------------------------------------
 // to be tested
 
-HB_FUNC ( LOADBITMAP )
+HB_FUNC( LOADBITMAP )
 {
    hb_retnl( (LONG) LoadBitmap(
              ISNIL(1) ? GetModuleHandle( NULL ): (HINSTANCE) hb_parnl(1) ,
@@ -46,7 +46,7 @@ HB_FUNC ( LOADBITMAP )
 // Alex Kresin
 // DrawBitmap( hDC, hBitmap, nROP, x, y, nWidth, hHeight )
 
-HB_FUNC ( DRAWBITMAP )
+HB_FUNC( DRAWBITMAP )
 {
    HDC hDC = (HDC) hb_parnl( 1 );
    HDC hDCmem = CreateCompatibleDC( hDC );

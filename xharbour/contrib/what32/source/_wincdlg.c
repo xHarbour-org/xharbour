@@ -39,7 +39,7 @@ HB_FUNC( COMMDLGEXTENDEDERROR )
 
 //Syntax: ChooseFont( cf:value) -> structure buffer, or NIL
 
-HB_FUNC(CHOOSEFONT)
+HB_FUNC( CHOOSEFONT )
 {
   CHOOSEFONT *cf =  (CHOOSEFONT * ) hb_param( 1, HB_IT_STRING )->item.asString.value;
 
@@ -53,7 +53,7 @@ HB_FUNC(CHOOSEFONT)
 
 // to be called called via FindText (in WinCDlg.Prg)
 
-HB_FUNC(_FINDTEXT)
+HB_FUNC( _FINDTEXT )
 {
    FINDREPLACE fr ;
 
@@ -78,7 +78,7 @@ HB_FUNC(_FINDTEXT)
 
 // to be called called via FindText (in WinCDlg.Prg)
 
-HB_FUNC(_REPLACETEXT)
+HB_FUNC( _REPLACETEXT )
 {
    FINDREPLACE fr ;
 
@@ -141,7 +141,7 @@ HB_FUNC( PRINTDLGEX )
 
 //----------------------------------------------------------------------------
 
-HB_FUNC(PAGESETUPDLG)
+HB_FUNC( PAGESETUPDLG )
 {
 
    PAGESETUPDLG *psd = (PAGESETUPDLG * ) hb_param( 1, HB_IT_STRING )->item.asString.value;
@@ -163,7 +163,7 @@ HB_FUNC(PAGESETUPDLG)
 
 // nColor := ChooseColor( [hParentWnd],[nInitColor],[aCustColors[16]],[nFlags])
 
-HB_FUNC ( CHOOSECOLOR )
+HB_FUNC( CHOOSECOLOR )
 {
    CHOOSECOLOR cc ;
    COLORREF crCustClr[16] ;
@@ -187,7 +187,7 @@ HB_FUNC ( CHOOSECOLOR )
 
 // to be called via GetOpenFileName in WinCDlg.Prg
 
-HB_FUNC ( _GETOPENFILENAME )
+HB_FUNC( _GETOPENFILENAME )
 {
    OPENFILENAME ofn;
    char *szFileName =(char*) hb_xgrab( hb_parcsiz(2));
@@ -226,7 +226,7 @@ HB_FUNC ( _GETOPENFILENAME )
 
 // to be called via GetSaveFileName in WinCDlg.Prg
 
-HB_FUNC ( _GETSAVEFILENAME )
+HB_FUNC( _GETSAVEFILENAME )
 {
     OPENFILENAME ofn;
     char szFileName[MAX_PATH+1] ;

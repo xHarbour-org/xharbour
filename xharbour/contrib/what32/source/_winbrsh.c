@@ -19,7 +19,7 @@
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( CREATESOLIDBRUSH )
+HB_FUNC( CREATESOLIDBRUSH )
 {
    hb_retnl( (LONG) CreateSolidBrush( (COLORREF) hb_parnl( 1 ) ) ) ;    // brush color
 }
@@ -27,7 +27,7 @@ HB_FUNC ( CREATESOLIDBRUSH )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( CREATEPATTERNBRUSH )
+HB_FUNC( CREATEPATTERNBRUSH )
 {
    hb_retnl( (LONG) CreatePatternBrush((HBITMAP) hb_parnl( 1 ) ) ) ;    // bitmap handle
 }

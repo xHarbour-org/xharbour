@@ -17,21 +17,21 @@ extern void Size2ArrayEx( SIZE *siz  ,  PHB_ITEM aSize);
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( ISICONIC )
+HB_FUNC( ISICONIC )
 {
    hb_retl( IsIconic( (HWND) hb_parnl( 1 ) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( ISWINDOWVISIBLE )
+HB_FUNC( ISWINDOWVISIBLE )
 {
    hb_retl( IsWindowVisible( (HWND) hb_parnl( 1 ) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( ISZOOMED )
+HB_FUNC( ISZOOMED )
 {
    hb_retl( IsZoomed( (HWND) hb_parnl( 1 ) ) ) ;
 }
@@ -49,14 +49,14 @@ HB_FUNC( ISWINDOWUNICODE )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( CLOSEWINDOW )
+HB_FUNC( CLOSEWINDOW )
 {
    hb_retl( CloseWindow( (HWND) hb_parnl(1) ) );
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( FINDWINDOW )
+HB_FUNC( FINDWINDOW )
 {
 
    hb_retnl((ULONG) FindWindow( (LPCSTR) hb_parcx(1), ISCHAR(2) ? hb_parcx(2):NULL ) ) ;
@@ -78,28 +78,28 @@ HB_FUNC( FINDWINDOWEX )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( ISCHILD )
+HB_FUNC( ISCHILD )
 {
    hb_retl( ( BOOL ) IsChild( (HWND) hb_parnl(1), (HWND) hb_parnl(2) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( UPDATEWINDOW )
+HB_FUNC( UPDATEWINDOW )
 {
   hb_retl( UpdateWindow( (HWND) hb_parnl(1)) ) ;
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( GETWINDOWLONG )
+HB_FUNC( GETWINDOWLONG )
 {
    hb_retnl( GetWindowLong( (HWND) hb_parnl(1), hb_parni(2) ));
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( SETWINDOWLONG )
+HB_FUNC( SETWINDOWLONG )
 {
    hb_retnl( SetWindowLong( (HWND) hb_parnl(1), hb_parni(2), hb_parnl(3) ));
 }
@@ -107,7 +107,7 @@ HB_FUNC ( SETWINDOWLONG )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( ENABLEWINDOW )
+HB_FUNC( ENABLEWINDOW )
 {
    EnableWindow( (HWND) hb_parnl(1), hb_parl(2) ) ;
 }
@@ -123,27 +123,27 @@ HB_FUNC( ISWINDOWENABLED )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( DESTROYWINDOW )
+HB_FUNC( DESTROYWINDOW )
 {
    hb_retl( DestroyWindow( (HWND) hb_parnl( 1 )) );
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( ISWINDOW )
+HB_FUNC( ISWINDOW )
 {
     hb_retl( IsWindow( (HWND) hb_parnl( 1 )) );
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( SHOWWINDOW )
+HB_FUNC( SHOWWINDOW )
 {
    hb_retl( ShowWindow( (HWND) hb_parnl( 1 ), hb_parni(2) ));
 }
 
 //-----------------------------------------------------------------------------
-HB_FUNC ( MOVEWINDOW )
+HB_FUNC( MOVEWINDOW )
 {
   hb_retl( MoveWindow(
                        (HWND) hb_parnl(1),
@@ -157,28 +157,28 @@ HB_FUNC ( MOVEWINDOW )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( DEFWINDOWPROC )
+HB_FUNC( DEFWINDOWPROC )
 {
   hb_retnl( DefWindowProc( (HWND) hb_parnl(1), hb_parnl(2), hb_parnl(3), hb_parnl(4)));
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( DEFDLGPROC )
+HB_FUNC( DEFDLGPROC )
 {
   hb_retnl( DefDlgProc( (HWND) hb_parnl(1), hb_parnl(2), hb_parnl(3), hb_parnl(4)));
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( DEFMDICHILDPROC )
+HB_FUNC( DEFMDICHILDPROC )
 {
   hb_retnl( DefMDIChildProc( (HWND) hb_parnl(1), hb_parnl(2), hb_parnl(3), hb_parnl(4)));
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( DEFFRAMEPROC )
+HB_FUNC( DEFFRAMEPROC )
 {
   hb_retnl( DefFrameProc( (HWND) hb_parnl(1), (HWND) hb_parnl(2), hb_parnl(3), hb_parnl(4), hb_parnl(5)));
 }
@@ -186,7 +186,7 @@ HB_FUNC ( DEFFRAMEPROC )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( CALLWINDOWPROC )
+HB_FUNC( CALLWINDOWPROC )
 {
   hb_retnl( CallWindowProc( (WNDPROC) hb_parnl(1), (HWND) hb_parnl(2), hb_parni(3), hb_parnl(4), hb_parnl(5)));
 }
@@ -196,7 +196,7 @@ HB_FUNC ( CALLWINDOWPROC )
 //WINUSERAPI BOOL WINAPI InvalidateRect(    IN HWND hWnd,    IN CONST RECT *lpRect,    IN BOOL bErase);
 //SYNTAX INVALIDATERECT ( hWnd,aArray ) -> lSuccess
 
-HB_FUNC ( INVALIDATERECT )
+HB_FUNC( INVALIDATERECT )
 {
    RECT rc;
    BOOL bRectOk ;
@@ -214,7 +214,7 @@ HB_FUNC ( INVALIDATERECT )
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI RedrawWindow( IN HWND hWnd, IN CONST RECT *lprcUpdate, IN HRGN hrgnUpdate, IN UINT flags);
 
-HB_FUNC ( REDRAWWINDOW )
+HB_FUNC( REDRAWWINDOW )
 {
    RECT rc ;
    BOOL bRectOk ;
@@ -235,7 +235,7 @@ HB_FUNC ( REDRAWWINDOW )
 //WINUSERAPI BOOL WINAPI GetClientRect(    IN HWND hWnd,    OUT LPRECT lpRect);
 //Syntax GETCLIENTRECT( hWnd ) -> aRect
 
-HB_FUNC ( GETCLIENTRECT )
+HB_FUNC( GETCLIENTRECT )
 {
    RECT rc;
 
@@ -253,7 +253,7 @@ HB_FUNC ( GETCLIENTRECT )
 //WINUSERAPI BOOL WINAPI GetWindowRect(    IN HWND hWnd,    OUT LPRECT lpRect);
 //Syntax GETWINDOWRECT( hWnd ) -> aRect
 
-HB_FUNC ( GETWINDOWRECT )
+HB_FUNC( GETWINDOWRECT )
 {
    RECT rc;
    PHB_ITEM aMetr ;
@@ -1262,7 +1262,7 @@ AllowSetForegroundWindow( ASFW_ANY or GetCurrentProcessId() )
 #if(WINVER >= 0x0500)
 
 
-HB_FUNC ( ALLOWSETFOREGROUNDWINDOW )
+HB_FUNC( ALLOWSETFOREGROUNDWINDOW )
 {
    hb_retl( AllowSetForegroundWindow ( (DWORD) hb_parnl( 1 ) ) );
 }
@@ -1275,7 +1275,7 @@ HB_FUNC ( ALLOWSETFOREGROUNDWINDOW )
   #define ASFW_ANY    ((DWORD)-1)
 #endif
 
-HB_FUNC ( ALLOWSETFOREGROUNDWINDOW )
+HB_FUNC( ALLOWSETFOREGROUNDWINDOW )
 {
 
    HINSTANCE h = LoadLibraryEx( "user32.dll", NULL, 0 );
@@ -1307,14 +1307,14 @@ BOOL LockSetForegroundWindow( UINT uLockCode
 /*
 #if (WINVER >= 0X0500)
 
-HB_FUNC ( LOCKSETFOREGROUNDWINDOW )
+HB_FUNC( LOCKSETFOREGROUNDWINDOW )
 {
    hb_retl( LockSetForegroundWindow( (UINT) hb_parnl( 1 ) ) );
 }
 
 #endif
 */
-HB_FUNC ( LOCKWINDOWUPDATE )
+HB_FUNC( LOCKWINDOWUPDATE )
 {
    hb_retl( LockWindowUpdate( (HWND) hb_parnl( 1 ) ) );
 }

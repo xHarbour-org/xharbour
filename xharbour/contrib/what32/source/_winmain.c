@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.1.1.1 2001/12/21 10:40:57 ronpinkas Exp $
+ * $Id: _winmain.c,v 1.2 2002/09/04 09:37:19 andy_wos Exp $
  */
 
 /*
@@ -127,17 +127,17 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 }
 
 // don not use GetInstance(), because it is an API, which means something else
-HB_FUNC(HINSTANCE)
+HB_FUNC( HINSTANCE )
 {
   hb_retnl( (LONG) hb_hInstance );
 }
 
-HB_FUNC(HPREVINSTANCE)
+HB_FUNC( HPREVINSTANCE )
 {
   hb_retnl( (LONG) hb_hPrevInstance );
 }
 
-HB_FUNC(NCMDSHOW)
+HB_FUNC( NCMDSHOW )
 {
   hb_retni( hb_iCmdShow );
 }

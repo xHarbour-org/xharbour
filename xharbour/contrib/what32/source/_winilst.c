@@ -15,7 +15,7 @@ extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
 //-----------------------------------------------------------------------------
 //WINCOMMCTRLAPI HIMAGELIST  WINAPI ImageList_Create(int cx, int cy, UINT flags, int cInitial, int cGrow);
 
-HB_FUNC ( IMAGELIST_CREATE )
+HB_FUNC( IMAGELIST_CREATE )
 {
    HIMAGELIST ilist;
    ilist = ImageList_Create( hb_parni(1), hb_parni(2), hb_parnl(3), hb_parni(4), hb_parni(5));
@@ -25,7 +25,7 @@ HB_FUNC ( IMAGELIST_CREATE )
 //-----------------------------------------------------------------------------
 // WINCOMMCTRLAPI int         WINAPI ImageList_ReplaceIcon(HIMAGELIST himl, int i, HICON hicon);
 
-HB_FUNC ( IMAGELIST_REPLACEICON )
+HB_FUNC( IMAGELIST_REPLACEICON )
 {
    hb_retni( ImageList_ReplaceIcon( (HIMAGELIST) hb_parnl(1),
                           (int) hb_parni(2)                 ,
@@ -35,7 +35,7 @@ HB_FUNC ( IMAGELIST_REPLACEICON )
 //-----------------------------------------------------------------------------
 //#define     ImageList_AddIcon(himl, hicon) ImageList_ReplaceIcon(himl, -1, hicon)
 
-HB_FUNC ( IMAGELIST_ADDICON )
+HB_FUNC( IMAGELIST_ADDICON )
 {
    hb_retni( ImageList_AddIcon( (HIMAGELIST) hb_parnl(1), (HICON) hb_parnl(2) ) );
 }
@@ -43,7 +43,7 @@ HB_FUNC ( IMAGELIST_ADDICON )
 //-----------------------------------------------------------------------------
 //  ImageList_Destroy(HIMAGELIST himl);
 
-HB_FUNC(IMAGELIST_DESTROY)
+HB_FUNC( IMAGELIST_DESTROY )
 {
    hb_retl( ImageList_Destroy( (HIMAGELIST) hb_parnl(1) ) );
 }

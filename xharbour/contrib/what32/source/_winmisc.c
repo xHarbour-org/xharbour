@@ -331,7 +331,7 @@ HB_FUNC( MAKEINRESOURCE )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( MESSAGEBOX )
+HB_FUNC( MESSAGEBOX )
 {
  // LPCSTR lpCaption =  hb_parcx(3) ;
 
@@ -343,14 +343,14 @@ HB_FUNC ( MESSAGEBOX )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( MESSAGEBEEP )
+HB_FUNC( MESSAGEBEEP )
 {
   hb_retl( MessageBeep( ISNIL(1) ?  (0xFFFFFFFF) : hb_parnl(1) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( SETBIT )
+HB_FUNC( SETBIT )
 {
    if( hb_pcount() < 3 || hb_parni( 3 ) )
       hb_retnl( hb_parnl(1) | ( 1 << (hb_parni(2)-1) ) );
@@ -361,7 +361,7 @@ HB_FUNC ( SETBIT )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( CHECKBIT )
+HB_FUNC( CHECKBIT )
 {
    hb_retl( hb_parnl(1) & ( 1 << (hb_parni(2)-1) ) );
 }

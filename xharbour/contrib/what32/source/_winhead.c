@@ -346,7 +346,7 @@ HB_FUNC( HEADER_CLEARFILTER )
 //-----------------------------------------------------------------------------
 // Header_Layout(hwndHD, playout) (BOOL)SNDMSG((hwndHD), HDM_LAYOUT, 0, (LPARAM)(HD_LAYOUT FAR*)(playout))
 
-HB_FUNC ( HEADER_LAYOUT )
+HB_FUNC( HEADER_LAYOUT )
 {
    HD_LAYOUT *hdLayout = ( HD_LAYOUT *) hb_param( 2, HB_IT_STRING )->item.asString.value ;
    hb_retl( Header_Layout( (HWND) hb_parnl(1), hdLayout ) );

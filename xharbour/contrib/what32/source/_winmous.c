@@ -32,7 +32,7 @@ extern void Size2ArrayEx( SIZE *siz  ,  PHB_ITEM aSize);
 //-----------------------------------------------------------------------------
 // WINUSERAPI HCURSOR WINAPI LoadCursorA( IN HINSTANCE hInstance, IN LPCSTR lpCursorName);
 
-HB_FUNC ( LOADCURSOR )
+HB_FUNC( LOADCURSOR )
 {
    hb_retnl( (LONG) LoadCursor( ISNIL(1) ? NULL : (HINSTANCE) hb_parnl(1) ,
                     hb_parinfo(2)== HB_IT_STRING ? hb_parcx(2): MAKEINTRESOURCE( hb_parnl( 2 ) ) ) );
