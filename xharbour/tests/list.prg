@@ -53,6 +53,10 @@ RETURN
 
 Procedure Main()
 
+   memvar cFields2, cFields3, n, cFor, true, var
+
+   field last, age
+
    LOCAL   cGoodInput := "FIELD->Age == 30"
    LOCAL   cBadInput  := "FIELD->Age -= 30"
    LOCAL   cFields    := "First, Last, Age"

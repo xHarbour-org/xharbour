@@ -1,6 +1,9 @@
 Procedure Main()
 
+   MEMVAR Var
+
    LOCAL cMacro := "1, 2, 3"
+
    PRIVATE Var
 
    /*
@@ -20,3 +23,5 @@ Function Test( p1, p2, p3 )
    ? p1, p2, p3
 
 return p3
+
+

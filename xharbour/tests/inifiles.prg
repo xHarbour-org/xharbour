@@ -1,13 +1,21 @@
 //
-// $Id: inifiles.prg,v 1.1.1.1 2001/12/21 10:45:53 ronpinkas Exp $
+// $Id: inifiles.prg,v 1.2 2003/08/08 04:18:25 ronpinkas Exp $
 //
 #define CRLF (Chr(13) + Chr(10))
 
 #xtranslate Default( <x>, <y> ) => IIF( <x> == NIL, <y>, <x> )
 
 function Main(cFilename, cSection)
-   local oIni := TIniFile():New(Default( cFilename, 'harbour.ini' ) )
-   local s, n := Val( Default( cSection, '1' ) )
+
+   local oIni, s, n := Val( Default( cSection, '1' ) )
+
+   if empty( cFilename )
+      qOut( "usage: INIFILES <cFileName.ini> [<nSection>]" )
+      qOut("")
+      quit
+   endif
+
+   oIni = TIniFile():New(Default( cFilename, 'harbour.ini' ) )
 
    qout('')
    qout('Sections:')
