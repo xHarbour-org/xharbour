@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.130 2004/09/13 14:34:21 paultucker Exp $
+ * $Id: gtwvt.c,v 1.131 2004/09/15 03:52:49 bdj Exp $
  */
 
 /*
@@ -2158,7 +2158,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           {
             // handle special characters
             case VK_BACK:
-              hb_wvt_gtTranslateKey( K_BS, K_BS, K_ALT_BS, K_CTRL_BS );
+              hb_wvt_gtTranslateKey( K_BS, K_SH_BS, K_ALT_BS, K_CTRL_BS );
               break;
             case VK_TAB:
               hb_wvt_gtTranslateKey( K_TAB, K_SH_TAB, K_ALT_TAB, K_CTRL_TAB );
