@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.1.1.1 2001/12/21 10:47:34 ronpinkas Exp $
+ * $Id: hbapirdd.h,v 1.25 2002/04/27 22:27:56 horacioroldan Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ extern "C" {
 
 /* RDD virtual machine integration functions */
 
-extern USHORT  hb_rddInsertAreaNode( char *szDriver );
+extern USHORT hb_rddInsertAreaNode( char *szDriver );
 extern USHORT  hb_rddGetCurrentFieldPos( char * szName );
 extern int     hb_rddGetCurrentWorkAreaNumber( void );
 void *         hb_rddGetCurrentWorkAreaPointer( void );
@@ -355,6 +355,7 @@ typedef struct
    PHB_ITEM itmOrder;     /* Name or Number of the Order */
    PHB_ITEM itmCobExpr;   /* Code block containing the KEY expression */
    PHB_ITEM itmResult;    /* Operation result */
+   PHB_ITEM itmNewVal;    /* New Setting   */
    BOOL     fAllTags;     /* Open all tags */
 } DBORDERINFO;
 
