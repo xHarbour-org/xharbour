@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.101 2004/02/17 18:44:13 andijahja Exp $
+ * $Id: dbfcdx1.c,v 1.102 2004/02/18 21:35:55 druzus Exp $
  */
 
 /*
@@ -392,7 +392,7 @@ static ERRCODE hb_cdxErrorRT( CDXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode
    if ( uiFlags )
       hb_errPutFlags( pError, uiFlags );
    iRet = SELF_ERROR( ( AREAP ) pArea, pError );
-   hb_errRelease( pError );
+   hb_itemRelease( pError );
    return iRet;
 }
 

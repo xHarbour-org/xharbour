@@ -1,5 +1,5 @@
 /*
- * $Id: ctc.c,v 1.1 2003/03/04 21:04:23 lculik Exp $
+ * $Id: ctc.c,v 1.2 2004/01/23 09:52:21 andijahja Exp $
  */
 
 /*
@@ -62,7 +62,7 @@
 USHORT ct_error (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
                  char * szDescription, char * szOperation, USHORT uiOsCode,
                  USHORT uiFlags, ULONG uiArgCount, ...)
-{                                                                                                
+{
   USHORT uiAction;
   PHB_ITEM pError;
 
@@ -109,13 +109,13 @@ USHORT ct_error (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
   uiAction = hb_errLaunch (pError);
 
   /* release error codeblock */
-  hb_errRelease (pError);
+  hb_itemRelease( pError );
 
   return (uiAction);
 }
 
 
-/* throwing a CT-subsystem error with value substitution 
+/* throwing a CT-subsystem error with value substitution
    - function adapted from errorapi.c */
 PHB_ITEM ct_error_subst (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
                          char * szDescription, char * szOperation, USHORT uiOsCode,
@@ -159,7 +159,7 @@ PHB_ITEM ct_error_subst (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
 
   /* launch error codeblock */
   pRetVal = hb_errLaunchSubst (pError);
-  hb_errRelease (pError);
+  hb_itemRelease( pError );
 
   return (pRetVal);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.8 2003/12/12 10:16:06 druzus Exp $
+ * $Id: dbffpt1.c,v 1.9 2004/01/23 14:59:58 andijahja Exp $
  */
 
 /*
@@ -1857,7 +1857,7 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_errPutSubCode( pError, uiError );
          hb_errPutFlags( pError, EF_CANDEFAULT );
          SELF_ERROR( ( AREAP ) pArea, pError );
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
          return FAILURE;
       }
       return SUCCESS;
@@ -1914,7 +1914,7 @@ static ERRCODE hb_fptPutValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_errPutSubCode( pError, uiError );
          hb_errPutFlags( pError, EF_CANDEFAULT );
          SELF_ERROR( ( AREAP ) pArea, pError );
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
          return FAILURE;
       }
       return SUCCESS;
@@ -1962,7 +1962,7 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
             bRetry = FALSE;
       } while( bRetry );
       if( pError )
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
 
       if( pArea->hMemoFile == FS_ERROR )
          return FAILURE;
@@ -2051,7 +2051,7 @@ static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo )
    } while( bRetry );
 
    if( pError )
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
 
    if( pArea->hMemoFile == FS_ERROR )
       return FAILURE;
@@ -2100,7 +2100,7 @@ static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo )
       hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CORRUPTION ) );
       hb_errPutFileName( pError, (char *) pOpenInfo->abName );
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       return FAILURE;
    }
 

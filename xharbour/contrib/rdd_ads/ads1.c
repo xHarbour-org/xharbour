@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.28 2004/02/16 04:02:13 brianhays Exp $
+ * $Id: ads1.c,v 1.29 2004/02/16 06:40:55 paultucker Exp $
  */
 
 /*
@@ -171,8 +171,11 @@ static void commonError( ADSAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, cha
    {
       hb_errPutFileName( pError, filename );
    }
+
    SUPER_ERROR( ( AREAP ) pArea, pError );
-   hb_errRelease( pError );
+
+   hb_itemRelease( pError );
+
    return;
 }
 

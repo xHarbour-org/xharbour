@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.71 2004/02/17 18:16:55 druzus Exp $
+ * $Id: dbfntx1.c,v 1.72 2004/02/17 18:44:13 andijahja Exp $
  */
 
 /*
@@ -266,7 +266,7 @@ static void commonError( NTXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, cha
    if( uiFlags )
       hb_errPutFlags( pError, uiFlags );
    SUPER_ERROR( ( AREAP ) pArea, pError );
-   hb_errRelease( pError );
+   hb_itemRelease( pError );
    return;
 }
 
@@ -4082,7 +4082,7 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
    } while( bRetry );
    if( pError )
    {
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       // pError = NULL;
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.72 2004/02/12 21:37:30 andijahja Exp $
+ * $Id: dbcmd.c,v 1.73 2004/02/20 02:35:40 ronpinkas Exp $
  */
 
 /*
@@ -152,7 +152,7 @@ static ERRCODE hb_waUnsupported( AREAP pArea )
    hb_errPutGenCode( pError, EG_UNSUPPORTED );
    hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_UNSUPPORTED ) );
    SELF_ERROR( pArea, pError );
-   hb_errRelease( pError );
+   hb_itemRelease( pError );
 
    return FAILURE;
 }
@@ -840,7 +840,7 @@ ERRCODE  HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
             }
          }
 
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
       }
    }
 
@@ -905,7 +905,7 @@ ERRCODE  HB_EXPORT hb_rddSelectWorkAreaAlias( char * szName )
             }
          }
 
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
       }
    }
 
@@ -959,7 +959,7 @@ ERRCODE  HB_EXPORT hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol
             }
          }
       }
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
    }
    return bSuccess;
 }
@@ -1000,7 +1000,7 @@ ERRCODE  HB_EXPORT hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol
             }
          }
       }
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
    }
    return bSuccess;
 }

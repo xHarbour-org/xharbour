@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.33 2004/01/27 03:07:00 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.34 2004/02/20 12:52:52 druzus Exp $
  */
 
 /*
@@ -239,12 +239,11 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
       szModuleName = NULL;
    }
 
-   pError = hb_itemNew( NULL );
-
    hb_vmPushSymbol( s_pDynErrorNew->pSymbol );
    hb_vmPushNil();
    hb_vmDo( 0 );
 
+   pError = hb_itemNew( NULL );
    hb_itemForwardValue( pError, &(HB_VM_STACK.Return) );
 
    if( ! HB_IS_OBJECT( pError ) )
@@ -298,12 +297,14 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
 
       if( hb_itemType( s_errorBlock ) != HB_IT_BLOCK )
       {
+         hb_itemRelease( pError );
          hb_errInternal( HB_EI_ERRNOBLOCK, NULL, NULL, NULL );
       }
 
       /* Check if the error launcher was called too many times recursively */
       if( s_iLaunchCount == HB_ERROR_LAUNCH_MAX )
       {
+         hb_itemRelease( pError );
          hb_errInternal( HB_EI_ERRTOOMANY, NULL, NULL, NULL );
       }
 
@@ -338,7 +339,8 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
              hb_itemRelease( pResult );
          }
 
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
+
          /* Allow other threads to go */
          #if defined( HB_THREAD_SUPPORT )
             /* We are going to quit now, so we don't want to have mutexes
@@ -385,6 +387,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
 
          if( bFailure )
          {
+            hb_itemRelease( pError );
             hb_errInternal( HB_EI_ERRRECFAILURE, NULL, NULL, NULL );
          }
 
@@ -397,6 +400,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
       }
       else
       {
+         hb_itemRelease( pError );
          hb_errInternal( HB_EI_ERRRECFAILURE, NULL, NULL, NULL );
       }
    }
@@ -443,30 +447,31 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
    /* Act as an idle inspector */
    #ifdef HB_THREAD_SUPPORT
       /* Don't run on quit request */
-      if ( hb_vm_bQuitRequest  )
+      if( hb_vm_bQuitRequest  )
       {
          return NULL; /* Meaningless here */
       }
+
       /* Force idle fencing */
       old_bIdleFence = hb_bIdleFence;
       hb_bIdleFence = TRUE;
       hb_threadWaitForIdle();
       hb_bIdleFence = old_bIdleFence;
-
    #endif
 
    if( pError )
    {
       /* Check if we have a valid error handler */
-
       if( hb_itemType( s_errorBlock ) != HB_IT_BLOCK )
       {
+         hb_itemRelease( pError );
          hb_errInternal( HB_EI_ERRNOBLOCK, NULL, NULL, NULL );
       }
 
       /* Check if the error launcher was called too many times recursively */
       if( s_iLaunchCount == HB_ERROR_LAUNCH_MAX )
       {
+         hb_itemRelease( pError );
          hb_errInternal( HB_EI_ERRTOOMANY, NULL, NULL, NULL );
       }
 
@@ -501,7 +506,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
             pResult = NULL;
          }
 
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
 
          /*
           *  If the error happened from an EXIT procedure (already called from hb_vmQuit() then
@@ -529,9 +534,9 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
       {
          /* If the canSubstitute flag has not been set,
             consider it as a failure. */
-
          if( ! ( hb_errGetFlags( pError ) & EF_CANSUBSTITUTE ) )
          {
+            hb_itemRelease( pError );
             hb_errInternal( HB_EI_ERRRECFAILURE, NULL, NULL, NULL );
          }
       }
@@ -550,14 +555,6 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
    #endif
 
    return pResult;
-}
-
-void HB_EXPORT hb_errRelease( PHB_ITEM pError )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_errRelease(%p)", pError));
-
-   /* NOTE: NULL pointer is checked by hb_itemRelease() [vszakats] */
-   hb_itemRelease( pError );
 }
 
 char HB_EXPORT * hb_errGetDescription( PHB_ITEM pError )
@@ -1274,12 +1271,16 @@ USHORT HB_EXPORT hb_errRT_BASE( ULONG ulGenCode, ULONG ulSubCode, char * szDescr
    {
       hb_itemRelease( pArray );
    }
+   else
+   {
+      hb_itemClear( pArray );
+   }
 
    /* Ok, launch... */
    uiAction = hb_errLaunch( pError );
 
    /* Release. */
-   hb_errRelease( pError );
+   hb_itemRelease( pError );
 
    return uiAction;
 }
@@ -1326,7 +1327,7 @@ USHORT HB_EXPORT hb_errRT_BASE_Ext1( ULONG ulGenCode, ULONG ulSubCode, char * sz
    /* Ok, launch... */
    uiAction = hb_errLaunch( pError );
 
-   hb_errRelease( pError );
+   hb_itemRelease( pError );
 
    return uiAction;
 }
@@ -1374,7 +1375,7 @@ PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, char *
    /* Ok, launch... */
    pRetVal = hb_errLaunchSubst( pError );
 
-   hb_errRelease( pError );
+   hb_itemRelease( pError );
 
    return pRetVal;
 }
@@ -1407,6 +1408,10 @@ void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, char * sz
    }
    else
    {
+      HB_ITEM NullItem;
+
+      NullItem.type = HB_IT_NIL;
+
       pArray = hb_itemArrayNew( ulArgCount );
 
       for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
@@ -1415,9 +1420,12 @@ void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, char * sz
 
          if ( pVaItem == NULL )
          {
-            pVaItem = hb_itemNew( NULL );
+            hb_arraySet( pArray, ulArgPos, &NullItem );
          }
-         hb_arraySet( pArray, ulArgPos, pVaItem );
+         else
+         {
+            hb_arraySet( pArray, ulArgPos, pVaItem );
+         }
       }
    }
    va_end( va );
@@ -1437,26 +1445,30 @@ void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, char * sz
    {
       hb_itemRelease( pArray );
    }
+   else
+   {
+      hb_itemClear( pArray );
+   }
 
    /* Ok, launch... */
    pResult = hb_errLaunchSubst( pError );
+
+   hb_itemRelease( pError );
 
    if( pResult )
    {
       hb_itemRelease( hb_itemReturn( pResult ) );
    }
-   hb_errRelease( pError );
 }
 
 USHORT HB_EXPORT hb_errRT_TERM( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, USHORT uiOSCode, USHORT uiFlags )
 {
    USHORT uiAction;
-   PHB_ITEM pError =
-      hb_errRT_New( ES_ERROR, HB_ERR_SS_TERMINAL, ulGenCode, ulSubCode, szDescription, szOperation, uiOSCode, uiFlags );
+   PHB_ITEM pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TERMINAL, ulGenCode, ulSubCode, szDescription, szOperation, uiOSCode, uiFlags );
 
    uiAction = hb_errLaunch( pError );
 
-   hb_errRelease( pError );
+   hb_itemRelease( pError );
 
    return uiAction;
 }
@@ -1470,7 +1482,7 @@ USHORT HB_EXPORT hb_errRT_DBCMD( ULONG ulGenCode, ULONG ulSubCode, char * szDesc
 
    uiAction = hb_errLaunch( pError );
 
-   hb_errRelease( pError );
+   hb_itemRelease( pError );
 
    return uiAction;
 }
@@ -1478,12 +1490,11 @@ USHORT HB_EXPORT hb_errRT_DBCMD( ULONG ulGenCode, ULONG ulSubCode, char * szDesc
 USHORT HB_EXPORT hb_errRT_TOOLS( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation )
 {
    USHORT uiAction;
-   PHB_ITEM pError =
-      hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
+   PHB_ITEM pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
 
    uiAction = hb_errLaunch( pError );
 
-   hb_errRelease( pError );
+   hb_itemRelease( pError );
 
    return uiAction;
 }

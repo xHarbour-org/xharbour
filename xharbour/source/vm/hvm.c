@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.325 2004/02/20 02:29:14 likewolf Exp $
+ * $Id: hvm.c,v 1.326 2004/02/20 18:27:35 ronpinkas Exp $
  */
 
 /*
@@ -5238,10 +5238,13 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
       /*
        These types were added for Clipper compatibility
       */
-      case HB_IT_NIL:
-      case HB_IT_BLOCK:
-      case HB_IT_LOGICAL:
       case HB_IT_ARRAY:
+      case HB_IT_BLOCK:
+         hb_itemClear( pAlias );
+         // Fall through.
+
+      case HB_IT_NIL:
+      case HB_IT_LOGICAL:
       case HB_IT_DATE:
          hb_rddSelectWorkAreaNumber( -1 );
          pAlias->type = HB_IT_NIL;
@@ -5490,26 +5493,29 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 /* JC1: I need this error display routine to be used also by hash pseudo class
    operators, so I put it here
 */
-static void s_hb_vmClassError( int uiParams, char *szClassName, char *szMsg )
+static void hb_vmClassError( int uiParams, char *szClassName, char *szMsg )
 {
    char sDesc[128];
+   HB_ITEM ArgsArray;
+   PHB_ITEM pArgsArray;
+
+   // Should be optimized by rewriting hb_arrayFrom*() to accept Pointer to use.
+   pArgsArray = hb_arrayFromStack( uiParams );
+   ArgsArray.type = HB_IT_NIL;
+   hb_itemForwardValue( &ArgsArray, pArgsArray );
+   hb_itemRelease( pArgsArray );
+
    if( *szMsg == '_' )
    {
-      PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
-
       //TraceLog( NULL, "Class: '%s' has no property: '%s'\n", sClass, pSym->szName );
       sprintf( (char *) sDesc, "Class: '%s' has no property", szClassName );
-      hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, (char *) sDesc, szMsg + 1, 1, pArgsArray );
-      hb_itemRelease( pArgsArray );
+      hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, (char *) sDesc, szMsg + 1, 1, &ArgsArray );
    }
    else
    {
-      PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
-
       //TraceLog( NULL, "Class: '%s' has no method: '%s'\n", sClass, pSym->szName );
       sprintf( (char *) sDesc, "Class: '%s' has no exported method", szClassName );
-      hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, (char *) sDesc, szMsg, 1, pArgsArray );
-      hb_itemRelease( pArgsArray );
+      hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, (char *) sDesc, szMsg, 1, &ArgsArray );
    }
 }
 
@@ -5703,7 +5709,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             }
             else
             {
-               s_hb_vmClassError( uiParams, "HASH", szIndex );
+               hb_vmClassError( uiParams, "HASH", szIndex );
             }
          }
       }
@@ -5776,7 +5782,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       else
       {
          //TraceLog( NULL, "METHOD NOT FOUND!\n" );
-         s_hb_vmClassError( uiParams, sClass, pSym->szName );
+         hb_vmClassError( uiParams, sClass, pSym->szName );
       }
    }
 
@@ -6917,7 +6923,7 @@ static void hb_vmPushVariable( PHB_SYMB pVarSymb )
             pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003, NULL, pVarSymb->szName, 0, EF_CANRETRY );
 
             uiAction = hb_errLaunch( pError );
-            hb_errRelease( pError );
+            hb_itemRelease( pError );
          }
       }
    }

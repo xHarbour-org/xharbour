@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.60 2004/02/17 18:44:13 andijahja Exp $
+ * $Id: dbf1.c,v 1.61 2004/02/18 21:35:55 druzus Exp $
  */
 
 /*
@@ -252,7 +252,7 @@ static BOOL hb_dbfReadRecord( DBFAREAP pArea )
       hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READ ) );
       hb_errPutSubCode( pError, EDBF_READ );
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       return FALSE;
    }
 
@@ -282,7 +282,7 @@ static BOOL hb_dbfWriteRecord( DBFAREAP pArea )
       hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_WRITE ) );
       hb_errPutSubCode( pError, EDBF_WRITE );
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       return FALSE;
    }
    return TRUE;
@@ -801,7 +801,7 @@ static ERRCODE hb_dbfGoToId( DBFAREAP pArea, PHB_ITEM pItem )
       hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_DATATYPE ) );
       hb_errPutSubCode( pError, EDBF_DATATYPE );
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       return FAILURE;
    }
 }
@@ -917,7 +917,7 @@ static ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
       hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READONLY ) );
       hb_errPutSubCode( pError, EDBF_READONLY );
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       return FAILURE;
    }
 
@@ -949,7 +949,7 @@ static ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
          hb_errPutSubCode( pError, EDBF_APPENDLOCK );
          hb_errPutFlags( pError, EF_CANDEFAULT );
          SELF_ERROR( ( AREAP ) pArea, pError );
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
          return FAILURE;
       }
    }
@@ -1126,7 +1126,7 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_DATATYPE ) );
       hb_errPutSubCode( pError, EDBF_DATATYPE );
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       return FAILURE;
    }
    return SUCCESS;
@@ -1195,7 +1195,7 @@ static ERRCODE hb_dbfGoHot( DBFAREAP pArea )
       hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READONLY ) );
       hb_errPutSubCode( pError, EDBF_READONLY );
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       return FAILURE;
    }
    else if( pArea->fShared && !pArea->fFLocked &&
@@ -1206,7 +1206,7 @@ static ERRCODE hb_dbfGoHot( DBFAREAP pArea )
       hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_UNLOCKED ) );
       hb_errPutSubCode( pError, EDBF_UNLOCKED );
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       return FAILURE;
    }
    pArea->fRecordChanged = TRUE;
@@ -1333,7 +1333,7 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       hb_errPutSubCode( pError, uiError );
       hb_errPutFlags( pError, EF_CANDEFAULT );
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       return FAILURE;
    }
 
@@ -1526,7 +1526,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    if( pError )
    {
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
    }
 
    if( pArea->hDataFile == FS_ERROR )
@@ -1844,7 +1844,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    if( pError )
    {
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       pError = NULL;
    }
 
@@ -1923,7 +1923,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    } while( bRetry );
    if( pError )
    {
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       pError = NULL;
    }
 
@@ -2011,7 +2011,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
          hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
       }
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       SELF_CLOSE( ( AREAP ) pArea );
       return FAILURE;
    }
@@ -2068,7 +2068,7 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
       hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_SHARED ) );
       hb_errPutSubCode( pError, EDBF_SHARED );
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       return FAILURE;
    }
 
@@ -2308,7 +2308,7 @@ static ERRCODE hb_dbfZap( DBFAREAP pArea )
       hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_SHARED ) );
       hb_errPutSubCode( pError, EDBF_SHARED );
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
       return FAILURE;
    }
 
@@ -2633,7 +2633,7 @@ static ERRCODE hb_dbfCreateMemFile( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
       hb_errPutFileName( pError, ( char * ) pCreateInfo->abName );
       SELF_ERROR( ( AREAP ) pArea, pError );
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
    }
    pArea->fHasMemo = FALSE;
    return FAILURE;
@@ -2654,7 +2654,7 @@ static ERRCODE hb_dbfOpenMemFile( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
    hb_errPutFileName( pError, ( char * ) pOpenInfo->abName );
    SELF_ERROR( ( AREAP ) pArea, pError );
-   hb_errRelease( pError );
+   hb_itemRelease( pError );
    return FAILURE;
 }
 
@@ -2698,7 +2698,7 @@ static ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
    } while( bRetry );
 
    if( pError )
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
 
    /* Read error? */
    if( bError )

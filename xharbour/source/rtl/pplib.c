@@ -1,5 +1,5 @@
 /*
- * $Id: pplib.c,v 1.2 2002/10/25 03:06:08 ronpinkas Exp $
+ * $Id: pplib.c,v 1.1 2003/03/21 00:06:31 ronpinkas Exp $
  */
 
 /*
@@ -285,7 +285,7 @@ void hb_compGenError( char * szErrors[], char cPrefix, int iError, const char * 
    sprintf( buffer, szErrors[ iError - 1 ], szError1, szError2 );
    pError = hb_errRT_New( ES_ERROR, "PP", 9999, ( ULONG ) iError, buffer, NULL, 0, EF_NONE | EF_CANDEFAULT );
    hb_errLaunch( pError );
-   hb_errRelease( pError );
+   hb_itemRelease( pError );
 
    longjmp( s_env, iError == 0 ? -1 : iError );
 }

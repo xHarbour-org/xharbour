@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.4 2003/10/01 17:41:47 paultucker Exp $
+ * $Id: dbfdbt1.c,v 1.5 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -547,7 +547,7 @@ static ERRCODE hb_dbtGetValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_errPutSubCode( pError, EDBF_LOCK );
          hb_errPutFlags( pError, EF_CANDEFAULT );
          SELF_ERROR( ( AREAP ) pArea, pError );
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
          return FAILURE;
       }
       return SUCCESS;
@@ -609,7 +609,7 @@ static ERRCODE hb_dbtPutValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_errPutSubCode( pError, uiError );
          hb_errPutFlags( pError, EF_CANDEFAULT );
          SELF_ERROR( ( AREAP ) pArea, pError );
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
          return FAILURE;
       }
       return SUCCESS;
@@ -658,7 +658,7 @@ static ERRCODE hb_dbtCreateMemFile( DBTAREAP pArea, LPDBOPENINFO pCreateInfo )
             bRetry = FALSE;
       } while( bRetry );
       if( pError )
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
 
       if( pArea->hMemoFile == FS_ERROR )
          return FAILURE;
@@ -716,7 +716,7 @@ static ERRCODE hb_dbtOpenMemFile( DBTAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    if( pError )
    {
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
    }
    pArea->uiMemoBlockSize = DBT_BLOCKSIZE;
 

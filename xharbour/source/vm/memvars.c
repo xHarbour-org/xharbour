@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.55 2004/02/20 02:35:40 ronpinkas Exp $
+ * $Id: memvars.c,v 1.56 2004/02/20 18:27:36 ronpinkas Exp $
  */
 
 /*
@@ -847,7 +847,7 @@ void hb_memvarGetValue( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
          }
       }
 
-      hb_errRelease( pError );
+      hb_itemRelease( pError );
    }
 }
 
@@ -924,7 +924,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
             }
          }
 
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
       }
    }
    else
@@ -1788,7 +1788,7 @@ HB_FUNC( __MVGET )
             }
          }
 
-         hb_errRelease( pError );
+         hb_itemRelease( pError );
       }
    }
    else

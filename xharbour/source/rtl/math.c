@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.8 2003/07/18 21:42:35 andijahja Exp $
+ * $Id: math.c,v 1.9 2003/09/08 12:56:53 druzus Exp $
  */
 
 /*
@@ -190,7 +190,7 @@ int matherr (struct exception * err)
      /* there is no custom math handler */
      retval = 1;  /* don't print any message, don't set errno and use return value provided by C RTL */
    }
-   return (retval);  
+   return (retval);
 
 }
 #endif
@@ -232,8 +232,8 @@ HB_FUNC (MATHERRMODE)  /* ([<nNewMode>]) -> <nOldMode> */
   {
     int iNewMode = hb_parni (1);
     if ((iNewMode == HB_MATH_ERRMODE_DEFAULT) ||
-	(iNewMode == HB_MATH_ERRMODE_CDEFAULT) ||    
-	(iNewMode == HB_MATH_ERRMODE_USER) ||    
+	(iNewMode == HB_MATH_ERRMODE_CDEFAULT) ||
+	(iNewMode == HB_MATH_ERRMODE_USER) ||
 	(iNewMode == HB_MATH_ERRMODE_USERDEFAULT) ||
 	(iNewMode == HB_MATH_ERRMODE_USERCDEFAULT))
     {
@@ -269,41 +269,41 @@ int hb_matherr (HB_MATH_EXCEPTION * pexc)
     PHB_ITEM pError;
 
     /* create an array with the two double arguments */
-    /* NOTE: Unfortunately, we cannot decide whether one or two parameters have been used when the 
+    /* NOTE: Unfortunately, we cannot decide whether one or two parameters have been used when the
        math function has been called, so we always take two */
     pArray = hb_itemArrayNew (2);
     hb_itemArrayPut (pArray, 1, pArg1);
     hb_itemArrayPut (pArray, 2, pArg2);
-    
+
     /* create an error object */
     /* NOTE: In case of HB_MATH_ERRMODE_USER[C]DEFAULT, I am setting both EF_CANSUBSTITUTE and EF_CANDEFAULT to .T. here.
-       This is forbidden according to the original Cl*pper docs, but I think this reflects the situation best here: 
+       This is forbidden according to the original Cl*pper docs, but I think this reflects the situation best here:
        The error handler can either substitute the errorneous value (by returning a numeric value) or choose the
-       default error handling (by returning .F., as usual) [martin vogel]*/ 
+       default error handling (by returning .F., as usual) [martin vogel]*/
     pError = hb_errRT_New_Subst (ES_ERROR, "MATH", EG_NUMERR, pexc->type,
-				 pexc->error, pexc->funcname, 0, EF_CANSUBSTITUTE | 
+				 pexc->error, pexc->funcname, 0, EF_CANSUBSTITUTE |
 				 (mode == HB_MATH_ERRMODE_USER ? 0: EF_CANDEFAULT));
-    
+
     /* Assign the new array to the object data item. */
     hb_vmPushSymbol (hb_dynsymGet ("_ARGS")->pSymbol);
     hb_vmPush (pError);
     hb_vmPush (pArray);
     hb_vmDo (1);
-    
+
     /* Release the Array. */
     hb_itemRelease (pArray);
-    
+
     /* launch error codeblock */
     pMatherrResult = hb_errLaunchSubst (pError);
-    hb_errRelease (pError);
-    
-    if ((pMatherrResult != NULL) && (HB_IS_NUMERIC (pMatherrResult)))
+    hb_itemRelease( pError );
+
+    if( (pMatherrResult != NULL) && (HB_IS_NUMERIC (pMatherrResult)) )
     {
       pexc->retval = hb_itemGetND (pMatherrResult);
       hb_itemGetNLen (pMatherrResult, &(pexc->retvalwidth), &(pexc->retvaldec));
       pexc->handled = 1;
     }
-    
+
     hb_itemRelease (pMatherrResult);
     hb_itemRelease (pArg1);
     hb_itemRelease (pArg2);
@@ -349,7 +349,7 @@ int hb_matherr (HB_MATH_EXCEPTION * pexc)
 /*
  * ************************************************************
  * Harbour Math functions Part III:
- * (de)installing and (de)activating custom math error handlers  
+ * (de)installing and (de)activating custom math error handlers
  * ************************************************************
  */
 
@@ -362,10 +362,10 @@ HB_MATH_HANDLERPROC hb_mathSetHandler (HB_MATH_HANDLERPROC handlerproc)
   HB_MATH_HANDLERPROC oldHandlerProc;
 
   HB_TRACE (HB_TR_DEBUG, ("hb_mathSetHandler (%p)", handlerproc));
-  
+
   oldHandlerProc = s_mathHandlerProc;
   s_mathHandlerProc = handlerproc;
-  
+
   return ((HB_MATH_HANDLERPROC)oldHandlerProc);
 }
 
@@ -373,7 +373,7 @@ HB_MATH_HANDLERPROC hb_mathSetHandler (HB_MATH_HANDLERPROC handlerproc)
 HB_MATH_HANDLERPROC hb_mathGetHandler (void)
 {
   HB_TRACE (HB_TR_DEBUG, ("hb_mathGetHandler ()"));
-  
+
   return ((HB_MATH_HANDLERPROC)s_mathHandlerProc);
 }
 
@@ -395,7 +395,7 @@ static int hb_matherrblock (HB_MATH_EXCEPTION * pexc)
   /* call codeblock for both case: handled and unhandled exceptions */
 
   if (spMathErrorBlock != NULL)
-  {  
+  {
     PHB_ITEM pArray, pRet;
     PHB_ITEM pType, pFuncname, pError, pArg1, pArg2, pRetval, pHandled;
 
@@ -474,7 +474,7 @@ static int hb_matherrblock (HB_MATH_EXCEPTION * pexc)
   {
     retval = 1; /* default return value to suppress C math lib warnings */
   }
- 
+
   if (sPrevMathHandler != NULL)
   {
     if (pexc->handled)
@@ -495,7 +495,7 @@ static int hb_matherrblock (HB_MATH_EXCEPTION * pexc)
 HB_FUNC (MATHERRORBLOCK)  /* ([<nNewErrorBlock>]) -> <nOldErrorBlock> */
 {
 
-  /* immediately install hb_matherrblock and keep it permanently installed ! 
+  /* immediately install hb_matherrblock and keep it permanently installed !
      This is not dangerous because hb_matherrorblock will always call the previous error handler */
   if (sPrevMathHandler == NULL)
   {
@@ -542,8 +542,8 @@ HB_FUNC (MATHERRORBLOCK)  /* ([<nNewErrorBlock>]) -> <nOldErrorBlock> */
 
   return;
 }
-      
-  
+
+
 /*
  * ************************************************************
  * Harbour Math functions Part V:
