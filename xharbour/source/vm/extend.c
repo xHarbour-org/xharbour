@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: extend.c,v 1.3 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -63,6 +63,10 @@
  *
  * Copyright 2000 Jose Lalin <dezac@corevia.com>
  *    hb_retd()
+ *
+ * Copyright 2002 Marek Paliwoda <paliwoda@inetia.pl>
+ *    hb_parptr()
+ *    hb_retptr()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -426,6 +430,42 @@ long  HB_EXPORT hb_parnl( int iParam, ... )
    return 0;
 }
 
+/* NEW function - to retrieve a pointer from a harbour level */
+void *hb_parptr( int iParam, ... )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_parptr(%d, ...)", iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? &hb_stack.Return : hb_stackItemFromBase( iParam );
+
+      if( HB_IS_BYREF( pItem ) )
+         pItem = hb_itemUnRef( pItem );
+
+      if( HB_IS_POINTER( pItem ) )
+         return pItem->item.asPointer.value;
+      else if( HB_IS_LONG( pItem ) )
+         return ( void * )pItem->item.asLong.value;
+      else if( HB_IS_INTEGER( pItem ) )
+         return ( void * )pItem->item.asInteger.value;
+      else if( HB_IS_LOGICAL( pItem ) )
+         return ( void * )pItem->item.asLogical.value;
+      else if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         ULONG ulArrayIndex;
+
+         va_start( va, iParam );
+         ulArrayIndex = va_arg( va, ULONG );
+         va_end( va );
+
+         return ( void * )hb_arrayGetNL( pItem, ulArrayIndex );
+      }
+   }
+
+   return ( void * )0;
+}
+
 ULONG  HB_EXPORT hb_parinfa( int iParamNum, ULONG uiArrayIndex )
 {
    PHB_ITEM pArray;
@@ -593,6 +633,12 @@ void HB_EXPORT hb_retnllen( long lNumber, int iWidth )
    HB_TRACE(HB_TR_DEBUG, ("hb_retnllen(%ld, %d)", lNumber, iWidth));
 
    hb_itemPutNLLen( &hb_stack.Return, lNumber, iWidth );
+}
+
+/* NEW function - to return a pointer to a harbour level */
+void hb_retptr( void *voidPtr )
+{
+   hb_itemPutPtrGC( &hb_stack.Return, voidPtr );
 }
 
 #endif
