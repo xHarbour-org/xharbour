@@ -314,18 +314,6 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
          bCCH := .T.
       ENDIF
 
-      /* Process command line defines. */
-      WHILE ( nAt := At( "-D", sSwitch ) ) > 0
-         nNext := At( "-", SubStr( sSwitch, nAt + 2 ) )
-         IF nNext == 0
-            nNext := 256
-         ENDIF
-
-         sDefine := SubStr( sSwitch, nAt + 2, nNext - 1 )
-         sSwitch := Left( sSwitch, nAt - 1 ) + SubStr( sSwitch, nAt + 1 + nNext )
-         CompileDefine( sDefine )
-      ENDDO
-
       /* Debug tracing options. */
       IF "-D:E" $ sSwitch
          bDbgExp := .T.
@@ -339,6 +327,18 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
          bDbgPPO := .T.
          sSwitch := StrTran( sSwitch, "-D:P", "" )
       ENDIF
+
+      /* Process command line defines. */
+      WHILE ( nAt := At( "-D", sSwitch ) ) > 0
+         nNext := At( "-", SubStr( sSwitch, nAt + 2 ) )
+         IF nNext == 0
+            nNext := 256
+         ENDIF
+
+         sDefine := SubStr( sSwitch, nAt + 2, nNext - 1 )
+         sSwitch := Left( sSwitch, nAt - 1 ) + SubStr( sSwitch, nAt + 1 + nNext )
+         CompileDefine( sDefine )
+      ENDDO
 
       /* Process command line include paths. */
       IF ( nAt := At( "-I", sSwitch ) ) > 0
@@ -5018,10 +5018,11 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
 
   FOR Counter := 1 TO nResults
 
-      IF bDbgPPO
-         ? Counter, "of:", nResults, sResult, nGroupStart, nRepeats
-         WAIT
-      ENDIF
+     IF bDbgPPO
+        ? sResult
+        ? Counter, "of:", nResults, nGroupStart, nRepeats
+        WAIT
+     ENDIF
 
      /* Normal mode. */
      IF nRepeats == 0
@@ -5043,16 +5044,6 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
               anMarkers := {}
               bBuildList := .T.
            ENDIF
-
-        #ifdef z
-           IF aMarkers[ nDependee ] == NIL
-              nRepeats := 0
-           ELSE
-              nRepeats := Len( aMarkers[ nDependee ] )
-              anMarkers := {}
-              bBuildList := .T.
-           ENDIF
-        #endif
 
            IF bDbgPPO
               ? Counter, nDependee, aMarkers, ValType( aMarkers ), nRepeats
@@ -5125,6 +5116,42 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
               //ENDIF
            ELSE
               sResult += aResults[1][Counter][2]
+
+              IF nRepeats > 1 .AND. Counter == nResults
+                 nRepeats--
+                 Counter := nGroupStart - 1
+
+                 bBuildList := .F.
+
+                 nMarkers := Len( anMarkers )
+                 FOR nMarker := 1 TO nMarkers
+                    // Clipper does not remove optional nested repeatable which only has single value if main repeatable has more values.
+                    IF ValType( aMarkers[ anMarkers[nMarker] ] ) == 'A' .AND. ( Len( aBackup[ anMarkers[1] ] ) = 1 .OR. Len( aMarkers[ anMarkers[nMarker] ] ) > 1 )
+                       aDel( aMarkers[ anMarkers[nMarker] ], 1 )
+                       aSize( aMarkers[ anMarkers[nMarker] ], nRepeats )
+                       IF bDbgPPO
+                          ? nMarker, "Removed Repeatable"
+                          WAIT
+                       ENDIF
+                    ELSE
+                       IF bDbgPPO
+                          ? nMarker, Len( aBackup[ anMarkers[1] ] ), Len( aMarkers[ anMarkers[nMarker] ] ),"Removed Repeatable"
+                          WAIT
+                       ENDIF
+                    ENDIF
+                 NEXT
+
+                 IF bDbgPPO
+                    ? "END - Looping: ", Counter, nMarker, nGroupStart, nRepeats
+                    WAIT
+                 ENDIF
+              ENDIF
+
+              IF bDbgPPO
+                 ? "Bottom: ", Counter, nMarker, nGroupStart, nRepeats
+                 WAIT
+              ENDIF
+
               LOOP
            ENDIF
         ELSE
@@ -5166,7 +5193,7 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
               // Restore for possible re-use.
               aMarkers := aClone( aBackup )
 
-                 /* Recheck this item in "normal" mode. */
+              /* Recheck this item in "normal" mode. */
               Counter--
               LOOP
            ENDIF

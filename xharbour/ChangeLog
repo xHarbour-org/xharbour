@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.147 2002/04/02 04:55:43 walito Exp $
+ * $Id: ChangeLog,v 1.148 2002/04/02 19:31:34 mafact Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-04 11:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    * Fixed minor bug in PPOut() - If last element of result was a static text which ended a repeat group,
+      the group was output only once, instead of N times.
 
 2002-04-02 21:30 UTC+0200 JF Lefebvre (Mafact) <jfl@mafact.com>
    * include/hbclass.ch
