@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.7 2002/01/17 23:20:48 ronpinkas Exp $
+ * $Id: garbage.c,v 1.8 2002/01/21 09:11:57 ronpinkas Exp $
  */
 
 /*
@@ -382,6 +382,8 @@ void hb_gcCollect( void )
 */
 void hb_gcCollectAll( void )
 {
+   HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
+
    if( s_pCurrBlock && ! s_bCollecting )
    {
       HB_GARBAGE_PTR pAlloc, pDelete;
@@ -393,6 +395,8 @@ void hb_gcCollectAll( void )
        * the used/unused flag
        */
 
+      HB_TRACE( HB_TR_INFO, ( "Sweep Scan" ) );
+
       /* Step 2 - sweep */
       /* check all known places for blocks they are referring */
       hb_vmIsLocalRef();
@@ -400,6 +404,8 @@ void hb_gcCollectAll( void )
       hb_memvarsIsMemvarRef();
       hb_gcItemRef( &hb_stack.Return );
       hb_clsIsClassRef();
+
+      HB_TRACE( HB_TR_INFO, ( "Locked Scan" ) );
 
       /* check list of locked block for blocks referenced from
        * locked block
@@ -418,6 +424,8 @@ void hb_gcCollectAll( void )
          } while ( s_pLockedBlock != pAlloc );
       }
 
+      HB_TRACE( HB_TR_INFO, ( "Cleanup Scan" ) );
+
       /* Step 3 - Call Cleanup Functions */
       pAlloc = s_pCurrBlock;
       do
@@ -428,11 +436,17 @@ void hb_gcCollectAll( void )
            s_pCurrBlock->used |= HB_GC_DELETE;
            if( s_pCurrBlock->pFunc )
            {
+              HB_TRACE( HB_TR_INFO, ( "Cleanup, %p", s_pCurrBlock ) );
               ( s_pCurrBlock->pFunc )( ( void *)( s_pCurrBlock + 1 ) );
+              HB_TRACE( HB_TR_INFO, ( "DONE Cleanup, %p", s_pCurrBlock ) );
            }
          }
 
+         s_pCurrBlock = s_pCurrBlock->pNext;
+
       } while ( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
+
+      HB_TRACE( HB_TR_INFO, ( "Release Scan" ) );
 
       /* Step 4 - Release all blocks that are still marked as unused */
       pAlloc = s_pCurrBlock;
@@ -442,6 +456,8 @@ void hb_gcCollectAll( void )
 
          if( s_pCurrBlock->used & HB_GC_DELETE )
          {
+            HB_TRACE( HB_TR_INFO, ( "Delete, %p", s_pCurrBlock ) );
+
             pDelete = s_pCurrBlock;
             hb_gcUnlink( &s_pCurrBlock, s_pCurrBlock );
 
@@ -453,6 +469,8 @@ void hb_gcCollectAll( void )
             */
             if( pDelete == pAlloc )
             {
+               HB_TRACE( HB_TR_INFO, ( "New Top, %p", pDelete ) );
+
                pAlloc = s_pCurrBlock;
                HB_GARBAGE_FREE( pDelete );
 
@@ -463,7 +481,9 @@ void hb_gcCollectAll( void )
             }
             else
             {
+               HB_TRACE( HB_TR_INFO, ( "Free, %p", pDelete ) );
                HB_GARBAGE_FREE( pDelete );
+               HB_TRACE( HB_TR_INFO, ( "DONE Free, %p", pDelete ) );
             }
          }
          else
@@ -489,7 +509,7 @@ void hb_gcReleaseAll( void )
 {
    HB_GARBAGE_PTR pAlloc, pDelete;
 
-   HB_TRACE( HB_TR_INFO, ( "Release All" ) );
+   HB_TRACE( HB_TR_INFO, ( "hb_gcReleaseAll()" ) );
 
    s_bReleaseAll = TRUE;
    s_bCollecting = TRUE;
