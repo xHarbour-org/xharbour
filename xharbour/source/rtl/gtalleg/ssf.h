@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: ssf.h,v 1.3 2004/01/22 01:01:46 maurifull Exp $
  */
 
 /*
@@ -11,7 +11,7 @@
 
 /*
  * xHarbour Project source code:
- * Simple Scalable Font library.
+ * Simple Scalable Font library, main header file.
  *
  * Copyright 2004 Mauricio Abre <maurifull@datafull.com>
  * www - http: (yet to be constructed...)

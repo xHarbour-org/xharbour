@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: gtalleg.c,v 1.2 2004/01/22 01:01:46 maurifull Exp $
  */
 
 /*
@@ -65,6 +65,8 @@
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 static int s_iMsButtons, s_iMSBoundTop, s_iMSBoundLeft, s_iMSBoundBottom, s_iMSBoundRight;
+static int s_iMSX, s_iMSY;
+static BYTE s_byMSButtons;
 static USHORT s_usScrWidth = 80, s_usScrHeight = 25;
 static USHORT s_usUpdTop, s_usUpdLeft, s_usUpdBottom, s_usUpdRight;
 static USHORT s_usDispCount, s_usCursorStyle;
@@ -837,142 +839,143 @@ BOOL lMode = FALSE, lPrev = FALSE;
     if ( usRows > 11 && usCols > 23 && usRows < 129 && usCols < 257 )
     {
 #if defined(ALLEGRO_UNIX) | defined(ALLEGRO_LINUX)
-    HB_TRACE(HB_TR_DEBUG, ("trying X DGA2 mode"));
-    iRet = al_set_gfx_mode( AL_GFX_XDGA2, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
-    if ( iRet < 0 )
-    {
-	HB_TRACE(HB_TR_DEBUG, ("trying X DGA mode"));
-	iRet = al_set_gfx_mode( AL_GFX_XDGA, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
-    }
-    if ( iRet < 0 )
-    {
-	HB_TRACE(HB_TR_DEBUG, ("trying X Windows mode"));
-	iRet = al_set_gfx_mode( AL_GFX_XWINDOWS, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
-    }
+	HB_TRACE(HB_TR_DEBUG, ("trying X DGA2 mode"));
+	iRet = al_set_gfx_mode( AL_GFX_XDGA2, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
+	if ( iRet < 0 )
+	{
+	    HB_TRACE(HB_TR_DEBUG, ("trying X DGA mode"));
+	    iRet = al_set_gfx_mode( AL_GFX_XDGA, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
+	}
+	if ( iRet < 0 )
+	{
+	    HB_TRACE(HB_TR_DEBUG, ("trying X Windows mode"));
+	    iRet = al_set_gfx_mode( AL_GFX_XWINDOWS, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
+	}
 #endif
 #if defined (ALLEGRO_UNIX) | defined(ALLEGRO_LINUX) | defined(ALLEGRO_DOS)
-    if ( iRet < 0 )
-    {
-	HB_TRACE(HB_TR_DEBUG, ("trying VBE/AF mode"));
-	iRet = al_set_gfx_mode( AL_GFX_VBEAF, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
-    }
+	if ( iRet < 0 )
+	{
+	    HB_TRACE(HB_TR_DEBUG, ("trying VBE/AF mode"));
+	    iRet = al_set_gfx_mode( AL_GFX_VBEAF, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
+	}
 #endif
 #if defined(ALLEGRO_UNIX) | defined(ALLEGRO_LINUX)
-    if ( iRet < 0 )
-    {
-	HB_TRACE(HB_TR_DEBUG, ("trying fb console mode"));
-	iRet = al_set_gfx_mode( AL_GFX_FBCON, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
-    }
+	if ( iRet < 0 )
+	{
+	    HB_TRACE(HB_TR_DEBUG, ("trying fb console mode"));
+	    iRet = al_set_gfx_mode( AL_GFX_FBCON, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
+	}
 #endif
-    // Trying safe (slower) modes
-    // Try a windowed mode first
-    if ( iRet < 0 )
-    {
-	HB_TRACE(HB_TR_DEBUG, ("trying autodetect windowed mode"));
-	iRet = al_set_gfx_mode( AL_GFX_AUTODETECT_WINDOWED, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
-    }
-    if ( iRet < 0 )
-    {
-	HB_TRACE(HB_TR_DEBUG, ("trying autodetect console mode"));
-	iRet = al_set_gfx_mode( AL_GFX_AUTODETECT, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
-    }
-    if ( iRet < 0 )
-    {
-    /* If that fails (ie, plain DOS or Linux VESA Framebuffer)
-       ensure to get any available gfx mode */
-	HB_TRACE(HB_TR_DEBUG, ("trying safe mode"));
-        iRet = al_set_gfx_mode(AL_GFX_SAFE, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0);
-    }
-    if ( iRet < 0 )  // Doh!
-    {
-//	printf("gtAlleg fatal error: could not switch to graphics mode\n");
-//	exit(1);
-	if ( lPrev )
+	// Trying safe (slower) modes
+	// Try a windowed mode first
+	if ( iRet < 0 )
 	{
-	    usCols = s_usScrWidth;
-	    usRows = s_usScrHeight;
+	    HB_TRACE(HB_TR_DEBUG, ("trying autodetect windowed mode"));
+	    iRet = al_set_gfx_mode( AL_GFX_AUTODETECT_WINDOWED, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
 	}
-    } else
-    {
-	lMode = TRUE;
-    }
+	if ( iRet < 0 )
+	{
+	    HB_TRACE(HB_TR_DEBUG, ("trying autodetect console mode"));
+	    iRet = al_set_gfx_mode( AL_GFX_AUTODETECT, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0 );
+	}
+	if ( iRet < 0 )
+	{
+	/* If that fails (ie, plain DOS or Linux VESA Framebuffer)
+    	   ensure to get any available gfx mode */
+	    HB_TRACE(HB_TR_DEBUG, ("trying safe mode"));
+    	    iRet = al_set_gfx_mode(AL_GFX_SAFE, s_byFontWidth * usCols, s_byFontSize * usRows, 0, 0);
+	}
+	if ( iRet < 0 )  // Doh!
+	{
+	    if ( lPrev )
+	    {
+		usCols = s_usScrWidth;
+		usRows = s_usScrHeight;
+	    }
+	} else
+	{
+	    lMode = TRUE;
+	}
     
-    pFileName = hb_fsFNameSplit(hb_cmdargARGV()[0]);
-    al_set_window_title(pFileName->szName);
-    if ( !lPrev )
-    {
-	al_install_timer();
-	al_install_keyboard();
-	s_iMsButtons = al_install_mouse();
-    }
-    s_iMSBoundLeft = 0;
-    s_iMSBoundTop = 0;
-    s_iMSBoundRight = AL_SCREEN_W - 1;
-    s_iMSBoundBottom = AL_SCREEN_H - 1;
-    al_show_mouse(al_screen);
-    s_usScrWidth = usCols;
-    s_usScrHeight = usRows;
-
-    // WAS: Center console in screen if we got a larger resolution than requested
-    // NOW: Calculate proper font size
-    // eg: Linux vesafb (doesn't support mode switching)
-    //     or for DOS, we'll mostly request unavailable resolutions
-    if ( AL_SCREEN_W > s_byFontWidth * s_usScrWidth )
-    {
-	ixFP = (BYTE) (AL_SCREEN_W / s_usScrWidth) * 2;
-    }
-    if ( AL_SCREEN_H > s_byFontSize * s_usScrHeight )
-    {
-	iyFP = (BYTE) (AL_SCREEN_H / s_usScrHeight);
-	if ( iyFP % 2 == 1 )
-	{
-	    iyFP--;
+	pFileName = hb_fsFNameSplit(hb_cmdargARGV()[0]);
+	al_set_window_title(pFileName->szName);
+	if ( !lPrev )
+        {
+	    al_install_timer();
+	    al_install_keyboard();
+	    s_iMsButtons = al_install_mouse();
 	}
-    }
-    if ( ixFP | iyFP )
-    {
-	if ( !ixFP )
-	{
-	    ixFP = iyFP;
-	}
-	if ( !iyFP )
-	{
-	    iyFP = ixFP;
-	}
-	s_byFontSize = ( ixFP < iyFP ? ixFP : iyFP );
-	s_byFontWidth = s_byFontSize / 2;
-    }
+	s_iMSBoundLeft = 0;
+	s_iMSBoundTop = 0;
+	s_iMSBoundRight = AL_SCREEN_W - 1;
+	s_iMSBoundBottom = AL_SCREEN_H - 1;
+	s_iMSX = al_mouse_x;
+	s_iMSY = al_mouse_y;
+	s_byMSButtons = (BYTE) al_mouse_b;
+	al_show_mouse(al_screen);
+	s_usScrWidth = usCols;
+	s_usScrHeight = usRows;
 
-    s_usUpdTop = s_usScrHeight;
-    s_usUpdLeft = s_usScrWidth;
-    s_usUpdBottom = 0;
-    s_usUpdRight = 0;
-    s_usCursorStyle = SC_NORMAL;
-    s_sCurCol = 0;
-    s_sCurRow = 0;
-    s_usDispCount = 0;
-    al_text_mode(-1);
-    ssfSetFontSize(ssfDefaultFont, s_byFontSize);
-    s_pClr[ 0] = al_make_color(0x00, 0x00, 0x00);  // black
-    s_pClr[ 1] = al_make_color(0x00, 0x00, 0xAA);  // blue
-    s_pClr[ 2] = al_make_color(0x00, 0xAA, 0x00);  // green
-    s_pClr[ 3] = al_make_color(0x00, 0xAA, 0xAA);  // cyan
-    s_pClr[ 4] = al_make_color(0xAA, 0x00, 0x00);  // red
-    s_pClr[ 5] = al_make_color(0xAA, 0x00, 0xAA);  // magenta
-    s_pClr[ 6] = al_make_color(0xAA, 0x55, 0x00);  // brown
-    s_pClr[ 7] = al_make_color(0xAA, 0xAA, 0xAA);  // white
-    s_pClr[ 8] = al_make_color(0x55, 0x55, 0x55);  // gray
-    s_pClr[ 9] = al_make_color(0x55, 0x55, 0xFF);  // bright blue
-    s_pClr[10] = al_make_color(0x55, 0xFF, 0x55);  // bright green
-    s_pClr[11] = al_make_color(0x55, 0xFF, 0xFF);  // bright cyan
-    s_pClr[12] = al_make_color(0xFF, 0x55, 0x55);  // bright red
-    s_pClr[13] = al_make_color(0xFF, 0x55, 0xFF);  // bright magenta
-    s_pClr[14] = al_make_color(0xFF, 0xFF, 0x55);  // yellow
-    s_pClr[15] = al_make_color(0xFF, 0xFF, 0xFF);  // bright white
+	// WAS: Center console in screen if we got a larger resolution than requested
+	// NOW: Calculate proper font size
+	// eg: Linux vesafb (doesn't support mode switching)
+	//     or for DOS, we'll mostly request unavailable resolutions
+	if ( AL_SCREEN_W > s_byFontWidth * s_usScrWidth )
+	{
+	    ixFP = (BYTE) (AL_SCREEN_W / s_usScrWidth) * 2;
+	}
+	if ( AL_SCREEN_H > s_byFontSize * s_usScrHeight )
+	{
+	    iyFP = (BYTE) (AL_SCREEN_H / s_usScrHeight);
+	    if ( iyFP % 2 == 1 )
+	    {
+		iyFP--;
+	    }
+	}
+	if ( ixFP | iyFP )
+	{
+	    if ( !ixFP )
+	    {
+		ixFP = iyFP;
+	    }
+	    if ( !iyFP )
+	    {
+		iyFP = ixFP;
+	    }
+    	    s_byFontSize = ( ixFP < iyFP ? ixFP : iyFP );
+	    s_byFontWidth = s_byFontSize / 2;
+	}
 
-    s_pbyScrBuffer = hb_xgrab( s_usScrWidth * s_usScrHeight * 2 );
-    bzero( s_pbyScrBuffer, s_usScrWidth * s_usScrHeight * 2 );
-    hb_gt_DoCursor();  // show initial cursor
+	s_usUpdTop = s_usScrHeight;
+        s_usUpdLeft = s_usScrWidth;
+	s_usUpdBottom = 0;
+        s_usUpdRight = 0;
+        s_usCursorStyle = SC_NORMAL;
+        s_sCurCol = 0;
+        s_sCurRow = 0;
+        s_usDispCount = 0;
+        al_text_mode(-1);
+        ssfSetFontSize(ssfDefaultFont, s_byFontSize);
+        s_pClr[ 0] = al_make_color(0x00, 0x00, 0x00);  // black
+        s_pClr[ 1] = al_make_color(0x00, 0x00, 0xAA);  // blue
+        s_pClr[ 2] = al_make_color(0x00, 0xAA, 0x00);  // green
+        s_pClr[ 3] = al_make_color(0x00, 0xAA, 0xAA);  // cyan
+        s_pClr[ 4] = al_make_color(0xAA, 0x00, 0x00);  // red
+        s_pClr[ 5] = al_make_color(0xAA, 0x00, 0xAA);  // magenta
+        s_pClr[ 6] = al_make_color(0xAA, 0x55, 0x00);  // brown
+        s_pClr[ 7] = al_make_color(0xAA, 0xAA, 0xAA);  // white
+        s_pClr[ 8] = al_make_color(0x55, 0x55, 0x55);  // gray
+        s_pClr[ 9] = al_make_color(0x55, 0x55, 0xFF);  // bright blue
+        s_pClr[10] = al_make_color(0x55, 0xFF, 0x55);  // bright green
+        s_pClr[11] = al_make_color(0x55, 0xFF, 0xFF);  // bright cyan
+	s_pClr[12] = al_make_color(0xFF, 0x55, 0x55);  // bright red
+        s_pClr[13] = al_make_color(0xFF, 0x55, 0xFF);  // bright magenta
+	s_pClr[14] = al_make_color(0xFF, 0xFF, 0x55);  // yellow
+	s_pClr[15] = al_make_color(0xFF, 0xFF, 0xFF);  // bright white
+
+	s_pbyScrBuffer = hb_xgrab( s_usScrWidth * s_usScrHeight * 2 );
+	bzero( s_pbyScrBuffer, s_usScrWidth * s_usScrHeight * 2 );
+	hb_gt_DoCursor();  // show initial cursor
     }
 
     return lMode;
@@ -1197,34 +1200,79 @@ int i;
 	HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
     }
 
-    if ( al_keyboard_needs_poll() )
+    if ( al_mouse_needs_poll() )
     {
-	al_poll_keyboard();
+	al_poll_mouse();
     }
 
-    if ( al_key_pressed() )
+    if ( ( al_mouse_x != s_iMSX ) | ( al_mouse_y != s_iMSY ) )
     {
-	nKey = al_read_key();
-    }
-
-    if ( eventmask & HB_INKEY_RAW )
+	s_iMSX = al_mouse_x;
+	s_iMSY = al_mouse_y;
+	nKey = K_MOUSEMOVE;
+    } else if ( (BYTE) al_mouse_b != s_byMSButtons )
     {
-	// let the key as its raw value
-    }
-    else if ( nKey & 255 )
-    {
-	nKey = nKey & 255;
-    }
-    else if ( nKey != 0 )
-    {
-//	Good standard debuging...
-//	printf("scancode: %d (0x%0x) ascii: %d (0x%0x)\n", nKey>>8, nKey>>8, nKey&0xff, nKey&0xff);
-	for ( i = 0; i < GT_KEY_TABLE_SIZE; i++ )
+	if ( ( al_mouse_b & 1 ) != ( s_byMSButtons & 1 ) )
 	{
-	    if ( ( nKey >> 8 ) == sKeyTable[i].al_key )
+	    if ( al_mouse_b & 1 )
 	    {
-		nKey = sKeyTable[i].xhb_key;
-		break;
+		nKey = K_LBUTTONDOWN;
+	    } else
+	    {
+		nKey = K_LBUTTONUP;
+	    }
+	} else if ( ( al_mouse_b & 2 ) != ( s_byMSButtons & 2 ) )
+	{
+	    if ( al_mouse_b & 2 )
+	    {
+		nKey = K_RBUTTONDOWN;
+	    } else
+	    {
+		nKey = K_RBUTTONUP;
+	    }
+	} /* else if ( ( al_mouse_b & 4 ) != ( s_byMSButtons & 4 ) )
+	{
+	    if ( al_mouse_b & 4 )
+	    {
+		nKey = K_MBUTTONDOWN;
+	    } else
+	    {
+		nKey = K_MBUTTONUP;
+	    }
+	} */
+	// We need to define K_MBUTTON[DOWN|UP] in inkey.ch !
+	s_byMSButtons = (BYTE) al_mouse_b;
+    } else
+    {
+        if ( al_keyboard_needs_poll() )
+        {
+	    al_poll_keyboard();
+        }
+
+        if ( al_key_pressed() )
+        {
+	    nKey = al_read_key();
+        }
+
+        if ( eventmask & HB_INKEY_RAW )
+        {
+	    // let the key as its raw value
+        }
+	else if ( nKey & 255 )
+	{
+	    nKey = nKey & 255;
+        }
+	else if ( nKey != 0 )
+        {
+//	    Good standard debuging...
+//	    printf("scancode: %d (0x%0x) ascii: %d (0x%0x)\n", nKey>>8, nKey>>8, nKey&0xff, nKey&0xff);
+	    for ( i = 0; i < GT_KEY_TABLE_SIZE; i++ )
+	    {
+		if ( ( nKey >> 8 ) == sKeyTable[i].al_key )
+		{
+		    nKey = sKeyTable[i].xhb_key;
+		    break;
+		}
 	    }
 	}
     }

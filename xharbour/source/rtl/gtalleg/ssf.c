@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: ssf.c,v 1.2 2004/01/22 01:01:46 maurifull Exp $
  */
 
 /*
@@ -11,7 +11,7 @@
 
 /*
  * xHarbour Project source code:
- * Allegro based virtual gt with graphic extensions.
+ * Simple Scalable Font library, main C module.
  *
  * Copyright 2004 Mauricio Abre <maurifull@datafull.com>
  * www - http: (yet to be constructed...)

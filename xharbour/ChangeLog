@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2121 2004/01/22 00:46:34 peterrees Exp $
+ * $Id: ChangeLog,v 1.2122 2004/01/22 01:01:45 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-21 23:50 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/gtalleg.c
+    + Added mouse events handling in gt_ReadKey()
+
 2004-01-21 21:50 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/gtalleg/gtalleg.c
   * source/rtl/gtalleg/ssf.h
   * source/rtl/gtalleg/ssf.c
   * source/rtl/gtalleg/fixedth.c
-    ! Fixed $Id$ header
+    ! Fixed $Id: ChangeLog,v 1.2122 2004/01/22 01:01:45 maurifull Exp $ header
 
 2004-01-22 13:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /contrib/winprn/tprint.prg
