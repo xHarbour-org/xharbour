@@ -1,5 +1,5 @@
 /*
- * $Id: gauge.c,v 1.5 2001/11/15 22:09:28 andijahja Exp $
+ * $Id: gauge.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
  */
 
 /*
@@ -161,7 +161,7 @@ HB_FUNC( GAUGEDISPLAY )
 
       hb_gtSetColorStr( szOldColor );
 
-      hb_gaugeUpdate( pArray, (float) hb_arrayGetNL( pArray, B_PERCENT ) );
+      hb_gaugeUpdate( pArray, ( float ) hb_arrayGetND( pArray, B_PERCENT ) );
 
       hb_itemReturn( pArray );
    }
@@ -190,7 +190,7 @@ static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent )
    int iMax;
    char szOldColor[ CLR_STRLEN ];
    char * szStr = "        ";
-   char szPct[ 4 ];
+   char szPct[ 5 ];
 
    hb_gtGetColorStr( szOldColor );
    hb_gtSetColorStr( hb_arrayGetCPtr( pArray, B_BARCOLOR ) );
