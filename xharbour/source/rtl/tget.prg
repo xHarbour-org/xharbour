@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.80 2004/05/31 03:08:05 lculik Exp $
+ * $Id: tget.prg,v 1.81 2004/06/09 05:26:49 guerra000 Exp $
  */
 
 /*
@@ -346,14 +346,18 @@ METHOD ParsePict( cPicture ) CLASS Get
 
    ::lPicComplex := .f.
 
-   if ! Empty( ::cPicMask )
+   IF ! Empty( ::cPicMask )
       For each cChar in ::cPicMask
-         if !(cChar IN "!ANX9#")
+         IF cChar == 'a'
+            ::cPicMask[ HB_EnumIndex() ] := 'A'
+         ELSEIF cChar == 'n'
+            ::cPicMask[ HB_EnumIndex() ] := 'N'
+         ELSEIF !(cChar IN "!ANX9#")
             ::lPicComplex := .t.
-            exit
-         endif
-      Next
-   endif
+            EXIT
+         ENDIF
+      NEXT
+   ENDIF
 
 //   if ::HasFocus  // TODO: Delete this line if the "if ::hasfocus" in ::Picture
                   //       is correct.
@@ -362,6 +366,10 @@ METHOD ParsePict( cPicture ) CLASS Get
                      Transform( 1, if( Empty( ::cPicFunc ), "", ::cPicFunc + " " ) + ::cPicMask ) )
       else
          ::decpos := NIL
+
+         IF ::type == 'L'
+            ::cPicMask := Upper( ::cPicMask )
+         ENDIF
       endif
 //   endif
 
