@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3390 2004/09/01 19:30:39 druzus Exp $
+ * $Id: ChangeLog,v 1.3391 2004/09/02 03:15:20 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-02 10:00 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/teditor.prg
+     ! on a readonly editor only movement keys are "allowed", BrowseText()
+       should not call KeyboardHook() or we end up on an infinite
+       recursive loop.
 
 2004-09-02 00:10 UTC-0300 Walter Negro <anegro at overnet.com.ar>
   * source/vm/thread.c

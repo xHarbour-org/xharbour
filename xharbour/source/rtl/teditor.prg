@@ -1,4 +1,5 @@
-/*
+/* $Id: teditor.prg,v 1.49 2004/09/01 17:21:17 lf_sfnet Exp $
+*
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
 *
@@ -28,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.48 2004/08/09 11:15:18 vouchcac Exp $
+/* $Id: teditor.prg,v 1.49 2004/09/01 17:21:17 lf_sfnet Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -1934,11 +1935,17 @@ STATIC procedure BrowseText( oSelf, nPassedKey )
       // ******* modified to add exit with K_LEFT when in non-edit mode
       if nKey == K_ESC .or. nkey == K_CTRL_W
          oSelf:lExitEdit := .T.
+
       else
-         if !oSelf:MoveCursor( nKey )
+         oSelf:MoveCursor( nKey )
+         /* 02/09/2004 - <maurilio.longo@libero.it>
+                         If I'm on a readonly editor don't call KeyboardHook() because
+                         it calls HandleUserKey() which calls Edit() which sees this is
+                         a readonly editor and calls again BrowseText() which..,
+         if ! oSelf:MoveCursor( nKey )
             oSelf:KeyboardHook( nKey )
          endif
-
+         */
       endif
 
    enddo
