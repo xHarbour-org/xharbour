@@ -78,8 +78,8 @@ HB_FUNC( HARDCR )
 
    if( pString )
    {
-      char * pszBuffer = pString->item.asString.value ;
-      ULONG ulStringLen = pString->item.asString.length;
+      char * pszBuffer = hb_itemGetC( pString );
+      ULONG ulStringLen = hb_itemGetCLen( pString );
 
       /* hb_strHardCR() actually returns its 1st paramater, in this case pszBuffer. */
       hb_retclenAdopt( hb_strHardCR( pszBuffer, ulStringLen ), ulStringLen );
