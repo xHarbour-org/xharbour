@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2924 2004/05/11 21:06:33 andijahja Exp $
+ * $Id: ChangeLog,v 1.2926 2004/05/11 23:35:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-11 23:20 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
+  * source/rtl/teditor.prg
+    + Any fixes, enhancements and improvements: Tab management. Text scroll
+      management, <insert> message, HardCR and SoftCR management.
+      CTRL-T (Del word right) behaviour implemented. Any methods was added,
+      others changed and rewrited. See teditor.prg to more details.
+
+  * source/rtl/memoedit.prg
+    + New memoedit parameter <lToggleExitSave> to toggle CTRL-W / CTRL-Q to
+      exit with save, default is CTRL-W as Clipper. All changes was made to
+      turn xHarbour memoedit more Clipper compatible.
+
+  * source/rtl/ttextlin.prg
+    + Added TabCol element to Tab management.
+
+  * tests/medit.prg
+    + Added medit.prg to test these changes.
 
 2004-05-12 04:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/libct/addascii.c
@@ -58,6 +76,7 @@
   * xharbour/source/compiler/harbour.sly
     * use hb_compGenSwitchCase() for HB_P_SWITCHCASE
 
+>>>>>>> 1.2925
 2004-05-12 04:05 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/gtwvt/gtwvt.c
     + define _WIN32_IE if not defined. For MinGW and Open-Watcom

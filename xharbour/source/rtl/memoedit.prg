@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.17 2004/04/17 23:27:21 jonnymind Exp $
+ * $Id: memoedit.prg,v 1.19 2004/05/11 22:47:40 modalsist Exp $
  */
 
 /*
@@ -50,6 +50,14 @@
  *
  */
 //-------------------------------------------------------------------//
+
+/*
+ * Eduardo Fernandes <eduardo@modalsistemas.com.br>
+ * 11-May-2004
+ *
+ * Revision to proper working with tab columns, CTRL_T behaviour and other things.
+ * See teditor.prg and ttextlin.prg to more details.
+ */
 
 #include "common.ch"
 #include "hbclass.ch"
@@ -193,8 +201,12 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
 
    // HBEditor does not handle these keys and would call ::KeyboardHook() causing infinite loop
    //
-   local aUnHandledKeys := {K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T,;
-                            K_CTRL_U, K_F1, K_F2, K_F3, K_F4, K_F5, K_F6, K_F7, K_F8, K_F9, K_F10, K_F11, K_F12}
+   Local aUnHandledKeys := { K_CTRL_J,K_CTRL_K,K_CTRL_L,K_CTRL_N,K_CTRL_O,K_CTRL_P,K_CTRL_Q,K_CTRL_U,; // K_CTRL_T is activated.
+                             K_F1,K_F2,K_F3,K_F4,K_F5,K_F6,K_F7,K_F8,K_F9,K_F10,K_F11,K_F12,;
+                             K_SH_F1,K_SH_F2,K_SH_F3,K_SH_F4,K_SH_F5,K_SH_F6,K_SH_F7,K_SH_F8,K_SH_F9,K_SH_F10,K_SH_F11,K_SH_F12,;
+                             K_CTRL_F1,K_CTRL_F2,K_CTRL_F3,K_CTRL_F4,K_CTRL_F5,K_CTRL_F6,K_CTRL_F7,K_CTRL_F8,K_CTRL_F9,K_CTRL_F10,K_CTRL_F11,K_CTRL_F12,;
+                             K_ALT_F1,K_ALT_F2,K_ALT_F3,K_ALT_F4,K_ALT_F5,K_ALT_F6,K_ALT_F7,K_ALT_F8,K_ALT_F9,K_ALT_F10,K_ALT_F11,K_ALT_F12 }
+                           
 
    if nUserKey <> nil
       Switch nUserKey
@@ -203,7 +215,7 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
          case ME_DEFAULT
             // HBEditor is not able to handle keys with a value higher than 256
             //
-            if ( nKey <= 256 .OR. nKey == K_ALT_W .or. nKey == K_CTRL_W ) .AND. !( nKey IN aUnHandledKeys )
+            if ( nKey <= 256 .or. nKey == K_ALT_W .or. nKey == K_CTRL_W ) .AND. !( nKey IN aUnHandledKeys )
                super:Edit( nKey )
             endif
             exit
@@ -226,13 +238,13 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
          case 14
          case 15
          case 16
-         case 17
+         case 17 
          case 18
          case 19
          case 20
          case 21
          case 22
-         case 23
+         case 23  
          case 24
          case 25
          case 26
@@ -241,15 +253,25 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
          case 29
          case 30
          case 31
-         case K_ALT_W
+         case K_ALT_W // Not Clipper compatible. Save but don´t exit.
+            //if !( nUserKey IN aUnHandledKeys )
+            //   super:Edit( nUserKey )
+            //endif
+            //exit
+         case K_CTRL_Q
+              if !( nUserKey IN aUnHandledKeys )
+                 super:Edit( nUserKey )
+              endif
+              exit
+
          case K_CTRL_W
-            if !( nUserKey IN aUnHandledKeys )
-               super:Edit( nUserKey )
-            endif
-            exit
+              if !( nUserKey IN aUnHandledKeys )
+                 super:Edit( nUserKey )
+              endif
+              exit
 
          case ME_DATA
-            if nKey <= 256 .AND. !( nKey IN aUnHandledKeys )
+            if nKey <= 255 .AND. !( nKey IN aUnHandledKeys ) // char 255 is used to virtual tab spaces.
                super:Edit( nKey )
             endif
             exit
@@ -289,7 +311,8 @@ METHOD xDo( nStatus ) CLASS TMemoEditor
 
    xRes := Do( ::xUserFunction, nStatus, ::nRow, ::nCol - 1 )
 
-   ::SetPos( nCurRow, nCurCol )
+   //::SetPos( nCurRow, nCurCol )
+   SetPos( nCurRow, nCurCol )
    SetCursor( nCurCur )
 
 return xRes
@@ -304,41 +327,58 @@ return xRes
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
-FUNCTION MemoEdit(cString,;
-                  nTop, nLeft,;
-                  nBottom, nRight,;
-                  lEditMode,;
-                  cUserFunction,;
-                  nLineLength,;
-                  nTabSize,;
-                  nTextBuffRow,;
-                  nTextBuffColumn,;
-                  nWindowRow,;
-                  nWindowColumn)
+FUNCTION MemoEdit(cString,;         // same as Clipper
+                  nTop, nLeft,;     // idem
+                  nBottom, nRight,; // idem
+                  lEditMode,;       // idem
+                  cUserFunction,;   // idem
+                  nLineLength,;     // idem
+                  nTabSize,;        // idem
+                  nTextBuffRow,;    // idem
+                  nTextBuffColumn,; // idem
+                  nWindowRow,;      // idem
+                  nWindowColumn,;   // idem
+                  lToggleExitSave)  // new parameter, xHarbour option.
+                                    // this change CTRL-W by CTRL-Q to finish edit with save. 
+                                    // Default is CTRL-W as Clipper, but in xHarbour CTRL-W 
+                                    // have same behaviour as CTRL-END.
 
-   LOCAL oEd
-
+   LOCAL oEd 
+   
    DEFAULT nTop            TO 0
    DEFAULT nLeft           TO 0
    DEFAULT nBottom         TO MaxRow()
    DEFAULT nRight          TO MaxCol()
    DEFAULT lEditMode       TO .T.
-   DEFAULT nLineLength     TO nRight - nLeft 
+   DEFAULT nLineLength     TO nRight - nLeft + 1 // dont´t change.
    DEFAULT nTabSize        TO 4
    DEFAULT nTextBuffRow    TO 1
    DEFAULT nTextBuffColumn TO 0
    DEFAULT nWindowRow      TO 0
    DEFAULT nWindowColumn   TO nTextBuffColumn
    DEFAULT cString         TO ""
-
+   DEFAULT lToggleExitSave  TO .F.  // Toogle betewn CTRL-W/CTRL-Q. Default is CTRL-W
+   
    if !ISLOGICAL( cUserFunction ) .AND. Empty( cUserFunction )
       cUserFunction = nil
    endif
 
-   // Original MemoEdit() converts Tabs into spaces;
-   //
-   oEd := TMemoEditor():New( StrTran( cString, Chr( K_TAB ), Space( 1 ) ), nTop, nLeft, nBottom, nRight, ;
-              lEditMode, nLineLength, nTabSize, nTextBuffRow, nTextBuffColumn, nWindowRow, nWindowColumn )
+// Original MemoEdit() converts Tabs into spaces;
+//   oEd := TMemoEditor():New( StrTran( cString, Chr( K_TAB ), Space( 1 ) ), nTop, nLeft, nBottom, nRight, ;
+//              lEditMode, nLineLength, nTabSize, nTextBuffRow, nTextBuffColumn, nWindowRow, nWindowColumn )
+
+// Now Tabs is trated properly in HBEditor
+   oEd := TMemoEditor():New( cString ,;
+                             nTop, nLeft,;
+                             nBottom, nRight, ;
+                             lEditMode,;
+                             nLineLength,;
+                             nTabSize,;
+                             nTextBuffRow,;
+                             nTextBuffColumn,;
+                             nWindowRow,;
+                             nWindowColumn,;
+                             lToggleExitSave )
 
    oEd:MemoInit( cUserFunction )
    oEd:RefreshWindow()

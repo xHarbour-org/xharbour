@@ -1,10 +1,10 @@
 /*
- * $Id: ttextlin.prg,v 1.3 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: ttextlin.prg,v 1.1.1.2 2004/05/11 22:47:00 modalsist Exp $
  */
 
 /*
  * Harbour Project source code:
- * HBTextLine Class (used by HBEditor class)
+ * HBTextLine Class (used by HBEditor class, see teditor.prg )
  *
  * Copyright 2000 Maurilio Longo <maurilio.longo@libero.it>
  * www - http://www.harbour-project.org
@@ -50,22 +50,35 @@
  *
  */
 
+/*
+ * Eduardo Fernandes <eduardo@modalsistemas.com.br>
+ * 11-May-2004
+ *
+ * Revision to proper working with tab columns.
+ * See teditor.prg and memoedit.prg to more details.
+ */
+
+ */
+
 #include "hbclass.ch"
 
 CLASS HBTextLine
 
-   DATA cText       // A line of text
-   DATA lSoftCR     // true if line doesn't end with a HB_OSNewLine() char (word wrapping)
+   DATA cText       // Text line
+   DATA lSoftCR     // 3 State:  .T.   if text line end with SoftCR at Word Wrap Column (See HBEditor class in teditor.prg).
+                    //           .F.   if text line end with HardCR 
+                    //           .NIL. if text line end with null char
+   DATA aTabCol     // array to save/restore tab columns
 
-   METHOD New( cLine, lSoftCR )
+   METHOD New( cLine, lSoftCR , aTab )
 
 ENDCLASS
 
 // Creates a new line of text
-METHOD New( cLine, lSoftCR ) CLASS HBTextLine
+METHOD New( cLine, lSoftCR, aTab ) CLASS HBTextLine
 
-   ::cText := iif( Empty( cLine ), "", cLine )
-   ::lSoftCR := iif( Empty( lSoftCR ), .F., lSoftCR )
+   ::cText   := iif( Empty( cLine ), "", cLine )
+   ::lSoftCR := iif( Empty( lSoftCR ), NIL, lSoftCR )
+   ::aTabCol := iif( Empty( aTab ) , {}, aTab )
 
-   RETURN Self
-
+RETURN Self
