@@ -81,6 +81,7 @@ FUNCTION Main
             :Tabs:Configure()
             
             // sets the controls toolbar on the TabControl
+
             WITH OBJECT :Tabs:Tabs[1]
                WITH OBJECT :Add( 'TabBand', TRebar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1] ) )
                   :SetStyle( WS_BORDER, .F. )
@@ -113,8 +114,8 @@ FUNCTION Main
                   oApp:MainFrame:SetLink( 'StdBar', :StdTools )
                END
             END
-         END
-         
+
+         END // rebar
          // add the main status bar
          WITH OBJECT :Add('Status',  TStatusBar():New( oApp:MainFrame, 'StatusBar', 1001 ) ) 
             :SetPanels( { 150,380,480,580,-1 } )

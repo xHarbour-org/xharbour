@@ -60,6 +60,8 @@ METHOD New( oParent ) CLASS TRebar
    
    super:new( oParent )
     
+   InitCommonControlsEx(ICC_COOL_CLASSES)
+
    ::Name      := REBARCLASSNAME
    ::id        := 1
    ::lRegister := .F.

@@ -97,6 +97,8 @@ ENDCLASS
 
 METHOD New( oParent, nId, nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp ) CLASS TToolBar
 
+   InitCommonControlsEx(ICC_COOL_CLASSES)
+
    ::nImg    := nImg
    ::hBMInst := hBMInst
    ::nBMId   := nBMId

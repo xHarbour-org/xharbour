@@ -26,6 +26,7 @@ ENDCLASS
 *-----------------------------------------------------------------------------*
 
 METHOD New( oParent ) CLASS TForm
+   
    ::WndProc   := IFNIL(::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL(::Msgs,-1,::Msgs)
    ::FrameWnd  := .F.

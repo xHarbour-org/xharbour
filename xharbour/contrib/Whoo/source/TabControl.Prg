@@ -22,7 +22,7 @@ typedef struct {;
 
 CLASS TTabControl FROM TControl
 
-   DATA Tabs AS  ARRAY HIDDEN
+   DATA Tabs AS  ARRAY
    DATA nCurSel
    DATA Cargo
    DATA ntProc

@@ -22,9 +22,6 @@ ENDCLASS
 
 METHOD New( oParent ) CLASS TFrame
 
-   InitCommonControls()
-   InitCommonControlsEx(ICC_COOL_CLASSES)
-
    ::WndProc   := 'FormProc'
    ::Msgs      := -1
    ::FrameWnd  := .T.
@@ -32,6 +29,8 @@ METHOD New( oParent ) CLASS TFrame
    ::ExStyle   := WS_EX_APPWINDOW
    ::FormType  := RCF_WINDOW
    ::lRegister := .T.
+   InitCommonControls()
+   InitCommonControlsEx(ICC_BAR_CLASSES)
 
    return( super:New( oParent ) )
 
