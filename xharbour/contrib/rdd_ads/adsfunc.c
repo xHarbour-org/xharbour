@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.23 2003/11/08 06:17:29 brianhays Exp $
+ * $Id: adsfunc.c,v 1.24 2004/02/16 00:39:25 brianhays Exp $
  */
 
 /*
@@ -1576,19 +1576,6 @@ HB_FUNC( ADSSHOWERROR )
    AdsShowError( pucTitle );
 }
 
-HB_FUNC( ADSGETNUMACTIVELINKS )
-{
-   UNSIGNED16 pusNumLinks = 0;
-
-   if( adsConnectHandle )
-   {
-      AdsGetNumActiveLinks( adsConnectHandle, &pusNumLinks );
-   }
-   hb_retnl( pusNumLinks );
-}
-
-
-
 
 HB_FUNC( ADSBEGINTRANSACTION )
 {
@@ -1755,6 +1742,18 @@ HB_FUNC( ADSVERSION )
 }
 
 #ifdef ADS_REQUIRE_VERSION6
+
+HB_FUNC( ADSGETNUMACTIVELINKS )         // requires 6.2 !
+{
+   UNSIGNED16 pusNumLinks = 0;
+
+   if( adsConnectHandle )
+   {
+      AdsGetNumActiveLinks( adsConnectHandle, &pusNumLinks );
+   }
+   hb_retnl( pusNumLinks );
+}
+
 
 HB_FUNC( ADSDDADDTABLE )
 {
