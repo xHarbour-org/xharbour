@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.49 2003/02/22 01:30:37 jonnymind Exp $
+* $Id: thread.c,v 1.50 2003/02/22 05:54:57 jonnymind Exp $
 */
 
 /*
@@ -74,6 +74,41 @@
 
 #ifdef HB_THREAD_SUPPORT
 
+/* Creating a trylock for systems that have to use LWR */
+#if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
+
+/* To be honest, this implementation is far from being thread safe;
+   TODO: better implementation, but I argue it will ALWAYS be better
+   to implement syste specific solution, where available.
+*/
+
+static HB_CRITICAL_T s_mtxTryLock;
+
+BOOL hb_critical_mutex_trylock( HB_CRITICAL_T *lpMutex )
+{
+   HB_CRITICAL_LOCK( s_mtxTryLock );
+   if ( lpMutex.Locker == HB_CURRENT_THREAD() )
+   {
+      lpMutex.nCount++;
+      HB_CRITICAL_UNLOCK( s_mtxTryLock );
+      return TRUE;
+   }
+   else
+   {
+      if ( lpMutex.nCount > 0 )
+      {
+         HB_CRITICAL_UNLOCK( s_mtxTryLock );
+         return FALSE;
+      }
+      HB_MUTEX_LOCK( lpMutex.Critical );
+      lpMutex.nCount = 1;
+      lpMutex.Locker = HB_CURRENT_THREAD();
+      HB_CRITICAL_UNLOCK( s_mtxTryLock );
+   }
+}
+
+#endif  //LWR mutexes for OS without them.
+
 HB_THREAD_CONTEXT *hb_ht_context;
 HB_CRITICAL_T hb_threadContextMutex;
 HB_THREAD_CONTEXT *last_context;
@@ -83,7 +118,6 @@ extern HB_CRITICAL_T hb_allocMutex;
 
 HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th )
 {
-   HB_THREAD_CONTEXT *p;
    HB_THREAD_CONTEXT *tc;
    int i;
 
@@ -93,9 +127,6 @@ HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th )
    tc->th_id = th;
 
    tc->stack       = ( HB_STACK *) malloc( sizeof( HB_STACK ) );
-   tc->Cargo       = NULL;
-   tc->pDestructor = NULL;
-   //tc->GCList      = NULL;
    tc->next        = NULL;
 
    tc->stack->pItems = ( HB_ITEM_PTR * ) malloc( sizeof( HB_ITEM_PTR ) * STACK_THREADHB_ITEMS );
@@ -105,20 +136,25 @@ HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th )
    tc->stack->pMethod = NULL;
    tc->stack->Return.type = HB_IT_NIL;
    
-
-
-   //printf( "New Context: %p Stack: %p\n", tc, tc->stack );
-
    for( i = 0; i < tc->stack->wItems; ++i )
    {
       tc->stack->pItems[ i ] = (HB_ITEM *) malloc( sizeof( HB_ITEM ) );
    }
-   HB_CRITICAL_UNLOCK( hb_allocMutex );
-
    ( * (tc->stack->pPos) )->type = HB_IT_NIL;
 
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
+   HB_CRITICAL_UNLOCK( hb_allocMutex );
 
+   return tc;
+}
+
+/*JC1: WARNING
+* This function is not locked because is meant to be called ONLY within
+* a thread context locked area.
+*/
+HB_THREAD_CONTEXT *hb_threadLinkContext( HB_THREAD_CONTEXT *tc )
+{
+   HB_THREAD_CONTEXT *p;
+   
    if( hb_ht_context == NULL )
    {
       hb_ht_context = tc;
@@ -135,23 +171,23 @@ HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th )
       p->next = tc;
    }
 
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-
+   last_context = p;
    return tc;
 }
 
 
-void hb_threadDestroyContext( HB_THREAD_T th_id )
+/*JC1: WARNING
+* This function is not locked because is meant to be called ONLY within
+* a thread context locked area.
+*/
+HB_THREAD_CONTEXT *hb_threadUnlinkContext( HB_THREAD_T th_id )
 {
    HB_THREAD_CONTEXT *p, *prev;
-   int i;
 
    if ( hb_ht_context == NULL )
    {
-      return;
+      return NULL;
    }
-
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
 
    p = hb_ht_context;
    prev = NULL;
@@ -174,55 +210,55 @@ void hb_threadDestroyContext( HB_THREAD_T th_id )
          hb_ht_context = p->next;
       }
       s_threadStarted --;
-      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-
-      HB_CRITICAL_LOCK( hb_allocMutex );
-      /* Free each element of the stack */
-      for( i = 0; i < p->stack->wItems; ++i )
-      {
-         if( HB_IS_COMPLEX( p->stack->pItems[ i ] ) )
-         {
-            hb_itemClear( p->stack->pItems[ i ] );
-         }
-
-         free( p->stack->pItems[ i ] );
-      }
-
-      /* Free the stack */
-
-      free( p->stack->pItems );
-      free( p->stack );
-
-      // Call destructor
-      if( p->pDestructor )
-      {
-         p->pDestructor( (void *) p );
-      }
-
-      /* Free the context */
-      free( p );
-
-      HB_CRITICAL_UNLOCK( hb_allocMutex );
-
    }
-   else
-   {
-      char errdat[70];
-      s_threadStarted --;
-      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-      sprintf( errdat, "Context not found for Thread %ld",  (long) th_id );
-      hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadDestroyContext", 0 );
-   }
+   
+   return p;
 }
+
+      
+void hb_threadDestroyContext( HB_THREAD_CONTEXT *pContext )
+{
+   int i;
+   
+   /* Free each element of the stack */
+   for( i = 0; i < pContext->stack->wItems; ++i )
+   {
+      if( HB_IS_COMPLEX( pContext->stack->pItems[ i ] ) )
+      {
+         hb_itemClear( pContext->stack->pItems[ i ] );
+      }
+   }
+
+   HB_CRITICAL_LOCK( hb_allocMutex );
+   /* Free each element of the stack */
+   for( i = 0; i < pContext->stack->wItems; ++i )
+   {
+      free( pContext->stack->pItems[ i ] );
+   }      
+   /* Free the stack */
+
+   free( pContext->stack->pItems );
+   free( pContext->stack );
+
+   // Call destructor
+   /*
+   if( pContext->pDestructor )
+   {
+      pContext->pDestructor( (void *) p );
+   }*/
+   
+   /* Free the context */
+   free( pContext );
+
+   HB_CRITICAL_UNLOCK( hb_allocMutex );
+}
+
 
 HB_THREAD_CONTEXT *hb_threadGetContext( HB_THREAD_T id )
 {
    HB_THREAD_CONTEXT *p;
 
-   //printf( "Requested context for %ld\r\n", id);
-
    HB_CRITICAL_LOCK( hb_threadContextMutex );
-
 
    if( last_context && last_context->th_id == id )
    {
@@ -263,7 +299,9 @@ void hb_threadInit( void )
    HB_CRITICAL_INIT( hb_threadContextMutex );
    last_context = NULL;
    hb_main_thread_id = HB_CURRENT_THREAD();
-
+   #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
+      HB_CRITICAL_INIT( s_mtxTryLock );
+   #endif
 }
 
 void hb_threadExit( void )
@@ -284,11 +322,14 @@ void hb_threadExit( void )
          WaitForSingleObject( hb_ht_context->th_h, INFINITE );
          CloseHandle( hb_ht_context->th_h );
       #endif
-      hb_threadDestroyContext( hb_ht_context->th_id );
+      hb_threadDestroyContext( hb_threadUnlinkContext( hb_ht_context->th_id ) );
    }
 
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
    HB_CRITICAL_DESTROY( hb_threadContextMutex );
+   #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
+      HB_CRITICAL_DESTROY( s_mtxTryLock );
+   #endif
 }
 
 #ifdef HB_OS_WIN_32
@@ -310,42 +351,71 @@ hb_create_a_thread(
    HB_THREAD_PARAM *pt = (HB_THREAD_PARAM *) Cargo;
    HB_THREAD_T tCurrent = HB_CURRENT_THREAD();
    PHB_ITEM pPointer = hb_arrayGetItemPtr( pt->pArgs, 1 );
+   PHB_ITEM pItem, *pPos;
+   HB_THREAD_CONTEXT *pContext;
+   HB_STACK *pStack;
       
    #ifndef HB_OS_WIN_32
-       hb_threadCreateContext( tCurrent );
+      pContext = hb_threadCreateContext( tCurrent );
       /* now that the context has been created,
          it is safe to set async cancellation mode */
       pthread_setcanceltype( PTHREAD_CANCEL_ASYNCHRONOUS , NULL );
+   #else
+      pContext = Cargo->context;
    #endif
-
+   
+   pStack = pContext->stack;
+   pPos = pStack->pPos;
+   
    if( HB_IS_SYMBOL( pPointer ) )
    {
-      hb_vmPushSymbol( pPointer->item.asSymbol.value );
+      (*pPos)->type = HB_IT_SYMBOL;
+      (*pPos)->item.asSymbol.value = pPointer->item.asSymbol.value;
+      (*pPos)->item.asSymbol.stackbase = pPos - pStack->pItems;
+      pPos++;
+      (*pPos)->type = HB_IT_NIL;
 
       if( pt->bIsMethod )
       {
-         hb_vmPush( hb_arrayGetItemPtr( pt->pArgs, 2 ) );
+         pItem = hb_arrayGetItemPtr( pt->pArgs, 2 );
+         hb_itemCopy( (*pPos), pItem );
          uiParam = 3;
       }
       else
       {
-         hb_vmPushNil();
+         (*pPos)->type = HB_IT_NIL;
          uiParam = 2;
       }
-
+      pPos++;
+      (*pPos)->type = HB_IT_NIL;
    }
    else if( HB_IS_BLOCK( pPointer ) )
    {
-      hb_vmPushSymbol( &hb_symEval );
-      hb_vmPush( pPointer );
+      (*pPos)->type = HB_IT_SYMBOL;
+      (*pPos)->item.asSymbol.value = &hb_symEval;
+      (*pPos)->item.asSymbol.stackbase = pPos - pStack->pItems;
+      pPos++;
+      (*pPos)->type = HB_IT_NIL;
+      hb_itemCopy( (*pPos), pPointer );
+      pPos++;
+      (*pPos)->type = HB_IT_NIL;
       uiParam = 2;
    }
 
+   
    for( ; uiParam <= pt->uiCount; uiParam++ )
    {
-      hb_vmPush( hb_arrayGetItemPtr( pt->pArgs, uiParam ) );
+      hb_itemCopy( (*pPos), hb_arrayGetItemPtr( pt->pArgs, uiParam ) );
+      pPos++;
+      (*pPos)->type = HB_IT_NIL;
    }
-
+   pStack->pPos = pPos;
+   
+   
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
+   hb_threadLinkContext( pContext );
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+   
    if( pt->bIsMethod )
    {
       hb_vmSend( pt->uiCount - 2 );
@@ -354,8 +424,11 @@ hb_create_a_thread(
    {
       hb_vmDo( pt->uiCount - 1 );
    }
-   hb_threadDestroyContext( tCurrent );
-   hb_gcUnlock( pt->pArgs->item.asArray.value );
+   
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
+   pContext = hb_threadUnlinkContext( tCurrent );
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+   
    hb_itemRelease( pt->pArgs );
    free( pt );
 
@@ -368,6 +441,12 @@ hb_create_a_thread(
    #endif
 }
 
+/**
+* JC1: **IsLocalRef functions are thread unsafe functions by default,
+* because the GC process is a linearized process by hypotesis. NEVER
+* call this function from outside GC process, since this function must
+* be locked both in GC (outer) and in thread (inner) mutexes
+*/
 void hb_threadIsLocalRef( void )
 {
    HB_THREAD_CONTEXT *pContext;
@@ -376,8 +455,6 @@ void hb_threadIsLocalRef( void )
 
    hb_vmIsLocalRef();
 
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
-   
    pContext = hb_ht_context;
 
    while( pContext )
@@ -387,7 +464,6 @@ void hb_threadIsLocalRef( void )
       {
          hb_gcItemRef( &(pContext->stack->Return) );
       }
-      //printf( "After ThreadReturnRef\n" );
 
       if( pContext->stack->pPos > pContext->stack->pItems )
       {
@@ -397,7 +473,6 @@ void hb_threadIsLocalRef( void )
          {
             if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
             {
-               //printf( "      Item: %p\n", pItem );
                hb_gcItemRef( *pItem );
             }
 
@@ -408,8 +483,6 @@ void hb_threadIsLocalRef( void )
       pContext = pContext->next;
    }
    
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-
 }
 
 HB_FUNC( STARTTHREAD )
@@ -529,7 +602,6 @@ HB_FUNC( STARTTHREAD )
    // We signal that we are going to start a thread
    HB_CRITICAL_LOCK( hb_threadContextMutex );
    s_threadStarted ++;
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
    
 #if defined(HB_OS_WIN_32)
    if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, CREATE_SUSPENDED, &th_id ) ) != NULL )
@@ -537,8 +609,8 @@ HB_FUNC( STARTTHREAD )
       /* Under windws, we put the handle after creation */
       HB_THREAD_CONTEXT *context = hb_threadCreateContext( th_id );
       context->th_h = th_h;
+      pt->context = context;
       ResumeThread( th_h );
-
 #else
    if( pthread_create( &th_id, NULL, hb_create_a_thread, (void * ) pt ) == 0 )
    {
@@ -549,6 +621,7 @@ HB_FUNC( STARTTHREAD )
    {
       hb_retnl( -1 );
    }
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 }
 
 HB_FUNC( STOPTHREAD )
@@ -556,13 +629,15 @@ HB_FUNC( STOPTHREAD )
    HB_MUTEX_STRUCT *Mutex;
    HB_THREAD_T th;
    PHB_ITEM pMutex;
-#ifdef HB_OS_WIN_32
    HB_THREAD_CONTEXT *context;
-#endif
 
    th = (HB_THREAD_T) hb_parnl( 1 );
    pMutex = hb_param( 2, HB_IT_STRING );
 
+   /* Forbid the higher level mutex. This operation must be done
+      when this thread is alone. */
+   HB_CRITICAL_LOCK( hb_garbageMutex );
+   
    /* Forbid alteration of the stack in the meanwhile */
    HB_CRITICAL_LOCK( hb_threadContextMutex );
 
@@ -612,8 +687,12 @@ HB_FUNC( STOPTHREAD )
       CloseHandle( context->th_h );
    #endif
 
-   hb_threadDestroyContext( th );
+   context = hb_threadUnlinkContext( th );
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+   
+   hb_threadDestroyContext( context );
+   
+   HB_CRITICAL_UNLOCK( hb_garbageMutex );
 
 }
 
@@ -650,6 +729,7 @@ HB_FUNC( KILLTHREAD )
 HB_FUNC( CLEARTHREAD )
 {
    HB_THREAD_T th;
+   HB_THREAD_CONTEXT *pContext;
 
    if( ! ISNUM( 1 ) )
    {
@@ -662,9 +742,17 @@ HB_FUNC( CLEARTHREAD )
    }
 
    th = (HB_THREAD_T) hb_parnl( 1 );
-
-   hb_threadDestroyContext( th );
    
+   HB_CRITICAL_LOCK( hb_garbageMutex );
+
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
+   pContext = hb_threadUnlinkContext( th );
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+   
+   hb_threadDestroyContext( pContext );
+   
+   HB_CRITICAL_LOCK( hb_garbageMutex );
+
 }
 
 HB_FUNC( JOINTHREAD )
@@ -1112,8 +1200,8 @@ HB_FUNC( KILLALLTHREADS )
          TerminateThread( hb_ht_context->th_h, 0);
          WaitForSingleObject( hb_ht_context->th_h, INFINITE );
          CloseHandle( hb_ht_context->th_h );
+         hb_threadDestroyContext( hb_ht_context );
       #endif
-      hb_threadDestroyContext( hb_ht_context->th_id );
    }
 }
 

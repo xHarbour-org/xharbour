@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.23 2003/01/27 21:44:48 jonnymind Exp $
+* $Id: thread.h,v 1.24 2003/02/22 05:54:57 jonnymind Exp $
 */
 
 /*
@@ -77,6 +77,7 @@
    #define HB_CRITICAL_DESTROY( x )    DeleteCriticalSection( &(x) )
    #define HB_CRITICAL_LOCK( x )       EnterCriticalSection( &(x) )
    #define HB_CRITICAL_UNLOCK( x )     LeaveCriticalSection( &(x) )
+   #define HB_CRITICAL_TRYLOCK( x )    TryEnterCriticalSection( &(x) )
 
    #define HB_MUTEX_T                  HANDLE
    #define HB_MUTEX_INIT( x )          x = CreateMutex( NULL, FALSE, NULL )
@@ -143,15 +144,13 @@ typedef struct {
 /* Context */
 typedef struct tag_HB_THREAD_CONTEXT
 {
-    HB_THREAD_T th_id;
-    HB_STACK *stack;
-    void *Cargo;
-    HB_GARBAGE_FUNC_PTR pDestructor;
+   HB_THREAD_T th_id;
+   HB_STACK *stack;
+   /* monitor must be owned to operate on the context */
 #ifdef HB_OS_WIN_32
     HANDLE th_h;
 #endif
-    //HB_GARBAGE_PTR GCList;
-    struct tag_HB_THREAD_CONTEXT *next;
+   struct tag_HB_THREAD_CONTEXT *next;
 } HB_THREAD_CONTEXT;
 
 extern HB_THREAD_CONTEXT *last_context;
@@ -162,13 +161,15 @@ typedef struct tag_HB_THREAD_PARAM
     PHB_ITEM pArgs;
     USHORT uiCount;
     BOOL bIsMethod;
+#ifdef HB_OS_WIN_32
+   HB_THREAD_CONTEXT *context;
+#endif
 } HB_THREAD_PARAM;
 
 /* Ligthweight system indepented reentrant mutex, used internally by harbour */
 typedef struct tag_HB_LWR_MUTEX
 {
     HB_THREAD_T Locker;
-/**JC: Warning; this is a test change */
 #if defined(HB_OS_WIN32)
     HB_CRITICAL_T Critical;
 #else
@@ -182,7 +183,9 @@ extern HB_THREAD_CONTEXT *hb_ht_context;
 extern HB_THREAD_T hb_main_thread_id;
 
 extern HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th_id );
-extern void hb_threadDestroyContext( HB_THREAD_T th_id );
+extern HB_THREAD_CONTEXT *hb_threadLinkContext( HB_THREAD_CONTEXT *tc );
+extern HB_THREAD_CONTEXT *hb_threadUnlinkContext( HB_THREAD_T th_id );
+extern void hb_threadDestroyContext( HB_THREAD_CONTEXT *pContext );
 extern HB_THREAD_CONTEXT *hb_threadGetContext( HB_THREAD_T th_id );
 extern void hb_threadInit( void );
 extern void hb_threadExit( void );
@@ -214,7 +217,6 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
             if ( lpMutex.Locker == HB_CURRENT_THREAD() )\
             {\
                lpMutex.nCount++;\
-               HB_MUTEX_UNLOCK( hb_threadMutexLock );\
             }\
             else\
             {\
@@ -223,7 +225,10 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
                lpMutex.Locker = HB_CURRENT_THREAD();\
             }\
          }
-
+         
+    BOOL hb_critical_mutex_trylock( HB_CRITICAL_T *lpMutex );
+    #define HB_CRITICAL_TRYLOCK( lpMutex )   hb_critical_mutex_trylock( lpMutex )
+    
     #define HB_CRITICAL_UNLOCK( lpMutex ) \
          {\
             if ( lpMutex.Locker == HB_CURRENT_THREAD() )\
@@ -255,11 +260,9 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
       #define HB_CRITICAL_LOCK( x )       HB_MUTEX_LOCK( x )
       #define HB_CRITICAL_UNLOCK( x )     HB_MUTEX_UNLOCK( x )
       #define HB_CRITICAL_DESTROY( x )    HB_MUTEX_DESTROY( x )
+      #define HB_CRITICAL_TRYLOCK( x )    pthread_mutex_trylock( x )
    #endif
 #endif
-
-/* Monitor for sync access to the context library */
-extern HB_CRITICAL_T hb_threadContextMutex;
 
 /* Forbidder mutex for xharbour */
 typedef struct tag_HB_FORBID_MUTEX
@@ -274,11 +277,30 @@ void hb_threadForbidenDestroy( HB_FORBID_MUTEX *Forbid );
 extern void hb_threadForbid( HB_FORBID_MUTEX * );
 extern void hb_threadAllow( HB_FORBID_MUTEX * );
 
+/* More elegant guard of a small section of code */
+#define HB_THREAD_GUARD( mutex, code )\
+   {\
+      HB_CRITICAL_LOCK( mutex );\
+      { code; }\
+      HB_CRITICAL_UNLOCK( mutex );\
+   }
+
+/************************************************************
+* List of mutexes that can be used to regulate concurency 
+*************************************************************/
+/* Monitor for sync access to the garbage collecting process */
+extern HB_CRITICAL_T hb_garbageMutex;
+/* Monitor for sync access to the local contexts */
+extern HB_CRITICAL_T hb_threadContextMutex;
+
 #else
 
    #define HB_CRITICAL_LOCK( x )
+   #define HB_CRITICAL_TRYLOCK( x )
    #define HB_CRITICAL_UNLOCK( x )
+   #define HB_THREAD_GUARD( mutex, code ) { code; }
 
 #endif
+
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.17 2002/12/30 21:24:09 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.18 2003/01/21 04:56:18 likewolf Exp $
  */
 
 /*
@@ -56,11 +56,6 @@
 #include "hbapiitm.h"
 #include "hbvm.h"
 #include "hbstack.h"
-
-#ifdef HB_THREAD_SUPPORT
-   extern HB_FORBID_MUTEX hb_gcCollectionForbid;
-   extern HB_CRITICAL_T hb_gcCollectionMutex;
-#endif
 
 extern PHB_ITEM **hb_vm_pGlobals;
 extern short hb_vm_iGlobals;
@@ -245,13 +240,6 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
    if( pCBlock && (--pCBlock->ulCounter == 0) )
    {
-      #ifdef HB_THREAD_SUPPORT
-        if( hb_ht_context )
-        {
-           //hb_threadForbid( &hb_gcCollectionForbid );
-           HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-        }
-      #endif
 
       if( pCBlock->pLocals )
       {
@@ -283,14 +271,6 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
       /* free space allocated for a CODEBLOCK structure
       */
       hb_gcFree( pCBlock );
-
-      #ifdef HB_THREAD_SUPPORT
-        if( hb_ht_context )
-        {
-           //hb_threadAllow( &hb_gcCollectionMutex );
-           HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-        }
-      #endif
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.42 2003/02/24 05:55:55 jonnymind Exp $
+ * $Id: fastitem.c,v 1.43 2003/02/24 23:52:19 jonnymind Exp $
  */
 
 /*
@@ -157,8 +157,6 @@ void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
 void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemClear(%p) type: %i", pItem, pItem->type ) );
-
-   
 
    if( HB_IS_STRING( pItem ) )
    {

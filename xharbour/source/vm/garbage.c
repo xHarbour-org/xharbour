@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.41 2003/02/22 01:30:36 jonnymind Exp $
+ * $Id: garbage.c,v 1.43 2003/02/22 05:54:57 jonnymind Exp $
  */
 
 /*
@@ -113,8 +113,13 @@ static ULONG s_uAllocated = 0;
 
 #ifdef HB_THREAD_SUPPORT
    //HB_FORBID_MUTEX hb_gcCollectionForbid;
-   static HB_CRITICAL_T s_CriticalMutex;
-   HB_CRITICAL_T hb_gcCollectionMutex;
+   HB_CRITICAL_T hb_garbageMutex;
+   
+   /* Mutex to access safely the "used flag" that is swapped at each scan */
+   
+   /* Mutex to access safely garbage allocation strategy */
+   static HB_CRITICAL_T s_garbageAllocMutex;
+   
    /* JC1: signal that GC is being used now */
    static BOOL s_bGarbageAtWork = FALSE;
    static HB_CRITICAL_T s_GawMutex;
@@ -160,18 +165,17 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 {
    HB_GARBAGE_PTR pAlloc;
 
-   #ifdef HB_THREAD_SUPPORT
-       HB_CRITICAL_LOCK( s_CriticalMutex );
-   #endif
-
    #ifdef GC_RECYCLE
+      HB_CRITICAL_LOCK( s_garbageAllocMutex );
       if( s_pAvailableBaseArrays && ulSize == sizeof( HB_BASEARRAY ) )
       {
          pAlloc = s_pAvailableBaseArrays;
          hb_gcUnlink( &s_pAvailableBaseArrays, s_pAvailableBaseArrays );
+         HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
       }
       else
       {
+         HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
          pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( ulSize + sizeof( HB_GARBAGE ) );
       }
    #else
@@ -180,28 +184,22 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 
    if( pAlloc )
    {
-      s_uAllocated++;
-
-      hb_gcLink( &s_pCurrBlock, pAlloc );
 
       pAlloc->pFunc  = pCleanupFunc;
       pAlloc->locked = 0;
       pAlloc->used   = s_uUsedFlag;
+      
+      HB_CRITICAL_LOCK( s_garbageAllocMutex );
+      s_uAllocated++;
+      hb_gcLink( &s_pCurrBlock, pAlloc );
+      HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
 
       HB_TRACE( HB_TR_DEBUG, ( "hb_gcAlloc %p in %p", pAlloc + 1, pAlloc ) );
-
-      #ifdef HB_THREAD_SUPPORT
-          HB_CRITICAL_UNLOCK( s_CriticalMutex );
-      #endif
 
       return (void *)( pAlloc + 1 );   /* hide the internal data */
    }
    else
    {
-      #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
-      #endif
-
       return NULL;
    }
 }
@@ -211,17 +209,9 @@ void hb_gcFree( void *pBlock )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p)", pBlock ) );
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( s_CriticalMutex );
-   #endif
-
    if( s_bReleaseAll )
    {
-      #ifdef HB_THREAD_SUPPORT
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
-      #endif
       HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcFree(%p)", pBlock ) );
-
       return;
    }
 
@@ -233,30 +223,28 @@ void hb_gcFree( void *pBlock )
       if( pAlloc->locked )
       {
          HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p) *LOCKED* %p", pBlock, pAlloc ) );
-         hb_gcUnlink( &s_pLockedBlock, pAlloc );
+         
+         HB_THREAD_GUARD( s_garbageAllocMutex, hb_gcUnlink( &s_pLockedBlock, pAlloc ) );
+         
          HB_GARBAGE_FREE( pAlloc );
       }
       else
       {
          // Might already be marked for deletion.
+         HB_CRITICAL_LOCK( s_garbageAllocMutex );
          if( ! ( pAlloc->used & HB_GC_DELETE ) )
          {
             s_uAllocated--;
-
             hb_gcUnlink( &s_pCurrBlock, pAlloc );
-
             HB_GARBAGE_FREE( pAlloc );
          }
+         HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
       }
    }
    else
    {
       hb_errInternal( HB_EI_XFREENULL, NULL, NULL, NULL );
    }
-
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
-   #endif
 }
 
 static HB_GARBAGE_FUNC( hb_gcGripRelease )
@@ -267,22 +255,27 @@ static HB_GARBAGE_FUNC( hb_gcGripRelease )
    HB_SYMBOL_UNUSED( Cargo );
 }
 
+/** JC1:
+* Warning: THREAD UNSAFE
+* If pOrigin is given, hb_gcGripGet must be provided in a thread safe way,
+* (generally locking the data set of pOrigin)
+****/
+
 HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 {
    HB_GARBAGE_PTR pAlloc;
 
-   #if defined( HB_THREAD_SUPPORT )
-      HB_CRITICAL_LOCK( s_CriticalMutex );
-   #endif
-
    #ifdef GC_RECYCLE
+      HB_CRITICAL_LOCK( s_garbageAllocMutex );
       if( s_pAvailableItems )
       {
          pAlloc = s_pAvailableItems;
          hb_gcUnlink( &s_pAvailableItems, s_pAvailableItems );
-      }
+         HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+   }
       else
       {
+         HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
          pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( sizeof( HB_ITEM ) + sizeof( HB_GARBAGE ) );
       }
    #else
@@ -293,7 +286,6 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
    {
       HB_ITEM_PTR pItem = ( HB_ITEM_PTR )( pAlloc + 1 );
 
-      hb_gcLink( &s_pLockedBlock, pAlloc );
 
       pAlloc->pFunc  = hb_gcGripRelease;
       pAlloc->locked = 1;
@@ -309,44 +301,32 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
          memset( pItem, 0, sizeof( HB_ITEM ) );
          pItem->type = HB_IT_NIL;
       }
-
-      #if defined( HB_THREAD_SUPPORT )
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
-      #endif
-
+      
+      HB_THREAD_GUARD( s_garbageAllocMutex, hb_gcLink( &s_pLockedBlock, pAlloc ) );
       return pItem;
    }
    else
    {
-      #if defined( HB_THREAD_SUPPORT )
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
-      #endif
-
       return NULL;
    }
 }
+
+/** JC1:
+* Warning: THREAD UNSAFE
+* If pItem is in a data set, hb_gcGripDrop must be provided in a thread safe way,
+* (generally locking the data set of pItem )
+****/
 
 void hb_gcGripDrop( HB_ITEM_PTR pItem )
 {
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcGripDrop(%p)", pItem ) );
 
-   #if defined( HB_THREAD_SUPPORT )
-      HB_CRITICAL_LOCK( s_CriticalMutex );
-   #endif
-
    if( s_bReleaseAll )
    {
       HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcGripDrop(%p)", pItem ) );
-      #if defined( HB_THREAD_SUPPORT )
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
-      #endif
-
       return;
    }
-   #if defined( HB_THREAD_SUPPORT )
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
-   #endif
 
    if( pItem )
    {
@@ -363,16 +343,12 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
          }
       }
 
-      #if defined( HB_THREAD_SUPPORT )
-         HB_CRITICAL_LOCK( s_CriticalMutex );
-      #endif
-
+      HB_CRITICAL_LOCK( s_garbageAllocMutex );
+      
       hb_gcUnlink( &s_pLockedBlock, pAlloc );
 
-      #if defined( HB_THREAD_SUPPORT )
-         HB_CRITICAL_UNLOCK( s_CriticalMutex );
-      #endif
-
+      HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+      
       HB_GARBAGE_FREE( pAlloc );
    }
 
@@ -380,13 +356,14 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 
 /* Lock a memory pointer so it will not be released if stored
    outside of harbour variables
+* JC1: THREAD UNSAFE.
+* The caller must make sure to obtain the garbage mutex before to
+* call this function, and once obtained it must also be sure that
+* the object still exists, as the garbage could have removed it
+* in the meanwhile (unless it has been safely stored in a data set).
 */
 void * hb_gcLock( void * pBlock )
 {
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( s_CriticalMutex );
-   #endif
-
    if( pBlock )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pBlock;
@@ -394,19 +371,19 @@ void * hb_gcLock( void * pBlock )
 
       if( ! pAlloc->locked )
       {
+         HB_CRITICAL_LOCK( s_garbageAllocMutex );
+         
          //hb_gcUnlink( pContextList, pAlloc );
          hb_gcUnlink( &s_pCurrBlock, pAlloc );
 
          hb_gcLink( &s_pLockedBlock, pAlloc );
 
          pAlloc->used = s_uUsedFlag;
+         
+         HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
       }
       ++pAlloc->locked;
    }
-
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
-   #endif
 
    return pBlock;
 }
@@ -416,9 +393,6 @@ void * hb_gcLock( void * pBlock )
 */
 void *hb_gcUnlock( void *pBlock )
 {
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( s_CriticalMutex );
-   #endif
 
    if( pBlock )
    {
@@ -429,23 +403,30 @@ void *hb_gcUnlock( void *pBlock )
       {
          if( --pAlloc->locked == 0 )
          {
+            HB_CRITICAL_LOCK( s_garbageAllocMutex );
+            
             hb_gcUnlink( &s_pLockedBlock, pAlloc );
 
             hb_gcLink( &s_pCurrBlock, pAlloc );
 
             pAlloc->used = s_uUsedFlag;
+            
+            HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
          }
       }
    }
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
-   #endif
-
    return pBlock;
 }
 
+
 /* Mark a passed item as used so it will be not released by the GC
+*
+* JC1: hb_gcItemRef is thread unsafe, and MUST stay this way because
+* it can ONLY be called form within a GC process. The GC process is
+* made by one thread at a time by definition.
+* Don't ever call hb_gcItemRef() from outside an IsItemRef() function,
+* or else call it locked against hb_garbageMutex;
 */
 void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
@@ -503,6 +484,7 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
             }
          }
       }
+      
    }
    else if( HB_IS_BLOCK( pItem ) )
    {
@@ -539,6 +521,7 @@ void hb_gcCollect( void )
 */
 void hb_gcCollectAll( void )
 {
+   
    /*JC1: in MT, GC collecting is not just -locked-: if a second thread
    wants to collect while another is doing collection, it will just wait
    for the first to finish and then return. Double garbage collecting is
@@ -567,16 +550,15 @@ void hb_gcCollectAll( void )
       HB_CRITICAL_UNLOCK( s_GawMutex );
 
       /* Lock if first thread, sync if others */
-      HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+      HB_CRITICAL_LOCK( hb_garbageMutex );
 
       /* return harmlessy if Garbage was at work when function begun */
+      
       if(bWait)
       {
-         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+         HB_CRITICAL_UNLOCK( hb_garbageMutex );
          return;
       }
-      // prevent operations from being executed in GC context
-      HB_CRITICAL_LOCK( s_CriticalMutex );
 
    #else
       if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
@@ -585,216 +567,218 @@ void hb_gcCollectAll( void )
       }
    #endif
 
-
-      /*
-      HB_CRITICAL_LOCK( hb_gcCollectionForbid.Control );
-
-      while( hb_gcCollectionForbid.lCount )
-      {
-         if( hb_gcCollectionForbid.lCount < 0 )
-         {
-            HB_CRITICAL_UNLOCK( hb_gcCollectionForbid.Control );
-            printf( "Unexpected condition!\n" );
-            exit(1);
-         }
-
-         HB_CRITICAL_UNLOCK( hb_gcCollectionForbid.Control );
-
-         #if defined(HB_OS_WIN_32)
-             Sleep( 0 );
-         #elif defined(HB_OS_DARWIN)
-             usleep( 1 );
-         #else
-             static struct timespec nanosecs = { 0, 1000 };
-             nanosleep( &nanosecs, NULL );
-         #endif
-
-         HB_CRITICAL_LOCK( hb_gcCollectionForbid.Control );
-      }
-
-      HB_CRITICAL_UNLOCK( hb_gcCollectionForbid.Control );
-      */
-
-   //printf(  "Collecting...\n" );
-
-   HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
-
-   if( s_pCurrBlock && ! s_bCollecting )
+   /* safely, atomically see if we have some work to do */
+   HB_CRITICAL_LOCK( s_garbageAllocMutex );
+   if( s_pCurrBlock==0 || s_bCollecting )
    {
-      HB_GARBAGE_PTR pAlloc, pDelete;
+      HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+      HB_CRITICAL_UNLOCK( hb_garbageMutex );
+      return;
+   }
+   
+   /* By hypotesis, only one thread will be granted the right to be here; 
+   so cheching for consistency of s_pCurrBlock further is useless.*/
+   HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+      
+   HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
+   
+   
+   /* Now that we are rightful owner of the GC process, we must
+   * forbid all other threads from acting into the objects that
+   * are going to be (in different times):
+   * - scanned,
+   * - freed (in their members)
+   * - modified/released (in their strucure )
+   *****/
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
+   
+   HB_GARBAGE_PTR pAlloc, pDelete;
 
-      s_bCollecting = TRUE;
-      s_uAllocated = 0;
+   s_bCollecting = TRUE;
+   s_uAllocated = 0;
 
-      /* Step 1 - mark */
-      /* All blocks are already marked because we are flipping
-       * the used/unused flag
-       */
+   /* Step 1 - mark */
+   /* All blocks are already marked because we are flipping
+   * the used/unused flag
+   */
 
-      HB_TRACE( HB_TR_INFO, ( "Sweep Scan" ) );
+   HB_TRACE( HB_TR_INFO, ( "Sweep Scan" ) );
 
-      //printf( "Sweep Scan\n" );
+   //printf( "Sweep Scan\n" );
 
-      /* Step 2 - sweep */
-      /* check all known places for blocks they are referring */
-      #ifdef HB_THREAD_SUPPORT
-         hb_threadIsLocalRef();
-      #else
-         hb_vmIsLocalRef();
-      #endif
+   /* Step 2 - sweep */
+   /* check all known places for blocks they are referring */
+   #ifdef HB_THREAD_SUPPORT
+      hb_threadIsLocalRef();
+   #else
+      hb_vmIsLocalRef();
+   #endif
 
-      //printf( "After LocalRef\n" );
+   //printf( "After LocalRef\n" );
 
-      hb_vmIsStaticRef();
-      //printf( "After StaticRef\n" );
+   hb_vmIsStaticRef();
+   //printf( "After StaticRef\n" );
 
-      hb_vmIsGlobalRef();
-      //printf( "After Globals\n" );
+   hb_vmIsGlobalRef();
+   //printf( "After Globals\n" );
 
-      hb_memvarsIsMemvarRef();
-      //printf( "After MemvarRef\n" );
+   hb_memvarsIsMemvarRef();
+   //printf( "After MemvarRef\n" );
 
-      hb_clsIsClassRef();
-      //printf( "After ClassRef\n" );
+   hb_clsIsClassRef();
+   //printf( "After ClassRef\n" );
 
-      HB_TRACE( HB_TR_INFO, ( "Locked Scan" ) );
+   HB_TRACE( HB_TR_INFO, ( "Locked Scan" ) );
 
-      /* check list of locked blocks for blocks referenced from
-       * locked block
-      */
-      if( s_pLockedBlock )
-      {
-         pAlloc = s_pLockedBlock;
+   /* check list of locked blocks for blocks referenced from
+   * locked block
+   */
+   HB_CRITICAL_LOCK( s_garbageAllocMutex );
+    
+   if( s_pLockedBlock )
+   {
+      pAlloc = s_pLockedBlock;
 
-         do
-         {
-            /* it is not very elegant method but it works well */
-            if( pAlloc->pFunc == hb_gcGripRelease )
-            {
-               hb_gcItemRef( ( HB_ITEM_PTR ) ( pAlloc + 1 ) );
-            }
-            else if( pAlloc->pFunc == hb_arrayReleaseGarbage )
-            {
-               HB_ITEM FakedItem;
-
-               (&FakedItem)->type = HB_IT_ARRAY;
-               (&FakedItem)->item.asArray.value = ( PHB_BASEARRAY )( pAlloc + 1 );
-
-               hb_gcItemRef( &FakedItem );
-            }
-            else if( pAlloc->pFunc == hb_codeblockDeleteGarbage )
-            {
-               HB_ITEM FakedItem;
-
-               (&FakedItem)->type = HB_IT_BLOCK;
-               (&FakedItem)->item.asBlock.value = ( PHB_CODEBLOCK )( pAlloc + 1 );
-
-               hb_gcItemRef( &FakedItem );
-            }
-
-            pAlloc = pAlloc->pNext;
-
-         }
-         while ( s_pLockedBlock != pAlloc );
-      }
-
-      HB_TRACE( HB_TR_INFO, ( "Cleanup Scan" ) );
-
-      /* Step 3 - Call Cleanup Functions */
-      pAlloc = s_pCurrBlock;
       do
       {
-         if( s_pCurrBlock->used == s_uUsedFlag )
+         /* it is not very elegant method but it works well */
+         if( pAlloc->pFunc == hb_gcGripRelease )
          {
-           /* Mark for deletion. */
-           s_pCurrBlock->used |= HB_GC_DELETE;
+            hb_gcItemRef( ( HB_ITEM_PTR ) ( pAlloc + 1 ) );
+         }
+         else if( pAlloc->pFunc == hb_arrayReleaseGarbage )
+         {
+            HB_ITEM FakedItem;
 
-           //printf( "Marked, %p Item: %p\n", s_pCurrBlock, s_pCurrBlock + 1 );
+            (&FakedItem)->type = HB_IT_ARRAY;
+            (&FakedItem)->item.asArray.value = ( PHB_BASEARRAY )( pAlloc + 1 );
 
-           /* call the cleanup function. */
-           if( s_pCurrBlock->pFunc )
-           {
-              HB_TRACE( HB_TR_INFO, ( "Cleanup, %p", s_pCurrBlock ) );
-              ( s_pCurrBlock->pFunc )( ( void *)( s_pCurrBlock + 1 ) );
-              HB_TRACE( HB_TR_INFO, ( "DONE Cleanup, %p", s_pCurrBlock ) );
-           }
+            hb_gcItemRef( &FakedItem );
+         }
+         else if( pAlloc->pFunc == hb_codeblockDeleteGarbage )
+         {
+            HB_ITEM FakedItem;
+
+            (&FakedItem)->type = HB_IT_BLOCK;
+            (&FakedItem)->item.asBlock.value = ( PHB_CODEBLOCK )( pAlloc + 1 );
+
+            hb_gcItemRef( &FakedItem );
          }
 
-         s_pCurrBlock = s_pCurrBlock->pNext;
+         pAlloc = pAlloc->pNext;
 
       }
-      while ( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
+      while ( s_pLockedBlock != pAlloc );
+   }
 
-      HB_TRACE( HB_TR_INFO, ( "Release Scan" ) );
+   HB_TRACE( HB_TR_INFO, ( "Cleanup Scan" ) );
 
-      /* Step 4 - Release all blocks that are still marked as unused */
-      pAlloc = s_pCurrBlock;
-      do
+   /* Step 3 - Call Cleanup Functions */
+   
+   pAlloc = s_pCurrBlock;
+   do
+   {
+      if( s_pCurrBlock->used == s_uUsedFlag )
       {
-         NewTopBlock:
+         /* Mark for deletion. */
+         s_pCurrBlock->used |= HB_GC_DELETE;
 
-         if( s_pCurrBlock->used & HB_GC_DELETE )
+         //printf( "Marked, %p Item: %p\n", s_pCurrBlock, s_pCurrBlock + 1 );
+
+         /* call the cleanup function. */
+         if( s_pCurrBlock->pFunc )
          {
-            HB_TRACE( HB_TR_INFO, ( "Delete, %p", s_pCurrBlock ) );
+            HB_TRACE( HB_TR_INFO, ( "Cleanup, %p", s_pCurrBlock ) );
+            ( s_pCurrBlock->pFunc )( ( void *)( s_pCurrBlock + 1 ) );
+            HB_TRACE( HB_TR_INFO, ( "DONE Cleanup, %p", s_pCurrBlock ) );
+         }
+      }
 
-            pDelete = s_pCurrBlock;
-            hb_gcUnlink( &s_pCurrBlock, s_pCurrBlock );
+      s_pCurrBlock = s_pCurrBlock->pNext;
 
-            /*
-               Releasing the top block in the list, so we must mark the new top into pAlloc
-               but we still need to process this new top. Without this goto, the while
-               condition will immediatly fail. Using extra flags, and new conditions
-               will adversly effect performance.
-            */
-            if( pDelete == pAlloc )
+   }
+   while ( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
+      
+   HB_TRACE( HB_TR_INFO, ( "Release Scan" ) );
+
+   /* Step 4 - Release all blocks that are still marked as unused */
+   pAlloc = s_pCurrBlock;
+   do
+   {
+      NewTopBlock:
+
+      if( s_pCurrBlock->used & HB_GC_DELETE )
+      {
+         HB_TRACE( HB_TR_INFO, ( "Delete, %p", s_pCurrBlock ) );
+
+         pDelete = s_pCurrBlock;
+         hb_gcUnlink( &s_pCurrBlock, s_pCurrBlock );
+
+         /*
+            Releasing the top block in the list, so we must mark the new top into pAlloc
+            but we still need to process this new top. Without this goto, the while
+            condition will immediatly fail. Using extra flags, and new conditions
+            will adversly effect performance.
+         */
+         if( pDelete == pAlloc )
+         {
+            HB_TRACE( HB_TR_INFO, ( "New Top, %p", pDelete ) );
+
+            pAlloc = s_pCurrBlock;
+            HB_GARBAGE_FREE( pDelete );
+
+            if( s_pCurrBlock )
             {
-               HB_TRACE( HB_TR_INFO, ( "New Top, %p", pDelete ) );
-
-               pAlloc = s_pCurrBlock;
-               HB_GARBAGE_FREE( pDelete );
-
-               if( s_pCurrBlock )
-               {
-                  goto NewTopBlock;
-               }
-            }
-            else
-            {
-               HB_TRACE( HB_TR_INFO, ( "Free, %p", pDelete ) );
-               HB_GARBAGE_FREE( pDelete );
-               HB_TRACE( HB_TR_INFO, ( "DONE Free, %p", pDelete ) );
+               goto NewTopBlock;
             }
          }
          else
          {
-            s_pCurrBlock = s_pCurrBlock->pNext;
+            HB_TRACE( HB_TR_INFO, ( "Free, %p", pDelete ) );
+            HB_GARBAGE_FREE( pDelete );
+            HB_TRACE( HB_TR_INFO, ( "DONE Free, %p", pDelete ) );
          }
-
       }
-      while ( s_pCurrBlock && ( pAlloc != s_pCurrBlock ) );
+      else
+      {
+         s_pCurrBlock = s_pCurrBlock->pNext;
+      }
 
-      s_bCollecting = FALSE;
-
-      s_pCurrBlock = pAlloc;
-
-      /* Step 4 - flip flag */
-      /* Reverse used/unused flag so we don't have to mark all blocks
-       * during next collecting
-       */
-      s_uUsedFlag ^= HB_GC_USED_FLAG;
    }
+   while ( s_pCurrBlock && ( pAlloc != s_pCurrBlock ) );
+
+   s_bCollecting = FALSE;
+
+   s_pCurrBlock = pAlloc;
+   
+   HB_CRITICAL_UNLOCK( s_garbageAllocMutex );
+
+   /* Step 4 - flip flag */
+   /* Reverse used/unused flag so we don't have to mark all blocks
+   * during next collecting
+   */
+   s_uUsedFlag ^= HB_GC_USED_FLAG;
 
    #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
+   
+      /* Step 5: release all the locks on the scanned objects */
+      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+
       HB_CRITICAL_LOCK( s_GawMutex );
       s_bGarbageAtWork = FALSE;
       HB_CRITICAL_UNLOCK( s_GawMutex );
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+      
+      /* Now free all the global object mutexes mutexes */
+      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+      
+      HB_CRITICAL_UNLOCK( hb_garbageMutex );
    #endif
 
-   //printf( "Done Collecting...\n" );
 }
 
+/* JC1: THREAD UNSAFE
+* Should be called only at VM termination, when all threads have been terminated
+*/
 void hb_gcReleaseAll( void )
 {
    HB_GARBAGE_PTR pAlloc, pDelete;
@@ -891,8 +875,8 @@ void hb_gcInit( void )
    #ifdef HB_THREAD_SUPPORT
       //hb_threadForbidenInit( &hb_gcCollectionForbid );
       HB_CRITICAL_INIT( s_GawMutex );
-      HB_CRITICAL_INIT( s_CriticalMutex );
-      HB_CRITICAL_INIT( hb_gcCollectionMutex );
+      HB_CRITICAL_INIT( hb_garbageMutex );
+      HB_CRITICAL_INIT( s_garbageAllocMutex );
    #endif
 }
 
@@ -901,8 +885,8 @@ void hb_gcExit( void )
    #ifdef HB_THREAD_SUPPORT
       //hb_threadForbidenDestroy( &hb_gcCollectionForbid );
       HB_CRITICAL_DESTROY( s_GawMutex );
-      HB_CRITICAL_DESTROY( s_CriticalMutex );
-      HB_CRITICAL_DESTROY( hb_gcCollectionMutex );
+      HB_CRITICAL_DESTROY( hb_garbageMutex );
+      HB_CRITICAL_DESTROY( s_garbageAllocMutex );
    #endif
 }
 

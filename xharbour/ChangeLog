@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.776 2003/02/25 16:59:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.777 2003/02/25 19:06:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-26 06:33 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+   * include/thread.h
+   * source/vm/thread.c
+     + Added macro HB_TREAD_GUARD() for simpler threadsafing of one 
+       command
+     + Context initialization and destruction is now done in 4 phases
+       instead of 2.
+     + Added structures for TRYLOCK.
+   
+   * source/vm/arrays.c
+   * source/vm/arrayshb.c
+   * source/vm/codebloc.c
+   * source/vm/extend.c
+   * source/vm/fastitem.c
+   * source/vm/fm.c
+   * source/vm/garbage.c
+   * source/vm/hvm.c
+     + New multithreading infracstructure framework has been initiated.
+       
+   NOTE: This is a work in progress, and exactly a BEGIN of a LONG work.
+   I have made sure that this commit works with mttest.prg and mtgc.prg,
+   and I commit it because I need to show this changes to other developers
+   involved in the project, and to port the source to my windows test
+   machines. Other programs, (involving classes, RDD and array management) 
+   are NOT going to work with this commit, because the develpement of the
+   new framework has just started.
 
 2003-02-25 11:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c

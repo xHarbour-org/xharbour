@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.165 2003/02/23 21:03:15 jonnymind Exp $
+ * $Id: hvm.c,v 1.166 2003/02/25 08:07:05 ronpinkas Exp $
  */
 
 /*
@@ -97,8 +97,6 @@
 #endif
 
 #ifdef HB_THREAD_SUPPORT
-   //extern HB_FORBID_MUTEX hb_gcCollectionForbid;
-   extern HB_CRITICAL_T hb_gcCollectionMutex;
    /** JC1:
       Turning on stack usage optimization. In MT libs, every function
       accessing stack will record the HB_STACK (provided by
@@ -3925,14 +3923,6 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
 
    itArray.type = HB_IT_NIL;
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         //hb_threadForbid( &hb_gcCollectionForbid );
-         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-      }
-   #endif
-
    hb_vmArrayNew( &itArray, uiDimensions );
 
    while( uiDimensions-- )
@@ -3943,13 +3933,6 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
    hb_itemForwardValue( ( * HB_VM_STACK.pPos ), &itArray );
    hb_stackPush();
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         //hb_threadAllow( &hb_gcCollectionForbid );
-         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-      }
-   #endif
 }
 
 static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array and fills it from the stack values */
@@ -3961,13 +3944,7 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayGen(%lu)", ulElements));
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         //hb_threadForbid( &hb_gcCollectionForbid );
-         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-      }
-   #endif
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
 
    itArray.type = HB_IT_NIL;
    hb_arrayNew( &itArray, ulElements );
@@ -3993,14 +3970,9 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
       hb_itemForwardValue( ( * HB_VM_STACK.pPos ), &itArray );
       hb_stackPush();
    }
+   
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         //hb_threadAllow( &hb_gcCollectionForbid );
-         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-      }
-   #endif
 }
 
 /* This function creates an array item using 'uiDimension' as an index
@@ -4015,7 +3987,7 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayNew(%p, %hu)", pArray, uiDimension));
 
-   // HB_CRITICAL_LOCK() - Protected an ENTRY POINT hb_vmArrayDim()!
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
 
    pDim = hb_stackItemFromTop( - uiDimension );
 
@@ -4055,6 +4027,9 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
          hb_vmArrayNew( hb_arrayGetItemPtr( pArray, ulElements-- ), uiDimension );
       }
    }
+   
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+
 }
 
 /* ------------------------------- */
@@ -4825,6 +4800,7 @@ static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the g
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmStatics(%p, %hu)", pSym, uiStatics));
 
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
    if( HB_IS_NIL( &s_aStatics ) )
    {
       pSym->pFunPtr = NULL;         /* statics frame for this PRG */
@@ -4837,6 +4813,8 @@ static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the g
    }
 
    s_uiStatics = uiStatics; /* We need s_uiStatics for processing hb_vmStaticName() */
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+   
 }
 
 static void hb_vmEndBlock( void )
@@ -5133,13 +5111,6 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_BLOCK;
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         //hb_threadForbid( &hb_gcCollectionForbid );
-         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-      }
-   #endif
 
    uiLocals = HB_PCODE_MKUSHORT( &( pCode[ 5 ] ) );
    ( * HB_VM_STACK.pPos )->item.asBlock.value =
@@ -5159,13 +5130,6 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    ( * HB_VM_STACK.pPos )->item.asBlock.lineno = hb_stackBaseItem()->item.asSymbol.lineno;
    hb_stackPush();
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         //hb_threadAllow( &hb_gcCollectionForbid );
-         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-      }
-   #endif
 }
 
 /* +0    -> HB_P_PUSHBLOCKSHORT
@@ -5180,14 +5144,6 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushBlockShort(%p, %p)", pCode, pSymbols));
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_BLOCK;
-
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         //hb_threadForbid( &hb_gcCollectionForbid );
-         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-      }
-   #endif
 
    ( * HB_VM_STACK.pPos )->item.asBlock.value =
          hb_codeblockNew( pCode + 2,                /* pcode buffer         */
@@ -5206,13 +5162,6 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    ( * HB_VM_STACK.pPos )->item.asBlock.lineno = hb_stackBaseItem()->item.asSymbol.lineno;
    hb_stackPush();
 
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         //hb_threadAllow( &hb_gcCollectionForbid );
-         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-      }
-   #endif
 }
 
 /* +0    -> HB_P_MPUSHBLOCK

@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.25 2002/12/31 00:58:55 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.26 2003/02/10 01:22:34 ronpinkas Exp $
  */
 
 /*
@@ -67,10 +67,6 @@
 #include "hbapilng.h"
 #include "cstruct.ch"
 
-#ifdef HB_THREAD_SUPPORT
-   //extern HB_FORBID_MUTEX hb_gcCollectionForbid;
-   extern HB_CRITICAL_T hb_gcCollectionMutex;
-#endif
 
 /* This function creates an array item using 'iDimension' as an index
  * to retrieve the number of elements from the parameter list.
@@ -83,25 +79,8 @@ static void hb_arrayNewRagged( PHB_ITEM pArray, int iDimension )
 
    ulElements = ( ULONG ) hb_parnl( iDimension );
 
-   #ifdef HB_THREAD_SUPPORT
-     if( hb_ht_context )
-     {
-        //hb_threadForbid( &hb_gcCollectionForbid );
-        HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-     }
-   #endif
-
    /* create an array */
    hb_arrayNew( pArray, ulElements );
-
-   #ifdef HB_THREAD_SUPPORT
-     if( hb_ht_context )
-     {
-        // Called from ARRAY() which means target is HB_VM_STACK.Return which means we are safe.
-        //hb_threadForbid( &hb_gcCollectionForbid );
-        HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-     }
-   #endif
 
    if( ++iDimension <= hb_pcount() )
    {
@@ -141,7 +120,9 @@ HB_FUNC( ARRAY )
 
       if( ! bError )
       {
+         HB_CRITICAL_LOCK( hb_threadContextMutex );
          hb_arrayNewRagged( &(HB_VM_STACK.Return), 1 );
+         HB_CRITICAL_UNLOCK( hb_threadContextMutex );
       }
    }
 }
@@ -435,8 +416,10 @@ HB_FUNC( HB_AEXPRESSIONS )
       return;
    }
 
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
    hb_arrayNew( pArray, 0 );
-
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+   
    for( i = 0; i < pLine->item.asString.length; i++ )
    {
       switch( pLine->item.asString.value[i] )
@@ -511,9 +494,13 @@ HB_FUNC( HB_AEXPRESSIONS )
    {
       PHB_ITEM pExp = hb_itemNew( NULL );
 
+      HB_CRITICAL_LOCK( hb_threadContextMutex );
+      
       hb_arrayAdd( pArray, hb_itemPutCL( pExp, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
 
       hb_itemRelease( pExp );
+      
+      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
    }
 }
 
@@ -529,6 +516,8 @@ HB_FUNC( HB_ATOKENS )
       char cDelimiter = pDelim ? pDelim->item.asString.value[0] : 32;
       size_t i, iOffset = 0;
 
+      HB_CRITICAL_LOCK( hb_threadContextMutex );
+      
       hb_arrayNew( pArray, 0 );
 
       for( i = 0; i < pLine->item.asString.length; i++ )
@@ -546,6 +535,8 @@ HB_FUNC( HB_ATOKENS )
       }
 
       hb_itemRelease( pToken );
+      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+      
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.46 2003/02/10 01:22:34 ronpinkas Exp $
+ * $Id: arrays.c,v 1.47 2003/02/22 05:54:57 jonnymind Exp $
  */
 
 /*
@@ -76,16 +76,25 @@
 #include "hbvm.h"
 #include "hbstack.h"
 
-#ifdef HB_THREAD_SUPPORT
-   //extern HB_FORBID_MUTEX hb_gcCollectionForbid;
-   extern HB_CRITICAL_T hb_gcCollectionMutex;
-   #undef HB_CRITICAL_LOCK
-   #define HB_CRITICAL_LOCK( x )
-   #undef HB_CRITICAL_UNLOCK
-   #define HB_CRITICAL_UNLOCK( x )
-#endif
-
 extern char *hb_vm_acAscii[256];
+
+/*JC1: THREAD UNSAFE.
+* The caller must be sure that pItem, if given, is detached by any data set 
+* and/or not subject to garbage collection or else it must lock the 
+* appropriate mutex.
+* Also, the caller must make sure that 1) the target pItem is in a data set,
+* or else to use the hb_gcLock function:
+* Pattern one:
+* LOCK DATASET
+* hb_arrayNew( pToDataset );
+* UNLOCK DATASET
+* Pattern 2:
+* pItem = hb_itemNew( NULL );  // with NULL as parameter, this is thread safe
+* LOCK GC
+* hb_arrayNew( pItem )
+* UNLOCK GC
+* This second pattern is done by hb_arrayNewLocked(). 
+*/
 
 BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
 {
@@ -93,9 +102,6 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
    ULONG ulPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayNew(%p, %lu)", pItem, ulLen));
-
-   //printf( "Got: %p For: %p\n", pBaseArray, pItem );
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_COMPLEX( pItem ) )
    {
@@ -127,16 +133,18 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
    // ITEM ARRAY MUST BE SET FOR LAST!
    pItem->type = HB_IT_ARRAY;
 
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-
    return TRUE;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array is on a dataset, the caller must lock it.
+* If the item is on a dataset, the caller must lock it.
+*/
 
 BOOL HB_EXPORT hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayAdd(%p, %p)", pArray, pValue));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) )
    {
@@ -147,21 +155,24 @@ BOOL HB_EXPORT hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
          hb_arraySize( pArray, pBaseArray->ulLen + 1 );
          pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
          hb_itemCopy( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
-         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
          return TRUE;
       }
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-
+   
    return FALSE;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array is on a dataset, the caller must lock it.
+* If the item is on a dataset, the caller must lock it.
+*/
 
 BOOL HB_EXPORT hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pValue )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayAddForward(%p, %p)", pArray, pValue));
 
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( HB_IS_ARRAY( pArray ) )
    {
       PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
@@ -175,48 +186,55 @@ BOOL HB_EXPORT hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pValue )
          return TRUE;
       }
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-
+   
    return FALSE;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array is on a non-local dataset, the caller must lock it.
+*/
 
 ULONG HB_EXPORT hb_arrayLen( PHB_ITEM pArray )
 {
    ULONG ulLen = 0;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayLen(%p)", pArray));
 
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-
    if( HB_IS_ARRAY( pArray ) )
    {
       ulLen = pArray->item.asArray.value->ulLen;
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    return ulLen;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array is on a non-local dataset, the caller must lock it.
+*/
 
 BOOL HB_EXPORT hb_arrayIsObject( PHB_ITEM pArray )
 {
    BOOL bObj = FALSE;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayIsObject(%p)", pArray));
 
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( HB_IS_ARRAY( pArray ) )
    {
       bObj = pArray->item.asArray.value->uiClass != 0;
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    return bObj;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* Array dataset must be locked.
+*/
 
 BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySize(%p, %lu)", pArray, ulLen));
   
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-
    if( HB_IS_ARRAY( pArray ) )
    {
       PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
@@ -276,21 +294,22 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
          pBaseArray->ulLen = ulLen;
       }
 
-     HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return TRUE;
    }
    else
    {
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return FALSE;
    }
 }
 
+/**
+* Warning: THREAD UNSAFE. 
+* Caller must lock array dataset.
+*/
+
 BOOL HB_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayDel(%p, %lu)", pArray, ulIndex));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) )
    {
@@ -314,21 +333,22 @@ BOOL HB_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
             ( pBaseArray->pItems + ( ulLen - 1 ) )->type = HB_IT_NIL;
          }
       }
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return TRUE;
    }
    else
    {
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return FALSE;
    }
 }
 
+/**
+* Warning: THREAD UNSAFE. 
+* Caller must lock array dataset.
+*/
+
 BOOL HB_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayIns(%p, %lu)", pArray, ulIndex));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) )
    {
@@ -352,23 +372,25 @@ BOOL HB_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
             ( pBaseArray->pItems + ulLen )->type = HB_IT_NIL;
          }
       }
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return TRUE;
    }
    else
    {
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return FALSE;
    }
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked.
+* If the item's dataset must be locked if non-local.
+*/
 
 BOOL HB_EXPORT hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
    PHB_ITEM pElement;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySet(%p, %lu, %p)", pArray, ulIndex, pItem));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -382,21 +404,23 @@ BOOL HB_EXPORT hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
       {
          hb_itemCopy( pElement, pItem );
       }
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return TRUE;
    }
    else
    {
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return FALSE;
    }
 }
 
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
+
 BOOL HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGet(%p, %lu, %p) Base: %p Items: %p", pArray, ulIndex, pItem, pArray->item.asArray.value, pArray->item.asArray.value->pItems));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -410,7 +434,6 @@ BOOL HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
       {
          hb_itemCopy( pItem, pElement );
       }
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return TRUE;
    }
    else
@@ -425,15 +448,18 @@ BOOL HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
       }
    }
    
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return FALSE;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
 
 BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetByRef(%p, %lu, %p) Base: %p Items: %p", pArray, ulIndex, pItem, pArray->item.asArray.value, pArray->item.asArray.value->pItems));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_COMPLEX( pItem ) )
    {
@@ -467,7 +493,6 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
          *( pElement->item.asString.puiHolders ) = 1;
       }
 
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return TRUE;
    }
    else if( HB_IS_STRING( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asString.length )
@@ -479,7 +504,6 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
       pItem->item.asString.bStatic = TRUE;
       pItem->item.asString.length  = 1;
 
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return TRUE;
    }
 
@@ -488,12 +512,16 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
    return FALSE;
 }
 
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
+
 char HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
 {
    char *exData;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDS(%p, %lu, %s)", pArray, ulIndex, szDate));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -505,16 +533,19 @@ char HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
                the default value from hb_itemGetDS(). [vszakats] */
       exData = hb_itemGetDS( NULL, szDate );
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return exData;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
 
 long HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
 {
    long lData;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDL(%p, %lu)", pArray, ulIndex ));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -527,7 +558,6 @@ long HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
       lData = hb_itemGetDL( NULL );
    }
 
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return lData;
 }
 
@@ -535,28 +565,35 @@ long HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
  * This function returns a pointer to an item occupied by the specified
  * array element - it doesn't return an item's value
  */
+ /**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
+
 PHB_ITEM HB_EXPORT hb_arrayGetItemPtr( PHB_ITEM pArray, ULONG ulIndex )
 {
    PHB_ITEM pItem = NULL;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetItemPtr(%p, %lu)", pArray, ulIndex));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       pItem = pArray->item.asArray.value->pItems + ulIndex - 1;
    }
 
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return pItem;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
 
 BOOL HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex )
 {
    BOOL bRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetL(%p, %lu)", pArray, ulIndex));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -566,16 +603,19 @@ BOOL HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex )
    {
       bRet =  FALSE;
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return bRet;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
 
 int HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex )
 {
    int iRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNI(%p, %lu)", pArray, ulIndex));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -585,17 +625,19 @@ int HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex )
    {
       iRet = 0;
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return iRet;
-
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
 
 long HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex )
 {
    long lRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNL(%p, %lu)", pArray, ulIndex));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -605,16 +647,19 @@ long HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex )
    {
       lRet = 0;
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return lRet;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
 
 double HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex )
 {
    double dRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetND(%p, %lu)", pArray, ulIndex));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -624,16 +669,20 @@ double HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex )
    {
       dRet = 0;
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+   
    return dRet;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
 
 ULONG HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, ULONG ulLen )
 {
    ULONG ulRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayCopyC(%p, %lu, %s, %lu)", pArray, ulIndex, szBuffer, ulLen));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -643,16 +692,19 @@ ULONG HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, 
    {
       ulRet = 0;
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return ulRet;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
 
 char HB_EXPORT * hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex )
 {
    char *cRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetC(%p, %lu)", pArray, ulIndex));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -662,7 +714,6 @@ char HB_EXPORT * hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex )
    {
       cRet = NULL;
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return cRet;
 }
 
@@ -670,8 +721,6 @@ char HB_EXPORT * hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex )
 {
    char *cRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetCPtr(%p, %lu)", pArray, ulIndex));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -681,15 +730,19 @@ char HB_EXPORT * hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex )
    {
       cRet = "";
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return cRet;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
 
 ULONG HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex )
 {
    ULONG ulRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetCLen(%p, %lu)", pArray, ulIndex));
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -699,16 +752,19 @@ ULONG HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex )
    {
       ulRet = 0;
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return ulRet;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
 
 USHORT HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
 {
    USHORT uType;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetType(%p, %lu)", pArray, ulIndex));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
@@ -718,15 +774,18 @@ USHORT HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
    {
       uType = 0;
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return uType;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+* If the item's dataset must be locked.
+*/
 
 BOOL HB_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayLast(%p, %p)", pArray, pResult));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) )
    {
@@ -746,7 +805,6 @@ BOOL HB_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
          }
       }
 
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return TRUE;
    }
 
@@ -758,17 +816,20 @@ BOOL HB_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
    {
       pResult->type = HB_IT_NIL;
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return FALSE;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked.
+* If the item's dataset must be locked  if non-local.
+*/
 
 void HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount )
 {
    PHB_BASEARRAY pBaseArray;
    ULONG ulLen;
    PHB_ITEM pElement;
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    pBaseArray = pArray->item.asArray.value;
    ulLen = pBaseArray->ulLen;
@@ -798,15 +859,18 @@ void HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, UL
          }
       }
    }
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked.
+* If the item's dataset must be locked  if non-local.
+*/
 
 ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayScan(%p, %p, %p, %p)", pArray, pValue, pulStart, pulCount, bExact));
    
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-
    if( HB_IS_ARRAY( pArray ) )
    {
       PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
@@ -850,7 +914,6 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 
                if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) && HB_VM_STACK.Return.item.asLogical.value )
                {  
-                  HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
                   return ulStart + 1;                  /* arrays start from 1 */
                }
             }
@@ -865,7 +928,6 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
                         hb_itemStrCmp() is significant, please don't change it. [vszakats] */
                if( HB_IS_STRING( pItem ) && hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
                {
-                  HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
                   return ulStart + 1;
                }
             }
@@ -880,7 +942,6 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 
                if( HB_IS_DATE( pItem ) && hb_itemGetDL( pItem ) == lValue )
                {
-                  HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
                   return ulStart + 1;
                }
             }
@@ -897,7 +958,6 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 
                if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
                {
-                  HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
                   return ulStart + 1;
                }
             }
@@ -912,7 +972,6 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 
                if( HB_IS_LOGICAL( pItem ) && hb_itemGetL( pItem ) == bValue )
                {
-                  HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
                   return ulStart + 1;
                }
             }
@@ -923,7 +982,6 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
             {
                if( HB_IS_NIL( pBaseArray->pItems + ulStart ) )
                {
-                  HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
                   return ulStart + 1;
                }
             }
@@ -931,15 +989,18 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       }
    }
 
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    return 0;
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked.
+* If the item's dataset must be locked  if non-local.
+*/
 
 BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * pulCount )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayEval(%p, %p, %p, %p)", pArray, bBlock, pulStart, pulCount));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) && HB_IS_BLOCK( bBlock ) )
    {
@@ -974,23 +1035,24 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
             hb_vmSend( 2 );
          }
       }
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return TRUE;
    }
    else 
    {
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return FALSE;
    }
 }
+
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked.
+*/
 
 BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
 {
    HB_TRACE( HB_TR_DEBUG, ("hb_arrayRelease(%p) %p", pArray, pArray->item.asArray.value ) );
 
    //printf( "hb_arrayRelease(%p) type: %i %p\n", pArray, pArray->type, pArray->item.asArray.value );
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pArray ) )
    {
@@ -1053,14 +1115,11 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
       pArray->type = HB_IT_NIL;
       pArray->item.asArray.value = NULL;
 
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-
       //printf( "\nDone! hb_arrayRelease(%p) %p", pArray, pArray->item.asArray.value );
       return TRUE;
    }
    else
    {
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return FALSE;
    }
 }
@@ -1068,12 +1127,16 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
 /* NOTE: CA-Cl*pper 5.3a has a fix for the case when the starting position
          is greater than the length of the array. [vszakats] */
 
+/**
+* Warning: THREAD UNSAFE. 
+* If the target array's dataset must be locked.
+* If the source array's dataset must be locked  if non-local.
+*/
+
 BOOL HB_EXPORT hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart,
                    ULONG * pulCount, ULONG * pulTarget )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayCopy(%p, %p, %p, %p, %p)", pSrcArray, pDstArray, pulStart, pulCount, pulTarget));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pSrcArray ) && HB_IS_ARRAY( pDstArray ) )
    {
@@ -1149,21 +1212,22 @@ BOOL HB_EXPORT hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pul
          }
       }
 
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return TRUE;
    }
    else
    {
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return FALSE;
    }
 }
 
+/**
+* Warning: THREAD UNSAFE. 
+* If the array's dataset must be locked if non-local.
+*/
+
 PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedList )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayClone(%p, %p)", pSrcArray, pClonedList));
-
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_ARRAY( pSrcArray ) )
    {
@@ -1277,15 +1341,14 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
             hb_xfree( pCloned );
          }
       }
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return pDstArray;
    }
    else
    {
-      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
       return hb_itemNew( NULL );
    }
 }
+
 
 PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
 {
@@ -1293,14 +1356,15 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
    PHB_BASEARRAY pBaseArray;
    USHORT uiPos;
 
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
-
-   pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
 
    //printf( "Got: %p\n", pBaseArray );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromStack(%iu)", uiLen));
 
+   /* JC1: prevent being interrupted/killed and prevents GC from taking pBaseArray*/
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
+   pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
+   pArray->item.asArray.value = pBaseArray;
    pArray->type = HB_IT_ARRAY;
 
    if( uiLen > 0 )
@@ -1323,10 +1387,8 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
       ( pBaseArray->pItems + uiPos )->type = HB_IT_NIL;
       hb_itemCopy( pBaseArray->pItems + uiPos, hb_stackItemFromTop( uiPos - uiLen ) );
    }
-
-   pArray->item.asArray.value = pBaseArray;
-
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+   
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
    return pArray;
 }
@@ -1337,7 +1399,7 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    PHB_BASEARRAY pBaseArray;
    USHORT uiPos, uiPCount;
 
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
 
    pArray = hb_itemNew( NULL );
    uiPCount = (*pBase)->item.asSymbol.paramcnt;
@@ -1379,8 +1441,9 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 
    pArray->item.asArray.value = pBaseArray;
 
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+   /*Notice: the thread could still be killed HERE, causing a memory leak */
+   
    return pArray;
 }
 
@@ -1392,12 +1455,13 @@ PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
 
-   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
 
    pArray = hb_itemNew( NULL );
    uiPCount = (*pBase)->item.asSymbol.paramcnt;
 
 
+   /* Thread safety: the array type is set AFTER the array locking */
    pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
    hb_gcLock( pBaseArray );
 
@@ -1433,15 +1497,13 @@ PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase )
    }
 
    pArray->item.asArray.value = pBaseArray;
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
-   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+   /*Notice: the thread could still be killed HERE, causing a memory leak */
    return pArray;
 }
 
 /* This releases array when called from the garbage collector */
-/* JC1: This garbage function should be already locked, but
-   Melius abundare quam deficere
-*/
 HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 {
    PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) Cargo;
@@ -1492,8 +1554,6 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
          pBaseArray->pItems = NULL;
       }
    }
-   //HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
-
 }
 
 
