@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.2 2004/10/23 19:26:25 ronpinkas Exp $
+ * $Id: calconst.c,v 1.3 2004/10/23 21:52:15 ronpinkas Exp $
  */
 
 /*
@@ -196,7 +196,14 @@ static double Reduce( PBIOP Exp )
       case '&':
          if( Exp->Operator[1] )
          {
-            dRet = (long) Exp->Left && (long) Reduce( Exp->Right );
+            if( Exp->Left )
+            {
+               dRet = Reduce( Exp->Right ) ? 1 : 0;
+            }
+            else
+            {
+               dRet = 0;
+            }
          }
          else
          {
@@ -207,7 +214,14 @@ static double Reduce( PBIOP Exp )
       case '|':
          if( Exp->Operator[1] )
          {
-            dRet = (long) Exp->Left || (long) Reduce( Exp->Right );
+            if( Exp->Left )
+            {
+               dRet = 1;
+            }
+            else
+            {
+               dRet = Reduce( Exp->Right ) ? 1 : 0;
+            }
          }
          else
          {
@@ -277,7 +291,7 @@ char * NextTokenInConstant( char **pExp )
 
       (*pExp)++;
    }
-   else
+   else if( isdigit( (*pExp)[0] ) )
    {
       int i = 0;
 
@@ -290,7 +304,7 @@ char * NextTokenInConstant( char **pExp )
          i = 2;
 
          // Hex
-         while( i < 31 && ( ( (*pExp)[0] >= '0' && (*pExp)[0] <= '9' ) || ( (*pExp)[0] >= 'A' && (*pExp)[0] <= 'F' ) ) )
+         while( i < 31 && isxdigit( (*pExp)[0] ) )
          {
             sToken[i++] = (*pExp)[0];
             (*pExp)++;
@@ -301,11 +315,11 @@ char * NextTokenInConstant( char **pExp )
       }
 
       // Number
-      while( i < 31 && (*pExp)[0] >= '0' && (*pExp)[0] <= '9' )
+      do
       {
          sToken[i++] = (*pExp)[0];
          (*pExp)++;
-      }
+      } while( i < 31 && isdigit( (*pExp)[0] ) );
 
       // Decimals
       if( i < 31 && (*pExp)[0] == '.' )
@@ -313,7 +327,7 @@ char * NextTokenInConstant( char **pExp )
          sToken[i++] = (*pExp)[0];
          (*pExp)++;
 
-         while( i < 31 && (*pExp)[0] >= '0' && (*pExp)[0] <= '9' )
+         while( i < 31 && isdigit( (*pExp)[0] ) )
          {
             sToken[i++] = (*pExp)[0];
             (*pExp)++;
@@ -321,6 +335,16 @@ char * NextTokenInConstant( char **pExp )
       }
 
       sToken[i] = '\0';
+   }
+   else if( isalpha( (*pExp)[0] ) || (*pExp)[0] == '_' )
+   {
+      int i = 0;
+
+      do
+      {
+         sToken[i++] = (*pExp)[0];
+         (*pExp)++;
+      } while( isalnum( (*pExp)[0] ) || (*pExp)[0] == '_' );
    }
 
    if(

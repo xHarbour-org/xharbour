@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3539 2004/10/25 17:29:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3540 2004/10/25 20:19:21 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-25 17:37 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/compiler/calconst.c
+    + Added shortcut logic to && and || support in #if and #elif directives.
+    + Added support for Identifiers in NextTokenInConstant()
+      /* Undefined IDs evaluates to 0 instead of an expression error (like C compilers) */
+    * Revised to use C macros isdigit() isxdigit() isalpha() and isalnum)
+
+  * source/rtl/terror.prg
+    + Added Error() to provide a default class function
+    + Added INLINE New() to return Self (Class(y) compatability)
 
 2004-10-25 15:15 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/gtapi.c

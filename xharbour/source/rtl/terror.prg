@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.12 2004/01/27 03:06:59 ronpinkas Exp $
+ * $Id: terror.prg,v 1.13 2004/07/03 03:34:54 ronpinkas Exp $
  */
 
 /*
@@ -102,6 +102,8 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName 
 
       s_oClass:AddData( "ModuleName"   , "" )
 
+      s_oClass:AddInline( "New", {|Self| Self } )
+
       s_oClass:Create()
    ENDIF
 
@@ -140,6 +142,9 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName 
    lInErr := .F.
 
 RETURN oErr
+
+FUNCTION Error()
+RETURN ErrorNew()
 
 #ifndef HB_THREAD_SUPPORT
 
