@@ -738,31 +738,81 @@ HB_FUNC( WSAASYNCSELECT )
                                   ) ) ;
 }
 
+//-----------------------------------------------------------------------------
+// int CALLBACK ConditionFunc(  IN LPWSABUF lpCallerId,  IN LPWSABUF lpCallerData,
+//                              IN OUT LPQOS lpSQOS,  IN OUT LPQOS lpGQOS,
+//                              IN LPWSABUF lpCalleeId, OUT LPWSABUF lpCalleeData,
+//                              OUT GROUP FAR * g, IN DWORD dwCallbackData );
+
+
+// dwCallbackData should contain the Harbour function pointer or NULL/0
+
+
+int _stdcall _WSACondFunc( LPWSABUF lpCallerId,  LPWSABUF lpCallerData, LPQOS lpSQOS,
+                 LPQOS lpGQOS, LPWSABUF lpCalleeId, LPWSABUF lpCalleeData,
+                 GROUP FAR * g, DWORD dwCallbackData )
+{
+
+   int res = CF_ACCEPT ;
+
+   if ( dwCallbackData != 0 )
+   {
+      hb_vmPushSymbol( (HB_SYMB *) dwCallbackData ); // Harbour function pointer
+      hb_vmPushNil();
+
+      hb_vmPushLong( (LONG ) lpCallerId );
+      hb_vmPushLong( (LONG ) lpCallerData );
+      hb_vmPushLong( (LONG ) lpSQOS );
+      hb_vmPushLong( (LONG ) lpGQOS );
+      hb_vmPushLong( (LONG ) lpCalleeId );
+      hb_vmPushLong( (LONG ) lpCalleeData );
+      hb_vmPushLong( (LONG ) g );
+
+      hb_vmDo(7) ;
+      res = hb_itemGetNI( (PHB_ITEM) &hb_stack.Return );
+
+   }
+   return res ;
+
+}
+
 
 //-----------------------------------------------------------------------------
 //  SOCKET  WSAAccept( IN SOCKET s, OUT struct sockaddr FAR * addr, IN OUT LPINT addrlen,
 //                     IN LPCONDITIONPROC lpfnCondition, IN DWORD_PTR dwCallbackData );
 
-/*
+
+// syntax: if (skt := WSAAccept( s, [@addr], pHrbFunc )) <> INVALID_SOCKET
+//
+
+// Callback function pointer pHrbFunc should be obtained using HB_FuncPtr(),
+//      HB_ObjMsgPtr(), or @MyFunc().
+
+// If you require to pass extra data to the callback function
+// you must use the extra parameter, when establishing the Harbour
+// function pointer using HB_FuncPtr or HB_ObjMsgPtr.
+
 
 HB_FUNC( WSAACCEPT )
 {
    SOCKET          s              ;
-   sockaddr struct addr           ;
-   LPINT           addrlen        ;
-   LPCONDITIONPROC lpfnCondition  ;
+   struct sockaddr addr           ;
+   INT           addrlen  = ISBYREF( 2 ) ? 0 : sizeof(addr)  ;
+   SOCKET sRet ;
 
-   // Your code goes here
+   sRet = WSAAccept( (SOCKET) hb_parnl( 1 )   ,
+                     &addr                    ,
+                     &addrlen                 ,
+                     _WSACondFunc              ,
+                     ISNIL( 3 ) ? 0 : (DWORD_PTR) hb_parnl( 3 ) ) ;
 
-   hb_retnl( ( ULONG ) WSAAccept( (SOCKET) hb_parnl( 1 )                   ,
-                                                  &addr                    ,
-                                                  addrlen                  ,
-                                                  lpfnCondition            ,
-                                                  (DWORD_PTR) hb_parnl( 5 )
-                                                ) ) ;
+   if( ( sRet != INVALID_SOCKET ) && ISBYREF( 2 ) )
+        hb_storclen( ( char * ) &addr, addrlen, 2 ) ;
+
+    hb_retnl( ( ULONG ) sRet ) ;
+
 }
 
-*/
 
 
 //-----------------------------------------------------------------------------
