@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.4 2002/11/13 04:28:29 walito Exp $
+ * $Id: tclass.prg,v 1.5 2002/11/29 20:14:10 walito Exp $
  */
 
 /*
@@ -101,6 +101,7 @@ FUNCTION HBClass()
       __clsAddMsg( s_hClass, "Instance"       , @Instance()       , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "SetOnError"     , @SetOnError()     , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "InitClass"      , @InitClass()      , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "ConstructorCall", @ConstructorCall(), HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "cSuper"         , {| Self | iif( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, NIL, ::acSuper[ 1 ] ) }, HB_OO_MSG_INLINE )
       __clsAddMsg( s_hClass, "_cSuper"        , {| Self, xVal | iif( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, ( ::acSuper := { xVal } ), ::acSuper[ 1 ] := xVal ), xVal }, HB_OO_MSG_INLINE )
       __clsAddMsg( s_hClass, "hClass"         ,  1, HB_OO_MSG_DATA )
@@ -225,11 +226,13 @@ STATIC PROCEDURE Create(MetaClass)
 
    // We will work here on the MetaClass object to add the Class Method
    // as needed
-   //nLen := Len( ::aClsMethods )
-   //FOR n := 1 TO nLen
-   // // do it
-   //NEXT
-   ////
+   FOR EACH cDato IN ::aClsMethods
+       IF !( __objHasMsg( Self, cDato[ HB_OO_MTHD_SYMBOL ] ) )
+          __clsAddMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ], HB_OO_MSG_METHOD, NIL, cDato[ HB_OO_MTHD_SCOPE ] )
+       ENDIF
+   // do it
+   NEXT
+   //
 
    //Local message...
 
@@ -456,6 +459,18 @@ STATIC FUNCTION InitClass()
 
    LOCAL Self := QSelf()
 
+   RETURN Self
+
+//----------------------------------------------------------------------------//
+STATIC FUNCTION ConstructorCall( oClass, aParams )
+   LOCAL Self := QSelf()
+   LOCAL aConstrMethods
+   // Search CONSTRUCTOR methods
+   aConstrMethods := __objGetMethodList( oClass, HB_OO_CLSTP_CTOR )  //  8 = CONSTRUCTOR SCOPE
+   IF !Empty( aConstrMethods )
+      // We take only first constructor method
+      HB_ExecFromArray( oClass, aConstrMethods[1], aParams )
+   ENDIF
    RETURN Self
 
 //----------------------------------------------------------------------------//

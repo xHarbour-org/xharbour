@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.733 2003/02/18 23:54:52 jonnymind Exp $
+ * $Id: ChangeLog,v 1.734 2003/02/19 02:07:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-19 03:03 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * include/hbclass.ch
+    * fixed AddClsMethod name typo
+    + added automatic constructor call with parameters throught Class Name
+      oMyClass := TClass( "par1", par2, ... )
+      is the same of
+      oMyClass := TClass():New( "par1", par2, ... )
+    + added Class Methods definition, but not finished
+    + added CONSTRUCTOR / DESTRUCTOR definitions
+    + added OVERRIDE optional parameter to METHOD syntax, only as an explicit word
+      to remember that a method will be overrided in this class
+    + added DYNAMIC parameter like Delphi syntax. Equivalent to VIRTUAL parameter.
+  * source/rtl/tclass.prg
+    + ConstructorCall() method added
+      this automatically calls the object constructor if there are parameters passed
+  + tests/clsctor.prg
+    + test to demonstrate the new call syntax
+
+  -------------------------------
+  NOTE: Actually the only real change is the Class Name call with parameters
+        others are little modifications that don't change actual programs.
+        To use above new sintax you have to make a clean build.
+
 
 2003-02-18 18:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.sly
