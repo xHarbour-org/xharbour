@@ -25,6 +25,7 @@ CLASS ObjInspect FROM TForm
    
    VAR Browser  AS OBJECT
    VAR Objects  AS ARRAY INIT {}
+   VAR CurObject AS OBJECT
    METHOD New( oParent ) INLINE ::Caption := 'Object Inspector',;
                                 ::left    := 0,;
                                 ::top     := 275,;
@@ -42,12 +43,14 @@ CLASS ObjInspect FROM TForm
                                                       ::InspTabs:Properties:ClientRect()[4],.t.),;
                                  nil
    METHOD SetBrowserData()
+   METHOD SaveVar()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------
 
 METHOD SetBrowserData(oObj) CLASS ObjInspect
    local n,c
+   ::CurObject := oObj
    ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
    aSort( ::Browser:source,,, {|x,y| x[1] < y[1] } )
    aEval( ::Browser:source,{|a|a[1]:=Proper( a[1] )} )
@@ -82,14 +85,15 @@ METHOD OnCreate() CLASS ObjInspect
   oCol1:Style  := 0
   
   oCol2:=whColumn():INIT( 'Value'   , {|oCol,oB,n| asString(oB:source[n,2]) } ,DT_LEFT,81)
-  oCol2:VertAlign   :=TA_CENTER
-  oCol2:fgColor:= RGB(0,0,128)
+  oCol2:VertAlign  :=TA_CENTER
+  oCol2:fgColor    := RGB(0,0,128)
+  oCol2:bSaveBlock := {|cText|::SaveVar(cText)}
 
   ::Browser:addColumn(oCol1)
   ::Browser:addColumn(oCol2)
-  ::Browser:HeadFont  :=GetMessageFont()
-  ::Browser:Font      :=GetMessageFont()
-  ::Browser:HeadHeight:=0
+  ::Browser:HeadFont      :=GetMessageFont()
+  ::Browser:Font          :=GetMessageFont()
+  ::Browser:HeadHeight    :=0
   ::Browser:BgColor       := GetSysColor(COLOR_BTNFACE)
   ::Browser:HiliteNoFocus := GetSysColor(COLOR_BTNFACE)
 
@@ -97,6 +101,14 @@ METHOD OnCreate() CLASS ObjInspect
   ::Browser:configure()
 
 return( super:OnCreate() )
+
+METHOD SaveVar(cText) CLASS ObjInspect
+   
+   __objSendMsg( ::CurObject, "_"+::Browser:source[::Browser:RowPos][1], cText ) 
+   ::Browser:source[::Browser:RowPos][2]:= cText 
+   ::Browser:RefreshCurrent()
+   ::CurObject:Update()
+return(self)
 
 //----------------------------------------------------------------------------------------------
 
