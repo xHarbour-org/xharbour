@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.25 2003/08/24 23:55:20 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.26 2003/08/25 22:25:03 ronpinkas Exp $
  */
 
 /*
@@ -142,7 +142,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
 
             memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
 
-            #ifdef HB_ARRAY_USE_COUNTER
+            #ifndef HB_ARRAY_USE_COUNTER
                if( pLocal->type == HB_IT_ARRAY )
                {
                   hb_arrayResetHolder( pLocal->item.asArray.value, pLocal, pCBlock->pLocals + ui );
