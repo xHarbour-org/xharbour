@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.13 2003/11/26 09:55:07 druzus Exp $
+# $Id: Makefile,v 1.14 2004/02/01 00:35:42 maurifull Exp $
 #
 
 ROOT = ../
@@ -55,6 +55,7 @@ C_HEADERS=\
 	hb_io.h      \
 	hrbdll.h     \
 	inet.h       \
+    local.h      \
 	regex.h      \
 	thread.h     \
 
