@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.168 2003/02/28 10:38:45 ronpinkas Exp $
+ * $Id: hvm.c,v 1.169 2003/03/02 15:22:31 jonnymind Exp $
  */
 
 /*
@@ -2460,7 +2460,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       }
       /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
       #ifdef HB_THREAD_SUPPORT
-         if ( iCount == 500 )
+         if ( iCount == 20 )
          {
             HB_CONTEXT_UNLOCK;
             iCount = 0;

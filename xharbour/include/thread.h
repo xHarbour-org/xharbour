@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.25 2003/02/26 05:36:09 jonnymind Exp $
+* $Id: thread.h,v 1.27 2003/03/02 15:22:30 jonnymind Exp $
 */
 
 /*
@@ -96,6 +96,10 @@
    #define HB_COND_DESTROY( x )        CloseHandle( x )
 
    #define HB_CURRENT_THREAD           GetCurrentThreadId
+   
+   // No need for cleanup pushing under windows (for now)
+   #define HB_CLEANUP_PUSH(X,Y)
+   #define HB_CLEANUP_POP( X )
 #else
 
     #include <pthread.h>
@@ -131,7 +135,7 @@
 
     #define HB_CURRENT_THREAD           pthread_self
     #define HB_TEST_CANCEL              pthread_testcancel
-    #define HB_CLEANUP_PUSH(x, y )             pthread_cleanup_push( x, (void *)&(y) )
+    #define HB_CLEANUP_PUSH(x, y )      pthread_cleanup_push( x, (void *)&(y) )
     #define HB_CLEANUP_POP              pthread_cleanup_pop    
 #endif
 
@@ -159,6 +163,7 @@ typedef struct tag_HB_THREAD_CONTEXT
 
 #ifdef HB_OS_WIN_32
    HANDLE th_h;
+   BOOL bCanceled; // set when there is a cancel request and bInUse is true
 #endif
    struct tag_HB_THREAD_CONTEXT *next;
 } HB_THREAD_CONTEXT;
@@ -263,6 +268,7 @@ void hb_threadSleep( int millisec );
 
 #ifdef HB_OS_WIN_32
 extern void hb_threadTerminator();
+extern void hb_threadTerminator2( HB_THREAD_CONTEXT * );
 #else
 extern void hb_threadTerminator( void *pData );
 #endif
@@ -424,17 +430,39 @@ extern HB_SHARED_RESOURCE hb_runningContexts;
    HB_CLEANUP_POP( 0 );\
 } 
 
-#define HB_CONTEXT_UNLOCK \
-{\
-   HB_MUTEX_LOCK( hb_runningContexts.Mutex );\
-   if( HB_VM_CONTEXT.bInUse ) \
+#ifdef HB_OS_WIN32
+
+   #define HB_CONTEXT_UNLOCK \
    {\
-      hb_runningContexts.content.asLong--;\
-      HB_VM_CONTEXT.bInUse = FALSE;\
-      HB_COND_SIGNAL( hb_runningContexts.Cond );\
-   }\
-   HB_MUTEX_UNLOCK( hb_runningContexts.Mutex );\
-} 
+      HB_MUTEX_LOCK( hb_runningContexts.Mutex );\
+      if( HB_VM_CONTEXT.bInUse ) \
+      {\
+         hb_runningContexts.content.asLong--;\
+         HB_VM_CONTEXT.bInUse = FALSE;\
+         HB_COND_SIGNAL( hb_runningContexts.Cond );\
+      }\
+      HB_MUTEX_UNLOCK( hb_runningContexts.Mutex );\
+      if( HB_VM_CONTEXT.bCanceled ) \
+      {\
+         hb_threadTerminator();\
+         ExitThread( 0 );\
+      }\
+   } 
+
+#else
+
+   #define HB_CONTEXT_UNLOCK \
+   {\
+      HB_MUTEX_LOCK( hb_runningContexts.Mutex );\
+      if( HB_VM_CONTEXT.bInUse ) \
+      {\
+         hb_runningContexts.content.asLong--;\
+         HB_VM_CONTEXT.bInUse = FALSE;\
+         HB_COND_SIGNAL( hb_runningContexts.Cond );\
+      }\
+      HB_MUTEX_UNLOCK( hb_runningContexts.Mutex );\
+   } 
+#endif
 
 #define HB_CONTEXT_STOP_TELLING( var, value )\
 {\
@@ -452,7 +480,7 @@ extern HB_SHARED_RESOURCE hb_runningContexts;
 }
 
 #define HB_CONTEXT_STOP    ( HB_WAIT_SHARED( hb_runningContexts, HB_COND_EQUAL, 0, HB_COND_SET, -1 ) )
-#define HB_CONTEXT_START   ( HB_SET_SHARED( hb_runningContexts, HB_COND_SET, 0 ) )
+#define HB_CONTEXT_START   HB_SET_SHARED( hb_runningContexts, HB_COND_SET, 0 )
 
 /* LEVEL 3 shell lock - locks all inner level objects */
 #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
