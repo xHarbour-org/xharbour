@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.872 2003/03/26 02:19:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.873 2003/03/26 03:33:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-26 19:30 UTC+0000 Ian Anderson <i.anderson@procon-online.de>
+  * source/rtl/memoedit.prg
+    * Fix minor bug - UserFunction can now map the escape key to CTRL-W successfully
 
 2003-03-25 19:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/cstruct.prg

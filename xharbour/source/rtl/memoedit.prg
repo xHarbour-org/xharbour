@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.8 2002/11/29 20:11:48 walito Exp $
+ * $Id: memoedit.prg,v 1.9 2003/01/27 03:40:53 walito Exp $
  */
 
 /*
@@ -177,7 +177,7 @@ METHOD HandleUserKey(nKey, nUserKey) CLASS TMemoEditor
 
    // HBEditor does not handle these keys and would call ::KeyboardHook() causing infinite loop
    local aUnHandledKeys := {K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T,;
-                            K_CTRL_U, K_F1 ,K_CTRL_W}
+                            K_CTRL_U, K_F1}
 
    Switch nUserKey
       // I won't reach this point during ME_INIT since ME_DEFAULT ends initialization phase of MemoEdit()
