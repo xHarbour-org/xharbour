@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.10 2004/06/17 22:10:17 peterrees Exp $
+ * $Id: mysql.c,v 1.11 2004/06/18 03:41:51 peterrees Exp $
  */
 
 /*
@@ -262,38 +262,37 @@ HB_FUNC(SQLGETERRNO)
 
 HB_FUNC(SQLLISTDB) // MYSQL_RES * mysql_list_dbs(MYSQL *, char * wild);
 {
-   MYSQL * mysql = (MYSQL *)_parnl(1);
+   MYSQL * mysql = (MYSQL *)hb_parnl(1);
    MYSQL_RES * mresult;
    MYSQL_ROW mrow;
    long nr, i;
-   HB_ITEM itDBs, itTemp;
+   HB_ITEM itDBs = HB_ITEM_NIL, itTemp= HB_ITEM_NIL ;
 
    mresult = mysql_list_dbs(mysql, NULL);
 
    nr = (LONG) mysql_num_rows(mresult);
 
-   hb_arrayNew( &itDBs, 0 );
+   hb_arrayNew( &itDBs, nr) ;
 
    for (i = 0; i < nr; i++)
    {
       mrow = mysql_fetch_row(mresult);
-      hb_arrayAddForward((PHB_ITEM) &itDBs , hb_itemPutC(&itTemp, mrow[0]) );
+      hb_itemPutC(&itTemp, mrow[0]) ;
+      hb_arraySetForward( &itDBs, i+1, &itTemp );
    }
 
    mysql_free_result(mresult);
    hb_itemReturn(&itDBs);
 }
 
-
 HB_FUNC(SQLLISTTBL) // MYSQL_RES * mysql_list_tables(MYSQL *, char * wild);
 {
-   MYSQL * mysql = (MYSQL *)_parnl(1);
+   MYSQL * mysql = (MYSQL *)hb_parnl(1);
    MYSQL_RES * mresult;
    MYSQL_ROW mrow;
    long nr, i;
-   HB_ITEM itTables, itTemp;
-   itTables.type = HB_IT_NIL;
-   itTemp.type = HB_IT_NIL ;
+   HB_ITEM itTables= HB_ITEM_NIL, itTemp= HB_ITEM_NIL;
+
    mresult = mysql_list_tables(mysql, NULL);
    nr = (LONG) mysql_num_rows(mresult);
 
@@ -307,7 +306,6 @@ HB_FUNC(SQLLISTTBL) // MYSQL_RES * mysql_list_tables(MYSQL *, char * wild);
    mysql_free_result(mresult);
    hb_itemReturn(&itTables);
 }
-
 
 // returns bitwise and of first parameter with second
 HB_FUNC(SQLAND)

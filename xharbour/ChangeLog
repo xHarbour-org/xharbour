@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3092 2004/06/19 01:02:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3093 2004/06/19 02:01:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-06-20 00:07 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * contrib/mysql/mysql.c
+    - Fix GPF in HB_FUNC(SQLLISTTBL) & HB_FUNC(SQLLISTDB)
+        ( effects TMysqlServer:ListTables() & TMysqlServer:ListDBs() in tmysql.prg )
 
 2004-06-18 19:01 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/tget.prg
