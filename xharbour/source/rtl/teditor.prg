@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.56 2005/01/26 21:29:44 lculik Exp $
+/* $Id: teditor.prg,v 1.57 2005/02/08 18:35:34 ronpinkas Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.56 2005/01/26 21:29:44 lculik Exp $
+/* $Id: teditor.prg,v 1.57 2005/02/08 18:35:34 ronpinkas Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -1948,24 +1948,16 @@ STATIC function Text2Array( cString, nWordWrapCol )
             // Split line at nWordWrapCol boundary
             if Len( cLine ) > nWordWrapCol
 
-               nFirstSpace := nWordWrapCol + 1
-               while SubStr( cLine, nFirstSpace, 1 ) <> " " .AND. nFirstSpace > 1
-                  nFirstSpace--
-               enddo
-
+               nFirstSpace := RAt( " ", Left( cLine, nWordWrapCol + 1 ) )
                if nFirstSpace > 1
                   cSplittedLine := Left( cLine, nFirstSpace  )
+                  cLine := SubStr( cLine, nFirstSpace + 1 )
                else
-                  cSplittedLine := Left( cLine, nWordWrapCol )
-               endif
-               if right( cSplittedLine, 1 ) <> " "
-                  cSplittedLine += " "
+                  cSplittedLine := Left( cLine, nWordWrapCol ) + " "
+                  cLine := SubStr( cLine, nWordWrapCol + 1 )
                endif
 
-               AAdd( aArray, HBTextLine():New( cSplittedLine, .T. ) )
-
-               // cLine := Right( cLine, Len( cLine ) - Len( cSplittedLine ) )
-               cLine := substr( cLine, Len( cSplittedLine ) + 1 )
+               AAdd( aArray, HBTextLine():New( cSplittedLine, ! Empty( cLine ) ) )
             else
                // remainder of line is shorter than split point
                AAdd( aArray, HBTextLine():New( cLine, .F. ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3826 2005/02/15 22:46:31 andijahja Exp $
+ * $Id: ChangeLog,v 1.3827 2005/02/16 00:34:36 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-16 11:15 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/teditor.prg
+    ! Fixed for detect HardCR when line ends with blank space at
+      the width limit (plus 1).
 
 2005-02-15 18:29 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/setkey.c
