@@ -1,5 +1,5 @@
 /*
- * $Id: macroslx.c,v 1.5 2004/03/20 12:01:25 andijahja Exp $
+ * $Id: macroslx.c,v 1.6 2005/01/09 01:41:05 ronpinkas Exp $
  */
 
 /*
@@ -79,11 +79,7 @@
 #if ( defined(__XCC__) || defined(__LCC__) )
    #define SLX_RULES "source/macro/macro.slx"
 #else
-   #ifdef OS_DOS_COMPATIBLE
-      #define SLX_RULES "..\source\macro\macro.slx"
-   #else
-      #define SLX_RULES "../source/macro/macro.slx"
-   #endif
+   #define SLX_RULES "../source/macro/macro.slx"
 #endif
 
 #include "simplex.c"

@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.10 2004/08/21 17:27:15 lf_sfnet Exp $
+ * $Id: gencobj.c,v 1.11 2004/09/03 16:01:52 lf_sfnet Exp $
  */
 
 /*
@@ -49,7 +49,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
    char szCommandLine[ HB_CFG_LINE_LEN * 2 ];
    char szOutPath[ _POSIX_PATH_MAX ] = "\0";
 
-#if defined( OS_UNIX_COMPATIBLE )
+#if defined( HOST_OS_UNIX_COMPATIBLE )
    char szDefaultPath[ _POSIX_PATH_MAX ] = "/etc:/usr/local/etc";
    char * pszEnv = szDefaultPath;
    #define HB_CFG_FILENAME    "harbour.cfg"   

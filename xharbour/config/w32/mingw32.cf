@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.20 2004/10/31 19:43:30 druzus Exp $
+# $Id: mingw32.cf,v 1.21 2004/12/27 11:06:10 lf_sfnet Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -9,7 +9,7 @@ EXE_EXT = .exe
 LIB_PREF = lib
 LIB_EXT = .a
 
-CC = gcc
+CC = $(CCPREFIX)gcc
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE) -Iinclude -mno-cygwin
@@ -32,7 +32,7 @@ endif
 endif
 
 
-LD = gcc
+LD = $(CCPREFIX)gcc
 LD_OUT = -o
 
 # Add all libraries specified in HB_USER_LIBS.
@@ -78,8 +78,10 @@ LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 LINKLIBS += -lgtnul
 endif
 ifneq ($(HB_DEFAULT_GT),$(HB_GT_LIB))
+ifneq ($(HB_DEFAULT_LIB),)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_DEFAULT_GT)/$(ARCH)
 LINKLIBS += -l$(HB_DEFAULT_GT)
+endif
 endif
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
 LINKLIBS += -l$(HB_GT_LIB)
@@ -145,7 +147,7 @@ endef
 
 LDFLAGS = $(LINKPATHS) -mno-cygwin
 
-AR = ar
+AR = $(CCPREFIX)ar
 ARFLAGS = $(A_USR)
 AR_RULE = $(AR) $(ARFLAGS) r $@ $(^F) && $(RANLIB) $@ || $(RM) $@
 #AR_RULE = $(create_library)

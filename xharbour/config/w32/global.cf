@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.12 2004/08/04 12:34:07 mauriliolongo Exp $
+# $Id: global.cf,v 1.13 2004/08/05 12:21:16 lf_sfnet Exp $
 #
 
 ifndef MK
@@ -44,7 +44,7 @@ MV = move
 MD = md
 
 #this will be used only under MINGW
-RANLIB = ranlib
+RANLIB = $(CCPREFIX)ranlib
 
 dirbase::
 	-@for %%d in ($(HB_ARCHITECTURE) $(ARCH_DOS)) do if not exist %%d\. $(MD) %%d
@@ -68,7 +68,7 @@ MV = mv -f
 MD = mkdir
 
 #this will be used only under MINGW
-RANLIB = ranlib
+RANLIB = $(CCPREFIX)ranlib
 
 dirbase::
 	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3730 2005/01/11 17:50:01 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3731 2005/01/11 22:28:19 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-12 02:52 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  + make_xmingw.sh
+  * make_gnu.sh
+  * bin/postinst.sh
+  * config/w32/global.cf
+  * config/w32/mingw32.cf
+  * source/compiler/gencobj.c
+  * source/compiler/hbslex.c
+  * source/macro/macroslx.c
+  * source/rtl/fssize.c
+  * source/rtl/seconds.c
+  * source/rtl/gtstd/gtstd.c
+    + Added capability to cross-compile xHarbour for Windows from Unix using
+      MinGW32. Currently, only Debian, Gentoo Linux, and FreeBSD are
+      supported.
+  * config/w32/mingw32.cf
+  * config/w32/watcom.cf
+    ! Link with HB_DEFAULT_GT only if it is not empty.
 
 2005-01-11 14:27 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/cstr.prg

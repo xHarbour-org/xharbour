@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.7 2003/12/29 19:25:52 ronpinkas Exp $
+ * $Id: seconds.c,v 1.8 2004/07/21 23:03:57 fsgiudice Exp $
  */
 
 /*
@@ -53,16 +53,15 @@
 #include "hbapi.h"
 
 #include <time.h>
+
+#if defined( HB_OS_BSD)
+   #include <sys/time.h>
+#else
+   #include <sys/timeb.h>
+#endif
 #if defined( OS_UNIX_COMPATIBLE )
-   #if defined( HB_OS_BSD)
-      #include <sys/time.h>
-   #else
-      #include <sys/timeb.h>
-   #endif
    #include <sys/times.h>
    #include <unistd.h>
-#else
-   #include <sys\timeb.h>
 #endif
 
 HB_EXPORT double hb_dateSeconds( void )

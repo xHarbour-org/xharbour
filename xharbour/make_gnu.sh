@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_gnu.sh,v 1.14 2005/01/09 20:39:46 likewolf Exp $
+# $Id: make_gnu.sh,v 1.15 2005/01/10 18:45:10 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -164,7 +164,7 @@ else
 
    # ---------------------------------------------------------------
    # Start the GNU make system
-   if [ "$HB_ARCHITECTURE" = "bsd" ]; then
+   if [ `uname` = "FreeBSD" ]; then
       gmake $*
    else
       make $*

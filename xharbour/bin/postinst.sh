@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.12 2004/11/01 21:36:45 druzus Exp $
+# $Id: postinst.sh,v 1.13 2004/11/21 21:43:17 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -40,7 +40,7 @@ then
     RANLIB=""
     MAKE=make
     AR="ar -cr"
-    if [ "${HB_ARCHITECTURE}" = "bsd" ]; then
+    if [ "${HB_ARCHITECTURE}" = "bsd" ] || [ `uname` = "FreeBSD" ]; then
         MAKE=gmake
     elif [ "${HB_ARCHITECTURE}" = "darwin" ]; then
         # We must build an archive index on Darwin

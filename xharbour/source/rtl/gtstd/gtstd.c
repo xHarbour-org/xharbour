@@ -1,5 +1,5 @@
  /*
- * $Id: gtstd.c,v 1.19 2004/10/22 11:26:46 paultucker Exp $
+ * $Id: gtstd.c,v 1.20 2004/11/25 01:54:13 guerra000 Exp $
  */
 
 /*
@@ -75,10 +75,8 @@
 #include <time.h>
 #if defined( HB_OS_BSD )
    #include <sys/time.h>
-#elif defined( OS_UNIX_COMPATIBLE )
-   #include <sys/timeb.h>
 #else
-   #include <sys\timeb.h>
+   #include <sys/timeb.h>
 #endif
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: fssize.c,v 1.4 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: fssize.c,v 1.5 2004/04/06 01:50:55 druzus Exp $
  */
 
 /*
@@ -54,13 +54,8 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 
-#if defined( OS_UNIX_COMPATIBLE )
-   #include <sys/types.h>
-   #include <sys/stat.h>
-#else
-   #include <sys\types.h>
-   #include <sys\stat.h>
-#endif
+#include <sys/types.h>
+#include <sys/stat.h>
 
 ULONG hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
 {
