@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.11 2003/04/09 17:02:17 iananderson Exp $
+ * $Id: adsfunc.c,v 1.12 2003/06/30 17:07:28 ronpinkas Exp $
  */
 
 /*
@@ -109,7 +109,7 @@ HB_FUNC( ADSSETSERVERTYPE )
 HB_FUNC( ADSSETDATEFORMAT  )
 {
    UNSIGNED8  pucFormat[16];
-   UNSIGNED16 pusLen = 15;
+   UNSIGNED16 pusLen = 16;
 
    hb_retc( "");
    AdsGetDateFormat (pucFormat, &pusLen);
@@ -252,7 +252,7 @@ HB_FUNC( ADSSETCHARTYPE )
 HB_FUNC( ADSSETDEFAULT )
 {
    UNSIGNED8  pucDefault[ MAX_STR_LEN+1];
-   UNSIGNED16 pusLen = MAX_STR_LEN;
+   UNSIGNED16 pusLen = MAX_STR_LEN+1;
 
    AdsGetDefault( pucDefault, &pusLen);
 
@@ -267,7 +267,7 @@ HB_FUNC( ADSSETDEFAULT )
 HB_FUNC( ADSSETSEARCHPATH )
 {
    UNSIGNED8  pucPath[ MAX_STR_LEN+1];
-   UNSIGNED16 pusLen = MAX_STR_LEN;
+   UNSIGNED16 pusLen = MAX_STR_LEN+1;
 
    AdsGetSearchPath( pucPath, &pusLen);
 
@@ -404,7 +404,7 @@ HB_FUNC( ADSKEYCOUNT )
    ADSHANDLE hIndex;
    UNSIGNED16 usFilterOption = ADS_IGNOREFILTERS;
    UNSIGNED8 pucScope[ ADS_MAX_KEY_LENGTH+1 ];
-   UNSIGNED16 pusBufLen = ADS_MAX_KEY_LENGTH;
+   UNSIGNED16 pusBufLen = ADS_MAX_KEY_LENGTH+1;
 
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
@@ -585,7 +585,7 @@ HB_FUNC( ADSGETTABLEALIAS )
 {
    ADSAREAP pArea;
    UNSIGNED8  pucAlias[HARBOUR_MAX_RDD_ALIAS_LENGTH +1];
-   UNSIGNED16 pusLen = HARBOUR_MAX_RDD_ALIAS_LENGTH;
+   UNSIGNED16 pusLen = HARBOUR_MAX_RDD_ALIAS_LENGTH+1;
    UNSIGNED32 ulRetVal = FAILURE;
 
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
@@ -605,7 +605,7 @@ HB_FUNC( ADSGETAOF )
    ADSAREAP pArea;
    UNSIGNED8  pucFilter[HARBOUR_MAX_RDD_FILTER_LENGTH+1];
    UNSIGNED8 *pucFilter2;
-   UNSIGNED16 pusLen = HARBOUR_MAX_RDD_FILTER_LENGTH;
+   UNSIGNED16 pusLen = HARBOUR_MAX_RDD_FILTER_LENGTH+1;
    UNSIGNED32 ulRetVal;
 
    hb_retc( "" );
@@ -655,7 +655,7 @@ HB_FUNC( ADSGETAOFNOOPT )
    UNSIGNED16 pusOptLevel;
    UNSIGNED8  pucNonOpt[HARBOUR_MAX_RDD_FILTER_LENGTH+1];
    UNSIGNED8 *pucNonOpt2;
-   UNSIGNED16 pusLen = HARBOUR_MAX_RDD_FILTER_LENGTH;
+   UNSIGNED16 pusLen = HARBOUR_MAX_RDD_FILTER_LENGTH+1;
    UNSIGNED32 ulRetVal;
 
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
@@ -749,7 +749,7 @@ HB_FUNC( ADSGETFILTER )
    ADSAREAP pArea;
    UNSIGNED8  pucFilter[HARBOUR_MAX_RDD_FILTER_LENGTH+1];
    UNSIGNED8 *pucFilter2;
-   UNSIGNED16 pusLen = HARBOUR_MAX_RDD_FILTER_LENGTH;
+   UNSIGNED16 pusLen = HARBOUR_MAX_RDD_FILTER_LENGTH+1;
    UNSIGNED32 ulRetVal;
 
    hb_retc( "" );

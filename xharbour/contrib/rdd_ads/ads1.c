@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.11 2003/05/27 01:37:36 brianhays Exp $
+ * $Id: ads1.c,v 1.12 2003/06/30 17:07:28 ronpinkas Exp $
  */
 
 /*
@@ -502,6 +502,7 @@ static ERRCODE adsGoTo( ADSAREAP pArea, ULONG ulRecNo )
       pArea->ulRecNo = ulRecNo;
       pArea->fBof = pArea->fEof = FALSE;
       ulRetVal = AdsGotoRecord( pArea->hTable, ulRecNo );
+      AdsAtEOF( pArea->hTable, (UNSIGNED16 *)&(pArea->fEof) );
       /* hb_adsCheckBofEof( pArea );        // bh: GoTo should never do the skipfilter that may happen in hb_adsCheckBofEof */
    }
    else /* GoTo Phantom record */
@@ -1126,7 +1127,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case HB_IT_LONG:
-         pulLength = pArea->maxFieldLen;
+         pulLength = pArea->maxFieldLen + 1;
          if (AdsGetField( pArea->hTable, szName, pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD  )
          {
             memset( pBuffer, ' ', pField->uiLen );
@@ -1161,10 +1162,10 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_IT_DATE:
          {
             UNSIGNED8 pucFormat[ 11 ];
-            UNSIGNED16 pusLen = 10;
+            UNSIGNED16 pusLen = 11;
             AdsGetDateFormat  ( pucFormat, &pusLen );
             AdsSetDateFormat  ( (UNSIGNED8*)"YYYYMMDD" );
-               pulLength = pArea->maxFieldLen;
+               pulLength = pArea->maxFieldLen + 1;
                if (AdsGetField( pArea->hTable, szName, pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD  )
                {
                   memset( pBuffer, ' ', pField->uiLen );
