@@ -191,7 +191,7 @@ CLASS TWindow FROM TWindowBase
     METHOD OnNCDestroy()                    //VIRTUAL // FSG - to be implemented
     METHOD OnNCMouseMove()                  VIRTUAL
     METHOD OnNotify()                       VIRTUAL // FSG - to be implemented
-
+    METHOD OnLBtnDown()                     VIRTUAL
 //    METHOD OnPaint()                        VIRTUAL // FSG - to be implemented
    METHOD OnGetMinMaxInfo()                 VIRTUAL
    METHOD OnPaint()                 ;
