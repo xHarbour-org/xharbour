@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3815 2005/02/14 06:07:20 paultucker Exp $
+ * $Id: ChangeLog,v 1.3816 2005/02/14 18:43:03 snaiperis Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-14 22:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/debug/debugger.prg
+    ! Added capability to change LOCAL and STATIC variables from the command
+      window. Improved error diagnostics for expression evaluation.
 
 2005-02-14 20:35 UTC+0200 Mindaugas Kavaliauskas <dbtopas at dbtopas.lt>
   * source/vm/hvm.c

@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.54 2004/11/02 22:39:10 likewolf Exp $
+ * $Id: debugger.prg,v 1.55 2005/02/04 19:05:36 likewolf Exp $
  */
 
 /*
@@ -3186,8 +3186,9 @@ static function ValToStr( uVal )
 
 return cResult
 
+
 STATIC FUNCTION GetWatchValue( aWatch, plSuccess )
-   LOCAL aVars, i, j
+   LOCAL aVars, aNewVars, aScopes, i, j
    LOCAL nLen, aLocVars
    LOCAL cVar, nPos, cName
    LOCAL xVal
@@ -3196,25 +3197,30 @@ STATIC FUNCTION GetWatchValue( aWatch, plSuccess )
 
    plSuccess := .F.
    bEblock := ErrorBlock( {|o| BREAK(o)} )
+   
    BEGIN SEQUENCE
       IF( aWatch[WP_BLOCK] != NIL )
          nLen :=LEN(aWatch)-WP_BLOCK
          IF( nLen > 0 )
             aVars := ARRAY( nLen )
+            aScopes := Array( nLen )
+            aNewVars := Array( nLen )
             FOR i:=1 TO nLen
                cVar := aWatch[ i + WP_BLOCK ]
                //search local variables in current procedure
                aLocVars := s_oDebugger:aProcStack[1][CSTACK_LOCALS]
                nPos := ASCAN( aLocVars, {|a| a[VAR_NAME]==cVar} )
                IF( nPos > 0 )
-                  j :=hb_dbg_ProcLevel() - aLocVars[ nPos ][ VAR_LEVEL ]
-                  aVars[i] := hb_dbg_vmVarLGet( j, aLocVars[ nPos ][ VAR_POS ] )
+                  j := hb_dbg_ProcLevel() - aLocVars[ nPos ][ VAR_LEVEL ]
+                  aScopes[ i ] := { 'L', j, aLocVars[ nPos ][ VAR_POS ] }
+                  aVars[ i ] := hb_dbg_vmVarLGet( aScopes[ i ][ 2 ], aScopes[ i ][ 3 ] )
                ELSE
                   //search local statics
                   aLocVars := s_oDebugger:aProcStack[1][CSTACK_STATICS]
                   nPos := ASCAN( aLocVars, {|a| a[VAR_NAME]==cVar} )
                   IF( nPos > 0 )
-                     aVars[i] := hb_dbg_vmVarSGet( aLocVars[ nPos ][VAR_LEVEL], aLocVars[ nPos ][VAR_POS] )
+                     aScopes[ i ] := { 'S', aLocVars[ nPos ][ VAR_LEVEL ], aLocVars[ nPos ][ VAR_POS ] }
+                     aVars[ i ] := hb_dbg_vmVarSGet( aScopes[ i ][ 2 ], aScopes[ i ][ 3 ] )
                   ELSE
                      //search global statics
                      cName := s_oDebugger:aProcStack[1][CSTACK_MODULE]
@@ -3223,7 +3229,8 @@ STATIC FUNCTION GetWatchValue( aWatch, plSuccess )
                         aLocVars := __dbgStatics[nPos][ 2 ]
                         nPos := ASCAN( aLocVars, {|a| a[VAR_NAME]==cVar} )
                         IF( nPos > 0 )
-                           aVars[i] := hb_dbg_vmVarSGet( aLocVars[ nPos ][VAR_LEVEL], aLocVars[ nPos ][VAR_POS] )
+                           aScopes[ i ] := { 'S', aLocVars[ nPos ][ VAR_LEVEL ], aLocVars[ nPos ][ VAR_POS ] }
+                           aVars[ i ] := hb_dbg_vmVarSGet( aScopes[ i ][ 2 ], aScopes[ i ][ 3 ] )
                            EXIT
                         ENDIF
                      ENDIF
@@ -3233,14 +3240,39 @@ STATIC FUNCTION GetWatchValue( aWatch, plSuccess )
                   ENDIF
                ENDIF
             NEXT
+
+            /* Copy the vars array. Deep copy is unneeded here */
+            ACopy( aVars, aNewVars )
          ENDIF
 
-         xVal := EVAL( aWatch[WP_BLOCK], aVars )
+         xVal := EVAL( aWatch[WP_BLOCK], aNewVars )
+
+         /* Set any variables in case the expression has changed them */
+         IF ValType( aNewVars ) == 'A'
+           FOR i := 1 TO Len( aNewVars )
+             IF ( ValType( aScopes[ i ] ) == 'A' ;
+                  .AND. ( ValType( aVars[ i ] ) != ValType( aNewVars[ i ] ) ;
+                          .OR. !( aVars[ i ] == aNewVars[ i ] ) ) )
+               IF aScopes[ i ][ 1 ] == 'L'
+                 hb_dbg_vmVarLSet( aScopes[ i ][ 2 ], aScopes[ i ][ 3 ], aNewVars[ i ] )
+               ELSEIF aScopes[ i ][ 1 ] == 'S'
+                 hb_dbg_vmVarSSet( aScopes[ i ][ 2 ], aScopes[ i ][ 3 ], aNewVars[ i ] )
+               ENDIF
+             ENDIF
+           NEXT
+         ENDIF
+         
          plSuccess :=.T.
       ENDIF
 
    RECOVER USING oErr
-      xVal := oErr:description
+   
+      xVal := oErr:operation + ": " + oErr:description
+      IF ValType( oErr:args ) == 'A'
+        xVal += "; arguments:"
+        AEval( oErr:args, {|x| xVal += " " + AllTrim(CStr( x )) } )
+      ENDIF
+      
    END SEQUENCE
    ErrorBlock( bEBlock )
 
@@ -3344,7 +3376,7 @@ STATIC FUNCTION CreateExpression( cExpr, aWatch )
       j := i
    ENDDO
 
-//      s_oDebugger:InputBox("AFTER", cExpr )
+   //   s_oDebugger:InputBox("AFTER", cExpr )
    oEBlock := ErrorBlock( {|o| BREAK(o)} )
    BEGIN SEQUENCE
       aWatch[WP_BLOCK] := &( "{|__dbg|"+ cExpr +"}" )
