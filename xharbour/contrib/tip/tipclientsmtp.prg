@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclientsmtp.prg,v 1.4 2004/02/07 12:53:55 lculik Exp $
+* $Id: tipclientsmtp.prg,v 1.5 2004/02/07 13:04:02 lculik Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -29,7 +29,7 @@ CLASS tIPClientSMTP FROM tIPClient
    METHOD OpenSecure()
    METHOD AUTH( cUser, cPass) // Auth by login method
    METHOD AUTHplain( cUser, cPass) // Auth by plain method
-
+   METHOD ServerSuportSecure(lAuthp,lAuthl) 
 
 ENDCLASS
 
@@ -178,3 +178,25 @@ Local aTo,cRecpt
 
    ::nLastWrite := ::super:Write( cData, nLen, bCommit )
 RETURN ::nLastWrite
+
+METHOD ServerSuportSecure(lAuthp,lAuthl) CLASS  tIPClientSMTP
+   Local lAuthLogin := .F.,lAuthPlain :=.F.
+
+   IF ::OPENSECURE()
+      WHILE .T.
+         ::GetOk()
+         IF ::cReply == NIL
+            EXIT
+         ELSEIF "LOGIN" IN ::cReply
+            lAuthLogin := .T.
+         ELSEIF "PLAIN" IN ::cReply
+            lAuthPlain := .T.
+         ENDIF
+      ENDDO
+    ::CLOSE()
+ ENDIF
+
+   lAuthp:=lAuthPlain
+   lAuthl:=lAuthLogin
+
+RETURN  lAuthLogin .OR. lAuthPlain
