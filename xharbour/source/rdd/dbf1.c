@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.54 2004/01/30 09:38:28 andijahja Exp $
+ * $Id: dbf1.c,v 1.55 2004/02/04 00:51:45 andijahja Exp $
  */
 
 /*
@@ -2008,6 +2008,13 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             bError = TRUE;
             break;
       }
+
+      if( pField->bType == 0 && pArea->bVersion == 0x30 )
+      {
+         bError = FALSE;
+         break;
+      }
+
       /* Add field */
       if( !bError )
          bError = ( SELF_ADDFIELD( ( AREAP ) pArea, &pFieldInfo ) == FAILURE );
@@ -2692,7 +2699,11 @@ static ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
    {
       hb_fsSeek( pArea->hDataFile, 0, FS_SET );
       if( hb_fsRead( pArea->hDataFile, ( BYTE * ) &dbHeader, sizeof( DBFHEADER ) ) != sizeof( DBFHEADER ) ||
-          ( dbHeader.bVersion != 0x03 && dbHeader.bVersion != 0x83 && dbHeader.bVersion != 0xF5 ) )
+          ( dbHeader.bVersion != 0x03 &&    // dBase III
+            dbHeader.bVersion != 0x30 &&    // VisualFoxPro 6.0
+            dbHeader.bVersion != 0x83 &&    // dBase III w/memo
+            dbHeader.bVersion != 0xF5       // FoxPro??? w/memo
+        ) )
       {
          bError = TRUE;
          if( !pError )
