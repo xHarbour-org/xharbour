@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.15 2003/09/04 20:26:24 xthefull Exp $
+   $Id: xwt_win.h,v 1.1 2003/10/09 23:18:34 jonnymind Exp $
 
    GTK interface
 */
@@ -31,13 +31,25 @@ LRESULT CALLBACK xwt_gtk_framewndproc(
     LPARAM lParam
 );
 
-typedef struct tag_xwt_win_data
+
+typedef struct tag_xwt_win_base_data
 {
    PXWT_WIDGET *xwt_widget;
+   HWND  hMain;
+} XWT_WIN_BASE_DATA, *PXWT_WIN_BASE_DATA;
+
+
+typedef struct tag_xwt_win_data
+{
+   XWT_WIN_BASE_DATA;
+   HMENU hMenu;
+   HWND  hMainWidget;
+   HWND  hStatusBar;
 } XWT_WIN_DATA, *PXWT_WIN_DATA;
 
 
 void *xwt_win_get_topwidget_neuter( void *);
+void xwt_win_free_wnd( void *);
 
 BOOL xwt_win_createFrameWindow( PXWT_WIDGET xwtData );
 

@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win.c,v 1.1 2003/10/09 23:18:34 jonnymind Exp $
+   $Id: xwt_win.c,v 1.2 2003/10/10 13:33:52 paultucker Exp $
 
    Global declarations, common functions
 
@@ -21,7 +21,7 @@ HB_EXPORT extern int    hb_iCmdShow;
 
 BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 {
-   HWND hWnd = ( HWND ) wWidget->get_top_widget( wWidget );
+   HWND hWnd = ( HWND ) wWidget->get_top_widget( wWidget->widget_data );
 
    switch( prop->type ) {
       case XWT_PROP_TEXT:
@@ -86,8 +86,6 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
 
       return FALSE;
-
-      
    }
    
    return FALSE;
@@ -96,7 +94,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
 BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 {
-   HWND hWnd = ( HWND ) wWidget->get_top_widget( wWidget );
+   HWND hWnd = ( HWND ) wWidget->get_top_widget( wWidget->widget_data );
 
    switch( prop->type ) {
       case XWT_PROP_TEXT:
@@ -248,5 +246,13 @@ BOOL xwt_drv_quit()
    
 void *xwt_win_get_topwidget_neuter( void *data )
 {
-   return ((PXWT_WIDGET) data)->widget_data;
+   PXWT_WIN_DATA win = (PXWT_WIN_DATA) data;
+   return win->hMain;
+}
+
+void xwt_win_free_wnd( void *wnd )
+{
+   PXWT_WIN_DATA self = (PXWT_WIN_DATA) wnd;
+   CloseHandle( self->hMain );
+   hb_xfree( self );
 }

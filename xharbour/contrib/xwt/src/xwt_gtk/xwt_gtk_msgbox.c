@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_msgbox.c,v 1.1 2003/03/27 23:19:10 gian Exp $
+   $Id: xwt_gtk_msgbox.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Message box implementation
 */
@@ -71,12 +71,12 @@ HB_FUNC( XWT_DRV_MSGBOX )
       gtk_dialog_add_button( GTK_DIALOG( gbox ), GTK_STOCK_NO, XWT_MSGBOX_NO );
    }
    
-   if ( (iButtons & XWT_MSGBOX_OK) == XWT_MSGBOX_ABORT )
+   if ( (iButtons & XWT_MSGBOX_ABORT) == XWT_MSGBOX_ABORT )
    {
       gtk_dialog_add_button( GTK_DIALOG( gbox ), "Abort", XWT_MSGBOX_ABORT );
    }
    
-   if ( (iButtons & XWT_MSGBOX_OK) == XWT_MSGBOX_RETRY )
+   if ( (iButtons & XWT_MSGBOX_RETRY) == XWT_MSGBOX_RETRY )
    {
       gtk_dialog_add_button( GTK_DIALOG( gbox ), "Retry", XWT_MSGBOX_RETRY );
    }

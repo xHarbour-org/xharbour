@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: msgbox.prg,v 1.1 2003/03/27 23:19:10 gian Exp $
+   $Id: msgbox.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Message Box
    
@@ -16,8 +16,8 @@
 
 #include "xwt.ch"
 
-Function XWT_MsgBox( cMessage, nButtonType, nMsgType )
-RETURN XWT_drv_msgbox(, cMessage, nButtonType, nMsgType )
+Function XWT_MsgBox( cMessage, nButtonType, nMsgType, oParent, cCaption )
+RETURN XWT_drv_msgbox( oParent, cMessage, nButtonType, nMsgType, cCaption )
 
 Function XWT_MsgBoxParent( oParent, cMessage, nButtonType, nMsgType )
 RETURN XWT_drv_msgbox( oParent:oRawWidget, cMessage, nButtonType, nMsgType )

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_framewnd.c,v 1.1 2003/10/09 23:18:34 jonnymind Exp $
+   $Id: xwt_win_framewnd.c,v 1.2 2003/10/10 13:33:53 paultucker Exp $
 
    MS-Windows interface - Frame window
 */
@@ -24,12 +24,12 @@ LRESULT CALLBACK xwt_gtk_framewndproc(
 )
 { 
    XWT_WIN_MAKESELF( hwnd );
-      
+   
    switch( uMsg ) {
       case WM_CREATE: 
       break;
          
-      case WM_DESTROY:
+      case WM_CLOSE:
          if ( ! xwt_rise_event( &Self, XWT_E_DESTROY_REQ, 0 ) )
          {
             // This will 1: rise destroyed event, 2: call widget destructor, 
@@ -48,7 +48,7 @@ LRESULT CALLBACK xwt_gtk_framewndproc(
 
 BOOL xwt_win_createFrameWindow( PXWT_WIDGET xwtData )
 {
-//   PXWT_WIN_DATA data;
+   PXWT_WIN_DATA data;
    HWND hWnd;
    
    /* Create the window */
@@ -69,12 +69,16 @@ BOOL xwt_win_createFrameWindow( PXWT_WIDGET xwtData )
    if ( hWnd == NULL ) 
       return FALSE;
 
+   data = (PXWT_WIN_DATA) hb_xgrab( sizeof( XWT_WIN_DATA ) );
+   data->xwt_widget = xwtData;
+   data->hMain = hWnd;
+   
    /* BackReferences our XWT widget */
    SetWindowLong( hWnd, GWL_USERDATA, (LONG) xwtData );
       
    /* Forward reference the window into XWT_WIDGET */
-   xwtData->widget_data = (void *) hWnd;
-   xwtData->destructor = 0;
+   xwtData->widget_data = (void *) data;
+   xwtData->destructor = xwt_win_free_wnd;
    xwtData->get_main_widget = xwt_win_get_topwidget_neuter;
    xwtData->get_top_widget = xwt_win_get_topwidget_neuter;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.41 2003/10/09 23:57:22 jonnymind Exp $
+ * $Id: Changelog,v 1.42 2003/10/10 13:33:52 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-13 14:10 UTC+0200 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * src/msgbox.prg
+    ! added support for parent and caption (optional parameters).
+
+  * src/xwt_win/xwt_win_msgbox.c
+    + Messagebox is now active.
+
+  * src/xwt_win/xwt_win.c
+  * src/xwt_win/xwt_win.h
+    * Complete driver framework ready
+
+  * src/xwt_win/xwt_win_framewnd.c
+    ! Fixed close sequence.
+
+  * src/xwt_gtk/xwt_gtk_msgbox.c
+    ! some value checking in parameter parsing (buttons).
+
+  * test/wndtest.prg
+    ! Added test for Xwt_MsgBox on closing.
+
 
 2003-10-10 09:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.bc
