@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.154 2002/04/17 01:33:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.155 2002/04/17 02:47:12 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-17 02:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/filesys.c
+    * convert_create_flags() now Set File mask on linux to 777
+  * source/rtl/errorsys.prg
+    * Enhaced errorsys.prg to produce an error.log when user click on quit button
 
 2002-04-16 19:44 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexpra.c

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.12 2002/03/10 18:44:56 lculik Exp $
+ * $Id: filesys.c,v 1.13 2002/04/01 21:09:17 ronpinkas Exp $
  */
 
 /*
@@ -195,6 +195,38 @@
    #define S_IXUSR      0x0040  /* owner may execute <directory search> */
 #endif
 
+#ifndef S_IRWXG
+    #define S_IRWXG     (S_IRGRP | S_IWGRP | S_IXGRP)
+#endif
+
+#ifndef     S_IRGRP
+    #define     S_IRGRP 0x00020 /* read permission, group */
+#endif
+
+#ifndef     S_IWGRP
+    #define     S_IWGRP 0x00010 /* write permission, grougroup */
+#endif
+
+#ifndef     S_IXGRP
+    #define     S_IXGRP 0x00008/* execute/search permission, group */
+#endif
+
+#ifndef     S_IRWXO
+    #define     S_IRWXO    (S_IROTH | S_IWOTH | S_IXOTH)
+#endif
+
+#ifndef     S_IROTH
+    #define     S_IROTH 0x00004 /* read permission, other */
+#endif
+
+#ifndef     S_IWOTH
+    #define     S_IWOTH 0x00002 /* write permission, other */
+#endif
+
+#ifndef     S_IXOTH
+    #define     S_IXOTH 0x00001/* execute/search permission, other */
+#endif
+
 #ifndef SH_COMPAT
    #define SH_COMPAT    0x00    /* Compatibility */
 #endif
@@ -341,7 +373,7 @@ static void convert_create_flags( USHORT uiFlags, int * result_flags, unsigned *
    /* by default FC_NORMAL is set */
 
    *result_flags = O_BINARY | O_CREAT | O_TRUNC | O_RDWR;
-   *result_pmode = S_IRUSR | S_IWUSR;
+   *result_pmode = S_IRWXU | S_IRWXG | S_IRWXO;
 
    if( uiFlags & FC_READONLY )
    {
