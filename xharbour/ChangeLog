@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3207 2004/07/24 00:58:36 peterrees Exp $
+ * $Id: ChangeLog,v 1.3208 2004/07/24 09:19:50 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-27 17:58 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/tbrowse.prg
+    ! Fixed bug which leaves "blank" lines at the top of the browse.
+    - Removed ::ForceStabilize(). ::ForceStable() performs all the work.
+    - Removed ::lInitRow. It was used only in ::ForceStabilize(), but
+      wasn't used in ::stabilize().
+    - Removed ::DrawRows(). It was integrated to ::DrawARow(), so there
+      will not be double code for the same task.
 
 2004-07-24 13:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * contrib/libct/ascpos.c
