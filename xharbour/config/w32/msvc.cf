@@ -1,5 +1,5 @@
 #
-# $Id: msvc.cf,v 1.3 2003/05/16 19:52:05 druzus Exp $
+# $Id: msvc.cf,v 1.4 2003/09/25 02:24:03 paultucker Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -40,7 +40,7 @@ LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
 LINKLIBS += $(HB_GT_LIB)$(LIB_EXT)
 ifeq ($(HB_MULTI_GT),yes)
 LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
-LINKLIBS += -lgtnul
+LINKLIBS += gtnul$(LIB_EXT)
 endif
 endif
 

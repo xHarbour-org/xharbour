@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.27 2003/11/11 20:20:54 ronpinkas Exp $
+ * $Id: gtwin.c,v 1.28 2003/12/04 09:26:55 druzus Exp $
  */
 
 /*
@@ -397,11 +397,16 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
     if( ( s_HInput = GetStdHandle( STD_INPUT_HANDLE ) ) == INVALID_HANDLE_VALUE )
     {
+#ifdef HB_MULTI_GT
+        AllocConsole(); /* It is a Windows app without a console, so we create one */
+        s_HInput = GetStdHandle( STD_INPUT_HANDLE );
+#else
         if( hb_dynsymFindName( "__DBGENTRY" ) ) /* the debugger is linked */
         {
             AllocConsole(); /* It is a Windows app without a console, so we create one */
             s_HInput = GetStdHandle( STD_INPUT_HANDLE );
         }
+#endif
     }
 
     s_HOutput = CreateFile( "CONOUT$",     /* filename    */

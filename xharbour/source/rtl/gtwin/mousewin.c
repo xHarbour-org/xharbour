@@ -1,5 +1,5 @@
 /*
- * $Id: mousewin.c,v 1.4 2003/10/06 03:29:00 lculik Exp $
+ * $Id: mousewin.c,v 1.5 2003/12/04 09:26:55 druzus Exp $
  */
 
 /*
@@ -113,14 +113,14 @@ int HB_GT_FUNC(mouse_Col( void ))
 {
    /* TODO: */
 
-   return HB_GT_FUNC(mouse_iCol);
+   return hb_mouse_iCol;
 }
 
 int HB_GT_FUNC(mouse_Row( void ))
 {
    /* TODO: */
 
-   return HB_GT_FUNC(mouse_iRow);
+   return hb_mouse_iRow;
 }
 
 void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
@@ -172,4 +172,3 @@ void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int 
    HB_SYMBOL_UNUSED( piBottom );
    HB_SYMBOL_UNUSED( piRight );
 }
-

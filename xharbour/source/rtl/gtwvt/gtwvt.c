@@ -557,9 +557,7 @@ void HB_GT_FUNC(gt_PutText( USHORT top, USHORT left, USHORT bottom, USHORT right
 void HB_GT_FUNC(gt_SetAttribute( USHORT rowStart, USHORT colStart, USHORT rowStop, USHORT colStop, BYTE attr ))
 {
   USHORT irow, icol, index;
-
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %i", rowStart, colStart, rowStop, colStop, attr));
-
+  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d", usTop, usLeft, usBottom, usRight, (int) attr));
   for ( irow = rowStart; irow <=rowStop; irow++)
   {
     index = hb_wvt_gtGetIndexForTextBuffer(colStart, irow);
@@ -689,11 +687,9 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
  */
 BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
 {
-  BOOL bResult = FALSE;
-  HFONT hFont;
-
+  BOOL bResult= FALSE;
+  HFONT hFont
   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", row, col));
-
   if (row<= WVT_MAX_ROWS && col<= WVT_MAX_COLS)
   {
     hFont = hb_wvt_gtGetFont(_s.fontFace, _s.fontHeight, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage);
@@ -2666,8 +2662,7 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 /* ********************************************************************** */
 
 static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
-                             HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit),
-                             HB_GT_FUNC(wvtFnInit) };
+                             HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
 
