@@ -1,5 +1,5 @@
 /*
- * $Id: settime.c,v 1.1 2004/02/01 11:36:59 lculik Exp $
+ * $Id: settime.c,v 1.2 2004/02/01 17:23:55 paultucker Exp $
  *
  * xHarbour Project source code:
  * CT3 Date & Time supplementary functions:
@@ -61,10 +61,25 @@
 
 #include <windows.h>
 #include <winbase.h>
-
 #define HB_OS_WIN_32_USED
+#endif
+#include <time.h>
+#if defined( OS_UNIX_COMPATIBLE )
+   #if defined( HB_OS_BSD)
+      #include <sys/time.h>
+   #else
+      #include <sys/timeb.h>
+   #endif
+   #include <sys/times.h>
+   #include <unistd.h>
+#else
+   #include <sys\timeb.h>
+#endif
 
 HB_FUNC ( SETNEWDATE )
+{
+
+#if defined(HB_OS_WIN_32)
 {
    WORD wNewYear,wNewMonth,wNewDay,wNewDayOfWeek;
    BOOL lMode;
@@ -85,9 +100,19 @@ HB_FUNC ( SETNEWDATE )
 
    hb_retl ( SetLocalTime(&st) );
 }
+#elif  defined( OS_UNIX_COMPATIBLE )    || defined(__DJGPP__)
+{
+   LONG lNewYear,lNewMonth,lNewDay,lNewDayOfWeek;
+   hb_retl(0);
+   
+}   
+#endif
+}
 
 
 HB_FUNC ( SETNEWTIME )
+{
+#if defined(HB_OS_WIN_32)
 {
    WORD wNewHour,wNewMin,wNewSec;
    BOOL lMode ;
@@ -105,6 +130,20 @@ HB_FUNC ( SETNEWTIME )
    st.wSecond = wNewSec ;
 
    hb_retl ( SetLocalTime(&st) );
+}   
+#elif  defined( OS_UNIX_COMPATIBLE )    || defined(__DJGPP__)
+{
+   LONG lNewHour,lNewMin,lNewSec;
+   time_t tm;
+   tm = time(NULL);
+   lNewHour = (LONG) hb_parni(1)*3600;
+   lNewMin = (LONG) hb_parni(2)*60;
+   lNewSec = (LONG) hb_parni(3);
+   tm += lNewHour+lNewMin+lNewSec;
+   hb_retl( stime(&tm) == 0);
+}   
+#endif   
+   
 
 }
 
@@ -160,12 +199,15 @@ HB_FUNC ( SETNEWTIME )
 
 HB_FUNC ( WAITPERIOD )
 {
-   DWORD dwWait = hb_parnl( 1 ) ;
 
+   ULONG dwWait = hb_parnl( 1 ) ;
+#if defined(HB_OS_WIN_32)
    Sleep( dwWait * 10 );
-
+#else
+   sleep(dwWait *10);
+#endif   
    hb_retl( FALSE );
 }
 
 
-#endif
+
