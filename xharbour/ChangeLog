@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2443 2004/03/02 04:46:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2444 2004/03/02 05:17:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-02 15:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/hbapifs.h
+  * source/rtl/direct.c
+    ! explicitely clear HB_ITEMs when no longer in use
+    % add fourth parameter to hb_fsDirectoryRecursive() as file attributes.
+    % DirectoryRecurse() now accepts file attributes as second parameter
+    Example: DirectoryRecurse( "C:\*.*", "SH" )
 
 2004-03-01 21:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/win32ole.prg

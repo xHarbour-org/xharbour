@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.20 2004/03/01 09:54:52 andijahja Exp $
+ * $Id: direct.c,v 1.21 2004/03/01 22:00:38 andijahja Exp $
  */
 
 /*
@@ -284,7 +284,7 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
 
 }
 
-static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName )
+static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName, char* szAttributes )
 {
    ULONG ui, uiLen = pRecurse->item.asArray.value->ulLen;
 
@@ -300,9 +300,10 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
             char *szSubdir = hb_xstrcpy(NULL,szEntry,"\\",HB_DIR_ALL_FILES_MASK,NULL);
             HB_ITEM SubDir;
             SubDir.type = HB_IT_NIL;
-            hb_fsDirectory( &SubDir, szSubdir, "D", FALSE, TRUE );
-            hb_fsDirectoryCrawler( &SubDir, pResult, szFName );
+            hb_fsDirectory( &SubDir, szSubdir, szAttributes, FALSE, TRUE );
+            hb_fsDirectoryCrawler( &SubDir, pResult, szFName, szAttributes );
             hb_xfree( szSubdir );
+            hb_itemClear( &SubDir );
          }
          else
          {
@@ -317,18 +318,20 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
    }
 }
 
-void HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char *szFName )
+void HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char *szFName, char* szAttributes )
 {
    HB_ITEM Dir;
    Dir.type = HB_IT_NIL;
-   hb_fsDirectory( &Dir, szSkleton, "D", FALSE, TRUE );
+   hb_fsDirectory( &Dir, szSkleton, szAttributes, FALSE, TRUE );
    hb_arrayNew( pResult, 0 );
-   hb_fsDirectoryCrawler( &Dir, pResult, szFName );
+   hb_fsDirectoryCrawler( &Dir, pResult, szFName, szAttributes );
+   hb_itemClear( &Dir );
 }
 
 HB_FUNC( DIRECTORYRECURSE )
 {
    PHB_ITEM pDirSpec = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pAttribute = hb_param( 2, HB_IT_STRING );
    char *szRecurse;
    char szDrive[1];
    PHB_FNAME fDirSpec;
@@ -337,11 +340,29 @@ HB_FUNC( DIRECTORYRECURSE )
    BOOL bAddDrive = TRUE;
    char cCurDsk = hb_fsCurDrv() ;
    BYTE *pCurDir = hb_fsCurDir( cCurDsk ) ;
+   char *szAttributes;
 
    Dir.type = HB_IT_NIL;
 
    if ( pDirSpec )
    {
+      szAttributes = (char*) hb_xgrab( 4 + 1 ); // HSDV
+      hb_xmemset( szAttributes, 0, 5 );
+      szAttributes[0] = 'D';                    // Compulsory
+      hb_strupr(pAttribute->item.asString.value);
+
+      if ( pAttribute )
+      {
+         if ( strchr( pAttribute->item.asString.value, 'H' ) != NULL )
+            strcat( szAttributes, "H" );
+
+         if ( strchr( pAttribute->item.asString.value, 'S' ) != NULL )
+            strcat( szAttributes, "S" );
+
+         if ( strchr( pAttribute->item.asString.value, 'V' ) != NULL )
+            strcat( szAttributes, "V" );
+      }
+
       if ( (fDirSpec = hb_fsFNameSplit( pDirSpec->item.asString.value)) !=NULL )
       {
          if( fDirSpec->szDrive == NULL )
@@ -366,9 +387,11 @@ HB_FUNC( DIRECTORYRECURSE )
 
       }
 
-      hb_fsDirectoryRecursive( &Dir, szRecurse, szFName );
+      hb_fsDirectoryRecursive( &Dir, szRecurse, szFName, szAttributes );
 
       hb_itemForwardValue( &(HB_VM_STACK).Return, &Dir );
+
+      hb_itemClear( &Dir );
 
       if( fDirSpec )
       {
@@ -384,7 +407,13 @@ HB_FUNC( DIRECTORYRECURSE )
       {
          hb_xfree( szRecurse );
       }
+
+      if( szAttributes )
+      {
+         hb_xfree( szAttributes );
+      }
    }
+
    else
    {
       hb_reta( 0 );
@@ -397,4 +426,5 @@ HB_FUNC( DIRECTORY )
    Dir.type = HB_IT_NIL;
    hb_fsDirectory( &Dir, hb_parc(1), hb_parc(2), hb_parl(3), hb_parl(4) );
    hb_itemForwardValue( &(HB_VM_STACK).Return, &Dir );
+   hb_itemClear( &Dir );
 }
