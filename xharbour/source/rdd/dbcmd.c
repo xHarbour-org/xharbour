@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.32 2003/05/15 01:52:30 andijahja Exp $
+ * $Id: dbcmd.c,v 1.33 2003/05/26 05:58:54 paultucker Exp $
  */
 
 /*
@@ -71,7 +71,7 @@
 #include "hbapilng.h"
 #include "hbapiitm.h"
 #include "hbrddwrk.h"
-
+#include "hbapicdp.h"
 
 typedef struct _AREANODE
 {
@@ -1234,8 +1234,9 @@ HB_FUNC( DBCREATE )
    PHB_FNAME pFileName;
    PHB_ITEM pStruct, pFieldDesc, pFileExt;
    BOOL bOpen;
+   BYTE * codePageId = (BYTE*) hb_parc(6);
 
-   hb_retl( FALSE );
+   hb_ret(  );
    szFileName = hb_parc( 1 );
    pStruct = hb_param( 2 , HB_IT_ARRAY );
    if( pStruct )
@@ -1408,6 +1409,7 @@ HB_FUNC( DBCREATE )
       pInfo.atomAlias = ( BYTE * ) szAlias;
       strcpy( ( char * ) pInfo.abName, szSavedFileName );
       pInfo.fShared = !hb_set.HB_SET_EXCLUSIVE;
+      pInfo.cdpId = codePageId;
       ( ( AREAP ) s_pCurrArea->pArea )->uiArea = s_uiCurrArea;
       if( SELF_OPEN( ( AREAP ) s_pCurrArea->pArea, &pInfo ) == FAILURE )
       {
@@ -2107,6 +2109,7 @@ HB_FUNC( DBUSEAREA )
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
    PHB_ITEM pFileExt;
+   BYTE * codePageId = (BYTE*) hb_parc(7);
    char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
 
@@ -2194,6 +2197,7 @@ HB_FUNC( DBUSEAREA )
    pInfo.atomAlias = ( BYTE * ) szAlias;
    pInfo.fShared = ISLOG( 5 ) ? hb_parl( 5 ) : !hb_set.HB_SET_EXCLUSIVE;
    pInfo.fReadonly = ISLOG( 6 ) ? hb_parl( 6 ) : FALSE;
+   pInfo.cdpId = codePageId;
 
    ( ( AREAP ) s_pCurrArea->pArea )->uiArea = s_uiCurrArea;
 
