@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.18 2004/08/25 17:02:57 lf_sfnet Exp $
+# $Id: Makefile,v 1.19 2004/08/29 00:26:22 druzus Exp $
 #
 
 ROOT = ../
@@ -115,6 +115,10 @@ PRG_HEADERS=\
 	tbrowse.ch   \
 	tip.ch       \
 	wvtwin.ch    \
+	ct.ch        \
+	ctvideo.ch   \
+	ctwin.ch     \
+	cterror.ch
 
 API_HEADERS=\
 	error.api    \

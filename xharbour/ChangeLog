@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3367 2004/08/29 17:05:53 paultucker Exp $
+ * $Id: ChangeLog,v 1.3368 2004/08/29 17:12:05 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-08-29 20:20 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * include/Makefile
+    * added missed ct*.ch
+  * bin/hb-func.sh
+    * changed tip to hbtip and ct to hbct. Przemyslaw please check.
+    
 2004-08-29 13:11 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/vm/arrayshb.c
     * casts as reported by Lorenzo and Sylvain
@@ -382,7 +388,7 @@
       to add other language translations
 
   + tests/i18n/es_MX.hit
-    + Spanish (México) translation added
+    + Spanish (Mï¿½ico) translation added
 
 2004-08-19 08:50 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * xharbour/utils/hbdict/hbdict.prg
@@ -390,7 +396,7 @@
       an additional row in browse
 
   + xharbour/utils/hbdict/i18n/hbdict_es_MX.hit
-    + Spanish (México) translation added
+    + Spanish (Mï¿½ico) translation added
 
 2004-08-19 17:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/pp/ppcore.c
@@ -622,7 +628,7 @@
 
 2004-08-10 22:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
-   * fixed bug reported by Juan Gálvez - thanks.
+   * fixed bug reported by Juan Gï¿½vez - thanks.
 
 2004-08-10 17:40 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/devoutp.prg
@@ -860,7 +866,7 @@
   * source/rtl/tget.prg
     ! Fixed a Clipper compatibility issure in Static Function BuildGetColor()
       when the param received was non-numeric.
-      Reported by David Arturo Macías Corona
+      Reported by David Arturo Macï¿½s Corona
 
 2004-08-05 14:25 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/memoedit.prg
