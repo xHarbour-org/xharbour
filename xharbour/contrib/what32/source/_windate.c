@@ -358,25 +358,25 @@ HB_FUNC( DATETIME_SETMONTHCALFONT )
 
 HB_FUNC( DATETIME_SETSYSTEMTIME )
 {
-   SYSTEMTIME *SysTime ;
-
+   SYSTEMTIME SysTime, *lpSysTime ;
 
    if ( ISARRAY( 3 ) ) // array
    {
-      SysTime->wYear         = (WORD)  hb_parnl( 3, 1 );
-      SysTime->wMonth        = (WORD)  hb_parnl( 3, 2 );
-      SysTime->wDayOfWeek    = (WORD)  hb_parnl( 3, 3 );
-      SysTime->wDay          = (WORD)  hb_parnl( 3, 4 );
-      SysTime->wHour         = (WORD)  hb_parnl( 3, 5 );
-      SysTime->wMinute       = (WORD)  hb_parnl( 3, 6 );
-      SysTime->wSecond       = (WORD)  hb_parnl( 3, 7 );
-      SysTime->wMilliseconds = (WORD)  hb_parnl( 3, 8 );
+      SysTime.wYear         = (WORD)  hb_parnl( 3, 1 );
+      SysTime.wMonth        = (WORD)  hb_parnl( 3, 2 );
+      SysTime.wDayOfWeek    = (WORD)  hb_parnl( 3, 3 );
+      SysTime.wDay          = (WORD)  hb_parnl( 3, 4 );
+      SysTime.wHour         = (WORD)  hb_parnl( 3, 5 );
+      SysTime.wMinute       = (WORD)  hb_parnl( 3, 6 );
+      SysTime.wSecond       = (WORD)  hb_parnl( 3, 7 );
+      SysTime.wMilliseconds = (WORD)  hb_parnl( 3, 8 );
+      lpSysTime = &SysTime;
    }
    else
    {
      if ( ISCHAR(2) )  // xHarbour structure
      {
-        SysTime =( SYSTEMTIME *) hb_param( 3, HB_IT_STRING)->item.asString.value;
+        lpSysTime =( SYSTEMTIME *) hb_param( 3, HB_IT_STRING)->item.asString.value;
      }
      else
      {
@@ -388,8 +388,7 @@ HB_FUNC( DATETIME_SETSYSTEMTIME )
    hb_retl( DateTime_SetSystemtime(
                       (HWND) hb_parnl( 1 ) ,   // Handle to a DTP control
                       (DWORD) hb_parnl( 2 ),   // Value that specifies the action that should be performed.
-                      SysTime                  // Pointer to SYSTEMTIME structures
+                      lpSysTime                // Pointer to SYSTEMTIME structures
                                ) );
-
 }
 
