@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclientftp.prg,v 1.2 2003/06/22 04:43:51 jonnymind Exp $
+* $Id: tipclientftp.prg,v 1.3 2003/11/05 11:06:41 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -37,6 +37,7 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD TypeA()
    METHOD List()
    METHOD Cwd()
+   METHOD Dele()
    //METHOD Port()
    //METHOD SendPort()
    METHOD Retr()
@@ -81,7 +82,6 @@ METHOD Open() CLASS tIPClientFTP
          ENDIF
       ENDIF
    ENDIF
-   ? "Reply", ::cReply
 RETURN .F.
 
 
@@ -149,6 +149,10 @@ RETURN ::GetReply()
 
 METHOD CWD( cPath ) CLASS tIPClientFTP
    InetSendAll( ::SocketCon, "CWD " + cPath + ::cCRLF )
+RETURN ::GetReply()
+
+METHOD DELE( cPath ) CLASS tIPClientFTP
+   InetSendAll( ::SocketCon, "DELE " + cPath + ::cCRLF )
 RETURN ::GetReply()
 
 

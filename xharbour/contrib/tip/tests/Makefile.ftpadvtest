@@ -1,0 +1,13 @@
+#
+# $Id: Makefile,v 1.2 2003/06/16 00:41:29 jonnymind Exp $
+#
+
+TARGET=ftpadvtest
+INCLUDE=-I../include
+LIBS=-lhbtip
+LIBDIR=-L../
+SOURCES=ftpadvtest.prg
+
+#COMMANDS
+include ../Rules.make
+

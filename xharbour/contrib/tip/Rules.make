@@ -1,6 +1,6 @@
 #
 # Rules for making a generic xharbour library or program
-# $Id: Rules.make,v 1.2 2003/06/16 00:41:28 jonnymind Exp $
+# $Id: Rules.make,v 1.3 2003/11/05 11:06:41 jonnymind Exp $
 #
 # (C) Giancarlo Niccolai 2003
 #
@@ -18,12 +18,12 @@ CFLAGS += -Wall -I.:$(HB_INCLUDE)
 #libraries for binary building
 
 ifeq ($(HB_MT),MT)
-MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntxmt -ldbfcdxmt
+MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntxmt -ldbfcdx -ldbfdbt
 ifeq ($(HB_ARCHITECTURE),linux)
 MTLIBS+=-lpthread
 endif
 else
-  MTLIBS= -lvm -lrtl -lrdd -lrtl -lvm -ldbfntx -ldbfcdx
+  MTLIBS= -lvm -lrtl -lrdd -lrtl -lvm  -ldbfntx -ldbfcdx -ldbfdbt
 endif
 
 ifeq ($(HB_ARCHITECTURE),linux)
@@ -80,7 +80,7 @@ ifeq ( lib , $(patsubst %.a, lib, $(TARGET)))
 else
 	$(CC) -o $(TARGET) $(OBJECTS) -L$(HB_LIB_INSTALL) $(LIBDIR) $(LIBS) $(LIBFILES) \
 		-ldebug $(MTLIBS) -lmacro  -lpp  -llang  -lcommon\
-		$(GT_LIBS) -lm -ldbfdbt 
+		$(GT_LIBS) -lm 
 endif
 
 clean:

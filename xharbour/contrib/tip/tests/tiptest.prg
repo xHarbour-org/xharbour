@@ -1,7 +1,7 @@
 *****************************************************
 * TEST of TIP libs (for higher level URI interface)
 *
-* $Id: tiptest.prg,v 1.1 2003/02/22 16:44:47 jonnymind Exp $
+* $Id: tiptest.prg,v 1.2 2003/06/22 04:43:57 jonnymind Exp $
 *
 * Usage: This file is similar to a wget command
 *
@@ -78,7 +78,7 @@ PROCEDURE MAIN( cUrl, cFile )
    ENDIF
 
    @4,5 SAY "Connecting to " + oUrl:cProto + "://" + oUrl:cServer
-   IF oClient:Open()
+   IF oClient:Open( oUrl )
       IF Empty( oClient:cReply )
          @5,5 SAY "Connection status: <connected>"
       ELSE

@@ -1,12 +1,8 @@
 #
-# $Id: Makefile,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
+# $Id: Makefile,v 1.2 2003/06/16 00:41:29 jonnymind Exp $
 #
 
-TARGET=tiptest
-INCLUDE=-I../include
-LIBS=-lhbtip
-LIBDIR=-L../
-
-#COMMANDS
-include ../Rules.make
+all:
+	make -f Makefile.tiptest
+	make -f Makefile.ftpadvtest
 
