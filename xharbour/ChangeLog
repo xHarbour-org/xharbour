@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.499 2002/11/18 14:49:51 map Exp $
+ * $Id: ChangeLog,v 1.500 2002/11/19 06:03:11 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-19 23:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/gtsln/kbsln.c
+    ! Added Define to enable Only ONE ESC KEY press. To use the sources must be compiled with HB_SLANG_ONE_ESC
 
 2002-11-19 11:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * source/rtl\tbrowse.prg

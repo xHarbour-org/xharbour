@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.3 2002/03/30 19:25:16 map Exp $
+ * $Id: kbsln.c,v 1.5 2002/04/16 16:12:18 map Exp $
  */
 
 /*
@@ -323,11 +323,17 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
     /* NOTE: This will probably not work on slow terminals
        or on very busy lines (i.e. modem lines ) */
     ch = SLang_getkey();
+#if HB_SLANG_ONE_ESC
+    if( ch == 033 )   /* escape pressed - wait 0.6 sec for another key */
+        if( 0 == SLang_input_pending( 0.3))
+            return( 033 );
+
+#else
 
     if( ch == 033 )   /* escape pressed - wait 0.6 sec for another key */
         if( 0 == SLang_input_pending( 6 ) )
             return( 0 );
-
+#endif
     /* user AbortKey break */
     if( ch == s_hb_gt_Abort_key )
         return( HB_BREAK_FLAG );
