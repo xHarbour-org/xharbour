@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.64 2004/01/17 17:52:59 lculik Exp $
+ * $Id: filesys.c,v 1.65 2004/01/17 22:15:53 andijahja Exp $
  */
 
 /*
@@ -2695,7 +2695,7 @@ BOOL HB_EXPORT    hb_fsMkDir( BYTE * pDirname )
 
    if ( ! bResult )
    {
-      hb_fsSetError( ( USHORT ) GetLastError());
+      hb_fsSetError( ( USHORT ) WintoDosError(GetLastError()));
    }
    else
    {
@@ -2743,7 +2743,7 @@ BOOL HB_EXPORT    hb_fsChDir( BYTE * pDirname )
 
    if ( ! bResult )
    {
-      hb_fsSetError( ( USHORT ) GetLastError());
+      hb_fsSetError( ( USHORT ) WintoDosError(GetLastError()));
    }
    else
    {
@@ -2786,7 +2786,7 @@ BOOL HB_EXPORT    hb_fsRmDir( BYTE * pDirname )
 
    if ( ! bResult )
    {
-      hb_fsSetError( ( USHORT ) GetLastError());
+      hb_fsSetError( ( USHORT ) WintoDosError(GetLastError()));
    }
    else
    {
