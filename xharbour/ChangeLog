@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3655 2004/12/05 23:33:16 oh1 Exp $
+ * $Id: ChangeLog,v 1.3656 2004/12/06 01:14:28 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-12-08 14:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/version.c
+    - HB_FUNC( OS_ISWINNT )  - remove to new winos.c
+  + /source/rtl/winos.prg
+    + OS_NETREGOK()
+    + OS_NETVREDIROK()
+    + OS_ISWINNT()
+    + OS_ISWIN9X()
+    + OS_ISWIN95()
+    + OS_ISWIN98()
+    + OS_ISWINME()
+    + OS_ISWINNT351()
+    + OS_ISWINNT4()
+    + OS_ISWIN2000()
+    + OS_ISWINXP()
+    + OS_ISWIN2003()
+    + OS_ISWTSCLIENT()
+    + OS_VERSIONINFO()
+
+  + /source/rtl/winreg.prg
+    + QueryRegistry()
+    + GetRegistry()
+    + SetRegistry()
+  + /doc/en/winos.txt
+     Documentation for new OS_* functions
+  + /doc/en/winreg.txt
+     Documentation for new Reg* functions
+  + /tests/wincheck.prg
+     Program to show use of new Reg* & OS_* functions
 
 2004-12-06 17:24 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/achoice.prg
