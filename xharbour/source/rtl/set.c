@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.47 2004/04/20 14:33:23 jacekp Exp $
+ * $Id: set.c,v 1.48 2004/05/19 23:47:10 peterrees Exp $
  */
 
 /*
@@ -1275,7 +1275,7 @@ HB_FUNC( SET )
            if ( ulLength > 0 )
            {
              ulLength++ ;    // Add on space for '\0'
-             hb_set.hb_set_printerjob = hb_xgrab( ulLength ) ;
+             hb_set.hb_set_printerjob = ( char *) hb_xgrab( ulLength ) ;
              memcpy( hb_set.hb_set_printerjob, hb_parc( 2 ), ulLength ) ;
            }
          }
