@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.20 2004/04/01 16:16:44 srobert Exp $
+ * $Id: dbedit.prg,v 1.21 2004/05/10 15:19:47 mlombardo Exp $
  */
 
 /*
@@ -71,6 +71,8 @@
  *           This is very useful, it increases A LOT the power of dbedit()
  *         - UserFunc is also called once with nMode == -1 (initialization)
  *           Prior to begin browsing
+ *         - You can pass pre/post blocks for later using in user func
+ *           (combinated with the GET system)
  *
  * DBEdit() is no more deprecated :)
  * Have fun
@@ -87,7 +89,7 @@
 #translate SETIFEMPTY(<x>,<v>) => Do Case; Case Empty(<x>); <x>:=<v>; End
 #translate SETIFNIL(<x>,<v>) => Do Case; Case HB_ISNIL(<x>); <x>:=<v>; End
 
-Function DBEdit(nTop, nLeft, nBottom, nRight, aCols, xFunc, xPict, xHdr, xHSep, xCSep, xFSep, xFoot)
+Function DBEdit(nTop, nLeft, nBottom, nRight, aCols, xFunc, xPict, xHdr, xHSep, xCSep, xFSep, xFoot, xPre, xPost)
 Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
 
   SetIfEmpty(nTop, 0)
@@ -110,6 +112,18 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
   End
   SetIfEmpty(xHdr, "")
   SetIfEmpty(xFoot, "")
+
+  If HB_ISBLOCK(xPre)
+    i := xPre
+    xPre := Array(Len(aCols))
+    aFill(xPre, i)
+  End
+  If HB_ISBLOCK(xPost)
+    i := xPost
+    xPost := Array(Len(aCols))
+    aFill(xPost, i)
+  End
+
   // NOTE: Heading/footing separator is SINGLE line instead of DOUBLE line
   //       this is because most codepages (unicode too) don't have DOUBLE line chars
   //       so the output is ugly with them
@@ -137,7 +151,7 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
 #endif
 
   For Each i In aCols
-    If !Empty( i[1] )
+    If !Empty( i )
        If HB_ISARRAY(i)
          bFun := IIf(HB_ISBLOCK(i[1]), i[1], &("{||" + i[1] + '}'))
        Else
@@ -174,6 +188,18 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
          oTBC:picture := xPict[HB_EnumIndex()]
        ElseIf HB_ISSTRING(xPict)
          oTBC:picture := xPict
+       End
+       If HB_ISARRAY(xPre)
+         If HB_ISLOGICAL(xPre[HB_EnumIndex()])
+           xPre[HB_EnumIndex()] := IIf(xPre[HB_EnumIndex()], {|| .T.}, {|| .F.})
+         End
+         oTBC:preBlock := xPre[HB_EnumIndex()]
+       End
+       If HB_ISARRAY(xPost)
+         If HB_ISLOGICAL(xPost[HB_EnumIndex()])
+           xPost[HB_EnumIndex()] := IIf(xPost[HB_EnumIndex()], {|| .T.}, {|| .F.})
+         End
+         oTBC:postBlock := xPost[HB_EnumIndex()]
        End
 
        oTBR:addColumn(oTBC)

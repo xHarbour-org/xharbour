@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.23 2004/02/17 18:44:14 andijahja Exp $
+ * $Id: gtalleg.c,v 1.24 2004/05/08 19:32:52 maurifull Exp $
  */
 
 /*
@@ -1419,6 +1419,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
    int nKey = 0;
    int i;
+   BOOL lKey = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
 
@@ -1511,21 +1512,30 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
       if ( nKey & 255 )
       {
          nKey = nKey & 255;
+	 lKey = TRUE;
       }
       else if ( nKey != 0 )
       {
-//       Good standard debuging...
-//       printf("scancode: %d (0x%0x) ascii: %d (0x%0x)\n", nKey>>8, nKey>>8, nKey&0xff, nKey&0xff);
          for ( i = 0; i < GT_KEY_TABLE_SIZE; i++ )
          {
             if ( ( nKey >> 8 ) == sKeyTable[i].al_key )
             {
                nKey = sKeyTable[i].xhb_key;
+	       lKey = TRUE;
                break;
             }
          }
       }
    }
+
+#ifdef DEBUG
+//   if (!lKey && nKey != 0)
+   if (nKey != 0)
+   {
+//     Good standard debuging...
+       printf("gtAlleg: Unhandled Key, scancode: %d (0x%0x) ascii: %d (0x%0x)\n", nKey>>8, nKey>>8, nKey&0xff, nKey&0xff);
+   }
+#endif
 
    return nKey;
 }
@@ -1835,9 +1845,9 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
    gt_funcs->ExtendedKeySupport = HB_GT_FUNC(gt_ExtendedKeySupport);
    gt_funcs->ReadKey            = HB_GT_FUNC(gt_ReadKey);
    gt_funcs->info               = HB_GT_FUNC(gt_info);
-   gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
-    gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
-    gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+   gt_funcs->SetClipboard       = HB_GT_FUNC( gt_SetClipboard );
+   gt_funcs->GetClipboard       = HB_GT_FUNC( gt_GetClipboard );
+   gt_funcs->GetClipboardSize   = HB_GT_FUNC( gt_GetClipboardSize );
 
    // todo: update
 }
