@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.c,v 1.2 2002/10/27 14:41:37 lculik Exp $
+ * $Id: hbtrace.c,v 1.3 2003/01/29 21:30:27 andijahja Exp $
  */
 
 /*
@@ -63,6 +63,7 @@ char * hb_tr_file_ = "";
 int    hb_tr_line_ = 0;
 int    hb_tr_level_ = 0;
 
+static int s_level = -1;
 static int s_enabled = 1;
 static int s_flush   = 0;
 
@@ -91,18 +92,17 @@ int hb_tracestate( int new_state )
 
 int hb_tracelevel( int new_level )
 {
-   int old_level = hb_tr_level_;
+   int old_level = s_level;
 
    if( new_level >= HB_TR_ALWAYS &&
        new_level <  HB_TR_LAST )
-      hb_tr_level_ = new_level;
+      s_level = new_level;
 
    return old_level;
 }
 
 int hb_tr_level( void )
 {
-   static int s_level = -1;
 
    if( s_level == -1 )
    {
@@ -166,9 +166,10 @@ int hb_tr_level( void )
 void hb_tr_trace( char * fmt, ... )
 {
    /*
-    * If tracing is disabled, do nothing.
+    * If tracing is disabled, or called when level is not set
+    * do nothing.
     */
-   if( s_enabled )
+   if( s_enabled && hb_tr_level_>0 )
    {
       int i;
       va_list ap;
