@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.33 2002/10/22 17:23:46 what32 Exp $
+ * $Id: xInspect.prg,v 1.34 2002/10/22 23:07:44 what32 Exp $
  */
 
 /*
@@ -242,8 +242,10 @@ return(1)
 
 
 CLASS InspectBrowser FROM TWBrowse
+   DATA oCtrl
    METHOD New() CONSTRUCTOR
    METHOD SetColControl()
+   METHOD OnCommand()
 ENDCLASS
 
 METHOD New( oParent ) CLASS InspectBrowser
@@ -266,17 +268,35 @@ METHOD New( oParent ) CLASS InspectBrowser
    ::AddColumn( oCol1 )
    ::AddColumn( oCol2 )
 
-   ::bOnDblClick := {|o,x,y|::SetColControl(x,y)}
-   ::Font        := oParent:Parent:font
-
+   ::bOnDblClick   := {|o,x,y|::SetColControl(x,y)}
+   ::Font          := oParent:Parent:font
 RETURN(self)
 
 METHOD SetColControl(x,y) CLASS InspectBrowser
-   local cType, cVar
+   local cType, cVar, aRect
    if y==2
       cVar := ::source[::RecPos][1]
-//      cType:= valtype( __objSendMsg( oApp:MainFrame:ObjInsp:CurObject, cVar ) )
       cType:= valtype( __objSendMsg( ::Parent:Parent:Parent:CurObject, cVar ) )
-      view cType
+      IF cType == "L"
+         aRect:=::GetItemRect()
+         ::oCtrl:=TComboBox():New(self,555,aRect[1]-1,aRect[2]-1,aRect[3]-aRect[1]+1,100) //,aRect[4]-aRect[2]+1)
+         ::oCtrl:Create()
+         ::oCtrl:AddString("TRUE")
+         ::oCtrl:AddString("FALSE")
+      ENDIF
    endif
 RETURN(self)
+
+METHOD OnCommand(nwParam,nlParam) CLASS InspectBrowser
+   IF nlParam==::oCtrl:handle
+      IF HIWORD(nwParam)==CBN_KILLFOCUS
+         view ::oCtrl:GetCurSel()
+         ::oCtrl:Destroy()
+         ::oCtrl:=NIL
+      ENDIF
+   ENDIF
+RETURN(nil)
+
+
+//------------------------------------------------------------------------------------------
+

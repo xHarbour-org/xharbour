@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.6 2002/10/22 17:24:20 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.7 2002/10/22 23:08:10 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -1936,7 +1936,7 @@ METHOD OnKeyDown( nwParam, nlParam)  CLASS TWBrowse
       ENDCASE
    ENDIF
    ::OnChange()
-RETURN(0)
+RETURN(nil)
 
 //---------------------------------------------------------------------------------------------
 

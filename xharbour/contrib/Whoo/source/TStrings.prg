@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.14 2002/10/22 17:24:20 what32 Exp $
+ * $Id: TStrings.prg,v 1.1 2002/10/22 23:19:52 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -52,48 +52,48 @@ CLASS TStrings FROM TPersistent
    DATA Values         EXPORTED  
      
    METHOD New() CONSTRUCTOR
-/*
-   METHOD Add
-   METHOD AddObject
-   METHOD AddStrings
-   METHOD Append
-   METHOD Assign
-   METHOD BeginUpdate
-   METHOD Clear
-   METHOD CompareStrings
-   METHOD DefineProperties
-   METHOD Delete
-   METHOD Destroy
-   METHOD EndUpdate
-   METHOD Equals
-   METHOD Error
-   METHOD Exchange
-   METHOD ExtractName
-   METHOD Get
 
-   METHOD GetCapacity
-   METHOD GetCount
-   METHOD GetObject
-   METHOD GetText
-   METHOD GetTextStr
-   METHOD IndexOf
-   METHOD IndexOfName
-   METHOD IndexOfObject
-   METHOD Insert
-   METHOD InsertObject
-   METHOD LoadFromFile
-   METHOD LoadFromStream
-   METHOD Move
-   METHOD Put
-   METHOD PutObject
-   METHOD SaveToFile
+//   METHOD Add
+//   METHOD AddObject
+//   METHOD AddStrings
+//   METHOD Append
+//   METHOD Assign
+//   METHOD BeginUpdate
+//   METHOD Clear
+//   METHOD CompareStrings
+//   METHOD DefineProperties
+//   METHOD Delete
+//   METHOD Destroy
+//   METHOD EndUpdate
+//   METHOD Equals
+//   METHOD Error
+//   METHOD Exchange
+//   METHOD ExtractName
+//   METHOD Get
 
-   METHOD SaveToStream
-   METHOD SetCapacity
-   METHOD SetText
-   METHOD SetTextStr
-   METHOD SetUpdateState
-*/
+//   METHOD GetCapacity
+//   METHOD GetCount
+//   METHOD GetObject
+//   METHOD GetText
+//   METHOD GetTextStr
+//   METHOD IndexOf
+//   METHOD IndexOfName
+//   METHOD IndexOfObject
+//   METHOD Insert
+//   METHOD InsertObject
+//   METHOD LoadFromFile
+//   METHOD LoadFromStream
+//   METHOD Move
+//   METHOD Put
+//   METHOD PutObject
+//   METHOD SaveToFile
+
+//   METHOD SaveToStream
+//   METHOD SetCapacity
+//   METHOD SetText
+//   METHOD SetTextStr
+//   METHOD SetUpdateState
+
 ENDCLASS
 
 *------------------------------------------------------------------------------*
