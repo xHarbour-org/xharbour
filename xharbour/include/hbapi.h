@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.88 2003/11/07 10:03:11 jonnymind Exp $
+ * $Id: hbapi.h,v 1.89 2003/11/07 11:45:41 jonnymind Exp $
  */
 
 /*
@@ -427,7 +427,7 @@ HB_EXPORT extern PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg );
 HB_EXPORT extern PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pSymMsg, BOOL bAllowErrFunc, BOOL *bConstructor, BOOL bOptimized ); /* returns the method pointer of a object class */
 HB_EXPORT extern ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
 HB_EXPORT extern void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
-HB_EXPORT extern PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp); /* Returns a property */
+HB_EXPORT extern PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pDestNullable ); /* Returns a property */
 HB_EXPORT extern void     hb_objSetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pValue ); /* Set a property to a certain value */
 
 /* dynamic symbol table management */

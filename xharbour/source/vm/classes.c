@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.79 2003/11/07 10:03:10 jonnymind Exp $
+ * $Id: classes.c,v 1.80 2003/11/07 18:20:54 jonnymind Exp $
  */
 
 /*
@@ -2393,7 +2393,7 @@ void hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
   Callers should NEVER dispose it.
 */
 
-PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp )
+PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pDest )
 {
    PHB_DYNS pMsgSym;
 
@@ -2408,7 +2408,12 @@ PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp )
       hb_vmPush( pObj );
       hb_vmSend( 0 );
 
-      return &HB_VM_STACK.Return;
+      if (pDest != 0)
+      {
+         hb_itemCopy( pDest, &(HB_VM_STACK.Return) );
+      }
+
+      return &(HB_VM_STACK.Return);
    }
    else
    {
