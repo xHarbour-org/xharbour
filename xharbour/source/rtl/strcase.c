@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.10 2003/09/30 20:35:07 ronpinkas Exp $
+ * $Id: strcase.c,v 1.11 2003/10/01 04:39:39 ronpinkas Exp $
  */
 
 /*
@@ -160,7 +160,7 @@ HB_EXPORT char * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLe
 
    if( ulLen )
    {
-      while (--ulLen)
+      while (ulLen--)
       {
          *pDest++ = '\0';
       }
@@ -196,7 +196,7 @@ HB_EXPORT char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG 
 
    if( ulLen )
    {
-      while (--ulLen)
+      while (ulLen--)
       {
          *pDest++ = '\0';
       }

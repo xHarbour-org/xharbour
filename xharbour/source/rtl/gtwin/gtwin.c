@@ -191,10 +191,12 @@ static void HB_GT_FUNC(gt_xSetCursorStyle( void ))
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_xSetCursorStyle(%hu)", s_usCursorStyle));
 
+    GetConsoleCursorInfo( s_HOutput, &cci );
+
     switch( s_usCursorStyle )
     {
     case SC_NONE:
-        cci.dwSize = 25;
+//        cci.dwSize = 25;
         cci.bVisible = FALSE;
         break;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1558 2003/10/06 13:01:42 paultucker Exp $
+ * $Id: ChangeLog,v 1.1559 2003/10/06 21:31:32 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-06 20:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/gtwin/gtwin.c
+    * get cursor state before setting new.
+  * source/rtl/strcase.c
+    * hb_strncpyUpper*() was copying 1 byte short sometimes.
+     (reported by M.Lombardo)
 
 2003-10-06 14:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbcomp.h
