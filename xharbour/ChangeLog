@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2714 2004/04/02 01:35:20 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2715 2004/04/02 04:30:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-02 05:30 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
+  * source/rtl/filesys.c
+    ! Fixed R/T error when trying to open a DBF in Exclusive mode and
+      a sharing violation occur (_doserrno==32) by removing special error
+      translation for MSVC in hb_fsSetError()
+  * hb_fsOpen() set the error to _doserrno if possible for MSVC
 
 2004-04-01 20:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbvmpub.h
