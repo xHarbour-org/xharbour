@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.75 2004/11/24 02:48:45 guerra000 Exp $
+ * $Id: gtwin.c,v 1.76 2004/11/25 22:53:35 guerra000 Exp $
  */
 
 /*
@@ -1653,6 +1653,13 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
             ch = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar;
 
+            /*
+             * 2004-11-26 Vicente Guerra
+             * This fix doesn't work for non-US keyboards.
+             * I tried to replicate the problem under Win98SE (spanish),
+             * but it works fine. I hope someone could tell me how the
+             * problem appears, for try to fix it.
+
             // Under Win98, Upper row keys are affected by caps-lock
             // and should not be.
             // TODO: *** Fix it to foregin keyboards!!! ***
@@ -1672,47 +1679,47 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                      wChar = ch = wKey + 47;
                      break;
 
-                  case 11:          /* 0 */
+                  case 11:          // 0
                      wChar = ch = 48;
                      break;
 
-                  case 12:          /* - */
+                  case 12:          // -
                      ch = 45;
                      break;
 
-                  case 13:          /* = */
+                  case 13:          // =
                      wChar = ch = 61;
                      break;
 
-                  case 26:          /* [ */
+                  case 26:          // [
                      wChar = ch = 91;
                      break;
 
-                  case 27:          /* ] */
+                  case 27:          // ]
                      wChar = ch = 93;
                      break;
 
-                  case 39:          /* ; */
+                  case 39:          // ;
                      wChar = ch = 59;
                      break;
 
-                  case 40:          /* ' */
+                  case 40:          // '
                      ch = 39;
                      break;
 
-                  case 41:          /* ` */
+                  case 41:          // `
                      wChar = ch = 96;
                      break;
 
-                  case 43:          /* \ */
+                  case 43:          // \
                      wChar = ch = 92;
                      break;
 
-                  case 51:          /* , */
+                  case 51:          // ,
                      wChar = ch = 44;
                      break;
 
-                  case 52:          /* . */
+                  case 52:          // .
                      wChar = ch = 46;
                      break;
 
@@ -1720,6 +1727,9 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                      break;
                }
             }
+
+             *
+             */
 
             if ( s_wRepeated == 0 )
             {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3634 2004/11/26 17:46:20 druzus Exp $
+ * $Id: ChangeLog,v 1.3635 2004/11/26 21:58:14 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-26 21:58 UTC+0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/gtwin/gtwin.c
+    - Commented out the "Under Win98, Upper row keys are affected by
+      caps-lock and should not be" fix. This is code works only for
+      US keyboard layout. Using non-US keyboards, keystrokes are
+      wrong "recognized".
 
 2004-11-26 22:57 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbapi.h
