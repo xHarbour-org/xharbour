@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.95 2005/01/10 18:45:42 druzus Exp $
+ * $Id: memvars.c,v 1.96 2005/02/01 14:39:11 druzus Exp $
  */
 
 /*
@@ -1123,8 +1123,8 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
          pDynVar = s_privateStack[ ulBase ];
 
          /* reset current value to NIL - the overriden variables will be
-         * visible after exit from current procedure
-         */
+          * visible after exit from current procedure
+          */
          if( pDynVar->hMemvar )
          {
             if( hb_stricmp( pDynVar->pSymbol->szName, pMemvar->item.asString.value ) == 0 )
@@ -1335,6 +1335,9 @@ static HB_DYNS_FUNC( hb_memvarCountPublics )
    return TRUE;
 }
 
+/* Checks passed dynamic symbol if it is a PUBLIC variable and
+ * released it eventually stoping the searching
+ */
 static HB_DYNS_FUNC( hb_memvarReleasePublicWorker )
 {
    HB_THREAD_STUB
@@ -1353,6 +1356,8 @@ static HB_DYNS_FUNC( hb_memvarReleasePublicWorker )
    return TRUE;
 }
 
+/* find and release if exists given public variable
+ */
 void hb_memvarReleasePublic( PHB_ITEM pMemVar )
 {
    char *sPublic = pMemVar->item.asString.value;
