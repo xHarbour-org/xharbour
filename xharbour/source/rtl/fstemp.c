@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.11 2004/04/06 01:50:55 druzus Exp $
+ * $Id: fstemp.c,v 1.12 2004/04/08 13:26:53 druzus Exp $
  */
 
 /*
@@ -50,6 +50,10 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#ifndef HB_OS_WIN_32_USED
+   #define HB_OS_WIN_32_USED
+#endif
 
 #ifdef HB_OS_BSD
 #include <unistd.h>  /* We need mkstemp() */

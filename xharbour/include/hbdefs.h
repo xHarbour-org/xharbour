@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.35 2004/04/07 03:10:14 andijahja Exp $
+ * $Id: hbdefs.h,v 1.36 2004/04/08 13:26:53 druzus Exp $
  */
 
 /*
@@ -65,13 +65,22 @@
    #if defined( X__WIN32__ ) && !defined( HB_WIN32_IO )
       #define HB_WIN32_IO
    #endif
-#else
-   #if defined( HB_WIN32_IO )
-      #undef HB_WIN32_IO
+   #if defined( HB_WIN32_IO ) && !defined( HB_OS_WIN_32_USED )
+      /* disabled to avoid problems with windows.h */
+      /* #define HB_OS_WIN_32_USED */
    #endif
-#endif
-#if defined( HB_WIN32_IO ) && !defined( HB_OS_WIN_32_USED )
-   #define HB_OS_WIN_32_USED
+
+   /*
+    * This is a temporary hack to resolve problem with binary
+    * compatibility 3-rd party binaries - mostly FWH now.
+    * I hope we will be able to remove it soon
+    */
+   #ifndef HB_LONG_HOLDERS
+      #define HB_FWH_COMPATIBLE
+   #endif
+#else
+   #undef HB_WIN32_IO
+   #undef HB_OS_WIN_32_USED
 #endif
 
 /* Include windows.h if applicable and requested */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2773 2004/04/08 21:14:16 andijahja Exp $
+ * $Id: ChangeLog,v 1.2774 2004/04/08 21:48:41 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-09 03:18 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbdefs.h
+    * disabled '#define HB_OS_WIN_32_USED' for HB_WIN32_IO to avoid
+      problems with windows.h
+
+  * xharbour/include/hbvmpub.h
+    * reverted binary compatibility with old array structures for
+      FWH users. I hope this problem will be resolved in the future
+      with FWH author. Now by default Windows build uses:
+      #define HB_FWH_COMPATIBLE which cause that old array structure
+      is used. If someone build xHarbour with -DHB_LONG_HOLDERS then
+      the LONG version of holders is used and HB_FWH_COMPATIBLE is not
+      automatically set in hbdefs.h but if he set both -DHB_FWH_COMPATIBLE
+      and -DHB_LONG_HOLDERS then the hacked version which cleans the bug
+      and is binary compatible with old array structure is used.
+
+  * xharbour/source/rtl/fstemp.c
+    * #define HB_OS_WIN_32_USED added
+
 2004-04-09 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/fserror.c
     ! reverted back error code hack for BCC and Watcom
