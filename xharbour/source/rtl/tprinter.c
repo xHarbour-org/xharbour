@@ -204,6 +204,7 @@ BOOL THarbourPrinter_NewPage()
 
 #define MAXBUFFERSIZE 250
 
+#define WINVER  0x0500 
 BOOL THarbourPrinter_DPGetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
 {
    BOOL bFlag;
@@ -338,5 +339,15 @@ BOOL THarbourPrinter_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBuffe
    }
 
    return FALSE;
+}
+
+HB_FUNC(GETDEFAULTPRINTER)
+{
+      char szDefaultPrinter[ 160 ];
+      DWORD pdwBufferSize = 160;
+      if( THarbourPrinter_DPGetDefaultPrinter( ( LPTSTR ) &szDefaultPrinter , &pdwBufferSize ) )
+         hb_retclen(szDefaultPrinter , pdwBufferSize);
+      else
+         hb_retc("");
 }
 #endif
