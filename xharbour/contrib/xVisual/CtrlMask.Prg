@@ -575,8 +575,10 @@ METHOD OnLButtonUp( wParam, x, y )
    endif
    ::MoveCtrl( ,aPt)
    FOR EACH a IN ::aSelected
+      ShowWindow(a[SEL_HANDLE],SW_HIDE)
       MoveWindow(a[SEL_HANDLE],a[SEL_NEWRECT,1],a[SEL_NEWRECT,2],;
                  a[SEL_NEWRECT,3]-a[SEL_NEWRECT,1],a[SEL_NEWRECT,4]-a[SEL_NEWRECT,2],.T. )
+      ShowWindow(a[SEL_HANDLE],SW_SHOW)
       aRect:=GetWindowRect(a[1])
       RectScreenToClient(::Handle,aRect)
       a[SEL_OLDRECT]:=aClone(aRect)

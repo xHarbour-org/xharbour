@@ -13,7 +13,6 @@
 *-----------------------------------------------------------------------------*
 
 CLASS TFrame FROM TWindow
-   DATA Controls INIT {}
    METHOD New()
    METHOD Add()
    METHOD SetLink()

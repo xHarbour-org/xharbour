@@ -14,7 +14,6 @@
 *-----------------------------------------------------------------------------*
 
 CLASS TForm FROM TWindow
-   DATA Controls INIT {}
    METHOD New()
    METHOD Add()
    METHOD Del()

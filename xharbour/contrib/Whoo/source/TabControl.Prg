@@ -22,7 +22,6 @@ typedef struct {;
 
 CLASS TTabControl FROM TControl
 
-   DATA Controls AS  ARRAY
    DATA nCurSel
    DATA Cargo
    DATA ntProc

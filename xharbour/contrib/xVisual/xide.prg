@@ -129,6 +129,7 @@ FUNCTION Main
          :Add( 'ObjInsp', ObjInspect():New( oApp:MainFrame ) )
          
          // focus to main Frame
+         :ClientRect()
          :SetFocus()
       END
       :Run()
@@ -158,7 +159,7 @@ CLASS ObjTree FROM TForm
                                 ::top     := 125,;
                                 ::width   := 200,;
                                 ::height  := 150,;
-                                ::ExStyle := WS_EX_CLIENTEDGE + WS_EX_TOOLWINDOW ,;
+                                ::ExStyle := /*WS_EX_CLIENTEDGE + */WS_EX_TOOLWINDOW ,;
                                 super:new( oParent )
    // disallow window from being closed
    METHOD OnCloseQuery() INLINE 0
@@ -172,22 +173,24 @@ CLASS ObjInspect FROM TForm
                                 ::top     := 275,;
                                 ::width   := 200,;
                                 ::height  := 250,;
-                                ::ExStyle := WS_EX_CLIENTEDGE + WS_EX_TOOLWINDOW ,;
+                                ::ExStyle := /*WS_EX_CLIENTEDGE + */WS_EX_TOOLWINDOW ,;
                                 super:new( oParent )
    // disallow window from being closed
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE ::GetObj("InspTabs"):Move(,,x,y,.t.),nil
+   METHOD OnSize(n,x,y)  INLINE  ::GetObj("InspCombo"):Move(,,x,,.t.),;
+                                 ::GetObj("InspTabs"):Move(,25,x,y-25,.t.),nil
 ENDCLASS
 
 METHOD OnCreate() CLASS ObjInspect
   local aRect := ::ClientRect()
-  ::Add( 'InspTabs', TTabControl():New( self, 555,  0,  0, aRect[3], aRect[4]) )
-  ::GetObj("InspTabs"):AddTab( "Properties", "Test" )
-  ::GetObj("InspTabs"):AddTab( "Events", TabPage():New( ::GetObj("InspTabs"), "Events") )
-  ::GetObj("InspTabs"):Configure()
+  ::Add( 'InspCombo',TComboBox():New( self, 100, 0, 0, aRect[3], 100 ) )
+  ::InspCombo:Dir( 16384, '*.*')
   
-  ::GetObj("InspTabs"):GetObj("Events"):Add( 'btn', TButton():New( ::GetObj("InspTabs"):GetObj("Events"), 'OOPS', 500,  10, 10, 50, 20 ) )
+  ::Add( 'InspTabs', TTabControl():New( self, 101,  0,  25, aRect[3], aRect[4]-25) )
+  ::InspTabs:AddTab( "Properties")
+  ::InspTabs:AddTab( "Events", TabPage():New( ::InspTabs, "Events") )
+  ::InspTabs:Configure()
   
 return( super:OnCreate() )
 
