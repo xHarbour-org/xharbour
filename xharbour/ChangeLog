@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1111 2003/06/10 11:02:40 lculik Exp $
+ * $Id: ChangeLog,v 1.1112 2003/06/10 23:45:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-06-13 05:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/compiler/genc.c
+    ! Minor modification on function HB_GENC_FUNC( hb_p_localnearsetstr )
+      to be consistent with other typical function, to make the generated
+      C file more readable in verbose mode.
 
 2003-06-10 16:44 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c
