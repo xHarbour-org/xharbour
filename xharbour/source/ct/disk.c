@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.4 2005/03/14 15:43:56 modalsist Exp $
+ * $Id: disk.c,v 1.5 2005/03/15 04:05:43 andijahja Exp $
  */
 /*
  * xHarbour Project source code:
@@ -311,10 +311,10 @@ HB_FUNC( GETVOLINFO )
                                    (char*) &sVolName,
                                    256,
                                    NULL,
-                                   NULL, 
                                    NULL,
                                    NULL,
-                                   NULL );
+                                   NULL,
+                                   0 );
 #endif
     if ( retval!=0 )
       hb_retc( (char *) sVolName );
