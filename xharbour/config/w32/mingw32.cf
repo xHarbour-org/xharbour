@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.15 2004/01/05 18:59:28 lf_sfnet Exp $
+# $Id: mingw32.cf,v 1.16 2004/04/03 00:49:17 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -105,7 +105,7 @@ endif
 # LINKLIBS += -Wl,-)
 LINKLIBS += -Wl,--end-group
 
-LINKLIBS += -luser32 -lwinspool -lgdi32 -lcomctl32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32
+LINKLIBS += -luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32
 
 
 # NOTE: The empty line directly before 'endef' HAVE TO exist!

@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.16 2004/04/07 03:10:15 andijahja Exp $
+ * $Id: mainwin.c,v 1.17 2004/05/06 23:42:02 peterrees Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ HB_EXTERN_BEGIN
 int argc = 0;
 char * argv[ MAX_ARGS ];  //23/12/2003 3:40p.m. change from 20 to 64
 
-void HB_EXPORT hb_SetWinMainParameters( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow ) ;
+void HB_EXPORT hb_SetWinMainParameters( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow );
 
 int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
                     HINSTANCE hPrevInstance,  /* handle to previous instance */
@@ -167,7 +167,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
 HB_EXTERN_END
 
-#if defined(__WATCOMC__) && !defined(__EXPORT__)
+#if ( defined(__WATCOMC__) || defined(__MINGW32__) ) && !defined(__EXPORT__)
 void HB_EXPORT hb_forceLinkMain( void ) {}
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.402 2004/06/04 03:27:50 ronpinkas Exp $
+ * $Id: hvm.c,v 1.403 2004/06/10 02:55:26 ronpinkas Exp $
  */
 
 /*
@@ -8790,7 +8790,8 @@ HB_FUNC( HB_WITHOBJECTCOUNTER )
    hb_retnl( hb_vm_wWithObjectCounter ) ;
 }
 
-#if defined(HB_OS_WIN_32) && defined(__WATCOMC__) && !defined(__EXPORT__)
+#if defined(HB_OS_WIN_32) && \
+    ( defined(__WATCOMC__) || defined(__MINGW32__) ) && !defined(__EXPORT__)
 extern void HB_EXPORT hb_forceLinkMain( void );
 void _hb_forceLinkMain()
 {

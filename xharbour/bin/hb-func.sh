@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.19 2004/05/30 20:37:17 likewolf Exp $
+# $Id: hb-func.sh,v 1.20 2004/06/15 11:56:09 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -82,7 +82,7 @@ mk_hbtools()
     HB_CRS_LIB=""
     HB_SLN_LIB=""
     if [ "${HB_COMPILER}" = "mingw32" ]; then
-        HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lgdi32 -lcomctl32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
+        HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
     elif [ "${HB_COMPILER}" = "djgpp" ]; then
         HB_SYS_LIBS="${HB_SYS_LIBS}"
     else
@@ -96,7 +96,7 @@ mk_hbtools()
 
     cat > ${hb_tool} <<EOF
 #!/bin/sh
-[ "$BASH" ] || exec bash `which \$0` \${1+"\$@"}
+[ "\$BASH" ] || exec bash `which \$0` \${1+"\$@"}
 #
 # ---------------------------------------------------------------
 # Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
@@ -110,7 +110,7 @@ if [ \$# = 0 ]; then
     echo "syntax: \$0 [<options,...>] <file>[.prg|.o]
 
 \"${hb_pref}cc\", \"${hb_pref}cmp\", \"${hb_pref}lnk\" and \"${hb_pref}mk\" parameters:
-    -o<outputfilename>      # output file name
+    -o<outputfilename>  # output file name
 \"${hb_pref}lnk\" and \"${hb_pref}mk\" parameters:
     -static             # link with static ${name} libs
     -fullstatic         # link with all static libs
@@ -286,7 +286,7 @@ do
         fi
     fi
 done
-if [ `uname` = "Darwin" ]; then
+if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
     HARBOUR_LIBS="\${HARBOUR_LIBS} \${HARBOUR_LIBS}"
 else
     HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3074 2004/06/17 07:07:28 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3075 2004/06/17 09:31:20 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-17 14:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/xprompt.sh
+    * removed unnecessary comment line from pack_src.sh file
+
+  * xharbour/bin/hb-func.sh
+    * missing \ added
+    * comdlg32 lib added for MINGW xhb* scripts - it's necessary for
+      current GTWVT
+
+  * xharbour/config/w32/mingw32.cf
+    * comdlg32 lib added for MINGW xhb* scripts - it's necessary for
+      current GTWVT
+
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/mainwin.c
+    * force reference to WinMain for MINGW
 
 2004-06-17 15:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/tbcolumn.prg
