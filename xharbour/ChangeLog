@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2542 2004/03/10 12:15:36 andijahja Exp $
+ * $Id: ChangeLog,v 1.2543 2004/03/10 13:50:22 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-11 08:15 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/achoice.prg
+    - fix "CASE nKey == K_LBUTTONDOWN" where mouse clicked out of bounds
+
 2004-03-10 21:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rdd/dbcmd.c
     * minor fix for MT compilation

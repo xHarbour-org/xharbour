@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.17 2004/02/20 00:31:23 andijahja Exp $
+ * $Id: achoice.prg,v 1.18 2004/03/01 09:36:20 paultucker Exp $
  */
 
 /*
@@ -422,16 +422,16 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
       CASE nKey == K_LBUTTONDOWN .or. (nKey == K_LDBLCLK .AND. !lUserFunc )
          nNewPos := Hittest( nTop, nLeft, nBottom, nRight )
 
-         IF nNewPos >= 0
-            nNewPos += nAtTop
-            IF Eval( bSelect, alSelect[ nNewPos ] )
-               nPos := nNewPos
-            ENDIF
-         ENDIF
+         IF nNewPos >= 0 .AND. (nNewPos+nAtTop) <= LEN(alSelect)
+              nNewPos += nAtTop
+              IF Eval( bSelect, alSelect[ nNewPos ] )
+                 nPos := nNewPos
+              ENDIF
 
-         IF nKey == K_LDBLCLK
-            nMode     := AC_SELECT
-            lFinished := .T.
+           IF nKey == K_LDBLCLK
+              nMode     := AC_SELECT
+              lFinished := .T.
+           ENDIF
          ENDIF
 
       CASE nKey == K_RIGHT .AND. !lUserFunc
