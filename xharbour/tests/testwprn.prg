@@ -10,8 +10,7 @@ local aPrinter
   IF EMPTY(aPrinter)
    ? '----- No Printers installed'
   ELSE
-    set(24, "WIN:"+GetDefaultPrinter())
-    set device to printer
+    set printer to (GetDefaultPrinter())
     ? SET(_SET_DEVICE)
     set console off
     set printer on
