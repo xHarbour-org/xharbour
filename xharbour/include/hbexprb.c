@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.51 2003/03/28 05:52:05 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.52 2003/05/09 04:21:19 ronpinkas Exp $
  */
 
 /*
@@ -1942,6 +1942,17 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   hb_compWarnMeaningless( pSelf );
                   break;
                }
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "__CLSSETMODULE" ) == 0  )
+               {
+                  // Only 1 Paramater allowed!
+                  if( pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext == NULL )
+                  {
+                     HB_EXPR_USE( pSelf->value.asFunCall.pParms->value.asList.pExprList, HB_EA_PUSH_PCODE );
+                     HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_CLASSSETMODULE );
+
+                     break;
+                  }
+               }
             }
 
          #endif
@@ -1996,6 +2007,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
          }
          break;
    }
+
    return pSelf;
 }
 

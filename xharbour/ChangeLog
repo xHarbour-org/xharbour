@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1074 2003/05/27 20:41:28 paultucker Exp $
+ * $Id: ChangeLog,v 1.1075 2003/05/28 03:06:29 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,55 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+ 2003-05-27 20:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  + include/hbvmprv.h
+    + New header for definitions NOT shared with the Compiler.
+  * source/vm/hvm.c
+    - Removed definition for SYMBOLS and replace with #include "hbvmprv.h"
+  * source/vm/runner.c
+    - Removed duplicate definition for SYMBOLS and replace with #include "hbvmprv.h"
+
+  * include/classes.h
+    + Added Member PHB_SYMB pModuleSymbols to CLASS Structure.
+
+  * include/hbexprb.c
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+    + Added support for new Pseudo Function __ClsSetModule() as new PCODE HB_P_CLASSSETMODULE
+
+  * include/hbclass.ch
+    ! Optimized Instantiation.
+    + Added support for new __ClsSetModule()
+
+  * source/vm/classes.c
+    + Added logic to utilize new pModuleSymbols Member of CLASS Structure to accept SAME MODULE access to ANY SCOPE.
+
+  * tests/tstscope.prg
+  + tests/scope1.prg
+  + tests/scope2.prg
+    * Modified to show Scoping Validation of MULTI-MODULE inter-crossed with INHERITANCE.
+    /* Use:
+         bld_b32 tstscope scope1 scope2
+         bld_vc  tstscope scope1 scope2
+    */
+
+  * bin/bld.bat
+    * Modified to allow 3 sources to be compiled and linked.
+
+ /*
+    NOTE: Finally we should have FULL SUPPORT for OOP Scoping as per standards established by current
+          Leading Tools.
+
+          As you may know, we never had support for a Module [Unit of compilation] scoping. This was
+          a serious omission, and was a BIG hurdle in correctly addressing SCOPE problems with WHOO
+          [and likely many other projects]. Well now xHarbour fully support compilation unit scoping
+          so that when you have multiple classes that need access to PROTECTED Members of each other
+          you may now place those classes in the SAME Module, and avoid the SCOPE issues that you'd
+          otherwise encounter [unless you'd dismissed the required restricted SCOPEing. altogether.]
+ */
 2003-05-27 17:12 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makallvc.bat
     * ignore first errorlevel (for now)
@@ -24,7 +73,7 @@
     * numerous corrections
   * include/hbapicdp.h
     * restore previous.
-  
+
 2003-05-27 16:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/hbchecksum.c
     * cast at 127

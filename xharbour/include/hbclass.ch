@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.7 2003/05/16 04:10:27 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.8 2003/05/16 18:40:59 ronpinkas Exp $
  */
 
 /*
@@ -226,7 +226,7 @@ DECLARE HBClass ;
    _HB_CLASS <ClassName> ;;
    <static> function <ClassName>(...) ;;
       static s_oClass ;;
-      local oThisClass ;;
+      local oClassInstance ;;
       local nScope ;;
       nScope := HB_OO_CLSTP_EXPORTED ;;
       if s_oClass == NIL ;;
@@ -250,7 +250,7 @@ DECLARE HBClass ;
    _HB_CLASS <ClassName> ;;
    <static> function <ClassName>(...) ;;
       static s_oClass  ;;
-      local oThisClass ;;
+      local oClassInstance ;;
       local nScope ;;
       nScope := HB_OO_CLSTP_EXPORTED ;;
       if s_oClass == NIL ;;
@@ -695,23 +695,25 @@ s_oClass:AddInline( <(op)>, {|Self, <cArg> | <Code> }, HBCLSCHOICE( .F., <.expor
 #xcommand ENDCLASS => ;;
                        s_oClass:Create(MetaClass) ;;
                        MetaClass:InitClass() ;;
+                       __ClsSetModule( s_oClass:hClass ) ;;
                       endif ;;
-                      oThisClass := s_oClass:Instance();;
+                      oClassInstance := __clsInst( s_oClass:hClass );;
                       IF PCount() > 0 ;;
-                         s_oClass:ConstructorCall( oThisClass, hb_aparams() ) ;;
+                         s_oClass:ConstructorCall( oClassInstance, hb_aparams() ) ;;
                       ENDIF ;;
-                      return oThisClass AS CLASS _CLASS_NAME_ ;;
+                      return oClassInstance AS CLASS _CLASS_NAME_ ;;
                       #undef  _CLASS_MODE_ ;;
                       #define _CLASS_MODE_ _CLASS_IMPLEMENTATION_
 #else
 #xcommand ENDCLASS => ;;
-                      s_oClass:Create() ;;
+                       s_oClass:Create() ;;
+                       __ClsSetModule( s_oClass:hClass ) ;;
                       endif ;;
-                      oThisClass := s_oClass:Instance();;
+                      oClassInstance := __clsInst( s_oClass:hClass );;
                       IF PCount() > 0 ;;
-                         s_oClass:ConstructorCall( oThisClass, hb_aparams() ) ;;
+                         s_oClass:ConstructorCall( oClassInstance, hb_aparams() ) ;;
                       ENDIF ;;
-                      return oThisClass AS CLASS _CLASS_NAME_ ;;
+                      return oClassInstance AS CLASS _CLASS_NAME_ ;;
                       #undef  _CLASS_MODE_ ;;
                       #define _CLASS_MODE_ _CLASS_IMPLEMENTATION_
 #endif

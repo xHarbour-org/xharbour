@@ -1,140 +1,133 @@
+/*
+   This file is to be used with secondary linked module scopetst.prg.
+ */
+
 #include "hbclass.ch"
 #include "classex.ch"
-
-static oChild
 
 PROCEDURE Main()
 
    LOCAL oErr, oStranger := TStranger()
-   LOCAL oParent := TParent()
+   LOCAL oParent := TParent(), oChild := TChild():Create(), oCloseChild := TCloseChild():Create()
 
-   oChild := TChild():Create()
+   TRY
+      // Should be Ok.
+      oParent:ChangeReadOnly( 7 )
+   CATCH oErr
+      ? "OOPS No Violation!", oErr:Description, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   END
 
-   oParent:ChangeReadOnly( 7 )
-   ? Eval( oParent:ExposePrivateOfParent )
+   TRY
+      // Should be Ok.
+      ? "Ok from Expose Method:", Eval( oParent:ExposePrivateOfParent )
+   CATCH oErr
+      ? "OOPS No Violation!", oErr:Description, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   END
 
-   oChild:PublicOfChild := "Public is Ok."
+   TRY
+      // Should be Ok.
+      oChild:PublicOfChild := "Public is Ok."
+   CATCH oErr
+      ? "OOPS No Violation!", oErr:Description, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   END
 
    TRY
       ? oChild:PrivateOfParent
-      ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
+      ? "OOPS PrivateOfParent", ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
    CATCH oErr
-      ? "Caught:", oErr:Description, oErr:operation, '[' + Str( ProcLine(), 3 ) + ']'
+      ? "Caught:", oErr:Description, oErr:Operation, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
    END
 
    TRY
       ? oChild:ProtectedOfParent
-      ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
+      ? "OOPS", ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
    CATCH oErr
-      ? "Caught:", oErr:Description, oErr:Operation, '[' + Str( ProcLine(), 3 ) + ']'
+      ? "Caught:", oErr:Description, oErr:Operation, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
    END
 
    TRY
       oChild:ProtectedReadOnlyOfParent := "Can NOT assign a READONLY or PROTECTED outside of [DERIVED] Class!"
-      ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
+      ? "OOPS", ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
    CATCH oErr
-      ? "Caught:", oErr:Description, oErr:Operation, '[' + Str( ProcLine(), 3 ) + ']'
+      ? "Caught:", oErr:Description, oErr:Operation, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
    END
 
    TRY
       TestByRef( @oChild:ReadOnlyOfParent )
-      ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
+      ? "OOPS", ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
    CATCH oErr
-      ? "Caught:", oErr:Description, oErr:Operation, '[' + Str( ProcLine(), 3 ) + ']'
+      ? "Caught:", oErr:Description, oErr:Operation, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
    END
 
-   oStranger:TestScope()
+   TRY
+      ? oCloseChild:PrivateOfParent
+      ? "OOPS", ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   CATCH oErr
+      ? "Caught:", oErr:Description, oErr:Operation, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   END
 
-   ?
-   ? oChild:ReadOnlyOfParent
+   TRY
+      ? oCloseChild:ProtectedOfParent
+      ? "OOPS", ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   CATCH oErr
+      ? "Caught:", oErr:Description, oErr:Operation, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   END
+
+   TRY
+      oCloseChild:ProtectedReadOnlyOfParent := "Can NOT assign a READONLY or PROTECTED outside of [DERIVED] Class!"
+      ? "OOPS", ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   CATCH oErr
+      ? "Caught:", oErr:Description, oErr:Operation, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   END
+
+   TRY
+      TestByRef( @oCloseChild:ReadOnlyOfParent )
+      ? "OOPS", ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   CATCH oErr
+      ? "Caught:", oErr:Description, oErr:Operation, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   END
+
+   oStranger:TestScope( oChild )
+
+   TRY
+      // Should be Ok.
+      ? "OK to read:", oChild:ReadOnlyOfParent
+   CATCH oErr
+      ? "OOPS No Violation!", oErr:Description, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   END
 
    oChild:Property := "Can assign into a property."
 
    TRY
       ? oChild:FProperty
-      ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
+      ? "OOPS", ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
    CATCH oErr
-      ? "Caught:", oErr:Description, oErr:Operation, '[' + Str( ProcLine(), 3 ) + ']'
+      ? "Caught:", oErr:Description, oErr:Operation, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
    END
 
 RETURN
-
-CLASS TParent
-
-   PROPERTY Property READ FProperty WRITE FProperty
-
-   DATA ReadOnlyOfParent READONLY
-
-   PROTECTED:
-      DATA ProtectedOfParent
-      DATA ProtectedReadOnlyOfParent READONLY
-
-   PRIVATE:
-      DATA PrivateOfParent
-
-   PUBLIC:
-   METHOD ChangeReadOnly(x) INLINE ::ReadOnlyOfParent := x
-
-   DATA ExposePrivateOfParent INIT {|| HB_QSelf():PrivateOfParent }
-
-ENDCLASS
-
-CLASS TChild FROM TParent
-
-   DATA ProtectedOfChild PROTECTED
-
-   DATA PublicOfChild
-
-   METHOD Create() CONSTRUCTOR
-
-ENDCLASS
-
-METHOD Create() CLASS TChild
-
-   LOCAL oErr
-
-   ::ProtectedOfParent := "Can assign PROTECTED of Parent in a DERIVED Class - Can read anywhere."
-   ::ReadOnlyOfParent := "Can assign READONLY of Parent in a DERIVED Class if NOT PROTECTED - Can read anywhere."
-   ::FProperty := "Can assign property from derived class, otherwise hidden."
-
-   TRY
-      ? ::PrivateOfParent
-      ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
-   CATCH oErr
-      ? "Caught:", oErr:Description, oErr:Operation, '[' + Str( ProcLine(), 3 ) + ']'
-   END
-
-   TRY
-      ::ProtectedReadOnlyOfParent := "Can NOT assign PROTECTED READONLY of Parent in Derived Class!"
-      ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
-   CATCH oErr
-      ? "Caught:", oErr:Description, oErr:Operation, '[' + Str( ProcLine(), 3 ) + ']'
-   END
-
-RETURN Self
-
-CLASS TStranger
-
-   METHOD TestScope()
-
-ENDCLASS
-
-METHOD TestScope()
-
-   LOCAL oErr
-
-   TRY
-      ? oChild:ProtectedOfChild
-      ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
-   CATCH oErr
-      ? "Caught:", oErr:Description, oErr:Operation, '[' + Str( ProcLine(), 3 ) + ']'
-   END
-
-RETURN NIL
 
 PROCEDURE TestByRef( xByRef )
 
-   ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
    xByRef := "New Value"
 
 RETURN
+
+CLASS TStranger
+
+   METHOD TestScope( oObject )
+
+ENDCLASS
+
+METHOD TestScope( oObject ) CLASS TStranger
+
+   LOCAL oErr
+
+   TRY
+      ? oObject:ProtectedOfChild
+      ? "OOPS", ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   CATCH oErr
+      ? "Caught:", oErr:Description, oErr:Operation, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
+   END
+
+RETURN NIL

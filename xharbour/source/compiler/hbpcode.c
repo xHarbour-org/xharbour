@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.18 2003/03/14 00:32:41 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.19 2003/03/27 07:44:56 ronpinkas Exp $
  */
 
 /*
@@ -194,7 +194,8 @@ static BYTE s_pcode_len[] = {
    1,        /* HB_P_LIKE,                 */
    1,        /* HB_P_MATCH                 */
    1,        /* HB_P_PUSHMACROREF          */
-   1         /* HB_P_IVARREF */
+   1,        /* HB_P_IVARREF               */
+   1         /* HB_P_CLASSSETMODULE        */
 };
 
 static PVAR hb_compPrivateFind( char * szPrivateName )

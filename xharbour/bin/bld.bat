@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.19 2003/04/05 20:00:51 ronpinkas Exp $
+rem $Id: bld.bat,v 1.20 2003/05/27 03:46:30 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -113,6 +113,9 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    IF NOT '%2'=='' %HB_BIN_INSTALL%\harbour %2.prg -n -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
    IF NOT '%2'=='' SET HB_2nd_prg=%2.c
    IF '%2'=='' SET HB_2nd_prg=
+   IF NOT '%3'=='' %HB_BIN_INSTALL%\harbour %3.prg -n -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
+   IF NOT '%3'=='' SET HB_3rd_prg=%3.c
+   IF '%3'=='' SET HB_3rd_prg=
 
 :A_DOS
 
@@ -177,8 +180,8 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
 
-   if "%HB_COMPILER%" == "bcc32"   if exist ..\lib\bcc640.lib bcc32 -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% bcc640.lib common.lib  debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib
-   if "%HB_COMPILER%" == "bcc32"   if not exist ..\lib\bcc640.lib bcc32 -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% common.lib  debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib
+   if "%HB_COMPILER%" == "bcc32"   if exist ..\lib\bcc640.lib bcc32 -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% bcc640.lib common.lib  debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib
+   if "%HB_COMPILER%" == "bcc32"   if not exist ..\lib\bcc640.lib bcc32 -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% common.lib  debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib
    if "%HB_COMPILER%" == "gcc"     gcc %1.c -o%1.exe %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon
    if "%HB_COMPILER%" == "mingw32" gcc %1.c -o%1.exe %CFLAGS% -mno-cygwin -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd%HB_MT% -lrtl%HB_MT% -lvm%HB_MT% -lmacro -lpp%HB_MT% -ldbfntx%HB_MT% -ldbfcdx%HB_MT% -lcommon -luser32 -lwinspool -lole32 -loleaut32 -luuid
    if "%HB_COMPILER%" == "rsxnt"   gcc %1.c -Zwin32 %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon
@@ -188,8 +191,8 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    if "%HB_MT%"=="" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    if not "%HB_MT%"=="" set LDFLAGS=/NODEFAULTLIB:LIBC
 
-   echo cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% /link /subsystem:CONSOLE /FORCE:MULTIPLE %LDFLAGS% %HB_LIB_INSTALL%\debug.lib %HB_LIB_INSTALL%\vm%HB_MT%.lib %HB_LIB_INSTALL%\rtl%HB_MT%.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\lang.lib %HB_LIB_INSTALL%\rdd%HB_MT%.lib %HB_LIB_INSTALL%\macro%HB_MT%.lib %HB_LIB_INSTALL%\pp%HB_MT%.lib %HB_LIB_INSTALL%\dbfntx%HB_MT%.lib %HB_LIB_INSTALL%\dbfcdx%HB_MT%.lib %HB_LIB_INSTALL%\common.lib shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib >msvc.log
-   cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% /link /subsystem:CONSOLE /FORCE:MULTIPLE %LDFLAGS% %HB_LIB_INSTALL%\debug.lib %HB_LIB_INSTALL%\vm%HB_MT%.lib %HB_LIB_INSTALL%\rtl%HB_MT%.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\lang.lib %HB_LIB_INSTALL%\rdd%HB_MT%.lib %HB_LIB_INSTALL%\macro%HB_MT%.lib %HB_LIB_INSTALL%\pp%HB_MT%.lib %HB_LIB_INSTALL%\dbfntx%HB_MT%.lib %HB_LIB_INSTALL%\dbfcdx%HB_MT%.lib %HB_LIB_INSTALL%\common.lib shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib >> msvc.log
+   echo cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link /subsystem:CONSOLE /FORCE:MULTIPLE %LDFLAGS% %HB_LIB_INSTALL%\debug.lib %HB_LIB_INSTALL%\vm%HB_MT%.lib %HB_LIB_INSTALL%\rtl%HB_MT%.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\lang.lib %HB_LIB_INSTALL%\rdd%HB_MT%.lib %HB_LIB_INSTALL%\macro%HB_MT%.lib %HB_LIB_INSTALL%\pp%HB_MT%.lib %HB_LIB_INSTALL%\dbfntx%HB_MT%.lib %HB_LIB_INSTALL%\dbfcdx%HB_MT%.lib %HB_LIB_INSTALL%\common.lib shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib >msvc.log
+   cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link /subsystem:CONSOLE /FORCE:MULTIPLE %LDFLAGS% %HB_LIB_INSTALL%\debug.lib %HB_LIB_INSTALL%\vm%HB_MT%.lib %HB_LIB_INSTALL%\rtl%HB_MT%.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\lang.lib %HB_LIB_INSTALL%\rdd%HB_MT%.lib %HB_LIB_INSTALL%\macro%HB_MT%.lib %HB_LIB_INSTALL%\pp%HB_MT%.lib %HB_LIB_INSTALL%\dbfntx%HB_MT%.lib %HB_LIB_INSTALL%\dbfcdx%HB_MT%.lib %HB_LIB_INSTALL%\common.lib shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib >> msvc.log
    @type msvc.log
    @echo Ignore LNK4033 warning
    set LDFLAGS=

@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.10 2003/05/09 02:53:00 ronpinkas Exp $
+ * $Id: runner.c,v 1.11 2003/05/24 00:29:10 ronpinkas Exp $
  */
 
 /*
@@ -67,16 +67,7 @@
 #include "hbapifs.h"
 #include "hbvm.h"
 #include "hbpcode.h"
-
-// *** WARNING *** copy of this also in hvm.c !!!
-typedef struct _SYMBOLS
-{
-   PHB_SYMB pModuleSymbols;  /* pointer to a one module own symbol table */
-   USHORT   uiModuleSymbols; /* number of symbols on that table */
-   struct _SYMBOLS * pNext;  /* pointer to the next SYMBOLS structure */
-   HB_SYMBOLSCOPE hScope;    /* scope collected from all symbols in module used to speed initialization code */
-   char * szModuleName;
-} SYMBOLS, * PSYMBOLS;       /* structure to keep track of all modules symbol tables */
+#include "hbvmprv.h"
 
 extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.0 2003/03/14 22:23:29 ronpinkas Exp $
+ * $Id: classes.h,v 1.1 2003/03/27 07:44:55 ronpinkas Exp $
  */
 
 /*
@@ -85,6 +85,7 @@ typedef struct
    PHB_ITEM pClassDatas;    /* Harbour Array for ClassDatas and shared */
    PHB_ITEM pInlines;       /* Array for inline codeblocks */
    PHB_FUNC pFunError;      /* error handler for not defined messages */
+   PHB_SYMB pModuleSymbols;
 } CLASS, * PCLASS;
 
 #if defined(HB_EXTERN_C)

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.203 2003/05/26 05:58:55 paultucker Exp $
+ * $Id: hvm.c,v 1.204 2003/05/26 14:49:06 ronpinkas Exp $
  */
 
 /*
@@ -95,26 +95,14 @@
 #include "hbinkey.ch"
 #include "inkey.ch"
 #include "classes.h"
+#include "hbvmprv.h"
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
 #endif
 
-
-
 /* DEBUG only*/
 /*#include <windows.h>*/
-
-// Here because of hbvm.h can't be used to to conflict with symbold in hbcomp.h BOTH are #included from expression optimizer :-(
-// *** WARNING *** copy of this also in runner.c !!!
-typedef struct _SYMBOLS
-{
-   PHB_SYMB pModuleSymbols;  /* pointer to a one module own symbol table */
-   USHORT   uiModuleSymbols; /* number of symbols on that table */
-   struct _SYMBOLS * pNext;  /* pointer to the next SYMBOLS structure */
-   HB_SYMBOLSCOPE hScope;    /* scope collected from all symbols in module used to speed initialization code */
-   char * szModuleName;
-} SYMBOLS, * PSYMBOLS;       /* structure to keep track of all modules symbol tables */
 
 extern HB_FUNC( SYSINIT );
 
@@ -222,14 +210,12 @@ extern HARBOUR  hb___msgSetShrData( void );
 extern HARBOUR  hb___msgGetData( void );
 extern HARBOUR  hb___msgSetData( void );
 extern PCLASS   hb_clsClassesArray( void );
+extern void hb_clsSetModule( USHORT uiClass );
 
 BOOL hb_bProfiler = FALSE; /* profiler status is off */
 BOOL hb_bTracePrgCalls = FALSE; /* prg tracing is off */
 ULONG hb_ulOpcodesCalls[ HB_P_LAST_PCODE ]; /* array to profile opcodes calls */
 ULONG hb_ulOpcodesTime[ HB_P_LAST_PCODE ]; /* array to profile opcodes consumed time */
-
-PSYMBOLS hb_vmFindModule( PHB_SYMB pModuleSymbols );
-PSYMBOLS hb_vmFindModuleByName( char *szModuleName );
 
 /* virtual machine state */
 
@@ -1238,6 +1224,25 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                hb_itemForwardValue( *( HB_VM_STACK.pPos - 1 ), &(HB_VM_STACK.Return) );
             }
 
+            break;
+         }
+
+         case HB_P_CLASSSETMODULE:
+         {
+            PHB_ITEM pClassHandle = hb_stackItemFromTop( -1 );
+            USHORT uiClass;
+
+            if( HB_IS_INTEGER( pClassHandle ) )
+            {
+               hb_clsSetModule( (USHORT) ( pClassHandle->item.asInteger.value ) );
+            }
+            else
+            {
+               hb_errRT_BASE( EG_ARG, 1081, NULL, "__ClsSetModule()", 1, pClassHandle );
+            }
+
+            hb_stackPop(); //pClassHandle.
+            w++;
             break;
          }
 
