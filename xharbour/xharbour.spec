@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.42 2003/11/24 20:08:03 lculik Exp $
+# $Id: xharbour.spec,v 1.43 2003/11/30 10:02:39 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -620,6 +620,11 @@ export HB_LEX="SIMPLEX"
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 EOF
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/harb.sh
+fi
+
+if [ ! "%{?_with_odbc:1}" ] && \
+   [ -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libhbodbc.a ]; then
+    rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libhbodbc.a
 fi
 
 # Create PP
