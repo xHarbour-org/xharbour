@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3279 2004/08/05 12:30:35 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3280 2004/08/05 15:20:16 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-05 12:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/tip/encoding/base64.c
+  * source/tip/encoding/base64.h
+  * source/tip/encoding/uuencode.c
+  * source/tip/encoding/uuencode.h
+    * formatting - What are these used for?
+  * source/tip/base64x.c
+    * formatting
+  * makallvc.bat
+  * makallbc.bat
+    - contrib/tip
+    - contrib/hwgui
+  * makefile.bc
+  * makefile.nt
+  * makefile.vc
+  * makefile.wc
+  * hrbdll.bc
+  * hrbdll.vc
+  * hrbdll.wc
+    + source/tip
+  * source/compiler/harbour.c
+    * hb_comp_szPrefix size s/b 21.  (Why doesn't msvc catch this??)
 
 2004-08-05 08:18 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * source/rtl/tget.prg
