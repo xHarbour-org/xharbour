@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1667 2003/11/07 18:04:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1668 2003/11/07 18:20:52 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-03 22:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtapi.c
+    ! Ops, a mispelled variable was making DevOutAt() to fail on gtwin. Reported
+      by Andy.
+ 
 2003-11-07 10:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/estack.c
     * Minor optimization.
 
-2003-11-03 07:10 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+2003-11-07 18:20 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/itemapi.c
   * source/rtl/cstr.prg
     ! Codeblock was no longer correctly translated into string.
@@ -45,7 +50,7 @@
     * Retouches in hb_objGetPropValue()
 
 
-2003-11-03 07:10 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+2003-11-07 11:25 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbapi.h
   * source/vm/estack.c
     * Added hb_stackReturn() that returns a pointer to HB_VM_STACK.Return.

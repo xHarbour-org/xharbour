@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.11 2003/10/07 22:25:46 paultucker Exp $
+ * $Id: gtapi.c,v 1.12 2003/11/07 18:20:53 jonnymind Exp $
  */
 
 /*
@@ -914,7 +914,7 @@ USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr, ULONG ul
    HB_TRACE(HB_TR_DEBUG, ("hb_gtWriteAt(%hu, %hu, %p, %lu)", uiRow, uiCol, pStr, ulLength));
 
    /* Display the text if the cursor is on screen */
-   if( s_Width <= 0 ||  ( s_iCol < s_Width && uiRow < s_Height ) )
+   if( s_Width <= 0 ||  ( uiCol < s_Width && uiRow < s_Height ) )
    {
       /* Truncate the text if the cursor will end up off the right edge */
       hb_gt_Puts( uiRow, uiCol, ( BYTE ) s_pColor[ s_uiColorIndex ], pStr,
