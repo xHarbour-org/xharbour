@@ -185,7 +185,7 @@ HB_FUNC ( INTERNETWRITEFILE )
    HINTERNET hFile                    = ( HINTERNET ) hb_parnl( 1 ) ;
    LPCVOID   lpBuffer                 = hb_parc( 2 ) ;
    DWORD     dwNumberOfBytesToWrite   = ( DWORD ) hb_parnl( 3 ) ;
-   LPDWORD   lpdwNumberOfBytesWritten = ( DWORD ) 0 ;
+   LPDWORD   lpdwNumberOfBytesWritten = ( LPDWORD ) 0 ;
    
    hb_retl( InternetWriteFile( hFile, lpBuffer, dwNumberOfBytesToWrite, 
                                                 lpdwNumberOfBytesWritten ) ) ;
@@ -213,7 +213,7 @@ HB_FUNC ( INTERNETREADFILE )
    HINTERNET hFile                    = ( HINTERNET ) hb_parnl( 1 ) ;
    LPCVOID   lpBuffer                 = hb_parc( 2 ) ;
    DWORD     dwNumberOfBytesToRead    = ( DWORD ) hb_parnl( 3 ) ;
-   LPDWORD   lpdwNumberOfBytesRead    = ( DWORD ) 0  ;
+   LPDWORD   lpdwNumberOfBytesRead    = ( LPDWORD ) 0  ;
    BOOL      bRet ;
    
    bRet = InternetReadFile( hFile, &lpBuffer, 
@@ -540,7 +540,7 @@ HB_FUNC ( FTPRENAMEFILE )
 HB_FUNC ( FTPGETCURRENTDIRECTORY )
 {
    HINTERNET hInternet           = ( HINTERNET ) hb_parnl( 1 ) ;
-   LPTSTR   lpszCurrentDirectory = hb_xgrab( MAX_PATH ) ; 
+   LPTSTR   lpszCurrentDirectory = ( LPTSTR ) hb_xgrab( MAX_PATH ) ; 
    DWORD    dwCurrentDirectory   = MAX_PATH     ;
    BOOL     bRet ;
    

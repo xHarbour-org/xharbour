@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.39 2002/11/03 15:17:44 paultucker Exp $
+ * $Id: ChangeLog,v 1.40 2002/11/03 17:05:21 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-04 10:38 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+   * makefile.nt
+   * makefile.vc
+    * correct ordering of modules.  .c first, then .prg
+   * contrib/what32/_wininet.c
+    * added casts for msvc
+   * contrib/what32/_WinTree.c
+    * DUMMYUNIONNAME... etc doesn't seem to be working work for msvc
 
 2002-11-03 10:12 UTC -0500 Paul Tucker <ptucker@sympatico.ca>
    * env/bccwin32.mak

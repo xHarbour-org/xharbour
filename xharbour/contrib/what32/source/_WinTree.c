@@ -12,11 +12,11 @@ HB_FUNC( TVINSERTITEM )
    is.hParent      = ( HTREEITEM ) hb_parnl( 3 );
    is.hInsertAfter = TVI_LAST;
 
-   #if (_WIN32_IE >= 0x0400)
-      is.item.pszText = hb_parc( 2 );
-      is.item.mask    = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-      is.item.iImage  = hb_parnl( 4 );
-      is.item.iSelectedImage = hb_parnl( 4 );
+   #if (_WIN32_IE >= 0x0400) && !defined(_MSC_VER)
+      is.DUMMYUNIONNAME.item.pszText = hb_parc( 2 );
+      is.DUMMYUNIONNAME.item.mask    = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+      is.DUMMYUNIONNAME.item.iImage  = hb_parnl( 4 );
+      is.DUMMYUNIONNAME.item.iSelectedImage = hb_parnl( 4 );
    #else
       is.item.pszText = hb_parc( 2 );
       is.item.mask    = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
@@ -71,4 +71,3 @@ HB_FUNC( TVGETSELECTED ) // ( hWnd ) --> hItem
 }
 
 //-------------------------------------------------------------------------//
-

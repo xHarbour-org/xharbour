@@ -25,24 +25,18 @@ hbc      =$(HBR_DIR)\BIN\harbour
 hbcflags =-n -w -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include
 
 #-- C COMPILER ----------
-CC=cl
-CFLAGS=-TP -Fpvc -W3 -G6 -Ox -GA -c -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include
+CC       =cl
+CFLAGS   =-TP -W3 -Ox -GA -nologo -c -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include
 
 #-- RESOURCE COMPILER ---
 rc       =rc
 rcflags  =-r
 
-.SUFFIXES: .prg .c
+.SUFFIXES: .prg .lib .c .obj .asm
 
 .c.obj:
  $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
 
-#.prg.obj:
-# $(hbc) $(hbcflags) -o$(OBJ_DIR)\ $<
-# $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
-
-#.prg.c:
-# $(hbc) $(hbcflags) -o$(OBJ_DIR)\ $<
 
 WHAT32LIB= $(LIBDIR)\what32.lib
 
@@ -51,7 +45,7 @@ LIBLIST  = $(WHAT32LIB)
 # library
 #
 
-{$(OBJ_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(OBJ_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(SRCDIR)}.c{$(OBJ_DIR)}.obj::
@@ -62,17 +56,6 @@ LIBLIST  = $(WHAT32LIB)
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(WHAT32LIB)2
 
 WHAT32OBJ = \
-    $(OBJ_DIR)\Debug.obj \
-    $(OBJ_DIR)\ErrorSys.obj \
-    $(OBJ_DIR)\WhatUtil.obj \
-    $(OBJ_DIR)\WinCDlg.obj \
-    $(OBJ_DIR)\WinComm.obj \
-    $(OBJ_DIR)\WinCore.obj \
-    $(OBJ_DIR)\WinIni.obj \
-    $(OBJ_DIR)\WinRBar.obj \
-    $(OBJ_DIR)\WinTBar.obj \
-    $(OBJ_DIR)\WinTabs.obj \
-    \
     $(OBJ_DIR)\_winbmp.obj \
     $(OBJ_DIR)\_winbrsh.obj \
     $(OBJ_DIR)\_wincall.obj \
@@ -117,13 +100,23 @@ WHAT32OBJ = \
     $(OBJ_DIR)\_wintext.obj \
     $(OBJ_DIR)\_winTree.obj \
     $(OBJ_DIR)\_winview.obj \
-    $(OBJ_DIR)\_winwnd.obj
+    $(OBJ_DIR)\_winwnd.obj \
+    \
+    $(OBJ_DIR)\Debug.obj \
+    $(OBJ_DIR)\ErrorSys.obj \
+    $(OBJ_DIR)\WhatUtil.obj \
+    $(OBJ_DIR)\WinCDlg.obj \
+    $(OBJ_DIR)\WinComm.obj \
+    $(OBJ_DIR)\WinCore.obj \
+    $(OBJ_DIR)\WinIni.obj \
+    $(OBJ_DIR)\WinRBar.obj \
+    $(OBJ_DIR)\WinTBar.obj \
+    $(OBJ_DIR)\WinTabs.obj
 
 
 !if ( "$(MK_FLAGS)"=="A" )
 
 all: zot \
-   $(WHAT32OBJ) \
    $(WHAT32LIB)
 
 MK_FLAGS = $(MK_FLAGS:A=)
@@ -136,7 +129,6 @@ zot:
 !else
 
 all: \
-   $(WHAT32OBJ) \
    $(WHAT32LIB)
 
 !endif
@@ -144,4 +136,4 @@ all: \
 $(WHAT32LIB) : $(WHAT32OBJ)
    lib /out:$@ $**
 
-$(WHAT32LIB)2  : $(WHAT32LIB)
+$(WHAT32LIB)2  : $(WHAT32OBJ)
