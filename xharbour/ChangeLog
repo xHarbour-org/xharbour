@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3638 2004/11/29 22:08:43 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3639 2004/11/30 04:54:47 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-30 14:45 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tbrowse.prg
+    ! ::colPos must not set ::lConfigured to .F. if the column where I want to
+    go is a frozen one (in other words it was not taking into account frozen
+    columns)
 
 2004-11-29 23:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.nt

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.97 2004/11/24 10:34:29 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.98 2004/11/25 15:31:54 mauriliolongo Exp $
  */
 
 /*
@@ -164,7 +164,7 @@ CLASS TBrowse
 
    ACCESS colPos              INLINE ::nColPos
    ASSIGN colPos(nColPos)     INLINE ::nColPos := iif( nColPos == nil, ::nColPos, nColPos ),;
-                                     iif(::nColPos < ::leftVisible .OR. ::nColPos > ::rightVisible, ::lConfigured := .F., NIL),;
+                                     iif( ( ::nColPos < ::leftVisible .AND. ::nColPos > ::nFrozenCols ) .OR. ::nColPos > ::rightVisible, ::lConfigured := .F., NIL),;
                                      ::nColPos
 
    ACCESS nBottom             INLINE ::nwBottom +  iif( ::cBorder == "", 0, 1 )
