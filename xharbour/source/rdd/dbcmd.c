@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.80 2004/02/24 18:20:36 jonnymind Exp $
+ * $Id: dbcmd.c,v 1.81 2004/02/25 17:51:51 walito Exp $
  */
 
 /*
@@ -1542,8 +1542,11 @@ HB_FUNC( DBCREATE )
    {
       s_DefaultExtension.type = HB_IT_NIL;
       SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, &s_DefaultExtension );
-      strncat( szFileName, s_DefaultExtension.item.asString.value, _POSIX_PATH_MAX - strlen( szFileName ) );
-      hb_itemClear( &s_DefaultExtension );
+      if( s_DefaultExtension.item.asString.value )
+      {
+         strncat( szFileName, s_DefaultExtension.item.asString.value, _POSIX_PATH_MAX - strlen( szFileName ) );
+         hb_itemClear( &s_DefaultExtension );
+      }
    }
 
    hb_xfree( pFileName );
@@ -2457,8 +2460,11 @@ HB_FUNC( DBUSEAREA )
    {
       s_DefaultExtension.type = HB_IT_NIL;
       SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, &s_DefaultExtension );
-      strncat( szFileName, s_DefaultExtension.item.asString.value, _POSIX_PATH_MAX - strlen( szFileName ) );
-      hb_itemClear( &s_DefaultExtension );
+      if( s_DefaultExtension.item.asString.value )
+      {
+         strncat( szFileName, s_DefaultExtension.item.asString.value, _POSIX_PATH_MAX - strlen( szFileName ) );
+         hb_itemClear( &s_DefaultExtension );
+      }
    }
 
    hb_xfree( pFileName );
@@ -4337,14 +4343,15 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
 
   if( ! pFileName->szExtension )
   {
-      s_DefaultExtension.type = HB_IT_NIL;
-      SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, &s_DefaultExtension );
-      szFileWithExt = (char *) hb_xgrab( strlen( szFileName ) +
-            s_DefaultExtension.item.asString.length + 1 );
-      sprintf( szFileWithExt, "%s%s", szFileName,
-         s_DefaultExtension.item.asString.value );
-      szFileName = szFileWithExt;
-      hb_itemClear( &s_DefaultExtension );
+     s_DefaultExtension.type = HB_IT_NIL;
+     SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, &s_DefaultExtension );
+     if( s_DefaultExtension.item.asString.value )
+     {
+        szFileWithExt = (char *) hb_xgrab( strlen( szFileName ) + s_DefaultExtension.item.asString.length + 1 );
+        sprintf( szFileWithExt, "%s%s", szFileName, s_DefaultExtension.item.asString.value );
+        szFileName = szFileWithExt;
+        hb_itemClear( &s_DefaultExtension );
+     }
   }
 
   hb_xfree( pFileName );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2405 2004/02/25 16:07:48 lculik Exp $
+ * $Id: ChangeLog,v 1.2406 2004/02/25 17:59:59 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-02-25 18:45 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/rdd/dbcmd.c
+    ! Fixed recently introduced GPF when RDD has no default file extension
+
 2004-02-25 14:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rdd/dbcmd.c
     ! Fix behavior of DbSetFilter(), with out parameters clear filter.
       Reported by Cesar Lozada
- 
+
 2004-02-25 13:10 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   * source/vm/hvm.c
     !minor typo fix on line 5004
@@ -29,9 +33,9 @@
   * source/vm/hvm.c
   * source/vm/memvars.c
     !minor fix due my last changes
-      pItem->item.asString.puiHolders =  (USHORT*) hb_xgrab( sizeof( USHORT ) ) ; to 
+      pItem->item.asString.puiHolders =  (USHORT*) hb_xgrab( sizeof( USHORT ) ) ; to
     pitem->item.asString.puiHolders =  (ULONG*) hb_xgrab( sizeof( ULONG ) );
-   
+
 2004-02-25 21:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
 contrib/hbzlib/zip.c
   * contrib/hbzlib/zipcomp.cpp
