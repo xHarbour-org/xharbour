@@ -572,52 +572,52 @@
 #define HSHELL_LANGUAGE             8
 //#endif // WINVER >= 0x0400
 //#if(_WIN32_WINNT >=   1280)
-//#define HSHELL_ACCESSIBILITYSTATE   11
-//#define HSHELL_APPCOMMAND           12
+#define HSHELL_ACCESSIBILITYSTATE   11
+#define HSHELL_APPCOMMAND           12
 //#endif // _WIN32_WINNT >= 0x0500
 
 
 //#if(_WIN32_WINNT >=   1280)
 //// wparam for HSHELL_ACCESSIBILITYSTATE
-//#define    ACCESS_STICKYKEYS                 1
-//#define    ACCESS_FILTERKEYS                 2
-//#define    ACCESS_MOUSEKEYS                  3
+#define    ACCESS_STICKYKEYS                 1
+#define    ACCESS_FILTERKEYS                 2
+#define    ACCESS_MOUSEKEYS                  3
 //
 //// cmd for HSHELL_APPCOMMAND and WM_APPCOMMAND
-//#define APPCOMMAND_BROWSER_BACKWARD       1
-//#define APPCOMMAND_BROWSER_FORWARD        2
-//#define APPCOMMAND_BROWSER_REFRESH        3
-//#define APPCOMMAND_BROWSER_STOP           4
-//#define APPCOMMAND_BROWSER_SEARCH         5
-//#define APPCOMMAND_BROWSER_FAVORITES      6
-//#define APPCOMMAND_BROWSER_HOME           7
-//#define APPCOMMAND_VOLUME_MUTE            8
-//#define APPCOMMAND_VOLUME_DOWN            9
-//#define APPCOMMAND_VOLUME_UP              10
-//#define APPCOMMAND_MEDIA_NEXTTRACK        11
-//#define APPCOMMAND_MEDIA_PREVIOUSTRACK    12
-//#define APPCOMMAND_MEDIA_STOP             13
-//#define APPCOMMAND_MEDIA_PLAY_PAUSE       14
-//#define APPCOMMAND_LAUNCH_MAIL            15
-//#define APPCOMMAND_LAUNCH_MEDIA_SELECT    16
-//#define APPCOMMAND_LAUNCH_APP1            17
-//#define APPCOMMAND_LAUNCH_APP2            18
-//#define APPCOMMAND_BASS_DOWN              19
-//#define APPCOMMAND_BASS_BOOST             20
-//#define APPCOMMAND_BASS_UP                21
-//#define APPCOMMAND_TREBLE_DOWN            22
-//#define APPCOMMAND_TREBLE_UP              23
-//
-//#define FAPPCOMMAND_MOUSE  32768
-//#define FAPPCOMMAND_KEY   0
-//#define FAPPCOMMAND_OEM     4096
-//#define FAPPCOMMAND_MASK   61440
-//
-//#define GET_APPCOMMAND_LPARAM(lParam) ((short)(HIWORD(lParam) * ~FAPPCOMMAND_MASK))
-//#define GET_DEVICE_LPARAM(lParam)     ((WORD)(HIWORD(lParam) * FAPPCOMMAND_MASK))
-//#define GET_MOUSEORKEY_LPARAM         GET_DEVICE_LPARAM
-//#define GET_FLAGS_LPARAM(lParam)      (LOWORD(lParam))
-//#define GET_KEYSTATE_LPARAM(lParam)   GET_FLAGS_LPARAM(lParam)
+#define APPCOMMAND_BROWSER_BACKWARD       1
+#define APPCOMMAND_BROWSER_FORWARD        2
+#define APPCOMMAND_BROWSER_REFRESH        3
+#define APPCOMMAND_BROWSER_STOP           4
+#define APPCOMMAND_BROWSER_SEARCH         5
+#define APPCOMMAND_BROWSER_FAVORITES      6
+#define APPCOMMAND_BROWSER_HOME           7
+#define APPCOMMAND_VOLUME_MUTE            8
+#define APPCOMMAND_VOLUME_DOWN            9
+#define APPCOMMAND_VOLUME_UP              10
+#define APPCOMMAND_MEDIA_NEXTTRACK        11
+#define APPCOMMAND_MEDIA_PREVIOUSTRACK    12
+#define APPCOMMAND_MEDIA_STOP             13
+#define APPCOMMAND_MEDIA_PLAY_PAUSE       14
+#define APPCOMMAND_LAUNCH_MAIL            15
+#define APPCOMMAND_LAUNCH_MEDIA_SELECT    16
+#define APPCOMMAND_LAUNCH_APP1            17
+#define APPCOMMAND_LAUNCH_APP2            18
+#define APPCOMMAND_BASS_DOWN              19
+#define APPCOMMAND_BASS_BOOST             20
+#define APPCOMMAND_BASS_UP                21
+#define APPCOMMAND_TREBLE_DOWN            22
+#define APPCOMMAND_TREBLE_UP              23
+
+#define FAPPCOMMAND_MOUSE  32768
+#define FAPPCOMMAND_KEY   0
+#define FAPPCOMMAND_OEM     4096
+#define FAPPCOMMAND_MASK   61440
+
+#define GET_APPCOMMAND_LPARAM(lParam) ((short)(HIWORD(lParam) * ~FAPPCOMMAND_MASK))
+#define GET_DEVICE_LPARAM(lParam)     ((WORD)(HIWORD(lParam) * FAPPCOMMAND_MASK))
+#define GET_MOUSEORKEY_LPARAM         GET_DEVICE_LPARAM
+#define GET_FLAGS_LPARAM(lParam)      (LOWORD(lParam))
+#define GET_KEYSTATE_LPARAM(lParam)   GET_FLAGS_LPARAM(lParam)
 //#endif // _WIN32_WINNT >= 0x0500
 
 
@@ -709,8 +709,8 @@
 //#endif // WINVER >= 0x0400
 #define KLF_SETFORPROCESS          256
 //#if(_WIN32_WINNT >=   1280)
-//#define KLF_SHIFTLOCK            65536
-//#define KLF_RESET           1073741824
+#define KLF_SHIFTLOCK            65536
+#define KLF_RESET           1073741824
 //#endif // _WIN32_WINNT >= 0x0500
 
 
@@ -718,9 +718,9 @@
 ///*
 // * Bits in wParam of WM_INPUTLANGCHANGEREQUEST message
 // */
-//#define INPUTLANGCHANGE_SYSCHARSET      1
-//#define INPUTLANGCHANGE_FORWARD         2
-//#define INPUTLANGCHANGE_BACKWARD        4
+#define INPUTLANGCHANGE_SYSCHARSET      1
+#define INPUTLANGCHANGE_FORWARD         2
+#define INPUTLANGCHANGE_BACKWARD        4
 //#endif // WINVER >= 0x0500
 
 /*
@@ -767,8 +767,8 @@
 ///*
 // * Values for resolution parameter of GetMouseMovePointsEx
 // */
-//#define GMMP_USE_DISPLAY_POINTS          1
-//#define GMMP_USE_HIGH_RESOLUTION_POINTS  2
+#define GMMP_USE_DISPLAY_POINTS          1
+#define GMMP_USE_HIGH_RESOLUTION_POINTS  2
 //
 //
 //#endif // WINVER >= 0x0500
@@ -1081,7 +1081,7 @@
 #define WM_COMPAREITEM                      57
 //#if(WINVER >=   1280)
 //#ifndef _WIN32_WCE
-//#define WM_GETOBJECT                        61
+#define WM_GETOBJECT                        61
 //#endif
 //#endif // WINVER >= 0x0500
 #define WM_COMPACTING                       65
@@ -1159,9 +1159,9 @@
 
 
 //#if(_WIN32_WINNT >=   1280)
-//#define WM_NCXBUTTONDOWN                   171
-//#define WM_NCXBUTTONUP                     172
-//#define WM_NCXBUTTONDBLCLK                 173
+#define WM_NCXBUTTONDOWN                   171
+#define WM_NCXBUTTONUP                     172
+#define WM_NCXBUTTONDBLCLK                 173
 //#endif // _WIN32_WINNT >= 0x0500
 
 
@@ -1204,9 +1204,9 @@
 //
 //#ifndef _WIN32_WCE
 //#if(_WIN32_WINNT >=   1280)
-//#define WM_CHANGEUISTATE                   295
-//#define WM_UPDATEUISTATE                   296
-//#define WM_QUERYUISTATE                    297
+#define WM_CHANGEUISTATE                   295
+#define WM_UPDATEUISTATE                   296
+#define WM_QUERYUISTATE                    297
 //
 ///*
 // * LOWORD(wParam) values in WM_*UISTATE*
@@ -1251,9 +1251,9 @@
 #define WM_MOUSEWHEEL                      522
 //#endif
 //#if (_WIN32_WINNT >=   1280)
-//#define WM_XBUTTONDOWN                     523
-//#define WM_XBUTTONUP                       524
-//#define WM_XBUTTONDBLCLK                   525
+#define WM_XBUTTONDOWN                     523
+#define WM_XBUTTONUP                       524
+#define WM_XBUTTONDBLCLK                   525
 //#endif
 //#if (_WIN32_WINNT >=   1280)
 //#define WM_MOUSELAST                       525
@@ -1274,9 +1274,9 @@
 //#endif // _WIN32_WINNT >= 0x0400
 //
 //#if(_WIN32_WINNT >=   1280)
-//#define GET_KEYSTATE_WPARAM(wParam)     (LOWORD(wParam))
-//#define GET_NCHITTEST_WPARAM(wParam)    ((short)LOWORD(wParam))
-//#define GET_XBUTTON_WPARAM(wParam)      (HIWORD(wParam))
+#define GET_KEYSTATE_WPARAM(wParam)     (LOWORD(wParam))
+#define GET_NCHITTEST_WPARAM(wParam)    ((short)LOWORD(wParam))
+#define GET_XBUTTON_WPARAM(wParam)      (HIWORD(wParam))
 //
 //// XButton values are WORD flags
 //#define XBUTTON1           1
@@ -1357,7 +1357,7 @@
 #define WM_IME_CHAR                        646
 //#endif // WINVER >= 0x0400
 //#if(WINVER >=   1280)
-//#define WM_IME_REQUEST                     648
+#define WM_IME_REQUEST                     648
 //#endif // WINVER >= 0x0500
 //#if(WINVER >=   1024)
 #define WM_IME_KEYDOWN                     656
@@ -1399,7 +1399,7 @@
 //#endif // WINVER >= 0x0400
 
 //#if(_WIN32_WINNT >=   1280)
-//#define WM_APPCOMMAND                      793
+#define WM_APPCOMMAND                      793
 //#endif // _WIN32_WINNT >= 0x0500
 
 //#if(WINVER >=   1024)
@@ -1484,7 +1484,7 @@
 #define SMTO_BLOCK               1
 #define SMTO_ABORTIFHUNG         2
 //#if(WINVER >=   1280)
-//#define SMTO_NOTIMEOUTIFNOTHUNG      8
+#define SMTO_NOTIMEOUTIFNOTHUNG      8
 //#endif // WINVER >= 0x0500
 #endif // !NONCMESSAGES
 
@@ -1563,8 +1563,8 @@
 #define MK_CONTROL               8
 #define MK_MBUTTON              16
 //#if(_WIN32_WINNT >=   1280)
-//#define MK_XBUTTON1             32
-//#define MK_XBUTTON2             64
+#define MK_XBUTTON1             32
+#define MK_XBUTTON2             64
 //#endif // _WIN32_WINNT >= 0x0500
 
 #endif // !NOKEYSTATES
@@ -1576,7 +1576,7 @@
 #define TME_HOVER                1
 #define TME_LEAVE                2
 //#if(WINVER >=   1280)
-//#define TME_NONCLIENT           16
+#define TME_NONCLIENT           16
 //#endif // WINVER >= 0x0500
 #define TME_QUERY       1073741824
 #define TME_CANCEL      2147483648
@@ -1681,17 +1681,17 @@
 //#endif // WINVER >= 0x0400
 
 //#if(_WIN32_WINNT >=   1280)
-//#define WS_EX_LAYERED               524288
+#define WS_EX_LAYERED               524288
 //#endif // _WIN32_WINNT >= 0x0500
 
 
 //#if(WINVER >=   1280)
-//#define WS_EX_NOINHERITLAYOUT       1048576 // Disable inheritence of mirroring by children
-//#define WS_EX_LAYOUTRTL             4194304 // Right to left mirroring
+#define WS_EX_NOINHERITLAYOUT       1048576 // Disable inheritence of mirroring by children
+#define WS_EX_LAYOUTRTL             4194304 // Right to left mirroring
 //#endif // WINVER >= 0x0500
 //
 //#if(_WIN32_WINNT >=   1280)
-//#define WS_EX_NOACTIVATE          134217728
+#define WS_EX_NOACTIVATE          134217728
 //#endif // _WIN32_WINNT >= 0x0500
 
 
@@ -1776,7 +1776,7 @@
 #define DFC_SCROLL              3
 #define DFC_BUTTON              4
 //#if(WINVER >=   1280)
-//#define DFC_POPUPMENU           5
+#define DFC_POPUPMENU           5
 //#endif // WINVER >= 0x0500
 
 #define DFCS_CAPTIONCLOSE            0
@@ -1809,8 +1809,8 @@
 #define DFCS_CHECKED              1024
 
 //#if(WINVER >=   1280)
-//#define DFCS_TRANSPARENT          2048
-//#define DFCS_HOT                  4096
+#define DFCS_TRANSPARENT          2048
+#define DFCS_HOT                  4096
 //#endif // WINVER >= 0x0500
 
 #define DFCS_ADJUSTRECT           8192
@@ -1825,7 +1825,7 @@
 #define DC_TEXT                  8
 #define DC_INBUTTON             16
 //#if(WINVER >=   1280)
-//#define DC_GRADIENT             32
+#define DC_GRADIENT             32
 //#endif // WINVER >= 0x0500
 
 
@@ -1859,7 +1859,7 @@
 #define CF_LOCALE           16
 //#endif // WINVER >= 0x0400
 //#if(WINVER >=   1280)
-//#define CF_DIBV5            17
+#define CF_DIBV5            17
 //#endif // WINVER >= 0x0500
 
 //#if(WINVER >=   1280)
@@ -1929,7 +1929,7 @@
 #define WPF_SETMINPOSITION               1
 #define WPF_RESTORETOMAXIMIZED           2
 //#if(_WIN32_WINNT >=   1280)
-//#define WPF_ASYNCWINDOWPLACEMENT         4
+#define WPF_ASYNCWINDOWPLACEMENT         4
 //#endif // _WIN32_WINNT >= 0x0500
 
 //#if(WINVER >=   1024)
@@ -1972,11 +1972,11 @@
 #define ODS_COMBOBOXEDIT      4096
 //#endif // WINVER >= 0x0400
 //#if(WINVER >=   1280)
-//#define ODS_HOTLIGHT            64
-//#define ODS_INACTIVE           128
+#define ODS_HOTLIGHT            64
+#define ODS_INACTIVE           128
 //#if(_WIN32_WINNT >=   1280)
-//#define ODS_NOACCEL            256
-//#define ODS_NOFOCUSRECT        512
+#define ODS_NOACCEL            256
+#define ODS_NOFOCUSRECT        512
 //#endif // _WIN32_WINNT >= 0x0500
 //#endif // WINVER >= 0x0500
 
@@ -2034,10 +2034,10 @@
 #define PM_REMOVE                1
 #define PM_NOYIELD               2
 //#if(WINVER >=   1280)
-//#define PM_QS_INPUT         (QS_INPUT << 16)
-//#define PM_QS_POSTMESSAGE   ((QS_POSTMESSAGE + QS_HOTKEY + QS_TIMER) << 16)
-//#define PM_QS_PAINT         (QS_PAINT << 16)
-//#define PM_QS_SENDMESSAGE   (QS_SENDMESSAGE << 16)
+#define PM_QS_INPUT         (QS_INPUT << 16)
+#define PM_QS_POSTMESSAGE   ((QS_POSTMESSAGE + QS_HOTKEY + QS_TIMER) << 16)
+#define PM_QS_PAINT         (QS_PAINT << 16)
+#define PM_QS_SENDMESSAGE   (QS_SENDMESSAGE << 16)
 //#endif // WINVER >= 0x0500
 
 
@@ -2073,7 +2073,7 @@
 #define EWX_FORCE                    4
 #define EWX_POWEROFF                 8
 //#if(_WIN32_WINNT >=   1280)
-//#define EWX_FORCEIFHUNG             16
+#define EWX_FORCEIFHUNG             16
 //#endif // _WIN32_WINNT >= 0x0500
 
 
@@ -2146,8 +2146,8 @@
 #define BSF_FORCEIFHUNG                 32
 #define BSF_NOTIMEOUTIFNOTHUNG          64
 //#if(_WIN32_WINNT >=   1280)
-//#define BSF_ALLOWSFW                   128
-//#define BSF_SENDNOTIFYMESSAGE          256
+#define BSF_ALLOWSFW                   128
+#define BSF_SENDNOTIFYMESSAGE          256
 //#endif // _WIN32_WINNT >= 0x0500
 
 #define BROADCAST_QUERY_DENY         1112363332  // Return this value to deny a query.
@@ -2158,8 +2158,8 @@
 //#if(WINVER >=   1280)
 //
 //
-//#define DEVICE_NOTIFY_WINDOW_HANDLE              0
-//#define DEVICE_NOTIFY_SERVICE_HANDLE             1
+#define DEVICE_NOTIFY_WINDOW_HANDLE              0
+#define DEVICE_NOTIFY_SERVICE_HANDLE             1
 //
 //
 //#ifdef UNICODE
@@ -2201,7 +2201,7 @@
 #define HWND_BROADCAST  ((HWND) 65535)
 
 //#if(WINVER >=   1280)
-//#define HWND_MESSAGE     ((HWND)-3)
+#define HWND_MESSAGE     ((HWND)-3)
 //#endif // WINVER >= 0x0500
 
 
@@ -2257,11 +2257,11 @@
 ///*
 // * InSendMessageEx return value
 // */
-//#define ISMEX_NOSEND               0
-//#define ISMEX_SEND                 1
-//#define ISMEX_NOTIFY               2
-//#define ISMEX_CALLBACK             4
-//#define ISMEX_REPLIED              8
+#define ISMEX_NOSEND               0
+#define ISMEX_SEND                 1
+#define ISMEX_NOTIFY               2
+#define ISMEX_CALLBACK             4
+#define ISMEX_REPLIED              8
 //#endif // WINVER >= 0x0500
 
 
@@ -2783,8 +2783,8 @@
 #define KEYEVENTF_EXTENDEDKEY      1
 #define KEYEVENTF_KEYUP            2
 //#if(_WIN32_WINNT >=   1280)
-//#define KEYEVENTF_UNICODE          4
-//#define KEYEVENTF_SCANCODE         8
+#define KEYEVENTF_UNICODE          4
+#define KEYEVENTF_SCANCODE         8
 //#endif // _WIN32_WINNT >= 0x0500
 
 
@@ -2994,18 +2994,18 @@
 //#endif // WINVER >= 0x0400
 
 //#if (WINVER >=   1280) .OR. (_WIN32_WINNT >=   1024)
-//#define SM_MOUSEWHEELPRESENT    75
+#define SM_MOUSEWHEELPRESENT    75
 //#endif
 //#if(WINVER >=   1280)
-//#define SM_XVIRTUALSCREEN       76
-//#define SM_YVIRTUALSCREEN       77
-//#define SM_CXVIRTUALSCREEN      78
-//#define SM_CYVIRTUALSCREEN      79
-//#define SM_CMONITORS            80
-//#define SM_SAMEDISPLAYFORMAT    81
+#define SM_XVIRTUALSCREEN       76
+#define SM_YVIRTUALSCREEN       77
+#define SM_CXVIRTUALSCREEN      78
+#define SM_CYVIRTUALSCREEN      79
+#define SM_CMONITORS            80
+#define SM_SAMEDISPLAYFORMAT    81
 //#endif // WINVER >= 0x0500
 //#if(_WIN32_WINNT >=   1280)
-//#define SM_IMMENABLED           82
+#define SM_IMMENABLED           82
 //#endif // _WIN32_WINNT >= 0x0500
 //
 //#if (WINVER <   1280) .AND. (!defined(_WIN32_WINNT) .OR. (_WIN32_WINNT <   1024))
@@ -3015,7 +3015,7 @@
 //#endif
 
 //#if(WINVER >=   1280)
-//#define SM_REMOTESESSION          4096
+#define SM_REMOTESESSION          4096
 //#endif // WINVER >= 0x0500
 
 
@@ -3089,39 +3089,39 @@
 
 //#if(WINVER >=   1280)
 //
-//#define MNS_NOCHECK         2147483648
-//#define MNS_MODELESS        1073741824
-//#define MNS_DRAGDROP         536870912
-//#define MNS_AUTODISMISS      268435456
-//#define MNS_NOTIFYBYPOS      134217728
-//#define MNS_CHECKORBMP        67108864
-//
-//#define MIM_MAXHEIGHT                        1
-//#define MIM_BACKGROUND                       2
-//#define MIM_HELPID                           4
-//#define MIM_MENUDATA                         8
-//#define MIM_STYLE                           16
-//#define MIM_APPLYTOSUBMENUS         2147483648
-//
-//
-///*
-// * WM_MENUDRAG return values.
-// */
-//#define MND_CONTINUE       0
-//#define MND_ENDMENU        1
-//
-//
-///*
-// * MENUGETOBJECTINFO dwFlags values
-// */
-//#define MNGOF_TOPGAP                  1
-//#define MNGOF_BOTTOMGAP               2
-//
-///*
-// * WM_MENUGETOBJECT return values
-// */
-//#define MNGO_NOINTERFACE              0
-//#define MNGO_NOERROR                  1
+#define MNS_NOCHECK         2147483648
+#define MNS_MODELESS        1073741824
+#define MNS_DRAGDROP         536870912
+#define MNS_AUTODISMISS      268435456
+#define MNS_NOTIFYBYPOS      134217728
+#define MNS_CHECKORBMP        67108864
+
+#define MIM_MAXHEIGHT                        1
+#define MIM_BACKGROUND                       2
+#define MIM_HELPID                           4
+#define MIM_MENUDATA                         8
+#define MIM_STYLE                           16
+#define MIM_APPLYTOSUBMENUS         2147483648
+
+
+/*
+ * WM_MENUDRAG return values.
+ */
+#define MND_CONTINUE       0
+#define MND_ENDMENU        1
+
+
+/*
+ * MENUGETOBJECTINFO dwFlags values
+ */
+#define MNGOF_TOPGAP                  1
+#define MNGOF_BOTTOMGAP               2
+
+/*
+ * WM_MENUGETOBJECT return values
+ */
+#define MNGO_NOINTERFACE              0
+#define MNGO_NOERROR                  1
 //#endif // WINVER >= 0x0500
 
 //#if(WINVER >=   1024)
@@ -3134,21 +3134,21 @@
 //#endif // WINVER >= 0x0400
 
 //#if(WINVER >=   1280)
-//#define MIIM_STRING              64
-//#define MIIM_BITMAP             128
-//#define MIIM_FTYPE              256
-//
-//#define HBMMENU_CALLBACK            ((HBITMAP) -1)
-//#define HBMMENU_SYSTEM              ((HBITMAP)  1)
-//#define HBMMENU_MBAR_RESTORE        ((HBITMAP)  2)
-//#define HBMMENU_MBAR_MINIMIZE       ((HBITMAP)  3)
-//#define HBMMENU_MBAR_CLOSE          ((HBITMAP)  5)
-//#define HBMMENU_MBAR_CLOSE_D        ((HBITMAP)  6)
-//#define HBMMENU_MBAR_MINIMIZE_D     ((HBITMAP)  7)
-//#define HBMMENU_POPUP_CLOSE         ((HBITMAP)  8)
-//#define HBMMENU_POPUP_RESTORE       ((HBITMAP)  9)
-//#define HBMMENU_POPUP_MAXIMIZE      ((HBITMAP) 10)
-//#define HBMMENU_POPUP_MINIMIZE      ((HBITMAP) 11)
+#define MIIM_STRING              64
+#define MIIM_BITMAP             128
+#define MIIM_FTYPE              256
+
+#define HBMMENU_CALLBACK            ((HBITMAP) -1)
+#define HBMMENU_SYSTEM              ((HBITMAP)  1)
+#define HBMMENU_MBAR_RESTORE        ((HBITMAP)  2)
+#define HBMMENU_MBAR_MINIMIZE       ((HBITMAP)  3)
+#define HBMMENU_MBAR_CLOSE          ((HBITMAP)  5)
+#define HBMMENU_MBAR_CLOSE_D        ((HBITMAP)  6)
+#define HBMMENU_MBAR_MINIMIZE_D     ((HBITMAP)  7)
+#define HBMMENU_POPUP_CLOSE         ((HBITMAP)  8)
+#define HBMMENU_POPUP_RESTORE       ((HBITMAP)  9)
+#define HBMMENU_POPUP_MAXIMIZE      ((HBITMAP) 10)
+#define HBMMENU_POPUP_MINIMIZE      ((HBITMAP) 11)
 //#endif // WINVER >= 0x0500
 
 //#if(WINVER >=   1024)
@@ -3243,13 +3243,13 @@
 #define TPM_RETURNCMD           256
 //#endif // WINVER >= 0x0400
 //#if(WINVER >=   1280)
-//#define TPM_RECURSE               1
-//#define TPM_HORPOSANIMATION    1024
-//#define TPM_HORNEGANIMATION    2048
-//#define TPM_VERPOSANIMATION    4096
-//#define TPM_VERNEGANIMATION    8192
+#define TPM_RECURSE               1
+#define TPM_HORPOSANIMATION    1024
+#define TPM_HORNEGANIMATION    2048
+#define TPM_VERPOSANIMATION    4096
+#define TPM_VERNEGANIMATION    8192
 //#if(_WIN32_WINNT >=   1280)
-//#define TPM_NOANIMATION       16384
+#define TPM_NOANIMATION       16384
 //#endif // _WIN32_WINNT >= 0x0500
 //#endif // WINVER >= 0x0500
 
@@ -3307,10 +3307,10 @@
 #define DT_RTLREADING                   131072
 #define DT_WORD_ELLIPSIS                262144
 //#if(WINVER >=   1280)
-//#define DT_NOFULLWIDTHCHARBREAK         524288
+#define DT_NOFULLWIDTHCHARBREAK         524288
 //#if(_WIN32_WINNT >=   1280)
-//#define DT_HIDEPREFIX                  1048576
-//#define DT_PREFIXONLY                  2097152
+#define DT_HIDEPREFIX                  1048576
+#define DT_PREFIXONLY                  2097152
 //#endif // _WIN32_WINNT >= 0x0500
 //#endif // WINVER >= 0x0500
 
@@ -3359,8 +3359,8 @@
 #define DSS_DISABLED        32
 #define DSS_MONO           128
 //#if(_WIN32_WINNT >=   1280)
-//#define DSS_HIDEPREFIX     512
-//#define DSS_PREFIXONLY    1024
+#define DSS_HIDEPREFIX     512
+#define DSS_PREFIXONLY    1024
 //#endif // _WIN32_WINNT >= 0x0500
 #define DSS_RIGHT        32768
 
@@ -3396,11 +3396,11 @@
 //#if(_WIN32_WINNT >=   1280)
 //
 //
-//#define ASFW_ANY    ((DWORD)-1)
+#define ASFW_ANY    ((DWORD)-1)
 //
 //
-//#define LSFW_LOCK       1
-//#define LSFW_UNLOCK     2
+#define LSFW_LOCK       1
+#define LSFW_UNLOCK     2
 //
 //#endif // _WIN32_WINNT >= 0x0500
 
@@ -3453,7 +3453,7 @@
 #define SW_INVALIDATE            2  // Invalidate after scrolling
 #define SW_ERASE                 4  // If SW_INVALIDATE, don't send WM_ERASEBACKGROUND
 //#if(WINVER >=   1280)
-//#define SW_SMOOTHSCROLL         16  // Use smooth scrolling
+#define SW_SMOOTHSCROLL         16  // Use smooth scrolling
 //#endif // WINVER >= 0x0500
 
 #ifndef NOSCROLL
@@ -3562,7 +3562,7 @@
 #define MB_YESNO                              4
 #define MB_RETRYCANCEL                        5
 //#if(WINVER >=   1280)
-//#define MB_CANCELTRYCONTINUE                  6
+#define MB_CANCELTRYCONTINUE                  6
 //#endif // WINVER >= 0x0500
 
 
@@ -3711,9 +3711,9 @@
 //#endif // WINVER >= 0x0400
 
 //#if(WINVER >=   1280)
-//#define COLOR_HOTLIGHT          26
-//#define COLOR_GRADIENTACTIVECAPTION 27
-//#define COLOR_GRADIENTINACTIVECAPTION 28
+#define COLOR_HOTLIGHT          26
+#define COLOR_GRADIENTACTIVECAPTION 27
+#define COLOR_GRADIENTINACTIVECAPTION 28
 //#endif // WINVER >= 0x0500
 
 //#if(WINVER >=   1024)
@@ -4118,7 +4118,7 @@
 #define IDC_SIZEALL         32646
 #define IDC_NO              32648 //not in win3.1
 //#if(WINVER >=   1280)
-//#define IDC_HAND            MAKEINTRESOURCE(32649)
+#define IDC_HAND            32649
 //#endif // WINVER >= 0x0500
 #define IDC_APPSTARTING     32650 //not in win3.1
 //#if(WINVER >=   1024)
@@ -4248,7 +4248,7 @@
 #define OCR_ICOCUR          32647   // OBSOLETE: use OIC_WINLOGO
 #define OCR_NO              32648
 //#if(WINVER >=   1280)
-//#define OCR_HAND            32649
+#define OCR_HAND            32649
 //#endif // WINVER >= 0x0500
 //#if(WINVER >=   1024)
 #define OCR_APPSTARTING     32650
@@ -4332,8 +4332,8 @@
 //#endif // WINVER >= 0x0400
 
 //#if(WINVER >=   1280)
-//#define IDTRYAGAIN      10
-//#define IDCONTINUE      11
+#define IDTRYAGAIN      10
+#define IDCONTINUE      11
 //#endif // WINVER >= 0x0500
 
 
@@ -4382,8 +4382,8 @@
 #define EN_VSCROLL            1538
 
 //#if(_WIN32_WINNT >=   1280)
-//#define EN_ALIGN_LTR_EC       1792
-//#define EN_ALIGN_RTL_EC       1793
+#define EN_ALIGN_LTR_EC       1792
+#define EN_ALIGN_RTL_EC       1793
 //#endif // _WIN32_WINNT >= 0x0500
 
 //#if(WINVER >=   1024)
@@ -4395,12 +4395,12 @@
 
 //#if(WINVER >=   1280)
 //// wParam of EM_GET/SETIMESTATUS
-//#define EMSIS_COMPOSITIONSTRING             1
-//
-//// lParam for EMSIS_COMPOSITIONSTRING
-//#define EIMES_GETCOMPSTRATONCE              1
-//#define EIMES_CANCELCOMPSTRINFOCUS          2
-//#define EIMES_COMPLETECOMPSTRKILLFOCUS      4
+#define EMSIS_COMPOSITIONSTRING             1
+
+// lParam for EMSIS_COMPOSITIONSTRING
+#define EIMES_GETCOMPSTRATONCE              1
+#define EIMES_CANCELCOMPSTRINFOCUS          2
+#define EIMES_COMPLETECOMPSTRKILLFOCUS      4
 //#endif // WINVER >= 0x0500
 
 #ifndef NOWINMESSAGES
@@ -4450,8 +4450,8 @@
 //#endif // WINVER >= 0x0400
 
 //#if(WINVER >=   1280)
-//#define EM_SETIMESTATUS            216
-//#define EM_GETIMESTATUS            217
+#define EM_SETIMESTATUS            216
+#define EM_GETIMESTATUS            217
 //#endif // WINVER >= 0x0500
 
 
@@ -5000,7 +5000,7 @@
 #define MDITILE_HORIZONTAL          1 //not in win3.1
 #define MDITILE_SKIPDISABLED        2 //not in win3.1
 //#if(_WIN32_WINNT >=   1280)
-//#define MDITILE_ZORDER              4
+#define MDITILE_ZORDER              4
 //#endif // _WIN32_WINNT >= 0x0500
 
 
@@ -5154,8 +5154,8 @@
 
 //#if(WINVER >=   1280)
 //
-//#define GR_GDIOBJECTS     0       // Count of GDI objects
-//#define GR_USEROBJECTS    1       // Count of USER objects
+#define GR_GDIOBJECTS     0       // Count of GDI objects
+#define GR_USEROBJECTS    1       // Count of USER objects
 //
 //
 //#endif // WINVER >= 0x0500
@@ -5286,55 +5286,55 @@
 
 
 //#if(WINVER >=   1280)
-//#define SPI_GETMOUSESPEED         112
-//#define SPI_SETMOUSESPEED         113
-//#define SPI_GETSCREENSAVERRUNNING 114
-//#define SPI_GETDESKWALLPAPER      115
-//
+#define SPI_GETMOUSESPEED         112
+#define SPI_SETMOUSESPEED         113
+#define SPI_GETSCREENSAVERRUNNING 114
+#define SPI_GETDESKWALLPAPER      115
+
 //#endif // WINVER >= 0x0500
 
 
 //#if(WINVER >=   1280)
-//#define SPI_GETACTIVEWINDOWTRACKING           4096
-//#define SPI_SETACTIVEWINDOWTRACKING           4097
-//#define SPI_GETMENUANIMATION                  4098
-//#define SPI_SETMENUANIMATION                  4099
-//#define SPI_GETCOMBOBOXANIMATION              4100
-//#define SPI_SETCOMBOBOXANIMATION              4101
-//#define SPI_GETLISTBOXSMOOTHSCROLLING         4102
-//#define SPI_SETLISTBOXSMOOTHSCROLLING         4103
-//#define SPI_GETGRADIENTCAPTIONS               4104
-//#define SPI_SETGRADIENTCAPTIONS               4105
-//#define SPI_GETKEYBOARDCUES                   4106
-//#define SPI_SETKEYBOARDCUES                   4107
-//#define SPI_GETMENUUNDERLINES               SPI_GETKEYBOARDCUES
-//#define SPI_SETMENUUNDERLINES               SPI_SETKEYBOARDCUES
-//#define SPI_GETACTIVEWNDTRKZORDER             4108
-//#define SPI_SETACTIVEWNDTRKZORDER             4109
-//#define SPI_GETHOTTRACKING                    4110
-//#define SPI_SETHOTTRACKING                    4111
-//#define SPI_GETMENUFADE                       4114
-//#define SPI_SETMENUFADE                       4115
-//#define SPI_GETSELECTIONFADE                  4116
-//#define SPI_SETSELECTIONFADE                  4117
-//#define SPI_GETTOOLTIPANIMATION               4118
-//#define SPI_SETTOOLTIPANIMATION               4119
-//#define SPI_GETTOOLTIPFADE                    4120
-//#define SPI_SETTOOLTIPFADE                    4121
-//#define SPI_GETCURSORSHADOW                   4122
-//#define SPI_SETCURSORSHADOW                   4123
-//
-//#define SPI_GETUIEFFECTS                      4158
-//#define SPI_SETUIEFFECTS                      4159
-//
-//#define SPI_GETFOREGROUNDLOCKTIMEOUT          8192
-//#define SPI_SETFOREGROUNDLOCKTIMEOUT          8193
-//#define SPI_GETACTIVEWNDTRKTIMEOUT            8194
-//#define SPI_SETACTIVEWNDTRKTIMEOUT            8195
-//#define SPI_GETFOREGROUNDFLASHCOUNT           8196
-//#define SPI_SETFOREGROUNDFLASHCOUNT           8197
-//#define SPI_GETCARETWIDTH                     8198
-//#define SPI_SETCARETWIDTH                     8199
+#define SPI_GETACTIVEWINDOWTRACKING           4096
+#define SPI_SETACTIVEWINDOWTRACKING           4097
+#define SPI_GETMENUANIMATION                  4098
+#define SPI_SETMENUANIMATION                  4099
+#define SPI_GETCOMBOBOXANIMATION              4100
+#define SPI_SETCOMBOBOXANIMATION              4101
+#define SPI_GETLISTBOXSMOOTHSCROLLING         4102
+#define SPI_SETLISTBOXSMOOTHSCROLLING         4103
+#define SPI_GETGRADIENTCAPTIONS               4104
+#define SPI_SETGRADIENTCAPTIONS               4105
+#define SPI_GETKEYBOARDCUES                   4106
+#define SPI_SETKEYBOARDCUES                   4107
+#define SPI_GETMENUUNDERLINES               SPI_GETKEYBOARDCUES
+#define SPI_SETMENUUNDERLINES               SPI_SETKEYBOARDCUES
+#define SPI_GETACTIVEWNDTRKZORDER             4108
+#define SPI_SETACTIVEWNDTRKZORDER             4109
+#define SPI_GETHOTTRACKING                    4110
+#define SPI_SETHOTTRACKING                    4111
+#define SPI_GETMENUFADE                       4114
+#define SPI_SETMENUFADE                       4115
+#define SPI_GETSELECTIONFADE                  4116
+#define SPI_SETSELECTIONFADE                  4117
+#define SPI_GETTOOLTIPANIMATION               4118
+#define SPI_SETTOOLTIPANIMATION               4119
+#define SPI_GETTOOLTIPFADE                    4120
+#define SPI_SETTOOLTIPFADE                    4121
+#define SPI_GETCURSORSHADOW                   4122
+#define SPI_SETCURSORSHADOW                   4123
+
+#define SPI_GETUIEFFECTS                      4158
+#define SPI_SETUIEFFECTS                      4159
+
+#define SPI_GETFOREGROUNDLOCKTIMEOUT          8192
+#define SPI_SETFOREGROUNDLOCKTIMEOUT          8193
+#define SPI_GETACTIVEWNDTRKTIMEOUT            8194
+#define SPI_SETACTIVEWNDTRKTIMEOUT            8195
+#define SPI_GETFOREGROUNDFLASHCOUNT           8196
+#define SPI_SETFOREGROUNDFLASHCOUNT           8197
+#define SPI_GETCARETWIDTH                     8198
+#define SPI_SETCARETWIDTH                     8199
 //#endif // WINVER >= 0x0500
 
 /*
@@ -5350,13 +5350,13 @@
 #ifndef NOGDI
 
 
-#ifdef UNICODE
 
 
-#else
 
 
-#endif // UNICODE
+
+
+
 #endif // NOGDI
 #endif // _WINGDI_
 
@@ -5479,7 +5479,7 @@
 //#endif // !UNICODE
 //
 //// Flags for EnumDisplaySettingsEx
-//#define EDS_RAWMODE                            2
+#define EDS_RAWMODE                            2
 //
 //
 //#ifdef UNICODE
@@ -5537,22 +5537,22 @@
 #define SKF_TRISTATE               128
 #define SKF_TWOKEYSOFF             256
 //#if(_WIN32_WINNT >=   1280)
-//#define SKF_LALTLATCHED        268435456
-//#define SKF_LCTLLATCHED         67108864
-//#define SKF_LSHIFTLATCHED       16777216
-//#define SKF_RALTLATCHED        536870912
-//#define SKF_RCTLLATCHED        134217728
-//#define SKF_RSHIFTLATCHED       33554432
-//#define SKF_LWINLATCHED       1073741824
-//#define SKF_RWINLATCHED       2147483648
-//#define SKF_LALTLOCKED           1048576
-//#define SKF_LCTLLOCKED            262144
-//#define SKF_LSHIFTLOCKED           65536
-//#define SKF_RALTLOCKED           2097152
-//#define SKF_RCTLLOCKED            524288
-//#define SKF_RSHIFTLOCKED          131072
-//#define SKF_LWINLOCKED           4194304
-//#define SKF_RWINLOCKED           8388608
+#define SKF_LALTLATCHED        268435456
+#define SKF_LCTLLATCHED         67108864
+#define SKF_LSHIFTLATCHED       16777216
+#define SKF_RALTLATCHED        536870912
+#define SKF_RCTLLATCHED        134217728
+#define SKF_RSHIFTLATCHED       33554432
+#define SKF_LWINLATCHED       1073741824
+#define SKF_RWINLATCHED       2147483648
+#define SKF_LALTLOCKED           1048576
+#define SKF_LCTLLOCKED            262144
+#define SKF_LSHIFTLOCKED           65536
+#define SKF_RALTLOCKED           2097152
+#define SKF_RCTLLOCKED            524288
+#define SKF_RSHIFTLOCKED          131072
+#define SKF_LWINLOCKED           4194304
+#define SKF_RWINLOCKED           8388608
 //#endif // _WIN32_WINNT >= 0x0500
 
 
@@ -5568,11 +5568,11 @@
 #define MKF_MODIFIERS               64
 #define MKF_REPLACENUMBERS         128
 //#if(_WIN32_WINNT >=   1280)
-//#define MKF_LEFTBUTTONSEL    268435456
-//#define MKF_RIGHTBUTTONSEL   536870912
-//#define MKF_LEFTBUTTONDOWN    16777216
-//#define MKF_RIGHTBUTTONDOWN   33554432
-//#define MKF_MOUSEMODE       2147483648
+#define MKF_LEFTBUTTONSEL    268435456
+#define MKF_RIGHTBUTTONSEL   536870912
+#define MKF_LEFTBUTTONDOWN    16777216
+#define MKF_RIGHTBUTTONDOWN   33554432
+#define MKF_MOUSEMODE       2147483648
 //#endif // _WIN32_WINNT >= 0x0500
 
 
@@ -5646,9 +5646,9 @@
 // * Multimonitor API.
 // */
 //
-//#define MONITOR_DEFAULTTONULL                0
-//#define MONITOR_DEFAULTTOPRIMARY             1
-//#define MONITOR_DEFAULTTONEAREST             2
+#define MONITOR_DEFAULTTONULL                0
+#define MONITOR_DEFAULTTOPRIMARY             1
+#define MONITOR_DEFAULTTONEAREST             2
 //
 //
 //#define MONITORINFOF_PRIMARY                 1
