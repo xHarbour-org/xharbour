@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.32 2003/01/24 09:52:43 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.33 2003/01/25 01:44:47 ronpinkas Exp $
  */
 
 /*
@@ -2264,8 +2264,6 @@ Try          : TRY
                }
                END
                {
-                  hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_RESETTRY", TRUE ) ), NULL ) ) );
-
                   /* Fix END address
                    * There is no line number after HB_P_SEQEND in case no
                    * RECOVER clause is used
@@ -2280,6 +2278,8 @@ Try          : TRY
 
                   hb_compSequenceFinish( $<lNumber>2, $<iNumber>4 );
                   hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
+
+                  hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_RESETTRY", TRUE ) ), NULL ) ) );
                }
              ;
 

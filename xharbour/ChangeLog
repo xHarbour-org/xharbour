@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.732 2003/02/18 22:41:03 likewolf Exp $
+ * $Id: ChangeLog,v 1.733 2003/02/18 23:54:52 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-18 18:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.sly
+    ! Fixed imporoper generation of HB_ResetTry() portion of TRY syntax.
 
 2003-02-19 00:55 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/hvm.c
