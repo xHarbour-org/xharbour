@@ -1,5 +1,5 @@
 /*
- * $Id: mouseapi.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: mouseapi.c,v 1.4 2003/06/28 21:51:26 lculik Exp $
  */
 
 /*
@@ -78,21 +78,21 @@ static int    s_iRightButton = 1;
 */
 /* C callable interface */
 
-BOOL hb_mouseIsPresent( void )
+BOOL HB_EXPORT hb_mouseIsPresent( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseIsPresent()"));
 
    return hb_mouse_IsPresent();
 }
 
-BOOL hb_mouseGetCursor( void )
+BOOL HB_EXPORT hb_mouseGetCursor( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseGetCursor()"));
 
    return s_bVisible;
 }
 
-void hb_mouseSetCursor( BOOL bVisible )
+void HB_EXPORT hb_mouseSetCursor( BOOL bVisible )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseSetCursor(%d)", (int) bVisible));
 
@@ -108,49 +108,49 @@ void hb_mouseSetCursor( BOOL bVisible )
    }
 }
 
-int hb_mouseCol( void )
+int HB_EXPORT hb_mouseCol( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseCol()"));
 
    return hb_mouse_Col();
 }
 
-int hb_mouseRow( void )
+int HB_EXPORT hb_mouseRow( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseRow()"));
 
    return hb_mouse_Row();
 }
 
-void hb_mouseSetPos( int iRow, int iCol )
+void HB_EXPORT hb_mouseSetPos( int iRow, int iCol )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseSetPos(%d, %d)", iRow, iCol));
 
    hb_mouse_SetPos( iRow, iCol );
 }
 
-BOOL hb_mouseIsButtonPressed( int iButton )
+BOOL HB_EXPORT hb_mouseIsButtonPressed( int iButton )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseIsButtonPressed(%d)", iButton));
 
    return hb_mouse_IsButtonPressed( iButton );
 }
 
-int hb_mouseCountButton( void )
+int HB_EXPORT hb_mouseCountButton( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseCountButton()"));
 
    return hb_mouse_CountButton();
 }
 
-void hb_mouseSetBounds( int iTop, int iLeft, int iBottom, int iRight )
+void HB_EXPORT hb_mouseSetBounds( int iTop, int iLeft, int iBottom, int iRight )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseSetBounds(%d, %d, %d, %d)", iTop, iLeft, iBottom, iRight));
 
    hb_mouse_SetBounds( iTop, iLeft, iBottom, iRight );
 }
 
-void hb_mouseGetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight )
+void HB_EXPORT hb_mouseGetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_mouseSetBounds(%p, %p, %p, %p)", piTop, piLeft, piBottom, piRight));
 

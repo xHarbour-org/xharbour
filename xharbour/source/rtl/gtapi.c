@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.9 2003/07/23 22:09:30 druzus Exp $
+ * $Id: gtapi.c,v 1.10 2003/10/02 20:34:36 paultucker Exp $
  */
 
 /*
@@ -167,14 +167,14 @@ void hb_gtExit( void )
    }
 }
 
-int hb_gtExtendedKeySupport()
+int HB_EXPORT hb_gtExtendedKeySupport()
 {
     return hb_gt_ExtendedKeySupport();
 }
 
 /* Why this redundancy ??? */
 #if 0
-int hb_gtReadKey( HB_inkey_enum eventmask )
+int HB_EXPORT hb_gtReadKey( HB_inkey_enum eventmask )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtReadKey(%d)", (int) eventmask));
 
@@ -182,7 +182,7 @@ int hb_gtReadKey( HB_inkey_enum eventmask )
 }
 #endif
 
-void hb_gtAdjustPos( int iHandle, char * pStr, ULONG ulLen )
+void HB_EXPORT hb_gtAdjustPos( int iHandle, char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtAdjustPos()"));
 
@@ -775,7 +775,7 @@ USHORT HB_EXPORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMethod )
    return 0;
 }
 
-BOOL hb_gtIsColor( void )
+BOOL HB_EXPORT hb_gtIsColor( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtIsColor()"));
 
@@ -1085,14 +1085,14 @@ USHORT HB_EXPORT hb_gtDrawShadow( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, 
    return 0;
 }
 
-void hb_gtTone( double dFrequency, double dDuration )
+void HB_EXPORT hb_gtTone( double dFrequency, double dDuration )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtTone(%lf, %lf)", dFrequency, dDuration));
 
    hb_gt_Tone( dFrequency, dDuration );
 }
 
-char * hb_gtVersion( void )
+char HB_EXPORT * hb_gtVersion( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtVersion()"));
 
@@ -1116,9 +1116,9 @@ USHORT HB_EXPORT hb_gtSuspend( void )
     * to prepare screen for outside output
     */
    if( !hb_gt_Suspend() )
-      return( -1 );
+      return -1;
 
-   return( 0 );
+   return 0;
 }
 
 USHORT HB_EXPORT hb_gtResume( void )
@@ -1132,17 +1132,17 @@ USHORT HB_EXPORT hb_gtResume( void )
          hb_gt_DispBegin();
    }
    else
-      return( -1 );
+      return -1;
 
-   return( 0 );
+   return  0;
 }
 
-int hb_gtIndexedColor( int idx )
+int HB_EXPORT hb_gtIndexedColor( int idx )
 {
-    return( s_pColor[ idx ] );
+    return s_pColor[ idx ];
 }
 
-int hb_gtCurrentColor()
+int HB_EXPORT hb_gtCurrentColor()
 {
-    return( s_pColor[ s_uiColorIndex ] );
+    return s_pColor[ s_uiColorIndex ];
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.11 2003/06/19 22:39:02 druzus Exp $
+ * $Id: hbapigt.h,v 1.12 2003/10/02 20:34:36 paultucker Exp $
  */
 
 /*
@@ -161,7 +161,7 @@ typedef enum
 
 extern void   hb_gtInit( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr );
 extern void   hb_gtExit( void );
-extern void   hb_gtAdjustPos( int iHandle, char * pStr, ULONG ulLen );
+extern void   HB_EXPORT hb_gtAdjustPos( int iHandle, char * pStr, ULONG ulLen );
 extern USHORT HB_EXPORT hb_gtBox( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight, BYTE * pbyFrame );
 extern USHORT HB_EXPORT hb_gtBoxD( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
 extern USHORT HB_EXPORT hb_gtBoxS( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
@@ -182,8 +182,8 @@ extern USHORT HB_EXPORT hb_gtPostExt( void );
 extern USHORT HB_EXPORT hb_gtPreExt( void );
 extern USHORT HB_EXPORT hb_gtSuspend( void ); /* prepare the reminal for shell output */
 extern USHORT HB_EXPORT hb_gtResume( void ); /* resume the terminal after the shell output */
-extern int    hb_gtExtendedKeySupport( void );
-extern int    hb_gtReadKey( HB_inkey_enum eventmask );
+extern int    HB_EXPORT hb_gtExtendedKeySupport( void );
+extern int    HB_EXPORT hb_gtReadKey( HB_inkey_enum eventmask );
 extern USHORT HB_EXPORT hb_gtRectSize( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, UINT * puiBuffSize );
 extern USHORT HB_EXPORT hb_gtRepChar( USHORT uiRow, USHORT uiCol, BYTE byChar, USHORT uiCount );
 extern USHORT HB_EXPORT hb_gtRest( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff );
@@ -197,12 +197,12 @@ extern USHORT HB_EXPORT hb_gtSetMode( USHORT uiRows, USHORT uiCols );
 extern USHORT HB_EXPORT hb_gtSetPos( SHORT iRow, SHORT iCol );
 extern USHORT HB_EXPORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMode );
 extern USHORT HB_EXPORT hb_gtSetSnowFlag( BOOL bNoSnow );
-extern void   hb_gtTone( double dFrequency, double dDuration );
+extern void   HB_EXPORT hb_gtTone( double dFrequency, double dDuration );
 extern USHORT HB_EXPORT hb_gtWrite( BYTE * pbyStr, ULONG ulLen );
 extern USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pbyStr, ULONG ulLen );
 extern USHORT HB_EXPORT hb_gtWriteCon( BYTE * pbyStr, ULONG ulLen );
-extern int    hb_gtCurrentColor( void );
-extern char * hb_gtVersion( void );
+extern int    HB_EXPORT hb_gtCurrentColor( void );
+extern char   HB_EXPORT * hb_gtVersion( void );
 #define hb_gtOutStd( pbyStr, ulLen ) hb_gt_OutStd( pbyStr, ulLen )
 #define hb_gtOutErr( pbyStr, ulLen ) hb_gt_OutErr( pbyStr, ulLen )
 
@@ -298,16 +298,16 @@ extern int    hb_inkeyTranslate( int key, HB_inkey_enum event_make ); /* Transla
 
 /* Public interface. These should never change, only be added to. */
 
-extern BOOL   hb_mouseIsPresent( void );
-extern BOOL   hb_mouseGetCursor( void );
-extern void   hb_mouseSetCursor( BOOL bVisible );
-extern int    hb_mouseCol( void );
-extern int    hb_mouseRow( void );
-extern void   hb_mouseSetPos( int iRow, int iCol );
-extern BOOL   hb_mouseIsButtonPressed( int iButton );
-extern int    hb_mouseCountButton( void );
-extern void   hb_mouseSetBounds( int iTop, int iLeft, int iBottom, int iRight );
-extern void   hb_mouseGetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight );
+extern BOOL   HB_EXPORT hb_mouseIsPresent( void );
+extern BOOL   HB_EXPORT hb_mouseGetCursor( void );
+extern void   HB_EXPORT hb_mouseSetCursor( BOOL bVisible );
+extern int    HB_EXPORT hb_mouseCol( void );
+extern int    HB_EXPORT hb_mouseRow( void );
+extern void   HB_EXPORT hb_mouseSetPos( int iRow, int iCol );
+extern BOOL   HB_EXPORT hb_mouseIsButtonPressed( int iButton );
+extern int    HB_EXPORT hb_mouseCountButton( void );
+extern void   HB_EXPORT hb_mouseSetBounds( int iTop, int iLeft, int iBottom, int iRight );
+extern void   HB_EXPORT hb_mouseGetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight );
 
 /* Private interface listed below. these are common to all platforms */
 
