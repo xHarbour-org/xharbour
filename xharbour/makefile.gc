@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.gcc,v 1.0 2005/02/17 12:57:38 andijahja Exp $
+# $Id: makefile.gc,v 1.1 2005/02/17 08:03:07 andijahja Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -3844,7 +3844,7 @@ $(HARBOUR_EXE) : \
 	$(CC) -Wall\
       -o$(HARBOUR_EXE) \
       $(HARBOUR_EXE_OBJS) \
-      -Ld:/xhrb/lib/gcc \
+      -L$(LIB_DIR) \
       -mno-cygwin \
       -lpp -lcommon \
       -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32
