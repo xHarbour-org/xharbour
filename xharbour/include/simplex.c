@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.9 2004/04/01 22:00:41 druzus Exp $
+ * $Id: simplex.c,v 1.10 2004/05/09 02:54:28 ronpinkas Exp $
  */
 
 /*
@@ -85,11 +85,11 @@
 #define STREAM_EXCEPTION( sPair, chrPair) \
         if( chrPair ) \
         { \
-           printf(  "Exception: %c for stream at: \"%s\"\n", chrPair, sPair ); \
+           printf(  "Exception: %c for stream at: \"%s\"\n", chrPair, (char *) sPair ); \
         } \
         else \
         { \
-           printf(  "Exception: <EOF> for stream at: \"%s\"\n", chrPair, sPair ); \
+           printf(  "Exception: <EOF> for stream at: \"%s\"\n", chrPair, (char *) sPair ); \
         } \
 
 /* Pairs. */
@@ -747,7 +747,7 @@ int SimpLex_GetNextToken( void )
 
                   sPair[ iPairLen ] = '\0';
 
-                  STREAM_EXCEPTION( sPair, NULL );
+                  STREAM_EXCEPTION( sPair, (char) -1 );
                }
 
                {
