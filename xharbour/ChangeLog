@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3238 2004/07/30 08:53:34 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3239 2004/07/30 09:54:14 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -323,7 +323,6 @@
     - Removed ::DrawRows(). It was integrated to ::DrawARow(), so there
       will not be double code for the same task.
 
->>>>>>> 1.3231
 2004-07-24 13:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * contrib/libct/ascpos.c
   * contrib/libct/tests/ascpos.prg
