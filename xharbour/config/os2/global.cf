@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.2 2003/05/16 19:52:04 druzus Exp $
+# $Id: global.cf,v 1.3 2003/12/03 13:01:19 mauriliolongo Exp $
 #
 
 all : first
@@ -34,19 +34,14 @@ MV = move
 MD = md
 
 dirbase::
-	-CMD.EXE /c IF NOT EXIST $(HB_ARCHITECTURE) $(MD) $(HB_ARCHITECTURE)
-	-CMD.EXE /c IF NOT EXIST $(OS2_ARCH_DIR)    $(MD) $(OS2_ARCH_DIR)
+	-@for %d in ($(HB_ARCHITECTURE) $(OS2_ARCH_DIR)) do if not exist %d\. $(MD) %d
 
 dirbase_mt::
-	-CMD.EXE /c IF NOT EXIST $(HB_ARCHITECTURE) $(MD) $(HB_ARCHITECTURE)
-	-CMD.EXE /c IF NOT EXIST $(OS2_ARCH_DIR)_mt $(MD) $(OS2_ARCH_DIR)_mt
+	-@for %d in ($(HB_ARCHITECTURE) $(OS2_ARCH_DIR)_mt) do if not exist %d\. $(MD) %d
 
 clean::
-	-CMD.EXE /c IF EXIST $(OS2_ARCH_DIR)\\*.* $(RM) $(OS2_ARCH_DIR)\\*.*
-	-CMD.EXE /c IF EXIST $(OS2_ARCH_DIR)_mt\\*.* $(RM) $(OS2_ARCH_DIR)_mt\\*.*
-	-CMD.EXE /c IF EXIST $(OS2_ARCH_DIR)     $(RD) $(OS2_ARCH_DIR)
-	-CMD.EXE /c IF EXIST $(OS2_ARCH_DIR)_mt     $(RD) $(OS2_ARCH_DIR)_mt
-	-CMD.EXE /c IF EXIST $(HB_ARCHITECTURE)  $(RD) $(HB_ARCHITECTURE)
+	-@for %f in ($(OS2_ARCH_DIR)\*.* $(OS2_ARCH_DIR)_mt\*.*) do $(RM) %f
+	-@for %d in ($(OS2_ARCH_DIR) $(OS2_ARCH_DIR)_mt $(HB_ARCHITECTURE)) do if exist %d\. $(RD) %d
 
 else  # bash
 

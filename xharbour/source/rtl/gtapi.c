@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.26 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: gtapi.c,v 1.27 2004/03/02 23:19:40 jonnymind Exp $
  */
 
 /*
@@ -1255,7 +1255,7 @@ void HB_EXPORT hb_gtHandleClose()
    s_closing = FALSE;
 }
 
-int HB_EXPORT hb_gtHandleShutdown()
+BOOL HB_EXPORT hb_gtHandleShutdown()
 {
    // this can work only in single threading, but we MUST have just
    // one thread that can send a close request even in MT.

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2627 2004/03/22 17:46:58 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.2628 2004/03/22 17:50:15 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2004-03-22 19:08 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+  * config/os2/global.cf
+    * changes to dir creation rules
+  ! source/rtl/gtapi.c
+    ! line 1258 of gtapi.c was conflicting with definition in hbapigt.h, line 280
+      which is the one I used to correct gtapi.c
 
 2004-03-22 18:58 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
   * source/common/hbver.c
