@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.50 2004/01/15 16:52:22 lf_sfnet Exp $
+ * $Id: gtwvt.c,v 1.51 2004/01/15 22:31:59 peterrees Exp $
  */
 
 /*
@@ -3258,7 +3258,7 @@ HB_FUNC( WVT_GETFONTINFO )
 
 //-------------------------------------------------------------------//
 
-HB_FUNC( WVT_GETPALLETE )
+HB_FUNC( WVT_GETPALETTE )
 {
    PHB_ITEM  info;
    PHB_ITEM  temp;
@@ -3278,9 +3278,9 @@ HB_FUNC( WVT_GETPALLETE )
 
 //-------------------------------------------------------------------//
 //
-//    Wvt_SetPallet( aRGBValues ) -> An array of 16 elements with RGB values
+//    Wvt_SetPalette( aRGBValues ) -> An array of 16 elements with RGB values
 //
-HB_FUNC( WVT_SETPALLETE )
+HB_FUNC( WVT_SETPALETTE )
 {
    int       i;
 

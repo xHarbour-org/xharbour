@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2082 2004/01/17 00:05:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2083 2004/01/17 01:53:10 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-17 03:30 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    + Changed function name *Pallete to *Palette
+  + tests/wvtgui.ch
+    + Added WVT preprocessor commands
+  + tests/wvt.prg
+    + Added functions to serve preprocessor commands
+  + tests/wvtguie.prg
+    * Rewrote wvtgui.prg using the new commands
+
+  /*
+    If ppl working on WVT accepts this news i'll move wvtgui.ch to include folder
+    and wvt.prg in source/rtl/gtwvt
+  */
 
 2004-01-16 17:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
