@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.122 2004/06/30 22:50:42 marcosgambeta Exp $
+ * $Id: dbcmd.c,v 1.123 2004/07/12 23:58:37 kaddath Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ static USHORT s_uiRddMax = 0;          /* Number of registered RDD */
 
 static AREAP * s_WaList = NULL;        /* Allocated WorkAreas */
 static USHORT s_uiWaMax = 0;           /* Number of allocated WA */
-static USHORT s_uiWaSpace = 0;           /* Number of allocated WA */
+static USHORT s_uiWaSpace = 0;         /* Number of allocated WA */
 
 static USHORT * s_WaNums = NULL;       /* Allocated WorkAreas */
 static USHORT s_uiWaNumMax = 0;        /* Number of allocated WA */
@@ -120,7 +120,7 @@ static USHORT s_uiWaNumMax = 0;        /* Number of allocated WA */
 static BOOL s_bNetError = FALSE;       /* Error on Networked environments */
 #ifndef HB_THREAD_SUPPORT
    static USHORT s_uiCurrArea = 1;     /* Selected area */
-   static AREAP  s_pCurrArea = NULL;     /* Selected area */
+   static AREAP  s_pCurrArea = NULL;   /* Selected area */
    #define LOCK_AREA
    #define UNLOCK_AREA
    #define LOCK_AREA_INIT
@@ -3063,6 +3063,7 @@ HB_FUNC( ORDFOR )
       }
 
       pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
+      pOrderInfo.itmNewVal = hb_param( 3, HB_IT_STRING );
       pOrderInfo.itmResult = hb_itemPutC( NULL, "" );
       SELF_ORDINFO( pArea, DBOI_CONDITION, &pOrderInfo );
       hb_itemReturn( pOrderInfo.itmResult );
@@ -3174,6 +3175,17 @@ HB_FUNC( ORDKEYGOTO )
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYGOTO" );
 }
+
+HB_FUNC( ORDSKIPRAW )
+{
+   HB_THREAD_STUB
+   AREAP pArea = HB_CURRENT_WA;
+   if( pArea )
+      SELF_SKIPRAW( pArea, ISNUM( 1 ) ? hb_parnl( 1 ) : 1 );
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDSKIPRAW" );
+}
+
 
 HB_FUNC( ORDSKIPUNIQUE )
 {
@@ -3304,6 +3316,48 @@ HB_FUNC( ORDISUNIQUE )
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDISUNIQUE" );
+}
+
+HB_FUNC( ORDCUSTOM )
+{
+   HB_THREAD_STUB
+   DBORDERINFO pOrderInfo;
+   AREAP pArea = HB_CURRENT_WA;
+
+   if( pArea )
+   {
+      pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
+      if( !pOrderInfo.itmOrder )
+         pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
+      pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
+      /* Either or both may be NIL */
+      pOrderInfo.itmNewVal = hb_param( 3 , HB_IT_LOGICAL );
+      pOrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
+      SELF_ORDINFO( pArea, DBOI_CUSTOM, &pOrderInfo );
+      hb_itemReturn( pOrderInfo.itmResult );
+      hb_itemRelease( pOrderInfo.itmResult );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDCUSTOM" );
+}
+
+HB_FUNC( ORDCOUNT )
+{
+   HB_THREAD_STUB
+   DBORDERINFO pOrderInfo;
+   AREAP pArea = HB_CURRENT_WA;
+
+   if( pArea )
+   {
+      pOrderInfo.itmOrder = NULL;
+      pOrderInfo.atomBagName = hb_param( 1, HB_IT_STRING );
+      pOrderInfo.itmResult = hb_itemPutNI( NULL, FALSE );
+      SELF_ORDINFO( pArea, DBOI_ORDERCOUNT, &pOrderInfo );
+      hb_itemReturn( pOrderInfo.itmResult );
+      hb_itemRelease( pOrderInfo.itmResult );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDCOUNT" );
 }
 
 #endif

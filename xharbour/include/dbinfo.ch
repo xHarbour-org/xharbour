@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.4 2004/03/16 14:39:22 druzus Exp $
+ * $Id: dbinfo.ch,v 1.5 2004/07/27 13:19:34 druzus Exp $
  */
 
 /*
@@ -174,7 +174,9 @@
 #define DBI_RDD_VERSION         102  /* current RDD's version               */
 
 /* HARBOUR extension */
-#define DBI_LOCKSCHEME          128  /* locking scheme used by RDD */
+#define DBI_LOCKSCHEME          128  /* Locking scheme used by RDD */
+#define DBI_ISREADONLY          129  /* Was the file opened readonly? */
+#define DBI_ROLLBACK            130  /* Rollback changes made to current record */
 
 #define DBI_USER               1000  /* User-defined DBI_ constants */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.85 2004/07/28 20:56:18 druzus Exp $
+ * $Id: dbf1.c,v 1.86 2004/07/29 21:16:24 druzus Exp $
  */
 
 /*
@@ -1935,6 +1935,10 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutL( pItem, pArea->fFLocked );
          break;
 
+      case DBI_ISREADONLY:
+         hb_itemPutL( pItem, pArea->fReadonly );
+         break;
+
       case DBI_LOCKSCHEME:
       {
          SHORT bScheme = hb_itemGetNI( pItem );
@@ -1946,7 +1950,22 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             case HB_SET_DBFLOCK_VFP:
                pArea->bLockType = (BYTE) bScheme;
          }
+         break;
       }
+      case DBI_ROLLBACK:
+         if ( pArea->fRecordChanged )
+         {
+            if ( pArea->fAppend )
+            {
+               hb_dbfSetBlankRecord( pArea ) ;
+               pArea->fDeleted = FALSE;
+            }
+            else
+            {
+               pArea->fRecordChanged = pArea->fValidBuffer = FALSE;
+            }
+         }
+         break;
 
       default:
          return SUPER_INFO( ( AREAP ) pArea, uiIndex, pItem );

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.48 2004/05/22 15:38:29 likewolf Exp $
+ * $Id: hbdefs.h,v 1.49 2004/06/30 10:05:14 likewolf Exp $
  */
 
 /*
@@ -57,6 +57,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "hbsetup.h"
 #include "hbtrace.h"
@@ -253,9 +254,13 @@
 #if !defined( UINT16 )
 #  if USHRT_MAX == 0xffff
       typedef USHORT       UINT16;
-#     if ( ! defined( __XCC__ ) && ! defined( __MINGW32__ ) )
+#     if !defined( UINT16_MAX )
 #        define UINT16_MAX    USHRT_MAX
+#     endif
+#     if !defined( INT16_MAX )
 #        define INT16_MAX     SHRT_MAX
+#     endif
+#     if !defined( INT16_MIN )
 #        define INT16_MIN     SHRT_MIN
 #     endif
 #  endif
@@ -265,16 +270,24 @@
 #     if !( defined( __MINGW32__ ) && defined( _BASETSD_H ) )
          typedef UINT         UINT32;
 #     endif
-#     if ( ! defined( __XCC__ ) && ! defined( __MINGW32__ ) )
+#     if !defined( UINT32_MAX )
 #        define UINT32_MAX    UINT_MAX
+#     endif
+#     if !defined( INT32_MAX )
 #        define INT32_MAX     INT_MAX
+#     endif
+#     if !defined( INT32_MIN )
 #        define INT32_MIN     INT_MIN
 #     endif
 #  elif ULONG_MAX == 0xffffffff
       typedef ULONG        UINT32;
-#     if ( ! defined( __XCC__ ) )
+#     if !defined( UINT32_MAX )
 #        define UINT32_MAX    ULONG_MAX
+#     endif
+#     if !defined( INT32_MAX )
 #        define INT32_MAX     LONG_MAX
+#     endif
+#     if !defined( INT32_MIN )
 #        define INT32_MIN     LONG_MIN
 #     endif
 #  endif
@@ -282,18 +295,26 @@
 #if !defined( UINT64 ) && !defined( HB_LONG_LONG_OFF )
 #  if ULONG_MAX > UINT_MAX && UINT_MAX > USHORT_MAX
       typedef ULONG        UINT64;
-#     if ( ! defined( __XCC__ ) && ! defined( __MINGW32__ ) )
+#     if !defined( UINT64_MAX )
 #        define UINT64_MAX    ULONG_MAX
+#     endif
+#     if !defined( INT64_MAX )
 #        define INT64_MAX     LONG_MAX
+#     endif
+#     if !defined( INT64_MIN )
 #        define INT64_MIN     LONG_MIN
 #     endif
 #  else
 #     if !( defined( __MINGW32__ ) && defined( _BASETSD_H ) )
          typedef ULONGLONG    UINT64;
 #     endif
-#     if ( ! defined( __XCC__ ) && ! defined( __MINGW32__ ) )
+#     if !defined( UINT64_MAX )
 #        define UINT64_MAX    ULONGLONG_MAX
+#     endif
+#     if !defined( INT64_MAX )
 #        define INT64_MAX     LONGLONG_MAX
+#     endif
+#     if !defined( INT64_MIN )
 #        define INT64_MIN     LONGLONG_MIN
 #     endif
 #  endif

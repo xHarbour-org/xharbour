@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3252 2004/08/01 19:22:15 mlombardo Exp $
+ * $Id: ChangeLog,v 1.3253 2004/08/02 01:45:45 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-02 14:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * include/Makefile
+   + added gfx.ch - Mauricio the mail I sent to you returned to me - your
+     ISP doesn't accept it.
+  * xharbour/include/hbdefs.h
+   * include stdint.h and modified [U]INT_{MIN|MAX}* to avoid conflicts
+
+  * xharbour/include/dbinfo.ch
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   + DBI_ISREADONLY and DBI_ROLLBACK added
+   + ORDFOR() change online the FOR condition like in Clipper 5.3
+     and COMIX (be careful and first read documentation what it
+     could cause)
+   + added ORDSKIPRAW(nRows) - unfiltered raw skip
+   + added ORDCUSTOM( [nTag|cTag], [cBag], [lNewSet] ) return/change
+     CUSTOM index flag in tag - you can make normal index custom but
+     you cannot make custom index to be normal. The custom index are
+     not updated automatically but only by programmer with ORDKEYADD
+     and ORDKEYDEL.
+   + added ORDCOUNT([cBag]) - return number of indexes in workarea or
+     in cBag if given.
 
 2004-08-01 22:10 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * bin/bld.bat

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.143 2004/07/28 23:27:55 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.144 2004/07/29 21:16:24 druzus Exp $
  */
 
 /*
@@ -6963,6 +6963,38 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
    {
       case DBOI_CONDITION:
          pOrderInfo->itmResult = hb_itemPutC( pOrderInfo->itmResult, ( pTag ? pTag->ForExpr : "" ) );
+         if ( pTag && pOrderInfo->itmNewVal && HB_IS_STRING( pOrderInfo->itmNewVal ) )
+         {
+            if ( pTag->ForExpr != NULL )
+               hb_xfree( pTag->ForExpr );
+            if ( pTag->pForItem != NULL )
+            {
+               if ( hb_itemType( pTag->pForItem ) != HB_IT_BLOCK )
+                  hb_macroDelete( ( HB_MACRO_PTR ) hb_itemGetPtr( pTag->pForItem ) );
+               hb_itemRelease( pTag->pForItem );
+            }
+            if ( hb_itemGetCLen( pOrderInfo->itmNewVal ) != 0 )
+            {
+               HB_MACRO_PTR pMacro;
+               pTag->ForExpr = ( char * ) hb_xgrab( CDX_MAXKEY + 1 );
+               hb_strncpyTrim( pTag->ForExpr, ( const char * ) hb_itemGetCPtr( pOrderInfo->itmNewVal ), CDX_MAXKEY );
+               SELF_COMPILE( ( AREAP ) pTag->pIndex->pArea, ( BYTE * ) pTag->ForExpr );
+               /* TODO: RT error if SELF_COMPILE return FAILURE */
+               pTag->pForItem = pTag->pIndex->pArea->valResult;
+               pTag->pIndex->pArea->valResult = NULL;
+               pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pTag->pForItem );
+               hb_macroRun( pMacro );
+               if ( hb_itemType( hb_stackItemFromTop( -1 ) ) != HB_IT_LOGICAL )
+               {
+                  hb_macroDelete( pMacro );
+                  hb_itemRelease( pTag->pForItem );
+                  pTag->pForItem = NULL;
+                  hb_xfree( pTag->ForExpr );
+                  pTag->ForExpr = NULL;
+               }
+               hb_stackPop();
+            }
+         }
          break;
 
       case DBOI_EXPRESSION:
@@ -7094,26 +7126,28 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          }
 
       case DBOI_ORDERCOUNT:
-         uiTag = 0;
-         if ( pArea->lpIndexes )
          {
-            pTag = pArea->lpIndexes->TagList;
-            while ( pTag )
+            LPCDXINDEX pIndex;
+            uiTag = 0;
+            pIndex = pOrderInfo->atomBagName ? pArea->lpIndexes :
+                         hb_cdxFindBag( pArea, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
+            if ( pIndex )
             {
-               uiTag++;
-               if ( pTag->pNext )
-                  pTag = pTag->pNext;
-               else
+               pTag = pIndex->TagList;
+               while ( pTag )
                {
-                  if ( pTag->pIndex->pNext )
+                  uiTag++;
+                  pTag = pTag->pNext;
+                  if ( pTag == NULL && pOrderInfo->atomBagName == NULL && 
+                       pTag->pIndex->pNext != NULL )
+                  {
                      pTag = pTag->pIndex->pNext->TagList;
-                  else
-                     pTag = NULL;
+                  }
                }
             }
+            pOrderInfo->itmResult = hb_itemPutNI( pOrderInfo->itmResult, uiTag );
+            break;
          }
-         pOrderInfo->itmResult = hb_itemPutNI( pOrderInfo->itmResult, uiTag );
-         break;
 
       case DBOI_FILEHANDLE:
          pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult, ( pTag ? ( LONG ) pTag->pIndex->hFile : FS_ERROR ) );
@@ -7213,6 +7247,11 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_CUSTOM:
          pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, ( pTag ? pTag->Custom : FALSE ) );
+         if ( pOrderInfo->itmNewVal && HB_IS_LOGICAL( pOrderInfo->itmNewVal )
+                                    && hb_itemGetL( pOrderInfo->itmNewVal ) )
+         {
+            pTag->Custom = TRUE;
+         }
          break;
 
       case DBOI_KEYADD:

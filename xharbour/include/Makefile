@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.15 2004/04/15 16:53:11 lculik Exp $
+# $Id: Makefile,v 1.16 2004/04/20 08:26:57 lf_sfnet Exp $
 #
 
 ROOT = ../
@@ -75,6 +75,7 @@ PRG_HEADERS=\
 	fileio.ch    \
 	getexit.ch   \
 	gtinfo.ch    \
+	gfx.ch       \
 	hbclass.ch   \
 	hbcommon.ch  \
 	hbcomprs.ch  \
