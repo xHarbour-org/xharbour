@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.45 2003/06/18 19:47:10 mlombardo Exp $
+ * $Id: dbfntx1.c,v 1.46 2003/06/19 02:44:49 druzus Exp $
  */
 
 /*
@@ -2455,11 +2455,15 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
    BOOL fValidBuffer;
 #ifndef HB_CDP_SUPPORT_OFF
    PHB_CODEPAGE cdpTmp = s_cdpage;
-   s_cdpage = pArea->cdPage;
 #endif
 
    ulRecCount = pIndex->Owner->ulRecCount;
    pArea = pIndex->Owner;
+
+#ifndef HB_CDP_SUPPORT_OFF
+   s_cdpage = (NTXAREAP) pArea->cdPage;
+#endif
+
    pTag = pIndex->CompoundTag;
    pItem = hb_itemNew( NULL );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.73 2003/06/08 22:12:55 lculik Exp $
+ * $Id: hbmake.prg,v 1.74 2003/06/10 10:54:29 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -98,6 +98,7 @@ STATIC s_aDir
 STATIC s_aLangMessages := {}
 STATIC s_cAppName      := ""
 STATIC s_cDefLang
+STATIC s_cLog          := ""
 
 FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
@@ -108,7 +109,8 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    LOCAL AllParam
    LOCAL nLang    := GETUSERLANG()
 
-   Ferase( "Test.out" )
+
+   
    Ferase( s_cLinker )
    SET(39,159)
    IF Pcount() == 0
@@ -187,6 +189,10 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       ENDIF
 
    ENDIF
+
+   s_cLog := Substr( cFile,1 , AT(".",cFile) -1) + ".out"
+
+   Ferase( (s_cLog) )
 
    IF s_lEditMode
 
@@ -771,18 +777,18 @@ FUNCTION CompileFiles()
                IF nPos > 0
                   cComm := Strtran( cComm, "o$*", "o" + s_aCs[ nPos ] )
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> Test.out"," > Test.out")
+                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
                   Outstd( cComm )
                   Outstd( Hb_OsNewLine() )
                   __RUN( (cComm) )
-                  cErrText := Memoread( 'Test.out' )
+                  cErrText := Memoread( (s_cLog) )
                   lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
 
                   IF ! s_lIgnoreErrors .AND. lEnd
-                     IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit Test.out" ), __run( "Notepad Test.out" ) )
+                     IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit " +(s_cLog) ), __run( "Notepad " + (s_cLog) ) )
                      QUIT
                   ELSE
-                     //                            Ferase( 'Test.out' )
+                     //                            Ferase( (s_cLog) )
                   ENDIF
 
                   cComm := cOld
@@ -841,8 +847,8 @@ FUNCTION CompileFiles()
                       cComm := Strtran( cComm, "o$*", "o" + Strtran( s_aObjs[ nPos ], '/', '\' ) )
                   ENDIF
 
-                  cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> Test.out"," > Test.out")
+                  cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] ) 
+                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
                   Outstd( " " )
                   Outstd( cComm )
                   Outstd( Hb_OsNewLine() )
@@ -898,21 +904,21 @@ FUNCTION CompileFiles()
 
                      cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
 
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> Test.out"," > Test.out")
+                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
 
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                      nFile ++
                      //                            Outstd( cComm )
                      __RUN( (cComm) )
-                     cErrText := Memoread( 'Test.out' )
+                     cErrText := Memoread( (s_cLog) )
                      lEnd     := 'Error E' $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit Test.out" ), __run( "Notepad Test.out" ) )
+                        IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog)) )
                         QUIT
                      ELSE
-                        //                                Ferase( 'Test.out' )
+                        //                                Ferase( (s_cLog) )
                       ENDIF
 
                      cComm := cOld
@@ -966,21 +972,21 @@ FUNCTION CompileFiles()
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> Test.out"," >> Test.out")
+                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
 
                   @  4, 16 SAY cPrg
                   GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                   //                        Outstd( Hb_OsNewLine() )
                   nFile ++
                   __RUN( (cComm) )
-                  cErrText := Memoread( 'Test.out' )
+                  cErrText := Memoread( (s_cLog) )
                   lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
 
                   IF ! s_lIgnoreErrors .AND. lEnd
-                     IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit Test.out" ), __run( "Notepad Test.out" ) )
+                     IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog)) )
                      QUIT
                   ELSE
-                     //                            Ferase( 'Test.out' )
+                     //                            Ferase( (s_cLog) )
                   ENDIF
 
                   cComm := cOld
@@ -1950,19 +1956,19 @@ FUNCTION CompileUpdatedFiles()
                      aAdd( aCtocompile, s_aCs[ nPos ] )
                      cComm := Strtran( cComm, "o$*", "o" + s_aCs[ nPos ] )
                      cComm := Strtran( cComm, "$**", s_aPrgs[ nFiles ] )
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> Test.out"," > Test.out")
+                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 , " 2> "+ (s_cLog)," >>"+ (s_cLog))
 
                      //                   Outstd( cComm )
                      //                   Outstd( Hb_OsNewLine() )
                      __RUN( (cComm) )
-                     cErrText := Memoread( 'Test.out' )
+                     cErrText := Memoread( (s_cLog) )
                      lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit Test.out" ), __run( "Notepad Test.out" ) )
+                        IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog) ) )
                         QUIT
                      ELSE
-                        //                                Ferase( 'Test.out' )
+                        //                                Ferase( (s_cLog) )
                      ENDIF
 
                      cComm := cOld
@@ -2008,7 +2014,7 @@ FUNCTION CompileUpdatedFiles()
                IF nPos > 0
                   cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                   cComm := Strtran( cComm, "$**", aCtocompile[ nFiles ] )
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> Test.out"," > Test.out")
+                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
                   Outstd( " " )
 
                   Outstd( cComm )
@@ -2051,7 +2057,7 @@ FUNCTION CompileUpdatedFiles()
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjsc[ nPos ] )
                      cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> Test.out"," > Test.out")
+                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                      nFile ++
@@ -2059,14 +2065,14 @@ FUNCTION CompileUpdatedFiles()
                      //                            Outstd( Hb_OsNewLine() )
 
                      __RUN( (cComm) )
-                     cErrText := Memoread( 'Test.out' )
+                     cErrText := Memoread( (s_cLog) )
                      lEnd     := 'Error E' $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit Test.out" ), __run( "Notepad Test.out" ) )
+                        IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit "  + (s_cLog)), __run( "Notepad " + (s_cLog) ) )
                         QUIT
                      ELSE
-                        //                                Ferase( 'Test.out' )
+                        //                                Ferase( (s_cLog) )
                      ENDIF
 
                      cComm := cOld
@@ -2112,19 +2118,19 @@ FUNCTION CompileUpdatedFiles()
                   IF nPos > 0
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                      cComm := Strtran( cComm, "$**", cPrg )
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2 > Test.out"," > Test.out")
+                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " 2> "+ (s_cLog)," >>"+ (s_cLog))
                      @  4, 16 SAY cPrg
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
 
                      __RUN( (cComm) )
-                     cErrText := Memoread( 'Test.out' )
+                     cErrText := Memoread( (s_cLog) )
                      lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        IIF( "LINUX" IN Upper( Os() ) , __run( "mcedit Test.out" ), __run( "Notepad Test.out" ) )
+                        IIF( "LINUX" IN Upper( Os() ) , __run( "mcedit " + (s_cLog) ), __run( "Notepad "  + (s_cLog) ) )
                         QUIT
                      ELSE
-                        //                                Ferase( 'test.out' )
+                        //                                Ferase( (s_cLog) )
                      ENDIF
 
                      cComm := cOld
