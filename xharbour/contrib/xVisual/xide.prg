@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.142 2003/01/28 02:25:22 what32 Exp $
+ * $Id: xide.prg,v 1.143 2003/01/30 08:40:07 what32 Exp $
  */
 
 /*
@@ -117,6 +117,7 @@ METHOD MainMenu() CLASS MainForm
    
          oSubItem := TMenuItem():Create( oItem )
          oSubItem:Caption := "Open"
+         oSubItem:Action  := {||OpenProject():Create()}
          oSubItem:AppendTo( oItem:Handle )
 
          oSubItem := TMenuItem():Create( oItem )

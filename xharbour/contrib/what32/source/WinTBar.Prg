@@ -176,8 +176,8 @@ METHOD AddButton(nIndex, nId, nState, nStyle, ncargo, nString, cText, cToolTip )
 
 RETURN(self)
 
-METHOD AddMenu(nId,aMenuItems)
-AADD(::aMenus,{nId,aMenuItems})
+METHOD AddMenu(nButton, nMenuId, cMenuText )
+AADD(::aMenus,{nButton, nMenuId, cMenuText })
 return(self)
 
 *-----------------------------------------------------------------------------*
@@ -259,30 +259,39 @@ METHOD tbProc(nMsg,nwParam,nlParam)
    LOCAL Ttt
    LOCAL nmt
    LOCAL nID
-   LOCAL hMenu,rc,aRect
+   LOCAL hMenu,rc,aRect, aPoint
    LOCAL n,x
    LOCAL hic
    DO CASE
    CASE nMsg==WM_NOTIFY
      Hdr IS NMHDR
      Hdr:Buffer(peek(nlParam,Hdr:sizeof))
+
      DO CASE
-     /*
      CASE Hdr:code==TBN_DROPDOWN
          Nmt IS NMTOOLBAR
          nmt:buffer(peek(nlParam,nmt:sizeof))
          IF (n:=ASCAN(::aMenus,{|a| a[1]==nmt:iItem})) > 0
             ::nBtn:=nmt:iItem
-            SendMessage(::hWnd,TB_SETSTATE,nmt:iItem,MAKELONG(TBSTATE_ENABLED+TBSTATE_PRESSED,0) )
             hMenu = CreatePopupMenu( )
-            FOR x:=1 TO LEN(::aMenus[n][2])
-                AppendMenu( hMenu, MF_ENABLED + MF_STRING,::aMenus[n][2][1],::aMenus[n][2][2])
+            FOR x:=1 TO LEN(::aMenus)
+                IF ::aMenus[x][1] == nmt:iItem
+                   IF ::aMenus[x][3] == "-".and. ::aMenus[x][2] == 0
+                      AppendMenu( hMenu, MF_SEPARATOR )
+                     ELSE
+                      AppendMenu( hMenu, MF_ENABLED + MF_STRING,::aMenus[x][2],::aMenus[x][3])
+                   ENDIF
+                ENDIF
             NEXT
-            aRect:=GetToolBarItemRect(::hWnd,n-1)
-            TrackPopupMenu( hMenu,TPM_TOPALIGN + TPM_HORIZONTAL, aRect[1], aRect[4], 0, ::hWnd)
+            
+            x:= ASCAN(::aButtons,{|btn| btn:idCommand==nmt:iItem})
+            aRect:=GetToolBarItemRect(::hWnd,x-1)
+            aPoint := {aRect[1],aRect[4]}
+            ClientToScreen( ::hParent, @aPoint )
+            TrackPopupMenu( hMenu, TPM_LEFTALIGN+TPM_TOPALIGN, aPoint[1]+9, aPoint[2], 0, ::hWnd )
             DestroyMenu(hMenu)
+            RETURN 0
          end
-         */
      CASE Hdr:code==TTN_NEEDTEXT
        IF (n:=ASCAN(::aButtons,{|btn| btn:idCommand==Hdr:idFrom})) > 0
          Ttt IS TOOLTIPTEXT
