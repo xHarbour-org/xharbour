@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.43 2003/07/06 17:18:44 lculik Exp $
+ * $Id: itemapi.c,v 1.44 2003/07/06 19:00:25 lculik Exp $
  */
 
 /*
@@ -548,7 +548,7 @@ long HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
             return ( long ) pItem->item.asDouble.value;
 
          #ifndef HB_LONG_DOUBLE_OFF
-         case HB_IT_DOUBLE:
+         case HB_IT_LDOUBLE:
             return ( long ) pItem->item.asLDouble.value;
          #endif
          case HB_IT_DATE:
