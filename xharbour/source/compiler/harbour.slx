@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.7 2002/05/18 08:55:49 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.8 2002/05/18 09:12:48 ronpinkas Exp $
  */
 
 /*
@@ -65,12 +65,6 @@
    #define YY_BUF_SIZE HB_PP_STR_SIZE
 
 static int iCloseSquare = 0, iWantsEOL, iWantsEXP, iWantsID, iWantsVAR;
-
-/* Commented 2001-08-29 - Not really needed!
-#define NUMERALS_PER_LINE 3000
-static char *aTexts[ NUMERALS_PER_LINE ];
-int iTexts = 0;
-*/
 
 static unsigned char iIdentifier = 0;
 static char *sIdOnHold, *s_sLastBlock = NULL;
