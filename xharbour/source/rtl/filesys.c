@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.68 2004/02/14 21:01:16 andijahja Exp $
+ * $Id: filesys.c,v 1.69 2004/02/18 21:35:56 druzus Exp $
  */
 
 /*
@@ -166,7 +166,7 @@
 #endif
 
 #if defined(__BORLANDC__) || defined(__IBMCPP__) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__WATCOMC__)
-   #include <sys\stat.h>
+   #include <sys/stat.h>
    #include <share.h>
    #include <fcntl.h>
    #include <direct.h>
@@ -178,7 +178,7 @@
    #endif
 
    #if defined(_MSC_VER) || defined(__MINGW32__)
-      #include <sys\locking.h>
+      #include <sys/locking.h>
       #define ftruncate _chsize
       #if defined(__MINGW32__) && !defined(_LK_UNLCK)
          #define _LK_UNLCK _LK_UNLOCK

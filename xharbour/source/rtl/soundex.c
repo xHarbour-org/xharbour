@@ -1,5 +1,5 @@
 /*
- * $Id: soundex.c,v 1.8 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: soundex.c,v 1.1.1.1 2001/12/21 10:42:04 ronpinkas Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ HB_FUNC( SOUNDEX )
          {
             static const char s_szTable[] = "01230120022455012623010202"; /* NOTE: SoundEx result codes for letters from "A" to "Z" */
                                          /* "ABCDEFGHIJKLMNOPQRSTUVWXYZ" */
-            char cCharConverted = ( ( cChar - 'A' ) > ( sizeof( s_szTable ) - 1 ) ) ? '9' : s_szTable[ cChar - 'A' ];
+            char cCharConverted = ( ( cChar - 'A' ) > ( (char) sizeof( s_szTable ) - 1 ) ) ? '9' : s_szTable[ cChar - 'A' ];
 
             if( nResultPos == 0 )
                szResult[ nResultPos++ ] = cChar;

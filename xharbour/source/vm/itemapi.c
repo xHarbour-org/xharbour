@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.77 2004/02/14 21:01:19 andijahja Exp $
+ * $Id: itemapi.c,v 1.78 2004/02/19 20:52:07 andijahja Exp $
  */
 
 /*
@@ -1410,10 +1410,12 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
             iDec = 0;
          }
 
-         if( iDec < pNumber->item.asDouble.decimal )
-         {
-            dNumber = hb_numRound( dNumber, iDec );
-         }
+         /*
+          * always round! decimal item pointer cannot be used
+          * in numerical expressions
+          * // if( iDec < pNumber->item.asDouble.decimal ) 
+          */
+         dNumber = hb_numRound( dNumber, iDec );
 
          if( dNumber != 0.0 )
          {
@@ -1425,7 +1427,6 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
             dNumber = 0.0; /* -0.0 hack */
             iDecR = iDec;
          }
-         //printf("\r\n[iDec=%d, iDecR=%d]  ", iDec, iDecR);fflush(stdout);
 
          if( iDecR >= 0 )
          {
@@ -1435,9 +1436,13 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
             }
             else
             {
-               if( iDec <= iDecR || iDecR == 0 )
+               if( iDec <= iDecR )
                {
                   iBytes = snprintf( szResult, iSize + 1, "%*.*f", iSize, iDec, dNumber );
+               }
+               else if ( iDecR == 0 )
+               {
+                  iBytes = snprintf( szResult, iSize + 1, "%*.0f.%0*u", iSize-iDec-1, dNumber, iDec, 0 );
                }
                else
                {

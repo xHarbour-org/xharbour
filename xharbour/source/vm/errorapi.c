@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.32 2003/12/28 22:25:35 druzus Exp $
+ * $Id: errorapi.c,v 1.33 2004/01/27 03:07:00 ronpinkas Exp $
  */
 
 /*
@@ -1444,8 +1444,8 @@ void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, char * sz
    if( pResult )
    {
       hb_itemRelease( hb_itemReturn( pResult ) );
-      hb_errRelease( pError );
    }
+   hb_errRelease( pError );
 }
 
 USHORT HB_EXPORT hb_errRT_TERM( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, USHORT uiOSCode, USHORT uiFlags )
