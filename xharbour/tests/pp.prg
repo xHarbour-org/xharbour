@@ -393,6 +393,8 @@ STATIC s_lReturnRequested
    STATIC s_bExternalRecovery
 #endif
 
+STATIC s_cVer := "1.0.B13"
+
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
   STATIC PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
@@ -9527,6 +9529,10 @@ RETURN s_bExternalRecovery
 PROCEDURE PP_Warning( cMsg )
    ? cMsg
 RETURN
+
+FUNCTION Version
+
+RETURN s_cVer
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__

@@ -41,7 +41,7 @@
      METHOD New()              INLINE ( Self )
 
      METHOD AddLine( cLine )   INLINE ( ::nProcs := 0, ::acPPed := {}, ::cText += ( cLine + Chr(10) ) )
-     METHOD SetScript( cText, nStartLine ) INLINE ( ::nProcs := 0, ::acPPed := {}, ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ) )
+     METHOD SetScript( cText, nStartLine ) INLINE ( ::nProcs := 0, ::acPPed := {}, ::aScriptHostGlobals := {}, ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ) )
      METHOD GetPPO()           INLINE ( ::cPPed )
 
      METHOD Compile()
@@ -52,8 +52,9 @@
         METHOD EvalExpression()
 
         #ifdef AX
-           METHOD RecoverSiteGlobals( oErr )
            METHOD IsProcedure( cName )
+           METHOD ScriptSiteAddGlobal( cName, pDisp )
+           METHOD ScriptSiteResetGlobals()
         #endif
      #endif
 
@@ -67,11 +68,6 @@
 
      #ifdef MINIGUI
        METHOD LoadMiniGUI()      INLINE PP_LoadMiniGUI()
-     #endif
-
-     #ifdef WIN
-       METHOD ScriptSiteAddGlobal( cName, pDisp )
-       //METHOD ScriptSiteAutomateGlobals()
      #endif
 
   ENDCLASS
@@ -166,7 +162,7 @@
         IF ::nProcs > 0
            #ifdef AX
               IF Len( ::aScriptHostGlobals ) > 0
-                 bRecoveryBlock := PP_RecoveryBlock( {|oErr| Self:RecoverSiteGlobals( oErr ) } )
+                 bRecoveryBlock := PP_RecoveryBlock( {|oErr| ResolveSiteGlobals( oErr, oErr:Args ) } )
               ENDIF
            #endif
 
@@ -212,7 +208,7 @@
 
      #ifdef AX
         IF Len( ::aScriptHostGlobals ) > 0
-           bRecoveryBlock := PP_RecoveryBlock( {|oErr| Self:RecoverSiteGlobals( oErr ) } )
+           bRecoveryBlock := PP_RecoveryBlock( {|oErr| ResolveSiteGlobals( oErr ) } )
         ENDIF
      #endif
 
@@ -245,127 +241,7 @@
 
      RETURN aScan( ::aCompiledProcs, {|aProc| aProc[1] == cName } ) > 0
 
-     //----------------------------------------------------------------------------//
-     METHOD RecoverSiteGlobals( oErr )
-
-         LOCAL Global, xRet, aParams, nParams, p1, p2, p3, p4, p5, p6, p7, p8, p9
-
-         //Alert( ProcName() + ":" + oErr:Operation + "->" + oErr:Description )
-
-         SWITCH oErr:SubCode
-            CASE 1001
-               aParams := oErr:Args
-               nParams := Len( aParams )
-
-               IF nParams > 9
-                  Eval( ErrorBlock(), ErrorNew( [PP], 9009, [OLE], [Too many params], { oErr:Operation, aParams } ) )
-                  nParams := 9
-               ENDIF
-
-               // Intentionally reversed so we may fall through.
-               SWITCH nParams
-                  CASE 9
-                     p9 := aParams[9]
-
-                  CASE 8
-                     p8 := aParams[8]
-
-                  CASE 7
-                     p7 := aParams[7]
-
-                  CASE 6
-                     p6 := aParams[6]
-
-                  CASE 5
-                     p5 := aParams[5]
-
-                  CASE 4
-                     p4 := aParams[4]
-
-                  CASE 3
-                     p3 := aParams[3]
-
-                  CASE 2
-                     p2 := aParams[2]
-
-                  CASE 1
-                     p1 := aParams[1]
-               END
-
-               FOR EACH Global IN ::aScriptHostGlobals
-                   //Alert( "Trying: "  + oErr:Operation + "(" + Str( nParams, 1 ) + ") with: " + Global[1] )
-
-                   TRY
-                      SWITCH nParams
-                         CASE 0
-                            xRet := Global[3]:&( oErr:Operation )()
-                            EXIT
-
-                         CASE 1
-                            xRet := Global[3]:&( oErr:Operation )( p1 )
-                            EXIT
-
-                         CASE 2
-                            xRet := Global[3]:&( oErr:Operation )( p1, p2 )
-                            EXIT
-
-                         CASE 3
-                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3 )
-                            EXIT
-
-                         CASE 4
-                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3, p4 )
-                            EXIT
-
-                         CASE 5
-                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3, p4, p5 )
-                            EXIT
-
-                         CASE 6
-                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3, p4, p5, p6 )
-                            EXIT
-
-                         CASE 7
-                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3, p4, p5, p6, p7 )
-                            EXIT
-
-                         CASE 8
-                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3, p4, p5, p6, p7, p8 )
-                            EXIT
-
-                         CASE 9
-                            xRet := Global[3]:&( oErr:Operation )( p1, p2, p3, p4, p5, p6, p7, p8, p9 )
-                            EXIT
-                      END
-
-                   CATCH xRet
-                      //Alert( "OLE Error: " + xRet:Operation + "->" + xRet:Description )
-                   END
-
-                   IF ! xRet:ClassName == "ERROR"
-                      EXIT
-                   ENDIF
-               NEXT
-
-               EXIT
-
-            DEFAULT
-               TraceLog( oErr )
-         END
-
-         IF oErr:SubCode == 1003
-            RETURN .F.
-         ENDIF
-
-     RETURN xRet
-  #endif
-
-  #endif
-
-  //----------------------------------------------------------------------------//
-
-  #ifdef WIN
-
+    //----------------------------------------------------------------------------//
     METHOD ScriptSiteAddGlobal( cName, pDisp ) CLASS  TInterpreter
 
        LOCAL oGlobal := TOleAuto():New( pDisp, cName )
@@ -380,27 +256,18 @@
     RETURN Self
 
     //----------------------------------------------------------------------------//
+    METHOD ScriptSiteResetGlobals() CLASS  TInterpreter
 
-    /*
-    METHOD ScriptSiteAutomateGlobals() CLASS  TInterpreter
+       LOCAL aGlobal
 
-       LOCAL aGlobals := ::aScriptHostGlobals
-       LOCAL nGlobals := Len( aGlobals ), nGlobal
-       LOCAL cName, pDisp
-
-       FOR nGlobal := 1 TO nGlobals
-          cName := aGlobals[ nGlobal ][1]
-          pDisp := aGlobals[ nGlobal ][2]
-          __QQPub( cName )
-          __MVPUT( cName, TOleAuto():New( pDisp ) )
+       FOR EACH aGlobal IN ::aScriptHostGlobals
+          __MVXRELEASE( aGlobal[1] )
        NEXT
 
     RETURN .T.
-    */
-
   #endif
-
   //--------------------------------------------------------------//
+
   #ifdef __XHARBOUR__
   EXIT PROCEDURE PP_EXIT()
        PP_ReleaseDynProcedures()
