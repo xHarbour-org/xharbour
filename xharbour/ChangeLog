@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3672 2004/12/13 13:10:07 walito Exp $
+ * $Id: ChangeLog,v 1.3673 2004/12/14 00:15:12 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-14 21:40 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * include/hbsetup.h
+    + More HP-UX stuff
+  * make_gnu.sh
+    + Fixed HP-UX autodetection
 
 2004-12-14 01:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/make_gnu.sh
@@ -52,7 +58,7 @@
   * source/vm/thread.c
     + Add function HB_MUTEXTIMEOUTLOCK.
        This funcion try to lock a mutex with timeout, if success return .T.,
-        if timeout occurrr return .F. 
+        if timeout occurrr return .F.
 
 2004-12-11 22:00 UTC-0800 Brian Hays <bhays@abacuslaw.com>
   * contrib/rdd_ads/ads1.c

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_gnu.sh,v 1.9 2004/12/10 03:43:30 mlombardo Exp $
+# $Id: make_gnu.sh,v 1.10 2004/12/14 00:15:31 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -15,7 +15,7 @@
 # ---------------------------------------------------------------
 
 if [ -z "$HB_ARCHITECTURE" ]; then
-    hb_arch=`uname -s | tr "[A-Z]" "[a-z]" 2>/dev/null`
+    hb_arch=`uname -s | tr -d [-] | tr "[A-Z]" "[a-z]" 2>/dev/null`
     case "$hb_arch" in
         *windows*) hb_arch="w32" ;;
         *dos)      hb_arch="dos" ;;

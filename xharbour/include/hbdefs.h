@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.60 2004/12/11 00:43:03 druzus Exp $
+ * $Id: hbdefs.h,v 1.61 2004/12/14 00:15:37 druzus Exp $
  */
 
 /*
@@ -470,7 +470,7 @@ typedef long HB_PTRDIFF;
 
 #  else /* We cannot detect byte order, we will have to guess */
 
-#     if defined( HB_OS_DARWIN ) || defined( HB_OS_SUNOS )
+#     if defined( HB_OS_DARWIN ) || defined( HB_OS_SUNOS ) || defined( HB_OS_HPUX )
 #        define HB_BIG_ENDIAN
 #     else
 #        define HB_LITTLE_ENDIAN
@@ -551,7 +551,7 @@ typedef long HB_PTRDIFF;
  * IMHO need HB_ARCH_<arch> macro yet - the same OS can be used with
  * different architectures - SPARC + LINUX, ALPHA + LINUX
  */
-#if defined( HB_OS_SUNOS )
+#if defined( HB_OS_SUNOS ) || defined( HB_OS_HPUX )
 #  if !defined( HB_STRICT_ALIGNMENT )
 #     define HB_STRICT_ALIGNMENT
 #  endif
