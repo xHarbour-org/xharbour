@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.280 2003/11/22 02:03:38 ronpinkas Exp $
+ * $Id: hvm.c,v 1.281 2003/11/22 04:34:47 ronpinkas Exp $
  */
 
 /*
@@ -3374,14 +3374,14 @@ static void hb_vmPlus( void )
    }
    else if( HB_IS_HASH( pItem1 ) && HB_IS_HASH( pItem2 ) )
    {
-      ULONG ulLen     = pItem1->item.asHash.value->ulLen;
+      ULONG ulLen = pItem2->item.asHash.value->ulTotalLen;
       HB_ITEM hbNum;
       PHB_ITEM pResult;
 
-      pResult = hb_hashClone( pItem2 );
+      pResult = hb_hashClone( pItem1 );
       hb_itemPutNI( &hbNum, 0 ); // normal merge mode
 
-      hb_hashMerge( pResult, pItem1, 1, ulLen, &hbNum );
+      hb_hashMerge( pResult, pItem2, 1, ulLen, &hbNum );
       hb_stackPop();
       hb_stackPop();
       hb_itemPushForward( pResult );
@@ -3484,7 +3484,7 @@ static void hb_vmMinus( void )
    }
    else if( HB_IS_HASH( pItem1 ) && HB_IS_HASH( pItem2 ) )
    {
-      ULONG ulLen = pItem2->item.asHash.value->ulLen;
+      ULONG ulLen = pItem2->item.asHash.value->ulTotalLen;
       HB_ITEM hbNum;
       PHB_ITEM pResult;
 
@@ -4202,17 +4202,15 @@ static void hb_vmInstringOrArray( void )
       )
    {
       ULONG ulPos;
-      // waring: change IN operator (hb_vmInstringOrArray() ) when changing
-      // pagination
 
       if ( HB_IS_HASH( pItem1 ) ) // length 1 by hypotesis
       {
          if ( hb_hashScan( pItem2, pItem1->item.asHash.value->pKeys, &ulPos ) )
          {
             HB_ITEM hbV1;
-            PHB_ITEM pV2 = pItem2->item.asHash.value->pValues + ( ulPos -1 );
+            PHB_ITEM pV2 = hb_hashGetValueAt( pItem2, ulPos );
 
-            hb_itemCopy( &hbV1, pItem1->item.asHash.value->pValues);
+            hb_itemCopy( &hbV1, hb_hashGetValueAt( pItem1, 1) );
             hb_stackPop();
             hb_stackPop();
 

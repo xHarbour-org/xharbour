@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.18 2003/11/09 23:16:39 jonnymind Exp $
+ * $Id: hbvmpub.h,v 1.19 2003/11/15 21:26:43 jonnymind Exp $
  */
 
 /*
@@ -266,7 +266,10 @@
        ULONG    ulAllocated;  /* items allocated in keys and values */
        PHB_HASH_ORDER_FUNC fOrder; /* returns -1, 0 or 1 */
        BOOL     bCase;        /* Case sensitivity */
-       BOOL     bAutoAdd;  /* Signal error if key is not found on assign */
+       BOOL     bAutoAdd;     /* Signal error if key is not found on assign */
+       USHORT   uiLevel;      /* Pagination depth level */
+       ULONG    ulTotalLen;   /* Total lenght in paged hashes */
+       ULONG    ulPageSize;   /* Maximum size allowed per page */
     } HB_BASEHASH, * PHB_BASEHASH, * HB_BASEHASH_PTR;
 
     /* internal structure for codeblocks */

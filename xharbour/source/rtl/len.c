@@ -1,5 +1,5 @@
 /*
- * $Id: len.c,v 1.2 2003/03/05 08:51:36 andijahja Exp $
+ * $Id: len.c,v 1.3 2003/11/09 23:16:39 jonnymind Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include "hbapi.h"
+#include "hbhashapi.h"
 #include "hbapierr.h"
 #include "hbapiitm.h"
 
@@ -77,7 +78,7 @@ HB_FUNC( LEN )
          // hb_retnl( hb_itemGetCLen( pItem ) );
          /* hb_itemGetCLen() previously checked if pItem is a string.
             this is an unnecessary redundancy */
-         hb_retnl( pItem->item.asHash.value->ulLen );
+         hb_retnl( hb_hashLen(pItem) );
          return;
       }
       else if( HB_IS_ARRAY( pItem ) )

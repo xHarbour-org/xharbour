@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.79 2003/09/13 19:14:30 ronpinkas Exp $
+ * $Id: arrays.c,v 1.80 2003/11/09 23:16:39 jonnymind Exp $
  */
 
 /*
@@ -793,16 +793,20 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       ULONG ulStart;
       ULONG ulCount;
 
+      /* Select array type */
       if ( HB_IS_ARRAY( pArray ) )
       {
          pItems = pArray->item.asArray.value->pItems;
          ulLen = pArray->item.asArray.value->ulLen;
       }
-      else {
+      else
+      {
          pItems = pArray->item.asHash.value->pValues;
-         ulLen = pArray->item.asHash.value->ulLen;
+         ulLen = pArray->item.asHash.value->ulTotalLen;
       }
 
+
+      /* sanitize scan range */
       if( pulStart && ( *pulStart >= 1 ) )
       {
          ulStart = *pulStart;
@@ -812,113 +816,152 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
          ulStart = 1;
       }
 
-      if( ulStart <= ulLen )
+      if( ulStart > ulLen )
       {
-         if( pulCount && ( *pulCount <= ulLen - ulStart ) )
+         return 0;
+      }
+
+      if( pulCount && ( *pulCount <= ulLen - ulStart ) )
+      {
+         ulCount = *pulCount;
+      }
+      else
+      {
+         ulCount = ulLen - ulStart + 1;
+      }
+
+      if( ulStart + ulCount > ulLen )             /* check range */
+      {
+         ulCount = ulLen - ulStart + 1;
+      }
+
+
+      /* work with subhashes */
+      if ( HB_IS_HASH( pArray ) && pArray->item.asHash.value->uiLevel > 0 )
+      {
+         ULONG ulPos, ulTotal = 0;
+
+         // skip first items
+         while( ulTotal + pItems->item.asHash.value->ulTotalLen < ulStart )
          {
-            ulCount = *pulCount;
+            ulTotal += pItems->item.asHash.value->ulTotalLen;
+            pItems ++;
          }
-         else
+
+         ulStart -= ulTotal;
+
+         ulPos = hb_arrayScan( pItems, pValue, &ulStart, &ulCount, bExact );
+
+         while( ulCount > pItems->item.asHash.value->ulTotalLen && ulPos == 0 )
          {
-            ulCount = ulLen - ulStart + 1;
-         }
-
-         if( ulStart + ulCount > ulLen )             /* check range */
-         {
-            ulCount = ulLen - ulStart + 1;
-         }
-
-         /* Make separate search loops for different types to find, so that
-            the loop can be faster. */
-
-         if( HB_IS_BLOCK( pValue ) )
-         {
-            ULONG ulParams = HB_IS_HASH( pArray ) ? 3 : 2;
-
-            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+            ulPos = hb_arrayScan( pItems, pValue, NULL, &ulCount, bExact );
+            if ( ulPos == 0 )
             {
-               hb_vmPushSymbol( &hb_symEval );
-               hb_vmPush( pValue );
-               if ( ulParams == 3)
-               {
-                  hb_vmPush( pArray->item.asHash.value->pKeys + ulStart );
-               }
-               hb_vmPush( pItems + ulStart );
-               hb_vmPushNumber( ( double ) ( ulStart + 1 ), 0 );
-               hb_vmSend( ulParams );
-
-               if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) && HB_VM_STACK.Return.item.asLogical.value )
-               {
-                  return ulStart + 1;                  /* arrays start from 1 */
-               }
+               ulCount -= pItems->item.asHash.value->ulTotalLen;
+               ulTotal += pItems->item.asHash.value->ulTotalLen;
+               pItems ++;
             }
          }
-         else if( HB_IS_STRING( pValue ) ) // Must precede HB_IS_NUMERIC()
-         {
-            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
-            {
-               PHB_ITEM pItem = pItems + ulStart;
 
-               /* NOTE: The order of the pItem and pValue parameters passed to
-                        hb_itemStrCmp() is significant, please don't change it. [vszakats] */
-               if( HB_IS_STRING( pItem ) && hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
-               {
-                  return ulStart + 1;
-               }
+         if ( ulPos == 0 )
+         {
+            ulPos = hb_arrayScan( pItems, pValue, NULL, &ulCount, bExact );
+         }
+
+         return ulPos+ulTotal;
+      }
+
+
+      /* Make separate search loops for different types to find, so that
+         the loop can be faster. */
+
+      if( HB_IS_BLOCK( pValue ) )
+      {
+         ULONG ulParams = HB_IS_HASH( pArray ) ? 3 : 2;
+
+         for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+         {
+            hb_vmPushSymbol( &hb_symEval );
+            hb_vmPush( pValue );
+            if ( ulParams == 3)
+            {
+               hb_vmPush( pArray->item.asHash.value->pKeys + ulStart );
+            }
+            hb_vmPush( pItems + ulStart );
+            hb_vmPushNumber( ( double ) ( ulStart + 1 ), 0 );
+            hb_vmSend( ulParams );
+
+            if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) && HB_VM_STACK.Return.item.asLogical.value )
+            {
+               return ulStart + 1;                  /* arrays start from 1 */
             }
          }
-         else if( HB_IS_DATE( pValue ) ) // Must precede HB_IS_NUMERIC()
+      }
+      else if( HB_IS_STRING( pValue ) ) // Must precede HB_IS_NUMERIC()
+      {
+         for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {
-            long lValue = hb_itemGetDL( pValue );
+            PHB_ITEM pItem = pItems + ulStart;
 
-            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+            /* NOTE: The order of the pItem and pValue parameters passed to
+                     hb_itemStrCmp() is significant, please don't change it. [vszakats] */
+            if( HB_IS_STRING( pItem ) && hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
             {
-               PHB_ITEM pItem = pItems + ulStart;
-
-               if( HB_IS_DATE( pItem ) && hb_itemGetDL( pItem ) == lValue )
-               {
-                  return ulStart + 1;
-               }
+               return ulStart + 1;
             }
          }
-         else if( HB_IS_NUMERIC( pValue ) )
+      }
+      else if( HB_IS_DATE( pValue ) ) // Must precede HB_IS_NUMERIC()
+      {
+         long lValue = hb_itemGetDL( pValue );
+
+         for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {
-            double dValue = hb_itemGetND( pValue );
+            PHB_ITEM pItem = pItems + ulStart;
 
-            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+            if( HB_IS_DATE( pItem ) && hb_itemGetDL( pItem ) == lValue )
             {
-               PHB_ITEM pItem = pItems + ulStart;
-
-                HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
-
-               if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
-               {
-                  return ulStart + 1;
-               }
+               return ulStart + 1;
             }
          }
-         else if( HB_IS_LOGICAL( pValue ) )
+      }
+      else if( HB_IS_NUMERIC( pValue ) )
+      {
+         double dValue = hb_itemGetND( pValue );
+
+         for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {
-            BOOL bValue = hb_itemGetL( pValue ); /* NOTE: This is correct: Get the date as a long value. [vszakats] */
+            PHB_ITEM pItem = pItems + ulStart;
 
-            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+            HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
+
+            if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
             {
-               PHB_ITEM pItem = pItems + ulStart;
-
-               if( HB_IS_LOGICAL( pItem ) && hb_itemGetL( pItem ) == bValue )
-               {
-                  return ulStart + 1;
-               }
+               return ulStart + 1;
             }
          }
-         else if( HB_IS_NIL( pValue ) )
+      }
+      else if( HB_IS_LOGICAL( pValue ) )
+      {
+         BOOL bValue = hb_itemGetL( pValue ); /* NOTE: This is correct: Get the date as a long value. [vszakats] */
+
+         for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {
-            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+            PHB_ITEM pItem = pItems + ulStart;
+
+            if( HB_IS_LOGICAL( pItem ) && hb_itemGetL( pItem ) == bValue )
             {
-               if( HB_IS_NIL( pItems + ulStart ) )
-               {
-                  return ulStart + 1;
-               }
+               return ulStart + 1;
+            }
+         }
+      }
+      else if( HB_IS_NIL( pValue ) )
+      {
+         for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+         {
+            if( HB_IS_NIL( pItems + ulStart ) )
+            {
+               return ulStart + 1;
             }
          }
       }
@@ -949,7 +992,7 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
       {
          pKeys = pArray->item.asHash.value->pKeys;
          pItems = pArray->item.asHash.value->pValues;
-         ulLen = pArray->item.asHash.value->ulLen;
+         ulLen = pArray->item.asHash.value->ulTotalLen;
          ulParams = 3;
       }
 
@@ -960,6 +1003,7 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
       else
       {
          ulStart = 1;
+
       }
 
       if( ulStart <= ulLen )
@@ -976,6 +1020,33 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
          if( ulStart + ulCount > ulLen )             /* check range */
          {
             ulCount = ulLen - ulStart + 1;
+         }
+
+         /* work with subhashes */
+         if ( HB_IS_HASH( pArray ) && pArray->item.asHash.value->uiLevel > 0 )
+         {
+            ULONG ulTotal = 0;
+
+            // skip first items
+            while( ulTotal + pItems->item.asHash.value->ulTotalLen < ulStart )
+            {
+               ulTotal += pItems->item.asHash.value->ulTotalLen;
+               pItems ++;
+            }
+
+            ulStart -= ulTotal;
+
+            while( ulCount > pItems->item.asHash.value->ulTotalLen )
+            {
+               hb_arrayEval( pItems, bBlock, &ulStart,
+                  &ulCount );
+               ulCount -= pItems->item.asHash.value->ulTotalLen;
+               ulStart = 1;
+               pItems ++;
+            }
+
+            hb_arrayEval( pItems, bBlock, NULL, &ulCount );
+            return TRUE;
          }
 
          for( ulStart--; ulCount > 0; ulCount--, ulStart++ )

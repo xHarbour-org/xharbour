@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.11 2003/11/15 21:26:43 jonnymind Exp $
+ * $Id: hash.c,v 1.12 2003/11/21 13:03:29 jonnymind Exp $
  */
 
 /*
@@ -166,216 +166,8 @@ static int s_hashOrderComplex( PHB_ITEM pFirst,
    return -2;
 }
 
-/*****************************************************
-* CORE api
-******************************************************/
 
-PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
-{
-   PHB_BASEHASH pBaseHash;
-   HB_TRACE(HB_TR_DEBUG, ("hb_hashNew(%p)", pItem ));
-
-   pBaseHash = ( PHB_BASEHASH )
-      hb_gcAlloc( sizeof( HB_BASEHASH ), hb_hashReleaseGarbage );
-
-   if ( pItem == NULL ) {
-      pItem = hb_itemNew( NULL );
-   }
-   else if( HB_IS_COMPLEX( pItem ) )
-   {
-      hb_itemClear( pItem );
-   }
-
-   pBaseHash->uiHolders = 1;
-
-   pBaseHash->ulLen = 0;
-   pBaseHash->ulAllocated = HB_HASH_ALLOC_BLOCK;
-   pBaseHash->pValues = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM ) * HB_HASH_ALLOC_BLOCK );
-   pBaseHash->pKeys = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM ) * HB_HASH_ALLOC_BLOCK );
-   pBaseHash->fOrder = s_hashOrderComplex;
-   pBaseHash->bCase = TRUE;
-   pBaseHash->bAutoAdd = TRUE;
-
-   // ITEM TYPE MUST BE SET FOR LAST!
-   pItem->item.asHash.value = pBaseHash;
-   pItem->type = HB_IT_HASH;
-
-   return pItem;
-}
-
-BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
-{
-   ULONG ulLen;
-   PHB_ITEM pPos, pPos1;
-   PHB_BASEHASH pBaseHash;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_hashAdd(%p, %p, %p)", pHash, pKey, pValue));
-
-   if( ! HB_IS_HASH( pHash ) )
-   {
-      return FALSE;
-   }
-
-   // if the user don't know where to put this data...
-   if ( ulPos == ULONG_MAX )
-   {
-      // ... check if a key already exists ...
-      if ( hb_hashScan( pHash, pKey, &ulPos ) )
-      {
-         // ... and if so, just set the value
-         return hb_hashSet( pHash, ulPos, pValue );
-      }
-      // else we must add it at the point of ulpos.
-   }
-   // ... else, the user must have decided to really add the data in that
-   // position. Notice that this can effectively destroy the hash ordering
-   // if misused. if ulPos != 0, this ulPos must always be obtained with a
-   // failed scan.
-
-   pBaseHash = pHash->item.asHash.value;
-
-   // if we are here, we are autoadding.
-   if ( ! pBaseHash->bAutoAdd )
-   {
-      hb_errRT_BASE( EG_BOUND, 1131, "Hash key not found and Auto Add turned off",
-         hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
-      return FALSE;
-   }
-
-   if( pBaseHash->ulLen < ULONG_MAX )
-   {
-      /* ulLen is the OLD length */
-      ulLen = pBaseHash->ulLen++;
-      if ( ulLen >= pBaseHash->ulAllocated )
-      {
-         pBaseHash->ulAllocated += HB_HASH_ALLOC_BLOCK;
-         pBaseHash->pValues = ( PHB_ITEM ) hb_xrealloc(
-               pBaseHash->pValues,
-               sizeof( HB_ITEM ) * pBaseHash->ulAllocated );
-         pBaseHash->pKeys = ( PHB_ITEM ) hb_xrealloc(
-               pBaseHash->pKeys,
-               sizeof( HB_ITEM ) * pBaseHash->ulAllocated );
-      }
-      // find the point where I have to insert the data.
-      if ( ulLen == 0 )
-      {
-         hb_itemCopy( pBaseHash->pValues, pValue );
-         hb_itemCopy( pBaseHash->pKeys, pKey );
-      }
-      else {
-         pPos = pBaseHash->pValues + ulLen;
-         pPos1 = pBaseHash->pKeys + ulLen;
-
-         for( ; ulPos < ulLen; ulLen--, pPos--, pPos1-- )
-         {
-            memcpy( pPos, pPos-1, sizeof( HB_ITEM ) );
-            memcpy( pPos1, pPos1-1, sizeof( HB_ITEM ) );
-         }
-
-         /* Insert AFTER the given position */
-         pPos = pBaseHash->pValues + ulPos;
-         pPos->type = HB_IT_NIL;
-         hb_itemCopy( pPos, pValue );
-
-         pPos = pBaseHash->pKeys + ulPos;
-         pPos->type = HB_IT_NIL;
-         hb_itemCopy( pPos, pKey );
-      }
-
-      return TRUE;
-   }
-
-   return FALSE;
-}
-
-
-BOOL HB_EXPORT hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
-{
-   ULONG ulLen;
-   PHB_ITEM pPos, pPos1;
-   PHB_BASEHASH pBaseHash;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_hashAdd(%p, %p, %p)", pHash, pKey, pValue));
-
-   if( ! HB_IS_HASH( pHash ) )
-   {
-      return FALSE;
-   }
-
-   // if the user don't know where to put this data...
-   if ( ulPos == ULONG_MAX )
-   {
-      // ... check if a key already exists ...
-      if ( hb_hashScan( pHash, pKey, &ulPos ) )
-      {
-         // ... and if so, just set the value
-         return hb_hashSet( pHash, ulPos, pValue );
-      }
-      // else we must add it at the point of ulpos.
-   }
-   // ... else, the user must have decided to really add the data in that
-   // position. Notice that this can effectively destroy the hash ordering
-   // if misused. if ulPos != 0, this ulPos must always be obtained with a
-   // failed scan.
-
-   pBaseHash = pHash->item.asHash.value;
-
-   // if we are here, we are autoadding.
-   if ( ! pBaseHash->bAutoAdd )
-   {
-      hb_errRT_BASE( EG_BOUND, 1131, "Hash key not found and Auto Add turned off",
-         hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
-      return FALSE;
-   }
-
-   if( pBaseHash->ulLen < ULONG_MAX )
-   {
-      /* ulLen is the OLD length */
-      ulLen = pBaseHash->ulLen++;
-      if ( ulLen >= pBaseHash->ulAllocated )
-      {
-         pBaseHash->ulAllocated += HB_HASH_ALLOC_BLOCK;
-         pBaseHash->pValues = ( PHB_ITEM ) hb_xrealloc(
-               pBaseHash->pValues,
-               sizeof( HB_ITEM ) * pBaseHash->ulAllocated );
-         pBaseHash->pKeys = ( PHB_ITEM ) hb_xrealloc(
-               pBaseHash->pKeys,
-               sizeof( HB_ITEM ) * pBaseHash->ulAllocated );
-      }
-      // find the point where I have to insert the data.
-      if ( ulLen == 0 )
-      {
-         hb_itemForwardValue( pBaseHash->pValues, pValue );
-         hb_itemForwardValue( pBaseHash->pKeys, pKey );
-      }
-      else {
-         pPos = pBaseHash->pValues + ulLen;
-         pPos1 = pBaseHash->pKeys + ulLen;
-
-         for( ; ulPos < ulLen; ulLen--, pPos--, pPos1-- )
-         {
-            memcpy( pPos, pPos-1, sizeof( HB_ITEM ) );
-            memcpy( pPos1, pPos1-1, sizeof( HB_ITEM ) );
-         }
-
-         /* Insert AFTER the given position */
-         pPos = pBaseHash->pValues + ulPos;
-         pPos->type = HB_IT_NIL;
-         hb_itemForwardValue( pPos, pValue );
-
-         pPos = pBaseHash->pKeys + ulPos;
-         pPos->type = HB_IT_NIL;
-         hb_itemForwardValue( pPos, pKey );
-      }
-
-      return TRUE;
-   }
-
-   return FALSE;
-}
-
-
-BOOL HB_EXPORT hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulIndex )
+static BOOL hb_hashSurfaceScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulIndex )
 {
    ULONG ulLower = 0, ulHigher, ulPoint;
    int iRes;
@@ -384,7 +176,7 @@ BOOL HB_EXPORT hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulIndex )
    BOOL bCase;
    PHB_HASH_ORDER_FUNC fOrder;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_hashScan(%p, %p, %p)", pHash, pKey, ulIndex));
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashSurfaceScan(%p, %p, %p)", pHash, pKey, ulIndex));
 
    ulHigher = pHash->item.asHash.value->ulLen;
 
@@ -425,7 +217,7 @@ BOOL HB_EXPORT hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulIndex )
          {
             // key is EVEN less than the lower one
             if ( iRes <  0 ) {
-               *ulIndex = ulLower;
+               *ulIndex = ulLower+1;
                return FALSE;
             }
 
@@ -455,8 +247,419 @@ BOOL HB_EXPORT hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulIndex )
    }
 
    // entry not found, but signal the best match anyway
-   *ulIndex =  iRes > 0 ? ulHigher+1 : ulHigher;
+   *ulIndex =  iRes > 0 ? ulHigher+2 : ulHigher+1;
+
    return FALSE;
+}
+
+static void hb_calcTotalLenght( PHB_BASEHASH pBase )
+{
+   ULONG ulTot = 0;
+   ULONG ulPos;
+
+   if ( pBase->uiLevel == 0 )
+   {
+      pBase->ulTotalLen = pBase->ulLen;
+      return;
+   }
+
+   for( ulPos = 0; ulPos < pBase->ulLen; ulPos ++ )
+   {
+      ulTot += ( pBase->pValues + ulPos)->item.asHash.value->ulTotalLen;
+   }
+
+   pBase->ulTotalLen = ulTot;
+}
+
+
+
+/*****************************************************
+* CORE api
+******************************************************/
+
+PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
+{
+   PHB_BASEHASH pBaseHash;
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashNew(%p)", pItem ));
+
+   pBaseHash = ( PHB_BASEHASH )
+      hb_gcAlloc( sizeof( HB_BASEHASH ), hb_hashReleaseGarbage );
+
+   if ( pItem == NULL ) {
+      pItem = hb_itemNew( NULL );
+   }
+   else if( HB_IS_COMPLEX( pItem ) )
+   {
+      hb_itemClear( pItem );
+   }
+
+   pBaseHash->uiHolders = 1;
+
+   pBaseHash->ulLen = 0;
+   pBaseHash->ulTotalLen = 0;
+   pBaseHash->uiLevel = 0;
+   pBaseHash->ulPageSize = 0;
+   pBaseHash->ulAllocated = HB_HASH_ALLOC_BLOCK;
+   pBaseHash->pValues = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM ) * HB_HASH_ALLOC_BLOCK );
+   pBaseHash->pKeys = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM ) * HB_HASH_ALLOC_BLOCK );
+   pBaseHash->fOrder = s_hashOrderComplex;
+   pBaseHash->bCase = TRUE;
+   pBaseHash->bAutoAdd = TRUE;
+
+   // ITEM TYPE MUST BE SET FOR LAST!
+   pItem->item.asHash.value = pBaseHash;
+   pItem->type = HB_IT_HASH;
+
+   return pItem;
+}
+
+
+
+BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
+{
+   ULONG ulLen;
+   PHB_ITEM pPos, pPos1;
+   PHB_BASEHASH pBaseHash;
+   HB_ITEM hbSubHash;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashAdd(%p, %p, %p)", pHash, pKey, pValue));
+
+   if( ! HB_IS_HASH( pHash ) )
+   {
+      return FALSE;
+   }
+
+   // if the user don't know where to put this data...
+   if ( ulPos == ULONG_MAX )
+   {
+      // ... check if a key already exists ...
+      if ( hb_hashScan( pHash, pKey, &ulPos ) )
+      {
+         return hb_hashSet( pHash, ulPos, pValue );
+      }
+      // else we must add it at the point of ulpos.
+   }
+   // ... else, the user must have decided to really add the data in that
+   // position. Notice that this can effectively destroy the hash ordering
+   // if misused. if ulPos != 0, this ulPos must always be obtained with a
+   // failed scan.
+
+   pBaseHash = pHash->item.asHash.value;
+
+   // if we are here, we are autoadding.
+   if ( ! pBaseHash->bAutoAdd )
+   {
+      hb_errRT_BASE( EG_BOUND, 1131, "Hash key not found and Auto Add turned off",
+         hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
+      return FALSE;
+   }
+
+   if( pBaseHash->ulTotalLen < ULONG_MAX )
+   {
+      // If we are partitioning,
+      if ( pBaseHash->uiLevel > 0 ) {
+         PHB_ITEM pPage;
+         PHB_BASEHASH pPageBase;
+
+         // Creates the first partition
+         if ( pBaseHash->ulLen == 0 )
+         {
+            pPage = hb_hashNew( NULL );
+            pPageBase = pPage->item.asHash.value;
+            pPageBase->uiLevel = pBaseHash->uiLevel - 1;
+            pPageBase->bCase = pBaseHash->bCase;
+            pPageBase->fOrder = pBaseHash->fOrder;
+            pPageBase->bAutoAdd = pBaseHash->bAutoAdd;
+            pPageBase->ulPageSize = pBaseHash->ulPageSize;
+            hb_hashAdd( pPage, ULONG_MAX, pKey, pValue );
+
+            pBaseHash->ulLen = 1;
+            pBaseHash->ulTotalLen = 1;
+            hb_itemCopy( pBaseHash->pKeys, pKey );
+            hb_itemForwardValue( pBaseHash->pValues, pPage );
+            return TRUE;
+
+         }
+
+         // get Current Partition.
+         hb_hashSurfaceScan( pHash, pKey, &ulPos );
+         if ( ulPos > pBaseHash->ulLen ) {
+            // stack in last partition
+            ulPos = pBaseHash->ulLen;
+         }
+         pPage = pBaseHash->pValues + ( ulPos - 1 );
+         pPageBase = pPage->item.asHash.value;
+
+
+         // we must see if lower level has reached maximum partition size.
+         // Notice that ulLenght may be bigger than ulPageSize by one or two elements,
+         // some api function may allow this for faster operations.
+         if ( pPageBase->ulLen >= pPageBase->ulPageSize )
+         {
+            // repartitioning
+            PHB_ITEM pPivot = pPageBase->pKeys + ( pPageBase->ulPageSize / 2 -1 );
+            PHB_BASEHASH pNewBase;
+
+            hbSubHash.type = HB_IT_HASH;
+            hbSubHash.item.asHash.value = ( PHB_BASEHASH )
+                  hb_gcAlloc( sizeof( HB_BASEHASH ), hb_hashReleaseGarbage );
+
+            pNewBase = hbSubHash.item.asHash.value;
+            pNewBase->bCase = pPageBase->bCase;
+            pNewBase->bAutoAdd = pPageBase->bAutoAdd;
+            pNewBase->uiHolders = 1;
+            pNewBase->fOrder = pPageBase->fOrder;
+            pNewBase->uiLevel = pPageBase->uiLevel;
+            pNewBase->ulPageSize = pPageBase->ulPageSize;
+            // WARNING: May be an odd number. Leave this line as it is.
+            pNewBase->ulAllocated = pPageBase->ulLen -
+                  (pPageBase->ulPageSize / 2);
+            pNewBase->pKeys = (PHB_ITEM) hb_xgrab(
+                  sizeof( HB_ITEM) * pNewBase->ulAllocated );
+            pNewBase->pValues = (PHB_ITEM) hb_xgrab(
+                  sizeof( HB_ITEM) * pNewBase->ulAllocated );
+
+            memcpy( pNewBase->pKeys, pPivot + 1,
+                     sizeof( HB_ITEM) * pNewBase->ulAllocated );
+            memcpy( pNewBase->pValues, pPageBase->pValues +
+                     (pBaseHash->ulPageSize / 2),
+                     sizeof( HB_ITEM) * pNewBase->ulAllocated );
+            pNewBase->ulLen = pNewBase->ulAllocated;
+
+            // Resize old page
+            pPageBase->ulLen = pPageBase->ulLen - pNewBase->ulLen;
+            hb_xrealloc( pPageBase->pKeys, pPageBase->ulLen * sizeof( HB_ITEM ) );
+            hb_xrealloc( pPageBase->pValues, pPageBase->ulLen * sizeof( HB_ITEM ) );
+            pPageBase->ulAllocated = pPageBase->ulLen;
+
+            // recalculate ulTotalLenght
+            hb_calcTotalLenght( pPageBase );
+            hb_calcTotalLenght( pNewBase );
+
+            // now, add the item to the right page.
+            if ( pPageBase->fOrder( pKey, pPivot, pPageBase->bCase ) <= 0 )
+            {
+               hb_hashAdd( pPage, ULONG_MAX, pKey, pValue );
+            }
+            else
+            {
+               hb_hashAdd( &hbSubHash, ULONG_MAX, pKey, pValue );
+            }
+
+            // and finally, add this pivotal element to ourselves
+            hb_itemCopy( pBaseHash->pKeys + ( ulPos - 1 ),
+               pPageBase->pKeys + ( pPageBase->ulLen -1 ) );
+            pKey = pNewBase->pKeys + ( pNewBase->ulLen - 1 );
+            pValue = &hbSubHash;
+            // insert after the previous one
+            ulPos++;
+
+            // will fall through normal item insertion.
+         }
+         else
+         {
+            // simply add the element to the page
+            if ( hb_hashAdd( pPage, ULONG_MAX, pKey, pValue ) )
+            {
+               // eventually change partition key:
+               PHB_ITEM pPivot = pPage->item.asHash.value->pKeys +
+                         ( pPage->item.asHash.value->ulLen - 1 );
+               PHB_ITEM pPartKey = pBaseHash->pKeys + (ulPos - 1);
+
+               if ( pBaseHash->fOrder( pPivot, pPartKey, pBaseHash->bCase ) != 0 )
+               {
+                  hb_itemCopy( pPartKey, pPivot );
+               }
+               // done
+               pBaseHash->ulTotalLen++;
+               return TRUE;
+            }
+            // done, unsuccesful
+            return FALSE;
+         }
+      }
+
+      /* ulLen is the OLD length */
+      ulLen = pBaseHash->ulLen++;
+      pBaseHash->ulTotalLen++;
+
+      if ( ulLen >= pBaseHash->ulAllocated )
+      {
+         pBaseHash->ulAllocated += HB_HASH_ALLOC_BLOCK;
+         pBaseHash->pValues = ( PHB_ITEM ) hb_xrealloc(
+               pBaseHash->pValues,
+               sizeof( HB_ITEM ) * pBaseHash->ulAllocated );
+         pBaseHash->pKeys = ( PHB_ITEM ) hb_xrealloc(
+               pBaseHash->pKeys,
+               sizeof( HB_ITEM ) * pBaseHash->ulAllocated );
+      }
+
+      // find the point where I have to insert the data.
+      if ( ulLen == 0 )
+      {
+         hb_itemCopy( pBaseHash->pValues, pValue );
+         hb_itemCopy( pBaseHash->pKeys, pKey );
+      }
+      else {
+         pPos = pBaseHash->pValues + ulLen;
+         pPos1 = pBaseHash->pKeys + ulLen;
+
+         for( ; ulPos <= ulLen; ulLen--, pPos--, pPos1-- )
+         {
+            memcpy( pPos, pPos-1, sizeof( HB_ITEM ) );
+            memcpy( pPos1, pPos1-1, sizeof( HB_ITEM ) );
+         }
+
+         /* Insert BEFORE the given position */
+         pPos = pBaseHash->pValues + (ulPos-1);
+         pPos->type = HB_IT_NIL;
+         hb_itemCopy( pPos, pValue );
+
+         pPos = pBaseHash->pKeys + (ulPos-1);
+         pPos->type = HB_IT_NIL;
+         hb_itemCopy( pPos, pKey );
+      }
+
+      return TRUE;
+   }
+
+   return FALSE;
+}
+
+//WARNING: DOES NOT WORK WITH PAGED HASHES
+
+BOOL HB_EXPORT hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
+{
+   ULONG ulLen;
+   PHB_ITEM pPos, pPos1;
+   PHB_BASEHASH pBaseHash;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashAdd(%p, %p, %p)", pHash, pKey, pValue));
+
+   if( ! HB_IS_HASH( pHash ) )
+   {
+      return FALSE;
+   }
+
+   // if the user don't know where to put this data...
+   if ( ulPos == ULONG_MAX )
+   {
+      // ... check if a key already exists ...
+      if ( hb_hashSurfaceScan( pHash, pKey, &ulPos ) )
+      {
+         // ... and if so, just set the value
+         return hb_hashSet( pHash, ulPos, pValue );
+      }
+      // else we must add it at the point of ulpos.
+   }
+   // ... else, the user must have decided to really add the data in that
+   // position. Notice that this can effectively destroy the hash ordering
+   // if misused. if ulPos != 0, this ulPos must always be obtained with a
+   // failed scan.
+
+   pBaseHash = pHash->item.asHash.value;
+
+   // if we are here, we are autoadding.
+   if ( ! pBaseHash->bAutoAdd )
+   {
+      hb_errRT_BASE( EG_BOUND, 1131, "Hash key not found and Auto Add turned off",
+         hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
+      return FALSE;
+   }
+
+   if( pBaseHash->ulLen < ULONG_MAX )
+   {
+      /* ulLen is the OLD length */
+      ulLen = pBaseHash->ulLen++;
+      pBaseHash->ulTotalLen++;
+      if ( ulLen >= pBaseHash->ulAllocated )
+      {
+         pBaseHash->ulAllocated += HB_HASH_ALLOC_BLOCK;
+         pBaseHash->pValues = ( PHB_ITEM ) hb_xrealloc(
+               pBaseHash->pValues,
+               sizeof( HB_ITEM ) * pBaseHash->ulAllocated );
+         pBaseHash->pKeys = ( PHB_ITEM ) hb_xrealloc(
+               pBaseHash->pKeys,
+               sizeof( HB_ITEM ) * pBaseHash->ulAllocated );
+      }
+      // find the point where I have to insert the data.
+      if ( ulLen == 0 )
+      {
+         hb_itemForwardValue( pBaseHash->pValues, pValue );
+         hb_itemForwardValue( pBaseHash->pKeys, pKey );
+      }
+      else {
+         pPos = pBaseHash->pValues + ulLen;
+         pPos1 = pBaseHash->pKeys + ulLen;
+
+         for( ; ulPos <= ulLen; ulLen--, pPos--, pPos1-- )
+         {
+            memcpy( pPos, pPos-1, sizeof( HB_ITEM ) );
+            memcpy( pPos1, pPos1-1, sizeof( HB_ITEM ) );
+         }
+
+         /* Insert AFTER the given position */
+         pPos = pBaseHash->pValues + (ulPos-1);
+         pPos->type = HB_IT_NIL;
+         hb_itemForwardValue( pPos, pValue );
+
+         pPos = pBaseHash->pKeys + (ulPos-1);
+         pPos->type = HB_IT_NIL;
+         hb_itemForwardValue( pPos, pKey );
+      }
+
+      return TRUE;
+   }
+
+   return FALSE;
+}
+
+
+BOOL HB_EXPORT hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulIndex )
+{
+   ULONG ulPos, ulTotal, ulElem;
+   PHB_BASEHASH pBase;
+   PHB_ITEM pPage;
+   BOOL bRet;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashScan(%p, %p, %p)", pHash, pKey, ulIndex));
+
+   pBase = pHash->item.asHash.value;
+
+   if ( pBase->ulLen == 0 )
+   {
+      *ulIndex = 1;
+      return FALSE;
+   }
+
+   bRet = hb_hashSurfaceScan( pHash, pKey, ulIndex );
+   if ( pBase->uiLevel == 0 )
+   {
+      return bRet;
+   }
+
+   ulPos = *ulIndex;
+
+   if ( ulPos <= pBase->ulLen )
+   {
+      ulTotal = 0;
+      pPage = pBase->pValues;
+
+      for( ulElem = 0; ulElem < ulPos-1; ulElem ++, pPage++ )
+      {
+         ulTotal += pPage->item.asHash.value->ulTotalLen;
+      }
+
+      bRet = hb_hashScan( pBase->pValues + ( ulPos - 1 ), pKey, &ulPos );
+
+      *ulIndex = ulPos + ulTotal;
+   }
+   else {
+      *ulIndex = pBase->ulTotalLen+1;
+      bRet = FALSE;
+   }
+
+   return bRet;
 }
 
 
@@ -469,10 +672,52 @@ BOOL HB_EXPORT hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
    if( HB_IS_HASH( pHash ) )
    {
       PHB_BASEHASH pBaseHash = pHash->item.asHash.value;
+
+      if ( pBaseHash->uiLevel > 0 )
+      {
+         ULONG ulElem = 1;
+         ULONG ulTotal = 0;
+         PHB_ITEM pPage;
+
+         if ( ulPos < 1 || ulPos > pBaseHash->ulTotalLen ) {
+            return FALSE;
+         }
+
+         pPage = pBaseHash->pValues;
+
+         while ( ulTotal + pPage->item.asHash.value->ulTotalLen < ulPos )
+         {
+            ulTotal += pPage->item.asHash.value->ulTotalLen;
+            ulElem ++;
+            pPage++;
+         }
+
+         if ( hb_hashRemove( pPage, ulPos - ulTotal ) )
+         {
+            // is the page empty?
+            if ( pPage->item.asHash.value->ulTotalLen == 0 )
+            {
+               // then falling through to removal of this item.
+               ulPos = ulElem;
+            }
+            else
+            {
+               // we are done
+               pBaseHash->ulTotalLen--;
+               return TRUE;
+            }
+         }
+         else {
+            // done, unsuccesful
+            return FALSE;
+         }
+      }
+
       /* ulLen is the OLD length */
       ulLen = pBaseHash->ulLen;
 
-      if ( ulLen > 0 && ulPos > 0 && ulPos <= ulLen )
+      // flat inem removal.
+      if ( ulPos > 0 && ulPos <= ulLen )
       {
          // find the point where I have to insert the data.
 
@@ -504,6 +749,7 @@ BOOL HB_EXPORT hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
          }
 
          pBaseHash->ulLen--;
+         pBaseHash->ulTotalLen--;
          return TRUE;
       }
    }
@@ -519,7 +765,7 @@ ULONG HB_EXPORT hb_hashLen( PHB_ITEM pHash )
 
    if( HB_IS_HASH( pHash ) )
    {
-      ulLen = pHash->item.asHash.value->ulLen;
+      ulLen = pHash->item.asHash.value->ulTotalLen;
    }
 
    return ulLen;
@@ -532,24 +778,47 @@ BOOL HB_EXPORT hb_hashSet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hashSet(%p, %lu, %p)", pHash, ulIndex, pItem));
 
-   if( HB_IS_HASH( pHash ) && ulIndex > 0 && ulIndex <= pHash->item.asHash.value->ulLen )
+   if( HB_IS_HASH( pHash ) && ulIndex > 0 )
    {
+
+      if ( pHash->item.asHash.value->uiLevel > 0 )
+      {
+         ULONG ulTotal = 0;
+
+         if ( pHash->item.asHash.value->ulTotalLen < ulIndex )
+         {
+            return FALSE;
+         }
+
+         pElement = pHash->item.asHash.value->pValues;
+
+         while( ulTotal + pElement->item.asHash.value->ulTotalLen < ulIndex )
+         {
+            ulTotal += pElement->item.asHash.value->ulTotalLen;
+            pElement ++;
+         }
+         return hb_hashSet( pElement, ulIndex - ulTotal, pItem );
+      }
+
       pElement = pHash->item.asHash.value->pValues + ( ulIndex - 1 );
 
-      if( HB_IS_BYREF( pElement ) )
+      if  ( ulIndex <= pHash->item.asHash.value->ulLen )
       {
-         hb_itemCopy( hb_itemUnRef( pElement ), pItem );
+         pElement = pHash->item.asHash.value->pValues + ( ulIndex - 1 );
+
+         if( HB_IS_BYREF( pElement ) )
+         {
+            hb_itemCopy( hb_itemUnRef( pElement ), pItem );
+         }
+         else
+         {
+            hb_itemCopy( pElement, pItem );
+         }
+         return TRUE;
       }
-      else
-      {
-         hb_itemCopy( pElement, pItem );
-      }
-      return TRUE;
    }
-   else
-   {
-      return FALSE;
-   }
+
+   return FALSE;
 }
 
 
@@ -559,102 +828,107 @@ BOOL HB_EXPORT hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem 
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hashSetForward(%p, %lu, %p)", pHash, ulIndex, pItem));
 
-   if( HB_IS_HASH( pHash ) && ulIndex > 0 && ulIndex <= pHash->item.asHash.value->ulLen )
+   if( HB_IS_HASH( pHash ) && ulIndex > 0 )
    {
       pElement = pHash->item.asHash.value->pValues + ( ulIndex - 1 );
 
-      if( HB_IS_BYREF( pElement ) )
+      if ( pHash->item.asHash.value->uiLevel > 0 )
       {
-         hb_itemForwardValue( hb_itemUnRef( pElement ), pItem );
-      }
-      else
-      {
-         hb_itemForwardValue( pElement, pItem );
-      }
-      return TRUE;
-   }
-   else
-   {
-      return FALSE;
-   }
-}
+         ULONG ulTotal = 0;
 
-BOOL HB_EXPORT hb_hashGet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_hashGet(%p, %lu, %p) Base: %p Keys: %p Values: %p", pHash, ulIndex, pItem, pHash->item.asHash.value, pHash->item.asHash.value->pKeys, pHash->item.asHash.value->pValues));
+         if ( pHash->item.asHash.value->ulTotalLen < ulIndex )
+         {
+            return FALSE;
+         }
 
-   if( HB_IS_HASH( pHash ) && ulIndex > 0 && ulIndex <= pHash->item.asHash.value->ulLen )
-   {
-      PHB_ITEM pElement = pHash->item.asHash.value->pValues + ( ulIndex - 1 );
+         while( ulTotal + pElement->item.asHash.value->ulTotalLen < ulIndex )
+         {
+            ulTotal += pElement->item.asHash.value->ulTotalLen;
+            pElement ++;
+         }
+         return hb_hashSetForward( pElement, ulIndex - ulTotal, pItem );
+      }
 
-      if( HB_IS_BYREF( pElement ) )
+
+      if  ( ulIndex <= pHash->item.asHash.value->ulLen )
       {
-         hb_itemCopy( pItem, hb_itemUnRef( pElement ) );
-      }
-      else
-      {
-         hb_itemCopy( pItem, pElement );
-      }
-      return TRUE;
-   }
-   else
-   {
-      if( HB_IS_COMPLEX( pItem ) )
-      {
-         hb_itemClear( pItem );
-      }
-      else
-      {
-         pItem->type = HB_IT_NIL;
+         pElement = pHash->item.asHash.value->pValues + ( ulIndex - 1 );
+
+         if( HB_IS_BYREF( pElement ) )
+         {
+            hb_itemForwardValue( hb_itemUnRef( pElement ), pItem );
+         }
+         else
+         {
+            hb_itemForwardValue( pElement, pItem );
+         }
+         return TRUE;
       }
    }
 
    return FALSE;
 }
 
-BOOL HB_EXPORT hb_hashGetByRef( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
+
+
+
+BOOL HB_EXPORT hb_hashGet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_hashGetByRef(%p, %lu, %p) Base: %p Keys: %p Values: %p", pHash, ulIndex, pItem, pHash->item.asHash.value, pHash->item.asHash.value->pKeys, pHash->item.asHash.value->pValues ));
+   PHB_ITEM pElement;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashGet(%p, %lu, %p) Base: %p Keys: %p Values: %p", pHash, ulIndex, pItem, pHash->item.asHash.value, pHash->item.asHash.value->pKeys, pHash->item.asHash.value->pValues));
+
+   if( HB_IS_HASH( pHash ) && ulIndex > 0 )
+   {
+      if ( pHash->item.asHash.value->uiLevel > 0 )
+      {
+         ULONG ulTotal = 0;
+
+         if ( pHash->item.asHash.value->ulTotalLen < ulIndex )
+         {
+            return FALSE;
+         }
+
+         pElement = pHash->item.asHash.value->pValues;
+
+         while( ulTotal + pElement->item.asHash.value->ulTotalLen < ulIndex )
+         {
+            ulTotal += pElement->item.asHash.value->ulTotalLen;
+            pElement ++;
+         }
+
+         return hb_hashGet( pElement, ulIndex - ulTotal, pItem );
+      }
+
+      pElement = pHash->item.asHash.value->pValues + ( ulIndex - 1 );
+
+      if  ( ulIndex <= pHash->item.asHash.value->ulLen )
+      {
+         pElement = pHash->item.asHash.value->pValues + ( ulIndex - 1 );
+
+         if( HB_IS_BYREF( pElement ) )
+         {
+            hb_itemCopy( pItem, hb_itemUnRef( pElement ) );
+         }
+         else
+         {
+            hb_itemCopy( pItem, pElement );
+         }
+         return TRUE;
+      }
+   }
 
    if( HB_IS_COMPLEX( pItem ) )
    {
       hb_itemClear( pItem );
    }
-
-   if( HB_IS_HASH( pHash ) && ulIndex > 0 && ulIndex <= pHash->item.asHash.value->ulLen )
+   else
    {
-      PHB_ITEM pElement = pHash->item.asHash.value->pValues + ( ulIndex - 1 );
-
-      pItem->type = HB_IT_BYREF;
-
-      pItem->item.asRefer.value = ulIndex - 1;
-      pItem->item.asRefer.offset = 0;
-      pItem->item.asRefer.BasePtr.itemsbase = &( pHash->item.asHash.value->pValues );
-
-      if( pElement->type == HB_IT_STRING && ( pElement->item.asString.bStatic || *( pElement->item.asString.puiHolders ) > 1 ) )
-      {
-         char *sString = (char*) hb_xgrab( pElement->item.asString.length + 1 );
-
-         memcpy( sString, pElement->item.asString.value, pElement->item.asString.length + 1 );
-
-         if( pElement->item.asString.bStatic == FALSE )
-         {
-            hb_itemReleaseString( pElement );
-         }
-
-         pElement->item.asString.value = sString;
-         pElement->item.asString.bStatic = FALSE;
-         pElement->item.asString.puiHolders = (USHORT *) hb_xgrab( sizeof( USHORT ) );
-         *( pElement->item.asString.puiHolders ) = 1;
-      }
-
-      return TRUE;
+      pItem->type = HB_IT_NIL;
    }
-
-   pItem->type = HB_IT_NIL;
-
    return FALSE;
 }
+
 
 
 void HB_EXPORT hb_hashPreallocate( PHB_ITEM pHash, ULONG ulNewLen )
@@ -724,6 +998,9 @@ PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash )
       hb_itemCopy( pDestBase->pValues + ulCount, pVal );
    }
    pDestBase->ulLen = ulLen;
+   pDestBase->ulTotalLen = pSrcBase->ulTotalLen;
+   pDestBase->ulPageSize = pSrcBase->ulPageSize;
+   pDestBase->uiLevel = pSrcBase->uiLevel;
    pDestBase->fOrder = pSrcBase->fOrder;
    pDestBase->bCase = pSrcBase->bCase;
    pDestBase->bAutoAdd = pSrcBase->bAutoAdd;
@@ -760,51 +1037,101 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
    if ( mode != 1 ) // and mode is different
    {
       BOOL bAdd = pDest->item.asHash.value->bAutoAdd;
-      pKey = pSource->item.asHash.value->pKeys;
-      pValue = pSource->item.asHash.value->pValues;
 
       // temporarily enabling auto add
       pDest->item.asHash.value->bAutoAdd = TRUE;
 
-      for ( ulElem = ulStart - 1; ulElem < ulStart-1+ulCount;
-            ulElem ++, pKey++, pValue++ )
+      if ( pSource->item.asHash.value->uiLevel == 0 )
       {
-         switch( mode )
+         pKey = pSource->item.asHash.value->pKeys;
+         pValue = pSource->item.asHash.value->pValues;
+
+         for ( ulElem = ulStart - 1; ulElem < ulStart-1+ulCount;
+               ulElem ++, pKey++, pValue++ )
          {
-            case 0: // default OR mode
-               hb_hashAdd( pDest, ULONG_MAX, pKey, pValue );
-               break;
-
-            case 2: // XOR mode
-               if ( ! hb_hashScan( pDest, pKey, &ulPos ) )
-               {
-                  hb_hashAdd( pDest, ulPos, pKey, pValue );
-               }
-               else
-               {
-                  hb_hashRemove( pDest, ulPos );
-               }
-               break;
-
-             case 3: // NOT mode
-               if ( hb_hashScan( pDest, pKey, &ulPos ) )
-               {
-                  hb_hashRemove( pDest, ulPos );
-               }
-               break;
-
-            default: // codeblock mode
-               hb_vmPushSymbol( &hb_symEval );
-               hb_vmPush( pBlock );
-               hb_vmPush( pKey );
-               hb_vmPush( pValue );
-               hb_vmPushNumber( ( double ) ( ulElem + 1 ), 0 );
-               hb_vmSend( 3 );
-               if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) &&
-                     HB_VM_STACK.Return.item.asLogical.value )
-               {
+            switch( mode )
+            {
+               case 0: // default OR mode
                   hb_hashAdd( pDest, ULONG_MAX, pKey, pValue );
-               }
+                  break;
+
+               case 2: // XOR mode
+                  if ( ! hb_hashScan( pDest, pKey, &ulPos ) )
+                  {
+                     hb_hashAdd( pDest, ulPos, pKey, pValue );
+                  }
+                  else
+                  {
+                     hb_hashRemove( pDest, ulPos );
+                  }
+                  break;
+
+               case 3: // NOT mode
+                  if ( hb_hashScan( pDest, pKey, &ulPos ) )
+                  {
+                     hb_hashRemove( pDest, ulPos );
+                  }
+                  break;
+
+               default: // codeblock mode
+                  hb_vmPushSymbol( &hb_symEval );
+                  hb_vmPush( pBlock );
+                  hb_vmPush( pKey );
+                  hb_vmPush( pValue );
+                  hb_vmPushNumber( ( double ) ( ulElem + 1 ), 0 );
+                  hb_vmSend( 3 );
+                  if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) &&
+                        HB_VM_STACK.Return.item.asLogical.value )
+                  {
+                     hb_hashAdd( pDest, ULONG_MAX, pKey, pValue );
+                  }
+            }
+         }
+      }
+      else
+      {
+         for ( ulElem = ulStart; ulElem < ulStart+ulCount; ulElem ++ )
+         {
+            pKey = hb_hashGetKeyAt( pSource, ulElem);
+            pValue = hb_hashGetValueAt( pSource, ulElem);
+
+            switch( mode )
+            {
+               case 0: // default OR mode
+                  hb_hashAdd( pDest, ULONG_MAX, pKey, pValue );
+                  break;
+
+               case 2: // XOR mode
+                  if ( ! hb_hashScan( pDest, pKey, &ulPos ) )
+                  {
+                     hb_hashAdd( pDest, ulPos, pKey, pValue );
+                  }
+                  else
+                  {
+                     hb_hashRemove( pDest, ulPos );
+                  }
+                  break;
+
+               case 3: // NOT mode
+                  if ( hb_hashScan( pDest, pKey, &ulPos ) )
+                  {
+                     hb_hashRemove( pDest, ulPos );
+                  }
+                  break;
+
+               default: // codeblock mode
+                  hb_vmPushSymbol( &hb_symEval );
+                  hb_vmPush( pBlock );
+                  hb_vmPush( pKey );
+                  hb_vmPush( pValue );
+                  hb_vmPushNumber( ( double ) ( ulElem ), 0 );
+                  hb_vmSend( 3 );
+                  if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) &&
+                        HB_VM_STACK.Return.item.asLogical.value )
+                  {
+                     hb_hashAdd( pDest, ULONG_MAX, pKey, pValue );
+                  }
+            }
          }
       }
       // resetting default autoadd status
@@ -814,30 +1141,59 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
    {
       ULONG ulDestLen = hb_hashLen( pDest );
       ulElem = 0;
-      while ( ulElem < ulDestLen )
+
+      if ( pDest->item.asHash.value->uiLevel == 0 )
       {
-         PHB_ITEM pKeyDest = pDest->item.asHash.value->pKeys + ulElem;
-
-         if ( ! hb_hashScan( pSource, pKeyDest, &ulPos ) )
+         while ( ulElem < ulDestLen )
          {
-            hb_hashRemove( pDest, ulElem + 1);
-            ulDestLen--;
-         }
-         else {
-            if ( ulPos < ulStart || ulPos > ulCount+ ulStart ) {
-               hb_hashRemove( pDest, ulElem +1 );
-               ulDestLen--;
+            PHB_ITEM pKeyDest = pDest->item.asHash.value->pKeys + ulElem;
 
+            if ( ! hb_hashScan( pSource, pKeyDest, &ulPos ) )
+            {
+               hb_hashRemove( pDest, ulElem + 1);
+               ulDestLen--;
             }
             else {
-               hb_hashSet( pDest, ulElem+1,
-               pSource->item.asHash.value->pValues + (ulPos-1) );
-               ulElem++;
+               if ( ulPos < ulStart || ulPos > ulCount+ ulStart ) {
+                  hb_hashRemove( pDest, ulElem +1 );
+                  ulDestLen--;
+
+               }
+               else {
+                  hb_hashSet( pDest, ulElem+1,
+                  pSource->item.asHash.value->pValues + (ulPos-1) );
+                  ulElem++;
+               }
+            }
+         }
+      }
+      else
+      {
+         ulElem = 1;
+
+         while ( ulElem <= ulDestLen )
+         {
+            PHB_ITEM pKeyDest = hb_hashGetKeyAt( pDest, ulElem );
+
+            if ( ! hb_hashScan( pSource, pKeyDest, &ulPos ) )
+            {
+               hb_hashRemove( pDest, ulElem );
+               ulDestLen--;
+            }
+            else {
+               if ( ulPos < ulStart || ulPos > ulCount+ ulStart ) {
+                  hb_hashRemove( pDest, ulElem );
+                  ulDestLen--;
+
+               }
+               else {
+                  hb_hashSet( pDest, ulElem, hb_hashGetValueAt( pSource, ulPos ) );
+                  ulElem++;
+               }
             }
          }
       }
    }
-
 }
 
 void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
@@ -993,7 +1349,6 @@ HB_GARBAGE_FUNC( hb_hashReleaseGarbage )
    }
 }
 
-
 PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pHash )
 {
    PHB_ITEM pKeys, pK, pArr;
@@ -1005,18 +1360,33 @@ PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pHash )
    }
 
    pKeys = hb_itemNew( NULL );
-   ulLen = pHash->item.asHash.value->ulLen;
-   hb_arrayNew( pKeys, ulLen );
-   pK = pHash->item.asHash.value->pKeys;
-   pArr = pKeys->item.asArray.value->pItems;
 
-   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pK++, pArr++ )
+   if ( pHash->item.asHash.value->uiLevel == 0 )
    {
-      hb_itemCopy( pArr, pK );
+      ulLen = pHash->item.asHash.value->ulLen;
+      hb_arrayNew( pKeys, ulLen );
+      pK = pHash->item.asHash.value->pKeys;
+      pArr = pKeys->item.asArray.value->pItems;
+
+      for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pK++, pArr++ )
+      {
+         hb_itemCopy( pArr, pK );
+      }
+   }
+   else {
+      ulLen = pHash->item.asHash.value->ulTotalLen;
+      hb_arrayNew( pKeys, ulLen );
+      pArr = pKeys->item.asArray.value->pItems;
+
+      for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pArr++ )
+      {
+         hb_itemCopy( pArr, hb_hashGetKeyAt( pHash, ulPos ) );
+      }
    }
 
    return pKeys;
 }
+
 
 PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pHash )
 {
@@ -1029,31 +1399,69 @@ PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pHash )
    }
 
    pVals = hb_itemNew( NULL );
-   ulLen = pHash->item.asHash.value->ulLen;
-   hb_arrayNew( pVals, ulLen );
-   pV = pHash->item.asHash.value->pKeys;
-   pArr = pVals->item.asArray.value->pItems;
 
-   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pV++, pArr++ )
+   if ( pHash->item.asHash.value->uiLevel == 0 )
    {
-      hb_itemCopy( pArr, pV );
+      ulLen = pHash->item.asHash.value->ulLen;
+      hb_arrayNew( pVals, ulLen );
+      pV = pHash->item.asHash.value->pKeys;
+      pArr = pVals->item.asArray.value->pItems;
+
+      for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pV++, pArr++ )
+      {
+         hb_itemCopy( pArr, pV );
+      }
+   }
+   else {
+      ulLen = pHash->item.asHash.value->ulTotalLen;
+      hb_arrayNew( pVals, ulLen );
+      pArr = pVals->item.asArray.value->pItems;
+
+      for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pArr++ )
+      {
+         hb_itemCopy( pArr, hb_hashGetValueAt( pHash, ulPos ) );
+      }
    }
 
    return pVals;
 }
 
+
 PHB_ITEM HB_EXPORT hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos )
 {
-
    PHB_BASEHASH pBaseHash = pHash->item.asHash.value;
+   PHB_ITEM pElement;
 
-   if ( ulPos < 1 ||  ulPos > pBaseHash->ulLen  )
+   if ( ulPos < 1 )
    {
       return NULL;
    }
 
-   // waring: change IN operator (hb_vmInstringOrArray() ) when changing
-   // pagination
+   if ( pBaseHash->uiLevel > 0 )
+   {
+      ULONG ulTotal = 0;
+
+      if ( pBaseHash->ulTotalLen < ulPos )
+      {
+         return NULL;
+      }
+
+      pElement = pBaseHash->pValues;
+
+      while( ulTotal + pElement->item.asHash.value->ulTotalLen < ulPos )
+      {
+         ulTotal += pElement->item.asHash.value->ulTotalLen;
+         pElement ++;
+      }
+
+      return hb_hashGetKeyAt( pElement, ulPos - ulTotal );
+   }
+
+   if ( ulPos > pHash->item.asHash.value->ulLen )
+   {
+      return NULL;
+   }
+
    return pBaseHash->pKeys + (ulPos -1 );
 }
 
@@ -1062,14 +1470,38 @@ PHB_ITEM HB_EXPORT hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos )
 {
 
    PHB_BASEHASH pBaseHash = pHash->item.asHash.value;
+   PHB_ITEM pElement;
 
-   if ( ulPos < 1 ||  ulPos > pBaseHash->ulLen  )
+   if ( ulPos < 1 )
    {
       return NULL;
    }
 
-   // waring: change IN operator (hb_vmInstringOrArray() ) when changing
-   // pagination
+   if ( pBaseHash->uiLevel > 0 )
+   {
+      ULONG ulTotal = 0;
+
+      if ( pBaseHash->ulTotalLen < ulPos )
+      {
+         return NULL;
+      }
+
+      pElement = pBaseHash->pValues;
+
+      while( ulTotal + pElement->item.asHash.value->ulTotalLen < ulPos )
+      {
+         ulTotal += pElement->item.asHash.value->ulTotalLen;
+         pElement ++;
+      }
+
+      return hb_hashGetValueAt( pElement, ulPos - ulTotal );
+   }
+
+   if ( ulPos > pBaseHash->ulLen  )
+   {
+      return NULL;
+   }
+
    return pBaseHash->pValues + (ulPos -1 );
 }
 
@@ -1248,83 +1680,71 @@ HB_FUNC( HDEL )
 HB_FUNC( HGETKEYAT )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
-   PHB_ITEM pKey = hb_param( 2, HB_IT_NUMERIC );
-   PHB_BASEHASH pBaseHash;
+   PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
    ULONG ulPos;
 
-   if ( pHash == NULL || pKey == NULL )
+   if ( pHash == NULL || pPos == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
          "HGETKEYAT", 2, hb_paramError(1), hb_paramError( 2 ) );
       return;
    }
-   // WARNING: for speed reasons, not using internal api but writing directly
-   // the code here. To be changed when we'll add automatic pagination
-   ulPos = hb_itemGetNL( pKey );
-   pBaseHash = pHash->item.asHash.value;
 
-   if ( ulPos < 1 ||  ulPos > pBaseHash->ulLen  )
+   ulPos = hb_itemGetNL( pPos );
+
+   if ( ulPos < 1 ||  ulPos > hb_hashLen( pHash )  )
    {
       hb_errRT_BASE( EG_BOUND, 1187, NULL, "HGETKEYAT", 2,
             hb_paramError( 1 ), hb_paramError( 2 ) );
       return;
    }
 
-   // waring: change IN operator (hb_vmInstringOrArray() ) when changing
-   // pagination
-
-   hb_itemCopy ( &HB_VM_STACK.Return, pBaseHash->pKeys + (ulPos -1 ) );
+   hb_itemCopy ( &HB_VM_STACK.Return, hb_hashGetKeyAt(pHash, ulPos ) );
 }
 
 HB_FUNC( HGETVALUEAT )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
-   PHB_ITEM pKey = hb_param( 2, HB_IT_NUMERIC );
-   PHB_BASEHASH pBaseHash;
+   PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
    ULONG ulPos;
 
-   if ( pHash == NULL || pKey == NULL )
+   if ( pHash == NULL || pPos == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
          "HGETVALUEAT", 2, hb_paramError(1), hb_paramError( 2 ) );
       return;
    }
-   // WARNING: for speed reasons, not using internal api but writing directly
-   // the code here. To be changed when we'll add automatic pagination
-   ulPos = hb_itemGetNL( pKey );
-   pBaseHash = pHash->item.asHash.value;
 
-   if ( ulPos < 1 || ulPos > pBaseHash->ulLen  )
+   ulPos = hb_itemGetNL( pPos );
+
+   if ( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
    {
       hb_errRT_BASE( EG_BOUND, 1187, NULL, "HGETVALUEAT", 2,
             hb_paramError( 1 ), hb_paramError( 2 ) );
       return;
    }
 
-   // waring: change IN operator (hb_vmInstringOrArray() ) when changing
-   // pagination
-   hb_itemCopy ( &HB_VM_STACK.Return, pBaseHash->pValues + (ulPos -1 ) );
+   hb_itemCopy ( &HB_VM_STACK.Return, hb_hashGetValueAt(pHash, ulPos ) );
 }
 
 HB_FUNC( HSETVALUEAT )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
-   PHB_ITEM pKey = hb_param( 2, HB_IT_NUMERIC );
+   PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
    PHB_ITEM pValue = hb_param( 3, HB_IT_ANY );
-   PHB_BASEHASH pBaseHash;
+   PHB_ITEM pItem;
    ULONG ulPos;
 
-   if ( pHash == NULL || pKey == NULL || pValue == NULL )
+   if ( pHash == NULL || pPos == NULL || pValue == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
          "HSETVALUEAT", 3, hb_paramError(1), hb_paramError(2),
          hb_paramError(3) );
       return;
    }
-   ulPos = hb_itemGetNL( pKey );
-   pBaseHash = pHash->item.asHash.value;
+   ulPos = hb_itemGetNL( pPos );
 
-   if ( ulPos < 1 || ulPos > pBaseHash->ulLen  )
+   if ( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
    {
       hb_errRT_BASE( EG_BOUND, 1187, NULL, "HSETVALUEAT",
           3, hb_paramError(1), hb_paramError(2),
@@ -1332,7 +1752,8 @@ HB_FUNC( HSETVALUEAT )
       return;
    }
 
-   hb_itemCopy( pBaseHash->pValues + (ulPos -1 ), pValue );
+   pItem = hb_hashGetValueAt(pHash, ulPos );
+   hb_itemCopy( pItem, pValue );
 }
 
 HB_FUNC( HGETPAIRAT )
@@ -1356,7 +1777,7 @@ HB_FUNC( HGETPAIRAT )
    ulPos = hb_itemGetNL( pPos );
    pBaseHash = pHash->item.asHash.value;
 
-   if ( ulPos < 1 || ulPos > pBaseHash->ulLen  )
+   if ( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HGETPAIRAT",
          4, hb_paramError(1), hb_paramError( 2 ),
@@ -1373,15 +1794,15 @@ HB_FUNC( HGETPAIRAT )
       pArrRet = hb_itemNew( NULL );
       hb_arrayNew( pArrRet, 2 );
       hb_itemCopy( hb_arrayGetItemPtr( pArrRet, 1 ),
-         pBaseHash->pKeys + (ulPos -1 ) );
+         hb_hashGetKeyAt(pHash, ulPos ) );
       hb_itemCopy( hb_arrayGetItemPtr( pArrRet, 2 ),
-         pBaseHash->pValues + (ulPos -1 ) );
+         hb_hashGetValueAt(pHash, ulPos ) );
       hb_itemForwardValue( &HB_VM_STACK.Return, pArrRet );
    }
    else
    {
-      hb_itemCopy( pKey, pBaseHash->pKeys + (ulPos -1 ) );
-      hb_itemCopy( pValue, pBaseHash->pValues + (ulPos -1 ) );
+      hb_itemCopy( pKey, hb_hashGetKeyAt(pHash, ulPos ) );
+      hb_itemCopy( pValue, hb_hashGetValueAt(pHash, ulPos ) );
       hb_ret();
    }
 }
@@ -1390,7 +1811,6 @@ HB_FUNC( HDELAT )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pKey = hb_param( 2, HB_IT_NUMERIC );
-   PHB_BASEHASH pBaseHash;
    ULONG ulPos;
 
    if ( pHash == NULL || pKey == NULL )
@@ -1400,9 +1820,8 @@ HB_FUNC( HDELAT )
       return;
    }
    ulPos = hb_itemGetNL( pKey );
-   pBaseHash = pHash->item.asHash.value;
 
-   if ( ulPos < 1 || ulPos > pBaseHash->ulLen  )
+   if ( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
    {
       hb_errRT_BASE( EG_BOUND, 1187, NULL, "HDELAT", 2,
          hb_paramError(1), hb_paramError(2) );
@@ -1463,12 +1882,22 @@ HB_FUNC( HFILL )
       return;
    }
 
-   pV = pHash->item.asHash.value->pValues;
-   ulLen = pHash->item.asHash.value->ulLen;
-
-   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pV++ )
+   if ( pHash->item.asHash.value->uiLevel == 0 )
    {
-      hb_itemCopy( pV, pVal );
+      pV = pHash->item.asHash.value->pValues;
+      ulLen = pHash->item.asHash.value->ulLen;
+
+      for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pV++ )
+      {
+         hb_itemCopy( pV, pVal );
+      }
+   }
+   else
+   {
+      for ( ulPos = 1; ulPos <= hb_hashLen( pHash ); ulPos ++ )
+      {
+         hb_itemCopy( hb_hashGetValueAt( pHash, ulPos ), pVal );
+      }
    }
 }
 
@@ -1487,9 +1916,9 @@ HB_FUNC( HSCAN )
    }
    else
    {
-         hb_errRT_BASE( EG_ARG, 2017, NULL, "HSCAN", 5,
-         hb_paramError( 1 ), hb_paramError( 2 ),
-         hb_paramError( 3 ), hb_paramError( 4 ), hb_paramError( 5 ));
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "HSCAN", 5,
+      hb_paramError( 1 ), hb_paramError( 2 ),
+      hb_paramError( 3 ), hb_paramError( 4 ), hb_paramError( 5 ));
    }
 
 }
@@ -1593,9 +2022,27 @@ HB_FUNC( HMERGE )
    hb_itemCopy( &(HB_VM_STACK.Return), pDest );
 }
 
+
 /**********************************************************
 * Setup and set options
 ***********************************************************/
+static void hb_hashSetCaseMatch( PHB_ITEM pHash, BOOL bCase )
+{
+   PHB_BASEHASH pBase = pHash->item.asHash.value;
+
+   pBase->bCase = bCase;
+
+   if ( pBase->uiLevel > 0 )
+   {
+      ULONG ulCount;
+
+      for ( ulCount = 0; ulCount < pBase->ulLen; ulCount ++ )
+      {
+         hb_hashSetCaseMatch( pBase->pValues + ulCount, bCase );
+      }
+   }
+}
+
 
 HB_FUNC( HSETCASEMATCH )
 {
@@ -1604,15 +2051,15 @@ HB_FUNC( HSETCASEMATCH )
 
    if( pHash && pValue )
    {
-      pHash->item.asHash.value->bCase = hb_itemGetL( pValue );
+      hb_hashSetCaseMatch( pHash, hb_itemGetL( pValue ) );
 
       /* return a reference to the hash */
       hb_itemCopy( &(HB_VM_STACK.Return), pHash );
    }
    else
    {
-         hb_errRT_BASE( EG_ARG, 2017, NULL, "HSETCASEMATCH", 2,
-         hb_paramError( 1 ), hb_paramError( 2 ));
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "HSETCASEMATCH", 2,
+      hb_paramError( 1 ), hb_paramError( 2 ));
    }
 }
 
@@ -1663,6 +2110,103 @@ HB_FUNC( HGETAUTOADD )
    else {
       hb_retl( pHash->item.asHash.value->bAutoAdd );
    }
+}
+
+
+HB_FUNC( HSETPARTITION )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   PHB_ITEM pSize = hb_param( 2, HB_IT_NUMERIC );
+   PHB_ITEM pLevel = hb_param( 3, HB_IT_NUMERIC );
+   ULONG ulSize;
+   UINT uiLevel;
+
+
+   if( ! pHash )
+   {
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "HSETPARTITION", 3,
+            hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ));
+      return;
+   }
+
+   if( hb_hashLen( pHash ) > 0 )
+   {
+      hb_errRT_BASE( EG_ARG, 2017, "Can't change partitioning in a non-empty hash",
+            "HSETPARTITION", 3,
+            hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ));
+      return;
+   }
+
+   if ( pLevel != NULL )
+   {
+      uiLevel = hb_itemGetNI( pLevel );
+   }
+   else
+   {
+      uiLevel = 1;
+   }
+
+   if ( uiLevel < 1 || uiLevel > 8 )
+   {
+      hb_errRT_BASE( EG_ARG, 2017, "Pagination level must be between 1 and 8",
+            "HSETPARTITION", 3,
+            hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ));
+      return;
+   }
+
+   if ( pSize == NULL )
+   {
+      ulSize = 0;
+   }
+   else
+   {
+      ulSize = hb_itemGetNL( pSize );
+   }
+
+
+   if ( ulSize == 0 )
+   {
+      pHash->item.asHash.value->uiLevel = 0;
+      pHash->item.asHash.value->ulPageSize = 0;
+   }
+   else
+   {
+      pHash->item.asHash.value->uiLevel = uiLevel;
+      pHash->item.asHash.value->ulPageSize = ulSize;
+   }
+}
+
+HB_FUNC( HGETPARTITION )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   PHB_ITEM pSize = hb_param( 2, HB_IT_BYREF );
+   PHB_ITEM pLevel = hb_param( 3, HB_IT_BYREF );
+   BOOL bPaged;
+
+   if( ! pHash )
+   {
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "HGETPARTITION", 3,
+         hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ));
+      return;
+   }
+
+   bPaged = pHash->item.asHash.value->uiLevel > 0;
+
+   if ( bPaged )
+   {
+      if ( pSize != NULL )
+      {
+         hb_itemPutNL( pSize, pHash->item.asHash.value->ulPageSize );
+      }
+
+      if ( pLevel != NULL )
+      {
+         hb_itemPutNI( pLevel, pHash->item.asHash.value->uiLevel );
+      }
+   }
+
+   hb_retl( bPaged );
+
 }
 
 

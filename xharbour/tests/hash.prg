@@ -5,12 +5,12 @@
 *
 * This is a test that demonstrates how to use hashes
 *
-* $Id: hash.prg,v 1.6 2003/11/15 16:55:18 jonnymind Exp $
+* $Id: hash.prg,v 1.7 2003/11/15 21:26:43 jonnymind Exp $
 *
 
 PROCEDURE Main()
    LOCAL hHash, hTemp
-   LOCAL nSum, eError
+   LOCAL nSum, nLevel, eError
    LOCAL xKey, xValue, hDest
 
    SET DATE TO ITALIAN
@@ -23,9 +23,13 @@ PROCEDURE Main()
    * Creation by PP command:
    * Equivalent to Hash( K1, V1, ... KN, VN )
 
-   hHash := { "Kval"=> 'StrKey 0', 8=> 'Num Key 0' }
+   hHash := Hash()
+   HSetPartition( hHash, 2, 2 )
+
 
    /* Insertion by API */
+   hHash["Kval"] = 'StrKey 0'
+   hHash[ 8 ] = 'Num Key 0'
    HSet( hHash, 4,  "Numeric key 1" )
    HSet( hHash, 2,  "Numeric key 2" )
    HSet( hHash, "Str8", "String key 1" )
@@ -40,6 +44,9 @@ PROCEDURE Main()
    ? "Empty hash value:", ValToPrg( { => } )
    ? "String representation (should be nothing):", {=>}
    ? "Equality of hashes (Success for .T. , .F.): ", hHash == hHash, hHash == {=>}
+   HGetPartition(hHash, @nSum, @nLevel )
+   ? "Hash partitioned as: ", nSum, nLevel
+
    ? "Plus operator: ", ValToPrg( { 1=>1, 'a'=>2} + { 3=>3, 'b'=>4 } )
    hHash += { 5=> "numkey 3" }
    ? "Plusequal operator (success if Len(hHash) == 9: ",;
@@ -165,7 +172,7 @@ PROCEDURE Main()
 
    ? "HASH Secondary API test:"
    ? "Scanning for value 'A newer value': ", HScan( hHash, 'A newer value' )
-   ? "Scanning for value 'Date key 1' using CB: ",;
+   ? "Scanning for value 'A newer value' using CB: ",;
        HScan( hHash, {| cKey, cVal| HB_ISSTRING(cVal) .and. cVal == 'A newer value'} )
 
    nSum := 0
