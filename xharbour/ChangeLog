@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3742 2005/01/14 04:43:02 bdj Exp $
+ * $Id: ChangeLog,v 1.3743 2005/01/14 06:16:47 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2005-01-14 13:25 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   + contrib/gtwvw/samples/cbtest1.prg
-  + contrib/gtwvw/samples/cbtest2.prg
+  + contrib/gtwvw/samples/cbtest6.prg
     * Samples on how to use GTWVW combobox.
 
 2005-01-14 11:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
