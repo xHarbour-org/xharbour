@@ -53,7 +53,7 @@ GLOBAL EXTERNAL hThisInstance
    METHOD OnDestroy()
    METHOD SetGridSize(x,y)
    METHOD OnCloseQuery()  INLINE    ::Parent:WindowMenu:Enable( 101 ),;
-                                    ::Parent:Rebar:Tabs:Tabs[1]:TabBand:StdTools:DisableAll(),;
+                                    ::Parent:StdBar:DisableAll(),;
                                     nil
 
    
@@ -195,6 +195,7 @@ METHOD CreateControl(aRect)
       ENDCASE
 
    ENDIF
+   ::Parent:StdBar:CheckButton( 100, .T. )
 
    RETURN(oObj)
 
@@ -253,7 +254,7 @@ METHOD CreateSub()
    ::Parent:WindowMenu:Enable( 109 )
    ::Parent:WindowMenu:Enable( 110 )
 */
-   ::Parent:Rebar:Tabs:Tabs[1]:TabBand:StdTools:EnableAll()
+   ::Parent:StdBar:EnableAll()
 
    xRet := super:OnCreate()
 

@@ -32,32 +32,9 @@ FUNCTION Main
             WITH OBJECT :Popup
                :AddItem( 'Editor'     , 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )
 
-/*
-               :AddSeparator()
-               :AddItem( 'Button'     , 102, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-               :AddItem( 'Edit'       , 103, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-               :AddItem( 'ComboBox'   , 104, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-               :AddItem( 'Label'      , 105, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-               :AddItem( 'RadioButton', 106, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-               :AddItem( 'CheckBox'   , 107, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-               :AddItem( 'ListBox'    , 108, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-               :AddItem( 'StatusBar'  , 109, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-               :AddItem( 'TabControl' , 110, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-*/               
             END
          END
          :SetWindowMenu()
-/*
-         :WindowMenu:Gray( 102 )
-         :WindowMenu:Gray( 103 )
-         :WindowMenu:Gray( 104 )
-         :WindowMenu:Gray( 105 )
-         :WindowMenu:Gray( 106 )
-         :WindowMenu:Gray( 107 )
-         :WindowMenu:Gray( 108 )
-         :WindowMenu:Gray( 109 )
-         :WindowMenu:Gray( 110 )
-*/
          WITH OBJECT :Add('Rebar', TRebar():New( oApp:MainFrame ) )
             WITH OBJECT :Add( 'Tools', TToolBar():New( oApp:MainFrame:Rebar, 444, 15, , , 26, 26, 20, 20 ))
                
@@ -125,6 +102,9 @@ FUNCTION Main
                   END
                   :AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 34,  , "", NIL )
                   :StdTools:DisableAll()
+                  
+                  //--------- sets a QUICK access to the control
+                  oApp:MainFrame:Access( 'StdBar', :StdTools )
                END
             END
          END
@@ -134,6 +114,7 @@ FUNCTION Main
             :SetPanelText( 0, "What32 API StatusBar" )
             :SetPanelText( 2, "Enjoy" )
          END
+         
       END
       
       oSplash:OnTimer(1)
