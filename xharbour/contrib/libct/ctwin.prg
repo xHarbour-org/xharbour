@@ -4,7 +4,7 @@
 *   write by Adam Lubszczyk    alubszcz@rsw.pl                     *
 ********************************************************************
 /*
- * $Id: ctwin.prg,v 1.5 2004/01/29 17:28:45 lculik Exp $
+ * $Id: ctwin.prg,v 1.6 2004/06/30 19:07:10 jabrecer Exp $
  */
 
 /*
@@ -127,18 +127,24 @@ FUNCTION ctw_SAVESCREEN( nT, nL, nB, nR)
    cRet := ctw_WINDOWS[ctw_CURRENT]:SaveScreen( nT, nL, nB, nR)
  ENDIF
 RETURN cRet
+
 *********************************************
 * Function....: CTW_RestScreen( nT, nL, nB, nR, cScr)
 * Author......: Tony Bretado
 * Date Created: 8/27/03             2:33PM
 *********************************************
 FUNCTION ctw_RESTSCREEN( nT, nL, nB, nR, cScr)
- IF ctw_CURRENT == 0
-   RESTSCREEN( nT, nL, nB, nR, cScr)
- ELSE
-   cRet := ctw_WINDOWS[ctw_CURRENT]:RestScreen( nT, nL, nB, nR, cScr)
- ENDIF
-RETURN Nil
+
+   LOCAL cRet
+
+   IF ctw_CURRENT == 0
+     cRet := RESTSCREEN( nT, nL, nB, nR, cScr)
+   ELSE
+     cRet := ctw_WINDOWS[ctw_CURRENT]:RestScreen( nT, nL, nB, nR, cScr)
+   ENDIF
+
+RETURN cRet
+
 ********************************************
 FUNCTION ctw_SCROLL(nT,nL,nB,nR,nV,nH)
  IF ctw_CURRENT == 0
@@ -793,7 +799,8 @@ method WinShadow() CLASS TctWIN
          ::ColorShadow(::posT + 1, ::posR + 1, ::posB + nRows, ::PosR + nCols, ctw_SHADOWATTR)
       Endif
    Endif
-   return
+
+   return Self
 
 *********************************************************************
 * Method......: ColorShadow( nTop, nLeft, nBottom, nRight, xAtt)
