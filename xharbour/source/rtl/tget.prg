@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.65 2004/01/07 23:39:58 ronpinkas Exp $
+ * $Id: tget.prg,v 1.66 2004/01/17 22:15:53 andijahja Exp $
  */
 
 /*
@@ -331,6 +331,14 @@ METHOD ParsePict( cPicture ) CLASS Get
             ::cPicMask := Replicate( '9', Len( cNum ) )
          endif
          exit
+
+       case "C"
+          If ::cPicFunc == "@9"
+             ::cPicMask := Replicate( "9", Len( ::VarGet() ) )
+             ::cPicFunc := ""
+          Endif
+          exit
+
       end
    endif
 
