@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: TELEPATH.CH,v 1.1 2004/08/25 08:49:06 mauriliolongo Exp $
  */
 
 /*
@@ -114,3 +114,4 @@
 #define TXS_EFILE   10              // End of file
 #define TXS_END     11              // End of transfer
 
+#define TP_32MAGIC  558161692
