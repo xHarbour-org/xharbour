@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.59 2004/12/19 14:00:00 ptsarenko Exp $
+# $Id: hrbdll.vc,v 1.59 2004/12/19 11:33:52 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -468,6 +468,7 @@ HARBOUR_DLL_OBJS = \
 #
 # Codepage
 #
+  $(OBJ_DIR)\cpdos437.obj \
   $(OBJ_DIR)\cpesdos.obj \
   $(OBJ_DIR)\cpesmwin.obj \
   $(OBJ_DIR)\cpeswin.obj \
@@ -475,6 +476,9 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cpgewin.obj \
   $(OBJ_DIR)\cphr1250.obj \
   $(OBJ_DIR)\cphr852.obj \
+  $(OBJ_DIR)\cpitdos.obj \
+  $(OBJ_DIR)\cpitisb.obj \
+  $(OBJ_DIR)\cpitiso.obj \
   $(OBJ_DIR)\cpltwin.obj \
   $(OBJ_DIR)\cppl852.obj \
   $(OBJ_DIR)\cppliso.obj \
@@ -495,13 +499,13 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\uc1250.obj \
   $(OBJ_DIR)\uc1251.obj \
   $(OBJ_DIR)\uc1257.obj \
-  $(OBJ_DIR)\uc850.obj  \
-  $(OBJ_DIR)\uc852.obj  \
-  $(OBJ_DIR)\uc866.obj  \
+  $(OBJ_DIR)\uc850.obj \
+  $(OBJ_DIR)\uc852.obj \
+  $(OBJ_DIR)\uc866.obj \
   $(OBJ_DIR)\uc8859_1.obj \
   $(OBJ_DIR)\uc8859_2.obj \
   $(OBJ_DIR)\uc88591b.obj \
-  $(OBJ_DIR)\uckoi8.obj  \
+  $(OBJ_DIR)\uckoi8.obj \
   $(OBJ_DIR)\uckoi8u.obj \
   $(OBJ_DIR)\ucmaz.obj \
 #
