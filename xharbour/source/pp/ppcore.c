@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.23 2002/06/21 19:18:27 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.24 2002/07/17 15:08:13 ronpinkas Exp $
  */
 
 /*
@@ -99,7 +99,7 @@ static COMMANDS * TraSearch( char *, COMMANDS * );
 
 static int    ParseUndef( char * );                        /* Process #undef directive */
 static int    ParseIfdef( char *, int );                   /* Process #ifdef directive */
-static void   ParseCommand( char *, BOOL, BOOL );          /* Process #command or #translate directive */
+static void   ParseCommand( char *, BOOL, BOOL, BOOL );    /* Process #command or #translate directive */
 static void   ConvertPatterns( char *, int, char *, int ); /* Converting result pattern in #command and #translate */
 static int    WorkDefine( char **, char *, DEFINES * );    /* Replace fragment of code with a #defined result text */
 static int    WorkPseudoF( char **, char *, DEFINES * );   /* Replace pseudofunction with a #defined result text */
@@ -517,12 +517,22 @@ int hb_pp_ParseDirective( char * sLine )
       else if( (i >= 4 && i <= 7 && memcmp( sDirective, "COMMAND", i ) == 0) ||
                (i >= 4 && i <= 8 && memcmp( sDirective, "XCOMMAND", i ) == 0) )
                                 /* --- #command  --- */
-        ParseCommand( sLine, (i==7)? FALSE:TRUE, TRUE );
+        ParseCommand( sLine, (i==7)? FALSE:TRUE, TRUE, FALSE );
+
+      else if( (i >= 4 && i <= 9 && memcmp( sDirective, "UNCOMMAND", i ) == 0) ||
+               (i >= 4 && i <= 10 && memcmp( sDirective, "UNXCOMMAND", i ) == 0) )
+                                /* --- #uncommand  --- */
+        ParseCommand( sLine, (i==9)? FALSE:TRUE, TRUE, TRUE );
 
       else if( (i >= 4 && i <= 9 && memcmp( sDirective, "TRANSLATE", i ) == 0) ||
                (i >= 4 && i <= 10 && memcmp( sDirective, "XTRANSLATE", i ) == 0) )
                                 /* --- #translate  --- */
-        ParseCommand( sLine, (i==9)? FALSE:TRUE, FALSE );
+        ParseCommand( sLine, (i==9)? FALSE:TRUE, FALSE, FALSE );
+
+      else if( (i >= 4 && i <= 11 && memcmp( sDirective, "UNTRANSLATE", i ) == 0) ||
+               (i >= 4 && i <= 12 && memcmp( sDirective, "UNXTRANSLATE", i ) == 0) )
+                                /* --- #untranslate  --- */
+        ParseCommand( sLine, (i==11)? FALSE:TRUE, FALSE, TRUE );
 
       else if( i >= 4 && i <= 6 && memcmp( sDirective, "STDOUT", i ) == 0 )
         printf( "%s\n", sLine ); /* --- #stdout  --- */
@@ -797,7 +807,7 @@ static COMMANDS * TraSearch( char * cmdname, COMMANDS * sttraStart )
   return sttra;
 }
 
-static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra )
+static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL bRemove )
 {
   static char mpatt[ PATTERN_SIZE ];
   static char rpatt[ PATTERN_SIZE ];
@@ -810,7 +820,7 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra )
   /* Ron Pinkas added 2000-12-03 */
   BOOL bOk = FALSE;
 
-  HB_TRACE(HB_TR_DEBUG, ("ParseCommand(%s, %d, %d)", sLine, com_or_xcom, com_or_tra));
+  HB_TRACE(HB_TR_DEBUG, ("ParseCommand(%s, %d, %d, %d)", sLine, com_or_xcom, com_or_tra, bRemove));
 
   HB_SKIPTABSPACES( sLine );
   ipos = 0;
@@ -917,10 +927,68 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra )
 
     ConvertPatterns( mpatt, mlen, rpatt, rlen );
 
-    if( com_or_tra )
-      stcmd = AddCommand( cmdname );
+    if( bRemove )
+    {
+       COMMANDS *cmd, *cmdLast = NULL;
+
+       if( com_or_tra )
+       {
+          cmd = hb_pp_topCommand;
+       }
+       else
+       {
+          cmd = hb_pp_topTranslate;
+       }
+
+       while ( cmd )
+       {
+          //printf( "Searching Key (%i) '%s' Rule '%s' Result '%s' in Command: (%i) '%s' Rule: '%s' Result '%s'\n", com_or_xcom, cmdname, mpatt, rpatt, cmd->name, cmd->com_or_xcom, cmd->mpatt, cmd->value );
+
+          if( strcmp( cmd->name, cmdname ) == 0 && cmd->com_or_xcom == com_or_xcom )
+          {
+             if( strcmp( cmd->mpatt, mpatt ) == 0 && strcmp( cmd->value, rpatt ) == 0 )
+             {
+                if( cmdLast == NULL )
+                {
+                   if( com_or_tra )
+                   {
+                      hb_pp_topCommand = cmd->last;
+                   }
+                   else
+                   {
+                      hb_pp_topTranslate = cmd->last;
+                   }
+                }
+                else
+                {
+                   cmdLast = cmd->last;
+                }
+
+                hb_xfree( cmd->name );
+                hb_xfree( cmd->mpatt );
+                hb_xfree( cmd->value );
+                hb_xfree( cmd );
+
+                return;
+             }
+          }
+
+          cmd = cmd->last;
+       }
+
+       return;
+    }
     else
-      stcmd = AddTranslate( cmdname );
+    {
+       if( com_or_tra )
+       {
+          stcmd = AddCommand( cmdname );
+       }
+       else
+       {
+          stcmd = AddTranslate( cmdname );
+       }
+    }
 
     stcmd->com_or_xcom = com_or_xcom;
     stcmd->mpatt = hb_strdup( mpatt );
