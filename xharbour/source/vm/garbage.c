@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.50 2003/03/12 00:24:09 jonnymind Exp $
+ * $Id: garbage.c,v 1.51 2003/03/14 11:22:30 jonnymind Exp $
  */
 
 /*
@@ -499,16 +499,12 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 
 void hb_gcCollect( void )
 {
-   HB_THREAD_STUB
-   
    /* TODO: decrease the amount of time spend collecting */
-   HB_STACK_UNLOCK;
    #if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT )
       hb_threadSubscribeIdle( hb_gcCollectAll );
    #else
       hb_gcCollectAll();
    #endif
-   HB_STACK_LOCK;
 }
 
 /* Check all memory blocks if they can be released
@@ -520,13 +516,13 @@ void hb_gcCollectAll()
 
    /* is anoter garbage in action? */
    #ifdef HB_THREAD_SUPPORT
-
       #ifdef HB_OS_WIN_32
          if ( s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
          {
             return;
          }
       #else
+         HB_UNLOCK_STACK;
          HB_CRITICAL_LOCK( hb_runningStacks.Mutex );
          if ( s_bCollecting == TRUE || s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
          {
@@ -536,8 +532,8 @@ void hb_gcCollectAll()
          s_bCollecting = TRUE;
 
          hb_threadWaitForIdle();
+         
          HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
-
       #endif
    #else
       if ( s_bCollecting )  // note: 1) is volatile and 2) not very important if fails 1 time
@@ -731,8 +727,10 @@ void hb_gcCollectAll()
    /* Put itself back on machine execution count */
 
    /* Unblocks all threads */
-   #if defined( HB_THREAD_SUPPORT )
+   #if defined( HB_THREAD_SUPPORT ) && ! defined( HB_OS_WIN_32 )
       hb_runningStacks.aux = 0;
+      // this will also signal the changed situation.
+      HB_STACK_LOCK
    #endif
 }
 
@@ -858,7 +856,6 @@ HB_FUNC( HB_GCSTEP )
 */
 HB_FUNC( HB_GCALL )
 {
-   HB_THREAD_STUB
    
    if( hb_parl( 1 ) )
    {
@@ -868,9 +865,7 @@ HB_FUNC( HB_GCALL )
    #if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT ) 
       hb_threadSubscribeIdle( hb_gcCollectAll );
    #else
-      HB_STACK_UNLOCK;
       hb_gcCollectAll();
-      HB_STACK_LOCK;
    #endif
 }
 

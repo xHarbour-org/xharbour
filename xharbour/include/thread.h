@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.36 2003/03/13 02:59:40 jonnymind Exp $
+* $Id: thread.h,v 1.37 2003/03/14 11:22:15 jonnymind Exp $
 */
 
 /*
@@ -138,10 +138,6 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define HB_STACK_LOCK \
    {\
       HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
-      while ( hb_runningStacks.content.asLong < 0 || hb_runningStacks.aux ) \
-      {\
-         HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );\
-      }\
       if( ! HB_VM_STACK.bInUse ) \
       {\
          hb_runningStacks.content.asLong++;\
@@ -474,11 +470,13 @@ extern HB_CRITICAL_T hb_outputMutex;
 /* Guard for memory allocated by the garbage collector */
 extern HB_CRITICAL_T hb_garbageAllocMutex;
 /* Guard for PRG level mutex asyncrhonous operations */
-extern HB_CRITICAL_T HB_mutexMutex;
+extern HB_CRITICAL_T hb_mutexMutex;
 
 /* count of running stacks; set to -1 to block stacks from running */
 extern HB_SHARED_RESOURCE hb_runningStacks;
 #ifdef HB_OS_WIN_32
+   /* Fence guard for windows */
+   extern HB_CRITICAL_T hb_fenceMutex;
    extern HB_SHARED_RESOURCE hb_idleQueueRes;
 #endif
 

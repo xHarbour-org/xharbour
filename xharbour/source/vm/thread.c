@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.64 2003/03/13 02:43:13 jonnymind Exp $
+* $Id: thread.c,v 1.65 2003/03/14 11:22:31 jonnymind Exp $
 */
 
 /*
@@ -134,6 +134,7 @@ HB_CRITICAL_T hb_garbageAllocMutex;
 HB_CRITICAL_T hb_outputMutex;
 HB_CRITICAL_T hb_mutexMutex;
 HB_CRITICAL_T hb_cancelMutex;
+HB_CRITICAL_T hb_fenceMutex;
 
 HB_SHARED_RESOURCE hb_runningStacks;
 #ifdef HB_OS_WIN_32
@@ -499,7 +500,7 @@ void hb_threadCallIdle()
       pIdle = pIdle->next;
    }
    
-   /* Begin to signal waiting threaeds */
+   /* Begin to signal waiting threads */
    pIdle = (HB_IDLE_FUNC_LIST*)hb_idleQueueRes.content.asPointer;
    if ( pIdle != NULL )
    {
@@ -549,9 +550,10 @@ void hb_threadSubscribeIdle( HB_IDLE_FUNC pFunc )
    HB_STACK_UNLOCK;
 
    // here we can allow cancellation
-   HB_ENABLE_ASYN_CANC;
+   //HB_TEST_CANCEL_ENABLE_ASYN;
    WaitForSingleObject( hb_idleQueueRes.Cond, INFINITE );
-   HB_DISABLE_ASYN_CANC;
+   //HB_DISABLE_ASYN_CANC;
+   
    HB_STACK_LOCK;
    HB_CRITICAL_LOCK( hb_idleQueueRes.Mutex );
       
@@ -1509,11 +1511,11 @@ HB_FUNC( WAITFORTHREADS )
 }
 
 
-
 HB_FUNC( KILLALLTHREADS )
 {
    hb_threadKillAll();
 }
+
 
 HB_FUNC( THREADIDLEFENCE )
 {
@@ -1581,7 +1583,7 @@ DWORD hb_SignalObjectAndWait( HB_MUTEX_T hToSignal, HB_COND_T hToWaitFor, DWORD 
 
    HB_MUTEX_UNLOCK( hToSignal );
    // here we can allow cancellation
-   HB_ENABLE_ASYN_CANC;
+   HB_TEST_CANCEL_ENABLE_ASYN;
    /* return 0 on success like unix functions */
    iStatus = WaitForSingleObject( hToWaitFor, dwMillisec ) != WAIT_OBJECT_0;
    HB_DISABLE_ASYN_CANC;
@@ -1624,6 +1626,7 @@ void hb_threadInit( void )
    hb_bIdleFence = TRUE;
 
    #ifdef HB_OS_WIN_32
+      HB_CRITICAL_INIT( hb_fenceMutex );
       HB_CRITICAL_INIT( hb_cancelMutex );
       hb_dwCurrentStack = TlsAlloc();
       TlsSetValue( hb_dwCurrentStack, (void *)hb_ht_stack );
@@ -1659,7 +1662,8 @@ void hb_threadExit( void )
       TlsFree( hb_dwCurrentStack );
       HB_CRITICAL_DESTROY( hb_cancelMutex );
       HB_SHARED_DESTROY( hb_idleQueueRes );
-   #else
+      HB_CRITICAL_DESTROY( hb_fenceMutex );
+#else
       pthread_key_delete( hb_pkCurrentStack );
    #endif
 
