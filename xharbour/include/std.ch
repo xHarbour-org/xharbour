@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.1.1.1 2001/12/21 10:47:28 ronpinkas Exp $
+ * $Id: std.ch,v 1.2 2003/11/04 08:31:03 druzus Exp $
  */
 
 /*
@@ -67,5 +67,7 @@
                      <{eval}>, <every>,                                 ;
                      RECNO(), <next>, <rec>,                            ;
                      [<.rest.>], [<.descend.>] )
+
+#xtranslate printf( => ? sprintf(
 
 #endif /* HB_STD_CH_ */

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.43 2003/12/08 01:36:12 mlombardo Exp $
+# $Id: Makefile,v 1.44 2003/12/19 01:32:39 fsgiudice Exp $
 #
 
 ROOT = ../../
@@ -184,6 +184,7 @@ PRG_SOURCES=\
         scrollbr.prg \
         setfunc.prg  \
         setta.prg    \
+	sprintf.prg  \
         tclass.prg   \
         tbcolumn.prg \
         tbrowse.prg  \
