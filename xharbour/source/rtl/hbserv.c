@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.14 2004/03/07 00:01:19 andijahja Exp $
+* $Id: hbserv.c,v 1.15 2004/04/01 22:00:42 druzus Exp $
 */
 
 /*
@@ -784,7 +784,7 @@ BOOL HB_EXPORT hb_isService()
 * Called from hb_vmQuit()
 */
 
-void HB_EXPORT hb_seriviceExit()
+void HB_EXPORT hb_serviceExit()
 {   
    if( sp_hooks != NULL )
    {

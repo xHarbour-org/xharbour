@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.h,v 1.2 2004/02/27 22:04:47 andijahja Exp $
+* $Id: hbserv.h,v 1.3 2004/03/31 09:19:54 andijahja Exp $
 */
 
 /*
@@ -57,6 +57,6 @@
 #endif
 HB_EXTERN_BEGIN
 BOOL HB_EXPORT hb_isService( void );
-void HB_EXPORT hb_seriviceExit( void );
+void HB_EXPORT hb_serviceExit( void );
 HB_EXTERN_END
 #endif

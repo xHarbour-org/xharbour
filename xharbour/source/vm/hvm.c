@@ -738,7 +738,7 @@ int HB_EXPORT hb_vmQuit( void )
    hb_i18nExit();
 
 #if !defined(HB_OS_DOS) && !defined(HB_OS_DARWIN)
-   hb_seriviceExit();
+   hb_serviceExit();
 #endif
 
    /* release all remaining items */
@@ -8429,6 +8429,14 @@ HB_FUNC( HB_RESTOREBLOCK )
 
 HB_FUNC( HB_NOMOUSE ){}
 
+#if defined(HB_OS_WIN_32) && defined(__WATCOMC__)
+extern void HB_EXPORT hb_forceLinkMain();
+void _hb_forceLinkMain()
+{
+   hb_forceLinkMain();
+}
+#endif
+
 HB_FUNC( __VMVARSLIST )
 {
    HB_FUNCNAME(HB_DBG_VMVARSLIST)();
@@ -8448,11 +8456,3 @@ HB_FUNC( __VMVARSSET )
 {
    HB_FUNCNAME(HB_DBG_VMVARSSET)();
 }
-
-#if defined(HB_OS_WIN_32) && defined(__WATCOMC__)
-extern void HB_EXPORT hb_forceLinkMain();
-void _hb_forceLinkMain()
-{
-   hb_forceLinkMain();
-}
-#endif
