@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.31 2003/10/23 09:01:34 ronpinkas Exp $
+ * $Id: pptable.c,v 1.32 2003/11/09 23:16:39 jonnymind Exp $
  */
 
 /*
@@ -487,8 +487,8 @@ void hb_pp_Table( void )
    static COMMANDS sT___02 = {0,"_GET_","(\1A00,\1B00 )","_GET_(\1A00,\1B00,NIL,NIL,NIL )",&sT___01 };
    static COMMANDS sT___03 = {0,"_GET_","(\1A00,\1B00,\1C00 )","_GET_(\1A00,\1B00,\1C00,NIL,NIL )",&sT___02 };
    static COMMANDS sT___04 = {0,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___03 };
-   static COMMANDS sT___05 = {0,"{","\1A00 : \1B00 \16,\1C00 : \1D00\17 }", "Hash( \1A00,\1B00 \16, \1C00,\1D00 \17 )",&sT___04 };
-   static COMMANDS sT___06 = {0,"{"," : }", "Hash()",&sT___05 };
+   static COMMANDS sT___05 = {0,"{","\1A00 :> \1B00 \16,\1C00 :> \1D00\17 }", "Hash( \1A00,\1B00 \16, \1C00,\1D00 \17 )",&sT___04 };
+   static COMMANDS sT___06 = {0,"{"," :> }", "Hash()",&sT___05 };
 
 #if defined( HB_COMPAT_C53 )
    hb_pp_topCommand = &sC___271;

@@ -5,7 +5,7 @@
 *
 * This is a test that demonstrates how to use hashes
 *
-* $Id$
+* $Id: hash.prg,v 1.1 2003/11/09 23:16:40 jonnymind Exp $
 *
 
 PROCEDURE Main()
@@ -23,7 +23,7 @@ PROCEDURE Main()
    * Creation by PP command:
    * Equivalent to Hash( K1, V1, ... KN, VN )
 
-   hHash := { "Kval": 'StrKey 0', 8: 'Num Key 0' }
+   hHash := { "Kval":> 'StrKey 0', 8:> 'Num Key 0' }
 
    /* Insertion by API */
    HSet( hHash, 4,  "Numeric key 1" )
@@ -37,8 +37,8 @@ PROCEDURE Main()
    ? "Hash type:", ValType( hHash )
    ? "Hash length:", Len( hHash )
    ? "Hash value:", ValToPrg( hHash )
-   ? "Empty hash value:", ValToPrg( {:} )
-   ? "String representation (should be nothing):", {:}
+   ? "Empty hash value:", ValToPrg( {:>} )
+   ? "String representation (should be nothing):", {:>}
    ? "Press a Key to continue"
    ?
    Inkey(0)
@@ -142,19 +142,19 @@ PROCEDURE Main()
 
    ? "Eval summing up all the numeric keys :", nSum
    ? "Clone of the hash:", ValToPrg(HClone( hHash ))
-   hDest := { 'A': 1, 'b':2 }
-   ? "Merging hash with { 'a': 1, 'b':2 }:"
+   hDest := { 'A':> 1, 'b':>2 }
+   ? "Merging hash with { 'a':> 1, 'b':>2 }:"
    ? "Result: ", ValToPrg(HCopy( hHash, hDest ))
 
-   hDest := { 'B': 1, 'A':2 }
+   hDest := { 'B':> 1, 'A':>2 }
    ? "Merging limited with a codeblock (Only numeric values): "
    ? "Result: ", ValToPrg( HMerge( hDest, hHash, { |cKey, nVal| HB_IsNum( nVal ) } ) )
    * The last "2" means XOR
    ? "Doing a xor merge with the original one (first 4 elements): "
    ? "Result: ",  ValToPrg( HCopy( hHash, hDest, , , 2 ) )
 
-   ? "Doing an AND merge with { 'A':0, 'B':1 } "
-   ? "Result: ",  ValToPrg( HMerge( hDest, {'A':0, 'B':1 }, 1) )
+   ? "Doing an AND merge with { 'A':>0, 'B':>1 } "
+   ? "Result: ",  ValToPrg( HMerge( hDest, {'A':>0, 'B':>1 }, 1) )
 
    ? "Press a Key to continue"
    ?
