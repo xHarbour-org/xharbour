@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.63 2004/05/11 01:22:41 druzus Exp $
+ * $Id: fm.c,v 1.64 2004/05/12 02:25:30 druzus Exp $
  */
 
 /*
@@ -746,8 +746,8 @@ char * hb_mem2str( void * pMem, UINT uiSize )
       for( uiIndex=0; uiIndex < uiSize; uiIndex++ )
       {
          int lownibble, hinibble;
-         lownibble = (cMem[uiIndex])>>4;
-         hinibble = (cMem[uiIndex]) & 0x0F;
+         hinibble = (cMem[uiIndex])>>4;
+         lownibble = (cMem[uiIndex]) & 0x0F;
          cBuffer[uiIndex*2] = (hinibble <= 9) ?  ('0'+hinibble) : ('A'+hinibble-10);
          cBuffer[uiIndex*2+1] = (lownibble <= 9) ? ('0'+lownibble) : ('A'+lownibble-10);
       }

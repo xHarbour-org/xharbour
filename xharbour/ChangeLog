@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3457 2004/09/21 04:09:19 druzus Exp $
+ * $Id: ChangeLog,v 1.3458 2004/09/21 04:57:56 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-21 14:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/vm/fm.c
+    * fixed the HEX output in fm.log - the hex digits in byte were
+      reverted
 
 2004-09-21 01:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rdd/dbfcdx/dbfcdx1.c
