@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.10 2003/01/27 04:51:26 walito Exp $
+# $Id: hrbdll.bc,v 1.11 2003/03/16 22:19:32 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -683,9 +683,6 @@ $(HARBOUR_DLL)  : \
 $(OBJ_DIR)\hbfsapi.obj : $(COMMON_DIR)\hbfsapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\hbffind.obj : $(COMMON_DIR)\hbffind.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
 $(OBJ_DIR)\hbgete.obj : $(COMMON_DIR)\hbgete.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -888,9 +885,6 @@ $(OBJ_DIR)\ppcomp.obj : $(PP_DIR)\ppcomp.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\pplib.obj : $(PP_DIR)\pplib.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
@@ -1145,6 +1139,9 @@ $(OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
 $(OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -1296,6 +1293,9 @@ $(OBJ_DIR)\philes53.obj : $(RTL_DIR)\philes53.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\philesx.obj : $(RTL_DIR)\philesx.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\pplib.obj : $(RTL_DIR)\pplib.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\profiler.c : $(RTL_DIR)\profiler.prg

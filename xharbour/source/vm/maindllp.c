@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: maindllp.c,v 1.3 2002/09/19 01:57:43 ronpinkas Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 
 #define HB_OS_WIN_32_USED
 
-#include "hbtypes.h"
+//#include "hbtypes.h"
 
 
 #if defined(HB_OS_WIN_32)
