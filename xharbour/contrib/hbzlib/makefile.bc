@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.9 2003/09/14 15:01:28 paultucker Exp $
+# $Id: makefile.bc,v 1.10 2003/09/23 04:52:34 paultucker Exp $
 #
 
 #
@@ -37,7 +37,7 @@ IDE_LinkFLAGS32 =  -L$(BCB)\LIB\b32
 LinkerLocalOptsAtC32_ziparddll =  -L$(BCB)\LIB\b32 -Tpe -ap -c
 ResLocalOptsAtC32_ziparddll = 
 BLocalOptsAtC32_ziparddll = 
-CompInheritOptsAt_ziparddll = -I$(BCB)\INCLUDE -Iinclude -I\xharbour\include;. -DZLIB_DLL;WIN32;ASSERT -u 
+CompInheritOptsAt_ziparddll = -I$(BCB)\INCLUDE -Iinclude -I..\..\include;. -DZLIB_DLL;WIN32;ASSERT -u 
 LinkerInheritOptsAt_ziparddll = -x
 LinkerOptsAt_ziparddll = $(LinkerLocalOptsAtC32_ziparddll)
 ResOptsAt_ziparddll = $(ResLocalOptsAtC32_ziparddll)
