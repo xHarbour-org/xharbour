@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.h,v 1.2 2003/06/21 06:59:22 jonnymind Exp $
+ * $Id: hbi18n.h,v 1.3 2003/06/23 20:31:39 jonnymind Exp $
  */
 
 /*
@@ -58,7 +58,8 @@
 #define HB_DEFAULT_I18N_PATH     "i18n"
 #define HB_I18N_LIST_EXT         "hil"
 #define HB_I18N_TAB_EXT          "hit"
-#define HB_INTERNATIONAL_NAME    "en_US"
+#define HB_INTERNATIONAL_CODE    "en_US"
+#define HB_INTERNATIONAL_NAME    "International"
 
 typedef struct tag_hb_i18n_tab_header
 {

@@ -1,7 +1,7 @@
 *****************************************************
 * HB I18N dictionary editor
 *
-* $Id$
+* $Id: hbdict.prg,v 1.1 2003/06/21 06:59:23 jonnymind Exp $
 *
 * Usage: hbdict <infile> <outfile>
 *
@@ -19,7 +19,7 @@
 #include "inkey.ch"
 
 PROCEDURE Main( cInput, cOutput )
-   LOCAL aInput
+   LOCAL aInput, output
    LOCAL recpos
    LOCAL nKey
 
@@ -42,6 +42,22 @@ PROCEDURE Main( cInput, cOutput )
       Popup( i18n( "Error in loading file" ) )
       @12,12 SAY i18n( "Can't load file " ) + cInput
       DoQuit()
+   ENDIF
+
+   // now we must merge duplicated strings
+   MergeDuplicates( aInput[2] )
+   //then we try to load the output table
+   if cInput != cOutput
+      aOutput := HB_I18nLoadTable( cOutput )
+      // If we exists, we merge it's content in the input
+      IF aOutput != NIL
+         MergeTables( aInput[2], aOutput[2] )
+         // also, get header from output
+         IF aInput[1][1] == chr(3) + "HIL"
+            aInput[1] := aOutput[1]
+            aInput[1][1] := chr(3) + "HIL"
+         ENDIF
+      ENDIF
    ENDIF
 
    // Sorting records
@@ -69,14 +85,14 @@ PROCEDURE Main( cInput, cOutput )
       SWITCH nKey
 
          CASE K_LEFT
-         CASE K_DOWN
+         CASE K_UP
             IF recpos > 1
                recpos--
             ENDIF
          EXIT
 
          CASE K_RIGHT
-         CASE K_UP
+         CASE K_DOWN
             IF recpos < Len ( aInput[2] )
                recpos++
             ENDIF
@@ -213,3 +229,37 @@ PROCEDURE ShowHeader( aHeader )
    @4,3 SAY i18n("Language:  ") +" "+ aHeader[3]
    @5,3 SAY i18n("Code:      ") +" "+ aHeader[5]
 RETURN
+
+PROCEDURE MergeDuplicates( aTable )
+   LOCAL nPos, nFound
+
+   // very, very unefficient, but it works.
+   // Suggestions are welcome
+   nPos := 1
+
+   DO WHILE nPos < Len( aTable )
+      nFound := aScan( aTable, { | x | x[1] == aTable[ nPos ][1] }, nPos +1 )
+      IF nFound > 0
+         aDel( aTable, nFound )
+         aSize( aTable, Len( aTable ) -1)
+      ELSE
+         nPos ++
+      ENDIF
+   ENDDO
+RETURN
+
+
+PROCEDURE MergeTables( aInTable, aOutTable )
+   LOCAL aElem, nFound
+   LOCAL cEntry
+
+   FOR EACH aElem in aInTable
+      cEntry := aElem[1]
+      nFound := AScan( aOutTable, { |x| x[1] == cEntry } )
+      IF nFound > 0
+         aElem[2] := aOutTable[ nFound ][2]
+      ENDIF
+   NEXT
+
+RETURN
+

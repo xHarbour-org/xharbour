@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.5 2003/06/23 20:31:39 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.6 2003/06/23 22:41:38 jonnymind Exp $
  */
 
 /*
@@ -73,6 +73,7 @@ static char *s_default_i18n_dir;
 
 /** And our current language */
 static char *s_current_language;
+static char s_current_language_name[50];
 
 /***************************************
         Low level API interface
@@ -407,6 +408,7 @@ BOOL hb_i18n_load_language( char *language )
    if( pTable != NULL )
    {
       s_current_language = language;
+      strcpy( s_current_language_name, header.language );
       if ( s_i18n_table != NULL )
       {
          hb_arrayRelease( s_i18n_table );
@@ -456,7 +458,7 @@ HB_FUNC( HB_I18NLOADTABLE )
 
    if ( HB_IS_STRING( pParam ) )
    {
-      handle = hb_fsOpen( ( BYTE * ) hb_itemGetC( pParam ), FO_READ );
+      handle = hb_fsOpen( ( BYTE * ) hb_itemGetCPtr( pParam ), FO_READ );
    }
    else
    {
@@ -576,7 +578,7 @@ HB_FUNC( HB_I18NSAVETABLE )
    if ( HB_IS_STRING( pParam ) )
    {
 
-      handle = hb_fsCreate( (BYTE *) hb_itemGetC( pParam ), FO_WRITE );
+      handle = hb_fsCreate( (BYTE *) hb_itemGetCPtr( pParam ), FO_WRITE );
 
       // an opening failure will cause following operations to fail
       if ( handle < 0 ) {
@@ -634,7 +636,7 @@ HB_FUNC( I18N ) // we get a license over HB_ naming convention for this
    }
    else
    {
-      hb_itemReturn( pRet );
+      hb_itemReturnCopy( pRet );
    }
 }
 
@@ -675,14 +677,16 @@ HB_FUNC( HB_I18NSETLANGUAGE )
       return;
    }
 
-   language = hb_itemGetC( pStr );
+   language = hb_itemGetCPtr( pStr );
 
-   if ( strcmp( HB_INTERNATIONAL_NAME, language ) == 0 )
+   if ( strcmp( HB_INTERNATIONAL_CODE, language ) == 0 )
    {
       if ( s_i18n_table != NULL )
       {
          hb_arrayRelease( s_i18n_table );
          s_i18n_table = NULL;
+         s_current_language = HB_INTERNATIONAL_CODE;
+         strcpy( s_current_language_name, HB_INTERNATIONAL_NAME);
       }
       hb_retl( TRUE );
    }
@@ -696,6 +700,12 @@ HB_FUNC( HB_I18NGETLANGUAGE )
 {
    HB_THREAD_STUB
    hb_retc( s_current_language );
+}
+
+HB_FUNC( HB_I18NGETLANGUAGENAME )
+{
+   HB_THREAD_STUB
+   hb_retc( s_current_language_name );
 }
 
 /***********************************************
@@ -714,15 +724,6 @@ BOOL hb_i18nInit( char *i18n_dir, char *language )
       }
    }
 
-   /* No automatic internationalization can be found */
-   if ( language == NULL )
-   {
-      s_i18n_table = NULL;
-      s_current_language = HB_INTERNATIONAL_NAME;
-      // but we know that we don't want internationalization
-      return TRUE;
-   }
-
    if ( i18n_dir == NULL )
    {
       s_default_i18n_dir = HB_DEFAULT_I18N_PATH;
@@ -731,13 +732,20 @@ BOOL hb_i18nInit( char *i18n_dir, char *language )
    {
       s_default_i18n_dir = i18n_dir;
    }
-   // if i18n_dir is null, default will be used by this func
-   if (! hb_i18n_load_language( language ) )
+
+   /* No automatic internationalization can be found */
+   if ( language == NULL || ! hb_i18n_load_language( language ) )
    {
       s_i18n_table = NULL;
-      s_current_language = HB_INTERNATIONAL_NAME;
-      return FALSE;
+      s_current_language = HB_INTERNATIONAL_CODE;
+      strcpy( s_current_language_name, HB_INTERNATIONAL_NAME );
+      // but we know that we don't want internationalization
+      if ( language != NULL )
+      {
+         return FALSE;
+      }
    }
+
    return TRUE;
 }
 

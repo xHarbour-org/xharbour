@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1176 2003/06/23 22:41:37 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1177 2003/06/23 22:45:18 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-24 02:40 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * include/hbi18n.h
+  * source/vm/hbi18n.c
+    + Added support for symbolic language names (stored in the
+      HIT headers).
+    ! Fixed some memory leaks.
+
+  * tests/i18n/fr_FR.hit
+  * tests/i18n/it_IT.hit
+  * tests/i18ntest.prg
+    + Added test for switching languages in runtime
+
+  * utils/hbdict/hbdict.prg
+    ! Duplicates stings in HIL are merged before passing control to the
+      program.
+    ! IF the "output" file is already present, it's former content is then
+      read and put in the table that is being edited. This allows to modify
+      previously existing versions of HIT files having new HIL (generated i.e.
+      by a different compilation).
+    ! Up and Down arrows are now swapped.
+
 
 2003-06-24 00:40 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rtl/gtcrs/gtcrs.c
