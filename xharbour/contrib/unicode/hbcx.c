@@ -1,5 +1,5 @@
 /*
- * $Id: hbcx.c,v 1.3 2004/02/07 18:49:48 andijahja Exp $
+ * $Id: hbcx.c,v 1.4 2004/02/21 14:39:01 andijahja Exp $
  */
 
 /*
@@ -590,8 +590,7 @@ HB_FUNC(HB_XXENCODE)
       dstlen=int_xxenc(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       int_xxenc(srcstr,srclen,dststr);
-      hb_retclen((char *) dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char *) dststr,dstlen);
    }
    else
    {
@@ -612,8 +611,7 @@ HB_FUNC(HB_XXDECODE)
       dstlen=int_xxdec(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       int_xxdec(srcstr,srclen,dststr);
-      hb_retclen((char*) dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char*) dststr,dstlen);
    }
    else
    {

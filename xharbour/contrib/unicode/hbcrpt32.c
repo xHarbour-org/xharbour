@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrpt32.c,v 1.1 2004/01/14 06:14:03 andijahja Exp $
+ * $Id: hbcrpt32.c,v 1.2 2004/02/02 10:12:40 andijahja Exp $
  */
 
 /*
@@ -115,8 +115,7 @@ HB_FUNC(HB_ENCRYPT32) //(cStr)->cEnc
       dststr[7]=(BYTE) (crc&0xFF);
       memcpy(dststr+8,srcstr,srclen);
       int_encrypt(dststr,dstlen);
-      hb_retclen((char *) dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char *) dststr,dstlen);
    }
    else
    {
@@ -172,8 +171,7 @@ HB_FUNC(HB_DECRYPT32) //(cEnc)->cStr
          return;
       }
 
-      hb_retclen((char *) dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char *) dststr,dstlen);
    }
    else
    {

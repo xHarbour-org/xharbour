@@ -1,5 +1,5 @@
 /*
- * $Id: hbc7.c,v 1.2 2004/01/19 22:00:50 andijahja Exp $
+ * $Id: hbc7.c,v 1.3 2004/02/02 10:12:32 andijahja Exp $
  */
 
 /*
@@ -125,8 +125,7 @@ HB_FUNC(HB_URLENCODE)
       dstlen=str2ue7(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen+1);
       str2ue7(srcstr,srclen,dststr);
-      hb_retclen((char *) dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char *) dststr,dstlen);
    }
    else
    {
@@ -147,8 +146,7 @@ HB_FUNC(HB_QPENCODE)
       dstlen=str2qp7(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen+1);
       str2qp7(srcstr,srclen,dststr);
-      hb_retclen((char *) dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char *) dststr,dstlen);
    }
    else
    {
@@ -169,8 +167,7 @@ HB_FUNC(HB_URLDECODE)
       dstlen=ue72str(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       ue72str(srcstr,srclen,dststr);
-      hb_retclen((char*) dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char*) dststr,dstlen);
    }
    else
    {
@@ -191,8 +188,7 @@ HB_FUNC(HB_QPDECODE)
       dstlen=qp72str(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       qp72str(srcstr,srclen,dststr);
-      hb_retclen((char* )dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char* )dststr,dstlen);
    }
    else
    {

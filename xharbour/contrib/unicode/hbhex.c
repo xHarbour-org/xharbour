@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex.c,v 1.1 2004/01/14 06:14:03 andijahja Exp $
+ * $Id: hbhex.c,v 1.2 2004/02/02 10:12:40 andijahja Exp $
  */
 
 /*
@@ -108,8 +108,7 @@ HB_FUNC(HB_NLTOH8)
          }
       }
 
-      hb_retclen((char *) dststr,8);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char *) dststr,8);
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcu.c,v 1.4 2004/02/07 18:49:48 andijahja Exp $
+ * $Id: hbcu.c,v 1.5 2004/02/21 14:39:01 andijahja Exp $
  */
 
 /*
@@ -277,8 +277,7 @@ HB_FUNC(HB_UUENCODE)
       dstlen=int_uuenc(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       int_uuenc(srcstr,srclen,dststr);
-      hb_retclen((char *) dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char *) dststr,dstlen);
    }
    else
    {
@@ -299,8 +298,7 @@ HB_FUNC(HB_UUDECODE)
       dstlen=int_uudec(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       int_uudec(srcstr,srclen,dststr);
-      hb_retclen((char*) dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char*) dststr,dstlen);
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.7 2004/02/07 18:49:48 andijahja Exp $
+ * $Id: hbcc.prg,v 1.8 2004/02/21 14:39:01 andijahja Exp $
  */
 
 /*
@@ -807,8 +807,7 @@ HB_FUNC(HB_B64ENCODE)
          dststr[--n]=dststr[--i];
       }
 
-      hb_retclen((char*)dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char*)dststr,dstlen);
    }
    else
    {
@@ -847,9 +846,8 @@ HB_FUNC(HB_B64DECODE)
       dstlen=b64dec(tmpstr,tmplen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       b64dec(tmpstr,tmplen,dststr);
-      hb_retclen((char*)dststr,dstlen);
+      hb_retclenAdoptRaw((char*)dststr,dstlen);
       hb_xfree(tmpstr);
-      hb_xfree(dststr);
    }
    else
    {

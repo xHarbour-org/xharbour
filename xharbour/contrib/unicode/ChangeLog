@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.12 2004/02/06 12:55:17 andijahja Exp $
+ * $Id: ChangeLog,v 1.13 2004/02/07 18:49:48 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-24 21:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcrpt128.c
+  * contrib/unicode/hbhex.c
+  * contrib/unicode/hbcy.c
+  * contrib/unicode/hbc7.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbcrpt32.c
+  * contrib/unicode/hbcu.c
+    % using xHarbour extension hb_retclenAdoptRaw()
+
+2004-02-21 21:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbcy.c
+    % Optimized out usage of hb_itemNew()
+
 2004-02-08 01:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * contrib/unicode/hbcx.c
     + add XXENCODE_FILE()
@@ -53,152 +71,152 @@
     + test program for file decoding
 
 2004-02-03 15:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   + contrib/unicode/hbdecode.prg
-     + added the following file decoding functions:
-       + UUDECODE_FILE()
-       + B64DECODE_FILE()
-       + YYDECODE_FILE()
+  + contrib/unicode/hbdecode.prg
+    + added the following file decoding functions:
+      + UUDECODE_FILE()
+      + B64DECODE_FILE()
+      + YYDECODE_FILE()
 
-   * contrib/unicode/make_b32.bat
-   * contrib/unicode/makefile.bc
-   * contrib/unicode/makefile.vc
-     + add hbdecode.obj file dependency
+  * contrib/unicode/make_b32.bat
+  * contrib/unicode/makefile.bc
+  * contrib/unicode/makefile.vc
+    + add hbdecode.obj file dependency
 
 2004-02-03 09:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   * contrib/unicode/hbencode.c
-     + Add option to manually configure line length of encoded file (default is 128)
+  * contrib/unicode/hbencode.c
+    + Add option to manually configure line length of encoded file (default is 128)
 
 2004-02-03 04:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   * contrib/unicode/hbencode.c
-     ! optimization on YYENNCODE_FILE*() functions
+  * contrib/unicode/hbencode.c
+    ! optimization on YYENNCODE_FILE*() functions
 
 2004-02-02 19:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   * contrib/unicode/hbencode.c
-     ! corrections on YYENCODE_FILE() and YYENCODE_FILE_BY_CHUNK() functions:
-       * fix wrong file size when file name supplied with path
-       * change run time error codes
-       * fix wrong byte count in YYENCODE_FILE_BY_CHUNK() so that encoded file
-         was excessive by one byte.
+  * contrib/unicode/hbencode.c
+    ! corrections on YYENCODE_FILE() and YYENCODE_FILE_BY_CHUNK() functions:
+      * fix wrong file size when file name supplied with path
+      * change run time error codes
+      * fix wrong byte count in YYENCODE_FILE_BY_CHUNK() so that encoded file
+        was excessive by one byte.
 
 2004-02-02 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   + contrib/unicode/hbencode.c
-     + added the following file encoding functions:
-       + UUENCODE_FILE()
-       + UUENCODE_FILE_BY_CHUNK()
-       + B64ENCODE_FILE()
-       + B64ENCODE_FILE_BY_CHUNK()
-       + YYENCODE_FILE()
-       + YYENCODE_FILE_BY_CHUNK()
+  + contrib/unicode/hbencode.c
+    + added the following file encoding functions:
+      + UUENCODE_FILE()
+      + UUENCODE_FILE_BY_CHUNK()
+      + B64ENCODE_FILE()
+      + B64ENCODE_FILE_BY_CHUNK()
+      + YYENCODE_FILE()
+      + YYENCODE_FILE_BY_CHUNK()
 
-   * contrib/unicode/make_b32.bat
-   * contrib/unicode/makefile.bc
-   * contrib/unicode/makefile.vc
-     + add hbencode.obj file dependency
+  * contrib/unicode/make_b32.bat
+  * contrib/unicode/makefile.bc
+  * contrib/unicode/makefile.vc
+    + add hbencode.obj file dependency
 
-   * contrib/unicode/hbc7.c
-   * contrib/unicode/hbcc.prg
-   * contrib/unicode/hbcrc16.c
-   * contrib/unicode/hbcrc32.c
-   * contrib/unicode/hbcrpt32.c
-   * contrib/unicode/hbcrpt128.c
-   * contrib/unicode/hbcu.c
-   * contrib/unicode/hbcx.c
-   * contrib/unicode/hbcy.c
-   * contrib/unicode/hbhex.c
-     ! source code re-formatting
+  * contrib/unicode/hbc7.c
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcrc16.c
+  * contrib/unicode/hbcrc32.c
+  * contrib/unicode/hbcrpt32.c
+  * contrib/unicode/hbcrpt128.c
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbcy.c
+  * contrib/unicode/hbhex.c
+    ! source code re-formatting
 
 2004-01-20 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   * contrib/unicode/hbcc.prg
-   * contrib/unicode/hbc7.c
-     ! fix memory leakeage.
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbc7.c
+    ! fix memory leakeage.
 
 2004-01-18 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   * contrib/unicode/hbcrpt128.c
-     ! replace calls to crc32() with hbcc_crc32()
+  * contrib/unicode/hbcrpt128.c
+    ! replace calls to crc32() with hbcc_crc32()
 
-   * contrib/unicode/makefile.bc
-   * contrib/unicode/makefile.vc
-   * contrib/unicode/make_b32.bat
-     ! add hbcrpt128.obj file dependency
+  * contrib/unicode/makefile.bc
+  * contrib/unicode/makefile.vc
+  * contrib/unicode/make_b32.bat
+    ! add hbcrpt128.obj file dependency
 
 2004-01-15 02:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   * contrib/unicode/test/cp1251.cst
-   * contrib/unicode/test/cp866.cst
-   * contrib/unicode/test/shiftjis.cst
-     ! Were added as text. Readded as binary.
+  * contrib/unicode/test/cp1251.cst
+  * contrib/unicode/test/cp866.cst
+  * contrib/unicode/test/shiftjis.cst
+    ! Were added as text. Readded as binary.
 
 2004-01-14 13:22 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   + contrib/unicode/util/txt2cst.c
-   + contrib/unicode/include/hbcc.ch
-   + contrib/unicode/hbcc.prg
-   + contrib/unicode/hbc7.c
-   + contrib/unicode/hbcrc16.c
-   + contrib/unicode/hbcrc32.c
-   + contrib/unicode/hbcrpt32.c
-   + contrib/unicode/hbcrpt128.c
-   + contrib/unicode/hbcu.c
-   + contrib/unicode/hbcx.c
-   + contrib/unicode/hbcy.c
-   + contrib/unicode/hbhex.c
-   + contrib/unicode/makefile.bc
-   + contrib/unicode/makefile.vc
-   + contrib/unicode/make_b32.bat
-   + contrib/unicode/make_vc.bat
-   + contrib/unicode/hbcc.txt
-   + contrib/unicode/hbcclic.txt
-   + contrib/unicode/whatsnew.txt
-   + contrib/unicode/test/c_test.prg
-   + contrib/unicode/test/cp1251.cst
-   + contrib/unicode/test/cp866.cst
-   + contrib/unicode/test/shiftjis.cst
+  + contrib/unicode/util/txt2cst.c
+  + contrib/unicode/include/hbcc.ch
+  + contrib/unicode/hbcc.prg
+  + contrib/unicode/hbc7.c
+  + contrib/unicode/hbcrc16.c
+  + contrib/unicode/hbcrc32.c
+  + contrib/unicode/hbcrpt32.c
+  + contrib/unicode/hbcrpt128.c
+  + contrib/unicode/hbcu.c
+  + contrib/unicode/hbcx.c
+  + contrib/unicode/hbcy.c
+  + contrib/unicode/hbhex.c
+  + contrib/unicode/makefile.bc
+  + contrib/unicode/makefile.vc
+  + contrib/unicode/make_b32.bat
+  + contrib/unicode/make_vc.bat
+  + contrib/unicode/hbcc.txt
+  + contrib/unicode/hbcclic.txt
+  + contrib/unicode/whatsnew.txt
+  + contrib/unicode/test/c_test.prg
+  + contrib/unicode/test/cp1251.cst
+  + contrib/unicode/test/cp866.cst
+  + contrib/unicode/test/shiftjis.cst
 
 2004-01-14 08:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   The following unicode tables have been uploaded to contrib/unicode:
-   + contrib/unicode/cst/eastasia/jis/jis0201.txt
-   + contrib/unicode/cst/eastasia/jis/jis0208.txt
-   + contrib/unicode/cst/eastasia/jis/jis0212.txt
-   + contrib/unicode/cst/eastasia/jis/shiftjis.txt
-   + contrib/unicode/cst/eastasia/other/big5.txt
-   + contrib/unicode/cst/iso8859/8859-1.TXT
-   + contrib/unicode/cst/iso8859/8859-10.TXT
-   + contrib/unicode/cst/iso8859/8859-13.TXT
-   + contrib/unicode/cst/iso8859/8859-14.TXT
-   + contrib/unicode/cst/iso8859/8859-15.TXT
-   + contrib/unicode/cst/iso8859/8859-2.TXT
-   + contrib/unicode/cst/iso8859/8859-3.TXT
-   + contrib/unicode/cst/iso8859/8859-4.TXT
-   + contrib/unicode/cst/iso8859/8859-5.TXT
-   + contrib/unicode/cst/iso8859/8859-6.TXT
-   + contrib/unicode/cst/iso8859/8859-7.TXT
-   + contrib/unicode/cst/iso8859/8859-8.TXT
-   + contrib/unicode/cst/iso8859/8859-9.TXT
-   + contrib/unicode/cst/vendor/apple/roman.txt
-   + contrib/unicode/cst/vendor/misc/cp1006.txt
-   + contrib/unicode/cst/vendor/misc/cp424.txt
-   + contrib/unicode/cst/vendor/misc/cp856.txt
-   + contrib/unicode/cst/vendor/misc/koi8-r.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp437.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp737.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp775.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp850.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp852.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp855.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp857.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp860.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp861.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp862.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp863.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp864.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp865.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp866.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp869.txt
-   + contrib/unicode/cst/vendor/ms/pc/cp874.txt
-   + contrib/unicode/cst/vendor/ms/windows/cp1250.txt
-   + contrib/unicode/cst/vendor/ms/windows/cp1251.txt
-   + contrib/unicode/cst/vendor/ms/windows/cp1252.txt
-   + contrib/unicode/cst/vendor/ms/windows/cp1253.txt
-   + contrib/unicode/cst/vendor/ms/windows/cp1254.txt
-   + contrib/unicode/cst/vendor/ms/windows/cp1255.txt
-   + contrib/unicode/cst/vendor/ms/windows/cp1256.txt
-   + contrib/unicode/cst/vendor/ms/windows/cp1257.txt
-   + contrib/unicode/cst/vendor/ms/windows/cp1258.txt
+  The following unicode tables have been uploaded to contrib/unicode:
+  + contrib/unicode/cst/eastasia/jis/jis0201.txt
+  + contrib/unicode/cst/eastasia/jis/jis0208.txt
+  + contrib/unicode/cst/eastasia/jis/jis0212.txt
+  + contrib/unicode/cst/eastasia/jis/shiftjis.txt
+  + contrib/unicode/cst/eastasia/other/big5.txt
+  + contrib/unicode/cst/iso8859/8859-1.TXT
+  + contrib/unicode/cst/iso8859/8859-10.TXT
+  + contrib/unicode/cst/iso8859/8859-13.TXT
+  + contrib/unicode/cst/iso8859/8859-14.TXT
+  + contrib/unicode/cst/iso8859/8859-15.TXT
+  + contrib/unicode/cst/iso8859/8859-2.TXT
+  + contrib/unicode/cst/iso8859/8859-3.TXT
+  + contrib/unicode/cst/iso8859/8859-4.TXT
+  + contrib/unicode/cst/iso8859/8859-5.TXT
+  + contrib/unicode/cst/iso8859/8859-6.TXT
+  + contrib/unicode/cst/iso8859/8859-7.TXT
+  + contrib/unicode/cst/iso8859/8859-8.TXT
+  + contrib/unicode/cst/iso8859/8859-9.TXT
+  + contrib/unicode/cst/vendor/apple/roman.txt
+  + contrib/unicode/cst/vendor/misc/cp1006.txt
+  + contrib/unicode/cst/vendor/misc/cp424.txt
+  + contrib/unicode/cst/vendor/misc/cp856.txt
+  + contrib/unicode/cst/vendor/misc/koi8-r.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp437.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp737.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp775.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp850.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp852.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp855.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp857.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp860.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp861.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp862.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp863.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp864.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp865.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp866.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp869.txt
+  + contrib/unicode/cst/vendor/ms/pc/cp874.txt
+  + contrib/unicode/cst/vendor/ms/windows/cp1250.txt
+  + contrib/unicode/cst/vendor/ms/windows/cp1251.txt
+  + contrib/unicode/cst/vendor/ms/windows/cp1252.txt
+  + contrib/unicode/cst/vendor/ms/windows/cp1253.txt
+  + contrib/unicode/cst/vendor/ms/windows/cp1254.txt
+  + contrib/unicode/cst/vendor/ms/windows/cp1255.txt
+  + contrib/unicode/cst/vendor/ms/windows/cp1256.txt
+  + contrib/unicode/cst/vendor/ms/windows/cp1257.txt
+  + contrib/unicode/cst/vendor/ms/windows/cp1258.txt

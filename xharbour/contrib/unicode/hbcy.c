@@ -1,5 +1,5 @@
 /*
- * $Id: hbcy.c,v 1.5 2004/02/07 18:49:48 andijahja Exp $
+ * $Id: hbcy.c,v 1.6 2004/02/21 14:39:01 andijahja Exp $
  */
 
 /*
@@ -275,8 +275,7 @@ HB_FUNC(HB_YYENCODE)
       dstlen=str2yye(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       str2yye(srcstr,srclen,dststr);
-      hb_retclen((char *) dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char *) dststr,dstlen);
    }
    else
    {
@@ -297,8 +296,7 @@ HB_FUNC(HB_YYDECODE)
       dstlen=yye2str(srcstr,srclen,NULL);
       dststr=(BYTE *) hb_xgrab(dstlen);
       yye2str(srcstr,srclen,dststr);
-      hb_retclen((char*) dststr,dstlen);
-      hb_xfree(dststr);
+      hb_retclenAdoptRaw((char*) dststr,dstlen);
    }
    else
       hb_retc("");
