@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.20 2003/01/06 12:39:26 horacioroldan Exp $
+ * $Id: dbf1.c,v 1.21 2003/01/26 02:48:51 likewolf Exp $
  */
 
 /*
@@ -1792,6 +1792,7 @@ ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Open memo file if exists */
    if( pArea->fHasMemo )
    {
+      BYTE *tmp;
       pFileName = hb_fsFNameSplit( ( char * ) pOpenInfo->abName );
       pFileExt = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) pArea, DBI_MEMOEXT, pFileExt );
@@ -1804,15 +1805,18 @@ ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
                strlen( szFileName ) );
       hb_itemRelease( pFileExt );
       hb_xfree( pFileName );
+      tmp = pOpenInfo->abName;
       pOpenInfo->abName = ( BYTE * ) szFileName;
       pArea->szMemoFileName = szFileName;
 
       /* Open memo file and exit if error */
       if( SELF_OPENMEMFILE( ( AREAP ) pArea, pOpenInfo ) == FAILURE )
       {
+         pOpenInfo->abName = tmp;
          SELF_CLOSE( ( AREAP ) pArea );
          return FAILURE;
       }
+      pOpenInfo->abName = tmp;
    }
 
    /* Add fields */
