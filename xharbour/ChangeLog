@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3105 2004/06/23 10:23:44 bdj Exp $
+ * $Id: ChangeLog,v 1.3106 2004/06/23 14:09:38 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-23 12:58 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/transfrm.c
+    ! Fix for masks without space separator between picture's function
+      and mask (i.e. "@B99.99").
 
 2004-06-23 18:08 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rtl/gtdos/gtdos.c
