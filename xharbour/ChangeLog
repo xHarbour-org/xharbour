@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3174 2004/07/20 12:15:20 paultucker Exp $
+ * $Id: ChangeLog,v 1.3175 2004/07/20 20:45:59 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-21 16:45 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/include/inkey.ch
+    + #define K_NCMOUSEMOVE  1016
+      Posted to WindProc when mouse hovers on Non-Client area of a Window.
+      
+  * xharbour/include/wvtwin.ch
+    + #define SW_* constants
+      These constants contol Windows current state and can be used
+      as Wvt_ShowWindow( SW_HIDE ) ( SW_RESTORE ) etc. 
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/rtl/gtwvt/wvtcore.c
+  * xharbour/source/rtl/gtwvt/wvtutils.c
+  * xharbour/source/rtl/gtwvt/wvtclass.prg
+  * xharbour/source/rtl/gtwvt/wvtpaint.prg
+    Additions of few functions, enhancement of mouse control, general
+    optimizations, code formatting.
+
+  * xharbour/tests/wvtgui.prg
+    Updated to use Wvt_ShowWindow().   
 
 2004-07-20 13:45 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/cstr.prg
