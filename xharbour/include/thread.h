@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.102 2005/02/13 17:42:03 paultucker Exp $
+* $Id: thread.h,v 1.103 2005/02/24 10:44:03 andijahja Exp $
 */
 
 /*
@@ -771,8 +771,8 @@ extern void hb_threadExit( void );
 extern void hb_threadCloseHandles( void );
 extern int hb_threadCountStacks( void );
 extern void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs );
-extern void hb_threadWaitAll( void );
-extern void hb_threadKillAll( void );
+extern void HB_EXPORT hb_threadWaitAll( void );
+extern void HB_EXPORT hb_threadKillAll( void );
 extern void hb_threadSleep( int millisec, BOOL bIdleWaitNoCpu );
 extern void hb_mutexForceUnlock( void *);
 extern void hb_rawMutexForceUnlock( void *);

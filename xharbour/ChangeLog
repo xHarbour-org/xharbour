@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3939 2005/03/14 12:52:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3939 2005/03/14 15:54:45 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-03-15 03:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/thread.c
+  * include/thread.h
+    * make consistent function declaration for hb_threadWaitAll and
+      hb_threadKillAll.
 
 2005-03-14 12:51 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * /tests/cttest/volget.prg
