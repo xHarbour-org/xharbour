@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.16 2003/01/07 10:48:19 likewolf Exp $
+ * $Id: macro.c,v 1.17 2003/01/26 02:48:51 likewolf Exp $
  */
 
 /*
@@ -296,12 +296,31 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
    ULONG ulCharsLeft;
    char * pHead;
    char * pTail;
+   BOOL bCopy = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_macroTextSubst(%s, %li)", szString, *pulStringLen));
 
-   pHead = (char *)memchr( (void *)szString, '&', *pulStringLen );
+   (*pulStringLen)--;
+   while( szString[*pulStringLen] == ' ' )
+   {
+      (*pulStringLen)--;
+      bCopy = TRUE;
+   }
+   (*pulStringLen)++;
+
+   pHead = (char *) memchr( (void *)szString, '&', *pulStringLen );
    if( pHead == NULL )
+   {
+      if( bCopy )
+      {
+         szResult = hb_xgrab( *pulStringLen + 1 );
+         strncpy( szResult, szString, *pulStringLen );
+         szResult[*pulStringLen] = '\0';
+         return szResult;
+      }
+
       return szString;  /* no more processing is required */
+   }
 
    /* initial length of the string and the result buffer (it can contain null bytes) */
    ulResBufLen = ulResStrLen = *pulStringLen;
@@ -579,23 +598,53 @@ void hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
 
    if( hb_macroCheckParam( pItem ) )
    {
-      char * szString = pItem->item.asString.value;
+      char * szString;
       HB_MACRO struMacro;
       int iStatus;
+      ULONG ulLen = pItem->item.asString.length;
+      BOOL bCopy = FALSE;
+
+      ulLen--;
+      while( szString[ulLen] == ' ' )
+      {
+         ulLen--;
+         bCopy = TRUE;
+      }
+      ulLen--;
+
+      if( bCopy )
+      {
+         szString = hb_xgrab( ulLen + 1 );
+         strncpy( szString, pItem->item.asString.value, ulLen );
+         szString[ulLen] = '\0';
+      }
+      else
+      {
+         szString = pItem->item.asString.value;
+      }
 
       struMacro.Flags      = HB_MACRO_GEN_POP;
       struMacro.uiNameLen  = HB_SYMBOL_NAME_LEN;
       struMacro.status     = HB_MACRO_CONT;
       struMacro.supported  = (flags & HB_SM_RT_MACRO) ? s_macroFlags : flags;
+
       iStatus = hb_macroParse( &struMacro, szString );
 
       hb_stackPop();    /* remove compiled string */
+
       if( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) )
       {
          hb_macroEvaluate( &struMacro );
       }
       else
+      {
          hb_macroSyntaxError( &struMacro );
+      }
+
+      if( bCopy )
+      {
+         hb_xfree( szString );
+      }
    }
 }
 
