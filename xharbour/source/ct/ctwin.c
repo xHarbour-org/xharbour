@@ -1,5 +1,5 @@
 /*
- * $Id: ctwin.c,v 1.1 2004/10/23 23:29:08 oh1 Exp $
+ * $Id: ctwin.c,v 1.2 2004/10/24 17:59:27 druzus Exp $
  */
 
 /*
@@ -90,29 +90,26 @@
 /****************************************************************************/
 HB_FUNC( WACLOSE ) /* Close all windows */
 {
-
    hb_retni( hb_ctWAClose() );
 }
 /****************************************************************************/
 HB_FUNC( WBOARD ) /* Allocates screen area for windows */
 {
-   SHORT FRow, FCol, LRow, LCol, iRet;
+   SHORT FRow, FCol, LRow, LCol;
 
-   FRow = hb_pcount() >= 1 && ISNUM( 1 ) ? hb_parni( 1 ) : 0;
-   FCol = hb_pcount() >= 2 && ISNUM( 2 ) ? hb_parni( 2 ) : 0;
-   LRow = hb_pcount() >= 3 && ISNUM( 3 ) ? hb_parni( 3 ) : hb_ctMaxRow( TRUE );
-   LCol = hb_pcount() >= 4 && ISNUM( 4 ) ? hb_parni( 4 ) : hb_ctMaxCol( TRUE );
+   FRow = ISNUM( 1 ) ? hb_parni( 1 ) : 0;
+   FCol = ISNUM( 2 ) ? hb_parni( 2 ) : 0;
+   LRow = ISNUM( 3 ) ? hb_parni( 3 ) : hb_ctMaxRow( TRUE );
+   LCol = ISNUM( 4 ) ? hb_parni( 4 ) : hb_ctMaxCol( TRUE );
 
-   iRet = hb_ctWBoard( FRow, FCol, LRow, LCol );
-
-   hb_retni( iRet );
+   hb_retni( hb_ctWBoard( FRow, FCol, LRow, LCol ) );
 }
 /****************************************************************************/
 HB_FUNC( WBOX )     /* Places a frame around the active window */
 {
-   char      * cBox, cBox2[ 10 ], c;
-   HB_CT_WND * wnd;
-   int       i, j;
+   char        * cBox, cBox2[ 10 ], c;
+   HB_CT_WND   * wnd;
+   int         i, j;
    static char * cWBOX[] = {
             _B_DOUBLE,        // 0  WB_DOUBLE_CLEAR
             _B_SINGLE,        // 1  WB_SINGLE_CLEAR
@@ -136,12 +133,12 @@ HB_FUNC( WBOX )     /* Places a frame around the active window */
 
    wnd = hb_ctWCurrent();
 
-   if( hb_pcount() >= 1 && ISCHAR( 1 ) )
+   if( ISCHAR( 1 ) )
    {
       i = 4;
       cBox = hb_parcx( 1 );
    }
-   else if( hb_pcount() >= 1 && ISNUM( 1 ) )
+   else if( ISNUM( 1 ) )
    {
       i = hb_parni( 1 );
       if( i < 0 || i > 15 ) i = 0;
@@ -191,24 +188,12 @@ HB_FUNC( WBOX )     /* Places a frame around the active window */
 /****************************************************************************/
 HB_FUNC( WCENTER )  /* Returns a window to the visible area, or centers it */
 {
-   BOOL  WCen = FALSE;
-   SHORT NCur;
-
-   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
-      WCen = TRUE;
-
-   NCur = hb_ctWCenter( WCen );
-
-   hb_retni( NCur );
+   hb_retni( hb_ctWCenter( hb_parl( 1 ) ) );
 }
 /****************************************************************************/
 HB_FUNC( WCLOSE ) /* Close the active window */
 {
-   SHORT NCur;
-
-   NCur = hb_ctWClose();
-
-   hb_retni( NCur );
+   hb_retni( hb_ctWClose() );
 }
 /****************************************************************************/
 HB_FUNC( WCOL ) /* Return position of the leftmost column */
@@ -220,7 +205,7 @@ HB_FUNC( WCOL ) /* Return position of the leftmost column */
 
    FCol = wnd->WFCol;
 
-   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
+   if( hb_parl( 1 ) )
    {
       FCol += ( wnd->BFCol + wnd->BLCol - wnd->WFCol - wnd->WLCol ) / 2;
 
@@ -241,9 +226,7 @@ HB_FUNC( WFCOL ) /* Return position of the leftmost column of formatted area */
    wnd = hb_ctWCurrent();
 
    UFCol = ( wnd->NCur ==0 ? wnd->BFCol : wnd->UFCol );
-
-   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
-      UFCol -= wnd->WFCol;
+   if( hb_parl( 1 ) ) UFCol -= wnd->WFCol;
 
    hb_retni( UFCol );
 }
@@ -257,8 +240,7 @@ HB_FUNC( WFLASTCOL ) /* Return position of the rightmost column of formatted are
 
    ULCol = ( wnd->NCur ==0 ? wnd->BLCol : wnd->ULCol );
 
-   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
-      ULCol = wnd->WLCol - ULCol;
+   if( hb_parl( 1 ) ) ULCol = wnd->WLCol - ULCol;
 
    hb_retni( ULCol );
 }
@@ -272,30 +254,20 @@ HB_FUNC( WFLASTROW ) /* Return position of the bottom row of formatted area */
 
    ULRow = ( wnd->NCur ==0 ? wnd->BLRow : wnd->ULRow );
 
-   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
-      ULRow = wnd->WLRow - ULRow;
+   if( hb_parl( 1 ) ) ULRow = wnd->WLRow - ULRow;
 
    hb_retni( ULRow );
 }
 /****************************************************************************/
 HB_FUNC( WFORMAT ) /* Set the usable area within a window */
 {
-   SHORT FRow = 0, FCol = 0, LRow = 0, LCol = 0, NCur;
+   SHORT NCur;
 
    NCur = hb_ctWSelect( -2 );
 
-   if( NCur < 1 )
-   {
-      hb_retni( NCur );
-      return;
-   }
-
-   if( hb_pcount() >= 1 && ISNUM( 1 ) ) FRow = hb_parni( 1 );
-   if( hb_pcount() >= 2 && ISNUM( 2 ) ) FCol = hb_parni( 2 );
-   if( hb_pcount() >= 3 && ISNUM( 3 ) ) LRow = hb_parni( 3 );
-   if( hb_pcount() >= 4 && ISNUM( 4 ) ) LCol = hb_parni( 4 );
-
-   NCur = hb_ctWFormat( FRow, FCol, LRow, LCol );
+   if( NCur >= 1 )
+      NCur = hb_ctWFormat( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ),
+                           hb_parni( 4 ) );
 
    hb_retni( NCur );
 }
@@ -308,9 +280,7 @@ HB_FUNC( WFROW ) /* Return position of the top row of formatted area */
    wnd = hb_ctWCurrent();
 
    UFRow = ( wnd->NCur ==0 ? wnd->BFRow : wnd->UFRow );
-
-   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
-      UFRow -= wnd->WFRow;
+   if( hb_parl( 1 ) ) UFRow -= wnd->WFRow;
 
    hb_retni( UFRow );
 }
@@ -324,7 +294,7 @@ HB_FUNC( WLASTCOL ) /* Return position of the rightmost column */
 
    LCol = wnd->WLCol;
 
-   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
+   if( hb_parl( 1 ) )
    {
       LCol += ( wnd->BFCol + wnd->BLCol - wnd->WFCol - wnd->WLCol ) / 2;
 
@@ -346,7 +316,7 @@ HB_FUNC( WLASTROW ) /* Return position of the bottom row */
 
    LRow = wnd->WLRow;
 
-   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
+   if( hb_parl( 1 ) )
    {
       LRow += ( wnd->BFRow + wnd->BLRow - wnd->WFRow - wnd->WLRow ) / 2;
 
@@ -363,10 +333,10 @@ HB_FUNC( WMODE ) /* Set the screen border overstep mode */
 {
    BOOL MFRow = -2, MFCol = -2, MLRow = -2, MLCol = -2;
 
-   if( hb_pcount() >= 1 && ISLOG( 1 ) ) MFRow = hb_parl( 1 );
-   if( hb_pcount() >= 2 && ISLOG( 2 ) ) MFCol = hb_parl( 2 );
-   if( hb_pcount() >= 3 && ISLOG( 3 ) ) MLRow = hb_parl( 3 );
-   if( hb_pcount() >= 4 && ISLOG( 4 ) ) MLCol = hb_parl( 4 );
+   if( ISLOG( 1 ) ) MFRow = hb_parl( 1 );
+   if( ISLOG( 2 ) ) MFCol = hb_parl( 2 );
+   if( ISLOG( 3 ) ) MLRow = hb_parl( 3 );
+   if( ISLOG( 4 ) ) MLCol = hb_parl( 4 );
 
    hb_ctWMode( MFRow, MFCol, MLRow, MLCol );
 
@@ -394,27 +364,13 @@ HB_FUNC( WNUM ) /* Get the highest windows handle */
 /****************************************************************************/
 HB_FUNC( WOPEN ) /* Opens a new window */
 {
-   BOOL      lDel = FALSE;
-   int i;
+   SHORT iwnd = -1;
 
-   if( hb_pcount() < 4 || !ISNUM( 1 ) || !ISNUM( 2 ) || !ISNUM( 3 ) ||
-       !ISNUM( 4 ) )
-   {
-      hb_retni( -1 );
-      return;
-   }
+   if( ISNUM( 1 ) && ISNUM( 2 ) && ISNUM( 3 ) && ISNUM( 4 ) )
+      iwnd = hb_ctWOpen( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ),
+                         hb_parni( 4 ), hb_parl( 5 ) );
 
-   if( hb_pcount() >= 5 && ISLOG( 5 ) && hb_parl( 5 ) ) lDel = TRUE;
-
-   i = hb_ctWOpen( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ), hb_parni( 4 ),
-                   lDel );
-   if( i < 0 )
-   {
-      hb_retni( i );
-      return;
-   }
-
-   hb_retni( hb_ctWSelect ( -1 ) );
+   hb_retni( iwnd );
 }
 /****************************************************************************/
 HB_FUNC( WROW ) /* Return position of the top row */
@@ -426,7 +382,7 @@ HB_FUNC( WROW ) /* Return position of the top row */
 
    FRow = wnd->WFRow;
 
-   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
+   if( hb_parl( 1 ) )
    {
       FRow += ( wnd->BFRow + wnd->BLRow - wnd->WFRow - wnd->WLRow ) / 2;
 
@@ -441,51 +397,22 @@ HB_FUNC( WROW ) /* Return position of the top row */
 /****************************************************************************/
 HB_FUNC( WSELECT ) /* Activate window */
 {
-   SHORT iWnd;
-
-   if( hb_pcount() > 0 && ISNUM( 1 ) )
-   {
-      iWnd = hb_ctWSelect( hb_parni( 1 ) );
-   }
-   else
-   {
-      iWnd = hb_ctWSelect( -1 );
-   }
-
-   hb_retni( iWnd );
+   hb_retni( hb_ctWSelect( ISNUM( 1 ) ? hb_parni( 1 ) : -1 ) );
 }
 /****************************************************************************/
 HB_FUNC( WSETMOVE ) /* Set the interactive movement mode */
 {
-   BOOL Mode;
-
-   if( hb_pcount() >= 1 && ISLOG( 1 ) )
-      Mode = hb_ctWSetMove( hb_parl( 1 ) );
-   else
-      Mode = hb_ctWSetMove( -2 );
-
-   hb_retl( Mode );
+   hb_retl( hb_ctWSetMove( ISLOG( 1 ) ? hb_parl( 1 ) : -2 ) );
 }
 /****************************************************************************/
 HB_FUNC( WSETSHADOW ) /* Set the window shadow color */
 {
-   SHORT nAttr;
+   SHORT nAttr = -2;
 
-   if( hb_pcount() > 0 && ISCHAR( 1 ) )
-   {
-      nAttr = hb_gtColorToN( hb_parcx( 1 ) );
-      nAttr = hb_ctWSetShadow( nAttr );
-   }
-   else if( hb_pcount() > 0 && ISNUM( 1 ) )
-   {
-      nAttr = hb_ctWSetShadow( hb_parni( 1 ) );
-   }
-   else
-   {
-      nAttr = hb_ctWSetShadow( -2 );
-   }
+   if( ISCHAR( 1 ) )     nAttr = hb_gtColorToN( hb_parcx( 1 ) );
+   else if( ISNUM( 1 ) ) nAttr = hb_parni( 1 );
 
-   hb_retni( nAttr );
+   hb_retni( hb_ctWSetShadow( nAttr ) );
 }
 /****************************************************************************/
 /* Get the array of windows handle ( New ) */
@@ -512,10 +439,8 @@ HB_FUNC( WSTEP ) /* Set the step width of interactive window movement */
 {
    SHORT iRet = -1;
 
-   if( hb_pcount() >= 2 && ISNUM( 1 ) && ISNUM( 2 ) )
-   {
+   if( ISNUM( 1 ) && ISNUM( 2 ) )
       iRet = hb_ctWStep( hb_parni( 1 ), hb_parni( 2 ) );
-   }
 
    hb_retni( iRet );
 }

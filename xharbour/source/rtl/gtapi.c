@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.44 2004/10/27 19:35:57 oh1 Exp $
+ * $Id: gtapi.c,v 1.45 2004/10/30 22:41:35 druzus Exp $
  */
 
 /*
@@ -161,6 +161,10 @@ extern void HB_EXPORT HB_FUN_HB_EXECFROMARRAY();
 /****************************************************************************/
 /* CT3 Windows API static (oh1) */
 
+#define CLEARB_DEFAULT ' '             // ct_ClearB default value
+        // Clipper uses 255
+        // but we cannot not all platform/character set uses 255 as blank char
+
 static BOOL         ct_Init  = FALSE;
 
 static SHORT        ct_BFRow = 0;      // Wboard First Row
@@ -196,10 +200,7 @@ static SHORT        ct_MRStep = 2;     // Move Rows Step
 static SHORT        ct_MCStep = 5;     // Move Columns Step
 
 static SHORT        ct_ClearA = 7;     // Windows Clear Attribute
-static SHORT        ct_ClearB = ' ';   // Windows Clear Char
-        // Clipper uses 255
-        // but we cannot not all platform/character set uses 255 as blank char
-
+static SHORT        ct_ClearB = CLEARB_DEFAULT;   // Windows Clear Char
 static SHORT        ct_ShadowA = -1;   // Windows Shadow Attribute
 static UINT         ct_CSize   = 0;    // Windows Buffer One Char Size
 
@@ -2012,36 +2013,32 @@ void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize )
 
 
 /****************************************************************************/
-/* New CT3 Windows API functions                                                */
+/* New CT3 Windows API functions                                            */
 /****************************************************************************/
 /*
-  hb_ctMaxCol()      - Get the highest column number for screen/window
-  hb_ctMaxRow()      - Get the highest row number for screen/window
   hb_ctGetClearA()   - Get the default attribute for screen/window clear
   hb_ctGetClearB()   - Get the default character for screen/window clear
+  hb_ctMaxCol()      - Get the highest column number for screen/window
+  hb_ctMaxRow()      - Get the highest row number for screen/window
   hb_ctSetClearA()   - Set the default attribute for screen/window clear
   hb_ctSetClearB()   - Set the default character for screen/window clear
   hb_ctSetCurColor() - Set current color
-  hb_ctWSetShadow()  - Set the window shadow color
   hb_ctSetPos()      - Move the cursor to a new position
-
-  hb_ctWFree()       - Free HB_CT_WND Table
-
-  hb_ctWClose()      - Close the active window
   hb_ctWAClose()     - Close all windows
-  hb_ctWOpen()       - Opens a new window
-
-
   hb_ctWBoard()      - Allocates screen area for windows
   hb_ctWCenter()     - Returns a window to the visible area, or centers it
+  hb_ctWClose()      - Close the active window
   hb_ctWCurrent()    - Get the current windows info
   hb_ctWFormat()     - Set the usable area within a window
+  hb_ctWFree()       - Free HB_CT_WND Table
   hb_ctWMode()       - Set the screen border overstep mode
   hb_ctWMove()       - Moves a window
   hb_ctWNew()        - Create new HB_CT_WND Table
   hb_ctWNum()        - Get the highest windows handle
+  hb_ctWOpen()       - Opens a new window
   hb_ctWSelect()     - Activate Window
   hb_ctWSetMove()    - Set the interactive movement mode
+  hb_ctWSetShadow()  - Set the window shadow color
   hb_ctWStep()       - Set the step width of interactive window movement
 
    Static functions:
@@ -2089,10 +2086,7 @@ static void hb_ctInit( void )
       ct_MCStep = 5;     // Move Columns Step
 
       ct_ClearA  = 7;    // Windows Clear Attribute
-      ct_ClearB  = ' ';  // Windows Clear Char
-        // Clipper uses 255
-        // but we cannot not all platform/character set uses 255 as blank char
-
+      ct_ClearB  = CLEARB_DEFAULT;  // Windows Clear Char
       ct_ShadowA = -1;   // Windows Shadow Attribute
 
       ct_NCur = -1;
@@ -2365,11 +2359,10 @@ SHORT HB_EXPORT hb_ctGetClearB( void )
 /* Set the default character for screen/window clear */
 SHORT HB_EXPORT hb_ctSetClearB( SHORT nClearB )
 {
-   SHORT pClearB;
+   SHORT pClearB = ct_ClearB;
 
-   pClearB = ct_ClearB;
-
-   if( nClearB >= 0 ) ct_ClearB = nClearB;
+   if( nClearB >= 0 && nClearB <= 255 ) ct_ClearB = nClearB;
+   else if( nClearB == -1 )             ct_ClearB = CLEARB_DEFAULT;
 
    return pClearB;
 }
@@ -2377,16 +2370,10 @@ SHORT HB_EXPORT hb_ctSetClearB( SHORT nClearB )
 /* Move the cursor to a new position */
 SHORT HB_EXPORT hb_ctSetPos( SHORT iRow, SHORT iCol )
 {
-   SHORT     iRC = FALSE;
-
-   /* temporary hack for GTs which do not set maxrow/maxcol */
-   if ( s_Width == 0 && s_Height == 0 )
+   if( s_Width > 0 && s_Height > 0 )
    {
-      return hb_gtSetPos( iRow, iCol );
-   }
+      SHORT     iRC = FALSE;
 
-   if ( s_Width == 0 && s_Height == 0 )
-   {
       /* Clipper 5.3b compatible (oh1) */
 
       if( iRow < ct_WFRow - ct_UFRow )
@@ -2427,9 +2414,7 @@ SHORT HB_EXPORT hb_ctSetPos( SHORT iRow, SHORT iCol )
       }
    }
 
-   iRC = hb_gtSetPos( iRow, iCol );
-
-   return iRC;
+   return hb_gtSetPos( iRow, iCol );
 }
 /****************************************************************************/
 /* Allocates screen area for windows */
@@ -2672,8 +2657,8 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
 
    FRow = HB_MAX( ct_BFRow, HB_MIN( FRow, ct_BLRow ) );
    FCol = HB_MAX( ct_BFCol, HB_MIN( FCol, ct_BLCol ) );
-   LRow = HB_MAX( ct_BFRow, HB_MIN( LRow, ct_BLRow ) );
-   LCol = HB_MAX( ct_BFCol, HB_MIN( LCol, ct_BLCol ) );
+   if( LRow > ct_BLRow ) LRow = ct_BLRow;
+   if( LCol > ct_BLCol ) LCol = ct_BLCol;
 
    if( LRow < FRow || LCol < FCol ) return -1;
 
@@ -2717,7 +2702,7 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
 
    hb_ctWSDisp( ct_WCur );
 
-   return i;
+   return ct_NCur;
 }
 /****************************************************************************/
 /* Activate Window */
@@ -2925,12 +2910,9 @@ SHORT HB_EXPORT hb_ctWNum( void )
 /* Set the window shadow color */
 SHORT HB_EXPORT hb_ctWSetShadow( SHORT nAttr )
 {
-   SHORT pAttr;
+   SHORT pAttr = ct_ShadowA;
 
-   pAttr = ct_ShadowA;
-
-   if( nAttr >= 0 || nAttr == -1 )
-    ct_ShadowA = nAttr;
+   if( nAttr >= 0 || nAttr == -1 ) ct_ShadowA = nAttr;
 
    return pAttr;
 }
@@ -2963,8 +2945,7 @@ BOOL HB_EXPORT hb_ctWSetMove( BOOL Mode )
 {
    BOOL p_MMode = ct_MMode;
 
-   if( Mode == FALSE || Mode == TRUE )
-      ct_MMode = Mode;
+   if( Mode == FALSE || Mode == TRUE ) ct_MMode = Mode;
 
    return p_MMode;
 }
