@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.65 2003/06/18 13:29:12 andijahja Exp $
+ * $Id: classes.c,v 1.66 2003/06/18 19:28:58 ronpinkas Exp $
  */
 
 /*
@@ -1903,9 +1903,10 @@ HB_FUNC( __CLSNEW )
       pNewCls->pMethods = ( PMETHOD ) hb_xgrab( pNewCls->uiHashKey * BUCKET * sizeof( METHOD ) );
       memset( pNewCls->pMethods, 0, pNewCls->uiHashKey * BUCKET * sizeof( METHOD ) );
 
-      pNewCls->pClassDatas  = hb_itemArrayNew( 0 );
-      pNewCls->pInlines     = hb_itemArrayNew( 0 );
-      pNewCls->pFunError    = NULL;
+      pNewCls->pClassDatas    = hb_itemArrayNew( 0 );
+      pNewCls->pInlines       = hb_itemArrayNew( 0 );
+      pNewCls->pFunError      = NULL;
+      pNewCls->pModuleSymbols = NULL;
    }
    hb_itemRelease( pahSuper );
 
