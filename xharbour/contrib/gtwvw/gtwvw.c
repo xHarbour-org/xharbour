@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c $
+ * $Id: gtwvw.c,v 1.6 2005/01/13 04:41:17 bdj Exp $
  */
 
 /*
@@ -5698,8 +5698,8 @@ static void   hb_wvw_vmouse_SetPos( WIN_DATA * pWindowData, USHORT usRow, USHORT
 {
   POINT xy;
 
-  hb_wvw_gtSetMouseX( pWindowData, usRow );
-  hb_wvw_gtSetMouseY( pWindowData, usCol );
+  hb_wvw_gtSetMouseY( pWindowData, usRow );
+  hb_wvw_gtSetMouseX( pWindowData, usCol );
 
   xy = hb_wvw_gtGetXYFromColRow( pWindowData, usCol, usRow );
 

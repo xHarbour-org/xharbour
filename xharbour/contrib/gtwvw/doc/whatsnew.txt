@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt $
+ * $Id: whatsnew.txt,v 1.2 2005/01/13 04:41:18 bdj Exp $
  */
 
 /*
@@ -15,6 +15,11 @@
  *
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
+
+ 2005/01/13:
+ * gtwvw.c
+    ! Fixed a hidden bug:
+      HB_GT_FUNC( mouse_SetPos ) was using X for row, and Y for col (!).
 
  2005/01/12:
  * gtwvw.c

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3737 2005/01/13 04:46:09 bdj Exp $
+ * $Id: ChangeLog,v 1.3738 2005/01/13 08:24:38 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-13 17:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+  * source/rtl/gtwvt/gtwvt.c
+    ! Fixed a hidden bug:
+      HB_GT_FUNC( mouse_SetPos ) was using X for row, and Y for col (!).
 
 2004-01-13 09:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/filesys.c
@@ -19,7 +25,7 @@
 
 2005-01-13 11:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/gtwvw.c
-  * contrib/gtwvw/hbgtwvw.c
+  * contrib/gtwvw/hbgtwvw.h
   * contrib/gtwvw/doc/whatsnew.txt
     + Combobox functions and some other changes.
       Please see details in the changelog on contrib/gtwvw/doc/whatsnew.txt

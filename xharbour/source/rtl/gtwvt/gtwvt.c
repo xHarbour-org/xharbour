@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.140 2004/12/28 22:00:00 ptsarenko Exp $
+ * $Id: gtwvt.c,v 1.140 2004/12/28 20:32:33 ptsarenko Exp $
  */
 
 /*
@@ -1412,8 +1412,8 @@ int HB_GT_FUNC( mouse_Row( void ) )
 
 void HB_GT_FUNC( mouse_SetPos( int iRow, int iCol ) )
 {
-  hb_wvt_gtSetMouseX( iRow );
-  hb_wvt_gtSetMouseY( iCol );
+  hb_wvt_gtSetMouseY( iRow );
+  hb_wvt_gtSetMouseX( iCol );
 }
 
 //-------------------------------------------------------------------//
