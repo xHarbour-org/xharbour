@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.1.1.1 2001/12/21 10:42:05 ronpinkas Exp $
+ * $Id: strcase.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 #include "hbapierr.h"
 
 /* converts szText to lower case. Does not create a new string! */

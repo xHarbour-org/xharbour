@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.2 2001/12/30 03:30:04 ronpinkas Exp $
+ * $Id: estack.c,v 1.3 2002/01/02 04:40:08 ronpinkas Exp $
  */
 
 /*
@@ -84,7 +84,10 @@ void hb_stackPop( void )
    {
       hb_itemClear( * hb_stack.pPos );
    }
-   ( * hb_stack.pPos )->bShadow = FALSE;
+   else
+   {
+      ( * hb_stack.pPos )->bShadow = FALSE;
+   }
 }
 
 void hb_stackDec( void )

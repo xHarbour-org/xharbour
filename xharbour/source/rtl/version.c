@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.1.1.1 2001/12/21 10:42:19 ronpinkas Exp $
+ * $Id: version.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -62,6 +62,7 @@
  */
 
 #include "hbapi.h"
+#include "hbfast.h"
 
 HB_FUNC( OS )
 {

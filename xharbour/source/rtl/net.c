@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.1.1.1 2001/12/21 10:41:53 ronpinkas Exp $
+ * $Id: net.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -64,6 +64,7 @@
 #define HB_OS_WIN_32_USED
 
 #include "hbapi.h"
+#include "hbfast.h"
 
 #if defined(HB_OS_OS2) && defined(__GNUC__)
 

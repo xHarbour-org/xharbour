@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.15 2001/07/18 07:21:03 mauriliolongo Exp $
+ * $Id: hbapiitm.h,v 1.1.1.1 2001/12/21 10:47:16 ronpinkas Exp $
  */
 
 /*
@@ -77,7 +77,6 @@ extern PHB_ITEM hb_itemDoC      ( char * szFunc, ULONG ulPCount, ... );
 
 extern PHB_ITEM hb_itemArrayGet ( PHB_ITEM pArray, ULONG ulIndex );
 extern PHB_ITEM hb_itemArrayNew ( ULONG ulLen );
-extern PHB_ITEM hb_itemArrayPut ( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem );
 extern ULONG    hb_itemCopyC    ( PHB_ITEM pItem, char * szBuffer, ULONG ulLen );
 extern BOOL     hb_itemFreeC    ( char * szText );
 extern char *   hb_itemGetC     ( PHB_ITEM pItem );
@@ -120,7 +119,6 @@ extern char *   hb_itemTypeStr  ( PHB_ITEM pItem );
 /* Non Clipper compliant internal API */
 
 extern PHB_ITEM hb_itemParamPtr ( USHORT uiParam, int iMask );
-extern PHB_ITEM hb_itemReturnPtr( void );
 extern int      hb_itemStrCmp   ( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact ); /* our string compare */
 extern void     hb_itemCopy     ( PHB_ITEM pDest, PHB_ITEM pSource ); /* copies an item to one place to another respecting its containts */
 extern void     hb_itemClear    ( PHB_ITEM pItem );

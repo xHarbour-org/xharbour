@@ -1,5 +1,5 @@
 /*
- * $Id: memofile.c,v 1.12 2001/09/27 12:44:36 vszakats Exp $
+ * $Id: memofile.c,v 1.1.1.1 2001/12/21 10:41:50 ronpinkas Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapifs.h"
+#include "hbstack.h"
 
 /* NOTE: CA-Clipper has 64K (65516 bytes exactly) limit on read, in Harbour
          this limit is extended, so we are not *strictly* compatible here.
@@ -95,7 +96,7 @@ HB_FUNC( MEMOREAD )
 
             hb_fsClose( fhnd );
 
-            hb_itemPutCPtr( hb_itemReturnPtr(), ( char * ) pbyBuffer, ulSize );
+            hb_itemPutCPtr( &hb_stack.Return, ( char * ) pbyBuffer, ulSize );
          }
          else
             hb_retc( "" );

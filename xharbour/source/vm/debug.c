@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.21 2001/06/18 18:12:00 dholm Exp $
+ * $Id: debug.c,v 1.1.1.1 2001/12/21 10:40:48 ronpinkas Exp $
  */
 
 /*
@@ -73,11 +73,13 @@ static void AddToArray( PHB_ITEM pItem, PHB_ITEM pReturn, ULONG ulPos )
 
       sprintf( pTemp->item.asString.value, "[%s]", pItem->item.asSymbol.value->szName );
 
-      hb_itemArrayPut( pReturn, ulPos, pTemp );
+      hb_arraySet( pReturn, ulPos, pTemp );
       hb_itemRelease( pTemp );                  /* Get rid of temporary str.*/
    }
    else                                         /* Normal types             */
-      hb_itemArrayPut( pReturn, ulPos, pItem );
+   {
+      hb_arraySet( pReturn, ulPos, pItem );
+   }
 }
 
 /* $Doc$

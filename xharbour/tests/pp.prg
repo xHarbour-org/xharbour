@@ -6356,42 +6356,9 @@ RETURN Len( aDefRules )
 
 //--------------------------------------------------------------//
 
+#ifndef __HARBOUR__
+
 FUNCTION ExtractLeadingWS( sLine, sWS )
-
-  #ifdef __HARBOUR__
-
-   HB_INLINE( @sLine, @sWs )
-   {
-      PHB_ITEM pItem1 = hb_itemUnRef( hb_stackItemFromBase( 1 ) );
-      PHB_ITEM pItem2 = hb_itemUnRef( hb_stackItemFromBase( 2 ) );
-      size_t iLen = pItem1->item.asString.length, i = 0;
-      void *pTmp;
-
-      while( pItem1->item.asString.value[i] == ' ' )
-      {
-         i++;
-      }
-
-      if( i > 0 )
-      {
-         pItem1->item.asString.length = iLen - i;
-         pTmp = (void *) pItem1->item.asString.value;
-         pItem1->item.asString.value = hb_strdup( pItem1->item.asString.value + i ) ;
-         hb_xfree( pTmp );
-      }
-
-      if( pItem2 )
-      {
-         hb_itemClear( pItem2 );
-         pItem2->type = HB_IT_STRING;
-         pItem2->item.asString.length = i;
-         pItem2->item.asString.value = ( char * ) hb_xgrab( pItem2->item.asString.length + 1 );
-         memset( pItem2->item.asString.value, ' ', pItem2->item.asString.length );
-         pItem2->item.asString.value[ pItem2->item.asString.length ] = '\0';
-      }
-   }
-
-  #else
 
    LOCAL Counter, cChar, nLen := Len( sLine )
 
@@ -6411,8 +6378,6 @@ FUNCTION ExtractLeadingWS( sLine, sWS )
       sLine := SubStr( sLine, Counter )
    ENDIF
 
-  #endif
-
    //? "Removed: '" + sWs + "' sLine: " + sLine
 
 RETURN sWS
@@ -6420,38 +6385,6 @@ RETURN sWS
 //--------------------------------------------------------------//
 
 FUNCTION DropTrailingWS( sLine, sWS )
-
-  #ifdef __HARBOUR__
-
-   HB_INLINE( @sLine, @sWs )
-   {
-      PHB_ITEM pItem1 = hb_itemUnRef( hb_stackItemFromBase( 1 ) );
-      PHB_ITEM pItem2 = hb_itemUnRef( hb_stackItemFromBase( 2 ) );
-      size_t iLen = pItem1->item.asString.length, i = iLen - 1;
-
-      while( pItem1->item.asString.value[i] == ' ' )
-      {
-         i--;
-      }
-
-      if( ++i < iLen )
-      {
-         pItem1->item.asString.length = i;
-         pItem1->item.asString.value[i] = '\0';
-      }
-
-      if( pItem2 )
-      {
-         hb_itemClear( pItem2 );
-         pItem2->type = HB_IT_STRING;
-         pItem2->item.asString.length = ( iLen - i );
-         pItem2->item.asString.value = ( char * ) hb_xgrab( pItem2->item.asString.length + 1 );
-         memset( pItem2->item.asString.value, ' ', pItem2->item.asString.length );
-         pItem2->item.asString.value[ pItem2->item.asString.length ] = '\0';
-      }
-   }
-
-  #else
 
    LOCAL nLenSource, nLen := Len( sLine ), cChar
 
@@ -6468,8 +6401,6 @@ FUNCTION DropTrailingWS( sLine, sWS )
    sLine := Left( sLine, nLen )
    sWS   := Space( nLenSource - nLen )
 
-  #endif
-
    //? "After Drop: '" + sLine + "'"
 
 RETURN sLine
@@ -6477,30 +6408,6 @@ RETURN sLine
 //--------------------------------------------------------------//
 
 FUNCTION DropExtraTrailingWS( sLine )
-
-  #ifdef __HARBOUR__
-
-   HB_INLINE( @sLine )
-   {
-      extern PHB_ITEM hb_stackItemFromBase( int );
-      extern PHB_ITEM hb_itemUnRef( PHB_ITEM );
-
-      PHB_ITEM pItem = hb_itemUnRef( hb_stackItemFromBase( 1 ) );
-      size_t iLen = pItem->item.asString.length, i = iLen - 1;
-
-      while( i > 1 && pItem->item.asString.value[i] == ' ' && pItem->item.asString.value[i - 1] == ' ' )
-      {
-         i--;
-      }
-
-      if( ++i < iLen )
-      {
-         pItem->item.asString.length = i;
-         pItem->item.asString.value[i] = '\0';
-      }
-   }
-
-  #else
 
    LOCAL nLen := Len( sLine )
    /* Tabs are converted to spaces at PP_PreProFile() */
@@ -6514,9 +6421,9 @@ FUNCTION DropExtraTrailingWS( sLine )
 
    sLine := Left( sLine, nLen )
 
-  #endif
-
 RETURN sLine
+
+#endif
 
 //--------------------------------------------------------------//
 

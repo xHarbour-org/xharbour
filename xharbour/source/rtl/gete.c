@@ -1,5 +1,5 @@
 /*
- * $Id: gete.c,v 1.1.1.1 2001/12/21 10:42:16 ronpinkas Exp $
+ * $Id: gete.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -63,6 +63,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 
 /* NOTE: The second parameter is a Harbour extension. In CA-Cl*pper the
          function will return an empty string if called with more than one

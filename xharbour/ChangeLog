@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.9 2002/01/02 04:40:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.10 2002/01/03 03:22:10 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,13 +7,69 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-02 19:25 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
+  * xharbour/source/vm/itemapi.c
+  * xharbour/include/hbapiitm.h
+    - Removed unneeded hb_itemReturnPtr() and hb_itemArrayPut()
+
+  * xharbour/source/rtl/memofile.c
+    + Added #include "hbstack.h"
+    ! Changed hb_itemReturnPtr() to &hb_stack.Return
+
+  * xharbour/source/vm/classes.c
+  * xharbour/source/vm/debug.c
+    ! Changed hb_itemArrayPut() to hb_arraySet()
+
+  * xharbour/source/rtl/ampm.c
+  * xharbour/source/rtl/descend.c
+  * xharbour/source/rtl/dir.c
+  * xharbour/source/rtl/errorapi.c
+  * xharbour/source/rtl/gete.c
+  * xharbour/source/rtl/hardcr.c
+  * xharbour/source/rtl/langapi.c
+  * xharbour/source/rtl/memoline.c
+  * xharbour/source/rtl/mouseapi.c
+  * xharbour/source/rtl/mtran.c
+  * xharbour/source/rtl/net.c
+  * xharbour/source/rtl/oemansi.c
+  * xharbour/source/rtl/padc.c
+  * xharbour/source/rtl/padl.c
+  * xharbour/source/rtl/padr.c
+  * xharbour/source/rtl/philes.c
+  * xharbour/source/rtl/replic.c
+  * xharbour/source/rtl/saverest.c
+  * xharbour/source/rtl/setkey.c
+  * xharbour/source/rtl/space.c
+  * xharbour/source/rtl/strcase.c
+  * xharbour/source/rtl/strtran.c
+  * xharbour/source/rtl/strzero.c
+  * xharbour/source/rtl/stuff.c
+  * xharbour/source/rtl/transfrm.c
+  * xharbour/source/rtl/valtostr.c
+  * xharbour/source/rtl/version.c
+    + Added #include "hbfast.h" to resolve compiler warnings.
+
+  * xharbour/source/vm/memvars.c
+    * Corrected compiler warnning in __MVEXIST()
+
+  * xharbour/source/vm/fastitem.c
+  * xharbour/source/vm/estack.c
+  * xharbour/source/vm/hvm.c
+    * Optimization work in progress.
+
+  * xharbour/tests/pp.prg
+    - Removed INLINE_C versions of ExtractLeadingWS() DropTrailingWS() and DropTrailingExtraWS()
+  * xharbour/tests/pp_harb.ch
+    + Added c versions of ExtractLeadingWS() DropTrailingWS() and DropTrailingExtraWS()
+
 2002-01-03 00:40 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
    * include/hbfsapi.h
      * under Win32 FHANDLE is typedef to long
    * source/rtl/filesys.c
      * Replaced all X__WIN32__ with __WIN32__
      * hb_fscommit() now used true Win32 Api calls
-     * No more file limit on Win32  
+     * No more file limit on Win32
 
 2002-01-02 07:45 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
    * utils/hbmake/hbmake.prg

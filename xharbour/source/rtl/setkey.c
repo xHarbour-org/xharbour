@@ -1,5 +1,5 @@
 /*
- * $Id: setkey.c,v 1.12 2001/06/07 15:25:54 dholm Exp $
+ * $Id: setkey.c,v 1.1.1.1 2001/12/21 10:42:03 ronpinkas Exp $
  */
 
 /*
@@ -279,21 +279,21 @@ HB_FUNC( HB_SETKEYSAVE )
       pKeyElements = hb_itemArrayNew( 3 );
 
       pTmp = hb_itemPutNI( NULL, sk_list_tmp->iKeyCode );
-      hb_itemArrayPut( pKeyElements, 1, pTmp );
+      hb_arraySet( pKeyElements, 1, pTmp );
       hb_itemRelease( pTmp );
 
       pTmp = hb_itemNew( sk_list_tmp->pAction );
-      hb_itemArrayPut( pKeyElements, 2, pTmp );
+      hb_arraySet( pKeyElements, 2, pTmp );
       hb_itemRelease( pTmp );
 
       if( sk_list_tmp->pIsActive )
       {
          pTmp = hb_itemNew( sk_list_tmp->pIsActive );
-         hb_itemArrayPut( pKeyElements, 3, pTmp );
+         hb_arraySet( pKeyElements, 3, pTmp );
          hb_itemRelease( pTmp );
       }
 
-      hb_itemArrayPut( pKeys, nitem, pKeyElements );
+      hb_arraySet( pKeys, nitem, pKeyElements );
       hb_itemRelease( pKeyElements );
    }
 

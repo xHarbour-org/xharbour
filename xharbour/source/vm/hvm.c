@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.4 2001/12/30 03:30:04 ronpinkas Exp $
+ * $Id: hvm.c,v 1.5 2002/01/02 04:40:08 ronpinkas Exp $
  */
 
 /*
@@ -1608,29 +1608,44 @@ static void hb_vmPlus( void )
    }
    else if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
+      HB_TRACE( HB_TR_DEBUG, ( "***hb_vmPlus() (%u)\"%p\" + (%u)\"%p\"", pItem1->item.asString.length, pItem1->item.asString.value, pItem2->item.asString.length, pItem2->item.asString.value ) );
+
       if( ( double ) ( ( double ) pItem1->item.asString.length + ( double ) pItem2->item.asString.length ) < ( double ) ULONG_MAX )
       {
          if( pItem1->bShadow )
          {
+            char *pTmp = pItem1->item.asString.value;
+
             pItem1->item.asString.value = ( char * ) hb_xgrab( pItem1->item.asString.length + pItem2->item.asString.length + 1 );
             pItem1->bShadow = FALSE;
+            hb_xmemcpy( pItem1->item.asString.value, pTmp, pItem1->item.asString.length );
+            HB_TRACE( HB_TR_DEBUG, ( "SHADOW hb_vmPlus() \"%s\"", pItem1->item.asString.value ) );
          }
          else
          {
             pItem1->item.asString.value = ( char * ) hb_xrealloc( pItem1->item.asString.value, pItem1->item.asString.length + pItem2->item.asString.length + 1 );
+            HB_TRACE( HB_TR_DEBUG, ( "RESIZED hb_vmPlus() \"%s\"", pItem1->item.asString.value ) );
          }
+
+         HB_TRACE( HB_TR_DEBUG, ( "(%u)\"%p\" + (%u)\"%p\"", pItem1->item.asString.length, pItem1->item.asString.value, pItem2->item.asString.length, pItem2->item.asString.value ) );
 
          hb_xmemcpy( pItem1->item.asString.value + pItem1->item.asString.length, pItem2->item.asString.value, pItem2->item.asString.length );
          pItem1->item.asString.length += pItem2->item.asString.length;
          pItem1->item.asString.value[ pItem1->item.asString.length ] = '\0';
 
-         if( pItem2->item.asString.value && ! ( pItem2->bShadow ) )
+         HB_TRACE( HB_TR_DEBUG, ( "!!! hb_vmPlus() %u \"%s\"", pItem1->item.asString.length, pItem1->item.asString.value ) );
+
+         if( pItem2->item.asString.value && ( ! pItem2->bShadow ) )
          {
             hb_xfree( pItem2->item.asString.value );
             pItem2->item.asString.value = NULL;
+            pItem2->type = HB_IT_NIL;
+            HB_TRACE( HB_TR_DEBUG, ( "RELEASED SHADOW hb_vmPlus() \"%p\"", pItem2 ) );
          }
 
          hb_stackPop();
+
+         HB_TRACE( HB_TR_DEBUG, ( "--- hb_vmPlus() \"%s\" \"%s\"", pItem1->item.asString.value, hb_stackItemFromTop(-1)->item.asString.value ) );
       }
       else
       {
@@ -1708,8 +1723,11 @@ static void hb_vmMinus( void )
 
          if( pItem1->bShadow )
          {
+            char *pTmp = pItem1->item.asString.value;
+
             pItem1->item.asString.value = ( char * ) hb_xgrab( pItem1->item.asString.length + pItem2->item.asString.length + 1 );
             pItem1->bShadow = FALSE;
+            hb_xmemcpy( pItem1->item.asString.value, pTmp, pItem1->item.asString.length );
          }
          else
          {
@@ -2626,7 +2644,7 @@ static void hb_vmArrayPop( void )
    PHB_ITEM pArray;
    ULONG ulIndex;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayPut()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayPop()"));
 
    pValue = hb_stackItemFromTop( -3 );
    pArray = hb_stackItemFromTop( -2 );
@@ -3533,7 +3551,17 @@ static void hb_vmRetValue( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRetValue()"));
 
    hb_stackDec();                               /* make the last item visible */
-   hb_itemForwardValue( &hb_stack.Return, hb_stackTopItem() ); /* copy it */
+
+   if( hb_stackTopItem()->bShadow )
+   {
+      /* Must create true copy because underlaying value might be released on function termination. */
+      hb_itemCopy( &hb_stack.Return, hb_stackTopItem() );
+   }
+   else
+   {
+      hb_itemForwardValue( &hb_stack.Return, hb_stackTopItem() );
+   }
+
    hb_itemClear( hb_stackTopItem() );               /* now clear it */
 }
 
@@ -3743,13 +3771,14 @@ void hb_vmPushString( char * szText, ULONG length )
 {
    char * szTemp;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushString(%s, %lu)", szText, length));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_vmPushString( \"%s\", %lu )", szText, length ) );
 
    szTemp = ( char * ) hb_xgrab( length + 1 );
    hb_xmemcpy( szTemp, szText, length );
    szTemp[ length ] = '\0';
 
    ( hb_stackTopItem() )->type = HB_IT_STRING;
+   ( hb_stackTopItem() )->bShadow = FALSE;
    ( hb_stackTopItem() )->item.asString.length = length;
    ( hb_stackTopItem() )->item.asString.value = szTemp;
 
@@ -3782,6 +3811,7 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushBlock(%p, %p)", pCode, pSymbols));
 
    ( hb_stackTopItem() )->type = HB_IT_BLOCK;
+   ( hb_stackTopItem() )->bShadow = FALSE;
 
    uiLocals = pCode[ 5 ] + ( pCode[ 6 ] * 256 );
    ( hb_stackTopItem() )->item.asBlock.value =

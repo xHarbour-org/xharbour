@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.36 2001/12/15 22:06:51 vszakats Exp $
+ * $Id: memvars.c,v 1.1.1.1 2001/12/21 10:40:56 ronpinkas Exp $
  */
 
 /*
@@ -1154,7 +1154,7 @@ HB_FUNC( __MVEXIST )
    HB_ITEM_PTR pName = hb_param( 1, HB_IT_STRING );
    PHB_DYNS pDyn = NULL;
 
-   hb_retl( pName && ( pDyn = hb_memvarFindSymbol( pName ) ) && pDyn->hMemvar );
+   hb_retl( pName && ( ( pDyn = hb_memvarFindSymbol( pName ) ) != NULL ) && pDyn->hMemvar );
 }
 
 HB_FUNC( __MVGET )

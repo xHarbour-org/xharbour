@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.4 2001/12/30 03:30:04 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.5 2002/01/02 04:40:08 ronpinkas Exp $
  */
 
 /*
@@ -57,7 +57,6 @@
  * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
  *    hb_itemPCount()
  *    hb_itemParamPtr()
- *    hb_itemReturnPtr()
  *    hb_itemPutDL()
  *    hb_itemPutNI()
  *    hb_itemGetDL()
@@ -171,16 +170,6 @@ PHB_ITEM hb_itemArrayGet( PHB_ITEM pArray, ULONG ulIndex )
       hb_arrayGet( pArray, ulIndex, pItem );
 
    return pItem;
-}
-
-PHB_ITEM hb_itemArrayPut( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemArrayPut(%p, %lu, %p)", pArray, ulIndex, pItem));
-
-   if( pArray )
-      hb_arraySet( pArray, ulIndex, pItem );
-
-   return pArray;
 }
 
 PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
@@ -472,20 +461,13 @@ PHB_ITEM hb_itemReturn( PHB_ITEM pItem )
 
    if( pItem )
    {
-      hb_itemForwardValue( &hb_stack.Return, pItem );
+      hb_itemCopy( &hb_stack.Return, pItem );
    }
 
    return pItem;
 }
 
 /* Internal Item API. Use this with care. */
-
-PHB_ITEM hb_itemReturnPtr( void )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_itemReturnPtr()"));
-
-   return &hb_stack.Return;
-}
 
 PHB_ITEM hb_itemPutDS( PHB_ITEM pItem, char * szDate )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: strzero.c,v 1.1.1.1 2001/12/21 10:42:06 ronpinkas Exp $
+ * $Id: strzero.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 #include "hbapierr.h"
 
 HB_FUNC( STRZERO )

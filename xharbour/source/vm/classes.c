@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.1.1.1 2001/12/21 10:40:52 ronpinkas Exp $
+ * $Id: classes.c,v 1.2 2001/12/22 06:36:17 ronpinkas Exp $
  */
 
 /*
@@ -1981,7 +1981,7 @@ HB_FUNC( __CLASSSEL )
          {
             PHB_ITEM pItem = hb_itemPutC( NULL, pMessage->pSymbol->szName );
                                                 /* Add to array             */
-            hb_itemArrayPut( pReturn, ++uiPos, pItem );
+            hb_arraySet( pReturn, ++uiPos, pItem );
             hb_itemRelease( pItem );
          }
       }
@@ -2209,7 +2209,7 @@ static HARBOUR hb___msgClsSel( void )
 
                PHB_ITEM pItem = hb_itemPutC( NULL, pMessage->pSymbol->szName );
                                                 /* Add to array             */
-               hb_itemArrayPut( pReturn, ++uiPos, pItem );
+               hb_arraySet( pReturn, ++uiPos, pItem );
                hb_itemRelease( pItem );
              }
          }
@@ -2293,7 +2293,7 @@ static HARBOUR hb___msgSuper( void )
    PHB_ITEM pCopy = hb_itemArrayNew(1);
 
    /* Now save the Self object as the 1st elem. */
-   hb_itemArrayPut( pCopy, 1 , pObject );
+   hb_arraySet( pCopy, 1 , pObject );
 
    /* Or Store original object as 1st elem */
    /* hb_itemCopy( pCopy->item.asArray.value->pItems , pObject) ; */
@@ -2443,7 +2443,7 @@ HB_FUNC( __CLS_PARAM )
       for( n = 1; n <= uiParam; n++ )
       {
          PHB_ITEM iTmp = hb_itemParam( n );
-         hb_itemArrayPut( array, n, iTmp );
+         hb_arraySet( array, n, iTmp );
          hb_itemRelease( iTmp );
       }
    }
@@ -2451,7 +2451,7 @@ HB_FUNC( __CLS_PARAM )
    {
       PHB_ITEM iTmp = hb_itemPutC( NULL, (char *) "HBObject" );
       array = hb_itemArrayNew( 1 );
-      hb_itemArrayPut( array, 1, iTmp );
+      hb_arraySet( array, 1, iTmp );
       hb_itemRelease( iTmp );
    }
 
@@ -2470,7 +2470,7 @@ HB_FUNC( __CLS_PAR00 )
    for( n = 1; n <= uiParam; n++ )
     {
          PHB_ITEM iTmp = hb_itemParam( n );
-         hb_itemArrayPut( array, n, iTmp );
+         hb_arraySet( array, n, iTmp );
          hb_itemRelease( iTmp );
     }
 

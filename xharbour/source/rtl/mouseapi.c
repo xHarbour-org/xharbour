@@ -1,5 +1,5 @@
 /*
- * $Id: mouseapi.c,v 1.1.1.1 2001/12/21 10:41:52 ronpinkas Exp $
+ * $Id: mouseapi.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -63,6 +63,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 #include "hbapigt.h"
 
 static BOOL   s_bVisible = FALSE;

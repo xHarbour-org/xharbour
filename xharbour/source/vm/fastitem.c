@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.2 2001/12/30 03:30:04 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.3 2002/01/02 04:40:08 ronpinkas Exp $
  */
 
 /*
@@ -106,6 +106,13 @@ void hb_itemShareValue( PHB_ITEM pDest, PHB_ITEM pSource )
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
 {
    HB_TRACE( HB_TR_DEBUG, ("hb_itemForwardValue(%p, %p)", pDest, pSource ) );
+
+   /* Source is already a shadow. */
+   if( pSource->bShadow )
+   {
+      hb_itemCopy( pDest, pSource );
+      return;
+   }
 
    if( pDest->type )
    {

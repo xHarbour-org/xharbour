@@ -1,5 +1,5 @@
 /*
- * $Id: padl.c,v 1.1.1.1 2001/12/21 10:41:55 ronpinkas Exp $
+ * $Id: padl.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 #include "hbapierr.h"
 
 /* left-pads a date, number, or string with spaces or supplied character */

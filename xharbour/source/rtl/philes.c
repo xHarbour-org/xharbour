@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.2 2001/12/21 22:00:49 ronpinkas Exp $
+ * $Id: philes.c,v 1.3 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
 #include <ctype.h>
 
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbapifs.h"
 #include "hbapierr.h"
 #include "hbset.h"

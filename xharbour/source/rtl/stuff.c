@@ -1,5 +1,5 @@
 /*
- * $Id: stuff.c,v 1.1.1.1 2001/12/21 10:42:06 ronpinkas Exp $
+ * $Id: stuff.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include "hbapi.h"
+#include "hbfast.h"
 
 /* replaces characters in a string */
 HB_FUNC( STUFF )

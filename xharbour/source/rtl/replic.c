@@ -1,5 +1,5 @@
 /*
- * $Id: replic.c,v 1.1.1.1 2001/12/21 10:42:01 ronpinkas Exp $
+ * $Id: replic.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 #include "hbapierr.h"
 
 /* returns n copies of given string */

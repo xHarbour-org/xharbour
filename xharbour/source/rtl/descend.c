@@ -1,5 +1,5 @@
 /*
- * $Id: descend.c,v 1.1.1.1 2001/12/21 10:41:27 ronpinkas Exp $
+ * $Id: descend.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 
 void hb_strDescend( char * szStringTo, const char * szStringFrom, ULONG ulLen )
 {
