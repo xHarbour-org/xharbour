@@ -10,7 +10,7 @@
 # Global paths
 #
 HBR_DIR=..\..
-BCC_DIR=e:\bcc55
+#BCC_DIR=c:\bcc55   # now look at the BCC_DIR env var
 WG_DIR=.
 #WH_DIR=..\what32
 WH_DIR=.

@@ -43,7 +43,7 @@ RETURN aColor
 
 METHOD Create() CLASS TColorDatabase
    IF  ::aColorTable == NIL
-#ifndef (_MSC_VER)
+#ifndef _MSC_VER
        ::aColorTable := ;
        { ;
            {"AQUAMARINE",112, 219, 147}, ;
@@ -210,5 +210,6 @@ METHOD Create() CLASS TColorDatabase
 {"MED FOREST GREEN",107,142,35},;
 {"LIGHT MAGENTA",255,0,255},;
 {"MED GREY",100,100,100}}
+#endif
    ENDIF
 RETURN Self
