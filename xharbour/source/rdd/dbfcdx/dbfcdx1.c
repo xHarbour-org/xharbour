@@ -3571,8 +3571,8 @@ static int hb_cdxSortSwapBuildIndex( LPSORTINFO pSort )
       {
          if ( pKeyPrevVal ) {
             if ( nKeyPrevLen == nKeyLen ) {
-               if (! hb_cdxKeyValCompare( pSort->CurTag, pKeyPrevVal, nKeyPrevLen,
-                     pKeyVal, nKeyLen, NULL, TRUE ) )
+               if (! hb_cdxKeyValCompare( pSort->CurTag, (char *) pKeyPrevVal, nKeyPrevLen,
+                     (char *) pKeyVal, nKeyLen, NULL, TRUE ) )
                {
                   continue;
                }
@@ -6879,7 +6879,15 @@ ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrderInf
             {
                LPCDXKEYINFO pKey;
                hb_cdxIndexLockWrite ( pTag->pIndex, pTag );
-               pKey = hb_cdxEvalKey( pArea, pTag );
+               if ( pOrderInfo->itmNewVal && !HB_IS_NIL( pOrderInfo->itmNewVal ) )
+               {
+                  pKey = hb_cdxKeyPutItem( NULL, pOrderInfo->itmNewVal );
+                  pKey->Tag = pArea->ulRecNo;
+               }
+               else
+               {
+                  pKey = hb_cdxEvalKey( pArea, pTag );
+               }
                hb_cdxTagKeyAdd( pTag, pKey );
                pTag->RootPage->Changed = TRUE;
                      /* if( uiTag == pArea->lpIndexes->uiTag) */
@@ -6907,7 +6915,15 @@ ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrderInf
             {
                LPCDXKEYINFO pKey;
                hb_cdxIndexLockWrite ( pTag->pIndex, pTag );
-               pKey = hb_cdxEvalKey( pArea, pTag );
+               if ( pOrderInfo->itmNewVal && !HB_IS_NIL( pOrderInfo->itmNewVal ) )
+               {
+                  pKey = hb_cdxKeyPutItem( NULL, pOrderInfo->itmNewVal );
+                  pKey->Tag = pArea->ulRecNo;
+               }
+               else
+               {
+                  pKey = hb_cdxEvalKey( pArea, pTag );
+               }
                if( hb_cdxTagKeyFind( pTag, pKey ) > 0 )
                {
                   hb_cdxPageDeleteKey( pTag->RootPage );
