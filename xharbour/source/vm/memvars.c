@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.70 2004/03/31 09:25:52 andijahja Exp $
+ * $Id: memvars.c,v 1.71 2004/04/03 01:51:03 ronpinkas Exp $
  */
 
 /*
@@ -188,10 +188,7 @@ void hb_memvarsRelease( void )
    {
       while( --ulCnt )
       {
-         /*
-          * 2003-Sep-10 Ron Pinkas - Ok to process all, including detached variables.
-         if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
-          */
+         if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
          {
             if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
             {
@@ -247,10 +244,7 @@ void hb_memvarsRelease( HB_STACK *pStack )
    {
       while( --ulCnt )
       {
-         /*
-          * 2003-Sep-10 Ron Pinkas - Ok to process all, including detached variables.
-         if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
-          */
+         if( pStack->globalTable[ ulCnt ].counter && pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
          {
             if( HB_IS_COMPLEX( &pStack->globalTable[ ulCnt ].item ) )
             {
@@ -427,7 +421,7 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
    }
    else
    {
-      pValue->hPrevMemvar = ( HB_HANDLE )-1;    /* detached variable */
+      pValue->hPrevMemvar = ( HB_HANDLE ) -1;    /* detached variable */
    }
 
    HB_TRACE(HB_TR_INFO, ("hb_memvarValueNew: memvar item created with handle %i", hValue));
@@ -640,7 +634,7 @@ void hb_memvarValueDecRefMT( HB_HANDLE hValue, HB_STACK *pStack )
 
    pValue = pStack->globalTable + hValue;
 
-   HB_TRACE(HB_TR_INFO, ("Memvar item (%i) decrement refCounter=%li", hValue, pValue->counter-1));
+   HB_TRACE(HB_TR_INFO, ("Memvar item (%i) decrement refCounter=%li", hValue, pValue->counter - 1 ));
 
    if( pValue->counter > 0 )
    {
@@ -685,7 +679,7 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
 
    pValue = s_globalTable + hValue;
 
-   HB_TRACE(HB_TR_INFO, ("Memvar item (%i) decrement refCounter=%li", hValue, pValue->counter-1));
+   HB_TRACE(HB_TR_INFO, ("Memvar item (%i) decrement refCounter=%li", hValue, pValue->counter - 1));
 
    /* Notice that Counter can be equal to 0.
    * This can happen if for example PUBLIC variable holds a codeblock
@@ -2264,7 +2258,7 @@ void hb_memvarsIsMemvarRef( void )
          /* do not check detached variables - for these variables only
           * references from the eval stack are meaningfull for the GC
          */
-         if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
+         if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
          {
             hb_gcItemRef( &s_globalTable[ ulCnt ].item );
          }

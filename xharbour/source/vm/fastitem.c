@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.64 2004/04/02 17:54:40 lf_sfnet Exp $
+ * $Id: fastitem.c,v 1.65 2004/04/03 01:51:03 ronpinkas Exp $
  */
 
 /*
@@ -153,7 +153,7 @@ void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
       {
          if( pItem->item.asString.value == NULL )
          {
-            hb_errInternal( HB_EI_ITEMBADSTRING, NULL, "Invalid String value detected in hb_itemReleaseString()", NULL );
+            hb_errInternal( HB_EI_ITEMBADSTRING, "Invalid String value detected in hb_itemReleaseString()", NULL, NULL );
          }
 
          HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.puiHolders ) );
@@ -194,7 +194,7 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
          #ifdef HB_ARRAY_USE_COUNTER
            if( pItem->item.asArray.value->uiHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
            {
-              hb_errInternal( HB_EI_PREMATURE_RELEASE, NULL, "Premature Array/Object Release detected", NULL );
+              hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
            }
 
            if( --( pItem->item.asArray.value->uiHolders ) == 0 )
@@ -274,7 +274,7 @@ void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
          #ifdef HB_ARRAY_USE_COUNTER
            if( pItem->item.asArray.value->uiHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
            {
-            hb_errInternal( HB_EI_PREMATURE_RELEASE, NULL, "Premature Array/Object Release detected", NULL );
+              hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
            }
 
            if( --( pItem->item.asArray.value->uiHolders ) == 0 )
@@ -307,7 +307,7 @@ void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
             #ifdef HB_ARRAY_USE_COUNTER
                if( pItem->item.asRefer.BasePtr.pBaseArray->uiHolders == HB_ARRAY_COUNTER_DEFAULT_HOLDERS - 1 )
                {
-                  hb_errInternal( HB_EI_PREMATURE_RELEASE, NULL, "Premature Array/Object Release detected", NULL );
+                  hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Array/Object Release detected", NULL, NULL );
                }
 
                if( --( pItem->item.asRefer.BasePtr.pBaseArray->uiHolders ) == 0 )
