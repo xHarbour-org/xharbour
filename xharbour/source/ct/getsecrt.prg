@@ -1,11 +1,11 @@
 /*
- * $Id: blank.prg,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: getsecrt.prg,v 1.1 2004/10/12 12:28:59 lculik Exp $
  */
 
 /*
  * Harbour Project source code:
  *   CT3 GetSecret function
- *   Generic Password reader  
+ *   Generic Password reader
  *
  * Copyright 2004 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
  *
@@ -122,16 +122,15 @@ FUNCTION GetSecret( cDef,nrow,ncol,lSay,lPrompt)
    Local GetList := {}
    Local cColor := Setcolor()
    Local cVar   := Space( Len( cDef ) )
-   DEFAULT nRow to Row(), nCol to Col, lSay To .F.
+   DEFAULT nRow to Row(), nCol to Col(), lSay To .F.
 
    IF lPrompt <> Nil
       @ nRow,nCol Say lPrompt Get cVar PASSWORD
    ELSE
-      @ nRow,Col Get cVar PASSWORD
+      @ nRow,nCol Get cVar PASSWORD
    ENDIF
 
    READ
    SetPos(OldRow,OldCol)
 
 RETURN cVar
-
