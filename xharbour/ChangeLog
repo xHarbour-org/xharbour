@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.770 2003/02/24 05:55:53 jonnymind Exp $
+ * $Id: ChangeLog,v 1.771 2003/02/24 06:32:51 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-02-24 13:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * contrib/htmllib/ofile.prg
+  * contrib/htmllib/ohtm.prg
+  * contrib/htmllib/jlist.prg
+  * contrib/htmllib/oini.prg
+    ! Fix compilation errors
 
 2003-02-24 07:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/estack.c
