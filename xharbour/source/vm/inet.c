@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.46 2004/04/28 18:31:26 druzus Exp $
+* $Id: inet.c,v 1.47 2004/05/02 21:48:53 druzus Exp $
 */
 
 /*
@@ -738,8 +738,7 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || pBuffer == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, szFuncName, 2,
-         hb_paramError(1), hb_paramError(2) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, szFuncName, 2, hb_paramError(1), hb_paramError(2) );
       return;
    }
 
@@ -765,20 +764,22 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
 
    do
    {
-      if ( iMode == 1 )
+      if( iMode == 1 )
       {
-         iBufferLen = HB_SENDRECV_BUFFER_SIZE > iMaxLen-iReceived ?
-               iMaxLen-iReceived : HB_SENDRECV_BUFFER_SIZE;
+         iBufferLen = HB_SENDRECV_BUFFER_SIZE > iMaxLen - iReceived ? iMaxLen - iReceived : HB_SENDRECV_BUFFER_SIZE;
       }
-      else {
+      else
+      {
          iBufferLen = iMaxLen;
       }
 
       HB_STACK_UNLOCK;
       HB_TEST_CANCEL_ENABLE_ASYN;
+
       if( hb_selectReadSocket( Socket ) )
       {
          iLen = recv( Socket->com, Buffer + iReceived, iBufferLen, MSG_NOSIGNAL );
+
          HB_DISABLE_ASYN_CANC;
          HB_STACK_LOCK;
 
@@ -799,15 +800,16 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
          // timed out; let's see if we have to run a cb routine
          HB_DISABLE_ASYN_CANC;
          HB_STACK_LOCK;
+
          iTimeElapsed += Socket->timeout;
 
          /* if we have a caPeriodic, timeLimit is our REAL timeout */
          if ( Socket->caPeriodic != NULL )
          {
             hb_execFromArray( Socket->caPeriodic );
+
             // do we continue?
-            if ( ! hb_itemGetL( &HB_VM_STACK.Return ) ||
-               (Socket->timelimit != -1 && iTimeElapsed >= Socket->timelimit ) )
+            if ( ! hb_itemGetL( &HB_VM_STACK.Return ) || (Socket->timelimit != -1 && iTimeElapsed >= Socket->timelimit ) )
             {
                HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
                hb_retni( iReceived );
@@ -829,22 +831,22 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
 
    Socket->count = iReceived;
 
-   if ( iLen == 0 )
+   if( iLen == 0 )
    {
       HB_SOCKET_SET_ERROR2( Socket, -2, "Connection closed" );
       hb_retni( iLen );
    }
-   if ( iLen < 0 )
+   else if( iLen < 0 )
    {
       HB_SOCKET_SET_ERROR( Socket );
       hb_retni( iLen );
    }
    else
    {
+      //TraceLog( NULL, "Received: %i Len: %i\n", iReceived, iBufferLen );
       hb_retni( iReceived );
    }
 }
-
 
 HB_FUNC( INETRECV )
 {
@@ -1308,8 +1310,7 @@ static void s_inetSendInternal( char *szFuncName, int iMode )
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || pBuffer == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, szFuncName, 3,
-         hb_paramError(1), hb_paramError(2), hb_paramError(3) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, szFuncName, 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
    }
 
@@ -1336,8 +1337,7 @@ static void s_inetSendInternal( char *szFuncName, int iMode )
    {
       if ( iMode == 1 )
       {
-         iBufferLen = HB_SENDRECV_BUFFER_SIZE > iSend - iSent ?
-               iSend - iSent : HB_SENDRECV_BUFFER_SIZE;
+         iBufferLen = HB_SENDRECV_BUFFER_SIZE > iSend - iSent ? iSend - iSent : HB_SENDRECV_BUFFER_SIZE;
       }
       else
       {
@@ -1369,6 +1369,7 @@ static void s_inetSendInternal( char *szFuncName, int iMode )
          break;
       }
    }
+
    HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
 
@@ -1376,6 +1377,7 @@ static void s_inetSendInternal( char *szFuncName, int iMode )
 
    if ( iLen > 0 )
    {
+      //TraceLog( NULL, "Sent: %i\n", iSent );
       hb_retni( iSent );
    }
    else

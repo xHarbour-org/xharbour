@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2934 2004/05/13 10:40:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.2934 2004/05/13 13:51:14 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-14 00:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/stream.prg
+    * Minor fixes.
+  * source/vm/inet.c
+    * Minor formatting, and added 2 commented TraceLog()
 
 2004-05-13 10:40 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
   * source/rtl/memoedit.prg
@@ -18,7 +24,7 @@
     * Just formatting to make it readabale and graspable. No code change as
       Eduardo is working on it.
 
-    /* Eduardo, please note that a debugged code is always better but a 
+    /* Eduardo, please note that a debugged code is always better but a
        manageable code is much-much better. */
 
 2004-05-12 23:05 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>

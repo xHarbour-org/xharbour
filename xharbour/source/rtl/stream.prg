@@ -78,7 +78,7 @@ CLASS TStreamFileReader FROM TStream
 
    METHOD New( cFile ) CONSTRUCTOR
 
-   METHOD Close() INLINE IIF( ::Handle >= 0, FClose( ::Handle ), ), ::Handle := 0
+   METHOD Close() INLINE IIF( ::Handle > 0, FClose( ::Handle ), ), ::Handle := -2
    METHOD Seek( nOffset Origin ) INLINE FSeek( ::Handle, nOffset, Origin )
 
    METHOD Read( sBuffer, nOffset, nCount )
@@ -95,8 +95,8 @@ METHOD New( cFile, nMode ) CLASS TStreamFileReader
    ::cFile := cFile
 
    ::Handle := FOpen( cFile, nMode )
-   IF ::Handle == -1
-      Throw( ErrorNew( "Stream", 1004, ProcName(), "Open Error.", HB_aParams() ) )
+   IF ::Handle <= 0
+      Throw( ErrorNew( "Stream", 1004, ProcName(), "Open Error: " + Str( FError() ), HB_aParams() ) )
    ENDIF
 
    ::nPosition := 0
@@ -142,7 +142,7 @@ CLASS TStreamFileWriter FROM TStream
 
    METHOD New( cFile ) CONSTRUCTOR
 
-   METHOD Close() INLINE FClose( ::Handle )
+   METHOD Close() INLINE IIF( ::Handle > 0, FClose( ::Handle ), ), ::Handle := -2
    METHOD Seek( nOffset Origin ) INLINE ::nPosition := FSeek( ::Handle, nOffset, Origin )
 
    METHOD Write( sBuffer, nOffset, nCount )
@@ -164,16 +164,16 @@ METHOD New( cFile, nMode ) CLASS TStreamFileWriter
 
    IF File( cFile )
       ::Handle := FOpen( cFile, nMode )
-      IF ::Handle == -1
-         Throw( ErrorNew( "Stream", 1004, ProcName(), "Open Error.", HB_aParams() ) )
+      IF ::Handle <= 0
+         Throw( ErrorNew( "Stream", 1004, ProcName(), "Open Error: " + Str( FError() ), HB_aParams() ) )
       ENDIF
 
       ::nLength := FSeek( ::Handle, 0, FS_END )
       ::nPosition := ::nLength
    ELSE
       ::Handle := FCreate( cFile, nMode )
-      IF ::Handle == -1
-         Throw( ErrorNew( "Stream", 1005, ProcName(), "Create Error.", HB_aParams() ) )
+      IF ::Handle <= 0
+         Throw( ErrorNew( "Stream", 1004, ProcName(), "Create Error: " + Str( FError() ), HB_aParams() ) )
       ENDIF
 
       ::nPosition := 0
