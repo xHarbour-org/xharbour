@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3451 2004/09/21 02:40:34 paultucker Exp $
+ * $Id: ChangeLog,v 1.3452 2004/09/21 02:52:32 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -46,7 +46,8 @@
   * source/rtl/gtwin/gtwin.c
     * Better Clipper compatibility on certain alt-key combinations.
     * Fixed quite a number of Win98 related keyboard handling issues
-    * with thanks to aardvark(Fredrick) and Milan Mehta
+    * with thanks to aardvark(Fredrick), Milan Mehta & Ant¢nio Campos
+
   * source/ct/ctnet.c
     * casts.
 
