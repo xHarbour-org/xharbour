@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id: Changelog,v 1.2 2004/01/04 12:12:54 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-04 17:40 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  * Add function PQExecParams
+    * This will be usefull on Append/Updated TPostgres Methods to avoid scaping strings
+
 2004-01-04 10:10 UTC-0300 Luiz Rafael Culik<culikr@brturbo.com>
   * All Files recommited (trash on source file( chr(13))
   *  postgres.c Xharbour sources should only include "hbapi.h" clipper

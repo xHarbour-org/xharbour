@@ -1,4 +1,8 @@
 /*
+ * Chr(36) + "Id" + Chr(36)
+ */
+
+/*
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
  *
@@ -130,6 +134,49 @@ HB_FUNC(PQEXEC)
         hb_retc("");        
 }
 
+HB_FUNC(PQEXECPARAMS)
+{
+    PGconn     *conn;    
+    PGresult   *res;
+    char       **paramvalues;
+    int        i;
+    long       n;
+
+    PHB_ITEM   qry_handle;
+    PHB_ITEM   aParam;
+    
+    if (hb_pcount() == 3)
+    {
+        aParam = hb_param(3,HB_IT_ARRAY);
+                
+        n = hb_arrayLen(aParam);
+        
+        paramvalues = (char **) hb_xgrab( sizeof( char ) * n );
+        
+        for (i=0;i < n;i++) 
+            paramvalues[i] = hb_itemGetCPtr(hb_itemArrayGet( aParam, i + 1 ));
+                        
+        conn = ( PGconn * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+        
+        res = PQexecParams(conn, hb_parc(2), n, NULL, paramvalues, NULL, NULL, 1);
+        
+        hb_xfree(paramvalues);  
+
+        if (PQresultStatus(res) != PGRES_COMMAND_OK && PQresultStatus(res) != PGRES_TUPLES_OK )
+        {
+            hb_retc(PQresultErrorMessage(res));
+            PQclear(res);
+            return;
+        }
+            
+        qry_handle = hb_itemPutPtr( NULL, ( void * ) res );        
+        hb_itemReturn(qry_handle);
+        hb_itemRelease(qry_handle); 
+    }
+    else
+        hb_retc("");        
+}
+
 HB_FUNC(PQFCOUNT)
 {
     PGresult   *res;
@@ -241,47 +288,3 @@ HB_FUNC(PQMETADATA)
         }
     }                    
 }    
-
-
-
-HB_FUNC(STRUCT) 
-{
-    int i, n;
-    char **paramvalues;
-    
-    PHB_ITEM aParam ;
-    PHB_ITEM aTemp ;
-    PHB_ITEM temp ;
-
-    if (ISARRAY( 1 ) )
-    {        
-        aParam = hb_param(1,HB_IT_ARRAY);
-        
-        n = 3;
-        
-        paramvalues = hb_xgrab( sizeof( char ) * n );
-        
-        for (i=0;i < n;i++) 
-        {
-            paramvalues[i] = hb_itemGetCPtr(hb_itemArrayGet( aParam, i + 1 ));
-        }
-        
-        aTemp = hb_itemArrayNew( 3 );
-        
-        for (i=0;i < n;i++) 
-        {
-            temp = hb_itemPutC( NULL, paramvalues[i] );            
-            hb_itemArrayPut( aTemp, i + 1, temp);
-            hb_itemRelease( temp );
-        }            
-
-        
-        hb_itemReturn(aTemp);
-
-        hb_itemRelease(temp);                   
-        hb_itemRelease(aParam);                   
-
-        hb_xfree(paramvalues);        
-    } 
-}
-
