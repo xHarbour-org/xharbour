@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.845 2003/03/16 15:03:33 jonnymind Exp $
+ * $Id: ChangeLog,v 1.846 2003/03/16 22:19:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-17 05:32 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/hbcompress.h
+  * source/rtl/hbcompress.c
+    - Removed zlib specific decl and memory management
+    ! Using now hb_xgrab() family instead of malloc/calloc 
+      (also thread safe).
+    % some code cleaning.
 
 2003-03-16 14:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * hrbdll.bc
