@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3647 2004/12/01 10:55:11 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3648 2004/12/01 15:16:10 aleytys Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,11 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-12-02 09:03 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/idle.c
+    - remove redundant functions
+       hb_idleSleepMsec()
+       hb_idleWaitNoCpu()
 
 2004-12-01 15:07 UTC +0000 Philip Chee <philip@aleytys.pc.my>
   + source/ct/getinfo.prg
     + COUNTGETS(), CURRENTGET(), GETFLDROW(), GETFLDCOL(), GETFLDVAR()
-      commented out functions from CTMISC.PRG: SAVEGETS(), RESTGETS() 
+      commented out functions from CTMISC.PRG: SAVEGETS(), RESTGETS()
       Not in makefiles yet
 
 2004-12-01 12:00 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>

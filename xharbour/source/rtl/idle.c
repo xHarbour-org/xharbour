@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.17 2004/12/01 00:51:58 peterrees Exp $
+ * $Id: idle.c,v 1.18 2004/12/01 10:55:13 lf_sfnet Exp $
  */
 
 /*
@@ -111,24 +111,6 @@ static int s_iIdleWaitNoCpu = 0;
 
 /* flag to indicate GarbageCollection should be done in idle state. */
 BOOL hb_vm_bCollectGarbage = TRUE;
-
-
-static USHORT hb_idleSleepMsec( USHORT uiMsec )
-{
-   USHORT uiWas = s_uiIdleSleepMsec;
-   HB_TRACE(HB_TR_DEBUG, ( "hb_idleSleepMsec(%d)", uiMsec));
-   s_uiIdleSleepMsec= uiMsec;
-   return( uiWas );
-}
-
-static int hb_idleWaitNoCpu( int iUseIt )
-{
-   int iWas = s_iIdleWaitNoCpu;
-   HB_TRACE(HB_TR_DEBUG, ( "hb_idleWaitNoCpu(%d)", iUseIt));
-   s_iIdleWaitNoCpu= iUseIt;
-   return( iWas );
-}
-
 
 static void hb_releaseCPU( BOOL bIndefinite )
 {
