@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.68 2003/03/16 13:01:03 jonnymind Exp $
+* $Id: thread.c,v 1.69 2003/04/04 17:21:22 paultucker Exp $
 */
 
 /*
@@ -1673,7 +1673,7 @@ void hb_threadInit( void )
 
    last_stack = NULL;
    hb_main_thread_id = HB_CURRENT_THREAD();
-   hb_ht_stack = hb_threadCreateStack( hb_main_thread_id );
+   hb_ht_stack = &hb_stack;
    hb_ht_mutex = NULL;
    s_threadStarted = 1;
 
@@ -1701,7 +1701,8 @@ void hb_threadExit( void )
    hb_threadKillAll();
    hb_threadWaitAll();
 
-   hb_threadDestroyStack( hb_ht_stack );
+   // the main stack is now destroyed by hb_stack_exit
+   //hb_threadDestroyStack( hb_ht_stack );
    hb_ht_stack = NULL;
    s_threadStarted = 0;
 
@@ -1718,7 +1719,7 @@ void hb_threadExit( void )
       HB_CRITICAL_DESTROY( hb_cancelMutex );
       HB_SHARED_DESTROY( hb_idleQueueRes );
       HB_CRITICAL_DESTROY( hb_fenceMutex );
-#else
+   #else
       pthread_key_delete( hb_pkCurrentStack );
    #endif
 

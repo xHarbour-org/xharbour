@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.971 2003/04/20 23:09:28 jonnymind Exp $
+ * $Id: ChangeLog,v 1.972 2003/04/21 01:40:27 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-21 05:04 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/estack.c
+  * source/vm/fm.c
+  * source/vm/hvm.c
+  * source/vm/thread.c
+    % Under MT, hb_stack variable has been reintroduced, and is
+      now used for the main thread stack.
 
 2003-04-21 03:35 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/hbapi.h

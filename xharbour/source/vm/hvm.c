@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.189 2003/04/01 22:29:16 iananderson Exp $
+ * $Id: hvm.c,v 1.190 2003/04/20 22:46:10 jonnymind Exp $
  */
 
 /*
@@ -392,11 +392,13 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    HB_TRACE( HB_TR_INFO, ("errInit" ) );
    hb_errInit();
-#ifndef HB_THREAD_SUPPORT
+
    /* Under mt, this is done by static initializers */
-   HB_TRACE( HB_TR_INFO, ("stackInit" ) );
-   hb_stackInit();
-#endif
+   #ifndef HB_THREAD_SUPPORT
+      HB_TRACE( HB_TR_INFO, ("stackInit" ) );
+      hb_stackInit();
+   #endif
+
    HB_TRACE( HB_TR_INFO, ("dynsymNew" ) );
    hb_dynsymNew( &hb_symEval );  /* initialize dynamic symbol for evaluating codeblocks */
    HB_TRACE( HB_TR_INFO, ("setInitialize" ) );
@@ -592,9 +594,11 @@ void HB_EXPORT hb_vmQuit( void )
    hb_memvarsFree();    /* free memory allocated for memvars table */
    //printf( "After memvarsFree\n" );
 
-#ifndef HB_THREAD_SUPPORT
-   hb_stackFree();
+#ifdef HB_THREAD_SUPPORT
+   hb_threadExit();
 #endif
+
+   hb_stackFree();
 
    //printf( "After stackFree\n" );
 
@@ -609,9 +613,6 @@ void HB_EXPORT hb_vmQuit( void )
    hb_traceExit();
    //printf( "After traceExit\n" );
 
-#ifdef HB_THREAD_SUPPORT
-   hb_threadExit();
-#endif
 
    exit( s_byErrorLevel );
 }
@@ -7004,7 +7005,6 @@ HB_FUNC( HB_EXECFROMARRAY )
 
 BOOL hb_execFromArray( PHB_ITEM pFirst )
 {
-   HB_THREAD_STUB
    PHB_ITEM pArgs = NULL, pSelf = NULL, pString;
    PHB_DYNS pExecSym = NULL;
    PHB_FUNC pFunc = NULL;

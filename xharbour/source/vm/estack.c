@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.28 2003/03/02 15:22:31 jonnymind Exp $
+ * $Id: estack.c,v 1.29 2003/03/08 02:06:47 jonnymind Exp $
  */
 
 /*
@@ -66,9 +66,7 @@
 
 /* ------------------------------- */
 
-#ifndef HB_THREAD_SUPPORT
-   HB_STACK hb_stack;
-#endif
+HB_STACK hb_stack;
 
 /* ------------------------------- */
 
@@ -105,22 +103,6 @@ void hb_stackDec( void )
    }
 }
 
-void hb_stackFree( void )
-{
-   HB_THREAD_STUB
-   LONG i;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_stackFree()"));
-
-   i = HB_VM_STACK.wItems - 1;
-
-   while( i >= 0 )
-   {
-      hb_xfree( HB_VM_STACK.pItems[ i-- ] );
-   }
-
-   hb_xfree( HB_VM_STACK.pItems );
-}
 
 void hb_stackPush( void )
 {
@@ -165,24 +147,78 @@ void hb_stackPush( void )
    ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
 }
 
+
 void hb_stackInit( void )
 {
-   /* IN MT, we are taking care of it elsewhere */
-   #ifndef HB_THREAD_SUPPORT
-      LONG i;
-      HB_TRACE(HB_TR_DEBUG, ("hb_stackInit()"));
-      // Optimized to directly accessing hb_stack instead of HB_VM_STACK
+   LONG i;
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackInit()"));
+   // Optimized to directly accessing hb_stack instead of HB_VM_STACK
+
+   /*JC1: Under threads, the stack is not present until it is created here. Notice that
+     calling xgrab is an error also WITHOUT threads, as the xgrab routine accesses
+     a variable (the stack) that cannot be initialized yet */
+   #ifdef HB_THREAD_SUPPORT
+      hb_stack.pItems = ( HB_ITEM_PTR * ) malloc( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
+   #else
       hb_stack.pItems = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
-      hb_stack.pBase  = hb_stack.pItems;
-      hb_stack.pPos   = hb_stack.pItems;     /* points to the first stack item */
-      hb_stack.wItems = STACK_INITHB_ITEMS;
+   #endif
 
-      for( i=0; i < hb_stack.wItems; ++i )
-      {
+   hb_stack.pBase  = hb_stack.pItems;
+   hb_stack.pPos   = hb_stack.pItems;     /* points to the first stack item */
+   hb_stack.wItems = STACK_INITHB_ITEMS;
+
+   for( i=0; i < hb_stack.wItems; ++i )
+   {
+      #ifdef HB_THREAD_SUPPORT
+         hb_stack.pItems[ i ] = (HB_ITEM *) malloc( sizeof( HB_ITEM ) );
+      #else
          hb_stack.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
-      }
+      #endif
+   }
 
-      ( * hb_stack.pPos )->type = HB_IT_NIL;
+   ( * hb_stack.pPos )->type = HB_IT_NIL;
+
+   // other data to be initialized under MT
+   #ifdef HB_THREAD_SUPPORT
+      hb_stack.th_id = HB_CURRENT_THREAD();
+      hb_stack.next = NULL;
+      hb_stack.pMethod = NULL;
+      hb_stack.Return.type = HB_IT_NIL;
+      hb_stack.bInUse = FALSE;
+      #ifdef HB_OS_WIN_32
+         hb_stack.th_h = NULL;
+         hb_stack.bCanceled = FALSE;
+         hb_stack.bCanCancel = FALSE;
+         /*
+         tc->iCleanCount = 0;
+         tc->pCleanUp = (HB_CLEANUP_FUNC *) malloc( sizeof( HB_CLEANUP_FUNC ) * HB_MAX_CLEANUPS );
+         tc->pCleanUpParam = (void **) malloc( sizeof( void *) * HB_MAX_CLEANUPS );
+         */
+      #endif
+   #endif
+}
+
+void hb_stackFree( void )
+{
+   LONG i;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackFree()"));
+
+   i = hb_stack.wItems - 1;
+
+   while( i >= 0 )
+   {
+      #ifdef HB_THREAD_SUPPORT
+         free( hb_stack.pItems[ i-- ] );
+      #else
+         hb_xfree( hb_stack.pItems[ i-- ] );
+      #endif
+   }
+
+   #ifdef HB_THREAD_SUPPORT
+      free( hb_stack.pItems );
+   #else
+      hb_xfree( hb_stack.pItems );
    #endif
 }
 
