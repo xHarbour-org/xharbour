@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.51 2004/01/28 04:14:30 maurifull Exp $
+# $Id: xharbour.spec,v 1.52 2004/01/30 02:06:31 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -74,6 +74,7 @@
 Summary:        Free software Clipper compatible compiler
 Summary(pl):    Darmowy kompilator kompatybilny z jЙzykiem Clipper.
 Summary(pt_BR): Um compilador Clipper compativel Gratis 
+Summary(ru):    Свободный компилятор, совместимый с языком Clipper.
 Name:           %{name}
 Version:        %{version}
 Release:        %{releasen}%{platform}
@@ -104,8 +105,13 @@ zbiory nagЁСwkowe, wirtualn╠ maszynЙ oraz dokumentacjЙ.
 
 %description -l pt_BR
 %{dname} ┌ um compilador Clipper compativel para multiplas plataformas.
-Esse pacote contem um compilador ,um pr┌-processador, arquivos de cabe┤alho
-uma maquina virtual e documenta┤фo
+Esse pacote contem um compilador, um pr┌-processador, arquivos de cabe┤alho
+uma maquina virtual e documenta┤фo.
+
+%description -l ru
+%{dname} - многоплатформенный компилятор, совместимый с языком CA-Clipper.
+Этот пакет содержит компилятор, препроцессор, файлы заголовков, виртуальную
+машину и документацию.
 
 
 ######################################################################
@@ -115,6 +121,7 @@ uma maquina virtual e documenta┤фo
 %package lib
 Summary:        Shared runtime libaries for %{dname} compiler
 Summary(pl):    Dzielone bilioteki dla kompilatora %{dname}
+Summary(ru):    Совместно используемые библиотеки для компилятора %{dname}
 Group:          Development/Languages
 Provides:       lib%{name}.so lib%{name}mt.so
 
@@ -131,7 +138,12 @@ dla programСw konsolidowanych dynamicznie.
 %description -l pt_BR lib
 %{dname} ┌ um compilador compativel com o Clipper.
 Esse pacote %{dname} provem as bibliotecas compartilhadas para programas
-linkados dinamicamente
+linkados dinamicamente.
+
+%description -l ru lib
+%{dname} - компилятор, совместимый с языком CA-Clipper.
+Этот пакет содержит совместно используемые библиотеки %{dname},
+необходимые для работы динамически скомпонованных программ.
 
 
 ######################################################################
@@ -141,6 +153,7 @@ linkados dinamicamente
 %package static
 Summary:        Static runtime libaries for %{dname} compiler
 Summary(pl):    Statyczne bilioteki dla kompilatora %{dname}
+Summary(ru):    Статические библиотеки для компилятора %{dname}
 Group:          Development/Languages
 Requires:       %{name} = %{version}
 
@@ -159,11 +172,17 @@ niezbЙdne do statycznej konsolidacji programСw.
 Esse pacote %{dname} provem as bibliotecas  de run time staticas para linkagem
 dos os programas
 
+%description -l ru static
+%{dname} - компилятор, совместимый с языком CA-Clipper.
+Этот пакет содержит статические библиотеки компилятора %{dname},
+необходимые для статической компоновки программ.
+
 
 %package contrib
 Summary:        Contrib runtime libaries for %{dname} compiler
 Summary(pl):    Bilioteki z drzewa contrib dla kompilatora %{dname}
 Summary(pt_BR): Libs contrib para %{dname}
+Summary(ru):    Библиотеки из дерева contrib для компилятора %{dname}
 Group:          Development/Languages
 Requires:       %{name} = %{version}
 
@@ -174,12 +193,16 @@ This package provides %{dname} contrib libraries for program linking.
 %description -l pl contrib
 %{dname} to kompatybilny z jЙzykiem CA-Clipper kompilator.
 Ten pakiet udostЙpnia statyczne bilioteki z drzewa contrib dla
-kompilatora %{dname}
+kompilatora %{dname}.
 
 %description -l pt_BR contrib
 %{dname} ┌ um compilador compativel com o clippe.
-Esse pacote %{dname} provem as bibliotecas  contrib para linkagem
-dos  programas
+Esse pacote %{dname} provem as bibliotecas contrib para linkagem
+dos programas.
+
+%description -l ru contrib
+%{dname} - компилятор, совместимый с языком CA-Clipper.
+Этот пакет содержит статические библиотеки %{dname} из дерева contrib.
 
 
 ######################################################################
@@ -189,6 +212,7 @@ dos  programas
 %package pp
 Summary:        Clipper/Harbour/xBase compatible Pre-Processor, DOT prompt and interpreter
 Summary(pl):    Kompatybilny z Clipper/Harbour/xBase Preprocesor i interpreter
+Summary(ru):    Совместимый с Clipper/Harbour/xBase препроцессор и интерпретатор
 Copyright:      GPL
 Group:          Development/Languages
 Requires:       %{name} = %{version}
@@ -226,6 +250,18 @@ uma da outra.
    com algumas limita┤Дes que pode executar a maioria da syntaxe do Harbour.
    Voce pode escrever seus proprios scritps em .prg ao adicionar as seus arquivos 
    .prg #!/usr/bin/pprun
+
+%description -l ru pp
+%{dname} - компилятор, совместимый с языком CA-Clipper.
+Этот пакет содержит препроцессор %{dname}, который состоит из трех тесно
+связанных частей.
+1. 100%-совместимый с Clipper препроцессор (с некоторыми расширениями).
+2. DOT Prompt, в котором можно использовать большинство конструкций Clipper.
+3. Кроме того, PP - ограниченный интерпретатор Clipper. За исключением
+   нескольких описанных ограничений, он может выполнять большинство
+   конструкций Harbour. Можно создавать собственные xBase-скрипты путем
+   добавления в начало .prg-файла строки:
+      #!/usr/bin/pprun
 
 
 ######################################################################
@@ -549,6 +585,9 @@ rm -rf $RPM_BUILD_ROOT
 ######################################################################
 
 %changelog
+* Sun Mar 07 2004 Phil Krylov <phil@newstar.rinet.ru>
+- Russian translation added.
+
 * Thu Sep 11 2003 Przemyslaw Czerpak <druzus@polbox.com>
 - automatic platform checking - now MDK and RH, please add others
 
