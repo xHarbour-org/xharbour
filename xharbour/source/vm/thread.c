@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.86 2003/07/14 19:18:47 jonnymind Exp $
+* $Id: thread.c,v 1.87 2003/07/14 23:27:57 jonnymind Exp $
 */
 
 /*
@@ -175,8 +175,8 @@ static UINT hb_threadUniqueId( void )
    {
       s_thread_unique_id = 1;
    }
-   s_thread_unique_id++;
    uiRet = s_thread_unique_id;
+   s_thread_unique_id++;
    HB_CRITICAL_UNLOCK( s_thread_unique_id_mutex );
 
    return uiRet;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1259 2003/07/17 01:52:48 andijahja Exp $
+ * $Id: ChangeLog,v 1.1260 2003/07/17 03:08:21 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-17 21:18 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/thread.c
+    ! Main thread had internal unique ID 2. Now is back to 1.
+
+  * source/rtl/hblog.prg
+    ! In case the program name is not give in log system, the
+      name is assumed to be "Unnamed program" just before the
+      open() step.
+
 2003-07-17 10:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * source/rdd/dbcmd.c
      * Modified error handling to allow retry if alias is not exist during
