@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3455 2004/09/21 03:47:46 lculik Exp $
+ * $Id: ChangeLog,v 1.3456 2004/09/21 04:06:50 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-21 06:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/strcase.c
+  * xharbour/source/common/hbstr.c
+    * moved hb_strncpy, hb_strncat, hb_strncpyUpper, hb_strncpyUpperTrim,
+      hb_strncpyTrim from RTL to COMMON lib
+      Ron, the size of destination buffer should be uiLen + 1 like
+      in all other hb_strn*() functions - I do not set it but if
+      other hb_strn*() functions use it then I want to respect it.
+      This is not direct C equivalent of strncat().
+
 2004-09-21 16:10 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rtl/gtwvt/gtwvt.c
     ! change hb_wvt_gtTranslateKey( K_BS, K_BS... to
