@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.111 2005/02/26 15:16:52 andijahja Exp $
+ * $Id: itemapi.c,v 1.112 2005/03/31 04:02:28 druzus Exp $
  */
 
 /*
@@ -473,7 +473,7 @@ BOOL HB_EXPORT hb_itemGetL( PHB_ITEM pItem )
          case  HB_IT_STRING:
             if( pItem->item.asString.length == 1 )
             {
-               return pItem->item.asString.value[0];
+               return ( BYTE ) pItem->item.asString.value[0];
             }
       }
    }
@@ -507,7 +507,7 @@ double HB_EXPORT hb_itemGetND( PHB_ITEM pItem )
          case  HB_IT_STRING:
             if( pItem->item.asString.length == 1 )
             {
-               return (double) pItem->item.asString.value[0];
+               return ( double ) ( BYTE ) pItem->item.asString.value[0];
             }
       }
    }
@@ -541,7 +541,7 @@ int HB_EXPORT hb_itemGetNI( PHB_ITEM pItem )
          case  HB_IT_STRING:
             if( pItem->item.asString.length == 1 )
             {
-               return ( int ) pItem->item.asString.value[0];
+               return ( int ) ( BYTE ) pItem->item.asString.value[0];
             }
       }
    }
@@ -579,7 +579,7 @@ LONG HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
          case  HB_IT_STRING:
             if( pItem->item.asString.length == 1 )
             {
-               return ( LONG ) pItem->item.asString.value[0];
+               return ( LONG ) ( BYTE ) pItem->item.asString.value[0];
             }
       }
    }
@@ -1527,7 +1527,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
             break;
 
          case HB_IT_STRING:
-            lNumber = pNumber->item.asString.value[0];
+            lNumber = ( BYTE ) pNumber->item.asString.value[0];
             break;
 
          default:
@@ -1862,7 +1862,7 @@ LONGLONG HB_EXPORT hb_itemGetNLL( PHB_ITEM pItem )
             return ( LONGLONG ) pItem->item.asLogical.value;
 
          case HB_IT_STRING:
-            return ( LONGLONG ) pItem->item.asString.value[0];
+            return ( LONGLONG ) ( BYTE ) pItem->item.asString.value[0];
       }
    }
 
@@ -1999,7 +1999,7 @@ HB_LONG HB_EXPORT hb_itemGetNInt( PHB_ITEM pItem )
             return ( HB_LONG ) pItem->item.asLogical.value;
 
          case HB_IT_STRING:
-            return ( HB_LONG ) pItem->item.asString.value[0];
+            return ( HB_LONG ) ( BYTE ) pItem->item.asString.value[0];
       }
    }
 

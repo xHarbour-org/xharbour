@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4011 2005/04/06 05:45:48 andijahja Exp $
+ * $Id: ChangeLog,v 1.4012 2005/04/06 13:27:49 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-06 17:45 UTC+0300 Mindaugas Kavaliauskas <dbtopas at @ at dbtopas.lt>
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/extend.c
+  * xharbour/source/vm/itemapi.c
+    * treat one character strings as UNSIGNED numbers
 
 2005-04-06 14:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/vm/hvm.c

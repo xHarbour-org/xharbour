@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.449 2005/04/06 03:57:57 mlombardo Exp $
+ * $Id: hvm.c,v 1.450 2005/04/06 13:28:17 druzus Exp $
  */
 
 /*
@@ -2717,7 +2717,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if( HB_IS_STRING( pTop ) && pTop->item.asString.length == 1 )
             {
-               HB_LONG lVal = iAdd + pTop->item.asString.value[0];
+               HB_LONG lVal = iAdd + ( BYTE ) pTop->item.asString.value[0];
                hb_itemClear( pTop );
                pTop->type = HB_IT_LONG;
                pTop->item.asLong.value  = lVal;
@@ -2800,7 +2800,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if( pTop->type & HB_IT_STRING && pTop->item.asString.length == 1 )
             {
-               hb_vmPushLogical( (LONG) ( pTop->item.asString.value[0] ) == lCase );
+               hb_vmPushLogical( (LONG) ( ( BYTE ) pTop->item.asString.value[0] ) == lCase );
             }
             else
             {
@@ -3679,7 +3679,7 @@ static void hb_vmNegate( void )
    }
    else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
    {
-      pItem->item.asInteger.value = - ( int ) pItem->item.asString.value[0];
+      pItem->item.asInteger.value = - ( int ) ( BYTE ) pItem->item.asString.value[0];
       pItem->type = HB_IT_INTEGER;
       pItem->item.asInteger.length = 10;
    }
@@ -5536,7 +5536,7 @@ static void hb_vmArrayPush( void )
 #ifndef HB_C52_STRICT
    else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
    {
-      lIndex = ( LONG ) pIndex->item.asString.value[0];
+      lIndex = ( LONG ) ( BYTE ) pIndex->item.asString.value[0];
    }
    else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) &&
             strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
@@ -5763,7 +5763,7 @@ static void hb_vmArrayPop( void )
 #ifndef HB_C52_STRICT
    else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
    {
-      lIndex = ( LONG ) pIndex->item.asString.value[0];
+      lIndex = ( LONG ) ( BYTE ) pIndex->item.asString.value[0];
    }
    else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) &&
             strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
@@ -8041,7 +8041,7 @@ static double hb_vmPopNumber( void )
          break;
 
       case HB_IT_STRING:
-         dNumber = (double) ( pItem->item.asString.value[0] );
+         dNumber = (double) ( BYTE ) ( pItem->item.asString.value[0] );
          hb_itemReleaseString( pItem );
          break;
 
@@ -8133,7 +8133,7 @@ static double hb_vmPopDouble( int * piDec )
          break;
 
       case HB_IT_STRING:
-         dNumber = (double) pItem->item.asString.value[0];
+         dNumber = (double) ( BYTE ) pItem->item.asString.value[0];
          hb_itemReleaseString( pItem );
          *piDec = 0;
          break;

@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.48 2005/03/30 21:31:14 andijahja Exp $
+ * $Id: extend.c,v 1.49 2005/03/31 04:02:25 druzus Exp $
  */
 
 /*
@@ -451,7 +451,7 @@ int  HB_EXPORT hb_parl( int iParam, ... )
       }
       else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
       {
-         return pItem->item.asString.value[0];
+         return ( BYTE ) pItem->item.asString.value[0];
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
@@ -502,7 +502,7 @@ double  HB_EXPORT hb_parnd( int iParam, ... )
       }
       else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
       {
-         return ( double ) pItem->item.asString.value[0];
+         return ( double ) ( BYTE ) pItem->item.asString.value[0];
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
@@ -553,7 +553,7 @@ int  HB_EXPORT hb_parni( int iParam, ... )
       }
       else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
       {
-         return ( int ) pItem->item.asString.value[0];
+         return ( int ) ( BYTE ) pItem->item.asString.value[0];
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
@@ -612,7 +612,7 @@ LONG  HB_EXPORT hb_parnl( int iParam, ... )
       }
       else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
       {
-         return ( LONG ) pItem->item.asString.value[0];
+         return ( LONG ) ( BYTE ) pItem->item.asString.value[0];
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
@@ -671,7 +671,7 @@ HB_LONG  HB_EXPORT hb_parnint( int iParam, ... )
       }
       else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
       {
-         return ( HB_LONG ) pItem->item.asString.value[0];
+         return ( HB_LONG ) ( BYTE ) pItem->item.asString.value[0];
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
