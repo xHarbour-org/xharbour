@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1060 2003/05/26 18:09:39 mlombardo Exp $
+ * $Id: ChangeLog,v 1.1061 2003/05/26 20:37:09 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2003-05-26 13:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/maindllp.c
-    * Upgraded to work with compile with latest xHarbour sources.
+    * Upgraded to compile with latest xHarbour sources.
 
 2003-05-26 15:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/vm/macro.c
