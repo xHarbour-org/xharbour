@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.45 2003/02/19 20:20:31 jonnymind Exp $
+* $Id: thread.c,v 1.46 2003/02/20 01:35:24 jonnymind Exp $
 */
 
 /*
@@ -10,18 +10,18 @@
 *                Ron Pinkas [Ron@RonPinkas.com]
 * www - http://www.xharbour.org
 *
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
+* this program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
-* This program is distributed in the hope that it will be useful,
+* this program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
+* MERCHANTABILITY or FITNESS for A PARTICULAR PURPOSE.  See the
+* GNU General public License for more details.
 *
-* You should have received a copy of the GNU General Public License
-* along with this software; see the file COPYING.  If not, write to
+* You should have received a copy of the GNU General public License
+* along with this software; see the file COPYING.  if not, write to
 * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
 *
@@ -30,23 +30,23 @@
 *
 * The exception is that, if you link the xHarbour libraries with other
 * files to produce an executable, this does not by itself cause the
-* resulting executable to be covered by the GNU General Public License.
+* resulting executable to be covered by the GNU General public License.
 * Your use of that executable is in no way restricted on account of
 * linking the xHarbour library code into it.
 *
-* This exception does not however invalidate any other reasons why
-* the executable file might be covered by the GNU General Public License.
+* this exception does not however invalidate any other reasons why
+* the executable file might be covered by the GNU General public License.
 *
-* This exception applies only to the code released with this xHarbour
-* explicit exception.  If you add/copy code from other sources,
-* as the General Public License permits, the above exception does
+* this exception applies only to the code released with this xHarbour
+* explicit exception.  if you add/copy code from other sources,
+* as the General public License permits, the above exception does
 * not apply to the code that you add in this way.  To avoid misleading
 * anyone as to the status of such modified files, you must delete
 * this exception notice from them.
 *
-* If you write modifications of your own for xHarbour, it is your choice
+* if you write modifications of your own for xHarbour, it is your choice
 * whether to permit this exception to apply to your modifications.
-* If you do not wish that, delete this exception notice.
+* if you do not wish that, delete this exception notice.
 *
 * hb_itemClear() and hb_itemCopy() are derivative work of original code
 * in the Harbour Project http://harbour-project.org (source/vm/itemapi.c)
@@ -78,11 +78,7 @@ HB_THREAD_CONTEXT *hb_ht_context;
 HB_CRITICAL_T hb_threadContextMutex;
 HB_THREAD_CONTEXT *last_context;
 HB_THREAD_T hb_main_thread_id;
-#ifdef HB_OS_WIN_32
-   static HB_CRITICAL_T s_winStartMutex;
-#endif
-
-
+static int s_threadStarted = 0;
 extern HB_CRITICAL_T hb_allocMutex;
 
 HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th )
@@ -176,10 +172,6 @@ void hb_threadDestroyContext( HB_THREAD_T th_id )
          hb_ht_context = p->next;
       }
 
-      // Only for secondary Stacks.
-      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-
-
       /* Free each element of the stack */
       for( i = 0; i < p->stack->wItems; ++i )
       {
@@ -207,12 +199,17 @@ void hb_threadDestroyContext( HB_THREAD_T th_id )
 
       /* Free the context */
       free( p );
+      
       HB_CRITICAL_UNLOCK( hb_allocMutex );
+      
+      s_threadStarted --;
+      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
    }
    else
    {
       char errdat[70];
+      s_threadStarted --;
       HB_CRITICAL_UNLOCK( hb_threadContextMutex );
       sprintf( errdat, "Context not found for Thread %ld",  (long) th_id );
       hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadDestroyContext", 0 );
@@ -265,9 +262,6 @@ void hb_threadInit( void )
 {
    hb_ht_context = NULL;
    HB_CRITICAL_INIT( hb_threadContextMutex );
-   #ifdef HB_OS_WIN_32
-      HB_CRITICAL_INIT( s_winStartMutex );
-   #endif
    last_context = NULL;
    hb_main_thread_id = HB_CURRENT_THREAD();
 
@@ -275,10 +269,13 @@ void hb_threadInit( void )
 
 void hb_threadExit( void )
 {
-
+   #ifdef HB_OS_WIN_32
+      HANDLE th_h;
+   #endif
+   
    HB_CRITICAL_LOCK( hb_threadContextMutex );
 
-   while( hb_ht_context )
+   while( s_threadStarted )
    {
       #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
          pthread_cancel( hb_ht_context->th_id );
@@ -293,9 +290,6 @@ void hb_threadExit( void )
 
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
    HB_CRITICAL_DESTROY( hb_threadContextMutex );
-   #ifdef HB_OS_WIN_32
-      HB_CRITICAL_DESTROY( s_winStartMutex );
-   #endif
 }
 
 #ifdef HB_OS_WIN_32
@@ -317,21 +311,15 @@ hb_create_a_thread(
    HB_THREAD_PARAM *pt = (HB_THREAD_PARAM *) Cargo;
    HB_THREAD_T tCurrent = HB_CURRENT_THREAD();
    PHB_ITEM pPointer = hb_arrayGetItemPtr( pt->pArgs, 1 );
-
+   
+   /* NO CODE HERE ! */
+  
    #ifndef HB_OS_WIN_32
-      /* under unix, we can create our context */
-      hb_threadCreateContext( tCurrent );
+       hb_threadCreateContext( tCurrent );
       /* now that the context has been created,
          it is safe to set async cancellation mode */
       pthread_setcanceltype( PTHREAD_CANCEL_ASYNCHRONOUS , NULL );
-   #else
-      /* under windows, we must wait for the caller to create our context
-      ( because he must set our handle with full rights in our context ) */
-      HB_CRITICAL_LOCK( s_winStartMutex );
-
-      HB_CRITICAL_UNLOCK( s_winStartMutex );
    #endif
-
 
    if( HB_IS_SYMBOL( pPointer ) )
    {
@@ -376,7 +364,6 @@ hb_create_a_thread(
    free( pt );
    hb_threadDestroyContext( tCurrent );
 
-
    #ifdef HB_OS_WIN_32
       return 0;
    #else
@@ -399,7 +386,7 @@ void hb_threadIsLocalRef( void )
    while( pContext )
    {
       //printf( "   Context: %p Stack: %p Items: %i\n", pContext, pContext->stack, pContext->stack->pPos - pContext->stack->pItems );
-
+    
       if( pContext->stack->Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
       {
          hb_gcItemRef( &(pContext->stack->Return) );
@@ -541,33 +528,30 @@ HB_FUNC( STARTTHREAD )
    pt->uiCount = hb_pcount();
    pt->bIsMethod = bIsMethod;
 
+
+   // We signal that we are going to start a thread
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
+   s_threadStarted ++;
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+   
 #if defined(HB_OS_WIN_32)
-   /* creates a thread, but don't start it */
-   HB_CRITICAL_LOCK( s_winStartMutex );
-   if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, 0, &th_id ) ) != NULL )
+   if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, CREATE_SUSPENDED, &th_id ) ) != NULL )
    {
+      /* Under windws, we put the handle after creation */
       HB_THREAD_CONTEXT *context = hb_threadCreateContext( th_id );
       context->th_h = th_h;
-      //ResumeThread( th_h );
-      /* Now our thread can start */
-      HB_CRITICAL_UNLOCK( s_winStartMutex );
-      hb_retnl( (long) th_id );
-   }
-   else
-   {
-      HB_CRITICAL_UNLOCK( s_winStartMutex );
-      hb_retnl( -1 );
-   }
+      ResumeThread( th_h );
+
 #else
    if( pthread_create( &th_id, NULL, hb_create_a_thread, (void * ) pt ) == 0 )
    {
+#endif
       hb_retnl( (long) th_id );
    }
    else
    {
       hb_retnl( -1 );
    }
-#endif
 }
 
 HB_FUNC( STOPTHREAD )
@@ -582,6 +566,8 @@ HB_FUNC( STOPTHREAD )
    th = (HB_THREAD_T) hb_parnl( 1 );
    pMutex = hb_param( 2, HB_IT_STRING );
 
+   /* Forbid alteration of the stack in the meanwhile */
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
 
    if( ! ISNUM( 1 ) )
    {
@@ -630,6 +616,8 @@ HB_FUNC( STOPTHREAD )
    #endif
 
    hb_threadDestroyContext( th );
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+
 }
 
 HB_FUNC( KILLTHREAD )
@@ -639,6 +627,8 @@ HB_FUNC( KILLTHREAD )
    HB_THREAD_CONTEXT *context;
 #endif
 
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
+   
    if( ! ISNUM( 1 ) )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
@@ -656,6 +646,8 @@ HB_FUNC( KILLTHREAD )
       TerminateThread( context->th_h, 0);
       CloseHandle( context->th_h );
    #endif
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+
 }
 
 HB_FUNC( CLEARTHREAD )
@@ -675,6 +667,7 @@ HB_FUNC( CLEARTHREAD )
    th = (HB_THREAD_T) hb_parnl( 1 );
 
    hb_threadDestroyContext( th );
+   
 }
 
 HB_FUNC( JOINTHREAD )
@@ -1092,7 +1085,7 @@ HB_FUNC( THREADGETCURRENT )
 
 HB_FUNC( WAITFORTHREADS )
 {
-   while( hb_ht_context )
+   while( s_threadStarted )
    {
       #if defined(HB_OS_WIN_32)
          Sleep( 1 );
@@ -1131,7 +1124,7 @@ int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec
 }
 #endif
 /*
-JC1: This should be reactivated if we want flat mutex
+JC1: this should be reactivated if we want flat mutex
 
 void hb_threadLock( HB_LWR_MUTEX *lpMutex )
 {
