@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.52 2004/03/23 19:56:30 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.53 2004/03/25 18:54:15 ronpinkas Exp $
  */
 
 /*
@@ -103,16 +103,16 @@ RETURN TOleAuto():GetActiveObject( cString )
 
    #include <ctype.h>
 
-   #include <Windows.h>
-   #include <Ole2.h>
-   #include <OleAuto.h>
+   #include <windows.h>
+   #include <ole2.h>
+   #include <oleauto.h>
 
    #ifndef __MINGW32__
       // Missing in Mingw V 2.
       //#include <OleDB.h>
    #endif
 
-   #include <ShlObj.h>
+   #include <shlobj.h>
 
    #ifdef __MINGW32__
       // Missing in oleauto.h

@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.29 2004/01/10 10:21:48 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.30 2004/03/17 02:29:01 druzus Exp $
  */
 
 /*
@@ -483,7 +483,7 @@ RETURN cArguments
 #include "hbstack.h"
 #include "thread.h"
 
-#include "Windows.h"
+#include <windows.h>
 
 static PHB_FUNC s_xHbFunc;
 

@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-03-28 20:12 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/rtl/errorsys.prg
+  * source/rtl/win32ole.prg
+    ! Changed Windows header file names to lowercase to allow
+      cross-compiling from Unix via MinGW.
+
 2004-03-28 19:30 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * tests/macro.prg
     + Added some tests for Clipper compatibility of &() and Type().
