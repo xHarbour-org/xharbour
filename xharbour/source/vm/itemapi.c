@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.14 2002/02/19 03:09:53 walito Exp $
+ * $Id: itemapi.c,v 1.15 2002/03/22 15:40:14 map Exp $
  */
 
 /*
@@ -929,6 +929,20 @@ PHB_ITEM hb_itemUnRef( PHB_ITEM pItem )
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemUnRef(%p)", pItem));
 
    while( HB_IS_BYREF( pItem ) )
+     pItem = hb_itemUnRefOnce( pItem );
+
+   return pItem;
+}
+
+
+/* Internal API, not standard Clipper */
+/* De-references item passed by the reference */
+
+PHB_ITEM hb_itemUnRefOnce( PHB_ITEM pItem )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemUnRefOnce(%p)", pItem));
+
+   if( HB_IS_BYREF( pItem ) )
    {
       if( HB_IS_MEMVAR( pItem ) )
       {
