@@ -144,18 +144,14 @@ HB_FUNC ( SENDMESSAGE )
 
 HB_FUNC ( SENDDLGITEMMESSAGE )
 {
-
-
-
   char *cText ;
 
-
-  if (ISBYREF(5)) {
-     cText = hb_strdup( hb_parc(5) ) ;
-     //cText = (char*) hb_xgrab( hb_parcsiz(5) );
-     //hb_xmemcpy( *cText, hb_parc(5), hb_parcsiz(5) );
+  if( ISBYREF(5) )
+  {
+     //cText = hb_strdup( hb_parc(5) ) ;
+     cText = (char*) hb_xgrab( hb_parcsiz(5) );
+     hb_xmemcpy( cText, hb_parc(5), hb_parcsiz(5) );
   }
-
 
    hb_retnl( (LONG) SendDlgItemMessage( (HWND) hb_parnl( 1 ) ,
                                         (int)  hb_parni( 2 ) ,
@@ -165,16 +161,11 @@ HB_FUNC ( SENDDLGITEMMESSAGE )
                                )
             );
 
-
-  if (ISBYREF( 5 ))
-   {
-      hb_storclen( cText, hb_parcsiz( 5 ), 5 ) ;
-      hb_xfree( cText );
-   }
-
-
-
-
+  if( ISBYREF( 5 ) )
+  {
+     hb_storclen( cText, hb_parcsiz( 5 ), 5 ) ;
+     hb_xfree( cText );
+  }
 
 /*
    hb_retnl( SendDlgItemMessage( (HWND) hb_parnl(1) ,     // handle of dialog box
@@ -187,7 +178,7 @@ HB_FUNC ( SENDDLGITEMMESSAGE )
 */
 
 }
- 
+
 //-----------------------------------------------------------------------------
 
 // consider passing an array instead of MSG string ( but it will be slower )
