@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3306 2004/08/14 07:57:51 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3307 2004/08/14 09:54:41 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-14 12:04 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tget.prg
+    ! Small correction to latest fix, inside ::SetFocus() I forgot to
+      explicitly set ::minus to .F. when editing a number
 
 2004-08-14 11:48 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tget.prg

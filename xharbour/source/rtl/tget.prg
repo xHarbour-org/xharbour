@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.89 2004/08/12 01:14:31 mauriliolongo Exp $
+ * $Id: tget.prg,v 1.90 2004/08/14 09:54:43 mauriliolongo Exp $
  */
 
 /*
@@ -580,6 +580,7 @@ METHOD SetFocus() CLASS Get
          ::minus := ( xVarGet < 0 )
          */
          ::lMinusPrinted := ( xVarGet < 0 )
+         ::minus := .F.
       else
          ::decpos := NIL
          ::lMinusPrinted := ::minus  := .f.
