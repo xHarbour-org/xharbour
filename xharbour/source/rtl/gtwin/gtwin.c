@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.69 2004/09/21 02:40:40 paultucker Exp $
+ * $Id: gtwin.c,v 1.70 2004/10/21 13:03:02 jonnymind Exp $
  */
 
 /*
@@ -2324,9 +2324,9 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
             return SetConsoleTitle( (LPCSTR) vpParam ) ? 1 : -1;
          }
          else {
-            return GetConsoleTitle( (LPCSTR) vpParam, iParam );
-         }   
-      }   
+            return GetConsoleTitle( (char *) vpParam, iParam );
+         }
+      }
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.129 2004/09/12 15:37:31 lf_sfnet Exp $
+ * $Id: classes.c,v 1.130 2004/09/13 06:42:58 druzus Exp $
  */
 
 /*
@@ -165,7 +165,7 @@
 #if ( defined(HB_OPT_CON) || defined(HB_OPT_GUI) ) && !defined(HB_NO_PROFILER)
    #define HB_NO_PROFILER
 #endif
- 
+
 #ifndef HB_NO_PROFILER
    extern BOOL hb_bProfiler; /* profiler activity status */
 #endif
@@ -4451,9 +4451,11 @@ HB_FUNC( __CLSGETHANDLEFROMNAME )
 
    HB_THREAD_STUB
 
-   szClass = hb_parcx(1);
+   szClass = hb_strUpperCopy( hb_parcx(1), hb_parclen(1) );
 
    uiClass = hb_clsGetHandleFromName( szClass );
+
+   hb_xfree( szClass );
 
    if( uiClass == 0 )
    {
