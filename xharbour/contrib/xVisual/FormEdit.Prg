@@ -83,6 +83,7 @@ METHOD OnSize(nFlag,Width,Height)
       ::oMask:Move(aRect[1],aRect[2],aRect[3],aRect[4],.T.)
       ::oMask:Refresh()
    ENDIF
+   ::Parent:ObjInsp:SetBrowserData( self )
 
    RETURN(NIL)
 

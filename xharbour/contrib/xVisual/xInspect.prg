@@ -4,8 +4,9 @@
 #include "what32.ch"
 #include "wintypes.ch"
 #include "cstruct.ch"
+#include "debug.ch"
 
-GLOBAL oApp
+GLOBAL EXTERNAL oApp
 
 typedef struct {;
     UINT    mask; 
@@ -21,8 +22,8 @@ typedef struct {;
 
 CLASS ObjInspect FROM TForm
    
-   VAR Browser AS OBJECT
-   
+   VAR Browser  AS OBJECT
+   VAR Objects  AS ARRAY INIT {}
    METHOD New( oParent ) INLINE ::Caption := 'Object Inspector',;
                                 ::left    := 0,;
                                 ::top     := 275,;
@@ -39,9 +40,17 @@ CLASS ObjInspect FROM TForm
                                                       ::InspTabs:Properties:ClientRect()[3]+1,;
                                                       ::InspTabs:Properties:ClientRect()[4],.t.),;
                                  nil
+   METHOD SetBrowserData()
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------
+
+METHOD SetBrowserData(oObj) CLASS ObjInspect
+   local n,c
+   ::Browser:source := ACLONE(oObj:PropList)
+   aeval(::Browser:source,{|a|a[2]:=__objSendMsg( oObj, a[1] )} )
+   ::Browser:RefreshAll()
+return(self)
 
 METHOD OnCreate() CLASS ObjInspect
   local oCol1, oCol2
@@ -64,15 +73,21 @@ METHOD OnCreate() CLASS ObjInspect
                                                  ::InspTabs:Properties:ClientRect()[4],,WS_EX_CLIENTEDGE )
   ::Browser:wantHScroll:=.F.
   oCol1:=whColumn():Init( 'Property', {|oCol,oB,n| asString(oB:source[n,1]) } ,DT_LEFT,85)
-  oCol2:=whColumn():INIT( 'Value'   , {|oCol,oB,n| asString(oB:source[n,2]) } ,DT_LEFT,80)
   oCol1:VertAlign   :=TA_CENTER
+  oCol1:fgColor:= GetSysColor(COLOR_WINDOWTEXT)
+
+  oCol2:=whColumn():INIT( 'Value'   , {|oCol,oB,n| asString(oB:source[n,2]) } ,DT_LEFT,80)
   oCol2:VertAlign   :=TA_CENTER
+  oCol2:fgColor:= GetSysColor(COLOR_WINDOWTEXT)
+
   ::Browser:addColumn(oCol1)
   ::Browser:addColumn(oCol2)
   ::Browser:HeadFont  :=GetMessageFont()
   ::Browser:Font      :=GetMessageFont()
   ::Browser:HeadHeight:=0
-  ::Browser:BgColor   := GetSysColor(COLOR_BTNFACE)
+  ::Browser:BgColor       := GetSysColor(COLOR_BTNFACE)
+  ::Browser:HiliteNoFocus := GetSysColor(COLOR_BTNFACE)
+
   ::Browser:bKillBlock:={|| DeleteObject(::Browser:Font),DeleteObject(::Browser:HeadFont)}
   ::Browser:configure()
 
@@ -82,7 +97,32 @@ return( super:OnCreate() )
 
 CLASS ComboInsp FROM TComboBox
    METHOD DrawItem()
+   METHOD OnClick()
+   METHOD AddString()
+   METHOD SetCurSel()
 ENDCLASS
+
+METHOD OnClick(nwParam,nlParam) CLASS ComboInsp
+   local oObj
+   if hiword(nwParam)==CBN_SELCHANGE
+      oObj := ::Parent:Objects[::GetCurSel()+1]
+      ::Parent:SetBrowserData( oObj )
+      if aScan(::Parent:Objects[1]:oMask:aSelected,{|a| a[1]==oObj:handle })==0
+         ::Parent:Objects[1]:oMask:OnLButtonDown(,oObj:Left,oObj:Top)
+         ::Parent:Objects[1]:oMask:mousedown:=.T.
+         ::Parent:Objects[1]:oMask:OnLButtonUp(,oObj:Left,oObj:Top)
+         ::SetFocus()
+      endif
+   endif
+return(0)
+
+METHOD AddString(cText,oObj) CLASS ComboInsp
+   aadd(::Parent:Objects,oObj)
+return(super:AddString(cText))
+
+METHOD SetCurSel(n) CLASS ComboInsp
+   ::Parent:SetBrowserData( ::Parent:Objects[n+1] )
+return(super:SetCurSel(n))
 
 METHOD DrawItem( dis ) CLASS ComboInsp
    LOCAL lselected

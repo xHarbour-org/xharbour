@@ -31,7 +31,7 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight) CLASS TComboBox
    ::id        := nId
    ::lRegister := .F.
    ::lControl  := .T.
-   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_MEASUREITEM}, ::Msgs )
+   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_MEASUREITEM,WM_COMMAND}, ::Msgs )
    ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
    ::Left      := nLeft
    ::Top       := nTop
