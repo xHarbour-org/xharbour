@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.130 2004/09/21 02:52:35 druzus Exp $
+ * $Id: dbcmd.c,v 1.131 2004/09/30 02:09:27 guerra000 Exp $
  */
 
 /*
@@ -4376,8 +4376,8 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
    memset( &pInfo, 0, sizeof(DBOPENINFO) );
    pInfo.uiArea = uiNewArea;
    pInfo.atomAlias = ( BYTE * ) "__TMPAREA";
-   pInfo.fShared = FALSE;
-   pInfo.fReadonly = FALSE;
+   pInfo.fShared = createIt ? FALSE : !hb_set.HB_SET_EXCLUSIVE;
+   pInfo.fReadonly = !createIt;
 
    strncpy( szFile, szFileName, _POSIX_PATH_MAX );
    szFile[ _POSIX_PATH_MAX ] = '\0';

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.160 2004/09/21 02:52:36 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.161 2004/09/21 04:58:02 paultucker Exp $
  */
 
 /*
@@ -87,7 +87,6 @@
 #ifndef HB_CDP_SUPPORT_OFF
    /* for nation sorting support */
    #include "hbapicdp.h"
-   extern PHB_CODEPAGE s_cdpage;
    #define hb_cdpcharcmp( c1, c2, cdpage )  \
                                        ( ( cdpage && cdpage->lSort )    ? \
                                          hb_cdpchrcmp( c1, c2, cdpage ) : \
@@ -664,7 +663,7 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
    pKey = hb_cdxKeyPut( pKey, ptr, len, ulRec );
 #ifndef HB_CDP_SUPPORT_OFF
    if ( fTrans && pTag->uiType == 'C' )
-      hb_cdpnTranslate( ( char * ) pKey->val, s_cdpage, pTag->pIndex->pArea->cdPage, pKey->len );
+      hb_cdpnTranslate( ( char * ) pKey->val, hb_cdp_page, pTag->pIndex->pArea->cdPage, pKey->len );
 #endif
    return pKey;
 }
@@ -718,9 +717,9 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag, BOOL fSetWA )
    int iCurrArea = 0;
    CDXAREAP pArea = pTag->pIndex->pArea;
 #ifndef HB_CDP_SUPPORT_OFF
-   /* TODO: this hack is not thread safe, s_cdpage has to be thread specific */
-   PHB_CODEPAGE cdpTmp = s_cdpage;
-   s_cdpage = pArea->cdPage;
+   /* TODO: this hack is not thread safe, hb_cdp_page has to be thread specific */
+   PHB_CODEPAGE cdpTmp = hb_cdp_page;
+   hb_cdp_page = pArea->cdPage;
 #endif
 
    if ( fSetWA && !pTag->nField )
@@ -758,7 +757,7 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag, BOOL fSetWA )
       hb_rddSelectWorkAreaNumber( iCurrArea );
 
 #ifndef HB_CDP_SUPPORT_OFF
-   s_cdpage = cdpTmp;
+   hb_cdp_page = cdpTmp;
 #endif
 
    return pKey;
@@ -8177,9 +8176,9 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
    BOOL bDirectRead;
    PHB_ITEM pForItem, pWhileItem, pEvalItem;
 #ifndef HB_CDP_SUPPORT_OFF
-   /* TODO: this hack is not thread safe, s_cdpage has to be thread specific */
-   PHB_CODEPAGE cdpTmp = s_cdpage;
-   s_cdpage = pArea->cdPage;
+   /* TODO: this hack is not thread safe, hb_cdp_page has to be thread specific */
+   PHB_CODEPAGE cdpTmp = hb_cdp_page;
+   hb_cdp_page = pArea->cdPage;
 #endif
 
    if ( ( pTag->OptFlags & CDX_TYPE_STRUCTURE ) || pTag->Custom )
@@ -8408,6 +8407,6 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
    }
    pTag->pIndex->pArea->ulRecNo = 0;
 #ifndef HB_CDP_SUPPORT_OFF
-   s_cdpage = cdpTmp;
+   hb_cdp_page = cdpTmp;
 #endif
 }
