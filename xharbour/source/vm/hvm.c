@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.109 2002/10/05 06:05:31 ronpinkas Exp $
+ * $Id: hvm.c,v 1.110 2002/10/05 08:57:57 ronpinkas Exp $
  */
 
 /*
@@ -890,7 +890,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_ENUMERATE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENUMERATE") );
-            hb_vmPushLogical( hb_arrayGet( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter - 1 ] ),
+            hb_vmPushLogical( hb_arrayGetByRef( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter - 1 ] ),
                                           ++hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ],
                                           hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter - 1 ] ) );
 

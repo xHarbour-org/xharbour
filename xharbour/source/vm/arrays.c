@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.21 2002/09/20 19:48:20 ronpinkas Exp $
+ * $Id: arrays.c,v 1.22 2002/09/21 05:21:07 ronpinkas Exp $
  */
 
 /*
@@ -346,6 +346,35 @@ BOOL hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       hb_itemCopy( pItem, pArray->item.asArray.value->pItems + ( ulIndex - 1 ) );
+
+      return TRUE;
+   }
+   else
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+      else
+      {
+         pItem->type = HB_IT_NIL;
+      }
+   }
+
+   return FALSE;
+}
+
+BOOL hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetByRef(%p, %lu, %p) Base: %p Items: %p", pArray, ulIndex, pItem, pArray->item.asArray.value, pArray->item.asArray.value->pItems));
+
+   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
+      pItem->type = HB_IT_BYREF;
+
+      pItem->item.asRefer.value = ulIndex - 1; // To offset the -1 below.
+      pItem->item.asRefer.offset = 0; // Because 0 will be translated as a STATIC in hb_itemUnref();
+      pItem->item.asRefer.BasePtr.itemsbase = &( pArray->item.asArray.value->pItems );
 
       return TRUE;
    }

@@ -28,11 +28,11 @@ FUNCTION Main
          :MainMenu()
          :MainToolBar()
          :MainStatusBar()
-         
+
          // add the object windows
          :Add( 'ObjTree', ObjTree():New( oApp:MainFrame ) )
          :Add( 'ObjInsp', ObjInspect():New( oApp:MainFrame ) )
-         
+
          // focus to main Frame
          :SetFocus()
       END
@@ -64,7 +64,7 @@ METHOD MainMenu() CLASS MainFrame
    With Object ::WindowMenu
       :AddPopup('&Test')
       With Object :Popup
-         :AddItem( 'Editor', 101, {||oApp:CreateForm( 'Form1', TFormEdit(),oApp:MainFrame ) } )
+         :AddItem( 'Editor', 101, {||oApp:CreateForm( 'Form1', TFormEdit(), oApp:MainFrame ) } )
          :AddSeparator()
          :AddItem( 'Exit'  , 200, {||oApp:MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
       end
@@ -94,7 +94,7 @@ METHOD MainToolBar() CLASS MainFrame
          :AddButton( "CompPPO",      ToolButton():New(11,,'Compile to PPO',                 111 ) )
          :AddButton( "View",         ToolButton():New(12,,'View',                           112 ) )
          :AddButton( "Files",        ToolButton():New(13,,'Files',                          113 ) )
-               
+
          SendMessage( :handle, TB_SETROWS, 2 )
          // ----------------------------------------------------   set imagelist
          hImg1:= ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
@@ -120,7 +120,7 @@ METHOD MainToolBar() CLASS MainFrame
       End
       :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :GetObj("Tabs"):handle, 550, 56, , "", NIL )
       :GetObj("Tabs"):Configure()
-            
+
       // sets the controls toolbar on the TabControl
       With Object :Tabs:StdTab
          With Object :Add( 'TabBand', TRebar():New( oApp:MainFrame:Rebar:Tabs:StdTab ) )
@@ -137,7 +137,7 @@ METHOD MainToolBar() CLASS MainFrame
                    oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
                    :AddButton( if(n==0,'arrow',aStdTab[n+1] ), oTool )
                next
-                     
+
                // ----------------------------------------------------   set imagelist
                hImg2:= ImageList_Create( 24, 24, ILC_COLORDDB+ILC_MASK )
                hBmp := LoadImage( hInstance(), "STDTAB", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
@@ -148,7 +148,7 @@ METHOD MainToolBar() CLASS MainFrame
             End
             :AddBand( NIL, RBBS_NOVERT, :GetObj("StdTools"):handle, 100, 30,  , "", NIL )
             :GetObj("StdTools"):DisableAll()
-                  
+
             //--------- sets a QUICK access to the control
             oApp:MainFrame:SetLink( 'StdBar', :GetObj("StdTools") )
          End
@@ -159,7 +159,7 @@ return(self)
 //----------------------------------------------------------------------------------------------
 
 METHOD MainStatusBar() CLASS MainFrame
-   ::Add('Status',  TStatusBar():New( oApp:MainFrame, 'StatusBar', 1001 ) ) 
+   ::Add('Status',  TStatusBar():New( oApp:MainFrame, 'StatusBar', 1001 ) )
    ::Status:SetPanels( { 150,380,480,580,-1 } )
    ::Status:SetPanelText( 0, "Visual xHarbour" )
 return(self)

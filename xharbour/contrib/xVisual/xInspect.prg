@@ -10,19 +10,19 @@ GLOBAL EXTERNAL oApp
 
 
 typedef struct {;
-    UINT    mask; 
-    int     cxy; 
-    LPTSTR  pszText; 
-    HBITMAP hbm; 
-    int     cchTextMax; 
-    int     fmt; 
-    LPARAM  lParam; 
+    UINT    mask;
+    int     cxy;
+    LPTSTR  pszText;
+    HBITMAP hbm;
+    int     cchTextMax;
+    int     fmt;
+    LPARAM  lParam;
     int     iImage;
     int     iOrder;
 } HDITEM, FAR * LPHDITEM
 
 CLASS ObjInspect FROM TForm
-   
+
    VAR Browser  AS OBJECT
    VAR Objects  AS ARRAY INIT {}
    VAR CurObject AS OBJECT
@@ -47,15 +47,24 @@ CLASS ObjInspect FROM TForm
 ENDCLASS
 
 //-------------------------------------------------------------------------------------------------
+METHOD SetBrowserData( oObj ) CLASS ObjInspect
 
-METHOD SetBrowserData(oObj) CLASS ObjInspect
-   local n,c
    ::CurObject := oObj
+
    ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
-   aSort( ::Browser:source,,, {|x,y| x[1] < y[1] } )
-   aEval( ::Browser:source,{|a|a[1]:=Proper( a[1] )} )
-  ::Browser:RefreshAll()
-return(self)
+
+   aSort( ::Browser:Source,,, {|x,y| x[1] < y[1] } )
+   aEval( ::Browser:Source, {|a|a[1] := Proper( a[1] )} )
+
+   ::Browser:RefreshAll()
+
+   IF oObj:ClassName == "TFORMEDIT"
+      oObj:XFMRoot()
+   ELSE
+      oObj:Parent:XFMRoot()
+   ENDIF
+
+RETURN Self
 
 METHOD OnCreate() CLASS ObjInspect
   local oCol1, oCol2
@@ -63,7 +72,7 @@ METHOD OnCreate() CLASS ObjInspect
   local aRect := ::ClientRect()
   local oCombo:= ComboInsp():New(  self, 100, 0, 0, aRect[3], 100 )
   oCombo:Style:= WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
-  
+
   ::Add( 'InspCombo', oCombo )
   ::InspCombo:SetItemHeight( -1, 15 )
 
@@ -83,7 +92,7 @@ METHOD OnCreate() CLASS ObjInspect
   oCol1:VertAlign   :=TA_CENTER
   oCol1:fgColor:= GetSysColor(COLOR_WINDOWTEXT)
   oCol1:Style  := 0
-  
+
   oCol2:=whColumn():INIT( 'Value'   , {|oCol,oB,n| asString(oB:source[n,2]) } ,DT_LEFT,81)
   oCol2:VertAlign  :=TA_CENTER
   oCol2:fgColor    := RGB(0,0,128)
@@ -117,8 +126,8 @@ METHOD SaveVar(cText) CLASS ObjInspect
       case cType == 'L'
            cText:= IIF( cText == ".T.",.T.,.F.)
    endcase
-   __objSendMsg( ::CurObject, "_"+cVar, cText ) 
-   ::Browser:source[::Browser:RecPos][2]:= cText 
+   __objSendMsg( ::CurObject, "_"+cVar, cText )
+   ::Browser:source[::Browser:RecPos][2]:= cText
    ::Browser:RefreshCurrent()
    ::CurObject:Update()
    ::CurObject:SetFocus()

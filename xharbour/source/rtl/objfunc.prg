@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.3 2002/10/05 00:32:08 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.4 2002/10/05 08:16:43 ronpinkas Exp $
  */
 
 /*
@@ -57,6 +57,7 @@
  * Copyright 2002 Ron Pinkas <ron@ronpinkas.com>
  *    __objGetMsgList
  *    __objGetValueList
+ *    __objGetValueDiff
  *   __objSetMethod
  *
  * Copyright 2000 Jf. Lefebvre <jfl@mafact.com> and Ra. Cuylen <rac@mafact.com>
@@ -155,6 +156,32 @@ FUNCTION __objGetValueList( oObject, aExcept, nScope )
       IF AScan( aExcept, { | cElement | cElement == cVar } ) == 0
          AAdd( aReturn, { cVar, __objSendMsg( oObject, cVar ) } )
       ENDIF
+   NEXT
+
+RETURN aReturn
+
+FUNCTION __ObjGetValueDiff( oBase, oObject )
+
+   LOCAL aBaseVars, aObjectVars
+   LOCAL aReturn
+   LOCAL nVar, aVar
+
+   IF ValType( oBase ) != 'O' .OR. ValType( oObject ) != 'O' .OR. oBase:ClassH != oObject:ClassH
+      __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
+   ENDIF
+
+   aBaseVars   := __objGetValueList( oBase  , NIL, HB_OO_CLSTP_EXPORTED )
+   aObjectVars := __objGetValueList( oObject, NIL, HB_OO_CLSTP_EXPORTED )
+
+   aReturn := {}
+
+   nVar := 1
+   FOR EACH aVar IN aObjectVars
+      IF nVar > Len( aBaseVars ) .OR. aVar[2] != aBaseVars[ nVar ][ 2 ]
+         AAdd( aReturn, aVar )
+      ENDIF
+
+      nVar++
    NEXT
 
 RETURN aReturn

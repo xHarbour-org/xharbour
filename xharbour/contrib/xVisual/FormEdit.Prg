@@ -10,11 +10,23 @@
 #Include "cstruct.ch"
 #include "debug.ch"
 
+#define XFM_Header   1
+#define XFM_Class    2
+#define XFM_Datas    3
+#define XFM_Events   4
+#define XFM_Controls 5
+#define XFM_EndClass 6
+#define XFM_Methods  7
+#define XFM_Footer   8
+#define XFM_Size     XFM_Footer
+
 GLOBAL EXTERNAL hThisInstance
 GLOBAL EXTERNAL oApp
 //----------------------------------------------------------------------------//
 
  CLASS TFormEdit FROM TForm
+
+   CLASSDATA nForms INIT 0
 
    DATA oMask        PROTECTED
    DATA Editing      PROTECTED
@@ -27,18 +39,20 @@ GLOBAL EXTERNAL oApp
    DATA xBmpSize     PROTECTED
    DATA yBmpSize     PROTECTED
    DATA CtrlName     PROTECTED
+   DATA aXFM         PROTECTED INIT Array( XFM_Size )
 
-   METHOD New( oParent )     INLINE ::Caption := 'TForm1', ;
-                                    ::Editing := .F.        ,;
-                                    ::aCtrl   := {}         ,;
-                                    ::left    := 200        ,;
-                                    ::top     := 125        ,;
-                                    ::width   := 600        ,;
-                                    ::height  := 400        ,;
-                                    ::xGrid   := 8          ,;
-                                    ::yGrid   := 8          ,;
-                                    ::GridColor:=RGB(0,0,0) ,;
-                                    super:New( oParent )
+   METHOD New( oParent )       INLINE ::Caption := 'TForm' + LTrim( Str( ++::nForms ) ), ;
+                                      ::Editing := .F.        ,;
+                                      ::aCtrl   := {}         ,;
+                                      ::left    := 200        ,;
+                                      ::top     := 125        ,;
+                                      ::width   := 600        ,;
+                                      ::height  := 400        ,;
+                                      ::xGrid   := 8          ,;
+                                      ::yGrid   := 8          ,;
+                                      ::GridColor:=RGB(0,0,0) ,;
+                                      super:New( oParent )    ,;
+                                      ::XFMTop()
 
    METHOD Add()
    METHOD OnCreate()         INLINE ::CreateSub()
@@ -55,9 +69,13 @@ GLOBAL EXTERNAL oApp
    METHOD SetGridSize(x,y)
    METHOD OnCloseQuery()     INLINE ::Parent:WindowMenu:Enable( 101 ),;
                                     ::Parent:StdBar:DisableAll(),;
+                                    ::XFMTrace(),;
                                     super:OnCloseQuery()
 
-   
+   METHOD XFMTop()
+   METHOD XFMRoot()
+   METHOD XFMTrace()
+
  END CLASS
 
 //----------------------------------------------------------------------------//
@@ -139,7 +157,7 @@ METHOD OnMenuCommand(oItem)
 // all controls must have default sizes !!!!!
 // please check Tab control
 
-    
+
 METHOD CreateControl(aRect)
 
    LOCAL oObj
@@ -246,10 +264,10 @@ METHOD CreateSub()
    ::SetGridSize()
 
    ::Parent:StdBar:EnableAll()
-   
+
    ::Parent:ObjInsp:InspCombo:AddString(::PropName+chr(9)+"TFORM",self)
    ::Parent:ObjInsp:InspCombo:SetCurSel(::Parent:ObjInsp:InspCombo:GetCount()-1)
-   
+
    ::Parent:ObjTree:Tree:Add( ::PropName )
 
    xRet := super:OnCreate()
@@ -286,6 +304,91 @@ METHOD TileGrid(hDC)
 
    RETURN(0)
 
+
+//----------------------------------------------------------------------------//
+METHOD XFMTop() CLASS TFormEdit
+
+   LOCAL XFM
+
+   FOR EACH XFM IN ::aXFM
+      XFM := {}
+   NEXT
+
+   aAdd( ::aXFM[ XFM_Header ], "#include [hbclass.ch]" )
+   aAdd( ::aXFM[ XFM_Header ], "#include [xide.ch]" )
+
+   aAdd( ::aXFM[ XFM_Class ], "CLASS " + ::Caption + " FROM TForm" )
+
+   aAdd( ::aXFM[ XFM_EndClass ], "END CLASS " + ::Caption )
+
+RETURN Self
+
+//----------------------------------------------------------------------------//
+METHOD XFMRoot() CLASS TFormEdit
+
+   LOCAL aVar, aDiff
+   STATIC lOn := .F.
+
+   IF lOn
+      Return Self
+   ENDIF
+   lOn := .T.
+
+   aSize( ::aXFM[ XFM_Datas ], 0 )
+   aSize( ::aXFM[ XFM_Controls ], 0 )
+
+   aDiff := __ObjGetValueDiff( TFormEdit():New( oApp:MainFrame, .F. ), Self )
+
+   FOR EACH aVar IN aDiff
+      IF ValType( aVar[2] ) == 'O'
+         aAdd( ::aXFM[ XFM_Controls ], aVar )
+      ELSE
+         aAdd( ::aXFM[ XFM_Datas ], aVar )
+      ENDIF
+   NEXT
+
+   lOn := .F.
+
+RETURN Self
+
+//----------------------------------------------------------------------------//
+METHOD XFMTrace() CLASS TFormEdit
+   /*
+   OutputDebugString( "Header: " + Str( Len( ::aXFM[ XFM_Header ] ) ) + CRLF )
+   OutputDebugString( "Class: " + Str( Len( ::aXFM[ XFM_Class ] ) ) + CRLF )
+   OutputDebugString( "Datas: " + Str( Len( ::aXFM[ XFM_Datas ] ) ) + CRLF )
+   OutputDebugString( "Events: " + Str( Len( ::aXFM[ XFM_Events ] ) ) + CRLF )
+   OutputDebugString( "Controls: " + Str( Len( ::aXFM[ XFM_Controls ] ) ) + CRLF )
+   OutputDebugString( "EndClass: " + Str( Len( ::aXFM[ XFM_EndClass ] ) ) + CRLF )
+   OutputDebugString( "Methdos: " + Str( Len( ::aXFM[ XFM_Methods ] ) ) + CRLF )
+   OutputDebugString( "Footer: " + Str( Len( ::aXFM[ XFM_Footer ] ) ) + CRLF )
+   */
+
+   SayMembers( ::aXFM )
+
+RETURN Self
+
+//----------------------------------------------------------------------------//
+Static Procedure SayMembers( aArray, cPad )
+
+   LOCAL xProperty
+
+   IF cPad == NIL
+      cPad := ""
+   ENDIF
+
+   OutputDebugString( cPad + SubStr( aArray:ClassName, 13 ) + CRLF )
+   OutputDebugString( cPad + Replicate( "-", Len( SubStr( aArray:ClassName, 13 ) ) ) + CRLF )
+
+   FOR EACH xProperty IN aArray
+      IF ValType( xProperty ) == 'A'
+         SayMembers( xProperty, cPad + cPad )
+      ELSE
+         OutputDebugString( cPad + ":" + CStr( xProperty ) + CRLF )
+      END
+   NEXT
+
+Return
 
 //----------------------------------------------------------------------------//
 
@@ -335,57 +438,4 @@ FUNCTION MakeGridTile(nxGrid,nyGrid,width,height)
    NEXT
 
    RETURN(cBits)
-
-
-/*
-
-*------------------------------------------------------------------------------
-* Low Level C Routines
-*------------------------------------------------------------------------------
-#pragma BEGINDUMP
-
-
-#define _WIN32_WINNT   0x0400
-
-#include <shlobj.h>
-#include <windows.h>
-#include <commctrl.h>
-#include "hbapi.h"
-#include "hbvm.h"
-#include "hbstack.h"
-#include "hbapiitm.h"
-
-
-// DrawGrid(hDC,nWidth,yWidth,nColor, xGran,yGran)
-
-HB_FUNC( DRAWGRID )
-{
-
-   HDC hDC            = (HDC) hb_parnl( 1 );
-   int width          = hb_parni( 2 );
-   int height         = hb_parni( 3 );
-   COLORREF nRGBColor = hb_parnl( 4 );
-   int xGran          = hb_parni( 5 );
-   int yGran          = hb_parni( 6 );
-   int x, y ;
-
-   for( y = 0 ; y < height ; y += yGran )
-        for( x = 0 ; x < width ; x += xGran )
-           SetPixel( hDC, x, y, nRGBColor ) ;
-
-}
-
-
-#pragma ENDDUMP
-
-
-*/
-
-
-//----------------------------------------------------------------------------//
-
-//----------------------------------------------------------------------------//
-
-
-
 

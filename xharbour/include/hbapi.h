@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.34 2002/09/23 00:40:37 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.35 2002/09/23 17:50:44 ronpinkas Exp $
  */
 
 /*
@@ -265,6 +265,7 @@ extern BOOL     hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult ); /* retrieve l
 extern BOOL     hb_arrayRelease( PHB_ITEM pArray ); /* releases an array - don't call it - use ItemRelease() !!! */
 extern BOOL     HB_EXPORT hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* sets an array element */
 extern BOOL     HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* retrieves an item */
+extern BOOL     HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* retrieves an item by ref */
 extern PHB_ITEM hb_arrayGetItemPtr( PHB_ITEM pArray, ULONG ulIndex ); /* returns pointer to specified element of the array */
 extern ULONG    hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, ULONG ulLen ); /* copy a string into an array item */
 extern char *   hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string contained on an array element */
