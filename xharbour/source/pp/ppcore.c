@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.123 2004/01/20 00:20:03 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.124 2004/01/28 01:54:33 ronpinkas Exp $
  */
 
 /*
@@ -142,7 +142,7 @@ static int    md_strAt( char *, int, char *, BOOL, BOOL, BOOL, BOOL );
 static char * PrevSquare( char * , char *, int * );
 static int    stroncpy( char *, char *, int );
 static int    strincpy( char *, char * );
-static BOOL   truncmp( char **, char **, BOOL );
+static BOOL   MatchToken( char **, char **, BOOL );
 static BOOL   strincmp( char *, char **, BOOL );
 static int    strotrim( char *, int ); /* Ron Pinkas 2001-02-14 added 2nd parameter */
 static int    NextWord( char **, char *, BOOL );
@@ -2715,7 +2715,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
           ptr = ptri;
 
-          if( *ptri == ',' || truncmp( &ptri, &ptrmp, !com_or_xcom ) )
+          if( *ptri == ',' || MatchToken( &ptri, &ptrmp, !com_or_xcom ) == FALSE )
           {
              ptri = ptr;
 
@@ -4097,7 +4097,7 @@ static BOOL CheckOptional( char * ptrmp, char * ptri, char * ptro, int * lenres,
          default:    /*   Key word    */
            ptr = ptri;
 
-           if( *ptri == ',' || truncmp( &ptri, &ptrmp, !com_or_xcom ) )
+           if( *ptri == ',' || MatchToken( &ptri, &ptrmp, !com_or_xcom ) == FALSE )
            {
               ptri = ptr;
 
@@ -5523,27 +5523,17 @@ static int stroncpy( char * ptro, char * ptri, int lens )
   return i;
 }
 
-static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
+static BOOL MatchToken( char ** ptro, char ** ptri, BOOL lTrunc )
 {
   char *ptrb = *ptro, co, ci;
 
-  HB_TRACE(HB_TR_DEBUG, ("truncmp(%p, %p, %d)", ptro, ptri, lTrunc));
+  HB_TRACE(HB_TR_DEBUG, ("MatchToken(%p, %p, %d)", ptro, ptri, lTrunc));
 
   //printf( "Input: '%s' MP: '%s'\n", *ptro, *ptri );
 
-  /* 2003-02-19 Ron Pinkas replaced with code below.
-  while( **ptri && **ptri != ' ' && **ptri != '\t' &&
-         **ptri != ',' && **ptri != '[' && **ptri != ']' &&
-         **ptri != '\1' && toupper(**ptri) == toupper(**ptro) )
-  {
-     (*ptro)++;
-     (*ptri)++;
-  }
-  */
-
   while( **ptri && **ptro )
   {
-     if( strchr( "({:=+-*/<>$^%#!", **ptri ) )
+     if( strchr( "(){}:=+-*/<>$^%#!|", **ptri ) )
      {
         while( **ptro == ' ' || **ptro == '\t' )
         {
@@ -5574,24 +5564,23 @@ static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
      if( strchr( ":=!><+-*/^%", co ) && **ptro == '=' )
      {
         //printf( ">>>Rejected: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
-        return TRUE;
+        return FALSE;
      }
      // BI-Chars: "\++\--\**\"
      else if( strchr( "+-*", co ) && **ptro == co )
      {
         //printf( ">>>Rejected: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
-        return TRUE;
+        return FALSE;
      }
      // BI-Chars: "\->\<>\"
      else if( strchr( "->", co ) && **ptro == '>' )
      {
         //printf( ">>>Rejected: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
-        return TRUE;
+        return FALSE;
      }
 
      //printf( ">>>Accepted: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
-
-     return FALSE;
+     return TRUE;
   }
   else if( lTrunc && *ptro-ptrb >= 4 && ISNAME(ci) && !ISNAME(**ptro) && ISNAME(co) )
   {
@@ -5601,11 +5590,11 @@ static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
       }
 
       //printf( ">>>Accepted: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
-      return FALSE;
+      return TRUE;
   }
 
   //printf( ">>>Rejected: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
-  return TRUE;
+  return FALSE;
 }
 
 static BOOL strincmp( char * ptro, char ** ptri, BOOL lTrunc )
@@ -5620,16 +5609,18 @@ static BOOL strincmp( char * ptro, char ** ptri, BOOL lTrunc )
   co = *(ptro-1);
   ci = **ptri;
 
-  if( ( ( ci == ' ' || ci == ',' || ci == '\16' ||
-          ci == '\17' || ci == '\1' || ci == '\0' ) &&
-        ( ( !ISNAME(*ptro) && ISNAME(co) ) ||
-          ( !ISNAME(co) ) ) ) )
-    return FALSE;
+  if( ( ci == ' ' || ci == ',' || ci == '\16' || ci == '\17' || ci == '\1' || ci == '\0' ) &&
+      ( ( ! ISNAME(*ptro) && ISNAME(co) ) || ( ! ISNAME(co) ) )
+    )
+  {
+     return FALSE;
+  }
   else if( lTrunc && ptro-ptrb >= 4 && ISNAME(ci) && !ISNAME(*ptro) && ISNAME(co) )
-    {
-      /*      while( ISNAME(**ptri) ) (*ptri)++; */
-      return FALSE;
-    }
+  {
+     /*  while( ISNAME(**ptri) ) (*ptri)++; */
+     return FALSE;
+  }
+
   return TRUE;
 }
 

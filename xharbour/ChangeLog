@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2255 2004/02/10 00:36:17 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2256 2004/02/10 02:02:11 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-09 22:43 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Minor fix in truncmp()
+    * Reveresed logic in truncmp() (and callers) to return TRUE on success and FALSE on failure.
+    * Renamed truncmp() to MatchToken()
 
 2004-02-10 03:03 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/contrib/libct/pack.c
