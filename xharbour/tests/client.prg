@@ -68,7 +68,7 @@ PROCEDURE ReceivePoll( Socket )
 
    DO WHILE ! RequestTerm
      IF InetDataReady( Socket ) > 0
-        cResponse := InetRecvLine( Socket )
+        nResponse := InetRecvLine( Socket, @cResponse, 128 )
 
         IF InetErrorCode( Socket ) != 0
            @ 10, 0 SAY Left( cResponse, nResponse )

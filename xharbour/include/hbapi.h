@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.47 2002/12/19 18:15:34 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.48 2002/12/23 00:14:22 ronpinkas Exp $
  */
 
 /*
@@ -204,11 +204,6 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
       #define HB_API_MACROS
    #endif
 #endif
-
-/* garbage collector */
-#define HB_GARBAGE_FUNC( hbfunc )   void hbfunc( void * Cargo ) /* callback function for cleaning garbage memory pointer */
-typedef HB_GARBAGE_FUNC( HB_GARBAGE_FUNC_ );
-typedef HB_GARBAGE_FUNC_ * HB_GARBAGE_FUNC_PTR;
 
 extern HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
 extern void   hb_gcGripDrop( HB_ITEM_PTR pItem );
