@@ -1,5 +1,5 @@
 /*
- * $Id: set.txt,v 1.3 2003/03/03 02:06:21 lculik Exp $
+ * $Id: set.txt,v 1.4 2003/12/29 01:26:30 fsgiudice Exp $
  */
 
 /*
@@ -1369,25 +1369,27 @@
 
 /*  $DOC$
  *  $COMMANDNAME$
- *      SET BACKGROUND TASKS
+ *      SET DBFLOCKSCHEME
  *  $CATEGORY$
  *      Command
  *  $ONELINER$
- *      Toggle background tasks activity.
+ *      Toggle The lock scheme
  *  $SYNTAX$
- *      SET BACKGROUND TASKS on | OFF | (<lOnOff>)
+ *      SET DBFLOCKSCHEME 0 | 1 | 2 | 3
  *  $ARGUMENTS$
- *      <lOnOff> Logical expression for toggle
+ *      0 1 2 3 the type of locking scheme to use
  *  $DESCRIPTION$
- *      This command toggles the background tasks activity.
- *  $EXAMPLES$
- *      See Tests/bkgtest.prg
+ *  This command affect how file wil be locked  the default value of 0 means default locking scheme
+ *  An Value of 1 means clip compatible lock
+ *  An value of 2 means clipper 5.3 lock  and an value of  3 means visual fox pro lock
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
  *      This command is an xHarbour extension.
  *  $SEEALSO$
- *      HB_BACKGROUNDADD(),Set()
+ *      Set()
  *  $END$
  */
+
+
 
