@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.532 2002/12/17 16:08:37 walito Exp $
+ * $Id: ChangeLog,v 1.533 2002/12/18 13:43:52 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -32,6 +32,7 @@
       /* This is required so that more efficent Mutex can be set for the combined operation. */
 
   * source/rtl/console.c
+    + Added MT Mutex support to all PRG level Output Functions.
     * Added 2 optional paramaters nRow, nCol to DevOut().
 
   * source/rtl/devoutp.prg
