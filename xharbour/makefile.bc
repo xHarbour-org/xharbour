@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.26 2003/01/12 21:01:33 ronpinkas Exp $
+# $Id: makefile.bc,v 1.27 2003/01/23 21:47:25 andijahja Exp $
 #
 
 #
@@ -372,10 +372,12 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\achoice.obj \
    $(RTL_OBJ_DIR)\adir.obj \
    $(RTL_OBJ_DIR)\alert.obj \
+   $(RTL_OBJ_DIR)\arrayblk.obj \
    $(RTL_OBJ_DIR)\browdb.obj \
    $(RTL_OBJ_DIR)\browdbx.obj \
    $(RTL_OBJ_DIR)\browse.obj \
    $(RTL_OBJ_DIR)\checkbox.obj \
+   $(RTL_OBJ_DIR)\color53.obj \
    $(RTL_OBJ_DIR)\cstr.obj \
    $(RTL_OBJ_DIR)\cstruct.obj \
    $(RTL_OBJ_DIR)\dbedit.obj \
@@ -393,6 +395,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\memoedit.obj \
    $(RTL_OBJ_DIR)\memvarbl.obj \
    $(RTL_OBJ_DIR)\menuto.obj \
+   $(RTL_OBJ_DIR)\mssgline.obj \
    $(RTL_OBJ_DIR)\objfunc.obj \
    $(RTL_OBJ_DIR)\perfuncs.obj \
    $(RTL_OBJ_DIR)\persist.obj \
@@ -1305,6 +1308,13 @@ $(RTL_OBJ_DIR)\ampm.obj : $(RTL_DIR)\ampm.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
+$(RTL_OBJ_DIR)\arrayblk.c : $(RTL_DIR)\arrayblk.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\arrayblk.obj : $(RTL_OBJ_DIR)\arrayblk.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
 $(RTL_OBJ_DIR)\at.obj : $(RTL_DIR)\at.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
@@ -1346,6 +1356,13 @@ $(RTL_OBJ_DIR)\checkbox.c : $(RTL_DIR)\checkbox.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\checkbox.obj : $(RTL_OBJ_DIR)\checkbox.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(RTL_OBJ_DIR)\color53.c : $(RTL_DIR)\color53.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\color53.obj : $(RTL_OBJ_DIR)\color53.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
@@ -1661,6 +1678,13 @@ $(RTL_OBJ_DIR)\mouseapi.obj : $(RTL_DIR)\mouseapi.c
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\mousex.obj : $(RTL_DIR)\mousex.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(RTL_OBJ_DIR)\mssgline.c : $(RTL_DIR)\mssgline.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\mssgline.obj : $(RTL_OBJ_DIR)\mssgline.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.5 2002/06/17 22:34:23 andijahja Exp $
+# $Id: hrbdll.vc,v 1.6 2003/01/19 21:43:45 andijahja Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -203,10 +203,12 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\achoice.obj \
   $(OBJ_DIR)\adir.obj \
   $(OBJ_DIR)\alert.obj \
+  $(OBJ_DIR)\arrayblk.obj \
   $(OBJ_DIR)\browdb.obj \
   $(OBJ_DIR)\browdbx.obj \
   $(OBJ_DIR)\browse.obj \
   $(OBJ_DIR)\checkbox.obj \
+  $(OBJ_DIR)\color53.obj \
   $(OBJ_DIR)\cstr.obj \
   $(OBJ_DIR)\dbedit.obj \
   $(OBJ_DIR)\devoutp.obj \
@@ -219,6 +221,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\input.obj \
   $(OBJ_DIR)\memoedit.obj \
   $(OBJ_DIR)\memvarbl.obj \
+  $(OBJ_DIR)\mssgline.obj \
   $(OBJ_DIR)\objfunc.obj \
   $(OBJ_DIR)\readkey.obj \
   $(OBJ_DIR)\readvar.obj \
@@ -623,6 +626,12 @@ $(OBJ_DIR)\alert.c : $(RTL_DIR)\alert.prg
 $(OBJ_DIR)\alert.obj : $(OBJ_DIR)\alert.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
+$(OBJ_DIR)\arrayblk.c : $(RTL_DIR)\arrayblk.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\arrayblk.obj : $(OBJ_DIR)\arrayblk.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
 $(OBJ_DIR)\ampm.obj : $(RTL_DIR)\ampm.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
@@ -663,6 +672,12 @@ $(OBJ_DIR)\checkbox.obj : $(OBJ_DIR)\checkbox.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\chrasc.obj : $(RTL_DIR)\chrasc.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\color53.c : $(RTL_DIR)\color53.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\color53.obj : $(OBJ_DIR)\color53.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\colorind.obj : $(RTL_DIR)\colorind.c
@@ -903,6 +918,12 @@ $(OBJ_DIR)\mouseapi.obj : $(RTL_DIR)\mouseapi.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\mousex.obj : $(RTL_DIR)\mousex.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\mssgline.c : $(RTL_DIR)\mssgline.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\mssgline.obj : $(OBJ_DIR)\mssgline.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\mtran.obj : $(RTL_DIR)\mtran.c
