@@ -6631,22 +6631,20 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
  Caller must allocate sRegEx with enough space for conversion.
  returns the length of the resulting RegEx.
  */
-int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase )
+HB_EXPORT int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase )
 {
    char cChar;
    int iLen = strlen( sWild );
-   int i, iLenResult;
+   int i, iLenResult = 0;
 
-   if( ! bMatchCase )
+   if( bMatchCase == FALSE )
    {
       strncpy( sRegEx, "(?i)", 4 );
       iLenResult = 4;
    }
-   else
-   {
-      strncpy( sRegEx, "\\b", 2 );
-      iLenResult = 2;
-   }
+
+   strncpy( sRegEx + iLenResult, "\\b", 2 );
+   iLenResult += 2;
 
    for( i = 0; i < iLen; i++ )
    {
@@ -6686,6 +6684,17 @@ int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase )
    sRegEx[ iLenResult ] = '\0';
 
    return iLenResult;
+}
+
+HB_FUNC( WILD2REGEX )
+{
+#ifdef HB_API_MACROS
+   HB_THREAD_STUB
+#endif
+   char sRegEx[ _POSIX_PATH_MAX ];
+   int iLen = Wild2RegEx( hb_parc( 1 ), sRegEx, hb_parl( 2 ) );
+
+   hb_retclen( sRegEx, iLen );
 }
 
 // Returns array of Match + Sub-Matches.

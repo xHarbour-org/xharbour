@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.25 2004/03/02 09:07:56 andijahja Exp $
+ * $Id: direct.c,v 1.26 2004/03/03 01:33:37 ronpinkas Exp $
  */
 
 /*
@@ -116,6 +116,7 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
 {
    USHORT    uiMask;
    BYTE      *szDirSpec;
+
 /*
 #if defined(__MINGW32__) || ( defined(_MSC_VER) && _MSC_VER >= 910 )
    PHB_ITEM pEightDotThree = hb_param( 3, HB_IT_LOGICAL );
@@ -129,9 +130,6 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
    PHB_FFIND ffind;
    PHB_FNAME fDirSpec = NULL;
    BOOL bAlloc = FALSE;
-   BYTE *pCurDir;
-   char cCurDsk;
-
    /* Get the passed attributes and convert them to Harbour Flags */
 
    uiMask = HB_FA_ARCHIVE
@@ -151,17 +149,7 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
 
    if ( bDirOnly )
    {
-      if( !szAttributes )
-      {
-         szAttributes = "D";
-      }
-      else
-      {
-         if ( szAttributes != "D" )
-         {
-            szAttributes = "D";
-         }
-      }
+      szAttributes = "D";
    }
 
    if( szAttributes && strlen( szAttributes ) > 0 )
@@ -183,10 +171,7 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
       szDirSpec = (BYTE *) HB_DIR_ALL_FILES_MASK;
    }
 
-   cCurDsk = hb_fsCurDrv() ;
-   pCurDir = hb_fsCurDir( cCurDsk ) ;
-
-   if ( bDirOnly || bFullPath )
+   if( bDirOnly || bFullPath )
    {
       if ( (fDirSpec = hb_fsFNameSplit( (char*) szDirSpec )) !=NULL )
       {
@@ -240,11 +225,13 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
             {
                hb_arrayAddForward( &Subarray, hb_itemPutC( &Filename, ffind->szName ) );
             }
+
          #ifndef HB_LONG_LONG_OFF
             hb_arrayAddForward( &Subarray, hb_itemPutNLL( &Size, ffind->size ) );
          #else
             hb_arrayAddForward( &Subarray, hb_itemPutNL( &Size, ffind->size ) );
          #endif
+
             hb_arrayAddForward( &Subarray, hb_itemPutDL( &Date, ffind->lDate ) );
             hb_arrayAddForward( &Subarray, hb_itemPutC( &Time, ffind->szTime ) );
             hb_arrayAddForward( &Subarray, hb_itemPutC( &Attr, hb_fsAttrDecode( ffind->attr, buffer ) ) );
@@ -256,24 +243,12 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
             {
                hb_arrayAddForward( pDir, &Subarray );
             }
-
-            hb_itemClear( &Subarray );
          }
       }
       while( hb_fsFindNext( ffind ) );
 
       hb_fsFindClose( ffind );
-
-      hb_itemClear( &Filename );
-      hb_itemClear( &Size );
-      hb_itemClear( &Date );
-      hb_itemClear( &Time );
-      hb_itemClear( &Attr );
-
    }
-
-   hb_fsChDrv( (BYTE ) cCurDsk );
-   hb_fsChDir( pCurDir );
 
    if ( fDirSpec != NULL )
    {
@@ -284,7 +259,6 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
    {
       hb_xfree( szDirSpec );
    }
-
 }
 
 static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName, char* szAttributes, BOOL bMatchCase )
@@ -327,12 +301,46 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
 
 void HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char *szFName, char* szAttributes, BOOL bMatchCase )
 {
+   static BOOL s_bTop = TRUE;
+   char cCurDsk;
+   BYTE *pCurDir;
    HB_ITEM Dir;
+
+   if( s_bTop )
+   {
+      cCurDsk = hb_fsCurDrv() ;
+      pCurDir = hb_strdup( hb_fsCurDir( cCurDsk ) );
+      s_bTop = FALSE;
+   }
+   else
+   {
+      cCurDsk = 0;
+      pCurDir = NULL;
+   }
+
    Dir.type = HB_IT_NIL;
    hb_fsDirectory( &Dir, szSkleton, szAttributes, FALSE, TRUE );
+
    hb_arrayNew( pResult, 0 );
    hb_fsDirectoryCrawler( &Dir, pResult, szFName, szAttributes, bMatchCase );
+
    hb_itemClear( &Dir );
+
+   if( pCurDir )
+   {
+      char sRoot[2];
+
+      sRoot[0] = OS_PATH_DELIMITER;
+      sRoot[1] = '\0';
+
+      hb_fsChDrv( (BYTE ) cCurDsk );
+      hb_fsChDir( sRoot );
+      hb_fsChDir( pCurDir );
+
+      hb_xfree( pCurDir );
+      // For next run.
+      s_bTop = TRUE;
+   }
 }
 
 HB_FUNC( DIRECTORYRECURSE )
@@ -346,8 +354,6 @@ HB_FUNC( DIRECTORYRECURSE )
    HB_ITEM Dir;
    char *szFName;
    BOOL bAddDrive = TRUE;
-   char cCurDsk = hb_fsCurDrv() ;
-   BYTE *pCurDir = hb_fsCurDir( cCurDsk ) ;
    char *szAttributes;
 
    Dir.type = HB_IT_NIL;
@@ -392,14 +398,13 @@ HB_FUNC( DIRECTORYRECURSE )
 
          if( fDirSpec->szPath == NULL )
          {
-            fDirSpec->szPath = (char*) pCurDir ;
+            fDirSpec->szPath = (char*) hb_fsCurDir( hb_fsCurDrv() );
          }
 
          szRecurse = bAddDrive ? hb_xstrcpy( NULL,fDirSpec->szDrive,":\\",fDirSpec->szPath,"\\",HB_DIR_ALL_FILES_MASK,NULL):
                      hb_xstrcpy( NULL,fDirSpec->szPath,HB_DIR_ALL_FILES_MASK,NULL);
 
          szFName = hb_xstrcpy( NULL,fDirSpec->szName,fDirSpec->szExtension,NULL);
-
       }
 
       hb_fsDirectoryRecursive( &Dir, szRecurse, szFName, szAttributes, bMatchCase );
@@ -438,5 +443,4 @@ HB_FUNC( DIRECTORY )
    Dir.type = HB_IT_NIL;
    hb_fsDirectory( &Dir, hb_parc(1), hb_parc(2), hb_parl(3), hb_parl(4) );
    hb_itemForwardValue( &(HB_VM_STACK).Return, &Dir );
-   hb_itemClear( &Dir );
 }

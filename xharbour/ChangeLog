@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2458 2004/03/03 03:31:16 mlombardo Exp $
+ * $Id: ChangeLog,v 1.2459 2004/03/03 04:28:54 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,6 +10,19 @@
 2004-03-03 11:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/regex.c
     ! minor correction on Wild2RegEx() for case.
+
+2004-03-02 20:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/direct.c
+    + Added logic to restore current dir in hb_fsDirectoryCrawler()
+    - Removed unneeded save/restore of current directory
+      /* please advise if I'm wrong */
+
+  * source/rtl/regex.c
+    * Minor fix to iLenResult when bMatchCase is FALSE
+    + Added PRG Wrapper Wild2RegEx()
+
+  * tests/dirtest4.prg
+    * Simplified, optimized, and formatted.
 
 2004-03-03 00:25 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * include/hbset.h
