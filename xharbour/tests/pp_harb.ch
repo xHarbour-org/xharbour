@@ -485,6 +485,26 @@
             else
             {
                s_bArrayPrefix = ( isalnum( sReturn[0] ) || strchr( "])}._", sReturn[0] ) );
+
+               if( nLen < 7 && toupper( sReturn[0] ) == 'R' && toupper( sReturn[1] ) == 'E' &&
+                   toupper( sReturn[2] ) == 'T' && toupper( sReturn[3] ) == 'U'  )
+               {
+                  if( sReturn[4] == '\0' )
+                  {
+                     s_bArrayPrefix = FALSE;
+                  }
+                  else if( toupper( sReturn[4] ) == 'R' )
+                  {
+                     if( sReturn[5] == '\0' )
+                     {
+                        s_bArrayPrefix = FALSE;
+                     }
+                     else if( toupper( sReturn[5] ) == 'N' && sReturn[6] == '\0' )
+                     {
+                        s_bArrayPrefix = FALSE;
+                     }
+                  }
+               }
             }
          }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1001 2003/05/06 08:31:31 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1002 2003/05/06 08:53:03 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-06 19:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Few additional fixes related to [...] following RETURN keyword.
+    ! Fixed getExpReal() to allow '/' as first char to allow Linux path values.
+
+  * tests/pp.prg
+  * tests/pp_harb.ch
+    ! Fixed Extened Marker support of literal strings in NextExp()
+    ! Added logic to revert array context to string context when [...] folows RETURN token.
+      /* Needs to be refined still */
 
 2003-05-06 10:50 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * source/rtl/set.c

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.64 2003/04/22 22:34:32 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.65 2003/05/06 03:56:45 ronpinkas Exp $
  */
 
 /*
@@ -196,7 +196,7 @@ static int  s_ParseState;
 static int  s_maxCondCompile;
 static int  s_aIsRepeate[ 5 ];
 static int  s_Repeate;
-static BOOL s_bReplacePat = TRUE;
+static BOOL s_bReplacePat = TRUE, s_bNewLine = FALSE;
 static int  s_numBrackets;
 static char s_groupchar;
 static char s_prevchar;
@@ -1644,6 +1644,8 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
      }
      else
      {
+       s_bNewLine = TRUE;
+
        NextName:
 
         if( kolpass > MAX_CICLES )
@@ -2721,7 +2723,8 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
 
    HB_SKIPTABSPACES( *ptri );
 
-   if( strchr( "}]),|=*/^%", **ptri ) || ( strchr( ":-+", **ptri ) && *( ( *ptri) + 1 ) == '=' ) )
+   // Was:  "}]),|=*/^%" removed '/' to allow for Unix Paths starting with '/'
+   if( strchr( "}]),|=*^%", **ptri ) || ( strchr( ":-+", **ptri ) && *( ( *ptri) + 1 ) == '=' ) )
    {
       return 0;
    }
@@ -4765,13 +4768,15 @@ static int strotrim( char * stroka, BOOL bRule )
   char *ptr = stroka, *pString, lastc = '0', curc;
   int lens = 0, State = STATE_NORMAL;
 
-  char cLastChar = '\0';
+  char cLastChar = ' ';
 
   char *sFirstToken = stroka;
 
   HB_TRACE(HB_TR_DEBUG, ("strotrim(%s)", stroka));
 
-  #if 0
+  //#define DEBUG_TRIM
+
+  #ifdef DEBUG_TRIM
      printf( "StrIn: >%s<\n", stroka );
   #endif
 
@@ -4851,37 +4856,66 @@ static int strotrim( char * stroka, BOOL bRule )
         }
         /* Ron Pinkas added 2000-11-05 */
         /* Ron Pinkas 2001-02-14 added bRule logic */
-        else if( curc == '[' && bRule == FALSE && ( strchr( ")]}.\"'\\", cLastChar ) == NULL ) )
+        else if( curc == '[' )
         {
-           if( ISNAME( cLastChar ) )
+           if( bRule == FALSE && ( strchr( ")]}.\"'\\", cLastChar ) == NULL ) )
            {
-              if( lens < 8 && toupper( sFirstToken[0] ) == 'R' && toupper( sFirstToken[1] ) == 'E' &&
-                  toupper( sFirstToken[2] ) == 'T' && toupper( sFirstToken[3] ) == 'U'  )
+              if( ISNAME( cLastChar ) )
               {
-                 if( sFirstToken[4] == ' ' )
+                 if( lens < 8 && toupper( sFirstToken[0] ) == 'R' && toupper( sFirstToken[1] ) == 'E' &&
+                     toupper( sFirstToken[2] ) == 'T' && toupper( sFirstToken[3] ) == 'U'  )
                  {
-                    pString = ptr;
-                    State = STATE_QUOTE3;
-                 }
-                 else if( toupper( sFirstToken[4] ) == 'R' )
-                 {
-                    if( sFirstToken[5] == ' ' )
+                    if( sFirstToken[4] == ' ' )
                     {
                        pString = ptr;
                        State = STATE_QUOTE3;
                     }
-                    else if( toupper( sFirstToken[5] ) == 'N' && sFirstToken[6] == ' ' )
+                    else if( toupper( sFirstToken[4] ) == 'R' )
                     {
-                       pString = ptr;
-                       State = STATE_QUOTE3;
+                       if( sFirstToken[5] == ' ' )
+                       {
+                          pString = ptr;
+                          State = STATE_QUOTE3;
+                       }
+                       else if( toupper( sFirstToken[5] ) == 'N' && sFirstToken[6] == ' ' )
+                       {
+                          pString = ptr;
+                          State = STATE_QUOTE3;
+                       }
                     }
+
+                  // This logic makes pp compatible with Clipper's PP, but the Clipper Parser uses STRING Context regardless when following RETURN token!!!
+                  #ifdef HB_C52_STRICT
+                    // Revert to Array context if character following the CLSING Bracket is ':'.
+                    if( State == STATE_QUOTE3 )
+                    {
+                       char *pTmp = strchr( pString, ']' );
+
+                       if ( pTmp )
+                       {
+                          pTmp++;
+
+                          while( *pTmp == ' ' )
+                          {
+                             pTmp++;
+                          }
+
+                          if( *pTmp == ':' )
+                          {
+                             s_bArray = TRUE;
+                             State = STATE_NORMAL;
+                          }
+                       }
+                    }
+                 #endif
+
                  }
               }
-           }
-           else
-           {
-              pString = ptr;
-              State = STATE_QUOTE3;
+              else
+              {
+                 pString = ptr;
+                 State = STATE_QUOTE3;
+              }
            }
         }
         /* END - Ron Pinkas added 2000-11-05 */
@@ -4927,7 +4961,7 @@ static int strotrim( char * stroka, BOOL bRule )
 
   *ptr = '\0';
 
-  #if 0
+  #ifdef DEBUG_TRIM
      printf( "Str Out: >%s<\n", ptr - lens );
   #endif
 
@@ -4962,11 +4996,25 @@ static int NextName( char ** sSource, char * sDest )
 
   int lenName = 0, State = STATE_NORMAL;
 
+  BOOL bReturn = FALSE;
+
   HB_TRACE_STEALTH(HB_TR_DEBUG, ("NextName(%p, %s)", sSource, sDest));
 
-  #if 0
-     printf( "In: >%s<\n", *sSource );
+  //#define DEBUG_NAME
+
+  #ifdef DEBUG_NAME
+     printf( "NextName() In: >%s<\n", *sSource );
   #endif
+
+  while ( **sSource == ' ' )
+  {
+     (*sSource)++;
+  }
+
+  if( ! isalpha( **sSource ) )
+  {
+     s_bNewLine = FALSE;
+  }
 
   while( **sSource != '\0' && ( State != STATE_NORMAL || **sSource != '_' && ! isalpha( **sSource ) ) )
   {
@@ -5090,6 +5138,7 @@ static int NextName( char ** sSource, char * sDest )
            /* Ron Pinkas added 2000-11-08 */
            pString = *sSource;
            State = STATE_QUOTE3;
+           printf( "String: >%s< After: '%c' (%i)\n", pString, cLastChar, cLastChar );
         }
      }
      /* END - Ron Pinkas added 2000-11-08 */
@@ -5098,6 +5147,7 @@ static int NextName( char ** sSource, char * sDest )
      if( State == STATE_NORMAL && **sSource != ' ' && **sSource != '\t' )
      {
         cLastChar = **sSource;
+        //printf( "Char: '%c' (%i)\n", cLastChar, cLastChar );
      }
      /* END - Ron Pinkas added 2000-11-08 */
 
@@ -5111,27 +5161,24 @@ static int NextName( char ** sSource, char * sDest )
   }
   *sDest = '\0';
 
-  if( lenName > 3 && lenName < 7 )
+  if( s_bNewLine && lenName > 3 && lenName < 7 )
   {
      if( toupper( (sDest - lenName)[0] ) == 'R' && toupper( (sDest - lenName)[1] ) == 'E' &&
          toupper( (sDest - lenName)[2] ) == 'T' && toupper( (sDest - lenName)[3] ) == 'U'  )
      {
         if( (sDest - lenName)[4] == '\0' )
         {
-           s_bArray = FALSE;
-           goto Done;
+           bReturn = TRUE;
         }
         else if( toupper( (sDest - lenName)[4] ) == 'R' )
         {
            if( (sDest - lenName)[5] == '\0' )
            {
-              s_bArray = FALSE;
-              goto Done;
+              bReturn = TRUE;
            }
            else if( toupper( (sDest - lenName)[5] ) == 'N' )
            {
-              s_bArray = FALSE;
-              goto Done;
+              bReturn = TRUE;
            }
         }
      }
@@ -5147,12 +5194,39 @@ static int NextName( char ** sSource, char * sDest )
   s_bArray = ( *pTmp == '[' );
   /* END - Ron Pinkas added 2000-11-08 */
 
-  #if 0
-     printf( "Len: %i NextName: >%s<\n", lenName, sDest - lenName );
+  if( s_bArray && bReturn )
+  {
+     // RETURN context supercede Array conext.
+     s_bArray = FALSE;
+
+     // This logic makes pp compatible with Clipper's PP, but the Clipper Parser uses STRING Context regardless when following RETURN token!!!
+     #ifdef HB_C52_STRICT
+        pTmp = strchr( pTmp, ']' );
+
+        if( pTmp )
+        {
+           pTmp++;
+
+           while( *pTmp == ' ' )
+           {
+              pTmp++;
+           }
+
+           if( *pTmp == ':' )
+           {
+              // Revert to Array context if character following the CLSING Bracket is ':'.
+              s_bArray = TRUE;
+           }
+        }
+     #endif
+  }
+
+  s_bNewLine = FALSE;
+
+  #ifdef DEBUG_NAME
+     printf( "Len: %i NextName: >%s< Array: %i\n", lenName, sDest - lenName, s_bArray );
      printf( "Rest: >%s<\n", *sSource );
   #endif
-
- Done:
 
   return lenName;
 }
@@ -5406,7 +5480,11 @@ int hb_pp_NextToken( char** pLine )
    sLine = *pLine;
    nLen = strlen( sLine );
 
-   //printf( "\nProcessing: >%s<\n", sLine );
+   //#define DEBUG_TOKEN
+
+   #ifdef DEBUG_TOKEN
+      printf( "\nProcessing: >%s<\n", sLine );
+   #endif
 
    // *** To be removed after final testing !!!
    while( sLine[0] == ' ' )
@@ -5688,7 +5766,9 @@ int hb_pp_NextToken( char** pLine )
 
    *pLine = (char *) sLine;
 
-   //printf( "Token: >%s< Line: >%s<\n", s_sToken, *pLine );
+   #ifdef DEBUG_TOKEN
+      printf( "Token: >%s< Line: >%s<\n", s_sToken, *pLine );
+   #endif
 
    return nLen + iPad;
 }

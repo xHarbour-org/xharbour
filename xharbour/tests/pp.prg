@@ -4477,6 +4477,7 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
    LOCAL sReturn, Counter, nLen, nClose
    LOCAL s1, s2, s3
    LOCAL sDigits
+   LOCAL sToken
 
    //TRaceLog( sLine, lDontRecord )
 
@@ -4697,12 +4698,22 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
 
    sLine := SubStr( sLine, Len( sReturn ) + 1 )
 
-   IF lDontRecord != .T.
+   IF lDontRecord == .F.
       IF Left( sReturn, 1 ) == '.' .AND. Len( sReturn ) > 1 .AND. Right( sReturn, 1 ) == '.'
          s_bArrayPrefix := .F.
       ELSE
          s1             := Right( sReturn, 1 )
-         s_bArrayPrefix := ( IsAlpha( s1 ) .OR. IsDigit( s1 ) .OR. s1 $ "])}._" )
+
+         IF Upper( s1 ) == 'R'
+            sToken := Upper( sReturn )
+            IF sToken == "RETU" .OR. sToken == "RETUR" .OR. sToken == "RETURN"
+               s_bArrayPrefix := .F.
+            ELSE
+               s_bArrayPrefix := .T.
+            ENDIF
+         ELSE
+            s_bArrayPrefix := ( IsAlpha( s1 ) .OR. IsDigit( s1 ) .OR. s1 $ "])}._" )
+         ENDIF
       ENDIF
    ENDIF
 
@@ -4832,20 +4843,23 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         //? "EXP <*>: " + sExp
         RETURN sExp
 
-     CASE cType == '(' .AND. Left( sLine, 1 ) != '('
-        nSpaceAt := At( ' ', sLine )
+     CASE cType == '('
+        s1 := Left( sLine, 1 )
+        IF ! ( s1 $ "(['" + '"' )
+            nSpaceAt := At( ' ', sLine )
 
-        IF nSpaceAt = 0
-           sExp  := sLine
-           sLine := ""
-        ELSE
-           sExp  := Left( sLine, nSpaceAt - 1 )
-           sLine := SubStr( sLine, nSpaceAt )
-           sExp  += ExtractLeadingWS( @sLine )
+            IF nSpaceAt = 0
+               sExp  := sLine
+               sLine := ""
+            ELSE
+               sExp  := Left( sLine, nSpaceAt - 1 )
+               sLine := SubStr( sLine, nSpaceAt )
+               sExp  += ExtractLeadingWS( @sLine )
+            ENDIF
+
+            //? "EXP <(>: " + sExp
+            RETURN sExp
         ENDIF
-
-        //? "EXP <(>: " + sExp
-        RETURN sExp
 
      CASE cType == '!'
         IF IsAlpha( cChar := Left( sLine, 1 ) ) .OR. cChar == '_'
