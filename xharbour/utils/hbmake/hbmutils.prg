@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.39 2005/01/17 20:42:00 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.41 2005/02/17 00:00:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -63,6 +63,7 @@
     DECLARE GetMakeDir() as String
     DECLARE HB_ARGV( n as numeric ) as string
     DECLARE HbMake_FileDate( c as String ) as string
+    DECLARE GetPccDir() as String
 
 #endif
 
@@ -284,6 +285,28 @@ FUNCTION GetVccDir()
    FOR EACH cCurEnv IN aEnv
 
       IF FILE( cCurEnv + '\cl.exe' ) .OR. FILE( UPPER( cCurEnv ) + '\cl.EXE' )
+         cPath := cCurEnv
+         cPath := LEFT( cPath, RAT( '\', cPath ) - 1 )
+         EXIT
+      ENDIF
+
+   NEXT
+
+RETURN cPath
+
+*--------------------
+FUNCTION GetPccDir()
+*--------------------
+
+   LOCAL cPath   := ''
+   LOCAL cEnv    := GETE( "PATH" )
+   LOCAL aEnv    := HB_ATokens( cEnv, ";" )
+   LOCAL nPos
+   LOCAL cCurEnv := ""
+
+   FOR EACH cCurEnv IN aEnv
+
+      IF FILE( cCurEnv + '\pocc.exe' ) .OR. FILE( UPPER( cCurEnv ) + '\POCC.EXE' )
          cPath := cCurEnv
          cPath := LEFT( cPath, RAT( '\', cPath ) - 1 )
          EXIT

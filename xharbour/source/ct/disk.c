@@ -1,17 +1,20 @@
 /*
- * $Id: disk.c,v 1.2 2004/08/27 15:47:35 mauriliolongo Exp $
+ * $Id: disk.c,v 1.4 2005/03/14 11:17:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
- * LibCT (Clipper Tools) Disk, File and Directory management.
+ * CT (Clipper Tools) Disk, File and Directory management.
  *
- * Copyright 2004 Eduardo Fernandes <eduardo@modalsistemas.com.br>
+ * Copyright 2004-2005 Eduardo Fernandes <modalsist@yahoo.com.br>
+ *
  * DeleteFile()  - Ready. Source is in "disk.c"
- * DirMake()     - Ready. Already exist a MakeDir() function in xHarbour RT Library, but
- *                 this funtion return a more compatible error codes.
+ * DirMake()     - Ready. Already exist a MakeDir() function in xHarbour RTL Lib,
+ *                        but DirMake returns a more compatible error codes.
  * DirName()     - Ready.
  * DriveType()   - Ready.  corrected <ptucker@sympatico.ca>
  * FileMove()    - Ready.
+ * Volume()      - Ready.
+ * GetVolInfo()  - Ready.  This function is new.
  *
  * Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>
  * NUMDISKL()
@@ -220,3 +223,103 @@ HB_FUNC( NUMDISKL )
    hb_retni( 1 );
 }
 #endif
+
+
+
+/*
+Volume() depends of the CSETSAFETY() setting and, if is true, does not overwrite an 
+existing label. 
+Syntax is: Volume("x:test") or Volume("x:\test"), where "x" is the
+any drive letter and "test" will be the new volume name. 
+Note:
+1) if the drive letter is not suplied, then the current drive will 
+   be used to change voloume name.
+2) if Volume("x:") or Volume("x:\") then the volume name of the drive
+   "x:" will be erased.
+3) if Volume("") or Volume() then the volume name of the current drive 
+   will be erased.
+
+*/
+
+extern BOOL ct_getsafety( void );  // this function is in ct/strfile.c
+
+HB_FUNC( VOLUME )
+{
+   BOOL bReturn = FALSE;
+
+if ( !ct_getsafety() ) 
+{                                             
+   PHB_FNAME fname;
+   BYTE * sDiskName;
+   char * sRoot=NULL;
+   char * sVolName=NULL;
+   
+   if( ISCHAR(1) && hb_parclen(1) > 0 )
+   {
+     sDiskName = hb_fileNameConv( hb_strdup( hb_parcx(1) ) );
+
+     if( ( fname = hb_fsFNameSplit( (char*) sDiskName ) ) != NULL )
+     {
+        if( fname->szPath )
+        {
+         sRoot = ""; 
+         strncat( sRoot, fname->szPath, 2 ); // truncate in 2 positions: trailing backslash isn't needed.
+         strcat( sRoot , "\0" );
+        }
+        if( fname->szName )
+        {   
+         sVolName="           ";
+         strncpy( sVolName, fname->szName, 11 );
+         strcat( sVolName, "\0" );
+        }     
+
+        hb_xfree( fname );
+     }
+     else
+     {
+       sVolName="           ";
+       strncpy( sVolName, (char *) sDiskName, 11 );
+       strcat( sVolName, "\0" );
+     }
+   }
+#if defined(HB_OS_WIN_32)
+   bReturn = SetVolumeLabel( sRoot, sVolName );
+#endif
+}  
+   hb_retl( bReturn );
+}
+
+/*
+ GetVolInfo() is a new function. It returns the volume name of a Floppy, CD, 
+ Hard-disk or network drive.
+ Sintax is: GetVolInfo("x:\")
+ Note that the trailing backslash is required.
+ In the near future, this function will be increased to return serial number also.
+*/
+HB_FUNC( GETVOLINFO )
+{
+    int retval=0;
+    char * sDrive="";
+    char * sVolName[255];
+
+    strncat( sDrive, (char*) hb_parcx(1), 3 ); 
+    strcat( sDrive, "\0" );
+
+#if defined(HB_OS_WIN_32)
+
+    retval = GetVolumeInformation( sDrive,
+                                   &sVolName, 
+                                   256,
+                                   NULL,
+                                   NULL, 
+                                   NULL,
+                                   NULL,
+                                   NULL );
+#endif
+    if ( retval!=0 )
+      hb_retc( (char *) sVolName );
+    else  
+      hb_retc("");
+
+}
+
