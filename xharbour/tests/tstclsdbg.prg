@@ -9,7 +9,7 @@
 *
 * (C) 2003 Francesco Saverio Giudice
 *
-* $Id: service.prg,v 1.3 2003/10/20 02:39:29 jonnymind Exp $
+* $Id: tstclsdbg.prg,v 1.1 2003/11/10 00:59:32 fsgiudice Exp $
 *
 
 #include "common.ch"
@@ -21,6 +21,7 @@ PROCEDURE Main( cNoWait )
 
   LOCAL a := TAssociativeArray()
   LOCAL b := TAssociativeArray()
+  LOCAL h := Hash()
   LOCAL t
   LOCAL lWait := TRUE
 
@@ -33,9 +34,13 @@ PROCEDURE Main( cNoWait )
   t := Test( 100 )  // Declaring t as Test Object autoinizializing with a value.
                     // Look at CONSTRUCTOR in class definition
 
+  //---------------------------
+
   a['Test1'] := Date()
   a['TEST2'] := "Francesco"
   a['Test3'] := 10
+
+  //---------------------------
 
   b:Var1 := 10             // This will be stored in UPPER case
   b:Var2 := .t.            // This will be stored in UPPER case
@@ -43,12 +48,29 @@ PROCEDURE Main( cNoWait )
   b['VaR4'] := { "This", "is", "an", "array", ;  // As above
                  "of", 11, "items", Date(), .T., { "Array", "of", 4, "items" }, {"AssocArray" => .t. } }
   b['Var5'] := ErrorNew()  // An object
+  b['var6'] := {}          // An empty array
+  b['var7'] := { "Test 1" => "an associative array nested" } // Another associative array
+  b['var8'] := { "Test 2" :> "an hash nested" }
+
+  //---------------------------
+
+  h['Hash1'] := "Giudice"
+  h[1]       := "Frank"
+  h[Date()]  := { "10" :> "a hash of hash" }
+  h['']      := "Hash with null key (empty string)"
+  h[2]       := { :> }   // another hash of an empty hash
+
+  //---------------------------
 
   t:Add( "x"  , 20 )
   t:Add( "one", { "This", "is", "an", "array", "of", 11, "items", Date(), .T., { "Array", "of", 4, "items" }, {"AssocArray" => .t. } } )
   t:Add( "two", 40 )
 
+  //---------------------------
+
   //? a['Test2']       // Uncomment this to get error because TEST2 is declared in UPPER case
+
+  //---------------------------
 
   Write( "Display value of: a" )
   Write( HB_DumpVar( a ) )
@@ -68,8 +90,20 @@ PROCEDURE Main( cNoWait )
   IF lWait THEN Write( "Press any key to continue" )
   IF lWait THEN Inkey( 0 )
   Write( "" )
-  Write( "Display value of var b recurively" )
+  Write( "Display value of var b recursively" )
   Write( HB_DumpVar( b,, TRUE ) )
+  Write( "" )
+  IF lWait THEN Write( "Press any key to continue" )
+  IF lWait THEN Inkey( 0 )
+  Write( "" )
+  Write( "Display value of var h" )
+  Write( HB_DumpVar( h ) )
+  Write( "" )
+  IF lWait THEN Write( "Press any key to continue" )
+  IF lWait THEN Inkey( 0 )
+  Write( "" )
+  Write( "Display value of var h recursively" )
+  Write( HB_DumpVar( h,, TRUE ) )
   Write( "" )
   IF lWait THEN Write( "Press any key to continue" )
   IF lWait THEN Inkey( 0 )
@@ -95,6 +129,8 @@ PROCEDURE Main( cNoWait )
   Write( "End of test" )
 
 RETURN
+
+//-----------------------------------------------------------------------------------//
 
 CLASS TestParent
    METHOD MyConstructorParent CONSTRUCTOR

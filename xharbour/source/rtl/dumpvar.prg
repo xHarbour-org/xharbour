@@ -1,5 +1,5 @@
 /*
- * $Id: dummy.prg,v 1.4 2003/11/04 08:31:04 druzus Exp $
+ * $Id: dumpvar.prg,v 1.1 2003/11/10 01:14:50 fsgiudice Exp $
  */
 
 /*
@@ -82,9 +82,10 @@ FUNCTION HB_DumpVar( xVar, lAssocAsObj, lRecursive, nIndent )
                 cString += Space( nIndent ) + "{" + CRLF
                 FOR EACH cKey IN xVar:Keys
                     cString += Space( nIndent ) + " '" + cKey + "' => " + asString( xVar:SendKey( cKey ) ) + ", " + CRLF
-                    IF lRecursive .AND. ValType( xVar:SendKey( cKey ) ) $ "AO"
+                    IF lRecursive .AND. ValType( xVar:SendKey( cKey ) ) $ "AOH"
                        cString := SubStr( cString, 1, Len( cString )-4 ) + CRLF
                        cString += hb_DumpVar( xVar:SendKey( cKey ),, lRecursive, nIndent+3 )
+                       cString := SubStr( cString, 1, Len( cString )-2 ) + ", " + CRLF
                     ENDIF
                 NEXT
                 cString := SubStr( cString, 1, Len( cString )-4 ) + CRLF
@@ -107,6 +108,11 @@ FUNCTION HB_DumpVar( xVar, lAssocAsObj, lRecursive, nIndent )
      CASE cType == "A"
           cString += Space( nIndent ) + "Type='" + cType + "' -> " + CRLF
           cString += DShowArray( xVar, lRecursive, nIndent )
+
+     CASE cType == "H"
+          cString += Space( nIndent ) + "Type='" + cType + "' -> " + CRLF
+          cString += DShowHash( xVar, lRecursive, nIndent )
+
      OTHERWISE
           cString +=  Space( nIndent ) + AsString( xVar ) + CRLF
   ENDCASE
@@ -166,13 +172,43 @@ STATIC FUNCTION DShowArray( aVar, lRecursive, nIndent )
      cString += Space( nIndent ) + "{" + CRLF
      FOR EACH xVal IN aVar
          cString += Space( nIndent ) + " ["+ LTrim( StrZero( HB_EnumIndex(), nChar ) ) + "] => " + AsString( xVal ) + ", " + CRLF
-         IF lRecursive .AND. ValType( xVal ) $ "AO"
+         IF lRecursive .AND. ValType( xVal ) $ "AOH"
             cString := SubStr( cString, 1, Len( cString )-4 ) + CRLF
             cString += hb_DumpVar( xVal,, lRecursive, nIndent+3 )
             cString := SubStr( cString, 1, Len( cString )-2 ) + ", " + CRLF
          ENDIF
      NEXT
-     cString := SubStr( cString, 1, Len( cString )-4 ) + CRLF
+     IF Len( aVar ) > 0
+        cString := SubStr( cString, 1, Len( cString )-4 ) + CRLF
+     ENDIF
+     cString += Space( nIndent ) + "}" + CRLF
+  ENDIF
+
+RETURN cString
+
+STATIC FUNCTION DShowHash( hVar, lRecursive, nIndent )
+  LOCAL xVal, nChar, xKey, aKeys
+  LOCAL cString := ""
+
+  DEFAULT nIndent TO 0
+
+  //TraceLog( "DShowHash: hVar, ValType( hVar ), lRecursive", hVar, ValType( hVar ), ValToPrg( hVar ), lRecursive )
+
+  IF ValType( hVar ) == "H"
+     aKeys := HGetKeys( hVar )
+     cString += Space( nIndent ) + "{" + CRLF
+     FOR EACH xKey IN aKeys
+         xVal := hVar[ xKey ]
+         cString += Space( nIndent ) + " ["+ LTrim( AsString( xKey ) ) + "] :> " + AsString( xVal ) + ", " + CRLF
+         IF lRecursive .AND. ValType( xVal ) $ "AOH"
+            cString := SubStr( cString, 1, Len( cString )-4 ) + CRLF
+            cString += hb_DumpVar( xVal,, lRecursive, nIndent+3 )
+            cString := SubStr( cString, 1, Len( cString )-2 ) + ", " + CRLF
+         ENDIF
+     NEXT
+     IF Len( aKeys ) > 0
+        cString := SubStr( cString, 1, Len( cString )-4 ) + CRLF
+     ENDIF
      cString += Space( nIndent ) + "}" + CRLF
   ENDIF
 
