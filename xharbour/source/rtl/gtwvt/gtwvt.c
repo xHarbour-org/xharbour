@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.76 2004/02/23 00:07:19 peterrees Exp $
+ * $Id: gtwvt.c,v 1.77 2004/03/03 13:20:55 lf_sfnet Exp $
  */
 
 /*
@@ -3913,7 +3913,7 @@ HB_FUNC( WVT_GETRGBCOLOR )
    if ( !ISNIL( 1 ) )
    {
       iColor = hb_parni( 1 );
-      if ( iColor >= 0 && iColor <= 16 )  /* Test bound error */
+      if ( iColor >= 0 && iColor < 16 )  /* Test bound error */
       {
          hb_retnl( _COLORS[ iColor ] );
       }
