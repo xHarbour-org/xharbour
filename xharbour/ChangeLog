@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.522 2002/12/11 19:02:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.523 2002/12/13 04:12:06 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-13 02:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/regex.h
+  * source/rtl/regex.c
+    -+ Replaced RegEx engine to PCRE. Written by: Philip Hazel <ph10@cam.ac.uk> Copyright (c) 1997-2001 University of Cambridge.
+      This engine is FAR more powerful, and FAR faster.
+
+  * doc/regex.txt
+    -+ Replaced with text from pcre.tx which is the complete documentation of PCRE originaly pcre.txt
+       /* NOTE: This does include general Regular Expressions documentation, for those intrested. */
+
+  * tests/tstregex.prg
+    * Minor modifications to show \b (begin of word), feature not avialable before.
 
 2002-12-12 20:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/regex.c
