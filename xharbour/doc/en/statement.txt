@@ -201,3 +201,212 @@
  *      LOCAL,PARAMETERS,PCOUNT(),PRIVATE,PROCEDURE,RETURN 
  *  $END$
  */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      IF
+ *  $CATEGORY$
+ *      Statement
+ *  $ONELINER$
+ *      Execute one of several alternative blocks of statements
+ *  $SYNTAX$
+ *      IF <lCondition1>
+ *         <statements>...
+ *      [ELSEIF <lCondition2>]
+ *         <statements>...
+ *      [ELSE]
+ *         <statements>...
+ *      END[IF]
+ *  $ARGUMENTS$
+ *      <lCondition> is a logical control expression.  If it evaluates to
+ *      true (.T.), all following statements are executed until an ELSEIF, ELSE,
+ *      or ENDIF is encountered.
+ *  
+ *      ELSEIF <lCondition> identifies statements to execute if the
+ *      associated condition evaluates to true (.T.) and all preceding IF or
+ *      ELSEIF conditions evaluate to false (.F.).  Any number of ELSEIF
+ *      statements can be specified within the same IF...ENDIF control
+ *      structure.
+ *  
+ *      ELSE identifies statements to execute if the IF and all preceding
+ *      ELSEIF conditions evaluate to false (.F.).
+ *  $RETURNS$
+ *      None
+ *  $DESCRIPTION$
+ *      The IF control structure works by branching execution to statements
+ *      following the first true (.T.) evaluation of the IF or any ELSEIF
+ *      condition.  Execution then continues until the next ELSEIF, ELSE, or
+ *      ENDIF is encountered whereupon execution branches to the first statement
+ *      following the ENDIF.
+ *  
+ *      If no condition evaluates to true (.T.), control passes to the first
+ *      statement following the ELSE statement.  If an ELSE statement is not
+ *      specified, control branches to the first statement following the ENDIF
+ *      statement.
+ *  
+ *      IF...ENDIF structures may be nested within IF...ENDIF structures and
+ *      other control structure commands.  These structures, however, must be
+ *      nested properly.
+ *  
+ *      The IF...ELSEIF...ENDIF form of the IF construct is identical to DO
+ *      CASE...ENDCASE.  There is no specific advantage of one syntax over the
+ *      other.  The IF construct is also similar to the IF() function which can
+ *      be used within expressions.
+ *  $EXAMPLES$
+ *      n := 50
+ *      y := 100
+ *      IF n < y
+ *         ? "n is smaller"
+ *      ELSE
+ *         ? "n is greater"
+ *      ENDIF 
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This is Clipper compliant
+ *  $PLATFORMS$
+ *      All
+ *  $SEEALSO$
+ *      BEGIN,SEQUENCE,DO CASE,DO WHILE,FOR,IF() 
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *
+ *  $CATEGORY$
+ *
+ *  $ONELINER$
+ *
+ *  $SYNTAX$
+ *
+ *  $ARGUMENTS$
+ *
+ *  $RETURNS$
+ *
+ *  $DESCRIPTION$
+ *
+ *  $EXAMPLES$
+ *
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This is Clipper compliant
+ *  $PLATFORMS$
+ *      All
+ *  $SEEALSO$
+ *
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *
+ *  $CATEGORY$
+ *
+ *  $ONELINER$
+ *
+ *  $SYNTAX$
+ *
+ *  $ARGUMENTS$
+ *
+ *  $RETURNS$
+ *
+ *  $DESCRIPTION$
+ *
+ *  $EXAMPLES$
+ *
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This is Clipper compliant
+ *  $PLATFORMS$
+ *      All
+ *  $SEEALSO$
+ *
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *
+ *  $CATEGORY$
+ *
+ *  $ONELINER$
+ *
+ *  $SYNTAX$
+ *
+ *  $ARGUMENTS$
+ *
+ *  $RETURNS$
+ *
+ *  $DESCRIPTION$
+ *
+ *  $EXAMPLES$
+ *
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This is Clipper compliant
+ *  $PLATFORMS$
+ *      All
+ *  $SEEALSO$
+ *
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *
+ *  $CATEGORY$
+ *
+ *  $ONELINER$
+ *
+ *  $SYNTAX$
+ *
+ *  $ARGUMENTS$
+ *
+ *  $RETURNS$
+ *
+ *  $DESCRIPTION$
+ *
+ *  $EXAMPLES$
+ *
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This is Clipper compliant
+ *  $PLATFORMS$
+ *      All
+ *  $SEEALSO$
+ *
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *
+ *  $CATEGORY$
+ *
+ *  $ONELINER$
+ *
+ *  $SYNTAX$
+ *
+ *  $ARGUMENTS$
+ *
+ *  $RETURNS$
+ *
+ *  $DESCRIPTION$
+ *
+ *  $EXAMPLES$
+ *
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This is Clipper compliant
+ *  $PLATFORMS$
+ *      All
+ *  $SEEALSO$
+ *
+ *  $END$
+ */
+

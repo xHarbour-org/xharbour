@@ -13,411 +13,780 @@ original author in your pubblication.
 
 Thread functions
 ----------------
-
-StartThread
-
-   Syntax
-      StartThread( @FuncName() [, param1, ....., paramN] ) --> THREAD
-      StartThread( "funcname" [, param1, ....., paramN] ) --> THREAD
-      StartThread( { CodeBlock } [, param1, ....., paramN] ) --> THREAD
-      StartThread( Object, MtdPtr [, param1, ....., paramN] ) --> THREAD
-      StartThread( Object, "MtdName" [, param1, ....., paramN] ) --> THREAD
-
-   Description
-      Starts a new thread, using the first parameter as a main thread function;
-      the first parameter can be a function pointer, or a string containing a
-      valid function name. This second grammar rule allows the programmer to
-      build dynamically a function name and pass it to StartThread.
-      The named function will be scheduled to be executed as soon as possible.
-      If a codeblock is passed as first parameter, then the codeblock is
-      evaluated as usual, but it is executed in another, parallel thread.
-      Codeblocks used in StartThread can use also parameters  with the syntax
-      {|<paramlist>| <statements> } , where <paramlist> is a comma separated
-      list of symbols.
-
-      StartThread can also be used to start an object method in a parallel
-      thread. When an object is specified as the first parameter, the second
-      parameter must be either a method pointer obtained with the function
-      MtdPtr := HB_ObjMsgPtr( Object, "MtdName" ), or a string containing a
-      valid method name for that object.
-
-      For all this functions, the optional parameters are passed to the target
-      thread function, codeblock or method. They should match the number and
-      the type of the parameters the target is waiting for.
-
-      StartThread might return before the other thread has been really started,
-      but it will wait until proper thread resources have been allocated into
-      the virtual machine.
-
-      The return value is a Thread Pseudo Object. This pseudo object carries
-      data about the state of the thread; if the function call is sucessful,
-      IsValidThread( THREAID ) will return .T.
-      The thread pseudo object is used in all the functions of the multithreading
-      system, and remains valid even after child thread termination, so you can
-      safely store this value somewhere and use it later on.
-
-StopThread
-
-   Syntax
-      StopThread( THREAD [, MUTEX ] ) --> NIL
-
-   Description
-      Stops the given thread as soon as possible. This happens generally as
-      soon as the target thread is resumed, or just before resuming it.
-      This function will also wait for the target thread to be terminated,
-      and all of his system resources to be de-allocated, before to return
-      to the caller.
-
-      A mutex can be passed to StopThread as second parameter; the mutex will be
-      notified as if a NotifyAll() function were called before to send the
-      termination request. This allows to terminate more gracefully threads that
-      are waiting for notification on a mutex.
-
-
-KillThread
-
-   Syntax
-      KillThread( THREAD ) --> NIL
-
-   Description
-      This function acts as StopThread, except for the fact that it does not
-      wait for the thread to be terminated before to return to the caller. In
-      other words, KillThread will issue a termination request to the target
-      thread, and then will return immediately.
-
-   Remarks
-      Since this function does not wait for the thread to be terminated,
-      resources allocated for the target thread will be collected when possible
-      by the garbage collector.
-
-
-ThreadGetCurrent
-
-   Syntax
-      ThreadGetCurrent()  --> THREAD
-
-   Description
-      [THIS FUNCTION IS NOW DEPRECATED IN FAVOR OF GETCURRENTTHREAD]
-
-
-GetCurrentThread
-
-   Syntax
-      GetCurrentThread()  --> THREAD
-
-   Description
-      This function returns a thread pseudo object identifying of the current
-      thread. This object can be stored and can be used by other threads to
-      refer to this one, to stop it with StopThread() or KillThread(), or to join
-      it using JoinThread(). It can be used also to determine if a given thread
-      pseudo object is referencing this thread wit the function IsSameThread().
-
-
-GetThreadId
-
-   Syntax
-      GetThreadId( THREAD )  --> nThreadNumber
-
-   Description
-      This function returns the number that xharbour virtual machine associates
-      with each thread it creates. For every implementation, under every
-      operating system, it is granted that:
-
-      1) Main thread ID is 1:
-         Procedure MAIN()
-            GetThreadId( GetCurrentThread() ) == 1
-
-      2) Thread ID are assigned sequentially:
-         TH1 := StartThread( ... )
-         TH2 := StartThread( ... )
-         GetThreadId( TH1 ) < GetThreadId( TH2 )
-
-      3) If two thread Pseudo Objects have the same ID, they reference
-         the same thread:
-         IF GetThreadId( TH1 ) == GetThreadId( TH2 )
-            //TH1 and TH2 are referencing the same thread
-
-      4) An invalid parameter, or an invalid thread object, rises an error.
-
-
-
-IsValidThread
-
-   Syntax
-      IsValidThread( xThing ) --> lValid
-
-   Description
-      This function returns true if the given parameter is a valid thread
-      pseudo object, that is:
-      1) if the parameter is exactly of kind THREAD
-      2) if the thread is started or going to start correctly.
-
-
-
-
-IsSameThread
-
-   Syntax
-      IsSameThread( TH1, TH2 ) --> lAreSame
-
-   Description
-      Returns true if TH1 and TH2 are the same, or are referencing the same
-      valid thread.
-      If one or both the parameters refer to invalid threads, an error is
-      risen.
-
-
-
-JoinThread
-
-   Syntax
-      JoinThread( THREAD ) --> NIL
-
-   Description
-      JoinThread wait indefinitely for the target thread to finish. This
-      function can be used even on already terminated threads. If the thread
-      is already terminated, of if the thread number is not valid, JoinThread
-      will return immediately.
-
-
-ThreadSleep
-   
-   Syntax
-      ThreadSleep( nMillisec ) --> NIL
-
-   Description
-      Blocks the execution of the thread for at least nMillisec milliseconds.
-      After this time is elapsed, the thread will be resumed starting from the
-      instruction immediately following ThreadSleep() as soon as possible.
-      This additional delay depends on operating system peculiarities and on
-      the current system load.
-
-
-WaitForThreads
-
-   Syntax
-      WaitForThreads() --> Nil
-
-   Description
-      This function is used to wait for all the threads launched by the 
-      program to be terminated, and their resources to be freed. It should be 
-      called only from main application thread (the one that calls the first 
-      StartThread() ), just before quitting the program, or when the program 
-      needs to be sure that not a single secondary thread remains before 
-      to proceed.
-
-
-
-Mutex Functions
----------------
-
-
-Mutex (MUTual EXclusion) are complex objects that can be used by different 
-thread to do one or more of the following operations:
-  1.Ensure to be the unique thread that is ?owning the mutex?.
-  2.Wait for an event to happen in another thread.
-  3.Signal another (or all the other) waiting threads that the event they were 
-    waiting for has happened.
-To achieve this results, the mutex must be shared among several threads. This
-can be done by passing the mutex as one of the StartThread parameters, or 
-having the mutex as a global variable.
-
-NOTE: the functions in this section may be preceded with HB_ prefix.
-
-MutexCreate
-   
-   Syntax
-      MutexCreate() --> MUTEX
-
-   Description
-      Creates a mutex. You should store the return value in a global module 
-      variable or in another variable that can be accessed from several 
-      threads.
-
-DestroyMutex
-
-   Syntax
-      DestroyMutex( MUTEX ) --> NIL
-
-   Description
-      [THIS FUNCTION IS DEPRECATED AND SHOULD NEVER BE USED]
-
-
-MutexLock
-
-   Syntax
-      MutexLock( MUTEX ) --> NIL
-
-   Description
-      This function waits until the mutex passed as parameter has not been
-      locked by any other thread; when the mutex is free, the execution of
-      the current thread continues and the mutex is locked so that any other
-      thread trying to achieve a lock will have to wait.
-
-      xHarbour mutexes are reentrant. This means that the thread that is
-      currently the owner of the lock on the mutex could possibly lock again
-      the same mutex any number of times, provided it calls MutexUnlock() the
-      same number of times MutexLock() is called.
-
-      Xharbour support cancellable mutex waits. This means that a thread may
-      be canceled while waiting for a mutex. If this happens, the canceled
-      thread will NOT hold the mutex. If a thread is canceled while holding
-      a mutex, the mutex will be automatically freed.
-
-      Anyhow, avoid it. If you feel the need to cancel a thread waiting or
-      holding a mutex, there's something wrong with your multithreading
-      programming technique. This support is provided only for emergency
-      recovery.
-
-
-MutexTryLock
-
-   Syntax
-      MutexTryLock( MUTEX ) --> lAchieved
-
-   Description
-      This functions acts as MutexLock, but if the lock cannot be immediately
-      achieved, the function returns false. If lock has been achieved, it
-      returns true.
-
-
-
-
-MutexUnlock
-
-   Syntax
-      MutexUnlock( MUTEX ) --> NIL
-
-   Default
-      Unlocks the target mutex; if  one thread was waiting to achieve a lock on
-      that mutex, it will be resumed as soon as possible. If more than one
-      thread was waiting, the resumed thread could be any one of the waiting 
-      thread, depending on a scheme varying from system to system. Any way, 
-      operative systems ensures that the lock is granted to each thread in 
-      a fair way.
-
-
-Subscribe
-   
-   Syntax
-      Subscribe( MUTEX [, nMaxMilliSecs [, @bStatus]] ) --> ANY
-
-   Description
-      Subscribe() function suspends current thread until the target mutex is
-      signaled by another thread, using the Notify() or NotifyAll() functions.
-      If nMaxMilliSecs parameter is given, the wait will be interrupted anyway
-      if a notification is not issued by the given amount of milliseconds.
-      The return value is NIL if the wait time has expired and a notification
-      has not been issued, or if the notification parameter was not given. 
-      In fact, the notifying thread can specify an object, a string or any 
-      kind of parameter to be passed as return parameter of subscribe in the
-      subscribing thread.
-      If the bStatus parameter is given too, then it will assume the value of 
-      .F. if the wait has expired without a notification being issued, and a 
-      value of .T. if the function received a notification: this is useful if 
-      the Notify() function does not send any notification value: in this case, 
-      Subscribe() would return NIL both if timeout has expired or not.
-
-      xHBThreads supports late subscription. A notification message can be
-      issued before Subscribe() function is called. If this happens, 
-      Subscribe() returns immediately, and the notification object, if given, 
-      is returned. If more than a notification is issued, an equal number of
-      Subscribe() functions will be allowed to proceed without blocking.
-
-      Another important feature of xHBthreads implementation is that if the 
-      mutex is locked by the current thread, then it is automatically unlocked
-      by Subscribe() before suspending the current thread, and when the thread 
-      is resumed after notification or after the timeout is passed, the lock on
-      the mutex is achieved again before the control passes to the next 
-      instruction.
-      This allows "stop and go" programming schemes, where the subscribing
-      thread locks a resources, does some operations, then put itself in a 
-      waiting state, allowing other threads to lock the mutex at their needs;
-      then, when that other threads notify the waiting one, they must release 
-      the resource (the mutex) they are holding before the subscribing mutex
-      can really begin to operate. Under this context, Subscribe() can be 
-      viewed as a temporary suspensions of lock rights on the target mutex.
-
-   Remarks
-      Windows98 implementation of mutexes does not allows atomic mutex lock 
-      releasing at the same time as subscription; this reduces the possibility
-      to have stop and go programming schemes; the late subscription support
-      can be used instead.
-
-
-Notify
-
-   Syntax
-      Notify( MUTEX [,anyParam] ) --> NIL
-
-   Description
-      This functions resumes the next thread that has subscribed the target 
-      mutex. If more of one thread has subscribed the mutex, only one will be
-      resumed; the resumed thread will be chosen at random, but the operating
-      system will be fair with all waiting threads.  Notify() acts also on
-      future subscriptions: if there isn't any thread subscribing the mutex at
-      the moment, Notify() will cause the next thread to subscribe to be
-      immediately resumed without any wait. One thread will be allowed
-      subscribing for each Notify issued on the mutex (so, if a non-subscribed
-      mutex is notified three times, three subscriptions will be allowed to
-      proceed, and the fourth will be blocked).
-
-      If anyParam is provided, this parameter will be returned by the
-      Subscribe() routine, else it will return NIL. This optional parameter can
-      be of any xHarbour types, both simple (numeric, date, string etc.) or 
-      complex (object, array, CSTRUCT etc.).
-      If more than one Notify are called on an not subscribed mutex, only the 
-      last Notify()'s parameter will be returned by all the later Subscribe()
-      routines.
-      If the thread that is calling Notify() is also locking the mutex, this 
-      lock must be released just before or, preferably, just after the Notify()
-      call. The notifying thread should ensure that the optional parameter, if 
-      provided, is not shared with other threads: there is not any guarantee 
-      that the subscribing thread will take control immediately, and the fact 
-      that the lock on the mutex must be released by the notifying thread, to 
-      allow the subscribing one to achieve back the lock, can allow a third 
-      thread to lock the mutex and act before the subscribing thread is able 
-      to take control.
-
-
-SubscribeNow
-
-   Syntax
-      SubscribeNow( MUTEX [,nMaxMilliSecs [, @bStatus]] ) --> ANY
-
-   Description
-      This function acts exactly as Subscribe(), except for the fact that it
-      clears atomically any previous notification that might have been issued
-      before on the target mutex. So, calling SubscribeNow() is a safe method
-      to suspend the current thread until a notification is done. Please refer
-      the Subscribe() function documentation for a complete description.
-
-
-NotifyAll
-
-   Syntax
-      NotifyAll( MUTEX [,anyParam] ) --> NIL
-
-   Description
-      This functions is perfectly equivalent to Notify(), with two major 
-      differences. First of all, it notifies all the subscribing threads
-      altogether. If more than a subscribing thread is waiting for a signal on
-      this mutex, they all will be told to proceed. The operating system will
-      decide the order by which the subscribing threads will be resumed, but
-      all of them will be activated as soon as possible.
-
-      The second difference with respect of the Notify() function is that 
-      NotifyAll() will resume only threads currently waiting for notification;
-      any subscription request coming after a NotifyAll() will be blocked 
-      (unless there are other Notify() messages pending on the mutex).
-
-      Another peculiar feature of this procedure is that a separate copy of the
-      notification object, if given, is handled to each subscriber. Using this
-      function could cause a big deal of data being duplicated: if you are sure
-      that the subscribers won't modify the data, you can pass a reference 
-      instead of the object, but you must also make sure that the object passed 
-      by reference is not destroyed in the context where it is created (like
-      i.e., when passing by reference a LOCAL variable and then exiting the
-      function).
-
-      
+/*  $DOC$
+ *  $FUNCNAME$
+ *      StartThread()
+ *  $CATEGORY$
+ *      XHarbour Mt Engine
+ *  $ONELINER$
+ *      Create An New thread
+ *  $SYNTAX$
+ *      StartThread( @FuncName() [, param1, ....., paramN] ) --> THREAD
+ *      StartThread( "funcname" [, param1, ....., paramN] ) --> THREAD
+ *      StartThread( { CodeBlock } [, param1, ....., paramN] ) --> THREAD
+ *      StartThread( Object, MtdPtr [, param1, ....., paramN] ) --> THREAD
+ *      StartThread( Object, "MtdName" [, param1, ....., paramN] ) --> THREAD
+ *  $ARGUMENTS$
+ *
+ *  $RETURNS$
+ *      <THREAD> An Thread id
+ *  $DESCRIPTION$
+ *      Starts a new thread, using the first parameter as a main thread function;
+ *      the first parameter can be a function pointer, or a string containing a
+ *      valid function name. This second grammar rule allows the programmer to
+ *      build dynamically a function name and pass it to StartThread.
+ *      The named function will be scheduled to be executed as soon as possible.
+ *      If a codeblock is passed as first parameter, then the codeblock is
+ *      evaluated as usual, but it is executed in another, parallel thread.
+ *      Codeblocks used in StartThread can use also parameters  with the syntax
+ *      {|<paramlist>| <statements> } , where <paramlist> is a comma separated
+ *      list of symbols.
+ * 
+ *      StartThread can also be used to start an object method in a parallel
+ *      thread. When an object is specified as the first parameter, the second
+ *      parameter must be either a method pointer obtained with the function
+ *      MtdPtr := HB_ObjMsgPtr( Object, "MtdName" ), or a string containing a
+ *      valid method name for that object.
+ * 
+ *      For all this functions, the optional parameters are passed to the target
+ *      thread function, codeblock or method. They should match the number and
+ *      the type of the parameters the target is waiting for.
+ * 
+ *      StartThread might return before the other thread has been really started,
+ *      but it will wait until proper thread resources have been allocated into
+ *      the virtual machine.
+ * 
+ *      The return value is a Thread Pseudo Object. This pseudo object carries
+ *      data about the state of the thread; if the function call is sucessful,
+ *      IsValidThread( THREAID ) will return .T.
+ *      The thread pseudo object is used in all the functions of the multithreading
+ *      system, and remains valid even after child thread termination, so you can
+ *      safely store this value somewhere and use it later on.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StopThread(),KillThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      StopThread
+ *  $CATEGORY$
+ *      XHarbour Mt Engine
+ *  $ONELINER$
+ *      Stops an thread
+ *  $SYNTAX$
+ *      StopThread( THREAD [, MUTEX ] ) --> NIL
+ *  $ARGUMENTS$
+ *      <THREAD> An Thread Id Value
+ *      <MUTEX>  An optional Mutex Id value
+ *  $RETURNS$
+ *      NIL This function always return nil
+ *  $DESCRIPTION$
+ *      Stops the given thread as soon as possible. This happens generally as
+ *      soon as the target thread is resumed, or just before resuming it.
+ *      This function will also wait for the target thread to be terminated,
+ *      and all of his system resources to be de-allocated, before to return
+ *      to the caller.
+ * 
+ *      A mutex can be passed to StopThread as second parameter; the mutex will be
+ *      notified as if a NotifyAll() function were called before to send the
+ *      termination request. This allows to terminate more gracefully threads that
+ *      are waiting for notification on a mutex.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),KillThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      KillThread()
+ *  $CATEGORY$
+ *      XHarbour Mt Engine
+ *  $ONELINER$
+ *      Kill an thread
+ *  $SYNTAX$
+ *      KillThread( <THREAD> ) --> NIL
+ *  $ARGUMENTS$
+ *      <THREAD> An Thread Id Value
+ *  $RETURNS$
+ *      NIL This function always return nil
+ *  $DESCRIPTION$
+ *      This function acts as StopThread, except for the fact that it does not
+ *      wait for the thread to be terminated before to return to the caller. In
+ *      other words, KillThread will issue a termination request to the target
+ *      thread, and then will return immediately.
+ * 
+ *      Remarks
+ *      Since this function does not wait for the thread to be terminated,
+ *      resources allocated for the target thread will be collected when possible
+ *      by the garbage collector.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ThreadGetCurrent()
+ *  $CATEGORY$
+ *      XHarbour Mt Engine
+ *  $ONELINER$
+ *      Get the current thread Id
+ *  $SYNTAX$
+ *      ThreadGetCurrent()  --> THREAD
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      <THREAD>  An Thread Id Value
+ *  $DESCRIPTION$   
+ *      [THIS FUNCTION IS NOW DEPRECATED IN FAVOR OF GETCURRENTTHREAD]
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),Killthread()
+ *  $END$
+ */
+
+
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      GetCurrentThread()
+ *  $CATEGORY$
+ *      XHarbour Mt Engine
+ *  $ONELINER$
+ *      Get the current thread Id
+ *  $SYNTAX$
+ *      GetCurrentThread()  --> THREAD
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      <THREAD>  An Thread Id Value
+ *  $DESCRIPTION$   
+ *      This function returns a thread pseudo object identifying of the current
+ *      thread. This object can be stored and can be used by other threads to
+ *      refer to this one, to stop it with StopThread() or KillThread(), or to join
+ *      it using JoinThread(). It can be used also to determine if a given thread
+ *      pseudo object is referencing this thread wit the function IsSameThread().
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),Killthread()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      GetThreadId()
+ *  $CATEGORY$
+ *      XHarbour Mt Engine
+ *  $ONELINER$
+ *      Get the current thread id
+ *  $SYNTAX$
+ *      GetThreadId( THREAD )  --> nThreadNumber
+ *  $ARGUMENTS$
+ *      <THREAD> An Thread Id Value
+ *  $RETURNS$
+ *      <nThreadNumber> Id of this thread
+ *  $DESCRIPTION$
+ *      This function returns the number that xharbour virtual machine associates
+ *      with each thread it creates. For every implementation, under every
+ *      operating system, it is granted that:
+ * 
+ *      1) Main thread ID is 1:
+ *         Procedure MAIN()
+ *            GetThreadId( GetCurrentThread() ) == 1
+ * 
+ *      2) Thread ID are assigned sequentially:
+ *         TH1 := StartThread( ... )
+ *         TH2 := StartThread( ... )
+ *         GetThreadId( TH1 ) < GetThreadId( TH2 )
+ * 
+ *      3) If two thread Pseudo Objects have the same ID, they reference
+ *         the same thread:
+ *         IF GetThreadId( TH1 ) == GetThreadId( TH2 )
+ *            //TH1 and TH2 are referencing the same thread
+ * 
+ *      4) An invalid parameter, or an invalid thread object, rises an error.
+ * 
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      IsValidThread()
+ *  $CATEGORY$
+ *      XHarbour Mt Engine
+ *  $ONELINER$
+ *      Verify if an thread is valid
+ *  $SYNTAX$
+ *      IsValidThread( xThing ) --> lValid
+ *  $ARGUMENTS$
+ *      <xThing> any expression
+ *  $RETURNS$
+ *      <lValid> True if expression is valid otherwise false.
+ *  $DESCRIPTION$
+ *      This function returns true if the given parameter is a valid thread
+ *      pseudo object, that is:
+ *      1) if the parameter is exactly of kind THREAD
+ *      2) if the thread is started or going to start correctly.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      IsSameThread()
+ *  $CATEGORY$
+ *      XHarbour Mt Engine
+ *  $ONELINER$
+ *      Verify if two thread are iqual
+ *  $SYNTAX$
+ *      IsSameThread( TH1, TH2 ) --> lAreSame
+ *  $ARGUMENTS$
+ *      <TH1> An thread Handle
+ *      <TH2> An thread Handle
+ *  $RETURNS$
+ *      <lAreSame> True if both thread are same
+ *  $DESCRIPTION$
+ *      Returns true if TH1 and TH2 are the same, or are referencing the same
+ *      valid thread.
+ *      If one or both the parameters refer to invalid threads, an error is
+ *      risen.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      JoinThread()
+ *  $CATEGORY$
+ *      XHarbour Mt Engine
+ *  $ONELINER$
+ *      Join an thread
+ *  $SYNTAX$
+ *      JoinThread( THREAD ) --> NIL
+ *  $ARGUMENTS$
+ *      <THREAD> An thread Handle
+ *  $RETURNS$
+ *      This function alwarys return nil
+ *  $DESCRIPTION$
+ *     JoinThread wait indefinitely for the target thread to finish. This
+ *     function can be used even on already terminated threads. If the thread
+ *     is already terminated, of if the thread number is not valid, JoinThread
+ *     will return immediately.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      ThreadSleep()
+ *  $CATEGORY$
+ *      XHarbour Mt Engine
+ *  $ONELINER$
+ *      Put an thread to sleep
+ *  $SYNTAX$
+ *      ThreadSleep( <nMillisec> ) --> NIL
+ *  $ARGUMENTS$
+ *      <nMillisec> Number of mili second to put the thread to sleep
+ *  $RETURNS$
+ *      This function alwarys return nil
+ *  $DESCRIPTION$
+ *      Blocks the execution of the thread for at least nMillisec milliseconds.
+ *      After this time is elapsed, the thread will be resumed starting from the
+ *      instruction immediately following ThreadSleep() as soon as possible.
+ *      This additional delay depends on operating system peculiarities and on
+ *      the current system load.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      WaitForThreads()
+ *  $CATEGORY$
+ *      XHarbour Mt Engine
+ *  $ONELINER$
+ *      Wait for all thread
+ *  $SYNTAX$
+ *      WaitForThreads() -> NIL
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      This function alwarys return nil
+ *  $DESCRIPTION$
+ *      This function is used to wait for all the threads launched by the 
+ *      program to be terminated, and their resources to be freed. It should be 
+ *      called only from main application thread (the one that calls the first 
+ *      StartThread() ), just before quitting the program, or when the program 
+ *      needs to be sure that not a single secondary thread remains before 
+ *      to proceed.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      Mutex Functions
+ *  $CATEGORY$
+ *      XHarbour Mutex Engine
+ *  $ONELINER$
+ *      Xharbour mutex function descriptions
+ *  $DESCRIPTION$
+ *      Mutex (MUTual EXclusion) are complex objects that can be used by different 
+ *      thread to do one or more of the following operations:
+ *        1.Ensure to be the unique thread that is ?owning the mutex?.
+ *        2.Wait for an event to happen in another thread.
+ *        3.Signal another (or all the other) waiting threads that the event they were 
+ *          waiting for has happened.
+ *      To achieve this results, the mutex must be shared among several threads. This
+ *      can be done by passing the mutex as one of the StartThread parameters, or 
+ *      having the mutex as a global variable.
+ * 
+ *      NOTE: the functions in this section may be preceded with HB_ prefix.
+ *  $END$
+ */
+
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      MutexCreate
+ *  $CATEGORY$
+ *      XHarbour Mutex Engine
+ *  $ONELINER$
+ *      Creates an mutex
+ *  $SYNTAX$
+ *      MutexCreate() --> <Mutex>
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      <Mutex>   An Mutex handle
+ *  $DESCRIPTION$
+ *      Creates a mutex. You should store the return value in a global module 
+ *      variable or in another variable that can be accessed from several 
+ *      threads.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      DestroyMutex()
+ *  $CATEGORY$
+ *      XHarbour Mutex Engine
+ *  $ONELINER$
+ *      Destroy an mutex
+ *  $SYNTAX$
+ *      DestroyMutex( MUTEX ) --> NIL
+ *  $ARGUMENTS$
+ *      <MUTEX>     An Mutex handle
+ *  $RETURNS$
+ *      NIL This function always return nil
+ *  $DESCRIPTION$
+ *      [THIS FUNCTION IS DEPRECATED AND SHOULD NEVER BE USED]
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      MutexLock()
+ *  $CATEGORY$
+ *      XHarbour Mutex Engine
+ *  $ONELINER$
+ *      Locks an mutex
+ *  $SYNTAX$
+ *      MutexLock( MUTEX ) --> NIL
+ *  $ARGUMENTS$
+ *      <MUTEX>     An Mutex handle
+ *  $RETURNS$
+ *      NIL This function always return nil
+ *  $DESCRIPTION$
+ *      This function waits until the mutex passed as parameter has not been
+ *      locked by any other thread; when the mutex is free, the execution of
+ *      the current thread continues and the mutex is locked so that any other
+ *      thread trying to achieve a lock will have to wait.
+ *
+ *      xHarbour mutexes are reentrant. This means that the thread that is
+ *      currently the owner of the lock on the mutex could possibly lock again
+ *      the same mutex any number of times, provided it calls MutexUnlock() the
+ *      same number of times MutexLock() is called.
+ *
+ *      Xharbour support cancellable mutex waits. This means that a thread may
+ *      be canceled while waiting for a mutex. If this happens, the canceled
+ *      thread will NOT hold the mutex. If a thread is canceled while holding
+ *      a mutex, the mutex will be automatically freed.
+ *
+ *      Anyhow, avoid it. If you feel the need to cancel a thread waiting or
+ *      holding a mutex, there's something wrong with your multithreading
+ *      programming technique. This support is provided only for emergency
+ *      recovery.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      MutexTryLock()
+ *  $CATEGORY$
+ *      XHarbour Mutex Engine
+ *  $ONELINER$
+ *      Try to locks an mutex
+ *  $SYNTAX$
+ *      MutexTryLock( MUTEX ) --> lAchieved
+ *  $ARGUMENTS$
+ *      <MUTEX>         An Mutex handle
+ *  $RETURNS$
+ *      <lAchieved>  True if mutex is locked, otherwise false
+ *  $DESCRIPTION$
+ *      This functions acts as MutexLock, but if the lock cannot be immediately
+ *      achieved, the function returns false. If lock has been achieved, it
+ *      returns true.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+
+
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      MutexUnlock()
+ *  $CATEGORY$
+ *      XHarbour Mutex Engine
+ *  $ONELINER$
+ *      Unlocks an mutex
+ *  $SYNTAX$
+ *      MutexUnlock( <MUTEX> ) -->Nil
+ *  $ARGUMENTS$
+ *      <MUTEX>         An Mutex handle
+ *  $RETURNS$
+ *      NIL  This function always return nil
+ *  $DESCRIPTION$
+ *      Unlocks the target mutex; if  one thread was waiting to achieve a lock on
+ *      that mutex, it will be resumed as soon as possible. If more than one
+ *      thread was waiting, the resumed thread could be any one of the waiting 
+ *      thread, depending on a scheme varying from system to system. Any way, 
+ *      operative systems ensures that the lock is granted to each thread in 
+ *      a fair way.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+ 
+/*  $DOC$
+ *  $FUNCNAME$
+ *      Subscribe()
+ *  $CATEGORY$
+ *      XHarbour Mutex Engine
+ *  $ONELINER$
+ *      Subscribe an mutex
+ *  $SYNTAX$
+ *      Subscribe( MUTEX [, nMaxMilliSecs [, @bStatus]] ) --> ANY
+ *  $ARGUMENTS$
+ *      <MUTEX>         An Mutex handle
+ *      <nMaxMilliSec>  Optional how many mili seconds to wait
+ *      <bStatus>       Optional logical parameter passed by reference that has
+ *                      the result of the operation
+ *  $RETURNS$
+ *      <ANY>    This function can return any value
+ *  $DESCRIPTION$
+ *      Subscribe() function suspends current thread until the target mutex is
+ *      signaled by another thread, using the Notify() or NotifyAll() functions.
+ *      If nMaxMilliSecs parameter is given, the wait will be interrupted anyway
+ *      if a notification is not issued by the given amount of milliseconds.
+ *      The return value is NIL if the wait time has expired and a notification
+ *      has not been issued, or if the notification parameter was not given. 
+ *      In fact, the notifying thread can specify an object, a string or any 
+ *      kind of parameter to be passed as return parameter of subscribe in the
+ *      subscribing thread.
+ *      If the bStatus parameter is given too, then it will assume the value of 
+ *      .F. if the wait has expired without a notification being issued, and a 
+ *      value of .T. if the function received a notification: this is useful if 
+ *      the Notify() function does not send any notification value: in this case, 
+ *      Subscribe() would return NIL both if timeout has expired or not.
+ * 
+ *      xHBThreads supports late subscription. A notification message can be
+ *      issued before Subscribe() function is called. If this happens, 
+ *      Subscribe() returns immediately, and the notification object, if given, 
+ *      is returned. If more than a notification is issued, an equal number of
+ *      Subscribe() functions will be allowed to proceed without blocking.
+ * 
+ *      Another important feature of xHBthreads implementation is that if the 
+ *      mutex is locked by the current thread, then it is automatically unlocked
+ *      by Subscribe() before suspending the current thread, and when the thread 
+ *      is resumed after notification or after the timeout is passed, the lock on
+ *      the mutex is achieved again before the control passes to the next 
+ *      instruction.
+ *      This allows "stop and go" programming schemes, where the subscribing
+ *      thread locks a resources, does some operations, then put itself in a 
+ *      waiting state, allowing other threads to lock the mutex at their needs;
+ *      then, when that other threads notify the waiting one, they must release 
+ *      the resource (the mutex) they are holding before the subscribing mutex
+ *      can really begin to operate. Under this context, Subscribe() can be 
+ *      viewed as a temporary suspensions of lock rights on the target mutex.
+ * 
+ *   Remarks
+ *      Windows98 implementation of mutexes does not allows atomic mutex lock 
+ *      releasing at the same time as subscription; this reduces the possibility
+ *      to have stop and go programming schemes; the late subscription support
+ *      can be used instead.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+ 
+ * 
+/*  $DOC$
+ *  $FUNCNAME$
+ *      Notify()
+ *  $CATEGORY$
+ *      XHarbour Mutex Engine
+ *  $ONELINER$
+ *      Notify an mutex
+ *  $SYNTAX$
+ *      Notify( MUTEX [,anyParam] ) --> NIL
+ *  $ARGUMENTS$
+ *      <MUTEX>     An Mutex handle
+ *      <anyParam>  Optional Value
+ *  $RETURNS$
+ *      NIL This function always return nil
+ *  $DESCRIPTION$
+ *      This functions resumes the next thread that has subscribed the target 
+ *      mutex. If more of one thread has subscribed the mutex, only one will be
+ *      resumed; the resumed thread will be chosen at random, but the operating
+ *      system will be fair with all waiting threads.  Notify() acts also on
+ *      future subscriptions: if there isn't any thread subscribing the mutex at
+ *      the moment, Notify() will cause the next thread to subscribe to be
+ *      immediately resumed without any wait. One thread will be allowed
+ *      subscribing for each Notify issued on the mutex (so, if a non-subscribed
+ *      mutex is notified three times, three subscriptions will be allowed to
+ *      proceed, and the fourth will be blocked).
+ * 
+ *      If anyParam is provided, this parameter will be returned by the
+ *      Subscribe() routine, else it will return NIL. This optional parameter can
+ *      be of any xHarbour types, both simple (numeric, date, string etc.) or 
+ *      complex (object, array, CSTRUCT etc.).
+ *      If more than one Notify are called on an not subscribed mutex, only the 
+ *      last Notify()'s parameter will be returned by all the later Subscribe()
+ *      routines.
+ *      If the thread that is calling Notify() is also locking the mutex, this 
+ *      lock must be released just before or, preferably, just after the Notify()
+ *      call. The notifying thread should ensure that the optional parameter, if 
+ *      provided, is not shared with other threads: there is not any guarantee 
+ *      that the subscribing thread will take control immediately, and the fact 
+ *      that the lock on the mutex must be released by the notifying thread, to 
+ *      allow the subscribing one to achieve back the lock, can allow a third 
+ *      thread to lock the mutex and act before the subscribing thread is able 
+ *      to take control.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SubscribeNow()
+ *  $CATEGORY$
+ *      XHarbour Mutex Engine
+ *  $ONELINER$
+ *      Subscribe an mutex
+ *  $SYNTAX$
+ *      SubscribeNow( MUTEX [,nMaxMilliSecs [, @bStatus]] ) --> ANY
+ *  $ARGUMENTS$
+ *      <MUTEX>         An Mutex handle
+ *      <nMaxMilliSec>  Optional how many mili seconds to wait
+ *      <bStatus>       Optional logical parameter passed by reference that has
+ *                      the result of the operation
+ *  $RETURNS$
+ *      <ANY>    This function can return any value
+ *  $DESCRIPTION$
+ *      This function acts exactly as Subscribe(), except for the fact that it
+ *      clears atomically any previous notification that might have been issued
+ *      before on the target mutex. So, calling SubscribeNow() is a safe method
+ *      to suspend the current thread until a notification is done. Please refer
+ *      the Subscribe() function documentation for a complete description.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an xharbour extension
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      StartThread(),StopThread(),ThreadGetCurrent(),GetCurrentThread
+ *  $END$
+ */
+
+ *   
+/*  $DOC$
+ *  $FUNCNAME$
+ *      NotifyAll()
+ *  $CATEGORY$
+ *      XHarbour Mutex Engine
+ *  $ONELINER$
+ *      Notify all mutexes
+ *  $SYNTAX$
+ *      NotifyAll( MUTEX [,anyParam] ) --> NIL
+ *  $ARGUMENTS$
+ *      <MUTEX>     An Mutex handle
+ *      <anyParam>  Optional Value
+ *  $RETURNS$
+ *      NIL This function always return nil
+ *  $DESCRIPTION$
+ *      This functions is perfectly equivalent to Notify(), with two major 
+ *      differences. First of all, it notifies all the subscribing threads
+ *      altogether. If more than a subscribing thread is waiting for a signal on
+ *      this mutex, they all will be told to proceed. The operating system will
+ *      decide the order by which the subscribing threads will be resumed, but
+ *      all of them will be activated as soon as possible.
+ * 
+ *      The second difference with respect of the Notify() function is that 
+ *      NotifyAll() will resume only threads currently waiting for notification;
+ *      any subscription request coming after a NotifyAll() will be blocked 
+ *      (unless there are other Notify() messages pending on the mutex).
+ * 
+ *      Another peculiar feature of this procedure is that a separate copy of the
+ *      notification object, if given, is handled to each subscriber. Using this
+ *      function could cause a big deal of data being duplicated: if you are sure
+ *      that the subscribers won't modify the data, you can pass a reference 
+ *      instead of the object, but you must also make sure that the object passed 
+ *      by reference is not destroyed in the context where it is created (like
+ *      i.e., when passing by reference a LOCAL variable and then exiting the
+ *      function).
+ *
+ *     
+ *  $END$
+ */

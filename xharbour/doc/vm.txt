@@ -1,5 +1,5 @@
 /*
- * $Id: vm.txt,v 1.1.1.1 2001/12/21 10:48:04 ronpinkas Exp $
+ * $Id: vm.txt,v 1.2 2004/02/28 20:37:25 lculik Exp $
  */
 
 /*  $DOC$
@@ -100,6 +100,8 @@
  *      Answer:
  *      
  *                         Clipper language pcode opcodes
+ *
+ *      <table>
  *          DEFINE        NAME             VALOR     BYTES
  *          #define       NOP              0x00      1
  *          #define       PUSHC            0x01      3 + literal
@@ -286,6 +288,7 @@
  *          #define       ROW              0xCD      1
  *          #define       SETPOS           0xCE      1
  *          #define       SETPOSBS         0xCF      1
+ *      </table>
  *      
  *      Harbour will not implement all of them as we want to provide the highest
  *      freedom to programers to extend and modify Harbour as needed. In example:
