@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.184 2004/11/01 06:33:46 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.185 2004/11/03 21:20:06 ronpinkas Exp $
  */
 
 /*
@@ -821,7 +821,9 @@ int hb_pp_ParseDirective( char * sLine )
   char szInclude[ _POSIX_PATH_MAX ];
   int i;
   char szExpandedLine[ HB_PP_STR_SIZE ];
+  #ifndef __WATCOMC__
   extern BOOL hb_pp_bInline;
+  #endif
 
   HB_TRACE(HB_TR_DEBUG, ("hb_pp_ParseDirective(%s)", sLine));
 
