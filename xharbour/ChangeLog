@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.453 2002/10/19 16:30:44 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.454 2002/10/22 02:08:21 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-21 23:35 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/common/hbffind.c
+    ! Add #include for DJGPP compiler
+  * source/rtl/achoice.prg
+    ! Reduce redundant code.
+    ! Fix default values of nBottom and nRight out of range.
+    ! Add control of value of nBottom and nRight.
+  * source/rtl/tbrowse.prg
+    ! Fixed SetColumnMethod*( that was not using all Display Area
+      (The nWidthMax variable was substraced by 2)
+      Fixed by Luiz Culik
 
 2002-10-21 18:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * include/hbdefs.h
