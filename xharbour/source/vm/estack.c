@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.5 2002/01/12 10:04:28 ronpinkas Exp $
+ * $Id: estack.c,v 1.6 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -179,8 +179,7 @@ void hb_stackRemove( LONG lUntilPos )
 
 HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
 {
-   HB_ITEM_PTR pItem;
-   pItem = hb_stackItemFromTop( - uiParams - 2 );   /* procedure name */
+   HB_ITEM_PTR pItem = hb_stackItemFromTop( - uiParams - 2 );   /* procedure name */
 
    if( ! HB_IS_SYMBOL( pItem ) )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.6 2002/01/17 23:20:47 ronpinkas Exp $
+ * $Id: classes.c,v 1.7 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -1826,18 +1826,22 @@ HB_FUNC( __OBJSENDMSG )
       {
          USHORT uiParam;
 
+         hb_vmPushSymbol( pMsg->pSymbol );      /* Push char symbol as message  */
+
          hb_vmPush( pObject );               /* Push object */
 
-         hb_vmMessage( pMsg->pSymbol );      /* Push char symbol as message  */
-
          for( uiParam = 3; uiParam <= uiPCount; uiParam++ )   /* Push arguments on stack */
+         {
             hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
+         }
 
-         hb_vmDo( ( USHORT ) ( uiPCount - 2 ) );             /* Execute message */
+         hb_vmSend( ( USHORT ) ( uiPCount - 2 ) );             /* Execute message */
       }
    }
    else
+   {
       hb_errRT_BASE( EG_ARG, 3000, NULL, "__OBJSENDMSG", 0 );
+   }
 }
 
 /*

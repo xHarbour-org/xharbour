@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.3 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -97,24 +97,16 @@ void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
    {
       HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
 
+      /* Push _message for the later assignment.  */
+      HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
       /* Push object */
       HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
-      /* Push _message for later use  */
-      HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
 
       /* Now push current value of variable */
-#ifdef HB_C52_STRICT
+      HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
       /* push object */
       HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
-#else
-      /* NOTE: this duplicate optimization requires that HB_P_MESSAGE
-       * reverts items on the stack !
-       * duplicate object on the stack
-       */
-      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
-#endif
-      /* now send the message */
-      HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
+      /* Do it. */
       HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 0, ( BOOL ) 1 );
 
 /* NOTE: COMPATIBILITY ISSUE:
@@ -147,9 +139,10 @@ void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
       /* increase operation */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOpEq );
 
-      /* call pop message with one argument */
+      /* Now do the assignment - call pop message with one argument */
       HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 1, ( BOOL ) 1 );
    }
+
    /* TODO: add a special code for arrays to correctly handle a[ i++ ]++
     */
    else
@@ -211,21 +204,16 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
    {
       HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
 
+      /* Push _message for the later assignment.  */
+      HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
       /* Push object */
       HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
-      /* Push _message for later use  */
-      HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
 
       /* Now push current value of variable */
-#ifdef HB_C52_STRICT
-      /* push object */
-      HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
-#else
-      /* duplicate object on the stack */
-      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
-#endif
-      /* now send the message */
       HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
+      /* Push object */
+      HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+      /* Do it.*/
       HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 0, ( BOOL ) 1 );
 
       /* push increment value */
@@ -233,9 +221,10 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
       /* increase operation */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOpEq );
 
-      /* call pop message with one argument */
+      /* Now do the assignment - call pop message with one argument */
       HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 1, ( BOOL ) 1 );
-      /* pop the value from the stack */
+
+      /* pop the unneeded value from the stack */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
    }
    else
@@ -296,27 +285,22 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
    {
       HB_EXPR_PTR pObj = pSelf->value.asOperator.pLeft;
 
-      /* Push object */
-      HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
       /* Push _message for later use */
       HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
+      /* Push object */
+      HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
 
       /* Now push current value of variable */
-#ifdef HB_C52_STRICT
-      /* push object */
-      HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
-#else
-      /* duplicate object on the stack */
-      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
-#endif
-      /* now send the message */
       HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
+      /* Push object */
+      HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+      /* Do it. */
       HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 0, ( BOOL ) 1 );
 
       /* increase/decrease operation */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOper );
 
-      /* call pop message with one argument - it leaves the value on the stack */
+      /* Now, do the assignment - call pop message with one argument - it leaves the value on the stack */
       HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 1, ( BOOL ) 1 );
    }
    else

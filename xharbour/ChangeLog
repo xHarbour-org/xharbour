@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.34 2002/01/20 20:55:49 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.35 2002/01/21 09:11:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-21 12:50 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/estack.c
+    * Minor formatting.
+
+  * include/hbexprb.c
+  * include/hbexprc.c
+    * Modified message handling to use same stack structure as a function call:
+      Sym/Message + Object + Paramaters
+
+  * source/vm/classes.c
+    * Formatting.
+
+  * source/vm/hvm.c
+    - Removed Function handling logic from hb_vmSend()
 
 2002-01-21 01:00 UTC+0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h

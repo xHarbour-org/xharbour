@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.4 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -1793,8 +1793,11 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
       case HB_EA_REDUCE:
          {
             pSelf->value.asMessage.pObject = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_REDUCE ), HB_MACRO_PARAM );
+
             if( pSelf->value.asMessage.pParms )  /* Is it a method call ? */
+            {
                pSelf->value.asMessage.pParms = HB_EXPR_USE( pSelf->value.asMessage.pParms, HB_EA_REDUCE );
+            }
          }
          break;
 
@@ -1808,27 +1811,38 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
             if( pSelf->value.asMessage.pParms )  /* Is it a method call ? */
             {
                int iParms = hb_compExprListLen( pSelf->value.asMessage.pParms );
-               HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+
                HB_EXPR_PCODE1( hb_compGenMessage, pSelf->value.asMessage.szMessage );
+               HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+
                /* NOTE: if method with no parameters is called then the list
                 * of parameters contain only one expression of type HB_ET_NONE
                 * There is no need to push this parameter
                 */
                if( iParms == 1 && pSelf->value.asMessage.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+               {
                   --iParms;
+               }
+
                if( iParms )
+               {
                   HB_EXPR_USE( pSelf->value.asMessage.pParms, HB_EA_PUSH_PCODE );
+               }
 
                if( iParms > 255 )
+               {
                   HB_EXPR_GENPCODE3( hb_compGenPCode3, HB_P_SEND, HB_LOBYTE( iParms ), HB_HIBYTE( iParms ), ( BOOL ) 1 );
+               }
                else
+               {
                   HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, ( BYTE ) iParms, ( BOOL ) 1 );
+               }
             }
             else
             {
                /* acces to instance variable */
-               HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
                HB_EXPR_PCODE1( hb_compGenMessage, pSelf->value.asMessage.szMessage );
+               HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
                HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 0, ( BOOL ) 1 );
             }
          }
@@ -1839,8 +1853,8 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
             /* NOTE: This is an exception from the rule - this leaves
              *    the return value on the stack
              */
-            HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
             HB_EXPR_PCODE1( hb_compGenMessageData, pSelf->value.asMessage.szMessage );
+            HB_EXPR_USE( pSelf->value.asMessage.pObject, HB_EA_PUSH_PCODE );
             HB_EXPR_USE( pSelf->value.asMessage.pParms, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 1, ( BOOL ) 1 );
          }
