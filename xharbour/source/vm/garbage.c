@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.47 2003/03/02 15:22:31 jonnymind Exp $
+ * $Id: garbage.c,v 1.48 2003/03/08 02:06:47 jonnymind Exp $
  */
 
 /*
@@ -511,44 +511,47 @@ void hb_gcCollect( void )
 */
 void hb_gcCollectAll( void )
 {
-   HB_THREAD_STUB
    HB_GARBAGE_PTR pAlloc, pDelete;
    #ifdef HB_THREAD_SUPPORT
-   BOOL bWait = FALSE;
+      #ifdef HB_OS_WIN_32
+         HB_THREAD_STUB
+      #endif
    #endif
    
    HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
-
+      
    /* is anoter garbage in action? */  
    #ifdef HB_THREAD_SUPPORT
-      if ( s_bCollecting )  // note: 1) is volatile and 2) not very important if fails 1 time
+      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );
+      if ( s_bCollecting == TRUE || s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )  
       {
-         bWait = TRUE;
-      }
-      /* Working in single thread mode */
-      HB_STACK_STOP_TELLING( s_bCollecting, TRUE );
-      if ( bWait )
-      {
-         s_bCollecting = FALSE;
-         HB_STACK_START;
+         HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
          return;
-      }  
+      }
+      s_bCollecting = TRUE;
+      HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_runningStacks.Mutex );
+      while ( hb_runningStacks.content.asLong != 0 )
+      {
+         HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );
+      }
+      hb_runningStacks.content.asLong = -1;
+      // no need to signal, no one must be awaken
+      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
+      HB_CLEANUP_POP;
    #else
       if ( s_bCollecting )  // note: 1) is volatile and 2) not very important if fails 1 time
       {
          return;
       }
+      /* Even if not locked, a read only non-critical variable here
+      should not be a problem */
+      if( s_pCurrBlock==0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
+      {
+         s_bCollecting = FALSE;
+         return;
+      }
    #endif
 
-
-   /* Even if not locked, a read only non-critical variable here
-   should not be a problem */
-   if( s_pCurrBlock==0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
-   {
-      s_bCollecting = FALSE;
-      HB_SET_SHARED( hb_runningStacks, HB_COND_SET, 0 );
-      return;
-   }
 
    /* By hypotesis, only one thread will be granted the right to be here; 
    so cheching for consistency of s_pCurrBlock further is useless.*/   
@@ -600,7 +603,6 @@ void hb_gcCollectAll( void )
    /* check list of locked blocks for blocks referenced from
    * locked block
    */
-   //HB_CRITICAL_LOCK( hb_garbageAllocMutex );
     
    if( s_pLockedBlock )
    {
@@ -718,8 +720,6 @@ void hb_gcCollectAll( void )
 
    s_pCurrBlock = pAlloc;
    
-   //HB_CRITICAL_UNLOCK( hb_garbageAllocMutex );
-
    /* Step 4 - flip flag */
    /* Reverse used/unused flag so we don't have to mark all blocks
    * during next collecting
@@ -729,7 +729,6 @@ void hb_gcCollectAll( void )
    /* Step 5: release all the locks on the scanned objects */      
    /* Put itself back on machine execution count */
    HB_STACK_START;
-   
 }
 
 /* JC1: THREAD UNSAFE
@@ -863,5 +862,5 @@ HB_FUNC( HB_GCALL )
    HB_STACK_UNLOCK;
    hb_gcCollectAll();
    HB_STACK_LOCK;
-
 }
+

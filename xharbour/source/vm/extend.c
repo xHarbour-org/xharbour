@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.14 2003/02/26 05:36:10 jonnymind Exp $
+ * $Id: extend.c,v 1.15 2003/03/08 02:06:47 jonnymind Exp $
  */
 
 /*
@@ -72,6 +72,8 @@
  *
  */
 
+#define HB_THREAD_OPTIMIZE_STACK
+ 
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbset.h"
@@ -83,6 +85,8 @@
 
 PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_param(%d, %d)", iParam, iMask));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -112,7 +116,7 @@ PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
 }
 
 PHB_ITEM  HB_EXPORT hb_paramError( int iParam )
-{
+{   
    static HB_ITEM s_NIL;
 
    PHB_ITEM pParam = hb_param( iParam, HB_IT_ANY );
@@ -131,6 +135,8 @@ PHB_ITEM  HB_EXPORT hb_paramError( int iParam )
 
 BOOL HB_EXPORT hb_extIsArray( int iParam )
 {
+   HB_THREAD_STUB
+   
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
       PHB_ITEM pItem = ( iParam == -1 ) ? &(HB_VM_STACK.Return) : hb_stackItemFromBase( iParam );
@@ -146,6 +152,8 @@ BOOL HB_EXPORT hb_extIsArray( int iParam )
 
 char HB_EXPORT * hb_parc( int iParam, ... )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_parc(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -179,6 +187,8 @@ char HB_EXPORT * hb_parc( int iParam, ... )
 
 ULONG  HB_EXPORT hb_parclen( int iParam, ... )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_parclen(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -216,6 +226,8 @@ ULONG  HB_EXPORT hb_parclen( int iParam, ... )
 
 ULONG  HB_EXPORT hb_parcsiz( int iParam, ... )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_parcsiz(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -255,6 +267,8 @@ ULONG  HB_EXPORT hb_parcsiz( int iParam, ... )
 
 char  HB_EXPORT * hb_pards( int iParam, ... )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_pards(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -290,6 +304,8 @@ char  HB_EXPORT * hb_pards( int iParam, ... )
 
 char  HB_EXPORT * hb_pardsbuff( char * szDate, int iParam, ... )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_pardsbuff(%p, %d, ...)", szDate, iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -323,6 +339,8 @@ char  HB_EXPORT * hb_pardsbuff( char * szDate, int iParam, ... )
 
 int  HB_EXPORT hb_parl( int iParam, ... )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_parl(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -368,6 +386,8 @@ int  HB_EXPORT hb_parl( int iParam, ... )
 
 double  HB_EXPORT hb_parnd( int iParam, ... )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_parnd(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -413,6 +433,8 @@ double  HB_EXPORT hb_parnd( int iParam, ... )
 
 int  HB_EXPORT hb_parni( int iParam, ... )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_parni(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -458,6 +480,8 @@ int  HB_EXPORT hb_parni( int iParam, ... )
 
 long  HB_EXPORT hb_parnl( int iParam, ... )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_parnl(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -508,6 +532,8 @@ long  HB_EXPORT hb_parnl( int iParam, ... )
 /* NEW function - to retrieve a pointer from a harbour level */
 void *hb_parptr( int iParam, ... )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_parptr(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
@@ -572,6 +598,8 @@ ULONG  HB_EXPORT hb_parinfa( int iParamNum, ULONG uiArrayIndex )
 
 int  HB_EXPORT hb_parinfo( int iParam )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_parinfo(%d)", iParam));
 
    if( iParam == 0 )
@@ -604,14 +632,18 @@ int  HB_EXPORT hb_parinfo( int iParam )
 #undef hb_pcount
 int  HB_EXPORT hb_pcount( void )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_pcount()"));
 
-   return ( int )( ( hb_stackBaseItem() )->item.asSymbol.paramcnt < 255 ? ( hb_stackBaseItem() )->item.asSymbol.paramcnt : ( hb_stackBaseItem() )->item.asSymbol.paramcnt - 256 );
+   return ( int )( ( *( HB_VM_STACK.pBase ) )->item.asSymbol.paramcnt < 255 ? ( *( HB_VM_STACK.pBase ) )->item.asSymbol.paramcnt : ( *( HB_VM_STACK.pBase ) )->item.asSymbol.paramcnt - 256 );
 }
 
 #undef hb_ret
 void  HB_EXPORT hb_ret( void )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE(HB_TR_DEBUG, ("hb_ret()"));
 
    if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
@@ -623,6 +655,12 @@ void  HB_EXPORT hb_ret( void )
       ( &(HB_VM_STACK.Return) )->type = HB_IT_NIL;
    }
 }
+
+/* JC1: tunrning off optimization; from now on, HB_VM_STACK is referenced just once */
+#if defined( HB_THREAD_SUPPORT )
+   #undef HB_VM_STACK
+   #define HB_VM_STACK (* hb_threadGetCurrentStack() )
+#endif
 
 #undef hb_reta
 void  HB_EXPORT hb_reta( ULONG ulLen )  /* undocumented hb_reta() */

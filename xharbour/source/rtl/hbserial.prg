@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.1 2003/02/14 17:13:38 jonnymind Exp $
+ * $Id: hbserial.prg,v 1.2 2003/02/16 00:00:13 jonnymind Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ FUNCTION HB_DeserialNext( cSerial )
    LOCAL nPos
 
    nPos := HB_GetLen8( cSerial )
-   IF nPos >= Len( cSerial )
+   IF nPos < 0 .or. nPos >= Len( cSerial )
       RETURN NIL
    ENDIF
 

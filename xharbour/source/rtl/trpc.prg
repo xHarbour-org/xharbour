@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.6 2003/02/24 01:58:10 jonnymind Exp $
+ * $Id: trpc.prg,v 1.7 2003/02/24 05:55:55 jonnymind Exp $
  */
 
 /*
@@ -607,7 +607,7 @@ METHOD RecvFunction( bComp, bMode ) CLASS tRPCServeCon
 
    /* Original lenght of data */
    IF InetRecvAll( ::skRemote, @cLength, 8 ) != 8
-      RETURN .F.
+      RETURN NIL
    ENDIF
 
    nLen := HB_GetLen8( cLength )
@@ -657,6 +657,9 @@ METHOD FuncCall( cData ) CLASS tRPCServeCon
 
    /* Deserialize all elements */
    cSer := HB_DeserialBegin( cData )
+   IF Empty( cSer )
+      RETURN .F.
+   ENDIF
    cFuncName := HB_DeserialNext( cSer )
    aParams := HB_DeserialNext( cSer )
 
@@ -675,6 +678,9 @@ METHOD FuncLoopCall( cMode, cData ) CLASS tRPCServeCon
 
    /* Deserialize all elements */
    cSer := HB_DeserialBegin( cData )
+   IF Empty( cSer )
+      RETURN .F.
+   ENDIF
    nBegin := HB_DeserialNext( cSer )
    nEnd := HB_DeserialNext( cSer )
    nStep := HB_DeserialNext( cSer )
@@ -696,6 +702,10 @@ METHOD FuncForeachCall( cMode, cData ) CLASS tRPCServeCon
 
    /* Deserialize all elements */
    cSer := HB_DeserialBegin( cData )
+   IF Empty( aParams )
+      RETURN .F.
+   ENDIF
+
    cFuncName := HB_DeserialNext( cSer )
    aParams := HB_DeserialNext( cSer )
    aItems := HB_DeserialNext( cSer )

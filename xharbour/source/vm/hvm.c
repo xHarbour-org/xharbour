@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.175 2003/03/08 02:06:47 jonnymind Exp $
+ * $Id: hvm.c,v 1.176 2003/03/08 22:59:13 ronpinkas Exp $
  */
 
 /*
@@ -668,6 +668,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 #if defined(HB_THREAD_SUPPORT)
       if ( iCount == 0 )
       {
+         HB_DISABLE_ASYN_CANC;
          HB_STACK_LOCK;
       }
       iCount++;
@@ -2491,12 +2492,14 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             else
             {
                HB_STACK_UNLOCK;
+               HB_TEST_CANCEL_ENABLE_ASYN;
                break;
             }
          }
          else if( s_uiActionRequest & HB_QUIT_REQUESTED )
          {
             HB_STACK_UNLOCK;
+            HB_TEST_CANCEL_ENABLE_ASYN;
             break;
          }
          else if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
@@ -2506,6 +2509,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              */
             s_uiActionRequest = 0;
             HB_STACK_UNLOCK;
+            HB_TEST_CANCEL_ENABLE_ASYN;
             break;
          }
       }
@@ -2514,6 +2518,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          if ( iCount == 20 )
          {
             HB_STACK_UNLOCK;
+            HB_TEST_CANCEL_ENABLE_ASYN;
             iCount = 0;
          }
       //printf( "Count: %d\r\n", hb_runningContexts.content.asLong );
@@ -2521,6 +2526,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    }
 
    /* No cancellation here */
+   HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
 
    HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmExecute(%p, %p)", pCode, pSymbols));
@@ -2548,6 +2554,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
 
    HB_STACK_UNLOCK;
+   //JC1: do not allow cancellation: thread cleanup procedure is under way
 }
 
 /* ------------------------------- */

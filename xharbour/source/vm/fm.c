@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.27 2003/03/02 15:22:31 jonnymind Exp $
+ * $Id: fm.c,v 1.28 2003/03/08 02:06:47 jonnymind Exp $
  */
 
 /*
@@ -123,6 +123,9 @@ static PHB_MEMINFO s_pLastBlock = NULL;
 void HB_EXPORT * hb_xalloc( ULONG ulSize )
 {
    void * pMem;
+#ifdef HB_FM_STATISTICS
+    HB_THREAD_STUB
+#endif      
    
    /* NOTE: we cannot use here HB_TRACE because it will overwrite the
     * function name/line number of code which called hb_xalloc/hb_xgrab
@@ -137,16 +140,15 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 #ifdef HB_FM_STATISTICS
 
    HB_CRITICAL_LOCK( hb_allocMutex );
-
-   s_lAllocations++;
-
    pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
-
+   
    if( ! pMem )
-   {
+   {      
       HB_CRITICAL_UNLOCK( hb_allocMutex );
       return NULL;
    }
+   
+   s_lAllocations++;
 
    if( ! s_pFirstBlock )
    {
@@ -183,14 +185,13 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    }
    else
    {
-      HB_THREAD_STUB
       
       if( HB_VM_STACK.pItems && ( HB_VM_STACK.pBase != HB_VM_STACK.pItems ) )
       {
           /* PRG line number */
-         ( ( PHB_MEMINFO ) pMem )->uiProcLine = ( hb_stackBaseItem() )->item.asSymbol.lineno;
+         ( ( PHB_MEMINFO ) pMem )->uiProcLine = (*(HB_VM_STACK.pBase))->item.asSymbol.lineno;
           /* PRG ProcName */
-         strcpy( ( ( PHB_MEMINFO ) pMem )->szProcName, ( hb_stackBaseItem() )->item.asSymbol.value->szName );
+         strcpy( ( ( PHB_MEMINFO ) pMem )->szProcName, (*(HB_VM_STACK.pBase))->item.asSymbol.value->szName );
       }
       else
       {
@@ -252,8 +253,6 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 
    HB_CRITICAL_LOCK( hb_allocMutex );
 
-   s_lAllocations++;
-
    pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
 
    if( ! pMem )
@@ -262,6 +261,8 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 
       hb_errInternal( HB_EI_XGRABALLOC, NULL, NULL, NULL );
    }
+   /* allocation should be counted AFTER we know that malloc has suceed */
+   s_lAllocations++;
 
    if( ! s_pFirstBlock )
    {
@@ -302,9 +303,9 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
       if( HB_VM_STACK.pItems && ( HB_VM_STACK.pBase != HB_VM_STACK.pItems ) )
       {
          /* PRG line number */
-         ( ( PHB_MEMINFO ) pMem )->uiProcLine = ( hb_stackBaseItem() )->item.asSymbol.lineno;
+         ( ( PHB_MEMINFO ) pMem )->uiProcLine = (*(HB_VM_STACK.pBase))->item.asSymbol.lineno;
          /* PRG ProcName */
-         strcpy( ( ( PHB_MEMINFO ) pMem )->szProcName, ( hb_stackBaseItem() )->item.asSymbol.value->szName );
+         strcpy( ( ( PHB_MEMINFO ) pMem )->szProcName, (*(HB_VM_STACK.pBase))->item.asSymbol.value->szName );
       }
       else
       {

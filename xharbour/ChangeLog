@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.823 2003/03/09 22:54:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.824 2003/03/10 03:07:24 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-11 00:17 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/thread.h
+  * source/rtl/console.c
+  * source/vm/extend.c
+  * source/vm/fm.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+  * source/vm/thread.c
+    + New threading framework has been added. On Windows, suppor for 
+      "kind" cancellations and "single thread running" has been added.
+      Also, pthread_key optimization is included in the model, and 
+
+  * source/rtl/hbserial.prg
+  * source/rtl/trpc.prg
 
 2003-03-19 02:50 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * include/thread.h

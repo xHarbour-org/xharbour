@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.59 2003/03/08 02:25:34 jonnymind Exp $
+* $Id: thread.c,v 1.60 2003/03/10 02:46:11 druzus Exp $
 */
 
 /*
@@ -87,7 +87,7 @@
 
 static HB_CRITICAL_T s_mtxTryLock;
 
-BOOL hb_critical_mutex_trylock( HB_CRITICAL_T *lpMutex )
+BOOL hb_critical_CRITICAL_trylock( HB_CRITICAL_T *lpMutex )
 {
    HB_CRITICAL_LOCK( s_mtxTryLock );
    if ( lpMutex->Locker == HB_CURRENT_THREAD() )
@@ -103,7 +103,7 @@ BOOL hb_critical_mutex_trylock( HB_CRITICAL_T *lpMutex )
          HB_CRITICAL_UNLOCK( s_mtxTryLock );
          return FALSE;
       }
-      HB_MUTEX_LOCK( lpMutex->Critical );
+      HB_CRITICAL_LOCK( lpMutex->Critical );
       lpMutex->nCount = 1;
       lpMutex->Locker = HB_CURRENT_THREAD();
       HB_CRITICAL_UNLOCK( s_mtxTryLock );
@@ -118,8 +118,15 @@ BOOL hb_critical_mutex_trylock( HB_CRITICAL_T *lpMutex )
 
 HB_STACK *hb_ht_stack;
 HB_STACK *last_stack;
+HB_MUTEX_STRUCT *hb_ht_mutex;
 HB_THREAD_T hb_main_thread_id;
 volatile static int s_threadStarted = 0;
+
+#ifdef HB_OS_WIN_32
+   DWORD hb_dwCurrentStack;
+#else
+   pthread_key_t hb_pkCurrentStack;
+#endif
 
 /* Declarations of shell mutexes */
 HB_CRITICAL_T hb_garbageMutex;
@@ -130,6 +137,8 @@ HB_CRITICAL_T hb_memvarsMutex;
 HB_CRITICAL_T hb_allocMutex;
 HB_CRITICAL_T hb_garbageAllocMutex;
 HB_CRITICAL_T hb_outputMutex;
+HB_CRITICAL_T hb_mutexMutex;
+HB_CRITICAL_T hb_cancelMutex;
 
 HB_SHARED_RESOURCE hb_runningStacks;
 
@@ -138,7 +147,7 @@ HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
    HB_STACK *tc;
    int i;
 
-   //HB_CRITICAL_LOCK( hb_allocMutex );
+   HB_CRITICAL_LOCK( hb_allocMutex );
    tc = (HB_STACK *) malloc( sizeof( HB_STACK));
 
    tc->th_id = th;
@@ -154,10 +163,12 @@ HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
    #ifdef HB_OS_WIN_32
       tc->th_h = NULL;
       tc->bCanceled = FALSE;
+      tc->bCanCancel = FALSE;
+      /*
       tc->iCleanCount = 0;
       tc->pCleanUp = (HB_CLEANUP_FUNC *) malloc( sizeof( HB_CLEANUP_FUNC ) * HB_MAX_CLEANUPS );
       tc->pCleanUpParam = (void **) malloc( sizeof( void *) * HB_MAX_CLEANUPS );
-      
+      */
    #endif
 
    for( i = 0; i < tc->wItems; i++ )
@@ -166,7 +177,7 @@ HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
    }
    ( * (tc->pPos) )->type = HB_IT_NIL;
 
-   //HB_CRITICAL_UNLOCK( hb_allocMutex );
+   HB_CRITICAL_UNLOCK( hb_allocMutex );
 
    return tc;
 }
@@ -251,7 +262,7 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    }
 
    /* Free each element of the stack */
-
+   HB_CRITICAL_LOCK( hb_allocMutex );
    for( i = 0; i < pStack->wItems; i++ )
    {
       free( pStack->pItems[ i ] );
@@ -260,11 +271,12 @@ void hb_threadDestroyStack( HB_STACK *pStack )
 
    free( pStack->pItems );
    #ifdef HB_OS_WIN_32
-   free( pStack->pCleanUp );
-   free( pStack->pCleanUpParam );
+   //free( pStack->pCleanUp );
+   //free( pStack->pCleanUpParam );
    #endif
    free( pStack );
-
+   HB_CRITICAL_UNLOCK( hb_allocMutex );
+   
    // Call destructor
    /*
    if( pStack->pDestructor )
@@ -273,7 +285,6 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    }*/
 
 }
-
 
 HB_STACK *hb_threadGetStack( HB_THREAD_T id )
 {
@@ -372,54 +383,82 @@ void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs )
 }
 
 
-#ifdef HB_OS_WIN_32
-void hb_threadTerminator2()
+HB_MUTEX_STRUCT *hb_threadLinkMutex( HB_MUTEX_STRUCT *mx )
 {
-   HB_STACK *pStack = hb_threadGetStack( HB_CURRENT_THREAD() );
-   hb_threadTerminator( pStack );
-}
+   HB_MUTEX_STRUCT *p;
 
-void hb_threadTerminator( void *pData )
-{
-   HB_STACK *_pStack_ = (HB_STACK *) pData;
-   HB_STACK_LOCK;  // prevent being searched here
-
-     
-   HB_CRITICAL_LOCK( hb_threadStackMutex );
-   /* now we can detach this thread */
-   hb_threadUnlinkStack( _pStack_->th_id );
-   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
-   CloseHandle( _pStack_->th_h );
-   hb_threadDestroyStack( _pStack_ );
-   
-   HB_SET_SHARED( hb_runningStacks, HB_COND_INC, -1 );
-}
-
-void hb_threadTestCancel()
-{
-   int iCount;
-   HB_THREAD_STUB
-
-   if ( HB_VM_STACK.bCanceled )
+   HB_CRITICAL_LOCK( hb_mutexMutex );
+   if ( hb_ht_mutex == NULL )
    {
-      /* Calling the cleanup stack */
-      iCount = HB_VM_STACK.iCleanCount;
-      while (iCount > 0 )
-      {
-         iCount--;
-         HB_VM_STACK.pCleanUp[ iCount ]( HB_VM_STACK.pCleanUpParam[ iCount ]);
-      }
-      
-      ExitThread( 0 );
+      hb_ht_mutex = mx;
+      HB_CRITICAL_UNLOCK( hb_mutexMutex );
+      return mx;
    }
+      
+   p = hb_ht_mutex;
+
+   while( p->next )
+   {
+      p = p->next;
+   }
+
+   p->next = mx;
+   
+   HB_CRITICAL_UNLOCK( hb_mutexMutex );
+
+   return mx;
 }
+
+
+HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *pMtx )
+{
+   HB_MUTEX_STRUCT *p, *prev;
+
+   HB_CRITICAL_LOCK( hb_mutexMutex );
+   
+   if ( hb_ht_mutex == NULL )
+   {
+      HB_CRITICAL_UNLOCK( hb_mutexMutex );
+      return NULL;
+   }
+
+   p = hb_ht_mutex;
+   prev = NULL;
+
+   while ( p && p != pMtx )
+   {
+      prev = p;
+      p = p->next;
+   }
+
+   if( p )
+   {
+      /*unlink the stack*/
+      if ( prev )
+      {
+         prev->next = p->next;
+      }
+      else
+      {
+         hb_ht_mutex = p->next;
+      }
+   }
+   HB_CRITICAL_UNLOCK( hb_mutexMutex );
+
+   return p;
+}
+
+#ifdef HB_OS_WIN_32
 
 void hb_threadCancelInternal( )
 {
    HB_THREAD_STUB
    int iCount;
    
-   /* Calling the cleanup stack */
+   /* Make sure we are not going to be canceled */
+   HB_DISABLE_ASYN_CANC;
+     
+/*   
    iCount = HB_VM_STACK.iCleanCount;
    while ( iCount > 0 )
    {
@@ -427,7 +466,9 @@ void hb_threadCancelInternal( )
       HB_VM_STACK.pCleanUp[ iCount ]( HB_VM_STACK.pCleanUpParam[ iCount ]);
    }
    // the stack must have been destroyed by the last cleanup function
-   ExitThread( 0 );
+*/
+   hb_threadTerminator( &HB_VM_STACK );
+   ExitThread( 0 ); 
 }
 
 /***
@@ -441,7 +482,6 @@ void hb_threadCancel( HB_STACK *pStack )
    // stack resource mutex is being locked now
    pStack->bInUse = TRUE;  // mark the stack as used   
    SuspendThread( pStack->th_h ); // stop thread before he can do something with stack
-   HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
 
    context.ContextFlags = CONTEXT_CONTROL;
    GetThreadContext(  pStack->th_h , &context);
@@ -449,41 +489,60 @@ void hb_threadCancel( HB_STACK *pStack )
    context.Eip = (DWORD)hb_threadCancelInternal;
    SetThreadContext(  pStack->th_h , &context);
    ResumeThread(  pStack->th_h );
+   HB_CRITICAL_UNLOCK( hb_cancelMutex );
 }
-
-         
-#else
+   
+#endif
 
 void hb_threadTerminator( void *pData )
 {
    HB_STACK *_pStack_ = (HB_STACK *) pData;
+   HB_MUTEX_STRUCT *pMtx;
    HB_STACK_LOCK;
    
    HB_CRITICAL_LOCK( hb_threadStackMutex );
    /* now we can detach this thread */
    hb_threadUnlinkStack( _pStack_->th_id );
    HB_CRITICAL_UNLOCK( hb_threadStackMutex );
+   
+   #ifdef HB_OS_WIN_32
+      CloseHandle( _pStack_->th_h );
+   #else
+      pthread_detach( HB_CURRENT_THREAD() );
+   #endif
+   
+   /* eventually unlocks held mutexes */
+   HB_CRITICAL_LOCK( hb_mutexMutex );
+   pMtx = hb_ht_mutex;
+   while( pMtx != NULL )
+   {
+      if ( pMtx->locker == _pStack_->th_id )
+      {
+         hb_mutexForceUnlock( pMtx );
+      }
+      pMtx = pMtx->next;
+   }
+   HB_CRITICAL_UNLOCK( hb_mutexMutex );
+    
    hb_threadDestroyStack( _pStack_ );
    
-   pthread_detach( HB_CURRENT_THREAD() );
    HB_SET_SHARED( hb_runningStacks, HB_COND_INC, -1 );
 }
 
-#endif
 
 
-void hb_mutexForceUnlock( void *mtx)
+void hb_mutexForceUnlock( void *mtx )
 {
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) mtx;
    Mutex->locker = 0;
    Mutex->lock_count = 0;
-   HB_MUTEX_UNLOCK( Mutex->mutex);	
+   HB_CRITICAL_UNLOCK( Mutex->mutex );	
 }
 
-void hb_rawMutexForceUnlock( void * mtx)
+void hb_rawMutexForceUnlock( void * mtx )
 {
-   HB_MUTEX_T *Mutex = (HB_MUTEX_T *) mtx;
-   HB_MUTEX_UNLOCK( *Mutex );	
+   HB_CRITICAL_T *Mutex = (HB_CRITICAL_T *) mtx;
+   HB_CRITICAL_UNLOCK( *Mutex );	
 }
 
 
@@ -492,25 +551,19 @@ void hb_rawMutexForceUnlock( void * mtx)
 #else
    void *hb_create_a_thread( void *Cargo )
 #endif
-{
-   HB_STACK *_pStack_ = hb_threadGetStack( HB_CURRENT_THREAD() );
-
-   #if defined( HB_OS_LINUX )
-      /* link stack to local thread data */
-      pthread_setspecific(hb_thread_stack_key, _pStack_);
-   #endif
-
-   /* avoid warning */
-   if ( Cargo != 0 ) return 0;
+{  
+   HB_STACK *_pStack_ = (HB_STACK *) Cargo;
    /* Sets the cancellation handler so small delays in
    cancellation do not cause segfault or memory leaks */
 #ifdef HB_OS_WIN_32
-   HB_CLEANUP_PUSH( hb_threadTerminator, &(HB_VM_STACK) );
+   TlsSetValue( hb_dwCurrentStack, Cargo );
 #else
+   HB_CRITICAL_LOCK( hb_threadStackMutex );    /* wait for the father to be done */
+   pthread_setspecific( hb_pkCurrentStack, Cargo );  
+   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
    HB_CLEANUP_PUSH( hb_threadTerminator, HB_VM_STACK );
 #endif
 
-   // Do and Send reduce the count of function by one.
    if( _pStack_->bIsMethod )
    {
       hb_vmSend( HB_VM_STACK.uiParams - 2 );
@@ -522,8 +575,7 @@ void hb_rawMutexForceUnlock( void * mtx)
 
    #ifdef HB_OS_WIN_32
    {  
-      HB_VM_STACK.bCanceled = TRUE;
-      hb_threadTestCancel(); // never returns 
+      hb_threadCancelInternal(); // never returns 
       return 0;
    }
    #else
@@ -576,7 +628,6 @@ void hb_threadIsLocalRef( void )
 
       pStack = pStack->next;
    }
-
 }
 
 HB_FUNC( STARTTHREAD )
@@ -589,6 +640,8 @@ HB_FUNC( STARTTHREAD )
    PHB_DYNS pExecSym;
    PHB_FUNC pFunc;
    BOOL bIsMethod = FALSE;
+   HB_STACK *pStack;
+   
 #ifdef HB_OS_WIN_32
    HANDLE th_h;
 #endif
@@ -682,15 +735,16 @@ HB_FUNC( STARTTHREAD )
 
    // We signal that we are going to start a thread
    HB_CRITICAL_LOCK( hb_threadStackMutex );
+   pStack = hb_threadCreateStack( 0 ); // we don't know thread ID now
 
 #if defined(HB_OS_WIN_32)
-   if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, NULL , CREATE_SUSPENDED, &th_id ) ) != NULL )
+   if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (void *) pStack , CREATE_SUSPENDED, &th_id ) ) != NULL )
 #else
-   if( pthread_create( &th_id, NULL, hb_create_a_thread, NULL ) == 0 )
+   if( pthread_create( &th_id, NULL, hb_create_a_thread, (void *) pStack ) == 0 )
 #endif
    {
       /* Under windws, we put the handle after creation */
-      HB_STACK *pStack = hb_threadCreateStack( th_id );
+      pStack->th_id = th_id;
       pStack->uiParams = hb_pcount();
       pStack->bIsMethod = bIsMethod;
       hb_threadFillStack( pStack, pArgs );
@@ -745,11 +799,11 @@ HB_FUNC( STOPTHREAD )
 
       stack = hb_threadGetStack( th );
       /* Shell locking the thread */
-      HB_MUTEX_LOCK( hb_runningStacks.Mutex );
-      if ( stack->bInUse )
+      HB_CRITICAL_LOCK( hb_cancelMutex );
+      if ( ! stack->bCanCancel )
       {
          stack->bCanceled = TRUE;
-         HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+         HB_CRITICAL_UNLOCK( hb_cancelMutex );
          WaitForSingleObject( stack->th_h, INFINITE );
       }
       else
@@ -797,11 +851,11 @@ HB_FUNC( KILLTHREAD )
    #else
       stack = hb_threadGetStack( th );
       /* Shell locking the thread */
-      HB_MUTEX_LOCK( hb_runningStacks.Mutex );
-      if ( stack->bInUse )
+      HB_CRITICAL_LOCK( hb_cancelMutex );
+      if ( ! stack->bCanCancel )
       {
          stack->bCanceled = TRUE;
-         HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+         HB_CRITICAL_UNLOCK( hb_cancelMutex );
       }
       else
       {
@@ -855,14 +909,17 @@ HB_FUNC( CREATEMUTEX )
 
    mt = (HB_MUTEX_STRUCT *) hb_xgrab( sizeof( HB_MUTEX_STRUCT ) );
 
-   HB_MUTEX_INIT( mt->mutex );
+   HB_CRITICAL_INIT( mt->mutex );
    HB_COND_INIT( mt->cond );
 
    mt->lock_count = 0;
    mt->waiting = 0;
    mt->locker = 0;
    mt->aEventObjects = hb_itemArrayNew( 0 );
+   mt->next = 0;
 
+   hb_threadLinkMutex( mt );
+   
    hb_retclenAdoptRaw( (char *) mt, sizeof( HB_MUTEX_STRUCT ) );
 }
 
@@ -886,13 +943,15 @@ HB_FUNC( DESTROYMUTEX )
 
    Mutex = (HB_MUTEX_STRUCT *)  pMutex->item.asString.value;
 
+   hb_threadUnlinkMutex( Mutex );
+   
    while( Mutex->lock_count )
    {
-      HB_MUTEX_UNLOCK( Mutex->mutex );
+      HB_CRITICAL_UNLOCK( Mutex->mutex );
       Mutex->lock_count--;
    }
 
-   HB_MUTEX_DESTROY( Mutex->mutex );
+   HB_CRITICAL_DESTROY( Mutex->mutex );
    HB_COND_DESTROY( Mutex->cond );
    hb_itemRelease( Mutex->aEventObjects );
 }
@@ -915,19 +974,17 @@ HB_FUNC( MUTEXLOCK )
    }
 
    /* Cannot be interrupted now */
-
+   //HB_CRITICAL_LOCK( hb_mutexMutex );
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
    if( Mutex->locker == HB_CURRENT_THREAD() )
    {
       Mutex->lock_count ++;
+      //HB_CRITICAL_UNLOCK( hb_mutexMutex );
    }
    else
    {  
-      /* prevent the thread from being canceled while waiting for the mutex */
-      HB_CLEANUP_PUSH( hb_mutexForceUnlock, Mutex )
-      HB_MUTEX_LOCK( Mutex->mutex );
-      HB_TEST_CANCEL(); // is this really thread safe? What if canc arrives AFTER
-      HB_CLEANUP_POP;
+      //HB_CRITICAL_UNLOCK( hb_mutexMutex );
+      HB_CRITICAL_LOCK( Mutex->mutex );
       Mutex->locker = HB_CURRENT_THREAD();
       Mutex->lock_count = 1;
    }
@@ -953,6 +1010,7 @@ HB_FUNC( MUTEXUNLOCK )
 
    /* Cannot be interrupted now */
 
+   //HB_CRITICAL_LOCK( hb_mutexMutex );
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
    if( Mutex->locker == HB_CURRENT_THREAD() )
@@ -962,10 +1020,10 @@ HB_FUNC( MUTEXUNLOCK )
       if( Mutex->lock_count == 0 )
       {
          Mutex->locker = 0;
-         HB_MUTEX_UNLOCK( Mutex->mutex );
+         HB_CRITICAL_UNLOCK( Mutex->mutex );
       }
    }
-
+   //HB_CRITICAL_UNLOCK( hb_mutexMutex );
 }
 
 /*JC1: this will always be called when cancellation is delayed */
@@ -998,7 +1056,7 @@ HB_FUNC( SUBSCRIBE )
    if( Mutex->locker != HB_CURRENT_THREAD() )
    {
       islocked = 0;
-      HB_MUTEX_LOCK( Mutex->mutex );
+      HB_CRITICAL_LOCK( Mutex->mutex );
    }
    else
    {
@@ -1034,7 +1092,7 @@ HB_FUNC( SUBSCRIBE )
 
    if( ! islocked )
    {
-      HB_MUTEX_UNLOCK( Mutex->mutex );
+      HB_CRITICAL_UNLOCK( Mutex->mutex );
    }
    else
    {
@@ -1091,7 +1149,7 @@ HB_FUNC( SUBSCRIBENOW )
    if( Mutex->locker != HB_CURRENT_THREAD() )
    {
       islocked = 0;
-      HB_MUTEX_LOCK( Mutex->mutex );
+      HB_CRITICAL_LOCK( Mutex->mutex );
    }
    else
    {
@@ -1133,7 +1191,7 @@ HB_FUNC( SUBSCRIBENOW )
 
    if( ! islocked )
    {
-      HB_MUTEX_UNLOCK( Mutex->mutex );
+      HB_CRITICAL_UNLOCK( Mutex->mutex );
       Mutex->locker = 0;
    }
    else
@@ -1288,7 +1346,6 @@ void hb_threadWaitAll()
          static struct timespec nanosecs = { 0, 1000 };
          nanosleep( &nanosecs, NULL );
       #endif
-      HB_TEST_CANCEL();
    }
    HB_STACK_LOCK;
 }
@@ -1314,11 +1371,11 @@ void hb_threadKillAll()
          pthread_cancel( pStack->th_id );
       #else
          /* Shell locking the thread */
-         HB_MUTEX_LOCK( hb_runningStacks.Mutex );
-         if ( pStack->bInUse )
+         HB_CRITICAL_LOCK( hb_cancelMutex );
+         if ( ! pStack->bCanCancel )
          {
             pStack->bCanceled = TRUE;
-            HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+            HB_CRITICAL_UNLOCK( hb_cancelMutex );
          }
          else
          {
@@ -1327,7 +1384,6 @@ void hb_threadKillAll()
       #endif
       pStack = pStack->next;
    }
-
 }
 
 HB_FUNC( WAITFORTHREADS )
@@ -1346,16 +1402,28 @@ HB_FUNC( KILLALLTHREADS )
 JC: I am leaving this in the source code for now; you can never know, this could
 be useful in the future.
 */
-#if defined( HB_OS_WIN_32 ) 
-DWORD hb_SignalObjectAndWait( HB_COND_T hToSignal, HB_MUTEX_T hToWaitFor, DWORD dwMillisec, BOOL bUnused )
+#if defined( HB_OS_WIN_32 ) //&& ( WINVER < 0x0400)
+DWORD hb_SignalObjectAndWait( HB_CRITICAL_T hToSignal, HB_COND_T hToWaitFor, DWORD dwMillisec, BOOL bUnused )
 {
+   HB_THREAD_STUB 
+   int iStatus;
+   
    HB_SYMBOL_UNUSED( bUnused );
 
-   ReleaseMutex( hToSignal );
+   HB_CRITICAL_UNLOCK( hToSignal );
+   // here we can allow cancellation
+   HB_ENABLE_ASYN_CANC;
    /* return 0 on success like unix functions */
-   return ( WaitForSingleObject( hToWaitFor, dwMillisec ) != WAIT_OBJECT_0);
+   iStatus = WaitForSingleObject( hToWaitFor, dwMillisec ) != WAIT_OBJECT_0;
+   HB_DISABLE_ASYN_CANC;
+   
+   HB_CRITICAL_LOCK( hToSignal );
+   
+   return iStatus;
 }
-#else
+#endif
+
+#ifndef HB_OS_WIN_32
 int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec )
 {
    struct timeval now;
@@ -1374,11 +1442,14 @@ void hb_threadInit( void )
    HB_CRITICAL_INIT( hb_allocMutex );
    HB_CRITICAL_INIT( hb_garbageAllocMutex );
    HB_CRITICAL_INIT( hb_outputMutex );
-   HB_SHARED_INIT( hb_runningStacks, 0 );
+   HB_CRITICAL_INIT( hb_mutexMutex );
 
+   HB_SHARED_INIT( hb_runningStacks, 0 );
+   
    last_stack = NULL;
    hb_main_thread_id = HB_CURRENT_THREAD();
    hb_ht_stack = hb_threadCreateStack( hb_main_thread_id );
+   hb_ht_mutex = NULL;
    s_threadStarted = 1;
 
    #if defined( HB_OS_LINUX )
@@ -1388,6 +1459,15 @@ void hb_threadInit( void )
       pthread_setspecific(hb_thread_stack_key, hb_threadGetStack( hb_main_thread_id ));
    #endif
    
+   #ifdef HB_OS_WIN_32
+      HB_CRITICAL_INIT( hb_cancelMutex );
+      hb_dwCurrentStack = TlsAlloc();
+      TlsSetValue( hb_dwCurrentStack, (void *)hb_ht_stack );
+   #else
+      pthread_key_create( &hb_pkCurrentStack, NULL );
+      pthread_setspecific( hb_pkCurrentStack, (void *)hb_ht_stack );
+   #endif
+
    #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
       HB_CRITICAL_INIT( s_mtxTryLock );
    #endif
@@ -1404,46 +1484,23 @@ void hb_threadExit( void )
    
    /* Destroyng all shell locks mutexes */
    HB_SHARED_DESTROY( hb_runningStacks );
+   HB_CRITICAL_DESTROY( hb_mutexMutex );
    HB_CRITICAL_DESTROY( hb_outputMutex );
    HB_CRITICAL_DESTROY( hb_garbageAllocMutex );
    HB_CRITICAL_DESTROY( hb_allocMutex );
    HB_CRITICAL_DESTROY( hb_threadStackMutex );
 
+   #ifdef HB_OS_WIN_32
+      TlsFree( hb_dwCurrentStack );
+      HB_CRITICAL_DESTROY( hb_cancelMutex );
+   #else
+      pthread_key_delete( hb_pkCurrentStack );
+   #endif
+   
    #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
       HB_CRITICAL_DESTROY( s_mtxTryLock );
    #endif
 }
 
-
-/*
-JC1: this should be reactivated if we want flat mutex
-
-void hb_threadLock( HB_LWR_MUTEX *lpMutex )
-{
-   if ( lpMutex->Locker == HB_CURRENT_THREAD() )
-   {
-      lpMutex->nCount++;
-   }
-   else
-   {
-      HB_CRITICAL_LOCK( lpMutex->Critical );
-      lpMutex->nCount = 1;
-      lpMutex->Locker = HB_CURRENT_THREAD();
-   }
-}
-
-void hb_threadUnlock( HB_LWR_MUTEX *lpMutex )
-{
-   if ( lpMutex->Locker == HB_CURRENT_THREAD() )
-   {
-      lpMutex->nCount--;
-
-      if ( lpMutex->nCount == 0 )
-      {
-         lpMutex->Locker = 0;
-         HB_CRITICAL_UNLOCK( lpMutex->Critical );
-      }
-   }
-}
-*/
 #endif
+
