@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.55 2003/11/24 15:15:26 lf_sfnet Exp $
+ * $Id: itemapi.c,v 1.56 2003/11/27 13:27:22 lf_sfnet Exp $
  */
 
 /*
@@ -1400,11 +1400,6 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
             static double s_dInfinity = 0;
             static double s_bInfinityInit = FALSE;
 
-            if( dNumber == -0 )
-            {
-               dNumber = 0;
-            }
-
             if( ! s_bInfinityInit )
             {
                 /* set math handler to NULL for evaluating log(0),
@@ -1473,13 +1468,19 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
                   if( iDec == 0 )
                   {
                      iBytes = sprintf( szResult, "%*.0f", iSize, dNumber );
-
                   }
                   else
                   {
                      if( iDec <=  iDecR )
                      {
+                        char szTemp[20];
+                        sprintf( szTemp, "%f", dNumber );
+
+                        if ( !strcmp( szTemp,"-0.000000") )
+                           dNumber = 0;
+
                         iBytes = sprintf( szResult, "%*.*f", iSize, iDec, dNumber );
+
                      }
                      else
                      {
