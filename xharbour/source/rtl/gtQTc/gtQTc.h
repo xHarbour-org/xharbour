@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.5 2002/11/13 15:37:05 walito Exp $
+ * $Id: gtQTc.h,v 1.1 2003/01/30 00:46:25 jonnymind Exp $
  */
 
 /*
@@ -64,6 +64,8 @@
  *  the Harbour project
  */
 
+#include "hbapigt.h"
+
 #ifndef GTQTC_H
 #define GTQTC_H
 
@@ -77,22 +79,22 @@ static char hb_gt_GetScreenMode( void );
 static void hb_gt_SetCursorSize( char start, char end );
 static void hb_gt_GetCursorSize( char * start, char * end );
 
+static void hb_gt_xGetXY( USHORT cRow, USHORT cCol, BYTE * attr, BYTE * ch );
+static void hb_gt_xPutch( USHORT cRow, USHORT cCol, BYTE attr, BYTE ch );
+static USHORT hb_gt_GetDisplay( void );
+
+/* 
 void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr );
 void hb_gt_Exit( void );
 int hb_gt_ExtendedKeySupport();
 int hb_gt_ReadKey( HB_inkey_enum eventmask );
 BOOL hb_gt_AdjustPos( BYTE * pStr, ULONG ulLen );
 BOOL hb_gt_IsColor( void );
-static char hb_gt_GetScreenMode( void );
 USHORT hb_gt_GetScreenWidth( void );
 USHORT hb_gt_GetScreenHeight( void );
 void hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod );
-static void hb_gt_SetCursorSize( char start, char end );
-static void hb_gt_GetCursorSize( char * start, char *end );
 USHORT hb_gt_GetCursorStyle( void );
 void hb_gt_SetCursorStyle( USHORT style );
-static void hb_gt_xGetXY( USHORT cRow, USHORT cCol, BYTE * attr, BYTE * ch );
-static void hb_gt_xPutch( USHORT cRow, USHORT cCol, BYTE attr, BYTE ch );
 void hb_gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG len );
 int hb_gt_RectSize( USHORT rows, USHORT cols );
 void hb_gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE * dest );
@@ -114,7 +116,6 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
 USHORT hb_gt_BoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * pbyFrame, BYTE byAttr );
 USHORT hb_gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE byAttr );
 USHORT hb_gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byAttr );
-static USHORT hb_gt_GetDisplay( void );
 BOOL hb_gt_SetMode( USHORT uiRows, USHORT uiCols );
 BOOL hb_gt_PreExt();
 BOOL hb_gt_PostExt();
@@ -122,6 +123,7 @@ BOOL hb_gt_Suspend();
 BOOL hb_gt_Resume();
 void hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen );
 void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen );
+*/
 //}
 
 // references to the qtconsole lib

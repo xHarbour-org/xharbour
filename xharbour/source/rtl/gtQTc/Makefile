@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2003/01/30 13:38:03 jonnymind Exp $
+# $Id: Makefile,v 1.2 2003/05/16 19:52:08 druzus Exp $
 #
 
 ROOT = ../../../
@@ -16,14 +16,14 @@ CPP_SOURCES=\
 C_SOURCES=\
 	mouseQTc.c
 
-LIBNAME=gtQTc
-
-C_USR=-I/usr/lib/qt3/include
+LIBNAME=
+MT_LIBNAME=gtQTc
 
 %.moc.cpp: %.h
 	moc -o $@ $<
 
 include $(TOP)$(ROOT)config/lib.cf
+CFLAGS += -I/usr/lib/qt3/include
 
 ifeq ($(HB_MULTI_GT),yes)
 CFLAGS += -DHB_MULTI_GT
