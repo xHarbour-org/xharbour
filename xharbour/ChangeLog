@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.700 2003/02/11 11:23:18 what32 Exp $
+ * $Id: ChangeLog,v 1.701 2003/02/12 01:12:48 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-12-11 02:10 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+2003-02-12 02:10 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
   * source/rtl/Makefile
   + source/rtl/hbcompress.c
     + Added compression routines based on a xharbour rearrangement
