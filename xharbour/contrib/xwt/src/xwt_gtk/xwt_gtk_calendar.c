@@ -1,9 +1,9 @@
 /*
    XWT - xHarbour Windowing Toolkit
 
-   (C) 2003 Luiz Rafael Culik
+   (C) 2004 Luiz Rafael Culik
 
-   $Id: xwt_gtk_fontselect.c,v 1.1 2003/09/02 22:42:32 lculik Exp $
+   $Id: xwt_gtk_calendar.c,v 1.1 2004/01/25 02:42:00 lculik Exp $
 
    GTK interface - File Selection Box 
 */
@@ -160,19 +160,8 @@ BOOL xwt_gtk_createCalendar( PXWT_WIDGET xwtData )
    long lyear,lmonth,lday;
    hb_dateToday(&lyear,&lmonth,&lday );
        
-//   PXWT_GTK_MODAL xwtFilew;
-
-//   xwtFilew = (PXWT_GTK_MODAL) hb_xgrab( sizeof( XWT_GTK_MODAL ) );
 
    filew = gtk_calendar_new ();
-   // this widget is NOT displayed by default
-//   #if __GNUC__ <3
-//   xwtFilew->a.main_widget = filew;
-//   #else   
-//   xwtFilew->main_widget = filew;
-//   #endif
-//   xwtFilew->modal = FALSE;
-//   xwtFilew->canceled = FALSE;
   gtk_calendar_select_month ( GTK_CALENDAR(filew), lmonth, lyear);
   gtk_calendar_mark_day ( GTK_CALENDAR(filew),lday);	
   gtk_calendar_display_options(GTK_CALENDAR(filew),GTK_CALENDAR_SHOW_DAY_NAMES | GTK_CALENDAR_SHOW_HEADING);
@@ -237,35 +226,8 @@ BOOL xwt_gtk_createCalendarModal( PXWT_WIDGET xwtData )
 //  calendar_set_flags (&xwtCalendarW);
   gtk_calendar_select_month ( GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar), lmonth, lyear);
   gtk_calendar_mark_day ( GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar),lday);	
+  gtk_calendar_display_options(GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar),GTK_CALENDAR_SHOW_DAY_NAMES | GTK_CALENDAR_SHOW_HEADING  );
 
-                    //G_OBJECT (
-/*  g_signal_connect (
-    G_OBJECT ( GTK_XWTCALENDAR_SELECTION_DIALOG( filew )->calendar),
-    "month_changed", 
-		    G_CALLBACK (calendar_month_changed),
-		    &xwtData);
-  g_signal_connect ( G_OBJECT (GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar), 
-  "day_selected", 
-		    G_CALLBACK (calendar_day_selected),
-		    &xwtData);
-  g_signal_connect ( G_OBJECT (GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar),
-   "prev_month", 
-		    G_CALLBACK (calendar_prev_month),
-		    &xwtData);
-  g_signal_connect ( G_OBJECT (GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar),
-   "next_month", 
-		    G_CALLBACK (calendar_next_month),
-		    &xwtData);
-  g_signal_connect ( G_OBJECT (GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar),
-   "prev_year", 
-		    G_CALLBACK (calendar_prev_year),
-		    &xwtData);
-  g_signal_connect ( G_OBJECT (GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar),
-   "next_year", 
-		    G_CALLBACK (calendar_next_year),
-		    &xwtData);
-
-*/
   g_signal_connect ( G_OBJECT (GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->button1),
    "clicked", 
 		    G_CALLBACK (calendar_ok_sel), 

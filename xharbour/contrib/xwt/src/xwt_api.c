@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.15 2003/10/09 23:18:33 jonnymind Exp $
+   $Id: xwt_api.c,v 1.16 2003/11/08 00:45:56 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -336,6 +336,7 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_ATTACH:
       case XWT_PROP_CONTENT:
       case XWT_PROP_TITLES:
+      case XWT_PROP_SETCOMBOITEMS:
          prop.value.data = hb_param( 3, HB_IT_ARRAY );
          if ( prop.value.data == NULL )
          {
@@ -343,6 +344,15 @@ HB_FUNC( XWT_SETPROPERTY )
             return;
          }
       break;
+     case XWT_PROP_SETDATE:
+     {
+        prop.date.year=1900;
+	prop.date.month=01;
+	prop.date.day=01;
+     }
+     break;
+	
+	 
    }
 
    hb_retl( xwt_drv_set_property( wSelf, &prop ) );
@@ -505,6 +515,17 @@ HB_FUNC( XWT_GETPROPERTY )
             bRet = TRUE;
          }
       break;
+     // Date Parametres
+     case XWT_PROP_GETDATE:
+     case XWT_PROP_GETDATEMODAL:
+         if ( pParam1 != NULL )
+	 {
+	 TraceLog(NULL,"%i%i%i",(long)prop.date.year,(long)prop.date.month,(long) prop.date.day);
+	   hb_itemPutD( pParam1,(long)prop.date.year,(long)prop.date.month,(long) prop.date.day);
+	   bRet= TRUE;
+	 }
+     break;	   
+	   
    }
 
    hb_retl( bRet );

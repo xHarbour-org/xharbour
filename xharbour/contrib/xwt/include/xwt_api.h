@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.h,v 1.5 2003/08/27 20:53:44 lculik Exp $
+   $Id: xwt_api.h,v 1.6 2003/10/09 23:18:33 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE - header
 */
@@ -93,6 +93,11 @@ typedef struct tag_xwt_property
       char * base;
       char * text;
    } color;
+   union{
+      unsigned int year;
+      unsigned int month;
+      unsigned int day;
+   } date;
    
 } XWT_PROPERTY, *PXWT_PROPERTY;
 

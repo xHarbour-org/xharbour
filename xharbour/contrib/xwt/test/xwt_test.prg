@@ -4,7 +4,7 @@
 * Giancarlo Niccolai et al.:
 * (PLZ. add your copyright...)
 *
-* $Id$
+* $Id: xwt_test.prg,v 1.24 2003/10/09 23:18:34 jonnymind Exp $
 *
 
 
@@ -21,7 +21,10 @@ PROCEDURE MAIN()
    LOCAL oTextbox, oLabel, oViewPort, oPane
    LOCAL oImg, oHlay, oVLay, oVlay2, oFrame, oSplit
    LOCAL oGrid
-   LOCAL oList, oCheck, aInputs, oInput, oRadioPanel
+   Local oCalen
+   LOCAL oList, oCheck, aInputs, oInput, oRadioPanel,oCombo
+   Local cData
+   Local aItems := {"Luiz","Ron","Gian","Marcelo","Patrick"}
 
    XwtInit()
 
@@ -120,6 +123,9 @@ PROCEDURE MAIN()
    oRadioPanel:add( XWTRadioButton():New( "Option 3" ,"Sans",7,"#111210","#222222","#A38103","#A38103") )
 
    oVLay2:Add( oRadioPanel )
+   @ 50,2 COMBO oCombo items aItems
+   oVlay2:add(oCombo)
+   
    /***** A list **********/
    oList := XWTTreeList():New(;
          { {"uno", 2, 3.12, "fir"}, ;
@@ -128,8 +134,10 @@ PROCEDURE MAIN()
          )
    oList:SetColumnEditable( 0 )
    oVLay:Add( oList )
-
-   
+   //oCalen := XWTCalendar():New()
+   @  200,50 CALENDAR oCalen VAR cData 
+      oCalen:AddEventListener(XWT_E_UPDATED, @BoxModified1())
+   ovlay:add(oCalen)
    /*** Showing window ***/
    oWindow:Resize( 200, 200 )
    oWindow:Show()
@@ -172,6 +180,7 @@ FUNCTION FileEvent( oEvent )
    //Filesel can't be local!
    //Local oFileSel
    Local cFileName
+   local cDate := ""
    
 ?  "Menu activated: ", oEvent:oSender:nId
    IF oEvent:oSender:nId == 1
@@ -196,6 +205,19 @@ FUNCTION FileEvent( oEvent )
       ELSE
 ?  "Font NAME: ", cFileName
       ENDIF      
+   elseIF oEvent:oSender:nId == 3
+      oFileSel := XWTCalendar():New( "Open file" ,,,,.T.,cFileName)
+//      oFileSel:SetFile( "Select an Font" )
+
+      // Notice: after a "do_modal", the object will not exist anymore
+      cFileName := oFileSel:DoModal()
+//      IF cFileName == ""
+//?  "Canceled!"
+//      ELSE
+?  "Date: ", cFileName
+//      ENDIF      
+      
+      
    ELSEIF oEvent:oSender:nId == 99
       Quit
    ENDIF
@@ -206,6 +228,13 @@ FUNCTION BoxModified( oEvent )
 ?  "Text entered in box: ", oEvent:oSender:getText()
    oEvent:oSender:SetText( "Reset" )
    oOtherBox:SetFocus()
+RETURN .F.
+
+
+FUNCTION BoxModified1( oEvent )
+?  "Text entered in box: ", oEvent:oSender:getdate()
+//   oEvent:oSender:SetText( "Reset" )
+//   oOtherBox:SetFocus()
 RETURN .F.
 
 
@@ -244,6 +273,7 @@ FUNCTION BuildMenu()
    MENU oMenu PROMPT "File"
         MENUITEM oMenuItem PROMPT "Op_en" ICON "valley.png" ACTION @FileEvent() OF oMenu FONT "Clean" Size 20 Color "#44DE5F"
         MENUITEM oMenuItem PROMPT "Font s_el"  ACTION @FileEvent() OF oMenu FONT "Dingbats" Size 30 Color "#A300FF"	
+        MENUITEM oMenuItem PROMPT "Calendar"  ACTION @FileEvent() OF oMenu FONT "Dingbats" Size 30 Color "#A300FF"	
         MENUITEM PROMPT "Close" ACTION @FileEvent() OF oMenu SIZE 5 COLOR "#A38103"
 
         MENU oMenuSec PROMPT "SubMenu" OF oMenu

@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.26 2003/11/08 00:45:56 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.27 2004/01/25 02:41:59 lculik Exp $
 
    Global declarations, common functions
 
@@ -758,6 +758,11 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
       }
       return TRUE;
+      case XWT_PROP_SETCOMBOITEMS:  
+          xwt_gtk_ComboAddItem(wWidget,(PHB_ITEM) prop->value.data);
+	  return TRUE;
+//      case XWT_PROP_SETCOMBOEDIT:
+         
 
       case XWT_PROP_PROGRESSFRAC:
          gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR (wSelf),prop->value.number);
@@ -1082,10 +1087,10 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
          return TRUE;
 
-      case XWT_PROP_GETDATE:        
+      case XWT_PROP_GETDATEMODAL:        
          if ( ! (( PXWT_GTK_MODAL ) wWidget->widget_data)->canceled )
          {
-            gtk_calendar_get_date (GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG(wSelf)->calendar ),(guint)&prop->date.year, (guint)&prop->date.month, (guint)&prop->date.day);
+            gtk_calendar_get_date (GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG(wSelf)->calendar ),&prop->date.year, &prop->date.month, &prop->date.day);
          }
          else
          {
@@ -1095,6 +1100,9 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
          return TRUE;
 
+      case XWT_PROP_GETDATE:        
+            gtk_calendar_get_date (GTK_CALENDAR( wSelf ),&prop->date.year, &prop->date.month, &prop->date.day);
+         return TRUE;
 
       case XWT_PROP_STATUS:
          if ( wWidget->type == XWT_TYPE_CHECKBOX || wWidget->type == XWT_TYPE_RADIOBUTTON || wWidget->type == XWT_TYPE_TOGGLEBUTTON)
@@ -1152,6 +1160,7 @@ BOOL xwt_drv_create( PXWT_WIDGET xwtData )
       case XWT_TYPE_FONTSEL:     return xwt_gtk_createFontSelection( xwtData );
       case XWT_TYPE_CALENDAR:    return xwt_gtk_createCalendar(xwtData);
       case XWT_TYPE_CALENDARM:    return xwt_gtk_createCalendarModal(xwtData);
+      case XWT_TYPE_COMBOBOX: return  xwt_gtk_createComboBox(xwtData);
 
    }
    return FALSE;

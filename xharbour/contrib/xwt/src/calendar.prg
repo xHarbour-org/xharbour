@@ -1,9 +1,9 @@
 /*
    XWT - xHarbour Windowing Toolkit
 
-   (C) 2003 Giancarlo Niccolai
+   (C) 2004 Luiz Rafael Culik
 
-   $Id: textbox.prg,v 1.3 2003/07/21 18:14:40 xthefull Exp $
+   $Id: calendar.prg,v 1.1 2004/01/25 02:44:16 lculik Exp $
 
    Text box Control. 
 */
@@ -22,6 +22,7 @@ CLASS XWTCalendar FROM XWTWidget
    METHOD SetCursorPos( nPos )
 */
 METHOD GetDate()
+METHOD GetDateModal()
 METHOD domodal()
 
 ENDCLASS
@@ -59,10 +60,20 @@ METHOD GetDate() Class XWTCalendar
    LOCAL cFile := "  /  /    "
 
    IF  XWT_GetProperty( ::oRawWidget, XWT_PROP_GETDATE, @cFile)
-   tracelog(cFile)
+
       RETURN cFile
    ENDIF
-   tracelog(cFile)
+
+RETURN CTOD("")
+
+METHOD GetDateModal() Class XWTCalendar
+   LOCAL cFile := "  /  /    "
+
+   IF  XWT_GetProperty( ::oRawWidget, XWT_PROP_GETDATEMODAL, @cFile)
+
+      RETURN cFile
+   ENDIF
+
 RETURN CTOD("")
 
 /*
@@ -103,7 +114,7 @@ METHOD DoModal() Class  XWTCalendar
 
    ::Show()
    XWT_Modal( ::oRawWidget )
-   cFile := ::Getdate()
+   cFile := ::GetdateMODAL()
    ::Destroy()
 
 RETURN cFile

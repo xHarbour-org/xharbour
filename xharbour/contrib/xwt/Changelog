@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.51 2003/12/18 14:34:44 jonnymind Exp $
+ * $Id: Changelog,v 1.52 2004/01/25 02:45:26 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-26 12:00 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
+  + src/combobox.prg
+    class for combo boxes
+  + source/xwt_gtk/xwt_gtk_combobox.c
+    !combo box routines
+  * src/xwt_api.c
+    src/xwt_gtk/xwt_gtk.c
+    src/xwt_gtk/xwt_gtk.h
+    ! support for combo boxes
+    + src/xwt_gtk/xwt_gtk_calendar.c
+    ! minor ajusts
+  * test/xwt_test.prg
+    ! added test for calendar and combo box    
+        
 2004-01-25 00:40 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   + src/xwt_gtk/xwt_calendar.h
     src/xwt_gtk/xwt_calendar.c

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwtcmd.ch,v 1.7 2003/08/31 20:02:36 xthefull Exp $
+   $Id: xwtcmd.ch,v 1.8 2003/11/08 00:45:55 jonnymind Exp $
 
    Definitions
 */
@@ -81,6 +81,14 @@
                                [ ACTION <pAction> ] [ METHOD <oMethod> ][ OF <oMenu> ] [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>];
           => [<oMenuItem> := ] XWTMenuItem():New( <cPrompt>, <nId>, <pAction>, <oMethod>, <cIcon>, <oMenu> ,<(cFont)>,<nSize>,<(clr)>)
 
+//calendat
+#xcommand @ <x>,<y> CALENDAR [ <oTextBox> ] [ VAR <cText> ] [ OF <oParent> ];
+          => [ <oTextBox> := ] XWTCalendar():New( <cText>, <x>, <y>, <oParent> )
+	  
+#xcommand @ <x>,<y> COMBO [ <oTextBox> ] [ VAR <cText> ] [ OF <oParent> ] ITEMS <aItems>;
+          => [ <oTextBox> := ] XWTComboBox():New( <cText>, <x>, <y>, <oParent> ,<aItems>)
+	  
+	  
 // Tope level commands --------------------------------------------------------------------------
 #xcommand QUIT => XWTQUIT()
 

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.21 2003/09/02 22:51:30 lculik Exp $
+   $Id: xwt.ch,v 1.22 2003/11/08 00:45:55 jonnymind Exp $
 
    Definitions
 */
@@ -76,6 +76,9 @@
 
 #define XWT_PROP_STATUS    70 // Integer or bool, depending on widget
 #define XWT_PROP_RADIOGROUP    71 // Pointer
+#define XWT_PROP_GETDATEMODAL   72 //date 
+#define XWT_PROP_GETDATE   73 //date 
+#define XWT_PROP_SETDATE   74 //date 
 
 #define XWT_PROP_FILEMASK  80
 #define XWT_PROP_FILENAME  81
@@ -101,6 +104,14 @@
 #define XWT_PROP_TEXTCOLOR      133
 
 #define XWT_PROP_FONTNAME        140
+
+#define XWT_PROP_PROGRESSTYPE   150
+#define XWT_PROP_PROGRESSFRAC   151
+
+#define XWT_PROP_SETCOMBOITEMS 160
+#define XWT_PROP_SETCOMBOEDIT  161
+#define XWT_PROP_GETCOMBOSELECT 162
+
 
 // Global widget management status
 #define XWT_PROP_UPDATE    200  // boolean (ready or not)
@@ -178,7 +189,10 @@
 #define XWT_TYPE_TREELIST 81
 #define XWT_TYPE_BROWSE   82
 #define XWT_TYPE_FONTSEL  90
-
+#define XWT_TYPE_PROGRESSBAR 100
+#define XWT_TYPE_CALENDAR 110
+#define XWT_TYPE_CALENDARM 120
+#define XWT_TYPE_COMBOBOX    130
 // Container of Widgets ---------------------------
 
 #endif
