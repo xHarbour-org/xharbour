@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.1 2004/09/08 00:17:17 druzus Exp $
+ * $Id: gtxwc.c,v 1.2 2004/10/22 11:26:48 paultucker Exp $
  */
 
 /*
@@ -4117,7 +4117,7 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
          break;
 
       case GTI_VIEWMAXHEIGHT:
-         iret = _GetScreenHeight();
+         iRet = _GetScreenHeight();
          break;
 
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.1 2004/10/22 02:40:35 ronpinkas Exp $
+ * $Id$
  */
 
 /*
@@ -143,7 +143,7 @@ double CalcConstant( char **pExp )
 static double Reduce( PBIOP Exp )
 {
    PBIOP Right;
-   double dRet;
+   double dRet = 0;
 
    if( Exp->Operator[0] == 0 )
    {

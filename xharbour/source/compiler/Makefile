@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2002/01/29 08:00:24 ronpinkas Exp $
+# $Id: Makefile,v 1.3 2003/07/31 18:56:12 druzus Exp $
 #
 
 HB_LEX := SIMPLEX
@@ -39,6 +39,7 @@ LEX_HEADERS=\
 endif
 
 C_SOURCES=\
+	calconst.c \
 	cmdcheck.c \
 	genc.c \
 	gencobj.c \

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.47 2004/10/21 14:26:42 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.48 2004/10/22 11:26:48 paultucker Exp $
  */
 
 /*
@@ -394,7 +394,7 @@ static int s_fontReqWidth = XVT_DEFAULT_FONT_WIDTH;
 static char s_fontReqName[XVT_FONTNAME_SIZE];
 
 #define _GetScreenWidth()  (s_buffer->cols)
-#define _GetScreenHieght() (s_buffer->rows)
+#define _GetScreenHeight() (s_buffer->rows)
 
 /**********************************************************************
 *                                                                     *

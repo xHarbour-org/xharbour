@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.46 2004/09/26 11:55:22 jonnymind Exp $
+ * $Id: gtcrs.c,v 1.47 2004/10/22 11:26:44 paultucker Exp $
  */
 
 /*
@@ -168,8 +168,8 @@ typedef struct InOutBase {
 static InOutBase *s_ioBase = NULL;
 
 /* faster macro version for use inside this module */
-#define _GetScreenWidth()  ( s_ioBase->maxrow )
-#define _GetScreenHeight() ( s_ioBase->maxcol )
+#define _GetScreenWidth()  ( s_ioBase->maxcol )
+#define _GetScreenHeight() ( s_ioBase->maxrow )
 
 static InOutBase **s_ioBaseTab = NULL;
 static int s_iSize_ioBaseTab = 0;
@@ -2338,9 +2338,9 @@ void HB_GT_FUNC( gt_Exit( void ) )
 
 /* *********************************************************************** */
 
-USHORT HB_GT_FUNC( gt_GetScreenHeight( void ))
+USHORT HB_GT_FUNC( gt_GetScreenHeight( void ) )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenHeight()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenHeight()" ) );
 
    if ( s_WinSizeChangeFlag )
    {
@@ -2353,9 +2353,9 @@ USHORT HB_GT_FUNC( gt_GetScreenHeight( void ))
 
 /* *********************************************************************** */
 
-USHORT HB_GT_FUNC( gt_GetScreenWidth( void ))
+USHORT HB_GT_FUNC( gt_GetScreenWidth( void ) )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenWidth()"));
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenWidth()" ) );
 
    if ( s_WinSizeChangeFlag )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.28 2004/09/26 11:55:22 jonnymind Exp $
+ * $Id: gtsln.c,v 1.29 2004/10/22 11:26:45 paultucker Exp $
  */
 
 /*
@@ -120,8 +120,8 @@ extern int s_gtSLN_escDelay;
 extern unsigned char s_convKDeadKeys[];
 extern int HB_GT_FUNC(gt_Init_Terminal( int phase ));
 
-#define _GetScreenWidth()  SLtt_Screen_Cols;
-#define _GetScreenHeight)  SLtt_Screen_Rows;
+#define _GetScreenWidth()  SLtt_Screen_Cols
+#define _GetScreenHeight() SLtt_Screen_Rows
 
 /* the name of an environmet variable containig a definition of nation chars.*/
 /* A definition is a list of pairs of chars. The first char in each pair is  */

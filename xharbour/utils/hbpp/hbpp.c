@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.5 2004/05/11 01:22:42 druzus Exp $
+ * $Id: hbpp.c,v 1.6 2004/10/20 19:36:59 druzus Exp $
  */
 
 /*
@@ -678,4 +678,10 @@ PINLINE   hb_compInlineAdd( char * szFunName )
 {
    HB_SYMBOL_UNUSED( szFunName );
    return NULL;
+}
+
+double CalcConstant( char **pExp )
+{
+   HB_SYMBOL_UNUSED( pExp );
+   return 0;
 }
