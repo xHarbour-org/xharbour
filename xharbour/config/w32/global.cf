@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.2 2002/12/15 23:06:01 ronpinkas Exp $
+# $Id: global.cf,v 1.3 2003/01/10 17:16:37 jonnymind Exp $
 #
 
 all : first
@@ -39,6 +39,9 @@ CP = copy
 MV = move
 MD = md
 
+#this will be used only under MINGW
+RANLIB = ranlib
+
 dirbase::
 	-if not exist $(HB_ARCHITECTURE) $(MD) $(HB_ARCHITECTURE)
 	-if not exist $(ARCH_DOS)        $(MD) $(ARCH_DOS)
@@ -63,6 +66,10 @@ RD = rm -f -r
 CP = cp -f
 MV = mv -f
 MD = mkdir
+
+#this will be used only under MINGW
+RANLIB = ranlib
+
 
 dirbase::
 	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \

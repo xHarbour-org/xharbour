@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.605 2003/01/10 09:45:06 jonnymind Exp $
+ * $Id: ChangeLog,v 1.608 2003/01/10 18:26:01 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-10 23:13 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  + make_mingw.sh
+    + Added an easy to use back end for mingw compilation under MSYS shell.
+      (should we make this able to start even the MSYS shell by itself?)
+
+  * config/w32/gcc.cf
+  * config/w32/global.cf
+  * config/w32/mingw32.cf
+    ! Added CFLAGS += -DHB_THREAD_SUPPORT if HB_MT is present
+    + Added ranlib postlinking of libs (is this correct?)
+
+  * samples/sitesvr/Makefile
+  - samples/sitesvr/sitesrv.prg
+  + samples/sitesvr/sitesvr.prg
+    ! Changed name to sitesvr.prg to match the directory name
+
 
 2003-01-10 19:14 UTC+0100 Patrick Mast <patrick@winfakt.com>
   * doc/genhtm.bat

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.3 2002/05/03 07:38:45 ronpinkas Exp $
+# $Id: gcc.cf,v 1.4 2003/01/10 17:16:35 jonnymind Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -17,6 +17,10 @@ ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS = -Wall -DSIMPLEX
 else
 CFLAGS = -Wall
+endif
+
+ifeq ($(HB_MT),MT)
+CFLAGS += -DHB_THREAD_SUPPORT
 endif
 
 LD = gcc
@@ -90,6 +94,6 @@ LDFLAGS = $(LINKPATHS)
 
 AR = ar
 ARFLAGS = $(A_USR)
-AR_RULE = $(AR) $(ARFLAGS) r $@ $^ || $(RM) $@
+AR_RULE = $(AR) $(ARFLAGS) r $@ $^ && $(RANLIB) $@ || $(RM) $@
 
 include $(TOP)$(ROOT)config/rules.cf

@@ -1,12 +1,12 @@
 #
-# $Id: Makefile,v 1.2 2003/01/04 13:14:09 jonnymind Exp $
+# $Id: Makefile,v 1.3 2003/01/10 16:13:04 jonnymind Exp $
 #
 
 ROOT = ../../
 
 PRG_SOURCES=\
 	blddbf.prg \
-	sitesrv.prg \
+	sitesvr.prg \
 	
 PRG_MAIN=sitesrv.prg 
 
