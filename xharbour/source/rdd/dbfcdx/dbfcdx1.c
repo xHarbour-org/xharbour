@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.90 2003/12/04 09:26:54 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.91 2003/12/12 10:16:05 druzus Exp $
  */
 
 /*
@@ -4464,7 +4464,7 @@ static BOOL hb_cdxCurKeyRefresh( CDXAREAP pArea, LPCDXTAG pTag, BOOL fUniq )
 }
 
 /*
- * return number of keys in order
+ * skit to next unique key
  */
 static ERRCODE hb_cdxSkipUnique( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward )
 {
@@ -4543,7 +4543,6 @@ static ERRCODE hb_cdxSkipUnique( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward )
    hb_cdxIndexUnLockRead( pTag->pIndex );
    return retval;
 }
-
 
 /*
  * return number of keys in order

@@ -1,5 +1,5 @@
 #
-# $Id: install.cf,v 1.2 2003/11/24 10:25:13 druzus Exp $
+# $Id: install.cf,v 1.3 2003/12/07 19:36:18 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -14,5 +14,3 @@ endef
 
 INSTALL_LIST = $(subst /,\,$(INSTALL_OBJS))
 INSTALL_RULE = $(foreach file, $(INSTALL_LIST), $(inst_file))
-
-POSTINST_RULE = $(HB_POSTINST)

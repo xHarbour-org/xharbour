@@ -1,5 +1,5 @@
 #
-# $Id: dir.cf,v 1.6 2000/02/14 16:19:50 vszel Exp $
+# $Id: dir.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
 #
 
 ifneq ($(HB_ARCHITECTURE),)
@@ -12,6 +12,11 @@ all : first
 
 first clean install::
 	$(DIR_RULE)
+
+ifneq ($(HB_POSTINST),)
+install::
+	$(HB_POSTINST)
+endif
 
 endif
 endif

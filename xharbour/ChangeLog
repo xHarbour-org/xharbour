@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1866 2003/12/13 17:45:07 paultucker Exp $
+ * $Id: ChangeLog,v 1.1867 2003/12/13 17:47:21 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-13 18:52 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * typo in comment fixed
+
+  * xharbour/Makefile
+  * xharbour/bin/hb-func.sh
+  * xharbour/config/dir.cf
+  * xharbour/config/install.cf
+  * xharbour/config/dos/install.cf
+  * xharbour/config/linux/install.cf
+  * xharbour/config/w32/install.cf
+    ! fixed redundant pass in 'install' I introduced recently
+    * next changes and cleanups for msys build
 
 2003-12-13 12:43 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * hrbdll.vc

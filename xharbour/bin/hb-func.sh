@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: hb-func.sh,v 1.1 2003/12/07 19:36:18 druzus Exp $
+# $Id: hb-func.sh,v 1.2 2003/12/12 10:16:05 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -385,7 +385,7 @@ mk_hblibso()
         esac
     done
     $HB_BIN_INSTALL/hb-mkslib lib${name}-${hb_ver}.so $LIBS
-    [ $HB_MT != "MT" ] || $HB_BIN_INSTALL/hb-mkslib lib${name}mt-${hb_ver}.so $LIBSMT
+    [ "$HB_MT" != "MT" ] || $HB_BIN_INSTALL/hb-mkslib lib${name}mt-${hb_ver}.so $LIBSMT
     for l in lib${name}-${hb_ver}.so lib${name}mt-${hb_ver}.so
     do
         if [ -f $l ]

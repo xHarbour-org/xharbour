@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2003/01/10 16:12:59 jonnymind Exp $
+# $Id: Makefile,v 1.4 2003/12/07 19:36:17 druzus Exp $
 #
 
 ROOT = ./
@@ -10,6 +10,8 @@ DIRS=\
 	utils \
 #	tests \
 #	samples \
+
+ifeq ($(HB_POSTINST),)
 
 ifneq ($(SHLVL),)
 HB_POSTINST = $(TOP)$(ROOT)bin/postinst.sh
@@ -23,5 +25,6 @@ endif
 endif
 endif
 
+endif
+
 include $(ROOT)config/dir.cf
-include $(ROOT)config/install.cf
