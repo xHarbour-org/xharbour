@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.78 2004/05/30 20:44:09 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.79 2004/06/04 03:27:49 ronpinkas Exp $
  */
 
 /*
@@ -100,6 +100,12 @@ extern USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName );
 
    #define HB_SUPPORT_XBASE     ( HB_COMP_ISSUPPORTED(HB_COMPFLAG_XBASE) )
    #define HB_SUPPORT_HARBOUR   ( HB_COMP_ISSUPPORTED(HB_COMPFLAG_HARBOUR) )
+
+   extern int hb_compMemvarGetPos( char *, PFUNCTION );
+
+   extern BOOL hb_comp_AmbiguousVar;
+   extern int hb_comp_iExitLevel;
+
 #endif
 
 
@@ -1129,12 +1135,19 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                   if( hb_compLocalGetPos( pSelf->value.asList.pExprList->value.asSymbol ) ||
                       hb_compStaticGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pLast ) ||
                       hb_compVariableGetPos( hb_comp_pGlobals, pSelf->value.asList.pExprList->value.asSymbol ) ||
-                      ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pFirst ) ) )
+                      hb_compMemvarGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pLast ) ||
+                      ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pFirst ) ) ||
+                      ( hb_comp_bStartProc == FALSE && hb_compMemvarGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pFirst ) ) )
                   {
                      // Declared var - do not change context.
                   }
                   else
                   {
+                     if( hb_comp_iExitLevel == HB_EXITLEVEL_DELTARGET )
+                     {
+                        hb_comp_AmbiguousVar = TRUE;
+                     }
+
                      hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_MEMVAR_ASSUMED, pSelf->value.asList.pExprList->value.asSymbol, NULL );
 
                      // Force MEMVAR context.

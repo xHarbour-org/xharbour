@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.81 2004/05/12 02:25:24 druzus Exp $
+ * $Id: harbour.c,v 1.82 2004/05/30 20:44:10 ronpinkas Exp $
  */
 
 /*
@@ -224,7 +224,7 @@ static BOOL hb_comp_bExternal   = FALSE;
    that warnings on uninitialized locals would not stop compilation when
    exit severity is set to 2
 */
-static BOOL hb_comp_AmbiguousVar = FALSE;
+BOOL hb_comp_AmbiguousVar = FALSE;
 
 /* linked list with EXTERNAL symbols declarations
  */
