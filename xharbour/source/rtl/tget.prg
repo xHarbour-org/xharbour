@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.69 2004/02/18 08:55:40 ronpinkas Exp $
+ * $Id: tget.prg,v 1.70 2004/02/20 22:01:35 what32 Exp $
  */
 
 /*
@@ -1021,31 +1021,17 @@ METHOD WordLeft() CLASS Get
       return Self
    endif
 
-   nPos := ::Pos - 1
+   nPos := ::Pos
 
-   do while nPos > 0
-      if SubStr( ::buffer, nPos, 1 ) == " "
-         do while nPos > 0 .and. SubStr( ::buffer, nPos, 1 ) == " "
-            nPos--
-         Enddo
-         do while nPos > 0 .and. !( SubStr( ::buffer, nPos, 1 ) == " " )
-            nPos--
-         Enddo
-         if nPos > 0
-            nPos++
-         endif
-         Exit
-      endif
+   do while nPos > 1 .and. SubStr( ::buffer, nPos - 1, 1 ) == " "
       nPos--
-   Enddo
+   enddo
 
-   if nPos < 1
-      nPos := 1
-   endif
+   do while nPos > 1 .and. ! SubStr( ::buffer, nPos - 1, 1 ) == " "
+      nPos--
+   enddo
 
-   if nPos > 0
-      ::Pos := nPos
-   endif
+   ::Pos := nPos
 
    ::Display( .f. )
 
@@ -1069,25 +1055,17 @@ METHOD WordRight() CLASS Get
       return Self
    endif
 
-   nPos := ::Pos + 1
+   nPos := ::Pos
 
-   do while nPos <= ::nMaxEdit
-      if SubStr( ::buffer, nPos, 1 ) == " "
-         do while nPos <= ::nMaxEdit .and. SubStr( ::buffer, nPos, 1 ) == " "
-            nPos++
-         Enddo
-         Exit
-      endif
+   do while nPos < ::nMaxEdit .and. ! SubStr( ::buffer, nPos, 1 ) == " "
       nPos++
-   Enddo
+   enddo
 
-   if nPos > ::nMaxEdit
-      nPos := ::nMaxEdit
-   endif
+   do while nPos < ::nMaxEdit .and. SubStr( ::buffer, nPos, 1 ) == " "
+      nPos++
+   enddo
 
-   if nPos <= ::nMaxEdit
-      ::Pos := nPos
-   endif
+   ::Pos := nPos
 
    ::Display( .f. )
 
