@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.100 2004/03/26 13:35:35 druzus Exp $
+ * $Id: dbcmd.c,v 1.101 2004/03/30 05:55:35 druzus Exp $
  */
 
 /*
@@ -3643,6 +3643,7 @@ HB_FUNC( RDDSETDEFAULT )
          return;
       }
       strncpy( s_szDefDriver, szNewDriver, uiLen );
+      s_szDefDriver[ uiLen ] = '\0';
    }
 }
 
@@ -4287,7 +4288,7 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
    uiOldArea = pOldArea->uiArea;
    /*
     * 0 means chose first available in hb_rddInsertAreaNode()
-    * This hack is necassary to avoid race condition in MT
+    * This hack is necessary to avoid race condition in MT
     * if we don't want to lock whole RDD subsytem, Druzus
     */
    hb_rddSelectWorkAreaNumber( 0 );
