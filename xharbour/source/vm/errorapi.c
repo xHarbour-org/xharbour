@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.25 2003/11/22 01:41:10 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.26 2003/11/26 13:43:15 jonnymind Exp $
  */
 
 /*
@@ -272,11 +272,11 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
 
    /* Act as an idle inspector */
    #ifdef HB_THREAD_SUPPORT
-      HB_MUTEX_LOCK( hb_runningStacks.Mutex );
+      HB_SHARED_LOCK( hb_runningStacks );
       /* Don't run on quit request */
       if ( hb_vm_bQuitRequest  )
       {
-         HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+         HB_SHARED_UNLOCK( hb_runningStacks );
          return 0; /* Meaningless here */
       }
 
@@ -288,7 +288,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
 
       /* Make this thread the only one VM thread running */
       HB_VM_STACK.uiIdleInspecting++;
-      HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+      HB_SHARED_UNLOCK( hb_runningStacks );
    #endif
 
    if( pError )
@@ -351,7 +351,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
             HB_VM_STACK.bInUse=TRUE;
             hb_runningStacks.aux = 0;
             // this will also signal the changed situation.
-            HB_COND_SIGNAL( hb_runningStacks.Cond );
+            HB_SHARED_SIGNAL( hb_runningStacks );
          #endif
 
          exit( hb_vmQuit() );
@@ -421,7 +421,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
          HB_VM_STACK.bInUse = TRUE;
          hb_runningStacks.aux = 0;
          // this will also signal the changed situation.
-         HB_COND_SIGNAL( hb_runningStacks.Cond );
+         HB_SHARED_SIGNAL( hb_runningStacks );
       }
    #endif
 
@@ -454,11 +454,11 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
 
    /* Act as an idle inspector */
    #ifdef HB_THREAD_SUPPORT
-      HB_MUTEX_LOCK( hb_runningStacks.Mutex );
+      HB_SHARED_LOCK( hb_runningStacks );
       /* Don't run on quit request */
       if ( hb_vm_bQuitRequest  )
       {
-         HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+         HB_SHARED_UNLOCK( hb_runningStacks );
          return NULL; /* Meaningless here */
       }
       /* Force idle fencing */
@@ -468,7 +468,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
       hb_bIdleFence = old_bIdleFence;
       HB_VM_STACK.uiIdleInspecting++;
 
-      HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+      HB_SHARED_UNLOCK( hb_runningStacks );
    #endif
 
    if( pError )
@@ -533,7 +533,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
             hb_runningStacks.aux = 0;
             // this will also signal the changed situation.
             HB_VM_STACK.bInUse = TRUE;
-            HB_COND_SIGNAL( hb_runningStacks.Cond );
+            HB_SHARED_SIGNAL( hb_runningStacks );
          #endif
 
          exit( hb_vmQuit() );
@@ -572,7 +572,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
          hb_runningStacks.aux = 0;
          // this will also signal the changed situation.
          HB_VM_STACK.bInUse = TRUE;
-         HB_COND_SIGNAL( hb_runningStacks.Cond );
+         HB_SHARED_SIGNAL( hb_runningStacks );
       }
    #endif
 

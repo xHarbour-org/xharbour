@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.122 2003/11/26 22:09:10 jonnymind Exp $
+* $Id: thread.c,v 1.123 2003/11/26 23:52:52 jonnymind Exp $
 */
 
 /*
@@ -448,7 +448,7 @@ HB_STACK *hb_threadGetStack( HB_THREAD_T id )
 
    HB_CRITICAL_LOCK( hb_threadStackMutex );
 
-   if( last_stack && HB_SAME_THREAD( last_stack->th_id,id ))
+   if( last_stack && HB_SAME_THREAD( last_stack->th_id, id ) )
    {
       p = last_stack;
    }
@@ -735,21 +735,24 @@ void hb_threadTerminator( void *pData )
    hb_threadDestroyStack( _pStack_ );
 
    /* we are out of business */
-   HB_MUTEX_LOCK( hb_runningStacks.Mutex );
-   hb_runningStacks.content.asLong--;
-   HB_COND_SIGNAL( hb_runningStacks.Cond );
-   HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+   HB_SHARED_LOCK( hb_runningStacks );
+   if ( --hb_runningStacks.content.asLong < 1 )
+   {
+      HB_SHARED_SIGNAL( hb_runningStacks );
+   }
+   HB_SHARED_UNLOCK( hb_runningStacks );
 }
 
 void hb_mutexForceUnlock( void *mtx )
 {
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) mtx;
 
-   while ( Mutex->lock_count > 0 ) {
+   if( Mutex->locker != 0 )
+   {
+      Mutex->lock_count = 0;
+      Mutex->locker = 0;
       HB_MUTEX_UNLOCK( Mutex->mutex );
-      Mutex->lock_count --;
    }
-   Mutex->locker = 0;
 }
 
 void hb_rawMutexForceUnlock( void * mtx )
@@ -1581,24 +1584,27 @@ HB_EXPORT void hb_threadWaitAll()
       return;
    }
 
-   HB_MUTEX_LOCK( hb_runningStacks.Mutex );
+   HB_SHARED_LOCK( hb_runningStacks );
 
    if( HB_VM_STACK.bInUse )
    {
       hb_runningStacks.content.asLong--;
       HB_VM_STACK.bInUse = FALSE;
-      HB_COND_SIGNAL( hb_runningStacks.Cond );
+      if ( hb_runningStacks.content.asLong < 1)
+      {
+         HB_SHARED_SIGNAL( hb_runningStacks );
+      }
    }
 
    while ( hb_ht_stack->next != NULL )
    {
-      HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );
+      HB_SHARED_WAIT( hb_runningStacks );
    }
 
    hb_runningStacks.content.asLong++;
    HB_VM_STACK.bInUse = TRUE;
 
-   HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+   HB_SHARED_UNLOCK( hb_runningStacks );
 
 
    // check for the main stack to be the only one left
@@ -1682,7 +1688,7 @@ HB_FUNC( THREADIDLEFENCE )
    HB_THREAD_STUB
    BOOL bOld;
 
-   HB_MUTEX_LOCK( hb_runningStacks.Mutex );
+   HB_SHARED_LOCK( hb_runningStacks );
 
    bOld = hb_bIdleFence;
 
@@ -1693,14 +1699,14 @@ HB_FUNC( THREADIDLEFENCE )
 
    hb_retl( bOld );
 
-   HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+   HB_SHARED_UNLOCK( hb_runningStacks );
 }
 
 void hb_threadResetAux( void *ptr )
 {
    ((HB_SHARED_RESOURCE *) ptr)->aux = 0;
-   HB_COND_SIGNAL( hb_runningStacks.Cond );
-   HB_MUTEX_UNLOCK(  hb_runningStacks.Mutex );
+   HB_SHARED_SIGNAL( hb_runningStacks );
+   HB_SHARED_UNLOCK( hb_runningStacks );
 }
 
 /* hb_runningStacks mutex must be held before calling this function */
@@ -1727,7 +1733,7 @@ void hb_threadWaitForIdle( void )
    /* wait until the road is clear (only WE are running) */
    while ( hb_runningStacks.content.asLong != 0 )
    {
-      HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );
+      HB_SHARED_WAIT( hb_runningStacks );
    }
    /* blocks all threads here if not blocked before */
    hb_runningStacks.aux = 1;

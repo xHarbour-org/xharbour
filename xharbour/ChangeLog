@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1783 2003/11/27 00:40:30 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1784 2003/11/27 13:27:19 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-27 19:00 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/thread.h
+    * rationlaized layout of sections
+    + added macros to manages shared resources;
+      HB_SHARED_LOCK( shared ) is more elegant than HB_MUTEX_LOCK( shared.Mutex )
+
+  * source/vm/errorapi.c
+  * source/vm/garbage.c
+  * source/vm/thread.c
+    * Changed code to match the new macros.
+
+  * source/rtl/hblog.prg
+  * source/rtl/hblognet.prg
+  * source/rtl/trpc.prg
+  * source/rtl/trpccli.prg
+    - Removed "deprecated" DestroyMutex() calls
 
 2003-11-27 14:18 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini@tin.it>
   * source/rtl/filesys.c

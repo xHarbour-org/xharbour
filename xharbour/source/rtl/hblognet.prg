@@ -1,5 +1,5 @@
 /*
-* $Id: hbloginet.prg,v 1.3 2003/07/22 11:35:11 jonnymind Exp $
+* $Id: hblognet.prg,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
 */
 
 /*
@@ -271,7 +271,6 @@ METHOD Close( cName ) CLASS HB_LogInetPort
    // kind termination request
    ::bTerminate := .T.
    JoinThread( ::nThread )
-   DestroyMutex( ::mtxBusy )
 #endif
 
    InetDestroy( ::skIn )

@@ -1,6 +1,6 @@
 
 /*
- * $Id: garbage.c,v 1.64 2003/11/26 14:03:14 jonnymind Exp $
+ * $Id: garbage.c,v 1.65 2003/11/26 21:58:35 jonnymind Exp $
  */
 
 /*
@@ -547,10 +547,10 @@ void hb_gcCollectAll()
 
    /* is anoter garbage in action? */
    #ifdef HB_THREAD_SUPPORT
-      HB_MUTEX_LOCK( hb_runningStacks.Mutex );
+      HB_SHARED_LOCK( hb_runningStacks );
       if ( s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
       {
-         HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+         HB_SHARED_UNLOCK( hb_runningStacks );
          return;
       }
 
@@ -561,7 +561,7 @@ void hb_gcCollectAll()
          future */
       HB_VM_STACK.uiIdleInspecting++;
 
-      HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+      HB_SHARED_UNLOCK( hb_runningStacks );
    #else
       if ( s_bCollecting )  // note: 1) is volatile and 2) not very important if fails 1 time
       {
@@ -768,7 +768,7 @@ void hb_gcCollectAll()
       hb_runningStacks.aux = 0;
       HB_VM_STACK.bInUse = TRUE;
       // this will also signal the changed situation.
-      HB_COND_SIGNAL( hb_runningStacks.Cond );
+      HB_SHARED_SIGNAL( hb_runningStacks );
    #endif
 
 }

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.64 2003/10/19 00:17:35 jonnymind Exp $
+* $Id: thread.h,v 1.65 2003/11/26 05:44:04 jonnymind Exp $
 */
 
 /*
@@ -57,8 +57,7 @@
 #ifdef HB_THREAD_SUPPORT
 
 /* Check if malloc/free is thread safe */
-/*
-JC1: tests demonstrates that this does not work
+/* temporarily disabled
 #ifndef HB_SAFE_ALLOC
 #  if defined( HB_OS_LINUX ) && (defined(_THREAD_SAFE) || defined(_REENTRANT))
 #    define HB_SAFE_ALLOC
@@ -154,7 +153,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    }
       
    #define HB_CLEANUP_POP (HB_VM_STACK.iCleanCount--);
-   
+
    #define HB_CLEANUP_POP_EXEC {\
       HB_VM_STACK.iCleanCount--;\
       HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ]( HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount ]);\
@@ -171,10 +170,11 @@ extern "C" {
 #else
 
    #include <pthread.h>
+   #include <semaphore.h>
    #include <errno.h>
    #define HB_THREAD_T                 pthread_t
-   #define HB_CRITICAL_T               pthread_mutex_t
 
+   #define HB_CRITICAL_T               pthread_mutex_t
    /* ODD: this definition is missing on some linux headers;
       we should remove it when this bug is fixed */
    int pthread_mutexattr_setkind_np( pthread_mutexattr_t * attr, int kind );
@@ -186,13 +186,12 @@ extern "C" {
          pthread_mutex_init( &(x), &attr );\
          pthread_mutexattr_destroy( &attr );\
       }
-
-   #define HB_MUTEX_T                  pthread_mutex_t
    #define HB_CRITICAL_DESTROY( x )    pthread_mutex_destroy( &(x) )
    #define HB_CRITICAL_LOCK( x )       pthread_mutex_lock( &(x) )
    #define HB_CRITICAL_UNLOCK( x )     pthread_mutex_unlock( &(x) )
    #define HB_CRITICAL_TRYLOCK( x )    ( pthread_mutex_trylock( &(x) ) != EBUSY )
 
+   #define HB_MUTEX_T                  HB_CRITICAL_T
    #define HB_MUTEX_INIT( x )          HB_CRITICAL_INIT( x )
    #define HB_MUTEX_DESTROY( x )       HB_CRITICAL_DESTROY( x )
    #define HB_MUTEX_LOCK( x )          HB_CRITICAL_LOCK( x )
@@ -222,34 +221,6 @@ extern "C" {
    #define hb_threadGetCurrentStack() ( (HB_STACK *) pthread_getspecific( hb_pkCurrentStack ) )
 
 #endif
-
-/* Context using management */
-#define HB_STACK_LOCK \
-{\
-   HB_MUTEX_LOCK( hb_runningStacks.Mutex );\
-   if( ! HB_VM_STACK.bInUse && ! HB_VM_STACK.uiIdleInspecting ) \
-   {\
-      while ( hb_runningStacks.aux ) \
-      {\
-         HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );\
-      }\
-      hb_runningStacks.content.asLong++;\
-      HB_VM_STACK.bInUse = TRUE;\
-   }\
-   HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );\
-}
-
-#define HB_STACK_UNLOCK \
-{\
-   HB_MUTEX_LOCK( hb_runningStacks.Mutex );\
-   if( HB_VM_STACK.bInUse && ! HB_VM_STACK.uiIdleInspecting ) \
-   {\
-      hb_runningStacks.content.asLong--;\
-      HB_VM_STACK.bInUse = FALSE;\
-      HB_COND_SIGNAL( hb_runningStacks.Cond );\
-   }\
-   HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );\
-}
 
 extern void hb_threadWaitForIdle( void );
 
@@ -386,7 +357,9 @@ typedef struct tag_HB_STACK
 
 } HB_STACK;
 
-/* Complex Mutex Structure*/
+/*********************************************************************/
+/* Complex PRG LEVEL Mutex Structure                                 */
+
 typedef struct tag_HB_MUTEX_STRUCT {
    HB_MUTEX_T mutex;
    HB_COND_T cond;
@@ -397,18 +370,27 @@ typedef struct tag_HB_MUTEX_STRUCT {
    struct tag_HB_MUTEX_STRUCT *next;
 } HB_MUTEX_STRUCT;
 
+
 /*********************************************************************/
 /* Shared resource is a set of a resource, a mutex and a condition. */
 
 typedef struct tag_HB_SHARED_RESOURCE
 {
-   HB_MUTEX_T Mutex;  /* mutex is used to read or write safely */
-   union {              /* data that can be read or written */
+   /* mutex is used to read or write safely */
+   HB_MUTEX_T Mutex;
+
+   /* data that can be read or written */
+   union {
       volatile long asLong;
       volatile void *asPointer;
    } content;
+
+   /* Auxiliary ancillary data to signal metastatus of content */
    volatile unsigned int aux;
-   HB_COND_T Cond; /* condition that may change */
+
+   /* Event that is risen when the condition changes */
+   HB_COND_T Cond;
+
 } HB_SHARED_RESOURCE;
 
 #define HB_SHARED_INIT( pshr, data ) \
@@ -425,8 +407,46 @@ typedef struct tag_HB_SHARED_RESOURCE
    HB_COND_DESTROY( pshr.Cond ); \
 }
 
-/** JC1:
-   In MT libs, every function accessing stack will record the HB_STACK
+#define HB_SHARED_LOCK( pshr )   HB_MUTEX_LOCK( (pshr).Mutex )
+#define HB_SHARED_UNLOCK( pshr ) HB_MUTEX_UNLOCK( (pshr).Mutex )
+#define HB_SHARED_SIGNAL( pshr )    HB_COND_SIGNAL( (pshr).Cond )
+#define HB_SHARED_WAIT( pshr )      HB_COND_WAIT( (pshr).Cond, (pshr).Mutex )
+
+/**********************************************************/
+/* Context using management
+   This macros are used for directing threads and blocking
+   them on clean points.
+*/
+
+#define HB_STACK_LOCK \
+{\
+   HB_SHARED_LOCK( hb_runningStacks );\
+   if( ! HB_VM_STACK.bInUse && ! HB_VM_STACK.uiIdleInspecting ) \
+   {\
+      while ( hb_runningStacks.aux ) \
+      {\
+         HB_SHARED_WAIT( hb_runningStacks );\
+      }\
+      hb_runningStacks.content.asLong++;\
+      HB_VM_STACK.bInUse = TRUE;\
+   }\
+   HB_SHARED_UNLOCK( hb_runningStacks );\
+}
+
+#define HB_STACK_UNLOCK \
+{\
+   HB_SHARED_LOCK( hb_runningStacks );\
+   if( HB_VM_STACK.bInUse && ! HB_VM_STACK.uiIdleInspecting ) \
+   {\
+      hb_runningStacks.content.asLong--;\
+      HB_VM_STACK.bInUse = FALSE;\
+      HB_SHARED_SIGNAL( hb_runningStacks );\
+   }\
+   HB_SHARED_UNLOCK( hb_runningStacks );\
+}
+
+/*********************************************************************/
+/** In MT libs, every function accessing stack will record the HB_STACK
    (provided by hb_threadGetCurrentContext()) into a local Stack variable, and
    this variable will be accessed instead of HB_VM_STACK.
 */
@@ -441,7 +461,8 @@ typedef struct tag_HB_SHARED_RESOURCE
 #endif
 
 
-/* More elegant guard of a small section of code */
+/*********************************************************************/
+/* More elegant guard of a small section of code                     */
 #define HB_THREAD_GUARD( mutex, code )\
    {\
       HB_CRITICAL_LOCK( mutex );\
@@ -471,7 +492,7 @@ extern HB_CRITICAL_T hb_macroMutex;
 /* Guard for PRG level mutex asyncrhonous operations */
 extern HB_CRITICAL_T hb_mutexMutex;
 
-/* count of running stacks; set to -1 to block stacks from running */
+/* count of running stacks */
 extern HB_SHARED_RESOURCE hb_runningStacks;
 
 /* regulates idle aware threads to be fenced or free */
@@ -550,6 +571,11 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
    #define HB_ENABLE_ASYN_CANC
    #define HB_DISABLE_ASYN_CANC
    #define HB_TEST_CANCEL_ENABLE_ASYN
+
+   #define HB_SHARED_LOCK
+   #define HB_SHARED_UNLOCK
+   #define HB_SHARED_SIGNAL
+   #define HB_SHARED_WAIT
 
 #endif
 

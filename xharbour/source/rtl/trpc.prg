@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.20 2003/04/22 13:46:10 jonnymind Exp $
+ * $Id: trpc.prg,v 1.21 2003/09/23 15:16:21 jonnymind Exp $
  */
 
 /*
@@ -454,7 +454,6 @@ METHOD Destroy() CLASS tRPCServeCon
       ::skRemote := NIL
    ENDIF
    MutexUnlock( ::mtxBusy )
-   DestroyMutex( ::mtxBusy )
 RETURN .T.
 
 

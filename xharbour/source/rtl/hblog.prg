@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.12 2003/09/11 12:08:28 jonnymind Exp $
+* $Id: hblog.prg,v 1.13 2003/10/20 02:39:29 jonnymind Exp $
 */
 
 /*
@@ -134,7 +134,6 @@ PROCEDURE HB_CloseStandardLog()
 
       #ifdef HB_THREAD_SUPPORT
          MutexUnlock( StdLogMutex )
-         DestroyMutex( StdLogMutex )
       #Endif
 
    ENDIF

@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.21 2003/05/26 16:38:10 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.22 2003/09/23 15:16:21 jonnymind Exp $
  */
 
 /*
@@ -245,7 +245,6 @@ METHOD Destroy() CLASS tRPCClient
       ENDIF
 #ifdef HB_THREAD_SUPPORT
    MutexUnlock( ::mtxBusy )
-   DestroyMutex( ::mtxBusy )
 #endif
 RETURN .T.
 
