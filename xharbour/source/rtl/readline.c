@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.7 2004/02/09 19:15:05 mlombardo Exp $
+ * $Id: readline.c,v 1.8 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -163,7 +163,8 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT uiBuffLen, char ** Term, int *
 
 HB_FUNC( HB_FREADLINE )
 {
-   PHB_ITEM pTerm1, pOpt;
+   PHB_ITEM pTerm1;
+   HB_ITEM Opt;
    FHANDLE hFileHandle  = (FHANDLE) hb_parnl( 1 );
    char ** Term;
    BYTE * pBuffer;
@@ -197,13 +198,13 @@ HB_FUNC( HB_FREADLINE )
 
          Term   = (char**) hb_xgrab( sizeof(char*) * iTerms );
          iTermSizes = (int *) hb_xgrab( sizeof(int) * iTerms );
+         Opt.type = HB_IT_NIL;
 
          for(i=0;i<iTerms;i++)
          {
-            pOpt          = hb_itemArrayGet( pTerm1, i+1 );
-            Term[i]       = (char *) pOpt->item.asString.value;
-            iTermSizes[i] = pOpt->item.asString.length;
-            hb_itemRelease( pOpt );
+            hb_arrayGet( pTerm1, i + 1, &Opt );
+            Term[i]       = (char *) (&Opt)->item.asString.value;
+            iTermSizes[i] = (&Opt)->item.asString.length;
          }
       }
       else
