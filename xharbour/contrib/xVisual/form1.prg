@@ -34,7 +34,7 @@ CLASS TForm1 FROM TForm
    METHOD Button1Click( Sender )
    //...
 
-END CLASS 
+END CLASS
 
 METHOD Click() CLASS TForm1
 
@@ -67,7 +67,7 @@ METHOD Button1Click( Sender /* Button1 class TButton() */ ) CLASS TForm1
    Self:Button1:Caption := "New Caption" // Slower, but might be needed when referring other controls on the form.
 
    // Now self:
-   ::Caption := "My Form"     // Faster.
+   ::Caption := "My Changed Form"     // Faster.
 
    END WITH // Sender
 

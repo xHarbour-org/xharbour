@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.143 2003/01/30 08:40:07 what32 Exp $
+ * $Id: xide.prg,v 1.144 2003/02/02 14:32:54 what32 Exp $
  */
 
 /*
@@ -49,8 +49,7 @@ GLOBAL ObjEdit
 
 FUNCTION Main
    local oSplash
- 
-   
+
    Application():Initialize()
 
    // splash screen
@@ -76,12 +75,12 @@ FUNCTION Main
          // focus to main Frame
          :SetFocus()
       END
-      
+
       MainForm:Update()
 
       :Run()
   END
-  
+
 RETURN NIL
 
 //----------------------------------------------------------------------------------------------
@@ -114,7 +113,7 @@ METHOD MainMenu() CLASS MainForm
       oItem := TMenuItem():Create( oMenu )
       oItem:Caption := "File"
       oItem:AppendTo( oMenu:Handle )
-   
+
          oSubItem := TMenuItem():Create( oItem )
          oSubItem:Caption := "Open"
          oSubItem:Action  := {||OpenProject():Create()}
@@ -148,7 +147,7 @@ METHOD MainToolBar() CLASS MainForm
    oBand1 := TCoolBand():Create( oCB )
    oBand1:MinWidth  := 190
    oBand1:MinHeight := 54
-   
+
    oBand2 := TCoolBand():Create( oCB )
    oBand2:MinWidth  := ::Width - 250
    oBand2:MinHeight := 56
@@ -162,7 +161,7 @@ METHOD MainToolBar() CLASS MainForm
       oTb:Hint := "New Project"
       oTb:OnClick := {|| FormEdit := TFormEdit():Create( MainForm ) }
 //      oTb:OnClick := {|| Application:CreateForm( TFormEdit(), @FormEdit ) }
-      
+
       ToolButton():Create( oTool ):Hint := "Open Project"
       ToolButton():Create( oTool ):Hint := "Properties"
       ToolButton():Create( oTool ):Hint := "Build Application"
@@ -199,7 +198,7 @@ METHOD MainToolBar() CLASS MainForm
       oPage:Name    := "StdTab"
       oPage:Caption := "Standard"
       oPage:SetParent( MainForm:ToolTabs )
-      
+
       oPage := TabPage():Create( MainForm:ToolTabs )
       oPage:Name    := "Win32"
       oPage:Caption := "Win32"
@@ -218,7 +217,7 @@ METHOD MainToolBar() CLASS MainForm
       oBand:MinWidth  := 190
       oBand:MinHeight := 54
       oBand:Grippers  := .F.
-      
+
       With Object StdTools():Create( MainForm:ToolTabs:StdTab )
          :SetParent( MainForm:ToolTabs:StdTab )
          :SetStyle( TBSTYLE_CHECKGROUP )
@@ -252,12 +251,12 @@ METHOD MainToolBar() CLASS MainForm
       oCoolBar := TCoolBar():Create( MainForm:ToolTabs:Win32 )
       oCoolBar:SetParent( MainForm:ToolTabs:Win32 )
       oCoolBar:SetStyle( WS_BORDER, .F. )
-      
+
       oBand := TCoolBand():Create( oCoolBar )
       oBand:MinWidth  := 190
       oBand:MinHeight := 54
       oBand:Grippers  := .F.
-      
+
       With Object WinTools():Create( ::ToolTabs:Win32 )
          :SetParent( MainForm:ToolTabs:Win32 )
          :SetStyle( TBSTYLE_CHECKGROUP )
@@ -356,6 +355,7 @@ ENDCLASS
 
 #define SKIP_SPACE(p) { while( *p == ' ' || *p == '\t' ) p++; }
 #define SKIP_EOL() { while( *sText == '\n' || *sText == '\r' ) sText++; }
+#define NEXT_LINE() { while( *sText != '\n' ) sText++; while( *sText == '\n' || *sText == '\r' ) sText++; }
 
 #define XFM_MAX_EXP 1024
 
@@ -520,16 +520,15 @@ int XFMParse( char *sText )
    // Save result into pForm - we will use it multiple times below.
    hb_itemForwardValue( pForm, &hb_stack.Return );
 
-   //Application:CreateForm( @FormEdit, TFormEdit(), MainForm )
+   //Application:CreateForm( TFormEdit(), @Form1 )
    hb_vmPushSymbol( pCreateForm->pSymbol );
    hb_vmPush( &APPLICATION );
    // See below alternative to pushing REF.
    //memcpy( ( * hb_stack.pPos ), &FORMEDIT, sizeof( HB_ITEM ) );
    //hb_stackPush();
-   hb_vmPushNil();
    hb_vmPush( pForm );
-   hb_vmPush( &MAINFORM );
-   hb_vmSend( 3 );
+   hb_vmPushNil();
+   hb_vmSend( 2 );
 
    // Instead of pushing @FormEdit
    hb_itemForwardValue( &FORMEDIT, &hb_stack.Return );
@@ -712,7 +711,7 @@ int XFMParse( char *sText )
    if( strstr( "CAPTION;TOP;LEFT;HEIGHT;WIDTH;", sVar ) )
    {
       sVar[ iLen ] = '\0';
-      strcat( (char *) sAssign, (char *) "XX" );
+      strcat( (char *) sAssign, (char *) "F" );
    }
    else
    {
@@ -821,7 +820,7 @@ int XFMParse( char *sText )
             {
                OutputDebugString( "END CONTROL\n" );
 
-               hb_objSendMsg( &FORMEDIT, "ADD", 1, &Control );
+               hb_objSendMsg( &Control, "SETPARENT", 1, &FORMEDIT );
                hb_stack.Return.type = HB_IT_NIL;
 
                OutputDebugString( "Done Add()" );
@@ -979,74 +978,22 @@ int XFMParse( char *sText )
 
    if( strncmp( sText, ":=", 2 ) )
    {
-      if( strncmp( sVar, "SetMethod", 9 ) == 0 && *sText == '(' )
+      if( strncmp( sVar, "METHOD", 6 ) == 0 )
       {
-         sText++;
+         OutputDebugString( "Skipping Method." );
+
+         NEXT_LINE();
 
          SKIP_SPACE( sText );
 
-         if( *sText == '"' )
-         {
-            sText++;
-
-            i = 0;
-            while( isalnum( *sText ) )
-            {
-              sVar[i++] = *sText++;
-            }
-            sVar[i] = '\0';
-
-            sText++;
-
-            OutputDebugString( "Event: " );
-            OutputDebugString( (char *) sVar );
-
-            SKIP_SPACE( sText );
-
-            if( *sText != ',' )
-            {
-               return 0;
-            }
-            sText++;
-
-            SKIP_SPACE( sText )
-
-            if( strncmp( sText, "{ ||", 4 ) )
-            {
-               return 0;
-            }
-            sText += 4;
-
-            SKIP_SPACE( sText );
-
-            i = 0;
-            while( isalnum( *sText ) || *sText == '_' )
-            {
-              sExp[i++] = *sText++;
-            }
-            sExp[i] = '\0';
-
-            OutputDebugString( " = " );
-            OutputDebugString( (char *) sExp );
-            OutputDebugString( "\n" );
-
-            sText = strchr( sText, '\n' );
-            if( sText == NULL )
-            {
-               return 0;
-            }
-
-            SKIP_EOL();
-
-            SKIP_SPACE( sText );
-
-            goto Properties;
-         }
+         goto Properties;
       }
+
+      OutputDebugString( "*** NOT METHOD." );
       return 0;
    }
 
-   OutputDebugString( "Var: " );
+   OutputDebugString( "Object/Control Var: " );
    OutputDebugString( (char *) sVar );
 
    sText += 2;
@@ -1082,87 +1029,94 @@ int XFMParse( char *sText )
         break;
 
       case '{' :
-        hb_arrayNew( &Exp, 0 );
-
-        pTemp = (char *) sExp + 1;
+        pTemp = (char *) sExp;
+        pTemp++;
 
         SKIP_SPACE( pTemp );
 
-        while( *pTemp && *pTemp != '}' )
+        if( pTemp[0] == '|' )
         {
-           switch( pTemp[0] )
+           hb_itemPutC( &Exp, (char *) sExp );
+        }
+        else
+        {
+           hb_arrayNew( &Exp, 0 );
+
+           while( *pTemp && *pTemp != '}' )
            {
-              case '.' :
-                Element.type = HB_IT_LOGICAL;
-                Element.item.asLogical.value = pTemp[1] == 'T' ? TRUE : FALSE;
-                pTemp += 3;
-                break;
+              switch( pTemp[0] )
+              {
+                 case '.' :
+                   Element.type = HB_IT_LOGICAL;
+                   Element.item.asLogical.value = pTemp[1] == 'T' ? TRUE : FALSE;
+                   pTemp += 3;
+                   break;
 
-              case '"' :
-                pTemp++;
-                pTerm = strchr( pTemp, '"' );
+                 case '"' :
+                   pTemp++;
+                   pTerm = strchr( pTemp, '"' );
 
-                if( pTerm )
-                {
-                   pTerm[0] = '\0';
-                   hb_itemPutC( &Element, pTemp );
-                   pTemp = pTerm + 1;
-                }
-                else
-                {
-                   return 0;
-                }
-
-                break;
-
-              default :
-                pTerm = strpbrk( pTemp, ", " );
-
-                if( pTerm )
-                {
-                   if( pTerm[0] == ',' )
+                   if( pTerm )
                    {
                       pTerm[0] = '\0';
-
-                      Element.type = HB_IT_LONG;
-                      Element.item.asLong.value = atol( pTemp );
-
-                      pTerm[0] = ',';
+                      hb_itemPutC( &Element, pTemp );
+                      pTemp = pTerm + 1;
                    }
                    else
                    {
-                      pTerm[0] = '\0';
-
-                      Element.type = HB_IT_LONG;
-                      Element.item.asLong.value = atol( pTemp );
+                      return 0;
                    }
 
-                   pTemp = pTerm;
-                }
-                else
-                {
-                   return 0;
-                }
+                   break;
 
-                break;
-           }
+                 default :
+                   pTerm = strpbrk( pTemp, ", " );
 
-           SKIP_SPACE( pTemp );
+                   if( pTerm )
+                   {
+                      if( pTerm[0] == ',' )
+                      {
+                         pTerm[0] = '\0';
 
-           if( pTemp[0] == ',' )
-           {
-              pTemp++;
+                         Element.type = HB_IT_LONG;
+                         Element.item.asLong.value = atol( pTemp );
+
+                         pTerm[0] = ',';
+                      }
+                      else
+                      {
+                         pTerm[0] = '\0';
+
+                         Element.type = HB_IT_LONG;
+                         Element.item.asLong.value = atol( pTemp );
+                      }
+
+                      pTemp = pTerm;
+                   }
+                   else
+                   {
+                      return 0;
+                   }
+
+                   break;
+              }
+
+              SKIP_SPACE( pTemp );
+
+              if( pTemp[0] == ',' )
+              {
+                 pTemp++;
+                 SKIP_SPACE( pTemp );
+              }
+              else if( pTemp[0] != '}' )
+              {
+                 return 0;
+              }
+
+              hb_arrayAddForward( &Exp, &Element );
               SKIP_SPACE( pTemp );
            }
-           else if( pTemp[0] != '}' )
-           {
-              return 0;
-           }
-
-           hb_arrayAddForward( &Exp, &Element );
-           SKIP_SPACE( pTemp );
         }
-
         break;
 
       default :
@@ -1181,7 +1135,7 @@ int XFMParse( char *sText )
    if( strstr( "CAPTION;TOP;LEFT;HEIGHT;WIDTH;", sVar ) )
    {
       sVar[ iLen ] = '\0';
-      strcat( (char *) sAssign, (char *) "XX" );
+      strcat( (char *) sAssign, (char *) "F" );
    }
    else
    {
@@ -1199,6 +1153,8 @@ int XFMParse( char *sText )
 
    hb_objSendMsg( Object.type == HB_IT_NIL ? &Control : &Object, sAssign, 1, &Exp );
    hb_stack.Return.type = HB_IT_NIL;
+
+   SKIP_SPACE( sText );
 
    SKIP_EOL();
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.49 2003/01/09 08:21:01 what32 Exp $
+ * $Id: TApplication.prg,v 1.50 2003/01/31 09:08:20 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -128,7 +128,7 @@ METHOD CreateForm( oForm, oTarget ) CLASS Application
    //__objAddData( Self, oForm:Name )
    //__ObjSetValueList( self, { { oForm:Name, oForm } } )
 
-   //TraceLog( :Caption, :Top, :Left, :Height, :Width )
+   TraceLog( oForm:Caption, oForm:Top, oForm:Left, oForm:Height, oForm:Width )
 
 
    //aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
@@ -136,8 +136,13 @@ METHOD CreateForm( oForm, oTarget ) CLASS Application
 
    FOR EACH aVar IN aVars
       IF ValType( aVar[2] ) == 'O'
+         //TraceLog( aVar[1] )
          aVar[2]:Create( oForm )
          aVar[2]:SetParent( oForm )
+
+         IF aVar[2]:ClassName == "TLISTBOX"
+
+         ENDIF
       ENDIF
    NEXT
 

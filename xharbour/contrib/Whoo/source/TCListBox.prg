@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.25 2003/01/09 08:21:25 what32 Exp $
+ * $Id: TCListBox.prg,v 1.26 2003/01/29 10:26:45 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -138,7 +138,7 @@ RETURN Self
 
 METHOD SetItems( Value )
 
-  ::Items := Value
+  ::FItems := Value
 
 RETURN Self
 

@@ -34,4 +34,4 @@ CLASS TForm1 FROM TForm
       :TOP :=         83
    END CONTROL
 
-END CLASS 
+END CLASS

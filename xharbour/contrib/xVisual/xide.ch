@@ -35,7 +35,9 @@
 #command :Height  := <x> => :FHeight  := <x>
 #command :Width   := <x> => :FWidth   := <x>
 
+
 #command OBJECT <!object!> IS <!class!> => WITH OBJECT ( :<object> := <class>() )
+#command OBJECT Items IS <class> => WITH OBJECT ( :FItems := <class>() )
 
 #command DATA Caption INIT <x> => DATA FCaption PROTECTED INIT <x>
 #command DATA Top     INIT <x> => DATA FTop     PROTECTED INIT <x>
