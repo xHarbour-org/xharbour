@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.44 2004/09/08 00:17:16 druzus Exp $
+ * $Id: gtxvt.c,v 1.45 2004/09/26 11:26:52 jonnymind Exp $
  */
 
 /*
@@ -4595,6 +4595,31 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    return -1;
 }
 
+/* ********** Graphics API ********** */
+
+int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
+{
+  HB_SYMBOL_UNUSED( iType );
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( iBottom );
+  HB_SYMBOL_UNUSED( iRight );
+  HB_SYMBOL_UNUSED( iColor );
+
+  return 0;
+}
+
+void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) )
+{
+  HB_SYMBOL_UNUSED( iTop );
+  HB_SYMBOL_UNUSED( iLeft );
+  HB_SYMBOL_UNUSED( cBuf );
+  HB_SYMBOL_UNUSED( iColor );
+  HB_SYMBOL_UNUSED( iSize );
+  HB_SYMBOL_UNUSED( iWidth );
+}
+
+/* ******** Graphics API end ******** */
 
 #ifdef HB_MULTI_GT
 
