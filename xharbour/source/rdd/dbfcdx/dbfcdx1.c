@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.44 2003/06/09 17:49:05 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.45 2003/06/11 23:23:59 ronpinkas Exp $
  */
 
 /*
@@ -687,7 +687,7 @@ static void hb_cdxWriteMemo( CDXAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
    BOOL bWriteBlocks;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxWriteMemo(%p, %lu, %p, %lu, %p, %hu)", pArea, ulBlock,
-                           pItem, ulLen, ulStoredBlock, uiType));
+                           pItem, ulLen, ulStoredBlock, ulType));
    /*
    uiBloksRequired = ( USHORT ) (( ulLen + sizeof( MEMOBLOCK ) + pArea->uiMemoBlockSize - 1 ) /
                                   pArea->uiMemoBlockSize);

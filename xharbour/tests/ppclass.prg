@@ -17,7 +17,6 @@ CLASS TTest
    VAR nVar
    METHOD New CONSTRUCTOR
    METHOD Increment()
-   METHOD SomeProcedure()
 ENDCLASS
 
 METHOD New //CLASS TTest /* CLASS clause now optional */
