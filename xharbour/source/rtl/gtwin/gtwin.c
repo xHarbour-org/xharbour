@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.67 2004/09/03 01:35:00 druzus Exp $
+ * $Id: gtwin.c,v 1.62 2004/08/27 06:00:23 paultucker Exp $
  */
 
 /*
@@ -13,6 +13,7 @@
  *     Copyright 2002 Przemys³aw Czerpak <druzus@polbox.com>
  *   Video subsystem for Win32 compilers
  *     Copyright 1999-2000 Paul Tucker <ptucker@sympatico.ca>
+ *     (with 2004 work on Readkey)
  *
  * The following parts are Copyright of the individual authors.
  * www - http://www.harbour-project.org
@@ -163,17 +164,17 @@ static HANDLE s_HOutput = INVALID_HANDLE_VALUE;
 static CONSOLE_SCREEN_BUFFER_INFO s_csbi,     /* active screen mode */
                                   s_origCsbi; /* to restore screen mode on exit */
 
-#define INPUT_BUFFER_LEN 1
+#define INPUT_BUFFER_LEN 32
 
 static DWORD        s_cNumRead;   /* Ok to use DWORD here, because this is specific... */
 static DWORD        s_cNumIndex;  /* ...to the Windows API, which defines DWORD, etc.  */
-static WORD         s_wRepeated = 0;  /* number of times the event (key) was repeated */
+static WORD         s_wRepeated = 0;   /* number of times the event (key) was repeated */
 static INPUT_RECORD s_irInBuf[ INPUT_BUFFER_LEN ];
 static BYTE         s_charTransRev[ 256 ];
 static BYTE         s_charTrans[ 256 ];
 static BYTE         s_keyTrans[ 256 ];
 
-int    s_mouseLast;  /* Last mouse button to be pressed                     */
+int    s_mouseLast;               /* Last mouse button to be pressed                   */
 
 extern int hb_mouse_iCol;
 extern int hb_mouse_iRow;
@@ -186,105 +187,108 @@ typedef struct tag_ClipKeyCode {
 } ClipKeyCode;
 
 #define CLIP_STDKEY_COUNT      96
-#define CLIP_EXTKEY_COUNT      30
+#define CLIP_EXTKEY_COUNT      34
+
+/* Keypad keys */
+
 
 static const ClipKeyCode stdKeyTab[CLIP_STDKEY_COUNT] = {
-    {K_SPACE,              0,             0,         0}, /*  32 */
-    {'!',                  0,             0,         0}, /*  33 */
-    {'"',                  0,             0,         0}, /*  34 */
-    {'#',                  0,             0,         0}, /*  35 */
-    {'$',                  0,             0,         0}, /*  36 */
-    {'%',                  0,             0,         0}, /*  37 */
-    {'&',                  0,             0,         0}, /*  38 */
-    {'\'',               296,             7,         0}, /*  39 */
-    {'(',                  0,             0,         0}, /*  40 */
-    {')',                  0,             0,         0}, /*  41 */
-    {'*',                  0,             0,         0}, /*  42 */
-    {'+',                  0,             0,         0}, /*  43 */
-    {',',                307,             0,         0}, /*  44 */
-    {'-',                386,            31,         0}, /*  45 */
-    {'.',                308,             0,         0}, /*  46 */
-    {'/',                309,           127,         0}, /*  47 */
-    {'0',            K_ALT_0,             0,         0}, /*  48 */
-    {'1',            K_ALT_1,             0,         0}, /*  49 */
-    {'2',            K_ALT_2,           259,         0}, /*  50 */
-    {'3',            K_ALT_3,            27,         0}, /*  51 */
-    {'4',            K_ALT_4,            28,         0}, /*  52 */
-    {'5',            K_ALT_5,            29,         0}, /*  53 */
-    {'6',            K_ALT_6,            30,         0}, /*  54 */
-    {'7',            K_ALT_7,            31,         0}, /*  55 */
-    {'8',            K_ALT_8,           127,         0}, /*  56 */
-    {'9',            K_ALT_9,             0,         0}, /*  57 */
-    {':',                  0,             0,         0}, /*  58 */
-    {';',                295,             0,         0}, /*  59 */
-    {'<',                  0,             0,         0}, /*  60 */
-    {'=',       K_ALT_EQUALS,             0,         0}, /*  61 */
-    {'>',                  0,             0,         0}, /*  62 */
-    {'?',                  0, K_CTRL_QUESTION,       0}, /*  63 */
-    {'@',                  0,             0,         0}, /*  64 */
-    {'A',            K_ALT_A,      K_CTRL_A,         0}, /*  65 */
-    {'B',            K_ALT_B,      K_CTRL_B,         0}, /*  66 */
-    {'C',            K_ALT_C,      K_CTRL_C,         0}, /*  67 */
-    {'D',            K_ALT_D,      K_CTRL_D,         0}, /*  68 */
-    {'E',            K_ALT_E,      K_CTRL_E,         0}, /*  69 */
-    {'F',            K_ALT_F,      K_CTRL_F,         0}, /*  70 */
-    {'G',            K_ALT_G,      K_CTRL_G,         0}, /*  71 */
-    {'H',            K_ALT_H,      K_CTRL_H,         0}, /*  72 */
-    {'I',            K_ALT_I,      K_CTRL_I,         0}, /*  73 */
-    {'J',            K_ALT_J,      K_CTRL_J,         0}, /*  74 */
-    {'K',            K_ALT_K,      K_CTRL_K,         0}, /*  75 */
-    {'L',            K_ALT_L,      K_CTRL_L,         0}, /*  76 */
-    {'M',            K_ALT_M,      K_CTRL_M,         0}, /*  77 */
-    {'N',            K_ALT_N,      K_CTRL_N,         0}, /*  78 */
-    {'O',            K_ALT_O,      K_CTRL_O,         0}, /*  79 */
-    {'P',            K_ALT_P,      K_CTRL_P,         0}, /*  80 */
-    {'Q',            K_ALT_Q,      K_CTRL_Q,         0}, /*  81 */
-    {'R',            K_ALT_R,      K_CTRL_R,         0}, /*  82 */
-    {'S',            K_ALT_S,      K_CTRL_S,         0}, /*  83 */
-    {'T',            K_ALT_T,      K_CTRL_T,         0}, /*  84 */
-    {'U',            K_ALT_U,      K_CTRL_U,         0}, /*  85 */
-    {'V',            K_ALT_V,      K_CTRL_V,         0}, /*  86 */
-    {'W',            K_ALT_W,      K_CTRL_W,         0}, /*  87 */
-    {'X',            K_ALT_X,      K_CTRL_X,         0}, /*  88 */
-    {'Y',            K_ALT_Y,      K_CTRL_Y,         0}, /*  89 */
-    {'Z',            K_ALT_Z,      K_CTRL_Z,         0}, /*  90 */
-    {'[',                  0,             0,         0}, /*  91 */
-    {'\\',                 0,             0,         0}, /*  92 */
-    {']',                  0,             0,         0}, /*  93 */
-    {'^',            K_ALT_6,             0,         0}, /*  94 */
-    {'_',                  0,             0,         0}, /*  95 */
-    {'`',                  0,             0,         0}, /*  96 */
-    {'a',            K_ALT_A,      K_CTRL_A,         0}, /*  97 */
-    {'b',            K_ALT_B,      K_CTRL_B,         0}, /*  98 */
-    {'c',            K_ALT_C,      K_CTRL_C,         0}, /*  99 */
-    {'d',            K_ALT_D,      K_CTRL_D,         0}, /* 100 */
-    {'e',            K_ALT_E,      K_CTRL_E,         0}, /* 101 */
-    {'f',            K_ALT_F,      K_CTRL_F,         0}, /* 102 */
-    {'g',            K_ALT_G,      K_CTRL_G,         0}, /* 103 */
-    {'h',            K_ALT_H,      K_CTRL_H,         0}, /* 104 */
-    {'i',            K_ALT_I,      K_CTRL_I,         0}, /* 105 */
-    {'j',            K_ALT_J,      K_CTRL_J,         0}, /* 106 */
-    {'k',            K_ALT_K,      K_CTRL_K,         0}, /* 107 */
-    {'l',            K_ALT_L,      K_CTRL_L,         0}, /* 108 */
-    {'m',            K_ALT_M,      K_CTRL_M,         0}, /* 109 */
-    {'n',            K_ALT_N,      K_CTRL_N,         0}, /* 110 */
-    {'o',            K_ALT_O,      K_CTRL_O,         0}, /* 111 */
-    {'p',            K_ALT_P,      K_CTRL_P,         0}, /* 112 */
-    {'q',            K_ALT_Q,      K_CTRL_Q,         0}, /* 113 */
-    {'r',            K_ALT_R,      K_CTRL_R,         0}, /* 114 */
-    {'s',            K_ALT_S,      K_CTRL_S,         0}, /* 115 */
-    {'t',            K_ALT_T,      K_CTRL_T,         0}, /* 116 */
-    {'u',            K_ALT_U,      K_CTRL_U,         0}, /* 117 */
-    {'v',            K_ALT_V,      K_CTRL_V,         0}, /* 118 */
-    {'w',            K_ALT_W,      K_CTRL_W,         0}, /* 119 */
-    {'x',            K_ALT_X,      K_CTRL_X,         0}, /* 120 */
-    {'y',            K_ALT_Y,      K_CTRL_Y,         0}, /* 121 */
-    {'z',            K_ALT_Z,      K_CTRL_Z,         0}, /* 122 */
-    {'{',                282,            27,         0}, /* 123 */
-    {'|',                299,            28,         0}, /* 124 */
-    {'}',                283,            29,         0}, /* 125 */
-    {'~',                297,           297,         0}, /* 126 */
-    {K_CTRL_BS,     K_ALT_BS,           127,         0}, /* 127 */
+    { 32,                  0,             0,         0}, /* ' ' */
+    { 33,                  0,             0,         0}, /* '!' */
+    { 34,                  0,             0,         0}, /* '"' */
+    { 35,                  0,             0,         0}, /* '#' */
+    { 36,                  0,             0,         0}, /* '$' */
+    { 37,                  0,             0,         0}, /* '%' */
+    { 38,                  0,             0,         0}, /* '&' */
+    { 39,        K_ALT_QUOTE,             7,         0}, /* ''' */
+    { 40,                  0,             0,         0}, /* '(' */
+    { 41,                  0,             0,         0}, /* ')' */
+    { 42,                  0,             0,         0}, /* '*' */
+    { 43,                  0,             0,         0}, /* '+' */
+    { 44,        K_ALT_COMMA,             0,         0}, /* ',' */
+    { 45,        K_ALT_MINUS,           398,         0}, /* '-' */
+    { 46,       K_ALT_PERIOD,             0,         0}, /* '.' */
+    { 47,        K_ALT_SLASH,             0,         0}, /* '/' */
+    { 48,            K_ALT_0,             0,         0}, /* '0' */
+    { 49,            K_ALT_1,             0,         0}, /* '1' */
+    { 50,            K_ALT_2,           259,         0}, /* '2' */
+    { 51,            K_ALT_3,            27,         0}, /* '3' */
+    { 52,            K_ALT_4,            28,         0}, /* '4' */
+    { 53,            K_ALT_5,            29,         0}, /* '5' */
+    { 54,            K_ALT_6,            30,         0}, /* '6' */
+    { 55,            K_ALT_7,            31,         0}, /* '7' */
+    { 56,            K_ALT_8,           127,         0}, /* '8' */
+    { 57,            K_ALT_9,             0,         0}, /* '9' */
+    { 58,                  0,             0,         0}, /* ':' */
+    { 59,           K_ALT_SC,             0,         0}, /* ';' */
+    { 60,                  0,             0,         0}, /* '<' */
+    { 61,       K_ALT_EQUALS,             0,         0}, /* '=' */
+    { 62,                  0,             0,         0}, /* '>' */
+    { 63,                  0, K_CTRL_QUESTION,       0}, /* '?' */
+    { 64,                  0,             0,         0}, /* '@' */
+    { 65,            K_ALT_A,      K_CTRL_A,         0}, /* 'A' */
+    { 66,            K_ALT_B,      K_CTRL_B,         0}, /* 'B' */
+    { 67,            K_ALT_C,      K_CTRL_C,         0}, /* 'C' */
+    { 68,            K_ALT_D,      K_CTRL_D,         0}, /* 'D' */
+    { 69,            K_ALT_E,      K_CTRL_E,         0}, /* 'E' */
+    { 70,            K_ALT_F,      K_CTRL_F,         0}, /* 'F' */
+    { 71,            K_ALT_G,      K_CTRL_G,         0}, /* 'G' */
+    { 72,            K_ALT_H,      K_CTRL_H,         0}, /* 'H' */
+    { 73,            K_ALT_I,      K_CTRL_I,         0}, /* 'I' */
+    { 74,            K_ALT_J,      K_CTRL_J,         0}, /* 'J' */
+    { 75,            K_ALT_K,      K_CTRL_K,         0}, /* 'K' */
+    { 76,            K_ALT_L,      K_CTRL_L,         0}, /* 'L' */
+    { 77,            K_ALT_M,      K_CTRL_M,         0}, /* 'M' */
+    { 78,            K_ALT_N,      K_CTRL_N,         0}, /* 'N' */
+    { 79,            K_ALT_O,      K_CTRL_O,         0}, /* 'O' */
+    { 80,            K_ALT_P,      K_CTRL_P,         0}, /* 'P' */
+    { 81,            K_ALT_Q,      K_CTRL_Q,         0}, /* 'Q' */
+    { 82,            K_ALT_R,      K_CTRL_R,         0}, /* 'R' */
+    { 83,            K_ALT_S,      K_CTRL_S,         0}, /* 'S' */
+    { 84,            K_ALT_T,      K_CTRL_T,         0}, /* 'T' */
+    { 85,            K_ALT_U,      K_CTRL_U,         0}, /* 'U' */
+    { 86,            K_ALT_V,      K_CTRL_V,         0}, /* 'V' */
+    { 87,            K_ALT_W,      K_CTRL_W,         0}, /* 'W' */
+    { 88,            K_ALT_X,      K_CTRL_X,         0}, /* 'X' */
+    { 89,            K_ALT_Y,      K_CTRL_Y,         0}, /* 'Y' */
+    { 90,            K_ALT_Z,      K_CTRL_Z,         0}, /* 'Z' */
+    { 91,          K_ALT_OSB,             0,         0}, /* '[' */
+    { 92,    K_ALT_BACKSLASH,             0,         0}, /* '\' */
+    { 93,          K_ALT_CSB,             0,         0}, /* ']' */
+    { 94,            K_ALT_6,             0,         0}, /* '^' */
+    { 95,                  0,             0,         0}, /* '_' */
+    { 96,    K_ALT_BACKQUOTE,             0,         0}, /* '`' */
+    { 97,            K_ALT_A,      K_CTRL_A,         0}, /* 'a' */
+    { 98,            K_ALT_B,      K_CTRL_B,         0}, /* 'b' */
+    { 99,            K_ALT_C,      K_CTRL_C,         0}, /* 'c' */
+    {100,            K_ALT_D,      K_CTRL_D,         0}, /* 'd' */
+    {101,            K_ALT_E,      K_CTRL_E,         0}, /* 'e' */
+    {102,            K_ALT_F,      K_CTRL_F,         0}, /* 'f' */
+    {103,            K_ALT_G,      K_CTRL_G,         0}, /* 'g' */
+    {104,            K_ALT_H,      K_CTRL_H,         0}, /* 'h' */
+    {105,            K_ALT_I,      K_CTRL_I,         0}, /* 'i' */
+    {106,            K_ALT_J,      K_CTRL_J,         0}, /* 'j' */
+    {107,            K_ALT_K,      K_CTRL_K,         0}, /* 'k' */
+    {108,            K_ALT_L,      K_CTRL_L,         0}, /* 'l' */
+    {109,            K_ALT_M,      K_CTRL_M,         0}, /* 'm' */
+    {110,            K_ALT_N,      K_CTRL_N,         0}, /* 'n' */
+    {111,            K_ALT_O,      K_CTRL_O,         0}, /* 'o' */
+    {112,            K_ALT_P,      K_CTRL_P,         0}, /* 'p' */
+    {113,            K_ALT_Q,      K_CTRL_Q,         0}, /* 'q' */
+    {114,            K_ALT_R,      K_CTRL_R,         0}, /* 'r' */
+    {115,            K_ALT_S,      K_CTRL_S,         0}, /* 's' */
+    {116,            K_ALT_T,      K_CTRL_T,         0}, /* 't' */
+    {117,            K_ALT_U,      K_CTRL_U,         0}, /* 'u' */
+    {118,            K_ALT_V,      K_CTRL_V,         0}, /* 'v' */
+    {119,            K_ALT_W,      K_CTRL_W,         0}, /* 'w' */
+    {120,            K_ALT_X,      K_CTRL_X,         0}, /* 'x' */
+    {121,            K_ALT_Y,      K_CTRL_Y,         0}, /* 'y' */
+    {122,            K_ALT_Z,      K_CTRL_Z,         0}, /* 'z' */
+    {123,                282,            27,         0}, /* '{' */
+    {124,                299,            28,         0}, /* '|' */
+    {125,                283,            29,         0}, /* '}' */
+    {126,                297,           297,         0}, /* '~' */
+    {127,           K_ALT_BS,           127,         0}, /* '' */
 };
 
 #define EXKEY_F1              ( 0 )
@@ -317,6 +321,10 @@ static const ClipKeyCode stdKeyTab[CLIP_STDKEY_COUNT] = {
 #define EXKEY_CENTER          (27 )
 #define EXKEY_PRTSCR          (28 )
 #define EXKEY_PAUSE           (29 )
+#define EXKEY_KPASTERISK      (30 )
+#define EXKEY_KPPLUS          (31 )
+#define EXKEY_KPMINUS         (32 )
+#define EXKEY_KPDIVIDE        (33 )
 
 static const ClipKeyCode extKeyTab[CLIP_EXTKEY_COUNT] = {
     {K_F1,          K_ALT_F1,     K_CTRL_F1,   K_SH_F1}, /*  00 */
@@ -352,7 +360,13 @@ static const ClipKeyCode extKeyTab[CLIP_EXTKEY_COUNT] = {
     {K_ENTER,   KP_ALT_ENTER,  K_CTRL_ENTER,         0}, /*  26 */
     {KP_CENTER,            0,     KP_CTRL_5,         0}, /*  27 */
     {0,                    0, K_CTRL_PRTSCR,         0}, /*  28 */
-    {0,                    0, HB_BREAK_FLAG,         0}  /*  29 */
+    {0,                    0, HB_BREAK_FLAG,         0}, /*  29 */
+/* under win98 it seems that keypad / key is 'enhanced' */
+    {42,     KP_ALT_ASTERISK,KP_CTRL_ASTERISK,       0}, /*  30 */
+    {43,         KP_ALT_PLUS,  KP_CTRL_PLUS,         0}, /*  31 */
+    {45,        KP_ALT_MINUS, KP_CTRL_MINUS,         0}, /*  32 */
+    {47,        KP_ALT_SLASH, KP_CTRL_SLASH,         0}  /*  33 */
+
 };
 
 /* *********************************************************************** */
@@ -502,12 +516,12 @@ static BOOL WINAPI HB_GT_FUNC(gt_CtrlHandler( DWORD dwCtrlType ))
       bHandled = FALSE;
       break;
 
+   case CTRL_CLOSE_EVENT:
    case CTRL_BREAK_EVENT:
       s_bBreak = TRUE;
       bHandled = TRUE;
       break;
 
-   case CTRL_CLOSE_EVENT:
    case CTRL_LOGOFF_EVENT:
    case CTRL_SHUTDOWN_EVENT:
    default:
@@ -585,7 +599,6 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
         s_charTrans[ i ] = ( BYTE ) i;
         s_keyTrans[ i ] = ( BYTE ) i;
     }
-
 
     /* Add Ctrl+Break handler [vszakats] */
     SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), TRUE );
@@ -1373,17 +1386,27 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
     if( Col >= 0 && Col < HB_GT_FUNC(gt_GetScreenWidth()) )
     {
         if( Top < 0 )
+        {
             Top = 0;
+        }
         else if( Top >= HB_GT_FUNC(gt_GetScreenHeight()) )
+        {
             Top = HB_GT_FUNC(gt_GetScreenHeight()) - 1;
+        }
 
         if( Bottom < 0 )
+        {
             Bottom = 0;
+        }
         else if( Bottom >= HB_GT_FUNC(gt_GetScreenHeight()) )
+        {
             Bottom = HB_GT_FUNC(gt_GetScreenHeight()) - 1;
+        }
 
         if( Top <= Bottom )
+        {
             Row = Top;
+        }
         else
         {
             Row = Bottom;
@@ -1393,7 +1416,9 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
         HB_GT_FUNC(gt_DispBegin());
 
         while( Row <= Bottom )
+        {
             HB_GT_FUNC(gt_xPutch( Row++, Col, byAttr, byChar ));
+        }
 
         HB_GT_FUNC(gt_DispEnd());
 
@@ -1456,346 +1481,449 @@ int HB_GT_FUNC(gt_ExtendedKeySupport())
 
 int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
-    int ch = 0,
-        extKey = -1;
-    const ClipKeyCode *clipKey = NULL;
+   int ch = 0,
+       extKey = -1;
+   const ClipKeyCode *clipKey = NULL;
 
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
 
-    /* First check for Ctrl+Break, which is handled by gt/gtwin.c */
+   /* First check for Ctrl+Break, which is handled by gt/gtwin.c */
 
-    if( s_bBreak )
+   if( s_bBreak )
+   {
+      /* Reset the global Ctrl+Break flag */
+      s_bBreak = FALSE;
+      ch = HB_BREAK_FLAG; /* Indicate that Ctrl+Break was pressed */
+   }
+   /* Check for events only when the event buffer is exhausted. */
+   else if( s_wRepeated == 0 && s_cNumRead <= s_cNumIndex )
+   {
+      int altisdown = 0;
+      int altnum = 0;
+
+      /* Check for keyboard input */
+      do
+      {
+         s_cNumRead = 0;
+         GetNumberOfConsoleInputEvents( s_HInput, &s_cNumRead );
+
+         if( s_cNumRead )
+         {
+            /* Read keyboard input */
+            ReadConsoleInput( s_HInput,          /* input buffer handle   */
+                              s_irInBuf,         /* buffer to read into   */
+                              INPUT_BUFFER_LEN,  /* size of read buffer   */
+                              &s_cNumRead);      /* number of records read */
+            /* Set up to process the first input event */
+            s_cNumIndex = 0;
+
+            if ( s_irInBuf[ s_cNumIndex ].EventType == KEY_EVENT )
+            {
+               unsigned short wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode;
+
+#if 0
+    if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
     {
-       /* Reset the global Ctrl+Break flag */
-       s_bBreak = FALSE;
-       ch = HB_BREAK_FLAG; /* Indicate that Ctrl+Break was pressed */
+      printf("\n %ld %ld %ld %ld",
+          wKey, /* scan code */
+          s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualKeyCode,  /* key code */
+          s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar,  /* char */
+          s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState); /* state */
     }
-    /* Check for events only when the event buffer is exhausted. */
-    else if( s_wRepeated == 0 && s_cNumRead <= s_cNumIndex )
-    {
-       int altisdown = 0;
-       int altnum = 0;
+#endif
+               if( altisdown )
+               {
+                  if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
+                  {
+                     /*
+                        on Keydown, it better be the alt or a numpad key,
+                        or bail out.
+                     */
+                     switch(wKey)
+                     {
+                        case 0x38:
+                        case 0x47:
+                        case 0x48:
+                        case 0x49:
+                        case 0x4b:
+                        case 0x4c:
+                        case 0x4d:
+                        case 0x4f:
+                        case 0x50:
+                        case 0x51:
+                        case 0x52:
+                           break;
 
-       /* Check for keyboard input */
-       do
-       {
-          s_cNumRead = 0;
-          GetNumberOfConsoleInputEvents( s_HInput, &s_cNumRead );
-          if( s_cNumRead )
+                        default:
+                           altisdown=0;
+                           break;
+                     }
+                  }
+                  else
+                  {
+                     /* Keypad handling is done during Key up */
+
+                     unsigned short nm = 10;
+
+                     switch(wKey)
+                     {
+                        case 0x38:
+                           /* Alt key ... */
+                           if ((s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState &
+                              0x04000000 ))
+                           /* ... has been released after a numpad entry */
+                           {
+                              ch = altnum & 0xff;
+                              ++s_cNumIndex;
+                           }
+                           else
+                           /* ... has been released after no numpad entry */
+                           {
+                              s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown = 1;
+                           }
+                           altisdown = altnum = 0;
+                           break;
+
+                        case 0x52: --nm;
+                        case 0x4f: --nm;
+                        case 0x50: --nm;
+                        case 0x51: --nm;
+                        case 0x4b: --nm;
+                        case 0x4c: --nm;
+                        case 0x4d: --nm;
+                        case 0x47: --nm;
+                        case 0x48: --nm;
+                        case 0x49: --nm;
+                           altnum = ((altnum * 10) & 0xff) + nm;
+                           break;
+
+                        default:
+                           altisdown=0;
+                           break;
+                     }
+                  }
+               }
+               else
+               {
+                  /* Also traps the holding of 1 alt key and pressing the other */
+                  if ( wKey == 0x38 && s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
+                  {
+                     altisdown = 1;
+                  }
+               }
+            }
+         }
+      } while (altisdown);
+   }
+
+   /* Only process one keyboard event at a time. */
+   if( s_wRepeated > 0 || s_cNumRead > s_cNumIndex )
+   {
+      if ( s_irInBuf[ s_cNumIndex ].EventType == KEY_EVENT )
+      {
+         /* Only process key down events */
+
+         if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
+         {
+            /* Save the keyboard state and ASCII,scan, key code */
+            WORD wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode;
+            WORD wChar = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualKeyCode;
+            DWORD dwState= s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState;
+
+            ch = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar;
+
+            if ( ( dwState & CAPSLOCK_ON ) && !( dwState & 0x001F ) )
+            {
+               switch (wKey)
+               {
+                  /* under Win98, Upper row keys are affected by caps-lock
+                     and should not be.
+                   */
+                  case 2:
+                  case 3:
+                  case 4:
+                  case 5:
+                  case 6:
+                  case 7:
+                  case 8:
+                  case 9:
+                  case 10:
+                     wChar = ch = wKey + 47;
+                     break;
+
+                  case 11:          /* 0 */
+                     wChar = ch = 48;
+                     break;
+
+                  case 12:          /* - */
+                     ch = 45;
+                     break;
+
+                  case 13:          /* = */
+                     wChar = ch = 61;
+                     break;
+
+                  case 26:          /* [ */
+                     wChar = ch = 91;
+                     break;
+
+                  case 27:          /* ] */
+                     wChar = ch = 93;
+                     break;
+
+                  case 39:          /* ; */
+                     wChar = ch = 59;
+                     break;
+
+                  case 40:          /* ' */
+                     ch = 39;
+                     break;
+
+                  case 41:          /* ` */
+                     wChar = ch = 96;
+                     break;
+
+                  case 43:          /* \ */
+                     wChar = ch = 92;
+                     break;
+
+                  case 51:          /* , */
+                     wChar = ch = 44;
+                     break;
+
+                  case 52:          /* . */
+                     wChar = ch = 46;
+                     break;
+
+                  default:
+                     break;
+               }
+            }
+
+            if ( s_wRepeated == 0 )
+            {
+               s_wRepeated = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wRepeatCount;
+            }
+
+            if ( s_wRepeated > 0 ) /* Might not be redundant */
+            {
+               s_wRepeated--;
+            }
+
+            // printf( "\n\nhb_gt_ReadKey(): dwState is %ld, wChar is %d, wKey is %d, ch is %d", dwState, wChar, wKey, ch );
+
+            if ( wChar == 8 )      // VK_BACK
+            {
+               extKey = EXKEY_BS;
+            }
+            else if ( wChar == 9 )  // VK_TAB
+            {
+               extKey = EXKEY_TAB;
+            }
+            else if ( wChar == 13 ) // VK_RETURN
+            {
+               extKey = EXKEY_ENTER;
+            }
+            else if ( wChar == 27 ) // VK_ESCAPE
+            {
+               extKey = EXKEY_ESC;
+            }
+            else if ( wChar == 33 ) // VK_PRIOR
+            {
+               extKey = EXKEY_PGUP;
+            }
+            else if ( wChar == 34 ) // VK_NEXT
+            {
+               extKey = EXKEY_PGDN;
+            }
+            else if ( wChar == 35 ) // VK_END
+            {
+               extKey = EXKEY_END;
+            }
+            else if ( wChar == 36 ) // VK_HOME
+            {
+               extKey = EXKEY_HOME;
+            }
+            else if ( wChar == 37 ) // VK_LEFT
+            {
+               extKey = EXKEY_LEFT;
+            }
+            else if ( wChar == 38 ) // VK_UP
+            {
+               extKey = EXKEY_UP;
+            }
+            else if ( wChar == 39 ) // VK_RIGHT
+            {
+               extKey = EXKEY_RIGHT;
+            }
+            else if ( wChar == 40 ) // VK_DOWN
+            {
+               extKey = EXKEY_DOWN;
+            }
+            else if ( wChar == 45 ) // VK_INSERT
+            {
+               extKey = EXKEY_INS;
+            }
+            else if ( wChar == 46 && (!(ch==46)) ) // VK_DELETE
+            {
+               /* International keyboard under Win98 - when VirtualKey and Ascii
+                  char are both 46, then it's keypad del key, but numlock is on,
+                  so treat as '.' else DEL
+                */
+               extKey = EXKEY_DEL;
+            }
+            else if ( wChar == 191 && ch == 63 && ( dwState & ENHANCED_KEY ))
+            {                 /* numpad '/' always */
+               /* This is the Win98 test */
+               ch = 47;
+            }
+            else if ( wChar == 106 ) // VK_MULTIPLY
+            {
+               extKey = EXKEY_KPASTERISK;
+            }
+            else if ( wChar == 107 ) // VK_ADD
+            {
+               extKey = EXKEY_KPPLUS;
+            }
+            else if ( wChar == 109 ) // VK_SUBTRACT
+            {
+               extKey = EXKEY_KPMINUS;
+            }
+            else if ( wChar == 111 || // VK_DIVIDE
+                    ( wChar == 191 && ( dwState & ENHANCED_KEY )))
+            {
+               /* This should be for other than Win98 */
+               extKey = EXKEY_KPDIVIDE;
+            }
+            else if ( wChar >= 112 && wChar <= 123 ) // F1-F12 VK_F1-VK_F12
+            {
+               extKey = wChar - 112;
+            }
+            else if ( ch >= K_SPACE && ch <= K_CTRL_BS )
+            {
+               clipKey = &stdKeyTab[ ch - K_SPACE ];
+            }
+            else if ( ch > 0 && ch < K_SPACE && ( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )
+            {
+               clipKey = &stdKeyTab[ ch + '@' ];
+            }
+            else if ( ch < 0 ) // international keys
+            {
+               ch += 256;
+            }
+
+            if ( extKey > -1 )
+            {
+               clipKey = &extKeyTab[ extKey ];
+            }
+
+            if ( clipKey != NULL )
+            {
+               if( ( dwState & SHIFT_PRESSED ) && ( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )
+               {
+                  if( clipKey->key == K_TAB )
+                  {
+                     ch = K_CTRL_SH_TAB;
+                  }
+               }
+               else if( dwState & ( LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED ) )
+               {
+                  ch = clipKey->alt_key;
+               }
+               else if( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) )
+               {
+                  ch = clipKey->ctrl_key;
+               }
+               else if( dwState & SHIFT_PRESSED )
+               {
+                  ch = clipKey->shift_key;
+               }
+               else
+               {
+                  ch = clipKey->key;
+               }
+
+               if( ch == 0 ) // for keys that are only on shift or AltGr
+               {
+                  ch = clipKey->key;
+               }
+            }
+         }
+      }
+      else if( b_MouseEnable &&
+            eventmask & ~( INKEY_KEYBOARD | INKEY_RAW ) &&
+            s_irInBuf[ s_cNumIndex ].EventType == MOUSE_EVENT )
+      {
+
+        hb_mouse_iCol = s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwMousePosition.X;
+        hb_mouse_iRow = s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwMousePosition.Y;
+
+        if( eventmask & INKEY_MOVE &&
+           s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == MOUSE_MOVED )
+        {
+          ch = K_MOUSEMOVE;
+        }
+
+        else if( eventmask & INKEY_LDOWN &&
+            s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState &
+               FROM_LEFT_1ST_BUTTON_PRESSED )
+        {
+          if( s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == DOUBLE_CLICK )
           {
-             /* Read keyboard input */
-             ReadConsoleInput(
-                s_HInput,         /* input buffer handle    */
-                s_irInBuf,        /* buffer to read into    */
-                INPUT_BUFFER_LEN, /* size of read buffer    */
-                &s_cNumRead);     /* number of records read */
-             /* Set up to process the first input event */
-             s_cNumIndex = 0;
-
-             if ( s_irInBuf[ s_cNumIndex ].EventType == KEY_EVENT )
-             {
-                unsigned short sc = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode;
-
-                if( altisdown )
-                {
-                   if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
-                   {
-                      /*
-                         on Keydown, it better be the alt or a numpad key,
-                         or bail
-                      */
-                      switch(sc)
-                      {
-                         case 0x38:
-                         case 0x47:
-                         case 0x48:
-                         case 0x49:
-                         case 0x4b:
-                         case 0x4c:
-                         case 0x4d:
-                         case 0x4f:
-                         case 0x50:
-                         case 0x51:
-                         case 0x52:
-                            break;
-
-                         default:
-                            altisdown=0;
-                            break;
-                      }
-                   }
-                   else
-                   {
-                      /* Keypad handling is done during Key up */
-
-                      unsigned short nm = 10;
-
-                      switch(sc)
-                      {
-                         case 0x38:
-                            /* Alt key ... */
-                            if ((s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState &
-                                0x04000000 ))
-                            /* ... has been released after a numpad entry */
-                            {
-                               ch = altnum & 0xff;
-                               ++s_cNumIndex;
-                            }
-                            else
-                            /* ... has been released after no numpad entry */
-                            {
-                               s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown = 1;
-                            }
-                            altisdown = altnum = 0;
-                            break;
-
-                         case 0x52: --nm;
-                         case 0x4f: --nm;
-                         case 0x50: --nm;
-                         case 0x51: --nm;
-                         case 0x4b: --nm;
-                         case 0x4c: --nm;
-                         case 0x4d: --nm;
-                         case 0x47: --nm;
-                         case 0x48: --nm;
-                         case 0x49: --nm;
-                            altnum = ((altnum * 10) & 0xff) + nm;
-                            break;
-
-                         default:
-                            altisdown=0;
-                            break;
-                      }
-                   }
-                }
-                else
-                {
-                   /* Also traps the holding of 1 alt key and pressing the other */
-                   if ( sc == 0x38 && s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
-                   {
-                      altisdown = 1;
-                   }
-                }
-             }
+            ch = K_LDBLCLK;
           }
-       } while (altisdown);
-    }
-
-    /* Only process one keyboard event at a time. */
-    if( s_wRepeated > 0 || s_cNumRead > s_cNumIndex )
-    {
-       if ( s_irInBuf[ s_cNumIndex ].EventType == KEY_EVENT )
-       {
-          /* Only process key down events */
-
-          if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
+          else
           {
-             /* Save the keyboard state and ASCII key code */
-             DWORD dwState;
-             WORD wChar = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualKeyCode;
-
-             /* Could be used in the future */
-             // WORD wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode;
-
-             ch = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar;
-             dwState = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState;
-
-             if ( s_wRepeated == 0 )
-             {
-                s_wRepeated = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wRepeatCount;
-             }
-
-             if ( s_wRepeated > 0 ) /* Might not be redundant */
-             {
-                s_wRepeated--;
-             }
-
-             // printf( "\n\nhb_gt_ReadKey(): dwState is %ld, wChar is %d, wKey is %d, ch is %d", dwState, wChar, wKey, ch );
-
-             if ( wChar == 8 )
-             {
-                extKey = EXKEY_BS;
-             }
-             else if ( wChar == 9 )
-             {
-                extKey = EXKEY_TAB;
-             }
-             else if ( wChar == 13 )
-             {
-                extKey = EXKEY_ENTER;
-             }
-             else if ( wChar == 27 )
-             {
-                extKey = EXKEY_ESC;
-             }
-             else if ( wChar >= 112 && wChar <= 123 ) // F1-F12
-             {
-                extKey = wChar - 112;
-             }
-             else if ( wChar == 33 )
-             {
-                extKey = EXKEY_PGUP;
-             }
-             else if ( wChar == 34 )
-             {
-                extKey = EXKEY_PGDN;
-             }
-             else if ( wChar == 35 )
-             {
-                extKey = EXKEY_END;
-             }
-             else if ( wChar == 36 )
-             {
-                extKey = EXKEY_HOME;
-             }
-             else if ( wChar == 37 )
-             {
-                extKey = EXKEY_LEFT;
-             }
-             else if ( wChar == 38 )
-             {
-                extKey = EXKEY_UP;
-             }
-             else if ( wChar == 39 )
-             {
-                extKey = EXKEY_RIGHT;
-             }
-             else if ( wChar == 40 )
-             {
-                extKey = EXKEY_DOWN;
-             }
-             else if ( wChar == 45 )
-             {
-                extKey = EXKEY_INS;
-             }
-             else if ( wChar == 46 && /* temp fix */
-              !(dwState == 32 || dwState == 160 || dwState==224 || dwState==96) )
-             {
-                extKey = EXKEY_DEL;
-             }
-             else if ( ch >= K_SPACE && ch <= K_CTRL_BS )
-             {
-                clipKey = &stdKeyTab[ ch - K_SPACE ];
-             }
-             else if ( ch > 0 && ch < K_SPACE && ( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )
-             {
-                clipKey = &stdKeyTab[ ch + '@' ];
-             }
-             else if ( ch < 0 ) // international keys
-             {
-                ch += 256;
-             }
-
-             if ( extKey > -1 )
-             {
-                clipKey = &extKeyTab[ extKey ];
-             }
-
-             if ( clipKey != NULL )
-             {
-                if( ( dwState & SHIFT_PRESSED ) && ( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) ) )
-                {
-                   if( clipKey->key == K_TAB )
-                   {
-                      ch = K_CTRL_SH_TAB;
-                   }
-                }
-                else if( dwState & ( LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED ) )
-                {
-                   ch = clipKey->alt_key;
-                }
-                else if( dwState & ( LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED ) )
-                {
-                   ch = clipKey->ctrl_key;
-                }
-                else if( dwState & SHIFT_PRESSED )
-                {
-                   ch = clipKey->shift_key;
-                }
-                else
-                {
-                   ch = clipKey->key;
-                }
-
-                if( ch == 0 ) // for keys that are only on shift or AltGr
-                {
-                   ch = clipKey->key;
-                }
-             }
-             if ( ch > 0 && ch < 256 )
-             {
-                ch = s_keyTrans[ ch ];
-             }
-          }
-       }
-       else if( b_MouseEnable &&
-                eventmask & ~( INKEY_KEYBOARD | INKEY_RAW ) &&
-                s_irInBuf[ s_cNumIndex ].EventType == MOUSE_EVENT )
-       {
-
-          hb_mouse_iCol = s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwMousePosition.X;
-          hb_mouse_iRow = s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwMousePosition.Y;
-
-          if( eventmask & INKEY_MOVE &&
-              s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == MOUSE_MOVED )
-          {
-             ch = K_MOUSEMOVE;
+            ch = K_LBUTTONDOWN;
           }
 
-          else if( eventmask & INKEY_LDOWN &&
+          s_mouseLast = K_LBUTTONDOWN;
+        }
+
+        else if( eventmask & INKEY_RDOWN &&
                s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState &
-                   FROM_LEFT_1ST_BUTTON_PRESSED )
+               RIGHTMOST_BUTTON_PRESSED )
+        {
+          if( s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == DOUBLE_CLICK )
           {
-             if( s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == DOUBLE_CLICK )
-             {
-                ch = K_LDBLCLK;
-             }
-             else
-             {
-                ch = K_LBUTTONDOWN;
-             }
-
-             s_mouseLast = K_LBUTTONDOWN;
+            ch = K_RDBLCLK;
+          }
+          else
+          {
+            ch = K_RBUTTONDOWN;
           }
 
-          else if( eventmask & INKEY_RDOWN &&
-                   s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState &
-                   RIGHTMOST_BUTTON_PRESSED )
+          s_mouseLast = K_RBUTTONDOWN;
+        }
+
+        else if( s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == 0 &&
+               s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState == 0 )
+        {
+          if( eventmask & INKEY_LUP && s_mouseLast == K_LBUTTONDOWN )
           {
-             if( s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == DOUBLE_CLICK )
-             {
-                ch = K_RDBLCLK;
-             }
-             else
-             {
-                ch = K_RBUTTONDOWN;
-             }
-
-             s_mouseLast = K_RBUTTONDOWN;
+            ch = K_LBUTTONUP;
           }
-
-          else if( s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == 0 &&
-                   s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState == 0 )
+          else if( eventmask & INKEY_RUP && s_mouseLast == K_RBUTTONDOWN )
           {
-             if( eventmask & INKEY_LUP && s_mouseLast == K_LBUTTONDOWN )
-             {
-                ch = K_LBUTTONUP;
-             }
-             else if( eventmask & INKEY_RUP && s_mouseLast == K_RBUTTONDOWN )
-             {
-                ch = K_RBUTTONUP;
-             }
+            ch = K_RBUTTONUP;
           }
-       }
+        }
+      }
 
-       /* Set up to process the next input event (if any) */
-       if ( s_wRepeated == 0 )
-       {
-          s_cNumIndex++;
-       }
-    }
+      /* Set up to process the next input event (if any) */
+      if ( s_wRepeated == 0 )
+      {
+         s_cNumIndex++;
+      }
+   }
+#if 0
+   if (ch )
+   {
+      printf(" %ld:%ld",ch,extKey);
+   }
+#endif
 
-    return ch;
+   return ch;
 }
 
 /* *********************************************************************** */
@@ -1992,9 +2120,9 @@ void HB_GT_FUNC( gt_SetDispCP( char *pszTermCDP, char *pszHostCDP, BOOL bBox ) )
       {
          for ( i = 0; i < cdpHost->nChars; i++ )
          {
-            s_charTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] = 
+            s_charTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] =
                          ( BYTE ) cdpTerm->CharsUpper[ i ];
-            s_charTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] = 
+            s_charTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] =
                          ( BYTE ) cdpTerm->CharsLower[ i ];
          }
       }
@@ -2036,9 +2164,9 @@ void HB_GT_FUNC( gt_SetKeyCP( char *pszTermCDP, char *pszHostCDP ) )
       {
          for ( i = 0; i < cdpHost->nChars; i++ )
          {
-            s_keyTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] = 
+            s_keyTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] =
                         ( BYTE ) cdpTerm->CharsUpper[ i ];
-            s_keyTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] = 
+            s_keyTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] =
                         ( BYTE ) cdpTerm->CharsLower[ i ];
          }
       }
@@ -2102,7 +2230,7 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
    // char *  cText;
    // int     nLen;
 
-/*  This poses problems when some other application copies a bitmap on the 
+/*  This poses problems when some other application copies a bitmap on the
     clipboard. The only way to set text to clipboard is made possible
     only if another application copies some text on the clipboard.
 

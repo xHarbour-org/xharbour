@@ -1,5 +1,5 @@
 /*
- * $Id: ctnet.c,v 1.2 2004/08/31 15:40:42 paultucker Exp $
+ * $Id: ctnet.c,v 1.3 2004/09/19 09:01:56 lf_sfnet Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.
@@ -94,6 +94,9 @@
 #include <winnetwk.h>
 
 #define HB_OS_WIN_32_USED
+#if defined(_MSC_VER)
+#define snprintf _snprintf
+#endif
 
 BOOL WINAPI WNetErrorHandler(DWORD dwErrorCode, LPSTR lpszFunction) 
 { 
@@ -105,12 +108,18 @@ BOOL WINAPI WNetErrorHandler(DWORD dwErrorCode, LPSTR lpszFunction)
  
     if (dwErrorCode != ERROR_EXTENDED_ERROR) 
     { 
-        pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999, "Windows Network operation failed", lpszFunction, dwErrorCode, EF_NONE ); 
+        pError = hb_errRT_New(
+             ES_ERROR, 
+             HB_ERR_SS_TOOLS, 
+             9999, 
+             9999, 
+             "Windows Network operation failed",
+             lpszFunction,
+             (USHORT) dwErrorCode,
+             EF_NONE ); 
         hb_errLaunch( pError );
         hb_itemRelease( pError );
-        return TRUE; 
     } 
- 
     else 
     { 
         dwWNetResult = WNetGetLastError(&dwLastError, (LPSTR) szDescription, sizeof(szDescription), 
@@ -118,17 +127,29 @@ BOOL WINAPI WNetErrorHandler(DWORD dwErrorCode, LPSTR lpszFunction)
                            sizeof(szProvider)); 
  
         if(dwWNetResult != NO_ERROR) { 
-            pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999, "WNetGetLastError failed", "see OS error", dwWNetResult, EF_NONE ); 
+            pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999, "WNetGetLastError failed", "see OS error", (USHORT) dwWNetResult, EF_NONE ); 
             hb_errLaunch( pError );
             hb_itemRelease( pError );
             return FALSE; 
         } 
  
-        pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999, szDescription, szProvider, dwLastError, EF_NONE ); 
+/*
+extern PHB_ITEM HB_EXPORT hb_errRT_New(
+   USHORT uiSeverity,
+   char * szSubSystem,
+   ULONG  ulGenCode,
+   ULONG  ulSubCode,
+   char * szDescription,
+   char * szOperation,
+   USHORT uiOsCode,
+   USHORT uiFlags );
+*/
+        pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_TOOLS, 9999, 9999, szDescription, szProvider, (USHORT) dwLastError, EF_NONE ); 
         hb_errLaunch( pError );
         hb_itemRelease( pError );
-        return TRUE; 
     } 
+
+    return TRUE; 
 }
 
 static BOOL hb_IsNetShared(LPSTR szLocalDevice )
@@ -143,10 +164,8 @@ static BOOL hb_IsNetShared(LPSTR szLocalDevice )
    {
       return TRUE;
    }
-   else
-   {
-      return FALSE;
-   }
+
+   return FALSE;
 }
 
 HB_FUNC ( NETCANCEL )

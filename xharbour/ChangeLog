@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3449 2004/09/19 23:52:25 modalsist Exp $
+ * $Id: ChangeLog,v 1.3450 2004/09/20 00:40:02 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-20 23:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * include/inkey.ch
+    * added further Extended keys for keypad handling.
+
+  * source/rtl/gtwin/gtwin.c
+    * Better Clipper compatibility on certain alt-key combinations.
+    * Fixed quite a number of Win98 related keyboard handling issues
+    * with thanks to aardvark(Fredrick) and Milan Mehta
+  * source/ct/ctnet.c
+    * casts.
 
 2004-09-20 02:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/regex.c
@@ -533,31 +544,6 @@
 2004-09-01 03:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbrddfpt.h
   * xharbour/source/rdd/dbffpt/dbffpt1.c
-   * added macro HB_FPT_SAFE (enabled by default) to force a little
-     bit differ then Clipper lock schemes in read/update process but
-     really safe in network environment
-
-  * xharbour/source/rdd/dbf1.c
-   * indenting
-
-  * xharbour/source/rtl/gtcrs/gtcrs.c
-   * indenting also - I wrote this file using tabs (sorry) then someone
-     update it with differ tab size setting and many of the functions
-     where unreadable - it was to big for manual changes so I used:
-         indent -bad -bap -bl -bli0 -cli3 -cbi0 -cs -hnl -i3 -lps -l80 \
-                -nfca -npcs -npsl -nsob -nut -prs -ss -ts3 "$@"
-     for automatic reformatting the whole file
-
-2004-08-31 11:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-  * source/ct/ctnet.c
-    * correction to netdisk and netredir - Don't concatenate onto hb_parc pointer!
-
-2004-08-31 18:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
-  * xharbour/source/gtwin/gtwin.c
-  * xharbour/source/gtwvt/gtwvt.c
-    Commented out IsClipBoardFormatAvailable() because of a peculiar
-    problem where if some other application copied some bitmap on
-xharbour/source/rdd/dbffpt/dbffpt1.c
    * added macro HB_FPT_SAFE (enabled by default) to force a little
      bit differ then Clipper lock schemes in read/update process but
      really safe in network environment

@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.ch,v 1.10 2004/06/09 06:22:14 bdj Exp $
+ * $Id: inkey.ch,v 1.13 2004/07/29 14:33:10 lf_sfnet Exp $
  */
 
 /*
@@ -137,7 +137,6 @@
 
 #define K_ALT_ENTER             284   /* * Alt-Enter                     */
 #define K_ALT_RETURN            284   /* * Alt-Return                    */
-#define K_ALT_EQUALS            387   /* * Alt-Equals                    */
 #define K_ALT_ESC               257   /* * Alt-Esc                       */
 
 /* Keypad keys */
@@ -311,6 +310,7 @@
 #define K_ALT_X                 301   /*   Alt-X                         */
 #define K_ALT_Y                 277   /*   Alt-Y                         */
 #define K_ALT_Z                 300   /*   Alt-Z                         */
+#define K_ALT_BACKQUOTE         297   /*   Alt-`                         */
 #define K_ALT_1                 376   /*   Alt-1                         */
 #define K_ALT_2                 377   /*   Alt-2                         */
 #define K_ALT_3                 378   /*   Alt-3                         */
@@ -321,6 +321,18 @@
 #define K_ALT_8                 383   /*   Alt-8                         */
 #define K_ALT_9                 384   /*   Alt-9                         */
 #define K_ALT_0                 385   /*   Alt-0                         */
+#define K_ALT_MINUS             386
+#define K_ALT_EQUALS            387   /* * Alt-Equals                    */
+#define K_ALT_OSB               282
+#define K_ALT_CSB               283
+#define K_ALT_BACKSLASH         299
+#define K_ALT_SC                295
+#define K_ALT_QUOTE             296
+#define K_ALT_COMMA             307
+#define K_ALT_PERIOD            308
+#define K_ALT_SLASH             309   /*   Alt-Slash (fyi Ctrl-? doesn't
+                                           work - maybe just under xp?)  */
+
 
 /* Function keys */
 
