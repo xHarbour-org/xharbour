@@ -33,7 +33,6 @@ local aPrinter
     EJECT
     set printer off
     set console on
-    set device to screen
     set printer to
   ENDIF
   ? SET(_SET_DEVICE)

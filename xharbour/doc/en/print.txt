@@ -51,7 +51,6 @@
  *          EJECT
  *          set printer off
  *          set console on
- *          set device to screen
  *          set printer to
  *        ENDIF
  *        ? SET(_SET_DEVICE)
@@ -85,7 +84,7 @@
  *      <cPrinter> The printer name
  *  $DESCRIPTION$
  *      GETDEFAULTPRINTER() return the default printer name that can be used with
- *      set(24,"win:"+printername) to send data to this specific printer
+ *      SET PRINT TO (cPrinterName) to send data to this specific printer
  *  $EXAMPLES$
  *      FUNCTION MAIN()
  *        Local cPrinter := GETDEFAULTPRINTER()
@@ -158,5 +157,38 @@
  *      This function is part of Rtl library
  *  $SEEALSO$
  *      GETPRINTERS(), GETDEFAULTPRINTER()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      PRINTEREXISTS()
+ *  $CATEGORY$
+ *      Printer
+ *  $ONELINER$
+ *      See if a printer is installed
+ *  $SYNTAX$
+ *      <bInstalled> := PRINTEREXISTS( <cPrinterName>)
+ *  $ARGUMENTS$
+ *      <cPrinter> = a string that represents a printer name e.g. "HP LaserJet 1200 Series PCL"
+ *  $RETURNS$
+ *      <bInstalled> > .T. if the printer with the passed name is installed on the machine
+ *  $DESCRIPTION$
+ *      PRINTEREXISTS() is used to ensure that a printer is still available before attempting to
+ *      print to it
+ *  $EXAMPLES$
+ *      FUNCTION MAIN()
+          ? PRINTEREXISTS("HP LaserJet 1200 Series PCL")
+ *      RETURN(NIL)
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is Xharbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      This function is part of Rtl library
+ *  $SEEALSO$
+ *      GETPRINTERS(), GETDEFAULTPRINTER(), ISPRINTER(), XISPRINTER()
  *  $END$
  */
