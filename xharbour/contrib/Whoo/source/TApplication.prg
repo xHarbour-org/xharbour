@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.39 2002/10/31 08:18:20 what32 Exp $
+ * $Id: TApplication.prg,v 1.40 2002/11/07 20:05:55 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -54,6 +54,8 @@ CLASS Application
    DATA InstMsg               INIT NIL
    DATA aForms                INIT {}
    DATA AppForms              INIT {}
+
+   PROPERTY MainForm READ FMainForm
 
    METHOD Initialize() CONSTRUCTOR
    METHOD Run()
@@ -122,46 +124,35 @@ METHOD Run() CLASS Application
 
 *------------------------------------------------------------------------------*
 
-METHOD CreateForm( oTarget, oForm, oParent ) CLASS Application
+METHOD CreateForm( oTarget, oForm ) CLASS Application
 
    LOCAL aVars, aVar
 
-   DEFAULT oParent TO self
+   //TraceLog( cForm, oForm, oForm:PropName )
 
-   oForm:Name := oForm:ClassName() //ControlName + AllTrim( Str( Len( ::AppForms ) + 1 ) )
+   oForm:Create( Self )
 
-//   oForm := if( oForm != NIL, oForm:Create( oParent ), TForm():Create( oParent ) )
+   //oForm:Name := oForm:ClassName() //ControlName + AllTrim( Str( Len( ::AppForms ) + 1 ) )
+   //__objAddData( Self, oForm:Name )
+   //__ObjSetValueList( self, { { oForm:Name, oForm } } )
 
-   __objAddData( Self, oForm:Name )
-   __ObjSetValueList( self, { { oForm:Name, oForm } } )
-
-   WITH OBJECT oForm
-
-//      :Create()
-
-      IF oParent:handle == ::handle
-         aAdd( ::aForms, oForm )
-      ENDIF
-
-      aAdd( ::AppForms, :Name )
-   END WITH
+   //TraceLog( :Caption, :Top, :Left, :Height, :Width )
 
    aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
    FOR EACH aVar IN aVars
       IF ValType( aVar[2] ) == 'O'
-         aAdd( oForm:Controls, aVar[2] )
-
-         WITH OBJECT aVar[2]
-            :Parent    := oForm
-            :Instance  := hInstance()
-            :Create( Self )
-         END WITH
+         aVar[2]:Create( oForm )
       ENDIF
    NEXT
 
+   IF ::FMainForm == NIL
+      oForm:GetHandle()
+      ::FMainForm := oForm
+   ENDIF
+
    oTarget := oForm
 
-RETURN( oForm )
+RETURN oForm
 
 *------------------------------------------------------------------------------*
 
