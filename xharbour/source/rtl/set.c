@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.1.1.1 2001/12/21 10:42:21 ronpinkas Exp $
+ * $Id: set.c,v 1.123 2002/03/10 18:22:54 lculik Exp $
  */
 
 /*
@@ -80,20 +80,23 @@ static void hb_setFreeSetPath( void )
    /* Free all set paths */
    HB_PATHNAMES * curPath = sp_set_path;
    HB_PATHNAMES * nextPath;
-   while( curPath )
-   {
-      nextPath = curPath->pNext;
-      hb_xfree( curPath );
-      curPath = nextPath;
-   }
+
    if( sp_set_path )
    {
       /* Only the first path holds an allocated string.
          All of the other paths in the list are part of
          that first string. */
       hb_xfree( sp_set_path->szPath );
-      sp_set_path = NULL;
    }
+
+   while( curPath )
+   {
+      nextPath = curPath->pNext;
+      hb_xfree( curPath );
+      curPath = nextPath;
+   }
+
+   sp_set_path = NULL;
 }
 
 static BOOL set_logical( PHB_ITEM pItem )
@@ -195,21 +198,31 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
    FHANDLE handle;
    PHB_FNAME pFilename;
    char path[ _POSIX_PATH_MAX + 1 ];
-
+   BOOL bPipe = FALSE;
    HB_TRACE(HB_TR_DEBUG, ("open_handle(%s, %d, %s, %d)", file_name, (int) bAppend, def_ext, (int) set_specifier));
 
    user_ferror = hb_fsError(); /* Save the current user file error code */
    /* Create full filename */
 
-   pFilename = hb_fsFNameSplit( file_name );
 
-   if( ! pFilename->szPath && hb_set.HB_SET_DEFAULT )
-      pFilename->szPath = hb_set.HB_SET_DEFAULT;
-   if( ! pFilename->szExtension && def_ext )
-      pFilename->szExtension = def_ext;
+     #if defined(OS_UNIX_COMPATIBLE)
+      if( ( bPipe = ( set_specifier == HB_SET_PRINTFILE && \
+                      (char) *file_name == '|' ) ) ) {
+         file_name++;
+	 bAppend = FALSE;
+      }
+   #endif
+   if( ! bPipe ) {
+      pFilename = hb_fsFNameSplit( file_name );
 
-   hb_fsFNameMerge( path, pFilename );
-   hb_xfree( pFilename );
+      if( ! pFilename->szPath && hb_set.HB_SET_DEFAULT )
+         pFilename->szPath = hb_set.HB_SET_DEFAULT;
+      if( ! pFilename->szExtension && def_ext )
+         pFilename->szExtension = def_ext;
+
+      hb_fsFNameMerge( path, pFilename );
+      hb_xfree( pFilename );
+   }
 
    /* Open the file either in append (bAppend) or truncate mode (!bAppend), but
       always use binary mode */
@@ -221,40 +234,45 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
    {
       BOOL bCreate = FALSE;
 
-      if( bAppend )
-      {  /* Append mode */
-         if( hb_fsFile( ( BYTE * ) path ) )
-         {  /* If the file already exists, open it (in read-write mode, in
-               case of non-Unix and text modes). */
-            handle = hb_fsOpen( ( BYTE * ) path, FO_READWRITE | FO_DENYWRITE );
-            if( handle != FS_ERROR )
-            {  /* Position to EOF */
-            #if ! defined(OS_UNIX_COMPATIBLE)
-               /* Non-Unix needs special binary vs. text file handling */
-               if( set_specifier == HB_SET_PRINTFILE )
-               {  /* PRINTFILE is binary and needs no special handling. */
-            #endif
-                  hb_fsSeek( handle, 0, FS_END );
-            #if ! defined(OS_UNIX_COMPATIBLE)
-               }
-               else
-               {  /* All other files are text files and may have an EOF
-                     ('\x1A') character at the end (non-UNIX only). */
-                  char cEOF = '\0';
-                  hb_fsSeek( handle, -1, FS_END ); /* Position to last char. */
-                  hb_fsRead( handle, ( BYTE * ) &cEOF, 1 );   /* Read the last char. */
-                  if( cEOF == '\x1A' )             /* If it's an EOF, */
-                     hb_fsSeek( handle, -1, FS_END ); /* Then write over it. */
-               }
-            #endif
-            }
-         }
-         else bCreate = TRUE; /* Otherwise create a new file. */
-      }
-      else bCreate = TRUE; /* Always create a new file for overwrite mode. */
+      if( bPipe )
+         handle = hb_fsPOpen( ( BYTE * ) file_name, ( BYTE * ) "w" );
+      else
+      {
+         if( bAppend )
+         {  /* Append mode */
+            if( hb_fsFile( ( BYTE * ) path ) )
+            {  /* If the file already exists, open it (in read-write mode, in
+                  case of non-Unix and text modes). */
+               handle = hb_fsOpen( ( BYTE * ) path, FO_READWRITE | FO_DENYWRITE );
+               if( handle != FS_ERROR )
+               {  /* Position to EOF */
+               #if ! defined(OS_UNIX_COMPATIBLE)
+                  /* Non-Unix needs special binary vs. text file handling */
+                  if( set_specifier == HB_SET_PRINTFILE )
+                  {  /* PRINTFILE is binary and needs no special handling. */
+               #endif
+                     hb_fsSeek( handle, 0, FS_END );
+               #if ! defined(OS_UNIX_COMPATIBLE)
+                  }
+                  else
+                  {  /* All other files are text files and may have an EOF
+                        ('\x1A') character at the end (non-UNIX only). */
+                     char cEOF = '\0';
+                     hb_fsSeek( handle, -1, FS_END ); /* Position to last char. */
+                     hb_fsRead( handle, ( BYTE * ) &cEOF, 1 );   /* Read the last char. */
+                     if( cEOF == '\x1A' )             /* If it's an EOF, */
+                        hb_fsSeek( handle, -1, FS_END ); /* Then write over it. */
+                  }
+               #endif
+                }
+             }
+            else bCreate = TRUE; /* Otherwise create a new file. */
+          }
+         else bCreate = TRUE; /* Always create a new file for overwrite mode. */
 
-      if( bCreate )
-         handle = hb_fsCreate( ( BYTE * ) path, FC_NORMAL );
+         if( bCreate )
+            handle = hb_fsCreate( ( BYTE * ) path, FC_NORMAL );
+      }
 
       if( handle == FS_ERROR )
       {
@@ -392,7 +410,7 @@ HB_FUNC( SET )
          break;
       case HB_SET_ALTFILE    :
          if( hb_set.HB_SET_ALTFILE ) hb_retc( hb_set.HB_SET_ALTFILE );
-         else hb_retc( "" );
+         else hb_retc( NULL );
          if( args > 1 && ! HB_IS_NIL( pArg2 ) ) hb_set.HB_SET_ALTFILE = set_string( pArg2, hb_set.HB_SET_ALTFILE );
          if( args > 2 ) bFlag = set_logical( pArg3 );
          else bFlag = FALSE;
@@ -450,7 +468,7 @@ HB_FUNC( SET )
          if( hb_set.HB_SET_DATEFORMAT )
             hb_retc( hb_set.HB_SET_DATEFORMAT );
          else
-            hb_retc( "" );
+            hb_retc( NULL );
 
          if( args > 1 )
          {
@@ -495,7 +513,7 @@ HB_FUNC( SET )
          break;
       case HB_SET_DEFAULT    :
          if( hb_set.HB_SET_DEFAULT ) hb_retc( hb_set.HB_SET_DEFAULT );
-         else hb_retc( "" );
+         else hb_retc( NULL );
          if( args > 1 ) hb_set.HB_SET_DEFAULT = set_string( pArg2, hb_set.HB_SET_DEFAULT );
          break;
       case HB_SET_DELETED    :
@@ -504,7 +522,7 @@ HB_FUNC( SET )
          break;
       case HB_SET_DELIMCHARS :
          if( hb_set.HB_SET_DELIMCHARS ) hb_retc( hb_set.HB_SET_DELIMCHARS );
-         else hb_retc( "" );
+         else hb_retc( NULL );
          if( args > 1 ) hb_set.HB_SET_DELIMCHARS = set_string( pArg2, hb_set.HB_SET_DELIMCHARS );
          break;
       case HB_SET_DELIMITERS :
@@ -513,7 +531,7 @@ HB_FUNC( SET )
          break;
       case HB_SET_DEVICE     :
          if( hb_set.HB_SET_DEVICE ) hb_retc( hb_set.HB_SET_DEVICE );
-         else hb_retc( "" );
+         else hb_retc( NULL );
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
             /* If the print file is not already open, open it in overwrite mode. */
@@ -559,7 +577,7 @@ HB_FUNC( SET )
          break;
       case HB_SET_EXTRAFILE  :
          if( hb_set.HB_SET_EXTRAFILE ) hb_retc( hb_set.HB_SET_EXTRAFILE );
-         else hb_retc( "" );
+         else hb_retc( NULL );
          if( args > 1 && ! HB_IS_NIL( pArg2 ) ) hb_set.HB_SET_EXTRAFILE = set_string( pArg2, hb_set.HB_SET_EXTRAFILE );
          if( args > 2 ) bFlag = set_logical( pArg3 );
          else bFlag = FALSE;
@@ -618,7 +636,7 @@ HB_FUNC( SET )
          break;
       case HB_SET_MFILEEXT   :
          if( hb_set.HB_SET_MFILEEXT ) hb_retc( hb_set.HB_SET_MFILEEXT );
-         else hb_retc( "" );
+         else hb_retc( NULL );
          if( args > 1 ) hb_set.HB_SET_MFILEEXT = set_string( pArg2, hb_set.HB_SET_MFILEEXT );
          break;
       case HB_SET_OPTIMIZE   :
@@ -631,7 +649,7 @@ HB_FUNC( SET )
          break;
       case HB_SET_PATH       :
          if( hb_set.HB_SET_PATH ) hb_retc( hb_set.HB_SET_PATH );
-         else hb_retc( "" );
+         else hb_retc( NULL );
          if( args > 1 )
          {
             hb_setFreeSetPath();
@@ -645,7 +663,7 @@ HB_FUNC( SET )
          break;
       case HB_SET_PRINTFILE  :
          if( hb_set.HB_SET_PRINTFILE ) hb_retc( hb_set.HB_SET_PRINTFILE );
-         else hb_retc( "" );
+         else hb_retc( NULL );
          if( args > 1 && ! HB_IS_NIL( pArg2 ) ) hb_set.HB_SET_PRINTFILE = set_string( pArg2, hb_set.HB_SET_PRINTFILE );
          if( args > 2 ) bFlag = set_logical( pArg3 );
          else bFlag = FALSE;
@@ -710,10 +728,6 @@ HB_FUNC( SET )
       case HB_SET_IDLEREPEAT :
          hb_retl( hb_set.HB_SET_IDLEREPEAT );
          if( args > 1 ) hb_set.HB_SET_IDLEREPEAT = set_logical( pArg2 );
-         break;
-      case HB_SET_TRACE :
-         hb_retl( hb_set.HB_SET_TRACE );
-         if( args > 1 ) hb_set.HB_SET_TRACE = set_logical( pArg2 );
          break;
       default                :
          /* Return NIL if called with invalid SET specifier */
@@ -781,14 +795,13 @@ void hb_setInitialize( void )
    hb_set.HB_SET_PATH = ( char * ) hb_xgrab( 1 );
    hb_set.HB_SET_PATH[ 0 ] = '\0';
    hb_set.HB_SET_PRINTER = FALSE;
-   hb_set.HB_SET_PRINTFILE = ( char * ) hb_xgrab( 4 );
-   memcpy( hb_set.HB_SET_PRINTFILE, "PRN", 4 ); /* Default printer device */
+   hb_set.HB_SET_PRINTFILE = ( char * ) hb_xgrab( 1 );
+   memcpy( hb_set.HB_SET_PRINTFILE, "", 1 ); /* Default printer device */
    hb_set.hb_set_printhan = FS_ERROR;
    hb_set.HB_SET_SCOREBOARD = TRUE;
    hb_set.HB_SET_SCROLLBREAK = TRUE;
    hb_set.HB_SET_SOFTSEEK = FALSE;
    hb_set.HB_SET_STRICTREAD = FALSE;
-   hb_set.HB_SET_TRACE = TRUE; /* Default Trace to ON */
    hb_set.HB_SET_TYPEAHEAD = 50; hb_inkeyReset( TRUE ); /* Allocate keyboard typeahead buffer */
    hb_set.HB_SET_UNIQUE = FALSE;
    hb_set.HB_SET_VIDEOMODE = 0;

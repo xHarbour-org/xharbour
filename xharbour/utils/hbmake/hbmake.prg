@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.47 2002/01/11 00:21:19 lculik Exp $
+ * $Id: hbmake.prg,v 1.53 2002/03/08 10:30:02 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -150,7 +150,7 @@ else
    cFile := ""
 endif
 
-If empty(cFile) .and. !lEditMode
+If (empty(cFile) .and. !lEditMode) .or. !file(cfile) 
    ? "File not Found"
    Return Nil
 Endif
@@ -171,9 +171,6 @@ Endif
 If Pcount() >= 1
    ProcessParameters(AllParam)
 Endif
-//if !file(cfile)
-//   return nil
-//endif
 if lEditMode
    if lLibrary
       crtlibmakfile( cFile )
@@ -257,6 +254,10 @@ While !leof
      lBuildSec := .f.
      lComSec   := .t.
      lMacroSec := .f.
+  Else
+   ? "Invalid Make File"
+   fclose(nHandle)
+   Return Nil
   Endif
 
   cTemp := Trim( Substr( ReadLN( @lEof ), 1 ) )
@@ -931,7 +932,7 @@ Local cTopFile     := ""
 Local cDefBccLibs  := "lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib common.lib gtwin.lib"
 Local cDefGccLibs  := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
 Local cgcclibsos2  := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
-Local cDeflibGccLibs := "-lvm -lrtl -lgtstd -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lm"
+Local cDeflibGccLibs := "-lvm -lrtl -lgtsln -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lslang -lm"
 local cLibs := ""
 local citem:=""
 Local cExt:=""
@@ -1024,10 +1025,10 @@ cDefHarOpts+=" -v "
 endif
 if ldebug
 cDefHarOpts+=" -b "
- cDefBccLibs  += "debug.lib"
- cDefGccLibs  += "-ldebug"
- cgcclibsos2  += "-ldebug"
- cDeflibGccLibs += "-ldebug"
+ cDefBccLibs  += " debug.lib "
+ cDefGccLibs  += " -ldebug "
+ cgcclibsos2  += " -ldebug "
+ cDeflibGccLibs += " -ldebug "
 endif
 if lSupressline
 cDefHarOpts+=" -l "
@@ -1335,7 +1336,7 @@ if lBcc .or. lVcc
    endif
 elseif lGcc
       if  cOs=="Linux"
-          Fwrite( nLinkHandle, "LIBFILES = " +cDeflibGccLibs + CRLF )
+          Fwrite( nLinkHandle, "LIBFILES = -Wl,--start-group " +cDeflibGccLibs + " -Wl,--end-group "+ CRLF )
       elseif cOs=="OS/2"
           Fwrite( nLinkHandle, "LIBFILES = " + cgcclibsos2 + CRLF )
       else
@@ -1349,7 +1350,7 @@ if lBcc
  Fwrite( nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" +CRLF)
 
  Fwrite( nLinkHandle, "RFLAGS = "+CRLF)
- Fwrite( nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib;$(FWH)\lib -Gn -M -m -s -aa" + if(lFwh,"-Tpe","")+CRLF)
+ Fwrite( nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib;$(FWH)\lib -Gn -M -m -s -Tpe"+ if(lFWH," -aa", " -ap") +CRLF)
  Fwrite( nLinkHandle, "IFLAGS = " +CRLF)
  Fwrite( nLinkHandle, "LINKER = ilink32"+CRLF)
  Fwrite( nLinkHandle, " "+CRLF)
@@ -2096,7 +2097,7 @@ For nPos := 1 To 7
       If At( "$", amacro[ nCount ] ) > 0
              if (amacro[ nCount ] = "$(PROJECT)") .and. lGcc 
              Findmacro(amacro[ nCount ], @cRead )
-             fwrite(nLinkHandle,"CREATE " + "lib"+cRead+CRLF)
+             fwrite(nLinkHandle,"CREATE " + " lib"+cRead+CRLF)
 	     cLib:="lib"+cRead	
          elseif (amacro[ nCount ] =="$(ALLOBJ)")
              findmacro( amacro[ nCount ], @cRead )
