@@ -229,9 +229,9 @@ HB_FUNC(PQMETADATA)
 {
     PGresult   *res;
     int         nFields, i;
-    ITEM aTemp;
-    ITEM aNew;
-    ITEM temp;
+    PHB_ITEM aTemp;
+    PHB_ITEM aNew;
+    PHB_ITEM temp;
 
     if (hb_parinfo(1)) 
     {
