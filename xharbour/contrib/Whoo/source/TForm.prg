@@ -36,7 +36,7 @@ METHOD New( oParent ) CLASS TFrame
    ::Msgs    := -1
    ::FrameWnd:= .T.
    ::Style   := WS_OVERLAPPEDWINDOW
-//   ::FormStyle := 1
+   ::FormStyle := 2
    super:New( oParent )
 
 return( self )

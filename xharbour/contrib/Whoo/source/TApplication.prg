@@ -4,6 +4,8 @@ static oAppl
 #include "what32.ch"
 #include "windows.ch"
 
+GLOBAL EXTERNAL lPrevInstance
+
 CLASS Application
    
    DATA Instance
@@ -11,15 +13,31 @@ CLASS Application
    DATA aForms                INIT {}
    DATA nFormCount            INIT 0
    DATA FrameCreated AS LOGIC INIT .F.
+   DATA MultiInstance         INIT .F.
+   DATA InstMsg
+
    METHOD New() CONSTRUCTOR
    METHOD Run()
    METHOD CreateForm()
    METHOD CreateFrame()
-   
+   METHOD Terminate()                            INLINE PostQuitMessage(0)
+   METHOD MessageBox( cText, cCaption, nFlags )  INLINE MessageBox( GetActiveWindow(), cText, cCaption, nFlags )
+
+//   METHOD NotifyForms( nMsg, nwParam, nlParam )  INLINE 
 ENDCLASS
 
-
 METHOD New() CLASS Application
+
+   ::InstMsg := RegisterWindowMessage( GetModuleHandle() )
+
+   if !::MultiInstance .and. lPrevInstance 
+      
+      SendMessage(HWND_BROADCAST, ::InstMsg, 0, 0)
+      
+      PostQuitMessage(0)
+      QUIT
+      return(0)
+   endif
 
    ::Instance := hInstance()
 
