@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.20 2003/04/04 17:21:13 paultucker Exp $
+# $Id: makefile.nt,v 1.21 2003/04/04 23:18:47 paultucker Exp $
 #
 
 #
@@ -112,6 +112,7 @@ MACRO_DIR    =source\macro
 PP_DIR       =source\pp
 RDD_DIR      =source\rdd
 RTL_DIR      =source\rtl
+RPC_DIR      =source\rtl\uses_mt
 VM_DIR       =source\vm
 HBRUN_DIR    =utils\hbrun
 HBTEST_DIR   =utils\hbtest
@@ -159,6 +160,9 @@ ODBC_LIB     =$(LIB_DIR)\hbodbc$(MT).lib
 PP_LIB       =$(LIB_DIR)\pp$(MT).lib
 RDD_LIB      =$(LIB_DIR)\rdd$(MT).lib
 RTL_LIB      =$(LIB_DIR)\rtl$(MT).lib
+!ifdef HB_MT
+RPC_LIB      =$(LIB_DIR)\rpcmt.lib
+!ENDIF
 SAMPLES_LIB  =$(LIB_DIR)\samples.lib
 VM_LIB       =$(LIB_DIR)\vm$(MT).lib
 
@@ -203,19 +207,11 @@ HB_GT_LIB = $(LIB_DIR)\$(HB_GT_LIB).lib
 
 # override builtin
 
-!ifdef HB_MT
 .c.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 .cpp.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
-!else
-.c.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
-
-.cpp.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
-!endif
 
 #
 #
@@ -237,7 +233,8 @@ LIBLIST = \
    $(VM_LIB) \
    $(HB_GT_LIB) \
    $(SAMPLES_LIB) \
-   $(ODBC_LIB)
+   $(ODBC_LIB) \
+   $(RPC_LIB)
 
 #
 # macro.lib needs to be listed twice
@@ -273,15 +270,12 @@ LIBS2 = \
 #    is cause make to evaluate the obj list of dependants which then
 #    causes the .c.obj rule above to fire. (by inference)
 
-{$(RTL_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RTL_LIB)2
-
 {$(RTL_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RTL_DIR)}.cpp{$(OBJ_DIR)$(MT)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+{$(RTL_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RTL_LIB)2
 
 # List C modules first, then PRG modules
 
@@ -464,22 +458,24 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\wait.obj \
    $(OBJ_DIR)$(MT)\win32ole.obj
 
+#
+# RPC.LIB rules
+#
+# only in MT mode
+
 !ifdef HB_MT
 
-{$(RTL_DIR)\uses_mt}.prg{$(OBJ_DIR)$(MT)}.obj::
+{$(RPC_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RTL_LIB)2
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RPC_LIB)2
 
-{$(RTL_DIR)\uses_mt}.c{$(OBJ_DIR)$(MT)}.obj::
+{$(RPC_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RTL_DIR)\uses_mt}.cpp{$(OBJ_DIR)$(MT)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
-
-RTL_LIB_OBJS = \
-   $(RTL_LIB_OBJS) \
+RPC_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\trpc.obj \
    $(OBJ_DIR)$(MT)\trpccli.obj 
+
 !endif
 
 #
@@ -809,11 +805,7 @@ ODBC_LIB_OBJS =       \
 #
 # Our default target
 #
-
-!if ( "$(MK_FLAGS:Y=)"=="A" )
-
-all: \
-   CLEAN \
+TARGETS= \
    $(COMMON_LIB) \
    $(PP_LIB) \
    $(HARBOUR_EXE) \
@@ -823,6 +815,7 @@ all: \
    $(DEBUG_LIB) \
    $(LANG_LIB) \
    $(RDD_LIB) \
+   $(RPC_LIB) \
    $(NULSYS_LIB) \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
@@ -834,32 +827,20 @@ all: \
    $(HBTEST_EXE) \
    $(HBDOC_EXE) \
    $(HBMAKE_EXE)
+
+
+!if ( "$(MK_FLAGS:Y=)"=="A" )
+
+all: \
+   CLEAN \
+   $(TARGETS)
 
 MK_FLAGS = $(MK_FLAGS:A=)
 
 !else
 
 all: \
-   $(COMMON_LIB) \
-   $(PP_LIB) \
-   $(HARBOUR_EXE) \
-   $(VM_LIB) \
-   $(RTL_LIB) \
-   $(MACRO_LIB) \
-   $(DEBUG_LIB) \
-   $(LANG_LIB) \
-   $(RDD_LIB) \
-   $(NULSYS_LIB) \
-   $(DBFNTX_LIB) \
-   $(DBFCDX_LIB) \
-   $(HB_GT_LIBS) \
-   $(SAMPLES_LIB) \
-   $(ODBC_LIB) \
-   $(HBRUN_EXE) \
-   $(HBPP_EXE) \
-   $(HBTEST_EXE) \
-   $(HBDOC_EXE) \
-   $(HBMAKE_EXE)
+   $(TARGETS)
 
 !endif
 
@@ -1034,6 +1015,11 @@ $(HARBOUR_EXE) : \
 $(RTL_LIB) : $(RTL_LIB_OBJS)
    lib /out:$@ $**
 
+!ifdef HB_MT
+$(RPC_LIB) : $(RPC_LIB_OBJS)
+   lib /out:$@ $**
+!endif
+
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
    lib /out:$@ $**
 
@@ -1113,6 +1099,7 @@ $(OBJ_DIR)$(MT)\macroslx.obj : $(MACRO_DIR)\macroslx.c
 # dummy targets used for prg to c creation
 
 $(RTL_LIB)2    : $(RTL_LIB_OBJS)
+$(RPC_LIB)2    : $(RPC_LIB_OBJS)
 $(COMMON_LIB)2 : $(COMMON_LIB_OBJS)
 $(DEBUG_LIB)2  : $(DEBUG_LIB_OBJS)
 $(MACRO_LIB)2  : $(MACRO_LIB_OBJS)

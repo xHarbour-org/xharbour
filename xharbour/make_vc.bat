@@ -1,6 +1,6 @@
-@echo off
+@echo on
 rem 
-rem $Id: make_vc.bat,v 1.6 2003/04/04 17:21:14 paultucker Exp $
+rem $Id: make_vc.bat,v 1.7 2003/04/04 23:18:47 paultucker Exp $
 rem 
 
 rem ---------------------------------------------------------------
@@ -38,7 +38,8 @@ if not exist bin md bin
 if not exist bin\vc md bin\vc
 if not exist bin\vcmt md bin\vcmt
 
-set MK_FILE=makefile.vc
+SET MK_FILE=makefile.vc
+SET _HBMT=%HB_MT%
 if "%OS%" == "Windows_NT" set MK_FILE=makefile.nt
 if "%1" == "/Y" set MK_FILE=makefile.vc
 if "%1" == "/y" set MK_FILE=makefile.vc
@@ -49,20 +50,12 @@ if "%1" == "CLEAN" goto CLEAN
 
 :BUILD
 
+   SET HB_MT=
    nmake /f %MK_FILE% %1 %2 %3 > make_vc.log
    if errorlevel 1 goto BUILD_ERR
-
-if "%1"=="/A" goto check3
-
-:CHECK2
-
-if not "%1"=="/a" goto build_ok
-
-:CHECK3
-
-if "%hb_mt%"=="" set hb_mt=xyzzy
+   SET HB_MT=MT
+rem do not pass /a (if used) the second time!
    nmake /f %MK_FILE% %2 %3 >> make_vc.log
-if "%hb_mt%"=="xyzzy" set hb_mt=
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
@@ -78,6 +71,9 @@ if "%hb_mt%"=="xyzzy" set hb_mt=
 
 :CLEAN
 
+   SET HB_MT=
+   nmake /f %MK_FILE% %1
+   SET HB_MT=MT
    nmake /f %MK_FILE% %1
    rem in this case, the makefile handles most cleanup. Add what you need here
    if exist make_vc.log del make_vc.log
@@ -85,3 +81,5 @@ if "%hb_mt%"=="xyzzy" set hb_mt=
 
 :EXIT
 SET MK_FILE=
+SET HB_MT=%_HBMT%
+SET _HBMT=
