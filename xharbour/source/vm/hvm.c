@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.395 2004/05/12 02:51:58 druzus Exp $
+ * $Id: hvm.c,v 1.396 2004/05/16 23:54:11 ronpinkas Exp $
  */
 
 /*
@@ -1965,7 +1965,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQBEGIN") );
 
          {
-            PHB_SEQUENCE pSequence = hb_xgrab( sizeof( HB_SEQUENCE ) );
+            PHB_SEQUENCE pSequence = (PHB_SEQUENCE) hb_xgrab( sizeof( HB_SEQUENCE ) );
 
             /*
              * Create the SEQUENCE envelope
@@ -2055,7 +2055,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
 
             hb_vm_pSequence = hb_vm_pSequence->pPrev;
-            hb_xfree( pFree );
+            hb_xfree( (void *) pFree );
 
             w += lOffset;
             break;
