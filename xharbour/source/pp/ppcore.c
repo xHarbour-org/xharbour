@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.96 2003/11/11 02:38:53 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.97 2003/11/11 20:20:53 ronpinkas Exp $
  */
 
 /*
@@ -2726,7 +2726,7 @@ static int RemoveNotInstanciated( char * stroka )
   int lenres = strlen( stroka );
   char cLastChar = '\0';
 
-  HB_TRACE(HB_TR_DEBUG, ("RemoveNotInstanciated(%s)", stroka, bRemoveBrackets));
+  HB_TRACE(HB_TR_DEBUG, ("RemoveNotInstanciated(%s)", stroka));
 
   while( *ptr != '\0' )
   {
