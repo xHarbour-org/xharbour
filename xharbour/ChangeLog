@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1857 2003/12/12 10:16:02 druzus Exp $
+ * $Id: ChangeLog,v 1.1858 2003/12/12 15:04:35 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-12-12 21:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/w32/dir.cf
+  * xharbour/config/w32/install.cf
+    ! fixed small incompatibilities with MSYS
+
 2003-12-12 16:08 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbrdddbf.h
     * Reverted to original locking sckeme.
 
-2003-12-11 11:12 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+2003-12-12 11:12 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
     * some workaround for GCC3.x bug in optimization
 
