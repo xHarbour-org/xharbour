@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.33 2004/04/15 16:04:31 likewolf Exp $
+ * $Id: errorsys.prg,v 1.34 2004/05/21 00:02:59 ronpinkas Exp $
  */
 
 /*
@@ -154,9 +154,9 @@ STATIC FUNCTION DefError( oError )
          Endif
      Else
         If Empty( oError:osCode )
-           nChoice := Alert( cMessage )
+           nChoice := Alert( cMessage + ";" + oError:ProcName + "(" + LTrim( Str( oError:ProcLine() ) ) +  ") in module: " + oError:ModuleName )
         Else
-           nChoice := Alert( cMessage + ";" + cDOSError )
+           nChoice := Alert( cMessage + ";" + cDOSError + ";" + oError:ProcName + "(" + LTrim( Str( oError:ProcLine() ) ) +  ") in module: " + oError:ModuleName )
         Endif
      ENDIF
 
