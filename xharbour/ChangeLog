@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3665 2004/12/10 03:43:27 mlombardo Exp $
+ * $Id: ChangeLog,v 1.3667 2004/12/10 00:00:00 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-10 21:25 UTC-300 Eduardo Fernandes <modalsist@yahoo.com.br>
+
+  * utils/hbmake/hbmake.prg
+  * utils/hbmake/hbmutils.prg
+    ! hbct.lib, hbctmt.lib, hbtip.lib and hbtipmt were renamed to
+      ct.lib, ctmt.li tip.lib and tipmt.lib respectively, in accordance
+      with recent changes. Now these libs will be compiled together with
+      default libs and not with external libs. Please, recreate yours
+      *.bc makefiles to avoid errors.
 
 2004-12-11 11:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/winos.prg

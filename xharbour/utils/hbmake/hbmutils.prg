@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.36 2004/12/08 00:00:00 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.37 2004/12/10 00:00:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -498,8 +498,7 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
                       'dbfcdxmt' + cSuffix, ;
                       'macromt' + cSuffix,;
                       'codepage' + cSuffix,;
-                      'gtnul' + cSuffix,;
-                      'hbtip'+ cSuffix }
+                      'gtnul' + cSuffix }
 
    LOCAL aReturnLibs := {}
    LOCAL aLibs       := DIRECTORY( clibs )
@@ -537,8 +536,8 @@ FUNCTION GetLibs( lGcc, cDir )
                             { "Harbour Ole        library - HbOle"  , 'hbole' + IIF( lGcc, '.a', '.lib' ) + ' ole2' + IIF( lGcc, '.a', '.lib' ) }, ;
                             { "Harbour MySql      library - MySql"  , 'mysql' + IIF( lGcc, '.a', '.lib' )}, ;
                             { "Harbour PostGreSql library - hbpg"   , 'libhbpg' + IIF( lGcc, '.a', '.lib' )}, ;
-                            { "Harbour Samples    library - Samples", 'samples' + IIF( lGcc, '.a', '.lib' ) },;
-                            { "Harbour TIP        library - Hbtip"  , 'hbtip' + IIF( lGcc, '.a', '.lib' ) } }
+                            { "Harbour Samples    library - Samples", 'samples' + IIF( lGcc, '.a', '.lib' ) }  }
+                                                                                                           
 
    AEVAL( aInstaledLibs, { | x | AADD( aLibsDesc, { "User - " + padr(x,12) + " Library", x } ) } )
 
