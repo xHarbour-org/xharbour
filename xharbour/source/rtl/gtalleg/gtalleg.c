@@ -1,11 +1,6 @@
 /*
-<<<<<<< gtalleg.c
-* $Id: gtalleg.c,v 1.13 2004/02/01 23:09:34 jonnymind Exp $
-*/
-=======
- * $Id: gtalleg.c,v 1.13 2004/02/01 23:09:34 jonnymind Exp $
+ * $Id: gtalleg.c,v 1.14 2004/02/01 23:40:49 jonnymind Exp $
  */
->>>>>>> 1.12
 
 /*
 * xHarbour Project source code:
@@ -1668,7 +1663,7 @@ void HB_GT_FUNC(mouse_GetBounds( int *piTop, int *piLeft, int *piBottom, int *pi
 * GTInfo() implementation
 *
 */
-int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParm, void *vpParam ) )
+int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
 {
    int iOldValue;
    int iWidth, iHeight;
