@@ -1,5 +1,5 @@
 /*
- * $Id: gfx.ch,v 1.3 2004/08/02 21:05:49 lf_sfnet Exp $
+ * $Id: gfx.ch,v 1.4 2004/08/06 02:25:35 maurifull Exp $
  *
  */
 
@@ -76,9 +76,15 @@
  */
 
 /* Misc, internals */
-#define GFX_ACQUIRESCREEN   1  // Some GTs may require that you 'aqcuire' the screen before doing gfx things
-#define GFX_RELEASESCREEN   2  // Release a previouly 'aquired' screen
+#define GFX_ACQUIRESCREEN   1  // Some GTs may require that you 'acquire' the screen before doing gfx things
+#define GFX_RELEASESCREEN   2  // Release a previously 'acquired' screen
 #define GFX_MAKECOLOR       3  // Calculate gfx color number based on RGBA values
+/* Functions that affect drawing area */
+#define GFX_CLIPTOP        10
+#define GFX_CLIPLEFT       11
+#define GFX_CLIPBOTTOM     12
+#define GFX_CLIPRIGHT      13
+#define GFX_SETCLIP        14  // NOTE: set to 0, 0, 0, 0 to disable ;)
 /* Functions that affect drawing mode */
 #define GFX_DRAWINGMODE    20
 /* Drawing primitives */
@@ -106,6 +112,8 @@
 #translate GFXACQUIRESCREEN() => gfxPrimitive(GFX_ACQUIRESCREEN)
 #translate GFXRELEASESCREEN() => gfxPrimitive(GFX_RELEASESCREEN)
 #translate GFXMAKECOLOR(<nRed>, <nGreen>, <nBlue>[, <nAlpha>]) => gfxPrimitive(GFX_MAKECOLOR, <nRed>, <nGreen>, <nBlue>[, <nAlpha>])
+#translate GFXGETCLIP(<nTop>, <nLeft>, <nBottom>, <nRight>) => <nTop> := gfxPrimitive(GFX_CLIPTOP); <nLeft> := gfxPrimitive(GFX_CLIPLEFT); <nBottom> := gfxPrimitive(GFX_CLIPBOTTOM); <nRight> := gfxPrimitive(GFX_CLIPRIGHT)
+#translate GFXSETCLIP(<nTop>, <nLeft>, <nBottom>, <nRight>) => gfxPrimitive(GFX_SETCLIP, <nTop>, <nLeft>, <nBottom>, <nRight>)
 #translate GFXDRAWINGMODE([<nMode>]) => gfxPrimitive(GFX_DRAWINGMODE[, <nMode>])
 #translate GFXGETPIXEL(<nY>, <nX>) => gfxPrimitive(GFX_GETPIXEL, <nY>, <nX>)
 #translate GFXPUTPIXEL(<nY>, <nX>, <nColor>) => gfxPrimitive(GFX_PUTPIXEL, <nY>, <nX>, <nColor>)

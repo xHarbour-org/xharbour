@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.33 2004/10/24 09:32:02 oh1 Exp $
+ * $Id: gtalleg.c,v 1.34 2004/11/25 05:11:57 guerra000 Exp $
  */
 
 /*
@@ -70,6 +70,8 @@ static BYTE s_byMSButtons;
 static USHORT s_usScrWidth = 80, s_usScrHeight = 25;
 static USHORT s_usGFXWidth = 0, s_usGFXHeight = 0;
 static USHORT s_usUpdTop, s_usUpdLeft, s_usUpdBottom, s_usUpdRight;
+static USHORT s_usGFXUpdTop, s_usGFXUpdLeft, s_usGFXUpdBottom, s_usGFXUpdRight;
+static int s_iCTop, s_iCLeft, s_iCBottom, s_iCRight;
 static USHORT s_usDispCount, s_usCursorStyle;
 static SHORT s_sCurCol, s_sCurRow;
 static BYTE * s_pbyScrBuffer = NULL;
@@ -170,6 +172,7 @@ static const gtAllegKey sCtrlTable[GT_CTRL_TABLE_SIZE] = {
 #define _GetScreenWidth()   (s_usScrWidth)
 
 #define GT_UPD_RECT(t,l,b,r) if (t<s_usUpdTop) s_usUpdTop=t; if (l<s_usUpdLeft) s_usUpdLeft=l; if (b>s_usUpdBottom) s_usUpdBottom=b; if (r>s_usUpdRight) s_usUpdRight=r;
+#define GT_UPD_GFXRECT(t,l,b,r) if (t<s_usGFXUpdTop) s_usGFXUpdTop=t; if (l<s_usGFXUpdLeft) s_usGFXUpdLeft=l; if (b>s_usGFXUpdBottom) s_usGFXUpdBottom=b; if (r>s_usGFXUpdRight) s_usGFXUpdRight=r;
 #define MK_GT8BCOLOR(n) (n & 0xFF) / 16 | (n & 0xFF00) / 256
 
 /*
@@ -402,6 +405,20 @@ static void HB_GT_FUNC(gt_ScreenUpdate( void ))
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ScreenUpdate()"));
 #endif
 
+   if ( s_usDispCount == 0 && s_usGFXUpdTop <= s_usGFXUpdBottom && s_usGFXUpdLeft <= s_usGFXUpdRight )
+   {
+      al_acquire_screen();
+      al_scare_mouse_area(s_usGFXUpdLeft, s_usGFXUpdTop, s_usGFXUpdRight, s_usGFXUpdBottom);
+      al_blit(bmp, al_screen, s_usGFXUpdLeft, s_usGFXUpdTop, s_usGFXUpdLeft, s_usGFXUpdTop, s_usGFXUpdRight - s_usGFXUpdLeft + 1, s_usGFXUpdBottom - s_usGFXUpdTop + 1);
+      al_release_screen();
+      al_unscare_mouse();
+
+      s_usGFXUpdTop = s_usScrHeight;
+      s_usGFXUpdLeft = s_usScrWidth;
+      s_usGFXUpdBottom = 0;
+      s_usGFXUpdRight = 0;
+   }
+
    if ( s_usDispCount == 0 && s_usUpdTop <= s_usUpdBottom && s_usUpdLeft <= s_usUpdRight )
    {
       al_acquire_bitmap( bmp );
@@ -540,6 +557,11 @@ void HB_GT_FUNC(gt_DispBegin( void ))
       HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
+   if ( s_usDispCount == 0 )
+   {
+      al_acquire_bitmap(bmp);
+   }
+
    s_usDispCount++;
 }
 
@@ -559,6 +581,7 @@ void HB_GT_FUNC(gt_DispEnd( void ))
       s_usDispCount--;
       if ( s_usDispCount == 0 )
       {
+         al_release_bitmap(bmp);
          HB_GT_FUNC(gt_ScreenUpdate());
       }
    }
@@ -1237,6 +1260,14 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       s_usUpdLeft = _GetScreenWidth();
       s_usUpdBottom = 0;
       s_usUpdRight = 0;
+      s_usGFXUpdTop = s_usScrHeight;
+      s_usGFXUpdLeft = s_usScrWidth;
+      s_usGFXUpdBottom = 0;
+      s_usGFXUpdRight = 0;
+      s_iCTop = 0;
+      s_iCLeft = 0;
+      s_iCBottom = AL_SCREEN_H - 1;
+      s_iCRight = AL_SCREEN_W - 1;
       s_sCurCol = 0;
       s_sCurRow = 0;
       s_usDispCount = 0;
@@ -1259,6 +1290,11 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       s_pClr[15] = al_make_color(0xFF, 0xFF, 0xFF);  // bright white
 
       bmp = al_create_system_bitmap(AL_SCREEN_W, AL_SCREEN_H);
+      if ( bmp == NULL )
+      {
+         bmp = al_create_bitmap(AL_SCREEN_W, AL_SCREEN_H);
+      }
+
       if ( lClearInit )
       {
          s_pbyScrBuffer = (BYTE *) hb_xgrab( _GetScreenWidth() * _GetScreenHeight() * 2 );
@@ -1267,11 +1303,6 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       {
          al_clear_to_color( bmp, s_pClr[s_pbyScrBuffer[1] >> 4] );
          al_clear_to_color( al_screen, s_pClr[s_pbyScrBuffer[1] >> 4] );
-      }
-
-      if ( bmp == NULL )
-      {
-         bmp = al_create_bitmap(AL_SCREEN_W, AL_SCREEN_H);
       }
 
       hb_xfree( pFileName );
@@ -1472,7 +1503,7 @@ USHORT HB_GT_FUNC(gt_HorizLine( SHORT sRow, SHORT sLeft, SHORT sRight, BYTE byCh
 
       if ( sRight >= sLeft )
       {
-         HB_GT_FUNC(gt_Replicate((USHORT) sRow, (USHORT) sLeft, byAttr, byChar, sRight - sLeft));
+         HB_GT_FUNC(gt_Replicate((USHORT) sRow, (USHORT) sLeft, byAttr, byChar, sRight - sLeft + 1));
          usRet = 0;
       }
    }
@@ -1946,6 +1977,7 @@ void HB_GT_FUNC( gt_ProcessMessages( void ) )
 
 int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
 {
+AL_BITMAP *dst;
 
 #ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_gfxPrimitive(%d, %d, %d, %d, %d, %d)", iType, iTop, iLeft, iBottom, iRight, iColor));
@@ -1956,70 +1988,120 @@ int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, in
       HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
+   dst = s_usDispCount == 0 ? al_screen : bmp;
+
    switch (iType)
    {
       case GFX_ACQUIRESCREEN:
+        if ( s_usDispCount )
+        {
+           al_acquire_bitmap(bmp);
+        } else
+        {
+           al_acquire_screen();
+        }
         return 1;
       case GFX_RELEASESCREEN:
+        if ( s_usDispCount )
+        {
+           al_release_bitmap(bmp);
+        } else
+        {
+           al_release_screen();
+        }
         return 1;
       case GFX_MAKECOLOR:
         return al_make_color(iTop, iLeft, iBottom);
+      case GFX_CLIPTOP:
+        return s_iCTop;
+      case GFX_CLIPLEFT:
+        return s_iCLeft;
+      case GFX_CLIPBOTTOM:
+        return s_iCBottom;
+      case GFX_CLIPRIGHT:
+        return s_iCRight;
+      case GFX_SETCLIP:
+        al_set_clip(dst, iLeft, iTop, iRight, iBottom);
+        s_iCTop = iTop;
+        s_iCLeft = iLeft;
+        s_iCBottom = iBottom;
+        s_iCRight = iRight;
+        return 1;
       case GFX_DRAWINGMODE:
         return GFX_MODE_SOLID;
       case GFX_GETPIXEL:
-        return al_get_pixel(al_screen, iLeft, iTop);
+        return al_get_pixel(dst, iLeft, iTop);
       case GFX_PUTPIXEL:
-        al_put_pixel(al_screen, iLeft, iTop, iBottom);
+        al_put_pixel(dst, iLeft, iTop, iBottom);
+        if ( s_usDispCount > 0 )
+        {
+           GT_UPD_GFXRECT(iTop,iLeft,iTop,iLeft);
+        }
         return 1;
       case GFX_LINE:
-        al_scare_mouse_area( iLeft, iTop, iBottom, iRight );
+        if ( s_usDispCount == 0 )
+          al_scare_mouse_area( iLeft, iTop, iBottom, iRight );
         if ( iLeft == iRight )
         {
-           al_draw_vline(al_screen, iLeft, iTop, iBottom, iColor);
+           al_draw_vline(dst, iLeft, iTop, iBottom, iColor);
         }
         else if ( iTop == iBottom )
         {
-           al_draw_hline(al_screen, iLeft, iTop, iRight, iColor);
+           al_draw_hline(dst, iLeft, iTop, iRight, iColor);
         }
         else
         {
-           al_draw_line(al_screen, iLeft, iTop, iRight, iBottom, iColor);
+           al_draw_line(dst, iLeft, iTop, iRight, iBottom, iColor);
         }
+        if ( s_usDispCount > 0 )
+        {
+           GT_UPD_GFXRECT(iTop,iLeft,iBottom,iRight);
+        } else
         al_unscare_mouse();
         return 1;
       case GFX_RECT:
-        al_scare_mouse_area( iLeft, iTop, iBottom, iRight );
-        al_draw_rect(al_screen, iLeft, iTop, iRight, iBottom, iColor);
+        if ( s_usDispCount == 0 )
+          al_scare_mouse_area( iLeft, iTop, iBottom, iRight );
+        al_draw_rect(dst, iLeft, iTop, iRight, iBottom, iColor);
+        if ( s_usDispCount > 0 )
+        {
+           GT_UPD_GFXRECT(iTop,iLeft,iBottom,iRight);
+        } else
         al_unscare_mouse();
         return 1;
       case GFX_FILLEDRECT:
-        al_scare_mouse_area( iLeft, iTop, iBottom, iRight );
-        al_draw_rect_fill(al_screen, iLeft, iTop, iRight, iBottom, iColor);
+        if ( s_usDispCount == 0 )
+          al_scare_mouse_area( iLeft, iTop, iBottom, iRight );
+        al_draw_rect_fill(dst, iLeft, iTop, iRight, iBottom, iColor);
+        if ( s_usDispCount > 0 )
+        {
+           GT_UPD_GFXRECT(iTop,iLeft,iBottom,iRight);
+        } else
         al_unscare_mouse();
         return 1;
       case GFX_CIRCLE:
         al_scare_mouse_area( iLeft - iBottom, iTop - iBottom, iLeft + iBottom, iTop + iBottom );
-        al_draw_circle(al_screen, iLeft, iTop, iBottom, iRight);
+        al_draw_circle(dst, iLeft, iTop, iBottom, iRight);
         al_unscare_mouse();
         return 1;
       case GFX_FILLEDCIRCLE:
         al_scare_mouse_area( iLeft - iBottom, iTop - iBottom, iLeft + iBottom, iTop + iBottom );
-        al_draw_circle_fill(al_screen, iLeft, iTop, iBottom, iRight);
+        al_draw_circle_fill(dst, iLeft, iTop, iBottom, iRight);
         al_unscare_mouse();
         return 1;
       case GFX_ELLIPSE:
         al_scare_mouse_area( iLeft - iRight, iTop - iBottom, iLeft + iRight, iTop + iBottom );
-        al_draw_ellipse(al_screen, iLeft, iTop, iRight, iBottom, iColor);
+        al_draw_ellipse(dst, iLeft, iTop, iRight, iBottom, iColor);
         al_unscare_mouse();
         return 1;
       case GFX_FILLEDELLIPSE:
         al_scare_mouse_area( iLeft - iRight, iTop - iBottom, iLeft + iRight, iTop + iBottom );
-        al_draw_ellipse_fill(al_screen, iLeft, iTop, iRight, iBottom, iColor);
+        al_draw_ellipse_fill(dst, iLeft, iTop, iRight, iBottom, iColor);
         al_unscare_mouse();
         return 1;
       case GFX_FLOODFILL:
         al_scare_mouse();
-        al_floodfill(al_screen, iLeft, iTop, iBottom);
+        al_floodfill(dst, iLeft, iTop, iBottom);
         al_unscare_mouse();
         return 1;
    }
@@ -2029,6 +2111,8 @@ int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, in
 
 void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) )
 {
+AL_BITMAP *dst;
+int iBottom, iRight;
 
    HB_SYMBOL_UNUSED( iWidth );
 
@@ -2036,6 +2120,22 @@ void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iS
    {
       ssfSetFontSize( ssfDefaultFont, (unsigned short) iSize);
    }
+
+   dst = s_usDispCount == 0 ? al_screen : bmp;
+   
+   iRight = iLeft + strlen(cBuf) * ( iSize > 0 ? iSize / 2 : ssfDefaultFont->fsize / 2 ) - 1;
+   iBottom = iTop + ( iSize > 0 ? iSize : ssfDefaultFont->fsize ) - 1;
+
+   if ( s_usDispCount == 0 )
+     al_scare_mouse_area( iLeft, iTop, iBottom, iRight );
+   
+   ssfDrawText( dst, ssfDefaultFont, cBuf, iLeft, iTop, iColor );
+   
+   if ( s_usDispCount > 0 )
+   {
+      GT_UPD_GFXRECT(iTop,iLeft,iBottom,iRight);
+   } else
+     al_unscare_mouse();
 
    ssfDrawText( al_screen, ssfDefaultFont, cBuf, iLeft, iTop, iColor );
 
