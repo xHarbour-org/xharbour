@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.47 2002/12/28 22:12:55 lculik Exp $
+ * $Id: ChangeLog,v 1.48 2002/12/29 11:30:43 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,73 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-11 21:14 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+   * source/_winclpb.c 
+      ! GETCLIPBOARDFORMATNAME
+        removed unused cchMaxCount
+   * source/_windll.c 
+      ! CALLDLL
+        removed unused float  FltParms[15];
+   * source/_wininet.c 
+      ! FTPCOMMAND
+        phFtpCommand  should be an HINTERNET, not a pointer.
+   * source/_winhead.c 
+      ! HEADER_GETITEM
+        hdi should be an HDITEM, not a pointer to it.
+   * source/_winmenu.c 
+      ! added cast in call to GetMenuItemInfo
+   * source/_winlv.c 
+      ! LISTVIEWNOTIFY
+        commented out unused szString decl
+   * source/_winsys.c 
+      ! GETUSERNAME
+        nSize is a DWORD, not a pointer.
+      ! GETVERSIONEX
+        msvc didn't like the OSVERSIONEX* cast
+   * source/_winsock.c
+      + added #define _WINSOCKAPI_
+      ! This prevents the inclusion of Winsock.h in Windows.h
+      ! since Winsock2.h is already being included further down
+      ! the list.
+      ! RECVFROM
+        _retni() was being called twice.  It appears to me that
+        the intent was to return the result of recvfrom()
+      ! SETSOCKOPT
+        commented out unused s
+      ! WSASTARTUP
+        WSAData should be a WSADATA, not a pointer
+      ! WSAACCEPT
+        commented out unused s 
+   * source/_winmous.c 
+     ! GETCURSORINFO
+      pci should be a CURSORINFO, not a pointer.
+   * source/_winwnd.c 
+     ! GETTITLEBARINFO
+       pti should be a TITLEBARINFO, not a pointer.
+   * source/_winshell.c 
+     ! DRAGQUERYPOINT
+       lpPoint should actually be a POINT, not a pointer.
+   * source/wincore.prg 
+     ! Changed Otherwise: to Default:
+   * source/_winicon.c 
+     ! GETICONINFO
+       ii should be an ICONINFO, not a pointer.
+     ! EXTRACTASSOCIATEDICON
+       lpilcon should be a WORD not a pointer to one.
+   * source/_windlg.c 
+     ! MAPDIALOGRECT
+       lpRect is only a pointer to a RECT.  It is being used
+       as if it IS a RECT.  Changed into a rect, and passed
+       address to MapDialogRect
+   * source/_winbmp.c 
+     ! CreateDIBSection()
+       VOID ** ppBits -> VOID ** ppBits = (VOID **)0;
+       to remove 'use before initialise' warning
+   * makefile.nt 
+   * makefile.vc 
+   * make_vc.bat 
+     ! Now compiles with MSVC
 
 2002-12-29 17:00 UTC+05:30 Pritpal Bedi <vouch32@vouchcac.com>
    * contrib/what32/source/_winreg.c
