@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.373 2002/09/05 21:51:44 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.374 2002/09/06 00:26:53 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-09-06 17:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  Following changes are for new math error handler borrowed from Harbour:
+  ( in order to enable xHarbour users to use functions in libct.lib )
+  * source/vm/itemapi.c ( hb_itemPutNDLen, hb_itemStr )
+    2002-07-07 22:40 UTC+0100 Martin Vogel <vogel@inttec.de>
+       * source/vm/itemapi.c
+         * bug fix: app compiled with BCC crashed if hb_itemPutNDLen was called with a "NaN" double
+         * BCC checks for infinity added in hb_itemStr
+         * possible bug fixed: math handler has not been switched off before using log(0) in hb_itemStr
+  * source/rtl/math.c
+  * include/hbmath.h
+  * tests/mathtest.prg
+  + include/math.ch
+
+  BCC hbtest.exe increased from 107 to 108 because of :
+
+  ? str(log(-1))
+
+     Previously: "***********************"
+            Now: "*********************************************************************************************"
+
+  !!-- IMPORTANT NOTE --!!
+  !!! Synchronization was tested on BCC and MSVC only !!!
 
 2002-09-05 21:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
    * contrib/rdd_ads/ads1.c
