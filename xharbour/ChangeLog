@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3529 2004/10/23 15:59:06 paultucker Exp $
+ * $Id: ChangeLog,v 1.3530 2004/10/23 19:26:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,43 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-10-23 23:00 UTC+0200 Henryk Olkowski <oh1@op.pl>
+  + source/ct/ctwin.c
+  - source/ct/ctwin.prg ( --> source/ct/alt/ctwin.prg )
+  + source/ct/setclear.c
+  * source/include/ctwin.h
+  * source/include/hbapigt.h
+  * source/source/rtl/console.c
+  * source/source/rtl/gtapi.c
+  * source/source/rtl/maxrow.c
+  * source/source/rtl/setpos.c
+  + source/tests/cttest/wmove.prg
+
+    * replaced CT3 Windows API ( source/ct/ctwin.prg --> source/rtl/gtapi.c )
+       added new functions hb_ct***()
+       modified function hb_gt***()
+
+    + added CLEARWIN() function
+    + added GETCLEARA() function
+    + added GETCLEARB() function
+    + added SETCLEARA() function
+    + added SETCLEARB() function
+    + added cttest/wmove.prg - test WMOVE(), WBOARD(), WSETSHADOW()
+
+  * makefile.bc
+  * makefile.nt
+  * makefile.vc
+  * makefile.wc
+  * source/ct/Makefile
+
+    - removed source/ct/ctwin.prg
+    + added source/ct/ctwin.c
+    + added source/ct/setclear.c
+    + added missing source/ct/pack.c
+
+  * source/source/rtl/gtwin/gtwin.c
+
+    * replaced fpBlank value ( ' ' --> hb_ctGetClearB() )
 
 2004-10-23 12:25 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/compiler/calconst.c
