@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwtcmd.ch,v 1.5 2003/08/29 18:28:30 lculik Exp $
+   $Id: xwtcmd.ch,v 1.6 2003/08/30 10:01:17 jonnymind Exp $
 
    Definitions
 */
@@ -20,6 +20,10 @@
           [ SIZE <nWidth>,<nHeigth> ] ;
           [ PADDING <nPadding>] [BORDER <nBorder> ];
           [ OF <oParent> ] => <oLayout> := XWTLayout():New( <nMode>, <nWidth>, <nHeigth>, <nPadding>, <nBorder>,  <oParent> )
+
+#xcommand DEFINE WINDOW <oWindow> [ TITLE <cTitle>] [ MENU <aMenus> ];
+          => <oWindow> := XWTFrameWindow():New( <cTitle>, <aMenus> )
+
 
 
 // Button ----------------------------------------------------------------------

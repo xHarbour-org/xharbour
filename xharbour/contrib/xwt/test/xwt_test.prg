@@ -18,9 +18,8 @@ PROCEDURE MAIN()
    XwtInit()
 
    /*** Window creation ****/
-   oWindow:= XwtFrameWindow():New("Hola Mundo. Thefull desde Linux")
+   DEFINE WINDOW oWindow TITLE "New FrameWindow from XWT" MENU BuildMenu()
    oWindow:AddEventListener( XWT_E_DESTROY_REQ, @XwtQuit() )
-   oWindow:SetMenuBar( BuildMenu() )
 
 
    /*** Splitter panes layout( our new main widget) ***/
@@ -122,8 +121,7 @@ PROCEDURE MAIN()
    oList:SetColumnEditable( 0 )
    oVLay:Add( oList )
 
-   //oWindow:SetMenuBar( BuildMenu() )
-
+   
    /*** Showing window ***/
    oWindow:Resize( 200, 200 )
    oWindow:Show()
