@@ -127,7 +127,7 @@ HB_FUNC( DESCRIBEPIXELFORMAT )
                                   ) ) ;
     if ( ISBYREF(3) )
        hb_storclen( (char*) &pfd, sizeof(PIXELFORMATDESCRIPTOR), 3 ) ;
-    //hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) pfd , sizeof( PIXELFORMATDESCRIPTOR ) );
+    //hb_itemPutCRaw( hb_param( -1, HB_IT_ANY ), (char *) pfd , sizeof( PIXELFORMATDESCRIPTOR ) );
 
 }
 

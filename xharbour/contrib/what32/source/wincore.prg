@@ -33,13 +33,13 @@ GLOBAL hThisInstance
 *-----------------------------------------------------------------------------*
 
 INIT PROCEDURE _CheckMultiInst
-   
+
 
    lPrevInstance:=(empty(CreateMutex( , .T., strtran(GetModuleFileName(),'\','_') )) ;
                    .or. (GetLastError() > 0) )
-                   
+
    hThisInstance:=_getinstance()
-   
+
    RETURN
 
 *-----------------------------------------------------------------------------*
@@ -291,8 +291,8 @@ Function _ProcessMsg( hWnd, nMsg, nwParam, nlParam, nIndex )
       ElseIf nType == WT_MDIFRAME
          nRet := DefFrameProc( hWnd, nMsg, nwParam, nlParam )
       ElseIf nType == WT_DIALOG
-         nRet := DefDlgProc( hWnd, nMsg, nwParam, nlParam ) 
-      Else  //WT_WINDOW 
+         nRet := DefDlgProc( hWnd, nMsg, nwParam, nlParam )
+      Else  //WT_WINDOW
          nRet := DefWindowProc( hWnd, nMsg, nwParam, nlParam )
       EndIf
    Else
@@ -409,7 +409,7 @@ Function DialogBox( hInst, acnDlg, hWnd, bAction, oObj, xCargo )
 
    Return( nResult )
 
-   
+
 
 *-----------------------------------------------------------------------------*
 // internal to access setting dialog procedures as codeblocks
@@ -725,7 +725,6 @@ Function isDialogMessage( hDlg, cMsg )
 #include "hbstack.h"
 #include "hbapiitm.h"
 
-
 LRESULT CALLBACK __WndProc   (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) ;
 LRESULT CALLBACK __WndProc2  (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) ;
 LRESULT CALLBACK __WndProc3  (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) ;
@@ -850,8 +849,8 @@ LRESULT CALLBACK __WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
       hb_vmPushLong( (LONG ) lParam );
       hb_vmPushLong( 1 );
       hb_vmDo( 5 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( hb_param( -1, HB_IT_ANY ) );
+
       return res;
    }
    else // shouldn't happen
@@ -878,8 +877,8 @@ LRESULT CALLBACK __WndProc2 (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
       hb_vmPushLong( (LONG ) lParam );
       hb_vmPushLong( 2 );
       hb_vmDo( 5 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( hb_param( -1, HB_IT_ANY ) );
+
       return res;
    }
    else // shouldn't happen
@@ -906,8 +905,8 @@ LRESULT CALLBACK __WndProc3 (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
       hb_vmPushLong( (LONG ) lParam );
       hb_vmPushLong( 3 );
       hb_vmDo( 5 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( hb_param( -1, HB_IT_ANY ) );
+
       return res;
    }
    else // shouldn't happen
@@ -934,8 +933,8 @@ LRESULT CALLBACK __WndProc4 (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
       hb_vmPushLong( (LONG ) lParam );
       hb_vmPushLong( 4 );
       hb_vmDo( 5 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( hb_param( -1, HB_IT_ANY ) );
+
       return res;
    }
    else // shouldn't happen
@@ -962,8 +961,8 @@ LRESULT CALLBACK __WndProc5 (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
       hb_vmPushLong( (LONG ) lParam );
       hb_vmPushLong( 5 );
       hb_vmDo( 5 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( hb_param( -1, HB_IT_ANY ) );
+
       return res;
    }
    else // shouldn't happen
@@ -989,8 +988,8 @@ LRESULT CALLBACK __WndProc6 (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
       hb_vmPushLong( (LONG ) lParam );
       hb_vmPushLong( 6 );
       hb_vmDo( 5 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( hb_param( -1, HB_IT_ANY ) );
+
       return res;
    }
    else // shouldn't happen
@@ -1017,8 +1016,8 @@ LRESULT CALLBACK __WndProc7 (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
       hb_vmPushLong( (LONG ) lParam );
       hb_vmPushLong( 7 );
       hb_vmDo( 5 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( hb_param( -1, HB_IT_ANY ) );
+
       return res;
    }
    else // shouldn't happen
@@ -1045,8 +1044,8 @@ LRESULT CALLBACK __WndProc8 (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
       hb_vmPushLong( (LONG ) lParam );
       hb_vmPushLong( 8 );
       hb_vmDo( 5 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( hb_param( -1, HB_IT_ANY ) );
+
       return res;
    }
    else // shouldn't happen
@@ -1073,8 +1072,8 @@ LRESULT CALLBACK __WndProc9 (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
       hb_vmPushLong( (LONG ) lParam );
       hb_vmPushLong( 9 );
       hb_vmDo( 5 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( hb_param( -1, HB_IT_ANY ) );
+
       return res;
    }
    else // shouldn't happen
@@ -1101,8 +1100,8 @@ LRESULT CALLBACK __WndProc10 (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
       hb_vmPushLong( (LONG ) lParam );
       hb_vmPushLong( 10 );
       hb_vmDo( 5 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( hb_param( -1, HB_IT_ANY ) );
+
       return res;
    }
    else // shouldn't happen
@@ -1162,9 +1161,9 @@ HB_FUNC (GETWNDPROC )
     default:
       hb_retnl( (ULONG) 0 ) ;
       return ;
-    
+
   }
-    
+
 }
 
 
@@ -1194,8 +1193,8 @@ BOOL CALLBACK __DlgProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       hb_vmPushLong( (LONG ) wParam );
       hb_vmPushLong( (LONG ) lParam );
       hb_vmDo( 4 );
-      res = hb_itemGetNL( (PHB_ITEM) &hb_stack.Return );
-    
+      res = hb_itemGetNL( hb_param( -1, HB_IT_ANY ) );
+
       return res;
    }
    else // shouldn't happen
@@ -1215,7 +1214,7 @@ HB_FUNC ( _DIALOGBOX )
                        (ISNIL(3) ?  NULL : (HWND) hb_parnl(3) )        ,
                        (DLGPROC) hb_parnl(4)
                      ));
-    
+
 }
 
 
@@ -1274,11 +1273,11 @@ HB_FUNC ( _MAKEDLGTEMPLATE )
    // Parameters: 12 arrays
    // 1 for DLG template
    // 11 for item properties
-   
+
    pdlgtemplate = p = (PWORD) LocalAlloc (LPTR, 65534)  ; // 64k allow to build up to 255 items on the dialog
 
    //---------------
-    
+
     lStyle = hb_parnl(1,3) ;
 
     // start to fill in the dlgtemplate information.  addressing by WORDs
@@ -1328,7 +1327,7 @@ HB_FUNC ( _MAKEDLGTEMPLATE )
 
       // make sure each item starts on a DWORD boundary
       p = lpwAlign (p) ;
- 
+
 
       *p++ = LOWORD ( hb_parnl(2,i) ) ;    // help id
       *p++ = HIWORD ( hb_parnl(2,i) ) ;
@@ -1356,7 +1355,7 @@ HB_FUNC ( _MAKEDLGTEMPLATE )
          *p++ = 0xFFFF ;
          *p++ = (WORD) hb_parni(10,i) ;
          }
-         
+
       if ( hb_parinfa(11,i) == HB_IT_STRING ) {
          nchar = nCopyAnsiToWideChar(p, (LPSTR) hb_parc(11,i) ) ;  // text
          p += nchar ;
@@ -1366,7 +1365,7 @@ HB_FUNC ( _MAKEDLGTEMPLATE )
          *p++ = 0xFFFF ;
          *p++ = (WORD) hb_parni(11,i) ;
          }
-   
+
 
       *p++ = 0x00 ;  // extras ( in array 12 )
 
@@ -1374,11 +1373,11 @@ HB_FUNC ( _MAKEDLGTEMPLATE )
     } ;
     p = lpwAlign (p)  ;
 
-    
+
     hb_retclen( (LPSTR) pdlgtemplate, ( (ULONG) p - (ULONG) pdlgtemplate ) ) ;
 
     LocalFree (LocalHandle (pdlgtemplate) ) ;
-           
+
 }
 
 #pragma ENDDUMP

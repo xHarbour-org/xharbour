@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1939 2003/12/23 21:01:20 maurifull Exp $
+ * $Id: ChangeLog,v 1.1940 2003/12/23 22:52:47 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-23 16:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * contrib/what32/source/_windraw.c
+  * contrib/what32/source/_winfont.c
+  * contrib/what32/source/_wingdi.c
+  * contrib/what32/source/_winhead.c
+  * contrib/what32/source/_winlv.c
+  * contrib/what32/source/_winmisc.c
+  * contrib/what32/source/_winscrlb.c
+  * contrib/what32/source/_winsock.c
+  * contrib/what32/source/whatutil.prg
+  * contrib/what32/source/wincore.prg
+    * Replaced direct access to hb_stack with API access.
+    * Minor corrections.
 
 2003-12-23 23:48 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/config/w32/mingw32.cf

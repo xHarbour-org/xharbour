@@ -573,7 +573,7 @@ HB_FUNC( GETCLASSINFO )
      hb_retclen( (char*) &WndClass, sizeof(WNDCLASS) ) ;
 
    // the line below GPFs !
-   // hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) &WndClass, sizeof( WNDCLASS ) );
+   // hb_itemPutCRaw( hb_param( -1, HB_IT_ANY ), (char *) &WndClass, sizeof( WNDCLASS ) );
 
 }
 
@@ -595,7 +595,7 @@ HB_FUNC( GETCLASSINFOEX )
                             (LPCSTR) hb_parc( 2 ), &WndClassEx ) )
 
       hb_retclen( (char*) &WndClassEx, sizeof(WNDCLASSEX) ) ;
-      //hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) &WndClassEx, sizeof( WNDCLASSEX ) );
+      //hb_itemPutCRaw( hb_param( -1, HB_IT_ANY ), (char *) &WndClassEx, sizeof( WNDCLASSEX ) );
 
 }
 

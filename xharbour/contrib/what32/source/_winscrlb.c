@@ -129,7 +129,7 @@ HB_FUNC( GETSCROLLINFO )
       hb_retclen( (char *) &si, sizeof( SCROLLINFO ) );
 
       // problem
-      //hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) &si, sizeof( SCROLLINFO ) );
+      //hb_itemPutCRaw( hb_param( -1, HB_IT_ANY ), (char *) &si, sizeof( SCROLLINFO ) );
 
 }
 
@@ -150,7 +150,7 @@ HB_FUNC( GETSCROLLBARINFO )
        hb_retclen( (char *) &sbi, sizeof( SCROLLBARINFO ) );
 
      // problem
-     // hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) &sbi, sizeof( SCROLLBARINFO ) );
+     // hb_itemPutCRaw( hb_param( -1, HB_IT_ANY ), (char *) &sbi, sizeof( SCROLLBARINFO ) );
 }
 
 #endif

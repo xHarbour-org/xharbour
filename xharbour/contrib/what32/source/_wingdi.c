@@ -663,7 +663,7 @@ HB_FUNC( GETRASTERIZERCAPS )
 
    if( GetRasterizerCaps( lprs, (UINT) hb_parni( 2 ) ) )
        hb_retclen( (char*) lprs, sizeof(RASTERIZER_STATUS) ) ;
-   //hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) lprs, sizeof(RASTERIZER_STATUS ) );
+   //hb_itemPutCRaw( hb_param( -1, HB_IT_ANY ), (char *) lprs, sizeof(RASTERIZER_STATUS ) );
 
 }
 

@@ -84,7 +84,7 @@ HB_FUNC( HEADER_GETITEM )
    BOOL lRet = Header_GetItem( (HWND) hb_parnl(1), hb_parni(2), &hdi ) ;
    if ( lRet )
        hb_retclen( (char*) &hdi, sizeof(HDITEM) ) ;
-      //hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) hdi, sizeof( HDITEM ) );
+      //hb_itemPutCRaw( hb_param( -1, HB_IT_ANY ), (char *) hdi, sizeof( HDITEM ) );
 
 }
 

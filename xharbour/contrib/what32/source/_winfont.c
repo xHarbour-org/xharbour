@@ -234,7 +234,7 @@ int CALLBACK GenericCallbackProc( LONG param1, LONG param2, int wParam, LPARAM l
       hb_vmPushLong( (LONG ) wParam );
       hb_vmPushLong( (LONG ) lParam );
       hb_vmDo( 4 );
-      res = hb_itemGetNL( (PHB_ITEM) &HB_VM_STACK.Return );
+      res = hb_itemGetNL( (PHB_ITEM) hb_param( -1, HB_IT_ANY ) );
 
       return res;
    }
@@ -248,31 +248,38 @@ int CALLBACK GenericCallbackProc( LONG param1, LONG param2, int wParam, LPARAM l
 //-----------------------------------------------------------------------------
 
 // using a codeblock
-
 int CALLBACK GenericCallblockProc( LONG param1, LONG param2, int wParam, LPARAM lParam )
 {
-
    PHB_ITEM pItem ;
    long int res   ;
+   static PHB_DYNS s_pEval = NULL;
+
+   if( s_pEval == NULL )
+   {
+      s_pEval = hb_dynsymFind( "__EVAL" );
+   }
 
    pItem = (PHB_ITEM ) lParam ;
 
    if ( pItem )
    {
-      hb_vmPushSymbol( &hb_symEval );
+      hb_vmPushSymbol( s_pEval->pSymbol );
       hb_vmPush(pItem);
+
       hb_vmPushLong( (LONG ) param1 );
       hb_vmPushLong( (LONG ) param2 );
       hb_vmPushLong( (LONG ) wParam );
       hb_vmPushLong( (LONG ) lParam );
+
       hb_vmSend( 4 );
-      res = hb_itemGetNL( (PHB_ITEM) &HB_VM_STACK.Return );
+      res = hb_itemGetNL( (PHB_ITEM) hb_param( -1, HB_IT_ANY ) );
 
       return res;
    }
    else // shouldn't happen
+   {
       return( 0 );
-
+   }
 }
 
 //-----------------------------------------------------------------------------

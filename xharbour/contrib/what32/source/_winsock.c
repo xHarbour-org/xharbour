@@ -772,7 +772,7 @@ int _stdcall _WSACondFunc( LPWSABUF lpCallerId,  LPWSABUF lpCallerData, LPQOS lp
       hb_vmPushLong( (LONG ) g );
 
       hb_vmDo(7) ;
-      res = hb_itemGetNI( (PHB_ITEM) &HB_VM_STACK.Return );
+      res = hb_itemGetNI( (PHB_ITEM) hb_param( -1, HB_IT_ANY ) );
 
    }
    return res ;

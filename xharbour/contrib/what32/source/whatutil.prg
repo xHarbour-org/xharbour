@@ -16,38 +16,38 @@
 pragma pack(4)
 
 typedef struct tagLOGFONT { ;
-   LONG lfHeight; 
-   LONG lfWidth; 
-   LONG lfEscapement; 
-   LONG lfOrientation; 
-   LONG lfWeight; 
-   BYTE lfItalic; 
-   BYTE lfUnderline; 
-   BYTE lfStrikeOut; 
-   BYTE lfCharSet; 
-   BYTE lfOutPrecision; 
-   BYTE lfClipPrecision; 
-   BYTE lfQuality; 
-   BYTE lfPitchAndFamily; 
-   TCHAR lfFaceName[32]; 
-} LOGFONT; 
+   LONG lfHeight;
+   LONG lfWidth;
+   LONG lfEscapement;
+   LONG lfOrientation;
+   LONG lfWeight;
+   BYTE lfItalic;
+   BYTE lfUnderline;
+   BYTE lfStrikeOut;
+   BYTE lfCharSet;
+   BYTE lfOutPrecision;
+   BYTE lfClipPrecision;
+   BYTE lfQuality;
+   BYTE lfPitchAndFamily;
+   TCHAR lfFaceName[32];
+} LOGFONT;
 
 typedef struct tagNONCLIENTMETRICS { ;
-    UINT    cbSize; 
-    int     iBorderWidth; 
-    int     iScrollWidth; 
-    int     iScrollHeight; 
-    int     iCaptionWidth; 
-    int     iCaptionHeight; 
-    LOGFONT lfCaptionFont; 
-    int     iSmCaptionWidth; 
-    int     iSmCaptionHeight; 
-    LOGFONT lfSmCaptionFont; 
-    int     iMenuWidth; 
-    int     iMenuHeight; 
-    LOGFONT lfMenuFont; 
-    LOGFONT lfStatusFont; 
-    LOGFONT lfMessageFont; 
+    UINT    cbSize;
+    int     iBorderWidth;
+    int     iScrollWidth;
+    int     iScrollHeight;
+    int     iCaptionWidth;
+    int     iCaptionHeight;
+    LOGFONT lfCaptionFont;
+    int     iSmCaptionWidth;
+    int     iSmCaptionHeight;
+    LOGFONT lfSmCaptionFont;
+    int     iMenuWidth;
+    int     iMenuHeight;
+    LOGFONT lfMenuFont;
+    LOGFONT lfStatusFont;
+    LOGFONT lfMessageFont;
 } NONCLIENTMETRICS
 
 
@@ -83,7 +83,6 @@ Function Alert( cMsg, aChoices )
    LOCAL hOldFont
    LOCAL xBase
 
-
    If ValType( cMsg ) != "C"
       IF VALTYPE( cMsg)=="A"
          cMsg:=a2str(cMsg,";")
@@ -91,6 +90,7 @@ Function Alert( cMsg, aChoices )
         cMsg = asString( cMsg )
       Endif
    EndIf
+
    cTitle := 'Alert'
 
    If aChoices == NIL
@@ -105,7 +105,7 @@ Function Alert( cMsg, aChoices )
    EndIf
 
    hDC = GetDC( 0 )
-   hOldFont:=SelectObject(hDC,hFont)
+   hOldFont := SelectObject( hDC, hFont )
 
 * ------------- total width without buttons
 
@@ -129,9 +129,9 @@ Function Alert( cMsg, aChoices )
       aChoose[ i ] = If( at( "&", aChoices[ i ] ) == 0, "&" + aChoices[ i ] , aChoices[ i ] )
    Next i
 
-   SelectObject(hDC,hOldFont)
+   SelectObject( hDC, hOldFont )
    ReleaseDC( 0, hDC )
-   DeleteObject(hFont)
+   DeleteObject( hFont )
 
 
    butwidth := t
@@ -175,7 +175,7 @@ Function Alert( cMsg, aChoices )
 
    MessageBeep( MB_ICONHAND )
 
-   i = DialogBox( , aDlg, hWnd, { | hDlg, nMsg, nwParam, nlParam | AlertProc( hDlg, nMsg, nwParam, nlParam ) } )
+   i := DialogBox( ,aDlg, hWnd, { | hDlg, nMsg, nwParam, nlParam | AlertProc( hDlg, nMsg, nwParam, nlParam ) } )
 
    SetFocus( hWnd )
 
@@ -187,7 +187,7 @@ Function AlertProc( hDlg, nMsg, nwParam, nlParam )
 
    Do Case
    Case nMsg == WM_INITDIALOG
-      centerwindow( hDlg )
+      CenterWindow( hDlg )
       Return( 1 )
 
    Case nMsg == WM_COMMAND
@@ -287,7 +287,6 @@ Function UnMapDialogRect(cText,hfont)
 
 Function CenterWindow( hWnd, NewX, NewY, hParent )
 
-   Local hWndParent
    Local aChild_[ 4 ]
    Local iCWidth
    Local iCHeight
@@ -297,20 +296,24 @@ Function CenterWindow( hWnd, NewX, NewY, hParent )
    aChild_ := GetWindowRect( hWnd )
    iCWidth := aChild_[ 3 ] - aChild_[ 1 ]
    iCHeight := aChild_[ 4 ] - aChild_[ 2 ]
-   If hparent == NIL
-      hWndParent := GetWindow( hWnd, GW_OWNER )
-   Else
-      hWndParent := hparent
-   EndIf
-   aParent_ := GetClientRect( hWndParent )
+
+   IF hparent == NIL
+      hParent := GetWindow( hWnd, GW_OWNER )
+
+      IF hParent == 0
+         hParent := GetDesktopWindow()
+      ENDIF
+   ENDIF
+
+   aParent_ := GetClientRect( hParent )
    aPoint_ := { ( aParent_[ 3 ] / 2 ) , ( aParent_[ 4 ] / 2 ) }
-   ClientToScreen( hWndParent, aPoint_ )
+   ClientToScreen( hParent, aPoint_ )
    aPoint_[ 1 ] -= ( iCWidth / 2 )
    aPoint_[ 2 ] -= ( iCHeight / 2 )
-   ScreenToClient( hWndParent, aPoint_ )
+   ScreenToClient( hParent, aPoint_ )
    aPoint_[ 1 ] := Max( 0, aPoint_[ 1 ] )
    aPoint_[ 2 ] := Max( 0, aPoint_[ 2 ] )
-   ClientToScreen( hWndParent, aPoint_ )
+   ClientToScreen( hParent, aPoint_ )
 
    If NewX # NIL .AND. NewY # NIL
       MoveWindow( hWnd, NewX, NewY, iCWidth, iCHeight, .F. )
@@ -754,7 +757,7 @@ nlen:=len(cStr)
 FOR n:=1 TO nLen
    ch:=substr(cStr,n,1)
    c+=if(l,upper(ch),ch)
-   l:=(ch==" ") 
+   l:=(ch==" ")
 NEXT
 
 RETURN(c)
@@ -778,7 +781,7 @@ FUNCTION GetMessageFont( nWeight ) // retrieves the current font used in Message
 
    LOCAL cBuff, n
    LOCAL ncm IS NONCLIENTMETRICS
-   
+
    ncm:cbSize := ncm:sizeof()
    cBuff := ncm:value
 
@@ -788,6 +791,6 @@ FUNCTION GetMessageFont( nWeight ) // retrieves the current font used in Message
    IF nWeight != NIL
       ncm:lfMessageFont:lfWeight := nWeight
    ENDIF
-   
+
 RETURN CreateFontIndirect( ncm:lfMessageFont:value )
 
