@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.26 2003/11/12 14:19:01 jonnymind Exp $
+ * $Id: errorsys.prg,v 1.27 2003/12/10 18:30:23 ronpinkas Exp $
  */
 
 /*
@@ -173,6 +173,7 @@ STATIC FUNCTION DefError( oError )
      LogError( oError )
 
      ErrorLevel(1)
+     ?
      Quit
 
 Return .F.

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1854 2003/12/11 16:32:19 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.1855 2003/12/11 21:33:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-12-12 06:35 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hblog.ch
+    + Now supports shorter grammar:
+      Log <msgs> PRIO [class] as a shortand for PRIO HB_LOG_[class]
+
+  * include/hbrdddbf.h
+    * For linux, exclusive lock values changed to 0,0.
+
+  * source/rtl/errorsys.prg
+    ? Added an extra "?" at the end of error reporting; this makes
+    visualization clean also on consoles that do not add a CRLF at
+    program termination (like unix...)
 
 2003-12-11 13:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/hbserv.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hblog.ch,v 1.3 2003/07/22 11:35:11 jonnymind Exp $
+ * $Id: hblog.ch,v 1.4 2003/08/01 16:56:52 jonnymind Exp $
  */
 
 /*
@@ -104,6 +104,14 @@
       HB_StandardLog( HB_BldLogMsg( <data> ), <prio> )
 
 #xcommand CLOSE LOG =>  HB_CloseStandardLog()
+
+#xtranslate PRIO[RITY] DEFAULT  => PRIO HB_LOG_DEFAULT
+#xtranslate PRIO[RITY] CRITICAL => PRIO HB_LOG_CRITICAL
+#xtranslate PRIO[RITY] ERROR => PRIO HB_LOG_ERROR
+#xtranslate PRIO[RITY] WARNING => PRIO HB_LOG_WARNING
+#xtranslate PRIO[RITY] WARN => PRIO HB_LOG_WARN
+#xtranslate PRIO[RITY] INFO => PRIO HB_LOG_INFO
+#xtranslate PRIO[RITY] DEBUG => PRIO HB_LOG_DEBUG
 
 #endif /* HB_LOGDEF_CH */
 

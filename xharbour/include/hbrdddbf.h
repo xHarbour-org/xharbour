@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.9 2003/11/23 19:34:54 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.10 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -82,8 +82,15 @@ HB_EXTERN_BEGIN
 #define FILE_LOCKPOOL_VFP                 0L
 
 #ifdef OS_UNIX_COMPATIBLE
+#ifndef HB_OS_LINUX
 #define DBF_EXLUSIVE_LOCKPOS              0x7fffffffL
 #define DBF_EXLUSIVE_LOCKSIZE             1L
+#else
+// Under linux, 0L has the special meanin of "LOCK ALL THE FILE",
+// including it's future growth, from LOCKPOS to the end.
+#define DBF_EXLUSIVE_LOCKPOS              0L
+#define DBF_EXLUSIVE_LOCKSIZE             0L
+#endif
 #endif
 
 /*
