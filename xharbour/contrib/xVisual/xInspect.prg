@@ -103,6 +103,9 @@ METHOD DrawItem( dis ) CLASS ComboInsp
       aRect := ACLONE(aClip)
       for n:=1 to nLen+1
           if substr(itemTxt,n,1)==chr(9).or.n==nLen+1
+             if n==nLen+1
+                SetTextColor( dis:hDC, GetSysColor(IF( lselected,COLOR_HIGHLIGHTTEXT,COLOR_BTNSHADOW )) )
+             endif
              exttextout( dis:hDC , dis:rcItem:Left + aRect[1]+2, dis:rcItem:Top , ;
                                  ETO_OPAQUE + ETO_CLIPPED, aRect, cText )
              cText:=""
