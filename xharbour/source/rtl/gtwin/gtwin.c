@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.50 2004/03/29 02:43:24 peterrees Exp $
+ * $Id: gtwin.c,v 1.51 2004/04/14 15:06:07 lf_sfnet Exp $
  */
 
 /*
@@ -1395,7 +1395,7 @@ int HB_GT_FUNC(gt_ExtendedKeySupport())
 
 int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
-    int ch = 0, extKey = 0;
+    int ch = 0, extKey = -1;
     const ClipKeyCode *clipKey = NULL;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
@@ -1524,7 +1524,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 ch += 256;
              }
 
-             if ( extKey > 0 )
+             if ( extKey > -1 )
              {
                 clipKey = &extKeyTab[ extKey ];
              }
