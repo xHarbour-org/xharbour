@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.144 2003/02/02 14:32:54 what32 Exp $
+ * $Id: xide.prg,v 1.145 2003/02/02 16:48:11 ronpinkas Exp $
  */
 
 /*
@@ -112,23 +112,21 @@ METHOD MainMenu() CLASS MainForm
 
       oItem := TMenuItem():Create( oMenu )
       oItem:Caption := "File"
-      oItem:AppendTo( oMenu:Handle )
 
          oSubItem := TMenuItem():Create( oItem )
          oSubItem:Caption := "Open"
          oSubItem:Action  := {||OpenProject():Create()}
-         oSubItem:AppendTo( oItem:Handle )
 
          oSubItem := TMenuItem():Create( oItem )
          oSubItem:Caption := "-"
-         oSubItem:AppendTo( oItem:Handle )
 
          oSubItem := TMenuItem():Create( oItem )
          oSubItem:Caption := "Exit"
          oSubItem:Action  := {|| MainForm:Close() }
-         oSubItem:AppendTo( oItem:Handle )
 
    ::SetMenu( oMenu )
+
+
 
 RETURN Self
 
@@ -345,6 +343,7 @@ ENDCLASS
 #include <string.h>
 
 #include <windows.h>
+#include <winuser.h>
 
 #include "hbapi.h"
 #include "hbstack.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: TMenuItem.prg,v 1.15 2003/01/27 09:34:17 what32 Exp $
+ * $Id: TMenuItem.prg,v 1.16 2003/01/27 11:54:01 what32 Exp $
  */
 
 /*
@@ -132,6 +132,8 @@ METHOD Create( oMenu ) CLASS TMenuItem
    ::FDefault   := .F.
    ::MenuItemInfo IS MENUITEMINFO
 
+   AADD( ::FMenu:aItems, Self )
+
 Return Self
 
 *-----------------------------------------------------------------------------*
@@ -183,6 +185,7 @@ METHOD AppendTo( HMenu, ARightToLeft ) CLASS TMenuItem
      ::MenuItemInfo:wID           := ::FCommand
      ::MenuItemInfo:hbmpChecked   := 0
      ::MenuItemInfo:hbmpUnchecked := 0
+
      ::MenuItemInfo:dwTypeData    := Caption
 
      IF ::GetCount > 0
@@ -191,7 +194,7 @@ METHOD AppendTo( HMenu, ARightToLeft ) CLASS TMenuItem
 
      InsertMenuItem( HMenu, -1, .T., ::MenuItemInfo:value )
 
-     AADD( ::FMenu:aItems, Self )
+//     AADD( ::FMenu:aItems, Self )
      
   ENDIF
 

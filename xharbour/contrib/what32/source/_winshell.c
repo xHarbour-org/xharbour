@@ -309,9 +309,9 @@ HB_FUNC( SHEMPTYRECYCLEBIN )
 HB_FUNC( SHELL_NOTIFYICON )
 {
    NOTIFYICONDATA * Data =  (NOTIFYICONDATA * ) hb_param(2, HB_IT_STRING)->item.asString.value;
-
    hb_retl( Shell_NotifyIcon( (DWORD) hb_parnl( 1 ), Data ) ) ;
 }
+
 
 
 //-----------------------------------------------------------------------------

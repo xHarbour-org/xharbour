@@ -173,7 +173,7 @@ METHOD Set() CLASS TMenu
 
 METHOD GetItem( nId ) CLASS TMenu
 
-   local n := aScan( ::aItems,{|o|o:id == nId} )
+   local n := aScan( ::aItems,{|o|o:Command == nId} )
    if n > 0
       return( ::aItems[n] )
    endif
@@ -196,7 +196,6 @@ METHOD GetHandle() CLASS TMenu
       
       hMenu := ::FItems:GetHandle()
       //SetMenuInfo( hMenu, lpMenuInfo:value )
-
    ENDIF
 RETURN hMenu
 
@@ -213,9 +212,14 @@ RETURN Result
 METHOD DeployMenu() CLASS TMenu
    LOCAL MenuItem, SubMenu
    FOR EACH MenuItem IN ::aItems
-      MenuItem:AppendTo( ::FHandle )
-      FOR EACH SubMenu IN MenuItem:aItems
-         MenuItem:AppendTo( SubMenu:FMenu:FHandle )
-      NEXT
+      
+      IF menuItem:Caption != NIL
+         MenuItem:AppendTo( ::Handle )
+         FOR EACH SubMenu IN MenuItem:aItems
+            SubMenu:AppendTo( SubMenu:Owner:FHandle )
+         NEXT
+      ENDIF
    NEXT
 RETURN NIL
+
+

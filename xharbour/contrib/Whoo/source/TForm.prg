@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.61 2002/12/24 17:26:08 what32 Exp $
+ * $Id: TForm.prg,v 1.62 2003/01/09 08:21:41 what32 Exp $
  */
 
 /*
@@ -34,11 +34,16 @@
 #include "classex.ch"
 
 #include "error.ch"
+#include "wintypes.ch"
+#Include "cstruct.ch"
 
 #Define RCF_DIALOG     0
 #Define RCF_WINDOW     1
 #Define RCF_MDIFRAME   2
 #Define RCF_MDICHILD   4
+
+IMPORT C STRUCTURE LOGBRUSH
+IMPORT C STRUCTURE RECT
 
 *-----------------------------------------------------------------------------*
 
@@ -99,7 +104,6 @@ CLASS TForm FROM TCustomForm //WinControl
    METHOD GetObj()
    METHOD SetLink()
    METHOD SetBorders()
-
 ENDCLASS
 
 METHOD SetBorders(c) CLASS TForm
@@ -214,3 +218,5 @@ METHOD SetLink( oObj ) CLASS TForm
    __objAddData( self, oObj:Name )
    __ObjSetValueList( self, { { oObj:Name, oObj } } )
 return( oObj )
+
+

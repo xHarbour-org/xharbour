@@ -1,5 +1,5 @@
 [Version]
-Type=xMake
+Type=xMate
 
 [Info]
 Type=Executable
@@ -11,6 +11,7 @@ Final Path=
 
 [xMake]
 Show Defaults=No
+Create Map/List File=Yes
 
 [Project]
 Run=
@@ -27,20 +28,21 @@ Final Path=%HOME%
 %HB_INSTALL%\contrib\xVisual\xInspect.prg=7,.F.
 %HB_INSTALL%\contrib\what32\lib\what32.lib=8,.F.
 %HB_INSTALL%\contrib\Whoo\lib\Whoo.Lib=9,.F.
-%C_LIB_INSTALL%\C0W32.OBJ=10,.T.
-%HB_LIB_INSTALL%\rtl.lib=11,.T.
-%HB_LIB_INSTALL%\vm.lib=12,.T.
-%HB_LIB_INSTALL%\gtwin.lib=13,.T.
-%HB_LIB_INSTALL%\lang.lib=14,.T.
-%HB_LIB_INSTALL%\macro.lib=15,.T.
-%HB_LIB_INSTALL%\rdd.lib=16,.T.
-%HB_LIB_INSTALL%\dbfntx.lib=17,.T.
-%HB_LIB_INSTALL%\dbfcdx.lib=18,.T.
-%HB_LIB_INSTALL%\debug.lib=19,.T.
-%HB_LIB_INSTALL%\common.lib=20,.T.
-%HB_LIB_INSTALL%\pp.lib=21,.T.
-%C_LIB_INSTALL%\CW32.LIB=22,.T.
-%C_LIB_INSTALL%\IMPORT32.LIB=23,.T.
-%HB_INSTALL%\contrib\xVisual\Xide.res=24,.F.
-%HB_INSTALL%\contrib\Whoo\Whoo.xhp=25,.F.
+%HB_INSTALL%\contrib\xVisual\Xide.res=10,.F.
+%HB_INSTALL%\contrib\Whoo\Whoo.xhp=11,.F.
+C:\BCC55\Lib\ws2_32.lib=12,.F.
+%C_LIB_INSTALL%\C0W32.OBJ=13,.T.
+%HB_LIB_INSTALL%\rtl.lib=14,.T.
+%HB_LIB_INSTALL%\vm.lib=15,.T.
+%HB_LIB_INSTALL%\gtwin.lib=16,.T.
+%HB_LIB_INSTALL%\lang.lib=17,.T.
+%HB_LIB_INSTALL%\macro.lib=18,.T.
+%HB_LIB_INSTALL%\rdd.lib=19,.T.
+%HB_LIB_INSTALL%\dbfntx.lib=20,.T.
+%HB_LIB_INSTALL%\dbfcdx.lib=21,.T.
+%HB_LIB_INSTALL%\debug.lib=22,.T.
+%HB_LIB_INSTALL%\common.lib=23,.T.
+%HB_LIB_INSTALL%\pp.lib=24,.T.
+%C_LIB_INSTALL%\CW32.LIB=25,.T.
+%C_LIB_INSTALL%\IMPORT32.LIB=26,.T.
 

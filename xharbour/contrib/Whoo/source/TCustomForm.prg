@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.13 2003/01/09 08:21:41 what32 Exp $
+ * $Id: TCustomForm.prg,v 1.14 2003/01/28 02:25:20 what32 Exp $
  */
 
 /*
@@ -174,6 +174,7 @@ METHOD SetMenu( Value )
 
            IF ::HandleAllocated
               IF GetMenu( ::Handle ) != ::FMenu:Handle
+                 Value:DeployMenu()
                  SetMenu( ::Handle, ::FMenu:Handle)
                  Value:WindowHandle := ::Handle
               ENDIF
@@ -185,6 +186,7 @@ METHOD SetMenu( Value )
 //           ENDIF
 //        ENDIF
 //     ENDIF
+
 
    ELSEIF ::HandleAllocated 
       SetMenu( ::Handle, 0)
