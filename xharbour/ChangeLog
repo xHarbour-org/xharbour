@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3990 2005/03/31 20:21:58 modalsist Exp $
+ * $Id: ChangeLog,v 1.3991 2005/04/01 02:02:14 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-01 00:06 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/tbrowse.prg
+    ! Fixed cell repaint when ::ColorRect() is used.
 
 2005-03-31 19:57 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/teditor.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.102 2005/01/01 18:50:26 guerra000 Exp $
+ * $Id: tbrowse.prg,v 1.103 2005/01/17 04:53:01 guerra000 Exp $
  */
 
 /*
@@ -243,6 +243,7 @@ CLASS TBrowse
    METHOD PosCursor()                     // Positions the cursor to the beginning of the call, used only when autolite==.F.
    METHOD LeftDetermine()                 // Determine leftmost unfrozen column in display
    METHOD DispCell( nRow, nCol, nColor )  // Displays a single cell and returns position of first char of displayed value if needed
+   METHOD DispCellPos( nRow, nCol, nColor )  // Calculates the cursor's position and displays a cell
    METHOD HowManyCol()                    // Counts how many cols can be displayed
    METHOD RedrawHeaders( nWidth )         // Repaints TBrowse Headers
    METHOD Moved()                         // Every time a movement key is issued I need to reset certain properties
@@ -1736,7 +1737,7 @@ METHOD ColorRect( aRect, aRectColor ) CLASS TBrowse
    If ::lRect .AND. ! Empty( ::aRedraw )
       If ::colPos >= ::aRect[ 2 ] .and. ::colPos <= ::aRect[ 4 ] .and. ;
          ::rowPos >= ::aRect[ 1 ] .and. ::rowPos <= ::aRect[ 3 ]
-         ::DispCell( ::rowPos, ::colPos, 1 )
+         ::DispCellPos( ::rowPos, ::colPos, 1 )
       endif
    endif
 
@@ -2485,6 +2486,37 @@ METHOD DispCell( nRow, nColumn, nColor ) CLASS TBrowse
 
 Return nNotLeftCol
 
+//-------------------------------------------------------------------//
+
+METHOD DispCellPos( nRow, nColumn, nColor ) CLASS TBrowse
+
+Local nOldRow := Row()
+Local nOldCol := Col()
+Local nColScrn, nCol, uRet
+
+   nColScrn := ::nwLeft + LEN( ::cSpacePre )
+
+   nCol := if( ::nFrozenCols == 0, ::LeftVisible, 1 )
+
+   do while nCol < nColumn
+      nColScrn += ::aColsInfo[ nCol, o_Width ]
+      if ::aColsInfo[ nCol, o_lColSep ]
+         nColScrn += LEN( ::aColsInfo[ nCol + 1, o_ColSep ] )
+      endif
+      if nCol == ::nFrozenCols
+         nCol := ::leftVisible
+      else
+         nCol++
+      endif
+   enddo
+
+   DevPos( nRow + ::nRowData, nColScrn )
+
+   uRet := ::DispCell( nRow, nColumn, nColor )
+
+   DevPos( nOldRow, nOldCol )
+
+return uRet
 
 //-------------------------------------------------------------------//
 //
