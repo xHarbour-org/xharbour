@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2713 2004/04/02 00:32:56 druzus Exp $
+ * $Id: ChangeLog,v 1.2714 2004/04/02 01:35:20 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-01 20:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbvmpub.h
+    * Removed Member <itemsbase> in favor of NEW Member <pBaseArray>
+
+  * source/vm/arrays.c
+  * source/vm/hvm.c
+    ! Fixed creation of BYREF items into Arrays to use new pBaseArray Member.
+
+  * source/vm/itemapi.c
+    ! Fixed de-referencing of of BYREF items into Arrays to use new pBaseArray Member.
+    + Added logic detect and generate R/T Error upon refernce into array being out of bound.
+
+  * source/vm/garbage.c
+    + Added logic to Mark the Base Array of a BYREF Item in Sweep Scan.
+
+  * source/vm/fastitem.c
+    * Removed some redundant ()
+
+  /* The above fixes critical GPF traps related to BYREF item pointing into an Array Element. */
 
 2004-04-02 03:28 UTC+0200 Francesco Saverio Giudice <info / at / fsgiudice.com>
   * source/rtl/bkgtsks.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.25 2004/02/14 22:11:51 andijahja Exp $
+ * $Id: hbvmpub.h,v 1.26 2004/02/25 12:40:28 lculik Exp $
  */
 
 /*
@@ -172,7 +172,7 @@
     {
        union {
           struct _HB_CODEBLOCK * block;    /* codeblock */
-          struct _HB_ITEM ** itemsbase;    /* static variables */
+          struct _HB_BASEARRAY * pBaseArray;    /* Array Members */
           struct _HB_ITEM ** *itemsbasePtr; /* local variables */
        } BasePtr;
        LONG offset;    /* 0 for static variables */

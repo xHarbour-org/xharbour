@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.368 2004/03/31 09:19:54 andijahja Exp $
+ * $Id: hvm.c,v 1.369 2004/04/01 09:35:37 andijahja Exp $
  */
 
 /*
@@ -770,9 +770,10 @@ int HB_EXPORT hb_vmQuit( void )
    if( s_aGlobals.type == HB_IT_ARRAY )
    {
       // Because GLOBALS items are of type HB_IT_REF (see hb_vmRegisterGlobals())!
-      hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
+      //hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
       //TraceLog( NULL, "Releasing s_aGlobals: %p\n", &s_aGlobals );
       hb_arrayRelease( &s_aGlobals );
+      s_aGlobals.type = HB_IT_NIL;
       //TraceLog( NULL, "   Released s_aGlobals: %p\n", &s_aGlobals );
    }
    //printf("\nAfter Globals\n" );
@@ -785,6 +786,7 @@ int HB_EXPORT hb_vmQuit( void )
    {
       HB_TRACE(HB_TR_DEBUG, ("Releasing s_aStatics: %p\n", &s_aStatics) );
       hb_arrayRelease( &s_aStatics );
+      s_aStatics.type = HB_IT_NIL;
       HB_TRACE(HB_TR_DEBUG, ("   Released s_aStatics: %p\n", &s_aStatics) );
    }
    //printf("\nAfter Statics\n" );
@@ -7002,7 +7004,7 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
    /* we store the offset instead of a pointer to support a dynamic stack */
    pTop->item.asRefer.value = HB_VM_STACK.iStatics + uiStatic - 1;
    pTop->item.asRefer.offset = 0;    /* 0 for static variables */
-   pTop->item.asRefer.BasePtr.itemsbase = &s_aStatics.item.asArray.value->pItems;
+   pTop->item.asRefer.BasePtr.pBaseArray = s_aStatics.item.asArray.value;
 
    hb_stackPush();
 }

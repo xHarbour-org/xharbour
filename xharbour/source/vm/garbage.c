@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.77 2004/03/21 15:55:06 druzus Exp $
+ * $Id: garbage.c,v 1.78 2004/03/30 18:37:29 ronpinkas Exp $
  */
 
 /*
@@ -404,10 +404,19 @@ HB_EXPORT void *hb_gcUnlock( void *pBlock )
 */
 void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
-
-   if( HB_IS_BYREF( pItem ) )
+   while( HB_IS_BYREF( pItem ) )
    {
-      pItem = hb_itemUnRef( pItem );
+      if( HB_IS_MEMVAR( pItem ) == FALSE && pItem->item.asRefer.offset == 0 )
+      {
+         HB_ITEM FakedItem;
+
+         FakedItem.type = HB_IT_ARRAY;
+         FakedItem.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
+
+         hb_gcItemRef( &FakedItem );
+      }
+
+      pItem = hb_itemUnRefOnce( pItem );
    }
 
    if( HB_IS_POINTER( pItem ) )

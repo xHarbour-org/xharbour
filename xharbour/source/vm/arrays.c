@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.102 2004/03/30 18:52:26 ronpinkas Exp $
+ * $Id: arrays.c,v 1.103 2004/04/01 22:00:42 druzus Exp $
  */
 
 /*
@@ -472,7 +472,13 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
 
       pItem->item.asRefer.value = ulIndex - 1;
       pItem->item.asRefer.offset = 0;
-      pItem->item.asRefer.BasePtr.itemsbase = &( pArray->item.asArray.value->pItems );
+      pItem->item.asRefer.BasePtr.pBaseArray = pArray->item.asArray.value;
+
+      #ifdef HB_ARRAY_USE_COUNTER
+         pArray->item.asArray.value->uiHolders++;
+      #else
+          hb_arrayRegisterHolder( pArray->item.asArray.value, (void *) pArray->item.asArray.value );
+      #endif
 
       if( pElement->type == HB_IT_STRING && ( pElement->item.asString.bStatic || *( pElement->item.asString.puiHolders ) > 1 ) )
       {
@@ -1158,7 +1164,7 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
       hb_xfree( pItems );
 
       pBaseArray->pItems = NULL;
-      pBaseArray->ulLen = -1; //Intentionally - might cause earlier GPF on invalid reuse.;
+      pBaseArray->ulLen = 4070707070; //Intentionally - debugging flag indicating array was explictly released.
    }
 
    HB_TRACE( HB_TR_INFO, ( "Release pBaseArray %p", pBaseArray ) );
@@ -1534,7 +1540,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pItems ) );
       hb_xfree( pBaseArray->pItems );
       pBaseArray->pItems = NULL;
-      pBaseArray->ulLen = -2; //Intentionally - might cause earlier GPF on invalid reuse.;
+      pBaseArray->ulLen = 4171717171; //Intentionally - debugging flag indicating array was released by GC.
    }
 
    // Has to be AFTER the array elements have been released!

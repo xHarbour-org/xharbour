@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.89 2004/03/21 21:48:49 druzus Exp $
+ * $Id: itemapi.c,v 1.90 2004/03/30 18:37:30 ronpinkas Exp $
  */
 
 /*
@@ -96,6 +96,7 @@
 #include "hbset.h"
 #include "hbmath.h"
 #include "hashapi.h"
+#include "hbapilng.h"
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
@@ -1228,16 +1229,13 @@ PHB_ITEM HB_EXPORT hb_itemUnRefOnce( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemUnRefOnce(%p)", pItem));
 
-
-
    if( HB_IS_BYREF( pItem ) )
    {
       if( HB_IS_MEMVAR( pItem ) )
       {
          HB_VALUE_PTR pValue;
 
-         pValue = *( pItem->item.asMemvar.itemsbase ) + pItem->item.asMemvar.offset +
-                     pItem->item.asMemvar.value;
+         pValue = *( pItem->item.asMemvar.itemsbase ) + pItem->item.asMemvar.offset + pItem->item.asMemvar.value;
          pItem = &pValue->item;
       }
       else
@@ -1246,8 +1244,21 @@ PHB_ITEM HB_EXPORT hb_itemUnRefOnce( PHB_ITEM pItem )
          {
             if( pItem->item.asRefer.offset == 0 )
             {
+               if( pItem->item.asRefer.BasePtr.pBaseArray->pItems == NULL || pItem->item.asRefer.BasePtr.pBaseArray->ulLen <= pItem->item.asRefer.value )
+               {
+                  HB_ITEM Array, Index;
+
+                  Array.type = HB_IT_ARRAY;
+                  Array.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
+
+                  Index.type = HB_IT_LONG;
+                  Index.item.asLong.value = pItem->item.asRefer.value + 1;
+
+                  hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, &Array, &Index );
+               }
+
                /* a reference to an Array Member (like static var) */
-               pItem = *( pItem->item.asRefer.BasePtr.itemsbase ) + pItem->item.asRefer.value;
+               pItem = pItem->item.asRefer.BasePtr.pBaseArray->pItems + pItem->item.asRefer.value;
             }
             else
             {

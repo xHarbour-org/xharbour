@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.61 2004/03/29 18:04:01 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.62 2004/03/30 18:37:29 ronpinkas Exp $
  */
 
 /*
@@ -189,7 +189,7 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
             hb_errInternal( HB_EI_PREMATURE_RELEASE, NULL, "Premature Array/Object Release detected", NULL );
 		 }
 
-         if( --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
+         if( --( pItem->item.asArray.value->uiHolders ) == 0 )
          {
             //hb_arrayRelease( pItem );
          }
@@ -207,7 +207,6 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
    }
 
    pItem->type = HB_IT_NIL;
-
 }
 
 #ifdef HB_THREAD_SUPPORT
@@ -226,7 +225,7 @@ void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
    else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
       #ifdef HB_ARRAY_USE_COUNTER
-         if( --( ( pItem->item.asArray.value )->uiHolders ) == 0 )
+         if( --( pItem->item.asArray.value->uiHolders ) == 0 )
          {
             hb_arrayRelease( pItem );
          }
@@ -312,18 +311,26 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
    else if( HB_IS_ARRAY( pSource ) )
    {
       #ifdef HB_ARRAY_USE_COUNTER
-         ( pSource->item.asArray.value )->uiHolders++;
+         pSource->item.asArray.value->uiHolders++;
       #else
           hb_arrayRegisterHolder( pDest->item.asArray.value, (void *) pDest );
       #endif
    }
    else if( HB_IS_BLOCK( pSource ) )
    {
-      ( pSource->item.asBlock.value )->ulCounter++;
+      pSource->item.asBlock.value->ulCounter++;
    }
    else if( HB_IS_MEMVAR( pSource ) )
    {
       hb_memvarValueIncRef( pSource->item.asMemvar.value );
+   }
+   else if( HB_IS_BYREF( pSource ) && pSource->item.asRefer.offset == 0 )
+   {
+      #ifdef HB_ARRAY_USE_COUNTER
+         pSource->item.asRefer.BasePtr.pBaseArray->uiHolders++;
+      #else
+          hb_arrayRegisterHolder( pSource->item.asRefer.BasePtr.pBaseArray, (void *) pSource->item.asRefer.BasePtr.pBaseArray );
+      #endif
    }
 }
 
