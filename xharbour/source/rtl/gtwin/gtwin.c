@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.73 2004/10/23 23:33:30 oh1 Exp $
+ * $Id: gtwin.c,v 1.74 2004/10/28 04:33:25 paultucker Exp $
  */
 
 /*
@@ -2323,6 +2323,13 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 /* *********************************************************************** */
 
+void HB_GT_FUNC( gt_ProcessMessages( void ) )
+{
+   return;
+}
+
+/* *********************************************************************** */
+
 int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
 {
 
@@ -2438,6 +2445,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->Tone                  = HB_GT_FUNC( gt_Tone );
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
+
     /* extended GT functions */
     gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
     gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
@@ -2445,6 +2453,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+    gt_funcs->ProcessMessages       = HB_GT_FUNC( gt_ProcessMessages );
 
     /* Graphics API */
     gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );
