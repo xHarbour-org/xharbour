@@ -26,30 +26,58 @@
 #include   "winreg.h"
 
 //---------------------------------------------------------------------//
-
+/*
+   DWORD InternetDial(
+       IN HWND     hwndParent,
+       IN LPTSTR   lpszConnectoid,
+       IN DWORD    dwFlags,
+       OUT LPDWORD lpdwConnection,
+       IN DWORD    dwReserved
+   );
+*/
+//
+//     InternetDial()
+//
 HB_FUNC ( INTERNETDIAL )
 {
-   HWND    hWnd   = NULL;    // ( HWND ) GetDeskTopWindow() ;
-   LPTSTR  lpszId = ISNIL( 1 ) ? NULL : hb_parc( 1 ) ;
+   HWND    hWnd   = ISNIL( 1 ) ? NULL : ( HWND ) hb_parnl( 1 ) ;
+   LPTSTR  lpszId = ISNIL( 2 ) ? NULL : hb_parc( 2 ) ;
    DWORD   nFlags = INTERNET_AUTODIAL_FORCE_ONLINE ;
-   LPDWORD nRet   = 0;
+   DWORD   nRet   = 0;
    
-   hb_retnl( InternetDialA( hWnd, lpszId, nFlags, nRet, 0 ) );
+   hb_retnl( InternetDialA( hWnd, lpszId, nFlags, &nRet, 0 ) );
    
 }
 
 //---------------------------------------------------------------------//
-
+/*
+   BOOL InternetGetConnectedState(
+       OUT LPDWORD lpdwFlags,
+       IN DWORD    dwReserved
+   );
+*/
+//
+//     lIsOn := InternetGetConnectedState()
+//
 HB_FUNC ( INTERNETGETCONNECTEDSTATE )
 {
-	hb_retl( InternetGetConnectedState( NULL, 0 ) ) ;
+   hb_retl( InternetGetConnectedState( NULL, 0 ) ) ;
 }
 
 //---------------------------------------------------------------------//
+/*
+   HINTERNET InternetOpen(
+       IN LPCTSTR lpszAgent,
+       IN DWORD   dwAccessType,
+       IN LPCTSTR lpszProxyName,
+       IN LPCTSTR lpszProxyBypass,
+       IN DWORD   dwFlags
+   );
+*/
 //
 //   hInternet := InternetOpen()
 //   if hInternet <> 0
-//       hFtp := InternetConnect( hInternet, 'chcac.com', ;
+//       hFtp := InternetConnect( hInternet, 'vouchcac.com', ;
 //                   INTERNET_DEFAULT_FTP_PORT, cUserName, cPassword, ;
 //                        INTERNET_SERVICE_FTP )
 //       if hFtp <> 0
@@ -66,6 +94,7 @@ HB_FUNC ( INTERNETGETCONNECTEDSTATE )
 //   endif
 //
 //
+//
 HB_FUNC ( INTERNETOPEN )
 {
 	LPCTSTR lpszAgent       = ISNIL( 1 ) ? NULL : hb_parc( 1 ) ;
@@ -79,6 +108,18 @@ HB_FUNC ( INTERNETOPEN )
 }
 
 //---------------------------------------------------------------------//
+/*
+   HINTERNET InternetConnect(
+     IN HINTERNET hInternet,
+     IN LPCTSTR   lpszServerName,
+     IN INTERNET_PORT nServerPort,
+     IN LPCTSTR   lpszUserName,
+     IN LPCTSTR   lpszPassword,
+     IN DWORD     dwService,
+     IN DWORD     dwFlags,
+     IN DWORD_PTR dwContext
+   );
+*/
 //
 //       hFtp := InternetConnect( hInternet, 'chcac.com', ;
 //                   INTERNET_DEFAULT_FTP_PORT, cUserName, cPassword, ;
@@ -101,8 +142,19 @@ HB_FUNC ( INTERNETCONNECT )
 }
 
 //---------------------------------------------------------------------//
+/*
+   HINTERNET FtpOpenFile(
+       IN HINTERNET hConnect,
+       IN LPCTSTR   lpszFileName,
+       IN DWORD     dwAccess,
+       IN DWORD     dwFlags,
+       IN DWORD_PTR dwContext
+   );
+*/
 //
-//   InternetOpenFile( hInternet, 'Temp/Config.sys', GENERIC_WRITE )
+//    if FtpOpenFile( hInternet, 'Temp/Config.sys', GENERIC_WRITE )
+//       // take next step
+//    endif
 //
 HB_FUNC ( FTPOPENFILE )
 {
@@ -117,8 +169,18 @@ HB_FUNC ( FTPOPENFILE )
 }
 
 //---------------------------------------------------------------------//
+/*
+   BOOL InternetWriteFile(
+       IN HINTERNET hFile,
+       IN LPCVOID   lpBuffer,
+       IN DWORD     dwNumberOfBytesToWrite,
+       OUT LPDWORD  lpdwNumberOfBytesWritten
+   );
+*/
 //
-//    InternetWriteFile( hFile, @cBuffer, len( cBuffer ), @nWritten )
+//    if InternetWriteFile( hFile, @cBuffer, len( cBuffer ), @nWritten )
+//       // Take next step
+//    endif
 //
 HB_FUNC ( INTERNETWRITEFILE )
 {
@@ -135,8 +197,18 @@ HB_FUNC ( INTERNETWRITEFILE )
 }
 
 //---------------------------------------------------------------------//
+/*
+   BOOL InternetReadFile(
+       IN HINTERNET hFile,
+       IN LPVOID    lpBuffer,
+       IN DWORD     dwNumberOfBytesToRead,
+       OUT LPDWORD  lpdwNumberOfBytesRead
+   );
+*/
 //
-//    InternetReadFile( hFile, @cBuffer, len( cBuffer ), @nRead )
+//     if InternetReadFile( hFile, @cBuffer, len( cBuffer ), @nRead )
+//        // Write to local handle
+//     endif
 //
 HB_FUNC ( INTERNETREADFILE )
 {
@@ -163,8 +235,18 @@ HB_FUNC ( INTERNETREADFILE )
 }
 
 //---------------------------------------------------------------------//
+/*
+   BOOL FtpCommand(
+       IN HINTERNET  hConnect,
+       IN BOOL       fExpectResponse,
+       IN DWORD      dwFlags,
+       IN LPCTSTR    lpszCommand,
+       IN DWORD_PTR  dwContext,
+       OUT HINTERNET *phFtpCommand
+   );
+*/
 //
-//   
+//       
 //
 HB_FUNC ( FTPCOMMAND )
 {
@@ -190,6 +272,15 @@ HB_FUNC ( FTPCOMMAND )
 }
 
 //---------------------------------------------------------------------//
+/*
+   HINTERNET FtpFindFirstFile(
+       IN HINTERNET hConnect,
+       IN LPCTSTR   lpszSearchFile,
+       OUT LPWIN32_FIND_DATA lpFindFileData,
+       IN DWORD     dwFlags,
+       IN DWORD_PTR dwContext
+   );
+*/
 //
 //   Fills the structure which have to be resolved
 //
@@ -207,8 +298,40 @@ HB_FUNC ( FTPFINDFIRSTFILE )
 }
 
 //---------------------------------------------------------------------//
+/*
+   BOOL InternetFindNextFile(
+       IN HINTERNET hFind,
+       OUT LPVOID   lpvFindData
+   );
+*/
 //
-//   FtpGetFile( hInternet, cRemoteFile, cLocalFile, lFailIfExist )
+//    FtpFindNextFile( hFile, @aFileInfo )
+//
+HB_FUNC ( INTERNETFINDNEXTFILE )
+{
+	HINTERNET       hFind       = ( HINTERNET ) hb_parnl( 1 ) ;
+	WIN32_FIND_DATA lpDirInfo ;
+	
+	hb_retl( InternetFindNextFile( hFind, &lpDirInfo ) ) ;
+	
+}
+
+//---------------------------------------------------------------------//
+/*
+   BOOL FtpGetFile(
+       IN HINTERNET hConnect,
+       IN LPCTSTR   lpszRemoteFile,
+       IN LPCTSTR   lpszNewFile,
+       IN BOOL      fFailIfExists,
+       IN DWORD     dwFlagsAndAttributes,
+       IN DWORD     dwFlags,
+       IN DWORD_PTR dwContext
+   );
+*/
+//
+//   if FtpGetFile( hInternet, cRemoteFile, cLocalFile, lFailIfExist )
+//      ? 'Success'
+//   endif
 //
 HB_FUNC ( FTPGETFILE )
 {
@@ -226,8 +349,19 @@ HB_FUNC ( FTPGETFILE )
 }
 
 //---------------------------------------------------------------------//
+/*
+   BOOL FtpPutFile(
+       IN HINTERNET hConnect,
+       IN LPCTSTR   lpszLocalFile,
+       IN LPCTSTR   lpszNewRemoteFile,
+       IN DWORD     dwFlags,
+       IN DWORD_PTR dwContext
+   );
+*/
 //
-//   FtpPutFile( hInternet, cLocalFile, cRemoteFile )
+//   if FtpPutFile( hInternet, cLocalFile, cRemoteFile )
+//      ?
+//   endif
 //
 HB_FUNC ( FTPPUTFILE )
 {
@@ -242,9 +376,15 @@ HB_FUNC ( FTPPUTFILE )
 }
 
 //---------------------------------------------------------------------//
+/*
+   BOOL FtpCreateDirectory(
+       IN HINTERNET hConnect,
+       IN LPCTSTR   lpszDirectory
+   );
+*/
 //
 //   if FtpCreateDirectory( hInternet, 'Temp' )
-//      ? 'Sucess'
+//      ? 'Success'
 //   endif
 //
 HB_FUNC ( FTPCREATEDIRECTORY )
@@ -257,6 +397,12 @@ HB_FUNC ( FTPCREATEDIRECTORY )
 }
 
 //---------------------------------------------------------------------//
+/*
+   BOOL FtpRemoveDirectory(
+       IN HINTERNET hConnect,
+       IN LPCTSTR   lpszDirectory
+   );
+*/
 //
 //   if FtpRemoveDirectory( hInternet, cDirectory )
 //      ? 'Success'
@@ -272,6 +418,12 @@ HB_FUNC ( FTPREMOVEDIRECTORY )
 }
 
 //---------------------------------------------------------------------//
+/*
+   BOOL FtpDeleteFile(
+       IN HINTERNET hConnect,
+       IN LPCTSTR   lpszFileName
+   );
+*/
 //
 //   if FtpDeleteFile( hInternet, 'Temp\Config.sys' )
 //      ? 'Sucess'
@@ -287,8 +439,17 @@ HB_FUNC ( FTPDELETEFILE )
 }
 
 //---------------------------------------------------------------------//
+/*
+   BOOL FtpRenameFile(
+       IN HINTERNET hConnect,
+       IN LPCTSTR   lpszExisting,
+       IN LPCTSTR   lpszNew
+   );
+*/
 //
-//   FtpRenameFile( hInternet, cExisting, cNew )
+//   if FtpRenameFile( hInternet, cExisting, cNew )
+//      ? 'Success'
+//   endif
 //
 HB_FUNC ( FTPRENAMEFILE )
 {
@@ -301,6 +462,13 @@ HB_FUNC ( FTPRENAMEFILE )
 }
 
 //---------------------------------------------------------------------//
+/*
+   BOOL FtpGetCurrentDirectory(
+       IN HINTERNET   hConnect,
+       OUT LPTSTR     lpszCurrentDirectory,
+       IN OUT LPDWORD lpdwCurrentDirectory
+   );
+*/
 //
 //   if FtpGetCurrentDirectory( hInternet, @cDirectory )
 //      ? cDirectory
@@ -308,25 +476,34 @@ HB_FUNC ( FTPRENAMEFILE )
 //
 HB_FUNC ( FTPGETCURRENTDIRECTORY )
 {
-	HINTERNET hInternet            = ( HINTERNET ) hb_parnl( 1 ) ;
-	LPTSTR    lpszCurrentDirectory = hb_parc( 2 ) ;
-	DWORD     dwtemp               = MAX_PATH     ;
-	LPDWORD   lpdwCurrentDirectory = &dwtemp      ;
+   HINTERNET hInternet           = ( HINTERNET ) hb_parnl( 1 ) ;
+   LPTSTR   lpszCurrentDirectory = hb_xgrab( MAX_PATH ) ; 
+   DWORD    dwCurrentDirectory   = MAX_PATH     ;
+   BOOL     bRet ;
 	
-	BOOL      bRet ;
+   bRet = FtpGetCurrentDirectory( hInternet, lpszCurrentDirectory, &dwCurrentDirectory ) ;
+   hb_retl( bRet ) ;
 	
-	bRet = FtpGetCurrentDirectoryA( hInternet, lpszCurrentDirectory, lpdwCurrentDirectory ) ;
+   if ( bRet )
+   {
+      if ( ISBYREF( 2 ) )
+         hb_storclen( ( char * ) lpszCurrentDirectory, ( ULONG ) dwCurrentDirectory, 2 ) ;
+   }
 	
-	hb_retl( bRet ) ;
-	
-	if ( bRet )
-		hb_storclen( ( char * ) lpszCurrentDirectory, ( ULONG ) lpdwCurrentDirectory, 2 ) ;
-
+   hb_xfree( lpszCurrentDirectory ) ;
 }
 
 //---------------------------------------------------------------------//
+/*
+   BOOL FtpSetCurrentDirectory(
+       IN HINTERNET hConnect,
+       IN LPCTSTR   lpszDirectory
+   );
+*/
 //
-//   FtpSetCurrentDirectory( hInternet, cDirectory )
+//    if FtpSetCurrentDirectory( hInternet, cDirectory )
+//       ? 'Success'
+//    endif
 //
 HB_FUNC ( FTPSETCURRENTDIRECTORY )
 {
@@ -338,7 +515,16 @@ HB_FUNC ( FTPSETCURRENTDIRECTORY )
 }
 
 //---------------------------------------------------------------------//
-
+/*
+   BOOL InternetCloseHandle(
+       IN HINTERNET hInternet
+   );  
+*/
+//
+//    if InternetCloseHandle( hInternet )
+//       ? 'Success'
+//    endif
+//
 HB_FUNC ( INTERNETCLOSEHANDLE )
 {
 	HINTERNET hInternet = ( HINTERNET ) hb_parnl( 1 ) ;
@@ -347,7 +533,14 @@ HB_FUNC ( INTERNETCLOSEHANDLE )
 }
 
 //---------------------------------------------------------------------//
-
+/*
+   DWORD InternetAttemptConnect(
+       IN DWORD dwReserved
+   );
+*/
+//
+//    InternetAttempConnect()
+//
 HB_FUNC ( INTERNETATTEMPTCONNECT )
 {
 	DWORD dwReserved = 0 ;
