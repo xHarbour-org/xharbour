@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.3 2003/02/14 21:10:59 lculik Exp $
+ * $Id: tmysql.prg,v 1.4 2003/02/15 02:00:17 lculik Exp $
  */
 
 /*
@@ -439,7 +439,7 @@ Local nOldrow := ::nCurRow
    elseif nRows < 0
       // Negative movement
       if (::nCurRow += nRows) < 1
-         ::nCurRow := 1
+         ::nCurRow := 0
          ::lBof    := .t.
 //      else
 //         ::nCurRow += nRows
