@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1070 2003/05/27 14:02:00 druzus Exp $
+ * $Id: ChangeLog,v 1.1071 2003/05/27 15:19:07 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-27 16:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tbrowse.prg
+    ! Fix logic to repositioning after to gobottom().
+      Reported by Oscar Hernandez Suarez
+    ! Evaluate skipblock with 0 in goto() for compatibilit with Clipper.
+      Report and code provided by Oscar Hernandez Suarez
 
 2003-05-27 11:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   + contrib/htmllib/make_vc.bat
