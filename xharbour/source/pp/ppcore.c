@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.156 2004/06/17 17:47:27 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.157 2004/06/19 01:03:06 ronpinkas Exp $
  */
 
 /*
@@ -4713,6 +4713,8 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                      // Maybe the group was instanciated already and since this is Non Repeatable we don't need to instanciate again.
                      if( ! rezs )
                      {
+                        int iExpanded = 0;
+
                         // Flagging all markers (EXCEPT the non repeatable that we'll be instanciated) in Repeatable group as Instanciated.
                         for( i = 0; i < lennew; i++ )
                         {
@@ -4737,15 +4739,17 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                          */
                         // *** EITHER *** this block OR the #else below!!!
                         #if 1
-                            while( (i = hb_strAt( exppatt, 2, ptr + 1, lennew )) > 0 )
+                            while( (i = hb_strAt( exppatt, 2, ptr + iResidualOffset + 1, lennew )) > 0 )
                             {
+                               iExpanded++;
+
                                #ifdef DEBUG_MARKERS
-                                  printf( "   Expand: '%s' at %i\n", exppatt, i );
+                                  printf( "   Expand: '%s' at %i len: %i\n", exppatt, i, lennew );
                                #endif
 
                                // Ron Pinkas iOffset and iResidualOffset added June-03-2003.
 
-                               iOffset = ReplacePattern( exppatt[2], expreal, lenreal, ptr + 1 + i - 1, *lenres - ( ptr + i - ptro ) );
+                               iOffset = ReplacePattern( exppatt[2], expreal, lenreal, ptr + iResidualOffset + i, *lenres - ( ptr + i - ptro ) );
                                lennew += iOffset;
                                iResidualOffset += iOffset;
 
@@ -4778,7 +4782,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                             while( (i = hb_strAt( exppatt, 2, expnew, lennew )) > 0 )
                             {
                                #ifdef DEBUG_MARKERS
-                                  printf( "   Expand: '%s' at %i\n", exppatt, i );
+                                  printf( "   Expand: '%s' at %i, Len: %i\n", exppatt, i, lennew );
                                #endif
 
                                lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew + i - 1, lennew );

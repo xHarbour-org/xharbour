@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3120 2004/06/30 15:02:33 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3121 2004/06/30 19:06:24 jabrecer Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-30 14:36 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/pp/ppcore.c
+    ! Fixed bug in expnasion of non repeatable Marker into residual group when found multiple times.
 
 2004-06-30 11:39 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
   * contrib/libct/ctwin.prg
