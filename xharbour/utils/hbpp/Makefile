@@ -1,10 +1,12 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:44:58 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2004/10/31 13:15:47 druzus Exp $
 #
 
 ROOT = ../../
 
-C_SOURCES=$(TOP)$(ROOT)source/compiler/calconst.c
+vpath %.c $(TOP)$(ROOT)source/compiler/
+
+C_SOURCES=calconst.c
 
 C_MAIN=hbpp.c
 

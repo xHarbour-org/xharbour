@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3564 2004/10/31 19:43:26 druzus Exp $
+ * $Id: ChangeLog,v 1.3565 2004/10/31 20:39:12 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-01 05:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/vm/mainstd/Makefile
+  * xharbour/source/vm/optcon/Makefile
+  * xharbour/source/vm/optgui/Makefile
+  * xharbour/utils/hbpp/Makefile
+    * added hack with 'vpath' to avoid redefining the rules for
+      different path - be careful, it can have some bad side effects
+      for files with the same name at different directories
 
 2004-10-31 21:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/codepage/Makefile

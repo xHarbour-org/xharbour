@@ -1,11 +1,13 @@
 #
-# $Id: Makefile,v 1.5 2004/04/01 22:00:42 druzus Exp $
+# $Id: Makefile,v 1.1 2004/08/02 21:05:50 lf_sfnet Exp $
 #
+
+vpath %.c ../
 
 ROOT = ../../../
 
 C_SOURCES=\
-	../mainstd.c \
+	mainstd.c \
 
 LIBNAME=mainstd
 

@@ -1,13 +1,15 @@
 #
-# $Id: Makefile,v 1.1 2004/08/22 17:20:14 lf_sfnet Exp $
+# $Id: Makefile,v 1.2 2004/09/12 15:37:33 lf_sfnet Exp $
 #
+
+vpath %.c ../
 
 ROOT = ../../../
 
 C_SOURCES=\
-	../hvm.c \
-	../fm.c \
-	../classes.c 
+	hvm.c \
+	fm.c \
+	classes.c 
 
 LIBNAME=optcon
 
