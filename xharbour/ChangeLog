@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3082 2004/06/17 20:18:37 modalsist Exp $
+ * $Id: ChangeLog,v 1.3082 2004/06/17 23:33:16 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-06-17 20:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/gtapi.c
+    ! Fixed a long standing issue with how the 'border' color is handled
+    ! in SetColor().
+  * include/hbver.h
+    * Refreshed.
 
 2004-06-17 20:19 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
   * include/hbclass.ch

@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.28 2004/03/22 17:58:40 mauriliolongo Exp $
+ * $Id: gtapi.c,v 1.29 2004/06/17 22:14:38 ronpinkas Exp $
  */
 
 /*
@@ -593,7 +593,9 @@ USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
    HB_TRACE(HB_TR_DEBUG, ("hb_gtSetColorStr(%s)", szColorString));
 
    if( szColorString == ( char * ) NULL )
+   {
       return 1;
+   }
 
    if( *szColorString == '\0' )
    {
@@ -612,7 +614,9 @@ USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
       while( c <= '9' && c >= '0' && i < 6 )
       {
          if( i == 0 )
+         {
             memset( buff, '\0', 6 );
+         }
 
          buff[ i++ ] = c;
          c = *szColorString++;
@@ -627,7 +631,9 @@ USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
          for( y = 1; i + 1; y *= 10, i-- )
          {
             if( buff[ i ] != '\0')
+            {
                nColor += ( ( buff[ i ] - '0' ) * y );
+            }
          }
          nColor &= 0x0F;
          i = 0;
@@ -692,7 +698,9 @@ USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
          case ',':
          case '\0':
             if( ! nCount )
+            {
                nFore = s_pColor[ nPos ];
+            }
             nCount = -1;
             if( nPos == s_uiColorCount )
             {
@@ -700,10 +708,14 @@ USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
                ++s_uiColorCount;
             }
             if( bHasX )
+            {
                nFore &= 0x88F8;
+            }
 
             if( bHasU ) /* background if slash, else foreground */
+            {
                nColor |= 0x0800;
+            }
 
             if( bHasI )
             {
@@ -721,12 +733,18 @@ USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
                }
             }
             if( ( nFore & 0x8800 ) != 0 && ( ( nFore | nColor ) & 0x0077 ) == 0)
+            {
                nFore |= 1;
+            }
 
             if( bSlash )
+            {
                s_pColor[ nPos++ ] = ( nColor << 4 ) | nFore;
+            }
             else
+            {
                s_pColor[ nPos++ ] = nColor | nFore;
+            }
 
             nColor = nFore = 0;
             bSlash = bHasX = bHasU = bHasI = FALSE;
@@ -734,8 +752,10 @@ USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
    }
    while( c );
 
-   if( nPos > 0 && nPos < 4 )
+   if( nPos > 1 && nPos < 4 )
+   {
       s_pColor[ 4 ] = s_pColor[ 1 ];
+   }
 
    s_uiColorIndex = HB_CLR_STANDARD; /* hb_gtColorSelect( HB_CLR_STANDARD ); */
 
