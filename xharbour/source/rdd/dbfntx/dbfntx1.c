@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.105 2002/03/18 12:08:06 alkresin Exp $
+ * $Id: dbfntx1.c,v 1.12 2002/03/19 01:07:58 ronpinkas Exp $
  */
 
 /*
@@ -162,7 +162,7 @@ static void hb_IncString( char* s, int slen )
    unsigned char *ptr;
    unsigned int nsymb;
 
-   for( ptr=s+slen-1;ptr>=s;ptr-- )
+   for( ptr= (unsigned char *) ( s + slen - 1 ); ptr >= (unsigned char *) s; ptr-- )
    {
       nsymb = (unsigned int) *ptr;
       if( nsymb < 255 )

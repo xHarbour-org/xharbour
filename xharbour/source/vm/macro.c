@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.5 2002/03/17 03:50:39 ronpinkas Exp $
+ * $Id: macro.c,v 1.6 2002/03/19 01:07:58 ronpinkas Exp $
  */
 
 /*
@@ -58,6 +58,7 @@
 #include "hbcomp.h"
 #include "hbstack.h"
 #include "hbmemvar.ch"   /* for values returned by hb_memvarScope() */
+#include "hbapirdd.h"
 
 #ifdef HB_MACRO_STATEMENTS
   #include "hbpp.h"
