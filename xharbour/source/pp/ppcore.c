@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.48 2003/03/08 04:26:51 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.49 2003/03/09 17:30:36 ronpinkas Exp $
  */
 
 /*
@@ -3467,13 +3467,25 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                      {
                         if( ptr[i + 1] == exppatt[1] )
                         {
-                            ptr[ i + 3 ]++;
+                            int j = i + 3;
+
+                            ptr[ j ]++;
+
+                            if( ptr[ j ] == '[' )
+                            {
+                               ptr[ j ]++;
+                            }
+
+                            if( ptr[ j ] == ']' )
+                            {
+                               ptr[ j ]++;
+                            }
 
                             #ifdef DEBUG_MARKERS
                                printf( "   Marked %s as instanciated\n", ptr + i );
                             #endif
 
-                            cMarkerCount = ptr[ i + 3 ];
+                            cMarkerCount = ptr[ j ];
                         }
                         else
                         {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.829 2003/03/12 13:30:48 jonnymind Exp $
+ * $Id: ChangeLog,v 1.830 2003/03/12 15:42:23 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-12 16:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Fixed bug in instanciation of optional group excessive number of times.
 
 2003-03-12 12:38 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tbrowse.prg
@@ -22,8 +26,8 @@
   * source/vm/garbage.c
   * source/vm/thread.c
   * include/thread.h
-    ! Latest thread architecture has been ported on windows. 
-      Now they are working, under almost all conditions. 
+    ! Latest thread architecture has been ported on windows.
+      Now they are working, under almost all conditions.
       Architecture is fine, still some optimization and compatibilty
       issue is to be addressed.
 
