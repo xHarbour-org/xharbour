@@ -1,9 +1,10 @@
 #define _WIN32_WINNT   0x0400
+#define _WIN32_IE      0x0400
 
-#ifndef __MINGW32__
 #ifndef __WATCOMC__
 
 #include <windows.h>
+#include <commctrl.h>
 #include <shlobj.h>
 
 #include "item.api"
@@ -288,7 +289,8 @@ HB_FUNC( TABCTRL_GETCURFOCUS )
 
 HB_FUNC( TABCTRL_SETCURFOCUS )
 {
-  hb_retni( TabCtrl_SetCurFocus( (HWND) hb_parnl(1), (int) hb_parni(2) ) );
+  TabCtrl_SetCurFocus( (HWND) hb_parnl(1), (int) hb_parni(2) );   
+  hb_ret();
 }
 
 //---------------------------------------------------------------------------//
@@ -356,5 +358,4 @@ HB_FUNC( TABCTRL_GETUNICODEFORMAT )
 
 //---------------------------------------------------------------------------//
 
-#endif
 #endif

@@ -19,10 +19,11 @@
 #ifndef __MINGW32__
 #ifndef __WATCOMC__
 
-#include   "windows.h"
-#include   "shlobj.h"
-#include   "shellApi.h"
-#include   "wininet.h"
+#include   <windows.h>
+#include   <commctrl.h>
+#include   <shlobj.h>
+#include   <shellApi.h>
+#include   <wininet.h>
 
 #include   "hbapi.h"
 #include   "hbvm.h"

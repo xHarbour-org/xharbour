@@ -351,11 +351,7 @@ HB_FUNC( IMAGELIST_MERGE )
 //-----------------------------------------------------------------------------
 // WINCOMMCTRLAPI HIMAGELIST  WINAPI ImageList_Duplicate(HIMAGELIST himl);
 
-#ifndef __MINGW32__
-
 HB_FUNC( IMAGELIST_DUPLICATE )
 {
    hb_retnl( (LONG) ImageList_Duplicate((HIMAGELIST) hb_parnl( 1 )));
 }
-
-#endif
