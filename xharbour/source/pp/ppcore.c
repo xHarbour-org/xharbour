@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.186 2004/11/04 07:46:42 lf_sfnet Exp $
+ * $Id: ppcore.c,v 1.187 2004/11/04 14:06:03 druzus Exp $
  */
 
 /*
@@ -2492,11 +2492,18 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
                  if( hb_comp_PPTrace )
                  {
-                    fprintf( hb_comp_PPTrace, "%s(%i) >%.*s<\n", hb_comp_files.pLast->szFileName, hb_comp_iLine - 1, i, ptrb );
-                    fprintf( hb_comp_PPTrace, "#defined >%.*s<\n\n", ( int ) ( ptri - ptrb ), ptro );
+                    fprintf( hb_comp_PPTrace, "%s(%i) >%.*s<\n", hb_comp_files.pLast->szFileName, hb_comp_iLine - 1, ( int ) ( ptri - ptrb ), ptrb );
+                    fprintf( hb_comp_PPTrace, "#defined >%.*s<\n", i, ptro );
                  }
 
                  hb_pp_Stuff( ptro, ptrb, i, ptri - ptrb, lens + 1 );
+
+                 #if 0
+                 if( hb_comp_PPTrace )
+                 {
+                    fprintf( hb_comp_PPTrace, ">%s<\n\n", sLine + isdvig );
+                 }
+                 #endif
 
                  //printf( "Defined: >%s<\n", ptrb );
 
@@ -2558,11 +2565,18 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
                  if( hb_comp_PPTrace )
                  {
-                    fprintf( hb_comp_PPTrace, "%s(%i) >%.*s<\n", hb_comp_files.pLast->szFileName, hb_comp_iLine - 1, i, ptri );
-                    fprintf( hb_comp_PPTrace, "#[x]translated >%.*s<\n\n", lens, ptro );
+                    fprintf( hb_comp_PPTrace, "%s(%i) >%.*s<\n", hb_comp_files.pLast->szFileName, hb_comp_iLine - 1, lens, ptri );
+                    fprintf( hb_comp_PPTrace, "#[x]translated >%.*s<\n", i, ptro );
                  }
 
                  hb_pp_Stuff( ptro, ptri, i, lens, strlen( ptri ) );
+
+                 #if 0
+                 if( hb_comp_PPTrace )
+                 {
+                    fprintf( hb_comp_PPTrace, ">%s<\n\n", sLine + isdvig );
+                 }
+                 #endif
 
                  //printf( "Translated: >%s<\n", ptri );
 
@@ -2627,20 +2641,6 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
            if( ( i = WorkCommand( ptri, ptro, stcmd ) ) >= 0 )
            {
-              if( hb_comp_PPTrace )
-              {
-                 if( i )
-                 {
-                    fprintf( hb_comp_PPTrace, "%s(%i) >%s %.*s<\n", hb_comp_files.pLast->szFileName, hb_comp_iLine - 1, s_sToken, i, ptri );
-                 }
-                 else
-                 {
-                    fprintf( hb_comp_PPTrace, "%s(%i) >%s<\n", hb_comp_files.pLast->szFileName, hb_comp_iLine - 1, s_sToken );
-                 }
-
-                 fprintf( hb_comp_PPTrace, "#[x]commanded >%.*s<\n\n", lens, ptro );
-              }
-
               ptri = sLine + isdvig;
 
               if( ipos > 0 )
@@ -2658,11 +2658,23 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
               {
                  lens = strlen( sLine + isdvig );
 
+                 if( hb_comp_PPTrace )
+                 {
+                    fprintf( hb_comp_PPTrace, "%s(%i) >%.*s<\n", hb_comp_files.pLast->szFileName, hb_comp_iLine - 1, s_sToken, (ipos)? ipos - 1 : lens, ptri );
+                    fprintf( hb_comp_PPTrace, "#[x]commanded >%.*s<\n\n", i, ptro );
+                 }
+
                  hb_pp_Stuff( ptro, ptri, i, (ipos)? ipos - 1 : lens, lens );
               }
               else
               {
-                 memcpy( sLine, sOutLine, i+1);
+                 if( hb_comp_PPTrace )
+                 {
+                    fprintf( hb_comp_PPTrace, "%s(%i) >%s<\n", hb_comp_files.pLast->szFileName, hb_comp_iLine - 1, sLine );
+                    fprintf( hb_comp_PPTrace, "#[x]commanded >%.*s<\n\n", i, ptro );
+                 }
+
+                 memcpy( sLine, sOutLine, i + 1 );
               }
 
               //printf( "Commanded: >%s<\n", ptro );
