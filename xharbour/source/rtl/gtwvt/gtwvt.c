@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.12 2003/12/24 10:03:56 ronpinkas Exp $
+ * $Id: gtwvt.c,v 1.13 2003/12/26 17:11:32 vouchcac Exp $
  */
 
 /*
@@ -139,6 +139,7 @@ typedef struct global_data
   BOOL      CaretExist;                // TRUE if a caret has been created
   int       CaretSize;
   POINT     mousePos;                  // the last mousedown position
+  BOOL      MouseMove;                 // Flag to say whether to return mouse movement events
   HWND      hWnd;                      // the window handle
   int       Keys[WVT_CHAR_QUEUE_SIZE]; // Array to hold the characters & events
   int       keyPointerIn;              // Offset into key array for character to be placed
@@ -915,7 +916,7 @@ USHORT HB_GT_FUNC( gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar
 {
   USHORT ret    = 1;
   USHORT sWidth = HB_GT_FUNC( gt_GetScreenWidth() );
- 
+
   if( Row >= 0 && Row < sWidth )
   {
       if( Left < 0 )
@@ -1378,7 +1379,7 @@ static USHORT hb_wvt_gtCalcPixelWidth( void )
 static BOOL hb_wvt_gtAllocSpBuffer( USHORT col, USHORT row )
 {
   BOOL bRet = TRUE;
- 
+
   _s.COLS        = col;
   _s.ROWS        = row;
   _s.BUFFERSIZE  = col * row * sizeof(char);
@@ -1845,7 +1846,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
         POINT xy, colrow ;
 
         xy.x   = LOWORD( lParam );
-        xy.y   = HIWORD( lParam ); 
+        xy.y   = HIWORD( lParam );
         colrow = hb_wvt_gtGetColRowFromXY( xy.x, xy.y );
         hb_wvt_gtSetMouseX( colrow.x );
         hb_wvt_gtSetMouseY( colrow.y );
@@ -1889,9 +1890,29 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
         return( 0 );
       }
     }
+    case WM_RBUTTONDBLCLK:
+    case WM_LBUTTONDBLCLK:
+    {
+      if ( !b_MouseEnable )
+      {
+        break;
+      }
+      else
+      {
+        POINT xy, colrow ;
+
+        xy.x   = LOWORD(lParam);
+        xy.y   = HIWORD(lParam);
+        colrow = hb_wvt_gtGetColRowFromXY( xy.x, xy.y );
+        hb_wvt_gtSetMouseX( colrow.x );
+        hb_wvt_gtSetMouseY( colrow.y );
+        hb_wvt_gtAddCharToInputQueue( message == WM_LBUTTONDBLCLK ? K_LDBLCLK : K_RDBLCLK );
+        return( 0 );
+      }
+    }
     case WM_MOUSEMOVE:
     {
-      if ( !b_MouseEnable || ( wParam == MK_LBUTTON ) || ( wParam == MK_RBUTTON ) )
+      if ( !b_MouseEnable || !_s.MouseMove|| ( wParam == MK_LBUTTON ) || ( wParam == MK_RBUTTON ) )
       {
         break;
       }
@@ -1900,13 +1921,13 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
         POINT xy, colrow ;
 
         xy.x   = LOWORD( lParam );
-        xy.y   = HIWORD( lParam ); 
+        xy.y   = HIWORD( lParam );
         colrow = hb_wvt_gtGetColRowFromXY( xy.x, xy.y );
         hb_wvt_gtSetMouseX( colrow.x );
         hb_wvt_gtSetMouseY( colrow.y );
         hb_wvt_gtAddCharToInputQueue( K_MOUSEMOVE );
         return( 0 );
-      }      
+      }
     }
   }
   return(DefWindowProc(hWnd, message, wParam, lParam));
@@ -1922,7 +1943,7 @@ static HWND hb_wvt_gtCreateWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
   HB_SYMBOL_UNUSED( szCmdLine );
   InitCommonControls();
 
-  wndclass.style         = CS_HREDRAW | CS_VREDRAW;
+  wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
   wndclass.lpfnWndProc   = hb_wvt_gtWndProc;
   wndclass.cbClsExtra    = 0;
   wndclass.cbWndExtra    = 0;
@@ -2326,6 +2347,7 @@ static void gt_hbInitStatics(void)
   _s.CaretSize        = 4;
   _s.mousePos.x       = 0;
   _s.mousePos.y       = 0;
+  _s.MouseMove        = FALSE ;
   _s.hWnd             = NULL;
   _s.keyPointerIn     = 1;
   _s.keyPointerOut    = 0;
@@ -2612,6 +2634,13 @@ BOOL HB_EXPORT hb_wvt_gtSetAltF4Close( BOOL bCanClose)
 void HB_EXPORT hb_wvt_gtDoProcessMessages(void)
 {
   hb_wvt_gtProcessMessages();
+}
+
+BOOL HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent)
+{
+  BOOL bWas = _s.MouseMove;
+  _s.MouseMove = bHandleEvent;
+  return(bWas);
 }
 
 /* *********************************************************************** */
