@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.27 2004/09/03 08:39:54 druzus Exp $
+ * $Id: dbffpt1.c,v 1.28 2004/09/03 16:08:26 druzus Exp $
  */
 
 /*
@@ -647,20 +647,20 @@ static ERRCODE hb_fptGCfreeBlock( FPTAREAP pArea, LPMEMOGCTABLE pGCtable,
             pGCtable->pGCitems[ pGCtable->usItems ].fChanged = fChanged = TRUE;
             pGCtable->usItems++;
          }
-         else if ( pGCtable->pGCitems[ 1 ].ulSize < ulSize )
+         else if ( pGCtable->pGCitems[ 0 ].ulSize < ulSize )
          {
-            if ( pGCtable->ulNextBlock == pGCtable->pGCitems[ 1 ].ulOffset +
-                                          pGCtable->pGCitems[ 1 ].ulSize )
+            if ( pGCtable->ulNextBlock == pGCtable->pGCitems[ 0 ].ulOffset +
+                                          pGCtable->pGCitems[ 0 ].ulSize )
             {
-               pGCtable->ulNextBlock -= pGCtable->pGCitems[ 1 ].ulSize;
+               pGCtable->ulNextBlock -= pGCtable->pGCitems[ 0 ].ulSize;
             }
-            else if ( pGCtable->pGCitems[ 1 ].fChanged )
+            else if ( pGCtable->pGCitems[ 0 ].fChanged )
             {
-               errCode = hb_fptWriteGCitems( pArea, pGCtable, 1 );
+               errCode = hb_fptWriteGCitems( pArea, pGCtable, 0 );
             }
-            pGCtable->pGCitems[ 1 ].ulOffset = ulOffset;
-            pGCtable->pGCitems[ 1 ].ulSize = ulSize;
-            pGCtable->pGCitems[ 1 ].fChanged = fChanged = TRUE;
+            pGCtable->pGCitems[ 0 ].ulOffset = ulOffset;
+            pGCtable->pGCitems[ 0 ].ulSize = ulSize;
+            pGCtable->pGCitems[ 0 ].fChanged = fChanged = TRUE;
          }
       }
 
@@ -850,10 +850,10 @@ static ERRCODE hb_fptWriteGCdata( FPTAREAP pArea, LPMEMOGCTABLE pGCtable )
    {
       if ( pGCtable->bType == MEMO_FPT_SIX )
       {
-         HB_PUT_LE_UINT16( pGCtable->fptHeader.nGCitems, pGCtable->usItems );
+         USHORT usItems = HB_MIN( pGCtable->usItems, pGCtable->usMaxItem );
+         HB_PUT_LE_UINT16( pGCtable->fptHeader.nGCitems, usItems );
          memset( pGCtable->fptHeader.reserved2, 0, sizeof( pGCtable->fptHeader.reserved2 ) );
-         j = ( pGCtable->usItems > pGCtable->usMaxItem ) ?
-               pGCtable->usItems - pGCtable->usMaxItem : 0;
+         j = pGCtable->usItems - usItems;
          for( i = j ; i < pGCtable->usItems; i++ )
          {
             HB_PUT_LE_UINT16( &pGCtable->fptHeader.reserved2[ ( i - j ) * 6 ],
@@ -904,14 +904,14 @@ static ERRCODE hb_fptWriteGCdata( FPTAREAP pArea, LPMEMOGCTABLE pGCtable )
          {
             FPTBLOCK fptBlock;
             BYTE *bPageBuf;
+            USHORT usItems = HB_MIN( pGCtable->usItems, pGCtable->usMaxItem );
 
             HB_PUT_BE_UINT32( fptBlock.type, FPTIT_FLEX_GC );
             HB_PUT_BE_UINT32( fptBlock.size, pGCtable->ulSize );
             bPageBuf = ( BYTE * ) hb_xgrab( pGCtable->ulSize );
             memset( bPageBuf, 0xAD, pGCtable->ulSize );
-            HB_PUT_LE_UINT16( bPageBuf, ( (USHORT) pGCtable->usItems << 2 ) + 3 );
-            j = ( pGCtable->usItems > pGCtable->usMaxItem ) ?
-                  pGCtable->usItems - pGCtable->usMaxItem : 0;
+            HB_PUT_LE_UINT16( bPageBuf, ( (USHORT) usItems << 2 ) + 3 );
+            j = pGCtable->usItems - usItems;
             for( i = j ; i < pGCtable->usItems; i++ )
             {
                HB_PUT_LE_UINT32( &bPageBuf[ ( i - j ) * 8 + 2 ],
