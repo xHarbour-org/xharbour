@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.27 2004/03/02 23:19:40 jonnymind Exp $
+ * $Id: gtapi.c,v 1.28 2004/03/22 17:58:40 mauriliolongo Exp $
  */
 
 /*
@@ -256,21 +256,34 @@ USHORT HB_EXPORT hb_gtBox( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYT
             short [vszakats] */
 
    cPadChar = ' ';
+
    for( tmp = 0; *pbyFrame && tmp < 9; tmp++ )
+   {
       cPadChar = szBox[ tmp ] = *pbyFrame++;
+   }
+
    while( tmp < 8 )
+   {
       szBox[ tmp++ ] = cPadChar;
+   }
+
    szBox[ tmp ] = '\0';
 
    if( Top != Bottom )
    {
       if( Left != Right )
+      {
          Ret = hb_gt_Box( Top, Left, Bottom, Right, szBox, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+      }
       else
+      {
          Ret = hb_gt_VertLine( Left, Top, Bottom, szBox[ 3 ], ( BYTE ) s_pColor[ s_uiColorIndex ] );
+      }
    }
    else
+   {
       Ret = hb_gt_HorizLine( Top, Left, Right, szBox[ 1 ], ( BYTE ) s_pColor[ s_uiColorIndex ] );
+   }
 
    hb_gtSetPosContext( HB_MAX(Top,0) + 1, HB_MAX(Left,0) + 1, HB_GT_SET_POS_AFTER );
 
@@ -303,12 +316,18 @@ USHORT HB_EXPORT hb_gtBoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
    if( Top != Bottom )
    {
       if( Left != Right )
+      {
          Ret = hb_gt_BoxS( Top, Left, Bottom, Right, ( BYTE * ) _B_SINGLE, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+      }
       else
+      {
          Ret = hb_gt_VertLine( Left, Top, Bottom, (BYTE) HB_B_SINGLE_V, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+      }
    }
    else
+   {
       Ret = hb_gt_HorizLine( Top, Left, Right, (BYTE) HB_B_SINGLE_H, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+   }
 
    hb_gtSetPosContext( HB_MAX(Top,0) + 1, HB_MAX(Left,0) + 1, HB_GT_SET_POS_AFTER );
 

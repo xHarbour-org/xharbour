@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.56 2004/06/06 18:33:23 bdj Exp $
+ * $Id: gtwin.c,v 1.57 2004/06/09 06:24:01 bdj Exp $
  */
 
 /*
@@ -1173,6 +1173,7 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
             Top = Bottom;
             Bottom = Row;
         }
+
         if( Left > Right )
         {
             Row = Left;
@@ -1184,32 +1185,35 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         Height = Bottom - Top + 1;
         Width  = Right - Left + 1;
 
-        HB_GT_FUNC(gt_DispBegin());
+        HB_GT_FUNC( gt_DispBegin() );
 
-        if( Height > 1 && Width > 1 &&
-               Top >= 0 && Top < sHeight &&
-              Left >= 0 && Left < sWidth )
-            HB_GT_FUNC(gt_xPutch( Top, Left, byAttr, szBox[ 0 ] )); /* Upper left corner */
+        if( Height > 1 && Width > 1 && Top >= 0 && Top < sHeight && Left >= 0 && Left < sWidth )
+        {
+           HB_GT_FUNC( gt_xPutch( Top, Left, byAttr, szBox[ 0 ] ) ); /* Upper left corner */
+        }
 
-        Col = ( Height > 1 ? Left + 1 : Left );
+        Col = ( Width > 1 ? Left + 1 : Left );
+
         if( Col < 0 )
         {
             Width += Col;
             Col = 0;
         }
+
         if( Right >= sWidth )
         {
             Width -= Right - sWidth;
         }
 
-        if( Col <= Right && Col < sWidth &&
-                Top >= 0 && Top < sHeight )
-            HB_GT_FUNC(gt_Replicate( Top, Col, byAttr, szBox[ 1 ], Width + ( (Right - Left) > 1 ? -2 : 0 ) )); /* Top line */
+        if( Col < Right && Col < sWidth && Top >= 0 && Top < sHeight )
+        {
+            HB_GT_FUNC( gt_Replicate( Top, Col, byAttr, szBox[ 1 ], Width + ( (Right - Left) > 1 ? -2 : 0 ) )); /* Top line */
+        }
 
-        if( Height > 1 &&
-               (Right - Left) > 1 && Right < sWidth &&
-               Top >= 0 && Top < sHeight )
-            HB_GT_FUNC(gt_xPutch( Top, Right, byAttr, szBox[ 2 ] )); /* Upper right corner */
+        if( Height > 1 && (Right - Left) > 0 && Right < sWidth && Top >= 0 && Top < sHeight )
+        {
+            HB_GT_FUNC( gt_xPutch( Top, Right, byAttr, szBox[ 2 ] ) ); /* Upper right corner */
+        }
 
         if( szBox[ 8 ] && Height > 2 && Width > 2 )
         {
@@ -1218,13 +1222,22 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
                 if( Row >= 0 && Row < sHeight )
                 {
                     Col = Left;
+
                     if( Col < 0 )
+                    {
                         Col = 0; /* The width was corrected earlier. */
+                    }
                     else
-                        HB_GT_FUNC(gt_xPutch( Row, Col++, byAttr, szBox[ 7 ] )); /* Left side */
-                    HB_GT_FUNC(gt_Replicate( Row, Col, byAttr, szBox[ 8 ], Width - 2 )); /* Fill */
+                    {
+                        HB_GT_FUNC( gt_xPutch( Row, Col++, byAttr, szBox[ 7 ] ) ); /* Left side */
+                    }
+
+                    HB_GT_FUNC( gt_Replicate( Row, Col, byAttr, szBox[ 8 ], Width - 2 ) ); /* Fill */
+
                     if( Right < sWidth )
-                        HB_GT_FUNC(gt_xPutch( Row, Right, byAttr, szBox[ 3 ] )); /* Right side */
+                    {
+                       HB_GT_FUNC(gt_xPutch( Row, Right, byAttr, szBox[ 3 ] )); /* Right side */
+                    }
                 }
             }
         }
@@ -1235,9 +1248,14 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
                 if( Row >= 0 && Row < sHeight )
                 {
                     if( Left >= 0 && Left < sWidth )
+                    {
                         HB_GT_FUNC(gt_xPutch( Row, Left, byAttr, szBox[ 7 ] )); /* Left side */
+                    }
+
                     if( ( Width > 1 || Left < 0 ) && Right < sWidth )
+                    {
                         HB_GT_FUNC(gt_xPutch( Row, Right, byAttr, szBox[ 3 ] )); /* Right side */
+                    }
                 }
             }
         }
@@ -1245,21 +1263,32 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         if( Height > 1 && Width > 1 )
         {
             if( Left >= 0 && Bottom < sHeight )
+            {
                 HB_GT_FUNC(gt_xPutch( Bottom, Left, byAttr, szBox[ 6 ] )); /* Bottom left corner */
+            }
 
             Col = Left + 1;
+
             if( Col < 0 )
+            {
                 Col = 0; /* The width was corrected earlier. */
+            }
 
             if( Col <= Right && Bottom < sHeight )
+            {
                 HB_GT_FUNC(gt_Replicate( Bottom, Col, byAttr, szBox[ 5 ], Width - 2 )); /* Bottom line */
+            }
 
             if( Right < sWidth && Bottom < sHeight )
+            {
                 HB_GT_FUNC(gt_xPutch( Bottom, Right, byAttr, szBox[ 4 ] )); /* Bottom right corner */
+            }
         }
 
         HB_GT_FUNC(gt_DispEnd());
+
         MK_SCREEN_UPDATE();
+
         ret = 0;
     }
 

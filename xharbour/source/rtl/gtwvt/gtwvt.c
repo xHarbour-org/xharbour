@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.110 2004/06/09 06:24:00 bdj Exp $
+ * $Id: gtwvt.c,v 1.111 2004/06/12 18:55:08 bdj Exp $
  */
 
 /*
@@ -832,12 +832,12 @@ USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
                           BYTE * szBox, BYTE byAttr ) )
 {
     USHORT ret = 1;
-    SHORT  Row;
-    SHORT  Col;
-    SHORT  Height;
-    SHORT  Width;
-    USHORT sWidth  = HB_GT_FUNC( gt_GetScreenWidth()  );
-    USHORT sHeight = HB_GT_FUNC( gt_GetScreenHeight() );
+    SHORT Row;
+    SHORT Col;
+    SHORT Height;
+    SHORT Width;
+    USHORT sWidth = HB_GT_FUNC(gt_GetScreenWidth()),
+          sHeight = HB_GT_FUNC(gt_GetScreenHeight());
 
     if( ( Left   >= 0 && Left   < sWidth  ) ||
         ( Right  >= 0 && Right  < sWidth  ) ||
@@ -847,14 +847,15 @@ USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         /* Ensure that box is drawn from top left to bottom right. */
         if( Top > Bottom )
         {
-            Row    = Top;
-            Top    = Bottom;
+            Row = Top;
+            Top = Bottom;
             Bottom = Row;
         }
+
         if( Left > Right )
         {
-            Row   = Left;
-            Left  = Right;
+            Row = Left;
+            Left = Right;
             Right = Row;
         }
 
@@ -864,35 +865,34 @@ USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
 
         HB_GT_FUNC( gt_DispBegin() );
 
-        if( Height > 1 && Width > 1 &&
-               Top >= 0 && Top  < sHeight &&
-              Left >= 0 && Left < sWidth )
+        if( Height > 1 && Width > 1 && Top >= 0 && Top < sHeight && Left >= 0 && Left < sWidth )
         {
-          HB_GT_FUNC( gt_xPutch( Top, Left, byAttr, szBox[ 0 ] ) ); /* Upper left corner */
+           HB_GT_FUNC( gt_xPutch( Top, Left, byAttr, szBox[ 0 ] ) ); /* Upper left corner */
         }
 
-        Col = ( Height > 1 ? Left + 1 : Left );
+        Col = ( Width > 1 ? Left + 1 : Left );
+
         if( Col < 0 )
         {
             Width += Col;
             Col = 0;
         }
+
         if( Right >= sWidth )
         {
             Width -= Right - sWidth;
         }
 
-        if( Col <= Right && Col < sWidth &&
-                Top >= 0 && Top < sHeight )
+        if( Col < Right && Col < sWidth && Top >= 0 && Top < sHeight )
         {
-            HB_GT_FUNC( gt_Replicate( Top, Col, byAttr, szBox[ 1 ], Width + ( ( Right - Left ) > 1 ? -2 : 0 ) ) ); /* Top line */
+            HB_GT_FUNC( gt_Replicate( Top, Col, byAttr, szBox[ 1 ], Width + ( (Right - Left) > 1 ? -2 : 0 ) )); /* Top line */
         }
-        if( Height > 1 &&
-               ( Right - Left ) > 1 && Right < sWidth &&
-               Top >= 0 && Top < sHeight )
+
+        if( Height > 1 && (Right - Left) > 0 && Right < sWidth && Top >= 0 && Top < sHeight )
         {
             HB_GT_FUNC( gt_xPutch( Top, Right, byAttr, szBox[ 2 ] ) ); /* Upper right corner */
         }
+
         if( szBox[ 8 ] && Height > 2 && Width > 2 )
         {
             for( Row = Top + 1; Row < Bottom; Row++ )
@@ -900,35 +900,39 @@ USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
                 if( Row >= 0 && Row < sHeight )
                 {
                     Col = Left;
+
                     if( Col < 0 )
                     {
-                      Col = 0; /* The width was corrected earlier. */
+                        Col = 0; /* The width was corrected earlier. */
                     }
                     else
                     {
-                      HB_GT_FUNC( gt_xPutch( Row, Col++, byAttr, szBox[ 7 ] ) );           /* Left side */
+                        HB_GT_FUNC( gt_xPutch( Row, Col++, byAttr, szBox[ 7 ] ) ); /* Left side */
                     }
+
                     HB_GT_FUNC( gt_Replicate( Row, Col, byAttr, szBox[ 8 ], Width - 2 ) ); /* Fill */
+
                     if( Right < sWidth )
                     {
-                      HB_GT_FUNC( gt_xPutch( Row, Right, byAttr, szBox[ 3 ] ) );           /* Right side */
+                       HB_GT_FUNC(gt_xPutch( Row, Right, byAttr, szBox[ 3 ] )); /* Right side */
                     }
                 }
             }
         }
         else
         {
-            for( Row = ( Width > 1 ? Top + 1 : Top ); Row < ( ( Right - Left ) > 1 ? Bottom : Bottom + 1 ); Row++ )
+            for( Row = ( Width > 1 ? Top + 1 : Top ); Row < ( (Right - Left ) > 1 ? Bottom : Bottom + 1 ); Row++ )
             {
                 if( Row >= 0 && Row < sHeight )
                 {
                     if( Left >= 0 && Left < sWidth )
                     {
-                        HB_GT_FUNC( gt_xPutch( Row, Left, byAttr, szBox[ 7 ] ) );            /* Left side */
+                        HB_GT_FUNC(gt_xPutch( Row, Left, byAttr, szBox[ 7 ] )); /* Left side */
                     }
+
                     if( ( Width > 1 || Left < 0 ) && Right < sWidth )
                     {
-                        HB_GT_FUNC( gt_xPutch( Row, Right, byAttr, szBox[ 3 ] ) );           /* Right side */
+                        HB_GT_FUNC(gt_xPutch( Row, Right, byAttr, szBox[ 3 ] )); /* Right side */
                     }
                 }
             }
@@ -938,27 +942,33 @@ USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         {
             if( Left >= 0 && Bottom < sHeight )
             {
-                HB_GT_FUNC( gt_xPutch( Bottom, Left, byAttr, szBox[ 6 ] ) );                /* Bottom left corner */
+                HB_GT_FUNC(gt_xPutch( Bottom, Left, byAttr, szBox[ 6 ] )); /* Bottom left corner */
             }
+
             Col = Left + 1;
+
             if( Col < 0 )
             {
                 Col = 0; /* The width was corrected earlier. */
             }
+
             if( Col <= Right && Bottom < sHeight )
             {
-                HB_GT_FUNC( gt_Replicate( Bottom, Col, byAttr, szBox[ 5 ], Width - 2 ) );  /* Bottom line */
+                HB_GT_FUNC(gt_Replicate( Bottom, Col, byAttr, szBox[ 5 ], Width - 2 )); /* Bottom line */
             }
+
             if( Right < sWidth && Bottom < sHeight )
             {
-                HB_GT_FUNC( gt_xPutch( Bottom, Right, byAttr, szBox[ 4 ] ) );              /* Bottom right corner */
+                HB_GT_FUNC(gt_xPutch( Bottom, Right, byAttr, szBox[ 4 ] )); /* Bottom right corner */
             }
         }
-        HB_GT_FUNC( gt_DispEnd() );
+
+        HB_GT_FUNC(gt_DispEnd());
+
         ret = 0;
     }
 
-    return( ret );
+    return ret;
 }
 
 //-------------------------------------------------------------------//

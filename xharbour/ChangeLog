@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3079 2004/06/17 19:42:09 likewolf Exp $
+ * $Id: ChangeLog,v 1.3080 2004/06/17 22:12:15 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-17 15:10 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/rtl/gtapi.c
+    * Formating.
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+    ! Fixed clipper compatability in gt_Box
+      (other GTs might need similiar fix if they used gtwin code as template).
+
 2004-06-18 10:10 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * contrib/mysql/mysql.c
     - HB_FUNC(FILETOSQLBINARY) fixed to use local filelength() and test return value
