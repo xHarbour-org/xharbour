@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.77 2003/05/25 17:03:19 jonnymind Exp $
+* $Id: thread.c,v 1.78 2003/05/26 06:06:20 paultucker Exp $
 */
 
 /*
@@ -54,8 +54,8 @@
 *
 */
 
-/* JC1: pretty useless to even include files if thread is off */
-#ifdef HB_THREAD_SUPPORT
+/* JC1: Now including all this files to make threadsleep available in ST */
+
 
 #define HB_THREAD_OPTIMIZE_STACK
 
@@ -83,6 +83,8 @@
 #ifdef HB_OS_WIN_32
 #undef extern
 #endif
+
+#ifdef HB_THREAD_SUPPORT
 
 /* Creating a trylock for systems that have to use LWR */
 #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
@@ -1569,43 +1571,6 @@ HB_FUNC( NOTIFYALL )
    }
 }
 
-HB_FUNC( THREADSLEEP )
-{
-   HB_THREAD_STUB
-   if( ! ISNUM( 1 ) )
-   {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "THREADSLEEP", 1, pArgs );
-      hb_itemRelease( pArgs );
-
-      return;
-   }
-
-   hb_threadSleep( hb_parni( 1 ) );
-}
-
-void hb_threadSleep( int millisec )
-{
-   HB_THREAD_STUB
-
-   HB_STACK_UNLOCK;
-
-   #if defined( HB_OS_DARWIN )
-      usleep( millisec * 1000 );
-   #elif defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
-      {
-         struct timespec ts;
-         ts.tv_sec = millisec / 1000;
-         ts.tv_nsec = (millisec % 1000) * 1000000;
-         nanosleep( &ts, 0 );
-      }
-   #else
-      Sleep( millisec );
-   #endif
-
-   HB_STACK_LOCK;
-}
 
 HB_FUNC( THREADGETCURRENT )
 {
@@ -1857,3 +1822,63 @@ void hb_threadExit( void )
 
 #endif
 
+/***********************************************************
+   Threadsleep is available also on non-mt applications
+************************************************************/
+
+void hb_threadSleep( int millisec )
+{
+   HB_THREAD_STUB
+
+   HB_STACK_UNLOCK;
+
+   #if defined( HB_OS_DARWIN )
+      usleep( millisec * 1000 );
+   #elif defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+      {
+         struct timespec ts;
+         ts.tv_sec = millisec / 1000;
+         ts.tv_nsec = (millisec % 1000) * 1000000;
+         nanosleep( &ts, 0 );
+      }
+   #else
+      Sleep( millisec );
+   #endif
+
+   HB_STACK_LOCK;
+}
+
+HB_FUNC( THREADSLEEP )
+{
+   HB_THREAD_STUB
+   if( ! ISNUM( 1 ) )
+   {
+      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "THREADSLEEP", 1, pArgs );
+      hb_itemRelease( pArgs );
+
+      return;
+   }
+
+   hb_threadSleep( hb_parni( 1 ) );
+}
+
+HB_FUNC( SECONDSSLEEP )
+{
+   HB_THREAD_STUB
+   int sleep;
+
+   if( ! ISNUM( 1 ) )
+   {
+      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "THREADSLEEP", 1, pArgs );
+      hb_itemRelease( pArgs );
+
+      return;
+   }
+
+   sleep = (int) (hb_parnd( 1 ) * 1000.0);
+   hb_threadSleep( sleep );
+}
