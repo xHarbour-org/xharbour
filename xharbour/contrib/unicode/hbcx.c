@@ -1,5 +1,5 @@
 /*
- * $Id: hbcx.c,v 1.6 2004/03/02 12:58:14 andijahja Exp $
+ * $Id: hbcx.c,v 1.7 2005/02/19 10:08:40 andijahja Exp $
  */
 
 /*
@@ -330,7 +330,7 @@ HB_FUNC ( XXENCODE_FILE_BY_CHUNK )
    }
    else
    {
-      ulLine = pLine->item.asLong.value;
+      ulLine = hb_parnl( 2 );
       if ( ulLine <= 0 )
       {
          fclose( infile );

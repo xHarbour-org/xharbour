@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.5 2004/02/03 22:11:43 andijahja Exp $
+ * $Id: hbencode.c,v 1.6 2004/02/07 18:49:48 andijahja Exp $
  */
 
 /*
@@ -750,6 +750,7 @@ HB_FUNC( UUENCODE_FILE_BY_CHUNK )
    PHB_ITEM pOut  = hb_param( 3, HB_IT_STRING  );
    PHB_FNAME pFileName = NULL;
    char szUUEFileName[ _POSIX_PATH_MAX ] ;
+   ULONG ulLine;
 
    if ( !pIn )
    {
@@ -761,7 +762,9 @@ HB_FUNC( UUENCODE_FILE_BY_CHUNK )
       hb_errRT_BASE_SubstR( EG_ARG, 8003, NULL, "UUENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 
-   if ( pLine->item.asLong.value <= 0 )
+   ulLine = hb_parnl( 2 );
+
+   if ( ulLine <= 0 )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8003, NULL, "UUENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
@@ -777,7 +780,7 @@ HB_FUNC( UUENCODE_FILE_BY_CHUNK )
       strcpy( szUUEFileName, pOut->item.asString.value );
    }
 
-   hb_retni( uuencode_file_by_chunk( (BYTE*) pIn->item.asString.value, (BYTE*) szUUEFileName , (ULONG) pLine->item.asLong.value ) );
+   hb_retni( uuencode_file_by_chunk( (BYTE*) pIn->item.asString.value, (BYTE*) szUUEFileName , ulLine ) );
 
    if ( pFileName )
    {
@@ -825,6 +828,7 @@ HB_FUNC( B64ENCODE_FILE_BY_CHUNK )
    PHB_ITEM pOut  = hb_param( 3, HB_IT_STRING  );
    PHB_FNAME pFileName = NULL;
    char szUUEFileName[ _POSIX_PATH_MAX ] ;
+   ULONG ulLine;
 
    if ( !pIn )
    {
@@ -836,7 +840,9 @@ HB_FUNC( B64ENCODE_FILE_BY_CHUNK )
       hb_errRT_BASE_SubstR( EG_ARG, 8004, NULL, "B64ENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 
-   if ( pLine->item.asLong.value <= 0 )
+   ulLine = hb_parnl( 2 );
+
+   if ( ulLine <= 0 )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8004, NULL, "B64ENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
@@ -852,7 +858,7 @@ HB_FUNC( B64ENCODE_FILE_BY_CHUNK )
       strcpy( szUUEFileName, pOut->item.asString.value );
    }
 
-   hb_retni( b64encode_file_by_chunk ( (BYTE *) pIn->item.asString.value, (BYTE *) szUUEFileName, (ULONG) pLine->item.asLong.value ) );
+   hb_retni( b64encode_file_by_chunk ( (BYTE *) pIn->item.asString.value, (BYTE *) szUUEFileName, ulLine ) );
 
    if ( pFileName )
    {
@@ -951,6 +957,8 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
    USHORT YYELineLength = 128;
    USHORT iPart = 1;
    int iResult = 0;
+   ULONG ulLine;
+   ULONG ulLineLength;
 
    if ( !pIn )
    {
@@ -962,7 +970,9 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
       hb_errRT_BASE_SubstR( EG_ARG, 8006, NULL, "YYENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 
-   if ( pLine->item.asLong.value < 5 )
+   ulLine = hb_parnl( 2 );
+
+   if ( ulLine < 5 )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8006, "Value too small", "YYENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
@@ -991,12 +1001,13 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
 
    if ( pLineLength )
    {
-      if (( pLineLength->item.asInteger.value > 0 ) &&
-          ( pLineLength->item.asInteger.value <= 255 ))
+      ulLineLength = hb_parnl( 4 );
+      if (( ulLineLength > 0 ) &&
+          ( ulLineLength <= 255 ))
       {
-         YYELineLength = pLineLength->item.asInteger.value;
+         YYELineLength = ulLineLength;
       }
-      else if ( pLineLength->item.asInteger.value > 255 )
+      else if ( ulLineLength > 255 )
       {
          YYELineLength = 255;
       }
@@ -1012,7 +1023,7 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
       YYELineLegth which is 128 bytes by default.
       */
 
-      nBytes = pLine->item.asLong.value * YYELineLength;
+      nBytes = ulLine * YYELineLength;
 
       if (( nTotalEncoded + nBytes ) > filelen )
       {

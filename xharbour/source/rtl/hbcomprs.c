@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.c,v 1.9 2004/12/15 13:39:34 druzus Exp $
+ * $Id: hbcomprs.c,v 1.10 2005/01/20 08:28:04 brianhays Exp $
  */
 
 /*
@@ -4061,7 +4061,7 @@ HB_FUNC( HB_COMPRESS )
       }
       pDest = hb_itemUnRef( pDest );
       pDestLen = hb_itemUnRef( pDestLen );
-      ulDstlen = pDestLen->item.asLong.value;
+      ulDstlen = hb_parnl( iFirst + 4 );
       cDest = pDest->item.asString.value;
    }
    else
