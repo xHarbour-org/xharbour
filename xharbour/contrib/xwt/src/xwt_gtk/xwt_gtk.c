@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.15 2003/06/08 14:05:34 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.16 2003/07/23 15:58:10 lculik Exp $
 
    Global declarations, common functions
 */
@@ -511,7 +511,51 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
                   GINT_TO_POINTER( prop->value.number ) );
          }
       return FALSE;
+            case XWT_PROP_FONT:
+      {
+         PangoFontDescription *font_desc =  pango_font_description_from_string(prop->value.font);
+         GtkRcStyle *style = gtk_widget_get_modifier_style(GTK_LABEL(wMain) );
+         style -> font_desc = font_desc;
+	 
+	 switch( wWidget->type )
+        {
+            case XWT_TYPE_BUTTON:
+            case XWT_TYPE_TOGGLEBUTTON:
+            case XWT_TYPE_RADIOBUTTON:
+            case XWT_TYPE_CHECKBOX:
+	        gtk_widget_modify_style(GTK_BUTTON(wMain) , style);
+            case XWT_TYPE_LABEL:
+	        gtk_widget_modify_style(GTK_LABEL(wMain) , style);
+//            case XWT_TYPE_TEXTBOX:
+//	        gtk_widget_modify_style(GTK_ENTRY(wMain) , style);
+        }		
+	 return TRUE;
    }
+   return FALSE;
+
+      case XWT_PROP_COLOR:
+      {
+        GdkColor color;
+        gdk_color_parse (prop->value.color, &color);
+        switch( wWidget->type )
+         {
+            case XWT_TYPE_BUTTON:
+            case XWT_TYPE_TOGGLEBUTTON:
+            case XWT_TYPE_RADIOBUTTON:
+            case XWT_TYPE_CHECKBOX:
+	        gtk_widget_modify_fg (wSelf, GTK_STATE_NORMAL, &color);
+		break;
+            case XWT_TYPE_LABEL:
+            gtk_widget_modify_text (wMain, GTK_STATE_NORMAL, &color);
+            break;
+
+         }
+
+        return TRUE;
+   }
+
+   }
+
 
    return FALSE;
 }

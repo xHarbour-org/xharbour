@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.17 2003/07/22 16:04:11 xthefull Exp $
+   $Id: xwtcmd.ch,v 1.1 2003/07/23 15:58:10 lculik Exp $
 
    Definitions
 */
@@ -30,11 +30,11 @@
           => <oBtn> := XWTButton():New( <cText>, <x>, <y>, <oParent>)
 
 // Label -------------------------------------------------------------------------
-#xcommand DEFINE LABEL <oLabel> [ TEXT <cText> ] [ MOVE <x>,<y> ] [ OF <oParent> ];
-          => <oLabel> := XWTLabel():New( <cText>, <x>, <y>, <oParent>)
+#xcommand DEFINE LABEL <oLabel> [ TEXT <cText> ] [ MOVE <x>,<y> ] [ OF <oParent> ] [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>];
+          => <oLabel> := XWTLabel():New( <cText>, <x>, <y>, <oParent>, <(cFont)>,<nSize>,<(clr)>)
 
-#xcommand @ <x>,<y> LABEL <oLabel> [ TEXT <cText> ] [ OF <oParent> ];
-          => <oLabel> := XWTLabel():New( <cText>, <x>, <y>, <oParent>)
+#xcommand @ <x>,<y> LABEL <oLabel> [ TEXT <cText> ] [ OF <oParent> ] [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>;
+          => <oLabel> := XWTLabel():New( <cText>, <x>, <y>, <oParent>, <(cFont)>,<nSize>,<(clr)>)
 
 // TextBox -------------------------------------------------------------------------
 #xcommand DEFINE TEXTBOX [ <oTextBox> ] [ VAR <cText> ] [MOVE <x>,<y>] [ OF <oParent> ];

@@ -32,7 +32,7 @@ PROCEDURE MAIN()
    DEFINE LAYOUT oHLay  MODE XWT_LM_HORIZ
 
    /*** Text And Button ***/
-   DEFINE LABEL oLabel TEXT "Text: " OF oHlay
+   DEFINE LABEL oLabel TEXT "Text: " FONT "Courier" COLOR "#44FD56" OF oHlay
 
    oHLay:SetFill( .T. )
    oHLay:SetExpand( .T. )
@@ -65,13 +65,13 @@ PROCEDURE MAIN()
 
    oGrid := XwtGrid():New(2,3)
 
-   DEFINE LABEL oLabel TEXT "Field label"
+   DEFINE LABEL oLabel TEXT "Field label"  FONT "Clean" SIZE 20
 
    oGrid:setPadding( 2, 10 )
    oGrid:SetFill( .T. )
 
    oGrid:Attach( oLabel, 1, 2 )
-   oGrid:Attach( XwtLabel():New("Field 2"), 2, 2 )
+   oGrid:Attach( XwtLabel():New("Field 2",,,,"Helvetica",5,"#AC4F3C"), 2, 2 )
 
    oGrid:SetExpand( .T. )
    oGrid:Attach( XwtTextBox():New("Data 1"), 1, 3 )

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.11 2003/06/05 17:06:22 jonnymind Exp $
+   $Id: xwt_api.c,v 1.12 2003/06/08 14:05:33 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -276,6 +276,15 @@ HB_FUNC( XWT_SETPROPERTY )
          prop.value.data = hb_parptr( 3 );
       break;
 
+      //Font Parameter
+      case XWT_PROP_FONT:
+         prop.value.font = hb_parc(3);
+      break;
+
+      case XWT_PROP_COLOR:
+         prop.value.color = hb_parc(3);
+      break;
+
       //Array
       case XWT_PROP_SETMENUBAR:
       case XWT_PROP_RSTMENUBAR:
@@ -368,6 +377,22 @@ HB_FUNC( XWT_GETPROPERTY )
             bRet = TRUE;
          }
       break;
+      // Font Parametre
+      case XWT_PROP_FONT:
+         if( pParam1 != NULL )
+         {
+            hb_itemPutC( pParam1, (char *)prop.value.font );
+            bRet = TRUE;
+         }
+      break;
+      case XWT_PROP_COLOR:
+         if( pParam1 != NULL )
+         {
+            hb_itemPutC( pParam1, (char *)prop.value.color );
+            bRet = TRUE;
+         }
+      break;
+
 
       //Numeric parameters
       case XWT_PROP_VISIBILITY:
@@ -380,6 +405,8 @@ HB_FUNC( XWT_GETPROPERTY )
             bRet = TRUE;
          }
       break;
+
+
 
 
       case XWT_PROP_PADDING:

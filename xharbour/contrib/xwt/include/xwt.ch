@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.17 2003/07/22 16:04:11 xthefull Exp $
+   $Id: xwt.ch,v 1.18 2003/07/23 15:58:10 lculik Exp $
 
    Definitions
 */
@@ -93,6 +93,9 @@
 #define XWT_PROP_TITLES     110 //PHB_ITEM (HB_IT_ARRAY) in data
 #define XWT_PROP_COLUMNS    111 //Number of columns in a table
 #define XWT_PROP_COLEDITABLE    112 //Number of columns in a table, negative for disable
+
+#define XWT_PROP_FONT       120
+#define XWT_PROP_COLOR      130
 
 /* Fake properties */
 #define XWT_PROP_SETMENUBAR 1000 // PHB_ITEM (HB_IT_ARRAY) in data
