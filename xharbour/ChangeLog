@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3175 2004/07/20 20:45:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3176 2004/07/21 11:18:08 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-21 17:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * GTWVT - Needed Approach
+    Now if GtWvt.lib is compiled with -D__WVT_NOSHOW_STARTUP__, 
+    then the appln window is not visible until Wvt_ShowWindow( SW_RESTORE )
+    is called. This has been necessary to avoid black window being visible
+    prior to setting the fonts and size desired. 
+    Moreover, there may be a need ( sometimes ) that appln window 
+    should not be visible until desired.
 
 2004-07-21 16:45 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/include/inkey.ch
