@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.20 2002/11/05 21:39:58 what32 Exp $
+ * $Id: TCListBox.prg,v 1.21 2002/11/07 02:48:47 fsgiudice Exp $
  */
 /*
  * xHarbour Project source code:
@@ -64,7 +64,7 @@ CLASS TCustomListBox FROM TCustomControl
    DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
 
-   PROPERTY Items DEFAULT TListBoxStrings() READ FItems WRITE SetItems
+   PROPERTY Items READ FItems WRITE SetItems DEFAULT TListBoxStrings()
 
    ACCESS CurSel  INLINE ::GetCurSel()
 

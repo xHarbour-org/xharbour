@@ -1,5 +1,5 @@
 /*
- * $Id: TPopup.prg,v 1.6 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TCustomForm.prg,v 1.1 2002/11/07 02:45:06 fsgiudice Exp $
  */
 
 /*
@@ -105,7 +105,7 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY Scaled                     AS LOGICAL           DEFAULT TRUE
     PROPERTY TileMode                   TYPE TTileMode       DEFAULT tbHorizontal
     PROPERTY VertScrollBar              //stored IsForm;
-    PROPERTY Visible                    DEFAULT FALSE  WRITE SetVisible
+    PROPERTY Visible                    WRITE SetVisible     DEFAULT FALSE
     PROPERTY Width                      //stored IsFormSizeStored;
     PROPERTY WindowMenu                 //: TMenuItem;
     PROPERTY OnActivate                 //: TNotifyEvent;

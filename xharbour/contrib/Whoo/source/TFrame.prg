@@ -64,7 +64,9 @@ ENDCLASS
 
 *-----------------------------------------------------------------------------*
 
-METHOD Create( oParent ) CLASS TFrame
+METHOD Create( oOwner ) CLASS TFrame
+
+   ::Super:Create( oOwner )
 
    ::WndProc   := 'FormProc'
    ::Msgs      := -1
@@ -75,7 +77,7 @@ METHOD Create( oParent ) CLASS TFrame
    ::lRegister := .T.
    InitCommonControls()
 
-return( super:Create( oParent ) )
+Return Self
 
 *-----------------------------------------------------------------------------*
 

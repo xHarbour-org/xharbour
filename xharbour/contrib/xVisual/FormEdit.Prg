@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.82 2002/11/08 01:36:01 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.83 2002/11/08 03:24:32 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -409,6 +409,7 @@ METHOD XFMTop() CLASS TFormEdit
 
    LOCAL XFM
 
+   // Warning can NOT use aFill() because all elements will share SAME array!!!
    FOR EACH XFM IN ::aXFM
       XFM := {}
    NEXT

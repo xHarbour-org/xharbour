@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.117 2002/11/08 01:36:01 what32 Exp $
+ * $Id: xide.prg,v 1.118 2002/11/08 03:24:32 what32 Exp $
  */
 
 /*
@@ -63,10 +63,9 @@ FUNCTION Main
          :MainStatusBar()
 
          // add the object windows
-         :Add( ObjTree():Create( MainFrame ) )
-         :Add( ObjInspect():Create( MainFrame ) )
-         :Add( ObjEdit():Create( MainFrame ) )
-         
+//         :Add( ObjTree():Create( MainFrame ) )
+//         :Add( ObjInspect():Create( MainFrame ) )
+//         :Add( ObjEdit():Create( MainFrame ) )
          // focus to main Frame
          :SetFocus()
 
@@ -98,17 +97,51 @@ ENDCLASS
 //----------------------------------------------------------------------------------------------
 
 METHOD MainMenu() CLASS MainFrame
-   ::WindowMenu := TMenu():New()
-   WITH OBJECT ::WindowMenu
-      :AddPopup('&Test')
-      WITH OBJECT :Popup
-         :AddItem( 'Editor', 101, {||  FormEdit := TFormEdit():Create( MainFrame ) } )
-         :AddItem( 'Open', 102, {|| OpenProject():Create() } )
-         :AddSeparator()
-         :AddItem( 'Exit'  , 200, {||MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
-      END WITH
-   END WITH
-   ::SetWindowMenu()
+
+   LOCAL oPopup, oMenuItem
+
+   ::WindowMenu := TMainMenu():Create( Self ) //TMenu():New()
+   view ::WindowMenu
+
+   oPopup := TMenuItem():Create( ::WindowMenu )
+   oPopup:Caption := "File"
+
+   view oPopup
+   oPopup:AppendTo( ::WindowMenu:Handle )
+
+   oMenuItem := TMenuItem():Create( oPopup )
+   oMenuItem:Caption := "Editor"
+   oMenuItem:Command := 101
+   oMenuItem:OnClick := {||oApp:CreateForm( @FormEdit, TFormEdit(), MainFrame ) }
+   oMenuItem:AppendTo( oPopup:Handle )
+
+   oMenuItem := TMenuItem():Create( oPopup )
+   oMenuItem:Caption := "Open"
+   oMenuItem:Command := 102
+   oMenuItem:OnClick := {|| OpenProject():Create() }
+   oMenuItem:AppendTo( oPopup:Handle )
+
+   oMenuItem := TMenuItem():Create( Self )
+   oMenuItem:Caption := "-"
+   oMenuItem:AppendTo( oPopup:Handle )
+
+   oMenuItem := TMenuItem():Create( oPopup )
+   oMenuItem:Caption := "Exit"
+   oMenuItem:Command := 200
+   oMenuItem:OnClick := {||MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)}
+   oMenuItem:AppendTo( oPopup:Handle )
+
+   //With Object ::WindowMenu
+   //   :AddPopup('&Test')
+   //   With Object :Popup
+   //      :AddItem( 'Editor', 101, {||oApp:CreateForm( @FormEdit, TFormEdit(), MainFrame ) } )
+   //      :AddItem( 'Open', 102, {|| OpenProject():Create() } )
+   //      :AddSeparator()
+   //      :AddItem( 'Exit'  , 200, {||MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
+   //   end
+   //end
+   //::SetWindowMenu()
+
 return(self)
 
 //----------------------------------------------------------------------------------------------
@@ -153,7 +186,7 @@ METHOD MainToolBar() CLASS MainFrame
    WITH OBJECT ToolTabs():Create( MainFrame )
       :AddTab( "StdTab", TabPage():Create( MainFrame:ToolTabs ) )
       :StdTab:Caption := "Standard"
-      
+
       :AddTab( "Win32", TabPage():Create( MainFrame:ToolTabs ) )
       :Win32:Caption := "Win32"
 
@@ -163,11 +196,11 @@ METHOD MainToolBar() CLASS MainFrame
       :AddTab( "Dialogs" )
       :AddTab( "Samples" )
       :AddTab( "Activex" )
-      
-      :Configure()
-   END 
-   ::Rebar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolTabs:handle, 550, 56, , "", NIL )
 
+      :Configure()
+   END
+
+   ::Rebar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolTabs:handle, 550, 56, , "", NIL )
 
    // sets the controls toolbar on the TabControl
    With Object ::ToolTabs:StdTab
@@ -180,14 +213,12 @@ METHOD MainToolBar() CLASS MainFrame
          aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
                           'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
                           'RadioGroup', 'Panel', 'ActionList' }
-         for n:=0 to 16
-
-             oTool := ToolButton():Create( MainFrame:ToolTabs:StdTab:StdTools )     //n,,aStdTab[n+1], 150+n )
+         FOR n :=0 TO 16
+             oTool := ToolButton():Create( MainFrame:ToolTabs:StdTab:StdTools )
 
              oTool:Action := {|oItem| FormEdit:OnMenuCommand( oItem ) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
-
-         next
+         NEXT
 
          // ----------------------------------------------------   set imagelist
          hImg2:= ImageList_Create( 24, 24, ILC_COLORDDB+ILC_MASK )

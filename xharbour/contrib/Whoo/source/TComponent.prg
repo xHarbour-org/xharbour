@@ -1,5 +1,5 @@
 /*
- * $Id: TComponent.prg,v 1.6 2002/11/08 02:54:49 ronpinkas Exp $
+ * $Id: TComponent.prg,v 1.7 2002/11/08 03:24:31 what32 Exp $
  */
 
 /*
@@ -34,18 +34,21 @@ GLOBAL EXTERNAL oApp
 #include "HbClass.ch"
 #include "what32.ch"
 #include "debug.ch"
+#include "classex.ch"
 
 CLASS TComponent FROM TPersistent
 
-    DATA ComObject          AS OBJECT  READONLY
+   PROPERTY Owner READ FOwner
+
+   DATA ComObject          AS OBJECT  READONLY
    METHOD ComponentCount              INLINE Len( ::Components )
+
    DATA ComponentIndex     AS NUMERIC
-   DATA Components         AS ARRAY   READONLY
+   DATA FComponents        AS ARRAY   PRIVATE
    DATA ComponentState     AS NUMERIC READONLY
    DATA ComponentStyle     AS NUMERIC READONLY
    DATA DesignInfo         AS NUMERIC
    DATA Name               AS STRING  EXPORTED
-   DATA Owner              AS OBJECT  READONLY
    DATA Tag                           EXPORTED
    DATA VCLComObject
 

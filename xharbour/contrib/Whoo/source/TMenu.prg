@@ -30,17 +30,18 @@
 #include "windows.ch"
 #include "hbclass.ch"
 #include "what32.ch"
+#include "classex.ch"
 
 *-----------------------------------------------------------------------------*
 
-CLASS TMenu
+CLASS TMenu FROM TComponent
 
-   DATA Parent AS OBJECT   READONLY
-   DATA handle
    DATA Popup  AS OBJECT
-   DATA aItems AS ARRAY INIT {}
-   DATA name
-   METHOD New() CONSTRUCTOR
+
+   PROPERTY Items READ FItems
+
+   METHOD Create() CONSTRUCTOR
+   METHOD GetHandle()
    METHOD AddPopUp()
    METHOD Set()
    METHOD GetItem(nId)
@@ -54,13 +55,23 @@ CLASS TMenu
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
-   
-METHOD New( oParent ) CLASS TMenu
 
-   ::handle := CreateMenu()
-   ::Parent := oParent
+METHOD Create( oParent ) CLASS TMenu
 
-   return( self )
+  ::FItems := TMenuItem():Create( Self )
+  ::FItems:FOnChange := HB_ObjMsgPtr( Self, "MenuChanged" )
+
+  ::FItems:FMenu := Self
+
+  //::FImageChangeLink := TChangeLink():Create
+  //::FImageChangeLink:OnChange := HB_ObjMsgPtr( Self, "ImageListChange" )
+  //::FParentBiDiMode := .T.
+
+  ::Super:Create( oParent )
+
+  //::ParentBiDiModeChanged()
+
+Return Self
 
 *-----------------------------------------------------------------------------*
 
@@ -69,6 +80,7 @@ METHOD AddPopUp( cText ) CLASS TMenu
    if ::Popup != NIL
       ::Popup:Add()
    endif
+
    ::PopUp := TPopup():New( self, cText)
 
    return(self)
@@ -80,6 +92,7 @@ METHOD Set() CLASS TMenu
    if ::Popup != NIL
       ::Popup:Add()
    endif
+
    SetMenu( ::Parent:handle, ::handle )
 
    return( self )
@@ -87,14 +100,22 @@ METHOD Set() CLASS TMenu
 *-----------------------------------------------------------------------------*
 
 METHOD GetItem( nId ) CLASS TMenu
-   local n:= aScan( ::aItems,{|o|o:id == nId} )
-   if n>0
+
+   local n := aScan( ::aItems,{|o|o:id == nId} )
+
+   if n > 0
       return( ::aItems[n] )
    endif
+
    return( nil )
 
 *-----------------------------------------------------------------------------*
-
 METHOD GetPos( nId ) CLASS TMenu
-   return( aScan( ::aItems,{|o|o:id == nId} ) )
+
+Return( aScan( ::aItems,{|o|o:id == nId} ) )
+
+METHOD GetHandle() CLASS TMenu
+
+Return ::FItems.GetHandle
+
 

@@ -40,12 +40,14 @@ CLASS TMainMenu FROM TMenu
   PROTECTED:
     METHOD   MenuChanged               virtual // override
     METHOD   GetHandle                 virtual // override
+
   PUBLIC:
     METHOD   Merge                     virtual
     METHOD   Unmerge                   virtual
     METHOD   PopulateOle2Menu          virtual
     METHOD   GetOle2AcceleratorTable   virtual
     METHOD   SetOle2MenuHandle         virtual
+
   PUBLISHED:
     PROPERTY AutoHotkeys
     PROPERTY AutoLineReduction
