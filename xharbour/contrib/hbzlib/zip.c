@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.5 2003/09/12 20:10:13 paultucker Exp $
+ * $Id: zip.c,v 1.6 2003/09/14 09:27:24 paultucker Exp $
  */
 
 /*
@@ -234,7 +234,7 @@ HB_FUNC( HB_UNZIPFILE )
                              hb_param( 6, HB_IT_ARRAY ),
                              hb_itemParam( 7 ) );
       }
-      else if( ISBLOCK( 6 ) )
+      else
       {
          bRet = hb_UnzipAll( hb___CheckFile( szFile ),
                              hb_param( 2, HB_IT_BLOCK ),
