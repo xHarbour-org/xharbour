@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.942 2003/04/11 17:12:49 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.943 2003/04/12 22:32:03 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-13 01:27 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbreadini.prg
+    ! Due to a mistyping, separator character to have more than one
+      possible ini to be searched (in the parameter) was ":".
+      In Italian keyboard ";" and ":" are one at the side of
+      the other... :-(
+      The correct character is ";", althoug ":" is used storically
+      as a path separator in UNIX, ";" is used in all the cross
+      platform languages (inlcuding PHP, Python and Perl).
 
 2003-04-13 05:20:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/compiler/genc.c
