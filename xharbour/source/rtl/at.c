@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.6 2004/04/17 23:27:21 jonnymind Exp $
+ * $Id: at.c,v 1.7 2004/07/01 04:09:06 ronpinkas Exp $
  */
 
 /*
@@ -49,6 +49,8 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#include <ctype.h>
 
 #include "hbapi.h"
 #include "hbapiitm.h"

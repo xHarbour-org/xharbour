@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.80 2004/05/30 14:41:11 lculik Exp $
+# $Id: makefile.nt,v 1.81 2004/07/01 13:18:35 vouchcac Exp $
 #
 
 #
@@ -1017,26 +1017,16 @@ GTWIN_LIB_OBJS = \
 {$(RTL_DIR)\gtwvt}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
-{$(RTL_DIR)\wvtcore}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
-
-{$(RTL_DIR)\wvtutils}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
-
-{$(RTL_DIR)\wvtclass}.prg{$(OBJ_DIR)}.c::
+{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
 
-{$(OBJ_DIR)\wvtclass}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
-
-{$(RTL_DIR)\wvtpaint}.prg{$(OBJ_DIR)}.c::
+{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
-
-{$(OBJ_DIR)\wvtpaint}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RTL_LIB)\gtwvt2
 
 GTWVT_LIB_OBJS = \
    $(OBJ_DIR)\gtwvt.obj \
+   \
    $(OBJ_DIR)\wvtcore.obj \
    $(OBJ_DIR)\wvtutils.obj \
    $(OBJ_DIR)\wvtclass.obj \
@@ -1446,6 +1436,7 @@ $(OBJ_DIR)$(MT)\macroslx.obj : $(MACRO_DIR)\macroslx.c
 # dummy targets used for prg to c creation
 
 $(RTL_LIB)2    : $(RTL_LIB_OBJS)
+$(RTL_LIB)\gtwvt2 : $(GTWVT_LIB_OBJS)
 $(RPC_LIB)2    : $(RPC_LIB_OBJS)
 $(COMMON_LIB)2 : $(COMMON_LIB_OBJS)
 $(DEBUG_LIB)2  : $(DEBUG_LIB_OBJS)
