@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.30 2004/08/06 02:25:37 maurifull Exp $
+ * $Id: gtalleg.c,v 1.31 2004/09/08 00:17:12 druzus Exp $
  */
 
 /*
@@ -166,6 +166,9 @@ static const gtAllegKey sCtrlTable[GT_CTRL_TABLE_SIZE] = {
    {AL_KEY_PGDN,   K_CTRL_PGDN}
 };
 
+#define _GetScreenHeight()  (s_usScrHeight)
+#define _GetScreenWidth()   (s_usScrWidth)
+
 #define GT_UPD_RECT(t,l,b,r) if (t<s_usUpdTop) s_usUpdTop=t; if (l<s_usUpdLeft) s_usUpdLeft=l; if (b>s_usUpdBottom) s_usUpdBottom=b; if (r>s_usUpdRight) s_usUpdRight=r;
 #define MK_GT8BCOLOR(n) (n & 0xFF) / 16 | (n & 0xFF00) / 256
 
@@ -285,10 +288,10 @@ void HB_GT_FUNC(gt_Exit( void ))
 USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
 {
 #ifdef DEBUG   
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth(%d)"));
 #endif
 
-   return s_usScrWidth;
+   return _GetScreenWidth();
 }
 
 USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
@@ -297,7 +300,7 @@ USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenHeight()"));
 #endif
 
-   return s_usScrHeight;
+   return _GetScreenHeight();
 }
 
 SHORT HB_GT_FUNC(gt_Col( void ))
@@ -404,7 +407,7 @@ static void HB_GT_FUNC(gt_ScreenUpdate( void ))
       al_acquire_bitmap( bmp );
       for ( y = s_usUpdTop; y <= s_usUpdBottom; y++ )
       {
-         z = y * s_usScrWidth * 2 + s_usUpdLeft * 2;
+         z = y * _GetScreenWidth() * 2 + s_usUpdLeft * 2;
          for ( x = s_usUpdLeft; x <= s_usUpdRight; x++ )
          {
             byChar = s_pbyScrBuffer[z++];
@@ -519,8 +522,8 @@ static void HB_GT_FUNC(gt_ScreenUpdate( void ))
          hb_gt_DoCursor();
       }
 
-      s_usUpdTop = s_usScrHeight;
-      s_usUpdLeft = s_usScrWidth;
+      s_usUpdTop = _GetScreenHeight();
+      s_usUpdLeft = _GetScreenWidth();
       s_usUpdBottom = 0;
       s_usUpdRight = 0;
    }
@@ -534,7 +537,7 @@ void HB_GT_FUNC(gt_DispBegin( void ))
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    s_usDispCount++;
@@ -548,7 +551,7 @@ void HB_GT_FUNC(gt_DispEnd( void ))
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    if ( s_usDispCount > 0 )
@@ -668,19 +671,19 @@ void HB_GT_FUNC(gt_Puts( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE *pbyStr, 
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
-   if ( usRow < s_usScrHeight )
+   if ( usRow < _GetScreenHeight() )
    {
       j = (USHORT) ulLen;
 
-      if ( usCol + j > s_usScrWidth )
+      if ( usCol + j > _GetScreenWidth() )
       {
-         j = s_usScrWidth - usCol;
+         j = _GetScreenWidth() - usCol;
       }
 
-      k = usRow * s_usScrWidth * 2 + usCol * 2;
+      k = usRow * _GetScreenWidth() * 2 + usCol * 2;
 
       for ( i = 0; i < j; i++ )
       {
@@ -733,7 +736,7 @@ void HB_GT_FUNC(gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    if ( usTop > usBottom )
@@ -750,21 +753,21 @@ void HB_GT_FUNC(gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
       usRight = x;
    }
 
-   if ( usBottom >= s_usScrHeight )
+   if ( usBottom >= _GetScreenHeight() )
    {
-      usBottom = s_usScrHeight - 1;
+      usBottom = _GetScreenHeight() - 1;
    }
 
-   if ( usRight >= s_usScrWidth )
+   if ( usRight >= _GetScreenWidth() )
    {
-      usRight = s_usScrWidth - 1;
+      usRight = _GetScreenWidth() - 1;
    }
 
-   if ( usTop < s_usScrHeight && usLeft < s_usScrWidth )
+   if ( usTop < _GetScreenHeight() && usLeft < _GetScreenWidth() )
    {
       for ( y = usTop; y <= usBottom; y++ )
       {
-         z = y * s_usScrWidth * 2 + usLeft * 2;
+         z = y * _GetScreenWidth() * 2 + usLeft * 2;
 
          for ( x = usLeft; x <= usRight; x++ )
          {
@@ -787,7 +790,7 @@ void HB_GT_FUNC(gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    // coord check
@@ -810,21 +813,21 @@ void HB_GT_FUNC(gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
    uB = usTop;
    uR = usLeft;
 
-   if ( usBottom >= s_usScrHeight )
+   if ( usBottom >= _GetScreenHeight() )
    {
-      usBottom = s_usScrHeight - 1;
+      usBottom = _GetScreenHeight() - 1;
    }
 
-   if ( usRight >= s_usScrWidth )
+   if ( usRight >= _GetScreenWidth() )
    {
-      usRight = s_usScrWidth - 1;
+      usRight = _GetScreenWidth() - 1;
    }
 
-   if ( usTop < s_usScrHeight && usLeft < s_usScrWidth )
+   if ( usTop < _GetScreenHeight() && usLeft < _GetScreenWidth() )
    {
       for ( y = usTop; y <= usBottom; y++ )
       {
-         z = y * s_usScrWidth * 2 + usLeft * 2;
+         z = y * _GetScreenWidth() * 2 + usLeft * 2;
          for ( x = usLeft; x <= usRight; x++ )
          {
             if ( ( s_pbyScrBuffer[z++] != *(pbySrc++) ) | ( s_pbyScrBuffer[z++] != *(pbySrc++) ) )
@@ -858,7 +861,7 @@ void HB_GT_FUNC(gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, U
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    if ( usTop > usBottom )
@@ -875,21 +878,21 @@ void HB_GT_FUNC(gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, U
       usRight = x;
    }
 
-   if ( usBottom >= s_usScrHeight )
+   if ( usBottom >= _GetScreenHeight() )
    {
-      usBottom = s_usScrHeight - 1;
+      usBottom = _GetScreenHeight() - 1;
    }
 
-   if ( usRight >= s_usScrWidth )
+   if ( usRight >= _GetScreenWidth() )
    {
-      usRight = s_usScrWidth - 1;
+      usRight = _GetScreenWidth() - 1;
    }
 
-   if ( usTop < s_usScrHeight && usLeft < s_usScrWidth )
+   if ( usTop < _GetScreenHeight() && usLeft < _GetScreenWidth() )
    {
       for ( y = usTop; y <= usBottom; y++ )
       {
-         z = y * s_usScrWidth * 2 + usLeft * 2;
+         z = y * _GetScreenWidth() * 2 + usLeft * 2;
 
          for ( x = usLeft; x <= usRight; x++ )
          {
@@ -919,7 +922,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    if ( usTop > usBottom )
@@ -936,7 +939,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
       usRight = usT;
    }
 
-   if ( usTop < s_usScrHeight && usLeft < s_usScrWidth )
+   if ( usTop < _GetScreenHeight() && usLeft < _GetScreenWidth() )
    {
    HB_GT_FUNC(gt_DispBegin());
    if ( ( iRows != 0 ) | ( iCols != 0 ) )
@@ -972,7 +975,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
       {
          usT = MIN(usTop,usBottom);
          usB = usT + (-iRows);
-         usBottom = MIN(usBottom - iRows,s_usScrHeight-1);
+         usBottom = MIN(usBottom - iRows,_GetScreenHeight()-1);
       }
       else if ( iRows == 0 )
       {
@@ -1001,7 +1004,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
       {
          usR = usL;
          usL = usR - iCols;
-         usRight = MIN(usRight-iCols,s_usScrWidth-1);
+         usRight = MIN(usRight-iCols,_GetScreenWidth()-1);
       }
    }
    else
@@ -1164,8 +1167,8 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       {
          if ( lPrev )
          {
-            usCols = s_usScrWidth;
-            usRows = s_usScrHeight;
+            usCols = _GetScreenWidth();
+            usRows = _GetScreenHeight();
          }
          else
          {
@@ -1200,14 +1203,14 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       // NOW: Calculate proper font size
       // eg: Linux vesafb (doesn't support mode switching)
       //     or for DOS, we'll mostly request unavailable resolutions
-      if ( AL_SCREEN_W != s_byFontWidth * s_usScrWidth )
+      if ( AL_SCREEN_W != s_byFontWidth * _GetScreenWidth() )
       {
-         ixFP = (BYTE) (AL_SCREEN_W / s_usScrWidth) * 2;
+         ixFP = (BYTE) (AL_SCREEN_W / _GetScreenWidth()) * 2;
       }
 
-      if ( AL_SCREEN_H != s_byFontSize * s_usScrHeight )
+      if ( AL_SCREEN_H != s_byFontSize * _GetScreenHeight() )
       {
-         iyFP = (BYTE) (AL_SCREEN_H / s_usScrHeight);
+         iyFP = (BYTE) (AL_SCREEN_H / _GetScreenHeight());
          if ( iyFP % 2 == 1 )
          {
             iyFP--;
@@ -1230,8 +1233,8 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
 
       s_iMSX = al_mouse_x / s_byFontWidth;
       s_iMSY = al_mouse_y / s_byFontSize;
-      s_usUpdTop = s_usScrHeight;
-      s_usUpdLeft = s_usScrWidth;
+      s_usUpdTop = _GetScreenHeight();
+      s_usUpdLeft = _GetScreenWidth();
       s_usUpdBottom = 0;
       s_usUpdRight = 0;
       s_sCurCol = 0;
@@ -1258,8 +1261,8 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       bmp = al_create_system_bitmap(AL_SCREEN_W, AL_SCREEN_H);
       if ( lClearInit )
       {
-         s_pbyScrBuffer = (BYTE *) hb_xgrab( s_usScrWidth * s_usScrHeight * 2 );
-         memset( s_pbyScrBuffer, 0, s_usScrWidth * s_usScrHeight * 2 );
+         s_pbyScrBuffer = (BYTE *) hb_xgrab( _GetScreenWidth() * _GetScreenHeight() * 2 );
+         memset( s_pbyScrBuffer, 0, _GetScreenWidth() * _GetScreenHeight() * 2 );
       } else
       {
          al_clear_to_color( bmp, s_pClr[s_pbyScrBuffer[1] >> 4] );
@@ -1286,8 +1289,8 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
    {
       s_usUpdTop = 0;
       s_usUpdLeft = 0;
-      s_usUpdBottom = s_usScrHeight - 1;
-      s_usUpdRight = s_usScrWidth - 1;
+      s_usUpdBottom = _GetScreenHeight() - 1;
+      s_usUpdRight = _GetScreenWidth() - 1;
       HB_GT_FUNC(gt_ScreenUpdate());
    }
 
@@ -1308,7 +1311,7 @@ USHORT HB_GT_FUNC(gt_Box( SHORT sTop, SHORT sLeft, SHORT sBottom, SHORT sRight, 
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    // coord check
@@ -1326,7 +1329,7 @@ USHORT HB_GT_FUNC(gt_Box( SHORT sTop, SHORT sLeft, SHORT sBottom, SHORT sRight, 
       sRight = x;
    }
 
-   if ( sTop < s_usScrHeight && sLeft < s_usScrWidth && sBottom >= 0 && sRight >= 0)
+   if ( sTop < _GetScreenHeight() && sLeft < _GetScreenWidth() && sBottom >= 0 && sRight >= 0)
    {
       sWidth = sRight - sLeft + 1;
       sHeight = sBottom - sTop + 1;
@@ -1339,9 +1342,9 @@ USHORT HB_GT_FUNC(gt_Box( SHORT sTop, SHORT sLeft, SHORT sBottom, SHORT sRight, 
             sTop = 0;
          }
 
-         if ( sBottom >= s_usScrHeight )
+         if ( sBottom >= _GetScreenHeight() )
          {
-            sBottom = s_usScrHeight - 1;
+            sBottom = _GetScreenHeight() - 1;
          }
 
          for ( y = sTop; y <= sBottom; y++ )
@@ -1356,9 +1359,9 @@ USHORT HB_GT_FUNC(gt_Box( SHORT sTop, SHORT sLeft, SHORT sBottom, SHORT sRight, 
             sLeft = 0;
             sWidth = sRight - sLeft + 1;
          }
-         if ( sRight >= s_usScrWidth )
+         if ( sRight >= _GetScreenWidth() )
          {
-            sRight = s_usScrWidth - 1;
+            sRight = _GetScreenWidth() - 1;
             sWidth = sRight - sLeft + 1;
          }
          HB_GT_FUNC(gt_Replicate(sTop, sLeft, byAttr, szBox[1], sWidth));
@@ -1375,14 +1378,14 @@ USHORT HB_GT_FUNC(gt_Box( SHORT sTop, SHORT sLeft, SHORT sBottom, SHORT sRight, 
             sWidth -= sLeft * -1;
          }
 
-         if ( sBottom >= s_usScrHeight )
+         if ( sBottom >= _GetScreenHeight() )
          {
-            sHeight -= sBottom - s_usScrHeight + 1;
+            sHeight -= sBottom - _GetScreenHeight() + 1;
          }
 
-         if ( sRight >= s_usScrWidth )
+         if ( sRight >= _GetScreenWidth() )
          {
-            sWidth -= sRight - s_usScrWidth + 1;
+            sWidth -= sRight - _GetScreenWidth() + 1;
          }
 
          if ( sTop >= 0 )
@@ -1393,13 +1396,13 @@ USHORT HB_GT_FUNC(gt_Box( SHORT sTop, SHORT sLeft, SHORT sBottom, SHORT sRight, 
                HB_GT_FUNC(gt_Replicate(sTop, x, byAttr, szBox[0], 1));
             }
             HB_GT_FUNC(gt_Replicate(sTop, x + 1, byAttr, szBox[1], sWidth - 2));
-            if ( sRight < s_usScrWidth )
+            if ( sRight < _GetScreenWidth() )
             {
                HB_GT_FUNC(gt_Replicate(sTop, x + sWidth - 1, byAttr, szBox[2], 1));
             }
          }
 
-         if ( sRight < s_usScrWidth )
+         if ( sRight < _GetScreenWidth() )
          {
             x = ( sTop >= 0 ? sTop : 0 );
             for ( y = 1; y < sHeight - 1; y++ )
@@ -1413,7 +1416,7 @@ USHORT HB_GT_FUNC(gt_Box( SHORT sTop, SHORT sLeft, SHORT sBottom, SHORT sRight, 
             }
          }
 
-         if ( sBottom < s_usScrHeight )
+         if ( sBottom < _GetScreenHeight() )
          {
             x = ( sLeft >= 0 ? sLeft : 0 );
             if ( sLeft >= 0)
@@ -1423,7 +1426,7 @@ USHORT HB_GT_FUNC(gt_Box( SHORT sTop, SHORT sLeft, SHORT sBottom, SHORT sRight, 
 
             HB_GT_FUNC(gt_Replicate(sBottom, x + 1, byAttr, szBox[5], sWidth - 2));
 
-            if ( sRight < s_usScrWidth )
+            if ( sRight < _GetScreenWidth() )
             {
                HB_GT_FUNC(gt_Replicate(sBottom, x + sWidth - 1, byAttr, szBox[4], 1));
             }
@@ -1457,10 +1460,10 @@ USHORT HB_GT_FUNC(gt_HorizLine( SHORT sRow, SHORT sLeft, SHORT sRight, BYTE byCh
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
-   if ( sRow >= 0 && sRow < s_usScrHeight )
+   if ( sRow >= 0 && sRow < _GetScreenHeight() )
    {
       if ( sLeft < 0 )
       {
@@ -1487,10 +1490,10 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT sCol, SHORT sTop, SHORT sBottom, BYTE byCha
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
-   if ( sCol >= 0 && sCol < s_usScrWidth )
+   if ( sCol >= 0 && sCol < _GetScreenWidth() )
    {
       if ( sTop < 0 )
       {
@@ -1532,7 +1535,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    if ( al_mouse_needs_poll() )
@@ -1705,7 +1708,7 @@ int HB_GT_FUNC(mouse_Col( void ))
 {
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    if ( al_mouse_needs_poll() )
@@ -1720,7 +1723,7 @@ int HB_GT_FUNC(mouse_Row( void ))
 {
    if ( s_pbyScrBuffer == NULL )
    {
-   HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+   HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    if ( al_mouse_needs_poll() )
@@ -1735,7 +1738,7 @@ void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
 {
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    al_position_mouse(iCol * s_byFontWidth, iRow * s_byFontSize);
@@ -1747,7 +1750,7 @@ BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    if ( al_mouse_needs_poll() )
@@ -1779,7 +1782,7 @@ int HB_GT_FUNC(mouse_CountButton( void ))
 {
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    return s_iMsButtons;
@@ -1789,7 +1792,7 @@ void HB_GT_FUNC(mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ))
 {
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    if ( iTop > -1 && iTop * s_byFontSize < AL_SCREEN_H )
@@ -1819,7 +1822,7 @@ void HB_GT_FUNC(mouse_GetBounds( int *piTop, int *piLeft, int *piBottom, int *pi
 {
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    *piTop = s_iMSBoundTop;
@@ -1847,22 +1850,22 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
          return (int) TRUE;
 
       case GTI_SCREENWIDTH:
-         iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontWidth * s_usScrWidth : AL_SCREEN_W );
+         iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontWidth * _GetScreenWidth() : AL_SCREEN_W );
          if ( bUpdate && iParam > 0 )
          {
             s_usGFXWidth = (USHORT) iParam;
 //            lClearInit = ( s_pbyScrBuffer == NULL );
-//            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+//            HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
          }
       return iOldValue;
 
       case GTI_SCREENHEIGHT:
-         iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontSize * s_usScrHeight : AL_SCREEN_H );
+         iOldValue = ( s_pbyScrBuffer == NULL ? s_byFontSize * _GetScreenHeight() : AL_SCREEN_H );
          if ( bUpdate && iParam > 0 )
          {
             s_usGFXHeight = (USHORT) iParam;
             lClearInit = ( s_pbyScrBuffer == NULL );
-            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+            HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
          }
          return iOldValue;
 
@@ -1875,7 +1878,7 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
          {
             al_set_color_depth( iParam );
             lClearInit = ( s_pbyScrBuffer == NULL );
-            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+            HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
          }
          return iOldValue;
 
@@ -1886,7 +1889,7 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
             s_byFontSize = (char) iParam;
             s_byFontWidth = s_byFontSize / 2;
             lClearInit = ( s_pbyScrBuffer == NULL );
-            HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+            HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
          }
          return iOldValue;
 
@@ -1922,6 +1925,12 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
             al_set_window_title( (char *) vpParam );
             return 1;
          }
+      case GTI_VIEWMAXWIDTH:
+         return _GetScreenWidth();
+
+      case GTI_VIEWMAXHEIGHT:
+         return _GetScreenHeight();
+
    }
 
    // DEFAULT: there's something wrong if we are here.
@@ -1939,7 +1948,7 @@ int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, in
    
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(s_usScrHeight, s_usScrWidth));
+      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
    }
 
    switch (iType)

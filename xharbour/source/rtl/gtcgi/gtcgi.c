@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.17 2004/08/06 02:25:38 maurifull Exp $
+ * $Id: gtcgi.c,v 1.18 2004/09/08 00:17:12 druzus Exp $
  */
 
 /*
@@ -76,6 +76,11 @@ static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 static char *s_clipboard = NULL;
 static int s_clipsize = 0;
+
+/* faster macro version for use inside this module */
+#define _GetScreenWidth()  ( s_uiMaxRow )
+#define _GetScreenHeight() ( s_uiMaxCol )
+
 
 void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
@@ -206,14 +211,14 @@ USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth()"));
 
-   return s_uiMaxCol;
+   return _GetScreenHeight();
 }
 
 USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenHeight()"));
 
-   return s_uiMaxRow;
+   return _GetScreenWidth();
 }
 
 void HB_GT_FUNC(gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod ))
@@ -427,10 +432,10 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
    SHORT Height;
    SHORT Width;
 
-   if( ( Left   >= 0 && Left   < HB_GT_FUNC(gt_GetScreenWidth())  )  ||
-       ( Right  >= 0 && Right  < HB_GT_FUNC(gt_GetScreenWidth())  )  ||
-       ( Top    >= 0 && Top    < HB_GT_FUNC(gt_GetScreenHeight()) )  ||
-       ( Bottom >= 0 && Bottom < HB_GT_FUNC(gt_GetScreenHeight()) ) )
+   if( ( Left   >= 0 && Left   < _GetScreenWidth()  )  ||
+       ( Right  >= 0 && Right  < _GetScreenWidth()  )  ||
+       ( Top    >= 0 && Top    < _GetScreenHeight() )  ||
+       ( Bottom >= 0 && Bottom < _GetScreenHeight() ) )
    {
 
       /* Ensure that box is drawn from top left to bottom right. */
@@ -453,7 +458,7 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
 
       HB_GT_FUNC(gt_DispBegin());
 
-      if( Height > 1 && Width > 1 && Top >= 0 && Top < HB_GT_FUNC(gt_GetScreenHeight()) && Left >= 0 && Left < HB_GT_FUNC(gt_GetScreenWidth()) )
+      if( Height > 1 && Width > 1 && Top >= 0 && Top < _GetScreenHeight() && Left >= 0 && Left < _GetScreenWidth() )
          HB_GT_FUNC(gt_xPutch( Top, Left, byAttr, szBox[ 0 ] )); /* Upper left corner */
 
       Col = ( Height > 1 ? Left + 1 : Left );
@@ -462,22 +467,22 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
          Width += Col;
          Col = 0;
       }
-      if( Right >= HB_GT_FUNC(gt_GetScreenWidth()) )
+      if( Right >= _GetScreenWidth() )
       {
-         Width -= Right - HB_GT_FUNC(gt_GetScreenWidth());
+         Width -= Right - _GetScreenWidth();
       }
 
-      if( Col <= Right && Col < HB_GT_FUNC(gt_GetScreenWidth()) && Top >= 0 && Top < HB_GT_FUNC(gt_GetScreenHeight()) )
+      if( Col <= Right && Col < _GetScreenWidth() && Top >= 0 && Top < _GetScreenHeight() )
          HB_GT_FUNC(gt_Replicate( Top, Col, byAttr, szBox[ 1 ], Width + ( (Right - Left) > 1 ? -2 : 0 ) )); /* Top line */
 
-      if( Height > 1 && (Right - Left) > 1 && Right < HB_GT_FUNC(gt_GetScreenWidth()) && Top >= 0 && Top < HB_GT_FUNC(gt_GetScreenHeight()) )
+      if( Height > 1 && (Right - Left) > 1 && Right < _GetScreenWidth() && Top >= 0 && Top < _GetScreenHeight() )
          HB_GT_FUNC(gt_xPutch( Top, Right, byAttr, szBox[ 2 ] )); /* Upper right corner */
 
       if( szBox[ 8 ] && Height > 2 && Width > 2 )
       {
          for( Row = Top + 1; Row < Bottom; Row++ )
          {
-            if( Row >= 0 && Row < HB_GT_FUNC(gt_GetScreenHeight()) )
+            if( Row >= 0 && Row < _GetScreenHeight() )
             {
                Col = Left;
                if( Col < 0 )
@@ -485,7 +490,7 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
                else
                   HB_GT_FUNC(gt_xPutch( Row, Col++, byAttr, szBox[ 7 ] )); /* Left side */
                HB_GT_FUNC(gt_Replicate( Row, Col, byAttr, szBox[ 8 ], Width - 2 )); /* Fill */
-               if( Right < HB_GT_FUNC(gt_GetScreenWidth()) )
+               if( Right < _GetScreenWidth() )
                   HB_GT_FUNC(gt_xPutch( Row, Right, byAttr, szBox[ 3 ] )); /* Right side */
             }
          }
@@ -494,11 +499,11 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
       {
          for( Row = ( Width > 1 ? Top + 1 : Top ); Row < ( (Right - Left ) > 1 ? Bottom : Bottom + 1 ); Row++ )
          {
-            if( Row >= 0 && Row < HB_GT_FUNC(gt_GetScreenHeight()) )
+            if( Row >= 0 && Row < _GetScreenHeight() )
             {
-               if( Left >= 0 && Left < HB_GT_FUNC(gt_GetScreenWidth()) )
+               if( Left >= 0 && Left < _GetScreenWidth() )
                   HB_GT_FUNC(gt_xPutch( Row, Left, byAttr, szBox[ 7 ] )); /* Left side */
-               if( ( Width > 1 || Left < 0 ) && Right < HB_GT_FUNC(gt_GetScreenWidth()) )
+               if( ( Width > 1 || Left < 0 ) && Right < _GetScreenWidth() )
                   HB_GT_FUNC(gt_xPutch( Row, Right, byAttr, szBox[ 3 ] )); /* Right side */
             }
          }
@@ -506,17 +511,17 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
 
       if( Height > 1 && Width > 1 )
       {
-         if( Left >= 0 && Bottom < HB_GT_FUNC(gt_GetScreenHeight()) )
+         if( Left >= 0 && Bottom < _GetScreenHeight() )
             HB_GT_FUNC(gt_xPutch( Bottom, Left, byAttr, szBox[ 6 ] )); /* Bottom left corner */
 
          Col = Left + 1;
          if( Col < 0 )
             Col = 0; /* The width was corrected earlier. */
 
-         if( Col <= Right && Bottom < HB_GT_FUNC(gt_GetScreenHeight()) )
+         if( Col <= Right && Bottom < _GetScreenHeight() )
             HB_GT_FUNC(gt_Replicate( Bottom, Col, byAttr, szBox[ 5 ], Width - 2 )); /* Bottom line */
 
-         if( Right < HB_GT_FUNC(gt_GetScreenWidth()) && Bottom < HB_GT_FUNC(gt_GetScreenHeight()) )
+         if( Right < _GetScreenWidth() && Bottom < _GetScreenHeight() )
             HB_GT_FUNC(gt_xPutch( Bottom, Right, byAttr, szBox[ 4 ] )); /* Bottom right corner */
       }
       HB_GT_FUNC(gt_DispEnd());
@@ -539,17 +544,17 @@ USHORT HB_GT_FUNC(gt_BoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYT
 USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE byAttr ))
 {
    USHORT ret = 1;
-   if( Row >= 0 && Row < HB_GT_FUNC(gt_GetScreenHeight()) )
+   if( Row >= 0 && Row < _GetScreenHeight() )
    {
       if( Left < 0 )
          Left = 0;
-      else if( Left >= HB_GT_FUNC(gt_GetScreenWidth()) )
-         Left = HB_GT_FUNC(gt_GetScreenWidth()) - 1;
+      else if( Left >= _GetScreenWidth() )
+         Left = _GetScreenWidth() - 1;
 
       if( Right < 0 )
          Right = 0;
-      else if( Right >= HB_GT_FUNC(gt_GetScreenWidth()) )
-         Right = HB_GT_FUNC(gt_GetScreenWidth()) - 1;
+      else if( Right >= _GetScreenWidth() )
+         Right = _GetScreenWidth() - 1;
 
       if( Left < Right )
          HB_GT_FUNC(gt_Replicate( Row, Left, byAttr, byChar, Right - Left + 1 ));
@@ -565,17 +570,17 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
    USHORT ret = 1;
    USHORT Row;
 
-   if( Col >= 0 && Col < HB_GT_FUNC(gt_GetScreenWidth()) )
+   if( Col >= 0 && Col < _GetScreenWidth() )
    {
       if( Top < 0 )
          Top = 0;
-      else if( Top >= HB_GT_FUNC(gt_GetScreenHeight()) )
-         Top = HB_GT_FUNC(gt_GetScreenHeight()) - 1;
+      else if( Top >= _GetScreenHeight() )
+         Top = _GetScreenHeight() - 1;
 
       if( Bottom < 0 )
          Bottom = 0;
-      else if( Bottom >= HB_GT_FUNC(gt_GetScreenHeight()) )
-         Bottom = HB_GT_FUNC(gt_GetScreenHeight()) - 1;
+      else if( Bottom >= _GetScreenHeight() )
+         Bottom = _GetScreenHeight() - 1;
 
       if( Top <= Bottom )
          Row = Top;
@@ -669,10 +674,19 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    {
       case GTI_ISGRAPHIC:
          return (int) FALSE;
+
       case GTI_INPUTFD:
          return s_iStdIn;
+
       case GTI_OUTPUTFD:
          return s_iStdOut;
+
+      case GTI_VIEWMAXWIDTH:
+         return _GetScreenWidth();
+
+      case GTI_VIEWMAXHEIGHT:
+         return _GetScreenHeight();
+
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;

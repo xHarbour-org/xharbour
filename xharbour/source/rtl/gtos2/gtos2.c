@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.17 2004/09/08 10:39:40 druzus Exp $
+ * $Id: gtos2.c,v 1.18 2004/09/13 07:39:38 mauriliolongo Exp $
  */
 
 /*
@@ -481,7 +481,7 @@ USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth()"));
 
-   return s_vi.col;
+   return _GetScreenWidth();
 }
 
 
@@ -490,7 +490,7 @@ USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenHeight()"));
 
-   return s_vi.row;
+   return _GetScreenHeight();
 }
 
 
@@ -1424,7 +1424,14 @@ int HB_GT_FUNC(gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ))
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-      return (int) FALSE;
+         return (int) FALSE;
+
+      case GTI_VIEWMAXWIDTH:
+         return _GetScreenWidth();
+
+      case GTI_VIEWMAXHEIGHT:
+         return _GetScreenHeight();
+
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;

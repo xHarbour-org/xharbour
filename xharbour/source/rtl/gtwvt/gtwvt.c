@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.132 2004/09/21 04:04:58 peterrees Exp $
+ * $Id: gtwvt.c,v 1.133 2004/09/28 03:25:17 vouchcac Exp $
  */
 
 /*
@@ -221,6 +221,9 @@ HB_EXTERN_END
 
 extern BOOL    b_MouseEnable;
 
+#define _GetScreenHeight()  (_s.ROWS)
+#define _GetScreenWidth()   (_s.COLS)
+
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
@@ -372,7 +375,7 @@ USHORT HB_GT_FUNC( gt_GetScreenWidth( void ) )
 {
   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenWidth()" ) );
 
-  return( _s.COLS );
+  return _GetScreenWidth();
 }
 
 //-------------------------------------------------------------------//
@@ -381,9 +384,9 @@ USHORT HB_GT_FUNC( gt_GetScreenWidth( void ) )
 //
 USHORT HB_GT_FUNC( gt_GetScreenHeight( void ) )
 {
-  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenHeight()" ) );
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenHeight()"));
 
-  return( _s.ROWS );
+  return _GetScreenHeight();
 }
 
 //-------------------------------------------------------------------//
@@ -412,7 +415,7 @@ void HB_GT_FUNC( gt_SetPos( SHORT sRow, SHORT sCol, SHORT sMethod ) )
 
   HB_SYMBOL_UNUSED( sMethod );
 
-  if ( sRow >= 0 && sRow< _s.ROWS && sCol>=0 && sCol <= _s.COLS )
+  if ( sRow >= 0 && sRow< _GetScreenHeight() && sCol>=0 && sCol <= _GetScreenWidth() )
   {
     _s.caretPos.x = sCol;
     _s.caretPos.y = sRow;
@@ -862,8 +865,8 @@ USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
     SHORT Col;
     SHORT Height;
     SHORT Width;
-    USHORT sWidth = HB_GT_FUNC(gt_GetScreenWidth()),
-          sHeight = HB_GT_FUNC(gt_GetScreenHeight());
+    USHORT sWidth = _GetScreenWidth(),
+          sHeight = _GetScreenHeight();
 
     if( ( Left   >= 0 && Left   < sWidth  ) ||
         ( Right  >= 0 && Right  < sWidth  ) ||
@@ -1022,7 +1025,7 @@ USHORT HB_GT_FUNC( gt_BoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BY
 USHORT HB_GT_FUNC( gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE byAttr ) )
 {
   USHORT ret    = 1;
-  USHORT sWidth = HB_GT_FUNC( gt_GetScreenWidth() );
+  USHORT sWidth = _GetScreenWidth();
 
   if( Row >= 0 && Row < sWidth )
   {
@@ -1062,8 +1065,8 @@ USHORT HB_GT_FUNC( gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar
 USHORT HB_GT_FUNC( gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byAttr ) )
 {
     USHORT ret     = 1;
-    USHORT sWidth  = HB_GT_FUNC( gt_GetScreenWidth()  );
-    USHORT sHeight = HB_GT_FUNC( gt_GetScreenHeight() );
+    USHORT sWidth  = _GetScreenWidth();
+    USHORT sHeight = _GetScreenHeight();
     SHORT  Row;
 
     if( Col >= 0 && Col < sWidth )
@@ -1511,14 +1514,14 @@ static void hb_wvt_gtCreateObjects( void )
 
 static USHORT hb_wvt_gtCalcPixelHeight( void )
 {
-  return( _s.PTEXTSIZE.y*_s.ROWS );
+  return( _s.PTEXTSIZE.y*_GetScreenHeight() );
 }
 
 //-------------------------------------------------------------------//
 
 static USHORT hb_wvt_gtCalcPixelWidth( void )
 {
-  return( _s.PTEXTSIZE.x*_s.COLS );
+  return( _s.PTEXTSIZE.x*_GetScreenWidth() );
 }
 
 //-------------------------------------------------------------------//
@@ -1621,7 +1624,7 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
     _s.FixedFont = TRUE ;
   }
 
-  for( n = 0 ; n < _s.COLS ; n++ ) // _s.FixedSize[] is used by ExtTextOut() to emulate
+  for( n = 0 ; n < _GetScreenWidth() ; n++ ) // _s.FixedSize[] is used by ExtTextOut() to emulate
   {                             //          fixed font when a proportional font is used
     _s.FixedSize[ n ] = _s.PTEXTSIZE.x;
   }
@@ -1670,8 +1673,8 @@ static int hb_wvt_key_ansi_to_oem( int c )
 
 static void hb_wvt_gtInitGui( void )
 {
-  _s.iGuiWidth  = _s.COLS * _s.PTEXTSIZE.x ;
-  _s.iGuiHeight = _s.ROWS * _s.PTEXTSIZE.y ;
+  _s.iGuiWidth  = _GetScreenWidth() * _s.PTEXTSIZE.x ;
+  _s.iGuiHeight = _GetScreenHeight() * _s.PTEXTSIZE.y ;
 
   if ( _s.hGuiDC )
   {
@@ -2669,20 +2672,20 @@ static void hb_wvt_gtValidateRow( void )
 {
   if ( _s.caretPos.y < 0 )
   {
-    _s.caretPos.y = _s.ROWS-1;
+    _s.caretPos.y = _GetScreenHeight()-1;
     if ( _s.caretPos.x > 0 )
     {
       _s.caretPos.x--;
     }
     else
     {
-      _s.caretPos.x = _s.COLS-1;
+      _s.caretPos.x = _GetScreenWidth()-1;
     }
   }
-  else if ( _s.caretPos.y >= _s.ROWS )
+  else if ( _s.caretPos.y >= _GetScreenHeight() )
   {
     _s.caretPos.y = 0;
-    if ( _s.caretPos.x < _s.COLS-1 )
+    if ( _s.caretPos.x < _GetScreenWidth()-1 )
     {
       _s.caretPos.x++;
     }
@@ -2701,20 +2704,20 @@ static void hb_wvt_gtValidateCol( void )
 {
   if ( _s.caretPos.x < 0 )
   {
-    _s.caretPos.x = _s.COLS-1;
+    _s.caretPos.x = _GetScreenWidth()-1;
     if ( _s.caretPos.y > 0 )
     {
       _s.caretPos.y--;
     }
     else
     {
-      _s.caretPos.y = _s.ROWS-1;
+      _s.caretPos.y = _GetScreenHeight()-1;
     }
   }
-  else if ( _s.caretPos.x >= _s.COLS )
+  else if ( _s.caretPos.x >= _GetScreenWidth() )
   {
     _s.caretPos.x = 0;
-    if ( _s.caretPos.y < _s.ROWS-1 )
+    if ( _s.caretPos.y < _GetScreenHeight()-1 )
     {
       _s.caretPos.y++;
     }
@@ -2747,7 +2750,7 @@ static void hb_wvt_gtValidateCaret( void )
  */
 static USHORT hb_wvt_gtGetIndexForTextBuffer( USHORT col, USHORT row )
 {
-  return( row * _s.COLS + col );
+  return( row * _GetScreenWidth() + col );
 }
 
 //-------------------------------------------------------------------//
@@ -2759,8 +2762,8 @@ static POINT hb_wvt_gtGetColRowForTextBuffer( USHORT index )
 {
   POINT colrow;
 
-  colrow.x = index % _s.COLS;
-  colrow.y = index / _s.COLS;
+  colrow.x = index % _GetScreenWidth();
+  colrow.y = index / _GetScreenWidth();
 
   return( colrow );
 }
@@ -2778,9 +2781,9 @@ static BOOL hb_wvt_gtTextOut( HDC hdc,  USHORT col, USHORT row, LPCTSTR lpString
 //  long  nFontCX = _s.PTEXTSIZE.x;
 //  long  nFontCY = _s.PTEXTSIZE.y;
 
-  if ( cbString > _s.COLS ) // make sure string is not too long
+  if ( cbString > _GetScreenWidth() ) // make sure string is not too long
   {
-    cbString = _s.COLS;
+    cbString = _GetScreenWidth();
   }
   xy = hb_wvt_gtGetXYFromColRow( col, row );
 
@@ -3407,7 +3410,7 @@ BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold
   {
     // make sure that the font  will fit inside the
     // window with the current _s.ROWS and _s.COLS setting
-//    if ( hb_wvt_gtValidWindowSize( _s.ROWS,_s.COLS, hFont, width ) )
+//    if ( hb_wvt_gtValidWindowSize( _GetScreenHeight(),_GetScreenWidth(), hFont, width ) )
     {
       _s.fontHeight  = height;
       _s.fontWidth   = width;
@@ -3945,18 +3948,18 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
          return iOldValue;
 
       case GTI_SCREENHEIGHT:
-         iOldValue = _s.PTEXTSIZE.y * _s.ROWS;
+         iOldValue = _s.PTEXTSIZE.y * _GetScreenHeight();
          if ( bUpdate )
          {
-            HB_GT_FUNC( gt_SetMode( (USHORT) (iParam/_s.PTEXTSIZE.y), _s.COLS ) );
+            HB_GT_FUNC( gt_SetMode( (USHORT) (iParam/_s.PTEXTSIZE.y), _GetScreenWidth() ) );
          }
          return iOldValue;
 
       case GTI_SCREENWIDTH:
-         iOldValue = _s.PTEXTSIZE.x * _s.COLS;
+         iOldValue = _s.PTEXTSIZE.x * _GetScreenWidth();
          if ( bUpdate )
          {
-            HB_GT_FUNC( gt_SetMode( _s.ROWS, (USHORT) (iParam/_s.PTEXTSIZE.x) ) );
+            HB_GT_FUNC( gt_SetMode( _GetScreenHeight(), (USHORT) (iParam/_s.PTEXTSIZE.x) ) );
          }
          return iOldValue;
 
@@ -4024,6 +4027,12 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
 
       case GTI_ICONRES:
          return (long) hb_wvt_gtSetWindowIcon( iParam );
+
+      case GTI_VIEWMAXWIDTH:
+         return _GetScreenWidth();
+
+      case GTI_VIEWMAXHEIGHT:
+         return _GetScreenHeight();
 
    }
 

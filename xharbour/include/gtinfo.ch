@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.8 2004/07/30 22:14:13 maurifull Exp $
+ * $Id: gtinfo.ch,v 1.9 2004/09/12 15:37:31 lf_sfnet Exp $
  */
 
 /*
@@ -86,6 +86,10 @@
 #define GTI_ERRORFD       32  /* Get Standard error steream of application/GT */
 
 #define GTI_ESCDELAY      33  /* Get/Set escape key delay */
+
+/* these 2 are used for MaxCol(.t.) and MaxRow(.t.) */
+#define GTI_VIEWMAXHEIGHT 34  /* Maximum viewport height:for current mode */
+#define GTI_VIEWMAXWIDTH  35  /* Max viewport width:either win or full scrn */
 
 /* Font weights */
 #define GTI_FONTW_THIN     1

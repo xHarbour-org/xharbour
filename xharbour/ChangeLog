@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3514 2004/10/22 02:55:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3515 2004/10/22 05:40:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-22 07:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * include\gtinfo.ch
+    + GTI_VIEWMAXHEIGHT
+    + GTI_VIEWMAXWIDTH
+
+  * source/rtl/gtalleg/gtalleg.c
+  * source/rtl/gtcgi/gtcgi.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtdos/gtdos.c
+  * source/rtl/gtpca/gtpca.c
+  * source/rtl/gtqtc/gtqtc.c
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtstd/gtstd.c
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxwc/gtxwc.c
+    ! added support for GTI_VIEWMAXHEIGHT and GTI_VIEWMAXWIDTH
+    * This returns the max height and width for the current display
+    * viewport.  Meaning windowed or full Screen under Windows.
+    * This is used by MaxRow(.t.) and MaxCol(.t.)
+    * Other platforms return Maxrow() and Maxcol() values.
+    ! Changed all internal calls to GetScreenHeight, etc to Macro
+    * _GetScreenHeight()/_GetScreenWidth()
+
+  * source/rtl/gtwin/gtwin.c
+    * corrected ALT-ArrowKey handling for compatibility.
 
 2004-10-21 22:39 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c

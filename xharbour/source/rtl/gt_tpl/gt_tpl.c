@@ -1,5 +1,5 @@
 /*
- * $Id: gt_tpl.c,v 1.8 2004/02/18 21:35:56 druzus Exp $
+ * $Id: gt_tpl.c,v 1.9 2004/09/08 00:17:12 druzus Exp $
  */
 
 /*
@@ -138,14 +138,14 @@ BOOL HB_GT_FUNC(gt_AdjustPos( BYTE * pStr, ULONG ulLen ))
                col--;
             else
             {
-               col = HB_GT_FUNC(gt_GetScreenWidth());
+               col = HB_GT_FUNC(gt_GetScreenWidth(FALSE));
                if( row )
                   row--;
             }
             break;
 
          case HB_CHAR_LF:
-            if( row < HB_GT_FUNC(gt_GetScreenHeight()) )
+            if( row < HB_GT_FUNC(gt_GetScreenHeight(FALSE)) )
                row++;
             break;
 
@@ -154,12 +154,12 @@ BOOL HB_GT_FUNC(gt_AdjustPos( BYTE * pStr, ULONG ulLen ))
             break;
 
          default:
-            if( col < HB_GT_FUNC(gt_GetScreenWidth()) )
+            if( col < HB_GT_FUNC(gt_GetScreenWidth(FALSE)) )
                col++;
             else
             {
                col = 0;
-               if( row < HB_GT_FUNC(gt_GetScreenHeight()) )
+               if( row < HB_GT_FUNC(gt_GetScreenHeight(FALSE)) )
                   row++;
             }
       }
@@ -777,7 +777,8 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-      return (int) FALSE;
+         return (int) FALSE;
+
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;

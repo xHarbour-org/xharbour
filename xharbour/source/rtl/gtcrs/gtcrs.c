@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.45 2004/09/08 00:17:13 druzus Exp $
+ * $Id: gtcrs.c,v 1.46 2004/09/26 11:55:22 jonnymind Exp $
  */
 
 /*
@@ -166,6 +166,10 @@ typedef struct InOutBase {
 } InOutBase;
 
 static InOutBase *s_ioBase = NULL;
+
+/* faster macro version for use inside this module */
+#define _GetScreenWidth()  ( s_ioBase->maxrow )
+#define _GetScreenHeight() ( s_ioBase->maxcol )
 
 static InOutBase **s_ioBaseTab = NULL;
 static int s_iSize_ioBaseTab = 0;
@@ -2334,9 +2338,9 @@ void HB_GT_FUNC( gt_Exit( void ) )
 
 /* *********************************************************************** */
 
-USHORT HB_GT_FUNC( gt_GetScreenHeight( void ) )
+USHORT HB_GT_FUNC( gt_GetScreenHeight( void ))
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenHeight()" ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenHeight()"));
 
    if ( s_WinSizeChangeFlag )
    {
@@ -2344,14 +2348,14 @@ USHORT HB_GT_FUNC( gt_GetScreenHeight( void ) )
       gt_resize( s_ioBase );
    }
 
-   return s_ioBase->maxrow;
+   return _GetScreenHeight();
 }
 
 /* *********************************************************************** */
 
-USHORT HB_GT_FUNC( gt_GetScreenWidth( void ) )
+USHORT HB_GT_FUNC( gt_GetScreenWidth( void ))
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenWidth()" ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenWidth()"));
 
    if ( s_WinSizeChangeFlag )
    {
@@ -2359,7 +2363,7 @@ USHORT HB_GT_FUNC( gt_GetScreenWidth( void ) )
       gt_resize( s_ioBase );
    }
 
-   return s_ioBase->maxcol;
+   return _GetScreenWidth();
 }
 
 
@@ -2665,7 +2669,7 @@ HB_GT_FUNC( gt_PutText
                uiRight, pbySrc ) );
 
    cols = uiRight - uiLeft + 1;
-   maxcol = HB_GT_FUNC( gt_GetScreenWidth(  ) ) - uiLeft;
+   maxcol = _GetScreenWidth() - uiLeft;
    if ( maxcol > cols )
       maxcol = cols;
 
@@ -2693,11 +2697,11 @@ HB_GT_FUNC( gt_SetAttribute
              ( "hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d)", uiTop, uiLeft,
                uiBottom, uiRight, ( int ) byAttr ) );
 
-   dx = HB_GT_FUNC( gt_GetScreenWidth(  ) );
+   dx = _GetScreenWidth();
    if ( uiRight >= dx )
       uiRight = dx - 1;
 
-   dx = HB_GT_FUNC( gt_GetScreenHeight(  ) );
+   dx = _GetScreenHeight();
    if ( uiBottom >= dx )
       uiBottom = dx - 1;
 
@@ -2851,8 +2855,8 @@ USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
              ( "hb_gt_box(%i, %i, %i, %i, %s, %hu)", Top, Left, Bottom, Right,
                szBox, byAttr ) );
 
-   maxrow = HB_GT_FUNC( gt_GetScreenHeight(  ) );
-   maxcol = HB_GT_FUNC( gt_GetScreenWidth(  ) );
+   maxrow = _GetScreenHeight();
+   maxcol = _GetScreenWidth();
 
    if ( ( Left >= 0 && Left < maxcol ) ||
         ( Right >= 0 && Right < maxcol ) ||
@@ -3026,8 +3030,8 @@ HB_GT_FUNC( gt_HorizLine
              ( "hb_gt_HorizLine(%i, %i, %i, %hu, %hu)", Row, Left, Right,
                byChar, byAttr ) );
 
-   maxrow = HB_GT_FUNC( gt_GetScreenHeight(  ) );
-   maxcol = HB_GT_FUNC( gt_GetScreenWidth(  ) );
+   maxrow = _GetScreenHeight();
+   maxcol = _GetScreenWidth();
 
    if ( Row >= 0 && Row < maxrow )
    {
@@ -3080,8 +3084,8 @@ HB_GT_FUNC( gt_VertLine
              ( "hb_gt_VertLine(%i, %i, %i, %hu, %hu)", Col, Top, Bottom, byChar,
                byAttr ) );
 
-   maxrow = HB_GT_FUNC( gt_GetScreenHeight(  ) );
-   maxcol = HB_GT_FUNC( gt_GetScreenWidth(  ) );
+   maxrow = _GetScreenHeight();
+   maxcol = _GetScreenWidth();
 
    if ( Col >= 0 && Col < maxcol )
    {
@@ -3258,8 +3262,8 @@ HB_GT_FUNC( mouse_GetBounds
                piRight ) );
 
    *piTop = *piLeft = 0;
-   *piBottom = HB_GT_FUNC( gt_GetScreenHeight(  ) ) - 1;
-   *piRight = HB_GT_FUNC( gt_GetScreenWidth(  ) ) - 1;
+   *piBottom = _GetScreenHeight() - 1;
+   *piRight = _GetScreenWidth() - 1;
 }
 
 /* *********************************************************************** */
@@ -3565,20 +3569,31 @@ HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
       case GTI_ISGRAPHIC:
          iRet = ( int ) FALSE;
          break;
+
       case GTI_INPUTFD:
          iRet = s_ioBase->base_infd;
          break;
+
       case GTI_OUTPUTFD:
          iRet = s_ioBase->base_outfd;
          break;
+
       case GTI_ERRORFD:
          iRet = s_ioBase->stderrfd;
          break;
+
       case GTI_ESCDELAY:
          iRet = s_ioBase->esc_delay;
          if ( bUpdate )
             s_ioBase->esc_delay = iParam;
          break;
+
+      case GTI_VIEWMAXWIDTH:
+         return _GetScreenWidth();
+
+      case GTI_VIEWMAXHEIGHT:
+         return _GetScreenHeight();
+
    }
    return iRet;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: gtxwc.c,v 1.1 2004/09/08 00:17:17 druzus Exp $
  */
 
 /*
@@ -430,6 +430,9 @@ static BOOL s_cursorState = TRUE;
 
 static int s_updateMode = XVT_SYNC_UPDATE;
 //static int s_updateMode = XVT_ASYNC_UPDATE;
+
+#define _GetScreenWidth()  (s_wnd->cols)
+#define _GetScreenHeight() (s_wnd->rows)
 
 
 /* *********************************************************************** */
@@ -3063,7 +3066,7 @@ USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth()"));
 
-   return s_wnd->cols;
+   return _GetScreenWidth();
 }
 
 /* *********************************************************************** */
@@ -3073,7 +3076,7 @@ USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenHeight()"));
 
-   return s_wnd->rows;
+   return _GetScreenHeight();
 }
 
 /* *********************************************************************** */
@@ -3200,9 +3203,9 @@ static void HB_GT_FUNC(gt_xPutch( USHORT iRow, USHORT iCol, BYTE bAttr, BYTE bCh
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_xPutch(%hu, %hu, %d, %i)", iRow, iCol, (int) bAttr, bChar));
 
-   if ( iRow < s_wnd->rows && iCol < s_wnd->cols )
+   if ( iRow < _GetScreenHeight() && iCol < _GetScreenWidth() )
    {
-      USHORT index = iRow * s_wnd->cols + iCol;
+      USHORT index = iRow * _GetScreenWidth() + iCol;
       s_wnd->pChars[index] = bChar;
       s_wnd->pColors[index] = bAttr;
       hb_xvt_gtInvalidateChar(s_wnd, iCol, iRow, iCol, iRow);
@@ -3215,13 +3218,13 @@ void HB_GT_FUNC(gt_Puts( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE *pbyStr, 
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Puts(%hu, %hu, %d, %p, %lu)", usRow, usCol, (int) byAttr, pbyStr, ulLen));
 
-   if ( ( SHORT ) ulLen > s_wnd->cols - usCol ) /* make sure string is not too long */
+   if ( ( SHORT ) ulLen > _GetScreenWidth() - usCol ) /* make sure string is not too long */
    {
-      ulLen = s_wnd->cols - usCol;
+      ulLen = _GetScreenWidth() - usCol;
    }
-   if ( ulLen > 0 && usRow < s_wnd->rows && usCol < s_wnd->cols )
+   if ( ulLen > 0 && usRow < _GetScreenHeight() && usCol < _GetScreenWidth() )
    {
-      USHORT index = usRow * s_wnd->cols + usCol;
+      USHORT index = usRow * _GetScreenWidth() + usCol;
 
       memset( s_wnd->pColors + index, byAttr, ulLen );
       memcpy( s_wnd->pChars + index, pbyStr, ulLen );
@@ -3236,13 +3239,13 @@ void HB_GT_FUNC(gt_Replicate( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE byCh
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Replicate(%hu, %hu, %i, %i, %lu)", usRow, usCol, byAttr, byChar, ulLen));
 
-   if ( ( SHORT ) ulLen > s_wnd->cols - usCol ) /* make sure string is not too long */
+   if ( ( SHORT ) ulLen > _GetScreenWidth() - usCol ) /* make sure string is not too long */
    {
-      ulLen = s_wnd->cols - usCol;
+      ulLen = _GetScreenWidth() - usCol;
    }
-   if ( ulLen > 0 && usRow < s_wnd->rows && usCol < s_wnd->cols )
+   if ( ulLen > 0 && usRow < _GetScreenHeight() && usCol < _GetScreenWidth() )
    {
-      USHORT index = usRow * s_wnd->cols + usCol;
+      USHORT index = usRow * _GetScreenWidth() + usCol;
 
       memset( s_wnd->pColors + index, byAttr, ulLen );
       memset( s_wnd->pChars + index, byChar, ulLen );
@@ -3269,15 +3272,15 @@ void HB_GT_FUNC(gt_GetText( USHORT top, USHORT left, USHORT bottom, USHORT right
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p)", top, left, bottom, right, sBuffer));
 
-   if ( bottom >= s_wnd->rows )
-      bottom = s_wnd->rows - 1;
+   if ( bottom >= _GetScreenHeight() )
+      bottom = _GetScreenHeight() - 1;
 
    while( top <= bottom )
    {
-      index = s_wnd->cols * top + left;
+      index = _GetScreenWidth() * top + left;
       for( col = left; col <= right; col++, index++ )
       {
-         if ( col < s_wnd->cols )
+         if ( col < _GetScreenWidth() )
          {
             *(pBuffer++) = s_wnd->pChars[index];
             *(pBuffer++) = s_wnd->pColors[index];
@@ -3301,15 +3304,15 @@ void HB_GT_FUNC(gt_PutText( USHORT top, USHORT left, USHORT bottom, USHORT right
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", top, left, bottom, right, sBuffer));
 
-   if ( bottom >= s_wnd->rows )
-      bottom = s_wnd->rows - 1;
+   if ( bottom >= _GetScreenHeight() )
+      bottom = _GetScreenHeight() - 1;
 
    for ( row = top; row <= bottom; row++ )
    {
-      index = s_wnd->cols * row + left;
+      index = _GetScreenWidth() * row + left;
       for( col = left; col <= right; col++, index++ )
       {
-         if ( col < s_wnd->cols )
+         if ( col < _GetScreenWidth() )
          {
             s_wnd->pChars[index] = *(pBuffer++);
             s_wnd->pColors[index] = *(pBuffer++);
@@ -3332,16 +3335,16 @@ void HB_GT_FUNC(gt_SetAttribute( USHORT rowStart, USHORT colStart, USHORT rowSto
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d", rowStart, colStart, rowStop, colStop, (int) attr));
 
-   if ( rowStop >= s_wnd->rows )
-      rowStop = s_wnd->rows - 1;
-   if ( colStop >= s_wnd->cols )
-      colStop = s_wnd->cols - 1;
+   if ( rowStop >= _GetScreenHeight() )
+      rowStop = _GetScreenHeight() - 1;
+   if ( colStop >= _GetScreenWidth() )
+      colStop = _GetScreenWidth() - 1;
 
    for ( row = rowStart; row <=rowStop; row++ )
    {
       for (col = colStart; col <= colStop; col++ )
       {
-         s_wnd->pColors[ row * s_wnd->cols + col ] = attr;
+         s_wnd->pColors[ row * _GetScreenWidth() + col ] = attr;
       }
    }
 
@@ -3416,7 +3419,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
          }
    }
    HB_GT_FUNC(gt_SetPos( usSaveRow, usSaveCol, HB_GT_SET_POS_AFTER ));
-   hb_xvt_gtInvalidateChar( s_wnd, 0, 0, s_wnd->cols-1, s_wnd->rows-1 );
+   hb_xvt_gtInvalidateChar( s_wnd, 0, 0, _GetScreenWidth()-1, _GetScreenHeight()-1 );
    HB_GT_FUNC(gt_DispEnd());
 
    if (bMalloc)
@@ -3440,16 +3443,16 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
 
    /* ignore stupid requests */
    if ( col < 1 || row < 1 || col > XVT_MAX_COLS || row > XVT_MAX_ROWS ||
-        ( col == s_wnd->cols && row == s_wnd->rows) )
+        ( col == _GetScreenWidth() && row == _GetScreenHeight()) )
    {
       return FALSE;
    }
 
-   oldrows = s_wnd->rows-1;
-   oldcols = s_wnd->cols-1;
+   oldrows = _GetScreenHeight()-1;
+   oldcols = _GetScreenWidth()-1;
 
    /* take current screen buffer */
-   memory = (BYTE *) hb_xgrab( HB_GT_FUNC(gt_RectSize( s_wnd->rows, s_wnd->cols )) );
+   memory = (BYTE *) hb_xgrab( HB_GT_FUNC(gt_RectSize( _GetScreenHeight(), _GetScreenWidth() )) );
    HB_GT_FUNC(gt_GetText( 0, 0, oldrows, oldcols, memory ));
 
    hb_xvt_gtDisable();
@@ -3462,13 +3465,13 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
       s_wnd->cols = col;
       s_wnd->rows = row;
 
-      if ( s_wnd->col >= s_wnd->cols )
+      if ( s_wnd->col >= _GetScreenWidth() )
       {
-         s_wnd->col = s_wnd->cols -1;
+         s_wnd->col = _GetScreenWidth() -1;
       }
-      if ( s_wnd->row >= s_wnd->rows )
+      if ( s_wnd->row >= _GetScreenHeight() )
       {
-         s_wnd->row = s_wnd->rows -1;
+         s_wnd->row = _GetScreenHeight() -1;
       }
       HB_GT_FUNC(gt_PutText( 0, 0, oldrows, oldcols, memory ));
    }
@@ -3520,8 +3523,8 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
    SHORT Col;
    SHORT Height;
    SHORT Width;
-   USHORT sWidth = s_wnd->cols;
-   USHORT sHeight = s_wnd->rows;
+   USHORT sWidth = _GetScreenWidth();
+   USHORT sHeight = _GetScreenHeight();
 
    if( ( Left   >= 0 && Left   < sWidth  ) ||
        ( Right  >= 0 && Right  < sWidth  ) ||
@@ -4032,13 +4035,13 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
       case GTI_SCREENWIDTH:
          iRet = s_wnd->width;
          if ( bUpdate )
-            hb_gtSetMode( s_wnd->rows, iParam / s_wnd->fontWidth );
+            hb_gtSetMode( _GetScreenHeight(), iParam / s_wnd->fontWidth );
          break;
 
       case GTI_SCREENHEIGHT:
          iRet =  s_wnd->height;
          if ( bUpdate )
-            hb_gtSetMode( iParam / s_wnd->fontHeight, s_wnd->cols );
+            hb_gtSetMode( iParam / s_wnd->fontHeight, _GetScreenWidth() );
          break;
 
       case GTI_SCREENDEPTH:
@@ -4108,6 +4111,15 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
       case GTI_ERRORFD:
          iRet = s_iStdErr;
          break;
+
+      case GTI_VIEWMAXWIDTH:
+         iRet = _GetScreenWidth();
+         break;
+
+      case GTI_VIEWMAXHEIGHT:
+         iret = _GetScreenHeight();
+         break;
+
    }
 
    return iRet;

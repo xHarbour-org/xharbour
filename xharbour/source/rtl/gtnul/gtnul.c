@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.24 2004/08/06 02:25:38 maurifull Exp $
+ * $Id: gtnul.c,v 1.25 2004/09/08 00:17:13 druzus Exp $
  */
 
 /*
@@ -95,6 +95,9 @@ static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 static char *s_clipboard = NULL;
 static ULONG s_clipsize = 0;
+
+#define _GetScreenHeight()  (s_uiMaxRow)
+#define _GetScreenWidth()  (s_uiMaxCol)
 
 /* ********************************************************************** */
 
@@ -192,14 +195,14 @@ USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_GetScreenWidth()"));
 
-   return s_uiMaxCol;
+   return _GetScreenWidth();
 }
 
 USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_GetScreenHeight()"));
 
-   return s_uiMaxRow;
+   return _GetScreenHeight();
 }
 
 SHORT HB_GT_FUNC(gt_Col( void ))
@@ -666,7 +669,14 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-      return (int) FALSE;
+         return (int) FALSE;
+
+      case GTI_VIEWMAXWIDTH:
+         return _GetScreenWidth();
+
+      case GTI_VIEWMAXHEIGHT:
+         return _GetScreenHeight();
+
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;
@@ -738,7 +748,7 @@ void hb_gt_Exit( void )
    GT_FUNCS.Exit();
 }
 
-USHORT hb_gt_GetScreenWidth( void )
+USHORT hb_gt_GetScreenWidth()
 {
    return GT_FUNCS.GetScreenWidth();
 }

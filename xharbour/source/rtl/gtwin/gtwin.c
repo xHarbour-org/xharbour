@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.70 2004/10/21 13:03:02 jonnymind Exp $
+ * $Id: gtwin.c,v 1.69 2004/09/21 02:40:40 paultucker Exp $
  */
 
 /*
@@ -163,6 +163,10 @@ static HANDLE s_HInput  = INVALID_HANDLE_VALUE;
 static HANDLE s_HOutput = INVALID_HANDLE_VALUE;
 static CONSOLE_SCREEN_BUFFER_INFO s_csbi,     /* active screen mode */
                                   s_origCsbi; /* to restore screen mode on exit */
+
+/* faster macro version for use inside this module */
+#define _GetScreenWidth()  ( s_csbi.dwSize.X )
+#define _GetScreenHeight() ( s_csbi.dwSize.Y )
 
 #define INPUT_BUFFER_LEN 32
 
@@ -445,8 +449,8 @@ static void HB_GT_FUNC(gt_xScreenUpdate( void ))
             COORD coDest, coSize;
             SMALL_RECT srWin;
 
-            coSize.Y = s_csbi.dwSize.Y;
-            coSize.X = s_csbi.dwSize.X;
+            coSize.Y = _GetScreenHeight();
+            coSize.X = _GetScreenWidth();
             coDest.Y = s_usUpdtTop;
             coDest.X = s_usUpdtLeft;
             srWin.Top    = ( SHORT ) s_usUpdtTop;
@@ -460,8 +464,8 @@ static void HB_GT_FUNC(gt_xScreenUpdate( void ))
                                 coDest,            /* upper-left cell to write data from in src */
                                 &srWin );          /* screen buffer rect to write data to */
 
-            s_usUpdtTop = s_csbi.dwSize.Y;
-            s_usUpdtLeft = s_csbi.dwSize.X;
+            s_usUpdtTop = _GetScreenHeight();
+            s_usUpdtLeft = _GetScreenWidth();
             s_usUpdtBottom = s_usUpdtRight = 0;
         }
 
@@ -488,9 +492,9 @@ static void HB_GT_FUNC(gt_xUpdtSet( USHORT usTop, USHORT usLeft, USHORT usBottom
     if ( usLeft < s_usUpdtLeft )
         s_usUpdtLeft = usLeft;
     if ( usBottom > s_usUpdtBottom )
-        s_usUpdtBottom = HB_MIN( usBottom, ( USHORT )s_csbi.dwSize.Y - 1);
+        s_usUpdtBottom = HB_MIN( usBottom, ( USHORT )_GetScreenHeight() - 1);
     if ( usRight > s_usUpdtRight )
-        s_usUpdtRight = HB_MIN( usRight, ( USHORT )s_csbi.dwSize.X - 1);
+        s_usUpdtRight = HB_MIN( usRight, ( USHORT )_GetScreenWidth() - 1);
 }
 
 /* *********************************************************************** */
@@ -543,13 +547,13 @@ static void HB_GT_FUNC(gt_xInitScreenParam( void ))
         hb_xfree( s_pCharInfoScreen );
 
     if (GetConsoleScreenBufferInfo( s_HOutput, &s_csbi ))
-        s_pCharInfoScreen = ( CHAR_INFO * ) hb_xgrab( s_csbi.dwSize.X *
-                                                      s_csbi.dwSize.Y *
+        s_pCharInfoScreen = ( CHAR_INFO * ) hb_xgrab( _GetScreenWidth() *
+                                                      _GetScreenHeight() *
                                                       sizeof( CHAR_INFO ) );
     s_sCurRow = s_csbi.dwCursorPosition.Y;
     s_sCurCol = s_csbi.dwCursorPosition.X;
-    s_usUpdtTop = s_csbi.dwSize.Y;
-    s_usUpdtLeft = s_csbi.dwSize.X;
+    s_usUpdtTop = _GetScreenHeight();
+    s_usUpdtLeft = _GetScreenWidth();
     s_usUpdtBottom = s_usUpdtRight = 0;
 
     /* read the screen rectangle into the buffer */
@@ -632,8 +636,8 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
         memcpy( &s_origCsbi, &s_csbi, sizeof( s_csbi ) );
 
         s_csbi.srWindow.Top = s_csbi.srWindow.Left = 0;
-        s_csbi.srWindow.Right = HB_MIN( s_csbi.srWindow.Right, s_csbi.dwSize.X-1 );
-        s_csbi.srWindow.Bottom = HB_MIN( s_csbi.srWindow.Bottom, s_csbi.dwSize.Y-1 );
+        s_csbi.srWindow.Right = HB_MIN( s_csbi.srWindow.Right, _GetScreenWidth()-1 );
+        s_csbi.srWindow.Bottom = HB_MIN( s_csbi.srWindow.Bottom, _GetScreenHeight()-1 );
 
         SetConsoleWindowInfo( s_HOutput, TRUE,  &s_csbi.srWindow );
         SetConsoleScreenBufferSize( s_HOutput, s_csbi.dwSize );
@@ -701,9 +705,9 @@ void HB_GT_FUNC(gt_Exit( void ))
 
 USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
 {
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth()"));
+    HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth(%d)"));
 
-    return s_csbi.dwSize.X;
+    return _GetScreenWidth();
 }
 
 /* *********************************************************************** */
@@ -712,7 +716,7 @@ USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenHeight()"));
 
-    return s_csbi.dwSize.Y;
+    return _GetScreenHeight();
 }
 
 /* *********************************************************************** */
@@ -840,18 +844,18 @@ void HB_GT_FUNC(gt_Puts( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE *pbyStr, 
     if( ulLen > 0 && s_pCharInfoScreen != NULL )
     {
         i = ( int ) ulLen;
-        j = ( int ) ( usRow * s_csbi.dwSize.X + usCol );
+        j = ( int ) ( usRow * _GetScreenWidth() + usCol );
 
-        if ( i > s_csbi.dwSize.Y * s_csbi.dwSize.X - j )
-            i = s_csbi.dwSize.Y * s_csbi.dwSize.X - j;
+        if ( i > _GetScreenHeight() * _GetScreenWidth() - j )
+            i = _GetScreenHeight() * _GetScreenWidth() - j;
 
         if ( i > 0 )
         {
-            u = usRow + ( i + usCol - 1 ) / s_csbi.dwSize.X;
+            u = usRow + ( i + usCol - 1 ) / _GetScreenWidth();
             if ( u > usRow )
             {
                 l = 0;
-                r = s_csbi.dwSize.X - 1;
+                r = _GetScreenWidth() - 1;
             }
             else
             {
@@ -881,18 +885,18 @@ void HB_GT_FUNC(gt_Replicate( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE byCh
     if( ulLen > 0 && s_pCharInfoScreen != NULL )
     {
         i = ( int ) ulLen;
-        j = ( int ) ( usRow * s_csbi.dwSize.X + usCol );
+        j = ( int ) ( usRow * _GetScreenWidth() + usCol );
 
-        if ( i > s_csbi.dwSize.Y * s_csbi.dwSize.X - j )
-            i = s_csbi.dwSize.Y * s_csbi.dwSize.X - j;
+        if ( i > _GetScreenHeight() * _GetScreenWidth() - j )
+            i = _GetScreenHeight() * _GetScreenWidth() - j;
 
         if ( i > 0 )
         {
-            u = usRow + ( i + usCol - 1 ) / s_csbi.dwSize.X;
+            u = usRow + ( i + usCol - 1 ) / _GetScreenWidth();
             if ( u > usRow )
             {
                 l = 0;
-                r = s_csbi.dwSize.X - 1;
+                r = _GetScreenWidth() - 1;
             }
             else
             {
@@ -929,15 +933,15 @@ void HB_GT_FUNC(gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
 
     if ( s_pCharInfoScreen != NULL )
     {
-        if ( usBottom >= s_csbi.dwSize.Y )
-            usBottom = s_csbi.dwSize.Y - 1;
+        if ( usBottom >= _GetScreenHeight() )
+            usBottom = _GetScreenHeight() - 1;
 
-        if ( usRight >= s_csbi.dwSize.X )
-            usRight = s_csbi.dwSize.X - 1;
+        if ( usRight >= _GetScreenWidth() )
+            usRight = _GetScreenWidth() - 1;
 
         for( y = usTop; y <= usBottom; y++ )
         {
-            i = y * s_csbi.dwSize.X;
+            i = y * _GetScreenWidth();
             for( x = usLeft; x <= usRight; x++ )
             {
                 *(pbyDst++) = s_charTransRev[ (BYTE) s_pCharInfoScreen[i+x].Char.AsciiChar ];
@@ -958,17 +962,17 @@ void HB_GT_FUNC(gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
 
     if ( s_pCharInfoScreen != NULL )
     {
-        if ( usBottom >= s_csbi.dwSize.Y )
-            usBottom = s_csbi.dwSize.Y - 1;
+        if ( usBottom >= _GetScreenHeight() )
+            usBottom = _GetScreenHeight() - 1;
 
-        if ( usRight >= s_csbi.dwSize.X )
-            usRight = s_csbi.dwSize.X - 1;
+        if ( usRight >= _GetScreenWidth() )
+            usRight = _GetScreenWidth() - 1;
 
         if ( usTop <= usBottom && usLeft <= usRight )
         {
             for( y = usTop; y <= usBottom; y++ )
             {
-                i = y * s_csbi.dwSize.X;
+                i = y * _GetScreenWidth();
                 for( x = usLeft; x <= usRight; x++ )
                 {
                     s_pCharInfoScreen[i+x].Char.AsciiChar = ( CHAR ) s_charTrans[ *pbySrc++ ];
@@ -992,17 +996,17 @@ void HB_GT_FUNC(gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, U
 
     if ( s_pCharInfoScreen != NULL )
     {
-        if ( usBottom >= s_csbi.dwSize.Y )
-            usBottom = s_csbi.dwSize.Y - 1;
+        if ( usBottom >= _GetScreenHeight() )
+            usBottom = _GetScreenHeight() - 1;
 
-        if ( usRight >= s_csbi.dwSize.X )
-            usRight = s_csbi.dwSize.X - 1;
+        if ( usRight >= _GetScreenWidth() )
+            usRight = _GetScreenWidth() - 1;
 
         if ( usTop <= usBottom && usLeft <= usRight )
         {
             for( y = usTop; y <= usBottom; y++ )
             {
-                i = y * s_csbi.dwSize.X;
+                i = y * _GetScreenWidth();
                 for( x = usLeft; x <= usRight; x++ )
                     s_pCharInfoScreen[i+x].Attributes = ( WORD )( attr & 0xFF );
             }
@@ -1083,60 +1087,67 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
 
 BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
 {
-    BOOL Ret = FALSE;
-    SMALL_RECT srWin;
-    COORD coBuf;
-    USHORT uiDispCount = s_uiDispCount;
+   BOOL Ret = FALSE;
+   SMALL_RECT srWin;
+   COORD coBuf;
+   USHORT uiDispCount = s_uiDispCount;
 
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", usRows, usCols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", usRows, usCols));
 
-    if( s_HOutput != INVALID_HANDLE_VALUE )
-    {
-        while( s_uiDispCount )
-            HB_GT_FUNC(gt_DispEnd());
+   if( s_HOutput != INVALID_HANDLE_VALUE )
+   {
+      while( s_uiDispCount )
+      {
+         HB_GT_FUNC(gt_DispEnd());
+      }
 
-        coBuf = GetLargestConsoleWindowSize( s_HOutput );
-        if ( usRows > coBuf.Y )
-            usRows = coBuf.Y;
-        else
-            coBuf.Y = usRows;  /* Thx to Peter Rees */
+      coBuf = GetLargestConsoleWindowSize( s_HOutput );
+      if ( usRows > coBuf.Y )
+         usRows = coBuf.Y;
+      else
+         coBuf.Y = usRows;  /* Thx to Peter Rees */
 
-        if ( usCols > coBuf.X )
-            usCols = coBuf.X;
-        else
-            coBuf.X = usCols;
+      if ( usCols > coBuf.X )
+         usCols = coBuf.X;
+      else
+         coBuf.X = usCols;
 
-        /* new console window size and scroll position */
-        srWin.Top    = srWin.Left = 0;
-        srWin.Bottom = ( SHORT ) ( usRows - 1 );
-        srWin.Right  = ( SHORT ) ( usCols - 1 );
+      /* new console window size and scroll position */
+      srWin.Top   = srWin.Left = 0;
+      srWin.Bottom = ( SHORT ) ( usRows - 1 );
+      srWin.Right  = ( SHORT ) ( usCols - 1 );
 
-        /* if the current buffer is larger than what we want, resize the */
-        /* console window first, then the buffer */
-        if( ( DWORD ) s_csbi.dwSize.X * s_csbi.dwSize.Y > ( DWORD ) usCols * usRows )
-        {
-            if ( SetConsoleWindowInfo( s_HOutput, TRUE, &srWin ) )
-            {
-                SetConsoleScreenBufferSize( s_HOutput, coBuf );
-                Ret = TRUE;
-            }
-        }
-        else
-        {
-            if ( SetConsoleScreenBufferSize( s_HOutput, coBuf ) )
-            {
-                SetConsoleWindowInfo( s_HOutput, TRUE, &srWin );
-                Ret = TRUE;
-            }
-        }
+      /* if the current buffer is larger than what we want, resize the */
+      /* console window first, then the buffer */
+      if( ( DWORD ) _GetScreenWidth() * _GetScreenHeight() > ( DWORD ) usCols * usRows )
+      {
+         if ( SetConsoleWindowInfo( s_HOutput, TRUE, &srWin ) )
+         {
+            SetConsoleScreenBufferSize( s_HOutput, coBuf );
+            Ret = TRUE;
+         }
+      }
+      else
+      {
+         if ( SetConsoleScreenBufferSize( s_HOutput, coBuf ) )
+         {
+            SetConsoleWindowInfo( s_HOutput, TRUE, &srWin );
+            Ret = TRUE;
+         }
+      }
 
-        if ( Ret )
-            HB_GT_FUNC(gt_xInitScreenParam());
+      if ( Ret )
+      {
+         HB_GT_FUNC(gt_xInitScreenParam());
+      }
 
-        while( s_uiDispCount < uiDispCount )
-            HB_GT_FUNC(gt_DispBegin());
-    }
-    return ( Ret );
+      while( s_uiDispCount < uiDispCount )
+      {
+         HB_GT_FUNC(gt_DispBegin());
+      }
+   }
+
+   return Ret;
 }
 
 /* *********************************************************************** */
@@ -1178,9 +1189,9 @@ static void HB_GT_FUNC(gt_xPutch( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_xPutch(%hu, %hu, %d, %i)", usRow, usCol, (int) byAttr, byChar));
 
     if ( s_pCharInfoScreen != NULL &&
-         usRow < s_csbi.dwSize.Y && usCol < s_csbi.dwSize.X )
+         usRow < _GetScreenHeight() && usCol < _GetScreenWidth() )
     {
-        int i = ( int ) ( usRow * s_csbi.dwSize.X + usCol );
+        int i = ( int ) ( usRow * _GetScreenWidth() + usCol );
 
         s_pCharInfoScreen[i].Char.AsciiChar = ( CHAR ) s_charTrans[ byChar ];
         s_pCharInfoScreen[i].Attributes = ( WORD )( byAttr & 0xFF );
@@ -1199,8 +1210,8 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
     SHORT Col;
     SHORT Height;
     SHORT Width;
-    USHORT sWidth = HB_GT_FUNC(gt_GetScreenWidth()),
-          sHeight = HB_GT_FUNC(gt_GetScreenHeight());
+    USHORT sWidth = _GetScreenWidth(),
+          sHeight = _GetScreenHeight();
 
     if( ( Left   >= 0 && Left   < sWidth  ) ||
         ( Right  >= 0 && Right  < sWidth  ) ||
@@ -1355,17 +1366,17 @@ USHORT HB_GT_FUNC(gt_BoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYT
 USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar, BYTE byAttr ))
 {
     USHORT ret = 1;
-    if( Row >= 0 && Row < HB_GT_FUNC(gt_GetScreenHeight()) )
+    if( Row >= 0 && Row < _GetScreenHeight() )
     {
         if( Left < 0 )
             Left = 0;
-        else if( Left >= HB_GT_FUNC(gt_GetScreenWidth()) )
-            Left = HB_GT_FUNC(gt_GetScreenWidth()) - 1;
+        else if( Left >= _GetScreenWidth() )
+            Left = _GetScreenWidth() - 1;
 
         if( Right < 0 )
             Right = 0;
-        else if( Right >= HB_GT_FUNC(gt_GetScreenWidth()) )
-            Right = HB_GT_FUNC(gt_GetScreenWidth()) - 1;
+        else if( Right >= _GetScreenWidth() )
+            Right = _GetScreenWidth() - 1;
 
         if( Left < Right )
             HB_GT_FUNC(gt_Replicate( Row, Left, byAttr, byChar, Right - Left + 1 ));
@@ -1383,24 +1394,24 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
     USHORT ret = 1;
     SHORT Row;
 
-    if( Col >= 0 && Col < HB_GT_FUNC(gt_GetScreenWidth()) )
+    if( Col >= 0 && Col < _GetScreenWidth() )
     {
         if( Top < 0 )
         {
             Top = 0;
         }
-        else if( Top >= HB_GT_FUNC(gt_GetScreenHeight()) )
+        else if( Top >= _GetScreenHeight() )
         {
-            Top = HB_GT_FUNC(gt_GetScreenHeight()) - 1;
+            Top = _GetScreenHeight() - 1;
         }
 
         if( Bottom < 0 )
         {
             Bottom = 0;
         }
-        else if( Bottom >= HB_GT_FUNC(gt_GetScreenHeight()) )
+        else if( Bottom >= _GetScreenHeight() )
         {
-            Bottom = HB_GT_FUNC(gt_GetScreenHeight()) - 1;
+            Bottom = _GetScreenHeight() - 1;
         }
 
         if( Top <= Bottom )
@@ -1524,82 +1535,90 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 #if 0
     if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
     {
-      printf("\n %ld %ld %ld %ld",
+      printf("\n %ld %ld %ld %ld %d",
           wKey, /* scan code */
           s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualKeyCode,  /* key code */
           s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar,  /* char */
-          s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState); /* state */
+          s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState, /* state */
+          altisdown);
     }
 #endif
                if( altisdown )
                {
-                  if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
+                  if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState & ENHANCED_KEY)
                   {
-                     /*
-                        on Keydown, it better be the alt or a numpad key,
-                        or bail out.
-                     */
-                     switch(wKey)
-                     {
-                        case 0x38:
-                        case 0x47:
-                        case 0x48:
-                        case 0x49:
-                        case 0x4b:
-                        case 0x4c:
-                        case 0x4d:
-                        case 0x4f:
-                        case 0x50:
-                        case 0x51:
-                        case 0x52:
-                           break;
-
-                        default:
-                           altisdown=0;
-                           break;
-                     }
+                     altisdown = 0;
                   }
                   else
                   {
-                     /* Keypad handling is done during Key up */
-
-                     unsigned short nm = 10;
-
-                     switch(wKey)
+                     if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
                      {
-                        case 0x38:
-                           /* Alt key ... */
-                           if ((s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState &
-                              0x04000000 ))
-                           /* ... has been released after a numpad entry */
-                           {
-                              ch = altnum & 0xff;
-                              ++s_cNumIndex;
-                           }
-                           else
-                           /* ... has been released after no numpad entry */
-                           {
-                              s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown = 1;
-                           }
-                           altisdown = altnum = 0;
-                           break;
+                        /*
+                           on Keydown, it better be the alt or a numpad key,
+                           or bail out.
+                        */
+                        switch(wKey)
+                        {
+                           case 0x38:
+                           case 0x47:
+                           case 0x48:
+                           case 0x49:
+                           case 0x4b:
+                           case 0x4c:
+                           case 0x4d:
+                           case 0x4f:
+                           case 0x50:
+                           case 0x51:
+                           case 0x52:
+                              break;
 
-                        case 0x52: --nm;
-                        case 0x4f: --nm;
-                        case 0x50: --nm;
-                        case 0x51: --nm;
-                        case 0x4b: --nm;
-                        case 0x4c: --nm;
-                        case 0x4d: --nm;
-                        case 0x47: --nm;
-                        case 0x48: --nm;
-                        case 0x49: --nm;
-                           altnum = ((altnum * 10) & 0xff) + nm;
-                           break;
+                           default:
+                              altisdown=0;
+                              break;
+                        }
+                     }
+                     else
+                     {
+                        /* Keypad handling is done during Key up */
 
-                        default:
-                           altisdown=0;
-                           break;
+                        unsigned short nm = 10;
+
+                        switch(wKey)
+                        {
+                           case 0x38:
+                              /* Alt key ... */
+                              if ((s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState &
+                                 0x04000000 ))
+                              /* ... has been released after a numpad entry */
+                              {
+                                 ch = altnum & 0xff;
+                                 ++s_cNumIndex;
+                              }
+                              else
+                              /* ... has been released after no numpad entry */
+                              {
+                                 s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown = 1;
+                              }
+                              altisdown = altnum = 0;
+                              break;
+
+                           case 0x52: --nm;
+                           case 0x4f: --nm;
+                           case 0x50: --nm;
+                           case 0x51: --nm;
+                           case 0x4b: --nm;
+                           case 0x4c: --nm;
+                           case 0x4d: --nm;
+                           case 0x47: --nm;
+                           case 0x48: --nm;
+                           case 0x49: --nm;
+                              altnum = ((altnum * 10) & 0xff) + nm;
+                              break;
+
+                           default:
+                              altisdown=0;
+                              break;
+                        }
                      }
                   }
                }
@@ -2314,19 +2333,36 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    {
       case GTI_ISGRAPHIC:
          return (int) FALSE;
+
       case GTI_INPUTFD:
          return s_iStdIn;
+
       case GTI_OUTPUTFD:
          return s_iStdOut;
+
       case GTI_WINTITLE:
       {
-         if (bUpdate) {
+         if (bUpdate)
+         {
             return SetConsoleTitle( (LPCSTR) vpParam ) ? 1 : -1;
          }
-         else {
+         else
+         {
             return GetConsoleTitle( (char *) vpParam, iParam );
-         }
+         }   
+      }   
+
+      case GTI_VIEWMAXHEIGHT:
+      {
+         COORD coBuf = GetLargestConsoleWindowSize( s_HOutput );
+         return coBuf.Y;
       }
+      case GTI_VIEWMAXWIDTH:
+      {
+         COORD coBuf = GetLargestConsoleWindowSize( s_HOutput );
+         return coBuf.X;
+      }
+
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;

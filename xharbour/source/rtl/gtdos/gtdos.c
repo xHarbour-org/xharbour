@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.21 2004/08/30 23:43:24 druzus Exp $
+ * $Id: gtdos.c,v 1.22 2004/09/08 00:17:13 druzus Exp $
  */
 
 /*
@@ -1776,10 +1776,19 @@ int HB_GT_FUNC(gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ))
    {
       case GTI_ISGRAPHIC:
          return (int) FALSE;
+
       case GTI_INPUTFD:
          return s_iStdIn;
+
       case GTI_OUTPUTFD:
          return s_iStdOut;
+
+      case GTI_VIEWMAXWIDTH:
+         return _GetScreenWidth();
+
+      case GTI_VIEWMAXHEIGHT:
+         return _GetScreenHeight();
+
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;
