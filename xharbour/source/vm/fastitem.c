@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.7 2002/01/04 17:56:12 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.8 2002/01/05 03:29:39 ronpinkas Exp $
  */
 
 /*
@@ -49,6 +49,7 @@
  */
 
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
@@ -56,8 +57,10 @@
 #include "hbset.h"
 
 /* Forward decalarations. */
+void hb_itemFastCopy( PHB_ITEM pDest, PHB_ITEM pSource );
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
 
+/* Forward instead of copy. */
 void hb_itemPushForward( PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_itemPushForward(%p)", pItem));
@@ -66,74 +69,80 @@ void hb_itemPushForward( PHB_ITEM pItem )
    hb_stackPush();
 }
 
-void hb_itemShareValue( PHB_ITEM pDest, PHB_ITEM pSource )
-{
-   HB_TRACE( HB_TR_INFO, ("*** hb_itemShareValue(%p, %p)", pDest, pSource ) );
-
-   //return hb_itemCopy( pDest, pSource );
-
-   if( pDest == pSource )
-   {
-      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemShareValue()", NULL );
-   }
-
-   if( pDest->type )
-   {
-      hb_itemClear( pDest );
-   }
-
-   memcpy( pDest, pSource, sizeof( HB_ITEM ) );
-
-   if( HB_IS_STRING( pSource ) )
-   {
-      pDest->bShadow = TRUE;
-   }
-   else if( HB_IS_ARRAY( pSource ) )
-   {
-      ( pSource->item.asArray.value )->uiHolders++;
-      pDest->bShadow = FALSE;
-   }
-   else if( HB_IS_BLOCK( pSource ) )
-   {
-      ( pSource->item.asBlock.value )->ulCounter++;
-      pDest->bShadow = FALSE;
-   }
-   else if( HB_IS_MEMVAR( pSource ) )
-   {
-      hb_memvarValueIncRef( pSource->item.asMemvar.value );
-      pDest->bShadow = FALSE;
-   }
-}
-
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
 {
    HB_TRACE( HB_TR_DEBUG, ("hb_itemForwardValue(%p, %p)", pDest, pSource ) );
 
    if( pDest == pSource )
    {
-      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemShareValue()", NULL );
+      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemFastCopy()", NULL );
    }
-
-   /* Source is already a shadow. */
-
-   #if 1
-   if( pSource->bShadow )
-   {
-      hb_itemCopy( pDest, pSource );
-      return;
-   }
-   #endif
 
    if( pDest->type )
    {
-      hb_itemClear( pDest );
+      if( HB_IS_STRING( pDest ) )
+      {
+         hb_itemReleaseString( pDest );
+      }
+      else
+      {
+         hb_itemFastClear( pDest );
+      }
+   }
+
+   /* Forward. */
+   memcpy( pDest, pSource, sizeof( HB_ITEM ) );
+
+   /* Now fake clear the transferer. */
+   //pSource->item.asString.bStatic = FALSE;
+   pSource->type = HB_IT_NIL;
+}
+
+void hb_itemReleaseString( PHB_ITEM pItem )
+{
+   HB_TRACE( HB_TR_DEBUG, ( "hb_itemReleaseString(%p) %i, '%s'", pItem, *( pItem->item.asString.puiHolders ), pItem->item.asString.value ) );
+
+   if( --*( pItem->item.asString.puiHolders ) == 0 )
+   {
+      hb_xfree( pItem->item.asString.puiHolders );
+
+      if( ! pItem->item.asString.bStatic )
+      {
+         hb_xfree( pItem->item.asString.value );
+      }
+   }
+
+   //pItem->item.asString.bStatic = FALSE;
+   pItem->item.asString.value = NULL;
+   //pItem->item.asString.length = 0;
+}
+
+void hb_itemFastCopy( PHB_ITEM pDest, PHB_ITEM pSource )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemFastCopy(%p, %p)", pDest, pSource));
+
+   if( pDest == pSource )
+   {
+      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemFastCopy()", NULL );
+   }
+
+   if( pDest->type )
+   {
+      if( HB_IS_STRING( pDest ) )
+      {
+         hb_itemReleaseString( pDest );
+      }
+      else
+      {
+         hb_itemFastClear( pDest );
+      }
    }
 
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
    if( HB_IS_STRING( pSource ) )
    {
-      pSource->bShadow = TRUE;
+      ++*( pSource->item.asString.puiHolders );
    }
    else if( HB_IS_ARRAY( pSource ) )
    {
@@ -149,101 +158,67 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
    }
 }
 
-void hb_itemVarAssign( PHB_ITEM pVar )
+void hb_itemFastClear( PHB_ITEM pItem )
 {
-   PHB_ITEM pValue = hb_stackTopItem();
+   HB_TRACE(HB_TR_DEBUG, ( "hb_itemFastClear(%p) Type: %i", pItem, pItem->type ) );
 
-   HB_TRACE( HB_TR_DEBUG, ("hb_itemAssign(%p, %p)", pVar ) );
-
-   if( HB_IS_STRING( pVar ) )
+   if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
-      if( pVar->bShadow )
+      if( ( pItem->item.asArray.value )->uiHolders && --( pItem->item.asArray.value )->uiHolders == 0 )
       {
-         /* Recepient Var is a shadow, value will not be released, do nothing. */
-      }
-      else if( HB_IS_STRING( pValue ) && pVar->item.asString.value == pValue->item.asString.value )
-      {
-         /* Assign self ( cVar := cVar ), value would have been lost on hb_itemClear(), which is also the new value! */
-         pValue->type = HB_IT_NIL;
-         return;
-      }
-      else if( pVar->item.asString.value == NULL )
-      {
-         /* Nothing will be released, do nothing. */
-      }
-      else
-      {
-         long i;
-
-         long lItems = hb_stack.pPos - hb_stack.pItems - 1;
-
-         for( i = 2; i < lItems; ++i )
-         {
-            if( hb_stack.pItems[ i ]->bShadow && HB_IS_STRING( hb_stack.pItems[ i ] ) && hb_stack.pItems[ i ]->item.asString.value == pVar->item.asString.value )
-            {
-               /* Shadow caster is about to change, the shadow must now get a true copy before value is lost. */
-               hb_stack.pItems[ i ]->item.asString.value = hb_itemGetC( pVar );
-               hb_stack.pItems[ i ]->bShadow = FALSE;
-            }
-         }
+         hb_arrayRelease( pItem );
       }
    }
-
-   if( HB_IS_STRING( pValue ) )
+   else if( HB_IS_BLOCK( pItem ) )
    {
-      hb_itemForwardValue( pVar, pValue );
-      hb_itemClear( pValue );
-      return;
+      hb_codeblockDelete( pItem );
+   }
+   else if( HB_IS_MEMVAR( pItem ) )
+   {
+      hb_memvarValueDecRef( pItem->item.asMemvar.value );
    }
 
-   hb_itemCopy( pVar, pValue );
-   hb_itemClear( pValue );
+   pItem->type    = HB_IT_NIL;
+
+   HB_TRACE(HB_TR_DEBUG, ( "DONE hb_itemFastClear(%p)", pItem ) );
 }
 
-void hb_itemReleaseString( PHB_ITEM pItem )
+void hb_itemPushStaticString( char * szText, ULONG length )
 {
-   if( pItem->item.asString.value )
-   {
-      long i;
+   PHB_ITEM pTop = hb_stackTopItem();
 
-      long lItems = hb_stack.pPos - hb_stack.pItems - 1;
+   HB_TRACE(HB_TR_DEBUG, ( "hb_itemPushStaticString( \"%s\", %lu ) %p", szText, length, pTop ) );
 
-      for( i = 2; i < lItems; ++i )
-      {
-         if( hb_stack.pItems[ i ]->bShadow && HB_IS_STRING( hb_stack.pItems[ i ] ) && hb_stack.pItems[ i ]->item.asString.value == pItem->item.asString.value )
-         {
-            /* Shadow caster is about to be released, the shadow must now obtain a true copy before value is lost. */
-            hb_stack.pItems[ i ]->item.asString.value = hb_itemGetC( pItem );
-            hb_stack.pItems[ i ]->bShadow = FALSE;
-         }
-      }
-
-      hb_xfree( pItem->item.asString.value );
-      pItem->item.asString.value = NULL;
-      pItem->item.asString.length = 0;
-   }
-}
-
-void hb_itemPushEnvelopeString( char * szText, ULONG length )
-{
-   HB_TRACE(HB_TR_DEBUG, ( "hb_itemPushEnvelopeString( \"%s\", %lu )", szText, length ) );
-
-   ( hb_stackTopItem() )->bShadow = TRUE;
-
-   ( hb_stackTopItem() )->type = HB_IT_STRING;
-   ( hb_stackTopItem() )->item.asString.length = length;
-   ( hb_stackTopItem() )->item.asString.value = szText;
+   pTop->type = HB_IT_STRING;
+   pTop->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
+   *( pTop->item.asString.puiHolders ) = 1;
+   pTop->item.asString.bStatic = TRUE;
+   pTop->item.asString.length = length;
+   pTop->item.asString.value = szText;
 
    hb_stackPush();
 }
 
 void hb_retcAdopt( char * szText )
 {
-   HB_TRACE( HB_TR_INFO, ("hb_retcAdopt(%s)", szText ) );
+   HB_TRACE( HB_TR_INFO, ("hb_retcAdopt(%s) %p", &hb_stack.Return, szText ) );
 
-   hb_itemClear( &hb_stack.Return );
+   if( &hb_stack.Return )
+   {
+      if( HB_IS_STRING( &hb_stack.Return ) )
+      {
+         hb_itemReleaseString( &hb_stack.Return );
+      }
+      else
+      {
+         hb_itemFastClear( &hb_stack.Return );
+      }
+   }
 
    ( &hb_stack.Return )->type = HB_IT_STRING;
+   ( &hb_stack.Return )->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
+   *( ( &hb_stack.Return )->item.asString.puiHolders ) = 1;
+   ( &hb_stack.Return )->item.asString.bStatic = FALSE;
    ( &hb_stack.Return )->item.asString.value = szText;
    ( &hb_stack.Return )->item.asString.length = strlen( szText );
 }
@@ -252,11 +227,24 @@ void hb_retclenAdopt( char * szText, ULONG ulLen )
 {
    szText[ulLen] = '\0';
 
-   HB_TRACE( HB_TR_INFO, ("hb_retclenAdopt( %p, %lu ) \"%s\"", szText, ulLen, szText ) );
+   HB_TRACE( HB_TR_INFO, ("hb_retclenAdopt( %p, %lu ) %p \"%s\"", szText, ulLen, &hb_stack.Return, szText ) );
 
-   hb_itemClear( &hb_stack.Return );
+   if( &hb_stack.Return )
+   {
+      if( HB_IS_STRING( &hb_stack.Return ) )
+      {
+         hb_itemReleaseString( &hb_stack.Return );
+      }
+      else
+      {
+         hb_itemFastClear( &hb_stack.Return );
+      }
+   }
 
    ( &hb_stack.Return )->type = HB_IT_STRING;
+   ( &hb_stack.Return )->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
+   *( ( &hb_stack.Return )->item.asString.puiHolders ) = 1;
+   ( &hb_stack.Return )->item.asString.bStatic = FALSE;
    ( &hb_stack.Return )->item.asString.value = szText;
    ( &hb_stack.Return )->item.asString.length = ulLen;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: error.ch,v 1.16 2001/04/27 19:03:46 dholm Exp $
+ * $Id: error.ch,v 1.18 2002/01/06 12:33:25 antoniolinares Exp $
  */
 
 /*
@@ -131,6 +131,8 @@
 #define HB_EI_ITEMBADCOPY       9020 /* "An item was going to be copied to itself from %s" */
 #define HB_EI_MVBADSYMBOL       9021 /* "Invalid symbol item passed as memvar %s" */
 #define HB_EI_XMEMOVERFLOW      9022 /* "Memory buffer overflow" */
+#define HB_EI_XGRABNULLSIZE     9023 /* "hb_xgrab requested to allocate zero byte" */
+#define HB_EI_XREALLOCNULLSIZE  9024 /* "hb_xrealloc requested to resize to zero byte" */
+#define HB_EI_XALLOCNULLSIZE    9025 /* "hb_xalloc requested to allocate zero byte" */
 
 #endif /* _ERROR_CH */
-

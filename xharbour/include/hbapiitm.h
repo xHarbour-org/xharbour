@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.3 2002/01/04 21:24:50 andijahja Exp $
+ * $Id: hbapiitm.h,v 1.4 2002/01/08 19:11:43 andijahja Exp $
  */
 
 /*
@@ -121,7 +121,6 @@ extern char *   hb_itemTypeStr  ( PHB_ITEM pItem );
 
 extern PHB_ITEM hb_itemParamPtr ( USHORT uiParam, int iMask );
 extern int      hb_itemStrCmp   ( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact ); /* our string compare */
-extern void     hb_itemCopy     ( PHB_ITEM pDest, PHB_ITEM pSource ); /* copies an item to one place to another respecting its containts */
 extern void     hb_itemClear    ( PHB_ITEM pItem );
 extern PHB_ITEM hb_itemUnRef    ( PHB_ITEM pItem ); /* de-references passed variable */
 extern char *   hb_itemStr      ( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec ); /* convert a number to a string */

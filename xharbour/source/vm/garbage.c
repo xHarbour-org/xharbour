@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.4 2002/01/03 06:28:34 ronpinkas Exp $
+ * $Id: garbage.c,v 1.5 2002/01/05 03:29:39 ronpinkas Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
@@ -198,13 +199,14 @@ static HB_GARBAGE_FUNC( hb_gcGripRelease )
    /* Only needed when collecting garbage. */
    if( s_bCollecting )
    {
-      if( HB_IS_STRING( (HB_ITEM_PTR) Cargo ) && ( ! ( ( (HB_ITEM_PTR) Cargo )->bShadow ) ) && ( (HB_ITEM_PTR) Cargo )->item.asString.value )
+      if( HB_IS_STRING( (HB_ITEM_PTR) Cargo ) && ( (HB_ITEM_PTR) Cargo )->item.asString.value )
       {
          HB_TRACE( HB_TR_INFO, ( "Garbage Release String %p", ( (HB_ITEM_PTR) Cargo )->item.asString.value ) );
 
-         hb_xfree( ( (HB_ITEM_PTR) Cargo )->item.asString.value );
-         ( (HB_ITEM_PTR) Cargo )->item.asString.value = NULL;
-         ( (HB_ITEM_PTR) Cargo )->type = HB_IT_NIL;
+         hb_itemReleaseString( (HB_ITEM_PTR) Cargo );
+
+         //( (HB_ITEM_PTR) Cargo )->item.asString.value = NULL;
+         ( (HB_ITEM_PTR) Cargo )->type    = HB_IT_NIL;
       }
    }
 }
@@ -227,7 +229,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
       if( pOrigin )
       {
          pItem->type = HB_IT_NIL;
-         hb_itemCopy( pItem, pOrigin );
+         hb_itemFastCopy( pItem, pOrigin );
       }
       else
       {
@@ -260,7 +262,10 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 
       HB_TRACE( HB_TR_INFO, ( "Drop %p %p", pItem, pAlloc ) );
 
-      hb_itemClear( pItem );    /* clear value stored in this item */
+      if( pItem->type )
+      {
+         hb_itemClear( pItem );    /* clear value stored in this item */
+      }
 
       hb_gcUnlink( &s_pLockedBlock, pAlloc );
       HB_GARBAGE_FREE( pAlloc );

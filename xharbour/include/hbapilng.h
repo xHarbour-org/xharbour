@@ -1,5 +1,5 @@
 /*
- * $Id: hbapilng.h,v 1.14 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: hbapilng.h,v 1.15 2002/01/06 09:17:59 vszakats Exp $
  */
 
 /*
@@ -68,8 +68,8 @@ extern "C" {
 #define HB_LANG_ITEM_BASE_NATMSG        25
 #define HB_LANG_ITEM_BASE_ERRDESC       38
 #define HB_LANG_ITEM_BASE_ERRINTR       89
-#define HB_LANG_ITEM_BASE_TEXT          112
-#define HB_LANG_ITEM_MAX_               115
+#define HB_LANG_ITEM_BASE_TEXT          114
+#define HB_LANG_ITEM_MAX_               117
 
 /* This hack is needed to force preprocessing if id is also a macro */
 #define HB_LANG_REQUEST( id )           HB_LANG_REQUEST_( id )

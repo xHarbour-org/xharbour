@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.3 2002/01/03 03:22:13 lculik Exp $
+ * $Id: hbapifs.h,v 1.25 2002/01/07 21:37:40 lculik Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 #ifndef HB_APIFS_H_
 #define HB_APIFS_H_
-#define HB_OS_WIN_32_USED
+
 #include "hbapi.h"
 #include "fileio.ch"
 
@@ -62,7 +62,8 @@ extern "C" {
 
 #define FS_ERROR F_ERROR
 
-typedef long    FHANDLE;
+typedef int    FHANDLE;
+
 /* File locking flags */
 #define FL_LOCK       0x0000   /* Lock a region   */
 #define FL_UNLOCK     0x0001   /* Unlock a region */
@@ -95,6 +96,7 @@ typedef long    FHANDLE;
 #define HB_FA_NOTINDEXED        4096
 #define HB_FA_ENCRYPTED         8192
 #define HB_FA_VOLCOMP           16384   /* volume supports compression. */
+#define HB_FA_NORMAL            HB_FA_ALL
 
 extern BOOL     hb_fsChDir      ( BYTE * pszDirName ); /* change working directory */
 extern USHORT   hb_fsChDrv      ( BYTE nDrive ); /* change working drive */
@@ -126,8 +128,6 @@ extern BOOL     hb_fsRename     ( BYTE * pszOldName, BYTE * pszNewName ); /* ren
 extern ULONG    hb_fsSeek       ( FHANDLE hFileHandle, LONG lOffset, USHORT uiMode ); /* reposition an open file */
 extern ULONG    hb_fsTell       ( FHANDLE hFileHandle ); /* retrieve the current position of a file */
 extern void     hb_fsSetDevMode ( FHANDLE hFileHandle, USHORT uiDevMode ); /* change the device mode of a file (text/binary) */
-extern void     hb_fsSetDevRaw  ( FHANDLE hFileHandle ); /* change the device mode of a file to raw (binary) */
-extern void     hb_fsSetDevText ( FHANDLE hFileHandle ); /* change the device mode of a file to text */
 extern void     hb_fsSetError   ( USHORT uiError ); /* set the file system error number */
 extern USHORT   hb_fsWrite      ( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount ); /* write to an open file from a buffer (<=64K) */
 extern ULONG    hb_fsWriteLarge ( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount ); /* write to an open file from a buffer (>64K) */

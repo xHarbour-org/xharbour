@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.2 2001/12/23 18:01:37 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.3 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -198,8 +198,10 @@ struct hb_struRefer
 
 struct hb_struString
 {
-   ULONG length;
-   char * value;
+   ULONG  length;
+   char   *value;
+   USHORT *puiHolders;
+   BOOL   bStatic;
 };
 
 struct hb_struSymbol
@@ -214,7 +216,6 @@ struct hb_struSymbol
 typedef struct _HB_ITEM
 {
    USHORT type;
-   BOOL bShadow;
    union
    {
       struct hb_struArray   asArray;

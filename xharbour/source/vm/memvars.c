@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.1.1.1 2001/12/21 10:40:56 ronpinkas Exp $
+ * $Id: memvars.c,v 1.2 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -66,6 +66,7 @@
 #include <ctype.h> /* for toupper() function */
 
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
 #include "hbapifs.h" /* for __MVSAVE()/__MVRESTORE() */
@@ -221,18 +222,27 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
    pValue = s_globalTable + hValue;
    pValue->counter = 1;
    pValue->item.type = HB_IT_NIL;
+
    if( pSource )
    {
       if( bTrueMemvar )
-         hb_itemCopy( &pValue->item, pSource );
+      {
+         hb_itemFastCopy( &pValue->item, pSource );
+      }
       else
+      {
          memcpy( &pValue->item, pSource, sizeof(HB_ITEM) );
+      }
    }
 
    if( bTrueMemvar )
-       pValue->hPrevMemvar = 0;
+   {
+      pValue->hPrevMemvar = 0;
+   }
    else
-       pValue->hPrevMemvar = ( HB_HANDLE )-1;    /* detached variable */
+   {
+      pValue->hPrevMemvar = ( HB_HANDLE )-1;    /* detached variable */
+   }
 
    HB_TRACE(HB_TR_INFO, ("hb_memvarValueNew: memvar item created with handle %i", hValue));
 
@@ -428,9 +438,9 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
          /* value is already created */
          HB_ITEM_PTR pSetItem = &s_globalTable[ pDyn->hMemvar ].item;
          if( HB_IS_BYREF( pSetItem ) )
-            hb_itemCopy( hb_itemUnRef( pSetItem ), pItem );
+            hb_itemFastCopy( hb_itemUnRef( pSetItem ), pItem );
          else
-            hb_itemCopy( pSetItem, pItem );
+            hb_itemFastCopy( pSetItem, pItem );
       }
       else
       {
@@ -461,14 +471,20 @@ ERRCODE hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
           */
          HB_ITEM_PTR pGetItem = &s_globalTable[ pDyn->hMemvar ].item;
          if( HB_IS_BYREF( pGetItem ) )
-            hb_itemCopy( pItem, hb_itemUnRef( pGetItem ) );
+         {
+            hb_itemFastCopy( pItem, hb_itemUnRef( pGetItem ) );
+         }
          else
-            hb_itemCopy( pItem, pGetItem );
+         {
+            hb_itemFastCopy( pItem, pGetItem );
+         }
          bSuccess = SUCCESS;
       }
    }
    else
+   {
       hb_errInternal( HB_EI_MVBADSYMBOL, NULL, pMemvarSymb->szName, NULL );
+   }
 
    return bSuccess;
 }
@@ -588,8 +604,12 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
          /* variable contains some data
           */
          HB_ITEM_PTR pItem = &s_globalTable[ pDynVar->hMemvar ].item;
+
          if( HB_IS_BYREF( pItem ) )
+         {
             pItem = hb_itemUnRef( pItem );   /* it is a PARAMETER variable */
+         }
+
          if( HB_IS_STRING( pItem ) )
          {
             szValue = pItem->item.asString.value;
@@ -1224,8 +1244,11 @@ HB_FUNC( __MVPUT )
    HB_ITEM_PTR pValue = &nil;
 
    nil.type = HB_IT_NIL;
+
    if( hb_pcount() >= 2 )
+   {
       pValue = hb_param( 2, HB_IT_ANY );
+   }
 
    if( pName )
    {

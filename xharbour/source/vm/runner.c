@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.9 2001/06/18 18:12:00 dholm Exp $
+ * $Id: runner.c,v 1.1.1.1 2001/12/21 10:40:59 ronpinkas Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
@@ -297,7 +298,7 @@ HB_FUNC( __HRBRUN )
                 hb_vmDo( hb_pcount() - 1 );                   /* Run the thing !!!        */
 
                 pRetVal = hb_itemNew( NULL );
-                hb_itemCopy( pRetVal, &hb_stack.Return );
+                hb_itemFastCopy( pRetVal, &hb_stack.Return );
             }
 
             for( ul = 0; ul < ulSymbols; ul++ )    /* Check EXIT functions     */

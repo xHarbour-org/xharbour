@@ -29,7 +29,7 @@
 #DEFINE PP_BUFFER_SIZE 8192 //16384
 
 #ifdef __HARBOUR__
-   #ifndef DONT_BOOST
+   #ifndef NO_BOOST
       #define USE_C_BOOST
    #endif
 
@@ -247,13 +247,14 @@ static s_lRunLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F.
    ENDIF
 
    IF sSource != NIL .AND. ( "-H" $ Upper( sSource ) .OR. "--HELP"  $ Upper( sSource ) )
-      sSwitch := "   PP filename[.ext] [-CCH] [-D<id>] [-D:E] [-D:M] [-D:P] [-P] [-STRICT] [-U]" + CRLF + CRLF
+      sSwitch := " PP filename[.ext] [-CCH] [-D<id>] [-D:E] [-D:M] [-D:P] [-P] [-R] [-STRICT] [-U]" + CRLF + CRLF
       sSwitch += [    -CCH    = Generate a .cch file (compiled command header).] + CRLF
       sSwitch += [    -D<id>  = #define <id>.] + CRLF
       sSwitch += [    -D:E    = Show tracing information into the Expression Scanner.] + CRLF
       sSwitch += [    -D:M    = Show tracing information into the Match Engine.] + CRLF
       sSwitch += [    -D:P    = Show tracing information into the Output Generator.] + CRLF
       sSwitch += [    -P      = Generate .pp$ pre-processed output file.] + CRLF
+      sSwitch += [    -R      = Run filename as a script.] + CRLF
       sSwitch += [    -STRICT = Strict Clipper compatability (clone PP bugs).] + CRLF
       sSwitch += [    -U      = Don't load standard rules.] + CRLF
 

@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.1.1.1 2001/12/21 10:41:09 ronpinkas Exp $
+ * $Id: eval.c,v 1.2 2002/01/04 07:15:22 ronpinkas Exp $
  */
 
 /*
@@ -144,10 +144,14 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
          hb_itemForwardValue( pResult, &hb_stack.Return );
       }
       else
+      {
          pResult = NULL;
+      }
    }
    else
+   {
       pResult = NULL;
+   }
 
    return pResult;
 }
@@ -259,7 +263,9 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
       }
    }
    else
+   {
       pResult = NULL;
+   }
 
    return pResult;
 }

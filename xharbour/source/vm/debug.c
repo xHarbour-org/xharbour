@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.1.1.1 2001/12/21 10:40:48 ronpinkas Exp $
+ * $Id: debug.c,v 1.2 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbapiitm.h"
 #include "hbstack.h"
 
@@ -222,7 +223,9 @@ HB_FUNC( __VMVARLSET )
    PHB_ITEM * pBase = hb_stack.pBase;
 
    while( ( iLevel-- > 0 ) && pBase != hb_stack.pItems )
+   {
       pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+   }
 
-   hb_itemCopy( *(pBase + 1 + hb_parni( 2 )), *(hb_stack.pBase + 4) );
+   hb_itemFastCopy( *(pBase + 1 + hb_parni( 2 )), *(hb_stack.pBase + 4) );
 }

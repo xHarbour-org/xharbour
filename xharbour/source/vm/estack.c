@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.3 2002/01/02 04:40:08 ronpinkas Exp $
+ * $Id: estack.c,v 1.4 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -84,10 +84,6 @@ void hb_stackPop( void )
    {
       hb_itemClear( * hb_stack.pPos );
    }
-   else
-   {
-      ( * hb_stack.pPos )->bShadow = FALSE;
-   }
 }
 
 void hb_stackDec( void )
@@ -147,7 +143,6 @@ void hb_stackPush( void )
    /* now, push it: */
    hb_stack.pPos++;
    ( * hb_stack.pPos )->type = HB_IT_NIL;
-   ( * hb_stack.pPos )->bShadow = FALSE;
 }
 
 void hb_stackInit( void )
@@ -167,14 +162,15 @@ void hb_stackInit( void )
    }
 
    ( * hb_stack.pPos )->type = HB_IT_NIL;
-   ( * hb_stack.pPos )->bShadow = FALSE;
 }
 
 void hb_stackRemove( LONG lUntilPos )
 {
    HB_ITEM_PTR * pEnd = hb_stack.pItems + lUntilPos;
    while( hb_stack.pPos > pEnd )
+   {
       hb_stackPop();
+   }
 }
 
 HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )

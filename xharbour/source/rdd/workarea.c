@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.24 2001/11/05 13:33:43 andijahja Exp $
+ * $Id: workarea.c,v 1.1.1.1 2001/12/21 10:42:49 ronpinkas Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include <ctype.h>
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbinit.h"
 #include "hbvm.h"
 #include "hbapiitm.h"
@@ -608,7 +609,7 @@ ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
       return SUCCESS;
    }
 
-   if( !pEvalInfo->dbsci.itmCobWhile && 
+   if( !pEvalInfo->dbsci.itmCobWhile &&
          (!pEvalInfo->dbsci.fRest || !hb_itemGetL( pEvalInfo->dbsci.fRest ) ) &&
          !pEvalInfo->dbsci.lNext )
       SELF_GOTOP( pArea );
@@ -925,7 +926,7 @@ ERRCODE hb_waFilterText( AREAP pArea, PHB_ITEM pFilter )
    HB_TRACE(HB_TR_DEBUG, ("hb_waFilterText(%p, %p)", pArea, pFilter));
 
    if( pArea->dbfi.abFilterText )
-      hb_itemCopy( pFilter, pArea->dbfi.abFilterText );
+      hb_itemFastCopy( pFilter, pArea->dbfi.abFilterText );
 
    return SUCCESS;
 }
@@ -1041,6 +1042,6 @@ ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
    if( ! pArea->valResult )
       pArea->valResult = hb_itemNew( NULL );
 
-   hb_itemCopy( pArea->valResult, hb_vmEvalBlock( pBlock ) );
+   hb_itemFastCopy( pArea->valResult, hb_vmEvalBlock( pBlock ) );
    return SUCCESS;
 }

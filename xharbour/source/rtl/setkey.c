@@ -1,5 +1,5 @@
 /*
- * $Id: setkey.c,v 1.1.1.1 2001/12/21 10:42:03 ronpinkas Exp $
+ * $Id: setkey.c,v 1.2 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -58,6 +58,7 @@
 
 #include "hbvm.h"
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbapiitm.h"
 #include "hbapigt.h"
 
@@ -249,7 +250,9 @@ HB_FUNC( HB_SETKEYGET )
          hb_itemReturn( sk_list_tmp->pAction );
 
          if( pIsActive )
-            hb_itemCopy( pIsActive, sk_list_tmp->pIsActive );
+         {
+            hb_itemFastCopy( pIsActive, sk_list_tmp->pIsActive );
+         }
       }
    }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.67 2001/11/05 02:59:24 vszakats Exp $
+ * $Id: hbsetup.h,v 1.68 2002/01/08 22:49:26 dholm Exp $
  */
 
 /*
@@ -311,6 +311,17 @@
 #endif
 
 /* ***********************************************************************
+ * Here you can force the EOL string to be CRLF
+ *
+ * By default, the EOL string depends upon the detected platform.
+*/
+/* #define HB_EOL_CRLF */
+#ifdef HB_EOL_CRLF
+   #undef OS_EOL_LEN
+   #define OS_EOL_LEN 2
+#endif
+
+/* ***********************************************************************
  * See also the following files for task specific definitions/settings
  *
  * hbmath.h    - math errors handling
@@ -326,3 +337,4 @@
 #endif
 
 #endif /* HB_SETUP_H_ */
+

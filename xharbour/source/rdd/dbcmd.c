@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.186 2001/11/22 01:47:09 brianhays Exp $
+ * $Id: dbcmd.c,v 1.1.1.1 2001/12/21 10:43:00 ronpinkas Exp $
  */
 
 /*
@@ -58,6 +58,7 @@
 #include "hbapierr.h"
 #include "hbapilng.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 #include "hbrddwrk.h"
 
 
@@ -2279,7 +2280,7 @@ HB_FUNC( ORDCONDSET )
       if( pItem )
       {
          lpdbOrdCondInfo->itmCobFor = hb_itemNew( NULL );
-         hb_itemCopy( lpdbOrdCondInfo->itmCobFor, pItem );
+         hb_itemFastCopy( lpdbOrdCondInfo->itmCobFor, pItem );
       }
       else
          lpdbOrdCondInfo->itmCobFor = NULL;
@@ -2292,7 +2293,7 @@ HB_FUNC( ORDCONDSET )
       if( pItem )
       {
          lpdbOrdCondInfo->itmCobWhile = hb_itemNew( NULL );
-         hb_itemCopy( lpdbOrdCondInfo->itmCobWhile, pItem );
+         hb_itemFastCopy( lpdbOrdCondInfo->itmCobWhile, pItem );
       }
       else
          lpdbOrdCondInfo->itmCobWhile = NULL;
@@ -2301,7 +2302,7 @@ HB_FUNC( ORDCONDSET )
       if( pItem )
       {
          lpdbOrdCondInfo->itmCobEval = hb_itemNew( NULL );
-         hb_itemCopy( lpdbOrdCondInfo->itmCobEval, pItem );
+         hb_itemFastCopy( lpdbOrdCondInfo->itmCobEval, pItem );
       }
       else
          lpdbOrdCondInfo->itmCobEval = NULL;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbundoc.api,v 1.7 2001/12/23 09:19:10 vszakats Exp $
+ * $Id: hbundoc.api,v 1.8 2002/01/03 22:11:56 vszakats Exp $
  */
 
 /*
@@ -82,7 +82,7 @@
 #define _tcreat         hb_fsCreate
 #define _tcurdir        hb_fsCurDir
 #define _tcurdrv        hb_fsCurDrv
-#define _tdevraw        hb_fsSetDevRaw
+#define _tdevraw        hb_fsSetDevMode
 #define _terror         hb_fsError
 #define _tisdevice      hb_fsIsDevice
 #define _tisdrv         hb_fsIsDrv

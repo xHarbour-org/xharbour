@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.83 2002/01/08 05:24:05 andijahja Exp $
+ * $Id: dbfcdx1.c,v 1.2 2002/01/08 18:31:29 andijahja Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include "hbapi.h"
+#include "hbfast.h"
 #include "hbinit.h"
 #include "hbvm.h"
 #include "hbstack.h"
@@ -1760,13 +1761,13 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                hb_vmPushSymbol( &hb_symEval );
                hb_vmPush( pTag->pForItem );
                hb_vmDo( 0 );
-               hb_itemCopy( pItem, &hb_stack.Return );
+               hb_itemFastCopy( pItem, &hb_stack.Return );
             }
             else
             {
                pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pTag->pForItem );
                hb_macroRun( pMacro );
-               hb_itemCopy( pItem, hb_stackItemFromTop( - 1 ) );
+               hb_itemFastCopy( pItem, hb_stackItemFromTop( - 1 ) );
                hb_stackPop();
             }
             bWhileOk = hb_itemGetL( pItem );
@@ -1782,13 +1783,13 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                hb_vmPushSymbol( &hb_symEval );
                hb_vmPush( pTag->pKeyItem );
                hb_vmDo( 0 );
-               hb_itemCopy( pItem, &hb_stack.Return );
+               hb_itemFastCopy( pItem, &hb_stack.Return );
             }
             else
             {
                pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pTag->pKeyItem );
                hb_macroRun( pMacro );
-               hb_itemCopy( pItem, hb_stackItemFromTop( - 1 ) );
+               hb_itemFastCopy( pItem, hb_stackItemFromTop( - 1 ) );
                hb_stackPop();
             }
 
@@ -3971,7 +3972,7 @@ ERRCODE hb_cdxOrderCreate( CDXAREAP pAreaCdx, LPDBORDERCREATEINFO pOrderInfo )
 
    /* Save for later use */
    pKeyExp = hb_itemNew( NULL );
-   hb_itemCopy( pKeyExp, pExpr );
+   hb_itemFastCopy( pKeyExp, pExpr );
 
    /* Get a blank record before testing expression */
    SELF_GOBOTTOM( ( AREAP ) pArea );
@@ -3992,7 +3993,7 @@ ERRCODE hb_cdxOrderCreate( CDXAREAP pAreaCdx, LPDBORDERCREATEINFO pOrderInfo )
       pExpMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pExpr );
       hb_macroRun( pExpMacro );
       pResult = pExpr;
-      hb_itemCopy( pResult, hb_stackItemFromTop( - 1 ) );
+      hb_itemFastCopy( pResult, hb_stackItemFromTop( - 1 ) );
    }
 
    uiType = hb_itemType( pResult );
@@ -4070,7 +4071,7 @@ ERRCODE hb_cdxOrderCreate( CDXAREAP pAreaCdx, LPDBORDERCREATEINFO pOrderInfo )
       if( pExpr )
       {
          pForExp = hb_itemNew( NULL );
-         hb_itemCopy( pForExp, pExpr );
+         hb_itemFastCopy( pForExp, pExpr );
       }
    }
 
@@ -4095,7 +4096,7 @@ ERRCODE hb_cdxOrderCreate( CDXAREAP pAreaCdx, LPDBORDERCREATEINFO pOrderInfo )
          pForMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pExpr );
          hb_macroRun( pForMacro );
          pResult = pExpr;
-         hb_itemCopy( pResult, hb_stackItemFromTop( - 1 ) );
+         hb_itemFastCopy( pResult, hb_stackItemFromTop( - 1 ) );
       }
       uiType = hb_itemType( pResult );
       hb_itemRelease( pResult );
@@ -4548,19 +4549,19 @@ ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
    {
       if( pArea->fBof )
          SELF_GOTOP( ( AREAP ) pArea );
-    
+
       if( lToSkip == 0 )
       {
          SUPER_SKIPRAW( ( AREAP ) pArea, 0 );
       }
-    
+
       else if( lToSkip > 0 )
       {
          if( !pArea->fEof )
          {
             while( !pTag->TagEOF && lToSkip-- > 0 )
               hb_cdxTagKeyRead( pTag, NEXT_RECORD );
-         
+
             if( !pTag->TagEOF )
                SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
             else
@@ -4583,7 +4584,7 @@ ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
          pTag->TagBOF = FALSE;
          while( !pTag->TagBOF && lToSkip++ < 0 )
             hb_cdxTagKeyRead( pTag, PREV_RECORD );
-        
+
          if( !pTag->TagBOF )
             SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
          else
@@ -4628,7 +4629,7 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
    {
       LONG lRecno;
       LPKEYINFO pKey2;
-     
+
       pKey2 = hb_cdxKeyNew();
       hb_cdxKeyPutItem( pKey2, pKey );
       if( bFindLast )
@@ -4636,7 +4637,7 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
       else
          pKey2->Tag = CDX_IGNORE_REC_NUM;
       pKey2->Xtra = 0;
-     
+
       lRecno = hb_cdxTagKeyFind( pTag, pKey2 );
       pArea->fEof = pTag->TagEOF;
       pArea->fBof = pTag->TagBOF;
@@ -4899,7 +4900,7 @@ ERRCODE hb_cdxGoCold( CDXAREAP pArea )
                 hb_stackPop();
             }
             pKey->Tag = pArea->ulRecNo;
-          
+
             if( pArea->fAppend )
             {
                if( bForOk )
@@ -4924,14 +4925,14 @@ ERRCODE hb_cdxGoCold( CDXAREAP pArea )
                     hb_cdxTagKeyAdd( pTag, pKey );
 
                   pTag->RootPage->Changed = TRUE;
-          
+
                   if( uiTag == pArea->lpIndexes->uiTag)
                      hb_cdxTagTagStore( pTag );
                   else
                      hb_cdxTagTagClose( pTag );
                }
             }
-          
+
             hb_cdxKeyFree( pKey );
 
             if( pTag->HotKey )
