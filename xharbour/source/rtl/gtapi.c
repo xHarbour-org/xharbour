@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.37 2004/10/25 13:19:01 druzus Exp $
+ * $Id: gtapi.c,v 1.38 2004/10/25 17:06:30 guerra000 Exp $
  */
 
 /*
@@ -2061,8 +2061,8 @@ static void hb_ctInit( void )
 
       ct_BFRow = 0;
       ct_BFCol = 0;
-      ct_BLRow = s_Height - 1;
-      ct_BLCol = s_Width - 1;
+      ct_BLRow = HB_MAX( s_Height - 1, 0 );
+      ct_BLCol = HB_MAX( s_Width - 1, 0 );
 
       ct_WNRow = -1;
       ct_WNCol = -1;
