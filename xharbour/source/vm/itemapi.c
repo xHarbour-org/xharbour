@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.61 2004/01/12 22:51:41 paultucker Exp $
+ * $Id: itemapi.c,v 1.62 2004/01/21 13:44:19 walito Exp $
  */
 
 /*
@@ -1833,7 +1833,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNInt( PHB_ITEM pItem, long lNumber )
       hb_itemPutNL( pItem, ( long ) lNumber );
    }
 #ifndef HB_LONG_LONG_OFF
-   else if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )
+   else //if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )
    {
       hb_itemPutNLL( pItem, lNumber );
    }
@@ -1856,7 +1856,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNIntLen( PHB_ITEM pItem, long lNumber, int iWidth )
       hb_itemPutNLLen( pItem, ( long ) lNumber, iWidth );
    }
 #ifndef HB_LONG_LONG_OFF
-   else if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )
+   else //if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )
    {
       hb_itemPutNLLLen( pItem, lNumber, iWidth );
    }

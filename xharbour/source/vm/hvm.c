@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.304 2003/12/27 02:57:13 fsgiudice Exp $
+ * $Id: hvm.c,v 1.305 2004/01/21 13:44:19 walito Exp $
  */
 
 /*
@@ -3741,7 +3741,7 @@ static void hb_vmInc( void )
          pItem->item.asLong.value++;
       }
 #ifndef HB_LONG_LONG_OFF
-      else if( HB_IS_LONGLONG( pItem ) && pItem->item.asLongLong.value < LONGLONG_MAX )
+      else if( HB_IS_LONGLONG( pItem ) ) //&& pItem->item.asLongLong.value < LONGLONG_MAX )
       {
          pItem->item.asLongLong.value++;
       }
@@ -3794,16 +3794,16 @@ static void hb_vmDec( void )
    }
    else if( HB_IS_NUMBER_INT( pItem  ) )
    {
-      if( HB_IS_INTEGER( pItem ) && pItem->item.asInteger.value < SHRT_MAX )
+      if( HB_IS_INTEGER( pItem ) )
       {
          pItem->item.asInteger.value--;
       }
-      else if( HB_IS_LONG( pItem ) && pItem->item.asLong.value < LONG_MAX )
+      else if( HB_IS_LONG( pItem ) )
       {
          pItem->item.asLong.value--;
       }
 #ifndef HB_LONG_LONG_OFF
-      else if( HB_IS_LONGLONG( pItem ) && pItem->item.asLongLong.value < LONGLONG_MAX )
+      else if( HB_IS_LONGLONG( pItem ) )
       {
          pItem->item.asLongLong.value--;
       }
@@ -3817,7 +3817,7 @@ static void hb_vmDec( void )
    }
    else if( HB_IS_DOUBLE( pItem ) )
    {
-      pItem->item.asDouble.value++;
+      pItem->item.asDouble.value--;
    }
    else if( HB_IS_OBJECT( pItem ) && hb_objHasMsg( pItem, "__OpDec" ) )
    {
@@ -6140,7 +6140,7 @@ HB_EXPORT void hb_vmPushNumInt( long lNumber )
       hb_vmPushLong( ( long ) lNumber );
    }
 #ifndef HB_LONG_LONG_OFF
-   else if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )
+   else //if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )
    {
       hb_vmPushLongLong( lNumber );
    }
