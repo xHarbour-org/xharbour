@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.91 2003/08/29 14:28:21 lculik Exp $
+ * $Id: hbmake.prg,v 1.92 2003/08/29 16:04:17 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1904,7 +1904,7 @@ cResname += cAllRes
       fWrite( s_nLinkHandle, "CFLAG2 = " + IIF(  "Linux" IN cOs, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib" ) + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
-      fWrite( s_nLinkHandle, "LFLAGS =" + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static") + "-gtcrs", "$(CFLAG2)") + CRLF )
+      fWrite( s_nLinkHandle, "LFLAGS =" + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + "-gtcrs", "$(CFLAG2)") + CRLF )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LINKER = "+ IIF(lusexhb,"xhblnk","gcc") + CRLF )
       fWrite( s_nLinkHandle, " " + CRLF )
