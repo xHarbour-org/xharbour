@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1129 2003/06/17 14:22:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1130 2003/06/17 19:47:43 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,59 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-18 00:10 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * harbour/include/hbapilng.h
+  * harbour/include/hblang.ch
+  * harbour/source/lang/Makefile
+  * harbour/source/lang/msg_tpl.c
+  * xharbour/source/lang/msgca.c
+  * xharbour/source/lang/msgcs852.c
+  * xharbour/source/lang/msgcsiso.c
+  * xharbour/source/lang/msgcskam.c
+  * xharbour/source/lang/msgcswin.c
+  * xharbour/source/lang/msgde.c
+  * xharbour/source/lang/msgen.c
+  * xharbour/source/lang/msges.c
+  * xharbour/source/lang/msgeu.c
+  * xharbour/source/lang/msggl.c
+  * xharbour/source/lang/msghe862.c
+  * xharbour/source/lang/msghewin.c
+  * xharbour/source/lang/msghr852.c
+  * xharbour/source/lang/msghriso.c
+  * xharbour/source/lang/msghu852.c
+  * xharbour/source/lang/msghucwi.c
+  * xharbour/source/lang/msghuwin.c
+  * xharbour/source/lang/msgid.c
+  * xharbour/source/lang/msgis850.c
+  * xharbour/source/lang/msgit.c
+  * xharbour/source/lang/msgko.c
+  * xharbour/source/lang/msgpl852.c
+  * xharbour/source/lang/msgpliso.c
+  * xharbour/source/lang/msgplmaz.c
+  * xharbour/source/lang/msgplwin.c
+  * xharbour/source/lang/msgro.c
+  * xharbour/source/lang/msgru866.c
+  * xharbour/source/lang/msgrukoi.c
+  * xharbour/source/lang/msgruwin.c
+  * xharbour/source/lang/msgsr852.c
+  * xharbour/source/lang/msgsriso.c
+  * xharbour/source/lang/msgsrwin.c
+  * xharbour/source/lang/msgzhb5.c
+  * xharbour/source/lang/msgzhgb.c
+  + xharbour/source/lang/msgdewin.c
+  + xharbour/source/lang/msgeswin.c
+  + xharbour/source/lang/msgsl852.c
+  + xharbour/source/lang/msgsliso.c
+  + xharbour/source/lang/msgslwin.c
+  + xharbour/tests/langmsg.prg
+    ! bug fixed in national msg system and new localization added
+      (borrowed from Harbour)
+
+  + harbour/tests/langmsg.prg
+    * simple test program for national messages
+      I have to ask developpers to run it and check their national messages
+
 2003-06-17 16:50 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   * source/rtl/cdpapi.c
     ! Bug fixed in hb_cdpTranslate() and hb_cdpnTranslate() borrow from harbour

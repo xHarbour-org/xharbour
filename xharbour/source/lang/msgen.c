@@ -1,5 +1,5 @@
 /*
- * $Id: msgen.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: msgen.c,v 1.3 2003/06/15 13:11:58 druzus Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "English",                   /* Name (in native language) */
       "EN",                        /* RFC ID */
       "437",                       /* Codepage */
-      "$Revision: 1.2 $ $Date: 2002/01/19 14:15:45 $",         /* Version */
+      "$Revision: 1.3 $ $Date: 2003/06/15 13:11:58 $",         /* Version */
 
       /* Month names */
 
@@ -153,6 +153,7 @@ static HB_LANG s_lang =
       "Write not allowed",
       "Append lock failed",
       "Lock Failure",
+      "",
       "",
       "",
       "",

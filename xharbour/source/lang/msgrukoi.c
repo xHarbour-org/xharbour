@@ -1,5 +1,5 @@
 /*
- * $Id: msgrukoi.c,v 1.2 2003/06/14 17:23:29 alkresin Exp $
+ * $Id: msgrukoi.c,v 1.1 2003/06/15 13:11:58 druzus Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Русский",                   /* Name (in native language) */
       "RU",                        /* RFC ID */
       "KOI8",                       /* Codepage */
-      "$Revision: 1.2 $ $Date: 2003/06/14 17:23:29 $",         /* Version */
+      "$Revision: 1.1 $ $Date: 2003/06/15 13:11:58 $",         /* Version */
 
       /* Month names */
 
@@ -153,6 +153,7 @@ static HB_LANG s_lang =
       "Запись не разрешена",
       "Сбой блокировки при добавлении",
       "Блокировка не удалась",
+      "",
       "",
       "",
       "",

@@ -1,5 +1,5 @@
 /*
- * $Id: msgpl852.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: msgpl852.c,v 1.3 2003/06/15 13:11:58 druzus Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Polski",                    /* Name (in native language) */
       "PL",                        /* RFC ID */
       "852",                       /* Codepage */
-      "$Revision: 1.2 $ $Date: 2002/01/19 14:15:45 $",         /* Version */
+      "$Revision: 1.3 $ $Date: 2003/06/15 13:11:58 $",         /* Version */
 
       /* Month names */
 
@@ -153,6 +153,7 @@ static HB_LANG s_lang =
        "Zapis niedozwolony",
        "Brak blokady dost©pu podczas dodawania rekordu",
        "Nie udaˆo si© zablokowa† dost©pu",
+      "",
       "",
       "",
       "",

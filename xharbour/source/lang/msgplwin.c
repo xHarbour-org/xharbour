@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: msgplwin.c,v 1.1 2003/06/15 13:11:58 druzus Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Polski",                    /* Name (in native language) */
       "PL",                        /* RFC ID */
       "1250",                      /* Codepage */
-      "$Revision$ $Date$",         /* Version */
+      "$Revision: 1.1 $ $Date: 2003/06/15 13:11:58 $",         /* Version */
 
       /* Month names */
 
@@ -153,6 +153,7 @@ static HB_LANG s_lang =
        "Zapis niedozwolony",
        "Brak blokady dostêpu podczas dodawania rekordu",
        "Nie uda³o siê zablokowaæ dostêpu",
+      "",
       "",
       "",
       "",

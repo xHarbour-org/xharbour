@@ -1,5 +1,5 @@
 /*
- * $Id: msgsrwin.c,v 1.0 2003/04/16 14:15:45 digikv Exp $
+ * $Id: msgsrwin.c,v 1.1 2003/04/18 23:22:10 lculik Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Српски",                   /* Name (in native language) */
       "SR",                        /* RFC ID */
       "1251",                      /* Codepage */
-      "$Revision: 1.0 $ $Date: 2003/04/16 21:55:45 $",         /* Version */
+      "$Revision: 1.1 $ $Date: 2003/04/18 23:22:10 $",         /* Version */
 
       /* Month names */
 
@@ -156,6 +156,7 @@ static HB_LANG s_lang =
       "",
       "",
       "",
+      "",
       "Неверное количество аргументов",
       "приступ низу",
       "величина низа",
@@ -190,7 +191,7 @@ static HB_LANG s_lang =
       "Переполнение буфера памяти",
       "hb_xgrab requested to allocate zero bytes",
       "hb_xrealloc requested to resize to zero bytes",
-      "hb_xalloc requested to allocate zero bytes"
+      "hb_xalloc requested to allocate zero bytes",
 
       /* Texts */
 

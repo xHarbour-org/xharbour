@@ -1,5 +1,5 @@
 /*
- * $Id: msgzhb5.c,v 1.3 2002/01/06 13:37:33 antoniolinares Exp $
+ * $Id: msgzhb5.c,v 1.5 2003/06/16 17:19:16 alkresin Exp $
  */
 
 /*
@@ -51,10 +51,9 @@
  *
  */
 
-/* Language name: Chinese */
-/* ISO language code (2 chars):ZH */
-/* Codepage: 936 for ZH,ZH-CN,ZH-SG (Chinese Simplified)  */
-/* Codepage: 950 for ZH-HK,ZH-TW    (Chinese Traditional) */
+/* Language name: Chinese Traditional */
+/* ISO language code (2 chars): ZH    */
+/* Codepage: 950 for ZH-HK,ZH-TW      */
 
 #include "hbapilng.h"
 
@@ -68,7 +67,7 @@ static HB_LANG s_lang =
       "中文繁體BIG5",              /* Name (in native language) */
       "ZH",                        /* RFC ID */
       "950",                       /* Codepage */
-      "$Revision: 1.3 $ $Date: 2002/01/06 13:37:33 $",         /* Version */
+      "$Revision: 1.5 $ $Date: 2003/06/16 17:19:16 $",         /* Version */
 
       /* Month names */
 
@@ -83,7 +82,7 @@ static HB_LANG s_lang =
       "九月",
       "十月",
       "十一月",
-      "十二月"
+      "十二月",
 
       /* Day names */
 
@@ -93,23 +92,23 @@ static HB_LANG s_lang =
       "星期三",
       "星期四",
       "星期五",
-      "星期六"
+      "星期六",
 
       /* CA-Cl*pper compatible natmsg items */
 
-      "Database Files    # Records    Last Update     Size",
-      "Do you want more samples?",
-      "Page No.",
-      "** Subtotal **",
-      "* Subsubtotal *",
-      "*** Total ***",
-      "Ins",
-      "   ",
-      "Invalid date",
-      "Range: ",
+      "數據庫檔案        # 記錄       最後更新        大小",
+      "需要更多的例子嗎?",
+      "頁碼:",
+      "** 小計 **",
+      "* 子小計 *",
+      "*** 合計 ***",
+      "插入",
+      "    ",
+      "日期非法",
+      "範圍: ",
       " - ",
       "Y/N",
-      "INVALID EXPRESSION",
+      "非法表達式",
 
       /* Error description names */
 
@@ -192,7 +191,7 @@ static HB_LANG s_lang =
       "Memory buffer overflow",
       "hb_xgrab requested to allocate zero bytes",
       "hb_xrealloc requested to resize to zero bytes",
-      "hb_xalloc requested to allocate zero bytes"
+      "hb_xalloc requested to allocate zero bytes",
 
       /* Texts */
 

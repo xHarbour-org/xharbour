@@ -1,5 +1,5 @@
 /*
- * $Id: msges.c,v 1.9 2003/06/16 17:19:16 alkresin Exp $
+ * $Id: msgeswin.c,v 1.2 2003/06/16 17:19:16 alkresin Exp $
  */
 
 /*
@@ -8,6 +8,7 @@
  *
  * Copyright 2000 Jose Lalin <dezac@corevia.com>
  * www - http://www.harbour-project.org
+ * Adapted to Windows by Antonio Linares <alinares@fivetechsoft.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,9 +51,9 @@
  *
  */
 
-/* Language name: Spanish */
+/* Language name: Spanish WIN */
 /* ISO language code (2 chars): ES */
-/* Codepage: 850 */
+/* Codepage: ANSI */
 
 #include "hbapilng.h"
 
@@ -61,12 +62,12 @@ static HB_LANG s_lang =
    {
       /* Identification */
 
-      "ES",                        /* ID */
-      "Spanish",                   /* Name (in English) */
-      "Espa¤ol",                   /* Name (in native language) */
-      "ES",                        /* RFC ID */
-      "850",                       /* Codepage */
-      "$Revision: 1.9 $ $Date: 2003/06/16 17:19:16 $",         /* Version */
+      "ESWIN",                     /* ID */
+      "Spanish ANSI",              /* Name (in English) */
+      "Español ANSI",              /* Name (in native language) */
+      "ESWIN",                     /* RFC ID */
+      "ANSI",                      /* Codepage */
+      "$Revision: 1.2 $ $Date: 2003/06/16 17:19:16 $",         /* Version */
 
       /* Month names */
 
@@ -88,26 +89,26 @@ static HB_LANG s_lang =
       "Domingo",
       "Lunes",
       "Martes",
-      "Mi‚rcoles",
+      "Miércoles",
       "Jueves",
       "Viernes",
-      "S bado",
+      "Sábado",
 
       /* CA-Cl*pper compatible natmsg items */
 
-      "Bases de Datos    # Records    Last Update     Size",
-      "Desea Ud. m s ejemplos?",
-      "P gina N§.",
+      "Bases de Datos    # Registros  Ultima act.     Tamaño",
+      "Desea Vd. más ejemplos?",
+      "Página Nº.",
       "** Subtotal **",
       "* Subsubtotal *",
       "*** Total ***",
       "Ins",
       "   ",
-      "Fecha no v lida",
+      "Fecha no válida",
       "Rango: ",
       " - ",
       "S/N",
-      "EXPRESION NO VALIDA",
+      "EXPRESION NO VÁLIDA",
 
       /* Error description names */
 
@@ -115,35 +116,35 @@ static HB_LANG s_lang =
       "Error de argumento",
       "Error de rango",
       "Desbordamiento en cadena de caracteres",
-      "Desbordamiento num‚rico",
-      "Divisi¢n por cero",
-      "Error num‚rico",
+      "Desbordamiento numérico",
+      "División por cero",
+      "Error numérico",
       "Error de sintaxis",
-      "Operaci¢n demasiado compleja",
+      "Operación demasiado compleja",
       "",
       "",
       "Poca memoria",
-      "Funci¢n no definida",
-      "No existe el m‚todo",
+      "Función no definida",
+      "No existe el método",
       "No existe la variable",
       "No existe el alias",
       "No existe la variable de instancia",
-      "Alias con caracteres no v lidos",
+      "Alias con caracteres no válidos",
       "Alias actualmente en uso",
       "",
-      "Error de creaci¢n",
+      "Error de creación",
       "Error de apertura",
       "Error de cierre",
       "Error de lectura",
       "Error de escritura",
-      "Error de impresi¢n",
+      "Error de impresión",
       "",
       "",
       "",
       "",
-      "Operaci¢n no soportada",
-      "L¡mite excedido",
-      "Se detect¢ corrupci¢n",
+      "Operación no soportada",
+      "Límite excedido",
+      "Se detectó corrupción",
       "Error de tipo de datos",
       "Error de anchura de datos",
       "Area de trabajo no usada",
@@ -151,42 +152,42 @@ static HB_LANG s_lang =
       "Se requiere uso exclusivo",
       "Se requiere bloqueo",
       "Escritura no autorizada",
-      "Fallo en el bloqueo de adici¢n",
+      "Fallo en el bloqueo de adición",
       "Fallo en bloqueo",
       "",
       "",
       "",
       "",
       "acceso al array",
-      "asignaci¢n del array",
-      "dimensi¢n del array",
+      "asignación del array",
+      "dimensión del array",
       "no es un array",
       "conditional",
 
       /* Internal error names */
 
       "Error irrecuperable %lu: ",
-      "Fallo en recuperaci¢n de error",
+      "Fallo en recuperación de error",
       "No hay ERRORBLOCK() para el error",
       "Demasiadas llamadas recursivas al controlador de errores",
-      "RDD no v lido ¢ fallo al cargar",
-      "Tipo de m‚todo no v lido desde %s",
+      "RDD no válido ó fallo al cargar",
+      "Tipo de método no válido desde %s",
       "hb_xgrab no puede asignar memoria",
       "hb_xrealloc llamado con un puntero nulo",
-      "hb_xrealloc llamado con un puntero no v lido",
+      "hb_xrealloc llamado con un puntero no válido",
       "hb_xrealloc no puede reubicar la memoria",
-      "hb_xfree llamado con un puntero no v lido",
+      "hb_xfree llamado con un puntero no válido",
       "hb_xfree llamado con un puntero nulo",
       "No se puede localizar el procedimiento de inicio: \'%s\'",
       "No hay procedimiento de inicio",
       "Opcode no soportado por la VM",
-      "S¡mbolo item esperado desde %s",
-      "Tipo de s¡mbolo para self no v lido desde %s",
-      "Bloque de c¢digo esperado desde %s",
+      "Símbolo item esperado desde %s",
+      "Tipo de símbolo para self no válido desde %s",
+      "Bloque de código esperado desde %s",
       "Tipo item incorrecto en la Pila al tratar de sacarlo desde %s",
       "Desbordamiento negativo en la Pila",
-      "Un item estaba siendo copiado sobre s¡ mismo desde %s",
-      "S¡mbolo item no v lido pasado como memvar %s",
+      "Un item estaba siendo copiado sobre sí mismo desde %s",
+      "Símbolo item no válido pasado como memvar %s",
       "Memory buffer overflow",
       "hb_xgrab requested to allocate zero bytes",
       "hb_xrealloc requested to resize to zero bytes",
@@ -200,12 +201,11 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( ES );
+HB_LANG_ANNOUNCE( ESWIN );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_ES )
+HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_ESWIN )
    hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_ES )
+HB_CALL_ON_STARTUP_END( hb_lang_Init_ESWIN )
 #if ! defined(__GNUC__) && ! defined(_MSC_VER)
-   #pragma startup hb_lang_Init_ES
+   #pragma startup hb_lang_Init_ESWIN
 #endif
-

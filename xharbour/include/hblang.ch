@@ -1,5 +1,5 @@
 /*
- * $Id: hblang.ch,v 1.1.1.1 2001/12/21 10:47:40 ronpinkas Exp $
+ * $Id: hblang.ch,v 1.2 2003/01/27 04:24:05 walito Exp $
  */
 
 /*
@@ -62,7 +62,7 @@
 #define HB_LANG_ITEM_BASE_NATMSG        25
 #define HB_LANG_ITEM_BASE_ERRDESC       38
 #define HB_LANG_ITEM_BASE_ERRINTR       89
-#define HB_LANG_ITEM_BASE_TEXT          114
-#define HB_LANG_ITEM_MAX_               117
+#define HB_LANG_ITEM_BASE_TEXT          115
+#define HB_LANG_ITEM_MAX_               118
 
 #endif /* HB_LANG_CH_ */

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2003/04/18 23:22:10 lculik Exp $
+# $Id: Makefile,v 1.3 2003/05/16 19:52:07 druzus Exp $
 #
 
 ROOT = ../../
@@ -11,9 +11,11 @@ C_SOURCES=\
 	msgcskam.c   \
 	msgcswin.c   \
 	msgde.c      \
+	msgdewin.c   \
 	msgen.c      \
 	msgeo.c      \
 	msges.c      \
+	msgeswin.c   \
 	msgeu.c      \
 	msgfr.c      \
 	msggl.c      \
@@ -31,13 +33,18 @@ C_SOURCES=\
 	msgpl852.c   \
 	msgpliso.c   \
 	msgplmaz.c   \
+	msgplwin.c   \
 	msgpt.c      \
 	msgro.c      \
 	msgru866.c   \
+	msgrukoi.c   \
 	msgruwin.c   \
+	msgsl852.c   \
+	msgsliso.c   \
+	msgslwin.c   \
 	msgsr852.c   \
-	msgsrwin.c   \
 	msgsriso.c   \
+	msgsrwin.c   \
 	msgzhb5.c    \
 	msgzhgb.c    \
 	

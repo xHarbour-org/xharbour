@@ -1,5 +1,5 @@
 /*
- * $Id: msghr852.c,v 1.5 2002/01/06 13:37:33 antoniolinares Exp $
+ * $Id: msghr852.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "Hrvatski",                  /* Name (in native language) */
       "HR",                        /* RFC ID */
       "852",                       /* Codepage */
-      "$Revision: 1.5 $ $Date: 2002/01/06 13:37:33 $",         /* Version */
+      "$Revision: 1.2 $ $Date: 2002/01/19 14:15:45 $",         /* Version */
 
       /* Month names */
 
@@ -191,7 +191,7 @@ static HB_LANG s_lang =
       "Memory buffer overflow",
       "hb_xgrab requested to allocate zero bytes",
       "hb_xrealloc requested to resize to zero bytes",
-      "hb_xalloc requested to allocate zero bytes"
+      "hb_xalloc requested to allocate zero bytes",
 
       /* Texts */
 

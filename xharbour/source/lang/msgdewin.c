@@ -1,13 +1,13 @@
 /*
- * $Id: msgcs852.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: msgdewin.c,v 1.2 2003/06/16 17:19:16 alkresin Exp $
+ * modified 2003 Guenther Steiner <byte-one@aon.at>
  */
 
 /*
  * Harbour Project source code:
- * Language Support Module (CS852)
+ * Language Support Module (DEWIN)
  *
- * Copyright 2000 Viktor Szakats <viktor.szakats@syenar.hu> (English, from msg_tpl.c)
- * Copyright 2000 Davor Siklic <siki@msoft.cz>
+ * Copyright 1999 {list of individual authors and e-mail addresses}
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -51,9 +51,9 @@
  *
  */
 
-/* Language name: Czech */
-/* ISO language code (2 chars): CS */
-/* Codepage: 852 */
+/* Language name: German WIN*/
+/* ISO language code (2 chars): DE */
+/* Codepage: ANSI */
 
 #include "hbapilng.h"
 
@@ -62,53 +62,53 @@ static HB_LANG s_lang =
    {
       /* Identification */
 
-      "CS852",                     /* ID */
-      "Czech",                     /* Name (in English) */
-      "¬esky",                     /* Name (in native language) */
-      "CS",                        /* RFC ID */
-      "852",                       /* Codepage */
-      "$Revision: 1.2 $ $Date: 2002/01/19 14:15:45 $",         /* Version */
+      "DEWIN",                        /* ID */
+      "German ANSI",                    /* Name (in English) */
+      "Deutsch ANSI",                   /* Name (in native language) */
+      "DEWIN",                        /* RFC ID */
+      "ANSI",                       /* Codepage */
+      "$Revision: 1.2 $ $Date: 2003/06/16 17:19:16 $",         /* Version */
 
       /* Month names */
 
-      "leden",
-      "£nor",
-      "býezen",
-      "duben",
-      "kvØten",
-      "Yerven",
-      "Yervenec",
-      "srpen",
-      "z ý¡",
-      "ý¡jen",
-      "listopad",
-      "prosinec",
+      "Januar",
+      "Februar",
+      "März",
+      "April",
+      "Mai",
+      "Juni",
+      "Juli",
+      "August",
+      "September",
+      "Oktober",
+      "November",
+      "Dezember",
 
       /* Day names */
 
-      "nedØle",
-      "pondØl¡",
-      "£terì",
-      "stýeda",
-      "Ytvrtek",
-      "p tek",
-      "sobota",
+      "Sonntag",
+      "Montag",
+      "Dienstag",
+      "Mittwoch",
+      "Donnerstag",
+      "Freitag",
+      "Samstag",
 
       /* CA-Cl*pper compatible natmsg items */
 
-      "Database Files    # Records    Last Update     Size",
-      "Do you want more samples?",
-      "Page No.",
-      "** Subtotal **",
-      "* Subsubtotal *",
-      "*** Total ***",
-      "Ins",
+      "Datenbank Dateien    Anz. Sätze    Letzte Änderung     Größe",
+      "Möchten Sie mehr Beispiele?",
+      "Anz. Seiten",
+      "** Zwischensumme **",
+      "* Teilsumme *",
+      "*** Summe ***",
+      "Einfg.",
       "   ",
-      "Invalid date",
-      "Range: ",
+      "Ungültiges Datum",
+      "Bereich: ",
       " - ",
-      "A/N",
-      "INVALID EXPRESSION",
+      "J/N",
+      "UNGÜLTIGER AUSDRUCK",
 
       /* Error description names */
 
@@ -195,18 +195,18 @@ static HB_LANG s_lang =
 
       /* Texts */
 
-      "YYYY/MM/DD",
-      "A",
+      "DD.MM.YYYY",
+      "J",
       "N"
    }
 };
 
-HB_LANG_ANNOUNCE( CS852 );
+HB_LANG_ANNOUNCE( DEWIN );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_CS852 )
+HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_DEWIN )
    hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_CS852 )
+HB_CALL_ON_STARTUP_END( hb_lang_Init_DEWIN )
 #if ! defined(__GNUC__) && ! defined(_MSC_VER)
-   #pragma startup hb_lang_Init_CS852
+   #pragma startup hb_lang_Init_DEWIN
 #endif
 
