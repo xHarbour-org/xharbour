@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.324 2002/07/25 18:20:19 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.325 2002/07/26 09:32:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-07-27 16:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrayshb.c
+    + Added support for NIL to be compatible with ALL C TYPES.
+
+  * source/rtl/cstruct.prg
+    + Added logic to raise an error in HB_CStructureCSyntax() if member type is undefined.
+
+  * tests/wintypes.ch
+    + Added LPSTR and HBITMAP
 
 2002-07-26 02:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c

@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.10 2002/07/23 17:44:03 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.11 2002/07/27 16:56:43 ronpinkas Exp $
  */
 
 /*
@@ -173,6 +173,7 @@ Procedure HB_CStructureCSyntax( cStructure, aDefinitions, cTag, cSynonList, nAli
             CType := HB_CStructureID( Left( CType, Len( CType ) - 1 ), .F. )
          ELSE
             CType := HB_CStructureID( CType, .T. )
+
             IF CType == CTYPE_STRUCTURE .OR. CType == CTYPE_STRUCTURE_PTR
                oErr := ErrorNew()
                oErr:Args          := { cStructure, aDefinitions, cTag, cSynonList, nAlign }
