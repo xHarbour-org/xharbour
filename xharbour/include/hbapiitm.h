@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.24 2003/11/26 21:58:35 jonnymind Exp $
+ * $Id: hbapiitm.h,v 1.25 2003/11/30 12:32:29 druzus Exp $
  */
 
 /*
@@ -130,7 +130,7 @@ extern PHB_ITEM HB_EXPORT hb_itemPutNLLLen    ( PHB_ITEM pItem, LONGLONG llNumbe
 extern PHB_ITEM HB_EXPORT hb_itemParamPtr ( USHORT uiParam, int iMask );
 extern int      HB_EXPORT hb_itemStrCmp   ( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact ); /* our string compare */
 extern void     HB_EXPORT hb_itemCopy     ( PHB_ITEM pDest, PHB_ITEM pSource );
-extern void     HB_EXPORT hb_itemClear    ( PHB_ITEM pItem );
+//extern void     HB_EXPORT hb_itemClear    ( PHB_ITEM pItem );
 extern PHB_ITEM HB_EXPORT hb_itemUnRef    ( PHB_ITEM pItem ); /* de-references passed variable */
 extern PHB_ITEM HB_EXPORT hb_itemUnRefOnce( PHB_ITEM pItem ); /* de-references passed variable, one step*/
 extern char     HB_EXPORT * hb_itemStr      ( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec ); /* convert a number to a string */
