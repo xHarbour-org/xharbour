@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.32 2003/10/10 00:03:59 peterrees Exp $
+ * $Id: console.c,v 1.33 2003/10/18 01:15:19 jonnymind Exp $
  */
 /*
  * Harbour Project source code:
@@ -81,12 +81,14 @@
 
 #if  defined( HB_THREAD_SUPPORT )
    #include "hbset.h"
+
+   static void s_doNothing( void *nothing ) { HB_SYMBOL_UNUSED( nothing ) ;}
    /* WARNING: Output is a cancellation point. NEVER cross non optimized stack access,
    or calls to hb_param* / hb_ret* family functions with this macros. This macros
    are inner shell locks. */
    #define HB_CONSOLE_SAFE_LOCK\
+      HB_CLEANUP_PUSH( hb_set.HB_SET_OUTPUTSAFETY ? s_doNothing : hb_rawMutexForceUnlock, hb_outputMutex );\
       if ( hb_set.HB_SET_OUTPUTSAFETY ) {\
-         HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_outputMutex );\
          HB_STACK_UNLOCK;\
          HB_CRITICAL_LOCK( hb_outputMutex );\
       }
@@ -94,9 +96,9 @@
    #define HB_CONSOLE_SAFE_UNLOCK \
       if ( hb_set.HB_SET_OUTPUTSAFETY ) {\
          HB_CRITICAL_UNLOCK( hb_outputMutex );\
-         HB_CLEANUP_POP;\
          HB_STACK_LOCK;\
-      }
+      }\
+      HB_CLEANUP_POP;
 
 #else
    #define HB_CONSOLE_SAFE_LOCK

@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.11 2003/07/30 20:45:40 andijahja Exp $
+ * $Id: hbset.h,v 1.12 2003/10/18 01:15:18 jonnymind Exp $
  */
 
 /*
@@ -205,10 +205,7 @@ typedef struct
    int     HB_SET_DIRCASE;
    char    HB_SET_DIRSEPARATOR;
    int     HB_SET_ERRORLOOP;
-
-#ifdef HB_THREAD_SUPPORT
    BOOL    HB_SET_OUTPUTSAFETY;
-#endif
 
 } HB_SET_STRUCT;
 

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.106 2003/10/03 01:18:03 ronpinkas Exp $
+* $Id: thread.c,v 1.107 2003/10/18 01:15:19 jonnymind Exp $
 */
 
 /*
@@ -1175,7 +1175,9 @@ HB_FUNC( STOPTHREAD )
 
 HB_FUNC( KILLTHREAD )
 {
+#ifdef HB_OS_WIN_32
    HB_THREAD_STUB
+#endif
 
    HB_THREAD_T th = (HB_THREAD_T) hb_parnl( 1 );
 #ifdef HB_OS_WIN_32
@@ -2095,5 +2097,3 @@ HB_FUNC( SECONDSSLEEP )
    hb_threadSleep( sleep );
 }
 
-
- 
