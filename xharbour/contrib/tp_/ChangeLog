@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: ChangeLog,v 1.2 2004/08/16 14:30:18 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-08-16 16:32 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+	* tp_/telepath.prg
+		+ removed the original developed with Flagship and inserted
+		  the one ported to xharbour by Luiz Rafael Culik Guimaraes (culikr@brturbo.com)
 
 2004-08-16 16:22 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
 	* tp_/ChangeLog

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: telepath.prg,v 1.2 2004/08/16 14:30:18 mauriliolongo Exp $
  */
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -33,12 +33,17 @@
 ////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-#Cinline
+
+// xHarbour Port by Luiz Rafael Culik Guimaraes (culikr@brturbo.com)
+
+
+#pragma begindump
+    #include "hbapi.h"
    #include <sys/ioctl.h>
    #include <unistd.h>
    #include <sys/stat.h>
    #include <fcntl.h>
-#endCinline
+#pragma enddump
 
 #define TP_MAXPORTS  8
 
@@ -68,7 +73,7 @@ function tp_idle( lNewval )
 return .f.
 
 function tp_delay( insecs )
-   LOCAL_DOUBLE nseconds := 0
+    LOCAL nseconds := 0
 
    if valtype( insecs ) != "N"
       insecs := 0
@@ -79,12 +84,13 @@ function tp_delay( insecs )
    endif
 
    nseconds := insecs
+    HB_INLINE(nseconds)
+    {
+       double nseconds = hb_parnd(1);
 
-   #Cinline
-   {
-      usleep( nseconds * 1000000 );
+       usleep( nseconds * 1000000 );
    }
-   #endCinline
+
 return nil
 
 function tp_close( nPort )
@@ -108,7 +114,7 @@ function tp_reopen( cPortname, nPort, nBaud, nData, cParity, nStop )
 return tp_open( cPortname, nPort, nBaud, nData, cParity, nStop )
 
 function tp_open( cPortname, nPort, nBaud, nData, cParity, nStop )
-   LOCAL_DOUBLE cnhandle
+    LOCAL cnhandle
    local cCommand
    local lOldFile, lOldPath, lOldLower
 
@@ -314,9 +320,10 @@ function tp_recvto( nPort, cDelim, nMaxlen, nTimeout )
       if nFirst < 64000
          exit
       endif
-      #Cinline
+        HB_INLINE()
+        {
          sched_yield();
-      #endCinline
+        }
    enddo
 
    if nFirst < 64000
@@ -336,7 +343,7 @@ function tp_lookfor( nPort, cLookfor )
 return at( cLookfor, aPorts[ nPort, TPFP_INBUF ] )
 
 function tp_inchrs( nPort )
- if ! isopenport( nPort )
+   if ! isopenport( nPort )
       return 0
    endif
    _readfromporttobuffer( nPort )
@@ -403,9 +410,10 @@ function tp_waitfor( nPort, nTimeout, acList, lIgnorecase )
       if nFirst < 64000
          exit
       endif
-      #Cinline
+        hb_inline()
+        {
          sched_yield();
-      #endCinline
+        }
    enddo
 
    if nFirst < 64000
@@ -419,14 +427,17 @@ return 0
 // sets to 0 = rts off, 1 dtr on, 2 = dtr flow control autotoggle
 // I don't support 2.  who uses dtr for flow control anyway...
 function tp_ctrlrts( nPort, nParamNewval )
-   LOCAL_DOUBLE nph, nnewval, noldval
+    LOCAL nph, nnewval, noldval
+
 
    if ! isopenport( nPort )
       return -1
    endif
    nph := aPorts[ nPort, TPFP_HANDLE ]
-   #Cinline
+HB_INLINE( nph ,@nnewval, @noldval)
    {
+        double nph = hb_parnd( 1 );
+        double nnewval, noldval;
       unsigned int rtsresult = 0;
       ioctl( nph, TIOCMGET, &rtsresult );
       if ( rtsresult & TIOCM_RTS )
@@ -447,31 +458,42 @@ function tp_ctrlrts( nPort, nParamNewval )
             ioctl( nph, TIOCMSET, &rtsresult );
          }
          /// if newval == 2?  uhhhhhhh
-      }
+
+       }
+       hb_stornd(nnewval,2);
+       hb_stornd(noldval,3);
    }
-   #endCinline
+
    if nNewval == 2
       run( "stty crtscts < " + aPorts[ nPort, TPFP_NAME ] )
    endif
 return noldval
 
 function tp_isri( nPort )
-   LOCAL_DOUBLE rinph, riretval
+    LOCAL rinph, riretval
 
    if ! isopenport( nPort )
       return .f.
    endif
    rinph := aPorts[ nPort, TPFP_HANDLE ]
-   #Cinline
+
+    HB_INLINE(rinph,@riretval)
    {
+        double rinph= hb_parnd( 1 ) ;
+        double nnewval, noldval;
       unsigned int riresult = 0;
       ioctl( rinph, TIOCMGET, &riresult );
-      if ( riresult & TIOCM_RI )
+        if ( riresult & TIOCM_RI )
+        {
          riretval = 1;
+        }
       else
+        {
          riretval = 0;
+        }
+    hb_stornd(riretval,2);
    }
-   #endCinline
+
 return ( riretval == 1 )
 
 // telepathy says...
@@ -479,14 +501,16 @@ return ( riretval == 1 )
 // sets to 0 = dtr off, 1 dtr on, 2 = dtr flow control autotoggle
 // I don't support 2.  who uses dtr for flow control anyway...
 function tp_ctrldtr( nPort, nParamNewval )
-   LOCAL_DOUBLE nph, nnewval, noldval
+    LOCAL nph, nnewval, noldval
 
    if ! isopenport( nPort )
       return -1
    endif
    nph := aPorts[ nPort, TPFP_HANDLE ]
-   #Cinline
+   HB_INLINE(nph, @nnewval, @noldval)
    {
+        double nph = hb_parnd(1);
+        double nnewval, noldval;
       unsigned int result = 0;
       ioctl( nph, TIOCMGET, &result );
       if ( result & TIOCM_DTR )
@@ -503,66 +527,75 @@ function tp_ctrldtr( nPort, nParamNewval )
 
          ioctl( nph, TIOCMSET, &result );
       }
+        hb_stornd(nnewval,2);
+        hb_stornd(noldval,3);
    }
-   #endCinline
+
 return noldval
 
 function tp_isdcd( nPort )
-   LOCAL_DOUBLE nph, nretval
+    LOCAL nph, nretval
 
    if ! isopenport( nPort )
       return .f.
    endif
    nph := aPorts[ nPort, TPFP_HANDLE ]
-   #Cinline
+    hB_inline(nph,@nretval)
    {
+        double nph = hb_parnd( 1 ) ;
+        double nretval;
       unsigned int result = 0;
       ioctl( nph, TIOCMGET, &result );
       if ( result & TIOCM_CD )
          nretval = 1;
       else
          nretval = 0;
+    hb_stond(nretval,2);
    }
-   #endCinline
+
 return ( nretval == 1 )
 
 function tp_isdsr( nPort )
-   LOCAL_DOUBLE nph, nretval
+    LOCAL nph, nretval
 
    if ! isopenport( nPort )
       return .f.
    endif
    nph := aPorts[ nPort, TPFP_HANDLE ]
-   #Cinline
+    hB_inline(nph,@nretval)
    {
+        double nph = hb_parnd( 1 ) ;
+        double nretval;
       unsigned int result = 0;
       ioctl( nph, TIOCMGET, &result );
       if ( result & TIOCM_DSR )
          nretval = 1;
       else
          nretval = 0;
+    hb_stond(nretval,2);
    }
-   #endCinline
 return ( nretval == 1 )
 
 
 function tp_iscts( nPort )
-   LOCAL_DOUBLE nph, nretval
+    LOCAL nph, nretval
 
    if ! isopenport( nPort )
       return .f.
    endif
    nph := aPorts[ nPort, TPFP_HANDLE ]
-   #Cinline
+    hB_inline(nph,@nretval)
    {
+        double nph = hb_parnd( 1 ) ;
+        double nretval;
       unsigned int result = 0;
       ioctl( nph, TIOCMGET, &result );
       if ( result & TIOCM_CTS )
          nretval = 1;
       else
          nretval = 0;
+    hb_stond(nretval,2);
    }
-   #endCinline
 return ( nretval == 1 )
 
 /// sorry, but ctrldsr and ctrlcts will act like isdsr and iscts... if you want
@@ -619,7 +652,7 @@ static function _readfromporttobuffer( nPort )
 return 0
 
 static function _tpinit
-   local_int x
+    local x
    if aPorts == nil
       aPorts := array( TP_MAXPORTS )
       for x := 1 to len( aPorts )
@@ -630,11 +663,11 @@ static function _tpinit
 return nil
 
 static function _clock
-     LOCAL_DOUBLE myvar
+     LOCAL myvar
      myvar := 4
-     #Cinline
-        myvar = time( NULL );
-     #endCinline
+ //    #Cinline
+  //      myvar = time( NULL );
+  //   #endCinline
 return myvar
 
 /// you can uncomment the following section for compatability with TP code... I figured
