@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.39 2004/03/03 19:37:55 mlombardo Exp $
+ * $Id: pptable.c,v 1.40 2004/04/30 03:50:48 ronpinkas Exp $
  */
 
 /*
@@ -475,7 +475,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___260 = {0,"@","\1A00,\1B00,\1C00,\1D00 GET \1E00 LISTBOX \1F00 \16VALID \1G00\17 \16WHEN \1H00\17 \16CAPTION \1I00\17 \16MESSAGE \1J00\17 \16COLOR \1K00\17 \16FOCUS \1L00\17 \16STATE \1M00\17 \16\1N20  DROPDOWN>\17 \16\1O20  SCROLLBAR>\17 \16SEND \1P00\17 \16GUISEND \1Q00\17",
        "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1E00,\1E30,NIL,\1G40,\1H40 ) ) ; ATail(GetList):Control := _ListBox_(ATail(Getlist):row,ATail(Getlist):col,\1C00,\1D00,\1E00,\1F00,\1I00,\1J00,\1K00,\1L40,\1M40,\1N50,\1O50 ) ; ATail(GetList):reader := { | a,b,c,d | GuiReader(a,b,c,d ) } \16; ATail(GetList):\1P00\17 \16; ATail(GetList):Control:\1Q00\17 ; ATail(GetList):Control:Display()",&sC___259 };
    static COMMANDS sC___261 = {0,"@","\1A00,\1B00,\1C00,\1D00 GET \1E00 TBROWSE \1F00 \16VALID \1G00\17 \16WHEN \1H00\17 \16MESSAGE \1I00\17 \16SEND \1J00\17 \16GUISEND \1K00\17",
-       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1E00,\1E30,NIL,\1G40,\1H40 ) ) ; \1F00:ntop := ATail(Getlist):row ; \1F00:nleft := ATail(Getlist):col ; \1F00:nbottom := \1C00 ; \1F00:nright := \1D00 ; \1F00:Configure() ; ATail(GetList):Control := \1F00 ; ATail(GetList):reader := { | a,b,c | TBReader(a,b,c ) } \16; ATail(GetList):Control:Message := \1I00\17 \16; ATail(GetList):\1J00\17 \16; ATail(GetList):Control:\1K00\17",&sC___260 };
+       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1E00,\1E30,NIL,\1G40,\1H40 ) ) ; \1F00:ntop := ATail(Getlist):row ; \1F00:nleft := ATail(Getlist):col ; \1F00:nbottom := \1C00 ; \1F00:nright := \1D00 ; \1F00:Configure() ; ATail(GetList):Control := \1F00 ; ATail(GetList):reader := { | a,b,c,d | TBReader( a, b, c, d ) } \16; ATail(GetList):Control:Message := \1I00\17 \16; ATail(GetList):\1J00\17 \16; ATail(GetList):Control:\1K00\17",&sC___260 };
    static COMMANDS sC___262 = {0,"READ","\16MSG AT \1A00,\1B00,\1C00 \16MSG COLOR \1D00\17\17",
        "ReadModal(GetList,NIL,NIL,\1A00,\1B00,\1C00,\1D00 ) ; GetList := {}",&sC___261 };
    static COMMANDS sC___263 = {0,"@","\1A00,\1B00 GET \1C00 \16PICTURE \1D00\17 \16VALID \1E00\17 \16WHEN \1F00\17 \16CAPTION \1G00\17 \16MESSAGE \1H00\17 \16SEND \1I00\17",
