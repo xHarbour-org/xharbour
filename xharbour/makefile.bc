@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.43 2003/04/18 23:34:10 lculik Exp $
+# $Id: makefile.bc,v 1.44 2003/05/08 03:28:04 lculik Exp $
 #
 
 #
@@ -130,6 +130,7 @@ RTL_DIR      = source\rtl
 VM_DIR       = source\vm
 ODBC_DIR     = source\odbc
 SAMPLES_DIR  = source\clipsamp
+CODEPAGE_DIR = source\codepage
 
 HBRUN_DIR    = utils\hbrun
 HBTEST_DIR   = utils\hbtest
@@ -174,7 +175,7 @@ HVM_GUI_MT_OBJ_FLAGS = $(CLIBFLAGS) -DSIMPLEX -DHB_THREAD_SUPPORT -DHB_GUI
 
 !if $d(HB_THREAD_SUPPORT)
    HB_MT_FLAGS=-DHB_THREAD_SUPPORT
-   HARBOURFLAGS= $(HARBOURFLAGS) $(HB_MT_FLAGS)   
+   HARBOURFLAGS= $(HARBOURFLAGS) $(HB_MT_FLAGS)
 !endif
 
 #
@@ -186,6 +187,7 @@ HVM_MT_OBJ     = $(LIB_DIR)\hvmmt.obj
 HVM_GUI_OBJ    = $(LIB_DIR)\hvmgui.obj
 HVM_GUI_MT_OBJ = $(LIB_DIR)\hvmguimt.obj
 COMMON_LIB     = $(LIB_DIR)\common.lib
+CODEPAGE_LIB   = $(LIB_DIR)\codepage.lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdx.lib
 DBFNTX_LIB     = $(LIB_DIR)\dbfntx.lib
 DEBUG_LIB      = $(LIB_DIR)\debug.lib
@@ -198,6 +200,14 @@ RTL_LIB        = $(LIB_DIR)\rtl.lib
 VM_LIB         = $(LIB_DIR)\vm.lib
 ODBC_LIB       = $(LIB_DIR)\hbodbc.lib
 SAMPLES_LIB    = $(LIB_DIR)\samples.lib
+
+VM_STLIB     = $(VM_LIB)
+RTL_STLIB    = $(RTL_LIB)
+RDD_STLIB    = $(RDD_LIB)
+DBFNTX_STLIB = $(DBFNTX_LIB)
+DBFCDX_STLIB = $(DBFCDX_LIB)
+PP_STLIB     = $(PP_LIB)
+ODBC_STLIB   = $(ODBC_LIB)
 
 !if $d(HB_THREAD_SUPPORT)
    VM_LIB     = $(LIB_DIR)\vmmt.lib
@@ -217,7 +227,15 @@ GTWIN_LIB    = $(LIB_DIR)\gtwin.lib
 
 HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
 HBPP_EXE     = $(BIN_DIR)\hbpp.exe
+
+
 HBRUN_EXE    = $(BIN_DIR)\hbrun.exe
+
+!if $d(HB_THREAD_SUPPORT)
+   HBRUN_EXE    = $(BIN_DIR)\hbrunmt.exe
+!endif
+
+
 HBTEST_EXE   = $(BIN_DIR)\hbtest.exe
 HBDOC_EXE    = $(BIN_DIR)\hbdoc.exe
 HBMAKE_EXE   = $(BIN_DIR)\hbmake.exe
@@ -277,6 +295,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\binnum.obj \
    $(RTL_OBJ_DIR)\binnumx.obj \
    $(RTL_OBJ_DIR)\box.obj \
+   $(RTL_OBJ_DIR)\cdpapi.obj \
    $(RTL_OBJ_DIR)\chrasc.obj \
    $(RTL_OBJ_DIR)\colorind.obj \
    $(RTL_OBJ_DIR)\console.obj \
@@ -454,7 +473,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\wait.obj \
    $(RTL_OBJ_DIR)\win32ole.obj
 
-
 #
 # LANG.LIB rules
 #
@@ -499,7 +517,6 @@ LANG_LIB_OBJS = \
 #
 # MACRO.LIB rules
 #
-
 MACRO_LIB_OBJS = \
    $(OBJ_DIR)\macroy.obj \
    $(OBJ_DIR)\macroa.obj \
@@ -519,7 +536,6 @@ MACRO_LIB_OBJS = \
 #
 # RDD.LIB rules
 #
-
 RDD_LIB_OBJS = \
    $(RDD_OBJ_DIR)\dbcmd.obj \
    $(RDD_OBJ_DIR)\workarea.obj \
@@ -548,7 +564,6 @@ DBFNTX_LIB_OBJS = \
    $(NTX_OBJ_DIR)\dbfntx1.obj \
    \
    $(NTX_OBJ_DIR)\dbfntx0.obj
-
 
 DBFCDX_LIB_OBJS = \
    $(CDX_OBJ_DIR)\dbfcdx1.obj \
@@ -584,7 +599,6 @@ DEBUG_LIB_OBJS = \
 #
 # COMMON.LIB rules
 #
-
 COMMON_LIB_OBJS = \
    $(OBJ_DIR)\hbfhnd.obj \
    $(OBJ_DIR)\hbfsapi.obj \
@@ -600,7 +614,6 @@ COMMON_LIB_OBJS = \
 #
 # VM.LIB rules
 #
-
 VM_LIB_OBJS = \
    $(VM_OBJ_DIR)\arrays.obj \
    $(VM_OBJ_DIR)\arrayshb.obj \
@@ -684,6 +697,19 @@ GTSTD_LIB_OBJS = \
 GTWIN_LIB_OBJS = \
    $(OBJ_DIR)\gtwin.obj \
    $(OBJ_DIR)\mousewin.obj
+
+CODEPAGE_LIB_OBJS = \
+   $(OBJ_DIR)\cdpesdos.obj \
+   $(OBJ_DIR)\cdpeswin.obj \
+   $(OBJ_DIR)\cdpgedos.obj \
+   $(OBJ_DIR)\cdpgewin.obj \
+   $(OBJ_DIR)\cdpla850.obj \
+   $(OBJ_DIR)\cdppl852.obj \
+   $(OBJ_DIR)\cdppliso.obj \
+   $(OBJ_DIR)\cdpplmaz.obj \
+   $(OBJ_DIR)\cdpru866.obj \
+   $(OBJ_DIR)\cdpruwin.obj \
+   $(OBJ_DIR)\cdprukoi.obj
 
 #
 # HARBOUR.EXE rules
@@ -820,6 +846,7 @@ all: \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
    $(HB_GT_LIBS) \
+   $(CODEPAGE_LIB) \
    $(SAMPLES_LIB) \
    $(ODBC_LIB) \
    $(HBRUN_EXE) \
@@ -852,6 +879,7 @@ $(GTDOS_LIB)  : $(GTDOS_LIB_OBJS)
 $(GTPCA_LIB)  : $(GTPCA_LIB_OBJS)
 $(GTSTD_LIB)  : $(GTSTD_LIB_OBJS)
 $(GTWIN_LIB)  : $(GTWIN_LIB_OBJS)
+$(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
 $(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
 $(ODBC_LIB)    : $(ODBC_LIB_OBJS)
 #
@@ -1389,6 +1417,10 @@ $(RTL_OBJ_DIR)\browse.c : $(RTL_DIR)\browse.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\browse.obj : $(RTL_OBJ_DIR)\browse.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(RTL_OBJ_DIR)\cdpapi.obj : $(RTL_DIR)\cdpapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
@@ -2597,6 +2629,54 @@ $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
    tlib $(GTWIN_LIB) $(ARFLAGS) -+$@,,
 
 #
+# CODEPAGE.LIB dependencies
+#
+
+$(OBJ_DIR)\cdpesdos.obj : $(CODEPAGE_DIR)\cdpesdos.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\cdpeswin.obj : $(CODEPAGE_DIR)\cdpeswin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\cdpgedos.obj : $(CODEPAGE_DIR)\cdpgedos.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\cdpgewin.obj : $(CODEPAGE_DIR)\cdpgewin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\cdpla850.obj : $(CODEPAGE_DIR)\cdpla850.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\cdppl852.obj : $(CODEPAGE_DIR)\cdppl852.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\cdppliso.obj : $(CODEPAGE_DIR)\cdppliso.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\cdpplmaz.obj : $(CODEPAGE_DIR)\cdpplmaz.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\cdpru866.obj : $(CODEPAGE_DIR)\cdpru866.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\cdpruwin.obj : $(CODEPAGE_DIR)\cdpruwin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\cdprukoi.obj : $(CODEPAGE_DIR)\cdprukoi.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
+
+#
 # SAMPLES.LIB dependencies
 #
 
@@ -2684,6 +2764,7 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(MACRO_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
+   $(ECHO) $(CODEPAGE_LIB) >> make.tmp
    $(CC) @make.tmp
    $(DEL) make.tmp
 
@@ -2717,16 +2798,16 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\rt_array.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\rt_file.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\rt_misc.obj >> make.tmp
-   $(ECHO) $(PP_LIB) >> make.tmp
+   $(ECHO) $(PP_STLIB) >> make.tmp
    $(ECHO) $(COMMON_LIB) >> make.tmp
-   $(ECHO) $(VM_LIB) >> make.tmp
-   $(ECHO) $(RTL_LIB) >> make.tmp
+   $(ECHO) $(VM_STLIB) >> make.tmp
+   $(ECHO) $(RTL_STLIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
    $(ECHO) $(LANG_LIB) >> make.tmp
-   $(ECHO) $(RDD_LIB) >> make.tmp
+   $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
-   $(ECHO) $(DBFNTX_LIB) >> make.tmp
-   $(ECHO) $(DBFCDX_LIB) >> make.tmp
+   $(ECHO) $(DBFNTX_STLIB) >> make.tmp
+   $(ECHO) $(DBFCDX_STLIB) >> make.tmp
    $(CC) @make.tmp
    $(DEL) make.tmp
 
@@ -2820,16 +2901,16 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\fclass1.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\ffile1.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\ft_funcs.obj >> make.tmp
-   $(ECHO) $(PP_LIB) >> make.tmp
+   $(ECHO) $(PP_STLIB) >> make.tmp
    $(ECHO) $(COMMON_LIB) >> make.tmp
-   $(ECHO) $(VM_LIB) >> make.tmp
-   $(ECHO) $(RTL_LIB) >> make.tmp
+   $(ECHO) $(VM_STLIB) >> make.tmp
+   $(ECHO) $(RTL_STLIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
    $(ECHO) $(LANG_LIB) >> make.tmp
-   $(ECHO) $(RDD_LIB) >> make.tmp
+   $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
-   $(ECHO) $(DBFNTX_LIB) >> make.tmp
-   $(ECHO) $(DBFCDX_LIB) >> make.tmp
+   $(ECHO) $(DBFNTX_STLIB) >> make.tmp
+   $(ECHO) $(DBFCDX_STLIB) >> make.tmp
 !if $d(HB_DOC_PDF)
    $(ECHO) $(OBJ_DIR)\genpdf1.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\pdfhbdoc.obj >> make.tmp
@@ -2967,16 +3048,16 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\pickfile.obj  >> make.tmp
    $(ECHO) $(OBJ_DIR)\prb_stak.obj  >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbmlang.obj  >> make.tmp
-   $(ECHO) $(PP_LIB) >> make.tmp
+   $(ECHO) $(PP_STLIB) >> make.tmp
    $(ECHO) $(COMMON_LIB) >> make.tmp
-   $(ECHO) $(VM_LIB) >> make.tmp
-   $(ECHO) $(RTL_LIB) >> make.tmp
+   $(ECHO) $(VM_STLIB) >> make.tmp
+   $(ECHO) $(RTL_STLIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
    $(ECHO) $(LANG_LIB) >> make.tmp
-   $(ECHO) $(RDD_LIB) >> make.tmp
+   $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
-   $(ECHO) $(DBFNTX_LIB) >> make.tmp
-   $(ECHO) $(DBFCDX_LIB) >> make.tmp
+   $(ECHO) $(DBFNTX_STLIB) >> make.tmp
+   $(ECHO) $(DBFCDX_STLIB) >> make.tmp
    $(CC) @make.tmp
    $(DEL) make.tmp
 

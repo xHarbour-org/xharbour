@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.30 2003/04/21 03:05:18 jonnymind Exp $
+ * $Id: fm.c,v 1.31 2003/05/16 19:52:12 druzus Exp $
  */
 
 /*
@@ -125,8 +125,8 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    void * pMem;
 #ifdef HB_FM_STATISTICS
     HB_THREAD_STUB
-#endif      
-   
+#endif
+
    /* NOTE: we cannot use here HB_TRACE because it will overwrite the
     * function name/line number of code which called hb_xalloc/hb_xgrab
     */
@@ -143,15 +143,15 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
    pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
-   
+
    if( ! pMem )
-   {      
+   {
 #ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );
 #endif
       return NULL;
    }
-   
+
    s_lAllocations++;
 
    if( ! s_pFirstBlock )
@@ -189,7 +189,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    }
    else
    {
-      
+
       if( HB_VM_STACK.pItems && ( HB_VM_STACK.pBase != HB_VM_STACK.pItems ) )
       {
           /* PRG line number */
@@ -225,11 +225,11 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 #endif
-   
+
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
 #else
- 
+
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
@@ -257,7 +257,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    {
       hb_errInternal( HB_EI_XGRABNULLSIZE, NULL, NULL, NULL );
    }
-   
+
 #ifdef HB_FM_STATISTICS
 
 #ifndef HB_SAFE_ALLOC
@@ -348,7 +348,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 #endif
-   
+
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
 #else
@@ -425,7 +425,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 #endif
       hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xrealloc()", NULL, NULL );
    }
-   
+
    pMem = realloc( pMemBlock, ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
 
    s_lMemoryConsumed += ( ulSize - ulMemSize );
@@ -474,7 +474,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 #endif
-   
+
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
 #else
@@ -587,7 +587,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 
       hb_errInternal( HB_EI_XFREENULL, "hb_xfree(NULL)", NULL, NULL );
    }
-   
+
 #else
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xfree(%p)", pMem));
@@ -610,7 +610,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
    }
 
 #endif
-   
+
 
 
 }
@@ -960,18 +960,18 @@ ULONG hb_xquery( USHORT uiMode )
    default:
       ulResult = 0;
    }
-   
+
 /*
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 #endif
-/*
+*/
 
    return ulResult;
 }
 
 HB_FUNC( MEMORY )
 {
-   HB_THREAD_STUB   
+   HB_THREAD_STUB
    hb_retnl( hb_xquery( hb_parni( 1 ) ) );
 }

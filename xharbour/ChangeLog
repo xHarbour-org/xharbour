@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1024 2003/05/16 19:40:48 druzus Exp $
+ * $Id: ChangeLog,v 1.1025 2003/05/16 20:05:44 anoncvs_ivtv Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-16 14:57 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/fm.c
+    ! Corrected typo in comment terminator.
+
+  * makefile.bc
+    + Added codepage support.
+    + Added few variables to hold names of ST versions of MT capable libs.
+    * Corrected rules for hbmake.exe hbdoc.exe and hbtest.exe and hbrun.exe to use ST versions of libraries.
+    + Added hbrunmt.exe target (MT version of hbrun.exe)
+
+   /*
+      Can one of you Linux experts make same changes to the GNU Make system?
+      Paul, can you please do same in makefile.vc and makefile.nt?
+    */
 
 2003-05-16 17:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tget.prg
@@ -137,7 +152,7 @@
       or by setting environment variables HB_GT=<gtname>
       to make xHarbour binaries with MULTI GT you have to set environment
       variable HB_MULTI_GT=yes
-      then if you link your apps with static libraries you always have to 
+      then if you link your apps with static libraries you always have to
       link with gtnul and optionally with other gt libs you need.
       GTNUL is basic lib. It has to have all GT features. Other GTs may
       not have all function implemented on some platforms. My main idea
@@ -158,7 +173,7 @@
         add initialization code (see tail of gt_tpl.c)
       I've change a lot of code so It have to be intensively tested on
       different platforms.
-      
+
   * xharbour/source/rtl/seconds.c
     * the symbol CLK_TCK which is mentioned as obsolescent in POSIX-1996
       replaced by sysconf(_SC_CLK_TCK)
