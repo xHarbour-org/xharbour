@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2419 2004/02/28 19:50:45 lculik Exp $
+ * $Id: ChangeLog,v 1.2420 2004/02/28 20:39:52 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,10 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-29 06:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/hbzlib/include/hbzip2.h
+  * contrib/hbzlib/zip.c
+  * contrib/hbzlib/zipnew.cpp
+  * contrib/hbzlib/zipcomp.cpp
+    % more optimization.
+    % fix memory leak during unzipping
+    % HB_ZIPDELETEFILES() now returns correct values
+    - remove function hb_UnzipOne()
+    - remove function hb_UnzipAll()
+    - remove function hb_DeleteOne()
+    - remove function hb_DeleteOneIndex()
+    - remove function hb_UnzipOneIndex()
+
+  /*
+   In summary, I have removed 8 unnecessary functions which IMO may lead
+   to errors. Luiz, forgive me for making such a big surgery to hbzip.
+   Now hbzip is more compact than before :)
+  */
+
 2004-02-28 17:45 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   ! doc/xhbt_internals.txt
   ! doc/vm.txt
-    ! Formated for hbdoc processing 
+    ! Formated for hbdoc processing
 
 2004-02-28 16:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
   + doc/en/statement.txt
@@ -78,7 +98,7 @@
   * source/rtl/direct.c
     + PHB_ITEM hb_fsDirectory( char*, char*, BOOL, BOOL ) for access
       from C level.
-    % make Directory() function to call hb_directory()
+    % make Directory() function to call hb_fsDirectory()
 
   * include/hbserv.h
   * source/rtl/hbserv.c

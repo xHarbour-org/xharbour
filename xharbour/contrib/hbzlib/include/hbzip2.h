@@ -1,5 +1,5 @@
 /*
- * $Id: hbzip2.h,v 1.5 2004/02/14 16:37:54 lculik Exp $
+ * $Id: hbzip2.h,v 1.6 2004/02/28 03:45:09 andijahja Exp $
  */
 
 /*
@@ -114,14 +114,9 @@ extern int      hb___SetCallbackFunc(PHB_ITEM pFunc);
 extern int      hb_CmpTdSpan(char *szFile,PHB_ITEM pArray,int iCompLevel,PHB_ITEM pBlock,BOOL bOverWrite,char *szPassWord,int iSpanSize ,BOOL bPath ,BOOL bDrive,PHB_ITEM pProgress);
 
 extern int      hb_CompressFile(char *szFile,PHB_ITEM pArray,int iCompLevel,PHB_ITEM pBlock,BOOL bOverWrite,char *szPassWord,BOOL bPath,BOOL bDrive,PHB_ITEM pProgress);
-extern int      hb_UnzipAll(char *szFile,PHB_ITEM pBlock,BOOL bWithPath,char *szPassWord,char *szPath,PHB_ITEM pProgress);
-extern int      hb_UnzipOne(char *szFile,PHB_ITEM pBlock,BOOL bWithPath,char *szPassWord,char *szPath,char *szFiletoExtract,PHB_ITEM pProgress);
 extern int      hb_UnzipSel(char *szFile,PHB_ITEM pBlock,BOOL bWithPath,char *szPassWord,char *szPath,PHB_ITEM pArray,PHB_ITEM pProgress);
-extern int      hb_UnzipOneIndex(char *szFile,PHB_ITEM pBlock,BOOL bWithPath,char *szPassWord,char *szPath,ULONG ulCount,PHB_ITEM pProgress);
 extern int      hb_UnzipSelIndex(char *szFile,PHB_ITEM pBlock,BOOL bWithPath,char *szPassWord,char *szPath,PHB_ITEM pSelArray,PHB_ITEM pProgress);
-extern int      hb_DeleteOne(char *szFile,char *szFiletoDelete);
 extern int      hb_DeleteSel(char *szFile,PHB_ITEM pArray,BOOL bCase);
-extern int      hb_DeleteOneIndex(char *szFile,ULONG ulCount);
 extern int      hb_TestForPKS(char *szFile);
 extern void     hb_SetZipBuff(int a,int b,int c);
 extern void     hb_SetZipComment(char *szComment);
