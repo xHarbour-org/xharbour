@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrypt.c,v 1.8 2003/07/15 09:15:34 andijahja Exp $
+ * $Id: hbcrypt.c,v 1.9 2003/08/20 17:29:36 toninhofwi Exp $
  */
 
 /*
@@ -76,8 +76,6 @@
 #include "hbcompress.h"
 
 #define BASE 65521L /* largest prime smaller than 65536 */
-ULONG adler32( ULONG adler, const BYTE *buf, UINT len);
-
 
 /* Giancarlo Niccolai's x scrambler algorithm
 * Prerequisites:
@@ -479,4 +477,3 @@ HB_FUNC( HB_DECRYPT )
 
    hb_retclenAdopt( (char *)cRes, pSource->item.asString.length );
 }
-

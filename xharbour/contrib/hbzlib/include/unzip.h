@@ -41,12 +41,13 @@
 #ifndef _unz_H
 #define _unz_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef _HBCOMPRESS_H
 #include "hbcompres.h"
+#endif
+
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #if defined(STRICTUNZIP) || defined(STRICTZIPUNZIP)

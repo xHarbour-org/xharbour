@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.cpp $
 // $Archive: /ZipArchive/ZipArchive.cpp $
-// $Date: 2003/08/25 19:50:06 $ $Author: lculik $
+// $Date: 2003/09/12 20:10:13 $ $Author: paultucker $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -15,12 +15,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
+#include "hbcompress.h"
 #include "stdafx.h"
 #include "ziparchive.h"
 // #include "ZipPathComponent.h"
 #include "zipplatform.h"
 #include "zipcompatibility.h"
-
 #include <time.h>
 
 #ifndef DEF_MEM_LEVEL
@@ -1355,6 +1355,7 @@ bool CZipArchive::AddNewFileDrv(CZipAddNewFileInfo& info)
       {
 
          zip.Close(!bRet); // that doesn't really matter how it will be closed
+
          if (pmf)
             delete pmf;
          if (!bEffInMem)
@@ -1365,6 +1366,7 @@ bool CZipArchive::AddNewFileDrv(CZipAddNewFileInfo& info)
       catch (...)
       {
          zip.Close(true);
+
          if (pmf)
             delete pmf;
          if (!bEffInMem)

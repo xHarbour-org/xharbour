@@ -44,13 +44,16 @@
 
 #ifndef _zip_H
 #define _zip_H
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #ifndef _HBCOMPRESS_H
 #include "hbcompress.h"
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #if defined(STRICTZIP) || defined(STRICTZIPUNZIP)
 /* like the STRICT of WIN32, we define a pointer that cannot be converted

@@ -78,3 +78,7 @@ SpanCallback span;
 SpanActionCallback spanac;
 };
 
+#ifdef __cplusplus
+}
+#endif
+#endif
