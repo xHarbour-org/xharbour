@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 
 testtp : testtp.o telepathy.o
 	FlagShip -Mmain -otesttp testtp.o telepathy.o
