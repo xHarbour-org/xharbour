@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.19 2002/06/29 03:02:18 lculik Exp $
+ * $Id: tget.prg,v 1.20 2002/07/03 21:58:14 walito Exp $
  */
 
 /*
@@ -1148,6 +1148,8 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
       for nFor := 1 to ::nMaxLen
          if !::IsEditable( nFor )
             nNoEditable++
+         else
+            nNoEditable := 0
          endif
       next
       cBuffer += SubStr( ::Original, ::nMaxLen - nNoEditable + 1 )
