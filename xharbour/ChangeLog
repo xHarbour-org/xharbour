@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3019 2004/06/04 06:57:24 bdj Exp $
+ * $Id: ChangeLog,v 1.3020 2004/06/04 09:40:19 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-04 14:00 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/debug/debugger.prg
+    ! Clear and restore Inkey after- and before-blocks when in debugger.
 
 2004-06-04 13:40 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * contrib/libct/screen2.prg

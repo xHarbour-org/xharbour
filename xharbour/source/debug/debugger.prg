@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.39 2004/05/10 01:47:49 likewolf Exp $
+ * $Id: debugger.prg,v 1.40 2004/05/17 11:22:11 likewolf Exp $
  */
 
 /*
@@ -1228,10 +1228,13 @@ return nil
 METHOD HandleEvent() CLASS TDebugger
 
    local nPopup, oWnd
-   local nKey, nMRow, nMCol, n, nLastKey
+   local nKey, nMRow, nMCol, n
+   local nLastKey, bInkeyBefore, bInkeyAfter
 
-   /* Save LastKey value() */
+   /* Save LastKey() and Inkey() blocks */
    nLastKey := LastKey()
+   bInkeyBefore := SetInkeyBeforeBlock( NIL )
+   bInkeyAfter := SetInkeyAfterBlock( NIL )
    
    if ::lAnimate
       if ::nSpeed != 0
@@ -1384,8 +1387,10 @@ METHOD HandleEvent() CLASS TDebugger
       endcase
    end
 
-   /* Restore LastKey() value */   
+   /* Restore LastKey() and Inkey() blocks */   
    SetLastKey( nLastKey )
+   SetInkeyBeforeBlock( bInkeyBefore )
+   SetInkeyAfterBlock( bInkeyAfter )
    
 return nil
 
