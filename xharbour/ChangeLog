@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1902 2003/12/19 10:39:35 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1903 2003/12/19 16:14:00 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-12-18 17:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+2003-12-19 17:32 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/thread.h
+    % Thread VM Cancelation is now tested each 5000 loops instead of 1000.
+      Again, this seems to speed up normal MT programs by a good deal.
+
+2003-12-19 17:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbapi.h
     + added hb_background* functions definitions
     + added hb_idleAddFunc() and hb_idleDelFunc functions definitions

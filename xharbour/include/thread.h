@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.76 2003/12/19 07:30:01 ronpinkas Exp $
+* $Id: thread.h,v 1.77 2003/12/19 16:14:01 jonnymind Exp $
 */
 
 /*
@@ -72,7 +72,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 #define HB_MUTEX_SIGNATURE       0xF0316913
 
 /* Maximun number of cycles that can be completed by VM without stack unlock */
-#define HB_VM_UNLOCK_PERIOD 1000
+#define HB_VM_UNLOCK_PERIOD 5000
 
 #if defined(HB_OS_WIN_32)
    #ifndef _WIN32_WINNT
