@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.45 2002/03/11 22:58:40 ronpinkas Exp $
+ * $Id: hvm.c,v 1.46 2002/03/17 06:46:34 ronpinkas Exp $
  */
 
 /*
@@ -5263,7 +5263,7 @@ void hb_vmRequestCancel( void )
       while ( buffer[0] )
       {
          i2 = i;
-         hb_procname( i++, buffer, FALSE );
+         hb_procinfo( i++, buffer, NULL );
 
          if( buffer[0] == 0 )
             break;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.10 2002/01/31 02:58:06 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.11 2002/03/22 14:45:14 map Exp $
  */
 
 /*
@@ -503,7 +503,7 @@ extern void     hb_conXSaveRestRelease( void ); /* release the save/restore API 
 extern char *   hb_compReservedName( char * szName ); /* determines if a string contains a reserve word */
 
 /* misc */
-extern char *   hb_procname( int iLevel, char * szName, BOOL bskipBlock ); /* retrieve a procedure name into a buffer */
+extern char *   hb_procinfo( int iLevel, char * szName, USHORT *uLine ); /* retrieve a procedure name into a buffer */
 
 /* macro compiler */
 

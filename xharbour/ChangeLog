@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.132 2002/03/24 16:17:24 walito Exp $
+ * $Id: ChangeLog,v 1.133 2002/03/25 21:57:48 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-25 21:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/spfiles.c
+    * Minor optimization in hb_spFile().
+
+  * include/hbapi.h
+  * source/vm/proc.c
+    * Removed parameter BOOL bSkipBlock, and added USHORT *uLine to hb_procline()
+    * Rewrote and Renamed hb_procline() to hb_procinfo()
+
+  * source/vm/hvm.c
+    * Changed call to hb_procline() to hb_procinfo()
+
+  * source/rtl/tgetint.prg
+    * Corrected __GET() to be more Clipper compatible.
 
 2002-03-25 21:58 UTC-0300 Walter Negro <anegro@overnet.com.ar>
    * source/rtl/tget.prg

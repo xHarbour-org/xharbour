@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.14 2001/07/26 21:50:52 mafact Exp $
+ * $Id: proc.c,v 1.1.1.1 2001/12/21 10:40:58 ronpinkas Exp $
  */
 
 /*
@@ -63,6 +63,8 @@
  *    Special treatment in case of Object and __Eval (only for methodname)
  *    skipping block and adding (b) before the method name
  *
+ * Copyright 2002 Ron Pinkas <ron@ronpinkas.com>
+ *    hb_procinfo()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -73,30 +75,24 @@
 
 HB_FUNC( METHODNAME )
 {
-   char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 2 ];
+   char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
 
-   hb_retc( hb_procname( hb_parni( 1 ) + 1, szName, TRUE ) );
+   hb_retc( hb_procinfo( hb_parni( 1 ) + 1, szName, NULL ) );
 }
 
 HB_FUNC( PROCNAME )
 {
-   char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 2 ];
+   char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
 
-   hb_retc( hb_procname( hb_parni( 1 ) + 1, szName, FALSE ) );
+   hb_retc( hb_procinfo( hb_parni( 1 ) + 1, szName, NULL ) );
 }
 
 HB_FUNC( PROCLINE )
 {
-   int iLevel = hb_parni( 1 ) + 1;  /* we are already inside ProcName() */
-   PHB_ITEM * pBase = hb_stack.pBase;
+   USHORT uLine = 0;
 
-   while( ( iLevel-- > 0 ) && pBase != hb_stack.pItems )
-      pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
-
-   if( iLevel < 0 )
-      hb_retni( ( *pBase )->item.asSymbol.lineno );
-   else
-      hb_retni( 0 );
+   hb_procinfo( hb_parni( 1 ) + 1, NULL, &uLine );
+   hb_retni( uLine );
 }
 
 #ifdef HB_C52_UNDOC
@@ -111,56 +107,55 @@ HB_FUNC( PROCFILE )
 
 #endif
 
-/* NOTE: szName size must be an at least:
-         HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 2 [vszakats] */
+/* NOTE: szName size must be an at least: HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 */
 
-char * hb_procname( int iLevel, char * szName, BOOL bskipBlock  )
+char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
 {
    PHB_ITEM * pBase = hb_stack.pBase;
-   char * szTstName ;
-   BOOL lcb = FALSE ;
-   int iLev = iLevel;
+   BOOL bBlock = FALSE ;
 
-   while( ( iLevel-- > 0 ) && pBase != hb_stack.pItems )
+   // Default and safety to empty string.
+   if( szName )
+   {
+      szName[0] = '\0';
+   }
+
+   while( iLevel-- > 0 && pBase != hb_stack.pItems )
+   {
       pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
-
-      szTstName = ( *pBase )->item.asSymbol.value->szName ;
-
-      if (bskipBlock)
-      {
-       /* Is it an inline method ? if so back one more ... */
-       if ( ( strcmp( szTstName, "__EVAL" ) == 0 ) &&  pBase != hb_stack.pItems)
-        {
-         pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
-         lcb = TRUE ;
-        }
-      }
+   }
 
    if( iLevel < 0 )
    {
-      if( ( *( pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
+      /* Is it a block evaluation or inline method? if so back one more ... */
+      if( ( strcmp( ( *pBase )->item.asSymbol.value->szName, "EVAL" ) == 0 ||
+            strcmp( ( *pBase )->item.asSymbol.value->szName, "__EVAL" ) == 0 ) &&  pBase != hb_stack.pItems )
       {
-         strcpy( szName, hb_objGetRealClsName( *( pBase + 1 ), ( *pBase )->item.asSymbol.value->szName ) );
-         if (lcb)
-          strcat( szName, ":(b)" );
-         else
-          strcat( szName, ":" );
+         pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
+         bBlock = TRUE ;
+      }
+
+      if( szName )
+      {
+         if( ( *( pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
+         {
+            strcpy( szName, hb_objGetRealClsName( *( pBase + 1 ), ( *pBase )->item.asSymbol.value->szName ) );
+            strcat( szName, ":" );
+         }
+
+         if( bBlock )
+         {
+            strcat( szName, "(b)" );
+         }
+
          strcat( szName, ( *pBase )->item.asSymbol.value->szName );
       }
-      else
-       {
-        if (lcb)  /* Back to standart code block */
-         {
-          pBase = hb_stack.pBase;
-          while( ( iLev-- > 0 ) && pBase != hb_stack.pItems )
-           pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
-         }
-         strcpy( szName, ( *pBase )->item.asSymbol.value->szName );
-       }
+
+      if( uLine )
+      {
+         *uLine = ( *pBase )->item.asSymbol.lineno;
+      }
    }
-   else
-      strcpy( szName, "" );
 
    return szName;
 }
-

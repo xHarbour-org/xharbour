@@ -1,5 +1,5 @@
 /*
- * $Id: spfiles.c,v 1.3 2002/03/16 00:34:13 ronpinkas Exp $
+ * $Id: spfiles.c,v 1.4 2002/03/16 03:14:22 ronpinkas Exp $
  */
 
 /*
@@ -55,51 +55,61 @@
 
 BOOL hb_spFile( BYTE * pFilename, BYTE RetPath[ _POSIX_PATH_MAX + 3 + 10 ] )
 {
-   BYTE path[ _POSIX_PATH_MAX + 3 + 10 ];
+   BYTE *Path;
    BOOL bIsFile = FALSE;
    PHB_FNAME pFilepath;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_spFile(%s, %p)", (char*) pFilename));
+   HB_TRACE(HB_TR_DEBUG, ("hb_spFile(%s, %p)", (char*) pFilename, RetPath));
+
+   if( RetPath )
+   {
+      Path = RetPath;
+   }
+   else
+   {
+      Path = hb_xgrab( _POSIX_PATH_MAX + 3 + 10 );
+   }
 
    pFilepath = hb_fsFNameSplit( (char*) pFilename );
+
    if( pFilepath->szPath )
    {
-      hb_fsFNameMerge( (char*) path, pFilepath );
-      bIsFile = hb_fsFile( path );
+      hb_fsFNameMerge( (char*) Path, pFilepath );
+      bIsFile = hb_fsFile( Path );
    }
    else
    {
       if( hb_set.HB_SET_DEFAULT )
       {
          pFilepath->szPath = hb_set.HB_SET_DEFAULT;
-         hb_fsFNameMerge( (char*) path, pFilepath );
-         bIsFile = hb_fsFile( path );
+         hb_fsFNameMerge( (char*) Path, pFilepath );
+         bIsFile = hb_fsFile( Path );
       }
 
       if( !bIsFile && hb_set.HB_SET_PATH )
       {
-         HB_PATHNAMES * nextPath = hb_setGetFirstSetPath();
-         while( !bIsFile && nextPath )
+         HB_PATHNAMES *NextPath = hb_setGetFirstSetPath();
+
+         while( bIsFile == FALSE && NextPath )
          {
-            pFilepath->szPath = nextPath->szPath;
-            hb_fsFNameMerge( (char*) path, pFilepath );
-            bIsFile = hb_fsFile( path );
-            nextPath = nextPath->pNext;
+            pFilepath->szPath = NextPath->szPath;
+            hb_fsFNameMerge( (char*) Path, pFilepath );
+            bIsFile = hb_fsFile( Path );
+            NextPath = NextPath->pNext;
          }
       }
    }
+
    hb_xfree( pFilepath );
 
-   if( bIsFile )
+   if( bIsFile == FALSE )
    {
-      if( RetPath )
-      {
-         strcpy( (char *) RetPath, (const char *) path );
-      }
+      Path[0] = '\0';
    }
-   else
+
+   if( RetPath == NULL )
    {
-      *path = '\0';
+      hb_xfree( Path );
    }
 
    return bIsFile;
