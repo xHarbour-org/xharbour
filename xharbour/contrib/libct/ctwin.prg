@@ -4,7 +4,7 @@
 *   write by Adam Lubszczyk    alubszcz@rsw.pl                     *
 ********************************************************************
 /*
- * $Id: ctwin.prg,v 1.7 2004/06/30 21:59:31 ronpinkas Exp $
+ * $Id: ctwin.prg,v 1.8 2004/07/01 18:44:46 jabrecer Exp $
  */
 
 /*
@@ -1379,7 +1379,7 @@ RETURN NIL
 ************
 METHOD SetPos(nT,nL) CLASS TctWIN
 LOCAL nTop, nLeft
- nTop := ::UsedT + nT
+ nTop := ::UsedT + nT +1
  IF nTop < ::PosT
    nTop := ::PosT
  ELSE
@@ -1413,7 +1413,7 @@ METHOD MaxRow( lMode) CLASS TctWIN
    local nRet  := maxrow() // Default
 
    If lMode == Nil .or. !lMode
-      nRet := ::UsedB - ::UsedT
+      nRet := ::UsedB - ::UsedT+1
    EndIF
 
 RETURN nRet

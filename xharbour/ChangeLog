@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3333 2004/08/24 07:49:28 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3334 2004/08/24 08:32:35 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-24 10:55 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com>
+  * contrib/libct/ctwin.prg
+    ! minor fix to maxrow() and Setpos() methods( bottom line is an workable
+    line too, xharbour was not allow, while  clipper allow print text to
+    bottom line
 
 2004-08-24 01:31 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbextern.ch
@@ -851,7 +857,7 @@
       a string variable with the HRB body. It recognizes HRB header
       signature and call hb_hrbLoad() or hb_hrbLoadFromFile() properly.
 
-2004-07-31 20:10 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com
+2004-07-31 20:10 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com>
   * include/thread.h
     ! on Single thread use the hb_GetStack() function insted of hb_stack var.
       this allow acess to app stack on dll
