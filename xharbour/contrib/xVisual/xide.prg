@@ -49,7 +49,6 @@ FUNCTION Main
 
    oApp := Application():Initialize()
 
-
    // splash screen
 //   oSplash := TSplash():New( oApp, "visualxharbour.bmp", 3000 )
 
@@ -62,9 +61,9 @@ FUNCTION Main
          :MainStatusBar()
 
          // add the object windows
-         :Add( /*'ObjTree',*/ ObjTree():New( MainFrame ) )
-         :Add( /*'ObjInsp',*/ ObjInspect():New( MainFrame ) )
-         :Add( /*'ObjEdit',*/ ObjEdit():New( MainFrame ) )
+         :Add( ObjTree():New( MainFrame ) )
+         :Add( ObjInspect():New( MainFrame ) )
+         :Add( ObjEdit():New( MainFrame ) )
 
          // focus to main Frame
          :SetFocus()
@@ -112,10 +111,10 @@ return(self)
 METHOD MainToolBar() CLASS MainFrame
    local n, oTool, oSplash
    LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab
-   ::Add( /*"Rebar",*/ TRebar():New( MainFrame ) )
+   ::Add( TRebar():New( MainFrame ) )
 
     // add the xmake toolbar
-   With Object ::Add( /*"Tools",*/ TToolBar():New( MainFrame, 444, 15, , , 26, 26, 20, 20, 14 ))
+   With Object ::Add( TToolBar():New( MainFrame, 444, 15, , , 26, 26, 20, 20, 14 ))
       :AddButton( "NewProj",      ToolButton():New( 0,,"New Project",                    100 ) )
       :AddButton( "OpenProj",     ToolButton():New( 1,,"Open Project",                   101 ) )
       :AddButton( "Properties",   ToolButton():New( 2,,"Properties",                     102 ) )
@@ -143,10 +142,11 @@ METHOD MainToolBar() CLASS MainFrame
    ::Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolBar:handle, 200, 52, 200, "", NIL )
 
    // add the TabControl on the Rebarband
-   With Object ::Add( /*"Tabs",*/ TTabControl():New( MainFrame, 445,  0,  0,  0,  0) )
-      :AddTab( "StdTab", TabPage():New( MainFrame:TabControl, "Standard" ) )
+   
+   With Object ::Add( ToolTabs():New( MainFrame, 445,  0,  0,  0,  0) )
+      :AddTab( "StdTab", TabPage():New( MainFrame:ToolTabs, "Standard" ) )
       :AddTab( "Additional" )
-      :AddTab( "Win32", TabPage():New( MainFrame:TabControl, "Win32" ) )
+      :AddTab( "Win32", TabPage():New( MainFrame:ToolTabs, "Win32" ) )
       :AddTab( "System" )
       :AddTab( "Internet" )
       :AddTab( "Dialogs" )
@@ -155,13 +155,13 @@ METHOD MainToolBar() CLASS MainFrame
       :AddTab( "Activex" )
       :Configure()
    End
-   ::Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::TabControl:handle, 550, 56, , "", NIL )
+   ::Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolTabs:handle, 550, 56, , "", NIL )
 
    // sets the controls toolbar on the TabControl
-   With Object ::TabControl:StdTab
-      :Add( /*'TabBand',*/ TRebar():New( MainFrame:TabControl:StdTab ) )
+   With Object ::ToolTabs:StdTab
+      :Add( TRebar():New( MainFrame:ToolTabs:StdTab ) )
       :Rebar:SetStyle( WS_BORDER, .F. )
-      With Object :Add( /*'StdTools',*/ TToolBar():New( MainFrame:TabControl:StdTab, 444, 14, , , 28, 28, 20, 20 ) )
+      With Object :Add( StdTools():New( MainFrame:ToolTabs:StdTab, 444, 14, , , 28, 28, 20, 20 ) )
          :SetStyle( TBSTYLE_CHECKGROUP )
          aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
                           'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
@@ -181,15 +181,15 @@ METHOD MainToolBar() CLASS MainFrame
          SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
          //---------------------------------------------------------------------
       End
-      :Rebar:AddBand( NIL, RBBS_NOVERT, :ToolBar:handle, 100, 30,  , "", NIL )
-      :ToolBar:DisableAll()
+      :Rebar:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
+      :StdTools:DisableAll()
    End
 
 //----------------------------------------------------------------------------------------------
-   With Object ::TabControl:Win32
-      :Add( /*'TabWin32',*/ TRebar():New( MainFrame:TabControl:Win32 ) )
+   With Object ::ToolTabs:Win32
+      :Add( TRebar():New( MainFrame:ToolTabs:Win32 ) )
       :Rebar:SetStyle( WS_BORDER, .F. )
-      With Object :Add( /*'Win32Tools',*/ TToolBar():New( MainFrame:TabControl:Win32, 445, 14, , , 28, 28, 20, 20 ) )
+      With Object :Add( WinTools():New( MainFrame:ToolTabs:Win32, 445, 14, , , 28, 28, 20, 20 ) )
          :SetStyle( TBSTYLE_CHECKGROUP )
          aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'Rebar', ;
                       '', '', '', '', '', '', ;
@@ -210,23 +210,35 @@ METHOD MainToolBar() CLASS MainFrame
          //---------------------------------------------------------------------
 
       End
-      :Rebar:AddBand( NIL, RBBS_NOVERT, :ToolBar:handle, 100, 30,  , "", NIL )
-      :ToolBar:DisableAll()
+      :Rebar:AddBand( NIL, RBBS_NOVERT, :WinTools:handle, 100, 30,  , "", NIL )
+      :WinTools:DisableAll()
    End
    //--------- sets a QUICK access to the control
-   ::SetLink( 'StdBar',   ::TabControl:StdTab:ToolBar)
-   ::SetLink( 'Win32Bar', ::TabControl:Win32:ToolBar )
+   ::SetLink( 'StdBar',   ::ToolTabs:StdTab:StdTools)
+   ::SetLink( 'Win32Bar', ::ToolTabs:Win32:WinTools )
 return(self)
 
 //----------------------------------------------------------------------------------------------
 
 METHOD MainStatusBar() CLASS MainFrame
-   ::Add( /*'Status',*/  TStatusBar():New( MainFrame, 'StatusBar', 1001 ) )
+   ::Add( TStatusBar():New( MainFrame, 'StatusBar', 1001 ) )
    ::StatusBar:SetPanels( { 150,380,480,580,-1 } )
    ::StatusBar:SetPanelText( 0, "Visual xHarbour" )
 return(self)
 
 //----------------------------------------------------------------------------------------------
+   CLASS ToolTabs FROM TTabControl
+      DATA Name INIT "ToolTabs"
+   ENDCLASS
+   CLASS StdTools FROM TToolBar
+      DATA Name INIT "StdTools"
+   ENDCLASS
+   CLASS WinTools FROM TToolBar
+      DATA Name INIT "WinTools"
+   ENDCLASS
+//----------------------------------------------------------------------------------------------
+
+
 #pragma BEGINDUMP
 
 #include <stdio.h>

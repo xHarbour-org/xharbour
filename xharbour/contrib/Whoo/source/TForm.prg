@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.44 2002/10/22 17:24:20 what32 Exp $
+ * $Id: TForm.prg,v 1.45 2002/10/27 01:29:25 what32 Exp $
  */
 
 /*
@@ -185,8 +185,8 @@ METHOD ChildFromId( nId ) CLASS TForm
 
 *-----------------------------------------------------------------------------*
 
-METHOD GetObj( cName ) CLASS TForm
-   local n:= ASCAN( ::Controls,{|o|o:Name==cName} )
+METHOD GetObj( cName, n ) CLASS TForm
+   n:= ASCAN( ::Controls,{|o|o:Name==cName} )
    if n>0
       return( ::Controls[n] )
    endif

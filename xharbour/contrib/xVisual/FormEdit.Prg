@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.71 2002/10/27 01:29:26 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.72 2002/10/27 19:36:16 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -89,7 +89,7 @@ GLOBAL EXTERNAL FormEdit
                                       super:New( oParent )    ,;
                                       ::XFMTop()
 
-   METHOD Add()
+   METHOD AddControl()
    METHOD OnCreate()         INLINE ::CreateSub()
    METHOD OnSize()
    METHOD OnMove()           INLINE ::Parent:ObjInspect:SetBrowserData( self,1 ),NIL
@@ -117,7 +117,7 @@ GLOBAL EXTERNAL FormEdit
 
 //----------------------------------------------------------------------------//
 
-METHOD Add( cName, oObj )
+METHOD AddControl( cName, oObj )
 
    LOCAL oCtrl
 
@@ -216,51 +216,50 @@ METHOD CreateControl(aRect)
 
       DO CASE
       CASE ::CtrlName=="Button"
-         oObj:=::Add( cName, TButton():New(   self, cName, 500,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::AddControl( cName, TButton():New(   self, cName, 500,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="Edit"
-         oObj:=::Add( cName, TEdit():New(     self, cName, 501,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::AddControl( cName, TEdit():New(     self, cName, 501,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="Label"
-         oObj:=::Add( cName, TStatic():New(   self, cName, 502,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::AddControl( cName, TStatic():New(   self, cName, 502,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="CheckBox"
-         oObj:=::Add( cName, TCheck():New(    self, cName, 503,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::AddControl( cName, TCheck():New(    self, cName, 503,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="RadioButton"
-         oObj:=::Add( cName, TRadio():New(    self, cName, 504,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::AddControl( cName, TRadio():New(    self, cName, 504,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="ComboBox"
-         oObj:=::Add( cName, TComboBox():New( self,        505,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::AddControl( cName, TComboBox():New( self,        505,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="ListBox"
-         oObj:=::Add( cName, TListBox():New(  self,        506,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::AddControl( cName, TListBox():New(  self,        506,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="StatusBar"
          IF !("2" $ cName) // only one status bar
-           oObj:=::Add( cName, TStatusBar():New( self, cName, 507 ) )
+           oObj:=::AddControl( cName, TStatusBar():New( self, cName, 507 ) )
          ENDIF
       CASE ::CtrlName=="TabControl"
-         oObj:=::Add( cName, TTabControl():New( self,        508, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::AddControl( cName, TTabControl():New( self,        508, aRect[1], aRect[2], aRect[3], aRect[4] ) )
          oObj:AddTab( "Tab1" )
          oObj:configure()
       CASE ::CtrlName=="TabPage"
       CASE ::CtrlName=="GroupBox"
-         oObj:=::Add( cName, TGroupBox():New(   self, cName, 509, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::AddControl( cName, TGroupBox():New(   self, cName, 509, aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="TreeView"
-         oObj:=::Add( cName, TTreeView():New(   self,        510, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::AddControl( cName, TTreeView():New(   self,        510, aRect[1], aRect[2], aRect[3], aRect[4] ) )
 
 
       CASE ::CtrlName=="Rebar"
          IF !("2" $ cName) // only one Rebar
             cRebar := cName
-            oObj:=::Add( cName, TRebar():New( self ) )
+            oObj:=::AddControl( cName, TRebar():New( self ) )
+            oObj:AddBand( , RBBS_GRIPPERALWAYS+RBBS_NOVERT+RBBS_BREAK, oObj:handle, 200, 20, 200, "", NIL )
+//            MainFrame:ObjTree:TreeView:GetItem( n ):Add( oObj:Name,1, oObj:handle )
          ENDIF
 
       CASE ::CtrlName=="ToolBar"
-         oObj:=::Add( cName, TToolBar():New( self, 511, 2, HINST_COMMCTRL, IDB_STD_SMALL_COLOR, 16, 16, 16, 16, 14 ) )
+         oObj:=::AddControl( cName, TToolBar():New( self, 511, 2, HINST_COMMCTRL, IDB_STD_SMALL_COLOR, 16, 16, 16, 16, 14 ) )
          oObj:AddButton("New", ToolButton():New( 0 , ,"New",  100 ) )
          oObj:AddButton("Open",ToolButton():New( 1 , ,"Open", 100 ) )
-         IF cRebar != NIL
-            ::GetObj(cRebar):AddBand( , RBBS_GRIPPERALWAYS+RBBS_NOVERT+RBBS_BREAK, oObj:handle, 200, 20, 200, "", NIL )
-            ::Parent:ObjTree:GetItem(::GetObj(cRebar)):Add( oObj:Name,1, oObj:handle )
-         ENDIF
+         UpdateWindow( oObj:handle )
 
       CASE ::CtrlName=="ProgressBar"
-         oObj:=::Add( cName, TProgressBar():New( self, aRect[1], aRect[2], aRect[3], aRect[4] ) )
+         oObj:=::AddControl( cName, TProgressBar():New( self, aRect[1], aRect[2], aRect[3], aRect[4] ) )
       OTHERWISE // unknown name
 
          ::CtrlName    :=NIL
@@ -274,8 +273,8 @@ METHOD CreateControl(aRect)
 
          MainFrame:ObjInspect:ComboBox:AddString(oObj:name+chr(9)+oObj:ClassName(),oObj)
          MainFrame:ObjInspect:ComboBox:SetCurSel(MainFrame:ObjInspect:ComboBox:GetCount()-1)
-         oTree := ::Parent:ObjTree:TreeView:Add( oObj:Name,1, oObj:handle )
-         ::Parent:ObjTree:TreeView:Expand()
+         oTree := MainFrame:ObjTree:TreeView:Add( oObj:Name,1, oObj:handle )
+         MainFrame:ObjTree:TreeView:Expand()
 
          IF !EMPTY(oObj:Controls)
             FOR n:=1 TO LEN(oObj:Controls)

@@ -1,5 +1,5 @@
 /*
- * $Id: TPanel.prg,v 1.11 2002/10/17 09:59:15 what32 Exp $
+ * $Id: TPanel.prg,v 1.12 2002/10/19 10:03:39 what32 Exp $
  */
 
 /*
@@ -67,6 +67,9 @@ ENDCLASS
 
 METHOD New( oParent ) CLASS TPanel
    
+   ::WinClass    := IFNIL( ::WinClass, "Panel", ::WinClass )
+   ::ControlName := IFNIL( ::ControlName, "Panel", ::ControlName )
+
    ::WndProc   := IFNIL(::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL(::Msgs,-1,::Msgs)
    ::FrameWnd  := .F.
