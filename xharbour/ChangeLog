@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.394 2002/09/21 16:34:40 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.395 2002/09/23 00:40:36 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -18,7 +18,7 @@
     + Readded support for HB_P_PUSHGLOBALREF
 
   * source/vm/hvm.c
-    +  Added HB_ITEM hb_vmaGlobals - Harbour array to register all GLOBALS for GC.
+    +  Added HB_ITEM hb_vm_aGlobals - Harbour array to register all GLOBALS for GC.
 
   * source/compiler/genc.c
     * Changed _RELEASEGLOBALS to hb_RELEASEGLOBALS
