@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3472 2004/09/28 09:44:12 likewolf Exp $
+ * $Id: ChangeLog,v 1.3473 2004/09/28 15:32:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-09-29 16:23 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * xharbour/source/rtl/gtos2/Makefile
+    ! fixed HB_MULTI_GT support on OS/2
 
 2004-09-28 08:31 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbdefs.h
