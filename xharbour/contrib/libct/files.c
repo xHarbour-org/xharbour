@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.2 2003/03/22 17:22:44 lculik Exp $
+ * $Id: files.c,v 1.3 2003/06/09 21:08:04 lculik Exp $
  */
 
 /*
@@ -847,12 +847,12 @@ HB_FUNC( FILETIME )
             if ( FileTimeToSystemTime( &ft, &time ) )
             {
 
-                if (  iSize = GetDateFormat( NULL, 0, &time, tszFormat, NULL, 0 ) )
+                if (  iSize = GetDateFormat( 0, 0, &time, tszFormat, NULL, 0 ) )
                 {
                      LPTSTR tszDateString;
                     if (  tszDateString = ( LPTSTR )malloc( iSize+sizeof( TCHAR ) ) )
                     {
-                        if ( GetDateFormat( NULL, 0, &time, tszFormat, tszDateString, iSize ) )
+                        if ( GetDateFormat( 0, 0, &time, tszFormat, tszDateString, iSize ) )
                             return tszDateString;
                         free( tszDateString );
                     }
@@ -874,12 +874,12 @@ HB_FUNC( FILETIME )
             if ( FileTimeToSystemTime( &ft, &time ) )
             {
                 int iSize;
-                if (  iSize = GetTimeFormat( NULL, 0, &time, tszFormat, NULL, 0 ) )
+                if (  iSize = GetTimeFormat( 0, 0, &time, tszFormat, NULL, 0 ) )
                 {
                      LPTSTR tszDateString;
                     if (  tszDateString = ( LPTSTR )malloc( iSize+sizeof( TCHAR ) ) )
                     {
-                        if ( GetTimeFormat( NULL, 0, &time, tszFormat, tszDateString, iSize ) )
+                        if ( GetTimeFormat( 0, 0, &time, tszFormat, tszDateString, iSize ) )
                             return tszDateString;
                         free( tszDateString );
                     }
