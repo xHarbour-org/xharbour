@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.68 2002/10/22 17:44:57 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.69 2002/10/25 21:29:12 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -391,6 +391,7 @@ METHOD XFMTop() CLASS TFormEdit
    aAdd( ::aXFM[ XFM_Header ], '#include "hbclass.ch"' )
    aAdd( ::aXFM[ XFM_Header ], '#include "xide.ch"' )
 
+   aAdd( ::aXFM[ XFM_Class ], "// ! AUTO_GENERATED !" )
    aAdd( ::aXFM[ XFM_Class ], "CLASS " + ::Caption + " FROM TForm" )
 
    aAdd( ::aXFM[ XFM_EndClass ], "END CLASS //" + ::Caption )
@@ -512,7 +513,7 @@ METHOD XFMReflect() CLASS TFormEdit
       IF ValType( aVar[2] ) == 'O'
          ctext += ValToPrg( aVar[2], aVar[1], 6 ) + CRLF
       ELSE
-         cText += "      VAR " + aVar[1] + " INIT " + ValToPrg( aVar[2] ) + CRLF
+         cText += "      DATA " + aVar[1] + " INIT " + ValToPrg( aVar[2] ) + CRLF
       ENDIF
    NEXT
 

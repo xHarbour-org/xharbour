@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.92 2002/10/19 10:03:48 what32 Exp $
+ * $Id: xide.prg,v 1.93 2002/10/25 21:29:12 ronpinkas Exp $
  */
 
 /*
@@ -27,9 +27,6 @@
  *
  */
 
-GLOBAL MainFrame
-GLOBAL FormEdit
-
 #include "windows.ch"
 #include "wingdi.ch"
 #include "common.ch"
@@ -42,6 +39,8 @@ GLOBAL FormEdit
 #include "cstruct.ch"
 
 GLOBAL oApp
+GLOBAL MainFrame
+GLOBAL FormEdit
 
 //-------------------------------------------------------------------------------------------
 
@@ -99,7 +98,8 @@ METHOD MainMenu() CLASS TMainFrame
    With Object ::WindowMenu
       :AddPopup('&Test')
       With Object :Popup
-         :AddItem( 'Editor', 101, {||oApp:CreateForm( @FormEdit,TFormEdit(), oApp:MainFrame ) } )
+         :AddItem( 'Editor', 101, {||oApp:CreateForm( @FormEdit, TFormEdit(), oApp:MainFrame ) } )
+         :AddItem( 'Open', 102, {|| XFMOpen( "Form1.prg" ) } )
          :AddSeparator()
          :AddItem( 'Exit'  , 200, {||oApp:MainFrame:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
       end
@@ -226,6 +226,485 @@ METHOD MainStatusBar() CLASS TMainFrame
    ::Status:SetPanelText( 0, "Visual xHarbour" )
 return(self)
 
-
 //----------------------------------------------------------------------------------------------
+#pragma BEGINDUMP
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+
+#include <windows.h>
+
+#include "hbapi.h"
+#include "hbstack.h"
+#include "hbapierr.h"
+#include "hbapiitm.h"
+#include "hbvm.h"
+
+#define SKIP_SPACE() { while( *sText == ' ' || *sText == '\t' ) sText++; }
+#define SKIP_EOL() { while( *sText == '\n' || *sText == '\r' ) sText++; }
+
+int XFMParse( char *sText );
+
+HB_FUNC( XFMOPEN )
+{
+   PHB_ITEM pXFM = hb_param( 1, HB_IT_STRING );
+   FILE *fh;
+   long lSize ;
+   char *sXFM;
+   int  iErr;
+
+   //printf( "File: %s Handle: %p\n", argv[1], fh );
+
+   if( pXFM )
+   {
+      fh = fopen( pXFM->item.asString.value, "r" );
+   }
+   else
+   {
+      fh = NULL;
+   }
+
+   if( fh )
+   {
+      fseek( fh, 0, SEEK_END );
+      if( ( iErr = ferror( fh ) ) != 0 )
+      {
+         OutputDebugString( "I/O Error\n" );
+         hb_retl( 0 );
+         fclose( fh );
+         return;
+      }
+
+      lSize = ftell( fh );
+
+      if( lSize > 0 )
+      {
+         sXFM = malloc( lSize + 1 );
+
+         fseek( fh, 0, SEEK_SET );
+         if( ( iErr = ferror( fh ) ) != 0 )
+         {
+            OutputDebugString( "I/O Error\n" );
+            hb_retl( 0 );
+            fclose( fh );
+            return;
+         }
+
+         fread( sXFM, 1, lSize, fh );
+         if( ( iErr = ferror( fh ) ) != 0 )
+         {
+            OutputDebugString( "I/O Error\n" );
+            hb_retl( 0 );
+            fclose( fh );
+            return;
+         }
+
+         //printf( "%s", sXFM );
+         hb_retl( ! XFMParse( sXFM ) );
+         fclose( fh );
+      }
+   }
+
+   hb_retl( 1 );
+}
+
+int XFMParse( char *sText )
+{
+   char sClass[64], sFromClass[64], sVar[64], sExp[64], *pTemp, *pEnd[16];
+   int i, iEnd = 0;
+   static PHB_DYNS pCreateForm = NULL;
+   static PHB_DYNS pTFormEdit = NULL;
+
+   if( pCreateForm == NULL )
+   {
+      pCreateForm = hb_dynsymFind( "CreateForm" );
+   }
+
+   if( pTFormEdit == NULL )
+   {
+      pTFormEdit = hb_dynsymFind( "TFormEdit" );
+   }
+
+   //OutputDebugString( sText );
+
+   sText = strstr( sText, "// ! AUTO_GENERATED !" );
+   if( ! sText )
+   {
+      return 0;
+   }
+   sText += 21;
+
+   sText = strstr( sText, "CLASS" );
+   if( ! *sText )
+   {
+      return 0;
+   }
+   sText += 5;
+
+   SKIP_SPACE();
+
+   i = 0;
+   while( isalnum( *sText ) )
+   {
+     sClass[i++] = *sText++;
+   }
+   sClass[i] = '\0';
+
+   OutputDebugString( "Class: " );
+   OutputDebugString( (char *) sClass );
+
+   SKIP_SPACE();
+
+   if( strncmp( sText, "FROM", 4 ) )
+   {
+      return 0;
+   }
+   sText += 4;
+
+   SKIP_SPACE();
+
+   i = 0;
+   while( isalnum( *sText ) )
+   {
+     sFromClass[i++] = *sText++;
+   }
+   sFromClass[i] = '\0';
+
+   OutputDebugString( " From: " );
+   OutputDebugString( sFromClass );
+   OutputDebugString( "\n" );
+
+   /*
+   //TFormEdit()
+   hb_vmPushSymbol( pTFormEdit->pSymbol );
+   hb_vmPushNil();
+   hb_vmDo( 0 );
+
+   //oApp:CreateForm( @FormEdit, TFormEdit(), oApp:MainFrame
+   hb_vmPushSymbol( pCreateForm->pSymbol );
+   hb_vmPush( &OAPP );
+   hb_vmPushNil();
+   hb_vmPush( &MAINFRAME );
+   hb_vmPush( &hb_stack.Return );
+   hb_itemClear( &hb_stack.Return );
+   hb_vmSend( 3 );
+   */
+
+   pEnd[ iEnd ] = strstr( sText, "END CLASS" );
+   if( pEnd[ iEnd ] == NULL )
+   {
+      return 0;
+   }
+   pEnd[ iEnd++ ][0] = '\0';
+
+   SKIP_SPACE();
+
+   SKIP_EOL();
+
+   SKIP_SPACE();
+
+ Vars:
+
+   if( strncmp( sText, "DATA", 4 ) )
+   {
+      goto Controls;
+   }
+   sText += 4;
+
+   SKIP_SPACE();
+
+   i = 0;
+   while( isalnum( *sText ) )
+   {
+     sVar[i++] = *sText++;
+   }
+   sVar[i] = '\0';
+
+   OutputDebugString( "Var: " );
+   OutputDebugString( (char *) sVar );
+
+   SKIP_SPACE()
+
+   if( strncmp( sText, "INIT", 4 ) )
+   {
+      return 0;
+   }
+   sText += 4;
+
+   SKIP_SPACE();
+
+   i = 0;
+   while( i < 64 && *sText && *sText != '\n' )
+   {
+     sExp[i++] = *sText++;
+   }
+   sExp[i] = '\0';
+
+   if( *sText != '\n' )
+   {
+      return 0;
+   }
+
+   OutputDebugString( " = " );
+   OutputDebugString( (char *) sExp );
+   OutputDebugString( "\n" );
+
+   SKIP_EOL();
+
+   SKIP_SPACE();
+
+   goto Vars;
+
+ Controls:
+
+   if( strncmp( sText, "CONTROL", 6 ) )
+   {
+      return 1;
+   }
+   sText += 7;
+
+   SKIP_SPACE();
+
+   i = 0;
+   while( isalnum( *sText ) )
+   {
+     sClass[i++] = *sText++;
+   }
+   sClass[i] = '\0';
+
+   OutputDebugString( "Control: " );
+   OutputDebugString( (char *) sClass );
+
+   SKIP_SPACE();
+
+   if( strncmp( sText, " FROM", 4 ) )
+   {
+      return 0;
+   }
+   sText += 4;
+
+   SKIP_SPACE();
+
+   i = 0;
+   while( isalnum( *sText ) )
+   {
+     sFromClass[i++] = *sText++;
+   }
+   sFromClass[i] = '\0';
+
+   OutputDebugString( "From: " );
+   OutputDebugString( (char *) sFromClass );
+   OutputDebugString( "\n" );
+
+   pEnd[ iEnd ] = strstr( sText, "END CONTROL" );
+   if( pEnd[ iEnd ] == NULL )
+   {
+      return 0;
+   }
+   pEnd[ iEnd++ ][0] = '\0';
+
+   SKIP_SPACE();
+
+   SKIP_EOL();
+
+   SKIP_SPACE();
+
+ Properties:
+
+   if( *sText != ':' )
+   {
+      if( strncmp( sText, "OBJECT", 6 ) )
+      {
+         if( *sText == '\0' )
+         {
+            OutputDebugString( "END\n" );
+
+            sText = pEnd[ --iEnd ] + 10;
+
+            sText = strchr( sText, '\n' );
+            if( sText == NULL )
+            {
+               return 0;
+            }
+
+            SKIP_EOL();
+
+            SKIP_SPACE();
+         }
+
+         if( *sText == ':' )
+         {
+            goto Properties;
+         }
+
+         goto Vars;
+      }
+
+      sText += 6;
+
+      SKIP_SPACE();
+
+      i = 0;
+      while( isalnum( *sText ) )
+      {
+        sClass[i++] = *sText++;
+      }
+      sClass[i] = '\0';
+
+      OutputDebugString( "Object: " );
+      OutputDebugString( (char *) sClass );
+
+      SKIP_SPACE();
+
+      if( strncmp( sText, "IS", 2 ) )
+      {
+         return 0;
+      }
+      sText += 2;
+
+      SKIP_SPACE();
+
+      i = 0;
+      while( isalnum( *sText ) )
+      {
+        sFromClass[i++] = *sText++;
+      }
+      sFromClass[i] = '\0';
+
+      OutputDebugString( "IS: " );
+      OutputDebugString( (char *) sFromClass );
+      OutputDebugString( "\n" );
+
+      pEnd[ iEnd ] = strstr( sText, "END OBJECT" );
+      if( pEnd[ iEnd ] == NULL )
+      {
+         return 0;
+      }
+
+
+      pEnd[ iEnd++ ][0] = '\0';
+
+      SKIP_SPACE();
+
+      SKIP_EOL();
+
+      SKIP_SPACE();
+
+      goto Properties;
+   }
+
+   sText += 1;
+
+   SKIP_SPACE();
+
+   i = 0;
+   while( isalnum( *sText ) )
+   {
+     sVar[i++] = *sText++;
+   }
+   sVar[i] = '\0';
+
+   SKIP_SPACE();
+
+   if( strncmp( sText, ":=", 2 ) )
+   {
+      if( strncmp( sVar, "SetMethod", 9 ) == 0 && *sText == '(' )
+      {
+         sText++;
+
+         SKIP_SPACE();
+
+         if( *sText == '"' )
+         {
+            sText++;
+
+            i = 0;
+            while( isalnum( *sText ) )
+            {
+              sVar[i++] = *sText++;
+            }
+            sVar[i] = '\0';
+
+            sText++;
+
+            OutputDebugString( "Event: " );
+            OutputDebugString( (char *) sVar );
+
+            SKIP_SPACE();
+
+            if( *sText != ',' )
+            {
+               return 0;
+            }
+            sText++;
+
+            SKIP_SPACE()
+
+            if( strncmp( sText, "{ ||", 4 ) )
+            {
+               return 0;
+            }
+            sText += 4;
+
+            SKIP_SPACE();
+
+            i = 0;
+            while( isalnum( *sText ) || *sText == '_' )
+            {
+              sExp[i++] = *sText++;
+            }
+            sExp[i] = '\0';
+
+            OutputDebugString( " = " );
+            OutputDebugString( (char *) sExp );
+            OutputDebugString( "\n" );
+
+            sText = strchr( sText, '\n' );
+            if( sText == NULL )
+            {
+               return 0;
+            }
+
+            SKIP_EOL();
+
+            SKIP_SPACE();
+
+            goto Properties;
+         }
+      }
+      return 0;
+   }
+
+   OutputDebugString( "Var: " );
+   OutputDebugString( (char *) sVar );
+
+   sText += 2;
+
+   SKIP_SPACE()
+
+   i = 0;
+   while( i < 64 && *sText && *sText != '\n' )
+   {
+     sExp[i++] = *sText++;
+   }
+   sExp[i] = '\0';
+
+   if( *sText != '\n' )
+   {
+      return 0;
+   }
+
+   OutputDebugString( " = " );
+   OutputDebugString( (char *) sExp );
+   OutputDebugString( "\n" );
+
+   SKIP_EOL();
+
+   SKIP_SPACE();
+
+   goto Properties;
+}
+
+#pragma ENDDUMP
