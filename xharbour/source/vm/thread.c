@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.7 2002/12/20 08:39:43 ronpinkas Exp $
+* $Id: thread.c,v 1.8 2002/12/20 19:00:49 ronpinkas Exp $
 */
 
 /*
@@ -234,7 +234,6 @@ void hb_destroyContextFromHandle( HB_THREAD_HANDLE th_h )
     {
         HB_CRITICAL_UNLOCK( context_monitor );
         // TODO Error.
-        printf( "No context for %i\n" );
     }
 }
 
@@ -353,7 +352,11 @@ hb_create_a_thread(
     free( pt );
     hb_destroyContext();
 
-    return NULL;
+#ifdef HB_OS_WIN_32
+   return 0;
+#else
+   return NULL;
+#endif
 }
 
 HB_FUNC( STARTTHREAD )
@@ -554,7 +557,6 @@ HB_FUNC( CREATEMUTEX )
 
     HB_MUTEX_INIT( mt->mutex );
     HB_COND_INIT( mt->cond );
-
     mt->lock_count = 0;
     mt->waiting = 0;
     mt->locker = 0;
@@ -891,5 +893,18 @@ HB_FUNC( WAITFORTHREADS )
         #endif
     }
 }
+
+/*
+JC: I am leaving this in the source code for now; you can never know, this could
+be useful in the future.
+
+#if defined( HB_OS_WIN_32 )
+void hb_SignalObjectAndWait( HB_COND_T hToSignal, HB_MUTEX_T hToWaitFor, DWORD dwMillisec, BOOL bUnused )
+{
+    ReleaseMutex( hToSignal );
+    WaitForSingleObject( hToWaitFor, dwMillisec );
+}
+#endif */
+
 #endif
 

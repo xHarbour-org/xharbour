@@ -121,10 +121,10 @@
             gettimeofday(&now, 0);\
             timeout.tv_sec = now.tv_sec + t /1000;\
             timeout.tv_nsec = now.tv_usec * 1000 + (t % 1000) * 1000000 ;\
-            pthread_cond_timedwait( &x, &y, &timeout );\
+            pthread_cond_timedwait( &(x), &(y), &timeout );\
         }
-    #define HB_COND_SIGNAL( x )         pthread_cond_signal( &x )
-    #define HB_COND_DESTROY( x )        pthread_cond_destroy( &x )
+    #define HB_COND_SIGNAL( x )         pthread_cond_signal( &(x) )
+    #define HB_COND_DESTROY( x )        pthread_cond_destroy( &(x) )
 
     #define HB_CURRENT_THREAD           pthread_self
     #define HB_CURRENT_THREAD_HANDLE    pthread_self

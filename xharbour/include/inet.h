@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.4 2002/12/20 19:41:45 ronpinkas Exp $
+* $Id: inet.h,v 1.5 2002/12/20 20:20:34 ronpinkas Exp $
 */
 
 /*
@@ -106,6 +106,26 @@ typedef struct tag_HB_SOCKET_STRUCT
     }
 
 #define HB_SOCKET_FREE( s ) hb_xfree( s )
+
+#ifndef SHUT_RDWR
+    #define SHUT_RDWR   2
+#endif
+
+#ifndef MSG_NOSIGNAL
+    #define MSG_NOSIGNAL  0x4000
+#endif
+
+#ifndef MSG_DONTWAIT
+    #define MSG_DONTWAIT    0x40
+#endif
+
+#ifndef MSG_WAITALL
+    #define MSG_WAITALL 0x100
+#endif
+
+#ifndef MSG_PEEK
+    #define MSG_PEEK 0x02
+#endif
 
 
 #endif
