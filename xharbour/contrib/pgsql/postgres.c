@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
  *
@@ -53,13 +55,32 @@
 #include <hbapi.h>
 #include <hbapifs.h>
 #include <hbapiitm.h>
-#include <libpq-fe.h>
+#include "libpq-fe.h"
 
 #define _CLIPDEFS_H
 #if defined(HB_OS_WIN_32_USED)
    #include <windows.h>
 #endif
 
+#define VARHDRSZ                4
+#define BOOLOID	                16
+#define INT8OID			20
+#define INT2OID			21
+#define INT4OID			23
+#define TEXTOID			25
+#define FLOAT4OID               700
+#define FLOAT8OID               701
+#define CASHOID                 790                                                                
+#define BPCHAROID		1042
+#define VARCHAROID		1043
+#define DATEOID			1082
+#define TIMEOID			1083
+#define TIMESTAMPOID	        1114
+#define TIMESTAMPTZOID	        1184
+#define TIMETZOID		1266
+#define BITOID	                1560
+#define VARBITOID	        1562
+#define NUMERICOID		1700
 
 HB_FUNC(PQCONNECT)
 {
@@ -67,78 +88,44 @@ HB_FUNC(PQCONNECT)
     PGconn         *conn;
     PHB_ITEM   db_handle;
 
-    if (hb_pcount() != 5)
-    {
-        hb_retc("");
-        return;
-    }
-
-    sprintf(conninfo, "dbname = %s host = %s user = %s password = %s port = %i",
-                                           hb_parcx(1), hb_parcx(2), hb_parcx(3), hb_parcx(4), hb_parni(5) );
-
-    conn = PQconnectdb(conninfo);
-
-    if (PQstatus(conn) != CONNECTION_OK)
-    {
-        hb_retc(PQerrorMessage(conn));
-        PQfinish(conn);
-        return;
-    }
-
-    db_handle = hb_itemPutPtr( NULL, ( void * ) conn );
-    hb_itemReturn(db_handle);
-    hb_itemRelease(db_handle);
-
+    if (hb_pcount() == 5)
+    {    
+        sprintf(conninfo, "dbname = %s host = %s user = %s password = %s port = %i",
+                                           hb_parc(1), hb_parc(2), hb_parc(3), hb_parc(4), hb_parni(5) );
+        conn = PQconnectdb(conninfo);
+    }    
+    hb_retptr( conn );
 }
 
 HB_FUNC(PQCLOSE)
 {
     if (hb_parinfo(1))
-        PQfinish(( PGconn * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) ));
+        PQfinish(( PGconn * ) hb_parpointer(1));
 }
 
 HB_FUNC(PQCLEAR)
 {
     if (hb_parinfo(1))
-        PQclear(( PGresult * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) ));
+        PQclear(( PGresult * ) hb_parpointer(1));
 }
 
 HB_FUNC(PQEXEC)
 {
-    PGconn     *conn;
     PGresult   *res;
-    PHB_ITEM   qry_handle;
 
     if (hb_pcount() == 2)
-    {
-        conn = ( PGconn * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+        res = PQexec(( PGconn * ) hb_parpointer(1), hb_parc(2));
 
-        res = PQexec(conn, hb_parcx(2));
-
-        if (PQresultStatus(res) != PGRES_COMMAND_OK && PQresultStatus(res) != PGRES_TUPLES_OK )
-        {
-            hb_retc(PQresultErrorMessage(res));
-            PQclear(res);
-            return;
-        }
-
-        qry_handle = hb_itemPutPtr( NULL, ( void * ) res );
-        hb_itemReturn(qry_handle);
-        hb_itemRelease(qry_handle);
-    }
-    else
-        hb_retc("");
+    hb_retptr( res );        
 }
 
 HB_FUNC(PQEXECPARAMS)
 {
-    PGconn     *conn;
     PGresult   *res;
     const char **paramvalues;
     int        i;
     long       n;
 
-    PHB_ITEM   qry_handle;
     PHB_ITEM   aParam;
 
     if (hb_pcount() == 3)
@@ -152,25 +139,11 @@ HB_FUNC(PQEXECPARAMS)
         for (i=0;i < n;i++)
             paramvalues[i] = hb_arrayGetCPtr( aParam, i + 1 );
 
-        conn = ( PGconn * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-
-        res = PQexecParams(conn, hb_parcx(2), n, NULL, paramvalues, NULL, NULL, 1);
+        res = PQexecParams(( PGconn * ) hb_parpointer(1), hb_parc(2), n, NULL, paramvalues, NULL, NULL, 1);
 
         hb_xfree(paramvalues);
-
-        if (PQresultStatus(res) != PGRES_COMMAND_OK && PQresultStatus(res) != PGRES_TUPLES_OK )
-        {
-            hb_retc(PQresultErrorMessage(res));
-            PQclear(res);
-            return;
-        }
-
-        qry_handle = hb_itemPutPtr( NULL, ( void * ) res );
-        hb_itemReturn(qry_handle);
-        hb_itemRelease(qry_handle);
     }
-    else
-        hb_retc("");
+    hb_retptr( res );        
 }
 
 HB_FUNC(PQFCOUNT)
@@ -180,7 +153,7 @@ HB_FUNC(PQFCOUNT)
 
     if (hb_parinfo(1))
     {
-        res = ( PGresult * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+        res = ( PGresult * ) hb_parpointer(1);
 
         if (PQresultStatus(res) == PGRES_TUPLES_OK)
                 nFields = PQnfields(res);
@@ -196,7 +169,7 @@ HB_FUNC(PQLASTREC)
 
     if (hb_parinfo(1))
     {
-        res = ( PGresult * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+        res = ( PGresult * ) hb_parpointer(1);
 
         if (PQresultStatus(res) == PGRES_TUPLES_OK)
             nRows = PQntuples(res);
@@ -211,7 +184,7 @@ HB_FUNC(PQGETVALUE)
 
     if (hb_pcount() == 3)
     {
-        res = ( PGresult * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+        res = ( PGresult * ) hb_parpointer(1);
 
         if (PQresultStatus(res) == PGRES_TUPLES_OK)
         {
@@ -224,18 +197,39 @@ HB_FUNC(PQGETVALUE)
     }
 }
 
+HB_FUNC(PQGETLENGTH)
+{
+    PGresult   *res;
+    int         nRow, nCol;
+    int         result = 0;
+
+    if (hb_pcount() == 3)
+    {
+        res = ( PGresult * ) hb_parpointer(1);
+
+        if (PQresultStatus(res) == PGRES_TUPLES_OK)
+        {
+            nRow = hb_parni(2) - 1;
+            nCol = hb_parni(3) - 1;
+
+            result = PQgetlength(res, nRow, nCol);
+        }
+    }
+    hb_retni(result);
+}
 
 HB_FUNC(PQMETADATA)
 {
     PGresult   *res;
     int         nFields, i;
+    
     PHB_ITEM aTemp;
     PHB_ITEM aNew;
     PHB_ITEM temp;
 
     if (hb_parinfo(1))
     {
-        res = ( PGresult * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+        res = ( PGresult * ) hb_parpointer(1);
 
         if (PQresultStatus(res) == PGRES_TUPLES_OK)
         {
@@ -245,36 +239,126 @@ HB_FUNC(PQMETADATA)
 
             for (i=0; i < nFields; i++ )
             {
-                aTemp = hb_itemArrayNew( 7 );
+                char    buf[256];
+                Oid     type_oid = PQftype( res, i );
+                int     typemod = PQfmod( res, i );
+                int     length = 0;
+                int     decimal = 0;
+
+                switch (type_oid)
+                {
+                        case BITOID:
+                                if (typemod >= 0)
+                                    length = (int) typemod;
+                                    
+                                strcpy(buf, "bit");
+                                break;
+        
+                        case BOOLOID:
+                                length = 1;
+                                strcpy(buf, "boolean");                                
+                                break;
+        
+                        case BPCHAROID:
+                                if (typemod >= 0)
+                                    length = (int) (typemod - VARHDRSZ);
+                                    
+                                strcpy(buf, "character");
+                                break;
+        
+                        case FLOAT4OID:
+                                strcpy(buf, "real");
+                                break;
+        
+                        case FLOAT8OID:
+                                strcpy(buf, "double precision");
+                                break;
+        
+                        case INT2OID:
+                                strcpy(buf, "smallint");
+                                break;
+        
+                        case INT4OID:
+                                strcpy(buf, "integer");
+                                break;
+        
+                        case INT8OID:
+                                strcpy(buf, "bigint");
+                                break;
+        
+                        case NUMERICOID:
+                                length = ((typemod - VARHDRSZ) >> 16) & 0xffff;
+                                decimal = (typemod - VARHDRSZ) & 0xffff;
+                                strcpy(buf, "numeric");
+                                break;
+                
+                        case DATEOID:
+                                strcpy(buf, "date");
+                                break;
+        
+                        case TIMEOID:
+                        case TIMETZOID:
+                                strcpy(buf, "timezone");
+                                break;
+                                        
+                        case TIMESTAMPOID:
+                        case TIMESTAMPTZOID:
+                                strcpy(buf, "timestamp");
+                                break;
+        
+                        case VARBITOID:
+                                if (typemod >= 0)
+                                        length = (int) typemod;
+                                        
+                                strcpy(buf, "bit varying");
+                                break;
+        
+                        case VARCHAROID:
+                                if (typemod >= 0)
+                                        length = (int) (typemod - VARHDRSZ);
+                                
+                                strcpy(buf, "character varying");
+                                break;
+
+                        case TEXTOID:
+                                strcpy(buf, "text");
+                                break;
+
+                        case CASHOID:
+                                strcpy(buf, "money");
+                                break;
+                                            
+                        default:
+                                strcpy(buf, "not supported");
+                                break;                                
+                }
+                
+                aTemp = hb_itemArrayNew( 6 );
 
                 temp = hb_itemPutC( NULL, PQfname( res, i ) );
                 hb_itemArrayPut( aTemp, 1, temp);
                 hb_itemRelease( temp );
-
-                temp = hb_itemPutNL( NULL, PQftable( res, i ) );
+        
+                temp = hb_itemPutC( NULL, buf );
                 hb_itemArrayPut( aTemp, 2, temp);
                 hb_itemRelease( temp );
 
-                temp = hb_itemPutNI( NULL, PQftablecol( res, i ) );
+                temp = hb_itemPutNI( NULL, length );
                 hb_itemArrayPut( aTemp, 3, temp);
                 hb_itemRelease( temp );
 
-                temp = hb_itemPutNI( NULL, PQfformat( res, i ) );
+                temp = hb_itemPutNI( NULL, decimal );
                 hb_itemArrayPut( aTemp, 4, temp);
                 hb_itemRelease( temp );
 
-                temp = hb_itemPutNL( NULL, PQftype( res, i ) );
+                temp = hb_itemPutNL( NULL, PQftable( res, i ) );
                 hb_itemArrayPut( aTemp, 5, temp);
                 hb_itemRelease( temp );
 
-                temp = hb_itemPutNI( NULL, PQfmod( res, i ) );
+                temp = hb_itemPutNI( NULL, PQftablecol( res, i ) );
                 hb_itemArrayPut( aTemp, 6, temp);
                 hb_itemRelease( temp );
-
-                temp = hb_itemPutNI( NULL, PQfsize( res, i ) );
-                hb_itemArrayPut( aTemp, 7, temp);
-                hb_itemRelease( temp );
-
+       
                 hb_itemArrayPut( aNew, i+1, aTemp );
                 hb_itemRelease( aTemp );
             }
@@ -284,3 +368,35 @@ HB_FUNC(PQMETADATA)
         }
     }
 }
+
+HB_FUNC(PQTRANSACTIONSTATUS)
+{
+    if (hb_parinfo(1))
+        hb_retni(PQtransactionStatus(( PGconn * ) hb_parpointer(1) ));
+}
+
+HB_FUNC(PQERRORMESSAGE)
+{
+    if (hb_parinfo(1))
+        hb_retc(PQerrorMessage(( PGconn * ) hb_parpointer(1) ));
+}
+
+HB_FUNC(PQSTATUS)
+{
+    if (hb_parinfo(1))
+        hb_retni(PQstatus(( PGconn * ) hb_parpointer(1) ));
+}
+
+HB_FUNC(PQRESULTERRORMESSAGE)
+{
+    if (hb_parinfo(1))
+        hb_retc(PQresultErrorMessage(( PGresult * ) hb_parpointer(1)));
+}
+
+HB_FUNC(PQRESULTSTATUS)
+{
+    if (hb_parinfo(1))
+        hb_retni(PQresultStatus(( PGresult * ) hb_parpointer(1) ));
+}
+
+

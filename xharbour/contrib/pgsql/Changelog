@@ -8,11 +8,24 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2004-03-21 10:15 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+2004-04-25 16:00 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   * postgres.c
-    * changed the PQExecParams to handle array properly    
+    + Add new function to handle error message
+    * Changed pointer functions
   * TPostgres.prg
-    * changed methods: delete,append,update to use PQExecParams
+    + Add Schema support
+    ! Some fix and improve initial query
+  * tests/test.prg
+    ! Changed sample to handle connection and result messages
+    
+2004-04-05 14:45 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  * postgres.c
+    + Add new functions to handle connection and result set
+    * Changed pointer return
+    
+  * TPostgres.prg
+    * Changed to handle the status of connection and querys 
+    * Changed Fieldget, Fieldtype, Fielddec, Fieldlen, to handle char field name
 
 2004-03-12 14:45 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   * TPostgres.prg
