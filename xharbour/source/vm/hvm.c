@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.51 2002/04/17 01:46:07 ronpinkas Exp $
+ * $Id: hvm.c,v 1.52 2002/04/17 02:58:21 ronpinkas Exp $
  */
 
 /*
@@ -3376,10 +3376,52 @@ static void hb_vmArrayPop( void )
          hb_stackPop();    /* remove the value from the stack just like other POP operations */
       }
       else
+      {
          hb_errRT_BASE( EG_BOUND, 1133, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 1, pIndex );
+      }
+   }
+   else if( HB_IS_STRING( pArray ) && HB_IS_STRING( pValue ) )
+   {
+      long lIndex = (long) ulIndex;
+
+      if( lIndex < 0 )
+      {
+         lIndex += pArray->item.asString.length;
+      }
+
+      if( lIndex > 0 && lIndex <= pArray->item.asString.length )
+      {
+         lIndex--;
+
+         pArray = pArray->pOrigin;
+
+         if( pArray->item.asString.bStatic || *( pArray->item.asString.puiHolders ) > 1 )
+         {
+            char *sNew = hb_strdup( pArray->item.asString.value );
+
+            hb_itemReleaseString( pArray );
+
+            pArray->item.asString.value           =  sNew;
+            pArray->item.asString.puiHolders      = (USHORT*) hb_xgrab( sizeof( USHORT ) );
+            *( pArray->item.asString.puiHolders ) = 1;
+            pArray->item.asString.bStatic         = FALSE;
+         }
+
+         pArray->item.asString.value[ lIndex ] = pValue->item.asString.value[0];
+
+         hb_stackPop();
+         hb_stackPop();
+         hb_stackPop();    /* remove the value from the stack just like other POP operations */
+      }
+      else
+      {
+         hb_errRT_BASE( EG_BOUND, 1133, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 1, pIndex );
+      }
    }
    else
+   {
       hb_errRT_BASE( EG_ARG, 1069, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 1, pIndex );
+   }
 }
 
 static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Array and initialize those dimensions from the stack values */

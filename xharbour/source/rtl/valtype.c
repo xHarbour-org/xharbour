@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.1.1.1 2001/12/21 10:42:19 ronpinkas Exp $
+ * $Id: valtype.c,v 1.2 2002/04/17 19:59:05 walito Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
  * www - http://www.harbour-project.org
  *
  * Copyright 2002 Walter Negro <anegro@overnet.com.ar>
- *    IS_VARBYREF()
+ *    HB_ISBYREF()
  *
  * See doc/license.txt for licensing terms.
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.24 2002/04/17 00:52:50 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.25 2002/04/17 01:33:07 ronpinkas Exp $
  */
 
 /*
@@ -208,9 +208,14 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
-   if( HB_IS_STRING( pSource ) && pSource->item.asString.bStatic == FALSE )
+   pDest->pOrigin = pSource;
+
+   if( HB_IS_STRING( pSource ) )
    {
-      ++*( pSource->item.asString.puiHolders );
+      if( pSource->item.asString.bStatic == FALSE )
+      {
+         ++*( pSource->item.asString.puiHolders );
+      }
    }
    else if( HB_IS_ARRAY( pSource ) )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.156 2002/04/17 17:16:07 lculik Exp $
+ * $Id: ChangeLog,v 1.157 2002/04/17 20:26:51 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-17 13:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    * Added element pOrigin to HB_ITEM.
+
+  * source/vm/fastitem.c
+    * Modified hb_itemCopy() to keep track of the origin in pDest->pOrigin
+
+  * source/vm/hvm.c
+    + Added support for Assignment into String indexed as Array:
+
+      cVar    := "Hello "
+      cVar[6] := '!'
+      cVar -> "Hello!"
+
+      Please note: this will not record such modification if the variable is a database field.
+      This will only change a single character at the specified position. If the new value is
+      longer than 1 character, only the first character will be used.
+
+    /*
+       The current implementation supports negative index, much like SubStr(). I wonder if we
+       should support negative index (from tail) in general for array. This can easily be done.
+    */
 
 2002-04-17 19:59 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * include/hbapiitm.h
@@ -32,6 +55,7 @@
 
     * Bug fixed, reported by Marek Horodyski.
 
+>>>>>>> 1.157
 2002-04-17 02:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/filesys.c
     * convert_create_flags() now Set File mask on linux to 777
