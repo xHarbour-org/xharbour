@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.14 2003/12/29 01:23:27 peterrees Exp $
+ * $Id: gtwvt.c,v 1.15 2003/12/30 20:42:06 peterrees Exp $
  */
 
 /*
@@ -189,6 +189,7 @@ static COLORREF _COLORS[] = {
 static int nCountPuts=0,nCountScroll=0, nCountPaint=0, nSetFocus=0, nKillFocus=0;
 #endif
 
+/*
 static int _Alt_Alpha[] = {
   K_ALT_A, K_ALT_B, K_ALT_C, K_ALT_D, K_ALT_E, K_ALT_F, K_ALT_G, K_ALT_H,
   K_ALT_I, K_ALT_J, K_ALT_K, K_ALT_L, K_ALT_M, K_ALT_N, K_ALT_O, K_ALT_P,
@@ -200,6 +201,7 @@ static int _Alt_Num[] = {
   K_ALT_0, K_ALT_1, K_ALT_2, K_ALT_3, K_ALT_4, K_ALT_5, K_ALT_6, K_ALT_7,
   K_ALT_8, K_ALT_9
   };
+*/
 
 //private
 static void    gt_hbInitStatics(void);
@@ -1778,25 +1780,131 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
     }
     case WM_SYSCHAR:
     {
-      int c = toupper((int)wParam);
       if (!bIgnoreWM_SYSCHAR)
       {
-        if (c >= 'A' && c <= 'Z')
+        int c, iScanCode = HIWORD(lParam) & 0xFF ;
+        switch (iScanCode)
         {
-          hb_wvt_gtAddCharToInputQueue(_Alt_Alpha[c -'A']);
+          case  2:
+            c = K_ALT_1 ;
+            break;
+          case  3:
+            c = K_ALT_2 ;
+            break;
+          case  4:
+            c = K_ALT_3 ;
+            break;
+          case  5:
+            c = K_ALT_4 ;
+            break;
+          case  6:
+            c = K_ALT_5 ;
+            break;
+          case  7:
+            c = K_ALT_6 ;
+            break;
+          case  8:
+            c = K_ALT_7 ;
+            break;
+          case  9:
+            c = K_ALT_8 ;
+            break;
+          case 10:
+            c = K_ALT_9 ;
+            break;
+          case 11:
+            c = K_ALT_0 ;
+            break;
+          case 13:
+            c = K_ALT_EQUALS ;
+            break;
+          case 14:
+            c = K_ALT_BS ;
+            break;
+          case 16:
+            c = K_ALT_Q ;
+            break;
+          case 17:
+            c = K_ALT_W ;
+            break;
+          case 18:
+            c = K_ALT_E ;
+            break;
+          case 19:
+            c = K_ALT_R ;
+            break;
+          case 20:
+            c = K_ALT_T ;
+            break;
+          case 21:
+            c = K_ALT_Y ;
+            break;
+          case 22:
+            c = K_ALT_U ;
+            break;
+          case 23:
+            c = K_ALT_I ;
+            break;
+          case 24:
+            c = K_ALT_O ;
+            break;
+          case 25:
+            c = K_ALT_P ;
+            break;
+          case 30:
+            c = K_ALT_A ;
+            break;
+          case 31:
+            c = K_ALT_S ;
+            break;
+          case 32:
+            c = K_ALT_D ;
+            break;
+          case 33:
+            c = K_ALT_F ;
+            break;
+          case 34:
+            c = K_ALT_G ;
+            break;
+          case 35:
+            c = K_ALT_H ;
+            break;
+          case 36:
+            c = K_ALT_J ;
+            break;
+          case 37:
+            c = K_ALT_K ;
+            break;
+          case 38:
+            c = K_ALT_L ;
+            break;
+          case 44:
+            c = K_ALT_Z ;
+            break;
+          case 45:
+            c = K_ALT_X ;
+            break;
+          case 46:
+            c = K_ALT_C ;
+            break;
+          case 47:
+            c = K_ALT_V ;
+            break;
+          case 48:
+            c = K_ALT_B ;
+            break;
+          case 49:
+            c = K_ALT_N ;
+            break;
+          case 50:
+            c = K_ALT_M ;
+            break;
+          default:
+            c = (int) wParam ;
+            break;
         }
-        else if (c >= '0' && c <= '9')
-        {
-          hb_wvt_gtAddCharToInputQueue(_Alt_Num[wParam - '0']);
-        }
-        else if (wParam=='=' )
-        {
-          hb_wvt_gtAddCharToInputQueue(K_ALT_EQUALS);
-        }
-        else
-        {
-          hb_wvt_gtAddCharToInputQueue(wParam);
-        }
+        hb_wvt_gtAddCharToInputQueue(c);
+
       }
       return(0);
     }
