@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.17 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TCRebar.prg,v 1.18 2002/10/16 05:19:51 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -127,7 +127,8 @@ METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
 
    LOCAL rbBand IS REBARBANDINFO
    LOCAL aRect:=GetWindowRect(hChild)
-
+   local nBand
+   
    rbBand:Reset()
    rbBand:cbSize     := rbBand:sizeof()
    rbBand:fMask      := IFNIL(nMask,RBBIM_TEXT+RBBIM_STYLE+RBBIM_CHILDSIZE+RBBIM_SIZE+RBBIM_CHILD,nMask)
@@ -142,6 +143,7 @@ METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
    rbBand:lpText     := IFNIL(cText,"Test",cText)
    rbBand:hbmBack    := IFNIL(hBmp,0,hBmp)
 
-   RETURN( ::SendMessage( RB_INSERTBAND, -1, rbBand:value ) <> 0 )
+   nBand := ::SendMessage( RB_INSERTBAND, -1, rbBand:value )
+   RETURN( nBand <> 0 )
 
 *------------------------------------------------------------------------------*

@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.61 2002/10/16 03:32:06 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.62 2002/10/16 05:19:52 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -240,15 +240,18 @@ METHOD CreateControl(aRect)
 
 
       CASE ::CtrlName=="Rebar"
-         oObj:=::Add(cName, TRebar():New( self ) )
-         cRebar := cName
+         IF !("2" $ cName) // only one Rebar
+            cRebar := cName
+            oObj:=::Add(cName, TRebar():New( self ) )
+         ENDIF
 
       CASE ::CtrlName=="ToolBar"
-         oObj:=::Add(cName, TToolBar():New( self, 511, , HINST_COMMCTRL, IDB_STD_LARGE_COLOR, 26, 26, 20, 20, 14 ) )
-         if cRebar != nil
-            ::GetObj(cRebar):AddBand( , RBBS_GRIPPERALWAYS+RBBS_NOVERT, oObj:handle, 200, 24, 200, "", NIL )
-         endif
-
+         oObj:=::Add(cName, TToolBar():New( self, 511, 2, HINST_COMMCTRL, IDB_STD_SMALL_COLOR, 16, 16, 16, 16, 14 ) )
+         oObj:AddButton("New", ToolButton():New( 0 , ,"New",  100 ) )
+         oObj:AddButton("Open",ToolButton():New( 1 , ,"Open", 100 ) )
+         IF cRebar != NIL
+            ::GetObj(cRebar):AddBand( , RBBS_GRIPPERALWAYS+RBBS_NOVERT+RBBS_BREAK, oObj:handle, 200, 20, 200, "", NIL )
+         ENDIF
 
       CASE ::CtrlName=="ProgressBar"
          oObj:=::Add(cName, TProgressBar():New(   self,          aRect[1], aRect[2], aRect[3], aRect[4] ) )
