@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.32 2004/03/03 08:20:06 andijahja Exp $
+ * $Id: direct.c,v 1.33 2004/03/03 22:26:42 andijahja Exp $
  */
 
 /*
@@ -395,11 +395,6 @@ HB_FUNC( DIRECTORYRECURSE )
          if ( strchr( pAttribute->item.asString.value, 'S' ) != NULL )
          {
             strcat( szAttributes, "S" );
-         }
-
-         if ( strchr( pAttribute->item.asString.value, 'V' ) != NULL )
-         {
-            strcat( szAttributes, "V" );
          }
       }
 

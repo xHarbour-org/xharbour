@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2474 2004/03/03 21:45:03 likewolf Exp $
+ * $Id: ChangeLog,v 1.2475 2004/03/03 22:26:41 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-04 07:05 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/direct.c
+    ! ignore the "V" argument even it is passed in DirectoryRecurse() since
+      the purpose of this function is to retrive ONLY files information ex-
+      cluding sub-folder and volume-info.
+
 2004-03-04 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/direct.c
     ! argument "V" does not working. Fixed.
