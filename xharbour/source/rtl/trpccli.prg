@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.18 2003/04/21 01:40:30 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.19 2003/04/21 23:21:29 jonnymind Exp $
  */
 
 /*
@@ -92,7 +92,7 @@ CLASS tRPCClient
    METHOD SetLoopMode( nMethod, xData, nEnd, nStep )
    METHOD Call()  // variable parameters
    METHOD CallAgain()            INLINE ::TCPAccept()
-   METHOD StopAsyncCall()
+   METHOD StopCall()
 
    METHOD SetPeriodCallback()
    METHOD ClearPeriodCallback()
@@ -624,7 +624,7 @@ METHOD Call( ... ) CLASS tRPCClient
    ENDIF
 
    // clear eventual pending data
-   //::ClearTcpBuffer()
+   ::ClearTcpBuffer()
 
    // The real call
    #ifdef HB_THREAD_SUPPORT
@@ -748,8 +748,19 @@ METHOD GetTimeout()
 RETURN nRet
 
 
-METHOD StopAsyncCall() CLASS tRPCClient
+METHOD StopCall() CLASS tRPCClient
 
+   IF ::nStatus != RPC_STATUS_WAITING
+      RETURN .F.
+   ENDIF
+
+   // clear eventual pending data
+   ::ClearTcpBuffer()
+
+   // send cancelation request
+   InetSendAll( ::skTCP, "XHBR29" );
+
+   //Stops waiting for a result
 #ifdef HB_THREAD_SUPPORT
    MutexLock( ::mtxBusy )
    IF ::thTCPAccept > 0
@@ -925,9 +936,9 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
                nDataLen := HB_GetLen8( cDataLen )
                cData := Space( nDataLen )
                IF InetRecvAll( ::skTCP, @cData ) == nDataLen
-                  cData := HB_Uncompress( nOrigLen, cData )
+                  cData := HB_Uncompress( nOrigLen, ::Decrypt( cData ) )
                   IF .not. Empty( cData )
-                     ::oResult := HB_Deserialize( ::Decrypt( cData ), nDataLen )
+                     ::oResult := HB_Deserialize( cData, nDataLen )
                      IF ::oResult != NIL
                         ::OnFunctionReturn( ::oResult )
                      ENDIF

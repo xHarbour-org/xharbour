@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.980 2003/04/22 08:12:48 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.981 2003/04/22 08:58:33 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-04-22 16:00 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/hbrpc.ch
+    + Added server status macros
+
+  * source/rtl/trpc.prg
+    % The RPC function execution is now made in a separate thread,
+      to allow receiving of new commands from the client in the
+      meanwhile (i.e. "stop executing the RPC! or QUIT").
+    + Added TRpcService::IsCanceled() to allow the RPC function to
+      know if the user requested cancelation.
+    + Added RPC protocol support for cancelation
+
+  * source/rtl/trpccli.prg
+    + Added StopCall() for cancellation support.
+    ! Compressed + Encripted data were uncompressed and decrypted in
+      the wrong order :-( ; a left over. Now is fixed and working
+
+  * tests/rpcclient.prg
+    + Reactivated encryption test
 
 2003-04-22 10:53 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/vm/itemapi.c

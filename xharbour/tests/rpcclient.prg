@@ -1,6 +1,6 @@
 ************************************************************
 * rpcclient.prg
-* $Id: rpcclient.prg,v 1.8 2003/04/17 21:22:23 jonnymind Exp $
+* $Id: rpcclient.prg,v 1.9 2003/04/19 04:56:52 jonnymind Exp $
 * Test for tRpcClient class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -102,7 +102,7 @@ PROCEDURE Main( cNetwork )
 
    // Demo server has a fairly symple authorization scheme ;-)
    // remember to use the address, not the logical rpc name of the server
-   //oRpc:SetEncryption( "A nice key to be used by servers" )
+   oRpc:SetEncryption( "A nice key to be used by servers" )
    IF oRpc:Connect( oRpc:GetServerAddress(1) , "Giancarlo", "Niccolai" )
       @nRow, 10 SAY "Connection established"
       nRow ++

@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.14 2003/04/16 22:08:13 jonnymind Exp $
+ * $Id: hbrpc.ch,v 1.1 2003/04/17 21:22:23 jonnymind Exp $
  */
 
 /*
@@ -65,5 +65,13 @@
 #define RPC_STATUS_CONNECTED     2
 #define RPC_STATUS_LOGGED        3
 #define RPC_STATUS_WAITING       4
+
+#define RPCS_STATUS_BUSY         -2
+#define RPCS_STATUS_ERROR        -1
+#define RPCS_STATUS_NONE         0
+#define RPCS_STATUS_CHALLENGE    1
+#define RPCS_STATUS_LOGGED       2
+#define RPCS_STATUS_RUNNING      3
+#define RPCS_STATUS_CLOSED      10
 
 #endif

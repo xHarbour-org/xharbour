@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.18 2003/04/18 18:41:26 jonnymind Exp $
+ * $Id: trpc.prg,v 1.19 2003/04/19 04:56:52 jonnymind Exp $
  */
 
 /*
@@ -133,6 +133,7 @@
      +Array containing the elements
      Note: the parameter called $1 is substitued with the foreach
 
+   29 - Cancelation request
 
    TCP REPLIES:
 
@@ -166,9 +167,10 @@
       02 - wrong parameters
 
       10 - Internal function error
+         <LEN8> (function specific error code)+ cErrorDesc:45
       11 - busy, retry later
 
-
+      20 - Protocol error
 
    90 - LOGIN
       <LEN8> + USERID:PASSWORD
@@ -194,6 +196,7 @@
 #ifdef HB_THREAD_SUPPORT
 
 #include "hbclass.ch"
+#include "hbrpc.ch"
 
 
 /************************************
@@ -377,7 +380,7 @@ CLASS tRPCServeCon
    DATA cUserId
 
    /* Allow progress ?*/
-   DATA bAllowProgress
+   DATA lAllowProgress
 
    METHOD New( oCaller, skRemote ) CONSTRUCTOR
    METHOD Destroy()
@@ -389,16 +392,23 @@ CLASS tRPCServeCon
 
    /* Utilty */
    METHOD SendProgress( nProgress, aData )
+   METHOD IsCanceled()        INLINE ::lCanceled
 
+   METHOD GetStatus()         INLINE ::nStatus
 HIDDEN:
+   /* Current status */
+   DATA  nStatus              INIT RPCS_STATUS_NONE
    /* Is this connection encrypted? */
    DATA bEncrypted
-
    /* crc for challenge handshake */
    DATA nChallengeCRC
    /* Temporary supposed user in challenge */
    DATA cChallengeUserid
    DATA cCryptKey
+
+   /* Function execution data */
+   DATA thFunction   INIT -1
+   DATA lCanceled    INIT  .F.
 
    METHOD RecvAuth( lEncrypt )
    METHOD RecvChallenge()
@@ -408,6 +418,7 @@ HIDDEN:
    METHOD FuncForeachCall( cData, cMode )
    METHOD LaunchChallenge( cUserid, cPassword )
    METHOD LaunchFunction( cFuncName, aParms, nMode, aItems )
+   METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aItems )
    METHOD SendResult( oRet )
 
    METHOD Encrypt(cDataIn)
@@ -428,6 +439,14 @@ RETURN Self
 
 METHOD Destroy() CLASS tRPCServeCon
    MutexLock( ::mtxBusy )
+   // Eventually wait for the function to terminate
+   IF ::thFunction != -1
+      ::lCanceled := .T.
+      MutexUnlock( ::mtxBusy )
+      JoinThread( ::thFunction )
+      MutexLock( ::mtxBusy )
+   ENDIF
+
    IF ::skRemote != NIL
       InetDestroy( ::skRemote )
       ::skRemote := NIL
@@ -463,7 +482,7 @@ METHOD Stop() CLASS tRPCServeCon
    ELSE
       MutexUnlock( ::mtxBusy )
    ENDIF
-   
+
 RETURN lRet
 
 
@@ -471,6 +490,7 @@ METHOD Run() CLASS tRPCServeCon
    LOCAL cCode := Space( 6 )
    LOCAL lBreak := .F.
    LOCAL aData
+   LOCAL nSafeStatus
 
 
    DO WHILE InetErrorCode( ::skRemote ) == 0 .and. .not. lBreak
@@ -481,19 +501,44 @@ METHOD Run() CLASS tRPCServeCon
          EXIT
       ENDIF
 
+      MutexLock( ::mtxBusy )
+      nSafeStatus := ::nStatus
+      MutexUnlock( ::mtxBusy )
+
       DO CASE
 
          /* Read autorization request */
          CASE cCode == "XHBR90"
-            lBreak := .not. ::RecvAuth( .F. )
+            IF nSafeStatus == RPCS_STATUS_NONE
+               lBreak := .not. ::RecvAuth( .F. )
+               IF .not. lBreak
+                  nSafeStatus := RPCS_STATUS_LOGGED
+               ENDIF
+            ELSE
+               nSafeStatus := RPCS_STATUS_ERROR
+            ENDIF
 
          /* Read encrypted autorization request */
          CASE cCode == "XHBR93"
-            lBreak := .not. ::RecvAuth( .T. )
+            IF nSafeStatus == RPCS_STATUS_NONE
+               lBreak := .not. ::RecvAuth( .T. )
+               IF .not. lBreak
+                  nSafeStatus := RPCS_STATUS_CHALLENGE
+               ENDIF
+            ELSE
+               nSafeStatus := RPCS_STATUS_ERROR
+            ENDIF
 
          /* Challeng reply */
          CASE cCode == "XHBR95"
-            lBreak := .not. ::RecvChallenge( )
+            IF nSafeStatus == RPCS_STATUS_CHALLENGE
+               lBreak := .not. ::RecvChallenge( )
+               IF .not. lBreak
+                  nSafeStatus := RPCS_STATUS_LOGGED
+               ENDIF
+            ELSE
+               nSafeStatus := RPCS_STATUS_ERROR
+            ENDIF
 
          /* Close connection */
          CASE cCode == "XHBR92"
@@ -502,61 +547,132 @@ METHOD Run() CLASS tRPCServeCon
 
          /* Execute function */
          CASE cCode == "XHBR20"
-            aData := ::RecvFunction( .F., .F. )
-            IF aData != NIL
-               lBreak := .not. ::FuncCall( aData[2] )
+            IF nSafeStatus == RPCS_STATUS_LOGGED
+               aData := ::RecvFunction( .F., .F. )
+               IF aData != NIL
+                  lBreak := .not. ::FuncCall( aData[2] )
+               ELSE
+                  lBreak := .T.
+               ENDIF
+            ELSEIF nSafeStatus == RPCS_STATUS_RUNNING
+               nSafeStatus := RPCS_STATUS_BUSY
             ELSE
-               lBreak := .T.
+               nSafeStatus := RPCS_STATUS_ERROR
             ENDIF
+
 
          /* Execute function */
          CASE cCode == "XHBR21"
-            aData := ::RecvFunction( .T., .F. )
-            IF aData != NIL
-               lBreak := .not. ::FuncCall( aData[2] )
+            IF nSafeStatus == RPCS_STATUS_LOGGED
+               aData := ::RecvFunction( .T., .F. )
+               IF aData != NIL
+                  lBreak := .not. ::FuncCall( aData[2] )
+               ELSE
+                  lBreak := .T.
+               ENDIF
+            ELSEIF nSafeStatus == RPCS_STATUS_RUNNING
+               nSafeStatus := RPCS_STATUS_BUSY
             ELSE
-               lBreak := .T.
+               nSafeStatus := RPCS_STATUS_ERROR
             ENDIF
 
          /* Loop function */
          CASE cCode == "XHBR22"
-            aData := ::RecvFunction( .F., .T. )
-            IF aData != NIL
-               lBreak := .not. ::FuncLoopCall( aData[1], aData[2] )
+            IF nSafeStatus == RPCS_STATUS_LOGGED
+               aData := ::RecvFunction( .F., .T. )
+               IF aData != NIL
+                  lBreak := .not. ::FuncLoopCall( aData[1], aData[2] )
+               ELSE
+                  lBreak := .T.
+               ENDIF
+            ELSEIF nSafeStatus == RPCS_STATUS_RUNNING
+               nSafeStatus := RPCS_STATUS_BUSY
             ELSE
-               lBreak := .T.
+               nSafeStatus := RPCS_STATUS_ERROR
             ENDIF
 
          /* Loop function - compressed */
          CASE cCode == "XHBR23"
-            aData := ::RecvFunction( .T., .T. )
-            IF aData != NIL
-               lBreak := .not. ::FuncLoopCall( aData[1], aData[2] )
+            IF nSafeStatus == RPCS_STATUS_LOGGED
+               aData := ::RecvFunction( .T., .T. )
+               IF aData != NIL
+                  lBreak := .not. ::FuncLoopCall( aData[1], aData[2] )
+               ELSE
+                  lBreak := .T.
+               ENDIF
+            ELSEIF nSafeStatus == RPCS_STATUS_RUNNING
+               nSafeStatus := RPCS_STATUS_BUSY
             ELSE
-               lBreak := .T.
+               nSafeStatus := RPCS_STATUS_ERROR
             ENDIF
 
          /* Foreach function */
          CASE cCode == "XHBR24"
-            aData := ::RecvFunction( .F., .T. )
-            IF aData != NIL
-               lBreak := .not. ::FuncForeachCall( aData[1], aData[2] )
+            IF nSafeStatus == RPCS_STATUS_LOGGED
+               aData := ::RecvFunction( .F., .T. )
+               IF aData != NIL
+                  lBreak := .not. ::FuncForeachCall( aData[1], aData[2] )
+               ELSE
+                  lBreak := .T.
+               ENDIF
+            ELSEIF nSafeStatus == RPCS_STATUS_RUNNING
+               nSafeStatus := RPCS_STATUS_BUSY
             ELSE
-               lBreak := .T.
+               nSafeStatus := RPCS_STATUS_ERROR
             ENDIF
 
          /* Foreach function - compressed*/
          CASE cCode == "XHBR25"
-            aData := ::RecvFunction( .T., .T. )
-            IF aData  != NIL
-               lBreak := .not. ::FuncForeachCall( aData[1], aData[2] )
+            IF nSafeStatus == RPCS_STATUS_LOGGED
+               aData := ::RecvFunction( .T., .T. )
+               IF aData  != NIL
+                  lBreak := .not. ::FuncForeachCall( aData[1], aData[2] )
+               ELSE
+                  lBreak := .T.
+               ENDIF
+            ELSEIF nSafeStatus == RPCS_STATUS_RUNNING
+               nSafeStatus := RPCS_STATUS_BUSY
             ELSE
-               lBreak := .T.
+               nSafeStatus := RPCS_STATUS_ERROR
+            ENDIF
+
+         /* Function execution cancelation request */
+         CASE cCode == "XHBR29"
+            /* Note: even if the function is already terminated in the
+               meanwhile, and the -real- status is not RUNNING anymore,
+               there is no problem here. The cancelation request will
+               be reset at next function call, and the caller must ignore
+               any pending data before the "cancel" call */
+            IF nSafeStatus != RPCS_STATUS_RUNNING
+               nSafeStatus := RPCS_STATUS_ERROR
+            ELSE
+               MutexLock( ::mtxBusy )
+               ::lCanceled = .T.
+               MutexUnlock( ::mtxBusy )
+               InetSendAll( ::skRemote, "XHBR34")
             ENDIF
 
          OTHERWISE
-            EXIT
+            lBreak := .T.
+      ENDCASE
 
+      /* Analisys of the nSafeStatus code */
+      DO CASE
+         CASE nSafeStatus == RPCS_STATUS_BUSY
+            InetSendAll( ::skRemote, "XHBR4011" )
+
+         CASE nSafeStatus == RPCS_STATUS_ERROR
+            InetSendAll( ::skRemote, "XHBR4020" )
+
+         /* Update real status only if not in error case */
+         OTHERWISE
+            /* The running status is set (in this thread) indipendently
+               by the function launcher, if everything is fine */
+            MutexLock( ::mtxBusy )
+            IF ::nStatus != RPCS_STATUS_RUNNING
+               ::nStatus := nSafeStatus
+            ENDIF
+            MutexUnlock( ::mtxBusy )
       ENDCASE
 
    ENDDO
@@ -794,19 +910,15 @@ RETURN ::LaunchFunction( cFuncName, aParams, 2, { cMode, aItems } )
 
 
 METHOD LaunchFunction( cFuncName, aParams, nMode, aDesc ) CLASS tRPCServeCon
-   LOCAL oFunc, nCount
-   LOCAL cOrigLen, cCompLen
-   LOCAL oRet, oElem, aRet
-   LOCAL aSubst, nSubstPos
+   LOCAL oFunc
 
-   //let's try to run this function.
+   //Check for function existance
    oFunc := ::oServer:Find( cFuncName )
    IF Empty(oFunc)
       // signal error
       ::oServer:OnFunctionError( Self, cFuncName, 00 )
       InetSendAll( ::skRemote, "XHBR4000" )
-      // request socket closing
-      RETURN .F.
+      RETURN .T.
    ENDIF
 
    // check for level
@@ -814,8 +926,7 @@ METHOD LaunchFunction( cFuncName, aParams, nMode, aDesc ) CLASS tRPCServeCon
       // signal error
       ::oServer:OnFunctionError( Self, cFuncName, 01 )
       InetSendAll( ::skRemote, "XHBR4001" )
-      // request socket closing
-      RETURN .F.
+      RETURN .T.
    ENDIF
 
    //check for parameters
@@ -823,129 +934,171 @@ METHOD LaunchFunction( cFuncName, aParams, nMode, aDesc ) CLASS tRPCServeCon
       // signal error
       ::oServer:OnFunctionError( Self, cFuncName,02 )
       InetSendAll( ::skRemote, "XHBR4002" )
-      // request socket closing
-      RETURN .F.
+      RETURN .T.
    ENDIF
 
-   IF InetErrorCode( ::skRemote ) != 0
-      RETURN .F.
-   ENDIF
-
+   MutexLock( ::mtxBusy )
    // allow progress indicator by default
-   ::bAllowProgress := .T.
+   ::lAllowProgress := .T.
+   // setting the cancel indicator as false
+   ::lCanceled := .F.
+   // Set the running status
+   ::nStatus := RPCS_STATUS_RUNNING
+   ::thFunction := StartThread( Self, "FunctionRunner", ;
+      cFuncName, oFunc, nMode, aParams, aDesc )
+   MutexUnlock( ::mtxBusy )
 
+RETURN .T.
+
+
+METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aDesc ) CLASS tRPCServeCon
+   LOCAL nCount
+   LOCAL cOrigLen, cCompLen
+   LOCAL oRet, oElem, aRet
+   LOCAL aSubst, nSubstPos
+
+   //? "TH:", ::thFunction
    DO CASE
 
       CASE nMode == 0  // just run the function
          oRet := oFunc:Run( aParams, Self )
+         // Notice: SendResult checks for lCanceled before really sending
 
       CASE nMode == 1 // run in loop
          aSubst := AClone( aParams )
          nSubstPos := AScan( aParams, {|x| ValType( x ) == "C" .and. x == "$."} )
 
-         DO CASE
-            CASE aDesc[1] == 'A' // all results
+         SWITCH aDesc[1]
+            CASE 'A' // all results
                FOR nCount := aDesc[ 2 ] TO aDesc[ 3 ] STEP aDesc[ 4 ]
                   IF nSubstPos > 0
                      aSubst[ nSubstPos ] := nCount
                   ENDIF
                   oRet := oFunc:Run( aSubst, Self )
-                  IF .not. ::SendResult( oRet )
-                     RETURN .F.
-                  ENDIF
+                  ::SendResult( oRet, cFuncName )
                NEXT
-               RETURN .T.
+               oRet := "Done"
+            EXIT
 
-            CASE aDesc[1] == 'C' // Vector of all results
+            CASE 'C' // Vector of all results
                aRet := {}
-               ::bAllowProgress = .F.
+               ::lAllowProgress = .F.
                FOR nCount := aDesc[ 2 ] TO aDesc[ 3 ] STEP aDesc[ 4 ]
                   IF nSubstPos > 0
                      aSubst[ nSubstPos ] := nCount
                   ENDIF
                   oRet :=  oFunc:Run( aSubst, Self )
                   IF oRet == NIL
-                     ::SendResult( NIL )
-                     RETURN .F.
+                     ::SendResult( NIL, cFuncName )
+                     EXIT
                   ENDIF
                   AAdd( aRet, oRet )
                NEXT
-               oRet := aRet
+               IF oRet != NIL
+                  oRet := aRet
+               ENDIF
+            EXIT
 
-            CASE aDesc[1] == 'E' // Just send confirmation at end
-               ::bAllowProgress = .F.
+            CASE 'E' // Just send confirmation at end
+               ::lAllowProgress = .F.
                FOR nCount := aDesc[ 2 ] TO aDesc[ 3 ] STEP aDesc[ 4 ]
                   IF nSubstPos > 0
                      aSubst[ nSubstPos ] := nCount
                   ENDIF
                   oRet := oFunc:Run( aSubst, Self )
                   IF oRet == NIL
-                     ::SendResult( NIL )
-                     RETURN .F.
+                     ::SendResult( NIL, cFuncName )
+                     EXIT
                   ENDIF
                NEXT
-               oRet := "Done"
-         ENDCASE
+               IF oRet != NIL
+                  oRet := "Done"
+               ENDIF
+            EXIT
+         END
 
       CASE nMode == 2 // Run in a foreach loop
          aSubst := AClone( aParams )
          nSubstPos := AScan( aParams, {|x| ValType( x ) == "C" .and. x == "$."} )
 
-         DO CASE
-            CASE aDesc[1] == 'A' // all results
+         SWITCH aDesc[1]
+            CASE 'A' // all results
                FOR EACH oElem IN  aDesc[ 2 ]
                   IF nSubstPos > 0
                      aSubst[ nSubstPos ] := oElem
                   ENDIF
                   oRet := oFunc:Run( aSubst, Self )
-                  IF .not. ::SendResult( oRet )
-                     RETURN .F.
-                  ENDIF
+                  ::SendResult( oRet, cFuncName )
                NEXT
-               RETURN .T.
+               oRet := "Done"
+            EXIT
 
-            CASE aDesc[1] == 'C' // Vector of all results
+            CASE 'C' // Vector of all results
                aRet := {}
-               ::bAllowProgress = .F.
+               ::lAllowProgress = .F.
                FOR EACH oElem IN  aDesc[ 2 ]
                   IF nSubstPos > 0
                      aSubst[ nSubstPos ] := oElem
                   ENDIF
                   oRet := oFunc:Run( aSubst, Self )
                   IF oRet == NIL
-                     ::SendResult( NIL )
-                     RETURN .F.
+                     ::SendResult( NIL, cFuncName )
+                     EXIT
                   ENDIF
                   AAdd( aRet, oRet )
                NEXT
-               oRet := aRet
+               IF oRet != NIL
+                  oRet := aRet
+               ENDIF
+            EXIT
 
-            CASE aDesc[1] == 'E' // Just send confirmation at end
-               ::bAllowProgress = .F.
+            CASE 'E' // Just send confirmation at end
+               ::lAllowProgress = .F.
                FOR EACH oElem IN aDesc[ 2 ]
                   IF nSubstPos > 0
                      aSubst[ nSubstPos ] := oElem
                   ENDIF
                   oRet := oFunc:Run( aSubst, Self )
                   IF oRet == NIL
-                     ::SendResult( NIL )
-                     RETURN .F.
+                     EXIT
                   ENDIF
                NEXT
-               oRet := "Done"
-         ENDCASE
+            EXIT
+         END
    ENDCASE
-// Default return
-RETURN ::SendResult( oRet, cFuncName )
+
+   // Now we can signal that execution terminated
+   MutexLock( ::mtxBusy )
+   ::nStatus := RPCS_STATUS_LOGGED
+   MutexUnlock( ::mtxBusy )
+   // The execution of the function terminates BEFORE the sending of
+   // the last data or the confirmation data, even if the thread
+   // has still something to do.
+   ::SendResult( oRet, cFuncName )
+
+   //Signal that the thread is no longer alive
+   // Should not be needed!
+   /*MutexLock( ::mtxBusy )
+   ::thFunction := -1
+   MutexUnlock( ::mtxBusy )*/
+RETURN .T.
 
 
 METHOD SendResult( oRet, cFuncName )
    LOCAL cData, cOrigLen, cCompLen
 
+   // Ignore requests to send result if function is canceled
+   MutexLock( ::mtxBusy )
+   IF ::lCanceled
+      MutexUnlock( ::mtxBusy )
+      ::oServer:OnFunctionCanceled( Self, cFuncName )
+      RETURN .T. //as if it were done
+   ENDIF
+   MutexUnlock( ::mtxBusy )
+
    IF oRet == NIL
       ::oServer:OnFunctionError( Self, cFuncName, 10 )
       InetSendAll( ::skRemote, "XHBR4010" )
-      RETURN .F.
    ELSE
       cData := HB_Serialize( oRet )
       cOrigLen := HB_CreateLen8( Len( cData ) )
@@ -973,9 +1126,12 @@ METHOD SendProgress( nProgress, oData ) CLASS tRPCServeCon
    LOCAL cData
 
    //Ignore if told so
-   IF .not. ::bAllowProgress
+   MutexLock( ::mtxBusy )
+   IF .not. ::lAllowProgress .or. ::lCanceled
+      MutexUnlock( ::mtxBusy )
       RETURN .T.
    ENDIF
+   MutexUnlock( ::mtxBusy )
 
    ::oServer:OnFunctionProgress( Self, nProgress, oData )
    IF Empty( oData )
@@ -1046,6 +1202,7 @@ CLASS tRPCService
    DATA bOnFunctionProgress
    DATA bOnFunctionError
    DATA bOnFunctionReturn
+   DATA bOnFunctionCanceled
    DATA bOnClientLogout
    DATA bOnClientTerminate
 
@@ -1089,6 +1246,7 @@ CLASS tRPCService
    METHOD OnFunctionProgress( oClient, nProgress, aData )
    METHOD OnFunctionError( oClient, cFuncName, nError )
    METHOD OnFunctionReturn( oClient, aData )
+   METHOD OnFunctionCanceled( oClient, cFuncName )
    METHOD OnClientLogout( oClient )
    METHOD OnClientTerminate( oClient )
 
@@ -1432,6 +1590,12 @@ RETURN .T.
 METHOD OnFunctionReturn( oClient, aData ) CLASS tRPCService
    IF ::bOnFunctionReturn != NIL
       RETURN Eval( ::bOnFunctionReturn, oClient, aData )
+   ENDIF
+RETURN .T.
+
+METHOD OnFunctionCanceled( oClient, cFuncName ) CLASS tRPCService
+   IF ::bOnFunctionCanceled != NIL
+      RETURN Eval( ::bOnFunctionCanceled, oClient, cFuncName )
    ENDIF
 RETURN .T.
 
