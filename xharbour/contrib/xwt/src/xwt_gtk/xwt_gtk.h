@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.19 2004/01/30 18:34:12 lculik Exp $
+   $Id: xwt_gtk.h,v 1.20 2004/02/08 13:00:08 lculik Exp $
 
    GTK interface
 */
@@ -218,11 +218,12 @@ BOOL xwt_gtk_createComboBox( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createListBox( PXWT_WIDGET xwtData );
 BOOL xwt_gtk_createProgressBar( PXWT_WIDGET xwtData );
 BOOL xwt_gtk_createColorSelection( PXWT_WIDGET xwtData );
-
+void xwt_gtk_ComboAddItem(PXWT_WIDGET xwtData, PHB_ITEM pComboArray );
 void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
 void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
 BOOL xwt_gtk_imageLoad( PXWT_WIDGET xwtData, const char *fname );
 BOOL xwt_gtk_image_setSensible( PXWT_WIDGET wSelf );
+void xwt_gtk_ListAddItem(PXWT_WIDGET xwtData, PHB_ITEM pComboArray );
 
 BOOL xwt_gtk_layout_create_with_mode( PXWT_WIDGET wWidget, int mode );
 BOOL xwt_gtk_splitter_create_with_mode( PXWT_WIDGET wWidget, int mode );
