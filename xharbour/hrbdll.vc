@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.10 2003/06/09 20:41:15 lculik Exp $
+# $Id: hrbdll.vc,v 1.11 2003/06/20 00:24:14 druzus Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -72,7 +72,7 @@ HARBOUR_DLL  = lib\vc\harbour.dll
 # from DLL
 
 HARBOURFLAGS  = /D__EXPORT__ /i$(INCLUDE_DIR) /n /q0 /w /es2 /n1
-CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /DHB_NO_DEFAULT_API_MACROS /DHB_NO_DEFAULT_STACK_MACROS /MT /G6 /Ox /GD /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32
+CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /G6 /Ox /GD /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³  HARBOUR_DLL rules  ³Û
@@ -124,8 +124,10 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\hbcrc32.obj \
   $(OBJ_DIR)\hbcrypt.obj \
   $(OBJ_DIR)\hbffind.obj \
+  $(OBJ_DIR)\hbhextonum.obj \
   $(OBJ_DIR)\hbrandom.obj \
   $(OBJ_DIR)\hbsrlraw.obj \
+  $(OBJ_DIR)\hbxml.obj \
   $(OBJ_DIR)\idle.obj \
   $(OBJ_DIR)\inkey.obj \
   $(OBJ_DIR)\is.obj \
@@ -225,6 +227,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\fieldbl.obj \
   $(OBJ_DIR)\getlist.obj \
   $(OBJ_DIR)\getsys.obj \
+  $(OBJ_DIR)\hbreadini.obj \
   $(OBJ_DIR)\hbserial.obj \
   $(OBJ_DIR)\input.obj \
   $(OBJ_DIR)\listbox.obj \
@@ -264,6 +267,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ttable.obj \
   $(OBJ_DIR)\ttextlin.obj \
   $(OBJ_DIR)\ttopbar.obj \
+  $(OBJ_DIR)\txml.obj \
   $(OBJ_DIR)\typefile.obj \
   $(OBJ_DIR)\wait.obj \
   $(OBJ_DIR)\win32ole.obj \
@@ -289,6 +293,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\fastitem.obj \
   $(OBJ_DIR)\fm.obj \
   $(OBJ_DIR)\garbage.obj \
+  $(OBJ_DIR)\hbi18n.obj \
   $(OBJ_DIR)\hvm.obj \
   $(OBJ_DIR)\inet.obj \
   $(OBJ_DIR)\initexit.obj \
@@ -324,10 +329,12 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\workarea.obj \
 # rdd prg
   $(OBJ_DIR)\dbf0.obj \
+  $(OBJ_DIR)\dbfuncs.obj \
   $(OBJ_DIR)\dblist.obj \
   $(OBJ_DIR)\dbsort.obj \
   $(OBJ_DIR)\hbdbsort.obj \
   $(OBJ_DIR)\dbstrux.obj \
+  $(OBJ_DIR)\dbtotal.obj \
   $(OBJ_DIR)\dbupdat.obj \
   $(OBJ_DIR)\delim0.obj \
   $(OBJ_DIR)\rddord.obj \
@@ -355,9 +362,9 @@ HARBOUR_DLL_OBJS = \
 #
 # dbfcdx
 #
-  $(OBJ_DIR)\dbfcdx0.obj \
-#
   $(OBJ_DIR)\dbfcdx1.obj \
+#
+  $(OBJ_DIR)\dbfcdx0.obj \
 #
 # Lang
 #
@@ -484,10 +491,16 @@ $(OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
 $(OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
+$(OBJ_DIR)\hbhextonum.obj : $(RTL_DIR)\hbhextonum.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
 $(OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hbsrlraw.obj : $(RTL_DIR)\hbsrlraw.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\hbxml.obj : $(RTL_DIR)\hbxml.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hbgete.obj : $(COMMON_DIR)\hbgete.c
@@ -532,6 +545,12 @@ $(OBJ_DIR)\dbf0.obj : $(OBJ_DIR)\dbf0.c
 $(OBJ_DIR)\dbf1.obj : $(RDD_DIR)\dbf1.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
+$(OBJ_DIR)\dbfuncs.c : $(RDD_DIR)\dbfuncs.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dbfuncs.obj : $(OBJ_DIR)\dbfuncs.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
 $(OBJ_DIR)\dblist.c : $(RDD_DIR)\dblist.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
@@ -554,6 +573,12 @@ $(OBJ_DIR)\dbstrux.c : $(RDD_DIR)\dbstrux.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\dbstrux.obj : $(OBJ_DIR)\dbstrux.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\dbtotal.c : $(RDD_DIR)\dbtotal.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dbtotal.obj : $(OBJ_DIR)\dbtotal.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\dbupdat.c : $(RDD_DIR)\dbupdat.prg
@@ -644,6 +669,9 @@ $(OBJ_DIR)\harbinit.c : $(VM_DIR)\harbinit.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\harbinit.obj : $(OBJ_DIR)\harbinit.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\hbi18n.obj : $(VM_DIR)\hbi18n.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
@@ -929,6 +957,12 @@ $(OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\hbreadini.c : $(RTL_DIR)\hbreadini.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\hbreadini.obj : $(OBJ_DIR)\hbreadini.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hbserial.c : $(RTL_DIR)\hbserial.prg
@@ -1360,6 +1394,12 @@ $(OBJ_DIR)\ttopbar.c : $(RTL_DIR)\ttopbar.prg
 $(OBJ_DIR)\ttopbar.obj : $(OBJ_DIR)\ttopbar.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
+$(OBJ_DIR)\txml.c : $(RTL_DIR)\txml.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\txml.obj : $(OBJ_DIR)\txml.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
 $(OBJ_DIR)\type.obj : $(RTL_DIR)\type.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
@@ -1543,6 +1583,12 @@ $(OBJ_DIR)\dbfcdx0.obj : $(OBJ_DIR)\dbfcdx0.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\dbghelp.c : $(DEBUG_DIR)\dbghelp.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dbghelp.obj : $(OBJ_DIR)\dbghelp.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\dbgmenu.c : $(DEBUG_DIR)\dbgmenu.prg

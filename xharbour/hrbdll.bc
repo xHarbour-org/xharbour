@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.16 2003/06/09 20:41:14 lculik Exp $
+# $Id: hrbdll.bc,v 1.17 2003/06/20 00:24:14 druzus Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -54,7 +54,7 @@ INCLUDE_DIR  = include
 #  ßßßßßßßßßßßßßßßßßß
 
 
-C_USR          = -tW -DHB_FM_STATISTICS_OFF -DHB_NO_DEFAULT_API_MACROS -DHB_NO_DEFAULT_STACK_MACROS -D__WIN32__ -D__EXPORT__
+C_USR          = -tW -DHB_FM_STATISTICS_OFF -D__WIN32__ -D__EXPORT__
 CLIBFLAGS      = $(C_USR) -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3 -DSIMPLEX
 HARBOURFLAGS   = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /i$(INCLUDE_DIR) /q0 /w /es2 /n1 /gc0
 
@@ -280,6 +280,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\delim1.obj \
   $(OBJ_DIR)\sdf1.obj \
   $(OBJ_DIR)\dbf0.obj \
+  $(OBJ_DIR)\dbfuncs.obj \
   $(OBJ_DIR)\dblist.obj \
   $(OBJ_DIR)\dbsort.obj \
   $(OBJ_DIR)\hbdbsort.obj \
@@ -628,6 +629,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\delim1.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\sdf1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\dbf0.obj              + >> hdll.tmp
+  echo. $(OBJ_DIR)\dbfuncs.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dblist.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\dbsort.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hbdbsort.obj          + >> hdll.tmp
@@ -758,6 +760,12 @@ $(OBJ_DIR)\dbf0.obj : $(OBJ_DIR)\dbf0.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\dbf1.obj : $(RDD_DIR)\dbf1.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\dbfuncs.c : $(RDD_DIR)\dbfuncs.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dbfuncs.obj : $(OBJ_DIR)\dbfuncs.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\dblist.c : $(RDD_DIR)\dblist.prg
@@ -1769,6 +1777,12 @@ $(OBJ_DIR)\dbfcdx0.obj : $(OBJ_DIR)\dbfcdx0.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\dbghelp.c : $(DEBUG_DIR)\dbghelp.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dbghelp.obj : $(OBJ_DIR)\dbghelp.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\dbgmenu.c : $(DEBUG_DIR)\dbgmenu.prg
