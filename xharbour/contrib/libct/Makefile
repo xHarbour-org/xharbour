@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2003/04/09 17:47:14 lculik Exp $
+# $Id: Makefile,v 1.4 2003/06/15 13:11:58 druzus Exp $
 #
 
 ROOT = ../../
@@ -79,11 +79,13 @@ PRG_SOURCES= \
 	setlast.prg \
 
 LIBNAME=ct
-ifneq ($(HB_ARCHITECTURE),dos)
 ifeq ($(HB_MT),MT)
   MT_LIBNAME=ctmt
 endif
-endif
 
-include $(TOP)$(ROOT)config/lib.cf
 include $(TOP)$(ROOT)config/header.cf
+INSTALL_RULE_HEADERS := $(INSTALL_RULE)
+include $(TOP)$(ROOT)config/lib.cf
+
+install::
+	$(INSTALL_RULE_HEADERS)

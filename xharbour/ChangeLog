@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1124 2003/06/16 20:13:33 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1125 2003/06/16 22:30:24 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-17 02:43 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/lib.cf
+  * xharbour/config/linux/dir.cf
+    * minor cleanup to avoid installing lib.a when there is no special MT 
+      version of library
+
+  * xharbour/contrib/libct/Makefile
+    ! minor fix for installing headers and library files on make 'install'
+      action, this is still not clean (there is a side effect that libs
+      are installed twice and I cannot correct it without major change
+      in .cf files) but it works.
 
 2003-06-16 17:10 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   * source/vm/inet.c

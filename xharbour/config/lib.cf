@@ -1,5 +1,5 @@
 #
-# $Id: lib.cf,v 1.2 2003/01/12 22:50:16 jonnymind Exp $
+# $Id: lib.cf,v 1.3 2003/04/22 08:12:55 mauriliolongo Exp $
 #
 
 ifneq ($(HB_ARCHITECTURE),)
@@ -10,7 +10,11 @@ include $(TOP)$(ROOT)config/c.cf
 include $(TOP)$(ROOT)config/prg.cf
 
 LIB_NAME := $(LIB_PREF)$(LIBNAME)$(LIB_EXT)
+ifneq ($(MT_LIBNAME),)
+ifeq ($(HB_MT),MT)
 MT_LIB_NAME := $(LIB_PREF)$(MT_LIBNAME)$(LIB_EXT)
+endif
+endif
 
 LIB_ARCH := $(notdir $(ARCH_DIR))
 ifeq ($(LIB_ARCH),)
@@ -28,7 +32,7 @@ ALL_OBJS = $(ALL_C_OBJS) $(ALL_PRG_OBJS)
 # This test fails if I don't want to compile mt code (at least on OS/2)
 #ifeq ($(MT_LIBNAME),)
 # This one is correct
-ifeq ($(HB_MT),)
+ifeq ($(MT_LIB_NAME),)
 first:: dirbase descend
 else
 first:: dirbase dirbase_mt descend descend_mt
@@ -46,7 +50,7 @@ $(LIB_NAME) : $(ALL_OBJS)
 $(MT_LIB_NAME) : $(ALL_OBJS)
 	$(AR_RULE)
 
-ifeq ($(MT_LIBNAME),)
+ifeq ($(MT_LIB_NAME),)
 INSTALL_OBJS = $(LIB_ARCH)
 else
 INSTALL_OBJS = $(LIB_ARCH) $(ARCH)_mt/$(MT_LIB_NAME)
