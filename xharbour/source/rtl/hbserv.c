@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.11 2004/02/27 22:04:47 andijahja Exp $
+* $Id: hbserv.c,v 1.12 2004/03/06 12:56:59 jonnymind Exp $
 */
 
 /*
@@ -82,6 +82,7 @@
 
 static void s_serviceSetHBSig( void );
 static void s_serviceSetDflSig( void );
+static void s_signalHandlersInit( void );
 
 static PHB_ITEM sp_hooks = NULL;
 static BOOL bSignalEnabled = TRUE;
@@ -563,9 +564,10 @@ BOOL WINAPI s_ConsoleHandlerRoutine( DWORD dwCtrlType )
 
 static void s_serviceSetHBSig( void )
 {
-   struct sigaction act;
 
 #if defined( HB_OS_UNIX ) || defined(HARBOUR_GCC_OS2)
+   struct sigaction act;
+
    #ifdef HB_THREAD_SUPPORT
       sigset_t blockall;
       //set signal mask

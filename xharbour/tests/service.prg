@@ -19,7 +19,7 @@
 *
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id: service.prg,v 1.9 2004/02/26 04:56:56 mlombardo Exp $
+* $Id: service.prg,v 1.10 2004/03/06 12:56:59 jonnymind Exp $
 *
 
 #include "hbserv.ch"
@@ -33,7 +33,7 @@ PROCEDURE Main( cParam1, cParam2 )
 
    // put it on a file: windows console could be detached!
    INIT LOG ON CONSOLE();
-   FILE(HB_LOG_ALL, "service.log", 10, 10)
+      FILE(HB_LOG_ALL, "service.log", 10, 10)
 
    DEFAULT cParam1 to ""
    DEFAULT cParam2 to ""
