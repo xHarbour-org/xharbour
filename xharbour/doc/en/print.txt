@@ -6,16 +6,58 @@
  *  $ONELINER$
  *      Get an List of printers
  *  $SYNTAX$
- *      <aPrint> := GetPrinters()
+ *      <aPrint> := GetPrinters([ <lPorts> ])
  *  $ARGUMENTS$
- *      None
+ *      [<lPorts>] = .T. or .F. ( default .F. )
  *  $RETURNS$
- *      <aPrint> An list of printer with two items on array {Printer name , Printer Port}
+ *      <aPrint> A 1 dimension array of Printer names installed
+ *      if the optional <lPorts> parameter is passed .T. a 2 dimension array {Printer name , Printer Port}
  *  $DESCRIPTION$
  *      Getprinters() function return an list of printers instaled on your machine
  *      this function is useful to get an printer list, and say to what printer the data should be send
  *  $EXAMPLES$
- *
+ *      #include 'set.ch'
+ *      FUNCTION main
+ *      local x
+ *      local aPrinter
+ *        CLS
+ *        ?? 'Test program for WINDOWS printing'
+ *        ?  '---------------------------------'
+ *        ? SET(_SET_DEVICE)
+ *        aPrinter:=GetPrinters()
+ *        IF EMPTY(aPrinter)
+ *         ? '----- No Printers installed'
+ *        ELSE
+ *          set(24, "WIN:"+GetDefaultPrinter())
+ *          set device to printer
+ *          ? SET(_SET_DEVICE)
+ *          set console off
+ *          set printer on
+ *          ? 'Default Printer'
+ *          ?'----------------'
+ *          ? GetDefaultPrinter()
+ *          ?
+ *          ? 'Printers Available'
+ *          ?'-------------------'
+ *          FOR x:= 1 TO LEN(aPrinter)
+ *            ? aPrinter[x]
+ *          NEXT x
+ *          EJECT
+ *          aPrinter:= GetPrinters(.T.)
+ *          ? 'Printers and Ports'
+ *          ?'-------------------'
+ *          FOR x:= 1 TO LEN(aPrinter)
+ *            ? aPrinter[x,1]+' on '+aPrinter[x,2]
+ *          NEXT x
+ *          EJECT
+ *          set printer off
+ *          set console on
+ *          set device to screen
+ *          set printer to
+ *        ENDIF
+ *        ? SET(_SET_DEVICE)
+ *        WAIT
+ *      return nil
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
@@ -25,7 +67,7 @@
  *  $FILES$
  *      This function is part of Rtl library
  *  $SEEALSO$
- *      GETDEFAULTPRINTER()
+ *      GETDEFAULTPRINTER(), PRINTFILERAW()
  *  $END$
  */
 
@@ -59,7 +101,63 @@
  *  $FILES$
  *      This function is part of Rtl library
  *  $SEEALSO$
- *      GETPRINTERS()
+ *      GETPRINTERS(), PRINTFILERAW()
  *  $END$
  */
 
+/*  $DOC$
+ *  $FUNCNAME$
+ *      PRINTFILERAW()
+ *  $CATEGORY$
+ *      Printer
+ *  $ONELINER$
+ *      Print a file to a windows printer in RAW mode
+ *  $SYNTAX$
+ *      <nResult> := PRINTFILERAW( <cPrinterName>, <cFileName> [, <cDocName>])
+ *  $ARGUMENTS$
+ *      <cPrinter> = a valid windows printer name
+ *      <cFileName>= a valid filename that exists and can be printed
+        <cDocName> = option text to appear as the document name in the spooler
+ *  $RETURNS$
+ *      <nResult> > 0 printed OK else if < 0 then error (See example)
+ *  $DESCRIPTION$
+ *      PRINTFILERAW() will print the contens of the file <cFileName> to the windows printer
+ *      <cPrinterName> in RAW mode. It display <cDocName> as the "Document Name" in the wondows
+ *      spooler. If <cDocName> is not specified then <cFileName> is used.
+ *  $EXAMPLES$
+ *      FUNCTION MAIN()
+ *        LOCAL cPrinter:= GETDEFAULTPRINTER(), cFileName:="MyFile.Txt"
+ *        LOCAL nPrn:= -1, cMess:= "PrintFileRaw(): "
+ *        IF !EMPTY(cPrinter)
+ *          IF (nPrn := PrintFileRaw(cPrinter,cFileName)) < 0
+ *            DO CASE
+ *            CASE nPrn = -1
+ *              Alert(cMess+"Incorrect parameters passed to function")
+ *            CASE nPrn = -2
+ *              Alert(cMess+"WINAPI OpenPrinter() call failed")
+ *            CASE nPrn = -3
+ *              Alert(cMess+"WINAPI StartDocPrinter() call failed")
+ *            CASE nPrn = -4
+ *              Alert(cMess+"WINAPI StartPagePrinter() call failed")
+ *            CASE nPrn = -5
+ *              Alert(cMess+"WINAPI malloc() of memory failed")
+ *            CASE nPrn = -6
+ *              Alert(cMess+"WINAPI CreateFile() failed - File "+cFileName+" not found??")
+              OTHERWISE
+ *              Alert(cFileName+" PRINTED OK!!!?")
+ *            ENDCASE
+ *          ENDIF
+ *        ENDIF
+ *        RETURN(NIL)
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is Xharbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      This function is part of Rtl library
+ *  $SEEALSO$
+ *      GETPRINTERS(), GETDEFAULTPRINTER()
+ *  $END$
+ */
