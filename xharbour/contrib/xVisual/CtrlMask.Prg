@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.25 2002/10/25 07:13:46 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.26 2002/10/25 08:16:53 what32 Exp $
  */
 
 /*
@@ -118,7 +118,6 @@ CLASS oCtrlMask FROM TWinControl
    METHOD Refresh()
    METHOD SelectCtrl()
    METHOD DeSelectCtrl()
-   METHOD OnUserMsg()
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -460,15 +459,6 @@ METHOD Refresh()
 *-----------------------------------------------------------------------------*
 
 // client area coordinates
-METHOD OnUserMsg( nMsg, nwParam, nlParam)
-   IF nMsg == WM_USER + 1
-      UpdateWindow( ::handle )
-      ::HintWindow:SetTitle(0,"")
-      ::HintWindow:SetText(alltrim(str(::aEditRect[1]))+","+alltrim(str(::aEditRect[2]))+"  "+;
-                           alltrim(str(::aEditRect[3]-::aEditRect[1]))+","+alltrim(str(::aEditRect[4]-::aEditRect[2])))
-      UpdateWindow( ::Parent:handle )
-   ENDIF
-return(0)
 
 METHOD OnLButtonDown( wParam, x, y )
 
@@ -485,6 +475,7 @@ METHOD OnLButtonDown( wParam, x, y )
    ClientToScreen(::Handle,aPt)
 
    IF Empty(::Cursor)
+      
       FOR EACH hChild IN ::aSiblings
          aWRect:=GetWindowRect(hChild)
          IF PtInRect(aWRect,aPt)
@@ -580,6 +571,15 @@ METHOD OnMouseMove( aParam,x,y)
    
    IF ::mousedown
 
+//-----------------------------------------------------------
+      UpdateWindow( ::Parent:handle )
+
+      ::HintWindow:SetTitle(0,"")
+      ::HintWindow:SetText(alltrim(str(::aEditRect[1]))+","+alltrim(str(::aEditRect[2]))+"  "+;
+                           alltrim(str(::aEditRect[3]-::aEditRect[1]))+","+alltrim(str(::aEditRect[4]-::aEditRect[2])))
+
+//-----------------------------------------------------------
+
       hDC:=GetDC(::Handle)
       SetTextColor(hDC,RGB(255,255,128))
       SetBkColor(hDC,RGB(0,0,128))
@@ -603,8 +603,6 @@ METHOD OnMouseMove( aParam,x,y)
       ENDIF
 
       ReleaseDc(::Handle,hDC)
-
-      ::PostMessage( WM_USER+1 )
 
    ELSE
       IF Empty(::Cursor)
@@ -670,7 +668,9 @@ METHOD OnLButtonUp( wParam, x, y )
    IF ::creating
       ::cursor:=NIL
    ENDIF
-
+   IF ::moving .OR. ::sizing
+      UpdateWindow( ::Parent:handle )
+   ENDIF
    ::mousedown:=.F.
    hDC:=GetDC(::Handle)
 
@@ -699,6 +699,7 @@ METHOD OnLButtonUp( wParam, x, y )
                  a[SEL_NEWRECT,3]-a[SEL_NEWRECT,1],a[SEL_NEWRECT,4]-a[SEL_NEWRECT,2],.T. )
 
       ShowWindow(a[SEL_HANDLE],SW_SHOW)
+
       aRect:=GetWindowRect(a[1])
       RectScreenToClient(::Handle,aRect)
       a[SEL_OLDRECT]:=aClone(aRect)
@@ -706,6 +707,7 @@ METHOD OnLButtonUp( wParam, x, y )
          oObj:=::Parent:ChildFromHandle(a[SEL_HANDLE])
          oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1)
       endif
+
    NEXT
 
    IF ::selecting

@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.11 2002/10/25 07:13:43 what32 Exp $
+ * $Id: TCBrowser.prg,v 1.12 2002/10/25 07:20:18 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -1110,7 +1110,7 @@ METHOD UpdateVScrollBar(lRedraw) CLASS TWBrowse
       si:nPage  := ::RowCountUsable
       si:nPos   := ::RecPos - ::RowPos + 1
       si:nTrackPos := 0
-      SetScrollInfo( ::handle, SB_VERT, si:value,TRUE )
+      SetScrollInfo( ::handle, SB_VERT, si:value, TRUE )
    ENDIF
 RETURN(self)
 
@@ -1582,6 +1582,7 @@ METHOD GoUp(lInternal) CLASS TWBrowse
          ::Hilite(lInternal)
       ENDIF
    ENDIF
+   ::OnChange()
 RETURN(self)
 
 //---------------------------------------------------------------------------------------------
@@ -1604,6 +1605,7 @@ METHOD GoDown(lInternal) CLASS TWBrowse
          ::Hilite(lInternal)
       ENDIF
    ENDIF
+   ::OnChange()
 RETURN(self)
 
 //---------------------------------------------------------------------------------------------
@@ -1624,6 +1626,7 @@ METHOD GoPgup(lInternal) CLASS TWBrowse
      ::ScrollUp(::RowCountUsable,lInternal)
      ::Hilite(lInternal)
    Endif
+   ::OnChange()
 RETURN(self)
 
 //---------------------------------------------------------------------------------------------
@@ -1644,6 +1647,7 @@ METHOD GoPgdown(lInternal) CLASS TWBrowse
       ::ScrollDown(::RowCountUsable,lInternal)
       ::Hilite(lInternal)
    Endif
+   ::OnChange()
 RETURN(self)
 
 //---------------------------------------------------------------------------------------------
@@ -1665,6 +1669,7 @@ METHOD GoHome(lInternal) CLASS TWBrowse
    ELSE
       MessageBeep(MB_ICONSTOP)
    ENDIF
+   ::OnChange()
 RETURN(self)
 
 //---------------------------------------------------------------------------------------------
@@ -1687,6 +1692,7 @@ METHOD GoEnd(lInternal) CLASS TWBrowse
      ELSE
       MessageBeep(MB_ICONSTOP)
    ENDIF
+   ::OnChange()
 RETURN(self)
 
 //---------------------------------------------------------------------------------------------
