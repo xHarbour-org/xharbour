@@ -45,7 +45,7 @@ HB_FUNC ( INTERNETDIAL )
    DWORD   nFlags = INTERNET_AUTODIAL_FORCE_ONLINE ;
    DWORD   nRet   = 0;
    
-   hb_retnl( InternetDialA( hWnd, lpszId, nFlags, &nRet, 0 ) );
+   hb_retnl( InternetDial( hWnd, lpszId, nFlags, &nRet, 0 ) );
    
 }
 
@@ -101,9 +101,9 @@ HB_FUNC ( INTERNETOPEN )
    DWORD   dwAccessType    = ISNIL( 2 ) ? INTERNET_OPEN_TYPE_DIRECT : hb_parnl( 2 ) ;
    LPCTSTR lpszProxyName   = ISNIL( 3 ) ? NULL : hb_parc( 3 ) ; 
    LPCTSTR lpszProxyBypass = ISNIL( 4 ) ? NULL : hb_parc( 4 ) ;
-   DWORD   dwFlags         = ISNIL( 5 ) ? NULL : hb_parnl( 5 ) ;	
-	
-   hb_retnl( ( ULONG ) InternetOpenA( lpszAgent, dwAccessType, lpszProxyName, lpszProxyBypass, dwFlags ) ) ;
+   DWORD   dwFlags         = ISNIL( 5 ) ? NULL : hb_parnl( 5 ) ;  
+   
+   hb_retnl( ( ULONG ) InternetOpen( lpszAgent, dwAccessType, lpszProxyName, lpszProxyBypass, dwFlags ) ) ;
 }
 
 //---------------------------------------------------------------------//
@@ -133,11 +133,11 @@ HB_FUNC ( INTERNETCONNECT )
    LPCTSTR       lpszPassword   = ISNIL( 5 ) ? NULL : hb_parc( 5 ) ;
    DWORD         dwService      = ISNIL( 6 ) ? INTERNET_SERVICE_HTTP : hb_parnl( 6 ) ;
    DWORD         dwFlags        = ISNIL( 7 ) ? NULL : hb_parnl( 7 ) ;
-   DWORD_PTR     dwContext		  = ISNIL( 8 ) ? NULL : hb_parnl( 8 ) ;
-	
-   hb_retnl( ( ULONG ) InternetConnectA( hInternet,    lpszServerName, 
-	                           nServerPort, lpszUserName, lpszPassword,   
-	                           dwService, dwFlags,      dwContext ) ) ;
+   DWORD_PTR     dwContext      = ISNIL( 8 ) ? NULL : hb_parnl( 8 ) ;
+   
+   hb_retnl( ( ULONG ) InternetConnect( hInternet,    lpszServerName, 
+                              nServerPort, lpszUserName, lpszPassword,   
+                              dwService, dwFlags,      dwContext ) ) ;
 }
 
 //---------------------------------------------------------------------//
@@ -162,8 +162,8 @@ HB_FUNC ( FTPOPENFILE )
    DWORD     dwAccess     = ISNIL( 3 ) ? GENERIC_READ : hb_parni( 3  ) ;
    DWORD     dwFlags      = ISNIL( 4 ) ? FTP_TRANSFER_TYPE_BINARY : hb_parni( 4 ) ;
    DWORD_PTR dwContext    = ISNIL( 5 ) ? NULL : hb_parnl( 5 ) ;
-	
-   hb_retl( FtpOpenFileA( hFtp, lpszFileName, dwAccess, dwFlags, dwContext ) ) ;
+   
+   hb_retl( FtpOpenFile( hFtp, lpszFileName, dwAccess, dwFlags, dwContext ) ) ;
 }
 
 //---------------------------------------------------------------------//
@@ -186,10 +186,10 @@ HB_FUNC ( INTERNETWRITEFILE )
    LPCVOID   lpBuffer                 = hb_parc( 2 ) ;
    DWORD     dwNumberOfBytesToWrite   = ( DWORD ) hb_parnl( 3 ) ;
    LPDWORD   lpdwNumberOfBytesWritten = ( DWORD ) 0 ;
-	
+   
    hb_retl( InternetWriteFile( hFile, lpBuffer, dwNumberOfBytesToWrite, 
-   	                                          lpdwNumberOfBytesWritten ) ) ;
-	                                          
+                                                lpdwNumberOfBytesWritten ) ) ;
+                                             
    if ISBYREF( 4 )
       hb_stornl( ( ULONG ) lpdwNumberOfBytesWritten, 4 ) ;
 }
@@ -215,20 +215,20 @@ HB_FUNC ( INTERNETREADFILE )
    DWORD     dwNumberOfBytesToRead    = ( DWORD ) hb_parnl( 3 ) ;
    LPDWORD   lpdwNumberOfBytesRead    = ( DWORD ) 0  ;
    BOOL      bRet ;
-	
+   
    bRet = InternetReadFile( hFile, &lpBuffer, 
-          	               dwNumberOfBytesToRead, lpdwNumberOfBytesRead ) ;
+                           dwNumberOfBytesToRead, lpdwNumberOfBytesRead ) ;
 
    hb_retl( bRet ); 
-	
+   
    if ( bRet )
-   {	                                          
+   {                                            
       if ISBYREF( 4 )
       {
          hb_stornl( ( ULONG ) lpdwNumberOfBytesRead, 4 ) ;
       }
          hb_storclen( ( char * ) lpBuffer, ( ULONG ) lpdwNumberOfBytesRead, 2 ) ;
-   }	
+   }  
 }
 
 //---------------------------------------------------------------------//
@@ -253,12 +253,12 @@ HB_FUNC ( FTPCOMMAND )
    LPCTSTR   lpszCommand     = hb_parc( 4 ) ;
    DWORD_PTR dwContext       = ISNIL( 5 ) ? NULL : hb_parnl( 5 ) ;
    HINTERNET *phFtpCommand ;
-	
+   
    BOOL      bRet ;
-	
+   
    bRet = FtpCommand( hInternet, fExpectResponse, dwFlags, lpszCommand,
-	                   dwContext, phFtpCommand ) ;
-	                   
+                      dwContext, phFtpCommand ) ;
+                      
    hb_retl( bRet ) ;
 
    if ( bRet )
@@ -315,7 +315,7 @@ HB_FUNC ( FTPCOMMAND )
 //   hFind := FtpFindFirstFile( hInternet, cFileSpec, @cDirInfo )
 //   if hFind <> 0
 //      FindData:Buffer( cDirInfo )
-//      	
+//       
 //      ? FindData:cFileName:value                // Name
 //      ? FindData:dwFileAttributes               // Attribute in numeric, 16 for directory, 128 for file
 //      ? FindData:nFileSizeLow                   // Size in bytes
@@ -326,7 +326,7 @@ HB_FUNC ( FTPCOMMAND )
 //            exit
 //         endif
 //         FindData:Buffer( cDirInfo )
-//      	
+//       
 //         ? FindData:cFileName:value                // Name
 //         ? FindData:dwFileAttributes               // Attribute in numeric, 16 for directory, 128 for file
 //         ? FindData:nFileSizeLow                   // Size in bytes
@@ -345,15 +345,15 @@ HB_FUNC ( FTPFINDFIRSTFILE )
    WIN32_FIND_DATA FindFileData ;
    DWORD     dwFlags                = ISNIL( 4 ) ? INTERNET_FLAG_NEED_FILE : hb_parnl( 4 ) ;
    DWORD_PTR dwContext              = ISNIL( 5 ) ? NULL : hb_parnl( 5 ) ;
-   HINTERNET hResult ; 	
+   HINTERNET hResult ;  
 
    hResult = FtpFindFirstFile( hInternet, lpszSearchFile, 
-			                            &FindFileData, dwFlags, dwContext ) ;
+                                     &FindFileData, dwFlags, dwContext ) ;
         
    if ( hResult )
-      if ( ISBYREF( 3 ) )   	   
+      if ( ISBYREF( 3 ) )        
          hb_storclen( (char *) &FindFileData , sizeof( WIN32_FIND_DATA ), 3 ) ; 
-		
+      
    hb_retnl( ( ULONG ) hResult ) ;
 }
 
@@ -369,7 +369,7 @@ HB_FUNC ( INTERNETFINDNEXTFILE )
 {
    HINTERNET       hFind       = ( HINTERNET ) hb_parnl( 1 ) ;
    WIN32_FIND_DATA FindFileData ;
-	
+   
    if ( InternetFindNextFile( hFind, &FindFileData ) ) 
       {   
          hb_retl( TRUE ) ;
@@ -406,10 +406,10 @@ HB_FUNC ( FTPGETFILE )
    DWORD     dwFlagsAndAttributes = ISNIL( 5 ) ? FILE_ATTRIBUTE_NORMAL : hb_parnl( 5 ) ;
    DWORD     dwFlags              = ISNIL( 6 ) ? FTP_TRANSFER_TYPE_BINARY | INTERNET_FLAG_RELOAD : hb_parnl( 6 ) ;
    DWORD_PTR dwContext            = ISNIL( 7 ) ? 0 : hb_parnl( 7 ) ;
-	
+   
    hb_retl( FtpGetFile( hInternet, lpszRemoteFile, lpszLocalFile, 
-	                     fFailIfExist, dwFlagsAndAttributes,
-	                     dwFlags, dwContext ) ) ;
+                        fFailIfExist, dwFlagsAndAttributes,
+                        dwFlags, dwContext ) ) ;
 }
 
 //---------------------------------------------------------------------//
@@ -434,7 +434,7 @@ HB_FUNC ( FTPPUTFILE )
    LPCTSTR   lpszRemoteFile       = hb_parc( 3 ) ;
    DWORD     dwFlags              = ISNIL( 4 ) ? FTP_TRANSFER_TYPE_BINARY | INTERNET_FLAG_RELOAD : hb_parnl( 4 ) ;
    DWORD_PTR dwContext            = ISNIL( 5 ) ? 0 : hb_parnl( 5 ) ;
-	
+   
    hb_retl( FtpPutFile( hInternet, lpszLocalFile, lpszRemoteFile, dwFlags, dwContext ) ) ;
 }
 
@@ -454,9 +454,9 @@ HB_FUNC ( FTPCREATEDIRECTORY )
 {
    HINTERNET hInternet     = ( HINTERNET ) hb_parnl( 1 ) ;
    LPCTSTR   lpszDirectory = hb_parc( 2 ) ;
-	
+   
    hb_retl( FtpCreateDirectoryA( hInternet, lpszDirectory ) ) ;
-	
+   
 }
 
 //---------------------------------------------------------------------//
@@ -475,7 +475,7 @@ HB_FUNC ( FTPREMOVEDIRECTORY )
 {
    HINTERNET hInternet     = ( HINTERNET ) hb_parnl( 1 ) ;
    LPCTSTR   lpszDirectory = hb_parc( 2 ) ;
-	
+   
    hb_retl( FtpRemoveDirectoryA( hInternet, lpszDirectory ) ) ;
 
 }
@@ -496,9 +496,9 @@ HB_FUNC ( FTPDELETEFILE )
 {
    HINTERNET hInternet    = ( HINTERNET ) hb_parnl( 1 ) ;
    LPCTSTR   lpszFileName = hb_parc( 2 ) ;
-	
+   
    hb_retl( FtpDeleteFile( hInternet, lpszFileName ) ) ;
-	
+   
 }
 
 //---------------------------------------------------------------------//
@@ -543,16 +543,16 @@ HB_FUNC ( FTPGETCURRENTDIRECTORY )
    LPTSTR   lpszCurrentDirectory = hb_xgrab( MAX_PATH ) ; 
    DWORD    dwCurrentDirectory   = MAX_PATH     ;
    BOOL     bRet ;
-	
+   
    bRet = FtpGetCurrentDirectory( hInternet, lpszCurrentDirectory, &dwCurrentDirectory ) ;
    hb_retl( bRet ) ;
-	
+   
    if ( bRet )
    {
       if ( ISBYREF( 2 ) )
          hb_storclen( ( char * ) lpszCurrentDirectory, ( ULONG ) dwCurrentDirectory, 2 ) ;
    }
-	
+   
    hb_xfree( lpszCurrentDirectory ) ;
 }
 
@@ -590,7 +590,7 @@ HB_FUNC ( FTPSETCURRENTDIRECTORY )
 HB_FUNC ( INTERNETCLOSEHANDLE )
 {
    HINTERNET hInternet = ( HINTERNET ) hb_parnl( 1 ) ;
-	
+   
    hb_retl( InternetCloseHandle( hInternet ) ) ;
 }
 
@@ -606,7 +606,7 @@ HB_FUNC ( INTERNETCLOSEHANDLE )
 HB_FUNC ( INTERNETATTEMPTCONNECT )
 {
    DWORD dwReserved = 0 ;
-	
+   
    hb_retnl( ( ULONG ) InternetAttemptConnect( dwReserved ) ) ;
 }
 
