@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.7 2003/06/10 23:46:19 ronpinkas Exp $
+ * $Id: proc.c,v 1.8 2003/06/18 08:57:02 ronpinkas Exp $
  */
 
 /*
@@ -72,6 +72,7 @@
 
 #include "hbapi.h"
 #include "hbstack.h"
+#include "classes.h"
 
 HB_FUNC( METHODNAME )
 {
@@ -109,7 +110,7 @@ HB_FUNC( PROCFILE )
 
 char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName  )
 {
-   PHB_ITEM * pBase = HB_VM_STACK.pBase;
+   PHB_ITEM * pBase = HB_VM_STACK.pBase, pSelf;
 
    // Default and safety to empty string.
    if( szName )
@@ -127,20 +128,21 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
 
+   pSelf = *( pBase + 1 );
+
    if( iLevel < 0 )
    {
       if( szName )
       {
-         if( ( *( pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
+         if( HB_IS_OBJECT( pSelf ) )  /* it is a method name */
          {
-            strcpy( szName, hb_objGetRealClsName( *( pBase + 1 ), ( *pBase )->item.asSymbol.value->szName ) );
+            strcpy( szName, hb_objGetRealClsName( pSelf, ( *pBase )->item.asSymbol.value->szName ) );
             strcat( szName, ":" );
          }
-
-         if( ( *( pBase + 1 ) )->type == HB_IT_BLOCK )  /* it is a Block Evaluation. */
+         else if( HB_IS_BLOCK( pSelf ) )  /* it is a Block Evaluation. */
          {
             strcat( szName, "(b)" );
-            strcat( szName, ( *( pBase + 1 ) )->item.asBlock.value->procname );
+            strcat( szName, pSelf->item.asBlock.value->procname );
          }
          else
          {
@@ -150,13 +152,13 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
 
       if( uLine )
       {
-         if( HB_IS_OBJECT( *( pBase + 1 ) ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( *( pBase + 1 ) ) ) == 0 )
+         if( HB_IS_OBJECT( pSelf ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pSelf ) ) == 0 )
          {
             *uLine = 0;
          }
-         else if( ( *( pBase + 1 ) )->type == HB_IT_BLOCK )  /* it is a Block Evaluation. */
+         else if( HB_IS_BLOCK( pSelf ) )  /* it is a Block Evaluation. */
          {
-            *uLine = ( *( pBase + 1) )->item.asBlock.value->lineno;
+            *uLine = pSelf->item.asBlock.value->lineno;
          }
          else
          {
@@ -166,9 +168,30 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
 
       if( szModuleName )
       {
-         if( ( *pBase )->item.asSymbol.value->pDynSym && ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols )
+         if( HB_IS_OBJECT( pSelf ) )  /* it is a method name */
          {
-            strcat( szModuleName, ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName );
+            PCLASS pClass = hb_clsClassesArray() + ( pSelf->item.asArray.value->uiClass - 1 );
+
+            if( pClass->pModuleSymbols )
+            {
+               strcpy( szModuleName, pClass->pModuleSymbols->szModuleName );
+            }
+         }
+         else if( HB_IS_BLOCK( pSelf ) )  /* it is a Block Evaluation. */
+         {
+            PSYMBOLS pBlockModuleSymbols = hb_vmFindModule( pSelf->item.asBlock.value->pSymbols );
+
+            if( pBlockModuleSymbols )
+            {
+               strcpy( szModuleName, pBlockModuleSymbols->szModuleName );
+            }
+         }
+         else
+         {
+            if( ( *pBase )->item.asSymbol.value->pDynSym && ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols )
+            {
+               strcpy( szModuleName, ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName );
+            }
          }
       }
    }

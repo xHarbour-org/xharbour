@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.64 2003/06/18 08:57:02 ronpinkas Exp $
+ * $Id: classes.c,v 1.65 2003/06/18 13:29:12 andijahja Exp $
  */
 
 /*
@@ -516,7 +516,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
       }
       else if( HB_IS_BLOCK( pCaller ) )
       {
-         PSYMBOLS pBlockModuleSymbols = hb_vmFindModule( ( pCaller->item.asBlock.value )->pSymbols );
+         PSYMBOLS pBlockModuleSymbols = hb_vmFindModule( pCaller->item.asBlock.value->pSymbols );
 
          if( pRealClass->pModuleSymbols == NULL || pBlockModuleSymbols == NULL )
          {

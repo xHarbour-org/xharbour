@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.2 2003/05/28 04:10:17 ronpinkas Exp $
+ * $Id: classes.h,v 1.3 2003/06/18 08:57:01 ronpinkas Exp $
  */
 
 /*
@@ -88,6 +88,7 @@ typedef struct
    PSYMBOLS pModuleSymbols;
 } CLASS, * PCLASS;
 
+PCLASS hb_clsClassesArray( void );
 void     hb_clsReleaseAll( void );
 BOOL     hb_clsHasMsg( USHORT uiClass, char *szMsg );
 
