@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.841 2003/03/16 06:03:24 jonnymind Exp $
+ * $Id: ChangeLog,v 1.842 2003/03/16 06:18:09 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-16 08:27 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * test/rpcclient.prg
+    ! Removed InetInit() (is done by trpc).
+ 
+  ! source/vm/inet.c
+    ! Fixed UDP protocol recv.
+    
 2003-03-16 07:15 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * tests/mtcomplex.prg
     ! StopThread() is not anymore suitable to kill the monitor thread:

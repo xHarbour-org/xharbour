@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.18 2003/03/02 15:22:31 jonnymind Exp $
+* $Id: inet.c,v 1.19 2003/03/08 02:06:47 jonnymind Exp $
 */
 
 /*
@@ -1619,7 +1619,7 @@ HB_FUNC( INETDGRAMBIND )
 
    /* Creates comm socket */
    #if defined(HB_OS_WIN_32)
-      Socket->com = socket( AF_INET, SOCK_DGRAM, 0 );
+      Socket->com = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
    #else
       Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
    #endif
@@ -1676,7 +1676,7 @@ HB_FUNC( INETDGRAM )
 
    /* Creates comm socket */
    #if defined(HB_OS_WIN_32)
-      Socket->com = socket( AF_INET, SOCK_DGRAM, 0 );
+      Socket->com = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
    #else
       Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
    #endif
@@ -1767,9 +1767,9 @@ HB_FUNC( INETDGRAMRECV )
    int iLen,iMaxLen;
 
    #if defined(HB_OS_WIN_32)
-      int iDtLen;
+      int iDtLen = sizeof( struct sockaddr );
    #else
-      socklen_t iDtLen;
+      socklen_t iDtLen = (socklen_t) sizeof( struct sockaddr );
    #endif
 
    HB_SOCKET_STRUCT *Socket;
