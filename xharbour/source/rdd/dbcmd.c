@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.77 2004/02/22 10:17:02 lf_sfnet Exp $
+ * $Id: dbcmd.c,v 1.78 2004/02/23 08:31:54 andijahja Exp $
  */
 
 /*
@@ -4480,10 +4480,11 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
   HB_THREAD_STUB
 
   USHORT   i,f;
-  HB_ITEM fieldValue;
+  PHB_ITEM fieldValue;
   char * szName;
 
-  fieldValue.type = HB_IT_NIL;
+  fieldValue = hb_itemNew( NULL );
+
   szName = ( char * ) hb_xgrab( ( ( AREAP ) pAreaTo)->uiMaxFieldNameLength + 1 );
 
   for( i = 0 ; i < pAreaTo->uiFieldCount; i++ )
@@ -4501,14 +4502,14 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
       {
         LPAREANODE s_curr = s_pCurrArea;
 
-        SELF_GETVALUE( pAreaFrom, f++, &fieldValue );
+        SELF_GETVALUE( pAreaFrom, f++, fieldValue );
 
         if( s )
         {
           s_pCurrArea = s;
         }
 
-        SELF_PUTVALUE( pAreaTo, i + 1, &fieldValue );
+        SELF_PUTVALUE( pAreaTo, i + 1, fieldValue );
 
         s_pCurrArea = s_curr;
       }
@@ -4516,6 +4517,7 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
   }
 
   hb_xfree( szName );
+  hb_itemRelease( fieldValue );
 }
 
 /*move the records, filtering if apropiate*/
