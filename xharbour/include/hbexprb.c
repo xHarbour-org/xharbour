@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.41 2003/01/05 02:39:45 mlombardo Exp $
+ * $Id: hbexprb.c,v 1.42 2003/01/05 06:50:35 ronpinkas Exp $
  */
 
 /*
@@ -1754,7 +1754,10 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                         pSelf->ExprType = HB_ET_ARRAYAT;
                         pSelf->value.asList.pExprList = pString;
-                        pStart->value.asNum.lVal      = -1;
+                        if ( pSelf->ulLength > 0 )
+                           pStart->value.asNum.lVal      = -1;
+                        else
+                           pStart->value.asNum.lVal      =  1;
                         pSelf->value.asList.pIndex    = pStart;
                      }
                   }
