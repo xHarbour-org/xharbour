@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: stdafx.h $
 // $Archive: /ZipArchive_STL/stdafx.h $
-// $Date: 2003/09/12 20:12:35 $ $Author: paultucker $
+// $Date: 2003/09/13 04:06:39 $ $Author: paultucker $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -88,8 +88,8 @@
 
 
 #else
-  	#include <TCHAR.H>
-       	#include <windows.H>
+  	#include <tchar.h>
+       	#include <windows.h>
       	#ifndef STRICT
 		#define STRICT
 	#endif

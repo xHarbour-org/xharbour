@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: fcopy.prg,v 1.1 2004/08/27 07:25:45 mauriliolongo Exp $
  */
 
 /*
@@ -162,7 +162,7 @@ if ! file(cDest)
    nDestHand := fCreate(cDest)
 else
    nDestHand := fOpen(cDest, FO_WRITE)
-   fSeek(cDest, 0, FS_END)
+   FSeek( nDestHand, 0, FS_END )
 endif
 
 Do while ! lDone

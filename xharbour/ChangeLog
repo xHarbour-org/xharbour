@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3523 2004/10/22 16:47:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3524 2004/10/22 18:50:38 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-23 00:35 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * contrib/hbzlib/include/stdafx.h
+    ! Fixed #include filename case.
+  * include/gtinfo.h
+    ! Fixed some typos.
+  * source/ct/fcopy.prg
+    ! Fixed an error in FILEAPPEND() (thanks to Valery Belorustsev).
+  * source/vm/inet.c
+    ! Typecasts of (HB_SOCKET_T)-1.
 
 2004-10-22 13:43 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * utils/xbscript/xbscript.prg
@@ -269,6 +279,7 @@
     source/ct/Makefile
     ! updated to add getsecrt.prg
 
+>>>>>>> 1.3496
 2004-10-05 19:03 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c
     + Added few missing buffer overrun protection checks.

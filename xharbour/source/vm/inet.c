@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.48 2004/05/14 07:13:24 ronpinkas Exp $
+* $Id: inet.c,v 1.49 2004/09/26 12:36:21 jonnymind Exp $
 */
 
 /*
@@ -1554,7 +1554,7 @@ HB_FUNC( INETSERVER )
       Socket->com = socket( PF_INET, SOCK_STREAM, 0 );
    #endif
 
-   if( Socket->com == -1 )
+   if( Socket->com == (HB_SOCKET_T)-1 )
    {
       HB_SOCKET_SET_ERROR( Socket );
       Socket->com = 0;
@@ -1651,7 +1651,7 @@ HB_FUNC( INETACCEPT )
 
          HB_DISABLE_ASYN_CANC;
 
-         if (incoming == -1 )
+         if (incoming == (HB_SOCKET_T)-1 )
          {
             #if defined(HB_OS_WIN_32)
             iError = WSAGetLastError();
@@ -1747,7 +1747,7 @@ HB_FUNC( INETCONNECT )
       Socket->com = socket( PF_INET, SOCK_STREAM, 0);
    #endif
 
-   if( Socket->com == -1 )
+   if( Socket->com == (HB_SOCKET_T)-1 )
    {
       HB_SOCKET_SET_ERROR( Socket );
       goto ret;
@@ -1802,7 +1802,7 @@ HB_FUNC( INETCONNECTIP )
       Socket->com = socket( PF_INET, SOCK_STREAM, 0);
    #endif
 
-   if( Socket->com == -1 )
+   if( Socket->com == (HB_SOCKET_T)-1 )
    {
       HB_SOCKET_SET_ERROR( Socket );
       goto ret;
@@ -1853,7 +1853,7 @@ HB_FUNC( INETDGRAMBIND )
       Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
    #endif
 
-   if( Socket->com == -1 )
+   if( Socket->com == (HB_SOCKET_T)-1 )
    {
       HB_SOCKET_SET_ERROR( Socket );
       Socket->com = 0;
@@ -1910,7 +1910,7 @@ HB_FUNC( INETDGRAM )
       Socket->com = socket( PF_INET, SOCK_DGRAM, 0 );
    #endif
 
-   if( Socket->com == -1 )
+   if( Socket->com == (HB_SOCKET_T)-1 )
    {
       HB_SOCKET_SET_ERROR( Socket );
       Socket->com = 0;

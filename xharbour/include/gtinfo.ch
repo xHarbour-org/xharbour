@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.9 2004/09/12 15:37:31 lf_sfnet Exp $
+ * $Id: gtinfo.ch,v 1.10 2004/10/22 11:26:42 paultucker Exp $
  */
 
 /*
@@ -81,9 +81,9 @@
 #define GTI_ICONRES       28  /* icon resource */
 #define GTI_MOUSESTATUS   29  /* mouse enabled = 1 mouse disabled = 0 */
 
-#define GTI_INPUTFD       30  /* Get Standard input steream of application/GT */
-#define GTI_OUTPUTFD      31  /* Get Standard output steream of application/GT */
-#define GTI_ERRORFD       32  /* Get Standard error steream of application/GT */
+#define GTI_INPUTFD       30  /* Get Standard input stream of application/GT */
+#define GTI_OUTPUTFD      31  /* Get Standard output stream of application/GT */
+#define GTI_ERRORFD       32  /* Get Standard error stream of application/GT */
 
 #define GTI_ESCDELAY      33  /* Get/Set escape key delay */
 
