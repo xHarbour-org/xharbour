@@ -176,11 +176,20 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey, bFun, nCrs
     oTBR:addColumn(oTBC)
   Next
 
+  If Len(aCols) == 1
+    oTBR:setKey(K_LEFT, Nil)
+    oTBR:setKey(K_RIGHT, Nil)
+  End
   IIf(Empty(xFunc), bFun := {|| IIf(Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER), DE_ABORT, DE_CONT)}, bFun := IIf(HB_ISBLOCK(xFunc), xFunc, &("{|x, y, z|" + xFunc + "(x,y,z)}")))
 
   // EXTENSION: Initialization call
   _DoUserFunc(bFun, -1, oTBR:colPos, oTBR)
 
+  oTBR:refreshAll()
+  oTBR:invalidate()
+  oTBR:forceStable()
+  oTBR:deHilite()
+  
   i := RecNo()
   Go Top
   If (Eof() .Or. RecNo() == LastRec() + 1) .And. Bof()
@@ -189,7 +198,7 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey, bFun, nCrs
   Go (i)
 
   If nRet != DE_ABORT
-    nRet := DE_REFRESH
+    nRet := DE_CONT
   End
 
   While nRet != DE_ABORT
@@ -203,8 +212,9 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey, bFun, nCrs
 	Exit
     End
     oTBR:forceStable()
-    oTBR:refreshCurrent()
-    oTBR:stabilize()
+//    oTBR:refreshCurrent()
+//    oTBR:stabilize()
+    oTBR:deHilite()
     If oTBR:hitTop
       nRet := _DoUserFunc(bFun, DE_HITTOP, oTBR:colPos, oTBR)
     ElseIf oTBR:hitBottom

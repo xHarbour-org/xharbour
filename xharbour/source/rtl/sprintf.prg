@@ -1,5 +1,5 @@
 /*
- * $Id: sprintf.prg,v 1.0 2003/12/09 23:08:20 maurifull Exp $
+ * $Id: sprintf.prg,v 1.2 2003/12/20 03:13:50 maurifull Exp $
  */
 
 /*
@@ -138,10 +138,10 @@ Local nLen := 0, lUns, l0 := .F., lSign := .F., nDec
 			    End
 			    cTok := Str(IIf(lUns, Abs(aPar[nPar++]), aPar[nPar++]), nLen, nDec)
 			Else
-			    cTok += LTrim(Str(IIf(lUns, Abs(aPar[nPar++]), aPar[nPar++])))
+			    cTok := LTrim(Str(IIf(lUns, Abs(aPar[nPar++]), aPar[nPar++])))
 			End
 			If l0
-			    If '-' $ cTok
+			    If '-' $ cTok .And. cTok[1] != '-'
 				cTok:= StrTran(cTok, '-', ' ')
 				cTok[1] := '-'
 			    End

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1909 2003/12/20 10:57:26 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.1910 2003/12/20 11:12:02 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-20 23:15 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/sprintf.prg
+    ! Fixed bug returning '%' before numbers
+  * source/rtl/dbedit.prg
+    * Compatibility issue: Clipper displays dbedit() even if dbf empty, then calls UserFunc
 
 2003-12-20 12:08 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rtl/net.c
