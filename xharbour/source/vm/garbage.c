@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.22 2002/09/21 05:21:07 ronpinkas Exp $
+ * $Id: garbage.c,v 1.23 2002/09/21 16:34:41 ronpinkas Exp $
  */
 
 /*
@@ -475,11 +475,11 @@ void hb_gcCollectAll( void )
       hb_vmIsLocalRef();
       //printf( "After LocalRef\n" );
 
-      /*-----------------9/19/2002 6:16PM-----------------
-       * Statics are now Locked on each assignment, and thus can be excluded.
-       * --------------------------------------------------*/
       hb_vmIsStaticRef();
       //printf( "After StaticRef\n" );
+
+      hb_vmIsGlobalRef();
+      //printf( "After Globals\n" );
 
       hb_memvarsIsMemvarRef();
       //printf( "After MemvarRef\n" );

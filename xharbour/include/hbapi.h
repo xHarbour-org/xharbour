@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.32 2002/09/20 19:48:20 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.33 2002/09/21 05:21:06 ronpinkas Exp $
  */
 
 /*
@@ -459,6 +459,7 @@ extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers
 extern void   HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
 extern void   hb_vmIsStaticRef( void ); /* hvm.c - mark all static variables as used */
+extern void   hb_vmIsGlobalRef( void ); /* hvm.c - mark all global variables as used */
 
 extern void   hb_vmGlobalUnlock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcUnlock(...) when needed. */
 extern void   hb_memvarsIsMemvarRef( void ); /* memvars.c - mark all memvar variables as used */

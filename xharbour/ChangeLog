@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.393 2002/09/21 11:50:26 map Exp $
+ * $Id: ChangeLog,v 1.394 2002/09/21 16:34:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-22 17:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbpcode.h
+  * source/compiler/hbpcode.c
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/compiler/hbfix.c
+  * source/vm/hvm.c
+    + Readded support for HB_P_PUSHGLOBALREF
+
+  * source/vm/hvm.c
+    +  Added HB_ITEM hb_vmaGlobals - Harbour array to register all GLOBALS for GC.
+
+  * source/compiler/genc.c
+    * Changed _RELEASEGLOBALS to hb_RELEASEGLOBALS
+    + Added support for auto generated hb_REGISTERGLOBALS to register module globals into hb_vm_aGlobals.
+
+  * include/hbapi.h
+  * source/vm/hvm.c
+    + Added hb_vmIsGlobalRef()
+
+  * source/vm/garbage.c
+    + Added hb_vmIsGlobalRef() to sweep scan.
+
+  * tests/global1.prg
+    + Readded sample of passing Global by reference.
+
+  * tests/pp_harb.ch
+    * Removed extra paramater in call to hb_itemUnRef().
 
 2002-09-21 09:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rdd/dbf1.c

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.19 2002/09/18 03:00:50 ronpinkas Exp $
+ * $Id: harbour.c,v 1.20 2002/09/21 05:21:06 ronpinkas Exp $
  */
 
 /*
@@ -3121,8 +3121,7 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
    iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
    if( iVar )
    {
-      /* pushing Global by reference is not allowed */
-      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, szVarName, NULL );
+      hb_compGenPCode2( HB_P_PUSHGLOBALREF, (BYTE) iVar - 1, ( BOOL ) 1 );
 
       return;
    }
@@ -4288,7 +4287,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                {
                   PCOMSYMBOL pSym;
                   short iGlobal;
-                  PFUNCTION pReleaseGlobalsFunc = hb_compFunctionNew( hb_strdup( "_RELEASEGLOBALS" ), HB_FS_EXIT );
+                  PFUNCTION pReleaseGlobalsFunc = hb_compFunctionNew( hb_strdup( "hb_RELEASEGLOBALS" ), HB_FS_EXIT );
 
                   pReleaseGlobalsFunc->pOwner = hb_comp_functions.pLast;
                   pReleaseGlobalsFunc->bFlags = FUN_PROCEDURE;
@@ -4317,6 +4316,9 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
                   hb_compGenPCode1( HB_P_ENDPROC );
                   ++hb_comp_functions.iCount;
+
+                  pSym = hb_compSymbolAdd( hb_strdup( "{_REGISTERGLOBALS}" ), NULL );
+                  pSym->cScope = HB_FS_INIT | HB_FS_EXIT ;
                }
             }
 

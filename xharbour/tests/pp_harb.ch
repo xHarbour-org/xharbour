@@ -730,7 +730,7 @@
 
          if( HB_IS_BYREF( * ( hb_stack.pBase + 2 + 1 ) ) )
          {
-            PHB_ITEM pWS = hb_itemUnRef( * ( hb_stack.pBase + 2 + 1 ), NULL );
+            PHB_ITEM pWS = hb_itemUnRef( * ( hb_stack.pBase + 2 + 1 ) );
             char *pTmp = ( char * ) hb_xgrab( iLen - i + 1 );
 
             memset( pTmp, ' ', iLen - i );

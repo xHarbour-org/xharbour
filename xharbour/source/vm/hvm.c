@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.103 2002/09/20 19:48:20 ronpinkas Exp $
+ * $Id: hvm.c,v 1.104 2002/09/21 05:21:07 ronpinkas Exp $
  */
 
 /*
@@ -270,6 +270,8 @@ PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
 ULONG    hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
 USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
 
+HB_ITEM  hb_vm_aGlobals;         /* Harbour array to hold all application global variables */
+
 /* 21/10/00 - maurilio.longo@libero.it
    This Exception Handler gets called in case of an abnormal termination of an harbour program and
    displays a full stack trace at the harbour language level */
@@ -351,6 +353,9 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
    }
    hb_vm_wEnumCollectionCounter = 0;
+
+   hb_vm_aGlobals.type = HB_IT_NIL;
+   hb_arrayNew( &hb_vm_aGlobals, 0 );
 
    HB_TRACE( HB_TR_INFO, ("xinit" ) );
    hb_xinit();
@@ -1465,6 +1470,37 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             w += 2;
             break;
 
+         case HB_P_PUSHGLOBALREF:
+             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHGLOBALREF") );
+             {
+                short iGlobal    = pCode[ w + 1 ];
+                HB_ITEM_PTR pTop = ( * hb_stack.pPos );
+
+                pTop->type = HB_IT_BYREF;
+
+                /* we store its stack offset instead of a pointer to support a dynamic stack */
+                pTop->item.asRefer.value = iGlobal + 1; // To offset the -1 below.
+                pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
+                pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
+
+                if( (*pGlobals)[ iGlobal ]->type == HB_IT_STRING && (*pGlobals)[ iGlobal ]->item.asString.bStatic )
+                {
+                   char *sString = (char*) hb_xgrab( (*pGlobals)[ iGlobal ]->item.asString.length + 1 );
+
+                   memcpy( sString, (*pGlobals)[ iGlobal ]->item.asString.value, (*pGlobals)[ iGlobal ]->item.asString.length + 1 );
+
+                   (*pGlobals)[ iGlobal ]->item.asString.value = sString;
+                   (*pGlobals)[ iGlobal ]->item.asString.bStatic = FALSE;
+                   (*pGlobals)[ iGlobal ]->item.asString.puiHolders = (USHORT *) hb_xgrab( sizeof( USHORT ) );
+                   *( (*pGlobals)[ iGlobal ]->item.asString.puiHolders ) = 1;
+                }
+
+                hb_stackPush();
+             }
+
+             w += 2;
+             break;
+
          case HB_P_PUSHLOCAL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLOCAL") );
             hb_vmPushLocal( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
@@ -1895,13 +1931,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             hb_stackDec();
 
-            // So that released var can be claimed by GC.
-            HB_ITEM_UNLOCK( (*pGlobals)[ iGlobal ] );
-
             hb_itemForwardValue( (*pGlobals)[ iGlobal ], *( hb_stack.pPos ) );
-
-            // So that GLOBAL value can NEVER be claimed by GC
-            HB_ITEM_LOCK( (*pGlobals)[ iGlobal ] );
 
             w += 2;
             break;
@@ -5840,6 +5870,14 @@ void hb_vmIsStaticRef( void )
 
    /* statics are stored as an item of array type */
    hb_gcItemRef( &s_aStatics );
+}
+
+void hb_vmIsGlobalRef( void )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmIsGlobalRef()"));
+
+   /* statics are stored as an item of array type */
+   hb_gcItemRef( &hb_vm_aGlobals );
 }
 
 /* $Doc$

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.22 2002/09/19 02:04:14 ronpinkas Exp $
+ * $Id: genc.c,v 1.23 2002/09/21 05:21:06 ronpinkas Exp $
  */
 
 /*
@@ -63,9 +63,13 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
    BOOL bIsExitFunction   ;
    BOOL bIsStaticVariable ;
    BOOL bIsGlobalVariable ;
+   BOOL bRegisterGlobals;
 
    if( ! pFileName->szExtension )
+   {
       pFileName->szExtension = ".c";
+   }
+
    hb_fsFNameMerge( szFileName, pFileName );
 
    yyc = fopen( szFileName, "wb" );
@@ -81,19 +85,24 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       fflush( stdout );
    }
 
-   fprintf( yyc, "/*\n * xHarbour Compiler, build %d.%d (%s)\n",
-      HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
+   fprintf( yyc, "/*\n * xHarbour Compiler, build %d.%d (%s)\n", HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
    fprintf( yyc, " * Generated C source code\n */\n\n" );
 
    if( hb_comp_iFunctionCnt )
    {
       fprintf( yyc, "#include \"hbvmpub.h\"\n" );
+
       if( hb_comp_iGenCOutput != HB_COMPGENC_COMPACT )
+      {
          fprintf( yyc, "#include \"hbpcode.h\"\n" );
+      }
+
       fprintf( yyc, "#include \"hbinit.h\"\n\n\n" );
 
       if( ! hb_comp_bStartProc )
+      {
          pFunc = pFunc->pNext; /* No implicit starting procedure */
+      }
 
       /* write functions prototypes for PRG defined functions */
       while( pFunc )
@@ -126,6 +135,26 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          pFunc = pFunc->pNext;
       }
 
+      // Any NON EXTERN Globals to Register?
+      pGlobal = hb_comp_pGlobals;
+      while( pGlobal )
+      {
+         if( pGlobal->szAlias == NULL )
+         {
+            break;
+         }
+
+         pGlobal = pGlobal->pNext;
+      }
+
+      // Yes.
+      bRegisterGlobals = (BOOL) pGlobal;
+
+      if( bRegisterGlobals )
+      {
+         fprintf( yyc, "static HARBOUR hb_REGISTERGLOBALS( void );\n" ); /* NOTE: hb_ intentionally in lower case */
+      }
+
       /* write functions prototypes for inline blocks */
       while( pInline )
       {
@@ -138,9 +167,10 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       pFunc = hb_comp_funcalls.pFirst;
       while( pFunc )
       {
-         if( hb_compFunctionFind( pFunc->szName ) == NULL &&
-             hb_compInlineFind( pFunc->szName ) == NULL )
+         if( hb_compFunctionFind( pFunc->szName ) == NULL && hb_compInlineFind( pFunc->szName ) == NULL )
+         {
             fprintf( yyc, "extern HB_FUNC( %s );\n", pFunc->szName );
+         }
 
          pFunc = pFunc->pNext;
       }
@@ -172,6 +202,14 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
             * initialize global variables
             */
             fprintf( yyc, "{ \"(_INITGLOBALS)\", HB_FS_INIT | HB_FS_EXIT, hb_INITGLOBALS, NULL }" ); /* NOTE: hb_ intentionally in lower case */
+         }
+         else if( pSym->szName[ 0 ] == '{' )
+         {
+            /* Since the normal function cannot be INIT and EXIT at the same time
+            * we are using these two bits to mark the special function used to
+            * initialize global variables
+            */
+            fprintf( yyc, "{ \"(_REGISTERGLOBALS)\", HB_FS_INIT | HB_FS_EXIT, hb_REGISTERGLOBALS, NULL }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else
          {
@@ -329,6 +367,26 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          fprintf( yyc,  "}\n\n" );
 
          pFunc = pFunc->pNext;
+      }
+
+      if( bRegisterGlobals )
+      {
+         fprintf( yyc, "static HARBOUR hb_REGISTERGLOBALS( void )\n"
+                       "{\n"
+                       "   extern HB_ITEM hb_vm_aGlobals;\n" );
+
+         pGlobal = hb_comp_pGlobals;
+         while( pGlobal )
+         {
+            if( pGlobal->szAlias == NULL )
+            {
+               fprintf( yyc, "   hb_arrayAdd( &hb_vm_aGlobals, &%s );\n", pGlobal->szName );
+            }
+
+            pGlobal = pGlobal->pNext;
+         }
+
+         fprintf( yyc, "}\n\n" );
       }
 
       /* Generate codeblocks data
@@ -2185,6 +2243,21 @@ static HB_GENC_FUNC( hb_p_popglobal )
    return 2;
 }
 
+ static HB_GENC_FUNC( hb_p_pushglobalref )
+ {
+    fprintf( cargo->yyc, "\tHB_P_PUSHGLOBALREF, %i,",
+             pFunc->pCode[ lPCodePos + 1 ] );
+
+    if( cargo->bVerbose )
+    {
+       fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] + 1 )->szName );
+    }
+
+    fprintf( cargo->yyc, "\n" );
+
+    return 2;
+ }
+
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
@@ -2334,7 +2407,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_enumerate,
    hb_p_endenumerate,
    hb_p_pushglobal,
-   hb_p_popglobal
+   hb_p_popglobal,
+   hb_p_pushglobalref
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )
