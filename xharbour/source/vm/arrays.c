@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.90 2004/02/29 07:28:25 ronpinkas Exp $
+ * $Id: arrays.c,v 1.91 2004/03/03 11:41:22 ronpinkas Exp $
  */
 
 /*
@@ -1119,6 +1119,12 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
       FakedObject.type = HB_IT_ARRAY;
       FakedObject.item.asArray.value = pBaseArray;
 
+      // To avoid DOUBLE freeing - when poped off in hb_clsFinalize()
+      #ifdef HB_ARRAY_USE_COUNTER
+         FakedObject.item.asArray.value->uiHolders = 1;
+      #else
+         hb_arrayRegisterHolder( pBaseArray, (void *) &FakedObject );
+      #endif
       hb_clsFinalize( &FakedObject );
    }
 

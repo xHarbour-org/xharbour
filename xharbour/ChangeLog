@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2482 2004/03/04 08:49:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2483 2004/03/04 09:12:29 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-04 01:37 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrays.c
+    ! Fixed possibility of double freeing of base array when calling hb_clsFinalize()
 
 2004-03-04 04:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/direct.c
