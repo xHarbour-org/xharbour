@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: make_vc.bat,v 1.10 2003/04/09 20:12:39 paultucker Exp $
+rem $Id: make_vc.bat,v 1.11 2003/05/26 05:58:49 paultucker Exp $
 rem 
 
 rem ---------------------------------------------------------------
@@ -36,6 +36,17 @@ if not exist lib md lib
 if not exist lib\vc md lib\vc
 if not exist bin md bin
 if not exist bin\vc md bin\vc
+
+rem added subdir for optimized library
+rem start in build 81
+
+if not exist obj\vc\opt md obj\vc\opt
+if not exist obj\vc\opt\console md obj\vc\opt\console
+if not exist obj\vc\opt\gui md obj\vc\opt\gui
+
+if not exist obj\vcmt\opt md obj\vcmt\opt
+if not exist obj\vcmt\opt\console md obj\vcmt\opt\console
+if not exist obj\vcmt\opt\gui md obj\vcmt\opt\gui
 
 SET MK_FILE=makefile.vc
 SET _HBMT=%HB_MT%

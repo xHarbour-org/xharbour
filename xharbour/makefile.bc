@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.54 2003/06/20 18:14:59 jonnymind Exp $
+# $Id: makefile.bc,v 1.55 2003/06/20 18:25:38 ronpinkas Exp $
 #
 
 #
@@ -94,6 +94,8 @@ LIB_DIR = lib\b32
    CDX_OBJ_DIR   = $(OBJ_DIR)\mt
    PP_OBJ_DIR    = $(OBJ_DIR)\mt
    SAM_OBJ_DIR   = $(OBJ_DIR)\mt
+   OPT_CON_OBJ_DIR = $(OBJ_DIR)\mt\opt\console
+   OPT_GUI_OBJ_DIR = $(OBJ_DIR)\mt\opt\gui
 !else
    VM_OBJ_DIR    = $(OBJ_DIR)
    RTL_OBJ_DIR   = $(OBJ_DIR)
@@ -103,6 +105,8 @@ LIB_DIR = lib\b32
    CDX_OBJ_DIR   = $(OBJ_DIR)
    PP_OBJ_DIR    = $(OBJ_DIR)
    SAM_OBJ_DIR   = $(OBJ_DIR)
+   OPT_CON_OBJ_DIR = $(OBJ_DIR)\opt\console
+   OPT_GUI_OBJ_DIR = $(OBJ_DIR)\opt\gui
 !endif
 
 # This is needed, otherwise the libs may overflow when
@@ -186,10 +190,6 @@ HVM_GUI_MT_OBJ_FLAGS = $(CLIBFLAGS) -DSIMPLEX -DHB_THREAD_SUPPORT -DHB_GUI
 # Macros to access our library names
 #
 
-HVM_OBJ        = $(LIB_DIR)\hvm.obj
-HVM_MT_OBJ     = $(LIB_DIR)\hvmmt.obj
-HVM_GUI_OBJ    = $(LIB_DIR)\hvmgui.obj
-HVM_GUI_MT_OBJ = $(LIB_DIR)\hvmguimt.obj
 COMMON_LIB     = $(LIB_DIR)\common.lib
 CODEPAGE_LIB   = $(LIB_DIR)\codepage.lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdx.lib
@@ -205,25 +205,29 @@ VM_LIB         = $(LIB_DIR)\vm.lib
 ODBC_LIB       = $(LIB_DIR)\hbodbc.lib
 SAMPLES_LIB    = $(LIB_DIR)\samples.lib
 
-VM_STLIB     = $(VM_LIB)
-RTL_STLIB    = $(RTL_LIB)
-MACRO_STLIB  = $(MACRO_LIB)
-RDD_STLIB    = $(RDD_LIB)
-DBFNTX_STLIB = $(DBFNTX_LIB)
-DBFCDX_STLIB = $(DBFCDX_LIB)
-PP_STLIB     = $(PP_LIB)
-ODBC_STLIB   = $(ODBC_LIB)
+VM_STLIB         = $(VM_LIB)
+VM_LIB_OPT_CON   = $(LIB_DIR)\optcon.lib
+VM_LIB_OPT_GUI   = $(LIB_DIR)\optgui.lib
+RTL_STLIB        = $(RTL_LIB)
+MACRO_STLIB      = $(MACRO_LIB)
+RDD_STLIB        = $(RDD_LIB)
+DBFNTX_STLIB     = $(DBFNTX_LIB)
+DBFCDX_STLIB     = $(DBFCDX_LIB)
+PP_STLIB         = $(PP_LIB)
+ODBC_STLIB       = $(ODBC_LIB)
 
 !if $d(HB_THREAD_SUPPORT)
-   VM_LIB     = $(LIB_DIR)\vmmt.lib
-   RTL_LIB    = $(LIB_DIR)\rtlmt.lib
-   MACRO_LIB  = $(LIB_DIR)\macromt.lib
-   RDD_LIB    = $(LIB_DIR)\rddmt.lib
-   DBFNTX_LIB = $(LIB_DIR)\dbfntxmt.lib
-   DBFCDX_LIB = $(LIB_DIR)\dbfcdxmt.lib
-   PP_LIB     = $(LIB_DIR)\ppmt.lib
-   ODBC_LIB   = $(LIB_DIR)\hbodbcmt.lib
-   SAMPLES_LIB = $(LIB_DIR)\samplesmt.lib
+   VM_LIB         = $(LIB_DIR)\vmmt.lib
+   VM_LIB_OPT_CON = $(LIB_DIR)\optconmt.lib
+   VM_LIB_OPT_GUI = $(LIB_DIR)\optguimt.lib
+   RTL_LIB        = $(LIB_DIR)\rtlmt.lib
+   MACRO_LIB      = $(LIB_DIR)\macromt.lib
+   RDD_LIB        = $(LIB_DIR)\rddmt.lib
+   DBFNTX_LIB     = $(LIB_DIR)\dbfntxmt.lib
+   DBFCDX_LIB     = $(LIB_DIR)\dbfcdxmt.lib
+   PP_LIB         = $(LIB_DIR)\ppmt.lib
+   ODBC_LIB       = $(LIB_DIR)\hbodbcmt.lib
+   SAMPLES_LIB    = $(LIB_DIR)\samplesmt.lib
 !endif
 
 GTCGI_LIB    = $(LIB_DIR)\gtcgi.lib
@@ -666,6 +670,16 @@ VM_LIB_OBJS = \
    \
    $(VM_OBJ_DIR)\harbinit.obj
 
+VM_LIB_OPT_CON_OBJS = \
+   $(OPT_CON_OBJ_DIR)\hvm.obj \
+   $(OPT_CON_OBJ_DIR)\classes.obj \
+   $(OPT_CON_OBJ_DIR)\fm.obj
+
+VM_LIB_OPT_GUI_OBJS = \
+   $(OPT_GUI_OBJ_DIR)\hvm.obj \
+   $(OPT_GUI_OBJ_DIR)\classes.obj \
+   $(OPT_GUI_OBJ_DIR)\fm.obj
+
 #!if ! $d(BCC_NOSTARTUP)
 #VM_LIB_OBJS = $(VM_LIB_OBJS) \
 #   $(OBJ_DIR)\startup.obj
@@ -838,7 +852,7 @@ SAMPLES_LIB_OBJS =  \
    $(SAM_OBJ_DIR)\status.obj \
    $(SAM_OBJ_DIR)\time.obj
 
-   ODBC_LIB_OBJS =       \
+ODBC_LIB_OBJS =       \
       $(OBJ_DIR)\odbc.obj \
       $(OBJ_DIR)\todbc.obj
 
@@ -852,6 +866,8 @@ all: \
    $(PP_LIB) \
    $(HARBOUR_EXE) \
    $(VM_LIB) \
+   $(VM_LIB_OPT_CON) \
+   $(VM_LIB_OPT_GUI) \
    $(RTL_LIB) \
    $(MACRO_LIB) \
    $(DEBUG_LIB) \
@@ -868,50 +884,65 @@ all: \
    $(HBPP_EXE) \
    $(HBTEST_EXE) \
    $(HBDOC_EXE) \
-   $(HBMAKE_EXE) \
-   \
-   $(HVM_OBJ) \
-   $(HVM_MT_OBJ) \
-   $(HVM_GUI_OBJ) \
-   $(HVM_GUI_MT_OBJ)
+   $(HBMAKE_EXE)
+
 #
 # Library dependencies and build rules
 #
 
-$(COMMON_LIB) : $(COMMON_LIB_OBJS)
-$(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
-$(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
-$(DEBUG_LIB)  : $(DEBUG_LIB_OBJS)
-$(LANG_LIB)   : $(LANG_LIB_OBJS)
-$(MACRO_LIB)  : $(MACRO_LIB_OBJS)
-$(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
-$(PP_LIB)     : $(PP_LIB_OBJS)
-$(RDD_LIB)    : $(RDD_LIB_OBJS)
-$(RTL_LIB)    : $(RTL_LIB_OBJS)
-$(VM_LIB)     : $(VM_LIB_OBJS)
-$(GTCGI_LIB)  : $(GTCGI_LIB_OBJS)
-$(GTDOS_LIB)  : $(GTDOS_LIB_OBJS)
-$(GTPCA_LIB)  : $(GTPCA_LIB_OBJS)
-$(GTSTD_LIB)  : $(GTSTD_LIB_OBJS)
-$(GTWIN_LIB)  : $(GTWIN_LIB_OBJS)
-$(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
-$(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
-$(ODBC_LIB)    : $(ODBC_LIB_OBJS)
+$(COMMON_LIB)     : $(COMMON_LIB_OBJS)
+$(DBFCDX_LIB)     : $(DBFCDX_LIB_OBJS)
+$(DBFNTX_LIB)     : $(DBFNTX_LIB_OBJS)
+$(DEBUG_LIB)      : $(DEBUG_LIB_OBJS)
+$(LANG_LIB)       : $(LANG_LIB_OBJS)
+$(MACRO_LIB)      : $(MACRO_LIB_OBJS)
+$(NULSYS_LIB)     : $(NULSYS_LIB_OBJS)
+$(PP_LIB)         : $(PP_LIB_OBJS)
+$(RDD_LIB)        : $(RDD_LIB_OBJS)
+$(RTL_LIB)        : $(RTL_LIB_OBJS)
+$(VM_LIB)         : $(VM_LIB_OBJS)
+$(VM_LIB_OPT_CON) : $(VM_LIB_OPT_CON_OBJS)
+$(VM_LIB_OPT_GUI) : $(VM_LIB_OPT_GUI_OBJS)
+$(GTCGI_LIB)      : $(GTCGI_LIB_OBJS)
+$(GTDOS_LIB)      : $(GTDOS_LIB_OBJS)
+$(GTPCA_LIB)      : $(GTPCA_LIB_OBJS)
+$(GTSTD_LIB)      : $(GTSTD_LIB_OBJS)
+$(GTWIN_LIB)      : $(GTWIN_LIB_OBJS)
+$(CODEPAGE_LIB)   : $(CODEPAGE_LIB_OBJS)
+$(SAMPLES_LIB)    : $(SAMPLES_LIB_OBJS)
+$(ODBC_LIB)       : $(ODBC_LIB_OBJS)
+
 #
-# HVM*.OBJ dependencies
+# OPTCON.LIB dependencies
 #
 
-$(HVM_OBJ) : $(VM_DIR)\hvm.c
-   $(CC) $(HVM_OBJ_FLAGS) -o$@ $**
+$(OPT_CON_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
+   $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -o$@ $**
+   tlib $(VM_LIB_OPT_CON) $(ARFLAGS) -+$@,,
 
-$(HVM_MT_OBJ) : $(VM_DIR)\hvm.c
-   $(CC) $(HVM_MT_OBJ_FLAGS) -o$@ $**
+$(OPT_CON_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
+   $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -o$@ $**
+   tlib $(VM_LIB_OPT_CON) $(ARFLAGS) -+$@,,
 
-$(HVM_GUI_OBJ) : $(VM_DIR)\hvm.c
-   $(CC) $(HVM_GUI_OBJ_FLAGS) -o$@ $**
+$(OPT_CON_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
+   $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -o$@ $**
+   tlib $(VM_LIB_OPT_CON) $(ARFLAGS) -+$@,,
 
-$(HVM_GUI_MT_OBJ) : $(VM_DIR)\hvm.c
-   $(CC) $(HVM_GUI_MT_OBJ_FLAGS) -o$@ $**
+#
+# OPTGUI.LIB dependencies
+#
+
+$(OPT_GUI_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
+   $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -DHB_GUI -o$@ $**
+   tlib $(VM_LIB_OPT_GUI) $(ARFLAGS) -+$@,,
+
+$(OPT_GUI_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
+   $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -DHB_GUI -o$@ $**
+   tlib $(VM_LIB_OPT_GUI) $(ARFLAGS) -+$@,,
+
+$(OPT_GUI_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
+   $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -DHB_GUI -o$@ $**
+   tlib $(VM_LIB_OPT_GUI) $(ARFLAGS) -+$@,,
 
 #
 # COMMON.LIB dependencies
