@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.308 2002/07/13 22:55:26 lculik Exp $
+ * $Id: ChangeLog,v 1.309 2002/07/14 16:42:22 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-07-17 09:08 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tget.prg
+    ! Fix initialization ::lEdit in New method.
+
+    Bug and solution reported by Jose F. Gimenez
 
 2002-07-14 13:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * doc/transfrm.txt
