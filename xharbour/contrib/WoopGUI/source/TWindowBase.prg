@@ -99,12 +99,10 @@ CLASS TWindowBase FROM TObject
     METHOD CanAcceptFocus()                    INLINE ::IsShown() .AND. ::IsEnabled()
     METHOD CaptureMouse()                      VIRTUAL // FSG - to be implemented
     METHOD CreateId()                          INLINE snWinID++   //
-    METHOD Center()                            INLINE CenterWindow( ::nHandle )
-    METHOD CenterOnParent()                    VIRTUAL // FSG - to be implemented
-    METHOD CenterOnScreen()                    INLINE ::Center()
-    METHOD Centre()                            INLINE ::Center()
-    METHOD CentreOnParent()                    INLINE ::CenterOnParent()
-    METHOD CentreOnScreen()                    INLINE ::CenterOnScreen()
+    METHOD Center( nParentHandle, nDirection ) INLINE WG_CenterWindow( ::nHandle, nParentHandle, ;
+                                                      IIF( nDirection == NIL, WIN_CENTER_VERTICAL + WIN_CENTER_HORIZONTAL, nDirection ) )
+    METHOD CenterOnParent( nDirection )        INLINE ::Center( IIF( ValType( ::oParent ) == "O", ::oParent:nHandle, NIL ), nDirection )
+    METHOD CenterOnScreen( nDirection )        INLINE ::Center( NIL, nDirection )
     METHOD Close()                             INLINE CloseWindow( ::nHandle )
     METHOD Create()
     METHOD Destroy()                           INLINE DestroyWindow( ::nHandle ), Self := NIL

@@ -27,7 +27,11 @@ CLASS TMenuItem FROM TObject
     DATA nFlags
     DATA nIDItem       // nIDItem o oSubMenu
     DATA nPos         AS NUMERIC
-    DATA cItem        AS STRING
+    DATA cItem        AS STRING HIDDEN
+    ACCESS cCaption      INLINE ::cItem
+    ASSIGN cCaption( x ) INLINE ::cTranslatedItem := StrTran( x, "\t", CHR(9) ),;
+                                ::cItem := x
+    DATA cTranslatedItem AS STRING HIDDEN
     DATA bAction      AS CODEBLOCK
     DATA cMessage     AS STRING
     DATA oParentMenu  AS OBJECT
@@ -103,7 +107,7 @@ METHOD New( nFlags, nIDItem, cItem, bAction, lChecked, lEnabled, lGrayed, cMsg )
     ENDIF
 
     ASSIGN ::nIDItem  WITH nIDItem DEFAULT 100
-    ASSIGN ::cItem    WITH cItem   DEFAULT "Menu_1"
+    ASSIGN ::cCaption WITH cItem   DEFAULT "Menu_1"
     ASSIGN ::bAction  WITH bAction
     ASSIGN ::cMessage WITH cMsg    DEFAULT ""
 

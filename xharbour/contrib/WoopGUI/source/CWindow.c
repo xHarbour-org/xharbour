@@ -253,6 +253,7 @@ HB_FUNC ( CREATEWINDOWEX )
     hb_retnl ((LONG)hwnd);
 }
 */
+
 // Funzioni di Window
 
 /*
@@ -270,9 +271,7 @@ HB_FUNC ( ADJUSTWINDOWRECTEX )
 
 }
 */
-
-// From MiniGUI - Roberto Lopez
-//
+/*
 HB_FUNC ( WG_CENTERWINDOW )
 {
     RECT rect;
@@ -287,6 +286,103 @@ HB_FUNC ( WG_CENTERWINDOW )
     y = GetSystemMetrics(SM_CYSCREEN);
     SetWindowPos(hWnd, HWND_TOP, (x - w) / 2, (y - h) / 2, 0, 0, SWP_NOSIZE);
 }
+*/
+
+// centre the window with respect to its parent in either (or both) directions
+HB_FUNC ( WG_CENTERWINDOW )
+//
+//  FUNCTION: CenterWindow(HWND, HWND, INT)
+//
+//  PURPOSE:  Center one window over another.
+//
+//  PARAMETERS:
+//    hwndChild - The handle of the window to be centered.
+//    hwndParent- The handle of the window to center on.
+//    iDirection- WIN_CENTER_HORIZONTAL | WIN_CENTER_VERTICAL
+//
+//  RETURN VALUE:
+//
+//    TRUE  - Success
+//    FALSE - Failure
+//
+//  COMMENTS:
+//
+//    Dialog boxes take on the screen position that they were designed
+//    at, which is not always appropriate. Centering the dialog over a
+//    particular window usually results in a better position.
+//
+{
+
+    //char *szBuf[200];
+
+    // parameters
+    HWND hWndChild  = (HWND) hb_parnl (1);
+    // if not defined i use desktop
+    HWND hWndParent =  ( !ISNIL(2) ? (HWND) hb_parnl (2) : (HWND) GetDesktopWindow() );
+    int  iDirection =  ( !ISNIL(3) ? hb_parni(3) : WIN_CENTER_VERTICAL | WIN_CENTER_HORIZONTAL );
+
+
+    RECT    rcChild, rcParent;
+    int     cxChild, cyChild, cxParent, cyParent;
+    int     cxScreen, cyScreen, xNew, yNew;
+    HDC     hdc;
+
+    // Get the Height and Width of the child window
+    GetWindowRect(hWndChild, &rcChild);
+    cxChild = rcChild.right - rcChild.left;
+    cyChild = rcChild.bottom - rcChild.top;
+
+    // Get the Height and Width of the parent window
+    GetWindowRect(hWndParent, &rcParent);
+    cxParent = rcParent.right - rcParent.left;
+    cyParent = rcParent.bottom - rcParent.top;
+
+    // Get the display limits
+    hdc = GetDC(hWndChild);
+    cxScreen = GetDeviceCaps(hdc, HORZRES);
+    cyScreen = GetDeviceCaps(hdc, VERTRES);
+    ReleaseDC(hWndChild, hdc);
+
+    xNew = -1;
+    yNew = -1;
+
+    // Calculate new X position, then adjust for screen
+    if ( iDirection & WIN_CENTER_HORIZONTAL )
+         xNew = rcParent.left + ((cxParent - cxChild) / 2);
+    if (xNew < 0)
+    {
+        xNew = 0;
+    }
+    else if ((xNew + cxChild) > cxScreen)
+    {
+        xNew = cxScreen - cxChild;
+    }
+
+    // Calculate new Y position, then adjust for screen
+    if ( iDirection & WIN_CENTER_VERTICAL )
+       yNew = rcParent.top  + ((cyParent - cyChild) / 2);
+    if (yNew < 0)
+    {
+        yNew = 0;
+    }
+    else if ((yNew + cyChild) > cyScreen)
+    {
+        yNew = cyScreen - cyChild;
+    }
+
+    //sprintf( szBuf, "x=%u, y=%u, nx=%u, ny=%u, Dir=%i, wS=%u, hS=%u",
+    //                rcChild.left, rcChild.top, xNew, yNew, iDirection, cxScreen, cyScreen );
+    //MessageBox( 0, szBuf, "CenterWindow",
+    //            MB_ICONEXCLAMATION | MB_OK | MB_SYSTEMMODAL);
+
+    // Set it, and return
+    hb_retl( SetWindowPos(hWndChild,
+                        NULL,
+                        xNew, yNew,
+                        0, 0,
+                        SWP_NOSIZE | SWP_NOZORDER) );
+}
+
 
 HB_FUNC ( GETWINDOWWIDTH )
 {

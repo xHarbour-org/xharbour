@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.13 2002/09/13 02:49:55 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.14 2002/09/13 15:15:42 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,40 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-15 00:43 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
+   * source/CWindow.c
+     * rewrited CenterWindow() and renamed to WG_CenterWindow() to avoid conflict with CenterWindow() from What32
+       now WG_CenterWindow() can accept 3 parameter:
+       hWndChild - The handle of the window to be centered.
+       hWndParent- The handle of the window to center on.      (default Desktop Window )
+       iDirection- WIN_CENTER_HORIZONTAL | WIN_CENTER_VERTICAL (default both)
+
+   * source/TMenu.prg
+     * modified as TMenuItem want
+
+   * source/TMenuItem.prg
+     * modified to permit use of Accelerator inside menu item string (Accelerator not yet implemented)
+     + added cCaption SET/GET property, to use instead of cItem which now contains original value
+     + added cTranslatedItem property which contains correct value to use with API calls
+
+   * source/TWindow.prg
+     * reformatted
+
+   * source/TWindowBase.prg
+     - Deleted Centre*() methods, leaved only Center*()
+     * Now Center*() methods use WG_CenterWindow() and have this parameter:
+       Center( nParentHandle, nDirection )
+       CenterOnParent( nDirection )         ( if window has parent, or to Desktop Window if none )
+       CenterOnScreen( nDirection )
+
+    * include/woopgui.h
+    * include/woopgui.ch
+      + WIN_CENTER_VERTICAL and WIN_CENTER_HORIZONTAL
+        as direction parameter for Windows Centering
+
+    * tests/demo.prg
+
 
 2002-09-13 16:05 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
    * source/TApplication.prg

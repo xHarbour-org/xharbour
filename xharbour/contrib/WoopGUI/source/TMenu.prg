@@ -105,7 +105,7 @@ METHOD Append( oItem ) CLASS TMenu
 
     aAdd( ::aoItems, oItem )
     nIDItem := iif( ValType( oItem:nIDItem) == "O", oItem:nIDItem:nHandle, oItem:nIDItem )
-    lOk := AppendMenu( ::nHandle, oItem:nFlags, nIDItem, oItem:cItem )
+    lOk := AppendMenu( ::nHandle, oItem:nFlags, nIDItem, oItem:cTranslatedItem )
     IF lOk
        oItem:SetParent( Self )
     ENDIF
@@ -207,7 +207,7 @@ METHOD Insert( oItem, nPos ) CLASS TMenu  // nPos = Specifies the menu item befo
        ELSE
           nIDItem := oItem:nIDItem
        ENDIF
-       lOk := InsertMenu( ::nHandle, nPos-1, uFlags, nIDItem, oItem:cItem )
+       lOk := InsertMenu( ::nHandle, nPos-1, uFlags, nIDItem, oItem:cTranslatedItem )
        IF lOk
           oItem:SetParent( Self )
        ENDIF
@@ -234,7 +234,7 @@ METHOD Modify( oItem, nPos ) CLASS TMenu   // nPos = Specifies the menu item bef
        ELSE
           nIDItem := oItem:nIDItem
        ENDIF
-       lOk := ModifyMenu( ::nHandle, nPos-1, uFlags, nIDItem, oItem:cItem )
+       lOk := ModifyMenu( ::nHandle, nPos-1, uFlags, nIDItem, oItem:cTranslatedItem )
        IF lOk
           oItem:SetParent( Self )
        ENDIF

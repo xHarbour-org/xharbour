@@ -18,3 +18,5 @@ extern void WG_SetObjectDataLong( PHB_ITEM pObj, char* cData, long nNew );
 extern void WG_SetObjectDataString( PHB_ITEM pObj, char* cData, char *cNew );
 extern void WG_SetObjectData( PHB_ITEM pObj, char* cData, PHB_ITEM pNew );
 
+#define WIN_CENTER_VERTICAL     2
+#define WIN_CENTER_HORIZONTAL   4

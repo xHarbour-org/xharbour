@@ -105,6 +105,8 @@ function Main   //( hInstance, hprevInstance, cCmdLine, nCmdShow )
    //oWnd1:SetEventHandler( {|hWnd, nMsg, wParam, lParam| MyEvent( hWnd, nMsg, wParam, lParam, oWnd1 ) } )
 
    // oWnd1:Show()
+   oWnd1:Create()
+   oWnd1:CenterOnScreen()
    WINDOW oWnd1 ACTIVATE
    // oWnd1:Activate()
 
@@ -120,6 +122,22 @@ return (0)
 STATIC PROCEDURE Appl_Quit()
   // Here you can put your closing application calls
 RETURN
+
+/*
+STATIC FUNCTION MainLoop()
+   LOCAL cMsg
+   WG_DebugTrace( "TApplication:MainLoop() - Start MainLoop", "Self", Self )
+   DO WHILE GetMessage( @cMsg, 0, 0, 0 )
+      IF !IsDialogMessage( , cMsg )
+         TranslateMessage( cMsg )
+         DispatchMessage( cMsg )
+      ENDIF
+   ENDDO
+   WG_DebugTrace( "TApplication:MainLoop() - End MainLoop", "Self", Self )
+
+RETURN 0
+*/
+
 
 FUNCTION MyEvent( hWnd, nMsg, wParam, lParam, oWnd, oApp )
   LOCAL nRet := -1
@@ -162,6 +180,7 @@ PROCEDURE BaseDialog( oWnd1, lModal )
              TITLE "Example Modeless Dialog" ;
              OF oWnd1 STATUSBAR
    ENDIF
+
    // oDlg1 := tDialog():New("Example Dialog",0,0,300,550, oWnd1)
    /*
    DEFINE DIALOG oDlg1 ;
@@ -411,8 +430,8 @@ PROCEDURE BaseDialog( oWnd1, lModal )
 
    IF !lModal
       // From here if is modeless cannot be evaluate until end dialog
-      SET DIALOG oDlg1 CENTER
-      //oDlg1:Center()
+      //SET DIALOG oDlg1 CENTER
+      oDlg1:CenterOnParent()
 
       SET DIALOG oDlg1 STATUSBAR "Sample Dialog Window - Status bar"
       //oDlg1:SetStatusBar("Sample Dialog Window - Status bar")
@@ -564,8 +583,8 @@ PROCEDURE EditDialog( oWnd1, lModal )
 
    IF !lModal
       // From here if is modeless cannot be evaluate until end dialog
-      SET DIALOG oDlg1 CENTER
-      //oDlg1:Center()
+      //SET DIALOG oDlg1 CENTER
+      oDlg1:Center()
 
       SET DIALOG oDlg1 STATUSBAR "Sample Dialog Window - Status bar"
       //oDlg1:SetStatusBar("Sample Dialog Window - Status bar")
@@ -582,7 +601,7 @@ STATIC FUNCTION DefineMenu( oWnd )
        POPUP "&File"
            ITEM "&Dialog Window - Modal"  MESSAGE "Open a Modal Dialog Window"  ;
                 ACTION BaseDialog( oWnd, TRUE )
-           ITEM "&Dialog Window - Modeless" MESSAGE "Open a Modeless Dialog Window";
+           ITEM "&Dialog Window - Modeless\tCtrl+D" MESSAGE "Open a Modeless Dialog Window";
                 ACTION BaseDialog( oWnd, FALSE )
            SEPARATOR
            ITEM "Edit   &Window - Modal"    ACTION EditDialog( oWnd, TRUE )

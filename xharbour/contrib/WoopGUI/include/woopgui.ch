@@ -32,6 +32,9 @@
 #define StripFieldAlias( cKey )    StrTran( Upper( cKey ), "FIELD->" )
 #define StripAlias( cKey )         Upper( Substr( cKey, At( "->", cKey )+2 ) )
 
+#define WIN_CENTER_VERTICAL     2
+#define WIN_CENTER_HORIZONTAL   4
+
 
 // WOOPGUI PREPROCESSOR COMMANDS
 

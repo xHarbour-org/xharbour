@@ -175,13 +175,17 @@ CLASS TWindow FROM TWindowBase
     METHOD OnCloseWindow()                  VIRTUAL // FSG - to be implemented
     METHOD OnCreate( lParam )               VIRTUAL //INLINE ::Create( lParam )
     METHOD OnDestroy()                      VIRTUAL
+    METHOD OnDrawItem()                     VIRTUAL
     METHOD OnDropFile()                     VIRTUAL // FSG - to be implemented
     METHOD OnEraseBkGnd()                   VIRTUAL // FSG - to be implemented
+    METHOD OnGetMinMaxInfo()                VIRTUAL
+    METHOD OnHScroll()                      VIRTUAL
     METHOD OnIdle()                         VIRTUAL // FSG - to be implemented
     METHOD OnInitDialog()                   VIRTUAL // FSG - to be implemented
     METHOD OnKeyDown()                      VIRTUAL // FSG - to be implemented
     METHOD OnKeyUp()                        VIRTUAL // FSG - to be implemented
     METHOD OnKillFocus()                    VIRTUAL // FSG - to be implemented
+    METHOD OnLBtnDown()                     VIRTUAL
     METHOD OnMenuCommand()                  VIRTUAL // FSG - to be implemented
     METHOD OnMenuSelect()                   VIRTUAL // FSG - to be implemented
     //METHOD OnMenuHighlight()                VIRTUAL // FSG - to be implemented
@@ -191,16 +195,9 @@ CLASS TWindow FROM TWindowBase
     METHOD OnNCDestroy()                    //VIRTUAL // FSG - to be implemented
     METHOD OnNCMouseMove()                  VIRTUAL
     METHOD OnNotify()                       VIRTUAL // FSG - to be implemented
-    METHOD OnLBtnDown()                     VIRTUAL
-//    METHOD OnPaint()                        VIRTUAL // FSG - to be implemented
-   METHOD OnDrawItem()                      VIRTUAL
-   METHOD OnGetMinMaxInfo()                 VIRTUAL
-   METHOD OnPaint()                 ;
-          INLINE ;
-            ::hDC := BeginPaint(::nHandle, ::cPaint),     ;
-            ::Paint(), EndPaint(::nHandle, ::cPaint), 0
+    METHOD OnPaint()                        INLINE ::hDC := BeginPaint(::nHandle, ::cPaint),     ;
+                                                   ::Paint(), EndPaint(::nHandle, ::cPaint), 0
 
-    METHOD OnHScroll()                      VIRTUAL // FSG - to be implemented
     METHOD OnSetFocus()                     VIRTUAL // FSG - to be implemented
     METHOD OnSize()                         VIRTUAL // FSG - to be implemented
     METHOD OnSysColourChanged()             VIRTUAL // FSG - to be implemented
@@ -743,7 +740,7 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
          CASE nMsg == WM_SYSCOMMAND
               nRet := ::OnSysCommand(wParam, LoWord(lParam), HiWord(lParam))
          CASE nMsg == WM_ERASEBKGND
-              nRet := ::OnEraseBkGnd() 
+              nRet := ::OnEraseBkGnd()
          CASE nMsg == WM_TIMER
               nRet := ::OnTimer( wParam )
          //CASE nMsg == WM_QUERYENDSESSION
