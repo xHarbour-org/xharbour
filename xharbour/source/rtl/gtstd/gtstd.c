@@ -1,5 +1,5 @@
 /*
- * $Id: gtstd.c,v 1.2 2002/09/20 19:18:18 map Exp $
+ * $Id: gtstd.c,v 1.3 2002/09/27 20:51:49 map Exp $
  */
 
 /*
@@ -106,14 +106,14 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 
    HB_SYMBOL_UNUSED( iFilenoStdin );
    //HB_SYMBOL_UNUSED( iFilenoStderr );
-
+#if ! defined( HB_UNIX_GT_DAEMON )
 #if defined( OS_UNIX_COMPATIBLE )
    {
       struct termios ta;
-      
+
       tcgetattr( STDIN_FILENO, &startup_attributes );
 /*      atexit( restore_input_mode ); */
-      
+
       tcgetattr( STDIN_FILENO, &ta );
       ta.c_lflag &= ~( ICANON | ECHO );
       ta.c_iflag &= ~ICRNL;
@@ -121,6 +121,7 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
       ta.c_cc[ VTIME ] = 0;
       tcsetattr( STDIN_FILENO, TCSAFLUSH, &ta );
    }
+#endif
 #endif
 
 #if defined(_MSC_VER)
@@ -149,19 +150,26 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 
    s_szCrLf = (BYTE *) hb_conNewLine();
    s_ulCrLf = strlen( (char *) s_szCrLf );
-   
+
+#if ! defined( HB_UNIX_GT_DAEMON )
    hb_mouse_Init();
+#endif
 }
 
 void hb_gt_Exit( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
 
+#if ! defined( HB_UNIX_GT_DAEMON )
+
    hb_mouse_Exit();
 
 #if defined( OS_UNIX_COMPATIBLE )
    tcsetattr( STDIN_FILENO, TCSANOW, &startup_attributes );
 #endif
+
+#endif
+
 }
 
 int hb_gt_ExtendedKeySupport()
