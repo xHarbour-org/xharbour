@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: make_vc.bat,v 1.19 2001/11/07 13:56:28 vszakats Exp $
+rem $Id: make_vc.bat,v 1.1.1.1 2001/12/21 10:39:08 ronpinkas Exp $
 rem 
 
 rem ---------------------------------------------------------------
@@ -10,6 +10,13 @@ rem
 rem Instead, make a local copy and modify that one, or make a call to 
 rem this batch file from your customized one. [vszakats]
 rem ---------------------------------------------------------------
+
+if not exist obj md obj
+if not exist obj\vc md obj\vc
+if not exist lib md lib
+if not exist lib\vc md lib\vc
+if not exist bin md bin
+if not exist bin\vc md bin\vc
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
