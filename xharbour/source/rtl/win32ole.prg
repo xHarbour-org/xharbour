@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.29 2003/09/02 05:41:14 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.30 2003/11/01 06:00:55 ronpinkas Exp $
  */
 
 /*
@@ -1290,7 +1290,7 @@ RETURN uObj
 
      hb_xfree( wCLSID );
 
-     TraceLog( NULL, "Result: %i\n", s_nOleError );
+     //TraceLog( NULL, "Result: %i\n", s_nOleError );
 
      if ( hb_pcount() == 2 )
      {
@@ -1310,9 +1310,9 @@ RETURN uObj
 
      if ( s_nOleError == S_OK )
      {
-        TraceLog( NULL, "Class: %i\n", ClassID );
+        //TraceLog( NULL, "Class: %i\n", ClassID );
         s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, riid, (void **) &pDisp );
-        TraceLog( NULL, "Result: %i\n", s_nOleError );
+        //TraceLog( NULL, "Result: %i\n", s_nOleError );
      }
 
      hb_retnl( ( LONG ) pDisp );
