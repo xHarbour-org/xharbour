@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.318 2004/02/11 04:02:54 druzus Exp $
+ * $Id: hvm.c,v 1.319 2004/02/13 07:13:33 ronpinkas Exp $
  */
 
 /*
@@ -4870,6 +4870,7 @@ static void hb_vmArrayPop( void )
             pValue->item.asSymbol.value = hb_dynsymGetCase( szMessage )->pSymbol;
             hb_dynsymUnlock();
             pValue->item.asSymbol.stackbase = HB_VM_STACK.pPos - 3 - HB_VM_STACK.pItems;
+            pValue->item.asSymbol.uiSuperClass = 0;
 
             if( HB_IS_BYREF( hb_stackItemFromTop( -2 ) ) )
             {
@@ -5143,6 +5144,7 @@ static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSy
    ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
    hb_dynsymUnlock();
    ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
+   ItemMsg.item.asSymbol.uiSuperClass = 0;
 
    hb_vmPush( &ItemMsg );
    hb_vmPush( pObjItem );                             /* Push object              */
@@ -5176,6 +5178,7 @@ static void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
    ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
    hb_dynsymUnlock();
    ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
+   ItemMsg.item.asSymbol.uiSuperClass = 0;
 
    hb_vmPush( &ItemMsg );
    hb_vmPush( pObjItem );                             /* Push object */

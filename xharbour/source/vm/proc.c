@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.18 2004/02/13 07:13:33 ronpinkas Exp $
+ * $Id: proc.c,v 1.19 2004/02/13 09:22:47 andijahja Exp $
  */
 
 /*
@@ -112,6 +112,7 @@ HB_FUNC( PROCFILE )
 char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName  )
 {
    PHB_ITEM * pBase = HB_VM_STACK.pBase, pSelf;
+   USHORT uiSuperClass;
 
    // Default and safety to empty string.
    if( szName )
@@ -158,7 +159,9 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
       {
          if( HB_IS_OBJECT( pSelf ) )  /* it is a method name */
          {
-            if( ( *pBase )->item.asSymbol.uiSuperClass )
+            uiSuperClass = ( *pBase )->item.asSymbol.uiSuperClass;
+
+            if( uiSuperClass && uiSuperClass <= hb_clsMaxClasses() )
             {
                strcpy( szName, ( hb_clsClassesArray() + ( *pBase )->item.asSymbol.uiSuperClass - 1 )->szName );
             }
@@ -218,8 +221,6 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
          if( HB_IS_OBJECT( pSelf ) ) /* it is a method name */
          {
             // Find the real module where the Method is defined.
-            USHORT uiSuperClass;
-
             if( ( *pBase )->item.asSymbol.uiSuperClass )
             {
                uiSuperClass = ( *pBase )->item.asSymbol.uiSuperClass;
