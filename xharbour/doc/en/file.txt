@@ -1,5 +1,5 @@
 /*
- * $Id: file.txt,v 1.17 2001/11/29 01:13:44 dholm Exp $
+ * $Id: file.txt,v 1.1.1.1 2001/12/21 10:49:16 ronpinkas Exp $
  */
 
 /*
@@ -9,7 +9,7 @@
  * Copyright 2000 Chen Kedem <niki@actcom.co.il>
  *    Documentation for: __TYPEFILE(), TYPE
  *
- * Copyright 2000 Luiz Rafael Culik <culik@sl.conex.net>
+ * Copyright 2000 Luiz Rafael Culik <culikr@uol.com.br>
  *    Documentation for: FOPEN(), FCLOSE(), FWRITE(), FSEEK(), FREAD(), FILE(),
  *                       FREADSTR(), FRENAME(), FERROR(), RENAME, ERASE, CURDIR(),
  *                       DIRMAKE(),DIRCHANGE(),ISDISK(),DIRREMOVE(),DISKCHANGE(),
@@ -18,6 +18,8 @@
  * Copyright 2000 David G. Holm <Harbour@SpaceMoose.com>
  *    Documentation for: HB_FEOF()
  *
+ * Copyright 2003 Luiz Rafael Culik <culikr@uol.com.br>
+ *    Documentation for: HB_OsPathSeparator(),HB_OsPathListSeparator(),HB_OsPathDelimiters()
  * See doc/license.txt for licensing terms.
  *
  */
@@ -1093,5 +1095,114 @@
  *      Library is rtl
  *  $SEEALSO$
  *      DIRCHANGE(),MAKEDIR(),DIRREMOVE(),DISKCHANGE(),DISKNAME()
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_OSPATHDELIMITERS()
+ *  $CATEGORY$
+ *      Low Level Extension
+ *  $ONELINER$
+ *      Return current platform path delimeters character
+ *  $SYNTAX$
+ *      <cRet> := HB_OSPATHDELIMITERS()
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      <cRet>  The path delimitor of current platform
+ *  $DESCRIPTION$
+ *      This function return the Path delimeter chars of current platform
+ *      normaly will be "\/:" on windows/Dos or "/" on *nix platforms
+ *  $EXAMPLES$
+ *      LOCAL cFile := "c:\temp\test.dbf"
+ *      IF AT( HB_OSPATHDELIMITERS() ,cFile )
+ *         ?  "We are in Windows"
+ *      ELSE
+ *         ?  "We aren't in Windows"
+ *      ENDIF   
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Xharbour extension
+ *  $PLATFORMS$
+ *      ALL
+ *  $FILES$
+ *      Lib is rtl
+ *  $SEEALSO$
+ *      HB_OSPATHLISTSEPARATOR(),HB_OSPATHSEPARATOR()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_OSPATHLISTSEPARATOR()
+ *  $CATEGORY$
+ *      Low Level Extension
+ *  $ONELINER$
+ *      Return current platform path path list separator character
+ *  $SYNTAX$
+ *      <cRet> := HB_OSPATHLISTSEPARATOR()
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      <cRet>  The path list separator  of current platform
+ *  $DESCRIPTION$
+ *      Is the character (commonly) used to separate two or more complete paths
+ *      in a variable, or in a list of paths
+ *  $EXAMPLES$
+ *      LOCAL cFile := "c:\temp\test.dbf"
+ *      IF AT( HB_OSPATHLISTSEPARATOR() ,cFile )
+ *         ?  "We are in Windows"
+ *      ELSE
+ *         ?  "We aren't in Windows"
+ *      ENDIF   
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Xharbour extension
+ *  $PLATFORMS$
+ *      ALL
+ *  $FILES$
+ *      Lib is rtl
+ *  $SEEALSO$
+ *      HB_OSPATHSEPARATOR(),HB_OSPATHDELIMITERS()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_OSPATHSEPARATOR()
+ *  $CATEGORY$
+ *      Low Level Extension
+ *  $ONELINER$
+ *      Return the Path separator character
+ *  $SYNTAX$
+ *      <cRet> := HB_OSPATHSEPARATOR()
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      <cRet>  The path separator character current platform
+ *  $DESCRIPTION$
+ *      This function return the Path separator character of current platform
+ *      normaly will be "\" on windows/Dos or "/" on *nix platforms
+ *  $EXAMPLES$
+ *      LOCAL cFile := "c:\temp\test.dbf"
+ *      IF AT( HB_OSPATHSEPARATOR() ,cFile )
+ *         ?  "We are in Windows"
+ *      ELSE
+ *         ?  "We aren't in Windows"
+ *      ENDIF   
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Xharbour extension
+ *  $PLATFORMS$
+ *      ALL
+ *  $FILES$
+ *      Lib is rtl
+ *  $SEEALSO$
+ *      HB_OSPATHDELIMITERS(),HB_OSPATHSEPARATOR()
  *  $END$
  */
