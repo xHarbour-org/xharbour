@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.7 2002/07/03 21:49:35 walito Exp $
+ * $Id: transfrm.c,v 1.8 2002/07/07 17:02:47 walito Exp $
  */
 
 /*
@@ -669,7 +669,7 @@ HB_FUNC( TRANSFORM )
          char szPicDate[ 11 ];
          char szDate[ 9 ];
 
-         int  nFor;
+         ULONG nFor;
 
          szResult = ( char * ) hb_xgrab( 13 );
 
