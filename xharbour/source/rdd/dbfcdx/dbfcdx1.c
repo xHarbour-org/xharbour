@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.89 2003/11/30 12:32:30 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.90 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -1599,9 +1599,8 @@ static void hb_cdxPageCheckDupTrl( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys 
  */
 static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
 {
-   SHORT iKey, iTrl, iDup, iTmp, iNum = pPage->TagParent->uiLen;
-   SHORT iLen = iNum + 6;
-   BYTE *pKeyPos, *pRecPos, *pSrc, bReq, bShift;
+   SHORT iKey, iTrl, iDup, iReq, iTmp, iNum, iLen, iShift;
+   BYTE *pKeyPos, *pRecPos, *pSrc;
    ULONG RNMask;
 
 #ifndef HB_CDX_DBGCODE_OFF
@@ -1613,10 +1612,13 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
    }
    if ( ! pKeyBuf )
       hb_cdxErrInternal( "hb_cdxPageLeafEncode: page has no buffer." );
+   hb_cdxPageCheckDupTrl( pPage, pKeyBuf, iKeys );
 #endif
-   bReq = pPage->ReqByte;
+   iNum = pPage->TagParent->uiLen;
+   iLen = iNum + 6;
+   iReq = pPage->ReqByte;
    RNMask = ~pPage->RNMask;
-   bShift = 16 - pPage->TCBits;
+   iShift = 16 - pPage->TCBits;
    pKeyPos = &pPage->node.extNode.keyPool[ CDX_EXT_FREESPACE ];
    pRecPos = &pPage->node.extNode.keyPool[ 0 ];
    pSrc = &pKeyBuf[ 0 ];
@@ -1624,8 +1626,8 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
    {
       iDup = pSrc[ iNum + 4 ];
       iTrl = pSrc[ iNum + 5 ];
-      HB_PUT_LE_USHORT( &pRecPos[ bReq - 2 ],
-               ( iTrl << bShift ) | ( iDup << ( bShift - pPage->DCBits ) ) );
+      HB_PUT_LE_USHORT( &pRecPos[ iReq - 2 ],
+               ( iTrl << iShift ) | ( iDup << ( iShift - pPage->DCBits ) ) );
       HB_PUT_LE_ULONG( pRecPos, ( HB_GET_LE_ULONG( pRecPos ) & RNMask ) |
                                 HB_GET_LE_ULONG( &pSrc[ iNum ] ) );
       if ( ( iTmp = iNum - iTrl - iDup ) > 0 )
@@ -1633,14 +1635,14 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
          pKeyPos -= iTmp;
          memcpy( pKeyPos, &pSrc[ iDup ], iTmp );
       }
-//#ifndef HB_CDX_DBGCODE_OFF
+#ifndef HB_CDX_DBGCODE_OFF
       else if ( iTmp < 0 )
       {
          printf("\r\npPage->Page=%lx, iNum=%d, iDup=%d, iTrl=%d", pPage->Page, iNum, iDup, iTrl); fflush(stdout);
          hb_cdxErrInternal( "hb_cdxPageLeafEncode: index corrupted." );
       }
-//#endif
-      pRecPos += bReq;
+#endif
+      pRecPos += iReq;
       pSrc += iLen;
    }
    if ( pRecPos < pKeyPos )
@@ -2300,6 +2302,9 @@ static void hb_cdxPageGetChild( LPCDXPAGE pPage )
          pPage->Child = NULL;
       }
    }
+#ifdef HB_CDX_DSPDBG_INFO
+   printf("GetChild: Parent=%lx, Child=%lx\r\n", pPage->Page, ulPage); fflush(stdout);
+#endif
    if ( pPage->Child == NULL )
       pPage->Child = hb_cdxPageNew( pPage->TagParent, pPage, ulPage );
 }
@@ -2390,7 +2395,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
 
 #ifdef HB_CDX_DSPDBG_INFO
       printf(", childs[%d]->Page=%lx(%d/%d)", i, childs[i]->Page, childs[i]->iKeys, childs[i]->iFree);
-      printf("(%d/%d/%d:%d,%lx)", i, iSkip, iBlncKeys, iKeys,childs[i]->Right);
+      printf("(%d/%d/%d:%d,%lx)", i, iSkip, iBlncKeys, iKeys, childs[i]->Right);
       fflush(stdout);
 #endif
    }
@@ -3275,7 +3280,7 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
       case HB_IT_STRING:
          pTag->uiType = 'C';
          /* TODO: is this safe? */
-         pTag->uiLen = HB_CDXMAXKEY( ( hb_stackItemFromTop( -1 ) )->item.asString.length );
+         /* pTag->uiLen = HB_CDXMAXKEY( ( hb_stackItemFromTop( -1 ) )->item.asString.length ); */
          break;
    }
    hb_stackPop();    /* pop macro evaluated value */

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id$
+# $Id: postinst.sh,v 1.1 2003/12/07 19:36:18 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -29,9 +29,23 @@ hb_root=`dirname "$0"`
 hb_root=`dirname "${hb_root}"`
 . ${hb_root}/bin/hb-func.sh
 
-if [ "$HB_COMPILER" = "gcc" ]
+if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "mingw32" ]
 then
     install -m755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
     mk_hbtools "${HB_BIN_INSTALL}"
-    mk_hblibso "${hb_root}"
+    [ "$HB_COMPILER" = "gcc" ] && mk_hblibso "${hb_root}"
+
+    # build fm lib with memory statistic
+    pushd ${hb_root}/source/vm
+    C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
+    rm -f fm.o
+    make -r fm.o
+    ar -r ${HB_LIB_INSTALL}/libfm.a fm.o
+    rm -f fm.o
+    if [ "${HB_MT}" = "MT" ]; then
+        make -r fm.o 'HB_LIBCOMP_MT=YES'
+        ar -r ${HB_LIB_INSTALL}/libfmmt.a fm.o
+        rm -f fm.o
+    fi
+    popd
 fi

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id$
+# $Id: hb-func.sh,v 1.1 2003/12/07 19:36:18 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -41,7 +41,7 @@ mk_hbgetlibs()
 {
     if [ -z "$@" ]
     then
-        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca debug profiler"
+        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 debug profiler"
     else
         echo -n "$@"
     fi
@@ -73,8 +73,20 @@ mk_hbtools()
     [ -z "${_DEFAULT_INC_DIR}" ] && _DEFAULT_INC_DIR="${HB_INC_INSTALL}"
     [ -z "${_DEFAULT_LIB_DIR}" ] && _DEFAULT_LIB_DIR="${HB_LIB_INSTALL}"
 
+    HB_SYS_LIBS="-lm"
+    if [ "${HB_COMPILER}" = "mingw32" ]; then
+        HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lole32 -loleaut32 -luuid"
+    else
+        HB_SYS_LIBS="${HB_SYS_LIBS} -lncurses -lslang -lgpm"
+    fi
+
     cat > ${hb_tool} <<EOF
-#!/bin/bash
+#!/bin/sh
+#
+# Warning! it's a bash script not sh, /bin/sh is used for MSys compatibility
+#
+# Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
+#
 
 if [ \$# == 0 ]; then
     echo "syntax: \$0 [<options,...>] <file>[.prg|.o]
@@ -102,9 +114,11 @@ elif [ "\$*" == "mk-links" ]; then
     DIR="\${0%/*}"
     NAME="\${0##*/}"
     if [ "\${DIR}" != "\${NAME}" ]; then
-	for n in ${hb_pref}cc ${hb_pref}cmp ${hb_pref}mk ${hb_pref}lnk gharbour harbour-link; do
-	    ln -sf "\${NAME}" "\${DIR}/\${n}"
-	done
+        pushd "\${DIR}"
+        for n in ${hb_pref}cc ${hb_pref}cmp ${hb_pref}mk ${hb_pref}lnk gharbour harbour-link; do
+	        ln -sf "\${NAME}" "\${n}"
+        done
+        popd
     fi
     exit
 fi
@@ -142,8 +156,8 @@ while [ \$n -lt \${#P[@]} ]; do
         -gt*)        HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
         -fmstat)     HB_FM_REQ="STAT" ;;
         -nofmstat)   HB_FM_REQ="NOSTAT" ;;
-	-strip)      HB_STRIP="yes" ;;
-	-nostrip)    HB_STRIP="no" ;;
+        -strip)      HB_STRIP="yes" ;;
+        -nostrip)    HB_STRIP="no" ;;
         -main=*)     HB_MAIN_FUNC="\${v#*=}" ;;
         -*)          p="\${v}" ;;
         *)           [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
@@ -158,7 +172,7 @@ case "\${HB_MT}" in
     *)  HB_MT="";;
 esac
 
-SYSTEM_LIBS="-lm -lncurses -lslang -lgpm"
+SYSTEM_LIBS="${HB_SYS_LIBS}"
 # use pthread system library for MT programs
 if [ "\${HB_MT}" = "MT" ]; then
     SYSTEM_LIBS="-lpthread \${SYSTEM_LIBS}"
@@ -167,7 +181,9 @@ fi
 HB_GT_STAT=""
 [ -z "\${HB_GT_REQ}" ] && HB_GT_REQ="\${HB_GT}"
 if [ "\${HB_MG}" != "yes" ]; then
-    [ "\${HB_STATIC}" = "yes" ] && HB_GT_STAT=\`echo \${HB_GT_REQ}|tr A-Z a-z\`
+    if [ "\${HB_STATIC}" = "yes" ] || [ "\${HB_STATIC}" = "full" ]; then
+        HB_GT_STAT=\`echo \${HB_GT_REQ}|tr A-Z a-z\`
+    fi
     HB_GT_REQ=""
 else
     HB_GT_REQ=\`echo \${HB_GT_REQ}|tr a-z A-Z\`
@@ -343,7 +359,7 @@ mk_hblibso()
     for l in ${hb_libs}
     do
         case $l in
-            debug|profiler) ;;
+            debug|profiler|fm|hbodbc) ;;
             *)
                 ls="lib${l}.a"
                 if [ -f lib${l}mt.a ]

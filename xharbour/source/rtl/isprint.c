@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.23 2003/11/11 20:20:54 ronpinkas Exp $
+ * $Id: isprint.c,v 1.24 2003/11/12 00:01:16 peterrees Exp $
  */
 
 /*
@@ -71,7 +71,6 @@
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
 
    #include <stdio.h>
-//   #include <malloc.h>
    #include <winspool.h>
 
    static DWORD IsPrinterError(HANDLE hPrinter);

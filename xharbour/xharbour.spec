@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.44 2003/12/02 09:25:40 druzus Exp $
+# $Id: xharbour.spec,v 1.45 2003/12/07 19:36:17 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -284,22 +284,6 @@ do
         make -r -i install
     popd
 done
-
-# build fm lib with memory statistic
-pushd source/vm
-    TMP_C_USR=$C_USR
-    C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/-DHB_PARANOID_MEM_CHECK}
-    rm -f fm.o
-    make -r fm.o
-    ar -r $HB_LIB_INSTALL/libfm.a fm.o
-    rm -f fm.o
-    if [ $HB_MT = "MT" ]; then
-        make -r fm.o 'HB_LIBCOMP_MT=YES'
-        ar -r $HB_LIB_INSTALL/libfmmt.a fm.o
-        rm -f fm.o
-    fi
-    C_USR=$TMP_C_USR
-popd
 
 # Keep the size of the binaries to a minimim.
 strip $HB_BIN_INSTALL/harbour

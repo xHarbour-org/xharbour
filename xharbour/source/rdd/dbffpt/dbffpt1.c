@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.6 2003/11/11 01:34:45 druzus Exp $
+ * $Id: dbffpt1.c,v 1.7 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -2110,7 +2110,7 @@ static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo )
  */
 static ERRCODE hb_fptReadDBHeader( FPTAREAP pArea )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_fptReadHeader(%p)", pArea));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fptReadDBHeader(%p)", pArea));
 
    if( SUPER_READDBHEADER( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;

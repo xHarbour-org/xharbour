@@ -1,5 +1,5 @@
 #
-# $Id: install.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
+# $Id: install.cf,v 1.2 2003/12/04 09:26:53 druzus Exp $
 #
 
 ifeq ($(SHLVL),) # COMMAND.COM
@@ -35,3 +35,5 @@ INSTALL_RULE =\
 	fi
 
 endif
+
+POSTINST_RULE = $(HB_POSTINST)

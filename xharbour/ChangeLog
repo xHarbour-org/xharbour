@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1855 2003/12/11 21:33:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1856 2003/12/12 05:31:19 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-11 11:12 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * some workaround for GCC3.x bug in optimization
+
+  * xharbour/source/rdd/dbf1.c
+    * small fix for DBF files with corrupted header in exclusive mode
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * fixed typo in TRACELOG function name
+
+  * xharbour/make_tgz.sh
+  * xharbour/xharbour.spec
+    - build libfm.a with memory statistic removed
+
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/postinst.sh
+    + build libfm.a with memory statistic
+    + next changes to make it msys compatible
 
 2003-12-12 06:35 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hblog.ch

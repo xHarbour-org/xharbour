@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.47 2003/11/25 08:31:13 druzus Exp $
+ * $Id: dbf1.c,v 1.48 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -1422,7 +1422,7 @@ static ERRCODE hb_dbfRecNo( DBFAREAP pArea, PHB_ITEM pRecNo )
 
    if( pArea->lpdbPendingRel )
       SELF_FORCEREL( ( AREAP ) pArea );
-   hb_itemPutNL( pRecNo, pArea->ulRecNo );
+   hb_itemPutNLLen( pRecNo, pArea->ulRecNo, 7 );
    return SUCCESS;
 }
 
@@ -2036,6 +2036,9 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Alloc buffer */
    pArea->pRecord = ( BYTE * ) hb_xgrab( pArea->uiRecordLen );
    pArea->fValidBuffer = FALSE;
+
+   /* Update the number of record for corrupted headers */
+   pArea->ulRecCount = hb_dbfCalcRecCount( pArea );
 
    /* Position cursor at the first record */
    return SELF_GOTOP( ( AREAP ) pArea );
@@ -2698,6 +2701,7 @@ static ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
    pArea->bCodePage = dbHeader.bCodePage;
    pArea->uiHeaderLen = HB_USHORT_FROM_LE( dbHeader.uiHeaderLen );
    pArea->ulRecCount = HB_ULONG_FROM_LE( dbHeader.ulRecCount );
+
    pArea->fHasMemo = FALSE;
    return SUCCESS;
 }
