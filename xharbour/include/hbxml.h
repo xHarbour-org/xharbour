@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.h,v 1.2 2003/06/16 15:07:18 jonnymind Exp $
+ * $Id: hbxml.h,v 1.3 2003/06/30 23:06:27 jonnymind Exp $
  */
 
 /*
@@ -227,8 +227,13 @@ MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style );
 /* Attribute oriented operations */
 PHB_ITEM mxml_attribute_new( void );
 
-PHB_ITEM mxml_attribute_read( MXML_REFIL *data, PHB_ITEM doc, int style );
-MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHB_ITEM attr, int style );
+typedef struct _hbxml_attribute {
+   PHB_ITEM pName;
+   PHB_ITEM pValue;
+} HBXML_ATTRIBUTE, *PHBXML_ATTRIBUTE;
+
+MXML_STATUS mxml_attribute_read( MXML_REFIL *data, PHB_ITEM doc, PHBXML_ATTRIBUTE dest, int style );
+MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHBXML_ATTRIBUTE attr, int style );
 
 /* Refil routines */
 MXML_REFIL *mxml_refil_new( MXML_REFIL_FUNC func, char *buf, int buflen,

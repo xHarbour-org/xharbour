@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.6 2003/07/04 10:34:34 jonnymind Exp $
+ * $Id: txml.prg,v 1.7 2003/07/17 19:47:01 jonnymind Exp $
  */
 
 /*
@@ -78,8 +78,8 @@ CLASS TXMLNode
    METHOD InsertBelow( oNode )         INLINE HBXml_node_insert_below( Self, oNode )
    METHOD AddBelow( oNode )            INLINE HBXml_node_add_below( Self, oNode )
 
-   METHOD GetAttribute( cAttrib )
-   METHOD SetAttribute( cAttrib, cValue )
+   METHOD GetAttribute( cAttrib )         INLINE ::aAttributes[ cAttrib ]
+   METHOD SetAttribute( cAttrib, xValue ) INLINE ::aAttributes[ cAttrib ] := xValue
 
    METHOD Depth()
    METHOD Path()
@@ -100,7 +100,7 @@ METHOD New( nType, cName, aAttributes, cData ) class TXmlNode
    ENDIF
 
    IF aAttributes == NIL
-      ::aAttributes := {}
+      ::aAttributes := {=>}
    ELSE
       ::aAttributes := aAttributes
    ENDIF
@@ -129,36 +129,6 @@ METHOD NextInTree() CLASS TXmlNode
    ENDIF
 
 RETURN oNext
-
-
-METHOD GetAttribute( cAttrib ) CLASS TXmlNode
-   LOCAL aElem
-
-   FOR EACH aElem IN ::aAttributes
-      IF aElem[1] == cAttrib
-         RETURN aElem[2]
-      ENDIF
-   NEXT
-
-RETURN NIL
-
-
-METHOD SetAttribute( cAttrib, cValue ) CLASS TXmlNode
-   LOCAL aElem
-
-   cAttrib := CStr( cAttrib )
-   cValue := CStr( cValue )
-
-   FOR EACH aElem IN ::aAttributes
-      IF aElem[1] == cAttrib
-         aElem[2] := cValue
-         RETURN NIL
-      ENDIF
-   NEXT
-
-   AAdd( ::aAttributes, { cAttrib, cValue } )
-
-RETURN NIL
 
 
 METHOD Depth() CLASS TXmlNode
@@ -295,13 +265,12 @@ METHOD MatchCriteria( oFound ) CLASS TXmlIteratorScan
       RETURN .F.
    ENDIF
 
-   IF ::cAttribute != NIL .and. ;
-         AScan( oFound:aAttributes, {|elem| ::cAttribute == elem[1] }) == 0
+   IF ::cAttribute != NIL .and. .not. ::cAttribute IN oFound:aAttributes
       RETURN .F.
    ENDIF
 
    IF ::cValue != NIL .and. ;
-         AScan( oFound:aAttributes, {|elem| ::cValue == elem[2]}) == 0
+         HScan( oFound:aAttributes, {| xKey,cValue| ::cValue == cValue}) == 0
       RETURN .F.
    ENDIF
 
@@ -334,12 +303,12 @@ METHOD MatchCriteria( oFound ) CLASS TXmlIteratorRegex
    ENDIF
 
    IF ::cAttribute != NIL .and. ;
-         AScan( oFound:aAttributes, {|elem| elem[1] LIKE ::cAttribute } ) == 0
+         hScan( oFound:aAttributes, {|cKey| cKey LIKE ::cAttribute } ) == 0
       RETURN .F.
    ENDIF
 
    IF ::cValue != NIL .and.;
-         AScan( oFound:aAttributes, {|elem| elem[2] LIKE ::cValue } ) == 0
+         hScan( oFound:aAttributes, {| xKey ,cValue| cValue LIKE ::cValue } ) == 0
       RETURN .F.
    ENDIF
 

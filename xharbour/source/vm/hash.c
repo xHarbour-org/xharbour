@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.10 2003/11/15 20:25:51 jonnymind Exp $
+ * $Id: hash.c,v 1.11 2003/11/15 21:26:43 jonnymind Exp $
  */
 
 /*
@@ -280,6 +280,92 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
          pPos = pBaseHash->pKeys + ulPos;
          pPos->type = HB_IT_NIL;
          hb_itemCopy( pPos, pKey );
+      }
+
+      return TRUE;
+   }
+
+   return FALSE;
+}
+
+
+BOOL HB_EXPORT hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
+{
+   ULONG ulLen;
+   PHB_ITEM pPos, pPos1;
+   PHB_BASEHASH pBaseHash;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashAdd(%p, %p, %p)", pHash, pKey, pValue));
+
+   if( ! HB_IS_HASH( pHash ) )
+   {
+      return FALSE;
+   }
+
+   // if the user don't know where to put this data...
+   if ( ulPos == ULONG_MAX )
+   {
+      // ... check if a key already exists ...
+      if ( hb_hashScan( pHash, pKey, &ulPos ) )
+      {
+         // ... and if so, just set the value
+         return hb_hashSet( pHash, ulPos, pValue );
+      }
+      // else we must add it at the point of ulpos.
+   }
+   // ... else, the user must have decided to really add the data in that
+   // position. Notice that this can effectively destroy the hash ordering
+   // if misused. if ulPos != 0, this ulPos must always be obtained with a
+   // failed scan.
+
+   pBaseHash = pHash->item.asHash.value;
+
+   // if we are here, we are autoadding.
+   if ( ! pBaseHash->bAutoAdd )
+   {
+      hb_errRT_BASE( EG_BOUND, 1131, "Hash key not found and Auto Add turned off",
+         hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
+      return FALSE;
+   }
+
+   if( pBaseHash->ulLen < ULONG_MAX )
+   {
+      /* ulLen is the OLD length */
+      ulLen = pBaseHash->ulLen++;
+      if ( ulLen >= pBaseHash->ulAllocated )
+      {
+         pBaseHash->ulAllocated += HB_HASH_ALLOC_BLOCK;
+         pBaseHash->pValues = ( PHB_ITEM ) hb_xrealloc(
+               pBaseHash->pValues,
+               sizeof( HB_ITEM ) * pBaseHash->ulAllocated );
+         pBaseHash->pKeys = ( PHB_ITEM ) hb_xrealloc(
+               pBaseHash->pKeys,
+               sizeof( HB_ITEM ) * pBaseHash->ulAllocated );
+      }
+      // find the point where I have to insert the data.
+      if ( ulLen == 0 )
+      {
+         hb_itemForwardValue( pBaseHash->pValues, pValue );
+         hb_itemForwardValue( pBaseHash->pKeys, pKey );
+      }
+      else {
+         pPos = pBaseHash->pValues + ulLen;
+         pPos1 = pBaseHash->pKeys + ulLen;
+
+         for( ; ulPos < ulLen; ulLen--, pPos--, pPos1-- )
+         {
+            memcpy( pPos, pPos-1, sizeof( HB_ITEM ) );
+            memcpy( pPos1, pPos1-1, sizeof( HB_ITEM ) );
+         }
+
+         /* Insert AFTER the given position */
+         pPos = pBaseHash->pValues + ulPos;
+         pPos->type = HB_IT_NIL;
+         hb_itemForwardValue( pPos, pValue );
+
+         pPos = pBaseHash->pKeys + ulPos;
+         pPos->type = HB_IT_NIL;
+         hb_itemForwardValue( pPos, pKey );
       }
 
       return TRUE;
@@ -956,6 +1042,36 @@ PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pHash )
    return pVals;
 }
 
+PHB_ITEM HB_EXPORT hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos )
+{
+
+   PHB_BASEHASH pBaseHash = pHash->item.asHash.value;
+
+   if ( ulPos < 1 ||  ulPos > pBaseHash->ulLen  )
+   {
+      return NULL;
+   }
+
+   // waring: change IN operator (hb_vmInstringOrArray() ) when changing
+   // pagination
+   return pBaseHash->pKeys + (ulPos -1 );
+}
+
+
+PHB_ITEM HB_EXPORT hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos )
+{
+
+   PHB_BASEHASH pBaseHash = pHash->item.asHash.value;
+
+   if ( ulPos < 1 ||  ulPos > pBaseHash->ulLen  )
+   {
+      return NULL;
+   }
+
+   // waring: change IN operator (hb_vmInstringOrArray() ) when changing
+   // pagination
+   return pBaseHash->pValues + (ulPos -1 );
+}
 
 /**********************************************************************
 * Harbour API
@@ -1142,6 +1258,8 @@ HB_FUNC( HGETKEYAT )
          "HGETKEYAT", 2, hb_paramError(1), hb_paramError( 2 ) );
       return;
    }
+   // WARNING: for speed reasons, not using internal api but writing directly
+   // the code here. To be changed when we'll add automatic pagination
    ulPos = hb_itemGetNL( pKey );
    pBaseHash = pHash->item.asHash.value;
 
@@ -1154,6 +1272,7 @@ HB_FUNC( HGETKEYAT )
 
    // waring: change IN operator (hb_vmInstringOrArray() ) when changing
    // pagination
+
    hb_itemCopy ( &HB_VM_STACK.Return, pBaseHash->pKeys + (ulPos -1 ) );
 }
 
@@ -1170,6 +1289,8 @@ HB_FUNC( HGETVALUEAT )
          "HGETVALUEAT", 2, hb_paramError(1), hb_paramError( 2 ) );
       return;
    }
+   // WARNING: for speed reasons, not using internal api but writing directly
+   // the code here. To be changed when we'll add automatic pagination
    ulPos = hb_itemGetNL( pKey );
    pBaseHash = pHash->item.asHash.value;
 

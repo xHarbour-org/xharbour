@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.10 2003/08/07 05:54:12 jonnymind Exp $
+ * $Id: hbxml.c,v 1.11 2003/09/26 08:22:44 jonnymind Exp $
  */
 
 /*
@@ -81,6 +81,7 @@
 #include "hbapifs.h"
 
 #include "hbxml.h"
+#include "hbhashapi.h"
 
 // just a shortcut
 static void hbxml_set_doc_status( PHB_ITEM doc, int status, int error )
@@ -122,9 +123,8 @@ static void hbxml_doc_new_node( PHB_ITEM pDoc, int amount )
 ************************************************************/
 
 
-PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
+MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHBXML_ATTRIBUTE pDest, int style )
 {
-   PHB_ITEM pRet;
    int chr, quotechr = '"';
    char buf_name[ MXML_MAX_NAME_LEN + 1];
    char buf_attrib[ MXML_MAX_NAME_LEN *2 + 1];
@@ -147,7 +147,7 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
                case MXML_SOFT_LINE_TERMINATOR: break;
                case ' ': case '\t': break;
                // no attributes found
-               case '>': case '/': return NULL;
+               case '>': case '/': return MXML_STATUS_DONE;
                default:
                   if ( isalpha( chr ) ) {
                      buf_name[ iPosn++ ] = chr;
@@ -155,7 +155,7 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
                   }
                   else {
                      hbxml_set_doc_status( pDoc, MXML_STATUS_MALFORMED, MXML_ERROR_INVATT );
-                     return NULL;
+                     return MXML_STATUS_MALFORMED;
                   }
             }
          break;
@@ -178,7 +178,7 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
             }
             else {
                hbxml_set_doc_status( pDoc, MXML_STATUS_MALFORMED, MXML_ERROR_MALFATT );
-               return NULL;
+               return MXML_STATUS_MALFORMED;
             }
          break;
 
@@ -195,7 +195,7 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
             }
             else {
                hbxml_set_doc_status( pDoc, MXML_STATUS_MALFORMED, MXML_ERROR_MALFATT );
-               return NULL;
+               return MXML_STATUS_MALFORMED;
             }
          break;
 
@@ -213,7 +213,7 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
             }
             else {
                hbxml_set_doc_status( pDoc, MXML_STATUS_MALFORMED, MXML_ERROR_MALFATT );
-               return NULL;
+               return MXML_STATUS_MALFORMED;
             }
          break;
 
@@ -245,7 +245,7 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
                if ( iAmpLen <= 0 ) {
                   //error! - we have "&;"
                   hbxml_set_doc_status( pDoc, MXML_STATUS_MALFORMED, MXML_ERROR_WRONGENTITY );
-                  return NULL;
+                  return MXML_STATUS_MALFORMED;
                }
 
                iStatus = 4;
@@ -262,7 +262,7 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
             else if ( ! isalpha( chr ) ) {
                //error - we have something like &amp &amp
                hbxml_set_doc_status( pDoc, MXML_STATUS_MALFORMED, MXML_ERROR_WRONGENTITY );
-               return NULL;
+               return MXML_STATUS_MALFORMED;
             }
             else {
                buf_attrib[ iPosa++ ] = chr;
@@ -273,48 +273,52 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
    }
 
    if ( ref->status != MXML_STATUS_OK )
-      return NULL;
+      return ref->status;
 
    if ( iStatus < 6 ) {
       if ( iPosn > MXML_MAX_NAME_LEN )
+      {
          hbxml_set_doc_status( pDoc, MXML_STATUS_MALFORMED, MXML_ERROR_ATTRIBTOOLONG);
+      }
       else if ( iPosa > MXML_MAX_ATTRIB_LEN )
+      {
          hbxml_set_doc_status( pDoc, MXML_STATUS_MALFORMED, MXML_ERROR_VALATTOOLONG);
+      }
       else
+      {
          hbxml_set_doc_status( pDoc, MXML_STATUS_MALFORMED,MXML_ERROR_MALFATT);
+      }
 
-      return NULL;
+      return MXML_STATUS_MALFORMED;;
    }
 
    // time to create the attribute
    buf_name[ iPosn ] = 0;
    buf_attrib[ iPosa ] = 0;
 
-   pRet = hb_itemNew( NULL );
-   hb_arrayNew( pRet, 2 );
-   hb_itemPutCL( hb_arrayGetItemPtr( pRet, 1 ), buf_name, iPosn );
-   hb_itemPutCL( hb_arrayGetItemPtr( pRet, 2 ), buf_attrib, iPosa );
+   hb_itemPutCL( pDest->pName, buf_name, iPosn );
+   hb_itemPutCL( pDest->pValue, buf_attrib, iPosa );
 
-   return pRet;
+   return MXML_STATUS_OK;
 }
 
-MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHB_ITEM pAttr, int style )
+MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHBXML_ATTRIBUTE pAttr, int style )
 {
-   char *name = hb_arrayGetCPtr( pAttr, 1 );
+   char *name = hb_itemGetCPtr( pAttr->pName );
 
-   mxml_output_string_len( out, name, hb_arrayGetCLen( pAttr, 1 ) );
+   mxml_output_string_len( out, name, hb_itemGetCLen( pAttr->pName ) );
    mxml_output_char( out, '=' );
    mxml_output_char( out, '"' );
 
    if ( style & MXML_STYLE_NOESCAPE )
    {
       mxml_output_string_escape(  out,
-         hb_arrayGetCPtr( pAttr, 2 ) );
+         hb_itemGetCPtr( pAttr->pValue) );
    }
    else
    {
       mxml_output_string_len(  out,
-         hb_arrayGetCPtr( pAttr, 2 ), hb_arrayGetCLen( pAttr, 2 ) );
+         hb_itemGetCPtr(pAttr->pValue), hb_itemGetCLen( pAttr->pValue ) );
    }
    mxml_output_char( out, '"' );
 
@@ -570,7 +574,7 @@ PHB_ITEM mxml_node_clone( PHB_ITEM pTg )
    hb_objSendMsg( pTg, "AATTRIBUTES", 0 );
    pArrayClone = hb_arrayClone( &(HB_VM_STACK.Return), NULL );
    hb_objSendMsg( pNode, "_AATTRIBUTES", 1, pArrayClone );
-   
+
    return pNode;
 }
 
@@ -783,15 +787,24 @@ static MXML_STATUS mxml_node_read_attributes( MXML_REFIL *ref,
 {
 
    HB_ITEM attributes;
-   PHB_ITEM pAttr;
+   HBXML_ATTRIBUTE hbAttr;
+   HB_ITEM hbName;
+   HB_ITEM hbValue;
+   MXML_STATUS ret;
+
+   hbAttr.pName = &hbName;
+   hbAttr.pValue = &hbValue;
+   // the first value must be NIL; the other are nilled by hashAddForward()
+   hbName.type = HB_IT_NIL;
+   hbValue.type = HB_IT_NIL;
 
    attributes.type = HB_IT_NIL;
-   hb_arrayNew( &attributes, 0 );
+   hb_hashNew( &attributes );
 
-   pAttr = mxml_attribute_read( ref, doc, style );
-   while ( pAttr != NULL ) {
-      hb_arrayAddForward( &attributes, pAttr );
-      pAttr = mxml_attribute_read( ref, doc, style );
+   ret = mxml_attribute_read( ref, doc, &hbAttr, style );
+   while ( ret == MXML_STATUS_OK ) {
+      hb_hashAddForward( &attributes, ULONG_MAX, hbAttr.pName, hbAttr.pValue );
+      ret = mxml_attribute_read( ref, doc, &hbAttr, style );
    }
 
    hb_objSendMsg( pNode,"_AATTRIBUTES", 1, &attributes );
@@ -1212,13 +1225,17 @@ MXML_STATUS mxml_node_read( MXML_REFIL *ref, PHB_ITEM pNode,PHB_ITEM doc, int st
 
 void mxml_node_write_attributes( MXML_OUTPUT *out, PHB_ITEM pAttr, int style )
 {
-   ULONG iLen = hb_arrayLen( pAttr );
+   ULONG iLen = hb_hashLen( pAttr );
    ULONG i;
+   HBXML_ATTRIBUTE hbAttr;
 
    for ( i = 1; i <= iLen; i ++ )
    {
       mxml_output_char( out, ' ' );
-      mxml_attribute_write( out, hb_arrayGetItemPtr( pAttr, i ), style );
+      hbAttr.pName = hb_hashGetKeyAt( pAttr, i );
+      hbAttr.pValue = hb_hashGetValueAt( pAttr, i );
+
+      mxml_attribute_write( out, &hbAttr, style );
    }
 }
 
