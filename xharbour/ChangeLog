@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1663 2003/11/06 23:42:44 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1661 2003/11/06 07:34:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,25 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-03 07:10 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapi.h
+  * source/vm/estack.c
+    * Added hb_stackReturn() that returns a pointer to HB_VM_STACK.Return.
+      Sayed this way it seems just a waste of time, but it allows to
+      insolate libraries from the need to be thrad aware IF HB_STACK_MACRO
+      are off. This way, all the MT/non MT code can reside in vm/vmmt, and
+      the lower libraries can be compiled just once.
+
 2003-11-07 01:05 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   + My first commit :-)
   * source/rtl/tget.prg
     + Added caption support
-
-2003-11-06 15:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
-  + source/codepage/cdpltwin.c
-  + source/lang/msgltwin.c
-    + New lithuanian language support contributed by Mindaugas Kavaliauskas <dbtopas@dbtopas.lt>
-
-  * tests/pp.prg
-  * tests/ppclass.prg
-    * Minor corrections to allow compilation with Clipper.
-
-2003-11-06 20:06 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
-  * xharbour/source/rdd/dbcmd.c
-  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
-    ! fixed stupid bug in ORDKEYNO()
-    + ORDKEYGOTO finished
 
 2003-11-05 23:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/estack.c
@@ -230,8 +224,6 @@
     - useless file removed
   * utils/hbdict/make_b32
     ! Ops... wrong dos label format fixed
-
-2003-11-03 05:50 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
 
 2003-11-03 05:50 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/hbi18n.c
@@ -1877,3 +1869,4 @@
     * Fixed when conectiva is used (now build properly on both root/non root acount)
   * ChangeLog
     ! Renamed to ChangeLog.016 and Start an New One
+

@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.48 2003/11/06 06:46:18 ronpinkas Exp $
+ * $Id: estack.c,v 1.49 2003/11/06 07:34:02 ronpinkas Exp $
  */
 
 /*
@@ -392,6 +392,12 @@ HB_ITEM_PTR HB_EXPORT hb_stackBaseItem( void )
 HB_ITEM_PTR HB_EXPORT hb_stackSelfItem( void )
 {
    return * ( HB_VM_STACK.pBase + 1 );
+}
+
+#undef hb_stackReturn
+PHB_ITEM HB_EXPORT hb_stackReturn( void )
+{
+   return ( &(HB_VM_STACK.Return ) );
 }
 
 /* NOTE: DEBUG function */

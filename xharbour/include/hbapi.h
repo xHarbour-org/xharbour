@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.86 2003/10/08 13:07:24 paultucker Exp $
+ * $Id: hbapi.h,v 1.87 2003/10/18 01:15:18 jonnymind Exp $
  */
 
 /*
@@ -268,6 +268,9 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
     #define hb_retnlllen( llNumber, iWidth )      hb_itemPutNLLLen( &HB_VM_STACK.Return, (llNumber), (iWidth) )
    #endif
 
+   /* JC1: this helps to insolate thread independant libraries */
+   #define hb_stackReturn()                       (&(HB_WM_STACK.Return))
+
 #else
    /* JC1: including thread anyways, because it defines some void macros when not in MT */
    #include "thread.h"
@@ -302,6 +305,9 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
     extern void  HB_EXPORT  hb_retnll( LONGLONG llNumber ); /* returns a long long int */
     extern void  HB_EXPORT  hb_retnlllen( LONGLONG llNumber, int iWidth ); /* returns a long long int, with specific width */
    #endif
+
+   /* JC1: this helps to insolate thread independant libraries */
+   extern PHB_ITEM HB_EXPORT hb_stackReturn( void );
 #endif
 
 extern void  HB_EXPORT  hb_storc( char * szText, int iParam, ... ); /* stores a szString on a variable by reference */
@@ -421,6 +427,8 @@ HB_EXPORT extern PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg );
 HB_EXPORT extern PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pSymMsg, BOOL bAllowErrFunc, BOOL *bConstructor, BOOL bOptimized ); /* returns the method pointer of a object class */
 HB_EXPORT extern ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
 HB_EXPORT extern void     hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
+HB_EXPORT extern PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp); /* Returns a property */
+HB_EXPORT extern void     hb_objSetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pValue ); /* Set a property to a certain value */
 
 /* dynamic symbol table management */
 extern PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName );    /* finds and creates a dynamic symbol if not found */

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.77 2003/09/10 06:07:31 ronpinkas Exp $
+ * $Id: classes.c,v 1.78 2003/10/07 23:48:23 ronpinkas Exp $
  */
 
 /*
@@ -104,6 +104,10 @@
  *    Added hb_objGetRealClsName to keep a full class tree ( for 99% cases )
  *    Fixed hb_clsIsParent
  *
+ * Copyright 2003 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+ *    hb_objGetPropValue()
+ *    hb_objSetPropValue()
+ *      Functions to mask HB_VM_STACK.Return in MT programming.
  *
  *    hb_objGetMthd() & __CLSADDMSG modified to translate the followings operators
  *
@@ -2382,6 +2386,59 @@ void hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
       hb_errRT_BASE( EG_ARG, 3000, NULL, "__ObjSendMsg()", 0 );
    }
 }
+
+/**
+  Get an object property value.
+  Returns a pointer to HB_VM_STACK.Return on success.
+  Callers should NEVER dispose it.
+*/
+
+PHB_ITEM hb_objGetPropValue( PHB_ITEM pObj, char *szProp )
+{
+   PHB_DYNS pMsgSym;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_objGetPropValue(%p, %s)", pObject, szProp));
+
+   pMsgSym = hb_dynsymFindName( szProp );
+
+   if( pMsgSym && hb_objGetMthd( pObj, pMsgSym->pSymbol, FALSE, NULL, FALSE ) )
+   {
+      HB_THREAD_STUB
+      hb_vmPushSymbol( pMsgSym->pSymbol );
+      hb_vmPush( pObj );
+      hb_vmSend( 0 );
+
+      return &HB_VM_STACK.Return;
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 3000, NULL, "__objGetPropValue()", 0 );
+   }
+   return NULL;
+}
+
+/**
+  Set an object property value.
+  The caller should place a leading "_" in szProp.
+*/
+
+void hb_objSetPropValue( PHB_ITEM pObj, char *szProp, PHB_ITEM pValue )
+{
+   PHB_DYNS pMsgSym = hb_dynsymFindName( szProp );
+
+   if( pMsgSym && hb_objGetMthd( pObj, pMsgSym->pSymbol, FALSE, NULL, FALSE ) )
+   {
+      hb_vmPushSymbol( pMsgSym->pSymbol );
+      hb_vmPush( pObj );
+      hb_vmPush( pValue );
+      hb_vmSend( 1 );
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 3000, NULL, "__objSetPropValue()", 0 );
+   }
+}
+
 
 /*
  * <xRet> = __objSendMsg( <oObj>, <cSymbol>, <xArg,..>
