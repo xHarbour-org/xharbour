@@ -960,7 +960,9 @@ RETURN uObj
         #define __STDC__ 1
         #define CINTERFACE 1
 
-	#define __FLAT__
+        #ifndef __FLAT__
+          #define __FLAT__ 1
+        #endif
 
 	#include <Windows.h>
 	#include <Ole2.h>
@@ -1442,12 +1444,12 @@ RETURN uObj
 	   vTbl += hb_parni( 2 ) + 2;
 	   pFunc = *vTbl;
 
-	   char *sString;
-	   int iInt;
-	   double dDouble;
-
 	   for ( i = iParams; i > 2; i-- )
 	   {
+              char *sString;
+              int iInt;
+              double dDouble;
+
 	      switch ( ( hb_parinfo( i ) & ~HB_IT_BYREF) )
 	      {
 	         case HB_IT_STRING:
