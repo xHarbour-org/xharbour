@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.84 2004/06/12 01:31:04 ronpinkas Exp $
+ * $Id: memvars.c,v 1.85 2004/08/04 14:48:11 druzus Exp $
  */
 
 /*
@@ -774,7 +774,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
          // JC1: the variable we have now can't be destroyed in the meanwhile.
          // It could be changed, but this is a race condition that must be
          // prevented at prg level.
-         if( HB_IS_BYREF( pSetItem ) )
+         //if( HB_IS_BYREF( pSetItem ) )
          {
             pSetItem = hb_itemUnRef( pSetItem );
          }
@@ -923,12 +923,14 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
             *( pReference->item.asString.pulHolders ) = 1;
          }
 
+         //TraceLog( NULL, "Ref to %s (%i) type: %i counter: %i\n", pMemvarSymb->szName, pDyn->hMemvar, pReference->type, s_globalTable[ pDyn->hMemvar ].counter );
+
          /* value is already created */
          pItem->type = HB_IT_BYREF | HB_IT_MEMVAR;
          pItem->item.asMemvar.offset = 0;
          pItem->item.asMemvar.value = pDyn->hMemvar;
          pItem->item.asMemvar.itemsbase = &s_globalTable;
-         ++s_globalTable[ pDyn->hMemvar ].counter;
+         s_globalTable[ pDyn->hMemvar ].counter++;
       }
       else
       {
@@ -1167,7 +1169,9 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
             {
                PHB_ITEM pRef;
 
+               /* Wrong to reset - private may be used again in this procedure and counter maybecome negative!
                s_globalTable[ pDynVar->hMemvar ].counter = 0;
+               */
 
                pRef = &s_globalTable[ pDynVar->hMemvar ].item;
 

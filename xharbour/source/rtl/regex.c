@@ -6351,7 +6351,7 @@ HB_FUNC( HB_ATX )
    HB_THREAD_STUB
 #endif
    #define REGEX_MAX_GROUPS 16
-   regex_t re;
+   regex_t re, *pReg ;
    regmatch_t aMatches[REGEX_MAX_GROUPS];
    int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
    ULONG ulLen;
@@ -6362,22 +6362,30 @@ HB_FUNC( HB_ATX )
    PHB_ITEM pStart = hb_param( 4, HB_IT_INTEGER );
    PHB_ITEM pEnd = hb_param( 5, HB_IT_INTEGER );
 
-   if( pCaseSensitive && pCaseSensitive->item.asLogical.value == ( int ) FALSE )
-   {
-      CFlags |= REG_ICASE;
-   }
-
    if( pRegEx && pString )
    {
-      if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
-      {
-         /*
-         if( (real_pcre *) (re)->top_bracket > 0 )
-         {
-            aMatches = hb_xgrabb(  (const real_pcre *) (re)->top_bracket * sizeof() )
-         }
-         */
+      int iOffset;
 
+      if( pRegEx->item.asString.length > 3 && memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
+      {
+         pReg = (regex_t *) ( pRegEx->item.asString.value + 3 );
+         pReg->re_pcre = (pcre *) ( ( BYTE * ) pReg + sizeof( regex_t ) );
+      }
+      else
+      {
+         if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
+         {
+            if( pCaseSensitive && pCaseSensitive->item.asLogical.value == ( int ) FALSE )
+            {
+               CFlags |= REG_ICASE;
+            }
+
+            pReg = &re;
+         }
+      }
+
+      if( pReg )
+      {
          if( pStart || pEnd )
          {
             EFlags |= REG_STARTEND;
@@ -6395,13 +6403,15 @@ HB_FUNC( HB_ATX )
             aMatches[0].rm_eo = aMatches[0].rm_so + pEnd->item.asInteger.value;
          }
 
-         if( regexec( &re, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
+         iOffset = aMatches[0].rm_so;
+
+         if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
          {
             ulLen = aMatches[0].rm_eo - aMatches[0].rm_so;
 
             if( hb_pcount() > 3 )
             {
-               hb_stornl( aMatches[0].rm_so + 1, 4 );
+               hb_stornl( aMatches[0].rm_so + iOffset + 1, 4 );
             }
 
             if( hb_pcount() > 4 )
@@ -6410,10 +6420,19 @@ HB_FUNC( HB_ATX )
             }
 
             hb_retclen( pString->item.asString.value + aMatches[0].rm_so, ulLen );
-            regfree( &re );
+
+            if( pReg == &re )
+            {
+               regfree( &re );
+            }
+
             return;
          }
-         regfree( &re );
+
+         if( pReg == &re )
+         {
+            regfree( &re );
+         }
       }
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3312 2004/08/17 09:50:36 alexstrickland Exp $
+ * $Id: ChangeLog,v 1.3313 2004/08/17 09:58:12 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-17 10:02 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/rtl/regex.c
+    + Added support of precompiled regex to HB_AtX()
+    ! Corrected HB_AtX() to return starting position which considers the the start offset
+      (to be compatiable with At() extended functionality)
+
+    /* Note if anyone wqs using HB_AtX() with start offset such code will need to be corrected. */
+
+  * source/vm/memvars.c
+    ! Fixed bug and GPF trap in hb_memvarRelease()
+
+  * tests/tstregex.prg
+    * Modified to show usage of precompiled regex when using hHB_AtX()
 
 2004-08-17 12:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/direct.c

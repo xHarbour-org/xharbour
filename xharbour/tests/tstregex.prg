@@ -6,7 +6,7 @@ FUNCTION Main()
    LOCAL cString := "This is the string to search into"
 
    // Find a WORD starting with <word boundary> starting with 's' followed by 4 to 8 NON space charcters, and terminated at <word boundary>.
-   LOCAL cRegEx  := "\bs[^ ]{4,8}\b"
+   LOCAL cRegEx  := HB_RegExComp( "\bs[^ ]{4,8}\b" )
 
    ? "Found: <" + HB_AtX( cRegEx, cString, lCaseSensitive, @Start, @Len ) + "> At:", Start, "Len:", Len
    ? "Should have found: ' string '"
