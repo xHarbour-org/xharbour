@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.69 2004/02/09 18:00:36 druzus Exp $
+ * $Id: dbfntx1.c,v 1.70 2004/02/14 01:29:41 andijahja Exp $
  */
 
 /*
@@ -306,15 +306,28 @@ static void hb_IncString( NTXAREAP pArea, char* s, int slen )
 
 static char * numToStr( PHB_ITEM pItem, char* szBuffer, USHORT length, USHORT dec )
 {
+   char *ptr = szBuffer;
+
    hb_itemStrBuf( szBuffer, pItem, length, dec );
-   if( hb_itemGetND( pItem ) < 0 )
+
+   while( *ptr == ' ' )
    {
-      char *ptr = szBuffer;
-      *ptr++ = ',';
-      for( ; *ptr; ptr++ )
-         if( *ptr >= '0' && *ptr <= '9' )
-            *ptr = (char) ( 92 - (int)*ptr );
+      *ptr++ = '0';
    }
+
+   if( *ptr == '-' )
+   {
+      *ptr = '0';
+      szBuffer[0] = ',';
+      for( ptr = &szBuffer[1]; *ptr; ptr++ )
+      {
+         if( *ptr >= '0' && *ptr <= '9' )
+         {
+            *ptr = (char) ( 92 - (int)*ptr );
+         }
+      }
+   }
+
    return szBuffer;
 }
 

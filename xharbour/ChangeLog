@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2311 2004/02/17 02:36:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2312 2004/02/17 07:01:48 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-17 19:20 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed bug I introduced recently, leading spaces in numbers
+      should be replaced by 0 in NTX
 
 2004-02-17 02:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * contrib/rdd_ads/adsfunc.c
