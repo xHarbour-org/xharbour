@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.12 2002/04/17 00:35:43 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.13 2002/04/17 02:58:21 ronpinkas Exp $
  */
 
 /*
@@ -991,10 +991,10 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                   else
                      lIndex = ( LONG ) pIdx->value.asNum.dVal;
 
-                  if( lIndex > 0 )
+                  //if( lIndex > 0 )
                      HB_EXPR_USE( pExpr, HB_EA_ARRAY_AT );
-                  else
-                     hb_compErrorBound( pIdx ); /* index <= 0 - bound error */
+                  //else
+                  //   hb_compErrorBound( pIdx ); /* index <= 0 - bound error */
                }
             }
          }

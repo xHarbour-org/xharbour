@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.3 2002/01/17 23:20:47 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.4 2002/04/17 02:47:12 ronpinkas Exp $
  */
 
 /*
@@ -283,9 +283,13 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
       hb_compFunCallCheck( pName->value.asSymbol, iCount );
 #endif
 
-      /* TODO: LEN() (also done by Clipper)
+      /* TODO: This is not the correct place for this optimization - move to hb_compExprUseFunCall HB_EA_REDUCE !!!
+               LEN() (also done by Clipper)
                ASC() (not done by Clipper)
-               EMPTY() (not done by Clipper) */
+               EMPTY() (not done by Clipper)
+               SPACE()
+               REPLICATE()
+       */
 
       if( ( strcmp( "AT", pName->value.asSymbol ) == 0 ) && iCount == 2 )
       {
