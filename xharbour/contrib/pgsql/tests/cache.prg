@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cache.prg,v 1.1 2004/06/21 18:43:38 rodrigo_moreno Exp $
  *
  * This samples show how to use dbf to cache postgres records.
  *
@@ -104,7 +104,6 @@ Function SQLApplyUpdates()
   Local lDeleted
   Local oQuery
   Local oRow
-  Local oRecord
   Local lUpdate
   Local lError := .F.
   Local cError 
@@ -114,7 +113,7 @@ Function SQLApplyUpdates()
   i := ASCAN(aTableTemp, {|aVal| aVal[DB_ALIAS] == cAlias})   
   
   IF i != 0
-    oQuery := aTableTemp[i, DB_QUERY]
+    oQuery := aTableTemp[i, 3]
 
     FOR i := 1 TO Lastrec()
     
@@ -122,13 +121,15 @@ Function SQLApplyUpdates()
       
       IF i > oQuery:Lastrec()
         /* Verifica se eh um registro novo */
-        oRecord := oQuery:GetBlankRow()
+        oRow := oQuery:GetBlankRow()
 
         FOR x := 1 TO FCount()
-          oRecord:FieldPut(x, Fieldget(x))
+          if oRow:Fieldpos( Fieldname(x) ) != 0
+            oRow:FieldPut(Fieldname(x), Fieldget(x))
+          endif            
         NEXT
 
-        cError := oQuery:Append(oRecord)
+        cError := oQuery:Append(oRow)
         lError := ! Empty(cError)
       ELSE
           
@@ -142,10 +143,12 @@ Function SQLApplyUpdates()
         ELSE
           /* Faz update, mas compara quais campos sao diferentes */
           FOR x := 1 TO Fcount()
-            IF .not. (Fieldget(x) == oRow:Fieldget(x))
-              oRow:Fieldput(x, Fieldget(x))
-              lUpdate := .t.              
-            END
+            if oRow:Fieldpos( Fieldname(x) ) != 0
+                if .not. (Fieldget(x) == oRow:Fieldget(Fieldname(x)))
+                    oRow:Fieldput(Fieldname(x), Fieldget(x))
+                    lUpdate := .t.
+                endif
+            endif                
           NEXT
           
           IF lUpdate
