@@ -1,5 +1,5 @@
 /*
- * $Id: devoutp.prg,v 1.4 2002/12/18 13:43:56 ronpinkas Exp $
+ * $Id: devoutp.prg,v 1.5 2003/10/18 01:15:19 jonnymind Exp $
  */
 
 /*
@@ -52,8 +52,14 @@
 
 PROCEDURE DevOutPict( xValue, cPicture, cColor, nRow, nCol )
 
+   LOCAL cCurrentColor := iif(pCount() >= 3, SetColor(), NIL)
+
    IF Valtype( xValue ) IN "CMNDL"
       DevOut( Transform( xValue, cPicture ), cColor, nRow, nCol )
+   ENDIF
+
+   IF ! Empty(cCurrentColor)
+      SetColor(cCurrentColor)
    ENDIF
 
 RETURN

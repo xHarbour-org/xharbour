@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3296 2004/08/10 01:25:13 druzus Exp $
+ * $Id: ChangeLog,v 1.3297 2004/08/10 13:27:12 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-10 17:40 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/devoutp.prg
+    ! small incompatibility with clipper, if third parameter exists
+      (doesn't mind it's content) on exit DevOutPict() should restore
+      color setting there were in effect when it was called.
+
+  /* Try this before this fix to see what happens.
+     function main()
+   		LOCAL cCol := SetColor( "1/2,3/4,5/6,7/8,9/10" )
+
+	    clear screen
+
+   		ColorSelect( 1 )
+   		DevPos( 5, 1 )
+   		DevOutPict( 1 , "####", NIL )
+
+   		DevPos( 5, 1 )
+   		DevOutPict( 1 , "####" )
+	 return
+  */
 
 2004-08-10 15:20 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg
