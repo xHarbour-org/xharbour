@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2435 2004/03/01 09:51:48 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2436 2004/03/01 09:54:51 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-02 05:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/hbapifs.h
+  * source/rtl/direct.c
+    ! replace *.* with DIR_ALL_FILES_MASK macro.
+    - remove over-paste from my local work file.
+    % optimized by using HB_ITEM
+
+  * contrib/hbzlib/zip.c
+    ! modification in accordance with the above changes
+
 2004-03-01 17:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/direct.c
     ! minor optimization on dot checkings.

@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.19 2004/02/29 11:06:11 andijahja Exp $
+ * $Id: zip.c,v 1.20 2004/02/29 17:09:41 andijahja Exp $
  */
 
 /*
@@ -57,6 +57,55 @@ static HB_ITEM FileToZip;
 static HB_ITEM ExcludeFile;
 static HB_ITEM UnzipFiles;
 static HB_ITEM DelZip;
+static HB_ITEM FileAttribs;
+
+#define FA_RDONLY           1   /* R */
+#define FA_HIDDEN           2   /* H */
+#define FA_SYSTEM           4   /* S */
+#define FA_LABEL            8   /* V */
+#define FA_DIREC           16   /* D */
+#define FA_ARCH            32   /* A */
+#define FA_NORMAL         128
+
+static BOOL ZipAttribute( char *szFile, int iAttr )
+{
+   DWORD dwFlags=FILE_ATTRIBUTE_ARCHIVE;
+   BOOL lSuccess;
+
+   if(  iAttr & FA_RDONLY  )
+      dwFlags |= FILE_ATTRIBUTE_READONLY;
+
+   if(  iAttr & FA_HIDDEN  )
+      dwFlags |= FILE_ATTRIBUTE_HIDDEN;
+
+   if(  iAttr & FA_SYSTEM  )
+      dwFlags |= FILE_ATTRIBUTE_SYSTEM;
+
+   if(  iAttr & FA_NORMAL  )
+      dwFlags |=    FILE_ATTRIBUTE_NORMAL;
+
+   lSuccess=SetFileAttributes( szFile, dwFlags );
+
+   return lSuccess;
+}
+
+static void ResetAttribs()
+{
+   ULONG ulAtt, ulZipLen = FileToZip.item.asArray.value->ulLen;
+   char *szFile;
+   int iAttr;
+
+   for( ulAtt = 0; ulAtt < ulZipLen; ulAtt ++ )
+   {
+     szFile = hb_arrayGetC( &FileToZip, ulAtt + 1 );
+     iAttr  = hb_arrayGetNI( &FileAttribs, ulAtt + 1 );
+     ZipAttribute( szFile, iAttr );
+     hb_xfree( szFile );
+   }
+
+   hb_itemClear( &FileAttribs );
+   hb_itemClear( &FileToZip );
+}
 
 static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption )
 {
@@ -140,15 +189,19 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
 
       if ( strchr( pExclude->item.asString.value, '*') != NULL )
       {
-         PHB_ITEM pWildFile = hb_fsDirectory(pExclude->item.asString.value,NULL,NULL,TRUE);
+         HB_ITEM WildFile;
          PHB_ITEM pDirEntry;
-         int uiLen = pWildFile->item.asArray.value->ulLen;
+         int uiLen;
          int ui;
+
+         WildFile.type = HB_IT_NIL;
+         hb_fsDirectory( &WildFile, pExclude->item.asString.value,NULL,NULL,TRUE);
+         uiLen = WildFile.item.asArray.value->ulLen;
 
          for ( ui = 0 ; ui < uiLen; ui ++ )
          {
             char * szEntry;
-            pDirEntry = hb_arrayGetItemPtr( pWildFile, ui + 1 );
+            pDirEntry = hb_arrayGetItemPtr( &WildFile, ui + 1 );
             szEntry = hb_arrayGetC( pDirEntry, 1 );
 
             if( szEntry )
@@ -157,8 +210,6 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
                hb_xfree( szEntry );
             }
          }
-
-         hb_itemRelease( pWildFile );
       }
       else
       {
@@ -170,8 +221,10 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
       int ux;
       int ufx = pExclude->item.asArray.value->ulLen;
       char * szExclude;
-      PHB_ITEM pWildFile;
+      HB_ITEM WildFile;
       PHB_ITEM pDirEntry;
+
+      WildFile.type = HB_IT_NIL;
 
       if ( ufx == 0 )
       {
@@ -189,18 +242,16 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
                int uiW, uiWLen;
                char *szEntry;
 
-               pWildFile = hb_fsDirectory(szExclude,NULL,NULL,TRUE);
-               uiWLen = pWildFile->item.asArray.value->ulLen;
+               hb_fsDirectory(&WildFile,szExclude,NULL,NULL,TRUE);
+               uiWLen = WildFile.item.asArray.value->ulLen;
 
                for ( uiW = 0; uiW < uiWLen; uiW ++ )
                {
-                  pDirEntry = hb_arrayGetItemPtr( pWildFile, uiW + 1 );
+                  pDirEntry = hb_arrayGetItemPtr( &WildFile, uiW + 1 );
                   szEntry = hb_arrayGetC( pDirEntry, 1 );
                   hb_arrayAddForward( &ExcludeFile, hb_itemPutC( &ExTmp, szEntry ));
                   hb_xfree( szEntry );
                }
-
-               hb_itemRelease( pWildFile );
             }
             else
             {
@@ -215,14 +266,17 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
 
 static void ZipCreateArray( PHB_ITEM pParam )
 {
-   PHB_ITEM pDirEntry, pWildFile;
-   HB_ITEM Temp, TempArray;
+   PHB_ITEM pDirEntry;
+   HB_ITEM Temp, TempArray, WildFile;
    int ul, ulLen, ulArr, ulLenArr;
 
+   WildFile.type = HB_IT_NIL;
+   FileAttribs.type = HB_IT_NIL;
    FileToZip.type = HB_IT_NIL;
    Temp.type = HB_IT_NIL;
    TempArray.type = HB_IT_NIL;
 
+   hb_arrayNew( &FileAttribs, 0 );
    hb_arrayNew( &TempArray, 0 );
 
    if( pParam->type == HB_IT_STRING )
@@ -248,28 +302,30 @@ static void ZipCreateArray( PHB_ITEM pParam )
       {
          if ( strchr( szArrEntry, '*') != NULL )
          {
-            pWildFile = hb_fsDirectory(szArrEntry,NULL,NULL,TRUE);
-            ulLen = pWildFile->item.asArray.value->ulLen;
+            hb_fsDirectory(&WildFile,szArrEntry,NULL,NULL,TRUE);
+            ulLen = WildFile.item.asArray.value->ulLen;
 
             for ( ul = 0; ul < ulLen ; ul ++ )
             {
                char * szEntry;
-               pDirEntry = hb_arrayGetItemPtr( pWildFile, ul + 1 );
+               pDirEntry = hb_arrayGetItemPtr( &WildFile, ul + 1 );
                szEntry = hb_arrayGetC( pDirEntry, 1 );
 
                if ( ZipTestExclude ( szEntry ) )
                {
                   hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szEntry ) );
+                  hb_arrayAddForward( &FileAttribs, hb_itemPutNI( &Temp, GetFileAttributes( szEntry ) ) );
+                  ZipAttribute( szEntry, FA_ARCH );
                }
 
                hb_xfree( szEntry );
             }
-
-            hb_itemRelease( pWildFile );
          }
          else
          {
             hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szArrEntry ) );
+            hb_arrayAddForward( &FileAttribs, hb_itemPutNI( &Temp, GetFileAttributes( szArrEntry ) ) );
+            ZipAttribute( szArrEntry, FA_ARCH );
          }
 
          hb_xfree( szArrEntry );
@@ -320,6 +376,8 @@ HB_FUNC( HB_ZIPFILE )
                                     ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                     ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                     &iProgress );
+
+            ResetAttribs();
          }
 
          hb_xfree( szZipFileName );
