@@ -118,7 +118,11 @@
 #elif defined( ASANLM ) || defined( ADS_LINUX ) || defined( NLM )
    #define ENTRYPOINT
 #elif defined( WIN32 ) && !defined( __BORLANDC__ )
-   #define ENTRYPOINT _declspec( dllexport ) WINAPI
+   #if defined( __WATCOMC__ )
+      #define ENTRYPOINT __declspec( dllexport ) WINAPI
+   #else
+      #define ENTRYPOINT _declspec( dllexport ) WINAPI
+   #endif
 #else
    #define ENTRYPOINT _export WINAPI
 #endif

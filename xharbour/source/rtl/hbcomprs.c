@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.c,v 1.6 2004/03/23 02:23:39 andijahja Exp $
+ * $Id: hbcomprs.c,v 1.7 2004/03/30 22:47:23 druzus Exp $
  */
 
 /*
@@ -364,8 +364,10 @@ int HB_EXPORT compress ( Bytef * dest, uLongf *destLen, const Bytef * source, uL
     return err;
 }
 
+#if 0
 const char deflate_copyright[] =
    " deflate & inflate 1.1.4 Copyright 1995-2002 Jean-loup Gailly ";
+#endif
 
 /* ===========================================================================
  *  Function prototypes.

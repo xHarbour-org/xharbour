@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.32 2004/04/01 20:36:14 andijahja Exp $
+ * $Id: hbdefs.h,v 1.33 2004/04/05 02:29:30 druzus Exp $
  */
 
 /*
@@ -456,11 +456,14 @@ typedef PHB_FUNC HB_FUNC_PTR;
    #elif defined( __BORLANDC__ )
       #define HB_EXPORT _declspec( dllexport )
 
-   #elif defined( WIN32 ) && !defined( ASANT )
+   #elif defined( WIN32 ) && !defined( ASANT ) && !defined( __WATCOMC__ )
       #define HB_EXPORT _declspec( dllexport )
 
    #elif defined( ASANLM ) || defined( ASANT )
       #define HB_EXPORT
+
+   #elif defined( __WATCOMC__ )
+      #define HB_EXPORT __declspec( dllexport )
 
    #else
       #define HB_EXPORT

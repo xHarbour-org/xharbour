@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2759 2004/04/05 22:38:25 lculik Exp $
+ * $Id: ChangeLog,v 1.2760 2004/04/06 01:50:52 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-06 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/hbcomprs.c
+  * source/rtl/gtwvt/gtwvt.c
+    ! kill warning under Open-WatCom 1.2
+  * source/rtl/win32ole.prg
+    ! force LONGLONG under Open-WatCom 1.2 when __FORCE_LONG_LONG__ is defined.
+      This requires a hacked version of oaidl.h I atatched in other message.
+  * contrib/rdd_ads/ace.h
+    ! minor modification to allow compilation under Open-Watcom 1.2
+  * include/hbdefs.h
+    + add definition of HB_EXPORT for Open-Watcom 1.2
 
 2004-04-06 04:01 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/libct/files.c

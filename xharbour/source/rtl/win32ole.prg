@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.53 2004/03/25 18:54:15 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.54 2004/03/28 16:02:38 likewolf Exp $
  */
 
 /*
@@ -119,7 +119,7 @@ RETURN TOleAuto():GetActiveObject( cString )
       WINOLEAUTAPI VarR8FromDec(DECIMAL *pdecIn, DOUBLE *pdblOut);
    #endif
 
-   #if defined(__MINGW32__) || defined(__WATCOMC__)
+   #if ( defined(__MINGW32__) || ( defined(__WATCOMC__) && !defined(__FORCE_LONG_LONG__) ) )
       #define HB_LONG_LONG_OFF
    #endif
 

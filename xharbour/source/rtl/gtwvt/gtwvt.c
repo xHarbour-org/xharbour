@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.89 2004/04/05 19:33:31 andijahja Exp $
+ * $Id: gtwvt.c,v 1.90 2004/04/05 22:25:43 andijahja Exp $
  */
 
 /*
@@ -131,8 +131,9 @@ static void    hb_wvt_gtResetWindowSize( HWND hWnd );
 static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 static BOOL    hb_wvt_gtAllocSpBuffer( USHORT col, USHORT row );
 static DWORD   hb_wvt_gtProcessMessages( void );
+#if 0
 static BOOL    hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int width );
-
+#endif
 static void    hb_wvt_gtSetCaretOn( BOOL bOn );
 static BOOL    hb_wvt_gtSetCaretPos( void );
 static void    hb_wvt_gtValidateCaret( void );
