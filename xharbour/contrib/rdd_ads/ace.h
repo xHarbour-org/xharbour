@@ -1,6 +1,25 @@
+// Copyright (c) 2002-2003 Extended Systems, Inc.  ALL RIGHTS RESERVED.
+//
+// This source code can be used, modified, or copied by the licensee as long as
+// the modifications (or the new binary resulting from a copy or modification of
+// this source code) are used with Extended Systems' products. The source code
+// is not redistributable as source code, but is redistributable as compiled
+// and linked binary code. If the source code is used, modified, or copied by
+// the licensee, Extended Systems Inc. reserves the right to receive from the
+// licensee, upon request, at no cost to Extended Systems Inc., the modifications.
+//
+// Extended Systems Inc. does not warrant that the operation of this software
+// will meet your requirements or that the operation of the software will be
+// uninterrupted, be error free, or that defects in software will be corrected.
+// This software is provided "AS IS" without warranty of any kind. The entire
+// risk as to the quality and performance of this software is with the purchaser.
+// If this software proves defective or inadequate, purchaser assumes the entire
+// cost of servicing or repair. No oral or written information or advice given
+// by an Extended Systems Inc. representative shall create a warranty or in any
+// way increase the scope of this warranty.
+
 /*******************************************************************************
 * Source File  : ace.h
-* Copyright    : 1996-2002 Extended Systems, Inc.
 * Description  : This is the main header file for the Advantage Client
 *                Engine.  It contains the type definitions, constants,
 *                and prototypes for the APIs
@@ -40,6 +59,10 @@
    #pragma pack( push, 1 )
 #endif
 
+#if defined( WIN32 ) && !defined( SNAPDUMP )
+   #define ADS_WIN32
+#endif
+
 /* This forces a warning for single equals in if statements */
 #ifdef WIN32
    // 16-bit compiler doesn't seem to like this
@@ -66,18 +89,36 @@
    typedef double         DOUBLE;
 
 #ifdef WIN32
-   typedef ULONGLONG   UNSIGNED64;
-   typedef LONGLONG    SIGNED64;
+   typedef ULONGLONG        UNSIGNED64;
+   typedef LONGLONG         SIGNED64;
+#elif defined( NLM ) && !defined( ADS_LINUX )
+   #ifndef ADS_64INTS
+      #define ADS_64INTS
+         typedef __int64          SIGNED64;
+         typedef unsigned __int64 UNSIGNED64;
+   #endif
+#elif defined( ADS_LINUX ) || defined( __linux__ )
+   /* <sys/types.h> is required for loff_t (64bit ints) */
+   #include <sys/types.h>
+
+   /* use a define here to solve 64bit int typedef problems, see wincompat.h & rddunvrs.h */
+   #ifndef ADS_64INTS
+   #define ADS_64INTS
+   typedef loff_t           UNSIGNED64;
+   typedef loff_t           SIGNED64;
+   #endif
 #endif
 
 #define VOID   void
 #define EXTERN extern
 #define STATIC static
 
-#if defined( ASANLM ) || defined( ADS_LINUX ) || defined( ASANT ) || defined( NLM ) || defined( ADS_NT ) || defined( ADS_WIN9X ) || defined( STAND_ALONE_EXE )
+#if defined( ASANT ) || defined( ADS_NT ) || defined( ADS_WIN9X )
+   #define ENTRYPOINT WINAPI
+#elif defined( ASANLM ) || defined( ADS_LINUX ) || defined( NLM )
    #define ENTRYPOINT
 #elif defined( WIN32 ) && !defined( __BORLANDC__ )
-   #define ENTRYPOINT __declspec( dllimport ) WINAPI
+   #define ENTRYPOINT _declspec( dllexport ) WINAPI
 #else
    #define ENTRYPOINT _export WINAPI
 #endif
@@ -117,6 +158,10 @@
 #define ADS_TABLE_PERM_DELETE             0x00000080
 #define ADS_REINDEX_ON_COLLATION_MISMATCH 0x00000100
 #define ADS_IGNORE_COLLATION_MISMATCH     0x00000200
+//#define unpublished                     0x00000400
+//#define unpublished                     0x00000800
+#define ADS_DICTIONARY_BOUND_TABLE        0x00001000
+
 
 
 /* Options for creating indexes - can be ORed together */
@@ -127,11 +172,19 @@
 #define ADS_DESCENDING           0x00000008
 #define ADS_USER_DEFINED         0x00000010
 
+/* Options specifically for FTS indexes */
+#define ADS_FTS_INDEX            0x00000020      // This is implied for AdsCreateFTSIndex
+#define ADS_FTS_FIXED            0x00000040      // Do not maintain the index with record updates
+#define ADS_FTS_CASE_SENSITIVE   0x00000080      // Make the index case sensitive
+#define ADS_FTS_KEEP_SCORE       0x00000100      // Track word counts in the index for faster SCORE()
+#define ADS_FTS_PROTECT_NUMBERS  0x00000200      // Don't break numbers on commas and periods
+
+
 /* Options for returning string values */
-#define ADS_NONE                 0x00000000
-#define ADS_LTRIM                0x00000001
-#define ADS_RTRIM                0x00000002
-#define ADS_TRIM                 0x00000003
+#define ADS_NONE                 0x0000
+#define ADS_LTRIM                0x0001
+#define ADS_RTRIM                0x0002
+#define ADS_TRIM                 0x0003
 
 /* this is for passing null terminated strings */
 #define ADS_NTS    ( ( UNSIGNED16 ) -1 )
@@ -179,6 +232,7 @@
 #define ADS_CURSOR                5
 #define ADS_DATABASE_CONNECTION   6
 #define ADS_SYS_ADMIN_CONNECTION  7
+#define ADS_FTS_INDEX_ORDER       8
 
 
 /* ACE Cursor ReadOnly settings */
@@ -210,6 +264,10 @@
 #define ADS_CMP_LESS    -1
 #define ADS_CMP_EQUAL    0
 #define ADS_CMP_GREATER  1
+
+/* Property values for the AdsGetConnectionProperty API */
+#define ADS_CONNECTIONPROP_USERNAME    0
+#define ADS_CONNECTIONPROP_PASSWORD    1
 
 
 /* Success return code */
@@ -393,33 +451,15 @@
 #define AE_LINK_ACTIVATION_FAILED       5174
 #define AE_INDEX_COLLATION_MISMATCH     5175
 #define AE_ILLEGAL_USER_OPERATION       5176
-
-/* Available OEM Languages (for Clipper compatibility) */
-#define ADS_LANG_USA          "USA"
-#define ADS_LANG_DANISH       "DANISH"
-#define ADS_LANG_DUTCH        "DUTCH"
-#define ADS_LANG_FINNISH      "FINNISH"
-#define ADS_LANG_FRENCH       "FRENCH"
-#define ADS_LANG_GERMAN       "GERMAN"
-#define ADS_LANG_GREEK437     "GREEK437"
-#define ADS_LANG_GREEK851     "GREEK851"
-#define ADS_LANG_ICELD850     "ICELD850"
-#define ADS_LANG_ICELD861     "ICELD861"
-#define ADS_LANG_ITALIAN      "ITALIAN"
-#define ADS_LANG_NORWEGN      "NORWEGN"
-#define ADS_LANG_PORTUGUE     "PORTUGUE"
-#define ADS_LANG_SPANISH      "SPANISH"
-#define ADS_LANG_SWEDISH      "SWEDISH"
-#define ADS_LANG_MAZOVIA      "MAZOVIA"
-#define ADS_LANG_PC_LATIN     "PC_LATIN"
-#define ADS_LANG_ISOLATIN     "ISOLATIN"
-#define ADS_LANG_RUSSIAN      "RUSSIAN"
-#define ADS_LANG_NTXCZ852     "NTXCZ852"
-#define ADS_LANG_NTXCZ895     "NTXCZ895"
-#define ADS_LANG_NTXSL852     "NTXSL852"
-#define ADS_LANG_NTXSL895     "NTXSL895"
-#define ADS_LANG_NTXHU852     "NTXHU852"
-
+#define AE_TRIGGER_FAILED               5177
+#define AE_NO_ASA_FUNCTION_FOUND        5178
+#define AE_VALUE_OVERFLOW               5179
+#define AE_UNRECOGNIZED_FTS_VERSION     5180
+#define AE_TRIG_CREATION_FAILED         5181
+#define AE_MEMTABLE_SIZE_EXCEEDED       5182
+#define AE_OUTDATED_CLIENT_VERSION      5183
+#define AE_FREE_TABLE                   5184
+#define AE_LOCAL_CONN_RESTRICTED        5185
 
 /* Supported file types */
 #define ADS_DATABASE_TABLE       ADS_DEFAULT
@@ -439,9 +479,12 @@
 #define ADS_OPTIMIZED_PART       2
 #define ADS_OPTIMIZED_NONE       3
 
-/* Advantage Optimized Filter (AOF) resolution options */
-#define ADS_RESOLVE_IMMEDIATE    1
-#define ADS_RESOLVE_DYNAMIC      2
+/* Advantage Optimized Filter (AOF) options */
+#define ADS_DYNAMIC_AOF          0x00000000  /* default */
+#define ADS_RESOLVE_IMMEDIATE    0x00000001
+#define ADS_RESOLVE_DYNAMIC      0x00000002
+#define ADS_KEYSET_AOF           0x00000004
+#define ADS_FIXED_AOF            0x00000008
 
 /* Advantage Optimized Filter (AOF) customization options */
 #define ADS_AOF_ADD_RECORD       1
@@ -469,7 +512,7 @@
 #define ADS_MAX_TAG_NAME         128
 #define ADS_MAX_TAGS             50    /* maximum for CDX/ADI file */
 #define ADS_MAX_OBJECT_NAME      200   /* maximum length of DD object name */
-
+#define ADS_MAX_TABLE_AND_PATH   ADS_MAX_TABLE_NAME + ADS_MAX_PATH
 
 /*
  * Valid range of page sizes for ADI indexes.  The default page size is 512
@@ -511,13 +554,13 @@
 #define ADS_AUTOINC              15    /* 4 byte auto-increment value */
 #define ADS_RAW                  16    /* Untranslated data */
 #define ADS_CURDOUBLE            17    /* IEEE 8 byte floating point currency */
-
+#define ADS_MONEY                18    /* 8 byte, 4 implied decimal Currency Field */
+#define ADS_LONGLONG             19    /* 8 byte integer */
 
 /*
  * supported User Defined Function types to be used with AdsRegisterUDF
  */
 #define ADS_INDEX_UDF            1
-
 
 /*
  * Constant for AdsMgGetConfigInfo
@@ -745,6 +788,7 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_MAX_PROPERTY_LEN     0xFFFE
 #define ADS_DD_MAX_OBJECT_NAME_LEN  200
 
+#define ADS_DD_UNKNOWN_OBJECT            0
 #define ADS_DD_TABLE_OBJECT              1
 #define ADS_DD_RELATION_OBJECT           2
 #define ADS_DD_INDEX_FILE_OBJECT         3
@@ -759,6 +803,7 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_DATABASE_OBJECT           11
 #define ADS_DD_LINK_OBJECT               12
 #define ADS_DD_TABLE_VIEW_OR_LINK_OBJECT 13  /* Used in v6.2 AdsFindFirst/NextTable */
+#define ADS_DD_TRIGGER_OBJECT            14
 
 
 /* Common properties numbers < 100 */
@@ -800,6 +845,8 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_TABLE_ENCRYPTION        214
 #define ADS_DD_TABLE_MEMO_BLOCK_SIZE   215
 #define ADS_DD_TABLE_PERMISSION_LEVEL  216
+#define ADS_DD_TABLE_TRIGGER_TYPES     217
+#define ADS_DD_TABLE_TRIGGER_OPTIONS   218
 
 /* Field properties between 300 - 399 */
 #define ADS_DD_FIELD_DEFAULT_VALUE     300
@@ -811,6 +858,7 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_FIELD_TYPE              306
 #define ADS_DD_FIELD_LENGTH            307
 #define ADS_DD_FIELD_DECIMAL           308
+#define ADS_DD_FIELD_NUM               309
 
 /* Index tag properties between 400 - 499 */
 #define ADS_DD_INDEX_FILE_NAME         400
@@ -819,6 +867,11 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_INDEX_OPTIONS           403
 #define ADS_DD_INDEX_KEY_LENGTH        404
 #define ADS_DD_INDEX_KEY_TYPE          405
+#define ADS_DD_INDEX_FTS_MIN_LENGTH    406
+#define ADS_DD_INDEX_FTS_DELIMITERS    407
+#define ADS_DD_INDEX_FTS_NOISE         408
+#define ADS_DD_INDEX_FTS_DROP_CHARS    409
+#define ADS_DD_INDEX_FTS_CONDITIONAL_CHARS 410
 
 /* RI properties between 500-599 */
 #define ADS_DD_RI_PARENT_GRAPH         500
@@ -872,6 +925,17 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_LINK_OPTIONS            1301
 #define ADS_DD_LINK_USERNAME           1302
 
+/* Trigger properties 1400 - 1499 */
+#define ADS_DD_TRIG_TABLEID            1400
+#define ADS_DD_TRIG_EVENT_TYPE         1401
+#define ADS_DD_TRIG_TRIGGER_TYPE       1402
+#define ADS_DD_TRIG_CONTAINER_TYPE     1403
+#define ADS_DD_TRIG_CONTAINER          1404
+#define ADS_DD_TRIG_FUNCTION_NAME      1405
+#define ADS_DD_TRIG_PRIORITY           1406
+#define ADS_DD_TRIG_OPTIONS            1407
+#define ADS_DD_TRIG_TABLENAME          1408
+
 
 #define ADS_DD_LEVEL_0  0
 #define ADS_DD_LEVEL_1  1
@@ -896,12 +960,37 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_PERMISSION_INSERT       0x00000010
 #define ADS_PERMISSION_DELETE       0x00000020
 #define ADS_PERMISSION_LINK_ACCESS  0x00000040
-
+#define ADS_PERMISSION_ALL          0xFFFFFFFF
 
 /* Link DD options */
 #define ADS_LINK_GLOBAL             0x00000001
 #define ADS_LINK_AUTH_ACTIVE_USER   0x00000002
 #define ADS_LINK_PATH_IS_STATIC     0x00000004
+
+/* Trigger event types */
+#define ADS_TRIGEVENT_INSERT             1
+#define ADS_TRIGEVENT_UPDATE             2
+#define ADS_TRIGEVENT_DELETE             3
+
+/* Trigger types */
+#define ADS_TRIGTYPE_BEFORE         0x00000001
+#define ADS_TRIGTYPE_INSTEADOF      0x00000002
+#define ADS_TRIGTYPE_AFTER          0x00000004
+
+/* Trigger container types */
+#define ADS_TRIG_WIN32DLL           1
+#define ADS_TRIG_COM                2
+#define ADS_TRIG_SCRIPT             3
+
+/*
+ * Trigger options, if changed or adding more please inspect code
+ * in RemoveTriggerFromDictionary
+ */
+#define ADS_TRIGOPTIONS_NO_VALUES             0x00000000
+#define ADS_TRIGOPTIONS_WANT_VALUES           0x00000001
+#define ADS_TRIGOPTIONS_WANT_MEMOS_AND_BLOBS  0x00000002
+#define ADS_TRIGOPTIONS_DEFAULT               0x00000003  /* default is to include vals and memos */
+#define ADS_TRIGOPTIONS_NO_TRANSACTION        0x00000004  /* don't use implicit transactions */
 
 /*
  * Table permission verification levels.
@@ -914,7 +1003,7 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_TABLE_PERMISSION_LEVEL_3   3
 
 
-   /* stored procedure functions must be of this type */
+/* stored procedure functions must be of this type */
 #ifdef WINAPI
 typedef UNSIGNED32 (WINAPI *STORED_PROCEDURE_PTR)
 (
@@ -955,6 +1044,46 @@ typedef UNSIGNED32 (WINAPI *SHUTDOWN_PROCEDURE_PTR)
    UNSIGNED8   *pucPassword    // (I) the user's password in encrypted form
 );
 
+
+typedef UNSIGNED32 (WINAPI *STORED_PROCEDURE2_PTR)
+(
+   UNSIGNED32  ulConnectionID,        // (I) value used to associate a user/connection
+                                      //     and can be used to track the state
+   ADSHANDLE   hConnection,           // (I) active connection to be used by the procedure
+   UNSIGNED32  *pulNumRowsAffected    // (O) the number of rows affected
+);
+
+
+typedef UNSIGNED32 (WINAPI *STARTUP_PROCEDURE2_PTR)
+(
+   UNSIGNED32  ulConnectionID, // (I) value used to associate a user/connection
+                               //     and can be used to track the state
+   ADSHANDLE   hConnection     // (I) active connection to be used by the procedure
+);
+
+
+typedef UNSIGNED32 (WINAPI *SHUTDOWN_PROCEDURE2_PTR)
+(
+   UNSIGNED32  ulConnectionID, // (I) value used to associate a user/connection
+                               //     and can be used to track the state
+   ADSHANDLE   hConnection     // (I) active connection to be used by the procedure
+);
+
+
+typedef UNSIGNED32 (WINAPI *TRIGGER_FUNCTION_PTR)
+(
+   UNSIGNED32  ulConnectionID,  // (I) Unique ID identifying the user causing this trig
+   ADSHANDLE   hConnection,     // (I) Active ACE connection handle user can perform
+                                //     operations on
+   UNSIGNED8   *pucTriggerName, // (I) Name of trigger in the dictionary
+   UNSIGNED8   *pucTableName,   // (I) Name of the base table that caused the trigger
+   UNSIGNED32  ulEventType,     // (I) Flag with event type (insert, update, etc.)
+   UNSIGNED32  ulTriggerType,   // (I) Flag with trigger type (before, after, etc.)
+   UNSIGNED32  ulRecNo          // (I) Record number of the record being modified
+);
+
+typedef UNSIGNED32 (WINAPI *GET_INTERFACE_VERSION_PTR)();
+
 #endif // WINAPI
 
 /*
@@ -972,6 +1101,11 @@ typedef UNSIGNED32 (WINAPI *SHUTDOWN_PROCEDURE_PTR)
    {
 #endif
 
+#if defined( NLM ) || defined( ADS_LINUX )
+   #if !defined( SNAPDUMP )      // Snapdump is now built as a WIN32 app so WINAPI is defined
+      #define WINAPI   /* nothing */
+   #endif
+#endif
 
 UNSIGNED32 ENTRYPOINT AdsAddCustomKey( ADSHANDLE hIndex );
 
@@ -1026,6 +1160,8 @@ UNSIGNED32 ENTRYPOINT AdsCloseIndex( ADSHANDLE hIndex );
 
 UNSIGNED32 ENTRYPOINT AdsCloseTable( ADSHANDLE hTable );
 
+UNSIGNED32 ENTRYPOINT AdsCloseCachedTables( ADSHANDLE hConnection );
+
 UNSIGNED32 ENTRYPOINT AdsCommitTransaction( ADSHANDLE hConnect );
 
 UNSIGNED32 ENTRYPOINT AdsConnect( UNSIGNED8  *pucServerName,
@@ -1079,6 +1215,25 @@ UNSIGNED32 ENTRYPOINT AdsCreateIndex61( ADSHANDLE    hObj,
                                         UNSIGNED32   ulOptions,
                                         UNSIGNED32   ulPageSize,
                                         ADSHANDLE    *phIndex );
+
+UNSIGNED32 ENTRYPOINT AdsCreateFTSIndex( ADSHANDLE   hTable,
+                                         UNSIGNED8   *pucFileName,
+                                         UNSIGNED8   *pucTag,
+                                         UNSIGNED8   *pucField,
+                                         UNSIGNED32  ulPageSize,
+                                         UNSIGNED32  ulMinWordLen,
+                                         UNSIGNED32  ulMaxWordLen,
+                                         UNSIGNED16  usUseDefaultDelim,
+                                         UNSIGNED8   *pucDelimiters,
+                                         UNSIGNED16  usUseDefaultNoise,
+                                         UNSIGNED8   *pucNoiseWords,
+                                         UNSIGNED16  usUseDefaultDrop,
+                                         UNSIGNED8   *pucDropChars,
+                                         UNSIGNED16  usUseDefaultConditionals,
+                                         UNSIGNED8   *pucConditionalChars,
+                                         UNSIGNED8   *pucReserved1,
+                                         UNSIGNED8   *pucReserved2,
+                                         UNSIGNED32  ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsCreateTable( ADSHANDLE    hConnection,
                                       UNSIGNED8    *pucName,
@@ -1177,6 +1332,12 @@ UNSIGNED32 ENTRYPOINT AdsDDGetViewProperty( ADSHANDLE  hObject,
                                             VOID       *pvProperty,
                                             UNSIGNED16 *pusPropertyLen );
 
+UNSIGNED32 ENTRYPOINT AdsDDGetTriggerProperty( ADSHANDLE  hObject,
+                                               UNSIGNED8  *pucTriggerName,
+                                               UNSIGNED16 usPropertyID,
+                                               VOID       *pvProperty,
+                                               UNSIGNED16 *pusPropertyLen );
+
 UNSIGNED32 ENTRYPOINT AdsDDGetProcedureProperty( ADSHANDLE  hObject,
                                                  UNSIGNED8  *pucProcName,
                                                  UNSIGNED16 usPropertyID,
@@ -1259,7 +1420,6 @@ UNSIGNED32 ENTRYPOINT AdsDDAddProcedure( ADSHANDLE  hDictionary,
                                          UNSIGNED8  *pucOutParams,
                                          UNSIGNED8  *pucComments );
 
-
 UNSIGNED32 ENTRYPOINT AdsDDAddTable( ADSHANDLE    hDictionary,
                                      UNSIGNED8    *pucTableName,
                                      UNSIGNED8    *pucTablePath,
@@ -1272,6 +1432,21 @@ UNSIGNED32 ENTRYPOINT AdsDDAddView( ADSHANDLE      hDictionary,
                                     UNSIGNED8      *pucName,
                                     UNSIGNED8      *pucComments,
                                     UNSIGNED8      *pucSQL );
+
+UNSIGNED32 ENTRYPOINT AdsDDCreateTrigger( ADSHANDLE      hDictionary,
+                                          UNSIGNED8      *pucName,
+                                          UNSIGNED8      *pucTableName,
+                                          UNSIGNED32     ulTriggerType,
+                                          UNSIGNED32     ulEventTypes,
+                                          UNSIGNED32     ulContainerType,
+                                          UNSIGNED8      *pucContainer,
+                                          UNSIGNED8      *pucFunctionName,
+                                          UNSIGNED32     ulPriority,
+                                          UNSIGNED8      *pucComments,
+                                          UNSIGNED32     ulOptions );
+
+UNSIGNED32 ENTRYPOINT AdsDDRemoveTrigger( ADSHANDLE      hDictionary,
+                                          UNSIGNED8      *pucName );
 
 UNSIGNED32 ENTRYPOINT AdsDDAddIndexFile( ADSHANDLE    hDictionary,
                                          UNSIGNED8    *pucTableName,
@@ -1292,10 +1467,8 @@ UNSIGNED32 ENTRYPOINT AdsDDRemoveUserFromGroup( ADSHANDLE    hDictionary,
                                                 UNSIGNED8    *pucGroupName,
                                                 UNSIGNED8    *pucUserName );
 
-
 UNSIGNED32 ENTRYPOINT AdsDDDeleteUser( ADSHANDLE    hDictionary,
                                        UNSIGNED8    *pucUserName );
-
 
 UNSIGNED32 ENTRYPOINT AdsDDCreateUserGroup( ADSHANDLE    hDictionary,
                                             UNSIGNED8    *pucGroupName,
@@ -1315,7 +1488,6 @@ UNSIGNED32 ENTRYPOINT AdsDDRemoveIndexFile( ADSHANDLE    hDictionary,
 
 UNSIGNED32 ENTRYPOINT AdsDDRemoveProcedure( ADSHANDLE  hDictionary,
                                             UNSIGNED8  *pucName );
-
 
 UNSIGNED32 ENTRYPOINT AdsDDRemoveTable( ADSHANDLE    hObject,
                                         UNSIGNED8    *pucTableName,
@@ -1358,6 +1530,10 @@ UNSIGNED32 ENTRYPOINT AdsDeleteCustomKey( ADSHANDLE hIndex );
 UNSIGNED32 ENTRYPOINT AdsDeleteIndex( ADSHANDLE hIndex );
 
 UNSIGNED32 ENTRYPOINT AdsDeleteRecord( ADSHANDLE hTable );
+
+UNSIGNED32 ENTRYPOINT AdsGetKeyColumn( ADSHANDLE  hCursor,
+                                       UNSIGNED8  *pucKeyColumn,
+                                       UNSIGNED16 *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsDisableEncryption( ADSHANDLE hTable );
 
@@ -1447,6 +1623,26 @@ UNSIGNED32 ENTRYPOINT AdsGetAllIndexes(
                               ADSHANDLE        ahIndex[],
                               UNSIGNED16       *pusArrayLen );
 
+UNSIGNED32 ENTRYPOINT AdsGetFTSIndexes(
+                              ADSHANDLE        hTable,
+                              ADSHANDLE        ahIndex[],
+                              UNSIGNED16       *pusArrayLen );
+
+UNSIGNED32 ENTRYPOINT AdsGetFTSIndexInfo(
+                              ADSHANDLE   hIndex,
+                              UNSIGNED8   *pucOutput,
+                              UNSIGNED32  *pulBufLen,
+                              UNSIGNED8   **ppucField,
+                              UNSIGNED32  *pulMinWordLen,
+                              UNSIGNED32  *pulMaxWordLen,
+                              UNSIGNED8   **ppucDelimiters,
+                              UNSIGNED8   **ppucNoiseWords,
+                              UNSIGNED8   **ppucDropChars,
+                              UNSIGNED8   **ppucConditionalChars,
+                              UNSIGNED8   **ppucReserved1,
+                              UNSIGNED8   **ppucReserved2,
+                              UNSIGNED32  *pulOptions );
+
 UNSIGNED32 ENTRYPOINT AdsGetAllLocks(
                               ADSHANDLE        hTable,
                               UNSIGNED32       aulLocks[],
@@ -1493,6 +1689,17 @@ UNSIGNED32 ENTRYPOINT AdsGetCollationLang(
 UNSIGNED32 ENTRYPOINT AdsGetConnectionType(
                               ADSHANDLE        hConnect,
                               UNSIGNED16       *pusConnectType );
+
+UNSIGNED32 ENTRYPOINT AdsGetConnectionPath(
+                              ADSHANDLE        hConnect,
+                              UNSIGNED8        *pucConnectionPath,
+                              UNSIGNED16       *pusLen );
+
+UNSIGNED32 ENTRYPOINT AdsGetConnectionProperty(
+                              ADSHANDLE        hConnect,
+                              UNSIGNED16       usPropertyID,
+                              VOID             *pvProperty,
+                              UNSIGNED32       *pulPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetDate(
                               ADSHANDLE        hTable,
@@ -1607,13 +1814,11 @@ UNSIGNED32 ENTRYPOINT AdsGetIndexHandleByOrder(
                               UNSIGNED16       usOrderNum,
                               ADSHANDLE        *phIndex );
 
-
 UNSIGNED32 ENTRYPOINT AdsGetIndexHandleByExpr(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucExpr,
                               UNSIGNED32       ulDescending,
                               ADSHANDLE        *phIndex );
-
 
 UNSIGNED32 ENTRYPOINT AdsGetIndexName(
                               ADSHANDLE        hIndex,
@@ -1666,6 +1871,11 @@ UNSIGNED32 ENTRYPOINT AdsGetLong(
                               UNSIGNED8        *pucFldName,
                               SIGNED32         *plValue );
 
+UNSIGNED32 ENTRYPOINT AdsGetLongLong(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              SIGNED64         *pqValue );
+
 UNSIGNED32 ENTRYPOINT AdsGetMemoLength(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
@@ -1680,6 +1890,11 @@ UNSIGNED32 ENTRYPOINT AdsGetMilliseconds(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               SIGNED32         *plTime );
+
+UNSIGNED32 ENTRYPOINT AdsGetMoney(
+                              ADSHANDLE  hTbl,
+                              UNSIGNED8  *pucFldName,
+                              SIGNED64   *pqValue );
 
 UNSIGNED32 ENTRYPOINT AdsGetActiveLinkInfo(
                               ADSHANDLE         hDBConn,
@@ -1696,6 +1911,10 @@ UNSIGNED32 ENTRYPOINT AdsGetNumFields(
                               UNSIGNED16       *pusCount );
 
 UNSIGNED32 ENTRYPOINT AdsGetNumIndexes(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pusNum );
+
+UNSIGNED32 ENTRYPOINT AdsGetNumFTSIndexes(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pusNum );
 
@@ -1873,6 +2092,10 @@ UNSIGNED32 ENTRYPOINT AdsIsIndexDescending(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       *pbDescending );
 
+UNSIGNED32 ENTRYPOINT AdsIsIndexFTS(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       *pbFTS );
+
 UNSIGNED32 ENTRYPOINT AdsIsIndexUnique(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       *pbUnique );
@@ -1930,7 +2153,6 @@ UNSIGNED32 ENTRYPOINT AdsMgConnect( UNSIGNED8   *pucServerName,
                                     ADSHANDLE   *phMgmtHandle );
 
 UNSIGNED32 ENTRYPOINT AdsMgDisconnect( ADSHANDLE   hMgmtHandle );
-
 
 UNSIGNED32 ENTRYPOINT AdsMgGetCommStats( ADSHANDLE           hMgmtHandle,
                                          ADS_MGMT_COMM_STATS *pstCommStats,
@@ -2031,10 +2253,11 @@ UNSIGNED32 ENTRYPOINT AdsPackTable( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsRecallRecord( ADSHANDLE hTable );
 
+UNSIGNED32 ENTRYPOINT AdsRecallAllRecords( ADSHANDLE hTable );
+
 UNSIGNED32 ENTRYPOINT AdsRefreshRecord( ADSHANDLE hTable );
 
-
-#if !( defined( ASANLM ) || defined( ASANT ) || defined( NLM ) || defined( ADS_NT ) || defined( ADS_WIN9X ) || defined( STAND_ALONE_EXE ) || ( defined( ADS_LINUX ) && !defined( ACE ) ) )
+#if !( defined( ASANLM ) || defined( ASANT ) || defined( NLM ) || defined( ADS_NT ) || defined( ADS_WIN9X ) || ( defined( ADS_LINUX ) && !defined( ACE ) ) )
    UNSIGNED32 ENTRYPOINT AdsClearProgressCallback( void );
 
    UNSIGNED32 ENTRYPOINT AdsRegisterProgressCallback(
@@ -2052,6 +2275,11 @@ UNSIGNED32 ENTRYPOINT AdsReindex( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsReindex61( ADSHANDLE  hTable,
                                     UNSIGNED32 ulPageSize );
+
+UNSIGNED32 ENTRYPOINT AdsReindexFTS( ADSHANDLE  hTable,
+                                    UNSIGNED32 ulPageSize );
+
+UNSIGNED32 ENTRYPOINT AdsResetConnection( ADSHANDLE hConnect );
 
 UNSIGNED32 ENTRYPOINT AdsRollbackTransaction( ADSHANDLE hConnect );
 
@@ -2141,10 +2369,20 @@ UNSIGNED32 ENTRYPOINT AdsSetLong(
                                 UNSIGNED8        *pucFldName,
                                 SIGNED32         lValue );
 
+UNSIGNED32 ENTRYPOINT AdsSetLongLong(
+                                ADSHANDLE        hObj,
+                                UNSIGNED8        *pucFldName,
+                                SIGNED64         qValue );
+
 UNSIGNED32 ENTRYPOINT AdsSetMilliseconds(
                                         ADSHANDLE        hObj,
                                         UNSIGNED8        *pucFldName,
                                         SIGNED32         lTime );
+
+UNSIGNED32 ENTRYPOINT AdsSetMoney(
+                                ADSHANDLE  hObj,
+                                UNSIGNED8  *pucFldName,
+                                SIGNED64   qValue );
 
 UNSIGNED32 ENTRYPOINT AdsSetRecord(
                                   ADSHANDLE        hObj,
@@ -2220,7 +2458,7 @@ UNSIGNED32 ENTRYPOINT AdsZapTable( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsSetAOF( ADSHANDLE        hTable,
                                  UNSIGNED8        *pucFilter,
-                                 UNSIGNED16       usResolve );
+                                 UNSIGNED16       usOptions );
 
 UNSIGNED32 ENTRYPOINT AdsEvalAOF( ADSHANDLE        hTable,
                                   UNSIGNED8        *pucFilter,
@@ -2308,8 +2546,7 @@ UNSIGNED32 ENTRYPOINT AdsSetTimeStamp( ADSHANDLE        hObj,
                                        UNSIGNED8        *pucBuf,
                                        UNSIGNED32       ulLen );
 
-
-#if !( defined( ASANLM ) || defined( ASANT ) || defined( NLM ) || defined( ADS_NT ) || defined( ADS_WIN9X ) || defined( STAND_ALONE_EXE ) || ( defined( ADS_LINUX ) && !defined( ACE ) ) )
+#if !( defined( ASANLM ) || defined( ASANT ) || defined( NLM ) || defined( ADS_NT ) || defined( ADS_WIN9X ) || ( defined( ADS_LINUX ) && !defined( ACE ) ) )
    UNSIGNED32 ENTRYPOINT AdsClearSQLAbortFunc( void );
 
    UNSIGNED32 ENTRYPOINT AdsRegisterSQLAbortFunc( UNSIGNED32 (WINAPI *lpfnCallback)(void) );
