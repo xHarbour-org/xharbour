@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.30 2002/01/27 05:23:33 ronpinkas Exp $
+ * $Id: hvm.c,v 1.31 2002/01/27 09:01:57 ronpinkas Exp $
  */
 
 /*
@@ -3563,6 +3563,11 @@ void hb_vmSend( USHORT uiParams )
 
    //printf( "Symbol: '%s'\n", pSym->szName );
 
+   if( HB_IS_BYREF( pSelf ) )
+   {
+      pSelf = hb_itemUnRef( pSelf );
+   }
+
    if( HB_IS_BLOCK( pSelf ) )
    {
       if( pSym == &( hb_symEval ) )
@@ -3711,8 +3716,15 @@ static HARBOUR hb_vmDoBlock( void )
 
    pBlock = hb_stackSelfItem();
 
+   if( HB_IS_BYREF( pBlock ) )
+   {
+      pBlock = hb_itemUnRef( pBlock );
+   }
+
    if( ! HB_IS_BLOCK( pBlock ) )
+   {
       hb_errInternal( HB_EI_VMNOTCBLOCK, NULL, "hb_vmDoBlock()", NULL );
+   }
 
    /* Check for valid count of parameters */
    iParam = pBlock->item.asBlock.paramcnt - hb_pcount();

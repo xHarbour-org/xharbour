@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.4 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: transfrm.c,v 1.5 2002/01/27 09:01:57 ronpinkas Exp $
  */
 
 /*
@@ -158,7 +158,14 @@ HB_FUNC( TRANSFORM )
                   uiPicFlags |= PF_REMAIN;
                   break;
                case 'S':
-                  uiPicFlags |= PF_WIDTH;
+                  if( *( szPic + 1 ) == '-' )
+                  {
+                     szPic++;
+                  }
+                  else if( ulPicLen > 1 && *( szPic + 1 ) >= '0' && *( szPic + 1 ) <= '9' )
+                  {
+                     uiPicFlags |= PF_WIDTH;
+                  }
 
                   ulParamS = 0;
                   while( ulPicLen > 1 && *( szPic + 1 ) >= '0' && *( szPic + 1 ) <= '9' )
@@ -175,6 +182,10 @@ HB_FUNC( TRANSFORM )
                   break;
                case 'Z':
                   uiPicFlags |= PF_EMPTY;
+                  break;
+               case '0':
+                  uiPicFlags |= PF_PADL;
+                  byParamL = '0';
                   break;
             }
 
@@ -377,7 +388,7 @@ HB_FUNC( TRANSFORM )
          }
 
          pNumber = hb_itemPutNDLen( NULL, dPush, -1, iDec );
-         pWidth = hb_itemPutNI( NULL, iWidth );
+         pWidth = hb_itemPutNI( NULL, iWidth + ( ( ulPicLen || iDec == 0 ) ? 0 : ( iDec + 1 ) ) );
          pDec = hb_itemPutNI( NULL, iDec );
 
          szStr = hb_itemStr( pNumber, pWidth, pDec );
@@ -390,7 +401,7 @@ HB_FUNC( TRANSFORM )
          {
             iCount = 0;
 
-            /* Pad with Zero's */
+            /* Pad with padding char */
             if( uiPicFlags & PF_PADL )
             {
                for( i = 0; szStr[ i ] == ' ' && i < ( ULONG ) iWidth; i++ )
