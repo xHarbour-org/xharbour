@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.47 2004/04/05 22:38:27 lculik Exp $
+ * $Id: direct.c,v 1.48 2004/05/06 19:07:25 ronpinkas Exp $
  */
 
 /*
@@ -100,7 +100,7 @@
 #include "hbapiitm.h"
 #include "hbfast.h"
 #include "regex.h"
-
+#include "hbtrace.h"
 #include "directry.ch"
 
 extern char *hb_vm_acAscii[256];
@@ -418,7 +418,7 @@ HB_FUNC( DIRECTORYRECURSE )
    BOOL bAddDrive = TRUE;
    #endif
    char *szAttributes;
-
+   
    Dir.type = HB_IT_NIL;
 
    if( pDirSpec && pDirSpec->item.asString.length <= _POSIX_PATH_MAX )
@@ -442,6 +442,7 @@ HB_FUNC( DIRECTORYRECURSE )
 
       if( ( fDirSpec = hb_fsFNameSplit( pDirSpec->item.asString.value ) ) != NULL )
       {
+         #if !defined( HB_OS_UNIX )
          if( fDirSpec->szDrive == NULL )
          {
             szDrive[ 0 ] = ( char ) ( hb_fsCurDrv() + 'A' );
@@ -451,10 +452,15 @@ HB_FUNC( DIRECTORYRECURSE )
          {
             bAddDrive = FALSE;
          }
+         #endif
 
          if( fDirSpec->szPath == NULL )
          {
-            fDirSpec->szPath = (char*) hb_fsCurDir( hb_fsCurDrv() );
+            #if defined( HB_OS_UNIX )
+               fDirSpec->szPath = (char*) hb_fsCurDirEx( hb_fsCurDrv() );
+            #else
+               fDirSpec->szPath = (char*) hb_fsCurDir( hb_fsCurDrv() );
+            #endif
          }
 
          if( bAddDrive )

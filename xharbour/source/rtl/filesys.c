@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.105 2004/05/07 02:56:11 peterrees Exp $
+ * $Id: filesys.c,v 1.106 2004/05/09 23:40:05 druzus Exp $
  */
 
 /*
@@ -3027,6 +3027,17 @@ BOOL HB_EXPORT hb_fsEof( FHANDLE hFileHandle )
 #endif
 }
 
+BYTE HB_EXPORT * hb_fsCurDirEx( USHORT uiDrive )
+{
+   static BYTE s_byDirBuffer[ _POSIX_PATH_MAX + 1 ];
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDir(%hu)", uiDrive));
+
+   hb_fsCurDirBuffEx( uiDrive, s_byDirBuffer, _POSIX_PATH_MAX + 1 );
+
+   return ( BYTE * ) s_byDirBuffer;
+}
+
 USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
 #if defined(HB_OS_WIN_32)
@@ -3083,8 +3094,6 @@ USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulL
       if( pbyStart[ 1 ] == OS_DRIVE_DELIMITER )
          pbyStart += 2;
 #endif
-      if( strchr( OS_PATH_DELIMITER_LIST, pbyStart[ 0 ] ) )
-         pbyStart++;
 
       if( pbyBuffer != pbyStart )
          memmove( pbyBuffer, pbyStart, ulLen );
@@ -3092,8 +3101,10 @@ USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulL
       /* Strip the trailing (back)slash if there's one */
       ulPthLen = strlen( ( char * ) pbyBuffer );
       if( strchr( OS_PATH_DELIMITER_LIST, pbyBuffer[ ulPthLen - 1 ] ) )
-         pbyBuffer[ ulPthLen - 1 ] = '\0';
-
+         pbyBuffer[ ulPthLen  ] = '\0';
+      else
+         strcat( pbyBuffer,OS_PATH_DELIMITER_LIST);
+      
       return 0; // if it reaches here, it is right.
    }
 }

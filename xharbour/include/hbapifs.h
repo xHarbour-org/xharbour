@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.35 2004/04/05 02:29:30 druzus Exp $
+ * $Id: hbapifs.h,v 1.36 2004/05/04 17:03:24 jonnymind Exp $
  */
 
 /*
@@ -116,6 +116,7 @@ extern FHANDLE  HB_EXPORT hb_fsCreateEx   ( BYTE * pszFilename, USHORT uiAttr, U
 extern FHANDLE  HB_EXPORT hb_fsCreateTemp ( const BYTE * pszDir, const BYTE * pszPrefix, USHORT uiAttr, BYTE * pszName ); /* create a temporary file from components */
 extern BYTE     HB_EXPORT * hb_fsCurDir     ( USHORT uiDrive ); /* retrieve a static pointer containing current directory for specified drive */
 extern USHORT   HB_EXPORT hb_fsCurDirBuff ( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen ); /* copy current directory for given drive into a buffer */
+extern BYTE     HB_EXPORT * hb_fsCurDirEx   ( USHORT uiDrive ); /* retrieve a static pointer containing current directory for specified drive */
 extern USHORT   HB_EXPORT hb_fsCurDirBuffEx ( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen ); /* copy current directory for given drive into a buffer */
 extern BYTE     HB_EXPORT hb_fsCurDrv     ( void ); /* retrieve current drive number */
 extern BOOL     HB_EXPORT hb_fsDelete     ( BYTE * pszFileName ); /* delete a file */
