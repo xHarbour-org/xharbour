@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.20 2003/08/29 18:28:30 lculik Exp $  
+   $Id: xwt_gtk.c,v 1.21 2003/08/30 21:37:52 lculik Exp $  
 
    Global declarations, common functions
    
@@ -23,26 +23,26 @@
 /*
  Static function to change an color of an widget for buttons,checkboxes/radios and others
 */
-void widget_set_color(GtkWidget* entry,GdkColor* color,int component)
-{
-    gtk_widget_ensure_style(entry);
-    GtkStyle* newstyle;
-    {
+void widget_set_color(GtkWidget* entry,GdkColor* color,int component)
+{
+    gtk_widget_ensure_style(entry);
+    GtkStyle* newstyle;
+    {
 	int i;
-        newstyle = gtk_style_copy(gtk_widget_get_style(entry));
+        newstyle = gtk_style_copy(gtk_widget_get_style(entry));
 
-        for( i=0;i<5;++i) {
-            if (component & FGCOLOR)
-                newstyle->fg[i] = *color;
-            if (component &  BGCOLOR)
-                newstyle->bg[i] = *color;
-            if (component &  TEXTCOLOR)
-                newstyle->text[i] = *color;
-            if (component & BASECOLOR)
-                newstyle->base[i] = *color;
-        };
-    };
-    gtk_widget_set_style(entry,newstyle);
+        for( i=0;i<5;++i) {
+            if (component & FGCOLOR)
+                newstyle->fg[i] = *color;
+            if (component &  BGCOLOR)
+                newstyle->bg[i] = *color;
+            if (component &  TEXTCOLOR)
+                newstyle->text[i] = *color;
+            if (component & BASECOLOR)
+                newstyle->base[i] = *color;
+        };
+    };
+    gtk_widget_set_style(entry,newstyle);
 }
 
 BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
@@ -411,6 +411,8 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       case XWT_PROP_FILENAME:
          gtk_file_selection_set_filename(GTK_FILE_SELECTION(wMain), prop->value.text);
          return TRUE;
+//      case XWT_PROP_FONTNAME:
+      
 
       case XWT_PROP_ATTACH:
 
@@ -547,7 +549,6 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_PROP_FONT:
       {
          PangoFontDescription *font_desc =  pango_font_description_from_string(prop->value.font);
-         GtkRcStyle *style ;
 	 switch( wWidget->type )
         {
             case XWT_TYPE_BUTTON:
@@ -556,26 +557,29 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_CHECKBOX:
 	    {
 	
-	        GtkWidget *child = gtk_bin_get_child(GTK_BIN(wSelf));
+//	        GtkWidget *child = gtk_bin_get_child(GTK_BIN(wSelf));
 //                style = gtk_widget_get_modifier_style(child);
 //                style -> font_desc = font_desc;
 //	        gtk_widget_modify_style(GTK_WIDGET(child) , style);
-		gtk_widget_modify_font(GTK_WIDGET(child),font_desc);
+		gtk_widget_modify_font(GTK_WIDGET(gtk_bin_get_child (wSelf) ),font_desc);
+		pango_font_description_free (font_desc);
 	    }
 		break;
             case XWT_TYPE_LABEL:
-	        style = gtk_widget_get_modifier_style(wMain);
+	    {
+/*	        style = gtk_widget_get_modifier_style(wMain);
                 style -> font_desc = font_desc;
 
-	        gtk_widget_modify_style(GTK_WIDGET(wMain) , style);
+	        gtk_widget_modify_style(GTK_WIDGET(wMain) , style);*/
+		gtk_widget_modify_font(GTK_WIDGET(wMain),font_desc);
+		pango_font_description_free (font_desc);	
 		break;
+	}	
             case XWT_TYPE_MENUITEM:
 	    {
 	       PXWT_GTK_MENUITEM itm = (PXWT_GTK_MENUITEM) wWidget->widget_data;
-	       GtkWidget *child = itm->label;
-               style = gtk_widget_get_modifier_style(child);
-               style -> font_desc = font_desc;
-               gtk_widget_modify_style(GTK_WIDGET( child ) , style);
+		gtk_widget_modify_font(GTK_WIDGET(itm->label),font_desc);
+		pango_font_description_free (font_desc);		
 	       break;
 	    }	
         }		
@@ -600,7 +604,11 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 		widget_set_color(wMain, &color,FGCOLOR);
 		break;
 	    case XWT_TYPE_MENUITEM:
-	        gtk_widget_modify_fg (wSelf, GTK_STATE_NORMAL, &color);
+	    {
+//	        gtk_widget_modify_fg (wSelf, GTK_STATE_NORMAL, &color);
+	        PXWT_GTK_MENUITEM itm = (PXWT_GTK_MENUITEM) wWidget->widget_data;
+		widget_set_color(itm->label, &color,FGCOLOR);
+	    }
     	        break;
 
          }
@@ -624,8 +632,11 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 		widget_set_color(wMain, &color,BGCOLOR);
     		break;
 	    case XWT_TYPE_MENUITEM:
-	        gtk_widget_modify_bg (wSelf, GTK_STATE_NORMAL, &color);
-	    	    
+	    {
+	        PXWT_GTK_MENUITEM itm = (PXWT_GTK_MENUITEM) wWidget->widget_data;
+		widget_set_color(itm->label, &color,BGCOLOR);
+/*	        gtk_widget_modify_bg (wSelf, GTK_STATE_NORMAL, &color);*/
+	    }	    
             break;
 
          }
@@ -652,7 +663,11 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
 	    break;	    
 	    case XWT_TYPE_MENUITEM:
-	        gtk_widget_modify_base (wSelf, GTK_STATE_NORMAL, &color);
+	    {
+//	        gtk_widget_modify_base (wSelf, GTK_STATE_NORMAL, &color);
+	        PXWT_GTK_MENUITEM itm = (PXWT_GTK_MENUITEM) wWidget->widget_data;
+		widget_set_color(itm->label, &color,BASECOLOR);
+}
 	    	    
             break;
 
@@ -679,9 +694,12 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_LABEL:
 	    widget_set_color(wMain, &color,TEXTCOLOR);
 
-break;	    
+	    break;	    
 	    case XWT_TYPE_MENUITEM:
-	        gtk_widget_modify_text (wSelf, GTK_STATE_NORMAL, &color);
+	    {
+	        PXWT_GTK_MENUITEM itm = (PXWT_GTK_MENUITEM) wWidget->widget_data;
+		widget_set_color(itm->label, &color,TEXTCOLOR);
+	    }
 	    	    
             break;
 
@@ -960,6 +978,18 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
          return TRUE;
 
+      case XWT_PROP_FONTNAME:
+         if ( ! (( PXWT_GTK_MODAL ) wWidget->widget_data)->canceled )
+         {
+            prop->value.text =  gtk_font_selection_dialog_get_font_name( GTK_FONT_SELECTION_DIALOG( wSelf ) );
+         }
+         else
+         {
+            prop->value.text = "";
+         }
+         return TRUE;
+
+
       case XWT_PROP_STATUS:
          if ( wWidget->type == XWT_TYPE_CHECKBOX || wWidget->type == XWT_TYPE_RADIOBUTTON || wWidget->type == XWT_TYPE_TOGGLEBUTTON)
          {
@@ -1011,6 +1041,8 @@ BOOL xwt_drv_create( PXWT_WIDGET xwtData )
       case XWT_TYPE_SPLITTER:  return xwt_gtk_createSplitter( xwtData );
       case XWT_TYPE_TOGGLEBUTTON:  return xwt_gtk_createToggleButton( xwtData );
       case XWT_TYPE_TREELIST: return xwt_gtk_createTreelist( xwtData );
+      case XWT_TYPE_FONTSEL: return xwt_gtk_createFontSelection( xwtData ) ;
+  
    }
    return FALSE;
    

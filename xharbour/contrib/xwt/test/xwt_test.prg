@@ -40,7 +40,7 @@ PROCEDURE MAIN()
    oHLay:SetFill( .T. )
    oHLay:SetExpand( .T. )
 
-   DEFINE BUTTON oButton TEXT "Hello" OF oHLay FONT "Courier" COLOR "#90CF02"  BGCOLOR "#A38103"  TEXTCOLOR "#DD0000"
+   DEFINE BUTTON oButton TEXT "Hello" OF oHLay FONT "Courier"  size 32 COLOR "#90CF02"  BGCOLOR "#A38103"  TEXTCOLOR "#DD0000"
    oButton:AddListener( @DumpEvent() )
 
    oHLay:SetBox( .T.,"Horiz Box" )
@@ -177,6 +177,17 @@ FUNCTION FileEvent( oEvent )
       ELSE
 ?  "FILENAME: ", cFileName
       ENDIF
+   elseIF oEvent:oSender:nId == 2
+      oFileSel := XWTFontSel():New( "Open file" )
+      oFileSel:SetFile( "Select an Font" )
+
+      // Notice: after a "do_modal", the object will not exist anymore
+      cFileName := oFileSel:DoModal()
+      IF cFileName == ""
+?  "Canceled!"
+      ELSE
+?  "Font NAME: ", cFileName
+      ENDIF      
    ELSEIF oEvent:oSender:nId == 99
       Quit
    ENDIF
@@ -224,7 +235,8 @@ FUNCTION BuildMenu()
 
    MENU oMenu PROMPT "File"
         MENUITEM oMenuItem PROMPT "Op_en" ICON "valley.png" ACTION @FileEvent() OF oMenu FONT "Clean" Size 20 Color "#44DE5F"
-        MENUITEM PROMPT "Close" ACTION @FileEvent() OF oMenu SIZE 5
+        MENUITEM oMenuItem PROMPT "Font s_el"  ACTION @FileEvent() OF oMenu FONT "Dingbats" Size 30 Color "#A300FF"	
+        MENUITEM PROMPT "Close" ACTION @FileEvent() OF oMenu SIZE 5 COLOR "#A38103"
 
         MENU oMenuSec PROMPT "SubMenu" OF oMenu
              MENUITEM PROMPT "Opt1" ID 10 ACTION @FileEvent() OF oMenuSec FONT "Sans" SIZE 60
@@ -249,3 +261,4 @@ FUNCTION About(  )
 	       "Help desenvoluped by Luiz Culik and Rafa Carmona" ,  XWT_MSGBOX_OK , XWT_MSGBOX_INFO)
 
 RETURN .T.
+
