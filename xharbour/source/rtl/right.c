@@ -1,5 +1,5 @@
 /*
- * $Id: right.c,v 1.3 2003/02/20 01:49:04 ronpinkas Exp $
+ * $Id: right.c,v 1.4 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ HB_FUNC( RIGHT )
    if( pText && ISNUM( 2 ) )
    {
       LONG lLen = hb_parnl( 2 );
-      LONG lTextLen = ( LONG ) hb_itemGetCLen( pText );
+      LONG lTextLen = pText->item.asString.length;
 
       if( lLen > lTextLen )
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.12 2003/12/18 21:12:43 ronpinkas Exp $
+ * $Id: chrasc.c,v 1.13 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -85,14 +85,7 @@ HB_FUNC( ASC )
 
    if( pText )
    {
-      if( hb_itemGetCLen( pText ) > 0 )
-      {
-         hb_retni( ( BYTE ) * ( hb_itemGetCPtr( pText ) ) );
-      }
-      else
-      {
-         hb_retni( 0 );
-      }
+      hb_retni( ( pText->item.asString.length > 0 ) ? ( BYTE ) * pText->item.asString.value : 0 );
    }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1107, NULL, "ASC", 1, hb_paramError( 1 ) );

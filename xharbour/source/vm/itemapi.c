@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.79 2004/02/20 12:52:52 druzus Exp $
+ * $Id: itemapi.c,v 1.80 2004/02/22 12:15:57 andijahja Exp $
  */
 
 /*
@@ -1757,8 +1757,14 @@ char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, char * buffer, ULONG * pulSize 
    {
       if( HB_IS_STRING( pItem ) )
       {
-         szText = hb_itemGetCPtr( pItem );
-         *pulSize = hb_itemGetCLen( pItem );
+         // This call redundantly check for ( pItem != NULL )
+         // and HB_IS_STRING( pItem )
+         // szText = hb_itemGetCPtr( pItem );
+         // *pulSize = hb_itemGetCLen( pItem );
+         // Changed to use members directly.
+
+         szText = pItem->item.asString.value ;
+         *pulSize = pItem->item.asString.length ;
       }
       else if( HB_IS_DATE( pItem ) )
       {
@@ -1769,29 +1775,41 @@ char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, char * buffer, ULONG * pulSize 
       }
       else if( HB_IS_INTEGER( pItem ) )
       {
-         sprintf( buffer, "%d", hb_itemGetNI( pItem ) );
+         // Redundant check, see note above.
+         // sprintf( buffer, "%d", hb_itemGetNI( pItem ) );
+
+         sprintf( buffer, "%d", pItem->item.asInteger.value );
          szText = buffer;
          *pulSize = strlen( szText );
       }
       else if( HB_IS_LONG( pItem ) )
       {
-         sprintf( buffer, "%ld", hb_itemGetNL( pItem ) );
+         // Redundant check, see note above.
+         // sprintf( buffer, "%ld", hb_itemGetNL( pItem ) );
+
+         sprintf( buffer, "%ld", pItem->item.asLong.value );
          szText = buffer;
          *pulSize = strlen( szText );
       }
       else if( HB_IS_DOUBLE( pItem ) )
       {
-         int iDecimal;
+         // int iDecimal;
+         // Redundant check, see note above.
+         // hb_itemGetNLen( pItem, NULL, &iDecimal );
+         // sprintf( buffer, "%.*f", iDecimal, hb_itemGetND( pItem ) );
 
-         hb_itemGetNLen( pItem, NULL, &iDecimal );
-         sprintf( buffer, "%.*f", iDecimal, hb_itemGetND( pItem ) );
+         sprintf( buffer, "%.*f", pItem->item.asDouble.decimal, pItem->item.asDouble.value );
+
          szText = buffer;
          *pulSize = strlen( szText );
       }
 #ifndef HB_LONG_LONG_OFF
       else if( HB_IS_LONGLONG( pItem ) )
       {
-         sprintf( buffer, "%Ld", hb_itemGetNLL( pItem ) );
+         // Redundant check, see note above.
+         // sprintf( buffer, "%Ld", hb_itemGetNLL( pItem ) );
+
+         sprintf( buffer, "%Ld", pItem->item.asLongLong.value );
          szText = buffer;
          *pulSize = strlen( szText );
       }
@@ -1818,8 +1836,6 @@ PHB_ITEM HB_EXPORT hb_itemValToStr( PHB_ITEM pItem )
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemValToStr(%p)", pItem));
 
-
-
    buffer = hb_itemString( pItem, &ulLen, &bFreeReq );
    pResult = hb_itemPutCL( NULL, buffer, ulLen );
 
@@ -1828,9 +1844,9 @@ PHB_ITEM HB_EXPORT hb_itemValToStr( PHB_ITEM pItem )
       hb_xfree( buffer );
    }
 
-
    return pResult;
 }
+
 #ifndef HB_LONG_LONG_OFF
 LONGLONG HB_EXPORT hb_itemGetNLL( PHB_ITEM pItem )
 {
