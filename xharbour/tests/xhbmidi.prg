@@ -1,6 +1,6 @@
 **************************************************
 * xhbmidi.prg
-* $Id$
+* $Id: xhbmidi.prg,v 1.1 2004/01/31 00:45:50 andijahja Exp $
 * Test for midi player with gtalleg
 *
 * Andi Jahja
@@ -43,27 +43,38 @@ return
 #PRAGMA BEGINDUMP
 #include "hbapi.h"
 #include "allegro.h"
+
+#ifndef AL_MIDI_AUTODETECT
+#define AL_MIDI_AUTODETECT MIDI_AUTODETECT
+#define AL_MIDI MIDI
+#define al_install_sound install_sound
+#define al_load_midi load_midi
+#define al_play_midi play_midi
+#define al_read_key readkey
+#define al_destroy_midi destroy_midi
+#endif
+
 HB_FUNC( PLAYMIDI )
 {
-   MIDI *the_music;
+   AL_MIDI *the_music;
 
    /* install a MIDI sound driver */
-   if ( install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL) != 0)
+   if ( al_install_sound(DIGI_AUTODETECT, AL_MIDI_AUTODETECT, NULL) != 0)
       hb_retni(1);
 
    /* read in the MIDI file */
-   the_music = load_midi(hb_parc(1));
+   the_music = al_load_midi(hb_parc(1));
    if (!the_music) {
       hb_retni(2);
    }
 
-   play_midi(the_music, hb_parl(2));
+   al_play_midi(the_music, hb_parl(2));
 
    /* wait for a keypress */
-   readkey();
+   al_read_key();
 
    /* destroy the MIDI file */
-   destroy_midi(the_music);
+   al_destroy_midi(the_music);
 
    hb_retni(0);
 }

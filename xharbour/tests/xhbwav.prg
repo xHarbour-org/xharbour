@@ -1,6 +1,6 @@
 **************************************************
 * xhbwav.prg
-* $Id$
+* $Id: xhbwav.prg,v 1.1 2004/01/31 01:38:04 andijahja Exp $
 * Test for wav player with gtalleg
 *
 * Andi Jahja
@@ -43,29 +43,40 @@ return
 #PRAGMA BEGINDUMP
 #include "hbapi.h"
 #include "allegro.h"
+
+#ifndef AL_MIDI_AUTODETECT
+#define AL_MIDI_AUTODETECT MIDI_AUTODETECT
+#define AL_SAMPLE SAMPLE
+#define al_install_sound install_sound
+#define al_load_sample load_sample
+#define al_play_sample play_sample
+#define al_read_key readkey
+#define al_destroy_sample destroy_sample
+#endif
+
 HB_FUNC( HB_PLAYWAV )
 {
-   SAMPLE *the_wav;
+   AL_SAMPLE *the_wav;
    int pan = 128;
    int pitch = 1000;
 
    /* install a WAV sound driver */
-   if ( install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL) != 0)
+   if ( al_install_sound(DIGI_AUTODETECT, AL_MIDI_AUTODETECT, NULL) != 0)
       hb_retni(1);
 
    /* read in the WAV file */
-   the_wav = load_sample(hb_parc(1));
+   the_wav = al_load_sample(hb_parc(1));
    if (!the_wav) {
       hb_retni(2);
    }
 
-   play_sample(the_wav, 255, pan, pitch, TRUE);
+   al_play_sample(the_wav, 255, pan, pitch, TRUE);
 
    /* wait for a keypress */
-   readkey();
+   al_read_key();
 
    /* destroy the WAV file */
-   destroy_sample(the_wav);
+   al_destroy_sample(the_wav);
 
    hb_retni(0);
 }
