@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.24 2005/03/06 00:53:04 andijahja Exp $
+ * $Id: hbver.c,v 1.25 2005/03/06 03:49:30 andijahja Exp $
  */
 
 /*
@@ -824,10 +824,12 @@ void hb_verBuildInfo( void )
 #else
    hb_conOutErr( "Off", 0 );
 #endif
+#if 0
    hb_conOutErr( hb_conNewLine(), 0 );
 
    hb_conOutErr( "Memory tracing and statistics: ", 0 );
    hb_conOutErr( hb_xquery( HB_MEM_USEDMAX ) != 0 ? "On" : "Off", 0 );
+#endif
 /*
 #if defined( HB_FM_STATISTICS )
    hb_conOutErr( "On", 0 );

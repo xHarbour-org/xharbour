@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3914 2005/03/06 19:21:29 paultucker Exp $
+ * $Id: ChangeLog,v 1.3915 2005/03/06 19:30:32 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-03-07 04:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/common/hbver.c
+    - comment misleading info on memory tracing and statistics on
+      /BUILD info because it can only be detected on runtime.
+      ( hb_xquery in harbour.c always return 0 )
 
 2005-03-06 14:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.vc
