@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.5 2003/06/03 04:08:49 druzus Exp $
+# $Id: make_rpm.sh,v 1.6 2003/06/15 13:11:56 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -42,7 +42,11 @@ then
 		     ${RPMDIR}/BUILD ${RPMDIR}/SPECS
 	    echo "%_topdir ${RPMDIR}" > ${HOME}/.rpmmacros
 	fi
-	if which rpmbuild &>/dev/null
+	if [ -f /etc/conectiva-release ]; then
+	   cp ${hb_filename}  /usr/src/rpm/SOURCES
+	   rpm -ba xharbour.spec
+	
+	elif which rpmbuild &>/dev/null
 	then
 	    rpmbuild -ta ${hb_filename} --rmsource
 	else

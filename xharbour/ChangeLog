@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1447 2003/09/11 13:12:03 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1448 2003/09/11 13:23:28 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-11-09 12:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  *  xharbour.spec
+    * Added Conectiva to platform detection
+  * make_rpm.sh
+    * Fixed when conectiva is used    
 
 2003-11-03 10:15 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/vm/hbi18n.c

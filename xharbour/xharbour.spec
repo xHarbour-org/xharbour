@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.29 2003/09/10 21:35:45 druzus Exp $
+# $Id: xharbour.spec,v 1.30 2003/09/11 09:34:26 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -20,6 +20,9 @@
 %define platform %(release=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$release"|tr -d ".")
 %if "%{platform}" == ""
   %define platform %(release=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$release"|tr -d ".")
+  %if "%{platform}" == ""  
+  %define platform %(release=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$release"|tr -d ".")
+  %endif
 %endif
 
 %define name     xharbour
