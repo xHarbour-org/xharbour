@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.9 2003/04/21 06:56:33 jonnymind Exp $
+   $Id: xwt.ch,v 1.10 2003/04/22 19:03:33 jonnymind Exp $
 
    Definitions
 */
@@ -79,6 +79,7 @@
 
 #define XWT_PROP_FILEMASK  80
 #define XWT_PROP_FILENAME  81
+
 
 #define XWT_PROP_FIRSTWID  90 // Widget (data)
 #define XWT_PROP_SECWID    91 // Widget (data)
