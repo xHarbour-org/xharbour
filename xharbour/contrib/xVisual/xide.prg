@@ -32,13 +32,11 @@ FUNCTION Main
 
                :AddItem( 'Button'     , 102, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'Edit'       , 103, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-               :AddItem( 'CombBox'    , 104, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
+               :AddItem( 'ComboBox'   , 104, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'Label'      , 105, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'RadioButton', 106, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'CheckBox'   , 107, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'ListBox'    , 108, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
-
-
 
             END
          END

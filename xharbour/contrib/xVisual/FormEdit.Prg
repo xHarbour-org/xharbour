@@ -19,6 +19,10 @@ GLOBAL EXTERNAL hThisInstance
    DATA Editing
    DATA aCtrl
    DATA nCurrent
+   DATA GridColor
+   DATA xGrid
+   DATA yGrid
+
 
    METHOD New( oParent )     INLINE ::Caption := 'SubForm1 from TForm', ;
                                     ::Editing:=.F.       ,;
@@ -27,16 +31,18 @@ GLOBAL EXTERNAL hThisInstance
                                     ::top:=100           ,;
                                     ::width:=400         ,;
                                     ::height:=300        ,;
-                                     super:New( oParent )
+                                    ::xGrid:=8           ,;
+                                    ::yGrid:=8           ,;
+                                    ::GridColor:=RGB(0,0,0),;
+                                    super:New( oParent )
 
    METHOD Add()
-   METHOD OnPaint( hDC )     INLINE ::DrawGrid( hDC, 3 ),0
+   METHOD OnPaint( hDC )     INLINE DrawGrid(hDC, ::width, ::height, ::GridColor, ::xGrid, ::yGrid ), 0
    METHOD OnCreate()         INLINE ::CreateSub()
    METHOD OnSize()
 
    METHOD OnMenuCommand(oItem)
    METHOD CreateSub()
-   METHOD DrawGrid()
    METHOD GetUniquePropName()
 
  END CLASS
@@ -72,27 +78,26 @@ METHOD OnSize(nFlag,Width,Height)
 
 METHOD OnMenuCommand(oItem)
 
-  LOCAL a:=__objGetValueList( self )
-  LOCAL nInd:=0
-  LOCAL cName:=::GetUniquePropName(oItem:Text)
+   LOCAL a:=__objGetValueList( self )
+   LOCAL nInd:=0
+   LOCAL cName:=::GetUniquePropName(oItem:Text)
 
-  DO CASE
-  CASE oItem:Text=="Button"
-     ::Add(cName, TButton():New(   self, cName, 500,  10, 10, 100,  24 ) )
-  CASE oItem:Text=="Edit"
-     ::Add(cName, TEdit():New(     self, cName, 501, 210,  0, 200,  20 ) )
-  CASE oItem:Text=="ComboBox"
-     ::Add(cName, TComboBox():New( self, cName, 502, 210, 30, 200, 100 ) )
-  CASE oItem:Text=="CheckBox"
-     ::Add(cName, TCheck():New(    self, cName, 505, 210,105, 200,  20 ) )
-  CASE oItem:Text=="RadioButton"
-     ::Add(cName, TRadio():New(    self, cName, 504, 210, 80, 200,  20 ) )
-  CASE oItem:Text=="ListBox"
-     ::Add(cName, TListBox():New(  self, cName, 506, 210, 20, 200, 200 ) )
-  CASE oItem:Text=="Label"
-     ::Add(cName, TStatic():New(   self, cName, 503, 210, 55, 200,  20 ) )
-
-  ENDCASE
+   DO CASE
+   CASE oItem:Text=="Button"
+      ::Add(cName, TButton():New(   self, cName, 500,  50, 10 ) )
+   CASE oItem:Text=="Edit"
+      ::Add(cName, TEdit():New(     self, cName, 501,  50, 40 ) )
+   CASE oItem:Text=="Label"
+      ::Add(cName, TStatic():New(   self, cName, 502,  50, 80 ) )
+   CASE oItem:Text=="CheckBox"
+      ::Add(cName, TCheck():New(    self, cName, 503,  50,120 ) )
+   CASE oItem:Text=="RadioButton"
+      ::Add(cName, TRadio():New(    self, cName, 504,  50,160 ) )
+   CASE oItem:Text=="ComboBox"
+      ::Add(cName, TComboBox():New( self,        505, 200, 10 ) )
+   CASE oItem:Text=="ListBox"
+      ::Add(cName, TListBox():New(  self,        506, 200, 40 ) )
+   ENDCASE
 
   RETURN(NIL)
 
@@ -100,16 +105,14 @@ METHOD OnMenuCommand(oItem)
 
 METHOD GetUniquePropName(cName)
 
-  LOCAL aProp:=__objGetValueList( self )
-  LOCAL nInd:=1
+   LOCAL aProp:=__objGetValueList( self )
+   LOCAL nInd:=1
 
- // view aProp
+   DO WHILE aScan(aProp, {|a| a[1]==UPPER(cName)+alltrim(str(nInd))}) > 0
+      nInd++
+   ENDDO
 
-  DO WHILE aScan(aProp, {|a| a[1]==UPPER(cName)+alltrim(str(nInd))}) > 0
-     nInd++
-  ENDDO
-
-  RETURN(cName+alltrim(str(nInd)))
+   RETURN(cName+alltrim(str(nInd)))
 
 
 //----------------------------------------------------------------------------//
@@ -140,11 +143,56 @@ METHOD CreateSub()
 
    RETURN( xRet )
 
+
+
+*------------------------------------------------------------------------------
+* Low Level C Routines
+*------------------------------------------------------------------------------
+#pragma BEGINDUMP
+
+
+#define _WIN32_WINNT   0x0400
+
+#include <shlobj.h>
+#include <windows.h>
+#include <commctrl.h>
+#include "hbapi.h"
+#include "hbvm.h"
+#include "hbstack.h"
+#include "hbapiitm.h"
+
+
+// DrawGrid(hDC,nWidth,yWidth,nColor, xGran,yGran)
+
+HB_FUNC( DRAWGRID )
+{
+
+   HDC hDC            = (HDC) hb_parnl( 1 );
+   int width          = hb_parni( 2 );
+   int height         = hb_parni( 3 );
+   COLORREF nRGBColor = hb_parnl( 4 );
+   int xGran          = hb_parni( 5 );
+   int yGran          = hb_parni( 6 );
+   int x, y ;
+
+   for( y = 0 ; y < height ; y += yGran )
+        for( x = 0 ; x < width ; x += xGran )
+           SetPixel( hDC, x, y, nRGBColor ) ;
+
+}
+
+
+#pragma ENDDUMP
+
+
+
+
+
 //----------------------------------------------------------------------------//
 
-METHOD DrawGrid(hDC,nGran)
-
 /*
+
+METHOD DrawGrid(hDC,nGran)
 
    LOCAL i,j
    LOCAL nColor:=rgb(0,0,0)
@@ -159,6 +207,8 @@ METHOD DrawGrid(hDC,nGran)
 
 */
 
+/*
+METHOD DrawGrid(hDC,nGran)
 
    LOCAL aRect,hBrush,hOldPen,hOldBrush,hPen,hBmp
 
@@ -213,6 +263,8 @@ METHOD DrawGrid(hDC,nGran)
    DeleteObject( hPen )
 
 RETURN(0)
+
+*/
 
 //----------------------------------------------------------------------------//
 
