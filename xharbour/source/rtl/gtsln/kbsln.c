@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.11 2003/10/22 01:04:21 lculik Exp $
+ * $Id: kbsln.c,v 1.12 2004/03/21 15:55:06 druzus Exp $
  */
 
 /*
@@ -120,6 +120,13 @@ unsigned char s_convKDeadKeys[ 257 ];  /* it should be allocated by hb_xalloc() 
 
 /* contains an integer value of a DeadKey or -1 */
 int hb_DeadKey = -1;
+
+/* escape key delay */
+#ifdef HB_SLANG_ONE_ESC
+    int s_gtSLN_escDelay = 250;
+#else
+    int s_gtSLN_escDelay = 0;
+#endif
 
 static int HB_GT_FUNC(gt_try_get_Kbd_State());
 
@@ -323,17 +330,22 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
     /* NOTE: This will probably not work on slow terminals
        or on very busy lines (i.e. modem lines ) */
     ch = SLang_getkey();
-#ifdef HB_SLANG_ONE_ESC
-    if( ch == 033 )   /* escape pressed - wait 0.6 sec for another key */
-        if( 0 == SLang_input_pending( 0.3))
-            return( 033 );
+    if( ch == 033 )   /* escape char received, check for any pending chars */
+    {
+        if( s_gtSLN_escDelay == 0 )
+        {
+            /* standard acction, wait a 1 second for next char and if not then exit */
+            if( 0 == SLang_input_pending( 10 ) )
+                return( 0 );
+        }
+        else
+        {
+            /* wait s_gtSLN_escDelay milisec for next char and in not return ESC keycode */
+            if( 0 == SLang_input_pending( - HB_MAX( s_gtSLN_escDelay, 0 ) ) )
+                return( 033 );
+        }
+    }
 
-#else
-
-    if( ch == 033 )   /* escape pressed - wait 0.6 sec for another key */
-        if( 0 == SLang_input_pending( 6 ) )
-            return( 0 );
-#endif
     /* user AbortKey break */
     if( (int) ch == s_hb_gt_Abort_key )
         return( HB_BREAK_FLAG );

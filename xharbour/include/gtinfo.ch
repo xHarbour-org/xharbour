@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.2 2004/02/09 18:00:35 druzus Exp $
+ * $Id: gtinfo.ch,v 1.3 2004/02/16 16:11:19 jonnymind Exp $
  */
 
 /*
@@ -77,6 +77,8 @@
 #define GTI_INPUTFD       30  /* Get Standard input steream of application/GT */
 #define GTI_OUTPUTFD      31  /* Get Standard output steream of application/GT */
 #define GTI_ERRORFD       32  /* Get Standard error steream of application/GT */
+
+#define GTI_ESCDELAY      33  /* Get/Set escape key delay */
 
 /* Font weights */
 #define GTI_FONTW_THIN     1

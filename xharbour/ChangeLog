@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2988 2004/05/25 13:35:42 srobert Exp $
+ * $Id: ChangeLog,v 1.2989 2004/05/25 18:56:12 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-25 22:25 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rtl/gtsln/mousesln.c
+    * clean warnings when compiled without GPM
+
+  * xharbour/include/gtinfo.ch
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtsln/kbsln.c
+    + new GTI_ESCDELAY param - I need this for beta1 build to create
+      one binary for GTSLN. Now HB_SLANG_ONE_ESC only sets the default
+      ESC behaviour which could be controled by programmer using
+      GTInfo( GTI_ESCDELAY [, <nNewVal> ] ) -> <nOldVal>
+      where <nNewVal> is timeout in milliseconds, 0 means the
+      default behaviour of GTSLN compiled without HB_SLANG_ONE_ESC,
+      negative value means no delay (it will not work corectly on serial
+      lines)
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+    + GTI_ESCDELAY added
+
+  * xharbour/source/rtl/gtnul/gtext.c
+    * added error message when first param is not character to
+      HB_SETDISPCP, HB_SETTERMCP, HB_SETKEYCP
+
+  * xharbour/source/rtl/gx.c
+    * formatting
 
 2004-05-25 13:53 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/achoice.prg
@@ -21,13 +47,13 @@
   * source/rtl/tbrowse.prg
      ! Initialization in ::ForceStable counts lines going bottom.
 
-2004-03-24 22:16 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+2004-05-24 22:16 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
     ! real fix for the problem of path checking in hb_cdxFindBag()
       It was my fault - I had to have realy bad day that I hadn't
       noticed missed '!'
 
-2004-03-24 15:35 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+2004-05-24 15:35 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
     ! workaroud for path comparision on Windows in hb_cdxFindBag()
       It disables path checking (as it was before) so it's not
@@ -177,7 +203,7 @@
   * source/rtl/errorsys.prg
     * Use plain Alert() if MaxCol() is 0 - so that error is always reported.
 
-2004-03-20 23:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+2004-05-20 23:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbf1.c
     + added DBI_ISFLOCK to DBINFO()
     * casting

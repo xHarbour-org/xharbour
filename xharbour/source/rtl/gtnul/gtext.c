@@ -1,5 +1,5 @@
 /*
- * $Id: gtext.c,v 1.3 2003/07/23 12:35:57 druzus Exp $
+ * $Id: gtext.c,v 1.4 2004/03/18 03:59:13 ronpinkas Exp $
  */
 
 /*
@@ -57,16 +57,20 @@
 
 
 #include "hbapigt.h"
+#include "hbapierr.h"
 
 HB_FUNC( HB_SETDISPCP )
 {
    if ( ISCHAR(1) )
    {
       if ( hb_pcount() == 2 && ISLOG(2) )
-         hb_gt_SetDispCP( hb_parcx( 1 ), NULL, hb_parl( 2 ) );
+         hb_gt_SetDispCP( hb_parc( 1 ), NULL, hb_parl( 2 ) );
       else
-         hb_gt_SetDispCP( hb_parcx( 1 ), hb_parcx( 2 ), hb_parl( 3 ) );
+         hb_gt_SetDispCP( hb_parc( 1 ), hb_parc( 2 ), hb_parl( 3 ) );
    }
+   else
+      hb_errRT_BASE_SubstR( EG_ARG, 1089, NULL, "HB_SETDISPCP", 1, hb_paramError( 1 ) );
+
    hb_ret();  /* return NIL */
 }
 
@@ -74,8 +78,11 @@ HB_FUNC( HB_SETKEYCP )
 {
    if ( ISCHAR(1) )
    {
-      hb_gt_SetKeyCP( hb_parcx( 1 ), hb_parcx( 2 ) );
+      hb_gt_SetKeyCP( hb_parc( 1 ), hb_parc( 2 ) );
    }
+   else
+      hb_errRT_BASE_SubstR( EG_ARG, 1089, NULL, "HB_SETKEYCP", 1, hb_paramError( 1 ) );
+
    hb_ret();  /* return NIL */
 }
 
@@ -85,14 +92,17 @@ HB_FUNC( HB_SETTERMCP )
    {
       if ( hb_pcount() == 2 && ISLOG(2) )
       {
-         hb_gt_SetDispCP( hb_parcx( 1 ), NULL, hb_parl( 2 ) );
-         hb_gt_SetKeyCP( hb_parcx( 1 ), NULL );
+         hb_gt_SetDispCP( hb_parc( 1 ), NULL, hb_parl( 2 ) );
+         hb_gt_SetKeyCP( hb_parc( 1 ), NULL );
       }
       else
       {
-         hb_gt_SetDispCP( hb_parcx( 1 ), hb_parcx( 2 ), hb_parl( 3 ) );
-         hb_gt_SetKeyCP( hb_parcx( 1 ), hb_parcx( 2 ) );
+         hb_gt_SetDispCP( hb_parc( 1 ), hb_parc( 2 ), hb_parl( 3 ) );
+         hb_gt_SetKeyCP( hb_parc( 1 ), hb_parc( 2 ) );
       }
    }
+   else
+      hb_errRT_BASE_SubstR( EG_ARG, 1089, NULL, "HB_SETTERMCP", 1, hb_paramError( 1 ) );
+
    hb_ret();  /* return NIL */
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.36 2004/05/07 15:33:31 lf_sfnet Exp $
+ * $Id: gtcrs.c,v 1.37 2004/05/24 13:45:57 druzus Exp $
  */
 
 /*
@@ -3293,22 +3293,33 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
 {
-   HB_SYMBOL_UNUSED( bUpdate );
-   HB_SYMBOL_UNUSED( iParam );
+   int iRet = -1;
+
    HB_SYMBOL_UNUSED( vpParam );
 
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-         return (int) FALSE;
+         iRet = (int) FALSE;
+         break;
       case GTI_INPUTFD:
-         return s_ioBase->base_infd;
+         iRet = s_ioBase->base_infd;
+         break;
       case GTI_OUTPUTFD:
-         return s_ioBase->base_outfd;
+         iRet = s_ioBase->base_outfd;
+         break;
+      case GTI_ERRORFD:
+         iRet = s_ioBase->stderrfd;
+         break;
+      case GTI_ESCDELAY:
+         iRet = s_ioBase->esc_delay;
+         if ( bUpdate )
+            s_ioBase->esc_delay = iParam;
+         break;
    }
-   // DEFAULT: there's something wrong if we are here.
-   return -1;
+   return iRet;
 }
+
 /* *********************************************************************** */
 
 #ifdef HB_MULTI_GT

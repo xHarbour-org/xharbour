@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.10 2004/02/09 16:46:57 jonnymind Exp $
+ * $Id: gx.c,v 1.11 2004/02/23 10:01:42 andijahja Exp $
  */
 
 /*
@@ -86,7 +86,6 @@ HB_FUNC( SETMODE )
    hb_retl( hb_gtSetMode( ISNUM( 1 ) ? hb_parni( 1 ) : ( hb_gtMaxRow() + 1 ),
                           ISNUM( 2 ) ? hb_parni( 2 ) : ( hb_gtMaxCol() + 1 ) ) == 0 );
 }
-
 
 HB_FUNC( SETGTCLOSEHANDLER )
 {
@@ -251,7 +250,3 @@ HB_FUNC( GTINFO )
    }
 
 }
-
-
-
-

@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.20 2004/02/18 21:35:56 druzus Exp $
+ * $Id: gtsln.c,v 1.21 2004/03/21 15:55:05 druzus Exp $
  */
 
 /*
@@ -98,6 +98,7 @@ int SLsmg_get_color();
 
 /* to convert DeadKey+letter to national character */
 extern unsigned char s_convKDeadKeys[];
+extern int s_gtSLN_escDelay;
 extern int HB_GT_FUNC(gt_Init_Terminal( int phase ));
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
@@ -1390,21 +1391,30 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
 {
-   HB_SYMBOL_UNUSED( bUpdate );
-   HB_SYMBOL_UNUSED( iParam );
+   int iRet = -1;
    HB_SYMBOL_UNUSED( vpParam );
 
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-         return (int) FALSE;
+         iRet = (int) FALSE;
+         break;
       case GTI_INPUTFD:
-         return SLang_TT_Read_FD;
+         iRet = SLang_TT_Read_FD;
+         break;
       case GTI_OUTPUTFD:
-         return SLang_TT_Write_FD;
+         iRet = SLang_TT_Write_FD;
+         break;
+      case GTI_ERRORFD:
+         iRet = s_iStdErr;
+         break;
+      case GTI_ESCDELAY:
+         iRet = s_gtSLN_escDelay;
+         if ( bUpdate )
+            s_gtSLN_escDelay = iParam;
+         break;
    }
-   // DEFAULT: there's something wrong if we are here.
-   return -1;
+   return iRet;
 }
 
 #ifdef HB_MULTI_GT

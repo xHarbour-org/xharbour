@@ -1,5 +1,5 @@
 /*
- * $Id: mousesln.c,v 1.5 2003/01/31 19:24:50 map Exp $
+ * $Id: mousesln.c,v 1.6 2003/05/16 19:52:11 druzus Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
     #include <gpm.h>
     Gpm_Connect Conn;
 #endif
-    
+
 #define GET_TIME(tv)    (gettimeofday(&tv, (struct timezone *)NULL))
 #define DIF_TIME(t1,t2) ((t2->tv_sec -t1->tv_sec) *1000+ \
           (t2->tv_usec-t1->tv_usec)/1000)
@@ -132,8 +132,6 @@ static BOOL GetGpmEvent( Gpm_Event *Evt )
 
 int HB_GT_FUNC(mouse_Inkey( HB_inkey_enum EventMask ))
 {
-    struct timeval  CurrTime;
-    struct timezone TimeZone;
     /* Force first click as single */
     static struct timeval tv1 = { 0, 0 }  ;
     static struct timeval tv2;
@@ -223,8 +221,7 @@ int HB_GT_FUNC(mouse_Inkey( HB_inkey_enum EventMask ))
             s_LastMouseEvent.Row = Evt.y;
 
             /* get the time of a mouse event */
-            gettimeofday( &CurrTime, &TimeZone );
-            s_LastMouseEvent.Time = CurrTime;
+            GET_TIME( s_LastMouseEvent.Time );
 
             if( ( Evt.type & GPM_MOVE ) && ( EventMask & INKEY_MOVE ) )
                 return( K_MOUSEMOVE );
