@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1104 2003/06/06 17:47:20 mbirdyg Exp $
+ * $Id: ChangeLog,v 1.1105 2003/06/07 06:04:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-07 14:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/harbinit.prg
+    - Reverted the addition of EXTERN for standard RTL Functions.
+
+  * source/vm/initsymb.c
+    * Reenabled by removing the #if 0
 
 2003-06-06 23:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c

@@ -1,5 +1,5 @@
 /*
- * $Id: initsymb.c,v 1.3 2003/01/05 06:50:36 ronpinkas Exp $
+ * $Id: initsymb.c,v 1.4 2003/04/07 06:08:45 ronpinkas Exp $
  */
 
 /*
@@ -49,8 +49,6 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
-#if 0 // Why should we force inclusion of the RTL Symbols???
 
 #include "hbapi.h"
 #include "hbvm.h"
@@ -196,5 +194,3 @@ void hb_vmSymbolInit_RT( void )
 
    hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __FILE__, (int) HB_PCODE_VER );
 }
-
-#endif
