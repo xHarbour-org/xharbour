@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-mkslib.sh,v 1.6 2004/11/01 21:36:45 druzus Exp $
+# $Id: hb-mkslib.sh,v 1.7 2004/11/04 00:26:18 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -98,7 +98,7 @@ if [ `uname` = "Darwin" ]; then
     ld -r -o "${FULLNAME}.o" $OBJLST && \
     gcc -dynamiclib -install_name "${BASE}.${MAJOR}${SLIB_EXT}" \
         -compatibility_version ${MAJOR}.${MINOR} -current_version ${VERSION} \
-        -flat_namespace -undefined warning -multiply_defined suppress -bind_at_load \
+        -flat_namespace -undefined warning -multiply_defined suppress \
         -o "${FULLNAME}" "${FULLNAME}.o" ${linker_options} && \
     cd "${dir}" && \
     mv -f "${OTMPDIR}/${FULLNAME}" "${DSTDIR}${FULLNAME}" && \

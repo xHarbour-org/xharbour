@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3630 2004/11/25 23:01:00 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3631 2004/11/26 12:08:28 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-26 17:31 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * make_tgz.sh
+  * bin/hb-func.sh
+    * Respect HB_WITHOUT_GTSLN environment variable.
+  * make_drw.sh
+    * Use gtcrs instead of gtsln by default.
+  * bin/hb-mkslib.sh
+    ! Don't use -bind_at_load in Darwin - it does nothing sensible and
+      is unsupported by some libtool versions.
 
 2004-11-26 13:05 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/teditor.prg

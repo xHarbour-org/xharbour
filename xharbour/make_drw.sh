@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_drw.sh,v 1.8 2004/11/01 05:38:04 likewolf Exp $
+# $Id: make_drw.sh,v 1.9 2004/11/01 22:40:57 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -22,7 +22,7 @@ export HB_MULTI_GT=yes
 
 if [ -z "$PREFIX" ]; then export PREFIX=/usr/local; fi
 
-if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtsln; fi
+if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtcrs; fi
 
 # Set to constant value to be consistent with the non-GNU make files.
 

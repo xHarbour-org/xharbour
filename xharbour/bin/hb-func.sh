@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.33 2004/11/01 21:01:41 druzus Exp $
+# $Id: hb-func.sh,v 1.34 2004/11/21 21:43:16 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -482,6 +482,15 @@ mk_hblibso()
                     then
                         LIBSMT="$LIBSMT $lm"
                     fi
+                    if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
+                        if [ "${l}" = gtcrs ]; then
+                            linker_options="$linker_options -lncurses"
+                        elif [ "${l}" = gtsln ]; then
+                            if [ "${HB_WITHOUT_GTSLN}" != "yes" ]; then
+                                linker_options="$linker_options -lslang"
+                            fi
+                        fi
+                    fi
                 fi
                 ;;
         esac
@@ -489,7 +498,7 @@ mk_hblibso()
     if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
         full_lib_name="lib${name}.${hb_ver}.dylib"
         full_lib_name_mt="lib${name}mt.${hb_ver}.dylib"
-        linker_options="-L/sw/lib -lncurses -lslang"
+        linker_options="-L/sw/lib $linker_options"
     else
         full_lib_name="lib${name}-${hb_ver}.so"
         full_lib_name_mt="lib${name}mt-${hb_ver}.so"

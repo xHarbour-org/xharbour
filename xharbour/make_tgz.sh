@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.31 2004/11/01 22:40:57 likewolf Exp $
+# $Id: make_tgz.sh,v 1.32 2004/11/04 00:26:12 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -145,7 +145,10 @@ then
         linux)  [ "${HB_GPM_MOUSE}" = yes ] && ADD_LIBS="-lgpm" ;;
         darwin) ADD_LIBS="-L/sw/lib" ;;
     esac 
-    export L_USR="-L${HB_LIB_INSTALL} -l${name} ${ADD_LIBS} -lncurses -lslang -L/usr/X11R6/lib -lX11"
+    if [ "${HB_WITHOUT_GTSLN}" != yes ]; then
+        GTSLN_ADD_LIB="-lslang"
+    fi
+    export L_USR="-L${HB_LIB_INSTALL} -l${name} ${ADD_LIBS} -lncurses ${GTSLN_ADD_LIB} -L/usr/X11R6/lib -lX11"
     export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
 
     for utl in hb$MAKE hbrun hbpp hbdoc hbtest hbdict xbscript
