@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.659 2003/01/30 00:32:08 lculik Exp $
+ * $Id: ChangeLog,v 1.660 2003/01/30 00:46:20 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-29 23:00 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/tget.prg
+    ! Fixed problem on Delete() method that was not indicating that the Buffer has
+      changes to Updated() function Reported by Sidney Junior
 
 2003-01-30 01:41 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * makefile.bc

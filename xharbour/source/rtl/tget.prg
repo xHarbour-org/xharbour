@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.36 2003/01/27 03:49:44 walito Exp $
+ * $Id: tget.prg,v 1.37 2003/01/28 22:16:58 walito Exp $
  */
 
 /*
@@ -1268,6 +1268,8 @@ METHOD BackSpace( lDisplay ) CLASS Get
 
          ::buffer := SubStr( ::buffer, 1, nMinus - 1 ) + " " +;
                      SubStr( ::buffer, nMinus + 1 )
+
+         ::Changed := .T.
 
          ::Assign()
 
