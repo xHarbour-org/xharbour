@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.136 2002/12/23 00:14:22 ronpinkas Exp $
+ * $Id: hvm.c,v 1.137 2002/12/29 08:32:42 ronpinkas Exp $
  */
 
 /*
@@ -6049,6 +6049,12 @@ HB_FUNC( __VMVARSSET )
 void hb_vmIsLocalRef( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
+
+   if( hb_stack.Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
+   {
+      hb_gcItemRef( &(hb_stack.Return) );
+   }
+   //printf( "After ReturnRef\n" );
 
    if( hb_stack.pPos > hb_stack.pItems )
    {

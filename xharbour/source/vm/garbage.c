@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.27 2002/12/28 05:43:47 ronpinkas Exp $
+ * $Id: garbage.c,v 1.28 2002/12/29 08:32:42 ronpinkas Exp $
  */
 
 /*
@@ -696,9 +696,6 @@ void hb_gcCollectAll( void )
 
       hb_memvarsIsMemvarRef();
       //printf( "After MemvarRef\n" );
-
-      hb_gcItemRef( &(HB_VM_STACK.Return) );
-      //printf( "After ReturnRef\n" );
 
       hb_clsIsClassRef();
       //printf( "After ClassRef\n" );

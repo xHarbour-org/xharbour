@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.19 2002/12/27 22:34:37 jonnymind Exp $
+* $Id: thread.c,v 1.20 2002/12/29 08:32:42 ronpinkas Exp $
 */
 
 /*
@@ -425,13 +425,19 @@ void hb_threadIsLocalRef( void )
 
    //printf( "IsLocal\n" );
 
-   hb_vmIsLocalRef();
-
    HB_CRITICAL_LOCK( hb_threadContextMutex );
+
+   hb_vmIsLocalRef();
 
    while( pContext )
    {
-      printf( "   Context: %p Stack: %p Items: %i\n", pContext, pContext->stack, pContext->stack->pPos - pContext->stack->pItems );
+      //printf( "   Context: %p Stack: %p Items: %i\n", pContext, pContext->stack, pContext->stack->pPos - pContext->stack->pItems );
+
+      if( pContext->stack->Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
+      {
+         hb_gcItemRef( &(pContext->stack->Return) );
+      }
+      //printf( "After ThreadReturnRef\n" );
 
       if( pContext->stack->pPos > pContext->stack->pItems )
       {
