@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.36 2003/01/15 03:08:46 ronpinkas Exp $
+* $Id: thread.c,v 1.38 2003/01/27 21:44:48 jonnymind Exp $
 */
 
 /*
@@ -838,11 +838,11 @@ HB_FUNC( SUBSCRIBE )
 
    if ( iWaitRes == 0 )
    {
-      pNotifyVal = hb_itemNew( NULL );
-      pNotifyVal = hb_arrayGetItemPtr( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) );
+      pNotifyVal = hb_arrayGetItemPtr( Mutex->aEventObjects, 1 );
       hb_itemReturn( pNotifyVal );
-      hb_arraySize( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) -1 );
-   }
+      hb_arrayDel( Mutex->aEventObjects, 1 );
+      hb_arraySize( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) - 1);
+  }
    else
    {
       hb_ret();
@@ -882,8 +882,10 @@ HB_FUNC( SUBSCRIBENOW )
    lc = Mutex->lock_count;
    Mutex->lock_count = 0;
 
+   /* Destroying previous notify objects */
    if( Mutex->waiting <= 0 )
    {
+      hb_arraySize( Mutex->aEventObjects, 0 );
       Mutex->waiting = 1;
    }
    else
@@ -921,10 +923,10 @@ HB_FUNC( SUBSCRIBENOW )
 
    if ( iWaitRes == 0 )
    {
-      pNotifyVal = hb_itemNew( NULL );
-      pNotifyVal = hb_arrayGetItemPtr( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) );
+      pNotifyVal = hb_arrayGetItemPtr( Mutex->aEventObjects, 1 );
       hb_itemReturn( pNotifyVal );
-      hb_arraySize( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) -1 );
+      hb_arrayDel( Mutex->aEventObjects, 1 );
+      hb_arraySize( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) - 1);
    }
    else
    {
@@ -956,7 +958,7 @@ HB_FUNC( NOTIFY )
    }
 
    Mutex->waiting--;
-   hb_arrayAddForward( Mutex->aEventObjects, pVal );
+   hb_arrayAdd( Mutex->aEventObjects, pVal );
    HB_COND_SIGNAL( Mutex->cond );
 }
 
@@ -985,7 +987,7 @@ HB_FUNC( NOTIFYALL )
 
    for( iWt = 0; iWt < Mutex->waiting; iWt++ )
    {
-      hb_arrayAddForward( Mutex->aEventObjects, pVal );
+      hb_arrayAdd( Mutex->aEventObjects, pVal );
    }
 
    while( Mutex->waiting > 0 )
@@ -1060,8 +1062,9 @@ int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec
    struct timeval now;
    struct timespec timeout;
    gettimeofday( &now, NULL );
-   timeout.tv_sec = now.tv_sec + (iMillisec / 1000);
-   timeout.tv_nsec = (now.tv_usec + ( (iMillisec % 1000) * 1000 ) )* 1000;
+   timeout.tv_nsec = (now.tv_usec + ( (iMillisec % 1000l) * 1000l ) )* 1000l;
+   timeout.tv_sec = now.tv_sec + (iMillisec / 1000l) + timeout.tv_nsec / 1000000000l;
+   timeout.tv_nsec %= 1000000000l;
    return pthread_cond_timedwait( cond, mutex, &timeout );
 }
 #endif

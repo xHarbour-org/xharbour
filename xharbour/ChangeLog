@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.650 2003/01/27 12:31:34 lculik Exp $
+ * $Id: ChangeLog,v 1.651 2003/01/27 21:44:38 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-27 00:02 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/thread.c
+    ! Fixed a time slice rollover bug that could have caused miswaits in
+      Subscribe() and SubscribeAll() timed waits under linux.
+    ! Now the queue of notified object is FIFO instead of LIFO (queue
+      instead of stack) as it should presumibily be.
+    ! Fixed minor leftovers in SubscribeNow() and NotifyAll() functions
 
 
 2003-01-27 22:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
