@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2990 2004/05/25 20:27:20 druzus Exp $
+ * $Id: ChangeLog,v 1.2991 2004/05/26 14:18:41 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2004-05-27 12:24 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * hrbdll.bc
+    + added  -DHB_NO_PROFILER -DHB_NO_TRACE $(CFLAGS) to C_USR define
+    + Altered to use HB_GT_LIB to determine if linking with gtwin or gtwvt
 
 2004-05-25 11:50 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * contrib/hbzlib/zip.c

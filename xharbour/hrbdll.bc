@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.49 2004/05/09 23:40:01 druzus Exp $
+# $Id: hrbdll.bc,v 1.50 2004/05/11 16:29:48 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -54,7 +54,7 @@ INCLUDE_DIR  = include
 #  ßßßßßßßßßßßßßßßßßß
 
 
-C_USR          = -tW -DHB_FM_STATISTICS_OFF -D__WIN32__ -D__EXPORT__
+C_USR          = -tW -DHB_FM_STATISTICS_OFF -D__WIN32__ -D__EXPORT__ -DHB_NO_PROFILER -DHB_NO_TRACE $(CFLAGS)
 CLIBFLAGS      = $(C_USR) -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3 -DSIMPLEX
 HARBOURFLAGS   = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /i$(INCLUDE_DIR) /q0 /w /es2 /n1 /gc0
 
@@ -381,8 +381,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\pplib.obj \
   $(OBJ_DIR)\pptable.obj \
   $(OBJ_DIR)\pragma.obj \
-  $(OBJ_DIR)\gtwin.obj \
-  $(OBJ_DIR)\mousewin.obj \
   $(OBJ_DIR)\dbgmenu.obj \
   $(OBJ_DIR)\dbgtmenu.obj \
   $(OBJ_DIR)\dbgtmitm.obj \
@@ -438,6 +436,20 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\pplib.obj \
    $(OBJ_DIR)\pptable.obj \
    $(OBJ_DIR)\pragma.obj
+
+#
+#  Gt
+#
+!if $(HB_GT_LIB) == gtwvt
+HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
+  $(OBJ_DIR)\gtwvt.obj \
+  $(OBJ_DIR)\wvtcore.obj \
+  $(OBJ_DIR)\wvtutils.obj
+!else
+HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
+  $(OBJ_DIR)\gtwin.obj \
+  $(OBJ_DIR)\mousewin.obj
+!endif
 
 # ÚÄÄÄÄÄÄÄÄÄ¿
 # ³ project ³Û
@@ -805,8 +817,14 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\msgsriso.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgzhgb.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\msgzhb5.obj           + >> hdll.tmp
+!if $(HB_GT_LIB) == gtwvt
+  echo. $(OBJ_DIR)\gtwvt.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\wvtcore.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\wvtutils.obj           + >> hdll.tmp
+!else
   echo. $(OBJ_DIR)\gtwin.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\mousewin.obj          + >> hdll.tmp
+!endif
   echo. $(OBJ_DIR)\dbgmenu.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgtmenu.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgtmitm.obj          + >> hdll.tmp
@@ -2082,11 +2100,26 @@ $(OBJ_DIR)\tbrwtext.c : $(DEBUG_DIR)\tbrwtext.prg
 $(OBJ_DIR)\tbrwtext.obj : $(OBJ_DIR)\tbrwtext.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+!if $(HB_GT_LIB) == gtwvt
+
+$(OBJ_DIR)\gtwvt.obj : $(RTL_DIR)\gtwvt\gtwvt.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\wvtcore.obj : $(RTL_DIR)\gtwvt\wvtcore.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\wvtutils.obj : $(RTL_DIR)\gtwvt\wvtutils.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+!else
+
 $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
+
+!endif
 
 $(OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.c
    $(CC) $(CLIBFLAGS) -o$@ $**
