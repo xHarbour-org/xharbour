@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.5 2002/10/05 23:27:43 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.6 2002/10/06 01:23:06 ronpinkas Exp $
  */
 
 /*
@@ -171,7 +171,7 @@ FUNCTION __ObjGetValueDiff( oObject, oBase )
    ENDIF
 
    IF oBase == NIL
-      oBase := __clsInst( oObject:ClassH )
+      oBase := __ClsInst( oObject:ClassH )
    ENDIF
 
    aBaseVars   := __objGetValueList( oBase  , NIL, HB_OO_CLSTP_EXPORTED )

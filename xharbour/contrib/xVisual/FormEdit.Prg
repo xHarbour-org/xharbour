@@ -27,7 +27,7 @@ GLOBAL EXTERNAL oApp
  CLASS TFormEdit FROM TForm
 
    CLASSDATA nForms  PROTECTED INIT 0
-   CLASSDATA aBases  PROTECTED INIT {}
+   CLASSDATA aBases  PROTECTED INIT {0}
 
    DATA oMask        PROTECTED
    DATA Editing      PROTECTED
@@ -77,6 +77,7 @@ GLOBAL EXTERNAL oApp
    METHOD XFMTop()
    METHOD XFMRoot()
    METHOD XFMControl( cName, oControl )
+   METHOD XFMReflect()
    METHOD XFMTrace()
 
  END CLASS
@@ -212,7 +213,7 @@ METHOD CreateControl(aRect)
       if oObj!=NIL
          oObj:SetMethod("OnMove",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj )})
          oObj:SetMethod("OnSize",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj )})
-         
+
          oObj:SetMethod("Delete",{||oApp:MainFrame:ObjInsp:InspCombo:DelObject( oObj ),;
                                     HB_QSELF():DelControl() } )
 
@@ -328,6 +329,10 @@ METHOD XFMTop() CLASS TFormEdit
 
    aAdd( ::aXFM[ XFM_EndClass ], "END CLASS " + ::Caption )
 
+   ::aBases[1] := __ClsInst( ::ClassH )
+
+   ::XFMReflect()
+
 RETURN Self
 
 //----------------------------------------------------------------------------//
@@ -342,39 +347,100 @@ METHOD XFMRoot() CLASS TFormEdit
    lOn := .T.
 
    aSize( ::aXFM[ XFM_Datas ], 0 )
-   //aSize( ::aXFM[ XFM_Controls ], 0 )
 
-   aDiff := __ObjGetValueDiff( Self )
+   aDiff := __ObjGetValueDiff( Self, ::aBases[1] )
    ::nForms--
 
    FOR EACH aVar IN aDiff
-      IF ValType( aVar[2] ) == 'O'
-         //aAdd( ::aXFM[ XFM_Controls ], aVar )
-      ELSE
+      IF ValType( aVar[2] ) != 'O'
          aAdd( ::aXFM[ XFM_Datas ], aVar )
       ENDIF
    NEXT
 
    lOn := .F.
 
+   ::XFMReflect()
+
 RETURN Self
 
 //----------------------------------------------------------------------------//
 METHOD XFMControl( cName, oControl ) CLASS TFormEdit
 
-   LOCAL nControl, nBase
+   LOCAL nControl, nBase, aVar, XFMControl
 
    IF cName == NIL
       nControl := aScan( ::aXFM[ XFM_Controls ], { |XFM| XFM[2] == oControl } )
       nBase    := aScan( ::aBases, { | oBase | oBase:ClassH == oControl:ClassH } )
 
-      ::aXFM[ XFM_Controls ][ nControl ][ 3 ] := __ObjGetValueDiff( oControl, ::aBases[ nBase ] )
+      XFMControl := ::aXFM[ XFM_Controls ][ nControl ]
+
+      XFMControl[ 3 ] := __ObjGetValueDiff( oControl, ::aBases[ nBase ] )
+
+      aSize( XFMControl[ 4 ], 0 )
+      aAdd( XFMControl[ 4 ], "   CONTROL " + XFMControl[ 1 ] + " FROM " + oControl:ClassName )
+
+      FOR EACH aVar IN XFMControl[ 3 ]
+         aAdd( XFMControl[ 4 ], "      :" + aVar[1] + " := " + CStr( aVar[2] ) )
+      NEXT
+
+      aAdd( XFMControl[ 4 ], "   END CONTROL" )
    ELSE
-      aAdd( ::aXFM[ XFM_Controls ], { cName, oControl, {} } )
+      aAdd( ::aXFM[ XFM_Controls ], { cName, oControl, , {} } )
+
+      XFMControl := ::aXFM[ XFM_Controls ][ -1 ]
+
+      aAdd( XFMControl[4], "   CONTROL " + cName + " FROM " + oControl:ClassName )
+
       IF aScan( ::aBases, { | oBase | oBase:ClassH == oControl:ClassH } ) == 0
          aAdd( ::aBases, __ClsInst( oControl:ClassH ) )
       ENDIF
+
+      XFMControl[ 3 ] := __ObjGetValueDiff( oControl, ::aBases[ -1 ] )
+
+      FOR EACH aVar IN XFMControl[ 3 ]
+         aAdd( XFMControl[ 4 ], "      :" + aVar[1] + " := " + CStr( aVar[2] ) )
+      NEXT
+
+      aAdd( XFMControl[ 4 ], "   END CONTROL" )
    ENDIF
+
+   ::XFMReflect()
+
+RETURN Self
+
+//----------------------------------------------------------------------------//
+METHOD XFMReflect() CLASS TFormEdit
+
+   LOCAL cTExt := "", cLine, aVar, XFMControl
+
+   FOR EACH cLine IN ::aXFM[ XFM_Header ]
+      cText += ( cLine + CRLF )
+   NEXT
+
+   cText += CRLF
+
+   FOR EACH cLine IN ::aXFM[ XFM_Class ]
+      cText += ( cLine + CRLF )
+   NEXT
+   cText += CRLF
+
+   FOR EACH aVar IN ::aXFM[ XFM_Datas ]
+      cText += ( "   VAR " + aVar[1] + " INIT " + CStr( aVar[2] ) + CRLF )
+   NEXT
+
+   FOR EACH XFMControl IN ::aXFM[ XFM_Controls ]
+      FOR EACH cLine IN XFMControl[ 4 ]
+         cText += ( cLine + CRLF )
+      NEXT
+   NEXT
+
+   FOR EACH cLine IN ::aXFM[ XFM_EndClass ]
+      cText += ( cLine + CRLF )
+   NEXT
+
+   oApp:MainFrame:ObjEdit:QuickEdit:SetText( cText )
+
+   //OutputDebugString( cText )
 
 RETURN Self
 
