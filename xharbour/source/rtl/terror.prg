@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.7 2003/05/24 00:29:10 ronpinkas Exp $
+ * $Id: terror.prg,v 1.8 2003/05/25 17:03:18 jonnymind Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
    static s_aErrHandlers := {}
 #endif
 
-FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args )
+FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName )
 
    STATIC s_oClass
    LOCAL oErr
@@ -86,7 +86,7 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args )
       s_oClass:AddData( "ProcLine"     , Procline(1) )
 
       #ifdef HB_THREAD_SUPPORT
-         s_oClass:AddData( "RunningThreads"     , HB_ThreadCountStacks() )
+         s_oClass:AddData( "RunningThreads" , HB_ThreadCountStacks() )
          s_oClass:AddData( "OsThreadId"     , ThreadGetCurrent() )
          s_oClass:AddData( "VMThreadId"     , ThreadGetCurrentInternal() )
       #endif
@@ -112,6 +112,9 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args )
    ENDIF
    IF Args != NIL
       oErr:Args := Args
+   ENDIF
+   IF ModuleName != NIL
+      oErr:ModuleName := ModuleName
    ENDIF
 
 RETURN oErr
@@ -148,7 +151,3 @@ PROCEDURE HB_ResetTry()
 RETURN
 
 #endif
-
-FUNCTION Throw( oErr )
-
-RETURN Eval( ErrorBlock(), oErr )

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.37 2003/05/24 00:29:09 ronpinkas Exp $
+ * $Id: harbour.c,v 1.38 2003/05/26 00:19:15 ronpinkas Exp $
  */
 
 /*
@@ -4387,7 +4387,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
    if( hb_comp_pFileName->szName )
    {
-      char szFileName[ _POSIX_PATH_MAX ];    /* filename to parse */
+      char szFileName[ _POSIX_PATH_MAX ], szFileLiteral[ _POSIX_PATH_MAX + 2 ];
       char szPpoName[ _POSIX_PATH_MAX ];
       char *szSourceExtension, *szSourcePath;
 
@@ -4400,6 +4400,9 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
       szSourcePath = hb_comp_pFileName->szPath;
 
       hb_fsFNameMerge( szFileName, hb_comp_pFileName );
+
+      sprintf( szFileLiteral, "\"%s\"", szFileName );
+      hb_pp_AddDefine( "__FILE__", szFileLiteral );
 
       if( hb_comp_bPPO )
       {

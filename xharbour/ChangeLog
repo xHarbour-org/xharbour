@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1110 2003/06/09 21:10:01 lculik Exp $
+ * $Id: ChangeLog,v 1.1111 2003/06/10 11:02:40 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-10 16:44 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+    ! Fixed typo in hb_clsValidScope()
+
+  * source/rtl/terror.prg
+    - Removed Throw()
+    + Added optional 6th. paramater ModuleName to ErrorNew()
+
+  * source/vm/proc.c
+    - Removed no longer needed check for "THROW".
+
+  * source/compiler/harbour.c
+    + Added support for auto defined __FILE__
+
+  * source/pp/pptable.c
+    + Added rule for THOW <Err>
+    + Added rule to add  6th paramater to calls to ErrorNew() having 5 parameters or less, passing new __FILE__
+
+  * tests/tstscope.prg
+    * Corrected tyop in comment.
 
 2003-06-10 08:00 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg

@@ -1,5 +1,5 @@
 /*
-   This file is to be used with secondary linked module scopetst.prg.
+   This file is to be used with secondary linked modules scope1.prg and scope2.prg.
  */
 
 #include "hbclass.ch"
