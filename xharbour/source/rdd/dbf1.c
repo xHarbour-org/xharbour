@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.21 2003/01/26 02:48:51 likewolf Exp $
+ * $Id: dbf1.c,v 1.22 2003/03/08 01:40:36 horacioroldan Exp $
  */
 
 /*
@@ -310,8 +310,12 @@ static void hb_dbfUnlockRecord( DBFAREAP pArea, ULONG ulRecNo )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfUnlockRecord(%p, %lu)", pArea, ulRecNo));
 
-   if( hb_fsLock( pArea->hDataFile, DBF_LOCKPOS + pArea->pLocksPos[ ulRecNo - 1 ],
-                  1, FL_UNLOCK ) )
+   if( ulRecNo <= 0 )
+      ulRecNo = 1;
+
+//   if( hb_fsLock( pArea->hDataFile, DBF_LOCKPOS + pArea->pLocksPos[ ulRecNo - 1 ],
+//                  1, FL_UNLOCK ) )
+   if( hb_fsLock( pArea->hDataFile, DBF_LOCKPOS + ulRecNo, 1, FL_UNLOCK ) )
    {
       if( pArea->ulNumLocksPos == 1 )            /* Delete the list */
       {
@@ -357,6 +361,9 @@ static ERRCODE hb_dbfLockRecord( DBFAREAP pArea, ULONG ulRecNo, BOOL * pResult,
       * pResult = TRUE;
       return SUCCESS;
    }
+
+   if( ulRecNo <= 0 )
+      ulRecNo = 1;
 
    if( bExclusive )
       hb_dbfUnlockAllRecords( pArea );
@@ -2490,7 +2497,7 @@ ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
    BOOL bRetry, bError;
    PHB_ITEM pError;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbfReadHeader(%p)", pArea));
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfReadDBHeader(%p)", pArea));
 
    pError = NULL;
    /* Try read */
