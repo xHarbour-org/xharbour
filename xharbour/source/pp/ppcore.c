@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.116 2004/01/16 21:37:43 paultucker Exp $
+ * $Id: ppcore.c,v 1.117 2004/01/16 22:57:14 paultucker Exp $
  */
 
 /*
@@ -3219,35 +3219,25 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       return 0;
    }
 
-   if( cMarkerType == '4' && strchr( "&(", ( *ptri )[0] ) == NULL )
+   if( cMarkerType == '4' && strchr( "\"&(['", ( *ptri )[0] ) == NULL )
    {
-      char *pExp = expreal;
+      char *pTmp = strpbrk( *ptri, " ," );
 
-      hb_pp_NextToken( ptri, expreal );
-
-      lens = strlen( expreal );
-      expreal += lens;
-
-      while( **ptri && strchr( "./\\", **ptri ) )
+      if( pTmp )
       {
-         expreal[0] = **ptri;
-         expreal[1] = '\0';
-         expreal++;
-         (*ptri)++;
-         lens++;
+         lens = pTmp - *ptri;
 
-         if( **ptri == '\0' )
+         if( expreal != NULL )
          {
-            break;
+            strncpy( expreal, *ptri, lens );
+            expreal[lens] = '\0';
+
+            *ptri   += lens;
+            expreal += lens;
          }
 
-         hb_pp_NextToken( ptri, expreal );
-
-         lens += strlen( expreal );
-         expreal += lens;
+         goto Done;           goto Done;
       }
-
-      goto Done;
    }
 
    State = ( **ptri=='\'' || **ptri=='\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;

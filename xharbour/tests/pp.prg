@@ -4761,6 +4761,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
   LOCAL  sMultiStopper, nSpaceAt, sNextStopper, cChar
   LOCAL  aExp
   LOCAL bErrHandler := ErrorBlock()
+  LOCAL nCommaAt, nAt
 
   IF Empty( sLine )
      RETURN NIL
@@ -4858,19 +4859,27 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
      CASE cType == '('
         s1 := Left( sLine, 1 )
 
-        IF ! ( s1 $ "&(" )
-           sExp  := NextToken( @sLine )
+        IF ! ( s1 $ "&(['" + '"' )
+            nSpaceAt := At( ' ', sLine )
+            nCommaAt := At( ',', sLine )
 
-           WHILE SubStr( sLine, 1, 1 ) $ ".\/"
-              sExp += SubStr( sLine, 1, 1 )
-              sLine := SubStr( sLine, 2 )
-              sExp  += NextToken( @sLine )
-           ENDDO
+            IF nSpaceAt > 0 .AND. nSpaceAt < nCommaAt
+               nAt := nSpaceAt
+            ELSE
+               nAt := nCommaAt
+            ENDIF
 
-           sExp  += ExtractLeadingWS( @sLine )
+            IF nAt == 0
+               sExp  := sLine
+               sLine := ""
+            ELSE
+               sExp  := Left( sLine, nAt - 1 )
+               sLine := SubStr( sLine, nAt )
+               sExp  += ExtractLeadingWS( @sLine )
+            ENDIF
 
-           //? "EXP <(>: " + sExp
-           RETURN sExp
+            //? "EXP <(>: " + sExp
+            RETURN sExp
         ENDIF
 
      CASE cType == '!'

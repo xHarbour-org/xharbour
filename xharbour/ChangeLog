@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2080 2004/01/16 22:23:22 paultucker Exp $
+ * $Id: ChangeLog,v 1.2081 2004/01/16 22:57:07 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-16 16:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+  * tests/pp.prg
+    * Reverted Extented Marker matching to use delimiter based logic, but added ',' as a delimiter.
 
 2004-01-16 17:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   + include/hbwbase.h
