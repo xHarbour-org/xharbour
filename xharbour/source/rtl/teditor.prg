@@ -28,7 +28,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.28 2004/04/18 17:59:58 vouchcac Exp $
+/* $Id: teditor.prg,v 1.29 2004/04/19 01:52:27 jonnymind Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -378,7 +378,21 @@ METHOD RefreshWindow() CLASS HBEditor
    nOCol := ::Col()
    nORow := ::Row()
    nOCur := SetCursor( SC_NONE )
-   
+
+   for i := 0 to Min( ::nNumRows - 1, ::naTextLen - 1 )
+     DispOutAt( ::nTop + i, ::nLeft, ;
+                PadR( SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol ), ::nNumCols ), ;
+                ::LineColor( ::nFirstRow + i ) )
+   next
+
+   // Clear rest of editor window (needed when deleting lines of text or when
+   // the text is shorter than one window)
+   if ::naTextLen < ::nNumRows
+     Scroll( ::nTop + ::naTextLen, ::nLeft, ::nBottom, ::nRight )
+   endif
+
+   /* This breaks individual line coloring, so I restored the old version with
+    * a small optimization. -- Ph.Krylov   
    // CLEAR THE WHOLE WINDOW!!! previous version wished to spare some output, but 
    // C is faster than a VM loop!!
    Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight )
@@ -386,6 +400,7 @@ METHOD RefreshWindow() CLASS HBEditor
    for i := 0 to Min( ::nNumRows - 1, ::naTextLen - 1 )
      DispOutAt( ::nTop + i, ::nLeft, SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol, ::nNumCols ), ::LineColor( ::nFirstRow + i ) )
    next
+   */
    
    SetCursor( nOCur )
    ::SetPos( nORow, nOCol )
