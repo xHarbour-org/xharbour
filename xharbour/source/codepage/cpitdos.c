@@ -1,5 +1,5 @@
 /*
- * $Id: cdpesdos.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cpitdos.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
  */
 
 /*
@@ -96,5 +96,5 @@ HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ITDOS )
    hb_cdpRegister( &s_codepage );
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_ITDOS )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_InitITDOS
+   #pragma startup hb_codepage_Init_ITDOS
 #endif
