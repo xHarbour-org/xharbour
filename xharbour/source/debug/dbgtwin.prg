@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtwin.prg,v 1.1.1.1 2001/12/21 10:43:45 ronpinkas Exp $
+ * $Id: dbgtwin.prg,v 1.2 2003/01/31 04:29:39 walito Exp $
  */
 
 /*
@@ -77,6 +77,7 @@ CLASS TDbWindow  // Debugger windows and dialogs
    METHOD nWidth() INLINE ::nRight - ::nLeft + 1
    METHOD ScrollUp( nLines )
    METHOD SetCaption( cCaption )
+   METHOD ShowCaption()
    METHOD SetFocus( lOnOff )
    METHOD Show( lFocused )
    METHOD ShowModal()
@@ -128,15 +129,14 @@ METHOD ScrollUp( nLines ) CLASS TDbWindow
 return nil
 
 METHOD SetCaption( cCaption ) CLASS TDbWindow
-
-   local nOldLen := iif( ::cCaption != nil, Len( ::cCaption ), 0 )
-
    ::cCaption := cCaption
-
-   if ! Empty( cCaption )
+return nil
+  
+METHOD ShowCaption CLASS TDbWindow
+   if ! Empty( ::cCaption )
       DispOutAt( ::nTop, ::nLeft + ( ( ::nRight - ::nLeft ) / 2 ) - ;
-         ( ( Len( cCaption ) + 2 ) / 2 ),;
-         " " + cCaption + " ", ::cColor )
+         ( ( Len( ::cCaption ) + 2 ) / 2 ),;
+         " " + ::cCaption + " ", ::cColor )
    endif
 
 return nil
@@ -157,7 +157,7 @@ METHOD SetFocus( lOnOff ) CLASS TDbWindow
    DispOutAt( ::nTop, ::nLeft + 1, "[" + Chr( 254 ) + "]", ::cColor )
 
    if ! Empty( ::cCaption )
-      ::SetCaption( ::cCaption )
+      ::ShowCaption( ::cCaption )
    endif
 
    if ::bPainted != nil
@@ -182,7 +182,7 @@ METHOD Refresh() CLASS TDbWindow
    DispOutAt( ::nTop, ::nLeft + 1, "[" + Chr( 254 ) + "]", ::cColor )
 
    if ! Empty( ::cCaption )
-      ::SetCaption( ::cCaption )
+      ::ShowCaption( ::cCaption )
    endif
 
    if ::bPainted != nil
@@ -207,6 +207,8 @@ METHOD Show( lFocused ) CLASS TDbWindow
       hb_Shadow( ::nTop, ::nLeft, ::nBottom, ::nRight )
    endif
 
+   ::ShowCaption()
+   
    ::lVisible := .t.
 
 return nil
