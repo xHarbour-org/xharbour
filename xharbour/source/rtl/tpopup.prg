@@ -1,5 +1,5 @@
 /*
- * $Id: tpopup.prg,v 1.5 2003/01/31 21:03:35 walito Exp $
+ * $Id: tpopup.prg,v 1.6 2003/02/01 19:12:18 patrickmast Exp $
  */
 
 /*
@@ -378,6 +378,12 @@ METHOD Open() CLASS PopUpMenu
 
    if !::opened
       ::opened := TRUE
+      If ::top >= ::bottom
+        ::bottom := ::top + ::itemCount + 1
+      End
+      If ::left >= ::right
+        ::right := ::left + ::width - 1
+      End
       ::saveScr := SaveScreen( ::top, ::left, ::bottom, ::right )
       ::Display()
    endif
