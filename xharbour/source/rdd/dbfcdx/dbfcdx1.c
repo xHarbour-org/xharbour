@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.96 2002/05/13 03:55:13 horacioroldan Exp $
+ * $Id: dbfcdx1.c,v 1.112 2002/12/30 19:56:32 horacioroldan Exp $
  */
 
 /*
@@ -902,8 +902,12 @@ static int hb_cdxKeyCompare( LPCDXKEYINFO pKey1, LPCDXKEYINFO pKey2, USHORT * En
          (* EndPos)++;
          iResult = pKey1->length - pKey2->length;
       }
+      /*-----------------05/01/2003 06:55p.---------------
+       * If key isn't a string, Exact flag doesn't seem correct.
+       * --------------------------------------------------
       if( (iResult < 0) && (* EndPos > pKey1->length) && !Exact )
          iResult = 0;
+       */
    }
 
 
@@ -932,6 +936,7 @@ static LPCDXKEYINFO hb_cdxKeyPutItem( LPCDXKEYINFO pKey, PHB_ITEM pItem )
    switch( hb_itemType( pItem ) )
    {
       case HB_IT_STRING:
+      case HB_IT_STRING | HB_IT_MEMO:
 
          pKey->Value = hb_itemGetC( pItem );
          pKey->realLength = pKey->length = (USHORT) (pItem->item.asString.length > CDX_MAXKEY ?
@@ -941,8 +946,8 @@ static LPCDXKEYINFO hb_cdxKeyPutItem( LPCDXKEYINFO pKey, PHB_ITEM pItem )
          while( pKey->length > 0 &&
                pKey->Value[ pKey->length - 1 ] == ' ' )
                /*pKey->Value[ pItem->item.asString.length - 1 ] == ' ' )*/
-
             pKey->length--;
+
          pKey->Value[ pKey->length ] = 0;
 
          break;
@@ -957,6 +962,7 @@ static LPCDXKEYINFO hb_cdxKeyPutItem( LPCDXKEYINFO pKey, PHB_ITEM pItem )
 
          i++;
          pKey->length = i;
+         pKey->realLength = 8;
          pKey->Value = (char *) hb_xgrab( i + 1 );
          pKey->Value[i] = 0;
          memcpy( pKey->Value, cTemp, i );
@@ -973,6 +979,7 @@ static LPCDXKEYINFO hb_cdxKeyPutItem( LPCDXKEYINFO pKey, PHB_ITEM pItem )
 
          i++;
          pKey->length = i;
+         pKey->realLength = 8;
          pKey->Value = (char *) hb_xgrab( i + 1 );
          pKey->Value[i] = 0;
          memcpy( pKey->Value, cTemp, i );
