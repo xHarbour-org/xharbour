@@ -1,5 +1,5 @@
 /*
- * $Id: dbgwa.prg,v 1.5 2001/12/15 22:54:07 vszakats Exp $
+ * $Id: dbgwa.prg,v 1.1.1.1 2001/12/21 10:43:49 ronpinkas Exp $
  */
 
 /*
@@ -328,7 +328,7 @@ static function DbfInfo( aInfo )
       xType  := Valtype( xValue )
 
       do case
-      case xType $ "CM"
+      case xType IN "CM"
          cValue := xValue
       case xType == "N"
          cValue := ltrim( str( xValue ) )

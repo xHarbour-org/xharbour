@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtarr.prg,v 1.10 2002/03/05 20:23:26 antoniolinares Exp $
+ * $Id: dbgtarr.prg,v 1.2 2002/03/06 03:52:09 ronpinkas Exp $
  */
 
 /*
@@ -153,8 +153,7 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) Class T
                   ::AddWindows(aArray[nSet],oBrwSets:RowPos+oBrwSets:nTop)
                   ::arrayname:=coldname
 
-                  adel(::aWindows,::nCurWindow)
-                  asize(::awindows,len(::awindows)-1)
+                  adel(::aWindows,::nCurWindow, .t.)
                   if ::nCurwindow==0
                   ::ncurwindow:=1
                   else
@@ -191,7 +190,7 @@ static function ValToStr( uVal )
       case cType == "A"
            cResult := "{ ... }"
 
-      case cType $ "CM"
+      case cType IN "CM"
            cResult := '"' + uVal + '"'
 
       case cType == "L"

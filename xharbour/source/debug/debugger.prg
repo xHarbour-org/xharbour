@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.121 2002/02/24 08:34:54 antoniolinares Exp $
+ * $Id: debugger.prg,v 1.2 2002/03/06 03:52:09 ronpinkas Exp $
  */
 
 /*
@@ -109,8 +109,7 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
                  if ! s_oDebugger:lTrace
                     s_oDebugger:ShowCode( cModuleName )
                  else
-                    ASize( s_oDebugger:aCallStack, Len( s_oDebugger:aCallStack ) + 1 )
-                    AIns( s_oDebugger:aCallStack, 1 )
+                    AIns( s_oDebugger:aCallStack, 1, NIL, .t. )
                  endif
                  s_oDebugger:LoadVars()
               endif
@@ -484,7 +483,7 @@ METHOD Colors() CLASS TDebugger
 
    local oBrwColors := TBrowseNew( oWndColors:nTop + 1, oWndColors:nLeft + 1,;
                                  oWndColors:nBottom - 1, oWndColors:nRight - 1 )
-   local n := 1
+   local oWin
    local nWidth := oWndColors:nRight - oWndColors:nLeft - 1
    local oCol
 
@@ -520,9 +519,9 @@ METHOD Colors() CLASS TDebugger
    ::oPullDown:Refresh()
    ::BarDisplay()
 
-   for n := 1 to Len( ::aWindows )
-      ::aWindows[ n ]:LoadColors()
-      ::aWindows[ n ]:Refresh()
+   for each oWin in ::aWindows
+      oWin:LoadColors()
+      oWin:Refresh()
    next
 
 return nil
@@ -735,8 +734,7 @@ return nil
 METHOD EndProc() CLASS TDebugger
 
    if Len( ::aCallStack ) > 1
-      ADel( ::aCallStack, 1 )
-      ASize( ::aCallStack, Len( ::aCallStack ) - 1 )
+      ADel( ::aCallStack, 1, .t. )
       if ::oBrwStack != nil .and. ! ::lTrace
          ::oBrwStack:RefreshAll()
       endif
@@ -747,7 +745,7 @@ return nil
 METHOD HandleEvent() CLASS TDebugger
 
    local nPopup, oWnd
-   local nKey, nMRow, nMCol, n
+   local nKey, nMRow, nMCol, oWin
 
    if ::lAnimate
       if ::nSpeed != 0
@@ -780,15 +778,15 @@ METHOD HandleEvent() CLASS TDebugger
               else
                  nMRow := MRow()
                  nMCol := MCol()
-                 for n := 1 to Len( ::aWindows )
-                    if ::aWindows[ n ]:IsOver( nMRow, nMCol )
-                       if ! ::aWindows[ n ]:lFocused
+                 for each oWin in ::aWindows
+                    if oWin:IsOver( nMRow, nMCol )
+                       if ! oWin:lFocused
                           ::aWindows[ ::nCurrentWindow ]:SetFocus( .f. )
-                          ::nCurrentWindow := n
-                          ::aWindows[ n ]:SetFocus( .t. )
+                          ::nCurrentWindow := HB_EnumIndex()
+                          oWin:SetFocus( .t. )
                        endif
-                       ::aWindows[ n ]:LDblClick( nMRow, nMCol )
-                       n := Len( ::aWindows ) + 1
+                       oWin:LDblClick( nMRow, nMCol )
+                       exit
                     endif
                  next
               endif
@@ -805,15 +803,15 @@ METHOD HandleEvent() CLASS TDebugger
               else
                  nMRow := MRow()
                  nMCol := MCol()
-                 for n := 1 to Len( ::aWindows )
-                    if ::aWindows[ n ]:IsOver( nMRow, nMCol )
-                       if ! ::aWindows[ n ]:lFocused
+                 for each oWin in ::aWindows
+                    if oWin:IsOver( nMRow, nMCol )
+                       if ! oWin:lFocused
                           ::aWindows[ ::nCurrentWindow ]:SetFocus( .f. )
-                          ::nCurrentWindow := n
-                          ::aWindows[ n ]:SetFocus( .t. )
+                          ::nCurrentWindow := HB_EnumIndex()
+                          oWin:SetFocus( .t. )
                        endif
-                       ::aWindows[ n ]:LButtonDown( nMRow, nMCol )
-                       n := Len( ::aWindows ) + 1
+                       oWin:LButtonDown( nMRow, nMCol )
+                       exit
                     endif
                  next
               endif
@@ -883,7 +881,7 @@ return nil
 
 METHOD MonoDisplay() CLASS TDebugger
 
-   local n
+   local oWin
 
    ::lMonoDisplay := ! ::lMonoDisplay
 
@@ -892,9 +890,9 @@ METHOD MonoDisplay() CLASS TDebugger
 
    ::BarDisplay()
 
-   for n := 1 to Len( ::aWindows )
-      ::aWindows[ n ]:LoadColors()
-      ::aWindows[ n ]:Refresh()
+   for each oWin in ::aWindows
+      oWin:LoadColors()
+      oWin:Refresh()
    next
 
 return nil
@@ -1046,8 +1044,9 @@ return nil
 
 METHOD LoadVars() CLASS TDebugger // updates monitored variables
 
-   local nCount, n, m, xValue, cName
+   local nCount, n, xValue, cName
    local cStaticName, nStaticIndex, nStaticsBase
+   local aStatics, aStack
 
    ::aVars := {}
 
@@ -1071,10 +1070,9 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
 
    if ::lShowStatics
       if Type( "__DbgStatics" ) == "A"
-         for n := 1 to Len( __DbgStatics )
-            for m := 1 to Len( __DbgStatics[ n ][ 2 ] )
-               cStaticName  := __DbgStatics[ n ][ 2 ][ m ]
-               nStaticIndex := __DbgStatics[ n ][ 1 ] + m
+         for each aStatics in __DbgStatics
+            for each cStaticName in aStatics[ 2 ]
+               nStaticIndex := aStatics[1] + HB_EnumIndex()
                AAdd( ::aVars, { cStaticName, nStaticIndex, "Static" } )
             next
          next
@@ -1082,8 +1080,8 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
    endif
 
    if ::lShowLocals
-      for n := 1 to Len( ::aCallStack[ 1 ][ 2 ] )
-         AAdd( ::aVars, ::aCallStack[ 1 ][ 2 ][ n ] )
+      for each aStack in ::aCallStack[ 1 ][ 2 ]
+         AAdd( ::aVars, aStack )
       next
    endif
 
@@ -1237,9 +1235,7 @@ METHOD ShowCode( cModuleName ) CLASS TDebugger
    local cFunction := SubStr( cModuleName, RAt( ":", cModuleName ) + 1 )
    local cPrgName  := SubStr( cModuleName, 1, RAt( ":", cModuleName ) - 1 )
 
-   ASize( ::aCallStack, Len( ::aCallStack ) + 1 )
-   AIns( ::aCallStack, 1 )
-   ::aCallStack[ 1 ] := { cFunction, {} } // function name and locals array
+   AIns( ::aCallStack, 1, { cFunction, {} }, .t. ) // function name and locals array
 if !::lGo
    if ::oWndStack != nil
       ::oBrwStack:RefreshAll()
@@ -1419,7 +1415,7 @@ return nil
 
 METHOD RestoreSettings() CLASS TDebugger
 
-   local n
+   local oWin
 
    ::cSettingsFileName := ::InputBox( "File name", ::cSettingsFileName )
 
@@ -1430,9 +1426,9 @@ METHOD RestoreSettings() CLASS TDebugger
       ::oPullDown:Refresh()
       ::BarDisplay()
 
-      for n := 1 to Len( ::aWindows )
-        ::aWindows[ n ]:LoadColors()
-        ::aWindows[ n ]:Refresh()
+      for each oWin in ::aWindows
+        oWin:LoadColors()
+        oWin:Refresh()
       next
    endif
 
@@ -1453,7 +1449,7 @@ return nil
 
 METHOD SaveSettings() CLASS TDebugger
 
-   local cInfo := "", n, oWnd
+   local cInfo := "", nLen, oWnd, cColor
 
    ::cSettingsFileName := ::InputBox( "File name", ::cSettingsFileName )
 
@@ -1464,12 +1460,15 @@ METHOD SaveSettings() CLASS TDebugger
       endif
 
       cInfo += "Options Colors {"
-      for n := 1 to Len( ::aColors )
-         cInfo += '"' + ::aColors[ n ] + '"'
-         if n < Len( ::aColors )
+      nLen  := Len( ::aColors )
+
+      for each cColor in ::aColors
+         cInfo += '"' + cColor + '"'
+         if HB_EnumIndex() < nLen
             cInfo += ","
          endif
       next
+
       cInfo += "}" + Chr( 13 ) + Chr( 10 )
 
       if ::lMonoDisplay
@@ -1480,8 +1479,7 @@ METHOD SaveSettings() CLASS TDebugger
          cInfo += "Run Speed " + AllTrim( Str( ::nSpeed ) ) + Chr( 13 ) + Chr( 10 )
       endif
 
-      for n := 1 to Len( ::aWindows )
-         oWnd := ::aWindows[ n ]
+      for each oWnd in ::aWindows
          cInfo += "Window Size " + AllTrim( Str( oWnd:nBottom - oWnd:nTop + 1 ) ) + " "
          cInfo += AllTrim( Str( oWnd:nRight - oWnd:nLeft + 1 ) ) + Chr( 13 ) + Chr( 10 )
          cInfo += "Window Move " + AllTrim( Str( oWnd:nTop ) ) + " "
@@ -1519,8 +1517,7 @@ METHOD ToggleBreakPoint() CLASS TDebugger
       AAdd( ::aBreakPoints, { ::oBrwText:nRow, ::cPrgName } )     // it was nLine
       ::oBrwText:ToggleBreakPoint(::oBrwText:nRow, .T.)
    else
-      ADel( ::aBreakPoints, nAt )
-      ASize( ::aBreakPoints, Len( ::aBreakPoints ) - 1 )
+      ADel( ::aBreakPoints, nAt, .t. )
       ::oBrwText:ToggleBreakPoint(::oBrwText:nRow, .F.)
    endif
 
@@ -1676,7 +1673,7 @@ static function ValToStr( uVal )
       Case cType  =="B"
          cResult:= "{ || ... }"
 
-      case cType $ "CM"
+      case cType IN "CM"
            cResult := '"' + uVal + '"'
 
       case cType == "L"
@@ -1773,11 +1770,11 @@ function __Dbg()
 return s_oDebugger
 
 static function myColors( oBrowse, aColColors )
-   local i
    local nColPos := oBrowse:colpos
+   local nCol
 
-   for i := 1 to len( aColColors )
-      oBrowse:colpos := aColColors[i]
+   for each nCol in aColColors
+      oBrowse:colpos := nCol
       oBrowse:hilite()
    next
 
@@ -1797,6 +1794,7 @@ static procedure RefreshVarsS( oBrowse )
    endif
    oBrowse:hilite()
    return
+
 static function ArrayBrowseSkip( nPos, oBrwSets,n )
 
    return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;

@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtobj.prg,v 1.12 2001/12/15 11:22:28 vszakats Exp $
+ * $Id: dbgtobj.prg,v 1.1.1.1 2001/12/21 10:43:45 ronpinkas Exp $
  */
 
 /*
@@ -73,19 +73,18 @@ method SetsKeyPressed
 endclass
 
 method new(aArray,pArName) class tdbgObject
-Local nPos
-local aTempvars:=   __objGetValueList(aArray)
-Local aTempMethods:=  __objGetMethodList(aArray)
+Local aTemp
+
 ::pItems:={}
 ::AllNames:={}
-for nPos :=1 to len(aTempvars)
-   aadd(::pItems,{aTempvars[nPos,1],aTempvars[nPos,2]})
-   aadd(::AllNames,aTempvars[nPos,1])
+for each aTemp in __objGetValueList(aArray)
+   aadd(::pItems,{aTemp[1],aTemp[2]})
+   aadd(::AllNames,aTemp[1])
 next
-for nPos :=1 to len(aTempMethods)
-   if !empty(aTempMethods[nPos])
-      aadd(::pItems,{aTempMethods[nPos],"Method"})
-      aadd(::AllNames,aTempMethods[nPos])
+for each aTemp in __objGetMethodList(aArray)
+   if !empty(aTemp)
+      aadd(::pItems,{aTemp,"Method"})
+      aadd(::AllNames,aTemp)
    endif
 next
 ::aWindows:={}
@@ -247,7 +246,7 @@ static function ValToStr( uVal )
       case cType == "A"
            cResult := "{ ... }"
 
-      case cType $ "CM"
+      case cType IN "CM"
            cResult := '"' + uVal + '"'
 
       case cType == "L"
@@ -320,13 +319,13 @@ RETURN nil
 
 static FUNC maxelem( a )
 
-   LOCAL nSize   := LEN( a )
    LOCAL max     := 0
    LOCAL tam     := 0
+   LOCAL elem
    LOCAL nCount
 
-   FOR nCount := 1 TO nSize
-      tam := LEN( a[ nCount ] )
+   for each elem in a
+      tam := LEN( elem )
       max := IF( tam > max, tam, max )
    NEXT
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtmenu.prg,v 1.15 2001/12/15 11:22:28 vszakats Exp $
+ * $Id: dbgtmenu.prg,v 1.1.1.1 2001/12/21 10:43:44 ronpinkas Exp $
  */
 
 /*
@@ -143,29 +143,29 @@ return oMenuItem
 
 METHOD Build() CLASS TDbMenu
 
-   local n, nPos := 0, oMenuItem
+   local nPos := 0, oMenuItem, oItem
 
    if Len( ::aMenus ) == 1           // pulldown menu
-      for n := 1 to Len( ::aItems )
-         ::aItems[ n ]:nRow := 0
-         ::aItems[ n ]:nCol := nPos
-         nPos += Len( StrTran( ::aItems[ n ]:cPrompt, "~", "" ) )
+      for each oItem in ::aItems
+         oItem:nRow := 0
+         oItem:nCol := nPos
+         nPos += Len( StrTran( oItem:cPrompt, "~", "" ) )
       next
    else
       oMenuItem := ATail( ::aMenus[ Len( ::aMenus ) - 1 ]:aItems )
       ::nTop    := oMenuItem:nRow + 1
       ::nLeft   := oMenuItem:nCol
       nPos := ::nLeft
-      for n := 1 to Len( ::aItems )
-         ::aItems[ n ]:nRow := ::nTop + n
-         ::aItems[ n ]:nCol := ::nLeft + 1
-         nPos := Max( nPos, ::nLeft + Len( StrTran( ::aItems[ n ]:cPrompt, "~", "" ) ) + 1 )
+      for each oItem in ::aItems
+         oItem:nRow  := ::nTop + HB_EnumIndex()
+         oItem:nCol := ::nLeft + 1
+         nPos := Max( nPos, ::nLeft + Len( StrTran( oItem:cPrompt, "~", "" ) ) + 1 )
       next
       ::nRight  := nPos + 1
       ::nBottom := ::nTop + Len( ::aItems ) + 1
-      for n := 1 to Len( ::aItems )
-         if ::aItems[ n ]:cPrompt != "-"
-            ::aItems[ n ]:cPrompt := " " + PadR( ::aItems[ n ]:cPrompt, ::nRight - ::nLeft - 1 )
+      for each oItem in ::aItems
+         if oItem:cPrompt != "-"
+            oItem:cPrompt := " " + PadR( oItem:cPrompt, ::nRight - ::nLeft - 1 )
          endif
       next
       ATail( ::aMenus[ Len( ::aMenus ) - 1 ]:aItems ):bAction := ATail( ::aMenus )
@@ -200,7 +200,7 @@ return nil
 
 METHOD Display() CLASS TDbMenu
 
-   local n
+   local oItem
 
    SetColor( ::cClrPopup )
 
@@ -213,12 +213,12 @@ METHOD Display() CLASS TDbMenu
       hb_Shadow( ::nTop, ::nLeft, ::nBottom, ::nRight )
    endif
 
-   for n := 1 to Len( ::aItems )
-      if ::aItems[ n ]:cPrompt == "-"  // Separator
-         DispOutAt( ::aItems[ n ]:nRow, ::nLeft,;
+   for each oItem in ::aItems
+      if oItem:cPrompt == "-"  // Separator
+         DispOutAt( oItem:nRow, ::nLeft,;
             Chr( 195 ) + Replicate( Chr( 196 ), ::nRight - ::nLeft - 1 ) + Chr( 180 ) )
       else
-         ::aItems[ n ]:Display( ::cClrPopup, ::cClrHotKey )
+         oItem:Display( ::cClrPopup, ::cClrHotKey )
       endif
    next
 
@@ -240,12 +240,12 @@ return nil
 
 METHOD GetHotKeyPos( cKey ) CLASS TDbMenu
 
-   local n
+   local oItem
 
-   for n := 1 to Len( ::aItems )
-      if Upper( SubStr( ::aItems[ n ]:cPrompt,;
-         At( "~", ::aItems[ n ]:cPrompt ) + 1, 1 ) ) == cKey
-         return n
+   for each oItem in ::aItems
+      if Upper( SubStr( oItem:cPrompt,;
+         At( "~", oItem:cPrompt ) + 1, 1 ) ) == cKey
+         return HB_EnumIndex()
       endif
    next
 
@@ -253,12 +253,12 @@ return 0
 
 METHOD GetItemOrdByCoors( nRow, nCol ) CLASS TDbMenu
 
-   local n
+   local oItem
 
-   for n := 1 to Len( ::aItems )
-      if ::aItems[ n ]:nRow == nRow .and. nCol >= ::aItems[ n ]:nCol .and. ;
-         nCol <= ::aItems[ n ]:nCol + Len( ::aItems[ n ]:cPrompt ) - 2
-         return n
+   for each oItem in ::aItems
+      if oItem:nRow == nRow .and. nCol >= oItem:nCol .and. ;
+         nCol <= oItem:nCol + Len( oItem:cPrompt ) - 2
+         return HB_EnumIndex()
       endif
    next
 
@@ -339,16 +339,16 @@ return nil
 METHOD LoadColors() CLASS TDbMenu
 
    local aColors := __DbgColors()
-   local n
+   local oItem
 
    ::cClrPopup    := aColors[  8 ]
    ::cClrHotKey   := aColors[  9 ]
    ::cClrHilite   := aColors[ 10 ]
    ::cClrHotFocus := aColors[ 11 ]
 
-   for n := 1 to Len( ::aItems )
-      if ValType( ::aItems[ n ]:bAction ) == "O"
-         ::aItems[ n ]:bAction:LoadColors()
+   for each oItem in ::aItems
+      if ValType( oItem:bAction ) == "O"
+         oItem:bAction:LoadColors()
       endif
    next
 
@@ -356,7 +356,7 @@ return nil
 
 METHOD Refresh() CLASS TDbMenu
 
-   local n
+   local oItem
 
    DispBegin()
 
@@ -365,8 +365,8 @@ METHOD Refresh() CLASS TDbMenu
       SetPos( 0, 0 )
    endif
 
-   for n := 1 to Len( ::aItems )
-      ::aItems[ n ]:Display( ::cClrPopup, ::cClrHotKey )
+   for each oItem in ::aItems
+      oItem:Display( ::cClrPopup, ::cClrHotKey )
    next
 
    DispEnd()
