@@ -27,19 +27,18 @@ GLOBAL EXTERNAL hThisInstance
    DATA yBmpSize
 
    METHOD New( oParent )     INLINE ::Caption := 'SubForm1 from TForm', ;
-                                    ::Editing:=.F.       ,;
-                                    ::aCtrl:={}          ,;
-                                    ::left:=100          ,;
-                                    ::top:=100           ,;
-                                    ::width:=400         ,;
-                                    ::height:=300        ,;
-                                    ::xGrid:=8           ,;
-                                    ::yGrid:=8           ,;
-                                    ::GridColor:=RGB(0,0,0),;
+                                    ::Editing := .F.        ,;
+                                    ::aCtrl   := {}         ,;
+                                    ::left    := 100        ,;
+                                    ::top     := 100        ,;
+                                    ::width   := 400        ,;
+                                    ::height  := 300        ,;
+                                    ::xGrid   := 8          ,;
+                                    ::yGrid   := 8          ,;
+                                    ::GridColor:=RGB(0,0,0) ,;
                                     super:New( oParent )
 
    METHOD Add()
- //  METHOD OnPaint( hDC )     INLINE DrawGrid(hDC, ::width, ::height, ::GridColor, ::xGrid, ::yGrid ), 0
    METHOD OnCreate()         INLINE ::CreateSub()
    METHOD OnSize()
    METHOD OnPaint( hDC ) INLINE ::TileGrid(hDC)
@@ -47,6 +46,8 @@ GLOBAL EXTERNAL hThisInstance
    METHOD OnMenuCommand(oItem)
    METHOD CreateSub()
    METHOD GetUniquePropName()
+   METHOD OnDestroy()
+   METHOD SetGridSize(x,y)
 
  END CLASS
 
@@ -75,6 +76,16 @@ METHOD OnSize(nFlag,Width,Height)
    ENDIF
 
    RETURN(NIL)
+
+//----------------------------------------------------------------------------//
+
+METHOD OnDestroy()
+
+   IF !Empty(::hBmpGrid)
+      DeleteObject(::hBmpGrid)
+   ENDIF
+
+   RETURN(Super:OnDestroy())
 
 //----------------------------------------------------------------------------//
 
@@ -121,15 +132,16 @@ METHOD GetUniquePropName(cName)
 
 //----------------------------------------------------------------------------//
 
-METHOD CreateSub()
-
-   LOCAL oBtn
-   LOCAL xRet
-
+METHOD SetGridSize(x,y)
 
    LOCAL xSize
    LOCAL ySize
-   LOCAL cBits := MakeGridTile(::xGrid,::yGrid,@xSize,@ySize)
+   LOCAL cBits
+
+   ::xGrid:=IFNIL( x, ::xGrid, x )
+   ::yGrid:=IFNIL( y, ::yGrid, y )
+
+   cBits:= MakeGridTile(::xGrid,::yGrid,@xSize,@ySize)
 
    IF !Empty(::hBmpGrid)
       DeleteObject(::hBmpGrid)
@@ -137,6 +149,17 @@ METHOD CreateSub()
    ::hBmpGrid  := CreateBitmap( @xSize, ySize, 1, 1, cBits )
    ::xBmpSize:=xSize
    ::yBmpSize:=ySize
+
+   RETURN(NIL)
+
+//----------------------------------------------------------------------------//
+
+METHOD CreateSub()
+
+   LOCAL oBtn
+   LOCAL xRet
+
+   ::SetGridSize()
 
    ::WindowMenu := TMenu():New()
 
@@ -147,10 +170,7 @@ METHOD CreateSub()
       
    ::SetWindowMenu()
 
-
    xRet := super:OnCreate()
-
-
 
    ::oMask:=oCtrlMask():New( self )
    ::oMask:Create()
@@ -160,64 +180,9 @@ METHOD CreateSub()
 
    RETURN( xRet )
 
-
-//----------------------------------------------------------------------------//
-
-// Delphi grid max: 128
-// make the tile as close to 200x200 as possible
-
-FUNCTION MakeGridTile(nxGrid,nyGrid,width,height)
-
-   LOCAL nWidth   := 200-200%nxGrid
-   LOCAl nHeight  := 200-200%nyGrid
-   LOCAL cBits    := ""
-   LOCAL nByte    := 1
-   LOCAL nVal     := 0
-   LOCAL cDotted
-   LOCAL cEmpty
-   LOCAL nBits
-   LOCAL nPos
-   LOCAL i
-
-   width  := nWidth  // actual bitmap x size
-   height := nHeight // actual bitmap y size
-
-   nWidth:=ceiling(nWidth/8) // convert to bytes
-   nWidth := If( nWidth%2==0, nWidth, nWidth+1 ) // align on word
-
-   cDotted  := Replicate(chr(255),nWidth)
-   cEmpty   := cDotted
-
-   nBits    := (8* nWidth) -1 // -1 for the counter
-
-   FOR i:=0 TO nBits STEP nxGrid
-      IF i >= nByte*8 // next byte
-         cDotted[nByte]:=255-nVal
-         nVal:=2^((i%8)+1)
-         nByte:=Int(i/8)+1
-      ELSE
-         nVal+=2^((i%8)+1)
-      ENDIF
-   NEXT
-   cDotted[nByte]:=255-nVal
-
-   nHeight--
-   FOR i:=0 TO nHeight
-      IF i % nyGrid == 0
-         cBits += cDotted
-      ELSE
-         cBits += cEmpty
-      ENDIF
-   NEXT
-
-   RETURN(cBits)
-
-
 *------------------------------------------------------------------------------
 
-
-
-METHOD TileGrid(hDC) //, ::width, ::height, ::GridColor ), 0
+METHOD TileGrid(hDC)
 
    LOCAL hMemDC := CreateCompatibleDC(hDC)
    LOCAL i:=0
@@ -228,7 +193,7 @@ METHOD TileGrid(hDC) //, ::width, ::height, ::GridColor ), 0
    DO WHILE j < ::Height
       i:=0
       DO WHILE i < ::Width
-         BitBlt(hDC,i,j,::xBmpSize,::yBmpSize, hMemDC, 0, 0, SRCAND)
+         BitBlt( hDC, i, j, ::xBmpSize,::yBmpSize, hMemDC, 0, 0, SRCAND )
          i+=::xBmpSize
       ENDDO
       j+=::yBmpSize
@@ -238,6 +203,57 @@ METHOD TileGrid(hDC) //, ::width, ::height, ::GridColor ), 0
    DeleteDC(hMemDC)
 
    RETURN(0)
+
+
+//----------------------------------------------------------------------------//
+
+// make the tile as close to 256x256 as possible for speed
+// Maximum grid size 256x256 !
+// Mininimu 2x2
+
+FUNCTION MakeGridTile(nxGrid,nyGrid,width,height)
+
+   LOCAL nWidth   := 256 - 256 % nxGrid
+   LOCAL nHeight  := 256 - 256 % nyGrid
+   LOCAL cBits    := ""
+   LOCAL nByte    := 1
+   LOCAL nVal     := 0
+   LOCAL cDotted
+   LOCAL cEmpty
+   LOCAL nBits
+   LOCAL nPos
+   LOCAL i
+
+   width   := nWidth                              // actual bitmap x size
+   height  := nHeight                             // actual bitmap y size
+   nWidth  := Ceiling(nWidth/8)                     // convert to bytes
+   nWidth  := If( nWidth%2==0, nWidth, nWidth+1 ) // align on word
+   cDotted := Replicate(chr(255),nWidth)
+   cEmpty  := cDotted
+   nBits   := (8* nWidth) -1                    // -1 for the counter
+
+   FOR i:=0 TO nBits STEP nxGrid
+      IF i >= nByte*8                            // next byte
+         cDotted[nByte]:=255-nVal
+         nVal:=2^(7-(i%8))
+         nByte:=Int(i/8)+1
+      ELSE
+         nVal+=2^(7-(i%8))
+      ENDIF
+   NEXT
+   cDotted[nByte] := 255-nVal
+
+   nHeight--
+   FOR i:= 0 TO nHeight
+      IF i % nyGrid == 0
+         cBits += cDotted
+      ELSE
+         cBits += cEmpty
+      ENDIF
+   NEXT
+
+   RETURN(cBits)
+
 
 /*
 
