@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.99 2004/04/28 22:52:06 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.100 2004/04/30 16:11:04 ronpinkas Exp $
  */
 
 /*
@@ -991,6 +991,7 @@ PHB_ITEM hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
 
    pItem->type = HB_IT_POINTER;
    pItem->item.asPointer.value = pValue;
+   pItem->item.asPointer.collect = FALSE;
 
    return pItem;
 }

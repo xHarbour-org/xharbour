@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.385 2004/04/28 18:31:22 druzus Exp $
+ * $Id: hvm.c,v 1.386 2004/04/30 19:42:23 druzus Exp $
  */
 
 /*
@@ -4002,6 +4002,7 @@ static void hb_vmFuncPtr( void )  /* pushes a function address pointer. Removes 
    if( HB_IS_SYMBOL( pItem ) )
    {
       pItem->item.asPointer.value = (void *) pItem->item.asSymbol.value->value.pFunPtr;
+      pItem->item.asPointer.collect = FALSE;
       pItem->type = HB_IT_POINTER;
    }
    else
@@ -6564,6 +6565,8 @@ HB_EXPORT void hb_vmPushPointer( void * pPointer )
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_POINTER;
    ( * HB_VM_STACK.pPos )->item.asPointer.value = pPointer;
+   ( * HB_VM_STACK.pPos )->item.asPointer.collect = FALSE;
+
    hb_stackPush();
 }
 

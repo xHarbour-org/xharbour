@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.125 2004/04/28 18:27:49 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.126 2004/04/30 15:24:52 lf_sfnet Exp $
  */
 
 /*
@@ -55,13 +55,9 @@
  */
 
 #define HB_CDX_CLIP_AUTOPEN
-#ifdef HB_THREAD_SUPPORT
+//#if defined( HB_THREAD_SUPPORT ) || defined( __WATCOMC__ )
 #define HB_CDX_THREAD_SORT
-#endif
-
-#ifdef __WATCOMC__
-#define HB_CDX_THREAD_SORT
-#endif
+//#endif
 
 #define HB_CDX_DBGCODE
 //#define HB_CDX_DBGCODE_EXT
@@ -367,6 +363,7 @@ static CDXDBGTIME cdxTimeIntBlc = 0;
 static CDXDBGTIME cdxTimeExtBlc = 0;
 static CDXDBGTIME cdxTimeGetKey = 0;
 static CDXDBGTIME cdxTimeFreeKey = 0;
+static CDXDBGTIME cdxTimeIdxBld = 0;
 
 static CDXDBGTIME hb_cdxGetTime()
 {
@@ -5685,12 +5682,14 @@ static ERRCODE hb_cdxClose( CDXAREAP pArea )
    printf( "\r\ncdxTimeIntBld=%f, cdxTimeExtBld=%f, cdxTimeBld=%f\r\n"
            "cdxTimeGetKey=%f, cdxTimeFreeKey=%f\r\n"
            "cdxTimeExtBlc=%f, cdxTimeIntBlc=%f\r\n"
+           "cdxTimeIdxBld=%f\r\n"
            "cdxTimeTotal=%f\r\n",
            (double) cdxTimeIntBld / 1000000, (double) cdxTimeExtBld / 1000000,
            (double) ( cdxTimeIntBld + cdxTimeExtBld ) / 1000000,
            (double) cdxTimeGetKey / 1000000, (double) cdxTimeFreeKey / 1000000,
            (double) cdxTimeIntBlc / 1000000, (double) cdxTimeExtBlc / 1000000,
-           (double) ( cdxTimeIntBld + cdxTimeExtBld +
+	   (double) cdxTimeIdxBld / 1000000,
+           (double) ( cdxTimeIntBld + cdxTimeExtBld + cdxTimeIdxBld +
                       cdxTimeGetKey + cdxTimeFreeKey +
                       cdxTimeExtBlc + cdxTimeIntBlc ) / 1000000 );
    fflush(stdout);
@@ -7001,8 +7000,14 @@ static void hb_cdxSortSortPage( LPCDXSORTINFO pSort )
     * similar results on Linux. I'm interesting in test results on other
     * platforms.
     */
+#ifdef HB_CDX_DBGTIME
+   cdxTimeIdxBld -= hb_cdxGetTime();
+#endif
    s_cdxSort = pSort;
    qsort( pSort->pKeyPool, pSort->ulKeys, pSort->keyLen + 4, hb_cdxSortCompare );
+#ifdef HB_CDX_DBGTIME
+   cdxTimeIdxBld += hb_cdxGetTime();
+#endif
 }
 
 #else
@@ -7021,6 +7026,50 @@ static int hb_cdxQuickSortCompare( LPCDXSORTINFO pSort, BYTE * pKey1, BYTE * pKe
    return i;
 }
 
+static void hb_cdxQSort( LPCDXSORTINFO pSort, BYTE * pSrc, BYTE * pBuf, LONG lKeys )
+{
+   if ( lKeys > 1 )
+   {
+      int iLen = pSort->keyLen + 4;
+      LONG l1, l2;
+      BYTE * pPtr1, * pPtr2, *pDst;
+
+      l1 = lKeys >> 1;
+      l2 = lKeys - l1;
+      pPtr1 = &pSrc[ 0 ];
+      pPtr2 = &pSrc[ l1 * iLen ];
+      hb_cdxQSort( pSort, pPtr1, &pBuf[ 0 ], l1 );
+      hb_cdxQSort( pSort, pPtr2, &pBuf[ l1 * iLen ], l2 );
+      pDst = pBuf;
+      while ( l1 > 0 && l2 > 0 )
+      {
+         if ( hb_cdxQuickSortCompare( pSort, pPtr1, pPtr2 ) < 0 )
+         {
+            memcpy( pDst, pPtr1, iLen );
+            pPtr1 += iLen;
+            l1--;
+         }
+         else
+         {
+            memcpy( pDst, pPtr2, iLen );
+            pPtr2 += iLen;
+            l2--;
+         }
+         pDst += iLen;
+      }
+      if ( l1 > 0 )
+      {
+         memcpy( pDst, pPtr1, iLen * l1 );
+      }
+      else if ( l2 > 0 )
+      {
+         memcpy( pDst, pPtr2, iLen * l2 );
+      }
+      memcpy( pSrc, pBuf, iLen * lKeys );
+   }
+}
+
+#if 0
 static LONG hb_cdxQuickSortSegment( LPCDXSORTINFO pSort, LONG lFrom, LONG lTo )
 {
    LONG i, j, m;
@@ -7128,10 +7177,18 @@ static void hb_cdxQuickSort( LPCDXSORTINFO pSort, LONG lFrom, LONG lTo )
       }
    }
 }
+#endif
 
 static void hb_cdxSortSortPage( LPCDXSORTINFO pSort )
 {
-   hb_cdxQuickSort( pSort, 0, pSort->ulKeys - 1 );
+#ifdef HB_CDX_DBGTIME
+   cdxTimeIdxBld -= hb_cdxGetTime();
+#endif
+   //hb_cdxQuickSort( pSort, 0, pSort->ulKeys - 1 );
+   hb_cdxQSort( pSort, pSort->pKeyPool, &pSort->pKeyPool[ pSort->ulKeys * ( pSort->keyLen + 4 ) ], pSort->ulKeys );
+#ifdef HB_CDX_DBGTIME
+   cdxTimeIdxBld += hb_cdxGetTime();
+#endif
 }
 
 #endif
@@ -7322,7 +7379,7 @@ static void hb_cdxSortKeyAdd( LPCDXSORTINFO pSort, ULONG ulRec, BYTE * pKeyVal, 
    int iLen = pSort->keyLen;
    BYTE *pDst;
 
-   if ( pSort->ulKeys >= pSort->ulMaxKey )
+   if ( pSort->ulKeys >= pSort->ulPgKeys )
    {
       hb_cdxSortWritePage( pSort );
    }
@@ -7352,8 +7409,8 @@ static LPCDXSORTINFO hb_cdxSortNew( LPCDXTAG pTag, ULONG ulRecCount )
 
    pSort = ( LPCDXSORTINFO ) hb_xgrab( sizeof( CDXSORTINFO ) );
    memset( pSort, 0, sizeof( CDXSORTINFO ) );
-   ulMax = ( 1L << 30 ) / ( iLen + 4 );
-   //ulMax = ( 1L << 15 ) / ( iLen + 4 );
+   //ulMax = ( 1L << 30 ) / ( iLen + 4 );
+   ulMax = ( 1L << 21 ) / ( iLen + 4 );
    if ( ulMax > ulRecCount )
    {
       ulMax = ulRecCount;
@@ -7362,11 +7419,11 @@ static LPCDXSORTINFO hb_cdxSortNew( LPCDXTAG pTag, ULONG ulRecCount )
    do
    {
       ulSize = ulMax * ( iLen + 4 );
-      pBuf = ( BYTE * ) hb_xalloc( ulSize << 1 );
+      pBuf = ( BYTE * ) hb_xalloc( ulSize << 2 );
       if ( pBuf )
       {
          hb_xfree( pBuf );
-         pBuf = ( BYTE * ) hb_xalloc( ulSize );
+         pBuf = ( BYTE * ) hb_xalloc( ulSize << 1 );
       }
       else
       {
@@ -7380,10 +7437,11 @@ static LPCDXSORTINFO hb_cdxSortNew( LPCDXTAG pTag, ULONG ulRecCount )
    pSort->keyLen = iLen;
    pSort->bTrl = pTag->uiType == 'C' ? ' ' : '\0';
    pSort->fUnique = pTag->UniqueKey;
-   pSort->ulPages = ( ulRecCount + ulMax - 1 ) / ulMax;
-   pSort->ulMaxKey = ulMax;
+   pSort->ulMaxKey = ulMax << 1;
+   pSort->ulPgKeys = ulMax;
    pSort->ulMaxRec = ulRecCount;
    pSort->pKeyPool = pBuf;
+   pSort->ulPages = ( ulRecCount + pSort->ulPgKeys - 1 ) / pSort->ulPgKeys;
    pSort->pSwapPage = ( LPCDXSWAPPAGE ) hb_xgrab( sizeof( CDXSWAPPAGE ) * pSort->ulPages );
    memset( pSort->pSwapPage, 0, sizeof( CDXSWAPPAGE ) * pSort->ulPages );
 
@@ -7509,7 +7567,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
    BYTE cTemp[8];
    LPCDXAREA pArea = pTag->pIndex->pArea;
    LONG lStep = 0;
-   BOOL bDirectRead, bEnd;
+   BOOL bDirectRead;
    PHB_ITEM pForItem, pWhileItem, pEvalItem;
 #ifndef HB_CDP_SUPPORT_OFF
    /* TODO: this hack is not thread safe, s_cdpage has to be thread specific */
@@ -7523,9 +7581,13 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
    }
    else
    {
-      BOOL bSaveDeleted = hb_set.HB_SET_DELETED;
+      BOOL bSaveDeleted = hb_set.HB_SET_DELETED, fSaveRecDeleted = pArea->fDeleted;
       PHB_ITEM pSaveFilter = pArea->dbfi.itmCobExpr;
       USHORT uiSaveTag = pArea->uiTag;
+      ULONG ulSaveRecNo = pArea->ulRecNo, ulStartRec = 0;
+      BYTE * pRecBuff = NULL, * pSaveRecBuff = pArea->pRecord;
+      int iRecBuff = 0, iRecBufSize = 0xffff / pArea->uiRecordLen;
+
       hb_set.HB_SET_DELETED = FALSE;
       pArea->dbfi.itmCobExpr = NULL;
 
@@ -7536,55 +7598,89 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
       bForOk = TRUE;
       pEvalItem = ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->itmCobEval : NULL);
       pWhileItem = ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->itmCobWhile : NULL);
-      bEnd = FALSE;
-      bDirectRead = !hb_set.HB_SET_STRICTREAD && !pArea->lpdbRelations &&
-                    ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll );
-      if ( !bDirectRead )
+
+      if ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll )
       {
-         if ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll )
+         pArea->uiTag = 0;
+      }
+      else if ( pArea->lpdbOrdCondInfo->lRecno )
+      {
+         ulStartRec = ulRecCount = pArea->lpdbOrdCondInfo->lRecno;
+      }
+      else if ( pArea->lpdbOrdCondInfo->fUseCurrent )
+      {
+         if ( pArea->lpdbOrdCondInfo->lStartRecno )
          {
-            pArea->uiTag = 0;
-            SELF_GOTOP( ( AREAP ) pArea );
+            ulStartRec = pArea->lpdbOrdCondInfo->lStartRecno;
          }
-         else if ( pArea->lpdbOrdCondInfo->lRecno )
+      }
+      else if ( pArea->lpdbOrdCondInfo->fRest || pArea->lpdbOrdCondInfo->lNextCount )
+      {
+         if ( pArea->lpdbOrdCondInfo->lStartRecno )
          {
-            SELF_GOTO( ( AREAP ) pArea, pArea->lpdbOrdCondInfo->lRecno );
-            bEnd = TRUE;
-         }
-         else if ( pArea->lpdbOrdCondInfo->fUseCurrent )
-         {
-            if ( pArea->lpdbOrdCondInfo->lStartRecno )
-            {
-               SELF_GOTO( ( AREAP ) pArea, pArea->lpdbOrdCondInfo->lStartRecno );
-            }
-            else
-            {
-               SELF_GOTOP( ( AREAP ) pArea );
-            }
-         }
-         else if ( pArea->lpdbOrdCondInfo->fRest || pArea->lpdbOrdCondInfo->lNextCount )
-         {
-            if ( pArea->lpdbOrdCondInfo->lStartRecno )
-            {
-               SELF_GOTO( ( AREAP ) pArea, pArea->lpdbOrdCondInfo->lStartRecno );
-            }
+            ulStartRec = pArea->lpdbOrdCondInfo->lStartRecno;
          }
          else
          {
-            pArea->uiTag = 0;
-            SELF_GOTOP( ( AREAP ) pArea );
+            ulStartRec = pArea->ulRecNo;
+         }
+         if ( pArea->lpdbOrdCondInfo->lNextCount > 0 )
+         {
+            ulRecCount = ulStartRec + pArea->lpdbOrdCondInfo->lNextCount - 1;
          }
       }
-      for ( ulRecNo = 1; ulRecNo <= ulRecCount; ulRecNo++ )
+      else
+      {
+         pArea->uiTag = 0;
+      }
+
+      bDirectRead = !hb_set.HB_SET_STRICTREAD && !pArea->lpdbRelations &&
+                    ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll ||
+                      pArea->uiTag == 0 );
+
+      if ( bDirectRead )
+      {
+         pRecBuff = (BYTE *) hb_xgrab( pArea->uiRecordLen * iRecBufSize );
+         if ( ulStartRec == 0 )
+         {
+            ulStartRec = 1;
+         }
+      }
+      else
+      {
+         if ( ulStartRec == 0 )
+         {
+            SELF_GOTOP( ( AREAP ) pArea );
+         }
+         else
+         {
+            SELF_GOTO( ( AREAP ) pArea, ulStartRec );
+         }
+         ulStartRec = 1;
+      }
+
+      for ( ulRecNo = ulStartRec; ulRecNo <= ulRecCount; ulRecNo++ )
       {
          if ( bDirectRead )
          {
-            hb_fsSeek( pArea->hDataFile,
-                       pArea->uiHeaderLen + ( ulRecNo - 1 ) * pArea->uiRecordLen,
-                       FS_SET );
-            hb_fsRead( pArea->hDataFile, pArea->pRecord, pArea->uiRecordLen );
+            if ( iRecBuff == 0 || iRecBuff > iRecBufSize )
+            {
+               int iRec;
+               if ( ulRecCount - ulRecNo >= (ULONG) iRecBufSize )
+                  iRec = iRecBufSize;
+               else
+                  iRec = ulRecCount - ulRecNo + 1;
+
+               hb_fsSeek( pArea->hDataFile,
+                          pArea->uiHeaderLen + ( ulRecNo - 1 ) * pArea->uiRecordLen,
+                          FS_SET );
+               hb_fsReadLarge( pArea->hDataFile, pRecBuff, pArea->uiRecordLen * iRec );
+               iRecBuff = 0;
+            }
+            pArea->pRecord = pRecBuff + iRecBuff * pArea->uiRecordLen;
             pArea->ulRecNo = ulRecNo;
             pArea->fDeleted = ( pArea->pRecord[ 0 ] == '*' );
+            iRecBuff++;
          }
          else if ( pWhileItem && !hb_cdxEvalCond ( NULL, pWhileItem, FALSE ) )
             break;
@@ -7665,16 +7761,14 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                   break;
             }
          }
+         if ( pArea->lpdbOrdCondInfo && pArea->lpdbOrdCondInfo->lNextCount > 0 )
+         {
+            pArea->lpdbOrdCondInfo->lNextCount--;
+            if ( pArea->lpdbOrdCondInfo->lNextCount <= 0 )
+               break;
+         }
          if ( !bDirectRead )
          {
-            if ( bEnd )
-               break;
-            if ( pArea->lpdbOrdCondInfo && pArea->lpdbOrdCondInfo->lNextCount > 0 )
-            {
-               pArea->lpdbOrdCondInfo->lNextCount--;
-               if ( pArea->lpdbOrdCondInfo->lNextCount <= 0 )
-                  break;
-            }
             SELF_SKIP( ( AREAP ) pArea, 1 );
             if ( pArea->fEof )
                break;
@@ -7690,6 +7784,13 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
       }
       hb_itemRelease( pItem );
 
+      if ( bDirectRead )
+      {
+         pArea->pRecord = pSaveRecBuff;
+         pArea->ulRecNo = ulSaveRecNo;
+         pArea->fDeleted = fSaveRecDeleted;
+         hb_xfree( pRecBuff );
+      }
       hb_set.HB_SET_DELETED = bSaveDeleted;
       pArea->dbfi.itmCobExpr = pSaveFilter;
       pArea->uiTag = uiSaveTag;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2858 2004/04/30 19:42:20 druzus Exp $
+ * $Id: ChangeLog,v 1.2859 2004/05/01 04:00:37 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-02 12:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    + added buffered read when SET STRICTREAD is OFF and index is not
+      subindex
+    * the sort algorithm changed (QUICK SORT is nice but it depends
+      data order and the cost could be random - current version has
+      static cost and works faster then in optimistic
+      situation quick sort - the trick is done using second memory
+      buffer.
+    * reduced maximum buffer size to 2MB - the tests shows it's quite
+      enough.
+
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/itemapi.c
+    ! fixed bug with uninitialized item.asPointer.collect in
+      HB_IT_POINTER item
 
 2004-05-01 01:00 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * dll_b32.bat
