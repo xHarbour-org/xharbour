@@ -122,22 +122,6 @@ HB_FUNC( MEMOLINE )
          {
             if( ulLastSpace == 0 || ulLastSpace == ulCurLength )
             {
-               ///////////  Pritpal - 20 Apr 2004
-               // Clipper returns the memoline without the preceeding space it the line has wrapped
-               // at that character.
-               // "A lazy fox jumped over the bush"
-               //                  .                    // If word wrap occurs here
-               //
-               // Clipper  -> "over the bush    "
-               // xHarbour -> " over the bush   "
-               //
-               //////////
-               if ( ulLastSpace == ulCurLength )
-               {
-                  ulPos++;
-               }
-               ///////////
-
                ulCurLength = 1;
                ulLineEnd   = ulPos - 1;
             }
@@ -199,7 +183,6 @@ HB_FUNC( MEMOLINE )
       hb_retc( "" );
    }
 }
-
 
 #ifndef HB_C52_STRICT
 
@@ -267,6 +250,22 @@ HB_FUNC( MEMOLINELONG )
          {
             if( ulLastSpace == 0 || ulLastSpace == ulCurLength )
             {
+               ///////////  Pritpal - 20 Apr 2004
+               // Clipper returns the memoline without the preceeding space it the line has wrapped
+               // at that character.
+               // "A lazy fox jumped over the bush"
+               //                  .                    // If word wrap occurs here
+               //
+               // Clipper  -> "over the bush    "
+               // xHarbour -> " over the bush   "
+               //
+               //////////
+               if ( ulLastSpace == ulCurLength )
+               {
+                  ulPos++;
+               }
+               ///////////
+
                ulCurLength = 1;
                ulLineEnd   = ulPos - 1;
             }
@@ -330,4 +329,3 @@ HB_FUNC( MEMOLINELONG )
 }
 
 #endif
-
