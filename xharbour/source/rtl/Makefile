@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.41 2003/11/10 00:59:32 fsgiudice Exp $
+# $Id: Makefile,v 1.42 2003/11/24 15:15:25 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -35,6 +35,7 @@ C_SOURCES=\
         file.c       \
         filehb.c     \
         filesys.c    \
+        readline.c   \
         fkmax.c      \
         fnsplit.c    \
         fssize.c     \

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1833 2003/12/07 13:34:59 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1834 2003/12/07 19:36:17 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-07 23:30 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  + source/rtl/readline.c
+    + Added Text file reading functions
+  * source/rtl/Makefile
+  * makefile.bc
+    + Compile new file readline.c
+  + tests/rline1.prg
+    + Small sample to new readline() function
 
 2003-12-07 20:15 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/contrib/mysql/Makefile
@@ -137,7 +146,7 @@
 
   * tests/mtstress.prg
     * Nicer visualization of "mute" (maximum contention) tests.
-    
+
 
 2003-12-05 03:30 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/rtl/gtnul/gtnul.c
