@@ -1,5 +1,5 @@
 /*
- * $Id: filehb.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: filehb.c,v 1.3 2002/03/16 00:34:13 ronpinkas Exp $
  */
 
 /*
@@ -58,5 +58,7 @@
 
 HB_FUNC( FILE )
 {
-   hb_retl( ISCHAR( 1 ) ? hb_spFile( ( BYTE * ) hb_parc( 1 ), NULL ) : FALSE );
+   PHB_ITEM pFile = hb_param( 1, HB_IT_STRING );
+
+   hb_retl( ( pFile && pFile->item.asString.length < _POSIX_PATH_MAX ) ? hb_spFile( ( BYTE * ) pFile->item.asString.value, NULL ) : FALSE );
 }
