@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.3 2004/10/23 21:52:15 ronpinkas Exp $
+ * $Id: calconst.c,v 1.4 2004/10/26 00:38:46 ronpinkas Exp $
  */
 
 /*
@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 typedef struct tagBIOP
 {
@@ -290,6 +291,36 @@ char * NextTokenInConstant( char **pExp )
       sToken[1] = '\0';
 
       (*pExp)++;
+   }
+   else if( (*pExp)[0] == '.' && toupper( (*pExp)[1] ) == 'A' && toupper( (*pExp)[2] ) == 'N' && toupper( (*pExp)[3] ) == 'D' && toupper( (*pExp)[4] ) == '.' )
+   {
+      sToken[0] = '&';
+      sToken[1] = '&';
+      sToken[2] = '\0';
+
+      (*pExp) += 5;
+   }
+   else if( (*pExp)[0] == '.' && toupper( (*pExp)[1] ) == 'O' && toupper( (*pExp)[2] ) == 'R' && toupper( (*pExp)[3] ) == '.' )
+   {
+      sToken[0] = '|';
+      sToken[1] = '|';
+      sToken[2] = '\0';
+
+      (*pExp) += 4;
+   }
+   else if( (*pExp)[0] == '.' && toupper( (*pExp)[1] ) == 'T' && toupper( (*pExp)[2] ) == '.' )
+   {
+      sToken[0] = '1';
+      sToken[1] = '\0';
+
+      (*pExp) += 3;
+   }
+   else if( (*pExp)[0] == '.' && toupper( (*pExp)[1] ) == 'F' && toupper( (*pExp)[2] ) == '.' )
+   {
+      sToken[0] = '0';
+      sToken[1] = '\0';
+
+      (*pExp) += 3;
    }
    else if( isdigit( (*pExp)[0] ) )
    {

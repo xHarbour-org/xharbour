@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3549 2004/10/27 06:21:47 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3550 2004/10/27 09:37:43 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-27 09:53 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbclass.ch
+    + Added support for INLINE METHOD <Method>[()] (with no parameters).
+
+  * source/compiler/calconst.c
+    + Added support for .AND., .OR., .T., and .F.
 
 2004-10-25 16:35 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   + contrib/gtwvw/doc
