@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2628 2004/03/22 17:50:15 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.2629 2004/03/22 17:58:27 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2004-03-23 06:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/genc.c
+    ! fix to support prg file names containing: !$%')-@{} (Clipper compatible)
+      Example: hello!.prg, hello$.prg, hello%.prg, hello'.prg and so forth.
 
 2004-03-22 19:08 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
   * config/os2/global.cf

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.64 2004/02/07 03:07:15 andijahja Exp $
+ * $Id: genc.c,v 1.65 2004/02/17 18:52:11 andijahja Exp $
  */
 
 /*
@@ -149,9 +149,26 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
 
    hb_strupr( hb_comp_FileAsSymbol );
 
-   while( ( pTmp = strchr( hb_comp_FileAsSymbol, ' ' ) ) != NULL )
    {
-      *pTmp = '_';
+       int iTmp = strlen(hb_comp_FileAsSymbol);
+       int iCh;
+
+       for ( iCh = 0; iCh < iTmp; iCh ++ )
+       {
+          if ( ( hb_comp_FileAsSymbol[ iCh ] == '!' ) ||
+               ( hb_comp_FileAsSymbol[ iCh ] == '$' ) ||
+               ( hb_comp_FileAsSymbol[ iCh ] == '%' ) ||
+               ( hb_comp_FileAsSymbol[ iCh ] == '\'') ||
+               ( hb_comp_FileAsSymbol[ iCh ] == ')' ) ||
+               ( hb_comp_FileAsSymbol[ iCh ] == ' ' ) ||
+               ( hb_comp_FileAsSymbol[ iCh ] == '-' ) ||
+               ( hb_comp_FileAsSymbol[ iCh ] == '@' ) ||
+               ( hb_comp_FileAsSymbol[ iCh ] == '{' ) ||
+               ( hb_comp_FileAsSymbol[ iCh ] == '}' ) )
+          {
+               hb_comp_FileAsSymbol[ iCh ] = '_';
+          }
+       }
    }
 
    fprintf( yyc, "/*\n * xHarbour Compiler, build %d.%d (%s)\n", HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
