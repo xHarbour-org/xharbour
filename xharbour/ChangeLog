@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3834 2005/02/17 12:22:25 andijahja Exp $
+ * $Id: ChangeLog,v 1.3835 2005/02/17 19:14:12 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-17 20:45 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/w32/global.cf
+    * hacked to work from cmd.exe/command.com when GNU make detects
+      shell like environment - I do not know how to disable this
+      make feature - it was modified and the documentation not updated.
+
+  * xharbour/config/w32/xcc.cf
+    * small modification for command.com
 
 2005-02-16 11:15 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/teditor.prg

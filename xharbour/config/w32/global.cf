@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.14 2005/01/11 23:53:42 likewolf Exp $
+# $Id: global.cf,v 1.15 2005/02/11 18:58:35 druzus Exp $
 #
 
 ifndef MK
@@ -19,11 +19,6 @@ HB_GT_LIBS=\
 ifeq ($(HB_GT_LIB),)
    HB_GT_LIB = gtwin
 endif
-ifeq ($(SHLVL),)
-ifeq ($(SHELL),/bin/sh.exe)
-SHLVL=1
-endif
-endif
 
 
 ifeq ($(SHLVL),) # COMMAND.COM
@@ -42,25 +37,59 @@ ifeq ($(COMSPEC),) #location of command.com
     COMSPEC := command.com
   endif
 endif
+ifeq ($(findstring cmd.exe,$(COMSPEC)),cmd.exe)
+  CMD_EXE := yes
+endif
+
+ifeq ($(CMD_EXE),yes)
+else
+RM = del
+RD = rmdir
+MD = md
+CP = copy
+MV = move
+endif
+
+ifeq ($(CMD_EXE),yes)
+
+RM = del /q /f
+RD = rmdir /q /s
+MD = md
+CP = copy
+MV = move
+
+dirbase::
+	-@$(COMSPEC) /c \
+	'for %d in ($(HB_ARCHITECTURE) $(ARCH_DOS)) do if not exist %d\. $(MD) %d'
+
+dirbase_mt::
+	-@$(COMSPEC) /c \
+	'for %d in ($(HB_ARCHITECTURE) $(ARCH_DOS)_mt) do if not exist %d\. $(MD) %d'
+
+clean::
+	-@$(COMSPEC) /c \
+	'if exist $(ARCH_DOS) $(RD) $(ARCH_DOS) && \
+	if exist $(ARCH_DOS)_mt $(RD) $(ARCH_DOS)_mt'
+
+else # COMMAND.COM
 
 RM = del
 RD = rmdir
+MD = md
 CP = copy
 MV = move
-MD = md
-
-#this will be used only under MINGW
-RANLIB = $(CCPREFIX)ranlib
 
 dirbase::
-	-@for %%d in ($(HB_ARCHITECTURE) $(ARCH_DOS)) do if not exist %%d\. $(MD) %%d
+	-@for %%d in ($(HB_ARCHITECTURE) $(ARCH_DOS)) do if not exist %%d\nul $(MD) %%d
 
 dirbase_mt::
-	-@for %%d in ($(HB_ARCHITECTURE) $(ARCH_DOS)_mt) do if not exist %%d\. $(MD) %%d
+	-@for %%d in ($(HB_ARCHITECTURE) $(ARCH_DOS)_mt) do if not exist %%d\nul $(MD) %%d
 
 clean::
-	-@for %%f in ($(ARCH_DOS)\*.* $(ARCH_DOS)_mt\*.* *.bak *.obj *.o *.tds) do $(RM) %%f
-	-@for %%d in ($(ARCH_DOS) $(ARCH_DOS)_mt $(HB_ARCHITECTURE)) do if exist %%d\. $(RD) %%d
+	-@for %%f in ($(ARCH_DOS)\x $(ARCH_DOS)\*.* $(ARCH_DOS)_mt\*.* *.bak *.obj *.o *.tds) do if exist %%f $(RM) %%f
+	-@for %%d in ($(ARCH_DOS) $(ARCH_DOS)_mt) do if exist %%d\nul $(RD) %%d
+
+endif
 
 else  # bash
 
@@ -71,7 +100,7 @@ RM = rm -f
 RD = rm -f -r
 CP = cp -f
 MV = mv -f
-MD = mkdir
+MD = mkdir -p
 
 #this will be used only under MINGW
 RANLIB = $(CCPREFIX)ranlib
@@ -90,3 +119,6 @@ clean::
 
 endif
 endif
+
+#this will be used only under MINGW
+RANLIB = $(CCPREFIX)ranlib
