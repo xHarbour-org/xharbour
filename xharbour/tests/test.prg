@@ -1,17 +1,11 @@
 //
-// $Id: test.prg,v 1.1.1.1 2001/12/21 10:46:29 ronpinkas Exp $
+// $Id: test.prg,v 1.2 2003/02/04 23:43:44 ronpinkas Exp $
 //
 
 //
 
-procedure main()
+PROCEDURE Main()
 
-   local s := " " + chr(0) + "  mab  " + chr(0) + " "
+   ? "Hello World"
 
-   QOut( s )
-
-   qout( '"' + ltrim(s) + '"' )
-   qout( '"' + rtrim(s) + '"' )
-   qout( '"' + alltrim(s) + '"' )
-
-return
+RETURN

@@ -1,44 +1,41 @@
 //
-// $Id: fib.prg,v 1.1 1999/10/04 18:46:28 vszel Exp $
+// $Id: fib.prg,v 1.1.1.1 2001/12/21 10:45:46 ronpinkas Exp $
 //
 
-Function Main()
-Local n
+PROCEDURE Main( cNumber )
+  Local n
 
-  For n := 1 To 20
-     QOut( FibR( n ) )
-     QOut( FibI( n ) )
-  Next
+  IF cNumber == NIL
+    n := 10
+  ELSE
+    n := Val( cNumber )
+  ENDIF
 
-Return( NIL )
+  ? "Fib sum of: ", n
+   
+  ? "Recursive:", FibR( n )
+  ? "Inplace  :", FibI( n ) 
+   
+RETURN
 
 Function FibR( n )
-Local nFib
 
-   If n < 2
-      nFib := n
-   Else
-      nFib := FibR( n - 2 ) + FibR( n - 1 )
-   EndIf
-
-Return( nFib )
+  IF n <= 1
+     RETURN 1
+  ENDIF
+      
+RETURN FibR( n - 2 ) + FibR( n - 1 )
 
 Function FibI( n )
-Local nFibMin1  := 1
-Local nFibMinN1 := 0
-Local i         := 1
-Local nFib
+   Local nFirst := 0
+   Local nSecond := 1
+   LOCAL Counter
+   LOCAL nTemp
 
-   If n < 2
-      nFib := n
-   Else
-      Do While i < n
-         nFib      := nFibMin1 + nFibMinN1
-         nFibMinN1 := nFibMin1
-         nFibMin1  := nFib
-         ++i
-      EndDo
-   EndIf
+   FOR Counter := 1 TO n 
+      nTemp := nSecond
+      nSecond += nFirst     
+      nFirst := nTemp
+   NEXT
 
-Return( nFib )
-
+RETURN nSecond
