@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.14 2003/02/10 00:47:24 lculik Exp $
+ * $Id: hbapifs.h,v 1.15 2003/07/05 17:30:50 lculik Exp $
  */
 
 /*
@@ -177,7 +177,7 @@ typedef struct
    char      szTime[ 9 ]; /* in HH:MM:SS format */
    USHORT    attr;
    #ifndef HB_LONG_DOUBLE_OFF
-   long double size; 
+   long long size; 
    #else
    ULONG   size; 
    #endif

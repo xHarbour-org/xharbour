@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.10 2003/06/18 08:57:01 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.11 2003/07/05 17:30:50 lculik Exp $
  */
 
 /*
@@ -192,7 +192,7 @@
    {
       USHORT length;
       USHORT decimal;
-      long double value;
+      long long value;
    };
 #endif
 
