@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.514 2002/12/06 04:04:24 walito Exp $
+ * $Id: ChangeLog,v 1.515 2002/12/06 08:02:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-06 09:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/exproptb.c
+  * source/macro/macrob.c
+    * Touched to force compilation of expropt2.c
+
+  * include/hbexprb.c
+    - Removed code duplicated in expropt2.c (hb_compReduceEQ())
+
+  * source/common/expropt2.c
+    + Added #ifdef HB_OPTIMIZE_LOGICAL_COMPARISON guard to optimizations of:
+         Exp == .T. -> Exp
+         Exp == .F. -> ! Exp
+         .T. == Exp -> Exp
+         .F. == Exp -> ! Exp
+     because of compatibility side effect: IF NIL == .T. -> IF NIL // R/T Error.
 
 2002-12-06 00:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/macro/macro.slx

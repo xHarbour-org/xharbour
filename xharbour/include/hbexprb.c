@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.37 2002/11/13 00:37:32 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.38 2002/12/04 06:24:06 ronpinkas Exp $
  */
 
 /*
@@ -3266,121 +3266,25 @@ static HB_EXPR_FUNC( hb_compExprUseEqual )
          break;
       case HB_EA_PUSH_PCODE:
          {
-            /* '=' used in an expression - compare values
+            /* '=' used in an expression -> compare values
              */
-            /* Try to optimize expression - we cannot optimize in HB_EA_REDUCE
-             * because it is not decided yet if it is assigment or comparision
+            /* Try to optimize expression - we could not optimize in HB_EA_REDUCE
+             * because it was not decided yet if it is assigment or comparision
              */
-            HB_EXPR_PTR pLeft, pRight;
+            // Now optimize as an EQ comparison.
+            pSelf->ExprType = HB_EO_EQ;
+            pSelf = HB_EXPR_USE( pSelf, HB_EA_REDUCE );
 
-            pLeft  = pSelf->value.asOperator.pLeft;
-            pRight = pSelf->value.asOperator.pRight;
-
-            if( pLeft->ExprType == pRight->ExprType )
+            // Might have been optimized in hb_compExprReduceEQ() check type...
+            if( pSelf->ExprType == HB_EO_EQUAL || pSelf->ExprType == HB_EO_EQ )
             {
-               switch( pLeft->ExprType )
-               {
-                  case HB_ET_LOGICAL:
-                     HB_EXPR_PCODE1( hb_compGenPushLogical, (pLeft->value.asLogical == pRight->value.asLogical) );
-                     break;
-
-                  case HB_ET_STRING:
-                     /* NOTE: the result depends on SET EXACT setting then it
-                     * cannot be optimized except the case when NULL string are
-                     * compared - the result is always TRUE regardless of EXACT
-                     * setting
-                     */
-                     if( (pLeft->ulLength | pRight->ulLength) == 0 )
-                        HB_EXPR_PCODE1( hb_compGenPushLogical, TRUE ); /* NOTE: COMPATIBILITY: Clipper doesn't optimize this */
-                     else
-                     {
-                        HB_EXPR_USE( pLeft, HB_EA_PUSH_PCODE );
-                        HB_EXPR_USE( pRight, HB_EA_PUSH_PCODE );
-                        HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_EQUAL );
-                     }
-                     break;
-
-                  case HB_ET_NIL:
-                     /* NOTE: COMPATIBILITY: Clipper doesn't optimize this */
-                     HB_EXPR_PCODE1( hb_compGenPushLogical, TRUE ); /* NIL = NIL is always TRUE */
-                     break;
-
-                  case HB_ET_NUMERIC:
-                     switch( pLeft->value.asNum.NumType & pRight->value.asNum.NumType )
-                     {
-                        case HB_ET_LONG:
-                           HB_EXPR_PCODE1( hb_compGenPushLogical, (pLeft->value.asNum.lVal == pRight->value.asNum.lVal) );
-                           break;
-                        case HB_ET_DOUBLE:
-                           HB_EXPR_PCODE1( hb_compGenPushLogical, (pLeft->value.asNum.dVal == pRight->value.asNum.dVal) );
-                           break;
-                        default:
-                           {
-                              if( pLeft->value.asNum.NumType == HB_ET_LONG )
-                                 HB_EXPR_PCODE1( hb_compGenPushLogical, (pLeft->value.asNum.lVal == pRight->value.asNum.dVal) );
-                              else
-                                 HB_EXPR_PCODE1( hb_compGenPushLogical, (pLeft->value.asNum.dVal == pRight->value.asNum.lVal) );
-                           }
-                           break;
-                     }
-                     break;
-
-                  default:
-                     {
-                        HB_EXPR_USE( pLeft, HB_EA_PUSH_PCODE );
-                        HB_EXPR_USE( pRight, HB_EA_PUSH_PCODE );
-                        HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_EQUAL );
-                     }
-               }
+               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+               HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_EQUAL );
             }
             else
             {
-                /* Exp = .T. | .T. = Exp -> Exp
-                   Exp = .F. | .F. = Exp -> ! Exp */
-                if( pLeft->ExprType == HB_ET_LOGICAL )
-                {
-                   if( pLeft->value.asLogical )
-                   {
-                      hb_compExprFree( pSelf->value.asOperator.pLeft, HB_MACRO_PARAM );
-                      pSelf = pRight;
-                      HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
-                      break;
-                   }
-                   else
-                   {
-                      hb_compExprFree( pSelf->value.asOperator.pLeft, HB_MACRO_PARAM );
-                      pSelf->ExprType = HB_EO_NOT;
-                      pSelf->value.asOperator.pLeft = pSelf->value.asOperator.pRight;
-                      pSelf->value.asOperator.pRight = NULL;
-                      HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
-                      break;
-                   }
-                }
-                else if( pRight->ExprType == HB_ET_LOGICAL )
-                {
-                   if( pRight->value.asLogical )
-                   {
-                      hb_compExprFree( pSelf->value.asOperator.pRight, HB_MACRO_PARAM );
-                      pSelf = pLeft;
-                      HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
-                      break;
-                   }
-                   else
-                   {
-                      hb_compExprFree( pSelf->value.asOperator.pRight, HB_MACRO_PARAM );
-                      pSelf->ExprType = HB_EO_NOT;
-                      //pSelf->value.asOperator.pLeft = pSelf->value.asOperator.pLeft;
-                      pSelf->value.asOperator.pRight = NULL;
-                      HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
-                      break;
-                   }
-                }
-
-               /* TODO: check for incompatible types
-                */
-               HB_EXPR_USE( pLeft, HB_EA_PUSH_PCODE );
-               HB_EXPR_USE( pRight, HB_EA_PUSH_PCODE );
-               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_EQUAL );
+               HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
             }
          }
          break;
