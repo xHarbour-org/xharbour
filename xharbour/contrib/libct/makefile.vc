@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.13 2004/01/04 13:12:46 lculik Exp $
+# $Id: makefile.vc,v 1.14 2004/01/26 09:41:40 paultucker Exp $
 #
 
 #
@@ -121,6 +121,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\bit1.obj \
    $(OBJ_DIR)\bit2.obj \
    $(OBJ_DIR)\bit3.obj \
+   $(OBJ_DIR)\blank.obj \
    $(OBJ_DIR)\charevod.obj \
    $(OBJ_DIR)\charlist.obj \
    $(OBJ_DIR)\charmirr.obj \
@@ -131,18 +132,29 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\charrepl.obj \
    $(OBJ_DIR)\charsort.obj \
    $(OBJ_DIR)\charswap.obj \
+   $(OBJ_DIR)\color.obj \
    $(OBJ_DIR)\count.obj \
+   $(OBJ_DIR)\ct.obj \
    $(OBJ_DIR)\ctc.obj \
    $(OBJ_DIR)\ctchksum.obj \
    $(OBJ_DIR)\ctcrypt.obj \
    $(OBJ_DIR)\ctmath.obj \
+   $(OBJ_DIR)\ctmisc.obj \
    $(OBJ_DIR)\ctset.obj \
    $(OBJ_DIR)\ctstr.obj \
+   $(OBJ_DIR)\ctwin.obj \
+   $(OBJ_DIR)\datetime.obj \
+   $(OBJ_DIR)\dattime2.obj \
+   $(OBJ_DIR)\dattime3.obj \
    $(OBJ_DIR)\dbftools.obj \
+   $(OBJ_DIR)\disk.obj \
+   $(OBJ_DIR)\diskutil.obj \
    $(OBJ_DIR)\exponent.obj \
+   $(OBJ_DIR)\fcopy.obj
    $(OBJ_DIR)\files.obj \
    $(OBJ_DIR)\finan.obj \
    $(OBJ_DIR)\ftoc.obj \
+   $(OBJ_DIR)\invrtwin.obj \
    $(OBJ_DIR)\justify.obj \
    $(OBJ_DIR)\keyset.obj \
    $(OBJ_DIR)\math.obj \
@@ -150,6 +162,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\net.obj \
    $(OBJ_DIR)\num1.obj \
    $(OBJ_DIR)\numat.obj \
+   $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\numlohi.obj \
    $(OBJ_DIR)\pad.obj \
    $(OBJ_DIR)\pos1.obj \
@@ -161,29 +174,18 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\remove.obj \
    $(OBJ_DIR)\replace.obj \
    $(OBJ_DIR)\screen1.obj \
-   $(OBJ_DIR)\setlast.obj \
+   $(OBJ_DIR)\screen2.obj \
+   $(OBJ_DIR)\settime.obj \
    $(OBJ_DIR)\strdiff.obj \
    $(OBJ_DIR)\strswap.obj \
    $(OBJ_DIR)\tab.obj \
+   $(OBJ_DIR)\time.obj \
    $(OBJ_DIR)\token1.obj \
    $(OBJ_DIR)\token2.obj \
    $(OBJ_DIR)\trig.obj \
+   $(OBJ_DIR)\util.obj \
    $(OBJ_DIR)\wordrepl.obj \
    $(OBJ_DIR)\wordtoch.obj \
-   \
-   $(OBJ_DIR)\blank.obj \
-   $(OBJ_DIR)\color.obj \
-   $(OBJ_DIR)\ct.obj \
-   $(OBJ_DIR)\ctmisc.obj \
-   $(OBJ_DIR)\ctwin.obj \
-   $(OBJ_DIR)\datetime.obj \
-   $(OBJ_DIR)\dattime2.obj \
-   $(OBJ_DIR)\invrtwin.obj \
-   $(OBJ_DIR)\numconv.obj \
-   $(OBJ_DIR)\screen2.obj \
-   $(OBJ_DIR)\time.obj \
-   $(OBJ_DIR)\fcopy.obj
-
 
 
 #

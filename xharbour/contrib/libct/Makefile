@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.15 2004/01/26 01:18:16 likewolf Exp $
+# $Id: Makefile,v 1.16 2004/01/26 14:59:46 druzus Exp $
 #
 
 ROOT = ../../
@@ -37,6 +37,7 @@ C_SOURCES = \
 	ctchksum.c \
 	ctcrypt.c \
 	dbftools.c \
+    disk.c \
 	exponent.c \
 	files.c \
 	finan.c \
@@ -59,6 +60,7 @@ C_SOURCES = \
 	remove.c \
 	replace.c \
 	screen1.c \
+    settime.c \
 	strdiff.c \
 	strswap.c \
 	tab.c \
@@ -76,12 +78,16 @@ PRG_SOURCES= \
 	ctmisc.prg \
 	datetime.prg \
 	dattime2.prg \
+    dattime3.prg \
+    diskutil.prg \
 	fcopy.prg \
 	invrtwin.prg \
 	numconv.prg \
 	strfile.prg \
 	screen2.prg \
 	time.prg \
+    util.prg 
+
 
 LIBNAME=ct
 ifeq ($(HB_MT),MT)

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.12 2004/01/04 13:12:46 lculik Exp $
+# $Id: makefile.bc,v 1.13 2004/01/26 09:41:40 paultucker Exp $
 #
 
 #
@@ -117,6 +117,8 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\ctset.obj \
    $(OBJ_DIR)\ctstr.obj \
    $(OBJ_DIR)\dbftools.obj \
+   $(OBJ_DIR)\disk.obj \
+   $(OBJ_DIR)\diskutil.obj \
    $(OBJ_DIR)\exponent.obj \
    $(OBJ_DIR)\files.obj \
    $(OBJ_DIR)\finan.obj \
@@ -140,6 +142,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\replace.obj \
    $(OBJ_DIR)\screen1.obj \
    $(OBJ_DIR)\setlast.obj \
+   $(OBJ_DIR)\settime.obj \
    $(OBJ_DIR)\strdiff.obj \
    $(OBJ_DIR)\strswap.obj \
    $(OBJ_DIR)\tab.obj \
@@ -156,11 +159,13 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\ctwin.obj \
    $(OBJ_DIR)\datetime.obj \
    $(OBJ_DIR)\dattime2.obj \
+   $(OBJ_DIR)\dattime3.obj \
    $(OBJ_DIR)\invrtwin.obj \
    $(OBJ_DIR)\numconv.obj \
    $(OBJ_DIR)\screen2.obj \
    $(OBJ_DIR)\time.obj \
    $(OBJ_DIR)\strfile.obj \
+   $(OBJ_DIR)\util.obj \
    $(OBJ_DIR)\fcopy.obj
 
 
@@ -509,3 +514,31 @@ $(OBJ_DIR)\fcopy.obj : $(OBJ_DIR)\fcopy.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
+$(OBJ_DIR)\disk.obj : $(TOOLS_DIR)\disk.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\diskutil.c : $(TOOLS_DIR)\diskutil.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\diskutil.obj : $(OBJ_DIR)\diskutil.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\dattime3.c : $(TOOLS_DIR)\dattime3.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dattime3.obj : $(OBJ_DIR)\dattime3.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\settime.obj : $(TOOLS_DIR)\settime.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\util.c : $(TOOLS_DIR)\util.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\util.obj : $(OBJ_DIR)\util.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
