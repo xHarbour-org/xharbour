@@ -1,5 +1,5 @@
 /*
- * $Id: radiobtn.prg,v 1.5 2004/07/13 19:35:57 paultucker Exp $
+ * $Id: radiobtn.prg,v 1.6 2004/07/15 23:57:16 paultucker Exp $
  */
 
 /*
@@ -162,9 +162,8 @@ Return Self
 
 METHOD Display()  CLASS HBRadioButton
    
-   local cColor := SetColor(), cCurStyle, nCurRow:= Row(), nCurCol:= ;
-
-   Col(), cPairs, cPairs3, nPos, cPairs4, cOldCaption
+   local cColor := SetColor(), cCurStyle, nCurRow:= Row(), nCurCol:= Col(), ;
+         cPairs, cPairs3, nPos, cPairs4, cOldCaption
 
    if ::hasfocus
       cPairs4 := __guicolor( ::colorspec, 7)
