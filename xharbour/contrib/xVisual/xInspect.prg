@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.47 2002/10/28 13:29:05 what32 Exp $
+ * $Id: xInspect.prg,v 1.48 2002/10/28 17:23:59 what32 Exp $
  */
 
 /*
@@ -66,17 +66,23 @@ ENDCLASS
 
 METHOD SetBrowserData( oObj, nState ) CLASS ObjInspect
    LOCAL aProp
-   
+
    DEFAULT nState TO 0
+
+   IF ::CurObject == oObj
+      RETURN Self
+   ENDIF
+
    IF nState == 0
       ::CurObject := oObj
    ENDIF
+
    IF oObj:handle == ::CurObject:handle .OR. nState == 0
       IF nState == 0
          ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
          aSort( ::Browser:Source,,, {|x,y| x[1] < y[1] } )
          aEval( ::Browser:Source, {|a|a[1] := Proper( a[1] )} )
-        ELSE
+      ELSE
          FOR EACH aProp IN ::Browser:source
              aProp[2] := __objSendMsg( ::CurObject, aProp[1] )
          NEXT
@@ -96,7 +102,7 @@ RETURN Self
 
 METHOD OnCreate() CLASS ObjInspect
    local oTabs
-   
+
    local aRect := ::ClientRect()
    local oCombo:= ComboInsp():New(  self, 100, 0, 0, aRect[3], 100 )
    oCombo:Style:= WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
@@ -114,7 +120,7 @@ METHOD OnCreate() CLASS ObjInspect
 
    ::Browser:=InspectBrowser():New( ::InspTabs:Properties )
    ::Browser:Create()
-   
+
 return( super:OnCreate() )
 
 //----------------------------------------------------------------------------------------------
@@ -170,18 +176,21 @@ ENDCLASS
 //---------------------------------------------------------------------------------
 
 METHOD OnClick(nwParam,nlParam) CLASS ComboInsp
-   local oObj
-   if hiword(nwParam)==CBN_SELCHANGE
+   LOCAL oObj
+
+   IF HiWord( nwParam ) == CBN_SELCHANGE
       oObj := ::Parent:Objects[::GetCurSel()+1]
+
       ::Parent:SetBrowserData( oObj )
 
-      IF !FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ).and.!FormEdit:oMask:Creating
-         FormEdit:oMask:OnLButtonDown(, ::Parent:CurObject:Left+4, ::Parent:CurObject:Top+4 )
-         FormEdit:oMask:OnLButtonUp(, ::Parent:CurObject:Left+4, ::Parent:CurObject:Top+4 )
+      IF ( ! FormEdit:oMask:IsFocused( ::Parent:CurObject:handle ) ) .AND. ( ! FormEdit:oMask:Creating )
+         FormEdit:oMask:OnLButtonDown( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
+         FormEdit:oMask:OnLButtonUp( , ::Parent:CurObject:Left + 4, ::Parent:CurObject:Top + 4 )
       ENDIF
 
-   endif
-return(0)
+   ENDIF
+
+RETURN 0
 
 //---------------------------------------------------------------------------------
 
@@ -275,9 +284,9 @@ ENDCLASS
 
 METHOD New( oParent ) CLASS InspectBrowser
    local oCol1,oCol2, aProp := { {"",""} }
-   
+
    super:New( oParent, 150, 0, 0, 100, 100, aProp )
-   
+
    ::BgColor      := GetSysColor( COLOR_BTNFACE )
    ::HiliteNoFocus:= GetSysColor( COLOR_BTNFACE )
    ::wantHScroll  :=.F.
@@ -296,18 +305,18 @@ METHOD New( oParent ) CLASS InspectBrowser
 
    ::bOnDblClick   := {|o,x,y|::SetColControl(x,y)}
    ::Font          := oParent:Parent:font
-   
+
 RETURN(self)
 
 METHOD SetColControl(x,y) CLASS InspectBrowser
    local cType, cVar, aRect
    if y==2
-   
+
       IF ::oCtrl != NIL
          ::oCtrl:Destroy()
          ::oCtrl := NIL
       ENDIF
-      
+
       cVar := ::source[::RecPos][1]
       cType:= valtype( __objSendMsg( ::Parent:Parent:Parent:CurObject, cVar ) )
       DO CASE
@@ -336,27 +345,27 @@ RETURN(self)
 
 METHOD OnCommand(nwParam,nlParam) CLASS InspectBrowser
    LOCAL oList
-   
+
    IF ::oCtrl != NIL .AND. nlParam == ::oCtrl:handle
-   
+
       DO CASE
          CASE ::oCtrl:ClassName() == "TCOMBOBOX"
-         
+
               IF HiWord(nwParam) == CBN_KILLFOCUS
                  ::oCtrl:Destroy()
                  ::oCtrl := NIL
               ENDIF
-              
+
          CASE ::oCtrl:ClassName() == "TBUTTON"
               DO CASE
                  CASE HiWord(nwParam) == BN_KILLFOCUS
                       ::oCtrl:Destroy()
                       ::oCtrl := NIL
-                      
+
                  CASE HiWord(nwParam)==BN_CLICKED
                       ::oCtrl:Destroy()
                       ::oCtrl := NIL
-                      
+
                       oList := StringList():New(self)
                       oList:Create()
               ENDCASE
