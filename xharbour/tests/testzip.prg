@@ -1,5 +1,5 @@
 //
-// $Id: testzip.prg,v 1.4 2003/09/14 15:23:45 paultucker Exp $
+// $Id: testzip.prg,v 1.5 2003/09/14 22:09:10 lculik Exp $
 //
 
 // Requires samples.lib for gauge support
@@ -13,6 +13,9 @@ Local aFiles, aGauge, nLen, aDir
 Local aSaveFiles
 Local aGaugeFile
 
+   // This is the 'safe' thing to do until Alert() is given focus.
+   SetMode( 50,80 )
+
    ZipCreate( "TEST.ZIP", "testzip.prg" )
 
    aFiles := {"testzip.prg",GetEnv("windir")+ "\win.ini"}
@@ -22,6 +25,7 @@ Local aGaugeFile
    ZipCreate( "TEST2.ZIP", aFiles, 8, {|cFile,nPos| qout("Added " + cFile)})
 
    // something here is not clipper compatible
+   // (These can be removed after the box drawing is corrected)
    ?;?;?
    ?
    ?;?;?
@@ -32,14 +36,18 @@ Local aGaugeFile
    aGaugeFile := GaugeNew( row()+2, 5, row()+4,74 , "W/B", "W+/B" ,'²')
    GaugeDisplay( aGaugeFile )
 
-   aDir   := Directory( "*.prg" )
    aFiles := {}
+
+   aDir   := Directory( "*.prg" )
    Aeval( aDir, {|a| aadd( aFiles, a[1]) })
-   nLen   := Len(afiles)
 
    /* lets add an new bigger files on this example*/
    aDir   := Directory( "*.map" )
    Aeval( aDir, {|a| aadd( aFiles, a[1]) })
+
+   aDir   := Directory( "*.c" )
+   Aeval( aDir, {|a| aadd( aFiles, a[1]) })
+   nLen   := Len(afiles)
 
    // Lets save aFile  Array for later usage
    aSaveFiles := aFiles
@@ -66,25 +74,31 @@ Local aGaugeFile
    ZipHasPassword( "test3.zip" )
 
    //ok, now we create an file on an floppy
-   ? "Put an formatted Floppy/Zip disk on Drive and press an key"
+   ? "Put a formatted Floppy/Zip disk in drive A: and press any key - (ESC) to skip"
+   ? "Existing files will not be deleted!"
    Inkey( 0 )
-   Cls
-   ?;?;?
-   ?
-   ?;?;?
+   if lastkey() != 27
 
-   aGauge := GaugeNew( row()-6, 5, row()-4,74 , "W/B", "W+/B" ,'²')
-   GaugeDisplay( aGauge )
+      Cls
+      // no need for all the qout's after a cls.
 
-   aGaugeFile := GaugeNew( row()+2, 5, row()+4,74 , "W/B", "W+/B" ,'²')
-   GaugeDisplay( aGaugeFile )
+      aGauge := GaugeNew( row(), 5, row()+2,74 , "W/B", "W+/B" ,'²')
+      GaugeDisplay( aGauge )
+      ?;?
+      aGaugeFile := GaugeNew( row(), 5, row()+2,74 , "W/B", "W+/B" ,'²')
+      GaugeDisplay( aGaugeFile )
 
-   HB_SETDISKZIP( { | x |  Alert( "Please insert disk no " + Str( x , 3 ) ) } )
+      HB_SETDISKZIP( { | x |  Alert( "Please insert disk no " + Str( x , 3 ) ) } )
+ 
+      set cursor off
 
-   ZipCreateToFloppy("test4.zip", aSaveFiles, 9, ;
-              {|cFile,nPos| GaugeUpdate(aGauge,nPos/nLen) },,'hello',,,;
-              {|nPos,nCur| GaugeUpdate(aGaugeFile,nPos/nCur)})
+      ZipCreateToFloppy("test4.zip", aSaveFiles, 9, ;
+                 {|cFile,nPos| GaugeUpdate(aGauge,nPos/nLen) },,'hello',,,;
+                 {|nPos,nCur| GaugeUpdate(aGaugeFile,nPos/nCur)})
 
+      set cursor on
+
+   endif
 
 function ZipCreate(cFile, uContents, nLevel, bUpdate, lOverwrite, password,;
                    lPath, lDrive, bFileUpdate)

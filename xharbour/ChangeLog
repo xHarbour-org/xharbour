@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1474 2003/09/14 22:09:06 lculik Exp $
+ * $Id: ChangeLog,v 1.1475 2003/09/15 02:38:27 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-09-14 22:30 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
+2003-09-14 22:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/hbcrypt.c
     - local decl of Adler32()
     + #include "hbcompress.h"
