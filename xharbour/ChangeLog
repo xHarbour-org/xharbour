@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2677 2004/03/29 18:03:36 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2678 2004/03/29 21:20:57 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-30 09:05 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rdd/dbf1.c
+    ! small modification to hb_dbfOpen() to launch error only when hb_fsError()
+      is not zero. This modification allows xHarbour behaves as Clipper when
+      trying to open a file already opened exclusively by another application.
+      Bug reported by: <elcio@gecont.com.br>
+
+      .--
+      |  // Test program:
+      |  PROCEDURE MAIN()
+      |
+      |  USE Test EXCLUSIVE NEW
+      |  WHILE( NetErr() )
+      |    ? 'Looping while cannot open exclusively!'
+      |    USE Test EXCLUSIVE NEW
+      |  ENDDO
+      |  Alert( 'File Is Being Opened Exclusively!' )
+      |
+      |  Test->( dbCloseArea() )
+      |  RETURN
+      |
+      |  // How to make a test:
+      |  // 1. Run the EXE once and do not close the alert box
+      |  // 2. Run another instance -> loop is now honored. Previously,
+      |  //    error trapper is launched.
+      `--
 
 2004-03-29 16:16 UTC-0500 Sylvain Robert (s.robert/at/videotron.ca)
   * source\rtl\str.c

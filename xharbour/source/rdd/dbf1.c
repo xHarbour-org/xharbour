@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.70 2004/03/25 18:50:08 druzus Exp $
+ * $Id: dbf1.c,v 1.71 2004/03/26 13:35:36 druzus Exp $
  */
 
 /*
@@ -1854,9 +1854,17 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
           * should be revised with a better solution.
           */
          if ( hb_fsError() == EACCES || bLock )
+         {
             hb_errPutOsCode( pError, 32 );
+         }
+         else if ( hb_fsError() == 0 )
+         {
+            break;
+         }
          else
+         {
             hb_errPutOsCode( pError, hb_fsError() );
+         }
 
          bRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
       }
