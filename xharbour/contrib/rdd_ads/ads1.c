@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.15 2003/07/23 09:43:33 brianhays Exp $
+ * $Id: ads1.c,v 1.16 2003/08/13 00:18:00 ronpinkas Exp $
  */
 
 /*
@@ -292,6 +292,7 @@ static BOOL hb_ndtoa( double dValue, char * szBuffer, USHORT uiLen, USHORT uiDec
       memset( szBuffer, ' ', uiLen );
       return FALSE;
    }
+
    szEndChar = szBuffer[ uiLen ];
    sprintf( szBuffer, "%*.*f", uiLen, uiDec, dValue );
    szBuffer[ uiLen ] = szEndChar;
@@ -783,28 +784,38 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
       pFieldDesc = hb_arrayGetItemPtr( pStruct, uiCount + 1 );
       pFieldInfo.atomName = ( BYTE * ) hb_arrayGetCPtr( pFieldDesc, 1 );
       iData = hb_arrayGetNI( pFieldDesc, 3 );
+
+      //TraceLog( NULL, "Field: '%s'\n", pFieldInfo.atomName );
+
       if( iData < 0 )
+      {
          iData = 0;
+      }
+
       uiLen = pFieldInfo.uiLen = ( USHORT ) iData;
       iData = hb_arrayGetNI( pFieldDesc, 4 );
+
       if( iData < 0 )
+      {
          iData = 0;
+      }
+
       uiDec = ( USHORT ) iData;
       pFieldInfo.uiDec = 0;
       szFieldType = hb_arrayGetCPtr( pFieldDesc, 2 );
       iData = toupper( szFieldType[ 0 ] );
+
       /* printf( "\nadsCreateFields-0 %s",szFieldType ); */
+
       switch( iData )
       {
          case 'C':
-            if( strlen(szFieldType) == 1 ||
-                   !hb_stricmp( szFieldType,"char" ) )
+            if( strlen(szFieldType) == 1 || ! hb_stricmp( szFieldType, "char" ) )
             {
                pFieldInfo.uiType = HB_IT_STRING;
                pFieldInfo.uiLen = uiLen + uiDec * 256;
             }
-            else if( !hb_stricmp( szFieldType,"curdouble" ) &&
-                     adsFileType == ADS_ADT )
+            else if( ! hb_stricmp( szFieldType, "curdouble" ) && adsFileType == ADS_ADT )
             {
                pFieldInfo.uiType = HB_IT_LONG;
                pFieldInfo.uiTypeExtended = ADS_CURDOUBLE;
@@ -812,8 +823,9 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
                pFieldInfo.uiDec = uiDec;
             }
             else
+            {
                return FAILURE;
-
+            }
             break;
 
          case 'L':
@@ -823,17 +835,16 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
 
          case 'M':
             pFieldInfo.uiType = HB_IT_MEMO;
-            pFieldInfo.uiLen = (adsFileType == ADS_ADT)? 9:10;
+            pFieldInfo.uiLen = (adsFileType == ADS_ADT) ? 9 : 10;
             break;
 
          case 'D':
-            if( strlen(szFieldType) == 1 ||
-                   !hb_stricmp( szFieldType,"date" ) )
+            if( strlen(szFieldType) == 1 || ! hb_stricmp( szFieldType, "date" ) )
             {
                pFieldInfo.uiType = HB_IT_DATE;
-               pFieldInfo.uiLen = (adsFileType == ADS_ADT)? 4:8;
+               pFieldInfo.uiLen = (adsFileType == ADS_ADT) ? 4 : 8;
             }
-            else if( !hb_stricmp( szFieldType,"double" ) )
+            else if( ! hb_stricmp( szFieldType, "double" ) )
             {
                pFieldInfo.uiType = HB_IT_LONG;
                pFieldInfo.uiTypeExtended = ADS_DOUBLE;
@@ -841,15 +852,22 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
                pFieldInfo.uiDec = uiDec;
             }
             else
+            {
                return FAILURE;
+            }
             break;
 
          case 'N':
             pFieldInfo.uiType = HB_IT_LONG;
+
             if( uiLen > 20 )
+            {
                return FAILURE;
+            }
             else
+            {
                pFieldInfo.uiDec = uiDec;
+            }
             break;
 
          case 'A':
@@ -859,7 +877,9 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
                pFieldInfo.uiTypeExtended = ADS_AUTOINC;
             }
             else
+            {
                return FAILURE;
+            }
             break;
 
          case 'B':
@@ -880,70 +900,80 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
                pFieldInfo.uiTypeExtended = ADS_RAW;
             }
             else
+            {
                return FAILURE;
+            }
             break;
 
          case 'S':
-            if( !hb_stricmp( szFieldType,"shortdate" ) )
+            if( !hb_stricmp( szFieldType, "shortdate" ) )
             {
                pFieldInfo.uiType = HB_IT_DATE;
                pFieldInfo.uiTypeExtended = ADS_COMPACTDATE;
                pFieldInfo.uiLen = 4;
             }
-            else if( !hb_stricmp( szFieldType,"shortint" ) &&
-                     adsFileType == ADS_ADT )
+            else if( !hb_stricmp( szFieldType, "shortint" ) && adsFileType == ADS_ADT )
             {
                pFieldInfo.uiType = HB_IT_LONG;
                pFieldInfo.uiTypeExtended = ADS_SHORTINT;
                pFieldInfo.uiLen = 2;
             }
             else
+            {
                return FAILURE;
+            }
             break;
 
          case 'T':
-            if( !hb_stricmp( szFieldType,"timestamp" ) &&
-                     adsFileType == ADS_ADT )
+            if( ! hb_stricmp( szFieldType, "timestamp" ) && adsFileType == ADS_ADT )
             {
                pFieldInfo.uiType = HB_IT_LONG;
                pFieldInfo.uiTypeExtended = ADS_TIMESTAMP;
                pFieldInfo.uiLen = 8;
             }
-            else if( !hb_stricmp( szFieldType,"time" ) &&
-                     adsFileType == ADS_ADT )
+            else if( !hb_stricmp( szFieldType, "time" ) && adsFileType == ADS_ADT )
             {
                pFieldInfo.uiType = HB_IT_LONG;
                pFieldInfo.uiTypeExtended = ADS_TIME;
                pFieldInfo.uiLen = 4;
             }
             else
+            {
                return FAILURE;
+            }
             break;
 
          case 'I':
-            if( !hb_stricmp( szFieldType,"integer" ) )
+            if( !hb_stricmp( szFieldType, "integer" ) )
             {
                pFieldInfo.uiType = HB_IT_LONG;
                pFieldInfo.uiTypeExtended = ADS_INTEGER;
                pFieldInfo.uiLen = 4;
             }
-            else if( !hb_stricmp( szFieldType,"image" ) )
+            else if( !hb_stricmp( szFieldType, "image" ) )
             {
                pFieldInfo.uiType = HB_IT_MEMO;
                pFieldInfo.uiTypeExtended = ADS_IMAGE;
                pFieldInfo.uiLen = (adsFileType == ADS_ADT)? 9:10;
             }
             else
+            {
                return FAILURE;
+            }
             break;
 
          default:
+         {
             return FAILURE;
+         }
       }
       /* Add field */
       if( SELF_ADDFIELD( (AREAP)pArea, &pFieldInfo ) == FAILURE )
+      {
          return FAILURE;
+      }
    }
+
    return SUCCESS;
 }
 
@@ -1060,9 +1090,12 @@ static ERRCODE adsFieldName( ADSAREAP pArea, USHORT uiIndex, void * szName )
    HB_TRACE(HB_TR_DEBUG, ("adsFieldName(%p, %hu, %p)", pArea, uiIndex, szName));
 
    if( uiIndex > pArea->uiFieldCount )
+   {
       return FAILURE;
+   }
 
    AdsGetFieldName( pArea->hTable, uiIndex, (UNSIGNED8*)szName, &pusBufLen );
+
    return SUCCESS;
 }
 
@@ -1117,6 +1150,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             memset( pBuffer, ' ', pField->uiLen );
             pArea->fEof = TRUE;
          }
+
          hb_itemPutCL( pItem, ( char * ) pBuffer, pField->uiLen );
          break;
 
@@ -1159,12 +1193,14 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             UNSIGNED16 pusLen = 11;
             AdsGetDateFormat  ( pucFormat, &pusLen );
             AdsSetDateFormat  ( (UNSIGNED8*)"YYYYMMDD" );
-               pulLength = pArea->maxFieldLen + 1;
-               if (AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD  )
-               {
-                  memset( pBuffer, ' ', pField->uiLen );
-                  pArea->fEof = TRUE;
-               }
+            pulLength = pArea->maxFieldLen + 1;
+
+            if (AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD  )
+            {
+               memset( pBuffer, ' ', pField->uiLen );
+               pArea->fEof = TRUE;
+            }
+
             hb_itemPutDS( pItem, (char *) pBuffer );
             AdsSetDateFormat  ( pucFormat );
             break;
@@ -1386,12 +1422,12 @@ static ERRCODE adsClose( ADSAREAP pArea )
    return uiError;
 }
 
-static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo)
+static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
 {
    ADSHANDLE hTable;
    UNSIGNED32 uRetVal;
    UNSIGNED8 *ucfieldDefs;
-   UNSIGNED8 ucBuffer[MAX_STR_LEN+1], ucField[ADS_MAX_FIELD_NAME+1];
+   UNSIGNED8 ucBuffer[MAX_STR_LEN + 1], ucField[ADS_MAX_FIELD_NAME + 1];
    USHORT uiCount, uiLen;
    LPFIELD pField;
    char cType[8];
@@ -1418,48 +1454,48 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo)
      {
         case HB_IT_DATE:
             if( pField->uiTypeExtended == 0 )
-               strcpy(cType,"D");
+               strcpy(cType, "D");
             else
-               strcpy(cType,"ShortD");
+               strcpy(cType, "ShortD");
             break;
         case HB_IT_LOGICAL:
-            strcpy(cType,"L");
+            strcpy(cType, "L");
             break;
         case HB_IT_MEMO:
             if( pField->uiTypeExtended == 0 )
-               strcpy(cType,"M");
+               strcpy(cType, "M");
             else if( pField->uiTypeExtended == ADS_VARCHAR )
-               strcpy(cType,"VarC");
+               strcpy(cType, "VarC");
             else if( pField->uiTypeExtended == ADS_BINARY )
-               strcpy(cType,"Binary");
+               strcpy(cType, "Binary");
             else if( pField->uiTypeExtended == ADS_IMAGE )
-               strcpy(cType,"Image");
+               strcpy(cType, "Image");
             break;
         case HB_IT_STRING:
             if( pField->uiTypeExtended == 0 )
-               strcpy(cType,"C");
+               strcpy(cType, "C");
             else if( pField->uiTypeExtended == ADS_RAW )
-               strcpy(cType,"Raw");
+               strcpy(cType, "Raw");
             break;
         case HB_IT_INTEGER:
         case HB_IT_LONG:
         case HB_IT_DOUBLE:
             if( pField->uiTypeExtended == 0 )
-               strcpy(cType,"N");
+               strcpy(cType, "N");
             else if( pField->uiTypeExtended == ADS_INTEGER )
-               strcpy(cType,"Int");
+               strcpy(cType, "Int");
             else if( pField->uiTypeExtended == ADS_SHORTINT )
-               strcpy(cType,"ShortI");
+               strcpy(cType, "ShortI");
             else if( pField->uiTypeExtended == ADS_DOUBLE )
-               strcpy(cType,"Double");
+               strcpy(cType, "Double");
             else if( pField->uiTypeExtended == ADS_TIME )
-               strcpy(cType,"Time");
+               strcpy(cType, "Time");
             else if( pField->uiTypeExtended == ADS_TIMESTAMP )
-               strcpy(cType,"TimeSt");
+               strcpy(cType, "TimeSt");
             else if( pField->uiTypeExtended == ADS_AUTOINC )
-               strcpy(cType,"Auto");
+               strcpy(cType, "Auto");
             else if( pField->uiTypeExtended == ADS_CURDOUBLE )
-               strcpy(cType,"CurD");
+               strcpy(cType, "CurD");
             break;
      }
      switch ( pField->uiType )
@@ -1469,31 +1505,31 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo)
         case HB_IT_MEMO:
             if( pField->uiTypeExtended != ADS_VARCHAR )
             {
-               if(strlen((( PHB_DYNS ) pField->sym )->pSymbol->szName) > (unsigned int) pArea->uiMaxFieldNameLength )
+               if( strlen((( PHB_DYNS ) pField->sym )->pSymbol->szName) > (unsigned int) pArea->uiMaxFieldNameLength )
                {
-                   ucField[0]='\0';
-                   strncat((char*)ucField, (( PHB_DYNS ) pField->sym )->pSymbol->szName,
-                                       pArea->uiMaxFieldNameLength);
-                   sprintf((char*)ucBuffer,"%s,%s;", ucField, cType );
+                   strncpy((char*)ucField, (( PHB_DYNS ) pField->sym )->pSymbol->szName, pArea->uiMaxFieldNameLength);
+                   sprintf((char*)ucBuffer, "%s,%s;", ucField, cType );
                }
                else
-                   sprintf((char*)ucBuffer,"%s,%s;", ( ( PHB_DYNS ) pField->sym )->pSymbol->szName,
-                              cType );
+               {
+                   sprintf((char*)ucBuffer, "%s,%s;", ( ( PHB_DYNS ) pField->sym )->pSymbol->szName, cType );
+               }
                break;
             }
+
         default :
             if(strlen((( PHB_DYNS ) pField->sym )->pSymbol->szName) > (unsigned int) pArea->uiMaxFieldNameLength )
             {
-                ucField[0]='\0';
-                strncat((char*)ucField, (( PHB_DYNS ) pField->sym )->pSymbol->szName,
-                                    pArea->uiMaxFieldNameLength);
-                sprintf((char*)ucBuffer,"%s,%s,%d,%d;", ucField, cType, pField->uiLen, pField->uiDec );
+                strncpy((char*)ucField, (( PHB_DYNS ) pField->sym )->pSymbol->szName, pArea->uiMaxFieldNameLength);
+                sprintf((char*)ucBuffer, "%s,%s,%d,%d;", ucField, cType, pField->uiLen, pField->uiDec );
             }
             else
-                sprintf((char*)ucBuffer,"%s,%s,%d,%d;", (( PHB_DYNS ) pField->sym )->pSymbol->szName,
-                        cType, pField->uiLen, pField->uiDec );
+            {
+                sprintf((char*)ucBuffer, "%s,%s,%d,%d;", (( PHB_DYNS ) pField->sym )->pSymbol->szName, cType, pField->uiLen, pField->uiDec );
+            }
             break;
      }
+
      strcat((char*)ucfieldDefs, (char*)ucBuffer);
      pField++;
    }
@@ -1502,7 +1538,9 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo)
                     adsLockType, adsRights,
                     hb_set.HB_SET_MBLOCKSIZE,
                     ucfieldDefs, &hTable);
+
    hb_xfree(ucfieldDefs);
+
    if( uRetVal != AE_SUCCESS )
    {
       AdsShowError( (UNSIGNED8 *) "Error" );
@@ -1571,8 +1609,7 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             UNSIGNED8  aucBuffer[MAX_STR_LEN + 1];
             UNSIGNED16 pusLen   = MAX_STR_LEN;
-            AdsGetTableFilename  (pArea->hTable,
-                        ADS_FULLPATHNAME, aucBuffer, &pusLen);
+            AdsGetTableFilename  (pArea->hTable, ADS_FULLPATHNAME, aucBuffer, &pusLen);
             hb_itemPutCL( pItem, (char*)aucBuffer, pusLen );
             break;
          }
@@ -1735,7 +1772,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 
       //TraceLog( NULL, "Field: '%s'\n", szName );
 
-      * ( dbFieldInfo.atomName + pusBufLen - 1 ) = '\0';
+      * ( dbFieldInfo.atomName + pusBufLen ) = '\0';
       AdsGetFieldType  ( pArea->hTable, szName, &pusType );
       AdsGetFieldLength( pArea->hTable, szName, &pulLength );
       dbFieldInfo.uiLen = ( USHORT ) pulLength;
@@ -1747,6 +1784,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       {
          case ADS_STRING:
             dbFieldInfo.uiTypeExtended = 0;
+
          case ADS_RAW:
             dbFieldInfo.uiType = HB_IT_STRING;
             break;
@@ -1815,8 +1853,12 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       pArea->maxFieldLen = 18;
    pArea->pRecord = ( BYTE * ) hb_xgrab( pArea->maxFieldLen + 1 );
    pArea->fValidBuffer = FALSE;
+
    if( adsRecCount( pArea, &ulRecCount ) == FAILURE )
+   {
       return FAILURE;
+   }
+
    pArea->ulRecCount = ulRecCount;
 
    return SELF_GOTOP( ( AREAP ) pArea );
@@ -1839,9 +1881,14 @@ static ERRCODE adsSysName( ADSAREAP pArea, BYTE * pBuffer )
    HB_TRACE(HB_TR_DEBUG, ("adsSysName(%p, %p)", pArea, pBuffer));
 
    if( pArea->hTable )
+   {
       AdsGetTableType( pArea->hTable, &usTableType );
+   }
    else
+   {
       usTableType = (UNSIGNED16)adsFileType;
+   }
+
    switch( usTableType )
    {
       case ADS_NTX:
@@ -2067,6 +2114,7 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          from the index key and scope expression if there is one.
       */
       ulRetVal = AdsGetScope( pArea->hOrdCurrent, ADS_BOTTOM, pucScope, &pusBufLen );
+
       if ( ulRetVal == AE_SUCCESS && pusBufLen)
       {
          /* TODO:
@@ -2203,21 +2251,32 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
    {
       case DBOI_CONDITION:
          if ( phIndex )
+         {
             AdsGetIndexCondition( phIndex, aucBuffer, &pusLen);
+         }
+
          hb_itemPutCL( pOrderInfo->itmResult, (char*)aucBuffer, pusLen );
          break;
 
       case DBOI_EXPRESSION:
          if ( phIndex )
+         {
             AdsGetIndexExpr( phIndex, aucBuffer, &pusLen);
+         }
+
          hb_itemPutCL( pOrderInfo->itmResult, (char*)aucBuffer, pusLen );
          break;
 
       case DBOI_ISCOND:
          if ( phIndex )
+         {
             AdsGetIndexCondition( phIndex, aucBuffer, &pusLen);
+         }
          else
+         {
             pusLen = 0;
+         }
+
          hb_itemPutL( pOrderInfo->itmResult, pusLen );
          break;
 
@@ -2275,7 +2334,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
       case DBOI_KEYVAL:
          if ( !pArea->fEof && phIndex )
          {
-            AdsExtractKey( phIndex, aucBuffer, &pusLen);
+            AdsExtractKey( phIndex, aucBuffer, &pusLen );
             /* ----------------------------------
              From ads docs: It is important to note that the key generated
              by this function is built on the client, and the key may not
@@ -2285,30 +2344,38 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
             switch( pus16 )
             {
                case ADS_STRING:
-                  hb_itemPutCL( pOrderInfo->itmResult, (char*)aucBuffer, pusLen);
+                  hb_itemPutCL( pOrderInfo->itmResult, (char*)aucBuffer, pusLen );
                   break;
 
                case ADS_NUMERIC:
                   if ( pArea->iFileType == ADS_NTX )
                   {
-                     if ( aucBuffer[0] == '-' || aucBuffer[0] == ',')      /* negative number encoding */
+                     if( aucBuffer[0] == '-' || aucBuffer[0] == ',' )      /* negative number encoding */
                      {
                         pus16 = 0;
+
                         while ( pus16 < pusLen && aucBuffer[pus16] == ',') /* leading zeros were set as commas for sorting */
+                        {
                            aucBuffer[pus16++] = '0';
+                        }
 
                         if ( aucBuffer[pus16] == '-' )
+                        {
                            pus16++;            /* skip past the minus */
+                        }
 
                         while ( pus16 < pusLen )
+                        {
                            aucBuffer[pus16] = (SIGNED8) 0x5C - aucBuffer[pus16++];
-
+                        }
                      }
-                     hb_itemPutND( pOrderInfo->itmResult, hb_strVal((char*)aucBuffer, pusLen));
 
-                  }else
+                     hb_itemPutND( pOrderInfo->itmResult, hb_strVal((char*)aucBuffer, pusLen));
+                  }
+                  else
                   {         /* ADS_CDX, ADS_ADT */
                      double nValue;
+
                      FoxToDbl(aucBuffer, &nValue);
                      hb_itemPutND( pOrderInfo->itmResult, nValue );
                   }
@@ -2355,7 +2422,10 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
 
       case DBOI_NAME:
          if( phIndex )
+         {
             AdsGetIndexName( phIndex, aucBuffer, &pusLen);
+         }
+
          hb_itemPutCL( pOrderInfo->itmResult, (char*)aucBuffer, pusLen);
          break;
 
@@ -2372,13 +2442,19 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
 
       case DBOI_BAGNAME:
          if ( phIndex )
+         {
             AdsGetIndexFilename  ( phIndex, ADS_BASENAME, aucBuffer, &pusLen);
+         }
+
          hb_itemPutCL( pOrderInfo->itmResult, (char*)aucBuffer, pusLen );
          break;
 
       case DBOI_FULLPATH :
          if ( phIndex )
+         {
             AdsGetIndexFilename (phIndex, ADS_FULLPATHNAME, aucBuffer, &pusLen);
+         }
+
          hb_itemPutCL( pOrderInfo->itmResult, (char*)aucBuffer, pusLen );
          break;
 
@@ -2411,6 +2487,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          if ( phIndex )
          {
             AdsGetScope  ( phIndex, ADS_BOTTOM, aucBuffer, &pusLen);
+
             if ( pusLen )               /* had a scope, walk it. Skips obey filters */
             {
                AdsGetRecordNum( pArea->hTable, ADS_IGNOREFILTERS,
@@ -2850,8 +2927,12 @@ static ERRCODE adsDrop( PHB_ITEM pItemTable )
 
   pBuffer = hb_itemGetCPtr( pItemTable );
   strcpy( szFileName, pBuffer );
+
   if ( !strchr( szFileName, '.' ))
+  {
     strcat( szFileName, ((adsFileType==ADS_ADT) ? ".adt" : ".dbf") );
+  }
+
   return hb_fsDelete( (BYTE *) szFileName );
 }
 
@@ -2863,8 +2944,12 @@ BOOL adsExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex )
 
   pBuffer = hb_itemGetCPtr( pItemIndex != NULL ? pItemIndex : pItemTable );
   strcpy( szFileName, pBuffer );
+
   if ( pItemTable && !strchr( szFileName, '.' ))
+  {
     strcat( szFileName, ((adsFileType==ADS_ADT) ? ".adt" : ".dbf") );
+  }
+
   return hb_fsFile( (BYTE *) szFileName );
 }
 

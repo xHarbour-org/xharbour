@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.42 2003/08/01 12:16:51 jonnymind Exp $
+ * $Id: dbcmd.c,v 1.43 2003/08/02 01:21:57 ronpinkas Exp $
  */
 
 /*
@@ -1344,13 +1344,19 @@ HB_FUNC( DBCREATE )
    BOOL bOpen;
    BYTE * codePageId = (BYTE*) hb_parc(6);
 
-   hb_ret(  );
+   hb_ret();
+
    szFileName = hb_parc( 1 );
    pStruct = hb_param( 2 , HB_IT_ARRAY );
+
    if( pStruct )
+   {
       uiLen = ( USHORT ) hb_arrayLen( pStruct );
+   }
    else
+   {
       uiLen = 0;
+   }
 
    if( ( strlen( szFileName ) == 0 ) || !pStruct || uiLen == 0 )
    {
@@ -1361,6 +1367,7 @@ HB_FUNC( DBCREATE )
    for( uiSize = 0; uiSize < uiLen; uiSize++ )
    {
       pFieldDesc = hb_arrayGetItemPtr( pStruct, uiSize + 1 );
+
       if( hb_arrayLen( pFieldDesc ) < 4 )
       {
          hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
@@ -1379,6 +1386,7 @@ HB_FUNC( DBCREATE )
    }
 
    uiPrevArea = s_uiCurrArea;
+
    if( !ISLOG( 4 ) )
    {
       bOpen = FALSE;
@@ -1387,34 +1395,51 @@ HB_FUNC( DBCREATE )
    else
    {
       bOpen = TRUE;
+
       if( hb_parl( 4 ) )
+      {
          hb_rddSelectFirstAvailable();
+      }
       else if( s_pCurrArea )                  /* If current WorkArea is used then close it */
+      {
          hb_rddReleaseCurrentArea();
+      }
    }
 
    hb_rddCheck();
+
    uiLen = ( USHORT ) hb_parclen( 3 );
+
    if( uiLen > 0 )
    {
       if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
+      {
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
+      }
 
       hb_strncpyUpper( cDriverBuffer, hb_parc( 3 ), uiLen );
       szDriver = cDriverBuffer;
    }
    else
+   {
       szDriver = s_szDefDriver;
+   }
 
    pFileName = hb_fsFNameSplit( szFileName );
    // strncpy( szAlias, hb_parc( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
    szAlias[0] = '\0';
+
    if( ISCHAR(5) )
+   {
       strncat( szAlias, hb_parc( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+   }
 
    uiLen = strlen( szAlias );
+
    if( uiLen == 0 )
+   {
       strncat( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
+   }
    else if( uiLen == 1 )
    {
       /* Alias with a single letter. Only are valid 'L' and > 'M' */
@@ -1444,17 +1469,20 @@ HB_FUNC( DBCREATE )
    szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
    // strncpy( szFileName, hb_parc( 1 ), _POSIX_PATH_MAX );
    szFileName[0] = '\0';
+
    if( ISCHAR(1) )
+   {
       strncat( szFileName, hb_parc( 1 ), _POSIX_PATH_MAX );
+   }
 
    if( !pFileName->szExtension )
    {
       pFileExt = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, pFileExt );
-      strncat( szFileName, hb_itemGetCPtr( pFileExt ), _POSIX_PATH_MAX -
-               strlen( szFileName ) );
+      strncat( szFileName, hb_itemGetCPtr( pFileExt ), _POSIX_PATH_MAX - strlen( szFileName ) );
       hb_itemRelease( pFileExt );
    }
+
    hb_xfree( pFileName );
 
    /* Save filename for later use */
@@ -1499,8 +1527,10 @@ HB_FUNC( DBCREATE )
    {
       USHORT uiAreaSize, uiRddID;
       struct _RDDFUNCS * lprfsHost = ( ( AREAP ) s_pCurrArea->pArea )->lprfsHost;
+
       uiRddID = ( ( AREAP ) s_pCurrArea->pArea )->rddID;
       SELF_STRUCTSIZE( ( AREAP ) s_pCurrArea->pArea, &uiAreaSize );
+
       /* Close and release WorkArea */
       SELF_CLOSE( ( AREAP ) s_pCurrArea->pArea );
       SELF_RELEASE( ( AREAP ) s_pCurrArea->pArea );
@@ -1511,6 +1541,7 @@ HB_FUNC( DBCREATE )
       ( ( AREAP ) s_pCurrArea->pArea )->lprfsHost = lprfsHost;
       ( ( AREAP ) s_pCurrArea->pArea )->rddID = uiRddID;
       SELF_NEW( ( AREAP ) s_pCurrArea->pArea );
+
       //pInfo.abName = ( BYTE * )  hb_xgrab( _POSIX_PATH_MAX + 1 );
       szFileName = ( char * )  hb_xgrab( _POSIX_PATH_MAX + 1 );
       pInfo.abName = ( BYTE * ) szFileName;
@@ -1518,14 +1549,19 @@ HB_FUNC( DBCREATE )
       strcpy( ( char * ) pInfo.abName, szSavedFileName );
       pInfo.fShared = !hb_set.HB_SET_EXCLUSIVE;
       pInfo.cdpId = codePageId;
+
       ( ( AREAP ) s_pCurrArea->pArea )->uiArea = s_uiCurrArea;
+
       if( SELF_OPEN( ( AREAP ) s_pCurrArea->pArea, &pInfo ) == FAILURE )
       {
          s_bNetError = TRUE;           /* Temp fix! What about other types of errors? */
          hb_rddReleaseCurrentArea();
       }
       else
+      {
          hb_retl( TRUE );
+      }
+
       //hb_xfree( pInfo.abName );
       hb_xfree( szFileName );
    }
