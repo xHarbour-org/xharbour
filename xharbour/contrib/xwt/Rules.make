@@ -1,5 +1,5 @@
 ##################################
-# $Id: Rules.make,v 1.5 2003/11/26 22:58:44 jonnymind Exp $
+# $Id: Rules.make,v 1.6 2003/11/28 14:46:33 lf_sfnet Exp $
 #
 # Rules for making simwin
 #
@@ -36,8 +36,10 @@ endif
 
 ifeq ($(HB_COMPILER),mingw32)
    LIBFILES_ += -luser32 -lgdi32 -lcomdlg32 -lwinspool
+   EXETYPE=.exe
 else
    LIBFILES_ += -lgpm
+   EXETYPE=
 endif
 
 LIBDIR_ = $(LIBDIR) -L$(HB_LIB_INSTALL)
@@ -62,9 +64,12 @@ endif
 
 
 #COMMANDS
-all:$(TARGET)
+all:$(TARGET) $(TARGETS)
 
 .PHONY: clean install
+
+%$(EXETYPE):%.o
+	$(CC) -o$@ $< $(LIBDIR_) $(LIBS_)
 
 %.o: %.c
 	$(CC) -c -o$@ $(CFLAGS) -I$(HB_INC_INSTALL) $<
@@ -86,6 +91,7 @@ clean:
 	rm -f *.ppo
 	rm -f $(TARGET)
 	rm -f $(TARGET).exe
+	rm -f $(TARGETS)
 
 install: all
 	cp -f *.a $(XWT_INSTALL)
