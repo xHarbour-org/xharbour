@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1585 2003/10/11 16:18:03 lculik Exp $
+ * $Id: ChangeLog,v 1.1586 2003/10/13 00:03:40 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-13 00:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * utils/hbdoc/genpdf.prg
+    utils/hbdoc/genrtf.prg
+    utils/hbdoc/hbdoc.prg
+    ! renamed harbour string to xharbour
+  * source/odbc/sql.ch
+    * Added some new defined
+  * source/odbc/odbc.c
+    + SETNUMLEN() function
+  * source/odbc/todbc.prg
+    ! Changed method Loaddata to return the proper type on field buffer(numeric)
+  - doc/genhtm.rsp
+  - doc/genhtm.lnk
+    ! removed old docs makefiles
+  + doc/xharbour.lnk
+  + doc/xharbour.rsp
+    ! added new xharbour response files for hbdoc
+  * doc/genhtm.bat
+    ! minor update
 
 2003-10-13 02:03 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/hbapirdd.h
