@@ -1,5 +1,5 @@
 /*
- * $Id: dates.c,v 1.5 2004/02/14 21:01:16 andijahja Exp $
+ * $Id: dates.c,v 1.6 2004/08/06 12:05:22 druzus Exp $
  */
 
 /*
@@ -78,12 +78,18 @@
 #include "hbapi.h"
 #include "hbdate.h"
 
+#ifdef HB_C52_STRICT
+   #define HB_DATE_YEAR_LIMIT    2999
+#else
+   #define HB_DATE_YEAR_LIMIT    9999
+#endif
+
 LONG HB_EXPORT hb_dateEncode( LONG lYear, LONG lMonth, LONG lDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateEncode(%ld, %ld, %ld)", lYear, lMonth, lDay));
 
    /* Perform date validation */
-   if( lYear >= 1 && lYear <= 2999 &&
+   if( lYear >= 1 && lYear <= HB_DATE_YEAR_LIMIT &&
        lMonth >= 1 && lMonth <= 12 &&
        lDay >= 1 )
    {

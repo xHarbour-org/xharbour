@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3418 2004/09/09 11:48:37 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3419 2004/09/09 21:27:34 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-10 07:00 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/rtl/dates.c
+    ! Year in date encoder limited to 2999 when HB_C52_STRICT is defined,
+      otherwise 9999
 
 2004-09-09 23:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/val.c
@@ -20,7 +25,7 @@
   * xharbour/config/w32/watcom.cf
     * reverted C_USR change I did. It was not working
   * xharbour/source/rtl/gtwvt/wvtutil.c
-    * added an #ifdef __WATCOMC__ 
+    * added an #ifdef __WATCOMC__
 
 2004-09-08 18:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
