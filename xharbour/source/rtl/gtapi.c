@@ -201,7 +201,7 @@ static SHORT        ct_ClearB  = ' ';  // Windows Clear Char
         // but we cannot not all platform/character set uses 255 as blank char
 
 static SHORT        ct_ShadowA = -1;   // Windows Shadow Attribute
-static UINT         ct_CSize   = 2;    // Windows Buffer One Char Size
+static UINT         ct_CSize   = 0;    // Windows Buffer One Char Size
 
 static void hb_ctInit( void );
 static void hb_ctExit( void );
@@ -221,8 +221,6 @@ static void hb_ctWSDisp( HB_CT_WND * wnd );
 /****************************************************************************/
 void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
 {
-//   SHORT iTmpRow, iTmpCol;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_gtInit()"));
 
    hb_gt_gobjects = NULL;
@@ -240,8 +238,6 @@ void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
 
    hb_gtSetColorStr( hb_set.HB_SET_COLOR );
 
-//   iTmpRow = s_iRow = hb_gt_Row();
-//   iTmpCol = s_iCol = hb_gt_Col();
    s_iRow = hb_gt_Row();
    s_iCol = hb_gt_Col();
    s_ScNone = FALSE;
@@ -251,9 +247,6 @@ void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
    s_Width = hb_gt_GetScreenWidth();
 
    hb_ctInit();
-
-   // Restores the "original" cursor position
-//   hb_gtSetPos( iTmpRow, iTmpCol );
 
    /* This should be called after s_iRow/s_iCol initialization. */
    hb_gtSetCursor( SC_NORMAL );
@@ -374,123 +367,126 @@ USHORT HB_EXPORT hb_gtBox( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
 
    szBox[ tmp ] = '\0';
 
-   if( Bottom < ct_UFRow ) Bottom = ct_ULRow + 1;
-   if( Right  < ct_UFCol ) Right  = ct_ULCol + 1;
-
-   byAttr = s_pColor[ s_uiColorIndex ];
-
-   FRow = HB_MAX( Top,    ct_UFRow );
-   FCol = HB_MAX( Left,   ct_UFCol );
-   LRow = HB_MIN( Bottom, ct_ULRow );
-   LCol = HB_MIN( Right,  ct_ULCol );
-
-   if( LRow > FRow && LCol > FCol )                     // Box
+   if( s_Width > 1 )                        // CT3 version
    {
-      FRow = HB_MAX( Top + 1,    ct_UFRow );
-      FCol = HB_MAX( Left + 1,   ct_UFCol );
-      LRow = HB_MIN( Bottom - 1, ct_ULRow );
-      LCol = HB_MIN( Right - 1,  ct_ULCol );
+      if( Bottom < ct_UFRow ) Bottom = ct_ULRow + 1;
+      if( Right  < ct_UFCol ) Right  = ct_ULCol + 1;
 
-      if( Top >= ct_UFRow && Top <= ct_ULRow &&
-          Left >= ct_UFCol && Left <= ct_ULCol )    /* Top left corner */
-      {
-         hb_gt_Replicate( Top, Left, byAttr, szBox[ 0 ], 1 );
-         Ret = 0;
-      }
+      byAttr = s_pColor[ s_uiColorIndex ];
 
-      if( Top >= ct_UFRow && Top <= ct_ULRow && FCol <= LCol &&
-          FCol >= ct_UFCol && LCol <= ct_ULCol )    /* Top Line */
-      {
-         Ret = hb_gt_HorizLine( Top, FCol, LCol, szBox[ 1 ], byAttr );
-      }
+      FRow = HB_MAX( Top,    ct_UFRow );
+      FCol = HB_MAX( Left,   ct_UFCol );
+      LRow = HB_MIN( Bottom, ct_ULRow );
+      LCol = HB_MIN( Right,  ct_ULCol );
 
-      if( Top >= ct_UFRow && Top <= ct_ULRow &&
-          Right >= ct_UFCol && Right <= ct_ULCol )  /* Top right corner */
+      if( LRow > FRow && LCol > FCol )                     // Box
       {
-         hb_gt_Replicate( Top, Right, byAttr, szBox[ 2 ], 1 );
-         Ret = 0;
-      }
+         FRow = HB_MAX( Top + 1,    ct_UFRow );
+         FCol = HB_MAX( Left + 1,   ct_UFCol );
+         LRow = HB_MIN( Bottom - 1, ct_ULRow );
+         LCol = HB_MIN( Right - 1,  ct_ULCol );
 
-      if( FRow >= ct_UFRow && LRow <= ct_ULRow && FRow <= LRow &&
-          Right >= ct_UFCol && Right <= ct_ULCol )  /* Right Line */
-      {
-         Ret = hb_gt_VertLine( Right, FRow, LRow, szBox[ 3 ], byAttr );
-      }
-
-      if( Bottom >= ct_UFRow && Bottom <= ct_ULRow &&
-          Right >= ct_UFCol && Right <= ct_ULCol )  /* Bottom right corner */
-      {
-         hb_gt_Replicate( Bottom, Right, byAttr, szBox[ 4 ], 1 );
-         Ret = 0;
-      }
-
-      if( Bottom >= ct_UFRow && Bottom <= ct_ULRow && FCol <= LCol &&
-          FCol >= ct_UFCol && LCol <= ct_ULCol )    /* Bottom Line */
-      {
-         Ret = hb_gt_HorizLine( Bottom, FCol, LCol, szBox[ 5 ], byAttr );
-      }
-
-      if( Bottom >= ct_UFRow && Bottom <= ct_ULRow &&
-          Left >= ct_UFCol && Left <= ct_ULCol )    /* Bottom left corner */
-      {
-         hb_gt_Replicate( Bottom, Left, byAttr, szBox[ 6 ], 1 );
-         Ret = 0;
-      }
-
-      if( FRow >= ct_UFRow && LRow <= ct_ULRow && FRow <= LRow &&
-          Left >= ct_UFCol && Left <= ct_ULCol )    /* Left Line */
-      {
-         Ret = hb_gt_VertLine( Left, FRow, LRow, szBox[ 7 ], byAttr );
-      }
-
-      if( FRow <= LRow && FCol <= LCol && szBox[ 8 ] )
-      {
-         for( tmp = FRow; tmp <= LRow; tmp++ )      /* Fill box */
+         if( Top >= ct_UFRow && Top <= ct_ULRow &&
+             Left >= ct_UFCol && Left <= ct_ULCol )    /* Top left corner */
          {
-            hb_gt_Replicate( tmp, FCol, byAttr, szBox[ 8 ],
-                             LCol - FCol + 1 );
+            hb_gt_Replicate( Top, Left, byAttr, szBox[ 0 ], 1 );
             Ret = 0;
          }
-      }
 
-   }
-   else if( LRow > FRow && LCol == FCol )             // Vertical Line
-   {
-      if( FRow >= ct_UFRow && LRow <= ct_ULRow &&
-          FCol >= ct_UFCol && FCol <= ct_ULCol )
-      {
-         Ret = hb_gt_VertLine( FCol, FRow, LRow, szBox[ 3 ], byAttr );
-      }
-   }
-   else if( LRow == FRow && LCol >= FCol )     // Horizontal Line or Point
-   {
-      if( FRow >= ct_UFRow && FRow <= ct_ULRow &&
-          FCol >= ct_UFCol && LCol <= ct_ULCol )
-      {
-         Ret = hb_gt_HorizLine( FRow, FCol, LCol, szBox[ 1 ], byAttr );
-      }
-   }
+         if( Top >= ct_UFRow && Top <= ct_ULRow && FCol <= LCol &&
+             FCol >= ct_UFCol && LCol <= ct_ULCol )    /* Top Line */
+         {
+            Ret = hb_gt_HorizLine( Top, FCol, LCol, szBox[ 1 ], byAttr );
+         }
 
-/* //--- Old version ----//
-   if( Top != Bottom )
-   {
-      if( Left != Right )
+         if( Top >= ct_UFRow && Top <= ct_ULRow &&
+             Right >= ct_UFCol && Right <= ct_ULCol )  /* Top right corner */
+         {
+            hb_gt_Replicate( Top, Right, byAttr, szBox[ 2 ], 1 );
+            Ret = 0;
+         }
+
+         if( FRow >= ct_UFRow && LRow <= ct_ULRow && FRow <= LRow &&
+             Right >= ct_UFCol && Right <= ct_ULCol )  /* Right Line */
+         {
+            Ret = hb_gt_VertLine( Right, FRow, LRow, szBox[ 3 ], byAttr );
+         }
+
+         if( Bottom >= ct_UFRow && Bottom <= ct_ULRow &&
+             Right >= ct_UFCol && Right <= ct_ULCol )  /* Bottom right corner */
+         {
+            hb_gt_Replicate( Bottom, Right, byAttr, szBox[ 4 ], 1 );
+            Ret = 0;
+         }
+
+         if( Bottom >= ct_UFRow && Bottom <= ct_ULRow && FCol <= LCol &&
+             FCol >= ct_UFCol && LCol <= ct_ULCol )    /* Bottom Line */
+         {
+            Ret = hb_gt_HorizLine( Bottom, FCol, LCol, szBox[ 5 ], byAttr );
+         }
+
+         if( Bottom >= ct_UFRow && Bottom <= ct_ULRow &&
+             Left >= ct_UFCol && Left <= ct_ULCol )    /* Bottom left corner */
+         {
+            hb_gt_Replicate( Bottom, Left, byAttr, szBox[ 6 ], 1 );
+            Ret = 0;
+         }
+
+         if( FRow >= ct_UFRow && LRow <= ct_ULRow && FRow <= LRow &&
+             Left >= ct_UFCol && Left <= ct_ULCol )    /* Left Line */
+         {
+            Ret = hb_gt_VertLine( Left, FRow, LRow, szBox[ 7 ], byAttr );
+         }
+
+         if( FRow <= LRow && FCol <= LCol && szBox[ 8 ] )
+         {
+            for( tmp = FRow; tmp <= LRow; tmp++ )      /* Fill box */
+            {
+               hb_gt_Replicate( tmp, FCol, byAttr, szBox[ 8 ],
+                                LCol - FCol + 1 );
+               Ret = 0;
+            }
+         }
+
+      }
+      else if( LRow > FRow && LCol == FCol )             // Vertical Line
       {
-         Ret = hb_gt_Box( Top, Left, Bottom, Right, szBox,
-                          ( BYTE ) s_pColor[ s_uiColorIndex ] );
+         if( FRow >= ct_UFRow && LRow <= ct_ULRow &&
+             FCol >= ct_UFCol && FCol <= ct_ULCol )
+         {
+            Ret = hb_gt_VertLine( FCol, FRow, LRow, szBox[ 3 ], byAttr );
+         }
+      }
+      else if( LRow == FRow && LCol >= FCol )     // Horizontal Line or Point
+      {
+         if( FRow >= ct_UFRow && FRow <= ct_ULRow &&
+             FCol >= ct_UFCol && LCol <= ct_ULCol )
+         {
+            Ret = hb_gt_HorizLine( FRow, FCol, LCol, szBox[ 1 ], byAttr );
+         }
+      }
+   }
+   else                                     //--- Old GT version ----//
+   {
+      if( Top != Bottom )
+      {
+         if( Left != Right )
+         {
+            Ret = hb_gt_Box( Top, Left, Bottom, Right, szBox,
+                             ( BYTE ) s_pColor[ s_uiColorIndex ] );
+         }
+         else
+         {
+            Ret = hb_gt_VertLine( Left, Top, Bottom, szBox[ 3 ],
+                                  ( BYTE ) s_pColor[ s_uiColorIndex ] );
+         }
       }
       else
       {
-         Ret = hb_gt_VertLine( Left, Top, Bottom, szBox[ 3 ],
-                               ( BYTE ) s_pColor[ s_uiColorIndex ] );
+         Ret = hb_gt_HorizLine( Top, Left, Right, szBox[ 1 ],
+                                ( BYTE ) s_pColor[ s_uiColorIndex ] );
       }
    }
-   else
-   {
-      Ret = hb_gt_HorizLine( Top, Left, Right, szBox[ 1 ],
-                             ( BYTE ) s_pColor[ s_uiColorIndex ] );
-   }
-*/
 
    if( Ret == 0 )
    {
@@ -1076,7 +1072,7 @@ USHORT HB_EXPORT hb_gtSetPos( SHORT iRow, SHORT iCol )
    iCol += ct_UFCol;
 
    /* Validate the new cursor position */
-   if( ct_WNCol<= 0 ||
+   if( s_Width <= 0 ||
        ( ( iRow >= ct_WFRow && iRow <= ct_ULRow &&
            iCol >= ct_UFCol && iCol <= ct_ULCol ) &&
          ( ct_NCur == 0 ||
@@ -1117,7 +1113,7 @@ USHORT HB_EXPORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMethod )
    iCol += ct_UFCol;
 
    /* Validate the new cursor position */
-   if( ct_WNCol<= 0 ||
+   if( s_Width <= 0 ||
        ( ( iRow >= ct_WFRow && iRow <= ct_ULRow &&
            iCol >= ct_UFCol && iCol <= ct_ULCol ) &&
          ( ct_NCur == 0 ||
@@ -1187,17 +1183,20 @@ USHORT HB_EXPORT hb_gtRepChar( USHORT uiRow, USHORT uiCol, BYTE byChar,
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtRepChar(%hu, %hu, %d, %hu)", uiRow, uiCol, (int) byChar, uiCount));
 
-   uiRow += ct_UFRow;
-   uiCol += ct_UFCol;
-
-   if( uiRow < ct_WFRow ) uiRow = ct_WFRow;
-   if( uiRow > ct_ULRow ) uiRow = ct_ULRow;
-   if( uiCol < ct_UFCol ) uiCol = ct_UFCol;
-   if( uiCol > ct_ULCol ) uiCol = ct_ULCol;
-
-   if( uiCount > ( ct_ULRow - uiRow ) * ct_WNCol + ct_ULCol - uiCol + 1 )
+   if( s_Width > 1 )
    {
-      uiCount = ( ct_ULRow - uiRow ) * ct_WNCol + ct_ULCol - uiCol + 1;
+      uiRow += ct_UFRow;
+      uiCol += ct_UFCol;
+
+      if( uiRow < ct_WFRow ) uiRow = ct_WFRow;
+      if( uiRow > ct_ULRow ) uiRow = ct_ULRow;
+      if( uiCol < ct_UFCol ) uiCol = ct_UFCol;
+      if( uiCol > ct_ULCol ) uiCol = ct_ULCol;
+
+      if( uiCount > ( ct_ULRow - uiRow ) * ct_WNCol + ct_ULCol - uiCol + 1 )
+      {
+         uiCount = ( ct_ULRow - uiRow ) * ct_WNCol + ct_ULCol - uiCol + 1;
+      }
    }
 
    hb_gt_Replicate( uiRow, uiCol, ( BYTE ) s_pColor[ s_uiColorIndex ],
@@ -1278,6 +1277,16 @@ USHORT HB_EXPORT hb_gtSetMode( USHORT uiRows, USHORT uiCols )
    {
       s_Height = uiRows;
       s_Width  = uiCols;
+
+      ct_BLRow = ct_WLRow = ct_ULRow = HB_MAX( 0, s_Height - 1 );
+      ct_BLCol = ct_WLCol = ct_ULCol = HB_MAX( 0, s_Width - 1 );
+
+      if( ct_WCur != NULL )
+      {
+         ct_WCur->BLRow = ct_WCur->WLRow = ct_WCur->ULRow = ct_BLRow;
+         ct_WCur->BLCol = ct_WCur->WLCol = ct_WCur->ULCol = ct_BLCol;
+      }
+
       return 0;
    }
 
@@ -1305,7 +1314,7 @@ USHORT HB_EXPORT hb_gtWrite( BYTE * pStr, ULONG ulLength )
    HB_TRACE(HB_TR_DEBUG, ("hb_gtWrite(%p, %lu)", pStr, ulLength));
 
    /* Display the text if the cursor is on screen */
-   if( ct_WNCol <= 0 ||
+   if( s_Width <= 0 ||
        ( s_iRow >= ct_WFRow && s_iRow <= ct_ULRow &&
          s_iCol >= ct_UFCol && s_iCol <= ct_ULCol ) )
    {
@@ -1362,7 +1371,7 @@ USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr,
    uiCol += ct_UFCol;
 
    /* Display the text if the cursor is on screen */
-   if( ct_WNCol <= 0 ||
+   if( s_Width <= 0 ||
        ( uiRow >= ct_WFRow && uiRow <= ct_ULRow &&
          uiCol >= ct_UFCol && uiCol <= ct_ULCol ) )
    {
@@ -1380,7 +1389,7 @@ USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr,
 
       /* Truncate the text if the cursor will end up off the right edge */
       hb_gt_Puts( uiRow, uiCol, ( BYTE ) s_pColor[ s_uiColorIndex ], pStr,
-                  ct_WNCol > 0 ?
+                  s_Width > 0 ?
                     HB_MIN( ulLength, ( ULONG ) ( ct_ULCol - uiCol + 1 ) ):
                     ulLength);
 
@@ -1398,7 +1407,7 @@ USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr,
                           HB_GT_SET_POS_AFTER );
 
       /* Test End of line */
-      if ( ct_WNCol > 0 && s_iCol > ct_ULCol )
+      if ( s_Width > 1 && s_iCol > ct_ULCol )
       {
          if ( s_iRow < ct_ULRow )
             hb_gtSetPosContext( s_iRow - ct_UFRow + 1, 0, HB_GT_SET_POS_AFTER );
@@ -2067,8 +2076,10 @@ static void hb_ctInit( void )
 
       ct_BFRow = 0;
       ct_BFCol = 0;
-      ct_BLRow = HB_MAX( s_Height - 1, 0 );
-      ct_BLCol = HB_MAX( s_Width - 1, 0 );
+      ct_BLRow = HB_MAX( 0, s_Height - 1 );
+      ct_BLCol = HB_MAX( 0, s_Width - 1 );
+
+      if( ct_CSize < 2 || ct_BLCol < 1 ) ct_CSize = 0;
 
       ct_WNRow = -1;
       ct_WNCol = -1;
@@ -2133,7 +2144,7 @@ static void hb_ctSARest( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
    SHORT FRow2, FCol2, LRow2, LCol2, iRow, iCol;
    ULONG uiAddr2;
 
-   if( uiAddr == NULL ) return;
+   if( uiAddr == NULL || ct_CSize < 2 ) return;
 
    FRow2 = HB_MAX( FRow, ct_BFRow );
    FCol2 = HB_MAX( FCol, ct_BFCol );
@@ -2164,6 +2175,8 @@ static void hb_ctSCSave( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
 {
    SHORT FRow2, FCol2, LRow2, LCol2, iRow;
    ULONG uiAddr2;
+
+   if( ct_CSize < 2 ) return;
 
    if( *uiAddr == NULL )
    {
@@ -2205,7 +2218,7 @@ static void hb_ctSCRest( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
    SHORT FRow2, FCol2, LRow2, LCol2, iRow;
    ULONG uiAddr2;
 
-   if( uiAddr == NULL ) return;
+   if( uiAddr == NULL || ct_CSize < 2 ) return;
 
    if( FRow >= ct_BFRow && FCol >= ct_BFCol &&
        LRow <= ct_BLRow && LCol <= ct_BLCol)
@@ -2239,7 +2252,7 @@ SHORT HB_EXPORT hb_ctShadow( SHORT iTop, SHORT iLeft, SHORT iBottom,
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_ctShadow(%d, %d, %d, %d, %d)", iTop, iLeft, iBottom, iRight, (int) byAttr));
 
-   if( iBottom < ct_BFRow || iRight < ct_BFCol ) return 0;
+   if( iBottom < ct_BFRow || iRight < ct_BFCol || ct_CSize < 2 ) return 0;
 
    iLeft += 2;
    ++iBottom;
@@ -2596,6 +2609,8 @@ SHORT HB_EXPORT hb_ctWMove( SHORT FRow, SHORT FCol )
 
    if( FRow != ct_WFRow || FCol != ct_WFCol )
    {
+      hb_gtDispBegin();
+
       hb_ctWFSave( ct_WCur );
       hb_ctWBRest( ct_WCur );
 
@@ -2617,6 +2632,8 @@ SHORT HB_EXPORT hb_ctWMove( SHORT FRow, SHORT FCol )
       hb_ctWSDisp( ct_WCur );
 
       hb_gtSetPos( iRow, iCol );
+
+      hb_gtDispEnd();
    }
 
    return ct_NCur;
@@ -2653,20 +2670,12 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
       FCol -= i; LCol -= i;
    }
 
-   if( FRow < ct_BFRow )
-   {
-      FRow = ct_BFRow;
-   }
+   FRow = HB_MAX( ct_BFRow, HB_MIN( FRow, ct_BLRow ) );
+   FCol = HB_MAX( ct_BFCol, HB_MIN( FCol, ct_BLCol ) );
+   LRow = HB_MAX( ct_BFRow, HB_MIN( LRow, ct_BLRow ) );
+   LCol = HB_MAX( ct_BFCol, HB_MIN( LCol, ct_BLCol ) );
 
-   if( FCol < ct_BFCol )
-   {
-      FCol = ct_BFCol;
-   }
-
-   if( LRow < FRow || LCol < FCol )
-   {
-      return -1;
-   }
+   if( LRow < FRow || LCol < FCol ) return -1;
 
    wnd = hb_ctWNew( FRow, FCol, LRow, LCol );
 
@@ -2896,7 +2905,7 @@ SHORT HB_EXPORT hb_ctWAClose( void )
          }
    }
 
-   ct_WCur           = NULL; // ct_Wind[ 0 ];
+   ct_WCur           = NULL;
    ct_NCur           = -1;
    ct_Stac[ 0 ]      = 0;
    ct_WMax = ct_SMax = 1;
