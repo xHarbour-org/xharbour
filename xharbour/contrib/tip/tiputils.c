@@ -4,13 +4,13 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tiputils.c,v 1.1 2003/12/01 00:19:40 jonnymind Exp $
+* $Id: tiputils.c,v 1.2 2003/12/01 03:41:03 ronpinkas Exp $
 ************************************************/
 
 #include "hbapi.h"
 #include <time.h>
 
-#ifdef _MSC_VER
+#if defined _MSC_VER || defined __BORLANDC__
    #include <windows.h>
 #endif
 
@@ -20,13 +20,18 @@
 
 HB_FUNC( TIP_TIMESTAMP )
 {
-   PHB_ITEM pDate = hb_param( 2, HB_IT_DATE );
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
    ULONG ulHour = hb_parl(2);
    int nLen;
    char szDate[9];
    struct tm tmTime;
 
-   char *szRet = (char *) hb_xgrab( 48 );
+   char *szRet = (char *) hb_xgrab( 180 );
+
+   if ( !ulHour )
+   {
+      ulHour = 0;
+   }
 
    #if defined( HB_OS_WIN_32 )
    if ( !pDate )
@@ -79,11 +84,11 @@ HB_FUNC( TIP_TIMESTAMP )
       tmTime.tm_sec = (ulHour % 60);
    }
 
-   nLen = strftime( szRet, 48, "%a, %d %b %Y %H:%M:%S %z", &tmTime );
-   if ( nLen < 48 )
+   nLen = strftime( szRet, 180, "%a, %d %b %Y %H:%M:%S %z", &tmTime );
+   if ( nLen < 180 )
    {
       szRet = (char *) hb_xrealloc( szRet, nLen + 1 );
-      hb_retclenAdopt( szRet, nLen );
    }
+   hb_retclenAdoptRaw( szRet, nLen );
 }
 

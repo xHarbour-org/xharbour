@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
+# $Id: makefile.bc,v 1.1 2003/02/22 21:26:52 jonnymind Exp $
 #
 
 #
@@ -14,7 +14,7 @@ ID = impdef
 #       I'll leave it to TASM until a better solution is found
 AS = tasm
 
-TARGET_EXE=tiptest.exe
+TARGET_EXE=$(TARGET).exe
 
 BIN_DIR = ..\..\..\bin
 OBJ_DIR = obj
@@ -23,6 +23,7 @@ LIB_DIR = ..\..\..\lib
 COMMON_LIB   = $(LIB_DIR)\common.lib
 DBFCDX_LIB   = $(LIB_DIR)\dbfcdx.lib
 DBFNTX_LIB   = $(LIB_DIR)\dbfntx.lib
+DBFDBT_LIB   = $(LIB_DIR)\dbfdbt.lib
 DEBUG_LIB    = $(LIB_DIR)\debug.lib
 LANG_LIB     = $(LIB_DIR)\lang.lib
 MACRO_LIB    = $(LIB_DIR)\macro.lib
@@ -31,8 +32,8 @@ PP_LIB       = $(LIB_DIR)\pp.lib
 RDD_LIB      = $(LIB_DIR)\rdd.lib
 RTL_LIB      = $(LIB_DIR)\rtl.lib
 VM_LIB       = $(LIB_DIR)\vm.lib
-GTWIN_LIB    = $(LIB_DIR)\gtwin.lib
-HBTIP_LIB   = ..\hbtip.lib
+GTWIN_LIB    = $(LIB_DIR)\gtcgi.lib
+HBTIP_LIB    = $(LIB_DIR)\hbtip.lib
 HB_GT_LIB    = $(GTWIN_LIB)
 
 
@@ -55,7 +56,7 @@ LDFLAGS        = $(LDFLAGS)
 
 
 TARGET_OBJS=\
-   $(OBJ_DIR)\tiptest.obj\
+   $(OBJ_DIR)\$(TARGET).obj\
 
 all: $(TARGET_EXE)
 
@@ -63,7 +64,7 @@ $(TARGET_EXE) : $(TARGET_OBJS)
    echo. $(CFLAGS)  > make.tmp
    echo. -M -e$(TARGET_EXE) >> make.tmp
    echo. -I$(INCLUDE_DIR) >> make.tmp
-   echo. $(OBJ_DIR)\tiptest.obj >> make.tmp
+   echo. $(OBJ_DIR)\$(TARGET).obj >> make.tmp
    echo. $(PP_LIB) >> make.tmp
    echo. $(COMMON_LIB) >> make.tmp
    echo. $(VM_LIB) >> make.tmp
@@ -74,12 +75,13 @@ $(TARGET_EXE) : $(TARGET_OBJS)
    echo. $(MACRO_LIB) >> make.tmp
    echo. $(DBFNTX_LIB) >> make.tmp
    echo. $(DBFCDX_LIB) >> make.tmp
+   echo. $(DBFDBT_LIB) >> make.tmp
    echo. $(HBTIP_LIB) >> make.tmp
    $(CC) @make.tmp
    del make.tmp
 
-$(OBJ_DIR)\tiptest.c: tiptest.prg
+$(OBJ_DIR)\$(TARGET).c: $(TARGET).prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\tiptest.obj: $(OBJ_DIR)\tiptest.c
+$(OBJ_DIR)\$(TARGET).obj: $(OBJ_DIR)\$(TARGET).c
    $(CC) -u -c $(CLIBFLAGS) -o$@ $**

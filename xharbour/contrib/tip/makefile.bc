@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.4 2003/09/25 17:42:43 paultucker Exp $
+# $Id: makefile.bc,v 1.5 2003/12/01 03:44:07 ronpinkas Exp $
 #
 
 #
@@ -14,9 +14,14 @@ ID = impdef
 #       I'll leave it to TASM until a better solution is found
 AS = tasm
 
+SRC_DIR = .
 BIN_DIR = ..\..\bin
 LIB_DIR = ..\..\lib\b32
 OBJ_DIR = obj\b32
+
+.path.prg = .
+.path.c   = $(OBJ_DIR);$(SRC_DIR)
+.path.obj = $(OBJ_DIR)
 
 #
 # Directory macros. These should never have to change.
@@ -42,7 +47,12 @@ HBTIP_OBJS=\
    $(OBJ_DIR)\tipclient.obj\
    $(OBJ_DIR)\tipclientsmtp.obj\
    $(OBJ_DIR)\tipcredentials.obj\
+   $(OBJ_DIR)\tipencoder.obj\
+   $(OBJ_DIR)\tipencoderbase64.obj\
+   $(OBJ_DIR)\tipencoderqp.obj\
+   $(OBJ_DIR)\tipencoderurl.obj\
    $(OBJ_DIR)\tipurl.obj\
+   $(OBJ_DIR)\tipmail.obj\
    $(OBJ_DIR)\tiputils.obj\
 
 all: $(HBTIP_LIB)
@@ -54,57 +64,10 @@ CLEAN:
 
 $(HBTIP_LIB): $(HBTIP_OBJS)
 
-
-$(OBJ_DIR)\tipclientftp.c: tipclientftp.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\tipclienthttp.c: tipclienthttp.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\tipclientpop.c: tipclientpop.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\tipclientsmtp.c: tipclientsmtp.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\tipclient.c: tipclient.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\tipcredentials.c: tipcredentials.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(OBJ_DIR)\tipurl.c: tipurl.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-
-$(OBJ_DIR)\tipclientftp.obj: $(OBJ_DIR)\tipclientftp.c
+.c.obj:
    $(CC) -u -c $(CLIBFLAGS) -o$@ $**
    tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\tipclienthttp.obj: $(OBJ_DIR)\tipclienthttp.c
-   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
-   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
+.prg.c:
+  $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\tipclientpop.obj: $(OBJ_DIR)\tipclientpop.c
-   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
-   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
-
-$(OBJ_DIR)\tipclientsmtp.obj: $(OBJ_DIR)\tipclientsmtp.c
-   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
-   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
-
-$(OBJ_DIR)\tipclient.obj: $(OBJ_DIR)\tipclient.c
-   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
-   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
-
-$(OBJ_DIR)\tipcredentials.obj: $(OBJ_DIR)\tipcredentials.c
-   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
-   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
-
-$(OBJ_DIR)\tipurl.obj: $(OBJ_DIR)\tipurl.c
-   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
-   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
-
-$(OBJ_DIR)\tiputils.obj: $(OBJ_DIR)\tiputils.c
-   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
-   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
