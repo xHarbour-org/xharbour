@@ -1015,4 +1015,44 @@ HB_FUNC ( GETCURRENTTHREADID )
    hb_retnl( (DWORD) GetCurrentThreadId() );
 }
 
+//---------------------------------------------------------------------//
+//
+//   typedef struct { ;
+//       DWORD    dwLowDateTime;
+//       DWORD    dwHighDateTime;
+//   } FILETIME
+//
+//
+//   typedef struct { ;
+//       WORD     wYear ;
+//       WORD     wMonth ;
+//       WORD     wDayOfWeek ;
+//       WORD     wDay ;
+//       WORD     wHour ;
+//       WORD     wMinute ;
+//       WORD     wSecond ;
+//       WORD     wMilliSeconds ;
+//   } SYSTEMTIME
+//
+//
+HB_FUNC ( FILETIMETOSYSTEMTIME )
+{
+   FILETIME   *FileTime  = ( FILETIME *) hb_param( 1, HB_IT_STRING )->item.asString.value ;
+   SYSTEMTIME SystemTime ;
+	
+   if ( FileTimeToSystemTime( FileTime, &SystemTime ) )
+   {
+      hb_retl( TRUE ) ;
+      
+	   if ( ISBYREF( 2 ) )
+	   {
+	      hb_storclen( ( char * ) &SystemTime , sizeof( SYSTEMTIME ), 2 ) ; 
+	   }
+	}      
+   else
+      hb_retl( FALSE ) ;
+}
+
+//---------------------------------------------------------------------//
+
 
