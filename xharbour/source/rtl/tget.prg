@@ -536,7 +536,7 @@ METHOD Untransform( cBuffer ) CLASS Get
       cBuffer := StrTran( cBuffer, "(", "" )
       cBuffer := StrTran( cBuffer, ")", "" )
 
-      cBuffer := StrTran( cBuffer, " ", "" ) // It replace left, right
+      cBuffer := StrTran( cBuffer, " ", "" ) // It replace left, right 
                                              // and medium spaces.
                                              // Don't replace for Alltrim()
 
