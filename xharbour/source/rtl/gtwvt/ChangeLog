@@ -1,0 +1,900 @@
+/*
+   WVT Terminal Driver Specific ChangeLog
+   Compiled from ChangeLog entries of main repositry : 03 May 04 Pritpal Bedi <pritpal@vouchcac.com>
+*/
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+
+2004-04-30 17:15 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rtl/gtwvt/gtwvt.c
+    * added casts for OpenWatcom
+
+2004-04-30 17:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/include/hbgtwvt.h
+    + #define WVT_FONTS_MAX  20
+    + #define WVT_PENS_MAX   20
+    + HFONT hUserFonts[ WVT_FONTS_MAX ]
+    + HPEN  hUserPens[ WVT_PENS_MAX ]
+      Array to hold user defined fonts and pens. The objects thus held are
+      released automatically when application terminates.
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * Wvt_LoadPicture( nSlot, cImageFile )
+      Reversed the parameter order for generic compatibality with other such functionality.
+
+    * hb_wvt_gtDrawImage()
+    * hb_wvt_gtRenderPicture()
+      A big bug fixed which was causing Resource leak which was crashing the  application
+      on OS which had low resource profiles such as Win9x family.
+
+    + Wvt_LoadFont( nSlot, cFontFace, nHeight, nWidth, nWeight, lItalic, ;
+                    lUnderline, lStrikeout,nCharSet, nQuality, nEscapement )
+      Creates the font with requested attributes and stores the handle
+      in _s.hUserFont[ iSlot ( nSlot - 1 ) ]
+
+    + Wvt_LoadPen( nSlot, nStyle, nThick, nRGBColor )
+      As above.
+
+    + Wvt_DrawLabelEx(  nRow, nCol, cLabel, nAlign, nTextColor, nBkColor, nSlot )
+      Just like Wvt_DrawLabel() but with reduced parameters substituting <nSlot>
+      for all parameters related with font used. This way the need to recreate
+      the same font over and over is eliminated.
+
+    + Wvt_DrawLineEx( nTop, nLeft, nBottom, nRight, nOrient, nFormat, nAlign, nSlotPen )
+      Similar to Wvt_DrawLine() but substituting pen parameter with <nSlotPen>.
+
+    + Wvt_DrawOutlineEx( nTop, nLeft, nBottom, nRight, nSlotPen )
+      Similar to Wvt_DrawOutline() but substituting pen parameter with <nSlotPen>.
+
+  * xharbour/tests/wvtgui.prg
+    Updated to demonstrate the mechanism achieved with above functions.
+
+  /*
+     It is a common practice with every application to have common pens and fonts
+     for a variety of purposes. So, to speedup the refresh time, AND, more importantly,
+     to prevent GDI resources to be exhausted ( Win9x systems ), this mechanism has
+     facilitated superbly. Hope you all will find it useful.
+
+     With the above update I have achieved the complete stability of my applications
+     on all versions on Windows.
+  */
+
+2004-04-26 20:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/include/hbgtwvt.h
+    + #define WVT_PICTURES_MAX  20
+    + IPicture _s.iPicture[ WVT_PICTURES_MAX ]
+      Array to hold image stream loaded by hb_wvt_gtLoadPicture().
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + hb_wvt_gtLoadPicture()
+    + hb_wvt_gtRenderPicture()
+    + Wvt_LoadPicture( cImageFile, nSlot )
+    + Wvt_DrawPicture( nTop, nLeft, nBottom, nRight, aAdjPixels )
+      hb_wvt_gtDrawImage() code is broken in two section, 1) to load image,
+      and 2) render image. The image thus loaded is retained in _s.iPicture[ iSlot ]
+      array slot and rendered when required.
+
+    * Wvt_DrawImage()
+    * Wvt_DrawButton()
+      Now both these functions accept <cImage/nImageSlot> as its respective parameter.
+
+  * xharbour/tests/wvtgui.prg
+    Updated to demonstrate the mechanism achieved with above functions.
+
+  /*
+     It is a common practice with every application to have common buttons and images
+     for a variety of dialogs. So, to speedup the refresh time, AND, more importantly,
+     to prevent GDI resources to be exhausted ( Win9x systems ), this mechanism has
+     facilitated superbly. Hope you all will find it useful.
+  */
+
+2004-04-26 16:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! remove __XCC__ defines
+
+2004-04-26 07:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! add definition of IDC_HAND to allow compilation when WINVER < 0x0500
+
+2004-04-25 12:55 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_CreatePopupMenu()
+      Returns handle to the newly created popup menu. The menu thus created can be populated
+      with prompts and submenus through Wvt_AppendMenu().
+
+    + Wvt_SetPopupMenu()
+      Returns or sets the context menu available through K_RBUTTONDN (See Below). In no menu
+      handle is passed, NULL is assigned to _s.hPopup.
+
+    * hb_wvt_gtMouseEvent()
+      case WM_RBUTTONUP:
+        if ( _s.hPopup )
+        {
+           GetCursorPos( &xy );
+           lPopupRet = TrackPopupMenu( _s.hPopup, TPM_CENTERALIGN + TPM_RETURNCMD, xy.x, xy.y, 0, hWnd, NULL );
+           if ( lPopupRet )
+           {
+              hb_wvt_gtAddCharToInputQueue( lPopupRet );
+           }
+          return;
+        }
+        else
+        {
+          keyCode = K_RBUTTONUP;
+          break;
+        }
+
+      Adjusted to invoke the popup menu set through Wvt_SetPopupMenu(), and if found NULL, the event
+      is passed to the user to process. The LONG value returned by TrackPopupMenu() which is the third
+      parameter passed with Wvt_AppendMenu(), when a prompted is clicked, is posted to keyboard buffer
+      which can be retrieved with Inkey() function.
+
+  * xharbour/include/hbgtwvt.h
+    + HMENU _s.hPopup member to the GLOBAL_DATA _s to hold the last menu assigned though Wvt_SetPopupMenu().
+
+  * xharbour/tests/wvtgui.prg
+    Updated to demonstrate the usage of Context menu with each screen available in the application.
+    Just right-click anywhere on the screen and select an option.
+
+  + include/wvtwin.ch
+    To hold the Gtwvt specific constants:
+    1) Constants to define Button Formats - Wvt_DrawButton().
+    2) Constants to define Line Formats - Wvt_DrawLine()
+    3) Menu Manipulation Constants. ( WinUser.h - Decimal Notation )
+    4) Mouse Pointer Shape constants. ( WinUser.h - Changed to Ordinal Position )
+
+  * The Usage:
+
+    #include "wvtwin.ch"
+    //-----------------------//
+    Function Main()
+    local hPopup := Wvt_SetPopupMenu() // Clears the slot and returns back any previous assigned menu.
+    local hMenu, nKey
+
+    hMenu := DefinePopup()
+    Wvt_SetPopupMenu( hMenu )
+
+    // During the execution of this code K_RBUTTONUP will invoke the Popup and will post the keycode
+    // assigened to the menu prompt.
+
+    nKey := inkey( 0, INKEY_ALL )
+    if nKey == 299301
+       // Do Something
+    endif
+
+    Wvt_SetPopupMenu( hPopup )         // Restores the previous menu handle
+    Return nil
+
+    //-----------------------//
+
+    Static Function DefinePopup()
+    Local hMenu, hMenu1
+
+    hMenu := Wvt_CreatePopupMenu()
+    Wvt_AppendMenu( hMenu, MF_ENABLED + MF_PROMPT, 299301, 'Do Something' )
+
+    return hMenu
+
+    //-----------------------//
+
+    /*
+    This way we can simulate any inkey code we desire and can act according to that.
+    */
+
+2004-04-24 15:14 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
+  - tests/wvtgui.ch
+  + include/wvtgui.ch
+    * moved into include folder as per Pritpal request that want to
+      extend and use as default commands set for gtwvt
+
+2004-04-23 13:05 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * Formatting for recent changes.
+
+    + Wvt_setPointer( nPointer )
+      Set the mouse pointer shape to predefined mouse pointer which are in the
+      range of 1-15. 1-12 are usable on all win versions whereas 13-15 are for
+      winver > 4. To know what 1-15 constants means, please examine the gtwvt.c,
+      at per now I have not found a suitable .ch file to place them ( someone to
+      point ? ).
+
+      Also please note that if you set pointer through it, all windows running as
+      WVT windows will have the same pointer shape within them. So use it with care.
+
+2004-04-15 03:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! modification to enable compilation under LCC
+      <http://www.cs.virginia.edu/~lcc-win32/>
+
+2004-04-14 16:25 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rtl/gtwvt/gtwvt.c
+    * added an hack to manage K_CTRL_RETURN
+    * fixed support of keystrokes like Ctrl+Shift+F1 as suggested by Budyanto Dj.
+
+2004-04-06 05:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! remmed unused variable: iScanCode in line 1983
+
+2004-03-31 11:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * Wvt_Paint() now receives no parameters. nTop,nLeft,nBottom,nRight are shifted to
+      _s.rowStart, _s.rowStop, _s.colStart, _s.colStop. The necessary changes are
+      made to hb_wvt_gtWndProc() function.
+    + Wvt_GetPaintRect() -> { nTop,nLeft,nBottom,nRight }
+      It can be called if the rectangle to repaint needs to be known in Wvt_Paint().
+
+      This enhancement has decreased the window refreshtime marginally.
+
+2004-03-31 16:52 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+    - remove debug printf() & some redundant commented code
+
+2004-03-29 15:54 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+    - Posted correct file re previous post
+
+2004-03-29 12:15 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+    - fix handling of Scroll Lock key
+
+2004-03-16 23:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! optimized by removing usage of hb_itemNew(NULL)
+
+2004-03-16 20:20 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * Reveresed changes made on 15Mar04. MSVC was not accepting thee.
+
+2004-03-15 22:40 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * Replaced GetDC( hWnd )/ReleaseDC( hDC ) with _s.hdc where applicable, has decresed the
+      screen refresh time with some percent.
+
+2004-03-10 11:24 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * Corrected typo.
+
+2004-03-10 16:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * Wvt_Paint() at .prg level now received <nTop>, <nLeft>, <nBottom>, <nRight> coordinates of the screen
+      being repainted instead of <hWindowHandle>. This seems to be more logical as it is now easier
+      in the hands of the programmer to know whoch graphic objects need be painted again.
+
+2004-03-09 06:12 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * fixed bound check on Wvt_GetRGBColor
+      (Thanks to Budyanto Dj.)
+
+2004-02-15 21:12 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
+  * source/rtl/gtwvt/gtwvt.c
+    + GTINFO compliancy.
+
+2004-02-16 19:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! fixes for compilation under Borland CPP with -DHB_MULTI_GT
+
+2004-02-15 20:13 UTC+0100 Giancarlo Niccolai <gc@niccolai.ws>
+  * source/rtl/gtwvt/gtwvt.c
+    ! Some errors in returning latest mouse wheel defines
+
+2004-02-13 16:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! code clean-up ( mostly, consistent declaration of variable type to be
+      compared with passed parameter)
+
+2004-02-08 03:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    * remmed unused variables
+
+2004-02-08 01:13 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/include/inkey.ch
+    + #define K_MBUTTONDOWN           1008   // Middle Button Down
+    + #define K_MBUTTONUP             1009   // Middle Button Up
+    + #define K_MDBLCLK               1010   // Middle Button Double Click
+    + #define K_MMLEFTDOWN            1011   // Mouse Move Left Down
+    + #define K_MMRIGHTDOWN           1012   // Mouse Move Right Down
+    + #define K_MMMIDDLEDOWN          1013   // Mouse Move Middle Down
+    + #define K_MWFORWARD             1014   // Mouse Wheel Forward
+    + #define K_MWBACKWARD            1015   // Mouse Wheel Backward
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    ! Updated to support above Inkey() constants.
+
+2004-02-06 19:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtwvt/gtwin.h
+    + Added OS clipboard support.
+
+2004-02-03 14:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbgtwvt.h
+    * Rearranged headers inclusion.
+
+  * source/rtl/gtwvt/gtwvt.c
+    * Corrected few NULL to 0 and removed unused variable.
+
+2004-02-03 21:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_ChooseColor( nRGBInit, aRGB16, nFlags )
+    + Wvt_ChooseFont( cFontName, nHeight, nWidth, nWeight, nQuality, lItalic, lUnderline, lStrikeOut )
+    + Wvt_SetMousePos( nRow, nCol )
+      Forces the mouse pointer to rest at the nRow, nCol, in the mid of top and bottom of nRow.
+
+  * xharbour/include/hbgtwvt.h
+    + #include <commdlg.h>
+
+  * xhatbour/tests/wvtgui.prg
+    * Updated to demonstrate above functions.
+
+2004-01-26 14:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_Minimize()
+      Minimizes the application window. Useful when application is engaged in 
+      long uninterrupted tasks.
+
+    + Wvt_Maximize()
+      Maximizes, I mean, restores to normal position the previously minimized
+      application window.
+     
+    + Wvt_SetOnTop()
+      Forces the application window to be as the TOPMOST window. Useful when a 
+      compulsory input is required, or, where developer wants that no other window
+      is allowed to operlap application window.
+
+    + Wvt_SetAsNormal()
+      Restores windows TOPMOST attributes to normal. It is default, maens, any other
+      window on the Desktop can be brought in focus overlapping application window.
+
+    + Wvt_SaveScreen( nTop, nLeft, nBottom, nRight )
+      Saves the designated rectangle in an array with three elelments, viz., 
+      { nWidth, nHeight, hBitmap }. The bitmap image of the rectanle is retained
+      in memory until Wvt_RestScreen() is called. So it is important that 
+      Wvt_RestScreen() must be called when current program returns.
+
+    + Wvt_RestScreen( nTop, nLeft, nBottom, nRight, aSavedScreen )
+      Flushes the bitmap referenced in <aSavedScreen> onto the designated rectangle.
+      This function must be called after Wvt_SaveScreen() just not to exhaust 
+      GDI resources of Windows.
+
+    ! Wvt_DrawLine( nTop, nLeft, nBottom, nRight, nOrientation, nFormat, nAlign, ;
+                                                       nStyle, nThick, nRgbColor )
+      Line drawing has been made more user friendly.
+
+    ! Formatting and logocal ordering of functions.
+
+  * xharbour/tests/wvtgui.prg
+    Enhanced to demonstrate above functions. A beautiful ststus bar is added. And much more.
+
+    /*   Francesco, will you please update above functionality to wvtgui.ch and wvt.prg?   */
+
+
+2004-01-25 15:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+   * makefile.bc
+   * makefile.vc
+   * makefile.nt
+     * synchronise, slight re-ording
+   * source\rtl\gtwvt\gtwvt.c
+     * casts
+
+2004-01-25 16:05 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * Makefile.bc
+    + Added gtgraph support
+
+  * source/rtl/gtwvt/gtwvt.c
+    + Added support for gtgraph
+
+2004-01-20 03:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/tests/wvtgui.prg
+    ! Updated to ( still under heavy changes ) reflect the Wvt_DrawButton()
+      functionality. First two buttons are functional. Just move the
+      mouse over them, try to keep left button pressed and release them,
+      inside the button as well as outside.
+    + Few small .ico files to demonstrate the button usage.
+
+      The push button functionality is under changes and some functionality may change.
+
+2004-01-20 02:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_DrawButton( nTop, nLeft, nBottom, nRight, cText, cImage, nFormat, ;
+                      nTextColor, nBkColor, nImageAt )
+      Draws a push button with/or text/image and animates with mouse movements and
+      responds to mouse clicks.
+    + hb_wvt_gtMouseEvent()
+      Moved the code to handle mouse events from ever growing loop of hb_wvt_gtWndProc().
+
+    + hb_wvt_gtDrawBoxRecessed()
+    + hb_wvt_ftDrawBoxRaised()
+    + hb_vt_gtDrawOutline()
+      The code in its counterpart functions WVT_Draw...() has beed bifurcated.
+
+    ! Formatted.
+
+  * xharbour/include/hbgtwvt.h
+    + BOOL HB_EXPORT hb_wvt_gtDrawBoxRaised( int iTop, int iLeft, int iBottom, int iRight );
+    + BOOL HB_EXPORT hb_wvt_gtDrawBoxRecessed( int iTop, int iLeft, int iBottom, int iRight );
+    + BOOL HB_EXPORT hb_wvt_gtDrawOutline( int iTop, int iLeft, int iBottom, int iRight );
+
+    + One more member to GLOBAL_DATA _s.pSymWVT_MOUSE to handle the mouse events callback
+      function WVT_Mouse() at application level.
+
+2004-01-17 23:39 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * WVT_SETCLIPBOARD - Fixed lenght of string stored in clipboard
+
+2004-01-17 22:50 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    + Added clipboard functions
+      WVT_GETCLIPBOARD, WVT_SETCLIPBOARD, WVT_PASTEFROMCLIPBOARD
+  + tests/wvt.prg
+    + Added clipboard prg related functions
+      WVT_PasteFromClipboard(), WVT_CopyToClipboard()
+  + tests/wvtguie.prg
+    * Added keys for clipboard
+
+  /*
+    Now we can use clipboard!
+    Actually it is a simple method:
+    assign
+    SetKey( K_CTRL_C, {|| WVT_CopyToClipboard() } )
+    SetKey( K_CTRL_V, {|| WVT_PasteFromClipboard() } )
+
+    then a simple idea, when copy to clipboard I copy the entire
+    oGet:buffer, instead when paste I send the clipboard to
+    keyboard buffer but only if there is an active Get
+    This permit to me to don't think to selection at the moment.
+
+    To build these prgs use:
+    bldtest /wvt wvtguie wvt
+  */
+
+2004-01-17 03:30 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    + Changed function name *Pallete to *Palette
+  + tests/wvtgui.ch
+    + Added WVT preprocessor commands
+  + tests/wvt.prg
+    + Added functions to serve preprocessor commands
+  + tests/wvtguie.prg
+    * Rewrote wvtgui.prg using the new commands
+
+  /*
+    If ppl working on WVT accepts this news i'll move wvtgui.ch to include folder
+    and wvt.prg in source/rtl/gtwvt
+
+    To build these prgs use:
+    bldtest /wvt wvtguie wvt
+  */
+
+2004-01-16 11:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+     - WVT_SETFONT()/hb_wvt_gtSetFont() change so parameter fontWidth can be < 0
+        if fontWidth is < 0 then the width of character is forced and tm.tmAveCharWidth is not used
+        Allow precise control over width of characters but if abused will produce weird display
+
+2004-01-15 17:50 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+   * source/include/hbgtwvt.h
+     * fix include for OpenWatcom 1.2
+   * source/rtl/gtwvt/gtwvt.c
+     * fix K_CTRL_A-Z management
+
+2004-01-15 20:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + WVT_GETPALLETE() -> aRGBColors
+    + WVT_SETPALLETE( aRGBColors )
+    Retuens and set the new pallete values.
+
+  * xharbour/tests/wvtgui.prg
+    Enhanced to demonstrate the usage of Wvt_GetPallete() and Wvt_SetPallete().
+
+  /* Few  hours back I had made this entry but is not found now */
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    ! Formatted.
+    * Changed the sequence of some functions to their respective groups.
+
+2004-01-15 01:11 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    + Added WVT_GETRGBCOLOR that returns the correspondant RBG value of
+      a color ( i.e. use WVT_GetRGBColor( hb_ColorToN( "W" ) ) )
+  * tests/gtclose.prg
+    * Fixed typo
+
+2004-01-15 13:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+     - redo hb_stack with HB_VM_STACK overwritten
+     - remove
+        WVT_SETCLOSEEVENT(nEventNumber)
+        WVT_SETSHUTDOWNEVENT(nEventNumber)
+        Use new xHarbour wide functions
+  * /include/hbgtwvt.h
+     - remove redundant shutdownEvent & closeEvent defines and variables
+
+2004-01-15 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/file.c
+  * source/rtl/gtwvt/gtwvt.c
+    * castings for MSVC
+
+2004-01-15 11:21 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+     - replace hb_stack with HB_VM_STACK
+
+2004-01-15 10:47 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * Fix typo's in previous changelog
+
+2004-01-15 10:44 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+    + Fix translation of CTRL-A-Z to inkey.ch value of K_CTRL_A-Z
+
+    + added functions for creating and managing menus
+        WVT_CREATEMENU() -> nMenuHandle
+        WVT_SETMENU(nMenuHandle)
+        WVT_APPENDMENU(nMenuHandle, nMenuType, nMenuIdentifier, cMenuCaption)
+        WVT_DELETEMENU(nMenuHandle, nPosition, nDeleteMethod )
+        WVT_DESTROYMENU(nMenuHandle )
+        WVT_ENABLEMENUITEM(nMenuHandle, nItemId, nMethod)
+        WVT_GETLASTMENUEVENT() -> Identifier for last menu event
+        WVT_SETMENUKEYEVENT(nEventToReturnForMenuEvents ) ( Default ==1024 )
+
+    + added other useful utility functions
+        WVT_GETSCREENWIDTH() -> Return screen width in pixels
+        WVT_GETSCREENHEIGHT() -> return screen height in pixels
+        WVT_SETCLOSEEVENT(nEventNumber) -> set a K_ value to return if 'X' clicked or WM_CLOSE is received
+                                        need to add handler with SetKey(K_CLOSE, { || CloseHandler() }
+                                        The default behaviour is to return HB_BREAK_FLAG
+        WVT_SETSHUTDOWNEVENT(nEventNumber) -> event to return for WM_SHUTDOWN message
+                                        need to add handler with SetKey(K_SHUTDOWN, { || ShutdownHandler() }
+        WVT_SETWINDOWCENTRE( .T. or .F.) -> Tells WVT whether to create window centred
+        WVT_SETALTF4CLOSE( .T. or .F. ) -> Allow Alt+F4 to issue WM_CLOSE
+        WVT_PROCESSMESSAGES() -> Call WVT's event loop
+        WVT_GETTITLE() -> Get the current window title
+
+2004-01-14 18:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     !  if ( !b_MouseEnable || !_s.MouseMove|| ( wParam == MK_LBUTTON ) || ( wParam == MK_RBUTTON ) )
+     changed to :
+        if ( !b_MouseEnable || !_s.MouseMove )
+
+2004-01-13 23:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/tests/wvtgui.prg
+     Enhanced . Simulated Push Buttons, but without event handelling.
+
+2004-01-13 16:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + Wvt_DrawGridHorz( nTop, nLeft, nRight, nRows )
+       Draws horizontal grid begining nTop through nTop + nRows with the
+       pen set with Wvt_SetPen()
+
+     + Wvt_DrawGridVert( nTop, nBottom, aCols, nCols )
+       Draws vertical grid begining aCols[ 1 ] through aCols[ n ] with the
+       pen set with Wvt_SetPen().
+
+   * xharbour/tests/wvtgui.prg
+     Enhanced . Press F5 repeatedly to bring GUI TBrowse in focus. It
+     exploits above two functions to draw hotizontal and vertical grid.
+
+   * xharbour/source/rtl/tbrowse.prg
+     + DATA aColumnsSep, an array to hold the nColumn where seperator is
+       displayed. This array is used to draw vertical grid of GUI Tbrowse above.
+
+2004-01-12 22:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * tests/wvtgui.PRG
+     * Generalized, optimized, and formated.
+
+2004-01-12 21:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  *include/hbgwvt.h
+   ! Add file ID
+
+2004-01-12 10:24 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+    + Handle K_CTRL_TAB
+
+2004-01-11 20:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! remove unwanted ; in line 3721
+
+2004-01-10 16:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + static void hb_wvt_gtCreateCaret()
+     + static void hb_wvt_gtKillCaret
+       The above functions are called in hb_wvt_gtSetFont() instead of
+       SendMessage( _s.hWnd, WM_KILLFOCUS, 0, 0 ) and
+       SendMessage( _s.hWnd, WM_SETFOCUS, 0, 0 )
+       because these messages were generating the recursive calls.
+
+     + Callback functions for Window messages WM_SETFOCUS and WM_KILLFOCUS are
+       activated as Wvt_SetFocus() and Wvt_KillFocus() at the PRG level.
+
+     ! Wvt_DrawBoxRaised(), Wvt_DrawBoxRecessed()
+       Fixed right-bottom corner values.
+
+   * xharbour/include/hbgtwvt.h
+     + Added members to GLOBAL_DATA _s : pSymWVT_SETFOCUS and pSymWVT_KILLFOCUS
+       to hold handle to PRG functions Wvt_SetFocus() and Wvt_KillFocus().
+
+   * xharbour/tests/wvtgui.prg
+     Amended to reflect Wvt_SetFocus() and Wvt_LostFocus() functionality.
+
+2004-01-10 16:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + New members in GLOBAL_DATA _s : currentPen, currentBrush
+
+     + Wvt_SetPen( nPenStyle, nWidth, nColor )
+       Sets the _s.currentPen with handle to Pen created with above parameters.
+
+     + Wvt_SetBrush( nBrushStyle, nColor, [ nHatch ] )
+       Sets the _s.currentBrush with handle to Brush created with above parameters.
+
+       _s.currentPen and _s.currentBrush will be used to draw following GUI elements.
+
+     + Wvt_DrawRectangle( nTop, nLeft, nBottom, nRight )
+       Rectangle thus drawan will be inside the above parameters.
+
+     + Wvt_DrawRoundRect( nTop, nLeft, nBottom, nRight, nPixelsRoundHeight, nPixelsRoundWidth )
+       Rectangle thus drawan will be inside the above parameters. The corners will be rounded
+       honouring  nPixelsRoundHeight, nPixelsRoundWidth.
+
+     + Wvt_DrawEllipse( nTop, nLeft, nBottom, nRight )
+       Draws a circle inside the above parameters.
+
+   * xharbour/include/hbgtwvt.h
+     + Members to GLOBAL_DATA _s : currentPen, currentBrush
+
+   * xharbour/tests/wvtgui.prg
+     * Enhanced to support new functions.
+
+2004-01-10 13:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + Wvt_DrawOutline( nTop, nLeft, nBottom, nRight )
+       Draws a one pixel black outline for given rectangle.
+     + Wvt_DrawLine( nTop, nLeft, nBottom, nRight )
+       This functions draws a horizontal line at the middle of ( nBottom - nTop + 1 ).
+     ! Wvt_DrawBoxGet()
+       Right and Bottom edged corrected.
+
+2004-01-08 14:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + Wvt_DrawBoxGroupRaised( nTop, nLeft, nBottom, nRight )
+     ! Wvt_SetMouseMove( lSetMove )
+       Now the function returns the previous state of mouse movement set flag.
+
+2004-01-07 15:10 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+   * source/rtl/gtwvt/gtwvt.c
+     * add HB_OS_WIN_32_USED and changed includes to fix mingw32/OpenWatcom compile
+
+2004-01-07 12:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     * Wvt_DrawBoxGet()
+       Optimized to use _s.hdc instead of GetDC()/ReleaseDC() calls.
+     * Added Some comments.
+
+     /*
+         The above three messages were deletd from the changeLog, reported by
+         Francessco. And as I do not know how to, I am adding them again.
+         Why these message deleted, I do not know.
+     */
+
+2004-01-08 14:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_DrawBoxGroupRaised( nTop, nLeft, nBottom, nRight )
+    ! Wvt_SetMouseMove( lSetMove )
+      Now the function returns the previous state of mouse movement set flag.
+
+2004-01-08 12:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * include/hbgtwvt.h
+    * update contents to == include/hbwvt.h
+  * include/hbwvt.h
+    - Delete file
+
+2004-01-07 21:29 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+   * tests/bldwvt.bat
+     * changed to save old HB_GT_LIB and CFLAGS state and
+       restore them on exit.
+
+2004-01-07 12:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/gtwvt/gtwvt.c
+    - Moved declaration definitions and #includes to new include/hbwvt.h
+    + Added HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void );
+  + include/hbwvt.h
+    + Moved declaration definitions and #includes to new include/hbwvt.h
+
+2004-01-08 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+    * remove "if ( attr != ' ' )" in hb_wvt_gtSetStringInTextBuffer()
+    * added error checking to hb_wvt_gtDrawImage()
+
+2004-01-07 22:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * Wvt_DrawLabel()
+      Optimized.
+
+2004-01-07 15:10 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rtl/gtwvt/gtwvt.c
+    * add HB_OS_WIN_32_USED and changed includes
+      to fix mingw32/OpenWatcom compile
+
+2004-01-07 12:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * Wvt_DrawBoxGet()
+      Optimized to use _s.hdc instead of GetDC()/ReleaseDC() calls.
+    * Added Some comments.
+
+2004-01-07 12:20 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + move hb_dynsymFind( "WVT_PAINT" ) call out of wndProc
+   + into GLOBAL_DATA/gt_hbInitStatics()
+
+2004-01-06 16:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * bin/bld.bat
+    * msvc support for gtwvt
+
+2004-01-07 02:34 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    * fixes for MSVC compilation
+
+2004-01-06 15:00 utc+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_GetFontInfo()
+      Returns the current font name,height,width,weight,quality.
+    + GUI primitive functions:
+      + Wvt_DrawBoxGet( nRow, nCol, nWidth )
+      + Wvt_DrawBoxRaised( nTop, nLeft, nBottom, nRight )
+      + Wvt_DrawBoxRecessed( nTop, nLeft, nBottom, nRight )
+      + Wvt_DrawBoxGroup( nTop, nLeft, nBottom, nRight )
+      + Wvt_DrawImage( nTop, nLefy, nBottom, nRight, cAnyGraphicFileName )
+      + Wvt_DrawLabel( nRow, nCol, cLabel, nAlign, nAngle, cTextColor, cBackColor, ;
+                       cFontFace, nFontHeight, nFontWidth, nFontWeight, nFontQuality, ;
+                       nCharSet, lItalic, lUnderline, lStrikeout )
+   + xharbour/tests/wvtgui.prg
+   + xharbour/tests/bldwvt.bat
+     * bldwvt wvtgui
+
+     /*
+        These area few GUI primitive functions and hope a lot more will come up.
+        I have handelled the focus change and restore through WVT_PAINT function
+        to be written in the application code which executes a series of code blocks
+        whenever a WM_PAINT message is received by the window.
+
+        I propose that WVT_PAINT, or something lik that, function be part of standard GT
+        which should in turn executes all code blocks put on a stack by the user. The
+        primary job of those code blocks will be to call GUI functions with appropriate
+        parameter.
+
+        This concept has been shown in tests/wvtgui.prg. This window console offers
+        immense possibilities to be explored and incorporated and hope that
+        everybody will contribute to what Peter Rees has made possible.
+     */
+
+2004-01-05 19:50 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * bin/bld.bat
+    * add -lgdi32 -lcomctl32 to mingw32 for gtwvt
+  * source/rtl/gtwvt/gtwvt.c
+    * add HB_OS_WIN_32_USED and changed includes order
+      to fix mingw32 warnings
+
+2004-01-05 09:12 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + remove if (attr!=' ') test from hb_wvt_gtSetColors()
+
+2004-01-03 21:41 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * Fixed colors BRIGHT_BLUE and BRIGHT_RED to be closest to clipper colors
+    + Added application name title
+
+2004-01-03 16:30 utc+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * More formatting.
+
+2004-01-03 15:00 utc+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * More formatting for easier grasping.
+    * More color compatibility with console.
+    + hb_wvt_gtSetIconFromFile( char *icon )
+    + Added Prg level functions to exploit wvt functionality ( REQUEST these in your main() ):
+      + Wvt_SetIcon( ncIcon )
+      + Wvt_SetFont( cFontName, nHeight, nWidth, nWeight, nQuality )
+      + Wvt_SetTitle( cTitle )
+      + Wvt_SetWindowPos( nX, nY )
+      + Wvt_GetWindowHandle()
+      + Wvt_SetCodePage( nCodePage )
+      + Wvt_CenterWindow( lCenter, lPaint )
+      + Wvt_SetMouseMove( lMove )
+
+	  These functions need be implemented at GT level but is only possible
+        when someone implements them in proper way. Till then only for WVT.
+
+        When changing the fonts I could not control the box characters.
+        Hopefully Peter may get it done.
+
+  * xharbour/include/hbgtwvt.h
+    + Added extern hb_wvt_gtSetIconFromFile( char *icon )
+
+2003-12-31 11:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + Handle K_ALT_1 - 0, K_ALT_A - Z  for all Keyboard mappings
+
+2003-12-31 09:37 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + removed redundant static BOOL lMouseDown, rMouseDown
+   + Made default to not activate System Menu when Alt key pressed on it's own
+
+2003-12-29 14:26 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + added K_LDBLCLK & K_RDBLCLK support
+   + Turn off K_MOUSEMOVE handling by default ( see hbgtwvt.h )
+  * include/hbgtwvt.h
+   + added extern BOOL HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent)
+   *     - allows mouse movement events to be handled
+
+2003-12-26 22:46 utc+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * More formatting to make it more readable,
+    * Colors made 100% compatible with console window.
+    * K_MOUSEMOVE functionality added.
+
+2003-12-24  02:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * MSVC fixes
+
+2003-12-23 23:48 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/w32/mingw32.cf
+    * grouped xHarbour libraries to resolve problem with cyclic cross
+      referenced and gdi32, comctl32 libs added for linking with GTWVT
+
+2003-12-23 17:50 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtwvt/gtwvt.c
+    ! Fixed color values to be more DOS-like
+
+2003-12-23 21:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * source/rtl/gtwvt/gtwvt.c
+     * #define WHITE RGB( 0xC6, 0xC6, oxC6 )
+       White color more near to terminal screen.
+     * Formatting to make it more tangible to new comers.
+
+2003-12-23 15:51 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/gtwvt/gtwvt.c
+  + Fix handling of K_LBUTTONUP & K_RBUTTONUP
+
+2003-12-23 07:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    * modify castings on hb_hInstance and hb_hPrevInstance for MSVC.
+
+2003-12-22 15:00 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * bin/bld.bat
+  * config/w32/watcom.cf
+    * gtwvt needs comctl32.lib
+
+2003-12-22 15:07 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * fixed HB_GT_FUNC(gt_SetAttribute( )) so hb_shadow() works correctly
+
+2003-12-22 14:25 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * moved /source/rtl/gtwvt/gtwvt.h to /include/hbgtwvt.h
+  + added version no/Id line to gtwvt.c & hbgtwvt.h
+  + Changed "Peter Rose" to "Peter Rees" in this Changelog :-)
+
+2003-12-22 07:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * source/rtl/gtwvt/gtwvt.c
+     * fixed compilation under MSVC
+
+2003-12-22 00:30 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * makefile.bc
+  * makefile.vc
+  * makefile.nt
+    * updated for new GTWVT written by Peter Rees  (great job Peter)
+      /*
+      for ppl who want test it set:
+      HB_GT_LIB=gtwvt
+      CFLAGS=-W   (plus other flags already present)
+      then you can compile tests with bldtest.bat in tests folder
+      */
+
+2003-12-21 22:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * casting for OpenWatcom (and probably other C++) compilation.
+
+2003-12-22 08:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  + added source/rtl/gtwvt gtwvt.c gtwvt.h
+  * new Windows colsole mode gt system
+
